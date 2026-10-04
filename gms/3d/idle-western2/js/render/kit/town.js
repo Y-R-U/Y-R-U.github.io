@@ -16,12 +16,13 @@ const HAT_TOP = (b) => {
 export function buildTown(kit, data, field, pal) {
   const ST = data.STREET, FR = data.FRONTS || [], END = ST.end ?? ST.x1 - 18;
   const CELL = 56, X0 = ST.x0 - 160;
-  const cells = new Map(), gcells = new Map();
-  // three bands: north lots (n), the street and its edges (m), Pomfrey's side (s) — cards hide s when it would occlude.
-  const band = (z) => (z < ST.north ? 'n' : z < ST.south + 0.2 ? 'm' : 's');
+  const cells = new Map();
+  // R5 draw trim: two bands — north lots + street (nm) and Pomfrey's side (s, cards hide it when it would occlude);
+  // ground pebbles/tufts share their cell's chunk (same uber material), so a cell is one draw.
+  const band = (z) => (z < ST.south + 0.2 ? 'nm' : 's');
   const cellKey = (x, z) => Math.floor((x - X0) / CELL) + ':' + band(z);
   const B = (x, z = 0) => { const k = cellKey(x, z); if (!cells.has(k)) cells.set(k, kit.builder(pal, { seed: 100 + cells.size * 31 })); return cells.get(k); };
-  const G = (x = 0, z = 0) => { const k = cellKey(x, z); if (!gcells.has(k)) gcells.set(k, kit.builder(pal, { seed: 500 + gcells.size * 7 })); return gcells.get(k); };
+  const G = B;
   const far = kit.builder(pal, { seed: 999 });
   const bulbs = kit.builder(pal, { seed: 777 });
   const signs = kit.signs.batch();
@@ -194,6 +195,7 @@ export function buildTown(kit, data, field, pal) {
     const x = XA - 70 + r() * (XB - XA + 160), z = -120 + r() * 250;
     if (busy(x, z)) continue;
     const near = Math.abs(z - rz) < 70 && x > XA - 40 && x < XB + 40;
+    if (!near && i % 5 < 2) continue; // R5 vertex headroom: the far desert is mostly fogged silhouettes
     const b = near ? B(x, z) : far, y = Math.min(0, field.height(x, z)) - 0.05;
     const k = r();
     if (k < 0.3) W.cactus(b, x, z, { y, s: 0.8 + r() * 0.7, arms: Math.floor(r() * 4), flower: r() < 0.15 });
@@ -216,14 +218,13 @@ export function buildTown(kit, data, field, pal) {
   // userData.cell = { x0, x1, band } lets world.prepare cull by x-range/band for cards and drop far shadow casters.
   const tag = (m, k) => { const [ix, bd] = k.split(':'); m.userData.cell = { x0: X0 + +ix * CELL, x1: X0 + (+ix + 1) * CELL, band: bd }; return m; };
   const chunks = [...cells.entries()].map(([k, b]) => { const m = b.finish(); m.name = 'town:' + k; return tag(m, k); });
-  const ground = [...gcells.entries()].map(([k, b]) => { const m = b.finish({ cast: false }); m.name = 'ground:' + k; return tag(m, k); });
   const farMesh = far.finish({ cast: false });
   const bulbMesh = bulbs.finish({ cast: false });
   bulbMesh.name = 'town:bulbs';
   farMesh.name = 'town:far';
-  const rows = [...cells.values(), ...gcells.values()].flatMap((b) => b.contacts);
+  const rows = [...cells.values()].flatMap((b) => b.contacts);
   for (const b of cells.values()) lamps.push(...b.lamps);
-  const out = [...chunks, ...ground, farMesh, bulbMesh];
+  const out = [...chunks, farMesh, bulbMesh];
   if (rows.length) out.push(contactMesh(kit.materials, rows));
   const sm = signs.finish({ name: 'town:signs' });
   if (sm) out.push(sm);

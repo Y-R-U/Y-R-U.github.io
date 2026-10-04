@@ -34,7 +34,7 @@ void main() {
 }`;
 
 const COMPOSITE = `uniform sampler2D tScene, tS1, tS2; varying vec2 vUv;
-uniform float uBloom, uTh, uKnee, uTilt, uFocus, uBand, uFeather, uSharp; uniform vec2 uTexel;
+uniform float uBloom, uWide, uTh, uKnee, uTilt, uFocus, uBand, uFeather, uSharp; uniform vec2 uTexel;
 ${SHARP}
 float lum(vec3 c) { return max(c.r, max(c.g, c.b)); }
 void main() {
@@ -42,7 +42,7 @@ void main() {
   vec3 s1 = texture2D(tS1, vUv).rgb, s2 = texture2D(tS2, vUv).rgb;
   float t = smoothstep(uBand, uBand + uFeather, abs(vUv.y - uFocus)) * uTilt;
   c = mix(c, mix(s1, s2, t * 0.35), t);
-  c += (s1 * smoothstep(uTh, uTh + uKnee, lum(s1)) * 0.6 + s2 * smoothstep(uTh, uTh + uKnee, lum(s2)) * 0.9) * uBloom;
+  c += (s1 * smoothstep(uTh, uTh + uKnee, lum(s1)) * 0.6 + s2 * smoothstep(uTh, uTh + uKnee, lum(s2)) * 0.9 * uWide) * uBloom;
   gl_FragColor = vec4(c, 1.0);
   #include <tonemapping_fragment>
   #include <colorspace_fragment>
@@ -69,7 +69,7 @@ export function createPost() {
   const blur = mat(BLUR, { tSrc: { value: null }, uDir: { value: new THREE.Vector2() } });
   const U = (v) => ({ value: v });
   const comp = mat(COMPOSITE, {
-    tScene: U(null), tS1: U(null), tS2: U(null), uSharp: U(0), uTexel: U(new THREE.Vector2()), uBloom: U(0), uTh: U(1), uKnee: U(0.5), uTilt: U(0), uFocus: U(0.5), uBand: U(0.2), uFeather: U(0.3),
+    tScene: U(null), tS1: U(null), tS2: U(null), uSharp: U(0), uTexel: U(new THREE.Vector2()), uBloom: U(0), uWide: U(1), uTh: U(1), uKnee: U(0.5), uTilt: U(0), uFocus: U(0.5), uBand: U(0.2), uFeather: U(0.3),
   }, true);
   const resolve = mat(RESOLVE, { tScene: U(null), uTexel: U(new THREE.Vector2()), uSharp: U(0) }, true);
   let rts = null, key = '', last = null;
@@ -145,6 +145,7 @@ export function createPost() {
       u.uSharp.value = sharpen;
       u.uTexel.value.set(1 / v.pw, 1 / v.ph);
       u.uBloom.value = bloom ? bloom.strength ?? 0.35 : 0;
+      u.uWide.value = bloom?.wide ?? 1;
       u.uTh.value = bloom?.threshold ?? 0.85;
       u.uKnee.value = bloom?.knee ?? 0.5;
       u.uTilt.value = tilt ? tilt.strength ?? 0.8 : 0;

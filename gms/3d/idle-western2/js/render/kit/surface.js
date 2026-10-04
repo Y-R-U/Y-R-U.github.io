@@ -164,6 +164,24 @@ if (vSurf > 0.04 && vSurf < 0.235) {
     diffuseColor.rgb = dc * sh;
     sfAO = sh;
   }
+} else if (vSurf > 0.265 && vSurf < 0.295) {
+  // R5 wood: grain streaks along the part's long axis, board seams across it, the odd knot; end grain stays plain
+  vec3 ax = vSurf < 0.275 ? vec3(1.0, 0.0, 0.0) : vSurf < 0.285 ? vec3(0.0, 1.0, 0.0) : vec3(0.0, 0.0, 1.0);
+  float endg = abs(dot(sfWN, ax));
+  vec3 cr = cross(sfWN, ax);
+  cr = dot(cr, cr) > 1e-4 ? normalize(cr) : vec3(0.0, 0.0, 1.0);
+  float along = dot(vWP, ax), across = dot(vWP, cr);
+  float fade = (1.0 - smoothstep(0.35, 1.0, fwidth(across * 18.0))) * (1.0 - smoothstep(0.7, 0.9, endg));
+  float bu = across / 0.23, fb = fract(bu), jit = sfHash(vec2(floor(bu), floor(along / 1.9 + sfHash(vec2(floor(bu), 2.0)) * 3.0)));
+  float seam = smoothstep(0.0, 0.07, fb) * smoothstep(0.0, 0.07, 1.0 - fb);
+  float w = sfNoise(vec2(along * 0.9, across * 4.0)) * 1.6;
+  float streak = 0.5 + 0.5 * sin(across * 95.0 + w * 5.0 + jit * 9.0);
+  float fine = sfNoise(vec2(along * 2.2, across * 140.0));
+  float knot = smoothstep(0.86, 0.94, sfNoise(vec2(along * 1.7, across * 7.0) + jit * 13.0));
+  float sh = (0.8 + 0.2 * seam) * (0.88 + 0.22 * jit) * (0.9 + 0.08 * streak + 0.1 * fine) * (1.0 - 0.3 * knot);
+  sh = mix(0.96, sh, fade);
+  diffuseColor.rgb *= sh * mix(vec3(1.0), vec3(1.05, 0.98, 0.9), (jit - 0.5) * fade);
+  sfAO = sh;
 } else if (vSurf > 0.32 && vSurf < 0.48 && sfWN.y > 0.2) {
   vec2 tg = normalize(vec2(-sfWN.z, sfWN.x) + 1e-5);
   float cy = vWP.y / 0.24, along = dot(vWP.xz, tg) / 0.3;

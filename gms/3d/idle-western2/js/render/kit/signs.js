@@ -115,11 +115,12 @@ function signMaterial(shared, map) {
   m.onBeforeCompile = (sh) => {
     for (const k of ['uBounce', 'uLamps', 'uLampCol', 'uLampK']) sh.uniforms[k] = shared[k];
     sh.uniforms.uRim = shared.uRim;
+    sh.uniforms.uSunDir = shared.uSunDir;
     sh.vertexShader = sh.vertexShader
       .replace('#include <common>', '#include <common>\nvarying vec3 vWP;\nvarying vec3 vWN;')
       .replace('#include <project_vertex>', WORLD_POS_VERT);
     sh.fragmentShader = sh.fragmentShader
-      .replace('#include <common>', '#include <common>\nvarying vec3 vWP;\nvarying vec3 vWN;\nuniform vec3 uRim;\n' + WORLD_LIGHT_HEAD)
+      .replace('#include <common>', '#include <common>\nvarying vec3 vWP;\nvarying vec3 vWN;\nuniform vec3 uRim;\nuniform vec3 uSunDir;\n' + WORLD_LIGHT_HEAD)
       .replace('#include <opaque_fragment>', `${RIM_FRAG}\n${WORLD_LIGHT_FRAG}\n#include <opaque_fragment>`);
   };
   m.customProgramCacheKey = () => 'iw2-sign';

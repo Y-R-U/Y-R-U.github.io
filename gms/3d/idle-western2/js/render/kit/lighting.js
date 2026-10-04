@@ -101,12 +101,15 @@ void main() {
   c = mix(c, mix(uHor, uGround, 0.55), smoothstep(0.0, -0.08, y));
   float s = max(dot(d, uDiscDir), 0.0);
   float band = exp(-abs(y) * 9.0);
-  c += uSun * (pow(s, 4.0) * 0.22 + pow(s, 8.0) * 0.16 + pow(s, 60.0) * 0.32) * (1.0 - 0.75 * uNight) + uSun * band * pow(s, 2.0) * 0.16 * (1.0 - uNight);
+  c += uSun * (pow(s, 6.0) * 0.1 + pow(s, 16.0) * 0.14 + pow(s, 120.0) * 0.4) * (1.0 - 0.75 * uNight) + uSun * band * pow(s, 2.0) * 0.16 * (1.0 - uNight);
+  // R5 cloud bands: long horizontal streaks, sun-lit warm undersides, darker violet tops
   vec2 cp = d.xz / (y + 0.12);
-  float cl = smoothstep(0.55, 0.85, vn(cp * vec2(0.9, 3.2) + 7.0) * 0.65 + vn(cp * vec2(2.3, 7.0)) * 0.35) * smoothstep(0.02, 0.12, y) * (1.0 - smoothstep(0.45, 0.8, y));
-  vec3 cc = mix(uMid * 1.08, uSun * 0.9 + uHor * 0.35, pow(s, 3.0)) * (1.0 - 0.55 * uNight);
-  c = mix(c, cc, cl * 0.55);
-  float dr = mix(0.042, 0.052, uNight);
+  float n1 = vn(cp * vec2(0.55, 3.6) + 7.0) * 0.65 + vn(cp * vec2(1.6, 9.0)) * 0.35;
+  float cl = smoothstep(0.5, 0.78, n1) * smoothstep(0.02, 0.1, y) * (1.0 - smoothstep(0.38, 0.75, y));
+  float under = smoothstep(0.5, 0.78, vn((cp + vec2(0.0, 0.05)) * vec2(0.55, 3.6) + 7.0) * 0.65 + vn((cp + vec2(0.0, 0.05)) * vec2(1.6, 9.0)) * 0.35);
+  vec3 cc = mix(mix(uTop, uMid, 0.55) * 0.92, uSun * 1.05 + uHor * 0.3, clamp(pow(s, 2.0) * 1.4 + (1.0 - under) * 0.35, 0.0, 1.0)) * (1.0 - 0.6 * uNight);
+  c = mix(c, cc, cl * (0.78 - 0.5 * uNight));
+  float dr = mix(0.03, 0.05, uNight);
   float disc = smoothstep(cos(dr), cos(dr * 0.86), s);
   if (uNight > 0.5) {
     c += uDisc * 0.05 * pow(s, 90.0) * uNight + uDisc * 0.02 * pow(s, 14.0) * uNight;
@@ -134,9 +137,10 @@ void main() {
         float fy = clamp(y / max(b.z, 1e-3), 0.0, 1.0);
         float side = smoothstep(-0.6, 0.6, sign(da) * sign(saz - b.x) * min(1.0, abs(da) / (b.y * 0.6)));
         vec3 rc = mix(uRockShade, uRockLit, side * (1.0 - 0.6 * uNight));
-        rc *= 1.0 - 0.12 * step(0.5, fract(fy * 5.0 + 0.3)) * step(fy, 0.82);
-        rc *= 0.82 + 0.18 * smoothstep(0.0, 0.9, fy);
-        float haze = layer < 0.5 ? 0.62 : layer < 1.5 ? 0.36 : 0.12;
+        rc *= 1.0 - 0.14 * step(0.5, fract(fy * 5.0 + 0.3)) * step(fy, 0.82);
+        rc *= 0.78 + 0.22 * smoothstep(0.0, 0.9, fy);
+        rc += uRockLit * 0.35 * smoothstep(top - b.z * 0.08, top, y) * (1.0 - uNight);
+        float haze = layer < 0.5 ? 0.46 : layer < 1.5 ? 0.22 : 0.06;
         haze = mix(haze, 1.0, smoothstep(0.02, -0.04, y) * 0.6);
         c = mix(rc, mix(uHor, uMid, 0.25 * smoothstep(0.0, 0.1, y)), haze);
       }
@@ -156,11 +160,11 @@ function buttes() {
   let a = 77;
   const r = () => { a = (a * 16807) % 2147483647; return a / 2147483647; };
   const out = [];
-  const lay = [[0, 10, 0.016, 0.012], [1, 9, 0.026, 0.018], [2, 7, 0.032, 0.022]];
+  const lay = [[0, 10, 0.018, 0.014], [1, 9, 0.03, 0.022], [2, 7, 0.042, 0.03]];
   for (const [L, n, h, hv] of lay) for (let i = 0; i < n; i++) {
     let az = -Math.PI + (i + 0.2 + r() * 0.6) * (2 * Math.PI / n) + L * 0.37;
-    // keep the golden sun disc (az ≈ −0.14) in a notch between buttes
-    if (Math.abs(az + 0.14) < 0.07) az += 0.16;
+    // keep the golden sun disc (az ≈ +0.12) in a notch between buttes
+    if (Math.abs(az - 0.12) < 0.08) az += 0.18;
     const w = (L === 0 ? 0.16 : L === 1 ? 0.09 : 0.06) * (0.6 + r() * 0.9);
     out.push(new THREE.Vector4(az, w, h + r() * hv, L + (r() < 0.3 ? 0.2 + r() * 0.5 : 0)));
   }
@@ -193,7 +197,7 @@ function createSky() {
       u.uRockLit.value.set(l.rock?.lit || '#c8724f'); u.uRockShade.value.set(l.rock?.shade || '#8a5468');
       u.uSun.value.set(l.sun.color).lerp(_c1.set('#fff0d0'), 0.2);
       const disc = l.disc || { az: l.sun.azimuth, el: l.sun.elevation };
-      u.uDisc.value.set(n > 0.6 ? '#fff3d6' : l.sun.color).multiplyScalar(n > 0.6 ? 1.6 : 3.2);
+      u.uDisc.value.set(n > 0.6 ? '#fff3d6' : '#ffe6a8').multiplyScalar(n > 0.6 ? 1.6 : 2.6);
       const az = disc.az * D2R, el = disc.el * D2R;
       u.uDiscDir.value.set(Math.cos(az) * Math.cos(el), Math.sin(el), Math.sin(az) * Math.cos(el));
     },

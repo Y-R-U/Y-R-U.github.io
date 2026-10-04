@@ -6,7 +6,7 @@ const _m = new THREE.Matrix4(), _q = new THREE.Quaternion(), _e = new THREE.Eule
 
 // Surface response per slot name; palettes may override with { c, r, m, g }.
 export const SLOT_PBR = {
-  glass: [0.08, 0.15, 0], window: [0.1, 0.1, -1], metal: [0.32, 0.75, 0], chrome: [0.18, 0.9, 0], gold: [0.25, 0.9, 0],
+  glass: [0.08, 0.15, 0], bottle: [0.1, 0.12, 0], iron: [0.3, 0.72, 0], brass: [0.28, 0.85, 0], window: [0.1, 0.1, -1], metal: [0.32, 0.75, 0], chrome: [0.18, 0.9, 0], gold: [0.25, 0.9, 0],
   neon: [0.5, 0, 1.6], bulb: [0.4, 0, 1.3], lamp: [0.4, 0, -1], paint: [0.45, 0.05, 0], car: [0.3, 0.1, 0], water: [0.1, 0, 0],
   tile: [0.7, 0, 0], ceramic: [0.3, 0, 0], plastic: [0.5, 0, 0], leaf: [0.85, 0, 0], foliage: [0.85, 0, 0],
 };
@@ -46,6 +46,7 @@ export function mergeParts(parts, { ao = 0.35, aoH = 0.9, speckle = 0.05, seed =
       else if (A) { pbr[o * 4] = A.getX(i); pbr[o * 4 + 1] = A.getY(i); pbr[o * 4 + 2] = A.getZ(i); pbr[o * 4 + 3] = 1; }
       else { pbr[o * 4] = 0.82; pbr[o * 4 + 3] = 1; }
       if (SF) pbr[o * 4 + 3] = SF.getX(i);
+      else if (p.surf === WOOD) { if (!pb?.[3]) pbr[o * 4 + 3] = p.wax ??= woodAxis(p.geo, p.m); }
       else if (p.surf != null) pbr[o * 4 + 3] = p.surf;
       if (N) {
         _v.fromBufferAttribute(N, i).applyMatrix3(_n3).normalize();
@@ -76,7 +77,22 @@ export const DIRT = (wet = 0) => -1 - Math.max(0, Math.min(1, wet));
 export const cobble = DIRT;
 export const SURF = { GRASS, ROOF, CLAP, PLANK, PLANKX, DIRT };
 const GRASS_SLOTS = new Set(['grass', 'grass2', 'lawn']);
-const AUTO_SURF = { plank: PLANK, plank2: PLANK, plank3: PLANK, road: DIRT(0), dirt: DIRT(0.15), rut: DIRT(0.5) };
+// R5 wood grain: 'W' resolves at merge time to WOOD_X/Y/Z (0.27/0.28/0.29) = the world axis of the part's long side.
+export const WOOD = 'W';
+const AUTO_SURF = { plank: PLANK, plank2: PLANK, plank3: PLANK, road: DIRT(0), dirt: DIRT(0.15), rut: DIRT(0.5), wood: WOOD, wood2: WOOD, woodDark: WOOD, raw: WOOD, door: WOOD, trunk: WOOD };
+const _bx = new THREE.Vector3(), _ax = new THREE.Vector3();
+function woodAxis(geo, m) {
+  if (!geo.boundingBox) geo.computeBoundingBox();
+  geo.boundingBox.getSize(_bx);
+  const e = m.elements;
+  let best = -1, bi = 0;
+  for (let i = 0; i < 3; i++) {
+    const L = Math.hypot(e[i * 4], e[i * 4 + 1], e[i * 4 + 2]) * _bx.getComponent(i);
+    if (L > best) { best = L; bi = i; }
+  }
+  _ax.set(Math.abs(e[bi * 4]), Math.abs(e[bi * 4 + 1]), Math.abs(e[bi * 4 + 2]));
+  return _ax.x >= _ax.y && _ax.x >= _ax.z ? 0.27 : _ax.y >= _ax.z ? 0.28 : 0.29;
+}
 
 const cache = new Map();
 const unit = (key, make) => { let g = cache.get(key); if (!g) { g = make(); cache.set(key, g); } return g; };

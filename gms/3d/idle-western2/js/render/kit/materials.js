@@ -26,9 +26,11 @@ const PBR_SWAY = `#include <begin_vertex>
 }`;
 
 // Soft toy sheen: a fresnel lift tinted by the sky/sun so silhouettes glow a little, like lit vinyl.
+// R5: the rim is strongest on the sun-facing silhouette (a backlit edge), faint on the shade side.
 export const RIM_FRAG = `{
   float fr = pow(1.0 - saturate(dot(geometryNormal, geometryViewDir)), 3.0);
-  outgoingLight += uRim * fr * (0.35 + 0.65 * diffuseColor.rgb);
+  float sside = 0.3 + 1.4 * max(dot(normalize(vWN), uSunDir), 0.0);
+  outgoingLight += uRim * fr * sside * (0.35 + 0.65 * diffuseColor.rgb);
 }`;
 
 // World-space light the three.js rig can't give cheaply: warm bounce off the paving onto low walls, and the nearest
@@ -76,7 +78,7 @@ function pbrPatch(mat, uniforms, key) {
       .replace('#include <color_vertex>', '#include <color_vertex>\nvPbr = aPbr.xyz;\nvSurf = aPbr.w;')
       .replace('#include <project_vertex>', WORLD_POS_VERT);
     sh.fragmentShader = sh.fragmentShader
-      .replace('#include <common>', '#include <common>\nvarying vec3 vPbr;\nvarying vec3 vWP;\nvarying vec3 vWN;\nuniform float uNight;\nuniform float uGlow;\nuniform vec3 uRim;\n' + WORLD_LIGHT_HEAD + SURF_HEAD)
+      .replace('#include <common>', '#include <common>\nvarying vec3 vPbr;\nvarying vec3 vWP;\nvarying vec3 vWN;\nuniform float uNight;\nuniform float uGlow;\nuniform vec3 uRim;\nuniform vec3 uSunDir;\n' + WORLD_LIGHT_HEAD + SURF_HEAD)
       .replace('#include <color_fragment>', '#include <color_fragment>\n' + SURF_COLOR)
       .replace('#include <normal_fragment_maps>', '#include <normal_fragment_maps>\n' + SURF_NORMAL)
       .replace('#include <roughnessmap_fragment>', 'float roughnessFactor = clamp(vPbr.x, 0.04, 1.0);\nif (sfR >= 0.0) roughnessFactor = sfR;')

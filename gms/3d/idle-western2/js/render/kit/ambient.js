@@ -23,11 +23,11 @@ export function createAmbient(kit, scene, { lamps, life, street }) {
 
   const lampPos = [];
   const glowGeo = new THREE.BufferGeometry();
-  const glow = new THREE.Points(glowGeo, new THREE.PointsMaterial({ size: 2.6, map: kit.materials.basicBlob.map, color: 0xffcf88, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, fog: true, toneMapped: false, opacity: 0 }));
+  const glow = new THREE.Points(glowGeo, new THREE.PointsMaterial({ size: 0.9, map: kit.materials.basicBlob.map, color: 0xffc070, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, fog: true, toneMapped: false, opacity: 0 }));
   glow.frustumCulled = false;
   glow.renderOrder = 4;
   group.add(glow);
-  const poolMat = new THREE.MeshBasicMaterial({ color: 0xff8630, map: kit.materials.basicBlob.map, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, toneMapped: false, opacity: 0, polygonOffset: true, polygonOffsetFactor: -3, polygonOffsetUnits: -3 });
+  const poolMat = new THREE.MeshBasicMaterial({ color: 0xff7a1c, map: kit.materials.basicBlob.map, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, toneMapped: false, opacity: 0, polygonOffset: true, polygonOffsetFactor: -3, polygonOffsetUnits: -3 });
   const pool = new THREE.Mesh(new THREE.BufferGeometry(), poolMat);
   pool.frustumCulled = false;
   pool.renderOrder = 3;
@@ -58,7 +58,7 @@ export function createAmbient(kit, scene, { lamps, life, street }) {
     }
     const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; return t;
   })();
-  const mistMat = new THREE.MeshBasicMaterial({ map: mistTex, color: 0x6a5c9c, transparent: true, depthWrite: false, opacity: 0, fog: false, toneMapped: false });
+  const mistMat = new THREE.MeshBasicMaterial({ map: mistTex, color: 0x3c4c9c, transparent: true, depthWrite: false, opacity: 0, fog: false, toneMapped: false });
   const mist = (() => {
     const pos = [], uv = [];
     let r = 7;
@@ -141,11 +141,11 @@ export function createAmbient(kit, scene, { lamps, life, street }) {
     prepare() {},
     update(dt, time, n) {
       night = n;
-      glow.material.opacity = Math.max(0, (n - 0.15) / 0.85) * 0.85;
+      glow.material.opacity = Math.max(0, (n - 0.15) / 0.85) * 0.6;
       glow.visible = glow.material.opacity > 0.01;
-      poolMat.opacity = Math.max(0, (n - 0.2) / 0.8) * 0.34;
+      poolMat.opacity = Math.max(0, (n - 0.2) / 0.8) * 0.55;
       pool.visible = poolMat.opacity > 0.01;
-      mistMat.opacity = Math.max(0, (n - 0.3) / 0.7) * 0.13;
+      mistMat.opacity = Math.max(0, (n - 0.3) / 0.7) * 0.05;
       mist.visible = mistMat.opacity > 0.01;
       mist.position.x = Math.sin(time * 0.04) * 3;
       pigeons.forEach((p, i) => {

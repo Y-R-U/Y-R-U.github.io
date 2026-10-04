@@ -12,6 +12,7 @@ import { makeRng, noise2 } from './rng.js?v=20261004e';
 import * as western from './western.js?v=20261004e';
 import { createSigns } from './signs.js?v=20261004e';
 import { SURF } from './build.js?v=20261004e';
+import { createPlotBatch } from './plotbatch.js?v=20261004e';
 
 export function createKit() {
   const materials = createMaterials();
@@ -28,6 +29,7 @@ export function createKit() {
     SURF,
     SKINS: western.SKINS,
     signs: createSigns(materials),
+    plotBatch: createPlotBatch(),
     CLIP, OUTFITS, PANTS, ACC, STACHE, CHARACTERS, EXPR, CROWD_LAYER,
     crowdPool: materials.crowdPool, rigVertexCount,
     hats: { geometry: hatGeometry, HAT, TYPES: HAT_TYPES, SEAT: HAT_SEAT, COLORS: HAT_COLORS, forTier: hatForTier, forPomfrey: hatForPomfrey },
@@ -51,7 +53,7 @@ export function createKit() {
     setLight(l) {
       for (const m of materials.uberAll) m.envMapIntensity = l.envK ?? 0.15;
       if (materials.crowd) materials.crowd.envMapIntensity = (l.envK ?? 0.15) * 1.4;
-      materials.uRim.value.set(l.sheen || l.sky.horizon).multiplyScalar(0.16);
+      materials.uRim.value.set(l.sheen || l.sky.horizon).multiplyScalar(0.24);
       materials.uRimCrowd.value.set(l.sheen || l.sky.horizon).multiplyScalar(0.55 + 0.1 * (l.night || 0));
       materials.uBounce.value.set(l.bounce || '#000000').multiplyScalar(l.bounceK || 0);
       materials.uLampK.value = (l.lamps || 0) * 2.6;

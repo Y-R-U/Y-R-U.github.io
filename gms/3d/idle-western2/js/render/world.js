@@ -67,7 +67,7 @@ export function createWorld({ kit, data, skin = null }) {
   const cells = town.chunks.filter((m) => m.userData.cell);
   const farMesh = town.chunks.find((m) => m.name === 'town:far');
   const bulbMesh = town.chunks.find((m) => m.name === 'town:bulbs');
-  const cellDist = (c, x, z) => Math.max(0, c.x0 - x, x - c.x1) + (c.band === 'n' ? Math.max(0, z - 5) : c.band === 's' ? Math.max(0, 13 - z) : Math.max(0, 5 - z, z - 13));
+  const cellDist = (c, x, z) => Math.max(0, c.x0 - x, x - c.x1) + (c.band === 's' ? Math.max(0, 13 - z) : Math.max(0, z - 13));
   // P#5: only chunks near what the view looks at cast into the shadow map; far ones never do.
   const setTownCast = (on, x = 0, z = 0) => { for (const m of casters) m.castShadow = on && (!m.userData.cell || cellDist(m.userData.cell, x, z) < SHADOW_R); };
   // P#2: cards draw only the chunks around their plot; Pomfrey's side only when a card camera is turned to face it.
@@ -82,6 +82,13 @@ export function createWorld({ kit, data, skin = null }) {
   const pool = kit.materials.crowdPool;
   const CARD_L = kit.CROWD_LAYER?.card ?? 1, TOWN_L = kit.CROWD_LAYER?.town ?? 2;
   pool?.activate(scene);
+  const batch = kit.plotBatch;
+  if (batch) {
+    scene.add(batch.root);
+    for (const m of town.chunks) if (m.name === 'contact' || m.name === 'town:signs') batch.add(m, scene);
+  }
+  // card-only foreground framers (plots/construction.js 'fg') never draw in the hero: card layer.
+  const cardOnly = () => { for (const p of plots.values()) p.group.traverse((o) => { if (o.name === 'fg' && o.isMesh) o.layers.set(CARD_L); }); };
   // Open dirt in front of the Thirsty Gizzard's doors for the ejection gag (lane S may push more [x, z, r] zones).
   if (pool) pool.clear.push([HUB_X, PL.ROAD_Z - 1.2, 4.2]);
   const ambient = createAmbient(kit, scene, { lamps: town.lamps, life: town.life, street: ST });
@@ -111,6 +118,7 @@ export function createWorld({ kit, data, skin = null }) {
   for (const f of PL.FRONTS || []) if (f.side === 's') spill.push([f.x, f.z - 3.4, (f.w || 12) * 0.28, 1.6]);
   ambient.addSpill?.(spill);
   scene.updateMatrixWorld(true);
+  cardOnly();
 
   const bounds = { ...PL.WORLD_BOUNDS };
   const rigs = new Map();
@@ -137,10 +145,11 @@ export function createWorld({ kit, data, skin = null }) {
     return out.copy(cam.position).addScaledVector(_dir, Math.min(t, 400));
   }
 
-  const renderConfig = { bloom: { strength: 0.25, threshold: 2.4, knee: 1.0 }, tilt: { focus: 0.5, band: 0.2, feather: 0.34, strength: 0.6 } };
+  const renderConfig = { bloom: { strength: 0.25, threshold: 2.4, knee: 1.0, wide: 1 }, tilt: { focus: 0.5, band: 0.2, feather: 0.34, strength: 0.6 } };
   // R4: the threshold stays above anything lamp-lit (lamp light is soft-clipped in the shader), so only emissives
   // (windows, bulbs, lanterns, the sun disc) bloom; characters and the street never do.
-  const tuneBloom = () => { const n = light.night || 0; renderConfig.bloom.threshold = 2.6 - 0.95 * n; renderConfig.bloom.strength = 0.22 + 0.34 * n; };
+  // R5: at night the wide (1/8-res) level is nearly off, so lamps get a tight halo instead of floating orbs.
+  const tuneBloom = () => { const n = light.night || 0, b = renderConfig.bloom; b.threshold = 2.6 - 0.75 * n; b.strength = 0.22 + 0.12 * n; b.wide = 1 - 0.85 * n; };
   tuneBloom();
   const world = {
     renderConfig,
@@ -182,7 +191,7 @@ export function createWorld({ kit, data, skin = null }) {
         lookOf(cam, _look);
         cullTown(true, plots.get(view.lineId)?.group.position.x ?? _look.x, cam.getWorldDirection(_dir).z > 0.2);
         rig.place(_look, 22);
-        scene.fog.near = 70; scene.fog.far = 430;
+        scene.fog.near = 120; scene.fog.far = 760;
       } else {
         for (const p of plots.values()) p.group.visible = true;
         heroRig.setAspect(view.w / view.h);
@@ -193,9 +202,10 @@ export function createWorld({ kit, data, skin = null }) {
         setTownCast(true, _look.x, _look.z);
         const dist = cam.position.distanceTo(_look);
         rig.place(_look, Math.min(160, Math.max(30, dist * 0.9)));
-        scene.fog.near = dist + 45;
-        scene.fog.far = dist * 2 + 560;
+        scene.fog.near = dist + 110;
+        scene.fog.far = dist * 3 + 1000;
         if (pool) { cam.updateMatrixWorld(); pool.gather(cam); }
+        batch?.update();
       }
       if (light.lamps > 0.01) {
         _dir.copy(cam.position).sub(_look).setY(0).normalize();
@@ -208,7 +218,7 @@ export function createWorld({ kit, data, skin = null }) {
       time += dt;
       tierName = typeof tier === 'string' ? tier : tier?.name || 'mid';
       kit.setTime(time);
-      if ((splitClock -= dt) <= 0) { splitClock = 4; kit.materials.splitUber(scene); }
+      if ((splitClock -= dt) <= 0) { splitClock = 4; kit.materials.splitUber(scene); cardOnly(); }
       // W18: the game's own day, from game time (simTime is saved, so a fresh save boots in golden hour).
       const sim = typeof game?.simTime === 'number' ? game.simTime : (simSec ?? 0) + dt;
       simSec = sim;

@@ -120,6 +120,7 @@ export function createPlot(kit, { id, line = null, palette, rng = Math.random, c
         const m = t.batch.finish({ name: 'signs:' + P.id + ':' + t.tier });
         if (!m) continue;
         group.add(m);
+        kit.plotBatch?.add(m, group);
         if (t.tier === 'lot') lotObjs.push(m);
         else if (t.tier === 'always') m.visible = true;
         else (tierObjs[t.tier] || ownedObjs).push(m);
@@ -183,9 +184,9 @@ export function createPlot(kit, { id, line = null, palette, rng = Math.random, c
         kit.materials.splitUber?.(staticMesh);
       }
     }
-    if (contactObj) { group.remove(contactObj); contactObj.geometry.dispose(); contactObj = null; }
+    if (contactObj) { kit.plotBatch?.remove(contactObj); group.remove(contactObj); contactObj.geometry.dispose(); contactObj = null; }
     const rows = vt < 0 ? lot.contacts : tiers.slice(0, vt + 1).flatMap((t) => t.contacts);
-    if (rows.length) { contactObj = contactMesh(kit.materials, rows); group.add(contactObj); }
+    if (rows.length) { contactObj = contactMesh(kit.materials, rows); group.add(contactObj); contactObj.updateMatrixWorld(true); kit.plotBatch?.add(contactObj, group); }
     if (lotMesh) lotMesh.visible = vt < 0;
     lotObjs.forEach((m) => { m.visible = vt < 0; });
     tierObjs.forEach((arr, i) => arr.forEach((m) => { m.visible = vt >= i; }));

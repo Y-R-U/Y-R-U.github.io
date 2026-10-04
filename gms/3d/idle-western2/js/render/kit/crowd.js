@@ -13,7 +13,7 @@ export const CLIP = {
   flail: 8, slump: 9, duel: 10, draw: 11, point: 12, piano: 13, stagger: 14, hammer: 15, dizzy: 16, tiphat: 17,
   sprawl: 18, handsup: 19, cancan: 20, punch: 21,
 };
-export const SKIN = ['#f8cfae', '#efb98f', '#dc9c70', '#bd7b51', '#8f5838', '#fad6bd'];
+export const SKIN = ['#f4d3bd', '#eabfa3', '#d4a387', '#b58266', '#8a5e48', '#f7dccb'];
 export const HAIR = ['#5a3a2c', '#7c4a2c', '#b8743e', '#e8bc66', '#46343c', '#cc6440', '#e0dbd3', '#a09692', '#3c3a52', '#b8502a'];
 export const CROWD_K = 1.4;
 const STYLES = 7;
@@ -205,7 +205,7 @@ function rigGeometry(kind = 'full') {
   const M = (x, y, z, sx = 1, sy = sx, sz = sx, rx = 0, ry = 0, rz = 0) => S.matrix({ pos: [x, y, z], scale: [sx, sy, sz], rx, ry, rz });
   const ball = (d = 1, j = 0.0) => S.smooth(S.blob(1, d, { jitter: j, rng: () => 0.5 }));
   const fd = lite ? 0 : 1;
-  const BOOT = '#4a3328', BELT = '#3a2a22', BRASS = '#e2b84a', DARK = '#241a2c', MOUTH = '#5a1e26', TEETH = '#fff8ea';
+  const BROW = '#3a2620', BOOT = '#4a3328', BELT = '#3a2a22', BRASS = '#e2b84a', DARK = '#241a2c', MOUTH = '#5a1e26', TEETH = '#fff8ea';
   // R4 body: chunky boots with a toe cap and shaft, stocky legs, a barrel torso with a belly, and arms that stand
   // clear of the body (shoulder ball, sleeve angled out, cuff) ending in big mitten hands with a thumb.
   const SOLE = '#2e211b';
@@ -230,8 +230,10 @@ function rigGeometry(kind = 'full') {
   P(ball(2), M(0, 0.98, 0.01, 0.262, 0.245, 0.25), 5, 3);
   for (const sx of [-1, 1]) {
     P(ball(fd), M(sx * 0.262, 0.955, -0.01, 0.062, 0.088, 0.045, 0, sx * 0.3), 5, 3);
-    P(ball(fd), M(sx * 0.088, 0.99, 0.222, 0.049, 0.064, 0.034), 5, 0, -1, DARK);
-    P(ball(0), M(sx * 0.088 + 0.015, 1.012, 0.252, 0.016, 0.019, 0.009), 5, 0, -1, '#ffffff');
+    // R5 eyes: white sclera, a big dark pupil looking slightly inward, catchlight
+    P(ball(fd), M(sx * 0.09, 0.99, 0.214, 0.066, 0.08, 0.04), 5, 0, -1, '#fbf5ea');
+    P(ball(fd), M(sx * 0.082, 0.982, 0.243, 0.036, 0.048, 0.02), 5, 0, -1, DARK);
+    P(ball(0), M(sx * 0.082 + 0.012, 0.998, 0.26, 0.013, 0.015, 0.007), 5, 0, -1, '#ffffff');
     P(ball(0), M(sx * 0.17, 0.885, 0.19, 0.068, 0.04, 0.03), 5, 0, -1, '#f08a86');
   }
   P(ball(1), M(0, 0.915, 0.272, 0.112, 0.098, 0.102), 5, 7);
@@ -239,13 +241,13 @@ function rigGeometry(kind = 'full') {
   // expressions (brows: hair colour; lids: skin; mouths): grump 0, grin 1, shock 2, angry 3, sozzled 4
   const E = (...e) => 400 + MASK(...e);
   for (const sx of [-1, 1]) {
-    if (lite) P(ball(0), M(sx * 0.092, 1.056, 0.232, 0.108, 0.047, 0.036, 0, 0, sx * 0.4), 5, 4, E(0, 3));
+    if (lite) P(ball(0), M(sx * 0.092, 1.056, 0.232, 0.108, 0.0587, 0.036, 0, 0, sx * 0.4), 5, 0, E(0, 3), BROW);
     else {
-      P(ball(1), M(sx * 0.094, 1.062, 0.23, 0.104, 0.044, 0.036, 0, 0, sx * 0.28), 5, 4, E(0));
-      P(ball(1), M(sx * 0.09, 1.05, 0.234, 0.11, 0.048, 0.038, 0, 0, sx * 0.55), 5, 4, E(3));
+      P(ball(1), M(sx * 0.094, 1.062, 0.23, 0.104, 0.055, 0.036, 0, 0, sx * 0.28), 5, 0, E(0), BROW);
+      P(ball(1), M(sx * 0.09, 1.05, 0.234, 0.11, 0.06, 0.038, 0, 0, sx * 0.55), 5, 0, E(3), BROW);
     }
-    P(ball(fd), M(sx * 0.096, 1.11, 0.218, 0.1, 0.04, 0.034, 0, 0, sx * -0.24), 5, 4, E(1, 2));
-    P(ball(fd), M(sx * 0.096, 1.076, 0.226, 0.1, 0.04, 0.034, 0, 0, sx * -0.4), 5, 4, E(4));
+    P(ball(fd), M(sx * 0.096, 1.11, 0.218, 0.1, 0.05, 0.034, 0, 0, sx * -0.24), 5, 0, E(1, 2), BROW);
+    P(ball(fd), M(sx * 0.096, 1.076, 0.226, 0.1, 0.05, 0.034, 0, 0, sx * -0.4), 5, 0, E(4), BROW);
     if (lite) P(ball(0), M(sx * 0.086, 1.036, 0.236, 0.052, 0.024, 0.03, 0, 0, sx * 0.15), 5, 3, E(0, 3, 4));
     else {
       P(ball(1), M(sx * 0.086, 1.038, 0.236, 0.052, 0.022, 0.03, 0, 0, sx * 0.3), 5, 3, E(0, 3));
@@ -557,18 +559,18 @@ vSkin = float(abs(slot - 3.0) < 0.5 || slot > 6.5);`)
   vec3 cwn = normalize(vWN);
   float ndl = dot(cwn, uSunDir);
   float term = exp(-pow((ndl + 0.08) * 3.2, 2.0));
-  outgoingLight += diffuseColor.rgb * uSunCol * (term * vec3(1.0, 0.55, 0.38) * 0.55 + max(0.0, (ndl + 0.6) / 1.6) * 0.18);
+  outgoingLight += diffuseColor.rgb * uSunCol * (term * vec3(1.0, 0.62, 0.5) * 0.38 + max(0.0, (ndl + 0.6) / 1.6) * 0.14);
   outgoingLight *= 0.8 + 0.2 * smoothstep(-0.8, 0.4, cwn.y);
   float nv = saturate(dot(geometryNormal, geometryViewDir));
-  float fr = pow(1.0 - nv, 2.2);
-  outgoingLight += uRim * fr * (0.55 + 0.6 * diffuseColor.rgb);
-  outgoingLight += vSkin * diffuseColor.rgb * vec3(0.16, 0.07, 0.04) * (0.6 + 0.4 * nv);
+  float fr = pow(1.0 - nv, 2.6);
+  outgoingLight += uRim * fr * (0.25 + 1.5 * max(ndl, 0.0)) * (0.55 + 0.6 * diffuseColor.rgb);
+  outgoingLight += vSkin * diffuseColor.rgb * vec3(0.06, 0.035, 0.03) * (0.6 + 0.4 * nv);
   outgoingLight += diffuseColor.rgb * max(0.0, max(diffuseColor.r, diffuseColor.g) - 1.05) * 0.8;
 }
 ${WORLD_LIGHT_FRAG}
 #include <opaque_fragment>`);
   };
-  m.customProgramCacheKey = () => 'iw2-crowd6';
+  m.customProgramCacheKey = () => 'iw2-crowd7';
   return m;
 }
 

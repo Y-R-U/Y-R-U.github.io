@@ -128,8 +128,8 @@ ghost in a dark stetson, translucent with a cyan fresnel rim, hem flutter + bob 
   whatever slice of sky the camera sees, so a card with 6° of sky still gets the full sunset ramp.
 
 ### Town (`kit/town.js`, built by `world.js`; `world.town`)
-- Chunks are x-cells (56 m) × three bands: `n` (north lots, z < 5), `m` (street + edges), `s` (Pomfrey's side); ground
-  pebbles/tufts are split the same way. `mesh.userData.cell = {x0, x1, band}`. Cards (`world.prepare` line) show only cells
+- Chunks are x-cells (56 m) × two bands (R5): `nm` (north lots + street) and `s` (Pomfrey's side); ground pebbles/tufts
+  live in their cell's chunk (one draw per cell). `mesh.userData.cell = {x0, x1, band}`. Cards (`world.prepare` line) show only cells
   within ±40 m of the plot, hide `s` unless the card camera faces south, hide `town:far`; hero chunks > 60 m from the look
   point don't cast shadows (P#2/P#5).
 - `world.town.signs` (town sign batch mesh), `world.town.graves.setCount(n)` (world calls it from `state.graves.length`;
@@ -202,3 +202,25 @@ ghost in a dark stetson, translucent with a cyan fresnel rim, hem flutter + bob 
   `r4_after/lineup_lite.png`. Perf (perf-audit static, CDP 9331): hero 101 calls / 1.72 M verts / GPU 4.0 ms with post →
   109 calls (other lanes) / 1.56 M / 2.62 ms; cards +20–35 k verts each (rig + kerb dressing), GPU equal or lower.
   test-boot, test-cards PASS; test-scroll desktop pass, phone 3.8 ms PASS on the first run, 8.2–10.5 ms under load avg 7–11.
+- 2026-10-04 A round 5 (critic r4). **Draw trim** (`tools/drawlist.mjs [vp] [tod] [pin]` lists one hero frame's draws by
+  object, scene + shadow pass): town bands n+m merged and ground cells folded into their chunks (25 → 10 hero draws);
+  card-only `fg` framers moved to the card layer (they drew a zero-scale matrix in the hero: −13); new `kit.plotBatch`
+  (`kit/plotbatch.js`) merges every plot's sign batch + contact shadows + the town contact + town signs into one mesh per
+  material on the town layer, rebuilt only when the visible set changes (originals go to the card layer, so cards still
+  draw their own): −14. Hero frame (desktop, saloon pin) 134 → 91 draws incl. post + shadow; test-scroll desktop hero
+  151 → 98–101, phone 143 → 96; frame max 216 → 151–180. Hero verts 1.52 M (far desert scatter −40 %, eyes +120 v/person).
+  **Light:** golden sun el 23 → 14 (long shadows), fill 0.46 → 0.36 and bluer, env/bounce down, exposure 1.13, fog pushed
+  out (hero `dist+110 … dist·3+1000`, cards `120 … 760`); statics' fresnel rim is sun-side weighted (`RIM_FRAG` uses
+  `uSunDir`), crowd rim likewise (backlit edges). **Night:** blue moonlight `#7c9cff` 1.15 + blue hemisphere, zero warm bounce,
+  warmth only from lamp pools (decal 0.34 → 0.55, deeper amber) and lamp light; glow Points 2.6 → 0.9 m; bloom `wide`
+  (1/8-res level) × 0.15 at night, threshold 1.85 (post.js `bloom.wide`, see CONTRACT) — no floating orbs; mist 0.05.
+  **Faces:** eye whites + big inward-looking pupils + catchlight, brows always dark `#3a2620` and 25 % thicker, skin palette
+  desaturated, warm skin/terminator push cut ~60 %. **Wood:** new WOOD surface (slots wood/wood2/woodDark/raw/door/trunk,
+  axis = the part's long side → `aPbr.w` 0.27/0.28/0.29): grain streaks, board seams every 0.23 m, knots; `iron` (hoops),
+  `brass`, `bottle` get spec/metal in `SLOT_PBR`. **Backdrop:** sun disc moved into the street gap (az 7°, el 3.6°, smaller,
+  pale gold), tighter glow; cloud bands with lit undersides (dim at night); buttes taller (to ~4.5°), saturated red lit
+  faces with a warm top rim, haze 0.62/0.36/0.12 → 0.46/0.22/0.06.
+  Shots `docs/art/a/r5_before/` (= r4_after) + `r5_before_sheet.jpg`, `r5_after/` + `r5_after_sheet.jpg`.
+  test-boot, test-cards, test-scroll PASS (phone rAF p95 4.1 ms, desktop 1.6 ms).
+  Open: night cards still bright under lamp light; dirt reads a bit monochrome red-brown at golden; mesas in cards are good,
+  in the hero partly hidden by the HUD band.
