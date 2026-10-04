@@ -44,7 +44,7 @@ const MEASURE = `(() => {
   const heroBox = document.querySelector('.hero').getBoundingClientRect();
   const chips = [...document.querySelectorAll('.ev-edge, .hero-chip, .hero-btn, .qty')].filter(visible).reduce((a, e) => { const r = e.getBoundingClientRect(); return a + r.width * r.height; }, 0);
   return {
-    overflow: document.documentElement.scrollWidth > vw + 0.5, words, seen,
+    overflow: document.documentElement.scrollWidth > vw + 0.5, words, seen, qdpr: window.__iw2?.host.debug.dpr || 1,
     small: glyphs.filter((g) => g.w < 40 || g.h < 40), glyphs: glyphs.length, cards,
     hero: { cw: hc && hc.width, ch: hc && hc.height, ew: hr.width, eh: hr.height, dpr: hc ? hc.width / Math.max(1, hr.width) : 0, chipCover: chips / (heroBox.width * heroBox.height) },
   };
@@ -53,7 +53,7 @@ const MEASURE = `(() => {
 function verify(tag, r, { fresh, folded = false }) {
   check(!r.overflow, `${tag} no horizontal overflow`);
   check(!r.small.length, `${tag} all ${r.glyphs} buttons ≥40px` + (r.small.length ? ': ' + r.small.map((g) => `${g.cls} ${g.w.toFixed(0)}×${g.h.toFixed(0)}`).join(', ') : ''));
-  const dprOk = (x) => x.dpr > 0.9 && x.dpr < 3.1 && Math.abs(x.cw / x.ch - x.ew / x.eh) < 0.03;
+  const dprOk = (x) => x.dpr > Math.min(0.9, r.qdpr * 0.9) && x.dpr < 3.1 && Math.abs(x.cw / x.ch - x.ew / x.eh) < 0.03;
   check(r.hero.cw > 0 && dprOk(r.hero), `${tag} hero canvas ${r.hero.cw}×${r.hero.ch} matches box ${r.hero.ew.toFixed(0)}×${r.hero.eh.toFixed(0)}`);
   check(r.hero.chipCover < (folded ? 0.15 : 0.1), `${tag} hero chrome covers ${(r.hero.chipCover * 100).toFixed(1)}% of the hero`);
   for (const c of r.cards) {

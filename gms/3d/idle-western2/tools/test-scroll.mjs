@@ -90,13 +90,13 @@ try {
     const after = await gpuBusy();
     if (after.length && !busy.length) console.log(`    [GPU became busy (${after.join('+')}) during the run: numbers unreliable]`);
     const r = await page.eval(`(() => { const d = __iw2.host.debug; return { perf: d.perf, tier: d.tier, level: d.level, dpr: d.dpr, gov: d.governor,
-      mobile: d.device.mobile, cardDpr: d.cardDpr, frames: window.__frames, views: d.views, live: d.live2d, prepaints: d.prepaints, shadows: d.shadows, post: d.post }; })()`);
+      mobile: d.device.mobile, cardDpr: d.cardDpr, frames: window.__frames, views: d.views, live: d.live2d, prepaints: d.prepaints, shadows: d.shadows, post: d.post, qlog: d.qlog || [] }; })()`);
     if (pr.cpu > 1) await page.send('Emulation.setCPUThrottlingRate', { rate: 1 });
     const fr = r.frames;
     const dts = fr.slice(1).map((f, i) => f[0] - fr[i][0]);
     const work = fr.map((f) => f[1]);
     const p = r.perf;
-    console.log(`    scrolled ${Math.round(sc.room)} px in ${sc.tag}; tier at scroll start ${start}, end ${r.tier} (level ${r.level}, mobile ${r.mobile}) dpr ${r.dpr} (cards ${r.cardDpr}), shadows ${r.shadows}, post ${r.post}`);
+    console.log(`    scrolled ${Math.round(sc.room)} px in ${sc.tag}; tier at scroll start ${start}, end ${r.tier} (level ${r.level}, mobile ${r.mobile}) dpr ${r.dpr} (cards ${r.cardDpr}), shadows ${r.shadows}, post ${r.post}${r.qlog.length ? '; quality steps ' + JSON.stringify(r.qlog) : ''}`);
     console.log(`    ${fr.length} frames ≈ ${(fr.length / 5).toFixed(1)} fps; dt p50 ${pct(dts, 0.5).toFixed(1)} p95 ${pct(dts, 0.95).toFixed(1)} ms; rAF work p50 ${pct(work, 0.5).toFixed(2)} p95 ${pct(work, 0.95).toFixed(2)} ms; host work avg ${(p.workSum / Math.max(1, p.frames)).toFixed(2)} max ${p.workMax.toFixed(1)} ms`);
     console.log(`    draw calls max ${p.callsMax}/frame (hero ${p.heroCallsMax}, card ${p.cardCallsMax}), renders/frame max ${p.rendersMax}, live 2D canvases ${r.live}, prepaints ${r.prepaints}, governor downs ${r.gov.downs}`);
     check(pct(dts, 0.95) <= 20, `frame dt p95 ≤ 20 ms (${pct(dts, 0.95).toFixed(1)})`);

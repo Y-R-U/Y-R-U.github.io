@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 import { createBlitPresenter } from './presenter-blit.js?v=20261004g';
 import { createOverlayPresenter } from './presenter-overlay.js?v=20261004g';
-import { TIERS, LADDER, LADDER_START, startTier, qualityAt, createGovernor, device } from './quality.js?v=20261004g';
+import { LADDER, PRESET_LEVEL, startLevel, qualityAt, createGovernor, levelForBench, device } from './quality.js?v=20261004g';
 import { createPost, POST_DEFAULTS } from './post.js?v=20261004g';
 
 const LIVE_CAP = 10, LOSS_WAIT = 1000, MAX_RECREATE = 3, FRAME_BUDGET = 5;
@@ -16,8 +16,17 @@ export function createRenderHost({ lifecycle, flags, bus }) {
   const size = { W: 0, H: 0 };
   const governor = createGovernor();
   const noRecover = flags.break === 'norecover';
-  let mode = TIERS[flags.tier] ? flags.tier : 'auto';
-  let ceil = LADDER_START[startTier(flags)], level = ceil, q = qualityAt(level);
+  const qs = new URLSearchParams(location.search);
+  const presetOf = (n) => (n === 'auto' ? 'auto' : n === 'mid' ? 'medium' : n === 'battery' ? 'low' : PRESET_LEVEL[n] !== undefined ? n : null);
+  // ?qstart=<level>: auto mode starting (and capped) at that rung, no bench; ?gov=0: auto never moves; ?bench=0.
+  const qstart = qs.has('qstart') ? Math.max(0, Math.min(LADDER.length - 1, +qs.get('qstart') | 0)) : null;
+  const govOff = qs.get('gov') === '0', gpuLoad = Math.max(0, +qs.get('gpuload') || 0);
+  let mode = presetOf(flags.tier) || 'auto';
+  const autoCeil = () => qstart ?? startLevel();
+  let ceil = autoCeil(), level = mode === 'auto' ? ceil : PRESET_LEVEL[mode], q = qualityAt(level);
+  let bench = mode === 'auto' && qstart === null && qs.get('bench') !== '0' && !govOff ? { ms: [], sync: [], at: 0, done: false } : null;
+  const qListeners = new Set();
+  let crowdSent = 1;
   let heroPost = null, cardPost = null, envRT = null, cardTilt = null, cardTiltSrc = null;
   let world = null, renderer = null, lost = false, paused = false, lossTimer = null, focusLine = null;
   let srcW = 0, srcH = 0, lastNow = 0, lastWork = 0, forceAll = true, lastRenderCall = 0, focus = null;
@@ -29,17 +38,22 @@ export function createRenderHost({ lifecycle, flags, bus }) {
     frames: 0, presented: 0, lastPresentAt: 0, views: 0, renderedThisFrame: 0, calls: 0, tris: 0, heroCalls: 0,
     dpr: 1, tier: q.name, level, mode, lost: false, paused: false, losses: 0, restores: 0, recreations: 0,
     tierRecreations: 0, stalls: 0, shadowUpdates: 0, shadows: false, programs: 0, ctx2dLost: 0, prepaints: 0, live2d: 0, presenter: presenter.name,
-    workMs: 0, governor: governor.stats, device, post: false, env: false, hot: false, movers: 0,
+    workMs: 0, governor: governor.stats, device, post: false, env: false, hot: false, movers: 0, bench: null, gpuMs: -1,
+    qlog: [],
     perf: null,
     get visibleViews() { return vis.map((v) => v.id); },
   };
   const resetPerf = () => { dbg.perf = { frames: 0, workMax: 0, workSum: 0, hookSum: 0, presentSum: 0, heroSum: 0, cardSum: 0, cardRenders: 0, heroRenders: 0, bothFrames: 0, heroYields: 0, hotFrames: 0, callsMax: 0, heroCallsMax: 0, cardCallsMax: 0, blankMaxMs: 0, rendersMax: 0 }; };
   resetPerf();
 
-  const dpr = () => Math.min(flags.dpr || devicePixelRatio || 1, q.dprCap);
-  const qs = new URLSearchParams(location.search), sharpOff = qs.get('cardsharp') === '0', cardPxOff = qs.get('cardpx') === '0';
+  const devDpr = () => flags.dpr || devicePixelRatio || 1;
+  const dpr = () => {
+    const dev = devDpr(), floor = dev <= 1.25 ? Math.min(q.dprFloor, 0.8) : q.dprFloor;
+    return Math.min(dev, Math.max(floor, Math.min(dev, q.dprBase) * q.dprMul));
+  };
+  const sharpOff = qs.get('cardsharp') === '0', cardPxOff = qs.get('cardpx') === '0';
   const soloOff = qs.get('solo') === '0', moversCast = qs.get('movershadow') === '1', shzFlag = +qs.get('shz') || 0;
-  const cardDpr = () => sharpOff ? dpr() : Math.max(dpr(), Math.min(flags.dpr || devicePixelRatio || 1, q.cardDprCap || q.dprCap));
+  const cardDpr = () => sharpOff || !q.cardDprCap ? dpr() : Math.max(dpr(), Math.min(devDpr(), q.cardDprCap));
 
   function makeRenderer() {
     const canvas = document.createElement('canvas');
@@ -273,6 +287,7 @@ export function createRenderHost({ lifecycle, flags, bus }) {
     envRT?.dispose();
     envRT = null;
     presenter.onRecreate(renderer);
+    gpuReset();
     clearTimeout(lossTimer);
     lossTimer = null;
     lost = dbg.lost = false;
@@ -287,17 +302,42 @@ export function createRenderHost({ lifecycle, flags, bus }) {
 
   function dirtyAll() { for (const v of views.values()) v.dirty = true; }
 
-  function setLevel(l) {
+  function setLevel(l, why = '') {
     l = Math.max(mode === 'auto' ? ceil : 0, Math.min(LADDER.length - 1, l));
     if (l === level) return;
     const nq = qualityAt(l);
     const msaaChange = nq.msaa !== q.msaa || !!nq.shadows !== !!q.shadows;
+    const from = level;
     level = dbg.level = l;
     q = nq;
     dbg.tier = q.name;
     if (msaaChange) recreate('tier');
     else { srcW = srcH = 0; dirtyAll(); clearShadowCache(); }
+    syncCrowd();
+    dbg.qlog.push([Math.round(performance.now()), from, l, why]);
+    if (dbg.qlog.length > 40) dbg.qlog.shift();
     bus?.emit('graphics:tier', { tier: q.name, level, shadows: !!q.shadows });
+    notifyQuality();
+  }
+  // Crowd density rung: lane A's hook if the world has one (CONTRACT.md request), else nothing.
+  function syncCrowd() {
+    if (!world || q.crowd === crowdSent) return;
+    if (typeof world.setCrowdDensity === 'function') { try { world.setCrowdDensity(q.crowd); crowdSent = q.crowd; } catch {} }
+  }
+  function qState() {
+    return { mode, level, label: q.label, tier: q.name, auto: mode === 'auto', ceiling: mode === 'auto' ? ceil : level,
+      levels: LADDER.length, dpr: dbg.dpr || dpr(), bench: dbg.bench, reason: governor.stats.reason, device: { gpu: device.gpu, cls: device.cls, guess: device.guess, mobile: device.mobile, reasons: device.reasons } };
+  }
+  function notifyQuality() { const s = qState(); for (const fn of qListeners) { try { fn(s); } catch (e) { console.warn('[iw2] quality listener', e); } } }
+  function setMode(name) {
+    name = presetOf(name);
+    if (!name) return false;
+    mode = dbg.mode = name;
+    governor.reset(performance.now());
+    if (name === 'auto') { ceil = autoCeil(); setLevel(ceil, 'auto'); }
+    else { bench = null; setLevel(PRESET_LEVEL[name], 'preset ' + name); }
+    notifyQuality();
+    return true;
   }
 
   function enforceCap() {
@@ -411,6 +451,7 @@ export function createRenderHost({ lifecycle, flags, bus }) {
       (cardPost ||= createPost()).render(renderer, world.scene, cam, v, { samples: q.cardSamples, sharpen: q.cardSharpen });
     } else renderer.render(world.scene, cam);
     shadowStore();
+    burn(v);
     const calls = renderer.info.render.calls - c0;
     if (renderer.getContext().isContextLost()) return;
     const tp = performance.now();
@@ -430,12 +471,119 @@ export function createRenderHost({ lifecycle, flags, bus }) {
     dbg.renderedThisFrame++;
   }
 
+  // Desktop hero pixel budget (q.heroPx, scaled by the ladder): a huge window or a 4K monitor renders the hero at a
+  // lower DPR instead of pushing a slow GPU into fill. Phones have no hero budget (q.heroPx 0); their hero is small.
+  function heroDpr(v, d) {
+    if (!q.heroPx || presenter.direct) return d;
+    const px = v.w * v.h * d * d;
+    return px <= q.heroPx ? d : Math.max(0.6, Math.floor(Math.sqrt(q.heroPx / (v.w * v.h)) * 20) / 20);
+  }
+
+  // GPU time per frame (EXT_disjoint_timer_query_webgl2 where the browser exposes it; ?gputimer=0 off). One query spans
+  // the frame's GL work; results are read a few frames later. gpuMs is the smoothed ms per frame that did render, or -1.
+  let tq = null, gpuMs = -1, gpuAt = 0;
+  const tqFree = [], tqBusy = [];
+  function gpuInit() {
+    tq = false;
+    if (qs.get('gputimer') === '0') return;
+    try {
+      const gl = renderer.getContext();
+      const ext = gl.getExtension('EXT_disjoint_timer_query_webgl2');
+      if (ext && gl.createQuery) tq = { gl, ext };
+    } catch {}
+  }
+  function gpuBegin() {
+    if (tq === null) gpuInit();
+    if (!tq || tqBusy.length > 6) return false;
+    const { gl, ext } = tq;
+    try {
+      if (gl.getQuery(ext.TIME_ELAPSED_EXT, gl.CURRENT_QUERY)) return false;
+      const qo = tqFree.pop() || gl.createQuery();
+      gl.beginQuery(ext.TIME_ELAPSED_EXT, qo);
+      tqBusy.push(qo);
+      return true;
+    } catch { tq = false; return false; }
+  }
+  function gpuEnd() { try { tq.gl.endQuery(tq.ext.TIME_ELAPSED_EXT); } catch {} }
+  function gpuPoll() {
+    if (!tq || !tqBusy.length) { if (gpuMs >= 0 && performance.now() - gpuAt > 3000) gpuMs = dbg.gpuMs = -1; return; }
+    const { gl, ext } = tq;
+    try {
+      const disjoint = gl.getParameter(ext.GPU_DISJOINT_EXT);
+      while (tqBusy.length && gl.getQueryParameter(tqBusy[0], gl.QUERY_RESULT_AVAILABLE)) {
+        const qo = tqBusy.shift();
+        const ms = gl.getQueryParameter(qo, gl.QUERY_RESULT) / 1e6;
+        tqFree.push(qo);
+        if (disjoint || !(ms >= 0) || ms > 1000) continue;
+        gpuMs = dbg.gpuMs = gpuMs < 0 ? ms : gpuMs * 0.8 + ms * 0.2;
+        gpuAt = performance.now();
+      }
+    } catch { tq = false; }
+  }
+  // Restore/recreate makes a new context: the old queries are gone with it.
+  function gpuReset() { tq = null; tqFree.length = tqBusy.length = 0; }
+
+  // Boot micro-benchmark (auto mode, once): 2.5 s after the first present (shaders warm), 8 hero renders are timed with
+  // a sync before and after (1×1 readPixels: waits for the GPU), so each sample is CPU submit + GPU for one hero frame.
+  // The 2nd-fastest of the last 5 picks the start rung (quality.levelForBench). The governor waits for it to finish.
+  const syncPx = new Uint8Array(4);
+  function gpuSync() {
+    try { renderer.setRenderTarget(null); const gl = renderer.getContext(); gl.readPixels(0, 0, 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, syncPx); } catch {}
+  }
+  function benchReady(now) {
+    if (!dbg.presented) return false;
+    if (!bench.at) bench.at = now + 2500;
+    return now >= bench.at;
+  }
+  function benchSample(tv, now) {
+    gpuSync();
+    bench.ms.push(performance.now() - tv);
+    if (bench.ms.length < 8) return;
+    // Minus the round trip of an empty sync, so the number is the frame, not the readback.
+    const so = bench.sync.slice().sort((a, b) => a - b)[bench.sync.length >> 1] || 0;
+    // 2nd-fastest of the last 5: late warm-up and load on the machine only ever add time, so the low end is the device.
+    const s = bench.ms.slice(3).sort((a, b) => a - b), med = Math.max(0, s[1] - so);
+    const to = levelForBench(med, level, Math.min(LADDER.length - 1, 7));
+    bench.done = true;
+    dbg.bench = { ms: Math.round(med * 100) / 100, sync: Math.round(so * 100) / 100, samples: bench.ms.map((x) => Math.round(x * 10) / 10), from: level, to, at: Math.round(now) };
+    governor.reset(performance.now(), 4500);
+    if (to > level) setLevel(to, `bench ${med.toFixed(1)} ms`);
+    else notifyQuality();
+  }
+
+  // ?gpuload=N (tests only): a slow-GPU stand-in. After every view render, an additive full-view pass whose fragment
+  // shader loops N times, so the cost scales with rendered pixels × frames like a fill-bound integrated GPU.
+  let burnScene = null, burnCam = null;
+  function burn(v) {
+    if (!gpuLoad) return;
+    if (!burnScene) {
+      burnScene = new THREE.Scene();
+      burnCam = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
+      const mat = new THREE.ShaderMaterial({
+        defines: { ITERS: Math.round(gpuLoad) },
+        vertexShader: 'void main(){ gl_Position = vec4(position.xy, 0.0, 1.0); }',
+        fragmentShader: 'void main(){ float a = 0.0; for (int i = 0; i < ITERS; i++) { a += sin(gl_FragCoord.x * 0.013 + float(i) * 1.7 + a) * cos(gl_FragCoord.y * 0.011 - a); } gl_FragColor = vec4(vec3(a * 1e-9), 1.0); }',
+        blending: THREE.AdditiveBlending, depthTest: false, depthWrite: false, transparent: true, toneMapped: false,
+      });
+      const m = new THREE.Mesh(new THREE.PlaneGeometry(2, 2), mat);
+      m.frustumCulled = false;
+      burnScene.add(m);
+    }
+    dbg.burns = (dbg.burns || 0) + 1;
+    const ac = renderer.autoClear;
+    renderer.autoClear = false;
+    renderer.setRenderTarget(null);
+    renderer.setViewport(v.vx, v.vy, v.pw, v.ph);
+    renderer.setScissor(v.vx, v.vy, v.pw, v.ph);
+    renderer.render(burnScene, burnCam);
+    renderer.autoClear = ac;
+  }
+
   const host = {
     get lost() { return lost; },
     get paused() { return paused; },
     get renderer() { return renderer; },
     get world() { return world; },
-    get quality() { return q; },
     setWorld(w) {
       world = w;
       const st = w?.renderConfig?.shadowType;
@@ -443,6 +591,8 @@ export function createRenderHost({ lifecycle, flags, bus }) {
       applyConfig();
       buildEnv();
       warm();
+      crowdSent = 1;
+      syncCrowd();
       host.markDirty('*');
     },
     markShadow(id) {
@@ -489,13 +639,14 @@ export function createRenderHost({ lifecycle, flags, bus }) {
       else if (views.has(id)) views.get(id).dirty = true;
       else for (const v of views.values()) if (v.lineId === id) v.dirty = true;
     },
-    setTier(name) {
-      if (name === 'battery') name = 'low';
-      if (name !== 'auto' && !TIERS[name]) return;
-      mode = dbg.mode = name;
-      governor.reset(performance.now());
-      if (name === 'auto') ceil = LADDER_START[startTier({})];
-      setLevel(LADDER_START[name === 'auto' ? startTier({}) : name]);
+    // Old name, kept: 'auto'|'high'|'mid'|'medium'|'low'|'battery'.
+    setTier(name) { setMode(name); },
+    // Settings "Graphics" (ENGINE.md "Adaptive quality"): set('auto'|'high'|'medium'|'low'), current(), on(fn) → off.
+    quality: {
+      set: (name) => setMode(name),
+      current: () => qState(),
+      on(fn) { qListeners.add(fn); return () => qListeners.delete(fn); },
+      get knobs() { return q; },
     },
     restart() {
       lossLog.length = 0;
@@ -517,10 +668,13 @@ export function createRenderHost({ lifecycle, flags, bus }) {
       lastRenderCall = t0;
       if (lifecycle.hidden || !world || lost || paused) return;
       if (renderer.getContext().isContextLost()) { onLost(); return; }
-      if (mode === 'auto') {
-        const step = governor.sample(rafDt, lastWork, t0);
-        if (step) setLevel(level - step);
-        else if (pressure > 0.5 && t0 - pressureAt > 4000) { pressureAt = t0; pressure = 0; governor.reset(t0); setLevel(level + 1); }
+      gpuPoll();
+      if (mode === 'auto' && !govOff && (!bench || bench.done)) {
+        const step = governor.sample(rafDt, lastWork, gpuMs, t0, level, ceil, LADDER.length - 1);
+        if (step) setLevel(level + step, governor.stats.reason);
+        else if (pressure > 0.5 && t0 - pressureAt > 4000 && level < LADDER.length - 1) {
+          pressureAt = t0; pressure = 0; governor.pressure(t0, level); setLevel(level + 1, 'card pressure');
+        }
       }
       const dt = Math.min(0.1, rafDt / 1000);
       dbg.frames++;
@@ -534,7 +688,7 @@ export function createRenderHost({ lifecycle, flags, bus }) {
       let heroDue = false;
       let cardMax = 0;
       for (const v of views.values()) {
-        v.d = v.kind === 'hero' ? d : q.cardPx && !cardPxOff && !presenter.direct ? Math.max(d, Math.min(dc, Math.floor(Math.sqrt(q.cardPx / (v.w * v.h)) * 20) / 20)) : dc;
+        v.d = v.kind === 'hero' ? heroDpr(v, d) : q.cardPx && !cardPxOff && !presenter.direct ? Math.max(d, Math.min(dc, Math.floor(Math.sqrt(q.cardPx / (v.w * v.h)) * 20) / 20)) : dc;
         if (v.kind !== 'hero' && (v.visible || v.near) && v.d > cardMax) cardMax = v.d;
         if (v.visible || v.near) nearOrVis.push(v);
         if (!v.visible) { if (v.near && v.dirty) { if (v.kind === 'hero') pre.unshift(v); else pre.push(v); } continue; }
@@ -590,6 +744,9 @@ export function createRenderHost({ lifecycle, flags, bus }) {
       applyConfig();
       dbg.renderedThisFrame = 0;
       if (todo.length) presenter.beginFrame(renderer);
+      const timing = todo.length ? gpuBegin() : false;
+      const benchNow = bench && !bench.done && heroDue && benchReady(now);
+      if (benchNow) { gpuSync(); const ts = performance.now(); gpuSync(); bench.sync.push(performance.now() - ts); }
       // Cards only start while the frame is under budget; a card starved past 3× its interval may overrun once.
       let blocked = false, overrun = false, heroV = null;
       for (const v of todo) {
@@ -604,6 +761,7 @@ export function createRenderHost({ lifecycle, flags, bus }) {
         const tv = performance.now();
         renderView(v, d, now);
         if (v.last !== now) continue;
+        if (benchNow && v.kind === 'hero') benchSample(tv, now);
         if (v.kind !== 'hero') { cardCost = cardCost * 0.8 + (performance.now() - tv) * 0.2; replay = true; }
         else { heroV = v; replay = false; }
       }
@@ -617,6 +775,7 @@ export function createRenderHost({ lifecycle, flags, bus }) {
           dbg.replays = (dbg.replays || 0) + 1;
         }
       }
+      if (timing) gpuEnd();
       pressure = pressure * 0.98 + (blocked ? 0.02 : 0);
       dbg.pressure = pressure;
       dbg.cardCost = cardCost;

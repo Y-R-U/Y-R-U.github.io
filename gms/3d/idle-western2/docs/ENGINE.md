@@ -158,8 +158,9 @@ Append to `EVENTS`.
 | `node tools/test-scroll.mjs` | S22 at CPU 4× plus desktop scroll budgets. It waits up to `GPU_WAIT` s for the Flux and LTX queues; a busy GPU makes its numbers unreliable. |
 | `node tools/test-cards.mjs` | Blank-card gate (round 3): S22 CPU 4×, all 9 businesses building, then all open; scrolls every card (jumps + sweep). Fails if any card ≥ 40% on screen (DOM rect, not the host's observers) has an empty/uniform canvas for > 1 s, or if a `cardShot` capture taken while builds open (and yank the page) is the flat poster. Falsified both ways: a host that skips one card → `tubs 4079 ms` FAIL; the old camshot clip → 9/9 flat FAIL. |
 | `node tools/test-look.mjs` | Hold-to-look on the hero and a card (touch plus mouse), the edge clamp, tap and swipe still working. |
+| `node tools/test-quality.mjs [--only=normal,gov,bench,falsify]` | Adaptive quality (below): `classifyGpu` table; Metal no-load stays High (no steps, a 3 s freeze is ignored) and the `host.quality` API; slow laptop (CPU 6× + `?gpuload=900`) reaches dt p95 ≤ 34 ms over 10–25 s with no up/down reversals, both governor-only (`?bench=0`) and bench + governor; falsified with `?gov=0` (p95 50–67 ms must fail the gate). |
 
-URL flags (`core/flags.js`): `?nosave ?reset ?debug ?demo ?tier= ?dpr= ?fast= ?focus=<id> ?presenter=overlay ?break=norecover ?seed=`. The art params `?tod= ?tm= ?expo=` are read by world.js.
+URL flags (`core/flags.js`): `?nosave ?reset ?debug ?demo ?tier= ?dpr= ?fast= ?focus=<id> ?presenter=overlay ?break=norecover ?seed=`. Quality flags (read by host/quality): `?tier=high|medium|low` (fixed preset), `?qstart=<level>` (auto, starting and capped at that rung, no bench), `?bench=0`, `?gov=0` (auto never moves), `?gpu=<renderer string>` (spoof the GPU probe), `?gputimer=0`, `?gpuload=<n>` (test-only slow-GPU stand-in). The art params `?tod= ?tm= ?expo=` are read by world.js.
 
 ## Phone frame scheduling (round 2, lane M — PERF P#3, P#5, P#10)
 Phones are `device.mobile` (Android/iOS UA or `pointer:coarse`). Desktop scheduling is unchanged.
@@ -194,3 +195,59 @@ Storm runs at 60 fps by design (hot), so it gains only the shadow cut and the so
 
 ## Blank build cards (round 3, lane M)
 Not a scheduler bug. The UI scrolls the page to every business that opens (`app.js celebrateOpen → scrollToCard(id, true)`), so with all 9 sites building the page jumps to each one as it finishes. `camshot` centred a card, waited 6 s, then clipped the card's document rect; by then the page was often a screen away, and a CDP clip outside the viewport captures the flat beige poster (the 2D canvas is never painted there). Single-site runs have no other opening to jump to, so they looked fine. Measured in the page, no on-screen card was blank for more than one 60 ms sample in any run (S22, CPU 4×, building and open). Fix: `tools/cdp.mjs cardShot(page, id, path)` re-centres instantly, waits for two fresh host presents of that view, checks the card is fully on screen, and retries if it moved during the capture; `camshot` uses it. Use `cardShot` for any card screenshot.
+
+## Adaptive quality (lane M, 2026-10-04)
+Aaron: "a slow-ish laptop was a bit jerky". Before this, the governor stepped on a 2 s **mean** only, dropped every
+frame > 250 ms (so a really slow device never stepped at all), read a GPU-bound steady 33 ms as a refresh cap (never
+stepped), and on a 1× desktop its DPR rungs were no-ops (floored at 1). It already ran on desktops as well as phones.
+
+**One ladder for every device** (`quality.js LADDER`, cumulative, ordered by cost saved per visual loss):
+
+| level | adds | label |
+|---|---|---|
+| 0 | full: desktop DPR ≤ 2 (+ hero pixel budget 3.2 Mpx), phone 1.5 / cards 2 @ 0.5 Mpx, post ½-res + 4× RT MSAA, shadows 2048 | high |
+| 1, 2 | DPR × 0.85, × 0.7 (screens ≤ 1.25 DPR may go to 0.8; others never below 1) | high |
+| 3 | post from ¼ res, no RT/card MSAA, no hero sharpen | medium |
+| 4 | shadow map 1024 (world tier `mid`), hero shadow rate ½ | medium (**preset Medium**) |
+| 5 | cards 20/10 fps, K 2, fx 0.75 | medium |
+| 6 | hero 30 fps | medium |
+| 7 | post (bloom + tilt) off | low |
+| 8 | no shadow maps (the one renderer recreate), cards 15/8, K 1, fx 0.5 | low (**preset Low**) |
+| 9, 10 | DPR × 0.6 / × 0.5 (floor 0.75 / 0.6), crowd 0.6 / 0.35 | low |
+
+Context MSAA stays fixed per device. `q.crowd` is sent to `world.setCrowdDensity(f)` if the world has it (requested from A).
+
+**Start (auto).** `probeDevice()` → `classifyGpu(renderer string)`: software (SwiftShader, llvmpipe, Basic Render) low;
+old Intel HD (≤ 4xx/HD 4000 class) low; other Intel/AMD integrated, GeForce MX/GT mid; Iris Xe/Arc, Apple, discrete
+high; phones as before (Adreno/Mali numbers, PowerVR/Mali-T low). Then ≤ 2 cores or ≤ 2 GB → low, ≤ 4 cores or ≤ 4 GB
+(desktop) → at most mid; a > 6 Mpx screen on a mid GPU starts one rung lower. high/mid/low = level 0/4/8, and that is
+also the auto **ceiling**. `host.debug.device.reasons` lists why.
+**Boot bench** (auto only, once): 2.5 s after the first present, 8 hero renders are each fenced by a 1×1 readPixels
+(CPU submit + GPU), minus an empty-sync round trip; the 2nd-fastest of the last 5 is projected down the ladder by
+`cost` until it fits 14 ms (phone 16 ms). It only ever lowers the start, at most to level 7 (no recreate).
+Measured: M5 headless 1440×900 @1 ≈ 6–11 ms (stays High), @2 ≈ 21–23 ms (→ level 2, which then holds 60 fps); the
+slow-laptop stand-in 44–62 ms (→ 6–7). `host.debug.bench`.
+
+**Governor** (`createGovernor`, auto only; same code on phones and desktops). Fed every rendered rAF with the interval,
+the host's CPU work and the GPU time (`EXT_disjoint_timer_query_webgl2` around each frame's GL work, `debug.gpuMs`,
+−1 where unavailable). Decides every 250 ms over a 3 s window; no sampling for 4.5 s after boot/bench, 2.5 s after a
+visibility return (lifecycle resume resets it; hidden tabs don't render), 1.5 s after a step.
+- Down: mean > 1.25 × target (16.7 ms) or > 5 % hitches (> 2.5 × target). Size: ≤ 3 rungs, picked by `cost` from
+  mean/target (a 200 ms boot on the stand-in goes 0→3→6 in two steps). Card-budget pressure is still one rung.
+- Not ours: slow, but GPU (when known) and CPU both light → hold. Steady 2× with no GPU timer → one **trial** step;
+  if the next window isn't 12 % faster it is a 30 Hz refresh cap (iOS Low Power Mode): revert and target 33.3 ms.
+- Up: mean at target, < 1 % hitches, CPU < ½ target, GPU × next-rung cost < 0.8 × target; held 12 s × 2^(times that
+  rung already failed, max 16×), so a rung that can't hold is retried at 24, 48 … 192 s: no oscillation.
+- `debug.governor` (meanDt, p95, slow, gpu, reason, downs, ups, trials, capped), `debug.qlog` ([t, from, to, why]).
+
+**Settings API (for lane U).** `host.quality.set('auto'|'high'|'medium'|'low')` → bool (also `'mid'`, `'battery'`);
+`host.quality.current()` → `{ mode, level, label ('high'|'medium'|'low'), tier (world shadow tier), auto, ceiling,
+levels, dpr, bench, reason, device }`; `host.quality.on(fn)` → unsubscribe, `fn(current())` on every mode or level
+change (auto steps included, so "Auto (Medium)" can update live). `host.quality.knobs` is the live knob object (the
+frame hooks get it too). Fixed presets never move. `host.setTier(name)` is the old alias. U persists the choice and
+calls `set()` at boot; `?tier=` beats the saved setting. `bus graphics:tier` still fires.
+
+**Test stand-in.** Swiftshader can't model this (300–600 ms frames even at low), and CDP CPU throttling doesn't slow the
+GPU process, so `?gpuload=N` adds an additive full-view pass after every view render whose fragment loop runs N times
+(alpha 1 × ~0 colour: with alpha 0 Metal's pipeline compiler dead-strips it). Cost scales with pixels × frames, like a
+fill-bound iGPU. N = 900 at 1440×900 + CPU 6×: High = dt p95 50–67 ms, GPU 27–46 ms.
