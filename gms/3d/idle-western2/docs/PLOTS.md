@@ -315,3 +315,46 @@ Owner: lane P. The files are `js/render/plots/*`. Each business has one file. Th
 - test-boot PASS, test-cards PASS, test-scroll PASS (163 max draws, p95 3.8 ms). Plot draws are unchanged: everything new is static, an instance, or in an existing pool.
 - Shots in `docs/art/shots/r5/` (gitignored): `p_build_vs_ref_r5.jpg` (r4 → r5 → ref), `p_build_stages_r5.jpg`, `p_saloon_vs_ref_r5.jpg`, `p_cards_open_a_r5.jpg`, `p_cards_open_b_r5.jpg`.
 - **Open:** the open-state cards (other than the saloon) still show a lot of sky and sand above the roofs. That is the next framing pass.
+
+## Round 6 (2026-10-04)
+
+### Card framing: the building sits in the middle of the card (PT2#12)
+- In open cards the building now fills the middle of the frame under a sky and mesa band of about 20–25%. At scroll 0 the first card under the hero now shows the shop and its sign. Before, it showed only sky and desert.
+- The 8 non-saloon cards use `cardCam([lx, ≈0.45·FH, 2.2], 24, 15, 12.5–15, 54)`. The camera is close and wide, and it aims straight at the building's mid-height, so the pitch (15°) puts the horizon at about 24% from the top.
+- **Why close:** a low camera at the old 22–27 m stood behind the south frontage (z ≈ 13). Pomfrey's blade signs (FEED, GOODS, HATS, TOWN HALL) and the covered wagon then poked into the bottom of the card, because `town:signs` is never culled. At 12.5–15 m, those signs are behind the camera or below the frame.
+- **Saloon:** `cardCam([-0.3, 3.3, 2.8], 22, 11, 24.5, 40)`. Pulled back to 26 m, a south sign showed again.
+- **`cardCam(..., build = true)`** is now a flag. finishPlot replaces it with `buildCam(site)` (the same as R5).
+
+### Foreground cactus (C#5)
+- `fgProp` saguaro: radius `max(0.26, H·0.05)`, tone 0.58 (`ribbed(..., k)` takes a tone factor), and no red rock.
+- Defaults: open `sx ±1.08, up 1.3`; build `sx −1.1, dist 5.2, up 0.75, s 0.7`. The saguaro's centre is off the frame edge, so it covers about 2–4% of the card.
+
+### Build site (C#7)
+- The yard's red `rockN` stones are gone. In their place:
+  - 4 flat sawdust drifts, plus one under the sawhorse;
+  - 7 offcut blocks;
+  - 2 dropped planks.
+- All of it is static, so it costs 0 draws.
+- Some red pebbles still show at the build card's bottom edge. They come from the town ground scatter (town.js), not the plot.
+
+### Saloon (C#2 + interior light)
+- **Ejectee:** drawn at 1.1× (was 1.45×) with a 0.8 brown stetson. He lands in open dirt in front of the porch and left of the steps, clear of the doors (`LAND = [DOOR−1.7, 0, PZ1+3.3]`).
+- **Dust:** the puff is 4 + 14 small `dirtM` clods (pool 20, was 40 cream balls). Lane S's alpha sprites should replace this pool when they land (`puff` in saloon.js).
+- **Interior light:**
+  - `inGlow` and `inDeep` are hotter and more orange.
+  - All 5 front windows use the new `glassS` (orange, g 0.6). `win()` takes `o.glass`.
+  - A 4-band `spill` glow runs from the doorway across the porch boards (static, 0 draws).
+  - The queue head now waits right of the doorway (counter `DOOR+1.95`), so the lit bar shows.
+- **Still behind the ref:** the porch under the balcony stays in shadow, so the doorway reads amber but not blazing. A warm point light or lane A's lamp pool would do more.
+
+### Checks (CDP 9341)
+- test-boot PASS, test-cards PASS, test-scroll PASS (175 max draws). Plot draws are unchanged.
+- Shots in `docs/art/shots/r6/`:
+  - `p_cards_r5.jpg` and `p_cards_r6.jpg`;
+  - `p_rest_r6.jpg` (the rest screen, r5 → r6);
+  - `p_saloon_vs_ref_r6.jpg` (its ejection frame comes from the 26 m trial camera);
+  - `p_build_vs_ref_r6.jpg`;
+  - raw frames in `base/`, `v3/` and `ej/`.
+- **Open:**
+  - The build card's crew is still giant in the foreground (camera ≤ 12.5 m).
+  - Lane A or the engine should cull `town:signs` for north-facing card cameras. That would let the open cards back off to a gentler lens.

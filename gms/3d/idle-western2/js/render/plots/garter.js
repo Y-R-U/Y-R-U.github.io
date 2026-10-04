@@ -86,7 +86,7 @@ export default function buildPlot(kit, { line, palette, rng }) {
 
   const out = finishPlot(P, C, {
     w: 14, cardW: 12.5, d: 9, h: FH + 2,
-    camera: cardCam([-1.0, 2, 2.5], 26, 20, 25, 38, 7, [[-0.8, 3.0, 2.5], 24, 10, 22, 38, 12]),
+    camera: cardCam([-1.0, 3.6, 2.2], 24, 15, 15, 54, null, true),
     pileAnchor: PILE, pileR: 1.2,
     exit: [[DOOR[0] + 1, 3.4], [5, 4.0], [7.2, 4.2]],
     focus: [0, 1],

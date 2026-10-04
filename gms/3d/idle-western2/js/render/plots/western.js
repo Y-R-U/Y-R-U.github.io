@@ -105,7 +105,7 @@ export function door(b, x, y, z, o = {}) {
 
 export function win(b, x, y, z, o = {}) {
   const w = o.w ?? 1.2, h = o.h ?? 1.3, trim = o.trim ?? 'cream';
-  b.slab('glass', x, y, z - 0.02, w, h, 0.05, { round: 0.01, taper: 0, noAo: true });
+  b.slab(o.glass ?? 'glass', x, y, z - 0.02, w, h, 0.05, { round: 0.01, taper: 0, noAo: true });
   b.slab('interior', x, y + 0.02, z - 0.12, w - 0.05, h - 0.04, 0.03, { round: 0.01, taper: 0, noAo: true });
   b.slab(trim, x, y - 0.12, z + 0.02, w + 0.3, 0.14, 0.22, { round: 0.03, taper: 0 });
   b.slab(trim, x, y + h, z + 0.02, w + 0.3, 0.14, 0.14, { round: 0.03, taper: 0 });
@@ -437,7 +437,7 @@ export function cardCam(look, yaw = 16, elev = 32, dist = 14, fov = 40, sky = nu
     at = [pos[0] + Math.sin(a) * Math.cos(pt) * d, pos[1] - Math.sin(pt) * d, pos[2] - Math.cos(a) * Math.cos(pt) * d];
   }
   const cam = { pos, look: at, fov, facade: true };
-  if (build) cam.build = cardCam(...build);
+  if (build) cam.build = build === true ? { facade: true } : cardCam(...build);
   return cam;
 }
 
@@ -477,14 +477,15 @@ export function vignette(b, x, z, o = {}) {
 
 // Round ribbed cactus column (R5 critic: "a round ribbed cactus, not a flat bar"): a dark core with n smooth ellipsoid
 // ribs around it (they pinch together at the foot and crown) and a domed top, plus pale spine dots on the ribs.
-export function ribbed(b, x, y, z, r, h, n = 10) {
-  b.cyl('cactus2', x, y, z, r * 0.86, h - r * 0.4, 0, { sides: 12, taper: 0.94 });
+export function ribbed(b, x, y, z, r, h, n = 10, k = 1) {
+  const c1 = k === 1 ? 'cactus' : tone(COLORS.cactus, k), c2 = k === 1 ? 'cactus2' : tone(COLORS.cactus2, k);
+  b.cyl(c2, x, y, z, r * 0.86, h - r * 0.4, 0, { sides: 12, taper: 0.94 });
   for (let i = 0; i < n; i++) {
     const a = (i / n) * Math.PI * 2, c = Math.cos(a), sn = Math.sin(a);
-    b.ball(i % 2 ? 'cactus' : tone(COLORS.cactus, 1.08), x + c * r * 0.72, y + (h - r * 0.4) / 2, z + sn * r * 0.72, 1, { sx: r * 0.34, sy: (h - r * 0.4) / 2 + r * 0.1, sz: r * 0.34, ry: -a, detail: 1, smooth: true });
-    if (i % 2 === 0) for (let k = 1; k < 4; k++) b.ball('#f3e6c8', x + c * r * 1.04, y + (h - r * 0.4) * (k / 4), z + sn * r * 1.04, r * 0.05, { detail: 0, noAo: true });
+    b.ball(i % 2 ? c1 : tone(COLORS.cactus, 1.08 * k), x + c * r * 0.72, y + (h - r * 0.4) / 2, z + sn * r * 0.72, 1, { sx: r * 0.34, sy: (h - r * 0.4) / 2 + r * 0.1, sz: r * 0.34, ry: -a, detail: 1, smooth: true });
+    if (i % 2 === 0) for (let j = 1; j < 4; j++) b.ball(k === 1 ? '#f3e6c8' : tone('#f3e6c8', 0.5 + k * 0.5), x + c * r * 1.04, y + (h - r * 0.4) * (j / 4), z + sn * r * 1.04, r * 0.05, { detail: 0, noAo: true });
   }
-  b.ball('cactus', x, y + h - r * 0.55, z, r * 0.95, { sy: 0.85, detail: 1, smooth: true });
+  b.ball(c1, x, y + h - r * 0.55, z, r * 0.95, { sy: 0.85, detail: 1, smooth: true });
   return b;
 }
 
@@ -502,19 +503,19 @@ export function fgProp(b, cam, f) {
   const yb = pos[1] + (d.y / hl) * f.dist, H = Math.max(1, yb + (f.up ?? 1.5)), s = f.s ?? 1, side = f.sx < 0 ? 1 : -1;
   const face = Math.atan2(pos[0] - x, pos[2] - z), out = Math.sign(f.sx) || 1, ox = R.x * out, oz = R.z * out, ry = Math.atan2(-oz, ox);
   if (f.kind === 'saguaro') {
-    const r = Math.max(0.34, H * 0.065) * s;
-    ribbed(b, x, 0, z, r, H);
+    // R6 (critic r5 #5): a dark, slim silhouette half out of frame (≤ 6% of the card), not a hero prop
+    const r = Math.max(0.26, H * 0.05) * s, k = f.dark ?? 0.58;
+    ribbed(b, x, 0, z, r, H, 10, k);
     // two arms: a sphere-swept elbow out of the trunk (out, then curving up), then a ribbed column; the long one reaches
     // into the frame (-out), the short one out of it
     for (const [k, ay, R, up] of [[1, 0.4, 1.5, 0.3], [-1, 0.56, 1.0, 0.2]]) {
       const ar = r * 0.6, dx = -ox * k, dz = -oz * k, y0 = Math.max(H * ay, yb + (H - yb) * (ay - 0.2)), Rr = R * r, d0 = r * 0.8;
-      const at = (o, y, rad) => b.ball('cactus', x + dx * o, y, z + dz * o, rad, { detail: 1, smooth: true });
+      const at = (o, y, rad) => b.ball(tone(COLORS.cactus, k), x + dx * o, y, z + dz * o, rad, { detail: 1, smooth: true });
       for (let i = 0; i < 3; i++) at(r * 0.3 + (i / 2) * (d0 - r * 0.3), y0, ar);
       for (let i = 1; i <= 6; i++) { const t = (i / 6) * Math.PI / 2; at(d0 + Rr * Math.sin(t), y0 + Rr * (1 - Math.cos(t)), ar); }
-      ribbed(b, x + dx * (d0 + Rr), y0 + Rr, z + dz * (d0 + Rr), ar, Math.max(H * up, (H - y0) * 0.55), 7);
+      ribbed(b, x + dx * (d0 + Rr), y0 + Rr, z + dz * (d0 + Rr), ar, Math.max(H * up, (H - y0) * 0.55), 7, k);
     }
     for (let i = 0; i < 4; i++) b.cone(i % 2 ? 'hay2' : 'hay', x + Math.cos(i * 1.7) * r * 1.6, 0, z + Math.sin(i * 1.7) * r * 1.6, 0.14, 0.7, 0, { sides: 4, rz: Math.cos(i * 2.1) * 0.4, rx: Math.sin(i * 2.1) * 0.4 });
-    rock(b, x + ox * r * 2.2, z + oz * r * 2.2 + 0.4, 1.4 * s);
   } else if (f.kind === 'pole') {
     const r = Math.max(0.16, H * 0.022) * s;
     b.cyl('raw2', x, 0, z, r, H, 0, { sides: 8, taper: 0.85 });

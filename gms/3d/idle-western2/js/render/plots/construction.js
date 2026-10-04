@@ -4,6 +4,7 @@
 // walls rise with t. No geometry is made after boot: timbers and planks are one InstancedMesh, the swinging front and
 // the sign are two prebuilt meshes, the crew is one crowd. Also plays the Lv25/Lv100 "extension" crew bustle.
 import * as THREE from 'three';
+import { softPuffs } from '../fx.js?v=20261004f';
 import { tone, wheel, crate, particles, placed, headY, tilt, rand, smooth01, fgProp, COLORS, CROWD_K } from './western.js?v=20261004f';
 
 const easeBack = (x) => { const t = Math.max(0, Math.min(1, x)); const c = 1.9; return 1 + (c + 1) * Math.pow(t - 1, 3) + c * Math.pow(t - 1, 2); };
@@ -51,7 +52,11 @@ export function createConstruction(kit, P, site) {
   for (const [dx, dz] of [[0.45, 1.75], [1.05, 2.05], [0.6, 2.45]]) { g.cyl('plank', x1 + dx, 0, zf + dz, 0.3, 0.62, 0, { sides: 10, taper: 0.9 }); for (const h of [0.08, 0.5]) g.cyl('iron', x1 + dx, h, zf + dz, 0.31, 0.05, 0, { sides: 10, taper: 1, noAo: true }); }
   crate(g, x0 + 0.35, 0, zf + 1.7, 0.85, 0.4);
   g.cyl('iron', x0 + 1.5, 0, zf + 2.6, 0.2, 0.3, 0, { sides: 9, taper: 1.1 });
-  for (let i = 0; i < 5; i++) g.ball('rockN', S.x + (rnd() - 0.4) * S.w * 1.2, 0, zf + 3.6 + rnd() * 1.6, 0.18 + rnd() * 0.2, { sy: 0.55, detail: 0 });
+  // R6 (critic r5 #7): the yard foreground is sawdust, offcuts and dropped planks (no red rocks)
+  for (let i = 0; i < 4; i++) g.ball(tone('#ecd3a0', 0.94 + (i % 2) * 0.08), S.x + (rnd() - 0.45) * S.w * 1.1, 0, zf + 3.4 + rnd() * 1.4, 0.32 + rnd() * 0.22, { sy: 0.16, detail: 1, smooth: true, noAo: true });
+  for (let i = 0; i < 7; i++) g.slab(tone(COLORS.raw, 0.92 + (i % 3) * 0.07), S.x + (rnd() - 0.45) * S.w * 1.2, 0, zf + 3.2 + rnd() * 1.9, 0.18 + rnd() * 0.2, 0.1, 0.14 + rnd() * 0.08, { round: 0.02, taper: 0, ry: rnd() * 3 });
+  for (let i = 0; i < 2; i++) g.slab(tone(COLORS.raw, 1.0 + i * 0.05), S.x - 1.2 + i * 2.6, 0.03, zf + 3.9 + i * 0.5, 2.2, 0.08, 0.26, { round: 0.02, taper: 0, ry: 0.4 - i * 0.9, rz: 0.02 });
+  g.ball(tone("#ecd3a0", 1.0), S.x + 0.95, 0, zf + 2.35, 0.55, { sy: 0.14, detail: 1, smooth: true, noAo: true });
   // sawhorse with a plank half sawn (B works here: the bonk victim)
   const SAW = [S.x + 0.95, zf + 2.25];
   for (const k of [-1, 1]) for (const j of [-1, 1]) g.slab('raw2', SAW[0] + k * 0.6, 0, SAW[1] + j * 0.2, 0.13, 0.8, 0.13, { round: 0.03, taper: 0, rz: k * 0.14, rx: j * 0.2 });
@@ -213,7 +218,7 @@ export function createConstruction(kit, P, site) {
   stars.manual = true;
   stars.visible = false;
   root.add(stars);
-  const dust = particles(kit, P, (b) => { b.ball('dust', 0, 0, 0, 1, { detail: 1, smooth: true }); }, 24);
+  const dust = softPuffs(kit, P, 'dust', 24);
   root.add(dust);
 
   // crew state
@@ -549,7 +554,7 @@ export function finishPlot(P, C, spec) {
 // framing). Each is one mesh drawn only by this plot's own card camera in its own state: onBeforeRender runs before
 // three builds the model-view matrix, so other cameras (hero, neighbours' cards) get a zero-scale matrix. +1 draw, card only.
 const _z = new THREE.Matrix4().makeScale(0, 0, 0);
-const FG_BUILD = [{ kind: 'saguaro', sx: -1.02, dist: 4.4, up: 1.5, s: 0.85 }, { kind: 'post', sx: 1.02, dist: 4.2, up: 0.9 }];
+const FG_BUILD = [{ kind: 'saguaro', sx: -1.1, dist: 5.2, up: 0.75, s: 0.7 }, { kind: 'post', sx: 1.04, dist: 4.6, up: 0.7 }];
 
 // The build card's background (ref: a water tower and a shed on the far side of the lot), drawn in the card-only fg mesh.
 function backdrop(b, S) {
@@ -589,7 +594,7 @@ function framers(P, C, spec) {
     };
   };
   const flip = [...P.id].reduce((h, c) => h + c.charCodeAt(0), 0) % 2 ? 1 : -1;
-  mk(cam, spec.fg ?? [{ kind: 'saguaro', sx: -1.0 * flip, dist: 9, up: 2.4 }, { kind: 'post', sx: 1.02 * flip, dist: 8, up: 2.2 }], false);
+  mk(cam, spec.fg ?? [{ kind: 'saguaro', sx: -1.08 * flip, dist: 9, up: 1.3 }, { kind: 'post', sx: 1.04 * flip, dist: 8, up: 1.4 }], false);
   mk(cam.build, spec.fgBuild ?? FG_BUILD, true);
 }
 

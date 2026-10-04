@@ -4,6 +4,7 @@
 // the lot shows the late Mr Grimsby's version with Pomfrey's purple board.
 // L1 parlour → L25 a little Boot Hill of crosses + a gravedigger → L100 a bell tower with a gilded coffin weather vane.
 import * as THREE from 'three';
+import { softPuffs } from '../fx.js?v=20261004f';
 import { COLORS, EXTRA_HATS, cardCam, falseFront, porch, win, lantern, blade, signBoard, hats, hatted, particles, tufts, rock, wheel, tone, vignette } from './western.js?v=20261004f';
 import { createConstruction, finishPlot } from './construction.js?v=20261004f';
 
@@ -62,7 +63,7 @@ export default function buildPlot(kit, { line, palette, rng }) {
     for (const k of [-1, 1]) d.cyl('#e8d098', k * 0.1, 0, 0.05, 0.03, 0.12, 0, { sides: 4, taper: 1 });
   }, 3, { tier: 0, cast: false, radius: 8 });
   const tape = P.dynamic((d) => d.slab('#f2d16a', 0.5, 0, 0, 1, 0.05, 0.02, { round: 0, taper: 0 }), { tier: 0, cast: false });
-  const dust = particles(kit, P, (n) => n.ball('dust', 0, 0, 0, 1, { detail: 1, smooth: true }), 10);
+  const dust = softPuffs(kit, P, 'dust', 10);
 
   const SC = 1.08;
   const folk = hatted(P.crowd({ count: 5, seed: 47, scale: SC }), EXTRA_HATS, ['#1e1a22', '#c9b08a', '#6a5a3a', '#8a5a3a', '#3a2c2c'], [0, 1.0, 1.1, 1.0, 0.9]);
@@ -79,7 +80,7 @@ export default function buildPlot(kit, { line, palette, rng }) {
   return finishPlot(P, C, {
     w: 13, cardW: 12, d: 9, h: FH + 2,
     acquired: true,
-    camera: cardCam([-1.5, 2, 2.5], 26, 20, 23, 38, 7),
+    camera: cardCam([-1.5, 3.0, 2.2], 24, 15, 14, 54),
     pileAnchor: [DOM.x + DOM.gap * 4, 1.0, DOM.z], pileR: 1.6,
     exit: [[0, 3.4], [5, 4.0], [6.6, 4.2]],
     focus: [0, 1],

@@ -90,7 +90,7 @@ export default function buildPlot(kit, { line, palette, rng }) {
 
   return finishPlot(P, C, {
     w: 12, cardW: 11, d: 9, h: FH + 2,
-    camera: cardCam([-1.1, 2, 2.5], 26, 20, 22, 38, 7, [[-0.8, 3.0, 2.5], 24, 10, 21, 38, 12]),
+    camera: cardCam([-1.1, 3.2, 2.2], 24, 15, 13, 54, null, true),
     pileAnchor: JAR, pileR: 1.0,
     exit: [[BX - 1.6, 3.4], [4, 4.0], [6.3, 4.2]],
     focus: [0.5, 1.2],

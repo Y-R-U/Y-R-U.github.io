@@ -2,6 +2,7 @@
 // and a mule that kicks the barn wall every few seconds (dust, a plank pops loose). Stock: the manure heap, with flies.
 // L1 barn + corral → L25 lean-to stalls + more horses → L100 a big horseshoe on the roof and a horse weather vane.
 import * as THREE from 'three';
+import { softPuffs } from '../fx.js?v=20261004f';
 import { COLORS, EXTRA_HATS, cardCam, porch, win, lantern, blade, signBoard, hats, hatted, particles, tufts, rock, horse, bale, tone, battens, wheel, vignette } from './western.js?v=20261004f';
 import { createConstruction, finishPlot } from './construction.js?v=20261004f';
 
@@ -79,7 +80,7 @@ export default function buildPlot(kit, { line, palette, rng }) {
   b.slab('iron', PILE[0] + 1.25, 1.15, PILE[2] + 0.2, 0.35, 0.4, 0.05, { round: 0.02, taper: 0, rz: 0.4 });
 
   const sparks = particles(kit, P, (n) => n.ball('spark', 0, 0, 0, 1, { detail: 0 }), 18);
-  const dust = particles(kit, P, (n) => n.ball('dust', 0, 0, 0, 1, { detail: 1, smooth: true }), 10);
+  const dust = softPuffs(kit, P, 'dust', 10);
   const flies = particles(kit, P, (n) => n.ball('#1e1a1a', 0, 0, 0, 1, { detail: 0 }), 5);
   flies.manual = true;
   const SC = 1.08;
@@ -98,7 +99,7 @@ export default function buildPlot(kit, { line, palette, rng }) {
 
   return finishPlot(P, C, {
     w: 16, cardW: 13, d: 9, h: FH + 2,
-    camera: cardCam([-1.3, 2, 2.5], 26, 20, 27, 38, 7, [[-2.0, 2.6, 2.5], 24, 10, 22, 38, 12]),
+    camera: cardCam([-1.3, 2.8, 2.2], 24, 15, 14, 54, null, true),
     pileAnchor: [PILE[0], 0.6, PILE[2]], pileR: 1.4,
     exit: [[BX + 0.4, 3.4], [6, 4.0], [8.5, 4.3]],
     focus: [0, 0.5],

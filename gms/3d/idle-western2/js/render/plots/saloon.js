@@ -3,6 +3,7 @@
 // Won at poker (W13): while unowned the lot shows Pomfrey's version (purple + gold boards); buying re-skins it.
 // L1 saloon → L25 card-room annex + more lanterns → L100 hotel storey, gold sign and a rooftop water tank.
 import * as THREE from 'three';
+import { softPuffs } from '../fx.js?v=20261004f';
 import { COLORS, EXTRA_HATS, cardCam, falseFront, porch, win, barrel, crate, lantern, blade, signBoard, horse, hatted, particles, tufts, tone, cart, bale, tilt, vignette } from './western.js?v=20261004f';
 import { createConstruction, finishPlot } from './construction.js?v=20261004f';
 
@@ -15,7 +16,7 @@ const HAYCART = [6.4, 3.7], WAGON = [9.8, 8.8], BALC_Y = H1 + 0.36;
 const PZ1 = 3.9, BALZ = FZ + 1.75, OPEN_W = 3.3, OPEN_H = 2.75;
 
 export default function buildPlot(kit, { line, palette, rng }) {
-  const P = kit.plot({ id: 'saloon', line, palette, rng, seed: 41, colors: { ...COLORS, bottle: { c: '#7a3a1e', r: 0.2 }, felt: '#3f7a52', pom: '#6b3f8f', pomGold: COLORS.gold, inGlow: { c: '#ffb257', r: 0.5, g: 0.55 }, inDeep: { c: '#d9783a', r: 0.6, g: 0.3 }, inBar: { c: '#7a3a22', r: 0.7 }, inLamp: { c: '#ffe3a6', r: 0.2, g: 1.2 }, mirror: { c: '#ffd890', r: 0.1, g: 0.75 }, inSil: { c: '#4a2620', r: 0.9 } } });
+  const P = kit.plot({ id: 'saloon', line, palette, rng, seed: 41, colors: { ...COLORS, bottle: { c: '#7a3a1e', r: 0.2 }, felt: '#3f7a52', pom: '#6b3f8f', pomGold: COLORS.gold, inGlow: { c: '#ff9a3c', r: 0.5, g: 0.8 }, inDeep: { c: '#d8692a', r: 0.6, g: 0.55 }, glassS: { c: '#ff8f30', r: 0.25, g: 0.6 }, spill: { c: '#f2b06a', r: 0.7, g: 0.28 }, inBar: { c: '#7a3a22', r: 0.7 }, inLamp: { c: '#ffe3a6', r: 0.2, g: 1.2 }, mirror: { c: '#ffd890', r: 0.1, g: 1.0 }, inSil: { c: '#4a2620', r: 0.9 } } });
   const { b, t1, t2, lot } = P;
   vignette(b, -7.0, 5.7);
 
@@ -75,8 +76,8 @@ export default function buildPlot(kit, { line, palette, rng }) {
 
   // Card gag (R3): Mabel throws a cowboy through the bat-wings every EJ s; he tumbles into the street in a dust puff,
   // lies flat, sits up dizzy and staggers off. Card-only (out.inCard), so it never doubles lane S's hero ejection.
-  const puff = particles(kit, P, (n) => { n.ball('dirtL', 0, 0, 0, 1, { detail: 1, smooth: true }); }, 40);
-  const EJ = 8.5, LAND = [DOOR[0] - 1.1, 0, PZ1 + 1.9];
+  const puff = softPuffs(kit, P, 'dirtM', 20);
+  const EJ = 8.5, LAND = [DOOR[0] - 1.7, 0, PZ1 + 3.3];
   let ej = 0, landed = false, launched = false;
   const _mm = new THREE.Matrix4(), _sq = new THREE.Matrix4();
 
@@ -92,13 +93,13 @@ export default function buildPlot(kit, { line, palette, rng }) {
   // bouncer by the doors (8), Lulu and a cowboy on the balcony (9, 10)
   const SC = 1.08;
   const folk = hatted(P.crowd({ count: 12, seed: 23, scale: SC }), EXTRA_HATS, ['#7a5236', '#3a2c2c', '#c9b08a', '#8a3a2a', '#e6d6b8', '#2e2630', '#6a5a3a', '#d9c6a0', '#3a2c2c', '#c4473a', '#3a2c2c', '#c9a06a'], [1, 1.1, 0.9, 1.0, 1, 0.9, 1.3, 1.15, 0.38, 1, 1, 1.25]);
-  P.queue(folk, { ids: [0, 1, 2], spawn: [[8.4, 4.6], [8.4, 4.2]], counter: [DOOR[0] + 0.4, FZ + 1.25], dir: [1, 0.02], gap: 1.15, y: 0.37, exit: [[DOOR[0], FZ - 0.6], [DOOR[0], FZ - 1.6]], carry: false, faceCounter: Math.PI });
+  P.queue(folk, { ids: [0, 1, 2], spawn: [[8.4, 4.6], [8.4, 4.2]], counter: [DOOR[0] + 1.95, FZ + 1.3], dir: [1, 0.02], gap: 1.15, y: 0.37, exit: [[DOOR[0], FZ - 0.6], [DOOR[0], FZ - 1.6]], carry: false, faceCounter: Math.PI });
   folk.dress(5, 'fingers');
   folk.dress(6, 'pickles');
   folk.look(7, { top: '#5E8F8C', bot: '#4a3a32', skin: 3, hair: 0, style: 1 }).body(7, 1.18, 1.0, 1.0);
   folk.dress(8, 'mabel');
   folk.dress(9, 'lulu').body(9, 1.24, 0.95, 0.92).look(9, { hatScale: 0.8 });
-  folk.look(11, { top: '#c4473a', bot: '#4a5878', skin: 1, hair: 2, style: 3, stache: 'walrus', hat: 'stetson', hatScale: 0.62, hatColor: 'tan', acc: ['vest'] }).body(11, 1.2, 0.95, 1.0);
+  folk.look(11, { top: '#c4473a', bot: '#4a5878', skin: 1, hair: 2, style: 3, stache: 'walrus', hat: 'stetson', hatScale: 0.8, hatColor: 'brown', acc: ['vest'] }).body(11, 1.2, 0.95, 1.0);
   folk.look(10, { top: '#D9A441', bot: '#4a5878', skin: 3, hair: 1, style: 2, stache: 'walrus', hat: 'stetson', hatScale: 0.9, hatColor: 'brown' }).body(10, 1.2, 0.95, 1.05);
 
   let playK = 0, frenzy = 0, nextNote = 0;
@@ -110,8 +111,8 @@ export default function buildPlot(kit, { line, palette, rng }) {
   const out = finishPlot(P, C, {
     w: 16, cardW: 13, d: 9, h: FH + 2,
     acquired: true,
-    camera: cardCam([-0.3, 3.0, 2.8], 22, 11, 22, 40),
-    fg: [{ kind: 'saguaro', sx: -1.0, dist: 8.5, up: 2.6 }, { kind: 'post', sx: 1.0, dist: 7, up: 3.4 }],
+    camera: cardCam([-0.3, 3.3, 2.8], 22, 11, 24.5, 40),
+    fg: [{ kind: 'saguaro', sx: -1.08, dist: 8.5, up: 1.3 }, { kind: 'post', sx: 1.04, dist: 7, up: 1.6 }],
     pileAnchor: PILE, pileR: 1.4,
     lamps: [[DOOR[0] - 2.0, 2.6, FZ + 0.45], [DOOR[0] + 2.0, 2.6, FZ + 0.45], [DOOR[0], 1.8, FZ - 0.2]],
     exit: [[DOOR[0] + 1, 3.6], [6, 4.0], [8.5, 4.4]],
@@ -163,9 +164,9 @@ export default function buildPlot(kit, { line, palette, rng }) {
   // R5 (critic fix 4): the thrown cowboy is 1.45× and lands on the card's centre line, hangs at the top of a high arc,
   // stretches in flight, pancakes on landing (squash/stretch on the instance matrix) in a big dust burst.
   function eject(u) {
-    const C = P.CLIP, ES = 1.45;
+    const C = P.CLIP, ES = 1.1;
     if (u < 0.3) { folk.hide(11); landed = false; return; }
-    if (u < 0.4) { doorKick = 0.6; doorSwing = 1; if (!launched) { launched = true; for (let i = 0; i < 6; i++) puff.emit(DOOR[0] + (i - 2.5) * 0.3, 0.6 + (i % 3) * 0.3, FZ + 0.6, (i - 2.5) * 0.4, 0.4, 1.2, 0.8, 0.22, 0); } }
+    if (u < 0.4) { doorKick = 0.6; doorSwing = 1; if (!launched) { launched = true; for (let i = 0; i < 4; i++) puff.emit(DOOR[0] + (i - 1.5) * 0.35, 0.6 + (i % 2) * 0.3, FZ + 0.6, (i - 1.5) * 0.4, 0.3, 1.0, 0.6, 0.12, 0); } }
     if (u < 1.75) {
       const t = (u - 0.3) / 1.45, f = t + 0.1 * Math.sin(t * Math.PI * 2);
       const x = DOOR[0] + (LAND[0] - DOOR[0]) * f, z = FZ + 0.2 + (LAND[2] - FZ - 0.2) * f;
@@ -176,7 +177,7 @@ export default function buildPlot(kit, { line, palette, rng }) {
     }
     if (!landed) {
       landed = true; launched = false;
-      for (let i = 0; i < 30; i++) { const a = (i / 30) * Math.PI * 2 + Math.sin(i * 7) * 0.2, v = 1.6 + (i % 4) * 0.55; puff.emit(LAND[0] + Math.cos(a) * 0.8, 0.2, LAND[2] + Math.sin(a) * 0.6, Math.cos(a) * v, 0.45 + (i % 5) * 0.28, Math.sin(a) * v * 0.6, 1.1 + (i % 3) * 0.35, 0.22 + (i % 4) * 0.08, 0.5); }
+      for (let i = 0; i < 14; i++) { const a = (i / 14) * Math.PI * 2 + Math.sin(i * 7) * 0.2, v = 1.2 + (i % 4) * 0.4; puff.emit(LAND[0] + Math.cos(a) * 0.7, 0.1, LAND[2] + Math.sin(a) * 0.5, Math.cos(a) * v, 0.3 + (i % 5) * 0.15, Math.sin(a) * v * 0.6, 0.7 + (i % 3) * 0.2, 0.1 + (i % 4) * 0.035, 0.5); }
       doorSwing = 1;
     }
     if (u < 3.8) {
@@ -203,14 +204,14 @@ export default function buildPlot(kit, { line, palette, rng }) {
     const boardC = own ? 'cream' : 'pom', trimC = own ? 'brass' : 'pomGold';
     falseFront(B, { x: BX, fz: FZ, w: W, d: D, h: H2, fh: FH, front: 'barn', wall: tone(COLORS.barn, 0.85), parapet: 'stepped', door: false, windows: [], trim: 'cream' });
     // ground floor: a wide open doorway glowing with the bar inside (bat-wings in the middle), big windows each side
-    if (own) interior(B, DOOR[0], 0.35, FZ + 0.12);
+    if (own) { interior(B, DOOR[0], 0.35, FZ + 0.12); spill(B, DOOR[0], FZ + 0.25); }
     else B.slab('interior', DOOR[0], 0.35, FZ + 0.12, OPEN_W, OPEN_H, 0.05, { round: 0.01, taper: 0, noAo: true });
     B.slab('cream', DOOR[0], 0.35 + OPEN_H, FZ + 0.2, OPEN_W + 0.5, 0.2, 0.2, { round: 0.03, taper: 0 });
     for (const sd of [-1, 1]) B.slab('cream', DOOR[0] + sd * (OPEN_W / 2 + 0.1), 0.35, FZ + 0.2, 0.2, OPEN_H, 0.2, { round: 0.03, taper: 0 });
-    win(B, DOOR[0] - 3.35, 1.0, FZ + 0.16, { w: 2.0, h: 1.5, trim: 'cream', sil: 2 });
-    win(B, DOOR[0] + 3.15, 1.0, FZ + 0.16, { w: 1.6, h: 1.5, trim: 'cream', sil: 1 });
+    win(B, DOOR[0] - 3.35, 1.0, FZ + 0.16, { w: 2.0, h: 1.5, trim: 'cream', sil: 2, glass: own ? 'glassS' : 'glass' });
+    win(B, DOOR[0] + 3.15, 1.0, FZ + 0.16, { w: 1.6, h: 1.5, trim: 'cream', sil: 1, glass: own ? 'glassS' : 'glass' });
     // upstairs: three windows with shutters, one with a lady's curtain
-    for (let i = 0; i < 3; i++) win(B, BX - 3.4 + i * 3.4, H1 + 0.95, FZ + 0.16, { w: 1.1, h: 1.35, trim: 'cream', shutters: i === 1 ? 'teal' : 'mustard' });
+    for (let i = 0; i < 3; i++) win(B, BX - 3.4 + i * 3.4, H1 + 0.95, FZ + 0.16, { w: 1.1, h: 1.35, trim: 'cream', shutters: i === 1 ? 'teal' : 'mustard', glass: own ? 'glassS' : 'glass' });
     // the big sign + blade sign
     signBoard(B, BX + 0.6, H1 + 1.45 + 1.0, FZ + 0.18, 5.6, 1.25, { board: boardC, trim: trimC });
     bottle(B, BX + 0.6, H1 + 4.25, FZ + 0.3, own);
@@ -305,6 +306,11 @@ export default function buildPlot(kit, { line, palette, rng }) {
     }
     B.slab('inSil', x - 0.2, y + 0.95, z + 0.05, 0.08, 0.4, 0.01, { round: 0.03, taper: 0, rz: 0.5, noAo: true });
     B.slab('inSil', x - 0.08, y + 1.3, z + 0.05, 0.1, 0.15, 0.01, { round: 0.02, taper: 0, noAo: true });
+  }
+
+  // R6: warm lamplight spilling out of the doorway onto the porch boards and the step (static, glow slot)
+  function spill(B, x, z) {
+    for (let i = 0; i < 4; i++) B.slab('spill', x, 0.355 + i * 0.002, z + 0.4 + i * 0.55, OPEN_W - 0.2 + i * 0.5, 0.01, 0.55, { round: 0, taper: 0, noAo: true });
   }
 
   function hound(B, x, y, z) {
