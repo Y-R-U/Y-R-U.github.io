@@ -1,0 +1,1 @@
+artists/jackson-pollock: dropped clue leaking "jack": He was nicknamed Jack the Dripper.

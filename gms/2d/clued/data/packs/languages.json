@@ -1,0 +1,5653 @@
+{
+ "id": "languages",
+ "title": "Languages",
+ "theme": "geography",
+ "icon": "🗣️",
+ "kids": false,
+ "version": 1,
+ "notice": "\"Main languages\" are the official or most widely used languages of each country, simplified.",
+ "factsMeta": {
+  "family": {
+   "type": "cat",
+   "label": "Language family",
+   "ask": "Which language family does {name} belong to?",
+   "stmt": "{name} belongs to the {value} family."
+  },
+  "branch": {
+   "type": "cat",
+   "label": "Branch",
+   "ask": "Which branch of its family does {name} belong to?",
+   "stmt": "{name} belongs to the {value} branch of its language family."
+  },
+  "script": {
+   "type": "cat",
+   "label": "Script",
+   "ask": "Which script is {name} normally written in?",
+   "stmt": "{name} is normally written in the {value} script."
+  },
+  "countries": {
+   "type": "num",
+   "label": "Countries where it is a main language",
+   "higherLabel": "More countries"
+  }
+ },
+ "items": [
+  {
+   "id": "english",
+   "name": "English",
+   "group": "Indo-European",
+   "facts": {
+    "family": "Indo-European",
+    "branch": "Germanic",
+    "script": "Latin",
+    "countries": 58
+   },
+   "blurb": "English is an Indo-European language written in the Latin script, and a main language of Antigua and Barbuda, Australia, Bahamas, Barbados and Belize and others.",
+   "clues": [
+    "It belongs to the Germanic branch of the Indo-European family.",
+    "It is written in the Latin script.",
+    "It is a main language in 58 countries.",
+    "It is spoken in North America, Oceania, Africa, South America, Asia and Europe.",
+    "About 3.07 billion people live in the countries where it is a main language.",
+    "It is a main language of Antigua and Barbuda, Australia and Bahamas."
+   ],
+   "difficulty": 1
+  },
+  {
+   "id": "german",
+   "name": "German",
+   "group": "Indo-European",
+   "facts": {
+    "family": "Indo-European",
+    "branch": "Germanic",
+    "script": "Latin",
+    "countries": 6
+   },
+   "blurb": "German is an Indo-European language written in the Latin script, and a main language of Austria, Belgium, Germany, Liechtenstein and Luxembourg and others.",
+   "clues": [
+    "It is written in the Latin script.",
+    "It is a main language in 6 countries.",
+    "It is spoken in Europe.",
+    "Its speakers call it \"Deutsch\".",
+    "About 114 million people live in the countries where it is a main language."
+   ],
+   "difficulty": 1
+  },
+  {
+   "id": "dutch",
+   "name": "Dutch",
+   "group": "Indo-European",
+   "facts": {
+    "family": "Indo-European",
+    "branch": "Germanic",
+    "script": "Latin",
+    "countries": 3
+   },
+   "blurb": "Dutch is an Indo-European language written in the Latin script, and a main language of Belgium, Netherlands and Suriname.",
+   "clues": [
+    "It belongs to the Germanic branch of the Indo-European family.",
+    "It is written in the Latin script.",
+    "It is a main language in 3 countries.",
+    "It is spoken in Europe and South America.",
+    "Its speakers call it \"Nederlands\".",
+    "About 30.7 million people live in the countries where it is a main language.",
+    "It is a main language of Belgium, Netherlands and Suriname."
+   ],
+   "difficulty": 2
+  },
+  {
+   "id": "swedish",
+   "name": "Swedish",
+   "group": "Indo-European",
+   "facts": {
+    "family": "Indo-European",
+    "branch": "Germanic",
+    "script": "Latin",
+    "countries": 2
+   },
+   "blurb": "Swedish is an Indo-European language written in the Latin script, and a main language of Finland and Sweden.",
+   "clues": [
+    "It belongs to the Germanic branch of the Indo-European family.",
+    "It is written in the Latin script.",
+    "It is a main language in 2 countries.",
+    "It is spoken in Europe.",
+    "Its speakers call it \"svenska\".",
+    "About 16.2 million people live in the countries where it is a main language."
+   ],
+   "difficulty": 2
+  },
+  {
+   "id": "danish",
+   "name": "Danish",
+   "group": "Indo-European",
+   "facts": {
+    "family": "Indo-European",
+    "branch": "Germanic",
+    "script": "Latin",
+    "countries": 1
+   },
+   "blurb": "Danish is an Indo-European language written in the Latin script, and a main language of Denmark.",
+   "clues": [
+    "It belongs to the Germanic branch of the Indo-European family.",
+    "It is written in the Latin script.",
+    "It is a main language in 1 country.",
+    "It is spoken in Europe.",
+    "Its speakers call it \"dansk\".",
+    "About 6 million people live in the countries where it is a main language.",
+    "It is a main language of Denmark."
+   ],
+   "difficulty": 2
+  },
+  {
+   "id": "norwegian",
+   "name": "Norwegian",
+   "group": "Indo-European",
+   "facts": {
+    "family": "Indo-European",
+    "branch": "Germanic",
+    "script": "Latin",
+    "countries": 1
+   },
+   "blurb": "Norwegian is an Indo-European language written in the Latin script, and a main language of Norway.",
+   "clues": [
+    "It belongs to the Germanic branch of the Indo-European family.",
+    "It is written in the Latin script.",
+    "It is a main language in 1 country.",
+    "It is spoken in Europe.",
+    "Its speakers call it \"norsk\".",
+    "About 5.6 million people live in the countries where it is a main language.",
+    "It is a main language of Norway."
+   ],
+   "difficulty": 2
+  },
+  {
+   "id": "icelandic",
+   "name": "Icelandic",
+   "group": "Indo-European",
+   "facts": {
+    "family": "Indo-European",
+    "branch": "Germanic",
+    "script": "Latin",
+    "countries": 1
+   },
+   "blurb": "Icelandic is an Indo-European language written in the Latin script, and a main language of Iceland.",
+   "clues": [
+    "It belongs to the Germanic branch of the Indo-European family.",
+    "It is written in the Latin script.",
+    "It is a main language in 1 country.",
+    "It is spoken in Europe.",
+    "Its speakers call it \"íslenska\".",
+    "About 392,000 people live in the countries where it is a main language."
+   ],
+   "difficulty": 2
+  },
+  {
+   "id": "afrikaans",
+   "name": "Afrikaans",
+   "group": "Indo-European",
+   "facts": {
+    "family": "Indo-European",
+    "branch": "Germanic",
+    "script": "Latin",
+    "countries": 1
+   },
+   "blurb": "Afrikaans is an Indo-European language written in the Latin script, and a main language of South Africa.",
+   "clues": [
+    "It belongs to the Germanic branch of the Indo-European family.",
+    "It is written in the Latin script.",
+    "It is a main language in 1 country.",
+    "It is spoken in Africa.",
+    "About 64.7 million people live in the countries where it is a main language.",
+    "It is a main language of South Africa."
+   ],
+   "difficulty": 2
+  },
+  {
+   "id": "french",
+   "name": "French",
+   "group": "Indo-European",
+   "facts": {
+    "family": "Indo-European",
+    "branch": "Romance",
+    "script": "Latin",
+    "countries": 29
+   },
+   "blurb": "French is an Indo-European language written in the Latin script, and a main language of Belgium, Benin, Burkina Faso, Burundi and Cameroon and others.",
+   "clues": [
+    "It belongs to the Romance branch of the Indo-European family.",
+    "It is written in the Latin script.",
+    "It is a main language in 29 countries.",
+    "It is spoken in Europe, Africa, North America and Oceania.",
+    "Its speakers call it \"français\".",
+    "About 532 million people live in the countries where it is a main language.",
+    "It is a main language of Belgium, Benin and Burkina Faso."
+   ],
+   "difficulty": 1
+  },
+  {
+   "id": "spanish",
+   "name": "Spanish",
+   "group": "Indo-European",
+   "facts": {
+    "family": "Indo-European",
+    "branch": "Romance",
+    "script": "Latin",
+    "countries": 20
+   },
+   "blurb": "Spanish is an Indo-European language written in the Latin script, and a main language of Argentina, Bolivia, Chile, Colombia and Costa Rica and others.",
+   "clues": [
+    "It belongs to the Romance branch of the Indo-European family.",
+    "It is written in the Latin script.",
+    "It is a main language in 20 countries.",
+    "It is spoken in South America, North America, Africa and Europe.",
+    "Its speakers call it \"español\".",
+    "About 482 million people live in the countries where it is a main language.",
+    "It is a main language of Argentina, Bolivia and Chile."
+   ],
+   "difficulty": 1
+  },
+  {
+   "id": "portuguese",
+   "name": "Portuguese",
+   "group": "Indo-European",
+   "facts": {
+    "family": "Indo-European",
+    "branch": "Romance",
+    "script": "Latin",
+    "countries": 9
+   },
+   "blurb": "Portuguese is an Indo-European language written in the Latin script, and a main language of Angola, Brazil, Cape Verde, Equatorial Guinea and Guinea-Bissau and others.",
+   "clues": [
+    "It belongs to the Romance branch of the Indo-European family.",
+    "It is written in the Latin script.",
+    "It is a main language in 9 countries.",
+    "It is spoken in Africa, South America, Europe and Asia.",
+    "About 305 million people live in the countries where it is a main language.",
+    "It is a main language of Angola, Brazil and Cape Verde."
+   ],
+   "difficulty": 1
+  },
+  {
+   "id": "italian",
+   "name": "Italian",
+   "group": "Indo-European",
+   "facts": {
+    "family": "Indo-European",
+    "branch": "Romance",
+    "script": "Latin",
+    "countries": 4
+   },
+   "blurb": "Italian is an Indo-European language written in the Latin script, and a main language of Italy, San Marino, Switzerland and Vatican City.",
+   "clues": [
+    "It belongs to the Romance branch of the Indo-European family.",
+    "It is written in the Latin script.",
+    "It is a main language in 4 countries.",
+    "It is spoken in Europe.",
+    "About 68 million people live in the countries where it is a main language."
+   ],
+   "difficulty": 1
+  },
+  {
+   "id": "romanian",
+   "name": "Romanian",
+   "group": "Indo-European",
+   "facts": {
+    "family": "Indo-European",
+    "branch": "Romance",
+    "script": "Latin",
+    "countries": 2
+   },
+   "blurb": "Romanian is an Indo-European language written in the Latin script, and a main language of Moldova and Romania.",
+   "difficulty": 2
+  },
+  {
+   "id": "catalan",
+   "name": "Catalan",
+   "group": "Indo-European",
+   "facts": {
+    "family": "Indo-European",
+    "branch": "Romance",
+    "script": "Latin",
+    "countries": 1
+   },
+   "blurb": "Catalan is an Indo-European language written in the Latin script, and a main language of Andorra.",
+   "clues": [
+    "It belongs to the Romance branch of the Indo-European family.",
+    "It is written in the Latin script.",
+    "It is a main language in 1 country.",
+    "It is spoken in Europe.",
+    "About 83,000 people live in the countries where it is a main language.",
+    "It is a main language of Andorra."
+   ],
+   "difficulty": 2
+  },
+  {
+   "id": "russian",
+   "name": "Russian",
+   "group": "Indo-European",
+   "facts": {
+    "family": "Indo-European",
+    "branch": "Slavic",
+    "script": "Cyrillic",
+    "countries": 4
+   },
+   "blurb": "Russian is an Indo-European language written in the Cyrillic script, and a main language of Belarus, Kazakhstan, Kyrgyzstan and Russia.",
+   "clues": [
+    "It belongs to the Slavic branch of the Indo-European family.",
+    "It is written in the Cyrillic script.",
+    "It is a main language in 4 countries.",
+    "It is spoken in Europe and Asia.",
+    "About 181 million people live in the countries where it is a main language.",
+    "It is a main language of Belarus, Kazakhstan and Kyrgyzstan."
+   ],
+   "difficulty": 1
+  },
+  {
+   "id": "ukrainian",
+   "name": "Ukrainian",
+   "group": "Indo-European",
+   "facts": {
+    "family": "Indo-European",
+    "branch": "Slavic",
+    "script": "Cyrillic",
+    "countries": 1
+   },
+   "blurb": "Ukrainian is an Indo-European language written in the Cyrillic script, and a main language of Ukraine.",
+   "clues": [
+    "It belongs to the Slavic branch of the Indo-European family.",
+    "It is written in the Cyrillic script.",
+    "It is a main language in 1 country.",
+    "It is spoken in Europe.",
+    "About 39 million people live in the countries where it is a main language."
+   ],
+   "difficulty": 2
+  },
+  {
+   "id": "bulgarian",
+   "name": "Bulgarian",
+   "group": "Indo-European",
+   "facts": {
+    "family": "Indo-European",
+    "branch": "Slavic",
+    "script": "Cyrillic",
+    "countries": 1
+   },
+   "blurb": "Bulgarian is an Indo-European language written in the Cyrillic script, and a main language of Bulgaria.",
+   "clues": [
+    "It belongs to the Slavic branch of the Indo-European family.",
+    "It is written in the Cyrillic script.",
+    "It is a main language in 1 country.",
+    "It is spoken in Europe.",
+    "Its speakers call it \"balgarski\" (romanised).",
+    "About 6.4 million people live in the countries where it is a main language."
+   ],
+   "difficulty": 2
+  },
+  {
+   "id": "polish",
+   "name": "Polish",
+   "group": "Indo-European",
+   "facts": {
+    "family": "Indo-European",
+    "branch": "Slavic",
+    "script": "Latin",
+    "countries": 1
+   },
+   "blurb": "Polish is an Indo-European language written in the Latin script, and a main language of Poland.",
+   "clues": [
+    "It belongs to the Slavic branch of the Indo-European family.",
+    "It is written in the Latin script.",
+    "It is a main language in 1 country.",
+    "It is spoken in Europe.",
+    "Its speakers call it \"polski\".",
+    "About 36.4 million people live in the countries where it is a main language.",
+    "It is a main language of Poland."
+   ],
+   "difficulty": 2
+  },
+  {
+   "id": "czech",
+   "name": "Czech",
+   "group": "Indo-European",
+   "facts": {
+    "family": "Indo-European",
+    "branch": "Slavic",
+    "script": "Latin",
+    "countries": 1
+   },
+   "blurb": "Czech is an Indo-European language written in the Latin script, and a main language of Czechia.",
+   "clues": [
+    "It belongs to the Slavic branch of the Indo-European family.",
+    "It is written in the Latin script.",
+    "It is a main language in 1 country.",
+    "It is spoken in Europe.",
+    "Its speakers call it \"čeština\".",
+    "About 10.9 million people live in the countries where it is a main language."
+   ],
+   "difficulty": 2
+  },
+  {
+   "id": "slovak",
+   "name": "Slovak",
+   "group": "Indo-European",
+   "facts": {
+    "family": "Indo-European",
+    "branch": "Slavic",
+    "script": "Latin",
+    "countries": 1
+   },
+   "blurb": "Slovak is an Indo-European language written in the Latin script, and a main language of Slovakia.",
+   "clues": [
+    "It belongs to the Slavic branch of the Indo-European family.",
+    "It is written in the Latin script.",
+    "It is a main language in 1 country.",
+    "It is spoken in Europe.",
+    "About 5.4 million people live in the countries where it is a main language."
+   ],
+   "difficulty": 3
+  },
+  {
+   "id": "croatian",
+   "name": "Croatian",
+   "group": "Indo-European",
+   "facts": {
+    "family": "Indo-European",
+    "branch": "Slavic",
+    "script": "Latin",
+    "countries": 2
+   },
+   "blurb": "Croatian is an Indo-European language written in the Latin script, and a main language of Bosnia and Herzegovina and Croatia.",
+   "clues": [
+    "It belongs to the Slavic branch of the Indo-European family.",
+    "It is written in the Latin script.",
+    "It is a main language in 2 countries.",
+    "It is spoken in Europe.",
+    "Its speakers call it \"hrvatski\".",
+    "About 7 million people live in the countries where it is a main language."
+   ],
+   "difficulty": 2
+  },
+  {
+   "id": "greek",
+   "name": "Greek",
+   "group": "Indo-European",
+   "facts": {
+    "family": "Indo-European",
+    "branch": "Hellenic",
+    "script": "Greek",
+    "countries": 2
+   },
+   "blurb": "Greek is an Indo-European language written in the Greek script, and a main language of Cyprus and Greece.",
+   "clues": [
+    "It belongs to the Hellenic branch of the Indo-European family.",
+    "It is a main language in 2 countries.",
+    "It is spoken in Asia and Europe.",
+    "Its speakers call it \"elliniká\" (romanised).",
+    "About 11.8 million people live in the countries where it is a main language."
+   ],
+   "difficulty": 2
+  },
+  {
+   "id": "albanian",
+   "name": "Albanian",
+   "group": "Indo-European",
+   "facts": {
+    "family": "Indo-European",
+    "branch": "Albanian",
+    "script": "Latin",
+    "countries": 2
+   },
+   "blurb": "Albanian is an Indo-European language written in the Latin script, and a main language of Albania and North Macedonia.",
+   "clues": [
+    "It is written in the Latin script.",
+    "It is a main language in 2 countries.",
+    "It is spoken in Europe.",
+    "Its speakers call it \"shqip\".",
+    "About 4.2 million people live in the countries where it is a main language."
+   ],
+   "difficulty": 3
+  },
+  {
+   "id": "armenian",
+   "name": "Armenian",
+   "group": "Indo-European",
+   "facts": {
+    "family": "Indo-European",
+    "branch": "Armenian",
+    "script": "Armenian",
+    "countries": 1
+   },
+   "blurb": "Armenian is an Indo-European language written in the Armenian script, and a main language of Armenia.",
+   "difficulty": 3
+  },
+  {
+   "id": "hindi",
+   "name": "Hindi",
+   "group": "Indo-European",
+   "facts": {
+    "family": "Indo-European",
+    "branch": "Indo-Aryan",
+    "script": "Devanagari",
+    "countries": 1
+   },
+   "blurb": "Hindi is an Indo-European language written in the Devanagari script, and a main language of India.",
+   "clues": [
+    "It belongs to the Indo-Aryan branch of the Indo-European family.",
+    "It is written in the Devanagari script.",
+    "It is a main language in 1 country.",
+    "It is spoken in Asia.",
+    "About 1.46 billion people live in the countries where it is a main language.",
+    "It is a main language of India."
+   ],
+   "difficulty": 1
+  },
+  {
+   "id": "bengali",
+   "name": "Bengali",
+   "group": "Indo-European",
+   "facts": {
+    "family": "Indo-European",
+    "branch": "Indo-Aryan",
+    "script": "Bengali",
+    "countries": 1
+   },
+   "blurb": "Bengali is an Indo-European language written in the Bengali script, and a main language of Bangladesh.",
+   "clues": [
+    "It belongs to the Indo-Aryan branch of the Indo-European family.",
+    "It is a main language in 1 country.",
+    "It is spoken in Asia.",
+    "Its speakers call it \"bangla\" (romanised).",
+    "About 176 million people live in the countries where it is a main language.",
+    "It is a main language of Bangladesh."
+   ],
+   "difficulty": 2
+  },
+  {
+   "id": "urdu",
+   "name": "Urdu",
+   "group": "Indo-European",
+   "facts": {
+    "family": "Indo-European",
+    "branch": "Indo-Aryan",
+    "script": "Arabic",
+    "countries": 1
+   },
+   "blurb": "Urdu is an Indo-European language written in the Arabic script, and a main language of Pakistan.",
+   "clues": [
+    "It belongs to the Indo-Aryan branch of the Indo-European family.",
+    "It is written in the Arabic script.",
+    "It is a main language in 1 country.",
+    "It is spoken in Asia.",
+    "About 255 million people live in the countries where it is a main language.",
+    "It is a main language of Pakistan."
+   ],
+   "difficulty": 2
+  },
+  {
+   "id": "nepali",
+   "name": "Nepali",
+   "group": "Indo-European",
+   "facts": {
+    "family": "Indo-European",
+    "branch": "Indo-Aryan",
+    "script": "Devanagari",
+    "countries": 1
+   },
+   "blurb": "Nepali is an Indo-European language written in the Devanagari script, and a main language of Nepal.",
+   "clues": [
+    "It belongs to the Indo-Aryan branch of the Indo-European family.",
+    "It is written in the Devanagari script.",
+    "It is a main language in 1 country.",
+    "It is spoken in Asia.",
+    "About 29.6 million people live in the countries where it is a main language."
+   ],
+   "difficulty": 3
+  },
+  {
+   "id": "sinhala",
+   "name": "Sinhala",
+   "group": "Indo-European",
+   "facts": {
+    "family": "Indo-European",
+    "branch": "Indo-Aryan",
+    "script": "Sinhala",
+    "countries": 1
+   },
+   "blurb": "Sinhala is an Indo-European language written in the Sinhala script, and a main language of Sri Lanka.",
+   "clues": [
+    "It belongs to the Indo-Aryan branch of the Indo-European family.",
+    "It is a main language in 1 country.",
+    "It is spoken in Asia.",
+    "About 21.8 million people live in the countries where it is a main language.",
+    "It is a main language of Sri Lanka."
+   ],
+   "difficulty": 3
+  },
+  {
+   "id": "persian",
+   "name": "Persian",
+   "group": "Indo-European",
+   "facts": {
+    "family": "Indo-European",
+    "branch": "Iranian",
+    "script": "Arabic",
+    "countries": 1
+   },
+   "blurb": "Persian is an Indo-European language written in the Arabic script, and a main language of Iran.",
+   "clues": [
+    "It belongs to the Iranian branch of the Indo-European family.",
+    "It is written in the Arabic script.",
+    "It is a main language in 1 country.",
+    "It is spoken in Asia.",
+    "Its speakers call it \"fārsi\" (romanised).",
+    "About 92.4 million people live in the countries where it is a main language.",
+    "It is a main language of Iran."
+   ],
+   "difficulty": 2
+  },
+  {
+   "id": "pashto",
+   "name": "Pashto",
+   "group": "Indo-European",
+   "facts": {
+    "family": "Indo-European",
+    "branch": "Iranian",
+    "script": "Arabic",
+    "countries": 1
+   },
+   "blurb": "Pashto is an Indo-European language written in the Arabic script, and a main language of Afghanistan.",
+   "clues": [
+    "It belongs to the Iranian branch of the Indo-European family.",
+    "It is written in the Arabic script.",
+    "It is a main language in 1 country.",
+    "It is spoken in Asia.",
+    "Its speakers call it \"pax̌tó\" (romanised).",
+    "About 43.8 million people live in the countries where it is a main language.",
+    "It is a main language of Afghanistan."
+   ],
+   "difficulty": 3
+  },
+  {
+   "id": "arabic",
+   "name": "Arabic",
+   "group": "Afro-Asiatic",
+   "facts": {
+    "family": "Afro-Asiatic",
+    "branch": "Semitic",
+    "script": "Arabic",
+    "countries": 24
+   },
+   "blurb": "Arabic is an Afro-Asiatic language written in the Arabic script, and a main language of Algeria, Bahrain, Chad, Comoros and Djibouti and others.",
+   "clues": [
+    "It belongs to the Semitic branch of the Afro-Asiatic family.",
+    "It is a main language in 24 countries.",
+    "It is spoken in Africa and Asia.",
+    "About 528 million people live in the countries where it is a main language.",
+    "It is a main language of Algeria, Bahrain and Chad."
+   ],
+   "difficulty": 1
+  },
+  {
+   "id": "hebrew",
+   "name": "Hebrew",
+   "group": "Afro-Asiatic",
+   "facts": {
+    "family": "Afro-Asiatic",
+    "branch": "Semitic",
+    "script": "Hebrew",
+    "countries": 1
+   },
+   "blurb": "Hebrew is an Afro-Asiatic language written in the Hebrew script, and a main language of Israel.",
+   "clues": [
+    "It belongs to the Semitic branch of the Afro-Asiatic family.",
+    "It is a main language in 1 country.",
+    "It is spoken in Asia.",
+    "Its speakers call it \"ivrit\" (romanised).",
+    "About 10.1 million people live in the countries where it is a main language.",
+    "It is a main language of Israel."
+   ],
+   "difficulty": 2
+  },
+  {
+   "id": "amharic",
+   "name": "Amharic",
+   "group": "Afro-Asiatic",
+   "facts": {
+    "family": "Afro-Asiatic",
+    "branch": "Semitic",
+    "script": "Ge'ez",
+    "countries": 1
+   },
+   "blurb": "Amharic is an Afro-Asiatic language written in the Ge'ez script, and a main language of Ethiopia.",
+   "clues": [
+    "It belongs to the Semitic branch of the Afro-Asiatic family.",
+    "It is written in the Ge'ez script.",
+    "It is a main language in 1 country.",
+    "It is spoken in Africa.",
+    "Its speakers call it \"amarəñña\" (romanised).",
+    "About 135 million people live in the countries where it is a main language.",
+    "It is a main language of Ethiopia."
+   ],
+   "difficulty": 3
+  },
+  {
+   "id": "maltese",
+   "name": "Maltese",
+   "group": "Afro-Asiatic",
+   "facts": {
+    "family": "Afro-Asiatic",
+    "branch": "Semitic",
+    "script": "Latin",
+    "countries": 1
+   },
+   "blurb": "Maltese is an Afro-Asiatic language written in the Latin script, and a main language of Malta.",
+   "clues": [
+    "It belongs to the Semitic branch of the Afro-Asiatic family.",
+    "It is written in the Latin script.",
+    "It is a main language in 1 country.",
+    "It is spoken in Europe.",
+    "About 580,000 people live in the countries where it is a main language."
+   ],
+   "difficulty": 3
+  },
+  {
+   "id": "somali",
+   "name": "Somali",
+   "group": "Afro-Asiatic",
+   "facts": {
+    "family": "Afro-Asiatic",
+    "branch": "Cushitic",
+    "script": "Latin",
+    "countries": 1
+   },
+   "blurb": "Somali is an Afro-Asiatic language written in the Latin script, and a main language of Somalia.",
+   "clues": [
+    "It belongs to the Cushitic branch of the Afro-Asiatic family.",
+    "It is written in the Latin script.",
+    "It is a main language in 1 country.",
+    "It is spoken in Africa.",
+    "Its speakers call it \"af-Soomaali\".",
+    "About 19.7 million people live in the countries where it is a main language."
+   ],
+   "difficulty": 3
+  },
+  {
+   "id": "hausa",
+   "name": "Hausa",
+   "group": "Afro-Asiatic",
+   "facts": {
+    "family": "Afro-Asiatic",
+    "branch": "Chadic",
+    "script": "Latin",
+    "countries": 1
+   },
+   "blurb": "Hausa is an Afro-Asiatic language written in the Latin script, and a main language of Niger.",
+   "clues": [
+    "It belongs to the Chadic branch of the Afro-Asiatic family.",
+    "It is written in the Latin script.",
+    "It is a main language in 1 country.",
+    "It is spoken in Africa.",
+    "About 27.9 million people live in the countries where it is a main language.",
+    "It is a main language of Niger."
+   ],
+   "difficulty": 3
+  },
+  {
+   "id": "turkish",
+   "name": "Turkish",
+   "group": "Turkic",
+   "facts": {
+    "family": "Turkic",
+    "branch": "Oghuz",
+    "script": "Latin",
+    "countries": 2
+   },
+   "blurb": "Turkish is a Turkic language written in the Latin script, and a main language of Cyprus and Turkey.",
+   "difficulty": 2
+  },
+  {
+   "id": "azerbaijani",
+   "name": "Azerbaijani",
+   "group": "Turkic",
+   "facts": {
+    "family": "Turkic",
+    "branch": "Oghuz",
+    "script": "Latin",
+    "countries": 1
+   },
+   "blurb": "Azerbaijani is a Turkic language written in the Latin script, and a main language of Azerbaijan.",
+   "clues": [
+    "It belongs to the Oghuz branch of the Turkic family.",
+    "It is written in the Latin script.",
+    "It is a main language in 1 country.",
+    "It is spoken in Asia.",
+    "Its speakers call it \"Azərbaycan dili\".",
+    "About 10.2 million people live in the countries where it is a main language."
+   ],
+   "difficulty": 3
+  },
+  {
+   "id": "uzbek",
+   "name": "Uzbek",
+   "group": "Turkic",
+   "facts": {
+    "family": "Turkic",
+    "branch": "Karluk",
+    "script": "Latin",
+    "countries": 1
+   },
+   "blurb": "Uzbek is a Turkic language written in the Latin script, and a main language of Uzbekistan.",
+   "clues": [
+    "It belongs to the Karluk branch of the Turkic family.",
+    "It is written in the Latin script.",
+    "It is a main language in 1 country.",
+    "It is spoken in Asia.",
+    "Its speakers call it \"oʻzbekcha\".",
+    "About 37.1 million people live in the countries where it is a main language."
+   ],
+   "difficulty": 3
+  },
+  {
+   "id": "finnish",
+   "name": "Finnish",
+   "group": "Uralic",
+   "facts": {
+    "family": "Uralic",
+    "branch": "Finnic",
+    "script": "Latin",
+    "countries": 1
+   },
+   "blurb": "Finnish is an Uralic language written in the Latin script, and a main language of Finland.",
+   "clues": [
+    "It is written in the Latin script.",
+    "It is a main language in 1 country.",
+    "It is spoken in Europe.",
+    "Its speakers call it \"suomi\".",
+    "About 5.6 million people live in the countries where it is a main language.",
+    "It is a main language of Finland."
+   ],
+   "difficulty": 2
+  },
+  {
+   "id": "estonian",
+   "name": "Estonian",
+   "group": "Uralic",
+   "facts": {
+    "family": "Uralic",
+    "branch": "Finnic",
+    "script": "Latin",
+    "countries": 1
+   },
+   "blurb": "Estonian is an Uralic language written in the Latin script, and a main language of Estonia.",
+   "clues": [
+    "It belongs to the Finnic branch of the Uralic family.",
+    "It is written in the Latin script.",
+    "It is a main language in 1 country.",
+    "It is spoken in Europe.",
+    "Its speakers call it \"eesti\".",
+    "About 1.4 million people live in the countries where it is a main language."
+   ],
+   "difficulty": 3
+  },
+  {
+   "id": "hungarian",
+   "name": "Hungarian",
+   "group": "Uralic",
+   "facts": {
+    "family": "Uralic",
+    "branch": "Ugric",
+    "script": "Latin",
+    "countries": 1
+   },
+   "blurb": "Hungarian is an Uralic language written in the Latin script, and a main language of Hungary.",
+   "clues": [
+    "It belongs to the Ugric branch of the Uralic family.",
+    "It is written in the Latin script.",
+    "It is a main language in 1 country.",
+    "It is spoken in Europe.",
+    "Its speakers call it \"magyar\".",
+    "About 9.5 million people live in the countries where it is a main language."
+   ],
+   "difficulty": 2
+  },
+  {
+   "id": "georgian",
+   "name": "Georgian",
+   "group": "Kartvelian",
+   "facts": {
+    "family": "Kartvelian",
+    "branch": "Kartvelian",
+    "script": "Georgian",
+    "countries": 1
+   },
+   "blurb": "Georgian is a Kartvelian language written in the Georgian script, and a main language of Georgia.",
+   "clues": [
+    "It belongs to the Kartvelian family.",
+    "It is a main language in 1 country.",
+    "It is spoken in Asia.",
+    "Its speakers call it \"kartuli\" (romanised).",
+    "About 3.9 million people live in the countries where it is a main language."
+   ],
+   "difficulty": 3
+  },
+  {
+   "id": "mandarin-chinese",
+   "name": "Mandarin Chinese",
+   "group": "Sino-Tibetan",
+   "facts": {
+    "family": "Sino-Tibetan",
+    "branch": "Sinitic",
+    "script": "Chinese characters",
+    "countries": 2
+   },
+   "blurb": "Mandarin Chinese is a Sino-Tibetan language written in the Chinese characters script, and a main language of China and Singapore.",
+   "clues": [
+    "It belongs to the Sinitic branch of the Sino-Tibetan family.",
+    "It is a main language in 2 countries.",
+    "It is spoken in Asia.",
+    "Its speakers call it \"Pǔtōnghuà\" (romanised).",
+    "About 1.41 billion people live in the countries where it is a main language."
+   ],
+   "difficulty": 1
+  },
+  {
+   "id": "burmese",
+   "name": "Burmese",
+   "group": "Sino-Tibetan",
+   "facts": {
+    "family": "Sino-Tibetan",
+    "branch": "Lolo-Burmese",
+    "script": "Burmese",
+    "countries": 1
+   },
+   "blurb": "Burmese is a Sino-Tibetan language written in the Burmese script, and a main language of Myanmar.",
+   "clues": [
+    "It is a main language in 1 country.",
+    "It is spoken in Asia.",
+    "Its speakers call it \"myanma\" (romanised).",
+    "About 54.9 million people live in the countries where it is a main language.",
+    "It is a main language of Myanmar."
+   ],
+   "difficulty": 3
+  },
+  {
+   "id": "japanese",
+   "name": "Japanese",
+   "group": "Japonic",
+   "facts": {
+    "family": "Japonic",
+    "branch": "Japonic",
+    "script": "Kanji and kana",
+    "countries": 1
+   },
+   "blurb": "Japanese is a Japonic language written in the Kanji and kana script, and a main language of Japan.",
+   "clues": [
+    "It belongs to the Japonic family.",
+    "It is written in the Kanji and kana script.",
+    "It is a main language in 1 country.",
+    "It is spoken in Asia.",
+    "Its speakers call it \"nihongo\" (romanised).",
+    "About 123 million people live in the countries where it is a main language."
+   ],
+   "difficulty": 1
+  },
+  {
+   "id": "korean",
+   "name": "Korean",
+   "group": "Koreanic",
+   "facts": {
+    "family": "Koreanic",
+    "branch": "Koreanic",
+    "script": "Hangul",
+    "countries": 2
+   },
+   "blurb": "Korean is a Koreanic language written in the Hangul script, and a main language of North Korea and South Korea.",
+   "clues": [
+    "It is written in the Hangul script.",
+    "It is a main language in 2 countries.",
+    "It is spoken in Asia.",
+    "Its speakers call it \"hangugeo\" (romanised).",
+    "About 78.3 million people live in the countries where it is a main language."
+   ],
+   "difficulty": 2
+  },
+  {
+   "id": "thai",
+   "name": "Thai",
+   "group": "Kra-Dai",
+   "facts": {
+    "family": "Kra-Dai",
+    "branch": "Tai",
+    "script": "Thai",
+    "countries": 1
+   },
+   "blurb": "Thai is a Kra-Dai language written in the Thai script, and a main language of Thailand.",
+   "difficulty": 2
+  },
+  {
+   "id": "lao",
+   "name": "Lao",
+   "group": "Kra-Dai",
+   "facts": {
+    "family": "Kra-Dai",
+    "branch": "Tai",
+    "script": "Lao",
+    "countries": 1
+   },
+   "blurb": "Lao is a Kra-Dai language written in the Lao script, and a main language of Laos.",
+   "difficulty": 3
+  },
+  {
+   "id": "vietnamese",
+   "name": "Vietnamese",
+   "group": "Austroasiatic",
+   "facts": {
+    "family": "Austroasiatic",
+    "branch": "Vietic",
+    "script": "Latin",
+    "countries": 1
+   },
+   "blurb": "Vietnamese is an Austroasiatic language written in the Latin script, and a main language of Vietnam.",
+   "clues": [
+    "It belongs to the Vietic branch of the Austroasiatic family.",
+    "It is written in the Latin script.",
+    "It is a main language in 1 country.",
+    "It is spoken in Asia.",
+    "Its speakers call it \"tiếng Việt\".",
+    "About 102 million people live in the countries where it is a main language."
+   ],
+   "difficulty": 2
+  },
+  {
+   "id": "khmer",
+   "name": "Khmer",
+   "group": "Austroasiatic",
+   "facts": {
+    "family": "Austroasiatic",
+    "branch": "Khmer",
+    "script": "Khmer",
+    "countries": 1
+   },
+   "blurb": "Khmer is an Austroasiatic language written in the Khmer script, and a main language of Cambodia.",
+   "difficulty": 3
+  },
+  {
+   "id": "malay",
+   "name": "Malay",
+   "group": "Austronesian",
+   "facts": {
+    "family": "Austronesian",
+    "branch": "Malayic",
+    "script": "Latin",
+    "countries": 3
+   },
+   "blurb": "Malay is an Austronesian language written in the Latin script, and a main language of Brunei, Malaysia and Singapore.",
+   "clues": [
+    "It is written in the Latin script.",
+    "It is a main language in 3 countries.",
+    "It is spoken in Asia.",
+    "Its speakers call it \"bahasa Melayu\".",
+    "About 42.6 million people live in the countries where it is a main language."
+   ],
+   "difficulty": 2
+  },
+  {
+   "id": "indonesian",
+   "name": "Indonesian",
+   "group": "Austronesian",
+   "facts": {
+    "family": "Austronesian",
+    "branch": "Malayic",
+    "script": "Latin",
+    "countries": 1
+   },
+   "blurb": "Indonesian is an Austronesian language written in the Latin script, and a main language of Indonesia.",
+   "clues": [
+    "It belongs to the Malayic branch of the Austronesian family.",
+    "It is written in the Latin script.",
+    "It is a main language in 1 country.",
+    "It is spoken in Asia.",
+    "About 286 million people live in the countries where it is a main language."
+   ],
+   "difficulty": 2
+  },
+  {
+   "id": "filipino",
+   "name": "Filipino",
+   "group": "Austronesian",
+   "facts": {
+    "family": "Austronesian",
+    "branch": "Philippine",
+    "script": "Latin",
+    "countries": 1
+   },
+   "blurb": "Filipino is an Austronesian language written in the Latin script, and a main language of Philippines.",
+   "clues": [
+    "It belongs to the Philippine branch of the Austronesian family.",
+    "It is written in the Latin script.",
+    "It is a main language in 1 country.",
+    "It is spoken in Asia.",
+    "About 117 million people live in the countries where it is a main language.",
+    "It is a main language of Philippines."
+   ],
+   "difficulty": 2
+  },
+  {
+   "id": "malagasy",
+   "name": "Malagasy",
+   "group": "Austronesian",
+   "facts": {
+    "family": "Austronesian",
+    "branch": "Barito",
+    "script": "Latin",
+    "countries": 1
+   },
+   "blurb": "Malagasy is an Austronesian language written in the Latin script, and a main language of Madagascar.",
+   "clues": [
+    "It belongs to the Barito branch of the Austronesian family.",
+    "It is written in the Latin script.",
+    "It is a main language in 1 country.",
+    "It is spoken in Africa.",
+    "About 32.7 million people live in the countries where it is a main language.",
+    "It is a main language of Madagascar."
+   ],
+   "difficulty": 3
+  },
+  {
+   "id": "maori",
+   "name": "Māori",
+   "group": "Austronesian",
+   "facts": {
+    "family": "Austronesian",
+    "branch": "Polynesian",
+    "script": "Latin",
+    "countries": 1
+   },
+   "blurb": "Māori is an Austronesian language written in the Latin script, and a main language of New Zealand.",
+   "clues": [
+    "It belongs to the Polynesian branch of the Austronesian family.",
+    "It is written in the Latin script.",
+    "It is a main language in 1 country.",
+    "It is spoken in Oceania.",
+    "About 5.3 million people live in the countries where it is a main language.",
+    "It is a main language of New Zealand."
+   ],
+   "difficulty": 3
+  },
+  {
+   "id": "samoan",
+   "name": "Samoan",
+   "group": "Austronesian",
+   "facts": {
+    "family": "Austronesian",
+    "branch": "Polynesian",
+    "script": "Latin",
+    "countries": 1
+   },
+   "blurb": "Samoan is an Austronesian language written in the Latin script, and a main language of Samoa.",
+   "clues": [
+    "It belongs to the Polynesian branch of the Austronesian family.",
+    "It is written in the Latin script.",
+    "It is a main language in 1 country.",
+    "It is spoken in Oceania.",
+    "About 219,000 people live in the countries where it is a main language."
+   ],
+   "difficulty": 3
+  },
+  {
+   "id": "swahili",
+   "name": "Swahili",
+   "group": "Niger-Congo",
+   "facts": {
+    "family": "Niger-Congo",
+    "branch": "Bantu",
+    "script": "Latin",
+    "countries": 3
+   },
+   "blurb": "Swahili is a Niger-Congo language written in the Latin script, and a main language of Kenya, Tanzania and Uganda.",
+   "clues": [
+    "It belongs to the Bantu branch of the Niger-Congo family.",
+    "It is written in the Latin script.",
+    "It is a main language in 3 countries.",
+    "It is spoken in Africa.",
+    "About 179 million people live in the countries where it is a main language.",
+    "It is a main language of Kenya, Tanzania and Uganda."
+   ],
+   "difficulty": 2
+  },
+  {
+   "id": "zulu",
+   "name": "Zulu",
+   "group": "Niger-Congo",
+   "facts": {
+    "family": "Niger-Congo",
+    "branch": "Bantu",
+    "script": "Latin",
+    "countries": 1
+   },
+   "blurb": "Zulu is a Niger-Congo language written in the Latin script, and a main language of South Africa.",
+   "clues": [
+    "It belongs to the Bantu branch of the Niger-Congo family.",
+    "It is written in the Latin script.",
+    "It is a main language in 1 country.",
+    "It is spoken in Africa.",
+    "About 64.7 million people live in the countries where it is a main language.",
+    "It is a main language of South Africa."
+   ],
+   "difficulty": 2
+  },
+  {
+   "id": "xhosa",
+   "name": "Xhosa",
+   "group": "Niger-Congo",
+   "facts": {
+    "family": "Niger-Congo",
+    "branch": "Bantu",
+    "script": "Latin",
+    "countries": 1
+   },
+   "blurb": "Xhosa is a Niger-Congo language written in the Latin script, and a main language of South Africa.",
+   "clues": [
+    "It belongs to the Bantu branch of the Niger-Congo family.",
+    "It is written in the Latin script.",
+    "It is a main language in 1 country.",
+    "It is spoken in Africa.",
+    "About 64.7 million people live in the countries where it is a main language.",
+    "It is a main language of South Africa."
+   ],
+   "difficulty": 3
+  },
+  {
+   "id": "kinyarwanda",
+   "name": "Kinyarwanda",
+   "group": "Niger-Congo",
+   "facts": {
+    "family": "Niger-Congo",
+    "branch": "Bantu",
+    "script": "Latin",
+    "countries": 1
+   },
+   "blurb": "Kinyarwanda is a Niger-Congo language written in the Latin script, and a main language of Rwanda.",
+   "clues": [
+    "It belongs to the Bantu branch of the Niger-Congo family.",
+    "It is written in the Latin script.",
+    "It is a main language in 1 country.",
+    "It is spoken in Africa.",
+    "About 14.6 million people live in the countries where it is a main language.",
+    "It is a main language of Rwanda."
+   ],
+   "difficulty": 3
+  },
+  {
+   "id": "shona",
+   "name": "Shona",
+   "group": "Niger-Congo",
+   "facts": {
+    "family": "Niger-Congo",
+    "branch": "Bantu",
+    "script": "Latin",
+    "countries": 1
+   },
+   "blurb": "Shona is a Niger-Congo language written in the Latin script, and a main language of Zimbabwe.",
+   "clues": [
+    "It belongs to the Bantu branch of the Niger-Congo family.",
+    "It is written in the Latin script.",
+    "It is a main language in 1 country.",
+    "It is spoken in Africa.",
+    "About 17 million people live in the countries where it is a main language.",
+    "It is a main language of Zimbabwe."
+   ],
+   "difficulty": 3
+  },
+  {
+   "id": "tamil",
+   "name": "Tamil",
+   "group": "Dravidian",
+   "facts": {
+    "family": "Dravidian",
+    "branch": "Southern Dravidian",
+    "script": "Tamil",
+    "countries": 2
+   },
+   "blurb": "Tamil is a Dravidian language written in the Tamil script, and a main language of Singapore and Sri Lanka.",
+   "clues": [
+    "It belongs to the Southern Dravidian branch of the Dravidian family.",
+    "It is a main language in 2 countries.",
+    "It is spoken in Asia.",
+    "About 27.9 million people live in the countries where it is a main language.",
+    "It is a main language of Singapore and Sri Lanka."
+   ],
+   "difficulty": 2
+  },
+  {
+   "id": "mongolian",
+   "name": "Mongolian",
+   "group": "Mongolic",
+   "facts": {
+    "family": "Mongolic",
+    "branch": "Mongolic",
+    "script": "Cyrillic",
+    "countries": 1
+   },
+   "blurb": "Mongolian is a Mongolic language written in the Cyrillic script, and a main language of Mongolia.",
+   "difficulty": 3
+  },
+  {
+   "id": "quechua",
+   "name": "Quechua",
+   "group": "Quechuan",
+   "facts": {
+    "family": "Quechuan",
+    "branch": "Quechuan",
+    "script": "Latin",
+    "countries": 2
+   },
+   "blurb": "Quechua is a Quechuan language written in the Latin script, and a main language of Bolivia and Peru.",
+   "clues": [
+    "It is written in the Latin script.",
+    "It is a main language in 2 countries.",
+    "It is spoken in South America.",
+    "Its speakers call it \"runasimi\".",
+    "About 47.2 million people live in the countries where it is a main language.",
+    "It is a main language of Bolivia and Peru."
+   ],
+   "difficulty": 3
+  },
+  {
+   "id": "guarani",
+   "name": "Guaraní",
+   "group": "Tupian",
+   "facts": {
+    "family": "Tupian",
+    "branch": "Tupi-Guarani",
+    "script": "Latin",
+    "countries": 1
+   },
+   "blurb": "Guaraní is a Tupian language written in the Latin script, and a main language of Paraguay.",
+   "clues": [
+    "It is written in the Latin script.",
+    "It is a main language in 1 country.",
+    "It is spoken in South America.",
+    "Its speakers call it \"avañeʼẽ\".",
+    "About 7 million people live in the countries where it is a main language.",
+    "It is a main language of Paraguay."
+   ],
+   "difficulty": 3
+  }
+ ],
+ "questions": [
+  {
+   "id": "lang-afghanistan",
+   "kind": "mc",
+   "prompt": "Which of these is a main language of Afghanistan?",
+   "answer": "Pashto",
+   "wrong": [
+    "Bislama",
+    "Malagasy",
+    "Comorian"
+   ],
+   "explain": "Main languages of Afghanistan: Pashto and Dari.",
+   "difficulty": 2
+  },
+  {
+   "id": "lang-albania",
+   "kind": "mc",
+   "prompt": "Which of these is a main language of Albania?",
+   "answer": "Albanian",
+   "wrong": [
+    "Palauan",
+    "Filipino",
+    "Tigrinya"
+   ],
+   "explain": "Main language of Albania: Albanian.",
+   "difficulty": 3
+  },
+  {
+   "id": "lang-algeria",
+   "kind": "mc",
+   "prompt": "Which of these is a main language of Algeria?",
+   "answer": "Arabic",
+   "wrong": [
+    "Bengali",
+    "Bosnian",
+    "Guaraní"
+   ],
+   "explain": "Main languages of Algeria: Arabic and Berber.",
+   "difficulty": 2
+  },
+  {
+   "id": "lang-andorra",
+   "kind": "mc",
+   "prompt": "Which of these is a main language of Andorra?",
+   "answer": "Catalan",
+   "wrong": [
+    "Marshallese",
+    "Tuvaluan",
+    "Swahili"
+   ],
+   "explain": "Main language of Andorra: Catalan.",
+   "difficulty": 3
+  },
+  {
+   "id": "lang-angola",
+   "kind": "mc",
+   "prompt": "Which of these is a main language of Angola?",
+   "answer": "Portuguese",
+   "wrong": [
+    "Belarusian",
+    "Italian",
+    "Dutch"
+   ],
+   "explain": "Main language of Angola: Portuguese.",
+   "difficulty": 2
+  },
+  {
+   "id": "lang-antigua-and-barbuda",
+   "kind": "mc",
+   "prompt": "Which of these is a main language of Antigua and Barbuda?",
+   "answer": "English",
+   "wrong": [
+    "Chichewa",
+    "Slovak",
+    "German"
+   ],
+   "explain": "Main language of Antigua and Barbuda: English.",
+   "difficulty": 3
+  },
+  {
+   "id": "lang-argentina",
+   "kind": "mc",
+   "prompt": "Which of these is a main language of Argentina?",
+   "answer": "Spanish",
+   "wrong": [
+    "Arabic",
+    "Wolof",
+    "Kyrgyz"
+   ],
+   "explain": "Main language of Argentina: Spanish.",
+   "difficulty": 1
+  },
+  {
+   "id": "lang-armenia",
+   "kind": "mc",
+   "prompt": "Which of these is a main language of Armenia?",
+   "answer": "Armenian",
+   "wrong": [
+    "Dutch",
+    "Nauruan",
+    "Marshallese"
+   ],
+   "explain": "Main language of Armenia: Armenian.",
+   "difficulty": 2
+  },
+  {
+   "id": "lang-australia",
+   "kind": "mc",
+   "prompt": "Which of these is a main language of Australia?",
+   "answer": "English",
+   "wrong": [
+    "Hausa",
+    "Bosnian",
+    "Maltese"
+   ],
+   "explain": "Main language of Australia: English.",
+   "difficulty": 1
+  },
+  {
+   "id": "lang-austria",
+   "kind": "mc",
+   "prompt": "Which of these is a main language of Austria?",
+   "answer": "German",
+   "wrong": [
+    "Somali",
+    "Sinhala",
+    "Wolof"
+   ],
+   "explain": "Main language of Austria: German.",
+   "difficulty": 1
+  },
+  {
+   "id": "lang-azerbaijan",
+   "kind": "mc",
+   "prompt": "Which of these is a main language of Azerbaijan?",
+   "answer": "Azerbaijani",
+   "wrong": [
+    "Estonian",
+    "Italian",
+    "Marshallese"
+   ],
+   "explain": "Main language of Azerbaijan: Azerbaijani.",
+   "difficulty": 2
+  },
+  {
+   "id": "lang-bahamas",
+   "kind": "mc",
+   "prompt": "Which of these is a main language of Bahamas?",
+   "answer": "English",
+   "wrong": [
+    "Czech",
+    "Finnish",
+    "Tongan"
+   ],
+   "explain": "Main language of Bahamas: English.",
+   "difficulty": 3
+  },
+  {
+   "id": "lang-bahrain",
+   "kind": "mc",
+   "prompt": "Which of these is a main language of Bahrain?",
+   "answer": "Arabic",
+   "wrong": [
+    "Wolof",
+    "Ukrainian",
+    "Shona"
+   ],
+   "explain": "Main language of Bahrain: Arabic.",
+   "difficulty": 3
+  },
+  {
+   "id": "lang-bangladesh",
+   "kind": "mc",
+   "prompt": "Which of these is a main language of Bangladesh?",
+   "answer": "Bengali",
+   "wrong": [
+    "Fiji Hindi",
+    "Spanish",
+    "Finnish"
+   ],
+   "explain": "Main language of Bangladesh: Bengali.",
+   "difficulty": 2
+  },
+  {
+   "id": "lang-barbados",
+   "kind": "mc",
+   "prompt": "Which of these is a main language of Barbados?",
+   "answer": "English",
+   "wrong": [
+    "Seychellois Creole",
+    "Tajik",
+    "Swazi"
+   ],
+   "explain": "Main language of Barbados: English.",
+   "difficulty": 3
+  },
+  {
+   "id": "lang-belarus",
+   "kind": "mc",
+   "prompt": "Which of these is a main language of Belarus?",
+   "answer": "Belarusian",
+   "wrong": [
+    "Kirundi",
+    "Fijian",
+    "Mooré"
+   ],
+   "explain": "Main languages of Belarus: Belarusian and Russian.",
+   "difficulty": 2
+  },
+  {
+   "id": "lang-belgium",
+   "kind": "mc",
+   "prompt": "Which of these is a main language of Belgium?",
+   "answer": "Dutch",
+   "wrong": [
+    "Kirundi",
+    "Armenian",
+    "Hausa"
+   ],
+   "explain": "Main languages of Belgium: Dutch, French and German.",
+   "difficulty": 1
+  },
+  {
+   "id": "lang-belize",
+   "kind": "mc",
+   "prompt": "Which of these is a main language of Belize?",
+   "answer": "English",
+   "wrong": [
+    "Swahili",
+    "Lao",
+    "Dutch"
+   ],
+   "explain": "Main language of Belize: English.",
+   "difficulty": 3
+  },
+  {
+   "id": "lang-benin",
+   "kind": "mc",
+   "prompt": "Which of these is a main language of Benin?",
+   "answer": "French",
+   "wrong": [
+    "Māori",
+    "Tamil",
+    "Ukrainian"
+   ],
+   "explain": "Main language of Benin: French.",
+   "difficulty": 2
+  },
+  {
+   "id": "lang-bhutan",
+   "kind": "mc",
+   "prompt": "Which of these is a main language of Bhutan?",
+   "answer": "Dzongkha",
+   "wrong": [
+    "Tigrinya",
+    "Amharic",
+    "Afrikaans"
+   ],
+   "explain": "Main language of Bhutan: Dzongkha.",
+   "difficulty": 3
+  },
+  {
+   "id": "lang-bolivia",
+   "kind": "mc",
+   "prompt": "Which of these is a main language of Bolivia?",
+   "answer": "Spanish",
+   "wrong": [
+    "Romanian",
+    "Tetum",
+    "Polish"
+   ],
+   "explain": "Main languages of Bolivia: Spanish, Quechua and Aymara.",
+   "difficulty": 2
+  },
+  {
+   "id": "lang-bosnia-and-herzegovina",
+   "kind": "mc",
+   "prompt": "Which of these is a main language of Bosnia and Herzegovina?",
+   "answer": "Bosnian",
+   "wrong": [
+    "Kurdish",
+    "Gilbertese",
+    "Tuvaluan"
+   ],
+   "explain": "Main languages of Bosnia and Herzegovina: Bosnian, Croatian and Serbian.",
+   "difficulty": 2
+  },
+  {
+   "id": "lang-botswana",
+   "kind": "mc",
+   "prompt": "Which of these is a main language of Botswana?",
+   "answer": "English",
+   "wrong": [
+    "Tok Pisin",
+    "Japanese",
+    "Dari"
+   ],
+   "explain": "Main languages of Botswana: English and Setswana.",
+   "difficulty": 3
+  },
+  {
+   "id": "lang-brazil",
+   "kind": "mc",
+   "prompt": "Which of these is a main language of Brazil?",
+   "answer": "Portuguese",
+   "wrong": [
+    "Seychellois Creole",
+    "Sesotho",
+    "Indonesian"
+   ],
+   "explain": "Main language of Brazil: Portuguese.",
+   "difficulty": 1
+  },
+  {
+   "id": "lang-brunei",
+   "kind": "mc",
+   "prompt": "Which of these is a main language of Brunei?",
+   "answer": "Malay",
+   "wrong": [
+    "Shona",
+    "Tok Pisin",
+    "Sango"
+   ],
+   "explain": "Main language of Brunei: Malay.",
+   "difficulty": 3
+  },
+  {
+   "id": "lang-bulgaria",
+   "kind": "mc",
+   "prompt": "Which of these is a main language of Bulgaria?",
+   "answer": "Bulgarian",
+   "wrong": [
+    "Xhosa",
+    "Bengali",
+    "Urdu"
+   ],
+   "explain": "Main language of Bulgaria: Bulgarian.",
+   "difficulty": 2
+  },
+  {
+   "id": "lang-burkina-faso",
+   "kind": "mc",
+   "prompt": "Which of these is a main language of Burkina Faso?",
+   "answer": "French",
+   "wrong": [
+    "Norwegian",
+    "Bulgarian",
+    "Tongan"
+   ],
+   "explain": "Main languages of Burkina Faso: French and Mooré.",
+   "difficulty": 2
+  },
+  {
+   "id": "lang-burundi",
+   "kind": "mc",
+   "prompt": "Which of these is a main language of Burundi?",
+   "answer": "Kirundi",
+   "wrong": [
+    "Irish",
+    "Mongolian",
+    "Albanian"
+   ],
+   "explain": "Main languages of Burundi: Kirundi and French.",
+   "difficulty": 2
+  },
+  {
+   "id": "lang-cambodia",
+   "kind": "mc",
+   "prompt": "Which of these is a main language of Cambodia?",
+   "answer": "Khmer",
+   "wrong": [
+    "Slovene",
+    "Xhosa",
+    "Ukrainian"
+   ],
+   "explain": "Main language of Cambodia: Khmer.",
+   "difficulty": 2
+  },
+  {
+   "id": "lang-cameroon",
+   "kind": "mc",
+   "prompt": "Which of these is a main language of Cameroon?",
+   "answer": "French",
+   "wrong": [
+    "Dhivehi",
+    "Urdu",
+    "Lithuanian"
+   ],
+   "explain": "Main languages of Cameroon: French and English.",
+   "difficulty": 2
+  },
+  {
+   "id": "lang-canada",
+   "kind": "mc",
+   "prompt": "Which of these is a main language of Canada?",
+   "answer": "English",
+   "wrong": [
+    "Turkmen",
+    "Albanian",
+    "Mongolian"
+   ],
+   "explain": "Main languages of Canada: English and French.",
+   "difficulty": 1
+  },
+  {
+   "id": "lang-cape-verde",
+   "kind": "mc",
+   "prompt": "Which of these is a main language of Cape Verde?",
+   "answer": "Portuguese",
+   "wrong": [
+    "Korean",
+    "Finnish",
+    "Hindi"
+   ],
+   "explain": "Main language of Cape Verde: Portuguese.",
+   "difficulty": 3
+  },
+  {
+   "id": "lang-central-african-republic",
+   "kind": "mc",
+   "prompt": "Which of these is a main language of Central African Republic?",
+   "answer": "French",
+   "wrong": [
+    "Lithuanian",
+    "Georgian",
+    "Persian"
+   ],
+   "explain": "Main languages of Central African Republic: French and Sango.",
+   "difficulty": 2
+  },
+  {
+   "id": "lang-chad",
+   "kind": "mc",
+   "prompt": "Which of these is a main language of Chad?",
+   "answer": "French",
+   "wrong": [
+    "Sinhala",
+    "Guaraní",
+    "Khmer"
+   ],
+   "explain": "Main languages of Chad: French and Arabic.",
+   "difficulty": 2
+  },
+  {
+   "id": "lang-chile",
+   "kind": "mc",
+   "prompt": "Which of these is a main language of Chile?",
+   "answer": "Spanish",
+   "wrong": [
+    "Georgian",
+    "Pashto",
+    "Kinyarwanda"
+   ],
+   "explain": "Main language of Chile: Spanish.",
+   "difficulty": 1
+  },
+  {
+   "id": "lang-china",
+   "kind": "mc",
+   "prompt": "Which of these is a main language of China?",
+   "answer": "Mandarin Chinese",
+   "wrong": [
+    "Lithuanian",
+    "Mooré",
+    "Polish"
+   ],
+   "explain": "Main language of China: Mandarin Chinese.",
+   "difficulty": 1
+  },
+  {
+   "id": "lang-colombia",
+   "kind": "mc",
+   "prompt": "Which of these is a main language of Colombia?",
+   "answer": "Spanish",
+   "wrong": [
+    "Ndebele",
+    "Croatian",
+    "Gilbertese"
+   ],
+   "explain": "Main language of Colombia: Spanish.",
+   "difficulty": 2
+  },
+  {
+   "id": "lang-comoros",
+   "kind": "mc",
+   "prompt": "Which of these is a main language of Comoros?",
+   "answer": "Comorian",
+   "wrong": [
+    "Belarusian",
+    "Croatian",
+    "Marshallese"
+   ],
+   "explain": "Main languages of Comoros: Comorian, Arabic and French.",
+   "difficulty": 3
+  },
+  {
+   "id": "lang-democratic-republic-of-the-congo",
+   "kind": "mc",
+   "prompt": "Which of these is a main language of Democratic Republic of the Congo?",
+   "answer": "French",
+   "wrong": [
+    "Gilbertese",
+    "Belarusian",
+    "Thai"
+   ],
+   "explain": "Main language of Democratic Republic of the Congo: French.",
+   "difficulty": 2
+  },
+  {
+   "id": "lang-republic-of-the-congo",
+   "kind": "mc",
+   "prompt": "Which of these is a main language of Republic of the Congo?",
+   "answer": "French",
+   "wrong": [
+    "Pashto",
+    "Urdu",
+    "Georgian"
+   ],
+   "explain": "Main language of Republic of the Congo: French.",
+   "difficulty": 2
+  },
+  {
+   "id": "lang-costa-rica",
+   "kind": "mc",
+   "prompt": "Which of these is a main language of Costa Rica?",
+   "answer": "Spanish",
+   "wrong": [
+    "Seychellois Creole",
+    "Aymara",
+    "Serbian"
+   ],
+   "explain": "Main language of Costa Rica: Spanish.",
+   "difficulty": 2
+  },
+  {
+   "id": "lang-ivory-coast",
+   "kind": "mc",
+   "prompt": "Which of these is a main language of Ivory Coast?",
+   "answer": "French",
+   "wrong": [
+    "German",
+    "Lao",
+    "Burmese"
+   ],
+   "explain": "Main language of Ivory Coast: French.",
+   "difficulty": 2
+  },
+  {
+   "id": "lang-croatia",
+   "kind": "mc",
+   "prompt": "Which of these is a main language of Croatia?",
+   "answer": "Croatian",
+   "wrong": [
+    "Dari",
+    "Japanese",
+    "Swazi"
+   ],
+   "explain": "Main language of Croatia: Croatian.",
+   "difficulty": 2
+  },
+  {
+   "id": "lang-cuba",
+   "kind": "mc",
+   "prompt": "Which of these is a main language of Cuba?",
+   "answer": "Spanish",
+   "wrong": [
+    "Samoan",
+    "Romanian",
+    "Nauruan"
+   ],
+   "explain": "Main language of Cuba: Spanish.",
+   "difficulty": 1
+  },
+  {
+   "id": "lang-cyprus",
+   "kind": "mc",
+   "prompt": "Which of these is a main language of Cyprus?",
+   "answer": "Greek",
+   "wrong": [
+    "Finnish",
+    "Gilbertese",
+    "Icelandic"
+   ],
+   "explain": "Main languages of Cyprus: Greek and Turkish.",
+   "difficulty": 3
+  },
+  {
+   "id": "lang-czechia",
+   "kind": "mc",
+   "prompt": "Which of these is a main language of Czechia?",
+   "answer": "Czech",
+   "wrong": [
+    "Thai",
+    "Quechua",
+    "Swazi"
+   ],
+   "explain": "Main language of Czechia: Czech.",
+   "difficulty": 2
+  },
+  {
+   "id": "lang-denmark",
+   "kind": "mc",
+   "prompt": "Which of these is a main language of Denmark?",
+   "answer": "Danish",
+   "wrong": [
+    "Nepali",
+    "Bambara",
+    "Berber"
+   ],
+   "explain": "Main language of Denmark: Danish.",
+   "difficulty": 1
+  },
+  {
+   "id": "lang-djibouti",
+   "kind": "mc",
+   "prompt": "Which of these is a main language of Djibouti?",
+   "answer": "French",
+   "wrong": [
+    "Fiji Hindi",
+    "Dari",
+    "Finnish"
+   ],
+   "explain": "Main languages of Djibouti: French and Arabic.",
+   "difficulty": 3
+  },
+  {
+   "id": "lang-dominica",
+   "kind": "mc",
+   "prompt": "Which of these is a main language of Dominica?",
+   "answer": "English",
+   "wrong": [
+    "Italian",
+    "Danish",
+    "Slovak"
+   ],
+   "explain": "Main language of Dominica: English.",
+   "difficulty": 3
+  },
+  {
+   "id": "lang-dominican-republic",
+   "kind": "mc",
+   "prompt": "Which of these is a main language of Dominican Republic?",
+   "answer": "Spanish",
+   "wrong": [
+    "Kyrgyz",
+    "Kazakh",
+    "Mauritian Creole"
+   ],
+   "explain": "Main language of Dominican Republic: Spanish.",
+   "difficulty": 2
+  },
+  {
+   "id": "lang-ecuador",
+   "kind": "mc",
+   "prompt": "Which of these is a main language of Ecuador?",
+   "answer": "Spanish",
+   "wrong": [
+    "Māori",
+    "Uzbek",
+    "Sango"
+   ],
+   "explain": "Main language of Ecuador: Spanish.",
+   "difficulty": 2
+  },
+  {
+   "id": "lang-egypt",
+   "kind": "mc",
+   "prompt": "Which of these is a main language of Egypt?",
+   "answer": "Arabic",
+   "wrong": [
+    "Māori",
+    "Dari",
+    "Palauan"
+   ],
+   "explain": "Main language of Egypt: Arabic.",
+   "difficulty": 1
+  },
+  {
+   "id": "lang-el-salvador",
+   "kind": "mc",
+   "prompt": "Which of these is a main language of El Salvador?",
+   "answer": "Spanish",
+   "wrong": [
+    "Setswana",
+    "Burmese",
+    "Uzbek"
+   ],
+   "explain": "Main language of El Salvador: Spanish.",
+   "difficulty": 2
+  },
+  {
+   "id": "lang-equatorial-guinea",
+   "kind": "mc",
+   "prompt": "Which of these is a main language of Equatorial Guinea?",
+   "answer": "Spanish",
+   "wrong": [
+    "Malay",
+    "Kazakh",
+    "Thai"
+   ],
+   "explain": "Main languages of Equatorial Guinea: Spanish, French and Portuguese.",
+   "difficulty": 3
+  },
+  {
+   "id": "lang-eritrea",
+   "kind": "mc",
+   "prompt": "Which of these is a main language of Eritrea?",
+   "answer": "Tigrinya",
+   "wrong": [
+    "Nauruan",
+    "Lithuanian",
+    "German"
+   ],
+   "explain": "Main languages of Eritrea: Tigrinya, Arabic and English.",
+   "difficulty": 2
+  },
+  {
+   "id": "lang-estonia",
+   "kind": "mc",
+   "prompt": "Which of these is a main language of Estonia?",
+   "answer": "Estonian",
+   "wrong": [
+    "Comorian",
+    "Khmer",
+    "Burmese"
+   ],
+   "explain": "Main language of Estonia: Estonian.",
+   "difficulty": 3
+  },
+  {
+   "id": "lang-eswatini",
+   "kind": "mc",
+   "prompt": "Which of these is a main language of Eswatini?",
+   "answer": "Swazi",
+   "wrong": [
+    "Tuvaluan",
+    "Lao",
+    "Bislama"
+   ],
+   "explain": "Main languages of Eswatini: Swazi and English.",
+   "difficulty": 3
+  },
+  {
+   "id": "lang-ethiopia",
+   "kind": "mc",
+   "prompt": "Which of these is a main language of Ethiopia?",
+   "answer": "Amharic",
+   "wrong": [
+    "Tajik",
+    "Dutch",
+    "Kyrgyz"
+   ],
+   "explain": "Main language of Ethiopia: Amharic.",
+   "difficulty": 2
+  },
+  {
+   "id": "lang-fiji",
+   "kind": "mc",
+   "prompt": "Which of these is a main language of Fiji?",
+   "answer": "English",
+   "wrong": [
+    "Hindi",
+    "Azerbaijani",
+    "Korean"
+   ],
+   "explain": "Main languages of Fiji: English, Fijian and Fiji Hindi.",
+   "difficulty": 3
+  },
+  {
+   "id": "lang-finland",
+   "kind": "mc",
+   "prompt": "Which of these is a main language of Finland?",
+   "answer": "Finnish",
+   "wrong": [
+    "Haitian Creole",
+    "Bengali",
+    "Afrikaans"
+   ],
+   "explain": "Main languages of Finland: Finnish and Swedish.",
+   "difficulty": 1
+  },
+  {
+   "id": "lang-france",
+   "kind": "mc",
+   "prompt": "Which of these is a main language of France?",
+   "answer": "French",
+   "wrong": [
+    "Comorian",
+    "Sesotho",
+    "Arabic"
+   ],
+   "explain": "Main language of France: French.",
+   "difficulty": 1
+  },
+  {
+   "id": "lang-gabon",
+   "kind": "mc",
+   "prompt": "Which of these is a main language of Gabon?",
+   "answer": "French",
+   "wrong": [
+    "Kurdish",
+    "Dhivehi",
+    "Mandarin Chinese"
+   ],
+   "explain": "Main language of Gabon: French.",
+   "difficulty": 3
+  },
+  {
+   "id": "lang-gambia",
+   "kind": "mc",
+   "prompt": "Which of these is a main language of Gambia?",
+   "answer": "English",
+   "wrong": [
+    "Lao",
+    "Czech",
+    "Filipino"
+   ],
+   "explain": "Main language of Gambia: English.",
+   "difficulty": 3
+  },
+  {
+   "id": "lang-georgia",
+   "kind": "mc",
+   "prompt": "Which of these is a main language of Georgia?",
+   "answer": "Georgian",
+   "wrong": [
+    "Tongan",
+    "Quechua",
+    "Latin"
+   ],
+   "explain": "Main language of Georgia: Georgian.",
+   "difficulty": 2
+  },
+  {
+   "id": "lang-germany",
+   "kind": "mc",
+   "prompt": "Which of these is a main language of Germany?",
+   "answer": "German",
+   "wrong": [
+    "Tajik",
+    "Mongolian",
+    "Kirundi"
+   ],
+   "explain": "Main language of Germany: German.",
+   "difficulty": 1
+  },
+  {
+   "id": "lang-ghana",
+   "kind": "mc",
+   "prompt": "Which of these is a main language of Ghana?",
+   "answer": "English",
+   "wrong": [
+    "Bosnian",
+    "Latin",
+    "Mongolian"
+   ],
+   "explain": "Main language of Ghana: English.",
+   "difficulty": 2
+  },
+  {
+   "id": "lang-greece",
+   "kind": "mc",
+   "prompt": "Which of these is a main language of Greece?",
+   "answer": "Greek",
+   "wrong": [
+    "Georgian",
+    "Shona",
+    "Pashto"
+   ],
+   "explain": "Main language of Greece: Greek.",
+   "difficulty": 1
+  },
+  {
+   "id": "lang-grenada",
+   "kind": "mc",
+   "prompt": "Which of these is a main language of Grenada?",
+   "answer": "English",
+   "wrong": [
+    "Danish",
+    "Armenian",
+    "Nepali"
+   ],
+   "explain": "Main language of Grenada: English.",
+   "difficulty": 3
+  },
+  {
+   "id": "lang-guatemala",
+   "kind": "mc",
+   "prompt": "Which of these is a main language of Guatemala?",
+   "answer": "Spanish",
+   "wrong": [
+    "Romansh",
+    "Luxembourgish",
+    "Dhivehi"
+   ],
+   "explain": "Main language of Guatemala: Spanish.",
+   "difficulty": 2
+  },
+  {
+   "id": "lang-guinea",
+   "kind": "mc",
+   "prompt": "Which of these is a main language of Guinea?",
+   "answer": "French",
+   "wrong": [
+    "Persian",
+    "Sinhala",
+    "Mongolian"
+   ],
+   "explain": "Main language of Guinea: French.",
+   "difficulty": 2
+  },
+  {
+   "id": "lang-guinea-bissau",
+   "kind": "mc",
+   "prompt": "Which of these is a main language of Guinea-Bissau?",
+   "answer": "Portuguese",
+   "wrong": [
+    "Pashto",
+    "Romanian",
+    "Polish"
+   ],
+   "explain": "Main language of Guinea-Bissau: Portuguese.",
+   "difficulty": 3
+  },
+  {
+   "id": "lang-guyana",
+   "kind": "mc",
+   "prompt": "Which of these is a main language of Guyana?",
+   "answer": "English",
+   "wrong": [
+    "Afrikaans",
+    "Indonesian",
+    "Persian"
+   ],
+   "explain": "Main language of Guyana: English.",
+   "difficulty": 3
+  },
+  {
+   "id": "lang-haiti",
+   "kind": "mc",
+   "prompt": "Which of these is a main language of Haiti?",
+   "answer": "Haitian Creole",
+   "wrong": [
+    "Xhosa",
+    "Armenian",
+    "Setswana"
+   ],
+   "explain": "Main languages of Haiti: Haitian Creole and French.",
+   "difficulty": 2
+  },
+  {
+   "id": "lang-honduras",
+   "kind": "mc",
+   "prompt": "Which of these is a main language of Honduras?",
+   "answer": "Spanish",
+   "wrong": [
+    "Tamil",
+    "Azerbaijani",
+    "Lithuanian"
+   ],
+   "explain": "Main language of Honduras: Spanish.",
+   "difficulty": 2
+  },
+  {
+   "id": "lang-hungary",
+   "kind": "mc",
+   "prompt": "Which of these is a main language of Hungary?",
+   "answer": "Hungarian",
+   "wrong": [
+    "Persian",
+    "Chichewa",
+    "Mooré"
+   ],
+   "explain": "Main language of Hungary: Hungarian.",
+   "difficulty": 2
+  },
+  {
+   "id": "lang-iceland",
+   "kind": "mc",
+   "prompt": "Which of these is a main language of Iceland?",
+   "answer": "Icelandic",
+   "wrong": [
+    "Urdu",
+    "Mandarin Chinese",
+    "Kazakh"
+   ],
+   "explain": "Main language of Iceland: Icelandic.",
+   "difficulty": 1
+  },
+  {
+   "id": "lang-india",
+   "kind": "mc",
+   "prompt": "Which of these is a main language of India?",
+   "answer": "Hindi",
+   "wrong": [
+    "Albanian",
+    "Hungarian",
+    "Mauritian Creole"
+   ],
+   "explain": "Main languages of India: Hindi and English.",
+   "difficulty": 1
+  },
+  {
+   "id": "lang-indonesia",
+   "kind": "mc",
+   "prompt": "Which of these is a main language of Indonesia?",
+   "answer": "Indonesian",
+   "wrong": [
+    "Bislama",
+    "Mooré",
+    "Danish"
+   ],
+   "explain": "Main language of Indonesia: Indonesian.",
+   "difficulty": 2
+  },
+  {
+   "id": "lang-iran",
+   "kind": "mc",
+   "prompt": "Which of these is a main language of Iran?",
+   "answer": "Persian",
+   "wrong": [
+    "Slovene",
+    "Māori",
+    "Tuvaluan"
+   ],
+   "explain": "Main language of Iran: Persian.",
+   "difficulty": 2
+  },
+  {
+   "id": "lang-iraq",
+   "kind": "mc",
+   "prompt": "Which of these is a main language of Iraq?",
+   "answer": "Arabic",
+   "wrong": [
+    "Macedonian",
+    "Marshallese",
+    "Fiji Hindi"
+   ],
+   "explain": "Main languages of Iraq: Arabic and Kurdish.",
+   "difficulty": 2
+  },
+  {
+   "id": "lang-ireland",
+   "kind": "mc",
+   "prompt": "Which of these is a main language of Ireland?",
+   "answer": "Irish",
+   "wrong": [
+    "Wolof",
+    "Somali",
+    "Swahili"
+   ],
+   "explain": "Main languages of Ireland: Irish and English.",
+   "difficulty": 1
+  },
+  {
+   "id": "lang-israel",
+   "kind": "mc",
+   "prompt": "Which of these is a main language of Israel?",
+   "answer": "Hebrew",
+   "wrong": [
+    "Zulu",
+    "French",
+    "Aymara"
+   ],
+   "explain": "Main language of Israel: Hebrew.",
+   "difficulty": 2
+  },
+  {
+   "id": "lang-italy",
+   "kind": "mc",
+   "prompt": "Which of these is a main language of Italy?",
+   "answer": "Italian",
+   "wrong": [
+    "Tok Pisin",
+    "Kyrgyz",
+    "Mooré"
+   ],
+   "explain": "Main language of Italy: Italian.",
+   "difficulty": 1
+  },
+  {
+   "id": "lang-jamaica",
+   "kind": "mc",
+   "prompt": "Which of these is a main language of Jamaica?",
+   "answer": "English",
+   "wrong": [
+    "Montenegrin",
+    "Kurdish",
+    "Pashto"
+   ],
+   "explain": "Main language of Jamaica: English.",
+   "difficulty": 1
+  },
+  {
+   "id": "lang-japan",
+   "kind": "mc",
+   "prompt": "Which of these is a main language of Japan?",
+   "answer": "Japanese",
+   "wrong": [
+    "Hiri Motu",
+    "Irish",
+    "Bambara"
+   ],
+   "explain": "Main language of Japan: Japanese.",
+   "difficulty": 1
+  },
+  {
+   "id": "lang-jordan",
+   "kind": "mc",
+   "prompt": "Which of these is a main language of Jordan?",
+   "answer": "Arabic",
+   "wrong": [
+    "Fijian",
+    "Latvian",
+    "Mauritian Creole"
+   ],
+   "explain": "Main language of Jordan: Arabic.",
+   "difficulty": 2
+  },
+  {
+   "id": "lang-kazakhstan",
+   "kind": "mc",
+   "prompt": "Which of these is a main language of Kazakhstan?",
+   "answer": "Kazakh",
+   "wrong": [
+    "Gilbertese",
+    "Luxembourgish",
+    "Lithuanian"
+   ],
+   "explain": "Main languages of Kazakhstan: Kazakh and Russian.",
+   "difficulty": 2
+  },
+  {
+   "id": "lang-kenya",
+   "kind": "mc",
+   "prompt": "Which of these is a main language of Kenya?",
+   "answer": "Swahili",
+   "wrong": [
+    "Japanese",
+    "Hiri Motu",
+    "Pashto"
+   ],
+   "explain": "Main languages of Kenya: Swahili and English.",
+   "difficulty": 1
+  },
+  {
+   "id": "lang-kiribati",
+   "kind": "mc",
+   "prompt": "Which of these is a main language of Kiribati?",
+   "answer": "English",
+   "wrong": [
+    "Xhosa",
+    "Georgian",
+    "Vietnamese"
+   ],
+   "explain": "Main languages of Kiribati: English and Gilbertese.",
+   "difficulty": 3
+  },
+  {
+   "id": "lang-kuwait",
+   "kind": "mc",
+   "prompt": "Which of these is a main language of Kuwait?",
+   "answer": "Arabic",
+   "wrong": [
+    "Italian",
+    "Belarusian",
+    "Norwegian"
+   ],
+   "explain": "Main language of Kuwait: Arabic.",
+   "difficulty": 2
+  },
+  {
+   "id": "lang-kyrgyzstan",
+   "kind": "mc",
+   "prompt": "Which of these is a main language of Kyrgyzstan?",
+   "answer": "Kyrgyz",
+   "wrong": [
+    "Hiri Motu",
+    "Tongan",
+    "Czech"
+   ],
+   "explain": "Main languages of Kyrgyzstan: Kyrgyz and Russian.",
+   "difficulty": 2
+  },
+  {
+   "id": "lang-laos",
+   "kind": "mc",
+   "prompt": "Which of these is a main language of Laos?",
+   "answer": "Lao",
+   "wrong": [
+    "German",
+    "Spanish",
+    "Romanian"
+   ],
+   "explain": "Main language of Laos: Lao.",
+   "difficulty": 2
+  },
+  {
+   "id": "lang-latvia",
+   "kind": "mc",
+   "prompt": "Which of these is a main language of Latvia?",
+   "answer": "Latvian",
+   "wrong": [
+    "Arabic",
+    "Quechua",
+    "Kazakh"
+   ],
+   "explain": "Main language of Latvia: Latvian.",
+   "difficulty": 3
+  },
+  {
+   "id": "lang-lebanon",
+   "kind": "mc",
+   "prompt": "Which of these is a main language of Lebanon?",
+   "answer": "Arabic",
+   "wrong": [
+    "Hiri Motu",
+    "Swedish",
+    "Catalan"
+   ],
+   "explain": "Main language of Lebanon: Arabic.",
+   "difficulty": 2
+  },
+  {
+   "id": "lang-lesotho",
+   "kind": "mc",
+   "prompt": "Which of these is a main language of Lesotho?",
+   "answer": "Sesotho",
+   "wrong": [
+    "Hungarian",
+    "Latin",
+    "Norwegian"
+   ],
+   "explain": "Main languages of Lesotho: Sesotho and English.",
+   "difficulty": 3
+  },
+  {
+   "id": "lang-liberia",
+   "kind": "mc",
+   "prompt": "Which of these is a main language of Liberia?",
+   "answer": "English",
+   "wrong": [
+    "Italian",
+    "Māori",
+    "Uzbek"
+   ],
+   "explain": "Main language of Liberia: English.",
+   "difficulty": 2
+  },
+  {
+   "id": "lang-libya",
+   "kind": "mc",
+   "prompt": "Which of these is a main language of Libya?",
+   "answer": "Arabic",
+   "wrong": [
+    "Fijian",
+    "Malay",
+    "Czech"
+   ],
+   "explain": "Main language of Libya: Arabic.",
+   "difficulty": 2
+  },
+  {
+   "id": "lang-liechtenstein",
+   "kind": "mc",
+   "prompt": "Which of these is a main language of Liechtenstein?",
+   "answer": "German",
+   "wrong": [
+    "Guaraní",
+    "Indonesian",
+    "Uzbek"
+   ],
+   "explain": "Main language of Liechtenstein: German.",
+   "difficulty": 3
+  },
+  {
+   "id": "lang-lithuania",
+   "kind": "mc",
+   "prompt": "Which of these is a main language of Lithuania?",
+   "answer": "Lithuanian",
+   "wrong": [
+    "Palauan",
+    "Nepali",
+    "Tajik"
+   ],
+   "explain": "Main language of Lithuania: Lithuanian.",
+   "difficulty": 3
+  },
+  {
+   "id": "lang-luxembourg",
+   "kind": "mc",
+   "prompt": "Which of these is a main language of Luxembourg?",
+   "answer": "Luxembourgish",
+   "wrong": [
+    "Sango",
+    "Amharic",
+    "Mooré"
+   ],
+   "explain": "Main languages of Luxembourg: Luxembourgish, French and German.",
+   "difficulty": 3
+  },
+  {
+   "id": "lang-madagascar",
+   "kind": "mc",
+   "prompt": "Which of these is a main language of Madagascar?",
+   "answer": "Malagasy",
+   "wrong": [
+    "Japanese",
+    "Mandarin Chinese",
+    "Māori"
+   ],
+   "explain": "Main languages of Madagascar: Malagasy and French.",
+   "difficulty": 2
+  },
+  {
+   "id": "lang-malawi",
+   "kind": "mc",
+   "prompt": "Which of these is a main language of Malawi?",
+   "answer": "English",
+   "wrong": [
+    "Icelandic",
+    "Polish",
+    "Guaraní"
+   ],
+   "explain": "Main languages of Malawi: English and Chichewa.",
+   "difficulty": 2
+  },
+  {
+   "id": "lang-malaysia",
+   "kind": "mc",
+   "prompt": "Which of these is a main language of Malaysia?",
+   "answer": "Malay",
+   "wrong": [
+    "Aymara",
+    "Slovak",
+    "Bosnian"
+   ],
+   "explain": "Main language of Malaysia: Malay.",
+   "difficulty": 2
+  },
+  {
+   "id": "lang-maldives",
+   "kind": "mc",
+   "prompt": "Which of these is a main language of Maldives?",
+   "answer": "Dhivehi",
+   "wrong": [
+    "Setswana",
+    "Xhosa",
+    "Sesotho"
+   ],
+   "explain": "Main language of Maldives: Dhivehi.",
+   "difficulty": 3
+  },
+  {
+   "id": "lang-mali",
+   "kind": "mc",
+   "prompt": "Which of these is a main language of Mali?",
+   "answer": "Bambara",
+   "wrong": [
+    "Samoan",
+    "Catalan",
+    "Nepali"
+   ],
+   "explain": "Main language of Mali: Bambara.",
+   "difficulty": 2
+  },
+  {
+   "id": "lang-malta",
+   "kind": "mc",
+   "prompt": "Which of these is a main language of Malta?",
+   "answer": "Maltese",
+   "wrong": [
+    "Japanese",
+    "Nepali",
+    "Shona"
+   ],
+   "explain": "Main languages of Malta: Maltese and English.",
+   "difficulty": 3
+  },
+  {
+   "id": "lang-marshall-islands",
+   "kind": "mc",
+   "prompt": "Which of these is a main language of Marshall Islands?",
+   "answer": "Marshallese",
+   "wrong": [
+    "Nepali",
+    "Mauritian Creole",
+    "Kyrgyz"
+   ],
+   "explain": "Main languages of Marshall Islands: Marshallese and English.",
+   "difficulty": 3
+  },
+  {
+   "id": "lang-mauritania",
+   "kind": "mc",
+   "prompt": "Which of these is a main language of Mauritania?",
+   "answer": "Arabic",
+   "wrong": [
+    "Hiri Motu",
+    "Turkmen",
+    "Lithuanian"
+   ],
+   "explain": "Main language of Mauritania: Arabic.",
+   "difficulty": 2
+  },
+  {
+   "id": "lang-mauritius",
+   "kind": "mc",
+   "prompt": "Which of these is a main language of Mauritius?",
+   "answer": "English",
+   "wrong": [
+    "Dzongkha",
+    "Hungarian",
+    "Polish"
+   ],
+   "explain": "Main languages of Mauritius: English, French and Mauritian Creole.",
+   "difficulty": 3
+  },
+  {
+   "id": "lang-mexico",
+   "kind": "mc",
+   "prompt": "Which of these is a main language of Mexico?",
+   "answer": "Spanish",
+   "wrong": [
+    "Russian",
+    "Chichewa",
+    "Thai"
+   ],
+   "explain": "Main language of Mexico: Spanish.",
+   "difficulty": 1
+  },
+  {
+   "id": "lang-micronesia",
+   "kind": "mc",
+   "prompt": "Which of these is a main language of Micronesia?",
+   "answer": "English",
+   "wrong": [
+    "Dhivehi",
+    "Belarusian",
+    "Mooré"
+   ],
+   "explain": "Main language of Micronesia: English.",
+   "difficulty": 3
+  },
+  {
+   "id": "lang-moldova",
+   "kind": "mc",
+   "prompt": "Which of these is a main language of Moldova?",
+   "answer": "Romanian",
+   "wrong": [
+    "Shona",
+    "Comorian",
+    "Gilbertese"
+   ],
+   "explain": "Main language of Moldova: Romanian.",
+   "difficulty": 3
+  },
+  {
+   "id": "lang-monaco",
+   "kind": "mc",
+   "prompt": "Which of these is a main language of Monaco?",
+   "answer": "French",
+   "wrong": [
+    "Dzongkha",
+    "Quechua",
+    "Korean"
+   ],
+   "explain": "Main language of Monaco: French.",
+   "difficulty": 3
+  },
+  {
+   "id": "lang-mongolia",
+   "kind": "mc",
+   "prompt": "Which of these is a main language of Mongolia?",
+   "answer": "Mongolian",
+   "wrong": [
+    "Gilbertese",
+    "Chichewa",
+    "Hausa"
+   ],
+   "explain": "Main language of Mongolia: Mongolian.",
+   "difficulty": 2
+  },
+  {
+   "id": "lang-montenegro",
+   "kind": "mc",
+   "prompt": "Which of these is a main language of Montenegro?",
+   "answer": "Montenegrin",
+   "wrong": [
+    "Hebrew",
+    "Swahili",
+    "Hausa"
+   ],
+   "explain": "Main language of Montenegro: Montenegrin.",
+   "difficulty": 3
+  },
+  {
+   "id": "lang-morocco",
+   "kind": "mc",
+   "prompt": "Which of these is a main language of Morocco?",
+   "answer": "Arabic",
+   "wrong": [
+    "Korean",
+    "Urdu",
+    "Khmer"
+   ],
+   "explain": "Main languages of Morocco: Arabic and Berber.",
+   "difficulty": 2
+  },
+  {
+   "id": "lang-mozambique",
+   "kind": "mc",
+   "prompt": "Which of these is a main language of Mozambique?",
+   "answer": "Portuguese",
+   "wrong": [
+    "Ukrainian",
+    "Maltese",
+    "Danish"
+   ],
+   "explain": "Main language of Mozambique: Portuguese.",
+   "difficulty": 2
+  },
+  {
+   "id": "lang-myanmar",
+   "kind": "mc",
+   "prompt": "Which of these is a main language of Myanmar?",
+   "answer": "Burmese",
+   "wrong": [
+    "Māori",
+    "Setswana",
+    "Danish"
+   ],
+   "explain": "Main language of Myanmar: Burmese.",
+   "difficulty": 2
+  },
+  {
+   "id": "lang-namibia",
+   "kind": "mc",
+   "prompt": "Which of these is a main language of Namibia?",
+   "answer": "English",
+   "wrong": [
+    "Dari",
+    "Kyrgyz",
+    "Danish"
+   ],
+   "explain": "Main language of Namibia: English.",
+   "difficulty": 2
+  },
+  {
+   "id": "lang-nauru",
+   "kind": "mc",
+   "prompt": "Which of these is a main language of Nauru?",
+   "answer": "Nauruan",
+   "wrong": [
+    "Kirundi",
+    "Kazakh",
+    "Lithuanian"
+   ],
+   "explain": "Main languages of Nauru: Nauruan and English.",
+   "difficulty": 3
+  },
+  {
+   "id": "lang-nepal",
+   "kind": "mc",
+   "prompt": "Which of these is a main language of Nepal?",
+   "answer": "Nepali",
+   "wrong": [
+    "Bambara",
+    "Palauan",
+    "Sesotho"
+   ],
+   "explain": "Main language of Nepal: Nepali.",
+   "difficulty": 2
+  },
+  {
+   "id": "lang-netherlands",
+   "kind": "mc",
+   "prompt": "Which of these is a main language of Netherlands?",
+   "answer": "Dutch",
+   "wrong": [
+    "Mongolian",
+    "Quechua",
+    "Tongan"
+   ],
+   "explain": "Main language of Netherlands: Dutch.",
+   "difficulty": 1
+  },
+  {
+   "id": "lang-new-zealand",
+   "kind": "mc",
+   "prompt": "Which of these is a main language of New Zealand?",
+   "answer": "English",
+   "wrong": [
+    "Japanese",
+    "Aymara",
+    "Malagasy"
+   ],
+   "explain": "Main languages of New Zealand: English and Māori.",
+   "difficulty": 1
+  },
+  {
+   "id": "lang-nicaragua",
+   "kind": "mc",
+   "prompt": "Which of these is a main language of Nicaragua?",
+   "answer": "Spanish",
+   "wrong": [
+    "Fiji Hindi",
+    "Lao",
+    "Kurdish"
+   ],
+   "explain": "Main language of Nicaragua: Spanish.",
+   "difficulty": 2
+  },
+  {
+   "id": "lang-niger",
+   "kind": "mc",
+   "prompt": "Which of these is a main language of Niger?",
+   "answer": "French",
+   "wrong": [
+    "Slovak",
+    "Indonesian",
+    "Sinhala"
+   ],
+   "explain": "Main languages of Niger: French and Hausa.",
+   "difficulty": 2
+  },
+  {
+   "id": "lang-nigeria",
+   "kind": "mc",
+   "prompt": "Which of these is a main language of Nigeria?",
+   "answer": "English",
+   "wrong": [
+    "Latin",
+    "Italian",
+    "Turkish"
+   ],
+   "explain": "Main language of Nigeria: English.",
+   "difficulty": 1
+  },
+  {
+   "id": "lang-north-korea",
+   "kind": "mc",
+   "prompt": "Which of these is a main language of North Korea?",
+   "answer": "Korean",
+   "wrong": [
+    "Romansh",
+    "Malagasy",
+    "Spanish"
+   ],
+   "explain": "Main language of North Korea: Korean.",
+   "difficulty": 2
+  },
+  {
+   "id": "lang-north-macedonia",
+   "kind": "mc",
+   "prompt": "Which of these is a main language of North Macedonia?",
+   "answer": "Macedonian",
+   "wrong": [
+    "Korean",
+    "Mongolian",
+    "Nauruan"
+   ],
+   "explain": "Main languages of North Macedonia: Macedonian and Albanian.",
+   "difficulty": 3
+  },
+  {
+   "id": "lang-norway",
+   "kind": "mc",
+   "prompt": "Which of these is a main language of Norway?",
+   "answer": "Norwegian",
+   "wrong": [
+    "Azerbaijani",
+    "Amharic",
+    "Tigrinya"
+   ],
+   "explain": "Main language of Norway: Norwegian.",
+   "difficulty": 1
+  },
+  {
+   "id": "lang-oman",
+   "kind": "mc",
+   "prompt": "Which of these is a main language of Oman?",
+   "answer": "Arabic",
+   "wrong": [
+    "Setswana",
+    "Hausa",
+    "Xhosa"
+   ],
+   "explain": "Main language of Oman: Arabic.",
+   "difficulty": 2
+  },
+  {
+   "id": "lang-pakistan",
+   "kind": "mc",
+   "prompt": "Which of these is a main language of Pakistan?",
+   "answer": "Urdu",
+   "wrong": [
+    "Aymara",
+    "Māori",
+    "Irish"
+   ],
+   "explain": "Main languages of Pakistan: Urdu and English.",
+   "difficulty": 2
+  },
+  {
+   "id": "lang-palau",
+   "kind": "mc",
+   "prompt": "Which of these is a main language of Palau?",
+   "answer": "Palauan",
+   "wrong": [
+    "Quechua",
+    "Sesotho",
+    "Shona"
+   ],
+   "explain": "Main languages of Palau: Palauan and English.",
+   "difficulty": 3
+  },
+  {
+   "id": "lang-palestine",
+   "kind": "mc",
+   "prompt": "Which of these is a main language of Palestine?",
+   "answer": "Arabic",
+   "wrong": [
+    "Irish",
+    "Lithuanian",
+    "Malagasy"
+   ],
+   "explain": "Main language of Palestine: Arabic.",
+   "difficulty": 2
+  },
+  {
+   "id": "lang-panama",
+   "kind": "mc",
+   "prompt": "Which of these is a main language of Panama?",
+   "answer": "Spanish",
+   "wrong": [
+    "Romanian",
+    "Tajik",
+    "Hindi"
+   ],
+   "explain": "Main language of Panama: Spanish.",
+   "difficulty": 2
+  },
+  {
+   "id": "lang-papua-new-guinea",
+   "kind": "mc",
+   "prompt": "Which of these is a main language of Papua New Guinea?",
+   "answer": "English",
+   "wrong": [
+    "Uzbek",
+    "Kazakh",
+    "Icelandic"
+   ],
+   "explain": "Main languages of Papua New Guinea: English, Tok Pisin and Hiri Motu.",
+   "difficulty": 2
+  },
+  {
+   "id": "lang-paraguay",
+   "kind": "mc",
+   "prompt": "Which of these is a main language of Paraguay?",
+   "answer": "Spanish",
+   "wrong": [
+    "Armenian",
+    "Somali",
+    "Samoan"
+   ],
+   "explain": "Main languages of Paraguay: Spanish and Guaraní.",
+   "difficulty": 2
+  },
+  {
+   "id": "lang-peru",
+   "kind": "mc",
+   "prompt": "Which of these is a main language of Peru?",
+   "answer": "Spanish",
+   "wrong": [
+    "Italian",
+    "Kazakh",
+    "Georgian"
+   ],
+   "explain": "Main languages of Peru: Spanish and Quechua.",
+   "difficulty": 1
+  },
+  {
+   "id": "lang-philippines",
+   "kind": "mc",
+   "prompt": "Which of these is a main language of Philippines?",
+   "answer": "Filipino",
+   "wrong": [
+    "Polish",
+    "Wolof",
+    "Tongan"
+   ],
+   "explain": "Main languages of Philippines: Filipino and English.",
+   "difficulty": 2
+  },
+  {
+   "id": "lang-poland",
+   "kind": "mc",
+   "prompt": "Which of these is a main language of Poland?",
+   "answer": "Polish",
+   "wrong": [
+    "Tigrinya",
+    "Dari",
+    "Tajik"
+   ],
+   "explain": "Main language of Poland: Polish.",
+   "difficulty": 1
+  },
+  {
+   "id": "lang-portugal",
+   "kind": "mc",
+   "prompt": "Which of these is a main language of Portugal?",
+   "answer": "Portuguese",
+   "wrong": [
+    "Māori",
+    "Seychellois Creole",
+    "Kazakh"
+   ],
+   "explain": "Main language of Portugal: Portuguese.",
+   "difficulty": 1
+  },
+  {
+   "id": "lang-qatar",
+   "kind": "mc",
+   "prompt": "Which of these is a main language of Qatar?",
+   "answer": "Arabic",
+   "wrong": [
+    "Spanish",
+    "Hungarian",
+    "Guaraní"
+   ],
+   "explain": "Main language of Qatar: Arabic.",
+   "difficulty": 3
+  },
+  {
+   "id": "lang-romania",
+   "kind": "mc",
+   "prompt": "Which of these is a main language of Romania?",
+   "answer": "Romanian",
+   "wrong": [
+    "Bislama",
+    "Amharic",
+    "Malay"
+   ],
+   "explain": "Main language of Romania: Romanian.",
+   "difficulty": 2
+  },
+  {
+   "id": "lang-russia",
+   "kind": "mc",
+   "prompt": "Which of these is a main language of Russia?",
+   "answer": "Russian",
+   "wrong": [
+    "Japanese",
+    "Mongolian",
+    "Pashto"
+   ],
+   "explain": "Main language of Russia: Russian.",
+   "difficulty": 1
+  },
+  {
+   "id": "lang-rwanda",
+   "kind": "mc",
+   "prompt": "Which of these is a main language of Rwanda?",
+   "answer": "Kinyarwanda",
+   "wrong": [
+    "Georgian",
+    "Japanese",
+    "Hebrew"
+   ],
+   "explain": "Main languages of Rwanda: Kinyarwanda, French and English.",
+   "difficulty": 2
+  },
+  {
+   "id": "lang-saint-kitts-and-nevis",
+   "kind": "mc",
+   "prompt": "Which of these is a main language of Saint Kitts and Nevis?",
+   "answer": "English",
+   "wrong": [
+    "Chichewa",
+    "Czech",
+    "Marshallese"
+   ],
+   "explain": "Main language of Saint Kitts and Nevis: English.",
+   "difficulty": 3
+  },
+  {
+   "id": "lang-saint-lucia",
+   "kind": "mc",
+   "prompt": "Which of these is a main language of Saint Lucia?",
+   "answer": "English",
+   "wrong": [
+    "Lithuanian",
+    "Ukrainian",
+    "Seychellois Creole"
+   ],
+   "explain": "Main language of Saint Lucia: English.",
+   "difficulty": 3
+  },
+  {
+   "id": "lang-saint-vincent-and-the-grenadines",
+   "kind": "mc",
+   "prompt": "Which of these is a main language of Saint Vincent and the Grenadines?",
+   "answer": "English",
+   "wrong": [
+    "Guaraní",
+    "Sesotho",
+    "Russian"
+   ],
+   "explain": "Main language of Saint Vincent and the Grenadines: English.",
+   "difficulty": 3
+  },
+  {
+   "id": "lang-samoa",
+   "kind": "mc",
+   "prompt": "Which of these is a main language of Samoa?",
+   "answer": "Samoan",
+   "wrong": [
+    "Berber",
+    "Tetum",
+    "Hausa"
+   ],
+   "explain": "Main languages of Samoa: Samoan and English.",
+   "difficulty": 3
+  },
+  {
+   "id": "lang-san-marino",
+   "kind": "mc",
+   "prompt": "Which of these is a main language of San Marino?",
+   "answer": "Italian",
+   "wrong": [
+    "Kazakh",
+    "Thai",
+    "Comorian"
+   ],
+   "explain": "Main language of San Marino: Italian.",
+   "difficulty": 3
+  },
+  {
+   "id": "lang-sao-tome-and-principe",
+   "kind": "mc",
+   "prompt": "Which of these is a main language of São Tomé and Príncipe?",
+   "answer": "Portuguese",
+   "wrong": [
+    "Tamil",
+    "Montenegrin",
+    "Fijian"
+   ],
+   "explain": "Main language of São Tomé and Príncipe: Portuguese.",
+   "difficulty": 3
+  },
+  {
+   "id": "lang-saudi-arabia",
+   "kind": "mc",
+   "prompt": "Which of these is a main language of Saudi Arabia?",
+   "answer": "Arabic",
+   "wrong": [
+    "Dutch",
+    "Kinyarwanda",
+    "Croatian"
+   ],
+   "explain": "Main language of Saudi Arabia: Arabic.",
+   "difficulty": 2
+  },
+  {
+   "id": "lang-senegal",
+   "kind": "mc",
+   "prompt": "Which of these is a main language of Senegal?",
+   "answer": "French",
+   "wrong": [
+    "Malay",
+    "Dutch",
+    "Lithuanian"
+   ],
+   "explain": "Main languages of Senegal: French and Wolof.",
+   "difficulty": 2
+  },
+  {
+   "id": "lang-serbia",
+   "kind": "mc",
+   "prompt": "Which of these is a main language of Serbia?",
+   "answer": "Serbian",
+   "wrong": [
+    "Mandarin Chinese",
+    "Marshallese",
+    "Xhosa"
+   ],
+   "explain": "Main language of Serbia: Serbian.",
+   "difficulty": 2
+  },
+  {
+   "id": "lang-seychelles",
+   "kind": "mc",
+   "prompt": "Which of these is a main language of Seychelles?",
+   "answer": "Seychellois Creole",
+   "wrong": [
+    "Armenian",
+    "Fiji Hindi",
+    "Kurdish"
+   ],
+   "explain": "Main languages of Seychelles: Seychellois Creole, English and French.",
+   "difficulty": 3
+  },
+  {
+   "id": "lang-sierra-leone",
+   "kind": "mc",
+   "prompt": "Which of these is a main language of Sierra Leone?",
+   "answer": "English",
+   "wrong": [
+    "Norwegian",
+    "Latvian",
+    "Kazakh"
+   ],
+   "explain": "Main language of Sierra Leone: English.",
+   "difficulty": 2
+  },
+  {
+   "id": "lang-singapore",
+   "kind": "mc",
+   "prompt": "Which of these is a main language of Singapore?",
+   "answer": "English",
+   "wrong": [
+    "German",
+    "Polish",
+    "Haitian Creole"
+   ],
+   "explain": "Main languages of Singapore: English, Malay, Mandarin Chinese and Tamil.",
+   "difficulty": 2
+  },
+  {
+   "id": "lang-slovakia",
+   "kind": "mc",
+   "prompt": "Which of these is a main language of Slovakia?",
+   "answer": "Slovak",
+   "wrong": [
+    "Lao",
+    "Fiji Hindi",
+    "Māori"
+   ],
+   "explain": "Main language of Slovakia: Slovak.",
+   "difficulty": 2
+  },
+  {
+   "id": "lang-slovenia",
+   "kind": "mc",
+   "prompt": "Which of these is a main language of Slovenia?",
+   "answer": "Slovene",
+   "wrong": [
+    "Urdu",
+    "Lao",
+    "Tuvaluan"
+   ],
+   "explain": "Main language of Slovenia: Slovene.",
+   "difficulty": 3
+  },
+  {
+   "id": "lang-solomon-islands",
+   "kind": "mc",
+   "prompt": "Which of these is a main language of Solomon Islands?",
+   "answer": "English",
+   "wrong": [
+    "Guaraní",
+    "Tajik",
+    "Seychellois Creole"
+   ],
+   "explain": "Main language of Solomon Islands: English.",
+   "difficulty": 3
+  },
+  {
+   "id": "lang-somalia",
+   "kind": "mc",
+   "prompt": "Which of these is a main language of Somalia?",
+   "answer": "Somali",
+   "wrong": [
+    "Burmese",
+    "Kyrgyz",
+    "Nepali"
+   ],
+   "explain": "Main languages of Somalia: Somali and Arabic.",
+   "difficulty": 2
+  },
+  {
+   "id": "lang-south-africa",
+   "kind": "mc",
+   "prompt": "Which of these is a main language of South Africa?",
+   "answer": "Zulu",
+   "wrong": [
+    "Tajik",
+    "Bosnian",
+    "German"
+   ],
+   "explain": "Main languages of South Africa: Zulu, Xhosa, Afrikaans and English.",
+   "difficulty": 1
+  },
+  {
+   "id": "lang-south-korea",
+   "kind": "mc",
+   "prompt": "Which of these is a main language of South Korea?",
+   "answer": "Korean",
+   "wrong": [
+    "Spanish",
+    "Slovak",
+    "Māori"
+   ],
+   "explain": "Main language of South Korea: Korean.",
+   "difficulty": 1
+  },
+  {
+   "id": "lang-south-sudan",
+   "kind": "mc",
+   "prompt": "Which of these is a main language of South Sudan?",
+   "answer": "English",
+   "wrong": [
+    "Indonesian",
+    "Tongan",
+    "Sinhala"
+   ],
+   "explain": "Main language of South Sudan: English.",
+   "difficulty": 2
+  },
+  {
+   "id": "lang-spain",
+   "kind": "mc",
+   "prompt": "Which of these is a main language of Spain?",
+   "answer": "Spanish",
+   "wrong": [
+    "Lao",
+    "Kinyarwanda",
+    "Fiji Hindi"
+   ],
+   "explain": "Main language of Spain: Spanish.",
+   "difficulty": 1
+  },
+  {
+   "id": "lang-sri-lanka",
+   "kind": "mc",
+   "prompt": "Which of these is a main language of Sri Lanka?",
+   "answer": "Sinhala",
+   "wrong": [
+    "Dutch",
+    "Quechua",
+    "Czech"
+   ],
+   "explain": "Main languages of Sri Lanka: Sinhala and Tamil.",
+   "difficulty": 2
+  },
+  {
+   "id": "lang-sudan",
+   "kind": "mc",
+   "prompt": "Which of these is a main language of Sudan?",
+   "answer": "Arabic",
+   "wrong": [
+    "Lithuanian",
+    "Aymara",
+    "Slovene"
+   ],
+   "explain": "Main languages of Sudan: Arabic and English.",
+   "difficulty": 2
+  },
+  {
+   "id": "lang-suriname",
+   "kind": "mc",
+   "prompt": "Which of these is a main language of Suriname?",
+   "answer": "Dutch",
+   "wrong": [
+    "Shona",
+    "Burmese",
+    "Tetum"
+   ],
+   "explain": "Main language of Suriname: Dutch.",
+   "difficulty": 3
+  },
+  {
+   "id": "lang-sweden",
+   "kind": "mc",
+   "prompt": "Which of these is a main language of Sweden?",
+   "answer": "Swedish",
+   "wrong": [
+    "Samoan",
+    "Arabic",
+    "Shona"
+   ],
+   "explain": "Main language of Sweden: Swedish.",
+   "difficulty": 1
+  },
+  {
+   "id": "lang-switzerland",
+   "kind": "mc",
+   "prompt": "Which of these is a main language of Switzerland?",
+   "answer": "German",
+   "wrong": [
+    "Pashto",
+    "Chichewa",
+    "Comorian"
+   ],
+   "explain": "Main languages of Switzerland: German, French, Italian and Romansh.",
+   "difficulty": 1
+  },
+  {
+   "id": "lang-syria",
+   "kind": "mc",
+   "prompt": "Which of these is a main language of Syria?",
+   "answer": "Arabic",
+   "wrong": [
+    "German",
+    "Macedonian",
+    "Bulgarian"
+   ],
+   "explain": "Main language of Syria: Arabic.",
+   "difficulty": 2
+  },
+  {
+   "id": "lang-tajikistan",
+   "kind": "mc",
+   "prompt": "Which of these is a main language of Tajikistan?",
+   "answer": "Tajik",
+   "wrong": [
+    "Tongan",
+    "Norwegian",
+    "Setswana"
+   ],
+   "explain": "Main language of Tajikistan: Tajik.",
+   "difficulty": 2
+  },
+  {
+   "id": "lang-tanzania",
+   "kind": "mc",
+   "prompt": "Which of these is a main language of Tanzania?",
+   "answer": "Swahili",
+   "wrong": [
+    "Kurdish",
+    "Indonesian",
+    "Armenian"
+   ],
+   "explain": "Main languages of Tanzania: Swahili and English.",
+   "difficulty": 2
+  },
+  {
+   "id": "lang-thailand",
+   "kind": "mc",
+   "prompt": "Which of these is a main language of Thailand?",
+   "answer": "Thai",
+   "wrong": [
+    "Romanian",
+    "Malagasy",
+    "Māori"
+   ],
+   "explain": "Main language of Thailand: Thai.",
+   "difficulty": 1
+  },
+  {
+   "id": "lang-timor-leste",
+   "kind": "mc",
+   "prompt": "Which of these is a main language of Timor-Leste?",
+   "answer": "Tetum",
+   "wrong": [
+    "Tigrinya",
+    "Luxembourgish",
+    "Albanian"
+   ],
+   "explain": "Main languages of Timor-Leste: Tetum and Portuguese.",
+   "difficulty": 3
+  },
+  {
+   "id": "lang-togo",
+   "kind": "mc",
+   "prompt": "Which of these is a main language of Togo?",
+   "answer": "French",
+   "wrong": [
+    "Armenian",
+    "Italian",
+    "Nepali"
+   ],
+   "explain": "Main language of Togo: French.",
+   "difficulty": 2
+  },
+  {
+   "id": "lang-tonga",
+   "kind": "mc",
+   "prompt": "Which of these is a main language of Tonga?",
+   "answer": "Tongan",
+   "wrong": [
+    "Tetum",
+    "Montenegrin",
+    "Catalan"
+   ],
+   "explain": "Main languages of Tonga: Tongan and English.",
+   "difficulty": 3
+  },
+  {
+   "id": "lang-trinidad-and-tobago",
+   "kind": "mc",
+   "prompt": "Which of these is a main language of Trinidad and Tobago?",
+   "answer": "English",
+   "wrong": [
+    "Hausa",
+    "Wolof",
+    "Bislama"
+   ],
+   "explain": "Main language of Trinidad and Tobago: English.",
+   "difficulty": 3
+  },
+  {
+   "id": "lang-tunisia",
+   "kind": "mc",
+   "prompt": "Which of these is a main language of Tunisia?",
+   "answer": "Arabic",
+   "wrong": [
+    "Samoan",
+    "Pashto",
+    "Dhivehi"
+   ],
+   "explain": "Main language of Tunisia: Arabic.",
+   "difficulty": 2
+  },
+  {
+   "id": "lang-turkey",
+   "kind": "mc",
+   "prompt": "Which of these is a main language of Turkey?",
+   "answer": "Turkish",
+   "wrong": [
+    "Swedish",
+    "Zulu",
+    "Fijian"
+   ],
+   "explain": "Main language of Turkey: Turkish.",
+   "difficulty": 1
+  },
+  {
+   "id": "lang-turkmenistan",
+   "kind": "mc",
+   "prompt": "Which of these is a main language of Turkmenistan?",
+   "answer": "Turkmen",
+   "wrong": [
+    "Lithuanian",
+    "Sango",
+    "Czech"
+   ],
+   "explain": "Main language of Turkmenistan: Turkmen.",
+   "difficulty": 2
+  },
+  {
+   "id": "lang-tuvalu",
+   "kind": "mc",
+   "prompt": "Which of these is a main language of Tuvalu?",
+   "answer": "Tuvaluan",
+   "wrong": [
+    "Spanish",
+    "Swedish",
+    "Belarusian"
+   ],
+   "explain": "Main languages of Tuvalu: Tuvaluan and English.",
+   "difficulty": 3
+  },
+  {
+   "id": "lang-uganda",
+   "kind": "mc",
+   "prompt": "Which of these is a main language of Uganda?",
+   "answer": "English",
+   "wrong": [
+    "Gilbertese",
+    "Norwegian",
+    "Irish"
+   ],
+   "explain": "Main languages of Uganda: English and Swahili.",
+   "difficulty": 2
+  },
+  {
+   "id": "lang-ukraine",
+   "kind": "mc",
+   "prompt": "Which of these is a main language of Ukraine?",
+   "answer": "Ukrainian",
+   "wrong": [
+    "Hindi",
+    "Malay",
+    "Palauan"
+   ],
+   "explain": "Main language of Ukraine: Ukrainian.",
+   "difficulty": 2
+  },
+  {
+   "id": "lang-united-arab-emirates",
+   "kind": "mc",
+   "prompt": "Which of these is a main language of United Arab Emirates?",
+   "answer": "Arabic",
+   "wrong": [
+    "Hausa",
+    "Swahili",
+    "Estonian"
+   ],
+   "explain": "Main language of United Arab Emirates: Arabic.",
+   "difficulty": 2
+  },
+  {
+   "id": "lang-uruguay",
+   "kind": "mc",
+   "prompt": "Which of these is a main language of Uruguay?",
+   "answer": "Spanish",
+   "wrong": [
+    "Uzbek",
+    "Palauan",
+    "Catalan"
+   ],
+   "explain": "Main language of Uruguay: Spanish.",
+   "difficulty": 2
+  },
+  {
+   "id": "lang-uzbekistan",
+   "kind": "mc",
+   "prompt": "Which of these is a main language of Uzbekistan?",
+   "answer": "Uzbek",
+   "wrong": [
+    "Swazi",
+    "Latvian",
+    "Māori"
+   ],
+   "explain": "Main language of Uzbekistan: Uzbek.",
+   "difficulty": 2
+  },
+  {
+   "id": "lang-vanuatu",
+   "kind": "mc",
+   "prompt": "Which of these is a main language of Vanuatu?",
+   "answer": "Bislama",
+   "wrong": [
+    "Shona",
+    "Comorian",
+    "Tigrinya"
+   ],
+   "explain": "Main languages of Vanuatu: Bislama, English and French.",
+   "difficulty": 3
+  },
+  {
+   "id": "lang-vatican-city",
+   "kind": "mc",
+   "prompt": "Which of these is a main language of Vatican City?",
+   "answer": "Italian",
+   "wrong": [
+    "Kinyarwanda",
+    "Amharic",
+    "Korean"
+   ],
+   "explain": "Main languages of Vatican City: Italian and Latin.",
+   "difficulty": 3
+  },
+  {
+   "id": "lang-venezuela",
+   "kind": "mc",
+   "prompt": "Which of these is a main language of Venezuela?",
+   "answer": "Spanish",
+   "wrong": [
+    "Albanian",
+    "Persian",
+    "Serbian"
+   ],
+   "explain": "Main language of Venezuela: Spanish.",
+   "difficulty": 2
+  },
+  {
+   "id": "lang-vietnam",
+   "kind": "mc",
+   "prompt": "Which of these is a main language of Vietnam?",
+   "answer": "Vietnamese",
+   "wrong": [
+    "Mauritian Creole",
+    "Haitian Creole",
+    "Belarusian"
+   ],
+   "explain": "Main language of Vietnam: Vietnamese.",
+   "difficulty": 2
+  },
+  {
+   "id": "lang-yemen",
+   "kind": "mc",
+   "prompt": "Which of these is a main language of Yemen?",
+   "answer": "Arabic",
+   "wrong": [
+    "Malagasy",
+    "Romanian",
+    "Bulgarian"
+   ],
+   "explain": "Main language of Yemen: Arabic.",
+   "difficulty": 2
+  },
+  {
+   "id": "lang-zambia",
+   "kind": "mc",
+   "prompt": "Which of these is a main language of Zambia?",
+   "answer": "English",
+   "wrong": [
+    "Guaraní",
+    "Hungarian",
+    "German"
+   ],
+   "explain": "Main language of Zambia: English.",
+   "difficulty": 2
+  },
+  {
+   "id": "lang-zimbabwe",
+   "kind": "mc",
+   "prompt": "Which of these is a main language of Zimbabwe?",
+   "answer": "English",
+   "wrong": [
+    "Norwegian",
+    "Azerbaijani",
+    "Hungarian"
+   ],
+   "explain": "Main languages of Zimbabwe: English, Shona and Ndebele.",
+   "difficulty": 2
+  },
+  {
+   "id": "langc-english",
+   "kind": "mc",
+   "prompt": "In which of these countries is English a main language?",
+   "answer": "Australia",
+   "wrong": [
+    "Oman",
+    "Czechia",
+    "Nepal"
+   ],
+   "explain": "English is an Indo-European language written in the Latin script, and a main language of Antigua and Barbuda, Australia, Bahamas, Barbados and Belize and others.",
+   "difficulty": 1
+  },
+  {
+   "id": "langs-english",
+   "kind": "mc",
+   "prompt": "Which script is English normally written in?",
+   "answer": "Latin",
+   "wrong": [
+    "Devanagari",
+    "Greek",
+    "Cyrillic"
+   ],
+   "explain": "English is an Indo-European language written in the Latin script, and a main language of Antigua and Barbuda, Australia, Bahamas, Barbados and Belize and others.",
+   "difficulty": 2
+  },
+  {
+   "id": "langc-german",
+   "kind": "mc",
+   "prompt": "In which of these countries is German a main language?",
+   "answer": "Austria",
+   "wrong": [
+    "El Salvador",
+    "Panama",
+    "Bolivia"
+   ],
+   "explain": "German is an Indo-European language written in the Latin script, and a main language of Austria, Belgium, Germany, Liechtenstein and Luxembourg and others.",
+   "difficulty": 1
+  },
+  {
+   "id": "langs-german",
+   "kind": "mc",
+   "prompt": "Which script is German normally written in?",
+   "answer": "Latin",
+   "wrong": [
+    "Bengali",
+    "Cyrillic",
+    "Sinhala"
+   ],
+   "explain": "German is an Indo-European language written in the Latin script, and a main language of Austria, Belgium, Germany, Liechtenstein and Luxembourg and others.",
+   "difficulty": 2
+  },
+  {
+   "id": "langc-dutch",
+   "kind": "mc",
+   "prompt": "In which of these countries is Dutch a main language?",
+   "answer": "Belgium",
+   "wrong": [
+    "Singapore",
+    "Somalia",
+    "United States"
+   ],
+   "explain": "Dutch is an Indo-European language written in the Latin script, and a main language of Belgium, Netherlands and Suriname.",
+   "difficulty": 2
+  },
+  {
+   "id": "langs-dutch",
+   "kind": "mc",
+   "prompt": "Which script is Dutch normally written in?",
+   "answer": "Latin",
+   "wrong": [
+    "Arabic",
+    "Georgian",
+    "Hangul"
+   ],
+   "explain": "Dutch is an Indo-European language written in the Latin script, and a main language of Belgium, Netherlands and Suriname.",
+   "difficulty": 3
+  },
+  {
+   "id": "langc-swedish",
+   "kind": "mc",
+   "prompt": "In which of these countries is Swedish a main language?",
+   "answer": "Finland",
+   "wrong": [
+    "Sudan",
+    "Bolivia",
+    "India"
+   ],
+   "explain": "Swedish is an Indo-European language written in the Latin script, and a main language of Finland and Sweden.",
+   "difficulty": 2
+  },
+  {
+   "id": "langs-swedish",
+   "kind": "mc",
+   "prompt": "Which script is Swedish normally written in?",
+   "answer": "Latin",
+   "wrong": [
+    "Lao",
+    "Georgian",
+    "Kanji and kana"
+   ],
+   "explain": "Swedish is an Indo-European language written in the Latin script, and a main language of Finland and Sweden.",
+   "difficulty": 3
+  },
+  {
+   "id": "langc-danish",
+   "kind": "mc",
+   "prompt": "In which of these countries is Danish a main language?",
+   "answer": "Denmark",
+   "wrong": [
+    "Morocco",
+    "Kyrgyzstan",
+    "Zimbabwe"
+   ],
+   "explain": "Danish is an Indo-European language written in the Latin script, and a main language of Denmark.",
+   "difficulty": 2
+  },
+  {
+   "id": "langs-danish",
+   "kind": "mc",
+   "prompt": "Which script is Danish normally written in?",
+   "answer": "Latin",
+   "wrong": [
+    "Greek",
+    "Ge'ez",
+    "Kanji and kana"
+   ],
+   "explain": "Danish is an Indo-European language written in the Latin script, and a main language of Denmark.",
+   "difficulty": 3
+  },
+  {
+   "id": "langc-norwegian",
+   "kind": "mc",
+   "prompt": "In which of these countries is Norwegian a main language?",
+   "answer": "Norway",
+   "wrong": [
+    "Dominica",
+    "Trinidad and Tobago",
+    "Solomon Islands"
+   ],
+   "explain": "Norwegian is an Indo-European language written in the Latin script, and a main language of Norway.",
+   "difficulty": 2
+  },
+  {
+   "id": "langs-norwegian",
+   "kind": "mc",
+   "prompt": "Which script is Norwegian normally written in?",
+   "answer": "Latin",
+   "wrong": [
+    "Devanagari",
+    "Bengali",
+    "Arabic"
+   ],
+   "explain": "Norwegian is an Indo-European language written in the Latin script, and a main language of Norway.",
+   "difficulty": 3
+  },
+  {
+   "id": "langc-icelandic",
+   "kind": "mc",
+   "prompt": "In which of these countries is Icelandic a main language?",
+   "answer": "Iceland",
+   "wrong": [
+    "Mozambique",
+    "Nepal",
+    "Timor-Leste"
+   ],
+   "explain": "Icelandic is an Indo-European language written in the Latin script, and a main language of Iceland.",
+   "difficulty": 2
+  },
+  {
+   "id": "langs-icelandic",
+   "kind": "mc",
+   "prompt": "Which script is Icelandic normally written in?",
+   "answer": "Latin",
+   "wrong": [
+    "Georgian",
+    "Ge'ez",
+    "Bengali"
+   ],
+   "explain": "Icelandic is an Indo-European language written in the Latin script, and a main language of Iceland.",
+   "difficulty": 3
+  },
+  {
+   "id": "langc-afrikaans",
+   "kind": "mc",
+   "prompt": "In which of these countries is Afrikaans a main language?",
+   "answer": "South Africa",
+   "wrong": [
+    "Russia",
+    "Iran",
+    "Hungary"
+   ],
+   "explain": "Afrikaans is an Indo-European language written in the Latin script, and a main language of South Africa.",
+   "difficulty": 2
+  },
+  {
+   "id": "langs-afrikaans",
+   "kind": "mc",
+   "prompt": "Which script is Afrikaans normally written in?",
+   "answer": "Latin",
+   "wrong": [
+    "Armenian",
+    "Ge'ez",
+    "Thai"
+   ],
+   "explain": "Afrikaans is an Indo-European language written in the Latin script, and a main language of South Africa.",
+   "difficulty": 3
+  },
+  {
+   "id": "langc-french",
+   "kind": "mc",
+   "prompt": "In which of these countries is French a main language?",
+   "answer": "Belgium",
+   "wrong": [
+    "Somalia",
+    "China",
+    "Tanzania"
+   ],
+   "explain": "French is an Indo-European language written in the Latin script, and a main language of Belgium, Benin, Burkina Faso, Burundi and Cameroon and others.",
+   "difficulty": 1
+  },
+  {
+   "id": "langs-french",
+   "kind": "mc",
+   "prompt": "Which script is French normally written in?",
+   "answer": "Latin",
+   "wrong": [
+    "Armenian",
+    "Sinhala",
+    "Bengali"
+   ],
+   "explain": "French is an Indo-European language written in the Latin script, and a main language of Belgium, Benin, Burkina Faso, Burundi and Cameroon and others.",
+   "difficulty": 2
+  },
+  {
+   "id": "langc-spanish",
+   "kind": "mc",
+   "prompt": "In which of these countries is Spanish a main language?",
+   "answer": "Argentina",
+   "wrong": [
+    "Pakistan",
+    "Iraq",
+    "Denmark"
+   ],
+   "explain": "Spanish is an Indo-European language written in the Latin script, and a main language of Argentina, Bolivia, Chile, Colombia and Costa Rica and others.",
+   "difficulty": 1
+  },
+  {
+   "id": "langs-spanish",
+   "kind": "mc",
+   "prompt": "Which script is Spanish normally written in?",
+   "answer": "Latin",
+   "wrong": [
+    "Kanji and kana",
+    "Tamil",
+    "Armenian"
+   ],
+   "explain": "Spanish is an Indo-European language written in the Latin script, and a main language of Argentina, Bolivia, Chile, Colombia and Costa Rica and others.",
+   "difficulty": 2
+  },
+  {
+   "id": "langc-portuguese",
+   "kind": "mc",
+   "prompt": "In which of these countries is Portuguese a main language?",
+   "answer": "Brazil",
+   "wrong": [
+    "Burkina Faso",
+    "Central African Republic",
+    "Vatican City"
+   ],
+   "explain": "Portuguese is an Indo-European language written in the Latin script, and a main language of Angola, Brazil, Cape Verde, Equatorial Guinea and Guinea-Bissau and others.",
+   "difficulty": 1
+  },
+  {
+   "id": "langs-portuguese",
+   "kind": "mc",
+   "prompt": "Which script is Portuguese normally written in?",
+   "answer": "Latin",
+   "wrong": [
+    "Tamil",
+    "Ge'ez",
+    "Hebrew"
+   ],
+   "explain": "Portuguese is an Indo-European language written in the Latin script, and a main language of Angola, Brazil, Cape Verde, Equatorial Guinea and Guinea-Bissau and others.",
+   "difficulty": 2
+  },
+  {
+   "id": "langc-italian",
+   "kind": "mc",
+   "prompt": "In which of these countries is Italian a main language?",
+   "answer": "Italy",
+   "wrong": [
+    "Thailand",
+    "Turkey",
+    "India"
+   ],
+   "explain": "Italian is an Indo-European language written in the Latin script, and a main language of Italy, San Marino, Switzerland and Vatican City.",
+   "difficulty": 1
+  },
+  {
+   "id": "langs-italian",
+   "kind": "mc",
+   "prompt": "Which script is Italian normally written in?",
+   "answer": "Latin",
+   "wrong": [
+    "Burmese",
+    "Arabic",
+    "Thai"
+   ],
+   "explain": "Italian is an Indo-European language written in the Latin script, and a main language of Italy, San Marino, Switzerland and Vatican City.",
+   "difficulty": 2
+  },
+  {
+   "id": "langc-romanian",
+   "kind": "mc",
+   "prompt": "In which of these countries is Romanian a main language?",
+   "answer": "Moldova",
+   "wrong": [
+    "Trinidad and Tobago",
+    "Fiji",
+    "Armenia"
+   ],
+   "explain": "Romanian is an Indo-European language written in the Latin script, and a main language of Moldova and Romania.",
+   "difficulty": 2
+  },
+  {
+   "id": "langs-romanian",
+   "kind": "mc",
+   "prompt": "Which script is Romanian normally written in?",
+   "answer": "Latin",
+   "wrong": [
+    "Kanji and kana",
+    "Georgian",
+    "Arabic"
+   ],
+   "explain": "Romanian is an Indo-European language written in the Latin script, and a main language of Moldova and Romania.",
+   "difficulty": 3
+  },
+  {
+   "id": "langc-catalan",
+   "kind": "mc",
+   "prompt": "In which of these countries is Catalan a main language?",
+   "answer": "Andorra",
+   "wrong": [
+    "Morocco",
+    "Liberia",
+    "Bangladesh"
+   ],
+   "explain": "Catalan is an Indo-European language written in the Latin script, and a main language of Andorra.",
+   "difficulty": 2
+  },
+  {
+   "id": "langs-catalan",
+   "kind": "mc",
+   "prompt": "Which script is Catalan normally written in?",
+   "answer": "Latin",
+   "wrong": [
+    "Hebrew",
+    "Kanji and kana",
+    "Lao"
+   ],
+   "explain": "Catalan is an Indo-European language written in the Latin script, and a main language of Andorra.",
+   "difficulty": 3
+  },
+  {
+   "id": "langc-russian",
+   "kind": "mc",
+   "prompt": "In which of these countries is Russian a main language?",
+   "answer": "Russia",
+   "wrong": [
+    "Kenya",
+    "Qatar",
+    "Thailand"
+   ],
+   "explain": "Russian is an Indo-European language written in the Cyrillic script, and a main language of Belarus, Kazakhstan, Kyrgyzstan and Russia.",
+   "difficulty": 1
+  },
+  {
+   "id": "langs-russian",
+   "kind": "mc",
+   "prompt": "Which script is Russian normally written in?",
+   "answer": "Cyrillic",
+   "wrong": [
+    "Arabic",
+    "Tamil",
+    "Burmese"
+   ],
+   "explain": "Russian is an Indo-European language written in the Cyrillic script, and a main language of Belarus, Kazakhstan, Kyrgyzstan and Russia.",
+   "difficulty": 2
+  },
+  {
+   "id": "langc-ukrainian",
+   "kind": "mc",
+   "prompt": "In which of these countries is Ukrainian a main language?",
+   "answer": "Ukraine",
+   "wrong": [
+    "Lesotho",
+    "Kazakhstan",
+    "Palestine"
+   ],
+   "explain": "Ukrainian is an Indo-European language written in the Cyrillic script, and a main language of Ukraine.",
+   "difficulty": 2
+  },
+  {
+   "id": "langs-ukrainian",
+   "kind": "mc",
+   "prompt": "Which script is Ukrainian normally written in?",
+   "answer": "Cyrillic",
+   "wrong": [
+    "Sinhala",
+    "Hangul",
+    "Devanagari"
+   ],
+   "explain": "Ukrainian is an Indo-European language written in the Cyrillic script, and a main language of Ukraine.",
+   "difficulty": 3
+  },
+  {
+   "id": "langc-bulgarian",
+   "kind": "mc",
+   "prompt": "In which of these countries is Bulgarian a main language?",
+   "answer": "Bulgaria",
+   "wrong": [
+    "Eritrea",
+    "Senegal",
+    "Tunisia"
+   ],
+   "explain": "Bulgarian is an Indo-European language written in the Cyrillic script, and a main language of Bulgaria.",
+   "difficulty": 2
+  },
+  {
+   "id": "langs-bulgarian",
+   "kind": "mc",
+   "prompt": "Which script is Bulgarian normally written in?",
+   "answer": "Cyrillic",
+   "wrong": [
+    "Sinhala",
+    "Tamil",
+    "Lao"
+   ],
+   "explain": "Bulgarian is an Indo-European language written in the Cyrillic script, and a main language of Bulgaria.",
+   "difficulty": 3
+  },
+  {
+   "id": "langc-polish",
+   "kind": "mc",
+   "prompt": "In which of these countries is Polish a main language?",
+   "answer": "Poland",
+   "wrong": [
+    "Bahamas",
+    "South Korea",
+    "Malawi"
+   ],
+   "explain": "Polish is an Indo-European language written in the Latin script, and a main language of Poland.",
+   "difficulty": 2
+  },
+  {
+   "id": "langs-polish",
+   "kind": "mc",
+   "prompt": "Which script is Polish normally written in?",
+   "answer": "Latin",
+   "wrong": [
+    "Chinese characters",
+    "Cyrillic",
+    "Devanagari"
+   ],
+   "explain": "Polish is an Indo-European language written in the Latin script, and a main language of Poland.",
+   "difficulty": 3
+  },
+  {
+   "id": "langc-czech",
+   "kind": "mc",
+   "prompt": "In which of these countries is Czech a main language?",
+   "answer": "Czechia",
+   "wrong": [
+    "Canada",
+    "Somalia",
+    "Micronesia"
+   ],
+   "explain": "Czech is an Indo-European language written in the Latin script, and a main language of Czechia.",
+   "difficulty": 2
+  },
+  {
+   "id": "langs-czech",
+   "kind": "mc",
+   "prompt": "Which script is Czech normally written in?",
+   "answer": "Latin",
+   "wrong": [
+    "Sinhala",
+    "Cyrillic",
+    "Tamil"
+   ],
+   "explain": "Czech is an Indo-European language written in the Latin script, and a main language of Czechia.",
+   "difficulty": 3
+  },
+  {
+   "id": "langc-slovak",
+   "kind": "mc",
+   "prompt": "In which of these countries is Slovak a main language?",
+   "answer": "Slovakia",
+   "wrong": [
+    "São Tomé and Príncipe",
+    "Cameroon",
+    "Republic of the Congo"
+   ],
+   "explain": "Slovak is an Indo-European language written in the Latin script, and a main language of Slovakia.",
+   "difficulty": 3
+  },
+  {
+   "id": "langs-slovak",
+   "kind": "mc",
+   "prompt": "Which script is Slovak normally written in?",
+   "answer": "Latin",
+   "wrong": [
+    "Kanji and kana",
+    "Bengali",
+    "Armenian"
+   ],
+   "explain": "Slovak is an Indo-European language written in the Latin script, and a main language of Slovakia.",
+   "difficulty": 3
+  },
+  {
+   "id": "langc-croatian",
+   "kind": "mc",
+   "prompt": "In which of these countries is Croatian a main language?",
+   "answer": "Bosnia and Herzegovina",
+   "wrong": [
+    "Costa Rica",
+    "Syria",
+    "Bahamas"
+   ],
+   "explain": "Croatian is an Indo-European language written in the Latin script, and a main language of Bosnia and Herzegovina and Croatia.",
+   "difficulty": 2
+  },
+  {
+   "id": "langs-croatian",
+   "kind": "mc",
+   "prompt": "Which script is Croatian normally written in?",
+   "answer": "Latin",
+   "wrong": [
+    "Arabic",
+    "Khmer",
+    "Burmese"
+   ],
+   "explain": "Croatian is an Indo-European language written in the Latin script, and a main language of Bosnia and Herzegovina and Croatia.",
+   "difficulty": 3
+  },
+  {
+   "id": "langc-greek",
+   "kind": "mc",
+   "prompt": "In which of these countries is Greek a main language?",
+   "answer": "Greece",
+   "wrong": [
+    "Grenada",
+    "Angola",
+    "Japan"
+   ],
+   "explain": "Greek is an Indo-European language written in the Greek script, and a main language of Cyprus and Greece.",
+   "difficulty": 2
+  },
+  {
+   "id": "langs-greek",
+   "kind": "mc",
+   "prompt": "Which script is Greek normally written in?",
+   "answer": "Greek",
+   "wrong": [
+    "Thai",
+    "Chinese characters",
+    "Burmese"
+   ],
+   "explain": "Greek is an Indo-European language written in the Greek script, and a main language of Cyprus and Greece.",
+   "difficulty": 3
+  },
+  {
+   "id": "langc-albanian",
+   "kind": "mc",
+   "prompt": "In which of these countries is Albanian a main language?",
+   "answer": "Albania",
+   "wrong": [
+    "Laos",
+    "India",
+    "Micronesia"
+   ],
+   "explain": "Albanian is an Indo-European language written in the Latin script, and a main language of Albania and North Macedonia.",
+   "difficulty": 3
+  },
+  {
+   "id": "langs-albanian",
+   "kind": "mc",
+   "prompt": "Which script is Albanian normally written in?",
+   "answer": "Latin",
+   "wrong": [
+    "Lao",
+    "Georgian",
+    "Bengali"
+   ],
+   "explain": "Albanian is an Indo-European language written in the Latin script, and a main language of Albania and North Macedonia.",
+   "difficulty": 3
+  },
+  {
+   "id": "langc-armenian",
+   "kind": "mc",
+   "prompt": "In which of these countries is Armenian a main language?",
+   "answer": "Armenia",
+   "wrong": [
+    "Dominican Republic",
+    "Australia",
+    "Uganda"
+   ],
+   "explain": "Armenian is an Indo-European language written in the Armenian script, and a main language of Armenia.",
+   "difficulty": 3
+  },
+  {
+   "id": "langs-armenian",
+   "kind": "mc",
+   "prompt": "Which script is Armenian normally written in?",
+   "answer": "Armenian",
+   "wrong": [
+    "Tamil",
+    "Latin",
+    "Thai"
+   ],
+   "explain": "Armenian is an Indo-European language written in the Armenian script, and a main language of Armenia.",
+   "difficulty": 3
+  },
+  {
+   "id": "langc-hindi",
+   "kind": "mc",
+   "prompt": "In which of these countries is Hindi a main language?",
+   "answer": "India",
+   "wrong": [
+    "Tuvalu",
+    "Costa Rica",
+    "Gabon"
+   ],
+   "explain": "Hindi is an Indo-European language written in the Devanagari script, and a main language of India.",
+   "difficulty": 1
+  },
+  {
+   "id": "langs-hindi",
+   "kind": "mc",
+   "prompt": "Which script is Hindi normally written in?",
+   "answer": "Devanagari",
+   "wrong": [
+    "Ge'ez",
+    "Khmer",
+    "Thai"
+   ],
+   "explain": "Hindi is an Indo-European language written in the Devanagari script, and a main language of India.",
+   "difficulty": 2
+  },
+  {
+   "id": "langc-bengali",
+   "kind": "mc",
+   "prompt": "In which of these countries is Bengali a main language?",
+   "answer": "Bangladesh",
+   "wrong": [
+    "Costa Rica",
+    "Italy",
+    "Lesotho"
+   ],
+   "explain": "Bengali is an Indo-European language written in the Bengali script, and a main language of Bangladesh.",
+   "difficulty": 2
+  },
+  {
+   "id": "langs-bengali",
+   "kind": "mc",
+   "prompt": "Which script is Bengali normally written in?",
+   "answer": "Bengali",
+   "wrong": [
+    "Burmese",
+    "Armenian",
+    "Tamil"
+   ],
+   "explain": "Bengali is an Indo-European language written in the Bengali script, and a main language of Bangladesh.",
+   "difficulty": 3
+  },
+  {
+   "id": "langc-urdu",
+   "kind": "mc",
+   "prompt": "In which of these countries is Urdu a main language?",
+   "answer": "Pakistan",
+   "wrong": [
+    "Monaco",
+    "Palau",
+    "Eswatini"
+   ],
+   "explain": "Urdu is an Indo-European language written in the Arabic script, and a main language of Pakistan.",
+   "difficulty": 2
+  },
+  {
+   "id": "langs-urdu",
+   "kind": "mc",
+   "prompt": "Which script is Urdu normally written in?",
+   "answer": "Arabic",
+   "wrong": [
+    "Armenian",
+    "Thai",
+    "Chinese characters"
+   ],
+   "explain": "Urdu is an Indo-European language written in the Arabic script, and a main language of Pakistan.",
+   "difficulty": 3
+  },
+  {
+   "id": "langc-nepali",
+   "kind": "mc",
+   "prompt": "In which of these countries is Nepali a main language?",
+   "answer": "Nepal",
+   "wrong": [
+    "Colombia",
+    "Mauritius",
+    "Venezuela"
+   ],
+   "explain": "Nepali is an Indo-European language written in the Devanagari script, and a main language of Nepal.",
+   "difficulty": 3
+  },
+  {
+   "id": "langs-nepali",
+   "kind": "mc",
+   "prompt": "Which script is Nepali normally written in?",
+   "answer": "Devanagari",
+   "wrong": [
+    "Ge'ez",
+    "Armenian",
+    "Sinhala"
+   ],
+   "explain": "Nepali is an Indo-European language written in the Devanagari script, and a main language of Nepal.",
+   "difficulty": 3
+  },
+  {
+   "id": "langc-sinhala",
+   "kind": "mc",
+   "prompt": "In which of these countries is Sinhala a main language?",
+   "answer": "Sri Lanka",
+   "wrong": [
+    "Bolivia",
+    "Norway",
+    "Ecuador"
+   ],
+   "explain": "Sinhala is an Indo-European language written in the Sinhala script, and a main language of Sri Lanka.",
+   "difficulty": 3
+  },
+  {
+   "id": "langs-sinhala",
+   "kind": "mc",
+   "prompt": "Which script is Sinhala normally written in?",
+   "answer": "Sinhala",
+   "wrong": [
+    "Burmese",
+    "Lao",
+    "Kanji and kana"
+   ],
+   "explain": "Sinhala is an Indo-European language written in the Sinhala script, and a main language of Sri Lanka.",
+   "difficulty": 3
+  },
+  {
+   "id": "langc-persian",
+   "kind": "mc",
+   "prompt": "In which of these countries is Persian a main language?",
+   "answer": "Iran",
+   "wrong": [
+    "Republic of the Congo",
+    "Guyana",
+    "Democratic Republic of the Congo"
+   ],
+   "explain": "Persian is an Indo-European language written in the Arabic script, and a main language of Iran.",
+   "difficulty": 2
+  },
+  {
+   "id": "langs-persian",
+   "kind": "mc",
+   "prompt": "Which script is Persian normally written in?",
+   "answer": "Arabic",
+   "wrong": [
+    "Sinhala",
+    "Burmese",
+    "Kanji and kana"
+   ],
+   "explain": "Persian is an Indo-European language written in the Arabic script, and a main language of Iran.",
+   "difficulty": 3
+  },
+  {
+   "id": "langc-pashto",
+   "kind": "mc",
+   "prompt": "In which of these countries is Pashto a main language?",
+   "answer": "Afghanistan",
+   "wrong": [
+    "Belgium",
+    "Colombia",
+    "New Zealand"
+   ],
+   "explain": "Pashto is an Indo-European language written in the Arabic script, and a main language of Afghanistan.",
+   "difficulty": 3
+  },
+  {
+   "id": "langs-pashto",
+   "kind": "mc",
+   "prompt": "Which script is Pashto normally written in?",
+   "answer": "Arabic",
+   "wrong": [
+    "Khmer",
+    "Kanji and kana",
+    "Hebrew"
+   ],
+   "explain": "Pashto is an Indo-European language written in the Arabic script, and a main language of Afghanistan.",
+   "difficulty": 3
+  },
+  {
+   "id": "langc-arabic",
+   "kind": "mc",
+   "prompt": "In which of these countries is Arabic a main language?",
+   "answer": "Egypt",
+   "wrong": [
+    "Armenia",
+    "Maldives",
+    "Pakistan"
+   ],
+   "explain": "Arabic is an Afro-Asiatic language written in the Arabic script, and a main language of Algeria, Bahrain, Chad, Comoros and Djibouti and others.",
+   "difficulty": 1
+  },
+  {
+   "id": "langs-arabic",
+   "kind": "mc",
+   "prompt": "Which script is Arabic normally written in?",
+   "answer": "Arabic",
+   "wrong": [
+    "Lao",
+    "Tamil",
+    "Greek"
+   ],
+   "explain": "Arabic is an Afro-Asiatic language written in the Arabic script, and a main language of Algeria, Bahrain, Chad, Comoros and Djibouti and others.",
+   "difficulty": 2
+  },
+  {
+   "id": "langc-hebrew",
+   "kind": "mc",
+   "prompt": "In which of these countries is Hebrew a main language?",
+   "answer": "Israel",
+   "wrong": [
+    "United States",
+    "Zambia",
+    "Venezuela"
+   ],
+   "explain": "Hebrew is an Afro-Asiatic language written in the Hebrew script, and a main language of Israel.",
+   "difficulty": 2
+  },
+  {
+   "id": "langs-hebrew",
+   "kind": "mc",
+   "prompt": "Which script is Hebrew normally written in?",
+   "answer": "Hebrew",
+   "wrong": [
+    "Lao",
+    "Arabic",
+    "Kanji and kana"
+   ],
+   "explain": "Hebrew is an Afro-Asiatic language written in the Hebrew script, and a main language of Israel.",
+   "difficulty": 3
+  },
+  {
+   "id": "langc-amharic",
+   "kind": "mc",
+   "prompt": "In which of these countries is Amharic a main language?",
+   "answer": "Ethiopia",
+   "wrong": [
+    "San Marino",
+    "Marshall Islands",
+    "Maldives"
+   ],
+   "explain": "Amharic is an Afro-Asiatic language written in the Ge'ez script, and a main language of Ethiopia.",
+   "difficulty": 3
+  },
+  {
+   "id": "langs-amharic",
+   "kind": "mc",
+   "prompt": "Which script is Amharic normally written in?",
+   "answer": "Ge'ez",
+   "wrong": [
+    "Sinhala",
+    "Armenian",
+    "Latin"
+   ],
+   "explain": "Amharic is an Afro-Asiatic language written in the Ge'ez script, and a main language of Ethiopia.",
+   "difficulty": 3
+  },
+  {
+   "id": "langc-maltese",
+   "kind": "mc",
+   "prompt": "In which of these countries is Maltese a main language?",
+   "answer": "Malta",
+   "wrong": [
+    "Syria",
+    "Guatemala",
+    "Maldives"
+   ],
+   "explain": "Maltese is an Afro-Asiatic language written in the Latin script, and a main language of Malta.",
+   "difficulty": 3
+  },
+  {
+   "id": "langs-maltese",
+   "kind": "mc",
+   "prompt": "Which script is Maltese normally written in?",
+   "answer": "Latin",
+   "wrong": [
+    "Armenian",
+    "Hangul",
+    "Georgian"
+   ],
+   "explain": "Maltese is an Afro-Asiatic language written in the Latin script, and a main language of Malta.",
+   "difficulty": 3
+  },
+  {
+   "id": "langc-somali",
+   "kind": "mc",
+   "prompt": "In which of these countries is Somali a main language?",
+   "answer": "Somalia",
+   "wrong": [
+    "Kyrgyzstan",
+    "Nepal",
+    "Russia"
+   ],
+   "explain": "Somali is an Afro-Asiatic language written in the Latin script, and a main language of Somalia.",
+   "difficulty": 3
+  },
+  {
+   "id": "langs-somali",
+   "kind": "mc",
+   "prompt": "Which script is Somali normally written in?",
+   "answer": "Latin",
+   "wrong": [
+    "Bengali",
+    "Hangul",
+    "Khmer"
+   ],
+   "explain": "Somali is an Afro-Asiatic language written in the Latin script, and a main language of Somalia.",
+   "difficulty": 3
+  },
+  {
+   "id": "langc-hausa",
+   "kind": "mc",
+   "prompt": "In which of these countries is Hausa a main language?",
+   "answer": "Niger",
+   "wrong": [
+    "Israel",
+    "Iran",
+    "Bahamas"
+   ],
+   "explain": "Hausa is an Afro-Asiatic language written in the Latin script, and a main language of Niger.",
+   "difficulty": 3
+  },
+  {
+   "id": "langs-hausa",
+   "kind": "mc",
+   "prompt": "Which script is Hausa normally written in?",
+   "answer": "Latin",
+   "wrong": [
+    "Sinhala",
+    "Devanagari",
+    "Chinese characters"
+   ],
+   "explain": "Hausa is an Afro-Asiatic language written in the Latin script, and a main language of Niger.",
+   "difficulty": 3
+  },
+  {
+   "id": "langc-turkish",
+   "kind": "mc",
+   "prompt": "In which of these countries is Turkish a main language?",
+   "answer": "Turkey",
+   "wrong": [
+    "Dominican Republic",
+    "Czechia",
+    "Bulgaria"
+   ],
+   "explain": "Turkish is a Turkic language written in the Latin script, and a main language of Cyprus and Turkey.",
+   "difficulty": 2
+  },
+  {
+   "id": "langs-turkish",
+   "kind": "mc",
+   "prompt": "Which script is Turkish normally written in?",
+   "answer": "Latin",
+   "wrong": [
+    "Lao",
+    "Chinese characters",
+    "Georgian"
+   ],
+   "explain": "Turkish is a Turkic language written in the Latin script, and a main language of Cyprus and Turkey.",
+   "difficulty": 3
+  },
+  {
+   "id": "langc-azerbaijani",
+   "kind": "mc",
+   "prompt": "In which of these countries is Azerbaijani a main language?",
+   "answer": "Azerbaijan",
+   "wrong": [
+    "Germany",
+    "Latvia",
+    "Italy"
+   ],
+   "explain": "Azerbaijani is a Turkic language written in the Latin script, and a main language of Azerbaijan.",
+   "difficulty": 3
+  },
+  {
+   "id": "langs-azerbaijani",
+   "kind": "mc",
+   "prompt": "Which script is Azerbaijani normally written in?",
+   "answer": "Latin",
+   "wrong": [
+    "Khmer",
+    "Burmese",
+    "Arabic"
+   ],
+   "explain": "Azerbaijani is a Turkic language written in the Latin script, and a main language of Azerbaijan.",
+   "difficulty": 3
+  },
+  {
+   "id": "langc-uzbek",
+   "kind": "mc",
+   "prompt": "In which of these countries is Uzbek a main language?",
+   "answer": "Uzbekistan",
+   "wrong": [
+    "Iceland",
+    "Egypt",
+    "Haiti"
+   ],
+   "explain": "Uzbek is a Turkic language written in the Latin script, and a main language of Uzbekistan.",
+   "difficulty": 3
+  },
+  {
+   "id": "langs-uzbek",
+   "kind": "mc",
+   "prompt": "Which script is Uzbek normally written in?",
+   "answer": "Latin",
+   "wrong": [
+    "Chinese characters",
+    "Bengali",
+    "Lao"
+   ],
+   "explain": "Uzbek is a Turkic language written in the Latin script, and a main language of Uzbekistan.",
+   "difficulty": 3
+  },
+  {
+   "id": "langc-finnish",
+   "kind": "mc",
+   "prompt": "In which of these countries is Finnish a main language?",
+   "answer": "Finland",
+   "wrong": [
+    "Israel",
+    "Bhutan",
+    "Niger"
+   ],
+   "explain": "Finnish is an Uralic language written in the Latin script, and a main language of Finland.",
+   "difficulty": 2
+  },
+  {
+   "id": "langs-finnish",
+   "kind": "mc",
+   "prompt": "Which script is Finnish normally written in?",
+   "answer": "Latin",
+   "wrong": [
+    "Bengali",
+    "Ge'ez",
+    "Armenian"
+   ],
+   "explain": "Finnish is an Uralic language written in the Latin script, and a main language of Finland.",
+   "difficulty": 3
+  },
+  {
+   "id": "langc-estonian",
+   "kind": "mc",
+   "prompt": "In which of these countries is Estonian a main language?",
+   "answer": "Estonia",
+   "wrong": [
+    "Central African Republic",
+    "Sierra Leone",
+    "Gabon"
+   ],
+   "explain": "Estonian is an Uralic language written in the Latin script, and a main language of Estonia.",
+   "difficulty": 3
+  },
+  {
+   "id": "langs-estonian",
+   "kind": "mc",
+   "prompt": "Which script is Estonian normally written in?",
+   "answer": "Latin",
+   "wrong": [
+    "Devanagari",
+    "Armenian",
+    "Georgian"
+   ],
+   "explain": "Estonian is an Uralic language written in the Latin script, and a main language of Estonia.",
+   "difficulty": 3
+  },
+  {
+   "id": "langc-hungarian",
+   "kind": "mc",
+   "prompt": "In which of these countries is Hungarian a main language?",
+   "answer": "Hungary",
+   "wrong": [
+    "Afghanistan",
+    "Madagascar",
+    "Iran"
+   ],
+   "explain": "Hungarian is an Uralic language written in the Latin script, and a main language of Hungary.",
+   "difficulty": 2
+  },
+  {
+   "id": "langs-hungarian",
+   "kind": "mc",
+   "prompt": "Which script is Hungarian normally written in?",
+   "answer": "Latin",
+   "wrong": [
+    "Kanji and kana",
+    "Chinese characters",
+    "Ge'ez"
+   ],
+   "explain": "Hungarian is an Uralic language written in the Latin script, and a main language of Hungary.",
+   "difficulty": 3
+  },
+  {
+   "id": "langc-georgian",
+   "kind": "mc",
+   "prompt": "In which of these countries is Georgian a main language?",
+   "answer": "Georgia",
+   "wrong": [
+    "Liechtenstein",
+    "Greece",
+    "Equatorial Guinea"
+   ],
+   "explain": "Georgian is a Kartvelian language written in the Georgian script, and a main language of Georgia.",
+   "difficulty": 3
+  },
+  {
+   "id": "langs-georgian",
+   "kind": "mc",
+   "prompt": "Which script is Georgian normally written in?",
+   "answer": "Georgian",
+   "wrong": [
+    "Devanagari",
+    "Kanji and kana",
+    "Cyrillic"
+   ],
+   "explain": "Georgian is a Kartvelian language written in the Georgian script, and a main language of Georgia.",
+   "difficulty": 3
+  },
+  {
+   "id": "langc-mandarin-chinese",
+   "kind": "mc",
+   "prompt": "In which of these countries is Mandarin Chinese a main language?",
+   "answer": "China",
+   "wrong": [
+    "Peru",
+    "Dominican Republic",
+    "Madagascar"
+   ],
+   "explain": "Mandarin Chinese is a Sino-Tibetan language written in the Chinese characters script, and a main language of China and Singapore.",
+   "difficulty": 1
+  },
+  {
+   "id": "langs-mandarin-chinese",
+   "kind": "mc",
+   "prompt": "Which script is Mandarin Chinese normally written in?",
+   "answer": "Chinese characters",
+   "wrong": [
+    "Lao",
+    "Khmer",
+    "Hangul"
+   ],
+   "explain": "Mandarin Chinese is a Sino-Tibetan language written in the Chinese characters script, and a main language of China and Singapore.",
+   "difficulty": 2
+  },
+  {
+   "id": "langc-burmese",
+   "kind": "mc",
+   "prompt": "In which of these countries is Burmese a main language?",
+   "answer": "Myanmar",
+   "wrong": [
+    "Liberia",
+    "Antigua and Barbuda",
+    "Czechia"
+   ],
+   "explain": "Burmese is a Sino-Tibetan language written in the Burmese script, and a main language of Myanmar.",
+   "difficulty": 3
+  },
+  {
+   "id": "langs-burmese",
+   "kind": "mc",
+   "prompt": "Which script is Burmese normally written in?",
+   "answer": "Burmese",
+   "wrong": [
+    "Lao",
+    "Georgian",
+    "Khmer"
+   ],
+   "explain": "Burmese is a Sino-Tibetan language written in the Burmese script, and a main language of Myanmar.",
+   "difficulty": 3
+  },
+  {
+   "id": "langc-japanese",
+   "kind": "mc",
+   "prompt": "In which of these countries is Japanese a main language?",
+   "answer": "Japan",
+   "wrong": [
+    "Netherlands",
+    "Guinea",
+    "France"
+   ],
+   "explain": "Japanese is a Japonic language written in the Kanji and kana script, and a main language of Japan.",
+   "difficulty": 1
+  },
+  {
+   "id": "langs-japanese",
+   "kind": "mc",
+   "prompt": "Which script is Japanese normally written in?",
+   "answer": "Kanji and kana",
+   "wrong": [
+    "Bengali",
+    "Cyrillic",
+    "Greek"
+   ],
+   "explain": "Japanese is a Japonic language written in the Kanji and kana script, and a main language of Japan.",
+   "difficulty": 2
+  },
+  {
+   "id": "langc-korean",
+   "kind": "mc",
+   "prompt": "In which of these countries is Korean a main language?",
+   "answer": "South Korea",
+   "wrong": [
+    "France",
+    "Mauritius",
+    "Sierra Leone"
+   ],
+   "explain": "Korean is a Koreanic language written in the Hangul script, and a main language of North Korea and South Korea.",
+   "difficulty": 2
+  },
+  {
+   "id": "langs-korean",
+   "kind": "mc",
+   "prompt": "Which script is Korean normally written in?",
+   "answer": "Hangul",
+   "wrong": [
+    "Hebrew",
+    "Arabic",
+    "Cyrillic"
+   ],
+   "explain": "Korean is a Koreanic language written in the Hangul script, and a main language of North Korea and South Korea.",
+   "difficulty": 3
+  },
+  {
+   "id": "langc-thai",
+   "kind": "mc",
+   "prompt": "In which of these countries is Thai a main language?",
+   "answer": "Thailand",
+   "wrong": [
+    "Nigeria",
+    "Venezuela",
+    "France"
+   ],
+   "explain": "Thai is a Kra-Dai language written in the Thai script, and a main language of Thailand.",
+   "difficulty": 2
+  },
+  {
+   "id": "langs-thai",
+   "kind": "mc",
+   "prompt": "Which script is Thai normally written in?",
+   "answer": "Thai",
+   "wrong": [
+    "Burmese",
+    "Bengali",
+    "Cyrillic"
+   ],
+   "explain": "Thai is a Kra-Dai language written in the Thai script, and a main language of Thailand.",
+   "difficulty": 3
+  },
+  {
+   "id": "langc-lao",
+   "kind": "mc",
+   "prompt": "In which of these countries is Lao a main language?",
+   "answer": "Laos",
+   "wrong": [
+    "Tanzania",
+    "Albania",
+    "Djibouti"
+   ],
+   "explain": "Lao is a Kra-Dai language written in the Lao script, and a main language of Laos.",
+   "difficulty": 3
+  },
+  {
+   "id": "langs-lao",
+   "kind": "mc",
+   "prompt": "Which script is Lao normally written in?",
+   "answer": "Lao",
+   "wrong": [
+    "Bengali",
+    "Latin",
+    "Thai"
+   ],
+   "explain": "Lao is a Kra-Dai language written in the Lao script, and a main language of Laos.",
+   "difficulty": 3
+  },
+  {
+   "id": "langc-vietnamese",
+   "kind": "mc",
+   "prompt": "In which of these countries is Vietnamese a main language?",
+   "answer": "Vietnam",
+   "wrong": [
+    "Mauritius",
+    "Rwanda",
+    "Andorra"
+   ],
+   "explain": "Vietnamese is an Austroasiatic language written in the Latin script, and a main language of Vietnam.",
+   "difficulty": 2
+  },
+  {
+   "id": "langs-vietnamese",
+   "kind": "mc",
+   "prompt": "Which script is Vietnamese normally written in?",
+   "answer": "Latin",
+   "wrong": [
+    "Hebrew",
+    "Armenian",
+    "Thai"
+   ],
+   "explain": "Vietnamese is an Austroasiatic language written in the Latin script, and a main language of Vietnam.",
+   "difficulty": 3
+  },
+  {
+   "id": "langc-khmer",
+   "kind": "mc",
+   "prompt": "In which of these countries is Khmer a main language?",
+   "answer": "Cambodia",
+   "wrong": [
+    "Dominican Republic",
+    "El Salvador",
+    "Bahamas"
+   ],
+   "explain": "Khmer is an Austroasiatic language written in the Khmer script, and a main language of Cambodia.",
+   "difficulty": 3
+  },
+  {
+   "id": "langs-khmer",
+   "kind": "mc",
+   "prompt": "Which script is Khmer normally written in?",
+   "answer": "Khmer",
+   "wrong": [
+    "Georgian",
+    "Arabic",
+    "Burmese"
+   ],
+   "explain": "Khmer is an Austroasiatic language written in the Khmer script, and a main language of Cambodia.",
+   "difficulty": 3
+  },
+  {
+   "id": "langc-malay",
+   "kind": "mc",
+   "prompt": "In which of these countries is Malay a main language?",
+   "answer": "Brunei",
+   "wrong": [
+    "Eswatini",
+    "Guatemala",
+    "Equatorial Guinea"
+   ],
+   "explain": "Malay is an Austronesian language written in the Latin script, and a main language of Brunei, Malaysia and Singapore.",
+   "difficulty": 2
+  },
+  {
+   "id": "langs-malay",
+   "kind": "mc",
+   "prompt": "Which script is Malay normally written in?",
+   "answer": "Latin",
+   "wrong": [
+    "Hebrew",
+    "Cyrillic",
+    "Hangul"
+   ],
+   "explain": "Malay is an Austronesian language written in the Latin script, and a main language of Brunei, Malaysia and Singapore.",
+   "difficulty": 3
+  },
+  {
+   "id": "langc-indonesian",
+   "kind": "mc",
+   "prompt": "In which of these countries is Indonesian a main language?",
+   "answer": "Indonesia",
+   "wrong": [
+    "Brazil",
+    "Luxembourg",
+    "Paraguay"
+   ],
+   "explain": "Indonesian is an Austronesian language written in the Latin script, and a main language of Indonesia.",
+   "difficulty": 2
+  },
+  {
+   "id": "langs-indonesian",
+   "kind": "mc",
+   "prompt": "Which script is Indonesian normally written in?",
+   "answer": "Latin",
+   "wrong": [
+    "Bengali",
+    "Thai",
+    "Sinhala"
+   ],
+   "explain": "Indonesian is an Austronesian language written in the Latin script, and a main language of Indonesia.",
+   "difficulty": 3
+  },
+  {
+   "id": "langc-filipino",
+   "kind": "mc",
+   "prompt": "In which of these countries is Filipino a main language?",
+   "answer": "Philippines",
+   "wrong": [
+    "Tunisia",
+    "Iceland",
+    "Saint Kitts and Nevis"
+   ],
+   "explain": "Filipino is an Austronesian language written in the Latin script, and a main language of Philippines.",
+   "difficulty": 2
+  },
+  {
+   "id": "langs-filipino",
+   "kind": "mc",
+   "prompt": "Which script is Filipino normally written in?",
+   "answer": "Latin",
+   "wrong": [
+    "Bengali",
+    "Sinhala",
+    "Lao"
+   ],
+   "explain": "Filipino is an Austronesian language written in the Latin script, and a main language of Philippines.",
+   "difficulty": 3
+  },
+  {
+   "id": "langc-malagasy",
+   "kind": "mc",
+   "prompt": "In which of these countries is Malagasy a main language?",
+   "answer": "Madagascar",
+   "wrong": [
+    "China",
+    "Uruguay",
+    "Ecuador"
+   ],
+   "explain": "Malagasy is an Austronesian language written in the Latin script, and a main language of Madagascar.",
+   "difficulty": 3
+  },
+  {
+   "id": "langs-malagasy",
+   "kind": "mc",
+   "prompt": "Which script is Malagasy normally written in?",
+   "answer": "Latin",
+   "wrong": [
+    "Sinhala",
+    "Lao",
+    "Bengali"
+   ],
+   "explain": "Malagasy is an Austronesian language written in the Latin script, and a main language of Madagascar.",
+   "difficulty": 3
+  },
+  {
+   "id": "langc-maori",
+   "kind": "mc",
+   "prompt": "In which of these countries is Māori a main language?",
+   "answer": "New Zealand",
+   "wrong": [
+    "Slovenia",
+    "United States",
+    "Bangladesh"
+   ],
+   "explain": "Māori is an Austronesian language written in the Latin script, and a main language of New Zealand.",
+   "difficulty": 3
+  },
+  {
+   "id": "langs-maori",
+   "kind": "mc",
+   "prompt": "Which script is Māori normally written in?",
+   "answer": "Latin",
+   "wrong": [
+    "Thai",
+    "Hangul",
+    "Ge'ez"
+   ],
+   "explain": "Māori is an Austronesian language written in the Latin script, and a main language of New Zealand.",
+   "difficulty": 3
+  },
+  {
+   "id": "langc-samoan",
+   "kind": "mc",
+   "prompt": "In which of these countries is Samoan a main language?",
+   "answer": "Samoa",
+   "wrong": [
+    "Kazakhstan",
+    "Saudi Arabia",
+    "Somalia"
+   ],
+   "explain": "Samoan is an Austronesian language written in the Latin script, and a main language of Samoa.",
+   "difficulty": 3
+  },
+  {
+   "id": "langs-samoan",
+   "kind": "mc",
+   "prompt": "Which script is Samoan normally written in?",
+   "answer": "Latin",
+   "wrong": [
+    "Cyrillic",
+    "Arabic",
+    "Bengali"
+   ],
+   "explain": "Samoan is an Austronesian language written in the Latin script, and a main language of Samoa.",
+   "difficulty": 3
+  },
+  {
+   "id": "langc-swahili",
+   "kind": "mc",
+   "prompt": "In which of these countries is Swahili a main language?",
+   "answer": "Kenya",
+   "wrong": [
+    "Mexico",
+    "United Arab Emirates",
+    "Monaco"
+   ],
+   "explain": "Swahili is a Niger-Congo language written in the Latin script, and a main language of Kenya, Tanzania and Uganda.",
+   "difficulty": 2
+  },
+  {
+   "id": "langs-swahili",
+   "kind": "mc",
+   "prompt": "Which script is Swahili normally written in?",
+   "answer": "Latin",
+   "wrong": [
+    "Cyrillic",
+    "Khmer",
+    "Kanji and kana"
+   ],
+   "explain": "Swahili is a Niger-Congo language written in the Latin script, and a main language of Kenya, Tanzania and Uganda.",
+   "difficulty": 3
+  },
+  {
+   "id": "langc-zulu",
+   "kind": "mc",
+   "prompt": "In which of these countries is Zulu a main language?",
+   "answer": "South Africa",
+   "wrong": [
+    "Iraq",
+    "Nicaragua",
+    "Saudi Arabia"
+   ],
+   "explain": "Zulu is a Niger-Congo language written in the Latin script, and a main language of South Africa.",
+   "difficulty": 2
+  },
+  {
+   "id": "langs-zulu",
+   "kind": "mc",
+   "prompt": "Which script is Zulu normally written in?",
+   "answer": "Latin",
+   "wrong": [
+    "Arabic",
+    "Armenian",
+    "Kanji and kana"
+   ],
+   "explain": "Zulu is a Niger-Congo language written in the Latin script, and a main language of South Africa.",
+   "difficulty": 3
+  },
+  {
+   "id": "langc-xhosa",
+   "kind": "mc",
+   "prompt": "In which of these countries is Xhosa a main language?",
+   "answer": "South Africa",
+   "wrong": [
+    "Jordan",
+    "Haiti",
+    "Vietnam"
+   ],
+   "explain": "Xhosa is a Niger-Congo language written in the Latin script, and a main language of South Africa.",
+   "difficulty": 3
+  },
+  {
+   "id": "langs-xhosa",
+   "kind": "mc",
+   "prompt": "Which script is Xhosa normally written in?",
+   "answer": "Latin",
+   "wrong": [
+    "Greek",
+    "Burmese",
+    "Bengali"
+   ],
+   "explain": "Xhosa is a Niger-Congo language written in the Latin script, and a main language of South Africa.",
+   "difficulty": 3
+  },
+  {
+   "id": "langc-kinyarwanda",
+   "kind": "mc",
+   "prompt": "In which of these countries is Kinyarwanda a main language?",
+   "answer": "Rwanda",
+   "wrong": [
+    "Andorra",
+    "Nicaragua",
+    "Saint Lucia"
+   ],
+   "explain": "Kinyarwanda is a Niger-Congo language written in the Latin script, and a main language of Rwanda.",
+   "difficulty": 3
+  },
+  {
+   "id": "langs-kinyarwanda",
+   "kind": "mc",
+   "prompt": "Which script is Kinyarwanda normally written in?",
+   "answer": "Latin",
+   "wrong": [
+    "Devanagari",
+    "Sinhala",
+    "Kanji and kana"
+   ],
+   "explain": "Kinyarwanda is a Niger-Congo language written in the Latin script, and a main language of Rwanda.",
+   "difficulty": 3
+  },
+  {
+   "id": "langc-shona",
+   "kind": "mc",
+   "prompt": "In which of these countries is Shona a main language?",
+   "answer": "Zimbabwe",
+   "wrong": [
+    "Mexico",
+    "Fiji",
+    "Kazakhstan"
+   ],
+   "explain": "Shona is a Niger-Congo language written in the Latin script, and a main language of Zimbabwe.",
+   "difficulty": 3
+  },
+  {
+   "id": "langs-shona",
+   "kind": "mc",
+   "prompt": "Which script is Shona normally written in?",
+   "answer": "Latin",
+   "wrong": [
+    "Sinhala",
+    "Chinese characters",
+    "Cyrillic"
+   ],
+   "explain": "Shona is a Niger-Congo language written in the Latin script, and a main language of Zimbabwe.",
+   "difficulty": 3
+  },
+  {
+   "id": "langc-tamil",
+   "kind": "mc",
+   "prompt": "In which of these countries is Tamil a main language?",
+   "answer": "Singapore",
+   "wrong": [
+    "Belarus",
+    "Equatorial Guinea",
+    "Andorra"
+   ],
+   "explain": "Tamil is a Dravidian language written in the Tamil script, and a main language of Singapore and Sri Lanka.",
+   "difficulty": 2
+  },
+  {
+   "id": "langs-tamil",
+   "kind": "mc",
+   "prompt": "Which script is Tamil normally written in?",
+   "answer": "Tamil",
+   "wrong": [
+    "Khmer",
+    "Georgian",
+    "Hebrew"
+   ],
+   "explain": "Tamil is a Dravidian language written in the Tamil script, and a main language of Singapore and Sri Lanka.",
+   "difficulty": 3
+  },
+  {
+   "id": "langc-mongolian",
+   "kind": "mc",
+   "prompt": "In which of these countries is Mongolian a main language?",
+   "answer": "Mongolia",
+   "wrong": [
+    "Tonga",
+    "Gambia",
+    "Ecuador"
+   ],
+   "explain": "Mongolian is a Mongolic language written in the Cyrillic script, and a main language of Mongolia.",
+   "difficulty": 3
+  },
+  {
+   "id": "langs-mongolian",
+   "kind": "mc",
+   "prompt": "Which script is Mongolian normally written in?",
+   "answer": "Cyrillic",
+   "wrong": [
+    "Greek",
+    "Georgian",
+    "Lao"
+   ],
+   "explain": "Mongolian is a Mongolic language written in the Cyrillic script, and a main language of Mongolia.",
+   "difficulty": 3
+  },
+  {
+   "id": "langc-quechua",
+   "kind": "mc",
+   "prompt": "In which of these countries is Quechua a main language?",
+   "answer": "Peru",
+   "wrong": [
+    "Madagascar",
+    "Rwanda",
+    "San Marino"
+   ],
+   "explain": "Quechua is a Quechuan language written in the Latin script, and a main language of Bolivia and Peru.",
+   "difficulty": 3
+  },
+  {
+   "id": "langs-quechua",
+   "kind": "mc",
+   "prompt": "Which script is Quechua normally written in?",
+   "answer": "Latin",
+   "wrong": [
+    "Arabic",
+    "Devanagari",
+    "Burmese"
+   ],
+   "explain": "Quechua is a Quechuan language written in the Latin script, and a main language of Bolivia and Peru.",
+   "difficulty": 3
+  },
+  {
+   "id": "langc-guarani",
+   "kind": "mc",
+   "prompt": "In which of these countries is Guaraní a main language?",
+   "answer": "Paraguay",
+   "wrong": [
+    "Liechtenstein",
+    "Nicaragua",
+    "Philippines"
+   ],
+   "explain": "Guaraní is a Tupian language written in the Latin script, and a main language of Paraguay.",
+   "difficulty": 3
+  },
+  {
+   "id": "langs-guarani",
+   "kind": "mc",
+   "prompt": "Which script is Guaraní normally written in?",
+   "answer": "Latin",
+   "wrong": [
+    "Cyrillic",
+    "Ge'ez",
+    "Lao"
+   ],
+   "explain": "Guaraní is a Tupian language written in the Latin script, and a main language of Paraguay.",
+   "difficulty": 3
+  }
+ ],
+ "sources": [
+  {
+   "name": "World Bank Open Data (SP.POP.TOTL)",
+   "url": "https://data.worldbank.org"
+  },
+  {
+   "name": "Wikipedia: List of countries and dependencies by area",
+   "url": "https://en.wikipedia.org/wiki/List_of_countries_and_dependencies_by_area"
+  },
+  {
+   "name": "Wikidata",
+   "url": "https://www.wikidata.org"
+  },
+  {
+   "name": "Wikimedia Commons",
+   "url": "https://commons.wikimedia.org"
+  },
+  {
+   "name": "UN M49 regions",
+   "url": "https://unstats.un.org/unsd/methodology/m49/"
+  }
+ ]
+}

@@ -1,0 +1,891 @@
+{
+ "id": "classical-piano",
+ "title": "Classical on piano",
+ "theme": "music",
+ "icon": "🎹",
+ "kids": false,
+ "version": 1,
+ "factsMeta": {
+  "composer": {
+   "type": "cat",
+   "label": "Composer"
+  },
+  "year": {
+   "type": "year",
+   "label": "Written",
+   "higherLabel": "Later"
+  }
+ },
+ "items": [
+  {
+   "id": "fur-elise",
+   "name": "Für Elise",
+   "group": "Ludwig van Beethoven",
+   "facts": {
+    "composer": "Ludwig van Beethoven",
+    "year": 1810
+   },
+   "blurb": "Für Elise by Ludwig van Beethoven (1810).",
+   "media": {
+    "audio": [
+     {
+      "type": "piano",
+      "src": "data/music/notes/fur-elise.json",
+      "credit": "Ludwig van Beethoven (composer); MIDI from the Mutopia Project, maintained by Stelios Samelis; Salamander Grand Piano samples by Alexander Holm (CC BY 3.0)",
+      "license": "PD",
+      "page": "https://www.mutopiaproject.org/cgibin/piece-info.cgi?id=931",
+      "start": 0,
+      "dur": 33
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "moonlight-sonata",
+   "name": "Moonlight Sonata (1st movement)",
+   "alt": [
+    "Moonlight Sonata",
+    "Piano Sonata No. 14"
+   ],
+   "group": "Ludwig van Beethoven",
+   "facts": {
+    "composer": "Ludwig van Beethoven",
+    "year": 1801
+   },
+   "blurb": "Moonlight Sonata (1st movement) by Ludwig van Beethoven (1801).",
+   "media": {
+    "audio": [
+     {
+      "type": "piano",
+      "src": "data/music/notes/moonlight-sonata.json",
+      "credit": "Ludwig van Beethoven (composer); MIDI from the Mutopia Project, maintained by Stewart Holmes; Salamander Grand Piano samples by Alexander Holm (CC BY 3.0)",
+      "license": "CC BY-SA 2.5",
+      "page": "https://www.mutopiaproject.org/cgibin/piece-info.cgi?id=276",
+      "start": 0,
+      "dur": 40
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "beethoven-5",
+   "name": "Symphony No. 5 (opening)",
+   "alt": [
+    "Symphony No. 5",
+    "Fifth Symphony"
+   ],
+   "group": "Ludwig van Beethoven",
+   "facts": {
+    "composer": "Ludwig van Beethoven",
+    "year": 1808
+   },
+   "blurb": "Symphony No. 5 (opening) by Ludwig van Beethoven (1808).",
+   "media": {
+    "audio": [
+     {
+      "type": "piano",
+      "src": "data/music/notes/beethoven-5.json",
+      "credit": "Ludwig van Beethoven (composer); MIDI from the Mutopia Project, maintained by Magnus Lewis-Smith; Salamander Grand Piano samples by Alexander Holm (CC BY 3.0)",
+      "license": "PD",
+      "page": "https://www.mutopiaproject.org/cgibin/piece-info.cgi?id=497",
+      "start": 0,
+      "dur": 25
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "prelude-in-c",
+   "name": "Prelude in C major (The Well-Tempered Clavier)",
+   "alt": [
+    "Prelude in C",
+    "Prelude in C major"
+   ],
+   "group": "Johann Sebastian Bach",
+   "facts": {
+    "composer": "Johann Sebastian Bach",
+    "year": 1722
+   },
+   "blurb": "Prelude in C major (The Well-Tempered Clavier) by Johann Sebastian Bach (1722).",
+   "media": {
+    "audio": [
+     {
+      "type": "piano",
+      "src": "data/music/notes/prelude-in-c.json",
+      "credit": "Johann Sebastian Bach (composer); MIDI from the Mutopia Project, maintained by Tobias Erbsland; Salamander Grand Piano samples by Alexander Holm (CC BY 3.0)",
+      "license": "PD",
+      "page": "https://www.mutopiaproject.org/cgibin/piece-info.cgi?id=5",
+      "start": 0,
+      "dur": 36
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "minuet-in-g",
+   "name": "Minuet in G major",
+   "alt": [
+    "Minuet in G"
+   ],
+   "group": "Christian Petzold",
+   "facts": {
+    "composer": "Christian Petzold",
+    "year": 1725
+   },
+   "blurb": "From the Notebook for Anna Magdalena Bach; long credited to Bach, now attributed to Christian Petzold.",
+   "media": {
+    "audio": [
+     {
+      "type": "piano",
+      "src": "data/music/notes/minuet-in-g.json",
+      "credit": "Christian Petzold (long credited to J. S. Bach) (composer); MIDI from the Mutopia Project, maintained by Allen Garvin; Salamander Grand Piano samples by Alexander Holm (CC BY 3.0)",
+      "license": "PD",
+      "page": "https://www.mutopiaproject.org/cgibin/piece-info.cgi?id=75",
+      "start": 0,
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "toccata-and-fugue",
+   "name": "Toccata and Fugue in D minor",
+   "group": "Johann Sebastian Bach",
+   "facts": {
+    "composer": "Johann Sebastian Bach",
+    "year": 1704
+   },
+   "blurb": "Toccata and Fugue in D minor by Johann Sebastian Bach (c. 1704).",
+   "media": {
+    "audio": [
+     {
+      "type": "piano",
+      "src": "data/music/notes/toccata-and-fugue.json",
+      "credit": "Johann Sebastian Bach (composer); MIDI from the Mutopia Project, maintained by Anonymous; Salamander Grand Piano samples by Alexander Holm (CC BY 3.0)",
+      "license": "PD",
+      "page": "https://www.mutopiaproject.org/cgibin/piece-info.cgi?id=1780",
+      "start": 0,
+      "dur": 24
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "air-on-g",
+   "name": "Air (Orchestral Suite No. 3)",
+   "alt": [
+    "Air on the G String",
+    "Air"
+   ],
+   "group": "Johann Sebastian Bach",
+   "facts": {
+    "composer": "Johann Sebastian Bach",
+    "year": 1730
+   },
+   "blurb": "Air (Orchestral Suite No. 3) by Johann Sebastian Bach (c. 1730).",
+   "media": {
+    "audio": [
+     {
+      "type": "piano",
+      "src": "data/music/notes/air-on-g.json",
+      "credit": "Johann Sebastian Bach (composer); MIDI from the Mutopia Project, maintained by jeff covey; Salamander Grand Piano samples by Alexander Holm (CC BY 3.0)",
+      "license": "CC BY-SA 3.0",
+      "page": "https://www.mutopiaproject.org/cgibin/piece-info.cgi?id=242",
+      "start": 0,
+      "dur": 32
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "gymnopedie-1",
+   "name": "Gymnopédie No. 1",
+   "alt": [
+    "Gymnopedie No. 1",
+    "Gymnopedie"
+   ],
+   "group": "Erik Satie",
+   "facts": {
+    "composer": "Erik Satie",
+    "year": 1888
+   },
+   "blurb": "Gymnopédie No. 1 by Erik Satie (1888).",
+   "media": {
+    "audio": [
+     {
+      "type": "piano",
+      "src": "data/music/notes/gymnopedie-1.json",
+      "credit": "Erik Satie (composer); MIDI from the Mutopia Project, maintained by Evin Robertson; Salamander Grand Piano samples by Alexander Holm (CC BY 3.0)",
+      "license": "PD",
+      "page": "https://www.mutopiaproject.org/cgibin/piece-info.cgi?id=37",
+      "start": 0,
+      "dur": 39
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "gnossienne-1",
+   "name": "Gnossienne No. 1",
+   "alt": [
+    "Gnossienne"
+   ],
+   "group": "Erik Satie",
+   "facts": {
+    "composer": "Erik Satie",
+    "year": 1890
+   },
+   "blurb": "Gnossienne No. 1 by Erik Satie (1890).",
+   "media": {
+    "audio": [
+     {
+      "type": "piano",
+      "src": "data/music/notes/gnossienne-1.json",
+      "credit": "Erik Satie (composer); MIDI from the Mutopia Project, maintained by Knute Snortum; Salamander Grand Piano samples by Alexander Holm (CC BY 3.0)",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.mutopiaproject.org/cgibin/piece-info.cgi?id=2035",
+      "start": 0,
+      "dur": 36
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "rondo-alla-turca",
+   "name": "Rondo alla Turca (Turkish March)",
+   "alt": [
+    "Turkish March",
+    "Rondo alla Turca"
+   ],
+   "group": "Wolfgang Amadeus Mozart",
+   "facts": {
+    "composer": "Wolfgang Amadeus Mozart",
+    "year": 1783
+   },
+   "blurb": "Rondo alla Turca (Turkish March) by Wolfgang Amadeus Mozart (1783).",
+   "media": {
+    "audio": [
+     {
+      "type": "piano",
+      "src": "data/music/notes/rondo-alla-turca.json",
+      "credit": "Wolfgang Amadeus Mozart (composer); MIDI from the Mutopia Project, maintained by Rune Zedeler and Chris Sawer; Salamander Grand Piano samples by Alexander Holm (CC BY 3.0)",
+      "license": "PD",
+      "page": "https://www.mutopiaproject.org/cgibin/piece-info.cgi?id=108",
+      "start": 0,
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "sonata-facile",
+   "name": "Piano Sonata No. 16 \"Sonata facile\" (1st movement)",
+   "alt": [
+    "Sonata facile",
+    "Sonata in C K. 545"
+   ],
+   "group": "Wolfgang Amadeus Mozart",
+   "facts": {
+    "composer": "Wolfgang Amadeus Mozart",
+    "year": 1788
+   },
+   "blurb": "Piano Sonata No. 16 \"Sonata facile\" (1st movement) by Wolfgang Amadeus Mozart (1788).",
+   "media": {
+    "audio": [
+     {
+      "type": "piano",
+      "src": "data/music/notes/sonata-facile.json",
+      "credit": "Wolfgang Amadeus Mozart (composer); MIDI from the Mutopia Project, maintained by Alejandro Sierra; Salamander Grand Piano samples by Alexander Holm (CC BY 3.0)",
+      "license": "CC BY-SA 3.0",
+      "page": "https://www.mutopiaproject.org/cgibin/piece-info.cgi?id=998",
+      "start": 0,
+      "dur": 31
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "nocturne-op9-2",
+   "name": "Nocturne in E-flat major, Op. 9 No. 2",
+   "alt": [
+    "Nocturne Op. 9 No. 2",
+    "Nocturne"
+   ],
+   "group": "Frédéric Chopin",
+   "facts": {
+    "composer": "Frédéric Chopin",
+    "year": 1832
+   },
+   "blurb": "Nocturne in E-flat major, Op. 9 No. 2 by Frédéric Chopin (1832).",
+   "media": {
+    "audio": [
+     {
+      "type": "piano",
+      "src": "data/music/notes/nocturne-op9-2.json",
+      "credit": "Frédéric Chopin (composer); MIDI from the Mutopia Project, maintained by Renato Biolcati Rinaldi; Salamander Grand Piano samples by Alexander Holm (CC BY 3.0)",
+      "license": "CC BY-SA 3.0",
+      "page": "https://www.mutopiaproject.org/cgibin/piece-info.cgi?id=1590",
+      "start": 0,
+      "dur": 33
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "minute-waltz",
+   "name": "Minute Waltz (Waltz in D-flat, Op. 64 No. 1)",
+   "alt": [
+    "Minute Waltz"
+   ],
+   "group": "Frédéric Chopin",
+   "facts": {
+    "composer": "Frédéric Chopin",
+    "year": 1847
+   },
+   "blurb": "Minute Waltz (Waltz in D-flat, Op. 64 No. 1) by Frédéric Chopin (1847).",
+   "media": {
+    "audio": [
+     {
+      "type": "piano",
+      "src": "data/music/notes/minute-waltz.json",
+      "credit": "Frédéric Chopin (composer); MIDI from the Mutopia Project, maintained by Magnus Lewis-Smith; Salamander Grand Piano samples by Alexander Holm (CC BY 3.0)",
+      "license": "PD",
+      "page": "https://www.mutopiaproject.org/cgibin/piece-info.cgi?id=483",
+      "start": 0,
+      "dur": 25
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "prelude-op28-4",
+   "name": "Prelude in E minor, Op. 28 No. 4",
+   "alt": [
+    "Prelude Op. 28 No. 4"
+   ],
+   "group": "Frédéric Chopin",
+   "facts": {
+    "composer": "Frédéric Chopin",
+    "year": 1839
+   },
+   "blurb": "Prelude in E minor, Op. 28 No. 4 by Frédéric Chopin (1839).",
+   "media": {
+    "audio": [
+     {
+      "type": "piano",
+      "src": "data/music/notes/prelude-op28-4.json",
+      "credit": "Frédéric Chopin (composer); MIDI from the Mutopia Project, maintained by Magnus Lewis-Smith; Salamander Grand Piano samples by Alexander Holm (CC BY 3.0)",
+      "license": "PD",
+      "page": "https://www.mutopiaproject.org/cgibin/piece-info.cgi?id=468",
+      "start": 0,
+      "dur": 34
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "prelude-op28-7",
+   "name": "Prelude in A major, Op. 28 No. 7",
+   "alt": [
+    "Prelude Op. 28 No. 7"
+   ],
+   "group": "Frédéric Chopin",
+   "facts": {
+    "composer": "Frédéric Chopin",
+    "year": 1839
+   },
+   "blurb": "Prelude in A major, Op. 28 No. 7 by Frédéric Chopin (1839).",
+   "media": {
+    "audio": [
+     {
+      "type": "piano",
+      "src": "data/music/notes/prelude-op28-7.json",
+      "credit": "Frédéric Chopin (composer); MIDI from the Mutopia Project, maintained by Magnus Lewis-Smith; Salamander Grand Piano samples by Alexander Holm (CC BY 3.0)",
+      "license": "PD",
+      "page": "https://www.mutopiaproject.org/cgibin/piece-info.cgi?id=470",
+      "start": 0,
+      "dur": 24
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "the-entertainer",
+   "name": "The Entertainer",
+   "group": "Scott Joplin",
+   "facts": {
+    "composer": "Scott Joplin",
+    "year": 1902
+   },
+   "blurb": "The Entertainer by Scott Joplin (1902).",
+   "media": {
+    "audio": [
+     {
+      "type": "piano",
+      "src": "data/music/notes/the-entertainer.json",
+      "credit": "Scott Joplin (composer); MIDI from the Mutopia Project, maintained by Chris Sawer; Salamander Grand Piano samples by Alexander Holm (CC BY 3.0)",
+      "license": "PD",
+      "page": "https://www.mutopiaproject.org/cgibin/piece-info.cgi?id=263",
+      "start": 0,
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "maple-leaf-rag",
+   "name": "Maple Leaf Rag",
+   "group": "Scott Joplin",
+   "facts": {
+    "composer": "Scott Joplin",
+    "year": 1899
+   },
+   "blurb": "Maple Leaf Rag by Scott Joplin (1899).",
+   "media": {
+    "audio": [
+     {
+      "type": "piano",
+      "src": "data/music/notes/maple-leaf-rag.json",
+      "credit": "Scott Joplin (composer); MIDI from the Mutopia Project, maintained by Chris Sawer; Salamander Grand Piano samples by Alexander Holm (CC BY 3.0)",
+      "license": "PD",
+      "page": "https://www.mutopiaproject.org/cgibin/piece-info.cgi?id=23",
+      "start": 0,
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "arabesque-1",
+   "name": "Arabesque No. 1",
+   "alt": [
+    "Première Arabesque",
+    "Arabesque"
+   ],
+   "group": "Claude Debussy",
+   "facts": {
+    "composer": "Claude Debussy",
+    "year": 1891
+   },
+   "blurb": "Arabesque No. 1 by Claude Debussy (1891).",
+   "media": {
+    "audio": [
+     {
+      "type": "piano",
+      "src": "data/music/notes/arabesque-1.json",
+      "credit": "Claude Debussy (composer); MIDI from the Mutopia Project, maintained by Keith OHara; Salamander Grand Piano samples by Alexander Holm (CC BY 3.0)",
+      "license": "PD",
+      "page": "https://www.mutopiaproject.org/cgibin/piece-info.cgi?id=1777",
+      "start": 0,
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "clair-de-lune",
+   "name": "Clair de lune",
+   "group": "Claude Debussy",
+   "facts": {
+    "composer": "Claude Debussy",
+    "year": 1905
+   },
+   "blurb": "Clair de lune by Claude Debussy (1905).",
+   "media": {
+    "audio": [
+     {
+      "type": "piano",
+      "src": "data/music/notes/clair-de-lune.json",
+      "credit": "Claude Debussy (composer); MIDI from the Mutopia Project, maintained by Keith OHara; Salamander Grand Piano samples by Alexander Holm (CC BY 3.0)",
+      "license": "PD",
+      "page": "https://www.mutopiaproject.org/cgibin/piece-info.cgi?id=1778",
+      "start": 0,
+      "dur": 41
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "mountain-king",
+   "name": "In the Hall of the Mountain King",
+   "group": "Edvard Grieg",
+   "facts": {
+    "composer": "Edvard Grieg",
+    "year": 1875
+   },
+   "blurb": "In the Hall of the Mountain King by Edvard Grieg (1875).",
+   "media": {
+    "audio": [
+     {
+      "type": "piano",
+      "src": "data/music/notes/mountain-king.json",
+      "credit": "Edvard Grieg (composer); MIDI from the Mutopia Project, maintained by Coyau; Salamander Grand Piano samples by Alexander Holm (CC BY 3.0)",
+      "license": "PD",
+      "page": "https://www.mutopiaproject.org/cgibin/piece-info.cgi?id=1888",
+      "start": 0,
+      "dur": 35
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "wedding-day-troldhaugen",
+   "name": "Wedding Day at Troldhaugen",
+   "group": "Edvard Grieg",
+   "facts": {
+    "composer": "Edvard Grieg",
+    "year": 1896
+   },
+   "blurb": "Wedding Day at Troldhaugen by Edvard Grieg (1896).",
+   "media": {
+    "audio": [
+     {
+      "type": "piano",
+      "src": "data/music/notes/wedding-day-troldhaugen.json",
+      "credit": "Edvard Grieg (composer); MIDI from the Mutopia Project, maintained by David Whipple; Salamander Grand Piano samples by Alexander Holm (CC BY 3.0)",
+      "license": "PD",
+      "page": "https://www.mutopiaproject.org/cgibin/piece-info.cgi?id=781",
+      "start": 0,
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "ave-maria-schubert",
+   "name": "Ave Maria (Ellens dritter Gesang)",
+   "alt": [
+    "Ave Maria"
+   ],
+   "group": "Franz Schubert",
+   "facts": {
+    "composer": "Franz Schubert",
+    "year": 1825
+   },
+   "blurb": "Ave Maria (Ellens dritter Gesang) by Franz Schubert (1825).",
+   "media": {
+    "audio": [
+     {
+      "type": "piano",
+      "src": "data/music/notes/ave-maria-schubert.json",
+      "credit": "Franz Schubert (composer); MIDI from the Mutopia Project, maintained by Ph. Raynaud; Salamander Grand Piano samples by Alexander Holm (CC BY 3.0)",
+      "license": "PD",
+      "page": "https://www.mutopiaproject.org/cgibin/piece-info.cgi?id=1054",
+      "start": 0,
+      "dur": 40
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "wedding-march",
+   "name": "Wedding March (A Midsummer Night's Dream)",
+   "alt": [
+    "Wedding March"
+   ],
+   "group": "Felix Mendelssohn",
+   "facts": {
+    "composer": "Felix Mendelssohn",
+    "year": 1842
+   },
+   "blurb": "Wedding March (A Midsummer Night's Dream) by Felix Mendelssohn (1842).",
+   "media": {
+    "audio": [
+     {
+      "type": "piano",
+      "src": "data/music/notes/wedding-march.json",
+      "credit": "Felix Mendelssohn (composer); MIDI from the Mutopia Project, maintained by Alexander Brock; Salamander Grand Piano samples by Alexander Holm (CC BY 3.0)",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.mutopiaproject.org/cgibin/piece-info.cgi?id=2198",
+      "start": 0,
+      "dur": 26
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "spring-vivaldi",
+   "name": "Spring (The Four Seasons)",
+   "alt": [
+    "Spring",
+    "La primavera",
+    "The Four Seasons"
+   ],
+   "group": "Antonio Vivaldi",
+   "facts": {
+    "composer": "Antonio Vivaldi",
+    "year": 1725
+   },
+   "blurb": "Spring (The Four Seasons) by Antonio Vivaldi (1725).",
+   "media": {
+    "audio": [
+     {
+      "type": "piano",
+      "src": "data/music/notes/spring-vivaldi.json",
+      "credit": "Antonio Vivaldi (composer); MIDI from the Mutopia Project; Salamander Grand Piano samples by Alexander Holm (CC BY 3.0)",
+      "license": "CC BY-SA 3.0",
+      "page": "https://www.mutopiaproject.org/cgibin/piece-info.cgi?id=301",
+      "start": 0,
+      "dur": 25
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "brahms-lullaby",
+   "name": "Lullaby (Wiegenlied, Op. 49 No. 4)",
+   "alt": [
+    "Brahms' Lullaby",
+    "Wiegenlied",
+    "Lullaby"
+   ],
+   "group": "Johannes Brahms",
+   "facts": {
+    "composer": "Johannes Brahms",
+    "year": 1868
+   },
+   "blurb": "Lullaby (Wiegenlied, Op. 49 No. 4) by Johannes Brahms (1868).",
+   "media": {
+    "audio": [
+     {
+      "type": "piano",
+      "src": "data/music/notes/brahms-lullaby.json",
+      "credit": "Johannes Brahms (composer); MIDI from the Mutopia Project, maintained by 森 章吾; Salamander Grand Piano samples by Alexander Holm (CC BY 3.0)",
+      "license": "PD",
+      "page": "https://www.mutopiaproject.org/cgibin/piece-info.cgi?id=1037",
+      "start": 0,
+      "dur": 31
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "blue-danube",
+   "name": "The Blue Danube",
+   "alt": [
+    "Blue Danube"
+   ],
+   "group": "Johann Strauss II",
+   "facts": {
+    "composer": "Johann Strauss II",
+    "year": 1866
+   },
+   "blurb": "The Blue Danube by Johann Strauss II (1866).",
+   "media": {
+    "audio": [
+     {
+      "type": "piano",
+      "src": "data/music/notes/blue-danube.json",
+      "credit": "Johann Strauss II (composer); MIDI from the Mutopia Project, maintained by Nikos Kouremenos; Salamander Grand Piano samples by Alexander Holm (CC BY 3.0)",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.mutopiaproject.org/cgibin/piece-info.cgi?id=519",
+      "start": 0,
+      "dur": 35
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "carmen-prelude",
+   "name": "Carmen: Prelude",
+   "alt": [
+    "Carmen"
+   ],
+   "group": "Georges Bizet",
+   "facts": {
+    "composer": "Georges Bizet",
+    "year": 1875
+   },
+   "blurb": "Carmen: Prelude by Georges Bizet (1875).",
+   "media": {
+    "audio": [
+     {
+      "type": "piano",
+      "src": "data/music/notes/carmen-prelude.json",
+      "credit": "Georges Bizet (composer); MIDI from the Mutopia Project, maintained by Alex O'S; Salamander Grand Piano samples by Alexander Holm (CC BY 3.0)",
+      "license": "CC BY-SA 2.5",
+      "page": "https://www.mutopiaproject.org/cgibin/piece-info.cgi?id=635",
+      "start": 0,
+      "dur": 25
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "wooden-soldiers",
+   "name": "March of the Wooden Soldiers",
+   "group": "Pyotr Ilyich Tchaikovsky",
+   "facts": {
+    "composer": "Pyotr Ilyich Tchaikovsky",
+    "year": 1878
+   },
+   "blurb": "March of the Wooden Soldiers by Pyotr Ilyich Tchaikovsky (1878).",
+   "media": {
+    "audio": [
+     {
+      "type": "piano",
+      "src": "data/music/notes/wooden-soldiers.json",
+      "credit": "Pyotr Ilyich Tchaikovsky (composer); MIDI from the Mutopia Project, maintained by Anonymous; Salamander Grand Piano samples by Alexander Holm (CC BY 3.0)",
+      "license": "PD",
+      "page": "https://www.mutopiaproject.org/cgibin/piece-info.cgi?id=1806",
+      "start": 0,
+      "dur": 25
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "liszt-consolation-3",
+   "name": "Consolation No. 3",
+   "alt": [
+    "Consolation"
+   ],
+   "group": "Franz Liszt",
+   "facts": {
+    "composer": "Franz Liszt",
+    "year": 1850
+   },
+   "blurb": "Consolation No. 3 by Franz Liszt (1850).",
+   "media": {
+    "audio": [
+     {
+      "type": "piano",
+      "src": "data/music/notes/liszt-consolation-3.json",
+      "credit": "Franz Liszt (composer); MIDI from the Mutopia Project, maintained by Ryan Prince; Salamander Grand Piano samples by Alexander Holm (CC BY 3.0)",
+      "license": "CC BY 3.0",
+      "page": "https://www.mutopiaproject.org/cgibin/piece-info.cgi?id=1647",
+      "start": 0,
+      "dur": 36
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "ode-to-joy",
+   "name": "Ode to Joy (Symphony No. 9)",
+   "alt": [
+    "Ode to Joy",
+    "Symphony No. 9"
+   ],
+   "group": "Ludwig van Beethoven",
+   "facts": {
+    "composer": "Ludwig van Beethoven",
+    "year": 1824
+   },
+   "blurb": "Ode to Joy (Symphony No. 9) by Ludwig van Beethoven (1824).",
+   "media": {
+    "audio": [
+     {
+      "type": "piano",
+      "src": "data/music/notes/ode-to-joy.json",
+      "credit": "Ludwig van Beethoven (composer); transcribed by Clued from public-domain sources; Salamander Grand Piano samples by Alexander Holm (CC BY 3.0)",
+      "license": "PD",
+      "page": "https://en.wikipedia.org/wiki/Special:Search?search=Ode%20to%20Joy",
+      "start": 0,
+      "dur": 34
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "canon-in-d",
+   "name": "Canon in D",
+   "alt": [
+    "Pachelbel's Canon"
+   ],
+   "group": "Johann Pachelbel",
+   "facts": {
+    "composer": "Johann Pachelbel",
+    "year": 1690
+   },
+   "blurb": "Canon in D by Johann Pachelbel (c. 1690).",
+   "media": {
+    "audio": [
+     {
+      "type": "piano",
+      "src": "data/music/notes/canon-in-d.json",
+      "credit": "Johann Pachelbel (composer); transcribed by Clued from public-domain sources; Salamander Grand Piano samples by Alexander Holm (CC BY 3.0)",
+      "license": "PD",
+      "page": "https://en.wikipedia.org/wiki/Special:Search?search=Canon%20in%20D",
+      "start": 0,
+      "dur": 31
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "eine-kleine-nachtmusik",
+   "name": "Eine kleine Nachtmusik",
+   "alt": [
+    "A Little Night Music",
+    "Serenade No. 13"
+   ],
+   "group": "Wolfgang Amadeus Mozart",
+   "facts": {
+    "composer": "Wolfgang Amadeus Mozart",
+    "year": 1787
+   },
+   "blurb": "Eine kleine Nachtmusik by Wolfgang Amadeus Mozart (1787).",
+   "media": {
+    "audio": [
+     {
+      "type": "piano",
+      "src": "data/music/notes/eine-kleine-nachtmusik.json",
+      "credit": "Wolfgang Amadeus Mozart (composer); transcribed by Clued from public-domain sources; Salamander Grand Piano samples by Alexander Holm (CC BY 3.0)",
+      "license": "PD",
+      "page": "https://en.wikipedia.org/wiki/Special:Search?search=Eine%20kleine%20Nachtmusik",
+      "start": 0,
+      "dur": 7
+     }
+    ]
+   },
+   "difficulty": 1
+  }
+ ],
+ "questions": [],
+ "sources": [
+  {
+   "name": "Salamander Grand Piano V3 by Alexander Holm (CC BY 3.0)",
+   "url": "https://archive.org/details/SalamanderGrandPianoV3"
+  },
+  {
+   "name": "Mutopia Project (public-domain and Creative Commons scores/MIDI)",
+   "url": "https://www.mutopiaproject.org"
+  },
+  {
+   "name": "Clued transcriptions of public-domain themes"
+  }
+ ],
+ "notice": "Played on a sampled grand piano from public-domain scores."
+}

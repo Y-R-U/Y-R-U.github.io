@@ -1,0 +1,5 @@
+people/marie-curie: dropped clue leaking "mari": She was born Maria Skłodowska in Warsaw.
+people/katherine-johnson: dropped clue leaking "john": She was a mathematician who checked John Glenn's flight path.
+people/charlie-chaplin: dropped clue leaking "char": His best-known character is the Tramp.
+people/don-bradman: dropped clue leaking "don": He was nicknamed The Don.
+people/mother-teresa: dropped clue leaking "sain": She was made a saint in 2016.

@@ -1,0 +1,1440 @@
+{
+ "id": "hits-2020s",
+ "title": "Hits of the 2020s",
+ "theme": "music",
+ "icon": "🔥",
+ "kids": false,
+ "version": 1,
+ "notice": "30-second previews stream from Apple Music.",
+ "factsMeta": {
+  "artist": {
+   "type": "cat",
+   "label": "Artist"
+  },
+  "year": {
+   "type": "year",
+   "label": "Released",
+   "higherLabel": "Newer"
+  },
+  "decade": {
+   "type": "cat",
+   "label": "Decade"
+  }
+ },
+ "items": [
+  {
+   "id": "dont-start-now-dua-lipa",
+   "name": "Don't Start Now",
+   "group": "2010s",
+   "facts": {
+    "artist": "Dua Lipa",
+    "year": 2019,
+    "decade": "2010s"
+   },
+   "blurb": "\"Don't Start Now\" by Dua Lipa, released in 2019.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/24/3d/34/243d3413-a0fc-b229-f54a-1715ebd3a9ca/mzaf_11578996572221800393.plus.aac.p.m4a",
+      "credit": "Dua Lipa: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/dont-start-now/1484636581?i=1484636829&uo=4",
+      "apple": {
+       "trackId": 1484636829,
+       "url": "https://music.apple.com/us/album/dont-start-now/1484636581?i=1484636829&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music116/v4/41/ee/66/41ee66fa-f8dd-7e82-155a-3a1b360dc562/190295322175.jpg/300x300bb.jpg",
+       "term": "Dua Lipa Don't Start Now"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "circles-post-malone",
+   "name": "Circles",
+   "group": "2010s",
+   "facts": {
+    "artist": "Post Malone",
+    "year": 2019,
+    "decade": "2010s"
+   },
+   "blurb": "\"Circles\" by Post Malone, released in 2019.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/f9/b1/aa/f9b1aaed-3e24-227f-153d-99969f8b8464/mzaf_6272498007975402144.plus.aac.p.m4a",
+      "credit": "Post Malone: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/circles/1477880265?i=1477880561&uo=4",
+      "apple": {
+       "trackId": 1477880561,
+       "url": "https://music.apple.com/us/album/circles/1477880265?i=1477880561&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/7b/1b/1b/7b1b1b0b-7ce2-b223-f9e0-8e36abe51877/19UMGIM78325.rgb.jpg/300x300bb.jpg",
+       "term": "Post Malone Circles"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "watermelon-sugar-harry-styles",
+   "name": "Watermelon Sugar",
+   "group": "2010s",
+   "facts": {
+    "artist": "Harry Styles",
+    "year": 2019,
+    "decade": "2010s"
+   },
+   "blurb": "\"Watermelon Sugar\" by Harry Styles, released in 2019.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/25/54/81/255481c0-1ef2-c1bc-f3b3-ea2b1419c1f1/mzaf_5289557126888202047.plus.aac.p.m4a",
+      "credit": "Harry Styles: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/watermelon-sugar/1485802965?i=1485802967&uo=4",
+      "apple": {
+       "trackId": 1485802967,
+       "url": "https://music.apple.com/us/album/watermelon-sugar/1485802965?i=1485802967&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/2b/c4/c9/2bc4c9d4-3bc6-ab13-3f71-df0b89b173de/886448022213.jpg/300x300bb.jpg",
+       "term": "Harry Styles Watermelon Sugar"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "adore-you-harry-styles",
+   "name": "Adore You",
+   "group": "2010s",
+   "facts": {
+    "artist": "Harry Styles",
+    "year": 2019,
+    "decade": "2010s"
+   },
+   "blurb": "\"Adore You\" by Harry Styles, released in 2019.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/75/41/de/7541ded7-1699-85a7-0723-65f913ecc8a8/mzaf_8413154903682037570.plus.aac.p.m4a",
+      "credit": "Harry Styles: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/adore-you/1485802965?i=1485802970&uo=4",
+      "apple": {
+       "trackId": 1485802970,
+       "url": "https://music.apple.com/us/album/adore-you/1485802965?i=1485802970&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/2b/c4/c9/2bc4c9d4-3bc6-ab13-3f71-df0b89b173de/886448022213.jpg/300x300bb.jpg",
+       "term": "Harry Styles Adore You"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "dynamite-bts",
+   "name": "Dynamite",
+   "group": "2020s",
+   "facts": {
+    "artist": "BTS",
+    "year": 2020,
+    "decade": "2020s"
+   },
+   "blurb": "\"Dynamite\" by BTS, released in 2020.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/43/06/1e/43061eb6-9052-60da-7e95-aed315c0b34c/mzaf_2639750113226374892.plus.aac.p.m4a",
+      "credit": "BTS: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/dynamite/1627573936?i=1627575419&uo=4",
+      "apple": {
+       "trackId": 1627575419,
+       "url": "https://music.apple.com/us/album/dynamite/1627573936?i=1627575419&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music122/v4/f7/68/9c/f7689ce3-6d41-60cd-62d2-57a91ddf5b9d/196922067341_Cover.jpg/300x300bb.jpg",
+       "term": "BTS Dynamite"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "levitating-dua-lipa",
+   "name": "Levitating",
+   "group": "2020s",
+   "facts": {
+    "artist": "Dua Lipa",
+    "year": 2020,
+    "decade": "2020s"
+   },
+   "blurb": "\"Levitating\" by Dua Lipa, released in 2020.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/59/dc/4d/59dc4dda-93ff-8f1c-c536-f005f6ea6af5/mzaf_3066686759813252385.plus.aac.p.m4a",
+      "credit": "Dua Lipa: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/levitating/1538003494?i=1538003843&uo=4",
+      "apple": {
+       "trackId": 1538003843,
+       "url": "https://music.apple.com/us/album/levitating/1538003494?i=1538003843&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music116/v4/6c/11/d6/6c11d681-aa3a-d59e-4c2e-f77e181026ab/190295092665.jpg/300x300bb.jpg",
+       "term": "Dua Lipa Levitating"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "save-your-tears-the-weeknd",
+   "name": "Save Your Tears",
+   "group": "2020s",
+   "facts": {
+    "artist": "The Weeknd",
+    "year": 2020,
+    "decade": "2020s"
+   },
+   "blurb": "\"Save Your Tears\" by The Weeknd, released in 2020.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/8b/38/17/8b3817e4-c0e9-7e02-2654-3e2ecee93603/mzaf_18415642125637540903.plus.aac.p.m4a",
+      "credit": "The Weeknd: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/save-your-tears/1505683624?i=1505683980&uo=4",
+      "apple": {
+       "trackId": 1505683980,
+       "url": "https://music.apple.com/us/album/save-your-tears/1505683624?i=1505683980&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/83/3a/f7/833af71b-2e0c-3303-24f5-8f5c546c073b/20UMGIM21167.rgb.jpg/300x300bb.jpg",
+       "term": "The Weeknd Save Your Tears"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "mood-24kgoldn",
+   "name": "Mood",
+   "group": "2020s",
+   "facts": {
+    "artist": "24kGoldn",
+    "year": 2020,
+    "decade": "2020s"
+   },
+   "blurb": "\"Mood\" by 24kGoldn, released in 2020.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/e6/01/27/e6012764-1fc7-c6e3-ecbf-393df8092ece/mzaf_3527043514458329157.plus.aac.p.m4a",
+      "credit": "24kGoldn: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/mood-feat-iann-dior/1559066377?i=1559066401&uo=4",
+      "apple": {
+       "trackId": 1559066401,
+       "url": "https://music.apple.com/us/album/mood-feat-iann-dior/1559066377?i=1559066401&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music125/v4/ac/fe/35/acfe3571-3872-92c6-e208-072fe362d7c3/886449095070.jpg/300x300bb.jpg",
+       "term": "24kGoldn Mood"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "savage-love-laxed-siren-beat-jawsh-685-and-jason-derulo",
+   "name": "Savage Love (Laxed - Siren Beat)",
+   "group": "2020s",
+   "facts": {
+    "artist": "Jawsh 685 & Jason Derulo",
+    "year": 2020,
+    "decade": "2020s"
+   },
+   "blurb": "\"Savage Love (Laxed - Siren Beat)\" by Jawsh 685 & Jason Derulo, released in 2020.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/ec/d4/0e/ecd40e4b-8595-c431-2f1a-aa32fd26e58b/mzaf_4698749676542677606.plus.aac.p.m4a",
+      "credit": "Jawsh 685 & Jason Derulo: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/savage-love-laxed-siren-beat/1517698088?i=1517698089&uo=4",
+      "apple": {
+       "trackId": 1517698089,
+       "url": "https://music.apple.com/us/album/savage-love-laxed-siren-beat/1517698088?i=1517698089&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music126/v4/1a/91/0a/1a910a77-abae-e390-5eb1-6965476f667b/886448561804.jpg/300x300bb.jpg",
+       "term": "Jawsh 685 x Jason Derulo Savage Love"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "heat-waves-glass-animals",
+   "name": "Heat Waves",
+   "group": "2020s",
+   "facts": {
+    "artist": "Glass Animals",
+    "year": 2020,
+    "decade": "2020s"
+   },
+   "blurb": "\"Heat Waves\" by Glass Animals, released in 2020.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/a3/4c/b9/a34cb911-40fc-5f0c-e862-14bd171a77aa/mzaf_384792072030970151.plus.aac.p.m4a",
+      "credit": "Glass Animals: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/heat-waves/1508562310?i=1508562516&uo=4",
+      "apple": {
+       "trackId": 1508562516,
+       "url": "https://music.apple.com/us/album/heat-waves/1508562310?i=1508562516&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/da/8b/77/da8b7731-6f4f-eacf-5e74-8b23389eefa1/20UMGIM03371.rgb.jpg/300x300bb.jpg",
+       "term": "Glass Animals Heat Waves"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "drivers-license-olivia-rodrigo",
+   "name": "drivers license",
+   "alt": [
+    "Drivers License"
+   ],
+   "group": "2020s",
+   "facts": {
+    "artist": "Olivia Rodrigo",
+    "year": 2021,
+    "decade": "2020s"
+   },
+   "blurb": "\"drivers license\" by Olivia Rodrigo, released in 2021.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/36/62/61/366261be-0996-d73d-de6f-03417867c800/mzaf_8201528327761821135.plus.aac.p.m4a",
+      "credit": "Olivia Rodrigo: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/drivers-license/1560734944?i=1560735480&uo=4",
+      "apple": {
+       "trackId": 1560735480,
+       "url": "https://music.apple.com/us/album/drivers-license/1560734944?i=1560735480&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/02/ed/8c/02ed8cab-c089-2fdd-7ce6-ab334a9a4e19/21UMGIM26093.rgb.jpg/300x300bb.jpg",
+       "term": "Olivia Rodrigo drivers license"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "good-4-u-olivia-rodrigo",
+   "name": "good 4 u",
+   "alt": [
+    "Good 4 U"
+   ],
+   "group": "2020s",
+   "facts": {
+    "artist": "Olivia Rodrigo",
+    "year": 2021,
+    "decade": "2020s"
+   },
+   "blurb": "\"good 4 u\" by Olivia Rodrigo, released in 2021.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/9f/bd/f1/9fbdf1ce-12d9-7440-1c1c-3fed40567619/mzaf_7303839465958373073.plus.aac.p.m4a",
+      "credit": "Olivia Rodrigo: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/good-4-u/1582277315?i=1582277652&uo=4",
+      "apple": {
+       "trackId": 1582277652,
+       "url": "https://music.apple.com/us/album/good-4-u/1582277315?i=1582277652&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/76/46/48/76464884-0e9c-1951-a3f6-ce02f74c2b19/21UMGIM26093.rgb.jpg/300x300bb.jpg",
+       "term": "Olivia Rodrigo good 4 u"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "stay-the-kid-laroi-and-justin-bieber",
+   "name": "STAY",
+   "group": "2020s",
+   "facts": {
+    "artist": "The Kid LAROI & Justin Bieber",
+    "year": 2021,
+    "decade": "2020s"
+   },
+   "blurb": "\"STAY\" by The Kid LAROI & Justin Bieber, released in 2021.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/d7/4a/84/d74a84d5-9afa-761e-b632-baab55c2a23b/mzaf_11865500880477235553.plus.aac.p.m4a",
+      "credit": "The Kid LAROI & Justin Bieber: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/stay/1574968878?i=1574968888&uo=4",
+      "apple": {
+       "trackId": 1574968888,
+       "url": "https://music.apple.com/us/album/stay/1574968878?i=1574968888&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music125/v4/89/59/6a/89596ab9-fa3c-8d08-4d95-a6450fa2013c/886449400515.jpg/300x300bb.jpg",
+       "term": "The Kid LAROI & Justin Bieber STAY"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "montero-call-me-by-your-name-lil-nas-x",
+   "name": "MONTERO (Call Me By Your Name)",
+   "group": "2020s",
+   "facts": {
+    "artist": "Lil Nas X",
+    "year": 2021,
+    "decade": "2020s"
+   },
+   "blurb": "\"MONTERO (Call Me By Your Name)\" by Lil Nas X, released in 2021.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/dd/34/ae/dd34ae43-5c0f-1106-df51-d0cf5471a47c/mzaf_18406215460728875922.plus.aac.p.m4a",
+      "credit": "Lil Nas X: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/montero-call-me-by-your-name/1559318717?i=1559318719&uo=4",
+      "apple": {
+       "trackId": 1559318719,
+       "url": "https://music.apple.com/us/album/montero-call-me-by-your-name/1559318717?i=1559318719&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music125/v4/8d/ef/37/8def37cf-f641-1bba-f312-61a9b8d19fbf/886449068029.jpg/300x300bb.jpg",
+       "term": "Lil Nas X MONTERO"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "peaches-justin-bieber",
+   "name": "Peaches",
+   "group": "2020s",
+   "facts": {
+    "artist": "Justin Bieber",
+    "year": 2021,
+    "decade": "2020s"
+   },
+   "blurb": "\"Peaches\" by Justin Bieber, released in 2021.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/c9/6d/b1/c96db138-df15-d3d1-ef9d-98ef9d350960/mzaf_9411021956242812289.plus.aac.p.m4a",
+      "credit": "Justin Bieber: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/peaches-feat-daniel-caesar-giv%C4%93on/1556169567?i=1556170101&uo=4",
+      "apple": {
+       "trackId": 1556170101,
+       "url": "https://music.apple.com/us/album/peaches-feat-daniel-caesar-giv%C4%93on/1556169567?i=1556170101&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/e0/92/da/e092da2d-9f6d-11dc-7843-2021e95a2b61/21UMGIM17518.rgb.jpg/300x300bb.jpg",
+       "term": "Justin Bieber Peaches"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "kiss-me-more-doja-cat",
+   "name": "Kiss Me More",
+   "group": "2020s",
+   "facts": {
+    "artist": "Doja Cat",
+    "year": 2021,
+    "decade": "2020s"
+   },
+   "blurb": "\"Kiss Me More\" by Doja Cat, released in 2021.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/c3/db/9e/c3db9eb5-fed3-eae6-4bcd-baa949cb623d/mzaf_17138382012543023880.plus.aac.p.m4a",
+      "credit": "Doja Cat: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/kiss-me-more-feat-sza/1577636685?i=1577637152&uo=4",
+      "apple": {
+       "trackId": 1577637152,
+       "url": "https://music.apple.com/us/album/kiss-me-more-feat-sza/1577636685?i=1577637152&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music116/v4/14/f3/28/14f32832-b9d9-1ba1-e20a-18c2ff8b6a80/886449410873.jpg/300x300bb.jpg",
+       "term": "Doja Cat Kiss Me More"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "leave-the-door-open-silk-sonic",
+   "name": "Leave the Door Open",
+   "group": "2020s",
+   "facts": {
+    "artist": "Silk Sonic",
+    "year": 2021,
+    "decade": "2020s"
+   },
+   "blurb": "\"Leave the Door Open\" by Silk Sonic, released in 2021.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/ba/43/f5/ba43f52f-2bb0-4cde-a5d0-89fc01ec14d7/mzaf_1992637601291938921.plus.aac.p.m4a",
+      "credit": "Silk Sonic: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/leave-the-door-open/1612867237?i=1612867242&uo=4",
+      "apple": {
+       "trackId": 1612867242,
+       "url": "https://music.apple.com/us/album/leave-the-door-open/1612867237?i=1612867242&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music126/v4/c5/33/dc/c533dc8e-2baa-94f9-22be-e6e28945f932/075679754134.jpg/300x300bb.jpg",
+       "term": "Silk Sonic, Bruno Mars & Anderson .Paak Leave The Door Open"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "easy-on-me-adele",
+   "name": "Easy on Me",
+   "group": "2020s",
+   "facts": {
+    "artist": "Adele",
+    "year": 2021,
+    "decade": "2020s"
+   },
+   "blurb": "\"Easy on Me\" by Adele, released in 2021.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/4c/08/30/4c08305e-0556-30a1-d1ba-2f916b56d62c/mzaf_10419822985277809788.plus.aac.p.m4a",
+      "credit": "Adele: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/easy-on-me/1590035691?i=1590036021&uo=4",
+      "apple": {
+       "trackId": 1590036021,
+       "url": "https://music.apple.com/us/album/easy-on-me/1590035691?i=1590036021&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/73/6d/7c/736d7cfb-c79d-c9a9-4170-5e71d008dea1/886449666430.jpg/300x300bb.jpg",
+       "term": "Adele Easy On Me"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "bad-habits-ed-sheeran",
+   "name": "Bad Habits",
+   "group": "2020s",
+   "facts": {
+    "artist": "Ed Sheeran",
+    "year": 2021,
+    "decade": "2020s"
+   },
+   "blurb": "\"Bad Habits\" by Ed Sheeran, released in 2021.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/f2/08/5d/f2085d7c-a4d0-451b-4d1d-ccc3057ab6e2/mzaf_11771336260379351390.plus.aac.p.m4a",
+      "credit": "Ed Sheeran: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/bad-habits/1571330207?i=1571330212&uo=4",
+      "apple": {
+       "trackId": 1571330212,
+       "url": "https://music.apple.com/us/album/bad-habits/1571330207?i=1571330212&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/63/45/cc/6345cc98-aa83-ad6e-e3c9-1a36ff9838a4/190296614316.jpg/300x300bb.jpg",
+       "term": "Ed Sheeran Bad Habits"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "shivers-ed-sheeran",
+   "name": "Shivers",
+   "group": "2020s",
+   "facts": {
+    "artist": "Ed Sheeran",
+    "year": 2021,
+    "decade": "2020s"
+   },
+   "blurb": "\"Shivers\" by Ed Sheeran, released in 2021.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/a8/9f/a5/a89fa5e9-8a3b-77bb-e081-866067d3f213/mzaf_13889707114574366771.plus.aac.p.m4a",
+      "credit": "Ed Sheeran: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/shivers/1581087024?i=1581087034&uo=4",
+      "apple": {
+       "trackId": 1581087034,
+       "url": "https://music.apple.com/us/album/shivers/1581087024?i=1581087034&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music125/v4/c5/d8/c6/c5d8c675-63e3-6632-33db-2401eabe574d/190296491412.jpg/300x300bb.jpg",
+       "term": "Ed Sheeran Shivers"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "as-it-was-harry-styles",
+   "name": "As It Was",
+   "group": "2020s",
+   "facts": {
+    "artist": "Harry Styles",
+    "year": 2022,
+    "decade": "2020s"
+   },
+   "blurb": "\"As It Was\" by Harry Styles, released in 2022.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/67/10/16/67101606-3869-ca44-6c03-e13d6322cb51/mzaf_1135399237022217274.plus.aac.p.m4a",
+      "credit": "Harry Styles: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/as-it-was/1615584999?i=1615585008&uo=4",
+      "apple": {
+       "trackId": 1615585008,
+       "url": "https://music.apple.com/us/album/as-it-was/1615584999?i=1615585008&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music126/v4/2a/19/fb/2a19fb85-2f70-9e44-f2a9-82abe679b88e/886449990061.jpg/300x300bb.jpg",
+       "term": "Harry Styles As It Was"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "first-class-jack-harlow",
+   "name": "First Class",
+   "group": "2020s",
+   "facts": {
+    "artist": "Jack Harlow",
+    "year": 2022,
+    "decade": "2020s"
+   },
+   "blurb": "\"First Class\" by Jack Harlow, released in 2022.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/ea/97/61/ea97619d-0c0c-53e7-ad1f-47be0dded164/mzaf_10036427914607242610.plus.aac.p.m4a",
+      "credit": "Jack Harlow: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/first-class/1622624421?i=1622624618&uo=4",
+      "apple": {
+       "trackId": 1622624618,
+       "url": "https://music.apple.com/us/album/first-class/1622624421?i=1622624618&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music122/v4/cf/9a/0e/cf9a0ee1-3b03-c511-cf7c-4929265e261c/075679745118.jpg/300x300bb.jpg",
+       "term": "Jack Harlow First Class"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "anti-hero-taylor-swift",
+   "name": "Anti-Hero",
+   "group": "2020s",
+   "facts": {
+    "artist": "Taylor Swift",
+    "year": 2022,
+    "decade": "2020s"
+   },
+   "blurb": "\"Anti-Hero\" by Taylor Swift, released in 2022.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/1d/56/2a/1d562a07-dc5f-a9c0-1f36-2051a8c14eb7/mzaf_7214829135431340590.plus.aac.p.m4a",
+      "credit": "Taylor Swift: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/anti-hero/1649434004?i=1649434293&uo=4",
+      "apple": {
+       "trackId": 1649434293,
+       "url": "https://music.apple.com/us/album/anti-hero/1649434004?i=1649434293&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music112/v4/3d/01/f2/3d01f2e5-5a08-835f-3d30-d031720b2b80/22UM1IM07364.rgb.jpg/300x300bb.jpg",
+       "term": "Taylor Swift Anti-Hero"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "about-damn-time-lizzo",
+   "name": "About Damn Time",
+   "group": "2020s",
+   "facts": {
+    "artist": "Lizzo",
+    "year": 2022,
+    "decade": "2020s"
+   },
+   "blurb": "\"About Damn Time\" by Lizzo, released in 2022.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/1f/1d/91/1f1d9169-e7a4-85f4-c614-845640028993/mzaf_14417727468767979062.plus.aac.p.m4a",
+      "credit": "Lizzo: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/about-damn-time/1634655863?i=1634655870&uo=4",
+      "apple": {
+       "trackId": 1634655870,
+       "url": "https://music.apple.com/us/album/about-damn-time/1634655863?i=1634655870&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music112/v4/b8/20/f9/b820f951-e53c-93bf-e75d-33df6165e7c1/075679736109.jpg/300x300bb.jpg",
+       "term": "Lizzo About Damn Time"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "kill-bill-sza",
+   "name": "Kill Bill",
+   "group": "2020s",
+   "facts": {
+    "artist": "SZA",
+    "year": 2022,
+    "decade": "2020s"
+   },
+   "blurb": "\"Kill Bill\" by SZA, released in 2022.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/45/2b/ea/452bead6-c7f5-82d4-f5f7-ec876014b4cc/mzaf_2905911853279084717.plus.aac.p.m4a",
+      "credit": "SZA: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/kill-bill/1657869377?i=1657869393&uo=4",
+      "apple": {
+       "trackId": 1657869393,
+       "url": "https://music.apple.com/us/album/kill-bill/1657869377?i=1657869393&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music122/v4/bd/3b/a9/bd3ba9fb-9609-144f-bcfe-ead67b5f6ab3/196589564931.jpg/300x300bb.jpg",
+       "term": "SZA Kill Bill"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "calm-down-rema-and-selena-gomez",
+   "name": "Calm Down",
+   "group": "2020s",
+   "facts": {
+    "artist": "Rema & Selena Gomez",
+    "year": 2022,
+    "decade": "2020s"
+   },
+   "blurb": "\"Calm Down\" by Rema & Selena Gomez, released in 2022.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/c3/c7/54/c3c754cd-6680-4818-9182-e08a719d59ba/mzaf_1190051474475595816.plus.aac.p.m4a",
+      "credit": "Rema & Selena Gomez: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/calm-down/1640501237?i=1640501238&uo=4",
+      "apple": {
+       "trackId": 1640501238,
+       "url": "https://music.apple.com/us/album/calm-down/1640501237?i=1640501238&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music112/v4/ee/f1/dc/eef1dc82-f516-fd0f-581c-3f952a0e2243/22UMGIM92113.rgb.jpg/300x300bb.jpg",
+       "term": "Rema & Selena Gomez Calm Down"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "unholy-sam-smith-and-kim-petras",
+   "name": "Unholy",
+   "group": "2020s",
+   "facts": {
+    "artist": "Sam Smith & Kim Petras",
+    "year": 2022,
+    "decade": "2020s"
+   },
+   "blurb": "\"Unholy\" by Sam Smith & Kim Petras, released in 2022.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/ae/ce/44/aece4462-e94a-b215-7fab-0f7342ca50e5/mzaf_5268664849291899767.plus.aac.p.m4a",
+      "credit": "Sam Smith & Kim Petras: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/unholy/1680907429?i=1680907765&uo=4",
+      "apple": {
+       "trackId": 1680907765,
+       "url": "https://music.apple.com/us/album/unholy/1680907429?i=1680907765&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music116/v4/3c/ea/b8/3ceab8cc-b932-9e43-cffb-18dcac80ab30/23UMGIM38271.rgb.jpg/300x300bb.jpg",
+       "term": "Sam Smith & Kim Petras Unholy"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "creepin-metro-boomin-the-weeknd-and-21-savage",
+   "name": "Creepin'",
+   "group": "2020s",
+   "facts": {
+    "artist": "Metro Boomin, The Weeknd & 21 Savage",
+    "year": 2022,
+    "decade": "2020s"
+   },
+   "blurb": "\"Creepin'\" by Metro Boomin, The Weeknd & 21 Savage, released in 2022.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/47/ba/83/47ba83bd-ff6a-d4b2-f126-545a170f0775/mzaf_2932236241939206370.plus.aac.p.m4a",
+      "credit": "Metro Boomin, The Weeknd & 21 Savage: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/creepin/1657583857?i=1657584259&uo=4",
+      "apple": {
+       "trackId": 1657584259,
+       "url": "https://music.apple.com/us/album/creepin/1657583857?i=1657584259&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music112/v4/82/f7/2b/82f72ba4-524c-fc9d-cb8c-5a96d2ddf536/22UM1IM35267.rgb.jpg/300x300bb.jpg",
+       "term": "Metro Boomin, The Weeknd & 21 Savage Creepin'"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "flowers-miley-cyrus",
+   "name": "Flowers",
+   "group": "2020s",
+   "facts": {
+    "artist": "Miley Cyrus",
+    "year": 2023,
+    "decade": "2020s"
+   },
+   "blurb": "\"Flowers\" by Miley Cyrus, released in 2023.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/68/9e/f7/689ef7fe-14fe-a846-c87f-7d3b2d6344b1/mzaf_4167137058064023087.plus.aac.p.m4a",
+      "credit": "Miley Cyrus: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/flowers/1674691585?i=1674691586&uo=4",
+      "apple": {
+       "trackId": 1674691586,
+       "url": "https://music.apple.com/us/album/flowers/1674691585?i=1674691586&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music126/v4/8c/67/ff/8c67ff91-31c3-3fef-1884-ce3ec89f3af4/196589946874.jpg/300x300bb.jpg",
+       "term": "Miley Cyrus Flowers"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "last-night-morgan-wallen",
+   "name": "Last Night",
+   "group": "2020s",
+   "facts": {
+    "artist": "Morgan Wallen",
+    "year": 2023,
+    "decade": "2020s"
+   },
+   "blurb": "\"Last Night\" by Morgan Wallen, released in 2023.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/5e/80/50/5e80506c-cee2-618a-a481-63ca5c74c5ab/mzaf_1765193813138928866.plus.aac.p.m4a",
+      "credit": "Morgan Wallen: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/last-night/1818408501?i=1818408858&uo=4",
+      "apple": {
+       "trackId": 1818408858,
+       "url": "https://music.apple.com/us/album/last-night/1818408501?i=1818408858&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/db/9f/8e/db9f8e0c-d947-b7fd-cc93-a832c81ce4ee/00602455241252_Cover.jpg/300x300bb.jpg",
+       "term": "Morgan Wallen Last Night"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "vampire-olivia-rodrigo",
+   "name": "vampire",
+   "group": "2020s",
+   "facts": {
+    "artist": "Olivia Rodrigo",
+    "year": 2023,
+    "decade": "2020s"
+   },
+   "blurb": "\"vampire\" by Olivia Rodrigo, released in 2023.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/83/09/5e/83095ea1-83bf-ecdc-3b75-358c350fca51/mzaf_15560849688086702972.plus.aac.p.m4a",
+      "credit": "Olivia Rodrigo: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/vampire/1736994853?i=1736995100&uo=4",
+      "apple": {
+       "trackId": 1736995100,
+       "url": "https://music.apple.com/us/album/vampire/1736994853?i=1736995100&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/08/9e/07/089e0799-b405-9e69-b648-e6a19df9879c/24UMGIM30485.rgb.jpg/300x300bb.jpg",
+       "term": "Olivia Rodrigo vampire"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "lose-control-teddy-swims",
+   "name": "Lose Control",
+   "group": "2020s",
+   "facts": {
+    "artist": "Teddy Swims",
+    "year": 2023,
+    "decade": "2020s"
+   },
+   "blurb": "\"Lose Control\" by Teddy Swims, released in 2023.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/9f/65/d6/9f65d67d-db40-d7da-c954-9a23d28dfe1a/mzaf_7625794503195542708.plus.aac.p.m4a",
+      "credit": "Teddy Swims: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/lose-control/1691699589?i=1691699836&uo=4",
+      "apple": {
+       "trackId": 1691699836,
+       "url": "https://music.apple.com/us/album/lose-control/1691699589?i=1691699836&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music126/v4/36/19/66/36196640-1561-dc5e-c6bc-1e5f4befa583/093624856771.jpg/300x300bb.jpg",
+       "term": "Teddy Swims Lose Control"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "lovin-on-me-jack-harlow",
+   "name": "Lovin On Me",
+   "group": "2020s",
+   "facts": {
+    "artist": "Jack Harlow",
+    "year": 2023,
+    "decade": "2020s"
+   },
+   "blurb": "\"Lovin On Me\" by Jack Harlow, released in 2023.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/f4/6e/5a/f46e5aab-e970-1b1d-c0a3-473808a0e265/mzaf_9582060488473069126.plus.aac.p.m4a",
+      "credit": "Jack Harlow: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/lovin-on-me/1715920030?i=1715920580&uo=4",
+      "apple": {
+       "trackId": 1715920580,
+       "url": "https://music.apple.com/us/album/lovin-on-me/1715920030?i=1715920580&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music126/v4/60/88/3e/60883eee-7ec2-75e9-ccc6-5a6187371d97/075679665010.jpg/300x300bb.jpg",
+       "term": "Jack Harlow Lovin On Me"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "a-bar-song-tipsy-shaboozey",
+   "name": "A Bar Song (Tipsy)",
+   "group": "2020s",
+   "facts": {
+    "artist": "Shaboozey",
+    "year": 2024,
+    "decade": "2020s"
+   },
+   "blurb": "\"A Bar Song (Tipsy)\" by Shaboozey, released in 2024.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/46/6f/7f/466f7f67-0365-ddf8-16c2-e033371d2f7e/mzaf_3764341442720608698.plus.aac.p.m4a",
+      "credit": "Shaboozey: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/a-bar-song-tipsy/1749591710?i=1749591722&uo=4",
+      "apple": {
+       "trackId": 1749591722,
+       "url": "https://music.apple.com/us/album/a-bar-song-tipsy/1749591710?i=1749591722&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/be/db/81/bedb81c3-ca23-a1b9-f275-59e46ae4fdb1/197342625517_cover.jpg/300x300bb.jpg",
+       "term": "Shaboozey A Bar Song"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "beautiful-things-benson-boone",
+   "name": "Beautiful Things",
+   "group": "2020s",
+   "facts": {
+    "artist": "Benson Boone",
+    "year": 2024,
+    "decade": "2020s"
+   },
+   "blurb": "\"Beautiful Things\" by Benson Boone, released in 2024.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/4d/d5/00/4dd5006f-ee02-c3f1-94db-0ed4b8dd68f1/mzaf_14250561294796027079.plus.aac.p.m4a",
+      "credit": "Benson Boone: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/beautiful-things/1724488123?i=1724488124&uo=4",
+      "apple": {
+       "trackId": 1724488124,
+       "url": "https://music.apple.com/us/album/beautiful-things/1724488123?i=1724488124&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music116/v4/54/f4/92/54f49210-e260-b519-ebbd-f4f40ee710cd/054391342751.jpg/300x300bb.jpg",
+       "term": "Benson Boone Beautiful Things"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "i-had-some-help-post-malone-and-morgan-wallen",
+   "name": "I Had Some Help",
+   "group": "2020s",
+   "facts": {
+    "artist": "Post Malone & Morgan Wallen",
+    "year": 2024,
+    "decade": "2020s"
+   },
+   "blurb": "\"I Had Some Help\" by Post Malone & Morgan Wallen, released in 2024.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/1f/70/04/1f7004b7-414e-a89c-0148-abdd38981be8/mzaf_10246855408392712577.plus.aac.p.m4a",
+      "credit": "Post Malone & Morgan Wallen: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/i-had-some-help-feat-morgan-wallen/1744452421?i=1744452425&uo=4",
+      "apple": {
+       "trackId": 1744452425,
+       "url": "https://music.apple.com/us/album/i-had-some-help-feat-morgan-wallen/1744452421?i=1744452425&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/84/df/b9/84dfb96b-27c8-4d40-4780-b65ff22790e4/24UMGIM50612.rgb.jpg/300x300bb.jpg",
+       "term": "Post Malone I Had Some Help"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "espresso-sabrina-carpenter",
+   "name": "Espresso",
+   "group": "2020s",
+   "facts": {
+    "artist": "Sabrina Carpenter",
+    "year": 2024,
+    "decade": "2020s"
+   },
+   "blurb": "\"Espresso\" by Sabrina Carpenter, released in 2024.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/99/da/ff/99daffce-cdde-59c6-5ae0-7f922ce411a8/mzaf_5621292401829922816.plus.aac.p.m4a",
+      "credit": "Sabrina Carpenter: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/espresso/1752214909?i=1752214923&uo=4",
+      "apple": {
+       "trackId": 1752214923,
+       "url": "https://music.apple.com/us/album/espresso/1752214909?i=1752214923&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/a1/1c/ca/a11ccab6-7d4c-e041-d028-998bcebeb709/24UMGIM61704.rgb.jpg/300x300bb.jpg",
+       "term": "Sabrina Carpenter Espresso"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "please-please-please-sabrina-carpenter",
+   "name": "Please Please Please",
+   "group": "2020s",
+   "facts": {
+    "artist": "Sabrina Carpenter",
+    "year": 2024,
+    "decade": "2020s"
+   },
+   "blurb": "\"Please Please Please\" by Sabrina Carpenter, released in 2024.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/54/86/0b/54860b8b-0c3b-b16b-5b19-b00424af8b9b/mzaf_1272478887800630516.plus.aac.p.m4a",
+      "credit": "Sabrina Carpenter: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/please-please-please/1795512297?i=1795513492&uo=4",
+      "apple": {
+       "trackId": 1795513492,
+       "url": "https://music.apple.com/us/album/please-please-please/1795512297?i=1795513492&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/c9/a3/e9/c9a3e987-3952-a6ac-7975-680f2033e660/25UMGIM10586.rgb.jpg/300x300bb.jpg",
+       "term": "Sabrina Carpenter & Dolly Parton Please Please Please"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "not-like-us-kendrick-lamar",
+   "name": "Not Like Us",
+   "group": "2020s",
+   "facts": {
+    "artist": "Kendrick Lamar",
+    "year": 2024,
+    "decade": "2020s"
+   },
+   "blurb": "\"Not Like Us\" by Kendrick Lamar, released in 2024.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/2d/e0/e8/2de0e874-cd0b-e9a9-e876-76be13a86662/mzaf_12385336780649591409.plus.aac.p.m4a",
+      "credit": "Kendrick Lamar: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/not-like-us/1781353928?i=1781353929&uo=4",
+      "apple": {
+       "trackId": 1781353929,
+       "url": "https://music.apple.com/us/album/not-like-us/1781353928?i=1781353929&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/31/3a/3f/313a3fbc-bb8f-80c7-b5a2-e226869a38cd/24UMGIM51924.rgb.jpg/300x300bb.jpg",
+       "term": "Kendrick Lamar Not Like Us"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "too-sweet-hozier",
+   "name": "Too Sweet",
+   "group": "2020s",
+   "facts": {
+    "artist": "Hozier",
+    "year": 2024,
+    "decade": "2020s"
+   },
+   "blurb": "\"Too Sweet\" by Hozier, released in 2024.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/a6/61/fc/a661fcaf-f8e5-03db-36f3-31f2e196b1a5/mzaf_18300083713037280538.plus.aac.p.m4a",
+      "credit": "Hozier: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/too-sweet/1735414393?i=1735414394&uo=4",
+      "apple": {
+       "trackId": 1735414394,
+       "url": "https://music.apple.com/us/album/too-sweet/1735414393?i=1735414394&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/98/80/95/98809581-4a0e-68a6-04de-b72492e35939/196871908191.jpg/300x300bb.jpg",
+       "term": "Hozier Too Sweet"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "birds-of-a-feather-billie-eilish",
+   "name": "BIRDS OF A FEATHER",
+   "group": "2020s",
+   "facts": {
+    "artist": "Billie Eilish",
+    "year": 2024,
+    "decade": "2020s"
+   },
+   "blurb": "\"BIRDS OF A FEATHER\" by Billie Eilish, released in 2024.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/34/31/d3/3431d34e-847f-5d66-df83-0bce688d997e/mzaf_18106743962423782018.plus.aac.p.m4a",
+      "credit": "Billie Eilish: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/birds-of-a-feather/1739659134?i=1739659142&uo=4",
+      "apple": {
+       "trackId": 1739659142,
+       "url": "https://music.apple.com/us/album/birds-of-a-feather/1739659134?i=1739659142&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/92/9f/69/929f69f1-9977-3a44-d674-11f70c852d1b/24UMGIM36186.rgb.jpg/300x300bb.jpg",
+       "term": "Billie Eilish BIRDS OF A FEATHER"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "texas-hold-em-beyonce",
+   "name": "TEXAS HOLD 'EM",
+   "group": "2020s",
+   "facts": {
+    "artist": "Beyoncé",
+    "year": 2024,
+    "decade": "2020s"
+   },
+   "blurb": "\"TEXAS HOLD 'EM\" by Beyoncé, released in 2024.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/e7/fe/81/e7fe812a-e95d-8971-9885-0c317671ce63/mzaf_13578365911245876234.plus.aac.p.m4a",
+      "credit": "Beyoncé: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/texas-hold-em/1730410731?i=1730410734&uo=4",
+      "apple": {
+       "trackId": 1730410734,
+       "url": "https://music.apple.com/us/album/texas-hold-em/1730410731?i=1730410734&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music116/v4/ab/17/80/ab178005-ebf8-f22e-06ac-ffa1fc7f819a/196871850438.jpg/300x300bb.jpg",
+       "term": "Beyoncé TEXAS HOLD 'EM"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "die-with-a-smile-lady-gaga-and-bruno-mars",
+   "name": "Die With A Smile",
+   "group": "2020s",
+   "facts": {
+    "artist": "Lady Gaga & Bruno Mars",
+    "year": 2024,
+    "decade": "2020s"
+   },
+   "blurb": "\"Die With A Smile\" by Lady Gaga & Bruno Mars, released in 2024.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/07/6a/99/076a99ed-b946-431b-6f1f-54fa187ca5bd/mzaf_8102882277995122875.plus.aac.p.m4a",
+      "credit": "Lady Gaga & Bruno Mars: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/die-with-a-smile/1762656724?i=1762656732&uo=4",
+      "apple": {
+       "trackId": 1762656732,
+       "url": "https://music.apple.com/us/album/die-with-a-smile/1762656724?i=1762656732&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/11/ae/f2/11aef294-f57c-bab9-c9fc-529162984e62/24UMGIM85348.rgb.jpg/300x300bb.jpg",
+       "term": "Lady Gaga & Bruno Mars Die With A Smile"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "apt-rose-and-bruno-mars",
+   "name": "APT.",
+   "group": "2020s",
+   "facts": {
+    "artist": "ROSÉ & Bruno Mars",
+    "year": 2024,
+    "decade": "2020s"
+   },
+   "blurb": "\"APT.\" by ROSÉ & Bruno Mars, released in 2024.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/7a/15/38/7a1538f3-f41a-a2eb-0f24-8eb6712ee043/mzaf_7740628412097685267.plus.aac.p.m4a",
+      "credit": "ROSÉ & Bruno Mars: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/apt/1773452219?i=1773452221&uo=4",
+      "apple": {
+       "trackId": 1773452221,
+       "url": "https://music.apple.com/us/album/apt/1773452219?i=1773452221&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/2d/1a/7d/2d1a7d91-587e-0ceb-d434-327bd66d9e86/075679628312.jpg/300x300bb.jpg",
+       "term": "ROSÉ & Bruno Mars APT."
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "good-luck-babe-chappell-roan",
+   "name": "Good Luck, Babe!",
+   "group": "2020s",
+   "facts": {
+    "artist": "Chappell Roan",
+    "year": 2024,
+    "decade": "2020s"
+   },
+   "blurb": "\"Good Luck, Babe!\" by Chappell Roan, released in 2024.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/c3/6d/4f/c36d4f23-b87f-046d-7a0e-e3e05d180b2a/mzaf_17235999651335214399.plus.aac.p.m4a",
+      "credit": "Chappell Roan: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/good-luck-babe/1737497078?i=1737497080&uo=4",
+      "apple": {
+       "trackId": 1737497080,
+       "url": "https://music.apple.com/us/album/good-luck-babe/1737497078?i=1737497080&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/29/a7/c4/29a7c478-351d-25eb-a116-3e68118cdab8/24UMGIM31246.rgb.jpg/300x300bb.jpg",
+       "term": "Chappell Roan Good Luck, Babe!"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "ordinary-alex-warren",
+   "name": "Ordinary",
+   "group": "2020s",
+   "facts": {
+    "artist": "Alex Warren",
+    "year": 2025,
+    "decade": "2020s"
+   },
+   "blurb": "\"Ordinary\" by Alex Warren, released in 2025.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/32/24/4e/32244ed8-2193-e5af-0587-37a30c397089/mzaf_12564864637967673407.plus.aac.p.m4a",
+      "credit": "Alex Warren: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/ordinary-wedding-version/1802894766?i=1802894994&uo=4",
+      "apple": {
+       "trackId": 1802894994,
+       "url": "https://music.apple.com/us/album/ordinary-wedding-version/1802894766?i=1802894994&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/a3/2f/92/a32f9213-3a8c-eafa-0726-7779b6ae8dfe/075679615237.jpg/300x300bb.jpg",
+       "term": "Alex Warren Ordinary"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "abracadabra-lady-gaga",
+   "name": "Abracadabra",
+   "group": "2020s",
+   "facts": {
+    "artist": "Lady Gaga",
+    "year": 2025,
+    "decade": "2020s"
+   },
+   "blurb": "\"Abracadabra\" by Lady Gaga, released in 2025.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/7f/f0/f5/7ff0f508-1e7a-fefc-0c78-5bd659286525/mzaf_16241395143868251571.plus.aac.p.m4a",
+      "credit": "Lady Gaga: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/abracadabra/1792666546?i=1792667005&uo=4",
+      "apple": {
+       "trackId": 1792667005,
+       "url": "https://music.apple.com/us/album/abracadabra/1792666546?i=1792667005&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/be/11/d1/be11d187-1aeb-99f3-01c5-597ed65cdb6a/25UMGIM07433.rgb.jpg/300x300bb.jpg",
+       "term": "Lady Gaga Abracadabra"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "manchild-sabrina-carpenter",
+   "name": "Manchild",
+   "group": "2020s",
+   "facts": {
+    "artist": "Sabrina Carpenter",
+    "year": 2025,
+    "decade": "2020s"
+   },
+   "blurb": "\"Manchild\" by Sabrina Carpenter, released in 2025.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/7a/8a/35/7a8a3576-4f88-085a-b6f8-1b616a10bc72/mzaf_10188837811641524392.plus.aac.p.m4a",
+      "credit": "Sabrina Carpenter: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/manchild/1819377509?i=1819377511&uo=4",
+      "apple": {
+       "trackId": 1819377511,
+       "url": "https://music.apple.com/us/album/manchild/1819377509?i=1819377511&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/ae/c6/58/aec6589c-f5cf-0d81-2727-bc8775e34049/25UMGIM76990.rgb.jpg/300x300bb.jpg",
+       "term": "Sabrina Carpenter Manchild"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  }
+ ],
+ "questions": [],
+ "sources": [
+  {
+   "name": "Billboard Year-End Hot 100 singles (2020–2025)",
+   "url": "https://en.wikipedia.org/wiki/Billboard_Year-End_Hot_100_singles_of_2020"
+  },
+  {
+   "name": "UK best-selling singles by year",
+   "url": "https://en.wikipedia.org/wiki/List_of_best-selling_singles_by_year_(UK)"
+  },
+  {
+   "name": "Apple iTunes Search API (previews, artwork, links)",
+   "url": "https://performance-partners.apple.com/search-api"
+  }
+ ],
+ "built": "2026-10-04"
+}

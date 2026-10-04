@@ -1,0 +1,1718 @@
+{
+ "id": "bees",
+ "title": "Wasps, bees & hornets",
+ "theme": "animals",
+ "icon": "🐝",
+ "kids": true,
+ "version": 1,
+ "notice": "Not for real-world identification.",
+ "imgPrompt": "Which of these is {aName}?",
+ "nameImgPrompt": "Which insect is this?",
+ "tfImgPrompt": "This is {aName}.",
+ "leakExempt": [],
+ "factsMeta": {
+  "kind": {
+   "type": "cat",
+   "label": "Kind",
+   "values": [
+    "Bee",
+    "Wasp",
+    "Hornet",
+    "Fly"
+   ],
+   "ask": "Is the {lname} a bee, a wasp, a hornet or a fly?",
+   "askReverse": "Which of these is a {lvalue}?",
+   "stmt": "The {lname} is a {lvalue}."
+  },
+  "stings": {
+   "type": "bool",
+   "label": "Can sting",
+   "yes": "Can sting",
+   "no": "Cannot sting",
+   "askBool": "Which of these can sting?",
+   "stmt": "The {lname} can sting."
+  },
+  "social": {
+   "type": "bool",
+   "label": "Lives in colonies",
+   "yes": "Lives in a colony",
+   "no": "Lives alone",
+   "askBool": "Which of these lives in a colony with a queen?",
+   "stmt": "The {lname} lives in a colony with a queen."
+  }
+ },
+ "items": [
+  {
+   "id": "honey-bee",
+   "name": "Honey bee",
+   "alt": [
+    "western honey bee",
+    "European honey bee",
+    "honeybee"
+   ],
+   "sci": "Apis mellifera",
+   "group": "bee",
+   "facts": {
+    "kind": "Bee",
+    "stings": true,
+    "social": true
+   },
+   "lookalikes": [
+    "common-wasp",
+    "marmalade-hoverfly"
+   ],
+   "blurb": "The bee that makes the honey we eat. A hive can hold tens of thousands of bees with one queen.",
+   "clues": [
+    "Family: Apidae.",
+    "Genus: Apis.",
+    "Workers do a \"waggle dance\" to show others where flowers are.",
+    "A worker dies after stinging a person because its sting is barbed.",
+    "Its wax is used for candles and polish.",
+    "Females can sting.",
+    "It lives in a colony with a queen.",
+    "It lives in hives looked after by beekeepers.",
+    "It makes a sweet golden food spread on toast.",
+    "The answer has 2 words (5, 3 letters).",
+    "Its first letter is H."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/217394043/medium.jpeg",
+      "w": 500,
+      "h": 375,
+      "credit": "no rights reserved",
+      "license": "CC0 1.0",
+      "page": "https://www.inaturalist.org/photos/217394043"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/67970909/medium.jpeg",
+      "w": 500,
+      "h": 281,
+      "credit": "Albertus Horn",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/67970909"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/485263880/medium.jpg",
+      "w": 375,
+      "h": 500,
+      "credit": "Kieran Hanrahan",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/485263880"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "buff-tailed-bumblebee",
+   "name": "Buff-tailed bumblebee",
+   "alt": [
+    "bumblebee",
+    "bumble bee"
+   ],
+   "sci": "Bombus terrestris",
+   "group": "bee",
+   "facts": {
+    "kind": "Bee",
+    "stings": true,
+    "social": true
+   },
+   "lookalikes": [
+    "red-tailed-bumblebee",
+    "common-carder-bee"
+   ],
+   "blurb": "A big, fuzzy bee common in Europe. It can fly in cooler weather than most bees by shivering to warm up.",
+   "clues": [
+    "Family: Apidae.",
+    "Genus: Bombus.",
+    "It is used in greenhouses to pollinate tomatoes.",
+    "It shivers its flight muscles to warm up.",
+    "Its nests are often underground in old mouse holes.",
+    "Females can sting.",
+    "It lives in a colony with a queen.",
+    "The answer has 3 words (4, 6, 9 letters).",
+    "Its first letter is B."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/733614806/medium.jpg",
+      "w": 500,
+      "h": 500,
+      "credit": "Alan Flisch",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/733614806"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/60648454/medium.jpeg",
+      "w": 500,
+      "h": 375,
+      "credit": "no rights reserved",
+      "license": "CC0 1.0",
+      "page": "https://www.inaturalist.org/photos/60648454"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/716505768/medium.jpg",
+      "w": 500,
+      "h": 356,
+      "credit": "William Harland",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/716505768"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "red-tailed-bumblebee",
+   "name": "Red-tailed bumblebee",
+   "sci": "Bombus lapidarius",
+   "group": "bee",
+   "facts": {
+    "kind": "Bee",
+    "stings": true,
+    "social": true
+   },
+   "lookalikes": [
+    "buff-tailed-bumblebee"
+   ],
+   "blurb": "A black bumblebee with a bright orange-red tail, common in European gardens.",
+   "clues": [
+    "Family: Apidae.",
+    "Genus: Bombus.",
+    "It often nests under stones.",
+    "Males have yellow bands on the face.",
+    "It is common in British gardens.",
+    "Females can sting.",
+    "It lives in a colony with a queen.",
+    "Females are velvety black.",
+    "The answer has 3 words (3, 6, 9 letters).",
+    "Its first letter is R."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/72907211/medium.jpg",
+      "w": 449,
+      "h": 500,
+      "credit": "Odd Wellies",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/72907211"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/353354625/medium.jpeg",
+      "w": 500,
+      "h": 333,
+      "credit": "Katherine King",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/353354625"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/579208220/medium.jpg",
+      "w": 500,
+      "h": 500,
+      "credit": "Stephan Mende",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/579208220"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "common-carder-bee",
+   "name": "Common carder bee",
+   "sci": "Bombus pascuorum",
+   "group": "bee",
+   "facts": {
+    "kind": "Bee",
+    "stings": true,
+    "social": true
+   },
+   "lookalikes": [
+    "buff-tailed-bumblebee"
+   ],
+   "blurb": "A small gingery bumblebee that weaves moss into a nest above ground.",
+   "clues": [
+    "Family: Apidae.",
+    "Genus: Bombus.",
+    "It combs moss to build its nest.",
+    "It nests above ground in long grass.",
+    "It is one of the last bumblebees still flying in autumn.",
+    "Females can sting.",
+    "It lives in a colony with a queen.",
+    "It is fluffy and ginger-brown all over.",
+    "The answer has 3 words (6, 6, 3 letters).",
+    "Its first letter is C."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/10968015/medium.jpeg",
+      "w": 439,
+      "h": 500,
+      "credit": "Kostas Zontanos",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/10968015"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/7430227/medium.jpg",
+      "w": 500,
+      "h": 432,
+      "credit": "richyfourtytwo",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/7430227"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/295026536/medium.jpeg",
+      "w": 500,
+      "h": 375,
+      "credit": "Pavel Borodin",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/295026536"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "violet-carpenter-bee",
+   "name": "Violet carpenter bee",
+   "alt": [
+    "carpenter bee"
+   ],
+   "sci": "Xylocopa violacea",
+   "group": "bee",
+   "facts": {
+    "kind": "Bee",
+    "stings": true,
+    "social": false
+   },
+   "blurb": "A large, shiny black bee with purple-tinted wings. It chews tunnels in dead wood to make its nest.",
+   "clues": [
+    "Family: Apidae.",
+    "Genus: Xylocopa.",
+    "It is one of the largest bees in Europe.",
+    "It sometimes \"robs\" nectar by biting a hole in the flower.",
+    "Its wings shine bluish-purple.",
+    "Females can sting.",
+    "It lives alone, not in a colony.",
+    "It chews nest tunnels in dead wood.",
+    "It is named after a woodworker.",
+    "The answer has 3 words (6, 9, 3 letters).",
+    "Its first letter is V."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/99606/medium.jpg",
+      "w": 400,
+      "h": 500,
+      "credit": "Thomas Bresson",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/99606"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/243181971/medium.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Mario Bassini",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/243181971"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/231218968/medium.jpg",
+      "w": 375,
+      "h": 500,
+      "credit": "Brenda Black",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/231218968"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "leafcutter-bee",
+   "name": "Leafcutter bee",
+   "sci": "Megachile",
+   "group": "bee",
+   "facts": {
+    "kind": "Bee",
+    "stings": true,
+    "social": false
+   },
+   "blurb": "A solitary bee that cuts neat circles out of leaves to line its nest cells.",
+   "clues": [
+    "Family: Megachilidae.",
+    "It carries pollen on hairs under its belly.",
+    "It nests in hollow stems or holes in wood.",
+    "It lines each egg cell with plant pieces.",
+    "Females can sting.",
+    "It lives alone, not in a colony.",
+    "Gardeners find neat round holes in rose leaves.",
+    "It snips pieces out of leaves.",
+    "The answer has 2 words (10, 3 letters).",
+    "Its first letter is L."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/24197665/medium.jpeg",
+      "w": 500,
+      "h": 333,
+      "credit": "Even Dankowicz",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/24197665"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/57340050/medium.jpeg",
+      "w": 500,
+      "h": 326,
+      "credit": "Cecile Roux",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/57340050"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/28251090/medium.jpg",
+      "w": 500,
+      "h": 332,
+      "credit": "Amy Schnebelin",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/28251090"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "red-mason-bee",
+   "name": "Red mason bee",
+   "alt": [
+    "mason bee"
+   ],
+   "sci": "Osmia bicornis",
+   "group": "bee",
+   "facts": {
+    "kind": "Bee",
+    "stings": true,
+    "social": false
+   },
+   "blurb": "A gingery solitary bee that nests in holes and seals each cell with mud. It loves bee hotels.",
+   "clues": [
+    "Family: Megachilidae.",
+    "Genus: Osmia.",
+    "Females have two little horns on the face.",
+    "It is an excellent pollinator of fruit trees.",
+    "Females can sting.",
+    "It lives alone, not in a colony.",
+    "It seals its nest cells with mud.",
+    "It is named after a builder who works with stone.",
+    "The answer has 3 words (3, 5, 3 letters).",
+    "Its first letter is R."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/787758/medium.jpg",
+      "w": 500,
+      "h": 357,
+      "credit": "tpjunier",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/787758"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/787760/medium.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "tpjunier",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/787760"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/489895113/medium.jpg",
+      "w": 400,
+      "h": 500,
+      "credit": "Rupert Lees",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/489895113"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "blue-banded-bee",
+   "name": "Blue-banded bee",
+   "sci": "Amegilla cingulata",
+   "group": "bee",
+   "facts": {
+    "kind": "Bee",
+    "stings": true,
+    "social": false
+   },
+   "blurb": "An Australian bee with shiny blue stripes. It shakes pollen out of flowers by buzzing.",
+   "clues": [
+    "Family: Apidae.",
+    "Genus: Amegilla.",
+    "Males sleep clinging to plant stems by their jaws.",
+    "It \"buzz pollinates\" tomato flowers.",
+    "It is native to Australia.",
+    "Females can sting.",
+    "It lives alone, not in a colony.",
+    "It hovers in front of flowers.",
+    "The answer has 3 words (4, 6, 3 letters).",
+    "Its first letter is B."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/29046892/medium.jpg",
+      "w": 500,
+      "h": 365,
+      "credit": "Steve Kerr",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/29046892"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/489551264/medium.jpeg",
+      "w": 281,
+      "h": 500,
+      "credit": "no rights reserved",
+      "license": "CC0 1.0",
+      "page": "https://www.inaturalist.org/photos/489551264"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/248955613/medium.jpeg",
+      "w": 500,
+      "h": 333,
+      "credit": "Greg Tasney",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/248955613"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "teddy-bear-bee",
+   "name": "Teddy bear bee",
+   "sci": "Amegilla bombiformis",
+   "group": "bee",
+   "facts": {
+    "kind": "Bee",
+    "stings": true,
+    "social": false
+   },
+   "blurb": "A round, golden-furred Australian bee that looks like a soft toy.",
+   "clues": [
+    "Family: Apidae.",
+    "Genus: Amegilla.",
+    "It nests in burrows in soil banks.",
+    "It buzz pollinates flowers.",
+    "It lives in eastern Australia.",
+    "Females can sting.",
+    "It lives alone, not in a colony.",
+    "It is covered in golden-brown fur.",
+    "It is named after a cuddly toy.",
+    "The answer has 3 words (5, 4, 3 letters).",
+    "Its first letter is T."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/350608847/medium.jpg",
+      "w": 381,
+      "h": 500,
+      "credit": "Suzanne Muzic",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/350608847"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/587945700/medium.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Peter Dean",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/587945700"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/352667923/medium.jpg",
+      "w": 500,
+      "h": 500,
+      "credit": "James K. Douch",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/352667923"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "sugarbag-bee",
+   "name": "Sugarbag bee",
+   "alt": [
+    "stingless bee",
+    "Australian stingless bee"
+   ],
+   "sci": "Tetragonula carbonaria",
+   "group": "bee",
+   "facts": {
+    "kind": "Bee",
+    "stings": false,
+    "social": true
+   },
+   "blurb": "A tiny black Australian bee that cannot sting. Its hives make a small amount of tangy honey.",
+   "clues": [
+    "Family: Apidae.",
+    "Genus: Tetragonula.",
+    "Its hive is built in a spiral shape.",
+    "Aboriginal people have collected its honey for thousands of years.",
+    "It is kept in small boxes in backyards.",
+    "It cannot sting.",
+    "It lives in a colony with a queen.",
+    "It is tiny and black.",
+    "The answer has 2 words (8, 3 letters).",
+    "Its first letter is S."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/396408495/medium.jpg",
+      "w": 500,
+      "h": 500,
+      "credit": "Austen Armstrong",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/396408495"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/396408545/medium.jpg",
+      "w": 500,
+      "h": 500,
+      "credit": "Austen Armstrong",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/396408545"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/430592333/medium.jpg",
+      "w": 500,
+      "h": 400,
+      "credit": "Nadine Gaffney",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/430592333"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "orchid-bee",
+   "name": "Orchid bee",
+   "sci": "Euglossa",
+   "group": "bee",
+   "facts": {
+    "kind": "Bee",
+    "stings": true,
+    "social": false
+   },
+   "blurb": "Shiny metallic green or blue bees of tropical America. Males collect scents from orchids.",
+   "clues": [
+    "Family: Apidae.",
+    "Their tongues can be longer than their bodies.",
+    "They live in Central and South American forests.",
+    "Females can sting.",
+    "It lives alone, not in a colony.",
+    "They shine like metal.",
+    "They are named after a famous flower.",
+    "The answer has 2 words (6, 3 letters).",
+    "Its first letter is O."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/5692357/medium.jpg",
+      "w": 318,
+      "h": 500,
+      "credit": "Judy Gallagher",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/5692357"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/415361692/medium.jpeg",
+      "w": 500,
+      "h": 333,
+      "credit": "Carlos Alexandre Mattos Raposo",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/415361692"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/194142578/medium.jpeg",
+      "w": 500,
+      "h": 333,
+      "credit": "Carlos Alexandre Mattos Raposo",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/194142578"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "common-wasp",
+   "name": "Common wasp",
+   "alt": [
+    "yellowjacket",
+    "wasp"
+   ],
+   "sci": "Vespula vulgaris",
+   "group": "wasp",
+   "facts": {
+    "kind": "Wasp",
+    "stings": true,
+    "social": true
+   },
+   "lookalikes": [
+    "honey-bee",
+    "german-wasp",
+    "european-hornet",
+    "marmalade-hoverfly"
+   ],
+   "blurb": "The yellow-and-black wasp that turns up at picnics in late summer. It builds paper nests from chewed wood.",
+   "clues": [
+    "Family: Vespidae.",
+    "Genus: Vespula.",
+    "Its nest is made of paper from chewed wood.",
+    "In late summer it hunts for sweet food at picnics.",
+    "It can sting many times.",
+    "Females can sting.",
+    "It lives in a colony with a queen.",
+    "It feeds insects to its young.",
+    "It is striped bright yellow and black.",
+    "The answer has 2 words (6, 4 letters).",
+    "Its first letter is C."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/21937595/medium.jpeg",
+      "w": 500,
+      "h": 375,
+      "credit": "Tom",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/21937595"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/1183581/medium.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Jon Sullivan",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/1183581"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/225583/medium.jpg",
+      "w": 500,
+      "h": 444,
+      "credit": "anonymous",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/225583"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "german-wasp",
+   "name": "German wasp",
+   "lname": "German wasp",
+   "alt": [
+    "European wasp"
+   ],
+   "sci": "Vespula germanica",
+   "group": "wasp",
+   "facts": {
+    "kind": "Wasp",
+    "stings": true,
+    "social": true
+   },
+   "lookalikes": [
+    "common-wasp"
+   ],
+   "blurb": "A yellowjacket wasp from Europe that has invaded Australia, New Zealand and the Americas.",
+   "clues": [
+    "Family: Vespidae.",
+    "Genus: Vespula.",
+    "It is an invasive pest in Australia and New Zealand.",
+    "In warm places, nests can survive the winter and grow huge.",
+    "Females can sting.",
+    "It lives in a colony with a queen.",
+    "Its face has three tiny black dots.",
+    "The answer has 2 words (6, 4 letters).",
+    "Its first letter is G."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/99045394/medium.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Sid Mosdell",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/99045394"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/276576436/medium.jpeg",
+      "w": 500,
+      "h": 333,
+      "credit": "ingridaltmann",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/276576436"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/99045397/medium.jpg",
+      "w": 500,
+      "h": 370,
+      "credit": "Jean and Fred",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/99045397"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "european-hornet",
+   "name": "European hornet",
+   "lname": "European hornet",
+   "alt": [
+    "hornet"
+   ],
+   "sci": "Vespa crabro",
+   "group": "hornet",
+   "facts": {
+    "kind": "Hornet",
+    "stings": true,
+    "social": true
+   },
+   "lookalikes": [
+    "common-wasp",
+    "asian-giant-hornet",
+    "asian-hornet"
+   ],
+   "blurb": "The largest wasp in Europe. It is brown and yellow, and calmer than you might think.",
+   "clues": [
+    "Family: Vespidae.",
+    "Genus: Vespa.",
+    "It can fly and hunt at night.",
+    "It nests in hollow trees.",
+    "It is calmer than smaller wasps.",
+    "Females can sting.",
+    "It lives in a colony with a queen.",
+    "It is brown and yellow and very large.",
+    "The answer has 2 words (8, 6 letters).",
+    "Its first letter is E."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/24810290/medium.jpg",
+      "w": 500,
+      "h": 416,
+      "credit": "katunchik",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/24810290"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/416257156/medium.jpeg",
+      "w": 500,
+      "h": 375,
+      "credit": "Brian R Wilson",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/416257156"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/47451092/medium.jpeg",
+      "w": 412,
+      "h": 500,
+      "credit": "no rights reserved",
+      "license": "CC0 1.0",
+      "page": "https://www.inaturalist.org/photos/47451092"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "asian-giant-hornet",
+   "name": "Asian giant hornet",
+   "lname": "Asian giant hornet",
+   "alt": [
+    "northern giant hornet",
+    "murder hornet"
+   ],
+   "sci": "Vespa mandarinia",
+   "group": "hornet",
+   "facts": {
+    "kind": "Hornet",
+    "stings": true,
+    "social": true
+   },
+   "lookalikes": [
+    "european-hornet",
+    "asian-hornet"
+   ],
+   "blurb": "The largest wasp in the world, from East Asia. A small group can kill a whole hive of honey bees.",
+   "clues": [
+    "Family: Vespidae.",
+    "Genus: Vespa.",
+    "Japanese honey bees cook it to death in a ball of vibrating bees.",
+    "A few can wipe out a honey bee hive in hours.",
+    "Females can sting.",
+    "It lives in a colony with a queen.",
+    "Its head is big and orange.",
+    "It is the biggest wasp in the world.",
+    "The answer has 3 words (5, 5, 6 letters).",
+    "Its first letter is A."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/326699273/medium.jpg",
+      "w": 500,
+      "h": 385,
+      "credit": "Yasunori Koide",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/326699273"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/28685539/medium.jpeg",
+      "w": 500,
+      "h": 333,
+      "credit": "Alpsdake",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/28685539"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/104822583/medium.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "WATANABE Hitoshi 渡辺仁",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/104822583"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "asian-hornet",
+   "name": "Asian hornet",
+   "lname": "Asian hornet",
+   "alt": [
+    "yellow-legged hornet"
+   ],
+   "sci": "Vespa velutina",
+   "group": "hornet",
+   "facts": {
+    "kind": "Hornet",
+    "stings": true,
+    "social": true
+   },
+   "lookalikes": [
+    "european-hornet",
+    "asian-giant-hornet"
+   ],
+   "blurb": "A dark hornet from Asia with yellow legs. It has spread across Europe and hunts honey bees outside their hives.",
+   "clues": [
+    "Family: Vespidae.",
+    "Genus: Vespa.",
+    "It arrived in France around 2004 in pottery from China.",
+    "It hovers outside hives to catch honey bees.",
+    "Its nests are often high in trees.",
+    "Females can sting.",
+    "It lives in a colony with a queen.",
+    "It is dark with an orange face.",
+    "The answer has 2 words (5, 6 letters).",
+    "Its first letter is A."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/1328481/medium.jpg",
+      "w": 412,
+      "h": 500,
+      "credit": "BlueGinkgo",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/1328481"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/39392126/medium.jpeg",
+      "w": 500,
+      "h": 333,
+      "credit": "Gilles San Martin",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/39392126"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/39392134/medium.jpeg",
+      "w": 500,
+      "h": 333,
+      "credit": "Gilles San Martin",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/39392134"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "bald-faced-hornet",
+   "name": "Bald-faced hornet",
+   "sci": "Dolichovespula maculata",
+   "group": "wasp",
+   "facts": {
+    "kind": "Wasp",
+    "stings": true,
+    "social": true
+   },
+   "blurb": "A black-and-white wasp of North America that builds big grey paper nests in trees. It is really a yellowjacket, not a true hornet.",
+   "clues": [
+    "Family: Vespidae.",
+    "Genus: Dolichovespula.",
+    "Its football-sized paper nests hang in trees.",
+    "It can squirt venom at eyes.",
+    "Females can sting.",
+    "It lives in a colony with a queen.",
+    "It is black and white, not yellow.",
+    "The answer has 3 words (4, 5, 6 letters).",
+    "Its first letter is B."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/47461172/medium.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Amy Schnebelin",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/47461172"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/42372885/medium.jpg",
+      "w": 375,
+      "h": 500,
+      "credit": "Healthy Yards",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/42372885"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/147114294/medium.jpeg",
+      "w": 500,
+      "h": 360,
+      "credit": "Zachary Dankowicz",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/147114294"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "european-paper-wasp",
+   "name": "European paper wasp",
+   "lname": "European paper wasp",
+   "alt": [
+    "paper wasp"
+   ],
+   "sci": "Polistes dominula",
+   "group": "wasp",
+   "facts": {
+    "kind": "Wasp",
+    "stings": true,
+    "social": true
+   },
+   "lookalikes": [
+    "common-wasp"
+   ],
+   "blurb": "A slim wasp that builds small, open, umbrella-shaped nests under roofs. It dangles its legs in flight.",
+   "clues": [
+    "Family: Vespidae.",
+    "Genus: Polistes.",
+    "Its nest hangs from a single stalk.",
+    "It lets its legs dangle as it flies.",
+    "Females can sting.",
+    "It lives in a colony with a queen.",
+    "It is yellow and black and slimmer than a yellowjacket.",
+    "It builds its nest from a material you write on.",
+    "The answer has 3 words (8, 5, 4 letters).",
+    "Its first letter is E."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/64465661/medium.jpg",
+      "w": 500,
+      "h": 500,
+      "credit": "Bill Keim",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/64465661"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/28902308/medium.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Юрий Данилевский (Yuriy Danilevsky)",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/28902308"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/97956540/medium.jpeg",
+      "w": 500,
+      "h": 333,
+      "credit": "eebee",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/97956540"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "black-and-yellow-mud-dauber",
+   "name": "Black and yellow mud dauber",
+   "alt": [
+    "mud dauber"
+   ],
+   "sci": "Sceliphron caementarium",
+   "group": "wasp",
+   "facts": {
+    "kind": "Wasp",
+    "stings": true,
+    "social": false
+   },
+   "blurb": "A thin-waisted solitary wasp that builds nests of mud and stocks them with paralysed spiders.",
+   "clues": [
+    "Family: Sphecidae.",
+    "Genus: Sceliphron.",
+    "It stocks its nest with paralysed spiders.",
+    "It rarely stings people.",
+    "Its waist is long and thread-thin.",
+    "Females can sting.",
+    "It lives alone, not in a colony.",
+    "It builds nest cells from wet earth.",
+    "It smears soil, which is in its name.",
+    "The answer has 5 words (5, 3, 6, 3, 6 letters).",
+    "Its first letter is B."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/312926532/medium.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "JT Tomaschke",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/312926532"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/312926499/medium.jpg",
+      "w": 375,
+      "h": 500,
+      "credit": "JT Tomaschke",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/312926499"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/150152422/medium.jpeg",
+      "w": 375,
+      "h": 500,
+      "credit": "DDutrey",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/150152422"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "potter-wasp",
+   "name": "Potter wasp",
+   "sci": "Eumenes",
+   "group": "wasp",
+   "facts": {
+    "kind": "Wasp",
+    "stings": true,
+    "social": false
+   },
+   "blurb": "A small solitary wasp that makes a tiny round pot of mud for each egg, stocked with caterpillars.",
+   "clues": [
+    "Family: Vespidae.",
+    "It fills each nest with paralysed caterpillars.",
+    "Its nest has a narrow neck like a jug.",
+    "Its nest is made of mud.",
+    "Females can sting.",
+    "It lives alone, not in a colony.",
+    "It is black and yellow with a thin waist.",
+    "Its nest looks like a tiny clay jar.",
+    "The answer has 2 words (6, 4 letters).",
+    "Its first letter is P."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/7634909/medium.jpg",
+      "w": 500,
+      "h": 398,
+      "credit": "christine123",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/7634909"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/55089421/medium.jpeg",
+      "w": 335,
+      "h": 500,
+      "credit": "Douglas Goldman",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/55089421"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/152735859/medium.jpg",
+      "w": 500,
+      "h": 334,
+      "credit": "psweet",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/152735859"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "tarantula-hawk",
+   "name": "Tarantula hawk",
+   "sci": "Pepsis",
+   "group": "wasp",
+   "facts": {
+    "kind": "Wasp",
+    "stings": true,
+    "social": false
+   },
+   "blurb": "A huge blue-black wasp with orange wings that hunts tarantulas. Its sting is one of the most painful of any insect.",
+   "clues": [
+    "Family: Pompilidae.",
+    "Its sting ranks among the most painful in the world.",
+    "It is the state insect of New Mexico.",
+    "It lays an egg on a paralysed spider.",
+    "Females can sting.",
+    "It lives alone, not in a colony.",
+    "It has orange wings.",
+    "It hunts big hairy spiders.",
+    "The answer has 2 words (9, 4 letters).",
+    "Its first letter is T."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/205665581/medium.jpeg",
+      "w": 500,
+      "h": 333,
+      "credit": "Juan Cruzado Cortés",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/205665581"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/37845991/medium.jpg",
+      "w": 500,
+      "h": 500,
+      "credit": "Bill Levine",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/37845991"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/56129887/medium.jpeg",
+      "w": 500,
+      "h": 380,
+      "credit": "Francisco Farriols Sarabia",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/56129887"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "eastern-cicada-killer",
+   "name": "Eastern cicada killer",
+   "alt": [
+    "cicada killer"
+   ],
+   "sci": "Sphecius speciosus",
+   "group": "wasp",
+   "facts": {
+    "kind": "Wasp",
+    "stings": true,
+    "social": false
+   },
+   "blurb": "A huge solitary wasp of North America that hunts cicadas and carries them back to its burrow.",
+   "clues": [
+    "Family: Crabronidae.",
+    "Genus: Sphecius.",
+    "It flies with prey heavier than itself.",
+    "It digs burrows in sandy soil.",
+    "Males are territorial but cannot sting.",
+    "Females can sting.",
+    "It lives alone, not in a colony.",
+    "It is one of the largest wasps in North America.",
+    "It hunts loud summer insects.",
+    "The answer has 3 words (7, 6, 6 letters).",
+    "Its first letter is E."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/9100781/medium.jpg",
+      "w": 500,
+      "h": 337,
+      "credit": "Judy Gallagher",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/9100781"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/222310800/medium.jpeg",
+      "w": 375,
+      "h": 500,
+      "credit": "Tom Norton",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/222310800"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/421677119/medium.jpeg",
+      "w": 500,
+      "h": 375,
+      "credit": "W Rao",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/421677119"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "velvet-ant",
+   "name": "Velvet ant",
+   "alt": [
+    "cow killer"
+   ],
+   "sci": "Dasymutilla occidentalis",
+   "group": "wasp",
+   "facts": {
+    "kind": "Wasp",
+    "stings": true,
+    "social": false
+   },
+   "blurb": "A fuzzy red-and-black wingless insect that looks like an ant but is really a wasp. Its sting is very painful.",
+   "clues": [
+    "Family: Mutillidae.",
+    "Genus: Dasymutilla.",
+    "Females have no wings.",
+    "Females can sting.",
+    "It lives alone, not in a colony.",
+    "It is covered in red and black fuzz.",
+    "It is named after a soft fabric and a small insect.",
+    "The answer has 2 words (6, 3 letters).",
+    "Its first letter is V."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/10513401/medium.jpg",
+      "w": 500,
+      "h": 352,
+      "credit": "Judy Gallagher",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/10513401"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/104847092/medium.jpeg",
+      "w": 375,
+      "h": 500,
+      "credit": "no rights reserved",
+      "license": "CC0 1.0",
+      "page": "https://www.inaturalist.org/photos/104847092"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/2968008/medium.jpg",
+      "w": 500,
+      "h": 281,
+      "credit": "David Hebert",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/2968008"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "emerald-cockroach-wasp",
+   "name": "Emerald cockroach wasp",
+   "alt": [
+    "jewel wasp"
+   ],
+   "sci": "Ampulex compressa",
+   "group": "wasp",
+   "facts": {
+    "kind": "Wasp",
+    "stings": true,
+    "social": false
+   },
+   "blurb": "A shiny green wasp that stings a cockroach in the brain, then leads it to its burrow like a dog on a lead.",
+   "clues": [
+    "Family: Ampulicidae.",
+    "Genus: Ampulex.",
+    "It leads its victim by the antenna.",
+    "It stings its prey right in the brain.",
+    "It lays an egg on a living roach.",
+    "Females can sting.",
+    "It lives alone, not in a colony.",
+    "It shines metallic green.",
+    "It is named after a green gem and a kitchen pest.",
+    "The answer has 3 words (7, 9, 4 letters).",
+    "Its first letter is E."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/347213335/medium.jpeg",
+      "w": 500,
+      "h": 333,
+      "credit": "Carlos Alexandre Mattos Raposo",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/347213335"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/116827613/medium.jpeg",
+      "w": 500,
+      "h": 333,
+      "credit": "Carlos Alexandre Mattos Raposo",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/116827613"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/252077423/medium.jpg",
+      "w": 500,
+      "h": 331,
+      "credit": "Chandu Bandi",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/252077423"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "giant-ichneumon-wasp",
+   "name": "Giant ichneumon wasp",
+   "sci": "Megarhyssa",
+   "group": "wasp",
+   "facts": {
+    "kind": "Wasp",
+    "stings": false,
+    "social": false
+   },
+   "blurb": "A wasp with a hair-thin egg-laying tube longer than its body. It drills into wood to lay eggs on grubs.",
+   "clues": [
+    "It can smell grubs inside a tree.",
+    "It drills through solid wood.",
+    "Females have an egg-laying tube longer than their body.",
+    "It cannot sting.",
+    "It lives alone, not in a colony.",
+    "Despite its look, it does not sting people.",
+    "The answer has 3 words (5, 9, 4 letters).",
+    "Its first letter is G."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/25146753/medium.jpg",
+      "w": 500,
+      "h": 348,
+      "credit": "Zihao Wang",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/25146753"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/3942468/medium.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Ken-ichi Ueda",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/3942468"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/137922066/medium.jpg",
+      "w": 375,
+      "h": 500,
+      "credit": "anguspritchard",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/137922066"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "marmalade-hoverfly",
+   "name": "Marmalade hoverfly",
+   "alt": [
+    "hoverfly",
+    "hover fly"
+   ],
+   "sci": "Episyrphus balteatus",
+   "group": "fly",
+   "facts": {
+    "kind": "Fly",
+    "stings": false,
+    "social": false
+   },
+   "lookalikes": [
+    "common-wasp",
+    "honey-bee"
+   ],
+   "blurb": "A harmless fly dressed up like a wasp. It hovers still in the air and cannot sting.",
+   "clues": [
+    "Family: Syrphidae.",
+    "Genus: Episyrphus.",
+    "Its young eat aphids.",
+    "It has only one pair of wings, unlike wasps.",
+    "It has short, stubby antennae.",
+    "It cannot sting.",
+    "It lives alone, not in a colony.",
+    "It hangs still in the air.",
+    "It is named after an orange jam.",
+    "The answer has 2 words (9, 8 letters).",
+    "Its first letter is M."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/99038941/medium.jpeg",
+      "w": 500,
+      "h": 375,
+      "credit": "Michael Knapp",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/99038941"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/18548439/medium.jpeg",
+      "w": 454,
+      "h": 500,
+      "credit": "carnifex",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/18548439"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/201262356/medium.jpg",
+      "w": 500,
+      "h": 400,
+      "credit": "Alexis Tinker-Tsavalas",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/201262356"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "dark-edged-bee-fly",
+   "name": "Dark-edged bee-fly",
+   "alt": [
+    "bee-fly",
+    "bee fly"
+   ],
+   "sci": "Bombylius major",
+   "group": "fly",
+   "facts": {
+    "kind": "Fly",
+    "stings": false,
+    "social": false
+   },
+   "lookalikes": [
+    "buff-tailed-bumblebee"
+   ],
+   "blurb": "A furry fly that looks like a bee, with a long straight beak for drinking nectar. Its young live in bees' nests.",
+   "clues": [
+    "Family: Bombyliidae.",
+    "Genus: Bombylius.",
+    "Its young feed in the nests of solitary bees.",
+    "It has a long, stiff, straight tongue.",
+    "It cannot sting.",
+    "It lives alone, not in a colony.",
+    "The answer has 4 words (4, 5, 3, 3 letters).",
+    "Its first letter is D."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/368517415/medium.jpg",
+      "w": 500,
+      "h": 500,
+      "credit": "M. Whitson",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/368517415"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/14837087/medium.jpeg",
+      "w": 500,
+      "h": 442,
+      "credit": "Kostas Zontanos",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/14837087"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/354773453/medium.jpeg",
+      "w": 500,
+      "h": 500,
+      "credit": "no rights reserved",
+      "license": "CC0 1.0",
+      "page": "https://www.inaturalist.org/photos/354773453"
+     }
+    ]
+   },
+   "difficulty": 3
+  }
+ ],
+ "questions": [
+  {
+   "id": "q1",
+   "kind": "number",
+   "prompt": "How many legs does a bee have?",
+   "answer": 6,
+   "unit": "legs",
+   "tolerance": 0,
+   "explain": "Bees are insects, and all insects have six legs.",
+   "difficulty": 1
+  },
+  {
+   "id": "q2",
+   "kind": "mc",
+   "prompt": "What do honey bees make that people eat?",
+   "answer": "Honey",
+   "wrong": [
+    "Jam",
+    "Milk",
+    "Syrup"
+   ],
+   "explain": "They turn flower nectar into honey to feed the hive.",
+   "difficulty": 1
+  },
+  {
+   "id": "q3",
+   "kind": "tf",
+   "prompt": "A honey bee worker usually dies after stinging a person.",
+   "answer": true,
+   "explain": "Its barbed sting stays in our skin and tears away from the bee.",
+   "difficulty": 1
+  },
+  {
+   "id": "q4",
+   "kind": "tf",
+   "prompt": "Hoverflies can sting.",
+   "answer": false,
+   "explain": "Hoverflies are harmless flies that copy wasp colours.",
+   "difficulty": 1
+  },
+  {
+   "id": "q5",
+   "kind": "mc",
+   "prompt": "What does a honey bee's \"waggle dance\" tell the other bees?",
+   "answer": "Where to find flowers",
+   "wrong": [
+    "That the queen is hungry",
+    "That it is time to sleep",
+    "That a storm is coming"
+   ],
+   "explain": "The angle and length of the dance show direction and distance.",
+   "difficulty": 2
+  },
+  {
+   "id": "q6",
+   "kind": "mc",
+   "prompt": "Which is the largest wasp in the world?",
+   "answer": "Asian giant hornet",
+   "wrong": [
+    "European hornet",
+    "Tarantula hawk",
+    "Common wasp"
+   ],
+   "explain": "Queens can be about 5 cm long.",
+   "difficulty": 2
+  },
+  {
+   "id": "q7",
+   "kind": "mc",
+   "prompt": "How can you tell a hoverfly from a wasp?",
+   "answer": "It has one pair of wings",
+   "wrong": [
+    "It has eight legs",
+    "It has no eyes",
+    "It is always bigger"
+   ],
+   "explain": "Flies have one pair of wings; wasps and bees have two.",
+   "difficulty": 2
+  },
+  {
+   "id": "q8",
+   "kind": "mc",
+   "prompt": "What do common wasps build their nests from?",
+   "answer": "Chewed wood",
+   "wrong": [
+    "Wax",
+    "Mud",
+    "Leaves"
+   ],
+   "explain": "They mix wood fibres with saliva to make paper.",
+   "difficulty": 2
+  },
+  {
+   "id": "q9",
+   "kind": "tf",
+   "prompt": "Only female bees and wasps can sting.",
+   "answer": true,
+   "explain": "The sting is a modified egg-laying tube, so males have none.",
+   "difficulty": 2
+  },
+  {
+   "id": "q10",
+   "kind": "mc",
+   "prompt": "In a honey bee hive, which bee lays the eggs?",
+   "answer": "The queen",
+   "wrong": [
+    "The drones",
+    "The workers",
+    "The guards"
+   ],
+   "explain": "One queen can lay over a thousand eggs a day.",
+   "difficulty": 1
+  }
+ ],
+ "fakes": [
+  "Crimson mason hornet",
+  "Glass-winged honey wasp",
+  "Northern velvet bumblebee hornet",
+  "Striped thunder bee",
+  "Silver paper hornet",
+  "Golden digger hornet"
+ ],
+ "sources": [
+  {
+   "name": "iNaturalist",
+   "url": "https://www.inaturalist.org"
+  },
+  {
+   "name": "Wikidata",
+   "url": "https://www.wikidata.org"
+  }
+ ]
+}

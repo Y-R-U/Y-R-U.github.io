@@ -1,0 +1,1640 @@
+{
+ "id": "explorers",
+ "title": "Explorers",
+ "theme": "people",
+ "icon": "🧭",
+ "kids": false,
+ "version": 1,
+ "imgPrompt": "Which of these is {name}?",
+ "nameImgPrompt": "Who is this?",
+ "tfImgPrompt": "This is {name}.",
+ "factsMeta": {
+  "born": {
+   "type": "year",
+   "label": "Born",
+   "higherLabel": "Born later",
+   "askHigh": "Who of these was born most recently?",
+   "askLow": "Who of these was born first?"
+  },
+  "died": {
+   "type": "year",
+   "label": "Died",
+   "higherLabel": "Died later",
+   "askHigh": "Who of these died most recently?",
+   "askLow": "Who of these died first?"
+  },
+  "nationality": {
+   "type": "cat",
+   "label": "Nationality",
+   "exclusive": false,
+   "ask": "What nationality is {name}?",
+   "stmt": "{name}’s nationality: {value}."
+  },
+  "era": {
+   "type": "cat",
+   "label": "Born in",
+   "ask": "When was {name} born?",
+   "stmt": "{name} was born in the {value}."
+  },
+  "field": {
+   "type": "cat",
+   "label": "Field",
+   "ask": "What field is {name} best known for?",
+   "stmt": "{name} is best known for {value}."
+  }
+ },
+ "items": [
+  {
+   "id": "marco-polo",
+   "name": "Marco Polo",
+   "alt": [],
+   "group": "exploration",
+   "facts": {
+    "born": 1254,
+    "died": 1324,
+    "nationality": "Venetian",
+    "era": "Middle Ages",
+    "field": "exploration"
+   },
+   "blurb": "Marco Polo (1254–1324): A Venetian traveller who wrote about China.",
+   "clues": [
+    "He told his stories to a writer while in prison in Genoa.",
+    "He travelled the Silk Road with his father and uncle.",
+    "He served the Mongol ruler Kublai Khan.",
+    "Born in 1254.",
+    "Nationality: Venetian.",
+    "He was a Venetian traveller who wrote about China."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b0/Marco_Polo_Mosaic_from_Palazzo_Tursi.jpg/500px-Marco_Polo_Mosaic_from_Palazzo_Tursi.jpg",
+      "w": 500,
+      "h": 628,
+      "credit": "Salviati",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Marco_Polo_Mosaic_from_Palazzo_Tursi.jpg"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "ibn-battuta",
+   "name": "Ibn Battuta",
+   "alt": [],
+   "group": "exploration",
+   "facts": {
+    "born": 1304,
+    "died": 1368,
+    "nationality": "Moroccan",
+    "era": "Middle Ages",
+    "field": "exploration"
+   },
+   "blurb": "Ibn Battuta (1304–1368): A Muslim explorer of Africa and Asia.",
+   "clues": [
+    "He was born in Tangier.",
+    "He travelled for nearly 30 years.",
+    "He covered more distance than any known traveller before the steam age.",
+    "Born in 1304.",
+    "Nationality: Moroccan.",
+    "He was a Muslim explorer of Africa and Asia."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a4/Bust_of_Ibn_Battuta_at_Ibn_Battuta_museum.jpg/330px-Bust_of_Ibn_Battuta_at_Ibn_Battuta_museum.jpg",
+      "w": 330,
+      "h": 481,
+      "credit": "Ideophagous",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Bust_of_Ibn_Battuta_at_Ibn_Battuta_museum.jpg"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "zheng-he",
+   "name": "Zheng He",
+   "alt": [],
+   "group": "exploration",
+   "facts": {
+    "born": 1371,
+    "died": 1433,
+    "nationality": "Chinese",
+    "era": "Middle Ages",
+    "field": "exploration"
+   },
+   "blurb": "Zheng He (1371–1433): A Chinese admiral and explorer.",
+   "clues": [
+    "He was a Muslim admiral of the Ming dynasty.",
+    "His treasure ships were among the largest wooden ships ever built.",
+    "He led seven voyages to Asia and East Africa.",
+    "Born in 1371.",
+    "Nationality: Chinese.",
+    "He was a Chinese admiral and explorer."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/0e/2016_Malakka%2C_Stadhuys_%2809%29.jpg/330px-2016_Malakka%2C_Stadhuys_%2809%29.jpg",
+      "w": 330,
+      "h": 495,
+      "credit": "Marcin Konsek",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:2016_Malakka,_Stadhuys_(09).jpg"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "christopher-columbus",
+   "name": "Christopher Columbus",
+   "alt": [
+    "Columbus",
+    "Cristoforo Colombo"
+   ],
+   "group": "exploration",
+   "facts": {
+    "born": 1451,
+    "died": 1506,
+    "nationality": "Genoese",
+    "era": "Middle Ages",
+    "field": "exploration"
+   },
+   "blurb": "Christopher Columbus (1451–1506): Sailed across the Atlantic for Spain in 1492.",
+   "clues": [
+    "He was born in Genoa.",
+    "He thought he had reached Asia.",
+    "His ships included the Niña, the Pinta and the Santa María.",
+    "Born in 1451.",
+    "Nationality: Genoese.",
+    "He sailed across the Atlantic for Spain in 1492."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/05/Ridolfo_del_Ghirlandaio_-_Ritratto_di_Cristoforo_Colombo_%281520%29.jpg/500px-Ridolfo_del_Ghirlandaio_-_Ritratto_di_Cristoforo_Colombo_%281520%29.jpg",
+      "w": 500,
+      "h": 589,
+      "credit": "Ridolfo del Ghirlandaio",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Ridolfo_del_Ghirlandaio_-_Ritratto_di_Cristoforo_Colombo_(1520).jpg"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "ferdinand-magellan",
+   "name": "Ferdinand Magellan",
+   "alt": [
+    "Magellan"
+   ],
+   "group": "exploration",
+   "facts": {
+    "born": 1480,
+    "died": 1521,
+    "nationality": "Portuguese",
+    "era": "Middle Ages",
+    "field": "exploration"
+   },
+   "blurb": "Ferdinand Magellan (1480–1521): Led the first expedition to sail around the world.",
+   "clues": [
+    "He was killed in the Philippines in 1521.",
+    "A strait at the tip of South America is named after him.",
+    "He named the Pacific Ocean.",
+    "Born in 1480.",
+    "Nationality: Portuguese.",
+    "He led the first expedition to sail around the world."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/92/Retrato_de_Hernando_de_Magallanes.jpg/500px-Retrato_de_Hernando_de_Magallanes.jpg",
+      "w": 500,
+      "h": 631,
+      "credit": "Unknown artistUnknown artist",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Retrato_de_Hernando_de_Magallanes.jpg"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "hernan-cortes",
+   "name": "Hernán Cortés",
+   "alt": [
+    "Hernan Cortes",
+    "Cortez"
+   ],
+   "group": "exploration",
+   "facts": {
+    "born": 1485,
+    "died": 1547,
+    "nationality": "Spanish",
+    "era": "Middle Ages",
+    "field": "exploration"
+   },
+   "blurb": "Hernán Cortés (1485–1547): Brought about the fall of the Aztec Empire.",
+   "clues": [
+    "He landed on the coast of Mexico in 1519.",
+    "He met the ruler Moctezuma II.",
+    "He is called a conquistador.",
+    "Born in 1485.",
+    "Nationality: Spanish.",
+    "He brought about the fall of the Aztec Empire."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/06/Retrato_de_Hern%C3%A1n_Cort%C3%A9s.jpg/500px-Retrato_de_Hern%C3%A1n_Cort%C3%A9s.jpg",
+      "w": 500,
+      "h": 589,
+      "credit": "Unknown artistUnknown artist",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Retrato_de_Hern%C3%A1n_Cort%C3%A9s.jpg"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "abel-tasman",
+   "name": "Abel Tasman",
+   "alt": [
+    "Tasman"
+   ],
+   "group": "exploration",
+   "facts": {
+    "born": 1603,
+    "died": 1659,
+    "nationality": "Dutch",
+    "era": "1500s to 1700s",
+    "field": "exploration"
+   },
+   "blurb": "Abel Tasman (1603–1659): A Dutch seafarer.",
+   "clues": [
+    "He worked for the Dutch East India Company.",
+    "He was the first known European to reach New Zealand.",
+    "An island state of Australia is named after him.",
+    "Born in 1603.",
+    "Nationality: Dutch.",
+    "He was a Dutch seafarer."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f0/Abel_Tasman_Navigateur_en_Australie_%28cropped%29.jpg/500px-Abel_Tasman_Navigateur_en_Australie_%28cropped%29.jpg",
+      "w": 500,
+      "h": 500,
+      "credit": "Unknown authorUnknown author",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Abel_Tasman_Navigateur_en_Australie_(cropped).jpg"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "james-cook",
+   "name": "James Cook",
+   "alt": [
+    "Captain Cook"
+   ],
+   "group": "exploration",
+   "facts": {
+    "born": 1728,
+    "died": 1779,
+    "nationality": "British",
+    "era": "1500s to 1700s",
+    "field": "exploration"
+   },
+   "blurb": "James Cook (1728–1779): Charted the east coast of Australia.",
+   "clues": [
+    "He was killed in Hawaii in 1779.",
+    "He mapped the coast of New Zealand.",
+    "His ship on his first voyage was HMS Endeavour.",
+    "Born in 1728.",
+    "Nationality: British.",
+    "He charted the east coast of Australia."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/7/76/Captainjamescookportrait.jpg/500px-Captainjamescookportrait.jpg",
+      "w": 500,
+      "h": 627,
+      "credit": "Nathaniel Dance-Holland",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Captainjamescookportrait.jpg"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "david-livingstone",
+   "name": "David Livingstone",
+   "alt": [
+    "Dr Livingstone"
+   ],
+   "group": "exploration",
+   "facts": {
+    "born": 1813,
+    "died": 1873,
+    "nationality": "Scottish",
+    "era": "1800s",
+    "field": "exploration"
+   },
+   "blurb": "David Livingstone (1813–1873): A Scottish explorer of Africa.",
+   "clues": [
+    "He was a missionary doctor.",
+    "He was the first European to see Victoria Falls.",
+    "Born in 1813.",
+    "Nationality: Scottish.",
+    "He was a Scottish explorer of Africa."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f2/David_Livingstone_by_Thomas_Annan.jpg/500px-David_Livingstone_by_Thomas_Annan.jpg",
+      "w": 500,
+      "h": 611,
+      "credit": "Thomas Annan / Adam Cuerden",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:David_Livingstone_by_Thomas_Annan.jpg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "matthew-henson",
+   "name": "Matthew Henson",
+   "alt": [
+    "Henson"
+   ],
+   "group": "exploration",
+   "facts": {
+    "born": 1866,
+    "died": 1955,
+    "nationality": "American",
+    "era": "1800s",
+    "field": "exploration"
+   },
+   "blurb": "Matthew Henson (1866–1955): An African American Arctic explorer.",
+   "clues": [
+    "He spoke the Inuit language.",
+    "He travelled with Robert Peary for over 20 years.",
+    "He was part of the 1909 expedition that claimed to reach the North Pole.",
+    "Born in 1866.",
+    "Nationality: American.",
+    "He was an African American Arctic explorer."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/81/Matthew_Henson_1910.jpg/500px-Matthew_Henson_1910.jpg",
+      "w": 500,
+      "h": 594,
+      "credit": "Unknown authorUnknown author",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Matthew_Henson_1910.jpg"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "robert-falcon-scott",
+   "name": "Robert Falcon Scott",
+   "alt": [
+    "Captain Scott"
+   ],
+   "group": "exploration",
+   "facts": {
+    "born": 1868,
+    "died": 1912,
+    "nationality": "British",
+    "era": "1800s",
+    "field": "exploration"
+   },
+   "blurb": "Robert Falcon Scott (1868–1912): Led the doomed Terra Nova expedition.",
+   "clues": [
+    "His ship on his first Antarctic expedition was the Discovery.",
+    "He died on the return journey in 1912.",
+    "He reached the South Pole a month after Roald Amundsen.",
+    "Born in 1868.",
+    "Nationality: British.",
+    "He led the doomed Terra Nova expedition."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/7/72/Scott_of_the_Antarctic_%28bw%29_%28cropped%29.jpg/330px-Scott_of_the_Antarctic_%28bw%29_%28cropped%29.jpg",
+      "w": 330,
+      "h": 438,
+      "credit": "Henry Maull (1829–1914) and John Fox (1832–1907)",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Scott_of_the_Antarctic_(bw)_(cropped).jpg"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "roald-amundsen",
+   "name": "Roald Amundsen",
+   "alt": [
+    "Amundsen"
+   ],
+   "group": "exploration",
+   "facts": {
+    "born": 1872,
+    "died": 1928,
+    "nationality": "Norwegian",
+    "era": "1800s",
+    "field": "exploration"
+   },
+   "blurb": "Roald Amundsen (1872–1928): The first person to reach the South Pole.",
+   "clues": [
+    "He was the first to sail through the Northwest Passage.",
+    "He relied on sled dogs to reach his goal.",
+    "He reached the South Pole in December 1911.",
+    "Born in 1872.",
+    "Nationality: Norwegian.",
+    "He was the first person to reach the South Pole."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/6/6f/Amundsen_in_fur_skins.jpg/330px-Amundsen_in_fur_skins.jpg",
+      "w": 330,
+      "h": 444,
+      "credit": "AnonymousUnknown author",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Amundsen_in_fur_skins.jpg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "ernest-shackleton",
+   "name": "Ernest Shackleton",
+   "alt": [
+    "Shackleton"
+   ],
+   "group": "exploration",
+   "facts": {
+    "born": 1874,
+    "died": 1922,
+    "nationality": "Irish-born British",
+    "era": "1800s",
+    "field": "exploration"
+   },
+   "blurb": "Ernest Shackleton (1874–1922): Brought all his men home after their ship sank.",
+   "clues": [
+    "He sailed 1,300 km in a small lifeboat to get help.",
+    "His ship Endurance was crushed by ice.",
+    "He led an expedition that tried to cross Antarctica.",
+    "Born in 1874.",
+    "Nationality: Irish-born British.",
+    "He brought all his men home after their ship sank."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e3/Ernest_Henry_Shackleton_Nadar.jpg/330px-Ernest_Henry_Shackleton_Nadar.jpg",
+      "w": 330,
+      "h": 439,
+      "credit": "Nadar",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Ernest_Henry_Shackleton_Nadar.jpg"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "amelia-earhart",
+   "name": "Amelia Earhart",
+   "alt": [
+    "Earhart"
+   ],
+   "group": "exploration",
+   "facts": {
+    "born": 1897,
+    "died": 1939,
+    "nationality": "American",
+    "era": "1800s",
+    "field": "exploration"
+   },
+   "blurb": "Amelia Earhart (1897–1939): A famous American aviator.",
+   "clues": [
+    "She vanished over the Pacific in 1937.",
+    "She tried to fly around the world.",
+    "She was the first woman to fly solo across the Atlantic.",
+    "Born in 1897.",
+    "Nationality: American.",
+    "She was a famous American aviator."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d2/Amelia_Earhart_1935.jpg/500px-Amelia_Earhart_1935.jpg",
+      "w": 500,
+      "h": 626,
+      "credit": "NBC Photo-NBC Radio",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Amelia_Earhart_1935.jpg"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "charles-lindbergh",
+   "name": "Charles Lindbergh",
+   "alt": [
+    "Lindbergh"
+   ],
+   "group": "exploration",
+   "facts": {
+    "born": 1902,
+    "died": 1974,
+    "nationality": "American",
+    "era": "1900s or later",
+    "field": "exploration"
+   },
+   "blurb": "Charles Lindbergh (1902–1974): Made the first solo non-stop flight across the Atlantic.",
+   "clues": [
+    "His aircraft was called the Spirit of St. Louis.",
+    "He flew from New York to Paris in 1927.",
+    "He won a large cash prize for his flight.",
+    "Born in 1902.",
+    "Nationality: American.",
+    "He made the first solo non-stop flight across the Atlantic."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/7/70/Col_Charles_Lindbergh%2C_original%2C_hec.21329.jpg/500px-Col_Charles_Lindbergh%2C_original%2C_hec.21329.jpg",
+      "w": 500,
+      "h": 635,
+      "credit": "Harris & Ewing",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Col_Charles_Lindbergh,_original,_hec.21329.jpg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "jacques-cousteau",
+   "name": "Jacques Cousteau",
+   "alt": [
+    "Cousteau"
+   ],
+   "group": "exploration",
+   "facts": {
+    "born": 1910,
+    "died": 1997,
+    "nationality": "French",
+    "era": "1900s or later",
+    "field": "exploration"
+   },
+   "blurb": "Jacques Cousteau (1910–1997): A French ocean explorer.",
+   "clues": [
+    "His ship was called Calypso.",
+    "He made films about life under the sea.",
+    "He co-invented the Aqua-Lung.",
+    "Born in 1910.",
+    "Nationality: French.",
+    "He was a French ocean explorer."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/1/10/Cousteau1972_%28cropped%29.jpg/330px-Cousteau1972_%28cropped%29.jpg",
+      "w": 330,
+      "h": 463,
+      "credit": "Hans Peters for Anefo .",
+      "license": "CC0",
+      "page": "https://commons.wikimedia.org/wiki/File:Cousteau1972_(cropped).jpg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "tenzing-norgay",
+   "name": "Tenzing Norgay",
+   "alt": [
+    "Tenzing"
+   ],
+   "group": "exploration",
+   "facts": {
+    "born": 1914,
+    "died": 1986,
+    "nationality": "Nepali",
+    "era": "1900s or later",
+    "field": "exploration"
+   },
+   "blurb": "Tenzing Norgay (1914–1986): One of the first two people to climb Everest.",
+   "clues": [
+    "He was a Sherpa from the Khumbu region.",
+    "He had tried to climb the mountain six times before.",
+    "He reached the summit in 1953 with Edmund Hillary.",
+    "Born in 1914.",
+    "Nationality: Nepali.",
+    "He was one of the first two people to climb Everest."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c1/Tenzing_Norgay%2C_1953_-_2.jpg/330px-Tenzing_Norgay%2C_1953_-_2.jpg",
+      "w": 330,
+      "h": 437,
+      "credit": "original : OeiJamling Tenzing Norgay",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Tenzing_Norgay,_1953_-_2.jpg"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "edmund-hillary",
+   "name": "Edmund Hillary",
+   "alt": [
+    "Hillary",
+    "Sir Edmund Hillary"
+   ],
+   "group": "exploration",
+   "facts": {
+    "born": 1919,
+    "died": 2008,
+    "nationality": "New Zealander",
+    "era": "1900s or later",
+    "field": "exploration"
+   },
+   "blurb": "Edmund Hillary (1919–2008): One of the first two people to climb Mount Everest.",
+   "clues": [
+    "He was a beekeeper.",
+    "He drove a tractor to the South Pole.",
+    "He reached the top of Everest in 1953 with Tenzing Norgay.",
+    "Born in 1919.",
+    "Nationality: New Zealander.",
+    "He was one of the first two people to climb Mount Everest."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/7/76/Edmund_Hillary%2C_c._1953%2C_autograph_removed.jpg/500px-Edmund_Hillary%2C_c._1953%2C_autograph_removed.jpg",
+      "w": 500,
+      "h": 635,
+      "credit": "Photographer unidentified. Retouched by TimofKingsland.",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Edmund_Hillary,_c._1953,_autograph_removed.jpg"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "neil-armstrong",
+   "name": "Neil Armstrong",
+   "alt": [
+    "Armstrong"
+   ],
+   "group": "exploration",
+   "facts": {
+    "born": 1930,
+    "died": 2012,
+    "nationality": "American",
+    "era": "1900s or later",
+    "field": "exploration"
+   },
+   "blurb": "Neil Armstrong (1930–2012): The first person to walk on the Moon.",
+   "clues": [
+    "He was a test pilot who flew the X-15 rocket plane.",
+    "He commanded Gemini 8.",
+    "He said That's one small step for man.",
+    "Born in 1930.",
+    "Nationality: American.",
+    "He was the first person to walk on the Moon."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/0d/Neil_Armstrong_pose.jpg/500px-Neil_Armstrong_pose.jpg",
+      "w": 500,
+      "h": 625,
+      "credit": "Unknown authorUnknown author",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Neil_Armstrong_pose.jpg"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "buzz-aldrin",
+   "name": "Buzz Aldrin",
+   "alt": [
+    "Edwin Aldrin"
+   ],
+   "group": "exploration",
+   "facts": {
+    "born": 1930,
+    "nationality": "American",
+    "era": "1900s or later",
+    "field": "exploration"
+   },
+   "blurb": "Buzz Aldrin (1930): The second person to walk on the Moon.",
+   "clues": [
+    "He was the pilot of the lunar module Eagle.",
+    "He walked on the Moon with Neil Armstrong.",
+    "Born in 1930.",
+    "Nationality: American.",
+    "He was the second person to walk on the Moon."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/d/dc/Buzz_Aldrin.jpg/500px-Buzz_Aldrin.jpg",
+      "w": 500,
+      "h": 625,
+      "credit": "NASA",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Buzz_Aldrin.jpg"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "yuri-gagarin",
+   "name": "Yuri Gagarin",
+   "alt": [
+    "Gagarin"
+   ],
+   "group": "exploration",
+   "facts": {
+    "born": 1934,
+    "died": 1968,
+    "nationality": "Soviet",
+    "era": "1900s or later",
+    "field": "exploration"
+   },
+   "blurb": "Yuri Gagarin (1934–1968): The first human in space.",
+   "clues": [
+    "He died in a jet crash in 1968.",
+    "His spacecraft was called Vostok 1.",
+    "He orbited the Earth once in 1961.",
+    "Born in 1934.",
+    "Nationality: Soviet.",
+    "He was the first human in space."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4d/Yuri_Gagarin_portrait.png/330px-Yuri_Gagarin_portrait.png",
+      "w": 330,
+      "h": 477,
+      "credit": "В. Жихаренко / ТАСС Обработка: Roman Kubanskiy",
+      "license": "CC BY 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Yuri_Gagarin_portrait.png"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "valentina-tereshkova",
+   "name": "Valentina Tereshkova",
+   "alt": [
+    "Tereshkova"
+   ],
+   "group": "exploration",
+   "facts": {
+    "born": 1937,
+    "nationality": "Soviet",
+    "era": "1900s or later",
+    "field": "exploration"
+   },
+   "blurb": "Valentina Tereshkova (1937): The first woman in space.",
+   "clues": [
+    "She was a factory worker and amateur parachutist.",
+    "Her call sign was Chaika, meaning seagull.",
+    "She flew Vostok 6 in 1963.",
+    "Born in 1937.",
+    "Nationality: Soviet.",
+    "She was the first woman in space."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/96/1st_meeting_of_8th_State_Duma_07.jpg/500px-1st_meeting_of_8th_State_Duma_07.jpg",
+      "w": 500,
+      "h": 339,
+      "credit": "duma.gov.ru",
+      "license": "CC BY 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:1st_meeting_of_8th_State_Duma_07.jpg"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "sally-ride",
+   "name": "Sally Ride",
+   "alt": [
+    "Ride"
+   ],
+   "group": "exploration",
+   "facts": {
+    "born": 1951,
+    "died": 2012,
+    "nationality": "American",
+    "era": "1900s or later",
+    "field": "exploration"
+   },
+   "blurb": "Sally Ride (1951–2012): The first American woman in space.",
+   "clues": [
+    "She had a PhD in physics.",
+    "She flew on the space shuttle Challenger.",
+    "She was the youngest American in space at the time.",
+    "Born in 1951.",
+    "Nationality: American.",
+    "She was the first American woman in space."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/0c/Sally_Ride_%281984%29.jpg/500px-Sally_Ride_%281984%29.jpg",
+      "w": 500,
+      "h": 625,
+      "credit": "NASA; retouched by Coffeeandcrumbs",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Sally_Ride_(1984).jpg"
+     }
+    ]
+   },
+   "difficulty": 2
+  }
+ ],
+ "questions": [
+  {
+   "id": "who-marco-polo",
+   "kind": "mc",
+   "prompt": "Who is this? He was a Venetian traveller who wrote about China.",
+   "answer": "Marco Polo",
+   "wrong": [
+    "Matthew Henson",
+    "Valentina Tereshkova",
+    "Tenzing Norgay"
+   ],
+   "explain": "Marco Polo (1254–1324): A Venetian traveller who wrote about China.",
+   "difficulty": 1,
+   "refs": [
+    "explorers/marco-polo"
+   ]
+  },
+  {
+   "id": "born-marco-polo",
+   "kind": "mc",
+   "prompt": "In which year was Marco Polo born?",
+   "answer": "1254",
+   "wrong": [
+    "1244",
+    "1284",
+    "1234"
+   ],
+   "explain": "Marco Polo (1254–1324): A Venetian traveller who wrote about China.",
+   "difficulty": 3,
+   "refs": [
+    "explorers/marco-polo"
+   ]
+  },
+  {
+   "id": "who-ibn-battuta",
+   "kind": "mc",
+   "prompt": "Who is this? He was a Muslim explorer of Africa and Asia.",
+   "answer": "Ibn Battuta",
+   "wrong": [
+    "Valentina Tereshkova",
+    "Abel Tasman",
+    "Tenzing Norgay"
+   ],
+   "explain": "Ibn Battuta (1304–1368): A Muslim explorer of Africa and Asia.",
+   "difficulty": 3,
+   "refs": [
+    "explorers/ibn-battuta"
+   ]
+  },
+  {
+   "id": "born-ibn-battuta",
+   "kind": "mc",
+   "prompt": "In which year was Ibn Battuta born?",
+   "answer": "1304",
+   "wrong": [
+    "1314",
+    "1324",
+    "1294"
+   ],
+   "explain": "Ibn Battuta (1304–1368): A Muslim explorer of Africa and Asia.",
+   "difficulty": 3,
+   "refs": [
+    "explorers/ibn-battuta"
+   ]
+  },
+  {
+   "id": "who-zheng-he",
+   "kind": "mc",
+   "prompt": "Who is this? He was a Chinese admiral and explorer.",
+   "answer": "Zheng He",
+   "wrong": [
+    "Valentina Tereshkova",
+    "Jacques Cousteau",
+    "Ernest Shackleton"
+   ],
+   "explain": "Zheng He (1371–1433): A Chinese admiral and explorer.",
+   "difficulty": 3,
+   "refs": [
+    "explorers/zheng-he"
+   ]
+  },
+  {
+   "id": "born-zheng-he",
+   "kind": "mc",
+   "prompt": "In which year was Zheng He born?",
+   "answer": "1371",
+   "wrong": [
+    "1391",
+    "1381",
+    "1341"
+   ],
+   "explain": "Zheng He (1371–1433): A Chinese admiral and explorer.",
+   "difficulty": 3,
+   "refs": [
+    "explorers/zheng-he"
+   ]
+  },
+  {
+   "id": "who-christopher-columbus",
+   "kind": "mc",
+   "prompt": "Who is this? He sailed across the Atlantic for Spain in 1492.",
+   "answer": "Christopher Columbus",
+   "wrong": [
+    "Marco Polo",
+    "Zheng He",
+    "Buzz Aldrin"
+   ],
+   "explain": "Christopher Columbus (1451–1506): Sailed across the Atlantic for Spain in 1492.",
+   "difficulty": 1,
+   "refs": [
+    "explorers/christopher-columbus"
+   ]
+  },
+  {
+   "id": "born-christopher-columbus",
+   "kind": "mc",
+   "prompt": "In which year was Christopher Columbus born?",
+   "answer": "1451",
+   "wrong": [
+    "1441",
+    "1431",
+    "1471"
+   ],
+   "explain": "Christopher Columbus (1451–1506): Sailed across the Atlantic for Spain in 1492.",
+   "difficulty": 3,
+   "refs": [
+    "explorers/christopher-columbus"
+   ]
+  },
+  {
+   "id": "who-ferdinand-magellan",
+   "kind": "mc",
+   "prompt": "Who is this? He led the first expedition to sail around the world.",
+   "answer": "Ferdinand Magellan",
+   "wrong": [
+    "Charles Lindbergh",
+    "Matthew Henson",
+    "Ernest Shackleton"
+   ],
+   "explain": "Ferdinand Magellan (1480–1521): Led the first expedition to sail around the world.",
+   "difficulty": 1,
+   "refs": [
+    "explorers/ferdinand-magellan"
+   ]
+  },
+  {
+   "id": "born-ferdinand-magellan",
+   "kind": "mc",
+   "prompt": "In which year was Ferdinand Magellan born?",
+   "answer": "1480",
+   "wrong": [
+    "1510",
+    "1490",
+    "1460"
+   ],
+   "explain": "Ferdinand Magellan (1480–1521): Led the first expedition to sail around the world.",
+   "difficulty": 3,
+   "refs": [
+    "explorers/ferdinand-magellan"
+   ]
+  },
+  {
+   "id": "who-hernan-cortes",
+   "kind": "mc",
+   "prompt": "Who is this? He brought about the fall of the Aztec Empire.",
+   "answer": "Hernán Cortés",
+   "wrong": [
+    "Abel Tasman",
+    "Matthew Henson",
+    "Ibn Battuta"
+   ],
+   "explain": "Hernán Cortés (1485–1547): Brought about the fall of the Aztec Empire.",
+   "difficulty": 3,
+   "refs": [
+    "explorers/hernan-cortes"
+   ]
+  },
+  {
+   "id": "born-hernan-cortes",
+   "kind": "mc",
+   "prompt": "In which year was Hernán Cortés born?",
+   "answer": "1485",
+   "wrong": [
+    "1515",
+    "1455",
+    "1495"
+   ],
+   "explain": "Hernán Cortés (1485–1547): Brought about the fall of the Aztec Empire.",
+   "difficulty": 3,
+   "refs": [
+    "explorers/hernan-cortes"
+   ]
+  },
+  {
+   "id": "who-abel-tasman",
+   "kind": "mc",
+   "prompt": "Who is this? He was a Dutch seafarer.",
+   "answer": "Abel Tasman",
+   "wrong": [
+    "Tenzing Norgay",
+    "Sally Ride",
+    "Ferdinand Magellan"
+   ],
+   "explain": "Abel Tasman (1603–1659): A Dutch seafarer.",
+   "difficulty": 3,
+   "refs": [
+    "explorers/abel-tasman"
+   ]
+  },
+  {
+   "id": "born-abel-tasman",
+   "kind": "mc",
+   "prompt": "In which year was Abel Tasman born?",
+   "answer": "1603",
+   "wrong": [
+    "1633",
+    "1613",
+    "1583"
+   ],
+   "explain": "Abel Tasman (1603–1659): A Dutch seafarer.",
+   "difficulty": 3,
+   "refs": [
+    "explorers/abel-tasman"
+   ]
+  },
+  {
+   "id": "who-james-cook",
+   "kind": "mc",
+   "prompt": "Who is this? He charted the east coast of Australia.",
+   "answer": "James Cook",
+   "wrong": [
+    "Buzz Aldrin",
+    "Edmund Hillary",
+    "Yuri Gagarin"
+   ],
+   "explain": "James Cook (1728–1779): Charted the east coast of Australia.",
+   "difficulty": 1,
+   "refs": [
+    "explorers/james-cook"
+   ]
+  },
+  {
+   "id": "born-james-cook",
+   "kind": "mc",
+   "prompt": "In which year was James Cook born?",
+   "answer": "1728",
+   "wrong": [
+    "1698",
+    "1718",
+    "1708"
+   ],
+   "explain": "James Cook (1728–1779): Charted the east coast of Australia.",
+   "difficulty": 3,
+   "refs": [
+    "explorers/james-cook"
+   ]
+  },
+  {
+   "id": "who-david-livingstone",
+   "kind": "mc",
+   "prompt": "Who is this? He was a Scottish explorer of Africa.",
+   "answer": "David Livingstone",
+   "wrong": [
+    "Zheng He",
+    "Tenzing Norgay",
+    "Valentina Tereshkova"
+   ],
+   "explain": "David Livingstone (1813–1873): A Scottish explorer of Africa.",
+   "difficulty": 2,
+   "refs": [
+    "explorers/david-livingstone"
+   ]
+  },
+  {
+   "id": "born-david-livingstone",
+   "kind": "mc",
+   "prompt": "In which year was David Livingstone born?",
+   "answer": "1813",
+   "wrong": [
+    "1783",
+    "1803",
+    "1823"
+   ],
+   "explain": "David Livingstone (1813–1873): A Scottish explorer of Africa.",
+   "difficulty": 3,
+   "refs": [
+    "explorers/david-livingstone"
+   ]
+  },
+  {
+   "id": "who-matthew-henson",
+   "kind": "mc",
+   "prompt": "Who is this? He was an African American Arctic explorer.",
+   "answer": "Matthew Henson",
+   "wrong": [
+    "Robert Falcon Scott",
+    "Hernán Cortés",
+    "Sally Ride"
+   ],
+   "explain": "Matthew Henson (1866–1955): An African American Arctic explorer.",
+   "difficulty": 3,
+   "refs": [
+    "explorers/matthew-henson"
+   ]
+  },
+  {
+   "id": "born-matthew-henson",
+   "kind": "mc",
+   "prompt": "In which year was Matthew Henson born?",
+   "answer": "1866",
+   "wrong": [
+    "1846",
+    "1856",
+    "1886"
+   ],
+   "explain": "Matthew Henson (1866–1955): An African American Arctic explorer.",
+   "difficulty": 3,
+   "refs": [
+    "explorers/matthew-henson"
+   ]
+  },
+  {
+   "id": "who-robert-falcon-scott",
+   "kind": "mc",
+   "prompt": "Who is this? He led the doomed Terra Nova expedition.",
+   "answer": "Robert Falcon Scott",
+   "wrong": [
+    "James Cook",
+    "Ferdinand Magellan",
+    "Ernest Shackleton"
+   ],
+   "explain": "Robert Falcon Scott (1868–1912): Led the doomed Terra Nova expedition.",
+   "difficulty": 1,
+   "refs": [
+    "explorers/robert-falcon-scott"
+   ]
+  },
+  {
+   "id": "born-robert-falcon-scott",
+   "kind": "mc",
+   "prompt": "In which year was Robert Falcon Scott born?",
+   "answer": "1868",
+   "wrong": [
+    "1898",
+    "1858",
+    "1838"
+   ],
+   "explain": "Robert Falcon Scott (1868–1912): Led the doomed Terra Nova expedition.",
+   "difficulty": 3,
+   "refs": [
+    "explorers/robert-falcon-scott"
+   ]
+  },
+  {
+   "id": "who-roald-amundsen",
+   "kind": "mc",
+   "prompt": "Who is this? He was the first person to reach the South Pole.",
+   "answer": "Roald Amundsen",
+   "wrong": [
+    "James Cook",
+    "Charles Lindbergh",
+    "Ferdinand Magellan"
+   ],
+   "explain": "Roald Amundsen (1872–1928): The first person to reach the South Pole.",
+   "difficulty": 2,
+   "refs": [
+    "explorers/roald-amundsen"
+   ]
+  },
+  {
+   "id": "born-roald-amundsen",
+   "kind": "mc",
+   "prompt": "In which year was Roald Amundsen born?",
+   "answer": "1872",
+   "wrong": [
+    "1892",
+    "1852",
+    "1902"
+   ],
+   "explain": "Roald Amundsen (1872–1928): The first person to reach the South Pole.",
+   "difficulty": 3,
+   "refs": [
+    "explorers/roald-amundsen"
+   ]
+  },
+  {
+   "id": "who-ernest-shackleton",
+   "kind": "mc",
+   "prompt": "Who is this? He brought all his men home after their ship sank.",
+   "answer": "Ernest Shackleton",
+   "wrong": [
+    "Sally Ride",
+    "Neil Armstrong",
+    "Christopher Columbus"
+   ],
+   "explain": "Ernest Shackleton (1874–1922): Brought all his men home after their ship sank.",
+   "difficulty": 1,
+   "refs": [
+    "explorers/ernest-shackleton"
+   ]
+  },
+  {
+   "id": "born-ernest-shackleton",
+   "kind": "mc",
+   "prompt": "In which year was Ernest Shackleton born?",
+   "answer": "1874",
+   "wrong": [
+    "1884",
+    "1844",
+    "1904"
+   ],
+   "explain": "Ernest Shackleton (1874–1922): Brought all his men home after their ship sank.",
+   "difficulty": 3,
+   "refs": [
+    "explorers/ernest-shackleton"
+   ]
+  },
+  {
+   "id": "who-amelia-earhart",
+   "kind": "mc",
+   "prompt": "Who is this? She was a famous American aviator.",
+   "answer": "Amelia Earhart",
+   "wrong": [
+    "Sally Ride",
+    "James Cook",
+    "Tenzing Norgay"
+   ],
+   "explain": "Amelia Earhart (1897–1939): A famous American aviator.",
+   "difficulty": 1,
+   "refs": [
+    "explorers/amelia-earhart"
+   ]
+  },
+  {
+   "id": "born-amelia-earhart",
+   "kind": "mc",
+   "prompt": "In which year was Amelia Earhart born?",
+   "answer": "1897",
+   "wrong": [
+    "1917",
+    "1927",
+    "1887"
+   ],
+   "explain": "Amelia Earhart (1897–1939): A famous American aviator.",
+   "difficulty": 3,
+   "refs": [
+    "explorers/amelia-earhart"
+   ]
+  },
+  {
+   "id": "who-charles-lindbergh",
+   "kind": "mc",
+   "prompt": "Who is this? He made the first solo non-stop flight across the Atlantic.",
+   "answer": "Charles Lindbergh",
+   "wrong": [
+    "Zheng He",
+    "Robert Falcon Scott",
+    "Ibn Battuta"
+   ],
+   "explain": "Charles Lindbergh (1902–1974): Made the first solo non-stop flight across the Atlantic.",
+   "difficulty": 2,
+   "refs": [
+    "explorers/charles-lindbergh"
+   ]
+  },
+  {
+   "id": "born-charles-lindbergh",
+   "kind": "mc",
+   "prompt": "In which year was Charles Lindbergh born?",
+   "answer": "1902",
+   "wrong": [
+    "1912",
+    "1892",
+    "1932"
+   ],
+   "explain": "Charles Lindbergh (1902–1974): Made the first solo non-stop flight across the Atlantic.",
+   "difficulty": 3,
+   "refs": [
+    "explorers/charles-lindbergh"
+   ]
+  },
+  {
+   "id": "who-jacques-cousteau",
+   "kind": "mc",
+   "prompt": "Who is this? He was a French ocean explorer.",
+   "answer": "Jacques Cousteau",
+   "wrong": [
+    "Abel Tasman",
+    "Neil Armstrong",
+    "Amelia Earhart"
+   ],
+   "explain": "Jacques Cousteau (1910–1997): A French ocean explorer.",
+   "difficulty": 2,
+   "refs": [
+    "explorers/jacques-cousteau"
+   ]
+  },
+  {
+   "id": "born-jacques-cousteau",
+   "kind": "mc",
+   "prompt": "In which year was Jacques Cousteau born?",
+   "answer": "1910",
+   "wrong": [
+    "1940",
+    "1930",
+    "1890"
+   ],
+   "explain": "Jacques Cousteau (1910–1997): A French ocean explorer.",
+   "difficulty": 3,
+   "refs": [
+    "explorers/jacques-cousteau"
+   ]
+  },
+  {
+   "id": "who-tenzing-norgay",
+   "kind": "mc",
+   "prompt": "Who is this? He was one of the first two people to climb Everest.",
+   "answer": "Tenzing Norgay",
+   "wrong": [
+    "Sally Ride",
+    "Ibn Battuta",
+    "Zheng He"
+   ],
+   "explain": "Tenzing Norgay (1914–1986): One of the first two people to climb Everest.",
+   "difficulty": 1,
+   "refs": [
+    "explorers/tenzing-norgay"
+   ]
+  },
+  {
+   "id": "born-tenzing-norgay",
+   "kind": "mc",
+   "prompt": "In which year was Tenzing Norgay born?",
+   "answer": "1914",
+   "wrong": [
+    "1924",
+    "1904",
+    "1934"
+   ],
+   "explain": "Tenzing Norgay (1914–1986): One of the first two people to climb Everest.",
+   "difficulty": 3,
+   "refs": [
+    "explorers/tenzing-norgay"
+   ]
+  },
+  {
+   "id": "who-edmund-hillary",
+   "kind": "mc",
+   "prompt": "Who is this? He was one of the first two people to climb Mount Everest.",
+   "answer": "Edmund Hillary",
+   "wrong": [
+    "David Livingstone",
+    "Roald Amundsen",
+    "Matthew Henson"
+   ],
+   "explain": "Edmund Hillary (1919–2008): One of the first two people to climb Mount Everest.",
+   "difficulty": 1,
+   "refs": [
+    "explorers/edmund-hillary"
+   ]
+  },
+  {
+   "id": "born-edmund-hillary",
+   "kind": "mc",
+   "prompt": "In which year was Edmund Hillary born?",
+   "answer": "1919",
+   "wrong": [
+    "1949",
+    "1939",
+    "1929"
+   ],
+   "explain": "Edmund Hillary (1919–2008): One of the first two people to climb Mount Everest.",
+   "difficulty": 3,
+   "refs": [
+    "explorers/edmund-hillary"
+   ]
+  },
+  {
+   "id": "who-neil-armstrong",
+   "kind": "mc",
+   "prompt": "Who is this? He was the first person to walk on the Moon.",
+   "answer": "Neil Armstrong",
+   "wrong": [
+    "Marco Polo",
+    "Buzz Aldrin",
+    "Ibn Battuta"
+   ],
+   "explain": "Neil Armstrong (1930–2012): The first person to walk on the Moon.",
+   "difficulty": 1,
+   "refs": [
+    "explorers/neil-armstrong"
+   ]
+  },
+  {
+   "id": "born-neil-armstrong",
+   "kind": "mc",
+   "prompt": "In which year was Neil Armstrong born?",
+   "answer": "1930",
+   "wrong": [
+    "1900",
+    "1960",
+    "1950"
+   ],
+   "explain": "Neil Armstrong (1930–2012): The first person to walk on the Moon.",
+   "difficulty": 3,
+   "refs": [
+    "explorers/neil-armstrong"
+   ]
+  },
+  {
+   "id": "who-buzz-aldrin",
+   "kind": "mc",
+   "prompt": "Who is this? He was the second person to walk on the Moon.",
+   "answer": "Buzz Aldrin",
+   "wrong": [
+    "Marco Polo",
+    "Valentina Tereshkova",
+    "Tenzing Norgay"
+   ],
+   "explain": "Buzz Aldrin (1930): The second person to walk on the Moon.",
+   "difficulty": 1,
+   "refs": [
+    "explorers/buzz-aldrin"
+   ]
+  },
+  {
+   "id": "born-buzz-aldrin",
+   "kind": "mc",
+   "prompt": "In which year was Buzz Aldrin born?",
+   "answer": "1930",
+   "wrong": [
+    "1910",
+    "1920",
+    "1960"
+   ],
+   "explain": "Buzz Aldrin (1930): The second person to walk on the Moon.",
+   "difficulty": 3,
+   "refs": [
+    "explorers/buzz-aldrin"
+   ]
+  },
+  {
+   "id": "who-yuri-gagarin",
+   "kind": "mc",
+   "prompt": "Who is this? He was the first human in space.",
+   "answer": "Yuri Gagarin",
+   "wrong": [
+    "James Cook",
+    "Sally Ride",
+    "Hernán Cortés"
+   ],
+   "explain": "Yuri Gagarin (1934–1968): The first human in space.",
+   "difficulty": 1,
+   "refs": [
+    "explorers/yuri-gagarin"
+   ]
+  },
+  {
+   "id": "born-yuri-gagarin",
+   "kind": "mc",
+   "prompt": "In which year was Yuri Gagarin born?",
+   "answer": "1934",
+   "wrong": [
+    "1954",
+    "1904",
+    "1944"
+   ],
+   "explain": "Yuri Gagarin (1934–1968): The first human in space.",
+   "difficulty": 3,
+   "refs": [
+    "explorers/yuri-gagarin"
+   ]
+  },
+  {
+   "id": "who-valentina-tereshkova",
+   "kind": "mc",
+   "prompt": "Who is this? She was the first woman in space.",
+   "answer": "Valentina Tereshkova",
+   "wrong": [
+    "Matthew Henson",
+    "Jacques Cousteau",
+    "Edmund Hillary"
+   ],
+   "explain": "Valentina Tereshkova (1937): The first woman in space.",
+   "difficulty": 1,
+   "refs": [
+    "explorers/valentina-tereshkova"
+   ]
+  },
+  {
+   "id": "born-valentina-tereshkova",
+   "kind": "mc",
+   "prompt": "In which year was Valentina Tereshkova born?",
+   "answer": "1937",
+   "wrong": [
+    "1907",
+    "1927",
+    "1967"
+   ],
+   "explain": "Valentina Tereshkova (1937): The first woman in space.",
+   "difficulty": 3,
+   "refs": [
+    "explorers/valentina-tereshkova"
+   ]
+  },
+  {
+   "id": "who-sally-ride",
+   "kind": "mc",
+   "prompt": "Who is this? She was the first American woman in space.",
+   "answer": "Sally Ride",
+   "wrong": [
+    "Amelia Earhart",
+    "David Livingstone",
+    "James Cook"
+   ],
+   "explain": "Sally Ride (1951–2012): The first American woman in space.",
+   "difficulty": 2,
+   "refs": [
+    "explorers/sally-ride"
+   ]
+  },
+  {
+   "id": "born-sally-ride",
+   "kind": "mc",
+   "prompt": "In which year was Sally Ride born?",
+   "answer": "1951",
+   "wrong": [
+    "1981",
+    "1971",
+    "1941"
+   ],
+   "explain": "Sally Ride (1951–2012): The first American woman in space.",
+   "difficulty": 3,
+   "refs": [
+    "explorers/sally-ride"
+   ]
+  }
+ ],
+ "sources": [
+  {
+   "name": "Wikidata (birth/death dates, portraits)",
+   "url": "https://www.wikidata.org"
+  },
+  {
+   "name": "Wikimedia Commons (portraits, licence-checked)",
+   "url": "https://commons.wikimedia.org"
+  }
+ ]
+}

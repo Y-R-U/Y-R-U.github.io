@@ -1,0 +1,38 @@
+@id one-hit-wonders
+@title One-hit wonders
+@icon 🌠
+@sources [{"name":"Acts with a single US Billboard Hot 100 top-40 hit (or UK top-40, where noted); curated by Clued","url":"https://en.wikipedia.org/wiki/One-hit_wonder"}]
+1969 | Norman Greenbaum | Spirit in the Sky | d=1
+1969 | Zager & Evans | In the Year 2525
+1972 | Hot Butter | Popcorn | tm=^popcorn; note=keepyear 1972 single; Apple has compilations only
+1972 | Looking Glass | Brandy (You're a Fine Girl)
+1974 | Carl Douglas | Kung Fu Fighting | d=1
+1976 | Wild Cherry | Play That Funky Music
+1979 | The Buggles | Video Killed the Radio Star | d=1
+1979 | The Sugarhill Gang | Rapper's Delight
+1979 | M | Pop Muzik | am=^m$
+1980 | The Vapors | Turning Japanese
+1979 | Lipps Inc. | Funkytown | am=lipps
+1981 | Toni Basil | Mickey | d=1; tm=^mickey$
+1982 | Men Without Hats | The Safety Dance
+1983 | Nena | 99 Luftballons | tm=99 luftballons|99 red balloons
+1982 | Dexys Midnight Runners | Come On Eileen | d=1
+1988 | Bobby McFerrin | Don't Worry, Be Happy | d=1
+1990 | Deee-Lite | Groove Is in the Heart
+1991 | Right Said Fred | I'm Too Sexy
+1995 | OMC | How Bizarre
+1997 | Chumbawamba | Tubthumping | d=1
+1999 | Len | Steal My Sunshine
+1999 | Lou Bega | Mambo No. 5 (A Little Bit Of...) | tm=mambo no
+1999 | Eiffel 65 | Blue (Da Ba Dee) | tm=blue
+2000 | Baha Men | Who Let the Dogs Out | d=1
+2002 | Las Ketchup | The Ketchup Song (Aserejé) | tm=ketchup|asereje
+2003 | Fountains of Wayne | Stacy's Mom
+2005 | Daniel Powter | Bad Day
+2006 | Gnarls Barkley | Crazy
+2011 | Gotye | Somebody That I Used to Know | am=gotye
+2012 | PSY | Gangnam Style | tm=gangnam
+2012 | Baauer | Harlem Shake
+2013 | MAGIC! | Rude
+2014 | OMI | Cheerleader (Felix Jaehn Remix) | tm=cheerleader; extras=1
+2013 | Ylvis | The Fox (What Does the Fox Say?) | tm=the fox

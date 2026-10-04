@@ -1,0 +1,4823 @@
+{
+ "id": "elements",
+ "title": "Chemical elements",
+ "theme": "science",
+ "icon": "⚗️",
+ "kids": false,
+ "version": 1,
+ "leakExempt": [],
+ "factsMeta": {
+  "atomicNumber": {
+   "type": "num",
+   "label": "Atomic number",
+   "unit": "",
+   "higherLabel": "Higher atomic number"
+  },
+  "symbol": {
+   "type": "text",
+   "label": "Chemical symbol"
+  },
+  "block": {
+   "type": "cat",
+   "label": "Element type"
+  },
+  "period": {
+   "type": "num",
+   "label": "Period",
+   "unit": ""
+  },
+  "group": {
+   "type": "num",
+   "label": "Group",
+   "unit": ""
+  },
+  "state": {
+   "type": "cat",
+   "label": "State at room temperature",
+   "values": [
+    "Solid",
+    "Liquid",
+    "Gas"
+   ]
+  },
+  "year": {
+   "type": "year",
+   "label": "Discovered"
+  },
+  "ancient": {
+   "type": "bool",
+   "label": "Known since ancient times",
+   "yes": "Known since ancient times",
+   "no": "Discovered later"
+  },
+  "atomicMass": {
+   "type": "num",
+   "label": "Atomic mass",
+   "unit": "u",
+   "higherLabel": "Heavier atoms"
+  },
+  "meltingC": {
+   "type": "num",
+   "label": "Melting point",
+   "unit": "°C",
+   "higherLabel": "Higher melting point"
+  },
+  "density": {
+   "type": "num",
+   "label": "Density",
+   "unit": "g/cm³",
+   "higherLabel": "Denser"
+  }
+ },
+ "items": [
+  {
+   "id": "hydrogen",
+   "name": "Hydrogen",
+   "group": "Nonmetal",
+   "facts": {
+    "atomicNumber": 1,
+    "symbol": "H",
+    "block": "Nonmetal",
+    "period": 1,
+    "group": 1,
+    "state": "Gas",
+    "year": 1766,
+    "atomicMass": 1.008,
+    "meltingC": -259,
+    "density": 0.0000899
+   },
+   "blurb": "The lightest and most common element in the universe. Stars like the Sun are mostly made of it.",
+   "clues": [
+    "Its atomic mass is about 1.008.",
+    "It melts at about -259 °C.",
+    "It makes up about three-quarters of the normal matter in the universe.",
+    "The Hindenburg airship was filled with it.",
+    "It is the fuel that powers the Sun.",
+    "Water is made of it and oxygen.",
+    "It is the first element in the periodic table.",
+    "Its atomic number is 1.",
+    "Its chemical symbol is H.",
+    "The answer is one word of 8 letters.",
+    "It starts with the letter H."
+   ],
+   "difficulty": 1
+  },
+  {
+   "id": "helium",
+   "name": "Helium",
+   "group": "Noble gas",
+   "facts": {
+    "atomicNumber": 2,
+    "symbol": "He",
+    "block": "Noble gas",
+    "period": 1,
+    "group": 18,
+    "state": "Gas",
+    "year": 1868,
+    "atomicMass": 4.003,
+    "meltingC": -272,
+    "density": 0.000179
+   },
+   "blurb": "A light, unreactive gas that makes balloons float and voices squeaky. It was found in the Sun before it was found on Earth.",
+   "clues": [
+    "Its atomic mass is about 4.003.",
+    "It melts at about -272 °C.",
+    "It was discovered in sunlight before it was found on Earth.",
+    "Its name comes from the Greek word for the Sun.",
+    "Liquid forms of it cool MRI magnets.",
+    "Breathing it makes your voice squeaky.",
+    "It makes party balloons float.",
+    "Its atomic number is 2.",
+    "Its chemical symbol is He.",
+    "The answer is one word of 6 letters.",
+    "It starts with the letter H."
+   ],
+   "difficulty": 1
+  },
+  {
+   "id": "lithium",
+   "name": "Lithium",
+   "group": "Alkali metal",
+   "facts": {
+    "atomicNumber": 3,
+    "symbol": "Li",
+    "block": "Alkali metal",
+    "period": 2,
+    "group": 1,
+    "state": "Solid",
+    "year": 1817,
+    "atomicMass": 7,
+    "meltingC": 181,
+    "density": 0.534
+   },
+   "blurb": "The lightest metal. It powers the rechargeable batteries in phones and electric cars.",
+   "clues": [
+    "Its atomic mass is about 7.",
+    "It melts at about 181 °C.",
+    "It is so light it floats on oil.",
+    "It is used as a medicine for some mood disorders.",
+    "It is soft enough to cut with a knife.",
+    "It is the lightest metal.",
+    "Phone and car batteries are named after it.",
+    "Its atomic number is 3.",
+    "Its chemical symbol is Li.",
+    "The answer is one word of 7 letters.",
+    "It starts with the letter L."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/8/8a/Purified_lithium_in_an_ampoule_under_argon%2C_dark_background.png/500px-Purified_lithium_in_an_ampoule_under_argon%2C_dark_background.png",
+      "w": 500,
+      "h": 281,
+      "credit": "AdvancedTinkering",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Purified_lithium_in_an_ampoule_under_argon,_dark_background.png"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "beryllium",
+   "name": "Beryllium",
+   "group": "Alkaline earth metal",
+   "facts": {
+    "atomicNumber": 4,
+    "symbol": "Be",
+    "block": "Alkaline earth metal",
+    "period": 2,
+    "group": 2,
+    "state": "Solid",
+    "year": 1798,
+    "atomicMass": 9.012,
+    "meltingC": 1287,
+    "density": 1.85
+   },
+   "blurb": "Beryllium (Be) is element number 4, an alkaline earth metal that is a solid at room temperature. It was discovered in 1798.",
+   "clues": [
+    "Its atomic mass is about 9.012.",
+    "It melts at about 1287 °C.",
+    "It is in period 2, group 2 of the periodic table.",
+    "It is an alkaline earth metal.",
+    "It was discovered in 1798.",
+    "At room temperature it is a solid.",
+    "Its atomic number is 4.",
+    "Its chemical symbol is Be.",
+    "The answer is one word of 9 letters.",
+    "It starts with the letter B."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/f/f6/Beryllium_nuggets_2.jpg/500px-Beryllium_nuggets_2.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "W. Oelen",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Beryllium_nuggets_2.jpg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "boron",
+   "name": "Boron",
+   "group": "Metalloid",
+   "facts": {
+    "atomicNumber": 5,
+    "symbol": "B",
+    "block": "Metalloid",
+    "period": 2,
+    "group": 12,
+    "state": "Solid",
+    "year": 1808,
+    "atomicMass": 10.81,
+    "meltingC": 2075,
+    "density": 2.37
+   },
+   "blurb": "Boron (B) is element number 5, a metalloid that is a solid at room temperature. It was discovered in 1808.",
+   "clues": [
+    "Its atomic mass is about 10.81.",
+    "It melts at about 2075 °C.",
+    "It is in period 2, group 12 of the periodic table.",
+    "It is a metalloid.",
+    "It was discovered in 1808.",
+    "At room temperature it is a solid.",
+    "Its atomic number is 5.",
+    "Its chemical symbol is B.",
+    "The answer is one word of 5 letters.",
+    "It starts with the letter B."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/a/a2/Boron.jpg/500px-Boron.jpg",
+      "w": 500,
+      "h": 500,
+      "credit": "Jurii",
+      "license": "CC BY 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Boron.jpg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "carbon",
+   "name": "Carbon",
+   "group": "Nonmetal",
+   "facts": {
+    "atomicNumber": 6,
+    "symbol": "C",
+    "block": "Nonmetal",
+    "period": 2,
+    "group": 13,
+    "state": "Solid",
+    "ancient": true,
+    "atomicMass": 12.01,
+    "meltingC": 3550,
+    "density": 2.27
+   },
+   "blurb": "The element of life. Diamonds, graphite and coal are all made of it.",
+   "clues": [
+    "Its atomic mass is about 12.01.",
+    "It melts at about 3550 °C.",
+    "A type of it is used to date ancient objects.",
+    "Graphite in pencils is made of it.",
+    "Diamonds are made of it.",
+    "All living things are built around it.",
+    "Its dioxide is a greenhouse gas.",
+    "Its atomic number is 6.",
+    "Its chemical symbol is C.",
+    "The answer is one word of 6 letters.",
+    "It starts with the letter C."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/7/72/Coal_anthracite.jpg",
+      "w": 500,
+      "h": 468,
+      "credit": "http://resourcescommittee.house.gov/subcommittees/emr/usgsweb/photogallery/images/Coal,…",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Coal_anthracite.jpg"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "nitrogen",
+   "name": "Nitrogen",
+   "group": "Nonmetal",
+   "facts": {
+    "atomicNumber": 7,
+    "symbol": "N",
+    "block": "Nonmetal",
+    "period": 2,
+    "group": 14,
+    "state": "Gas",
+    "year": 1772,
+    "atomicMass": 14.01,
+    "meltingC": -210,
+    "density": 0.00125
+   },
+   "blurb": "The gas that makes up about 78% of the air. Liquid nitrogen is cold enough to freeze things instantly.",
+   "clues": [
+    "Its atomic mass is about 14.01.",
+    "It melts at about -210 °C.",
+    "It is a key part of fertilisers.",
+    "Its liquid form boils at −196 °C.",
+    "Chefs use its liquid form to make instant ice cream.",
+    "It makes up about 78% of the air.",
+    "Its symbol is N.",
+    "Its atomic number is 7.",
+    "Its chemical symbol is N.",
+    "The answer is one word of 8 letters.",
+    "It starts with the letter N."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/f/f5/Fluessiger_Stickstoff.jpg/330px-Fluessiger_Stickstoff.jpg",
+      "w": 330,
+      "h": 495,
+      "credit": "Robin Müller",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Fluessiger_Stickstoff.jpg"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "oxygen",
+   "name": "Oxygen",
+   "group": "Nonmetal",
+   "facts": {
+    "atomicNumber": 8,
+    "symbol": "O",
+    "block": "Nonmetal",
+    "period": 2,
+    "group": 15,
+    "state": "Gas",
+    "year": 1774,
+    "atomicMass": 16,
+    "meltingC": -219,
+    "density": 0.00143
+   },
+   "blurb": "The gas we need to breathe. It makes up about 21% of the air.",
+   "clues": [
+    "Its atomic mass is about 16.",
+    "It melts at about -219 °C.",
+    "It is the most common element in the Earth's crust.",
+    "Fires need it to burn.",
+    "It makes up about 21% of the air.",
+    "Plants release it.",
+    "We breathe it in to stay alive.",
+    "Its atomic number is 8.",
+    "Its chemical symbol is O.",
+    "The answer is one word of 6 letters.",
+    "It starts with the letter O."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/c/c3/Liquid_oxygen_in_a_beaker_4.jpg/500px-Liquid_oxygen_in_a_beaker_4.jpg",
+      "w": 500,
+      "h": 610,
+      "credit": "U.S. Air Force/Staff Sgt. Jim Araos",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Liquid_oxygen_in_a_beaker_4.jpg"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "fluorine",
+   "name": "Fluorine",
+   "group": "Halogen",
+   "facts": {
+    "atomicNumber": 9,
+    "symbol": "F",
+    "block": "Halogen",
+    "period": 2,
+    "group": 16,
+    "state": "Gas",
+    "year": 1670,
+    "atomicMass": 19,
+    "meltingC": -220,
+    "density": 0.0017
+   },
+   "blurb": "The most reactive element. A tiny amount added to toothpaste and water helps protect teeth.",
+   "clues": [
+    "Its atomic mass is about 19.",
+    "It melts at about -220 °C.",
+    "It is the most reactive of all elements.",
+    "Non-stick pan coatings contain it.",
+    "It is a pale yellow, poisonous gas.",
+    "It is a halogen.",
+    "Compounds of it are added to toothpaste.",
+    "Its atomic number is 9.",
+    "Its chemical symbol is F.",
+    "The answer is one word of 8 letters.",
+    "It starts with the letter F."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/9/91/Liquid_fluorine_tighter_crop.jpg",
+      "w": 500,
+      "h": 409,
+      "credit": ".mw-parser-output .plainlist ul{line-height:inherit;list-style:none none;margin:0}.mw-p…",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Liquid_fluorine_tighter_crop.jpg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "neon",
+   "name": "Neon",
+   "group": "Noble gas",
+   "facts": {
+    "atomicNumber": 10,
+    "symbol": "Ne",
+    "block": "Noble gas",
+    "period": 2,
+    "group": 17,
+    "state": "Gas",
+    "year": 1898,
+    "atomicMass": 20.18,
+    "meltingC": -249,
+    "density": 0.0009
+   },
+   "blurb": "An unreactive gas that glows bright red-orange in glass tubes, used in shop signs.",
+   "clues": [
+    "Its atomic mass is about 20.18.",
+    "It melts at about -249 °C.",
+    "It was discovered in 1898 in liquefied air.",
+    "It is the fifth most common element in the universe.",
+    "It is a noble gas.",
+    "It glows red-orange in a glass tube.",
+    "Bright glowing shop signs are named after it.",
+    "Its atomic number is 10.",
+    "Its chemical symbol is Ne.",
+    "The answer is one word of 4 letters.",
+    "It starts with the letter N."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/8/88/NeTube.jpg/500px-NeTube.jpg",
+      "w": 500,
+      "h": 500,
+      "credit": "User:Pslawinski",
+      "license": "CC BY-SA 2.5",
+      "page": "https://commons.wikimedia.org/wiki/File:NeTube.jpg"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "sodium",
+   "name": "Sodium",
+   "group": "Alkali metal",
+   "facts": {
+    "atomicNumber": 11,
+    "symbol": "Na",
+    "block": "Alkali metal",
+    "period": 3,
+    "group": 1,
+    "state": "Solid",
+    "year": 1807,
+    "atomicMass": 22.99,
+    "meltingC": 98,
+    "density": 0.97
+   },
+   "blurb": "A soft, very reactive metal that fizzes in water. It is half of table salt.",
+   "clues": [
+    "Its atomic mass is about 22.99.",
+    "It melts at about 98 °C.",
+    "It is soft enough to cut with a butter knife.",
+    "It makes street lamps glow orange.",
+    "It explodes when dropped in water.",
+    "Table salt is it combined with chlorine.",
+    "Its symbol, Na, comes from the Latin \"natrium\".",
+    "Its atomic number is 11.",
+    "Its chemical symbol is Na.",
+    "The answer is one word of 6 letters.",
+    "It starts with the letter S."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/2/27/Na_%28Sodium%29.jpg/500px-Na_%28Sodium%29.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "The original uploader was Dnn87 at English Wikipedia.",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Na_(Sodium).jpg"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "magnesium",
+   "name": "Magnesium",
+   "group": "Alkaline earth metal",
+   "facts": {
+    "atomicNumber": 12,
+    "symbol": "Mg",
+    "block": "Alkaline earth metal",
+    "period": 3,
+    "group": 2,
+    "state": "Solid",
+    "year": 1808,
+    "atomicMass": 24.3,
+    "meltingC": 650,
+    "density": 1.74
+   },
+   "blurb": "A light metal that burns with a dazzling white flame. It is at the centre of chlorophyll in plants.",
+   "clues": [
+    "Its atomic mass is about 24.3.",
+    "It melts at about 650 °C.",
+    "It sits at the centre of chlorophyll.",
+    "Old camera flashes burned it.",
+    "It burns with a blinding white flame.",
+    "It is used in light alloys for cars and planes.",
+    "Its name is linked to a region of ancient Greece.",
+    "Its atomic number is 12.",
+    "Its chemical symbol is Mg.",
+    "The answer is one word of 9 letters.",
+    "It starts with the letter M."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/3/3f/Magnesium_crystals.jpg/500px-Magnesium_crystals.jpg",
+      "w": 500,
+      "h": 299,
+      "credit": "Warut Roonguthai",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Magnesium_crystals.jpg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "aluminium",
+   "name": "Aluminium",
+   "alt": [
+    "Aluminum"
+   ],
+   "group": "Post-transition metal",
+   "facts": {
+    "atomicNumber": 13,
+    "symbol": "Al",
+    "block": "Post-transition metal",
+    "period": 3,
+    "group": 12,
+    "state": "Solid",
+    "ancient": true,
+    "atomicMass": 26.98,
+    "meltingC": 660,
+    "density": 2.7
+   },
+   "blurb": "A light, silvery metal that does not rust. It is used for drink cans, foil and aircraft.",
+   "clues": [
+    "Its atomic mass is about 26.98.",
+    "It melts at about 660 °C.",
+    "It is the most common metal in the Earth's crust.",
+    "It was once more valuable than gold.",
+    "Its American spelling has one fewer \"i\".",
+    "Aircraft are built from it.",
+    "Drink cans and cooking foil are made of it.",
+    "Its atomic number is 13.",
+    "Its chemical symbol is Al.",
+    "The answer is one word of 9 letters.",
+    "It starts with the letter A."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/5/5d/Aluminium-4.jpg/500px-Aluminium-4.jpg",
+      "w": 500,
+      "h": 500,
+      "credit": "Unknown authorUnknown author",
+      "license": "CC BY 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Aluminium-4.jpg"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "silicon",
+   "name": "Silicon",
+   "group": "Metalloid",
+   "facts": {
+    "atomicNumber": 14,
+    "symbol": "Si",
+    "block": "Metalloid",
+    "period": 3,
+    "group": 13,
+    "state": "Solid",
+    "year": 1854,
+    "atomicMass": 28.09,
+    "meltingC": 1414,
+    "density": 2.33
+   },
+   "blurb": "An element that is the basis of computer chips and solar panels. Sand is mostly silicon dioxide.",
+   "clues": [
+    "Its atomic mass is about 28.09.",
+    "It melts at about 1414 °C.",
+    "It is the second most common element in the Earth's crust.",
+    "Sand and glass contain it.",
+    "It is a metalloid.",
+    "Solar panels use it.",
+    "A Californian tech valley is named after it.",
+    "Its atomic number is 14.",
+    "Its chemical symbol is Si.",
+    "The answer is one word of 7 letters.",
+    "It starts with the letter S."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/e/e9/SiliconCroda.jpg/500px-SiliconCroda.jpg",
+      "w": 500,
+      "h": 348,
+      "credit": "Enricoros at English Wikipedia",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:SiliconCroda.jpg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "phosphorus",
+   "name": "Phosphorus",
+   "group": "Nonmetal",
+   "facts": {
+    "atomicNumber": 15,
+    "symbol": "P",
+    "block": "Nonmetal",
+    "period": 3,
+    "group": 14,
+    "state": "Solid",
+    "year": 1669,
+    "atomicMass": 30.97,
+    "meltingC": 44,
+    "density": 1.82
+   },
+   "blurb": "A reactive element that is used in match heads and fertilisers. Its white form glows in the dark.",
+   "clues": [
+    "Its atomic mass is about 30.97.",
+    "It melts at about 44 °C.",
+    "It was discovered in 1669 by boiling urine.",
+    "Its white form glows in the dark.",
+    "It is in DNA and bones.",
+    "Match heads contain it.",
+    "Its name means \"light bearer\".",
+    "Its atomic number is 15.",
+    "Its chemical symbol is P.",
+    "The answer is one word of 10 letters.",
+    "It starts with the letter P."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/c/ce/Phosphor.JPG/500px-Phosphor.JPG",
+      "w": 500,
+      "h": 375,
+      "credit": "Dnn87",
+      "license": "CC BY 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Phosphor.JPG"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "sulfur",
+   "name": "Sulfur",
+   "alt": [
+    "Sulphur"
+   ],
+   "group": "Nonmetal",
+   "facts": {
+    "atomicNumber": 16,
+    "symbol": "S",
+    "block": "Nonmetal",
+    "period": 3,
+    "group": 15,
+    "state": "Solid",
+    "ancient": true,
+    "atomicMass": 32.07,
+    "meltingC": 115,
+    "density": 2.07
+   },
+   "blurb": "A yellow element that smells when it forms compounds like rotten-egg gas. It was once called brimstone.",
+   "clues": [
+    "Its atomic mass is about 32.07.",
+    "It melts at about 115 °C.",
+    "It was called brimstone in the Bible.",
+    "Volcanoes give off gases containing it.",
+    "Rotten eggs smell of a compound of it.",
+    "It is bright yellow.",
+    "Its symbol is S.",
+    "Its atomic number is 16.",
+    "Its chemical symbol is S.",
+    "The answer is one word of 6 letters.",
+    "It starts with the letter S."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/8/88/Sulfur_-_El_Desierto_mine%2C_San_Pablo_de_Napa%2C_Daniel_Campos_Province%2C_Potos%C3%AD%2C_Bolivia.jpg/500px-Sulfur_-_El_Desierto_mine%2C_San_Pablo_de_Napa%2C_Daniel_Campos_Province%2C_Potos%C3%AD%2C_Bolivia.jpg",
+      "w": 500,
+      "h": 417,
+      "credit": "Ivar Leidus",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Sulfur_-_El_Desierto_mine,_San_Pablo_de_Napa,_Daniel_Campos_Province,_Potos%C3%AD,_Bolivia.jpg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "chlorine",
+   "name": "Chlorine",
+   "group": "Halogen",
+   "facts": {
+    "atomicNumber": 17,
+    "symbol": "Cl",
+    "block": "Halogen",
+    "period": 3,
+    "group": 16,
+    "state": "Gas",
+    "year": 1774,
+    "atomicMass": 35.45,
+    "meltingC": -101,
+    "density": 0.00321
+   },
+   "blurb": "A green, poisonous gas used to keep swimming pools clean. It is half of table salt.",
+   "clues": [
+    "Its atomic mass is about 35.45.",
+    "It melts at about -101 °C.",
+    "It was used as a weapon in World War I.",
+    "It is a halogen.",
+    "It is a yellow-green gas.",
+    "Table salt is sodium and this.",
+    "It is added to swimming pools to kill germs.",
+    "Its atomic number is 17.",
+    "Its chemical symbol is Cl.",
+    "The answer is one word of 8 letters.",
+    "It starts with the letter C."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/4/49/Chlorine_in_bottle.jpg",
+      "w": 500,
+      "h": 667,
+      "credit": "W. Oelen",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Chlorine_in_bottle.jpg"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "argon",
+   "name": "Argon",
+   "group": "Noble gas",
+   "facts": {
+    "atomicNumber": 18,
+    "symbol": "Ar",
+    "block": "Noble gas",
+    "period": 3,
+    "group": 17,
+    "state": "Gas",
+    "year": 1894,
+    "atomicMass": 39.9,
+    "meltingC": -189,
+    "density": 0.00178
+   },
+   "blurb": "An unreactive gas that makes up almost 1% of the air. It is used inside light bulbs and for welding.",
+   "clues": [
+    "Its atomic mass is about 39.9.",
+    "It melts at about -189 °C.",
+    "It makes up nearly 1% of the air.",
+    "Its name means \"lazy\" in Greek.",
+    "It is used inside old light bulbs.",
+    "It is a noble gas.",
+    "Welders use it as a shield gas.",
+    "Its atomic number is 18.",
+    "Its chemical symbol is Ar.",
+    "The answer is one word of 5 letters.",
+    "It starts with the letter A."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/2/2f/ArTube.jpg/500px-ArTube.jpg",
+      "w": 500,
+      "h": 500,
+      "credit": "User:Pslawinski",
+      "license": "CC BY-SA 2.5",
+      "page": "https://commons.wikimedia.org/wiki/File:ArTube.jpg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "potassium",
+   "name": "Potassium",
+   "group": "Alkali metal",
+   "facts": {
+    "atomicNumber": 19,
+    "symbol": "K",
+    "block": "Alkali metal",
+    "period": 4,
+    "group": 1,
+    "state": "Solid",
+    "year": 1807,
+    "atomicMass": 39.1,
+    "meltingC": 63,
+    "density": 0.89
+   },
+   "blurb": "A soft, reactive metal that bursts into lilac flames in water. Bananas are rich in it.",
+   "clues": [
+    "Its atomic mass is about 39.1.",
+    "It melts at about 63 °C.",
+    "It is named after potash.",
+    "Its symbol, K, comes from \"kalium\".",
+    "It burns with a lilac flame in water.",
+    "Our nerves need it to work.",
+    "Bananas are famous for containing it.",
+    "Its atomic number is 19.",
+    "Its chemical symbol is K.",
+    "The answer is one word of 9 letters.",
+    "It starts with the letter P."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/3/34/Kalium.jpg/500px-Kalium.jpg",
+      "w": 500,
+      "h": 515,
+      "credit": "BXXXD",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Kalium.jpg"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "calcium",
+   "name": "Calcium",
+   "group": "Alkaline earth metal",
+   "facts": {
+    "atomicNumber": 20,
+    "symbol": "Ca",
+    "block": "Alkaline earth metal",
+    "period": 4,
+    "group": 2,
+    "state": "Solid",
+    "ancient": true,
+    "atomicMass": 40.08,
+    "meltingC": 842,
+    "density": 1.54
+   },
+   "blurb": "A metal that our bones and teeth are built from. Milk and cheese are rich in it.",
+   "clues": [
+    "Its atomic mass is about 40.08.",
+    "It melts at about 842 °C.",
+    "Chalk and limestone contain it.",
+    "Shells and coral are made of compounds of it.",
+    "It is an alkaline earth metal.",
+    "Milk and cheese are rich in it.",
+    "Our bones and teeth need it.",
+    "Its atomic number is 20.",
+    "Its chemical symbol is Ca.",
+    "The answer is one word of 7 letters.",
+    "It starts with the letter C."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/0/09/Calcium_1.jpg",
+      "w": 500,
+      "h": 683,
+      "credit": "de:Benutzer:Tomihahndorf",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Calcium_1.jpg"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "scandium",
+   "name": "Scandium",
+   "group": "Transition metal",
+   "facts": {
+    "atomicNumber": 21,
+    "symbol": "Sc",
+    "block": "Transition metal",
+    "period": 4,
+    "group": 3,
+    "state": "Solid",
+    "year": 1879,
+    "atomicMass": 44.96,
+    "meltingC": 1541,
+    "density": 2.99
+   },
+   "blurb": "Scandium (Sc) is element number 21, a transition metal that is a solid at room temperature. It was discovered in 1879.",
+   "clues": [
+    "Its atomic mass is about 44.96.",
+    "It melts at about 1541 °C.",
+    "It is in period 4, group 3 of the periodic table.",
+    "It is a transition metal.",
+    "It was discovered in 1879.",
+    "At room temperature it is a solid.",
+    "Its atomic number is 21.",
+    "Its chemical symbol is Sc.",
+    "The answer is one word of 8 letters.",
+    "It starts with the letter S."
+   ],
+   "difficulty": 2
+  },
+  {
+   "id": "titanium",
+   "name": "Titanium",
+   "group": "Transition metal",
+   "facts": {
+    "atomicNumber": 22,
+    "symbol": "Ti",
+    "block": "Transition metal",
+    "period": 4,
+    "group": 4,
+    "state": "Solid",
+    "year": 1791,
+    "atomicMass": 47.87,
+    "meltingC": 1668,
+    "density": 4.5
+   },
+   "blurb": "A strong, light metal that does not rust. It is used for jet engines, hip replacements and bikes.",
+   "clues": [
+    "Its atomic mass is about 47.87.",
+    "It melts at about 1668 °C.",
+    "Its white oxide is used in paint and sunscreen.",
+    "It is used in hip replacements.",
+    "It is as strong as steel but much lighter.",
+    "Expensive bikes and aircraft parts use it.",
+    "Its atomic number is 22.",
+    "Its chemical symbol is Ti.",
+    "The answer is one word of 8 letters.",
+    "It starts with the letter T."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/d/db/Titan-crystal_bar.JPG/500px-Titan-crystal_bar.JPG",
+      "w": 500,
+      "h": 314,
+      "credit": "Alchemist-hp (pse-mendelejew.de)",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Titan-crystal_bar.JPG"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "vanadium",
+   "name": "Vanadium",
+   "group": "Transition metal",
+   "facts": {
+    "atomicNumber": 23,
+    "symbol": "V",
+    "block": "Transition metal",
+    "period": 4,
+    "group": 5,
+    "state": "Solid",
+    "year": 1801,
+    "atomicMass": 50.94,
+    "meltingC": 1910,
+    "density": 6
+   },
+   "blurb": "Vanadium (V) is element number 23, a transition metal that is a solid at room temperature. It was discovered in 1801.",
+   "clues": [
+    "Its atomic mass is about 50.94.",
+    "It melts at about 1910 °C.",
+    "It is in period 4, group 5 of the periodic table.",
+    "It is a transition metal.",
+    "It was discovered in 1801.",
+    "At room temperature it is a solid.",
+    "Its atomic number is 23.",
+    "Its chemical symbol is V.",
+    "The answer is one word of 8 letters.",
+    "It starts with the letter V."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/4/48/Vanadium_1.jpg",
+      "w": 500,
+      "h": 631,
+      "credit": "The original uploader was Tomihahndorf at German Wikipedia.",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Vanadium_1.jpg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "chromium",
+   "name": "Chromium",
+   "group": "Transition metal",
+   "facts": {
+    "atomicNumber": 24,
+    "symbol": "Cr",
+    "block": "Transition metal",
+    "period": 4,
+    "group": 6,
+    "state": "Solid",
+    "year": 1797,
+    "atomicMass": 52,
+    "meltingC": 1907,
+    "density": 7.15
+   },
+   "blurb": "A hard, shiny metal used to plate taps and car bumpers. It gives rubies their red colour.",
+   "clues": [
+    "Its atomic mass is about 52.",
+    "It melts at about 1907 °C.",
+    "Its name means \"colour\" in Greek.",
+    "It gives rubies and emeralds their colour.",
+    "Stainless steel contains it.",
+    "Shiny car bumpers are plated with it.",
+    "Its symbol is Cr.",
+    "Its atomic number is 24.",
+    "Its chemical symbol is Cr.",
+    "The answer is one word of 8 letters.",
+    "It starts with the letter C."
+   ],
+   "difficulty": 2
+  },
+  {
+   "id": "manganese",
+   "name": "Manganese",
+   "group": "Transition metal",
+   "facts": {
+    "atomicNumber": 25,
+    "symbol": "Mn",
+    "block": "Transition metal",
+    "period": 4,
+    "group": 7,
+    "state": "Solid",
+    "year": 1774,
+    "atomicMass": 54.94,
+    "meltingC": 1246,
+    "density": 7.3
+   },
+   "blurb": "Manganese (Mn) is element number 25, a transition metal that is a solid at room temperature. It was discovered in 1774.",
+   "clues": [
+    "Its atomic mass is about 54.94.",
+    "It melts at about 1246 °C.",
+    "It is in period 4, group 7 of the periodic table.",
+    "It is a transition metal.",
+    "It was discovered in 1774.",
+    "At room temperature it is a solid.",
+    "Its atomic number is 25.",
+    "Its chemical symbol is Mn.",
+    "The answer is one word of 9 letters.",
+    "It starts with the letter M."
+   ],
+   "difficulty": 2
+  },
+  {
+   "id": "iron",
+   "name": "Iron",
+   "group": "Transition metal",
+   "facts": {
+    "atomicNumber": 26,
+    "symbol": "Fe",
+    "block": "Transition metal",
+    "period": 4,
+    "group": 8,
+    "state": "Solid",
+    "ancient": true,
+    "atomicMass": 55.84,
+    "meltingC": 1538,
+    "density": 7.87
+   },
+   "blurb": "The most used metal, the main part of steel. The Earth's core is mostly iron.",
+   "clues": [
+    "Its atomic mass is about 55.84.",
+    "It melts at about 1538 °C.",
+    "The Earth's core is mostly made of it.",
+    "Its symbol, Fe, comes from Latin \"ferrum\".",
+    "Our blood needs it to carry oxygen.",
+    "It rusts when wet.",
+    "Steel is mostly made of it.",
+    "Its atomic number is 26.",
+    "Its chemical symbol is Fe.",
+    "The answer is one word of 4 letters.",
+    "It starts with the letter I."
+   ],
+   "difficulty": 1
+  },
+  {
+   "id": "cobalt",
+   "name": "Cobalt",
+   "group": "Transition metal",
+   "facts": {
+    "atomicNumber": 27,
+    "symbol": "Co",
+    "block": "Transition metal",
+    "period": 4,
+    "group": 9,
+    "state": "Solid",
+    "year": 1735,
+    "atomicMass": 58.93,
+    "meltingC": 1495,
+    "density": 8.86
+   },
+   "blurb": "A hard metal that gives glass and pottery a deep blue colour.",
+   "clues": [
+    "Its atomic mass is about 58.93.",
+    "It melts at about 1495 °C.",
+    "Its name comes from a German word for goblin.",
+    "It is used in rechargeable batteries.",
+    "Vitamin B12 contains it.",
+    "It is magnetic.",
+    "It gives glass a deep blue colour.",
+    "Its atomic number is 27.",
+    "Its chemical symbol is Co.",
+    "The answer is one word of 6 letters.",
+    "It starts with the letter C."
+   ],
+   "difficulty": 2
+  },
+  {
+   "id": "nickel",
+   "name": "Nickel",
+   "group": "Transition metal",
+   "facts": {
+    "atomicNumber": 28,
+    "symbol": "Ni",
+    "block": "Transition metal",
+    "period": 4,
+    "group": 10,
+    "state": "Solid",
+    "year": 1751,
+    "atomicMass": 58.69,
+    "meltingC": 1455,
+    "density": 8.91
+   },
+   "blurb": "A silvery, magnetic metal used in coins and stainless steel.",
+   "clues": [
+    "Its atomic mass is about 58.69.",
+    "It melts at about 1455 °C.",
+    "The Sudbury Basin in Canada is rich in it.",
+    "Stainless steel contains it.",
+    "It is magnetic.",
+    "A US five-cent coin shares its name.",
+    "Its atomic number is 28.",
+    "Its chemical symbol is Ni.",
+    "The answer is one word of 6 letters.",
+    "It starts with the letter N."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/5/53/Electrolytic_nickel.jpg/500px-Electrolytic_nickel.jpg",
+      "w": 500,
+      "h": 500,
+      "credit": "Jurii",
+      "license": "CC BY 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Electrolytic_nickel.jpg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "copper",
+   "name": "Copper",
+   "group": "Transition metal",
+   "facts": {
+    "atomicNumber": 29,
+    "symbol": "Cu",
+    "block": "Transition metal",
+    "period": 4,
+    "group": 11,
+    "state": "Solid",
+    "ancient": true,
+    "atomicMass": 63.55,
+    "meltingC": 1085,
+    "density": 8.93
+   },
+   "blurb": "A reddish metal that carries electricity well. It is used in wires and pipes, and turns green over time.",
+   "clues": [
+    "Its atomic mass is about 63.55.",
+    "It melts at about 1085 °C.",
+    "The Statue of Liberty is covered in it.",
+    "It turns green over time.",
+    "Bronze is made mostly of it.",
+    "Electrical wires are made of it.",
+    "It is a reddish-brown metal.",
+    "Its atomic number is 29.",
+    "Its chemical symbol is Cu.",
+    "The answer is one word of 6 letters.",
+    "It starts with the letter C."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/14/Cuivre_Michigan.jpg/500px-Cuivre_Michigan.jpg",
+      "w": 500,
+      "h": 344,
+      "credit": "Didier Descouens",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Cuivre_Michigan.jpg"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "zinc",
+   "name": "Zinc",
+   "group": "Transition metal",
+   "facts": {
+    "atomicNumber": 30,
+    "symbol": "Zn",
+    "block": "Transition metal",
+    "period": 4,
+    "group": 12,
+    "state": "Solid",
+    "year": 1746,
+    "atomicMass": 65.4,
+    "meltingC": 420,
+    "density": 7.13
+   },
+   "blurb": "A bluish-white metal used to coat steel so it does not rust. Brass is copper and zinc.",
+   "clues": [
+    "Its atomic mass is about 65.4.",
+    "It melts at about 420 °C.",
+    "Brass is copper mixed with it.",
+    "It coats steel to stop rust.",
+    "It is used in sunscreen.",
+    "Our bodies need it for healing.",
+    "Its name has four letters.",
+    "Its atomic number is 30.",
+    "Its chemical symbol is Zn.",
+    "The answer is one word of 4 letters.",
+    "It starts with the letter Z."
+   ],
+   "difficulty": 2
+  },
+  {
+   "id": "gallium",
+   "name": "Gallium",
+   "group": "Post-transition metal",
+   "facts": {
+    "atomicNumber": 31,
+    "symbol": "Ga",
+    "block": "Post-transition metal",
+    "period": 4,
+    "group": 13,
+    "state": "Solid",
+    "year": 1875,
+    "atomicMass": 69.72,
+    "meltingC": 30,
+    "density": 5.91
+   },
+   "blurb": "Gallium (Ga) is element number 31, a post-transition metal that is a solid at room temperature. It was discovered in 1875.",
+   "clues": [
+    "Its atomic mass is about 69.72.",
+    "It melts at about 30 °C.",
+    "It is in period 4, group 13 of the periodic table.",
+    "It is a post-transition metal.",
+    "It was discovered in 1875.",
+    "At room temperature it is a solid.",
+    "Its atomic number is 31.",
+    "Its chemical symbol is Ga.",
+    "The answer is one word of 7 letters.",
+    "It starts with the letter G."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/9/92/Gallium_crystals.jpg/500px-Gallium_crystals.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "en:user:foobar",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Gallium_crystals.jpg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "germanium",
+   "name": "Germanium",
+   "group": "Metalloid",
+   "facts": {
+    "atomicNumber": 32,
+    "symbol": "Ge",
+    "block": "Metalloid",
+    "period": 4,
+    "group": 14,
+    "state": "Solid",
+    "year": 1886,
+    "atomicMass": 72.63,
+    "meltingC": 938,
+    "density": 5.32
+   },
+   "blurb": "Germanium (Ge) is element number 32, a metalloid that is a solid at room temperature. It was discovered in 1886.",
+   "clues": [
+    "Its atomic mass is about 72.63.",
+    "It melts at about 938 °C.",
+    "It is in period 4, group 14 of the periodic table.",
+    "It is a metalloid.",
+    "It was discovered in 1886.",
+    "At room temperature it is a solid.",
+    "Its atomic number is 32.",
+    "Its chemical symbol is Ge.",
+    "The answer is one word of 9 letters.",
+    "It starts with the letter G."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/4/46/Germanium_element.jpg/500px-Germanium_element.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "W. Oelen",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Germanium_element.jpg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "arsenic",
+   "name": "Arsenic",
+   "group": "Metalloid",
+   "facts": {
+    "atomicNumber": 33,
+    "symbol": "As",
+    "block": "Metalloid",
+    "period": 4,
+    "group": 15,
+    "state": "Solid",
+    "ancient": true,
+    "atomicMass": 74.92,
+    "meltingC": 817,
+    "density": 5.78
+   },
+   "blurb": "A poisonous element, famous in history and crime stories as a deadly poison.",
+   "clues": [
+    "Its atomic mass is about 74.92.",
+    "It melts at about 817 °C.",
+    "It was once used in green wallpaper.",
+    "It is a metalloid.",
+    "Agatha Christie used it in her novels.",
+    "It is a famous poison.",
+    "Its symbol is As.",
+    "Its atomic number is 33.",
+    "Its chemical symbol is As.",
+    "The answer is one word of 7 letters.",
+    "It starts with the letter A."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/7/7e/Arsen_1.jpg",
+      "w": 500,
+      "h": 842,
+      "credit": "The original uploader was Tomihahndorf at German Wikipedia.",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Arsen_1.jpg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "selenium",
+   "name": "Selenium",
+   "group": "Nonmetal",
+   "facts": {
+    "atomicNumber": 34,
+    "symbol": "Se",
+    "block": "Nonmetal",
+    "period": 4,
+    "group": 16,
+    "state": "Solid",
+    "year": 1817,
+    "atomicMass": 78.97,
+    "meltingC": 221,
+    "density": 4.81
+   },
+   "blurb": "Selenium (Se) is element number 34, a nonmetal that is a solid at room temperature. It was discovered in 1817.",
+   "clues": [
+    "Its atomic mass is about 78.97.",
+    "It melts at about 221 °C.",
+    "It is in period 4, group 16 of the periodic table.",
+    "It is a nonmetal.",
+    "It was discovered in 1817.",
+    "At room temperature it is a solid.",
+    "Its atomic number is 34.",
+    "Its chemical symbol is Se.",
+    "The answer is one word of 8 letters.",
+    "It starts with the letter S."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/e/e0/Selen_1.jpg/500px-Selen_1.jpg",
+      "w": 500,
+      "h": 234,
+      "credit": "de:User:Tomihahndorf",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Selen_1.jpg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "bromine",
+   "name": "Bromine",
+   "group": "Halogen",
+   "facts": {
+    "atomicNumber": 35,
+    "symbol": "Br",
+    "block": "Halogen",
+    "period": 4,
+    "group": 17,
+    "state": "Liquid",
+    "year": 1826,
+    "atomicMass": 79.9,
+    "meltingC": -7,
+    "density": 3.11
+   },
+   "blurb": "One of only two elements that are liquid at room temperature. It is a red-brown, smelly liquid.",
+   "clues": [
+    "Its atomic mass is about 79.9.",
+    "It melts at about -7 °C.",
+    "Its name means \"stench\" in Greek.",
+    "It is a halogen.",
+    "It is used in some flame retardants.",
+    "It is one of two elements that are liquid at room temperature.",
+    "It is a red-brown liquid.",
+    "Its atomic number is 35.",
+    "Its chemical symbol is Br.",
+    "The answer is one word of 7 letters.",
+    "It starts with the letter B."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/3/35/Bromine_vial_in_acrylic_cube.jpg/500px-Bromine_vial_in_acrylic_cube.jpg",
+      "w": 500,
+      "h": 495,
+      "credit": "Alchemist-hp (pse-mendelejew.de)",
+      "license": "CC BY-SA 3.0 de",
+      "page": "https://commons.wikimedia.org/wiki/File:Bromine_vial_in_acrylic_cube.jpg"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "krypton",
+   "name": "Krypton",
+   "group": "Noble gas",
+   "facts": {
+    "atomicNumber": 36,
+    "symbol": "Kr",
+    "block": "Noble gas",
+    "period": 4,
+    "group": 18,
+    "state": "Gas",
+    "year": 1898,
+    "atomicMass": 83.8,
+    "meltingC": -157,
+    "density": 0.00373
+   },
+   "blurb": "An unreactive gas used in some lights. It shares its name with Superman's weakness, kryptonite.",
+   "clues": [
+    "Its atomic mass is about 83.8.",
+    "It melts at about -157 °C.",
+    "Its name means \"hidden\" in Greek.",
+    "It was found in 1898.",
+    "It is used in some camera flashes.",
+    "It is a noble gas.",
+    "Superman's home planet sounds like it.",
+    "Its atomic number is 36.",
+    "Its chemical symbol is Kr.",
+    "The answer is one word of 7 letters.",
+    "It starts with the letter K."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/e/e7/KrTube.jpg/500px-KrTube.jpg",
+      "w": 500,
+      "h": 500,
+      "credit": "User:Pslawinski",
+      "license": "CC BY-SA 2.5",
+      "page": "https://commons.wikimedia.org/wiki/File:KrTube.jpg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "rubidium",
+   "name": "Rubidium",
+   "group": "Alkali metal",
+   "facts": {
+    "atomicNumber": 37,
+    "symbol": "Rb",
+    "block": "Alkali metal",
+    "period": 5,
+    "group": 1,
+    "state": "Solid",
+    "year": 1861,
+    "atomicMass": 85.47,
+    "meltingC": 39,
+    "density": 1.53
+   },
+   "blurb": "Rubidium (Rb) is element number 37, an alkali metal that is a solid at room temperature. It was discovered in 1861.",
+   "clues": [
+    "Its atomic mass is about 85.47.",
+    "It melts at about 39 °C.",
+    "It is in period 5, group 1 of the periodic table.",
+    "It is an alkali metal.",
+    "It was discovered in 1861.",
+    "At room temperature it is a solid.",
+    "Its atomic number is 37.",
+    "Its chemical symbol is Rb.",
+    "The answer is one word of 8 letters.",
+    "It starts with the letter R."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/12/RbMetal.JPG/500px-RbMetal.JPG",
+      "w": 500,
+      "h": 375,
+      "credit": "Dnn87",
+      "license": "CC BY 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:RbMetal.JPG"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "strontium",
+   "name": "Strontium",
+   "group": "Alkaline earth metal",
+   "facts": {
+    "atomicNumber": 38,
+    "symbol": "Sr",
+    "block": "Alkaline earth metal",
+    "period": 5,
+    "group": 2,
+    "state": "Solid",
+    "year": 1790,
+    "atomicMass": 87.62,
+    "meltingC": 777,
+    "density": 2.64
+   },
+   "blurb": "Strontium (Sr) is element number 38, an alkaline earth metal that is a solid at room temperature. It was discovered in 1790.",
+   "clues": [
+    "Its atomic mass is about 87.62.",
+    "It melts at about 777 °C.",
+    "It is in period 5, group 2 of the periodic table.",
+    "It is an alkaline earth metal.",
+    "It was discovered in 1790.",
+    "At room temperature it is a solid.",
+    "Its atomic number is 38.",
+    "Its chemical symbol is Sr.",
+    "The answer is one word of 9 letters.",
+    "It starts with the letter S."
+   ],
+   "difficulty": 3
+  },
+  {
+   "id": "yttrium",
+   "name": "Yttrium",
+   "group": "Transition metal",
+   "facts": {
+    "atomicNumber": 39,
+    "symbol": "Y",
+    "block": "Transition metal",
+    "period": 5,
+    "group": 3,
+    "state": "Solid",
+    "year": 1794,
+    "atomicMass": 88.91,
+    "meltingC": 1522,
+    "density": 4.47
+   },
+   "blurb": "Yttrium (Y) is element number 39, a transition metal that is a solid at room temperature. It was discovered in 1794.",
+   "clues": [
+    "Its atomic mass is about 88.91.",
+    "It melts at about 1522 °C.",
+    "It is in period 5, group 3 of the periodic table.",
+    "It is a transition metal.",
+    "It was discovered in 1794.",
+    "At room temperature it is a solid.",
+    "Its atomic number is 39.",
+    "Its chemical symbol is Y.",
+    "The answer is one word of 7 letters.",
+    "It starts with the letter Y."
+   ],
+   "difficulty": 3
+  },
+  {
+   "id": "zirconium",
+   "name": "Zirconium",
+   "group": "Transition metal",
+   "facts": {
+    "atomicNumber": 40,
+    "symbol": "Zr",
+    "block": "Transition metal",
+    "period": 5,
+    "group": 4,
+    "state": "Solid",
+    "year": 1789,
+    "atomicMass": 91.22,
+    "meltingC": 1855,
+    "density": 6.52
+   },
+   "blurb": "Zirconium (Zr) is element number 40, a transition metal that is a solid at room temperature. It was discovered in 1789.",
+   "clues": [
+    "Its atomic mass is about 91.22.",
+    "It melts at about 1855 °C.",
+    "It is in period 5, group 4 of the periodic table.",
+    "It is a transition metal.",
+    "It was discovered in 1789.",
+    "At room temperature it is a solid.",
+    "Its atomic number is 40.",
+    "Its chemical symbol is Zr.",
+    "The answer is one word of 9 letters.",
+    "It starts with the letter Z."
+   ],
+   "difficulty": 3
+  },
+  {
+   "id": "niobium",
+   "name": "Niobium",
+   "group": "Transition metal",
+   "facts": {
+    "atomicNumber": 41,
+    "symbol": "Nb",
+    "block": "Transition metal",
+    "period": 5,
+    "group": 5,
+    "state": "Solid",
+    "year": 1801,
+    "atomicMass": 92.91,
+    "meltingC": 2477,
+    "density": 8.57
+   },
+   "blurb": "Niobium (Nb) is element number 41, a transition metal that is a solid at room temperature. It was discovered in 1801.",
+   "clues": [
+    "Its atomic mass is about 92.91.",
+    "It melts at about 2477 °C.",
+    "It is in period 5, group 5 of the periodic table.",
+    "It is a transition metal.",
+    "It was discovered in 1801.",
+    "At room temperature it is a solid.",
+    "Its atomic number is 41.",
+    "Its chemical symbol is Nb.",
+    "The answer is one word of 7 letters.",
+    "It starts with the letter N."
+   ],
+   "difficulty": 3
+  },
+  {
+   "id": "molybdenum",
+   "name": "Molybdenum",
+   "group": "Transition metal",
+   "facts": {
+    "atomicNumber": 42,
+    "symbol": "Mo",
+    "block": "Transition metal",
+    "period": 5,
+    "group": 6,
+    "state": "Solid",
+    "year": 1778,
+    "atomicMass": 95.95,
+    "meltingC": 2623,
+    "density": 10.2
+   },
+   "blurb": "Molybdenum (Mo) is element number 42, a transition metal that is a solid at room temperature. It was discovered in 1778.",
+   "clues": [
+    "Its atomic mass is about 95.95.",
+    "It melts at about 2623 °C.",
+    "It is in period 5, group 6 of the periodic table.",
+    "It is a transition metal.",
+    "It was discovered in 1778.",
+    "At room temperature it is a solid.",
+    "Its atomic number is 42.",
+    "Its chemical symbol is Mo.",
+    "The answer is one word of 10 letters.",
+    "It starts with the letter M."
+   ],
+   "difficulty": 3
+  },
+  {
+   "id": "technetium",
+   "name": "Technetium",
+   "group": "Transition metal",
+   "facts": {
+    "atomicNumber": 43,
+    "symbol": "Tc",
+    "block": "Transition metal",
+    "period": 5,
+    "group": 7,
+    "state": "Solid",
+    "year": 1937,
+    "atomicMass": 96.91,
+    "meltingC": 2157,
+    "density": 11
+   },
+   "blurb": "Technetium (Tc) is element number 43, a transition metal that is a solid at room temperature. It was discovered in 1937.",
+   "clues": [
+    "Its atomic mass is about 96.91.",
+    "It melts at about 2157 °C.",
+    "It is in period 5, group 7 of the periodic table.",
+    "It is a transition metal.",
+    "It was discovered in 1937.",
+    "At room temperature it is a solid.",
+    "Its atomic number is 43.",
+    "Its chemical symbol is Tc.",
+    "The answer is one word of 10 letters.",
+    "It starts with the letter T."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/3/37/Technetium-sample.jpg/500px-Technetium-sample.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "MARCO CARDIN",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Technetium-sample.jpg"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "ruthenium",
+   "name": "Ruthenium",
+   "group": "Transition metal",
+   "facts": {
+    "atomicNumber": 44,
+    "symbol": "Ru",
+    "block": "Transition metal",
+    "period": 5,
+    "group": 8,
+    "state": "Solid",
+    "year": 1827,
+    "atomicMass": 101.1,
+    "meltingC": 2334,
+    "density": 12.1
+   },
+   "blurb": "Ruthenium (Ru) is element number 44, a transition metal that is a solid at room temperature. It was discovered in 1827.",
+   "clues": [
+    "Its atomic mass is about 101.1.",
+    "It melts at about 2334 °C.",
+    "It is in period 5, group 8 of the periodic table.",
+    "It is a transition metal.",
+    "It was discovered in 1827.",
+    "At room temperature it is a solid.",
+    "Its atomic number is 44.",
+    "Its chemical symbol is Ru.",
+    "The answer is one word of 9 letters.",
+    "It starts with the letter R."
+   ],
+   "difficulty": 3
+  },
+  {
+   "id": "rhodium",
+   "name": "Rhodium",
+   "group": "Transition metal",
+   "facts": {
+    "atomicNumber": 45,
+    "symbol": "Rh",
+    "block": "Transition metal",
+    "period": 5,
+    "group": 9,
+    "state": "Solid",
+    "year": 1803,
+    "atomicMass": 102.9,
+    "meltingC": 1964,
+    "density": 12.4
+   },
+   "blurb": "Rhodium (Rh) is element number 45, a transition metal that is a solid at room temperature. It was discovered in 1803.",
+   "clues": [
+    "Its atomic mass is about 102.9.",
+    "It melts at about 1964 °C.",
+    "It is in period 5, group 9 of the periodic table.",
+    "It is a transition metal.",
+    "It was discovered in 1803.",
+    "At room temperature it is a solid.",
+    "Its atomic number is 45.",
+    "Its chemical symbol is Rh.",
+    "The answer is one word of 7 letters.",
+    "It starts with the letter R."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/9/98/Rhodium_powder_pressed_melted.jpg/500px-Rhodium_powder_pressed_melted.jpg",
+      "w": 500,
+      "h": 256,
+      "credit": "Alchemist-hp (talk) www.pse-mendelejew.de derivative work: Purpy Pupple (talk)",
+      "license": "CC BY-SA 3.0 de",
+      "page": "https://commons.wikimedia.org/wiki/File:Rhodium_powder_pressed_melted.jpg"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "palladium",
+   "name": "Palladium",
+   "group": "Transition metal",
+   "facts": {
+    "atomicNumber": 46,
+    "symbol": "Pd",
+    "block": "Transition metal",
+    "period": 5,
+    "group": 10,
+    "state": "Solid",
+    "year": 1803,
+    "atomicMass": 106.4,
+    "meltingC": 1555,
+    "density": 12
+   },
+   "blurb": "Palladium (Pd) is element number 46, a transition metal that is a solid at room temperature. It was discovered in 1803.",
+   "clues": [
+    "Its atomic mass is about 106.4.",
+    "It melts at about 1555 °C.",
+    "It is in period 5, group 10 of the periodic table.",
+    "It is a transition metal.",
+    "It was discovered in 1803.",
+    "At room temperature it is a solid.",
+    "Its atomic number is 46.",
+    "Its chemical symbol is Pd.",
+    "The answer is one word of 9 letters.",
+    "It starts with the letter P."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/d/d7/Palladium_%2846_Pd%29.jpg/500px-Palladium_%2846_Pd%29.jpg",
+      "w": 500,
+      "h": 500,
+      "credit": "Hi-Res Images of Chemical Elements",
+      "license": "CC BY 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Palladium_(46_Pd).jpg"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "silver",
+   "name": "Silver",
+   "group": "Transition metal",
+   "facts": {
+    "atomicNumber": 47,
+    "symbol": "Ag",
+    "block": "Transition metal",
+    "period": 5,
+    "group": 11,
+    "state": "Solid",
+    "ancient": true,
+    "atomicMass": 107.9,
+    "meltingC": 962,
+    "density": 10.5
+   },
+   "blurb": "A shiny white metal that conducts electricity better than any other. It is used in jewellery and coins.",
+   "clues": [
+    "Its atomic mass is about 107.9.",
+    "It melts at about 962 °C.",
+    "It conducts electricity better than any other element.",
+    "Its symbol, Ag, comes from Latin \"argentum\".",
+    "Argentina is named after it.",
+    "It tarnishes black over time.",
+    "Second-place winners get a medal of it.",
+    "Its atomic number is 47.",
+    "Its chemical symbol is Ag.",
+    "The answer is one word of 6 letters.",
+    "It starts with the letter S."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/5/55/Silver_crystal.jpg/500px-Silver_crystal.jpg",
+      "w": 500,
+      "h": 392,
+      "credit": "Alchemist-hp (talk) (www.pse-mendelejew.de)",
+      "license": "CC BY-SA 3.0 de",
+      "page": "https://commons.wikimedia.org/wiki/File:Silver_crystal.jpg"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "cadmium",
+   "name": "Cadmium",
+   "group": "Transition metal",
+   "facts": {
+    "atomicNumber": 48,
+    "symbol": "Cd",
+    "block": "Transition metal",
+    "period": 5,
+    "group": 12,
+    "state": "Solid",
+    "year": 1817,
+    "atomicMass": 112.4,
+    "meltingC": 321,
+    "density": 8.69
+   },
+   "blurb": "Cadmium (Cd) is element number 48, a transition metal that is a solid at room temperature. It was discovered in 1817.",
+   "clues": [
+    "Its atomic mass is about 112.4.",
+    "It melts at about 321 °C.",
+    "It is in period 5, group 12 of the periodic table.",
+    "It is a transition metal.",
+    "It was discovered in 1817.",
+    "At room temperature it is a solid.",
+    "Its atomic number is 48.",
+    "Its chemical symbol is Cd.",
+    "The answer is one word of 7 letters.",
+    "It starts with the letter C."
+   ],
+   "difficulty": 3
+  },
+  {
+   "id": "indium",
+   "name": "Indium",
+   "group": "Post-transition metal",
+   "facts": {
+    "atomicNumber": 49,
+    "symbol": "In",
+    "block": "Post-transition metal",
+    "period": 5,
+    "group": 13,
+    "state": "Solid",
+    "year": 1863,
+    "atomicMass": 114.8,
+    "meltingC": 157,
+    "density": 7.31
+   },
+   "blurb": "Indium (In) is element number 49, a post-transition metal that is a solid at room temperature. It was discovered in 1863.",
+   "clues": [
+    "Its atomic mass is about 114.8.",
+    "It melts at about 157 °C.",
+    "It is in period 5, group 13 of the periodic table.",
+    "It is a post-transition metal.",
+    "It was discovered in 1863.",
+    "At room temperature it is a solid.",
+    "Its atomic number is 49.",
+    "Its chemical symbol is In.",
+    "The answer is one word of 6 letters.",
+    "It starts with the letter I."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/d/d4/Indium_wetting_glass.jpg/500px-Indium_wetting_glass.jpg",
+      "w": 500,
+      "h": 369,
+      "credit": "Schtone",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Indium_wetting_glass.jpg"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "tin",
+   "name": "Tin",
+   "group": "Post-transition metal",
+   "facts": {
+    "atomicNumber": 50,
+    "symbol": "Sn",
+    "block": "Post-transition metal",
+    "period": 5,
+    "group": 14,
+    "state": "Solid",
+    "ancient": true,
+    "atomicMass": 118.7,
+    "meltingC": 232,
+    "density": 7.29
+   },
+   "blurb": "A soft, silvery metal used to coat food cans. Bronze is copper and tin.",
+   "clues": [
+    "Its atomic mass is about 118.7.",
+    "It melts at about 232 °C.",
+    "Bronze is copper mixed with it.",
+    "Bending a bar of it makes a \"cry\".",
+    "Its symbol, Sn, comes from Latin \"stannum\".",
+    "Food cans are coated with it.",
+    "A 10th wedding anniversary is named after it.",
+    "Its atomic number is 50.",
+    "Its chemical symbol is Sn.",
+    "The answer is one word of 3 letters.",
+    "It starts with the letter T."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/2/2c/C%C3%ADn.PNG",
+      "w": 500,
+      "h": 230,
+      "credit": "Ondřej Mangl",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:C%C3%ADn.PNG"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "antimony",
+   "name": "Antimony",
+   "group": "Metalloid",
+   "facts": {
+    "atomicNumber": 51,
+    "symbol": "Sb",
+    "block": "Metalloid",
+    "period": 5,
+    "group": 15,
+    "state": "Solid",
+    "ancient": true,
+    "atomicMass": 121.8,
+    "meltingC": 631,
+    "density": 6.68
+   },
+   "blurb": "Antimony (Sb) is element number 51, a metalloid that is a solid at room temperature.",
+   "clues": [
+    "Its atomic mass is about 121.8.",
+    "It melts at about 631 °C.",
+    "It is in period 5, group 15 of the periodic table.",
+    "It is a metalloid.",
+    "It has been known since ancient times.",
+    "At room temperature it is a solid.",
+    "Its atomic number is 51.",
+    "Its chemical symbol is Sb.",
+    "The answer is one word of 8 letters.",
+    "It starts with the letter A."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/8/88/Antimony-2.jpg/500px-Antimony-2.jpg",
+      "w": 500,
+      "h": 500,
+      "credit": "Jurii",
+      "license": "CC BY 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Antimony-2.jpg"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "tellurium",
+   "name": "Tellurium",
+   "group": "Metalloid",
+   "facts": {
+    "atomicNumber": 52,
+    "symbol": "Te",
+    "block": "Metalloid",
+    "period": 5,
+    "group": 16,
+    "state": "Solid",
+    "year": 1782,
+    "atomicMass": 127.6,
+    "meltingC": 450,
+    "density": 6.23
+   },
+   "blurb": "Tellurium (Te) is element number 52, a metalloid that is a solid at room temperature. It was discovered in 1782.",
+   "clues": [
+    "Its atomic mass is about 127.6.",
+    "It melts at about 450 °C.",
+    "It is in period 5, group 16 of the periodic table.",
+    "It is a metalloid.",
+    "It was discovered in 1782.",
+    "At room temperature it is a solid.",
+    "Its atomic number is 52.",
+    "Its chemical symbol is Te.",
+    "The answer is one word of 9 letters.",
+    "It starts with the letter T."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/8/89/Tellurium_element_2.jpg/500px-Tellurium_element_2.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "W. Oelen",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Tellurium_element_2.jpg"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "iodine",
+   "name": "Iodine",
+   "group": "Halogen",
+   "facts": {
+    "atomicNumber": 53,
+    "symbol": "I",
+    "block": "Halogen",
+    "period": 5,
+    "group": 17,
+    "state": "Solid",
+    "year": 1811,
+    "atomicMass": 126.9,
+    "meltingC": 114,
+    "density": 4.93
+   },
+   "blurb": "A dark element that turns into purple vapour. Our bodies need a little to make thyroid hormones.",
+   "clues": [
+    "Its atomic mass is about 126.9.",
+    "It melts at about 114 °C.",
+    "Its name means \"violet\" in Greek.",
+    "It turns into purple vapour when heated.",
+    "It is added to table salt.",
+    "It is used to clean cuts.",
+    "It is a halogen.",
+    "Its atomic number is 53.",
+    "Its chemical symbol is I.",
+    "The answer is one word of 6 letters.",
+    "It starts with the letter I."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/0/0a/Sample_of_iodine.jpg/500px-Sample_of_iodine.jpg",
+      "w": 500,
+      "h": 260,
+      "credit": "LHcheM",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Sample_of_iodine.jpg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "xenon",
+   "name": "Xenon",
+   "group": "Noble gas",
+   "facts": {
+    "atomicNumber": 54,
+    "symbol": "Xe",
+    "block": "Noble gas",
+    "period": 5,
+    "group": 18,
+    "state": "Gas",
+    "year": 1898,
+    "atomicMass": 131.3,
+    "meltingC": -112,
+    "density": 0.00589
+   },
+   "blurb": "A heavy, unreactive gas used in bright car headlights and in ion engines for spacecraft.",
+   "clues": [
+    "Its atomic mass is about 131.3.",
+    "It melts at about -112 °C.",
+    "Its name means \"stranger\" in Greek.",
+    "It powers ion engines on spacecraft.",
+    "It is used in bright car headlights.",
+    "It can put people to sleep as an anaesthetic.",
+    "It is a noble gas.",
+    "Its atomic number is 54.",
+    "Its chemical symbol is Xe.",
+    "The answer is one word of 5 letters.",
+    "It starts with the letter X."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/5/59/XeTube.jpg/500px-XeTube.jpg",
+      "w": 500,
+      "h": 500,
+      "credit": "User:Pslawinski",
+      "license": "CC BY-SA 2.5",
+      "page": "https://commons.wikimedia.org/wiki/File:XeTube.jpg"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "caesium",
+   "name": "Caesium",
+   "alt": [
+    "Cesium"
+   ],
+   "group": "Alkali metal",
+   "facts": {
+    "atomicNumber": 55,
+    "symbol": "Cs",
+    "block": "Alkali metal",
+    "period": 6,
+    "group": 1,
+    "state": "Solid",
+    "year": 1860,
+    "atomicMass": 132.9,
+    "meltingC": 28,
+    "density": 1.93
+   },
+   "blurb": "A very soft, reactive metal used to keep the world's most accurate time in atomic clocks.",
+   "clues": [
+    "Its atomic mass is about 132.9.",
+    "It melts at about 28 °C.",
+    "Atomic clocks use it to define the second.",
+    "It melts on a hot day, at about 28 °C.",
+    "It explodes violently in water.",
+    "Its name means \"sky blue\" in Latin.",
+    "It is an alkali metal.",
+    "Its atomic number is 55.",
+    "Its chemical symbol is Cs.",
+    "The answer is one word of 7 letters.",
+    "It starts with the letter C."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/3/3d/Cesium.jpg/500px-Cesium.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Dnn87 Contact email: Dnn87yahoo.dk",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Cesium.jpg"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "barium",
+   "name": "Barium",
+   "group": "Alkaline earth metal",
+   "facts": {
+    "atomicNumber": 56,
+    "symbol": "Ba",
+    "block": "Alkaline earth metal",
+    "period": 6,
+    "group": 2,
+    "state": "Solid",
+    "year": 1808,
+    "atomicMass": 137.3,
+    "meltingC": 727,
+    "density": 3.62
+   },
+   "blurb": "Barium (Ba) is element number 56, an alkaline earth metal that is a solid at room temperature. It was discovered in 1808.",
+   "clues": [
+    "Its atomic mass is about 137.3.",
+    "It melts at about 727 °C.",
+    "It is in period 6, group 2 of the periodic table.",
+    "It is an alkaline earth metal.",
+    "It was discovered in 1808.",
+    "At room temperature it is a solid.",
+    "Its atomic number is 56.",
+    "Its chemical symbol is Ba.",
+    "The answer is one word of 6 letters.",
+    "It starts with the letter B."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/9/9e/Barium_1.jpg",
+      "w": 500,
+      "h": 674,
+      "credit": "The original uploader was Tomihahndorf at German Wikipedia.",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Barium_1.jpg"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "lanthanum",
+   "name": "Lanthanum",
+   "group": "Lanthanide",
+   "facts": {
+    "atomicNumber": 57,
+    "symbol": "La",
+    "block": "Lanthanide",
+    "period": 6,
+    "state": "Solid",
+    "year": 1839,
+    "atomicMass": 138.9,
+    "meltingC": 918,
+    "density": 6.15
+   },
+   "blurb": "Lanthanum (La) is element number 57, a lanthanide that is a solid at room temperature. It was discovered in 1839.",
+   "clues": [
+    "Its atomic mass is about 138.9.",
+    "It melts at about 918 °C.",
+    "It is in period 6 of the periodic table.",
+    "It was discovered in 1839.",
+    "At room temperature it is a solid.",
+    "Its atomic number is 57.",
+    "Its chemical symbol is La.",
+    "The answer is one word of 9 letters.",
+    "It starts with the letter L."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/8/8f/Lanthan_1-cropflipped.jpg",
+      "w": 500,
+      "h": 407,
+      "credit": "Lanthan_1.jpg: Tomihahndorf derivative work: Materialscientist (talk)",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Lanthan_1-cropflipped.jpg"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "cerium",
+   "name": "Cerium",
+   "group": "Lanthanide",
+   "facts": {
+    "atomicNumber": 58,
+    "symbol": "Ce",
+    "block": "Lanthanide",
+    "period": 6,
+    "state": "Solid",
+    "year": 1803,
+    "atomicMass": 140.1,
+    "meltingC": 798,
+    "density": 6.77
+   },
+   "blurb": "Cerium (Ce) is element number 58, a lanthanide that is a solid at room temperature. It was discovered in 1803.",
+   "clues": [
+    "Its atomic mass is about 140.1.",
+    "It melts at about 798 °C.",
+    "It is in period 6 of the periodic table.",
+    "It is a lanthanide.",
+    "It was discovered in 1803.",
+    "At room temperature it is a solid.",
+    "Its atomic number is 58.",
+    "Its chemical symbol is Ce.",
+    "The answer is one word of 6 letters.",
+    "It starts with the letter C."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/a/ac/CE2k2g.jpg",
+      "w": 500,
+      "h": 274,
+      "credit": "Alchemist-hp (pse-mendelejew.de) Alchemist-hp at de.wikipedia",
+      "license": "CC BY-SA 2.0 de",
+      "page": "https://commons.wikimedia.org/wiki/File:CE2k2g.jpg"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "praseodymium",
+   "name": "Praseodymium",
+   "group": "Lanthanide",
+   "facts": {
+    "atomicNumber": 59,
+    "symbol": "Pr",
+    "block": "Lanthanide",
+    "period": 6,
+    "state": "Solid",
+    "year": 1885,
+    "atomicMass": 140.9,
+    "meltingC": 931,
+    "density": 6.77
+   },
+   "blurb": "Praseodymium (Pr) is element number 59, a lanthanide that is a solid at room temperature. It was discovered in 1885.",
+   "clues": [
+    "Its atomic mass is about 140.9.",
+    "It melts at about 931 °C.",
+    "It is in period 6 of the periodic table.",
+    "It is a lanthanide.",
+    "It was discovered in 1885.",
+    "At room temperature it is a solid.",
+    "Its atomic number is 59.",
+    "Its chemical symbol is Pr.",
+    "The answer is one word of 12 letters.",
+    "It starts with the letter P."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/3/37/Praseodym_1.jpg",
+      "w": 500,
+      "h": 710,
+      "credit": "The original uploader was Tomihahndorf at German Wikipedia.",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Praseodym_1.jpg"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "neodymium",
+   "name": "Neodymium",
+   "group": "Lanthanide",
+   "facts": {
+    "atomicNumber": 60,
+    "symbol": "Nd",
+    "block": "Lanthanide",
+    "period": 6,
+    "state": "Solid",
+    "year": 1885,
+    "atomicMass": 144.2,
+    "meltingC": 1021,
+    "density": 7.01
+   },
+   "blurb": "Neodymium (Nd) is element number 60, a lanthanide that is a solid at room temperature. It was discovered in 1885.",
+   "clues": [
+    "Its atomic mass is about 144.2.",
+    "It melts at about 1021 °C.",
+    "It is in period 6 of the periodic table.",
+    "It is a lanthanide.",
+    "It was discovered in 1885.",
+    "At room temperature it is a solid.",
+    "Its atomic number is 60.",
+    "Its chemical symbol is Nd.",
+    "The answer is one word of 9 letters.",
+    "It starts with the letter N."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/5/5d/Neodym_1.jpg",
+      "w": 500,
+      "h": 580,
+      "credit": "The original uploader was Tomihahndorf at German Wikipedia.",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Neodym_1.jpg"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "promethium",
+   "name": "Promethium",
+   "group": "Lanthanide",
+   "facts": {
+    "atomicNumber": 61,
+    "symbol": "Pm",
+    "block": "Lanthanide",
+    "period": 6,
+    "state": "Solid",
+    "year": 1945,
+    "atomicMass": 144.9,
+    "meltingC": 1042,
+    "density": 7.26
+   },
+   "blurb": "Promethium (Pm) is element number 61, a lanthanide that is a solid at room temperature. It was discovered in 1945.",
+   "clues": [
+    "Its atomic mass is about 144.9.",
+    "It melts at about 1042 °C.",
+    "It is in period 6 of the periodic table.",
+    "It is a lanthanide.",
+    "It was discovered in 1945.",
+    "At room temperature it is a solid.",
+    "Its atomic number is 61.",
+    "Its chemical symbol is Pm.",
+    "The answer is one word of 10 letters.",
+    "It starts with the letter P."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/f/f7/Promethium-147_solution.jpg/330px-Promethium-147_solution.jpg",
+      "w": 330,
+      "h": 667,
+      "credit": "Oak Ridge National Laboratory",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Promethium-147_solution.jpg"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "samarium",
+   "name": "Samarium",
+   "group": "Lanthanide",
+   "facts": {
+    "atomicNumber": 62,
+    "symbol": "Sm",
+    "block": "Lanthanide",
+    "period": 6,
+    "state": "Solid",
+    "year": 1879,
+    "atomicMass": 150.4,
+    "meltingC": 1074,
+    "density": 7.52
+   },
+   "blurb": "Samarium (Sm) is element number 62, a lanthanide that is a solid at room temperature. It was discovered in 1879.",
+   "clues": [
+    "Its atomic mass is about 150.4.",
+    "It melts at about 1074 °C.",
+    "It is in period 6 of the periodic table.",
+    "It is a lanthanide.",
+    "It was discovered in 1879.",
+    "At room temperature it is a solid.",
+    "Its atomic number is 62.",
+    "Its chemical symbol is Sm.",
+    "The answer is one word of 8 letters.",
+    "It starts with the letter S."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/2/20/Samarium_1.jpg",
+      "w": 500,
+      "h": 702,
+      "credit": "Tomihahndorf",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Samarium_1.jpg"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "europium",
+   "name": "Europium",
+   "group": "Lanthanide",
+   "facts": {
+    "atomicNumber": 63,
+    "symbol": "Eu",
+    "block": "Lanthanide",
+    "period": 6,
+    "state": "Solid",
+    "year": 1901,
+    "atomicMass": 152,
+    "meltingC": 822,
+    "density": 5.24
+   },
+   "blurb": "Europium (Eu) is element number 63, a lanthanide that is a solid at room temperature. It was discovered in 1901.",
+   "clues": [
+    "Its atomic mass is about 152.",
+    "It melts at about 822 °C.",
+    "It is in period 6 of the periodic table.",
+    "It is a lanthanide.",
+    "It was discovered in 1901.",
+    "At room temperature it is a solid.",
+    "Its atomic number is 63.",
+    "Its chemical symbol is Eu.",
+    "The answer is one word of 8 letters.",
+    "It starts with the letter E."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/b/bb/Eu-Block.jpg/500px-Eu-Block.jpg",
+      "w": 500,
+      "h": 332,
+      "credit": "Alchemist-hp (www.pse-mendelejew.de)",
+      "license": "CC BY-SA 3.0 de",
+      "page": "https://commons.wikimedia.org/wiki/File:Eu-Block.jpg"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "gadolinium",
+   "name": "Gadolinium",
+   "group": "Lanthanide",
+   "facts": {
+    "atomicNumber": 64,
+    "symbol": "Gd",
+    "block": "Lanthanide",
+    "period": 6,
+    "state": "Solid",
+    "year": 1880,
+    "atomicMass": 157.3,
+    "meltingC": 1313,
+    "density": 7.9
+   },
+   "blurb": "Gadolinium (Gd) is element number 64, a lanthanide that is a solid at room temperature. It was discovered in 1880.",
+   "clues": [
+    "Its atomic mass is about 157.3.",
+    "It melts at about 1313 °C.",
+    "It is in period 6 of the periodic table.",
+    "It is a lanthanide.",
+    "It was discovered in 1880.",
+    "At room temperature it is a solid.",
+    "Its atomic number is 64.",
+    "Its chemical symbol is Gd.",
+    "The answer is one word of 10 letters.",
+    "It starts with the letter G."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/b/b7/Gadolinium.jpg",
+      "w": 500,
+      "h": 506,
+      "credit": "Wikimedia Commons",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Gadolinium.jpg"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "terbium",
+   "name": "Terbium",
+   "group": "Lanthanide",
+   "facts": {
+    "atomicNumber": 65,
+    "symbol": "Tb",
+    "block": "Lanthanide",
+    "period": 6,
+    "state": "Solid",
+    "year": 1843,
+    "atomicMass": 158.9,
+    "meltingC": 1356,
+    "density": 8.23
+   },
+   "blurb": "Terbium (Tb) is element number 65, a lanthanide that is a solid at room temperature. It was discovered in 1843.",
+   "clues": [
+    "Its atomic mass is about 158.9.",
+    "It melts at about 1356 °C.",
+    "It is in period 6 of the periodic table.",
+    "It is a lanthanide.",
+    "It was discovered in 1843.",
+    "At room temperature it is a solid.",
+    "Its atomic number is 65.",
+    "Its chemical symbol is Tb.",
+    "The answer is one word of 7 letters.",
+    "It starts with the letter T."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/a/a1/Terbium_element.jpg/500px-Terbium_element.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "W. Oelen",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Terbium_element.jpg"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "dysprosium",
+   "name": "Dysprosium",
+   "group": "Lanthanide",
+   "facts": {
+    "atomicNumber": 66,
+    "symbol": "Dy",
+    "block": "Lanthanide",
+    "period": 6,
+    "state": "Solid",
+    "year": 1886,
+    "atomicMass": 162.5,
+    "meltingC": 1412,
+    "density": 8.55
+   },
+   "blurb": "Dysprosium (Dy) is element number 66, a lanthanide that is a solid at room temperature. It was discovered in 1886.",
+   "clues": [
+    "Its atomic mass is about 162.5.",
+    "It melts at about 1412 °C.",
+    "It is in period 6 of the periodic table.",
+    "It is a lanthanide.",
+    "It was discovered in 1886.",
+    "At room temperature it is a solid.",
+    "Its atomic number is 66.",
+    "Its chemical symbol is Dy.",
+    "The answer is one word of 10 letters.",
+    "It starts with the letter D."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/b/bb/Dysprosium1.jpg/500px-Dysprosium1.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "W. Oelen",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Dysprosium1.jpg"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "holmium",
+   "name": "Holmium",
+   "group": "Lanthanide",
+   "facts": {
+    "atomicNumber": 67,
+    "symbol": "Ho",
+    "block": "Lanthanide",
+    "period": 6,
+    "state": "Solid",
+    "year": 1878,
+    "atomicMass": 164.9,
+    "meltingC": 1474,
+    "density": 8.8
+   },
+   "blurb": "Holmium (Ho) is element number 67, a lanthanide that is a solid at room temperature. It was discovered in 1878.",
+   "clues": [
+    "Its atomic mass is about 164.9.",
+    "It melts at about 1474 °C.",
+    "It is in period 6 of the periodic table.",
+    "It is a lanthanide.",
+    "It was discovered in 1878.",
+    "At room temperature it is a solid.",
+    "Its atomic number is 67.",
+    "Its chemical symbol is Ho.",
+    "The answer is one word of 7 letters.",
+    "It starts with the letter H."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/a/a2/Holmium.jpg/500px-Holmium.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Wilco Oelen",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Holmium.jpg"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "erbium",
+   "name": "Erbium",
+   "group": "Lanthanide",
+   "facts": {
+    "atomicNumber": 68,
+    "symbol": "Er",
+    "block": "Lanthanide",
+    "period": 6,
+    "state": "Solid",
+    "year": 1843,
+    "atomicMass": 167.3,
+    "meltingC": 1529,
+    "density": 9.07
+   },
+   "blurb": "Erbium (Er) is element number 68, a lanthanide that is a solid at room temperature. It was discovered in 1843.",
+   "clues": [
+    "Its atomic mass is about 167.3.",
+    "It melts at about 1529 °C.",
+    "It is in period 6 of the periodic table.",
+    "It is a lanthanide.",
+    "It was discovered in 1843.",
+    "At room temperature it is a solid.",
+    "Its atomic number is 68.",
+    "Its chemical symbol is Er.",
+    "The answer is one word of 6 letters.",
+    "It starts with the letter E."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/c/cc/Erbium.jpg",
+      "w": 500,
+      "h": 712,
+      "credit": "Tomihahndorf",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Erbium.jpg"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "thulium",
+   "name": "Thulium",
+   "group": "Lanthanide",
+   "facts": {
+    "atomicNumber": 69,
+    "symbol": "Tm",
+    "block": "Lanthanide",
+    "period": 6,
+    "state": "Solid",
+    "year": 1879,
+    "atomicMass": 168.9,
+    "meltingC": 1545,
+    "density": 9.32
+   },
+   "blurb": "Thulium (Tm) is element number 69, a lanthanide that is a solid at room temperature. It was discovered in 1879.",
+   "clues": [
+    "Its atomic mass is about 168.9.",
+    "It melts at about 1545 °C.",
+    "It is in period 6 of the periodic table.",
+    "It is a lanthanide.",
+    "It was discovered in 1879.",
+    "At room temperature it is a solid.",
+    "Its atomic number is 69.",
+    "Its chemical symbol is Tm.",
+    "The answer is one word of 7 letters.",
+    "It starts with the letter T."
+   ],
+   "difficulty": 3
+  },
+  {
+   "id": "ytterbium",
+   "name": "Ytterbium",
+   "group": "Lanthanide",
+   "facts": {
+    "atomicNumber": 70,
+    "symbol": "Yb",
+    "block": "Lanthanide",
+    "period": 6,
+    "state": "Solid",
+    "year": 1878,
+    "atomicMass": 173.1,
+    "meltingC": 819,
+    "density": 6.9
+   },
+   "blurb": "Ytterbium (Yb) is element number 70, a lanthanide that is a solid at room temperature. It was discovered in 1878.",
+   "clues": [
+    "Its atomic mass is about 173.1.",
+    "It melts at about 819 °C.",
+    "It is in period 6 of the periodic table.",
+    "It is a lanthanide.",
+    "It was discovered in 1878.",
+    "At room temperature it is a solid.",
+    "Its atomic number is 70.",
+    "Its chemical symbol is Yb.",
+    "The answer is one word of 9 letters.",
+    "It starts with the letter Y."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/9/98/Ytterbium_element.jpg/500px-Ytterbium_element.jpg",
+      "w": 500,
+      "h": 250,
+      "credit": "W. Oelen",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Ytterbium_element.jpg"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "lutetium",
+   "name": "Lutetium",
+   "group": "Lanthanide",
+   "facts": {
+    "atomicNumber": 71,
+    "symbol": "Lu",
+    "block": "Lanthanide",
+    "period": 6,
+    "state": "Solid",
+    "year": 1907,
+    "atomicMass": 175,
+    "meltingC": 1663,
+    "density": 9.84
+   },
+   "blurb": "Lutetium (Lu) is element number 71, a lanthanide that is a solid at room temperature. It was discovered in 1907.",
+   "clues": [
+    "Its atomic mass is about 175.",
+    "It melts at about 1663 °C.",
+    "It is in period 6 of the periodic table.",
+    "It is a lanthanide.",
+    "It was discovered in 1907.",
+    "At room temperature it is a solid.",
+    "Its atomic number is 71.",
+    "Its chemical symbol is Lu.",
+    "The answer is one word of 8 letters.",
+    "It starts with the letter L."
+   ],
+   "difficulty": 3
+  },
+  {
+   "id": "hafnium",
+   "name": "Hafnium",
+   "group": "Transition metal",
+   "facts": {
+    "atomicNumber": 72,
+    "symbol": "Hf",
+    "block": "Transition metal",
+    "period": 6,
+    "group": 4,
+    "state": "Solid",
+    "year": 1923,
+    "atomicMass": 178.5,
+    "meltingC": 2233,
+    "density": 13.3
+   },
+   "blurb": "Hafnium (Hf) is element number 72, a transition metal that is a solid at room temperature. It was discovered in 1923.",
+   "clues": [
+    "Its atomic mass is about 178.5.",
+    "It melts at about 2233 °C.",
+    "It is in period 6, group 4 of the periodic table.",
+    "It is a transition metal.",
+    "It was discovered in 1923.",
+    "At room temperature it is a solid.",
+    "Its atomic number is 72.",
+    "Its chemical symbol is Hf.",
+    "The answer is one word of 7 letters.",
+    "It starts with the letter H."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/3/38/Hf-crystal_bar.jpg/500px-Hf-crystal_bar.jpg",
+      "w": 500,
+      "h": 142,
+      "credit": "Alchemist-hp (talk) (www.pse-mendelejew.de)",
+      "license": "CC BY-SA 3.0 de",
+      "page": "https://commons.wikimedia.org/wiki/File:Hf-crystal_bar.jpg"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "tantalum",
+   "name": "Tantalum",
+   "group": "Transition metal",
+   "facts": {
+    "atomicNumber": 73,
+    "symbol": "Ta",
+    "block": "Transition metal",
+    "period": 6,
+    "group": 5,
+    "state": "Solid",
+    "year": 1802,
+    "atomicMass": 180.9,
+    "meltingC": 3017,
+    "density": 16.4
+   },
+   "blurb": "Tantalum (Ta) is element number 73, a transition metal that is a solid at room temperature. It was discovered in 1802.",
+   "clues": [
+    "Its atomic mass is about 180.9.",
+    "It melts at about 3017 °C.",
+    "It is in period 6, group 5 of the periodic table.",
+    "It is a transition metal.",
+    "It was discovered in 1802.",
+    "At room temperature it is a solid.",
+    "Its atomic number is 73.",
+    "Its chemical symbol is Ta.",
+    "The answer is one word of 8 letters.",
+    "It starts with the letter T."
+   ],
+   "difficulty": 3
+  },
+  {
+   "id": "tungsten",
+   "name": "Tungsten",
+   "group": "Transition metal",
+   "facts": {
+    "atomicNumber": 74,
+    "symbol": "W",
+    "block": "Transition metal",
+    "period": 6,
+    "group": 6,
+    "state": "Solid",
+    "year": 1783,
+    "atomicMass": 183.8,
+    "meltingC": 3422,
+    "density": 19.3
+   },
+   "blurb": "The metal with the highest melting point. It was used for the glowing filaments in old light bulbs.",
+   "clues": [
+    "Its atomic mass is about 183.8.",
+    "It melts at about 3422 °C.",
+    "Its symbol, W, comes from \"wolfram\".",
+    "Its name means \"heavy stone\" in Swedish.",
+    "It has the highest melting point of any metal.",
+    "It is used in drill bits.",
+    "Old light-bulb filaments were made of it.",
+    "Its atomic number is 74.",
+    "Its chemical symbol is W.",
+    "The answer is one word of 8 letters.",
+    "It starts with the letter T."
+   ],
+   "difficulty": 2
+  },
+  {
+   "id": "rhenium",
+   "name": "Rhenium",
+   "group": "Transition metal",
+   "facts": {
+    "atomicNumber": 75,
+    "symbol": "Re",
+    "block": "Transition metal",
+    "period": 6,
+    "group": 7,
+    "state": "Solid",
+    "year": 1925,
+    "atomicMass": 186.2,
+    "meltingC": 3186,
+    "density": 20.8
+   },
+   "blurb": "Rhenium (Re) is element number 75, a transition metal that is a solid at room temperature. It was discovered in 1925.",
+   "clues": [
+    "Its atomic mass is about 186.2.",
+    "It melts at about 3186 °C.",
+    "It is in period 6, group 7 of the periodic table.",
+    "It is a transition metal.",
+    "It was discovered in 1925.",
+    "At room temperature it is a solid.",
+    "Its atomic number is 75.",
+    "Its chemical symbol is Re.",
+    "The answer is one word of 7 letters.",
+    "It starts with the letter R."
+   ],
+   "difficulty": 3
+  },
+  {
+   "id": "osmium",
+   "name": "Osmium",
+   "group": "Transition metal",
+   "facts": {
+    "atomicNumber": 76,
+    "symbol": "Os",
+    "block": "Transition metal",
+    "period": 6,
+    "group": 8,
+    "state": "Solid",
+    "year": 1803,
+    "atomicMass": 190.2,
+    "meltingC": 3033,
+    "density": 22.6
+   },
+   "blurb": "Osmium (Os) is element number 76, a transition metal that is a solid at room temperature. It was discovered in 1803.",
+   "clues": [
+    "Its atomic mass is about 190.2.",
+    "It melts at about 3033 °C.",
+    "It is in period 6, group 8 of the periodic table.",
+    "It is a transition metal.",
+    "It was discovered in 1803.",
+    "At room temperature it is a solid.",
+    "Its atomic number is 76.",
+    "Its chemical symbol is Os.",
+    "The answer is one word of 6 letters.",
+    "It starts with the letter O."
+   ],
+   "difficulty": 3
+  },
+  {
+   "id": "iridium",
+   "name": "Iridium",
+   "group": "Transition metal",
+   "facts": {
+    "atomicNumber": 77,
+    "symbol": "Ir",
+    "block": "Transition metal",
+    "period": 6,
+    "group": 9,
+    "state": "Solid",
+    "year": 1803,
+    "atomicMass": 192.2,
+    "meltingC": 2446,
+    "density": 22.4
+   },
+   "blurb": "Iridium (Ir) is element number 77, a transition metal that is a solid at room temperature. It was discovered in 1803.",
+   "clues": [
+    "Its atomic mass is about 192.2.",
+    "It melts at about 2446 °C.",
+    "It is in period 6, group 9 of the periodic table.",
+    "It is a transition metal.",
+    "It was discovered in 1803.",
+    "At room temperature it is a solid.",
+    "Its atomic number is 77.",
+    "Its chemical symbol is Ir.",
+    "The answer is one word of 7 letters.",
+    "It starts with the letter I."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/7/76/Iridium_foil.jpg/500px-Iridium_foil.jpg",
+      "w": 500,
+      "h": 425,
+      "credit": "Dschwen",
+      "license": "CC BY 2.5",
+      "page": "https://commons.wikimedia.org/wiki/File:Iridium_foil.jpg"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "platinum",
+   "name": "Platinum",
+   "group": "Transition metal",
+   "facts": {
+    "atomicNumber": 78,
+    "symbol": "Pt",
+    "block": "Transition metal",
+    "period": 6,
+    "group": 10,
+    "state": "Solid",
+    "year": 1735,
+    "atomicMass": 195.1,
+    "meltingC": 1768,
+    "density": 21.5
+   },
+   "blurb": "A rare, precious metal used in jewellery and in car exhaust catalysts.",
+   "clues": [
+    "Its atomic mass is about 195.1.",
+    "It melts at about 1768 °C.",
+    "Its name means \"little silver\" in Spanish.",
+    "Car catalytic converters use it.",
+    "It is rarer than gold.",
+    "It is used in jewellery.",
+    "A 70th anniversary and a record award are named after it.",
+    "Its atomic number is 78.",
+    "Its chemical symbol is Pt.",
+    "The answer is one word of 8 letters.",
+    "It starts with the letter P."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/6/68/Platinum_crystals.jpg/500px-Platinum_crystals.jpg",
+      "w": 500,
+      "h": 350,
+      "credit": "Periodictableru",
+      "license": "CC BY 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Platinum_crystals.jpg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "gold",
+   "name": "Gold",
+   "group": "Transition metal",
+   "facts": {
+    "atomicNumber": 79,
+    "symbol": "Au",
+    "block": "Transition metal",
+    "period": 6,
+    "group": 11,
+    "state": "Solid",
+    "ancient": true,
+    "atomicMass": 197,
+    "meltingC": 1064,
+    "density": 19.3
+   },
+   "blurb": "A soft, shiny yellow metal that never rusts. People have treasured it for thousands of years.",
+   "clues": [
+    "Its atomic mass is about 197.",
+    "It melts at about 1064 °C.",
+    "Its symbol, Au, comes from Latin \"aurum\".",
+    "It never rusts or tarnishes.",
+    "It is used in electronics because it conducts well.",
+    "Olympic winners get a medal of it.",
+    "It is a precious yellow metal.",
+    "Its atomic number is 79.",
+    "Its chemical symbol is Au.",
+    "The answer is one word of 4 letters.",
+    "It starts with the letter G."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/d/d7/Gold-crystals.jpg/500px-Gold-crystals.jpg",
+      "w": 500,
+      "h": 324,
+      "credit": "Alchemist-hp (talk) www.pse-mendelejew.de",
+      "license": "CC BY-SA 3.0 de",
+      "page": "https://commons.wikimedia.org/wiki/File:Gold-crystals.jpg"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "mercury",
+   "name": "Mercury",
+   "group": "Transition metal",
+   "facts": {
+    "atomicNumber": 80,
+    "symbol": "Hg",
+    "block": "Transition metal",
+    "period": 6,
+    "group": 12,
+    "state": "Liquid",
+    "ancient": true,
+    "atomicMass": 200.6,
+    "meltingC": -39,
+    "density": 13.5
+   },
+   "blurb": "The only metal that is liquid at room temperature. It was once used in thermometers.",
+   "clues": [
+    "Its atomic mass is about 200.6.",
+    "It melts at about -39 °C.",
+    "Its symbol, Hg, comes from Greek for \"liquid silver\".",
+    "It was once called quicksilver.",
+    "It was used in old thermometers.",
+    "It is the only metal that is liquid at room temperature.",
+    "It shares its name with the planet closest to the Sun.",
+    "Its atomic number is 80.",
+    "Its chemical symbol is Hg.",
+    "The answer is one word of 7 letters.",
+    "It starts with the letter M."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/8/86/Mercury-element.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Wikimedia Commons",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Mercury-element.jpg"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "thallium",
+   "name": "Thallium",
+   "group": "Post-transition metal",
+   "facts": {
+    "atomicNumber": 81,
+    "symbol": "Tl",
+    "block": "Post-transition metal",
+    "period": 6,
+    "group": 13,
+    "state": "Solid",
+    "year": 1861,
+    "atomicMass": 204.4,
+    "meltingC": 304,
+    "density": 11.8
+   },
+   "blurb": "Thallium (Tl) is element number 81, a post-transition metal that is a solid at room temperature. It was discovered in 1861.",
+   "clues": [
+    "Its atomic mass is about 204.4.",
+    "It melts at about 304 °C.",
+    "It is in period 6, group 13 of the periodic table.",
+    "It is a post-transition metal.",
+    "It was discovered in 1861.",
+    "At room temperature it is a solid.",
+    "Its atomic number is 81.",
+    "Its chemical symbol is Tl.",
+    "The answer is one word of 8 letters.",
+    "It starts with the letter T."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/b/bc/Thallium-croprotated.jpg",
+      "w": 500,
+      "h": 399,
+      "credit": "Thallium.jpg: Tomihahndorf at de.wikipedia derivative work: Materialscientist (talk)",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Thallium-croprotated.jpg"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "lead",
+   "name": "Lead",
+   "group": "Post-transition metal",
+   "facts": {
+    "atomicNumber": 82,
+    "symbol": "Pb",
+    "block": "Post-transition metal",
+    "period": 6,
+    "group": 14,
+    "state": "Solid",
+    "ancient": true,
+    "atomicMass": 207,
+    "meltingC": 327,
+    "density": 11.3
+   },
+   "blurb": "A heavy, soft, poisonous metal once used in pipes and paint. It blocks X-rays.",
+   "clues": [
+    "Its atomic mass is about 207.",
+    "It melts at about 327 °C.",
+    "Its symbol, Pb, comes from Latin \"plumbum\".",
+    "The word \"plumber\" comes from its Latin name.",
+    "It was once added to petrol.",
+    "X-ray aprons are lined with it.",
+    "It is a heavy grey metal, and pencils do not contain it.",
+    "Its atomic number is 82.",
+    "Its chemical symbol is Pb.",
+    "The answer is one word of 4 letters.",
+    "It starts with the letter L."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/6/63/Lead-2.jpg/500px-Lead-2.jpg",
+      "w": 500,
+      "h": 427,
+      "credit": "Chemical Elements",
+      "license": "CC BY 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Lead-2.jpg"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "bismuth",
+   "name": "Bismuth",
+   "group": "Post-transition metal",
+   "facts": {
+    "atomicNumber": 83,
+    "symbol": "Bi",
+    "block": "Post-transition metal",
+    "period": 6,
+    "group": 15,
+    "state": "Solid",
+    "year": 1753,
+    "atomicMass": 209,
+    "meltingC": 271,
+    "density": 9.81
+   },
+   "blurb": "Bismuth (Bi) is element number 83, a post-transition metal that is a solid at room temperature. It was discovered in 1753.",
+   "clues": [
+    "Its atomic mass is about 209.",
+    "It melts at about 271 °C.",
+    "It is in period 6, group 15 of the periodic table.",
+    "It is a post-transition metal.",
+    "It was discovered in 1753.",
+    "At room temperature it is a solid.",
+    "Its atomic number is 83.",
+    "Its chemical symbol is Bi.",
+    "The answer is one word of 7 letters.",
+    "It starts with the letter B."
+   ],
+   "difficulty": 3
+  },
+  {
+   "id": "polonium",
+   "name": "Polonium",
+   "group": "Metalloid",
+   "facts": {
+    "atomicNumber": 84,
+    "symbol": "Po",
+    "block": "Metalloid",
+    "period": 6,
+    "group": 16,
+    "state": "Solid",
+    "year": 1898,
+    "atomicMass": 209,
+    "meltingC": 254,
+    "density": 9.32
+   },
+   "blurb": "Polonium (Po) is element number 84, a metalloid that is a solid at room temperature. It was discovered in 1898.",
+   "clues": [
+    "Its atomic mass is about 209.",
+    "It melts at about 254 °C.",
+    "It is in period 6, group 16 of the periodic table.",
+    "It is a metalloid.",
+    "It was discovered in 1898.",
+    "At room temperature it is a solid.",
+    "Its atomic number is 84.",
+    "Its chemical symbol is Po.",
+    "The answer is one word of 8 letters.",
+    "It starts with the letter P."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/8/86/2019-11-22_Spark_plugs_and_static_eliminators_with_radioactive_polonium_at_museum_display.jpg/500px-2019-11-22_Spark_plugs_and_static_eliminators_with_radioactive_polonium_at_museum_display.jpg",
+      "w": 500,
+      "h": 478,
+      "credit": "Maksym Kozlenko",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:2019-11-22_Spark_plugs_and_static_eliminators_with_radioactive_polonium_at_museum_display.jpg"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "astatine",
+   "name": "Astatine",
+   "group": "Halogen",
+   "facts": {
+    "atomicNumber": 85,
+    "symbol": "At",
+    "block": "Halogen",
+    "period": 6,
+    "group": 17,
+    "state": "Solid",
+    "year": 1940,
+    "atomicMass": 210,
+    "meltingC": 302,
+    "density": 7
+   },
+   "blurb": "Astatine (At) is element number 85, a halogen that is a solid at room temperature. It was discovered in 1940.",
+   "clues": [
+    "Its atomic mass is about 210.",
+    "It melts at about 302 °C.",
+    "It is in period 6, group 17 of the periodic table.",
+    "It is a halogen.",
+    "It was discovered in 1940.",
+    "At room temperature it is a solid.",
+    "Its atomic number is 85.",
+    "Its chemical symbol is At.",
+    "The answer is one word of 8 letters.",
+    "It starts with the letter A."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/5/52/Glow_from_a_sample_of_astatine_%28cropped%29.jpg/330px-Glow_from_a_sample_of_astatine_%28cropped%29.jpg",
+      "w": 330,
+      "h": 499,
+      "credit": "NuclearAlex",
+      "license": "CC BY 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Glow_from_a_sample_of_astatine_(cropped).jpg"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "radon",
+   "name": "Radon",
+   "group": "Noble gas",
+   "facts": {
+    "atomicNumber": 86,
+    "symbol": "Rn",
+    "block": "Noble gas",
+    "period": 6,
+    "group": 18,
+    "state": "Gas",
+    "year": 1900,
+    "atomicMass": 222,
+    "meltingC": -71,
+    "density": 0.00973
+   },
+   "blurb": "A radioactive gas that can seep into homes from the ground.",
+   "clues": [
+    "Its atomic mass is about 222.",
+    "It melts at about -71 °C.",
+    "It forms when uranium decays.",
+    "It is the heaviest noble gas found in nature.",
+    "It can build up in basements.",
+    "It is radioactive.",
+    "It is a gas that seeps from rocks.",
+    "Its atomic number is 86.",
+    "Its chemical symbol is Rn.",
+    "The answer is one word of 5 letters.",
+    "It starts with the letter R."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/b/b4/Radon_water_apparatus_P1120815.JPG/330px-Radon_water_apparatus_P1120815.JPG",
+      "w": 330,
+      "h": 440,
+      "credit": "David.Monniaux",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Radon_water_apparatus_P1120815.JPG"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "francium",
+   "name": "Francium",
+   "group": "Alkali metal",
+   "facts": {
+    "atomicNumber": 87,
+    "symbol": "Fr",
+    "block": "Alkali metal",
+    "period": 7,
+    "group": 1,
+    "state": "Solid",
+    "year": 1939,
+    "atomicMass": 223,
+    "meltingC": 27
+   },
+   "blurb": "Francium (Fr) is element number 87, an alkali metal that is a solid at room temperature. It was discovered in 1939.",
+   "clues": [
+    "Its atomic mass is about 223.",
+    "It melts at about 27 °C.",
+    "It is in period 7, group 1 of the periodic table.",
+    "It is an alkali metal.",
+    "It was discovered in 1939.",
+    "At room temperature it is a solid.",
+    "Its atomic number is 87.",
+    "Its chemical symbol is Fr.",
+    "The answer is one word of 8 letters.",
+    "It starts with the letter F."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/2/2d/Francium_%28Element_-_87%29_1.jpg/500px-Francium_%28Element_-_87%29_1.jpg",
+      "w": 500,
+      "h": 454,
+      "credit": "James St. John",
+      "license": "CC BY 2.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Francium_(Element_-_87)_1.jpg"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "radium",
+   "name": "Radium",
+   "group": "Alkaline earth metal",
+   "facts": {
+    "atomicNumber": 88,
+    "symbol": "Ra",
+    "block": "Alkaline earth metal",
+    "period": 7,
+    "group": 2,
+    "state": "Solid",
+    "year": 1898,
+    "atomicMass": 226,
+    "meltingC": 700,
+    "density": 5
+   },
+   "blurb": "A radioactive element discovered by Marie and Pierre Curie. It glows faintly in the dark.",
+   "clues": [
+    "Its atomic mass is about 226.",
+    "It melts at about 700 °C.",
+    "It was once painted on watch dials to make them glow.",
+    "Marie and Pierre Curie discovered it in 1898.",
+    "It glows faintly blue.",
+    "Its name comes from the Latin for \"ray\".",
+    "Its atomic number is 88.",
+    "Its chemical symbol is Ra.",
+    "The answer is one word of 6 letters.",
+    "It starts with the letter R."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/b/bb/Radium226.jpg/500px-Radium226.jpg",
+      "w": 500,
+      "h": 400,
+      "credit": "grenadier",
+      "license": "CC BY 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Radium226.jpg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "actinium",
+   "name": "Actinium",
+   "group": "Actinide",
+   "facts": {
+    "atomicNumber": 89,
+    "symbol": "Ac",
+    "block": "Actinide",
+    "period": 7,
+    "state": "Solid",
+    "year": 1899,
+    "atomicMass": 227,
+    "meltingC": 1051,
+    "density": 10.1
+   },
+   "blurb": "Actinium (Ac) is element number 89, an actinide that is a solid at room temperature. It was discovered in 1899.",
+   "clues": [
+    "Its atomic mass is about 227.",
+    "It melts at about 1051 °C.",
+    "It is in period 7 of the periodic table.",
+    "It was discovered in 1899.",
+    "At room temperature it is a solid.",
+    "Its atomic number is 89.",
+    "Its chemical symbol is Ac.",
+    "The answer is one word of 8 letters.",
+    "It starts with the letter A."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/2/27/Actinium_sample_%2831481701837%29.png/500px-Actinium_sample_%2831481701837%29.png",
+      "w": 500,
+      "h": 625,
+      "credit": "Oak Ridge National Laboratory",
+      "license": "CC BY 2.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Actinium_sample_(31481701837).png"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "thorium",
+   "name": "Thorium",
+   "group": "Actinide",
+   "facts": {
+    "atomicNumber": 90,
+    "symbol": "Th",
+    "block": "Actinide",
+    "period": 7,
+    "state": "Solid",
+    "year": 1828,
+    "atomicMass": 232,
+    "meltingC": 1750,
+    "density": 11.7
+   },
+   "blurb": "Thorium (Th) is element number 90, an actinide that is a solid at room temperature. It was discovered in 1828.",
+   "clues": [
+    "Its atomic mass is about 232.",
+    "It melts at about 1750 °C.",
+    "It is in period 7 of the periodic table.",
+    "It is an actinide.",
+    "It was discovered in 1828.",
+    "At room temperature it is a solid.",
+    "Its atomic number is 90.",
+    "Its chemical symbol is Th.",
+    "The answer is one word of 7 letters.",
+    "It starts with the letter T."
+   ],
+   "difficulty": 3
+  },
+  {
+   "id": "protactinium",
+   "name": "Protactinium",
+   "group": "Actinide",
+   "facts": {
+    "atomicNumber": 91,
+    "symbol": "Pa",
+    "block": "Actinide",
+    "period": 7,
+    "state": "Solid",
+    "year": 1913,
+    "atomicMass": 231,
+    "meltingC": 1572,
+    "density": 15.4
+   },
+   "blurb": "Protactinium (Pa) is element number 91, an actinide that is a solid at room temperature. It was discovered in 1913.",
+   "clues": [
+    "Its atomic mass is about 231.",
+    "It melts at about 1572 °C.",
+    "It is in period 7 of the periodic table.",
+    "It is an actinide.",
+    "It was discovered in 1913.",
+    "At room temperature it is a solid.",
+    "Its atomic number is 91.",
+    "Its chemical symbol is Pa.",
+    "The answer is one word of 12 letters.",
+    "It starts with the letter P."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/a/af/Protactinium-233.jpg/500px-Protactinium-233.jpg",
+      "w": 500,
+      "h": 397,
+      "credit": "ENERGY.GOV",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Protactinium-233.jpg"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "uranium",
+   "name": "Uranium",
+   "group": "Actinide",
+   "facts": {
+    "atomicNumber": 92,
+    "symbol": "U",
+    "block": "Actinide",
+    "period": 7,
+    "state": "Solid",
+    "year": 1789,
+    "atomicMass": 238,
+    "meltingC": 1135,
+    "density": 18.9
+   },
+   "blurb": "A heavy, radioactive metal used as fuel in nuclear power stations and in atomic bombs.",
+   "clues": [
+    "Its atomic mass is about 238.",
+    "It melts at about 1135 °C.",
+    "It was discovered in 1789.",
+    "It is named after the seventh planet.",
+    "It was used in the first atomic bombs.",
+    "It is used as nuclear fuel.",
+    "It is radioactive.",
+    "Its atomic number is 92.",
+    "Its chemical symbol is U.",
+    "The answer is one word of 7 letters.",
+    "It starts with the letter U."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/e/ec/Uranium2.jpg",
+      "w": 500,
+      "h": 335,
+      "credit": "Wikimedia Commons",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Uranium2.jpg"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "neptunium",
+   "name": "Neptunium",
+   "group": "Actinide",
+   "facts": {
+    "atomicNumber": 93,
+    "symbol": "Np",
+    "block": "Actinide",
+    "period": 7,
+    "state": "Solid",
+    "year": 1940,
+    "atomicMass": 237,
+    "meltingC": 644,
+    "density": 20.3
+   },
+   "blurb": "Neptunium (Np) is element number 93, an actinide that is a solid at room temperature. It was discovered in 1940.",
+   "clues": [
+    "Its atomic mass is about 237.",
+    "It melts at about 644 °C.",
+    "It is in period 7 of the periodic table.",
+    "It is an actinide.",
+    "It was discovered in 1940.",
+    "At room temperature it is a solid.",
+    "Its atomic number is 93.",
+    "Its chemical symbol is Np.",
+    "The answer is one word of 9 letters.",
+    "It starts with the letter N."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/e/e5/Neptunium2.jpg",
+      "w": 500,
+      "h": 389,
+      "credit": "Los Alamos National Laboratory,",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Neptunium2.jpg"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "plutonium",
+   "name": "Plutonium",
+   "group": "Actinide",
+   "facts": {
+    "atomicNumber": 94,
+    "symbol": "Pu",
+    "block": "Actinide",
+    "period": 7,
+    "state": "Solid",
+    "year": 1940,
+    "atomicMass": 244.1,
+    "meltingC": 640,
+    "density": 19.8
+   },
+   "blurb": "A radioactive metal used in nuclear weapons and to power some space probes.",
+   "clues": [
+    "Its atomic mass is about 244.1.",
+    "It melts at about 640 °C.",
+    "It is named after a dwarf planet.",
+    "It powered Voyager and Curiosity's generators.",
+    "It was used in the Nagasaki bomb.",
+    "It is made in nuclear reactors.",
+    "It is radioactive.",
+    "Its atomic number is 94.",
+    "Its chemical symbol is Pu.",
+    "The answer is one word of 9 letters.",
+    "It starts with the letter P."
+   ],
+   "difficulty": 2
+  },
+  {
+   "id": "americium",
+   "name": "Americium",
+   "group": "Actinide",
+   "facts": {
+    "atomicNumber": 95,
+    "symbol": "Am",
+    "block": "Actinide",
+    "period": 7,
+    "state": "Solid",
+    "year": 1944,
+    "atomicMass": 243.1,
+    "meltingC": 1176,
+    "density": 13.7
+   },
+   "blurb": "Americium (Am) is element number 95, an actinide that is a solid at room temperature. It was discovered in 1944.",
+   "clues": [
+    "Its atomic mass is about 243.1.",
+    "It melts at about 1176 °C.",
+    "It is in period 7 of the periodic table.",
+    "It is an actinide.",
+    "It was discovered in 1944.",
+    "At room temperature it is a solid.",
+    "Its atomic number is 95.",
+    "Its chemical symbol is Am.",
+    "The answer is one word of 9 letters.",
+    "It starts with the letter A."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/e/ee/Americium_microscope.jpg/500px-Americium_microscope.jpg",
+      "w": 500,
+      "h": 479,
+      "credit": "Bionerd",
+      "license": "CC BY 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Americium_microscope.jpg"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "curium",
+   "name": "Curium",
+   "group": "Actinide",
+   "facts": {
+    "atomicNumber": 96,
+    "symbol": "Cm",
+    "block": "Actinide",
+    "period": 7,
+    "state": "Solid",
+    "year": 1944,
+    "atomicMass": 247.1,
+    "meltingC": 1345,
+    "density": 13.5
+   },
+   "blurb": "A radioactive element named after Marie and Pierre Curie.",
+   "clues": [
+    "Its atomic mass is about 247.1.",
+    "It melts at about 1345 °C.",
+    "It was made in 1944.",
+    "It is used to power some Mars rover instruments.",
+    "It is an actinide.",
+    "It is very radioactive.",
+    "It is named after a famous scientist couple.",
+    "Its atomic number is 96.",
+    "Its chemical symbol is Cm.",
+    "The answer is one word of 6 letters.",
+    "It starts with the letter C."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/f/f1/Cm-Fluoreszenz.png/500px-Cm-Fluoreszenz.png",
+      "w": 500,
+      "h": 375,
+      "credit": "Eschenmoser + Kollegen",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Cm-Fluoreszenz.png"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "berkelium",
+   "name": "Berkelium",
+   "group": "Actinide",
+   "facts": {
+    "atomicNumber": 97,
+    "symbol": "Bk",
+    "block": "Actinide",
+    "period": 7,
+    "state": "Solid",
+    "year": 1949,
+    "atomicMass": 247.1
+   },
+   "blurb": "Berkelium (Bk) is element number 97, an actinide that is a solid at room temperature. It was discovered in 1949.",
+   "clues": [
+    "Its atomic mass is about 247.1.",
+    "It is in period 7 of the periodic table.",
+    "It is an actinide.",
+    "It was discovered in 1949.",
+    "At room temperature it is a solid.",
+    "Its atomic number is 97.",
+    "Its chemical symbol is Bk.",
+    "The answer is one word of 9 letters.",
+    "It starts with the letter B."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/b/b6/Berkelium_metal.jpg",
+      "w": 500,
+      "h": 316,
+      "credit": "Oak Ridge National Laboratory, US Department of Energy",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Berkelium_metal.jpg"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "californium",
+   "name": "Californium",
+   "group": "Actinide",
+   "facts": {
+    "atomicNumber": 98,
+    "symbol": "Cf",
+    "block": "Actinide",
+    "period": 7,
+    "state": "Solid",
+    "year": 1950,
+    "atomicMass": 251.1
+   },
+   "blurb": "Californium (Cf) is element number 98, an actinide that is a solid at room temperature. It was discovered in 1950.",
+   "clues": [
+    "Its atomic mass is about 251.1.",
+    "It is in period 7 of the periodic table.",
+    "It is an actinide.",
+    "It was discovered in 1950.",
+    "At room temperature it is a solid.",
+    "Its atomic number is 98.",
+    "Its chemical symbol is Cf.",
+    "The answer is one word of 11 letters.",
+    "It starts with the letter C."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/9/93/Californium.jpg",
+      "w": 500,
+      "h": 449,
+      "credit": "United States Department of Energy (see File:Einsteinium.jpg)",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Californium.jpg"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "einsteinium",
+   "name": "Einsteinium",
+   "group": "Actinide",
+   "facts": {
+    "atomicNumber": 99,
+    "symbol": "Es",
+    "block": "Actinide",
+    "period": 7,
+    "state": "Solid",
+    "year": 1952,
+    "atomicMass": 252.1
+   },
+   "blurb": "A synthetic element first found in the debris of the first hydrogen bomb test, in 1952.",
+   "clues": [
+    "Its atomic mass is about 252.1.",
+    "It is in period 7 of the periodic table.",
+    "It was found in the fallout of a hydrogen bomb test.",
+    "It was discovered in 1952.",
+    "It is an actinide.",
+    "It is named after a famous physicist.",
+    "It is named after the man behind E = mc².",
+    "Its atomic number is 99.",
+    "Its chemical symbol is Es.",
+    "The answer is one word of 11 letters.",
+    "It starts with the letter E."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/5/55/Einsteinium.jpg",
+      "w": 500,
+      "h": 723,
+      "credit": "Haire, R. G., US Department of Energy. Touched up by Materialscientist at en.wikipedia.",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Einsteinium.jpg"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "fermium",
+   "name": "Fermium",
+   "group": "Actinide",
+   "facts": {
+    "atomicNumber": 100,
+    "symbol": "Fm",
+    "block": "Actinide",
+    "period": 7,
+    "state": "Solid",
+    "year": 1952,
+    "atomicMass": 257.1
+   },
+   "blurb": "Fermium (Fm) is element number 100, an actinide that is a solid at room temperature. It was discovered in 1952.",
+   "clues": [
+    "Its atomic mass is about 257.1.",
+    "It is in period 7 of the periodic table.",
+    "It is an actinide.",
+    "It was discovered in 1952.",
+    "At room temperature it is a solid.",
+    "Its atomic number is 100.",
+    "Its chemical symbol is Fm.",
+    "The answer is one word of 7 letters.",
+    "It starts with the letter F."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/9/9e/Fermium-Ytterbium_Alloy.jpg",
+      "w": 500,
+      "h": 463,
+      "credit": "Ben E. Lewis.",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Fermium-Ytterbium_Alloy.jpg"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "mendelevium",
+   "name": "Mendelevium",
+   "group": "Actinide",
+   "facts": {
+    "atomicNumber": 101,
+    "symbol": "Md",
+    "block": "Actinide",
+    "period": 7,
+    "state": "Solid",
+    "year": 1955,
+    "atomicMass": 258.1
+   },
+   "blurb": "A synthetic element named after Dmitri Mendeleev, who created the periodic table.",
+   "clues": [
+    "Its atomic mass is about 258.1.",
+    "It is in period 7 of the periodic table.",
+    "It was first made in 1955.",
+    "Only tiny amounts have ever been made.",
+    "It is an actinide.",
+    "It is radioactive.",
+    "It is named after the father of the periodic table.",
+    "Its atomic number is 101.",
+    "Its chemical symbol is Md.",
+    "The answer is one word of 11 letters.",
+    "It starts with the letter M."
+   ],
+   "difficulty": 3
+  },
+  {
+   "id": "nobelium",
+   "name": "Nobelium",
+   "group": "Actinide",
+   "facts": {
+    "atomicNumber": 102,
+    "symbol": "No",
+    "block": "Actinide",
+    "period": 7,
+    "state": "Solid",
+    "year": 1957,
+    "atomicMass": 259.1
+   },
+   "blurb": "Nobelium (No) is element number 102, an actinide that is a solid at room temperature. It was discovered in 1957.",
+   "clues": [
+    "Its atomic mass is about 259.1.",
+    "It is in period 7 of the periodic table.",
+    "It is an actinide.",
+    "It was discovered in 1957.",
+    "At room temperature it is a solid.",
+    "Its atomic number is 102.",
+    "Its chemical symbol is No.",
+    "The answer is one word of 8 letters.",
+    "It starts with the letter N."
+   ],
+   "difficulty": 3
+  },
+  {
+   "id": "lawrencium",
+   "name": "Lawrencium",
+   "group": "Actinide",
+   "facts": {
+    "atomicNumber": 103,
+    "symbol": "Lr",
+    "block": "Actinide",
+    "period": 7,
+    "state": "Solid",
+    "year": 1961,
+    "atomicMass": 266.1
+   },
+   "blurb": "Lawrencium (Lr) is element number 103, an actinide that is a solid at room temperature. It was discovered in 1961.",
+   "clues": [
+    "Its atomic mass is about 266.1.",
+    "It is in period 7 of the periodic table.",
+    "It is an actinide.",
+    "It was discovered in 1961.",
+    "At room temperature it is a solid.",
+    "Its atomic number is 103.",
+    "Its chemical symbol is Lr.",
+    "The answer is one word of 10 letters.",
+    "It starts with the letter L."
+   ],
+   "difficulty": 3
+  },
+  {
+   "id": "rutherfordium",
+   "name": "Rutherfordium",
+   "group": "Transition metal",
+   "facts": {
+    "atomicNumber": 104,
+    "symbol": "Rf",
+    "block": "Transition metal",
+    "period": 7,
+    "group": 4,
+    "state": "Solid",
+    "year": 1964,
+    "atomicMass": 267.1
+   },
+   "blurb": "Rutherfordium (Rf) is element number 104, a transition metal that is a solid at room temperature. It was discovered in 1964.",
+   "clues": [
+    "Its atomic mass is about 267.1.",
+    "It is in period 7, group 4 of the periodic table.",
+    "It is a transition metal.",
+    "It was discovered in 1964.",
+    "At room temperature it is a solid.",
+    "Its atomic number is 104.",
+    "Its chemical symbol is Rf.",
+    "The answer is one word of 13 letters.",
+    "It starts with the letter R."
+   ],
+   "difficulty": 3
+  },
+  {
+   "id": "dubnium",
+   "name": "Dubnium",
+   "group": "Transition metal",
+   "facts": {
+    "atomicNumber": 105,
+    "symbol": "Db",
+    "block": "Transition metal",
+    "period": 7,
+    "group": 5,
+    "state": "Solid",
+    "year": 1967,
+    "atomicMass": 268.1
+   },
+   "blurb": "Dubnium (Db) is element number 105, a transition metal that is a solid at room temperature. It was discovered in 1967.",
+   "clues": [
+    "Its atomic mass is about 268.1.",
+    "It is in period 7, group 5 of the periodic table.",
+    "It is a transition metal.",
+    "It was discovered in 1967.",
+    "At room temperature it is a solid.",
+    "Its atomic number is 105.",
+    "Its chemical symbol is Db.",
+    "The answer is one word of 7 letters.",
+    "It starts with the letter D."
+   ],
+   "difficulty": 3
+  },
+  {
+   "id": "seaborgium",
+   "name": "Seaborgium",
+   "group": "Transition metal",
+   "facts": {
+    "atomicNumber": 106,
+    "symbol": "Sg",
+    "block": "Transition metal",
+    "period": 7,
+    "group": 6,
+    "state": "Solid",
+    "year": 1974,
+    "atomicMass": 269.1
+   },
+   "blurb": "Seaborgium (Sg) is element number 106, a transition metal that is a solid at room temperature. It was discovered in 1974.",
+   "clues": [
+    "Its atomic mass is about 269.1.",
+    "It is in period 7, group 6 of the periodic table.",
+    "It is a transition metal.",
+    "It was discovered in 1974.",
+    "At room temperature it is a solid.",
+    "Its atomic number is 106.",
+    "Its chemical symbol is Sg.",
+    "The answer is one word of 10 letters.",
+    "It starts with the letter S."
+   ],
+   "difficulty": 3
+  },
+  {
+   "id": "bohrium",
+   "name": "Bohrium",
+   "group": "Transition metal",
+   "facts": {
+    "atomicNumber": 107,
+    "symbol": "Bh",
+    "block": "Transition metal",
+    "period": 7,
+    "group": 7,
+    "state": "Solid",
+    "year": 1976,
+    "atomicMass": 270.1
+   },
+   "blurb": "Bohrium (Bh) is element number 107, a transition metal that is a solid at room temperature. It was discovered in 1976.",
+   "clues": [
+    "Its atomic mass is about 270.1.",
+    "It is in period 7, group 7 of the periodic table.",
+    "It is a transition metal.",
+    "It was discovered in 1976.",
+    "At room temperature it is a solid.",
+    "Its atomic number is 107.",
+    "Its chemical symbol is Bh.",
+    "The answer is one word of 7 letters.",
+    "It starts with the letter B."
+   ],
+   "difficulty": 3
+  },
+  {
+   "id": "hassium",
+   "name": "Hassium",
+   "group": "Transition metal",
+   "facts": {
+    "atomicNumber": 108,
+    "symbol": "Hs",
+    "block": "Transition metal",
+    "period": 7,
+    "group": 8,
+    "state": "Solid",
+    "year": 1984,
+    "atomicMass": 269.1
+   },
+   "blurb": "Hassium (Hs) is element number 108, a transition metal that is a solid at room temperature. It was discovered in 1984.",
+   "clues": [
+    "Its atomic mass is about 269.1.",
+    "It is in period 7, group 8 of the periodic table.",
+    "It is a transition metal.",
+    "It was discovered in 1984.",
+    "At room temperature it is a solid.",
+    "Its atomic number is 108.",
+    "Its chemical symbol is Hs.",
+    "The answer is one word of 7 letters.",
+    "It starts with the letter H."
+   ],
+   "difficulty": 3
+  },
+  {
+   "id": "meitnerium",
+   "name": "Meitnerium",
+   "group": "Transition metal",
+   "facts": {
+    "atomicNumber": 109,
+    "symbol": "Mt",
+    "block": "Transition metal",
+    "period": 7,
+    "group": 9,
+    "state": "Solid",
+    "year": 1982,
+    "atomicMass": 277.2
+   },
+   "blurb": "Meitnerium (Mt) is element number 109, a transition metal that is a solid at room temperature. It was discovered in 1982.",
+   "clues": [
+    "Its atomic mass is about 277.2.",
+    "It is in period 7, group 9 of the periodic table.",
+    "It is a transition metal.",
+    "It was discovered in 1982.",
+    "At room temperature it is a solid.",
+    "Its atomic number is 109.",
+    "Its chemical symbol is Mt.",
+    "The answer is one word of 10 letters.",
+    "It starts with the letter M."
+   ],
+   "difficulty": 3
+  },
+  {
+   "id": "darmstadtium",
+   "name": "Darmstadtium",
+   "group": "Transition metal",
+   "facts": {
+    "atomicNumber": 110,
+    "symbol": "Ds",
+    "block": "Transition metal",
+    "period": 7,
+    "group": 10,
+    "year": 1994,
+    "atomicMass": 282.2
+   },
+   "blurb": "Darmstadtium (Ds) is element number 110, a transition metal. It was discovered in 1994.",
+   "clues": [
+    "Its atomic mass is about 282.2.",
+    "It is in period 7, group 10 of the periodic table.",
+    "It is a transition metal.",
+    "It was discovered in 1994.",
+    "Its atomic number is 110.",
+    "Its chemical symbol is Ds.",
+    "The answer is one word of 12 letters.",
+    "It starts with the letter D."
+   ],
+   "difficulty": 3
+  },
+  {
+   "id": "roentgenium",
+   "name": "Roentgenium",
+   "group": "Transition metal",
+   "facts": {
+    "atomicNumber": 111,
+    "symbol": "Rg",
+    "block": "Transition metal",
+    "period": 7,
+    "group": 11,
+    "year": 1994,
+    "atomicMass": 282.2
+   },
+   "blurb": "Roentgenium (Rg) is element number 111, a transition metal. It was discovered in 1994.",
+   "clues": [
+    "Its atomic mass is about 282.2.",
+    "It is in period 7, group 11 of the periodic table.",
+    "It is a transition metal.",
+    "It was discovered in 1994.",
+    "Its atomic number is 111.",
+    "Its chemical symbol is Rg.",
+    "The answer is one word of 11 letters.",
+    "It starts with the letter R."
+   ],
+   "difficulty": 3
+  },
+  {
+   "id": "copernicium",
+   "name": "Copernicium",
+   "group": "Transition metal",
+   "facts": {
+    "atomicNumber": 112,
+    "symbol": "Cn",
+    "block": "Transition metal",
+    "period": 7,
+    "group": 12,
+    "year": 1996,
+    "atomicMass": 286.2
+   },
+   "blurb": "Copernicium (Cn) is element number 112, a transition metal. It was discovered in 1996.",
+   "clues": [
+    "Its atomic mass is about 286.2.",
+    "It is in period 7, group 12 of the periodic table.",
+    "It is a transition metal.",
+    "It was discovered in 1996.",
+    "Its atomic number is 112.",
+    "Its chemical symbol is Cn.",
+    "The answer is one word of 11 letters.",
+    "It starts with the letter C."
+   ],
+   "difficulty": 3
+  },
+  {
+   "id": "nihonium",
+   "name": "Nihonium",
+   "group": "Post-transition metal",
+   "facts": {
+    "atomicNumber": 113,
+    "symbol": "Nh",
+    "block": "Post-transition metal",
+    "period": 7,
+    "group": 13,
+    "year": 2004,
+    "atomicMass": 286.2
+   },
+   "blurb": "Nihonium (Nh) is element number 113, a post-transition metal. It was discovered in 2004.",
+   "clues": [
+    "Its atomic mass is about 286.2.",
+    "It is in period 7, group 13 of the periodic table.",
+    "It is a post-transition metal.",
+    "It was discovered in 2004.",
+    "Its atomic number is 113.",
+    "Its chemical symbol is Nh.",
+    "The answer is one word of 8 letters.",
+    "It starts with the letter N."
+   ],
+   "difficulty": 3
+  },
+  {
+   "id": "flerovium",
+   "name": "Flerovium",
+   "group": "Post-transition metal",
+   "facts": {
+    "atomicNumber": 114,
+    "symbol": "Fl",
+    "block": "Post-transition metal",
+    "period": 7,
+    "group": 14,
+    "year": 1998,
+    "atomicMass": 290.2
+   },
+   "blurb": "Flerovium (Fl) is element number 114, a post-transition metal. It was discovered in 1998.",
+   "clues": [
+    "Its atomic mass is about 290.2.",
+    "It is in period 7, group 14 of the periodic table.",
+    "It is a post-transition metal.",
+    "It was discovered in 1998.",
+    "Its atomic number is 114.",
+    "Its chemical symbol is Fl.",
+    "The answer is one word of 9 letters.",
+    "It starts with the letter F."
+   ],
+   "difficulty": 3
+  },
+  {
+   "id": "moscovium",
+   "name": "Moscovium",
+   "group": "Post-transition metal",
+   "facts": {
+    "atomicNumber": 115,
+    "symbol": "Mc",
+    "block": "Post-transition metal",
+    "period": 7,
+    "group": 15,
+    "year": 2003,
+    "atomicMass": 290.2
+   },
+   "blurb": "Moscovium (Mc) is element number 115, a post-transition metal. It was discovered in 2003.",
+   "clues": [
+    "Its atomic mass is about 290.2.",
+    "It is in period 7, group 15 of the periodic table.",
+    "It is a post-transition metal.",
+    "It was discovered in 2003.",
+    "Its atomic number is 115.",
+    "Its chemical symbol is Mc.",
+    "The answer is one word of 9 letters.",
+    "It starts with the letter M."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/c/ce/U.S._Department_of_Energy_-_Science_-_529_005_001_%289735158765%29.jpg/500px-U.S._Department_of_Energy_-_Science_-_529_005_001_%289735158765%29.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "U.S. Department of Energy from United States",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:U.S._Department_of_Energy_-_Science_-_529_005_001_(9735158765).jpg"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "livermorium",
+   "name": "Livermorium",
+   "group": "Post-transition metal",
+   "facts": {
+    "atomicNumber": 116,
+    "symbol": "Lv",
+    "block": "Post-transition metal",
+    "period": 7,
+    "group": 16,
+    "year": 2000,
+    "atomicMass": 293.2
+   },
+   "blurb": "Livermorium (Lv) is element number 116, a post-transition metal. It was discovered in 2000.",
+   "clues": [
+    "Its atomic mass is about 293.2.",
+    "It is in period 7, group 16 of the periodic table.",
+    "It is a post-transition metal.",
+    "It was discovered in 2000.",
+    "Its atomic number is 116.",
+    "Its chemical symbol is Lv.",
+    "The answer is one word of 11 letters.",
+    "It starts with the letter L."
+   ],
+   "difficulty": 3
+  },
+  {
+   "id": "tennessine",
+   "name": "Tennessine",
+   "group": "Halogen",
+   "facts": {
+    "atomicNumber": 117,
+    "symbol": "Ts",
+    "block": "Halogen",
+    "period": 7,
+    "group": 17,
+    "year": 2010,
+    "atomicMass": 294.2
+   },
+   "blurb": "Tennessine (Ts) is element number 117, a halogen. It was discovered in 2010.",
+   "clues": [
+    "Its atomic mass is about 294.2.",
+    "It is in period 7, group 17 of the periodic table.",
+    "It is a halogen.",
+    "It was discovered in 2010.",
+    "Its atomic number is 117.",
+    "Its chemical symbol is Ts.",
+    "The answer is one word of 10 letters.",
+    "It starts with the letter T."
+   ],
+   "difficulty": 3
+  },
+  {
+   "id": "oganesson",
+   "name": "Oganesson",
+   "group": "Noble gas",
+   "facts": {
+    "atomicNumber": 118,
+    "symbol": "Og",
+    "block": "Noble gas",
+    "period": 7,
+    "group": 18,
+    "year": 2006,
+    "atomicMass": 295.2
+   },
+   "blurb": "The heaviest element known, made in 2002–2006. Only a handful of atoms have ever existed.",
+   "clues": [
+    "Its atomic mass is about 295.2.",
+    "It is in period 7, group 18 of the periodic table.",
+    "Only a few atoms have ever been made.",
+    "It was made by Russian and American scientists.",
+    "It is in group 18, with the noble gases.",
+    "It has the highest atomic number of any known element.",
+    "Its atomic number is 118.",
+    "Its chemical symbol is Og.",
+    "The answer is one word of 9 letters.",
+    "It starts with the letter O."
+   ],
+   "difficulty": 3
+  }
+ ],
+ "questions": [
+  {
+   "id": "q1",
+   "kind": "mc",
+   "prompt": "What is the chemical symbol for gold?",
+   "answer": "Au",
+   "wrong": [
+    "Go",
+    "Gd",
+    "Ag"
+   ],
+   "explain": "From the Latin \"aurum\".",
+   "difficulty": 1
+  },
+  {
+   "id": "q2",
+   "kind": "mc",
+   "prompt": "What is the chemical symbol for iron?",
+   "answer": "Fe",
+   "wrong": [
+    "Ir",
+    "In",
+    "I"
+   ],
+   "explain": "From the Latin \"ferrum\".",
+   "difficulty": 2
+  },
+  {
+   "id": "q3",
+   "kind": "mc",
+   "prompt": "What is the chemical symbol for sodium?",
+   "answer": "Na",
+   "wrong": [
+    "So",
+    "Sd",
+    "S"
+   ],
+   "explain": "From the Latin \"natrium\".",
+   "difficulty": 2
+  },
+  {
+   "id": "q4",
+   "kind": "mc",
+   "prompt": "What is the chemical symbol for silver?",
+   "answer": "Ag",
+   "wrong": [
+    "Si",
+    "Sv",
+    "Au"
+   ],
+   "explain": "From the Latin \"argentum\".",
+   "difficulty": 2
+  },
+  {
+   "id": "q5",
+   "kind": "mc",
+   "prompt": "What is the chemical symbol for potassium?",
+   "answer": "K",
+   "wrong": [
+    "P",
+    "Po",
+    "Pt"
+   ],
+   "explain": "From \"kalium\".",
+   "difficulty": 2
+  },
+  {
+   "id": "q6",
+   "kind": "mc",
+   "prompt": "Which element has the chemical symbol O?",
+   "answer": "Oxygen",
+   "wrong": [
+    "Osmium",
+    "Gold",
+    "Oganesson"
+   ],
+   "explain": "Oxygen is element 8.",
+   "difficulty": 1
+  },
+  {
+   "id": "q7",
+   "kind": "mc",
+   "prompt": "Which is the only metal that is liquid at room temperature?",
+   "answer": "Mercury",
+   "wrong": [
+    "Lead",
+    "Gallium",
+    "Tin"
+   ],
+   "explain": "Bromine is the only liquid non-metal.",
+   "difficulty": 1
+  },
+  {
+   "id": "q8",
+   "kind": "mc",
+   "prompt": "Which gas makes up most of the air we breathe?",
+   "answer": "Nitrogen",
+   "wrong": [
+    "Oxygen",
+    "Carbon dioxide",
+    "Hydrogen"
+   ],
+   "explain": "Air is about 78% nitrogen and 21% oxygen.",
+   "difficulty": 1
+  },
+  {
+   "id": "q9",
+   "kind": "mc",
+   "prompt": "What is the most common element in the universe?",
+   "answer": "Hydrogen",
+   "wrong": [
+    "Helium",
+    "Oxygen",
+    "Carbon"
+   ],
+   "explain": "About three-quarters of normal matter is hydrogen.",
+   "difficulty": 1
+  },
+  {
+   "id": "q10",
+   "kind": "number",
+   "prompt": "How many elements are in the periodic table today?",
+   "answer": 118,
+   "unit": "elements",
+   "tolerance": 0,
+   "explain": "The latest four were named in 2016.",
+   "difficulty": 2
+  },
+  {
+   "id": "q11",
+   "kind": "mc",
+   "prompt": "Who published the first widely recognised periodic table in 1869?",
+   "answer": "Dmitri Mendeleev",
+   "wrong": [
+    "Marie Curie",
+    "Isaac Newton",
+    "John Dalton"
+   ],
+   "explain": "He left gaps for elements that had not yet been discovered.",
+   "difficulty": 2
+  },
+  {
+   "id": "q12",
+   "kind": "mc",
+   "prompt": "Which two elements make up water?",
+   "answer": "Hydrogen and oxygen",
+   "wrong": [
+    "Carbon and oxygen",
+    "Hydrogen and nitrogen",
+    "Sodium and chlorine"
+   ],
+   "explain": "Water is H₂O.",
+   "difficulty": 1
+  },
+  {
+   "id": "q13",
+   "kind": "mc",
+   "prompt": "Table salt is made of sodium and which other element?",
+   "answer": "Chlorine",
+   "wrong": [
+    "Iodine",
+    "Oxygen",
+    "Calcium"
+   ],
+   "explain": "Its chemical name is sodium chloride.",
+   "difficulty": 2
+  },
+  {
+   "id": "q14",
+   "kind": "mc",
+   "prompt": "Which element did Marie and Pierre Curie discover in 1898, along with polonium?",
+   "answer": "Radium",
+   "wrong": [
+    "Uranium",
+    "Plutonium",
+    "Radon"
+   ],
+   "explain": "Radium glows faintly from its radioactivity.",
+   "difficulty": 2
+  },
+  {
+   "id": "q15",
+   "kind": "mc",
+   "prompt": "Which group are helium, neon and argon in?",
+   "answer": "Noble gases",
+   "wrong": [
+    "Halogens",
+    "Alkali metals",
+    "Lanthanides"
+   ],
+   "explain": "Noble gases hardly react with anything.",
+   "difficulty": 2
+  },
+  {
+   "id": "q16",
+   "kind": "tf",
+   "prompt": "Diamond and graphite are both made of carbon.",
+   "answer": true,
+   "explain": "Their atoms are arranged differently.",
+   "difficulty": 2
+  },
+  {
+   "id": "q17",
+   "kind": "mc",
+   "prompt": "Which metal has the highest melting point?",
+   "answer": "Tungsten",
+   "wrong": [
+    "Iron",
+    "Titanium",
+    "Gold"
+   ],
+   "explain": "Tungsten melts at about 3,400 °C.",
+   "difficulty": 3
+  }
+ ],
+ "sources": [
+  {
+   "name": "PubChem Periodic Table",
+   "url": "https://pubchem.ncbi.nlm.nih.gov/periodic-table/"
+  },
+  {
+   "name": "Wikidata",
+   "url": "https://www.wikidata.org"
+  },
+  {
+   "name": "Wikimedia Commons",
+   "url": "https://commons.wikimedia.org"
+  }
+ ]
+}

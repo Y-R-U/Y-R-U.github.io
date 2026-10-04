@@ -1,0 +1,5211 @@
+{
+ "id": "paintings",
+ "title": "Famous paintings",
+ "theme": "art",
+ "icon": "🖼️",
+ "kids": false,
+ "version": 1,
+ "imgPrompt": "Which of these is {name}?",
+ "nameImgPrompt": "What is this painting called?",
+ "tfImgPrompt": "This painting is {name}.",
+ "factsMeta": {
+  "artist": {
+   "type": "cat",
+   "label": "Artist",
+   "ask": "Who painted {name}?",
+   "askReverse": "Which of these was painted by {value}?",
+   "stmt": "{name} was painted by {value}."
+  },
+  "year": {
+   "type": "year",
+   "label": "Painted",
+   "higherLabel": "Later",
+   "askHigh": "Which of these was painted most recently?",
+   "askLow": "Which of these is the oldest painting?"
+  },
+  "museum": {
+   "type": "text",
+   "label": "Where it is"
+  }
+ },
+ "items": [
+  {
+   "id": "mona-lisa",
+   "name": "Mona Lisa",
+   "alt": [
+    "La Gioconda",
+    "La Joconde"
+   ],
+   "group": "Leonardo da Vinci",
+   "facts": {
+    "artist": "Leonardo da Vinci",
+    "year": 1503,
+    "museum": "Louvre, Paris"
+   },
+   "blurb": "Mona Lisa (1503) by Leonardo da Vinci. It is famous for a mysterious smile.",
+   "clues": [
+    "It was stolen in 1911 and missing for two years.",
+    "It is painted on a poplar wood panel.",
+    "It was painted in 1503.",
+    "It hangs in: Louvre, Paris.",
+    "It is by Leonardo da Vinci.",
+    "It is famous for a mysterious smile."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/e/ec/Mona_Lisa%2C_by_Leonardo_da_Vinci%2C_from_C2RMF_retouched.jpg/330px-Mona_Lisa%2C_by_Leonardo_da_Vinci%2C_from_C2RMF_retouched.jpg",
+      "w": 330,
+      "h": 492,
+      "credit": "Leonardo da Vinci",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Mona_Lisa,_by_Leonardo_da_Vinci,_from_C2RMF_retouched.jpg"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "the-last-supper",
+   "name": "The Last Supper",
+   "alt": [],
+   "group": "Leonardo da Vinci",
+   "facts": {
+    "artist": "Leonardo da Vinci",
+    "museum": "Santa Maria delle Grazie, Milan"
+   },
+   "blurb": "The Last Supper by Leonardo da Vinci. It shows Jesus at a meal with his twelve apostles.",
+   "clues": [
+    "It was painted on a monastery's dining-room wall.",
+    "Its experimental technique began flaking within decades.",
+    "It shows the moment one follower is about to be named as a betrayer.",
+    "It hangs in: Santa Maria delle Grazie, Milan.",
+    "It is by Leonardo da Vinci.",
+    "It shows Jesus at a meal with his twelve apostles."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/08/Leonardo_da_Vinci_%281452-1519%29_-_The_Last_Supper_%281495-1498%29.jpg/500px-Leonardo_da_Vinci_%281452-1519%29_-_The_Last_Supper_%281495-1498%29.jpg",
+      "w": 500,
+      "h": 261,
+      "credit": "Leonardo da Vinci",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Leonardo_da_Vinci_(1452-1519)_-_The_Last_Supper_(1495-1498).jpg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "the-starry-night",
+   "name": "The Starry Night",
+   "alt": [
+    "Starry Night"
+   ],
+   "group": "Vincent van Gogh",
+   "facts": {
+    "artist": "Vincent van Gogh",
+    "year": 1889,
+    "museum": "Museum of Modern Art, New York"
+   },
+   "blurb": "The Starry Night (1889) by Vincent van Gogh. Swirling stars fill a deep blue night sky above a village.",
+   "clues": [
+    "It was painted from memory during the day.",
+    "A cypress tree rises like a flame in the foreground.",
+    "It shows the view from an asylum window in Saint-Rémy.",
+    "It was painted in 1889.",
+    "It hangs in: Museum of Modern Art, New York.",
+    "It is by Vincent van Gogh."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/e/ea/Van_Gogh_-_Starry_Night_-_Google_Art_Project.jpg/500px-Van_Gogh_-_Starry_Night_-_Google_Art_Project.jpg",
+      "w": 500,
+      "h": 396,
+      "credit": "Vincent van Gogh",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Van_Gogh_-_Starry_Night_-_Google_Art_Project.jpg"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "the-scream",
+   "name": "The Scream",
+   "alt": [
+    "Scream"
+   ],
+   "group": "Edvard Munch",
+   "facts": {
+    "artist": "Edvard Munch",
+    "year": 1893,
+    "museum": "National Museum, Oslo"
+   },
+   "blurb": "The Scream (1893) by Edvard Munch. It shows a figure screaming in terror.",
+   "clues": [
+    "The artist made several versions, in paint and pastel.",
+    "The sky above is blood red.",
+    "A figure stands on a bridge with its hands on its face.",
+    "It was painted in 1893.",
+    "It hangs in: National Museum, Oslo.",
+    "It is by Edvard Munch."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c5/Edvard_Munch%2C_1893%2C_The_Scream%2C_oil%2C_tempera_and_pastel_on_cardboard%2C_91_x_73_cm%2C_National_Gallery_of_Norway.jpg/500px-Edvard_Munch%2C_1893%2C_The_Scream%2C_oil%2C_tempera_and_pastel_on_cardboard%2C_91_x_73_cm%2C_National_Gallery_of_Norway.jpg",
+      "w": 500,
+      "h": 621,
+      "credit": "Edvard Munch",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Edvard_Munch,_1893,_The_Scream,_oil,_tempera_and_pastel_on_cardboard,_91_x_73_cm,_National_Gallery_of_Norway.jpg"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "girl-with-a-pearl-earring",
+   "name": "Girl with a Pearl Earring",
+   "alt": [],
+   "group": "Johannes Vermeer",
+   "facts": {
+    "artist": "Johannes Vermeer",
+    "year": 1665,
+    "museum": "Mauritshuis, The Hague"
+   },
+   "blurb": "Girl with a Pearl Earring (1665) by Johannes Vermeer. A girl looks over her shoulder wearing a large pearl.",
+   "clues": [
+    "It is sometimes called the Mona Lisa of the North.",
+    "It is a tronie, a study of a face rather than a portrait.",
+    "It was painted in 1665.",
+    "It hangs in: Mauritshuis, The Hague.",
+    "It is by Johannes Vermeer."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/0f/1665_Girl_with_a_Pearl_Earring.jpg/500px-1665_Girl_with_a_Pearl_Earring.jpg",
+      "w": 500,
+      "h": 592,
+      "credit": "Johannes Vermeer",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:1665_Girl_with_a_Pearl_Earring.jpg"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "the-birth-of-venus",
+   "name": "The Birth of Venus",
+   "alt": [
+    "Birth of Venus"
+   ],
+   "group": "Sandro Botticelli",
+   "facts": {
+    "artist": "Sandro Botticelli",
+    "year": 1485,
+    "museum": "Uffizi, Florence"
+   },
+   "blurb": "The Birth of Venus (1485) by Sandro Botticelli. A goddess stands on a giant scallop shell.",
+   "clues": [
+    "A wind god blows the goddess towards the shore.",
+    "It was painted in Florence in the 1480s.",
+    "It shows a goddess arriving on land.",
+    "It was painted in 1485.",
+    "It hangs in: Uffizi, Florence.",
+    "It is by Sandro Botticelli.",
+    "A goddess stands on a giant scallop shell."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/0b/Sandro_Botticelli_-_La_nascita_di_Venere_-_Google_Art_Project_-_edited.jpg/500px-Sandro_Botticelli_-_La_nascita_di_Venere_-_Google_Art_Project_-_edited.jpg",
+      "w": 500,
+      "h": 314,
+      "credit": "Sandro Botticelli",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Sandro_Botticelli_-_La_nascita_di_Venere_-_Google_Art_Project_-_edited.jpg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "the-night-watch",
+   "name": "The Night Watch",
+   "alt": [
+    "Night Watch"
+   ],
+   "group": "Rembrandt",
+   "facts": {
+    "artist": "Rembrandt",
+    "year": 1642,
+    "museum": "Rijksmuseum, Amsterdam"
+   },
+   "blurb": "The Night Watch (1642) by Rembrandt. It is a huge group portrait full of light and shadow.",
+   "clues": [
+    "It was cut down on all four sides in 1715 to fit a wall.",
+    "It shows a militia company led by Captain Frans Banninck Cocq.",
+    "It was painted in 1642.",
+    "It hangs in: Rijksmuseum, Amsterdam.",
+    "It is by Rembrandt.",
+    "It is a huge group portrait full of light and shadow."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3a/La_ronda_de_noche%2C_por_Rembrandt_van_Rijn.jpg/500px-La_ronda_de_noche%2C_por_Rembrandt_van_Rijn.jpg",
+      "w": 500,
+      "h": 407,
+      "credit": "Rembrandt",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:La_ronda_de_noche,_por_Rembrandt_van_Rijn.jpg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "the-kiss",
+   "name": "The Kiss",
+   "alt": [
+    "The Kiss"
+   ],
+   "group": "Gustav Klimt",
+   "facts": {
+    "artist": "Gustav Klimt",
+    "year": 1908,
+    "museum": "Belvedere, Vienna"
+   },
+   "blurb": "The Kiss (1908) by Gustav Klimt. A couple embrace wrapped in golden robes.",
+   "clues": [
+    "The couple kneel on a carpet of flowers at the edge of a cliff.",
+    "It was bought by the Austrian state in 1908.",
+    "It is covered in real gold leaf.",
+    "It was painted in 1908.",
+    "It hangs in: Belvedere, Vienna.",
+    "It is by Gustav Klimt.",
+    "A couple embrace wrapped in golden robes."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/4/40/The_Kiss_-_Gustav_Klimt_-_Google_Cultural_Institute.jpg/500px-The_Kiss_-_Gustav_Klimt_-_Google_Cultural_Institute.jpg",
+      "w": 500,
+      "h": 502,
+      "credit": "Gustav Klimt",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:The_Kiss_-_Gustav_Klimt_-_Google_Cultural_Institute.jpg"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "the-great-wave-off-kanagawa",
+   "name": "The Great Wave off Kanagawa",
+   "alt": [
+    "The Great Wave"
+   ],
+   "group": "Katsushika Hokusai",
+   "facts": {
+    "artist": "Katsushika Hokusai",
+    "year": 1831,
+    "museum": "Woodblock print (many copies)"
+   },
+   "blurb": "The Great Wave off Kanagawa (1831) by Katsushika Hokusai. A giant claw-like wave towers over three boats.",
+   "clues": [
+    "It is a woodblock print, so many copies exist.",
+    "It uses an imported blue pigment called Prussian blue.",
+    "Mount Fuji appears small in the background.",
+    "It was painted in 1831.",
+    "It is a woodblock print with many copies.",
+    "It is by Katsushika Hokusai."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b5/Katsushika_Hokusai_-_The_Great_Wave_off_the_Coast_of_Kanagawa_LCCN2008660568.jpg/500px-Katsushika_Hokusai_-_The_Great_Wave_off_the_Coast_of_Kanagawa_LCCN2008660568.jpg",
+      "w": 500,
+      "h": 353,
+      "credit": "Katsushika, Hokusai, 1760-1849, artist",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Katsushika_Hokusai_-_The_Great_Wave_off_the_Coast_of_Kanagawa_LCCN2008660568.jpg"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "impression-sunrise",
+   "name": "Impression, Sunrise",
+   "alt": [
+    "Impression Sunrise"
+   ],
+   "group": "Claude Monet",
+   "facts": {
+    "artist": "Claude Monet",
+    "year": 1872,
+    "museum": "Musée Marmottan Monet, Paris"
+   },
+   "blurb": "Impression, Sunrise (1872) by Claude Monet. A small orange sun glows over a misty harbour.",
+   "clues": [
+    "A critic mocked its title, and the name stuck for a whole art movement.",
+    "It was stolen in 1985 and recovered in 1990.",
+    "It shows the port of Le Havre.",
+    "It was painted in 1872.",
+    "It hangs in: Musée Marmottan Monet, Paris.",
+    "It is by Claude Monet.",
+    "A small orange sun glows over a misty harbour."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/5/59/Monet_-_Impression%2C_Sunrise.jpg/500px-Monet_-_Impression%2C_Sunrise.jpg",
+      "w": 500,
+      "h": 388,
+      "credit": "Claude Monet",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Monet_-_Impression,_Sunrise.jpg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "the-creation-of-adam",
+   "name": "The Creation of Adam",
+   "alt": [
+    "Creation of Adam"
+   ],
+   "group": "Michelangelo",
+   "facts": {
+    "artist": "Michelangelo",
+    "year": 1512,
+    "museum": "Sistine Chapel, Vatican City"
+   },
+   "blurb": "The Creation of Adam (1512) by Michelangelo. Two fingers almost touch as God gives life to the first man.",
+   "clues": [
+    "It was painted on a ceiling high above the floor.",
+    "The shape around God has been compared to a human brain.",
+    "It is part of the Sistine Chapel ceiling.",
+    "It was painted in 1512.",
+    "It hangs in: Sistine Chapel, Vatican City.",
+    "It is by Michelangelo.",
+    "Two fingers almost touch as God gives life to the first man."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/2/29/The_Creation_of_Adam_perspective_fix.jpg/500px-The_Creation_of_Adam_perspective_fix.jpg",
+      "w": 500,
+      "h": 233,
+      "credit": "Michelangelo",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:The_Creation_of_Adam_perspective_fix.jpg"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "las-meninas",
+   "name": "Las Meninas",
+   "alt": [
+    "The Ladies-in-waiting"
+   ],
+   "group": "Diego Velázquez",
+   "facts": {
+    "artist": "Diego Velázquez",
+    "year": 1656,
+    "museum": "Museo del Prado, Madrid"
+   },
+   "blurb": "Las Meninas (1656) by Diego Velázquez. It shows the young Spanish princess Margarita with her attendants.",
+   "clues": [
+    "The king and queen appear only as reflections in a mirror.",
+    "The painter shows himself at work on a huge canvas.",
+    "It was painted in 1656.",
+    "It hangs in: Museo del Prado, Madrid.",
+    "It is by Diego Velázquez.",
+    "It shows the young Spanish princess Margarita with her attendants."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/3/31/Las_Meninas%2C_by_Diego_Vel%C3%A1zquez%2C_from_Prado_in_Google_Earth.jpg/500px-Las_Meninas%2C_by_Diego_Vel%C3%A1zquez%2C_from_Prado_in_Google_Earth.jpg",
+      "w": 500,
+      "h": 575,
+      "credit": "Diego Velázquez",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Las_Meninas,_by_Diego_Vel%C3%A1zquez,_from_Prado_in_Google_Earth.jpg"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "the-garden-of-earthly-delights",
+   "name": "The Garden of Earthly Delights",
+   "alt": [
+    "Garden of Earthly Delights"
+   ],
+   "group": "Hieronymus Bosch",
+   "facts": {
+    "artist": "Hieronymus Bosch",
+    "museum": "Museo del Prado, Madrid"
+   },
+   "blurb": "The Garden of Earthly Delights by Hieronymus Bosch. It is crowded with strange creatures, giant fruit and tiny naked people.",
+   "clues": [
+    "Its outer shutters show the world as a glass sphere.",
+    "It is a triptych with three panels.",
+    "Its right panel shows a nightmarish hell with musical instruments used as torture.",
+    "It hangs in: Museo del Prado, Madrid.",
+    "It is by Hieronymus Bosch.",
+    "It is crowded with strange creatures, giant fruit and tiny naked people."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/6/62/The_Garden_of_Earthly_Delights_by_Bosch_High_Resolution_2.jpg/500px-The_Garden_of_Earthly_Delights_by_Bosch_High_Resolution_2.jpg",
+      "w": 500,
+      "h": 282,
+      "credit": "Hieronymus Bosch",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:The_Garden_of_Earthly_Delights_by_Bosch_High_Resolution_2.jpg"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "a-sunday-afternoon-on-the-island-of-la-grande-jatte",
+   "name": "A Sunday Afternoon on the Island of La Grande Jatte",
+   "alt": [
+    "La Grande Jatte"
+   ],
+   "group": "Georges Seurat",
+   "facts": {
+    "artist": "Georges Seurat",
+    "year": 1886,
+    "museum": "Art Institute of Chicago"
+   },
+   "blurb": "A Sunday Afternoon on the Island of La Grande Jatte (1886) by Georges Seurat. Parisians relax by the river on a sunny day.",
+   "clues": [
+    "A woman in it walks a pet monkey on a lead.",
+    "It took about two years to complete.",
+    "It is made of millions of tiny dots.",
+    "It was painted in 1886.",
+    "It hangs in: Art Institute of Chicago.",
+    "It is by Georges Seurat.",
+    "Parisians relax by the river on a sunny day."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7d/A_Sunday_on_La_Grande_Jatte%2C_Georges_Seurat%2C_1884.jpg/500px-A_Sunday_on_La_Grande_Jatte%2C_Georges_Seurat%2C_1884.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Georges Seurat",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:A_Sunday_on_La_Grande_Jatte,_Georges_Seurat,_1884.jpg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "american-gothic",
+   "name": "American Gothic",
+   "alt": [],
+   "group": "Grant Wood",
+   "facts": {
+    "artist": "Grant Wood",
+    "year": 1930,
+    "museum": "Art Institute of Chicago"
+   },
+   "blurb": "American Gothic (1930) by Grant Wood. A stern farmer with a pitchfork stands beside a woman.",
+   "clues": [
+    "The models were the artist's sister and his dentist.",
+    "It was painted in 1930.",
+    "It hangs in: Art Institute of Chicago.",
+    "It is by Grant Wood.",
+    "A stern farmer with a pitchfork stands beside a woman."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f7/Grant_Wood_-_American_Gothic_%281930%29.jpg/500px-Grant_Wood_-_American_Gothic_%281930%29.jpg",
+      "w": 500,
+      "h": 604,
+      "credit": "Grant Wood",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Grant_Wood_-_American_Gothic_(1930).jpg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "the-arnolfini-portrait",
+   "name": "The Arnolfini Portrait",
+   "alt": [
+    "Arnolfini Wedding"
+   ],
+   "group": "Jan van Eyck",
+   "facts": {
+    "artist": "Jan van Eyck",
+    "year": 1434,
+    "museum": "National Gallery, London"
+   },
+   "blurb": "The Arnolfini Portrait (1434) by Jan van Eyck. A wealthy merchant and his wife stand in a room in Bruges.",
+   "clues": [
+    "The artist signed it on the wall: Jan van Eyck was here.",
+    "A convex mirror on the back wall reflects two more people.",
+    "A small dog stands at the couple's feet.",
+    "It was painted in 1434.",
+    "It hangs in: National Gallery, London.",
+    "It is by Jan van Eyck.",
+    "A wealthy merchant and his wife stand in a room in Bruges."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/3/33/Van_Eyck_-_Arnolfini_Portrait.jpg/330px-Van_Eyck_-_Arnolfini_Portrait.jpg",
+      "w": 330,
+      "h": 451,
+      "credit": "Jan van Eyck",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Van_Eyck_-_Arnolfini_Portrait.jpg"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "the-hay-wain",
+   "name": "The Hay Wain",
+   "alt": [
+    "Hay Wain"
+   ],
+   "group": "John Constable",
+   "facts": {
+    "artist": "John Constable",
+    "year": 1821,
+    "museum": "National Gallery, London"
+   },
+   "blurb": "The Hay Wain (1821) by John Constable. A horse-drawn farm cart stands in a shallow river.",
+   "clues": [
+    "It won a gold medal at the Paris Salon in 1824.",
+    "The cottage in it still stands at Flatford Mill.",
+    "It shows the River Stour in Suffolk.",
+    "It was painted in 1821.",
+    "It hangs in: National Gallery, London.",
+    "It is by John Constable.",
+    "A horse-drawn farm cart stands in a shallow river."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5e/John_Constable_-_The_Hay_Wain_%281821%29.jpg/500px-John_Constable_-_The_Hay_Wain_%281821%29.jpg",
+      "w": 500,
+      "h": 345,
+      "credit": "John Constable",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:John_Constable_-_The_Hay_Wain_(1821).jpg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "the-fighting-temeraire",
+   "name": "The Fighting Temeraire",
+   "alt": [
+    "Fighting Temeraire"
+   ],
+   "group": "J. M. W. Turner",
+   "facts": {
+    "artist": "J. M. W. Turner",
+    "year": 1839,
+    "museum": "National Gallery, London"
+   },
+   "blurb": "The Fighting Temeraire (1839) by J. M. W. Turner. A small steam tug tows an old sailing warship to be broken up.",
+   "clues": [
+    "It was voted Britain's favourite painting in 2005.",
+    "The old ship fought at the Battle of Trafalgar.",
+    "The sun sets behind the scene, as if marking the end of an era.",
+    "It was painted in 1839.",
+    "It hangs in: National Gallery, London.",
+    "It is by J. M. W. Turner.",
+    "A small steam tug tows an old sailing warship to be broken up."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/94/Turner%2C_J._M._W._-_The_Fighting_T%C3%A9m%C3%A9raire_tugged_to_her_last_Berth_to_be_broken.jpg/500px-Turner%2C_J._M._W._-_The_Fighting_T%C3%A9m%C3%A9raire_tugged_to_her_last_Berth_to_be_broken.jpg",
+      "w": 500,
+      "h": 371,
+      "credit": "J. M. W. Turner",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Turner,_J._M._W._-_The_Fighting_T%C3%A9m%C3%A9raire_tugged_to_her_last_Berth_to_be_broken.jpg"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "liberty-leading-the-people",
+   "name": "Liberty Leading the People",
+   "alt": [],
+   "group": "Eugène Delacroix",
+   "facts": {
+    "artist": "Eugène Delacroix",
+    "year": 1830,
+    "museum": "Louvre, Paris"
+   },
+   "blurb": "Liberty Leading the People (1830) by Eugène Delacroix. She raises the French tricolour flag.",
+   "clues": [
+    "A boy with two pistols charges beside her.",
+    "It commemorates the July Revolution of 1830.",
+    "It was painted in 1830.",
+    "It hangs in: Louvre, Paris.",
+    "It is by Eugène Delacroix.",
+    "She raises the French tricolour flag."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/02/La_Libert%C3%A9_guidant_le_peuple_-_Eug%C3%A8ne_Delacroix_-_Mus%C3%A9e_du_Louvre_Peintures_RF_129_-_apr%C3%A8s_restauration_2024.jpg/500px-La_Libert%C3%A9_guidant_le_peuple_-_Eug%C3%A8ne_Delacroix_-_Mus%C3%A9e_du_Louvre_Peintures_RF_129_-_apr%C3%A8s_restauration_2024.jpg",
+      "w": 500,
+      "h": 400,
+      "credit": "Eugène Delacroix",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:La_Libert%C3%A9_guidant_le_peuple_-_Eug%C3%A8ne_Delacroix_-_Mus%C3%A9e_du_Louvre_Peintures_RF_129_-_apr%C3%A8s_restauration_2024.jpg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "the-third-of-may-1808",
+   "name": "The Third of May 1808",
+   "alt": [
+    "Third of May"
+   ],
+   "group": "Francisco Goya",
+   "facts": {
+    "artist": "Francisco Goya",
+    "year": 1814,
+    "museum": "Museo del Prado, Madrid"
+   },
+   "blurb": "The Third of May 1808 (1814) by Francisco Goya. It shows a firing squad executing Spanish civilians.",
+   "clues": [
+    "A lantern on the ground lights the scene.",
+    "It shows events after an uprising against Napoleon's troops.",
+    "A man in a white shirt raises his arms before soldiers.",
+    "It was painted in 1814.",
+    "It hangs in: Museo del Prado, Madrid.",
+    "It is by Francisco Goya.",
+    "It shows a firing squad executing Spanish civilians."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3f/Francisco_de_Goya_y_Lucientes_-_Los_fusilamientos_del_tres_de_mayo_-_1814.jpg/500px-Francisco_de_Goya_y_Lucientes_-_Los_fusilamientos_del_tres_de_mayo_-_1814.jpg",
+      "w": 500,
+      "h": 382,
+      "credit": "Francisco Goya",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Francisco_de_Goya_y_Lucientes_-_Los_fusilamientos_del_tres_de_mayo_-_1814.jpg"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "wanderer-above-the-sea-of-fog",
+   "name": "Wanderer above the Sea of Fog",
+   "alt": [
+    "Wanderer above the Mists"
+   ],
+   "group": "Caspar David Friedrich",
+   "facts": {
+    "artist": "Caspar David Friedrich",
+    "year": 1818,
+    "museum": "Hamburger Kunsthalle"
+   },
+   "blurb": "Wanderer above the Sea of Fog (1818) by Caspar David Friedrich. A man stands on a rock gazing over a landscape covered in mist.",
+   "clues": [
+    "It is a famous image of German Romanticism.",
+    "We see the main figure only from behind.",
+    "He holds a walking stick on a rocky peak.",
+    "It was painted in 1818.",
+    "It hangs in: Hamburger Kunsthalle.",
+    "It is by Caspar David Friedrich."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/1/1e/Friedrich%2C_Caspar_David_-_Wanderer_%C3%BCber_dem_Nebelmeer.jpg/500px-Friedrich%2C_Caspar_David_-_Wanderer_%C3%BCber_dem_Nebelmeer.jpg",
+      "w": 500,
+      "h": 637,
+      "credit": "Caspar David Friedrich",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Friedrich,_Caspar_David_-_Wanderer_%C3%BCber_dem_Nebelmeer.jpg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "the-raft-of-the-medusa",
+   "name": "The Raft of the Medusa",
+   "alt": [
+    "Raft of the Medusa"
+   ],
+   "group": "Théodore Géricault",
+   "facts": {
+    "artist": "Théodore Géricault",
+    "year": 1819,
+    "museum": "Louvre, Paris"
+   },
+   "blurb": "The Raft of the Medusa (1819) by Théodore Géricault. Shipwreck survivors cling to a crowded raft.",
+   "clues": [
+    "The painter studied corpses in a hospital to get the details right.",
+    "It is based on a real French shipwreck of 1816.",
+    "Survivors wave desperately at a distant ship.",
+    "It was painted in 1819.",
+    "It hangs in: Louvre, Paris.",
+    "It is by Théodore Géricault."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/1/15/JEAN_LOUIS_TH%C3%89ODORE_G%C3%89RICAULT_-_La_Balsa_de_la_Medusa_%28Museo_del_Louvre%2C_1818-19%29.jpg/500px-JEAN_LOUIS_TH%C3%89ODORE_G%C3%89RICAULT_-_La_Balsa_de_la_Medusa_%28Museo_del_Louvre%2C_1818-19%29.jpg",
+      "w": 500,
+      "h": 341,
+      "credit": "Théodore Géricault",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:JEAN_LOUIS_TH%C3%89ODORE_G%C3%89RICAULT_-_La_Balsa_de_la_Medusa_(Museo_del_Louvre,_1818-19).jpg"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "the-school-of-athens",
+   "name": "The School of Athens",
+   "alt": [
+    "School of Athens"
+   ],
+   "group": "Raphael",
+   "facts": {
+    "artist": "Raphael",
+    "year": 1511,
+    "museum": "Apostolic Palace, Vatican City"
+   },
+   "blurb": "The School of Athens (1511) by Raphael. It shows the great thinkers of ancient Greece together.",
+   "clues": [
+    "The painter included himself looking out at the viewer.",
+    "Plato points up while Aristotle gestures towards the ground.",
+    "It is a fresco in a room of the Pope's palace.",
+    "It was painted in 1511.",
+    "It hangs in: Apostolic Palace, Vatican City.",
+    "It is by Raphael.",
+    "It shows the great thinkers of ancient Greece together."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/4/49/%22The_School_of_Athens%22_by_Raffaello_Sanzio_da_Urbino.jpg/500px-%22The_School_of_Athens%22_by_Raffaello_Sanzio_da_Urbino.jpg",
+      "w": 500,
+      "h": 388,
+      "credit": "Raphael",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:%22The_School_of_Athens%22_by_Raffaello_Sanzio_da_Urbino.jpg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "the-milkmaid",
+   "name": "The Milkmaid",
+   "alt": [
+    "The Kitchen Maid"
+   ],
+   "group": "Johannes Vermeer",
+   "facts": {
+    "artist": "Johannes Vermeer",
+    "year": 1658,
+    "museum": "Rijksmuseum, Amsterdam"
+   },
+   "blurb": "The Milkmaid (1658) by Johannes Vermeer. A kitchen maid carefully pours milk from a jug.",
+   "clues": [
+    "A foot warmer sits on the floor behind her.",
+    "Bread and a blue cloth lie on the table.",
+    "The light comes from a window on the left.",
+    "It was painted in 1658.",
+    "It hangs in: Rijksmuseum, Amsterdam.",
+    "It is by Johannes Vermeer."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/2/20/Johannes_Vermeer_-_Het_melkmeisje_-_Google_Art_Project.jpg/500px-Johannes_Vermeer_-_Het_melkmeisje_-_Google_Art_Project.jpg",
+      "w": 500,
+      "h": 561,
+      "credit": "Johannes Vermeer",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Johannes_Vermeer_-_Het_melkmeisje_-_Google_Art_Project.jpg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "dance-at-le-moulin-de-la-galette",
+   "name": "Dance at Le Moulin de la Galette",
+   "alt": [
+    "Bal du moulin de la Galette"
+   ],
+   "group": "Pierre-Auguste Renoir",
+   "facts": {
+    "artist": "Pierre-Auguste Renoir",
+    "year": 1876,
+    "museum": "Musée d'Orsay, Paris"
+   },
+   "blurb": "Dance at Le Moulin de la Galette (1876) by Pierre-Auguste Renoir. People dance and chat at an open-air café.",
+   "clues": [
+    "It sold for over 78 million dollars in 1990, though that was a smaller version.",
+    "Sunlight dapples through trees onto the crowd.",
+    "It shows a Sunday afternoon in Montmartre.",
+    "It was painted in 1876.",
+    "It hangs in: Musée d'Orsay, Paris.",
+    "It is by Pierre-Auguste Renoir."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/6/6f/Renoir%2C_Pierre-Auguste_-_Dance_at_Le_Moulin_de_la_Galette%2C_1876.jpg/500px-Renoir%2C_Pierre-Auguste_-_Dance_at_Le_Moulin_de_la_Galette%2C_1876.jpg",
+      "w": 500,
+      "h": 372,
+      "credit": "Pierre-Auguste Renoir",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Renoir,_Pierre-Auguste_-_Dance_at_Le_Moulin_de_la_Galette,_1876.jpg"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "luncheon-of-the-boating-party",
+   "name": "Luncheon of the Boating Party",
+   "alt": [],
+   "group": "Pierre-Auguste Renoir",
+   "facts": {
+    "artist": "Pierre-Auguste Renoir",
+    "year": 1881,
+    "museum": "Phillips Collection, Washington, D.C."
+   },
+   "blurb": "Luncheon of the Boating Party (1881) by Pierre-Auguste Renoir. Friends share lunch on a balcony by the river.",
+   "clues": [
+    "The painter's future wife sits in front holding a small dog.",
+    "It is set at a restaurant on the Seine at Chatou.",
+    "It was painted in 1881.",
+    "It hangs in: Phillips Collection, Washington, D.C..",
+    "It is by Pierre-Auguste Renoir."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8d/Pierre-Auguste_Renoir_-_Luncheon_of_the_Boating_Party_-_Google_Art_Project.jpg/500px-Pierre-Auguste_Renoir_-_Luncheon_of_the_Boating_Party_-_Google_Art_Project.jpg",
+      "w": 500,
+      "h": 370,
+      "credit": "Pierre-Auguste Renoir",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Pierre-Auguste_Renoir_-_Luncheon_of_the_Boating_Party_-_Google_Art_Project.jpg"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "cafe-terrace-at-night",
+   "name": "Café Terrace at Night",
+   "alt": [
+    "Cafe Terrace at Night"
+   ],
+   "group": "Vincent van Gogh",
+   "facts": {
+    "artist": "Vincent van Gogh",
+    "year": 1888,
+    "museum": "Kröller-Müller Museum, Otterlo"
+   },
+   "blurb": "Café Terrace at Night (1888) by Vincent van Gogh. People sit outside a café under the stars.",
+   "clues": [
+    "It was the first painting in which the artist used a starry background.",
+    "A yellow awning glows under a blue sky.",
+    "It was painted in 1888.",
+    "It hangs in: Kröller-Müller Museum, Otterlo.",
+    "It is by Vincent van Gogh."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/86/Van_Gogh_-_Terrace_of_a_Caf%C3%A9_at_Night_%28Place_du_Forum%29_1888.jpg/500px-Van_Gogh_-_Terrace_of_a_Caf%C3%A9_at_Night_%28Place_du_Forum%29_1888.jpg",
+      "w": 500,
+      "h": 624,
+      "credit": "Vincent van Gogh",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Van_Gogh_-_Terrace_of_a_Caf%C3%A9_at_Night_(Place_du_Forum)_1888.jpg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "self-portrait-with-bandaged-ear",
+   "name": "Self-Portrait with Bandaged Ear",
+   "alt": [],
+   "group": "Vincent van Gogh",
+   "facts": {
+    "artist": "Vincent van Gogh",
+    "year": 1889,
+    "museum": "Courtauld Gallery, London"
+   },
+   "blurb": "Self-Portrait with Bandaged Ear (1889) by Vincent van Gogh. The painter shows himself with a bandage over his ear.",
+   "clues": [
+    "A Japanese print hangs on the wall behind him.",
+    "He wears a fur hat and a green coat.",
+    "He painted it shortly after an incident in Arles.",
+    "It was painted in 1889.",
+    "It hangs in: Courtauld Gallery, London.",
+    "It is by Vincent van Gogh."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/a/ab/Self-Portrait_with_a_Bandaged_Ear_-_Vincent_van_Gogh.jpg/500px-Self-Portrait_with_a_Bandaged_Ear_-_Vincent_van_Gogh.jpg",
+      "w": 500,
+      "h": 607,
+      "credit": "Vincent van Gogh",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Self-Portrait_with_a_Bandaged_Ear_-_Vincent_van_Gogh.jpg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "the-hunters-in-the-snow",
+   "name": "The Hunters in the Snow",
+   "alt": [
+    "Hunters in the Snow"
+   ],
+   "group": "Pieter Bruegel the Elder",
+   "facts": {
+    "artist": "Pieter Bruegel the Elder",
+    "year": 1565,
+    "museum": "Kunsthistorisches Museum, Vienna"
+   },
+   "blurb": "The Hunters in the Snow (1565) by Pieter Bruegel the Elder. It is a winter landscape covered in snow.",
+   "clues": [
+    "It is one of a series showing the seasons.",
+    "Skaters play on frozen ponds in the valley.",
+    "It was painted in 1565.",
+    "It hangs in: Kunsthistorisches Museum, Vienna.",
+    "It is by Pieter Bruegel the Elder."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d8/Pieter_Bruegel_the_Elder_-_Hunters_in_the_Snow_%28Winter%29_-_Google_Art_Project.jpg/500px-Pieter_Bruegel_the_Elder_-_Hunters_in_the_Snow_%28Winter%29_-_Google_Art_Project.jpg",
+      "w": 500,
+      "h": 356,
+      "credit": "Pieter Brueghel the Elder",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Pieter_Bruegel_the_Elder_-_Hunters_in_the_Snow_(Winter)_-_Google_Art_Project.jpg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "the-tower-of-babel",
+   "name": "The Tower of Babel",
+   "alt": [
+    "Tower of Babel"
+   ],
+   "group": "Pieter Bruegel the Elder",
+   "facts": {
+    "artist": "Pieter Bruegel the Elder",
+    "year": 1563,
+    "museum": "Kunsthistorisches Museum, Vienna"
+   },
+   "blurb": "The Tower of Babel (1563) by Pieter Bruegel the Elder. A gigantic unfinished tower rises into the clouds.",
+   "clues": [
+    "Its design echoes the Colosseum in Rome.",
+    "A king inspects stonemasons in the foreground.",
+    "It shows a Bible story about language.",
+    "It was painted in 1563.",
+    "It hangs in: Kunsthistorisches Museum, Vienna.",
+    "It is by Pieter Bruegel the Elder."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/f/fc/Pieter_Bruegel_the_Elder_-_The_Tower_of_Babel_%28Vienna%29_-_Google_Art_Project_-_edited.jpg/500px-Pieter_Bruegel_the_Elder_-_The_Tower_of_Babel_%28Vienna%29_-_Google_Art_Project_-_edited.jpg",
+      "w": 500,
+      "h": 366,
+      "credit": "Pieter Brueghel the Elder",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Pieter_Bruegel_the_Elder_-_The_Tower_of_Babel_(Vienna)_-_Google_Art_Project_-_edited.jpg"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "the-ambassadors",
+   "name": "The Ambassadors",
+   "alt": [
+    "The Ambassadors"
+   ],
+   "group": "Hans Holbein the Younger",
+   "facts": {
+    "artist": "Hans Holbein the Younger",
+    "year": 1533,
+    "museum": "National Gallery, London"
+   },
+   "blurb": "The Ambassadors (1533) by Hans Holbein the Younger. Two richly dressed French diplomats stand side by side.",
+   "clues": [
+    "A stretched skull can only be seen properly from the side.",
+    "Scientific instruments sit on a shelf between the men.",
+    "It was painted in London during the reign of Henry VIII.",
+    "It was painted in 1533.",
+    "It hangs in: National Gallery, London.",
+    "It is by Hans Holbein the Younger.",
+    "Two richly dressed French diplomats stand side by side."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/88/Hans_Holbein_the_Younger_-_The_Ambassadors_-_Google_Art_Project.jpg/500px-Hans_Holbein_the_Younger_-_The_Ambassadors_-_Google_Art_Project.jpg",
+      "w": 500,
+      "h": 493,
+      "credit": "Hans Holbein the Younger",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Hans_Holbein_the_Younger_-_The_Ambassadors_-_Google_Art_Project.jpg"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "primavera",
+   "name": "Primavera",
+   "alt": [
+    "Allegory of Spring"
+   ],
+   "group": "Sandro Botticelli",
+   "facts": {
+    "artist": "Sandro Botticelli",
+    "year": 1480,
+    "museum": "Uffizi, Florence"
+   },
+   "blurb": "Primavera (1480) by Sandro Botticelli. Its title means Spring.",
+   "clues": [
+    "Botanists have identified around 500 plant species in it.",
+    "Cupid flies above firing an arrow.",
+    "Venus stands in the centre of an orange grove.",
+    "It was painted in 1480.",
+    "It hangs in: Uffizi, Florence.",
+    "It is by Sandro Botticelli."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/2/25/Sandro_Botticelli_-_La_Primavera_-_Google_Art_Project.jpg/500px-Sandro_Botticelli_-_La_Primavera_-_Google_Art_Project.jpg",
+      "w": 500,
+      "h": 332,
+      "credit": "Sandro Botticelli",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Sandro_Botticelli_-_La_Primavera_-_Google_Art_Project.jpg"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "the-calling-of-saint-matthew",
+   "name": "The Calling of Saint Matthew",
+   "alt": [
+    "Calling of Saint Matthew"
+   ],
+   "group": "Caravaggio",
+   "facts": {
+    "artist": "Caravaggio",
+    "museum": "San Luigi dei Francesi, Rome"
+   },
+   "blurb": "The Calling of Saint Matthew by Caravaggio. Jesus points at a tax collector to follow him.",
+   "clues": [
+    "It hangs in a chapel of a French church in Rome.",
+    "A beam of light cuts across the dark room.",
+    "Men sit counting money at a table.",
+    "It hangs in: San Luigi dei Francesi, Rome.",
+    "It is by Caravaggio.",
+    "Jesus points at a tax collector to follow him."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/5/59/Caravaggio_%E2%80%94_The_Calling_of_Saint_Matthew.jpg/500px-Caravaggio_%E2%80%94_The_Calling_of_Saint_Matthew.jpg",
+      "w": 500,
+      "h": 472,
+      "credit": "Gleb Simonov",
+      "license": "CC0",
+      "page": "https://commons.wikimedia.org/wiki/File:Caravaggio_%E2%80%94_The_Calling_of_Saint_Matthew.jpg"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "whistler-s-mother",
+   "name": "Whistler's Mother",
+   "alt": [
+    "Arrangement in Grey and Black No. 1"
+   ],
+   "group": "James McNeill Whistler",
+   "facts": {
+    "artist": "James McNeill Whistler",
+    "year": 1871,
+    "museum": "Musée d'Orsay, Paris"
+   },
+   "blurb": "Whistler's Mother (1871) by James McNeill Whistler. It shows the painter's mother.",
+   "clues": [
+    "It appeared on a US postage stamp in 1934.",
+    "The painter was an American living in London.",
+    "It was bought by the French state in 1891.",
+    "It was painted in 1871.",
+    "It hangs in: Musée d'Orsay, Paris."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/1/1b/Whistlers_Mother_high_res.jpg/500px-Whistlers_Mother_high_res.jpg",
+      "w": 500,
+      "h": 445,
+      "credit": "James McNeill Whistler",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Whistlers_Mother_high_res.jpg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "the-gleaners",
+   "name": "The Gleaners",
+   "alt": [
+    "Gleaners"
+   ],
+   "group": "Jean-François Millet",
+   "facts": {
+    "artist": "Jean-François Millet",
+    "year": 1857,
+    "museum": "Musée d'Orsay, Paris"
+   },
+   "blurb": "The Gleaners (1857) by Jean-François Millet. Three peasant women stoop to pick up leftover grain.",
+   "clues": [
+    "Wealthier viewers found it a disturbing picture of poverty.",
+    "A huge harvest is stacked in the background.",
+    "It shows rural women in the French countryside.",
+    "It was painted in 1857.",
+    "It hangs in: Musée d'Orsay, Paris.",
+    "It is by Jean-François Millet.",
+    "Three peasant women stoop to pick up leftover grain."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/d/da/Jean-Fran%C3%A7ois_Millet_-_Des_glaneuses.jpg/500px-Jean-Fran%C3%A7ois_Millet_-_Des_glaneuses.jpg",
+      "w": 500,
+      "h": 374,
+      "credit": "Jean-François Millet",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Jean-Fran%C3%A7ois_Millet_-_Des_glaneuses.jpg"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "a-bar-at-the-folies-bergere",
+   "name": "A Bar at the Folies-Bergère",
+   "alt": [],
+   "group": "Édouard Manet",
+   "facts": {
+    "artist": "Édouard Manet",
+    "year": 1882,
+    "museum": "Courtauld Gallery, London"
+   },
+   "blurb": "A Bar at the Folies-Bergère (1882) by Édouard Manet. A barmaid stands behind a marble counter in a Paris nightclub.",
+   "clues": [
+    "The legs of a trapeze artist appear in the top corner.",
+    "Bottles of English beer sit on the counter.",
+    "A large mirror behind her reflects the crowd.",
+    "It was painted in 1882.",
+    "It hangs in: Courtauld Gallery, London.",
+    "It is by Édouard Manet.",
+    "A barmaid stands behind a marble counter in a Paris nightclub."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/1/13/Un_bar_aux_Folies-Berg%C3%A8re_d%27E._Manet_%28Fondation_Vuitton%2C_Paris%29_%2833539037428%29.jpg/500px-Un_bar_aux_Folies-Berg%C3%A8re_d%27E._Manet_%28Fondation_Vuitton%2C_Paris%29_%2833539037428%29.jpg",
+      "w": 500,
+      "h": 372,
+      "credit": "Édouard Manet",
+      "license": "CC BY 2.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Un_bar_aux_Folies-Berg%C3%A8re_d%27E._Manet_(Fondation_Vuitton,_Paris)_(33539037428).jpg"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "where-do-we-come-from-what-are-we-where-are-we-going",
+   "name": "Where Do We Come From? What Are We? Where Are We Going?",
+   "alt": [],
+   "group": "Paul Gauguin",
+   "facts": {
+    "artist": "Paul Gauguin",
+    "year": 1898,
+    "museum": "Museum of Fine Arts, Boston"
+   },
+   "blurb": "Where Do We Come From? What Are We? Where Are We Going? (1898) by Paul Gauguin. It is a large frieze of figures under a three-question title.",
+   "clues": [
+    "The painter meant it to be read from right to left.",
+    "Its title is written in the top-left corner in French.",
+    "It was painted in Tahiti.",
+    "It was painted in 1898.",
+    "It hangs in: Museum of Fine Arts, Boston.",
+    "It is by Paul Gauguin.",
+    "It is a large frieze of figures under a three-question title."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/0a/Gauguin_-_Where_Do_We_Come_From%3F_What_Are_We%3F_Where_Are_We_Going%3F_%281897-98%29.jpg/500px-Gauguin_-_Where_Do_We_Come_From%3F_What_Are_We%3F_Where_Are_We_Going%3F_%281897-98%29.jpg",
+      "w": 500,
+      "h": 184,
+      "credit": "Paul Gauguin",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Gauguin_-_Where_Do_We_Come_From%3F_What_Are_We%3F_Where_Are_We_Going%3F_(1897-98).jpg"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "the-sleeping-gypsy",
+   "name": "The Sleeping Gypsy",
+   "alt": [
+    "Sleeping Gypsy"
+   ],
+   "group": "Henri Rousseau",
+   "facts": {
+    "artist": "Henri Rousseau",
+    "year": 1897,
+    "museum": "Museum of Modern Art, New York"
+   },
+   "blurb": "The Sleeping Gypsy (1897) by Henri Rousseau. A lion sniffs at a sleeping woman.",
+   "clues": [
+    "The painter was a self-taught former customs clerk.",
+    "The moon shines over a desert.",
+    "It was painted in 1897.",
+    "It hangs in: Museum of Modern Art, New York.",
+    "It is by Henri Rousseau."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/06/La_Boh%C3%A9mienne_endormie.jpg/500px-La_Boh%C3%A9mienne_endormie.jpg",
+      "w": 500,
+      "h": 319,
+      "credit": "Henri Rousseau",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:La_Boh%C3%A9mienne_endormie.jpg"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "tiger-in-a-tropical-storm-surprised",
+   "name": "Tiger in a Tropical Storm (Surprised!)",
+   "alt": [
+    "Surprised!",
+    "Tiger in a Tropical Storm"
+   ],
+   "group": "Henri Rousseau",
+   "facts": {
+    "artist": "Henri Rousseau",
+    "year": 1891,
+    "museum": "National Gallery, London"
+   },
+   "blurb": "Tiger in a Tropical Storm (Surprised!) (1891) by Henri Rousseau. A tiger crouches in a jungle during a storm.",
+   "clues": [
+    "The painter never left France and studied plants at the Paris botanical garden.",
+    "It was the painter's first jungle picture.",
+    "Lightning flashes as rain lashes the leaves.",
+    "It was painted in 1891.",
+    "It hangs in: National Gallery, London.",
+    "It is by Henri Rousseau."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/f/fa/Surprised-Rousseau.jpg/500px-Surprised-Rousseau.jpg",
+      "w": 500,
+      "h": 400,
+      "credit": "Henri Rousseau",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Surprised-Rousseau.jpg"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "the-lady-of-shalott",
+   "name": "The Lady of Shalott",
+   "alt": [
+    "Lady of Shalott"
+   ],
+   "group": "John William Waterhouse",
+   "facts": {
+    "artist": "John William Waterhouse",
+    "year": 1888,
+    "museum": "Tate Britain, London"
+   },
+   "blurb": "The Lady of Shalott (1888) by John William Waterhouse. A woman with long red hair sits in a boat drifting down a river.",
+   "clues": [
+    "It illustrates a poem by Alfred, Lord Tennyson.",
+    "Candles flicker at the front of the boat.",
+    "A tapestry hangs over the side of the boat.",
+    "It was painted in 1888.",
+    "It hangs in: Tate Britain, London.",
+    "It is by John William Waterhouse.",
+    "A woman with long red hair sits in a boat drifting down a river."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/6/68/John_William_Waterhouse_-_The_Lady_of_Shalott_-_Google_Art_Project_%28derivative_work_-_AutoContrast_edit_in_LCH_space%29.jpg/500px-John_William_Waterhouse_-_The_Lady_of_Shalott_-_Google_Art_Project_%28derivative_work_-_AutoContrast_edit_in_LCH_space%29.jpg",
+      "w": 500,
+      "h": 384,
+      "credit": "John William Waterhouse",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:John_William_Waterhouse_-_The_Lady_of_Shalott_-_Google_Art_Project_(derivative_work_-_AutoContrast_edit_in_LCH_space).jpg"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "ophelia",
+   "name": "Ophelia",
+   "alt": [],
+   "group": "John Everett Millais",
+   "facts": {
+    "artist": "John Everett Millais",
+    "year": 1852,
+    "museum": "Tate Britain, London"
+   },
+   "blurb": "Ophelia (1852) by John Everett Millais. A young woman floats singing in a stream.",
+   "clues": [
+    "The model, Elizabeth Siddal, posed in a bath of water.",
+    "Flowers float on the water around her.",
+    "It shows a character from Hamlet.",
+    "It was painted in 1852.",
+    "It hangs in: Tate Britain, London.",
+    "It is by John Everett Millais.",
+    "A young woman floats singing in a stream."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/94/John_Everett_Millais_-_Ophelia_-_Google_Art_Project.jpg/500px-John_Everett_Millais_-_Ophelia_-_Google_Art_Project.jpg",
+      "w": 500,
+      "h": 340,
+      "credit": "John Everett Millais",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:John_Everett_Millais_-_Ophelia_-_Google_Art_Project.jpg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "the-blue-boy",
+   "name": "The Blue Boy",
+   "alt": [
+    "Blue Boy"
+   ],
+   "group": "Thomas Gainsborough",
+   "facts": {
+    "artist": "Thomas Gainsborough",
+    "year": 1770,
+    "museum": "Huntington Library, San Marino, California"
+   },
+   "blurb": "The Blue Boy (1770) by Thomas Gainsborough. A boy stands in a shimmering blue satin suit.",
+   "clues": [
+    "It was sold to an American buyer in 1922 for a record price.",
+    "It returned to London for an exhibition in 2022, a century after it left.",
+    "The sitter wears clothes in the style of a century earlier.",
+    "It was painted in 1770.",
+    "It hangs in: Huntington Library, San Marino, California.",
+    "It is by Thomas Gainsborough."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/4/46/Thomas_Gainsborough_-_The_Blue_Boy_%28c._1770%29.jpg/330px-Thomas_Gainsborough_-_The_Blue_Boy_%28c._1770%29.jpg",
+      "w": 330,
+      "h": 480,
+      "credit": "Thomas Gainsborough",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Thomas_Gainsborough_-_The_Blue_Boy_(c._1770).jpg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "mr-and-mrs-andrews",
+   "name": "Mr and Mrs Andrews",
+   "alt": [],
+   "group": "Thomas Gainsborough",
+   "facts": {
+    "artist": "Thomas Gainsborough",
+    "year": 1750,
+    "museum": "National Gallery, London"
+   },
+   "blurb": "Mr and Mrs Andrews (1750) by Thomas Gainsborough. A young married couple pose under an oak tree.",
+   "clues": [
+    "An unfinished patch sits on the wife's lap.",
+    "The husband holds a gun and has a dog at his side.",
+    "Fields of their Suffolk estate stretch behind them.",
+    "It was painted in 1750.",
+    "It hangs in: National Gallery, London.",
+    "It is by Thomas Gainsborough.",
+    "A young married couple pose under an oak tree."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a0/Thomas_Gainsborough_-_Mr._und_Mrs._Andrews_%28c._1750%29.jpg/500px-Thomas_Gainsborough_-_Mr._und_Mrs._Andrews_%28c._1750%29.jpg",
+      "w": 500,
+      "h": 293,
+      "credit": "Thomas Gainsborough",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Thomas_Gainsborough_-_Mr._und_Mrs._Andrews_(c._1750).jpg"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "the-swing",
+   "name": "The Swing",
+   "alt": [
+    "Les hasards heureux de l'escarpolette"
+   ],
+   "group": "Jean-Honoré Fragonard",
+   "facts": {
+    "artist": "Jean-Honoré Fragonard",
+    "year": 1767,
+    "museum": "Wallace Collection, London"
+   },
+   "blurb": "The Swing (1767) by Jean-Honoré Fragonard. A young woman in a frothy pink dress flies through the air on a swing.",
+   "clues": [
+    "A young man hides in the bushes below.",
+    "She kicks off a pink slipper into the air.",
+    "It was painted in 1767.",
+    "It hangs in: Wallace Collection, London.",
+    "It is by Jean-Honoré Fragonard."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/e/eb/Fragonard%2C_The_Swing.jpg/500px-Fragonard%2C_The_Swing.jpg",
+      "w": 500,
+      "h": 628,
+      "credit": "Jean-Honoré Fragonard",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Fragonard,_The_Swing.jpg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "washington-crossing-the-delaware",
+   "name": "Washington Crossing the Delaware",
+   "alt": [],
+   "group": "Emanuel Leutze",
+   "facts": {
+    "artist": "Emanuel Leutze",
+    "year": 1851,
+    "museum": "Metropolitan Museum of Art, New York"
+   },
+   "blurb": "Washington Crossing the Delaware (1851) by Emanuel Leutze. A general stands boldly in a rowing boat among ice.",
+   "clues": [
+    "It was painted in Düsseldorf by a German-American artist.",
+    "The flag in it had not yet been adopted at the time of the event.",
+    "It shows a surprise attack on Christmas night 1776.",
+    "It was painted in 1851.",
+    "It hangs in: Metropolitan Museum of Art, New York.",
+    "It is by Emanuel Leutze.",
+    "A general stands boldly in a rowing boat among ice."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/91/Washington_Crossing_the_Delaware_MET_DP215410.jpg/500px-Washington_Crossing_the_Delaware_MET_DP215410.jpg",
+      "w": 500,
+      "h": 293,
+      "credit": "Emanuel Leutze",
+      "license": "CC0",
+      "page": "https://commons.wikimedia.org/wiki/File:Washington_Crossing_the_Delaware_MET_DP215410.jpg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "the-laughing-cavalier",
+   "name": "The Laughing Cavalier",
+   "alt": [
+    "Laughing Cavalier"
+   ],
+   "group": "Frans Hals",
+   "facts": {
+    "artist": "Frans Hals",
+    "year": 1624,
+    "museum": "Wallace Collection, London"
+   },
+   "blurb": "The Laughing Cavalier (1624) by Frans Hals. A man with a wide hat and curled moustache smiles at us.",
+   "clues": [
+    "His sleeve is embroidered with symbols of love.",
+    "The sitter is 26 years old, according to an inscription.",
+    "It was painted in 1624.",
+    "It hangs in: Wallace Collection, London.",
+    "It is by Frans Hals.",
+    "A man with a wide hat and curled moustache smiles at us."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d1/Frans_Hals_%E2%80%93_The_Laughing_Cavalier.jpg/500px-Frans_Hals_%E2%80%93_The_Laughing_Cavalier.jpg",
+      "w": 500,
+      "h": 611,
+      "credit": "Frans Hals",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Frans_Hals_%E2%80%93_The_Laughing_Cavalier.jpg"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "the-anatomy-lesson-of-dr-nicolaes-tulp",
+   "name": "The Anatomy Lesson of Dr. Nicolaes Tulp",
+   "alt": [
+    "The Anatomy Lesson"
+   ],
+   "group": "Rembrandt",
+   "facts": {
+    "artist": "Rembrandt",
+    "year": 1632,
+    "museum": "Mauritshuis, The Hague"
+   },
+   "blurb": "The Anatomy Lesson of Dr. Nicolaes Tulp (1632) by Rembrandt. Surgeons gather to watch a dissection.",
+   "clues": [
+    "It made its painter's name in Amsterdam at age 26.",
+    "The corpse was a criminal hanged that day.",
+    "The doctor shows the muscles of the forearm.",
+    "It was painted in 1632.",
+    "It hangs in: Mauritshuis, The Hague.",
+    "It is by Rembrandt.",
+    "Surgeons gather to watch a dissection."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4d/Rembrandt_-_The_Anatomy_Lesson_of_Dr_Nicolaes_Tulp.jpg/500px-Rembrandt_-_The_Anatomy_Lesson_of_Dr_Nicolaes_Tulp.jpg",
+      "w": 500,
+      "h": 377,
+      "credit": "Rembrandt",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Rembrandt_-_The_Anatomy_Lesson_of_Dr_Nicolaes_Tulp.jpg"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "woman-with-a-parasol",
+   "name": "Woman with a Parasol",
+   "alt": [
+    "Madame Monet and Her Son"
+   ],
+   "group": "Claude Monet",
+   "facts": {
+    "artist": "Claude Monet",
+    "year": 1875,
+    "museum": "National Gallery of Art, Washington, D.C."
+   },
+   "blurb": "Woman with a Parasol (1875) by Claude Monet. A woman holds a parasol against a bright sky.",
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/1/1b/Claude_Monet_-_Woman_with_a_Parasol_-_Madame_Monet_and_Her_Son_-_Google_Art_Project.jpg/500px-Claude_Monet_-_Woman_with_a_Parasol_-_Madame_Monet_and_Her_Son_-_Google_Art_Project.jpg",
+      "w": 500,
+      "h": 621,
+      "credit": "Claude Monet",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Claude_Monet_-_Woman_with_a_Parasol_-_Madame_Monet_and_Her_Son_-_Google_Art_Project.jpg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "portrait-of-adele-bloch-bauer-i",
+   "name": "Portrait of Adele Bloch-Bauer I",
+   "alt": [
+    "Woman in Gold",
+    "The Lady in Gold"
+   ],
+   "group": "Gustav Klimt",
+   "facts": {
+    "artist": "Gustav Klimt",
+    "year": 1907,
+    "museum": "Neue Galerie, New York"
+   },
+   "blurb": "Portrait of Adele Bloch-Bauer I (1907) by Gustav Klimt. A Viennese society woman sits surrounded by swirls of gold.",
+   "clues": [
+    "It was looted by the Nazis and returned to the family after a court case.",
+    "It sold for a reported 135 million dollars in 2006.",
+    "It was painted in 1907.",
+    "It hangs in: Neue Galerie, New York.",
+    "It is by Gustav Klimt."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/1/18/Gustav_Klimt%2C_1907%2C_Adele_Bloch-Bauer_I%2C_Neue_Galerie_New_York.jpg/500px-Gustav_Klimt%2C_1907%2C_Adele_Bloch-Bauer_I%2C_Neue_Galerie_New_York.jpg",
+      "w": 500,
+      "h": 500,
+      "credit": "Gustav Klimt",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Gustav_Klimt,_1907,_Adele_Bloch-Bauer_I,_Neue_Galerie_New_York.jpg"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "lady-with-an-ermine",
+   "name": "Lady with an Ermine",
+   "alt": [
+    "Portrait of Cecilia Gallerani"
+   ],
+   "group": "Leonardo da Vinci",
+   "facts": {
+    "artist": "Leonardo da Vinci",
+    "year": 1490,
+    "museum": "Czartoryski Museum, Kraków"
+   },
+   "blurb": "Lady with an Ermine (1490) by Leonardo da Vinci. A young woman holds a white stoat-like animal.",
+   "clues": [
+    "It was taken by the Nazis during the Second World War.",
+    "It was painted in 1490.",
+    "It hangs in: Czartoryski Museum, Kraków.",
+    "It is by Leonardo da Vinci.",
+    "A young woman holds a white stoat-like animal."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f9/Lady_with_an_Ermine_-_Leonardo_da_Vinci_-_Google_Art_Project.jpg/330px-Lady_with_an_Ermine_-_Leonardo_da_Vinci_-_Google_Art_Project.jpg",
+      "w": 330,
+      "h": 444,
+      "credit": "Leonardo da Vinci",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Lady_with_an_Ermine_-_Leonardo_da_Vinci_-_Google_Art_Project.jpg"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "the-harvesters",
+   "name": "The Harvesters",
+   "alt": [],
+   "group": "Pieter Bruegel the Elder",
+   "facts": {
+    "artist": "Pieter Bruegel the Elder",
+    "year": 1565,
+    "museum": "Metropolitan Museum of Art, New York"
+   },
+   "blurb": "The Harvesters (1565) by Pieter Bruegel the Elder. Peasants cut and gather golden wheat in summer.",
+   "clues": [
+    "It is one of a series of six paintings of the times of year.",
+    "A man naps under a pear tree.",
+    "Workers eat lunch in the shade.",
+    "It was painted in 1565.",
+    "It hangs in: Metropolitan Museum of Art, New York.",
+    "It is by Pieter Bruegel the Elder.",
+    "Peasants cut and gather golden wheat in summer."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/05/Pieter_Bruegel_the_Elder-_The_Harvesters_-_Google_Art_Project.jpg/500px-Pieter_Bruegel_the_Elder-_The_Harvesters_-_Google_Art_Project.jpg",
+      "w": 500,
+      "h": 364,
+      "credit": "Pieter Brueghel the Elder",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Pieter_Bruegel_the_Elder-_The_Harvesters_-_Google_Art_Project.jpg"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "irises",
+   "name": "Irises",
+   "alt": [
+    "Irises"
+   ],
+   "group": "Vincent van Gogh",
+   "facts": {
+    "artist": "Vincent van Gogh",
+    "year": 1889,
+    "museum": "J. Paul Getty Museum, Los Angeles"
+   },
+   "blurb": "Irises (1889) by Vincent van Gogh. It shows a bed of purple-blue flowers.",
+   "clues": [
+    "It sold in 1987 for a then-record 53.9 million dollars.",
+    "The artist painted it in his first week at the asylum in Saint-Rémy.",
+    "A single white flower stands out among the blue.",
+    "It was painted in 1889.",
+    "It hangs in: J. Paul Getty Museum, Los Angeles.",
+    "It is by Vincent van Gogh.",
+    "It shows a bed of purple-blue flowers."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3e/Irises-Vincent_van_Gogh.jpg/500px-Irises-Vincent_van_Gogh.jpg",
+      "w": 500,
+      "h": 382,
+      "credit": "Vincent van Gogh",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Irises-Vincent_van_Gogh.jpg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "the-potato-eaters",
+   "name": "The Potato Eaters",
+   "alt": [
+    "Potato Eaters"
+   ],
+   "group": "Vincent van Gogh",
+   "facts": {
+    "artist": "Vincent van Gogh",
+    "year": 1885,
+    "museum": "Van Gogh Museum, Amsterdam"
+   },
+   "blurb": "The Potato Eaters (1885) by Vincent van Gogh. A peasant family shares a simple meal.",
+   "clues": [
+    "He painted it in the Netherlands before moving to France.",
+    "A single lamp lights the dark room.",
+    "He wanted to show people who had dug the earth with their own hands.",
+    "It was painted in 1885.",
+    "It hangs in: Van Gogh Museum, Amsterdam.",
+    "It is by Vincent van Gogh.",
+    "A peasant family shares a simple meal."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c6/De_aardappeleters_-_s0005V1962_-_Van_Gogh_Museum.jpg/500px-De_aardappeleters_-_s0005V1962_-_Van_Gogh_Museum.jpg",
+      "w": 500,
+      "h": 354,
+      "credit": "Vincent van Gogh",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:De_aardappeleters_-_s0005V1962_-_Van_Gogh_Museum.jpg"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "the-death-of-marat",
+   "name": "The Death of Marat",
+   "alt": [
+    "Death of Marat"
+   ],
+   "group": "Jacques-Louis David",
+   "facts": {
+    "artist": "Jacques-Louis David",
+    "year": 1793,
+    "museum": "Royal Museums of Fine Arts of Belgium, Brussels"
+   },
+   "blurb": "The Death of Marat (1793) by Jacques-Louis David. It is a famous image of the French Revolution.",
+   "clues": [
+    "The victim's killer was Charlotte Corday.",
+    "He still holds the letter she used to get in to see him.",
+    "It shows a revolutionary leader murdered in his bath.",
+    "It was painted in 1793.",
+    "It hangs in: Royal Museums of Fine Arts of Belgium, Brussels.",
+    "It is by Jacques-Louis David.",
+    "It is a famous image of the French Revolution."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f8/Jacques-Louis_David_-_Marat_assassinated_-_Google_Art_Project_2.jpg/330px-Jacques-Louis_David_-_Marat_assassinated_-_Google_Art_Project_2.jpg",
+      "w": 330,
+      "h": 425,
+      "credit": "Jacques-Louis David",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Jacques-Louis_David_-_Marat_assassinated_-_Google_Art_Project_2.jpg"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "flaming-june",
+   "name": "Flaming June",
+   "alt": [],
+   "group": "Frederic Leighton",
+   "facts": {
+    "artist": "Frederic Leighton",
+    "year": 1895,
+    "museum": "Museo de Arte de Ponce, Puerto Rico"
+   },
+   "blurb": "Flaming June (1895) by Frederic Leighton. A woman sleeps curled up in a sheer orange dress.",
+   "clues": [
+    "In the 1960s it failed to sell at auction for a modest price.",
+    "A branch of poisonous oleander hangs at top right.",
+    "Her dress is a glowing orange.",
+    "It was painted in 1895.",
+    "It hangs in: Museo de Arte de Ponce, Puerto Rico.",
+    "It is by Frederic Leighton.",
+    "A woman sleeps curled up in a sheer orange dress."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8d/Flaming_June%2C_by_Frederic_Lord_Leighton_%281830-1896%29.jpg/500px-Flaming_June%2C_by_Frederic_Lord_Leighton_%281830-1896%29.jpg",
+      "w": 500,
+      "h": 500,
+      "credit": "Frederic Leighton",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Flaming_June,_by_Frederic_Lord_Leighton_(1830-1896).jpg"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "young-hare",
+   "name": "Young Hare",
+   "alt": [
+    "The Hare"
+   ],
+   "group": "Albrecht Dürer",
+   "facts": {
+    "artist": "Albrecht Dürer",
+    "year": 1502,
+    "museum": "Albertina, Vienna"
+   },
+   "blurb": "Young Hare (1502) by Albrecht Dürer. It is a famous painting of a young hare.",
+   "clues": [
+    "A window is reflected in the animal's eye.",
+    "Every hair of its fur seems to be painted.",
+    "It is a watercolour and gouache.",
+    "It was painted in 1502.",
+    "It hangs in: Albertina, Vienna.",
+    "It is by Albrecht Dürer."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/4/44/Albrecht_D%C3%BCrer_-_Hare%2C_1502_-_Google_Art_Project.jpg/500px-Albrecht_D%C3%BCrer_-_Hare%2C_1502_-_Google_Art_Project.jpg",
+      "w": 500,
+      "h": 553,
+      "credit": "Albrecht Dürer",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Albrecht_D%C3%BCrer_-_Hare,_1502_-_Google_Art_Project.jpg"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "the-night-cafe",
+   "name": "The Night Café",
+   "alt": [
+    "Night Café"
+   ],
+   "group": "Vincent van Gogh",
+   "facts": {
+    "artist": "Vincent van Gogh",
+    "year": 1888,
+    "museum": "Yale University Art Gallery"
+   },
+   "blurb": "The Night Café (1888) by Vincent van Gogh. It shows a billiard table in an all-night café.",
+   "clues": [
+    "He said he wanted to express the terrible passions of humanity with red and green.",
+    "Gas lamps glow over an almost empty room.",
+    "It was painted in 1888.",
+    "It hangs in: Yale University Art Gallery.",
+    "It is by Vincent van Gogh."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5e/Vincent_Willem_van_Gogh_076.jpg/500px-Vincent_Willem_van_Gogh_076.jpg",
+      "w": 500,
+      "h": 395,
+      "credit": "Vincent van Gogh",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Vincent_Willem_van_Gogh_076.jpg"
+     }
+    ]
+   },
+   "difficulty": 3
+  }
+ ],
+ "questions": [
+  {
+   "id": "artist-mona-lisa",
+   "kind": "mc",
+   "prompt": "Who painted Mona Lisa?",
+   "answer": "Leonardo da Vinci",
+   "wrong": [
+    "Johannes Vermeer",
+    "John Everett Millais",
+    "Michelangelo"
+   ],
+   "explain": "Mona Lisa (1503) by Leonardo da Vinci. It is famous for a mysterious smile.",
+   "difficulty": 1,
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/e/ec/Mona_Lisa%2C_by_Leonardo_da_Vinci%2C_from_C2RMF_retouched.jpg/330px-Mona_Lisa%2C_by_Leonardo_da_Vinci%2C_from_C2RMF_retouched.jpg",
+      "w": 330,
+      "h": 492,
+      "credit": "Leonardo da Vinci",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Mona_Lisa,_by_Leonardo_da_Vinci,_from_C2RMF_retouched.jpg"
+     }
+    ]
+   },
+   "refs": [
+    "paintings/mona-lisa"
+   ]
+  },
+  {
+   "id": "name-mona-lisa",
+   "kind": "mc",
+   "prompt": "What is this painting called?",
+   "answer": "Mona Lisa",
+   "wrong": [
+    "The Night Watch",
+    "The Great Wave off Kanagawa",
+    "A Bar at the Folies-Bergère"
+   ],
+   "explain": "Mona Lisa (1503) by Leonardo da Vinci. It is famous for a mysterious smile.",
+   "difficulty": 1,
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/e/ec/Mona_Lisa%2C_by_Leonardo_da_Vinci%2C_from_C2RMF_retouched.jpg/330px-Mona_Lisa%2C_by_Leonardo_da_Vinci%2C_from_C2RMF_retouched.jpg",
+      "w": 330,
+      "h": 492,
+      "credit": "Leonardo da Vinci",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Mona_Lisa,_by_Leonardo_da_Vinci,_from_C2RMF_retouched.jpg"
+     }
+    ]
+   },
+   "refs": [
+    "paintings/mona-lisa"
+   ]
+  },
+  {
+   "id": "artist-the-last-supper",
+   "kind": "mc",
+   "prompt": "Who painted The Last Supper?",
+   "answer": "Leonardo da Vinci",
+   "wrong": [
+    "Johannes Vermeer",
+    "Michelangelo",
+    "Raphael"
+   ],
+   "explain": "The Last Supper by Leonardo da Vinci. It shows Jesus at a meal with his twelve apostles.",
+   "difficulty": 2,
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/08/Leonardo_da_Vinci_%281452-1519%29_-_The_Last_Supper_%281495-1498%29.jpg/500px-Leonardo_da_Vinci_%281452-1519%29_-_The_Last_Supper_%281495-1498%29.jpg",
+      "w": 500,
+      "h": 261,
+      "credit": "Leonardo da Vinci",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Leonardo_da_Vinci_(1452-1519)_-_The_Last_Supper_(1495-1498).jpg"
+     }
+    ]
+   },
+   "refs": [
+    "paintings/the-last-supper"
+   ]
+  },
+  {
+   "id": "name-the-last-supper",
+   "kind": "mc",
+   "prompt": "What is this painting called?",
+   "answer": "The Last Supper",
+   "wrong": [
+    "Irises",
+    "The Scream",
+    "The Creation of Adam"
+   ],
+   "explain": "The Last Supper by Leonardo da Vinci. It shows Jesus at a meal with his twelve apostles.",
+   "difficulty": 2,
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/08/Leonardo_da_Vinci_%281452-1519%29_-_The_Last_Supper_%281495-1498%29.jpg/500px-Leonardo_da_Vinci_%281452-1519%29_-_The_Last_Supper_%281495-1498%29.jpg",
+      "w": 500,
+      "h": 261,
+      "credit": "Leonardo da Vinci",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Leonardo_da_Vinci_(1452-1519)_-_The_Last_Supper_(1495-1498).jpg"
+     }
+    ]
+   },
+   "refs": [
+    "paintings/the-last-supper"
+   ]
+  },
+  {
+   "id": "artist-the-starry-night",
+   "kind": "mc",
+   "prompt": "Who painted The Starry Night?",
+   "answer": "Vincent van Gogh",
+   "wrong": [
+    "John William Waterhouse",
+    "Johannes Vermeer",
+    "Henri Rousseau"
+   ],
+   "explain": "The Starry Night (1889) by Vincent van Gogh. Swirling stars fill a deep blue night sky above a village.",
+   "difficulty": 1,
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/e/ea/Van_Gogh_-_Starry_Night_-_Google_Art_Project.jpg/500px-Van_Gogh_-_Starry_Night_-_Google_Art_Project.jpg",
+      "w": 500,
+      "h": 396,
+      "credit": "Vincent van Gogh",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Van_Gogh_-_Starry_Night_-_Google_Art_Project.jpg"
+     }
+    ]
+   },
+   "refs": [
+    "paintings/the-starry-night"
+   ]
+  },
+  {
+   "id": "name-the-starry-night",
+   "kind": "mc",
+   "prompt": "What is this painting called?",
+   "answer": "The Starry Night",
+   "wrong": [
+    "Mr and Mrs Andrews",
+    "The Kiss",
+    "The Fighting Temeraire"
+   ],
+   "explain": "The Starry Night (1889) by Vincent van Gogh. Swirling stars fill a deep blue night sky above a village.",
+   "difficulty": 1,
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/e/ea/Van_Gogh_-_Starry_Night_-_Google_Art_Project.jpg/500px-Van_Gogh_-_Starry_Night_-_Google_Art_Project.jpg",
+      "w": 500,
+      "h": 396,
+      "credit": "Vincent van Gogh",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Van_Gogh_-_Starry_Night_-_Google_Art_Project.jpg"
+     }
+    ]
+   },
+   "refs": [
+    "paintings/the-starry-night"
+   ]
+  },
+  {
+   "id": "artist-the-scream",
+   "kind": "mc",
+   "prompt": "Who painted The Scream?",
+   "answer": "Edvard Munch",
+   "wrong": [
+    "Jacques-Louis David",
+    "Caravaggio",
+    "Henri Rousseau"
+   ],
+   "explain": "The Scream (1893) by Edvard Munch. It shows a figure screaming in terror.",
+   "difficulty": 1,
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c5/Edvard_Munch%2C_1893%2C_The_Scream%2C_oil%2C_tempera_and_pastel_on_cardboard%2C_91_x_73_cm%2C_National_Gallery_of_Norway.jpg/500px-Edvard_Munch%2C_1893%2C_The_Scream%2C_oil%2C_tempera_and_pastel_on_cardboard%2C_91_x_73_cm%2C_National_Gallery_of_Norway.jpg",
+      "w": 500,
+      "h": 621,
+      "credit": "Edvard Munch",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Edvard_Munch,_1893,_The_Scream,_oil,_tempera_and_pastel_on_cardboard,_91_x_73_cm,_National_Gallery_of_Norway.jpg"
+     }
+    ]
+   },
+   "refs": [
+    "paintings/the-scream"
+   ]
+  },
+  {
+   "id": "name-the-scream",
+   "kind": "mc",
+   "prompt": "What is this painting called?",
+   "answer": "The Scream",
+   "wrong": [
+    "Mona Lisa",
+    "Where Do We Come From? What Are We? Where Are We Going?",
+    "Tiger in a Tropical Storm (Surprised!)"
+   ],
+   "explain": "The Scream (1893) by Edvard Munch. It shows a figure screaming in terror.",
+   "difficulty": 1,
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c5/Edvard_Munch%2C_1893%2C_The_Scream%2C_oil%2C_tempera_and_pastel_on_cardboard%2C_91_x_73_cm%2C_National_Gallery_of_Norway.jpg/500px-Edvard_Munch%2C_1893%2C_The_Scream%2C_oil%2C_tempera_and_pastel_on_cardboard%2C_91_x_73_cm%2C_National_Gallery_of_Norway.jpg",
+      "w": 500,
+      "h": 621,
+      "credit": "Edvard Munch",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Edvard_Munch,_1893,_The_Scream,_oil,_tempera_and_pastel_on_cardboard,_91_x_73_cm,_National_Gallery_of_Norway.jpg"
+     }
+    ]
+   },
+   "refs": [
+    "paintings/the-scream"
+   ]
+  },
+  {
+   "id": "artist-girl-with-a-pearl-earring",
+   "kind": "mc",
+   "prompt": "Who painted Girl with a Pearl Earring?",
+   "answer": "Johannes Vermeer",
+   "wrong": [
+    "Francisco Goya",
+    "Jean-Honoré Fragonard",
+    "Raphael"
+   ],
+   "explain": "Girl with a Pearl Earring (1665) by Johannes Vermeer. A girl looks over her shoulder wearing a large pearl.",
+   "difficulty": 1,
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/0f/1665_Girl_with_a_Pearl_Earring.jpg/500px-1665_Girl_with_a_Pearl_Earring.jpg",
+      "w": 500,
+      "h": 592,
+      "credit": "Johannes Vermeer",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:1665_Girl_with_a_Pearl_Earring.jpg"
+     }
+    ]
+   },
+   "refs": [
+    "paintings/girl-with-a-pearl-earring"
+   ]
+  },
+  {
+   "id": "name-girl-with-a-pearl-earring",
+   "kind": "mc",
+   "prompt": "What is this painting called?",
+   "answer": "Girl with a Pearl Earring",
+   "wrong": [
+    "Tiger in a Tropical Storm (Surprised!)",
+    "The Kiss",
+    "Portrait of Adele Bloch-Bauer I"
+   ],
+   "explain": "Girl with a Pearl Earring (1665) by Johannes Vermeer. A girl looks over her shoulder wearing a large pearl.",
+   "difficulty": 1,
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/0f/1665_Girl_with_a_Pearl_Earring.jpg/500px-1665_Girl_with_a_Pearl_Earring.jpg",
+      "w": 500,
+      "h": 592,
+      "credit": "Johannes Vermeer",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:1665_Girl_with_a_Pearl_Earring.jpg"
+     }
+    ]
+   },
+   "refs": [
+    "paintings/girl-with-a-pearl-earring"
+   ]
+  },
+  {
+   "id": "artist-the-birth-of-venus",
+   "kind": "mc",
+   "prompt": "Who painted The Birth of Venus?",
+   "answer": "Sandro Botticelli",
+   "wrong": [
+    "Francisco Goya",
+    "Frederic Leighton",
+    "J. M. W. Turner"
+   ],
+   "explain": "The Birth of Venus (1485) by Sandro Botticelli. A goddess stands on a giant scallop shell.",
+   "difficulty": 2,
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/0b/Sandro_Botticelli_-_La_nascita_di_Venere_-_Google_Art_Project_-_edited.jpg/500px-Sandro_Botticelli_-_La_nascita_di_Venere_-_Google_Art_Project_-_edited.jpg",
+      "w": 500,
+      "h": 314,
+      "credit": "Sandro Botticelli",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Sandro_Botticelli_-_La_nascita_di_Venere_-_Google_Art_Project_-_edited.jpg"
+     }
+    ]
+   },
+   "refs": [
+    "paintings/the-birth-of-venus"
+   ]
+  },
+  {
+   "id": "name-the-birth-of-venus",
+   "kind": "mc",
+   "prompt": "What is this painting called?",
+   "answer": "The Birth of Venus",
+   "wrong": [
+    "The Hay Wain",
+    "A Bar at the Folies-Bergère",
+    "The Blue Boy"
+   ],
+   "explain": "The Birth of Venus (1485) by Sandro Botticelli. A goddess stands on a giant scallop shell.",
+   "difficulty": 2,
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/0b/Sandro_Botticelli_-_La_nascita_di_Venere_-_Google_Art_Project_-_edited.jpg/500px-Sandro_Botticelli_-_La_nascita_di_Venere_-_Google_Art_Project_-_edited.jpg",
+      "w": 500,
+      "h": 314,
+      "credit": "Sandro Botticelli",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Sandro_Botticelli_-_La_nascita_di_Venere_-_Google_Art_Project_-_edited.jpg"
+     }
+    ]
+   },
+   "refs": [
+    "paintings/the-birth-of-venus"
+   ]
+  },
+  {
+   "id": "artist-the-night-watch",
+   "kind": "mc",
+   "prompt": "Who painted The Night Watch?",
+   "answer": "Rembrandt",
+   "wrong": [
+    "Frederic Leighton",
+    "Vincent van Gogh",
+    "John Constable"
+   ],
+   "explain": "The Night Watch (1642) by Rembrandt. It is a huge group portrait full of light and shadow.",
+   "difficulty": 2,
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3a/La_ronda_de_noche%2C_por_Rembrandt_van_Rijn.jpg/500px-La_ronda_de_noche%2C_por_Rembrandt_van_Rijn.jpg",
+      "w": 500,
+      "h": 407,
+      "credit": "Rembrandt",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:La_ronda_de_noche,_por_Rembrandt_van_Rijn.jpg"
+     }
+    ]
+   },
+   "refs": [
+    "paintings/the-night-watch"
+   ]
+  },
+  {
+   "id": "name-the-night-watch",
+   "kind": "mc",
+   "prompt": "What is this painting called?",
+   "answer": "The Night Watch",
+   "wrong": [
+    "Mr and Mrs Andrews",
+    "The Laughing Cavalier",
+    "The Blue Boy"
+   ],
+   "explain": "The Night Watch (1642) by Rembrandt. It is a huge group portrait full of light and shadow.",
+   "difficulty": 2,
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3a/La_ronda_de_noche%2C_por_Rembrandt_van_Rijn.jpg/500px-La_ronda_de_noche%2C_por_Rembrandt_van_Rijn.jpg",
+      "w": 500,
+      "h": 407,
+      "credit": "Rembrandt",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:La_ronda_de_noche,_por_Rembrandt_van_Rijn.jpg"
+     }
+    ]
+   },
+   "refs": [
+    "paintings/the-night-watch"
+   ]
+  },
+  {
+   "id": "artist-the-kiss",
+   "kind": "mc",
+   "prompt": "Who painted The Kiss?",
+   "answer": "Gustav Klimt",
+   "wrong": [
+    "Pieter Bruegel the Elder",
+    "Jacques-Louis David",
+    "Caravaggio"
+   ],
+   "explain": "The Kiss (1908) by Gustav Klimt. A couple embrace wrapped in golden robes.",
+   "difficulty": 1,
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/4/40/The_Kiss_-_Gustav_Klimt_-_Google_Cultural_Institute.jpg/500px-The_Kiss_-_Gustav_Klimt_-_Google_Cultural_Institute.jpg",
+      "w": 500,
+      "h": 502,
+      "credit": "Gustav Klimt",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:The_Kiss_-_Gustav_Klimt_-_Google_Cultural_Institute.jpg"
+     }
+    ]
+   },
+   "refs": [
+    "paintings/the-kiss"
+   ]
+  },
+  {
+   "id": "name-the-kiss",
+   "kind": "mc",
+   "prompt": "What is this painting called?",
+   "answer": "The Kiss",
+   "wrong": [
+    "The Night Watch",
+    "The Scream",
+    "The Harvesters"
+   ],
+   "explain": "The Kiss (1908) by Gustav Klimt. A couple embrace wrapped in golden robes.",
+   "difficulty": 1,
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/4/40/The_Kiss_-_Gustav_Klimt_-_Google_Cultural_Institute.jpg/500px-The_Kiss_-_Gustav_Klimt_-_Google_Cultural_Institute.jpg",
+      "w": 500,
+      "h": 502,
+      "credit": "Gustav Klimt",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:The_Kiss_-_Gustav_Klimt_-_Google_Cultural_Institute.jpg"
+     }
+    ]
+   },
+   "refs": [
+    "paintings/the-kiss"
+   ]
+  },
+  {
+   "id": "artist-the-great-wave-off-kanagawa",
+   "kind": "mc",
+   "prompt": "Who painted The Great Wave off Kanagawa?",
+   "answer": "Katsushika Hokusai",
+   "wrong": [
+    "Claude Monet",
+    "Caspar David Friedrich",
+    "Albrecht Dürer"
+   ],
+   "explain": "The Great Wave off Kanagawa (1831) by Katsushika Hokusai. A giant claw-like wave towers over three boats.",
+   "difficulty": 1,
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b5/Katsushika_Hokusai_-_The_Great_Wave_off_the_Coast_of_Kanagawa_LCCN2008660568.jpg/500px-Katsushika_Hokusai_-_The_Great_Wave_off_the_Coast_of_Kanagawa_LCCN2008660568.jpg",
+      "w": 500,
+      "h": 353,
+      "credit": "Katsushika, Hokusai, 1760-1849, artist",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Katsushika_Hokusai_-_The_Great_Wave_off_the_Coast_of_Kanagawa_LCCN2008660568.jpg"
+     }
+    ]
+   },
+   "refs": [
+    "paintings/the-great-wave-off-kanagawa"
+   ]
+  },
+  {
+   "id": "name-the-great-wave-off-kanagawa",
+   "kind": "mc",
+   "prompt": "What is this painting called?",
+   "answer": "The Great Wave off Kanagawa",
+   "wrong": [
+    "Washington Crossing the Delaware",
+    "The Tower of Babel",
+    "Impression, Sunrise"
+   ],
+   "explain": "The Great Wave off Kanagawa (1831) by Katsushika Hokusai. A giant claw-like wave towers over three boats.",
+   "difficulty": 1,
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b5/Katsushika_Hokusai_-_The_Great_Wave_off_the_Coast_of_Kanagawa_LCCN2008660568.jpg/500px-Katsushika_Hokusai_-_The_Great_Wave_off_the_Coast_of_Kanagawa_LCCN2008660568.jpg",
+      "w": 500,
+      "h": 353,
+      "credit": "Katsushika, Hokusai, 1760-1849, artist",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Katsushika_Hokusai_-_The_Great_Wave_off_the_Coast_of_Kanagawa_LCCN2008660568.jpg"
+     }
+    ]
+   },
+   "refs": [
+    "paintings/the-great-wave-off-kanagawa"
+   ]
+  },
+  {
+   "id": "artist-impression-sunrise",
+   "kind": "mc",
+   "prompt": "Who painted Impression, Sunrise?",
+   "answer": "Claude Monet",
+   "wrong": [
+    "J. M. W. Turner",
+    "Jean-François Millet",
+    "Édouard Manet"
+   ],
+   "explain": "Impression, Sunrise (1872) by Claude Monet. A small orange sun glows over a misty harbour.",
+   "difficulty": 2,
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/5/59/Monet_-_Impression%2C_Sunrise.jpg/500px-Monet_-_Impression%2C_Sunrise.jpg",
+      "w": 500,
+      "h": 388,
+      "credit": "Claude Monet",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Monet_-_Impression,_Sunrise.jpg"
+     }
+    ]
+   },
+   "refs": [
+    "paintings/impression-sunrise"
+   ]
+  },
+  {
+   "id": "name-impression-sunrise",
+   "kind": "mc",
+   "prompt": "What is this painting called?",
+   "answer": "Impression, Sunrise",
+   "wrong": [
+    "The Laughing Cavalier",
+    "The Scream",
+    "Liberty Leading the People"
+   ],
+   "explain": "Impression, Sunrise (1872) by Claude Monet. A small orange sun glows over a misty harbour.",
+   "difficulty": 2,
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/5/59/Monet_-_Impression%2C_Sunrise.jpg/500px-Monet_-_Impression%2C_Sunrise.jpg",
+      "w": 500,
+      "h": 388,
+      "credit": "Claude Monet",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Monet_-_Impression,_Sunrise.jpg"
+     }
+    ]
+   },
+   "refs": [
+    "paintings/impression-sunrise"
+   ]
+  },
+  {
+   "id": "artist-the-creation-of-adam",
+   "kind": "mc",
+   "prompt": "Who painted The Creation of Adam?",
+   "answer": "Michelangelo",
+   "wrong": [
+    "Rembrandt",
+    "Vincent van Gogh",
+    "Edvard Munch"
+   ],
+   "explain": "The Creation of Adam (1512) by Michelangelo. Two fingers almost touch as God gives life to the first man.",
+   "difficulty": 1,
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/2/29/The_Creation_of_Adam_perspective_fix.jpg/500px-The_Creation_of_Adam_perspective_fix.jpg",
+      "w": 500,
+      "h": 233,
+      "credit": "Michelangelo",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:The_Creation_of_Adam_perspective_fix.jpg"
+     }
+    ]
+   },
+   "refs": [
+    "paintings/the-creation-of-adam"
+   ]
+  },
+  {
+   "id": "name-the-creation-of-adam",
+   "kind": "mc",
+   "prompt": "What is this painting called?",
+   "answer": "The Creation of Adam",
+   "wrong": [
+    "Self-Portrait with Bandaged Ear",
+    "The Death of Marat",
+    "The Hay Wain"
+   ],
+   "explain": "The Creation of Adam (1512) by Michelangelo. Two fingers almost touch as God gives life to the first man.",
+   "difficulty": 1,
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/2/29/The_Creation_of_Adam_perspective_fix.jpg/500px-The_Creation_of_Adam_perspective_fix.jpg",
+      "w": 500,
+      "h": 233,
+      "credit": "Michelangelo",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:The_Creation_of_Adam_perspective_fix.jpg"
+     }
+    ]
+   },
+   "refs": [
+    "paintings/the-creation-of-adam"
+   ]
+  },
+  {
+   "id": "artist-las-meninas",
+   "kind": "mc",
+   "prompt": "Who painted Las Meninas?",
+   "answer": "Diego Velázquez",
+   "wrong": [
+    "Henri Rousseau",
+    "Vincent van Gogh",
+    "John William Waterhouse"
+   ],
+   "explain": "Las Meninas (1656) by Diego Velázquez. It shows the young Spanish princess Margarita with her attendants.",
+   "difficulty": 3,
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/3/31/Las_Meninas%2C_by_Diego_Vel%C3%A1zquez%2C_from_Prado_in_Google_Earth.jpg/500px-Las_Meninas%2C_by_Diego_Vel%C3%A1zquez%2C_from_Prado_in_Google_Earth.jpg",
+      "w": 500,
+      "h": 575,
+      "credit": "Diego Velázquez",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Las_Meninas,_by_Diego_Vel%C3%A1zquez,_from_Prado_in_Google_Earth.jpg"
+     }
+    ]
+   },
+   "refs": [
+    "paintings/las-meninas"
+   ]
+  },
+  {
+   "id": "name-las-meninas",
+   "kind": "mc",
+   "prompt": "What is this painting called?",
+   "answer": "Las Meninas",
+   "wrong": [
+    "The Milkmaid",
+    "Mr and Mrs Andrews",
+    "Young Hare"
+   ],
+   "explain": "Las Meninas (1656) by Diego Velázquez. It shows the young Spanish princess Margarita with her attendants.",
+   "difficulty": 3,
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/3/31/Las_Meninas%2C_by_Diego_Vel%C3%A1zquez%2C_from_Prado_in_Google_Earth.jpg/500px-Las_Meninas%2C_by_Diego_Vel%C3%A1zquez%2C_from_Prado_in_Google_Earth.jpg",
+      "w": 500,
+      "h": 575,
+      "credit": "Diego Velázquez",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Las_Meninas,_by_Diego_Vel%C3%A1zquez,_from_Prado_in_Google_Earth.jpg"
+     }
+    ]
+   },
+   "refs": [
+    "paintings/las-meninas"
+   ]
+  },
+  {
+   "id": "artist-the-garden-of-earthly-delights",
+   "kind": "mc",
+   "prompt": "Who painted The Garden of Earthly Delights?",
+   "answer": "Hieronymus Bosch",
+   "wrong": [
+    "James McNeill Whistler",
+    "Francisco Goya",
+    "Michelangelo"
+   ],
+   "explain": "The Garden of Earthly Delights by Hieronymus Bosch. It is crowded with strange creatures, giant fruit and tiny naked people.",
+   "difficulty": 3,
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/6/62/The_Garden_of_Earthly_Delights_by_Bosch_High_Resolution_2.jpg/500px-The_Garden_of_Earthly_Delights_by_Bosch_High_Resolution_2.jpg",
+      "w": 500,
+      "h": 282,
+      "credit": "Hieronymus Bosch",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:The_Garden_of_Earthly_Delights_by_Bosch_High_Resolution_2.jpg"
+     }
+    ]
+   },
+   "refs": [
+    "paintings/the-garden-of-earthly-delights"
+   ]
+  },
+  {
+   "id": "name-the-garden-of-earthly-delights",
+   "kind": "mc",
+   "prompt": "What is this painting called?",
+   "answer": "The Garden of Earthly Delights",
+   "wrong": [
+    "Las Meninas",
+    "Irises",
+    "Primavera"
+   ],
+   "explain": "The Garden of Earthly Delights by Hieronymus Bosch. It is crowded with strange creatures, giant fruit and tiny naked people.",
+   "difficulty": 3,
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/6/62/The_Garden_of_Earthly_Delights_by_Bosch_High_Resolution_2.jpg/500px-The_Garden_of_Earthly_Delights_by_Bosch_High_Resolution_2.jpg",
+      "w": 500,
+      "h": 282,
+      "credit": "Hieronymus Bosch",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:The_Garden_of_Earthly_Delights_by_Bosch_High_Resolution_2.jpg"
+     }
+    ]
+   },
+   "refs": [
+    "paintings/the-garden-of-earthly-delights"
+   ]
+  },
+  {
+   "id": "artist-a-sunday-afternoon-on-the-island-of-la-grande-jatte",
+   "kind": "mc",
+   "prompt": "Who painted A Sunday Afternoon on the Island of La Grande Jatte?",
+   "answer": "Georges Seurat",
+   "wrong": [
+    "Hieronymus Bosch",
+    "Eugène Delacroix",
+    "Rembrandt"
+   ],
+   "explain": "A Sunday Afternoon on the Island of La Grande Jatte (1886) by Georges Seurat. Parisians relax by the river on a sunny day.",
+   "difficulty": 2,
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7d/A_Sunday_on_La_Grande_Jatte%2C_Georges_Seurat%2C_1884.jpg/500px-A_Sunday_on_La_Grande_Jatte%2C_Georges_Seurat%2C_1884.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Georges Seurat",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:A_Sunday_on_La_Grande_Jatte,_Georges_Seurat,_1884.jpg"
+     }
+    ]
+   },
+   "refs": [
+    "paintings/a-sunday-afternoon-on-the-island-of-la-grande-jatte"
+   ]
+  },
+  {
+   "id": "name-a-sunday-afternoon-on-the-island-of-la-grande-jatte",
+   "kind": "mc",
+   "prompt": "What is this painting called?",
+   "answer": "A Sunday Afternoon on the Island of La Grande Jatte",
+   "wrong": [
+    "Primavera",
+    "The Hay Wain",
+    "The Birth of Venus"
+   ],
+   "explain": "A Sunday Afternoon on the Island of La Grande Jatte (1886) by Georges Seurat. Parisians relax by the river on a sunny day.",
+   "difficulty": 2,
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7d/A_Sunday_on_La_Grande_Jatte%2C_Georges_Seurat%2C_1884.jpg/500px-A_Sunday_on_La_Grande_Jatte%2C_Georges_Seurat%2C_1884.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Georges Seurat",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:A_Sunday_on_La_Grande_Jatte,_Georges_Seurat,_1884.jpg"
+     }
+    ]
+   },
+   "refs": [
+    "paintings/a-sunday-afternoon-on-the-island-of-la-grande-jatte"
+   ]
+  },
+  {
+   "id": "artist-american-gothic",
+   "kind": "mc",
+   "prompt": "Who painted American Gothic?",
+   "answer": "Grant Wood",
+   "wrong": [
+    "Georges Seurat",
+    "Gustav Klimt",
+    "Michelangelo"
+   ],
+   "explain": "American Gothic (1930) by Grant Wood. A stern farmer with a pitchfork stands beside a woman.",
+   "difficulty": 2,
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f7/Grant_Wood_-_American_Gothic_%281930%29.jpg/500px-Grant_Wood_-_American_Gothic_%281930%29.jpg",
+      "w": 500,
+      "h": 604,
+      "credit": "Grant Wood",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Grant_Wood_-_American_Gothic_(1930).jpg"
+     }
+    ]
+   },
+   "refs": [
+    "paintings/american-gothic"
+   ]
+  },
+  {
+   "id": "name-american-gothic",
+   "kind": "mc",
+   "prompt": "What is this painting called?",
+   "answer": "American Gothic",
+   "wrong": [
+    "The Fighting Temeraire",
+    "The Night Watch",
+    "Liberty Leading the People"
+   ],
+   "explain": "American Gothic (1930) by Grant Wood. A stern farmer with a pitchfork stands beside a woman.",
+   "difficulty": 2,
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f7/Grant_Wood_-_American_Gothic_%281930%29.jpg/500px-Grant_Wood_-_American_Gothic_%281930%29.jpg",
+      "w": 500,
+      "h": 604,
+      "credit": "Grant Wood",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Grant_Wood_-_American_Gothic_(1930).jpg"
+     }
+    ]
+   },
+   "refs": [
+    "paintings/american-gothic"
+   ]
+  },
+  {
+   "id": "artist-the-arnolfini-portrait",
+   "kind": "mc",
+   "prompt": "Who painted The Arnolfini Portrait?",
+   "answer": "Jan van Eyck",
+   "wrong": [
+    "Georges Seurat",
+    "Hieronymus Bosch",
+    "Sandro Botticelli"
+   ],
+   "explain": "The Arnolfini Portrait (1434) by Jan van Eyck. A wealthy merchant and his wife stand in a room in Bruges.",
+   "difficulty": 3,
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/3/33/Van_Eyck_-_Arnolfini_Portrait.jpg/330px-Van_Eyck_-_Arnolfini_Portrait.jpg",
+      "w": 330,
+      "h": 451,
+      "credit": "Jan van Eyck",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Van_Eyck_-_Arnolfini_Portrait.jpg"
+     }
+    ]
+   },
+   "refs": [
+    "paintings/the-arnolfini-portrait"
+   ]
+  },
+  {
+   "id": "name-the-arnolfini-portrait",
+   "kind": "mc",
+   "prompt": "What is this painting called?",
+   "answer": "The Arnolfini Portrait",
+   "wrong": [
+    "The Laughing Cavalier",
+    "Mr and Mrs Andrews",
+    "The Tower of Babel"
+   ],
+   "explain": "The Arnolfini Portrait (1434) by Jan van Eyck. A wealthy merchant and his wife stand in a room in Bruges.",
+   "difficulty": 3,
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/3/33/Van_Eyck_-_Arnolfini_Portrait.jpg/330px-Van_Eyck_-_Arnolfini_Portrait.jpg",
+      "w": 330,
+      "h": 451,
+      "credit": "Jan van Eyck",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Van_Eyck_-_Arnolfini_Portrait.jpg"
+     }
+    ]
+   },
+   "refs": [
+    "paintings/the-arnolfini-portrait"
+   ]
+  },
+  {
+   "id": "artist-the-hay-wain",
+   "kind": "mc",
+   "prompt": "Who painted The Hay Wain?",
+   "answer": "John Constable",
+   "wrong": [
+    "Michelangelo",
+    "Katsushika Hokusai",
+    "Caspar David Friedrich"
+   ],
+   "explain": "The Hay Wain (1821) by John Constable. A horse-drawn farm cart stands in a shallow river.",
+   "difficulty": 2,
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5e/John_Constable_-_The_Hay_Wain_%281821%29.jpg/500px-John_Constable_-_The_Hay_Wain_%281821%29.jpg",
+      "w": 500,
+      "h": 345,
+      "credit": "John Constable",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:John_Constable_-_The_Hay_Wain_(1821).jpg"
+     }
+    ]
+   },
+   "refs": [
+    "paintings/the-hay-wain"
+   ]
+  },
+  {
+   "id": "name-the-hay-wain",
+   "kind": "mc",
+   "prompt": "What is this painting called?",
+   "answer": "The Hay Wain",
+   "wrong": [
+    "Woman with a Parasol",
+    "Self-Portrait with Bandaged Ear",
+    "The Calling of Saint Matthew"
+   ],
+   "explain": "The Hay Wain (1821) by John Constable. A horse-drawn farm cart stands in a shallow river.",
+   "difficulty": 2,
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5e/John_Constable_-_The_Hay_Wain_%281821%29.jpg/500px-John_Constable_-_The_Hay_Wain_%281821%29.jpg",
+      "w": 500,
+      "h": 345,
+      "credit": "John Constable",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:John_Constable_-_The_Hay_Wain_(1821).jpg"
+     }
+    ]
+   },
+   "refs": [
+    "paintings/the-hay-wain"
+   ]
+  },
+  {
+   "id": "artist-the-fighting-temeraire",
+   "kind": "mc",
+   "prompt": "Who painted The Fighting Temeraire?",
+   "answer": "J. M. W. Turner",
+   "wrong": [
+    "Frederic Leighton",
+    "Sandro Botticelli",
+    "Grant Wood"
+   ],
+   "explain": "The Fighting Temeraire (1839) by J. M. W. Turner. A small steam tug tows an old sailing warship to be broken up.",
+   "difficulty": 3,
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/94/Turner%2C_J._M._W._-_The_Fighting_T%C3%A9m%C3%A9raire_tugged_to_her_last_Berth_to_be_broken.jpg/500px-Turner%2C_J._M._W._-_The_Fighting_T%C3%A9m%C3%A9raire_tugged_to_her_last_Berth_to_be_broken.jpg",
+      "w": 500,
+      "h": 371,
+      "credit": "J. M. W. Turner",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Turner,_J._M._W._-_The_Fighting_T%C3%A9m%C3%A9raire_tugged_to_her_last_Berth_to_be_broken.jpg"
+     }
+    ]
+   },
+   "refs": [
+    "paintings/the-fighting-temeraire"
+   ]
+  },
+  {
+   "id": "name-the-fighting-temeraire",
+   "kind": "mc",
+   "prompt": "What is this painting called?",
+   "answer": "The Fighting Temeraire",
+   "wrong": [
+    "Irises",
+    "The Great Wave off Kanagawa",
+    "The Lady of Shalott"
+   ],
+   "explain": "The Fighting Temeraire (1839) by J. M. W. Turner. A small steam tug tows an old sailing warship to be broken up.",
+   "difficulty": 3,
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/94/Turner%2C_J._M._W._-_The_Fighting_T%C3%A9m%C3%A9raire_tugged_to_her_last_Berth_to_be_broken.jpg/500px-Turner%2C_J._M._W._-_The_Fighting_T%C3%A9m%C3%A9raire_tugged_to_her_last_Berth_to_be_broken.jpg",
+      "w": 500,
+      "h": 371,
+      "credit": "J. M. W. Turner",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Turner,_J._M._W._-_The_Fighting_T%C3%A9m%C3%A9raire_tugged_to_her_last_Berth_to_be_broken.jpg"
+     }
+    ]
+   },
+   "refs": [
+    "paintings/the-fighting-temeraire"
+   ]
+  },
+  {
+   "id": "artist-liberty-leading-the-people",
+   "kind": "mc",
+   "prompt": "Who painted Liberty Leading the People?",
+   "answer": "Eugène Delacroix",
+   "wrong": [
+    "John William Waterhouse",
+    "Jean-Honoré Fragonard",
+    "Michelangelo"
+   ],
+   "explain": "Liberty Leading the People (1830) by Eugène Delacroix. She raises the French tricolour flag.",
+   "difficulty": 2,
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/02/La_Libert%C3%A9_guidant_le_peuple_-_Eug%C3%A8ne_Delacroix_-_Mus%C3%A9e_du_Louvre_Peintures_RF_129_-_apr%C3%A8s_restauration_2024.jpg/500px-La_Libert%C3%A9_guidant_le_peuple_-_Eug%C3%A8ne_Delacroix_-_Mus%C3%A9e_du_Louvre_Peintures_RF_129_-_apr%C3%A8s_restauration_2024.jpg",
+      "w": 500,
+      "h": 400,
+      "credit": "Eugène Delacroix",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:La_Libert%C3%A9_guidant_le_peuple_-_Eug%C3%A8ne_Delacroix_-_Mus%C3%A9e_du_Louvre_Peintures_RF_129_-_apr%C3%A8s_restauration_2024.jpg"
+     }
+    ]
+   },
+   "refs": [
+    "paintings/liberty-leading-the-people"
+   ]
+  },
+  {
+   "id": "name-liberty-leading-the-people",
+   "kind": "mc",
+   "prompt": "What is this painting called?",
+   "answer": "Liberty Leading the People",
+   "wrong": [
+    "Wanderer above the Sea of Fog",
+    "The Hunters in the Snow",
+    "A Bar at the Folies-Bergère"
+   ],
+   "explain": "Liberty Leading the People (1830) by Eugène Delacroix. She raises the French tricolour flag.",
+   "difficulty": 2,
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/02/La_Libert%C3%A9_guidant_le_peuple_-_Eug%C3%A8ne_Delacroix_-_Mus%C3%A9e_du_Louvre_Peintures_RF_129_-_apr%C3%A8s_restauration_2024.jpg/500px-La_Libert%C3%A9_guidant_le_peuple_-_Eug%C3%A8ne_Delacroix_-_Mus%C3%A9e_du_Louvre_Peintures_RF_129_-_apr%C3%A8s_restauration_2024.jpg",
+      "w": 500,
+      "h": 400,
+      "credit": "Eugène Delacroix",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:La_Libert%C3%A9_guidant_le_peuple_-_Eug%C3%A8ne_Delacroix_-_Mus%C3%A9e_du_Louvre_Peintures_RF_129_-_apr%C3%A8s_restauration_2024.jpg"
+     }
+    ]
+   },
+   "refs": [
+    "paintings/liberty-leading-the-people"
+   ]
+  },
+  {
+   "id": "artist-the-third-of-may-1808",
+   "kind": "mc",
+   "prompt": "Who painted The Third of May 1808?",
+   "answer": "Francisco Goya",
+   "wrong": [
+    "Grant Wood",
+    "Frederic Leighton",
+    "Paul Gauguin"
+   ],
+   "explain": "The Third of May 1808 (1814) by Francisco Goya. It shows a firing squad executing Spanish civilians.",
+   "difficulty": 3,
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3f/Francisco_de_Goya_y_Lucientes_-_Los_fusilamientos_del_tres_de_mayo_-_1814.jpg/500px-Francisco_de_Goya_y_Lucientes_-_Los_fusilamientos_del_tres_de_mayo_-_1814.jpg",
+      "w": 500,
+      "h": 382,
+      "credit": "Francisco Goya",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Francisco_de_Goya_y_Lucientes_-_Los_fusilamientos_del_tres_de_mayo_-_1814.jpg"
+     }
+    ]
+   },
+   "refs": [
+    "paintings/the-third-of-may-1808"
+   ]
+  },
+  {
+   "id": "name-the-third-of-may-1808",
+   "kind": "mc",
+   "prompt": "What is this painting called?",
+   "answer": "The Third of May 1808",
+   "wrong": [
+    "The Anatomy Lesson of Dr. Nicolaes Tulp",
+    "The Kiss",
+    "Self-Portrait with Bandaged Ear"
+   ],
+   "explain": "The Third of May 1808 (1814) by Francisco Goya. It shows a firing squad executing Spanish civilians.",
+   "difficulty": 3,
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3f/Francisco_de_Goya_y_Lucientes_-_Los_fusilamientos_del_tres_de_mayo_-_1814.jpg/500px-Francisco_de_Goya_y_Lucientes_-_Los_fusilamientos_del_tres_de_mayo_-_1814.jpg",
+      "w": 500,
+      "h": 382,
+      "credit": "Francisco Goya",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Francisco_de_Goya_y_Lucientes_-_Los_fusilamientos_del_tres_de_mayo_-_1814.jpg"
+     }
+    ]
+   },
+   "refs": [
+    "paintings/the-third-of-may-1808"
+   ]
+  },
+  {
+   "id": "artist-wanderer-above-the-sea-of-fog",
+   "kind": "mc",
+   "prompt": "Who painted Wanderer above the Sea of Fog?",
+   "answer": "Caspar David Friedrich",
+   "wrong": [
+    "John Constable",
+    "Thomas Gainsborough",
+    "James McNeill Whistler"
+   ],
+   "explain": "Wanderer above the Sea of Fog (1818) by Caspar David Friedrich. A man stands on a rock gazing over a landscape covered in mist.",
+   "difficulty": 2,
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/1/1e/Friedrich%2C_Caspar_David_-_Wanderer_%C3%BCber_dem_Nebelmeer.jpg/500px-Friedrich%2C_Caspar_David_-_Wanderer_%C3%BCber_dem_Nebelmeer.jpg",
+      "w": 500,
+      "h": 637,
+      "credit": "Caspar David Friedrich",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Friedrich,_Caspar_David_-_Wanderer_%C3%BCber_dem_Nebelmeer.jpg"
+     }
+    ]
+   },
+   "refs": [
+    "paintings/wanderer-above-the-sea-of-fog"
+   ]
+  },
+  {
+   "id": "name-wanderer-above-the-sea-of-fog",
+   "kind": "mc",
+   "prompt": "What is this painting called?",
+   "answer": "Wanderer above the Sea of Fog",
+   "wrong": [
+    "The School of Athens",
+    "The Starry Night",
+    "The Potato Eaters"
+   ],
+   "explain": "Wanderer above the Sea of Fog (1818) by Caspar David Friedrich. A man stands on a rock gazing over a landscape covered in mist.",
+   "difficulty": 2,
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/1/1e/Friedrich%2C_Caspar_David_-_Wanderer_%C3%BCber_dem_Nebelmeer.jpg/500px-Friedrich%2C_Caspar_David_-_Wanderer_%C3%BCber_dem_Nebelmeer.jpg",
+      "w": 500,
+      "h": 637,
+      "credit": "Caspar David Friedrich",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Friedrich,_Caspar_David_-_Wanderer_%C3%BCber_dem_Nebelmeer.jpg"
+     }
+    ]
+   },
+   "refs": [
+    "paintings/wanderer-above-the-sea-of-fog"
+   ]
+  },
+  {
+   "id": "artist-the-raft-of-the-medusa",
+   "kind": "mc",
+   "prompt": "Who painted The Raft of the Medusa?",
+   "answer": "Théodore Géricault",
+   "wrong": [
+    "Grant Wood",
+    "Henri Rousseau",
+    "Leonardo da Vinci"
+   ],
+   "explain": "The Raft of the Medusa (1819) by Théodore Géricault. Shipwreck survivors cling to a crowded raft.",
+   "difficulty": 3,
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/1/15/JEAN_LOUIS_TH%C3%89ODORE_G%C3%89RICAULT_-_La_Balsa_de_la_Medusa_%28Museo_del_Louvre%2C_1818-19%29.jpg/500px-JEAN_LOUIS_TH%C3%89ODORE_G%C3%89RICAULT_-_La_Balsa_de_la_Medusa_%28Museo_del_Louvre%2C_1818-19%29.jpg",
+      "w": 500,
+      "h": 341,
+      "credit": "Théodore Géricault",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:JEAN_LOUIS_TH%C3%89ODORE_G%C3%89RICAULT_-_La_Balsa_de_la_Medusa_(Museo_del_Louvre,_1818-19).jpg"
+     }
+    ]
+   },
+   "refs": [
+    "paintings/the-raft-of-the-medusa"
+   ]
+  },
+  {
+   "id": "name-the-raft-of-the-medusa",
+   "kind": "mc",
+   "prompt": "What is this painting called?",
+   "answer": "The Raft of the Medusa",
+   "wrong": [
+    "Washington Crossing the Delaware",
+    "The Swing",
+    "A Bar at the Folies-Bergère"
+   ],
+   "explain": "The Raft of the Medusa (1819) by Théodore Géricault. Shipwreck survivors cling to a crowded raft.",
+   "difficulty": 3,
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/1/15/JEAN_LOUIS_TH%C3%89ODORE_G%C3%89RICAULT_-_La_Balsa_de_la_Medusa_%28Museo_del_Louvre%2C_1818-19%29.jpg/500px-JEAN_LOUIS_TH%C3%89ODORE_G%C3%89RICAULT_-_La_Balsa_de_la_Medusa_%28Museo_del_Louvre%2C_1818-19%29.jpg",
+      "w": 500,
+      "h": 341,
+      "credit": "Théodore Géricault",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:JEAN_LOUIS_TH%C3%89ODORE_G%C3%89RICAULT_-_La_Balsa_de_la_Medusa_(Museo_del_Louvre,_1818-19).jpg"
+     }
+    ]
+   },
+   "refs": [
+    "paintings/the-raft-of-the-medusa"
+   ]
+  },
+  {
+   "id": "artist-the-school-of-athens",
+   "kind": "mc",
+   "prompt": "Who painted The School of Athens?",
+   "answer": "Raphael",
+   "wrong": [
+    "Jan van Eyck",
+    "Johannes Vermeer",
+    "Diego Velázquez"
+   ],
+   "explain": "The School of Athens (1511) by Raphael. It shows the great thinkers of ancient Greece together.",
+   "difficulty": 2,
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/4/49/%22The_School_of_Athens%22_by_Raffaello_Sanzio_da_Urbino.jpg/500px-%22The_School_of_Athens%22_by_Raffaello_Sanzio_da_Urbino.jpg",
+      "w": 500,
+      "h": 388,
+      "credit": "Raphael",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:%22The_School_of_Athens%22_by_Raffaello_Sanzio_da_Urbino.jpg"
+     }
+    ]
+   },
+   "refs": [
+    "paintings/the-school-of-athens"
+   ]
+  },
+  {
+   "id": "name-the-school-of-athens",
+   "kind": "mc",
+   "prompt": "What is this painting called?",
+   "answer": "The School of Athens",
+   "wrong": [
+    "Self-Portrait with Bandaged Ear",
+    "Wanderer above the Sea of Fog",
+    "Irises"
+   ],
+   "explain": "The School of Athens (1511) by Raphael. It shows the great thinkers of ancient Greece together.",
+   "difficulty": 2,
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/4/49/%22The_School_of_Athens%22_by_Raffaello_Sanzio_da_Urbino.jpg/500px-%22The_School_of_Athens%22_by_Raffaello_Sanzio_da_Urbino.jpg",
+      "w": 500,
+      "h": 388,
+      "credit": "Raphael",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:%22The_School_of_Athens%22_by_Raffaello_Sanzio_da_Urbino.jpg"
+     }
+    ]
+   },
+   "refs": [
+    "paintings/the-school-of-athens"
+   ]
+  },
+  {
+   "id": "artist-the-milkmaid",
+   "kind": "mc",
+   "prompt": "Who painted The Milkmaid?",
+   "answer": "Johannes Vermeer",
+   "wrong": [
+    "Frederic Leighton",
+    "Caravaggio",
+    "Katsushika Hokusai"
+   ],
+   "explain": "The Milkmaid (1658) by Johannes Vermeer. A kitchen maid carefully pours milk from a jug.",
+   "difficulty": 2,
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/2/20/Johannes_Vermeer_-_Het_melkmeisje_-_Google_Art_Project.jpg/500px-Johannes_Vermeer_-_Het_melkmeisje_-_Google_Art_Project.jpg",
+      "w": 500,
+      "h": 561,
+      "credit": "Johannes Vermeer",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Johannes_Vermeer_-_Het_melkmeisje_-_Google_Art_Project.jpg"
+     }
+    ]
+   },
+   "refs": [
+    "paintings/the-milkmaid"
+   ]
+  },
+  {
+   "id": "name-the-milkmaid",
+   "kind": "mc",
+   "prompt": "What is this painting called?",
+   "answer": "The Milkmaid",
+   "wrong": [
+    "A Bar at the Folies-Bergère",
+    "The Harvesters",
+    "Liberty Leading the People"
+   ],
+   "explain": "The Milkmaid (1658) by Johannes Vermeer. A kitchen maid carefully pours milk from a jug.",
+   "difficulty": 2,
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/2/20/Johannes_Vermeer_-_Het_melkmeisje_-_Google_Art_Project.jpg/500px-Johannes_Vermeer_-_Het_melkmeisje_-_Google_Art_Project.jpg",
+      "w": 500,
+      "h": 561,
+      "credit": "Johannes Vermeer",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Johannes_Vermeer_-_Het_melkmeisje_-_Google_Art_Project.jpg"
+     }
+    ]
+   },
+   "refs": [
+    "paintings/the-milkmaid"
+   ]
+  },
+  {
+   "id": "artist-dance-at-le-moulin-de-la-galette",
+   "kind": "mc",
+   "prompt": "Who painted Dance at Le Moulin de la Galette?",
+   "answer": "Pierre-Auguste Renoir",
+   "wrong": [
+    "Diego Velázquez",
+    "Leonardo da Vinci",
+    "James McNeill Whistler"
+   ],
+   "explain": "Dance at Le Moulin de la Galette (1876) by Pierre-Auguste Renoir. People dance and chat at an open-air café.",
+   "difficulty": 3,
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/6/6f/Renoir%2C_Pierre-Auguste_-_Dance_at_Le_Moulin_de_la_Galette%2C_1876.jpg/500px-Renoir%2C_Pierre-Auguste_-_Dance_at_Le_Moulin_de_la_Galette%2C_1876.jpg",
+      "w": 500,
+      "h": 372,
+      "credit": "Pierre-Auguste Renoir",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Renoir,_Pierre-Auguste_-_Dance_at_Le_Moulin_de_la_Galette,_1876.jpg"
+     }
+    ]
+   },
+   "refs": [
+    "paintings/dance-at-le-moulin-de-la-galette"
+   ]
+  },
+  {
+   "id": "name-dance-at-le-moulin-de-la-galette",
+   "kind": "mc",
+   "prompt": "What is this painting called?",
+   "answer": "Dance at Le Moulin de la Galette",
+   "wrong": [
+    "Portrait of Adele Bloch-Bauer I",
+    "The Starry Night",
+    "The Potato Eaters"
+   ],
+   "explain": "Dance at Le Moulin de la Galette (1876) by Pierre-Auguste Renoir. People dance and chat at an open-air café.",
+   "difficulty": 3,
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/6/6f/Renoir%2C_Pierre-Auguste_-_Dance_at_Le_Moulin_de_la_Galette%2C_1876.jpg/500px-Renoir%2C_Pierre-Auguste_-_Dance_at_Le_Moulin_de_la_Galette%2C_1876.jpg",
+      "w": 500,
+      "h": 372,
+      "credit": "Pierre-Auguste Renoir",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Renoir,_Pierre-Auguste_-_Dance_at_Le_Moulin_de_la_Galette,_1876.jpg"
+     }
+    ]
+   },
+   "refs": [
+    "paintings/dance-at-le-moulin-de-la-galette"
+   ]
+  },
+  {
+   "id": "artist-luncheon-of-the-boating-party",
+   "kind": "mc",
+   "prompt": "Who painted Luncheon of the Boating Party?",
+   "answer": "Pierre-Auguste Renoir",
+   "wrong": [
+    "Jean-Honoré Fragonard",
+    "Frederic Leighton",
+    "Théodore Géricault"
+   ],
+   "explain": "Luncheon of the Boating Party (1881) by Pierre-Auguste Renoir. Friends share lunch on a balcony by the river.",
+   "difficulty": 3,
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8d/Pierre-Auguste_Renoir_-_Luncheon_of_the_Boating_Party_-_Google_Art_Project.jpg/500px-Pierre-Auguste_Renoir_-_Luncheon_of_the_Boating_Party_-_Google_Art_Project.jpg",
+      "w": 500,
+      "h": 370,
+      "credit": "Pierre-Auguste Renoir",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Pierre-Auguste_Renoir_-_Luncheon_of_the_Boating_Party_-_Google_Art_Project.jpg"
+     }
+    ]
+   },
+   "refs": [
+    "paintings/luncheon-of-the-boating-party"
+   ]
+  },
+  {
+   "id": "name-luncheon-of-the-boating-party",
+   "kind": "mc",
+   "prompt": "What is this painting called?",
+   "answer": "Luncheon of the Boating Party",
+   "wrong": [
+    "The Blue Boy",
+    "The Calling of Saint Matthew",
+    "Lady with an Ermine"
+   ],
+   "explain": "Luncheon of the Boating Party (1881) by Pierre-Auguste Renoir. Friends share lunch on a balcony by the river.",
+   "difficulty": 3,
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8d/Pierre-Auguste_Renoir_-_Luncheon_of_the_Boating_Party_-_Google_Art_Project.jpg/500px-Pierre-Auguste_Renoir_-_Luncheon_of_the_Boating_Party_-_Google_Art_Project.jpg",
+      "w": 500,
+      "h": 370,
+      "credit": "Pierre-Auguste Renoir",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Pierre-Auguste_Renoir_-_Luncheon_of_the_Boating_Party_-_Google_Art_Project.jpg"
+     }
+    ]
+   },
+   "refs": [
+    "paintings/luncheon-of-the-boating-party"
+   ]
+  },
+  {
+   "id": "artist-cafe-terrace-at-night",
+   "kind": "mc",
+   "prompt": "Who painted Café Terrace at Night?",
+   "answer": "Vincent van Gogh",
+   "wrong": [
+    "Albrecht Dürer",
+    "Hieronymus Bosch",
+    "Caravaggio"
+   ],
+   "explain": "Café Terrace at Night (1888) by Vincent van Gogh. People sit outside a café under the stars.",
+   "difficulty": 2,
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/86/Van_Gogh_-_Terrace_of_a_Caf%C3%A9_at_Night_%28Place_du_Forum%29_1888.jpg/500px-Van_Gogh_-_Terrace_of_a_Caf%C3%A9_at_Night_%28Place_du_Forum%29_1888.jpg",
+      "w": 500,
+      "h": 624,
+      "credit": "Vincent van Gogh",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Van_Gogh_-_Terrace_of_a_Caf%C3%A9_at_Night_(Place_du_Forum)_1888.jpg"
+     }
+    ]
+   },
+   "refs": [
+    "paintings/cafe-terrace-at-night"
+   ]
+  },
+  {
+   "id": "name-cafe-terrace-at-night",
+   "kind": "mc",
+   "prompt": "What is this painting called?",
+   "answer": "Café Terrace at Night",
+   "wrong": [
+    "The Harvesters",
+    "The Arnolfini Portrait",
+    "American Gothic"
+   ],
+   "explain": "Café Terrace at Night (1888) by Vincent van Gogh. People sit outside a café under the stars.",
+   "difficulty": 2,
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/86/Van_Gogh_-_Terrace_of_a_Caf%C3%A9_at_Night_%28Place_du_Forum%29_1888.jpg/500px-Van_Gogh_-_Terrace_of_a_Caf%C3%A9_at_Night_%28Place_du_Forum%29_1888.jpg",
+      "w": 500,
+      "h": 624,
+      "credit": "Vincent van Gogh",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Van_Gogh_-_Terrace_of_a_Caf%C3%A9_at_Night_(Place_du_Forum)_1888.jpg"
+     }
+    ]
+   },
+   "refs": [
+    "paintings/cafe-terrace-at-night"
+   ]
+  },
+  {
+   "id": "artist-self-portrait-with-bandaged-ear",
+   "kind": "mc",
+   "prompt": "Who painted Self-Portrait with Bandaged Ear?",
+   "answer": "Vincent van Gogh",
+   "wrong": [
+    "Jacques-Louis David",
+    "Georges Seurat",
+    "Jean-François Millet"
+   ],
+   "explain": "Self-Portrait with Bandaged Ear (1889) by Vincent van Gogh. The painter shows himself with a bandage over his ear.",
+   "difficulty": 2,
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/a/ab/Self-Portrait_with_a_Bandaged_Ear_-_Vincent_van_Gogh.jpg/500px-Self-Portrait_with_a_Bandaged_Ear_-_Vincent_van_Gogh.jpg",
+      "w": 500,
+      "h": 607,
+      "credit": "Vincent van Gogh",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Self-Portrait_with_a_Bandaged_Ear_-_Vincent_van_Gogh.jpg"
+     }
+    ]
+   },
+   "refs": [
+    "paintings/self-portrait-with-bandaged-ear"
+   ]
+  },
+  {
+   "id": "name-self-portrait-with-bandaged-ear",
+   "kind": "mc",
+   "prompt": "What is this painting called?",
+   "answer": "Self-Portrait with Bandaged Ear",
+   "wrong": [
+    "Café Terrace at Night",
+    "A Sunday Afternoon on the Island of La Grande Jatte",
+    "Tiger in a Tropical Storm (Surprised!)"
+   ],
+   "explain": "Self-Portrait with Bandaged Ear (1889) by Vincent van Gogh. The painter shows himself with a bandage over his ear.",
+   "difficulty": 2,
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/a/ab/Self-Portrait_with_a_Bandaged_Ear_-_Vincent_van_Gogh.jpg/500px-Self-Portrait_with_a_Bandaged_Ear_-_Vincent_van_Gogh.jpg",
+      "w": 500,
+      "h": 607,
+      "credit": "Vincent van Gogh",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Self-Portrait_with_a_Bandaged_Ear_-_Vincent_van_Gogh.jpg"
+     }
+    ]
+   },
+   "refs": [
+    "paintings/self-portrait-with-bandaged-ear"
+   ]
+  },
+  {
+   "id": "artist-the-hunters-in-the-snow",
+   "kind": "mc",
+   "prompt": "Who painted The Hunters in the Snow?",
+   "answer": "Pieter Bruegel the Elder",
+   "wrong": [
+    "Frans Hals",
+    "Thomas Gainsborough",
+    "Jean-François Millet"
+   ],
+   "explain": "The Hunters in the Snow (1565) by Pieter Bruegel the Elder. It is a winter landscape covered in snow.",
+   "difficulty": 2,
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d8/Pieter_Bruegel_the_Elder_-_Hunters_in_the_Snow_%28Winter%29_-_Google_Art_Project.jpg/500px-Pieter_Bruegel_the_Elder_-_Hunters_in_the_Snow_%28Winter%29_-_Google_Art_Project.jpg",
+      "w": 500,
+      "h": 356,
+      "credit": "Pieter Brueghel the Elder",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Pieter_Bruegel_the_Elder_-_Hunters_in_the_Snow_(Winter)_-_Google_Art_Project.jpg"
+     }
+    ]
+   },
+   "refs": [
+    "paintings/the-hunters-in-the-snow"
+   ]
+  },
+  {
+   "id": "name-the-hunters-in-the-snow",
+   "kind": "mc",
+   "prompt": "What is this painting called?",
+   "answer": "The Hunters in the Snow",
+   "wrong": [
+    "The Anatomy Lesson of Dr. Nicolaes Tulp",
+    "The Third of May 1808",
+    "The Fighting Temeraire"
+   ],
+   "explain": "The Hunters in the Snow (1565) by Pieter Bruegel the Elder. It is a winter landscape covered in snow.",
+   "difficulty": 2,
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d8/Pieter_Bruegel_the_Elder_-_Hunters_in_the_Snow_%28Winter%29_-_Google_Art_Project.jpg/500px-Pieter_Bruegel_the_Elder_-_Hunters_in_the_Snow_%28Winter%29_-_Google_Art_Project.jpg",
+      "w": 500,
+      "h": 356,
+      "credit": "Pieter Brueghel the Elder",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Pieter_Bruegel_the_Elder_-_Hunters_in_the_Snow_(Winter)_-_Google_Art_Project.jpg"
+     }
+    ]
+   },
+   "refs": [
+    "paintings/the-hunters-in-the-snow"
+   ]
+  },
+  {
+   "id": "artist-the-tower-of-babel",
+   "kind": "mc",
+   "prompt": "Who painted The Tower of Babel?",
+   "answer": "Pieter Bruegel the Elder",
+   "wrong": [
+    "Georges Seurat",
+    "Johannes Vermeer",
+    "Sandro Botticelli"
+   ],
+   "explain": "The Tower of Babel (1563) by Pieter Bruegel the Elder. A gigantic unfinished tower rises into the clouds.",
+   "difficulty": 3,
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/f/fc/Pieter_Bruegel_the_Elder_-_The_Tower_of_Babel_%28Vienna%29_-_Google_Art_Project_-_edited.jpg/500px-Pieter_Bruegel_the_Elder_-_The_Tower_of_Babel_%28Vienna%29_-_Google_Art_Project_-_edited.jpg",
+      "w": 500,
+      "h": 366,
+      "credit": "Pieter Brueghel the Elder",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Pieter_Bruegel_the_Elder_-_The_Tower_of_Babel_(Vienna)_-_Google_Art_Project_-_edited.jpg"
+     }
+    ]
+   },
+   "refs": [
+    "paintings/the-tower-of-babel"
+   ]
+  },
+  {
+   "id": "name-the-tower-of-babel",
+   "kind": "mc",
+   "prompt": "What is this painting called?",
+   "answer": "The Tower of Babel",
+   "wrong": [
+    "Luncheon of the Boating Party",
+    "Washington Crossing the Delaware",
+    "Woman with a Parasol"
+   ],
+   "explain": "The Tower of Babel (1563) by Pieter Bruegel the Elder. A gigantic unfinished tower rises into the clouds.",
+   "difficulty": 3,
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/f/fc/Pieter_Bruegel_the_Elder_-_The_Tower_of_Babel_%28Vienna%29_-_Google_Art_Project_-_edited.jpg/500px-Pieter_Bruegel_the_Elder_-_The_Tower_of_Babel_%28Vienna%29_-_Google_Art_Project_-_edited.jpg",
+      "w": 500,
+      "h": 366,
+      "credit": "Pieter Brueghel the Elder",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Pieter_Bruegel_the_Elder_-_The_Tower_of_Babel_(Vienna)_-_Google_Art_Project_-_edited.jpg"
+     }
+    ]
+   },
+   "refs": [
+    "paintings/the-tower-of-babel"
+   ]
+  },
+  {
+   "id": "artist-the-ambassadors",
+   "kind": "mc",
+   "prompt": "Who painted The Ambassadors?",
+   "answer": "Hans Holbein the Younger",
+   "wrong": [
+    "John Everett Millais",
+    "Diego Velázquez",
+    "Rembrandt"
+   ],
+   "explain": "The Ambassadors (1533) by Hans Holbein the Younger. Two richly dressed French diplomats stand side by side.",
+   "difficulty": 3,
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/88/Hans_Holbein_the_Younger_-_The_Ambassadors_-_Google_Art_Project.jpg/500px-Hans_Holbein_the_Younger_-_The_Ambassadors_-_Google_Art_Project.jpg",
+      "w": 500,
+      "h": 493,
+      "credit": "Hans Holbein the Younger",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Hans_Holbein_the_Younger_-_The_Ambassadors_-_Google_Art_Project.jpg"
+     }
+    ]
+   },
+   "refs": [
+    "paintings/the-ambassadors"
+   ]
+  },
+  {
+   "id": "name-the-ambassadors",
+   "kind": "mc",
+   "prompt": "What is this painting called?",
+   "answer": "The Ambassadors",
+   "wrong": [
+    "The Tower of Babel",
+    "The Kiss",
+    "The Birth of Venus"
+   ],
+   "explain": "The Ambassadors (1533) by Hans Holbein the Younger. Two richly dressed French diplomats stand side by side.",
+   "difficulty": 3,
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/88/Hans_Holbein_the_Younger_-_The_Ambassadors_-_Google_Art_Project.jpg/500px-Hans_Holbein_the_Younger_-_The_Ambassadors_-_Google_Art_Project.jpg",
+      "w": 500,
+      "h": 493,
+      "credit": "Hans Holbein the Younger",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Hans_Holbein_the_Younger_-_The_Ambassadors_-_Google_Art_Project.jpg"
+     }
+    ]
+   },
+   "refs": [
+    "paintings/the-ambassadors"
+   ]
+  },
+  {
+   "id": "artist-primavera",
+   "kind": "mc",
+   "prompt": "Who painted Primavera?",
+   "answer": "Sandro Botticelli",
+   "wrong": [
+    "Jan van Eyck",
+    "Jean-Honoré Fragonard",
+    "Leonardo da Vinci"
+   ],
+   "explain": "Primavera (1480) by Sandro Botticelli. Its title means Spring.",
+   "difficulty": 3,
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/2/25/Sandro_Botticelli_-_La_Primavera_-_Google_Art_Project.jpg/500px-Sandro_Botticelli_-_La_Primavera_-_Google_Art_Project.jpg",
+      "w": 500,
+      "h": 332,
+      "credit": "Sandro Botticelli",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Sandro_Botticelli_-_La_Primavera_-_Google_Art_Project.jpg"
+     }
+    ]
+   },
+   "refs": [
+    "paintings/primavera"
+   ]
+  },
+  {
+   "id": "name-primavera",
+   "kind": "mc",
+   "prompt": "What is this painting called?",
+   "answer": "Primavera",
+   "wrong": [
+    "The Swing",
+    "The Lady of Shalott",
+    "The Scream"
+   ],
+   "explain": "Primavera (1480) by Sandro Botticelli. Its title means Spring.",
+   "difficulty": 3,
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/2/25/Sandro_Botticelli_-_La_Primavera_-_Google_Art_Project.jpg/500px-Sandro_Botticelli_-_La_Primavera_-_Google_Art_Project.jpg",
+      "w": 500,
+      "h": 332,
+      "credit": "Sandro Botticelli",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Sandro_Botticelli_-_La_Primavera_-_Google_Art_Project.jpg"
+     }
+    ]
+   },
+   "refs": [
+    "paintings/primavera"
+   ]
+  },
+  {
+   "id": "artist-the-calling-of-saint-matthew",
+   "kind": "mc",
+   "prompt": "Who painted The Calling of Saint Matthew?",
+   "answer": "Caravaggio",
+   "wrong": [
+    "Georges Seurat",
+    "Frederic Leighton",
+    "Gustav Klimt"
+   ],
+   "explain": "The Calling of Saint Matthew by Caravaggio. Jesus points at a tax collector to follow him.",
+   "difficulty": 3,
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/5/59/Caravaggio_%E2%80%94_The_Calling_of_Saint_Matthew.jpg/500px-Caravaggio_%E2%80%94_The_Calling_of_Saint_Matthew.jpg",
+      "w": 500,
+      "h": 472,
+      "credit": "Gleb Simonov",
+      "license": "CC0",
+      "page": "https://commons.wikimedia.org/wiki/File:Caravaggio_%E2%80%94_The_Calling_of_Saint_Matthew.jpg"
+     }
+    ]
+   },
+   "refs": [
+    "paintings/the-calling-of-saint-matthew"
+   ]
+  },
+  {
+   "id": "name-the-calling-of-saint-matthew",
+   "kind": "mc",
+   "prompt": "What is this painting called?",
+   "answer": "The Calling of Saint Matthew",
+   "wrong": [
+    "Impression, Sunrise",
+    "The Raft of the Medusa",
+    "The Tower of Babel"
+   ],
+   "explain": "The Calling of Saint Matthew by Caravaggio. Jesus points at a tax collector to follow him.",
+   "difficulty": 3,
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/5/59/Caravaggio_%E2%80%94_The_Calling_of_Saint_Matthew.jpg/500px-Caravaggio_%E2%80%94_The_Calling_of_Saint_Matthew.jpg",
+      "w": 500,
+      "h": 472,
+      "credit": "Gleb Simonov",
+      "license": "CC0",
+      "page": "https://commons.wikimedia.org/wiki/File:Caravaggio_%E2%80%94_The_Calling_of_Saint_Matthew.jpg"
+     }
+    ]
+   },
+   "refs": [
+    "paintings/the-calling-of-saint-matthew"
+   ]
+  },
+  {
+   "id": "artist-whistler-s-mother",
+   "kind": "mc",
+   "prompt": "Who painted Whistler's Mother?",
+   "answer": "James McNeill Whistler",
+   "wrong": [
+    "Katsushika Hokusai",
+    "Henri Rousseau",
+    "Johannes Vermeer"
+   ],
+   "explain": "Whistler's Mother (1871) by James McNeill Whistler. It shows the painter's mother.",
+   "difficulty": 2,
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/1/1b/Whistlers_Mother_high_res.jpg/500px-Whistlers_Mother_high_res.jpg",
+      "w": 500,
+      "h": 445,
+      "credit": "James McNeill Whistler",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Whistlers_Mother_high_res.jpg"
+     }
+    ]
+   },
+   "refs": [
+    "paintings/whistler-s-mother"
+   ]
+  },
+  {
+   "id": "name-whistler-s-mother",
+   "kind": "mc",
+   "prompt": "What is this painting called?",
+   "answer": "Whistler's Mother",
+   "wrong": [
+    "The Scream",
+    "The Third of May 1808",
+    "The Birth of Venus"
+   ],
+   "explain": "Whistler's Mother (1871) by James McNeill Whistler. It shows the painter's mother.",
+   "difficulty": 2,
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/1/1b/Whistlers_Mother_high_res.jpg/500px-Whistlers_Mother_high_res.jpg",
+      "w": 500,
+      "h": 445,
+      "credit": "James McNeill Whistler",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Whistlers_Mother_high_res.jpg"
+     }
+    ]
+   },
+   "refs": [
+    "paintings/whistler-s-mother"
+   ]
+  },
+  {
+   "id": "artist-the-gleaners",
+   "kind": "mc",
+   "prompt": "Who painted The Gleaners?",
+   "answer": "Jean-François Millet",
+   "wrong": [
+    "Emanuel Leutze",
+    "Caravaggio",
+    "John Constable"
+   ],
+   "explain": "The Gleaners (1857) by Jean-François Millet. Three peasant women stoop to pick up leftover grain.",
+   "difficulty": 3,
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/d/da/Jean-Fran%C3%A7ois_Millet_-_Des_glaneuses.jpg/500px-Jean-Fran%C3%A7ois_Millet_-_Des_glaneuses.jpg",
+      "w": 500,
+      "h": 374,
+      "credit": "Jean-François Millet",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Jean-Fran%C3%A7ois_Millet_-_Des_glaneuses.jpg"
+     }
+    ]
+   },
+   "refs": [
+    "paintings/the-gleaners"
+   ]
+  },
+  {
+   "id": "name-the-gleaners",
+   "kind": "mc",
+   "prompt": "What is this painting called?",
+   "answer": "The Gleaners",
+   "wrong": [
+    "The Hay Wain",
+    "A Bar at the Folies-Bergère",
+    "The Great Wave off Kanagawa"
+   ],
+   "explain": "The Gleaners (1857) by Jean-François Millet. Three peasant women stoop to pick up leftover grain.",
+   "difficulty": 3,
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/d/da/Jean-Fran%C3%A7ois_Millet_-_Des_glaneuses.jpg/500px-Jean-Fran%C3%A7ois_Millet_-_Des_glaneuses.jpg",
+      "w": 500,
+      "h": 374,
+      "credit": "Jean-François Millet",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Jean-Fran%C3%A7ois_Millet_-_Des_glaneuses.jpg"
+     }
+    ]
+   },
+   "refs": [
+    "paintings/the-gleaners"
+   ]
+  },
+  {
+   "id": "artist-a-bar-at-the-folies-bergere",
+   "kind": "mc",
+   "prompt": "Who painted A Bar at the Folies-Bergère?",
+   "answer": "Édouard Manet",
+   "wrong": [
+    "Paul Gauguin",
+    "Jean-Honoré Fragonard",
+    "Eugène Delacroix"
+   ],
+   "explain": "A Bar at the Folies-Bergère (1882) by Édouard Manet. A barmaid stands behind a marble counter in a Paris nightclub.",
+   "difficulty": 3,
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/1/13/Un_bar_aux_Folies-Berg%C3%A8re_d%27E._Manet_%28Fondation_Vuitton%2C_Paris%29_%2833539037428%29.jpg/500px-Un_bar_aux_Folies-Berg%C3%A8re_d%27E._Manet_%28Fondation_Vuitton%2C_Paris%29_%2833539037428%29.jpg",
+      "w": 500,
+      "h": 372,
+      "credit": "Édouard Manet",
+      "license": "CC BY 2.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Un_bar_aux_Folies-Berg%C3%A8re_d%27E._Manet_(Fondation_Vuitton,_Paris)_(33539037428).jpg"
+     }
+    ]
+   },
+   "refs": [
+    "paintings/a-bar-at-the-folies-bergere"
+   ]
+  },
+  {
+   "id": "name-a-bar-at-the-folies-bergere",
+   "kind": "mc",
+   "prompt": "What is this painting called?",
+   "answer": "A Bar at the Folies-Bergère",
+   "wrong": [
+    "Primavera",
+    "The Hay Wain",
+    "Wanderer above the Sea of Fog"
+   ],
+   "explain": "A Bar at the Folies-Bergère (1882) by Édouard Manet. A barmaid stands behind a marble counter in a Paris nightclub.",
+   "difficulty": 3,
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/1/13/Un_bar_aux_Folies-Berg%C3%A8re_d%27E._Manet_%28Fondation_Vuitton%2C_Paris%29_%2833539037428%29.jpg/500px-Un_bar_aux_Folies-Berg%C3%A8re_d%27E._Manet_%28Fondation_Vuitton%2C_Paris%29_%2833539037428%29.jpg",
+      "w": 500,
+      "h": 372,
+      "credit": "Édouard Manet",
+      "license": "CC BY 2.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Un_bar_aux_Folies-Berg%C3%A8re_d%27E._Manet_(Fondation_Vuitton,_Paris)_(33539037428).jpg"
+     }
+    ]
+   },
+   "refs": [
+    "paintings/a-bar-at-the-folies-bergere"
+   ]
+  },
+  {
+   "id": "artist-where-do-we-come-from-what-are-we-where-are-we-going",
+   "kind": "mc",
+   "prompt": "Who painted Where Do We Come From? What Are We? Where Are We Going??",
+   "answer": "Paul Gauguin",
+   "wrong": [
+    "Sandro Botticelli",
+    "J. M. W. Turner",
+    "Jacques-Louis David"
+   ],
+   "explain": "Where Do We Come From? What Are We? Where Are We Going? (1898) by Paul Gauguin. It is a large frieze of figures under a three-question title.",
+   "difficulty": 3,
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/0a/Gauguin_-_Where_Do_We_Come_From%3F_What_Are_We%3F_Where_Are_We_Going%3F_%281897-98%29.jpg/500px-Gauguin_-_Where_Do_We_Come_From%3F_What_Are_We%3F_Where_Are_We_Going%3F_%281897-98%29.jpg",
+      "w": 500,
+      "h": 184,
+      "credit": "Paul Gauguin",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Gauguin_-_Where_Do_We_Come_From%3F_What_Are_We%3F_Where_Are_We_Going%3F_(1897-98).jpg"
+     }
+    ]
+   },
+   "refs": [
+    "paintings/where-do-we-come-from-what-are-we-where-are-we-going"
+   ]
+  },
+  {
+   "id": "name-where-do-we-come-from-what-are-we-where-are-we-going",
+   "kind": "mc",
+   "prompt": "What is this painting called?",
+   "answer": "Where Do We Come From? What Are We? Where Are We Going?",
+   "wrong": [
+    "The Lady of Shalott",
+    "The Hunters in the Snow",
+    "Dance at Le Moulin de la Galette"
+   ],
+   "explain": "Where Do We Come From? What Are We? Where Are We Going? (1898) by Paul Gauguin. It is a large frieze of figures under a three-question title.",
+   "difficulty": 3,
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/0a/Gauguin_-_Where_Do_We_Come_From%3F_What_Are_We%3F_Where_Are_We_Going%3F_%281897-98%29.jpg/500px-Gauguin_-_Where_Do_We_Come_From%3F_What_Are_We%3F_Where_Are_We_Going%3F_%281897-98%29.jpg",
+      "w": 500,
+      "h": 184,
+      "credit": "Paul Gauguin",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Gauguin_-_Where_Do_We_Come_From%3F_What_Are_We%3F_Where_Are_We_Going%3F_(1897-98).jpg"
+     }
+    ]
+   },
+   "refs": [
+    "paintings/where-do-we-come-from-what-are-we-where-are-we-going"
+   ]
+  },
+  {
+   "id": "artist-the-sleeping-gypsy",
+   "kind": "mc",
+   "prompt": "Who painted The Sleeping Gypsy?",
+   "answer": "Henri Rousseau",
+   "wrong": [
+    "Leonardo da Vinci",
+    "John Constable",
+    "Johannes Vermeer"
+   ],
+   "explain": "The Sleeping Gypsy (1897) by Henri Rousseau. A lion sniffs at a sleeping woman.",
+   "difficulty": 3,
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/06/La_Boh%C3%A9mienne_endormie.jpg/500px-La_Boh%C3%A9mienne_endormie.jpg",
+      "w": 500,
+      "h": 319,
+      "credit": "Henri Rousseau",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:La_Boh%C3%A9mienne_endormie.jpg"
+     }
+    ]
+   },
+   "refs": [
+    "paintings/the-sleeping-gypsy"
+   ]
+  },
+  {
+   "id": "name-the-sleeping-gypsy",
+   "kind": "mc",
+   "prompt": "What is this painting called?",
+   "answer": "The Sleeping Gypsy",
+   "wrong": [
+    "Mona Lisa",
+    "Dance at Le Moulin de la Galette",
+    "Self-Portrait with Bandaged Ear"
+   ],
+   "explain": "The Sleeping Gypsy (1897) by Henri Rousseau. A lion sniffs at a sleeping woman.",
+   "difficulty": 3,
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/06/La_Boh%C3%A9mienne_endormie.jpg/500px-La_Boh%C3%A9mienne_endormie.jpg",
+      "w": 500,
+      "h": 319,
+      "credit": "Henri Rousseau",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:La_Boh%C3%A9mienne_endormie.jpg"
+     }
+    ]
+   },
+   "refs": [
+    "paintings/the-sleeping-gypsy"
+   ]
+  },
+  {
+   "id": "artist-tiger-in-a-tropical-storm-surprised",
+   "kind": "mc",
+   "prompt": "Who painted Tiger in a Tropical Storm (Surprised!)?",
+   "answer": "Henri Rousseau",
+   "wrong": [
+    "Théodore Géricault",
+    "Albrecht Dürer",
+    "Edvard Munch"
+   ],
+   "explain": "Tiger in a Tropical Storm (Surprised!) (1891) by Henri Rousseau. A tiger crouches in a jungle during a storm.",
+   "difficulty": 1,
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/f/fa/Surprised-Rousseau.jpg/500px-Surprised-Rousseau.jpg",
+      "w": 500,
+      "h": 400,
+      "credit": "Henri Rousseau",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Surprised-Rousseau.jpg"
+     }
+    ]
+   },
+   "refs": [
+    "paintings/tiger-in-a-tropical-storm-surprised"
+   ]
+  },
+  {
+   "id": "name-tiger-in-a-tropical-storm-surprised",
+   "kind": "mc",
+   "prompt": "What is this painting called?",
+   "answer": "Tiger in a Tropical Storm (Surprised!)",
+   "wrong": [
+    "The Hunters in the Snow",
+    "The Calling of Saint Matthew",
+    "Irises"
+   ],
+   "explain": "Tiger in a Tropical Storm (Surprised!) (1891) by Henri Rousseau. A tiger crouches in a jungle during a storm.",
+   "difficulty": 1,
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/f/fa/Surprised-Rousseau.jpg/500px-Surprised-Rousseau.jpg",
+      "w": 500,
+      "h": 400,
+      "credit": "Henri Rousseau",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Surprised-Rousseau.jpg"
+     }
+    ]
+   },
+   "refs": [
+    "paintings/tiger-in-a-tropical-storm-surprised"
+   ]
+  },
+  {
+   "id": "artist-the-lady-of-shalott",
+   "kind": "mc",
+   "prompt": "Who painted The Lady of Shalott?",
+   "answer": "John William Waterhouse",
+   "wrong": [
+    "Francisco Goya",
+    "John Everett Millais",
+    "Michelangelo"
+   ],
+   "explain": "The Lady of Shalott (1888) by John William Waterhouse. A woman with long red hair sits in a boat drifting down a river.",
+   "difficulty": 3,
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/6/68/John_William_Waterhouse_-_The_Lady_of_Shalott_-_Google_Art_Project_%28derivative_work_-_AutoContrast_edit_in_LCH_space%29.jpg/500px-John_William_Waterhouse_-_The_Lady_of_Shalott_-_Google_Art_Project_%28derivative_work_-_AutoContrast_edit_in_LCH_space%29.jpg",
+      "w": 500,
+      "h": 384,
+      "credit": "John William Waterhouse",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:John_William_Waterhouse_-_The_Lady_of_Shalott_-_Google_Art_Project_(derivative_work_-_AutoContrast_edit_in_LCH_space).jpg"
+     }
+    ]
+   },
+   "refs": [
+    "paintings/the-lady-of-shalott"
+   ]
+  },
+  {
+   "id": "name-the-lady-of-shalott",
+   "kind": "mc",
+   "prompt": "What is this painting called?",
+   "answer": "The Lady of Shalott",
+   "wrong": [
+    "The Creation of Adam",
+    "The Kiss",
+    "Lady with an Ermine"
+   ],
+   "explain": "The Lady of Shalott (1888) by John William Waterhouse. A woman with long red hair sits in a boat drifting down a river.",
+   "difficulty": 3,
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/6/68/John_William_Waterhouse_-_The_Lady_of_Shalott_-_Google_Art_Project_%28derivative_work_-_AutoContrast_edit_in_LCH_space%29.jpg/500px-John_William_Waterhouse_-_The_Lady_of_Shalott_-_Google_Art_Project_%28derivative_work_-_AutoContrast_edit_in_LCH_space%29.jpg",
+      "w": 500,
+      "h": 384,
+      "credit": "John William Waterhouse",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:John_William_Waterhouse_-_The_Lady_of_Shalott_-_Google_Art_Project_(derivative_work_-_AutoContrast_edit_in_LCH_space).jpg"
+     }
+    ]
+   },
+   "refs": [
+    "paintings/the-lady-of-shalott"
+   ]
+  },
+  {
+   "id": "artist-ophelia",
+   "kind": "mc",
+   "prompt": "Who painted Ophelia?",
+   "answer": "John Everett Millais",
+   "wrong": [
+    "Frederic Leighton",
+    "Pierre-Auguste Renoir",
+    "J. M. W. Turner"
+   ],
+   "explain": "Ophelia (1852) by John Everett Millais. A young woman floats singing in a stream.",
+   "difficulty": 2,
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/94/John_Everett_Millais_-_Ophelia_-_Google_Art_Project.jpg/500px-John_Everett_Millais_-_Ophelia_-_Google_Art_Project.jpg",
+      "w": 500,
+      "h": 340,
+      "credit": "John Everett Millais",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:John_Everett_Millais_-_Ophelia_-_Google_Art_Project.jpg"
+     }
+    ]
+   },
+   "refs": [
+    "paintings/ophelia"
+   ]
+  },
+  {
+   "id": "name-ophelia",
+   "kind": "mc",
+   "prompt": "What is this painting called?",
+   "answer": "Ophelia",
+   "wrong": [
+    "Washington Crossing the Delaware",
+    "Whistler's Mother",
+    "Dance at Le Moulin de la Galette"
+   ],
+   "explain": "Ophelia (1852) by John Everett Millais. A young woman floats singing in a stream.",
+   "difficulty": 2,
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/94/John_Everett_Millais_-_Ophelia_-_Google_Art_Project.jpg/500px-John_Everett_Millais_-_Ophelia_-_Google_Art_Project.jpg",
+      "w": 500,
+      "h": 340,
+      "credit": "John Everett Millais",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:John_Everett_Millais_-_Ophelia_-_Google_Art_Project.jpg"
+     }
+    ]
+   },
+   "refs": [
+    "paintings/ophelia"
+   ]
+  },
+  {
+   "id": "artist-the-blue-boy",
+   "kind": "mc",
+   "prompt": "Who painted The Blue Boy?",
+   "answer": "Thomas Gainsborough",
+   "wrong": [
+    "Francisco Goya",
+    "Jan van Eyck",
+    "Jean-Honoré Fragonard"
+   ],
+   "explain": "The Blue Boy (1770) by Thomas Gainsborough. A boy stands in a shimmering blue satin suit.",
+   "difficulty": 2,
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/4/46/Thomas_Gainsborough_-_The_Blue_Boy_%28c._1770%29.jpg/330px-Thomas_Gainsborough_-_The_Blue_Boy_%28c._1770%29.jpg",
+      "w": 330,
+      "h": 480,
+      "credit": "Thomas Gainsborough",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Thomas_Gainsborough_-_The_Blue_Boy_(c._1770).jpg"
+     }
+    ]
+   },
+   "refs": [
+    "paintings/the-blue-boy"
+   ]
+  },
+  {
+   "id": "name-the-blue-boy",
+   "kind": "mc",
+   "prompt": "What is this painting called?",
+   "answer": "The Blue Boy",
+   "wrong": [
+    "Portrait of Adele Bloch-Bauer I",
+    "The Raft of the Medusa",
+    "The Death of Marat"
+   ],
+   "explain": "The Blue Boy (1770) by Thomas Gainsborough. A boy stands in a shimmering blue satin suit.",
+   "difficulty": 2,
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/4/46/Thomas_Gainsborough_-_The_Blue_Boy_%28c._1770%29.jpg/330px-Thomas_Gainsborough_-_The_Blue_Boy_%28c._1770%29.jpg",
+      "w": 330,
+      "h": 480,
+      "credit": "Thomas Gainsborough",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Thomas_Gainsborough_-_The_Blue_Boy_(c._1770).jpg"
+     }
+    ]
+   },
+   "refs": [
+    "paintings/the-blue-boy"
+   ]
+  },
+  {
+   "id": "artist-mr-and-mrs-andrews",
+   "kind": "mc",
+   "prompt": "Who painted Mr and Mrs Andrews?",
+   "answer": "Thomas Gainsborough",
+   "wrong": [
+    "Francisco Goya",
+    "John William Waterhouse",
+    "Claude Monet"
+   ],
+   "explain": "Mr and Mrs Andrews (1750) by Thomas Gainsborough. A young married couple pose under an oak tree.",
+   "difficulty": 3,
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a0/Thomas_Gainsborough_-_Mr._und_Mrs._Andrews_%28c._1750%29.jpg/500px-Thomas_Gainsborough_-_Mr._und_Mrs._Andrews_%28c._1750%29.jpg",
+      "w": 500,
+      "h": 293,
+      "credit": "Thomas Gainsborough",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Thomas_Gainsborough_-_Mr._und_Mrs._Andrews_(c._1750).jpg"
+     }
+    ]
+   },
+   "refs": [
+    "paintings/mr-and-mrs-andrews"
+   ]
+  },
+  {
+   "id": "name-mr-and-mrs-andrews",
+   "kind": "mc",
+   "prompt": "What is this painting called?",
+   "answer": "Mr and Mrs Andrews",
+   "wrong": [
+    "The Potato Eaters",
+    "Young Hare",
+    "Girl with a Pearl Earring"
+   ],
+   "explain": "Mr and Mrs Andrews (1750) by Thomas Gainsborough. A young married couple pose under an oak tree.",
+   "difficulty": 3,
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a0/Thomas_Gainsborough_-_Mr._und_Mrs._Andrews_%28c._1750%29.jpg/500px-Thomas_Gainsborough_-_Mr._und_Mrs._Andrews_%28c._1750%29.jpg",
+      "w": 500,
+      "h": 293,
+      "credit": "Thomas Gainsborough",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Thomas_Gainsborough_-_Mr._und_Mrs._Andrews_(c._1750).jpg"
+     }
+    ]
+   },
+   "refs": [
+    "paintings/mr-and-mrs-andrews"
+   ]
+  },
+  {
+   "id": "artist-the-swing",
+   "kind": "mc",
+   "prompt": "Who painted The Swing?",
+   "answer": "Jean-Honoré Fragonard",
+   "wrong": [
+    "Jean-François Millet",
+    "Théodore Géricault",
+    "Claude Monet"
+   ],
+   "explain": "The Swing (1767) by Jean-Honoré Fragonard. A young woman in a frothy pink dress flies through the air on a swing.",
+   "difficulty": 2,
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/e/eb/Fragonard%2C_The_Swing.jpg/500px-Fragonard%2C_The_Swing.jpg",
+      "w": 500,
+      "h": 628,
+      "credit": "Jean-Honoré Fragonard",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Fragonard,_The_Swing.jpg"
+     }
+    ]
+   },
+   "refs": [
+    "paintings/the-swing"
+   ]
+  },
+  {
+   "id": "name-the-swing",
+   "kind": "mc",
+   "prompt": "What is this painting called?",
+   "answer": "The Swing",
+   "wrong": [
+    "Dance at Le Moulin de la Galette",
+    "Liberty Leading the People",
+    "Mona Lisa"
+   ],
+   "explain": "The Swing (1767) by Jean-Honoré Fragonard. A young woman in a frothy pink dress flies through the air on a swing.",
+   "difficulty": 2,
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/e/eb/Fragonard%2C_The_Swing.jpg/500px-Fragonard%2C_The_Swing.jpg",
+      "w": 500,
+      "h": 628,
+      "credit": "Jean-Honoré Fragonard",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Fragonard,_The_Swing.jpg"
+     }
+    ]
+   },
+   "refs": [
+    "paintings/the-swing"
+   ]
+  },
+  {
+   "id": "artist-washington-crossing-the-delaware",
+   "kind": "mc",
+   "prompt": "Who painted Washington Crossing the Delaware?",
+   "answer": "Emanuel Leutze",
+   "wrong": [
+    "Caspar David Friedrich",
+    "Pierre-Auguste Renoir",
+    "Eugène Delacroix"
+   ],
+   "explain": "Washington Crossing the Delaware (1851) by Emanuel Leutze. A general stands boldly in a rowing boat among ice.",
+   "difficulty": 2,
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/91/Washington_Crossing_the_Delaware_MET_DP215410.jpg/500px-Washington_Crossing_the_Delaware_MET_DP215410.jpg",
+      "w": 500,
+      "h": 293,
+      "credit": "Emanuel Leutze",
+      "license": "CC0",
+      "page": "https://commons.wikimedia.org/wiki/File:Washington_Crossing_the_Delaware_MET_DP215410.jpg"
+     }
+    ]
+   },
+   "refs": [
+    "paintings/washington-crossing-the-delaware"
+   ]
+  },
+  {
+   "id": "name-washington-crossing-the-delaware",
+   "kind": "mc",
+   "prompt": "What is this painting called?",
+   "answer": "Washington Crossing the Delaware",
+   "wrong": [
+    "The Harvesters",
+    "Tiger in a Tropical Storm (Surprised!)",
+    "Girl with a Pearl Earring"
+   ],
+   "explain": "Washington Crossing the Delaware (1851) by Emanuel Leutze. A general stands boldly in a rowing boat among ice.",
+   "difficulty": 2,
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/91/Washington_Crossing_the_Delaware_MET_DP215410.jpg/500px-Washington_Crossing_the_Delaware_MET_DP215410.jpg",
+      "w": 500,
+      "h": 293,
+      "credit": "Emanuel Leutze",
+      "license": "CC0",
+      "page": "https://commons.wikimedia.org/wiki/File:Washington_Crossing_the_Delaware_MET_DP215410.jpg"
+     }
+    ]
+   },
+   "refs": [
+    "paintings/washington-crossing-the-delaware"
+   ]
+  },
+  {
+   "id": "artist-the-laughing-cavalier",
+   "kind": "mc",
+   "prompt": "Who painted The Laughing Cavalier?",
+   "answer": "Frans Hals",
+   "wrong": [
+    "Albrecht Dürer",
+    "Francisco Goya",
+    "Leonardo da Vinci"
+   ],
+   "explain": "The Laughing Cavalier (1624) by Frans Hals. A man with a wide hat and curled moustache smiles at us.",
+   "difficulty": 3,
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d1/Frans_Hals_%E2%80%93_The_Laughing_Cavalier.jpg/500px-Frans_Hals_%E2%80%93_The_Laughing_Cavalier.jpg",
+      "w": 500,
+      "h": 611,
+      "credit": "Frans Hals",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Frans_Hals_%E2%80%93_The_Laughing_Cavalier.jpg"
+     }
+    ]
+   },
+   "refs": [
+    "paintings/the-laughing-cavalier"
+   ]
+  },
+  {
+   "id": "name-the-laughing-cavalier",
+   "kind": "mc",
+   "prompt": "What is this painting called?",
+   "answer": "The Laughing Cavalier",
+   "wrong": [
+    "Tiger in a Tropical Storm (Surprised!)",
+    "The Night Café",
+    "Mona Lisa"
+   ],
+   "explain": "The Laughing Cavalier (1624) by Frans Hals. A man with a wide hat and curled moustache smiles at us.",
+   "difficulty": 3,
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d1/Frans_Hals_%E2%80%93_The_Laughing_Cavalier.jpg/500px-Frans_Hals_%E2%80%93_The_Laughing_Cavalier.jpg",
+      "w": 500,
+      "h": 611,
+      "credit": "Frans Hals",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Frans_Hals_%E2%80%93_The_Laughing_Cavalier.jpg"
+     }
+    ]
+   },
+   "refs": [
+    "paintings/the-laughing-cavalier"
+   ]
+  },
+  {
+   "id": "artist-the-anatomy-lesson-of-dr-nicolaes-tulp",
+   "kind": "mc",
+   "prompt": "Who painted The Anatomy Lesson of Dr. Nicolaes Tulp?",
+   "answer": "Rembrandt",
+   "wrong": [
+    "Hieronymus Bosch",
+    "Leonardo da Vinci",
+    "Frans Hals"
+   ],
+   "explain": "The Anatomy Lesson of Dr. Nicolaes Tulp (1632) by Rembrandt. Surgeons gather to watch a dissection.",
+   "difficulty": 3,
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4d/Rembrandt_-_The_Anatomy_Lesson_of_Dr_Nicolaes_Tulp.jpg/500px-Rembrandt_-_The_Anatomy_Lesson_of_Dr_Nicolaes_Tulp.jpg",
+      "w": 500,
+      "h": 377,
+      "credit": "Rembrandt",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Rembrandt_-_The_Anatomy_Lesson_of_Dr_Nicolaes_Tulp.jpg"
+     }
+    ]
+   },
+   "refs": [
+    "paintings/the-anatomy-lesson-of-dr-nicolaes-tulp"
+   ]
+  },
+  {
+   "id": "name-the-anatomy-lesson-of-dr-nicolaes-tulp",
+   "kind": "mc",
+   "prompt": "What is this painting called?",
+   "answer": "The Anatomy Lesson of Dr. Nicolaes Tulp",
+   "wrong": [
+    "Impression, Sunrise",
+    "Luncheon of the Boating Party",
+    "Woman with a Parasol"
+   ],
+   "explain": "The Anatomy Lesson of Dr. Nicolaes Tulp (1632) by Rembrandt. Surgeons gather to watch a dissection.",
+   "difficulty": 3,
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4d/Rembrandt_-_The_Anatomy_Lesson_of_Dr_Nicolaes_Tulp.jpg/500px-Rembrandt_-_The_Anatomy_Lesson_of_Dr_Nicolaes_Tulp.jpg",
+      "w": 500,
+      "h": 377,
+      "credit": "Rembrandt",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Rembrandt_-_The_Anatomy_Lesson_of_Dr_Nicolaes_Tulp.jpg"
+     }
+    ]
+   },
+   "refs": [
+    "paintings/the-anatomy-lesson-of-dr-nicolaes-tulp"
+   ]
+  },
+  {
+   "id": "artist-woman-with-a-parasol",
+   "kind": "mc",
+   "prompt": "Who painted Woman with a Parasol?",
+   "answer": "Claude Monet",
+   "wrong": [
+    "James McNeill Whistler",
+    "Théodore Géricault",
+    "Jan van Eyck"
+   ],
+   "explain": "Woman with a Parasol (1875) by Claude Monet. A woman holds a parasol against a bright sky.",
+   "difficulty": 2,
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/1/1b/Claude_Monet_-_Woman_with_a_Parasol_-_Madame_Monet_and_Her_Son_-_Google_Art_Project.jpg/500px-Claude_Monet_-_Woman_with_a_Parasol_-_Madame_Monet_and_Her_Son_-_Google_Art_Project.jpg",
+      "w": 500,
+      "h": 621,
+      "credit": "Claude Monet",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Claude_Monet_-_Woman_with_a_Parasol_-_Madame_Monet_and_Her_Son_-_Google_Art_Project.jpg"
+     }
+    ]
+   },
+   "refs": [
+    "paintings/woman-with-a-parasol"
+   ]
+  },
+  {
+   "id": "name-woman-with-a-parasol",
+   "kind": "mc",
+   "prompt": "What is this painting called?",
+   "answer": "Woman with a Parasol",
+   "wrong": [
+    "Flaming June",
+    "A Bar at the Folies-Bergère",
+    "The School of Athens"
+   ],
+   "explain": "Woman with a Parasol (1875) by Claude Monet. A woman holds a parasol against a bright sky.",
+   "difficulty": 2,
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/1/1b/Claude_Monet_-_Woman_with_a_Parasol_-_Madame_Monet_and_Her_Son_-_Google_Art_Project.jpg/500px-Claude_Monet_-_Woman_with_a_Parasol_-_Madame_Monet_and_Her_Son_-_Google_Art_Project.jpg",
+      "w": 500,
+      "h": 621,
+      "credit": "Claude Monet",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Claude_Monet_-_Woman_with_a_Parasol_-_Madame_Monet_and_Her_Son_-_Google_Art_Project.jpg"
+     }
+    ]
+   },
+   "refs": [
+    "paintings/woman-with-a-parasol"
+   ]
+  },
+  {
+   "id": "artist-portrait-of-adele-bloch-bauer-i",
+   "kind": "mc",
+   "prompt": "Who painted Portrait of Adele Bloch-Bauer I?",
+   "answer": "Gustav Klimt",
+   "wrong": [
+    "Frederic Leighton",
+    "Grant Wood",
+    "Paul Gauguin"
+   ],
+   "explain": "Portrait of Adele Bloch-Bauer I (1907) by Gustav Klimt. A Viennese society woman sits surrounded by swirls of gold.",
+   "difficulty": 3,
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/1/18/Gustav_Klimt%2C_1907%2C_Adele_Bloch-Bauer_I%2C_Neue_Galerie_New_York.jpg/500px-Gustav_Klimt%2C_1907%2C_Adele_Bloch-Bauer_I%2C_Neue_Galerie_New_York.jpg",
+      "w": 500,
+      "h": 500,
+      "credit": "Gustav Klimt",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Gustav_Klimt,_1907,_Adele_Bloch-Bauer_I,_Neue_Galerie_New_York.jpg"
+     }
+    ]
+   },
+   "refs": [
+    "paintings/portrait-of-adele-bloch-bauer-i"
+   ]
+  },
+  {
+   "id": "name-portrait-of-adele-bloch-bauer-i",
+   "kind": "mc",
+   "prompt": "What is this painting called?",
+   "answer": "Portrait of Adele Bloch-Bauer I",
+   "wrong": [
+    "Café Terrace at Night",
+    "The Potato Eaters",
+    "The Tower of Babel"
+   ],
+   "explain": "Portrait of Adele Bloch-Bauer I (1907) by Gustav Klimt. A Viennese society woman sits surrounded by swirls of gold.",
+   "difficulty": 3,
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/1/18/Gustav_Klimt%2C_1907%2C_Adele_Bloch-Bauer_I%2C_Neue_Galerie_New_York.jpg/500px-Gustav_Klimt%2C_1907%2C_Adele_Bloch-Bauer_I%2C_Neue_Galerie_New_York.jpg",
+      "w": 500,
+      "h": 500,
+      "credit": "Gustav Klimt",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Gustav_Klimt,_1907,_Adele_Bloch-Bauer_I,_Neue_Galerie_New_York.jpg"
+     }
+    ]
+   },
+   "refs": [
+    "paintings/portrait-of-adele-bloch-bauer-i"
+   ]
+  },
+  {
+   "id": "artist-lady-with-an-ermine",
+   "kind": "mc",
+   "prompt": "Who painted Lady with an Ermine?",
+   "answer": "Leonardo da Vinci",
+   "wrong": [
+    "Henri Rousseau",
+    "John William Waterhouse",
+    "Grant Wood"
+   ],
+   "explain": "Lady with an Ermine (1490) by Leonardo da Vinci. A young woman holds a white stoat-like animal.",
+   "difficulty": 3,
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f9/Lady_with_an_Ermine_-_Leonardo_da_Vinci_-_Google_Art_Project.jpg/330px-Lady_with_an_Ermine_-_Leonardo_da_Vinci_-_Google_Art_Project.jpg",
+      "w": 330,
+      "h": 444,
+      "credit": "Leonardo da Vinci",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Lady_with_an_Ermine_-_Leonardo_da_Vinci_-_Google_Art_Project.jpg"
+     }
+    ]
+   },
+   "refs": [
+    "paintings/lady-with-an-ermine"
+   ]
+  },
+  {
+   "id": "name-lady-with-an-ermine",
+   "kind": "mc",
+   "prompt": "What is this painting called?",
+   "answer": "Lady with an Ermine",
+   "wrong": [
+    "The Tower of Babel",
+    "Café Terrace at Night",
+    "A Sunday Afternoon on the Island of La Grande Jatte"
+   ],
+   "explain": "Lady with an Ermine (1490) by Leonardo da Vinci. A young woman holds a white stoat-like animal.",
+   "difficulty": 3,
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f9/Lady_with_an_Ermine_-_Leonardo_da_Vinci_-_Google_Art_Project.jpg/330px-Lady_with_an_Ermine_-_Leonardo_da_Vinci_-_Google_Art_Project.jpg",
+      "w": 330,
+      "h": 444,
+      "credit": "Leonardo da Vinci",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Lady_with_an_Ermine_-_Leonardo_da_Vinci_-_Google_Art_Project.jpg"
+     }
+    ]
+   },
+   "refs": [
+    "paintings/lady-with-an-ermine"
+   ]
+  },
+  {
+   "id": "artist-the-harvesters",
+   "kind": "mc",
+   "prompt": "Who painted The Harvesters?",
+   "answer": "Pieter Bruegel the Elder",
+   "wrong": [
+    "Jan van Eyck",
+    "Gustav Klimt",
+    "John Everett Millais"
+   ],
+   "explain": "The Harvesters (1565) by Pieter Bruegel the Elder. Peasants cut and gather golden wheat in summer.",
+   "difficulty": 3,
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/05/Pieter_Bruegel_the_Elder-_The_Harvesters_-_Google_Art_Project.jpg/500px-Pieter_Bruegel_the_Elder-_The_Harvesters_-_Google_Art_Project.jpg",
+      "w": 500,
+      "h": 364,
+      "credit": "Pieter Brueghel the Elder",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Pieter_Bruegel_the_Elder-_The_Harvesters_-_Google_Art_Project.jpg"
+     }
+    ]
+   },
+   "refs": [
+    "paintings/the-harvesters"
+   ]
+  },
+  {
+   "id": "name-the-harvesters",
+   "kind": "mc",
+   "prompt": "What is this painting called?",
+   "answer": "The Harvesters",
+   "wrong": [
+    "The Calling of Saint Matthew",
+    "Girl with a Pearl Earring",
+    "The Fighting Temeraire"
+   ],
+   "explain": "The Harvesters (1565) by Pieter Bruegel the Elder. Peasants cut and gather golden wheat in summer.",
+   "difficulty": 3,
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/05/Pieter_Bruegel_the_Elder-_The_Harvesters_-_Google_Art_Project.jpg/500px-Pieter_Bruegel_the_Elder-_The_Harvesters_-_Google_Art_Project.jpg",
+      "w": 500,
+      "h": 364,
+      "credit": "Pieter Brueghel the Elder",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Pieter_Bruegel_the_Elder-_The_Harvesters_-_Google_Art_Project.jpg"
+     }
+    ]
+   },
+   "refs": [
+    "paintings/the-harvesters"
+   ]
+  },
+  {
+   "id": "artist-irises",
+   "kind": "mc",
+   "prompt": "Who painted Irises?",
+   "answer": "Vincent van Gogh",
+   "wrong": [
+    "Rembrandt",
+    "Edvard Munch",
+    "Théodore Géricault"
+   ],
+   "explain": "Irises (1889) by Vincent van Gogh. It shows a bed of purple-blue flowers.",
+   "difficulty": 2,
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3e/Irises-Vincent_van_Gogh.jpg/500px-Irises-Vincent_van_Gogh.jpg",
+      "w": 500,
+      "h": 382,
+      "credit": "Vincent van Gogh",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Irises-Vincent_van_Gogh.jpg"
+     }
+    ]
+   },
+   "refs": [
+    "paintings/irises"
+   ]
+  },
+  {
+   "id": "name-irises",
+   "kind": "mc",
+   "prompt": "What is this painting called?",
+   "answer": "Irises",
+   "wrong": [
+    "Flaming June",
+    "The Death of Marat",
+    "The Last Supper"
+   ],
+   "explain": "Irises (1889) by Vincent van Gogh. It shows a bed of purple-blue flowers.",
+   "difficulty": 2,
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3e/Irises-Vincent_van_Gogh.jpg/500px-Irises-Vincent_van_Gogh.jpg",
+      "w": 500,
+      "h": 382,
+      "credit": "Vincent van Gogh",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Irises-Vincent_van_Gogh.jpg"
+     }
+    ]
+   },
+   "refs": [
+    "paintings/irises"
+   ]
+  },
+  {
+   "id": "artist-the-potato-eaters",
+   "kind": "mc",
+   "prompt": "Who painted The Potato Eaters?",
+   "answer": "Vincent van Gogh",
+   "wrong": [
+    "Hieronymus Bosch",
+    "Edvard Munch",
+    "Jean-François Millet"
+   ],
+   "explain": "The Potato Eaters (1885) by Vincent van Gogh. A peasant family shares a simple meal.",
+   "difficulty": 3,
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c6/De_aardappeleters_-_s0005V1962_-_Van_Gogh_Museum.jpg/500px-De_aardappeleters_-_s0005V1962_-_Van_Gogh_Museum.jpg",
+      "w": 500,
+      "h": 354,
+      "credit": "Vincent van Gogh",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:De_aardappeleters_-_s0005V1962_-_Van_Gogh_Museum.jpg"
+     }
+    ]
+   },
+   "refs": [
+    "paintings/the-potato-eaters"
+   ]
+  },
+  {
+   "id": "name-the-potato-eaters",
+   "kind": "mc",
+   "prompt": "What is this painting called?",
+   "answer": "The Potato Eaters",
+   "wrong": [
+    "The Laughing Cavalier",
+    "Impression, Sunrise",
+    "A Bar at the Folies-Bergère"
+   ],
+   "explain": "The Potato Eaters (1885) by Vincent van Gogh. A peasant family shares a simple meal.",
+   "difficulty": 3,
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c6/De_aardappeleters_-_s0005V1962_-_Van_Gogh_Museum.jpg/500px-De_aardappeleters_-_s0005V1962_-_Van_Gogh_Museum.jpg",
+      "w": 500,
+      "h": 354,
+      "credit": "Vincent van Gogh",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:De_aardappeleters_-_s0005V1962_-_Van_Gogh_Museum.jpg"
+     }
+    ]
+   },
+   "refs": [
+    "paintings/the-potato-eaters"
+   ]
+  },
+  {
+   "id": "artist-the-death-of-marat",
+   "kind": "mc",
+   "prompt": "Who painted The Death of Marat?",
+   "answer": "Jacques-Louis David",
+   "wrong": [
+    "Caspar David Friedrich",
+    "Sandro Botticelli",
+    "John William Waterhouse"
+   ],
+   "explain": "The Death of Marat (1793) by Jacques-Louis David. It is a famous image of the French Revolution.",
+   "difficulty": 3,
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f8/Jacques-Louis_David_-_Marat_assassinated_-_Google_Art_Project_2.jpg/330px-Jacques-Louis_David_-_Marat_assassinated_-_Google_Art_Project_2.jpg",
+      "w": 330,
+      "h": 425,
+      "credit": "Jacques-Louis David",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Jacques-Louis_David_-_Marat_assassinated_-_Google_Art_Project_2.jpg"
+     }
+    ]
+   },
+   "refs": [
+    "paintings/the-death-of-marat"
+   ]
+  },
+  {
+   "id": "name-the-death-of-marat",
+   "kind": "mc",
+   "prompt": "What is this painting called?",
+   "answer": "The Death of Marat",
+   "wrong": [
+    "The Gleaners",
+    "The Starry Night",
+    "The Hunters in the Snow"
+   ],
+   "explain": "The Death of Marat (1793) by Jacques-Louis David. It is a famous image of the French Revolution.",
+   "difficulty": 3,
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f8/Jacques-Louis_David_-_Marat_assassinated_-_Google_Art_Project_2.jpg/330px-Jacques-Louis_David_-_Marat_assassinated_-_Google_Art_Project_2.jpg",
+      "w": 330,
+      "h": 425,
+      "credit": "Jacques-Louis David",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Jacques-Louis_David_-_Marat_assassinated_-_Google_Art_Project_2.jpg"
+     }
+    ]
+   },
+   "refs": [
+    "paintings/the-death-of-marat"
+   ]
+  },
+  {
+   "id": "artist-flaming-june",
+   "kind": "mc",
+   "prompt": "Who painted Flaming June?",
+   "answer": "Frederic Leighton",
+   "wrong": [
+    "Diego Velázquez",
+    "J. M. W. Turner",
+    "Francisco Goya"
+   ],
+   "explain": "Flaming June (1895) by Frederic Leighton. A woman sleeps curled up in a sheer orange dress.",
+   "difficulty": 3,
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8d/Flaming_June%2C_by_Frederic_Lord_Leighton_%281830-1896%29.jpg/500px-Flaming_June%2C_by_Frederic_Lord_Leighton_%281830-1896%29.jpg",
+      "w": 500,
+      "h": 500,
+      "credit": "Frederic Leighton",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Flaming_June,_by_Frederic_Lord_Leighton_(1830-1896).jpg"
+     }
+    ]
+   },
+   "refs": [
+    "paintings/flaming-june"
+   ]
+  },
+  {
+   "id": "name-flaming-june",
+   "kind": "mc",
+   "prompt": "What is this painting called?",
+   "answer": "Flaming June",
+   "wrong": [
+    "Girl with a Pearl Earring",
+    "Self-Portrait with Bandaged Ear",
+    "Washington Crossing the Delaware"
+   ],
+   "explain": "Flaming June (1895) by Frederic Leighton. A woman sleeps curled up in a sheer orange dress.",
+   "difficulty": 3,
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8d/Flaming_June%2C_by_Frederic_Lord_Leighton_%281830-1896%29.jpg/500px-Flaming_June%2C_by_Frederic_Lord_Leighton_%281830-1896%29.jpg",
+      "w": 500,
+      "h": 500,
+      "credit": "Frederic Leighton",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Flaming_June,_by_Frederic_Lord_Leighton_(1830-1896).jpg"
+     }
+    ]
+   },
+   "refs": [
+    "paintings/flaming-june"
+   ]
+  },
+  {
+   "id": "artist-young-hare",
+   "kind": "mc",
+   "prompt": "Who painted Young Hare?",
+   "answer": "Albrecht Dürer",
+   "wrong": [
+    "Thomas Gainsborough",
+    "Caravaggio",
+    "Claude Monet"
+   ],
+   "explain": "Young Hare (1502) by Albrecht Dürer. It is a famous painting of a young hare.",
+   "difficulty": 1,
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/4/44/Albrecht_D%C3%BCrer_-_Hare%2C_1502_-_Google_Art_Project.jpg/500px-Albrecht_D%C3%BCrer_-_Hare%2C_1502_-_Google_Art_Project.jpg",
+      "w": 500,
+      "h": 553,
+      "credit": "Albrecht Dürer",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Albrecht_D%C3%BCrer_-_Hare,_1502_-_Google_Art_Project.jpg"
+     }
+    ]
+   },
+   "refs": [
+    "paintings/young-hare"
+   ]
+  },
+  {
+   "id": "name-young-hare",
+   "kind": "mc",
+   "prompt": "What is this painting called?",
+   "answer": "Young Hare",
+   "wrong": [
+    "The Calling of Saint Matthew",
+    "Luncheon of the Boating Party",
+    "The Swing"
+   ],
+   "explain": "Young Hare (1502) by Albrecht Dürer. It is a famous painting of a young hare.",
+   "difficulty": 1,
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/4/44/Albrecht_D%C3%BCrer_-_Hare%2C_1502_-_Google_Art_Project.jpg/500px-Albrecht_D%C3%BCrer_-_Hare%2C_1502_-_Google_Art_Project.jpg",
+      "w": 500,
+      "h": 553,
+      "credit": "Albrecht Dürer",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Albrecht_D%C3%BCrer_-_Hare,_1502_-_Google_Art_Project.jpg"
+     }
+    ]
+   },
+   "refs": [
+    "paintings/young-hare"
+   ]
+  },
+  {
+   "id": "artist-the-night-cafe",
+   "kind": "mc",
+   "prompt": "Who painted The Night Café?",
+   "answer": "Vincent van Gogh",
+   "wrong": [
+    "Grant Wood",
+    "Jacques-Louis David",
+    "Pierre-Auguste Renoir"
+   ],
+   "explain": "The Night Café (1888) by Vincent van Gogh. It shows a billiard table in an all-night café.",
+   "difficulty": 3,
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5e/Vincent_Willem_van_Gogh_076.jpg/500px-Vincent_Willem_van_Gogh_076.jpg",
+      "w": 500,
+      "h": 395,
+      "credit": "Vincent van Gogh",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Vincent_Willem_van_Gogh_076.jpg"
+     }
+    ]
+   },
+   "refs": [
+    "paintings/the-night-cafe"
+   ]
+  },
+  {
+   "id": "name-the-night-cafe",
+   "kind": "mc",
+   "prompt": "What is this painting called?",
+   "answer": "The Night Café",
+   "wrong": [
+    "The Raft of the Medusa",
+    "Mona Lisa",
+    "The Tower of Babel"
+   ],
+   "explain": "The Night Café (1888) by Vincent van Gogh. It shows a billiard table in an all-night café.",
+   "difficulty": 3,
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5e/Vincent_Willem_van_Gogh_076.jpg/500px-Vincent_Willem_van_Gogh_076.jpg",
+      "w": 500,
+      "h": 395,
+      "credit": "Vincent van Gogh",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Vincent_Willem_van_Gogh_076.jpg"
+     }
+    ]
+   },
+   "refs": [
+    "paintings/the-night-cafe"
+   ]
+  }
+ ],
+ "sources": [
+  {
+   "name": "Wikimedia Commons (public-domain reproductions)",
+   "url": "https://commons.wikimedia.org"
+  },
+  {
+   "name": "Wikidata (creator, date, collection)",
+   "url": "https://www.wikidata.org"
+  }
+ ]
+}

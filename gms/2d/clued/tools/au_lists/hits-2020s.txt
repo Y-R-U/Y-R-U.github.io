@@ -1,0 +1,52 @@
+@id hits-2020s
+@title Hits of the 2020s
+@icon 🔥
+@sources [{"name":"Billboard Year-End Hot 100 singles (2020–2025)","url":"https://en.wikipedia.org/wiki/Billboard_Year-End_Hot_100_singles_of_2020"},{"name":"UK best-selling singles by year","url":"https://en.wikipedia.org/wiki/List_of_best-selling_singles_by_year_(UK)"}]
+2019 | Dua Lipa | Don't Start Now | d=1
+2019 | Post Malone | Circles
+2019 | Harry Styles | Watermelon Sugar | d=1
+2019 | Harry Styles | Adore You
+2020 | BTS | Dynamite | d=1
+2020 | Dua Lipa | Levitating | d=1
+2020 | The Weeknd | Save Your Tears
+2020 | 24kGoldn | Mood | am=24kgoldn
+2020 | Jawsh 685 & Jason Derulo | Savage Love (Laxed - Siren Beat) | am=jawsh|derulo; tm=savage love
+2020 | Glass Animals | Heat Waves
+2021 | Olivia Rodrigo | drivers license | d=1; alt=Drivers License
+2021 | Olivia Rodrigo | good 4 u | alt=Good 4 U
+2021 | The Kid LAROI & Justin Bieber | STAY | am=laroi; d=1
+2021 | Lil Nas X | MONTERO (Call Me By Your Name) | tm=montero
+2021 | Justin Bieber | Peaches
+2021 | Doja Cat | Kiss Me More
+2021 | Silk Sonic | Leave the Door Open | am=silk sonic|bruno
+2021 | Adele | Easy on Me | d=1
+2021 | Ed Sheeran | Bad Habits | d=1
+2021 | Ed Sheeran | Shivers | d=1
+2022 | Harry Styles | As It Was | d=1
+2022 | Jack Harlow | First Class
+2022 | Taylor Swift | Anti-Hero | d=1
+2022 | Lizzo | About Damn Time
+2022 | SZA | Kill Bill | d=1
+2022 | Rema & Selena Gomez | Calm Down | am=rema
+2022 | Sam Smith & Kim Petras | Unholy | am=sam smith; d=1
+2022 | Metro Boomin, The Weeknd & 21 Savage | Creepin' | am=metro boomin
+2023 | Miley Cyrus | Flowers | d=1
+2023 | Morgan Wallen | Last Night
+2023 | Olivia Rodrigo | vampire
+2023 | Teddy Swims | Lose Control
+2023 | Jack Harlow | Lovin On Me
+2024 | Shaboozey | A Bar Song (Tipsy) | tm=bar song
+2024 | Benson Boone | Beautiful Things
+2024 | Post Malone & Morgan Wallen | I Had Some Help | am=post malone
+2024 | Sabrina Carpenter | Espresso | d=1
+2024 | Sabrina Carpenter | Please Please Please
+2024 | Kendrick Lamar | Not Like Us
+2024 | Hozier | Too Sweet
+2024 | Billie Eilish | BIRDS OF A FEATHER | d=1
+2024 | Beyoncé | TEXAS HOLD 'EM | tm=texas hold
+2024 | Lady Gaga & Bruno Mars | Die With A Smile | am=gaga; d=1
+2024 | ROSÉ & Bruno Mars | APT. | am=ros; d=1
+2024 | Chappell Roan | Good Luck, Babe!
+2025 | Alex Warren | Ordinary
+2025 | Lady Gaga | Abracadabra
+2025 | Sabrina Carpenter | Manchild

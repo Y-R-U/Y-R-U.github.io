@@ -1,0 +1,10 @@
+tools/.c1cache/
+tools/m_cache/
+tools/node_modules/
+tools/.linkcache.json
+tools/au_cache.json
+tools/*_cache/
+tools/*.cache.json
+server/clued
+*.db
+.DS_Store

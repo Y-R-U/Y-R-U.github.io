@@ -1,0 +1,92 @@
+@id music-artists
+@title Music artists
+@icon 🎤
+@kind artists
+@sources [{"name":"Curated by Clued; signature songs are each artist's best-known chart hits"}]
+# Artist | origin | breakthrough decade | Song ; Song
+The Beatles | UK | 1960s | Hey Jude ; Help! ; Let It Be | d=1
+Elvis Presley | US | 1950s | Jailhouse Rock ; Can't Help Falling in Love | d=1; alt=Elvis
+The Rolling Stones | UK | 1960s | (I Can't Get No) Satisfaction ; Paint It Black | d=1
+The Beach Boys | US | 1960s | Good Vibrations ; Surfin' U.S.A.
+Bob Dylan | US | 1960s | Like a Rolling Stone ; Blowin' in the Wind
+Aretha Franklin | US | 1960s | Respect ; Think
+Marvin Gaye | US | 1960s | I Heard It Through the Grapevine ; Let's Get It On
+Ray Charles | US | 1950s | Hit the Road Jack ; Georgia on My Mind
+Chuck Berry | US | 1950s | Johnny B. Goode ; Roll Over Beethoven
+Frank Sinatra | US | 1940s | Fly Me to the Moon ; New York, New York | am=sinatra; d=1
+Johnny Cash | US | 1950s | Ring of Fire ; I Walk the Line
+The Supremes | US | 1960s | Baby Love ; Stop! In the Name of Love
+Simon & Garfunkel | US | 1960s | Mrs. Robinson ; The Sound of Silence
+Stevie Wonder | US | 1960s | Superstition ; Sir Duke
+Led Zeppelin | UK | 1960s | Whole Lotta Love ; Stairway to Heaven
+David Bowie | UK | 1960s | Space Oddity ; Heroes ; Let's Dance | d=1
+Elton John | UK | 1970s | Your Song ; Rocket Man ; Tiny Dancer | d=1
+Queen | UK | 1970s | Bohemian Rhapsody ; Don't Stop Me Now ; We Will Rock You | d=1
+ABBA | Sweden | 1970s | Dancing Queen ; Mamma Mia ; Waterloo | d=1
+Bee Gees | UK | 1960s | Stayin' Alive ; How Deep Is Your Love
+Fleetwood Mac | UK | 1970s | Dreams ; Go Your Own Way
+Pink Floyd | UK | 1970s | Another Brick in the Wall, Pt. 2 ; Wish You Were Here
+Eagles | US | 1970s | Hotel California ; Take It Easy
+Bob Marley & The Wailers | Jamaica | 1970s | No Woman, No Cry ; Three Little Birds ; Could You Be Loved | am=marley; alt=Bob Marley
+Dolly Parton | US | 1970s | Jolene ; 9 to 5 | d=1
+Bruce Springsteen | US | 1970s | Born to Run ; Dancing in the Dark
+Billy Joel | US | 1970s | Piano Man ; Uptown Girl
+AC/DC | Australia | 1970s | Highway to Hell ; Back in Black
+Donna Summer | US | 1970s | Hot Stuff ; I Feel Love
+Michael Jackson | US | 1970s | Billie Jean ; Thriller ; Beat It | d=1
+Madonna | US | 1980s | Like a Prayer ; Vogue ; Like a Virgin | d=1
+Prince | US | 1980s | Purple Rain ; Kiss ; When Doves Cry
+Whitney Houston | US | 1980s | I Wanna Dance with Somebody (Who Loves Me) ; I Will Always Love You | d=1
+Tina Turner | US | 1980s | What's Love Got to Do with It ; The Best
+Phil Collins | UK | 1980s | In the Air Tonight ; Another Day in Paradise
+George Michael | UK | 1980s | Faith ; Careless Whisper
+U2 | Ireland | 1980s | With or Without You ; One ; Beautiful Day
+The Police | UK | 1970s | Every Breath You Take ; Roxanne
+Bon Jovi | US | 1980s | Livin' on a Prayer ; It's My Life
+Guns N' Roses | US | 1980s | Sweet Child o' Mine ; Paradise City
+Cyndi Lauper | US | 1980s | Girls Just Want to Have Fun ; Time After Time
+Lionel Richie | US | 1980s | Hello ; All Night Long (All Night)
+Dire Straits | UK | 1970s | Sultans of Swing ; Money for Nothing
+Kylie Minogue | Australia | 1980s | Can't Get You Out of My Head ; Spinning Around
+Metallica | US | 1980s | Enter Sandman ; Nothing Else Matters
+Mariah Carey | US | 1990s | All I Want for Christmas Is You ; We Belong Together ; Fantasy
+Celine Dion | Canada | 1990s | My Heart Will Go On ; Because You Loved Me
+Nirvana | US | 1990s | Smells Like Teen Spirit ; Come as You Are
+Oasis | UK | 1990s | Wonderwall ; Don't Look Back in Anger | d=1
+Red Hot Chili Peppers | US | 1990s | Californication ; Under the Bridge
+Spice Girls | UK | 1990s | Wannabe ; Spice Up Your Life
+Britney Spears | US | 1990s | ...Baby One More Time ; Toxic | d=1
+Backstreet Boys | US | 1990s | I Want It That Way ; Everybody (Backstreet's Back)
+Radiohead | UK | 1990s | Karma Police ; No Surprises
+Green Day | US | 1990s | Basket Case ; Good Riddance (Time of Your Life)
+Shakira | Colombia | 1990s | Hips Don't Lie ; Whenever, Wherever
+Eminem | US | 1990s | Lose Yourself ; Without Me
+Destiny's Child | US | 1990s | Say My Name ; Survivor
+Coldplay | UK | 2000s | Yellow ; Viva la Vida ; Fix You | d=1
+Beyoncé | US | 2000s | Crazy in Love ; Single Ladies (Put a Ring on It) ; Halo | d=1
+Alicia Keys | US | 2000s | Fallin' ; No One
+Linkin Park | US | 2000s | In the End ; Numb
+Usher | US | 1990s | Yeah! ; OMG
+The Killers | US | 2000s | Mr. Brightside ; Somebody Told Me
+Amy Winehouse | UK | 2000s | Rehab ; Back to Black
+Arctic Monkeys | UK | 2000s | I Bet You Look Good on the Dancefloor ; Do I Wanna Know?
+Daft Punk | France | 1990s | Get Lucky ; One More Time
+Rihanna | Barbados | 2000s | Umbrella ; Diamonds ; We Found Love | d=1
+Lady Gaga | US | 2000s | Poker Face ; Bad Romance ; Shallow | d=1
+Katy Perry | US | 2000s | Roar ; Firework
+Taylor Swift | US | 2000s | Shake It Off ; Love Story ; Anti-Hero | d=1
+Bruno Mars | US | 2010s | Just the Way You Are ; Grenade ; Locked Out of Heaven
+Adele | UK | 2000s | Rolling in the Deep ; Someone Like You ; Hello | d=1
+Ed Sheeran | UK | 2010s | Shape of You ; Perfect ; Thinking Out Loud | d=1
+Justin Bieber | Canada | 2000s | Baby ; Sorry ; Love Yourself
+Drake | Canada | 2010s | Hotline Bling ; God's Plan
+Imagine Dragons | US | 2010s | Radioactive ; Believer
+Ariana Grande | US | 2010s | thank u, next ; 7 rings
+The Weeknd | Canada | 2010s | Blinding Lights ; Can't Feel My Face
+Billie Eilish | US | 2010s | bad guy ; Birds of a Feather ; Ocean Eyes
+Dua Lipa | UK | 2010s | Levitating ; Don't Start Now ; New Rules
+Harry Styles | UK | 2010s | As It Was ; Watermelon Sugar
+BTS | South Korea | 2010s | Dynamite ; Butter
+Olivia Rodrigo | US | 2020s | drivers license ; good 4 u
+Sabrina Carpenter | US | 2020s | Espresso ; Please Please Please
+Kendrick Lamar | US | 2010s | HUMBLE. ; Not Like Us

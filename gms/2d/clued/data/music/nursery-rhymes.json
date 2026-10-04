@@ -1,0 +1,298 @@
+{
+ "id": "nursery-rhymes",
+ "title": "Nursery rhymes",
+ "theme": "music",
+ "icon": "🧸",
+ "kids": true,
+ "version": 1,
+ "factsMeta": {
+  "composer": {
+   "type": "cat",
+   "label": "Composer"
+  },
+  "year": {
+   "type": "year",
+   "label": "Written",
+   "higherLabel": "Later"
+  }
+ },
+ "items": [
+  {
+   "id": "twinkle-twinkle",
+   "name": "Twinkle, Twinkle, Little Star",
+   "facts": {},
+   "blurb": "The tune is the French song \"Ah! vous dirai-je, maman\" (1761); the words are from a poem by Jane Taylor (1806).",
+   "lyrics": [
+    "Twinkle, twinkle, little star",
+    "How I wonder what you are",
+    "Up above the world so high",
+    "Like a diamond in the sky"
+   ],
+   "media": {
+    "audio": [
+     {
+      "type": "piano",
+      "src": "data/music/notes/twinkle-twinkle.json",
+      "credit": "Traditional (composer); transcribed by Clued from public-domain sources; Salamander Grand Piano samples by Alexander Holm (CC BY 3.0)",
+      "license": "PD",
+      "page": "https://en.wikipedia.org/wiki/Special:Search?search=Twinkle%2C%20Twinkle%2C%20Little%20Star",
+      "start": 0,
+      "dur": 29
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "mary-had-a-little-lamb",
+   "name": "Mary Had a Little Lamb",
+   "facts": {},
+   "blurb": "Words by Sarah Josepha Hale (1830), sung to a traditional American tune.",
+   "lyrics": [
+    "Mary had a little lamb",
+    "Little lamb, little lamb",
+    "Mary had a little lamb",
+    "Its fleece was white as snow"
+   ],
+   "media": {
+    "audio": [
+     {
+      "type": "piano",
+      "src": "data/music/notes/mary-had-a-little-lamb.json",
+      "credit": "Traditional (composer); transcribed by Clued from public-domain sources; Salamander Grand Piano samples by Alexander Holm (CC BY 3.0)",
+      "license": "PD",
+      "page": "https://en.wikipedia.org/wiki/Special:Search?search=Mary%20Had%20a%20Little%20Lamb",
+      "start": 0,
+      "dur": 17
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "row-your-boat",
+   "name": "Row, Row, Row Your Boat",
+   "facts": {},
+   "blurb": "A traditional round, first printed in 1852.",
+   "lyrics": [
+    "Row, row, row your boat",
+    "Gently down the stream",
+    "Merrily, merrily, merrily, merrily",
+    "Life is but a dream"
+   ],
+   "media": {
+    "audio": [
+     {
+      "type": "piano",
+      "src": "data/music/notes/row-your-boat.json",
+      "credit": "Traditional (composer); transcribed by Clued from public-domain sources; Salamander Grand Piano samples by Alexander Holm (CC BY 3.0)",
+      "license": "PD",
+      "page": "https://en.wikipedia.org/wiki/Special:Search?search=Row%2C%20Row%2C%20Row%20Your%20Boat",
+      "start": 0,
+      "dur": 15
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "frere-jacques",
+   "name": "Frère Jacques",
+   "alt": [
+    "Are You Sleeping",
+    "Brother John"
+   ],
+   "facts": {},
+   "blurb": "A French round from the 1700s, sung in English as \"Are You Sleeping?\".",
+   "lyrics": [
+    "Are you sleeping, are you sleeping",
+    "Brother John, Brother John?",
+    "Morning bells are ringing, morning bells are ringing",
+    "Ding, dang, dong. Ding, dang, dong."
+   ],
+   "media": {
+    "audio": [
+     {
+      "type": "piano",
+      "src": "data/music/notes/frere-jacques.json",
+      "credit": "Traditional (composer); transcribed by Clued from public-domain sources; Salamander Grand Piano samples by Alexander Holm (CC BY 3.0)",
+      "license": "PD",
+      "page": "https://en.wikipedia.org/wiki/Special:Search?search=Fr%C3%A8re%20Jacques",
+      "start": 0,
+      "dur": 17
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "london-bridge",
+   "name": "London Bridge Is Falling Down",
+   "alt": [
+    "London Bridge"
+   ],
+   "facts": {},
+   "blurb": "London Bridge Is Falling Down.",
+   "lyrics": [
+    "London Bridge is falling down",
+    "Falling down, falling down",
+    "London Bridge is falling down",
+    "My fair lady"
+   ],
+   "media": {
+    "audio": [
+     {
+      "type": "piano",
+      "src": "data/music/notes/london-bridge.json",
+      "credit": "Traditional (composer); transcribed by Clued from public-domain sources; Salamander Grand Piano samples by Alexander Holm (CC BY 3.0)",
+      "license": "PD",
+      "page": "https://en.wikipedia.org/wiki/Special:Search?search=London%20Bridge%20Is%20Falling%20Down",
+      "start": 0,
+      "dur": 17
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "old-macdonald",
+   "name": "Old MacDonald Had a Farm",
+   "alt": [
+    "Old MacDonald"
+   ],
+   "facts": {},
+   "blurb": "Old MacDonald Had a Farm.",
+   "lyrics": [
+    "Old MacDonald had a farm",
+    "E-I-E-I-O",
+    "And on that farm he had a cow",
+    "E-I-E-I-O"
+   ],
+   "media": {
+    "audio": [
+     {
+      "type": "piano",
+      "src": "data/music/notes/old-macdonald.json",
+      "credit": "Traditional (composer); transcribed by Clued from public-domain sources; Salamander Grand Piano samples by Alexander Holm (CC BY 3.0)",
+      "license": "PD",
+      "page": "https://en.wikipedia.org/wiki/Special:Search?search=Old%20MacDonald%20Had%20a%20Farm",
+      "start": 0,
+      "dur": 16
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "hot-cross-buns",
+   "name": "Hot Cross Buns",
+   "facts": {},
+   "blurb": "Hot Cross Buns.",
+   "lyrics": [
+    "Hot cross buns!",
+    "Hot cross buns!",
+    "One a penny, two a penny",
+    "Hot cross buns!"
+   ],
+   "media": {
+    "audio": [
+     {
+      "type": "piano",
+      "src": "data/music/notes/hot-cross-buns.json",
+      "credit": "Traditional (composer); transcribed by Clued from public-domain sources; Salamander Grand Piano samples by Alexander Holm (CC BY 3.0)",
+      "license": "PD",
+      "page": "https://en.wikipedia.org/wiki/Special:Search?search=Hot%20Cross%20Buns",
+      "start": 0,
+      "dur": 16
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "happy-birthday",
+   "name": "Happy Birthday to You",
+   "alt": [
+    "Happy Birthday"
+   ],
+   "facts": {
+    "composer": "Patty Hill and Mildred J. Hill",
+    "year": 1893
+   },
+   "blurb": "The melody comes from \"Good Morning to All\" (1893) by sisters Patty and Mildred Hill; a US court found in 2015 that the song had no valid copyright.",
+   "media": {
+    "audio": [
+     {
+      "type": "piano",
+      "src": "data/music/notes/happy-birthday.json",
+      "credit": "Patty Hill and Mildred J. Hill (composer); transcribed by Clued from public-domain sources; Salamander Grand Piano samples by Alexander Holm (CC BY 3.0)",
+      "license": "PD",
+      "page": "https://en.wikipedia.org/wiki/Special:Search?search=Happy%20Birthday%20to%20You",
+      "start": 0,
+      "dur": 16
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "yankee-doodle",
+   "name": "Yankee Doodle",
+   "facts": {},
+   "blurb": "A song from the time of the American Revolution (1770s).",
+   "lyrics": [
+    "Yankee Doodle went to town",
+    "A-riding on a pony",
+    "Stuck a feather in his cap",
+    "And called it macaroni"
+   ],
+   "media": {
+    "audio": [
+     {
+      "type": "piano",
+      "src": "data/music/notes/yankee-doodle.json",
+      "credit": "Traditional (composer); transcribed by Clued from public-domain sources; Salamander Grand Piano samples by Alexander Holm (CC BY 3.0)",
+      "license": "PD",
+      "page": "https://en.wikipedia.org/wiki/Special:Search?search=Yankee%20Doodle",
+      "start": 0,
+      "dur": 15
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "ode-to-joy-kids",
+   "name": "Ode to Joy",
+   "facts": {
+    "composer": "Ludwig van Beethoven",
+    "year": 1824
+   },
+   "blurb": "Ode to Joy, by Ludwig van Beethoven (1824).",
+   "media": {
+    "audio": [
+     {
+      "type": "piano",
+      "src": "data/music/notes/ode-to-joy.json",
+      "credit": "Ludwig van Beethoven (composer); transcribed by Clued from public-domain sources; Salamander Grand Piano samples by Alexander Holm (CC BY 3.0)",
+      "license": "PD",
+      "page": "https://en.wikipedia.org/wiki/Special:Search?search=Ode%20to%20Joy",
+      "start": 0,
+      "dur": 34
+     }
+    ]
+   },
+   "difficulty": 1
+  }
+ ],
+ "questions": [],
+ "sources": [
+  {
+   "name": "Salamander Grand Piano V3 by Alexander Holm (CC BY 3.0)",
+   "url": "https://archive.org/details/SalamanderGrandPianoV3"
+  },
+  {
+   "name": "Clued transcriptions of traditional nursery-rhyme melodies (public domain)"
+  }
+ ]
+}

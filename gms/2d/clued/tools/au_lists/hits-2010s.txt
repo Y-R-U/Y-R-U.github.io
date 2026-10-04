@@ -1,0 +1,60 @@
+@id hits-2010s
+@title Hits of the 2010s
+@icon 🎧
+@sources [{"name":"Billboard Year-End Hot 100 singles (2010–2019)","url":"https://en.wikipedia.org/wiki/Billboard_Year-End_Hot_100_singles_of_2010"},{"name":"UK best-selling singles by year","url":"https://en.wikipedia.org/wiki/List_of_best-selling_singles_by_year_(UK)"}]
+2009 | Kesha | TiK ToK | tm=tik ?tok
+2009 | Train | Hey, Soul Sister
+2010 | Katy Perry | California Gurls
+2010 | Eminem | Love the Way You Lie | am=eminem
+2010 | Bruno Mars | Just the Way You Are | d=1
+2010 | Bruno Mars | Grenade
+2010 | Katy Perry | Firework | d=1
+2010 | Adele | Rolling in the Deep | d=1
+2011 | Adele | Someone Like You | d=1
+2011 | LMFAO | Party Rock Anthem
+2011 | Maroon 5 | Moves Like Jagger
+2011 | Pitbull | Give Me Everything | am=pitbull
+2011 | Gotye | Somebody That I Used to Know | am=gotye
+2011 | Carly Rae Jepsen | Call Me Maybe | d=1
+2011 | fun. | We Are Young | am=^fun
+2011 | Rihanna | We Found Love | am=rihanna
+2012 | Maroon 5 | Payphone
+2012 | PSY | Gangnam Style | d=1; tm=gangnam
+2012 | Macklemore & Ryan Lewis | Thrift Shop | am=macklemore
+2012 | Imagine Dragons | Radioactive
+2013 | Robin Thicke | Blurred Lines | am=thicke
+2013 | Daft Punk | Get Lucky | d=1; am=daft punk
+2013 | Lorde | Royals
+2013 | Miley Cyrus | Wrecking Ball
+2013 | Katy Perry | Roar
+2013 | Pharrell Williams | Happy | d=1; tm=^happy
+2013 | John Legend | All of Me
+2013 | Idina Menzel | Let It Go | d=1; am=idina
+2014 | Sam Smith | Stay with Me
+2014 | Taylor Swift | Shake It Off | d=1
+2014 | Mark Ronson | Uptown Funk | d=1; am=ronson; tm=uptown funk
+2014 | Ed Sheeran | Thinking Out Loud
+2015 | Wiz Khalifa | See You Again | am=wiz khalifa
+2015 | Adele | Hello | d=1
+2014 | Walk the Moon | Shut Up and Dance
+2015 | Justin Bieber | Love Yourself
+2015 | Justin Bieber | Sorry
+2016 | Drake | One Dance | am=drake
+2016 | Rihanna | Work | am=rihanna
+2016 | Justin Timberlake | CAN'T STOP THE FEELING! | tm=can.?t stop the feeling
+2016 | The Chainsmokers | Closer | am=chainsmokers
+2016 | Sia | Cheap Thrills | am=^sia
+2017 | Ed Sheeran | Shape of You | d=1
+2017 | Luis Fonsi & Daddy Yankee | Despacito | d=1; am=fonsi
+2017 | Kendrick Lamar | HUMBLE.
+2017 | Imagine Dragons | Believer
+2017 | Ed Sheeran | Perfect
+2017 | Camila Cabello | Havana | am=camila
+2018 | Drake | God's Plan
+2018 | Lady Gaga & Bradley Cooper | Shallow | am=gaga
+2018 | Post Malone & Swae Lee | Sunflower (Spider-Man: Into the Spider-Verse) | am=post malone; tm=sunflower
+2018 | Lil Nas X | Old Town Road | d=1; am=lil nas
+2019 | Billie Eilish | bad guy | d=1; alt=Bad Guy
+2019 | Shawn Mendes & Camila Cabello | Señorita | am=mendes
+2018 | Lewis Capaldi | Someone You Loved
+2019 | The Weeknd | Blinding Lights | d=1

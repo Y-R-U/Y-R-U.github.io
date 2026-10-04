@@ -1,0 +1,2857 @@
+{
+ "id": "flowers",
+ "title": "Flowers",
+ "theme": "nature",
+ "icon": "🌸",
+ "kids": true,
+ "version": 1,
+ "leakExempt": [
+  "flower",
+  "flowers"
+ ],
+ "factsMeta": {
+  "colour": {
+   "type": "cat",
+   "label": "Usual colour"
+  },
+  "region": {
+   "type": "cat",
+   "label": "Native to"
+  },
+  "emblem": {
+   "type": "cat",
+   "label": "Floral emblem of"
+  }
+ },
+ "items": [
+  {
+   "id": "sunflower",
+   "name": "Sunflower",
+   "alt": [
+    "common sunflower"
+   ],
+   "sci": "Helianthus annuus",
+   "group": "daisy family",
+   "facts": {
+    "colour": "Yellow",
+    "region": "North America"
+   },
+   "blurb": "A tall plant with a huge yellow flower head. Young sunflowers turn to follow the sun.",
+   "clues": [
+    "Family: Asteraceae.",
+    "Genus: Helianthus.",
+    "Its seeds are arranged in spirals.",
+    "Its seeds are pressed for cooking oil.",
+    "Young plants turn to follow the sun across the sky.",
+    "It is usually yellow.",
+    "It is native to North America.",
+    "Van Gogh painted it many times.",
+    "It is a tall plant with a giant yellow flower.",
+    "The answer is one word of 9 letters.",
+    "It starts with the letter S."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/98056702/medium.jpeg",
+      "w": 500,
+      "h": 400,
+      "credit": "Michelle W. （鍾偉瑋）",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/98056702"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/210274706/medium.jpeg",
+      "w": 500,
+      "h": 334,
+      "credit": "Michelle W. （鍾偉瑋）",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/210274706"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/88052561/medium.jpeg",
+      "w": 500,
+      "h": 375,
+      "credit": "Дарья Орлова",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/88052561"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "rose",
+   "name": "Rose",
+   "alt": [
+    "garden rose"
+   ],
+   "sci": "Rosa",
+   "group": "rose family",
+   "facts": {
+    "colour": "Red",
+    "region": "Asia",
+    "emblem": "England"
+   },
+   "blurb": "A flower with soft, scented petals and thorny stems. Red roses are a symbol of love.",
+   "clues": [
+    "Family: Rosaceae.",
+    "Its fruits are called hips.",
+    "It is the national flower of England and the USA.",
+    "It is usually red.",
+    "It is native to Asia.",
+    "It is the floral emblem of England.",
+    "Its stems have prickles called thorns.",
+    "Red ones are a symbol of love.",
+    "The answer is one word of 4 letters.",
+    "It starts with the letter R."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/50016224/medium.jpg",
+      "w": 500,
+      "h": 500,
+      "credit": "Юрий Данилевский (Yuriy Danilevsky)",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/50016224"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/239297896/medium.jpg",
+      "w": 500,
+      "h": 335,
+      "credit": "Douglas Goldman",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/239297896"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/267774353/medium.jpeg",
+      "w": 500,
+      "h": 331,
+      "credit": "Margarita",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/267774353"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "tulip",
+   "name": "Tulip",
+   "sci": "Tulipa gesneriana",
+   "group": "lily family",
+   "facts": {
+    "colour": "Red",
+    "region": "Asia"
+   },
+   "blurb": "A cup-shaped spring flower that grows from a bulb. Tulips are a symbol of the Netherlands.",
+   "clues": [
+    "Family: Liliaceae.",
+    "In the 1630s single bulbs sold for more than a house.",
+    "It first came from Central Asia and Turkey.",
+    "It grows from a bulb.",
+    "It is usually red.",
+    "It is native to Asia.",
+    "Its flowers are cup-shaped.",
+    "The Netherlands is famous for fields of it.",
+    "The answer is one word of 5 letters.",
+    "It starts with the letter T."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/275165315/medium.jpeg",
+      "w": 375,
+      "h": 500,
+      "credit": "Igor Balashov",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/275165315"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/38071897/medium.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Rebecca Ray",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/38071897"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/501064051/medium.jpg",
+      "w": 375,
+      "h": 500,
+      "credit": "Георгий Виноградов (Georgy Vinogradov)",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/501064051"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "common-daisy",
+   "name": "Common daisy",
+   "alt": [
+    "daisy",
+    "lawn daisy"
+   ],
+   "sci": "Bellis perennis",
+   "group": "daisy family",
+   "facts": {
+    "colour": "White",
+    "region": "Europe"
+   },
+   "blurb": "A small flower with white petals and a yellow centre that grows in lawns. Children make daisy chains from it.",
+   "clues": [
+    "Family: Asteraceae.",
+    "Genus: Bellis.",
+    "Its flowers close at night.",
+    "Its name comes from \"day's eye\".",
+    "It is usually white.",
+    "It is native to Europe.",
+    "Children thread them into chains.",
+    "It has white petals and a yellow centre.",
+    "The answer has 2 words (6, 5 letters).",
+    "It starts with the letter C."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/515847774/medium.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "m.dolores paderne sa…",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/515847774"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/208767960/medium.jpg",
+      "w": 335,
+      "h": 500,
+      "credit": "Douglas Goldman",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/208767960"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/498715260/medium.jpeg",
+      "w": 375,
+      "h": 500,
+      "credit": "Gianni Del Bufalo bygdb",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/498715260"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "dandelion",
+   "name": "Dandelion",
+   "alt": [
+    "common dandelion"
+   ],
+   "sci": "Taraxacum officinale",
+   "group": "daisy family",
+   "facts": {
+    "colour": "Yellow",
+    "region": "Europe"
+   },
+   "blurb": "A yellow flower that turns into a fluffy \"clock\" of seeds. Children blow the seeds away.",
+   "clues": [
+    "Family: Asteraceae.",
+    "Genus: Taraxacum.",
+    "Its name comes from French for \"lion's tooth\".",
+    "Its leaves can be eaten in salads.",
+    "Each seed has its own little parachute.",
+    "It is usually yellow.",
+    "It is native to Europe.",
+    "Its seed head is called a clock.",
+    "It is a yellow lawn weed.",
+    "The answer is one word of 9 letters.",
+    "It starts with the letter D."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/127729932/medium.jpeg",
+      "w": 500,
+      "h": 375,
+      "credit": "Jason Grant",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/127729932"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/349813880/medium.jpeg",
+      "w": 500,
+      "h": 334,
+      "credit": "Yung-Lun Lin",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/349813880"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/346880845/medium.jpg",
+      "w": 375,
+      "h": 500,
+      "credit": "Liz F",
+      "license": "CC0 1.0",
+      "page": "https://www.inaturalist.org/photos/346880845"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "english-lavender",
+   "name": "English lavender",
+   "alt": [
+    "lavender"
+   ],
+   "sci": "Lavandula angustifolia",
+   "group": "mint family",
+   "facts": {
+    "colour": "Purple",
+    "region": "the Mediterranean"
+   },
+   "blurb": "A purple, sweet-smelling herb. Its flowers are used in soaps, oils and bags to scent drawers.",
+   "clues": [
+    "Family: Lamiaceae.",
+    "Genus: Lavandula.",
+    "Provence in France is famous for fields of it.",
+    "Bees love it.",
+    "Its oil is used in soap and perfume.",
+    "It is usually purple.",
+    "It is native to the Mediterranean.",
+    "It smells sweet and calming.",
+    "It has spikes of purple flowers.",
+    "The answer has 2 words (7, 8 letters).",
+    "It starts with the letter E."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/2697772/medium.jpg",
+      "w": 375,
+      "h": 500,
+      "credit": "Andrey Zharkikh",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/2697772"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/2697773/medium.jpg",
+      "w": 375,
+      "h": 500,
+      "credit": "Andrey Zharkikh",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/2697773"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/172041726/medium.jpg",
+      "w": 375,
+      "h": 500,
+      "credit": "Naturalista",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/172041726"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "moth-orchid",
+   "name": "Moth orchid",
+   "alt": [
+    "orchid",
+    "phalaenopsis"
+   ],
+   "sci": "Phalaenopsis",
+   "group": "orchid",
+   "facts": {
+    "colour": "White",
+    "region": "Asia"
+   },
+   "blurb": "The most popular house orchid. Its flowers are said to look like moths in flight.",
+   "clues": [
+    "Its flowers can last for months.",
+    "In the wild it grows on trees.",
+    "Its roots grow in the air.",
+    "It is usually white.",
+    "It is native to Asia.",
+    "The answer has 2 words (4, 6 letters).",
+    "It starts with the letter M."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/368194406/medium.jpeg",
+      "w": 500,
+      "h": 333,
+      "credit": "Tom Heijnen",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/368194406"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/385082339/medium.jpeg",
+      "w": 281,
+      "h": 500,
+      "credit": "Nielbert Raner",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/385082339"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/236182938/medium.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Forest Botial-Jarvis",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/236182938"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "sacred-lotus",
+   "name": "Sacred lotus",
+   "alt": [
+    "lotus",
+    "Indian lotus"
+   ],
+   "sci": "Nelumbo nucifera",
+   "group": "lotus",
+   "facts": {
+    "colour": "Pink",
+    "region": "Asia",
+    "emblem": "India"
+   },
+   "lookalikes": [
+    "white-water-lily"
+   ],
+   "blurb": "A pink water flower that rises above the water. It is a holy symbol in Hinduism and Buddhism.",
+   "clues": [
+    "Family: Nelumbonaceae.",
+    "Genus: Nelumbo.",
+    "A seed over 1,000 years old has sprouted.",
+    "Water rolls off its leaves, keeping them clean.",
+    "Its flowers rise above the water.",
+    "It is usually pink.",
+    "It is native to Asia.",
+    "It is a holy symbol in Hinduism and Buddhism.",
+    "The answer has 2 words (6, 5 letters).",
+    "It starts with the letter S."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/145129428/medium.jpeg",
+      "w": 500,
+      "h": 331,
+      "credit": "Surabhi Srivastava",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/145129428"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/27340324/medium.jpeg",
+      "w": 500,
+      "h": 375,
+      "credit": "Ong Jyh Seng",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/27340324"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/317666647/medium.jpeg",
+      "w": 500,
+      "h": 333,
+      "credit": "WATANABE Hitoshi 渡辺仁",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/317666647"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "white-water-lily",
+   "name": "White water lily",
+   "alt": [
+    "water lily",
+    "European white waterlily"
+   ],
+   "sci": "Nymphaea alba",
+   "group": "water lily",
+   "facts": {
+    "colour": "White",
+    "region": "Europe"
+   },
+   "lookalikes": [
+    "sacred-lotus"
+   ],
+   "blurb": "A white flower that floats on ponds among round, flat leaves called lily pads. Monet painted water lilies many times.",
+   "clues": [
+    "Family: Nymphaeaceae.",
+    "Genus: Nymphaea.",
+    "Claude Monet painted hundreds of pictures of these plants.",
+    "Its flowers close at night.",
+    "Its round leaves are called pads.",
+    "Its flowers float on ponds.",
+    "The answer has 3 words (5, 5, 4 letters).",
+    "It starts with the letter W."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/681371591/medium.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Lukas Zangl",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/681371591"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/468462981/medium.jpg",
+      "w": 500,
+      "h": 323,
+      "credit": "zebedeugalinha",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/468462981"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/669720023/medium.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "zebedeugalinha",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/669720023"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "common-poppy",
+   "name": "Common poppy",
+   "alt": [
+    "poppy",
+    "corn poppy",
+    "red poppy",
+    "Flanders poppy"
+   ],
+   "sci": "Papaver rhoeas",
+   "group": "poppy",
+   "facts": {
+    "colour": "Red",
+    "region": "Europe"
+   },
+   "blurb": "A bright red wildflower that grew on the battlefields of World War I. It is worn to remember soldiers who died.",
+   "clues": [
+    "Family: Papaveraceae.",
+    "Genus: Papaver.",
+    "Its seeds can wait in soil for decades.",
+    "It grew on World War I battlefields.",
+    "It is native to Europe.",
+    "It is worn on Remembrance Day.",
+    "The answer has 2 words (6, 5 letters).",
+    "It starts with the letter C."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/114734771/medium.jpeg",
+      "w": 500,
+      "h": 333,
+      "credit": "Eleftherios Katsillis",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/114734771"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/370227932/medium.jpeg",
+      "w": 380,
+      "h": 500,
+      "credit": "Federico Biguzzi",
+      "license": "CC0 1.0",
+      "page": "https://www.inaturalist.org/photos/370227932"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/18496040/medium.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Andreas Rockstein",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/18496040"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "wild-daffodil",
+   "name": "Wild daffodil",
+   "alt": [
+    "daffodil",
+    "Lent lily"
+   ],
+   "sci": "Narcissus pseudonarcissus",
+   "group": "amaryllis family",
+   "facts": {
+    "colour": "Yellow",
+    "region": "Europe",
+    "emblem": "Wales"
+   },
+   "blurb": "A yellow spring flower with a trumpet in the middle. It is a symbol of Wales.",
+   "clues": [
+    "Family: Amaryllidaceae.",
+    "Genus: Narcissus.",
+    "William Wordsworth wrote a famous poem about a host of them.",
+    "Its bulbs are poisonous.",
+    "It is worn on St David's Day.",
+    "It is usually yellow.",
+    "It is native to Europe.",
+    "It is the floral emblem of Wales.",
+    "It has a trumpet-shaped centre.",
+    "It is a yellow spring flower.",
+    "The answer has 2 words (4, 8 letters).",
+    "It starts with the letter W."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/63617588/medium.jpg",
+      "w": 373,
+      "h": 500,
+      "credit": "Gilles San Martin",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/63617588"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/623370227/medium.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "jamie-aa",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/623370227"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/61926031/medium.jpg",
+      "w": 375,
+      "h": 500,
+      "credit": "Sam Kieschnick",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/61926031"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "common-bluebell",
+   "name": "Common bluebell",
+   "alt": [
+    "bluebell",
+    "English bluebell"
+   ],
+   "sci": "Hyacinthoides non-scripta",
+   "group": "asparagus family",
+   "facts": {
+    "colour": "Blue",
+    "region": "Europe"
+   },
+   "blurb": "A woodland flower with drooping blue bells. Half the world's bluebells grow in Britain.",
+   "clues": [
+    "Family: Asparagaceae.",
+    "Genus: Hyacinthoides.",
+    "About half the world's population grows in Britain.",
+    "It is protected by law in the UK.",
+    "It carpets woods in spring.",
+    "It is usually blue.",
+    "It is native to Europe.",
+    "Its flowers droop on one side of the stem.",
+    "It has blue bell-shaped flowers.",
+    "The answer has 2 words (6, 8 letters).",
+    "It starts with the letter C."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/375142586/medium.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Sean Crocker",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/375142586"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/429730167/medium.jpeg",
+      "w": 375,
+      "h": 500,
+      "credit": "no rights reserved",
+      "license": "CC0 1.0",
+      "page": "https://www.inaturalist.org/photos/429730167"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/368927713/medium.jpg",
+      "w": 333,
+      "h": 500,
+      "credit": "Jonathan Prior",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/368927713"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "common-snowdrop",
+   "name": "Common snowdrop",
+   "alt": [
+    "snowdrop"
+   ],
+   "sci": "Galanthus nivalis",
+   "group": "amaryllis family",
+   "facts": {
+    "colour": "White",
+    "region": "Europe"
+   },
+   "blurb": "A small white flower that droops like a drop of snow. It is one of the first flowers of the year.",
+   "clues": [
+    "Family: Amaryllidaceae.",
+    "Genus: Galanthus.",
+    "A drug for memory loss was made from it.",
+    "It can push up through snow.",
+    "It has three outer petals.",
+    "It is usually white.",
+    "It is native to Europe.",
+    "It flowers in late winter.",
+    "It is a small, drooping white flower.",
+    "The answer has 2 words (6, 8 letters).",
+    "It starts with the letter C."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/194996965/medium.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "nalagtus",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/194996965"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/455754320/medium.jpeg",
+      "w": 375,
+      "h": 500,
+      "credit": "Grzegorz Grzejszczak",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/455754320"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/484679715/medium.jpeg",
+      "w": 500,
+      "h": 333,
+      "credit": "Wairambar Rainforest",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/484679715"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "saffron-crocus",
+   "name": "Saffron crocus",
+   "alt": [
+    "crocus"
+   ],
+   "sci": "Crocus sativus",
+   "group": "iris family",
+   "facts": {
+    "colour": "Purple",
+    "region": "the Mediterranean"
+   },
+   "blurb": "A purple crocus whose red threads are dried to make saffron, the world's most expensive spice.",
+   "clues": [
+    "Family: Iridaceae.",
+    "About 150,000 flowers make 1 kg of spice.",
+    "Its red threads are hand-picked.",
+    "It flowers in autumn.",
+    "It is usually purple.",
+    "It is native to the Mediterranean.",
+    "It gives the world's most expensive spice.",
+    "The answer has 2 words (7, 6 letters).",
+    "It starts with the letter S."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/28500579/medium.jpg",
+      "w": 375,
+      "h": 500,
+      "credit": "Юрий Данилевский (Yuriy Danilevsky)",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/28500579"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/46803244/medium.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Юрий Данилевский (Yuriy Danilevsky)",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/46803244"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/28500558/medium.jpg",
+      "w": 500,
+      "h": 478,
+      "credit": "Юрий Данилевский (Yuriy Danilevsky)",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/28500558"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "bearded-iris",
+   "name": "Bearded iris",
+   "alt": [
+    "iris",
+    "German iris"
+   ],
+   "sci": "Iris germanica",
+   "group": "iris family",
+   "facts": {
+    "colour": "Purple",
+    "region": "the Mediterranean"
+   },
+   "blurb": "A tall garden flower with three upright and three drooping petals. It inspired the French fleur-de-lis.",
+   "clues": [
+    "It may have inspired the French fleur-de-lis.",
+    "It is named after a Greek goddess of the rainbow.",
+    "Its roots are used in perfume.",
+    "It is usually purple.",
+    "It is native to the Mediterranean.",
+    "It shares its name with part of the eye.",
+    "The answer has 2 words (7, 4 letters).",
+    "It starts with the letter B."
+   ],
+   "difficulty": 2
+  },
+  {
+   "id": "chinese-hibiscus",
+   "name": "Chinese hibiscus",
+   "alt": [
+    "hibiscus"
+   ],
+   "sci": "Hibiscus rosa-sinensis",
+   "group": "mallow family",
+   "facts": {
+    "colour": "Red",
+    "region": "Asia",
+    "emblem": "Malaysia"
+   },
+   "blurb": "A big, trumpet-shaped tropical flower that lasts only a day or so. It is the national flower of Malaysia.",
+   "clues": [
+    "Each flower lasts only about a day.",
+    "Its petals have been used to shine shoes.",
+    "It has a long stalk sticking out of the middle.",
+    "It is usually red.",
+    "It is native to Asia.",
+    "It is the floral emblem of Malaysia.",
+    "It is the national flower of Malaysia.",
+    "It is a big red tropical flower.",
+    "The answer has 2 words (7, 8 letters).",
+    "It starts with the letter C."
+   ],
+   "difficulty": 1
+  },
+  {
+   "id": "mexican-marigold",
+   "name": "Mexican marigold",
+   "alt": [
+    "marigold",
+    "African marigold",
+    "Aztec marigold"
+   ],
+   "sci": "Tagetes erecta",
+   "group": "daisy family",
+   "facts": {
+    "colour": "Orange",
+    "region": "North America"
+   },
+   "blurb": "A bright orange flower used to decorate altars and graves for Mexico's Day of the Dead.",
+   "clues": [
+    "Family: Asteraceae.",
+    "Genus: Tagetes.",
+    "It is used in garlands in India.",
+    "Its petals colour chicken feed to make yolks more orange.",
+    "It is usually orange.",
+    "It is native to North America.",
+    "It has a strong smell.",
+    "It is bright orange.",
+    "The answer has 2 words (7, 8 letters).",
+    "It starts with the letter M."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/30404707/medium.jpg",
+      "w": 500,
+      "h": 281,
+      "credit": "lisong",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/30404707"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/348913423/medium.jpeg",
+      "w": 500,
+      "h": 500,
+      "credit": "Ricardo Betancourt Sánchez",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/348913423"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/564131458/medium.jpg",
+      "w": 375,
+      "h": 500,
+      "credit": "Алёна Осипова",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/564131458"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "carnation",
+   "name": "Carnation",
+   "sci": "Dianthus caryophyllus",
+   "group": "pink family",
+   "facts": {
+    "colour": "Pink",
+    "region": "the Mediterranean"
+   },
+   "blurb": "A frilly-petalled flower often worn in buttonholes. It is a popular flower for Mother's Day.",
+   "clues": [
+    "Family: Caryophyllaceae.",
+    "Genus: Dianthus.",
+    "Its scent is a bit like cloves.",
+    "Its petals have zig-zag edges.",
+    "It is popular for Mother's Day.",
+    "It is usually pink.",
+    "It is native to the Mediterranean.",
+    "It is often worn in a buttonhole.",
+    "It has frilly pink or red petals.",
+    "The answer is one word of 9 letters.",
+    "It starts with the letter C."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/52411785/medium.jpeg",
+      "w": 500,
+      "h": 375,
+      "credit": "Jason Grant",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/52411785"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/66692952/medium.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Yves Bas",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/66692952"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/677526389/medium.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Louis Aureglia",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/677526389"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "chrysanthemum",
+   "name": "Chrysanthemum",
+   "alt": [
+    "mum"
+   ],
+   "sci": "Chrysanthemum morifolium",
+   "group": "daisy family",
+   "facts": {
+    "colour": "Yellow",
+    "region": "Asia",
+    "emblem": "Japan"
+   },
+   "blurb": "A flower with many layers of petals. It is the symbol of the Japanese emperor.",
+   "clues": [
+    "Japan's imperial throne is named after it.",
+    "In some European countries it is placed on graves.",
+    "Its name means \"gold flower\".",
+    "It is usually yellow.",
+    "It is native to Asia.",
+    "It is the floral emblem of Japan.",
+    "It flowers in autumn.",
+    "It has many layers of petals.",
+    "The answer is one word of 13 letters.",
+    "It starts with the letter C."
+   ],
+   "difficulty": 2
+  },
+  {
+   "id": "dahlia",
+   "name": "Dahlia",
+   "sci": "Dahlia pinnata",
+   "group": "daisy family",
+   "facts": {
+    "colour": "Red",
+    "region": "North America"
+   },
+   "blurb": "A showy garden flower from Mexico that comes in many shapes, from pompoms to spiky \"cactus\" types.",
+   "clues": [
+    "Family: Asteraceae.",
+    "It is the national flower of Mexico.",
+    "The Aztecs ate its roots.",
+    "It is named after a Swedish botanist.",
+    "It is usually red.",
+    "It is native to North America.",
+    "It comes in pompom and spiky shapes.",
+    "The answer is one word of 6 letters.",
+    "It starts with the letter D."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/183652241/medium.jpg",
+      "w": 375,
+      "h": 500,
+      "credit": "Stefano Menchetti",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/183652241"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/50574176/medium.jpeg",
+      "w": 500,
+      "h": 375,
+      "credit": "no rights reserved",
+      "license": "CC0 1.0",
+      "page": "https://www.inaturalist.org/photos/50574176"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/457531953/medium.jpeg",
+      "w": 376,
+      "h": 500,
+      "credit": "biogeek",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/457531953"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "common-peony",
+   "name": "Common peony",
+   "alt": [
+    "peony"
+   ],
+   "sci": "Paeonia officinalis",
+   "group": "peony",
+   "facts": {
+    "colour": "Pink",
+    "region": "Europe"
+   },
+   "blurb": "A big, round, frilly flower that blooms in late spring. In China it is called the \"king of flowers\".",
+   "clues": [
+    "Family: Paeoniaceae.",
+    "Genus: Paeonia.",
+    "It is called the \"king of flowers\" in China.",
+    "Ants are often seen on its buds.",
+    "One plant can live for 100 years.",
+    "It is usually pink.",
+    "It is native to Europe.",
+    "Its flowers are big and round.",
+    "It is named after Paeon, a healer in Greek myth.",
+    "The answer has 2 words (6, 5 letters).",
+    "It starts with the letter C."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/275394133/medium.jpeg",
+      "w": 375,
+      "h": 500,
+      "credit": "Ljaž",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/275394133"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/275394117/medium.jpeg",
+      "w": 375,
+      "h": 500,
+      "credit": "Ljaž",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/275394117"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/107571541/medium.jpeg",
+      "w": 500,
+      "h": 375,
+      "credit": "Yves Bas",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/107571541"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "bigleaf-hydrangea",
+   "name": "Bigleaf hydrangea",
+   "alt": [
+    "hydrangea",
+    "hortensia"
+   ],
+   "sci": "Hydrangea macrophylla",
+   "group": "hydrangea",
+   "facts": {
+    "colour": "Blue",
+    "region": "Asia"
+   },
+   "blurb": "A shrub with big balls of flowers. In acid soil the flowers are blue; in chalky soil they are pink.",
+   "clues": [
+    "Its flowers change colour with the soil.",
+    "Acid soil turns its flowers blue.",
+    "It comes from Japan.",
+    "It is usually blue.",
+    "It is native to Asia.",
+    "Its flowers grow in big round balls.",
+    "Its name begins with \"hydra\".",
+    "The answer has 2 words (7, 9 letters).",
+    "It starts with the letter B."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/31091656/medium.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Tony Rebelo",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/31091656"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/439784619/medium.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Claude Kolwelter",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/439784619"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/556183552/medium.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "zebedeugalinha",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/556183552"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "lily-of-the-valley",
+   "name": "Lily of the valley",
+   "sci": "Convallaria majalis",
+   "group": "asparagus family",
+   "facts": {
+    "colour": "White",
+    "region": "Europe"
+   },
+   "blurb": "A woodland plant with tiny white bell-shaped flowers and a sweet scent. All parts are poisonous.",
+   "clues": [
+    "Family: Asparagaceae.",
+    "Genus: Convallaria.",
+    "In France it is given as a gift on 1 May.",
+    "All parts of it are poisonous.",
+    "Its scent is used in perfume.",
+    "It is usually white.",
+    "It is native to Europe.",
+    "It has tiny white bells.",
+    "Its name includes a lowland between hills.",
+    "The answer has 4 words (4, 2, 3, 6 letters).",
+    "It starts with the letter L."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/42995958/medium.jpeg",
+      "w": 500,
+      "h": 382,
+      "credit": "Vladimir",
+      "license": "CC0 1.0",
+      "page": "https://www.inaturalist.org/photos/42995958"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/201171821/medium.jpeg",
+      "w": 375,
+      "h": 500,
+      "credit": "J V",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/201171821"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/449482464/medium.jpeg",
+      "w": 500,
+      "h": 375,
+      "credit": "Mike B",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/449482464"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "foxglove",
+   "name": "Foxglove",
+   "alt": [
+    "common foxglove"
+   ],
+   "sci": "Digitalis purpurea",
+   "group": "plantain family",
+   "facts": {
+    "colour": "Purple",
+    "region": "Europe"
+   },
+   "blurb": "A tall spike of purple, bell-shaped flowers. It is very poisonous, but it gave us an important heart medicine.",
+   "clues": [
+    "Family: Plantaginaceae.",
+    "Genus: Digitalis.",
+    "A heart drug, digoxin, comes from it.",
+    "Its genus name means \"finger\".",
+    "Its flowers have spots inside.",
+    "It is usually purple.",
+    "It is native to Europe.",
+    "Bees climb inside its tube-shaped flowers.",
+    "It is named after a wild animal's glove.",
+    "The answer is one word of 8 letters.",
+    "It starts with the letter F."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/464372621/medium.jpg",
+      "w": 500,
+      "h": 500,
+      "credit": "nbasargin",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/464372621"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/451204175/medium.jpeg",
+      "w": 375,
+      "h": 500,
+      "credit": "zebedeugalinha",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/451204175"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/456044336/medium.jpg",
+      "w": 315,
+      "h": 500,
+      "credit": "zebedeugalinha",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/456044336"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "water-forget-me-not",
+   "name": "Water forget-me-not",
+   "alt": [
+    "forget-me-not"
+   ],
+   "sci": "Myosotis scorpioides",
+   "group": "borage family",
+   "facts": {
+    "colour": "Blue",
+    "region": "Europe"
+   },
+   "blurb": "A tiny sky-blue flower with a yellow centre. It is a symbol of remembrance.",
+   "clues": [
+    "Family: Boraginaceae.",
+    "Genus: Myosotis.",
+    "Its genus name means \"mouse ear\".",
+    "It is the state flower of Alaska.",
+    "It is usually blue.",
+    "It is native to Europe.",
+    "It is tiny, blue and yellow-centred.",
+    "Its name is a plea to remember.",
+    "The answer has 4 words (5, 6, 2, 3 letters).",
+    "It starts with the letter W."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/248589470/medium.jpeg",
+      "w": 452,
+      "h": 500,
+      "credit": "Patrick Hacker",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/248589470"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/54579998/medium.jpeg",
+      "w": 500,
+      "h": 335,
+      "credit": "Douglas Goldman",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/54579998"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/228038917/medium.jpg",
+      "w": 500,
+      "h": 500,
+      "credit": "Larry Jensen",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/228038917"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "garden-pansy",
+   "name": "Garden pansy",
+   "alt": [
+    "pansy"
+   ],
+   "sci": "Viola × wittrockiana",
+   "group": "violet family",
+   "facts": {
+    "colour": "Purple",
+    "region": "Europe"
+   },
+   "lookalikes": [
+    "sweet-violet"
+   ],
+   "blurb": "A cheerful garden flower with a \"face\" in the middle. Its name comes from the French word for \"thought\".",
+   "clues": [
+    "Family: Violaceae.",
+    "Genus: Viola.",
+    "Its name comes from the French \"pensée\", meaning thought.",
+    "It was bred from wild violets.",
+    "It can flower in winter.",
+    "It is usually purple.",
+    "It is native to Europe.",
+    "Its petals seem to show a face.",
+    "The answer has 2 words (6, 5 letters).",
+    "It starts with the letter G."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/232798264/medium.jpeg",
+      "w": 500,
+      "h": 375,
+      "credit": "Jacqui Geux",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/232798264"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/68851906/medium.jpg",
+      "w": 375,
+      "h": 500,
+      "credit": "Bobby McCabe",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/68851906"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/187392103/medium.jpeg",
+      "w": 281,
+      "h": 500,
+      "credit": "Troi Perkins",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/187392103"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "sweet-violet",
+   "name": "Sweet violet",
+   "alt": [
+    "violet"
+   ],
+   "sci": "Viola odorata",
+   "group": "violet family",
+   "facts": {
+    "colour": "Purple",
+    "region": "Europe"
+   },
+   "lookalikes": [
+    "garden-pansy"
+   ],
+   "blurb": "A small, sweet-smelling purple flower. Its scent seems to vanish after a sniff or two.",
+   "clues": [
+    "Its scent seems to disappear after a few sniffs.",
+    "Its flowers are candied to decorate cakes.",
+    "It has heart-shaped leaves.",
+    "It is usually purple.",
+    "It is native to Europe.",
+    "A colour is named after it.",
+    "It is a small, scented purple flower.",
+    "The answer has 2 words (5, 6 letters).",
+    "It starts with the letter S."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/479236079/medium.jpeg",
+      "w": 500,
+      "h": 333,
+      "credit": "Björn Sothmann",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/479236079"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/315648038/medium.jpg",
+      "w": 333,
+      "h": 500,
+      "credit": "Tomás Carranza Perales",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/315648038"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/118085149/medium.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Abrimaal",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/118085149"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "meadow-buttercup",
+   "name": "Meadow buttercup",
+   "alt": [
+    "buttercup"
+   ],
+   "sci": "Ranunculus acris",
+   "group": "buttercup family",
+   "facts": {
+    "colour": "Yellow",
+    "region": "Europe"
+   },
+   "blurb": "A shiny yellow meadow flower. Children hold it under a chin to see if it glows yellow.",
+   "clues": [
+    "Family: Ranunculaceae.",
+    "Genus: Ranunculus.",
+    "Its sap can irritate skin.",
+    "Cows avoid eating it.",
+    "Children hold it under chins to see if they glow.",
+    "It is usually yellow.",
+    "It is native to Europe.",
+    "Its petals are glossy.",
+    "Its name includes a dairy spread.",
+    "The answer has 2 words (6, 9 letters).",
+    "It starts with the letter M."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/102792039/medium.jpeg",
+      "w": 500,
+      "h": 375,
+      "credit": "Daniel Cahen",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/102792039"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/178823211/medium.jpg",
+      "w": 500,
+      "h": 335,
+      "credit": "Douglas Goldman",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/178823211"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/178823025/medium.jpg",
+      "w": 500,
+      "h": 335,
+      "credit": "Douglas Goldman",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/178823025"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "bird-of-paradise",
+   "name": "Bird of paradise",
+   "alt": [
+    "crane flower",
+    "strelitzia"
+   ],
+   "sci": "Strelitzia reginae",
+   "group": "strelitzia",
+   "facts": {
+    "colour": "Orange",
+    "region": "Africa"
+   },
+   "blurb": "A South African flower that looks like a colourful bird's head. Sunbirds pollinate it.",
+   "clues": [
+    "It is named after Queen Charlotte.",
+    "Sunbirds stand on it to drink nectar.",
+    "It is the official flower of Los Angeles.",
+    "It is usually orange.",
+    "It is native to Africa.",
+    "It comes from South Africa.",
+    "The answer has 3 words (4, 2, 8 letters).",
+    "It starts with the letter B."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/375653805/medium.jpg",
+      "w": 500,
+      "h": 495,
+      "credit": "Henry de Lange",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/375653805"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/486997783/medium.jpeg",
+      "w": 500,
+      "h": 375,
+      "credit": "Lucas Christofides",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/486997783"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/504865117/medium.jpg",
+      "w": 281,
+      "h": 500,
+      "credit": "Rafael Silva",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/504865117"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "king-protea",
+   "name": "King protea",
+   "alt": [
+    "protea"
+   ],
+   "sci": "Protea cynaroides",
+   "group": "protea",
+   "facts": {
+    "colour": "Pink",
+    "region": "Africa",
+    "emblem": "South Africa"
+   },
+   "lookalikes": [
+    "waratah"
+   ],
+   "blurb": "A huge, bowl-shaped flower from South Africa. Its national cricket team is named after it.",
+   "clues": [
+    "South Africa's cricket team is named after its family.",
+    "Its flower head can be 30 cm across.",
+    "It sprouts again after fires.",
+    "It is usually pink.",
+    "It is native to Africa.",
+    "It is the floral emblem of South Africa.",
+    "It comes from the Cape.",
+    "It is the national flower of South Africa.",
+    "The answer has 2 words (4, 6 letters).",
+    "It starts with the letter K."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/180107528/medium.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Klaus Wehrlin",
+      "license": "CC0 1.0",
+      "page": "https://www.inaturalist.org/photos/180107528"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/175739278/medium.jpeg",
+      "w": 500,
+      "h": 333,
+      "credit": "Tony Rebelo",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/175739278"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/15418778/medium.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Tony Rebelo",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/15418778"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "waratah",
+   "name": "Waratah",
+   "alt": [
+    "New South Wales waratah"
+   ],
+   "sci": "Telopea speciosissima",
+   "group": "protea",
+   "facts": {
+    "colour": "Red",
+    "region": "Australia",
+    "emblem": "New South Wales"
+   },
+   "lookalikes": [
+    "king-protea"
+   ],
+   "blurb": "A big, bright red Australian flower. It is the floral emblem of New South Wales.",
+   "clues": [
+    "Family: Proteaceae.",
+    "Genus: Telopea.",
+    "Its name comes from the Eora people of Sydney.",
+    "It is related to proteas and banksias.",
+    "Birds drink its nectar.",
+    "It is usually red.",
+    "It is native to Australia.",
+    "Its flower head is big and bright red.",
+    "The answer is one word of 7 letters.",
+    "It starts with the letter W."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/15445139/medium.jpg",
+      "w": 500,
+      "h": 455,
+      "credit": "Tony Rebelo",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/15445139"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/15236398/medium.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Wynand Uys",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/15236398"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/154507901/medium.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "dhfischer",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/154507901"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "kangaroo-paw",
+   "name": "Kangaroo paw",
+   "alt": [
+    "red and green kangaroo paw"
+   ],
+   "sci": "Anigozanthos manglesii",
+   "group": "kangaroo paw",
+   "facts": {
+    "colour": "Red and green",
+    "region": "Australia",
+    "emblem": "Western Australia"
+   },
+   "blurb": "A furry Australian flower shaped like an animal's paw. It is the floral emblem of Western Australia.",
+   "clues": [
+    "Family: Haemodoraceae.",
+    "Genus: Anigozanthos.",
+    "Birds pollinate it while perching on its stem.",
+    "Its flowers are covered in velvety hairs.",
+    "It is native to Australia.",
+    "It is the floral emblem of Western Australia.",
+    "It is the emblem of Western Australia.",
+    "It is named after a hopping animal's foot.",
+    "The answer has 2 words (8, 3 letters).",
+    "It starts with the letter K."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/331657320/medium.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "pimelea",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/331657320"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/77268/medium.jpg",
+      "w": 374,
+      "h": 500,
+      "credit": "Ilena",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/77268"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/152627389/medium.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "dhfischer",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/152627389"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "sturts-desert-pea",
+   "name": "Sturt's desert pea",
+   "sci": "Swainsona formosa",
+   "group": "pea family",
+   "facts": {
+    "colour": "Red",
+    "region": "Australia",
+    "emblem": "South Australia"
+   },
+   "blurb": "A desert flower with bright red petals and a shiny black \"eye\". It is the floral emblem of South Australia.",
+   "clues": [
+    "Family: Fabaceae.",
+    "Genus: Swainsona.",
+    "It creeps along the ground.",
+    "It grows in arid inland Australia.",
+    "It is usually red.",
+    "It is native to Australia.",
+    "It is the floral emblem of South Australia.",
+    "It is the emblem of South Australia.",
+    "It is red with a glossy black centre.",
+    "The answer has 3 words (6, 6, 3 letters).",
+    "It starts with the letter S."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/488557951/medium.jpeg",
+      "w": 500,
+      "h": 375,
+      "credit": "Borja Fierro",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/488557951"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/93680053/medium.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Kym Nicolson",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/93680053"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/727341034/medium.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Em Lamond",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/727341034"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "old-man-banksia",
+   "name": "Old man banksia",
+   "alt": [
+    "banksia",
+    "saw banksia"
+   ],
+   "sci": "Banksia serrata",
+   "group": "protea",
+   "facts": {
+    "colour": "Yellow",
+    "region": "Australia"
+   },
+   "blurb": "A gnarled Australian tree with bottlebrush-like flower spikes. Its old cones inspired May Gibbs's \"big bad Banksia men\".",
+   "clues": [
+    "Family: Proteaceae.",
+    "Fire helps open its seed cones.",
+    "It is usually yellow.",
+    "It is native to Australia.",
+    "Its flowers grow in big cylindrical spikes.",
+    "The answer has 3 words (3, 3, 7 letters).",
+    "It starts with the letter O."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/244341884/medium.jpg",
+      "w": 333,
+      "h": 500,
+      "credit": "T. Hammer",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/244341884"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/60700686/medium.jpg",
+      "w": 375,
+      "h": 500,
+      "credit": "Guy Taseski",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/60700686"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/244061068/medium.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "T. Hammer",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/244061068"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "flannel-flower",
+   "name": "Flannel flower",
+   "sci": "Actinotus helianthi",
+   "group": "carrot family",
+   "facts": {
+    "colour": "White",
+    "region": "Australia"
+   },
+   "blurb": "A soft, white, daisy-like flower of the Sydney region that feels like flannel cloth.",
+   "clues": [
+    "Family: Apiaceae.",
+    "Genus: Actinotus.",
+    "It feels soft like cloth.",
+    "It flowers heavily after bushfires.",
+    "It is related to carrots.",
+    "It is usually white.",
+    "It is native to Australia.",
+    "It grows around Sydney.",
+    "It is white and fuzzy.",
+    "The answer has 2 words (7, 6 letters).",
+    "It starts with the letter F."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/342474424/medium.jpeg",
+      "w": 500,
+      "h": 500,
+      "credit": "Shelomi Doyle",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/342474424"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/86703861/medium.jpeg",
+      "w": 375,
+      "h": 500,
+      "credit": "Tim",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/86703861"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/8574803/medium.jpeg",
+      "w": 500,
+      "h": 375,
+      "credit": "John Barkla",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/8574803"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "edelweiss",
+   "name": "Edelweiss",
+   "sci": "Leontopodium nivale",
+   "group": "daisy family",
+   "facts": {
+    "colour": "White",
+    "region": "Europe"
+   },
+   "blurb": "A white, woolly star-shaped flower of the high Alps. A famous song from \"The Sound of Music\" is named after it.",
+   "clues": [
+    "Family: Asteraceae.",
+    "Genus: Leontopodium.",
+    "Its genus name means \"lion's paw\".",
+    "Its woolly hairs protect it from cold and sun.",
+    "It grows high in the Alps.",
+    "It is usually white.",
+    "It is native to Europe.",
+    "A song in \"The Sound of Music\" is about it.",
+    "It is a white, star-shaped mountain flower.",
+    "The answer is one word of 9 letters.",
+    "It starts with the letter E."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/45613211/medium.jpeg",
+      "w": 500,
+      "h": 375,
+      "credit": "Jens-Christian Svenning",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/45613211"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/535574862/medium.jpg",
+      "w": 375,
+      "h": 500,
+      "credit": "no rights reserved",
+      "license": "CC0 1.0",
+      "page": "https://www.inaturalist.org/photos/535574862"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/147603169/medium.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Karsten Rohweder",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/147603169"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "corpse-flower",
+   "name": "Corpse flower",
+   "alt": [
+    "rafflesia",
+    "stinking corpse lily"
+   ],
+   "sci": "Rafflesia arnoldii",
+   "group": "rafflesia",
+   "facts": {
+    "colour": "Red",
+    "region": "Asia"
+   },
+   "lookalikes": [
+    "titan-arum"
+   ],
+   "blurb": "The biggest single flower in the world, up to a metre across. It smells like rotting meat to attract flies.",
+   "clues": [
+    "It has no leaves, stems or roots of its own.",
+    "It lives as a parasite on vines.",
+    "It is usually red.",
+    "It is native to Asia.",
+    "It smells of rotting meat.",
+    "It is the biggest single flower in the world.",
+    "The answer has 2 words (6, 6 letters).",
+    "It starts with the letter C."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/101228662/medium.jpg",
+      "w": 500,
+      "h": 332,
+      "credit": "shankar s.",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/101228662"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/630962743/medium.jpg",
+      "w": 500,
+      "h": 281,
+      "credit": "no rights reserved",
+      "license": "CC0 1.0",
+      "page": "https://www.inaturalist.org/photos/630962743"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/364062201/medium.jpeg",
+      "w": 375,
+      "h": 500,
+      "credit": "Samuel GUIRAUDOU",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/364062201"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "titan-arum",
+   "name": "Titan arum",
+   "sci": "Amorphophallus titanum",
+   "group": "arum family",
+   "facts": {
+    "colour": "Purple",
+    "region": "Asia"
+   },
+   "lookalikes": [
+    "corpse-flower"
+   ],
+   "blurb": "A giant plant from Sumatra with the biggest unbranched flower spike in the world. It smells of rotting meat when it blooms.",
+   "clues": [
+    "Family: Araceae.",
+    "Genus: Amorphophallus.",
+    "It may bloom only once every several years.",
+    "Its spike can be 3 metres tall.",
+    "It heats up to spread its smell.",
+    "It is usually purple.",
+    "It is native to Asia.",
+    "It comes from Sumatra.",
+    "It smells of rotting meat.",
+    "The answer has 2 words (5, 4 letters).",
+    "It starts with the letter T."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/364052744/medium.jpeg",
+      "w": 375,
+      "h": 500,
+      "credit": "Samuel GUIRAUDOU",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/364052744"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/434469097/medium.jpeg",
+      "w": 375,
+      "h": 500,
+      "credit": "eustreptospondylus",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/434469097"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/629644361/medium.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "no rights reserved",
+      "license": "CC0 1.0",
+      "page": "https://www.inaturalist.org/photos/629644361"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "venus-flytrap",
+   "name": "Venus flytrap",
+   "sci": "Dionaea muscipula",
+   "group": "carnivorous",
+   "facts": {
+    "colour": "White",
+    "region": "North America"
+   },
+   "blurb": "A meat-eating plant whose leaves snap shut on insects. It is found wild only in the Carolinas, USA.",
+   "clues": [
+    "Family: Droseraceae.",
+    "Genus: Dionaea.",
+    "Its traps count: two touches set them off.",
+    "It grows wild only in North and South Carolina.",
+    "Its traps have tooth-like bristles.",
+    "It is usually white.",
+    "It is native to North America.",
+    "It digests insects.",
+    "Its leaves snap shut like a mouth.",
+    "The answer has 2 words (5, 7 letters).",
+    "It starts with the letter V."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/108567955/medium.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "David Hill",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/108567955"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/511537671/medium.jpg",
+      "w": 375,
+      "h": 500,
+      "credit": "Michael J. Papay",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/511537671"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/399138295/medium.jpeg",
+      "w": 500,
+      "h": 354,
+      "credit": "Michael J. Papay",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/399138295"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "gerbera",
+   "name": "Gerbera",
+   "alt": [
+    "gerbera daisy",
+    "Barberton daisy"
+   ],
+   "sci": "Gerbera jamesonii",
+   "group": "daisy family",
+   "facts": {
+    "colour": "Orange",
+    "region": "Africa"
+   },
+   "blurb": "A bright, daisy-like flower from South Africa. It is one of the most popular cut flowers in the world.",
+   "clues": [
+    "Family: Asteraceae.",
+    "It is one of the top five cut flowers.",
+    "It comes in many bright colours.",
+    "It is usually orange.",
+    "It is native to Africa.",
+    "The answer is one word of 7 letters.",
+    "It starts with the letter G."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/15793969/medium.jpg",
+      "w": 500,
+      "h": 339,
+      "credit": "Wynand Uys",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/15793969"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/286250647/medium.jpeg",
+      "w": 500,
+      "h": 375,
+      "credit": "katuchka",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/286250647"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/29806988/medium.jpeg",
+      "w": 500,
+      "h": 333,
+      "credit": "no rights reserved",
+      "license": "CC0 1.0",
+      "page": "https://www.inaturalist.org/photos/29806988"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "common-jasmine",
+   "name": "Common jasmine",
+   "alt": [
+    "jasmine"
+   ],
+   "sci": "Jasminum officinale",
+   "group": "olive family",
+   "facts": {
+    "colour": "White",
+    "region": "Asia"
+   },
+   "blurb": "A climbing plant with small white star-shaped flowers and a strong sweet scent, used in tea and perfume.",
+   "clues": [
+    "Family: Oleaceae.",
+    "Its scent is strongest at night.",
+    "It is used in perfumes.",
+    "It is usually white.",
+    "It is native to Asia.",
+    "It climbs walls and fences.",
+    "It has small, white, sweet-smelling flowers.",
+    "The answer has 2 words (6, 7 letters).",
+    "It starts with the letter C."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/496730426/medium.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Silvia Ten",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/496730426"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/437364703/medium.jpeg",
+      "w": 500,
+      "h": 333,
+      "credit": "no rights reserved",
+      "license": "CC0 1.0",
+      "page": "https://www.inaturalist.org/photos/437364703"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/660676826/medium.jpg",
+      "w": 281,
+      "h": 500,
+      "credit": "no rights reserved",
+      "license": "CC0 1.0",
+      "page": "https://www.inaturalist.org/photos/660676826"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "frangipani",
+   "name": "Frangipani",
+   "alt": [
+    "plumeria"
+   ],
+   "sci": "Plumeria rubra",
+   "group": "dogbane family",
+   "facts": {
+    "colour": "White",
+    "region": "the Americas",
+    "emblem": "Laos"
+   },
+   "blurb": "A tropical tree with waxy, scented flowers used in Hawaiian leis. It is the national flower of Laos.",
+   "clues": [
+    "Family: Apocynaceae.",
+    "It is the national flower of Laos.",
+    "It is used to make Hawaiian leis.",
+    "Its flowers have five waxy petals.",
+    "It is usually white.",
+    "It is native to the Americas.",
+    "It is the floral emblem of Laos.",
+    "It has no nectar but smells sweet.",
+    "It is a scented tropical flower.",
+    "The answer is one word of 10 letters.",
+    "It starts with the letter F."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/6277677/medium.jpeg",
+      "w": 500,
+      "h": 372,
+      "credit": "Francisco Farriols Sarabia",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/6277677"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/160986053/medium.jpeg",
+      "w": 375,
+      "h": 500,
+      "credit": "Cabanillas Lopez Jesus Miguel",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/160986053"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/23286722/medium.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Bill Levine",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/23286722"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "bougainvillea",
+   "name": "Bougainvillea",
+   "sci": "Bougainvillea glabra",
+   "group": "four o'clock family",
+   "facts": {
+    "colour": "Pink",
+    "region": "South America"
+   },
+   "blurb": "A thorny climbing plant covered in bright papery \"petals\" that are really leaves called bracts.",
+   "clues": [
+    "Family: Nyctaginaceae.",
+    "Its bright \"petals\" are really leaves.",
+    "Its real flowers are tiny and white.",
+    "It is named after a French explorer.",
+    "It is usually pink.",
+    "It is native to South America.",
+    "It has thorns.",
+    "It is a bright pink climber.",
+    "The answer is one word of 13 letters.",
+    "It starts with the letter B."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/279592/medium.jpeg",
+      "w": 500,
+      "h": 375,
+      "credit": "user:Lumbar",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/279592"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/348399424/medium.jpeg",
+      "w": 375,
+      "h": 500,
+      "credit": "Simon Scotland",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/348399424"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/719956793/medium.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "zebedeugalinha",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/719956793"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "japanese-camellia",
+   "name": "Japanese camellia",
+   "alt": [
+    "camellia"
+   ],
+   "sci": "Camellia japonica",
+   "group": "tea family",
+   "facts": {
+    "colour": "Pink",
+    "region": "Asia"
+   },
+   "blurb": "A shrub with glossy leaves and rose-like flowers that bloom in winter. The tea plant is a close relative.",
+   "clues": [
+    "Family: Theaceae.",
+    "Coco Chanel used it as her symbol.",
+    "Tea comes from a close relative.",
+    "It flowers in winter.",
+    "It is usually pink.",
+    "It is native to Asia.",
+    "Its leaves are glossy and dark.",
+    "Its flowers look a bit like roses.",
+    "The answer has 2 words (8, 8 letters).",
+    "It starts with the letter J."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/3190034/medium.JPG",
+      "w": 500,
+      "h": 333,
+      "credit": "harum.koh",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/3190034"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/307161003/medium.jpg",
+      "w": 375,
+      "h": 500,
+      "credit": "no rights reserved",
+      "license": "CC0 1.0",
+      "page": "https://www.inaturalist.org/photos/307161003"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/341068173/medium.jpeg",
+      "w": 500,
+      "h": 333,
+      "credit": "Hugo Innes",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/341068173"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "common-hyacinth",
+   "name": "Common hyacinth",
+   "alt": [
+    "hyacinth"
+   ],
+   "sci": "Hyacinthus orientalis",
+   "group": "asparagus family",
+   "facts": {
+    "colour": "Blue",
+    "region": "the Middle East"
+   },
+   "blurb": "A spring bulb with a dense spike of very sweet-smelling flowers, often grown indoors in winter.",
+   "clues": [
+    "Family: Asparagaceae.",
+    "It is named after a youth in Greek myth.",
+    "It can be grown in water in a glass.",
+    "Its scent is very strong.",
+    "It is usually blue.",
+    "It is native to the Middle East.",
+    "Its flowers form a dense spike.",
+    "It grows from a bulb in spring.",
+    "The answer has 2 words (6, 8 letters).",
+    "It starts with the letter C."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/258425794/medium.jpeg",
+      "w": 500,
+      "h": 375,
+      "credit": "florawhite",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/258425794"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/258594216/medium.jpg",
+      "w": 375,
+      "h": 500,
+      "credit": "Laura Mae",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/258594216"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/360459321/medium.jpg",
+      "w": 376,
+      "h": 500,
+      "credit": "no rights reserved",
+      "license": "CC0 1.0",
+      "page": "https://www.inaturalist.org/photos/360459321"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "blue-passionflower",
+   "name": "Blue passionflower",
+   "alt": [
+    "passionflower",
+    "passion flower"
+   ],
+   "sci": "Passiflora caerulea",
+   "group": "passionflower",
+   "facts": {
+    "colour": "Blue",
+    "region": "South America"
+   },
+   "blurb": "An amazing-looking climbing flower with a ring of thread-like filaments. Its relatives produce passion fruit.",
+   "clues": [
+    "Missionaries linked its parts to the story of the crucifixion.",
+    "It climbs using curly tendrils.",
+    "It is native to South America.",
+    "It has a ring of thin filaments.",
+    "It comes from South America.",
+    "The answer has 2 words (4, 13 letters).",
+    "It starts with the letter B."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/59317442/medium.jpeg",
+      "w": 500,
+      "h": 375,
+      "credit": "Stephen Thorpe",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/59317442"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/169805900/medium.jpeg",
+      "w": 500,
+      "h": 333,
+      "credit": "Victoria Prosdocimo",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/169805900"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/484358495/medium.jpeg",
+      "w": 500,
+      "h": 333,
+      "credit": "Andrea Gantzer",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/484358495"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "spear-thistle",
+   "name": "Spear thistle",
+   "alt": [
+    "thistle"
+   ],
+   "sci": "Cirsium vulgare",
+   "group": "daisy family",
+   "facts": {
+    "colour": "Purple",
+    "region": "Europe"
+   },
+   "blurb": "A spiky plant with purple flower heads. The thistle is the national emblem of Scotland.",
+   "clues": [
+    "Family: Asteraceae.",
+    "Genus: Cirsium.",
+    "Goldfinches eat its seeds.",
+    "Its seeds float on fluffy parachutes.",
+    "A legend says it saved Scotland from invaders.",
+    "It is usually purple.",
+    "It is native to Europe.",
+    "It is covered in sharp prickles.",
+    "It is Scotland's national emblem.",
+    "The answer has 2 words (5, 7 letters).",
+    "It starts with the letter S."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/106346873/medium.jpg",
+      "w": 375,
+      "h": 500,
+      "credit": "Sandy Wolkenberg",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/106346873"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/147491/medium.jpg",
+      "w": 500,
+      "h": 331,
+      "credit": "Don Loarie",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/147491"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/296056732/medium.jpeg",
+      "w": 500,
+      "h": 333,
+      "credit": "no rights reserved",
+      "license": "CC0 1.0",
+      "page": "https://www.inaturalist.org/photos/296056732"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "common-heather",
+   "name": "Common heather",
+   "alt": [
+    "heather",
+    "ling"
+   ],
+   "sci": "Calluna vulgaris",
+   "group": "heath family",
+   "facts": {
+    "colour": "Purple",
+    "region": "Europe"
+   },
+   "blurb": "A low, tough shrub that turns moors purple in late summer. White heather is said to be lucky.",
+   "clues": [
+    "Family: Ericaceae.",
+    "Genus: Calluna.",
+    "White ones are said to bring luck.",
+    "Bees make a dark honey from it.",
+    "It was used to make brooms.",
+    "It is usually purple.",
+    "It is native to Europe.",
+    "It covers Scottish moors.",
+    "It turns hills purple in late summer.",
+    "The answer has 2 words (6, 7 letters).",
+    "It starts with the letter C."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/4882011/medium.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Andreas Rockstein",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/4882011"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/465747023/medium.jpg",
+      "w": 500,
+      "h": 331,
+      "credit": "zebedeugalinha",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/465747023"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/604184709/medium.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "zebedeugalinha",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/604184709"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "cornflower",
+   "name": "Cornflower",
+   "alt": [
+    "bachelor's button"
+   ],
+   "sci": "Centaurea cyanus",
+   "group": "daisy family",
+   "facts": {
+    "colour": "Blue",
+    "region": "Europe"
+   },
+   "blurb": "A bright blue wildflower that once grew in cornfields. A wreath of them was found in Tutankhamun's tomb.",
+   "clues": [
+    "Family: Asteraceae.",
+    "Genus: Centaurea.",
+    "Garlands of it were found in Tutankhamun's tomb.",
+    "It is a national symbol of Estonia.",
+    "It once grew as a weed among crops.",
+    "It is usually blue.",
+    "It is native to Europe.",
+    "A shade of blue is named after it.",
+    "It is named after a cereal field.",
+    "The answer is one word of 10 letters.",
+    "It starts with the letter C."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/143259788/medium.jpg",
+      "w": 335,
+      "h": 500,
+      "credit": "Douglas Goldman",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/143259788"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/292128300/medium.jpeg",
+      "w": 500,
+      "h": 270,
+      "credit": "Thomas Gyselinck",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/292128300"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/143259808/medium.jpg",
+      "w": 500,
+      "h": 335,
+      "credit": "Douglas Goldman",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/143259808"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "common-morning-glory",
+   "name": "Common morning glory",
+   "alt": [
+    "morning glory"
+   ],
+   "sci": "Ipomoea purpurea",
+   "group": "bindweed family",
+   "facts": {
+    "colour": "Purple",
+    "region": "the Americas"
+   },
+   "blurb": "A climbing vine with trumpet-shaped flowers that open in the morning and fade by afternoon.",
+   "clues": [
+    "Family: Convolvulaceae.",
+    "Genus: Ipomoea.",
+    "It is related to the sweet potato.",
+    "It twines up fences and poles.",
+    "Its flowers are trumpet-shaped.",
+    "It is usually purple.",
+    "It is native to the Americas.",
+    "Each flower lasts only one day.",
+    "Its flowers open early in the day.",
+    "The answer has 3 words (6, 7, 5 letters).",
+    "It starts with the letter C."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/338150076/medium.jpg",
+      "w": 500,
+      "h": 500,
+      "credit": "M. Whitson",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/338150076"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/222679360/medium.jpeg",
+      "w": 500,
+      "h": 333,
+      "credit": "Michelle W. （鍾偉瑋）",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/222679360"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/338150047/medium.jpg",
+      "w": 500,
+      "h": 446,
+      "credit": "M. Whitson",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/338150047"
+     }
+    ]
+   },
+   "difficulty": 3
+  }
+ ],
+ "questions": [
+  {
+   "id": "q1",
+   "kind": "mc",
+   "prompt": "What do bees collect from flowers to make honey?",
+   "answer": "Nectar",
+   "wrong": [
+    "Pollen",
+    "Petals",
+    "Seeds"
+   ],
+   "explain": "Bees also collect pollen, but honey is made from nectar.",
+   "difficulty": 1
+  },
+  {
+   "id": "q2",
+   "kind": "mc",
+   "prompt": "Which flower is worn to remember soldiers who died in war?",
+   "answer": "Poppy",
+   "wrong": [
+    "Rose",
+    "Daisy",
+    "Tulip"
+   ],
+   "explain": "Poppies grew on World War I battlefields.",
+   "difficulty": 1
+  },
+  {
+   "id": "q3",
+   "kind": "mc",
+   "prompt": "Which country is famous for its tulip fields?",
+   "answer": "The Netherlands",
+   "wrong": [
+    "Italy",
+    "Brazil",
+    "Egypt"
+   ],
+   "explain": "Tulips first came from Central Asia and Turkey.",
+   "difficulty": 1
+  },
+  {
+   "id": "q4",
+   "kind": "mc",
+   "prompt": "Which flower is the national flower of India?",
+   "answer": "Lotus",
+   "wrong": [
+    "Rose",
+    "Sunflower",
+    "Tulip"
+   ],
+   "explain": "The sacred lotus is a symbol in Hinduism and Buddhism.",
+   "difficulty": 2
+  },
+  {
+   "id": "q5",
+   "kind": "mc",
+   "prompt": "Which is the biggest single flower in the world?",
+   "answer": "Rafflesia",
+   "wrong": [
+    "Sunflower",
+    "Titan arum",
+    "Water lily"
+   ],
+   "explain": "Rafflesia arnoldii can be about 1 m across.",
+   "difficulty": 2
+  },
+  {
+   "id": "q6",
+   "kind": "mc",
+   "prompt": "Which flower is a symbol of Wales?",
+   "answer": "Daffodil",
+   "wrong": [
+    "Thistle",
+    "Rose",
+    "Shamrock"
+   ],
+   "explain": "Daffodils and leeks are both Welsh symbols.",
+   "difficulty": 2
+  },
+  {
+   "id": "q7",
+   "kind": "mc",
+   "prompt": "Which spice comes from the threads of a crocus flower?",
+   "answer": "Saffron",
+   "wrong": [
+    "Cinnamon",
+    "Pepper",
+    "Nutmeg"
+   ],
+   "explain": "It takes about 150,000 flowers to make a kilogram.",
+   "difficulty": 2
+  },
+  {
+   "id": "q8",
+   "kind": "tf",
+   "prompt": "The Venus flytrap eats insects.",
+   "answer": true,
+   "explain": "It digests insects to get nutrients missing from boggy soil.",
+   "difficulty": 1
+  },
+  {
+   "id": "q9",
+   "kind": "mc",
+   "prompt": "What does a hydrangea grown in acid soil look like?",
+   "answer": "Blue",
+   "wrong": [
+    "Pink",
+    "White",
+    "Black"
+   ],
+   "explain": "Aluminium taken up from acid soil turns the flowers blue.",
+   "difficulty": 3
+  },
+  {
+   "id": "q10",
+   "kind": "mc",
+   "prompt": "Which flower turns into a fluffy \"clock\" of seeds?",
+   "answer": "Dandelion",
+   "wrong": [
+    "Daisy",
+    "Buttercup",
+    "Rose"
+   ],
+   "explain": "Each seed floats away on a little parachute.",
+   "difficulty": 1
+  }
+ ],
+ "fakes": [
+  "Crimson starbell",
+  "Moonlight tulipwort",
+  "Golden ghost orchid lily",
+  "Silver-cup poppy",
+  "Blue lantern daisy",
+  "Northern velvet rose"
+ ],
+ "sources": [
+  {
+   "name": "iNaturalist",
+   "url": "https://www.inaturalist.org"
+  },
+  {
+   "name": "Wikidata",
+   "url": "https://www.wikidata.org"
+  }
+ ]
+}

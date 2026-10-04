@@ -1,0 +1,60 @@
+@id hits-1990s
+@title Hits of the 1990s
+@icon 💿
+@sources [{"name":"Billboard Year-End Hot 100 singles (1990–1999)","url":"https://en.wikipedia.org/wiki/Billboard_Year-End_Hot_100_singles_of_1990"},{"name":"UK best-selling singles by year","url":"https://en.wikipedia.org/wiki/List_of_best-selling_singles_by_year_(UK)"}]
+1990 | Wilson Phillips | Hold On
+1990 | Sinéad O'Connor | Nothing Compares 2 U | d=1
+1990 | Madonna | Vogue
+1990 | Mariah Carey | Vision of Love
+1990 | MC Hammer | U Can't Touch This | d=1; am=hammer
+1990 | Vanilla Ice | Ice Ice Baby | d=1
+1990 | Deee-Lite | Groove Is in the Heart
+1991 | Bryan Adams | (Everything I Do) I Do It for You
+1991 | Nirvana | Smells Like Teen Spirit | d=1
+1991 | R.E.M. | Losing My Religion | d=1
+1991 | Michael Jackson | Black or White
+1990 | C+C Music Factory | Gonna Make You Sweat (Everybody Dance Now) | am=c\+c|music factory; tm=gonna make you sweat
+1992 | Boyz II Men | End of the Road
+1992 | Sir Mix-a-Lot | Baby Got Back
+1992 | Kris Kross | Jump
+1992 | Whitney Houston | I Will Always Love You | d=1
+1992 | Billy Ray Cyrus | Achy Breaky Heart
+1991 | Red Hot Chili Peppers | Under the Bridge
+1993 | Haddaway | What Is Love | d=1
+1993 | UB40 | (I Can't Help) Falling in Love with You
+1993 | Meat Loaf | I'd Do Anything for Love (But I Won't Do That)
+1993 | Tag Team | Whoomp! (There It Is) | note=keepyear single released 1993; Apple only has a 1998 compilation
+1993 | Ace of Base | The Sign
+1994 | All-4-One | I Swear
+1994 | Boyz II Men | I'll Make Love to You
+1994 | Wet Wet Wet | Love Is All Around
+1994 | Lisa Loeb | Stay (I Missed You)
+1995 | Coolio | Gangsta's Paradise | d=1
+1995 | TLC | Waterfalls
+1994 | Seal | Kiss from a Rose
+1995 | Mariah Carey & Boyz II Men | One Sweet Day | am=mariah
+1995 | Oasis | Wonderwall | d=1
+1995 | Alanis Morissette | Ironic
+1996 | Celine Dion | Because You Loved Me
+1996 | Fugees | Killing Me Softly with His Song
+1996 | Spice Girls | Wannabe | d=1
+1996 | Blackstreet | No Diggity
+1996 | Toni Braxton | Un-Break My Heart
+1997 | Puff Daddy | I'll Be Missing You | am=puff daddy|diddy
+1997 | Hanson | MMMBop
+1997 | Aqua | Barbie Girl | d=1
+1997 | The Verve | Bitter Sweet Symphony
+1997 | Chumbawamba | Tubthumping
+1997 | Celine Dion | My Heart Will Go On | d=1
+1997 | Savage Garden | Truly Madly Deeply
+1998 | Cher | Believe | d=1
+1998 | Britney Spears | ...Baby One More Time | d=1; tm=baby one more time; alt=Baby One More Time
+1998 | Goo Goo Dolls | Iris
+1999 | TLC | No Scrubs
+1999 | Santana | Smooth | am=santana
+1999 | Ricky Martin | Livin' la Vida Loca
+1999 | Christina Aguilera | Genie in a Bottle
+1999 | Backstreet Boys | I Want It That Way | d=1
+1999 | Smash Mouth | All Star
+1999 | Lou Bega | Mambo No. 5 (A Little Bit Of...) | tm=mambo no
+1999 | Eiffel 65 | Blue (Da Ba Dee) | tm=blue

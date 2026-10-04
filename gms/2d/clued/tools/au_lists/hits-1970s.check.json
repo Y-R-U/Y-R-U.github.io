@@ -1,0 +1,476 @@
+{
+ "dropped": [],
+ "offby": [
+  "1971 apple 1970 (earliest original 1970)  Three Dog Night — Joy to the World  [Naturally]",
+  "1973 apple 1973 (earliest original 1970)  Roberta Flack — Killing Me Softly with His Song  [Killing Me Softly]",
+  "1973 apple 1973 (earliest original 1966)  Barbra Streisand — The Way We Were  [The Way We Were]",
+  "1975 apple 1975 (earliest original 1972)  Eagles — One of These Nights  [One of These Nights]",
+  "1979 apple 1979 (earliest original 1966)  Michael Jackson — Don't Stop 'Til You Get Enough  [Michael: Songs From The Motion Picture]"
+ ],
+ "items": [
+  {
+   "id": "bridge-over-troubled-water-simon-and-garfunkel",
+   "appleYear": 1970,
+   "album": "Bridge Over Troubled Water",
+   "appleArtist": "Simon & Garfunkel",
+   "appleTitle": "Bridge Over Troubled Water",
+   "year": 1970
+  },
+  {
+   "id": "they-long-to-be-close-to-you-carpenters",
+   "appleYear": 1970,
+   "album": "Close To You",
+   "appleArtist": "Carpenters",
+   "appleTitle": "(They Long To Be) Close To You",
+   "year": 1970
+  },
+  {
+   "id": "american-woman-the-guess-who",
+   "appleYear": 1970,
+   "album": "American Woman (Expanded Edition)",
+   "appleArtist": "The Guess Who",
+   "appleTitle": "American Woman",
+   "year": 1970
+  },
+  {
+   "id": "war-edwin-starr",
+   "appleYear": 1970,
+   "album": "War and Peace",
+   "appleArtist": "Edwin Starr",
+   "appleTitle": "War",
+   "year": 1970
+  },
+  {
+   "id": "abc-the-jackson-5",
+   "appleYear": 1970,
+   "album": "Boogie",
+   "appleArtist": "Jackson 5",
+   "appleTitle": "ABC",
+   "year": 1970
+  },
+  {
+   "id": "let-it-be-the-beatles",
+   "appleYear": 1970,
+   "album": "Let It Be",
+   "appleArtist": "The Beatles",
+   "appleTitle": "Let It Be",
+   "year": 1970
+  },
+  {
+   "id": "joy-to-the-world-three-dog-night",
+   "appleYear": 1970,
+   "album": "Naturally",
+   "appleArtist": "Three Dog Night",
+   "appleTitle": "Joy to the World",
+   "year": 1971
+  },
+  {
+   "id": "maggie-may-rod-stewart",
+   "appleYear": 1971,
+   "album": "The Definitive Rod Stewart",
+   "appleArtist": "Rod Stewart",
+   "appleTitle": "Maggie May (Remastered Version)",
+   "year": 1971
+  },
+  {
+   "id": "its-too-late-carole-king",
+   "appleYear": 1971,
+   "album": "Tapestry",
+   "appleArtist": "Carole King",
+   "appleTitle": "It's Too Late",
+   "year": 1971
+  },
+  {
+   "id": "how-can-you-mend-a-broken-heart-bee-gees",
+   "appleYear": 1971,
+   "album": "Trafalgar",
+   "appleArtist": "Bee Gees",
+   "appleTitle": "How Can You Mend a Broken Heart",
+   "year": 1971
+  },
+  {
+   "id": "brown-sugar-the-rolling-stones",
+   "appleYear": 1971,
+   "album": "Sticky Fingers (Super Deluxe Edition) [2010 Remaster]",
+   "appleArtist": "The Rolling Stones",
+   "appleTitle": "Brown Sugar",
+   "year": 1971
+  },
+  {
+   "id": "imagine-john-lennon",
+   "appleYear": 1971,
+   "album": "Imagine",
+   "appleArtist": "John Lennon",
+   "appleTitle": "Imagine",
+   "year": 1971
+  },
+  {
+   "id": "american-pie-don-mclean",
+   "appleYear": 1971,
+   "album": "American Pie",
+   "appleArtist": "Don Mclean",
+   "appleTitle": "American Pie (Full Length Version)",
+   "year": 1971
+  },
+  {
+   "id": "alone-again-naturally-gilbert-osullivan",
+   "appleYear": 1972,
+   "album": "Back to Front (Deluxe Edition)",
+   "appleArtist": "Gilbert O'Sullivan",
+   "appleTitle": "Alone Again (Naturally)",
+   "year": 1972
+  },
+  {
+   "id": "lean-on-me-bill-withers",
+   "appleYear": 1972,
+   "album": "God Bless America",
+   "appleArtist": "Bill Withers",
+   "appleTitle": "Lean On Me (Single Version)",
+   "year": 1972
+  },
+  {
+   "id": "lets-stay-together-al-green",
+   "appleYear": 1971,
+   "album": "Let's Stay Together",
+   "appleArtist": "Al Green",
+   "appleTitle": "Let's Stay Together",
+   "year": 1971
+  },
+  {
+   "id": "without-you-nilsson",
+   "appleYear": 1971,
+   "album": "Nilsson Schmilsson",
+   "appleArtist": "Harry Nilsson",
+   "appleTitle": "Without You",
+   "year": 1971
+  },
+  {
+   "id": "crocodile-rock-elton-john",
+   "appleYear": 1972,
+   "album": "Don't Shoot Me I'm Only The Piano Player (Bonus Tracks Version)",
+   "appleArtist": "Elton John",
+   "appleTitle": "Crocodile Rock",
+   "year": 1972
+  },
+  {
+   "id": "youre-so-vain-carly-simon",
+   "appleYear": 1972,
+   "album": "No Secrets",
+   "appleArtist": "Carly Simon",
+   "appleTitle": "You're So Vain",
+   "year": 1972
+  },
+  {
+   "id": "tie-a-yellow-ribbon-round-the-ole-oak-tree-tony-orlando-and-",
+   "appleYear": 1973,
+   "album": "Tuneweaving",
+   "appleArtist": "Dawn",
+   "appleTitle": "Tie a Yellow Ribbon Round the Ole Oak Tree",
+   "year": 1973
+  },
+  {
+   "id": "killing-me-softly-with-his-song-roberta-flack",
+   "appleYear": 1973,
+   "album": "Killing Me Softly",
+   "appleArtist": "Roberta Flack",
+   "appleTitle": "Killing Me Softly With His Song",
+   "year": 1973
+  },
+  {
+   "id": "lets-get-it-on-marvin-gaye",
+   "appleYear": 1973,
+   "album": "Love Songs Number 1's",
+   "appleArtist": "Marvin Gaye",
+   "appleTitle": "Let's Get It On",
+   "year": 1973
+  },
+  {
+   "id": "bad-bad-leroy-brown-jim-croce",
+   "appleYear": 1973,
+   "album": "Life & Times",
+   "appleArtist": "Jim Croce",
+   "appleTitle": "Bad, Bad Leroy Brown",
+   "year": 1973
+  },
+  {
+   "id": "waterloo-abba",
+   "appleYear": 1974,
+   "album": "Thank You For The Music",
+   "appleArtist": "ABBA",
+   "appleTitle": "Waterloo",
+   "year": 1974
+  },
+  {
+   "id": "kung-fu-fighting-carl-douglas",
+   "appleYear": 1974,
+   "album": "The Soul of the Kung Fu Fighter",
+   "appleArtist": "Carl Douglas",
+   "appleTitle": "Kung Fu Fighting",
+   "year": 1974
+  },
+  {
+   "id": "come-and-get-your-love-redbone",
+   "appleYear": 1973,
+   "album": "Come and Get Your Love - Single",
+   "appleArtist": "Redbone",
+   "appleTitle": "Come and Get Your Love",
+   "year": 1973
+  },
+  {
+   "id": "the-way-we-were-barbra-streisand",
+   "appleYear": 1973,
+   "album": "The Way We Were",
+   "appleArtist": "Barbra Streisand",
+   "appleTitle": "The Way We Were",
+   "year": 1973
+  },
+  {
+   "id": "love-will-keep-us-together-captain-and-tennille",
+   "appleYear": 1975,
+   "album": "Love Will Keep Us Together",
+   "appleArtist": "Captain & Tennille",
+   "appleTitle": "Love Will Keep Us Together",
+   "year": 1975
+  },
+  {
+   "id": "rhinestone-cowboy-glen-campbell",
+   "appleYear": 1975,
+   "album": "Rhinestone Cowboy (Expanded Edition)",
+   "appleArtist": "Glen Campbell",
+   "appleTitle": "Rhinestone Cowboy",
+   "year": 1975
+  },
+  {
+   "id": "jive-talkin-bee-gees",
+   "appleYear": 1975,
+   "album": "Main Course",
+   "appleArtist": "Bee Gees",
+   "appleTitle": "Jive Talkin'",
+   "year": 1975
+  },
+  {
+   "id": "fame-david-bowie",
+   "appleYear": 1975,
+   "album": "Young Americans (2016 Remaster)",
+   "appleArtist": "David Bowie",
+   "appleTitle": "Fame",
+   "year": 1975
+  },
+  {
+   "id": "one-of-these-nights-eagles",
+   "appleYear": 1975,
+   "album": "One of These Nights",
+   "appleArtist": "Eagles",
+   "appleTitle": "One of These Nights",
+   "year": 1975
+  },
+  {
+   "id": "lady-marmalade-labelle",
+   "appleYear": 1974,
+   "album": "Nightbirds",
+   "appleArtist": "LaBelle",
+   "appleTitle": "Lady Marmalade",
+   "year": 1974
+  },
+  {
+   "id": "bohemian-rhapsody-queen",
+   "appleYear": 1975,
+   "album": "A Night At The Opera (Deluxe Edition)",
+   "appleArtist": "Queen",
+   "appleTitle": "Bohemian Rhapsody",
+   "year": 1975
+  },
+  {
+   "id": "silly-love-songs-wings",
+   "appleYear": 1976,
+   "album": "Wings At The Speed Of Sound (2014 Remaster)",
+   "appleArtist": "Wings",
+   "appleTitle": "Silly Love Songs",
+   "year": 1976
+  },
+  {
+   "id": "dont-go-breaking-my-heart-elton-john-and-kiki-dee",
+   "appleYear": 1976,
+   "album": "Diamonds (Deluxe)",
+   "appleArtist": "Elton John & Kiki Dee",
+   "appleTitle": "Don't Go Breaking My Heart (Remastered)",
+   "year": 1976
+  },
+  {
+   "id": "play-that-funky-music-wild-cherry",
+   "appleYear": 1976,
+   "album": "Wild Cherry",
+   "appleArtist": "Wild Cherry",
+   "appleTitle": "Play That Funky Music",
+   "year": 1976
+  },
+  {
+   "id": "dancing-queen-abba",
+   "appleYear": 1976,
+   "album": "Arrival (Bonus Track Version)",
+   "appleArtist": "ABBA",
+   "appleTitle": "Dancing Queen",
+   "year": 1976
+  },
+  {
+   "id": "sir-duke-stevie-wonder",
+   "appleYear": 1976,
+   "album": "Songs in the Key of Life",
+   "appleArtist": "Stevie Wonder",
+   "appleTitle": "Sir Duke",
+   "year": 1976
+  },
+  {
+   "id": "hotel-california-eagles",
+   "appleYear": 1976,
+   "album": "Hotel California",
+   "appleArtist": "Eagles",
+   "appleTitle": "Hotel California",
+   "year": 1976
+  },
+  {
+   "id": "tonights-the-night-gonna-be-alright-rod-stewart",
+   "appleYear": 1976,
+   "album": "The Definitive Rod Stewart",
+   "appleArtist": "Rod Stewart",
+   "appleTitle": "Tonight's the Night (Gonna Be Alright) [2008 Remaster]",
+   "year": 1976
+  },
+  {
+   "id": "i-just-want-to-be-your-everything-andy-gibb",
+   "appleYear": 1977,
+   "album": "Flowing Rivers",
+   "appleArtist": "Andy Gibb",
+   "appleTitle": "I Just Want To Be Your Everything",
+   "year": 1977
+  },
+  {
+   "id": "best-of-my-love-the-emotions",
+   "appleYear": 1977,
+   "album": "Rejoice",
+   "appleArtist": "The Emotions",
+   "appleTitle": "Best of My Love",
+   "year": 1977
+  },
+  {
+   "id": "go-your-own-way-fleetwood-mac",
+   "appleYear": 1977,
+   "album": "Rumours (Super Deluxe Edition)",
+   "appleArtist": "Fleetwood Mac",
+   "appleTitle": "Go Your Own Way (Sessions, Roughs & Outtakes)",
+   "year": 1977
+  },
+  {
+   "id": "stayin-alive-bee-gees",
+   "appleYear": 1977,
+   "album": "Saturday Night Fever (The Original Movie Soundtrack)",
+   "appleArtist": "Bee Gees",
+   "appleTitle": "Stayin' Alive (From \"Saturday Night Fever\" Soundtrack)",
+   "year": 1977
+  },
+  {
+   "id": "shadow-dancing-andy-gibb",
+   "appleYear": 1978,
+   "album": "Shadow Dancing",
+   "appleArtist": "Andy Gibb",
+   "appleTitle": "Shadow Dancing",
+   "year": 1978
+  },
+  {
+   "id": "night-fever-bee-gees",
+   "appleYear": 1977,
+   "album": "Saturday Night Fever (The Original Movie Soundtrack) [Deluxe Edition]",
+   "appleArtist": "Bee Gees",
+   "appleTitle": "Night Fever",
+   "year": 1977
+  },
+  {
+   "id": "le-freak-chic",
+   "appleYear": 1978,
+   "album": "C'est Chic (2018 Remaster)",
+   "appleArtist": "Chic",
+   "appleTitle": "Le Freak (2018 Remaster)",
+   "year": 1978
+  },
+  {
+   "id": "youre-the-one-that-i-want-john-travolta-and-olivia-newton-jo",
+   "appleYear": 1978,
+   "album": "Grease (The Original Soundtrack from the Motion Picture)",
+   "appleArtist": "John Travolta & Olivia Newton-John",
+   "appleTitle": "You're the One That I Want",
+   "year": 1978
+  },
+  {
+   "id": "grease-frankie-valli",
+   "appleYear": 1978,
+   "album": "Frankie Valli... Is the Word",
+   "appleArtist": "Frankie Valli",
+   "appleTitle": "Grease",
+   "year": 1978
+  },
+  {
+   "id": "i-will-survive-gloria-gaynor",
+   "appleYear": 1978,
+   "album": "Love Tracks (Deluxe Edition)",
+   "appleArtist": "Gloria Gaynor",
+   "appleTitle": "I Will Survive (Extended Version)",
+   "year": 1978
+  },
+  {
+   "id": "y-m-c-a-village-people",
+   "appleYear": 1978,
+   "album": "20 #1’s: Disco",
+   "appleArtist": "Village People",
+   "appleTitle": "Y.M.C.A. (Single Version)",
+   "year": 1978
+  },
+  {
+   "id": "my-sharona-the-knack",
+   "appleYear": 1979,
+   "album": "Get the Knack",
+   "appleArtist": "The Knack",
+   "appleTitle": "My Sharona",
+   "year": 1979
+  },
+  {
+   "id": "hot-stuff-donna-summer",
+   "appleYear": 1979,
+   "album": "Bad Girls",
+   "appleArtist": "Donna Summer",
+   "appleTitle": "Hot Stuff",
+   "year": 1979
+  },
+  {
+   "id": "ring-my-bell-anita-ward",
+   "appleYear": 1979,
+   "album": "Ring My Bell",
+   "appleArtist": "Anita Ward",
+   "appleTitle": "Ring My Bell",
+   "year": 1979
+  },
+  {
+   "id": "heart-of-glass-blondie",
+   "appleYear": 1978,
+   "album": "Parallel Lines",
+   "appleArtist": "Blondie",
+   "appleTitle": "Heart of Glass",
+   "year": 1978
+  },
+  {
+   "id": "dont-stop-til-you-get-enough-michael-jackson",
+   "appleYear": 1979,
+   "album": "Michael: Songs From The Motion Picture",
+   "appleArtist": "Michael Jackson",
+   "appleTitle": "Don't Stop 'Til You Get Enough",
+   "year": 1979
+  },
+  {
+   "id": "another-brick-in-the-wall-pt-2-pink-floyd",
+   "appleYear": 1979,
+   "album": "The Wall",
+   "appleArtist": "Pink Floyd",
+   "appleTitle": "Another Brick In the Wall, Pt. 2",
+   "year": 1979
+  }
+ ]
+}

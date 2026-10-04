@@ -1,0 +1,66 @@
+@id hits-1980s
+@title Hits of the 1980s
+@icon 📼
+@sources [{"name":"Billboard Year-End Hot 100 singles (1980–1989)","url":"https://en.wikipedia.org/wiki/Billboard_Year-End_Hot_100_singles_of_1980"},{"name":"UK best-selling singles by year","url":"https://en.wikipedia.org/wiki/List_of_best-selling_singles_by_year_(UK)"}]
+1980 | Blondie | Call Me
+1980 | Queen | Another One Bites the Dust | d=1
+1979 | Queen | Crazy Little Thing Called Love
+1980 | Olivia Newton-John | Magic
+1979 | Michael Jackson | Rock with You
+1980 | Lipps Inc. | Funkytown | am=lipps
+1980 | AC/DC | Back in Black
+1981 | Kim Carnes | Bette Davis Eyes
+1981 | Diana Ross & Lionel Richie | Endless Love | am=diana ross
+1980 | Kenny Rogers | Lady
+1981 | Rick Springfield | Jessie's Girl
+1980 | Kool & The Gang | Celebration | d=1
+1980 | Dolly Parton | 9 to 5 | alt=Nine to Five
+1981 | Journey | Don't Stop Believin' | d=1
+1981 | Soft Cell | Tainted Love
+1981 | The Human League | Don't You Want Me
+1981 | Olivia Newton-John | Physical
+1982 | Survivor | Eye of the Tiger | d=1
+1981 | Joan Jett & The Blackhearts | I Love Rock 'n' Roll | am=joan jett
+1982 | Paul McCartney & Stevie Wonder | Ebony and Ivory | am=mccartney
+1982 | John Cougar | Jack & Diane | am=mellencamp|cougar
+1982 | Dexys Midnight Runners | Come On Eileen
+1982 | Toto | Africa | d=1
+1983 | The Police | Every Breath You Take | d=1
+1982 | Michael Jackson | Billie Jean | d=1
+1983 | Irene Cara | Flashdance... What a Feeling | tm=flashdance
+1982 | Michael Jackson | Beat It | note=keepyear on Thriller (Nov 1982), single 1983
+1983 | Bonnie Tyler | Total Eclipse of the Heart | d=1
+1983 | Eurythmics | Sweet Dreams (Are Made of This)
+1983 | Culture Club | Karma Chameleon
+1983 | Cyndi Lauper | Girls Just Want to Have Fun | d=1
+1984 | Prince | When Doves Cry
+1984 | Tina Turner | What's Love Got to Do with It
+1983 | Van Halen | Jump
+1984 | Kenny Loggins | Footloose
+1984 | Ray Parker Jr. | Ghostbusters | d=1
+1984 | Madonna | Like a Virgin | d=1
+1984 | Wham! | Wake Me Up Before You Go-Go
+1984 | George Michael | Careless Whisper | am=george michael|wham
+1984 | Foreigner | I Want to Know What Love Is
+1984 | Band Aid | Do They Know It's Christmas?
+1985 | USA for Africa | We Are the World
+1985 | Tears for Fears | Everybody Wants to Rule the World
+1985 | Dire Straits | Money for Nothing
+1985 | Dionne Warwick | That's What Friends Are For | am=dionne
+1986 | Bon Jovi | Livin' on a Prayer | d=1
+1986 | Berlin | Take My Breath Away
+1986 | The Bangles | Walk Like an Egyptian
+1986 | Madonna | Papa Don't Preach
+1987 | U2 | With or Without You
+1987 | Whitney Houston | I Wanna Dance with Somebody (Who Loves Me) | d=1; alt=I Wanna Dance with Somebody
+1987 | Rick Astley | Never Gonna Give You Up | d=1
+1987 | George Michael | Faith
+1987 | Guns N' Roses | Sweet Child o' Mine | d=1
+1987 | INXS | Need You Tonight
+1988 | Bobby McFerrin | Don't Worry, Be Happy | d=1
+1987 | Michael Jackson | Man in the Mirror
+1988 | Paula Abdul | Straight Up
+1989 | Madonna | Like a Prayer
+1989 | Phil Collins | Another Day in Paradise
+1988 | Bette Midler | Wind Beneath My Wings
+1989 | Black Box | Ride on Time

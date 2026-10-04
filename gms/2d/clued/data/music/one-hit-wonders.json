@@ -1,0 +1,1024 @@
+{
+ "id": "one-hit-wonders",
+ "title": "One-hit wonders",
+ "theme": "music",
+ "icon": "🌠",
+ "kids": false,
+ "version": 1,
+ "notice": "30-second previews stream from Apple Music.",
+ "factsMeta": {
+  "artist": {
+   "type": "cat",
+   "label": "Artist"
+  },
+  "year": {
+   "type": "year",
+   "label": "Released",
+   "higherLabel": "Newer"
+  },
+  "decade": {
+   "type": "cat",
+   "label": "Decade"
+  }
+ },
+ "items": [
+  {
+   "id": "spirit-in-the-sky-norman-greenbaum",
+   "name": "Spirit in the Sky",
+   "group": "1960s",
+   "facts": {
+    "artist": "Norman Greenbaum",
+    "year": 1969,
+    "decade": "1960s"
+   },
+   "blurb": "\"Spirit in the Sky\" by Norman Greenbaum, released in 1969.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/9d/bc/9e/9dbc9e1d-599e-711d-46fe-15afd75a3988/mzaf_11053192268213103738.plus.aac.p.m4a",
+      "credit": "Norman Greenbaum: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/spirit-in-the-sky/1462211353?i=1462211356&uo=4",
+      "apple": {
+       "trackId": 1462211356,
+       "url": "https://music.apple.com/us/album/spirit-in-the-sky/1462211353?i=1462211356&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music116/v4/91/78/c8/9178c88b-ff65-6e4b-f8af-a5ab0c938b53/14UMDIM02986.rgb.jpg/300x300bb.jpg",
+       "term": "Norman Greenbaum Spirit In the Sky"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "in-the-year-2525-zager-and-evans",
+   "name": "In the Year 2525",
+   "group": "1960s",
+   "facts": {
+    "artist": "Zager & Evans",
+    "year": 1969,
+    "decade": "1960s"
+   },
+   "blurb": "\"In the Year 2525\" by Zager & Evans, released in 1969.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview115/v4/9d/bd/7f/9dbd7f3f-d5bb-6743-eae0-39a063371859/mzaf_10061041778653318765.plus.aac.p.m4a",
+      "credit": "Zager & Evans: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/in-the-year-2525-exordium-terminus/1268962643?i=1268962872&uo=4",
+      "apple": {
+       "trackId": 1268962872,
+       "url": "https://music.apple.com/us/album/in-the-year-2525-exordium-terminus/1268962643?i=1268962872&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music114/v4/d8/02/1d/d8021da7-dacd-81aa-1415-743eb333ed81/886445806359.jpg/300x300bb.jpg",
+       "term": "Zager & Evans In the Year 2525"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "popcorn-hot-butter",
+   "name": "Popcorn",
+   "group": "1970s",
+   "facts": {
+    "artist": "Hot Butter",
+    "year": 1972,
+    "decade": "1970s"
+   },
+   "blurb": "\"Popcorn\" by Hot Butter, released in 1972.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/Music/v4/1a/0d/41/1a0d419b-81fc-1430-9446-ce3139a8f496/mzaf_6304692052275531557.plus.aac.p.m4a",
+      "credit": "Hot Butter: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/popcorn/362239590?i=362239665&uo=4",
+      "apple": {
+       "trackId": 362239665,
+       "url": "https://music.apple.com/us/album/popcorn/362239590?i=362239665&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music/d2/2f/e3/mzi.rtejzmap.jpg/300x300bb.jpg",
+       "term": "Hot Buttered Popcorn Popcorn"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "brandy-youre-a-fine-girl-looking-glass",
+   "name": "Brandy (You're a Fine Girl)",
+   "group": "1970s",
+   "facts": {
+    "artist": "Looking Glass",
+    "year": 1972,
+    "decade": "1970s"
+   },
+   "blurb": "\"Brandy (You're a Fine Girl)\" by Looking Glass, released in 1972.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/6a/83/fa/6a83fac3-b026-7d8f-ea28-dd9fc3a97924/mzaf_13802065516100949048.plus.aac.p.m4a",
+      "credit": "Looking Glass: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/brandy-youre-a-fine-girl/388158145?i=388158216&uo=4",
+      "apple": {
+       "trackId": 388158216,
+       "url": "https://music.apple.com/us/album/brandy-youre-a-fine-girl/388158145?i=388158216&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music125/v4/c4/0c/cf/c40ccfe6-b4db-a03d-e4bd-ce3c179c15ab/884977715002.jpg/300x300bb.jpg",
+       "term": "Looking Glass Brandy"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "kung-fu-fighting-carl-douglas",
+   "name": "Kung Fu Fighting",
+   "group": "1970s",
+   "facts": {
+    "artist": "Carl Douglas",
+    "year": 1974,
+    "decade": "1970s"
+   },
+   "blurb": "\"Kung Fu Fighting\" by Carl Douglas, released in 1974.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/2d/26/c6/2d26c66d-eb2e-c861-40d9-b2a762196208/mzaf_8897577051555614309.plus.aac.p.m4a",
+      "credit": "Carl Douglas: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/kung-fu-fighting/1436092812?i=1436092826&uo=4",
+      "apple": {
+       "trackId": 1436092826,
+       "url": "https://music.apple.com/us/album/kung-fu-fighting/1436092812?i=1436092826&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music128/v4/a3/39/d0/a339d06c-ec27-a414-ed4e-a8783d474d4b/5414939482373.jpg/300x300bb.jpg",
+       "term": "Carl Douglas Kung Fu Fighting"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "play-that-funky-music-wild-cherry",
+   "name": "Play That Funky Music",
+   "group": "1970s",
+   "facts": {
+    "artist": "Wild Cherry",
+    "year": 1976,
+    "decade": "1970s"
+   },
+   "blurb": "\"Play That Funky Music\" by Wild Cherry, released in 1976.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/84/9a/e3/849ae35d-acdc-8f93-7c59-760d7594c406/mzaf_2143528349432358338.plus.aac.p.m4a",
+      "credit": "Wild Cherry: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/play-that-funky-music/198226103?i=198226129&uo=4",
+      "apple": {
+       "trackId": 198226129,
+       "url": "https://music.apple.com/us/album/play-that-funky-music/198226103?i=198226129&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music125/v4/af/f6/0c/aff60ca6-7385-e47d-7681-e5f73910665c/mzi.fjlfxpyy.jpg/300x300bb.jpg",
+       "term": "Wild Cherry Play That Funky Music"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "video-killed-the-radio-star-the-buggles",
+   "name": "Video Killed the Radio Star",
+   "group": "1970s",
+   "facts": {
+    "artist": "The Buggles",
+    "year": 1979,
+    "decade": "1970s"
+   },
+   "blurb": "\"Video Killed the Radio Star\" by The Buggles, released in 1979.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/f8/86/41/f8864178-e88b-c457-ba5e-d3735c24b64b/mzaf_11658591132409709159.plus.aac.p.m4a",
+      "credit": "The Buggles: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/video-killed-the-radio-star/1444090125?i=1444090128&uo=4",
+      "apple": {
+       "trackId": 1444090128,
+       "url": "https://music.apple.com/us/album/video-killed-the-radio-star/1444090125?i=1444090128&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/16/21/ea/1621eaf0-f7c8-c9e9-5eaf-e11a7ec87610/06UMGIM01037.rgb.jpg/300x300bb.jpg",
+       "term": "The Buggles Video Killed the Radio Star"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "rappers-delight-the-sugarhill-gang",
+   "name": "Rapper's Delight",
+   "group": "1970s",
+   "facts": {
+    "artist": "The Sugarhill Gang",
+    "year": 1979,
+    "decade": "1970s"
+   },
+   "blurb": "\"Rapper's Delight\" by The Sugarhill Gang, released in 1979.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview125/v4/d3/1f/68/d31f68c6-2fad-bbb1-80de-774c47609c18/mzaf_1052928966026709958.plus.aac.p.m4a",
+      "credit": "The Sugarhill Gang: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/rappers-delight-single-version/1220781024?i=1220781120&uo=4",
+      "apple": {
+       "trackId": 1220781120,
+       "url": "https://music.apple.com/us/album/rappers-delight-single-version/1220781024?i=1220781120&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music122/v4/33/d8/29/33d829b5-f510-27f8-f50c-b00cd3c0b9e6/084247961713.jpg/300x300bb.jpg",
+       "term": "The Sugarhill Gang Rapper's Delight"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "pop-muzik-m",
+   "name": "Pop Muzik",
+   "group": "1970s",
+   "facts": {
+    "artist": "M",
+    "year": 1979,
+    "decade": "1970s"
+   },
+   "blurb": "\"Pop Muzik\" by M, released in 1979.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/a7/ca/b0/a7cab019-a58a-d72d-8c6d-4eb844595729/mzaf_15391125805172221413.plus.aac.p.m4a",
+      "credit": "M: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/pop-muzik-nik-launay-79-12/1436343759?i=1436344063&uo=4",
+      "apple": {
+       "trackId": 1436344063,
+       "url": "https://music.apple.com/us/album/pop-muzik-nik-launay-79-12/1436343759?i=1436344063&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music128/v4/8a/40/a8/8a40a870-d158-5368-f8da-da744cde9f36/0698458122483.jpg/300x300bb.jpg",
+       "term": "M Pop Muzik"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "turning-japanese-the-vapors",
+   "name": "Turning Japanese",
+   "group": "1980s",
+   "facts": {
+    "artist": "The Vapors",
+    "year": 1980,
+    "decade": "1980s"
+   },
+   "blurb": "\"Turning Japanese\" by The Vapors, released in 1980.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/95/07/96/950796bb-494f-5c4f-20f4-2d16d7dd79d4/mzaf_6892562272385970691.plus.aac.p.m4a",
+      "credit": "The Vapors: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/turning-japanese-non-stop-edit/1343833738?i=1343834082&uo=4",
+      "apple": {
+       "trackId": 1343834082,
+       "url": "https://music.apple.com/us/album/turning-japanese-non-stop-edit/1343833738?i=1343834082&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music128/v4/e7/4b/19/e74b191d-7703-ea08-9738-96c384272924/888072050648.jpg/300x300bb.jpg",
+       "term": "The Vapors Turning Japanese"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "funkytown-lipps-inc",
+   "name": "Funkytown",
+   "group": "1970s",
+   "facts": {
+    "artist": "Lipps Inc.",
+    "year": 1979,
+    "decade": "1970s"
+   },
+   "blurb": "\"Funkytown\" by Lipps Inc., released in 1979.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/73/6b/19/736b196c-9851-2860-457e-51b1e228558a/mzaf_8722409030863972870.plus.aac.p.m4a",
+      "credit": "Lipps Inc.: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/funkytown-long-version/1443828321?i=1443828328&uo=4",
+      "apple": {
+       "trackId": 1443828328,
+       "url": "https://music.apple.com/us/album/funkytown-long-version/1443828321?i=1443828328&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/f2/8c/af/f28cafdd-e76e-5cef-42f9-80670b65f1ab/00044006305622.rgb.jpg/300x300bb.jpg",
+       "term": "Lipps, Inc. Funkytown"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "mickey-toni-basil",
+   "name": "Mickey",
+   "group": "1980s",
+   "facts": {
+    "artist": "Toni Basil",
+    "year": 1981,
+    "decade": "1980s"
+   },
+   "blurb": "\"Mickey\" by Toni Basil, released in 1981.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/47/0a/30/470a3026-0b21-13bd-e82a-d439c46988e8/mzaf_8873610037003132824.plus.aac.p.m4a",
+      "credit": "Toni Basil: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/gb/album/mickey/1765368952?i=1765368963&uo=4",
+      "apple": {
+       "trackId": 1765368963,
+       "url": "https://music.apple.com/gb/album/mickey/1765368952?i=1765368963&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/48/be/0e/48be0e5d-6b88-c7f3-b357-fa7ce68a4c38/148734.jpg/300x300bb.jpg",
+       "term": "Toni Basil Mickey"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "the-safety-dance-men-without-hats",
+   "name": "The Safety Dance",
+   "group": "1980s",
+   "facts": {
+    "artist": "Men Without Hats",
+    "year": 1982,
+    "decade": "1980s"
+   },
+   "blurb": "\"The Safety Dance\" by Men Without Hats, released in 1982.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/fd/f7/58/fdf75894-55c4-5d8a-71c7-27eebe413f0e/mzaf_6334821249560998159.plus.aac.p.m4a",
+      "credit": "Men Without Hats: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/the-safety-dance-short-version/1479631156?i=1479631804&uo=4",
+      "apple": {
+       "trackId": 1479631804,
+       "url": "https://music.apple.com/us/album/the-safety-dance-short-version/1479631156?i=1479631804&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/cb/2c/f3/cb2cf301-38f9-22d4-454e-eabcf3362763/19UMGIM75866.rgb.jpg/300x300bb.jpg",
+       "term": "Men Without Hats The Safety Dance"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "99-luftballons-nena",
+   "name": "99 Luftballons",
+   "group": "1980s",
+   "facts": {
+    "artist": "Nena",
+    "year": 1983,
+    "decade": "1980s"
+   },
+   "blurb": "\"99 Luftballons\" by Nena, released in 1983.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/a7/6e/fb/a76efb31-b380-673f-886d-a31b8f763815/mzaf_1652288231289913225.plus.aac.p.m4a",
+      "credit": "Nena: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/99-luftballons/1446013584?i=1446013598&uo=4",
+      "apple": {
+       "trackId": 1446013598,
+       "url": "https://music.apple.com/us/album/99-luftballons/1446013584?i=1446013598&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music128/v4/58/b3/df/58b3df70-d2e0-80e9-3f98-87d63fb9f02e/0859381162407.jpg/300x300bb.jpg",
+       "term": "Nena 99 Luftballons"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "come-on-eileen-dexys-midnight-runners",
+   "name": "Come On Eileen",
+   "group": "1980s",
+   "facts": {
+    "artist": "Dexys Midnight Runners",
+    "year": 1982,
+    "decade": "1980s"
+   },
+   "blurb": "\"Come On Eileen\" by Dexys Midnight Runners, released in 1982.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/99/3f/2f/993f2f79-eff6-8bb6-5620-89297ab82bf9/mzaf_8325234611055133997.plus.aac.p.m4a",
+      "credit": "Dexys Midnight Runners: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/come-on-eileen/1490913660?i=1490914106&uo=4",
+      "apple": {
+       "trackId": 1490914106,
+       "url": "https://music.apple.com/us/album/come-on-eileen/1490913660?i=1490914106&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/98/a5/7c/98a57c6d-c857-90bb-5835-fdd60699bf05/06UMGIM09147.rgb.jpg/300x300bb.jpg",
+       "term": "Dexys Midnight Runners Come On Eileen"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "dont-worry-be-happy-bobby-mcferrin",
+   "name": "Don't Worry, Be Happy",
+   "group": "1980s",
+   "facts": {
+    "artist": "Bobby McFerrin",
+    "year": 1988,
+    "decade": "1980s"
+   },
+   "blurb": "\"Don't Worry, Be Happy\" by Bobby McFerrin, released in 1988.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/89/57/92/895792e3-563f-d840-5c09-65a872c8f702/mzaf_5070569243041448906.plus.aac.p.m4a",
+      "credit": "Bobby McFerrin: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/dont-worry-be-happy/723398262?i=723398328&uo=4",
+      "apple": {
+       "trackId": 723398328,
+       "url": "https://music.apple.com/us/album/dont-worry-be-happy/723398262?i=723398328&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music116/v4/be/15/97/be159727-1ea2-73bb-c9a8-03e320bb064d/13UABIM59265.rgb.jpg/300x300bb.jpg",
+       "term": "Bobby McFerrin Don't Worry, Be Happy"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "groove-is-in-the-heart-deee-lite",
+   "name": "Groove Is in the Heart",
+   "group": "1990s",
+   "facts": {
+    "artist": "Deee-Lite",
+    "year": 1990,
+    "decade": "1990s"
+   },
+   "blurb": "\"Groove Is in the Heart\" by Deee-Lite, released in 1990.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/f3/3e/76/f33e769d-13c9-f31d-706d-1d419779ce2a/mzaf_5305677381400026069.plus.aac.p.m4a",
+      "credit": "Deee-Lite: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/groove-is-in-the-heart/72784411?i=72784339&uo=4",
+      "apple": {
+       "trackId": 72784339,
+       "url": "https://music.apple.com/us/album/groove-is-in-the-heart/72784411?i=72784339&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music125/v4/80/e2/27/80e227e7-df3f-a753-fb49-2b85ee811cca/s07.ixthhqeh.jpg/300x300bb.jpg",
+       "term": "Deee-Lite Groove Is In the Heart"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "im-too-sexy-right-said-fred",
+   "name": "I'm Too Sexy",
+   "group": "1990s",
+   "facts": {
+    "artist": "Right Said Fred",
+    "year": 1991,
+    "decade": "1990s"
+   },
+   "blurb": "\"I'm Too Sexy\" by Right Said Fred, released in 1991.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/a2/aa/3c/a2aa3c56-b1db-64f8-24fc-61b0cd33149b/mzaf_16162324708631397233.plus.aac.p.m4a",
+      "credit": "Right Said Fred: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/im-too-sexy/715829294?i=715829705&uo=4",
+      "apple": {
+       "trackId": 715829705,
+       "url": "https://music.apple.com/us/album/im-too-sexy/715829294?i=715829705&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music114/v4/af/48/9b/af489b4e-b6d5-3b5a-198b-445c6aa8c8fb/00077778627753.tif/300x300bb.jpg",
+       "term": "Right Said Fred I'm Too Sexy"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "how-bizarre-omc",
+   "name": "How Bizarre",
+   "group": "1990s",
+   "facts": {
+    "artist": "OMC",
+    "year": 1995,
+    "decade": "1990s"
+   },
+   "blurb": "\"How Bizarre\" by OMC, released in 1995.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/ec/6a/88/ec6a88bd-84eb-05c3-ee2b-9872a94bbc95/mzaf_17535667071610424694.plus.aac.p.m4a",
+      "credit": "OMC: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/how-bizarre/1442659830?i=1442660221&uo=4",
+      "apple": {
+       "trackId": 1442660221,
+       "url": "https://music.apple.com/us/album/how-bizarre/1442659830?i=1442660221&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/5e/0f/42/5e0f42b4-0655-61b2-28fa-9a34208cd18f/06UMGIM53688.rgb.jpg/300x300bb.jpg",
+       "term": "OMC How Bizarre"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "tubthumping-chumbawamba",
+   "name": "Tubthumping",
+   "group": "1990s",
+   "facts": {
+    "artist": "Chumbawamba",
+    "year": 1997,
+    "decade": "1990s"
+   },
+   "blurb": "\"Tubthumping\" by Chumbawamba, released in 1997.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview115/v4/b6/d2/ac/b6d2ac02-2784-81f6-d763-08e0b2be1dfe/mzaf_12670863909406805270.plus.aac.p.m4a",
+      "credit": "Chumbawamba: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/tubthumping/713773439?i=713773457&uo=4",
+      "apple": {
+       "trackId": 713773457,
+       "url": "https://music.apple.com/us/album/tubthumping/713773439?i=713773457&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music125/v4/e0/a1/ef/e0a1ef4a-6aa6-f614-6351-05a348fd4b56/13UABIM57031.rgb.jpg/300x300bb.jpg",
+       "term": "Chumbawamba Tubthumping"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "steal-my-sunshine-len",
+   "name": "Steal My Sunshine",
+   "group": "1990s",
+   "facts": {
+    "artist": "Len",
+    "year": 1999,
+    "decade": "1990s"
+   },
+   "blurb": "\"Steal My Sunshine\" by Len, released in 1999.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/83/6d/19/836d19dc-c765-bd37-fb46-222b1c1d702a/mzaf_15932800181967618349.plus.aac.p.m4a",
+      "credit": "Len: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/steal-my-sunshine/459816205?i=459816208&uo=4",
+      "apple": {
+       "trackId": 459816208,
+       "url": "https://music.apple.com/us/album/steal-my-sunshine/459816205?i=459816208&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/2c/05/5d/2c055dd5-d368-6762-4ad8-5b1fce635f5d/886443168640.jpg/300x300bb.jpg",
+       "term": "LEN Steal My Sunshine"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "mambo-no-5-a-little-bit-of-lou-bega",
+   "name": "Mambo No. 5 (A Little Bit Of...)",
+   "group": "1990s",
+   "facts": {
+    "artist": "Lou Bega",
+    "year": 1999,
+    "decade": "1990s"
+   },
+   "blurb": "\"Mambo No. 5 (A Little Bit Of...)\" by Lou Bega, released in 1999.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/95/12/14/951214ff-a3f2-7b9c-094c-385b382b5a14/mzaf_6010878480642586774.plus.aac.p.m4a",
+      "credit": "Lou Bega: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/mambo-no-5-a-little-bit-of/1322068623?i=1322068804&uo=4",
+      "apple": {
+       "trackId": 1322068804,
+       "url": "https://music.apple.com/us/album/mambo-no-5-a-little-bit-of/1322068623?i=1322068804&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music125/v4/68/59/96/68599610-92f1-4400-8db3-4e794e2f2757/886446819020.jpg/300x300bb.jpg",
+       "term": "Lou Bega Mambo No. 5"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "blue-da-ba-dee-eiffel-65",
+   "name": "Blue (Da Ba Dee)",
+   "group": "1990s",
+   "facts": {
+    "artist": "Eiffel 65",
+    "year": 1999,
+    "decade": "1990s"
+   },
+   "blurb": "\"Blue (Da Ba Dee)\" by Eiffel 65, released in 1999.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/e8/53/84/e85384b1-b2cc-41fa-140b-f7341234a4ca/mzaf_15329390040173012367.plus.aac.p.m4a",
+      "credit": "Eiffel 65: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/blue/1791038984?i=1791038986&uo=4",
+      "apple": {
+       "trackId": 1791038986,
+       "url": "https://music.apple.com/us/album/blue/1791038984?i=1791038986&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/dc/fc/5c/dcfc5ca2-f9a7-e457-a125-bd38e674cdf5/4065328582955.png/300x300bb.jpg",
+       "term": "Mat1ne, PED1NE & Eiffel 65 Blue"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "who-let-the-dogs-out-baha-men",
+   "name": "Who Let the Dogs Out",
+   "group": "2000s",
+   "facts": {
+    "artist": "Baha Men",
+    "year": 2000,
+    "decade": "2000s"
+   },
+   "blurb": "\"Who Let the Dogs Out\" by Baha Men, released in 2000.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/06/f3/e1/06f3e17f-51ca-6ab9-b994-e2052329925a/mzaf_1294416854126703238.plus.aac.p.m4a",
+      "credit": "Baha Men: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/who-let-the-dogs-out/723351610?i=723351644&uo=4",
+      "apple": {
+       "trackId": 723351644,
+       "url": "https://music.apple.com/us/album/who-let-the-dogs-out/723351610?i=723351644&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music122/v4/0b/37/10/0b3710e7-f427-939f-88b2-56ec186a6f03/13UABIM51494.rgb.jpg/300x300bb.jpg",
+       "term": "Baha Men Who Let the Dogs Out"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "the-ketchup-song-asereje-las-ketchup",
+   "name": "The Ketchup Song (Aserejé)",
+   "group": "2000s",
+   "facts": {
+    "artist": "Las Ketchup",
+    "year": 2002,
+    "decade": "2000s"
+   },
+   "blurb": "\"The Ketchup Song (Aserejé)\" by Las Ketchup, released in 2002.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/fc/43/9a/fc439a2f-29d6-14b5-83aa-f864ecc669c1/mzaf_17692198284863357917.plus.aac.p.m4a",
+      "credit": "Las Ketchup: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/the-ketchup-song-aserej%C3%A9-chiringuito-club-single-edit/1362213722?i=1362216854&uo=4",
+      "apple": {
+       "trackId": 1362216854,
+       "url": "https://music.apple.com/us/album/the-ketchup-song-aserej%C3%A9-chiringuito-club-single-edit/1362213722?i=1362216854&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music62/v4/05/56/27/05562700-1d3a-0f27-9fa3-1fd9cdd05f9f/192562272527.jpg/300x300bb.jpg",
+       "term": "Las Ketchup The Ketchup Song"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "stacys-mom-fountains-of-wayne",
+   "name": "Stacy's Mom",
+   "group": "2000s",
+   "facts": {
+    "artist": "Fountains of Wayne",
+    "year": 2003,
+    "decade": "2000s"
+   },
+   "blurb": "\"Stacy's Mom\" by Fountains of Wayne, released in 2003.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/41/92/1f/41921f95-dfb3-8057-3944-b7022b716ebe/mzaf_887188329895614171.plus.aac.p.m4a",
+      "credit": "Fountains of Wayne: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/stacys-mom/712721721?i=712721787&uo=4",
+      "apple": {
+       "trackId": 712721787,
+       "url": "https://music.apple.com/us/album/stacys-mom/712721721?i=712721787&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/1e/45/bd/1e45bdc7-54fb-1b2c-e401-b30ce8e08442/13UABIM51319.rgb.jpg/300x300bb.jpg",
+       "term": "Fountains Of Wayne Stacy's Mom"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "bad-day-daniel-powter",
+   "name": "Bad Day",
+   "group": "2000s",
+   "facts": {
+    "artist": "Daniel Powter",
+    "year": 2005,
+    "decade": "2000s"
+   },
+   "blurb": "\"Bad Day\" by Daniel Powter, released in 2005.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/e4/ae/91/e4ae912a-0685-a7c6-b10c-b7290a7fb16f/mzaf_16493963156495176302.plus.aac.p.m4a",
+      "credit": "Daniel Powter: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/bad-day/63816246?i=63816165&uo=4",
+      "apple": {
+       "trackId": 63816165,
+       "url": "https://music.apple.com/us/album/bad-day/63816246?i=63816165&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music/90/db/17/mzi.tiuteyft.jpg/300x300bb.jpg",
+       "term": "Daniel Powter Bad Day"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "crazy-gnarls-barkley",
+   "name": "Crazy",
+   "group": "2000s",
+   "facts": {
+    "artist": "Gnarls Barkley",
+    "year": 2006,
+    "decade": "2000s"
+   },
+   "blurb": "\"Crazy\" by Gnarls Barkley, released in 2006.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/ec/e1/4e/ece14e48-8c7b-ff66-7fe1-fa2af50cdc10/mzaf_15490780879090368893.plus.aac.p.m4a",
+      "credit": "Gnarls Barkley: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/crazy/1741403959?i=1741403966&uo=4",
+      "apple": {
+       "trackId": 1741403966,
+       "url": "https://music.apple.com/us/album/crazy/1741403959?i=1741403966&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/fc/6e/1e/fc6e1e95-7f93-09d8-455e-2f24a537a71f/603497823703.jpg/300x300bb.jpg",
+       "term": "Gnarls Barkley Crazy"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "somebody-that-i-used-to-know-gotye",
+   "name": "Somebody That I Used to Know",
+   "group": "2010s",
+   "facts": {
+    "artist": "Gotye",
+    "year": 2011,
+    "decade": "2010s"
+   },
+   "blurb": "\"Somebody That I Used to Know\" by Gotye, released in 2011.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/4a/63/85/4a6385ef-b80a-5e40-0bf2-245fa5b3dc52/mzaf_1146936378720252898.plus.aac.p.m4a",
+      "credit": "Gotye: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/somebody-that-i-used-to-know-feat-kimbra/1440754000?i=1440754487&uo=4",
+      "apple": {
+       "trackId": 1440754487,
+       "url": "https://music.apple.com/us/album/somebody-that-i-used-to-know-feat-kimbra/1440754000?i=1440754487&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/b3/8a/98/b38a9867-2a9c-de2f-2d80-c624fb2200ec/11UMGIM19347.rgb.jpg/300x300bb.jpg",
+       "term": "Gotye Somebody That I Used to Know"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "gangnam-style-psy",
+   "name": "Gangnam Style",
+   "group": "2010s",
+   "facts": {
+    "artist": "PSY",
+    "year": 2012,
+    "decade": "2010s"
+   },
+   "blurb": "\"Gangnam Style\" by PSY, released in 2012.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/00/53/c6/0053c6f7-6342-7a3d-37c5-60b896948bdb/mzaf_10727579274479911915.plus.aac.p.m4a",
+      "credit": "PSY: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/gangnam-style/1445144506?i=1445144527&uo=4",
+      "apple": {
+       "trackId": 1445144527,
+       "url": "https://music.apple.com/us/album/gangnam-style/1445144506?i=1445144527&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/7c/52/87/7c5287bc-818f-55ed-e607-08b052963632/12UMGIM50914.rgb.jpg/300x300bb.jpg",
+       "term": "PSY Gangnam Style"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "harlem-shake-baauer",
+   "name": "Harlem Shake",
+   "group": "2010s",
+   "facts": {
+    "artist": "Baauer",
+    "year": 2012,
+    "decade": "2010s"
+   },
+   "blurb": "\"Harlem Shake\" by Baauer, released in 2012.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/81/f3/01/81f3016c-8ae9-1888-4780-cabdbdc3bd6c/mzaf_5564874067446000717.plus.aac.p.m4a",
+      "credit": "Baauer: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/harlem-shake/601136812?i=601136935&uo=4",
+      "apple": {
+       "trackId": 601136935,
+       "url": "https://music.apple.com/us/album/harlem-shake/601136812?i=601136935&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/e1/fc/36/e1fc3610-7985-814a-8faa-80ec14412c94/340.jpg/300x300bb.jpg",
+       "term": "Baauer Harlem Shake"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "rude-magic",
+   "name": "Rude",
+   "group": "2010s",
+   "facts": {
+    "artist": "MAGIC!",
+    "year": 2013,
+    "decade": "2010s"
+   },
+   "blurb": "\"Rude\" by MAGIC!, released in 2013.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/41/32/08/413208e4-3d6e-eddc-b9b9-8fc7f1040e08/mzaf_80700342777456642.plus.aac.p.m4a",
+      "credit": "MAGIC!: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/rude/881629097?i=881629103&uo=4",
+      "apple": {
+       "trackId": 881629103,
+       "url": "https://music.apple.com/us/album/rude/881629097?i=881629103&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/2a/46/74/2a4674c2-889f-4f6b-e4e9-b3693f8ee962/886444607650.jpg/300x300bb.jpg",
+       "term": "MAGIC! Rude"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "cheerleader-felix-jaehn-remix-omi",
+   "name": "Cheerleader (Felix Jaehn Remix)",
+   "group": "2010s",
+   "facts": {
+    "artist": "OMI",
+    "year": 2014,
+    "decade": "2010s"
+   },
+   "blurb": "\"Cheerleader (Felix Jaehn Remix)\" by OMI, released in 2014.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview125/v4/23/34/38/233438b8-3e59-dcbd-87d8-14d9dc2c4ae0/mzaf_15636383636246184773.plus.aac.p.m4a",
+      "credit": "OMI: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/cheerleader/1141509237?i=1141509249&uo=4",
+      "apple": {
+       "trackId": 1141509249,
+       "url": "https://music.apple.com/us/album/cheerleader/1141509237?i=1141509249&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/3c/37/4f/3c374f10-b449-3e52-06d7-f6ddccfb313c/886445870381.jpg/300x300bb.jpg",
+       "term": "Omi Cheerleader"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "the-fox-what-does-the-fox-say-ylvis",
+   "name": "The Fox (What Does the Fox Say?)",
+   "group": "2010s",
+   "facts": {
+    "artist": "Ylvis",
+    "year": 2013,
+    "decade": "2010s"
+   },
+   "blurb": "\"The Fox (What Does the Fox Say?)\" by Ylvis, released in 2013.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/04/87/b0/0487b014-3052-819a-546d-55533910586a/mzaf_14292809388004102845.plus.aac.p.m4a",
+      "credit": "Ylvis: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/the-fox-what-does-the-fox-say/690233609?i=690233856&uo=4",
+      "apple": {
+       "trackId": 690233856,
+       "url": "https://music.apple.com/us/album/the-fox-what-does-the-fox-say/690233609?i=690233856&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music114/v4/32/f5/b4/32f5b44a-6713-dfd4-e561-e40679bff318/825646409051.jpg/300x300bb.jpg",
+       "term": "Ylvis The Fox"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  }
+ ],
+ "questions": [],
+ "sources": [
+  {
+   "name": "Acts with a single US Billboard Hot 100 top-40 hit (or UK top-40, where noted); curated by Clued",
+   "url": "https://en.wikipedia.org/wiki/One-hit_wonder"
+  },
+  {
+   "name": "Apple iTunes Search API (previews, artwork, links)",
+   "url": "https://performance-partners.apple.com/search-api"
+  }
+ ],
+ "built": "2026-10-04"
+}

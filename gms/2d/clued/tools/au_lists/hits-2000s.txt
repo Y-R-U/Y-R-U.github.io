@@ -1,0 +1,65 @@
+@id hits-2000s
+@title Hits of the 2000s
+@icon 📱
+@sources [{"name":"Billboard Year-End Hot 100 singles (2000–2009)","url":"https://en.wikipedia.org/wiki/Billboard_Year-End_Hot_100_singles_of_2000"},{"name":"UK best-selling singles by year","url":"https://en.wikipedia.org/wiki/List_of_best-selling_singles_by_year_(UK)"}]
+1999 | Faith Hill | Breathe
+1999 | Santana | Maria Maria | am=santana
+2000 | Destiny's Child | Say My Name
+2000 | Britney Spears | Oops!...I Did It Again | d=1; tm=oops
+2000 | *NSYNC | Bye Bye Bye | am=sync
+2000 | Madonna | Music
+2000 | Bon Jovi | It's My Life | d=1
+2000 | Baha Men | Who Let the Dogs Out | d=1
+2000 | Lifehouse | Hanging by a Moment
+2001 | Alicia Keys | Fallin'
+2001 | Christina Aguilera, Lil' Kim, Mýa & P!nk | Lady Marmalade | am=aguilera|lil.? kim
+2000 | Destiny's Child | Independent Women, Pt. 1 | tm=independent women
+2001 | Kylie Minogue | Can't Get You Out of My Head | d=1
+2001 | Nickelback | How You Remind Me
+2002 | Nelly | Hot in Herre
+2002 | Nelly & Kelly Rowland | Dilemma | am=nelly
+2002 | Vanessa Carlton | A Thousand Miles
+2002 | Avril Lavigne | Complicated
+2002 | Eminem | Lose Yourself | d=1
+2002 | Eminem | Without Me
+2003 | 50 Cent | In da Club | d=1
+2003 | Beyoncé | Crazy in Love | d=1
+2003 | Outkast | Hey Ya! | d=1
+2003 | The Black Eyed Peas | Where Is the Love?
+2003 | Evanescence | Bring Me to Life
+2002 | Sean Paul | Get Busy
+2002 | Coldplay | Clocks | am=coldplay
+2004 | Usher | Yeah! | d=1; am=usher
+2004 | Usher | Burn
+2003 | Alicia Keys | If I Ain't Got You
+2003 | Britney Spears | Toxic | d=1
+2004 | Kelly Clarkson | Since U Been Gone | d=1
+2005 | Mariah Carey | We Belong Together
+2004 | Gwen Stefani | Hollaback Girl
+2005 | Kanye West | Gold Digger
+2005 | Gorillaz | Feel Good Inc.
+2005 | Daniel Powter | Bad Day | d=1
+2004 | James Blunt | You're Beautiful
+2006 | Shakira | Hips Don't Lie | d=1
+2006 | Gnarls Barkley | Crazy | d=1
+2006 | Justin Timberlake | SexyBack
+2006 | Nelly Furtado | Promiscuous
+2006 | Snow Patrol | Chasing Cars
+2006 | Beyoncé | Irreplaceable
+2007 | Rihanna | Umbrella | d=1
+2007 | Avril Lavigne | Girlfriend
+2007 | Kanye West | Stronger
+2007 | Timbaland | Apologize | am=timbaland|onerepublic
+2007 | Leona Lewis | Bleeding Love
+2007 | Flo Rida | Low
+2008 | Katy Perry | I Kissed a Girl
+2008 | Coldplay | Viva la Vida | d=1
+2008 | Beyoncé | Single Ladies (Put a Ring on It) | tm=single ladies; alt=Single Ladies
+2008 | Taylor Swift | Love Story
+2008 | Lady Gaga | Poker Face | d=1
+2008 | Lady Gaga | Just Dance
+2009 | The Black Eyed Peas | I Gotta Feeling | d=1
+2009 | The Black Eyed Peas | Boom Boom Pow
+2009 | Miley Cyrus | Party in the U.S.A.
+2009 | Jay-Z & Alicia Keys | Empire State of Mind | am=ja.?.?-z|jay; q=empire state of mind
+2008 | Kings of Leon | Use Somebody

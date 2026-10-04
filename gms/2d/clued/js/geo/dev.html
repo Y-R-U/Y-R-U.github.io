@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>CLUED geo dev</title>
+<style>
+html,body{margin:0;height:100%;font-family:system-ui,-apple-system,sans-serif;background:#f4f1ea;color:#222}
+#bar{display:flex;gap:6px;padding:6px;flex-wrap:wrap;align-items:center;font-size:13px;background:#1d2733;color:#fff}
+#bar select,#bar button{font:inherit;padding:4px 6px;max-width:150px}
+#stage{position:absolute;left:8px;right:8px;top:var(--top,48px);bottom:8px}
+#log{position:fixed;left:6px;bottom:6px;font:11px monospace;background:rgba(0,0,0,.7);color:#fff;padding:4px 6px;border-radius:6px;pointer-events:none;max-width:90vw;z-index:9}
+#next{position:fixed;right:10px;top:54px;z-index:9;display:none;padding:10px 16px;border:0;border-radius:12px;background:#222;color:#fff;font:600 15px system-ui}
+.q-prompt{font-size:1.25rem;font-weight:800}
+.gmq-sub{opacity:.7;font-weight:600}
+</style></head><body>
+<div id="bar">
+  <select id="fmt"><option value="">map viewer</option></select>
+  <select id="region"></select>
+  <select id="target"><option>countries</option><option>states</option><option>marine</option><option>none</option></select>
+  <select id="style"><option>plain</option><option>political</option><option>continents</option></select>
+  <select id="diff"><option value="0">mixed</option><option value="1">easy</option><option value="2">medium</option><option value="3">hard</option></select>
+  <label><input type="checkbox" id="kids"> kids</label>
+  <span id="opts"></span>
+</div>
+<div id="stage"></div><button id="next">Next</button><div id="log"></div>
+<script type="module">
+import { createMap } from './map.js?v=1';
+import { createExplore } from './explore.js?v=1';
+import { REGIONS, STATE_VIEWS } from './regions.js?v=1';
+import { mulberry32, hashString } from '../core/rng.js?v=1';
+const FORMATS = ['map-click', 'city-pick', 'continent', 'water-click', 'pin-drop', 'neighbours', 'flag-map'];
+const q = new URLSearchParams(location.search);
+const $ = id => document.getElementById(id);
+for (const f of [...FORMATS, 'explore']) $('fmt').add(new Option(f, f));
+for (const k of [...Object.keys(REGIONS), ...Object.keys(STATE_VIEWS)]) $('region').add(new Option(k, k));
+$('fmt').value = q.get('fmt') || '';
+$('region').value = q.get('region') || 'world';
+$('target').value = q.get('target') || (STATE_VIEWS[$('region').value] ? 'states' : 'countries');
+$('style').value = q.get('style') || 'plain';
+$('diff').value = q.get('difficulty') || '0';
+$('kids').checked = q.has('kids');
+const log = o => { $('log').textContent = JSON.stringify(o); };
+window.results = [];
+let ctrl = null, mod = null, questions = [], qi = 0;
+const stage = $('stage');
+
+async function go() {
+  ctrl?.destroy?.(); stage.innerHTML = ''; $('next').style.display = 'none'; $('opts').innerHTML = '';
+  const fmt = $('fmt').value;
+  await new Promise(r => requestAnimationFrame(r));
+  document.body.style.setProperty('--top', $('bar').offsetHeight + 6 + 'px');
+  if (!fmt) {
+    ctrl = createMap(stage, { region: $('region').value, target: $('target').value, style: $('style').value, onTap(hit) {
+      log({ id: hit.id, p: hit.playable, s: hit.snapped, mk: hit.marker, lon: hit.lon?.toFixed(2), lat: hit.lat?.toFixed(2), n: hit.props?.n });
+      if (hit.id) { ctrl.clearStates(); ctrl.setState(hit.id, hit.playable ? 'correct' : 'wrong'); ctrl.label(hit.id, hit.props?.n); }
+    } });
+    window.map = ctrl; return;
+  }
+  if (fmt === 'explore') { ctrl = createExplore(stage, { region: $('region').value, onPick: (id, p) => log({ pick: id, n: p.n }) }); window.map = ctrl.map; return; }
+  mod = (await import(`./formats/${fmt}.js?v=1`)).default;
+  const opts = { kids: $('kids').checked };
+  for (const o of mod.options || []) {
+    const s = document.createElement('select'); s.id = 'o_' + o.key; s.title = o.label;
+    o.values.forEach((v, i) => s.add(new Option(o.labels?.[i] ?? v, v)));
+    s.value = q.get(o.key) ?? o.default; s.onchange = () => { q.set(o.key, s.value); history.replaceState(null, '', '?' + q); go(); };
+    $('opts').append(s); opts[o.key] = s.value;
+  }
+  const rng = mulberry32(hashString(q.get('seed') || 'dev'));
+  questions = mod.generate({ rng, packs: [], count: +(q.get('count') || 10), opts, difficulty: +$('diff').value });
+  window.questions = questions;
+  qi = 0; show();
+}
+function show() {
+  ctrl?.destroy?.(); stage.innerHTML = ''; $('next').style.display = 'none';
+  const qq = questions[qi];
+  if (!qq) { stage.textContent = 'No questions generated'; return; }
+  const api = {
+    opts: {}, mode: 'solo', kids: $('kids').checked, difficulty: +$('diff').value, rng: Math.random,
+    timer: { start() {}, remaining: () => 0 }, sfx() {}, preload() {}, speak() {}, reveal() {},
+    answer(r) { window.results.push({ q: qq.id, ...r }); log({ q: qq.id, correct: r.correct, pts: r.points, given: r.given, detail: r.detail }); $('next').style.display = 'block'; },
+  };
+  ctrl = mod.render(stage, qq, api);
+  window.ctrl = ctrl; window.map = ctrl.map; window.q = qq;
+  log({ q: qq.id, answer: qq.answer });
+}
+$('next').onclick = () => { qi = (qi + 1) % questions.length; show(); };
+window.goto = i => { qi = i; show(); };
+for (const id of ['fmt', 'region', 'target', 'style', 'diff', 'kids']) $(id).onchange = () => {
+  const map = { fmt: 'fmt', region: 'region', target: 'target', style: 'style', diff: 'difficulty' };
+  if (id === 'kids') $('kids').checked ? q.set('kids', '1') : q.delete('kids'); else q.set(map[id], $(id).value);
+  history.replaceState(null, '', '?' + q); go();
+};
+document.body.classList.toggle('kids-on', $('kids').checked);
+new ResizeObserver(() => document.body.style.setProperty('--top', $('bar').offsetHeight + 6 + 'px')).observe($('bar'));
+go().catch(e => { stage.textContent = 'ERROR ' + e.message; console.error(e); });
+window.ready = true;
+</script></body></html>

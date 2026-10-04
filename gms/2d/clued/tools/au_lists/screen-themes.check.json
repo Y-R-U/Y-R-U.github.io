@@ -1,0 +1,360 @@
+{
+ "dropped": [
+  "NO MATCH  1989 Danny Elfman — The Simpsons Main Title Theme"
+ ],
+ "offby": [],
+ "items": [
+  {
+   "id": "star-wars",
+   "appleYear": 1977,
+   "album": "Star Wars: A New Hope (Original Motion Picture Score)",
+   "appleArtist": "John Williams & London Symphony Orchestra",
+   "appleTitle": "Main Title",
+   "year": 1977
+  },
+  {
+   "id": "the-empire-strikes-back",
+   "appleYear": 1980,
+   "album": "Star Wars: The Empire Strikes Back (Original Motion Picture Soundtrack)",
+   "appleArtist": "John Williams & London Symphony Orchestra",
+   "appleTitle": "The Imperial March (Darth Vader's Theme)",
+   "year": 1980
+  },
+  {
+   "id": "jaws",
+   "appleYear": 1975,
+   "album": "Jaws (Music from the Original Motion Picture Soundtrack)",
+   "appleArtist": "John Williams",
+   "appleTitle": "Main Title (Theme from \"Jaws\")",
+   "year": 1975
+  },
+  {
+   "id": "raiders-of-the-lost-ark",
+   "appleYear": 1981,
+   "album": "Raiders of the Lost Ark (Original Motion Picture Soundtrack)",
+   "appleArtist": "John Williams & London Symphony Orchestra",
+   "appleTitle": "Washington Ending / Raiders March",
+   "year": 1981
+  },
+  {
+   "id": "jurassic-park",
+   "appleYear": 1993,
+   "album": "Jurassic Park (20th Anniversary)",
+   "appleArtist": "John Williams",
+   "appleTitle": "Theme from Jurassic Park",
+   "year": 1993
+  },
+  {
+   "id": "e-t-the-extra-terrestrial",
+   "appleYear": 1982,
+   "album": "E.T. The Extra-Terrestrial (Music From the Original Motion Picture Soundtrack)",
+   "appleArtist": "John Williams",
+   "appleTitle": "Flying",
+   "year": 1982
+  },
+  {
+   "id": "superman",
+   "appleYear": 1978,
+   "album": "Superman: The Movie (Soundtrack from the Motion Picture) [Deluxe]",
+   "appleArtist": "John Williams & London Symphony Orchestra",
+   "appleTitle": "Prelude / Main Title March",
+   "year": 1978
+  },
+  {
+   "id": "harry-potter-and-the-philosophers-stone",
+   "appleYear": 2001,
+   "album": "Harry Potter and the Sorcerer's Stone (Original Motion Picture Soundtrack)",
+   "appleArtist": "John Williams",
+   "appleTitle": "Hedwig's Theme",
+   "year": 2001
+  },
+  {
+   "id": "schindlers-list",
+   "appleYear": 1993,
+   "album": "Schindler's List (Original Motion Picture Score)",
+   "appleArtist": "John Williams, Itzhak Perlman & Boston Symphony Orchestra",
+   "appleTitle": "Theme from Schindler's List",
+   "year": 1993
+  },
+  {
+   "id": "pirates-of-the-caribbean-the-curse-of-the-black-pearl",
+   "appleYear": 2003,
+   "album": "Pirates of the Caribbean: The Curse of the Black Pearl (Original Soundtrack)",
+   "appleArtist": "Klaus Badelt",
+   "appleTitle": "He's a Pirate",
+   "year": 2003
+  },
+  {
+   "id": "gladiator",
+   "appleYear": 2000,
+   "album": "Gladiator (Soundtrack from the Motion Picture)",
+   "appleArtist": "Lisa Gerrard, Gavin Greenaway, The Lyndhurst Orchestra, Bruce Fowler, Yvonne S. Moriarty, Walt Fowler, Ladd McIntosh, Elizabeth Finch, Jack Smalley & Hans Zimmer",
+   "appleTitle": "Now We Are Free",
+   "year": 2000
+  },
+  {
+   "id": "inception",
+   "appleYear": 2010,
+   "album": "Inception (Music from the Motion Picture)",
+   "appleArtist": "Hans Zimmer",
+   "appleTitle": "Time",
+   "year": 2010
+  },
+  {
+   "id": "interstellar",
+   "appleYear": 2014,
+   "album": "Interstellar (Original Motion Picture Soundtrack) [Expanded Edition]",
+   "appleArtist": "Hans Zimmer",
+   "appleTitle": "Cornfield Chase",
+   "year": 2014
+  },
+  {
+   "id": "the-lion-king",
+   "appleYear": 1994,
+   "album": "The Lion King (Original Motion Picture Soundtrack)",
+   "appleArtist": "Carmen Twillie & Lebo M",
+   "appleTitle": "Circle of Life",
+   "year": 1994
+  },
+  {
+   "id": "rocky",
+   "appleYear": 1977,
+   "album": "Rocky (Original Motion Picture Score)",
+   "appleArtist": "Bill Conti",
+   "appleTitle": "Gonna Fly Now (Theme From \"Rocky\")",
+   "year": 1976
+  },
+  {
+   "id": "dr-no",
+   "appleYear": 1962,
+   "album": "Dr. No (Original Motion Picture Soundtrack) [Remastered]",
+   "appleArtist": "Monty Norman",
+   "appleTitle": "The James Bond Theme (Remastered)",
+   "year": 1962
+  },
+  {
+   "id": "the-good-the-bad-and-the-ugly",
+   "appleYear": 1966,
+   "album": "The Good, The Bad & The Ugly (Expanded Edition) [Original Motion Picture Soundtrack]",
+   "appleArtist": "Ennio Morricone",
+   "appleTitle": "The Good, The Bad & The Ugly (Main Title)",
+   "year": 1966
+  },
+  {
+   "id": "chariots-of-fire",
+   "appleYear": 1981,
+   "album": "Chariots of Fire (Original Motion Picture Score) [2019 Remaster]",
+   "appleArtist": "Vangelis",
+   "appleTitle": "Chariots of Fire",
+   "year": 1981
+  },
+  {
+   "id": "the-godfather",
+   "appleYear": 1972,
+   "album": "The Godfather (Soundtrack from the Motion Picture)",
+   "appleArtist": "Nino Rota & Carlo Savina",
+   "appleTitle": "Love Theme from \"The Godfather\"",
+   "year": 1972
+  },
+  {
+   "id": "back-to-the-future",
+   "appleYear": 1990,
+   "album": "The Back To the Future Trilogy",
+   "appleArtist": "Alan Silvestri",
+   "appleTitle": "Back To the Future, Pt. III: End Credits",
+   "year": 1985
+  },
+  {
+   "id": "ghostbusters",
+   "appleYear": 1984,
+   "album": "Ghostbusters (Original Motion Picture Soundtrack)",
+   "appleArtist": "Ray Parker Jr.",
+   "appleTitle": "Ghostbusters",
+   "year": 1984
+  },
+  {
+   "id": "the-pink-panther",
+   "appleYear": 1963,
+   "album": "The Pink Panther (Music from the Film Score)",
+   "appleArtist": "Henry Mancini",
+   "appleTitle": "The Pink Panther Theme (Remastered)",
+   "year": 1963
+  },
+  {
+   "id": "psycho",
+   "appleYear": 1969,
+   "album": "Hitchcock: The Great Movie Thrillers",
+   "appleArtist": "London Philharmonic Orchestra & Bernard Herrmann",
+   "appleTitle": "Psycho (A Narrative for Orchestra): The Murder",
+   "year": 1960
+  },
+  {
+   "id": "the-lord-of-the-rings-the-fellowship-of-the-ring",
+   "appleYear": 2001,
+   "album": "The Lord of the Rings: The Fellowship of the Ring (Original Motion Picture Soundtrack)",
+   "appleArtist": "Howard Shore",
+   "appleTitle": "Concerning Hobbits",
+   "year": 2001
+  },
+  {
+   "id": "top-gun",
+   "appleYear": 1986,
+   "album": "Top Gun (Original Motion Picture Soundtrack) [Special Expanded Edition]",
+   "appleArtist": "Harold Faltermeyer & Steve Stevens",
+   "appleTitle": "Top Gun Anthem",
+   "year": 1986
+  },
+  {
+   "id": "beverly-hills-cop",
+   "appleYear": 1984,
+   "album": "Harold F",
+   "appleArtist": "Harold Faltermeyer",
+   "appleTitle": "Axel F",
+   "year": 1984
+  },
+  {
+   "id": "halloween",
+   "appleYear": 1978,
+   "album": "Halloween Theme 1978 (Original Motion Picture Soundtrack) - Single",
+   "appleArtist": "John Carpenter",
+   "appleTitle": "Halloween Theme 1978 (Original Motion Picture Soundtrack)",
+   "year": 1978
+  },
+  {
+   "id": "the-exorcist",
+   "appleYear": 1973,
+   "album": "Tubular Bells",
+   "appleArtist": "Mike Oldfield",
+   "appleTitle": "Tubular Bells, Pt. I",
+   "year": 1973
+  },
+  {
+   "id": "titanic",
+   "appleYear": 1997,
+   "album": "Titanic (Music from the Motion Picture) [Collector's Anniversary Edition]",
+   "appleArtist": "Céline Dion & James Horner",
+   "appleTitle": "My Heart Will Go On (Love Theme from \"Titanic\")",
+   "year": 1997
+  },
+  {
+   "id": "batman",
+   "appleYear": 1989,
+   "album": "Batman (Original Motion Picture Score)",
+   "appleArtist": "Danny Elfman",
+   "appleTitle": "The Batman Theme",
+   "year": 1989
+  },
+  {
+   "id": "the-avengers",
+   "appleYear": 2012,
+   "album": "The Avengers (Original Motion Picture Soundtrack)",
+   "appleArtist": "Alan Silvestri",
+   "appleTitle": "The Avengers",
+   "year": 2012
+  },
+  {
+   "id": "casino-royale",
+   "appleYear": 2006,
+   "album": "007: Casino Royale (Original Motion Picture Soundtrack) [Deluxe Version]",
+   "appleArtist": "David Arnold & Nicholas Dodd",
+   "appleTitle": "African Rundown",
+   "year": 2006
+  },
+  {
+   "id": "friends",
+   "appleYear": 1995,
+   "album": "The Rembrandts: L.P.",
+   "appleArtist": "The Rembrandts",
+   "appleTitle": "I'll Be There for You (Theme from Friends)",
+   "year": 1995
+  },
+  {
+   "id": "game-of-thrones",
+   "appleYear": 2011,
+   "album": "Game of Thrones (Music From the HBO Series)",
+   "appleArtist": "Ramin Djawadi",
+   "appleTitle": "Main Title",
+   "year": 2011
+  },
+  {
+   "id": "stranger-things",
+   "appleYear": 2016,
+   "album": "Stranger Things, Vol. 1 (A Netflix Original Series Soundtrack)",
+   "appleArtist": "Kyle Dixon & Michael Stein",
+   "appleTitle": "Stranger Things",
+   "year": 2016
+  },
+  {
+   "id": "the-x-files",
+   "appleYear": 1996,
+   "album": "The Truth and the Light: Music from The X-Files",
+   "appleArtist": "Mark Snow & Chris Carter",
+   "appleTitle": "Materia Primoris: The X-Files Theme (Main Title)",
+   "year": 1993
+  },
+  {
+   "id": "twin-peaks",
+   "appleYear": 1990,
+   "album": "Twin Peaks (Soundtrack From)",
+   "appleArtist": "Angelo Badalamenti",
+   "appleTitle": "Twin Peaks Theme",
+   "year": 1990
+  },
+  {
+   "id": "cheers",
+   "appleYear": 2004,
+   "album": "Keeper",
+   "appleArtist": "Gary Portnoy",
+   "appleTitle": "Where Everybody Knows Your Name (Cheers Theme)",
+   "year": 1982
+  },
+  {
+   "id": "breaking-bad",
+   "appleYear": 2010,
+   "album": "Breaking Bad (Music from the Original TV Series)",
+   "appleArtist": "Dave Porter",
+   "appleTitle": "Breaking Bad (Main Title Theme) [Extended Version]",
+   "year": 2008
+  },
+  {
+   "id": "succession",
+   "appleYear": 2018,
+   "album": "Succession: Season 1 (HBO Original Series Soundtrack)",
+   "appleArtist": "Nicholas Britell",
+   "appleTitle": "Succession (Main Title Theme)",
+   "year": 2018
+  },
+  {
+   "id": "the-sopranos",
+   "appleYear": 1997,
+   "album": "Exile on Coldharbour Lane",
+   "appleArtist": "Alabama 3",
+   "appleTitle": "Woke up This Morning",
+   "year": 1997
+  },
+  {
+   "id": "peaky-blinders",
+   "appleYear": 2005,
+   "album": "B-Sides and Rarities",
+   "appleArtist": "Nick Cave & The Bad Seeds",
+   "appleTitle": "Red Right Hand (Scream 3 Version)",
+   "year": 2013
+  },
+  {
+   "id": "downton-abbey",
+   "appleYear": 2019,
+   "album": "Downton Abbey (Original Score)",
+   "appleArtist": "John Lunn & The Chamber Orchestra of London",
+   "appleTitle": "One Hundred Years of Downton (From \"Downton Abbey\")",
+   "year": 2010
+  },
+  {
+   "id": "star-trek",
+   "appleYear": 1970,
+   "album": "The Ultimate Star Trek",
+   "appleArtist": "Alexander Courage, Fred Steiner & Royal Philharmonic Orchestra",
+   "appleTitle": "Star Trek: Main Theme (From \"Star Trek\")",
+   "year": 1966
+  }
+ ]
+}

@@ -1,0 +1,2653 @@
+{
+ "id": "spiders",
+ "title": "Spiders",
+ "theme": "animals",
+ "icon": "🕷️",
+ "kids": true,
+ "version": 1,
+ "notice": "Not for real-world identification.",
+ "leakExempt": [
+  "spider",
+  "spiders"
+ ],
+ "factsMeta": {
+  "danger": {
+   "type": "cat",
+   "label": "Danger to people",
+   "values": [
+    "Harmless",
+    "Mildly venomous",
+    "Dangerous",
+    "Potentially deadly"
+   ]
+  },
+  "region": {
+   "type": "cat",
+   "label": "Found in"
+  },
+  "web": {
+   "type": "bool",
+   "label": "Catches prey in a web",
+   "yes": "Web builder",
+   "no": "Hunts without a web"
+  },
+  "legSpanCm": {
+   "type": "num",
+   "label": "Leg span",
+   "unit": "cm",
+   "higherLabel": "Bigger"
+  }
+ },
+ "items": [
+  {
+   "id": "sydney-funnel-web-spider",
+   "name": "Sydney funnel-web spider",
+   "alt": [
+    "funnel-web",
+    "Sydney funnel-web"
+   ],
+   "sci": "Atrax robustus",
+   "group": "funnel-web",
+   "facts": {
+    "danger": "Potentially deadly",
+    "region": "Australia",
+    "web": false
+   },
+   "lookalikes": [
+    "trapdoor-spider",
+    "eastern-mouse-spider"
+   ],
+   "blurb": "A glossy black spider from around Sydney. Its venom can kill a person. Since antivenom arrived in 1981, no one has died from its bite.",
+   "clues": [
+    "Family: Atracidae.",
+    "Genus: Atrax.",
+    "The males wander in summer looking for mates.",
+    "Male venom is far more dangerous than female venom.",
+    "An antivenom was made in 1981 using venom milked at a reptile park.",
+    "Its bite can kill a person without treatment.",
+    "It is found in Australia.",
+    "It lives in silk-lined burrows around Australia's biggest city.",
+    "It is said to be the deadliest spider in the world.",
+    "The answer has 4 words (6, 6, 3, 6 letters).",
+    "It starts with the letter S."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/54337827/medium.jpeg",
+      "w": 500,
+      "h": 375,
+      "credit": "Thomas Mesaglio",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/54337827"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/730150310/medium.jpg",
+      "w": 500,
+      "h": 400,
+      "credit": "Austen Armstrong",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/730150310"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/439587310/medium.jpg",
+      "w": 500,
+      "h": 500,
+      "credit": "James K. Douch",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/439587310"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "redback-spider",
+   "name": "Redback spider",
+   "alt": [
+    "redback"
+   ],
+   "sci": "Latrodectus hasselti",
+   "group": "widow",
+   "facts": {
+    "danger": "Dangerous",
+    "region": "Australia",
+    "web": true
+   },
+   "lookalikes": [
+    "black-widow",
+    "false-widow-spider"
+   ],
+   "blurb": "A small black Australian spider with a red stripe on its back. It likes sheds, letterboxes and outdoor toilets.",
+   "clues": [
+    "Family: Theridiidae.",
+    "Genus: Latrodectus.",
+    "It is a close relative of the black widow.",
+    "Males often get eaten by the female during mating.",
+    "It builds messy, tangled webs in dry, sheltered spots.",
+    "Its bite can make a person very ill.",
+    "It is found in Australia.",
+    "It catches prey in a web.",
+    "A pub song is about one hiding under a toilet seat.",
+    "The female is shiny black with a red stripe.",
+    "The answer has 2 words (7, 6 letters).",
+    "It starts with the letter R."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/341431303/medium.jpg",
+      "w": 500,
+      "h": 456,
+      "credit": "Paul Whitington",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/341431303"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/1219463/medium.",
+      "w": 500,
+      "h": 349,
+      "credit": "Steve Kerr",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/1219463"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/198549922/medium.jpeg",
+      "w": 500,
+      "h": 472,
+      "credit": "William Harland",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/198549922"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "white-tailed-spider",
+   "name": "White-tailed spider",
+   "sci": "Lampona cylindrata",
+   "group": "hunter",
+   "facts": {
+    "danger": "Mildly venomous",
+    "region": "Australia",
+    "web": false
+   },
+   "blurb": "A slim, dark Australian spider that hunts other spiders at night. Its bite is painful but it does not cause flesh to rot.",
+   "clues": [
+    "Family: Lamponidae.",
+    "Genus: Lampona.",
+    "It hunts other spiders, especially black house spiders.",
+    "It often hides in clothes and towels.",
+    "It was wrongly blamed for causing skin ulcers.",
+    "Its bite can hurt but is rarely serious.",
+    "It is found in Australia.",
+    "It hunts without a catching web.",
+    "It has a cigar-shaped grey body.",
+    "The answer has 3 words (5, 6, 6 letters).",
+    "It starts with the letter W."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/1327295/medium.jpg",
+      "w": 493,
+      "h": 500,
+      "credit": "Steve Kerr",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/1327295"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/11193750/medium.jpg",
+      "w": 500,
+      "h": 433,
+      "credit": "Steve Kerr",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/11193750"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/11193749/medium.jpg",
+      "w": 500,
+      "h": 364,
+      "credit": "Steve Kerr",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/11193749"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "huntsman-spider",
+   "name": "Huntsman spider",
+   "alt": [
+    "huntsman"
+   ],
+   "sci": "Sparassidae",
+   "group": "huntsman",
+   "facts": {
+    "danger": "Harmless",
+    "region": "many parts of the world",
+    "web": false
+   },
+   "lookalikes": [
+    "wolf-spider"
+   ],
+   "blurb": "Big, flat, fast spiders that often turn up on walls and in cars in Australia. They look scary but are harmless.",
+   "clues": [
+    "Family: Sparassidae.",
+    "Its legs spread out sideways, like a crab.",
+    "It can squeeze under doors and behind pictures.",
+    "It sometimes hides behind a car's sun visor.",
+    "Its bite is harmless to people.",
+    "It is found in many parts of the world.",
+    "The giant species from Laos has a leg span of about 30 cm.",
+    "It is a large, hairy, flat spider common in Australian homes.",
+    "The answer has 2 words (8, 6 letters).",
+    "It starts with the letter H."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/7497532/medium.jpeg",
+      "w": 500,
+      "h": 376,
+      "credit": "Matt Muir",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/7497532"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/5655389/medium.jpeg",
+      "w": 500,
+      "h": 376,
+      "credit": "Matt Muir",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/5655389"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/3939983/medium.JPG",
+      "w": 500,
+      "h": 333,
+      "credit": "Juan Cruzado Cortés",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/3939983"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "australian-golden-orb-weaver",
+   "name": "Australian golden orb-weaver",
+   "alt": [
+    "golden orb-weaver",
+    "golden orb weaver"
+   ],
+   "sci": "Trichonephila edulis",
+   "group": "orb-weaver",
+   "facts": {
+    "danger": "Harmless",
+    "region": "Australia",
+    "web": true
+   },
+   "lookalikes": [
+    "european-garden-spider"
+   ],
+   "blurb": "A large spider with long banded legs that spins a huge web of golden silk. The female is many times bigger than the male.",
+   "clues": [
+    "Family: Nephilidae.",
+    "Genus: Trichonephila.",
+    "Tiny males live on the edge of the female's web.",
+    "Its webs can be over a metre across.",
+    "Its huge webs often stay up for months.",
+    "Its bite is harmless to people.",
+    "It catches prey in a web.",
+    "The female has long legs with tufts at the joints.",
+    "Its silk shines like a precious yellow metal.",
+    "The answer has 4 words (10, 6, 3, 6 letters).",
+    "It starts with the letter A."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/632219672/medium.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "no rights reserved",
+      "license": "CC0 1.0",
+      "page": "https://www.inaturalist.org/photos/632219672"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/488190687/medium.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "no rights reserved",
+      "license": "CC0 1.0",
+      "page": "https://www.inaturalist.org/photos/488190687"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/466303500/medium.jpeg",
+      "w": 500,
+      "h": 333,
+      "credit": "jirau",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/466303500"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "eastern-mouse-spider",
+   "name": "Eastern mouse spider",
+   "alt": [
+    "mouse spider"
+   ],
+   "sci": "Missulena bradleyi",
+   "group": "mygalomorph",
+   "facts": {
+    "danger": "Dangerous",
+    "region": "Australia",
+    "web": false
+   },
+   "lookalikes": [
+    "sydney-funnel-web-spider"
+   ],
+   "blurb": "A stocky burrowing spider of eastern Australia with big, bulging jaws. Males wander by day looking for mates.",
+   "clues": [
+    "Family: Actinopodidae.",
+    "Genus: Missulena.",
+    "Funnel-web antivenom works against its bite.",
+    "Its jaws are large and bulging.",
+    "It lives in a deep burrow in the ground.",
+    "Its bite can make a person very ill.",
+    "It is found in Australia.",
+    "It hunts without a catching web.",
+    "Males often roam in daylight after rain.",
+    "It is named after a small rodent.",
+    "The answer has 3 words (7, 5, 6 letters).",
+    "It starts with the letter E."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/309551875/medium.jpg",
+      "w": 500,
+      "h": 500,
+      "credit": "James K. Douch",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/309551875"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/119622116/medium.jpeg",
+      "w": 500,
+      "h": 375,
+      "credit": "Thomas Mesaglio",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/119622116"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/83564945/medium.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "no rights reserved",
+      "license": "CC0 1.0",
+      "page": "https://www.inaturalist.org/photos/83564945"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "trapdoor-spider",
+   "name": "Trapdoor spider",
+   "sci": "Idiopidae",
+   "group": "mygalomorph",
+   "facts": {
+    "danger": "Harmless",
+    "region": "many parts of the world",
+    "web": false
+   },
+   "lookalikes": [
+    "sydney-funnel-web-spider"
+   ],
+   "blurb": "Burrowing spiders that close their burrows with a hinged lid of soil and silk. They wait under the lid and grab passing insects.",
+   "clues": [
+    "Family: Idiopidae.",
+    "Some live for over 40 years.",
+    "Silk trip-lines around the burrow warn it of prey.",
+    "It lives in a burrow in the ground.",
+    "Its bite is harmless to people.",
+    "It is found in many parts of the world.",
+    "It hunts without a catching web.",
+    "It is often confused with the funnel-web.",
+    "Its burrow has a hinged lid.",
+    "The answer has 2 words (8, 6 letters).",
+    "It starts with the letter T."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/359364419/medium.jpeg",
+      "w": 500,
+      "h": 375,
+      "credit": "Saryu Mae 前 朝琉",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/359364419"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/359364491/medium.jpeg",
+      "w": 500,
+      "h": 375,
+      "credit": "Saryu Mae 前 朝琉",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/359364491"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/325226462/medium.jpg",
+      "w": 375,
+      "h": 500,
+      "credit": "rosshawkins",
+      "license": "CC0 1.0",
+      "page": "https://www.inaturalist.org/photos/325226462"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "wolf-spider",
+   "name": "Wolf spider",
+   "sci": "Lycosidae",
+   "group": "wolf",
+   "facts": {
+    "danger": "Harmless",
+    "region": "many parts of the world",
+    "web": false
+   },
+   "lookalikes": [
+    "huntsman-spider"
+   ],
+   "blurb": "Hairy ground spiders that chase down prey instead of using webs. Mothers carry their babies on their backs.",
+   "clues": [
+    "Family: Lycosidae.",
+    "Their eyes shine green in torchlight.",
+    "Mothers drag their egg sac attached to their spinnerets.",
+    "Babies ride on their mother's back.",
+    "Its bite is harmless to people.",
+    "It is found in many parts of the world.",
+    "It hunts without a catching web.",
+    "They hunt on the ground at night.",
+    "They are named after a wild dog that hunts in packs.",
+    "The answer has 2 words (4, 6 letters).",
+    "It starts with the letter W."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/491213904/medium.png",
+      "w": 500,
+      "h": 363,
+      "credit": "Thomas Shahan",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/491213904"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/105142118/medium.jpg",
+      "w": 500,
+      "h": 313,
+      "credit": "Rudolph Steenkamp",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/105142118"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/422908850/medium.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Анатолий Озерной /Anatoly Ozernoy",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/422908850"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "peacock-spider",
+   "name": "Peacock spider",
+   "sci": "Maratus volans",
+   "group": "jumping",
+   "facts": {
+    "danger": "Harmless",
+    "region": "Australia",
+    "web": false
+   },
+   "blurb": "A tiny Australian jumping spider. The male raises a brightly coloured flap and dances to win a mate.",
+   "clues": [
+    "Family: Salticidae.",
+    "Genus: Maratus.",
+    "It is only about 5 millimetres long.",
+    "It belongs to the jumping spider family.",
+    "The male waves his third pair of legs in the air.",
+    "Its bite is harmless to people.",
+    "It is found in Australia.",
+    "It hunts without a catching web.",
+    "The male shows off a bright fan on his back.",
+    "It is named after a showy bird.",
+    "The answer has 2 words (7, 6 letters).",
+    "It starts with the letter P."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/9559732/medium.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Lek Khauv",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/9559732"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/74345276/medium.jpeg",
+      "w": 500,
+      "h": 375,
+      "credit": "Mark Ridgway",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/74345276"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/160634068/medium.jpg",
+      "w": 500,
+      "h": 334,
+      "credit": "Nigel Main",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/160634068"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "st-andrews-cross-spider",
+   "name": "St Andrew's cross spider",
+   "sci": "Argiope keyserlingi",
+   "group": "orb-weaver",
+   "facts": {
+    "danger": "Harmless",
+    "region": "Australia",
+    "web": true
+   },
+   "lookalikes": [
+    "wasp-spider"
+   ],
+   "blurb": "An Australian orb-weaver that adds bright zig-zag bands to its web in the shape of a cross.",
+   "clues": [
+    "Family: Araneidae.",
+    "Genus: Argiope.",
+    "It sits with its legs held in pairs.",
+    "It adds zig-zag silk bands to the web.",
+    "The bands may reflect ultraviolet light.",
+    "Its bite is harmless to people.",
+    "It is found in Australia.",
+    "It catches prey in a web.",
+    "The bands form an X shape.",
+    "The answer has 4 words (2, 7, 5, 6 letters).",
+    "It starts with the letter S."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/1745970/medium.jpg",
+      "w": 466,
+      "h": 500,
+      "credit": "Steve Kerr",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/1745970"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/5286643/medium.jpg",
+      "w": 500,
+      "h": 470,
+      "credit": "Graham Wise",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/5286643"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/29056976/medium.jpg",
+      "w": 416,
+      "h": 500,
+      "credit": "Steve Kerr",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/29056976"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "black-house-spider",
+   "name": "Black house spider",
+   "sci": "Badumna insignis",
+   "group": "hunter",
+   "facts": {
+    "danger": "Mildly venomous",
+    "region": "Australia",
+    "web": true
+   },
+   "lookalikes": [
+    "redback-spider"
+   ],
+   "blurb": "A dark, shy spider that builds messy, funnel-shaped webs in window frames and walls in Australia.",
+   "clues": [
+    "Family: Desidae.",
+    "Genus: Badumna.",
+    "White-tailed spiders hunt it.",
+    "Its lacy webs have a funnel retreat.",
+    "It is often found in window frames.",
+    "Its bite can hurt but is rarely serious.",
+    "It is found in Australia.",
+    "It catches prey in a web.",
+    "Its bite is painful but not dangerous.",
+    "It is a dark spider that lives on buildings.",
+    "The answer has 3 words (5, 5, 6 letters).",
+    "It starts with the letter B."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/589997318/medium.jpg",
+      "w": 375,
+      "h": 500,
+      "credit": "no rights reserved",
+      "license": "CC0 1.0",
+      "page": "https://www.inaturalist.org/photos/589997318"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/407859897/medium.jpg",
+      "w": 500,
+      "h": 355,
+      "credit": "Mike Bowie",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/407859897"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/432980423/medium.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "no rights reserved",
+      "license": "CC0 1.0",
+      "page": "https://www.inaturalist.org/photos/432980423"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "daddy-long-legs-spider",
+   "name": "Daddy long-legs spider",
+   "alt": [
+    "cellar spider",
+    "daddy longlegs"
+   ],
+   "sci": "Pholcus phalangioides",
+   "group": "cellar",
+   "facts": {
+    "danger": "Harmless",
+    "region": "many parts of the world",
+    "web": true
+   },
+   "blurb": "A spider with a tiny body and very long, thin legs. It lives in quiet corners of houses all over the world.",
+   "clues": [
+    "Family: Pholcidae.",
+    "Genus: Pholcus.",
+    "A myth says it has the strongest venom but fangs too small to bite.",
+    "When disturbed it shakes its web very fast.",
+    "It hunts other spiders, even redbacks.",
+    "Its bite is harmless to people.",
+    "It is found in many parts of the world.",
+    "It catches prey in a web.",
+    "It lives in house corners and ceilings.",
+    "The answer has 4 words (5, 4, 4, 6 letters).",
+    "It starts with the letter D."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/411699/medium.jpg",
+      "w": 500,
+      "h": 347,
+      "credit": "no rights reserved",
+      "license": "CC0 1.0",
+      "page": "https://www.inaturalist.org/photos/411699"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/221464692/medium.jpg",
+      "w": 400,
+      "h": 500,
+      "credit": "Rupert Lees",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/221464692"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/207839008/medium.jpeg",
+      "w": 500,
+      "h": 375,
+      "credit": "Gavin Slater",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/207839008"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "christmas-spider",
+   "name": "Christmas spider",
+   "alt": [
+    "jewel spider"
+   ],
+   "sci": "Austracantha minax",
+   "group": "orb-weaver",
+   "facts": {
+    "danger": "Harmless",
+    "region": "Australia",
+    "web": true
+   },
+   "blurb": "A small spiny orb-weaver that appears in Australian gardens in early summer, often in big groups.",
+   "clues": [
+    "Family: Araneidae.",
+    "Genus: Austracantha.",
+    "Its body has six spines.",
+    "Many often build webs together in a group.",
+    "It is black with white or yellow spots.",
+    "Its bite is harmless to people.",
+    "It is found in Australia.",
+    "It catches prey in a web.",
+    "It is common in Australian gardens in December.",
+    "It is named after a holiday.",
+    "The answer has 2 words (9, 6 letters).",
+    "It starts with the letter C."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/256778844/medium.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Connor Margetts",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/256778844"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/40720897/medium.jpeg",
+      "w": 500,
+      "h": 333,
+      "credit": "Sean Frey",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/40720897"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/105719819/medium.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Kym Nicolson",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/105719819"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "bird-dropping-spider",
+   "name": "Bird-dropping spider",
+   "sci": "Celaenia excavata",
+   "group": "orb-weaver",
+   "facts": {
+    "danger": "Harmless",
+    "region": "Australia",
+    "web": false
+   },
+   "blurb": "An Australian spider that looks like a bird dropping by day. At night it gives off a smell like a female moth to lure males.",
+   "clues": [
+    "Family: Araneidae.",
+    "Genus: Celaenia.",
+    "It catches male moths without a web.",
+    "It copies the scent of female moths.",
+    "It sits still on leaves all day.",
+    "Its bite is harmless to people.",
+    "It is found in Australia.",
+    "It hunts without a catching web.",
+    "Predators ignore it because of how it looks.",
+    "The answer has 3 words (4, 8, 6 letters).",
+    "It starts with the letter B."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/1556070/medium.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Shaun Lee",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/1556070"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/3164439/medium.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Lek Khauv",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/3164439"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/27999918/medium.jpeg",
+      "w": 500,
+      "h": 375,
+      "credit": "Jacqui Geux",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/27999918"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "black-widow",
+   "name": "Black widow",
+   "alt": [
+    "southern black widow"
+   ],
+   "sci": "Latrodectus mactans",
+   "group": "widow",
+   "facts": {
+    "danger": "Dangerous",
+    "region": "the Americas",
+    "web": true
+   },
+   "lookalikes": [
+    "redback-spider",
+    "brown-widow",
+    "false-widow-spider"
+   ],
+   "blurb": "A glossy black American spider with a red hourglass under its belly. The female sometimes eats the male.",
+   "clues": [
+    "Family: Theridiidae.",
+    "Genus: Latrodectus.",
+    "Its venom attacks the nerves.",
+    "The female sometimes eats the male after mating.",
+    "It builds a messy tangle web near the ground.",
+    "Its bite can make a person very ill.",
+    "It is found in the Americas.",
+    "It catches prey in a web.",
+    "Its belly has a red hourglass mark.",
+    "Its name means a woman whose husband has died.",
+    "The answer has 2 words (5, 5 letters).",
+    "It starts with the letter B."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/107951399/medium.jpg",
+      "w": 500,
+      "h": 500,
+      "credit": "Haydeé Salmones",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/107951399"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/479144847/medium.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "DiegoH",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/479144847"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/58786745/medium.jpeg",
+      "w": 500,
+      "h": 375,
+      "credit": "Justin Quintanilla",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/58786745"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "brown-widow",
+   "name": "Brown widow",
+   "sci": "Latrodectus geometricus",
+   "group": "widow",
+   "facts": {
+    "danger": "Mildly venomous",
+    "region": "many parts of the world",
+    "web": true
+   },
+   "lookalikes": [
+    "black-widow"
+   ],
+   "blurb": "A widow spider that has spread around the warm parts of the world. Its egg sacs are covered in spiky bumps.",
+   "clues": [
+    "Family: Theridiidae.",
+    "Genus: Latrodectus.",
+    "Its egg sacs look like spiky balls.",
+    "It has an orange hourglass on its belly.",
+    "It has spread across the warm parts of the world.",
+    "Its bite can hurt but is rarely serious.",
+    "It is found in many parts of the world.",
+    "It catches prey in a web.",
+    "Its venom is strong but it injects very little.",
+    "The answer has 2 words (5, 5 letters).",
+    "It starts with the letter B."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/2558788/medium.JPG",
+      "w": 500,
+      "h": 355,
+      "credit": "Jesse Rorabaugh",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/2558788"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/4731311/medium.jpg",
+      "w": 500,
+      "h": 419,
+      "credit": "Jesse Rorabaugh",
+      "license": "CC0 1.0",
+      "page": "https://www.inaturalist.org/photos/4731311"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/462849026/medium.jpg",
+      "w": 479,
+      "h": 500,
+      "credit": "Rudolph Steenkamp",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/462849026"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "brown-recluse",
+   "name": "Brown recluse",
+   "alt": [
+    "violin spider",
+    "fiddleback"
+   ],
+   "sci": "Loxosceles reclusa",
+   "group": "recluse",
+   "facts": {
+    "danger": "Dangerous",
+    "region": "the Americas",
+    "web": false
+   },
+   "blurb": "A shy brown spider of the central USA with a violin-shaped mark. Rarely, its bite causes a slow-healing wound.",
+   "clues": [
+    "Family: Sicariidae.",
+    "Genus: Loxosceles.",
+    "It has six eyes instead of eight.",
+    "It hides in boxes, shoes and closets.",
+    "Its bite can rarely cause a slow-healing wound.",
+    "Its bite can make a person very ill.",
+    "It is found in the Americas.",
+    "It hunts without a catching web.",
+    "Its name means it likes to be alone.",
+    "The answer has 2 words (5, 7 letters).",
+    "It starts with the letter B."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/3872449/medium.jpg",
+      "w": 375,
+      "h": 500,
+      "credit": "Cindy",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/3872449"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/414487/medium.jpg",
+      "w": 500,
+      "h": 391,
+      "credit": "mayfly1963",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/414487"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/92437087/medium.jpg",
+      "w": 375,
+      "h": 500,
+      "credit": "Meghan Cassidy",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/92437087"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "brazilian-wandering-spider",
+   "name": "Brazilian wandering spider",
+   "alt": [
+    "banana spider",
+    "armed spider"
+   ],
+   "sci": "Phoneutria nigriventer",
+   "group": "wandering",
+   "facts": {
+    "danger": "Potentially deadly",
+    "region": "the Americas",
+    "web": false
+   },
+   "blurb": "A large, fast South American spider that hunts on the forest floor at night. It sometimes hides in bunches of bananas.",
+   "clues": [
+    "Family: Ctenidae.",
+    "Genus: Phoneutria.",
+    "Its genus name means \"murderess\" in Greek.",
+    "It raises its front legs in a threat pose.",
+    "It roams the forest floor at night.",
+    "Its bite can kill a person without treatment.",
+    "It is found in the Americas.",
+    "It hunts without a catching web.",
+    "It comes from the largest country in South America.",
+    "The answer has 3 words (9, 9, 6 letters).",
+    "It starts with the letter B."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/636747/medium.jpg",
+      "w": 500,
+      "h": 352,
+      "credit": "Techuser",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/636747"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/304800566/medium.jpeg",
+      "w": 375,
+      "h": 500,
+      "credit": "Jefferson Ferreira",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/304800566"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/269675936/medium.jpg",
+      "w": 375,
+      "h": 500,
+      "credit": "anguspritchard",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/269675936"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "six-eyed-sand-spider",
+   "name": "Six-eyed sand spider",
+   "sci": "Hexophthalma hahni",
+   "group": "recluse",
+   "facts": {
+    "danger": "Dangerous",
+    "region": "Africa",
+    "web": false
+   },
+   "blurb": "A flat spider of southern African deserts that buries itself in sand to ambush prey. It can live a year without food.",
+   "clues": [
+    "Family: Sicariidae.",
+    "Genus: Hexophthalma.",
+    "It is related to the recluse spiders.",
+    "It can survive for a year without eating.",
+    "It lives in the deserts of southern Africa.",
+    "Its bite can make a person very ill.",
+    "It is found in Africa.",
+    "It hunts without a catching web.",
+    "It has fewer eyes than most spiders.",
+    "The answer has 4 words (3, 4, 4, 6 letters).",
+    "It starts with the letter S."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/550742892/medium.jpg",
+      "w": 500,
+      "h": 381,
+      "credit": "Ansie Dippenaar-Schoeman",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/550742892"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/550744529/medium.jpg",
+      "w": 500,
+      "h": 335,
+      "credit": "Ansie Dippenaar-Schoeman",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/550744529"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/285086997/medium.jpeg",
+      "w": 375,
+      "h": 500,
+      "credit": "no rights reserved",
+      "license": "CC0 1.0",
+      "page": "https://www.inaturalist.org/photos/285086997"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "goliath-birdeater",
+   "name": "Goliath birdeater",
+   "sci": "Theraphosa blondi",
+   "group": "tarantula",
+   "facts": {
+    "danger": "Mildly venomous",
+    "region": "the Americas",
+    "web": false,
+    "legSpanCm": 28
+   },
+   "lookalikes": [
+    "mexican-red-knee-tarantula"
+   ],
+   "blurb": "The heaviest spider in the world, from South American rainforests. Despite its name, it rarely eats birds.",
+   "clues": [
+    "Family: Theraphosidae.",
+    "Genus: Theraphosa.",
+    "It can weigh as much as 175 grams.",
+    "It flicks itchy hairs off its belly to defend itself.",
+    "It can make a hissing sound by rubbing its legs.",
+    "It is found in the Americas.",
+    "It hunts without a catching web.",
+    "Its leg span can reach about 28 cm.",
+    "It is the heaviest spider in the world.",
+    "It is named after a biblical giant.",
+    "The answer has 2 words (7, 9 letters).",
+    "It starts with the letter G."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/248249214/medium.jpeg",
+      "w": 500,
+      "h": 375,
+      "credit": "Guillaume Delaitre",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/248249214"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/253266804/medium.jpeg",
+      "w": 375,
+      "h": 500,
+      "credit": "martin ingemansson",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/253266804"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/262923074/medium.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Kristof Zyskowski",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/262923074"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "mexican-red-knee-tarantula",
+   "name": "Mexican red-knee tarantula",
+   "sci": "Brachypelma hamorii",
+   "group": "tarantula",
+   "facts": {
+    "danger": "Harmless",
+    "region": "the Americas",
+    "web": false,
+    "legSpanCm": 15
+   },
+   "lookalikes": [
+    "goliath-birdeater",
+    "chilean-rose-tarantula"
+   ],
+   "blurb": "A calm, colourful tarantula from Mexico and a favourite pet. Females can live for over 25 years.",
+   "clues": [
+    "Family: Theraphosidae.",
+    "Genus: Brachypelma.",
+    "Females can live for more than 25 years.",
+    "It flicks itchy hairs when threatened.",
+    "Its bite is harmless to people.",
+    "It is found in the Americas.",
+    "It hunts without a catching web.",
+    "Its leg span can reach about 15 cm.",
+    "Its legs have orange bands at the joints.",
+    "It comes from the country just south of the USA.",
+    "The answer has 4 words (7, 3, 4, 9 letters).",
+    "It starts with the letter M."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/4016251/medium.JPG",
+      "w": 500,
+      "h": 333,
+      "credit": "Alan Rockefeller",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/4016251"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/10512345/medium.jpeg",
+      "w": 500,
+      "h": 375,
+      "credit": "adel-fridus",
+      "license": "CC0 1.0",
+      "page": "https://www.inaturalist.org/photos/10512345"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/5539434/medium.jpeg",
+      "w": 375,
+      "h": 500,
+      "credit": "nasua",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/5539434"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "chilean-rose-tarantula",
+   "name": "Chilean rose tarantula",
+   "sci": "Grammostola rosea",
+   "group": "tarantula",
+   "facts": {
+    "danger": "Harmless",
+    "region": "the Americas",
+    "web": false,
+    "legSpanCm": 13
+   },
+   "lookalikes": [
+    "mexican-red-knee-tarantula"
+   ],
+   "blurb": "A gentle tarantula from South America and one of the most common pet spiders.",
+   "clues": [
+    "Family: Theraphosidae.",
+    "Genus: Grammostola.",
+    "It can go without food for months.",
+    "Its hairs have a pinkish shine.",
+    "Its bite is harmless to people.",
+    "It is found in the Americas.",
+    "It hunts without a catching web.",
+    "Its leg span can reach about 13 cm.",
+    "It comes from a long, thin country in South America.",
+    "It is named after a flower.",
+    "The answer has 3 words (7, 4, 9 letters).",
+    "It starts with the letter C."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/617608472/medium.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Nicolás Garcés",
+      "license": "CC0 1.0",
+      "page": "https://www.inaturalist.org/photos/617608472"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/336021190/medium.jpg",
+      "w": 500,
+      "h": 500,
+      "credit": "Gabriela Cartes",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/336021190"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/433710771/medium.jpg",
+      "w": 500,
+      "h": 500,
+      "credit": "Perrito Chiquitito",
+      "license": "CC0 1.0",
+      "page": "https://www.inaturalist.org/photos/433710771"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "gooty-sapphire-tarantula",
+   "name": "Gooty sapphire tarantula",
+   "alt": [
+    "peacock tarantula"
+   ],
+   "sci": "Poecilotheria metallica",
+   "group": "tarantula",
+   "facts": {
+    "danger": "Dangerous",
+    "region": "Asia",
+    "web": false,
+    "legSpanCm": 20
+   },
+   "blurb": "A bright blue tree-dwelling tarantula from a small patch of forest in India. It is critically endangered.",
+   "clues": [
+    "Family: Theraphosidae.",
+    "Genus: Poecilotheria.",
+    "It was rediscovered in 2001 after more than 100 years.",
+    "It lives in trees in southern India.",
+    "It is critically endangered in the wild.",
+    "It is found in Asia.",
+    "It hunts without a catching web.",
+    "Its leg span can reach about 20 cm.",
+    "Its legs are a bright metallic blue.",
+    "It is named after a blue gemstone.",
+    "The answer has 3 words (5, 8, 9 letters).",
+    "It starts with the letter G."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/57025181/medium.jpg",
+      "w": 500,
+      "h": 281,
+      "credit": "DJANDYW.COM AKA NOBODY",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/57025181"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/65568902/medium.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "John",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/65568902"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "european-garden-spider",
+   "name": "European garden spider",
+   "alt": [
+    "cross spider"
+   ],
+   "sci": "Araneus diadematus",
+   "group": "orb-weaver",
+   "facts": {
+    "danger": "Harmless",
+    "region": "Europe",
+    "web": true
+   },
+   "lookalikes": [
+    "australian-golden-orb-weaver"
+   ],
+   "blurb": "The common orb-weaver of European gardens in autumn. It has a white cross of spots on its back.",
+   "clues": [
+    "Family: Araneidae.",
+    "Genus: Araneus.",
+    "It eats its old web each day and spins a new one.",
+    "It is most noticed in autumn.",
+    "It spins a round, wheel-shaped web.",
+    "Its bite is harmless to people.",
+    "It catches prey in a web.",
+    "The answer has 3 words (8, 6, 6 letters).",
+    "It starts with the letter E."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/156036389/medium.jpg",
+      "w": 500,
+      "h": 415,
+      "credit": "hedera.baltica",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/156036389"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/156036390/medium.jpg",
+      "w": 500,
+      "h": 388,
+      "credit": "Thomas Bresson",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/156036390"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/163051738/medium.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Анатолий Озерной /Anatoly Ozernoy",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/163051738"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "wasp-spider",
+   "name": "Wasp spider",
+   "sci": "Argiope bruennichi",
+   "group": "orb-weaver",
+   "facts": {
+    "danger": "Harmless",
+    "region": "Europe",
+    "web": true
+   },
+   "lookalikes": [
+    "yellow-garden-spider",
+    "st-andrews-cross-spider"
+   ],
+   "blurb": "A striking orb-weaver with yellow and black stripes. It has spread north through Europe as the climate has warmed.",
+   "clues": [
+    "Family: Araneidae.",
+    "Genus: Argiope.",
+    "It adds a zig-zag band of silk to its web.",
+    "It has spread into southern Britain.",
+    "It builds its web low in long grass.",
+    "Its bite is harmless to people.",
+    "It is found in Europe.",
+    "It catches prey in a web.",
+    "It is striped yellow and black.",
+    "It is named after a stinging insect it looks like.",
+    "The answer has 2 words (4, 6 letters).",
+    "It starts with the letter W."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/29402710/medium.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Анатолий Озерной /Anatoliy Ozernoy",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/29402710"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/119144639/medium.jpg",
+      "w": 390,
+      "h": 500,
+      "credit": "Thomas Bresson",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/119144639"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/252504364/medium.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Анатолий Озерной /Anatoly Ozernoy",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/252504364"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "yellow-garden-spider",
+   "name": "Yellow garden spider",
+   "alt": [
+    "writing spider"
+   ],
+   "sci": "Argiope aurantia",
+   "group": "orb-weaver",
+   "facts": {
+    "danger": "Harmless",
+    "region": "the Americas",
+    "web": true
+   },
+   "lookalikes": [
+    "wasp-spider"
+   ],
+   "blurb": "A large black-and-yellow orb-weaver of North American gardens. The thick zig-zag in its web inspired the nickname \"writing spider\".",
+   "clues": [
+    "Family: Araneidae.",
+    "Genus: Argiope.",
+    "It often eats its web at night and spins a new one.",
+    "Its web has a thick zig-zag down the middle.",
+    "Its bite is harmless to people.",
+    "It is found in the Americas.",
+    "It catches prey in a web.",
+    "The answer has 3 words (6, 6, 6 letters).",
+    "It starts with the letter Y."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/208881445/medium.jpg",
+      "w": 500,
+      "h": 500,
+      "credit": "M. Whitson",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/208881445"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/555702674/medium.jpg",
+      "w": 375,
+      "h": 500,
+      "credit": "Michael J. Papay",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/555702674"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/211209217/medium.jpg",
+      "w": 375,
+      "h": 500,
+      "credit": "Brian Mork",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/211209217"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "zebra-jumping-spider",
+   "name": "Zebra jumping spider",
+   "sci": "Salticus scenicus",
+   "group": "jumping",
+   "facts": {
+    "danger": "Harmless",
+    "region": "many parts of the world",
+    "web": false
+   },
+   "lookalikes": [
+    "bold-jumping-spider"
+   ],
+   "blurb": "A small black-and-white jumping spider often seen hunting on sunny walls in Europe and North America.",
+   "clues": [
+    "Family: Salticidae.",
+    "Genus: Salticus.",
+    "It has two huge front eyes.",
+    "It stalks flies on sunny walls.",
+    "It can leap many times its own length.",
+    "Its bite is harmless to people.",
+    "It is found in many parts of the world.",
+    "It hunts without a catching web.",
+    "It is black with white stripes.",
+    "It is named after a striped African animal.",
+    "The answer has 3 words (5, 7, 6 letters).",
+    "It starts with the letter Z."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/306430245/medium.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Анатолий Озерной /Anatoly Ozernoy",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/306430245"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/306430239/medium.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Анатолий Озерной /Anatoly Ozernoy",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/306430239"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/410228598/medium.jpeg",
+      "w": 500,
+      "h": 375,
+      "credit": "Tyler Bishop",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/410228598"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "bold-jumping-spider",
+   "name": "Bold jumping spider",
+   "sci": "Phidippus audax",
+   "group": "jumping",
+   "facts": {
+    "danger": "Harmless",
+    "region": "the Americas",
+    "web": false
+   },
+   "lookalikes": [
+    "zebra-jumping-spider",
+    "regal-jumping-spider"
+   ],
+   "blurb": "A fuzzy black jumping spider of North America with shiny green-blue jaws.",
+   "clues": [
+    "Family: Salticidae.",
+    "Genus: Phidippus.",
+    "Its jaws are shiny metallic green or blue.",
+    "It has big front eyes and sharp vision.",
+    "It is black with white spots.",
+    "Its bite is harmless to people.",
+    "It is found in the Americas.",
+    "It hunts without a catching web.",
+    "It is common in North America.",
+    "Its name means daring.",
+    "The answer has 3 words (4, 7, 6 letters).",
+    "It starts with the letter B."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/95152709/medium.jpg",
+      "w": 375,
+      "h": 500,
+      "credit": "Katja Schulz",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/95152709"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/283830382/medium.jpeg",
+      "w": 451,
+      "h": 500,
+      "credit": "Rebecca Ray",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/283830382"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/648814191/medium.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "no rights reserved",
+      "license": "CC0 1.0",
+      "page": "https://www.inaturalist.org/photos/648814191"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "regal-jumping-spider",
+   "name": "Regal jumping spider",
+   "sci": "Phidippus regius",
+   "group": "jumping",
+   "facts": {
+    "danger": "Harmless",
+    "region": "the Americas",
+    "web": false
+   },
+   "lookalikes": [
+    "bold-jumping-spider"
+   ],
+   "blurb": "The largest jumping spider in eastern North America. Females are often orange or grey.",
+   "clues": [
+    "Family: Salticidae.",
+    "Genus: Phidippus.",
+    "Females can be bright orange.",
+    "It is often kept as a pet.",
+    "Its bite is harmless to people.",
+    "It is found in the Americas.",
+    "It hunts without a catching web.",
+    "It lives in Florida and the Caribbean.",
+    "Its name means royal.",
+    "The answer has 3 words (5, 7, 6 letters).",
+    "It starts with the letter R."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/116141918/medium.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Zygy",
+      "license": "CC0 1.0",
+      "page": "https://www.inaturalist.org/photos/116141918"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/116141908/medium.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Zygy",
+      "license": "CC0 1.0",
+      "page": "https://www.inaturalist.org/photos/116141908"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/105277951/medium.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Dennis Vollmar",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/105277951"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "diving-bell-spider",
+   "name": "Diving bell spider",
+   "alt": [
+    "water spider"
+   ],
+   "sci": "Argyroneta aquatica",
+   "group": "water",
+   "facts": {
+    "danger": "Harmless",
+    "region": "Europe",
+    "web": false
+   },
+   "blurb": "The only spider that lives almost its whole life underwater. It breathes from a silk bubble of air it fills itself.",
+   "clues": [
+    "Family: Argyronetidae.",
+    "Genus: Argyroneta.",
+    "Its genus name means \"silver net\".",
+    "It carries air down on its hairy body.",
+    "Its bite is harmless to people.",
+    "It is found in Europe.",
+    "It hunts without a catching web.",
+    "It lives in ponds in Europe and Asia.",
+    "It is the only spider that lives underwater.",
+    "The answer has 3 words (6, 4, 6 letters).",
+    "It starts with the letter D."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/1975683/medium.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Baupi",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/1975683"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/1975684/medium.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Baupi",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/1975684"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/235376670/medium.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Johan Kjær Prehn",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/235376670"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "raft-spider",
+   "name": "Raft spider",
+   "sci": "Dolomedes fimbriatus",
+   "group": "fishing",
+   "facts": {
+    "danger": "Harmless",
+    "region": "Europe",
+    "web": false
+   },
+   "blurb": "A large European spider that sits at the edge of ponds and runs across the water to catch insects and tiny fish.",
+   "clues": [
+    "Family: Dolomedidae.",
+    "Genus: Dolomedes.",
+    "It can catch small fish and tadpoles.",
+    "It senses ripples with its front legs.",
+    "It has a pale stripe down each side.",
+    "Its bite is harmless to people.",
+    "It is found in Europe.",
+    "It hunts without a catching web.",
+    "It walks on the surface of ponds.",
+    "It is named after a floating platform.",
+    "The answer has 2 words (4, 6 letters).",
+    "It starts with the letter R."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/154101759/medium.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Samuli Siltanen",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/154101759"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/455537300/medium.jpg",
+      "w": 500,
+      "h": 461,
+      "credit": "Andrejus Gaidamavičius",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/455537300"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/149655926/medium.jpeg",
+      "w": 500,
+      "h": 375,
+      "credit": "harry beaman",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/149655926"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "darwins-bark-spider",
+   "name": "Darwin's bark spider",
+   "sci": "Caerostris darwini",
+   "group": "orb-weaver",
+   "facts": {
+    "danger": "Harmless",
+    "region": "Africa",
+    "web": true
+   },
+   "blurb": "A spider from Madagascar that spins the biggest webs known, right across rivers. Its silk is the toughest known.",
+   "clues": [
+    "Family: Araneidae.",
+    "Genus: Caerostris.",
+    "It was described in 2010.",
+    "Its silk is tougher than Kevlar.",
+    "Its webs can stretch right across rivers.",
+    "Its bite is harmless to people.",
+    "It is found in Africa.",
+    "It catches prey in a web.",
+    "It lives in Madagascar.",
+    "It is named after a famous naturalist.",
+    "The answer has 3 words (7, 4, 6 letters).",
+    "It starts with the letter D."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/3439620/medium.jpg",
+      "w": 414,
+      "h": 500,
+      "credit": "Matjazgregoric",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/3439620"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/3439623/medium.jpg",
+      "w": 500,
+      "h": 434,
+      "credit": "EOL Learning and Education Group",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/3439623"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/3439624/medium.jpg",
+      "w": 500,
+      "h": 488,
+      "credit": "EOL Learning and Education Group",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/3439624"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "net-casting-spider",
+   "name": "Net-casting spider",
+   "alt": [
+    "ogre-faced spider"
+   ],
+   "sci": "Deinopis",
+   "group": "net-caster",
+   "facts": {
+    "danger": "Harmless",
+    "region": "many parts of the world",
+    "web": false
+   },
+   "blurb": "A stick-thin spider that holds a small stretchy net in its front legs and throws it over passing insects.",
+   "clues": [
+    "Family: Deinopidae.",
+    "It has two enormous eyes for seeing at night.",
+    "It hangs upside down and waits.",
+    "Its bite is harmless to people.",
+    "It is found in many parts of the world.",
+    "It hunts without a catching web.",
+    "It holds a stretchy web between its front legs.",
+    "It throws its web over prey.",
+    "The answer has 3 words (3, 7, 6 letters).",
+    "It starts with the letter N."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/563721575/medium.jpg",
+      "w": 500,
+      "h": 497,
+      "credit": "Amber M. King",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/563721575"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/262774372/medium.jpeg",
+      "w": 500,
+      "h": 375,
+      "credit": "Zac Peterson",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/262774372"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/168184484/medium.jpeg",
+      "w": 500,
+      "h": 333,
+      "credit": "no rights reserved",
+      "license": "CC0 1.0",
+      "page": "https://www.inaturalist.org/photos/168184484"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "goldenrod-crab-spider",
+   "name": "Goldenrod crab spider",
+   "sci": "Misumena vatia",
+   "group": "crab",
+   "facts": {
+    "danger": "Harmless",
+    "region": "many parts of the world",
+    "web": false
+   },
+   "blurb": "A crab spider that waits on flowers to grab bees and butterflies. It can slowly change between white and yellow.",
+   "clues": [
+    "Family: Thomisidae.",
+    "Genus: Misumena.",
+    "It can change colour between white and yellow.",
+    "It ambushes bees on flowers.",
+    "Its front legs are long and held open.",
+    "Its bite is harmless to people.",
+    "It is found in many parts of the world.",
+    "It hunts without a catching web.",
+    "It is named after a yellow flower.",
+    "The answer has 3 words (9, 4, 6 letters).",
+    "It starts with the letter G."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/35657903/medium.jpeg",
+      "w": 500,
+      "h": 375,
+      "credit": "Wolfgang Jauch",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/35657903"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/130005360/medium.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Анатолий Озерной /Anatoly Ozernoy",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/130005360"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/76758971/medium.jpg",
+      "w": 444,
+      "h": 500,
+      "credit": "christine123",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/76758971"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "spiny-orb-weaver",
+   "name": "Spiny orb-weaver",
+   "alt": [
+    "spiny-backed orb-weaver"
+   ],
+   "sci": "Gasteracantha cancriformis",
+   "group": "orb-weaver",
+   "facts": {
+    "danger": "Harmless",
+    "region": "the Americas",
+    "web": true
+   },
+   "blurb": "A small orb-weaver with a hard, colourful shell and six spikes. It is common in warm parts of the Americas.",
+   "clues": [
+    "Family: Araneidae.",
+    "Genus: Gasteracantha.",
+    "Its body is shaped a bit like a crab.",
+    "Its shell can be white, yellow or red with black spots.",
+    "It has six red spikes.",
+    "Its bite is harmless to people.",
+    "It is found in the Americas.",
+    "It catches prey in a web.",
+    "It builds round webs in gardens.",
+    "The answer has 3 words (5, 3, 6 letters).",
+    "It starts with the letter S."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/10541003/medium.jpg",
+      "w": 500,
+      "h": 386,
+      "credit": "Meghan Cassidy",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/10541003"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/21540808/medium.jpg",
+      "w": 500,
+      "h": 400,
+      "credit": "Meghan Cassidy",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/21540808"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/4956038/medium.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Judy Gallagher",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/4956038"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "false-widow-spider",
+   "name": "False widow spider",
+   "alt": [
+    "noble false widow"
+   ],
+   "sci": "Steatoda nobilis",
+   "group": "widow",
+   "facts": {
+    "danger": "Mildly venomous",
+    "region": "Europe",
+    "web": true
+   },
+   "lookalikes": [
+    "black-widow",
+    "redback-spider"
+   ],
+   "blurb": "A spider from the Canary Islands that has spread across Britain and Europe. Its bite hurts but is rarely serious.",
+   "clues": [
+    "Family: Theridiidae.",
+    "Genus: Steatoda.",
+    "It probably came from the Canary Islands.",
+    "It is now common in British homes.",
+    "It has a cream pattern like a skull on its back.",
+    "Its bite can hurt but is rarely serious.",
+    "It is found in Europe.",
+    "It catches prey in a web.",
+    "It is the most venomous spider in Britain.",
+    "The answer has 3 words (5, 5, 6 letters).",
+    "It starts with the letter F."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/439298610/medium.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Dustin Edmundson",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/439298610"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/53352329/medium.jpg",
+      "w": 500,
+      "h": 326,
+      "credit": "Martin Cooper",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/53352329"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/602797168/medium.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Shane Austin",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/602797168"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "giant-house-spider",
+   "name": "Giant house spider",
+   "sci": "Eratigena atrica",
+   "group": "funnel-weaver",
+   "facts": {
+    "danger": "Harmless",
+    "region": "Europe",
+    "web": true
+   },
+   "lookalikes": [
+    "hobo-spider"
+   ],
+   "blurb": "A big, fast, long-legged spider that appears in European homes in autumn. It is one of the fastest spiders.",
+   "clues": [
+    "Family: Agelenidae.",
+    "Genus: Eratigena.",
+    "Males go looking for females in autumn.",
+    "It builds sheet webs with a funnel in a corner.",
+    "It is one of the fastest-running spiders.",
+    "Its bite is harmless to people.",
+    "It is found in Europe.",
+    "It catches prey in a web.",
+    "It is often found in baths.",
+    "It is a large spider found indoors.",
+    "The answer has 3 words (5, 5, 6 letters).",
+    "It starts with the letter G."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/312878028/medium.jpeg",
+      "w": 500,
+      "h": 331,
+      "credit": "Ludivine Lamare",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/312878028"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/58420158/medium.jpg",
+      "w": 500,
+      "h": 365,
+      "credit": "Bin Aden",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/58420158"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/219652508/medium.jpg",
+      "w": 320,
+      "h": 500,
+      "credit": "Judy Gallagher",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/219652508"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "hobo-spider",
+   "name": "Hobo spider",
+   "sci": "Eratigena agrestis",
+   "group": "funnel-weaver",
+   "facts": {
+    "danger": "Harmless",
+    "region": "Europe",
+    "web": true
+   },
+   "lookalikes": [
+    "giant-house-spider"
+   ],
+   "blurb": "A brown funnel-weaver from Europe that spread to the north-western USA. It was wrongly blamed for nasty bites.",
+   "clues": [
+    "Family: Agelenidae.",
+    "Genus: Eratigena.",
+    "It was wrongly blamed for skin wounds in the USA.",
+    "It reached the north-western USA in the 1930s.",
+    "It builds funnel webs near the ground.",
+    "Its bite is harmless to people.",
+    "It is found in Europe.",
+    "It catches prey in a web.",
+    "It is brown with a herringbone pattern.",
+    "Its name is a word for a wandering worker.",
+    "The answer has 2 words (4, 6 letters).",
+    "It starts with the letter H."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/341120456/medium.jpg",
+      "w": 500,
+      "h": 345,
+      "credit": "Tone Killick",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/341120456"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/108970123/medium.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Анатолий Озерной /Anatoly Ozernoy",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/108970123"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/4474197/medium.jpeg",
+      "w": 500,
+      "h": 333,
+      "credit": "no rights reserved",
+      "license": "CC0 1.0",
+      "page": "https://www.inaturalist.org/photos/4474197"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "woodlouse-spider",
+   "name": "Woodlouse spider",
+   "sci": "Dysdera crocata",
+   "group": "hunter",
+   "facts": {
+    "danger": "Harmless",
+    "region": "many parts of the world",
+    "web": false
+   },
+   "blurb": "A reddish spider with huge jaws that hunts woodlice, which most other spiders avoid.",
+   "clues": [
+    "Family: Dysderidae.",
+    "Genus: Dysdera.",
+    "Its jaws are huge for its size.",
+    "It hides under stones and logs by day.",
+    "Its legs and head are reddish.",
+    "Its bite is harmless to people.",
+    "It is found in many parts of the world.",
+    "It hunts without a catching web.",
+    "Its body is pale and shiny.",
+    "It eats small grey crustaceans that roll into balls.",
+    "The answer has 2 words (9, 6 letters).",
+    "It starts with the letter W."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/66901473/medium.jpg",
+      "w": 400,
+      "h": 500,
+      "credit": "Meghan Cassidy",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/66901473"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/73687816/medium.jpg",
+      "w": 500,
+      "h": 260,
+      "credit": "Tone Killick",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/73687816"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/222420103/medium.jpg",
+      "w": 500,
+      "h": 347,
+      "credit": "Tone Killick",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/222420103"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "indian-ornamental-tarantula",
+   "name": "Indian ornamental tarantula",
+   "sci": "Poecilotheria regalis",
+   "group": "tarantula",
+   "facts": {
+    "danger": "Dangerous",
+    "region": "Asia",
+    "web": false,
+    "legSpanCm": 18
+   },
+   "lookalikes": [
+    "gooty-sapphire-tarantula"
+   ],
+   "blurb": "A fast, tree-dwelling tarantula from India with bold grey, black and yellow patterns.",
+   "clues": [
+    "Family: Theraphosidae.",
+    "Genus: Poecilotheria.",
+    "Its bite can cause strong cramps.",
+    "It lives in holes in trees.",
+    "Underneath, its front legs are bright yellow.",
+    "Its bite can make a person very ill.",
+    "It is found in Asia.",
+    "It hunts without a catching web.",
+    "Its leg span can reach about 18 cm.",
+    "Its name means decorative.",
+    "The answer has 3 words (6, 10, 9 letters).",
+    "It starts with the letter I."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/76551/medium.jpg",
+      "w": 454,
+      "h": 430,
+      "credit": "John",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/76551"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/127402301/medium.jpeg",
+      "w": 500,
+      "h": 375,
+      "credit": "Hopeland",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/127402301"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/60142353/medium.jpeg",
+      "w": 457,
+      "h": 500,
+      "credit": "no rights reserved",
+      "license": "CC0 1.0",
+      "page": "https://www.inaturalist.org/photos/60142353"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "jumping-spider",
+   "name": "Jumping spider",
+   "sci": "Salticidae",
+   "group": "jumping",
+   "facts": {
+    "danger": "Harmless",
+    "region": "many parts of the world",
+    "web": false
+   },
+   "lookalikes": [
+    "zebra-jumping-spider",
+    "peacock-spider"
+   ],
+   "blurb": "Small spiders with big front eyes that stalk and pounce on insects. They have some of the best eyesight of any small animal.",
+   "clues": [
+    "Family: Salticidae.",
+    "They are the largest family of spiders, with over 6,000 kinds.",
+    "They tie a silk safety line before each leap.",
+    "They have excellent eyesight.",
+    "Its bite is harmless to people.",
+    "It is found in many parts of the world.",
+    "It hunts without a catching web.",
+    "Two of their eyes are huge and face forward.",
+    "They leap onto their prey.",
+    "The answer has 2 words (7, 6 letters).",
+    "It starts with the letter J."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/378835762/medium.jpg",
+      "w": 500,
+      "h": 332,
+      "credit": "Thomas Shahan",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/378835762"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/223921337/medium.jpg",
+      "w": 500,
+      "h": 400,
+      "credit": "Alexis Tinker-Tsavalas",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/223921337"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/11760967/medium.jpg",
+      "w": 500,
+      "h": 281,
+      "credit": "Ryan Hodnett",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/11760967"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "tarantula",
+   "name": "Tarantula",
+   "sci": "Theraphosidae",
+   "group": "tarantula",
+   "facts": {
+    "danger": "Harmless",
+    "region": "many parts of the world",
+    "web": false
+   },
+   "lookalikes": [
+    "goliath-birdeater",
+    "mexican-red-knee-tarantula"
+   ],
+   "blurb": "Big, hairy spiders found in warm places around the world. Many are kept as pets and live for many years.",
+   "clues": [
+    "Family: Theraphosidae.",
+    "Some flick itchy hairs at attackers.",
+    "Females of some kinds live for over 20 years.",
+    "They moult their whole skin as they grow.",
+    "Its bite is harmless to people.",
+    "It is found in many parts of the world.",
+    "It hunts without a catching web.",
+    "Many are kept as pets.",
+    "They are very big and hairy.",
+    "The answer is one word of 9 letters.",
+    "It starts with the letter T."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/34513003/medium.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Richard Adams",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/34513003"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/2357740/medium.jpg",
+      "w": 375,
+      "h": 500,
+      "credit": "115527224325819725585",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/2357740"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/34699757/medium.jpeg",
+      "w": 375,
+      "h": 500,
+      "credit": "Christiaan Viljoen",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/34699757"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "money-spider",
+   "name": "Money spider",
+   "sci": "Linyphiidae",
+   "group": "sheet-weaver",
+   "facts": {
+    "danger": "Harmless",
+    "region": "many parts of the world",
+    "web": true
+   },
+   "blurb": "Tiny spiders that are said to bring good luck if one lands on you. Babies float through the air on threads of silk.",
+   "clues": [
+    "Family: Linyphiidae.",
+    "They are often only 2 or 3 millimetres long.",
+    "They spin flat sheet webs in grass.",
+    "Young ones fly long distances on silk threads.",
+    "Its bite is harmless to people.",
+    "It is found in many parts of the world.",
+    "It catches prey in a web.",
+    "On misty autumn mornings their webs cover fields.",
+    "Folklore says one landing on you brings riches.",
+    "The answer has 2 words (5, 6 letters).",
+    "It starts with the letter M."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/167460378/medium.jpeg",
+      "w": 500,
+      "h": 363,
+      "credit": "Toby",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/167460378"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/166377107/medium.jpeg",
+      "w": 500,
+      "h": 375,
+      "credit": "Toby",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/166377107"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/322225829/medium.jpeg",
+      "w": 500,
+      "h": 500,
+      "credit": "Ludivine Lamare",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/322225829"
+     }
+    ]
+   },
+   "difficulty": 1
+  }
+ ],
+ "questions": [
+  {
+   "id": "q1",
+   "kind": "number",
+   "prompt": "How many legs does a spider have?",
+   "answer": 8,
+   "unit": "legs",
+   "tolerance": 0,
+   "explain": "All spiders have eight legs; insects have six.",
+   "difficulty": 1
+  },
+  {
+   "id": "q2",
+   "kind": "tf",
+   "prompt": "Spiders are insects.",
+   "answer": false,
+   "explain": "Spiders are arachnids: eight legs and two body parts.",
+   "difficulty": 1
+  },
+  {
+   "id": "q3",
+   "kind": "mc",
+   "prompt": "Which is the heaviest spider in the world?",
+   "answer": "Goliath birdeater",
+   "wrong": [
+    "Huntsman spider",
+    "Sydney funnel-web spider",
+    "Mexican red-knee tarantula"
+   ],
+   "explain": "Goliath birdeaters can weigh about 175 g.",
+   "difficulty": 1
+  },
+  {
+   "id": "q4",
+   "kind": "mc",
+   "prompt": "Which Australian spider's male venom is far more dangerous than the female's?",
+   "answer": "Sydney funnel-web spider",
+   "wrong": [
+    "Redback spider",
+    "Huntsman spider",
+    "White-tailed spider"
+   ],
+   "explain": "A toxin found mainly in males is deadly to primates.",
+   "difficulty": 2
+  },
+  {
+   "id": "q5",
+   "kind": "mc",
+   "prompt": "Which spider lives almost its whole life underwater in a bubble of air?",
+   "answer": "Diving bell spider",
+   "wrong": [
+    "Raft spider",
+    "Wolf spider",
+    "Huntsman spider"
+   ],
+   "explain": "It builds a silk \"bell\" and fills it with air.",
+   "difficulty": 2
+  },
+  {
+   "id": "q6",
+   "kind": "mc",
+   "prompt": "Which mark is found under the belly of a female black widow?",
+   "answer": "A red hourglass",
+   "wrong": [
+    "A white cross",
+    "A blue spot",
+    "A yellow stripe"
+   ],
+   "explain": "The red hourglass is the classic widow marking.",
+   "difficulty": 1
+  },
+  {
+   "id": "q7",
+   "kind": "tf",
+   "prompt": "All spiders spin webs to catch their food.",
+   "answer": false,
+   "explain": "Many, like jumping, wolf and huntsman spiders, hunt without a web.",
+   "difficulty": 1
+  },
+  {
+   "id": "q8",
+   "kind": "mc",
+   "prompt": "How many eyes do most spiders have?",
+   "answer": "8",
+   "wrong": [
+    "2",
+    "4",
+    "12"
+   ],
+   "explain": "Most have eight eyes; recluse spiders have six.",
+   "difficulty": 2
+  },
+  {
+   "id": "q9",
+   "kind": "tf",
+   "prompt": "Wolf spider mothers carry their babies on their backs.",
+   "answer": true,
+   "explain": "The spiderlings ride on her back for days.",
+   "difficulty": 2
+  },
+  {
+   "id": "q10",
+   "kind": "mc",
+   "prompt": "Spiders belong to which group of animals?",
+   "answer": "Arachnids",
+   "wrong": [
+    "Insects",
+    "Crustaceans",
+    "Reptiles"
+   ],
+   "explain": "Arachnids include spiders, scorpions, ticks and mites.",
+   "difficulty": 2
+  }
+ ],
+ "fakes": [
+  "Crimson funnel-web",
+  "Glass-backed widow",
+  "Silver huntsman tarantula",
+  "Desert lantern spider",
+  "Velvet trapdoor weaver",
+  "Thunder orb-weaver",
+  "Blue-fanged recluse",
+  "Shadow wolf tarantula"
+ ],
+ "sources": [
+  {
+   "name": "iNaturalist",
+   "url": "https://www.inaturalist.org"
+  },
+  {
+   "name": "Wikidata",
+   "url": "https://www.wikidata.org"
+  }
+ ]
+}

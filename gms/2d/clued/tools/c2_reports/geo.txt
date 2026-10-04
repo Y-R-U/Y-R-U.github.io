@@ -1,0 +1,54 @@
+population ALB wb=2349580 (2025) wd=2811655 (2023)
+capital ATG mine=St. John's wd=St. John's
+language BGD mine=Bengali wd=bangla
+population BIH wb=3140095 (2025) wd=3816459 (2022)
+area BIH wp=51209 wd=10
+language BWA mine=Setswana wd=english
+language BFA mine=French wd=mooré,bissa,dioula
+language CHN mine=Mandarin Chinese wd=putonghua
+continent CYP mine=Asia wd=Europe
+capital GNQ mine=Malabo wd=Ciudad de la Paz
+continent GEO mine=Asia wd=Europe
+capital GRD mine=St. George's wd=St. George's
+population GIN wb=15099727 (2025) wd=17521167 (2025)
+population GNB wb=2249515 (2025) wd=1861283 (2017)
+population IRQ wb=47020774 (2025) wd=38274618 (2017)
+population KEN wb=57532493 (2025) wd=47564296 (2019)
+language KGZ mine=Russian wd=kyrgyz
+landlocked LIE mine=true wd=false
+population MWI wb=22216120 (2025) wd=17563749 (2018)
+language MDV mine=Dhivehi wd=maldivian
+population MDV wb=529676 (2025) wd=436330 (2017)
+population MHL wb=36282 (2025) wd=54366 (2023)
+language MUS mine=Mauritian Creole wd=english,french
+population FSM wb=113683 (2025) wd=75817 (2023)
+population MDA wb=2360527 (2025) wd=3599528 (2024)
+language MAR mine=Berber wd=arabic,standard moroccan tamazight
+population MOZ wb=35631653 (2025) wd=29668834 (2017)
+population NAM wb=3092816 (2025) wd=2533794 (2017)
+area NLD wp=41865 wd=37378
+language NER mine=French wd=hausa
+population NER wb=27917831 (2025) wd=21477348 (2017)
+population PLW wb=17663 (2025) wd=21729 (2017)
+population PNG wb=10762817 (2025) wd=8935000 (2020)
+language PRY mine=Guaraní wd=spanish,guarani
+area PHL wp=300000 wd=343448
+currency SLE mine=SLE wd=SLL
+language SGP mine=Mandarin Chinese wd=english,malay,standard chinese,tamil
+population SLB wb=838645 (2025) wd=611343 (2017)
+population SOM wb=19654739 (2025) wd=11031386 (2017)
+population TKM wb=7618847 (2025) wd=6117933 (2021)
+language USA mine=English wd=hawaiian,spanish,samoan,chamorro,carolinian
+area USA not in Wikipedia list, using Wikidata 9826675
+language URY mine=Spanish wd=
+landlocked UZB mine=true wd=false
+area VAT wp=0.44 wd=0.49
+population YEM wb=41773878 (2025) wd=28250420 (2017)
+landmark year Saint Basil's Cathedral mine=1561 wd=1555 -> dropped
+landmark year St. Peter's Basilica mine=1626 wd=1506 -> dropped
+landmark year Mount Rushmore mine=1941 wd= -> dropped
+landmark fallback image Gateway of India: Gateway of India Port Mumbai 4.jpg
+landmark fallback image Charles Bridge: North view of Charles Bridge from Mánesův most, Prague 20160808 1.jpg
+landmark fallback image Gyeongbokgung: Front view of the Imperial Throne Hall Geunjeongjeon at Gyeongbokgung Palace with blue sky in Seoul.jpg
+landmark fallback image Lotus Temple: Lotus Temple-Panoroma-Visit During WCI 2016- IMG 6471.jpg
+flag licence rejected OMN: OGL-om 1.0

@@ -1,0 +1,4 @@
+year mismatch The Last Supper: mine 1498, wikidata 1490 -> year dropped
+collection differs The Great Wave off Kanagawa: mine Woodblock print (many copies), wikidata Tokyo National Museum / Rijksmuseum / Honolulu Museum of Art / Centre Céramique / Metropolitan Museum of Art / British Museum / Tokyo Fuji Art Museum / National Gallery of Victoria / Museum of Art and Crafts Hamburg / Art Institute of Chicago / Los Angeles County Museum of Art / Maidstone Museum and Bentlif Art Gallery / MAK – Museum of Applied Arts
+year mismatch The Garden of Earthly Delights: mine 1505, wikidata 1490 -> year dropped
+year mismatch The Calling of Saint Matthew: mine 1600, wikidata 1609 -> year dropped

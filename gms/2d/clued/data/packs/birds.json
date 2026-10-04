@@ -1,0 +1,5149 @@
+{
+ "id": "birds",
+ "title": "Birds",
+ "theme": "animals",
+ "icon": "🐦",
+ "kids": true,
+ "version": 1,
+ "imgPrompt": "Which of these is {aName}?",
+ "nameImgPrompt": "Which bird is this?",
+ "tfImgPrompt": "This bird is {aName}.",
+ "leakExempt": [
+  "bird"
+ ],
+ "factsMeta": {
+  "region": {
+   "type": "cat",
+   "label": "Found in",
+   "ask": "Where does the {lname} live?",
+   "askReverse": "Which of these birds lives in {value}?",
+   "stmt": "The {lname} lives in {value}.",
+   "exclusive": false
+  },
+  "flightless": {
+   "type": "bool",
+   "label": "Flightless",
+   "yes": "Cannot fly",
+   "no": "Can fly",
+   "askBool": "Which of these birds cannot fly?",
+   "stmt": "The {lname} cannot fly."
+  },
+  "status": {
+   "type": "cat",
+   "label": "Conservation status (IUCN)",
+   "ask": "What is the IUCN conservation status of the {lname}?",
+   "askReverse": "Which of these is listed as \"{value}\" by the IUCN?",
+   "stmt": "The {lname} is listed as \"{value}\" by the IUCN."
+  }
+ },
+ "items": [
+  {
+   "id": "emu",
+   "name": "Emu",
+   "sci": "Dromaius novaehollandiae",
+   "group": "ratite",
+   "facts": {
+    "region": "Australia",
+    "flightless": true,
+    "status": "Least concern"
+   },
+   "lookalikes": [
+    "ostrich",
+    "southern-cassowary"
+   ],
+   "blurb": "Australia's tallest bird. It cannot fly, but it can run at about 50 km/h.",
+   "clues": [
+    "Its IUCN conservation status is \"Least concern\".",
+    "Family: Casuariidae.",
+    "Genus: Dromaius.",
+    "The father sits on the eggs and raises the chicks.",
+    "Its eggs are dark green.",
+    "In 1932, soldiers with machine guns lost a \"war\" against them.",
+    "It is found in Australia.",
+    "It cannot fly.",
+    "It appears on Australia's coat of arms with the kangaroo.",
+    "It is the second-tallest bird in the world.",
+    "The answer is one word of 3 letters.",
+    "Its first letter is E."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/187562031/medium.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "patrickkavanagh",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/187562031"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/368415620/medium.jpeg",
+      "w": 500,
+      "h": 375,
+      "credit": "JR Ferrer-Paris",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/368415620"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/330240035/medium.jpeg",
+      "w": 500,
+      "h": 375,
+      "credit": "Thomas Mesaglio",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/330240035"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "southern-cassowary",
+   "name": "Southern cassowary",
+   "alt": [
+    "cassowary"
+   ],
+   "sci": "Casuarius casuarius",
+   "group": "ratite",
+   "facts": {
+    "region": "Australia",
+    "flightless": true,
+    "status": "Least concern"
+   },
+   "lookalikes": [
+    "emu",
+    "ostrich"
+   ],
+   "blurb": "A huge flightless bird of rainforests in north Queensland and New Guinea. It has a tall helmet on its head and a dagger-like claw on each foot.",
+   "clues": [
+    "Its IUCN conservation status is \"Least concern\".",
+    "Family: Casuariidae.",
+    "Genus: Casuarius.",
+    "Its inner toe has a claw up to 12 cm long.",
+    "It spreads the seeds of many rainforest fruits.",
+    "The father raises the chicks.",
+    "It is found in Australia.",
+    "It cannot fly.",
+    "Its neck is bright blue with red wattles.",
+    "It has a tall horny helmet called a casque.",
+    "The answer has 2 words (8, 9 letters).",
+    "Its first letter is S."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/32203941/medium.jpeg",
+      "w": 500,
+      "h": 375,
+      "credit": "coenobita",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/32203941"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/161203172/medium.png",
+      "w": 500,
+      "h": 356,
+      "credit": "no rights reserved",
+      "license": "CC0 1.0",
+      "page": "https://www.inaturalist.org/photos/161203172"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/346814420/medium.jpeg",
+      "w": 500,
+      "h": 333,
+      "credit": "Oscar Dove",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/346814420"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "laughing-kookaburra",
+   "name": "Laughing kookaburra",
+   "alt": [
+    "kookaburra"
+   ],
+   "sci": "Dacelo novaeguineae",
+   "group": "kingfisher",
+   "facts": {
+    "region": "Australia",
+    "flightless": false,
+    "status": "Least concern"
+   },
+   "lookalikes": [
+    "common-kingfisher"
+   ],
+   "blurb": "A big Australian kingfisher famous for its loud call that sounds like laughter.",
+   "clues": [
+    "Its IUCN conservation status is \"Least concern\".",
+    "Family: Alcedinidae.",
+    "Genus: Dacelo.",
+    "It is the largest kingfisher in the world.",
+    "It eats snakes, lizards and mice.",
+    "Families call together at dawn and dusk.",
+    "It is found in Australia.",
+    "A famous children's song has it sitting in an old gum tree.",
+    "The answer has 2 words (8, 10 letters).",
+    "Its first letter is L."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/575470703/medium.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Emanuele Santarelli",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/575470703"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/47348059/medium.jpg",
+      "w": 500,
+      "h": 313,
+      "credit": "mcamcamca",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/47348059"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/112445203/medium.jpg",
+      "w": 500,
+      "h": 332,
+      "credit": "I Am birdsaspoetry.com ",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/112445203"
+     }
+    ],
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/c/c0/Dacelo_novaeguineae_ANWC_X00522.opus/Dacelo_novaeguineae_ANWC_X00522.opus.mp3",
+      "credit": "Powys, V.",
+      "license": "CC BY 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Dacelo_novaeguineae_ANWC_X00522.opus",
+      "start": 0
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "sulphur-crested-cockatoo",
+   "name": "Sulphur-crested cockatoo",
+   "sci": "Cacatua galerita",
+   "group": "parrot",
+   "facts": {
+    "region": "Australia",
+    "flightless": false,
+    "status": "Least concern"
+   },
+   "lookalikes": [
+    "galah"
+   ],
+   "blurb": "A big, noisy white parrot with a yellow crest. In Sydney, some have learned to open wheelie bins.",
+   "clues": [
+    "Its IUCN conservation status is \"Least concern\".",
+    "Family: Cacatuidae.",
+    "Genus: Cacatua.",
+    "Sydney birds have learned to open wheelie bins.",
+    "It can live for over 70 years in captivity.",
+    "A flock posts lookouts while the others feed.",
+    "It is found in Australia.",
+    "It screeches very loudly.",
+    "The answer has 3 words (7, 7, 8 letters).",
+    "Its first letter is S."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/248913955/medium.jpg",
+      "w": 500,
+      "h": 281,
+      "credit": "Hyme852052",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/248913955"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/31338798/medium.jpeg",
+      "w": 500,
+      "h": 333,
+      "credit": "Terra Occ",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/31338798"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/508608907/medium.jpg",
+      "w": 500,
+      "h": 281,
+      "credit": "Austen Armstrong",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/508608907"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "galah",
+   "name": "Galah",
+   "alt": [
+    "pink and grey cockatoo",
+    "rose-breasted cockatoo"
+   ],
+   "sci": "Eolophus roseicapilla",
+   "group": "parrot",
+   "facts": {
+    "region": "Australia",
+    "flightless": false,
+    "status": "Least concern"
+   },
+   "lookalikes": [
+    "sulphur-crested-cockatoo"
+   ],
+   "blurb": "A pink-and-grey cockatoo found all over Australia. Its name is also Australian slang for a silly person.",
+   "clues": [
+    "Its IUCN conservation status is \"Least concern\".",
+    "Family: Cacatuidae.",
+    "Genus: Eolophus.",
+    "It often hangs upside down from power lines.",
+    "Its name is slang for a fool in Australia.",
+    "It is found in Australia.",
+    "The answer is one word of 5 letters.",
+    "Its first letter is G."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/147415773/medium.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Andrew Allen",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/147415773"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/72563384/medium.jpeg",
+      "w": 500,
+      "h": 375,
+      "credit": "Graham Winterflood",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/72563384"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/157561709/medium.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Andrea",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/157561709"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "rainbow-lorikeet",
+   "name": "Rainbow lorikeet",
+   "sci": "Trichoglossus moluccanus",
+   "group": "parrot",
+   "facts": {
+    "region": "Australia",
+    "flightless": false,
+    "status": "Least concern"
+   },
+   "lookalikes": [
+    "crimson-rosella"
+   ],
+   "blurb": "A brilliantly coloured parrot with a blue head, green back and orange chest. It drinks nectar with a brush-tipped tongue.",
+   "clues": [
+    "Its IUCN conservation status is \"Least concern\".",
+    "Family: Psittaculidae.",
+    "Genus: Trichoglossus.",
+    "Its tongue has a brush tip for collecting nectar.",
+    "Flocks roost noisily in city trees at dusk.",
+    "It is an invasive pest in Perth and New Zealand.",
+    "It is found in Australia.",
+    "It has a blue head and an orange chest.",
+    "The answer has 2 words (7, 8 letters).",
+    "Its first letter is R."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/49571056/medium.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Andrew Allen",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/49571056"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/25878825/medium.jpg",
+      "w": 500,
+      "h": 362,
+      "credit": "Rolf Lawrenz",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/25878825"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/254802863/medium.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Nathan Ruser",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/254802863"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "crimson-rosella",
+   "name": "Crimson rosella",
+   "sci": "Platycercus elegans",
+   "group": "parrot",
+   "facts": {
+    "region": "Australia",
+    "flightless": false,
+    "status": "Least concern"
+   },
+   "lookalikes": [
+    "rainbow-lorikeet"
+   ],
+   "blurb": "A bright red parrot with blue cheeks and wings, common in forests of south-eastern Australia.",
+   "clues": [
+    "Its IUCN conservation status is \"Least concern\".",
+    "Family: Psittaculidae.",
+    "Genus: Platycercus.",
+    "Young birds are mostly green.",
+    "It is common in the Blue Mountains.",
+    "It eats seeds and fruit.",
+    "It is found in Australia.",
+    "Its cheeks and wings are blue.",
+    "It is a deep red colour.",
+    "The answer has 2 words (7, 7 letters).",
+    "Its first letter is C."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/159068173/medium.jpg",
+      "w": 333,
+      "h": 500,
+      "credit": "patrickkavanagh",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/159068173"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/159068170/medium.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "I Am birdsaspoetry.com ",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/159068170"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/159068171/medium.jpg",
+      "w": 500,
+      "h": 338,
+      "credit": "patrickkavanagh",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/159068171"
+     }
+    ],
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/e/ed/Bird_song%2C_grassy_woodlands%2C_central_Victoria.ogg/Bird_song%2C_grassy_woodlands%2C_central_Victoria.ogg.mp3",
+      "credit": "billinghurst",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Bird_song,_grassy_woodlands,_central_Victoria.ogg",
+      "start": 0
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "budgerigar",
+   "name": "Budgerigar",
+   "alt": [
+    "budgie",
+    "parakeet"
+   ],
+   "sci": "Melopsittacus undulatus",
+   "group": "parrot",
+   "facts": {
+    "region": "Australia",
+    "flightless": false,
+    "status": "Least concern"
+   },
+   "lookalikes": [
+    "cockatiel"
+   ],
+   "blurb": "A small green-and-yellow Australian parrot and one of the most popular pet birds in the world.",
+   "clues": [
+    "Its IUCN conservation status is \"Least concern\".",
+    "Family: Psittaculidae.",
+    "Genus: Melopsittacus.",
+    "Wild ones fly in huge flocks across the outback.",
+    "Males have a blue patch above the beak.",
+    "Pet ones come in blue, white and yellow.",
+    "It is found in Australia.",
+    "Some learn to say hundreds of words.",
+    "It is often kept in a cage as a pet and its name is often shortened.",
+    "The answer is one word of 10 letters.",
+    "Its first letter is B."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/159057697/medium.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "http://www.comebirdwatching.blogspot.com/",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/159057697"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/10202359/medium.jpg",
+      "w": 500,
+      "h": 248,
+      "credit": "Riccardo Marchingiglio",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/10202359"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/310118233/medium.jpg",
+      "w": 375,
+      "h": 500,
+      "credit": "no rights reserved",
+      "license": "CC0 1.0",
+      "page": "https://www.inaturalist.org/photos/310118233"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "cockatiel",
+   "name": "Cockatiel",
+   "sci": "Nymphicus hollandicus",
+   "group": "parrot",
+   "facts": {
+    "region": "Australia",
+    "flightless": false,
+    "status": "Least concern"
+   },
+   "lookalikes": [
+    "budgerigar"
+   ],
+   "blurb": "A small grey cockatoo with a yellow face, orange cheeks and a tall crest. It is a very popular pet.",
+   "clues": [
+    "Its IUCN conservation status is \"Least concern\".",
+    "Family: Cacatuidae.",
+    "Genus: Nymphicus.",
+    "It can whistle tunes.",
+    "It lives in the Australian outback.",
+    "It is found in Australia.",
+    "It has round orange cheek patches.",
+    "It has a tall, wispy crest.",
+    "The answer is one word of 9 letters.",
+    "Its first letter is C."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/148720764/medium.jpg",
+      "w": 500,
+      "h": 500,
+      "credit": "Third Silence",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/148720764"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/336257861/medium.jpeg",
+      "w": 500,
+      "h": 335,
+      "credit": "Alan Bell",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/336257861"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/245807277/medium.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "dhfischer",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/245807277"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "australian-magpie",
+   "name": "Australian magpie",
+   "lname": "Australian magpie",
+   "sci": "Gymnorhina tibicen",
+   "group": "songbird",
+   "facts": {
+    "region": "Australia",
+    "flightless": false,
+    "status": "Least concern"
+   },
+   "lookalikes": [
+    "eurasian-magpie",
+    "pied-currawong"
+   ],
+   "blurb": "A black-and-white Australian songbird with a beautiful warbling call. In spring, some swoop on people near their nests.",
+   "clues": [
+    "Its IUCN conservation status is \"Least concern\".",
+    "Family: Artamidae.",
+    "Genus: Gymnorhina.",
+    "It can recognise individual human faces.",
+    "It is not related to the European bird of the same name.",
+    "Cyclists wear spikes on helmets in spring because of it.",
+    "Its song is a rich, flute-like warble.",
+    "It is black and white and swoops in spring.",
+    "The answer has 2 words (10, 6 letters).",
+    "Its first letter is A."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/314512932/medium.jpeg",
+      "w": 500,
+      "h": 375,
+      "credit": "Saryu Mae 前 朝琉",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/314512932"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/50126314/medium.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Donald Hobern",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/50126314"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/74496402/medium.jpeg",
+      "w": 500,
+      "h": 350,
+      "credit": "linleymcg",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/74496402"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "pied-currawong",
+   "name": "Pied currawong",
+   "sci": "Strepera graculina",
+   "group": "songbird",
+   "facts": {
+    "region": "Australia",
+    "flightless": false,
+    "status": "Least concern"
+   },
+   "lookalikes": [
+    "australian-magpie"
+   ],
+   "blurb": "A big black bird with yellow eyes and white patches, found in eastern Australia. Its name copies its call.",
+   "clues": [
+    "Its IUCN conservation status is \"Least concern\".",
+    "Family: Artamidae.",
+    "Genus: Strepera.",
+    "Its name comes from its call.",
+    "It raids nests for eggs and chicks.",
+    "It has bright yellow eyes.",
+    "It is found in Australia.",
+    "It has white patches on its wings and tail.",
+    "It is mostly black.",
+    "The answer has 2 words (4, 9 letters).",
+    "Its first letter is P."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/90759569/medium.jpeg",
+      "w": 500,
+      "h": 435,
+      "credit": "Tim",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/90759569"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/603950987/medium.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Donald Davesne",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/603950987"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/75697208/medium.jpeg",
+      "w": 500,
+      "h": 361,
+      "credit": "Russell Best",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/75697208"
+     }
+    ],
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/6/67/Strepera_graculina_-_Pied_Currawong_XC443115.mp3",
+      "credit": "James Ray",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Strepera_graculina_-_Pied_Currawong_XC443115.mp3",
+      "start": 0
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "superb-fairywren",
+   "name": "Superb fairywren",
+   "alt": [
+    "blue wren",
+    "superb blue wren"
+   ],
+   "sci": "Malurus cyaneus",
+   "group": "songbird",
+   "facts": {
+    "region": "Australia",
+    "flightless": false,
+    "status": "Least concern"
+   },
+   "blurb": "A tiny Australian bird with a cocked tail. Breeding males are bright blue and black.",
+   "clues": [
+    "Its IUCN conservation status is \"Least concern\".",
+    "Family: Maluridae.",
+    "Genus: Malurus.",
+    "Males bring yellow petals to females.",
+    "Mothers sing a \"password\" to their eggs.",
+    "Families have helpers that feed the chicks.",
+    "It is found in Australia.",
+    "It holds its long tail upright.",
+    "The answer has 2 words (6, 9 letters).",
+    "Its first letter is S."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/249740626/medium.jpeg",
+      "w": 500,
+      "h": 339,
+      "credit": "Nathan Ruser",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/249740626"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/162831939/medium.jpeg",
+      "w": 500,
+      "h": 333,
+      "credit": "Tim",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/162831939"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/71276260/medium.jpg",
+      "w": 500,
+      "h": 331,
+      "credit": "Roy Lowry",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/71276260"
+     }
+    ],
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/e/ed/Bird_song%2C_grassy_woodlands%2C_central_Victoria.ogg/Bird_song%2C_grassy_woodlands%2C_central_Victoria.ogg.mp3",
+      "credit": "billinghurst",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Bird_song,_grassy_woodlands,_central_Victoria.ogg",
+      "start": 0
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "superb-lyrebird",
+   "name": "Superb lyrebird",
+   "alt": [
+    "lyrebird"
+   ],
+   "sci": "Menura novaehollandiae",
+   "group": "songbird",
+   "facts": {
+    "region": "Australia",
+    "flightless": false,
+    "status": "Least concern"
+   },
+   "blurb": "An Australian bird famous for copying sounds, from other birds to chainsaws and camera shutters.",
+   "clues": [
+    "Its IUCN conservation status is \"Least concern\".",
+    "Family: Menuridae.",
+    "Genus: Menura.",
+    "It appears on the Australian 10-cent coin.",
+    "It can copy chainsaws and camera shutters.",
+    "The male dances on a mound of earth.",
+    "It is found in Australia.",
+    "Its tail is shaped like an old stringed instrument.",
+    "It is the world's best-known mimic bird.",
+    "The answer has 2 words (6, 8 letters).",
+    "Its first letter is S."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/69898951/medium.jpeg",
+      "w": 500,
+      "h": 421,
+      "credit": "Tim",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/69898951"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/350107803/medium.png",
+      "w": 500,
+      "h": 350,
+      "credit": "Sockrosma",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/350107803"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/453861820/medium.jpeg",
+      "w": 375,
+      "h": 500,
+      "credit": "Zara",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/453861820"
+     }
+    ],
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/b/b7/Menura_novaehollandiae_-_Superb_Lyrebird_XC442769.mp3",
+      "credit": "James Ray",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Menura_novaehollandiae_-_Superb_Lyrebird_XC442769.mp3",
+      "start": 0
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "tawny-frogmouth",
+   "name": "Tawny frogmouth",
+   "sci": "Podargus strigoides",
+   "group": "frogmouth",
+   "facts": {
+    "region": "Australia",
+    "flightless": false,
+    "status": "Least concern"
+   },
+   "lookalikes": [
+    "barn-owl"
+   ],
+   "blurb": "A grey night bird that looks like an owl. By day it sits still and pretends to be a broken branch.",
+   "clues": [
+    "Its IUCN conservation status is \"Least concern\".",
+    "Family: Podargidae.",
+    "Genus: Podargus.",
+    "It is not an owl, though it looks like one.",
+    "By day it poses as a broken branch.",
+    "It catches insects at night.",
+    "It is found in Australia.",
+    "It has a very wide mouth.",
+    "Its mouth is said to look like an amphibian's.",
+    "The answer has 2 words (5, 9 letters).",
+    "Its first letter is T."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/350093729/medium.png",
+      "w": 500,
+      "h": 481,
+      "credit": "Sockrosma",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/350093729"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/350090817/medium.png",
+      "w": 500,
+      "h": 334,
+      "credit": "Sockrosma",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/350090817"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/102140797/medium.jpg",
+      "w": 500,
+      "h": 420,
+      "credit": "graeme lunt",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/102140797"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "satin-bowerbird",
+   "name": "Satin bowerbird",
+   "sci": "Ptilonorhynchus violaceus",
+   "group": "songbird",
+   "facts": {
+    "region": "Australia",
+    "flightless": false,
+    "status": "Least concern"
+   },
+   "blurb": "The male builds a stick bower and decorates it with blue objects, like bottle tops and pegs, to win a mate.",
+   "clues": [
+    "Its IUCN conservation status is \"Least concern\".",
+    "Family: Ptilonorhynchidae.",
+    "Genus: Ptilonorhynchus.",
+    "Males paint their bowers with chewed plant juice.",
+    "Males collect blue objects like straws and pegs.",
+    "The male has shiny blue-black feathers.",
+    "It is found in Australia.",
+    "It has violet-blue eyes.",
+    "The male builds a bower to attract females.",
+    "The answer has 2 words (5, 9 letters).",
+    "Its first letter is S."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/350135160/medium.jpeg",
+      "w": 500,
+      "h": 375,
+      "credit": "Sockrosma",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/350135160"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/245467722/medium.jpeg",
+      "w": 281,
+      "h": 500,
+      "credit": "Sofia Zvolanek",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/245467722"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/411315483/medium.jpeg",
+      "w": 375,
+      "h": 500,
+      "credit": "Sockrosma",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/411315483"
+     }
+    ],
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/4/4a/Ptilonorhynchus_violaceus_-_Satin_Bowerbird_XC442747.mp3",
+      "credit": "James Ray",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Ptilonorhynchus_violaceus_-_Satin_Bowerbird_XC442747.mp3",
+      "start": 0
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "australian-pelican",
+   "name": "Australian pelican",
+   "lname": "Australian pelican",
+   "sci": "Pelecanus conspicillatus",
+   "group": "waterbird",
+   "facts": {
+    "region": "Australia",
+    "flightless": false,
+    "status": "Least concern"
+   },
+   "blurb": "A big white-and-black waterbird with the longest bill of any bird. Its throat pouch holds fish.",
+   "clues": [
+    "Its IUCN conservation status is \"Least concern\".",
+    "Family: Pelecanidae.",
+    "Genus: Pelecanus.",
+    "It has the longest bill of any bird.",
+    "Flocks fly inland when outback lakes fill.",
+    "It herds fish together with others.",
+    "It scoops fish into a stretchy throat pouch.",
+    "It is a big black-and-white waterbird.",
+    "The answer has 2 words (10, 7 letters).",
+    "Its first letter is A."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/263627725/medium.jpg",
+      "w": 500,
+      "h": 382,
+      "credit": "Toby Hudson",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/263627725"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/452413122/medium.jpeg",
+      "w": 500,
+      "h": 375,
+      "credit": "pimelea",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/452413122"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/40714891/medium.jpeg",
+      "w": 500,
+      "h": 333,
+      "credit": "Sean Frey",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/40714891"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "black-swan",
+   "name": "Black swan",
+   "sci": "Cygnus atratus",
+   "group": "waterfowl",
+   "facts": {
+    "region": "Australia",
+    "flightless": false,
+    "status": "Least concern"
+   },
+   "lookalikes": [
+    "mute-swan"
+   ],
+   "blurb": "A black swan with a red bill. It is the state bird of Western Australia.",
+   "clues": [
+    "Its IUCN conservation status is \"Least concern\".",
+    "Family: Anatidae.",
+    "Genus: Cygnus.",
+    "It is the state emblem of Western Australia.",
+    "Europeans once thought it could not exist.",
+    "Its wing tips are white in flight.",
+    "It is found in Australia.",
+    "It has a bright red bill.",
+    "The answer has 2 words (5, 4 letters).",
+    "Its first letter is B."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/96194594/medium.jpeg",
+      "w": 375,
+      "h": 500,
+      "credit": "Nils",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/96194594"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/494499183/medium.jpeg",
+      "w": 500,
+      "h": 395,
+      "credit": "Micha Baum",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/494499183"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/29247529/medium.jpeg",
+      "w": 375,
+      "h": 500,
+      "credit": "Terra Occ",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/29247529"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "australian-white-ibis",
+   "name": "Australian white ibis",
+   "lname": "Australian white ibis",
+   "alt": [
+    "bin chicken",
+    "ibis"
+   ],
+   "sci": "Threskiornis molucca",
+   "group": "waterbird",
+   "facts": {
+    "region": "Australia",
+    "flightless": false,
+    "status": "Least concern"
+   },
+   "blurb": "A white bird with a bald black head and a long curved bill. In cities it raids rubbish bins, earning the nickname \"bin chicken\".",
+   "clues": [
+    "Its IUCN conservation status is \"Least concern\".",
+    "Family: Threskiornithidae.",
+    "Genus: Threskiornis.",
+    "Its head and neck have no feathers.",
+    "Its bill curves downwards.",
+    "It is related to a bird sacred in ancient Egypt.",
+    "The answer has 3 words (10, 5, 4 letters).",
+    "Its first letter is A."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/101675446/medium.jpeg",
+      "w": 500,
+      "h": 374,
+      "credit": "Tim",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/101675446"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/150841415/medium.jpeg",
+      "w": 500,
+      "h": 333,
+      "credit": "Natasha Taylor",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/150841415"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/116375953/medium.jpeg",
+      "w": 500,
+      "h": 333,
+      "credit": "Natasha Taylor",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/116375953"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "wedge-tailed-eagle",
+   "name": "Wedge-tailed eagle",
+   "alt": [
+    "wedgie"
+   ],
+   "sci": "Aquila audax",
+   "group": "raptor",
+   "facts": {
+    "region": "Australia",
+    "flightless": false,
+    "status": "Least concern"
+   },
+   "blurb": "Australia's largest bird of prey, with a diamond-shaped tail. It can take prey as big as young kangaroos.",
+   "clues": [
+    "Its IUCN conservation status is \"Least concern\".",
+    "Family: Accipitridae.",
+    "Genus: Aquila.",
+    "It can catch young kangaroos.",
+    "Its wingspan can reach about 2.3 metres.",
+    "It often feeds on roadkill.",
+    "It is found in Australia.",
+    "It is Australia's biggest bird of prey.",
+    "The answer has 3 words (5, 6, 5 letters).",
+    "Its first letter is W."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/200608451/medium.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "dhfischer",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/200608451"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/49244687/medium.jpg",
+      "w": 500,
+      "h": 281,
+      "credit": "Andrew Allen",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/49244687"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/124638862/medium.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Jean and Fred",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/124638862"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "willie-wagtail",
+   "name": "Willie wagtail",
+   "sci": "Rhipidura leucophrys",
+   "group": "songbird",
+   "facts": {
+    "region": "Australia",
+    "flightless": false,
+    "status": "Least concern"
+   },
+   "blurb": "A small black-and-white Australian bird that wags its tail from side to side. It bravely chases off much bigger birds.",
+   "clues": [
+    "Its IUCN conservation status is \"Least concern\".",
+    "Family: Rhipiduridae.",
+    "Genus: Rhipidura.",
+    "It even attacks eagles near its nest.",
+    "It sings at night.",
+    "It is a kind of fantail.",
+    "It is found in Australia.",
+    "It is black above and white below.",
+    "It flicks its tail from side to side.",
+    "The answer has 2 words (6, 7 letters).",
+    "Its first letter is W."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/50151413/medium.jpg",
+      "w": 500,
+      "h": 400,
+      "credit": "Lip Kee",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/50151413"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/50151416/medium.jpg",
+      "w": 494,
+      "h": 500,
+      "credit": "anonymous",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/50151416"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/50151417/medium.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Summerdrought",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/50151417"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "noisy-miner",
+   "name": "Noisy miner",
+   "sci": "Manorina melanocephala",
+   "group": "songbird",
+   "facts": {
+    "region": "Australia",
+    "flightless": false,
+    "status": "Least concern"
+   },
+   "blurb": "A grey honeyeater with a yellow patch behind its eye. Gangs of them chase other small birds out of gardens.",
+   "clues": [
+    "Its IUCN conservation status is \"Least concern\".",
+    "Family: Meliphagidae.",
+    "Genus: Manorina.",
+    "It is a native honeyeater, not the Indian bird with a similar name.",
+    "Gangs chase other birds away.",
+    "It has a yellow patch behind its eye.",
+    "It is found in Australia.",
+    "It is grey with a black crown.",
+    "It is loud.",
+    "The answer has 2 words (5, 5 letters).",
+    "Its first letter is N."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/68867/medium.jpg",
+      "w": 500,
+      "h": 400,
+      "credit": "Lip Kee Yap",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/68867"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/567144282/medium.jpg",
+      "w": 230,
+      "h": 500,
+      "credit": "James H",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/567144282"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/170190270/medium.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "no rights reserved",
+      "license": "CC0 1.0",
+      "page": "https://www.inaturalist.org/photos/170190270"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "masked-lapwing",
+   "name": "Masked lapwing",
+   "alt": [
+    "spur-winged plover",
+    "plover"
+   ],
+   "sci": "Vanellus miles",
+   "group": "wader",
+   "facts": {
+    "region": "Australia",
+    "flightless": false,
+    "status": "Least concern"
+   },
+   "blurb": "A loud, brave bird with yellow face wattles. It dive-bombs people who get close to its nest on footy ovals.",
+   "clues": [
+    "Its IUCN conservation status is \"Least concern\".",
+    "Family: Charadriidae.",
+    "Genus: Vanellus.",
+    "It nests on the ground, even on sports fields.",
+    "It dive-bombs people near its nest.",
+    "It is found in Australia.",
+    "It has a yellow face.",
+    "It looks as if it is wearing a disguise.",
+    "The answer has 2 words (6, 7 letters).",
+    "Its first letter is M."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/50148655/medium.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "patrickkavanagh",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/50148655"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/332871757/medium.jpg",
+      "w": 500,
+      "h": 470,
+      "credit": "no rights reserved",
+      "license": "CC0 1.0",
+      "page": "https://www.inaturalist.org/photos/332871757"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/52899911/medium.jpg",
+      "w": 500,
+      "h": 383,
+      "credit": "Seig",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/52899911"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "brolga",
+   "name": "Brolga",
+   "sci": "Antigone rubicunda",
+   "group": "crane",
+   "facts": {
+    "region": "Australia",
+    "flightless": false
+   },
+   "blurb": "A tall grey crane with a red head. Pairs perform graceful leaping dances.",
+   "clues": [
+    "Family: Gruidae.",
+    "Genus: Antigone.",
+    "It is Queensland's state bird.",
+    "Pairs perform leaping dances.",
+    "It has a red band on its head.",
+    "It is found in Australia.",
+    "It is grey and very tall.",
+    "It is a kind of crane.",
+    "The answer is one word of 6 letters.",
+    "Its first letter is B."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/56148989/medium.jpeg",
+      "w": 500,
+      "h": 375,
+      "credit": "Graham Winterflood",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/56148989"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/56149491/medium.jpeg",
+      "w": 500,
+      "h": 375,
+      "credit": "Graham Winterflood",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/56149491"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/222939603/medium.jpg",
+      "w": 500,
+      "h": 369,
+      "credit": "Paul Whitington",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/222939603"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "gouldian-finch",
+   "name": "Gouldian finch",
+   "lname": "Gouldian finch",
+   "alt": [
+    "rainbow finch"
+   ],
+   "sci": "Chloebia gouldiae",
+   "group": "songbird",
+   "facts": {
+    "region": "Australia",
+    "flightless": false,
+    "status": "Least concern"
+   },
+   "blurb": "A tiny, brilliantly coloured finch of northern Australia with a purple chest and yellow belly.",
+   "clues": [
+    "Its IUCN conservation status is \"Least concern\".",
+    "Family: Estrildidae.",
+    "Genus: Chloebia.",
+    "Its head can be red, black or yellow.",
+    "It lives in tropical savanna in northern Australia.",
+    "It is found in Australia.",
+    "Its chest is purple and its belly is yellow.",
+    "The answer has 2 words (8, 5 letters).",
+    "Its first letter is G."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/209771912/medium.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Paul Whitington",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/209771912"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/209771904/medium.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Paul Whitington",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/209771904"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/338249338/medium.jpeg",
+      "w": 500,
+      "h": 333,
+      "credit": "Alan Bell",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/338249338"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "little-penguin",
+   "name": "Little penguin",
+   "alt": [
+    "fairy penguin",
+    "little blue penguin"
+   ],
+   "sci": "Eudyptula minor",
+   "group": "penguin",
+   "facts": {
+    "region": "Australia",
+    "flightless": true,
+    "status": "Least concern"
+   },
+   "lookalikes": [
+    "emperor-penguin"
+   ],
+   "blurb": "The smallest penguin in the world. On Phillip Island, crowds watch them waddle up the beach at sunset.",
+   "clues": [
+    "Its IUCN conservation status is \"Least concern\".",
+    "Family: Spheniscidae.",
+    "Genus: Eudyptula.",
+    "Crowds watch its \"parade\" on Phillip Island.",
+    "It comes ashore after dark.",
+    "It lives in southern Australia and New Zealand.",
+    "It is found in Australia.",
+    "It cannot fly.",
+    "The answer has 2 words (6, 7 letters).",
+    "Its first letter is L."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/63612085/medium.jpeg",
+      "w": 500,
+      "h": 333,
+      "credit": "Spencer McIntyre",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/63612085"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/72265398/medium.jpeg",
+      "w": 500,
+      "h": 375,
+      "credit": "Jacqui Geux",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/72265398"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/64676218/medium.jpg",
+      "w": 375,
+      "h": 500,
+      "credit": "Spencer McIntyre",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/64676218"
+     }
+    ],
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/2/2c/Little_Penguin_%28Eudyptula_minor%29.ogg/Little_Penguin_%28Eudyptula_minor%29.ogg.mp3",
+      "credit": "Benchill",
+      "license": "CC BY 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Little_Penguin_(Eudyptula_minor).ogg",
+      "start": 0
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "north-island-brown-kiwi",
+   "name": "North Island brown kiwi",
+   "alt": [
+    "kiwi"
+   ],
+   "sci": "Apteryx mantelli",
+   "group": "ratite",
+   "facts": {
+    "region": "New Zealand",
+    "flightless": true,
+    "status": "Vulnerable"
+   },
+   "blurb": "A small flightless bird from New Zealand with hair-like feathers. It has nostrils at the tip of its long beak to sniff out worms.",
+   "clues": [
+    "Its IUCN conservation status is \"Vulnerable\".",
+    "Family: Apterygidae.",
+    "Genus: Apteryx.",
+    "Its nostrils are at the tip of its beak.",
+    "Its egg is huge, about a fifth of the mother's weight.",
+    "It comes out at night to sniff for worms.",
+    "It is found in New Zealand.",
+    "It cannot fly.",
+    "It is New Zealand's national bird.",
+    "The answer has 4 words (5, 6, 5, 4 letters).",
+    "Its first letter is N."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/212223422/medium.jpg",
+      "w": 500,
+      "h": 334,
+      "credit": "Tomáš Divilek",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/212223422"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/200349099/medium.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Shaun Lee",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/200349099"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/342982621/medium.jpeg",
+      "w": 500,
+      "h": 375,
+      "credit": "Emily Roberts",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/342982621"
+     }
+    ],
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/0/05/Female-ni-brown-kiwi.wav/Female-ni-brown-kiwi.wav.mp3",
+      "credit": "Unknown authorUnknown author",
+      "license": "CC BY 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Female-ni-brown-kiwi.wav",
+      "start": 0
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "kea",
+   "name": "Kea",
+   "sci": "Nestor notabilis",
+   "group": "parrot",
+   "facts": {
+    "region": "New Zealand",
+    "flightless": false
+   },
+   "lookalikes": [
+    "kakapo"
+   ],
+   "blurb": "A clever, cheeky mountain parrot from New Zealand. It is known for pulling rubber off cars.",
+   "clues": [
+    "Family: Strigopidae.",
+    "Genus: Nestor.",
+    "It solves puzzles as well as some apes.",
+    "It pulls rubber seals off cars.",
+    "Its wings are orange underneath.",
+    "It is found in New Zealand.",
+    "It is the world's only alpine parrot.",
+    "It is an olive-green parrot from New Zealand.",
+    "The answer is one word of 3 letters.",
+    "Its first letter is K."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/384672622/medium.jpeg",
+      "w": 500,
+      "h": 333,
+      "credit": "Mark Fraser",
+      "license": "CC0 1.0",
+      "page": "https://www.inaturalist.org/photos/384672622"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/26376608/medium.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Katja Schulz",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/26376608"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/172959642/medium.jpg",
+      "w": 500,
+      "h": 313,
+      "credit": "no rights reserved",
+      "license": "CC0 1.0",
+      "page": "https://www.inaturalist.org/photos/172959642"
+     }
+    ],
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/c/cf/Kea-song.wav/Kea-song.wav.mp3",
+      "credit": "Unknown authorUnknown author",
+      "license": "CC BY 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Kea-song.wav",
+      "start": 0
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "kakapo",
+   "name": "Kākāpō",
+   "alt": [
+    "kakapo",
+    "owl parrot"
+   ],
+   "sci": "Strigops habroptilus",
+   "group": "parrot",
+   "facts": {
+    "region": "New Zealand",
+    "flightless": true
+   },
+   "lookalikes": [
+    "kea"
+   ],
+   "blurb": "A fat, flightless, night-time parrot from New Zealand. Fewer than 300 are left, and each one has a name.",
+   "clues": [
+    "Family: Strigopidae.",
+    "Genus: Strigops.",
+    "Every living one has a name.",
+    "Males \"boom\" to call females from far away.",
+    "It is found in New Zealand.",
+    "It cannot fly.",
+    "It is nocturnal and smells musty-sweet.",
+    "The answer is one word of 6 letters.",
+    "Its first letter is K."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/154022742/medium.jpg",
+      "w": 375,
+      "h": 500,
+      "credit": "M Rutherford",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/154022742"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/412477110/medium.jpg",
+      "w": 448,
+      "h": 500,
+      "credit": "Oscar Dove",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/412477110"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/386289202/medium.jpg",
+      "w": 500,
+      "h": 336,
+      "credit": "no rights reserved",
+      "license": "CC0 1.0",
+      "page": "https://www.inaturalist.org/photos/386289202"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "ostrich",
+   "name": "Ostrich",
+   "alt": [
+    "common ostrich"
+   ],
+   "sci": "Struthio camelus",
+   "group": "ratite",
+   "facts": {
+    "region": "Africa",
+    "flightless": true,
+    "status": "Least concern"
+   },
+   "lookalikes": [
+    "emu",
+    "southern-cassowary"
+   ],
+   "blurb": "The biggest bird in the world. It cannot fly, but it can run faster than any other bird.",
+   "clues": [
+    "Its IUCN conservation status is \"Least concern\".",
+    "Family: Struthionidae.",
+    "Genus: Struthio.",
+    "It lays the largest eggs of any living bird.",
+    "It has only two toes on each foot.",
+    "It can run at about 70 km/h.",
+    "It is found in Africa.",
+    "It cannot fly.",
+    "The myth says it buries its head in the sand.",
+    "It is the biggest bird in the world.",
+    "The answer is one word of 7 letters.",
+    "Its first letter is O."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/55506762/medium.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Andrew Allen",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/55506762"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/110412944/medium.jpg",
+      "w": 500,
+      "h": 409,
+      "credit": "no rights reserved",
+      "license": "CC0 1.0",
+      "page": "https://www.inaturalist.org/photos/110412944"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/97591380/medium.jpeg",
+      "w": 500,
+      "h": 416,
+      "credit": "no rights reserved",
+      "license": "CC0 1.0",
+      "page": "https://www.inaturalist.org/photos/97591380"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "emperor-penguin",
+   "name": "Emperor penguin",
+   "sci": "Aptenodytes forsteri",
+   "group": "penguin",
+   "facts": {
+    "region": "Antarctica",
+    "flightless": true,
+    "status": "Near threatened"
+   },
+   "lookalikes": [
+    "little-penguin"
+   ],
+   "blurb": "The biggest penguin. Males keep the egg warm on their feet through the dark Antarctic winter.",
+   "clues": [
+    "Its IUCN conservation status is \"Near threatened\".",
+    "Family: Spheniscidae.",
+    "Genus: Aptenodytes.",
+    "It can dive deeper than 500 metres.",
+    "Huddles of males take turns on the cold outside.",
+    "Males balance the egg on their feet for about two months.",
+    "It is found in Antarctica.",
+    "It cannot fly.",
+    "It breeds on Antarctic sea ice in winter.",
+    "The answer has 2 words (7, 7 letters).",
+    "Its first letter is E."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/111479650/medium.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Enzo Fiorelli",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/111479650"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/85491479/medium.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Ian Duffy",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/85491479"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/85492504/medium.jpg",
+      "w": 500,
+      "h": 353,
+      "credit": "Christopher Michel",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/85492504"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "atlantic-puffin",
+   "name": "Atlantic puffin",
+   "lname": "Atlantic puffin",
+   "alt": [
+    "puffin"
+   ],
+   "sci": "Fratercula arctica",
+   "group": "seabird",
+   "facts": {
+    "region": "Europe",
+    "flightless": false,
+    "status": "Vulnerable"
+   },
+   "blurb": "A small black-and-white seabird with a colourful beak. It can carry many small fish in its beak at once.",
+   "clues": [
+    "Its IUCN conservation status is \"Vulnerable\".",
+    "Family: Alcidae.",
+    "Genus: Fratercula.",
+    "It nests in burrows on clifftops.",
+    "It can hold over ten fish in its beak at once.",
+    "Its beak is brightest in the breeding season.",
+    "It is found in Europe.",
+    "It is nicknamed the \"sea parrot\".",
+    "It has a big orange, blue and yellow beak.",
+    "The answer has 2 words (8, 6 letters).",
+    "Its first letter is A."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/193715532/medium.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Julia Moning",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/193715532"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/498923702/medium.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Diego González Dopico",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/498923702"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/467763437/medium.jpeg",
+      "w": 500,
+      "h": 333,
+      "credit": "allan5519",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/467763437"
+     }
+    ],
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/3/33/Atlantic_Puffin_%28Fratercula_arctica%29_%28W1CDR0001416_BD3%29.ogg/Atlantic_Puffin_%28Fratercula_arctica%29_%28W1CDR0001416_BD3%29.ogg.mp3",
+      "credit": "This file has been provided by the British Library from its digital collections. Links …",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Atlantic_Puffin_(Fratercula_arctica)_(W1CDR0001416_BD3).ogg",
+      "start": 0
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "bald-eagle",
+   "name": "Bald eagle",
+   "sci": "Haliaeetus leucocephalus",
+   "group": "raptor",
+   "facts": {
+    "region": "North America",
+    "flightless": false,
+    "status": "Least concern"
+   },
+   "lookalikes": [
+    "golden-eagle"
+   ],
+   "blurb": "A big eagle with a white head and tail. It is the national bird of the United States.",
+   "clues": [
+    "Its IUCN conservation status is \"Least concern\".",
+    "Family: Accipitridae.",
+    "Genus: Haliaeetus.",
+    "Its nests can weigh over a tonne.",
+    "It often steals fish from ospreys.",
+    "It nearly died out because of the pesticide DDT.",
+    "It is found in North America.",
+    "It is the national bird of the USA.",
+    "Its head is white, not really without feathers.",
+    "The answer has 2 words (4, 5 letters).",
+    "Its first letter is B."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/384490244/medium.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Marcel_Pepin",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/384490244"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/598855376/medium.jpg",
+      "w": 500,
+      "h": 281,
+      "credit": "Daughter Dad",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/598855376"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/609117510/medium.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Justin Flint",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/609117510"
+     }
+    ],
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/5/59/Bald_Eagle_Yellowstone_National_Park.ogg/Bald_Eagle_Yellowstone_National_Park.ogg.mp3",
+      "credit": "National Park Service",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Bald_Eagle_Yellowstone_National_Park.ogg",
+      "start": 0
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "golden-eagle",
+   "name": "Golden eagle",
+   "sci": "Aquila chrysaetos",
+   "group": "raptor",
+   "facts": {
+    "region": "many parts of the world",
+    "flightless": false,
+    "status": "Least concern"
+   },
+   "lookalikes": [
+    "bald-eagle",
+    "wedge-tailed-eagle"
+   ],
+   "blurb": "A powerful brown eagle of mountains across the northern hemisphere. Hunters in Central Asia train them to catch foxes.",
+   "clues": [
+    "Its IUCN conservation status is \"Least concern\".",
+    "Family: Accipitridae.",
+    "Genus: Aquila.",
+    "Kazakh hunters train it to catch foxes.",
+    "It is the national bird of Mexico.",
+    "It can dive at over 240 km/h.",
+    "It is found in many parts of the world.",
+    "It nests on cliffs in Scotland.",
+    "The back of its neck is a shining yellow-brown.",
+    "The answer has 2 words (6, 5 letters).",
+    "Its first letter is G."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/120823804/medium.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Morten Ross",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/120823804"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/112188157/medium.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Richard Littauer",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/112188157"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/222207380/medium.jpeg",
+      "w": 500,
+      "h": 500,
+      "credit": "no rights reserved",
+      "license": "CC0 1.0",
+      "page": "https://www.inaturalist.org/photos/222207380"
+     }
+    ],
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/c/cf/Golden_Eagle_%28Aquila_chrysaetos%29_%28W1CDR0001387_BD6%29.ogg/Golden_Eagle_%28Aquila_chrysaetos%29_%28W1CDR0001387_BD6%29.ogg.mp3",
+      "credit": "This file has been provided by the British Library from its digital collections. Links …",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Golden_Eagle_(Aquila_chrysaetos)_(W1CDR0001387_BD6).ogg",
+      "start": 0
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "peregrine-falcon",
+   "name": "Peregrine falcon",
+   "alt": [
+    "peregrine"
+   ],
+   "sci": "Falco peregrinus",
+   "group": "raptor",
+   "facts": {
+    "region": "many parts of the world",
+    "flightless": false,
+    "status": "Least concern"
+   },
+   "blurb": "The fastest animal on Earth. It dives on other birds at over 300 km/h.",
+   "clues": [
+    "Its IUCN conservation status is \"Least concern\".",
+    "It nests on skyscrapers in many cities.",
+    "It is found on every continent except Antarctica.",
+    "It strikes birds in mid-air with its feet.",
+    "It is found in many parts of the world.",
+    "It has a dark \"moustache\" stripe.",
+    "It is the fastest animal in the world.",
+    "The answer has 2 words (9, 6 letters).",
+    "Its first letter is P."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/226608554/medium.jpg",
+      "w": 500,
+      "h": 400,
+      "credit": "Nicolás Villaseca Merino",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/226608554"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/626747287/medium.jpg",
+      "w": 500,
+      "h": 348,
+      "credit": "sunnyjosef",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/626747287"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/243839915/medium.jpg",
+      "w": 400,
+      "h": 500,
+      "credit": "Andrea Poggi",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/243839915"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "osprey",
+   "name": "Osprey",
+   "alt": [
+    "fish hawk"
+   ],
+   "sci": "Pandion haliaetus",
+   "group": "raptor",
+   "facts": {
+    "region": "many parts of the world",
+    "flightless": false,
+    "status": "Least concern"
+   },
+   "blurb": "A bird of prey that eats almost only fish. It plunges feet-first into the water to catch them.",
+   "clues": [
+    "Its IUCN conservation status is \"Least concern\".",
+    "Family: Pandionidae.",
+    "Genus: Pandion.",
+    "It can close its nostrils when it dives.",
+    "It lives on every continent except Antarctica.",
+    "It is found in many parts of the world.",
+    "It plunges feet-first into water.",
+    "The answer is one word of 6 letters.",
+    "Its first letter is O."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/451322170/medium.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Lawrence Hylton",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/451322170"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/708734366/medium.jpg",
+      "w": 500,
+      "h": 303,
+      "credit": "froggymum",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/708734366"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/148993379/medium.jpg",
+      "w": 500,
+      "h": 403,
+      "credit": "Glenn Berry",
+      "license": "CC0 1.0",
+      "page": "https://www.inaturalist.org/photos/148993379"
+     }
+    ],
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/5/58/Osprey_%28Pandion_haliaetus%29_%28W1CDR0001434_BD8%29.ogg/Osprey_%28Pandion_haliaetus%29_%28W1CDR0001434_BD8%29.ogg.mp3",
+      "credit": "This file has been provided by the British Library from its digital collections. Links …",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Osprey_(Pandion_haliaetus)_(W1CDR0001434_BD8).ogg",
+      "start": 0
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "andean-condor",
+   "name": "Andean condor",
+   "lname": "Andean condor",
+   "sci": "Vultur gryphus",
+   "group": "raptor",
+   "facts": {
+    "region": "South America",
+    "flightless": false,
+    "status": "Vulnerable"
+   },
+   "blurb": "A huge vulture of the Andes mountains with one of the largest wingspans of any bird. It can glide for hours without flapping.",
+   "clues": [
+    "Its IUCN conservation status is \"Vulnerable\".",
+    "Family: Cathartidae.",
+    "Genus: Vultur.",
+    "One was tracked flying 170 km without flapping.",
+    "It can live for over 70 years.",
+    "Males have a fleshy comb on the head.",
+    "It is found in South America.",
+    "It is a symbol of several South American countries.",
+    "It soars over the mountains of South America.",
+    "The answer has 2 words (6, 6 letters).",
+    "Its first letter is A."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/28100377/medium.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Sebastian Serna Muñoz",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/28100377"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/263627085/medium.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "René Cortin",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/263627085"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/208280149/medium.jpg",
+      "w": 500,
+      "h": 340,
+      "credit": "Ltshears",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/208280149"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "secretary-bird",
+   "name": "Secretary bird",
+   "alt": [
+    "secretarybird"
+   ],
+   "sci": "Sagittarius serpentarius",
+   "group": "raptor",
+   "facts": {
+    "region": "Africa",
+    "flightless": false
+   },
+   "blurb": "A long-legged African bird of prey that kills snakes by stamping on them.",
+   "clues": [
+    "Family: Sagittariidae.",
+    "Genus: Sagittarius.",
+    "It kicks with a force about five times its body weight.",
+    "It appears on the coat of arms of Sudan and South Africa.",
+    "It hunts on foot across the savanna.",
+    "It is found in Africa.",
+    "It stamps on snakes to kill them.",
+    "Its head feathers look like quill pens behind an office worker's ear.",
+    "The answer has 2 words (9, 4 letters).",
+    "Its first letter is S."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/116433622/medium.jpeg",
+      "w": 500,
+      "h": 334,
+      "credit": "Jan Ebr &amp; Ivana Ebrová",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/116433622"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/507313802/medium.jpg",
+      "w": 500,
+      "h": 500,
+      "credit": "Jan Ebr &amp; Ivana Ebrová",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/507313802"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/110488340/medium.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "no rights reserved",
+      "license": "CC0 1.0",
+      "page": "https://www.inaturalist.org/photos/110488340"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "harpy-eagle",
+   "name": "Harpy eagle",
+   "sci": "Harpia harpyja",
+   "group": "raptor",
+   "facts": {
+    "region": "South America",
+    "flightless": false,
+    "status": "Vulnerable"
+   },
+   "blurb": "A huge rainforest eagle of Central and South America. Its talons are as big as a bear's claws, and it catches sloths and monkeys.",
+   "clues": [
+    "Its IUCN conservation status is \"Vulnerable\".",
+    "Family: Accipitridae.",
+    "Its back talons are about as long as a grizzly bear's claws.",
+    "It snatches sloths and monkeys from trees.",
+    "It has a grey crest that it can raise.",
+    "It is found in South America.",
+    "It is Panama's national bird.",
+    "It is named after a monster from Greek myth.",
+    "The answer has 2 words (5, 5 letters).",
+    "Its first letter is H."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/447085421/medium.jpeg",
+      "w": 500,
+      "h": 313,
+      "credit": "Christoph Moning",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/447085421"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/447088675/medium.jpeg",
+      "w": 500,
+      "h": 333,
+      "credit": "Christoph Moning",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/447088675"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/248983356/medium.jpg",
+      "w": 500,
+      "h": 320,
+      "credit": "Jiang Chunsheng",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/248983356"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "barn-owl",
+   "name": "Barn owl",
+   "sci": "Tyto alba",
+   "group": "owl",
+   "facts": {
+    "region": "many parts of the world",
+    "flightless": false,
+    "status": "Least concern"
+   },
+   "lookalikes": [
+    "tawny-frogmouth",
+    "snowy-owl"
+   ],
+   "blurb": "A pale owl with a heart-shaped face. It can find mice in total darkness just by listening.",
+   "clues": [
+    "Its IUCN conservation status is \"Least concern\".",
+    "Family: Tytonidae.",
+    "Genus: Tyto.",
+    "One ear is higher than the other to help pinpoint sounds.",
+    "It screeches rather than hoots.",
+    "It is found on every continent except Antarctica.",
+    "It is found in many parts of the world.",
+    "It often nests in farm buildings.",
+    "It has a white, heart-shaped face.",
+    "The answer has 2 words (4, 3 letters).",
+    "Its first letter is B."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/165796939/medium.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "caroline legg",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/165796939"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/165796940/medium.jpg",
+      "w": 500,
+      "h": 364,
+      "credit": "john.purvis",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/165796940"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/66539287/medium.jpeg",
+      "w": 500,
+      "h": 375,
+      "credit": "Andrew Bazdyrev",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/66539287"
+     }
+    ],
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/2/2b/Barn_Owl_%28Tyto_alba%29_%28W_TYTO_ALBA_R1_C16%29.ogg/Barn_Owl_%28Tyto_alba%29_%28W_TYTO_ALBA_R1_C16%29.ogg.mp3",
+      "credit": "This file has been provided by the British Library from its digital collections. Links …",
+      "license": "CC BY 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Barn_Owl_(Tyto_alba)_(W_TYTO_ALBA_R1_C16).ogg",
+      "start": 0
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "snowy-owl",
+   "name": "Snowy owl",
+   "sci": "Bubo scandiacus",
+   "group": "owl",
+   "facts": {
+    "region": "many parts of the world",
+    "flightless": false,
+    "status": "Vulnerable"
+   },
+   "lookalikes": [
+    "barn-owl"
+   ],
+   "blurb": "A big white owl of the Arctic. It hunts in daylight during the long summer days.",
+   "clues": [
+    "Its IUCN conservation status is \"Vulnerable\".",
+    "Family: Strigidae.",
+    "Genus: Bubo.",
+    "It hunts by day during the Arctic summer.",
+    "Its numbers rise and fall with lemmings.",
+    "Females have more dark spots than males.",
+    "It is found in many parts of the world.",
+    "The answer has 2 words (5, 3 letters).",
+    "Its first letter is S."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/175457294/medium.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Matt Felperin",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/175457294"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/263627380/medium.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Bill Bouton",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/263627380"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/175457284/medium.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Matt Felperin",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/175457284"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "great-horned-owl",
+   "name": "Great horned owl",
+   "sci": "Bubo virginianus",
+   "group": "owl",
+   "facts": {
+    "region": "the Americas",
+    "flightless": false,
+    "status": "Least concern"
+   },
+   "blurb": "A big, fierce owl of the Americas with feathery ear tufts. It even hunts skunks.",
+   "clues": [
+    "Its IUCN conservation status is \"Least concern\".",
+    "Family: Strigidae.",
+    "Genus: Bubo.",
+    "It is one of the few predators that eats skunks.",
+    "Its grip is very powerful.",
+    "It hoots deeply at night.",
+    "It is found in the Americas.",
+    "It has big feathery ear tufts.",
+    "The answer has 3 words (5, 6, 3 letters).",
+    "Its first letter is G."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/79388250/medium.jpg",
+      "w": 375,
+      "h": 500,
+      "credit": "Ben Hayden",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/79388250"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/264835127/medium.jpeg",
+      "w": 500,
+      "h": 408,
+      "credit": "no rights reserved",
+      "license": "CC0 1.0",
+      "page": "https://www.inaturalist.org/photos/264835127"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/408807127/medium.jpg",
+      "w": 380,
+      "h": 500,
+      "credit": "Michael Warner",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/408807127"
+     }
+    ],
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/e/e8/Bubo_virginianus_-_Great_Horned_Owl_XC156403.mp3",
+      "credit": "Bushman",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Bubo_virginianus_-_Great_Horned_Owl_XC156403.mp3",
+      "start": 0
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "greater-flamingo",
+   "name": "Greater flamingo",
+   "alt": [
+    "flamingo"
+   ],
+   "sci": "Phoenicopterus roseus",
+   "group": "waterbird",
+   "facts": {
+    "region": "many parts of the world",
+    "flightless": false,
+    "status": "Least concern"
+   },
+   "blurb": "A tall pink bird that feeds with its head upside down. Its pink colour comes from the food it eats.",
+   "clues": [
+    "Its IUCN conservation status is \"Least concern\".",
+    "Family: Phoenicopteridae.",
+    "Genus: Phoenicopterus.",
+    "It feeds with its head upside down.",
+    "Its colour comes from pigments in shrimp and algae.",
+    "It often stands on one leg.",
+    "It is found in many parts of the world.",
+    "Thousands gather on salty lakes.",
+    "It is tall and pink.",
+    "The answer has 2 words (7, 8 letters).",
+    "Its first letter is G."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/346681268/medium.jpg",
+      "w": 500,
+      "h": 334,
+      "credit": "Pierre-Marie Epiney",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/346681268"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/85928015/medium.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Diego Delso",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/85928015"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/85928017/medium.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Bernard DUPONT",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/85928017"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "scarlet-macaw",
+   "name": "Scarlet macaw",
+   "sci": "Ara macao",
+   "group": "parrot",
+   "facts": {
+    "region": "the Americas",
+    "flightless": false,
+    "status": "Least concern"
+   },
+   "lookalikes": [
+    "african-grey-parrot"
+   ],
+   "blurb": "A big, bright red, yellow and blue parrot from Central and South American rainforests.",
+   "clues": [
+    "Its IUCN conservation status is \"Least concern\".",
+    "Family: Psittacidae.",
+    "Genus: Ara.",
+    "It eats clay from riverbanks.",
+    "It can live for over 50 years.",
+    "It is Honduras's national bird.",
+    "It is found in the Americas.",
+    "It has a long tail and a huge beak.",
+    "It is bright red with yellow and blue wings.",
+    "The answer has 2 words (7, 5 letters).",
+    "Its first letter is S."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/53458435/medium.jpg",
+      "w": 500,
+      "h": 389,
+      "credit": "Matt Muir",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/53458435"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/591920768/medium.jpg",
+      "w": 500,
+      "h": 400,
+      "credit": "no rights reserved",
+      "license": "CC0 1.0",
+      "page": "https://www.inaturalist.org/photos/591920768"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/395848909/medium.jpeg",
+      "w": 359,
+      "h": 500,
+      "credit": "Cricket Raspet",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/395848909"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "african-grey-parrot",
+   "name": "African grey parrot",
+   "lname": "African grey parrot",
+   "alt": [
+    "grey parrot"
+   ],
+   "sci": "Psittacus erithacus",
+   "group": "parrot",
+   "facts": {
+    "region": "Africa",
+    "flightless": false
+   },
+   "lookalikes": [
+    "scarlet-macaw"
+   ],
+   "blurb": "A grey parrot with a red tail, famous as one of the best talking birds. One named Alex learned over 100 words.",
+   "clues": [
+    "Family: Psittacidae.",
+    "Genus: Psittacus.",
+    "A famous one named Alex knew colours, shapes and numbers.",
+    "It is endangered because of the pet trade.",
+    "It has a bright red tail.",
+    "It is one of the best talking birds.",
+    "The answer has 3 words (7, 4, 6 letters).",
+    "Its first letter is A."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/319398053/medium.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "http://commons.wikimedia.org/wiki/User:Lmbuga",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/319398053"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/42638096/medium.jpg",
+      "w": 500,
+      "h": 444,
+      "credit": "Sandra Keller",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/42638096"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/432659299/medium.jpeg",
+      "w": 500,
+      "h": 488,
+      "credit": "Daniel Onneweer",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/432659299"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "toco-toucan",
+   "name": "Toco toucan",
+   "alt": [
+    "toucan"
+   ],
+   "sci": "Ramphastos toco",
+   "group": "toucan",
+   "facts": {
+    "region": "South America",
+    "flightless": false,
+    "status": "Least concern"
+   },
+   "blurb": "A black bird with a huge orange beak, from South America. Its beak is light because it is hollow inside.",
+   "clues": [
+    "Its IUCN conservation status is \"Least concern\".",
+    "Family: Ramphastidae.",
+    "Genus: Ramphastos.",
+    "Its beak helps it lose heat.",
+    "Its beak is light because it is full of air spaces.",
+    "It sleeps with its beak tucked under its wing.",
+    "It is found in South America.",
+    "It is black with a white throat.",
+    "Its huge beak is bright orange.",
+    "The answer has 2 words (4, 6 letters).",
+    "Its first letter is T."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/95469825/medium.jpg",
+      "w": 334,
+      "h": 500,
+      "credit": "Diogo Luiz",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/95469825"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/145999537/medium.jpeg",
+      "w": 500,
+      "h": 375,
+      "credit": "Daniel Cavallari",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/145999537"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/349077750/medium.jpeg",
+      "w": 500,
+      "h": 346,
+      "credit": "Gabriel Martínez",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/349077750"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "bee-hummingbird",
+   "name": "Bee hummingbird",
+   "sci": "Mellisuga helenae",
+   "group": "hummingbird",
+   "facts": {
+    "region": "the Americas",
+    "flightless": false,
+    "status": "Near threatened"
+   },
+   "lookalikes": [
+    "ruby-throated-hummingbird"
+   ],
+   "blurb": "The smallest bird in the world, from Cuba. It weighs about as much as a paperclip.",
+   "clues": [
+    "Its IUCN conservation status is \"Near threatened\".",
+    "Family: Trochilidae.",
+    "Genus: Mellisuga.",
+    "It lays eggs the size of coffee beans.",
+    "It weighs about 2 grams.",
+    "It lives only in Cuba.",
+    "It is found in the Americas.",
+    "It hovers to drink nectar.",
+    "It is the smallest bird in the world.",
+    "The answer has 2 words (3, 11 letters).",
+    "Its first letter is B."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/252406870/medium.jpg",
+      "w": 500,
+      "h": 500,
+      "credit": "egorbirder",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/252406870"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/187011774/medium.jpg",
+      "w": 437,
+      "h": 500,
+      "credit": "avocat",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/187011774"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/144891172/medium.jpeg",
+      "w": 500,
+      "h": 375,
+      "credit": "amantedarmanin",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/144891172"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "ruby-throated-hummingbird",
+   "name": "Ruby-throated hummingbird",
+   "alt": [
+    "hummingbird"
+   ],
+   "sci": "Archilochus colubris",
+   "group": "hummingbird",
+   "facts": {
+    "region": "North America",
+    "flightless": false,
+    "status": "Least concern"
+   },
+   "lookalikes": [
+    "bee-hummingbird"
+   ],
+   "blurb": "A tiny bird that hovers at flowers. It flies non-stop across the Gulf of Mexico on migration.",
+   "clues": [
+    "Its IUCN conservation status is \"Least concern\".",
+    "Family: Trochilidae.",
+    "Genus: Archilochus.",
+    "It flies non-stop across the Gulf of Mexico.",
+    "Its heart can beat over 1,000 times a minute.",
+    "It can fly backwards.",
+    "It is found in North America.",
+    "It hovers in front of flowers.",
+    "The answer has 3 words (4, 8, 11 letters).",
+    "Its first letter is R."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/239401590/medium.jpg",
+      "w": 500,
+      "h": 376,
+      "credit": "Blake Ross",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/239401590"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/314800928/medium.jpeg",
+      "w": 500,
+      "h": 375,
+      "credit": "no rights reserved",
+      "license": "CC0 1.0",
+      "page": "https://www.inaturalist.org/photos/314800928"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/47442194/medium.jpg",
+      "w": 375,
+      "h": 500,
+      "credit": "no rights reserved",
+      "license": "CC0 1.0",
+      "page": "https://www.inaturalist.org/photos/47442194"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "resplendent-quetzal",
+   "name": "Resplendent quetzal",
+   "alt": [
+    "quetzal"
+   ],
+   "sci": "Pharomachrus mocinno",
+   "group": "trogon",
+   "facts": {
+    "region": "the Americas",
+    "flightless": false,
+    "status": "Near threatened"
+   },
+   "blurb": "A shining green bird of Central American cloud forests. Males have tail streamers longer than their bodies.",
+   "clues": [
+    "Its IUCN conservation status is \"Near threatened\".",
+    "Family: Trogonidae.",
+    "Genus: Pharomachrus.",
+    "Guatemala's money is named after it.",
+    "The Aztecs and Maya prized its feathers.",
+    "It loves wild avocados.",
+    "It is found in the Americas.",
+    "Males have very long tail streamers.",
+    "It is shining green with a red belly.",
+    "The answer has 2 words (11, 7 letters).",
+    "Its first letter is R."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/265024050/medium.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Cephas",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/265024050"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/111321224/medium.jpg",
+      "w": 346,
+      "h": 500,
+      "credit": "Morten Ross",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/111321224"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/175739925/medium.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Paul Hoekman",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/175739925"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "indian-peafowl",
+   "name": "Indian peafowl",
+   "lname": "Indian peafowl",
+   "alt": [
+    "peacock",
+    "peahen",
+    "peafowl"
+   ],
+   "sci": "Pavo cristatus",
+   "group": "gamebird",
+   "facts": {
+    "region": "Asia",
+    "flightless": false,
+    "status": "Least concern"
+   },
+   "blurb": "The male, called a peacock, shows off a huge fan of tail feathers covered in eye-spots.",
+   "clues": [
+    "Its IUCN conservation status is \"Least concern\".",
+    "Family: Phasianidae.",
+    "Genus: Pavo.",
+    "The female is mostly brown.",
+    "Its loud call sounds like someone shouting \"help\".",
+    "It is found in Asia.",
+    "The male's train has about 200 eye-spot feathers.",
+    "The male spreads a huge colourful fan.",
+    "The answer has 2 words (6, 7 letters).",
+    "Its first letter is I."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/407381945/medium.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Sarah Stierch",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/407381945"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/407381941/medium.jpg",
+      "w": 291,
+      "h": 500,
+      "credit": "Shino jacob koottanad",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/407381941"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/70910408/medium.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Becky Matsubara",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/70910408"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "mandarin-duck",
+   "name": "Mandarin duck",
+   "sci": "Aix galericulata",
+   "group": "waterfowl",
+   "facts": {
+    "region": "Asia",
+    "flightless": false,
+    "status": "Least concern"
+   },
+   "lookalikes": [
+    "mallard"
+   ],
+   "blurb": "A beautiful duck from East Asia. The male has orange \"sails\" on its back and a colourful face.",
+   "clues": [
+    "Its IUCN conservation status is \"Least concern\".",
+    "Family: Anatidae.",
+    "Genus: Aix.",
+    "It nests in holes in trees.",
+    "It is a symbol of love in China.",
+    "It is found in Asia.",
+    "The male has orange sail-like feathers on its back.",
+    "It is named after an official of imperial China.",
+    "The answer has 2 words (8, 4 letters).",
+    "Its first letter is M."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/171955255/medium.jpg",
+      "w": 500,
+      "h": 332,
+      "credit": "Alexis Lours",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/171955255"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/164374411/medium.jpg",
+      "w": 500,
+      "h": 324,
+      "credit": "Diliff",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/164374411"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/164374405/medium.jpg",
+      "w": 500,
+      "h": 323,
+      "credit": "Keven Law",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/164374405"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "mallard",
+   "name": "Mallard",
+   "alt": [
+    "wild duck"
+   ],
+   "sci": "Anas platyrhynchos",
+   "group": "waterfowl",
+   "facts": {
+    "region": "many parts of the world",
+    "flightless": false,
+    "status": "Least concern"
+   },
+   "lookalikes": [
+    "mandarin-duck"
+   ],
+   "blurb": "The common wild duck of parks and ponds. Almost all farm ducks come from it.",
+   "clues": [
+    "Its IUCN conservation status is \"Least concern\".",
+    "Family: Anatidae.",
+    "Genus: Anas.",
+    "Only the female gives a loud \"quack\".",
+    "The male has a white neck ring.",
+    "It is found in many parts of the world.",
+    "The male has a shiny green head.",
+    "The answer is one word of 7 letters.",
+    "Its first letter is M."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/95268822/medium.jpg",
+      "w": 500,
+      "h": 307,
+      "credit": "anonymous",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/95268822"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/45796333/medium.jpeg",
+      "w": 500,
+      "h": 375,
+      "credit": "Ron Pasieczna",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/45796333"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/94471985/medium.jpg",
+      "w": 500,
+      "h": 307,
+      "credit": "hedera.baltica",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/94471985"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "mute-swan",
+   "name": "Mute swan",
+   "sci": "Cygnus olor",
+   "group": "waterfowl",
+   "facts": {
+    "region": "Europe",
+    "flightless": false,
+    "status": "Least concern"
+   },
+   "lookalikes": [
+    "black-swan"
+   ],
+   "blurb": "A big white swan with an orange bill and a black knob. In Britain, the monarch can claim unmarked ones on open water.",
+   "clues": [
+    "Its IUCN conservation status is \"Least concern\".",
+    "Family: Anatidae.",
+    "Genus: Cygnus.",
+    "It hisses at people near its nest.",
+    "It has a black knob on its bill.",
+    "It is found in Europe.",
+    "Its bill is orange.",
+    "It is a big white waterbird with a curved neck.",
+    "The answer has 2 words (4, 4 letters).",
+    "Its first letter is M."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/283242966/medium.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Laura Mae",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/283242966"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/113908808/medium.jpeg",
+      "w": 500,
+      "h": 331,
+      "credit": "Codrin Bucur",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/113908808"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/13855998/medium.jpg",
+      "w": 500,
+      "h": 398,
+      "credit": "carnifex",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/13855998"
+     }
+    ],
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/c/cc/Cygnus_olor_-_Mute_Swan_XC434964.mp3",
+      "credit": "Joost van Bruggen",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Cygnus_olor_-_Mute_Swan_XC434964.mp3",
+      "start": 0
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "canada-goose",
+   "name": "Canada goose",
+   "lname": "Canada goose",
+   "sci": "Branta canadensis",
+   "group": "waterfowl",
+   "facts": {
+    "region": "North America",
+    "flightless": false,
+    "status": "Least concern"
+   },
+   "blurb": "A big brown goose with a black neck and white chin strap. Flocks fly in V shapes.",
+   "clues": [
+    "Its IUCN conservation status is \"Least concern\".",
+    "Family: Anatidae.",
+    "Genus: Branta.",
+    "It has been introduced to Britain and New Zealand.",
+    "Flocks fly in a V shape.",
+    "It honks loudly.",
+    "It is found in North America.",
+    "It has a white chin strap.",
+    "It is named after a big North American country.",
+    "The answer has 2 words (6, 5 letters).",
+    "Its first letter is C."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/247715952/medium.jpeg",
+      "w": 500,
+      "h": 431,
+      "credit": "John Barkla",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/247715952"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/123908815/medium.jpg",
+      "w": 500,
+      "h": 284,
+      "credit": "no rights reserved",
+      "license": "CC0 1.0",
+      "page": "https://www.inaturalist.org/photos/123908815"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/37800057/medium.jpeg",
+      "w": 455,
+      "h": 500,
+      "credit": "Henry Van T. Cotter",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/37800057"
+     }
+    ],
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/e/e6/Canada_Geese_%28Branta_canadensis%29_%28W1CDR0001421_BD11%29.ogg/Canada_Geese_%28Branta_canadensis%29_%28W1CDR0001421_BD11%29.ogg.mp3",
+      "credit": "This file has been provided by the British Library from its digital collections. Links …",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Canada_Geese_(Branta_canadensis)_(W1CDR0001421_BD11).ogg",
+      "start": 0
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "wild-turkey",
+   "name": "Wild turkey",
+   "alt": [
+    "turkey"
+   ],
+   "sci": "Meleagris gallopavo",
+   "group": "gamebird",
+   "facts": {
+    "region": "North America",
+    "flightless": false,
+    "status": "Least concern"
+   },
+   "blurb": "A big North American bird. Males puff up and fan their tails. Farm turkeys come from it.",
+   "clues": [
+    "Its IUCN conservation status is \"Least concern\".",
+    "Family: Phasianidae.",
+    "Genus: Meleagris.",
+    "Benjamin Franklin praised it over the bald eagle.",
+    "Males gobble loudly in spring.",
+    "It is found in North America.",
+    "It is eaten at Thanksgiving and Christmas.",
+    "Its name is also a country.",
+    "The answer has 2 words (4, 6 letters).",
+    "Its first letter is W."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/114655826/medium.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Judy Gallagher",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/114655826"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/19232661/medium.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Ken-ichi Ueda",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/19232661"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/20497431/medium.jpeg",
+      "w": 281,
+      "h": 500,
+      "credit": "Tom Norton",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/20497431"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "red-junglefowl",
+   "name": "Red junglefowl",
+   "alt": [
+    "chicken",
+    "jungle fowl"
+   ],
+   "sci": "Gallus gallus",
+   "group": "gamebird",
+   "facts": {
+    "region": "Asia",
+    "flightless": false,
+    "status": "Least concern"
+   },
+   "blurb": "A wild bird of Asian forests and the ancestor of the chicken. There are more chickens than any other bird.",
+   "clues": [
+    "Its IUCN conservation status is \"Least concern\".",
+    "Family: Phasianidae.",
+    "Genus: Gallus.",
+    "It was tamed in South-East Asia thousands of years ago.",
+    "Roosters crow at dawn.",
+    "It is found in Asia.",
+    "It is the wild ancestor of farmyard hens.",
+    "There are billions of its tame relatives.",
+    "The answer has 2 words (3, 10 letters).",
+    "Its first letter is R."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/3784873/medium.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Julien Renoult",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/3784873"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/43973343/medium.jpeg",
+      "w": 500,
+      "h": 375,
+      "credit": "Jacqui Geux",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/43973343"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/92534456/medium.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Sebastian Doak",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/92534456"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "rock-dove",
+   "name": "Rock dove",
+   "alt": [
+    "pigeon",
+    "feral pigeon",
+    "rock pigeon"
+   ],
+   "sci": "Columba livia",
+   "group": "pigeon",
+   "facts": {
+    "region": "many parts of the world",
+    "flightless": false,
+    "status": "Least concern"
+   },
+   "blurb": "The wild ancestor of the city pigeon. Pigeons can find their way home from hundreds of kilometres away.",
+   "clues": [
+    "Its IUCN conservation status is \"Least concern\".",
+    "Family: Columbidae.",
+    "Genus: Columba.",
+    "Homing ones can find their way home from far away.",
+    "It nests on buildings like sea cliffs.",
+    "It is found in many parts of the world.",
+    "It coos.",
+    "It is the grey bird of city squares.",
+    "The answer has 2 words (4, 4 letters).",
+    "Its first letter is R."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/466776975/medium.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Birds of Gilgit-Baltistan",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/466776975"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/66637915/medium.jpeg",
+      "w": 500,
+      "h": 333,
+      "credit": "Andrew Bazdyrev",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/66637915"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/466776981/medium.jpg",
+      "w": 375,
+      "h": 500,
+      "credit": "Birds of Gilgit-Baltistan",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/466776981"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "greater-roadrunner",
+   "name": "Greater roadrunner",
+   "alt": [
+    "roadrunner"
+   ],
+   "sci": "Geococcyx californianus",
+   "group": "cuckoo",
+   "facts": {
+    "region": "North America",
+    "flightless": false,
+    "status": "Least concern"
+   },
+   "blurb": "A fast desert cuckoo of the south-western USA and Mexico. It can run at about 30 km/h and kills rattlesnakes.",
+   "clues": [
+    "Its IUCN conservation status is \"Least concern\".",
+    "Family: Cuculidae.",
+    "Genus: Geococcyx.",
+    "It is a kind of cuckoo.",
+    "It can kill and eat rattlesnakes.",
+    "It warms up in the morning by sunbathing.",
+    "It is found in North America.",
+    "A cartoon one always escaped Wile E. Coyote.",
+    "It runs along roads in the desert.",
+    "The answer has 2 words (7, 10 letters).",
+    "Its first letter is G."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/243403713/medium.jpg",
+      "w": 500,
+      "h": 369,
+      "credit": "MarvalPhotography19",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/243403713"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/8844788/medium.jpeg",
+      "w": 500,
+      "h": 331,
+      "credit": "Jody Shugart",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/8844788"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/424993724/medium.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Jonathan Eisen",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/424993724"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "northern-cardinal",
+   "name": "Northern cardinal",
+   "alt": [
+    "cardinal",
+    "redbird"
+   ],
+   "sci": "Cardinalis cardinalis",
+   "group": "songbird",
+   "facts": {
+    "region": "North America",
+    "flightless": false,
+    "status": "Least concern"
+   },
+   "blurb": "A bright red songbird with a crest and a black face, common in gardens in the eastern USA.",
+   "clues": [
+    "Its IUCN conservation status is \"Least concern\".",
+    "It is the state bird of seven US states.",
+    "It sometimes attacks its own reflection.",
+    "The female is brown with red tints.",
+    "It has a crest and a black mask.",
+    "It is named after the red robes of church officials.",
+    "The answer has 2 words (8, 8 letters).",
+    "Its first letter is N."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/452211474/medium.jpg",
+      "w": 500,
+      "h": 500,
+      "credit": "Paul Danese",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/452211474"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/452211470/medium.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Paul Danese",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/452211470"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/452211478/medium.jpeg",
+      "w": 500,
+      "h": 363,
+      "credit": "Mykola Swarnyk",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/452211478"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "american-robin",
+   "name": "American robin",
+   "lname": "American robin",
+   "sci": "Turdus migratorius",
+   "group": "songbird",
+   "facts": {
+    "region": "North America",
+    "flightless": false,
+    "status": "Least concern"
+   },
+   "lookalikes": [
+    "european-robin"
+   ],
+   "blurb": "A big thrush with an orange breast, common on North American lawns. It is not closely related to the European robin.",
+   "clues": [
+    "Its IUCN conservation status is \"Least concern\".",
+    "Family: Turdidae.",
+    "Genus: Turdus.",
+    "It is really a kind of thrush.",
+    "Its eggs are a famous shade of blue.",
+    "It pulls worms from lawns.",
+    "Its breast is orange-red.",
+    "It shares its name with a smaller European bird.",
+    "The answer has 2 words (8, 5 letters).",
+    "Its first letter is A."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/111891996/medium.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Judy Gallagher",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/111891996"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/111891993/medium.jpg",
+      "w": 500,
+      "h": 344,
+      "credit": "Judy Gallagher",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/111891993"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/370528121/medium.jpg",
+      "w": 500,
+      "h": 500,
+      "credit": "Mila Turov",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/370528121"
+     }
+    ],
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/d/d8/Yellowstone_sound_library_-_American_Robin_-_001.mp3",
+      "credit": "NPS & MSU Acoustic Atlas/Jennifer Jerrett",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Yellowstone_sound_library_-_American_Robin_-_001.mp3",
+      "start": 0
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "european-robin",
+   "name": "European robin",
+   "lname": "European robin",
+   "alt": [
+    "robin",
+    "robin redbreast"
+   ],
+   "sci": "Erithacus rubecula",
+   "group": "songbird",
+   "facts": {
+    "region": "Europe",
+    "flightless": false,
+    "status": "Least concern"
+   },
+   "lookalikes": [
+    "american-robin"
+   ],
+   "blurb": "A small brown bird with an orange-red breast. It often follows gardeners to catch worms.",
+   "clues": [
+    "Its IUCN conservation status is \"Least concern\".",
+    "Family: Muscicapidae.",
+    "Genus: Erithacus.",
+    "It sings all through winter.",
+    "It fiercely defends its territory.",
+    "It follows gardeners to catch worms.",
+    "It appears on many Christmas cards.",
+    "It has an orange-red breast.",
+    "The answer has 2 words (8, 5 letters).",
+    "Its first letter is E."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/591732718/medium.jpg",
+      "w": 333,
+      "h": 500,
+      "credit": "Arjan Haverkamp",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/591732718"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/30475942/medium.jpeg",
+      "w": 500,
+      "h": 375,
+      "credit": "Alexis Tinker-Tsavalas",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/30475942"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/30476100/medium.jpeg",
+      "w": 500,
+      "h": 375,
+      "credit": "Alexis Tinker-Tsavalas",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/30476100"
+     }
+    ],
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/a/a5/European_Robin_%28Erithacus_rubecula%29_%28W1CDR0001425_BD16%29.ogg/European_Robin_%28Erithacus_rubecula%29_%28W1CDR0001425_BD16%29.ogg.mp3",
+      "credit": "This file has been provided by the British Library from its digital collections. Links …",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:European_Robin_(Erithacus_rubecula)_(W1CDR0001425_BD16).ogg",
+      "start": 0
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "blue-jay",
+   "name": "Blue jay",
+   "sci": "Cyanocitta cristata",
+   "group": "songbird",
+   "facts": {
+    "region": "North America",
+    "flightless": false,
+    "status": "Least concern"
+   },
+   "blurb": "A loud, clever blue-and-white bird with a crest. It buries acorns and helps oak forests spread.",
+   "clues": [
+    "Its IUCN conservation status is \"Least concern\".",
+    "Family: Corvidae.",
+    "Genus: Cyanocitta.",
+    "It buries thousands of acorns in autumn.",
+    "It can copy the call of hawks.",
+    "A Toronto baseball team is named after it.",
+    "It is found in North America.",
+    "It has a crest.",
+    "The answer has 2 words (4, 3 letters).",
+    "Its first letter is B."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/530721418/medium.jpg",
+      "w": 500,
+      "h": 368,
+      "credit": "Judy Gallagher",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/530721418"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/248588410/medium.jpg",
+      "w": 500,
+      "h": 314,
+      "credit": "Blake Ross",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/248588410"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/243875927/medium.jpg",
+      "w": 500,
+      "h": 322,
+      "credit": "Blake Ross",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/243875927"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "house-sparrow",
+   "name": "House sparrow",
+   "alt": [
+    "sparrow"
+   ],
+   "sci": "Passer domesticus",
+   "group": "songbird",
+   "facts": {
+    "region": "many parts of the world",
+    "flightless": false,
+    "status": "Least concern"
+   },
+   "blurb": "A small brown bird that lives close to people almost everywhere. Its numbers have dropped in many cities.",
+   "clues": [
+    "Its IUCN conservation status is \"Least concern\".",
+    "Family: Passeridae.",
+    "Genus: Passer.",
+    "It has been introduced to every continent except Antarctica.",
+    "Males have a black bib.",
+    "It takes dust baths.",
+    "It is found in many parts of the world.",
+    "It is a small brown bird that lives near people.",
+    "The answer has 2 words (5, 7 letters).",
+    "Its first letter is H."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/136543105/medium.jpeg",
+      "w": 500,
+      "h": 375,
+      "credit": "Esteban Poveda",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/136543105"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/454836800/medium.jpeg",
+      "w": 500,
+      "h": 333,
+      "credit": "jirau",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/454836800"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/181802756/medium.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "hedera.baltica",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/181802756"
+     }
+    ],
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/b/ba/House_Sparrows_%28Passer_domesticus%29_%28W1CDR0001537_BD13%29.ogg/House_Sparrows_%28Passer_domesticus%29_%28W1CDR0001537_BD13%29.ogg.mp3",
+      "credit": "This file has been provided by the British Library from its digital collections. Links …",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:House_Sparrows_(Passer_domesticus)_(W1CDR0001537_BD13).ogg",
+      "start": 0
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "common-starling",
+   "name": "Common starling",
+   "alt": [
+    "European starling",
+    "starling"
+   ],
+   "sci": "Sturnus vulgaris",
+   "group": "songbird",
+   "facts": {
+    "region": "many parts of the world",
+    "flightless": false,
+    "status": "Least concern"
+   },
+   "blurb": "A speckled songbird whose huge flocks make swirling shapes in the sky called murmurations.",
+   "clues": [
+    "Its IUCN conservation status is \"Least concern\".",
+    "Family: Sturnidae.",
+    "Genus: Sturnus.",
+    "It was released in New York's Central Park in 1890.",
+    "It is a brilliant mimic.",
+    "Its feathers shine purple and green.",
+    "It is found in many parts of the world.",
+    "Huge flocks swirl at dusk in murmurations.",
+    "It is speckled with white dots like tiny lights in the sky.",
+    "The answer has 2 words (6, 8 letters).",
+    "Its first letter is C."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/365984069/medium.jpg",
+      "w": 500,
+      "h": 500,
+      "credit": "Shiva Shenoy",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/365984069"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/488854941/medium.jpg",
+      "w": 500,
+      "h": 431,
+      "credit": "Timothy Lindsey",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/488854941"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/9368838/medium.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Paolo Zucca",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/9368838"
+     }
+    ],
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/e/e5/Common_Starling_%28Sturnus_vulgaris%29_%28W1CDR0001431_BD8%29.ogg/Common_Starling_%28Sturnus_vulgaris%29_%28W1CDR0001431_BD8%29.ogg.mp3",
+      "credit": "This file has been provided by the British Library from its digital collections. Links …",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Common_Starling_(Sturnus_vulgaris)_(W1CDR0001431_BD8).ogg",
+      "start": 0
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "barn-swallow",
+   "name": "Barn swallow",
+   "alt": [
+    "swallow"
+   ],
+   "sci": "Hirundo rustica",
+   "group": "songbird",
+   "facts": {
+    "region": "many parts of the world",
+    "flightless": false,
+    "status": "Least concern"
+   },
+   "blurb": "A fast-flying bird with a long forked tail. It flies from Europe to Africa each winter.",
+   "clues": [
+    "Its IUCN conservation status is \"Least concern\".",
+    "Family: Hirundinidae.",
+    "Genus: Hirundo.",
+    "British ones spend winter in South Africa.",
+    "It builds a cup nest of mud.",
+    "It catches insects in flight.",
+    "It is found in many parts of the world.",
+    "It has a red throat and a long forked tail.",
+    "It often nests in farm buildings.",
+    "The answer has 2 words (4, 7 letters).",
+    "Its first letter is B."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/635249690/medium.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Donald Davesne",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/635249690"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/8209375/medium.jpeg",
+      "w": 470,
+      "h": 500,
+      "credit": "Robbie Hannawacker",
+      "license": "CC0 1.0",
+      "page": "https://www.inaturalist.org/photos/8209375"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/575999585/medium.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Diego González Dopico",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/575999585"
+     }
+    ],
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/b/bc/Hirundo_rustica_-_Barn_Swallow_-_XC83449.ogg/Hirundo_rustica_-_Barn_Swallow_-_XC83449.ogg.mp3",
+      "credit": "Jonathon Jongsma",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Hirundo_rustica_-_Barn_Swallow_-_XC83449.ogg",
+      "start": 0
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "common-kingfisher",
+   "name": "Common kingfisher",
+   "alt": [
+    "kingfisher"
+   ],
+   "sci": "Alcedo atthis",
+   "group": "kingfisher",
+   "facts": {
+    "region": "Europe",
+    "flightless": false,
+    "status": "Least concern"
+   },
+   "lookalikes": [
+    "laughing-kookaburra"
+   ],
+   "blurb": "A tiny, bright blue and orange bird that dives into rivers to catch fish.",
+   "clues": [
+    "Its IUCN conservation status is \"Least concern\".",
+    "Family: Alcedinidae.",
+    "Genus: Alcedo.",
+    "The shape of its beak inspired the Japanese bullet train's nose.",
+    "It nests in tunnels in riverbanks.",
+    "It dives headfirst into water.",
+    "It is found in Europe.",
+    "It is bright blue and orange.",
+    "It is named after royalty and catching fish.",
+    "The answer has 2 words (6, 10 letters).",
+    "Its first letter is C."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/33183952/medium.jpg",
+      "w": 500,
+      "h": 357,
+      "credit": "Frank Sengpiel",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/33183952"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/347328453/medium.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "SteveM4560",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/347328453"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/163772236/medium.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Alexis Lours",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/163772236"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "eurasian-blue-tit",
+   "name": "Eurasian blue tit",
+   "lname": "Eurasian blue tit",
+   "alt": [
+    "blue tit"
+   ],
+   "sci": "Cyanistes caeruleus",
+   "group": "songbird",
+   "facts": {
+    "region": "Europe",
+    "flightless": false,
+    "status": "Least concern"
+   },
+   "blurb": "A tiny blue-and-yellow garden bird. It used to peck through foil milk bottle tops to drink the cream.",
+   "clues": [
+    "Its IUCN conservation status is \"Least concern\".",
+    "Family: Paridae.",
+    "Genus: Cyanistes.",
+    "It learned to open milk bottles in Britain.",
+    "It often uses nest boxes.",
+    "It can hang upside down on feeders.",
+    "It is found in Europe.",
+    "It is a tiny garden bird with a short name.",
+    "The answer has 3 words (8, 4, 3 letters).",
+    "Its first letter is E."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/405357242/medium.jpg",
+      "w": 500,
+      "h": 500,
+      "credit": "Bengt Nyman",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/405357242"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/355702420/medium.jpg",
+      "w": 500,
+      "h": 438,
+      "credit": "hedera.baltica",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/355702420"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/405357261/medium.jpg",
+      "w": 500,
+      "h": 325,
+      "credit": "pete beard",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/405357261"
+     }
+    ],
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/d/d7/Blue_Tit_%28Cyanistes_caeruleus%29_%28W1CDR0001535_BD30%29.ogg/Blue_Tit_%28Cyanistes_caeruleus%29_%28W1CDR0001535_BD30%29.ogg.mp3",
+      "credit": "This file has been provided by the British Library from its digital collections. Links …",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Blue_Tit_(Cyanistes_caeruleus)_(W1CDR0001535_BD30).ogg",
+      "start": 0
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "eurasian-magpie",
+   "name": "Eurasian magpie",
+   "lname": "Eurasian magpie",
+   "alt": [
+    "magpie"
+   ],
+   "sci": "Pica pica",
+   "group": "crow",
+   "facts": {
+    "region": "Europe",
+    "flightless": false,
+    "status": "Least concern"
+   },
+   "lookalikes": [
+    "australian-magpie"
+   ],
+   "blurb": "A black-and-white bird of the crow family with a long tail. It can recognise itself in a mirror.",
+   "clues": [
+    "Its IUCN conservation status is \"Least concern\".",
+    "Family: Corvidae.",
+    "Genus: Pica.",
+    "It can recognise itself in a mirror.",
+    "Folklore says it steals shiny things.",
+    "A rhyme says \"one for sorrow, two for joy\".",
+    "It is found in Europe.",
+    "It has a long, glossy tail.",
+    "It is black and white and in the crow family.",
+    "The answer has 2 words (8, 6 letters).",
+    "Its first letter is E."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/199815492/medium.jpeg",
+      "w": 500,
+      "h": 375,
+      "credit": "bitsnbirds",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/199815492"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/229929247/medium.jpeg",
+      "w": 500,
+      "h": 471,
+      "credit": "Noa",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/229929247"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/130771798/medium.jpg",
+      "w": 500,
+      "h": 500,
+      "credit": "euqirneto",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/130771798"
+     }
+    ],
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/b/b6/Pica_pica.ogg/Pica_pica.ogg.mp3",
+      "credit": "Oona Räisänen (Mysid)",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Pica_pica.ogg",
+      "start": 0
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "common-raven",
+   "name": "Common raven",
+   "alt": [
+    "raven"
+   ],
+   "sci": "Corvus corax",
+   "group": "crow",
+   "facts": {
+    "region": "many parts of the world",
+    "flightless": false,
+    "status": "Least concern"
+   },
+   "blurb": "The biggest songbird in the world, all glossy black. Ravens are very clever and can solve puzzles.",
+   "clues": [
+    "Its IUCN conservation status is \"Least concern\".",
+    "Family: Corvidae.",
+    "Genus: Corvus.",
+    "Legend says Britain will fall if they leave the Tower of London.",
+    "It is the largest songbird in the world.",
+    "It can solve puzzles and plan ahead.",
+    "It is found in many parts of the world.",
+    "It croaks deeply.",
+    "It is a big, glossy black bird.",
+    "The answer has 2 words (6, 5 letters).",
+    "Its first letter is C."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/119994014/medium.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "xulescu_g",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/119994014"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/462471314/medium.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "cello caruso-turiello",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/462471314"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/381522855/medium.jpeg",
+      "w": 375,
+      "h": 500,
+      "credit": "Mila C.",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/381522855"
+     }
+    ],
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/8/87/Corvus_corax_-_Northern_Raven_-_XC110257.ogg/Corvus_corax_-_Northern_Raven_-_XC110257.ogg.mp3",
+      "credit": "Jonathon Jongsma",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Corvus_corax_-_Northern_Raven_-_XC110257.ogg",
+      "start": 0
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "wandering-albatross",
+   "name": "Wandering albatross",
+   "alt": [
+    "albatross"
+   ],
+   "sci": "Diomedea exulans",
+   "group": "seabird",
+   "facts": {
+    "region": "Antarctica",
+    "flightless": false,
+    "status": "Vulnerable"
+   },
+   "blurb": "The bird with the longest wings in the world, up to about 3.5 metres. It glides over the Southern Ocean for hours without flapping.",
+   "clues": [
+    "Its IUCN conservation status is \"Vulnerable\".",
+    "Family: Diomedeidae.",
+    "Genus: Diomedea.",
+    "It can live for over 50 years.",
+    "It may fly over 100,000 km a year.",
+    "It glides for hours without flapping.",
+    "It is found in Antarctica.",
+    "It has the longest wingspan of any living bird.",
+    "It roams over the Southern Ocean.",
+    "The answer has 2 words (9, 9 letters).",
+    "Its first letter is W."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/336189515/medium.jpeg",
+      "w": 500,
+      "h": 333,
+      "credit": "Flavien Saboureau",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/336189515"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/137728426/medium.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "M Rutherford",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/137728426"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/504796381/medium.jpg",
+      "w": 378,
+      "h": 500,
+      "credit": "eloise kerroux",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/504796381"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "blue-footed-booby",
+   "name": "Blue-footed booby",
+   "sci": "Sula nebouxii",
+   "group": "seabird",
+   "facts": {
+    "region": "the Americas",
+    "flightless": false,
+    "status": "Least concern"
+   },
+   "blurb": "A seabird with bright blue feet. Males show off their feet in a high-stepping dance.",
+   "clues": [
+    "Its IUCN conservation status is \"Least concern\".",
+    "Family: Sulidae.",
+    "Genus: Sula.",
+    "It dives into the sea from high up.",
+    "Many live on the Galápagos Islands.",
+    "Females prefer males with the brightest feet.",
+    "It is found in the Americas.",
+    "Males strut in a high-stepping dance.",
+    "The answer has 3 words (4, 6, 5 letters).",
+    "Its first letter is B."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/64237933/medium.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "William Stephens",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/64237933"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/474042571/medium.jpeg",
+      "w": 500,
+      "h": 281,
+      "credit": "no rights reserved",
+      "license": "CC0 1.0",
+      "page": "https://www.inaturalist.org/photos/474042571"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/355651413/medium.jpeg",
+      "w": 500,
+      "h": 251,
+      "credit": "Bill Levine",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/355651413"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "magnificent-frigatebird",
+   "name": "Magnificent frigatebird",
+   "alt": [
+    "frigatebird"
+   ],
+   "sci": "Fregata magnificens",
+   "group": "seabird",
+   "facts": {
+    "region": "the Americas",
+    "flightless": false,
+    "status": "Least concern"
+   },
+   "blurb": "A seabird with long pointed wings. Males blow up a huge red throat pouch like a balloon.",
+   "clues": [
+    "Its IUCN conservation status is \"Least concern\".",
+    "Family: Fregatidae.",
+    "Genus: Fregata.",
+    "It can stay in the air for weeks.",
+    "It steals food from other seabirds.",
+    "Its feathers are not waterproof.",
+    "It is found in the Americas.",
+    "Males puff up a red throat pouch like a balloon.",
+    "It is named after a fast warship.",
+    "The answer has 2 words (11, 11 letters).",
+    "Its first letter is M."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/158806319/medium.jpeg",
+      "w": 500,
+      "h": 375,
+      "credit": "Megan Massa",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/158806319"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/463807692/medium.jpeg",
+      "w": 500,
+      "h": 281,
+      "credit": "no rights reserved",
+      "license": "CC0 1.0",
+      "page": "https://www.inaturalist.org/photos/463807692"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/471706486/medium.jpeg",
+      "w": 500,
+      "h": 500,
+      "credit": "no rights reserved",
+      "license": "CC0 1.0",
+      "page": "https://www.inaturalist.org/photos/471706486"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "grey-heron",
+   "name": "Grey heron",
+   "sci": "Ardea cinerea",
+   "group": "waterbird",
+   "facts": {
+    "region": "many parts of the world",
+    "flightless": false,
+    "status": "Least concern"
+   },
+   "blurb": "A tall grey wading bird that stands still in shallow water, then stabs fish with its sharp beak.",
+   "clues": [
+    "Its IUCN conservation status is \"Least concern\".",
+    "Family: Ardeidae.",
+    "Genus: Ardea.",
+    "It nests in colonies at the tops of trees.",
+    "It flies with its neck pulled back in an S.",
+    "It raids garden fish ponds.",
+    "It is found in many parts of the world.",
+    "It stands still waiting for fish.",
+    "The answer has 2 words (4, 5 letters).",
+    "Its first letter is G."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/73516715/medium.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Frank Sengpiel",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/73516715"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/197362536/medium.jpg",
+      "w": 375,
+      "h": 500,
+      "credit": "pmcabinet",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/197362536"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/710435847/medium.jpg",
+      "w": 407,
+      "h": 500,
+      "credit": "no rights reserved",
+      "license": "CC0 1.0",
+      "page": "https://www.inaturalist.org/photos/710435847"
+     }
+    ],
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/3/3a/Grey_Heron_%28Ardea_cinerea%29_%28W_ARDEA_CINEREA_R1_C19%29.ogg/Grey_Heron_%28Ardea_cinerea%29_%28W_ARDEA_CINEREA_R1_C19%29.ogg.mp3",
+      "credit": "This file has been provided by the British Library from its digital collections. Links …",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Grey_Heron_(Ardea_cinerea)_(W_ARDEA_CINEREA_R1_C19).ogg",
+      "start": 0
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "white-stork",
+   "name": "White stork",
+   "sci": "Ciconia ciconia",
+   "group": "waterbird",
+   "facts": {
+    "region": "Europe",
+    "flightless": false,
+    "status": "Least concern"
+   },
+   "blurb": "A big white bird with black wings and a red beak. In stories it delivers babies.",
+   "clues": [
+    "Its IUCN conservation status is \"Least concern\".",
+    "Family: Ciconiidae.",
+    "Genus: Ciconia.",
+    "It clatters its beak instead of calling.",
+    "It flies to Africa for winter.",
+    "It builds huge nests on rooftops and chimneys.",
+    "It is found in Europe.",
+    "It has a long red beak and legs.",
+    "The answer has 2 words (5, 5 letters).",
+    "Its first letter is W."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/269104502/medium.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "xulescu_g",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/269104502"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/53897081/medium.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Carlos Delgado",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/53897081"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/53896903/medium.jpg",
+      "w": 500,
+      "h": 300,
+      "credit": "Bernard DUPONT",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/53896903"
+     }
+    ],
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/0/06/Klapperstorch.ogg/Klapperstorch.ogg.mp3",
+      "credit": "Jugrü",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Klapperstorch.ogg",
+      "start": 0
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "shoebill",
+   "name": "Shoebill",
+   "alt": [
+    "whale-headed stork"
+   ],
+   "sci": "Balaeniceps rex",
+   "group": "waterbird",
+   "facts": {
+    "region": "Africa",
+    "flightless": false,
+    "status": "Vulnerable"
+   },
+   "blurb": "A huge, grey, prehistoric-looking bird from African swamps with an enormous beak. It catches lungfish and even baby crocodiles.",
+   "clues": [
+    "Its IUCN conservation status is \"Vulnerable\".",
+    "Family: Balaenicipitidae.",
+    "Genus: Balaeniceps.",
+    "It catches lungfish and even baby crocodiles.",
+    "It stands still for hours.",
+    "It claps its bill loudly.",
+    "It is found in Africa.",
+    "It lives in swamps in East Africa.",
+    "Its giant beak is shaped like footwear.",
+    "The answer is one word of 8 letters.",
+    "Its first letter is S."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/48493625/medium.jpeg",
+      "w": 500,
+      "h": 375,
+      "credit": "Annika Lindqvist",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/48493625"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/48493423/medium.jpeg",
+      "w": 500,
+      "h": 454,
+      "credit": "Annika Lindqvist",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/48493423"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/249448448/medium.jpg",
+      "w": 500,
+      "h": 281,
+      "credit": "benjchristensen",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/249448448"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "great-spotted-woodpecker",
+   "name": "Great spotted woodpecker",
+   "alt": [
+    "woodpecker"
+   ],
+   "sci": "Dendrocopos major",
+   "group": "woodpecker",
+   "facts": {
+    "region": "Europe",
+    "flightless": false,
+    "status": "Least concern"
+   },
+   "blurb": "A black-and-white woodpecker with red patches. It drums on trees so fast you can hear it across a wood.",
+   "clues": [
+    "Its IUCN conservation status is \"Least concern\".",
+    "Family: Picidae.",
+    "Genus: Dendrocopos.",
+    "Its tongue wraps round inside its skull.",
+    "It drums on dead branches to claim territory.",
+    "It visits garden bird feeders.",
+    "It is found in Europe.",
+    "It has a red patch under its tail.",
+    "It hammers holes in trees.",
+    "The answer has 3 words (5, 7, 10 letters).",
+    "Its first letter is G."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/11783387/medium.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Paolo Zucca",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/11783387"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/122215005/medium.jpg",
+      "w": 500,
+      "h": 323,
+      "credit": "hedera.baltica",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/122215005"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/28347741/medium.jpeg",
+      "w": 500,
+      "h": 297,
+      "credit": "Вячеслав Юсупов",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/28347741"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "common-cuckoo",
+   "name": "Common cuckoo",
+   "alt": [
+    "cuckoo"
+   ],
+   "sci": "Cuculus canorus",
+   "group": "cuckoo",
+   "facts": {
+    "region": "Europe",
+    "flightless": false,
+    "status": "Least concern"
+   },
+   "blurb": "A grey bird that lays its eggs in other birds' nests. Its chick pushes out the other eggs.",
+   "clues": [
+    "Its IUCN conservation status is \"Least concern\".",
+    "Family: Cuculidae.",
+    "Genus: Cuculus.",
+    "Its chick pushes the host's eggs out of the nest.",
+    "Its eggs can copy the colour of the host's eggs.",
+    "It flies to Africa for winter.",
+    "It is found in Europe.",
+    "It lays its eggs in other birds' nests.",
+    "Its call gave its name to a kind of clock.",
+    "The answer has 2 words (6, 6 letters).",
+    "Its first letter is C."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/241715354/medium.jpeg",
+      "w": 500,
+      "h": 489,
+      "credit": "Юрий Носков",
+      "license": "CC0 1.0",
+      "page": "https://www.inaturalist.org/photos/241715354"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/140638774/medium.jpg",
+      "w": 500,
+      "h": 500,
+      "credit": "Ramnarayan K",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/140638774"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/85456754/medium.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Safina Rezeda",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/85456754"
+     }
+    ],
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/a/a4/Common_Cuckoo_%28Cuculus_canorus%29_%28W1CDR0001463_BD1%29.ogg/Common_Cuckoo_%28Cuculus_canorus%29_%28W1CDR0001463_BD1%29.ogg.mp3",
+      "credit": "This file has been provided by the British Library from its digital collections. Links …",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Common_Cuckoo_(Cuculus_canorus)_(W1CDR0001463_BD1).ogg",
+      "start": 0
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "great-hornbill",
+   "name": "Great hornbill",
+   "sci": "Buceros bicornis",
+   "group": "hornbill",
+   "facts": {
+    "region": "Asia",
+    "flightless": false,
+    "status": "Vulnerable"
+   },
+   "blurb": "A huge Asian bird with a giant yellow beak and a helmet on top. The female seals herself inside a tree hole to nest.",
+   "clues": [
+    "Its IUCN conservation status is \"Vulnerable\".",
+    "Family: Bucerotidae.",
+    "Genus: Buceros.",
+    "The female seals herself into a tree hole with mud.",
+    "The male feeds her through a slit.",
+    "It has a hollow helmet on its beak called a casque.",
+    "It is found in Asia.",
+    "It lives in forests of India and South-East Asia.",
+    "Its huge beak is yellow.",
+    "The answer has 2 words (5, 8 letters).",
+    "Its first letter is G."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/477439197/medium.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "dhfischer",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/477439197"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/182063723/medium.jpeg",
+      "w": 500,
+      "h": 500,
+      "credit": "Aparna Krishnan",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/182063723"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/173064735/medium.jpeg",
+      "w": 374,
+      "h": 500,
+      "credit": "Thibaud Aronson",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/173064735"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "lilac-breasted-roller",
+   "name": "Lilac-breasted roller",
+   "sci": "Coracias caudatus",
+   "group": "roller",
+   "facts": {
+    "region": "Africa",
+    "flightless": false,
+    "status": "Least concern"
+   },
+   "blurb": "A brilliantly coloured bird of the African savanna. It tumbles and rolls in the air during courtship.",
+   "clues": [
+    "Its IUCN conservation status is \"Least concern\".",
+    "Family: Coraciidae.",
+    "Genus: Coracias.",
+    "It is often seen on safari in East Africa.",
+    "It perches on bare branches to spot prey.",
+    "It is found in Africa.",
+    "It has many bright colours.",
+    "Its chest is a pale purple colour.",
+    "The answer has 3 words (5, 8, 6 letters).",
+    "Its first letter is L."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/175604863/medium.jpeg",
+      "w": 500,
+      "h": 333,
+      "credit": "Justin Ponder",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/175604863"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/298432395/medium.jpg",
+      "w": 500,
+      "h": 383,
+      "credit": "Tony Eales",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/298432395"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/238863351/medium.jpg",
+      "w": 442,
+      "h": 500,
+      "credit": "Alan Manson",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/238863351"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "greater-bird-of-paradise",
+   "name": "Greater bird-of-paradise",
+   "sci": "Paradisaea apoda",
+   "group": "songbird",
+   "facts": {
+    "region": "Asia",
+    "flightless": false,
+    "status": "Least concern"
+   },
+   "blurb": "A bird of New Guinea forests. Males show off huge golden plumes in group displays.",
+   "clues": [
+    "Its IUCN conservation status is \"Least concern\".",
+    "Early traders sold skins without feet, so Europeans thought it never landed.",
+    "Its scientific name means \"footless\".",
+    "Males gather to display in treetops.",
+    "It is found in Asia.",
+    "Males have big golden plumes.",
+    "It lives in New Guinea.",
+    "The answer has 4 words (7, 4, 2, 8 letters).",
+    "Its first letter is G."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/337529552/medium.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Jay Pruett",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/337529552"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/337528805/medium.jpg",
+      "w": 500,
+      "h": 334,
+      "credit": "Jay Pruett",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/337528805"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/337531825/medium.jpg",
+      "w": 333,
+      "h": 500,
+      "credit": "Jay Pruett",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/337531825"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "arctic-tern",
+   "name": "Arctic tern",
+   "lname": "Arctic tern",
+   "sci": "Sterna paradisaea",
+   "group": "seabird",
+   "facts": {
+    "region": "many parts of the world",
+    "flightless": false,
+    "status": "Least concern"
+   },
+   "blurb": "A small seabird with the longest migration of any animal, flying from the Arctic to the Antarctic and back every year.",
+   "clues": [
+    "Its IUCN conservation status is \"Least concern\".",
+    "Family: Laridae.",
+    "Genus: Sterna.",
+    "It sees more daylight than any other animal.",
+    "It may fly about 70,000 km a year.",
+    "It dive-bombs people near its nest.",
+    "It is found in many parts of the world.",
+    "It has a red beak and a black cap.",
+    "It flies from pole to pole each year.",
+    "The answer has 2 words (6, 4 letters).",
+    "Its first letter is A."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/437768/medium.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Brian Gratwicke",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/437768"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/417731161/medium.jpeg",
+      "w": 412,
+      "h": 500,
+      "credit": "Afsar Nayakkan",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/417731161"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/572067505/medium.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Tomás Tamagno",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/572067505"
+     }
+    ],
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/e/e7/Sterna_paradisaea_-_Arctic_Tern_XC564600.mp3",
+      "credit": "Doug Hynes",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Sterna_paradisaea_-_Arctic_Tern_XC564600.mp3",
+      "start": 0
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "common-nightingale",
+   "name": "Common nightingale",
+   "alt": [
+    "nightingale"
+   ],
+   "sci": "Luscinia megarhynchos",
+   "group": "songbird",
+   "facts": {
+    "region": "Europe",
+    "flightless": false,
+    "status": "Least concern"
+   },
+   "blurb": "A plain brown songbird famous for its beautiful song, often sung at night.",
+   "clues": [
+    "Its IUCN conservation status is \"Least concern\".",
+    "Family: Muscicapidae.",
+    "Genus: Luscinia.",
+    "Males sing at night to attract females.",
+    "It spends winter in Africa.",
+    "It is found in Europe.",
+    "It is a plain brown bird.",
+    "It is famous for its beautiful song.",
+    "The answer has 2 words (6, 11 letters).",
+    "Its first letter is C."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/673268089/medium.jpg",
+      "w": 371,
+      "h": 500,
+      "credit": "Олеся",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/673268089"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/191077394/medium.jpg",
+      "w": 500,
+      "h": 330,
+      "credit": "katunchik",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/191077394"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/70223528/medium.jpeg",
+      "w": 500,
+      "h": 333,
+      "credit": "no rights reserved",
+      "license": "CC0 1.0",
+      "page": "https://www.inaturalist.org/photos/70223528"
+     }
+    ],
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/5/59/Common_Nightingale_%28Luscinia_megarhynchos%29_%28W1CDR0001376_BD18%29.ogg/Common_Nightingale_%28Luscinia_megarhynchos%29_%28W1CDR0001376_BD18%29.ogg.mp3",
+      "credit": "This file has been provided by the British Library from its digital collections. Links …",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Common_Nightingale_(Luscinia_megarhynchos)_(W1CDR0001376_BD18).ogg",
+      "start": 0
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "golden-pheasant",
+   "name": "Golden pheasant",
+   "sci": "Chrysolophus pictus",
+   "group": "gamebird",
+   "facts": {
+    "region": "Asia",
+    "flightless": false,
+    "status": "Least concern"
+   },
+   "blurb": "A dazzling pheasant from the mountains of China, with a golden crest and red body.",
+   "clues": [
+    "Its IUCN conservation status is \"Least concern\".",
+    "Family: Phasianidae.",
+    "Genus: Chrysolophus.",
+    "It comes from the mountains of western China.",
+    "Males have an orange cape they spread like a fan.",
+    "It spends most of its time on the ground.",
+    "It is found in Asia.",
+    "The male has a red body and a long tail.",
+    "The male has a bright yellow crest.",
+    "The answer has 2 words (6, 8 letters).",
+    "Its first letter is G."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/249007533/medium.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Thiago Valença",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/249007533"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/186367047/medium.jpeg",
+      "w": 500,
+      "h": 434,
+      "credit": "Alice Shanks",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/186367047"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/382009145/medium.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Wang.QG",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/382009145"
+     }
+    ]
+   },
+   "difficulty": 2
+  }
+ ],
+ "questions": [
+  {
+   "id": "q1",
+   "kind": "mc",
+   "prompt": "What is the biggest bird in the world?",
+   "answer": "Ostrich",
+   "wrong": [
+    "Emu",
+    "Wandering albatross",
+    "Bald eagle"
+   ],
+   "explain": "Ostriches can stand about 2.7 m tall.",
+   "difficulty": 1
+  },
+  {
+   "id": "q2",
+   "kind": "mc",
+   "prompt": "What is the smallest bird in the world?",
+   "answer": "Bee hummingbird",
+   "wrong": [
+    "House sparrow",
+    "Superb fairywren",
+    "Eurasian blue tit"
+   ],
+   "explain": "It weighs about 2 g and lives in Cuba.",
+   "difficulty": 2
+  },
+  {
+   "id": "q3",
+   "kind": "mc",
+   "prompt": "Which is the fastest animal in the world?",
+   "answer": "Peregrine falcon",
+   "wrong": [
+    "Cheetah",
+    "Ostrich",
+    "Sailfish"
+   ],
+   "explain": "Diving peregrines exceed 300 km/h.",
+   "difficulty": 1
+  },
+  {
+   "id": "q4",
+   "kind": "tf",
+   "prompt": "Penguins can fly.",
+   "answer": false,
+   "explain": "Penguins use their wings as flippers to \"fly\" underwater.",
+   "difficulty": 1
+  },
+  {
+   "id": "q5",
+   "kind": "mc",
+   "prompt": "Which bird lays its eggs in other birds' nests?",
+   "answer": "Common cuckoo",
+   "wrong": [
+    "Barn swallow",
+    "European robin",
+    "Mallard"
+   ],
+   "explain": "The host parents raise the cuckoo chick.",
+   "difficulty": 2
+  },
+  {
+   "id": "q6",
+   "kind": "mc",
+   "prompt": "Which bird has the longest wingspan?",
+   "answer": "Wandering albatross",
+   "wrong": [
+    "Andean condor",
+    "Bald eagle",
+    "Ostrich"
+   ],
+   "explain": "Up to about 3.5 m from tip to tip.",
+   "difficulty": 2
+  },
+  {
+   "id": "q7",
+   "kind": "mc",
+   "prompt": "Which Australian bird is famous for copying sounds like chainsaws and cameras?",
+   "answer": "Superb lyrebird",
+   "wrong": [
+    "Laughing kookaburra",
+    "Galah",
+    "Emu"
+   ],
+   "explain": "Males fill their songs with mimicry.",
+   "difficulty": 2
+  },
+  {
+   "id": "q8",
+   "kind": "mc",
+   "prompt": "Which bird makes the longest migration of any animal?",
+   "answer": "Arctic tern",
+   "wrong": [
+    "Barn swallow",
+    "Canada goose",
+    "White stork"
+   ],
+   "explain": "It flies between the Arctic and the Antarctic each year.",
+   "difficulty": 2
+  },
+  {
+   "id": "q9",
+   "kind": "mc",
+   "prompt": "Why are flamingos pink?",
+   "answer": "Pigments in their food",
+   "wrong": [
+    "They are born pink",
+    "Sunburn",
+    "Pink mud"
+   ],
+   "explain": "Carotenoids in shrimp and algae colour their feathers.",
+   "difficulty": 1
+  },
+  {
+   "id": "q10",
+   "kind": "mc",
+   "prompt": "Which bird is the national bird of the United States?",
+   "answer": "Bald eagle",
+   "wrong": [
+    "Wild turkey",
+    "Northern cardinal",
+    "Golden eagle"
+   ],
+   "explain": "It has been the national emblem since 1782.",
+   "difficulty": 1
+  },
+  {
+   "id": "q11",
+   "kind": "tf",
+   "prompt": "Male emperor penguins keep their egg warm on their feet.",
+   "answer": true,
+   "explain": "They huddle through the Antarctic winter for about two months.",
+   "difficulty": 1
+  },
+  {
+   "id": "q12",
+   "kind": "mc",
+   "prompt": "Which bird is the wild ancestor of the farmyard chicken?",
+   "answer": "Red junglefowl",
+   "wrong": [
+    "Wild turkey",
+    "Indian peafowl",
+    "Golden pheasant"
+   ],
+   "explain": "It was domesticated in South-East Asia.",
+   "difficulty": 2
+  },
+  {
+   "id": "q13",
+   "kind": "mc",
+   "prompt": "Which bird lays the largest eggs of any living bird?",
+   "answer": "Ostrich",
+   "wrong": [
+    "Emu",
+    "Emperor penguin",
+    "Southern cassowary"
+   ],
+   "explain": "An ostrich egg weighs about 1.4 kg.",
+   "difficulty": 1
+  },
+  {
+   "id": "q14",
+   "kind": "mc",
+   "prompt": "Which bird has nostrils at the tip of its beak?",
+   "answer": "Kiwi",
+   "wrong": [
+    "Toucan",
+    "Pelican",
+    "Emu"
+   ],
+   "explain": "It sniffs out worms in the soil.",
+   "difficulty": 2
+  },
+  {
+   "id": "q15",
+   "kind": "tf",
+   "prompt": "Birds are the only animals alive today with feathers.",
+   "answer": true,
+   "explain": "Some dinosaurs had feathers too, and birds are living dinosaurs.",
+   "difficulty": 2
+  }
+ ],
+ "fakes": [
+  "Crimson-crowned kookaburra",
+  "Silver-tailed emu",
+  "Northern glass penguin",
+  "Spotted thunder owl",
+  "Ruby-billed toucanet eagle",
+  "Velvet fantail cockatoo",
+  "Golden-eyed storm finch"
+ ],
+ "sources": [
+  {
+   "name": "iNaturalist",
+   "url": "https://www.inaturalist.org"
+  },
+  {
+   "name": "Wikidata",
+   "url": "https://www.wikidata.org"
+  },
+  {
+   "name": "Wikimedia Commons",
+   "url": "https://commons.wikimedia.org"
+  }
+ ]
+}

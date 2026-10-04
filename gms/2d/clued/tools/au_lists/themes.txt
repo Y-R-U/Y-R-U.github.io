@@ -1,0 +1,52 @@
+@id screen-themes
+@title Movie & TV themes
+@icon 🎬
+@kind themes
+@ask name
+@sources [{"name":"Curated by Clued from original soundtrack albums on Apple Music"}]
+# YEAR | composer/artist (as credited on Apple) | track | film=...; type=film|tv
+1977 | John Williams | Main Title | film=Star Wars; tm=^(star wars )?main title; am=john williams|london symphony; q=star wars main title john williams; composer=John Williams; d=1
+1980 | John Williams | The Imperial March | film=The Empire Strikes Back; tm=imperial march; am=john williams|london symphony; composer=John Williams
+1975 | John Williams | Main Title (Theme From "Jaws") | film=Jaws; tm=jaws; q=jaws main title john williams; am=john williams; composer=John Williams; d=1
+1981 | John Williams | Raiders March | film=Raiders of the Lost Ark; tm=raiders march; am=john williams|london symphony; composer=John Williams; alt=Indiana Jones
+1993 | John Williams | Theme from Jurassic Park | film=Jurassic Park; tm=jurassic park; q=theme from jurassic park john williams; am=john williams; composer=John Williams; d=1
+1982 | John Williams | Flying Theme | film=E.T. the Extra-Terrestrial; tm=flying; q=e.t. flying theme john williams; am=john williams; composer=John Williams; alt=ET/E.T.
+1978 | John Williams | Main Title | film=Superman; q=superman main title john williams; tm=main title|superman; am=john williams|london symphony; composer=John Williams
+2001 | John Williams | Hedwig's Theme | film=Harry Potter and the Philosopher's Stone; tm=hedwig; am=john williams; composer=John Williams; alt=Harry Potter; d=1
+1993 | John Williams | Theme from Schindler's List | film=Schindler's List; tm=schindler; am=john williams|perlman; composer=John Williams
+2003 | Klaus Badelt | He's a Pirate | film=Pirates of the Caribbean: The Curse of the Black Pearl; tm=he.?s a pirate; am=badelt|zimmer; composer=Klaus Badelt; alt=Pirates of the Caribbean; d=1
+2000 | Hans Zimmer | Now We Are Free | film=Gladiator; tm=now we are free; am=zimmer|gerrard; composer=Hans Zimmer & Lisa Gerrard
+2010 | Hans Zimmer | Time | film=Inception; tm=^time$; q=hans zimmer time inception; am=zimmer; composer=Hans Zimmer
+2014 | Hans Zimmer | Cornfield Chase | film=Interstellar; tm=cornfield; am=zimmer; composer=Hans Zimmer
+1994 | Hans Zimmer | Circle of Life | film=The Lion King; tm=circle of life; q=circle of life lion king; am=carmen twillie|lebo|elton|zimmer; composer=Elton John & Tim Rice; d=1; type=film
+1976 | Bill Conti | Gonna Fly Now | film=Rocky; tm=gonna fly now; am=conti; composer=Bill Conti; d=1
+1962 | Monty Norman | James Bond Theme | film=Dr. No; tm=james bond theme; am=monty norman|john barry; composer=Monty Norman; alt=James Bond/Bond; d=1
+1966 | Ennio Morricone | The Good, the Bad and the Ugly (Main Title) | film=The Good, the Bad and the Ugly; tm=good,? the bad; am=morricone; composer=Ennio Morricone
+1981 | Vangelis | Chariots of Fire | film=Chariots of Fire; tm=chariots of fire|titles; am=vangelis; composer=Vangelis
+1972 | Nino Rota | Love Theme from The Godfather | film=The Godfather; tm=godfather|speak softly; am=nino rota|carmine coppola; composer=Nino Rota
+1985 | Alan Silvestri | Back to the Future | film=Back to the Future; tm=back to the future|overture; q=back to the future alan silvestri; am=silvestri; composer=Alan Silvestri
+1984 | Ray Parker Jr. | Ghostbusters | film=Ghostbusters; composer=Ray Parker Jr.; d=1
+1963 | Henry Mancini | The Pink Panther Theme | film=The Pink Panther; tm=pink panther; am=mancini; composer=Henry Mancini; d=1
+1960 | Bernard Herrmann | The Murder | film=Psycho; tm=murder; q=psycho the murder bernard herrmann; am=herrmann; composer=Bernard Herrmann
+2001 | Howard Shore | Concerning Hobbits | film=The Lord of the Rings: The Fellowship of the Ring; tm=concerning hobbits; am=howard shore; composer=Howard Shore; alt=Lord of the Rings
+1986 | Harold Faltermeyer | Top Gun Anthem | film=Top Gun; tm=top gun anthem; am=faltermeyer; composer=Harold Faltermeyer
+1984 | Harold Faltermeyer | Axel F | film=Beverly Hills Cop; tm=axel f; am=faltermeyer; composer=Harold Faltermeyer
+1978 | John Carpenter | Halloween Theme | film=Halloween; tm=halloween; am=carpenter; composer=John Carpenter
+1973 | Mike Oldfield | Tubular Bells (Part One) | film=The Exorcist; tm=tubular bells; am=oldfield; composer=Mike Oldfield; note=keepyear
+1997 | Celine Dion | My Heart Will Go On | film=Titanic; composer=James Horner (music), Will Jennings (lyrics); d=1
+1989 | Danny Elfman | The Batman Theme | film=Batman; tm=batman theme; am=elfman; composer=Danny Elfman
+2012 | Alan Silvestri | The Avengers | film=The Avengers; tm=^the avengers$; q=the avengers alan silvestri; am=silvestri; composer=Alan Silvestri
+2006 | David Arnold | African Rundown | film=Casino Royale; tm=african rundown; am=arnold; composer=David Arnold
+1989 | Danny Elfman | The Simpsons Main Title Theme | film=The Simpsons; type=tv; tm=simpsons; am=elfman|simpsons; q=the simpsons theme danny elfman; composer=Danny Elfman; d=1
+1995 | The Rembrandts | I'll Be There for You | film=Friends; type=tv; composer=The Rembrandts; d=1
+2011 | Ramin Djawadi | Main Title | film=Game of Thrones; type=tv; tm=main title; q=game of thrones main title djawadi; am=djawadi; composer=Ramin Djawadi; d=1
+2016 | Kyle Dixon & Michael Stein | Stranger Things | film=Stranger Things; type=tv; tm=stranger things; am=dixon|stein; composer=Kyle Dixon & Michael Stein
+1993 | Mark Snow | The X-Files | film=The X-Files; type=tv; tm=x-files; am=mark snow; composer=Mark Snow
+1990 | Angelo Badalamenti | Twin Peaks Theme | film=Twin Peaks; type=tv; tm=twin peaks; am=badalamenti; composer=Angelo Badalamenti
+1982 | Gary Portnoy | Where Everybody Knows Your Name | film=Cheers; type=tv; tm=where everybody knows; am=portnoy; composer=Gary Portnoy & Judy Hart Angelo
+2008 | Dave Porter | Breaking Bad Main Title Theme (Extended) | film=Breaking Bad; type=tv; tm=breaking bad; am=dave porter; composer=Dave Porter
+2018 | Nicholas Britell | Succession (Main Title Theme) | film=Succession; type=tv; tm=succession; am=britell; composer=Nicholas Britell
+1997 | Alabama 3 | Woke Up This Morning (Chosen One Mix) | film=The Sopranos; type=tv; tm=woke up this morning; am=alabama 3|a3; composer=Alabama 3
+2013 | Nick Cave & The Bad Seeds | Red Right Hand | film=Peaky Blinders; type=tv; composer=Nick Cave & The Bad Seeds; blurb=Nick Cave & The Bad Seeds' 1994 song "Red Right Hand" is the theme of Peaky Blinders (2013).
+2010 | John Lunn | Downton Abbey - The Suite | film=Downton Abbey; type=tv; tm=downton; am=john lunn; composer=John Lunn
+1966 | Alexander Courage | Star Trek Main Title | film=Star Trek; type=tv; tm=star trek; q=star trek theme alexander courage; am=courage; composer=Alexander Courage

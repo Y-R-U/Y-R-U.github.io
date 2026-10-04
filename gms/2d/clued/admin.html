@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex">
+<title>Clued admin</title>
+<link rel="stylesheet" href="css/base.css?v=1">
+<link rel="stylesheet" href="js/net/net.css?v=1">
+<style>
+  body { overflow: auto; }
+  .adm { max-width: 980px; margin: 0 auto; padding: 16px 16px 40px; display: flex; flex-direction: column; gap: 14px; }
+  .adm h1 { font-size: 30px; }
+  .adm h2 { font-size: 20px; margin-bottom: 8px; }
+  .kpis { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 10px; }
+  .kpi { background: #fff; border: 3px solid var(--ink); border-radius: 14px; padding: 10px 12px; }
+  .kpi b { display: block; font-family: var(--font-display); font-weight: 400; font-size: 28px; }
+  .kpi small { color: var(--ink-2); }
+  .levels { display: flex; flex-wrap: wrap; gap: 8px; }
+  .chart { width: 100%; height: auto; display: block; }
+  .chart text { font: 700 10px var(--font); fill: var(--ink-2); }
+  .legend { display: flex; gap: 14px; flex-wrap: wrap; font-size: 13px; }
+  .legend i { display: inline-block; width: 12px; height: 12px; border-radius: 3px; margin-right: 4px; vertical-align: -1px; }
+  table { width: 100%; border-collapse: collapse; font-size: 14px; }
+  th, td { text-align: left; padding: 6px 8px; border-bottom: 2px dashed rgba(31, 26, 77, .15); }
+  th { font-size: 12px; text-transform: uppercase; letter-spacing: .5px; color: var(--ink-2); }
+  .scroll { overflow-x: auto; }
+  .muted { color: var(--ink-2); }
+  .alert-kind { font-weight: 900; }
+</style>
+</head>
+<body>
+<main class="adm" id="adm">
+  <h1>Clued admin</h1>
+  <div class="panel" id="gate"><p class="muted">Checking your sign-in…</p></div>
+</main>
+<div id="popups"></div>
+<script type="module" src="js/net/admin.js?v=1"></script>
+</body>
+</html>

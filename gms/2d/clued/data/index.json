@@ -1,0 +1,973 @@
+{
+ "build": "202610041548",
+ "themes": [
+  {
+   "id": "animals",
+   "title": "Animals",
+   "icon": "🦁",
+   "packs": [
+    "bees",
+    "birds",
+    "cats",
+    "dinosaurs",
+    "dogs",
+    "insects",
+    "jellyfish",
+    "mammals",
+    "reptiles",
+    "sharks",
+    "snakes",
+    "spiders"
+   ]
+  },
+  {
+   "id": "nature",
+   "title": "Nature",
+   "icon": "🌿",
+   "packs": [
+    "flowers",
+    "gems",
+    "mushrooms",
+    "trees"
+   ]
+  },
+  {
+   "id": "geography",
+   "title": "Geography",
+   "icon": "🌍",
+   "packs": [
+    "capitals",
+    "countries",
+    "currencies",
+    "flags",
+    "landmarks",
+    "languages"
+   ]
+  },
+  {
+   "id": "screen",
+   "title": "Screen",
+   "icon": "🎬",
+   "packs": [
+    "actors",
+    "movie-moments",
+    "movies"
+   ]
+  },
+  {
+   "id": "books",
+   "title": "Books & words",
+   "icon": "📚",
+   "packs": [
+    "books"
+   ]
+  },
+  {
+   "id": "people",
+   "title": "People",
+   "icon": "🧑",
+   "packs": [
+    "explorers",
+    "leaders",
+    "people"
+   ]
+  },
+  {
+   "id": "science",
+   "title": "Science",
+   "icon": "🔬",
+   "packs": [
+    "elements"
+   ]
+  },
+  {
+   "id": "art",
+   "title": "Art",
+   "icon": "🎨",
+   "packs": [
+    "artists",
+    "paintings"
+   ]
+  },
+  {
+   "id": "general",
+   "title": "General knowledge",
+   "icon": "💡",
+   "packs": [
+    "_dev"
+   ]
+  },
+  {
+   "id": "kids",
+   "title": "Kids",
+   "icon": "🧸",
+   "packs": [
+    "bees",
+    "birds",
+    "cats",
+    "dinosaurs",
+    "dogs",
+    "flags",
+    "flowers",
+    "gems",
+    "insects",
+    "jellyfish",
+    "landmarks",
+    "mammals",
+    "reptiles",
+    "sharks",
+    "snakes",
+    "spiders",
+    "trees"
+   ]
+  }
+ ],
+ "packs": {
+  "_dev": {
+   "title": "Dev sampler",
+   "theme": "general",
+   "icon": "🧪",
+   "kids": false,
+   "items": 20,
+   "questions": 20,
+   "notice": "Development pack. Lane C will delete this.",
+   "caps": {
+    "img": 20,
+    "audio": 0,
+    "clues": 7,
+    "facts": {
+     "class": "cat",
+     "venomous": "bool",
+     "massKg": "num",
+     "capital": "cat",
+     "continent": "cat"
+    },
+    "groups": 2,
+    "lookalikes": 0,
+    "fakes": 2,
+    "quotes": 0,
+    "easy": 22,
+    "kidsItems": 0
+   }
+  },
+  "actors": {
+   "title": "Actors",
+   "theme": "screen",
+   "icon": "🎭",
+   "kids": false,
+   "items": 84,
+   "questions": 168,
+   "caps": {
+    "img": 83,
+    "audio": 0,
+    "clues": 84,
+    "facts": {
+     "born": "year",
+     "died": "year",
+     "nationality": "cat",
+     "era": "cat",
+     "films": "text"
+    },
+    "groups": 2,
+    "lookalikes": 0,
+    "fakes": 0,
+    "quotes": 0,
+    "easy": 40,
+    "kidsItems": 0
+   }
+  },
+  "artists": {
+   "title": "Artists",
+   "theme": "art",
+   "icon": "🎨",
+   "kids": false,
+   "items": 34,
+   "questions": 68,
+   "caps": {
+    "img": 34,
+    "audio": 0,
+    "clues": 34,
+    "facts": {
+     "born": "year",
+     "died": "year",
+     "nationality": "cat",
+     "era": "cat",
+     "movement": "cat"
+    },
+    "groups": 18,
+    "lookalikes": 0,
+    "fakes": 0,
+    "quotes": 0,
+    "easy": 24,
+    "kidsItems": 0
+   }
+  },
+  "bees": {
+   "title": "Wasps, bees & hornets",
+   "theme": "animals",
+   "icon": "🐝",
+   "kids": true,
+   "items": 27,
+   "questions": 10,
+   "notice": "Not for real-world identification.",
+   "caps": {
+    "img": 27,
+    "audio": 0,
+    "clues": 27,
+    "facts": {
+     "kind": "cat",
+     "stings": "bool",
+     "social": "bool"
+    },
+    "groups": 4,
+    "lookalikes": 12,
+    "fakes": 6,
+    "quotes": 0,
+    "easy": 11,
+    "kidsItems": 6
+   }
+  },
+  "birds": {
+   "title": "Birds",
+   "theme": "animals",
+   "icon": "🐦",
+   "kids": true,
+   "items": 82,
+   "questions": 15,
+   "caps": {
+    "img": 82,
+    "audio": 30,
+    "clues": 82,
+    "facts": {
+     "region": "cat",
+     "flightless": "bool",
+     "status": "cat"
+    },
+    "groups": 23,
+    "lookalikes": 33,
+    "fakes": 7,
+    "quotes": 0,
+    "easy": 54,
+    "kidsItems": 47
+   }
+  },
+  "books": {
+   "title": "Famous books",
+   "theme": "books",
+   "icon": "📚",
+   "kids": false,
+   "items": 90,
+   "questions": 313,
+   "caps": {
+    "img": 0,
+    "audio": 0,
+    "clues": 90,
+    "facts": {
+     "author": "cat",
+     "year": "year",
+     "genre": "cat",
+     "century": "cat",
+     "kids": "bool"
+    },
+    "groups": 22,
+    "lookalikes": 0,
+    "fakes": 8,
+    "quotes": 0,
+    "easy": 104,
+    "kidsItems": 27
+   }
+  },
+  "capitals": {
+   "title": "Capitals",
+   "theme": "geography",
+   "icon": "🏛️",
+   "kids": false,
+   "items": 190,
+   "questions": 338,
+   "notice": "Contested capitals (Israel, Palestine, Yemen) and Nauru (no official capital) are left out.",
+   "caps": {
+    "img": 0,
+    "audio": 0,
+    "clues": 0,
+    "facts": {
+     "country": "text",
+     "continent": "cat"
+    },
+    "groups": 6,
+    "lookalikes": 0,
+    "fakes": 0,
+    "quotes": 0,
+    "easy": 120,
+    "kidsItems": 0
+   }
+  },
+  "cats": {
+   "title": "Cat breeds",
+   "theme": "animals",
+   "icon": "🐈",
+   "kids": true,
+   "items": 37,
+   "questions": 9,
+   "caps": {
+    "img": 37,
+    "audio": 0,
+    "clues": 37,
+    "facts": {
+     "origin": "cat",
+     "coat": "cat"
+    },
+    "groups": 0,
+    "lookalikes": 34,
+    "fakes": 7,
+    "quotes": 0,
+    "easy": 12,
+    "kidsItems": 8
+   }
+  },
+  "countries": {
+   "title": "Countries",
+   "theme": "geography",
+   "icon": "🌍",
+   "kids": false,
+   "items": 195,
+   "questions": 202,
+   "notice": "Covers the 193 UN member states plus the two observer states. Populations are World Bank estimates.",
+   "caps": {
+    "img": 194,
+    "audio": 0,
+    "clues": 195,
+    "facts": {
+     "population": "num",
+     "areaKm2": "num",
+     "continent": "cat",
+     "drivingSide": "cat",
+     "landlocked": "bool",
+     "capital": "text",
+     "currency": "text",
+     "languages": "text",
+     "callingCode": "text",
+     "landmark": "text"
+    },
+    "groups": 6,
+    "lookalikes": 0,
+    "fakes": 15,
+    "quotes": 0,
+    "easy": 77,
+    "kidsItems": 0
+   }
+  },
+  "currencies": {
+   "title": "Currencies",
+   "theme": "geography",
+   "icon": "💱",
+   "kids": false,
+   "items": 142,
+   "questions": 210,
+   "caps": {
+    "img": 0,
+    "audio": 0,
+    "clues": 69,
+    "facts": {
+     "countries": "num",
+     "continent": "cat",
+     "code": "text",
+     "symbol": "text"
+    },
+    "groups": 6,
+    "lookalikes": 0,
+    "fakes": 0,
+    "quotes": 0,
+    "easy": 72,
+    "kidsItems": 0
+   }
+  },
+  "dinosaurs": {
+   "title": "Dinosaurs & prehistoric life",
+   "theme": "animals",
+   "icon": "🦖",
+   "kids": true,
+   "items": 51,
+   "questions": 12,
+   "caps": {
+    "img": 51,
+    "audio": 0,
+    "clues": 51,
+    "facts": {
+     "period": "cat",
+     "mya": "num",
+     "diet": "cat",
+     "dinosaur": "bool",
+     "lengthM": "num",
+     "found": "cat"
+    },
+    "groups": 0,
+    "lookalikes": 29,
+    "fakes": 8,
+    "quotes": 0,
+    "easy": 18,
+    "kidsItems": 14
+   }
+  },
+  "dogs": {
+   "title": "Dog breeds",
+   "theme": "animals",
+   "icon": "🐕",
+   "kids": true,
+   "items": 84,
+   "questions": 14,
+   "caps": {
+    "img": 84,
+    "audio": 0,
+    "clues": 84,
+    "facts": {
+     "origin": "cat",
+     "type": "cat",
+     "massKg": "num",
+     "size": "cat"
+    },
+    "groups": 0,
+    "lookalikes": 75,
+    "fakes": 8,
+    "quotes": 0,
+    "easy": 37,
+    "kidsItems": 30
+   }
+  },
+  "elements": {
+   "title": "Chemical elements",
+   "theme": "science",
+   "icon": "⚗️",
+   "kids": false,
+   "items": 118,
+   "questions": 17,
+   "caps": {
+    "img": 77,
+    "audio": 0,
+    "clues": 118,
+    "facts": {
+     "atomicNumber": "num",
+     "symbol": "text",
+     "block": "cat",
+     "period": "num",
+     "group": "num",
+     "state": "cat",
+     "year": "year",
+     "ancient": "bool",
+     "atomicMass": "num",
+     "meltingC": "num",
+     "density": "num"
+    },
+    "groups": 10,
+    "lookalikes": 0,
+    "fakes": 0,
+    "quotes": 0,
+    "easy": 24,
+    "kidsItems": 0
+   }
+  },
+  "explorers": {
+   "title": "Explorers",
+   "theme": "people",
+   "icon": "🧭",
+   "kids": false,
+   "items": 23,
+   "questions": 46,
+   "caps": {
+    "img": 23,
+    "audio": 0,
+    "clues": 23,
+    "facts": {
+     "born": "year",
+     "died": "year",
+     "nationality": "cat",
+     "era": "cat",
+     "field": "cat"
+    },
+    "groups": 1,
+    "lookalikes": 0,
+    "fakes": 0,
+    "quotes": 0,
+    "easy": 26,
+    "kidsItems": 0
+   }
+  },
+  "flags": {
+   "title": "Flags",
+   "theme": "geography",
+   "icon": "🏳️",
+   "kids": true,
+   "items": 194,
+   "questions": 32,
+   "caps": {
+    "img": 194,
+    "audio": 0,
+    "clues": 0,
+    "facts": {
+     "continent": "cat"
+    },
+    "groups": 6,
+    "lookalikes": 0,
+    "fakes": 0,
+    "quotes": 0,
+    "easy": 47,
+    "kidsItems": 40
+   }
+  },
+  "flowers": {
+   "title": "Flowers",
+   "theme": "nature",
+   "icon": "🌸",
+   "kids": true,
+   "items": 50,
+   "questions": 10,
+   "caps": {
+    "img": 47,
+    "audio": 0,
+    "clues": 50,
+    "facts": {
+     "colour": "cat",
+     "region": "cat",
+     "emblem": "cat"
+    },
+    "groups": 34,
+    "lookalikes": 8,
+    "fakes": 6,
+    "quotes": 0,
+    "easy": 28,
+    "kidsItems": 23
+   }
+  },
+  "gems": {
+   "title": "Gemstones & minerals",
+   "theme": "nature",
+   "icon": "💎",
+   "kids": true,
+   "items": 31,
+   "questions": 12,
+   "caps": {
+    "img": 30,
+    "audio": 0,
+    "clues": 31,
+    "facts": {
+     "kind": "cat",
+     "colour": "cat",
+     "mohs": "num",
+     "birthstone": "cat"
+    },
+    "groups": 0,
+    "lookalikes": 18,
+    "fakes": 7,
+    "quotes": 0,
+    "easy": 19,
+    "kidsItems": 13
+   }
+  },
+  "insects": {
+   "title": "Insects",
+   "theme": "animals",
+   "icon": "🐞",
+   "kids": true,
+   "items": 50,
+   "questions": 18,
+   "caps": {
+    "img": 50,
+    "audio": 0,
+    "clues": 50,
+    "facts": {
+     "order": "cat",
+     "complete": "bool"
+    },
+    "groups": 18,
+    "lookalikes": 13,
+    "fakes": 6,
+    "quotes": 0,
+    "easy": 22,
+    "kidsItems": 16
+   }
+  },
+  "jellyfish": {
+   "title": "Jellyfish & stingers",
+   "theme": "animals",
+   "icon": "🪼",
+   "kids": true,
+   "items": 27,
+   "questions": 10,
+   "notice": "Not for real-world identification. If stung, get first aid and follow local advice.",
+   "caps": {
+    "img": 26,
+    "audio": 0,
+    "clues": 27,
+    "facts": {
+     "danger": "cat",
+     "kind": "cat"
+    },
+    "groups": 9,
+    "lookalikes": 12,
+    "fakes": 6,
+    "quotes": 0,
+    "easy": 12,
+    "kidsItems": 7
+   }
+  },
+  "landmarks": {
+   "title": "Landmarks",
+   "theme": "geography",
+   "icon": "🗿",
+   "kids": true,
+   "items": 102,
+   "questions": 102,
+   "caps": {
+    "img": 101,
+    "audio": 0,
+    "clues": 102,
+    "facts": {
+     "country": "cat",
+     "continent": "cat",
+     "kind": "cat",
+     "built": "year"
+    },
+    "groups": 10,
+    "lookalikes": 0,
+    "fakes": 0,
+    "quotes": 0,
+    "easy": 42,
+    "kidsItems": 21
+   }
+  },
+  "languages": {
+   "title": "Languages",
+   "theme": "geography",
+   "icon": "🗣️",
+   "kids": false,
+   "items": 67,
+   "questions": 327,
+   "notice": "\"Main languages\" are the official or most widely used languages of each country, simplified.",
+   "caps": {
+    "img": 0,
+    "audio": 0,
+    "clues": 60,
+    "facts": {
+     "family": "cat",
+     "branch": "cat",
+     "script": "cat",
+     "countries": "num"
+    },
+    "groups": 16,
+    "lookalikes": 0,
+    "fakes": 0,
+    "quotes": 0,
+    "easy": 60,
+    "kidsItems": 0
+   }
+  },
+  "leaders": {
+   "title": "Leaders and rulers",
+   "theme": "people",
+   "icon": "👑",
+   "kids": false,
+   "items": 34,
+   "questions": 61,
+   "caps": {
+    "img": 32,
+    "audio": 0,
+    "clues": 31,
+    "facts": {
+     "born": "year",
+     "died": "year",
+     "nationality": "cat",
+     "era": "cat",
+     "field": "cat"
+    },
+    "groups": 1,
+    "lookalikes": 0,
+    "fakes": 0,
+    "quotes": 0,
+    "easy": 32,
+    "kidsItems": 0
+   }
+  },
+  "mammals": {
+   "title": "Mammals",
+   "theme": "animals",
+   "icon": "🦁",
+   "kids": true,
+   "items": 79,
+   "questions": 15,
+   "caps": {
+    "img": 79,
+    "audio": 16,
+    "clues": 79,
+    "facts": {
+     "massKg": "num",
+     "region": "cat",
+     "diet": "cat",
+     "status": "cat"
+    },
+    "groups": 32,
+    "lookalikes": 42,
+    "fakes": 7,
+    "quotes": 0,
+    "easy": 61,
+    "kidsItems": 50
+   }
+  },
+  "movie-moments": {
+   "title": "Movie Moments",
+   "theme": "screen",
+   "icon": "🎬",
+   "kids": false,
+   "items": 5,
+   "questions": 0,
+   "notice": "Original illustrations of famous film scenes, not real stills.",
+   "caps": {
+    "img": 5,
+    "audio": 0,
+    "clues": 0,
+    "facts": {
+     "year": "year",
+     "decade": "cat",
+     "director": "cat",
+     "kids": "bool"
+    },
+    "groups": 0,
+    "lookalikes": 0,
+    "fakes": 0,
+    "quotes": 0,
+    "easy": 4,
+    "kidsItems": 3
+   }
+  },
+  "movies": {
+   "title": "Movies",
+   "theme": "screen",
+   "icon": "🎬",
+   "kids": false,
+   "items": 77,
+   "questions": 333,
+   "notice": "Box office figures are worldwide grosses, not adjusted for inflation, as listed on Wikipedia in October 2026; they include re-releases where listed.",
+   "caps": {
+    "img": 0,
+    "audio": 0,
+    "clues": 77,
+    "facts": {
+     "year": "year",
+     "boxOfficeUSD": "num",
+     "decade": "cat",
+     "director": "text",
+     "topOfYear": "bool",
+     "decadeRank": "num",
+     "kids": "bool"
+    },
+    "groups": 6,
+    "lookalikes": 0,
+    "fakes": 10,
+    "quotes": 47,
+    "easy": 74,
+    "kidsItems": 16
+   }
+  },
+  "mushrooms": {
+   "title": "Mushrooms & fungi",
+   "theme": "nature",
+   "icon": "🍄",
+   "kids": false,
+   "items": 34,
+   "questions": 10,
+   "notice": "Never use this to forage. Many deadly mushrooms look like edible ones. Not for real-world identification.",
+   "caps": {
+    "img": 34,
+    "audio": 0,
+    "clues": 34,
+    "facts": {
+     "edibility": "cat",
+     "region": "cat"
+    },
+    "groups": 24,
+    "lookalikes": 15,
+    "fakes": 6,
+    "quotes": 0,
+    "easy": 13,
+    "kidsItems": 0
+   }
+  },
+  "paintings": {
+   "title": "Famous paintings",
+   "theme": "art",
+   "icon": "🖼️",
+   "kids": false,
+   "items": 57,
+   "questions": 114,
+   "caps": {
+    "img": 57,
+    "audio": 0,
+    "clues": 56,
+    "facts": {
+     "artist": "cat",
+     "year": "year",
+     "museum": "text"
+    },
+    "groups": 40,
+    "lookalikes": 0,
+    "fakes": 0,
+    "quotes": 0,
+    "easy": 27,
+    "kidsItems": 0
+   }
+  },
+  "people": {
+   "title": "Famous people",
+   "theme": "people",
+   "icon": "🧑‍🔬",
+   "kids": false,
+   "items": 95,
+   "questions": 188,
+   "caps": {
+    "img": 94,
+    "audio": 0,
+    "clues": 95,
+    "facts": {
+     "born": "year",
+     "died": "year",
+     "nationality": "cat",
+     "era": "cat",
+     "field": "cat"
+    },
+    "groups": 10,
+    "lookalikes": 0,
+    "fakes": 0,
+    "quotes": 0,
+    "easy": 76,
+    "kidsItems": 0
+   }
+  },
+  "reptiles": {
+   "title": "Frogs & reptiles",
+   "theme": "animals",
+   "icon": "🐸",
+   "kids": true,
+   "items": 36,
+   "questions": 11,
+   "caps": {
+    "img": 34,
+    "audio": 5,
+    "clues": 36,
+    "facts": {
+     "cls": "cat",
+     "region": "cat",
+     "lengthM": "num",
+     "venomous": "bool",
+     "status": "cat"
+    },
+    "groups": 15,
+    "lookalikes": 23,
+    "fakes": 6,
+    "quotes": 0,
+    "easy": 23,
+    "kidsItems": 17
+   }
+  },
+  "sharks": {
+   "title": "Sharks",
+   "theme": "animals",
+   "icon": "🦈",
+   "kids": true,
+   "items": 34,
+   "questions": 10,
+   "caps": {
+    "img": 34,
+    "audio": 0,
+    "clues": 34,
+    "facts": {
+     "lengthM": "num",
+     "danger": "cat",
+     "habitat": "cat",
+     "status": "cat"
+    },
+    "groups": 12,
+    "lookalikes": 14,
+    "fakes": 7,
+    "quotes": 0,
+    "easy": 11,
+    "kidsItems": 7
+   }
+  },
+  "snakes": {
+   "title": "Snakes",
+   "theme": "animals",
+   "icon": "🐍",
+   "kids": true,
+   "items": 78,
+   "questions": 13,
+   "notice": "Not for real-world identification.",
+   "caps": {
+    "img": 78,
+    "audio": 0,
+    "clues": 78,
+    "facts": {
+     "venomous": "bool",
+     "danger": "cat",
+     "lengthM": "num",
+     "region": "cat",
+     "status": "cat"
+    },
+    "groups": 6,
+    "lookalikes": 51,
+    "fakes": 10,
+    "quotes": 0,
+    "easy": 21,
+    "kidsItems": 17
+   }
+  },
+  "spiders": {
+   "title": "Spiders",
+   "theme": "animals",
+   "icon": "🕷️",
+   "kids": true,
+   "items": 43,
+   "questions": 10,
+   "notice": "Not for real-world identification.",
+   "caps": {
+    "img": 43,
+    "audio": 0,
+    "clues": 43,
+    "facts": {
+     "danger": "cat",
+     "region": "cat",
+     "web": "bool",
+     "legSpanCm": "num"
+    },
+    "groups": 18,
+    "lookalikes": 26,
+    "fakes": 8,
+    "quotes": 0,
+    "easy": 20,
+    "kidsItems": 15
+   }
+  },
+  "trees": {
+   "title": "Trees",
+   "theme": "nature",
+   "icon": "🌳",
+   "kids": true,
+   "items": 43,
+   "questions": 10,
+   "caps": {
+    "img": 43,
+    "audio": 0,
+    "clues": 43,
+    "facts": {
+     "region": "cat",
+     "evergreen": "bool",
+     "conifer": "bool",
+     "heightM": "num"
+    },
+    "groups": 8,
+    "lookalikes": 15,
+    "fakes": 6,
+    "quotes": 0,
+    "easy": 22,
+    "kidsItems": 16
+   }
+  }
+ }
+}

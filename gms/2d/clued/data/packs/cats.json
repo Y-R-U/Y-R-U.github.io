@@ -1,0 +1,2240 @@
+{
+ "id": "cats",
+ "title": "Cat breeds",
+ "theme": "animals",
+ "icon": "🐈",
+ "kids": true,
+ "version": 1,
+ "imgPrompt": "Which of these is {aName}?",
+ "nameImgPrompt": "Which cat breed is this?",
+ "tfImgPrompt": "This cat is {aName}.",
+ "leakExempt": [
+  "cat",
+  "cats",
+  "breed"
+ ],
+ "factsMeta": {
+  "origin": {
+   "type": "cat",
+   "label": "Country of origin",
+   "ask": "Where does the {name} breed come from?",
+   "askReverse": "Which of these breeds comes from {value}?",
+   "stmt": "The {name} breed comes from {value}."
+  },
+  "coat": {
+   "type": "cat",
+   "label": "Coat",
+   "values": [
+    "Long",
+    "Medium",
+    "Short",
+    "Curly",
+    "Hairless"
+   ],
+   "ask": "What kind of coat does the {name} have?",
+   "askReverse": "Which of these breeds has a {lvalue} coat?",
+   "stmt": "The {name} has a {lvalue} coat."
+  }
+ },
+ "items": [
+  {
+   "id": "persian",
+   "name": "Persian",
+   "lname": "Persian",
+   "alt": [
+    "Persian cat"
+   ],
+   "facts": {
+    "origin": "Iran",
+    "coat": "Long"
+   },
+   "lookalikes": [
+    "himalayan",
+    "exotic-shorthair"
+   ],
+   "blurb": "A fluffy cat with a long coat and a flat face. It is calm and loves to relax.",
+   "clues": [
+    "Its ancestors came from the country now called Iran.",
+    "It needs brushing every day.",
+    "Queen Victoria owned two.",
+    "The breed comes from Iran.",
+    "Its fur is long.",
+    "It has a round face and a short, flat nose.",
+    "It has a very long, fluffy coat.",
+    "The answer is one word of 7 letters.",
+    "Its first letter is P."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/2/25/Chocolate_Persian.jpg/500px-Chocolate_Persian.jpg",
+      "w": 500,
+      "h": 652,
+      "credit": "Cindy See",
+      "license": "CC BY-SA 2.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Chocolate_Persian.jpg"
+     },
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/8/81/Persialainen.jpg",
+      "w": 500,
+      "h": 700,
+      "credit": "The original uploader was Lajoma at Finnish Wikipedia.",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Persialainen.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/6/6d/Ramsy.jpg/500px-Ramsy.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Usaid",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Ramsy.jpg"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "maine-coon",
+   "name": "Maine Coon",
+   "lname": "Maine Coon",
+   "facts": {
+    "origin": "United States",
+    "coat": "Long"
+   },
+   "lookalikes": [
+    "norwegian-forest-cat",
+    "siberian"
+   ],
+   "blurb": "One of the biggest cat breeds, with tufted ears and a bushy tail. It is friendly and loves water.",
+   "clues": [
+    "It often enjoys playing with water.",
+    "It has tufts of fur on the tips of its ears.",
+    "The breed comes from United States.",
+    "Its fur is long.",
+    "It is one of the largest pet cat breeds.",
+    "Its name includes a word for a racoon.",
+    "The answer has 2 words (5, 4 letters).",
+    "Its first letter is M."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/f/f3/%D0%A4%D0%BE%D1%82%D0%BE_%D0%BA%D1%83%D0%BD%D0%BE%D0%B2.jpg/500px-%D0%A4%D0%BE%D1%82%D0%BE_%D0%BA%D1%83%D0%BD%D0%BE%D0%B2.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Ankord",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:%D0%A4%D0%BE%D1%82%D0%BE_%D0%BA%D1%83%D0%BD%D0%BE%D0%B2.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/a/aa/Karin_Maine_Coon.jpg/330px-Karin_Maine_Coon.jpg",
+      "w": 330,
+      "h": 495,
+      "credit": "Takashi Hososhima",
+      "license": "CC BY-SA 2.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Karin_Maine_Coon.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/5/57/Maine_Coon_male_NO_Sigdalskauen_Balder.jpg/500px-Maine_Coon_male_NO_Sigdalskauen_Balder.jpg",
+      "w": 500,
+      "h": 500,
+      "credit": "T. Bjornstad",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Maine_Coon_male_NO_Sigdalskauen_Balder.jpg"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "siamese",
+   "name": "Siamese",
+   "lname": "Siamese",
+   "alt": [
+    "Siamese cat"
+   ],
+   "facts": {
+    "origin": "Thailand",
+    "coat": "Short"
+   },
+   "lookalikes": [
+    "himalayan",
+    "oriental-shorthair"
+   ],
+   "blurb": "A slim, chatty cat with blue eyes and dark ears, face, paws and tail.",
+   "clues": [
+    "Its dark points are caused by a gene that responds to cold.",
+    "Kittens are born almost white.",
+    "It is very talkative and loud.",
+    "The breed comes from Thailand.",
+    "Its fur is short.",
+    "It has bright blue almond-shaped eyes.",
+    "It is named after the old name of Thailand.",
+    "The answer is one word of 7 letters.",
+    "Its first letter is S."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/c/cb/Gatosiames.jpg/330px-Gatosiames.jpg",
+      "w": 330,
+      "h": 587,
+      "credit": "Ulics676767",
+      "license": "CC0 1.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Gatosiames.jpg"
+     },
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/1/16/Siamese_cat_Vaillante.JPG",
+      "w": 500,
+      "h": 625,
+      "credit": "Meekahoo",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Siamese_cat_Vaillante.JPG"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/f/f4/Siamese_cat%2C_chocolate_point.jpg/500px-Siamese_cat%2C_chocolate_point.jpg",
+      "w": 500,
+      "h": 313,
+      "credit": "Felinlove",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Siamese_cat,_chocolate_point.jpg"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "ragdoll",
+   "name": "Ragdoll",
+   "lname": "Ragdoll",
+   "facts": {
+    "origin": "United States",
+    "coat": "Long"
+   },
+   "lookalikes": [
+    "birman"
+   ],
+   "blurb": "A big, gentle cat with blue eyes that often goes floppy when you pick it up.",
+   "clues": [
+    "It was first bred in California in the 1960s.",
+    "It often follows its owner around like a dog.",
+    "It has blue eyes and darker points.",
+    "The breed comes from United States.",
+    "Its fur is long.",
+    "It goes limp when you pick it up.",
+    "It is named after a floppy toy.",
+    "The answer is one word of 7 letters.",
+    "Its first letter is R."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/8/8d/Gato_Ragdoll_BreedingCat.jpg/500px-Gato_Ragdoll_BreedingCat.jpg",
+      "w": 500,
+      "h": 395,
+      "credit": "Cgomez766",
+      "license": "CC0 1.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Gato_Ragdoll_BreedingCat.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/3/37/Seal_Point_mitted_Ragdoll_BreedingCat.jpg/500px-Seal_Point_mitted_Ragdoll_BreedingCat.jpg",
+      "w": 500,
+      "h": 569,
+      "credit": "Cgomez766",
+      "license": "CC0 1.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Seal_Point_mitted_Ragdoll_BreedingCat.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/c/ca/Blue_Lynx_Point.jpg/330px-Blue_Lynx_Point.jpg",
+      "w": 330,
+      "h": 440,
+      "credit": "Cgomez766",
+      "license": "CC0 1.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Blue_Lynx_Point.jpg"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "british-shorthair",
+   "name": "British Shorthair",
+   "lname": "British Shorthair",
+   "facts": {
+    "origin": "United Kingdom",
+    "coat": "Short"
+   },
+   "lookalikes": [
+    "russian-blue",
+    "chartreux"
+   ],
+   "blurb": "A round, chunky cat with a thick, plush coat. The classic colour is blue-grey with copper eyes.",
+   "clues": [
+    "It may be the model for the Cheshire Cat.",
+    "Its ancestors may have arrived with the Romans.",
+    "It has copper or orange eyes.",
+    "The breed comes from United Kingdom.",
+    "Its fur is short.",
+    "The best-known colour is blue-grey.",
+    "The answer has 2 words (7, 9 letters).",
+    "Its first letter is B."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/2/2d/Mystica_from_British_Empire_Cattery.jpg/500px-Mystica_from_British_Empire_Cattery.jpg",
+      "w": 500,
+      "h": 490,
+      "credit": "BritishEmpire",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Mystica_from_British_Empire_Cattery.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/9/98/Gerollte_Katze_20201104_DSC5446.jpg/500px-Gerollte_Katze_20201104_DSC5446.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "PantheraLeo1359531",
+      "license": "CC BY 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Gerollte_Katze_20201104_DSC5446.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/e/ed/Sitzende_graue_Mieze_20201026_DSC5103.jpg/500px-Sitzende_graue_Mieze_20201026_DSC5103.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "PantheraLeo1359531",
+      "license": "CC BY 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Sitzende_graue_Mieze_20201026_DSC5103.jpg"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "bengal",
+   "name": "Bengal",
+   "lname": "Bengal",
+   "alt": [
+    "Bengal cat"
+   ],
+   "facts": {
+    "origin": "United States",
+    "coat": "Short"
+   },
+   "lookalikes": [
+    "egyptian-mau",
+    "ocicat",
+    "savannah"
+   ],
+   "blurb": "A spotted cat that looks like a little leopard. It was bred from wild leopard cats and pet cats.",
+   "clues": [
+    "It was bred from the wild Asian leopard cat.",
+    "Its coat can shimmer with a \"glitter\" effect.",
+    "It loves to climb and play in water.",
+    "The breed comes from United States.",
+    "Its fur is short.",
+    "It has spots or marbled patterns like a wild cat.",
+    "It shares its name with a tiger from India.",
+    "The answer is one word of 6 letters.",
+    "Its first letter is B."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/b/ba/Paintedcats_Red_Star_standing.jpg/500px-Paintedcats_Red_Star_standing.jpg",
+      "w": 500,
+      "h": 642,
+      "credit": "User:Lightburst",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Paintedcats_Red_Star_standing.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/4/40/BEN_Bengalian_kitten_%284492540155%29.jpg/500px-BEN_Bengalian_kitten_%284492540155%29.jpg",
+      "w": 500,
+      "h": 353,
+      "credit": "Nickolas Titkov from Moscow, Russian Federation",
+      "license": "CC BY-SA 2.0",
+      "page": "https://commons.wikimedia.org/wiki/File:BEN_Bengalian_kitten_(4492540155).jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/4/49/Bengal_-_19.jpg/500px-Bengal_-_19.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Another one of my pictures: This photograph was taken by Medium69 (William Crochot) and…",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Bengal_-_19.jpg"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "sphynx",
+   "name": "Sphynx",
+   "lname": "Sphynx",
+   "alt": [
+    "Sphynx cat",
+    "Sphinx"
+   ],
+   "facts": {
+    "origin": "Canada",
+    "coat": "Hairless"
+   },
+   "lookalikes": [
+    "devon-rex",
+    "cornish-rex"
+   ],
+   "blurb": "A cat with almost no fur and wrinkly skin. It feels warm and soft, like a peach.",
+   "clues": [
+    "It was first bred in Canada in the 1960s.",
+    "It feels warm, like a peach.",
+    "It needs regular baths.",
+    "The breed comes from Canada.",
+    "It has almost no fur.",
+    "It has big ears and wrinkly skin.",
+    "The answer is one word of 6 letters.",
+    "Its first letter is S."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/e/e8/Sphinx2_July_2006.jpg/330px-Sphinx2_July_2006.jpg",
+      "w": 330,
+      "h": 440,
+      "credit": "M.Minderhoud at Dutch Wikipedia",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Sphinx2_July_2006.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/c/c1/Cat_Sphynx._img_025.jpg/500px-Cat_Sphynx._img_025.jpg",
+      "w": 500,
+      "h": 408,
+      "credit": "Dmitry Makeev",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Cat_Sphynx._img_025.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/0/05/Two_Sphynx_cats_in_bath.jpg/500px-Two_Sphynx_cats_in_bath.jpg",
+      "w": 500,
+      "h": 500,
+      "credit": "Shannon Badiee",
+      "license": "CC BY-SA 2.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Two_Sphynx_cats_in_bath.jpg"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "abyssinian",
+   "name": "Abyssinian",
+   "lname": "Abyssinian",
+   "alt": [
+    "Abyssinian cat",
+    "Aby"
+   ],
+   "facts": {
+    "origin": "Ethiopia",
+    "coat": "Short"
+   },
+   "lookalikes": [
+    "somali",
+    "singapura"
+   ],
+   "blurb": "A slim, active cat with a ticked coat where each hair has bands of colour.",
+   "clues": [
+    "Each hair has several bands of colour.",
+    "It looks like cats in ancient Egyptian art.",
+    "It is very active and curious.",
+    "The breed comes from Ethiopia.",
+    "Its fur is short.",
+    "It has large ears and almond eyes.",
+    "It is named after an old name for Ethiopia.",
+    "The answer is one word of 10 letters.",
+    "Its first letter is A."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/d/dc/Abessinierkater1.jpg/500px-Abessinierkater1.jpg",
+      "w": 500,
+      "h": 587,
+      "credit": "Martin Bahmann",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Abessinierkater1.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/9/9b/Gustav_chocolate.jpg/330px-Gustav_chocolate.jpg",
+      "w": 330,
+      "h": 471,
+      "credit": "Karin Langner-Bahmann",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Gustav_chocolate.jpg"
+     },
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/9/9d/Abyssinian_cat.png",
+      "w": 500,
+      "h": 375,
+      "credit": "Quentin Baker (Bakerq at English Wikipedia)",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Abyssinian_cat.png"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "scottish-fold",
+   "name": "Scottish Fold",
+   "lname": "Scottish Fold",
+   "facts": {
+    "origin": "United Kingdom",
+    "coat": "Short"
+   },
+   "blurb": "A cat whose ears fold forward and down, giving it an owl-like face. The fold comes from a gene that can cause joint problems.",
+   "clues": [
+    "All of them descend from a farm cat named Susie.",
+    "The gene that causes its look can harm joints.",
+    "It often sits up like an otter.",
+    "The breed comes from United Kingdom.",
+    "Its fur is short.",
+    "It comes from Scotland.",
+    "The answer has 2 words (8, 4 letters).",
+    "Its first letter is S."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/2/2e/Purple-scottish-fold.png/500px-Purple-scottish-fold.png",
+      "w": 500,
+      "h": 546,
+      "credit": "Kostj, cropped by Zanaq.",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Purple-scottish-fold.png"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/b/ba/Scottish_Fold_-_CFF_cat_show_Heinola_2008-05-03_IMG_7882.JPG/500px-Scottish_Fold_-_CFF_cat_show_Heinola_2008-05-03_IMG_7882.JPG",
+      "w": 500,
+      "h": 594,
+      "credit": "Heikki Siltala",
+      "license": "CC BY 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Scottish_Fold_-_CFF_cat_show_Heinola_2008-05-03_IMG_7882.JPG"
+     },
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/f/f8/Pirorino%27s_house_cat_of_the_Scottish_Fold%2C_sitting_up_in_a_%22Buddha_Position%22.jpg",
+      "w": 500,
+      "h": 667,
+      "credit": "User:Pirorino",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Pirorino%27s_house_cat_of_the_Scottish_Fold,_sitting_up_in_a_%22Buddha_Position%22.jpg"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "russian-blue",
+   "name": "Russian Blue",
+   "lname": "Russian Blue",
+   "facts": {
+    "origin": "Russia",
+    "coat": "Short"
+   },
+   "lookalikes": [
+    "british-shorthair",
+    "chartreux",
+    "korat"
+   ],
+   "blurb": "A slim, shy cat with a shimmering silver-blue coat and bright green eyes.",
+   "clues": [
+    "It is said to have come from the port of Arkhangelsk.",
+    "Its coat has silver-tipped hairs that shimmer.",
+    "It has vivid green eyes.",
+    "It is quiet and shy with strangers.",
+    "Its fur is short.",
+    "It is said to have been a favourite of the Tsars.",
+    "Its coat is thick and plush.",
+    "The answer has 2 words (7, 4 letters).",
+    "Its first letter is R."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/9/9f/Ruskis_dimka_3_%28cropped%29.jpg",
+      "w": 500,
+      "h": 793,
+      "credit": "ruskis",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Ruskis_dimka_3_(cropped).jpg"
+     },
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/4/4f/Russian_blue_kitten_%28cropped%29.jpg",
+      "w": 500,
+      "h": 735,
+      "credit": "Anna Utekhina http://kidsphoto.ru/",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Russian_blue_kitten_(cropped).jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/d/df/Russian_Blue_SE_Susets_Scilla_Lotus.jpg/330px-Russian_Blue_SE_Susets_Scilla_Lotus.jpg",
+      "w": 330,
+      "h": 442,
+      "credit": "Tigeresse",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Russian_Blue_SE_Susets_Scilla_Lotus.jpg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "norwegian-forest-cat",
+   "name": "Norwegian Forest Cat",
+   "lname": "Norwegian Forest Cat",
+   "alt": [
+    "Wegie"
+   ],
+   "facts": {
+    "origin": "Norway",
+    "coat": "Long"
+   },
+   "lookalikes": [
+    "maine-coon",
+    "siberian"
+   ],
+   "blurb": "A big, fluffy cat from Scandinavia with a waterproof coat. Legends say it pulled the goddess Freya's chariot.",
+   "clues": [
+    "Norse legends say it pulled the goddess Freya's chariot.",
+    "It can climb down trees head-first.",
+    "Its thick coat is waterproof.",
+    "The breed comes from Norway.",
+    "Its fur is long.",
+    "It has a bushy tail and tufted ears.",
+    "It comes from Norway.",
+    "The answer has 3 words (9, 6, 3 letters).",
+    "Its first letter is N."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/6/66/Noorse-boskat_wikipedia_1.JPG",
+      "w": 500,
+      "h": 667,
+      "credit": "Wieke de Rijk, Netherlands at nl.wikipedia",
+      "license": "CC BY 2.5",
+      "page": "https://commons.wikimedia.org/wiki/File:Noorse-boskat_wikipedia_1.JPG"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/6/65/Dalaja-Doll-norv%C3%A9gien-ambre-blotched-tabby_avec-blanc_2008_%28cropped%29.jpg/500px-Dalaja-Doll-norv%C3%A9gien-ambre-blotched-tabby_avec-blanc_2008_%28cropped%29.jpg",
+      "w": 500,
+      "h": 293,
+      "credit": "Gangburgondes",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Dalaja-Doll-norv%C3%A9gien-ambre-blotched-tabby_avec-blanc_2008_(cropped).jpg"
+     },
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/6/6f/Importjun2012_335_-_Copy_%283%29.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Dinodomo",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Importjun2012_335_-_Copy_(3).jpg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "birman",
+   "name": "Birman",
+   "lname": "Birman",
+   "facts": {
+    "origin": "Myanmar",
+    "coat": "Long"
+   },
+   "lookalikes": [
+    "ragdoll"
+   ],
+   "blurb": "A silky long-haired cat with blue eyes and pure white \"gloves\" on all four paws.",
+   "clues": [
+    "A legend links it to a temple in Burma.",
+    "It has blue eyes and darker points.",
+    "The breed comes from Myanmar.",
+    "Its fur is long.",
+    "Its four paws are pure white like gloves.",
+    "Its name comes from an old name for Myanmar.",
+    "The answer is one word of 6 letters.",
+    "Its first letter is B."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/6/66/Minerva-25.jpg/500px-Minerva-25.jpg",
+      "w": 500,
+      "h": 320,
+      "credit": "Claudia Zaino",
+      "license": "CC BY-SA 2.5 it",
+      "page": "https://commons.wikimedia.org/wiki/File:Minerva-25.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/a/a9/Birman_red_lynx_point_02.jpg/500px-Birman_red_lynx_point_02.jpg",
+      "w": 500,
+      "h": 348,
+      "credit": "Valerius Geng",
+      "license": "CC BY 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Birman_red_lynx_point_02.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/6/62/Chocolat_tabby.jpg/500px-Chocolat_tabby.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Chatterie Sinh",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Chocolat_tabby.jpg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "burmese",
+   "name": "Burmese",
+   "lname": "Burmese",
+   "alt": [
+    "Burmese cat"
+   ],
+   "facts": {
+    "origin": "Myanmar",
+    "coat": "Short"
+   },
+   "lookalikes": [
+    "bombay",
+    "tonkinese"
+   ],
+   "blurb": "A muscular, friendly cat with a glossy coat and golden eyes. All of them go back to one cat named Wong Mau.",
+   "clues": [
+    "The breed comes from one cat named Wong Mau.",
+    "It is surprisingly heavy for its size.",
+    "It has golden eyes.",
+    "The breed comes from Myanmar.",
+    "Its fur is short.",
+    "Its coat is often a rich sable brown.",
+    "Its name comes from an old name for Myanmar.",
+    "The answer is one word of 7 letters.",
+    "Its first letter is B."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/a/a7/BurMau_Vega_Star%2C_champagne_burmese_kitten_%28cropped%29.jpg/500px-BurMau_Vega_Star%2C_champagne_burmese_kitten_%28cropped%29.jpg",
+      "w": 500,
+      "h": 299,
+      "credit": "Sergey Lubov",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:BurMau_Vega_Star,_champagne_burmese_kitten_(cropped).jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/5/5c/British_burmese_-_Andel_Alois_at_Cat_show.JPG/500px-British_burmese_-_Andel_Alois_at_Cat_show.JPG",
+      "w": 500,
+      "h": 462,
+      "credit": "Heikkisiltala",
+      "license": "CC BY 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:British_burmese_-_Andel_Alois_at_Cat_show.JPG"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/d/d2/Burmese_Cat_Gamse_Zurich_Switzerland.jpg/500px-Burmese_Cat_Gamse_Zurich_Switzerland.jpg",
+      "w": 500,
+      "h": 374,
+      "credit": "DPCS.ie",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Burmese_Cat_Gamse_Zurich_Switzerland.jpg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "devon-rex",
+   "name": "Devon Rex",
+   "lname": "Devon Rex",
+   "facts": {
+    "origin": "United Kingdom",
+    "coat": "Curly"
+   },
+   "lookalikes": [
+    "cornish-rex",
+    "sphynx"
+   ],
+   "blurb": "An elf-like cat with huge ears and a short, wavy coat. It is playful and mischievous.",
+   "clues": [
+    "It was found in Buckfastleigh in 1960.",
+    "It is nicknamed the \"poodle cat\".",
+    "It has huge ears and big eyes.",
+    "The breed comes from United Kingdom.",
+    "Its fur is curly or wavy.",
+    "Its short coat is wavy.",
+    "It comes from an English county in the south-west.",
+    "The answer has 2 words (5, 3 letters).",
+    "Its first letter is D."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/a/ad/Devon_Rex_Cassini.jpeg/330px-Devon_Rex_Cassini.jpeg",
+      "w": 330,
+      "h": 496,
+      "credit": "Anna Belial",
+      "license": "CC BY 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Devon_Rex_Cassini.jpeg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/c/c0/DRX_Jesterex_Milky_Way_%286741144595%29.jpg/500px-DRX_Jesterex_Milky_Way_%286741144595%29.jpg",
+      "w": 500,
+      "h": 467,
+      "credit": "Nickolas Titkov from Moscow, Russian Federation",
+      "license": "CC BY-SA 2.0",
+      "page": "https://commons.wikimedia.org/wiki/File:DRX_Jesterex_Milky_Way_(6741144595).jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/8/86/Devon_rex_sweet_nose_%282416838046%29.jpg/500px-Devon_rex_sweet_nose_%282416838046%29.jpg",
+      "w": 500,
+      "h": 329,
+      "credit": "Nickolas Titkov from Moscow, Russian Federation",
+      "license": "CC BY-SA 2.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Devon_rex_sweet_nose_(2416838046).jpg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "cornish-rex",
+   "name": "Cornish Rex",
+   "lname": "Cornish Rex",
+   "facts": {
+    "origin": "United Kingdom",
+    "coat": "Curly"
+   },
+   "lookalikes": [
+    "devon-rex"
+   ],
+   "blurb": "A slim cat with a short, tightly curled coat that feels like velvet. It can run very fast.",
+   "clues": [
+    "The first one was a kitten named Kallibunker.",
+    "Its coat has no outer guard hairs.",
+    "It has a slim body and arched back like a greyhound.",
+    "The breed comes from United Kingdom.",
+    "Its fur is curly or wavy.",
+    "Its coat is tightly curled.",
+    "It comes from the county at the tip of south-west England.",
+    "The answer has 2 words (7, 3 letters).",
+    "Its first letter is C."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/1d/Cornish_Rex_-_Gatos_%28cropped%29.jpg/500px-Cornish_Rex_-_Gatos_%28cropped%29.jpg",
+      "w": 500,
+      "h": 500,
+      "credit": "Alexandre Gonçalves",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Cornish_Rex_-_Gatos_(cropped).jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/5/5c/Rex_staredown.jpg/500px-Rex_staredown.jpg",
+      "w": 500,
+      "h": 417,
+      "credit": "Tomi Tapio K from Helsinki, Finland",
+      "license": "CC BY 2.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Rex_staredown.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/5/5c/20170604_kot_wystawa_Krak%C3%B3w_8006.jpg/500px-20170604_kot_wystawa_Krak%C3%B3w_8006.jpg",
+      "w": 500,
+      "h": 493,
+      "credit": "Jakub Hałun",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:20170604_kot_wystawa_Krak%C3%B3w_8006.jpg"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "oriental-shorthair",
+   "name": "Oriental Shorthair",
+   "lname": "Oriental Shorthair",
+   "alt": [
+    "Oriental"
+   ],
+   "facts": {
+    "origin": "Thailand",
+    "coat": "Short"
+   },
+   "lookalikes": [
+    "siamese"
+   ],
+   "blurb": "A slim, long-legged cat with huge ears, closely related to the Siamese, but in hundreds of colours.",
+   "clues": [
+    "It comes in hundreds of colours and patterns.",
+    "It is very talkative.",
+    "It has very large ears.",
+    "The breed comes from Thailand.",
+    "Its fur is short.",
+    "It is a close relative of the Siamese.",
+    "It has short fur.",
+    "The answer has 2 words (8, 9 letters).",
+    "Its first letter is O."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/d/db/Orientalshorthairs2.jpg/500px-Orientalshorthairs2.jpg",
+      "w": 500,
+      "h": 441,
+      "credit": "Wikimedia Commons",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Orientalshorthairs2.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/b/bb/Falballa_%284499105%29.jpeg/330px-Falballa_%284499105%29.jpeg",
+      "w": 330,
+      "h": 461,
+      "credit": "Dominique Legros",
+      "license": "CC BY 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Falballa_(4499105).jpeg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/0/01/Oriental_Shorthair._Black_smoke.jpg/500px-Oriental_Shorthair._Black_smoke.jpg",
+      "w": 500,
+      "h": 313,
+      "credit": "Felinlove",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Oriental_Shorthair._Black_smoke.jpg"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "exotic-shorthair",
+   "name": "Exotic Shorthair",
+   "lname": "Exotic Shorthair",
+   "alt": [
+    "Exotic"
+   ],
+   "facts": {
+    "origin": "United States",
+    "coat": "Short"
+   },
+   "lookalikes": [
+    "persian",
+    "british-shorthair"
+   ],
+   "blurb": "Like a Persian with a short coat. Garfield is often said to look like one.",
+   "clues": [
+    "It is easier to groom than a Persian.",
+    "It has a flat face and round eyes.",
+    "The breed comes from United States.",
+    "Its fur is short.",
+    "It looks like a short-coated Persian.",
+    "Garfield is often said to look like one.",
+    "The answer has 2 words (6, 9 letters).",
+    "Its first letter is E."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/6/67/Exotic_cat_transparent.png/500px-Exotic_cat_transparent.png",
+      "w": 500,
+      "h": 393,
+      "credit": "Heikki Siltala from catza.net",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Exotic_cat_transparent.png"
+     },
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/4/4f/Cream_tabby_exotic_cat.jpg",
+      "w": 500,
+      "h": 323,
+      "credit": "Wikimedia Commons",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Cream_tabby_exotic_cat.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/e/ee/Bissel_3.jpg/500px-Bissel_3.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Dmitry Brant",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Bissel_3.jpg"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "american-shorthair",
+   "name": "American Shorthair",
+   "lname": "American Shorthair",
+   "facts": {
+    "origin": "United States",
+    "coat": "Short"
+   },
+   "lookalikes": [
+    "british-shorthair"
+   ],
+   "blurb": "A sturdy, easy-going cat whose ancestors came to North America on ships with early settlers.",
+   "clues": [
+    "Its ancestors hunted mice on settlers' ships.",
+    "The silver tabby is its best-known colour.",
+    "It is sturdy and easy-going.",
+    "The breed comes from United States.",
+    "Its fur is short.",
+    "It has short, thick fur.",
+    "It comes from the USA.",
+    "The answer has 2 words (8, 9 letters).",
+    "Its first letter is A."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/2/2a/Jewelkatz_Romeo_Of_Stalker-Bars.jpg/500px-Jewelkatz_Romeo_Of_Stalker-Bars.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "odin_aka_zero-one",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Jewelkatz_Romeo_Of_Stalker-Bars.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/d/df/American_shorthair_in_french_garden.JPG/500px-American_shorthair_in_french_garden.JPG",
+      "w": 500,
+      "h": 333,
+      "credit": "Ianaré Sévi",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:American_shorthair_in_french_garden.JPG"
+     },
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/1/16/Barbara_and_Jenna_Bush_with_India_the_Cat.jpg",
+      "w": 500,
+      "h": 437,
+      "credit": "Paul Morse",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Barbara_and_Jenna_Bush_with_India_the_Cat.jpg"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "turkish-angora",
+   "name": "Turkish Angora",
+   "lname": "Turkish Angora",
+   "alt": [
+    "Angora"
+   ],
+   "facts": {
+    "origin": "Turkey",
+    "coat": "Long"
+   },
+   "lookalikes": [
+    "turkish-van"
+   ],
+   "blurb": "An elegant, silky-coated cat from Turkey, often pure white. Ankara Zoo has a breeding programme for it.",
+   "clues": [
+    "Ankara Zoo has bred it for decades.",
+    "White ones may be deaf, especially with blue eyes.",
+    "It often has eyes of two different colours.",
+    "Its coat is silky and is often pure white.",
+    "Its fur is long.",
+    "It is slim and graceful.",
+    "It is one of the oldest natural breeds.",
+    "The answer has 2 words (7, 6 letters).",
+    "Its first letter is T."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/3/39/Fantine_de_l%27Empire_Ottoman.jpg/330px-Fantine_de_l%27Empire_Ottoman.jpg",
+      "w": 330,
+      "h": 495,
+      "credit": "Empire.ottoman",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Fantine_de_l%27Empire_Ottoman.jpg"
+     },
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/b/b7/Odd-eyed_White_Turkish_Angora_Female.jpg",
+      "w": 500,
+      "h": 500,
+      "credit": "Marinday Turkish Angoras",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Odd-eyed_White_Turkish_Angora_Female.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/7/76/Turkish_Angora_in_Ankara_Zoo_%28AO%C3%87%29.JPG/500px-Turkish_Angora_in_Ankara_Zoo_%28AO%C3%87%29.JPG",
+      "w": 500,
+      "h": 406,
+      "credit": "Ankarakediler",
+      "license": "CC BY 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Turkish_Angora_in_Ankara_Zoo_(AO%C3%87).JPG"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "turkish-van",
+   "name": "Turkish Van",
+   "lname": "Turkish Van",
+   "alt": [
+    "swimming cat"
+   ],
+   "facts": {
+    "origin": "Turkey",
+    "coat": "Medium"
+   },
+   "lookalikes": [
+    "turkish-angora"
+   ],
+   "blurb": "A white cat with coloured patches on its head and tail, nicknamed \"the swimming cat\" because it likes water.",
+   "clues": [
+    "It has a water-resistant coat.",
+    "Its colour is only on its head and tail.",
+    "It is mostly white.",
+    "Its fur is medium.",
+    "Its coloured tail is often ringed.",
+    "It comes from the mountains of eastern Anatolia.",
+    "It is a large, muscular cat.",
+    "The answer has 2 words (7, 3 letters).",
+    "Its first letter is T."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/b/be/Turkish_Van_cat_transparent.png/330px-Turkish_Van_cat_transparent.png",
+      "w": 330,
+      "h": 440,
+      "credit": "Matsu1024",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Turkish_Van_cat_transparent.png"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/9/9b/Turkish_Van_cat_transparent_%28cropped%29.png/330px-Turkish_Van_cat_transparent_%28cropped%29.png",
+      "w": 330,
+      "h": 573,
+      "credit": "Matsu1024",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Turkish_Van_cat_transparent_(cropped).png"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/a/ab/Yeux_vairon.JPG/500px-Yeux_vairon.JPG",
+      "w": 500,
+      "h": 375,
+      "credit": "Gelweo",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Yeux_vairon.JPG"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "manx",
+   "name": "Manx",
+   "lname": "Manx",
+   "alt": [
+    "Manx cat"
+   ],
+   "facts": {
+    "origin": "Isle of Man",
+    "coat": "Short"
+   },
+   "lookalikes": [
+    "japanese-bobtail"
+   ],
+   "blurb": "A cat from the Isle of Man that is born with no tail or a very short one.",
+   "clues": [
+    "Its back legs are longer than its front legs.",
+    "Some have a tiny stump called a \"stumpy\".",
+    "It runs with a hopping, rabbit-like gait.",
+    "The breed comes from Isle of Man.",
+    "Its fur is short.",
+    "It appears on Isle of Man coins.",
+    "It has no tail.",
+    "The answer is one word of 4 letters.",
+    "Its first letter is M."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/9/9b/Manx_cat_by_Karen_Weaver.jpg",
+      "w": 500,
+      "h": 515,
+      "credit": "Karen Weaver",
+      "license": "CC BY 2.5",
+      "page": "https://commons.wikimedia.org/wiki/File:Manx_cat_by_Karen_Weaver.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/b/bc/Manx_Silverwing.JPG/500px-Manx_Silverwing.JPG",
+      "w": 500,
+      "h": 355,
+      "credit": "See image",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Manx_Silverwing.JPG"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/c/cf/Manx_Dante_blue_eyes.jpg/500px-Manx_Dante_blue_eyes.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "EliasAlucard at Swedish Wikipedia",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Manx_Dante_blue_eyes.jpg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "egyptian-mau",
+   "name": "Egyptian Mau",
+   "lname": "Egyptian Mau",
+   "alt": [
+    "Mau"
+   ],
+   "facts": {
+    "origin": "Egypt",
+    "coat": "Short"
+   },
+   "lookalikes": [
+    "bengal",
+    "ocicat"
+   ],
+   "blurb": "A naturally spotted cat and one of the fastest pet cats. It has a worried-looking face.",
+   "clues": [
+    "It can run at around 48 km/h.",
+    "It has a loose flap of skin under its belly.",
+    "It has gooseberry-green eyes.",
+    "Its fur is short.",
+    "It has natural spots.",
+    "It comes from the land of the pharaohs.",
+    "The answer has 2 words (8, 3 letters).",
+    "Its first letter is E."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/0/08/Mau_Egytien.jpg/500px-Mau_Egytien.jpg",
+      "w": 500,
+      "h": 591,
+      "credit": "Desaix83, d'après le travail d'Heikki Siltala",
+      "license": "CC BY 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Mau_Egytien.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/7/72/RoyalNefertt_Serket_of_AchetAton.jpg/500px-RoyalNefertt_Serket_of_AchetAton.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Achet Aton",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:RoyalNefertt_Serket_of_AchetAton.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/7/7c/Egyptian_Mau%27s_eyes_change_from_pale_green_to_turquoise.jpg/500px-Egyptian_Mau%27s_eyes_change_from_pale_green_to_turquoise.jpg",
+      "w": 500,
+      "h": 428,
+      "credit": "Madame Diana",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Egyptian_Mau%27s_eyes_change_from_pale_green_to_turquoise.jpg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "savannah",
+   "name": "Savannah",
+   "lname": "Savannah",
+   "alt": [
+    "Savannah cat"
+   ],
+   "facts": {
+    "origin": "United States",
+    "coat": "Short"
+   },
+   "lookalikes": [
+    "bengal"
+   ],
+   "blurb": "A tall, spotted cat bred from a pet cat and a wild African serval. It can leap very high.",
+   "clues": [
+    "It was bred from a pet cat and a wild serval.",
+    "It can jump about 2.5 metres high.",
+    "It is one of the tallest cat breeds.",
+    "The breed comes from United States.",
+    "Its fur is short.",
+    "It has big ears and spots.",
+    "It is named after the African grasslands.",
+    "The answer is one word of 8 letters.",
+    "Its first letter is S."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/c/c4/Savannah_Cat_portrait.jpg/330px-Savannah_Cat_portrait.jpg",
+      "w": 330,
+      "h": 495,
+      "credit": "Jason Douglas",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Savannah_Cat_portrait.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/2/27/SAV_%D0%90%D0%BB%D0%B8%D1%81%D0%B0_%D0%90%D0%BB%D1%8C%D1%8F%D1%80%D1%83%D1%81_%285623632265%29.jpg/500px-SAV_%D0%90%D0%BB%D0%B8%D1%81%D0%B0_%D0%90%D0%BB%D1%8C%D1%8F%D1%80%D1%83%D1%81_%285623632265%29.jpg",
+      "w": 500,
+      "h": 335,
+      "credit": "Nickolas Titkov from Moscow, Russian Federation",
+      "license": "CC BY-SA 2.0",
+      "page": "https://commons.wikimedia.org/wiki/File:SAV_%D0%90%D0%BB%D0%B8%D1%81%D0%B0_%D0%90%D0%BB%D1%8C%D1%8F%D1%80%D1%83%D1%81_(5623632265).jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/8/84/Savannah_kitten.jpg/500px-Savannah_kitten.jpg",
+      "w": 500,
+      "h": 549,
+      "credit": "Camilla Hesby Johnsen",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Savannah_kitten.jpg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "siberian",
+   "name": "Siberian",
+   "lname": "Siberian",
+   "alt": [
+    "Siberian cat",
+    "Siberian forest cat"
+   ],
+   "facts": {
+    "origin": "Russia",
+    "coat": "Long"
+   },
+   "lookalikes": [
+    "maine-coon",
+    "norwegian-forest-cat"
+   ],
+   "blurb": "A strong, fluffy cat from the Russian forests with a triple-layer coat for the cold.",
+   "clues": [
+    "It is the national cat of Russia.",
+    "Its coat has three layers.",
+    "It is strong and a good jumper.",
+    "The breed comes from Russia.",
+    "Its fur is long.",
+    "It has a fluffy mane around its neck.",
+    "It comes from a cold part of Russia.",
+    "The answer is one word of 8 letters.",
+    "Its first letter is S."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/e/ef/SC_Alizarin_Animal_Beat_SIB_a_23.jpg/330px-SC_Alizarin_Animal_Beat_SIB_a_23.jpg",
+      "w": 330,
+      "h": 477,
+      "credit": "Heikki Siltala https://catza.net/",
+      "license": "CC BY 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:SC_Alizarin_Animal_Beat_SIB_a_23.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/b/bd/Murmur%27s_Siberian_Cat_siberiano_golden_%28cropped%29.JPG/500px-Murmur%27s_Siberian_Cat_siberiano_golden_%28cropped%29.JPG",
+      "w": 500,
+      "h": 336,
+      "credit": "Gatto Siberiano Murmur's",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Murmur%27s_Siberian_Cat_siberiano_golden_(cropped).JPG"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/2/27/Samiha%27s_Siberian_cat_Moon_Pie.jpg/500px-Samiha%27s_Siberian_cat_Moon_Pie.jpg",
+      "w": 500,
+      "h": 530,
+      "credit": "Floofymarshmallow",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Samiha%27s_Siberian_cat_Moon_Pie.jpg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "japanese-bobtail",
+   "name": "Japanese Bobtail",
+   "lname": "Japanese Bobtail",
+   "facts": {
+    "origin": "Japan",
+    "coat": "Short"
+   },
+   "lookalikes": [
+    "manx"
+   ],
+   "blurb": "A cat with a short, pom-pom tail. It is the cat on the Japanese good-luck \"beckoning cat\" statues.",
+   "clues": [
+    "Each one's tail is as unique as a fingerprint.",
+    "It inspired the \"beckoning cat\" lucky charm.",
+    "It is often white with red and black patches.",
+    "Its tail looks like a fluffy pom-pom.",
+    "Its fur is short.",
+    "It is very chatty and has a soft voice.",
+    "It often sits with one paw raised.",
+    "The answer has 2 words (8, 7 letters).",
+    "Its first letter is J."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/5/56/JapaneseBobtailBlueEyedMi-ke.JPG/500px-JapaneseBobtailBlueEyedMi-ke.JPG",
+      "w": 500,
+      "h": 358,
+      "credit": "ようてい",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:JapaneseBobtailBlueEyedMi-ke.JPG"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/d/d3/Japanese_Bobtail_Prized_Mik-ke_Colouring.jpg/500px-Japanese_Bobtail_Prized_Mik-ke_Colouring.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Patricia Bianco",
+      "license": "CC BY 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Japanese_Bobtail_Prized_Mik-ke_Colouring.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/9/92/Betty_and_Boop%2C_bonded_pair_of_cat_sisters.webp/330px-Betty_and_Boop%2C_bonded_pair_of_cat_sisters.webp",
+      "w": 330,
+      "h": 440,
+      "credit": "XanderK09",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Betty_and_Boop,_bonded_pair_of_cat_sisters.webp"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "himalayan",
+   "name": "Himalayan",
+   "lname": "Himalayan",
+   "alt": [
+    "Himalayan cat",
+    "Colourpoint Persian"
+   ],
+   "facts": {
+    "origin": "United States",
+    "coat": "Long"
+   },
+   "lookalikes": [
+    "persian",
+    "siamese"
+   ],
+   "blurb": "A long-haired cat with the flat face of a Persian and the blue eyes and dark points of a Siamese.",
+   "clues": [
+    "It has blue eyes and dark points.",
+    "It has a long, fluffy coat.",
+    "The breed comes from United States.",
+    "Its fur is long.",
+    "It is named after a rabbit with similar markings and a mountain range.",
+    "It needs daily grooming.",
+    "Its face is flat.",
+    "The answer is one word of 9 letters.",
+    "Its first letter is H."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/b/b5/Sonny_Bunny.jpg/330px-Sonny_Bunny.jpg",
+      "w": 330,
+      "h": 499,
+      "credit": "Cindy See",
+      "license": "CC BY-SA 2.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Sonny_Bunny.jpg"
+     },
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/b/b0/8_week_old_female_Himalayan_Kitten.jpg",
+      "w": 500,
+      "h": 888,
+      "credit": "Tallnut66",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:8_week_old_female_Himalayan_Kitten.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/a/ae/Himalayan-sharapova.jpg/500px-Himalayan-sharapova.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Luis.credie",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Himalayan-sharapova.jpg"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "tonkinese",
+   "name": "Tonkinese",
+   "lname": "Tonkinese",
+   "alt": [
+    "Tonk"
+   ],
+   "facts": {
+    "origin": "Canada",
+    "coat": "Short"
+   },
+   "lookalikes": [
+    "burmese",
+    "siamese"
+   ],
+   "blurb": "A friendly cross between the Siamese and the Burmese, with aqua-coloured eyes.",
+   "clues": [
+    "It was developed in Canada.",
+    "It often has aqua-blue eyes.",
+    "It is a cross of two Asian breeds.",
+    "The breed comes from Canada.",
+    "Its fur is short.",
+    "It is playful and friendly.",
+    "It is named after a region of Vietnam.",
+    "The answer is one word of 9 letters.",
+    "Its first letter is T."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/4/42/Chat_tonkinois_lilac_mink_%28chatterie_de_l%27Esprit_d%27Edenvane%29..jpg/500px-Chat_tonkinois_lilac_mink_%28chatterie_de_l%27Esprit_d%27Edenvane%29..jpg",
+      "w": 500,
+      "h": 417,
+      "credit": "Edenvane",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Chat_tonkinois_lilac_mink_(chatterie_de_l%27Esprit_d%27Edenvane)..jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/b/b7/Tonkinese_Cat_-_Leo.jpg/500px-Tonkinese_Cat_-_Leo.jpg",
+      "w": 500,
+      "h": 500,
+      "credit": "Luigi Leahy",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Tonkinese_Cat_-_Leo.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/8/8d/TON_Beautyburm%27s_Archi_White_%2811463281866%29.jpg/500px-TON_Beautyburm%27s_Archi_White_%2811463281866%29.jpg",
+      "w": 500,
+      "h": 365,
+      "credit": "Nickolas Titkov from Moscow, Russian Federation",
+      "license": "CC BY-SA 2.0",
+      "page": "https://commons.wikimedia.org/wiki/File:TON_Beautyburm%27s_Archi_White_(11463281866).jpg"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "chartreux",
+   "name": "Chartreux",
+   "lname": "Chartreux",
+   "facts": {
+    "origin": "France",
+    "coat": "Short"
+   },
+   "lookalikes": [
+    "british-shorthair",
+    "russian-blue"
+   ],
+   "blurb": "A sturdy blue-grey French cat with copper eyes and a smiling face. Legend links it with Carthusian monks.",
+   "clues": [
+    "Legend links it with Carthusian monks.",
+    "It rarely meows.",
+    "It has copper or orange eyes.",
+    "The breed comes from France.",
+    "Its fur is short.",
+    "Its woolly coat is blue-grey.",
+    "It comes from France.",
+    "The answer is one word of 9 letters.",
+    "Its first letter is C."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/d/db/CertosinoFemmina.JPG/330px-CertosinoFemmina.JPG",
+      "w": 330,
+      "h": 440,
+      "credit": "Fureur Bleu",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:CertosinoFemmina.JPG"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/3/3c/IC_Blue_Melody_Flipper_CHA_male_EX1_CACIB.jpg/500px-IC_Blue_Melody_Flipper_CHA_male_EX1_CACIB.jpg",
+      "w": 500,
+      "h": 472,
+      "credit": "Heikki Siltala - catza.net",
+      "license": "CC BY 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:IC_Blue_Melody_Flipper_CHA_male_EX1_CACIB.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/9/9f/Liegende_graue_Katze_20200219_135657.jpg/330px-Liegende_graue_Katze_20200219_135657.jpg",
+      "w": 330,
+      "h": 440,
+      "credit": "PantheraLeo1359531",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Liegende_graue_Katze_20200219_135657.jpg"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "bombay",
+   "name": "Bombay",
+   "lname": "Bombay",
+   "alt": [
+    "Bombay cat"
+   ],
+   "facts": {
+    "origin": "United States",
+    "coat": "Short"
+   },
+   "lookalikes": [
+    "burmese"
+   ],
+   "blurb": "A sleek, all-black cat with copper eyes, bred to look like a mini black panther.",
+   "clues": [
+    "It was bred in Kentucky in the 1950s.",
+    "It was bred to look like a mini panther.",
+    "It has copper or golden eyes.",
+    "The breed comes from United States.",
+    "Its fur is short.",
+    "Its coat is glossy and jet black.",
+    "It is named after an Indian city now called Mumbai.",
+    "The answer is one word of 6 letters.",
+    "Its first letter is B."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/8/88/Bombay_Katze_Ebene_of_Blue_Sinfonie.JPG/500px-Bombay_Katze_Ebene_of_Blue_Sinfonie.JPG",
+      "w": 500,
+      "h": 333,
+      "credit": "Bombaykatze",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Bombay_Katze_Ebene_of_Blue_Sinfonie.JPG"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/a/ac/Bombay_femelle.JPG/500px-Bombay_femelle.JPG",
+      "w": 500,
+      "h": 625,
+      "credit": "Pititebilette",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Bombay_femelle.JPG"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/8/84/BOM_Melody_in_Black_of_Bagilis_%2815051671613%29.jpg/500px-BOM_Melody_in_Black_of_Bagilis_%2815051671613%29.jpg",
+      "w": 500,
+      "h": 331,
+      "credit": "Nickolas Titkov from Moscow, Russian Federation",
+      "license": "CC BY-SA 2.0",
+      "page": "https://commons.wikimedia.org/wiki/File:BOM_Melody_in_Black_of_Bagilis_(15051671613).jpg"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "ocicat",
+   "name": "Ocicat",
+   "lname": "Ocicat",
+   "facts": {
+    "origin": "United States",
+    "coat": "Short"
+   },
+   "lookalikes": [
+    "bengal",
+    "egyptian-mau"
+   ],
+   "blurb": "A spotted cat that looks wild, but it has no wild cat in its family tree. It came from a Siamese–Abyssinian cross.",
+   "clues": [
+    "It has no wild ancestry at all.",
+    "It came from a Siamese and Abyssinian cross.",
+    "It is spotted like a wild cat.",
+    "The breed comes from United States.",
+    "Its fur is short.",
+    "It is very sociable.",
+    "It is named after the ocelot.",
+    "The answer is one word of 6 letters.",
+    "Its first letter is O."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/9/9d/Ocicat_Fond_Blanc.jpg",
+      "w": 500,
+      "h": 443,
+      "credit": "Desaix83, d'après le travail d'Heikki Siltala",
+      "license": "CC BY 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Ocicat_Fond_Blanc.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/14/Topspot_La_Colombina_%28Liina%29_OCI_c_24_female_kitten_EX1.JPG/500px-Topspot_La_Colombina_%28Liina%29_OCI_c_24_female_kitten_EX1.JPG",
+      "w": 500,
+      "h": 422,
+      "credit": "Heikki Siltala - catza.net",
+      "license": "CC BY 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Topspot_La_Colombina_(Liina)_OCI_c_24_female_kitten_EX1.JPG"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/6/6a/Cheetoh_cat_chilling.png/500px-Cheetoh_cat_chilling.png",
+      "w": 500,
+      "h": 282,
+      "credit": "Mcelite",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Cheetoh_cat_chilling.png"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "munchkin",
+   "name": "Munchkin",
+   "lname": "Munchkin",
+   "alt": [
+    "Munchkin cat"
+   ],
+   "facts": {
+    "origin": "United States",
+    "coat": "Short"
+   },
+   "blurb": "A cat with very short legs caused by a natural gene. Some groups refuse to recognise it because of health worries.",
+   "clues": [
+    "Some cat groups refuse to recognise it.",
+    "It was found in Louisiana in 1983.",
+    "It is sometimes called the \"sausage cat\".",
+    "The breed comes from United States.",
+    "Its fur is short.",
+    "Its legs are very short.",
+    "It is named after characters in \"The Wizard of Oz\".",
+    "The answer is one word of 8 letters.",
+    "Its first letter is M."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/3/32/Munchkin_cat_2_%28cropped%29.jpg/500px-Munchkin_cat_2_%28cropped%29.jpg",
+      "w": 500,
+      "h": 422,
+      "credit": "Tasy Hong",
+      "license": "CC0 1.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Munchkin_cat_2_(cropped).jpg"
+     },
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/6/6e/Longhairedmunchkin.jpg",
+      "w": 500,
+      "h": 612,
+      "credit": "Sg0668commons",
+      "license": "CC BY 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Longhairedmunchkin.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/c/cf/Taiwan_-_Cat_with_3D_anaglyph_cat_linoprint_2021.jpg/500px-Taiwan_-_Cat_with_3D_anaglyph_cat_linoprint_2021.jpg",
+      "w": 500,
+      "h": 350,
+      "credit": "Anomaler Circus",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Taiwan_-_Cat_with_3D_anaglyph_cat_linoprint_2021.jpg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "korat",
+   "name": "Korat",
+   "lname": "Korat",
+   "facts": {
+    "origin": "Thailand",
+    "coat": "Short"
+   },
+   "lookalikes": [
+    "russian-blue"
+   ],
+   "blurb": "A silver-blue cat from Thailand with green eyes. In Thailand it is a symbol of good luck, given as a wedding gift.",
+   "clues": [
+    "It appears in an old Thai book of cat poems.",
+    "It is given as a good-luck wedding gift.",
+    "Its face is heart-shaped.",
+    "The breed comes from Thailand.",
+    "Its fur is short.",
+    "It has a silver-blue coat and green eyes.",
+    "It is named after a Thai province.",
+    "The answer is one word of 5 letters.",
+    "Its first letter is K."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/8/8f/KOR_1149.jpg/500px-KOR_1149.jpg",
+      "w": 500,
+      "h": 404,
+      "credit": "Heikki Siltala, catza.net",
+      "license": "CC BY 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:KOR_1149.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/e/eb/Face_et_profil_du_korat.JPG/500px-Face_et_profil_du_korat.JPG",
+      "w": 500,
+      "h": 230,
+      "credit": "Yog-Hurt's_Atlach-Nacha_at_Turok_Cat_Show.JPG: Heikkisiltala GIC_Lucky_Uffe_at_cat_show…",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Face_et_profil_du_korat.JPG"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "australian-mist",
+   "name": "Australian Mist",
+   "lname": "Australian Mist",
+   "facts": {
+    "origin": "Australia",
+    "coat": "Short"
+   },
+   "blurb": "A gentle spotted cat developed in Sydney in the 1970s. It is happy to live indoors.",
+   "clues": [
+    "Dr Truda Straede developed it.",
+    "It is happy to live indoors.",
+    "It has a soft spotted or marbled coat.",
+    "Its fur is short.",
+    "It was bred from Burmese, Abyssinian and moggy cats.",
+    "It is calm and loves to be handled.",
+    "The answer has 2 words (10, 4 letters).",
+    "Its first letter is A."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/f/f0/Australian_Mist.jpg/500px-Australian_Mist.jpg",
+      "w": 500,
+      "h": 509,
+      "credit": "Regis2007",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Australian_Mist.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/16/Black_tortoiseshell_silver_tabby_cat.jpg/500px-Black_tortoiseshell_silver_tabby_cat.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "kitty.green66",
+      "license": "CC BY-SA 2.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Black_tortoiseshell_silver_tabby_cat.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/f/fd/Brown_and_gold_spotted_wikipedia.jpg/500px-Brown_and_gold_spotted_wikipedia.jpg",
+      "w": 500,
+      "h": 605,
+      "credit": "Dr. Trudae Staede",
+      "license": "CC0 1.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Brown_and_gold_spotted_wikipedia.jpg"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "somali",
+   "name": "Somali",
+   "lname": "Somali",
+   "alt": [
+    "Somali cat"
+   ],
+   "facts": {
+    "origin": "United States",
+    "coat": "Long"
+   },
+   "lookalikes": [
+    "abyssinian"
+   ],
+   "blurb": "A long-haired version of the Abyssinian, with a bushy fox-like tail.",
+   "clues": [
+    "It is a long-haired version of the Abyssinian.",
+    "It is nicknamed the \"fox cat\".",
+    "It has a big bushy tail.",
+    "The breed comes from United States.",
+    "Its fur is long.",
+    "Each hair has bands of colour.",
+    "It is named after a country next to Ethiopia.",
+    "The answer is one word of 6 letters.",
+    "Its first letter is S."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/e/e1/%D0%A1%D0%BE%D0%BC%D0%B0%D0%BB%D0%B8%D0%B9%D1%81%D0%BA%D0%B0%D1%8F_%D0%BA%D0%BE%D1%88%D0%BA%D0%B0.jpg/330px-%D0%A1%D0%BE%D0%BC%D0%B0%D0%BB%D0%B8%D0%B9%D1%81%D0%BA%D0%B0%D1%8F_%D0%BA%D0%BE%D1%88%D0%BA%D0%B0.jpg",
+      "w": 330,
+      "h": 463,
+      "credit": "Матвеева Ирина Владимировна",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:%D0%A1%D0%BE%D0%BC%D0%B0%D0%BB%D0%B8%D0%B9%D1%81%D0%BA%D0%B0%D1%8F_%D0%BA%D0%BE%D1%88%D0%BA%D0%B0.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/a/ab/Bluestream%27s_QuiQui2_SOM_o.jpg/500px-Bluestream%27s_QuiQui2_SOM_o.jpg",
+      "w": 500,
+      "h": 326,
+      "credit": "Heikki Siltala https://catza.net/",
+      "license": "CC BY 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Bluestream%27s_QuiQui2_SOM_o.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/b/b6/Zorrito_Blue_Rodrigo.jpg/330px-Zorrito_Blue_Rodrigo.jpg",
+      "w": 330,
+      "h": 440,
+      "credit": "Bellengé Christophe",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Zorrito_Blue_Rodrigo.jpg"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "singapura",
+   "name": "Singapura",
+   "lname": "Singapura",
+   "alt": [
+    "Singapura cat"
+   ],
+   "facts": {
+    "origin": "Singapore",
+    "coat": "Short"
+   },
+   "lookalikes": [
+    "abyssinian"
+   ],
+   "blurb": "One of the smallest cat breeds, with big eyes and ears and a ticked sepia coat.",
+   "clues": [
+    "It is one of the smallest cat breeds.",
+    "Its name means \"lion city\".",
+    "It has very large eyes and ears.",
+    "Its fur is short.",
+    "Its coat is ticked like an Abyssinian's.",
+    "It is named after a small island country.",
+    "The answer is one word of 9 letters.",
+    "Its first letter is S."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/3/3b/Singapura_Cats_%28cropped%29.jpg/330px-Singapura_Cats_%28cropped%29.jpg",
+      "w": 330,
+      "h": 445,
+      "credit": "Straits Singapuras",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Singapura_Cats_(cropped).jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/3/3b/Singapura_Cats.jpg/500px-Singapura_Cats.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Straits Singapuras",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Singapura_Cats.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/c/c7/Serrade_petit.jpg/500px-Serrade_petit.jpg",
+      "w": 500,
+      "h": 451,
+      "credit": "Fontaine 2",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Serrade_petit.jpg"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "laperm",
+   "name": "LaPerm",
+   "lname": "LaPerm",
+   "facts": {
+    "origin": "United States",
+    "coat": "Curly"
+   },
+   "lookalikes": [
+    "devon-rex",
+    "selkirk-rex"
+   ],
+   "blurb": "A cat with a loose, curly coat. The first one, Curly, was born bald on a farm in Oregon.",
+   "clues": [
+    "The first one was born on an Oregon farm in 1982.",
+    "Kittens may be born bald.",
+    "Its coat feels springy.",
+    "The breed comes from United States.",
+    "Its fur is curly or wavy.",
+    "Its fur is curly.",
+    "It is named after a curly hairstyle.",
+    "The answer is one word of 6 letters.",
+    "Its first letter is L."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/e/e1/Laperm_LH_blacktortie_white.jpg",
+      "w": 500,
+      "h": 374,
+      "credit": "Bebopscrx",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Laperm_LH_blacktortie_white.jpg"
+     },
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/c/cf/Oomaste.jpg",
+      "w": 500,
+      "h": 749,
+      "credit": "I am the image owner and grant permission for its use on Wikipedia.",
+      "license": "CC BY 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Oomaste.jpg"
+     },
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/a/a3/Lapermcat.jpg",
+      "w": 500,
+      "h": 752,
+      "credit": "Krister P",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Lapermcat.jpg"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "selkirk-rex",
+   "name": "Selkirk Rex",
+   "lname": "Selkirk Rex",
+   "facts": {
+    "origin": "United States",
+    "coat": "Curly"
+   },
+   "lookalikes": [
+    "laperm",
+    "devon-rex"
+   ],
+   "blurb": "A big, cuddly cat with a thick curly coat, first found in Montana in 1987.",
+   "clues": [
+    "The first one was found in Montana in 1987.",
+    "It comes in long and short coats.",
+    "Its whiskers are curly too.",
+    "The breed comes from United States.",
+    "Its fur is curly or wavy.",
+    "Its coat is thick and curly.",
+    "It is sometimes called \"the cat in sheep's clothing\".",
+    "The answer has 2 words (7, 3 letters).",
+    "Its first letter is S."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/f/fe/Selkirk_Longhair.jpg/500px-Selkirk_Longhair.jpg",
+      "w": 500,
+      "h": 419,
+      "credit": "Desaix83, d'après le travail d'Heikki Siltala",
+      "license": "CC BY 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Selkirk_Longhair.jpg"
+     },
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/b/b2/Selkirk_Rex.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Ramdrake at English Wikipedia",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Selkirk_Rex.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/f/f6/SRL_%28Selkirk_Rex_semi-longhair%29_%284171118303%29.jpg/330px-SRL_%28Selkirk_Rex_semi-longhair%29_%284171118303%29.jpg",
+      "w": 330,
+      "h": 461,
+      "credit": "Nickolas Titkov from Moscow, Russian Federation",
+      "license": "CC BY-SA 2.0",
+      "page": "https://commons.wikimedia.org/wiki/File:SRL_(Selkirk_Rex_semi-longhair)_(4171118303).jpg"
+     }
+    ]
+   },
+   "difficulty": 3
+  }
+ ],
+ "questions": [
+  {
+   "id": "q1",
+   "kind": "mc",
+   "prompt": "Which cat breed has almost no fur?",
+   "answer": "Sphynx",
+   "wrong": [
+    "Persian",
+    "Maine Coon",
+    "Ragdoll"
+   ],
+   "explain": "Sphynx cats have only fine down.",
+   "difficulty": 1
+  },
+  {
+   "id": "q2",
+   "kind": "mc",
+   "prompt": "Which cat breed is born without a tail?",
+   "answer": "Manx",
+   "wrong": [
+    "Siamese",
+    "Persian",
+    "Bengal"
+   ],
+   "explain": "It comes from the Isle of Man.",
+   "difficulty": 1
+  },
+  {
+   "id": "q3",
+   "kind": "mc",
+   "prompt": "Which cat breed goes floppy when picked up?",
+   "answer": "Ragdoll",
+   "wrong": [
+    "Siamese",
+    "Abyssinian",
+    "Bengal"
+   ],
+   "explain": "The name comes from this floppy habit.",
+   "difficulty": 1
+  },
+  {
+   "id": "q4",
+   "kind": "mc",
+   "prompt": "Which breed was bred from wild Asian leopard cats?",
+   "answer": "Bengal",
+   "wrong": [
+    "Ocicat",
+    "Egyptian Mau",
+    "Abyssinian"
+   ],
+   "explain": "Bengals were crossed with leopard cats in the USA.",
+   "difficulty": 2
+  },
+  {
+   "id": "q5",
+   "kind": "mc",
+   "prompt": "Siamese cats come from which country, once called Siam?",
+   "answer": "Thailand",
+   "wrong": [
+    "Japan",
+    "India",
+    "China"
+   ],
+   "explain": "Siam was renamed Thailand in 1939.",
+   "difficulty": 2
+  },
+  {
+   "id": "q6",
+   "kind": "tf",
+   "prompt": "Siamese kittens are born almost white.",
+   "answer": true,
+   "explain": "Their darker points develop as they grow, in cooler parts of the body.",
+   "difficulty": 2
+  },
+  {
+   "id": "q7",
+   "kind": "mc",
+   "prompt": "Which breed is the state cat of Maine?",
+   "answer": "Maine Coon",
+   "wrong": [
+    "American Shorthair",
+    "Persian",
+    "Siberian"
+   ],
+   "explain": "It developed among farm cats in Maine.",
+   "difficulty": 2
+  },
+  {
+   "id": "q8",
+   "kind": "tf",
+   "prompt": "The Ocicat has wild ocelot ancestors.",
+   "answer": false,
+   "explain": "It only looks wild; it came from Siamese and Abyssinian crosses.",
+   "difficulty": 3
+  },
+  {
+   "id": "q9",
+   "kind": "mc",
+   "prompt": "A baby cat is called a…",
+   "answer": "Kitten",
+   "wrong": [
+    "Cub",
+    "Pup",
+    "Calf"
+   ],
+   "explain": "Young cats are kittens.",
+   "difficulty": 1
+  },
+  {
+   "id": "q10",
+   "kind": "mc",
+   "prompt": "What sound does a happy cat often make?",
+   "answer": "Purr",
+   "wrong": [
+    "Bark",
+    "Moo",
+    "Quack"
+   ],
+   "explain": "Cats purr when they are relaxed.",
+   "difficulty": 1
+  },
+  {
+   "id": "q11",
+   "kind": "tf",
+   "prompt": "Cats use their whiskers to help feel their way around.",
+   "answer": true,
+   "explain": "Whiskers sense tiny movements in the air.",
+   "difficulty": 1
+  },
+  {
+   "id": "q12",
+   "kind": "mc",
+   "prompt": "Which cat breed has ears that fold forward?",
+   "answer": "Scottish Fold",
+   "wrong": [
+    "Siamese",
+    "Persian",
+    "Maine Coon"
+   ],
+   "explain": "Its folded ears give it an owl-like face.",
+   "difficulty": 1
+  },
+  {
+   "id": "q13",
+   "kind": "mc",
+   "prompt": "Which cat breed is very fluffy with a flat face?",
+   "answer": "Persian",
+   "wrong": [
+    "Sphynx",
+    "Siamese",
+    "Bengal"
+   ],
+   "explain": "Persians need brushing every day.",
+   "difficulty": 1
+  }
+ ],
+ "fakes": [
+  "Alpine Snow Mau",
+  "Nordic Velvet Rex",
+  "Highland Curlpaw",
+  "Tasmanian Mist",
+  "Celtic Bluefold",
+  "Andean Shorthair",
+  "Moroccan Tufted Cat"
+ ],
+ "sources": [
+  {
+   "name": "Wikidata",
+   "url": "https://www.wikidata.org"
+  },
+  {
+   "name": "Wikimedia Commons",
+   "url": "https://commons.wikimedia.org"
+  }
+ ]
+}

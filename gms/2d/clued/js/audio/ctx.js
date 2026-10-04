@@ -1,0 +1,100 @@
+// Shared AudioContext, buses and the mobile unlock. sfx, piano and clips all route through here.
+let ctx = null, master = null, sfxBus = null, musicBus = null, comp = null;
+const state = { volume: 0.8, sfx: 1, music: 1, muted: false };
+const unlockCbs = [];
+let unlocked = false;
+
+export function getCtx() {
+  if (ctx) return ctx;
+  const AC = globalThis.AudioContext || globalThis.webkitAudioContext;
+  if (!AC) return null;
+  ctx = new AC({ latencyHint: 'interactive' });
+  comp = ctx.createDynamicsCompressor();
+  comp.threshold.value = -10; comp.knee.value = 8; comp.ratio.value = 4;
+  comp.attack.value = 0.003; comp.release.value = 0.2;
+  master = ctx.createGain();
+  sfxBus = ctx.createGain();
+  musicBus = ctx.createGain();
+  sfxBus.connect(master); musicBus.connect(master);
+  master.connect(comp); comp.connect(ctx.destination);
+  apply();
+  return ctx;
+}
+
+export const buses = () => (getCtx(), { master, sfx: sfxBus, music: musicBus });
+
+function apply() {
+  if (!ctx) return;
+  const t = ctx.currentTime;
+  master.gain.setTargetAtTime(state.muted ? 0 : state.volume, t, 0.02);
+  sfxBus.gain.setTargetAtTime(state.sfx, t, 0.02);
+  musicBus.gain.setTargetAtTime(state.music, t, 0.02);
+}
+
+export function setVolume(v) { state.volume = clamp(v); apply(); }
+export function setSfxVolume(v) { state.sfx = clamp(v); apply(); }
+export function setMusicVolume(v) { state.music = clamp(v); apply(); }
+export function mute(on = true) { state.muted = !!on; apply(); for (const el of document.querySelectorAll?.('audio[data-clued]') || []) el.muted = state.muted; }
+export const isMuted = () => state.muted;
+export const volumes = () => ({ ...state });
+
+// settings object from A: { volume, sfxVolume, musicVolume, muted } (any subset, 0..1 or 0..100)
+export function applySettings(s = {}) {
+  const n = (x) => (x > 1 ? x / 100 : x);
+  if (s.volume != null) state.volume = clamp(n(s.volume));
+  if (s.sfxVolume != null) state.sfx = clamp(n(s.sfxVolume));
+  if (s.musicVolume != null) state.music = clamp(n(s.musicVolume));
+  if (s.muted != null || s.sound != null) state.muted = !!s.muted || s.sound === false;
+  apply();
+}
+
+const clamp = (v) => Math.max(0, Math.min(1, +v || 0));
+
+export function onUnlock(cb) { unlocked ? cb() : unlockCbs.push(cb); }
+export const isUnlocked = () => unlocked && ctx && ctx.state === 'running';
+
+export function unlock() {
+  const c = getCtx();
+  if (!c) return Promise.resolve(false);
+  // a silent one-sample buffer started inside the gesture is what iOS wants
+  try {
+    const b = c.createBuffer(1, 1, 22050), s = c.createBufferSource();
+    s.buffer = b; s.connect(c.destination); s.start(0);
+  } catch {}
+  return c.resume().then(() => {
+    if (!unlocked) { unlocked = true; unlockCbs.splice(0).forEach((f) => { try { f(); } catch {} }); }
+    return true;
+  }).catch(() => false);
+}
+
+// call once at boot; resumes on the first real gesture (and again after iOS interruptions)
+let installed = false;
+export function installUnlock(target = globalThis.document) {
+  if (installed || !target) return;
+  installed = true;
+  const h = () => { unlock(); if (ctx && ctx.state === 'running') ['pointerdown', 'touchend', 'keydown'].forEach((e) => target.removeEventListener(e, h, true)); };
+  ['pointerdown', 'touchend', 'keydown'].forEach((e) => target.addEventListener(e, h, true));
+  target.addEventListener('visibilitychange', () => {
+    if (target.visibilityState === 'visible' && ctx && ctx.state !== 'running' && unlocked) ctx.resume().catch(() => {});
+  });
+}
+if (globalThis.document) installUnlock();
+
+// impulse response for a small, light room (shared by piano and clip reveal)
+let ir = null;
+export function reverbIR() {
+  const c = getCtx();
+  if (ir || !c) return ir;
+  const len = Math.floor(c.sampleRate * 1.6);
+  ir = c.createBuffer(2, len, c.sampleRate);
+  for (let ch = 0; ch < 2; ch++) {
+    const d = ir.getChannelData(ch);
+    let seed = 1234 + ch * 77;
+    for (let i = 0; i < len; i++) {
+      seed = (seed * 16807) % 2147483647;
+      const t = i / len;
+      d[i] = ((seed / 2147483647) * 2 - 1) * Math.pow(1 - t, 3.2) * (i < 200 ? i / 200 : 1);
+    }
+  }
+  return ir;
+}

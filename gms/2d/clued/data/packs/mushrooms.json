@@ -1,0 +1,2062 @@
+{
+ "id": "mushrooms",
+ "title": "Mushrooms & fungi",
+ "theme": "nature",
+ "icon": "🍄",
+ "kids": false,
+ "version": 1,
+ "notice": "Never use this to forage. Many deadly mushrooms look like edible ones. Not for real-world identification.",
+ "leakExempt": [
+  "mushroom",
+  "mushrooms",
+  "fungus",
+  "fungi"
+ ],
+ "factsMeta": {
+  "edibility": {
+   "type": "cat",
+   "label": "Edibility",
+   "values": [
+    "Edible",
+    "Inedible",
+    "Poisonous",
+    "Deadly"
+   ]
+  },
+  "region": {
+   "type": "cat",
+   "label": "Found in"
+  },
+  "glows": {
+   "type": "bool",
+   "label": "Glows in the dark",
+   "yes": "Glows in the dark",
+   "no": "Does not glow"
+  }
+ },
+ "items": [
+  {
+   "id": "death-cap",
+   "name": "Death cap",
+   "sci": "Amanita phalloides",
+   "group": "amanita",
+   "facts": {
+    "edibility": "Deadly",
+    "region": "many parts of the world"
+   },
+   "lookalikes": [
+    "field-mushroom",
+    "destroying-angel",
+    "paddy-straw-mushroom"
+   ],
+   "blurb": "The deadliest mushroom in the world. It causes most mushroom poisoning deaths, and cooking does not make it safe.",
+   "clues": [
+    "Family: Amanitaceae.",
+    "Genus: Amanita.",
+    "It has spread to Australia and North America on the roots of imported trees.",
+    "Symptoms can seem to get better before the liver fails.",
+    "It can kill people who eat it.",
+    "It grows in many parts of the world.",
+    "It has a ring on its stem and a cup-like sac at its base.",
+    "The answer has 2 words (5, 3 letters).",
+    "It starts with the letter D."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/245302130/medium.jpeg",
+      "w": 500,
+      "h": 333,
+      "credit": "Davide Puddu",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/245302130"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/392666373/medium.jpeg",
+      "w": 375,
+      "h": 500,
+      "credit": "Sofia Zvolanek",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/392666373"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/347794788/medium.jpg",
+      "w": 375,
+      "h": 500,
+      "credit": "no rights reserved",
+      "license": "CC0 1.0",
+      "page": "https://www.inaturalist.org/photos/347794788"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "destroying-angel",
+   "name": "Destroying angel",
+   "sci": "Amanita virosa",
+   "group": "amanita",
+   "facts": {
+    "edibility": "Deadly",
+    "region": "Europe"
+   },
+   "lookalikes": [
+    "death-cap",
+    "field-mushroom"
+   ],
+   "blurb": "A pure white, deadly mushroom closely related to the death cap. It is easily mistaken for edible white mushrooms.",
+   "clues": [
+    "Family: Amanitaceae.",
+    "Genus: Amanita.",
+    "It contains the same toxins as the death cap.",
+    "Its gills stay white, unlike a field mushroom's.",
+    "It has a sac-like cup at its base.",
+    "It can kill people who eat it.",
+    "It grows in Europe.",
+    "It is pure white.",
+    "Its name sounds heavenly but deadly.",
+    "The answer has 2 words (10, 5 letters).",
+    "It starts with the letter D."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/338371641/medium.jpg",
+      "w": 358,
+      "h": 500,
+      "credit": "Thierry Arbault",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/338371641"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/736118412/medium.jpg",
+      "w": 375,
+      "h": 500,
+      "credit": "Anita Engler",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/736118412"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/224925218/medium.jpg",
+      "w": 375,
+      "h": 500,
+      "credit": "Виктор",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/224925218"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "fly-agaric",
+   "name": "Fly agaric",
+   "alt": [
+    "fly amanita"
+   ],
+   "sci": "Amanita muscaria",
+   "group": "amanita",
+   "facts": {
+    "edibility": "Poisonous",
+    "region": "the northern hemisphere"
+   },
+   "lookalikes": [
+    "panther-cap"
+   ],
+   "blurb": "The classic red toadstool with white spots, seen in fairy tales and video games. It is poisonous.",
+   "clues": [
+    "It was once broken into milk to kill flies.",
+    "It grows with birch and pine trees.",
+    "Its white spots can wash off in rain.",
+    "It is poisonous.",
+    "It grows in the northern hemisphere.",
+    "It appears in \"Super Mario\" games.",
+    "It is red with white spots.",
+    "The answer has 2 words (3, 6 letters).",
+    "It starts with the letter F."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/448681419/medium.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Borja Fierro",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/448681419"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/59724451/medium.jpeg",
+      "w": 375,
+      "h": 500,
+      "credit": "Drew T Henderson",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/59724451"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/28969484/medium.jpg",
+      "w": 375,
+      "h": 500,
+      "credit": "tlaloc27",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/28969484"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "panther-cap",
+   "name": "Panther cap",
+   "sci": "Amanita pantherina",
+   "group": "amanita",
+   "facts": {
+    "edibility": "Poisonous",
+    "region": "the northern hemisphere"
+   },
+   "lookalikes": [
+    "fly-agaric"
+   ],
+   "blurb": "A brown-capped Amanita with white warts. It is poisonous.",
+   "clues": [
+    "Family: Amanitaceae.",
+    "Genus: Amanita.",
+    "It is a close relative of the fly agaric.",
+    "It has a ring on its stem.",
+    "Its base has a rim like a collar.",
+    "It is poisonous.",
+    "It grows in the northern hemisphere.",
+    "It is named after a spotted big cat.",
+    "The answer has 2 words (7, 3 letters).",
+    "It starts with the letter P."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/29239726/medium.jpeg",
+      "w": 500,
+      "h": 333,
+      "credit": "Davide Puddu",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/29239726"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/18760669/medium.jpeg",
+      "w": 500,
+      "h": 375,
+      "credit": "Alan Rockefeller",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/18760669"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/165670015/medium.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Donald Davesne",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/165670015"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "field-mushroom",
+   "name": "Field mushroom",
+   "alt": [
+    "meadow mushroom"
+   ],
+   "sci": "Agaricus campestris",
+   "group": "agaricus",
+   "facts": {
+    "edibility": "Edible",
+    "region": "many parts of the world"
+   },
+   "lookalikes": [
+    "death-cap",
+    "yellow-stainer",
+    "destroying-angel"
+   ],
+   "blurb": "A white mushroom of grassy fields, related to the button mushroom. Deadly white Amanitas can look similar.",
+   "clues": [
+    "Family: Agaricaceae.",
+    "Genus: Agaricus.",
+    "Deadly white Amanitas can look very similar.",
+    "Its gills turn from pink to chocolate brown.",
+    "It grows in grassy pastures.",
+    "It is eaten as food, but only when expertly identified.",
+    "It grows in many parts of the world.",
+    "It is a close relative of the supermarket mushroom.",
+    "The answer has 2 words (5, 8 letters).",
+    "It starts with the letter F."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/452334488/medium.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "anonymous",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/452334488"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/1196316/medium.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Andreas Kunze",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/1196316"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/84604672/medium.jpeg",
+      "w": 375,
+      "h": 500,
+      "credit": "Kevin Speray",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/84604672"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "button-mushroom",
+   "name": "Button mushroom",
+   "alt": [
+    "white mushroom",
+    "portobello",
+    "chestnut mushroom",
+    "champignon"
+   ],
+   "sci": "Agaricus bisporus",
+   "group": "agaricus",
+   "facts": {
+    "edibility": "Edible",
+    "region": "many parts of the world"
+   },
+   "lookalikes": [
+    "field-mushroom"
+   ],
+   "blurb": "The common supermarket mushroom. White button, chestnut and portobello mushrooms are all the same species.",
+   "clues": [
+    "Family: Agaricaceae.",
+    "Genus: Agaricus.",
+    "It is grown in the dark on compost.",
+    "It is the most farmed mushroom in the world.",
+    "It is eaten as food, but only when expertly identified.",
+    "It grows in many parts of the world.",
+    "It is sold in every supermarket.",
+    "The answer has 2 words (6, 8 letters).",
+    "It starts with the letter B."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/32035053/medium.jpg",
+      "w": 500,
+      "h": 297,
+      "credit": "Adam J. Searcy",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/32035053"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/32035082/medium.jpg",
+      "w": 500,
+      "h": 355,
+      "credit": "Adam J. Searcy",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/32035082"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/6464471/medium.jpeg",
+      "w": 500,
+      "h": 334,
+      "credit": "Alan Rockefeller",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/6464471"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "yellow-stainer",
+   "name": "Yellow stainer",
+   "sci": "Agaricus xanthodermus",
+   "group": "agaricus",
+   "facts": {
+    "edibility": "Poisonous",
+    "region": "many parts of the world"
+   },
+   "lookalikes": [
+    "field-mushroom"
+   ],
+   "blurb": "A poisonous mushroom that looks like a field mushroom but turns bright yellow when scratched and smells of ink.",
+   "clues": [
+    "Family: Agaricaceae.",
+    "Genus: Agaricus.",
+    "It causes many poisonings in Australia.",
+    "It smells of ink or disinfectant.",
+    "It looks like an edible field mushroom.",
+    "It is poisonous.",
+    "It grows in many parts of the world.",
+    "The answer has 2 words (6, 7 letters).",
+    "It starts with the letter Y."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/144785717/medium.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Anisha Kumra",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/144785717"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/533951090/medium.jpg",
+      "w": 375,
+      "h": 500,
+      "credit": "Johan Adler",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/533951090"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/89747424/medium.jpg",
+      "w": 375,
+      "h": 500,
+      "credit": "Виктория Билоус",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/89747424"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "golden-chanterelle",
+   "name": "Golden chanterelle",
+   "alt": [
+    "chanterelle",
+    "girolle"
+   ],
+   "sci": "Cantharellus cibarius",
+   "group": "chanterelle",
+   "facts": {
+    "edibility": "Edible",
+    "region": "Europe"
+   },
+   "lookalikes": [
+    "jack-o-lantern-mushroom"
+   ],
+   "blurb": "A golden, funnel-shaped mushroom with a fruity smell. It has ridges instead of true gills.",
+   "clues": [
+    "Family: Hydnaceae.",
+    "Genus: Cantharellus.",
+    "It smells faintly of apricots.",
+    "It has ridges instead of real gills.",
+    "It is prized by chefs.",
+    "It is eaten as food, but only when expertly identified.",
+    "It grows in Europe.",
+    "It is shaped like a funnel or trumpet.",
+    "The answer has 2 words (6, 11 letters).",
+    "It starts with the letter G."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/78254813/medium.jpg",
+      "w": 333,
+      "h": 500,
+      "credit": "Björn S...",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/78254813"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/430849322/medium.jpeg",
+      "w": 376,
+      "h": 500,
+      "credit": "no rights reserved",
+      "license": "CC0 1.0",
+      "page": "https://www.inaturalist.org/photos/430849322"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/242562705/medium.jpeg",
+      "w": 375,
+      "h": 500,
+      "credit": "Ewa Olchanowska",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/242562705"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "jack-o-lantern-mushroom",
+   "name": "Jack-o'-lantern mushroom",
+   "alt": [
+    "jack-o-lantern"
+   ],
+   "sci": "Omphalotus olearius",
+   "group": "omphalotus",
+   "facts": {
+    "edibility": "Poisonous",
+    "region": "Europe",
+    "glows": true
+   },
+   "lookalikes": [
+    "golden-chanterelle",
+    "ghost-fungus"
+   ],
+   "blurb": "A bright orange, poisonous mushroom that grows in clusters on wood. Its gills glow faintly green in the dark.",
+   "clues": [
+    "Family: Omphalotaceae.",
+    "Genus: Omphalotus.",
+    "Its gills glow faintly green.",
+    "It is often mistaken for chanterelles.",
+    "It grows in clusters on olive and oak wood.",
+    "It is poisonous.",
+    "It grows in Europe.",
+    "It glows in the dark.",
+    "It is bright orange.",
+    "It is named after a carved Halloween pumpkin.",
+    "The answer has 4 words (4, 1, 7, 8 letters).",
+    "It starts with the letter J."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/19072595/medium.jpeg",
+      "w": 500,
+      "h": 333,
+      "credit": "Davide Puddu",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/19072595"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/450819713/medium.jpeg",
+      "w": 500,
+      "h": 375,
+      "credit": "Santiago Martín-Bravo",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/450819713"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/444025588/medium.jpeg",
+      "w": 500,
+      "h": 375,
+      "credit": "zebedeugalinha",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/444025588"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "ghost-fungus",
+   "name": "Ghost fungus",
+   "sci": "Omphalotus nidiformis",
+   "group": "omphalotus",
+   "facts": {
+    "edibility": "Poisonous",
+    "region": "Australia",
+    "glows": true
+   },
+   "lookalikes": [
+    "jack-o-lantern-mushroom"
+   ],
+   "blurb": "An Australian mushroom that glows green in the dark. It is poisonous.",
+   "clues": [
+    "Family: Omphalotaceae.",
+    "Genus: Omphalotus.",
+    "It is related to the jack-o'-lantern mushroom.",
+    "It grows on dead wood in Australian forests.",
+    "It is shaped like a fan.",
+    "It is poisonous.",
+    "It grows in Australia.",
+    "It glows in the dark.",
+    "It glows green at night.",
+    "It is named after a spooky spirit.",
+    "The answer has 2 words (5, 6 letters).",
+    "It starts with the letter G."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/188943/medium.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "tripsis",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/188943"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/106320622/medium.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Konan Farrelly-Horsfall",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/106320622"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/67254683/medium.jpeg",
+      "w": 500,
+      "h": 333,
+      "credit": "no rights reserved",
+      "license": "CC0 1.0",
+      "page": "https://www.inaturalist.org/photos/67254683"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "penny-bun",
+   "name": "Penny bun",
+   "alt": [
+    "porcini",
+    "cep",
+    "king bolete"
+   ],
+   "sci": "Boletus edulis",
+   "group": "bolete",
+   "facts": {
+    "edibility": "Edible",
+    "region": "the northern hemisphere"
+   },
+   "blurb": "A chunky mushroom with a brown cap and sponge-like pores instead of gills. Italians call it porcini.",
+   "clues": [
+    "Its name in Italian means \"piglets\".",
+    "It is sold dried for risotto.",
+    "It has pores like a sponge, not gills.",
+    "It is eaten as food, but only when expertly identified.",
+    "It grows in the northern hemisphere.",
+    "Its cap is brown like a bread roll.",
+    "Its name includes a small coin.",
+    "The answer has 2 words (5, 3 letters).",
+    "It starts with the letter P."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/29239600/medium.jpeg",
+      "w": 500,
+      "h": 333,
+      "credit": "Davide Puddu",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/29239600"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/5731114/medium.jpeg",
+      "w": 375,
+      "h": 500,
+      "credit": "Alan Rockefeller",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/5731114"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/148026039/medium.jpeg",
+      "w": 412,
+      "h": 500,
+      "credit": "Alan Rockefeller",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/148026039"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "shaggy-ink-cap",
+   "name": "Shaggy ink cap",
+   "alt": [
+    "lawyer's wig",
+    "shaggy mane"
+   ],
+   "sci": "Coprinus comatus",
+   "group": "ink cap",
+   "facts": {
+    "edibility": "Edible",
+    "region": "many parts of the world"
+   },
+   "blurb": "A tall, white, shaggy mushroom that melts into black ink as it ages. The ink was once used for writing.",
+   "clues": [
+    "Family: Coprinaceae.",
+    "Genus: Coprinus.",
+    "Its gills melt into a black liquid.",
+    "It is eaten as food, but only when expertly identified.",
+    "It grows in many parts of the world.",
+    "It grows on lawns and roadsides.",
+    "The answer has 3 words (6, 3, 3 letters).",
+    "It starts with the letter S."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/93399523/medium.jpeg",
+      "w": 375,
+      "h": 500,
+      "credit": "Tom Norton",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/93399523"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/379222802/medium.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Thomas Mesaglio",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/379222802"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/181639940/medium.jpeg",
+      "w": 281,
+      "h": 500,
+      "credit": "Lalys",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/181639940"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "giant-puffball",
+   "name": "Giant puffball",
+   "alt": [
+    "puffball"
+   ],
+   "sci": "Calvatia gigantea",
+   "group": "puffball",
+   "facts": {
+    "edibility": "Edible",
+    "region": "the northern hemisphere"
+   },
+   "blurb": "A huge white ball of a mushroom that can grow as big as a football. Old ones release trillions of spores.",
+   "clues": [
+    "Family: Lycoperdaceae.",
+    "Genus: Calvatia.",
+    "One can release trillions of spores.",
+    "It has no cap, gills or stem.",
+    "It can grow as big as a football.",
+    "It is eaten as food, but only when expertly identified.",
+    "It grows in the northern hemisphere.",
+    "It is a big white ball.",
+    "Old ones send out smoky clouds when squeezed.",
+    "The answer has 2 words (5, 8 letters).",
+    "It starts with the letter G."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/77020346/medium.jpeg",
+      "w": 500,
+      "h": 333,
+      "credit": "Yehor Yatsiuk",
+      "license": "CC0 1.0",
+      "page": "https://www.inaturalist.org/photos/77020346"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/3089906/medium.JPG",
+      "w": 500,
+      "h": 375,
+      "credit": "Jacqui Geux",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/3089906"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/66381049/medium.jpg",
+      "w": 500,
+      "h": 445,
+      "credit": "Adam Wilson",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/66381049"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "common-morel",
+   "name": "Common morel",
+   "alt": [
+    "morel",
+    "yellow morel"
+   ],
+   "sci": "Morchella esculenta",
+   "group": "morel",
+   "facts": {
+    "edibility": "Edible",
+    "region": "the northern hemisphere"
+   },
+   "lookalikes": [
+    "false-morel"
+   ],
+   "blurb": "A prized mushroom with a honeycomb-patterned cap. It is hollow inside, unlike the poisonous false morel.",
+   "clues": [
+    "Family: Morchellaceae.",
+    "Genus: Morchella.",
+    "It often appears after forest fires.",
+    "It must always be cooked.",
+    "Its cap is hollow inside.",
+    "It is eaten as food, but only when expertly identified.",
+    "It grows in the northern hemisphere.",
+    "Its cap looks like a honeycomb.",
+    "It is a prized spring mushroom.",
+    "The answer has 2 words (6, 5 letters).",
+    "It starts with the letter C."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/169965177/medium.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Сергей Неклюдов",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/169965177"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/446014878/medium.jpeg",
+      "w": 333,
+      "h": 500,
+      "credit": "no rights reserved",
+      "license": "CC0 1.0",
+      "page": "https://www.inaturalist.org/photos/446014878"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/253067355/medium.jpeg",
+      "w": 375,
+      "h": 500,
+      "credit": "no rights reserved",
+      "license": "CC0 1.0",
+      "page": "https://www.inaturalist.org/photos/253067355"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "false-morel",
+   "name": "False morel",
+   "alt": [
+    "brain mushroom"
+   ],
+   "sci": "Gyromitra esculenta",
+   "group": "morel",
+   "facts": {
+    "edibility": "Deadly",
+    "region": "the northern hemisphere"
+   },
+   "lookalikes": [
+    "common-morel"
+   ],
+   "blurb": "A poisonous lookalike of the morel with a wrinkled, brain-like cap. It contains a toxin related to rocket fuel.",
+   "clues": [
+    "Family: Discinaceae.",
+    "Genus: Gyromitra.",
+    "Its toxin turns into a chemical used in rocket fuel.",
+    "It has been eaten in Finland after special treatment, which is still risky.",
+    "Its cap is not hollow.",
+    "It can kill people who eat it.",
+    "It grows in the northern hemisphere.",
+    "The answer has 2 words (5, 5 letters).",
+    "It starts with the letter F."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/34215523/medium.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "no rights reserved",
+      "license": "CC0 1.0",
+      "page": "https://www.inaturalist.org/photos/34215523"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/18867417/medium.jpg",
+      "w": 375,
+      "h": 500,
+      "credit": "Jeffrey Lee (he/him/his)",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/18867417"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/127810881/medium.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Andrew Melton",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/127810881"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "oyster-mushroom",
+   "name": "Oyster mushroom",
+   "sci": "Pleurotus ostreatus",
+   "group": "oyster",
+   "facts": {
+    "edibility": "Edible",
+    "region": "many parts of the world"
+   },
+   "blurb": "A fan-shaped mushroom that grows in layers on dead trees. It even catches and eats tiny worms.",
+   "clues": [
+    "Family: Pleurotaceae.",
+    "Genus: Pleurotus.",
+    "It traps and digests tiny worms called nematodes.",
+    "It can be grown on coffee grounds.",
+    "It grows in overlapping shelves on wood.",
+    "It is eaten as food, but only when expertly identified.",
+    "It grows in many parts of the world.",
+    "It is a popular farmed mushroom.",
+    "It is shaped like a shellfish.",
+    "The answer has 2 words (6, 8 letters).",
+    "It starts with the letter O."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/34047624/medium.jpg",
+      "w": 375,
+      "h": 500,
+      "credit": "Katja Schulz",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/34047624"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/7573196/medium.jpeg",
+      "w": 500,
+      "h": 281,
+      "credit": "no rights reserved",
+      "license": "CC0 1.0",
+      "page": "https://www.inaturalist.org/photos/7573196"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/24549391/medium.jpeg",
+      "w": 500,
+      "h": 375,
+      "credit": "pinonbistro",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/24549391"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "shiitake",
+   "name": "Shiitake",
+   "sci": "Lentinula edodes",
+   "group": "shiitake",
+   "facts": {
+    "edibility": "Edible",
+    "region": "Asia"
+   },
+   "blurb": "A brown East Asian mushroom grown on logs. It has a rich, savoury taste.",
+   "clues": [
+    "Family: Omphalotaceae.",
+    "Genus: Lentinula.",
+    "It has been farmed in China for about 1,000 years.",
+    "It is grown on oak logs.",
+    "Its name comes from Japanese for a tree it grows on.",
+    "It is eaten as food, but only when expertly identified.",
+    "It grows in Asia.",
+    "It is used in miso soup and stir-fries.",
+    "It is a brown Japanese mushroom.",
+    "The answer is one word of 8 letters.",
+    "It starts with the letter S."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/63629337/medium.jpg",
+      "w": 375,
+      "h": 500,
+      "credit": "Scott Morris",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/63629337"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/263782428/medium.jpeg",
+      "w": 500,
+      "h": 375,
+      "credit": "MUNENORI YAMAKAWA",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/263782428"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/197797714/medium.jpg",
+      "w": 281,
+      "h": 500,
+      "credit": "Atsushi Nakajima",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/197797714"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "enoki",
+   "name": "Enoki",
+   "alt": [
+    "enokitake",
+    "velvet shank"
+   ],
+   "sci": "Flammulina velutipes",
+   "group": "enoki",
+   "facts": {
+    "edibility": "Edible",
+    "region": "Asia"
+   },
+   "blurb": "Farmed enoki are long, thin and white, grown in the dark. Wild ones look very different, with orange caps.",
+   "clues": [
+    "Family: Physalacriaceae.",
+    "Genus: Flammulina.",
+    "It grows even in winter.",
+    "Farmed ones are grown in the dark in bottles.",
+    "It is eaten as food, but only when expertly identified.",
+    "It grows in Asia.",
+    "It is used in hot pot and soup.",
+    "Farmed ones are long, thin and white.",
+    "The answer is one word of 5 letters.",
+    "It starts with the letter E."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/95241/medium.jpg",
+      "w": 333,
+      "h": 500,
+      "credit": "GollyGforce",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/95241"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/95239/medium.jpg",
+      "w": 500,
+      "h": 313,
+      "credit": "Jason Hollinger",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/95239"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/293164118/medium.jpeg",
+      "w": 375,
+      "h": 500,
+      "credit": "no rights reserved",
+      "license": "CC0 1.0",
+      "page": "https://www.inaturalist.org/photos/293164118"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "chicken-of-the-woods",
+   "name": "Chicken of the woods",
+   "alt": [
+    "sulphur shelf"
+   ],
+   "sci": "Laetiporus sulphureus",
+   "group": "bracket",
+   "facts": {
+    "edibility": "Edible",
+    "region": "the northern hemisphere"
+   },
+   "blurb": "A bright orange-yellow bracket fungus that grows in shelves on trees. It is said to taste like chicken.",
+   "clues": [
+    "Family: Laetiporaceae.",
+    "Genus: Laetiporus.",
+    "It can cause stomach upsets in some people.",
+    "It is eaten as food, but only when expertly identified.",
+    "It grows in the northern hemisphere.",
+    "It grows on oak and other trees.",
+    "It is said to taste like a farm bird.",
+    "The answer has 4 words (7, 2, 3, 5 letters).",
+    "It starts with the letter C."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/98944765/medium.jpg",
+      "w": 396,
+      "h": 500,
+      "credit": "no rights reserved",
+      "license": "CC0 1.0",
+      "page": "https://www.inaturalist.org/photos/98944765"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/435866428/medium.jpeg",
+      "w": 500,
+      "h": 375,
+      "credit": "zebedeugalinha",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/435866428"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/24338667/medium.jpeg",
+      "w": 500,
+      "h": 375,
+      "credit": "no rights reserved",
+      "license": "CC0 1.0",
+      "page": "https://www.inaturalist.org/photos/24338667"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "turkey-tail",
+   "name": "Turkey tail",
+   "sci": "Trametes versicolor",
+   "group": "bracket",
+   "facts": {
+    "edibility": "Inedible",
+    "region": "many parts of the world"
+   },
+   "blurb": "A thin bracket fungus with bands of colour, like a fanned-out turkey's tail.",
+   "clues": [
+    "Family: Polyporaceae.",
+    "Genus: Trametes.",
+    "Its species name means \"of several colours\".",
+    "It is one of the most common fungi on dead wood.",
+    "It is too tough to eat.",
+    "It is not good to eat.",
+    "It grows in many parts of the world.",
+    "It has bands of brown, grey and cream.",
+    "The answer has 2 words (6, 4 letters).",
+    "It starts with the letter T."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/27005174/medium.jpg",
+      "w": 467,
+      "h": 500,
+      "credit": "Ken Kneidel",
+      "license": "CC0 1.0",
+      "page": "https://www.inaturalist.org/photos/27005174"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/160331967/medium.jpg",
+      "w": 500,
+      "h": 400,
+      "credit": "Christine Young",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/160331967"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/171501819/medium.jpeg",
+      "w": 500,
+      "h": 375,
+      "credit": "Rick Farwell",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/171501819"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "lions-mane",
+   "name": "Lion's mane",
+   "alt": [
+    "bearded tooth fungus",
+    "pom pom mushroom"
+   ],
+   "sci": "Hericium erinaceus",
+   "group": "tooth fungus",
+   "facts": {
+    "edibility": "Edible",
+    "region": "the northern hemisphere"
+   },
+   "blurb": "A white fungus made of long, dangling spines, like a shaggy mane or a frozen waterfall.",
+   "clues": [
+    "Family: Hericiaceae.",
+    "Genus: Hericium.",
+    "It is rare and protected in Britain.",
+    "It tastes a bit like crab or lobster.",
+    "It grows on old beech and oak trees.",
+    "It is eaten as food, but only when expertly identified.",
+    "It grows in the northern hemisphere.",
+    "It is made of long white dangling spines.",
+    "The answer has 2 words (5, 4 letters).",
+    "It starts with the letter L."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/5885301/medium.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Katja Schulz",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/5885301"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/348556109/medium.jpg",
+      "w": 375,
+      "h": 500,
+      "credit": "Owen VanAntwerpen",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/348556109"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/5466254/medium.jpg",
+      "w": 500,
+      "h": 474,
+      "credit": "Katya",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/5466254"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "common-stinkhorn",
+   "name": "Common stinkhorn",
+   "alt": [
+    "stinkhorn"
+   ],
+   "sci": "Phallus impudicus",
+   "group": "stinkhorn",
+   "facts": {
+    "region": "Europe"
+   },
+   "lookalikes": [
+    "veiled-lady"
+   ],
+   "blurb": "A smelly fungus that hatches from an \"egg\". Its slimy tip smells of rotting meat to attract flies, which spread its spores.",
+   "clues": [
+    "Family: Phallaceae.",
+    "Genus: Phallus.",
+    "It grows out of a jelly-filled \"egg\".",
+    "Flies spread its spores.",
+    "You often smell it before you see it.",
+    "It grows in Europe.",
+    "Its tip is covered in dark green slime.",
+    "It smells awful.",
+    "The answer has 2 words (6, 9 letters).",
+    "It starts with the letter C."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/62455743/medium.jpg",
+      "w": 500,
+      "h": 334,
+      "credit": "Dr. Hans-Günter Wagner",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/62455743"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/75780233/medium.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Björn S...",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/75780233"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/159628472/medium.jpg",
+      "w": 375,
+      "h": 500,
+      "credit": "K Bar",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/159628472"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "collared-earthstar",
+   "name": "Collared earthstar",
+   "alt": [
+    "earthstar"
+   ],
+   "sci": "Geastrum triplex",
+   "group": "earthstar",
+   "facts": {
+    "edibility": "Inedible",
+    "region": "many parts of the world"
+   },
+   "blurb": "A fungus whose outer skin splits into a star shape around a round spore sac.",
+   "clues": [
+    "Family: Geastraceae.",
+    "Genus: Geastrum.",
+    "Raindrops puff its spores out.",
+    "It grows in leaf litter.",
+    "It has a round spore sac in the middle.",
+    "It is not good to eat.",
+    "It grows in many parts of the world.",
+    "It is related to puffballs.",
+    "Its outer layer splits into a star.",
+    "The answer has 2 words (8, 9 letters).",
+    "It starts with the letter C."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/24100061/medium.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "no rights reserved",
+      "license": "CC0 1.0",
+      "page": "https://www.inaturalist.org/photos/24100061"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/139143137/medium.jpeg",
+      "w": 375,
+      "h": 500,
+      "credit": "Cobi Calyx",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/139143137"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/437092767/medium.jpeg",
+      "w": 500,
+      "h": 404,
+      "credit": "no rights reserved",
+      "license": "CC0 1.0",
+      "page": "https://www.inaturalist.org/photos/437092767"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "deadly-webcap",
+   "name": "Deadly webcap",
+   "sci": "Cortinarius rubellus",
+   "group": "webcap",
+   "facts": {
+    "edibility": "Deadly",
+    "region": "Europe"
+   },
+   "blurb": "A rusty-orange mushroom whose poison destroys the kidneys. Symptoms can take up to three weeks to appear.",
+   "clues": [
+    "Family: Cortinariaceae.",
+    "Genus: Cortinarius.",
+    "Symptoms can take two to three weeks to appear.",
+    "Its poison attacks the kidneys.",
+    "Young ones have a cobweb-like veil.",
+    "It can kill people who eat it.",
+    "It grows in Europe.",
+    "It grows in pine forests.",
+    "It is rusty orange and very poisonous.",
+    "The answer has 2 words (6, 6 letters).",
+    "It starts with the letter D."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/93384549/medium.jpg",
+      "w": 500,
+      "h": 463,
+      "credit": "Albert Cardona",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/93384549"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/297778015/medium.jpeg",
+      "w": 500,
+      "h": 375,
+      "credit": "Justin Paulin",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/297778015"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/315854468/medium.jpg",
+      "w": 375,
+      "h": 500,
+      "credit": "wkee4ager",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/315854468"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "funeral-bell",
+   "name": "Funeral bell",
+   "sci": "Galerina marginata",
+   "group": "galerina",
+   "facts": {
+    "edibility": "Deadly",
+    "region": "many parts of the world"
+   },
+   "blurb": "A small brown mushroom on rotting wood that contains the same deadly toxins as the death cap.",
+   "clues": [
+    "Family: Hymenogastraceae.",
+    "Genus: Galerina.",
+    "It contains the same toxins as the death cap.",
+    "It grows on rotting wood.",
+    "It is a small brown mushroom.",
+    "It can kill people who eat it.",
+    "It grows in many parts of the world.",
+    "It has a ring on its stem.",
+    "Its name is linked to a burial.",
+    "The answer has 2 words (7, 4 letters).",
+    "It starts with the letter F."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/456769231/medium.jpg",
+      "w": 333,
+      "h": 500,
+      "credit": "Alan Rockefeller",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/456769231"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/456762435/medium.jpg",
+      "w": 333,
+      "h": 500,
+      "credit": "Alan Rockefeller",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/456762435"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/584244172/medium.jpg",
+      "w": 375,
+      "h": 500,
+      "credit": "Alan Rockefeller",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/584244172"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "honey-fungus",
+   "name": "Honey fungus",
+   "sci": "Armillaria mellea",
+   "group": "armillaria",
+   "facts": {
+    "edibility": "Edible",
+    "region": "the northern hemisphere"
+   },
+   "blurb": "A clump-forming fungus that attacks trees. A related species in Oregon is one of the largest living things on Earth.",
+   "clues": [
+    "Family: Physalacriaceae.",
+    "Genus: Armillaria.",
+    "A relative in Oregon covers nearly 10 square kilometres.",
+    "Its black root-like strands are called bootlaces.",
+    "It kills trees and shrubs in gardens.",
+    "It is eaten as food, but only when expertly identified.",
+    "It grows in the northern hemisphere.",
+    "It grows in big clumps.",
+    "Its cap is the colour of a sweet bee product.",
+    "The answer has 2 words (5, 6 letters).",
+    "It starts with the letter H."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/10028/medium.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Nathan Wilson",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/10028"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/335390229/medium.jpeg",
+      "w": 500,
+      "h": 375,
+      "credit": "Davide Puddu",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/335390229"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/53423123/medium.jpeg",
+      "w": 500,
+      "h": 375,
+      "credit": "Davide Puddu",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/53423123"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "sulphur-tuft",
+   "name": "Sulphur tuft",
+   "sci": "Hypholoma fasciculare",
+   "group": "hypholoma",
+   "facts": {
+    "edibility": "Poisonous",
+    "region": "the northern hemisphere"
+   },
+   "blurb": "A bitter, poisonous mushroom that grows in big yellow clumps on dead wood.",
+   "clues": [
+    "Family: Strophariaceae.",
+    "Genus: Hypholoma.",
+    "It tastes very bitter.",
+    "Its gills turn from yellow to greenish to dark.",
+    "It grows in big clumps on stumps.",
+    "It is poisonous.",
+    "It grows in the northern hemisphere.",
+    "It is very common.",
+    "The answer has 2 words (7, 4 letters).",
+    "It starts with the letter S."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/109907882/medium.jpeg",
+      "w": 375,
+      "h": 500,
+      "credit": "Alan Rockefeller",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/109907882"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/147869406/medium.jpeg",
+      "w": 500,
+      "h": 375,
+      "credit": "Rand Workman",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/147869406"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/226164232/medium.jpeg",
+      "w": 281,
+      "h": 500,
+      "credit": "Alan Rockefeller",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/226164232"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "amethyst-deceiver",
+   "name": "Amethyst deceiver",
+   "sci": "Laccaria amethystina",
+   "group": "laccaria",
+   "facts": {
+    "edibility": "Edible",
+    "region": "the northern hemisphere"
+   },
+   "blurb": "A small, bright purple mushroom that fades as it dries out, making it hard to recognise.",
+   "clues": [
+    "Family: Hydnangiaceae.",
+    "Genus: Laccaria.",
+    "It can soak up arsenic from soil.",
+    "Its colour fades as it dries.",
+    "It grows in woodland leaf litter.",
+    "It is eaten as food, but only when expertly identified.",
+    "It grows in the northern hemisphere.",
+    "It is bright violet.",
+    "It is named after a purple gemstone.",
+    "The answer has 2 words (8, 8 letters).",
+    "It starts with the letter A."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/100850899/medium.jpeg",
+      "w": 500,
+      "h": 375,
+      "credit": "Christian Berg",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/100850899"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/535944120/medium.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Wolfgang Wollschweber",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/535944120"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/535944140/medium.jpg",
+      "w": 333,
+      "h": 500,
+      "credit": "Björn S...",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/535944140"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "scarlet-elf-cup",
+   "name": "Scarlet elf cup",
+   "sci": "Sarcoscypha austriaca",
+   "group": "cup fungus",
+   "facts": {
+    "region": "the northern hemisphere"
+   },
+   "blurb": "A bright red, cup-shaped fungus that grows on mossy fallen twigs in winter and early spring.",
+   "clues": [
+    "Family: Sarcoscyphaceae.",
+    "Genus: Sarcoscypha.",
+    "It grows on mossy twigs.",
+    "It appears in winter and early spring.",
+    "It can puff out clouds of spores.",
+    "It grows in the northern hemisphere.",
+    "The answer has 3 words (7, 3, 3 letters).",
+    "It starts with the letter S."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/353955610/medium.jpeg",
+      "w": 500,
+      "h": 333,
+      "credit": "Björn Sothmann",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/353955610"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/187068177/medium.jpeg",
+      "w": 500,
+      "h": 375,
+      "credit": "Lena Perova",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/187068177"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/625720192/medium.jpg",
+      "w": 500,
+      "h": 451,
+      "credit": "Jerry Lanfear",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/625720192"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "parasol-mushroom",
+   "name": "Parasol mushroom",
+   "alt": [
+    "parasol"
+   ],
+   "sci": "Macrolepiota procera",
+   "group": "parasol",
+   "facts": {
+    "edibility": "Edible",
+    "region": "the northern hemisphere"
+   },
+   "blurb": "A tall mushroom with a wide, scaly cap like an umbrella. Its stem has a snakeskin pattern.",
+   "clues": [
+    "Family: Agaricaceae.",
+    "Genus: Macrolepiota.",
+    "Its ring can slide up and down the stem.",
+    "Its stem has a snakeskin pattern.",
+    "Its cap can be 30 cm across.",
+    "It is eaten as food, but only when expertly identified.",
+    "It grows in the northern hemisphere.",
+    "It is very tall.",
+    "Its cap opens like an umbrella.",
+    "The answer has 2 words (7, 8 letters).",
+    "It starts with the letter P."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/440636205/medium.jpeg",
+      "w": 375,
+      "h": 500,
+      "credit": "Lucian Clanet",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/440636205"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/24258524/medium.jpg",
+      "w": 375,
+      "h": 500,
+      "credit": "Andreas Rockstein",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/24258524"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/11157407/medium.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Kostas Zontanos",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/11157407"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "veiled-lady",
+   "name": "Veiled lady",
+   "alt": [
+    "bamboo fungus",
+    "long net stinkhorn"
+   ],
+   "sci": "Phallus indusiatus",
+   "group": "stinkhorn",
+   "facts": {
+    "edibility": "Edible",
+    "region": "Asia"
+   },
+   "lookalikes": [
+    "common-stinkhorn"
+   ],
+   "blurb": "A tropical stinkhorn with a lacy white \"skirt\" hanging from its cap. It is eaten in Chinese cooking.",
+   "clues": [
+    "Family: Phallaceae.",
+    "Genus: Phallus.",
+    "It is eaten in Chinese cooking.",
+    "Its cap is covered in smelly slime.",
+    "It grows in tropical forests.",
+    "It is eaten as food, but only when expertly identified.",
+    "It grows in Asia.",
+    "The answer has 2 words (6, 4 letters).",
+    "It starts with the letter V."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/59888418/medium.jpg",
+      "w": 366,
+      "h": 500,
+      "credit": "Oleg Kosterin",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/59888418"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/82737507/medium.jpeg",
+      "w": 375,
+      "h": 500,
+      "credit": "Carlos Funes",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/82737507"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/182681757/medium.jpg",
+      "w": 375,
+      "h": 500,
+      "credit": "no rights reserved",
+      "license": "CC0 1.0",
+      "page": "https://www.inaturalist.org/photos/182681757"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "bleeding-tooth-fungus",
+   "name": "Bleeding tooth fungus",
+   "sci": "Hydnellum peckii",
+   "group": "tooth fungus",
+   "facts": {
+    "edibility": "Inedible",
+    "region": "the northern hemisphere"
+   },
+   "blurb": "A white fungus that oozes drops of bright red liquid, like strawberry jam or blood.",
+   "clues": [
+    "Family: Boletopsidaceae.",
+    "Genus: Hydnellum.",
+    "It is nicknamed \"strawberries and cream\".",
+    "It has spines instead of gills.",
+    "It is too bitter to eat.",
+    "It is not good to eat.",
+    "It grows in the northern hemisphere.",
+    "It oozes red drops.",
+    "The answer has 3 words (8, 5, 6 letters).",
+    "It starts with the letter B."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/110612066/medium.jpg",
+      "w": 396,
+      "h": 500,
+      "credit": "Morten Ross",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/110612066"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/367736191/medium.jpeg",
+      "w": 375,
+      "h": 500,
+      "credit": "Mandy Hackney",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/367736191"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/178347211/medium.jpeg",
+      "w": 500,
+      "h": 374,
+      "credit": "Alan Rockefeller",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/178347211"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "indigo-milk-cap",
+   "name": "Indigo milk cap",
+   "sci": "Lactarius indigo",
+   "group": "milk cap",
+   "facts": {
+    "edibility": "Edible",
+    "region": "North America"
+   },
+   "blurb": "A rare bright blue mushroom that oozes blue \"milk\" when cut. It is sold in markets in Mexico.",
+   "clues": [
+    "Family: Russulaceae.",
+    "Genus: Lactarius.",
+    "It is sold in Mexican markets.",
+    "It oozes blue liquid when cut.",
+    "It turns green where bruised.",
+    "It is eaten as food, but only when expertly identified.",
+    "It grows in North America.",
+    "It is one of very few blue mushrooms.",
+    "It is a deep blue colour.",
+    "The answer has 3 words (6, 4, 3 letters).",
+    "It starts with the letter I."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/160173001/medium.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Elliott Gordon",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/160173001"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/91024329/medium.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Annie Weissman",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/91024329"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/1378641/medium.JPG",
+      "w": 500,
+      "h": 375,
+      "credit": "Iván Cumpián",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/1378641"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "paddy-straw-mushroom",
+   "name": "Paddy straw mushroom",
+   "alt": [
+    "straw mushroom"
+   ],
+   "sci": "Volvariella volvacea",
+   "group": "volvariella",
+   "facts": {
+    "edibility": "Edible",
+    "region": "Asia"
+   },
+   "lookalikes": [
+    "death-cap"
+   ],
+   "blurb": "A mushroom grown on rice straw in Asia. Young ones look dangerously like death caps.",
+   "clues": [
+    "Family: Volvariellaceae.",
+    "Genus: Volvariella.",
+    "Immigrants have been poisoned mistaking death caps for it.",
+    "Young ones are egg-shaped.",
+    "It is eaten as food, but only when expertly identified.",
+    "It grows in Asia.",
+    "It is used in Asian cooking.",
+    "It is grown in rice fields.",
+    "The answer has 3 words (5, 5, 8 letters).",
+    "It starts with the letter P."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/394451734/medium.jpeg",
+      "w": 500,
+      "h": 375,
+      "credit": "Kurt Miller",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/394451734"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/259047619/medium.jpeg",
+      "w": 500,
+      "h": 381,
+      "credit": "Kurt Miller",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/259047619"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/259009871/medium.jpeg",
+      "w": 375,
+      "h": 500,
+      "credit": "Kurt Miller",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/259009871"
+     }
+    ]
+   },
+   "difficulty": 3
+  }
+ ],
+ "questions": [
+  {
+   "id": "q1",
+   "kind": "tf",
+   "prompt": "A mushroom is a kind of plant.",
+   "answer": false,
+   "explain": "Fungi are a separate kingdom; they cannot make food from sunlight.",
+   "difficulty": 1
+  },
+  {
+   "id": "q2",
+   "kind": "mc",
+   "prompt": "Which mushroom causes the most deaths from mushroom poisoning?",
+   "answer": "Death cap",
+   "wrong": [
+    "Fly agaric",
+    "Button mushroom",
+    "Giant puffball"
+   ],
+   "explain": "Its toxins destroy the liver, and cooking does not remove them.",
+   "difficulty": 1
+  },
+  {
+   "id": "q3",
+   "kind": "tf",
+   "prompt": "Cooking a death cap makes it safe to eat.",
+   "answer": false,
+   "explain": "Its amatoxins are not destroyed by heat.",
+   "difficulty": 2
+  },
+  {
+   "id": "q4",
+   "kind": "mc",
+   "prompt": "Which red mushroom with white spots appears in fairy tales and \"Super Mario\"?",
+   "answer": "Fly agaric",
+   "wrong": [
+    "Death cap",
+    "Chanterelle",
+    "Shiitake"
+   ],
+   "explain": "It is poisonous despite its friendly look.",
+   "difficulty": 1
+  },
+  {
+   "id": "q5",
+   "kind": "mc",
+   "prompt": "What do mushrooms release to make new fungi?",
+   "answer": "Spores",
+   "wrong": [
+    "Seeds",
+    "Eggs",
+    "Pollen"
+   ],
+   "explain": "Spores are tiny and spread by wind, water and animals.",
+   "difficulty": 1
+  },
+  {
+   "id": "q6",
+   "kind": "mc",
+   "prompt": "Portobello, chestnut and white button mushrooms are all…",
+   "answer": "The same species",
+   "wrong": [
+    "Different poisonous species",
+    "Kinds of truffle",
+    "Grown on trees"
+   ],
+   "explain": "They are ages and strains of Agaricus bisporus.",
+   "difficulty": 2
+  },
+  {
+   "id": "q7",
+   "kind": "mc",
+   "prompt": "Which antibiotic was first discovered in a mould, a kind of fungus?",
+   "answer": "Penicillin",
+   "wrong": [
+    "Aspirin",
+    "Insulin",
+    "Paracetamol"
+   ],
+   "explain": "Alexander Fleming noticed it in 1928.",
+   "difficulty": 2
+  },
+  {
+   "id": "q8",
+   "kind": "mc",
+   "prompt": "Which fungus helps bread dough rise?",
+   "answer": "Yeast",
+   "wrong": [
+    "Mould",
+    "Mushroom spores",
+    "Lichen"
+   ],
+   "explain": "Yeast gives off carbon dioxide bubbles.",
+   "difficulty": 1
+  },
+  {
+   "id": "q9",
+   "kind": "mc",
+   "prompt": "One of the largest living things on Earth is a honey fungus in which US state?",
+   "answer": "Oregon",
+   "wrong": [
+    "Texas",
+    "Florida",
+    "Alaska"
+   ],
+   "explain": "It spreads underground across nearly 10 square kilometres.",
+   "difficulty": 3
+  },
+  {
+   "id": "q10",
+   "kind": "tf",
+   "prompt": "Some mushrooms glow in the dark.",
+   "answer": true,
+   "explain": "Ghost fungus and jack-o'-lantern mushrooms are bioluminescent.",
+   "difficulty": 1
+  }
+ ],
+ "fakes": [
+  "Silver bell cap",
+  "Crimson moon puffball",
+  "Golden widow's veil",
+  "Northern glass morel",
+  "Spotted thunder bolete",
+  "Velvet ghost chanterelle"
+ ],
+ "sources": [
+  {
+   "name": "iNaturalist",
+   "url": "https://www.inaturalist.org"
+  },
+  {
+   "name": "Wikidata",
+   "url": "https://www.wikidata.org"
+  }
+ ]
+}

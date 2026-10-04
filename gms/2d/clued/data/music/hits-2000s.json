@@ -1,0 +1,1814 @@
+{
+ "id": "hits-2000s",
+ "title": "Hits of the 2000s",
+ "theme": "music",
+ "icon": "📱",
+ "kids": false,
+ "version": 1,
+ "notice": "30-second previews stream from Apple Music.",
+ "factsMeta": {
+  "artist": {
+   "type": "cat",
+   "label": "Artist"
+  },
+  "year": {
+   "type": "year",
+   "label": "Released",
+   "higherLabel": "Newer"
+  },
+  "decade": {
+   "type": "cat",
+   "label": "Decade"
+  }
+ },
+ "items": [
+  {
+   "id": "breathe-faith-hill",
+   "name": "Breathe",
+   "group": "1990s",
+   "facts": {
+    "artist": "Faith Hill",
+    "year": 1999,
+    "decade": "1990s"
+   },
+   "blurb": "\"Breathe\" by Faith Hill, released in 1999.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/1c/3d/e1/1c3de12f-bffb-a854-5db6-f7793920ca09/mzaf_15487578874960967185.plus.aac.p.m4a",
+      "credit": "Faith Hill: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/breathe/321981503?i=321981540&uo=4",
+      "apple": {
+       "trackId": 321981540,
+       "url": "https://music.apple.com/us/album/breathe/321981503?i=321981540&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music114/v4/d2/81/53/d281539a-05d9-c2c0-8c7e-457cab47ed7b/mzi.ltpnekph.jpg/300x300bb.jpg",
+       "term": "Faith Hill Breathe"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "maria-maria-santana",
+   "name": "Maria Maria",
+   "group": "1990s",
+   "facts": {
+    "artist": "Santana",
+    "year": 1999,
+    "decade": "1990s"
+   },
+   "blurb": "\"Maria Maria\" by Santana, released in 1999.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/33/a0/f8/33a0f89e-4d1e-44a3-5b29-07629f62e22a/mzaf_10671385530310908346.plus.aac.p.m4a",
+      "credit": "Santana: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/maria-maria-feat-the-product-g-b/1726954467?i=1726954846&uo=4",
+      "apple": {
+       "trackId": 1726954846,
+       "url": "https://music.apple.com/us/album/maria-maria-feat-the-product-g-b/1726954467?i=1726954846&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music116/v4/20/31/8f/20318f92-bfc3-452e-1d1f-95a86366afc3/196871785426.jpg/300x300bb.jpg",
+       "term": "Santana Maria Maria"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "say-my-name-destinys-child",
+   "name": "Say My Name",
+   "group": "2000s",
+   "facts": {
+    "artist": "Destiny's Child",
+    "year": 2000,
+    "decade": "2000s"
+   },
+   "blurb": "\"Say My Name\" by Destiny's Child, released in 2000.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/05/ef/f6/05eff600-67a3-b51c-0308-d60bec096e24/mzaf_2579965979958664714.plus.aac.p.m4a",
+      "credit": "Destiny's Child: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/say-my-name-feat-kobe-bryant/400079116?i=400079143&uo=4",
+      "apple": {
+       "trackId": 400079143,
+       "url": "https://music.apple.com/us/album/say-my-name-feat-kobe-bryant/400079116?i=400079143&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music114/v4/17/1c/38/171c3806-789a-0ed1-6c71-ee077c7034de/mzi.dfdgaaof.jpg/300x300bb.jpg",
+       "term": "Destiny's Child Say My Name"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "oops-i-did-it-again-britney-spears",
+   "name": "Oops!...I Did It Again",
+   "group": "2000s",
+   "facts": {
+    "artist": "Britney Spears",
+    "year": 2000,
+    "decade": "2000s"
+   },
+   "blurb": "\"Oops!...I Did It Again\" by Britney Spears, released in 2000.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/ee/54/be/ee54be67-0fa0-2f64-75de-04b24ca169d5/mzaf_3093554389572572879.plus.aac.p.m4a",
+      "credit": "Britney Spears: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/oops-i-did-it-again/1806140818?i=1806140836&uo=4",
+      "apple": {
+       "trackId": 1806140836,
+       "url": "https://music.apple.com/us/album/oops-i-did-it-again/1806140818?i=1806140836&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/47/da/47/47da4771-8d83-980a-b323-1379f56f1c19/196872956641.jpg/300x300bb.jpg",
+       "term": "Britney Spears Oops!...I Did It Again"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "bye-bye-bye-nsync",
+   "name": "Bye Bye Bye",
+   "group": "2000s",
+   "facts": {
+    "artist": "*NSYNC",
+    "year": 2000,
+    "decade": "2000s"
+   },
+   "blurb": "\"Bye Bye Bye\" by *NSYNC, released in 2000.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/6a/a8/c2/6aa8c264-c7f8-5db7-4b52-808abf96156d/mzaf_15046152716316545247.plus.aac.p.m4a",
+      "credit": "*NSYNC: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/bye-bye-bye/303171298?i=303171368&uo=4",
+      "apple": {
+       "trackId": 303171368,
+       "url": "https://music.apple.com/us/album/bye-bye-bye/303171298?i=303171368&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/36/22/d6/3622d665-873c-57b8-392b-971292e6086f/012414170224.jpg/300x300bb.jpg",
+       "term": "*NSYNC Bye Bye Bye"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "music-madonna",
+   "name": "Music",
+   "group": "2000s",
+   "facts": {
+    "artist": "Madonna",
+    "year": 2000,
+    "decade": "2000s"
+   },
+   "blurb": "\"Music\" by Madonna, released in 2000.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/1c/d0/ed/1cd0ed64-558f-cd5d-bd52-467864112e30/mzaf_4293835052691265094.plus.aac.p.m4a",
+      "credit": "Madonna: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/music/80815197?i=80815173&uo=4",
+      "apple": {
+       "trackId": 80815173,
+       "url": "https://music.apple.com/us/album/music/80815197?i=80815173&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music123/v4/1c/46/da/1c46da55-6dff-2c58-837e-bdd419ff9ca8/093624759829.jpg/300x300bb.jpg",
+       "term": "Madonna Music"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "its-my-life-bon-jovi",
+   "name": "It's My Life",
+   "group": "2000s",
+   "facts": {
+    "artist": "Bon Jovi",
+    "year": 2000,
+    "decade": "2000s"
+   },
+   "blurb": "\"It's My Life\" by Bon Jovi, released in 2000.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/52/db/ba/52dbbae8-6257-b531-84e4-7fe34b6f690e/mzaf_6964344532418113264.plus.aac.p.m4a",
+      "credit": "Bon Jovi: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/its-my-life/1440813234?i=1440813250&uo=4",
+      "apple": {
+       "trackId": 1440813250,
+       "url": "https://music.apple.com/us/album/its-my-life/1440813234?i=1440813250&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/d5/ad/05/d5ad0586-8108-8da1-6017-3e915f26ad0b/14UMGIM44520.rgb.jpg/300x300bb.jpg",
+       "term": "Bon Jovi It's My Life"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "who-let-the-dogs-out-baha-men",
+   "name": "Who Let the Dogs Out",
+   "group": "2000s",
+   "facts": {
+    "artist": "Baha Men",
+    "year": 2000,
+    "decade": "2000s"
+   },
+   "blurb": "\"Who Let the Dogs Out\" by Baha Men, released in 2000.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/06/f3/e1/06f3e17f-51ca-6ab9-b994-e2052329925a/mzaf_1294416854126703238.plus.aac.p.m4a",
+      "credit": "Baha Men: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/who-let-the-dogs-out/723351610?i=723351644&uo=4",
+      "apple": {
+       "trackId": 723351644,
+       "url": "https://music.apple.com/us/album/who-let-the-dogs-out/723351610?i=723351644&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music122/v4/0b/37/10/0b3710e7-f427-939f-88b2-56ec186a6f03/13UABIM51494.rgb.jpg/300x300bb.jpg",
+       "term": "Baha Men Who Let the Dogs Out"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "hanging-by-a-moment-lifehouse",
+   "name": "Hanging by a Moment",
+   "group": "2000s",
+   "facts": {
+    "artist": "Lifehouse",
+    "year": 2000,
+    "decade": "2000s"
+   },
+   "blurb": "\"Hanging by a Moment\" by Lifehouse, released in 2000.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/71/77/26/717726bb-83d9-7bcf-225f-e90eff938512/mzaf_16194409436323072836.plus.aac.p.m4a",
+      "credit": "Lifehouse: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/hanging-by-a-moment/1440768163?i=1440768181&uo=4",
+      "apple": {
+       "trackId": 1440768181,
+       "url": "https://music.apple.com/us/album/hanging-by-a-moment/1440768163?i=1440768181&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music125/v4/28/f1/1f/28f11f2c-bea1-7b4f-a872-1d25c61086ef/00602527333472.rgb.jpg/300x300bb.jpg",
+       "term": "Lifehouse Hanging By a Moment"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "fallin-alicia-keys",
+   "name": "Fallin'",
+   "group": "2000s",
+   "facts": {
+    "artist": "Alicia Keys",
+    "year": 2001,
+    "decade": "2000s"
+   },
+   "blurb": "\"Fallin'\" by Alicia Keys, released in 2001.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/39/22/91/392291b5-39f1-8189-3a9b-924361e70776/mzaf_5017281125172140671.plus.aac.p.m4a",
+      "credit": "Alicia Keys: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/fallin/256936779?i=256937038&uo=4",
+      "apple": {
+       "trackId": 256937038,
+       "url": "https://music.apple.com/us/album/fallin/256936779?i=256937038&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music125/v4/bb/4d/55/bb4d552c-04d8-29ba-1b41-6ff8bcd199a5/808132000222.jpg/300x300bb.jpg",
+       "term": "Alicia Keys Fallin'"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "lady-marmalade-christina-aguilera-lil-kim-mya-and-p-nk",
+   "name": "Lady Marmalade",
+   "group": "2000s",
+   "facts": {
+    "artist": "Christina Aguilera, Lil' Kim, Mýa & P!nk",
+    "year": 2001,
+    "decade": "2000s"
+   },
+   "blurb": "\"Lady Marmalade\" by Christina Aguilera, Lil' Kim, Mýa & P!nk, released in 2001.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/df/ef/93/dfef93eb-90af-a354-eeeb-f758ad8f6a4a/mzaf_6059651279792556902.plus.aac.p.m4a",
+      "credit": "Christina Aguilera, Lil' Kim, Mýa & P!nk: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/lady-marmalade/1440845640?i=1440845801&uo=4",
+      "apple": {
+       "trackId": 1440845801,
+       "url": "https://music.apple.com/us/album/lady-marmalade/1440845640?i=1440845801&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music125/v4/58/7c/e1/587ce150-44d9-e1fa-966c-18b72cd666ac/00602547876706.rgb.jpg/300x300bb.jpg",
+       "term": "Christina Aguilera, Lil' Kim, Mýa & P!nk Lady Marmalade"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "independent-women-pt-1-destinys-child",
+   "name": "Independent Women, Pt. 1",
+   "group": "2000s",
+   "facts": {
+    "artist": "Destiny's Child",
+    "year": 2000,
+    "decade": "2000s"
+   },
+   "blurb": "\"Independent Women, Pt. 1\" by Destiny's Child, released in 2000.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/39/a2/ce/39a2ce45-09d0-1f71-41cc-cd034b361251/mzaf_965337791333781365.plus.aac.p.m4a",
+      "credit": "Destiny's Child: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/independent-women-pt-1/217363241?i=217363246&uo=4",
+      "apple": {
+       "trackId": 217363246,
+       "url": "https://music.apple.com/us/album/independent-women-pt-1/217363241?i=217363246&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music/67/1c/f9/mzi.giffxgjz.jpg/300x300bb.jpg",
+       "term": "Destiny's Child Independent Women, Pt. 1"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "cant-get-you-out-of-my-head-kylie-minogue",
+   "name": "Can't Get You Out of My Head",
+   "group": "2000s",
+   "facts": {
+    "artist": "Kylie Minogue",
+    "year": 2001,
+    "decade": "2000s"
+   },
+   "blurb": "\"Can't Get You Out of My Head\" by Kylie Minogue, released in 2001.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/61/4d/37/614d37a5-4ee8-48aa-c302-3550a2abf0e0/mzaf_2068714512784676202.plus.aac.p.m4a",
+      "credit": "Kylie Minogue: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/cant-get-you-out-of-my-head/726320287?i=726320692&uo=4",
+      "apple": {
+       "trackId": 726320692,
+       "url": "https://music.apple.com/us/album/cant-get-you-out-of-my-head/726320287?i=726320692&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Features115/v4/2d/27/f4/2d27f445-abf6-f360-f56a-683b65c9b842/dj.hhpuvuwv.jpg/300x300bb.jpg",
+       "term": "Kylie Minogue Can't Get You Out of My Head"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "how-you-remind-me-nickelback",
+   "name": "How You Remind Me",
+   "group": "2000s",
+   "facts": {
+    "artist": "Nickelback",
+    "year": 2001,
+    "decade": "2000s"
+   },
+   "blurb": "\"How You Remind Me\" by Nickelback, released in 2001.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/72/41/33/72413329-4f11-13af-ffa2-70c3280d56df/mzaf_6227722515418295262.plus.aac.p.m4a",
+      "credit": "Nickelback: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/how-you-remind-me/214475427?i=214475478&uo=4",
+      "apple": {
+       "trackId": 214475478,
+       "url": "https://music.apple.com/us/album/how-you-remind-me/214475427?i=214475478&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/ad/16/b7/ad16b7c9-2779-d2e5-0fca-83aeff09f4b6/mzi.exqcjkkz.jpg/300x300bb.jpg",
+       "term": "Nickelback How You Remind Me"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "hot-in-herre-nelly",
+   "name": "Hot in Herre",
+   "group": "2000s",
+   "facts": {
+    "artist": "Nelly",
+    "year": 2002,
+    "decade": "2000s"
+   },
+   "blurb": "\"Hot in Herre\" by Nelly, released in 2002.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/e0/1f/f3/e01ff398-5b46-58d8-eced-e4bf715dca33/mzaf_552008469913377827.plus.aac.p.m4a",
+      "credit": "Nelly: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/hot-in-herre/1440735154?i=1440735156&uo=4",
+      "apple": {
+       "trackId": 1440735156,
+       "url": "https://music.apple.com/us/album/hot-in-herre/1440735154?i=1440735156&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/37/35/62/373562e8-ab69-254b-bbf2-f1cb9aca66fe/06UMGIM16889.rgb.jpg/300x300bb.jpg",
+       "term": "Nelly Hot in Herre"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "dilemma-nelly-and-kelly-rowland",
+   "name": "Dilemma",
+   "group": "2000s",
+   "facts": {
+    "artist": "Nelly & Kelly Rowland",
+    "year": 2002,
+    "decade": "2000s"
+   },
+   "blurb": "\"Dilemma\" by Nelly & Kelly Rowland, released in 2002.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/09/fb/c9/09fbc90d-0900-3164-bd6b-dcb3aff01238/mzaf_1722221375269571338.plus.aac.p.m4a",
+      "credit": "Nelly & Kelly Rowland: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/dilemma-feat-kelly-rowland/1440735154?i=1440735612&uo=4",
+      "apple": {
+       "trackId": 1440735612,
+       "url": "https://music.apple.com/us/album/dilemma-feat-kelly-rowland/1440735154?i=1440735612&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/37/35/62/373562e8-ab69-254b-bbf2-f1cb9aca66fe/06UMGIM16889.rgb.jpg/300x300bb.jpg",
+       "term": "Nelly Dilemma"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "a-thousand-miles-vanessa-carlton",
+   "name": "A Thousand Miles",
+   "group": "2000s",
+   "facts": {
+    "artist": "Vanessa Carlton",
+    "year": 2002,
+    "decade": "2000s"
+   },
+   "blurb": "\"A Thousand Miles\" by Vanessa Carlton, released in 2002.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/63/38/40/633840d8-8ee4-dc75-96e5-acd71162cb8e/mzaf_9113523502409433892.plus.aac.p.m4a",
+      "credit": "Vanessa Carlton: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/a-thousand-miles/1440865939?i=1440865959&uo=4",
+      "apple": {
+       "trackId": 1440865959,
+       "url": "https://music.apple.com/us/album/a-thousand-miles/1440865939?i=1440865959&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/ca/a3/28/caa328ee-6aab-34cb-5ddd-30092599dfbd/06UMGIM22940.rgb.jpg/300x300bb.jpg",
+       "term": "Vanessa Carlton A Thousand Miles"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "complicated-avril-lavigne",
+   "name": "Complicated",
+   "group": "2000s",
+   "facts": {
+    "artist": "Avril Lavigne",
+    "year": 2002,
+    "decade": "2000s"
+   },
+   "blurb": "\"Complicated\" by Avril Lavigne, released in 2002.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/d5/82/55/d58255cd-4bd1-c339-1584-591e9d1305ee/mzaf_14546367220838781682.plus.aac.p.m4a",
+      "credit": "Avril Lavigne: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/complicated/315025768?i=315025823&uo=4",
+      "apple": {
+       "trackId": 315025823,
+       "url": "https://music.apple.com/us/album/complicated/315025768?i=315025823&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/32/2c/f3/322cf324-9ea1-3962-865a-f4f9bf83764d/888880191069.jpg/300x300bb.jpg",
+       "term": "Avril Lavigne Complicated"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "lose-yourself-eminem",
+   "name": "Lose Yourself",
+   "group": "2000s",
+   "facts": {
+    "artist": "Eminem",
+    "year": 2002,
+    "decade": "2000s"
+   },
+   "blurb": "\"Lose Yourself\" by Eminem, released in 2002.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/13/5a/61/135a6154-8ca2-0523-1fa2-f4ac0ea9e1e7/mzaf_13242749689945681184.plus.aac.p.m4a",
+      "credit": "Eminem: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/lose-yourself/1440903339?i=1440903439&uo=4",
+      "apple": {
+       "trackId": 1440903439,
+       "url": "https://music.apple.com/us/album/lose-yourself/1440903339?i=1440903439&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music125/v4/08/23/fc/0823fcd9-cb44-695b-32bf-b3bf51d9f800/00606949351229.rgb.jpg/300x300bb.jpg",
+       "term": "Eminem Lose Yourself"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "without-me-eminem",
+   "name": "Without Me",
+   "group": "2000s",
+   "facts": {
+    "artist": "Eminem",
+    "year": 2002,
+    "decade": "2000s"
+   },
+   "blurb": "\"Without Me\" by Eminem, released in 2002.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/60/7d/60/607d6038-10dd-1d8d-83c7-c7029e709da3/mzaf_13336706630570276296.plus.aac.p.m4a",
+      "credit": "Eminem: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/without-me/1440821542?i=1440821643&uo=4",
+      "apple": {
+       "trackId": 1440821643,
+       "url": "https://music.apple.com/us/album/without-me/1440821542?i=1440821643&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music118/v4/dd/5c/e6/dd5ce621-f7d2-f767-7a08-e7a7eaa7870b/00602537526994.rgb.jpg/300x300bb.jpg",
+       "term": "Eminem Without Me"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "in-da-club-50-cent",
+   "name": "In da Club",
+   "group": "2000s",
+   "facts": {
+    "artist": "50 Cent",
+    "year": 2003,
+    "decade": "2000s"
+   },
+   "blurb": "\"In da Club\" by 50 Cent, released in 2003.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/6e/6a/04/6e6a0436-3bd4-1f71-02df-6bcffe76e636/mzaf_3291234595362168142.plus.aac.p.m4a",
+      "credit": "50 Cent: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/in-da-club/1440907378?i=1440907550&uo=4",
+      "apple": {
+       "trackId": 1440907550,
+       "url": "https://music.apple.com/us/album/in-da-club/1440907378?i=1440907550&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music112/v4/6e/56/af/6e56af83-bdff-56c2-7c6a-b30cd0d356ce/06UMGIM08757.rgb.jpg/300x300bb.jpg",
+       "term": "50 Cent In da Club"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "crazy-in-love-beyonce",
+   "name": "Crazy in Love",
+   "group": "2000s",
+   "facts": {
+    "artist": "Beyoncé",
+    "year": 2003,
+    "decade": "2000s"
+   },
+   "blurb": "\"Crazy in Love\" by Beyoncé, released in 2003.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/7a/7f/b3/7a7fb397-c707-f7a6-93be-1db3cd1c7fcb/mzaf_10719026518601275807.plus.aac.p.m4a",
+      "credit": "Beyoncé: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/crazy-in-love-feat-ja%C3%BF-z/201274359?i=201274644&uo=4",
+      "apple": {
+       "trackId": 201274644,
+       "url": "https://music.apple.com/us/album/crazy-in-love-feat-ja%C3%BF-z/201274359?i=201274644&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music/03/c5/d4/mzi.ldvrmhxt.jpg/300x300bb.jpg",
+       "term": "Beyoncé Crazy in Love"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "hey-ya-outkast",
+   "name": "Hey Ya!",
+   "group": "2000s",
+   "facts": {
+    "artist": "Outkast",
+    "year": 2003,
+    "decade": "2000s"
+   },
+   "blurb": "\"Hey Ya!\" by Outkast, released in 2003.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/7b/90/59/7b9059ba-a8f2-2540-5bbb-d63a178bd8ce/mzaf_1797078659976130902.plus.aac.p.m4a",
+      "credit": "Outkast: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/hey-ya/1774798661?i=1774799818&uo=4",
+      "apple": {
+       "trackId": 1774799818,
+       "url": "https://music.apple.com/us/album/hey-ya/1774798661?i=1774799818&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/71/ae/6a/71ae6a46-99a6-e9d8-d7f3-41c0f2df45c4/196872579123.jpg/300x300bb.jpg",
+       "term": "Outkast Hey Ya!"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "where-is-the-love-the-black-eyed-peas",
+   "name": "Where Is the Love?",
+   "group": "2000s",
+   "facts": {
+    "artist": "The Black Eyed Peas",
+    "year": 2003,
+    "decade": "2000s"
+   },
+   "blurb": "\"Where Is the Love?\" by The Black Eyed Peas, released in 2003.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/59/ed/6e/59ed6e29-eef4-1ada-6e4a-1a60fa1e7d30/mzaf_6832991249166311292.plus.aac.p.m4a",
+      "credit": "The Black Eyed Peas: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/where-is-the-love/1615142131?i=1615142635&uo=4",
+      "apple": {
+       "trackId": 1615142635,
+       "url": "https://music.apple.com/us/album/where-is-the-love/1615142131?i=1615142635&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music122/v4/05/a3/a1/05a3a1aa-c472-a7f2-4d8b-9eacff8a1e43/22UMGIM30753.rgb.jpg/300x300bb.jpg",
+       "term": "Black Eyed Peas Where Is The Love?"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "bring-me-to-life-evanescence",
+   "name": "Bring Me to Life",
+   "group": "2000s",
+   "facts": {
+    "artist": "Evanescence",
+    "year": 2003,
+    "decade": "2000s"
+   },
+   "blurb": "\"Bring Me to Life\" by Evanescence, released in 2003.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/d2/b9/60/d2b96000-fd12-4645-106e-48238d264995/mzaf_4464035852986978967.plus.aac.p.m4a",
+      "credit": "Evanescence: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/bring-me-to-life/1440665838?i=1440666111&uo=4",
+      "apple": {
+       "trackId": 1440666111,
+       "url": "https://music.apple.com/us/album/bring-me-to-life/1440665838?i=1440666111&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/10/4c/21/104c21e6-9ef0-4d3a-d1bd-d47167f121e5/00601501406300.rgb.jpg/300x300bb.jpg",
+       "term": "Evanescence Bring Me to Life"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "get-busy-sean-paul",
+   "name": "Get Busy",
+   "group": "2000s",
+   "facts": {
+    "artist": "Sean Paul",
+    "year": 2002,
+    "decade": "2000s"
+   },
+   "blurb": "\"Get Busy\" by Sean Paul, released in 2002.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/65/b0/f3/65b0f3d9-9882-b43c-bb57-463b0849bf83/mzaf_10506361393973474378.plus.aac.p.m4a",
+      "credit": "Sean Paul: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/get-busy/1652781992?i=1652782418&uo=4",
+      "apple": {
+       "trackId": 1652782418,
+       "url": "https://music.apple.com/us/album/get-busy/1652781992?i=1652782418&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music122/v4/15/82/94/158294c4-e26c-ec66-6cd0-1f017db4359e/603497833917.jpg/300x300bb.jpg",
+       "term": "Sean Paul Get Busy"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "clocks-coldplay",
+   "name": "Clocks",
+   "group": "2000s",
+   "facts": {
+    "artist": "Coldplay",
+    "year": 2002,
+    "decade": "2000s"
+   },
+   "blurb": "\"Clocks\" by Coldplay, released in 2002.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/d2/9b/17/d29b173f-546a-606b-378f-8f3c333e81f1/mzaf_3952108508633208951.plus.aac.p.m4a",
+      "credit": "Coldplay: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/clocks/1122775993?i=1122776156&uo=4",
+      "apple": {
+       "trackId": 1122776156,
+       "url": "https://music.apple.com/us/album/clocks/1122775993?i=1122776156&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/b9/b4/2a/b9b42ad1-1e25-5096-da43-497a247e69a3/190295978051.jpg/300x300bb.jpg",
+       "term": "Coldplay Clocks"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "yeah-usher",
+   "name": "Yeah!",
+   "group": "2000s",
+   "facts": {
+    "artist": "Usher",
+    "year": 2004,
+    "decade": "2000s"
+   },
+   "blurb": "\"Yeah!\" by Usher, released in 2004.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/94/52/3c/94523c88-f5f9-16f4-dbd7-f284ca168048/mzaf_7184891920196479048.plus.aac.p.m4a",
+      "credit": "Usher: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/yeah-feat-lil-jon-ludacris/386153476?i=386153478&uo=4",
+      "apple": {
+       "trackId": 386153478,
+       "url": "https://music.apple.com/us/album/yeah-feat-lil-jon-ludacris/386153476?i=386153478&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music125/v4/02/c6/e1/02c6e1cd-8d57-97b4-6ef1-77d2be004509/mzi.sjrqsmrq.jpg/300x300bb.jpg",
+       "term": "USHER Yeah!"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "burn-usher",
+   "name": "Burn",
+   "group": "2000s",
+   "facts": {
+    "artist": "Usher",
+    "year": 2004,
+    "decade": "2000s"
+   },
+   "blurb": "\"Burn\" by Usher, released in 2004.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/a2/3a/70/a23a70ec-cdcd-48c7-cc87-da0e92f28516/mzaf_11416758196371970296.plus.aac.p.m4a",
+      "credit": "Usher: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/burn/1765605269?i=1765605482&uo=4",
+      "apple": {
+       "trackId": 1765605482,
+       "url": "https://music.apple.com/us/album/burn/1765605269?i=1765605482&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/4d/24/26/4d242649-1b36-b09c-6b88-9eebe76f6628/196871942218.jpg/300x300bb.jpg",
+       "term": "USHER Burn"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "if-i-aint-got-you-alicia-keys",
+   "name": "If I Ain't Got You",
+   "group": "2000s",
+   "facts": {
+    "artist": "Alicia Keys",
+    "year": 2003,
+    "decade": "2000s"
+   },
+   "blurb": "\"If I Ain't Got You\" by Alicia Keys, released in 2003.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/6e/9a/1a/6e9a1a17-c620-b047-91bb-d4ef4d28aac2/mzaf_5457671003416994461.plus.aac.p.m4a",
+      "credit": "Alicia Keys: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/if-i-aint-got-you/255342344?i=255343130&uo=4",
+      "apple": {
+       "trackId": 255343130,
+       "url": "https://music.apple.com/us/album/if-i-aint-got-you/255342344?i=255343130&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music125/v4/c2/07/c6/c207c6ee-e3f1-cad2-1259-69a3ebd08b5c/828765571227.jpg/300x300bb.jpg",
+       "term": "Alicia Keys If I Ain't Got You"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "toxic-britney-spears",
+   "name": "Toxic",
+   "group": "2000s",
+   "facts": {
+    "artist": "Britney Spears",
+    "year": 2003,
+    "decade": "2000s"
+   },
+   "blurb": "\"Toxic\" by Britney Spears, released in 2003.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/ae/c4/7f/aec47f56-842d-49b4-558b-7a7523fd6728/mzaf_6693111381462300599.plus.aac.p.m4a",
+      "credit": "Britney Spears: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/toxic/251947909?i=251948354&uo=4",
+      "apple": {
+       "trackId": 251948354,
+       "url": "https://music.apple.com/us/album/toxic/251947909?i=251948354&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music125/v4/38/8b/7a/388b7a8f-10ff-a4e0-7624-65e29ac6a793/828765374828.jpg/300x300bb.jpg",
+       "term": "Britney Spears Toxic"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "since-u-been-gone-kelly-clarkson",
+   "name": "Since U Been Gone",
+   "group": "2000s",
+   "facts": {
+    "artist": "Kelly Clarkson",
+    "year": 2004,
+    "decade": "2000s"
+   },
+   "blurb": "\"Since U Been Gone\" by Kelly Clarkson, released in 2004.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/8d/e7/24/8de72427-cabf-27c4-563f-5be2e83da122/mzaf_8282882240981789361.plus.aac.p.m4a",
+      "credit": "Kelly Clarkson: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/since-u-been-gone/275765354?i=275765380&uo=4",
+      "apple": {
+       "trackId": 275765380,
+       "url": "https://music.apple.com/us/album/since-u-been-gone/275765354?i=275765380&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/e3/7e/c5/e37ec5d7-725b-695c-333c-ee0deb5adcc6/dj.mveioodu.jpg/300x300bb.jpg",
+       "term": "Kelly Clarkson Since U Been Gone"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "we-belong-together-mariah-carey",
+   "name": "We Belong Together",
+   "group": "2000s",
+   "facts": {
+    "artist": "Mariah Carey",
+    "year": 2005,
+    "decade": "2000s"
+   },
+   "blurb": "\"We Belong Together\" by Mariah Carey, released in 2005.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/ec/a2/03/eca20372-e62e-a279-2fe9-118f19f03157/mzaf_3519549200001384487.plus.aac.p.m4a",
+      "credit": "Mariah Carey: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/we-belong-together/1476731879?i=1476731889&uo=4",
+      "apple": {
+       "trackId": 1476731889,
+       "url": "https://music.apple.com/us/album/we-belong-together/1476731879?i=1476731889&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music122/v4/34/66/31/346631f0-dc0e-500f-7cb8-537e7523e022/15UMGIM78299.rgb.jpg/300x300bb.jpg",
+       "term": "Mariah Carey We Belong Together"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "hollaback-girl-gwen-stefani",
+   "name": "Hollaback Girl",
+   "group": "2000s",
+   "facts": {
+    "artist": "Gwen Stefani",
+    "year": 2004,
+    "decade": "2000s"
+   },
+   "blurb": "\"Hollaback Girl\" by Gwen Stefani, released in 2004.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/aa/ab/dd/aaabdd89-7ca3-e6fe-86d1-e00b054d9332/mzaf_6128231353075845529.plus.aac.p.m4a",
+      "credit": "Gwen Stefani: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/hollaback-girl/1491226765?i=1491226770&uo=4",
+      "apple": {
+       "trackId": 1491226770,
+       "url": "https://music.apple.com/us/album/hollaback-girl/1491226765?i=1491226770&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/54/72/05/5472050c-5ec7-8cc5-787d-43f0d7f916d2/19UM1IM10385.rgb.jpg/300x300bb.jpg",
+       "term": "Gwen Stefani Hollaback Girl"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "gold-digger-kanye-west",
+   "name": "Gold Digger",
+   "group": "2000s",
+   "facts": {
+    "artist": "Kanye West",
+    "year": 2005,
+    "decade": "2000s"
+   },
+   "blurb": "\"Gold Digger\" by Kanye West, released in 2005.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/ec/1c/48/ec1c483c-d196-1c4f-d8e3-320d740c3f96/mzaf_7998854062663791888.plus.aac.p.m4a",
+      "credit": "Kanye West: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/gold-digger-feat-jamie-foxx/1440763821?i=1440763833&uo=4",
+      "apple": {
+       "trackId": 1440763833,
+       "url": "https://music.apple.com/us/album/gold-digger-feat-jamie-foxx/1440763821?i=1440763833&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music125/v4/0e/90/3c/0e903c43-9d81-f91b-90f1-727a58f7fb2c/00602498824030.rgb.jpg/300x300bb.jpg",
+       "term": "Kanye West Gold Digger"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "feel-good-inc-gorillaz",
+   "name": "Feel Good Inc.",
+   "group": "2000s",
+   "facts": {
+    "artist": "Gorillaz",
+    "year": 2005,
+    "decade": "2000s"
+   },
+   "blurb": "\"Feel Good Inc.\" by Gorillaz, released in 2005.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/9a/a7/90/9aa790e3-651e-9674-26ac-14aba4d3b8d1/mzaf_10454527198707970464.plus.aac.p.m4a",
+      "credit": "Gorillaz: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/feel-good-inc-feat-david-jolicoeur-kelvin-mercer-vincent/850571319?i=850571371&uo=4",
+      "apple": {
+       "trackId": 850571371,
+       "url": "https://music.apple.com/us/album/feel-good-inc-feat-david-jolicoeur-kelvin-mercer-vincent/850571319?i=850571371&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music125/v4/1c/0f/81/1c0f818a-e458-dd84-6f1b-ccbdf5fe14d6/825646291045.jpg/300x300bb.jpg",
+       "term": "Gorillaz & De La Soul Feel Good Inc."
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "bad-day-daniel-powter",
+   "name": "Bad Day",
+   "group": "2000s",
+   "facts": {
+    "artist": "Daniel Powter",
+    "year": 2005,
+    "decade": "2000s"
+   },
+   "blurb": "\"Bad Day\" by Daniel Powter, released in 2005.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/e4/ae/91/e4ae912a-0685-a7c6-b10c-b7290a7fb16f/mzaf_16493963156495176302.plus.aac.p.m4a",
+      "credit": "Daniel Powter: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/bad-day/63816246?i=63816165&uo=4",
+      "apple": {
+       "trackId": 63816165,
+       "url": "https://music.apple.com/us/album/bad-day/63816246?i=63816165&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music/90/db/17/mzi.tiuteyft.jpg/300x300bb.jpg",
+       "term": "Daniel Powter Bad Day"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "youre-beautiful-james-blunt",
+   "name": "You're Beautiful",
+   "group": "2000s",
+   "facts": {
+    "artist": "James Blunt",
+    "year": 2004,
+    "decade": "2000s"
+   },
+   "blurb": "\"You're Beautiful\" by James Blunt, released in 2004.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/59/50/7f/59507f2b-591d-f93e-3372-1b77b20b4ad9/mzaf_11337861972947919226.plus.aac.p.m4a",
+      "credit": "James Blunt: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/youre-beautiful/714601581?i=714601673&uo=4",
+      "apple": {
+       "trackId": 714601673,
+       "url": "https://music.apple.com/us/album/youre-beautiful/714601581?i=714601673&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/32/bf/13/32bf1302-fbfe-945a-44bc-c0aeaee12711/075678375224.jpg/300x300bb.jpg",
+       "term": "James Blunt You're Beautiful"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "hips-dont-lie-shakira",
+   "name": "Hips Don't Lie",
+   "group": "2000s",
+   "facts": {
+    "artist": "Shakira",
+    "year": 2006,
+    "decade": "2000s"
+   },
+   "blurb": "\"Hips Don't Lie\" by Shakira, released in 2006.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/9a/8e/b0/9a8eb009-2be0-f0f9-226e-2861ab9d76c3/mzaf_10838856194529443892.plus.aac.p.m4a",
+      "credit": "Shakira: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/hips-dont-lie-featuring-wyclef-jean-en-espa%C3%B1ol/1817217057?i=1817217411&uo=4",
+      "apple": {
+       "trackId": 1817217411,
+       "url": "https://music.apple.com/us/album/hips-dont-lie-featuring-wyclef-jean-en-espa%C3%B1ol/1817217057?i=1817217411&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/0d/b5/8a/0db58a8b-7b17-dd53-3464-116a415d0f49/196872648836.jpg/300x300bb.jpg",
+       "term": "Shakira Hips Don't Lie"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "crazy-gnarls-barkley",
+   "name": "Crazy",
+   "group": "2000s",
+   "facts": {
+    "artist": "Gnarls Barkley",
+    "year": 2006,
+    "decade": "2000s"
+   },
+   "blurb": "\"Crazy\" by Gnarls Barkley, released in 2006.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/ec/e1/4e/ece14e48-8c7b-ff66-7fe1-fa2af50cdc10/mzaf_15490780879090368893.plus.aac.p.m4a",
+      "credit": "Gnarls Barkley: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/crazy/1741403959?i=1741403966&uo=4",
+      "apple": {
+       "trackId": 1741403966,
+       "url": "https://music.apple.com/us/album/crazy/1741403959?i=1741403966&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/fc/6e/1e/fc6e1e95-7f93-09d8-455e-2f24a537a71f/603497823703.jpg/300x300bb.jpg",
+       "term": "Gnarls Barkley Crazy"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "sexyback-justin-timberlake",
+   "name": "SexyBack",
+   "group": "2000s",
+   "facts": {
+    "artist": "Justin Timberlake",
+    "year": 2006,
+    "decade": "2000s"
+   },
+   "blurb": "\"SexyBack\" by Justin Timberlake, released in 2006.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/1a/f4/7b/1af47ba3-a363-5716-4dd9-6aea4fe35e3f/mzaf_13609262275263691829.plus.aac.p.m4a",
+      "credit": "Justin Timberlake: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/sexyback-feat-timbaland/400946401?i=400946435&uo=4",
+      "apple": {
+       "trackId": 400946435,
+       "url": "https://music.apple.com/us/album/sexyback-feat-timbaland/400946401?i=400946435&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music125/v4/4c/44/30/4c4430dd-150b-d393-ec70-4894975f4b16/888880422095.jpg/300x300bb.jpg",
+       "term": "Justin Timberlake SexyBack"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "promiscuous-nelly-furtado",
+   "name": "Promiscuous",
+   "group": "2000s",
+   "facts": {
+    "artist": "Nelly Furtado",
+    "year": 2006,
+    "decade": "2000s"
+   },
+   "blurb": "\"Promiscuous\" by Nelly Furtado, released in 2006.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/7c/90/09/7c90091a-5085-e9bb-717b-789893e86ff6/mzaf_12573218488547151027.plus.aac.p.m4a",
+      "credit": "Nelly Furtado: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/promiscuous-feat-timbaland/1568362486?i=1568362821&uo=4",
+      "apple": {
+       "trackId": 1568362821,
+       "url": "https://music.apple.com/us/album/promiscuous-feat-timbaland/1568362486?i=1568362821&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music125/v4/0c/5a/d3/0c5ad339-9532-eca9-9231-30b6ea9949e4/21UMGIM32622.rgb.jpg/300x300bb.jpg",
+       "term": "Nelly Furtado Promiscuous"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "chasing-cars-snow-patrol",
+   "name": "Chasing Cars",
+   "group": "2000s",
+   "facts": {
+    "artist": "Snow Patrol",
+    "year": 2006,
+    "decade": "2000s"
+   },
+   "blurb": "\"Chasing Cars\" by Snow Patrol, released in 2006.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/bf/dc/fe/bfdcfeb4-7fde-c148-bf2d-f82d0f1e8096/mzaf_15850382492018725787.plus.aac.p.m4a",
+      "credit": "Snow Patrol: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/chasing-cars/1440758222?i=1440758864&uo=4",
+      "apple": {
+       "trackId": 1440758864,
+       "url": "https://music.apple.com/us/album/chasing-cars/1440758222?i=1440758864&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music122/v4/c4/25/bf/c425bf7c-f3d8-6baf-7397-40868971f77f/06UMGIM43473.rgb.jpg/300x300bb.jpg",
+       "term": "Snow Patrol Chasing Cars"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "irreplaceable-beyonce",
+   "name": "Irreplaceable",
+   "group": "2000s",
+   "facts": {
+    "artist": "Beyoncé",
+    "year": 2006,
+    "decade": "2000s"
+   },
+   "blurb": "\"Irreplaceable\" by Beyoncé, released in 2006.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/46/53/95/4653953c-6eb2-50a7-2126-c19be876de38/mzaf_14304340183842995989.plus.aac.p.m4a",
+      "credit": "Beyoncé: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/irreplaceable/261707051?i=261707067&uo=4",
+      "apple": {
+       "trackId": 261707067,
+       "url": "https://music.apple.com/us/album/irreplaceable/261707051?i=261707067&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music125/v4/47/b2/b2/47b2b26b-5abd-0953-6688-7dfff80508ec/mzi.sozuruch.jpg/300x300bb.jpg",
+       "term": "Beyoncé Irreplaceable"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "umbrella-rihanna",
+   "name": "Umbrella",
+   "group": "2000s",
+   "facts": {
+    "artist": "Rihanna",
+    "year": 2007,
+    "decade": "2000s"
+   },
+   "blurb": "\"Umbrella\" by Rihanna, released in 2007.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/7b/45/22/7b452241-882c-409b-3a9b-23306b14286a/mzaf_8588243939716013218.plus.aac.p.m4a",
+      "credit": "Rihanna: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/umbrella-feat-ja%C3%BF-z/1441154435?i=1441154437&uo=4",
+      "apple": {
+       "trackId": 1441154437,
+       "url": "https://music.apple.com/us/album/umbrella-feat-ja%C3%BF-z/1441154435?i=1441154437&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music126/v4/2b/c0/81/2bc081c8-25f0-ba43-d451-587a54613778/16UMGIM59202.rgb.jpg/300x300bb.jpg",
+       "term": "Rihanna Umbrella"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "girlfriend-avril-lavigne",
+   "name": "Girlfriend",
+   "group": "2000s",
+   "facts": {
+    "artist": "Avril Lavigne",
+    "year": 2007,
+    "decade": "2000s"
+   },
+   "blurb": "\"Girlfriend\" by Avril Lavigne, released in 2007.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/1a/d8/5e/1ad85eda-c47d-993c-33f1-0664a9d0392e/mzaf_15344942824663417415.plus.aac.p.m4a",
+      "credit": "Avril Lavigne: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/girlfriend-radio-edit/356980429?i=356980430&uo=4",
+      "apple": {
+       "trackId": 356980430,
+       "url": "https://music.apple.com/us/album/girlfriend-radio-edit/356980429?i=356980430&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music114/v4/69/fb/ce/69fbcef9-b3d9-4d3f-4e7f-64fabac750ba/mzi.tzienkxa.jpg/300x300bb.jpg",
+       "term": "Avril Lavigne Girlfriend"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "stronger-kanye-west",
+   "name": "Stronger",
+   "group": "2000s",
+   "facts": {
+    "artist": "Kanye West",
+    "year": 2007,
+    "decade": "2000s"
+   },
+   "blurb": "\"Stronger\" by Kanye West, released in 2007.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/9e/cc/69/9ecc6918-a8dc-354f-909f-ccc20a0a7a33/mzaf_7863921970418240507.plus.aac.p.m4a",
+      "credit": "Kanye West: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/stronger/1442845779?i=1442846328&uo=4",
+      "apple": {
+       "trackId": 1442846328,
+       "url": "https://music.apple.com/us/album/stronger/1442845779?i=1442846328&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music128/v4/39/25/2d/39252d65-2d50-b991-0962-f7a98a761271/00602517483507.rgb.jpg/300x300bb.jpg",
+       "term": "Kanye West Stronger"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "apologize-timbaland",
+   "name": "Apologize",
+   "group": "2000s",
+   "facts": {
+    "artist": "Timbaland",
+    "year": 2007,
+    "decade": "2000s"
+   },
+   "blurb": "\"Apologize\" by Timbaland, released in 2007.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/5d/57/3a/5d573a52-f066-0669-e22d-248634d1da64/mzaf_2821349459437227615.plus.aac.p.m4a",
+      "credit": "Timbaland: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/apologize-feat-onerepublic/1440748593?i=1440749959&uo=4",
+      "apple": {
+       "trackId": 1440749959,
+       "url": "https://music.apple.com/us/album/apologize-feat-onerepublic/1440748593?i=1440749959&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/a4/95/c0/a495c0cf-6e6a-7af5-308d-1cf8c9931fd6/07UMGIM03315.rgb.jpg/300x300bb.jpg",
+       "term": "Timbaland Apologize"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "bleeding-love-leona-lewis",
+   "name": "Bleeding Love",
+   "group": "2000s",
+   "facts": {
+    "artist": "Leona Lewis",
+    "year": 2007,
+    "decade": "2000s"
+   },
+   "blurb": "\"Bleeding Love\" by Leona Lewis, released in 2007.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/ed/5f/0b/ed5f0b87-a3d8-8e24-8019-f5c4cf3eafcb/mzaf_10706859781439569235.plus.aac.p.m4a",
+      "credit": "Leona Lewis: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/bleeding-love/303682720?i=303682849&uo=4",
+      "apple": {
+       "trackId": 303682849,
+       "url": "https://music.apple.com/us/album/bleeding-love/303682720?i=303682849&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music/93/83/03/mzi.wuooifms.jpg/300x300bb.jpg",
+       "term": "Leona Lewis Bleeding Love"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "low-flo-rida",
+   "name": "Low",
+   "group": "2000s",
+   "facts": {
+    "artist": "Flo Rida",
+    "year": 2007,
+    "decade": "2000s"
+   },
+   "blurb": "\"Low\" by Flo Rida, released in 2007.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/b3/8e/64/b38e64fe-81b4-353a-0912-e849792bd7d5/mzaf_3197818180611327662.plus.aac.p.m4a",
+      "credit": "Flo Rida: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/low-feat-t-pain/275496110?i=275496141&uo=4",
+      "apple": {
+       "trackId": 275496141,
+       "url": "https://music.apple.com/us/album/low-feat-t-pain/275496110?i=275496141&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music125/v4/14/42/a0/1442a084-36ea-09a0-ff87-d5aea0cc19f8/mzi.ktgesuhn.jpg/300x300bb.jpg",
+       "term": "Flo Rida Low"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "i-kissed-a-girl-katy-perry",
+   "name": "I Kissed a Girl",
+   "group": "2000s",
+   "facts": {
+    "artist": "Katy Perry",
+    "year": 2008,
+    "decade": "2000s"
+   },
+   "blurb": "\"I Kissed a Girl\" by Katy Perry, released in 2008.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/a0/36/eb/a036ebe4-81c6-fd45-5f2d-c430239def58/mzaf_3988256040876247761.plus.aac.p.m4a",
+      "credit": "Katy Perry: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/i-kissed-a-girl/715891425?i=715891620&uo=4",
+      "apple": {
+       "trackId": 715891620,
+       "url": "https://music.apple.com/us/album/i-kissed-a-girl/715891425?i=715891620&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/57/dc/18/57dc1854-4483-52b2-fe7c-8a221edf9e88/13UABIM48773.rgb.jpg/300x300bb.jpg",
+       "term": "Katy Perry I Kissed a Girl"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "viva-la-vida-coldplay",
+   "name": "Viva la Vida",
+   "group": "2000s",
+   "facts": {
+    "artist": "Coldplay",
+    "year": 2008,
+    "decade": "2000s"
+   },
+   "blurb": "\"Viva la Vida\" by Coldplay, released in 2008.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/b0/19/60/b0196060-7786-24c0-8c56-8f628fe89f52/mzaf_12479456646715449366.plus.aac.p.m4a",
+      "credit": "Coldplay: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/viva-la-vida/1122773394?i=1122773680&uo=4",
+      "apple": {
+       "trackId": 1122773680,
+       "url": "https://music.apple.com/us/album/viva-la-vida/1122773394?i=1122773680&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/52/aa/85/52aa851f-15b7-6322-f91f-df84b15b7b19/190295978044.jpg/300x300bb.jpg",
+       "term": "Coldplay Viva La Vida"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "single-ladies-put-a-ring-on-it-beyonce",
+   "name": "Single Ladies (Put a Ring on It)",
+   "alt": [
+    "Single Ladies"
+   ],
+   "group": "2000s",
+   "facts": {
+    "artist": "Beyoncé",
+    "year": 2008,
+    "decade": "2000s"
+   },
+   "blurb": "\"Single Ladies (Put a Ring on It)\" by Beyoncé, released in 2008.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/3b/27/a3/3b27a332-48ee-a5b1-1ce5-4b067850f6e6/mzaf_7719939820293883536.plus.aac.p.m4a",
+      "credit": "Beyoncé: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/single-ladies-put-a-ring-on-it/296016891?i=296016899&uo=4",
+      "apple": {
+       "trackId": 296016899,
+       "url": "https://music.apple.com/us/album/single-ladies-put-a-ring-on-it/296016891?i=296016899&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music125/v4/35/0f/55/350f55da-2104-162a-5872-cb35fef30410/mzi.morbeoaw.jpg/300x300bb.jpg",
+       "term": "Beyoncé Single Ladies"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "love-story-taylor-swift",
+   "name": "Love Story",
+   "group": "2000s",
+   "facts": {
+    "artist": "Taylor Swift",
+    "year": 2008,
+    "decade": "2000s"
+   },
+   "blurb": "\"Love Story\" by Taylor Swift, released in 2008.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/44/8a/a4/448aa432-42ae-8075-fe00-5f2deffe9896/mzaf_13232029737890307916.plus.aac.p.m4a",
+      "credit": "Taylor Swift: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/love-story/1440924803?i=1440924808&uo=4",
+      "apple": {
+       "trackId": 1440924808,
+       "url": "https://music.apple.com/us/album/love-story/1440924803?i=1440924808&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/cb/6e/a7/cb6ea70a-6cb8-89a0-4da7-91e2d04a7bba/08PNDIM05386.rgb.jpg/300x300bb.jpg",
+       "term": "Taylor Swift Love Story"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "poker-face-lady-gaga",
+   "name": "Poker Face",
+   "group": "2000s",
+   "facts": {
+    "artist": "Lady Gaga",
+    "year": 2008,
+    "decade": "2000s"
+   },
+   "blurb": "\"Poker Face\" by Lady Gaga, released in 2008.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/85/de/66/85de66c6-7a1e-6127-6488-16a6e8a2ea54/mzaf_15210367739878536717.plus.aac.p.m4a",
+      "credit": "Lady Gaga: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/gb/album/poker-face/1445860346?i=1445860576&uo=4",
+      "apple": {
+       "trackId": 1445860576,
+       "url": "https://music.apple.com/gb/album/poker-face/1445860346?i=1445860576&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music116/v4/1b/35/8d/1b358d76-329d-d98e-db68-a0e4ec4038cb/11UMGIM03647.rgb.jpg/300x300bb.jpg",
+       "term": "Lady Gaga Poker Face"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "just-dance-lady-gaga",
+   "name": "Just Dance",
+   "group": "2000s",
+   "facts": {
+    "artist": "Lady Gaga",
+    "year": 2008,
+    "decade": "2000s"
+   },
+   "blurb": "\"Just Dance\" by Lady Gaga, released in 2008.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/16/22/54/162254fd-6ea3-b69f-a53c-dcd76f92048c/mzaf_10868537793490182133.plus.aac.p.m4a",
+      "credit": "Lady Gaga: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/just-dance-feat-colby-odonis/1440818588?i=1440818653&uo=4",
+      "apple": {
+       "trackId": 1440818653,
+       "url": "https://music.apple.com/us/album/just-dance-feat-colby-odonis/1440818588?i=1440818653&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music126/v4/a6/68/28/a66828c0-3fe3-5419-374d-ad98739f3166/08UMGIM13954.rgb.jpg/300x300bb.jpg",
+       "term": "Lady Gaga Just Dance"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "i-gotta-feeling-the-black-eyed-peas",
+   "name": "I Gotta Feeling",
+   "group": "2000s",
+   "facts": {
+    "artist": "The Black Eyed Peas",
+    "year": 2009,
+    "decade": "2000s"
+   },
+   "blurb": "\"I Gotta Feeling\" by The Black Eyed Peas, released in 2009.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/88/5e/6a/885e6adb-f307-d849-a3e0-47280088b5a4/mzaf_12588254824919596992.plus.aac.p.m4a",
+      "credit": "The Black Eyed Peas: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/i-gotta-feeling/1440768902?i=1440769310&uo=4",
+      "apple": {
+       "trackId": 1440769310,
+       "url": "https://music.apple.com/us/album/i-gotta-feeling/1440768902?i=1440769310&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/42/fc/47/42fc4794-3c69-8c00-e528-1c7e92b5ac93/09UMGIM13833.rgb.jpg/300x300bb.jpg",
+       "term": "Black Eyed Peas I Gotta Feeling"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "boom-boom-pow-the-black-eyed-peas",
+   "name": "Boom Boom Pow",
+   "group": "2000s",
+   "facts": {
+    "artist": "The Black Eyed Peas",
+    "year": 2009,
+    "decade": "2000s"
+   },
+   "blurb": "\"Boom Boom Pow\" by The Black Eyed Peas, released in 2009.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/3a/da/d9/3adad915-8b13-b947-31a2-bc0967ee2ae7/mzaf_15782935795936941019.plus.aac.p.m4a",
+      "credit": "The Black Eyed Peas: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/boom-boom-pow/1443059530?i=1443060256&uo=4",
+      "apple": {
+       "trackId": 1443060256,
+       "url": "https://music.apple.com/us/album/boom-boom-pow/1443059530?i=1443060256&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music112/v4/79/5f/e3/795fe3be-f1b7-8fa5-2698-f92f7f194599/10UMGIM29127.rgb.jpg/300x300bb.jpg",
+       "term": "Black Eyed Peas Boom Boom Pow"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "party-in-the-u-s-a-miley-cyrus",
+   "name": "Party in the U.S.A.",
+   "group": "2000s",
+   "facts": {
+    "artist": "Miley Cyrus",
+    "year": 2009,
+    "decade": "2000s"
+   },
+   "blurb": "\"Party in the U.S.A.\" by Miley Cyrus, released in 2009.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/76/9e/79/769e79f5-3fbe-a416-4109-e57acaf7ebb7/mzaf_1472369971298162165.plus.aac.p.m4a",
+      "credit": "Miley Cyrus: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/party-in-the-u-s-a/1445007710?i=1445007713&uo=4",
+      "apple": {
+       "trackId": 1445007713,
+       "url": "https://music.apple.com/us/album/party-in-the-u-s-a/1445007710?i=1445007713&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/1f/29/3e/1f293e38-987a-9a77-d004-c866acebdac1/09BVMIM00838.rgb.jpg/300x300bb.jpg",
+       "term": "Miley Cyrus Party In the U.S.A."
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "empire-state-of-mind-jay-z-and-alicia-keys",
+   "name": "Empire State of Mind",
+   "group": "2000s",
+   "facts": {
+    "artist": "Jay-Z & Alicia Keys",
+    "year": 2009,
+    "decade": "2000s"
+   },
+   "blurb": "\"Empire State of Mind\" by Jay-Z & Alicia Keys, released in 2009.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/8f/e2/b8/8fe2b82b-b783-9584-3442-3f85e03db81a/mzaf_16411245635676557198.plus.aac.p.m4a",
+      "credit": "Jay-Z & Alicia Keys: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/empire-state-of-mind-feat-alicia-keys/1440932009?i=1440932018&uo=4",
+      "apple": {
+       "trackId": 1440932018,
+       "url": "https://music.apple.com/us/album/empire-state-of-mind-feat-alicia-keys/1440932009?i=1440932018&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music118/v4/e6/20/cf/e620cfeb-eb74-4ef1-00c1-fd38aac6c3d7/00858786005470.rgb.jpg/300x300bb.jpg",
+       "term": "JAŸ-Z Empire State Of Mind"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "use-somebody-kings-of-leon",
+   "name": "Use Somebody",
+   "group": "2000s",
+   "facts": {
+    "artist": "Kings of Leon",
+    "year": 2008,
+    "decade": "2000s"
+   },
+   "blurb": "\"Use Somebody\" by Kings of Leon, released in 2008.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/23/1d/b3/231db3c5-a99c-3fba-5d3b-f6e9cdbeb841/mzaf_12581310710694950303.plus.aac.p.m4a",
+      "credit": "Kings of Leon: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/use-somebody/290302885?i=290303018&uo=4",
+      "apple": {
+       "trackId": 290303018,
+       "url": "https://music.apple.com/us/album/use-somebody/290302885?i=290303018&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Features125/v4/74/25/4c/74254c8b-e03d-44e8-304d-4cde508b8cfb/dj.swemfdrr.jpg/300x300bb.jpg",
+       "term": "Kings of Leon Use Somebody"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  }
+ ],
+ "questions": [],
+ "sources": [
+  {
+   "name": "Billboard Year-End Hot 100 singles (2000–2009)",
+   "url": "https://en.wikipedia.org/wiki/Billboard_Year-End_Hot_100_singles_of_2000"
+  },
+  {
+   "name": "UK best-selling singles by year",
+   "url": "https://en.wikipedia.org/wiki/List_of_best-selling_singles_by_year_(UK)"
+  },
+  {
+   "name": "Apple iTunes Search API (previews, artwork, links)",
+   "url": "https://performance-partners.apple.com/search-api"
+  }
+ ],
+ "built": "2026-10-04"
+}

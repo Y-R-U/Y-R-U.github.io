@@ -1,0 +1,5012 @@
+{
+ "id": "dogs",
+ "title": "Dog breeds",
+ "theme": "animals",
+ "icon": "🐕",
+ "kids": true,
+ "version": 1,
+ "leakExempt": [
+  "dog",
+  "dogs",
+  "breed"
+ ],
+ "factsMeta": {
+  "origin": {
+   "type": "cat",
+   "label": "Country of origin"
+  },
+  "type": {
+   "type": "cat",
+   "label": "Breed type",
+   "values": [
+    "Gundog",
+    "Herding",
+    "Hound",
+    "Terrier",
+    "Toy",
+    "Working",
+    "Companion",
+    "Spitz"
+   ]
+  },
+  "massKg": {
+   "type": "num",
+   "label": "Typical adult weight",
+   "unit": "kg",
+   "higherLabel": "Heavier"
+  },
+  "size": {
+   "type": "cat",
+   "label": "Size",
+   "values": [
+    "Toy",
+    "Small",
+    "Medium",
+    "Large",
+    "Giant"
+   ]
+  }
+ },
+ "items": [
+  {
+   "id": "labrador-retriever",
+   "name": "Labrador Retriever",
+   "alt": [
+    "Labrador",
+    "Lab"
+   ],
+   "facts": {
+    "origin": "United Kingdom",
+    "type": "Gundog",
+    "massKg": 32,
+    "size": "Large"
+   },
+   "lookalikes": [
+    "golden-retriever"
+   ],
+   "blurb": "A friendly, clever dog that loves water and food. It is one of the most popular breeds in the world and often works as a guide dog.",
+   "clues": [
+    "Its ancestors came from Newfoundland in Canada.",
+    "It has a thick \"otter\" tail.",
+    "It is one of the most common guide dogs for blind people.",
+    "The breed comes from United Kingdom.",
+    "It is a gundog breed.",
+    "A typical adult weighs about 32 kg.",
+    "It comes in black, yellow and chocolate.",
+    "It is famous for loving food and swimming.",
+    "The answer has 2 words (8, 9 letters).",
+    "It starts with the letter L."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/9/9c/Yellow_Labrador_Retriever_2.jpg/500px-Yellow_Labrador_Retriever_2.jpg",
+      "w": 500,
+      "h": 334,
+      "credit": "SixtyWeb",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Yellow_Labrador_Retriever_2.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/3/34/Labrador_on_Quantock_%282175262184%29.jpg/500px-Labrador_on_Quantock_%282175262184%29.jpg",
+      "w": 500,
+      "h": 326,
+      "credit": "IDS.photos from Tiverton, UK",
+      "license": "CC BY-SA 2.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Labrador_on_Quantock_(2175262184).jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/d/d4/Labrador_Retriever_-_Yellow.JPG/500px-Labrador_Retriever_-_Yellow.JPG",
+      "w": 500,
+      "h": 608,
+      "credit": "Skansken",
+      "license": "CC BY 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Labrador_Retriever_-_Yellow.JPG"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "golden-retriever",
+   "name": "Golden Retriever",
+   "alt": [
+    "Golden"
+   ],
+   "facts": {
+    "origin": "United Kingdom",
+    "type": "Gundog",
+    "massKg": 30,
+    "size": "Large"
+   },
+   "lookalikes": [
+    "labrador-retriever",
+    "irish-setter"
+   ],
+   "blurb": "A gentle, friendly gundog with a feathery golden coat. It was first bred in Scotland in the 1800s.",
+   "clues": [
+    "It was first bred in the Scottish Highlands by Lord Tweedmouth.",
+    "It carries things gently in its \"soft mouth\".",
+    "It is a popular therapy and guide dog.",
+    "The breed comes from United Kingdom.",
+    "It is a gundog breed.",
+    "A typical adult weighs about 30 kg.",
+    "It has a long, feathery coat.",
+    "Its coat is a warm yellow colour.",
+    "The answer has 2 words (6, 9 letters).",
+    "It starts with the letter G."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/b/bd/Golden_Retriever_Dukedestiny01_drvd.jpg/500px-Golden_Retriever_Dukedestiny01_drvd.jpg",
+      "w": 500,
+      "h": 395,
+      "credit": "Dukedestiny01.jpg: \"Janneke Vreugdenhil\" derivative work: Anka Friedrich ([[User talk:A…",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Golden_Retriever_Dukedestiny01_drvd.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/b/bf/D%C3%BClmen%2C_Hausd%C3%BClmen%2C_Golden_Retriever_--_2022_--_5945.jpg/500px-D%C3%BClmen%2C_Hausd%C3%BClmen%2C_Golden_Retriever_--_2022_--_5945.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Dietmar Rabich",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:D%C3%BClmen,_Hausd%C3%BClmen,_Golden_Retriever_--_2022_--_5945.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/2/2e/%D0%A2%D0%B1%D0%B8%D0%BB%D0%B8%D1%81%D0%B8%2C_%D0%B7%D0%BE%D0%BB%D0%BE%D1%82%D0%B8%D1%81%D1%82%D1%8B%D0%B9_%D1%80%D0%B5%D1%82%D1%80%D0%B8%D0%B2%D0%B5%D1%80_%D0%BD%D0%B0_%D0%93%D0%BE%D1%80%D0%B3%D0%B0%D1%81%D0%B0%D0%BB%D0%B8.jpg/500px-%D0%A2%D0%B1%D0%B8%D0%BB%D0%B8%D1%81%D0%B8%2C_%D0%B7%D0%BE%D0%BB%D0%BE%D1%82%D0%B8%D1%81%D1%82%D1%8B%D0%B9_%D1%80%D0%B5%D1%82%D1%80%D0%B8%D0%B2%D0%B5%D1%80_%D0%BD%D0%B0_%D0%93%D0%BE%D1%80%D0%B3%D0%B0%D1%81%D0%B0%D0%BB%D0%B8.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Nikolai Bulykin",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:%D0%A2%D0%B1%D0%B8%D0%BB%D0%B8%D1%81%D0%B8,_%D0%B7%D0%BE%D0%BB%D0%BE%D1%82%D0%B8%D1%81%D1%82%D1%8B%D0%B9_%D1%80%D0%B5%D1%82%D1%80%D0%B8%D0%B2%D0%B5%D1%80_%D0%BD%D0%B0_%D0%93%D0%BE%D1%80%D0%B3%D0%B0%D1%81%D0%B0%D0%BB%D0%B8.jpg"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "german-shepherd",
+   "name": "German Shepherd",
+   "alt": [
+    "Alsatian",
+    "German Shepherd Dog"
+   ],
+   "facts": {
+    "origin": "Germany",
+    "type": "Herding",
+    "massKg": 34,
+    "size": "Large"
+   },
+   "lookalikes": [
+    "belgian-malinois"
+   ],
+   "blurb": "A strong, smart working dog often used by police and the army. It was first bred to herd sheep.",
+   "clues": [
+    "Rin Tin Tin, a famous film dog, was one.",
+    "Police and armies around the world use it.",
+    "It is a herding breed.",
+    "A typical adult weighs about 34 kg.",
+    "It has upright ears and a black-and-tan coat.",
+    "It was first bred to herd sheep in central Europe.",
+    "The answer has 2 words (6, 8 letters).",
+    "It starts with the letter G."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/e/eb/Pastor_aleman_a.jpg/500px-Pastor_aleman_a.jpg",
+      "w": 500,
+      "h": 400,
+      "credit": "Erick Drumss Hernández",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Pastor_aleman_a.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/d/d0/German_Shepherd_-_DSC_0346_%2810096362833%29.jpg/500px-German_Shepherd_-_DSC_0346_%2810096362833%29.jpg",
+      "w": 500,
+      "h": 416,
+      "credit": "gomagoti",
+      "license": "CC BY-SA 2.5",
+      "page": "https://commons.wikimedia.org/wiki/File:German_Shepherd_-_DSC_0346_(10096362833).jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/6/61/20110425_German_Shepherd_Dog_8505.jpg/500px-20110425_German_Shepherd_Dog_8505.jpg",
+      "w": 500,
+      "h": 332,
+      "credit": "Jakub Hałun",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:20110425_German_Shepherd_Dog_8505.jpg"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "french-bulldog",
+   "name": "French Bulldog",
+   "alt": [
+    "Frenchie"
+   ],
+   "facts": {
+    "origin": "France",
+    "type": "Companion",
+    "massKg": 11,
+    "size": "Small"
+   },
+   "lookalikes": [
+    "bulldog",
+    "boston-terrier",
+    "pug"
+   ],
+   "blurb": "A small, muscly dog with big bat-like ears. It is now one of the most popular breeds in the world.",
+   "clues": [
+    "It cannot swim well because of its heavy front.",
+    "It has large upright ears like a bat.",
+    "The breed comes from France.",
+    "It is a companion breed.",
+    "A typical adult weighs about 11 kg.",
+    "It snores a lot because of its flat face.",
+    "Its name says it comes from Paris's country.",
+    "The answer has 2 words (6, 7 letters).",
+    "It starts with the letter F."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/4/44/%D0%A4%D1%80%D0%B0%D0%BD%D1%86%D1%83%D0%B7%D1%81%D0%BA%D0%B8%D0%B5_%D0%B1%D1%83%D0%BB%D1%8C%D0%B4%D0%BE%D0%B3%D0%B8_2013-09-02_11-36.JPG/500px-%D0%A4%D1%80%D0%B0%D0%BD%D1%86%D1%83%D0%B7%D1%81%D0%BA%D0%B8%D0%B5_%D0%B1%D1%83%D0%BB%D1%8C%D0%B4%D0%BE%D0%B3%D0%B8_2013-09-02_11-36.JPG",
+      "w": 500,
+      "h": 333,
+      "credit": "User:Frosya a",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:%D0%A4%D1%80%D0%B0%D0%BD%D1%86%D1%83%D0%B7%D1%81%D0%BA%D0%B8%D0%B5_%D0%B1%D1%83%D0%BB%D1%8C%D0%B4%D0%BE%D0%B3%D0%B8_2013-09-02_11-36.JPG"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/18/2008-07-28_Dog_at_Frolick_Field.jpg/500px-2008-07-28_Dog_at_Frolick_Field.jpg",
+      "w": 500,
+      "h": 371,
+      "credit": "Ildar Sagdejev (Specious)",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:2008-07-28_Dog_at_Frolick_Field.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/11/Two_French_bulldogs_swimming_in_life_jackets.jpg/500px-Two_French_bulldogs_swimming_in_life_jackets.jpg",
+      "w": 500,
+      "h": 281,
+      "credit": "W.carter",
+      "license": "CC0 1.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Two_French_bulldogs_swimming_in_life_jackets.jpg"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "bulldog",
+   "name": "Bulldog",
+   "alt": [
+    "British Bulldog",
+    "English Bulldog"
+   ],
+   "facts": {
+    "origin": "United Kingdom",
+    "type": "Companion",
+    "massKg": 23,
+    "size": "Medium"
+   },
+   "lookalikes": [
+    "french-bulldog"
+   ],
+   "blurb": "A stocky, wrinkly dog with a pushed-in face. It is a national symbol of Britain.",
+   "clues": [
+    "It is a mascot of many sports teams.",
+    "It has a loose, wrinkly face and an underbite.",
+    "The breed comes from United Kingdom.",
+    "It is a companion breed.",
+    "A typical adult weighs about 23 kg.",
+    "It is linked with Winston Churchill.",
+    "The answer is one word of 7 letters.",
+    "It starts with the letter B."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/a/a4/Racib%C3%B3rz_2007_082.jpg/500px-Racib%C3%B3rz_2007_082.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Pleple2000",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Racib%C3%B3rz_2007_082.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/9/94/English_Bulldog_Ouside.jpg/500px-English_Bulldog_Ouside.jpg",
+      "w": 500,
+      "h": 667,
+      "credit": "OtisGD",
+      "license": "CC0 1.0",
+      "page": "https://commons.wikimedia.org/wiki/File:English_Bulldog_Ouside.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/b/b9/GAO_Watchdog_Report_artwork.png/500px-GAO_Watchdog_Report_artwork.png",
+      "w": 500,
+      "h": 500,
+      "credit": "United States Government Accountability Office",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:GAO_Watchdog_Report_artwork.png"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "poodle",
+   "name": "Poodle",
+   "alt": [
+    "Standard Poodle"
+   ],
+   "facts": {
+    "origin": "France",
+    "type": "Companion",
+    "massKg": 25,
+    "size": "Large"
+   },
+   "blurb": "A clever dog with curly fur that hardly sheds. It comes in standard, miniature and toy sizes.",
+   "clues": [
+    "It was first bred as a water dog in Germany.",
+    "Its fancy haircut was designed to help it swim.",
+    "It is one of the most intelligent breeds.",
+    "The breed comes from France.",
+    "It is a companion breed.",
+    "A typical adult weighs about 25 kg.",
+    "It has tight, curly fur.",
+    "The answer is one word of 6 letters.",
+    "It starts with the letter P."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/2/2e/Miniature_Poodle_%28Hungary%29.jpg/500px-Miniature_Poodle_%28Hungary%29.jpg",
+      "w": 500,
+      "h": 667,
+      "credit": "UszkarFoto92",
+      "license": "CC0 1.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Miniature_Poodle_(Hungary).jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/c/c0/Miniature_poodle.jpg/500px-Miniature_poodle.jpg",
+      "w": 500,
+      "h": 336,
+      "credit": "Boxerista96",
+      "license": "CC BY 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Miniature_poodle.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/f/f8/Full_attention_%288067543690%29.jpg/500px-Full_attention_%288067543690%29.jpg",
+      "w": 500,
+      "h": 331,
+      "credit": "Tim Wilson from Blaine, MN, USA",
+      "license": "CC BY 2.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Full_attention_(8067543690).jpg"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "beagle",
+   "name": "Beagle",
+   "facts": {
+    "origin": "United Kingdom",
+    "type": "Hound",
+    "massKg": 10,
+    "size": "Small"
+   },
+   "lookalikes": [
+    "basset-hound"
+   ],
+   "blurb": "A small, merry hound with floppy ears and a great sense of smell. It is used to sniff out food at airports.",
+   "clues": [
+    "Snoopy from \"Peanuts\" is one.",
+    "It sniffs bags for food at airports.",
+    "It was bred to hunt hares in packs.",
+    "The breed comes from United Kingdom.",
+    "It is a hound breed.",
+    "A typical adult weighs about 10 kg.",
+    "It has floppy ears and a white-tipped tail.",
+    "It is a small tricolour hound with a great nose.",
+    "The answer is one word of 6 letters.",
+    "It starts with the letter B."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/f/f5/MiloSmet.JPG/500px-MiloSmet.JPG",
+      "w": 500,
+      "h": 332,
+      "credit": "Jonatan De Geest",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:MiloSmet.JPG"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/5/55/Beagle_600.jpg/500px-Beagle_600.jpg",
+      "w": 500,
+      "h": 400,
+      "credit": "Wikimedia Commons",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Beagle_600.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/2/25/A_Pomeranian_sniffing_a_Beagle.jpg/500px-A_Pomeranian_sniffing_a_Beagle.jpg",
+      "w": 500,
+      "h": 667,
+      "credit": "Slyronit",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:A_Pomeranian_sniffing_a_Beagle.jpg"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "rottweiler",
+   "name": "Rottweiler",
+   "alt": [
+    "Rottie"
+   ],
+   "facts": {
+    "origin": "Germany",
+    "type": "Working",
+    "massKg": 45,
+    "size": "Giant"
+   },
+   "lookalikes": [
+    "dobermann"
+   ],
+   "blurb": "A big, powerful black-and-tan dog. Long ago it drove cattle to market and guarded the money.",
+   "clues": [
+    "Butchers once used it to pull carts of meat.",
+    "It drove cattle to market in a German town.",
+    "It is used as a police and guard dog.",
+    "The breed comes from Germany.",
+    "It is a working breed.",
+    "A typical adult weighs about 45 kg.",
+    "It is black with tan markings on its face and legs.",
+    "It is a big, strong, muscular dog.",
+    "The answer is one word of 10 letters.",
+    "It starts with the letter R."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/6/62/Rottweiler_Moletai_May_2014.2.jpg",
+      "w": 500,
+      "h": 731,
+      "credit": "Томасина",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Rottweiler_Moletai_May_2014.2.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/2/26/Rottweiler_standing_facing_left.jpg/500px-Rottweiler_standing_facing_left.jpg",
+      "w": 500,
+      "h": 380,
+      "credit": "Dr. Manfred Herrmann Allgemeiner Deutscher Rottweiler-Klub (ADRK) e.V. http://www.ADRK.de",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Rottweiler_standing_facing_left.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/8/85/Rottweiler_in_Lifou.jpg/500px-Rottweiler_in_Lifou.jpg",
+      "w": 500,
+      "h": 667,
+      "credit": "JustARandomEditor123",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Rottweiler_in_Lifou.jpg"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "dachshund",
+   "name": "Dachshund",
+   "alt": [
+    "sausage dog",
+    "wiener dog",
+    "Dackel"
+   ],
+   "facts": {
+    "origin": "Germany",
+    "type": "Hound",
+    "massKg": 10,
+    "size": "Small"
+   },
+   "lookalikes": [
+    "basset-hound",
+    "pembroke-welsh-corgi"
+   ],
+   "blurb": "A long, low dog with short legs. It was bred to dig into badger holes.",
+   "clues": [
+    "Its name means \"badger dog\" in German.",
+    "It comes in smooth, wire-haired and long-haired coats.",
+    "It was bred to chase badgers underground.",
+    "The breed comes from Germany.",
+    "It is a hound breed.",
+    "A typical adult weighs about 10 kg.",
+    "Its body is very long and its legs are very short.",
+    "It is nicknamed after a long meat snack.",
+    "The answer is one word of 9 letters.",
+    "It starts with the letter D."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/f/f4/MiniDachshund1_wb.jpg",
+      "w": 500,
+      "h": 336,
+      "credit": "Ellen Levy Finch (Elf)",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:MiniDachshund1_wb.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/b/be/%EB%8B%A5%EC%8A%A4%ED%9B%88%ED%8A%B8%28%EB%8B%A8%EB%AA%A8%EC%A2%85%29_%28Dachshund_%28Short%29%29.jpg/500px-%EB%8B%A5%EC%8A%A4%ED%9B%88%ED%8A%B8%28%EB%8B%A8%EB%AA%A8%EC%A2%85%29_%28Dachshund_%28Short%29%29.jpg",
+      "w": 500,
+      "h": 371,
+      "credit": "Katemil94",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:%EB%8B%A5%EC%8A%A4%ED%9B%88%ED%8A%B8(%EB%8B%A8%EB%AA%A8%EC%A2%85)_(Dachshund_(Short)).jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/17/Teckel_-_39.jpg/500px-Teckel_-_39.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Another one of my pictures: This photograph was taken by Medium69 (William Crochot) and…",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Teckel_-_39.jpg"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "yorkshire-terrier",
+   "name": "Yorkshire Terrier",
+   "alt": [
+    "Yorkie"
+   ],
+   "facts": {
+    "origin": "United Kingdom",
+    "type": "Toy",
+    "massKg": 3,
+    "size": "Toy"
+   },
+   "lookalikes": [
+    "silky-terrier",
+    "maltese"
+   ],
+   "blurb": "A tiny terrier with long, silky steel-blue and tan hair. It was bred to catch rats in mills.",
+   "clues": [
+    "It was bred to catch rats in clothing mills.",
+    "Its long coat is steel-blue and tan.",
+    "It is often carried in handbags.",
+    "The breed comes from United Kingdom.",
+    "It is a toy breed.",
+    "A typical adult weighs about 3 kg.",
+    "It is named after an English county.",
+    "The answer has 2 words (9, 7 letters).",
+    "It starts with the letter Y."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/3/32/Imageyorkie.png/500px-Imageyorkie.png",
+      "w": 500,
+      "h": 667,
+      "credit": "Gandalfelrojo2",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Imageyorkie.png"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/4/41/%282_version%29_Grupp_3%2C_YORKSHIRETERRIER%2C_NO_UCH_SE_UCH_Oxzar_Amazing_Bel%E2%80%99s_Toffy_%2824310212305%29.jpg/500px-%282_version%29_Grupp_3%2C_YORKSHIRETERRIER%2C_NO_UCH_SE_UCH_Oxzar_Amazing_Bel%E2%80%99s_Toffy_%2824310212305%29.jpg",
+      "w": 500,
+      "h": 621,
+      "credit": "Svenska Mässan from Sweden",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:(2_version)_Grupp_3,_YORKSHIRETERRIER,_NO_UCH_SE_UCH_Oxzar_Amazing_Bel%E2%80%99s_Toffy_(24310212305).jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/7/75/Yorkie_Halloween.jpg/500px-Yorkie_Halloween.jpg",
+      "w": 500,
+      "h": 605,
+      "credit": "KellyDoyle",
+      "license": "CC0 1.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Yorkie_Halloween.jpg"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "boxer",
+   "name": "Boxer",
+   "facts": {
+    "origin": "Germany",
+    "type": "Working",
+    "massKg": 30,
+    "size": "Large"
+   },
+   "lookalikes": [
+    "bulldog"
+   ],
+   "blurb": "A playful, strong dog with a square head. It got its name from the way it stands up and paws with its front legs.",
+   "clues": [
+    "It was among the first breeds used as police dogs in Germany.",
+    "It stays puppy-like for years.",
+    "It has a short, square muzzle.",
+    "The breed comes from Germany.",
+    "It is a working breed.",
+    "A typical adult weighs about 30 kg.",
+    "It is often fawn or brindle with white.",
+    "It is said to be named for \"punching\" with its front paws.",
+    "The answer is one word of 5 letters.",
+    "It starts with the letter B."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/e/e4/Boxer_female_brown.jpg/500px-Boxer_female_brown.jpg",
+      "w": 500,
+      "h": 408,
+      "credit": "Flickr user boxercab",
+      "license": "CC BY 2.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Boxer_female_brown.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/6/6f/Male_fawn_Boxer_undocked.jpg/500px-Male_fawn_Boxer_undocked.jpg",
+      "w": 500,
+      "h": 369,
+      "credit": "Mood210",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Male_fawn_Boxer_undocked.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/c/c2/Deutscher_Boxer_Elmo_vom_Freudenreich.jpg/500px-Deutscher_Boxer_Elmo_vom_Freudenreich.jpg",
+      "w": 500,
+      "h": 750,
+      "credit": "OleNeitzel",
+      "license": "CC BY 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Deutscher_Boxer_Elmo_vom_Freudenreich.jpg"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "siberian-husky",
+   "name": "Siberian Husky",
+   "alt": [
+    "Husky"
+   ],
+   "facts": {
+    "origin": "Russia",
+    "type": "Working",
+    "massKg": 22,
+    "size": "Medium"
+   },
+   "lookalikes": [
+    "alaskan-malamute",
+    "samoyed"
+   ],
+   "blurb": "A tough sled dog from Siberia, often with bright blue eyes. Huskies helped carry medicine to Nome, Alaska, in 1925.",
+   "clues": [
+    "A team carried diphtheria medicine to Nome in 1925.",
+    "It was bred by the Chukchi people.",
+    "It howls rather than barks.",
+    "The breed comes from Russia.",
+    "It is a working breed.",
+    "A typical adult weighs about 22 kg.",
+    "It often has bright blue eyes.",
+    "It pulls sleds over snow.",
+    "The answer has 2 words (8, 5 letters).",
+    "It starts with the letter S."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/f/f5/Siberian_Husky_-_Mika.jpg/500px-Siberian_Husky_-_Mika.jpg",
+      "w": 500,
+      "h": 500,
+      "credit": "ShonMichaeli",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Siberian_Husky_-_Mika.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/8/8b/Husky_L.jpg/500px-Husky_L.jpg",
+      "w": 500,
+      "h": 362,
+      "credit": "xJaM (talk · contribs)",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Husky_L.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/0/0e/Inzell_2017_Kat_A1_ZBYSZEK_Kunert_-9513.jpg/500px-Inzell_2017_Kat_A1_ZBYSZEK_Kunert_-9513.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Isiwal",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Inzell_2017_Kat_A1_ZBYSZEK_Kunert_-9513.jpg"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "pembroke-welsh-corgi",
+   "name": "Pembroke Welsh Corgi",
+   "alt": [
+    "Corgi"
+   ],
+   "facts": {
+    "origin": "United Kingdom",
+    "type": "Herding",
+    "massKg": 12,
+    "size": "Medium"
+   },
+   "lookalikes": [
+    "dachshund"
+   ],
+   "blurb": "A short-legged herding dog from Wales. Queen Elizabeth II owned more than 30 of them.",
+   "clues": [
+    "It herded cattle by nipping at their heels.",
+    "Queen Elizabeth II owned more than 30.",
+    "It has big pointed ears and a fox-like face.",
+    "The breed comes from United Kingdom.",
+    "It is a herding breed.",
+    "A typical adult weighs about 12 kg.",
+    "It has very short legs and a long body.",
+    "It comes from Wales.",
+    "The answer has 3 words (8, 5, 5 letters).",
+    "It starts with the letter P."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/9/99/Welsh_Pembroke_Corgi.jpg/500px-Welsh_Pembroke_Corgi.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Dog breed facts",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Welsh_Pembroke_Corgi.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/4/4a/Fawn_and_white_Welsh_Corgi_puppy_standing_on_rear_legs_and_sticking_out_the_tongue.jpg/500px-Fawn_and_white_Welsh_Corgi_puppy_standing_on_rear_legs_and_sticking_out_the_tongue.jpg",
+      "w": 500,
+      "h": 749,
+      "credit": "Huoadg5888Minor edits made by Subsidiary account",
+      "license": "CC0 1.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Fawn_and_white_Welsh_Corgi_puppy_standing_on_rear_legs_and_sticking_out_the_tongue.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/4/45/Pembroke_Welsh_Corgi.jpg/500px-Pembroke_Welsh_Corgi.jpg",
+      "w": 500,
+      "h": 321,
+      "credit": "Marsiyanka",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Pembroke_Welsh_Corgi.jpg"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "great-dane",
+   "name": "Great Dane",
+   "alt": [
+    "German Mastiff"
+   ],
+   "facts": {
+    "origin": "Germany",
+    "type": "Working",
+    "massKg": 65,
+    "size": "Giant"
+   },
+   "lookalikes": [
+    "english-mastiff",
+    "irish-wolfhound"
+   ],
+   "blurb": "One of the tallest dog breeds. Scooby-Doo is a cartoon one.",
+   "clues": [
+    "It was bred to hunt wild boar.",
+    "One named Zeus was the tallest dog ever recorded.",
+    "It is often called a \"gentle giant\".",
+    "It is a working breed.",
+    "A typical adult weighs about 65 kg.",
+    "Scooby-Doo is one.",
+    "It is one of the tallest breeds of all.",
+    "The answer has 2 words (5, 4 letters).",
+    "It starts with the letter G."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/e/e8/8675eds_win.jpg",
+      "w": 500,
+      "h": 487,
+      "credit": "Original uploader was Markovade.pero at sr.wikipedia",
+      "license": "CC BY-SA 3.0 rs",
+      "page": "https://commons.wikimedia.org/wiki/File:8675eds_win.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/e/e0/Dog_niemiecki_%C5%BC%C3%B3%C5%82ty_LM980.jpg/500px-Dog_niemiecki_%C5%BC%C3%B3%C5%82ty_LM980.jpg",
+      "w": 500,
+      "h": 485,
+      "credit": "Lilly M",
+      "license": "CC BY-SA 2.5",
+      "page": "https://commons.wikimedia.org/wiki/File:Dog_niemiecki_%C5%BC%C3%B3%C5%82ty_LM980.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/9/90/Don_Carlos_y_Melgar.JPG/500px-Don_Carlos_y_Melgar.JPG",
+      "w": 500,
+      "h": 716,
+      "credit": "Hirsbrunner, C.",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Don_Carlos_y_Melgar.JPG"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "chihuahua",
+   "name": "Chihuahua",
+   "facts": {
+    "origin": "Mexico",
+    "type": "Toy",
+    "massKg": 2,
+    "size": "Toy"
+   },
+   "lookalikes": [
+    "papillon",
+    "pomeranian"
+   ],
+   "blurb": "The smallest dog breed in the world, from Mexico. It has big ears and a big personality.",
+   "clues": [
+    "It may come from the Techichi dogs of ancient Mexico.",
+    "It has a soft spot on its skull like a baby.",
+    "It has big ears and big round eyes.",
+    "The breed comes from Mexico.",
+    "It is a toy breed.",
+    "A typical adult weighs about 2 kg.",
+    "It is named after a Mexican state.",
+    "It is the smallest dog breed in the world.",
+    "The answer is one word of 9 letters.",
+    "It starts with the letter C."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/3/39/Chihuahuas-_Holly%2C_Nina%2C_Doralice.jpg/500px-Chihuahuas-_Holly%2C_Nina%2C_Doralice.jpg",
+      "w": 500,
+      "h": 387,
+      "credit": "Caterinarufo",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Chihuahuas-_Holly,_Nina,_Doralice.jpg"
+     },
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/4/4c/Chihuahua1_bvdb.jpg",
+      "w": 500,
+      "h": 435,
+      "credit": "Bonnie van den Born, http://www.bonfoto.nl. The original uploader was Cwazi at Dutch Wi…",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Chihuahua1_bvdb.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/2/2d/Chihuahua_qui_profite_du_soleil.jpg/500px-Chihuahua_qui_profite_du_soleil.jpg",
+      "w": 500,
+      "h": 334,
+      "credit": "JackyM59",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Chihuahua_qui_profite_du_soleil.jpg"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "pug",
+   "name": "Pug",
+   "facts": {
+    "origin": "China",
+    "type": "Toy",
+    "massKg": 7,
+    "size": "Small"
+   },
+   "lookalikes": [
+    "french-bulldog",
+    "pekingese"
+   ],
+   "blurb": "A small, wrinkly dog with a flat face and curly tail. It was a favourite of Chinese emperors.",
+   "clues": [
+    "It was a favourite of Chinese emperors.",
+    "Dutch royalty made it popular in Europe.",
+    "It has a tightly curled tail.",
+    "The breed comes from China.",
+    "It is a toy breed.",
+    "A typical adult weighs about 7 kg.",
+    "Its face is flat and wrinkly.",
+    "Its name is just three letters.",
+    "The answer is one word of 3 letters.",
+    "It starts with the letter P."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/8/85/2.5-year-old_fawn_male_pug.jpg/500px-2.5-year-old_fawn_male_pug.jpg",
+      "w": 500,
+      "h": 437,
+      "credit": "Abuk SABUK",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:2.5-year-old_fawn_male_pug.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/f/f3/Mops-duke-mopszucht-vom-maegdebrunnen.jpg/500px-Mops-duke-mopszucht-vom-maegdebrunnen.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Xidrep",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Mops-duke-mopszucht-vom-maegdebrunnen.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/5/56/Pug_puppy_001.jpg/500px-Pug_puppy_001.jpg",
+      "w": 500,
+      "h": 750,
+      "credit": "No machine-readable author provided. Rtamayo~commonswiki assumed (based on copyright cl…",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Pug_puppy_001.jpg"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "shih-tzu",
+   "name": "Shih Tzu",
+   "facts": {
+    "origin": "China",
+    "type": "Toy",
+    "massKg": 6,
+    "size": "Small"
+   },
+   "lookalikes": [
+    "lhasa-apso",
+    "pekingese"
+   ],
+   "blurb": "A small, long-haired lap dog bred for Chinese royalty. Its name means \"lion dog\".",
+   "clues": [
+    "It was bred for Chinese royalty.",
+    "It is related to the Lhasa Apso from Tibet.",
+    "Its hair is often tied up in a topknot.",
+    "The breed comes from China.",
+    "It is a toy breed.",
+    "A typical adult weighs about 6 kg.",
+    "It has a long, flowing coat.",
+    "Its name means \"lion\" in Chinese.",
+    "The answer has 2 words (4, 3 letters).",
+    "It starts with the letter S."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/0/01/Shih_Tzu_portrait_show_dog.jpg/500px-Shih_Tzu_portrait_show_dog.jpg",
+      "w": 500,
+      "h": 752,
+      "credit": "danny O.",
+      "license": "CC BY 2.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Shih_Tzu_portrait_show_dog.jpg"
+     },
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/d/df/Shihtzu_%28cropped%29.jpg",
+      "w": 500,
+      "h": 400,
+      "credit": "Canino21",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Shihtzu_(cropped).jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/3/3a/Shitzu_with_buzzcut.jpg/500px-Shitzu_with_buzzcut.jpg",
+      "w": 500,
+      "h": 547,
+      "credit": "Theornamentalist",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Shitzu_with_buzzcut.jpg"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "border-collie",
+   "name": "Border Collie",
+   "alt": [
+    "Collie"
+   ],
+   "facts": {
+    "origin": "United Kingdom",
+    "type": "Herding",
+    "massKg": 17,
+    "size": "Medium"
+   },
+   "lookalikes": [
+    "australian-shepherd",
+    "rough-collie",
+    "shetland-sheepdog"
+   ],
+   "blurb": "A super-smart, energetic sheepdog. It controls sheep by staring at them with \"the eye\".",
+   "clues": [
+    "One named Chaser learned the names of over 1,000 toys.",
+    "It controls sheep with an intense stare.",
+    "It is often called the cleverest breed.",
+    "The breed comes from United Kingdom.",
+    "It is a herding breed.",
+    "A typical adult weighs about 17 kg.",
+    "It is usually black and white.",
+    "It comes from the area where England meets Scotland.",
+    "The answer has 2 words (6, 6 letters).",
+    "It starts with the letter B."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/9/9c/Argentine_border_collie.jpg/500px-Argentine_border_collie.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Horacio Cambeiro",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Argentine_border_collie.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/e/e4/Border_Collie_600.jpg/500px-Border_Collie_600.jpg",
+      "w": 500,
+      "h": 409,
+      "credit": "Wikimedia Commons",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Border_Collie_600.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/3/37/Border-Collie-tri-colour-face-1.jpg/500px-Border-Collie-tri-colour-face-1.jpg",
+      "w": 500,
+      "h": 374,
+      "credit": "Kreuzschnabel",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Border-Collie-tri-colour-face-1.jpg"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "australian-shepherd",
+   "name": "Australian Shepherd",
+   "alt": [
+    "Aussie"
+   ],
+   "facts": {
+    "origin": "United States",
+    "type": "Herding",
+    "massKg": 23,
+    "size": "Medium"
+   },
+   "lookalikes": [
+    "border-collie"
+   ],
+   "blurb": "Despite its name, this herding dog was developed in the USA. Many have blue or odd-coloured eyes.",
+   "clues": [
+    "It was developed on ranches in the western USA.",
+    "Many have one blue eye and one brown eye.",
+    "It is often blue merle coloured.",
+    "The breed comes from United States.",
+    "It is a herding breed.",
+    "A typical adult weighs about 23 kg.",
+    "It was popular in rodeos.",
+    "Its name suggests a country it does not come from.",
+    "The answer has 2 words (10, 8 letters).",
+    "It starts with the letter A."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/d/de/Aussi.jpg",
+      "w": 500,
+      "h": 686,
+      "credit": "Christoph Aeschlimann",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Aussi.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/8/80/Australian_Shepherd_red_bi.JPG/500px-Australian_Shepherd_red_bi.JPG",
+      "w": 500,
+      "h": 333,
+      "credit": "Trickdog-Fina",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Australian_Shepherd_red_bi.JPG"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/c/c5/Linus_%28dog%29_on_a_desert_trail.jpg/500px-Linus_%28dog%29_on_a_desert_trail.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "TnT20052013",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Linus_(dog)_on_a_desert_trail.jpg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "dobermann",
+   "name": "Dobermann",
+   "alt": [
+    "Doberman",
+    "Doberman Pinscher"
+   ],
+   "facts": {
+    "origin": "Germany",
+    "type": "Working",
+    "massKg": 38,
+    "size": "Large"
+   },
+   "lookalikes": [
+    "rottweiler"
+   ],
+   "blurb": "A sleek, fast guard dog. It was first bred by a German tax collector to protect him on his rounds.",
+   "clues": [
+    "It served with US Marines in World War II.",
+    "It is sleek, fast and alert.",
+    "The breed comes from Germany.",
+    "It is a working breed.",
+    "A typical adult weighs about 38 kg.",
+    "It is usually black and rust coloured.",
+    "It is a famous guard dog.",
+    "The answer is one word of 9 letters.",
+    "It starts with the letter D."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/3/3f/Dobermann_Father-and-son.jpg",
+      "w": 500,
+      "h": 603,
+      "credit": "Fran Hogan",
+      "license": "CC BY 2.5",
+      "page": "https://commons.wikimedia.org/wiki/File:Dobermann_Father-and-son.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/c/c9/DobermannSparte3.jpg/500px-DobermannSparte3.jpg",
+      "w": 500,
+      "h": 667,
+      "credit": "JoSaba11",
+      "license": "CC0 1.0",
+      "page": "https://commons.wikimedia.org/wiki/File:DobermannSparte3.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/6/67/My_dog%2C_her_name_is_Becky.jpg/500px-My_dog%2C_her_name_is_Becky.jpg",
+      "w": 500,
+      "h": 667,
+      "credit": "Chuvachonok",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:My_dog,_her_name_is_Becky.jpg"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "cavalier-king-charles-spaniel",
+   "name": "Cavalier King Charles Spaniel",
+   "alt": [
+    "Cavalier"
+   ],
+   "facts": {
+    "origin": "United Kingdom",
+    "type": "Toy",
+    "massKg": 7,
+    "size": "Small"
+   },
+   "blurb": "A gentle little spaniel with long, silky ears. It is named after King Charles II of England.",
+   "clues": [
+    "It appears in many old paintings.",
+    "It comes in four colours, including Blenheim.",
+    "It has long, feathery ears.",
+    "It is a toy breed.",
+    "A typical adult weighs about 7 kg.",
+    "Its silky coat is often chestnut and white.",
+    "It is one of the most popular lap dogs in Britain.",
+    "The answer has 4 words (8, 4, 7, 7 letters).",
+    "It starts with the letter C."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/e/e9/CavalierKgChas2_wb.jpg",
+      "w": 500,
+      "h": 448,
+      "credit": "en:user:Elf, Ellen Levy Finch",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:CavalierKgChas2_wb.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/a/ab/Betty_Verdure.Photo_Ph.BRIZARD.JPG/500px-Betty_Verdure.Photo_Ph.BRIZARD.JPG",
+      "w": 500,
+      "h": 409,
+      "credit": "Mapovfille",
+      "license": "CC BY 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Betty_Verdure.Photo_Ph.BRIZARD.JPG"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/5/5f/CarterBIS.Tiki.13.6.09.jpg/500px-CarterBIS.Tiki.13.6.09.jpg",
+      "w": 500,
+      "h": 365,
+      "credit": "Andreweatock",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:CarterBIS.Tiki.13.6.09.jpg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "miniature-schnauzer",
+   "name": "Miniature Schnauzer",
+   "alt": [
+    "Schnauzer"
+   ],
+   "facts": {
+    "origin": "Germany",
+    "type": "Terrier",
+    "massKg": 7,
+    "size": "Small"
+   },
+   "blurb": "A small, bearded German dog with bushy eyebrows. It was bred to catch rats on farms.",
+   "clues": [
+    "Its name means \"snout\" in German.",
+    "It was bred as a farm ratter.",
+    "It has bushy eyebrows.",
+    "The breed comes from Germany.",
+    "It is a terrier breed.",
+    "A typical adult weighs about 7 kg.",
+    "It has a long beard and whiskers.",
+    "It is the smallest of three sizes of its breed.",
+    "The answer has 2 words (9, 9 letters).",
+    "It starts with the letter M."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/3/36/%D0%9F%D0%B8%D1%82%D0%BE%D0%BC%D0%BD%D0%B8%D0%BA_%22%D0%90%D1%81%D1%81%D0%BE%D0%BD_%D0%90%D1%80%D0%B8%22_%D0%A6%D0%B2%D0%B5%D1%80%D0%B3%D1%88%D0%BD%D0%B0%D1%83%D1%86%D0%B5%D1%80%D1%8B_%D0%B1%D0%B5%D0%BB%D1%8B%D0%B5_%D0%B8_%D1%87%D0%B5%D1%80%D0%BD%D1%8B%D0%B5_%D1%81_%D1%81%D0%B5%D1%80%D0%B5%D0%B1%D1%80%D0%BE%D0%BC_12.jpg/500px-%D0%9F%D0%B8%D1%82%D0%BE%D0%BC%D0%BD%D0%B8%D0%BA_%22%D0%90%D1%81%D1%81%D0%BE%D0%BD_%D0%90%D1%80%D0%B8%22_%D0%A6%D0%B2%D0%B5%D1%80%D0%B3%D1%88%D0%BD%D0%B0%D1%83%D1%86%D0%B5%D1%80%D1%8B_%D0%B1%D0%B5%D0%BB%D1%8B%D0%B5_%D0%B8_%D1%87%D0%B5%D1%80%D0%BD%D1%8B%D0%B5_%D1%81_%D1%81%D0%B5%D1%80%D0%B5%D0%B1%D1%80%D0%BE%D0%BC_12.jpg",
+      "w": 500,
+      "h": 368,
+      "credit": "Zorik07",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:%D0%9F%D0%B8%D1%82%D0%BE%D0%BC%D0%BD%D0%B8%D0%BA_%22%D0%90%D1%81%D1%81%D0%BE%D0%BD_%D0%90%D1%80%D0%B8%22_%D0%A6%D0%B2%D0%B5%D1%80%D0%B3%D1%88%D0%BD%D0%B0%D1%83%D1%86%D0%B5%D1%80%D1%8B_%D0%B1%D0%B5%D0%BB%D1%8B%D0%B5_%D0%B8_%D1%87%D0%B5%D1%80%D0%BD%D1%8B%D0%B5_%D1%81_%D1%81%D0%B5%D1%80%D0%B5%D0%B1%D1%80%D0%BE%D0%BC_12.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/3/30/Miniature_Schnauzer_salt_%26_pepper_%28cropped%29.jpg/500px-Miniature_Schnauzer_salt_%26_pepper_%28cropped%29.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Canarian",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Miniature_Schnauzer_salt_%26_pepper_(cropped).jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/4/46/%C5%9Awierklaniec_bia%C5%82y_sznaucer_miniatura_12.06.2010_pl.jpg/500px-%C5%9Awierklaniec_bia%C5%82y_sznaucer_miniatura_12.06.2010_pl.jpg",
+      "w": 500,
+      "h": 489,
+      "credit": "Pleple2000",
+      "license": "CC BY 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:%C5%9Awierklaniec_bia%C5%82y_sznaucer_miniatura_12.06.2010_pl.jpg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "bernese-mountain-dog",
+   "name": "Bernese Mountain Dog",
+   "alt": [
+    "Berner"
+   ],
+   "facts": {
+    "origin": "Switzerland",
+    "type": "Working",
+    "massKg": 45,
+    "size": "Giant"
+   },
+   "lookalikes": [
+    "saint-bernard"
+   ],
+   "blurb": "A big, gentle three-coloured farm dog from the Swiss Alps. It pulled carts of milk and cheese.",
+   "clues": [
+    "It pulled carts of milk and cheese.",
+    "It has a black, white and rust coat.",
+    "It is gentle and calm.",
+    "The breed comes from Switzerland.",
+    "It is a working breed.",
+    "A typical adult weighs about 45 kg.",
+    "It comes from the Swiss Alps.",
+    "It is named after a Swiss city and the hills.",
+    "The answer has 3 words (7, 8, 3 letters).",
+    "It starts with the letter B."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/d/d4/Bouviers_Bernois_Ganjo.jpg",
+      "w": 500,
+      "h": 470,
+      "credit": "Ganjo http://fr.wikipedia.org/wiki/Utilisateur:Ganjo",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Bouviers_Bernois_Ganjo.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/c/cc/3-BerneseMountainDogInGrass.jpg/500px-3-BerneseMountainDogInGrass.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "FriendlyToaster",
+      "license": "CC BY 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:3-BerneseMountainDogInGrass.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/5/59/2-BerneseMountainDogInGrass.jpg/500px-2-BerneseMountainDogInGrass.jpg",
+      "w": 500,
+      "h": 750,
+      "credit": "FriendlyToaster",
+      "license": "CC BY 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:2-BerneseMountainDogInGrass.jpg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "shetland-sheepdog",
+   "name": "Shetland Sheepdog",
+   "alt": [
+    "Sheltie"
+   ],
+   "facts": {
+    "origin": "United Kingdom",
+    "type": "Herding",
+    "massKg": 9,
+    "size": "Small"
+   },
+   "lookalikes": [
+    "rough-collie",
+    "border-collie"
+   ],
+   "blurb": "A small herding dog from the Shetland Islands that looks like a mini Lassie.",
+   "clues": [
+    "It barks a lot.",
+    "It looks like a small Rough Collie.",
+    "The breed comes from United Kingdom.",
+    "It is a herding breed.",
+    "A typical adult weighs about 9 kg.",
+    "It has a thick mane-like coat.",
+    "It comes from islands north of Scotland.",
+    "The answer has 2 words (8, 8 letters).",
+    "It starts with the letter S."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/6/62/ShetlandShpdogBlue2_wb.jpg",
+      "w": 500,
+      "h": 411,
+      "credit": "Wikimedia Commons",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:ShetlandShpdogBlue2_wb.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/b/b5/Shetland_Sheepdog_sable.jpg/500px-Shetland_Sheepdog_sable.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Flickr user nickobec (Nick Cowie)",
+      "license": "CC BY-SA 2.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Shetland_Sheepdog_sable.jpg"
+     },
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/2/2b/Dog-sitting-pretty.jpg",
+      "w": 500,
+      "h": 912,
+      "credit": "Karen Arnold",
+      "license": "CC0 1.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Dog-sitting-pretty.jpg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "boston-terrier",
+   "name": "Boston Terrier",
+   "facts": {
+    "origin": "United States",
+    "type": "Companion",
+    "massKg": 8,
+    "size": "Small"
+   },
+   "lookalikes": [
+    "french-bulldog"
+   ],
+   "blurb": "A small black-and-white dog nicknamed \"the American gentleman\" because it looks like it is wearing a tuxedo.",
+   "clues": [
+    "It is nicknamed \"the American gentleman\".",
+    "It looks like it is wearing a tuxedo.",
+    "It has a flat face and upright ears.",
+    "The breed comes from United States.",
+    "It is a companion breed.",
+    "A typical adult weighs about 8 kg.",
+    "It is the state dog of Massachusetts.",
+    "It is named after a US city.",
+    "The answer has 2 words (6, 7 letters).",
+    "It starts with the letter B."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/f/fe/BOSTON_TERRIER%2C_Ving%C3%A5rdens_Essi_von_Richards_%2823995273800%29.2.jpg/500px-BOSTON_TERRIER%2C_Ving%C3%A5rdens_Essi_von_Richards_%2823995273800%29.2.jpg",
+      "w": 500,
+      "h": 427,
+      "credit": "Svenska Mässan from Sweden",
+      "license": "CC BY 2.0",
+      "page": "https://commons.wikimedia.org/wiki/File:BOSTON_TERRIER,_Ving%C3%A5rdens_Essi_von_Richards_(23995273800).2.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/d/d7/Boston-terrier-carlos-de.JPG/500px-Boston-terrier-carlos-de.JPG",
+      "w": 500,
+      "h": 375,
+      "credit": "Andreas Schlaugat",
+      "license": "CC BY 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Boston-terrier-carlos-de.JPG"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/9/91/Ocho_Boston_Terrier.jpg/500px-Ocho_Boston_Terrier.jpg",
+      "w": 500,
+      "h": 332,
+      "credit": "Wikipedro",
+      "license": "CC BY 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Ocho_Boston_Terrier.jpg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "pomeranian",
+   "name": "Pomeranian",
+   "alt": [
+    "Pom"
+   ],
+   "facts": {
+    "origin": "Germany",
+    "type": "Toy",
+    "massKg": 2.5,
+    "size": "Toy"
+   },
+   "lookalikes": [
+    "chihuahua",
+    "samoyed"
+   ],
+   "blurb": "A tiny, fluffy dog that looks like a little fox. Queen Victoria made it popular.",
+   "clues": [
+    "Its ancestors were big sled dogs.",
+    "Queen Victoria helped make it small and popular.",
+    "It has a fluffy coat that stands out.",
+    "The breed comes from Germany.",
+    "It is a toy breed.",
+    "A typical adult weighs about 2.5 kg.",
+    "It looks like a little fox or lion.",
+    "It is named after a region by the Baltic Sea.",
+    "The answer is one word of 10 letters.",
+    "It starts with the letter P."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/3/30/%D0%9F%D0%BE%D0%BC%D0%B5%D1%80%D0%B0%D0%BD%D1%81%D0%BA%D0%B8%D0%B9_%D1%88%D0%BF%D0%B8%D1%86_%28Pomeranian%29_01.jpg/500px-%D0%9F%D0%BE%D0%BC%D0%B5%D1%80%D0%B0%D0%BD%D1%81%D0%BA%D0%B8%D0%B9_%D1%88%D0%BF%D0%B8%D1%86_%28Pomeranian%29_01.jpg",
+      "w": 500,
+      "h": 633,
+      "credit": "Novoklimov",
+      "license": "CC0 1.0",
+      "page": "https://commons.wikimedia.org/wiki/File:%D0%9F%D0%BE%D0%BC%D0%B5%D1%80%D0%B0%D0%BD%D1%81%D0%BA%D0%B8%D0%B9_%D1%88%D0%BF%D0%B8%D1%86_(Pomeranian)_01.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/c/ca/Pomeranian.JPG/500px-Pomeranian.JPG",
+      "w": 500,
+      "h": 414,
+      "credit": "Blackoranges",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Pomeranian.JPG"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/e/eb/Spitz_Alem%C3%A3o_An%C3%A3o_-_Canil_Love_Blue_REFON_9.JPG/500px-Spitz_Alem%C3%A3o_An%C3%A3o_-_Canil_Love_Blue_REFON_9.JPG",
+      "w": 500,
+      "h": 443,
+      "credit": "José Reynaldo da Fonseca",
+      "license": "CC BY 2.5",
+      "page": "https://commons.wikimedia.org/wiki/File:Spitz_Alem%C3%A3o_An%C3%A3o_-_Canil_Love_Blue_REFON_9.JPG"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "havanese",
+   "name": "Havanese",
+   "facts": {
+    "origin": "Cuba",
+    "type": "Toy",
+    "massKg": 5,
+    "size": "Small"
+   },
+   "lookalikes": [
+    "bichon-frise",
+    "maltese"
+   ],
+   "blurb": "A small, cheerful dog with a long, soft coat. It is the national dog of Cuba.",
+   "clues": [
+    "It is related to the Bichon Frise.",
+    "It nearly died out after the Cuban revolution.",
+    "It has a long, silky coat.",
+    "The breed comes from Cuba.",
+    "It is a toy breed.",
+    "A typical adult weighs about 5 kg.",
+    "It is the national dog of Cuba.",
+    "It is named after Cuba's capital city.",
+    "The answer is one word of 8 letters.",
+    "It starts with the letter H."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/7/72/A_havanese_dog.jpg/500px-A_havanese_dog.jpg",
+      "w": 500,
+      "h": 391,
+      "credit": "QHuge",
+      "license": "CC BY 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:A_havanese_dog.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/e/ed/A_Havanese_judging.jpg/500px-A_Havanese_judging.jpg",
+      "w": 500,
+      "h": 453,
+      "credit": "audrey_sel",
+      "license": "CC BY-SA 2.0",
+      "page": "https://commons.wikimedia.org/wiki/File:A_Havanese_judging.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/1b/Havaneser_Anton.jpg/500px-Havaneser_Anton.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Edumegina",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Havaneser_Anton.jpg"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "english-cocker-spaniel",
+   "name": "English Cocker Spaniel",
+   "alt": [
+    "Cocker Spaniel",
+    "Cocker"
+   ],
+   "facts": {
+    "origin": "United Kingdom",
+    "type": "Gundog",
+    "massKg": 14,
+    "size": "Medium"
+   },
+   "lookalikes": [
+    "english-springer-spaniel",
+    "cavalier-king-charles-spaniel"
+   ],
+   "blurb": "A merry gundog with long, wavy ears. It was bred to flush woodcock for hunters.",
+   "clues": [
+    "It was bred to flush woodcock for hunters.",
+    "Its tail never seems to stop wagging.",
+    "It has long, silky ears.",
+    "The breed comes from United Kingdom.",
+    "It is a gundog breed.",
+    "A typical adult weighs about 14 kg.",
+    "Lady in \"Lady and the Tramp\" is the American kind.",
+    "The answer has 3 words (7, 6, 7 letters).",
+    "It starts with the letter E."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/7/70/%22Bill%22_-_Cocker_spaniel_anglais_1.jpg/500px-%22Bill%22_-_Cocker_spaniel_anglais_1.jpg",
+      "w": 500,
+      "h": 750,
+      "credit": "Jean-Pol GRANDMONT",
+      "license": "CC BY 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:%22Bill%22_-_Cocker_spaniel_anglais_1.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/0/04/English_Cocker_Spaniel_chocolate_solid.jpg/500px-English_Cocker_Spaniel_chocolate_solid.jpg",
+      "w": 500,
+      "h": 667,
+      "credit": "NicolasCoeurdelion",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:English_Cocker_Spaniel_chocolate_solid.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/7/7c/%22Bill%22_-_Cocker_spaniel_anglais_2.JPG/500px-%22Bill%22_-_Cocker_spaniel_anglais_2.JPG",
+      "w": 500,
+      "h": 333,
+      "credit": "Jean-Pol GRANDMONT",
+      "license": "CC BY 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:%22Bill%22_-_Cocker_spaniel_anglais_2.JPG"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "maltese",
+   "name": "Maltese",
+   "facts": {
+    "origin": "Malta",
+    "type": "Toy",
+    "massKg": 3,
+    "size": "Toy"
+   },
+   "lookalikes": [
+    "bichon-frise",
+    "havanese"
+   ],
+   "blurb": "A tiny dog with long, silky white hair that reaches the ground. It is one of the oldest toy breeds.",
+   "clues": [
+    "It was kept by ancient Greeks and Romans.",
+    "It has no undercoat and sheds very little.",
+    "Its long coat can reach the ground.",
+    "It is a toy breed.",
+    "A typical adult weighs about 3 kg.",
+    "It is pure white.",
+    "It is named after a Mediterranean island country.",
+    "The answer is one word of 7 letters.",
+    "It starts with the letter M."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/e/eb/Maltezer_Vereniging_Belgie.jpg",
+      "w": 500,
+      "h": 590,
+      "credit": "Maltezervereniging",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Maltezer_Vereniging_Belgie.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/9/94/Maltese_600.jpg/500px-Maltese_600.jpg",
+      "w": 500,
+      "h": 500,
+      "credit": "Sannse",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Maltese_600.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/b/b4/Maltese.webp/500px-Maltese.webp",
+      "w": 500,
+      "h": 667,
+      "credit": "Hercules142",
+      "license": "CC BY 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Maltese.webp"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "bichon-frise",
+   "name": "Bichon Frise",
+   "alt": [
+    "Bichon"
+   ],
+   "facts": {
+    "origin": "France",
+    "type": "Toy",
+    "massKg": 6,
+    "size": "Small"
+   },
+   "lookalikes": [
+    "maltese",
+    "poodle"
+   ],
+   "blurb": "A small, cheerful white dog with a fluffy, powder-puff coat. Its name means \"curly lap dog\" in French.",
+   "clues": [
+    "Sailors used it as a trading item.",
+    "Its name means \"curly lap dog\" in French.",
+    "It was a favourite of French kings.",
+    "The breed comes from France.",
+    "It is a toy breed.",
+    "A typical adult weighs about 6 kg.",
+    "Its coat is groomed into a round puff.",
+    "It is small, white and fluffy.",
+    "The answer has 2 words (6, 5 letters).",
+    "It starts with the letter B."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/9/93/Bichon_Fris%C3%A9_-_studdogbichon.jpg/500px-Bichon_Fris%C3%A9_-_studdogbichon.jpg",
+      "w": 500,
+      "h": 361,
+      "credit": "Heike Andres",
+      "license": "CC BY-SA 3.0 de",
+      "page": "https://commons.wikimedia.org/wiki/File:Bichon_Fris%C3%A9_-_studdogbichon.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/9/9c/Bichon_Fris%C3%A9_sitting.jpg/500px-Bichon_Fris%C3%A9_sitting.jpg",
+      "w": 500,
+      "h": 667,
+      "credit": "Julia",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Bichon_Fris%C3%A9_sitting.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/8/89/A_Beagle_%26_a_Bichon_Fris%C3%A9.jpg/500px-A_Beagle_%26_a_Bichon_Fris%C3%A9.jpg",
+      "w": 500,
+      "h": 500,
+      "credit": "Slyronit",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:A_Beagle_%26_a_Bichon_Fris%C3%A9.jpg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "dalmatian",
+   "name": "Dalmatian",
+   "facts": {
+    "origin": "Croatia",
+    "type": "Companion",
+    "massKg": 25,
+    "size": "Large"
+   },
+   "blurb": "A white dog covered in black or liver spots. Puppies are born pure white and grow spots later.",
+   "clues": [
+    "Its puppies are born without spots.",
+    "It once ran beside horse-drawn fire engines.",
+    "It is a mascot of firefighters.",
+    "The breed comes from Croatia.",
+    "It is a companion breed.",
+    "A typical adult weighs about 25 kg.",
+    "A Disney film has 101 of them.",
+    "It is white with black spots.",
+    "The answer is one word of 9 letters.",
+    "It starts with the letter D."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/f/fe/Dalmatien.jpg",
+      "w": 500,
+      "h": 460,
+      "credit": "Desaix83, d'après le travail de Le dalmatien",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Dalmatien.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/6/68/Sun_Dog_Dalmatian.jpg/500px-Sun_Dog_Dalmatian.jpg",
+      "w": 500,
+      "h": 667,
+      "credit": "Bradlien",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Sun_Dog_Dalmatian.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/19/Dalmatian_fetching_a_stick.jpg/500px-Dalmatian_fetching_a_stick.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Lucasbosch",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Dalmatian_fetching_a_stick.jpg"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "jack-russell-terrier",
+   "name": "Jack Russell Terrier",
+   "alt": [
+    "Jack Russell"
+   ],
+   "facts": {
+    "origin": "United Kingdom",
+    "type": "Terrier",
+    "massKg": 6,
+    "size": "Small"
+   },
+   "lookalikes": [
+    "parson-russell-terrier"
+   ],
+   "blurb": "A small, bold, bouncy terrier bred to chase foxes out of their dens.",
+   "clues": [
+    "It is named after a vicar who loved fox hunting.",
+    "It can jump many times its own height.",
+    "It is mostly white with tan or black patches.",
+    "The breed comes from United Kingdom.",
+    "A typical adult weighs about 6 kg.",
+    "It is full of energy.",
+    "The answer has 3 words (4, 7, 7 letters).",
+    "It starts with the letter J."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/f/f1/Jack_Russell_Terrier_1.jpg/500px-Jack_Russell_Terrier_1.jpg",
+      "w": 500,
+      "h": 750,
+      "credit": "Plank",
+      "license": "CC BY 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Jack_Russell_Terrier_1.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/7/74/AlexiaJackrusselterri%C3%ABr01.JPG/500px-AlexiaJackrusselterri%C3%ABr01.JPG",
+      "w": 500,
+      "h": 332,
+      "credit": "Henk Bezemer",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:AlexiaJackrusselterri%C3%ABr01.JPG"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/7/74/Dzek_Rasel_terijer_6_godina_i_5_meseci.jpg/500px-Dzek_Rasel_terijer_6_godina_i_5_meseci.jpg",
+      "w": 500,
+      "h": 560,
+      "credit": "Чарлито",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Dzek_Rasel_terijer_6_godina_i_5_meseci.jpg"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "staffordshire-bull-terrier",
+   "name": "Staffordshire Bull Terrier",
+   "alt": [
+    "Staffy",
+    "Staffie"
+   ],
+   "facts": {
+    "origin": "United Kingdom",
+    "type": "Terrier",
+    "massKg": 15,
+    "size": "Medium"
+   },
+   "lookalikes": [
+    "bull-terrier"
+   ],
+   "blurb": "A muscly, friendly terrier with a big grin. It is very popular in the UK and Australia.",
+   "clues": [
+    "It was once nicknamed the \"nanny dog\".",
+    "It is very popular in Britain and Australia.",
+    "It has a broad head and a wide grin.",
+    "The breed comes from United Kingdom.",
+    "A typical adult weighs about 15 kg.",
+    "It is short, stocky and muscular.",
+    "It is named after an English county in the Midlands.",
+    "The answer has 3 words (13, 4, 7 letters).",
+    "It starts with the letter S."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/b/be/Staffie.jpg/500px-Staffie.jpg",
+      "w": 500,
+      "h": 722,
+      "credit": "No machine-readable author provided. Aixeneta assumed (based on copyright claims).",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Staffie.jpg"
+     },
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/d/de/%D7%A1%D7%90%D7%98%D7%A3_%D7%90%D7%A0%D7%92%D7%9C%D7%99.jpg",
+      "w": 500,
+      "h": 665,
+      "credit": "Or Logassi",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:%D7%A1%D7%90%D7%98%D7%A3_%D7%90%D7%A0%D7%92%D7%9C%D7%99.jpg"
+     },
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/d/de/Lexus.bowin.jpg",
+      "w": 500,
+      "h": 751,
+      "credit": "Spcenter",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Lexus.bowin.jpg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "bull-terrier",
+   "name": "Bull Terrier",
+   "facts": {
+    "origin": "United Kingdom",
+    "type": "Terrier",
+    "massKg": 27,
+    "size": "Large"
+   },
+   "lookalikes": [
+    "staffordshire-bull-terrier"
+   ],
+   "blurb": "A muscular terrier with a unique egg-shaped head and small, triangular eyes.",
+   "clues": [
+    "Spuds MacKenzie, a famous beer mascot, was one.",
+    "Target stores use one as a mascot.",
+    "It has small, triangular eyes.",
+    "The breed comes from United Kingdom.",
+    "A typical adult weighs about 27 kg.",
+    "Its head is shaped like an egg.",
+    "Its name includes a male cow.",
+    "The answer has 2 words (4, 7 letters).",
+    "It starts with the letter B."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/b/bb/Bullterier_089_LM.jpg/500px-Bullterier_089_LM.jpg",
+      "w": 500,
+      "h": 446,
+      "credit": "Lilly M",
+      "license": "CC BY-SA 2.5",
+      "page": "https://commons.wikimedia.org/wiki/File:Bullterier_089_LM.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/4/4c/Bullterrier-3453301920.jpg/500px-Bullterrier-3453301920.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Pixabay User TC-TORRES",
+      "license": "CC0 1.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Bullterrier-3453301920.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/0/06/Bull_terrier_bring%C3%A9_et_blanc.jpg/500px-Bull_terrier_bring%C3%A9_et_blanc.jpg",
+      "w": 500,
+      "h": 332,
+      "credit": "Adeuh",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Bull_terrier_bring%C3%A9_et_blanc.jpg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "west-highland-white-terrier",
+   "name": "West Highland White Terrier",
+   "alt": [
+    "Westie"
+   ],
+   "facts": {
+    "origin": "United Kingdom",
+    "type": "Terrier",
+    "massKg": 8,
+    "size": "Small"
+   },
+   "lookalikes": [
+    "scottish-terrier",
+    "maltese"
+   ],
+   "blurb": "A small, white Scottish terrier with a bright, cheeky face.",
+   "clues": [
+    "It appears on Cesar dog food.",
+    "It has a rough double coat.",
+    "It comes from Scotland.",
+    "The breed comes from United Kingdom.",
+    "A typical adult weighs about 8 kg.",
+    "It was bred to hunt foxes and badgers among rocks.",
+    "Its face is often trimmed into a round shape.",
+    "The answer has 4 words (4, 8, 5, 7 letters).",
+    "It starts with the letter W."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/2/2c/West_Highland_White_Terrier_Krakow.jpg/500px-West_Highland_White_Terrier_Krakow.jpg",
+      "w": 500,
+      "h": 419,
+      "credit": "Christopher Walker from Krakow, Poland",
+      "license": "CC BY 2.0",
+      "page": "https://commons.wikimedia.org/wiki/File:West_Highland_White_Terrier_Krakow.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/5/50/Blossom_and_Laysha.jpg/500px-Blossom_and_Laysha.jpg",
+      "w": 500,
+      "h": 386,
+      "credit": "Carlos Valenzuela",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Blossom_and_Laysha.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/7/76/West_Highland_White_Terrier_face_portrait_May_2023.jpg/500px-West_Highland_White_Terrier_face_portrait_May_2023.jpg",
+      "w": 500,
+      "h": 335,
+      "credit": "Dominic Nelson",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:West_Highland_White_Terrier_face_portrait_May_2023.jpg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "scottish-terrier",
+   "name": "Scottish Terrier",
+   "alt": [
+    "Scottie",
+    "Aberdeen Terrier"
+   ],
+   "facts": {
+    "origin": "United Kingdom",
+    "type": "Terrier",
+    "massKg": 9,
+    "size": "Small"
+   },
+   "lookalikes": [
+    "west-highland-white-terrier"
+   ],
+   "blurb": "A short-legged black terrier with a beard and eyebrows. It is a playing piece in Monopoly.",
+   "clues": [
+    "It is a playing piece in Monopoly.",
+    "US President Franklin Roosevelt owned one called Fala.",
+    "It has a beard and bushy eyebrows.",
+    "The breed comes from United Kingdom.",
+    "A typical adult weighs about 9 kg.",
+    "It is usually black.",
+    "The answer has 2 words (8, 7 letters).",
+    "It starts with the letter S."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/a/ac/Scotish_terrier_burleska_2005.jpg/500px-Scotish_terrier_burleska_2005.jpg",
+      "w": 500,
+      "h": 500,
+      "credit": "Mider",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Scotish_terrier_burleska_2005.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/0/07/Scottish_Terrier_Photo_of_Face.jpg/500px-Scottish_Terrier_Photo_of_Face.jpg",
+      "w": 500,
+      "h": 625,
+      "credit": "Elise Carroll",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Scottish_Terrier_Photo_of_Face.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/5/50/Blossom_and_Laysha.jpg/500px-Blossom_and_Laysha.jpg",
+      "w": 500,
+      "h": 386,
+      "credit": "Carlos Valenzuela",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Blossom_and_Laysha.jpg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "airedale-terrier",
+   "name": "Airedale Terrier",
+   "alt": [
+    "Airedale"
+   ],
+   "facts": {
+    "origin": "United Kingdom",
+    "type": "Terrier",
+    "massKg": 25,
+    "size": "Large"
+   },
+   "blurb": "The biggest terrier, nicknamed \"the king of terriers\". It carried messages in World War I.",
+   "clues": [
+    "It carried messages in World War I.",
+    "It has a black saddle and tan legs.",
+    "The breed comes from United Kingdom.",
+    "A typical adult weighs about 25 kg.",
+    "It is named after a valley in Yorkshire.",
+    "Its coat is wiry and dense.",
+    "It has a long head with a beard.",
+    "The answer has 2 words (8, 7 letters).",
+    "It starts with the letter A."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/b/b5/Airedale_terrier_head%2C_Josselin_01.jpg/500px-Airedale_terrier_head%2C_Josselin_01.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Amélie Tsaag Valren",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Airedale_terrier_head,_Josselin_01.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/a/ad/Kennel_secrets_-_how_to_breed%2C_exhibit%2C_and_mannage_dogs_%281904%29_%2814586668379%29.jpg/500px-Kennel_secrets_-_how_to_breed%2C_exhibit%2C_and_mannage_dogs_%281904%29_%2814586668379%29.jpg",
+      "w": 500,
+      "h": 357,
+      "credit": "Internet Archive Book Images",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Kennel_secrets_-_how_to_breed,_exhibit,_and_mannage_dogs_(1904)_(14586668379).jpg"
+     },
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/a/a5/Bothwell-sorceress.jpg",
+      "w": 500,
+      "h": 513,
+      "credit": "Book: Jowett, Ferguson Marshall, Photo: Unknown.",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Bothwell-sorceress.jpg"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "whippet",
+   "name": "Whippet",
+   "facts": {
+    "origin": "United Kingdom",
+    "type": "Hound",
+    "massKg": 13,
+    "size": "Medium"
+   },
+   "lookalikes": [
+    "greyhound",
+    "italian-greyhound"
+   ],
+   "blurb": "A slim, fast dog like a small greyhound. It was called \"the poor man's racehorse\".",
+   "clues": [
+    "It was called \"the poor man's racehorse\".",
+    "It is one of the fastest-accelerating dogs.",
+    "It loves to curl up on the sofa.",
+    "The breed comes from United Kingdom.",
+    "It is a hound breed.",
+    "A typical adult weighs about 13 kg.",
+    "It looks like a small greyhound.",
+    "Its name sounds like a tool for driving horses.",
+    "The answer is one word of 7 letters.",
+    "It starts with the letter W."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/9/92/Whippet_stacked.jpg/500px-Whippet_stacked.jpg",
+      "w": 500,
+      "h": 376,
+      "credit": "Sagaciousphil",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Whippet_stacked.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/7/76/Whippet_2018_6.jpg/500px-Whippet_2018_6.jpg",
+      "w": 500,
+      "h": 401,
+      "credit": "Canarian",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Whippet_2018_6.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/4/42/Fireworks_Whippets.jpg/500px-Fireworks_Whippets.jpg",
+      "w": 500,
+      "h": 324,
+      "credit": "Winky, Vancouver, Canada",
+      "license": "CC BY 2.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Fireworks_Whippets.jpg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "greyhound",
+   "name": "Greyhound",
+   "facts": {
+    "origin": "United Kingdom",
+    "type": "Hound",
+    "massKg": 30,
+    "size": "Large"
+   },
+   "lookalikes": [
+    "whippet",
+    "italian-greyhound",
+    "saluki"
+   ],
+   "blurb": "The fastest dog breed, able to run at about 70 km/h. It is raced on tracks.",
+   "clues": [
+    "It can run at about 70 km/h.",
+    "Retired racers are often adopted as pets.",
+    "It has a deep chest and a very thin waist.",
+    "The breed comes from United Kingdom.",
+    "It is a hound breed.",
+    "A typical adult weighs about 30 kg.",
+    "It is raced on oval tracks chasing a lure.",
+    "It is the fastest dog breed.",
+    "The answer is one word of 9 letters.",
+    "It starts with the letter G."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/e/ef/GraceTheGreyhound.jpg/500px-GraceTheGreyhound.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Neurodoc",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:GraceTheGreyhound.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/5/51/Chart_angielski_z.jpg/500px-Chart_angielski_z.jpg",
+      "w": 500,
+      "h": 440,
+      "credit": "No machine-readable author provided. Pleple2000 assumed (based on copyright claims).",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Chart_angielski_z.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/2/2e/Greyhound_nor1-tb.jpg/500px-Greyhound_nor1-tb.jpg",
+      "w": 500,
+      "h": 315,
+      "credit": "No machine-readable author provided. ToB assumed (based on copyright claims).",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Greyhound_nor1-tb.jpg"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "italian-greyhound",
+   "name": "Italian Greyhound",
+   "alt": [
+    "Iggy"
+   ],
+   "facts": {
+    "origin": "Italy",
+    "type": "Toy",
+    "massKg": 4,
+    "size": "Toy"
+   },
+   "lookalikes": [
+    "whippet",
+    "greyhound"
+   ],
+   "blurb": "A tiny, slender sighthound that looks like a mini greyhound. It was loved by Renaissance nobles.",
+   "clues": [
+    "It appears in Renaissance paintings.",
+    "It feels the cold and often wears coats.",
+    "It is very slim with fine bones.",
+    "It is a toy breed.",
+    "A typical adult weighs about 4 kg.",
+    "It is a tiny sighthound.",
+    "It is named after a country shaped like a boot.",
+    "The answer has 2 words (7, 9 letters).",
+    "It starts with the letter I."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/f/fc/Charciki_W%C5%82oskie%2C_doros%C5%82y_i_szczeniak.jpg/500px-Charciki_W%C5%82oskie%2C_doros%C5%82y_i_szczeniak.jpg",
+      "w": 500,
+      "h": 421,
+      "credit": "Tesori di Carli",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Charciki_W%C5%82oskie,_doros%C5%82y_i_szczeniak.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/5/5d/Italian_Greyhound_standing_gray_%28cropped%29.jpg/500px-Italian_Greyhound_standing_gray_%28cropped%29.jpg",
+      "w": 500,
+      "h": 666,
+      "credit": "christina",
+      "license": "CC BY 2.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Italian_Greyhound_standing_gray_(cropped).jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/f/f4/Italian_Greyhound_Puppies.jpg/500px-Italian_Greyhound_Puppies.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Jim or Katie McClarty",
+      "license": "CC BY 2.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Italian_Greyhound_Puppies.jpg"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "afghan-hound",
+   "name": "Afghan Hound",
+   "facts": {
+    "origin": "Afghanistan",
+    "type": "Hound",
+    "massKg": 25,
+    "size": "Large"
+   },
+   "lookalikes": [
+    "saluki"
+   ],
+   "blurb": "A tall, elegant hound with a long, flowing silky coat. It was bred to hunt in the mountains.",
+   "clues": [
+    "Picasso painted one.",
+    "It was bred to hunt in cold mountains.",
+    "Its tail curls at the tip like a ring.",
+    "A typical adult weighs about 25 kg.",
+    "It has a very long, silky coat.",
+    "It comes from a country in Central Asia.",
+    "The answer has 2 words (6, 5 letters).",
+    "It starts with the letter A."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/5/56/Afghan_Hound_in_Tallinn.JPG/500px-Afghan_Hound_in_Tallinn.JPG",
+      "w": 500,
+      "h": 361,
+      "credit": "Томасина",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Afghan_Hound_in_Tallinn.JPG"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/3/3a/AKC_Helena_Fall_Dog_Show_2011.jpg/500px-AKC_Helena_Fall_Dog_Show_2011.jpg",
+      "w": 500,
+      "h": 431,
+      "credit": "SheltieBoy",
+      "license": "CC BY 2.0",
+      "page": "https://commons.wikimedia.org/wiki/File:AKC_Helena_Fall_Dog_Show_2011.jpg"
+     },
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/e/e8/Afghan_dog_-_cropped.jpg",
+      "w": 500,
+      "h": 441,
+      "credit": "Weaveravel",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Afghan_dog_-_cropped.jpg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "saluki",
+   "name": "Saluki",
+   "facts": {
+    "origin": "Middle East",
+    "type": "Hound",
+    "massKg": 22,
+    "size": "Medium"
+   },
+   "lookalikes": [
+    "afghan-hound",
+    "greyhound"
+   ],
+   "blurb": "An ancient, graceful sighthound from the Middle East. It was used to hunt gazelles in the desert.",
+   "clues": [
+    "It may be one of the oldest dog breeds.",
+    "It was used to hunt gazelles.",
+    "Bedouin people prized it.",
+    "The breed comes from Middle East.",
+    "It is a hound breed.",
+    "A typical adult weighs about 22 kg.",
+    "It has feathery ears and tail.",
+    "It is a slim desert sighthound.",
+    "The answer is one word of 6 letters.",
+    "It starts with the letter S."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/3/31/Red_Smooth_Saluki.jpg/500px-Red_Smooth_Saluki.jpg",
+      "w": 500,
+      "h": 407,
+      "credit": "r.",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Red_Smooth_Saluki.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/8/8a/Chart_perski_ucho_098i.jpg/500px-Chart_perski_ucho_098i.jpg",
+      "w": 500,
+      "h": 628,
+      "credit": "Pleple2000",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Chart_perski_ucho_098i.jpg"
+     },
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/f/f4/Gazelle_Hound_from_1915.JPG",
+      "w": 500,
+      "h": 408,
+      "credit": "not specified (except those with signature on image)",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Gazelle_Hound_from_1915.JPG"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "basset-hound",
+   "name": "Basset Hound",
+   "alt": [
+    "Basset"
+   ],
+   "facts": {
+    "origin": "France",
+    "type": "Hound",
+    "massKg": 27,
+    "size": "Large"
+   },
+   "lookalikes": [
+    "beagle",
+    "bloodhound",
+    "dachshund"
+   ],
+   "blurb": "A short-legged hound with long droopy ears and a great nose. It was bred to follow rabbits by scent.",
+   "clues": [
+    "Its name comes from a French word meaning \"low\".",
+    "Its long ears sweep scents up to its nose.",
+    "It has droopy eyes.",
+    "The breed comes from France.",
+    "A typical adult weighs about 27 kg.",
+    "It has very short legs and very long ears.",
+    "The answer has 2 words (6, 5 letters).",
+    "It starts with the letter B."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/7/7e/Basset_Hound_600.jpg/500px-Basset_Hound_600.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Wikimedia Commons",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Basset_Hound_600.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/c/cf/BassetHound_profil.jpg/500px-BassetHound_profil.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Cali1008",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:BassetHound_profil.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/6/64/Basset_hound_hunting_rabbit_in_art.png/500px-Basset_hound_hunting_rabbit_in_art.png",
+      "w": 500,
+      "h": 435,
+      "credit": "Lynn Bogue Hunt (artist)",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Basset_hound_hunting_rabbit_in_art.png"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "bloodhound",
+   "name": "Bloodhound",
+   "facts": {
+    "origin": "Belgium",
+    "type": "Hound",
+    "massKg": 45,
+    "size": "Giant"
+   },
+   "lookalikes": [
+    "basset-hound"
+   ],
+   "blurb": "A big, wrinkly hound with the best sense of smell of any dog. It can follow a trail days old.",
+   "clues": [
+    "Its tracking evidence has been accepted in court.",
+    "It was bred by monks in Belgium.",
+    "It can follow a scent trail days old.",
+    "The breed comes from Belgium.",
+    "It is a hound breed.",
+    "A typical adult weighs about 45 kg.",
+    "It has loose, wrinkly skin and long ears.",
+    "It has the best nose of any dog.",
+    "The answer is one word of 10 letters.",
+    "It starts with the letter B."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/a/a3/Perro_de_San_Huberto.jpg/500px-Perro_de_San_Huberto.jpg",
+      "w": 500,
+      "h": 477,
+      "credit": "Mary Bloom, American Kennel Club",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Perro_de_San_Huberto.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/d/d1/Bloodhound_Erland22.jpg/500px-Bloodhound_Erland22.jpg",
+      "w": 500,
+      "h": 354,
+      "credit": "User:Erland22",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Bloodhound_Erland22.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/f/f3/Bloodhound_Trials_Alton_2008.jpg/500px-Bloodhound_Trials_Alton_2008.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "John Leslie (\"Contadini\")",
+      "license": "CC BY 2.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Bloodhound_Trials_Alton_2008.jpg"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "irish-wolfhound",
+   "name": "Irish Wolfhound",
+   "facts": {
+    "origin": "Ireland",
+    "type": "Hound",
+    "massKg": 60,
+    "size": "Giant"
+   },
+   "lookalikes": [
+    "great-dane",
+    "scottish-deerhound"
+   ],
+   "blurb": "The tallest dog breed. It was bred to hunt wolves in Ireland.",
+   "clues": [
+    "It is the tallest dog breed on average.",
+    "It is gentle despite its size.",
+    "The breed comes from Ireland.",
+    "It is a hound breed.",
+    "A typical adult weighs about 60 kg.",
+    "It has a rough, wiry coat.",
+    "It hunted a wild canine in Ireland.",
+    "The answer has 2 words (5, 9 letters).",
+    "It starts with the letter I."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/f/fa/Irish_wolfhound_giaccomo.JPG/500px-Irish_wolfhound_giaccomo.JPG",
+      "w": 500,
+      "h": 410,
+      "credit": "Camillo 60",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Irish_wolfhound_giaccomo.JPG"
+     },
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/b/b8/IrishWolfhoundPair.jpg",
+      "w": 500,
+      "h": 339,
+      "credit": "Wikimedia Commons",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:IrishWolfhoundPair.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/d/da/%282%29_Irish_Wolfhound_4.jpg/500px-%282%29_Irish_Wolfhound_4.jpg",
+      "w": 500,
+      "h": 398,
+      "credit": "Dux",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:(2)_Irish_Wolfhound_4.jpg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "saint-bernard",
+   "name": "Saint Bernard",
+   "alt": [
+    "St Bernard",
+    "St. Bernard"
+   ],
+   "facts": {
+    "origin": "Switzerland",
+    "type": "Working",
+    "massKg": 75,
+    "size": "Giant"
+   },
+   "lookalikes": [
+    "bernese-mountain-dog",
+    "newfoundland"
+   ],
+   "blurb": "A giant rescue dog from the Swiss Alps. Monks used it to find travellers lost in the snow.",
+   "clues": [
+    "One named Barry saved over 40 people.",
+    "Cartoons show it with a barrel round its neck.",
+    "Beethoven in the film is one.",
+    "The breed comes from Switzerland.",
+    "It is a working breed.",
+    "A typical adult weighs about 75 kg.",
+    "Monks at a mountain pass bred it.",
+    "It is a giant Swiss rescue dog.",
+    "The answer has 2 words (5, 7 letters).",
+    "It starts with the letter S."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/d/d1/Rey_nieve.jpg/500px-Rey_nieve.jpg",
+      "w": 500,
+      "h": 508,
+      "credit": "Rafael Dominguez Rodriguez",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Rey_nieve.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/6/64/Hummel_Vedor_vd_Robandahoeve.jpg/500px-Hummel_Vedor_vd_Robandahoeve.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Blanky",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Hummel_Vedor_vd_Robandahoeve.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/9/99/Bernardyn_kr%C3%B3tkow%C5%82osy_339.jpg/500px-Bernardyn_kr%C3%B3tkow%C5%82osy_339.jpg",
+      "w": 500,
+      "h": 353,
+      "credit": "Pleple2000",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Bernardyn_kr%C3%B3tkow%C5%82osy_339.jpg"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "newfoundland",
+   "name": "Newfoundland",
+   "alt": [
+    "Newfie"
+   ],
+   "facts": {
+    "origin": "Canada",
+    "type": "Working",
+    "massKg": 60,
+    "size": "Giant"
+   },
+   "lookalikes": [
+    "saint-bernard"
+   ],
+   "blurb": "A huge, gentle water dog with webbed feet. It is famous for rescuing people from water.",
+   "clues": [
+    "Nana in \"Peter Pan\" is one.",
+    "It has webbed feet.",
+    "It is famous for water rescues.",
+    "The breed comes from Canada.",
+    "It is a working breed.",
+    "A typical adult weighs about 60 kg.",
+    "It has a thick, oily black coat.",
+    "It is named after a Canadian island.",
+    "The answer is one word of 12 letters.",
+    "It starts with the letter N."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/5/51/201210071658d.jpg/500px-201210071658d.jpg",
+      "w": 500,
+      "h": 750,
+      "credit": "Hartmann Linge",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:201210071658d.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/a/a5/Newfoundland_dog_Smoky.jpg/500px-Newfoundland_dog_Smoky.jpg",
+      "w": 500,
+      "h": 750,
+      "credit": "Flickr user DanDee Shots",
+      "license": "CC BY 2.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Newfoundland_dog_Smoky.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/f/f5/Armand_de_Montlezun_%281841-1914%29_Baculum_terre-neuve.jpg/500px-Armand_de_Montlezun_%281841-1914%29_Baculum_terre-neuve.jpg",
+      "w": 500,
+      "h": 127,
+      "credit": "Didier Descouens",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Armand_de_Montlezun_(1841-1914)_Baculum_terre-neuve.jpg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "alaskan-malamute",
+   "name": "Alaskan Malamute",
+   "alt": [
+    "Malamute"
+   ],
+   "facts": {
+    "origin": "United States",
+    "type": "Working",
+    "massKg": 38,
+    "size": "Large"
+   },
+   "lookalikes": [
+    "siberian-husky"
+   ],
+   "blurb": "A big, powerful sled dog bred by the Inuit of Alaska to pull heavy loads.",
+   "clues": [
+    "It is named after an Inuit people.",
+    "It is bigger and stronger than a husky.",
+    "It was bred for heavy hauling, not speed.",
+    "The breed comes from United States.",
+    "It is a working breed.",
+    "A typical adult weighs about 38 kg.",
+    "It has a plumed tail curled over its back.",
+    "It comes from a cold US state.",
+    "The answer has 2 words (7, 8 letters).",
+    "It starts with the letter A."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/9/9f/Alaskan_Malamute.jpg/500px-Alaskan_Malamute.jpg",
+      "w": 500,
+      "h": 405,
+      "credit": "SCMW",
+      "license": "CC BY 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Alaskan_Malamute.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/3/3a/Werfenweng_2018_Kat_D2_STAWOWCZYK_Waldemar-9379.jpg/500px-Werfenweng_2018_Kat_D2_STAWOWCZYK_Waldemar-9379.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Isiwal",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Werfenweng_2018_Kat_D2_STAWOWCZYK_Waldemar-9379.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/7/7a/Alaskan_Malamute_R_Bartz.jpg/500px-Alaskan_Malamute_R_Bartz.jpg",
+      "w": 500,
+      "h": 749,
+      "credit": "Richard Bartz",
+      "license": "CC BY-SA 2.5",
+      "page": "https://commons.wikimedia.org/wiki/File:Alaskan_Malamute_R_Bartz.jpg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "samoyed",
+   "name": "Samoyed",
+   "alt": [
+    "Sammy"
+   ],
+   "facts": {
+    "origin": "Russia",
+    "type": "Spitz",
+    "massKg": 23,
+    "size": "Medium"
+   },
+   "lookalikes": [
+    "siberian-husky",
+    "pomeranian"
+   ],
+   "blurb": "A fluffy white sled dog from Siberia. Its upturned mouth looks like a smile.",
+   "clues": [
+    "It went on polar expeditions.",
+    "The breed comes from Russia.",
+    "It is a spitz breed.",
+    "A typical adult weighs about 23 kg.",
+    "It is fluffy and pure white.",
+    "It comes from Siberia.",
+    "The answer is one word of 7 letters.",
+    "It starts with the letter S."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/18/Samojed00.jpg/500px-Samojed00.jpg",
+      "w": 500,
+      "h": 514,
+      "credit": "No machine-readable author provided. Pleple2000 assumed (based on copyright claims).",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Samojed00.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/9/9d/Samoyed_dog_two_year_old_female_dllu.jpg/500px-Samoyed_dog_two_year_old_female_dllu.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Dllu",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Samoyed_dog_two_year_old_female_dllu.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/f/f9/Samojedhund_4.JPG/500px-Samojedhund_4.JPG",
+      "w": 500,
+      "h": 343,
+      "credit": "Wikimedia Commons",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Samojedhund_4.JPG"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "akita",
+   "name": "Akita",
+   "alt": [
+    "Akita Inu"
+   ],
+   "facts": {
+    "origin": "Japan",
+    "type": "Spitz",
+    "massKg": 40,
+    "size": "Large"
+   },
+   "lookalikes": [
+    "shiba-inu"
+   ],
+   "blurb": "A big, loyal Japanese dog. The famous Hachikō waited for his dead owner at a station for nearly ten years.",
+   "clues": [
+    "Hachikō waited at Shibuya Station for nearly ten years.",
+    "Helen Keller brought the first one to the USA.",
+    "Its tail curls over its back.",
+    "The breed comes from Japan.",
+    "It is a spitz breed.",
+    "A typical adult weighs about 40 kg.",
+    "It is very loyal.",
+    "It is named after a region of Japan.",
+    "The answer is one word of 5 letters.",
+    "It starts with the letter A."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/0/0f/Akita_inu_criado_por_Tsutsui_Kennel.jpg/500px-Akita_inu_criado_por_Tsutsui_Kennel.jpg",
+      "w": 500,
+      "h": 332,
+      "credit": "TsutsuiKennel",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Akita_inu_criado_por_Tsutsui_Kennel.jpg"
+     },
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/a/af/Akita_Collage.png",
+      "w": 500,
+      "h": 459,
+      "credit": "Peter Theakston; Keetanii; Melodorakitas; Sevenfatdogs",
+      "license": "CC BY 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Akita_Collage.png"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/3/39/Akita_dog_Bukemaru_in_Kakunodate%2C_April_2023_01.jpg/500px-Akita_dog_Bukemaru_in_Kakunodate%2C_April_2023_01.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Calistemon",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Akita_dog_Bukemaru_in_Kakunodate,_April_2023_01.jpg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "shiba-inu",
+   "name": "Shiba Inu",
+   "alt": [
+    "Shiba"
+   ],
+   "facts": {
+    "origin": "Japan",
+    "type": "Spitz",
+    "massKg": 9,
+    "size": "Small"
+   },
+   "lookalikes": [
+    "akita"
+   ],
+   "blurb": "A small, fox-like Japanese dog. A photo of one became the famous \"Doge\" meme.",
+   "clues": [
+    "It became the \"Doge\" internet meme.",
+    "It is Japan's smallest native breed.",
+    "The breed comes from Japan.",
+    "It is a spitz breed.",
+    "A typical adult weighs about 9 kg.",
+    "It has a curly tail and pointed ears.",
+    "It looks like a little red fox.",
+    "The answer has 2 words (5, 3 letters).",
+    "It starts with the letter S."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/5/58/Shiba_inu_taiki.jpg/500px-Shiba_inu_taiki.jpg",
+      "w": 500,
+      "h": 589,
+      "credit": "Roberto Vasarri",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Shiba_inu_taiki.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/6/6b/Taka_Shiba.jpg/500px-Taka_Shiba.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Takashiba at English Wikipedia",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Taka_Shiba.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/d/da/Cucciolo_Shiba_Inu.jpg/500px-Cucciolo_Shiba_Inu.jpg",
+      "w": 500,
+      "h": 361,
+      "credit": "NicolaMoscardo",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Cucciolo_Shiba_Inu.jpg"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "chow-chow",
+   "name": "Chow Chow",
+   "alt": [
+    "Chow"
+   ],
+   "facts": {
+    "origin": "China",
+    "type": "Spitz",
+    "massKg": 25,
+    "size": "Large"
+   },
+   "lookalikes": [
+    "shar-pei"
+   ],
+   "blurb": "A fluffy, lion-like dog from China with a blue-black tongue.",
+   "clues": [
+    "It has a blue-black tongue.",
+    "It walks stiffly on straight back legs.",
+    "It looks like a lion with its thick mane.",
+    "The breed comes from China.",
+    "It is a spitz breed.",
+    "A typical adult weighs about 25 kg.",
+    "It is fluffy and often red.",
+    "It comes from China and its name repeats.",
+    "The answer has 2 words (4, 4 letters).",
+    "It starts with the letter C."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/2/2c/01_Chow_Chow.jpg/500px-01_Chow_Chow.jpg",
+      "w": 500,
+      "h": 625,
+      "credit": "Prayitno/more than 2.5 millions views: thank you!",
+      "license": "CC BY 2.0",
+      "page": "https://commons.wikimedia.org/wiki/File:01_Chow_Chow.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/0/0e/Chow-chow_in_Tallinn.JPG/500px-Chow-chow_in_Tallinn.JPG",
+      "w": 500,
+      "h": 452,
+      "credit": "Томасина",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Chow-chow_in_Tallinn.JPG"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/d/d3/Cream_Chow_Chow_dog_sitting_Christmas.jpg/500px-Cream_Chow_Chow_dog_sitting_Christmas.jpg",
+      "w": 500,
+      "h": 748,
+      "credit": "Fluffybeary",
+      "license": "CC0 1.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Cream_Chow_Chow_dog_sitting_Christmas.jpg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "shar-pei",
+   "name": "Shar Pei",
+   "alt": [
+    "Chinese Shar-Pei"
+   ],
+   "facts": {
+    "origin": "China",
+    "type": "Companion",
+    "massKg": 23,
+    "size": "Medium"
+   },
+   "lookalikes": [
+    "chow-chow"
+   ],
+   "blurb": "A Chinese dog with deep wrinkles and a blue-black tongue. Puppies are even more wrinkly than adults.",
+   "clues": [
+    "It was once one of the rarest dogs in the world.",
+    "It has a blue-black tongue.",
+    "Its name means \"sand skin\".",
+    "It is a companion breed.",
+    "A typical adult weighs about 23 kg.",
+    "Puppies are even more wrinkly than adults.",
+    "It is covered in deep wrinkles.",
+    "The answer has 2 words (4, 3 letters).",
+    "It starts with the letter S."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/3/3c/Shar_pei.jpg/500px-Shar_pei.jpg",
+      "w": 500,
+      "h": 396,
+      "credit": "UpdOWN. Original uploader was UpdOWN at ru.wikipedia",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Shar_pei.jpg"
+     },
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/0/05/Adult_sharpei.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Yan Mis/&Den Rakov",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Adult_sharpei.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/6/62/Dog._Galiza.jpg/500px-Dog._Galiza.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Luis Miguel Bugallo Sánchez",
+      "license": "CC BY 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Dog._Galiza.jpg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "pekingese",
+   "name": "Pekingese",
+   "alt": [
+    "Peke"
+   ],
+   "facts": {
+    "origin": "China",
+    "type": "Toy",
+    "massKg": 5,
+    "size": "Small"
+   },
+   "lookalikes": [
+    "shih-tzu",
+    "pug"
+   ],
+   "blurb": "A small, long-haired dog once owned only by Chinese emperors. One survived the sinking of the Titanic.",
+   "clues": [
+    "One survived the sinking of the Titanic.",
+    "Only Chinese royals could own one.",
+    "It walks with a rolling gait.",
+    "The breed comes from China.",
+    "It is a toy breed.",
+    "A typical adult weighs about 5 kg.",
+    "It has a flat face and long mane.",
+    "It is named after China's capital city.",
+    "The answer is one word of 9 letters.",
+    "It starts with the letter P."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/e/e1/Peki%C5%84czyk_f64.jpg/500px-Peki%C5%84czyk_f64.jpg",
+      "w": 500,
+      "h": 330,
+      "credit": "Lilly M",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Peki%C5%84czyk_f64.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/2/24/1AKC_Pekingese_Dog_Show_2011.jpg/500px-1AKC_Pekingese_Dog_Show_2011.jpg",
+      "w": 500,
+      "h": 342,
+      "credit": "SheltieBoy",
+      "license": "CC BY 2.0",
+      "page": "https://commons.wikimedia.org/wiki/File:1AKC_Pekingese_Dog_Show_2011.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/2/27/Pekingese001.JPG/500px-Pekingese001.JPG",
+      "w": 500,
+      "h": 375,
+      "credit": "Hugo.arg",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Pekingese001.JPG"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "lhasa-apso",
+   "name": "Lhasa Apso",
+   "facts": {
+    "origin": "Tibet",
+    "type": "Companion",
+    "massKg": 6,
+    "size": "Small"
+   },
+   "lookalikes": [
+    "shih-tzu"
+   ],
+   "blurb": "A small, long-haired dog from Tibet that guarded Buddhist monasteries.",
+   "clues": [
+    "It guarded monasteries indoors.",
+    "It was often given as a gift by the Dalai Lama.",
+    "It has a long, heavy coat.",
+    "The breed comes from Tibet.",
+    "It is a companion breed.",
+    "A typical adult weighs about 6 kg.",
+    "It comes from Tibet.",
+    "It is named after Tibet's capital city.",
+    "The answer has 2 words (5, 4 letters).",
+    "It starts with the letter L."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/8/8e/Grupp_9%2C_LHASA_APSO%2C_DK_JV-13_DK_V-14_DK_V-15_NO_UCH_NO_V-15_SE_UCH_Chic_Choix_Some_Like_It_Chic_%2824014621720%29.jpg/500px-Grupp_9%2C_LHASA_APSO%2C_DK_JV-13_DK_V-14_DK_V-15_NO_UCH_NO_V-15_SE_UCH_Chic_Choix_Some_Like_It_Chic_%2824014621720%29.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Svenska Mässan from Sweden",
+      "license": "CC BY 2.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Grupp_9,_LHASA_APSO,_DK_JV-13_DK_V-14_DK_V-15_NO_UCH_NO_V-15_SE_UCH_Chic_Choix_Some_Like_It_Chic_(24014621720).jpg"
+     },
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/8/87/Aishia.jpg",
+      "w": 500,
+      "h": 345,
+      "credit": "Elminjas at Dutch Wikipedia",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Aishia.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/3/3d/Lhasa_Apso_sable.jpg/500px-Lhasa_Apso_sable.jpg",
+      "w": 500,
+      "h": 341,
+      "credit": "Canarian",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Lhasa_Apso_sable.jpg"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "tibetan-mastiff",
+   "name": "Tibetan Mastiff",
+   "facts": {
+    "origin": "Tibet",
+    "type": "Working",
+    "massKg": 60,
+    "size": "Giant"
+   },
+   "lookalikes": [
+    "english-mastiff"
+   ],
+   "blurb": "A huge guardian dog from the Himalayas with a lion-like mane. One sold for a record price in China.",
+   "clues": [
+    "It guarded herds from wolves and snow leopards.",
+    "One was reportedly sold for millions of dollars in China.",
+    "It has a thick mane like a lion.",
+    "It is a working breed.",
+    "A typical adult weighs about 60 kg.",
+    "It is a huge, fluffy guard dog.",
+    "It comes from the Himalayas.",
+    "The answer has 2 words (7, 7 letters).",
+    "It starts with the letter T."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/e/e9/2013_Westminster_Kennel_Club_Dog_Show-_Tibetan_Mastiff_GCH_Sierras%27Sasha-Yakone_Nanuk_%288469240739%29_%28cropped%29.jpg/500px-2013_Westminster_Kennel_Club_Dog_Show-_Tibetan_Mastiff_GCH_Sierras%27Sasha-Yakone_Nanuk_%288469240739%29_%28cropped%29.jpg",
+      "w": 500,
+      "h": 404,
+      "credit": "Pets Adviser from Brooklyn, USA",
+      "license": "CC BY 2.0",
+      "page": "https://commons.wikimedia.org/wiki/File:2013_Westminster_Kennel_Club_Dog_Show-_Tibetan_Mastiff_GCH_Sierras%27Sasha-Yakone_Nanuk_(8469240739)_(cropped).jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/c/c1/BIR_Grupp_2-_TIBETANSK_MASTIFF%2C_Legenda_Tibeta_Temudzhin_%2823938629470%29.jpg/500px-BIR_Grupp_2-_TIBETANSK_MASTIFF%2C_Legenda_Tibeta_Temudzhin_%2823938629470%29.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Svenska Mässan from Sweden",
+      "license": "CC BY 2.0",
+      "page": "https://commons.wikimedia.org/wiki/File:BIR_Grupp_2-_TIBETANSK_MASTIFF,_Legenda_Tibeta_Temudzhin_(23938629470).jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/0/08/Mongolian_traditional_dog_called_Bankhar.jpg/500px-Mongolian_traditional_dog_called_Bankhar.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Yumjirdulam0501",
+      "license": "CC0 1.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Mongolian_traditional_dog_called_Bankhar.jpg"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "english-mastiff",
+   "name": "English Mastiff",
+   "alt": [
+    "Mastiff"
+   ],
+   "facts": {
+    "origin": "United Kingdom",
+    "type": "Working",
+    "massKg": 80,
+    "size": "Giant"
+   },
+   "lookalikes": [
+    "bullmastiff",
+    "great-dane",
+    "tibetan-mastiff"
+   ],
+   "blurb": "One of the heaviest dog breeds. A mastiff called Zorba was once the heaviest dog ever recorded.",
+   "clues": [
+    "Zorba was once the heaviest dog on record.",
+    "Romans wrote about British war dogs like it.",
+    "It has a black mask on its face.",
+    "The breed comes from United Kingdom.",
+    "It is a working breed.",
+    "A typical adult weighs about 80 kg.",
+    "It is calm and gentle.",
+    "It is one of the heaviest breeds.",
+    "The answer has 2 words (7, 7 letters).",
+    "It starts with the letter E."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/6/6a/Mastiff1.jpg/500px-Mastiff1.jpg",
+      "w": 500,
+      "h": 400,
+      "credit": "Karina Leo-Steffen, hier hochgeladen von --Caronna 14:08, 15 Apr 2005 (UTC)",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Mastiff1.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/e/e8/Mastif_angielski_pregowany_nn.jpg/500px-Mastif_angielski_pregowany_nn.jpg",
+      "w": 500,
+      "h": 558,
+      "credit": "Pleple2000",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Mastif_angielski_pregowany_nn.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/0/0b/Max_English_Mastiff_Puppy.jpg/500px-Max_English_Mastiff_Puppy.jpg",
+      "w": 500,
+      "h": 334,
+      "credit": "Valerie Everett",
+      "license": "CC BY-SA 2.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Max_English_Mastiff_Puppy.jpg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "bullmastiff",
+   "name": "Bullmastiff",
+   "facts": {
+    "origin": "United Kingdom",
+    "type": "Working",
+    "massKg": 50,
+    "size": "Giant"
+   },
+   "lookalikes": [
+    "english-mastiff"
+   ],
+   "blurb": "A powerful guard dog bred to catch poachers on English estates by pinning them down.",
+   "clues": [
+    "It was nicknamed \"the gamekeeper's night dog\".",
+    "It pinned poachers without biting.",
+    "It is a cross of two large breeds.",
+    "The breed comes from United Kingdom.",
+    "It is a working breed.",
+    "A typical adult weighs about 50 kg.",
+    "It has a black mask.",
+    "It is big and muscular.",
+    "The answer is one word of 11 letters.",
+    "It starts with the letter B."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/5/5c/Dog_Bullmastiff_600.jpg/500px-Dog_Bullmastiff_600.jpg",
+      "w": 500,
+      "h": 480,
+      "credit": "Wikimedia Commons",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Dog_Bullmastiff_600.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/6/6d/Bullmastiff_edited.JPG/500px-Bullmastiff_edited.JPG",
+      "w": 500,
+      "h": 436,
+      "credit": "Fausto Moreno",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Bullmastiff_edited.JPG"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/9/90/Bullmastiff_playing_with_poodle.jpg/500px-Bullmastiff_playing_with_poodle.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Davidmiron",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Bullmastiff_playing_with_poodle.jpg"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "weimaraner",
+   "name": "Weimaraner",
+   "alt": [
+    "Weim"
+   ],
+   "facts": {
+    "origin": "Germany",
+    "type": "Gundog",
+    "massKg": 32,
+    "size": "Large"
+   },
+   "lookalikes": [
+    "vizsla"
+   ],
+   "blurb": "A sleek silver-grey hunting dog nicknamed the \"grey ghost\". Its puppies have blue eyes.",
+   "clues": [
+    "Photographer William Wegman made it famous.",
+    "It is nicknamed the \"grey ghost\".",
+    "Its eyes are light amber or blue-grey.",
+    "The breed comes from Germany.",
+    "It is a gundog breed.",
+    "A typical adult weighs about 32 kg.",
+    "It has a sleek silver-grey coat.",
+    "It is named after a German city.",
+    "The answer is one word of 10 letters.",
+    "It starts with the letter W."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/d/d9/Weimaraner_Amigo.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Alexander Gratz",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Weimaraner_Amigo.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/5/59/Weimaraner_Freika-2.jpg/500px-Weimaraner_Freika-2.jpg",
+      "w": 500,
+      "h": 605,
+      "credit": "Rufus46",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Weimaraner_Freika-2.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/f/ff/Pepe_a_Josaphat_looking_back.jpg/500px-Pepe_a_Josaphat_looking_back.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Trougnouf",
+      "license": "CC BY 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Pepe_a_Josaphat_looking_back.jpg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "vizsla",
+   "name": "Vizsla",
+   "facts": {
+    "origin": "Hungary",
+    "type": "Gundog",
+    "massKg": 25,
+    "size": "Large"
+   },
+   "lookalikes": [
+    "weimaraner",
+    "rhodesian-ridgeback"
+   ],
+   "blurb": "A sleek, golden-rust hunting dog from Hungary. It likes to stay very close to its owner.",
+   "clues": [
+    "It is nicknamed the \"Velcro dog\".",
+    "It has a reddish nose.",
+    "It has a short golden-rust coat.",
+    "The breed comes from Hungary.",
+    "It is a gundog breed.",
+    "A typical adult weighs about 25 kg.",
+    "It comes from Hungary.",
+    "Its name begins with the letter V.",
+    "The answer is one word of 6 letters.",
+    "It starts with the letter V."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/2/2d/Wy%C5%BCe%C5%82_w%C4%99gierski_g%C5%82adkow%C5%82osy_500.jpg/500px-Wy%C5%BCe%C5%82_w%C4%99gierski_g%C5%82adkow%C5%82osy_500.jpg",
+      "w": 500,
+      "h": 525,
+      "credit": "Pleple2000",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Wy%C5%BCe%C5%82_w%C4%99gierski_g%C5%82adkow%C5%82osy_500.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/a/a2/Magyar_Vizsla_sc000221f6.jpg/500px-Magyar_Vizsla_sc000221f6.jpg",
+      "w": 500,
+      "h": 338,
+      "credit": "Ribax",
+      "license": "CC BY 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Magyar_Vizsla_sc000221f6.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/8/83/Bodza_a_t%C3%B6bbiekkel.JPG/500px-Bodza_a_t%C3%B6bbiekkel.JPG",
+      "w": 500,
+      "h": 375,
+      "credit": "Shepyke",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Bodza_a_t%C3%B6bbiekkel.JPG"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "german-shorthaired-pointer",
+   "name": "German Shorthaired Pointer",
+   "alt": [
+    "GSP"
+   ],
+   "facts": {
+    "origin": "Germany",
+    "type": "Gundog",
+    "massKg": 27,
+    "size": "Large"
+   },
+   "blurb": "A tireless hunting dog that freezes and points its nose at birds. It is spotted brown and white.",
+   "clues": [
+    "It can hunt on land and in water.",
+    "It has webbed feet.",
+    "It is a gundog breed.",
+    "A typical adult weighs about 27 kg.",
+    "It is spotted liver and white.",
+    "Its coat is short.",
+    "The answer has 3 words (6, 11, 7 letters).",
+    "It starts with the letter G."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/3/38/Duitse_staande_korthaar_10-10-2.jpg",
+      "w": 500,
+      "h": 332,
+      "credit": "Bonnie van den Born, http://www.bonfoto.nl",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Duitse_staande_korthaar_10-10-2.jpg"
+     },
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/c/ca/Duitse_staande_korthaar_10-10-1.jpg",
+      "w": 500,
+      "h": 753,
+      "credit": "Bonnie van den Born, http://www.bonfoto.nl",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Duitse_staande_korthaar_10-10-1.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/f/f2/%D0%9A%D1%83%D1%80%D1%86%D1%85%D0%B0%D0%B0%D1%80.jpg/500px-%D0%9A%D1%83%D1%80%D1%86%D1%85%D0%B0%D0%B0%D1%80.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Горбунова М.С.",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:%D0%9A%D1%83%D1%80%D1%86%D1%85%D0%B0%D0%B0%D1%80.jpg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "english-springer-spaniel",
+   "name": "English Springer Spaniel",
+   "alt": [
+    "Springer Spaniel",
+    "Springer"
+   ],
+   "facts": {
+    "origin": "United Kingdom",
+    "type": "Gundog",
+    "massKg": 22,
+    "size": "Medium"
+   },
+   "lookalikes": [
+    "english-cocker-spaniel"
+   ],
+   "blurb": "A bouncy, eager gundog that flushes birds into the air. It is a favourite sniffer dog.",
+   "clues": [
+    "It is often used as a sniffer dog.",
+    "It has long, feathery ears.",
+    "The breed comes from United Kingdom.",
+    "It is a gundog breed.",
+    "A typical adult weighs about 22 kg.",
+    "It is usually liver and white.",
+    "It jumps game birds into the air.",
+    "The answer has 3 words (7, 8, 7 letters).",
+    "It starts with the letter E."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/a/ae/Englishspringerspaniel_Winston.jpg",
+      "w": 500,
+      "h": 728,
+      "credit": "SuviLindholm",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Englishspringerspaniel_Winston.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/c/c4/Springer_Spaniel_Wide_Shot.jpg/500px-Springer_Spaniel_Wide_Shot.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Ratsniffer",
+      "license": "CC0 1.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Springer_Spaniel_Wide_Shot.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/a/a0/2019_Entengraben_01.jpg/500px-2019_Entengraben_01.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Derzno",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:2019_Entengraben_01.jpg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "irish-setter",
+   "name": "Irish Setter",
+   "alt": [
+    "Red Setter"
+   ],
+   "facts": {
+    "origin": "Ireland",
+    "type": "Gundog",
+    "massKg": 30,
+    "size": "Large"
+   },
+   "lookalikes": [
+    "golden-retriever"
+   ],
+   "blurb": "A tall, glossy, mahogany-red gundog with a happy, playful nature.",
+   "clues": [
+    "It was bred to find game birds.",
+    "It is playful and stays young at heart.",
+    "It has long, feathery fur on its legs.",
+    "The breed comes from Ireland.",
+    "It is a gundog breed.",
+    "A typical adult weighs about 30 kg.",
+    "It comes from Ireland.",
+    "The answer has 2 words (5, 6 letters).",
+    "It starts with the letter I."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/2/2e/Can_Setter_dog_GFDL.jpg/500px-Can_Setter_dog_GFDL.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Luis Miguel Bugallo Sánchez (Lmbuga Commons)(Lmbuga Galipedia) Publicada por/Publish by…",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Can_Setter_dog_GFDL.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/6/63/Uthandi_Beach_2ndMain_Benches_Chennai_May21_R16_04753.jpg/500px-Uthandi_Beach_2ndMain_Benches_Chennai_May21_R16_04753.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Timothy A. Gonsalves",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Uthandi_Beach_2ndMain_Benches_Chennai_May21_R16_04753.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/3/30/Irish_setter_-_%C4%B0rlanda_setteri%2C_Adana_2016-10-30_01-2.jpg/500px-Irish_setter_-_%C4%B0rlanda_setteri%2C_Adana_2016-10-30_01-2.jpg",
+      "w": 500,
+      "h": 337,
+      "credit": "Zeynel Cebeci",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Irish_setter_-_%C4%B0rlanda_setteri,_Adana_2016-10-30_01-2.jpg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "old-english-sheepdog",
+   "name": "Old English Sheepdog",
+   "alt": [
+    "Bobtail"
+   ],
+   "facts": {
+    "origin": "United Kingdom",
+    "type": "Herding",
+    "massKg": 35,
+    "size": "Large"
+   },
+   "blurb": "A big, shaggy grey-and-white dog whose hair often covers its eyes. It was used to drive cattle to market.",
+   "clues": [
+    "It was used to drive cattle to market.",
+    "It has a rolling, bear-like walk.",
+    "The breed comes from United Kingdom.",
+    "It is a herding breed.",
+    "A typical adult weighs about 35 kg.",
+    "Its shaggy hair often hides its eyes.",
+    "The answer has 3 words (3, 7, 8 letters).",
+    "It starts with the letter O."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/7/7b/Bobtail.JPG/500px-Bobtail.JPG",
+      "w": 500,
+      "h": 335,
+      "credit": "Mona (uploaded by Caronna 08:14, 15 Apr 2005 (UTC))",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Bobtail.JPG"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/c/c8/Old_english_sheepdog_Ch_Bobbyclown%27s_Dare_for_More.jpg/500px-Old_english_sheepdog_Ch_Bobbyclown%27s_Dare_for_More.jpg",
+      "w": 500,
+      "h": 547,
+      "credit": "Photo taken by Harald Urnes, Norway",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Old_english_sheepdog_Ch_Bobbyclown%27s_Dare_for_More.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/d/da/Chiot_bobtail.jpg/500px-Chiot_bobtail.jpg",
+      "w": 500,
+      "h": 321,
+      "credit": "Hervé, Brigitte",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Chiot_bobtail.jpg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "rough-collie",
+   "name": "Rough Collie",
+   "alt": [
+    "Lassie dog",
+    "Collie"
+   ],
+   "facts": {
+    "origin": "United Kingdom",
+    "type": "Herding",
+    "massKg": 25,
+    "size": "Large"
+   },
+   "lookalikes": [
+    "shetland-sheepdog",
+    "border-collie"
+   ],
+   "blurb": "A long-haired Scottish herding dog made famous by the film dog Lassie.",
+   "clues": [
+    "Queen Victoria made it popular.",
+    "It has a long, narrow face.",
+    "It has a long, thick mane.",
+    "The breed comes from United Kingdom.",
+    "It is a herding breed.",
+    "A typical adult weighs about 25 kg.",
+    "It comes from Scotland.",
+    "The answer has 2 words (5, 6 letters).",
+    "It starts with the letter R."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/5/5c/Rough_Collie_head.jpg/500px-Rough_Collie_head.jpg",
+      "w": 500,
+      "h": 488,
+      "credit": "WisewynD",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Rough_Collie_head.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/6/65/Rough-Collie-japan08_%28cropped%29.jpg/500px-Rough-Collie-japan08_%28cropped%29.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Yasu w",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Rough-Collie-japan08_(cropped).jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/0/05/Rough_Collie_puppy_8_weeks.jpg/500px-Rough_Collie_puppy_8_weeks.jpg",
+      "w": 500,
+      "h": 667,
+      "credit": "Sundance Raphael",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Rough_Collie_puppy_8_weeks.jpg"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "australian-cattle-dog",
+   "name": "Australian Cattle Dog",
+   "alt": [
+    "Blue Heeler",
+    "Red Heeler",
+    "Heeler",
+    "Queensland Heeler"
+   ],
+   "facts": {
+    "origin": "Australia",
+    "type": "Herding",
+    "massKg": 18,
+    "size": "Medium"
+   },
+   "lookalikes": [
+    "australian-kelpie"
+   ],
+   "blurb": "A tough herding dog from Australia that nips cattle on the heels. Bluey the cartoon dog is one.",
+   "clues": [
+    "It may have dingo in its ancestry.",
+    "Puppies are born white and change colour.",
+    "It is a herding breed.",
+    "A typical adult weighs about 18 kg.",
+    "It is known for its toughness and loyalty.",
+    "The answer has 3 words (10, 6, 3 letters).",
+    "It starts with the letter A."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/c/cc/ACD-blue-spud.jpg/500px-ACD-blue-spud.jpg",
+      "w": 500,
+      "h": 400,
+      "credit": "Zingpix",
+      "license": "CC BY 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:ACD-blue-spud.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/6/64/%22Bender%22_Australian_Cattle_Dog_Creeping_Legend_%28edited%29.png/500px-%22Bender%22_Australian_Cattle_Dog_Creeping_Legend_%28edited%29.png",
+      "w": 500,
+      "h": 375,
+      "credit": "Guilbrynski",
+      "license": "CC0 1.0",
+      "page": "https://commons.wikimedia.org/wiki/File:%22Bender%22_Australian_Cattle_Dog_Creeping_Legend_(edited).png"
+     },
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/5/51/Ajalugu_Nipper%2C_bred_by_Harry_Bagust_in_1899.jpg",
+      "w": 500,
+      "h": 387,
+      "credit": "Unknown authorUnknown author",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Ajalugu_Nipper,_bred_by_Harry_Bagust_in_1899.jpg"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "australian-kelpie",
+   "name": "Australian Kelpie",
+   "alt": [
+    "Kelpie"
+   ],
+   "facts": {
+    "origin": "Australia",
+    "type": "Herding",
+    "massKg": 16,
+    "size": "Medium"
+   },
+   "lookalikes": [
+    "australian-cattle-dog",
+    "border-collie"
+   ],
+   "blurb": "A tireless Australian sheepdog that can run across the backs of packed sheep.",
+   "clues": [
+    "Red Dog in the film was one.",
+    "It can run across the backs of sheep.",
+    "It can work all day in the heat.",
+    "It is a herding breed.",
+    "A typical adult weighs about 16 kg.",
+    "It is named after a water spirit from Scottish folklore.",
+    "The answer has 2 words (10, 6 letters).",
+    "It starts with the letter A."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/f/f4/Bashyr.jpg/500px-Bashyr.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "D.N. Geerlings (eigenaar)",
+      "license": "CC BY-SA 2.5 nl",
+      "page": "https://commons.wikimedia.org/wiki/File:Bashyr.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/7/75/Hilu_the_Australian_Kelpie_dog.jpg/500px-Hilu_the_Australian_Kelpie_dog.jpg",
+      "w": 500,
+      "h": 360,
+      "credit": "Pertti Kärppä",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Hilu_the_Australian_Kelpie_dog.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/c/cd/Australian_Shepherd_jumping-20190204-RM-163531.jpg/500px-Australian_Shepherd_jumping-20190204-RM-163531.jpg",
+      "w": 500,
+      "h": 387,
+      "credit": "Reinhold Möller Ermell",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Australian_Shepherd_jumping-20190204-RM-163531.jpg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "australian-terrier",
+   "name": "Australian Terrier",
+   "alt": [
+    "Aussie Terrier"
+   ],
+   "facts": {
+    "origin": "Australia",
+    "type": "Terrier",
+    "massKg": 6,
+    "size": "Small"
+   },
+   "lookalikes": [
+    "yorkshire-terrier",
+    "silky-terrier"
+   ],
+   "blurb": "A small, tough terrier and the first Australian breed recognised overseas. It hunted rats and snakes.",
+   "clues": [
+    "It hunted rats and snakes.",
+    "It has a soft topknot on its head.",
+    "It is blue and tan or red.",
+    "A typical adult weighs about 6 kg.",
+    "It has a rough, shaggy coat.",
+    "It was bred to work on farms and goldfields.",
+    "Its ears are small and pricked up.",
+    "The answer has 2 words (10, 7 letters).",
+    "It starts with the letter A."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/0/00/Australian_Terrier_002_U.jpg/500px-Australian_Terrier_002_U.jpg",
+      "w": 500,
+      "h": 361,
+      "credit": "Lilly M",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Australian_Terrier_002_U.jpg"
+     },
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/b/b6/Australian_Terrier_adult_male.jpg",
+      "w": 500,
+      "h": 419,
+      "credit": "Chuck in MA",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Australian_Terrier_adult_male.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/a/a1/Australian_Terrier_Image_001.jpg/500px-Australian_Terrier_Image_001.jpg",
+      "w": 500,
+      "h": 733,
+      "credit": "Flickr user smallrice",
+      "license": "CC BY 2.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Australian_Terrier_Image_001.jpg"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "silky-terrier",
+   "name": "Silky Terrier",
+   "alt": [
+    "Australian Silky Terrier"
+   ],
+   "facts": {
+    "origin": "Australia",
+    "type": "Toy",
+    "massKg": 4,
+    "size": "Toy"
+   },
+   "lookalikes": [
+    "yorkshire-terrier",
+    "australian-terrier"
+   ],
+   "blurb": "A small Australian terrier with a long, fine blue-and-tan coat, bred from Yorkshire and Australian terriers.",
+   "clues": [
+    "It was bred around Sydney.",
+    "Its hair is parted down its back.",
+    "It is a toy breed.",
+    "A typical adult weighs about 4 kg.",
+    "It is blue and tan.",
+    "Its coat is fine and smooth like a soft fabric.",
+    "The answer has 2 words (5, 7 letters).",
+    "It starts with the letter S."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/4/48/02_Australian_Silky_Terrier%2C_Zack%2C_spring_2012.jpg/500px-02_Australian_Silky_Terrier%2C_Zack%2C_spring_2012.jpg",
+      "w": 500,
+      "h": 357,
+      "credit": "island silks",
+      "license": "CC BY 2.0",
+      "page": "https://commons.wikimedia.org/wiki/File:02_Australian_Silky_Terrier,_Zack,_spring_2012.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/a/af/Australian_Silky_Terrier_Alana_Of_Silky%27s_Dream.jpg/500px-Australian_Silky_Terrier_Alana_Of_Silky%27s_Dream.jpg",
+      "w": 500,
+      "h": 443,
+      "credit": "Ofsilkysdream",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Australian_Silky_Terrier_Alana_Of_Silky%27s_Dream.jpg"
+     },
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/b/b8/Australian_Silky_Terrier.jpg",
+      "w": 500,
+      "h": 420,
+      "credit": "Wikimedia Commons",
+      "license": "CC BY 2.5",
+      "page": "https://commons.wikimedia.org/wiki/File:Australian_Silky_Terrier.jpg"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "papillon",
+   "name": "Papillon",
+   "alt": [
+    "Butterfly dog"
+   ],
+   "facts": {
+    "origin": "France",
+    "type": "Toy",
+    "massKg": 3,
+    "size": "Toy"
+   },
+   "lookalikes": [
+    "chihuahua"
+   ],
+   "blurb": "A tiny, lively dog with large fringed ears shaped like butterfly wings.",
+   "clues": [
+    "Marie Antoinette is said to have owned one.",
+    "It is one of the smartest toy breeds.",
+    "A droop-eared form is called the Phalène.",
+    "The breed comes from France.",
+    "It is a toy breed.",
+    "A typical adult weighs about 3 kg.",
+    "Its ears have long fringes.",
+    "The answer is one word of 8 letters.",
+    "It starts with the letter P."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/7/7d/Outdoor_Continental_Toy_Spaniel_Papillon.jpeg/500px-Outdoor_Continental_Toy_Spaniel_Papillon.jpeg",
+      "w": 500,
+      "h": 390,
+      "credit": "Gvdmoort",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Outdoor_Continental_Toy_Spaniel_Papillon.jpeg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/6/69/Shih_Tzu_In_Iran_Mashhad_City_Canon_Photography_Creative_Commons_Photographer_Mostafa_Meraji_07.jpg/500px-Shih_Tzu_In_Iran_Mashhad_City_Canon_Photography_Creative_Commons_Photographer_Mostafa_Meraji_07.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Mostafameraji",
+      "license": "CC0 1.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Shih_Tzu_In_Iran_Mashhad_City_Canon_Photography_Creative_Commons_Photographer_Mostafa_Meraji_07.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/2/22/%D8%AA%D8%B4%D9%8A%D9%87_%D8%AA%D8%B2%D9%88.jpg/500px-%D8%AA%D8%B4%D9%8A%D9%87_%D8%AA%D8%B2%D9%88.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Mostafameraji",
+      "license": "CC0 1.0",
+      "page": "https://commons.wikimedia.org/wiki/File:%D8%AA%D8%B4%D9%8A%D9%87_%D8%AA%D8%B2%D9%88.jpg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "basenji",
+   "name": "Basenji",
+   "facts": {
+    "origin": "Democratic Republic of the Congo",
+    "type": "Hound",
+    "massKg": 10,
+    "size": "Small"
+   },
+   "blurb": "An African hunting dog that does not bark. It yodels instead.",
+   "clues": [
+    "It cleans itself like a cat.",
+    "Its tail curls tightly.",
+    "It has a wrinkled forehead.",
+    "The breed comes from Democratic Republic of the Congo.",
+    "It is a hound breed.",
+    "A typical adult weighs about 10 kg.",
+    "It yodels instead of barking.",
+    "It is the \"barkless dog\" of Central Africa.",
+    "The answer is one word of 7 letters.",
+    "It starts with the letter B."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/2/2f/%D0%91%D0%B0%D1%81%D0%B5%D0%BD%D0%B4%D0%B6%D0%B8_%28Basenji%29_02.jpg/500px-%D0%91%D0%B0%D1%81%D0%B5%D0%BD%D0%B4%D0%B6%D0%B8_%28Basenji%29_02.jpg",
+      "w": 500,
+      "h": 369,
+      "credit": "Novoklimov",
+      "license": "CC0 1.0",
+      "page": "https://commons.wikimedia.org/wiki/File:%D0%91%D0%B0%D1%81%D0%B5%D0%BD%D0%B4%D0%B6%D0%B8_(Basenji)_02.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/c/c5/Basenji_Profile_%28loosercrop%29.jpg/500px-Basenji_Profile_%28loosercrop%29.jpg",
+      "w": 500,
+      "h": 459,
+      "credit": "fugzu",
+      "license": "CC BY 2.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Basenji_Profile_(loosercrop).jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/f/f9/Basenji_red_%26_white_2.jpg/500px-Basenji_red_%26_white_2.jpg",
+      "w": 500,
+      "h": 512,
+      "credit": "Canarian",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Basenji_red_%26_white_2.jpg"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "rhodesian-ridgeback",
+   "name": "Rhodesian Ridgeback",
+   "alt": [
+    "Ridgeback"
+   ],
+   "facts": {
+    "origin": "Zimbabwe",
+    "type": "Hound",
+    "massKg": 35,
+    "size": "Large"
+   },
+   "lookalikes": [
+    "vizsla"
+   ],
+   "blurb": "A strong African hound with a stripe of hair growing backwards along its spine. It was used to track lions.",
+   "clues": [
+    "It was nicknamed the \"African lion hound\".",
+    "It held lions at bay for hunters.",
+    "It comes from southern Africa.",
+    "The breed comes from Zimbabwe.",
+    "It is a hound breed.",
+    "A typical adult weighs about 35 kg.",
+    "It is wheaten coloured.",
+    "A strip of fur on its back grows the wrong way.",
+    "The answer has 2 words (9, 9 letters).",
+    "It starts with the letter R."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/d/d2/Grupp_6_RHODESIAN_RIDGEBACK%2C_NO_JV-15_SE_VCH_Kadamo_I%E2%80%99m_In_It_For_The_Gold_%2823920356649%29.jpg/500px-Grupp_6_RHODESIAN_RIDGEBACK%2C_NO_JV-15_SE_VCH_Kadamo_I%E2%80%99m_In_It_For_The_Gold_%2823920356649%29.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Svenska Mässan from Sweden",
+      "license": "CC BY 2.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Grupp_6_RHODESIAN_RIDGEBACK,_NO_JV-15_SE_VCH_Kadamo_I%E2%80%99m_In_It_For_The_Gold_(23920356649).jpg"
+     },
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/0/01/Rhodesian_ridgeback.jpg",
+      "w": 500,
+      "h": 332,
+      "credit": "Bonnie van den Born, http://www.bonfoto.nl",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Rhodesian_ridgeback.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/f/f3/Rhodesian_Ridgeback_In_A_Garden_2014.jpg/500px-Rhodesian_Ridgeback_In_A_Garden_2014.jpg",
+      "w": 500,
+      "h": 667,
+      "credit": "HGSeg",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Rhodesian_Ridgeback_In_A_Garden_2014.jpg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "chinese-crested",
+   "name": "Chinese Crested",
+   "alt": [
+    "Chinese Crested Dog"
+   ],
+   "facts": {
+    "origin": "China",
+    "type": "Toy",
+    "massKg": 4,
+    "size": "Toy"
+   },
+   "lookalikes": [
+    "xoloitzcuintle"
+   ],
+   "blurb": "A small dog that is mostly hairless, with tufts of hair on its head, feet and tail.",
+   "clues": [
+    "Some are fully furry and called \"powderpuffs\".",
+    "It has often won \"World's Ugliest Dog\".",
+    "It can get sunburn.",
+    "It is a toy breed.",
+    "A typical adult weighs about 4 kg.",
+    "It has tufts on its head, feet and tail.",
+    "It is mostly hairless.",
+    "The answer has 2 words (7, 7 letters).",
+    "It starts with the letter C."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/9/97/IndyStands.jpg/500px-IndyStands.jpg",
+      "w": 500,
+      "h": 332,
+      "credit": "Tommy Gildseth",
+      "license": "CC BY 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:IndyStands.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/3/3e/Chinese_crested_dog_on_the_beach_%2813200%29.jpg/500px-Chinese_crested_dog_on_the_beach_%2813200%29.jpg",
+      "w": 500,
+      "h": 340,
+      "credit": "Rhododendrites",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Chinese_crested_dog_on_the_beach_(13200).jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/6/67/Barbarella_the_Chinese_crested_puppy_%2812929%29.jpg/500px-Barbarella_the_Chinese_crested_puppy_%2812929%29.jpg",
+      "w": 500,
+      "h": 464,
+      "credit": "Rhododendrites",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Barbarella_the_Chinese_crested_puppy_(12929).jpg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "xoloitzcuintle",
+   "name": "Xoloitzcuintle",
+   "alt": [
+    "Xolo",
+    "Mexican Hairless Dog"
+   ],
+   "facts": {
+    "origin": "Mexico",
+    "type": "Companion"
+   },
+   "lookalikes": [
+    "chinese-crested"
+   ],
+   "blurb": "An ancient hairless dog of Mexico, linked with the Aztec god Xolotl. Dante in Disney's \"Coco\" is one.",
+   "clues": [
+    "The Aztecs linked it with a god of death.",
+    "It comes in three sizes.",
+    "Dante in Disney's \"Coco\" is one.",
+    "It is a companion breed.",
+    "Its skin feels warm to the touch.",
+    "Some puppies in a litter are born with fur.",
+    "Its name is often shortened to four letters.",
+    "The answer is one word of 14 letters.",
+    "It starts with the letter X."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/8/85/XoloLarge1.jpg/500px-XoloLarge1.jpg",
+      "w": 500,
+      "h": 420,
+      "credit": "Canarian",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:XoloLarge1.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/b/bb/BIR_Grupp_5-_MEXIKANSK_NAKENHUND%2C_Lokal_Hero%E2%80%99s_King_Og_Hart%E2%80%99s_Istas_%2823607403303%29.jpg/500px-BIR_Grupp_5-_MEXIKANSK_NAKENHUND%2C_Lokal_Hero%E2%80%99s_King_Og_Hart%E2%80%99s_Istas_%2823607403303%29.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Svenska Mässan from Sweden",
+      "license": "CC BY 2.0",
+      "page": "https://commons.wikimedia.org/wiki/File:BIR_Grupp_5-_MEXIKANSK_NAKENHUND,_Lokal_Hero%E2%80%99s_King_Og_Hart%E2%80%99s_Istas_(23607403303).jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/c/c9/XoloLarge2.jpg/500px-XoloLarge2.jpg",
+      "w": 500,
+      "h": 394,
+      "credit": "Canarian",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:XoloLarge2.jpg"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "puli",
+   "name": "Puli",
+   "facts": {
+    "origin": "Hungary",
+    "type": "Herding",
+    "massKg": 13,
+    "size": "Medium"
+   },
+   "lookalikes": [
+    "komondor"
+   ],
+   "blurb": "A Hungarian sheepdog whose coat grows into long cords, like dreadlocks.",
+   "clues": [
+    "Its cords take years to grow.",
+    "It is quick and acrobatic.",
+    "It is usually black.",
+    "The breed comes from Hungary.",
+    "It is a herding breed.",
+    "A typical adult weighs about 13 kg.",
+    "It comes from Hungary.",
+    "Its coat hangs in long cords like a mop.",
+    "The answer is one word of 4 letters.",
+    "It starts with the letter P."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/b/b3/Puli_600.jpg/500px-Puli_600.jpg",
+      "w": 500,
+      "h": 421,
+      "credit": "Sannse",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Puli_600.jpg"
+     },
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/a/ab/PuliBlack_wb.jpg",
+      "w": 500,
+      "h": 392,
+      "credit": "Original uploader was Elf at en.wikipedia",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:PuliBlack_wb.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/5/59/Puli_white.jpg/500px-Puli_white.jpg",
+      "w": 500,
+      "h": 396,
+      "credit": "Canarian",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Puli_white.jpg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "komondor",
+   "name": "Komondor",
+   "facts": {
+    "origin": "Hungary",
+    "type": "Working",
+    "massKg": 50,
+    "size": "Giant"
+   },
+   "lookalikes": [
+    "puli"
+   ],
+   "blurb": "A huge white Hungarian guard dog covered in long cords of hair. It guarded sheep from wolves.",
+   "clues": [
+    "Its coat can weigh several kilograms.",
+    "It blends in with the sheep it guards.",
+    "It guarded flocks from wolves.",
+    "The breed comes from Hungary.",
+    "It is a working breed.",
+    "A typical adult weighs about 50 kg.",
+    "It is white with long cords like a mop.",
+    "It comes from Hungary.",
+    "The answer is one word of 8 letters.",
+    "It starts with the letter K."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/3/3d/Komondor_Westminster_Dog_Show_crop.jpg/500px-Komondor_Westminster_Dog_Show_crop.jpg",
+      "w": 500,
+      "h": 547,
+      "credit": "Photo taken by Flickr user whartonds. Edit (cropped) by Pharaoh Hound.",
+      "license": "CC BY-SA 2.5",
+      "page": "https://commons.wikimedia.org/wiki/File:Komondor_Westminster_Dog_Show_crop.jpg"
+     },
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/6/66/Komondor_dog_breed.jpg",
+      "w": 500,
+      "h": 437,
+      "credit": "Wiki.awal",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Komondor_dog_breed.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/8/8b/Komondor_delvin.jpg/500px-Komondor_delvin.jpg",
+      "w": 500,
+      "h": 531,
+      "credit": "Nikki68 at Russian Wikipedia",
+      "license": "CC BY 2.5",
+      "page": "https://commons.wikimedia.org/wiki/File:Komondor_delvin.jpg"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "borzoi",
+   "name": "Borzoi",
+   "alt": [
+    "Russian Wolfhound"
+   ],
+   "facts": {
+    "origin": "Russia",
+    "type": "Hound",
+    "massKg": 35,
+    "size": "Large"
+   },
+   "lookalikes": [
+    "afghan-hound",
+    "saluki"
+   ],
+   "blurb": "A tall, elegant Russian sighthound with a long narrow head. Russian nobles used it to hunt wolves.",
+   "clues": [
+    "It has a long, narrow head.",
+    "It has a silky, wavy coat.",
+    "It is a hound breed.",
+    "A typical adult weighs about 35 kg.",
+    "It hunts by sight rather than smell.",
+    "It can run very fast over open ground.",
+    "It was a favourite of the Tsars.",
+    "The answer is one word of 6 letters.",
+    "It starts with the letter B."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/8/87/Borzoi_female.jpg/500px-Borzoi_female.jpg",
+      "w": 500,
+      "h": 373,
+      "credit": "Taru T Torpström",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Borzoi_female.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/d/de/Chart_rosyjski_borzoj_rybnik-kamien_pl.jpg/500px-Chart_rosyjski_borzoj_rybnik-kamien_pl.jpg",
+      "w": 500,
+      "h": 434,
+      "credit": "Pleple2000",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Chart_rosyjski_borzoj_rybnik-kamien_pl.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/3/38/Dog_show_%284320434879%29.jpg/500px-Dog_show_%284320434879%29.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Fido Factor from USA",
+      "license": "CC BY-SA 2.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Dog_show_(4320434879).jpg"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "portuguese-water-dog",
+   "name": "Portuguese Water Dog",
+   "alt": [
+    "Portie"
+   ],
+   "facts": {
+    "origin": "Portugal",
+    "type": "Working",
+    "massKg": 20,
+    "size": "Medium"
+   },
+   "lookalikes": [
+    "poodle"
+   ],
+   "blurb": "A curly-coated swimming dog that helped fishermen. Barack Obama's family had two.",
+   "clues": [
+    "Barack Obama's dogs Bo and Sunny were this breed.",
+    "It herded fish into nets.",
+    "It has webbed feet.",
+    "It is a working breed.",
+    "A typical adult weighs about 20 kg.",
+    "It has a curly or wavy coat.",
+    "It worked on boats with fishermen.",
+    "The answer has 3 words (10, 5, 3 letters).",
+    "It starts with the letter P."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/0/09/C%C3%A3o_de_agua_Portugu%C3%AAs_2.jpg/500px-C%C3%A3o_de_agua_Portugu%C3%AAs_2.jpg",
+      "w": 500,
+      "h": 427,
+      "credit": "Silke Hollje-Schumacher",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:C%C3%A3o_de_agua_Portugu%C3%AAs_2.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/a/a1/Portuguesewater-brown1.jpg/500px-Portuguesewater-brown1.jpg",
+      "w": 500,
+      "h": 419,
+      "credit": "Canarian",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Portuguesewater-brown1.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/9/98/Aung_San_Suu_Kyi_with_Barack_Obama_20120919.jpg/500px-Aung_San_Suu_Kyi_with_Barack_Obama_20120919.jpg",
+      "w": 500,
+      "h": 750,
+      "credit": "Pete Souza",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Aung_San_Suu_Kyi_with_Barack_Obama_20120919.jpg"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "leonberger",
+   "name": "Leonberger",
+   "facts": {
+    "origin": "Germany",
+    "type": "Working",
+    "massKg": 55,
+    "size": "Giant"
+   },
+   "lookalikes": [
+    "saint-bernard",
+    "newfoundland"
+   ],
+   "blurb": "A giant, gentle German dog with a lion-like mane. It was bred to look like the lion on its town's crest.",
+   "clues": [
+    "It was bred to look like a lion on a town crest.",
+    "It loves water.",
+    "It has a black mask.",
+    "The breed comes from Germany.",
+    "It is a working breed.",
+    "A typical adult weighs about 55 kg.",
+    "It has a thick lion-like mane.",
+    "It is named after a German town.",
+    "The answer is one word of 10 letters.",
+    "It starts with the letter L."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/7/76/Leonberger_male.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Kurre92",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Leonberger_male.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/f/f2/Leonberger_g%C5%82owa40tt.jpg/500px-Leonberger_g%C5%82owa40tt.jpg",
+      "w": 500,
+      "h": 388,
+      "credit": "Pleple2000",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Leonberger_g%C5%82owa40tt.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/a/ae/Leonberger_running_Moletai_May_2014.jpg/500px-Leonberger_running_Moletai_May_2014.jpg",
+      "w": 500,
+      "h": 401,
+      "credit": "Томасина",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Leonberger_running_Moletai_May_2014.jpg"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "cane-corso",
+   "name": "Cane Corso",
+   "alt": [
+    "Italian Mastiff"
+   ],
+   "facts": {
+    "origin": "Italy",
+    "type": "Working",
+    "massKg": 45,
+    "size": "Giant"
+   },
+   "lookalikes": [
+    "english-mastiff",
+    "rottweiler"
+   ],
+   "blurb": "A big, muscular Italian guard dog descended from Roman war dogs.",
+   "clues": [
+    "It nearly died out in the 1900s.",
+    "It descends from Roman war dogs.",
+    "It is often black or grey.",
+    "It is a working breed.",
+    "A typical adult weighs about 45 kg.",
+    "It is a large, muscular guard dog.",
+    "The answer has 2 words (4, 5 letters).",
+    "It starts with the letter C."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/9/97/Anita_Cane_Corso_Italiano_allevato_in_Italia.jpg/500px-Anita_Cane_Corso_Italiano_allevato_in_Italia.jpg",
+      "w": 500,
+      "h": 392,
+      "credit": "Topmoretta",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Anita_Cane_Corso_Italiano_allevato_in_Italia.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/0/03/Cane_corso_temi_1_1024x768x24_%28cropped%29.png/500px-Cane_corso_temi_1_1024x768x24_%28cropped%29.png",
+      "w": 500,
+      "h": 667,
+      "credit": "Claudio Domiziani",
+      "license": "CC BY-SA 2.5",
+      "page": "https://commons.wikimedia.org/wiki/File:Cane_corso_temi_1_1024x768x24_(cropped).png"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/7/7e/A_greyhound_and_cane_corso_examining_each_other.jpg/500px-A_greyhound_and_cane_corso_examining_each_other.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Supreme Chungus",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:A_greyhound_and_cane_corso_examining_each_other.jpg"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "belgian-malinois",
+   "name": "Belgian Malinois",
+   "alt": [
+    "Malinois"
+   ],
+   "facts": {
+    "origin": "Belgium",
+    "type": "Herding",
+    "massKg": 27,
+    "size": "Large"
+   },
+   "lookalikes": [
+    "german-shepherd"
+   ],
+   "blurb": "A lean, very energetic herding dog used by police and special forces. One helped in the raid on Osama bin Laden.",
+   "clues": [
+    "A dog named Cairo joined the raid on Osama bin Laden.",
+    "It is used by special forces.",
+    "It is lighter than a German Shepherd.",
+    "It is a herding breed.",
+    "A typical adult weighs about 27 kg.",
+    "It is fawn with a black mask.",
+    "The answer has 2 words (7, 8 letters).",
+    "It starts with the letter B."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/2/2f/04_-_Belgian_shepherd_dog_varieties_-_Groenendael%2CTervuren%2C_Malinois%2C_Laekenois.jpg/500px-04_-_Belgian_shepherd_dog_varieties_-_Groenendael%2CTervuren%2C_Malinois%2C_Laekenois.jpg",
+      "w": 500,
+      "h": 549,
+      "credit": "Various, see description. Compiled by User:Adventurous36",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:04_-_Belgian_shepherd_dog_varieties_-_Groenendael,Tervuren,_Malinois,_Laekenois.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/3/32/Chien_de_Berger_Belge_Malinois.jpg/500px-Chien_de_Berger_Belge_Malinois.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Elevage du Champ des Merles",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Chien_de_Berger_Belge_Malinois.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/e/e1/Boss_--_%22almost%22_Belgian_Shepherd_Malinois_%282010-07-25%29.jpg/500px-Boss_--_%22almost%22_Belgian_Shepherd_Malinois_%282010-07-25%29.jpg",
+      "w": 500,
+      "h": 668,
+      "credit": "Olgierd Rudak",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Boss_--_%22almost%22_Belgian_Shepherd_Malinois_(2010-07-25).jpg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "bedlington-terrier",
+   "name": "Bedlington Terrier",
+   "facts": {
+    "origin": "United Kingdom",
+    "type": "Terrier",
+    "massKg": 9,
+    "size": "Small"
+   },
+   "blurb": "A terrier that looks like a little lamb, with a curly coat and a pear-shaped head.",
+   "clues": [
+    "It was bred by miners to catch rats.",
+    "It can run fast like a whippet.",
+    "It has a pear-shaped head with a topknot.",
+    "The breed comes from United Kingdom.",
+    "A typical adult weighs about 9 kg.",
+    "It looks like a little lamb.",
+    "It is named after a town in Northumberland.",
+    "The answer has 2 words (10, 7 letters).",
+    "It starts with the letter B."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/5/52/Bedlington_terrier.jpeg/500px-Bedlington_terrier.jpeg",
+      "w": 500,
+      "h": 376,
+      "credit": "David Owsiany",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Bedlington_terrier.jpeg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/f/fe/Boutchie_apres_championnat_004.JPG/500px-Boutchie_apres_championnat_004.JPG",
+      "w": 500,
+      "h": 375,
+      "credit": "David Owsiany",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Boutchie_apres_championnat_004.JPG"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/0/09/Bedlington_Puppy.jpg/500px-Bedlington_Puppy.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Mball93",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Bedlington_Puppy.jpg"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "parson-russell-terrier",
+   "name": "Parson Russell Terrier",
+   "facts": {
+    "origin": "United Kingdom",
+    "type": "Terrier",
+    "massKg": 7,
+    "size": "Small"
+   },
+   "lookalikes": [
+    "jack-russell-terrier"
+   ],
+   "blurb": "A longer-legged relative of the Jack Russell, bred to run with fox hounds.",
+   "clues": [
+    "It has longer legs than its close cousin.",
+    "It was bred to keep up with horses and hounds.",
+    "It is mostly white.",
+    "The breed comes from United Kingdom.",
+    "A typical adult weighs about 7 kg.",
+    "It is named after a vicar.",
+    "The answer has 3 words (6, 7, 7 letters).",
+    "It starts with the letter P."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/2/28/Parson_Russell_Terrier.jpg",
+      "w": 500,
+      "h": 509,
+      "credit": "Wikimedia Commons",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Parson_Russell_Terrier.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/f/fe/05052881_PRT_braun_rau.jpg/500px-05052881_PRT_braun_rau.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Alephalpha",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:05052881_PRT_braun_rau.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/5/55/05052842_PRT_braun_glatt.jpg/500px-05052842_PRT_braun_glatt.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Alephalpha",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:05052842_PRT_braun_glatt.jpg"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "scottish-deerhound",
+   "name": "Scottish Deerhound",
+   "alt": [
+    "Deerhound"
+   ],
+   "facts": {
+    "origin": "United Kingdom",
+    "type": "Hound",
+    "massKg": 40,
+    "size": "Large"
+   },
+   "lookalikes": [
+    "irish-wolfhound"
+   ],
+   "blurb": "A very tall, shaggy grey hound bred to hunt red deer in the Scottish Highlands.",
+   "clues": [
+    "It looks like a rough-coated greyhound.",
+    "It has a wiry grey coat.",
+    "The breed comes from United Kingdom.",
+    "It is a hound breed.",
+    "A typical adult weighs about 40 kg.",
+    "It hunted red deer.",
+    "It comes from Scotland.",
+    "The answer has 2 words (8, 9 letters).",
+    "It starts with the letter S."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/3/34/Deerhound_305.jpg/500px-Deerhound_305.jpg",
+      "w": 500,
+      "h": 465,
+      "credit": "No machine-readable author provided. Pleple2000 assumed (based on copyright claims).",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Deerhound_305.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/e/e1/Grupp_10%2C_SKOTSK_HJORTHUND%2C_SEJV-12_SE_UCH_Necesse%E2%80%99s_Ars_Amandi_%2823664806293%29.jpg/500px-Grupp_10%2C_SKOTSK_HJORTHUND%2C_SEJV-12_SE_UCH_Necesse%E2%80%99s_Ars_Amandi_%2823664806293%29.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Svenska Mässan from Sweden",
+      "license": "CC BY 2.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Grupp_10,_SKOTSK_HJORTHUND,_SEJV-12_SE_UCH_Necesse%E2%80%99s_Ars_Amandi_(23664806293).jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/7/70/Karrie.JPG/500px-Karrie.JPG",
+      "w": 500,
+      "h": 332,
+      "credit": "Sisteskrik",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Karrie.JPG"
+     }
+    ]
+   },
+   "difficulty": 3
+  }
+ ],
+ "questions": [
+  {
+   "id": "q1",
+   "kind": "mc",
+   "prompt": "Which is the smallest dog breed?",
+   "answer": "Chihuahua",
+   "wrong": [
+    "Pug",
+    "Beagle",
+    "Dachshund"
+   ],
+   "explain": "Chihuahuas usually weigh 1.5 to 3 kg.",
+   "difficulty": 1
+  },
+  {
+   "id": "q2",
+   "kind": "mc",
+   "prompt": "Which breed is the fastest?",
+   "answer": "Greyhound",
+   "wrong": [
+    "Bulldog",
+    "Saint Bernard",
+    "Pug"
+   ],
+   "explain": "Greyhounds can reach about 70 km/h.",
+   "difficulty": 1
+  },
+  {
+   "id": "q3",
+   "kind": "mc",
+   "prompt": "What breed is Scooby-Doo?",
+   "answer": "Great Dane",
+   "wrong": [
+    "Beagle",
+    "Boxer",
+    "Labrador Retriever"
+   ],
+   "explain": "His creator based him on a Great Dane.",
+   "difficulty": 1
+  },
+  {
+   "id": "q4",
+   "kind": "mc",
+   "prompt": "What breed is Snoopy from \"Peanuts\"?",
+   "answer": "Beagle",
+   "wrong": [
+    "Dalmatian",
+    "Poodle",
+    "Pug"
+   ],
+   "explain": "Charles Schulz drew Snoopy as a beagle.",
+   "difficulty": 1
+  },
+  {
+   "id": "q5",
+   "kind": "mc",
+   "prompt": "Which breed is born pure white and gets its spots later?",
+   "answer": "Dalmatian",
+   "wrong": [
+    "Beagle",
+    "Border Collie",
+    "Great Dane"
+   ],
+   "explain": "Dalmatian spots appear in the first few weeks.",
+   "difficulty": 1
+  },
+  {
+   "id": "q6",
+   "kind": "mc",
+   "prompt": "Which dog breed does not bark but yodels?",
+   "answer": "Basenji",
+   "wrong": [
+    "Siberian Husky",
+    "Beagle",
+    "Shiba Inu"
+   ],
+   "explain": "Its unusual larynx makes a yodel-like sound.",
+   "difficulty": 2
+  },
+  {
+   "id": "q7",
+   "kind": "mc",
+   "prompt": "Which two breeds have blue-black tongues?",
+   "answer": "Chow Chow and Shar Pei",
+   "wrong": [
+    "Pug and Boxer",
+    "Akita and Shiba Inu",
+    "Beagle and Bloodhound"
+   ],
+   "explain": "Both come from China.",
+   "difficulty": 2
+  },
+  {
+   "id": "q8",
+   "kind": "mc",
+   "prompt": "Which country does the Shiba Inu come from?",
+   "answer": "Japan",
+   "wrong": [
+    "China",
+    "Korea",
+    "Russia"
+   ],
+   "explain": "It is Japan's smallest native breed.",
+   "difficulty": 2
+  },
+  {
+   "id": "q9",
+   "kind": "mc",
+   "prompt": "Which famous dog waited at a Tokyo train station for nearly ten years?",
+   "answer": "Hachikō",
+   "wrong": [
+    "Laika",
+    "Lassie",
+    "Balto"
+   ],
+   "explain": "Hachikō, an Akita, waited for his owner at Shibuya Station.",
+   "difficulty": 2
+  },
+  {
+   "id": "q10",
+   "kind": "tf",
+   "prompt": "The Australian Shepherd was developed in Australia.",
+   "answer": false,
+   "explain": "It was developed on ranches in the western USA.",
+   "difficulty": 2
+  },
+  {
+   "id": "q11",
+   "kind": "mc",
+   "prompt": "What breed is the cartoon dog Bluey?",
+   "answer": "Australian Cattle Dog",
+   "wrong": [
+    "Australian Kelpie",
+    "Border Collie",
+    "Siberian Husky"
+   ],
+   "explain": "Bluey is a Blue Heeler.",
+   "difficulty": 1
+  },
+  {
+   "id": "q12",
+   "kind": "mc",
+   "prompt": "Which breed was used by monks to rescue travellers in the Alps?",
+   "answer": "Saint Bernard",
+   "wrong": [
+    "Newfoundland",
+    "Bernese Mountain Dog",
+    "Great Dane"
+   ],
+   "explain": "They worked at the Great St Bernard Pass hospice.",
+   "difficulty": 1
+  },
+  {
+   "id": "q13",
+   "kind": "mc",
+   "prompt": "What does the name Dachshund mean in German?",
+   "answer": "Badger dog",
+   "wrong": [
+    "Sausage dog",
+    "Little legs",
+    "Long hound"
+   ],
+   "explain": "They were bred to hunt badgers.",
+   "difficulty": 2
+  },
+  {
+   "id": "q14",
+   "kind": "mc",
+   "prompt": "Which breed is a playing piece in Monopoly?",
+   "answer": "Scottish Terrier",
+   "wrong": [
+    "Poodle",
+    "Pug",
+    "Corgi"
+   ],
+   "explain": "The Scottie has been a token since the 1950s.",
+   "difficulty": 2
+  }
+ ],
+ "fakes": [
+  "Alpine Shadow Hound",
+  "Brazilian Snow Terrier",
+  "Danish Cloud Spaniel",
+  "Golden Moor Collie",
+  "Norwegian Ridge Retriever",
+  "Highland Velvet Pointer",
+  "Persian Water Mastiff",
+  "Silver Tundra Setter"
+ ],
+ "sources": [
+  {
+   "name": "Wikidata",
+   "url": "https://www.wikidata.org"
+  },
+  {
+   "name": "Wikimedia Commons",
+   "url": "https://commons.wikimedia.org"
+  }
+ ]
+}

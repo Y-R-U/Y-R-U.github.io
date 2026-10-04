@@ -1,0 +1,4120 @@
+{
+ "id": "music-artists",
+ "title": "Music artists",
+ "theme": "music",
+ "icon": "🎤",
+ "kids": false,
+ "version": 1,
+ "notice": "30-second previews stream from Apple Music.",
+ "factsMeta": {
+  "origin": {
+   "type": "cat",
+   "label": "From"
+  },
+  "decade": {
+   "type": "cat",
+   "label": "Breakthrough decade"
+  },
+  "songs": {
+   "type": "text",
+   "label": "Known for"
+  }
+ },
+ "items": [
+  {
+   "id": "the-beatles",
+   "name": "The Beatles",
+   "group": "1960s",
+   "facts": {
+    "origin": "UK",
+    "decade": "1960s",
+    "songs": "Hey Jude · Help! · Let It Be"
+   },
+   "blurb": "The Beatles (UK), breakthrough in the 1960s. Known for \"Hey Jude\" and \"Help!\" and \"Let It Be\".",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/3d/08/f5/3d08f5d7-1e0a-99d9-1085-d50ecc972bb9/mzaf_1689604474306790314.plus.aac.p.m4a",
+      "credit": "The Beatles: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/hey-jude/1441133100?i=1441133277&uo=4",
+      "apple": {
+       "trackId": 1441133277,
+       "url": "https://music.apple.com/us/album/hey-jude/1441133100?i=1441133277&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music126/v4/a6/8b/65/a68b657c-cac6-68e6-3bde-b79d58fbc795/18UMGIM30762.rgb.jpg/300x300bb.jpg",
+       "term": "The Beatles Hey Jude"
+      },
+      "dur": 30,
+      "title": "Hey Jude"
+     },
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/90/c1/c1/90c1c133-02e3-255d-3a0d-e70c5a404bc5/mzaf_14127376946151186172.plus.aac.p.m4a",
+      "credit": "The Beatles: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/help/1441164524?i=1441164536&uo=4",
+      "apple": {
+       "trackId": 1441164536,
+       "url": "https://music.apple.com/us/album/help/1441164524?i=1441164536&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music122/v4/1a/19/db/1a19db26-17ad-b986-11a9-f72ac7a6194b/18UMGIM31214.rgb.jpg/300x300bb.jpg",
+       "term": "The Beatles Help!"
+      },
+      "dur": 30,
+      "title": "Help!"
+     },
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/60/76/fd/6076fd8f-422a-d5e3-7b02-5953bc93cfbd/mzaf_3945462995290301839.plus.aac.p.m4a",
+      "credit": "The Beatles: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/let-it-be/1441164495?i=1441164738&uo=4",
+      "apple": {
+       "trackId": 1441164738,
+       "url": "https://music.apple.com/us/album/let-it-be/1441164495?i=1441164738&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/ae/98/4c/ae984c7a-cd06-a7cd-e8bf-32cb15ba698d/00602567705475.rgb.jpg/300x300bb.jpg",
+       "term": "The Beatles Let It Be"
+      },
+      "dur": 30,
+      "title": "Let It Be"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "elvis-presley",
+   "name": "Elvis Presley",
+   "alt": [
+    "Elvis"
+   ],
+   "group": "1950s",
+   "facts": {
+    "origin": "US",
+    "decade": "1950s",
+    "songs": "Jailhouse Rock · Can't Help Falling in Love"
+   },
+   "blurb": "Elvis Presley (US), breakthrough in the 1950s. Known for \"Jailhouse Rock\" and \"Can't Help Falling in Love\".",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/25/ec/b3/25ecb3e3-e968-ca43-ce09-9c7473148c11/mzaf_14638006568072396485.plus.aac.p.m4a",
+      "credit": "Elvis Presley: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/jailhouse-rock/1032723112?i=1032724658&uo=4",
+      "apple": {
+       "trackId": 1032724658,
+       "url": "https://music.apple.com/us/album/jailhouse-rock/1032723112?i=1032724658&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/7b/b5/62/7bb56262-8509-c451-eb9c-d3e403bfe4a9/884977782844.jpg/300x300bb.jpg",
+       "term": "Elvis Presley Jailhouse Rock"
+      },
+      "dur": 30,
+      "title": "Jailhouse Rock"
+     },
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/db/09/10/db0910a1-7b6c-13cc-dac8-285793a73762/mzaf_15845583078583707516.plus.aac.p.m4a",
+      "credit": "Elvis Presley: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/cant-help-falling-in-love/949550016?i=949550091&uo=4",
+      "apple": {
+       "trackId": 949550091,
+       "url": "https://music.apple.com/us/album/cant-help-falling-in-love/949550016?i=949550091&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/dc/79/4c/dc794ce3-b5e3-5cbe-ccf8-c10e695a38e8/886445009798.jpg/300x300bb.jpg",
+       "term": "Elvis Presley Can't Help Falling In Love"
+      },
+      "dur": 30,
+      "title": "Can't Help Falling in Love"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "the-rolling-stones",
+   "name": "The Rolling Stones",
+   "group": "1960s",
+   "facts": {
+    "origin": "UK",
+    "decade": "1960s",
+    "songs": "(I Can't Get No) Satisfaction · Paint It Black"
+   },
+   "blurb": "The Rolling Stones (UK), breakthrough in the 1960s. Known for \"(I Can't Get No) Satisfaction\" and \"Paint It Black\".",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/ee/4d/28/ee4d28cd-a465-1334-2863-efda9ea9669b/mzaf_8440807812349084607.plus.aac.p.m4a",
+      "credit": "The Rolling Stones: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/i-cant-get-no-satisfaction/1440743344?i=1440743544&uo=4",
+      "apple": {
+       "trackId": 1440743544,
+       "url": "https://music.apple.com/us/album/i-cant-get-no-satisfaction/1440743344?i=1440743544&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music113/v4/6b/8c/5b/6b8c5bc2-cbf3-5d48-ac10-565dd728802b/13ABKIM00023.rgb.jpg/300x300bb.jpg",
+       "term": "The Rolling Stones  Satisfaction"
+      },
+      "dur": 30,
+      "title": "(I Can't Get No) Satisfaction"
+     },
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/da/f5/ec/daf5ece2-6853-c6a4-d481-389001453f75/mzaf_3869995397273029315.plus.aac.p.m4a",
+      "credit": "The Rolling Stones: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/paint-it-black/1440745549?i=1440745782&uo=4",
+      "apple": {
+       "trackId": 1440745782,
+       "url": "https://music.apple.com/us/album/paint-it-black/1440745549?i=1440745782&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/cd/89/04/cd890449-e58f-7257-2c60-9c8c31f24ce3/13ABKIM00063.rgb.jpg/300x300bb.jpg",
+       "term": "The Rolling Stones Paint It, Black"
+      },
+      "dur": 30,
+      "title": "Paint It Black"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "the-beach-boys",
+   "name": "The Beach Boys",
+   "group": "1960s",
+   "facts": {
+    "origin": "US",
+    "decade": "1960s",
+    "songs": "Good Vibrations · Surfin' U.S.A."
+   },
+   "blurb": "The Beach Boys (US), breakthrough in the 1960s. Known for \"Good Vibrations\" and \"Surfin' U.S.A.\".",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/4f/a1/b2/4fa1b2fe-7f99-8a4c-72a9-0804c77f2b58/mzaf_7135940363914090298.plus.aac.p.m4a",
+      "credit": "The Beach Boys: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/good-vibrations/1442864862?i=1442865074&uo=4",
+      "apple": {
+       "trackId": 1442865074,
+       "url": "https://music.apple.com/us/album/good-vibrations/1442864862?i=1442865074&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/94/62/6c/94626c44-4657-739e-e639-39ae55e6d2cc/13UABIM03827.rgb.jpg/300x300bb.jpg",
+       "term": "The Beach Boys Good Vibrations"
+      },
+      "dur": 30,
+      "title": "Good Vibrations"
+     },
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/34/79/a9/3479a9e8-d01b-0f1a-fc2f-3ec876b04808/mzaf_2183123274094781408.plus.aac.p.m4a",
+      "credit": "The Beach Boys: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/surfin-u-s-a/716018399?i=716018776&uo=4",
+      "apple": {
+       "trackId": 716018776,
+       "url": "https://music.apple.com/us/album/surfin-u-s-a/716018399?i=716018776&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music112/v4/fa/41/66/fa416692-acf6-8b2c-af74-245ab6335ead/14ULAIM03759.rgb.jpg/300x300bb.jpg",
+       "term": "The Beach Boys Surfin' U.S.A."
+      },
+      "dur": 30,
+      "title": "Surfin' U.S.A."
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "bob-dylan",
+   "name": "Bob Dylan",
+   "group": "1960s",
+   "facts": {
+    "origin": "US",
+    "decade": "1960s",
+    "songs": "Like a Rolling Stone · Blowin' in the Wind"
+   },
+   "blurb": "Bob Dylan (US), breakthrough in the 1960s. Known for \"Like a Rolling Stone\" and \"Blowin' in the Wind\".",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/a5/68/b1/a568b1af-ff36-c4c4-f8b4-f1ffe5484c3a/mzaf_7213634674974695928.plus.aac.p.m4a",
+      "credit": "Bob Dylan: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/like-a-rolling-stone/201281514?i=201281527&uo=4",
+      "apple": {
+       "trackId": 201281527,
+       "url": "https://music.apple.com/us/album/like-a-rolling-stone/201281514?i=201281527&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/f8/ff/c0/f8ffc056-55b4-2033-657d-32492d1eea25/827969239926.jpg/300x300bb.jpg",
+       "term": "Bob Dylan Like a Rolling Stone"
+      },
+      "dur": 30,
+      "title": "Like a Rolling Stone"
+     },
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/98/c4/33/98c433b9-46f7-e554-6089-14558c7d8175/mzaf_16805051007550467902.plus.aac.p.m4a",
+      "credit": "Bob Dylan: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/blowin-in-the-wind/190758914?i=190758932&uo=4",
+      "apple": {
+       "trackId": 190758932,
+       "url": "https://music.apple.com/us/album/blowin-in-the-wind/190758914?i=190758932&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/63/3c/98/633c98ab-b4f3-3f40-798b-bdb49d923468/074640878626.jpg/300x300bb.jpg",
+       "term": "Bob Dylan Blowin' In the Wind"
+      },
+      "dur": 30,
+      "title": "Blowin' in the Wind"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "aretha-franklin",
+   "name": "Aretha Franklin",
+   "group": "1960s",
+   "facts": {
+    "origin": "US",
+    "decade": "1960s",
+    "songs": "Respect · Think"
+   },
+   "blurb": "Aretha Franklin (US), breakthrough in the 1960s. Known for \"Respect\" and \"Think\".",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/99/74/40/997440f5-f543-165d-321a-5a64245a6c1c/mzaf_7740075940996149397.plus.aac.p.m4a",
+      "credit": "Aretha Franklin: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/respect/937107826?i=937107838&uo=4",
+      "apple": {
+       "trackId": 937107838,
+       "url": "https://music.apple.com/us/album/respect/937107826?i=937107838&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/d1/31/ee/d131eec4-614c-d661-b580-3dc32b8547e8/603497896622.jpg/300x300bb.jpg",
+       "term": "Aretha Franklin Respect"
+      },
+      "dur": 30,
+      "title": "Respect"
+     },
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/53/5b/aa/535baa8c-acfc-ea5f-e2a2-61e0751e3803/mzaf_16361304394230201360.plus.aac.p.m4a",
+      "credit": "Aretha Franklin: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/think/933583586?i=933583587&uo=4",
+      "apple": {
+       "trackId": 933583587,
+       "url": "https://music.apple.com/us/album/think/933583586?i=933583587&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/7c/f9/f4/7cf9f44b-f47e-224b-1b40-bcdf1f9bcbbb/603497896653.jpg/300x300bb.jpg",
+       "term": "Aretha Franklin Think"
+      },
+      "dur": 30,
+      "title": "Think"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "marvin-gaye",
+   "name": "Marvin Gaye",
+   "group": "1960s",
+   "facts": {
+    "origin": "US",
+    "decade": "1960s",
+    "songs": "I Heard It Through the Grapevine · Let's Get It On"
+   },
+   "blurb": "Marvin Gaye (US), breakthrough in the 1960s. Known for \"I Heard It Through the Grapevine\" and \"Let's Get It On\".",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/52/07/ab/5207ab4e-8181-a316-bebd-de76a99c5c94/mzaf_17478980179707520116.plus.aac.p.m4a",
+      "credit": "Marvin Gaye: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/i-heard-it-through-the-grapevine/1443073563?i=1443073952&uo=4",
+      "apple": {
+       "trackId": 1443073952,
+       "url": "https://music.apple.com/us/album/i-heard-it-through-the-grapevine/1443073563?i=1443073952&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music122/v4/a1/67/26/a1672640-e140-6eaa-3197-8fc9a37a9995/09UMGIM40279.rgb.jpg/300x300bb.jpg",
+       "term": "Marvin Gaye I Heard It Through the Grapevine"
+      },
+      "dur": 30,
+      "title": "I Heard It Through the Grapevine"
+     },
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/aa/88/40/aa884016-f860-cd11-e4ed-4fe50d509ff9/mzaf_14524715883435750084.plus.aac.p.m4a",
+      "credit": "Marvin Gaye: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/lets-get-it-on/1445094266?i=1445094678&uo=4",
+      "apple": {
+       "trackId": 1445094678,
+       "url": "https://music.apple.com/us/album/lets-get-it-on/1445094266?i=1445094678&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music116/v4/3f/eb/3c/3feb3cc6-7f78-7cef-8f30-dfd3cd3472b9/07UMGIM03026.rgb.jpg/300x300bb.jpg",
+       "term": "Marvin Gaye Let's Get It On"
+      },
+      "dur": 30,
+      "title": "Let's Get It On"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "ray-charles",
+   "name": "Ray Charles",
+   "group": "1950s",
+   "facts": {
+    "origin": "US",
+    "decade": "1950s",
+    "songs": "Hit the Road Jack · Georgia on My Mind"
+   },
+   "blurb": "Ray Charles (US), breakthrough in the 1950s. Known for \"Hit the Road Jack\" and \"Georgia on My Mind\".",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/d6/eb/11/d6eb11ea-064d-31e5-5e48-4280a8aa3fcc/mzaf_16129771401851352984.plus.aac.p.m4a",
+      "credit": "Ray Charles: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/hit-the-road-jack/6796760741?i=6796761362&uo=4",
+      "apple": {
+       "trackId": 6796761362,
+       "url": "https://music.apple.com/us/album/hit-the-road-jack/6796760741?i=6796761362&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/93/3e/88/933e8829-3fee-36eb-0b0c-e9e2de0eed7c/128150.jpg/300x300bb.jpg",
+       "term": "Ray Charles Hit the Road Jack"
+      },
+      "dur": 30,
+      "title": "Hit the Road Jack"
+     },
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/21/56/76/215676ad-17ee-00cc-5bfa-47c161253df1/mzaf_12538635504043700720.plus.aac.p.m4a",
+      "credit": "Ray Charles: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/georgia-on-my-mind-original-master-recording/6796751743?i=6796751746&uo=4",
+      "apple": {
+       "trackId": 6796751746,
+       "url": "https://music.apple.com/us/album/georgia-on-my-mind-original-master-recording/6796751743?i=6796751746&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/5d/db/65/5ddb6517-726a-1d5a-ae5a-64ed658fbc71/107887.jpg/300x300bb.jpg",
+       "term": "Ray Charles Georgia on My Mind"
+      },
+      "dur": 30,
+      "title": "Georgia on My Mind"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "chuck-berry",
+   "name": "Chuck Berry",
+   "group": "1950s",
+   "facts": {
+    "origin": "US",
+    "decade": "1950s",
+    "songs": "Johnny B. Goode · Roll Over Beethoven"
+   },
+   "blurb": "Chuck Berry (US), breakthrough in the 1950s. Known for \"Johnny B. Goode\" and \"Roll Over Beethoven\".",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/e5/e3/7d/e5e37d79-825b-5412-c7d3-17e0c0858e97/mzaf_2407643628638675650.plus.aac.p.m4a",
+      "credit": "Chuck Berry: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/johnny-b-goode/1425230909?i=1425230917&uo=4",
+      "apple": {
+       "trackId": 1425230917,
+       "url": "https://music.apple.com/us/album/johnny-b-goode/1425230909?i=1425230917&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music116/v4/74/86/9f/74869f4f-c52b-289b-31a7-9ac9fec31e2d/06UMGIM70785.rgb.jpg/300x300bb.jpg",
+       "term": "Chuck Berry Johnny B. Goode"
+      },
+      "dur": 30,
+      "title": "Johnny B. Goode"
+     },
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/43/48/ca/4348ca86-3e12-1ce1-519c-1b5b3e6d028d/mzaf_1126413303479587599.plus.aac.p.m4a",
+      "credit": "Chuck Berry: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/roll-over-beethoven/1471418528?i=1471418720&uo=4",
+      "apple": {
+       "trackId": 1471418720,
+       "url": "https://music.apple.com/us/album/roll-over-beethoven/1471418528?i=1471418720&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music116/v4/45/d4/43/45d44372-3919-77ac-74c2-e2297603ea8e/06UMGIM19938.rgb.jpg/300x300bb.jpg",
+       "term": "Chuck Berry Roll Over Beethoven"
+      },
+      "dur": 30,
+      "title": "Roll Over Beethoven"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "frank-sinatra",
+   "name": "Frank Sinatra",
+   "group": "1940s",
+   "facts": {
+    "origin": "US",
+    "decade": "1940s",
+    "songs": "Fly Me to the Moon · New York, New York"
+   },
+   "blurb": "Frank Sinatra (US), breakthrough in the 1940s. Known for \"Fly Me to the Moon\" and \"New York, New York\".",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/ee/96/80/ee9680b1-a594-1578-7cf1-32cc99a76c9e/mzaf_774170529396593265.plus.aac.p.m4a",
+      "credit": "Frank Sinatra: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/fly-me-to-the-moon-in-other-words/1436866850?i=1436866861&uo=4",
+      "apple": {
+       "trackId": 1436866861,
+       "url": "https://music.apple.com/us/album/fly-me-to-the-moon-in-other-words/1436866850?i=1436866861&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music116/v4/e9/e1/9f/e9e19f17-813e-41ed-4aa9-04d76498895d/18UMGIM61659.rgb.jpg/300x300bb.jpg",
+       "term": "Frank Sinatra Fly Me To the Moon"
+      },
+      "dur": 30,
+      "title": "Fly Me to the Moon"
+     },
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/3d/60/18/3d601875-015e-0d8c-bf6c-c8e435634f5a/mzaf_5391873567364552515.plus.aac.p.m4a",
+      "credit": "Frank Sinatra: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/new-york-new-york/1443163836?i=1443164069&uo=4",
+      "apple": {
+       "trackId": 1443164069,
+       "url": "https://music.apple.com/us/album/new-york-new-york/1443163836?i=1443164069&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music118/v4/69/b0/03/69b0030d-67c2-23e0-d2b8-deefc1e627bb/00602537604746.rgb.jpg/300x300bb.jpg",
+       "term": "Frank Sinatra & Tony Bennett New York, New York"
+      },
+      "dur": 30,
+      "title": "New York, New York"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "johnny-cash",
+   "name": "Johnny Cash",
+   "group": "1950s",
+   "facts": {
+    "origin": "US",
+    "decade": "1950s",
+    "songs": "Ring of Fire · I Walk the Line"
+   },
+   "blurb": "Johnny Cash (US), breakthrough in the 1950s. Known for \"Ring of Fire\" and \"I Walk the Line\".",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/5f/1e/22/5f1e2245-6948-73d4-4cdd-15eea4b9be00/mzaf_15627701157644277122.plus.aac.p.m4a",
+      "credit": "Johnny Cash: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/ring-of-fire/158462122?i=158462775&uo=4",
+      "apple": {
+       "trackId": 158462775,
+       "url": "https://music.apple.com/us/album/ring-of-fire/158462122?i=158462775&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music/91/d8/74/mzi.njjsecwz.jpg/300x300bb.jpg",
+       "term": "Johnny Cash Ring of Fire"
+      },
+      "dur": 30,
+      "title": "Ring of Fire"
+     },
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/e3/2d/51/e32d51df-f0a9-ad02-b1d0-7a10a5b37b26/mzaf_11542569597638371357.plus.aac.p.m4a",
+      "credit": "Johnny Cash: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/i-walk-the-line-1988-version/1518146344?i=1518146491&uo=4",
+      "apple": {
+       "trackId": 1518146491,
+       "url": "https://music.apple.com/us/album/i-walk-the-line-1988-version/1518146344?i=1518146491&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/4f/42/84/4f4284ad-750f-2400-ae42-e6c24509d815/06UMGIM04034.rgb.jpg/300x300bb.jpg",
+       "term": "Johnny Cash I Walk The Line"
+      },
+      "dur": 30,
+      "title": "I Walk the Line"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "the-supremes",
+   "name": "The Supremes",
+   "group": "1960s",
+   "facts": {
+    "origin": "US",
+    "decade": "1960s",
+    "songs": "Baby Love · Stop! In the Name of Love"
+   },
+   "blurb": "The Supremes (US), breakthrough in the 1960s. Known for \"Baby Love\" and \"Stop! In the Name of Love\".",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/91/9f/72/919f7248-1796-36a8-f85b-27d3c0107d7c/mzaf_8989939591988961158.plus.aac.p.m4a",
+      "credit": "The Supremes: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/baby-love/1443150912?i=1443150938&uo=4",
+      "apple": {
+       "trackId": 1443150938,
+       "url": "https://music.apple.com/us/album/baby-love/1443150912?i=1443150938&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music123/v4/5d/c2/4d/5dc24de8-15d7-16e0-7585-72a2bcc721de/14UMGIM62198.rgb.jpg/300x300bb.jpg",
+       "term": "The Supremes Baby Love"
+      },
+      "dur": 30,
+      "title": "Baby Love"
+     },
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/17/d1/47/17d1475f-0630-3cac-31da-af98ec6c1adb/mzaf_7499839772612862476.plus.aac.p.m4a",
+      "credit": "The Supremes: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/stop-in-the-name-of-love/1464880940?i=1464881083&uo=4",
+      "apple": {
+       "trackId": 1464881083,
+       "url": "https://music.apple.com/us/album/stop-in-the-name-of-love/1464880940?i=1464881083&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/6f/8e/50/6f8e5094-44f0-14e9-d966-647acdf64240/08UMGIM28303.rgb.jpg/300x300bb.jpg",
+       "term": "The Supremes Stop! In the Name of Love"
+      },
+      "dur": 30,
+      "title": "Stop! In the Name of Love"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "simon-and-garfunkel",
+   "name": "Simon & Garfunkel",
+   "group": "1960s",
+   "facts": {
+    "origin": "US",
+    "decade": "1960s",
+    "songs": "Mrs. Robinson · The Sound of Silence"
+   },
+   "blurb": "Simon & Garfunkel (US), breakthrough in the 1960s. Known for \"Mrs. Robinson\" and \"The Sound of Silence\".",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/dc/34/a1/dc34a184-84c0-fc47-712a-bb1ac83dec72/mzaf_4775604353249705315.plus.aac.p.m4a",
+      "credit": "Simon & Garfunkel: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/mrs-robinson/203303421?i=203304387&uo=4",
+      "apple": {
+       "trackId": 203304387,
+       "url": "https://music.apple.com/us/album/mrs-robinson/203303421?i=203304387&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music113/v4/1c/3c/09/1c3c0934-8ae5-fc87-2647-e104057d41f4/074640952920.jpg/300x300bb.jpg",
+       "term": "Simon & Garfunkel Mrs. Robinson"
+      },
+      "dur": 30,
+      "title": "Mrs. Robinson"
+     },
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview125/v4/e6/24/04/e62404a3-6eb1-653a-5050-d1b9cfbcecdb/mzaf_18122663900179880548.plus.aac.p.m4a",
+      "credit": "Simon & Garfunkel: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/the-sound-of-silence/551039605?i=551039992&uo=4",
+      "apple": {
+       "trackId": 551039992,
+       "url": "https://music.apple.com/us/album/the-sound-of-silence/551039605?i=551039992&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music/v4/46/ee/c4/46eec48f-46b2-0328-4f84-b208a2df3630/886443390577.jpg/300x300bb.jpg",
+       "term": "Simon & Garfunkel The Sound of Silence"
+      },
+      "dur": 30,
+      "title": "The Sound of Silence"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "stevie-wonder",
+   "name": "Stevie Wonder",
+   "group": "1960s",
+   "facts": {
+    "origin": "US",
+    "decade": "1960s",
+    "songs": "Superstition · Sir Duke"
+   },
+   "blurb": "Stevie Wonder (US), breakthrough in the 1960s. Known for \"Superstition\" and \"Sir Duke\".",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/59/4b/88/594b880c-4744-0510-775c-73d8b06567e8/mzaf_14855748840810986812.plus.aac.p.m4a",
+      "credit": "Stevie Wonder: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/superstition/1440808973?i=1440808985&uo=4",
+      "apple": {
+       "trackId": 1440808985,
+       "url": "https://music.apple.com/us/album/superstition/1440808973?i=1440808985&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music114/v4/62/61/61/626161c0-f4d7-e6ff-8586-768340ef278f/00602537002382.rgb.jpg/300x300bb.jpg",
+       "term": "Stevie Wonder Superstition"
+      },
+      "dur": 30,
+      "title": "Superstition"
+     },
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/19/f1/cc/19f1ccc5-f10c-8b88-ddfa-b97acf5009b2/mzaf_16382814554090706144.plus.aac.p.m4a",
+      "credit": "Stevie Wonder: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/sir-duke/1440788438?i=1440788542&uo=4",
+      "apple": {
+       "trackId": 1440788542,
+       "url": "https://music.apple.com/us/album/sir-duke/1440788438?i=1440788542&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music118/v4/eb/1f/12/eb1f12ec-474c-63aa-43af-09282f423b9d/00602537004737.rgb.jpg/300x300bb.jpg",
+       "term": "Stevie Wonder Sir Duke"
+      },
+      "dur": 30,
+      "title": "Sir Duke"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "led-zeppelin",
+   "name": "Led Zeppelin",
+   "group": "1960s",
+   "facts": {
+    "origin": "UK",
+    "decade": "1960s",
+    "songs": "Whole Lotta Love · Stairway to Heaven"
+   },
+   "blurb": "Led Zeppelin (UK), breakthrough in the 1960s. Known for \"Whole Lotta Love\" and \"Stairway to Heaven\".",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/8a/15/37/8a1537e5-9d18-7e44-4ca8-3295942263b6/mzaf_2401048427177636441.plus.aac.p.m4a",
+      "credit": "Led Zeppelin: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/whole-lotta-love/580708374?i=580708471&uo=4",
+      "apple": {
+       "trackId": 580708471,
+       "url": "https://music.apple.com/us/album/whole-lotta-love/580708374?i=580708471&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music125/v4/1a/3d/bb/1a3dbb86-c1f8-737e-571f-d6b647a230be/dj.rhubuvkd.jpg/300x300bb.jpg",
+       "term": "Led Zeppelin Whole Lotta Love"
+      },
+      "dur": 30,
+      "title": "Whole Lotta Love"
+     },
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/a2/e9/c8/a2e9c8fb-e282-9e9d-b5f9-d44fadb07e1e/mzaf_13939222705716798166.plus.aac.p.m4a",
+      "credit": "Led Zeppelin: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/stairway-to-heaven/580708175?i=580708180&uo=4",
+      "apple": {
+       "trackId": 580708180,
+       "url": "https://music.apple.com/us/album/stairway-to-heaven/580708175?i=580708180&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/5c/15/9b/5c159b27-95ca-b9a7-84e3-28e795fffd39/dj.kvkrpptq.jpg/300x300bb.jpg",
+       "term": "Led Zeppelin Stairway to Heaven"
+      },
+      "dur": 30,
+      "title": "Stairway to Heaven"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "david-bowie",
+   "name": "David Bowie",
+   "group": "1960s",
+   "facts": {
+    "origin": "UK",
+    "decade": "1960s",
+    "songs": "Space Oddity · Heroes · Let's Dance"
+   },
+   "blurb": "David Bowie (UK), breakthrough in the 1960s. Known for \"Space Oddity\" and \"Heroes\" and \"Let's Dance\".",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/7e/b3/c4/7eb3c4fa-2716-5d8c-5c17-5bf13878d9d1/mzaf_18372047815099005449.plus.aac.p.m4a",
+      "credit": "David Bowie: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/space-oddity-love-you-til-tuesday-version/1683711407?i=1683711564&uo=4",
+      "apple": {
+       "trackId": 1683711564,
+       "url": "https://music.apple.com/us/album/space-oddity-love-you-til-tuesday-version/1683711407?i=1683711564&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music126/v4/b8/94/9c/b8949c1b-2d20-d3ab-0c25-46d69ebaf3ed/23UMGIM18326.rgb.jpg/300x300bb.jpg",
+       "term": "David Bowie Space Oddity"
+      },
+      "dur": 30,
+      "title": "Space Oddity"
+     },
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/1f/f3/12/1ff3122a-eb3e-373d-d524-cfe00de9b19a/mzaf_8446634475827049231.plus.aac.p.m4a",
+      "credit": "David Bowie: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/heroes-2017-remaster/1347894082?i=1347894092&uo=4",
+      "apple": {
+       "trackId": 1347894092,
+       "url": "https://music.apple.com/us/album/heroes-2017-remaster/1347894082?i=1347894092&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/e2/65/b2/e265b2ae-48d5-9dd8-0251-6cd6c6c4eb53/190295842826.jpg/300x300bb.jpg",
+       "term": "David Bowie \"Heroes\""
+      },
+      "dur": 30,
+      "title": "Heroes"
+     },
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/ea/e1/be/eae1be9d-611b-f67d-864f-1dc8df04726b/mzaf_8018381438157593013.plus.aac.p.m4a",
+      "credit": "David Bowie: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/lets-dance/1475002920?i=1475002923&uo=4",
+      "apple": {
+       "trackId": 1475002923,
+       "url": "https://music.apple.com/us/album/lets-dance/1475002920?i=1475002923&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/bd/df/9d/bddf9d26-d45a-278f-26c1-e5274094cb27/190295671600.jpg/300x300bb.jpg",
+       "term": "David Bowie Let's Dance"
+      },
+      "dur": 30,
+      "title": "Let's Dance"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "elton-john",
+   "name": "Elton John",
+   "group": "1970s",
+   "facts": {
+    "origin": "UK",
+    "decade": "1970s",
+    "songs": "Your Song · Rocket Man · Tiny Dancer"
+   },
+   "blurb": "Elton John (UK), breakthrough in the 1970s. Known for \"Your Song\" and \"Rocket Man\" and \"Tiny Dancer\".",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/85/f4/5e/85f45e08-8724-4144-54c0-d87f0ac42f51/mzaf_17953656609560449107.plus.aac.p.m4a",
+      "credit": "Elton John: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/your-song/1440810640?i=1440810937&uo=4",
+      "apple": {
+       "trackId": 1440810937,
+       "url": "https://music.apple.com/us/album/your-song/1440810640?i=1440810937&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music116/v4/a9/52/e6/a952e6c5-a5e1-a56d-a6f4-b01ca42a4368/06UMGIM50695.rgb.jpg/300x300bb.jpg",
+       "term": "Elton John Your Song"
+      },
+      "dur": 30,
+      "title": "Your Song"
+     },
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/8c/09/6d/8c096da7-10b6-422b-51b6-f1f97a66380d/mzaf_5290536375751623365.plus.aac.p.m4a",
+      "credit": "Elton John: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/rocket-man-i-think-its-going-to-be-a-long-long-time/1440910513?i=1440910931&uo=4",
+      "apple": {
+       "trackId": 1440910931,
+       "url": "https://music.apple.com/us/album/rocket-man-i-think-its-going-to-be-a-long-long-time/1440910513?i=1440910931&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music116/v4/75/b6/da/75b6da76-a3e0-6a77-cbe5-ad6c42cb0692/06UMGIM48050.rgb.jpg/300x300bb.jpg",
+       "term": "Elton John Rocket Man"
+      },
+      "dur": 30,
+      "title": "Rocket Man"
+     },
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/24/5b/6d/245b6dcb-098e-40ff-3d5d-b795b55410bf/mzaf_12791161787497744077.plus.aac.p.m4a",
+      "credit": "Elton John: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/tiny-dancer/1452863377?i=1452863597&uo=4",
+      "apple": {
+       "trackId": 1452863597,
+       "url": "https://music.apple.com/us/album/tiny-dancer/1452863377?i=1452863597&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music112/v4/f1/2a/0a/f12a0a94-5c3f-82d7-4faf-38873cbf77fe/06UMGIM01420.rgb.jpg/300x300bb.jpg",
+       "term": "Elton John Tiny Dancer"
+      },
+      "dur": 30,
+      "title": "Tiny Dancer"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "queen",
+   "name": "Queen",
+   "group": "1970s",
+   "facts": {
+    "origin": "UK",
+    "decade": "1970s",
+    "songs": "Bohemian Rhapsody · Don't Stop Me Now · We Will Rock You"
+   },
+   "blurb": "Queen (UK), breakthrough in the 1970s. Known for \"Bohemian Rhapsody\" and \"Don't Stop Me Now\" and \"We Will Rock You\".",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/17/fc/1e/17fc1eba-946d-84a9-710b-a0e88ea64209/mzaf_3049006317693088799.plus.aac.p.m4a",
+      "credit": "Queen: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/bohemian-rhapsody/6781024026?i=6781024437&uo=4",
+      "apple": {
+       "trackId": 6781024437,
+       "url": "https://music.apple.com/us/album/bohemian-rhapsody/6781024026?i=6781024437&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/8b/0a/ea/8b0aea60-6f4a-195b-5958-cdf459c2333b/602527644271.jpg/300x300bb.jpg",
+       "term": "Queen Bohemian Rhapsody"
+      },
+      "dur": 30,
+      "title": "Bohemian Rhapsody"
+     },
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/4b/d2/85/4bd2852c-81a9-1da0-01df-31b77705830c/mzaf_17036269860840746883.plus.aac.p.m4a",
+      "credit": "Queen: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/dont-stop-me-now/6781079346?i=6781079518&uo=4",
+      "apple": {
+       "trackId": 6781079518,
+       "url": "https://music.apple.com/us/album/dont-stop-me-now/6781079346?i=6781079518&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/9e/ae/4a/9eae4a23-130a-4ed7-d590-bfa701f9acaf/602527717685.jpg/300x300bb.jpg",
+       "term": "Queen Don't Stop Me Now"
+      },
+      "dur": 30,
+      "title": "Don't Stop Me Now"
+     },
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/0a/a9/f3/0aa9f3af-4672-fb3b-42d8-6d56a9a4c69b/mzaf_16030082968131796908.plus.aac.p.m4a",
+      "credit": "Queen: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/we-will-rock-you/6781080679?i=6781080737&uo=4",
+      "apple": {
+       "trackId": 6781080737,
+       "url": "https://music.apple.com/us/album/we-will-rock-you/6781080679?i=6781080737&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/3a/25/81/3a258183-09c1-e6ee-b517-258288ca3d03/602527717487.jpg/300x300bb.jpg",
+       "term": "Queen We Will Rock You"
+      },
+      "dur": 30,
+      "title": "We Will Rock You"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "abba",
+   "name": "ABBA",
+   "group": "1970s",
+   "facts": {
+    "origin": "Sweden",
+    "decade": "1970s",
+    "songs": "Dancing Queen · Mamma Mia · Waterloo"
+   },
+   "blurb": "ABBA (Sweden), breakthrough in the 1970s. Known for \"Dancing Queen\" and \"Mamma Mia\" and \"Waterloo\".",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/d2/9d/e3/d29de3af-c080-8558-6c41-823b9ab5bb6b/mzaf_18371402234402526781.plus.aac.p.m4a",
+      "credit": "ABBA: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/dancing-queen/1440820126?i=1440820267&uo=4",
+      "apple": {
+       "trackId": 1440820267,
+       "url": "https://music.apple.com/us/album/dancing-queen/1440820126?i=1440820267&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music125/v4/69/4d/b4/694db440-1fdd-0112-16a0-ae501501cb32/14UMGIM07610.rgb.jpg/300x300bb.jpg",
+       "term": "ABBA Dancing Queen"
+      },
+      "dur": 30,
+      "title": "Dancing Queen"
+     },
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/b6/11/b6/b611b634-d2ea-3413-19be-b3c19daddfe5/mzaf_11228048896593074702.plus.aac.p.m4a",
+      "credit": "ABBA: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/mamma-mia/1440861160?i=1440861294&uo=4",
+      "apple": {
+       "trackId": 1440861294,
+       "url": "https://music.apple.com/us/album/mamma-mia/1440861160?i=1440861294&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music125/v4/8a/5d/a4/8a5da415-562c-c7f3-0801-2bd251947ac3/14UMGIM07609.rgb.jpg/300x300bb.jpg",
+       "term": "ABBA Mamma Mia"
+      },
+      "dur": 30,
+      "title": "Mamma Mia"
+     },
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/45/3c/0e/453c0ee5-c11c-c939-ab63-5f11c34ecc40/mzaf_6340572945570753130.plus.aac.p.m4a",
+      "credit": "ABBA: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/waterloo/1530391535?i=1530392253&uo=4",
+      "apple": {
+       "trackId": 1530392253,
+       "url": "https://music.apple.com/us/album/waterloo/1530391535?i=1530392253&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/71/31/8c/71318c54-5bb0-58d8-1034-d2d09edbef0c/20UMGIM76140.rgb.jpg/300x300bb.jpg",
+       "term": "ABBA Waterloo"
+      },
+      "dur": 30,
+      "title": "Waterloo"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "bee-gees",
+   "name": "Bee Gees",
+   "group": "1960s",
+   "facts": {
+    "origin": "UK",
+    "decade": "1960s",
+    "songs": "Stayin' Alive · How Deep Is Your Love"
+   },
+   "blurb": "Bee Gees (UK), breakthrough in the 1960s. Known for \"Stayin' Alive\" and \"How Deep Is Your Love\".",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/72/f8/ca/72f8ca41-e760-6fb4-009d-a8b2b6b287bb/mzaf_18123089491337557034.plus.aac.p.m4a",
+      "credit": "Bee Gees: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/stayin-alive-from-saturday-night-fever-soundtrack/1445668458?i=1445668462&uo=4",
+      "apple": {
+       "trackId": 1445668462,
+       "url": "https://music.apple.com/us/album/stayin-alive-from-saturday-night-fever-soundtrack/1445668458?i=1445668462&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music113/v4/74/c1/73/74c17380-b75d-4d74-31d8-99f8e8b20c36/17UM1IM27905.rgb.jpg/300x300bb.jpg",
+       "term": "Bee Gees Stayin' Alive"
+      },
+      "dur": 30,
+      "title": "Stayin' Alive"
+     },
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/76/98/bd/7698bd6b-9b8b-63d9-e4ef-9bea33298d1e/mzaf_890688657503657456.plus.aac.p.m4a",
+      "credit": "Bee Gees: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/how-deep-is-your-love/1442259177?i=1442259189&uo=4",
+      "apple": {
+       "trackId": 1442259189,
+       "url": "https://music.apple.com/us/album/how-deep-is-your-love/1442259177?i=1442259189&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music113/v4/45/db/1d/45db1dac-fe00-3681-b216-266deea6e4cc/17UM1IM26789.rgb.jpg/300x300bb.jpg",
+       "term": "Bee Gees How Deep Is Your Love"
+      },
+      "dur": 30,
+      "title": "How Deep Is Your Love"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "fleetwood-mac",
+   "name": "Fleetwood Mac",
+   "group": "1970s",
+   "facts": {
+    "origin": "UK",
+    "decade": "1970s",
+    "songs": "Dreams · Go Your Own Way"
+   },
+   "blurb": "Fleetwood Mac (UK), breakthrough in the 1970s. Known for \"Dreams\" and \"Go Your Own Way\".",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/d4/37/e7/d437e72a-c41b-332c-f196-bee295a9d673/mzaf_11574904347171701919.plus.aac.p.m4a",
+      "credit": "Fleetwood Mac: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/dreams/594061854?i=594061856&uo=4",
+      "apple": {
+       "trackId": 594061856,
+       "url": "https://music.apple.com/us/album/dreams/594061854?i=594061856&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/4d/13/ba/4d13bac3-d3d5-7581-2c74-034219eadf2b/081227970949.jpg/300x300bb.jpg",
+       "term": "Fleetwood Mac Dreams"
+      },
+      "dur": 30,
+      "title": "Dreams"
+     },
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/d1/37/68/d1376853-ec1e-cce0-4ac9-2e98fc9d9c51/mzaf_7672022765745493173.plus.aac.p.m4a",
+      "credit": "Fleetwood Mac: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/go-your-own-way/594061854?i=594061859&uo=4",
+      "apple": {
+       "trackId": 594061859,
+       "url": "https://music.apple.com/us/album/go-your-own-way/594061854?i=594061859&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/4d/13/ba/4d13bac3-d3d5-7581-2c74-034219eadf2b/081227970949.jpg/300x300bb.jpg",
+       "term": "Fleetwood Mac Go Your Own Way"
+      },
+      "dur": 30,
+      "title": "Go Your Own Way"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "pink-floyd",
+   "name": "Pink Floyd",
+   "group": "1970s",
+   "facts": {
+    "origin": "UK",
+    "decade": "1970s",
+    "songs": "Another Brick in the Wall, Pt. 2 · Wish You Were Here"
+   },
+   "blurb": "Pink Floyd (UK), breakthrough in the 1970s. Known for \"Another Brick in the Wall, Pt. 2\" and \"Wish You Were Here\".",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/8a/21/41/8a214193-f9e0-fbeb-aad5-6ca8b8420dbb/mzaf_2628810625325580575.plus.aac.p.m4a",
+      "credit": "Pink Floyd: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/another-brick-in-the-wall-pt-2/1065975633?i=1065975638&uo=4",
+      "apple": {
+       "trackId": 1065975638,
+       "url": "https://music.apple.com/us/album/another-brick-in-the-wall-pt-2/1065975633?i=1065975638&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/3e/17/ec/3e17ec6d-f980-c64f-19e0-a6fd8bbf0c10/886445635850.jpg/300x300bb.jpg",
+       "term": "Pink Floyd Another Brick In the Wall, Pt. 2"
+      },
+      "dur": 30,
+      "title": "Another Brick in the Wall, Pt. 2"
+     },
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/ca/73/b0/ca73b075-9f43-5ba2-4a9c-494d2e2b1d6e/mzaf_16835053037302358726.plus.aac.p.m4a",
+      "credit": "Pink Floyd: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/wish-you-were-here/1065973975?i=1065973980&uo=4",
+      "apple": {
+       "trackId": 1065973980,
+       "url": "https://music.apple.com/us/album/wish-you-were-here/1065973975?i=1065973980&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/aa/e0/ab/aae0ab6a-d906-a189-81bf-70b56aa43f7a/886445635843.jpg/300x300bb.jpg",
+       "term": "Pink Floyd Wish You Were Here"
+      },
+      "dur": 30,
+      "title": "Wish You Were Here"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "eagles",
+   "name": "Eagles",
+   "group": "1970s",
+   "facts": {
+    "origin": "US",
+    "decade": "1970s",
+    "songs": "Hotel California · Take It Easy"
+   },
+   "blurb": "Eagles (US), breakthrough in the 1970s. Known for \"Hotel California\" and \"Take It Easy\".",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/17/30/06/1730066d-13fb-6803-0e52-46d4762b94e0/mzaf_8068080726527063383.plus.aac.p.m4a",
+      "credit": "Eagles: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/hotel-california/635770200?i=635770202&uo=4",
+      "apple": {
+       "trackId": 635770202,
+       "url": "https://music.apple.com/us/album/hotel-california/635770200?i=635770202&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/88/16/2c/88162c3d-46db-8321-61f3-3a47404cfe76/075596050920.jpg/300x300bb.jpg",
+       "term": "Eagles Hotel California"
+      },
+      "dur": 30,
+      "title": "Hotel California"
+     },
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/8a/69/a4/8a69a49b-db4a-22bb-4485-5209a1722724/mzaf_7773642911906509237.plus.aac.p.m4a",
+      "credit": "Eagles: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/take-it-easy/635791801?i=635791802&uo=4",
+      "apple": {
+       "trackId": 635791802,
+       "url": "https://music.apple.com/us/album/take-it-easy/635791801?i=635791802&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music125/v4/8f/e7/f4/8fe7f417-d464-8879-b00e-3d4965a9cfd1/075596062329.jpg/300x300bb.jpg",
+       "term": "Eagles Take It Easy"
+      },
+      "dur": 30,
+      "title": "Take It Easy"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "bob-marley-and-the-wailers",
+   "name": "Bob Marley & The Wailers",
+   "alt": [
+    "Bob Marley"
+   ],
+   "group": "1970s",
+   "facts": {
+    "origin": "Jamaica",
+    "decade": "1970s",
+    "songs": "No Woman, No Cry · Three Little Birds · Could You Be Loved"
+   },
+   "blurb": "Bob Marley & The Wailers (Jamaica), breakthrough in the 1970s. Known for \"No Woman, No Cry\" and \"Three Little Birds\" and \"Could You Be Loved\".",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/c0/72/17/c07217c9-c2ff-8f96-abc9-5a6c42464d69/mzaf_5036872155813968561.plus.aac.p.m4a",
+      "credit": "Bob Marley & The Wailers: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/no-woman-no-cry/1440861483?i=1440861526&uo=4",
+      "apple": {
+       "trackId": 1440861526,
+       "url": "https://music.apple.com/us/album/no-woman-no-cry/1440861483?i=1440861526&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music123/v4/b9/ec/9f/b9ec9f4a-c4f1-5136-7587-86826e28d67b/06UMGIM34964.rgb.jpg/300x300bb.jpg",
+       "term": "Bob Marley & The Wailers No Woman, No Cry"
+      },
+      "dur": 30,
+      "title": "No Woman, No Cry"
+     },
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/1b/12/1e/1b121eef-2368-dec5-4bc5-4fc911bcb819/mzaf_657438503506483618.plus.aac.p.m4a",
+      "credit": "Bob Marley & The Wailers: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/three-little-birds/1625213430?i=1625213809&uo=4",
+      "apple": {
+       "trackId": 1625213809,
+       "url": "https://music.apple.com/us/album/three-little-birds/1625213430?i=1625213809&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music116/v4/23/fa/f8/23faf820-c4fa-2bf1-d672-846971f5cf5c/06UMGIM31355.rgb.jpg/300x300bb.jpg",
+       "term": "Bob Marley & The Wailers Three Little Birds"
+      },
+      "dur": 30,
+      "title": "Three Little Birds"
+     },
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/82/fc/99/82fc998e-d1ed-c2a6-4642-1d907e6a12d8/mzaf_14571973186305665956.plus.aac.p.m4a",
+      "credit": "Bob Marley & The Wailers: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/could-you-be-loved/1740845714?i=1740845888&uo=4",
+      "apple": {
+       "trackId": 1740845888,
+       "url": "https://music.apple.com/us/album/could-you-be-loved/1740845714?i=1740845888&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/80/61/a5/8061a5cc-3372-7679-7396-e42e86041d21/15UMGIM05274.rgb.jpg/300x300bb.jpg",
+       "term": "Bob Marley & The Wailers Could You Be Loved"
+      },
+      "dur": 30,
+      "title": "Could You Be Loved"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "dolly-parton",
+   "name": "Dolly Parton",
+   "group": "1970s",
+   "facts": {
+    "origin": "US",
+    "decade": "1970s",
+    "songs": "Jolene · 9 to 5"
+   },
+   "blurb": "Dolly Parton (US), breakthrough in the 1970s. Known for \"Jolene\" and \"9 to 5\".",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/fc/bf/b6/fcbfb6fa-5293-1bb8-f250-7feaf5183892/mzaf_10820724967096911306.plus.aac.p.m4a",
+      "credit": "Dolly Parton: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/jolene/1062400323?i=1062400330&uo=4",
+      "apple": {
+       "trackId": 1062400330,
+       "url": "https://music.apple.com/us/album/jolene/1062400323?i=1062400330&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/0b/f8/1e/0bf81e88-de6e-aba3-9fd4-e7407bfbcc31/886445438048.jpg/300x300bb.jpg",
+       "term": "Dolly Parton Jolene"
+      },
+      "dur": 30,
+      "title": "Jolene"
+     },
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/3d/f5/51/3df5513f-d143-3d14-e341-e198b6804605/mzaf_11966397977289304830.plus.aac.p.m4a",
+      "credit": "Dolly Parton: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/9-to-5/273166232?i=273166378&uo=4",
+      "apple": {
+       "trackId": 273166378,
+       "url": "https://music.apple.com/us/album/9-to-5/273166232?i=273166378&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/98/6f/5f/986f5f6f-99e1-e23c-0513-d0415f2bb578/mzi.wpmfrxwd.jpg/300x300bb.jpg",
+       "term": "Dolly Parton 9 to 5"
+      },
+      "dur": 30,
+      "title": "9 to 5"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "bruce-springsteen",
+   "name": "Bruce Springsteen",
+   "group": "1970s",
+   "facts": {
+    "origin": "US",
+    "decade": "1970s",
+    "songs": "Born to Run · Dancing in the Dark"
+   },
+   "blurb": "Bruce Springsteen (US), breakthrough in the 1970s. Known for \"Born to Run\" and \"Dancing in the Dark\".",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/0e/64/14/0e641426-f2ba-95fd-c61d-bc03168a5a1c/mzaf_15664454903423188652.plus.aac.p.m4a",
+      "credit": "Bruce Springsteen: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/born-to-run/310730204?i=310730214&uo=4",
+      "apple": {
+       "trackId": 310730214,
+       "url": "https://music.apple.com/us/album/born-to-run/310730204?i=310730214&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/0a/02/f7/0a02f7a1-ca2a-c0d7-7192-50314971721f/884977157031.jpg/300x300bb.jpg",
+       "term": "Bruce Springsteen Born to Run"
+      },
+      "dur": 30,
+      "title": "Born to Run"
+     },
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/cf/97/6e/cf976e1c-1769-1747-5b30-13b2bf122f4d/mzaf_2930450612609077309.plus.aac.p.m4a",
+      "credit": "Bruce Springsteen: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/dancing-in-the-dark/203708420?i=203709340&uo=4",
+      "apple": {
+       "trackId": 203709340,
+       "url": "https://music.apple.com/us/album/dancing-in-the-dark/203708420?i=203709340&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/32/72/68/327268ba-b9dd-b322-2a16-bdd0212df48c/074643865326.jpg/300x300bb.jpg",
+       "term": "Bruce Springsteen Dancing In the Dark"
+      },
+      "dur": 30,
+      "title": "Dancing in the Dark"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "billy-joel",
+   "name": "Billy Joel",
+   "group": "1970s",
+   "facts": {
+    "origin": "US",
+    "decade": "1970s",
+    "songs": "Piano Man · Uptown Girl"
+   },
+   "blurb": "Billy Joel (US), breakthrough in the 1970s. Known for \"Piano Man\" and \"Uptown Girl\".",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/8e/e4/51/8ee451b3-a74e-25fa-be4e-09ce04a39df0/mzaf_13595078232063121698.plus.aac.p.m4a",
+      "credit": "Billy Joel: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/piano-man/158617297?i=158617575&uo=4",
+      "apple": {
+       "trackId": 158617575,
+       "url": "https://music.apple.com/us/album/piano-man/158617297?i=158617575&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Features125/v4/67/f9/8d/67f98d03-7896-153f-4965-a92458c06965/dj.aiuntmgo.jpg/300x300bb.jpg",
+       "term": "Billy Joel Piano Man"
+      },
+      "dur": 30,
+      "title": "Piano Man"
+     },
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/47/ed/6a/47ed6a89-63aa-12c0-7b13-8c2c086f3f47/mzaf_13314293207054965636.plus.aac.p.m4a",
+      "credit": "Billy Joel: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/uptown-girl/259814641?i=259814810&uo=4",
+      "apple": {
+       "trackId": 259814810,
+       "url": "https://music.apple.com/us/album/uptown-girl/259814641?i=259814810&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music125/v4/b3/ed/8e/b3ed8eb8-e276-ee92-bf69-fba2865516b6/dj.yjsnvawq.jpg/300x300bb.jpg",
+       "term": "Billy Joel Uptown Girl"
+      },
+      "dur": 30,
+      "title": "Uptown Girl"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "ac-dc",
+   "name": "AC/DC",
+   "group": "1970s",
+   "facts": {
+    "origin": "Australia",
+    "decade": "1970s",
+    "songs": "Highway to Hell · Back in Black"
+   },
+   "blurb": "AC/DC (Australia), breakthrough in the 1970s. Known for \"Highway to Hell\" and \"Back in Black\".",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/d0/54/a9/d054a909-fe00-757a-b5fb-3760ea7cdf13/mzaf_15087080229874880055.plus.aac.p.m4a",
+      "credit": "AC/DC: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/highway-to-hell/574043989?i=574044008&uo=4",
+      "apple": {
+       "trackId": 574044008,
+       "url": "https://music.apple.com/us/album/highway-to-hell/574043989?i=574044008&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music126/v4/b9/c8/ef/b9c8ef42-bbc9-64df-11f8-717571f6730f/886443673458.jpg/300x300bb.jpg",
+       "term": "AC/DC Highway to Hell"
+      },
+      "dur": 30,
+      "title": "Highway to Hell"
+     },
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/08/2e/ac/082eac8c-1d0e-f72f-7b37-b8e037ff1579/mzaf_7587164327744022409.plus.aac.p.m4a",
+      "credit": "AC/DC: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/back-in-black/574050396?i=574050602&uo=4",
+      "apple": {
+       "trackId": 574050602,
+       "url": "https://music.apple.com/us/album/back-in-black/574050396?i=574050602&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/1e/14/58/1e145814-281a-58e0-3ab1-145f5d1af421/886443673441.jpg/300x300bb.jpg",
+       "term": "AC/DC Back In Black"
+      },
+      "dur": 30,
+      "title": "Back in Black"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "donna-summer",
+   "name": "Donna Summer",
+   "group": "1970s",
+   "facts": {
+    "origin": "US",
+    "decade": "1970s",
+    "songs": "Hot Stuff · I Feel Love"
+   },
+   "blurb": "Donna Summer (US), breakthrough in the 1970s. Known for \"Hot Stuff\" and \"I Feel Love\".",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/33/3c/28/333c2803-51c5-4bc6-d841-3f36a22e8f1f/mzaf_7814669585703286529.plus.aac.p.m4a",
+      "credit": "Donna Summer: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/hot-stuff/6793735689?i=6793735690&uo=4",
+      "apple": {
+       "trackId": 6793735690,
+       "url": "https://music.apple.com/us/album/hot-stuff/6793735689?i=6793735690&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/10/07/f5/1007f5f4-71b2-6ba1-65e0-52e75b450980/602567826309_Cover.jpg/300x300bb.jpg",
+       "term": "Donna Summer Hot Stuff"
+      },
+      "dur": 30,
+      "title": "Hot Stuff"
+     },
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/f6/f2/f0/f6f2f08a-a788-a354-b5ed-b4a71f8a58da/mzaf_11155681679719877923.plus.aac.p.m4a",
+      "credit": "Donna Summer: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/i-feel-love/1442959303?i=1442959426&uo=4",
+      "apple": {
+       "trackId": 1442959426,
+       "url": "https://music.apple.com/us/album/i-feel-love/1442959303?i=1442959426&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music116/v4/82/13/19/8213190b-60a9-95cd-9cc0-0948e08a085a/06UMGIM05259.rgb.jpg/300x300bb.jpg",
+       "term": "Donna Summer I Feel Love"
+      },
+      "dur": 30,
+      "title": "I Feel Love"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "michael-jackson",
+   "name": "Michael Jackson",
+   "group": "1970s",
+   "facts": {
+    "origin": "US",
+    "decade": "1970s",
+    "songs": "Billie Jean · Thriller · Beat It"
+   },
+   "blurb": "Michael Jackson (US), breakthrough in the 1970s. Known for \"Billie Jean\" and \"Thriller\" and \"Beat It\".",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/81/1c/33/811c3302-2f45-b692-b492-257e612a900c/mzaf_5657255964929171362.plus.aac.p.m4a",
+      "credit": "Michael Jackson: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/billie-jean/160021509?i=160022413&uo=4",
+      "apple": {
+       "trackId": 160022413,
+       "url": "https://music.apple.com/us/album/billie-jean/160021509?i=160022413&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/48/59/bd/4859bde2-c345-d637-1079-26cb78c4e7e8/074646579428.jpg/300x300bb.jpg",
+       "term": "Michael Jackson Billie Jean"
+      },
+      "dur": 30,
+      "title": "Billie Jean"
+     },
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/58/8c/cb/588ccb9a-ab79-4a38-43b5-d4c24ea42859/mzaf_2083607504726567992.plus.aac.p.m4a",
+      "credit": "Michael Jackson: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/thriller/269572838?i=269573303&uo=4",
+      "apple": {
+       "trackId": 269573303,
+       "url": "https://music.apple.com/us/album/thriller/269572838?i=269573303&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/32/4f/fd/324ffda2-9e51-8f6a-0c2d-c6fd2b41ac55/074643811224.jpg/300x300bb.jpg",
+       "term": "Michael Jackson Thriller"
+      },
+      "dur": 30,
+      "title": "Thriller"
+     },
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/88/cd/46/88cd46bd-dba7-1dc2-a63b-e8c111ac4fc3/mzaf_4042555053237612653.plus.aac.p.m4a",
+      "credit": "Michael Jackson: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/beat-it/269572838?i=269573341&uo=4",
+      "apple": {
+       "trackId": 269573341,
+       "url": "https://music.apple.com/us/album/beat-it/269572838?i=269573341&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/32/4f/fd/324ffda2-9e51-8f6a-0c2d-c6fd2b41ac55/074643811224.jpg/300x300bb.jpg",
+       "term": "Michael Jackson Beat It"
+      },
+      "dur": 30,
+      "title": "Beat It"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "madonna",
+   "name": "Madonna",
+   "group": "1980s",
+   "facts": {
+    "origin": "US",
+    "decade": "1980s",
+    "songs": "Like a Prayer · Vogue · Like a Virgin"
+   },
+   "blurb": "Madonna (US), breakthrough in the 1980s. Known for \"Like a Prayer\" and \"Vogue\" and \"Like a Virgin\".",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/0b/23/82/0b238289-52e2-2107-5531-181836267ed2/mzaf_6726729811402686020.plus.aac.p.m4a",
+      "credit": "Madonna: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/like-a-prayer/83448003?i=83445997&uo=4",
+      "apple": {
+       "trackId": 83445997,
+       "url": "https://music.apple.com/us/album/like-a-prayer/83448003?i=83445997&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music114/v4/20/3c/f5/203cf53d-689e-528f-29d7-ba33758254aa/mzi.rotbotfl.jpg/300x300bb.jpg",
+       "term": "Madonna Like a Prayer"
+      },
+      "dur": 30,
+      "title": "Like a Prayer"
+     },
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/53/b2/ee/53b2ee92-354a-e3e2-e23c-a4c95a26206c/mzaf_18177219075819280580.plus.aac.p.m4a",
+      "credit": "Madonna: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/vogue-edit-version/83371916?i=83371738&uo=4",
+      "apple": {
+       "trackId": 83371738,
+       "url": "https://music.apple.com/us/album/vogue-edit-version/83371916?i=83371738&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/9a/c1/fd/9ac1fdc9-bc47-2ed9-f84a-a272caf5a6cf/mzi.rybubacs.jpg/300x300bb.jpg",
+       "term": "Madonna Vogue"
+      },
+      "dur": 30,
+      "title": "Vogue"
+     },
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/53/7c/ee/537ceef4-ef8b-f822-2863-e754a404cd0b/mzaf_10337818103101697835.plus.aac.p.m4a",
+      "credit": "Madonna: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/like-a-virgin/80815235?i=80815215&uo=4",
+      "apple": {
+       "trackId": 80815215,
+       "url": "https://music.apple.com/us/album/like-a-virgin/80815235?i=80815215&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music125/v4/8e/80/32/8e803264-c925-14dd-3412-2d7652c3df7b/mzi.wxptosaa.jpg/300x300bb.jpg",
+       "term": "Madonna Like a Virgin"
+      },
+      "dur": 30,
+      "title": "Like a Virgin"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "prince",
+   "name": "Prince",
+   "group": "1980s",
+   "facts": {
+    "origin": "US",
+    "decade": "1980s",
+    "songs": "Purple Rain · Kiss · When Doves Cry"
+   },
+   "blurb": "Prince (US), breakthrough in the 1980s. Known for \"Purple Rain\" and \"Kiss\" and \"When Doves Cry\".",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/4a/70/9b/4a709b41-3c29-626a-ca69-44aa907f4705/mzaf_14388295257133509788.plus.aac.p.m4a",
+      "credit": "Prince: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/purple-rain/1229320468?i=1229320478&uo=4",
+      "apple": {
+       "trackId": 1229320478,
+       "url": "https://music.apple.com/us/album/purple-rain/1229320468?i=1229320478&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/c1/b6/79/c1b679f5-d59d-1b3e-62ab-514de20f06c6/093624912002.jpg/300x300bb.jpg",
+       "term": "Prince & The Revolution Purple Rain"
+      },
+      "dur": 30,
+      "title": "Purple Rain"
+     },
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/da/48/98/da48985c-a43a-df20-e795-3a9c8dd193bb/mzaf_13129356430453756419.plus.aac.p.m4a",
+      "credit": "Prince: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/kiss/260336005?i=260336471&uo=4",
+      "apple": {
+       "trackId": 260336471,
+       "url": "https://music.apple.com/us/album/kiss/260336005?i=260336471&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/a7/04/dc/a704dce9-7671-9f42-4584-57bb7f822530/075992539562.jpg/300x300bb.jpg",
+       "term": "Prince & The Revolution Kiss"
+      },
+      "dur": 30,
+      "title": "Kiss"
+     },
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/0f/d3/ae/0fd3ae2b-542d-170e-f148-f4d08949a006/mzaf_2606432863197016679.plus.aac.p.m4a",
+      "credit": "Prince: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/when-doves-cry/1746833068?i=1746833079&uo=4",
+      "apple": {
+       "trackId": 1746833079,
+       "url": "https://music.apple.com/us/album/when-doves-cry/1746833068?i=1746833079&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/00/17/f2/0017f24f-e580-b77a-71a8-1bc7b75881bf/603497822065.jpg/300x300bb.jpg",
+       "term": "Prince & The Revolution When Doves Cry"
+      },
+      "dur": 30,
+      "title": "When Doves Cry"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "whitney-houston",
+   "name": "Whitney Houston",
+   "group": "1980s",
+   "facts": {
+    "origin": "US",
+    "decade": "1980s",
+    "songs": "I Wanna Dance with Somebody (Who Loves Me) · I Will Always Love You"
+   },
+   "blurb": "Whitney Houston (US), breakthrough in the 1980s. Known for \"I Wanna Dance with Somebody (Who Loves Me)\" and \"I Will Always Love You\".",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/7b/67/fd/7b67fd07-6a7a-0362-135c-878ac5799f2c/mzaf_11309521725869189721.plus.aac.p.m4a",
+      "credit": "Whitney Houston: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/i-wanna-dance-with-somebody-who-loves-me/840431884?i=840431935&uo=4",
+      "apple": {
+       "trackId": 840431935,
+       "url": "https://music.apple.com/us/album/i-wanna-dance-with-somebody-who-loves-me/840431884?i=840431935&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/86/b5/25/86b525b1-bff1-4bf6-6112-531251b3d672/dj.hthdmusj.jpg/300x300bb.jpg",
+       "term": "Whitney Houston I Wanna Dance with Somebody"
+      },
+      "dur": 30,
+      "title": "I Wanna Dance with Somebody (Who Loves Me)"
+     },
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/03/d2/1a/03d21aca-c69e-09af-03ef-118004e68ab5/mzaf_17408932698913708736.plus.aac.p.m4a",
+      "credit": "Whitney Houston: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/i-will-always-love-you/388151892?i=388151901&uo=4",
+      "apple": {
+       "trackId": 388151901,
+       "url": "https://music.apple.com/us/album/i-will-always-love-you/388151892?i=388151901&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/82/f3/e9/82f3e968-8174-c5eb-7fc5-36384d050129/dj.mdauihuy.jpg/300x300bb.jpg",
+       "term": "Whitney Houston I Will Always Love You"
+      },
+      "dur": 30,
+      "title": "I Will Always Love You"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "tina-turner",
+   "name": "Tina Turner",
+   "group": "1980s",
+   "facts": {
+    "origin": "US",
+    "decade": "1980s",
+    "songs": "What's Love Got to Do with It · The Best"
+   },
+   "blurb": "Tina Turner (US), breakthrough in the 1980s. Known for \"What's Love Got to Do with It\" and \"The Best\".",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/ed/20/fc/ed20fcf1-5059-3c8c-5fde-aac17d732040/mzaf_8779942766741000691.plus.aac.p.m4a",
+      "credit": "Tina Turner: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/whats-love-got-to-do-with-it/804178529?i=804178540&uo=4",
+      "apple": {
+       "trackId": 804178540,
+       "url": "https://music.apple.com/us/album/whats-love-got-to-do-with-it/804178529?i=804178540&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/94/f4/88/94f48860-5756-665f-329b-968b6264fe03/825646337910.jpg/300x300bb.jpg",
+       "term": "Tina Turner What's Love Got to Do with It"
+      },
+      "dur": 30,
+      "title": "What's Love Got to Do with It"
+     },
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/8c/aa/b0/8caab081-e764-1089-fa2c-d98a0fc9d5b2/mzaf_3454772204699386269.plus.aac.p.m4a",
+      "credit": "Tina Turner: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/the-best/696427993?i=696428406&uo=4",
+      "apple": {
+       "trackId": 696428406,
+       "url": "https://music.apple.com/us/album/the-best/696427993?i=696428406&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music118/v4/c8/73/af/c873af0b-57f0-8b84-3349-d990443efe5a/077779187355.jpg/300x300bb.jpg",
+       "term": "Tina Turner The Best"
+      },
+      "dur": 30,
+      "title": "The Best"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "phil-collins",
+   "name": "Phil Collins",
+   "group": "1980s",
+   "facts": {
+    "origin": "UK",
+    "decade": "1980s",
+    "songs": "In the Air Tonight · Another Day in Paradise"
+   },
+   "blurb": "Phil Collins (UK), breakthrough in the 1980s. Known for \"In the Air Tonight\" and \"Another Day in Paradise\".",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/87/dc/e5/87dce590-ff0c-3194-dfc1-1bc9b3aa1fe5/mzaf_1137975488766871124.plus.aac.p.m4a",
+      "credit": "Phil Collins: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/in-the-air-tonight/1076779219?i=1076779225&uo=4",
+      "apple": {
+       "trackId": 1076779225,
+       "url": "https://music.apple.com/us/album/in-the-air-tonight/1076779219?i=1076779225&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/29/3f/e0/293fe00f-f9ac-859f-bbe5-f3c2de3d83fc/603497880249.jpg/300x300bb.jpg",
+       "term": "Phil Collins In the Air Tonight"
+      },
+      "dur": 30,
+      "title": "In the Air Tonight"
+     },
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/32/44/ba/3244ba46-40b2-f28c-2341-e8d864c849e3/mzaf_10465170178399609940.plus.aac.p.m4a",
+      "credit": "Phil Collins: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/another-day-in-paradise-2016-remastered/1107820371?i=1107820627&uo=4",
+      "apple": {
+       "trackId": 1107820627,
+       "url": "https://music.apple.com/us/album/another-day-in-paradise-2016-remastered/1107820371?i=1107820627&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music126/v4/83/e7/96/83e79670-5716-d330-e984-e8dba7c2180f/603497879533.jpg/300x300bb.jpg",
+       "term": "Phil Collins Another Day in Paradise"
+      },
+      "dur": 30,
+      "title": "Another Day in Paradise"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "george-michael",
+   "name": "George Michael",
+   "group": "1980s",
+   "facts": {
+    "origin": "UK",
+    "decade": "1980s",
+    "songs": "Faith · Careless Whisper"
+   },
+   "blurb": "George Michael (UK), breakthrough in the 1980s. Known for \"Faith\" and \"Careless Whisper\".",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/a5/a0/b9/a5a0b9b5-25c0-eea4-aff5-e653eb2144a5/mzaf_12972342335011969375.plus.aac.p.m4a",
+      "credit": "George Michael: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/faith/282658449?i=282658468&uo=4",
+      "apple": {
+       "trackId": 282658468,
+       "url": "https://music.apple.com/us/album/faith/282658449?i=282658468&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music125/v4/47/55/0c/47550cd6-7ef5-bf86-c194-c7695d63c759/dj.xuditatj.jpg/300x300bb.jpg",
+       "term": "George Michael Faith"
+      },
+      "dur": 30,
+      "title": "Faith"
+     },
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/7c/bb/d8/7cbbd80c-29a1-6142-d0f3-de33e8569a0e/mzaf_12978360432335063808.plus.aac.p.m4a",
+      "credit": "George Michael: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/careless-whisper/429945575?i=429945616&uo=4",
+      "apple": {
+       "trackId": 429945616,
+       "url": "https://music.apple.com/us/album/careless-whisper/429945575?i=429945616&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/89/46/95/8946959a-e959-f22d-ced2-745feb799454/mzm.upagbaeg.jpg/300x300bb.jpg",
+       "term": "George Michael Careless Whisper"
+      },
+      "dur": 30,
+      "title": "Careless Whisper"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "u2",
+   "name": "U2",
+   "group": "1980s",
+   "facts": {
+    "origin": "Ireland",
+    "decade": "1980s",
+    "songs": "With or Without You · One · Beautiful Day"
+   },
+   "blurb": "U2 (Ireland), breakthrough in the 1980s. Known for \"With or Without You\" and \"One\" and \"Beautiful Day\".",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/73/9f/b8/739fb89d-05fc-a158-d34d-578d07213262/mzaf_15599762317871907296.plus.aac.p.m4a",
+      "credit": "U2: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/with-or-without-you/1440729856?i=1440729860&uo=4",
+      "apple": {
+       "trackId": 1440729860,
+       "url": "https://music.apple.com/us/album/with-or-without-you/1440729856?i=1440729860&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music125/v4/9a/48/54/9a485494-b969-aaf4-a916-07452ea69869/06UMGIM72507.rgb.jpg/300x300bb.jpg",
+       "term": "U2 With or Without You"
+      },
+      "dur": 30,
+      "title": "With or Without You"
+     },
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/6f/60/92/6f609299-3949-ad5b-8d7f-cbf9d0852644/mzaf_2221971436287478.plus.aac.p.m4a",
+      "credit": "U2: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/one/1440729856?i=1440729871&uo=4",
+      "apple": {
+       "trackId": 1440729871,
+       "url": "https://music.apple.com/us/album/one/1440729856?i=1440729871&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music125/v4/9a/48/54/9a485494-b969-aaf4-a916-07452ea69869/06UMGIM72507.rgb.jpg/300x300bb.jpg",
+       "term": "U2 One"
+      },
+      "dur": 30,
+      "title": "One"
+     },
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/29/ec/84/29ec846c-769f-91f2-5e28-768fa9de514b/mzaf_17613297004823866094.plus.aac.p.m4a",
+      "credit": "U2: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/beautiful-day/1443100430?i=1443100723&uo=4",
+      "apple": {
+       "trackId": 1443100723,
+       "url": "https://music.apple.com/us/album/beautiful-day/1443100430?i=1443100723&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/05/78/89/0578893b-9dac-d88a-ee9b-3c42ac40b6a0/17UMGIM95495.rgb.jpg/300x300bb.jpg",
+       "term": "U2 Beautiful Day"
+      },
+      "dur": 30,
+      "title": "Beautiful Day"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "the-police",
+   "name": "The Police",
+   "group": "1970s",
+   "facts": {
+    "origin": "UK",
+    "decade": "1970s",
+    "songs": "Every Breath You Take · Roxanne"
+   },
+   "blurb": "The Police (UK), breakthrough in the 1970s. Known for \"Every Breath You Take\" and \"Roxanne\".",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/fe/e4/66/fee46681-9bbc-358a-ba0f-51d39feabf8b/mzaf_16980938720718099101.plus.aac.p.m4a",
+      "credit": "The Police: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/every-breath-you-take-remastered-2003/1440673959?i=1440674160&uo=4",
+      "apple": {
+       "trackId": 1440674160,
+       "url": "https://music.apple.com/us/album/every-breath-you-take-remastered-2003/1440673959?i=1440674160&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/a4/67/ba/a467ba62-87df-9d10-98d2-c517f68ac870/16UMGIM60882.rgb.jpg/300x300bb.jpg",
+       "term": "The Police Every Breath You Take"
+      },
+      "dur": 30,
+      "title": "Every Breath You Take"
+     },
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/f7/a7/6a/f7a76a18-cdc7-9222-12e8-98ceb6177f2d/mzaf_2178124545148447319.plus.aac.p.m4a",
+      "credit": "The Police: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/roxanne-remastered-2003/1440797181?i=1440797616&uo=4",
+      "apple": {
+       "trackId": 1440797616,
+       "url": "https://music.apple.com/us/album/roxanne-remastered-2003/1440797181?i=1440797616&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music126/v4/47/de/29/47de29d9-5109-2020-d296-1021a7378574/16UMGIM60880.rgb.jpg/300x300bb.jpg",
+       "term": "The Police Roxanne"
+      },
+      "dur": 30,
+      "title": "Roxanne"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "bon-jovi",
+   "name": "Bon Jovi",
+   "group": "1980s",
+   "facts": {
+    "origin": "US",
+    "decade": "1980s",
+    "songs": "Livin' on a Prayer · It's My Life"
+   },
+   "blurb": "Bon Jovi (US), breakthrough in the 1980s. Known for \"Livin' on a Prayer\" and \"It's My Life\".",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/75/15/30/75153020-b7c4-7958-8907-4aa1b965dc24/mzaf_2377504467597068152.plus.aac.p.m4a",
+      "credit": "Bon Jovi: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/livin-on-a-prayer/1422954626?i=1422955211&uo=4",
+      "apple": {
+       "trackId": 1422955211,
+       "url": "https://music.apple.com/us/album/livin-on-a-prayer/1422954626?i=1422955211&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music112/v4/40/16/3e/40163e24-6985-b785-d4ea-cbae07d74812/06UMGIM05422.rgb.jpg/300x300bb.jpg",
+       "term": "Bon Jovi Livin' On a Prayer"
+      },
+      "dur": 30,
+      "title": "Livin' on a Prayer"
+     },
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/52/db/ba/52dbbae8-6257-b531-84e4-7fe34b6f690e/mzaf_6964344532418113264.plus.aac.p.m4a",
+      "credit": "Bon Jovi: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/its-my-life/1440813234?i=1440813250&uo=4",
+      "apple": {
+       "trackId": 1440813250,
+       "url": "https://music.apple.com/us/album/its-my-life/1440813234?i=1440813250&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/d5/ad/05/d5ad0586-8108-8da1-6017-3e915f26ad0b/14UMGIM44520.rgb.jpg/300x300bb.jpg",
+       "term": "Bon Jovi It's My Life"
+      },
+      "dur": 30,
+      "title": "It's My Life"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "guns-n-roses",
+   "name": "Guns N' Roses",
+   "group": "1980s",
+   "facts": {
+    "origin": "US",
+    "decade": "1980s",
+    "songs": "Sweet Child o' Mine · Paradise City"
+   },
+   "blurb": "Guns N' Roses (US), breakthrough in the 1980s. Known for \"Sweet Child o' Mine\" and \"Paradise City\".",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/a5/82/2d/a5822d67-2e65-fe95-511e-1f785d23e5cc/mzaf_8619467974951398014.plus.aac.p.m4a",
+      "credit": "Guns N' Roses: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/sweet-child-o-mine/1377813284?i=1377813701&uo=4",
+      "apple": {
+       "trackId": 1377813701,
+       "url": "https://music.apple.com/us/album/sweet-child-o-mine/1377813284?i=1377813701&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music125/v4/a0/4d/c4/a04dc484-03cc-02aa-fa82-5334fcb4bc16/18UMGIM24878.rgb.jpg/300x300bb.jpg",
+       "term": "Guns N' Roses Sweet Child O' Mine"
+      },
+      "dur": 30,
+      "title": "Sweet Child o' Mine"
+     },
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/0b/2d/ec/0b2dec08-f03d-8a96-93a8-386a7d7b5091/mzaf_12821402190646617663.plus.aac.p.m4a",
+      "credit": "Guns N' Roses: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/paradise-city/1377813284?i=1377813298&uo=4",
+      "apple": {
+       "trackId": 1377813298,
+       "url": "https://music.apple.com/us/album/paradise-city/1377813284?i=1377813298&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music125/v4/a0/4d/c4/a04dc484-03cc-02aa-fa82-5334fcb4bc16/18UMGIM24878.rgb.jpg/300x300bb.jpg",
+       "term": "Guns N' Roses Paradise City"
+      },
+      "dur": 30,
+      "title": "Paradise City"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "cyndi-lauper",
+   "name": "Cyndi Lauper",
+   "group": "1980s",
+   "facts": {
+    "origin": "US",
+    "decade": "1980s",
+    "songs": "Girls Just Want to Have Fun · Time After Time"
+   },
+   "blurb": "Cyndi Lauper (US), breakthrough in the 1980s. Known for \"Girls Just Want to Have Fun\" and \"Time After Time\".",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/95/1d/ed/951ded3d-4e31-1452-42b6-cc36070a2204/mzaf_10794841548233618528.plus.aac.p.m4a",
+      "credit": "Cyndi Lauper: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/girls-just-want-to-have-fun/400603643?i=400603693&uo=4",
+      "apple": {
+       "trackId": 400603693,
+       "url": "https://music.apple.com/us/album/girls-just-want-to-have-fun/400603643?i=400603693&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/8a/8c/13/8a8c13e0-06af-1710-7b7d-ebec65fb8361/074643893022.jpg/300x300bb.jpg",
+       "term": "Cyndi Lauper Girls Just Want to Have Fun"
+      },
+      "dur": 30,
+      "title": "Girls Just Want to Have Fun"
+     },
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/02/bd/5e/02bd5e7c-8efe-9218-6c91-1c69c4c5c062/mzaf_23204011408983330.plus.aac.p.m4a",
+      "credit": "Cyndi Lauper: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/time-after-time/400603643?i=400603695&uo=4",
+      "apple": {
+       "trackId": 400603695,
+       "url": "https://music.apple.com/us/album/time-after-time/400603643?i=400603695&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/8a/8c/13/8a8c13e0-06af-1710-7b7d-ebec65fb8361/074643893022.jpg/300x300bb.jpg",
+       "term": "Cyndi Lauper Time After Time"
+      },
+      "dur": 30,
+      "title": "Time After Time"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "lionel-richie",
+   "name": "Lionel Richie",
+   "group": "1980s",
+   "facts": {
+    "origin": "US",
+    "decade": "1980s",
+    "songs": "Hello · All Night Long (All Night)"
+   },
+   "blurb": "Lionel Richie (US), breakthrough in the 1980s. Known for \"Hello\" and \"All Night Long (All Night)\".",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/f0/cc/62/f0cc62b5-389c-325c-2230-f2477fccafe2/mzaf_15126553811640936372.plus.aac.p.m4a",
+      "credit": "Lionel Richie: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/hello/1440808868?i=1440809049&uo=4",
+      "apple": {
+       "trackId": 1440809049,
+       "url": "https://music.apple.com/us/album/hello/1440808868?i=1440809049&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music125/v4/8a/60/4f/8a604fba-247c-d4e2-25b0-ed5b230fe948/00602537021598.rgb.jpg/300x300bb.jpg",
+       "term": "Lionel Richie Hello"
+      },
+      "dur": 30,
+      "title": "Hello"
+     },
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/82/b9/9d/82b99d0c-9007-cfaf-1358-f90f6512378d/mzaf_4937461800498353733.plus.aac.p.m4a",
+      "credit": "Lionel Richie: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/all-night-long-all-night/1440808868?i=1440809027&uo=4",
+      "apple": {
+       "trackId": 1440809027,
+       "url": "https://music.apple.com/us/album/all-night-long-all-night/1440808868?i=1440809027&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music125/v4/8a/60/4f/8a604fba-247c-d4e2-25b0-ed5b230fe948/00602537021598.rgb.jpg/300x300bb.jpg",
+       "term": "Lionel Richie All Night Long"
+      },
+      "dur": 30,
+      "title": "All Night Long (All Night)"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "dire-straits",
+   "name": "Dire Straits",
+   "group": "1970s",
+   "facts": {
+    "origin": "UK",
+    "decade": "1970s",
+    "songs": "Sultans of Swing · Money for Nothing"
+   },
+   "blurb": "Dire Straits (UK), breakthrough in the 1970s. Known for \"Sultans of Swing\" and \"Money for Nothing\".",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/fd/75/02/fd75026a-5301-dbb5-f65d-b4359f7fd83d/mzaf_51370362575177613.plus.aac.p.m4a",
+      "credit": "Dire Straits: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/sultans-of-swing/307029087?i=307029144&uo=4",
+      "apple": {
+       "trackId": 307029144,
+       "url": "https://music.apple.com/us/album/sultans-of-swing/307029087?i=307029144&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music/47/c3/21/mzi.ciyzkqao.jpg/300x300bb.jpg",
+       "term": "Dire Straits Sultans of Swing"
+      },
+      "dur": 30,
+      "title": "Sultans of Swing"
+     },
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview125/v4/3a/0a/fe/3a0afe4f-6a40-2bfc-06b4-c7d876923384/mzaf_11343011571794572089.plus.aac.p.m4a",
+      "credit": "Dire Straits: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/money-for-nothing/602192125?i=602192564&uo=4",
+      "apple": {
+       "trackId": 602192564,
+       "url": "https://music.apple.com/us/album/money-for-nothing/602192125?i=602192564&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music2/v4/21/84/c6/2184c667-7c8d-4644-a816-b3bceb5d6ba2/DireStraits.jpg/300x300bb.jpg",
+       "term": "Dire Strats Money For Nothing"
+      },
+      "dur": 30,
+      "title": "Money for Nothing"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "kylie-minogue",
+   "name": "Kylie Minogue",
+   "group": "1980s",
+   "facts": {
+    "origin": "Australia",
+    "decade": "1980s",
+    "songs": "Can't Get You Out of My Head · Spinning Around"
+   },
+   "blurb": "Kylie Minogue (Australia), breakthrough in the 1980s. Known for \"Can't Get You Out of My Head\" and \"Spinning Around\".",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/61/4d/37/614d37a5-4ee8-48aa-c302-3550a2abf0e0/mzaf_2068714512784676202.plus.aac.p.m4a",
+      "credit": "Kylie Minogue: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/cant-get-you-out-of-my-head/726320287?i=726320692&uo=4",
+      "apple": {
+       "trackId": 726320692,
+       "url": "https://music.apple.com/us/album/cant-get-you-out-of-my-head/726320287?i=726320692&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Features115/v4/2d/27/f4/2d27f445-abf6-f360-f56a-683b65c9b842/dj.hhpuvuwv.jpg/300x300bb.jpg",
+       "term": "Kylie Minogue Can't Get You Out of My Head"
+      },
+      "dur": 30,
+      "title": "Can't Get You Out of My Head"
+     },
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview125/v4/25/99/09/259909df-a406-da0b-b127-1afa4a7e3cac/mzaf_8255129833435458648.plus.aac.p.m4a",
+      "credit": "Kylie Minogue: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/spinning-around-7th-spinnin-dizzy-dub/699768981?i=699770183&uo=4",
+      "apple": {
+       "trackId": 699770183,
+       "url": "https://music.apple.com/us/album/spinning-around-7th-spinnin-dizzy-dub/699768981?i=699770183&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music4/v4/07/55/b6/0755b6e0-aa3f-33cf-ade6-6444773924b4/0724387693654_1401x1401_300dpi.tif/300x300bb.jpg",
+       "term": "Kylie Minogue Spinning Around"
+      },
+      "dur": 30,
+      "title": "Spinning Around"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "metallica",
+   "name": "Metallica",
+   "group": "1980s",
+   "facts": {
+    "origin": "US",
+    "decade": "1980s",
+    "songs": "Enter Sandman · Nothing Else Matters"
+   },
+   "blurb": "Metallica (US), breakthrough in the 1980s. Known for \"Enter Sandman\" and \"Nothing Else Matters\".",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/53/8a/fc/538afc1c-b9cd-24ab-b401-2fa8c81abc46/mzaf_3160131754964321707.plus.aac.p.m4a",
+      "credit": "Metallica: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/enter-sandman/1572051816?i=1572051818&uo=4",
+      "apple": {
+       "trackId": 1572051818,
+       "url": "https://music.apple.com/us/album/enter-sandman/1572051816?i=1572051818&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/2e/94/95/2e9495d7-dfe3-ddc8-87ef-6ef797a60218/850007452056.png/300x300bb.jpg",
+       "term": "Metallica Enter Sandman"
+      },
+      "dur": 30,
+      "title": "Enter Sandman"
+     },
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/d4/3d/f7/d43df7ae-a9fc-6f17-cee8-46c20348bdd3/mzaf_5684199236885023822.plus.aac.p.m4a",
+      "credit": "Metallica: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/nothing-else-matters/1572046434?i=1572046444&uo=4",
+      "apple": {
+       "trackId": 1572046444,
+       "url": "https://music.apple.com/us/album/nothing-else-matters/1572046434?i=1572046444&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music125/v4/9e/80/1b/9e801b06-67fa-0990-2d15-85480ad3cd46/850007452025.png/300x300bb.jpg",
+       "term": "Metallica Nothing Else Matters"
+      },
+      "dur": 30,
+      "title": "Nothing Else Matters"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "mariah-carey",
+   "name": "Mariah Carey",
+   "group": "1990s",
+   "facts": {
+    "origin": "US",
+    "decade": "1990s",
+    "songs": "All I Want for Christmas Is You · We Belong Together · Fantasy"
+   },
+   "blurb": "Mariah Carey (US), breakthrough in the 1990s. Known for \"All I Want for Christmas Is You\" and \"We Belong Together\" and \"Fantasy\".",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/df/93/49/df93491d-65a6-bb2d-eb03-9ad3b3d62438/mzaf_10792594730801509593.plus.aac.p.m4a",
+      "credit": "Mariah Carey: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/all-i-want-for-christmas-is-you/585972750?i=585972803&uo=4",
+      "apple": {
+       "trackId": 585972803,
+       "url": "https://music.apple.com/us/album/all-i-want-for-christmas-is-you/585972750?i=585972803&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/c6/b7/27/c6b727f7-3a32-6b43-cee2-05bb71daf1cf/dj.itfmdeif.jpg/300x300bb.jpg",
+       "term": "Mariah Carey All I Want for Christmas Is You"
+      },
+      "dur": 30,
+      "title": "All I Want for Christmas Is You"
+     },
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/ec/a2/03/eca20372-e62e-a279-2fe9-118f19f03157/mzaf_3519549200001384487.plus.aac.p.m4a",
+      "credit": "Mariah Carey: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/we-belong-together/1476731879?i=1476731889&uo=4",
+      "apple": {
+       "trackId": 1476731889,
+       "url": "https://music.apple.com/us/album/we-belong-together/1476731879?i=1476731889&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music122/v4/34/66/31/346631f0-dc0e-500f-7cb8-537e7523e022/15UMGIM78299.rgb.jpg/300x300bb.jpg",
+       "term": "Mariah Carey We Belong Together"
+      },
+      "dur": 30,
+      "title": "We Belong Together"
+     },
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/c7/34/04/c73404de-86b3-29f1-7c05-6ba054519183/mzaf_902568908178362510.plus.aac.p.m4a",
+      "credit": "Mariah Carey: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/fantasy-feat-ol-dirty-bastard-bad-boy-fantasy/989380334?i=989380550&uo=4",
+      "apple": {
+       "trackId": 989380550,
+       "url": "https://music.apple.com/us/album/fantasy-feat-ol-dirty-bastard-bad-boy-fantasy/989380334?i=989380550&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music126/v4/84/6c/45/846c4546-3f31-5d3b-1c93-9aac043ffec4/886445157277.jpg/300x300bb.jpg",
+       "term": "Mariah Carey Fantasy"
+      },
+      "dur": 30,
+      "title": "Fantasy"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "celine-dion",
+   "name": "Celine Dion",
+   "group": "1990s",
+   "facts": {
+    "origin": "Canada",
+    "decade": "1990s",
+    "songs": "My Heart Will Go On · Because You Loved Me"
+   },
+   "blurb": "Celine Dion (Canada), breakthrough in the 1990s. Known for \"My Heart Will Go On\" and \"Because You Loved Me\".",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/54/5b/f7/545bf75d-1ea1-07f0-0c4e-a6d3bca7c092/mzaf_1410328638164863411.plus.aac.p.m4a",
+      "credit": "Celine Dion: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/my-heart-will-go-on-love-theme-from-titanic/507536640?i=507536740&uo=4",
+      "apple": {
+       "trackId": 507536740,
+       "url": "https://music.apple.com/us/album/my-heart-will-go-on-love-theme-from-titanic/507536640?i=507536740&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/ab/5a/96/ab5a9681-e891-8449-53d2-7d358501f97f/mzi.zbauexhy.jpg/300x300bb.jpg",
+       "term": "Céline Dion & James Horner My Heart Will Go On"
+      },
+      "dur": 30,
+      "title": "My Heart Will Go On"
+     },
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/2a/f1/84/2af184e4-e7c0-f5cb-6ec2-6ffc68a572a7/mzaf_13855375006191175068.plus.aac.p.m4a",
+      "credit": "Celine Dion: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/because-you-loved-me/160021509?i=160022706&uo=4",
+      "apple": {
+       "trackId": 160022706,
+       "url": "https://music.apple.com/us/album/because-you-loved-me/160021509?i=160022706&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/48/59/bd/4859bde2-c345-d637-1079-26cb78c4e7e8/074646579428.jpg/300x300bb.jpg",
+       "term": "Céline Dion Because You Loved Me"
+      },
+      "dur": 30,
+      "title": "Because You Loved Me"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "nirvana",
+   "name": "Nirvana",
+   "group": "1990s",
+   "facts": {
+    "origin": "US",
+    "decade": "1990s",
+    "songs": "Smells Like Teen Spirit · Come as You Are"
+   },
+   "blurb": "Nirvana (US), breakthrough in the 1990s. Known for \"Smells Like Teen Spirit\" and \"Come as You Are\".",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/65/49/4e/65494e02-b6d3-26d8-6b0c-9bd98dcf4d5d/mzaf_7665413316386155700.plus.aac.p.m4a",
+      "credit": "Nirvana: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/smells-like-teen-spirit/1440783617?i=1440783625&uo=4",
+      "apple": {
+       "trackId": 1440783625,
+       "url": "https://music.apple.com/us/album/smells-like-teen-spirit/1440783617?i=1440783625&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/95/fd/b9/95fdb9b2-6d2b-92a6-97f2-51c1a6d77f1a/00602527874609.rgb.jpg/300x300bb.jpg",
+       "term": "Nirvana Smells Like Teen Spirit"
+      },
+      "dur": 30,
+      "title": "Smells Like Teen Spirit"
+     },
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/88/55/17/88551793-f12c-c809-2657-bea5256c7aa0/mzaf_4166033993768096448.plus.aac.p.m4a",
+      "credit": "Nirvana: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/come-as-you-are/1440783617?i=1440783636&uo=4",
+      "apple": {
+       "trackId": 1440783636,
+       "url": "https://music.apple.com/us/album/come-as-you-are/1440783617?i=1440783636&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/95/fd/b9/95fdb9b2-6d2b-92a6-97f2-51c1a6d77f1a/00602527874609.rgb.jpg/300x300bb.jpg",
+       "term": "Nirvana Come As You Are"
+      },
+      "dur": 30,
+      "title": "Come as You Are"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "oasis",
+   "name": "Oasis",
+   "group": "1990s",
+   "facts": {
+    "origin": "UK",
+    "decade": "1990s",
+    "songs": "Wonderwall · Don't Look Back in Anger"
+   },
+   "blurb": "Oasis (UK), breakthrough in the 1990s. Known for \"Wonderwall\" and \"Don't Look Back in Anger\".",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/ab/16/93/ab16933c-6203-3db9-9da9-513ff1c8496d/mzaf_16993612140334549994.plus.aac.p.m4a",
+      "credit": "Oasis: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/wonderwall/1517447039?i=1517447333&uo=4",
+      "apple": {
+       "trackId": 1517447333,
+       "url": "https://music.apple.com/us/album/wonderwall/1517447039?i=1517447333&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music113/v4/04/92/e0/0492e08b-cbcc-9969-9ad6-8f5a0888068c/5051961007107.jpg/300x300bb.jpg",
+       "term": "Oasis Wonderwall"
+      },
+      "dur": 30,
+      "title": "Wonderwall"
+     },
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/e7/0d/2c/e70d2c62-b10a-333e-7289-1032482a5242/mzaf_380233244515330166.plus.aac.p.m4a",
+      "credit": "Oasis: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/dont-look-back-in-anger-remastered/1525933483?i=1525933492&uo=4",
+      "apple": {
+       "trackId": 1525933492,
+       "url": "https://music.apple.com/us/album/dont-look-back-in-anger-remastered/1525933483?i=1525933492&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music125/v4/34/2e/cb/342ecb17-ef19-816a-4ce5-e60b9ceec161/5051961073164.jpg/300x300bb.jpg",
+       "term": "Oasis Don't Look Back in Anger"
+      },
+      "dur": 30,
+      "title": "Don't Look Back in Anger"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "red-hot-chili-peppers",
+   "name": "Red Hot Chili Peppers",
+   "group": "1990s",
+   "facts": {
+    "origin": "US",
+    "decade": "1990s",
+    "songs": "Californication · Under the Bridge"
+   },
+   "blurb": "Red Hot Chili Peppers (US), breakthrough in the 1990s. Known for \"Californication\" and \"Under the Bridge\".",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/e7/de/6a/e7de6ab4-0e39-70b4-575a-5b82fba18d8e/mzaf_1705322343755871716.plus.aac.p.m4a",
+      "credit": "Red Hot Chili Peppers: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/californication/945575406?i=945575413&uo=4",
+      "apple": {
+       "trackId": 945575413,
+       "url": "https://music.apple.com/us/album/californication/945575406?i=945575413&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/4c/86/1d/4c861dab-5428-f3b7-8068-82bb69db5e89/093624932130.jpg/300x300bb.jpg",
+       "term": "Red Hot Chili Peppers Californication"
+      },
+      "dur": 30,
+      "title": "Californication"
+     },
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/ff/5e/6c/ff5e6c34-4b2c-fa5b-232c-194183e5310f/mzaf_18293543166089220451.plus.aac.p.m4a",
+      "credit": "Red Hot Chili Peppers: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/under-the-bridge/948460531?i=948460560&uo=4",
+      "apple": {
+       "trackId": 948460560,
+       "url": "https://music.apple.com/us/album/under-the-bridge/948460531?i=948460560&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music125/v4/c9/c8/b2/c9c8b20d-42b8-a2a6-1678-54b997e845f5/093624931973.jpg/300x300bb.jpg",
+       "term": "Red Hot Chili Peppers Under the Bridge"
+      },
+      "dur": 30,
+      "title": "Under the Bridge"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "spice-girls",
+   "name": "Spice Girls",
+   "group": "1990s",
+   "facts": {
+    "origin": "UK",
+    "decade": "1990s",
+    "songs": "Wannabe · Spice Up Your Life"
+   },
+   "blurb": "Spice Girls (UK), breakthrough in the 1990s. Known for \"Wannabe\" and \"Spice Up Your Life\".",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/db/cb/c6/dbcbc688-8277-b365-8deb-1da3c30da079/mzaf_7842872759474974048.plus.aac.p.m4a",
+      "credit": "Spice Girls: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/wannabe/1573849246?i=1573849255&uo=4",
+      "apple": {
+       "trackId": 1573849255,
+       "url": "https://music.apple.com/us/album/wannabe/1573849246?i=1573849255&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/e1/92/8f/e1928fcb-0204-ca19-597a-6edaf8e6ebc8/21UMGIM16233.rgb.jpg/300x300bb.jpg",
+       "term": "Spice Girls Wannabe"
+      },
+      "dur": 30,
+      "title": "Wannabe"
+     },
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/ae/95/51/ae955114-cfd4-23bb-3e88-1a296be58c6b/mzaf_18403383228422181787.plus.aac.p.m4a",
+      "credit": "Spice Girls: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/spice-up-your-life/724613654?i=724614188&uo=4",
+      "apple": {
+       "trackId": 724614188,
+       "url": "https://music.apple.com/us/album/spice-up-your-life/724613654?i=724614188&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music122/v4/cb/8a/8f/cb8a8fd9-a870-5dd9-aaaa-ecab748cdd33/13UABIM52141.rgb.jpg/300x300bb.jpg",
+       "term": "Spice Girls Spice Up Your Life"
+      },
+      "dur": 30,
+      "title": "Spice Up Your Life"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "britney-spears",
+   "name": "Britney Spears",
+   "group": "1990s",
+   "facts": {
+    "origin": "US",
+    "decade": "1990s",
+    "songs": "...Baby One More Time · Toxic"
+   },
+   "blurb": "Britney Spears (US), breakthrough in the 1990s. Known for \"...Baby One More Time\" and \"Toxic\".",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/2a/ef/e5/2aefe5c7-e83b-07b1-227e-117347aa3006/mzaf_11333878250757508664.plus.aac.p.m4a",
+      "credit": "Britney Spears: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/baby-one-more-time/273143723?i=273143820&uo=4",
+      "apple": {
+       "trackId": 273143820,
+       "url": "https://music.apple.com/us/album/baby-one-more-time/273143723?i=273143820&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/51/73/28/5173280b-9b5e-c5e4-d3f8-a2612d044543/888880423368.jpg/300x300bb.jpg",
+       "term": "Britney Spears ...Baby One More Time"
+      },
+      "dur": 30,
+      "title": "...Baby One More Time"
+     },
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/ae/c4/7f/aec47f56-842d-49b4-558b-7a7523fd6728/mzaf_6693111381462300599.plus.aac.p.m4a",
+      "credit": "Britney Spears: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/toxic/251947909?i=251948354&uo=4",
+      "apple": {
+       "trackId": 251948354,
+       "url": "https://music.apple.com/us/album/toxic/251947909?i=251948354&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music125/v4/38/8b/7a/388b7a8f-10ff-a4e0-7624-65e29ac6a793/828765374828.jpg/300x300bb.jpg",
+       "term": "Britney Spears Toxic"
+      },
+      "dur": 30,
+      "title": "Toxic"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "backstreet-boys",
+   "name": "Backstreet Boys",
+   "group": "1990s",
+   "facts": {
+    "origin": "US",
+    "decade": "1990s",
+    "songs": "I Want It That Way · Everybody (Backstreet's Back)"
+   },
+   "blurb": "Backstreet Boys (US), breakthrough in the 1990s. Known for \"I Want It That Way\" and \"Everybody (Backstreet's Back)\".",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/12/cd/f8/12cdf81c-f174-cd45-9a56-9b2388df9e63/mzaf_2642298639219088626.plus.aac.p.m4a",
+      "credit": "Backstreet Boys: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/i-want-it-that-way/283567119?i=283567164&uo=4",
+      "apple": {
+       "trackId": 283567164,
+       "url": "https://music.apple.com/us/album/i-want-it-that-way/283567119?i=283567164&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/5f/6b/e9/5f6be919-1b9e-30ef-45b7-cc27fc428fd5/012414167224.jpg/300x300bb.jpg",
+       "term": "Backstreet Boys I Want It That Way"
+      },
+      "dur": 30,
+      "title": "I Want It That Way"
+     },
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/bf/30/b7/bf30b77d-80db-f418-47ea-0f455e980f08/mzaf_733937835429193874.plus.aac.p.m4a",
+      "credit": "Backstreet Boys: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/everybody-backstreets-back-radio-edit/650116988?i=650117363&uo=4",
+      "apple": {
+       "trackId": 650117363,
+       "url": "https://music.apple.com/us/album/everybody-backstreets-back-radio-edit/650116988?i=650117363&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music2/v4/7f/84/e7/7f84e766-b755-46d2-678f-d35257d8d2fe/886443959590.jpg/300x300bb.jpg",
+       "term": "Backstreet Boys Everybody"
+      },
+      "dur": 30,
+      "title": "Everybody (Backstreet's Back)"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "radiohead",
+   "name": "Radiohead",
+   "group": "1990s",
+   "facts": {
+    "origin": "UK",
+    "decade": "1990s",
+    "songs": "Karma Police · No Surprises"
+   },
+   "blurb": "Radiohead (UK), breakthrough in the 1990s. Known for \"Karma Police\" and \"No Surprises\".",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/46/21/35/46213520-da4a-1806-0c59-5ca6ad008b4e/mzaf_5277404092043261430.plus.aac.p.m4a",
+      "credit": "Radiohead: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/karma-police/1097861387?i=1097861836&uo=4",
+      "apple": {
+       "trackId": 1097861836,
+       "url": "https://music.apple.com/us/album/karma-police/1097861387?i=1097861836&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music116/v4/07/60/ba/0760ba0f-148c-b18f-d0ff-169ee96f3af5/634904078164.png/300x300bb.jpg",
+       "term": "Radiohead Karma Police"
+      },
+      "dur": 30,
+      "title": "Karma Police"
+     },
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/f0/2a/fa/f02afaad-0a7f-9ceb-1236-55ef3d388061/mzaf_10063872040766906863.plus.aac.p.m4a",
+      "credit": "Radiohead: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/no-surprises/1097861387?i=1097861842&uo=4",
+      "apple": {
+       "trackId": 1097861842,
+       "url": "https://music.apple.com/us/album/no-surprises/1097861387?i=1097861842&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music116/v4/07/60/ba/0760ba0f-148c-b18f-d0ff-169ee96f3af5/634904078164.png/300x300bb.jpg",
+       "term": "Radiohead No Surprises"
+      },
+      "dur": 30,
+      "title": "No Surprises"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "green-day",
+   "name": "Green Day",
+   "group": "1990s",
+   "facts": {
+    "origin": "US",
+    "decade": "1990s",
+    "songs": "Basket Case"
+   },
+   "blurb": "Green Day (US), breakthrough in the 1990s. Known for \"Basket Case\".",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/d3/2b/fe/d32bfe59-ce6f-2130-7445-589be60c4b17/mzaf_14529423277593289725.plus.aac.p.m4a",
+      "credit": "Green Day: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/basket-case/1160081985?i=1160082180&uo=4",
+      "apple": {
+       "trackId": 1160082180,
+       "url": "https://music.apple.com/us/album/basket-case/1160081985?i=1160082180&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music125/v4/88/83/e7/8883e74b-1b7c-0725-09de-21e4e00d54b5/093624915713.jpg/300x300bb.jpg",
+       "term": "Green Day Basket Case"
+      },
+      "dur": 30,
+      "title": "Basket Case"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "shakira",
+   "name": "Shakira",
+   "group": "1990s",
+   "facts": {
+    "origin": "Colombia",
+    "decade": "1990s",
+    "songs": "Hips Don't Lie · Whenever, Wherever"
+   },
+   "blurb": "Shakira (Colombia), breakthrough in the 1990s. Known for \"Hips Don't Lie\" and \"Whenever, Wherever\".",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/ac/c7/61/acc7619f-c1e3-e0a5-df9b-0329a35af062/mzaf_13106936727189536738.plus.aac.p.m4a",
+      "credit": "Shakira: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/hips-dont-lie-feat-wyclef-jean/1817217057?i=1817217063&uo=4",
+      "apple": {
+       "trackId": 1817217063,
+       "url": "https://music.apple.com/us/album/hips-dont-lie-feat-wyclef-jean/1817217057?i=1817217063&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/0d/b5/8a/0db58a8b-7b17-dd53-3464-116a415d0f49/196872648836.jpg/300x300bb.jpg",
+       "term": "Shakira Hips Don't Lie"
+      },
+      "dur": 30,
+      "title": "Hips Don't Lie"
+     },
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/03/db/c9/03dbc935-12c2-4922-51ff-76170883753a/mzaf_13989672290091509449.plus.aac.p.m4a",
+      "credit": "Shakira: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/whenever-wherever/188260845?i=188261029&uo=4",
+      "apple": {
+       "trackId": 188261029,
+       "url": "https://music.apple.com/us/album/whenever-wherever/188260845?i=188261029&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/c5/4b/ff/c54bffa0-2333-1a55-e67e-a9c640e06f6f/mzi.hwxgzhsl.jpg/300x300bb.jpg",
+       "term": "Shakira Whenever, Wherever"
+      },
+      "dur": 30,
+      "title": "Whenever, Wherever"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "eminem",
+   "name": "Eminem",
+   "group": "1990s",
+   "facts": {
+    "origin": "US",
+    "decade": "1990s",
+    "songs": "Lose Yourself · Without Me"
+   },
+   "blurb": "Eminem (US), breakthrough in the 1990s. Known for \"Lose Yourself\" and \"Without Me\".",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/13/5a/61/135a6154-8ca2-0523-1fa2-f4ac0ea9e1e7/mzaf_13242749689945681184.plus.aac.p.m4a",
+      "credit": "Eminem: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/lose-yourself/1440903339?i=1440903439&uo=4",
+      "apple": {
+       "trackId": 1440903439,
+       "url": "https://music.apple.com/us/album/lose-yourself/1440903339?i=1440903439&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music125/v4/08/23/fc/0823fcd9-cb44-695b-32bf-b3bf51d9f800/00606949351229.rgb.jpg/300x300bb.jpg",
+       "term": "Eminem Lose Yourself"
+      },
+      "dur": 30,
+      "title": "Lose Yourself"
+     },
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/60/7d/60/607d6038-10dd-1d8d-83c7-c7029e709da3/mzaf_13336706630570276296.plus.aac.p.m4a",
+      "credit": "Eminem: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/without-me/1440821542?i=1440821643&uo=4",
+      "apple": {
+       "trackId": 1440821643,
+       "url": "https://music.apple.com/us/album/without-me/1440821542?i=1440821643&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music118/v4/dd/5c/e6/dd5ce621-f7d2-f767-7a08-e7a7eaa7870b/00602537526994.rgb.jpg/300x300bb.jpg",
+       "term": "Eminem Without Me"
+      },
+      "dur": 30,
+      "title": "Without Me"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "destinys-child",
+   "name": "Destiny's Child",
+   "group": "1990s",
+   "facts": {
+    "origin": "US",
+    "decade": "1990s",
+    "songs": "Say My Name · Survivor"
+   },
+   "blurb": "Destiny's Child (US), breakthrough in the 1990s. Known for \"Say My Name\" and \"Survivor\".",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/f1/57/eb/f157ebe3-81ce-1480-0d66-2a7efc949b96/mzaf_3068942405661016006.plus.aac.p.m4a",
+      "credit": "Destiny's Child: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/say-my-name/266809606?i=266809802&uo=4",
+      "apple": {
+       "trackId": 266809802,
+       "url": "https://music.apple.com/us/album/say-my-name/266809606?i=266809802&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music125/v4/c9/29/74/c92974ce-2bdd-4b86-a261-01adc901bb65/mzi.cmambura.jpg/300x300bb.jpg",
+       "term": "Destiny's Child Say My Name"
+      },
+      "dur": 30,
+      "title": "Say My Name"
+     },
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/9e/95/68/9e956830-e466-64b0-e719-546d815ef2c5/mzaf_6331976939945965822.plus.aac.p.m4a",
+      "credit": "Destiny's Child: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/survivor/217363241?i=217363250&uo=4",
+      "apple": {
+       "trackId": 217363250,
+       "url": "https://music.apple.com/us/album/survivor/217363241?i=217363250&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music/67/1c/f9/mzi.giffxgjz.jpg/300x300bb.jpg",
+       "term": "Destiny's Child Survivor"
+      },
+      "dur": 30,
+      "title": "Survivor"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "coldplay",
+   "name": "Coldplay",
+   "group": "2000s",
+   "facts": {
+    "origin": "UK",
+    "decade": "2000s",
+    "songs": "Yellow · Viva la Vida · Fix You"
+   },
+   "blurb": "Coldplay (UK), breakthrough in the 2000s. Known for \"Yellow\" and \"Viva la Vida\" and \"Fix You\".",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/66/f3/1a/66f31a76-a6ed-cb4c-f353-23310a7ae9a8/mzaf_10593596652344378873.plus.aac.p.m4a",
+      "credit": "Coldplay: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/yellow/1122782080?i=1122782283&uo=4",
+      "apple": {
+       "trackId": 1122782283,
+       "url": "https://music.apple.com/us/album/yellow/1122782080?i=1122782283&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/f5/93/8c/f5938c49-964c-31d1-4b33-78b634f71fb7/190295978075.jpg/300x300bb.jpg",
+       "term": "Coldplay Yellow"
+      },
+      "dur": 30,
+      "title": "Yellow"
+     },
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/b0/19/60/b0196060-7786-24c0-8c56-8f628fe89f52/mzaf_12479456646715449366.plus.aac.p.m4a",
+      "credit": "Coldplay: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/viva-la-vida/1122773394?i=1122773680&uo=4",
+      "apple": {
+       "trackId": 1122773680,
+       "url": "https://music.apple.com/us/album/viva-la-vida/1122773394?i=1122773680&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/52/aa/85/52aa851f-15b7-6322-f91f-df84b15b7b19/190295978044.jpg/300x300bb.jpg",
+       "term": "Coldplay Viva La Vida"
+      },
+      "dur": 30,
+      "title": "Viva la Vida"
+     },
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/e5/42/e3/e542e340-a45c-695e-e0b8-6155e222ebc0/mzaf_14955746616030397665.plus.aac.p.m4a",
+      "credit": "Coldplay: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/fix-you/1123076757?i=1123076826&uo=4",
+      "apple": {
+       "trackId": 1123076826,
+       "url": "https://music.apple.com/us/album/fix-you/1123076757?i=1123076826&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/0c/82/48/0c8248a8-4a5b-d30d-8056-f32d650d2fc9/190295978068.jpg/300x300bb.jpg",
+       "term": "Coldplay Fix You"
+      },
+      "dur": 30,
+      "title": "Fix You"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "beyonce",
+   "name": "Beyoncé",
+   "group": "2000s",
+   "facts": {
+    "origin": "US",
+    "decade": "2000s",
+    "songs": "Crazy in Love · Single Ladies (Put a Ring on It) · Halo"
+   },
+   "blurb": "Beyoncé (US), breakthrough in the 2000s. Known for \"Crazy in Love\" and \"Single Ladies (Put a Ring on It)\" and \"Halo\".",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/7a/7f/b3/7a7fb397-c707-f7a6-93be-1db3cd1c7fcb/mzaf_10719026518601275807.plus.aac.p.m4a",
+      "credit": "Beyoncé: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/crazy-in-love-feat-ja%C3%BF-z/201274359?i=201274644&uo=4",
+      "apple": {
+       "trackId": 201274644,
+       "url": "https://music.apple.com/us/album/crazy-in-love-feat-ja%C3%BF-z/201274359?i=201274644&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music/03/c5/d4/mzi.ldvrmhxt.jpg/300x300bb.jpg",
+       "term": "Beyoncé Crazy in Love"
+      },
+      "dur": 30,
+      "title": "Crazy in Love"
+     },
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/3b/27/a3/3b27a332-48ee-a5b1-1ce5-4b067850f6e6/mzaf_7719939820293883536.plus.aac.p.m4a",
+      "credit": "Beyoncé: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/single-ladies-put-a-ring-on-it/296016891?i=296016899&uo=4",
+      "apple": {
+       "trackId": 296016899,
+       "url": "https://music.apple.com/us/album/single-ladies-put-a-ring-on-it/296016891?i=296016899&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music125/v4/35/0f/55/350f55da-2104-162a-5872-cb35fef30410/mzi.morbeoaw.jpg/300x300bb.jpg",
+       "term": "Beyoncé Single Ladies"
+      },
+      "dur": 30,
+      "title": "Single Ladies (Put a Ring on It)"
+     },
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/bc/cf/16/bccf164e-fa68-11c2-5e03-f87ca8e6e637/mzaf_13683091017583481694.plus.aac.p.m4a",
+      "credit": "Beyoncé: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/halo/296016891?i=296016893&uo=4",
+      "apple": {
+       "trackId": 296016893,
+       "url": "https://music.apple.com/us/album/halo/296016891?i=296016893&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music125/v4/35/0f/55/350f55da-2104-162a-5872-cb35fef30410/mzi.morbeoaw.jpg/300x300bb.jpg",
+       "term": "Beyoncé Halo"
+      },
+      "dur": 30,
+      "title": "Halo"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "alicia-keys",
+   "name": "Alicia Keys",
+   "group": "2000s",
+   "facts": {
+    "origin": "US",
+    "decade": "2000s",
+    "songs": "Fallin' · No One"
+   },
+   "blurb": "Alicia Keys (US), breakthrough in the 2000s. Known for \"Fallin'\" and \"No One\".",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/39/22/91/392291b5-39f1-8189-3a9b-924361e70776/mzaf_5017281125172140671.plus.aac.p.m4a",
+      "credit": "Alicia Keys: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/fallin/256936779?i=256937038&uo=4",
+      "apple": {
+       "trackId": 256937038,
+       "url": "https://music.apple.com/us/album/fallin/256936779?i=256937038&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music125/v4/bb/4d/55/bb4d552c-04d8-29ba-1b41-6ff8bcd199a5/808132000222.jpg/300x300bb.jpg",
+       "term": "Alicia Keys Fallin'"
+      },
+      "dur": 30,
+      "title": "Fallin'"
+     },
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/ef/30/f2/ef30f2cf-b3bf-752f-5809-cadaf1a15fe3/mzaf_18259142165614061591.plus.aac.p.m4a",
+      "credit": "Alicia Keys: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/no-one/294461785?i=294461792&uo=4",
+      "apple": {
+       "trackId": 294461792,
+       "url": "https://music.apple.com/us/album/no-one/294461785?i=294461792&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music114/v4/c7/88/df/c788dffe-d06f-8923-ad61-a6194daf6616/888880809919.jpg/300x300bb.jpg",
+       "term": "Alicia Keys No One"
+      },
+      "dur": 30,
+      "title": "No One"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "linkin-park",
+   "name": "Linkin Park",
+   "group": "2000s",
+   "facts": {
+    "origin": "US",
+    "decade": "2000s",
+    "songs": "In the End · Numb"
+   },
+   "blurb": "Linkin Park (US), breakthrough in the 2000s. Known for \"In the End\" and \"Numb\".",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/d9/33/34/d933341d-ba95-dc3b-11a3-34d6632dd62e/mzaf_10942671303595386057.plus.aac.p.m4a",
+      "credit": "Linkin Park: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/in-the-end/590431776?i=590431785&uo=4",
+      "apple": {
+       "trackId": 590431785,
+       "url": "https://music.apple.com/us/album/in-the-end/590431776?i=590431785&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/53/a7/7f/53a77fab-c54c-a57b-8130-248fc12d0c80/093624948995.jpg/300x300bb.jpg",
+       "term": "LINKIN PARK In the End"
+      },
+      "dur": 30,
+      "title": "In the End"
+     },
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/1f/9d/28/1f9d2810-2ac3-efbd-ef02-623691ff9cd2/mzaf_17560018091772095942.plus.aac.p.m4a",
+      "credit": "Linkin Park: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/numb/590423275?i=590423552&uo=4",
+      "apple": {
+       "trackId": 590423552,
+       "url": "https://music.apple.com/us/album/numb/590423275?i=590423552&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/13/44/05/134405bd-9e27-a678-8953-b5f724201f95/093624948988.jpg/300x300bb.jpg",
+       "term": "LINKIN PARK Numb"
+      },
+      "dur": 30,
+      "title": "Numb"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "usher",
+   "name": "Usher",
+   "group": "1990s",
+   "facts": {
+    "origin": "US",
+    "decade": "1990s",
+    "songs": "Yeah! · OMG"
+   },
+   "blurb": "Usher (US), breakthrough in the 1990s. Known for \"Yeah!\" and \"OMG\".",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/94/52/3c/94523c88-f5f9-16f4-dbd7-f284ca168048/mzaf_7184891920196479048.plus.aac.p.m4a",
+      "credit": "Usher: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/yeah-feat-lil-jon-ludacris/386153476?i=386153478&uo=4",
+      "apple": {
+       "trackId": 386153478,
+       "url": "https://music.apple.com/us/album/yeah-feat-lil-jon-ludacris/386153476?i=386153478&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music125/v4/02/c6/e1/02c6e1cd-8d57-97b4-6ef1-77d2be004509/mzi.sjrqsmrq.jpg/300x300bb.jpg",
+       "term": "USHER Yeah!"
+      },
+      "dur": 30,
+      "title": "Yeah!"
+     },
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/b1/7b/69/b17b692c-d579-04aa-508a-df047319ec09/mzaf_16901101324230822409.plus.aac.p.m4a",
+      "credit": "Usher: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/omg-feat-will-i-am/923691585?i=923691591&uo=4",
+      "apple": {
+       "trackId": 923691591,
+       "url": "https://music.apple.com/us/album/omg-feat-will-i-am/923691585?i=923691591&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music125/v4/20/74/2d/20742d10-aae0-7a0c-0509-e8f611be5787/884977705362.jpg/300x300bb.jpg",
+       "term": "USHER Omg"
+      },
+      "dur": 30,
+      "title": "OMG"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "the-killers",
+   "name": "The Killers",
+   "group": "2000s",
+   "facts": {
+    "origin": "US",
+    "decade": "2000s",
+    "songs": "Mr. Brightside · Somebody Told Me"
+   },
+   "blurb": "The Killers (US), breakthrough in the 2000s. Known for \"Mr. Brightside\" and \"Somebody Told Me\".",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/5b/17/4e/5b174e80-1047-7214-1077-d822ba1f9520/mzaf_5975692497663881329.plus.aac.p.m4a",
+      "credit": "The Killers: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/mr-brightside/1526194184?i=1526194192&uo=4",
+      "apple": {
+       "trackId": 1526194192,
+       "url": "https://music.apple.com/us/album/mr-brightside/1526194184?i=1526194192&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music116/v4/07/1a/5a/071a5aee-6e42-060c-35b9-6a6e45b9ea59/06UMGIM10441.rgb.jpg/300x300bb.jpg",
+       "term": "The Killers Mr. Brightside"
+      },
+      "dur": 30,
+      "title": "Mr. Brightside"
+     },
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/63/87/bc/6387bc94-49fa-5511-43f4-ed6ee8fe0b4d/mzaf_13833190007925520351.plus.aac.p.m4a",
+      "credit": "The Killers: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/somebody-told-me/1526194184?i=1526194195&uo=4",
+      "apple": {
+       "trackId": 1526194195,
+       "url": "https://music.apple.com/us/album/somebody-told-me/1526194184?i=1526194195&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music116/v4/07/1a/5a/071a5aee-6e42-060c-35b9-6a6e45b9ea59/06UMGIM10441.rgb.jpg/300x300bb.jpg",
+       "term": "The Killers Somebody Told Me"
+      },
+      "dur": 30,
+      "title": "Somebody Told Me"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "amy-winehouse",
+   "name": "Amy Winehouse",
+   "group": "2000s",
+   "facts": {
+    "origin": "UK",
+    "decade": "2000s",
+    "songs": "Rehab · Back to Black"
+   },
+   "blurb": "Amy Winehouse (UK), breakthrough in the 2000s. Known for \"Rehab\" and \"Back to Black\".",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/c0/7f/37/c07f37f1-a8e1-b093-f643-9e3bae02589b/mzaf_10374144630525520706.plus.aac.p.m4a",
+      "credit": "Amy Winehouse: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/rehab/1422677780?i=1422677781&uo=4",
+      "apple": {
+       "trackId": 1422677781,
+       "url": "https://music.apple.com/us/album/rehab/1422677780?i=1422677781&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music112/v4/5a/72/3f/5a723fec-965d-3483-89f8-d66b79f88419/15UMGIM24224.rgb.jpg/300x300bb.jpg",
+       "term": "Amy Winehouse Rehab"
+      },
+      "dur": 30,
+      "title": "Rehab"
+     },
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/e2/d7/bf/e2d7bffb-affd-eae0-dcb8-a47ba2bba259/mzaf_4498279717793174345.plus.aac.p.m4a",
+      "credit": "Amy Winehouse: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/back-to-black/1440856219?i=1440856228&uo=4",
+      "apple": {
+       "trackId": 1440856228,
+       "url": "https://music.apple.com/us/album/back-to-black/1440856219?i=1440856228&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music112/v4/cf/3f/09/cf3f0994-980d-d8ed-088d-ae89af256b73/15UMGIM24224.rgb.jpg/300x300bb.jpg",
+       "term": "Amy Winehouse Back to Black"
+      },
+      "dur": 30,
+      "title": "Back to Black"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "arctic-monkeys",
+   "name": "Arctic Monkeys",
+   "group": "2000s",
+   "facts": {
+    "origin": "UK",
+    "decade": "2000s",
+    "songs": "I Bet You Look Good on the Dancefloor · Do I Wanna Know?"
+   },
+   "blurb": "Arctic Monkeys (UK), breakthrough in the 2000s. Known for \"I Bet You Look Good on the Dancefloor\" and \"Do I Wanna Know?\".",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/fe/1e/04/fe1e0418-bb71-7d68-d54b-1cb7a65eb89b/mzaf_17247549451194532748.plus.aac.p.m4a",
+      "credit": "Arctic Monkeys: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/i-bet-you-look-good-on-the-dancefloor/111153953?i=111153391&uo=4",
+      "apple": {
+       "trackId": 111153391,
+       "url": "https://music.apple.com/us/album/i-bet-you-look-good-on-the-dancefloor/111153953?i=111153391&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Features125/v4/cf/9b/96/cf9b9637-f619-eceb-5382-e9b4d44e74fb/dj.npwkgmai.jpg/300x300bb.jpg",
+       "term": "Arctic Monkeys I Bet You Look Good on the Dancefloor"
+      },
+      "dur": 30,
+      "title": "I Bet You Look Good on the Dancefloor"
+     },
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/89/ae/42/89ae4206-048a-7eae-3eaf-c3abd02914fb/mzaf_15551176804491638370.plus.aac.p.m4a",
+      "credit": "Arctic Monkeys: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/do-i-wanna-know/663097964?i=663097965&uo=4",
+      "apple": {
+       "trackId": 663097965,
+       "url": "https://music.apple.com/us/album/do-i-wanna-know/663097964?i=663097965&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/69/9c/b5/699cb5d6-115c-ff73-9d26-e57ea4350d72/887828031795.png/300x300bb.jpg",
+       "term": "Arctic Monkeys Do I Wanna Know?"
+      },
+      "dur": 30,
+      "title": "Do I Wanna Know?"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "daft-punk",
+   "name": "Daft Punk",
+   "group": "1990s",
+   "facts": {
+    "origin": "France",
+    "decade": "1990s",
+    "songs": "Get Lucky · One More Time"
+   },
+   "blurb": "Daft Punk (France), breakthrough in the 1990s. Known for \"Get Lucky\" and \"One More Time\".",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/57/a5/85/57a585aa-f1bc-7619-881b-f8a04a5541d5/mzaf_6906185026678279401.plus.aac.p.m4a",
+      "credit": "Daft Punk: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/get-lucky/617154241?i=617154366&uo=4",
+      "apple": {
+       "trackId": 617154366,
+       "url": "https://music.apple.com/us/album/get-lucky/617154241?i=617154366&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/e8/43/5f/e8435ffa-b6b9-b171-40ab-4ff3959ab661/886443919266.jpg/300x300bb.jpg",
+       "term": "Daft Punk, Pharrell Williams & Nile Rodgers Get Lucky"
+      },
+      "dur": 30,
+      "title": "Get Lucky"
+     },
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/5d/93/d8/5d93d83f-ad1e-da4d-1d79-9937bdff24ec/mzaf_14396932211949300852.plus.aac.p.m4a",
+      "credit": "Daft Punk: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/one-more-time/697194953?i=697195462&uo=4",
+      "apple": {
+       "trackId": 697195462,
+       "url": "https://music.apple.com/us/album/one-more-time/697194953?i=697195462&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/fd/4a/77/fd4a77db-0ebc-d043-41a2-f32fa1bb0fb4/dj.qrikkdwj.jpg/300x300bb.jpg",
+       "term": "Daft Punk One More Time"
+      },
+      "dur": 30,
+      "title": "One More Time"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "rihanna",
+   "name": "Rihanna",
+   "group": "2000s",
+   "facts": {
+    "origin": "Barbados",
+    "decade": "2000s",
+    "songs": "Umbrella · Diamonds · We Found Love"
+   },
+   "blurb": "Rihanna (Barbados), breakthrough in the 2000s. Known for \"Umbrella\" and \"Diamonds\" and \"We Found Love\".",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/7b/45/22/7b452241-882c-409b-3a9b-23306b14286a/mzaf_8588243939716013218.plus.aac.p.m4a",
+      "credit": "Rihanna: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/umbrella-feat-ja%C3%BF-z/1441154435?i=1441154437&uo=4",
+      "apple": {
+       "trackId": 1441154437,
+       "url": "https://music.apple.com/us/album/umbrella-feat-ja%C3%BF-z/1441154435?i=1441154437&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music126/v4/2b/c0/81/2bc081c8-25f0-ba43-d451-587a54613778/16UMGIM59202.rgb.jpg/300x300bb.jpg",
+       "term": "Rihanna Umbrella"
+      },
+      "dur": 30,
+      "title": "Umbrella"
+     },
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/26/97/fb/2697fb36-8ef2-9d18-0a2e-6545947b4445/mzaf_9032202105098805603.plus.aac.p.m4a",
+      "credit": "Rihanna: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/diamonds/1444320940?i=1444321282&uo=4",
+      "apple": {
+       "trackId": 1444321282,
+       "url": "https://music.apple.com/us/album/diamonds/1444320940?i=1444321282&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music116/v4/a0/1a/10/a01a1080-7b1d-e475-a03c-394e5cbba66c/12UMGIM53876.rgb.jpg/300x300bb.jpg",
+       "term": "Rihanna Diamonds"
+      },
+      "dur": 30,
+      "title": "Diamonds"
+     },
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/b0/4a/30/b04a30d4-edb9-a31c-2a0d-255c9c0a1b23/mzaf_6763945702626450264.plus.aac.p.m4a",
+      "credit": "Rihanna: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/we-found-love-feat-calvin-harris/1440758930?i=1440758945&uo=4",
+      "apple": {
+       "trackId": 1440758945,
+       "url": "https://music.apple.com/us/album/we-found-love-feat-calvin-harris/1440758930?i=1440758945&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music116/v4/74/23/7b/74237b93-8346-5fe1-b1eb-938808910c5d/11UMGIM38936.rgb.jpg/300x300bb.jpg",
+       "term": "Rihanna We Found Love"
+      },
+      "dur": 30,
+      "title": "We Found Love"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "lady-gaga",
+   "name": "Lady Gaga",
+   "group": "2000s",
+   "facts": {
+    "origin": "US",
+    "decade": "2000s",
+    "songs": "Poker Face · Bad Romance · Shallow"
+   },
+   "blurb": "Lady Gaga (US), breakthrough in the 2000s. Known for \"Poker Face\" and \"Bad Romance\" and \"Shallow\".",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/85/de/66/85de66c6-7a1e-6127-6488-16a6e8a2ea54/mzaf_15210367739878536717.plus.aac.p.m4a",
+      "credit": "Lady Gaga: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/gb/album/poker-face/1445860346?i=1445860576&uo=4",
+      "apple": {
+       "trackId": 1445860576,
+       "url": "https://music.apple.com/gb/album/poker-face/1445860346?i=1445860576&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music116/v4/1b/35/8d/1b358d76-329d-d98e-db68-a0e4ec4038cb/11UMGIM03647.rgb.jpg/300x300bb.jpg",
+       "term": "Lady Gaga Poker Face"
+      },
+      "dur": 30,
+      "title": "Poker Face"
+     },
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/3e/3d/5f/3e3d5f8b-2b31-45ef-81bf-4577603abeed/mzaf_2887026754624356956.plus.aac.p.m4a",
+      "credit": "Lady Gaga: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/bad-romance/1476095083?i=1476095084&uo=4",
+      "apple": {
+       "trackId": 1476095084,
+       "url": "https://music.apple.com/us/album/bad-romance/1476095083?i=1476095084&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/1f/25/c4/1f25c4bf-7f7a-ff26-8769-20ab6052dadf/09UMGIM40719.rgb.jpg/300x300bb.jpg",
+       "term": "Lady Gaga Bad Romance"
+      },
+      "dur": 30,
+      "title": "Bad Romance"
+     },
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/0c/cc/ed/0ccced59-6e6f-f0a0-0c9a-d20bfd475052/mzaf_26600833784075363.plus.aac.p.m4a",
+      "credit": "Lady Gaga: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/shallow/1434371867?i=1434371887&uo=4",
+      "apple": {
+       "trackId": 1434371887,
+       "url": "https://music.apple.com/us/album/shallow/1434371867?i=1434371887&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/b1/9f/ef/b19fef51-79de-a940-e8ab-9e4e07b04d96/18UMGIM53752.rgb.jpg/300x300bb.jpg",
+       "term": "Lady Gaga & Bradley Cooper Shallow"
+      },
+      "dur": 30,
+      "title": "Shallow"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "katy-perry",
+   "name": "Katy Perry",
+   "group": "2000s",
+   "facts": {
+    "origin": "US",
+    "decade": "2000s",
+    "songs": "Roar · Firework"
+   },
+   "blurb": "Katy Perry (US), breakthrough in the 2000s. Known for \"Roar\" and \"Firework\".",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/21/a8/76/21a87607-1fe3-2bd2-753c-0b4b73c22b90/mzaf_9666996724668759977.plus.aac.p.m4a",
+      "credit": "Katy Perry: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/roar/1440818542?i=1440818897&uo=4",
+      "apple": {
+       "trackId": 1440818897,
+       "url": "https://music.apple.com/us/album/roar/1440818542?i=1440818897&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/36/21/81/36218129-51b4-df22-cafb-8e9503b53147/13UAAIM70445.rgb.jpg/300x300bb.jpg",
+       "term": "Katy Perry Roar"
+      },
+      "dur": 30,
+      "title": "Roar"
+     },
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/ab/27/3b/ab273b22-1eb1-dd49-5332-5ef70c35683b/mzaf_4912325324633099647.plus.aac.p.m4a",
+      "credit": "Katy Perry: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/firework/716192216?i=716192625&uo=4",
+      "apple": {
+       "trackId": 716192625,
+       "url": "https://music.apple.com/us/album/firework/716192216?i=716192625&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music116/v4/c8/d3/42/c8d342af-26d9-3ec2-c511-e1eaf860e299/13UABIM57787.rgb.jpg/300x300bb.jpg",
+       "term": "Katy Perry Firework"
+      },
+      "dur": 30,
+      "title": "Firework"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "taylor-swift",
+   "name": "Taylor Swift",
+   "group": "2000s",
+   "facts": {
+    "origin": "US",
+    "decade": "2000s",
+    "songs": "Shake It Off · Love Story · Anti-Hero"
+   },
+   "blurb": "Taylor Swift (US), breakthrough in the 2000s. Known for \"Shake It Off\" and \"Love Story\" and \"Anti-Hero\".",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/11/d5/6d/11d56d4a-ce23-e793-8681-70dc4d35d931/mzaf_5886436202259848624.plus.aac.p.m4a",
+      "credit": "Taylor Swift: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/shake-it-off/1440933512?i=1440933651&uo=4",
+      "apple": {
+       "trackId": 1440933651,
+       "url": "https://music.apple.com/us/album/shake-it-off/1440933512?i=1440933651&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/a7/98/d8/a798d867-344d-2bf2-fbfe-d2d1412dcef8/14UMDIM03793.rgb.jpg/300x300bb.jpg",
+       "term": "Taylor Swift Shake It Off"
+      },
+      "dur": 30,
+      "title": "Shake It Off"
+     },
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/44/8a/a4/448aa432-42ae-8075-fe00-5f2deffe9896/mzaf_13232029737890307916.plus.aac.p.m4a",
+      "credit": "Taylor Swift: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/love-story/1440924803?i=1440924808&uo=4",
+      "apple": {
+       "trackId": 1440924808,
+       "url": "https://music.apple.com/us/album/love-story/1440924803?i=1440924808&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/cb/6e/a7/cb6ea70a-6cb8-89a0-4da7-91e2d04a7bba/08PNDIM05386.rgb.jpg/300x300bb.jpg",
+       "term": "Taylor Swift Love Story"
+      },
+      "dur": 30,
+      "title": "Love Story"
+     },
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/1d/56/2a/1d562a07-dc5f-a9c0-1f36-2051a8c14eb7/mzaf_7214829135431340590.plus.aac.p.m4a",
+      "credit": "Taylor Swift: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/anti-hero/1649434004?i=1649434293&uo=4",
+      "apple": {
+       "trackId": 1649434293,
+       "url": "https://music.apple.com/us/album/anti-hero/1649434004?i=1649434293&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music112/v4/3d/01/f2/3d01f2e5-5a08-835f-3d30-d031720b2b80/22UM1IM07364.rgb.jpg/300x300bb.jpg",
+       "term": "Taylor Swift Anti-Hero"
+      },
+      "dur": 30,
+      "title": "Anti-Hero"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "bruno-mars",
+   "name": "Bruno Mars",
+   "group": "2010s",
+   "facts": {
+    "origin": "US",
+    "decade": "2010s",
+    "songs": "Just the Way You Are · Grenade · Locked Out of Heaven"
+   },
+   "blurb": "Bruno Mars (US), breakthrough in the 2010s. Known for \"Just the Way You Are\" and \"Grenade\" and \"Locked Out of Heaven\".",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/04/c9/ee/04c9eeea-24ca-2198-17ea-c1c1436cb953/mzaf_16637738980836746910.plus.aac.p.m4a",
+      "credit": "Bruno Mars: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/just-the-way-you-are/576654788?i=576655095&uo=4",
+      "apple": {
+       "trackId": 576655095,
+       "url": "https://music.apple.com/us/album/just-the-way-you-are/576654788?i=576655095&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music114/v4/52/b1/45/52b1452b-229e-78db-231b-7b43fa0077cc/075679956491.jpg/300x300bb.jpg",
+       "term": "Bruno Mars Just the Way You Are"
+      },
+      "dur": 30,
+      "title": "Just the Way You Are"
+     },
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/56/70/01/567001be-26a3-6c61-cfe2-8184800dc347/mzaf_12349500431513219850.plus.aac.p.m4a",
+      "credit": "Bruno Mars: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/grenade/576654788?i=576655094&uo=4",
+      "apple": {
+       "trackId": 576655094,
+       "url": "https://music.apple.com/us/album/grenade/576654788?i=576655094&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music114/v4/52/b1/45/52b1452b-229e-78db-231b-7b43fa0077cc/075679956491.jpg/300x300bb.jpg",
+       "term": "Bruno Mars Grenade"
+      },
+      "dur": 30,
+      "title": "Grenade"
+     },
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/d5/05/04/d5050434-1278-6b8e-9cd8-6261ea319fd1/mzaf_9746689865251353718.plus.aac.p.m4a",
+      "credit": "Bruno Mars: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/locked-out-of-heaven/573962245?i=573962551&uo=4",
+      "apple": {
+       "trackId": 573962551,
+       "url": "https://music.apple.com/us/album/locked-out-of-heaven/573962245?i=573962551&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/e0/a4/7c/e0a47c6f-005a-9f9f-ce29-8e858e2bcfcb/075679957283.jpg/300x300bb.jpg",
+       "term": "Bruno Mars Locked Out of Heaven"
+      },
+      "dur": 30,
+      "title": "Locked Out of Heaven"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "adele",
+   "name": "Adele",
+   "group": "2000s",
+   "facts": {
+    "origin": "UK",
+    "decade": "2000s",
+    "songs": "Rolling in the Deep · Someone Like You · Hello"
+   },
+   "blurb": "Adele (UK), breakthrough in the 2000s. Known for \"Rolling in the Deep\" and \"Someone Like You\" and \"Hello\".",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/4c/4f/03/4c4f032a-3d2b-853d-da81-996602355b42/mzaf_11625850023134180491.plus.aac.p.m4a",
+      "credit": "Adele: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/rolling-in-the-deep/1544491232?i=1544491233&uo=4",
+      "apple": {
+       "trackId": 1544491233,
+       "url": "https://music.apple.com/us/album/rolling-in-the-deep/1544491232?i=1544491233&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/eb/ca/25/ebca2596-cd1e-b295-91a3-771c868d0a79/191404113868.png/300x300bb.jpg",
+       "term": "Adele Rolling in the Deep"
+      },
+      "dur": 30,
+      "title": "Rolling in the Deep"
+     },
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/08/22/2e/08222e25-43f5-20e6-a442-b8127ac83368/mzaf_1689070223363740216.plus.aac.p.m4a",
+      "credit": "Adele: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/someone-like-you/1544491232?i=1544491998&uo=4",
+      "apple": {
+       "trackId": 1544491998,
+       "url": "https://music.apple.com/us/album/someone-like-you/1544491232?i=1544491998&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/eb/ca/25/ebca2596-cd1e-b295-91a3-771c868d0a79/191404113868.png/300x300bb.jpg",
+       "term": "Adele Someone Like You"
+      },
+      "dur": 30,
+      "title": "Someone Like You"
+     },
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/10/7e/9d/107e9dc0-c13b-eace-2486-84a3c694b075/mzaf_6267923862748965591.plus.aac.p.m4a",
+      "credit": "Adele: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/hello/1544494115?i=1544494392&uo=4",
+      "apple": {
+       "trackId": 1544494392,
+       "url": "https://music.apple.com/us/album/hello/1544494115?i=1544494392&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music116/v4/08/8c/24/088c2405-2e33-801b-5c38-e967f2c01e69/191404113974.png/300x300bb.jpg",
+       "term": "Adele Hello"
+      },
+      "dur": 30,
+      "title": "Hello"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "ed-sheeran",
+   "name": "Ed Sheeran",
+   "group": "2010s",
+   "facts": {
+    "origin": "UK",
+    "decade": "2010s",
+    "songs": "Shape of You · Perfect · Thinking Out Loud"
+   },
+   "blurb": "Ed Sheeran (UK), breakthrough in the 2010s. Known for \"Shape of You\" and \"Perfect\" and \"Thinking Out Loud\".",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/44/c7/4f/44c74f0d-72dc-6143-d4d0-ba14d661ca0d/mzaf_9566898362556366703.plus.aac.p.m4a",
+      "credit": "Ed Sheeran: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/shape-of-you/1193701079?i=1193701392&uo=4",
+      "apple": {
+       "trackId": 1193701392,
+       "url": "https://music.apple.com/us/album/shape-of-you/1193701079?i=1193701392&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/15/e6/e8/15e6e8a4-4190-6a8b-86c3-ab4a51b88288/190295851286.jpg/300x300bb.jpg",
+       "term": "Ed Sheeran Shape of You"
+      },
+      "dur": 30,
+      "title": "Shape of You"
+     },
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/c7/ba/bc/c7babc66-f598-aaa6-bcf6-307281795817/mzaf_16337361235117168274.plus.aac.p.m4a",
+      "credit": "Ed Sheeran: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/perfect/1193701079?i=1193701400&uo=4",
+      "apple": {
+       "trackId": 1193701400,
+       "url": "https://music.apple.com/us/album/perfect/1193701079?i=1193701400&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/15/e6/e8/15e6e8a4-4190-6a8b-86c3-ab4a51b88288/190295851286.jpg/300x300bb.jpg",
+       "term": "Ed Sheeran Perfect"
+      },
+      "dur": 30,
+      "title": "Perfect"
+     },
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/78/a5/f2/78a5f25e-ad1b-718d-82ad-b82e676c1855/mzaf_6133970271589343093.plus.aac.p.m4a",
+      "credit": "Ed Sheeran: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/thinking-out-loud/1050204616?i=1050204631&uo=4",
+      "apple": {
+       "trackId": 1050204631,
+       "url": "https://music.apple.com/us/album/thinking-out-loud/1050204616?i=1050204631&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music125/v4/2d/36/f9/2d36f9a7-2c3e-ce0f-7fb6-036feecb221f/825646974450.jpg/300x300bb.jpg",
+       "term": "Ed Sheeran Thinking Out Loud"
+      },
+      "dur": 30,
+      "title": "Thinking Out Loud"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "justin-bieber",
+   "name": "Justin Bieber",
+   "group": "2000s",
+   "facts": {
+    "origin": "Canada",
+    "decade": "2000s",
+    "songs": "Baby · Sorry · Love Yourself"
+   },
+   "blurb": "Justin Bieber (Canada), breakthrough in the 2000s. Known for \"Baby\" and \"Sorry\" and \"Love Yourself\".",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/89/66/d3/8966d3cb-68eb-5f2c-fef8-4ac420721387/mzaf_3044382270474258872.plus.aac.p.m4a",
+      "credit": "Justin Bieber: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/baby-feat-ludacris/1440661543?i=1440661545&uo=4",
+      "apple": {
+       "trackId": 1440661545,
+       "url": "https://music.apple.com/us/album/baby-feat-ludacris/1440661543?i=1440661545&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music116/v4/b9/0a/b4/b90ab45a-07b1-0bcc-331c-c496a21d07e4/10UMGIM01134.rgb.jpg/300x300bb.jpg",
+       "term": "Justin Bieber Baby"
+      },
+      "dur": 30,
+      "title": "Baby"
+     },
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/66/eb/29/66eb29c0-c2f9-d9df-8af3-3bf2562c9d7c/mzaf_4099789285264521999.plus.aac.p.m4a",
+      "credit": "Justin Bieber: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/sorry/1440829460?i=1440829610&uo=4",
+      "apple": {
+       "trackId": 1440829610,
+       "url": "https://music.apple.com/us/album/sorry/1440829460?i=1440829610&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music116/v4/75/11/84/751184b0-77df-1eff-bb20-dac03247425d/15UMGIM59808.rgb.jpg/300x300bb.jpg",
+       "term": "Justin Bieber Sorry"
+      },
+      "dur": 30,
+      "title": "Sorry"
+     },
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/b6/fc/58/b6fc5860-ee45-7966-3e22-d6445acc933e/mzaf_1716189482689106429.plus.aac.p.m4a",
+      "credit": "Justin Bieber: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/love-yourself/1440829460?i=1440829613&uo=4",
+      "apple": {
+       "trackId": 1440829613,
+       "url": "https://music.apple.com/us/album/love-yourself/1440829460?i=1440829613&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music116/v4/75/11/84/751184b0-77df-1eff-bb20-dac03247425d/15UMGIM59808.rgb.jpg/300x300bb.jpg",
+       "term": "Justin Bieber Love Yourself"
+      },
+      "dur": 30,
+      "title": "Love Yourself"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "drake",
+   "name": "Drake",
+   "group": "2010s",
+   "facts": {
+    "origin": "Canada",
+    "decade": "2010s",
+    "songs": "Hotline Bling · God's Plan"
+   },
+   "blurb": "Drake (Canada), breakthrough in the 2010s. Known for \"Hotline Bling\" and \"God's Plan\".",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/73/56/5c/73565c27-16d4-1f8a-ec12-77616e3ca05d/mzaf_9178247693050174633.plus.aac.p.m4a",
+      "credit": "Drake: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/hotline-bling/1440841363?i=1440841730&uo=4",
+      "apple": {
+       "trackId": 1440841730,
+       "url": "https://music.apple.com/us/album/hotline-bling/1440841363?i=1440841730&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/f2/0d/8b/f20d8bff-a927-ae98-6784-20a1f51cb23e/16UMGIM27642.rgb.jpg/300x300bb.jpg",
+       "term": "Drake Hotline Bling"
+      },
+      "dur": 30,
+      "title": "Hotline Bling"
+     },
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/c6/4a/be/c64abe74-adb4-cff5-005d-0fab3d72a806/mzaf_10276154697254415719.plus.aac.p.m4a",
+      "credit": "Drake: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/gods-plan/1406109769?i=1406109863&uo=4",
+      "apple": {
+       "trackId": 1406109863,
+       "url": "https://music.apple.com/us/album/gods-plan/1406109769?i=1406109863&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/bb/6d/8f/bb6d8f67-6d04-10b5-dd62-eb5809ac54fc/00602567879152.rgb.jpg/300x300bb.jpg",
+       "term": "Drake God's Plan"
+      },
+      "dur": 30,
+      "title": "God's Plan"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "imagine-dragons",
+   "name": "Imagine Dragons",
+   "group": "2010s",
+   "facts": {
+    "origin": "US",
+    "decade": "2010s",
+    "songs": "Radioactive · Believer"
+   },
+   "blurb": "Imagine Dragons (US), breakthrough in the 2010s. Known for \"Radioactive\" and \"Believer\".",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/77/70/88/777088e9-60a1-c459-bfa5-6e66f2fd2695/mzaf_7685408661765681881.plus.aac.p.m4a",
+      "credit": "Imagine Dragons: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/radioactive/1440873107?i=1440873126&uo=4",
+      "apple": {
+       "trackId": 1440873126,
+       "url": "https://music.apple.com/us/album/radioactive/1440873107?i=1440873126&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music112/v4/1f/fa/09/1ffa092f-f52f-4a66-7d10-4cc5982dc747/12UMGIM46901.rgb.jpg/300x300bb.jpg",
+       "term": "Imagine Dragons Radioactive"
+      },
+      "dur": 30,
+      "title": "Radioactive"
+     },
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/c0/3f/36/c03f367a-b66b-fd0a-a54c-30f8250c4410/mzaf_12768434238801682952.plus.aac.p.m4a",
+      "credit": "Imagine Dragons: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/believer/1411625594?i=1411628233&uo=4",
+      "apple": {
+       "trackId": 1411628233,
+       "url": "https://music.apple.com/us/album/believer/1411625594?i=1411628233&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music126/v4/11/7a/b8/117ab805-6811-8929-18b9-0fad7baf0c25/17UMGIM98210.rgb.jpg/300x300bb.jpg",
+       "term": "Imagine Dragons Believer"
+      },
+      "dur": 30,
+      "title": "Believer"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "ariana-grande",
+   "name": "Ariana Grande",
+   "group": "2010s",
+   "facts": {
+    "origin": "US",
+    "decade": "2010s",
+    "songs": "thank u, next · 7 rings"
+   },
+   "blurb": "Ariana Grande (US), breakthrough in the 2010s. Known for \"thank u, next\" and \"7 rings\".",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/89/96/16/8996169e-2309-a298-f6f0-e7c52fe8e176/mzaf_590631660224715451.plus.aac.p.m4a",
+      "credit": "Ariana Grande: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/thank-u-next/1450333975?i=1450334169&uo=4",
+      "apple": {
+       "trackId": 1450334169,
+       "url": "https://music.apple.com/us/album/thank-u-next/1450333975?i=1450334169&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/bb/69/07/bb6907de-8ad4-970b-3311-121320e1bf9c/19UMGIM03691.rgb.jpg/300x300bb.jpg",
+       "term": "Ariana Grande thank u, next"
+      },
+      "dur": 30,
+      "title": "thank u, next"
+     },
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/d5/c8/f3/d5c8f31b-1c8f-93ed-e78b-8c0bce3e8b66/mzaf_14456154925680073521.plus.aac.p.m4a",
+      "credit": "Ariana Grande: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/7-rings/1450333975?i=1450334168&uo=4",
+      "apple": {
+       "trackId": 1450334168,
+       "url": "https://music.apple.com/us/album/7-rings/1450333975?i=1450334168&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/bb/69/07/bb6907de-8ad4-970b-3311-121320e1bf9c/19UMGIM03691.rgb.jpg/300x300bb.jpg",
+       "term": "Ariana Grande 7 rings"
+      },
+      "dur": 30,
+      "title": "7 rings"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "the-weeknd",
+   "name": "The Weeknd",
+   "group": "2010s",
+   "facts": {
+    "origin": "Canada",
+    "decade": "2010s",
+    "songs": "Blinding Lights · Can't Feel My Face"
+   },
+   "blurb": "The Weeknd (Canada), breakthrough in the 2010s. Known for \"Blinding Lights\" and \"Can't Feel My Face\".",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/1d/44/0d/1d440dbc-9832-08e6-080d-aa1e1bacf40c/mzaf_3600642016947675074.plus.aac.p.m4a",
+      "credit": "The Weeknd: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/blinding-lights/1505683705?i=1505683988&uo=4",
+      "apple": {
+       "trackId": 1505683988,
+       "url": "https://music.apple.com/us/album/blinding-lights/1505683705?i=1505683988&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music125/v4/03/e1/67/03e167d6-ee05-eb32-55e9-c5040f55a8bf/20UMGIM21166.rgb.jpg/300x300bb.jpg",
+       "term": "The Weeknd Blinding Lights"
+      },
+      "dur": 30,
+      "title": "Blinding Lights"
+     },
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/e0/4d/65/e04d6546-d5ae-28bf-51fa-e4e54d737c2f/mzaf_17329746342766146939.plus.aac.p.m4a",
+      "credit": "The Weeknd: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/cant-feel-my-face/1440858094?i=1440858500&uo=4",
+      "apple": {
+       "trackId": 1440858500,
+       "url": "https://music.apple.com/us/album/cant-feel-my-face/1440858094?i=1440858500&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/30/05/1e/30051e57-a63a-3acc-4b30-42568293f5f7/15UMGIM36514.rgb.jpg/300x300bb.jpg",
+       "term": "The Weeknd Can't Feel My Face"
+      },
+      "dur": 30,
+      "title": "Can't Feel My Face"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "billie-eilish",
+   "name": "Billie Eilish",
+   "group": "2010s",
+   "facts": {
+    "origin": "US",
+    "decade": "2010s",
+    "songs": "bad guy · Birds of a Feather · Ocean Eyes"
+   },
+   "blurb": "Billie Eilish (US), breakthrough in the 2010s. Known for \"bad guy\" and \"Birds of a Feather\" and \"Ocean Eyes\".",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/c3/87/1f/c3871f7e-3260-d615-1c66-5fdca2c3a48f/mzaf_10721331211699880949.plus.aac.p.m4a",
+      "credit": "Billie Eilish: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/bad-guy/1450695723?i=1450695739&uo=4",
+      "apple": {
+       "trackId": 1450695739,
+       "url": "https://music.apple.com/us/album/bad-guy/1450695723?i=1450695739&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/1a/37/d1/1a37d1b1-8508-54f2-f541-bf4e437dda76/19UMGIM05028.rgb.jpg/300x300bb.jpg",
+       "term": "Billie Eilish bad guy"
+      },
+      "dur": 30,
+      "title": "bad guy"
+     },
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/34/31/d3/3431d34e-847f-5d66-df83-0bce688d997e/mzaf_18106743962423782018.plus.aac.p.m4a",
+      "credit": "Billie Eilish: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/birds-of-a-feather/1739659134?i=1739659142&uo=4",
+      "apple": {
+       "trackId": 1739659142,
+       "url": "https://music.apple.com/us/album/birds-of-a-feather/1739659134?i=1739659142&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/92/9f/69/929f69f1-9977-3a44-d674-11f70c852d1b/24UMGIM36186.rgb.jpg/300x300bb.jpg",
+       "term": "Billie Eilish BIRDS OF A FEATHER"
+      },
+      "dur": 30,
+      "title": "Birds of a Feather"
+     },
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/8c/ad/cf/8cadcfe9-cd23-1118-661b-9672d590708c/mzaf_11533113803515788197.plus.aac.p.m4a",
+      "credit": "Billie Eilish: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/ocean-eyes/1498138558?i=1498138563&uo=4",
+      "apple": {
+       "trackId": 1498138563,
+       "url": "https://music.apple.com/us/album/ocean-eyes/1498138558?i=1498138563&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/2e/c1/e3/2ec1e3e2-12f5-2bc2-f9d5-b102d9efcb89/194491997700.jpg/300x300bb.jpg",
+       "term": "Billie Eilish Ocean Eyes"
+      },
+      "dur": 30,
+      "title": "Ocean Eyes"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "dua-lipa",
+   "name": "Dua Lipa",
+   "group": "2010s",
+   "facts": {
+    "origin": "UK",
+    "decade": "2010s",
+    "songs": "Levitating · Don't Start Now · New Rules"
+   },
+   "blurb": "Dua Lipa (UK), breakthrough in the 2010s. Known for \"Levitating\" and \"Don't Start Now\" and \"New Rules\".",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/59/dc/4d/59dc4dda-93ff-8f1c-c536-f005f6ea6af5/mzaf_3066686759813252385.plus.aac.p.m4a",
+      "credit": "Dua Lipa: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/levitating/1538003494?i=1538003843&uo=4",
+      "apple": {
+       "trackId": 1538003843,
+       "url": "https://music.apple.com/us/album/levitating/1538003494?i=1538003843&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music116/v4/6c/11/d6/6c11d681-aa3a-d59e-4c2e-f77e181026ab/190295092665.jpg/300x300bb.jpg",
+       "term": "Dua Lipa Levitating"
+      },
+      "dur": 30,
+      "title": "Levitating"
+     },
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/24/3d/34/243d3413-a0fc-b229-f54a-1715ebd3a9ca/mzaf_11578996572221800393.plus.aac.p.m4a",
+      "credit": "Dua Lipa: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/dont-start-now/1484636581?i=1484636829&uo=4",
+      "apple": {
+       "trackId": 1484636829,
+       "url": "https://music.apple.com/us/album/dont-start-now/1484636581?i=1484636829&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music116/v4/41/ee/66/41ee66fa-f8dd-7e82-155a-3a1b360dc562/190295322175.jpg/300x300bb.jpg",
+       "term": "Dua Lipa Don't Start Now"
+      },
+      "dur": 30,
+      "title": "Don't Start Now"
+     },
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/f1/aa/04/f1aa04b0-c057-3776-10d4-14dbee5d56f6/mzaf_5574626439682491111.plus.aac.p.m4a",
+      "credit": "Dua Lipa: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/new-rules-acapella/1804919323?i=1804919612&uo=4",
+      "apple": {
+       "trackId": 1804919612,
+       "url": "https://music.apple.com/us/album/new-rules-acapella/1804919323?i=1804919612&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/0c/ee/d8/0ceed81f-4289-e611-37a5-f6d9b2be7283/5021732756343.jpg/300x300bb.jpg",
+       "term": "Dua Lipa New Rules"
+      },
+      "dur": 30,
+      "title": "New Rules"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "harry-styles",
+   "name": "Harry Styles",
+   "group": "2010s",
+   "facts": {
+    "origin": "UK",
+    "decade": "2010s",
+    "songs": "As It Was · Watermelon Sugar"
+   },
+   "blurb": "Harry Styles (UK), breakthrough in the 2010s. Known for \"As It Was\" and \"Watermelon Sugar\".",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/67/10/16/67101606-3869-ca44-6c03-e13d6322cb51/mzaf_1135399237022217274.plus.aac.p.m4a",
+      "credit": "Harry Styles: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/as-it-was/1615584999?i=1615585008&uo=4",
+      "apple": {
+       "trackId": 1615585008,
+       "url": "https://music.apple.com/us/album/as-it-was/1615584999?i=1615585008&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music126/v4/2a/19/fb/2a19fb85-2f70-9e44-f2a9-82abe679b88e/886449990061.jpg/300x300bb.jpg",
+       "term": "Harry Styles As It Was"
+      },
+      "dur": 30,
+      "title": "As It Was"
+     },
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/25/54/81/255481c0-1ef2-c1bc-f3b3-ea2b1419c1f1/mzaf_5289557126888202047.plus.aac.p.m4a",
+      "credit": "Harry Styles: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/watermelon-sugar/1485802965?i=1485802967&uo=4",
+      "apple": {
+       "trackId": 1485802967,
+       "url": "https://music.apple.com/us/album/watermelon-sugar/1485802965?i=1485802967&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/2b/c4/c9/2bc4c9d4-3bc6-ab13-3f71-df0b89b173de/886448022213.jpg/300x300bb.jpg",
+       "term": "Harry Styles Watermelon Sugar"
+      },
+      "dur": 30,
+      "title": "Watermelon Sugar"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "bts",
+   "name": "BTS",
+   "group": "2010s",
+   "facts": {
+    "origin": "South Korea",
+    "decade": "2010s",
+    "songs": "Dynamite · Butter"
+   },
+   "blurb": "BTS (South Korea), breakthrough in the 2010s. Known for \"Dynamite\" and \"Butter\".",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/43/06/1e/43061eb6-9052-60da-7e95-aed315c0b34c/mzaf_2639750113226374892.plus.aac.p.m4a",
+      "credit": "BTS: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/dynamite/1627573936?i=1627575419&uo=4",
+      "apple": {
+       "trackId": 1627575419,
+       "url": "https://music.apple.com/us/album/dynamite/1627573936?i=1627575419&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music122/v4/f7/68/9c/f7689ce3-6d41-60cd-62d2-57a91ddf5b9d/196922067341_Cover.jpg/300x300bb.jpg",
+       "term": "BTS Dynamite"
+      },
+      "dur": 30,
+      "title": "Dynamite"
+     },
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/80/c8/46/80c84615-efb7-b538-d818-226cf7803358/mzaf_11498582023380901573.plus.aac.p.m4a",
+      "credit": "BTS: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/butter/1627573936?i=1627575769&uo=4",
+      "apple": {
+       "trackId": 1627575769,
+       "url": "https://music.apple.com/us/album/butter/1627573936?i=1627575769&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music122/v4/f7/68/9c/f7689ce3-6d41-60cd-62d2-57a91ddf5b9d/196922067341_Cover.jpg/300x300bb.jpg",
+       "term": "BTS Butter"
+      },
+      "dur": 30,
+      "title": "Butter"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "olivia-rodrigo",
+   "name": "Olivia Rodrigo",
+   "group": "2020s",
+   "facts": {
+    "origin": "US",
+    "decade": "2020s",
+    "songs": "drivers license · good 4 u"
+   },
+   "blurb": "Olivia Rodrigo (US), breakthrough in the 2020s. Known for \"drivers license\" and \"good 4 u\".",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/36/62/61/366261be-0996-d73d-de6f-03417867c800/mzaf_8201528327761821135.plus.aac.p.m4a",
+      "credit": "Olivia Rodrigo: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/drivers-license/1560734944?i=1560735480&uo=4",
+      "apple": {
+       "trackId": 1560735480,
+       "url": "https://music.apple.com/us/album/drivers-license/1560734944?i=1560735480&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/02/ed/8c/02ed8cab-c089-2fdd-7ce6-ab334a9a4e19/21UMGIM26093.rgb.jpg/300x300bb.jpg",
+       "term": "Olivia Rodrigo drivers license"
+      },
+      "dur": 30,
+      "title": "drivers license"
+     },
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/9f/bd/f1/9fbdf1ce-12d9-7440-1c1c-3fed40567619/mzaf_7303839465958373073.plus.aac.p.m4a",
+      "credit": "Olivia Rodrigo: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/good-4-u/1582277315?i=1582277652&uo=4",
+      "apple": {
+       "trackId": 1582277652,
+       "url": "https://music.apple.com/us/album/good-4-u/1582277315?i=1582277652&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/76/46/48/76464884-0e9c-1951-a3f6-ce02f74c2b19/21UMGIM26093.rgb.jpg/300x300bb.jpg",
+       "term": "Olivia Rodrigo good 4 u"
+      },
+      "dur": 30,
+      "title": "good 4 u"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "sabrina-carpenter",
+   "name": "Sabrina Carpenter",
+   "group": "2020s",
+   "facts": {
+    "origin": "US",
+    "decade": "2020s",
+    "songs": "Espresso · Please Please Please"
+   },
+   "blurb": "Sabrina Carpenter (US), breakthrough in the 2020s. Known for \"Espresso\" and \"Please Please Please\".",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/99/da/ff/99daffce-cdde-59c6-5ae0-7f922ce411a8/mzaf_5621292401829922816.plus.aac.p.m4a",
+      "credit": "Sabrina Carpenter: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/espresso/1752214909?i=1752214923&uo=4",
+      "apple": {
+       "trackId": 1752214923,
+       "url": "https://music.apple.com/us/album/espresso/1752214909?i=1752214923&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/a1/1c/ca/a11ccab6-7d4c-e041-d028-998bcebeb709/24UMGIM61704.rgb.jpg/300x300bb.jpg",
+       "term": "Sabrina Carpenter Espresso"
+      },
+      "dur": 30,
+      "title": "Espresso"
+     },
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/54/86/0b/54860b8b-0c3b-b16b-5b19-b00424af8b9b/mzaf_1272478887800630516.plus.aac.p.m4a",
+      "credit": "Sabrina Carpenter: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/please-please-please/1795512297?i=1795513492&uo=4",
+      "apple": {
+       "trackId": 1795513492,
+       "url": "https://music.apple.com/us/album/please-please-please/1795512297?i=1795513492&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/c9/a3/e9/c9a3e987-3952-a6ac-7975-680f2033e660/25UMGIM10586.rgb.jpg/300x300bb.jpg",
+       "term": "Sabrina Carpenter & Dolly Parton Please Please Please"
+      },
+      "dur": 30,
+      "title": "Please Please Please"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "kendrick-lamar",
+   "name": "Kendrick Lamar",
+   "group": "2010s",
+   "facts": {
+    "origin": "US",
+    "decade": "2010s",
+    "songs": "HUMBLE. · Not Like Us"
+   },
+   "blurb": "Kendrick Lamar (US), breakthrough in the 2010s. Known for \"HUMBLE.\" and \"Not Like Us\".",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/1f/2e/37/1f2e37be-bdd0-d770-6ea4-091011a6aade/mzaf_2360827885900940865.plus.aac.p.m4a",
+      "credit": "Kendrick Lamar: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/humble/1440881722?i=1440882165&uo=4",
+      "apple": {
+       "trackId": 1440882165,
+       "url": "https://music.apple.com/us/album/humble/1440881722?i=1440882165&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music112/v4/ab/16/ef/ab16efe9-e7f1-66ec-021c-5592a23f0f9e/17UMGIM88793.rgb.jpg/300x300bb.jpg",
+       "term": "Kendrick Lamar HUMBLE."
+      },
+      "dur": 30,
+      "title": "HUMBLE."
+     },
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/2d/e0/e8/2de0e874-cd0b-e9a9-e876-76be13a86662/mzaf_12385336780649591409.plus.aac.p.m4a",
+      "credit": "Kendrick Lamar: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/not-like-us/1781353928?i=1781353929&uo=4",
+      "apple": {
+       "trackId": 1781353929,
+       "url": "https://music.apple.com/us/album/not-like-us/1781353928?i=1781353929&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/31/3a/3f/313a3fbc-bb8f-80c7-b5a2-e226869a38cd/24UMGIM51924.rgb.jpg/300x300bb.jpg",
+       "term": "Kendrick Lamar Not Like Us"
+      },
+      "dur": 30,
+      "title": "Not Like Us"
+     }
+    ]
+   },
+   "difficulty": 2
+  }
+ ],
+ "questions": [],
+ "sources": [
+  {
+   "name": "Curated by Clued; signature songs are each artist's best-known chart hits"
+  },
+  {
+   "name": "Apple iTunes Search API (previews, artwork, links)",
+   "url": "https://performance-partners.apple.com/search-api"
+  }
+ ],
+ "built": "2026-10-04"
+}

@@ -1,0 +1,5062 @@
+{
+ "id": "mammals",
+ "title": "Mammals",
+ "theme": "animals",
+ "icon": "🦁",
+ "kids": true,
+ "version": 1,
+ "leakExempt": [],
+ "factsMeta": {
+  "massKg": {
+   "type": "num",
+   "label": "Typical adult weight",
+   "unit": "kg",
+   "higherLabel": "Heavier"
+  },
+  "region": {
+   "type": "cat",
+   "label": "Found in"
+  },
+  "diet": {
+   "type": "cat",
+   "label": "Diet",
+   "values": [
+    "Carnivore",
+    "Herbivore",
+    "Omnivore",
+    "Insectivore"
+   ]
+  },
+  "status": {
+   "type": "cat",
+   "label": "Conservation status (IUCN)",
+   "hard": true
+  }
+ },
+ "items": [
+  {
+   "id": "lion",
+   "name": "Lion",
+   "sci": "Panthera leo",
+   "group": "cat",
+   "facts": {
+    "massKg": 190,
+    "region": "Africa",
+    "diet": "Carnivore",
+    "status": "Vulnerable"
+   },
+   "lookalikes": [
+    "tiger",
+    "cougar"
+   ],
+   "blurb": "The only cat that lives in groups, called prides. Males have a big mane.",
+   "clues": [
+    "Family: Felidae.",
+    "Genus: Panthera.",
+    "A small group lives in the Gir Forest in India.",
+    "Its roar can be heard 8 km away.",
+    "The females do most of the hunting.",
+    "Typical adult weight: about 190 kg.",
+    "It lives in Africa.",
+    "It eats meat.",
+    "It lives in groups called prides.",
+    "The male has a big shaggy mane.",
+    "The answer is one word of 4 letters.",
+    "It starts with the letter L."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/62738921/medium.jpeg",
+      "w": 500,
+      "h": 375,
+      "credit": "datadan",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/62738921"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/300761357/medium.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "David Knox",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/300761357"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/12610319/medium.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Luis G. Restrepo",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/12610319"
+     }
+    ],
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/7/7d/Lion_raring-sound1TamilNadu178.ogg/Lion_raring-sound1TamilNadu178.ogg.mp3",
+      "credit": "த*உழவன்",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Lion_raring-sound1TamilNadu178.ogg",
+      "start": 0
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "tiger",
+   "name": "Tiger",
+   "sci": "Panthera tigris",
+   "group": "cat",
+   "facts": {
+    "massKg": 200,
+    "region": "Asia",
+    "diet": "Carnivore"
+   },
+   "lookalikes": [
+    "lion",
+    "jaguar"
+   ],
+   "blurb": "The biggest cat in the world. Its orange coat has black stripes, and no two tigers have the same stripes.",
+   "clues": [
+    "Family: Felidae.",
+    "Genus: Panthera.",
+    "Unlike most cats, it likes to swim.",
+    "Its skin is striped as well as its fur.",
+    "The Siberian kind is the largest.",
+    "Typical adult weight: about 200 kg.",
+    "It lives in Asia.",
+    "It eats meat.",
+    "It is the largest cat in the world.",
+    "It is orange with black stripes.",
+    "The answer is one word of 5 letters.",
+    "It starts with the letter T."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/111317641/medium.jpg",
+      "w": 500,
+      "h": 323,
+      "credit": "Morten Ross",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/111317641"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/222405547/medium.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Morten Ross",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/222405547"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/222514065/medium.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Morten Ross",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/222514065"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "leopard",
+   "name": "Leopard",
+   "sci": "Panthera pardus",
+   "group": "cat",
+   "facts": {
+    "massKg": 55,
+    "region": "Africa",
+    "diet": "Carnivore",
+    "status": "Vulnerable"
+   },
+   "lookalikes": [
+    "jaguar",
+    "cheetah",
+    "snow-leopard"
+   ],
+   "blurb": "A strong spotted cat that drags its prey up into trees to keep it safe from lions and hyenas.",
+   "clues": [
+    "Family: Felidae.",
+    "Genus: Panthera.",
+    "Some are all black and are called black panthers.",
+    "It lives in Africa and Asia.",
+    "It drags its prey up into trees.",
+    "Typical adult weight: about 55 kg.",
+    "It lives in Africa.",
+    "It eats meat.",
+    "Its spots are rosettes, like flowers.",
+    "It is a spotted big cat that climbs trees.",
+    "The answer is one word of 7 letters.",
+    "It starts with the letter L."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/90399697/medium.jpg",
+      "w": 500,
+      "h": 323,
+      "credit": "Raja bandi",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/90399697"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/182303394/medium.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "no rights reserved",
+      "license": "CC0 1.0",
+      "page": "https://www.inaturalist.org/photos/182303394"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/160809135/medium.jpeg",
+      "w": 500,
+      "h": 333,
+      "credit": "no rights reserved",
+      "license": "CC0 1.0",
+      "page": "https://www.inaturalist.org/photos/160809135"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "jaguar",
+   "name": "Jaguar",
+   "sci": "Panthera onca",
+   "group": "cat",
+   "facts": {
+    "massKg": 80,
+    "region": "South America",
+    "diet": "Carnivore",
+    "status": "Near threatened"
+   },
+   "lookalikes": [
+    "leopard",
+    "cheetah"
+   ],
+   "blurb": "The biggest cat in the Americas. It has the strongest bite of any big cat and kills by biting through skulls.",
+   "clues": [
+    "Family: Felidae.",
+    "Genus: Panthera.",
+    "Its rosettes have spots inside them.",
+    "It can bite through turtle shells.",
+    "It loves water and catches caimans.",
+    "Typical adult weight: about 80 kg.",
+    "It lives in South America.",
+    "It eats meat.",
+    "It is the biggest cat in the Americas.",
+    "A British car company is named after it.",
+    "The answer is one word of 6 letters.",
+    "It starts with the letter J."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/200127875/medium.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Charles J. Sharp",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/200127875"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/352611624/medium.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Charles J. Sharp",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/352611624"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/53458442/medium.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Matt Muir",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/53458442"
+     }
+    ],
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/b/b4/Jaguar_saw.flac/Jaguar_saw.flac.mp3",
+      "credit": "About Zoos",
+      "license": "CC BY 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Jaguar_saw.flac",
+      "start": 0
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "cheetah",
+   "name": "Cheetah",
+   "sci": "Acinonyx jubatus",
+   "group": "cat",
+   "facts": {
+    "massKg": 50,
+    "region": "Africa",
+    "diet": "Carnivore",
+    "status": "Vulnerable"
+   },
+   "lookalikes": [
+    "leopard",
+    "jaguar"
+   ],
+   "blurb": "The fastest land animal, reaching about 100 km/h in short bursts. It has black \"tear lines\" on its face.",
+   "clues": [
+    "Family: Felidae.",
+    "Genus: Acinonyx.",
+    "It cannot roar, but it chirps and purrs.",
+    "Its claws do not fully pull in.",
+    "It has black \"tear marks\" down its face.",
+    "Typical adult weight: about 50 kg.",
+    "It lives in Africa.",
+    "It eats meat.",
+    "It has solid black spots.",
+    "It is the fastest land animal.",
+    "The answer is one word of 7 letters.",
+    "It starts with the letter C."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/123082309/medium.jpg",
+      "w": 500,
+      "h": 325,
+      "credit": "Bernard DUPONT",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/123082309"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/58544633/medium.jpg",
+      "w": 500,
+      "h": 336,
+      "credit": "Karim Haddad",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/58544633"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/350833012/medium.jpeg",
+      "w": 500,
+      "h": 333,
+      "credit": "موسی مزینانیان Mousa Mazinanian",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/350833012"
+     }
+    ],
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/c/ca/Acoustic-Structure-and-Contextual-Use-of-Calls-by-Captive-Male-and-Female-Cheetahs-%28Acinonyx-pone.0158546.s001.oga/Acoustic-Structure-and-Contextual-Use-of-Calls-by-Captive-Male-and-Female-Cheetahs-%28Acinonyx-pone.0158546.s001.oga.mp3",
+      "credit": "Smirnova D, Volodin I, Demina T, Volodina E",
+      "license": "CC BY 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Acoustic-Structure-and-Contextual-Use-of-Calls-by-Captive-Male-and-Female-Cheetahs-(Acinonyx-pone.0158546.s001.oga",
+      "start": 0
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "snow-leopard",
+   "name": "Snow leopard",
+   "sci": "Panthera uncia",
+   "group": "cat",
+   "facts": {
+    "massKg": 45,
+    "region": "Asia",
+    "diet": "Carnivore",
+    "status": "Vulnerable"
+   },
+   "lookalikes": [
+    "leopard"
+   ],
+   "blurb": "A pale, spotted big cat of the high mountains of Central Asia. It wraps its long, thick tail around itself for warmth.",
+   "clues": [
+    "Its IUCN conservation status is \"Vulnerable\".",
+    "Family: Felidae.",
+    "Genus: Panthera.",
+    "It cannot roar.",
+    "It wraps its thick tail around itself like a scarf.",
+    "Typical adult weight: about 45 kg.",
+    "It lives in Asia.",
+    "It eats meat.",
+    "It lives in the Himalayas.",
+    "It is a pale grey spotted cat of the mountains.",
+    "The answer has 2 words (4, 7 letters).",
+    "It starts with the letter S."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/721834937/medium.jpg",
+      "w": 375,
+      "h": 500,
+      "credit": "Graham Whittaker",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/721834937"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/593179719/medium.jpg",
+      "w": 375,
+      "h": 500,
+      "credit": "Sara Navarro",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/593179719"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/381342970/medium.jpeg",
+      "w": 500,
+      "h": 333,
+      "credit": "Jan Ebr &amp; Ivana Ebrová",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/381342970"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "cougar",
+   "name": "Cougar",
+   "alt": [
+    "puma",
+    "mountain lion",
+    "panther"
+   ],
+   "sci": "Puma concolor",
+   "group": "cat",
+   "facts": {
+    "massKg": 60,
+    "region": "the Americas",
+    "diet": "Carnivore",
+    "status": "Least concern"
+   },
+   "lookalikes": [
+    "lion"
+   ],
+   "blurb": "A big, plain tawny cat found from Canada to the tip of South America. It has more names than almost any other animal.",
+   "clues": [
+    "Its IUCN conservation status is \"Least concern\".",
+    "Family: Felidae.",
+    "It has more common names than almost any other mammal.",
+    "It is found from Canada to Patagonia.",
+    "It purrs instead of roaring.",
+    "Typical adult weight: about 60 kg.",
+    "It lives in the Americas.",
+    "It eats meat.",
+    "It is tawny brown with no spots.",
+    "The answer is one word of 6 letters.",
+    "It starts with the letter C."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/253626237/medium.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Elaine R. Wilson",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/253626237"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/157098031/medium.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Jeff Bartlett",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/157098031"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/210735004/medium.jpg",
+      "w": 400,
+      "h": 500,
+      "credit": "Darío De la Fuente",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/210735004"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "eurasian-lynx",
+   "name": "Eurasian lynx",
+   "alt": [
+    "lynx"
+   ],
+   "sci": "Lynx lynx",
+   "group": "cat",
+   "facts": {
+    "massKg": 20,
+    "region": "Europe and Asia",
+    "diet": "Carnivore",
+    "status": "Least concern"
+   },
+   "blurb": "A wild cat with black ear tufts, a short tail and big furry paws. It hunts deer in northern forests.",
+   "clues": [
+    "Its IUCN conservation status is \"Least concern\".",
+    "Family: Felidae.",
+    "It is the third-largest predator in Europe.",
+    "It hunts roe deer.",
+    "Its big furry paws help it walk on snow.",
+    "Typical adult weight: about 20 kg.",
+    "It lives in Europe and Asia.",
+    "It eats meat.",
+    "It has a short tail with a black tip.",
+    "It has long black tufts on its ears.",
+    "The answer has 2 words (8, 4 letters).",
+    "It starts with the letter E."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/186702089/medium.jpeg",
+      "w": 500,
+      "h": 313,
+      "credit": "Christoph Moning",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/186702089"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/246545275/medium.jpeg",
+      "w": 500,
+      "h": 333,
+      "credit": "Julia Moning",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/246545275"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/186702107/medium.jpeg",
+      "w": 333,
+      "h": 500,
+      "credit": "Christoph Moning",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/186702107"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "african-bush-elephant",
+   "name": "African bush elephant",
+   "alt": [
+    "African elephant",
+    "elephant"
+   ],
+   "sci": "Loxodonta africana",
+   "group": "elephant",
+   "facts": {
+    "massKg": 6000,
+    "region": "Africa",
+    "diet": "Herbivore"
+   },
+   "lookalikes": [
+    "asian-elephant"
+   ],
+   "blurb": "The biggest land animal on Earth. Its huge ears help it keep cool.",
+   "clues": [
+    "Genus: Loxodonta.",
+    "It can recognise the voices of family members.",
+    "Its pregnancy lasts about 22 months.",
+    "Typical adult weight: about 6 tonnes.",
+    "It eats plants.",
+    "It uses its trunk to drink and smell.",
+    "It is the biggest land animal.",
+    "The answer has 3 words (7, 4, 8 letters).",
+    "It starts with the letter A."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/93674728/medium.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "dhfischer",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/93674728"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/110771183/medium.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Jean-Paul Boerekamps",
+      "license": "CC0 1.0",
+      "page": "https://www.inaturalist.org/photos/110771183"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/607144400/medium.jpg",
+      "w": 500,
+      "h": 334,
+      "credit": "Tony Rebelo",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/607144400"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "asian-elephant",
+   "name": "Asian elephant",
+   "sci": "Elephas maximus",
+   "group": "elephant",
+   "facts": {
+    "massKg": 4000,
+    "region": "Asia",
+    "diet": "Herbivore"
+   },
+   "lookalikes": [
+    "african-bush-elephant"
+   ],
+   "blurb": "A smaller elephant than the African kind, with smaller ears. Many females have no tusks.",
+   "clues": [
+    "Many females have no tusks.",
+    "It has one \"finger\" on its trunk tip, not two.",
+    "It has been used to carry heavy loads for centuries.",
+    "Typical adult weight: about 4 tonnes.",
+    "It eats plants.",
+    "Its ears are smaller and rounder than its African cousin's.",
+    "The answer has 2 words (5, 8 letters).",
+    "It starts with the letter A."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/219306743/medium.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Morten Ross",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/219306743"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/113030589/medium.jpeg",
+      "w": 500,
+      "h": 313,
+      "credit": "Eamon Corbett",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/113030589"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/110290149/medium.jpeg",
+      "w": 375,
+      "h": 500,
+      "credit": "T R Shankar Raman",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/110290149"
+     }
+    ],
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/4/40/Elephant_voice_-_trumpeting.ogg/Elephant_voice_-_trumpeting.ogg.mp3",
+      "credit": "தகவலுழவன்",
+      "license": "CC0 1.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Elephant_voice_-_trumpeting.ogg",
+      "start": 0
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "giraffe",
+   "name": "Giraffe",
+   "sci": "Giraffa camelopardalis",
+   "group": "giraffe",
+   "facts": {
+    "massKg": 1000,
+    "region": "Africa",
+    "diet": "Herbivore",
+    "status": "Vulnerable"
+   },
+   "lookalikes": [
+    "okapi"
+   ],
+   "blurb": "The tallest animal in the world. Its long neck has only seven bones, the same as ours.",
+   "clues": [
+    "Its IUCN conservation status is \"Vulnerable\".",
+    "Its tongue is dark blue-black and about 50 cm long.",
+    "Its neck has seven bones, just like a human's.",
+    "It sleeps for only a short time each day.",
+    "Typical adult weight: about 1 tonnes.",
+    "It lives in Africa.",
+    "It eats plants.",
+    "It eats leaves from acacia trees.",
+    "It is the tallest animal in the world.",
+    "The answer is one word of 7 letters.",
+    "It starts with the letter G."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/219565591/medium.jpg",
+      "w": 381,
+      "h": 500,
+      "credit": "tlaloc27",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/219565591"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/599886814/medium.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "B Pulman005",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/599886814"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/436466325/medium.jpeg",
+      "w": 500,
+      "h": 500,
+      "credit": "Chiara",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/436466325"
+     }
+    ],
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/a/a8/Giraffe_Hum.oga/Giraffe_Hum.oga.mp3",
+      "credit": "Anton Baotic, Florian Sicks and Angela S. Stoeger",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Giraffe_Hum.oga",
+      "start": 0
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "plains-zebra",
+   "name": "Plains zebra",
+   "alt": [
+    "zebra"
+   ],
+   "sci": "Equus quagga",
+   "group": "horse",
+   "facts": {
+    "massKg": 300,
+    "region": "Africa",
+    "diet": "Herbivore",
+    "status": "Near threatened"
+   },
+   "blurb": "A wild horse of Africa with black-and-white stripes. Every zebra's stripes are different.",
+   "clues": [
+    "Family: Equidae.",
+    "Genus: Equus.",
+    "Its stripes may help keep biting flies away.",
+    "No two have exactly the same pattern.",
+    "It migrates with wildebeest.",
+    "Typical adult weight: about 300 kg.",
+    "It lives in Africa.",
+    "It eats plants.",
+    "It is related to horses.",
+    "It has black and white stripes.",
+    "The answer has 2 words (6, 5 letters).",
+    "It starts with the letter P."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/261523831/medium.jpeg",
+      "w": 500,
+      "h": 375,
+      "credit": "Connor Long",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/261523831"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/473246789/medium.jpg",
+      "w": 500,
+      "h": 334,
+      "credit": "Francis",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/473246789"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/50371107/medium.jpg",
+      "w": 500,
+      "h": 391,
+      "credit": "Seig",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/50371107"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "hippopotamus",
+   "name": "Hippopotamus",
+   "alt": [
+    "hippo"
+   ],
+   "sci": "Hippopotamus amphibius",
+   "group": "hippo",
+   "facts": {
+    "massKg": 1500,
+    "region": "Africa",
+    "diet": "Herbivore",
+    "status": "Vulnerable"
+   },
+   "blurb": "A huge animal that spends its days in rivers. It is one of the most dangerous animals in Africa.",
+   "clues": [
+    "Its IUCN conservation status is \"Vulnerable\".",
+    "Its closest living relatives are whales.",
+    "Its skin makes a red oily liquid that works like sunscreen.",
+    "It cannot really swim; it walks on the river bed.",
+    "Typical adult weight: about 1.5 tonnes.",
+    "It lives in Africa.",
+    "It eats plants.",
+    "It is one of Africa's most dangerous animals.",
+    "Its name means \"river horse\".",
+    "The answer is one word of 12 letters.",
+    "It starts with the letter H."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/258049259/medium.jpeg",
+      "w": 500,
+      "h": 333,
+      "credit": "Tommy Andriollo",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/258049259"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/50294895/medium.jpeg",
+      "w": 500,
+      "h": 375,
+      "credit": "Annika Lindqvist",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/50294895"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/442908905/medium.jpeg",
+      "w": 500,
+      "h": 375,
+      "credit": "Noeleen du Toit",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/442908905"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "white-rhinoceros",
+   "name": "White rhinoceros",
+   "alt": [
+    "white rhino",
+    "square-lipped rhinoceros"
+   ],
+   "sci": "Ceratotherium simum",
+   "group": "rhino",
+   "facts": {
+    "massKg": 2300,
+    "region": "Africa",
+    "diet": "Herbivore",
+    "status": "Near threatened"
+   },
+   "lookalikes": [
+    "black-rhinoceros"
+   ],
+   "blurb": "The biggest rhino, with a wide, square mouth for grazing grass. It is not actually white.",
+   "clues": [
+    "Its IUCN conservation status is \"Near threatened\".",
+    "Genus: Ceratotherium.",
+    "The northern kind has only two females left.",
+    "Its horn is made of keratin, like fingernails.",
+    "Typical adult weight: about 2.3 tonnes.",
+    "It lives in Africa.",
+    "It eats plants.",
+    "It is grey, despite its name.",
+    "The answer has 2 words (5, 10 letters).",
+    "It starts with the letter W."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/18821982/medium.jpeg",
+      "w": 500,
+      "h": 281,
+      "credit": "Wynand Uys",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/18821982"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/58595467/medium.jpeg",
+      "w": 500,
+      "h": 332,
+      "credit": "Tom Heijnen",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/58595467"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/58595488/medium.jpeg",
+      "w": 500,
+      "h": 332,
+      "credit": "Tom Heijnen",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/58595488"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "black-rhinoceros",
+   "name": "Black rhinoceros",
+   "alt": [
+    "black rhino"
+   ],
+   "sci": "Diceros bicornis",
+   "group": "rhino",
+   "facts": {
+    "massKg": 1100,
+    "region": "Africa",
+    "diet": "Herbivore",
+    "status": "Critically endangered"
+   },
+   "lookalikes": [
+    "white-rhinoceros"
+   ],
+   "blurb": "A smaller rhino with a hooked lip for grabbing leaves from bushes. It is critically endangered.",
+   "clues": [
+    "Its IUCN conservation status is \"Critically endangered\".",
+    "Genus: Diceros.",
+    "It is critically endangered.",
+    "It has a pointed, hooked upper lip.",
+    "It browses on bushes rather than grass.",
+    "Typical adult weight: about 1.1 tonnes.",
+    "It lives in Africa.",
+    "It eats plants.",
+    "It has two horns.",
+    "It is grey, despite its name.",
+    "The answer has 2 words (5, 10 letters).",
+    "It starts with the letter B."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/114097812/medium.jpeg",
+      "w": 500,
+      "h": 333,
+      "credit": "Jan Ebr &amp; Ivana Ebrová",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/114097812"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/474635786/medium.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "martin ingemansson",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/474635786"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/471223393/medium.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "no rights reserved",
+      "license": "CC0 1.0",
+      "page": "https://www.inaturalist.org/photos/471223393"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "western-gorilla",
+   "name": "Western gorilla",
+   "alt": [
+    "gorilla"
+   ],
+   "sci": "Gorilla gorilla",
+   "group": "ape",
+   "facts": {
+    "massKg": 140,
+    "region": "Africa",
+    "diet": "Herbivore",
+    "status": "Critically endangered"
+   },
+   "lookalikes": [
+    "chimpanzee",
+    "bornean-orangutan"
+   ],
+   "blurb": "The biggest ape. Gorillas live in family groups led by a big male called a silverback.",
+   "clues": [
+    "Its IUCN conservation status is \"Critically endangered\".",
+    "Family: Hominidae.",
+    "It builds a new nest to sleep in each night.",
+    "It walks on its knuckles.",
+    "Typical adult weight: about 140 kg.",
+    "It lives in Africa.",
+    "It eats plants.",
+    "Old males have silver hair on their backs.",
+    "It is the largest ape.",
+    "The answer has 2 words (7, 7 letters).",
+    "It starts with the letter W."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/86526064/medium.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Thomas Fuhrmann",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/86526064"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/28969301/medium.jpeg",
+      "w": 500,
+      "h": 375,
+      "credit": "Matt Muir",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/28969301"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/2996372/medium.JPG",
+      "w": 500,
+      "h": 375,
+      "credit": "John P Friel",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/2996372"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "chimpanzee",
+   "name": "Chimpanzee",
+   "alt": [
+    "chimp"
+   ],
+   "sci": "Pan troglodytes",
+   "group": "ape",
+   "facts": {
+    "massKg": 50,
+    "region": "Africa",
+    "diet": "Omnivore"
+   },
+   "lookalikes": [
+    "bonobo",
+    "western-gorilla"
+   ],
+   "blurb": "Our closest living relative, along with the bonobo. Chimps use sticks as tools to fish for termites.",
+   "clues": [
+    "Family: Hominidae.",
+    "Genus: Pan.",
+    "Jane Goodall studied them at Gombe in Tanzania.",
+    "It uses sticks to fish termites out of mounds.",
+    "It shares about 98% of its DNA with us.",
+    "Typical adult weight: about 50 kg.",
+    "It lives in Africa.",
+    "It eats both plants and animals.",
+    "It lives in groups in African forests.",
+    "It is an ape and one of our closest relatives.",
+    "The answer is one word of 10 letters.",
+    "It starts with the letter C."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/217300479/medium.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Wairambar Rainforest",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/217300479"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/895774/medium.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Carrie Seltzer",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/895774"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/363002091/medium.jpg",
+      "w": 500,
+      "h": 335,
+      "credit": "Stan Rullman",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/363002091"
+     }
+    ],
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/a/af/Chimpanzee-Alarm-Call-Production-Meets-Key-Criteria-for-Intentionality-pone.0076674.s005.oga/Chimpanzee-Alarm-Call-Production-Meets-Key-Criteria-for-Intentionality-pone.0076674.s005.oga.mp3",
+      "credit": "Schel A, Townsend S, Machanda Z, Zuberbuhler K, Slocombe K",
+      "license": "CC BY 2.5",
+      "page": "https://commons.wikimedia.org/wiki/File:Chimpanzee-Alarm-Call-Production-Meets-Key-Criteria-for-Intentionality-pone.0076674.s005.oga",
+      "start": 0
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "bonobo",
+   "name": "Bonobo",
+   "sci": "Pan paniscus",
+   "group": "ape",
+   "facts": {
+    "massKg": 40,
+    "region": "Africa",
+    "diet": "Omnivore"
+   },
+   "lookalikes": [
+    "chimpanzee"
+   ],
+   "blurb": "A peaceful ape that lives only south of the Congo River. Bonobo groups are led by females.",
+   "clues": [
+    "Family: Hominidae.",
+    "Genus: Pan.",
+    "Its groups are led by females.",
+    "It lives only south of the Congo River.",
+    "It is more peaceful than its close cousin.",
+    "Typical adult weight: about 40 kg.",
+    "It lives in Africa.",
+    "It eats both plants and animals.",
+    "It is one of our two closest living relatives.",
+    "It looks like a slim chimpanzee.",
+    "The answer is one word of 6 letters.",
+    "It starts with the letter B."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/330742053/medium.jpg",
+      "w": 500,
+      "h": 379,
+      "credit": "Ltshears",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/330742053"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/97076291/medium.jpg",
+      "w": 500,
+      "h": 336,
+      "credit": "Pierre Fidenci",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/97076291"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/1443311/medium.JPG",
+      "w": 500,
+      "h": 375,
+      "credit": "116916927065934112165",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/1443311"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "bornean-orangutan",
+   "name": "Bornean orangutan",
+   "alt": [
+    "orangutan"
+   ],
+   "sci": "Pongo pygmaeus",
+   "group": "ape",
+   "facts": {
+    "massKg": 60,
+    "region": "Asia",
+    "diet": "Omnivore",
+    "status": "Critically endangered"
+   },
+   "lookalikes": [
+    "western-gorilla"
+   ],
+   "blurb": "A shaggy red-orange ape of Borneo that spends most of its life in trees. Its name means \"person of the forest\".",
+   "clues": [
+    "Family: Hominidae.",
+    "Genus: Pongo.",
+    "Adult males can have big cheek pads.",
+    "It makes a new tree nest every night.",
+    "Its arms are much longer than its legs.",
+    "Typical adult weight: about 60 kg.",
+    "It lives in Asia.",
+    "It eats both plants and animals.",
+    "Its name means \"person of the forest\" in Malay.",
+    "It is a red-orange ape.",
+    "The answer has 2 words (7, 9 letters).",
+    "It starts with the letter B."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/62662319/medium.jpeg",
+      "w": 500,
+      "h": 375,
+      "credit": "Pirataber",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/62662319"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/62662391/medium.jpeg",
+      "w": 500,
+      "h": 375,
+      "credit": "Pirataber",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/62662391"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/109597147/medium.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "no rights reserved",
+      "license": "CC0 1.0",
+      "page": "https://www.inaturalist.org/photos/109597147"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "ring-tailed-lemur",
+   "name": "Ring-tailed lemur",
+   "alt": [
+    "lemur"
+   ],
+   "sci": "Lemur catta",
+   "group": "primate",
+   "facts": {
+    "massKg": 2.2,
+    "region": "Africa",
+    "diet": "Omnivore"
+   },
+   "blurb": "A primate from Madagascar with a long black-and-white striped tail. Groups sunbathe together in the morning.",
+   "clues": [
+    "Groups sit and sunbathe each morning.",
+    "King Julien in \"Madagascar\" is one.",
+    "Typical adult weight: about 2.2 kg.",
+    "It lives in Africa.",
+    "It eats both plants and animals.",
+    "It lives only on Madagascar.",
+    "The answer has 3 words (4, 6, 5 letters).",
+    "It starts with the letter R."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/99684889/medium.jpg",
+      "w": 500,
+      "h": 339,
+      "credit": "George Williams",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/99684889"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/2068076/medium.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Rafael Medina",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/2068076"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/235042823/medium.jpeg",
+      "w": 375,
+      "h": 500,
+      "credit": "no rights reserved",
+      "license": "CC0 1.0",
+      "page": "https://www.inaturalist.org/photos/235042823"
+     }
+    ],
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/4/41/Lemur_catta--wails_%26_moans_%26_howls.ogg/Lemur_catta--wails_%26_moans_%26_howls.ogg.mp3",
+      "credit": "Joseph M. Macedonia",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Lemur_catta--wails_%26_moans_%26_howls.ogg",
+      "start": 0
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "mandrill",
+   "name": "Mandrill",
+   "sci": "Mandrillus sphinx",
+   "group": "primate",
+   "facts": {
+    "massKg": 25,
+    "region": "Africa",
+    "diet": "Omnivore",
+    "status": "Vulnerable"
+   },
+   "blurb": "The largest monkey, with a bright red-and-blue face. Rafiki in \"The Lion King\" is partly based on one.",
+   "clues": [
+    "Its IUCN conservation status is \"Vulnerable\".",
+    "Family: Cercopithecidae.",
+    "It is the largest monkey in the world.",
+    "It lives in rainforests of central Africa.",
+    "Rafiki in \"The Lion King\" is partly based on it.",
+    "Typical adult weight: about 25 kg.",
+    "It lives in Africa.",
+    "It eats both plants and animals.",
+    "It has a colourful bottom.",
+    "Males have a red nose and blue cheeks.",
+    "The answer is one word of 8 letters.",
+    "It starts with the letter M."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/339428082/medium.jpeg",
+      "w": 500,
+      "h": 333,
+      "credit": "Julien Renoult",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/339428082"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/339428130/medium.jpeg",
+      "w": 500,
+      "h": 333,
+      "credit": "Julien Renoult",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/339428130"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/339428057/medium.jpeg",
+      "w": 500,
+      "h": 333,
+      "credit": "Julien Renoult",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/339428057"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "meerkat",
+   "name": "Meerkat",
+   "sci": "Suricata suricatta",
+   "group": "mongoose",
+   "facts": {
+    "massKg": 0.7,
+    "region": "Africa",
+    "diet": "Insectivore",
+    "status": "Least concern"
+   },
+   "blurb": "A small mongoose of southern Africa. Meerkats take turns standing on their back legs to watch for danger.",
+   "clues": [
+    "Family: Herpestidae.",
+    "Genus: Suricata.",
+    "It is a kind of mongoose.",
+    "It is immune to some scorpion venom.",
+    "Timon in \"The Lion King\" is one.",
+    "Typical adult weight: about 700 g.",
+    "It lives in Africa.",
+    "It eats mostly insects.",
+    "It lives in big family groups in burrows.",
+    "It stands up on its back legs to keep watch.",
+    "The answer is one word of 7 letters.",
+    "It starts with the letter M."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/73792684/medium.jpeg",
+      "w": 500,
+      "h": 333,
+      "credit": "Justin Ponder",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/73792684"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/65999068/medium.jpg",
+      "w": 500,
+      "h": 359,
+      "credit": "H. Zel",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/65999068"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/73783329/medium.jpeg",
+      "w": 500,
+      "h": 333,
+      "credit": "Justin Ponder",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/73783329"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "spotted-hyena",
+   "name": "Spotted hyena",
+   "alt": [
+    "hyena"
+   ],
+   "sci": "Crocuta crocuta",
+   "group": "hyena",
+   "facts": {
+    "massKg": 60,
+    "region": "Africa",
+    "diet": "Carnivore",
+    "status": "Least concern"
+   },
+   "blurb": "A powerful hunter of the African savanna, famous for its \"laughing\" calls. Females lead the group.",
+   "clues": [
+    "Its IUCN conservation status is \"Least concern\".",
+    "Family: Hyaenidae.",
+    "Genus: Crocuta.",
+    "Females are bigger than males and lead the clan.",
+    "It can crunch and digest bones.",
+    "It hunts more than it scavenges.",
+    "Typical adult weight: about 60 kg.",
+    "It lives in Africa.",
+    "It eats meat.",
+    "Its call sounds like laughing.",
+    "The answer has 2 words (7, 5 letters).",
+    "It starts with the letter S."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/607418898/medium.jpg",
+      "w": 500,
+      "h": 340,
+      "credit": "Liaka ac",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/607418898"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/261238778/medium.jpeg",
+      "w": 500,
+      "h": 333,
+      "credit": "Darren Obbard",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/261238778"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/61607813/medium.jpg",
+      "w": 500,
+      "h": 307,
+      "credit": "Diogo Luiz",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/61607813"
+     }
+    ],
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/0/07/Spotted_Hyaena_%28Crocuta_crocuta%29_%28W1CDR0000381_BD12%29.ogg/Spotted_Hyaena_%28Crocuta_crocuta%29_%28W1CDR0000381_BD12%29.ogg.mp3",
+      "credit": "This file has been provided by the British Library from its digital collections. Links …",
+      "license": "CC BY 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Spotted_Hyaena_(Crocuta_crocuta)_(W1CDR0000381_BD12).ogg",
+      "start": 0
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "african-wild-dog",
+   "name": "African wild dog",
+   "alt": [
+    "painted dog"
+   ],
+   "sci": "Lycaon pictus",
+   "group": "dog",
+   "facts": {
+    "massKg": 25,
+    "region": "Africa",
+    "diet": "Carnivore"
+   },
+   "blurb": "A patchy-coated African dog that hunts in packs. Its hunts succeed more often than a lion's.",
+   "clues": [
+    "Family: Canidae.",
+    "Genus: Lycaon.",
+    "It has only four toes on each foot.",
+    "Pack members \"vote\" to start a hunt by sneezing.",
+    "Its hunts are very successful.",
+    "Typical adult weight: about 25 kg.",
+    "It eats meat.",
+    "Each one has a unique patchy coat.",
+    "The answer has 3 words (7, 4, 3 letters).",
+    "It starts with the letter A."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/4949165/medium.jpg",
+      "w": 500,
+      "h": 324,
+      "credit": "Per Arne Slotte",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/4949165"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/120818440/medium.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Morten Ross",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/120818440"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/11624075/medium.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Henry de Lange",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/11624075"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "honey-badger",
+   "name": "Honey badger",
+   "alt": [
+    "ratel"
+   ],
+   "sci": "Mellivora capensis",
+   "group": "weasel",
+   "facts": {
+    "massKg": 10,
+    "region": "Africa",
+    "diet": "Omnivore",
+    "status": "Least concern"
+   },
+   "blurb": "A small, fearless animal with thick, loose skin. It raids bee nests and fights snakes.",
+   "clues": [
+    "Family: Mustelidae.",
+    "Genus: Mellivora.",
+    "Its loose skin lets it twist round to bite attackers.",
+    "It eats venomous snakes.",
+    "It is famous for being fearless.",
+    "Typical adult weight: about 10 kg.",
+    "It lives in Africa.",
+    "It eats both plants and animals.",
+    "It is black with a grey-white back.",
+    "It raids bees' nests for a sweet food.",
+    "The answer has 2 words (5, 6 letters).",
+    "It starts with the letter H."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/343004199/medium.jpg",
+      "w": 500,
+      "h": 281,
+      "credit": "Sumeet Moghe",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/343004199"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/265592368/medium.jpg",
+      "w": 500,
+      "h": 281,
+      "credit": "Derek Keats",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/265592368"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/265592373/medium.jpg",
+      "w": 500,
+      "h": 281,
+      "credit": "Derek Keats",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/265592373"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "aardvark",
+   "name": "Aardvark",
+   "sci": "Orycteropus afer",
+   "group": "aardvark",
+   "facts": {
+    "massKg": 60,
+    "region": "Africa",
+    "diet": "Insectivore",
+    "status": "Least concern"
+   },
+   "blurb": "A burrowing African animal with a pig-like snout, long ears and a sticky tongue for eating ants and termites.",
+   "clues": [
+    "Family: Orycteropodidae.",
+    "Genus: Orycteropus.",
+    "It comes first in most English dictionaries.",
+    "Its name means \"earth pig\" in Afrikaans.",
+    "It can dig very fast.",
+    "Typical adult weight: about 60 kg.",
+    "It lives in Africa.",
+    "It eats mostly insects.",
+    "It eats ants and termites.",
+    "It has a long snout and rabbit-like ears.",
+    "The answer is one word of 8 letters.",
+    "It starts with the letter A."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/175359469/medium.jpg",
+      "w": 500,
+      "h": 346,
+      "credit": "Kelly Abram",
+      "license": "CC0 1.0",
+      "page": "https://www.inaturalist.org/photos/175359469"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/78448701/medium.jpg",
+      "w": 500,
+      "h": 302,
+      "credit": "Dave Brown",
+      "license": "CC0 1.0",
+      "page": "https://www.inaturalist.org/photos/78448701"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/370107127/medium.jpeg",
+      "w": 500,
+      "h": 332,
+      "credit": "Klaus Rassinger",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/370107127"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "okapi",
+   "name": "Okapi",
+   "sci": "Okapia johnstoni",
+   "group": "giraffe",
+   "facts": {
+    "massKg": 250,
+    "region": "Africa",
+    "diet": "Herbivore"
+   },
+   "lookalikes": [
+    "giraffe",
+    "plains-zebra"
+   ],
+   "blurb": "A shy forest animal with zebra-striped legs. It is the giraffe's only living relative.",
+   "clues": [
+    "Family: Giraffidae.",
+    "Its tongue is long enough to clean its ears.",
+    "Europeans did not know it until 1901.",
+    "It lives in rainforests of the Congo.",
+    "Typical adult weight: about 250 kg.",
+    "It lives in Africa.",
+    "It eats plants.",
+    "Its back legs have zebra-like stripes.",
+    "It is the giraffe's closest relative.",
+    "The answer is one word of 5 letters.",
+    "It starts with the letter O."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/276272792/medium.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Melvin TOULLEC",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/276272792"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/276272773/medium.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Postdlf",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/276272773"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/266584920/medium.jpg",
+      "w": 500,
+      "h": 365,
+      "credit": "Alan Eng",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/266584920"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "warthog",
+   "name": "Warthog",
+   "alt": [
+    "common warthog"
+   ],
+   "sci": "Phacochoerus africanus",
+   "group": "pig",
+   "facts": {
+    "massKg": 80,
+    "region": "Africa",
+    "diet": "Omnivore",
+    "status": "Least concern"
+   },
+   "blurb": "A wild African pig with tusks and lumpy \"warts\" on its face. It kneels to eat grass.",
+   "clues": [
+    "Family: Suidae.",
+    "Genus: Phacochoerus.",
+    "It runs with its tail straight up.",
+    "It kneels on its front legs to eat.",
+    "It backs into burrows so its tusks face out.",
+    "Typical adult weight: about 80 kg.",
+    "It lives in Africa.",
+    "It eats both plants and animals.",
+    "Pumbaa in \"The Lion King\" is one.",
+    "It is a wild pig with tusks.",
+    "The answer is one word of 7 letters.",
+    "It starts with the letter W."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/251735512/medium.jpg",
+      "w": 500,
+      "h": 367,
+      "credit": "Bernard DUPONT",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/251735512"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/187832008/medium.jpg",
+      "w": 500,
+      "h": 349,
+      "credit": "Bernard DUPONT",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/187832008"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/420815823/medium.jpeg",
+      "w": 500,
+      "h": 333,
+      "credit": "no rights reserved",
+      "license": "CC0 1.0",
+      "page": "https://www.inaturalist.org/photos/420815823"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "giant-panda",
+   "name": "Giant panda",
+   "alt": [
+    "panda"
+   ],
+   "sci": "Ailuropoda melanoleuca",
+   "group": "bear",
+   "facts": {
+    "massKg": 100,
+    "region": "Asia",
+    "diet": "Herbivore",
+    "status": "Vulnerable"
+   },
+   "lookalikes": [
+    "red-panda"
+   ],
+   "blurb": "A black-and-white bear from the mountains of China. It eats bamboo for up to 14 hours a day.",
+   "clues": [
+    "Family: Ursidae.",
+    "Genus: Ailuropoda.",
+    "It has a \"thumb\" made from a wrist bone.",
+    "It eats bamboo for up to 14 hours a day.",
+    "Its cubs are born tiny and pink.",
+    "Typical adult weight: about 100 kg.",
+    "It lives in Asia.",
+    "It eats plants.",
+    "It lives in the mountains of China.",
+    "It is a black-and-white bear.",
+    "The answer has 2 words (5, 5 letters).",
+    "It starts with the letter G."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/351209016/medium.jpeg",
+      "w": 500,
+      "h": 333,
+      "credit": "James Eaton",
+      "license": "CC0 1.0",
+      "page": "https://www.inaturalist.org/photos/351209016"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/351209004/medium.jpeg",
+      "w": 500,
+      "h": 333,
+      "credit": "no rights reserved",
+      "license": "CC0 1.0",
+      "page": "https://www.inaturalist.org/photos/351209004"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/351209026/medium.jpeg",
+      "w": 500,
+      "h": 333,
+      "credit": "no rights reserved",
+      "license": "CC0 1.0",
+      "page": "https://www.inaturalist.org/photos/351209026"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "red-panda",
+   "name": "Red panda",
+   "sci": "Ailurus fulgens",
+   "group": "red panda",
+   "facts": {
+    "massKg": 5,
+    "region": "Asia",
+    "diet": "Herbivore"
+   },
+   "lookalikes": [
+    "giant-panda"
+   ],
+   "blurb": "A small, red-furred tree animal of the Himalayas with a ringed tail. It was called a panda before the giant panda.",
+   "clues": [
+    "Family: Ailuridae.",
+    "Genus: Ailurus.",
+    "It is not a bear or a raccoon.",
+    "It wraps its bushy tail around itself.",
+    "Typical adult weight: about 5 kg.",
+    "It lives in Asia.",
+    "It eats plants.",
+    "It lives in Himalayan forests.",
+    "The answer has 2 words (3, 5 letters).",
+    "It starts with the letter R."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/123108651/medium.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "S.Brickman",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/123108651"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/117761880/medium.jpeg",
+      "w": 500,
+      "h": 333,
+      "credit": "zhangshen",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/117761880"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/523439045/medium.jpg",
+      "w": 375,
+      "h": 500,
+      "credit": "no rights reserved",
+      "license": "CC0 1.0",
+      "page": "https://www.inaturalist.org/photos/523439045"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "proboscis-monkey",
+   "name": "Proboscis monkey",
+   "sci": "Nasalis larvatus",
+   "group": "primate",
+   "facts": {
+    "massKg": 15,
+    "region": "Asia",
+    "diet": "Herbivore"
+   },
+   "blurb": "A monkey of Borneo whose males have huge, droopy noses. It is a great swimmer.",
+   "clues": [
+    "Family: Cercopithecidae.",
+    "Genus: Nasalis.",
+    "It has webbed feet.",
+    "It lives in mangroves on Borneo.",
+    "It is a strong swimmer.",
+    "Typical adult weight: about 15 kg.",
+    "It lives in Asia.",
+    "It eats plants.",
+    "It has a pot belly.",
+    "Males have a huge, droopy nose.",
+    "The answer has 2 words (9, 6 letters).",
+    "It starts with the letter P."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/70541169/medium.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Bernard DUPONT",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/70541169"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/96223659/medium.jpg",
+      "w": 500,
+      "h": 487,
+      "credit": "Bernard DUPONT",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/96223659"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/290199955/medium.jpg",
+      "w": 333,
+      "h": 500,
+      "credit": "James Hunt",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/290199955"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "japanese-macaque",
+   "name": "Japanese macaque",
+   "alt": [
+    "snow monkey"
+   ],
+   "sci": "Macaca fuscata",
+   "group": "primate",
+   "facts": {
+    "massKg": 10,
+    "region": "Asia",
+    "diet": "Omnivore",
+    "status": "Least concern"
+   },
+   "blurb": "The monkey that lives further north than any other. Some bathe in hot springs in winter.",
+   "clues": [
+    "Its IUCN conservation status is \"Least concern\".",
+    "Family: Cercopithecidae.",
+    "Some wash sweet potatoes in the sea.",
+    "Some bathe in hot springs in winter.",
+    "Typical adult weight: about 10 kg.",
+    "It lives in Asia.",
+    "It eats both plants and animals.",
+    "It has a bright red face.",
+    "The answer has 2 words (8, 7 letters).",
+    "It starts with the letter J."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/12751097/medium.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Brian Jeffery Beggerly",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/12751097"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/21697774/medium.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Pedro Henrique Maloso Ramos",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/21697774"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/62292452/medium.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Marco Mussita",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/62292452"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "malayan-tapir",
+   "name": "Malayan tapir",
+   "sci": "Tapirus indicus",
+   "group": "tapir",
+   "facts": {
+    "massKg": 300,
+    "region": "Asia",
+    "diet": "Herbivore"
+   },
+   "blurb": "A black-and-white tapir of South-East Asia with a short trunk. Its colours break up its outline in the moonlit forest.",
+   "clues": [
+    "Its babies are brown with stripes and spots.",
+    "It is related to horses and rhinos.",
+    "It has a short, bendy trunk.",
+    "Typical adult weight: about 300 kg.",
+    "It lives in Asia.",
+    "It eats plants.",
+    "Its body is black with a white middle.",
+    "The answer has 2 words (7, 5 letters).",
+    "It starts with the letter M."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/394188705/medium.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Allie_Caulfield",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/394188705"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/367746016/medium.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "AgainErick",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/367746016"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/351378417/medium.jpeg",
+      "w": 500,
+      "h": 333,
+      "credit": "James Eaton",
+      "license": "CC0 1.0",
+      "page": "https://www.inaturalist.org/photos/351378417"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "yak",
+   "name": "Yak",
+   "sci": "Bos mutus",
+   "group": "cattle",
+   "facts": {
+    "massKg": 500,
+    "region": "Asia",
+    "diet": "Herbivore",
+    "status": "Vulnerable"
+   },
+   "blurb": "A shaggy wild ox of the Tibetan Plateau. Tame yaks carry loads and give milk in the Himalayas.",
+   "clues": [
+    "Family: Bovidae.",
+    "Genus: Bos.",
+    "It grunts rather than moos.",
+    "It lives higher than almost any other large mammal.",
+    "Its milk is made into butter for tea.",
+    "Typical adult weight: about 500 kg.",
+    "It lives in Asia.",
+    "It eats plants.",
+    "It has long shaggy hair.",
+    "It is a wild ox of Tibet.",
+    "The answer is one word of 3 letters.",
+    "It starts with the letter Y."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/149500100/medium.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "RedGazelle15",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/149500100"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/47604060/medium.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Subhadra Devi",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/47604060"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/590674140/medium.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Sara Navarro",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/590674140"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "bactrian-camel",
+   "name": "Bactrian camel",
+   "sci": "Camelus bactrianus",
+   "group": "camel",
+   "facts": {
+    "massKg": 500,
+    "region": "Asia",
+    "diet": "Herbivore"
+   },
+   "lookalikes": [
+    "dromedary"
+   ],
+   "blurb": "A two-humped camel of the cold deserts of Central Asia. Its humps store fat, not water.",
+   "clues": [
+    "It copes with winters of -40 °C and hot summers.",
+    "It lives in the Gobi Desert.",
+    "Its humps store fat, not water.",
+    "Typical adult weight: about 500 kg.",
+    "It lives in Asia.",
+    "It eats plants.",
+    "Its shaggy coat falls out in summer.",
+    "It has two humps.",
+    "The answer has 2 words (8, 5 letters).",
+    "It starts with the letter B."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/86278784/medium.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Roland zh",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/86278784"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/463098369/medium.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Andrew Bazdyrev",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/463098369"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/330460339/medium.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Andrew Bazdyrev",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/330460339"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "grey-wolf",
+   "name": "Grey wolf",
+   "alt": [
+    "wolf",
+    "gray wolf"
+   ],
+   "sci": "Canis lupus",
+   "group": "dog",
+   "facts": {
+    "massKg": 40,
+    "region": "many parts of the world",
+    "diet": "Carnivore",
+    "status": "Least concern"
+   },
+   "lookalikes": [
+    "dingo",
+    "red-fox"
+   ],
+   "blurb": "The wild ancestor of the pet dog. Wolves live and hunt in family packs.",
+   "clues": [
+    "Family: Canidae.",
+    "Genus: Canis.",
+    "Pet dogs are descended from it.",
+    "Its reintroduction changed Yellowstone National Park.",
+    "It lives in family packs.",
+    "Typical adult weight: about 40 kg.",
+    "It lives in many parts of the world.",
+    "It eats meat.",
+    "It howls to talk to its pack.",
+    "It is a wild dog of northern lands.",
+    "The answer has 2 words (4, 4 letters).",
+    "It starts with the letter G."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/415517238/medium.jpg",
+      "w": 500,
+      "h": 281,
+      "credit": "Matt Muir",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/415517238"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/481187478/medium.gif",
+      "w": 500,
+      "h": 281,
+      "credit": "Matt Muir",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/481187478"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/468217911/medium.jpg",
+      "w": 408,
+      "h": 500,
+      "credit": "gerardbertrand",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/468217911"
+     }
+    ],
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/8/87/Wolf_howls.ogg/Wolf_howls.ogg.mp3",
+      "credit": "Wikimedia Commons",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Wolf_howls.ogg",
+      "start": 0
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "red-fox",
+   "name": "Red fox",
+   "alt": [
+    "fox"
+   ],
+   "sci": "Vulpes vulpes",
+   "group": "dog",
+   "facts": {
+    "massKg": 6,
+    "region": "many parts of the world",
+    "diet": "Omnivore",
+    "status": "Least concern"
+   },
+   "lookalikes": [
+    "fennec-fox",
+    "grey-wolf"
+   ],
+   "blurb": "The most widespread wild carnivore on Earth. It lives in forests, farms and even big cities.",
+   "clues": [
+    "Its IUCN conservation status is \"Least concern\".",
+    "Family: Canidae.",
+    "Genus: Vulpes.",
+    "It was taken to Australia for hunting.",
+    "It pounces on mice under the snow.",
+    "It is common in cities like London.",
+    "Typical adult weight: about 6 kg.",
+    "It lives in many parts of the world.",
+    "It eats both plants and animals.",
+    "It has a bushy, white-tipped tail.",
+    "The answer has 2 words (3, 3 letters).",
+    "It starts with the letter R."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/289085807/medium.jpg",
+      "w": 500,
+      "h": 400,
+      "credit": "David Willingham",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/289085807"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/120825265/medium.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Morten Ross",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/120825265"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/57391469/medium.jpg",
+      "w": 500,
+      "h": 337,
+      "credit": "Алина Урусова",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/57391469"
+     }
+    ],
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/7/79/Red_Fox_%28Vulpes_vulpes%29_%28W1CDR0001529_BD12%29.ogg/Red_Fox_%28Vulpes_vulpes%29_%28W1CDR0001529_BD12%29.ogg.mp3",
+      "credit": "This file has been provided by the British Library from its digital collections. Links …",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Red_Fox_(Vulpes_vulpes)_(W1CDR0001529_BD12).ogg",
+      "start": 0
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "fennec-fox",
+   "name": "Fennec fox",
+   "alt": [
+    "fennec"
+   ],
+   "sci": "Vulpes zerda",
+   "group": "dog",
+   "facts": {
+    "massKg": 1.2,
+    "region": "Africa",
+    "diet": "Omnivore",
+    "status": "Least concern"
+   },
+   "lookalikes": [
+    "red-fox"
+   ],
+   "blurb": "The smallest fox in the world, from the Sahara. Its enormous ears help it lose heat and hear prey underground.",
+   "clues": [
+    "Its IUCN conservation status is \"Least concern\".",
+    "Family: Canidae.",
+    "Genus: Vulpes.",
+    "It is the national animal of Algeria.",
+    "Its furry feet protect it from hot sand.",
+    "It can go a long time without drinking.",
+    "Typical adult weight: about 1.2 kg.",
+    "It lives in Africa.",
+    "It eats both plants and animals.",
+    "It has enormous ears.",
+    "The answer has 2 words (6, 3 letters).",
+    "It starts with the letter F."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/17864088/medium.jpeg",
+      "w": 500,
+      "h": 333,
+      "credit": "Stacey Robert Greenstein",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/17864088"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/142063337/medium.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Markus Krieger",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/142063337"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/471246065/medium.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Demian Hiß",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/471246065"
+     }
+    ],
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/5/5f/Fennec_Singing.ogg/Fennec_Singing.ogg.mp3",
+      "credit": "Eosin-Y",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Fennec_Singing.ogg",
+      "start": 0
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "polar-bear",
+   "name": "Polar bear",
+   "sci": "Ursus maritimus",
+   "group": "bear",
+   "facts": {
+    "massKg": 450,
+    "region": "the Arctic",
+    "diet": "Carnivore",
+    "status": "Vulnerable"
+   },
+   "lookalikes": [
+    "brown-bear"
+   ],
+   "blurb": "The biggest land carnivore. It lives on Arctic sea ice and hunts seals.",
+   "clues": [
+    "Its IUCN conservation status is \"Vulnerable\".",
+    "Family: Ursidae.",
+    "Genus: Ursus.",
+    "Its skin is black under its fur.",
+    "Its fur hairs are actually clear, not white.",
+    "It can swim for days.",
+    "Typical adult weight: about 450 kg.",
+    "It lives in the Arctic.",
+    "It eats meat.",
+    "It hunts seals on the sea ice.",
+    "The answer has 2 words (5, 4 letters).",
+    "It starts with the letter P."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/123092729/medium.jpg",
+      "w": 500,
+      "h": 315,
+      "credit": "Morten Ross",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/123092729"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/109439406/medium.jpeg",
+      "w": 500,
+      "h": 333,
+      "credit": "Алексей Логинов",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/109439406"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/111316985/medium.jpg",
+      "w": 500,
+      "h": 325,
+      "credit": "Morten Ross",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/111316985"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "brown-bear",
+   "name": "Brown bear",
+   "alt": [
+    "grizzly bear",
+    "grizzly"
+   ],
+   "sci": "Ursus arctos",
+   "group": "bear",
+   "facts": {
+    "massKg": 300,
+    "region": "many parts of the world",
+    "diet": "Omnivore",
+    "status": "Least concern"
+   },
+   "lookalikes": [
+    "polar-bear",
+    "american-black-bear"
+   ],
+   "blurb": "A big bear of northern forests and mountains. It catches salmon in rivers and sleeps through the winter.",
+   "clues": [
+    "Its IUCN conservation status is \"Least concern\".",
+    "Family: Ursidae.",
+    "Genus: Ursus.",
+    "It has a hump of muscle on its shoulders.",
+    "It catches salmon jumping up waterfalls.",
+    "Typical adult weight: about 300 kg.",
+    "It lives in many parts of the world.",
+    "It eats both plants and animals.",
+    "The answer has 2 words (5, 4 letters).",
+    "It starts with the letter B."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/334287109/medium.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Nathan Ruser",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/334287109"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/414075864/medium.jpeg",
+      "w": 500,
+      "h": 333,
+      "credit": "Валерия Ковалева",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/414075864"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/9581603/medium.jpeg",
+      "w": 500,
+      "h": 375,
+      "credit": "Annika Lindqvist",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/9581603"
+     }
+    ],
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/e/ea/Yellowstone_sound_library_-_Grizzly_Bear_Eating_-_002.mp3",
+      "credit": "NPS & MSU Acoustic Atlas / Jennifer Jerrett",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Yellowstone_sound_library_-_Grizzly_Bear_Eating_-_002.mp3",
+      "start": 0
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "american-black-bear",
+   "name": "American black bear",
+   "alt": [
+    "black bear"
+   ],
+   "sci": "Ursus americanus",
+   "group": "bear",
+   "facts": {
+    "massKg": 120,
+    "region": "North America",
+    "diet": "Omnivore",
+    "status": "Least concern"
+   },
+   "lookalikes": [
+    "brown-bear"
+   ],
+   "blurb": "The most common bear in North America. Despite its name, it can be brown, cinnamon or even white.",
+   "clues": [
+    "Its IUCN conservation status is \"Least concern\".",
+    "Family: Ursidae.",
+    "Genus: Ursus.",
+    "Some on the Canadian coast are white.",
+    "It is an excellent tree climber.",
+    "It raids bins in towns.",
+    "Typical adult weight: about 120 kg.",
+    "It eats both plants and animals.",
+    "The answer has 3 words (8, 5, 4 letters).",
+    "It starts with the letter A."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/184578489/medium.jpg",
+      "w": 500,
+      "h": 407,
+      "credit": "Jay Pruett",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/184578489"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/573514665/medium.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Jared Shorma",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/573514665"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/232740211/medium.jpeg",
+      "w": 500,
+      "h": 333,
+      "credit": "John Krampl",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/232740211"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "moose",
+   "name": "Moose",
+   "alt": [
+    "elk"
+   ],
+   "sci": "Alces alces",
+   "group": "deer",
+   "facts": {
+    "massKg": 450,
+    "region": "many parts of the world",
+    "diet": "Herbivore",
+    "status": "Least concern"
+   },
+   "lookalikes": [
+    "reindeer",
+    "red-deer"
+   ],
+   "blurb": "The biggest deer in the world. Males have huge flat antlers. In Europe it is called an elk.",
+   "clues": [
+    "Its IUCN conservation status is \"Least concern\".",
+    "Family: Cervidae.",
+    "Genus: Alces.",
+    "It can dive underwater to eat plants.",
+    "It has a flap of skin under its chin called a bell.",
+    "Typical adult weight: about 450 kg.",
+    "It lives in many parts of the world.",
+    "It eats plants.",
+    "Males grow huge, flat antlers.",
+    "It is the biggest deer in the world.",
+    "The answer is one word of 5 letters.",
+    "It starts with the letter M."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/187783997/medium.jpg",
+      "w": 500,
+      "h": 332,
+      "credit": "mikaelsoderberg",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/187783997"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/23946339/medium.jpeg",
+      "w": 375,
+      "h": 500,
+      "credit": "Matt Muir",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/23946339"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/458933375/medium.jpg",
+      "w": 500,
+      "h": 500,
+      "credit": "Dan Vickers",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/458933375"
+     }
+    ],
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/f/fd/Moose_mate.ogg/Moose_mate.ogg.mp3",
+      "credit": "Bwells",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Moose_mate.ogg",
+      "start": 0
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "reindeer",
+   "name": "Reindeer",
+   "alt": [
+    "caribou"
+   ],
+   "sci": "Rangifer tarandus",
+   "group": "deer",
+   "facts": {
+    "massKg": 120,
+    "region": "the Arctic",
+    "diet": "Herbivore",
+    "status": "Vulnerable"
+   },
+   "lookalikes": [
+    "moose"
+   ],
+   "blurb": "A deer of the Arctic where both males and females grow antlers. In North America it is called a caribou.",
+   "clues": [
+    "Its IUCN conservation status is \"Vulnerable\".",
+    "Family: Cervidae.",
+    "Genus: Rangifer.",
+    "Its knees make a clicking sound as it walks.",
+    "Its eyes change colour from gold to blue in winter.",
+    "Both males and females grow antlers.",
+    "Typical adult weight: about 120 kg.",
+    "It lives in the Arctic.",
+    "It eats plants.",
+    "Legend says it pulls Santa's sleigh.",
+    "The answer is one word of 8 letters.",
+    "It starts with the letter R."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/86057375/medium.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Bering Land Bridge National Preserve",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/86057375"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/86057277/medium.jpg",
+      "w": 500,
+      "h": 290,
+      "credit": "Gregory \"Slobirdr\" Smith",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/86057277"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/46874350/medium.jpeg",
+      "w": 500,
+      "h": 333,
+      "credit": "Oskar Liset Pryds Hansen",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/46874350"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "red-deer",
+   "name": "Red deer",
+   "alt": [
+    "stag"
+   ],
+   "sci": "Cervus elaphus",
+   "group": "deer",
+   "facts": {
+    "massKg": 150,
+    "region": "Europe and Asia",
+    "diet": "Herbivore",
+    "status": "Least concern"
+   },
+   "lookalikes": [
+    "moose"
+   ],
+   "blurb": "A big deer of Europe and Asia. In autumn, stags roar and fight with their antlers.",
+   "clues": [
+    "Its IUCN conservation status is \"Least concern\".",
+    "Family: Cervidae.",
+    "Genus: Cervus.",
+    "It is the largest wild land mammal in Britain.",
+    "It sheds its antlers every year.",
+    "Typical adult weight: about 150 kg.",
+    "It lives in Europe and Asia.",
+    "It eats plants.",
+    "Its coat is reddish-brown.",
+    "The answer has 2 words (3, 4 letters).",
+    "It starts with the letter R."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/330958725/medium.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Demian Hiß",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/330958725"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/177947667/medium.jpeg",
+      "w": 500,
+      "h": 377,
+      "credit": "Mourad Harzallah",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/177947667"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/170312227/medium.jpeg",
+      "w": 500,
+      "h": 375,
+      "credit": "Nicolas Olejnik",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/170312227"
+     }
+    ],
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/9/9b/Red_Deer_%28Cervus_elaphus%29_%28W1CDR0001424_BD3%29.ogg/Red_Deer_%28Cervus_elaphus%29_%28W1CDR0001424_BD3%29.ogg.mp3",
+      "credit": "This file has been provided by the British Library from its digital collections. Links …",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Red_Deer_(Cervus_elaphus)_(W1CDR0001424_BD3).ogg",
+      "start": 0
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "european-hedgehog",
+   "name": "European hedgehog",
+   "alt": [
+    "hedgehog"
+   ],
+   "sci": "Erinaceus europaeus",
+   "group": "hedgehog",
+   "facts": {
+    "massKg": 0.9,
+    "region": "Europe",
+    "diet": "Insectivore",
+    "status": "Near threatened"
+   },
+   "blurb": "A small, spiny animal that rolls into a ball when scared. It hibernates through winter.",
+   "clues": [
+    "Its IUCN conservation status is \"Near threatened\".",
+    "Family: Erinaceidae.",
+    "Genus: Erinaceus.",
+    "It has about 5,000 to 7,000 spines.",
+    "It hibernates in winter.",
+    "It eats beetles, worms and slugs.",
+    "Typical adult weight: about 900 g.",
+    "It eats mostly insects.",
+    "It rolls into a spiky ball when scared.",
+    "It is covered in spines.",
+    "The answer has 2 words (8, 8 letters).",
+    "It starts with the letter E."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/132296376/medium.jpg",
+      "w": 500,
+      "h": 387,
+      "credit": "Michael Gäbler",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/132296376"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/123442290/medium.jpeg",
+      "w": 500,
+      "h": 331,
+      "credit": "Codrin Bucur",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/123442290"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/11950016/medium.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Frank Sengpiel",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/11950016"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "red-squirrel",
+   "name": "Red squirrel",
+   "alt": [
+    "squirrel"
+   ],
+   "sci": "Sciurus vulgaris",
+   "group": "rodent",
+   "facts": {
+    "massKg": 0.3,
+    "region": "Europe and Asia",
+    "diet": "Herbivore",
+    "status": "Least concern"
+   },
+   "blurb": "A red squirrel with tufted ears. In Britain it has been pushed out of most areas by the grey squirrel.",
+   "clues": [
+    "Family: Sciuridae.",
+    "Genus: Sciurus.",
+    "In Britain it survives mostly in Scotland and on islands.",
+    "It has ear tufts in winter.",
+    "It buries nuts and forgets some, planting trees.",
+    "Typical adult weight: about 300 g.",
+    "It lives in Europe and Asia.",
+    "It eats plants.",
+    "It has a big bushy tail.",
+    "Its fur is reddish.",
+    "The answer has 2 words (3, 8 letters).",
+    "It starts with the letter R."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/462357539/medium.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Rhododendrites",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/462357539"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/462357532/medium.jpg",
+      "w": 500,
+      "h": 441,
+      "credit": "hedera.baltica",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/462357532"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/178305326/medium.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Blondinrikard Fröberg",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/178305326"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "european-badger",
+   "name": "European badger",
+   "alt": [
+    "badger"
+   ],
+   "sci": "Meles meles",
+   "group": "weasel",
+   "facts": {
+    "massKg": 12,
+    "region": "Europe and Asia",
+    "diet": "Omnivore",
+    "status": "Least concern"
+   },
+   "blurb": "A stocky night-time animal with a black-and-white striped face. It lives in big burrows called setts.",
+   "clues": [
+    "Its IUCN conservation status is \"Least concern\".",
+    "Family: Mustelidae.",
+    "Genus: Meles.",
+    "Its burrow is called a sett.",
+    "It eats lots of earthworms.",
+    "Its setts can be used for centuries.",
+    "Typical adult weight: about 12 kg.",
+    "It eats both plants and animals.",
+    "It comes out at night.",
+    "Its face has black and white stripes.",
+    "The answer has 2 words (8, 6 letters).",
+    "It starts with the letter E."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/172054371/medium.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "caroline legg",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/172054371"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/55269535/medium.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Tina Ellegaard Poulsen",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/55269535"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/187833913/medium.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "caroline legg",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/187833913"
+     }
+    ],
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/9/93/European_Badger_%28Meles_meles%29_%28W1CDR0001490_BD4%29.ogg/European_Badger_%28Meles_meles%29_%28W1CDR0001490_BD4%29.ogg.mp3",
+      "credit": "This file has been provided by the British Library from its digital collections. Links …",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:European_Badger_(Meles_meles)_(W1CDR0001490_BD4).ogg",
+      "start": 0
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "eurasian-otter",
+   "name": "Eurasian otter",
+   "alt": [
+    "otter"
+   ],
+   "sci": "Lutra lutra",
+   "group": "weasel",
+   "facts": {
+    "massKg": 8,
+    "region": "Europe and Asia",
+    "diet": "Carnivore",
+    "status": "Near threatened"
+   },
+   "blurb": "A playful river otter of Europe and Asia. It swims with its webbed feet and catches fish.",
+   "clues": [
+    "Family: Mustelidae.",
+    "Genus: Lutra.",
+    "Its droppings are called spraints.",
+    "It has returned to every county in England.",
+    "It has webbed feet.",
+    "Typical adult weight: about 8 kg.",
+    "It lives in Europe and Asia.",
+    "It eats meat.",
+    "It lives along rivers and catches fish.",
+    "It is a sleek, playful swimmer.",
+    "The answer has 2 words (8, 5 letters).",
+    "It starts with the letter E."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/474812609/medium.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Diego González Dopico",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/474812609"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/606127323/medium.jpg",
+      "w": 500,
+      "h": 500,
+      "credit": "Diego González Dopico",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/606127323"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/370920000/medium.jpg",
+      "w": 500,
+      "h": 305,
+      "credit": "no rights reserved",
+      "license": "CC0 1.0",
+      "page": "https://www.inaturalist.org/photos/370920000"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "wolverine",
+   "name": "Wolverine",
+   "sci": "Gulo gulo",
+   "group": "weasel",
+   "facts": {
+    "massKg": 13,
+    "region": "the Arctic",
+    "diet": "Carnivore",
+    "status": "Least concern"
+   },
+   "blurb": "The largest land member of the weasel family. It is tough enough to chase wolves off a kill.",
+   "clues": [
+    "Family: Mustelidae.",
+    "Genus: Gulo.",
+    "It can chase wolves off their kill.",
+    "Its scientific name means \"glutton\".",
+    "It is the largest land weasel.",
+    "Typical adult weight: about 13 kg.",
+    "It lives in the Arctic.",
+    "It eats meat.",
+    "It lives in cold northern forests.",
+    "A Marvel superhero shares its name.",
+    "The answer is one word of 9 letters.",
+    "It starts with the letter W."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/94772809/medium.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Susanne Nilsson",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/94772809"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/323241133/medium.jpeg",
+      "w": 500,
+      "h": 375,
+      "credit": "Wairambar Rainforest",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/323241133"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/429001711/medium.jpg",
+      "w": 500,
+      "h": 386,
+      "credit": "Dennis Vollmar",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/429001711"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "european-rabbit",
+   "name": "European rabbit",
+   "alt": [
+    "rabbit",
+    "bunny"
+   ],
+   "sci": "Oryctolagus cuniculus",
+   "group": "rabbit",
+   "facts": {
+    "massKg": 1.8,
+    "region": "many parts of the world",
+    "diet": "Herbivore"
+   },
+   "lookalikes": [
+    "european-hare"
+   ],
+   "blurb": "The rabbit that all pet rabbits come from. Rabbits live in burrows called warrens.",
+   "clues": [
+    "Family: Leporidae.",
+    "Genus: Oryctolagus.",
+    "It eats some of its own droppings.",
+    "Its introduction to Australia caused a plague.",
+    "It lives in burrows called warrens.",
+    "Typical adult weight: about 1.8 kg.",
+    "It lives in many parts of the world.",
+    "It eats plants.",
+    "It thumps its back feet as a warning.",
+    "The answer has 2 words (8, 6 letters).",
+    "It starts with the letter E."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/137362674/medium.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Alexis Lours",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/137362674"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/529217699/medium.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "jirau",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/529217699"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/463531772/medium.jpg",
+      "w": 500,
+      "h": 500,
+      "credit": "euqirneto",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/463531772"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "european-hare",
+   "name": "European hare",
+   "alt": [
+    "brown hare",
+    "hare"
+   ],
+   "sci": "Lepus europaeus",
+   "group": "rabbit",
+   "facts": {
+    "massKg": 4,
+    "region": "Europe",
+    "diet": "Herbivore",
+    "status": "Least concern"
+   },
+   "lookalikes": [
+    "european-rabbit"
+   ],
+   "blurb": "A long-eared, long-legged animal like a big rabbit. In spring, hares \"box\" in fields.",
+   "clues": [
+    "Its IUCN conservation status is \"Least concern\".",
+    "Family: Leporidae.",
+    "Genus: Lepus.",
+    "Its babies are born with fur and open eyes.",
+    "It does not dig burrows.",
+    "It can run at about 70 km/h.",
+    "Typical adult weight: about 4 kg.",
+    "It eats plants.",
+    "In spring it \"boxes\" in fields.",
+    "It looks like a big rabbit with long ears.",
+    "The answer has 2 words (8, 4 letters).",
+    "It starts with the letter E."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/48960994/medium.jpeg",
+      "w": 500,
+      "h": 375,
+      "credit": "Alexis Tinker-Tsavalas",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/48960994"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/15438896/medium.png",
+      "w": 402,
+      "h": 500,
+      "credit": "Grete Pasch",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/15438896"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/339863285/medium.jpeg",
+      "w": 500,
+      "h": 326,
+      "credit": "William Harland",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/339863285"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "american-bison",
+   "name": "American bison",
+   "alt": [
+    "bison",
+    "buffalo"
+   ],
+   "sci": "Bison bison",
+   "group": "cattle",
+   "facts": {
+    "massKg": 700,
+    "region": "North America",
+    "diet": "Herbivore",
+    "status": "Near threatened"
+   },
+   "blurb": "The biggest land animal in North America. Tens of millions once roamed the plains before hunters nearly wiped them out.",
+   "clues": [
+    "Its IUCN conservation status is \"Near threatened\".",
+    "Family: Bovidae.",
+    "Genus: Bos.",
+    "Only a few hundred were left by about 1890.",
+    "It can run at about 55 km/h.",
+    "Tens of millions once roamed the Great Plains.",
+    "Typical adult weight: about 700 kg.",
+    "It eats plants.",
+    "It has a big shoulder hump.",
+    "The answer has 2 words (8, 5 letters).",
+    "It starts with the letter A."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/297923496/medium.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Kathlin Simpkins",
+      "license": "CC0 1.0",
+      "page": "https://www.inaturalist.org/photos/297923496"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/91354425/medium.jpg",
+      "w": 310,
+      "h": 500,
+      "credit": "Catherine C. Galley",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/91354425"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/605263174/medium.jpg",
+      "w": 282,
+      "h": 500,
+      "credit": "Daughter Dad",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/605263174"
+     }
+    ],
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/c/cd/Bison.wav/Bison.wav.mp3",
+      "credit": "National Park Service",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Bison.wav",
+      "start": 0
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "llama",
+   "name": "Llama",
+   "sci": "Lama glama",
+   "group": "camel",
+   "facts": {
+    "massKg": 150,
+    "region": "South America",
+    "diet": "Herbivore"
+   },
+   "lookalikes": [
+    "alpaca"
+   ],
+   "blurb": "A tall South American camel relative used to carry loads in the Andes. It spits when annoyed.",
+   "clues": [
+    "Family: Camelidae.",
+    "Genus: Lama.",
+    "It is related to camels.",
+    "It was used by the Inca to carry goods.",
+    "It spits when annoyed.",
+    "Typical adult weight: about 150 kg.",
+    "It lives in South America.",
+    "It eats plants.",
+    "It is bigger than an alpaca.",
+    "It lives in the Andes.",
+    "The answer is one word of 5 letters.",
+    "It starts with the letter L."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/188007033/medium.jpg",
+      "w": 500,
+      "h": 332,
+      "credit": "Lucyin",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/188007033"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/188007041/medium.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Richard Masoner",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/188007041"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/11023551/medium.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Peter O'Connor aka anemoneprojectors",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/11023551"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "alpaca",
+   "name": "Alpaca",
+   "sci": "Lama pacos",
+   "group": "camel",
+   "facts": {
+    "massKg": 60,
+    "region": "South America",
+    "diet": "Herbivore"
+   },
+   "lookalikes": [
+    "llama"
+   ],
+   "blurb": "A fluffy South American animal kept for its soft wool. It is smaller than a llama.",
+   "clues": [
+    "Family: Camelidae.",
+    "Genus: Lama.",
+    "It hums to communicate.",
+    "It was bred from the wild vicuña.",
+    "Its wool is very soft and warm.",
+    "Typical adult weight: about 60 kg.",
+    "It lives in South America.",
+    "It eats plants.",
+    "It is smaller than a llama.",
+    "It is fluffy and lives in the Andes.",
+    "The answer is one word of 6 letters.",
+    "It starts with the letter A."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/112773251/medium.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "no rights reserved",
+      "license": "CC0 1.0",
+      "page": "https://www.inaturalist.org/photos/112773251"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/31073196/medium.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Tony Rebelo",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/31073196"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/496805095/medium.jpeg",
+      "w": 500,
+      "h": 375,
+      "credit": "Humber Alberto",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/496805095"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "capybara",
+   "name": "Capybara",
+   "sci": "Hydrochoerus hydrochaeris",
+   "group": "rodent",
+   "facts": {
+    "massKg": 50,
+    "region": "South America",
+    "diet": "Herbivore",
+    "status": "Least concern"
+   },
+   "blurb": "The biggest rodent in the world. It is so calm that other animals sit on it.",
+   "clues": [
+    "Family: Caviidae.",
+    "Genus: Hydrochoerus.",
+    "Birds and monkeys often sit on it.",
+    "It has partly webbed feet.",
+    "It lives near rivers in South America.",
+    "Typical adult weight: about 50 kg.",
+    "It lives in South America.",
+    "It eats plants.",
+    "It is very calm and friendly.",
+    "It is the biggest rodent in the world.",
+    "The answer is one word of 8 letters.",
+    "It starts with the letter C."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/39870217/medium.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Bernard DUPONT",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/39870217"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/28266462/medium.jpg",
+      "w": 500,
+      "h": 332,
+      "credit": "Bruce Kirchoff",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/28266462"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/10691626/medium.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "avocat",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/10691626"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "giant-anteater",
+   "name": "Giant anteater",
+   "alt": [
+    "anteater"
+   ],
+   "sci": "Myrmecophaga tridactyla",
+   "group": "anteater",
+   "facts": {
+    "massKg": 35,
+    "region": "South America",
+    "diet": "Insectivore",
+    "status": "Vulnerable"
+   },
+   "blurb": "A big South American animal with a long snout and a sticky tongue up to 60 cm long. It eats thousands of ants a day.",
+   "clues": [
+    "Family: Myrmecophagidae.",
+    "Genus: Myrmecophaga.",
+    "It has no teeth.",
+    "It can flick its tongue about 150 times a minute.",
+    "It walks on its knuckles to protect its claws.",
+    "Typical adult weight: about 35 kg.",
+    "It lives in South America.",
+    "It eats mostly insects.",
+    "Its tongue can be 60 cm long.",
+    "It eats thousands of ants and termites a day.",
+    "The answer has 2 words (5, 8 letters).",
+    "It starts with the letter G."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/123119770/medium.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Fernando Flores",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/123119770"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/12636412/medium.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "avocat",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/12636412"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/345917023/medium.jpeg",
+      "w": 500,
+      "h": 281,
+      "credit": "djcooker",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/345917023"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "brown-throated-sloth",
+   "name": "Brown-throated sloth",
+   "alt": [
+    "three-toed sloth",
+    "sloth"
+   ],
+   "sci": "Bradypus variegatus",
+   "group": "sloth",
+   "facts": {
+    "massKg": 4,
+    "region": "South America",
+    "diet": "Herbivore",
+    "status": "Least concern"
+   },
+   "blurb": "The world's slowest mammal. It hangs upside down in trees and climbs down only about once a week to go to the toilet.",
+   "clues": [
+    "Family: Bradypodidae.",
+    "Genus: Bradypus.",
+    "Green algae grow in its fur.",
+    "It comes down from its tree about once a week to poo.",
+    "It can turn its head almost all the way round.",
+    "Typical adult weight: about 4 kg.",
+    "It lives in South America.",
+    "It eats plants.",
+    "It hangs upside down.",
+    "It is the slowest mammal.",
+    "The answer has 3 words (5, 8, 5 letters).",
+    "It starts with the letter B."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/60587910/medium.jpg",
+      "w": 500,
+      "h": 500,
+      "credit": "Aitor",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/60587910"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/670139199/medium.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Joao Quental",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/670139199"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/256853375/medium.jpg",
+      "w": 375,
+      "h": 500,
+      "credit": "Roger A. Morales-Flores",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/256853375"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "nine-banded-armadillo",
+   "name": "Nine-banded armadillo",
+   "alt": [
+    "armadillo"
+   ],
+   "sci": "Dasypus novemcinctus",
+   "group": "armadillo",
+   "facts": {
+    "massKg": 5,
+    "region": "the Americas",
+    "diet": "Insectivore",
+    "status": "Least concern"
+   },
+   "blurb": "An animal covered in bony armour. It nearly always gives birth to four identical babies.",
+   "clues": [
+    "Family: Dasypodidae.",
+    "Genus: Dasypus.",
+    "It usually gives birth to identical quadruplets.",
+    "It can hold its breath for six minutes.",
+    "It jumps straight up when startled.",
+    "Typical adult weight: about 5 kg.",
+    "It lives in the Americas.",
+    "It eats mostly insects.",
+    "It is covered in bony armour.",
+    "Its name means \"little armoured one\" in Spanish.",
+    "The answer has 3 words (4, 6, 9 letters).",
+    "It starts with the letter N."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/552761863/medium.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Bruno Henrique Aranda",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/552761863"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/267511175/medium.jpeg",
+      "w": 500,
+      "h": 375,
+      "credit": "Pedro Silva",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/267511175"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/129628301/medium.jpeg",
+      "w": 500,
+      "h": 375,
+      "credit": "Pedro Henrique Maloso Ramos",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/129628301"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "north-american-beaver",
+   "name": "North American beaver",
+   "alt": [
+    "beaver"
+   ],
+   "sci": "Castor canadensis",
+   "group": "rodent",
+   "facts": {
+    "massKg": 20,
+    "region": "North America",
+    "diet": "Herbivore",
+    "status": "Least concern"
+   },
+   "blurb": "A big rodent that builds dams across streams with sticks and mud. Its orange teeth never stop growing.",
+   "clues": [
+    "Its IUCN conservation status is \"Least concern\".",
+    "Family: Castoridae.",
+    "Genus: Castor.",
+    "Its front teeth are orange because of iron.",
+    "It is the national animal of Canada.",
+    "It slaps its flat tail on water as a warning.",
+    "Typical adult weight: about 20 kg.",
+    "It eats plants.",
+    "It builds dams and lodges.",
+    "It chews down trees with its teeth.",
+    "The answer has 3 words (5, 8, 6 letters).",
+    "It starts with the letter N."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/172437951/medium.jpg",
+      "w": 500,
+      "h": 342,
+      "credit": "Rodney Campbell",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/172437951"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/214854240/medium.jpg",
+      "w": 500,
+      "h": 486,
+      "credit": "no rights reserved",
+      "license": "CC0 1.0",
+      "page": "https://www.inaturalist.org/photos/214854240"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/92345163/medium.jpg",
+      "w": 375,
+      "h": 500,
+      "credit": "Cody Stricker",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/92345163"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "common-raccoon",
+   "name": "Common raccoon",
+   "alt": [
+    "raccoon",
+    "racoon"
+   ],
+   "sci": "Procyon lotor",
+   "group": "raccoon",
+   "facts": {
+    "massKg": 7,
+    "region": "North America",
+    "diet": "Omnivore",
+    "status": "Least concern"
+   },
+   "lookalikes": [
+    "red-panda"
+   ],
+   "blurb": "A clever animal with a black \"mask\" and a ringed tail. It often raids rubbish bins at night.",
+   "clues": [
+    "Family: Procyonidae.",
+    "Genus: Procyon.",
+    "Its front paws are very sensitive.",
+    "It sometimes dunks food in water before eating.",
+    "It raids rubbish bins.",
+    "Typical adult weight: about 7 kg.",
+    "It lives in North America.",
+    "It eats both plants and animals.",
+    "It has a ringed tail.",
+    "It has a black mask across its eyes.",
+    "The answer has 2 words (6, 7 letters).",
+    "It starts with the letter C."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/38408348/medium.jpg",
+      "w": 500,
+      "h": 362,
+      "credit": "kent ozment",
+      "license": "CC0 1.0",
+      "page": "https://www.inaturalist.org/photos/38408348"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/244073456/medium.gif",
+      "w": 500,
+      "h": 250,
+      "credit": "no rights reserved",
+      "license": "CC0 1.0",
+      "page": "https://www.inaturalist.org/photos/244073456"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/2679010/medium.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Michael D Fox",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/2679010"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "striped-skunk",
+   "name": "Striped skunk",
+   "alt": [
+    "skunk"
+   ],
+   "sci": "Mephitis mephitis",
+   "group": "skunk",
+   "facts": {
+    "massKg": 3,
+    "region": "North America",
+    "diet": "Omnivore",
+    "status": "Least concern"
+   },
+   "blurb": "A black-and-white animal that sprays a horrible-smelling liquid at attackers.",
+   "clues": [
+    "Its IUCN conservation status is \"Least concern\".",
+    "Family: Mephitidae.",
+    "Genus: Mephitis.",
+    "Its spray can be smelled over a kilometre away.",
+    "It stamps its feet as a warning.",
+    "Great horned owls hunt it.",
+    "Typical adult weight: about 3 kg.",
+    "It lives in North America.",
+    "It eats both plants and animals.",
+    "It sprays a terrible smell.",
+    "The answer has 2 words (7, 5 letters).",
+    "It starts with the letter S."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/2761953/medium.jpg",
+      "w": 500,
+      "h": 383,
+      "credit": "Jesse Rorabaugh",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/2761953"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/66330139/medium.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "juniper_likethetree",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/66330139"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/2076866/medium.jpg",
+      "w": 497,
+      "h": 500,
+      "credit": "no rights reserved",
+      "license": "CC0 1.0",
+      "page": "https://www.inaturalist.org/photos/2076866"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "virginia-opossum",
+   "name": "Virginia opossum",
+   "alt": [
+    "opossum",
+    "possum"
+   ],
+   "sci": "Didelphis virginiana",
+   "group": "marsupial",
+   "facts": {
+    "massKg": 3,
+    "region": "North America",
+    "diet": "Omnivore",
+    "status": "Least concern"
+   },
+   "blurb": "North America's only marsupial. It \"plays dead\" when in danger.",
+   "clues": [
+    "Family: Didelphidae.",
+    "Genus: Didelphis.",
+    "It has 50 teeth.",
+    "It is the only marsupial in the USA and Canada.",
+    "It carries its babies in a pouch and on its back.",
+    "Typical adult weight: about 3 kg.",
+    "It lives in North America.",
+    "It eats both plants and animals.",
+    "Its long tail is almost hairless.",
+    "It \"plays dead\" when scared.",
+    "The answer has 2 words (8, 7 letters).",
+    "It starts with the letter V."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/64550531/medium.jpeg",
+      "w": 500,
+      "h": 375,
+      "credit": "Shirley Zundell",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/64550531"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/173131417/medium.jpeg",
+      "w": 375,
+      "h": 500,
+      "credit": "no rights reserved",
+      "license": "CC0 1.0",
+      "page": "https://www.inaturalist.org/photos/173131417"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/2443002/medium.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "no rights reserved",
+      "license": "CC0 1.0",
+      "page": "https://www.inaturalist.org/photos/2443002"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "red-kangaroo",
+   "name": "Red kangaroo",
+   "alt": [
+    "kangaroo"
+   ],
+   "sci": "Osphranter rufus",
+   "group": "marsupial",
+   "facts": {
+    "massKg": 55,
+    "region": "Australia",
+    "diet": "Herbivore",
+    "status": "Least concern"
+   },
+   "lookalikes": [
+    "eastern-grey-kangaroo"
+   ],
+   "blurb": "The biggest marsupial in the world. It hops on its big back legs and carries its baby, a joey, in a pouch.",
+   "clues": [
+    "Family: Macropodidae.",
+    "Genus: Osphranter.",
+    "It can jump about 8 metres in one bound.",
+    "Its baby is called a joey.",
+    "It uses its strong tail like a fifth leg.",
+    "Typical adult weight: about 55 kg.",
+    "It lives in Australia.",
+    "It eats plants.",
+    "It appears on Australia's coat of arms.",
+    "It is the biggest marsupial.",
+    "The answer has 2 words (3, 8 letters).",
+    "It starts with the letter R."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/167963905/medium.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "dhfischer",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/167963905"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/254198595/medium.jpg",
+      "w": 500,
+      "h": 334,
+      "credit": "Rachelle Haun",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/254198595"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/109828895/medium.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "dhfischer",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/109828895"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "eastern-grey-kangaroo",
+   "name": "Eastern grey kangaroo",
+   "sci": "Macropus giganteus",
+   "group": "marsupial",
+   "facts": {
+    "massKg": 40,
+    "region": "Australia",
+    "diet": "Herbivore",
+    "status": "Least concern"
+   },
+   "lookalikes": [
+    "red-kangaroo"
+   ],
+   "blurb": "A big grey kangaroo common in the grasslands and woodlands of eastern Australia.",
+   "clues": [
+    "Its IUCN conservation status is \"Least concern\".",
+    "Family: Macropodidae.",
+    "Genus: Macropus.",
+    "Its species name means \"gigantic\".",
+    "It lives in groups called mobs.",
+    "Typical adult weight: about 40 kg.",
+    "It lives in Australia.",
+    "It eats plants.",
+    "It is the second-largest marsupial.",
+    "The answer has 3 words (7, 4, 8 letters).",
+    "It starts with the letter E."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/53221252/medium.jpg",
+      "w": 500,
+      "h": 332,
+      "credit": "Shane Walker",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/53221252"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/5025744/medium.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Donald Hobern",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/5025744"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/262735841/medium.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Ged Tranter",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/262735841"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "koala",
+   "name": "Koala",
+   "alt": [
+    "koala bear"
+   ],
+   "sci": "Phascolarctos cinereus",
+   "group": "marsupial",
+   "facts": {
+    "massKg": 9,
+    "region": "Australia",
+    "diet": "Herbivore",
+    "status": "Vulnerable"
+   },
+   "lookalikes": [
+    "common-wombat"
+   ],
+   "blurb": "A tree-living marsupial from Australia that eats gum leaves. It sleeps for up to 20 hours a day.",
+   "clues": [
+    "Its IUCN conservation status is \"Vulnerable\".",
+    "Family: Phascolarctidae.",
+    "Genus: Phascolarctos.",
+    "Its fingerprints are almost like a human's.",
+    "It sleeps up to 20 hours a day.",
+    "It eats almost only eucalyptus leaves.",
+    "Typical adult weight: about 9 kg.",
+    "It lives in Australia.",
+    "It eats plants.",
+    "It is a furry grey tree-dweller from Australia.",
+    "The answer is one word of 5 letters.",
+    "It starts with the letter K."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/446727684/medium.jpeg",
+      "w": 500,
+      "h": 333,
+      "credit": "jirau",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/446727684"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/334142508/medium.jpg",
+      "w": 500,
+      "h": 481,
+      "credit": "no rights reserved",
+      "license": "CC0 1.0",
+      "page": "https://www.inaturalist.org/photos/334142508"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/363964034/medium.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Ged Tranter",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/363964034"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "common-wombat",
+   "name": "Common wombat",
+   "alt": [
+    "wombat"
+   ],
+   "sci": "Vombatus ursinus",
+   "group": "marsupial",
+   "facts": {
+    "massKg": 30,
+    "region": "Australia",
+    "diet": "Herbivore",
+    "status": "Least concern"
+   },
+   "lookalikes": [
+    "koala"
+   ],
+   "blurb": "A stocky burrowing marsupial from Australia. Famously, it does cube-shaped poo.",
+   "clues": [
+    "Family: Vombatidae.",
+    "Genus: Vombatus.",
+    "Its pouch faces backwards so dirt does not get in.",
+    "Its bottom is hard, like a shield.",
+    "It digs long burrows.",
+    "Typical adult weight: about 30 kg.",
+    "It lives in Australia.",
+    "It eats plants.",
+    "It is a stocky Australian marsupial.",
+    "It does cube-shaped poo.",
+    "The answer has 2 words (6, 6 letters).",
+    "It starts with the letter C."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/87611575/medium.jpeg",
+      "w": 500,
+      "h": 333,
+      "credit": "Nathan Ruser",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/87611575"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/602132755/medium.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Ryan van Huyssteen",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/602132755"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/348925020/medium.jpeg",
+      "w": 376,
+      "h": 500,
+      "credit": "David Thompson",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/348925020"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "tasmanian-devil",
+   "name": "Tasmanian devil",
+   "sci": "Sarcophilus harrisii",
+   "group": "marsupial",
+   "facts": {
+    "massKg": 8,
+    "region": "Australia",
+    "diet": "Carnivore"
+   },
+   "blurb": "The biggest meat-eating marsupial alive. It screeches loudly and has a very strong bite.",
+   "clues": [
+    "Family: Dasyuridae.",
+    "Genus: Sarcophilus.",
+    "A contagious face cancer has hit its numbers.",
+    "It eats bones and fur too.",
+    "It screeches when it feeds.",
+    "Typical adult weight: about 8 kg.",
+    "It lives in Australia.",
+    "It eats meat.",
+    "It is black with a white chest band.",
+    "It lives only on an island state of Australia.",
+    "The answer has 2 words (9, 5 letters).",
+    "It starts with the letter T."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/262038394/medium.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Mike Switzerland",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/262038394"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/662658737/medium.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Ramit Singal",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/662658737"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/114229625/medium.jpg",
+      "w": 375,
+      "h": 500,
+      "credit": "Ramit Singal",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/114229625"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "platypus",
+   "name": "Platypus",
+   "alt": [
+    "duck-billed platypus"
+   ],
+   "sci": "Ornithorhynchus anatinus",
+   "group": "monotreme",
+   "facts": {
+    "massKg": 1.5,
+    "region": "Australia",
+    "diet": "Carnivore",
+    "status": "Near threatened"
+   },
+   "lookalikes": [
+    "short-beaked-echidna"
+   ],
+   "blurb": "An Australian mammal that lays eggs, has a duck-like bill and webbed feet. Males have venomous spurs.",
+   "clues": [
+    "Its IUCN conservation status is \"Near threatened\".",
+    "Family: Ornithorhynchidae.",
+    "Genus: Ornithorhynchus.",
+    "Its fur glows under ultraviolet light.",
+    "Males have venomous spurs on their back legs.",
+    "It finds prey using electric signals.",
+    "Typical adult weight: about 1.5 kg.",
+    "It lives in Australia.",
+    "It eats meat.",
+    "It is a mammal that lays eggs.",
+    "The answer is one word of 8 letters.",
+    "It starts with the letter P."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/178746516/medium.jpeg",
+      "w": 500,
+      "h": 334,
+      "credit": "no rights reserved",
+      "license": "CC0 1.0",
+      "page": "https://www.inaturalist.org/photos/178746516"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/159363965/medium.jpeg",
+      "w": 500,
+      "h": 445,
+      "credit": "Tim",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/159363965"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/28248055/medium.jpg",
+      "w": 500,
+      "h": 241,
+      "credit": "zhangshen",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/28248055"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "short-beaked-echidna",
+   "name": "Short-beaked echidna",
+   "alt": [
+    "echidna",
+    "spiny anteater"
+   ],
+   "sci": "Tachyglossus aculeatus",
+   "group": "monotreme",
+   "facts": {
+    "massKg": 4,
+    "region": "Australia",
+    "diet": "Insectivore",
+    "status": "Least concern"
+   },
+   "lookalikes": [
+    "platypus",
+    "european-hedgehog"
+   ],
+   "blurb": "A spiny Australian mammal that lays eggs. Its baby, called a puggle, hatches in its pouch.",
+   "clues": [
+    "Its IUCN conservation status is \"Least concern\".",
+    "Family: Tachyglossidae.",
+    "Genus: Tachyglossus.",
+    "Its baby is called a puggle.",
+    "It is on the Australian five-cent coin.",
+    "It eats ants with a long sticky tongue.",
+    "Typical adult weight: about 4 kg.",
+    "It lives in Australia.",
+    "It eats mostly insects.",
+    "It lays eggs.",
+    "The answer has 3 words (5, 6, 7 letters).",
+    "It starts with the letter S."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/14939394/medium.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "no rights reserved",
+      "license": "CC0 1.0",
+      "page": "https://www.inaturalist.org/photos/14939394"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/457626616/medium.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Ged Tranter",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/457626616"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/624559106/medium.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Donald Davesne",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/624559106"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "quokka",
+   "name": "Quokka",
+   "sci": "Setonix brachyurus",
+   "group": "marsupial",
+   "facts": {
+    "massKg": 3,
+    "region": "Australia",
+    "diet": "Herbivore",
+    "status": "Vulnerable"
+   },
+   "blurb": "A small wallaby that looks like it is smiling. It is famous for selfies on Rottnest Island.",
+   "clues": [
+    "Family: Macropodidae.",
+    "Genus: Setonix.",
+    "Dutch explorers thought it was a giant rat.",
+    "Rottnest Island means \"rat's nest island\".",
+    "It is famous for selfies.",
+    "Typical adult weight: about 3 kg.",
+    "It lives in Australia.",
+    "It eats plants.",
+    "It lives on Rottnest Island.",
+    "It looks as if it is smiling.",
+    "The answer is one word of 6 letters.",
+    "It starts with the letter Q."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/458962044/medium.jpg",
+      "w": 500,
+      "h": 461,
+      "credit": "Caleb Catto",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/458962044"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/16496002/medium.jpeg",
+      "w": 500,
+      "h": 281,
+      "credit": "Philipp Pavelka",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/16496002"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/32082082/medium.jpeg",
+      "w": 500,
+      "h": 333,
+      "credit": "Thomas Mesaglio",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/32082082"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "sugar-glider",
+   "name": "Sugar glider",
+   "sci": "Petaurus breviceps",
+   "group": "marsupial",
+   "facts": {
+    "massKg": 0.12,
+    "region": "Australia",
+    "diet": "Omnivore",
+    "status": "Least concern"
+   },
+   "blurb": "A tiny marsupial that glides between trees on flaps of skin. It loves sweet sap and nectar.",
+   "clues": [
+    "Its IUCN conservation status is \"Least concern\".",
+    "Family: Petauridae.",
+    "Genus: Petaurus.",
+    "It lives in family groups in tree hollows.",
+    "It is active at night.",
+    "Typical adult weight: about 120 g.",
+    "It lives in Australia.",
+    "It eats both plants and animals.",
+    "It has a flap of skin like a cape between its legs.",
+    "The answer has 2 words (5, 6 letters).",
+    "It starts with the letter S."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/539944041/medium.jpg",
+      "w": 500,
+      "h": 334,
+      "credit": "no rights reserved",
+      "license": "CC0 1.0",
+      "page": "https://www.inaturalist.org/photos/539944041"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/679974138/medium.jpg",
+      "w": 500,
+      "h": 500,
+      "credit": "Jan Ebr &amp; Ivana Ebrová",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/679974138"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/254186060/medium.jpeg",
+      "w": 500,
+      "h": 375,
+      "credit": "no rights reserved",
+      "license": "CC0 1.0",
+      "page": "https://www.inaturalist.org/photos/254186060"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "numbat",
+   "name": "Numbat",
+   "alt": [
+    "banded anteater"
+   ],
+   "sci": "Myrmecobius fasciatus",
+   "group": "marsupial",
+   "facts": {
+    "massKg": 0.6,
+    "region": "Australia",
+    "diet": "Insectivore",
+    "status": "Near threatened"
+   },
+   "blurb": "A striped marsupial from Western Australia that eats up to 20,000 termites a day.",
+   "clues": [
+    "Family: Myrmecobiidae.",
+    "Genus: Myrmecobius.",
+    "It is Western Australia's animal emblem.",
+    "It eats up to 20,000 termites a day.",
+    "It is active during the day.",
+    "Typical adult weight: about 600 g.",
+    "It lives in Australia.",
+    "It eats mostly insects.",
+    "It has white stripes across its back.",
+    "Its name starts with a word for having no feeling.",
+    "The answer is one word of 6 letters.",
+    "It starts with the letter N."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/259629687/medium.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Kym Nicolson",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/259629687"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/106705794/medium.jpeg",
+      "w": 333,
+      "h": 500,
+      "credit": "T. Hammer",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/106705794"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/102731459/medium.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Ann Bentley",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/102731459"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "greater-bilby",
+   "name": "Greater bilby",
+   "alt": [
+    "bilby"
+   ],
+   "sci": "Macrotis lagotis",
+   "group": "marsupial",
+   "facts": {
+    "massKg": 1.5,
+    "region": "Australia",
+    "diet": "Omnivore",
+    "status": "Vulnerable"
+   },
+   "blurb": "A desert marsupial with long rabbit-like ears. Australians buy chocolate bilbies at Easter instead of bunnies.",
+   "clues": [
+    "Family: Thylacomyidae.",
+    "Genus: Macrotis.",
+    "It never needs to drink water.",
+    "Its pouch faces backwards.",
+    "It digs spiral burrows.",
+    "Typical adult weight: about 1.5 kg.",
+    "It lives in Australia.",
+    "It eats both plants and animals.",
+    "Chocolate ones are sold at Easter in Australia.",
+    "It has long ears like a rabbit.",
+    "The answer has 2 words (7, 5 letters).",
+    "It starts with the letter G."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/104083571/medium.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Bernard DUPONT",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/104083571"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/570952724/medium.jpg",
+      "w": 375,
+      "h": 500,
+      "credit": "Julia Palmer",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/570952724"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/570953671/medium.jpg",
+      "w": 500,
+      "h": 373,
+      "credit": "Julia Palmer",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/570953671"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "dingo",
+   "name": "Dingo",
+   "sci": "Canis familiaris dingo",
+   "group": "dog",
+   "facts": {
+    "massKg": 15,
+    "region": "Australia",
+    "diet": "Carnivore"
+   },
+   "lookalikes": [
+    "grey-wolf"
+   ],
+   "blurb": "Australia's wild dog. Dingoes arrived in Australia thousands of years ago.",
+   "clues": [
+    "Family: Canidae.",
+    "Genus: Canis.",
+    "A 5,600 km fence keeps it out of south-eastern farmland.",
+    "It howls but rarely barks.",
+    "It arrived in Australia thousands of years ago.",
+    "Typical adult weight: about 15 kg.",
+    "It lives in Australia.",
+    "It eats meat.",
+    "It is usually sandy-ginger.",
+    "It is Australia's wild dog.",
+    "The answer is one word of 5 letters.",
+    "It starts with the letter D."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/87498061/medium.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "dhfischer",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/87498061"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/52746014/medium.jpg",
+      "w": 500,
+      "h": 359,
+      "credit": "Graham Winterflood",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/52746014"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/4565267/medium.jpg",
+      "w": 500,
+      "h": 359,
+      "credit": "Nathan Odgers",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/4565267"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "grey-headed-flying-fox",
+   "name": "Grey-headed flying fox",
+   "alt": [
+    "flying fox",
+    "fruit bat"
+   ],
+   "sci": "Pteropus poliocephalus",
+   "group": "bat",
+   "facts": {
+    "massKg": 0.7,
+    "region": "Australia",
+    "diet": "Herbivore",
+    "status": "Vulnerable"
+   },
+   "blurb": "A big fruit bat of eastern Australia. Huge colonies roost in city parks, and they spread seeds and pollen at night.",
+   "clues": [
+    "Its IUCN conservation status is \"Vulnerable\".",
+    "Family: Pteropodidae.",
+    "Genus: Pteropus.",
+    "It spreads pollen and seeds over long distances.",
+    "Colonies roost in city parks.",
+    "It has a ginger collar.",
+    "Typical adult weight: about 700 g.",
+    "It lives in Australia.",
+    "It eats plants.",
+    "The answer has 4 words (4, 6, 6, 3 letters).",
+    "It starts with the letter G."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/597168533/medium.jpg",
+      "w": 500,
+      "h": 313,
+      "credit": "Lawrence Hylton",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/597168533"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/335884275/medium.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Carl Ramirez",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/335884275"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/343049121/medium.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Nathan Ruser",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/343049121"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "chinese-pangolin",
+   "name": "Chinese pangolin",
+   "alt": [
+    "pangolin"
+   ],
+   "sci": "Manis pentadactyla",
+   "group": "pangolin",
+   "facts": {
+    "massKg": 4,
+    "region": "Asia",
+    "diet": "Insectivore",
+    "status": "Critically endangered"
+   },
+   "blurb": "A scaly anteater that rolls into an armoured ball. Pangolins are among the most trafficked mammals.",
+   "clues": [
+    "Family: Manidae.",
+    "Genus: Manis.",
+    "It is one of the most trafficked mammals.",
+    "It has no teeth.",
+    "Its scales are made of keratin, like hair.",
+    "Typical adult weight: about 4 kg.",
+    "It lives in Asia.",
+    "It eats mostly insects.",
+    "It rolls into a ball when scared.",
+    "It is the only mammal covered in scales.",
+    "The answer has 2 words (7, 8 letters).",
+    "It starts with the letter C."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/414923786/medium.jpeg",
+      "w": 500,
+      "h": 375,
+      "credit": "雲一百香果",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/414923786"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/551362571/medium.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Mickey Wu",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/551362571"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/131662773/medium.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Licheng Shih",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/131662773"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "naked-mole-rat",
+   "name": "Naked mole-rat",
+   "sci": "Heterocephalus glaber",
+   "group": "rodent",
+   "facts": {
+    "massKg": 0.035,
+    "region": "Africa",
+    "diet": "Herbivore",
+    "status": "Least concern"
+   },
+   "blurb": "A wrinkly, almost hairless rodent that lives underground in colonies with a queen, like bees.",
+   "clues": [
+    "Family: Heterocephalidae.",
+    "Genus: Heterocephalus.",
+    "It can live for over 30 years.",
+    "It hardly ever gets cancer.",
+    "Its colony has a queen, like bees.",
+    "Typical adult weight: about 35 g.",
+    "It lives in Africa.",
+    "It eats plants.",
+    "It lives underground in East Africa.",
+    "It is wrinkly and nearly hairless.",
+    "The answer has 3 words (5, 4, 3 letters).",
+    "It starts with the letter N."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/54489/medium.jpg",
+      "w": 500,
+      "h": 374,
+      "credit": "116916927065934112165",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/54489"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/176037362/medium.jpeg",
+      "w": 423,
+      "h": 500,
+      "credit": "Jan Ebr &amp; Ivana Ebrová",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/176037362"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/736311673/medium.jpg",
+      "w": 418,
+      "h": 500,
+      "credit": "olliesaunders",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/736311673"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "crested-porcupine",
+   "name": "Crested porcupine",
+   "alt": [
+    "porcupine"
+   ],
+   "sci": "Hystrix cristata",
+   "group": "rodent",
+   "facts": {
+    "massKg": 15,
+    "region": "Africa",
+    "diet": "Herbivore",
+    "status": "Least concern"
+   },
+   "blurb": "A big rodent covered in long sharp quills. It rattles its quills and charges backwards at attackers.",
+   "clues": [
+    "Family: Hystricidae.",
+    "Genus: Hystrix.",
+    "It rattles hollow quills on its tail.",
+    "It charges backwards at attackers.",
+    "It cannot shoot its quills.",
+    "Typical adult weight: about 15 kg.",
+    "It lives in Africa.",
+    "It eats plants.",
+    "It is a large rodent.",
+    "It is covered in long sharp spines.",
+    "The answer has 2 words (7, 9 letters).",
+    "It starts with the letter C."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/132886023/medium.jpg",
+      "w": 500,
+      "h": 383,
+      "credit": "Drew Avery",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/132886023"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/51202052/medium.jpg",
+      "w": 500,
+      "h": 393,
+      "credit": "Julien Lepage",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/51202052"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/17360571/medium.jpg",
+      "w": 375,
+      "h": 500,
+      "credit": "tlaloc27",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/17360571"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "dromedary",
+   "name": "Dromedary",
+   "alt": [
+    "camel",
+    "Arabian camel"
+   ],
+   "sci": "Camelus dromedarius",
+   "group": "camel",
+   "facts": {
+    "massKg": 500,
+    "region": "Africa and the Middle East",
+    "diet": "Herbivore"
+   },
+   "lookalikes": [
+    "bactrian-camel"
+   ],
+   "blurb": "A one-humped camel of hot deserts. It can drink over 100 litres of water in a few minutes.",
+   "clues": [
+    "It can drink over 100 litres in about 10 minutes.",
+    "Australia has the largest wild herd.",
+    "It can close its nostrils against sand.",
+    "Typical adult weight: about 500 kg.",
+    "It lives in Africa and the Middle East.",
+    "It eats plants.",
+    "Its hump stores fat.",
+    "It has one hump.",
+    "The answer is one word of 9 letters.",
+    "It starts with the letter D."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/86281945/medium.jpg",
+      "w": 500,
+      "h": 308,
+      "credit": "Clément Bardot",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/86281945"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/77861714/medium.jpeg",
+      "w": 500,
+      "h": 333,
+      "credit": "Richard Fuller",
+      "license": "CC0 1.0",
+      "page": "https://www.inaturalist.org/photos/77861714"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/90920852/medium.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Norbert Nagel, Mörfelden-Walldorf, Germany",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/90920852"
+     }
+    ]
+   },
+   "difficulty": 1
+  }
+ ],
+ "questions": [
+  {
+   "id": "q1",
+   "kind": "mc",
+   "prompt": "Which is the biggest land animal?",
+   "answer": "African bush elephant",
+   "wrong": [
+    "Giraffe",
+    "Hippopotamus",
+    "White rhinoceros"
+   ],
+   "explain": "Bulls can weigh over 6 tonnes.",
+   "difficulty": 1
+  },
+  {
+   "id": "q2",
+   "kind": "mc",
+   "prompt": "Which is the tallest animal?",
+   "answer": "Giraffe",
+   "wrong": [
+    "African bush elephant",
+    "Ostrich",
+    "Moose"
+   ],
+   "explain": "Males can be about 5.5 m tall.",
+   "difficulty": 1
+  },
+  {
+   "id": "q3",
+   "kind": "mc",
+   "prompt": "Which is the fastest land animal?",
+   "answer": "Cheetah",
+   "wrong": [
+    "Lion",
+    "Horse",
+    "Greyhound"
+   ],
+   "explain": "It can reach about 100 km/h in short sprints.",
+   "difficulty": 1
+  },
+  {
+   "id": "q4",
+   "kind": "mc",
+   "prompt": "Which mammals lay eggs?",
+   "answer": "Platypus and echidna",
+   "wrong": [
+    "Koala and wombat",
+    "Bat and mole",
+    "Kangaroo and wallaby"
+   ],
+   "explain": "They are monotremes, found only in Australia and New Guinea.",
+   "difficulty": 2
+  },
+  {
+   "id": "q5",
+   "kind": "tf",
+   "prompt": "A koala is a kind of bear.",
+   "answer": false,
+   "explain": "Koalas are marsupials that carry their babies in a pouch.",
+   "difficulty": 1
+  },
+  {
+   "id": "q6",
+   "kind": "mc",
+   "prompt": "What is a baby kangaroo called?",
+   "answer": "A joey",
+   "wrong": [
+    "A cub",
+    "A kit",
+    "A calf"
+   ],
+   "explain": "Joeys grow up in their mother's pouch.",
+   "difficulty": 1
+  },
+  {
+   "id": "q7",
+   "kind": "mc",
+   "prompt": "Which animal is famous for cube-shaped poo?",
+   "answer": "Common wombat",
+   "wrong": [
+    "Koala",
+    "Rabbit",
+    "Kangaroo"
+   ],
+   "explain": "Its intestines shape the droppings into cubes.",
+   "difficulty": 1
+  },
+  {
+   "id": "q8",
+   "kind": "mc",
+   "prompt": "What is the biggest rodent in the world?",
+   "answer": "Capybara",
+   "wrong": [
+    "Beaver",
+    "Porcupine",
+    "Rat"
+   ],
+   "explain": "Capybaras can weigh over 60 kg.",
+   "difficulty": 1
+  },
+  {
+   "id": "q9",
+   "kind": "mc",
+   "prompt": "Which is the only bear that eats mostly bamboo?",
+   "answer": "Giant panda",
+   "wrong": [
+    "Polar bear",
+    "Brown bear",
+    "Red panda"
+   ],
+   "explain": "Bamboo makes up about 99% of its diet. Red pandas are not bears.",
+   "difficulty": 1
+  },
+  {
+   "id": "q10",
+   "kind": "tf",
+   "prompt": "A bat is a mammal.",
+   "answer": true,
+   "explain": "Bats are the only mammals that can truly fly.",
+   "difficulty": 1
+  },
+  {
+   "id": "q11",
+   "kind": "mc",
+   "prompt": "What colour is a polar bear's skin?",
+   "answer": "Black",
+   "wrong": [
+    "White",
+    "Pink",
+    "Grey"
+   ],
+   "explain": "Black skin soaks up heat; its fur hairs are clear.",
+   "difficulty": 2
+  },
+  {
+   "id": "q12",
+   "kind": "mc",
+   "prompt": "How many bones are in a giraffe's neck?",
+   "answer": "7",
+   "wrong": [
+    "2",
+    "20",
+    "50"
+   ],
+   "explain": "Almost all mammals, including us, have seven neck bones.",
+   "difficulty": 2
+  },
+  {
+   "id": "q13",
+   "kind": "mc",
+   "prompt": "What is a group of lions called?",
+   "answer": "A pride",
+   "wrong": [
+    "A pack",
+    "A herd",
+    "A flock"
+   ],
+   "explain": "Lions are the only truly social cats.",
+   "difficulty": 1
+  },
+  {
+   "id": "q14",
+   "kind": "mc",
+   "prompt": "Which animal is the closest living relative of the giraffe?",
+   "answer": "Okapi",
+   "wrong": [
+    "Zebra",
+    "Camel",
+    "Antelope"
+   ],
+   "explain": "Okapis are giraffids that live in Congo rainforest.",
+   "difficulty": 2
+  },
+  {
+   "id": "q15",
+   "kind": "mc",
+   "prompt": "What do you call an animal that eats only plants?",
+   "answer": "Herbivore",
+   "wrong": [
+    "Carnivore",
+    "Omnivore",
+    "Insectivore"
+   ],
+   "explain": "Herbivores eat plants; carnivores eat meat; omnivores eat both.",
+   "difficulty": 1
+  }
+ ],
+ "fakes": [
+  "Golden-maned tapir",
+  "Pygmy snow wombat",
+  "Striped forest yak",
+  "Northern glass otter",
+  "Spotted marsh panda",
+  "Desert thunder lemur",
+  "Crested tundra koala"
+ ],
+ "sources": [
+  {
+   "name": "iNaturalist",
+   "url": "https://www.inaturalist.org"
+  },
+  {
+   "name": "Wikidata",
+   "url": "https://www.wikidata.org"
+  },
+  {
+   "name": "Wikimedia Commons",
+   "url": "https://commons.wikimedia.org"
+  }
+ ]
+}

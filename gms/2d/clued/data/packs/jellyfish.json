@@ -1,0 +1,1590 @@
+{
+ "id": "jellyfish",
+ "title": "Jellyfish & stingers",
+ "theme": "animals",
+ "icon": "🪼",
+ "kids": true,
+ "version": 1,
+ "notice": "Not for real-world identification. If stung, get first aid and follow local advice.",
+ "leakExempt": [
+  "jellyfish",
+  "jelly"
+ ],
+ "factsMeta": {
+  "danger": {
+   "type": "cat",
+   "label": "Sting",
+   "values": [
+    "Harmless",
+    "Mild sting",
+    "Painful sting",
+    "Potentially deadly"
+   ]
+  },
+  "kind": {
+   "type": "cat",
+   "label": "Kind of animal"
+  }
+ },
+ "items": [
+  {
+   "id": "box-jellyfish",
+   "name": "Box jellyfish",
+   "alt": [
+    "sea wasp",
+    "Australian box jellyfish"
+   ],
+   "sci": "Chironex fleckeri",
+   "group": "box jellyfish",
+   "facts": {
+    "danger": "Potentially deadly",
+    "kind": "Box jellyfish"
+   },
+   "lookalikes": [
+    "moon-jellyfish",
+    "irukandji-jellyfish"
+   ],
+   "blurb": "A see-through jellyfish of northern Australia with a cube-shaped bell. Its sting is one of the most deadly in the world.",
+   "clues": [
+    "Class: Cubozoa.",
+    "Family: Chirodropidae.",
+    "It has 24 eyes, some with lenses.",
+    "Vinegar is poured on its stings to stop more stinging cells firing.",
+    "It can have up to 60 tentacles up to 3 metres long.",
+    "Its venom can kill a person.",
+    "Its bell is shaped like a cube.",
+    "The answer has 2 words (3, 9 letters).",
+    "It starts with the letter B."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/157640089/medium.jpeg",
+      "w": 500,
+      "h": 375,
+      "credit": "Kai Squires",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/157640089"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "irukandji-jellyfish",
+   "name": "Irukandji jellyfish",
+   "alt": [
+    "Irukandji"
+   ],
+   "sci": "Carukia barnesi",
+   "group": "box jellyfish",
+   "facts": {
+    "danger": "Potentially deadly",
+    "kind": "Box jellyfish"
+   },
+   "lookalikes": [
+    "box-jellyfish"
+   ],
+   "blurb": "A tiny box jellyfish, about the size of a fingernail. Its sting can cause terrible pain, sweating and a dangerous rise in blood pressure.",
+   "clues": [
+    "Class: Cubozoa.",
+    "Family: Carukiidae.",
+    "Its species name honours Jack Barnes, who let it sting him to prove it was the cause.",
+    "Its bell is only about 1 cm across.",
+    "Its sting causes a syndrome of back pain, vomiting and sweating.",
+    "Its venom can kill a person.",
+    "It is named after an Aboriginal people from near Cairns.",
+    "It is a tiny but very dangerous jellyfish.",
+    "The answer has 2 words (9, 9 letters).",
+    "It starts with the letter I."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/148301255/medium.jpg",
+      "w": 454,
+      "h": 500,
+      "credit": "Lisa-ann Gershwin",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/148301255"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/148301257/medium.jpg",
+      "w": 500,
+      "h": 362,
+      "credit": "GondwanaGirl 04:29, 6 January 2009 (UTC)",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/148301257"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "portuguese-man-o-war",
+   "name": "Portuguese man o' war",
+   "alt": [
+    "man o' war",
+    "Portuguese man-of-war"
+   ],
+   "sci": "Physalia physalis",
+   "group": "siphonophore",
+   "facts": {
+    "danger": "Painful sting",
+    "kind": "Siphonophore"
+   },
+   "lookalikes": [
+    "bluebottle",
+    "by-the-wind-sailor"
+   ],
+   "blurb": "It looks like a jellyfish, but it is really a floating colony of many tiny animals working together. Its long blue tentacles sting.",
+   "clues": [
+    "Class: Hydrozoa.",
+    "Family: Physaliidae.",
+    "It is a colony of many small animals, not one animal.",
+    "Its tentacles can be over 10 metres long.",
+    "It floats on a gas-filled sail.",
+    "Its sting is very painful.",
+    "It is named after an old sailing warship.",
+    "It comes from a country next to Spain.",
+    "The answer has 4 words (10, 3, 1, 3 letters).",
+    "It starts with the letter P."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/544306293/medium.jpg",
+      "w": 488,
+      "h": 500,
+      "credit": "Jan Ebr &amp; Ivana Ebrová",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/544306293"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/183028065/medium.jpeg",
+      "w": 500,
+      "h": 316,
+      "credit": "Jan Ebr &amp; Ivana Ebrová",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/183028065"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/31588251/medium.jpeg",
+      "w": 500,
+      "h": 375,
+      "credit": "Георгий Виноградов (Georgy Vinogradov)",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/31588251"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "bluebottle",
+   "name": "Bluebottle",
+   "alt": [
+    "Pacific man o' war"
+   ],
+   "sci": "Physalia utriculus",
+   "group": "siphonophore",
+   "facts": {
+    "danger": "Painful sting",
+    "kind": "Siphonophore"
+   },
+   "lookalikes": [
+    "portuguese-man-o-war",
+    "blue-button"
+   ],
+   "blurb": "A small blue floating stinger that washes up on Australian beaches in thousands after onshore winds.",
+   "clues": [
+    "Class: Hydrozoa.",
+    "Family: Physaliidae.",
+    "Its float acts as a sail.",
+    "It usually has one main long fishing tentacle.",
+    "Hot water helps ease its sting.",
+    "Its sting is very painful.",
+    "Thousands wash up on Australian beaches after north-east winds.",
+    "It is named after a blue glass container.",
+    "The answer is one word of 10 letters.",
+    "It starts with the letter B."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/660769247/medium.jpg",
+      "w": 334,
+      "h": 500,
+      "credit": "tunicatedreamz",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/660769247"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/463115994/medium.jpeg",
+      "w": 500,
+      "h": 375,
+      "credit": "Muhammad Uzair Davids",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/463115994"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/660768781/medium.jpg",
+      "w": 334,
+      "h": 500,
+      "credit": "tunicatedreamz",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/660768781"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "moon-jellyfish",
+   "name": "Moon jellyfish",
+   "alt": [
+    "moon jelly",
+    "common jellyfish"
+   ],
+   "sci": "Aurelia aurita",
+   "group": "true jellyfish",
+   "facts": {
+    "danger": "Mild sting",
+    "kind": "Jellyfish"
+   },
+   "lookalikes": [
+    "box-jellyfish"
+   ],
+   "blurb": "A common see-through jellyfish with four pale rings in its bell. Its sting is too weak for most people to feel.",
+   "clues": [
+    "Class: Scyphozoa.",
+    "Family: Ulmaridae.",
+    "It is often kept in aquariums.",
+    "It catches plankton on sticky mucus.",
+    "It has four horseshoe-shaped rings in its bell.",
+    "Its sting is mild.",
+    "It is clear and saucer-shaped.",
+    "It is named after something in the night sky.",
+    "The answer has 2 words (4, 9 letters).",
+    "It starts with the letter M."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/2915596/medium.JPG",
+      "w": 500,
+      "h": 375,
+      "credit": "Floyd A. Reed",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/2915596"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/17663444/medium.jpeg",
+      "w": 500,
+      "h": 375,
+      "credit": "mfeaver",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/17663444"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/44516705/medium.jpeg",
+      "w": 500,
+      "h": 375,
+      "credit": "Micha Baum",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/44516705"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "lions-mane-jellyfish",
+   "name": "Lion's mane jellyfish",
+   "alt": [
+    "lion's mane"
+   ],
+   "sci": "Cyanea capillata",
+   "group": "true jellyfish",
+   "facts": {
+    "danger": "Painful sting",
+    "kind": "Jellyfish"
+   },
+   "blurb": "The largest known jellyfish. Its mass of hundreds of tentacles can trail for many metres.",
+   "clues": [
+    "Class: Scyphozoa.",
+    "Family: Cyaneidae.",
+    "One washed up in 1870 had tentacles about 37 metres long.",
+    "It lives in cold northern seas.",
+    "It has hundreds of thin tentacles.",
+    "Its sting is very painful.",
+    "It is the largest known jellyfish.",
+    "Its tentacles look like the hairy neck of a big cat.",
+    "The answer has 3 words (5, 4, 9 letters).",
+    "It starts with the letter L."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/405338855/medium.jpg",
+      "w": 500,
+      "h": 331,
+      "credit": "no rights reserved",
+      "license": "CC0 1.0",
+      "page": "https://www.inaturalist.org/photos/405338855"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/557514597/medium.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "no rights reserved",
+      "license": "CC0 1.0",
+      "page": "https://www.inaturalist.org/photos/557514597"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/87476613/medium.jpeg",
+      "w": 500,
+      "h": 375,
+      "credit": "Charlotte Kirchner",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/87476613"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "compass-jellyfish",
+   "name": "Compass jellyfish",
+   "sci": "Chrysaora hysoscella",
+   "group": "true jellyfish",
+   "facts": {
+    "danger": "Painful sting",
+    "kind": "Jellyfish"
+   },
+   "blurb": "A European jellyfish with brown V-shaped markings that look like the points of a compass.",
+   "clues": [
+    "Class: Scyphozoa.",
+    "Family: Pelagiidae.",
+    "It starts life as a male and later becomes female.",
+    "It is common around Britain in summer.",
+    "It has 24 tentacles.",
+    "Its sting is very painful.",
+    "Its bell has 16 brown V-shaped marks.",
+    "It is named after a tool for finding north.",
+    "The answer has 2 words (7, 9 letters).",
+    "It starts with the letter C."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/215165228/medium.jpeg",
+      "w": 500,
+      "h": 375,
+      "credit": "John Hepburn",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/215165228"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/664933334/medium.jpg",
+      "w": 375,
+      "h": 500,
+      "credit": "Fraser Higgins",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/664933334"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/669161058/medium.jpg",
+      "w": 500,
+      "h": 281,
+      "credit": "no rights reserved",
+      "license": "CC0 1.0",
+      "page": "https://www.inaturalist.org/photos/669161058"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "barrel-jellyfish",
+   "name": "Barrel jellyfish",
+   "alt": [
+    "dustbin-lid jellyfish"
+   ],
+   "sci": "Rhizostoma pulmo",
+   "group": "true jellyfish",
+   "facts": {
+    "danger": "Mild sting",
+    "kind": "Jellyfish"
+   },
+   "blurb": "A huge, heavy European jellyfish with frilly arms instead of long tentacles. It can be as big as a person.",
+   "clues": [
+    "Class: Scyphozoa.",
+    "Family: Rhizostomatidae.",
+    "A diver filmed one as big as a person off Cornwall in 2019.",
+    "It has frilly arms instead of long tentacles.",
+    "Its bell has a purple rim.",
+    "Its sting is mild.",
+    "Its sting is weak.",
+    "It is named after a wooden container for wine.",
+    "The answer has 2 words (6, 9 letters).",
+    "It starts with the letter B."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/58146118/medium.jpg",
+      "w": 500,
+      "h": 376,
+      "credit": "katunchik",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/58146118"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/292750240/medium.jpeg",
+      "w": 500,
+      "h": 309,
+      "credit": "Gianni Del Bufalo bygdb",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/292750240"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/416296728/medium.jpeg",
+      "w": 375,
+      "h": 500,
+      "credit": "Jennie Pistevos",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/416296728"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "upside-down-jellyfish",
+   "name": "Upside-down jellyfish",
+   "sci": "Cassiopea",
+   "group": "true jellyfish",
+   "facts": {
+    "danger": "Mild sting",
+    "kind": "Jellyfish"
+   },
+   "blurb": "A jellyfish that lies on the sea floor with its arms pointing up, so algae living in it get sunlight.",
+   "clues": [
+    "Class: Scyphozoa.",
+    "Family: Cassiopeidae.",
+    "Algae living inside it make food from sunlight.",
+    "It releases stinging mucus into the water.",
+    "It lives in shallow lagoons and mangroves.",
+    "Its sting is mild.",
+    "It lies on the sea floor.",
+    "It rests the wrong way up.",
+    "The answer has 3 words (6, 4, 9 letters).",
+    "It starts with the letter U."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/179161047/medium.jpg",
+      "w": 500,
+      "h": 200,
+      "credit": "no rights reserved",
+      "license": "CC0 1.0",
+      "page": "https://www.inaturalist.org/photos/179161047"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/32969688/medium.jpeg",
+      "w": 500,
+      "h": 375,
+      "credit": "Louis Imbeau",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/32969688"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/385582737/medium.jpeg",
+      "w": 500,
+      "h": 281,
+      "credit": "Sarah Faulwetter",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/385582737"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "immortal-jellyfish",
+   "name": "Immortal jellyfish",
+   "sci": "Turritopsis dohrnii",
+   "group": "hydrozoan",
+   "facts": {
+    "danger": "Harmless",
+    "kind": "Hydrozoan"
+   },
+   "blurb": "A tiny jellyfish that can turn back into its baby form when stressed or old, again and again.",
+   "clues": [
+    "Class: Hydrozoa.",
+    "Family: Oceaniidae.",
+    "It is only about 4.5 mm across.",
+    "Its stomach shows bright red through its body.",
+    "It can turn back into a polyp.",
+    "It is harmless to people.",
+    "It can restart its life cycle.",
+    "It is said it may never die of old age.",
+    "The answer has 2 words (8, 9 letters).",
+    "It starts with the letter I."
+   ],
+   "difficulty": 2
+  },
+  {
+   "id": "fried-egg-jellyfish",
+   "name": "Fried egg jellyfish",
+   "alt": [
+    "Mediterranean jellyfish"
+   ],
+   "sci": "Cotylorhiza tuberculata",
+   "group": "true jellyfish",
+   "facts": {
+    "danger": "Harmless",
+    "kind": "Jellyfish"
+   },
+   "blurb": "A Mediterranean jellyfish with a raised yellow-orange dome in the middle of its pale bell.",
+   "clues": [
+    "Class: Scyphozoa.",
+    "Family: Cepheidae.",
+    "Small fish often shelter under it.",
+    "Its sting is too weak to hurt people.",
+    "It is harmless to people.",
+    "It has a yellow dome in the middle.",
+    "It looks like a breakfast food.",
+    "The answer has 3 words (5, 3, 9 letters).",
+    "It starts with the letter F."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/2901372/medium.jpg",
+      "w": 500,
+      "h": 500,
+      "credit": "Nils",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/2901372"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/151629853/medium.jpg",
+      "w": 375,
+      "h": 500,
+      "credit": "Chris Taklis",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/151629853"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/48385897/medium.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Emanuele Santarelli",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/48385897"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "mauve-stinger",
+   "name": "Mauve stinger",
+   "sci": "Pelagia noctiluca",
+   "group": "true jellyfish",
+   "facts": {
+    "danger": "Painful sting",
+    "kind": "Jellyfish"
+   },
+   "blurb": "A pinkish-purple jellyfish that glows at night. Huge swarms close beaches in the Mediterranean.",
+   "clues": [
+    "Class: Scyphozoa.",
+    "Family: Pelagiidae.",
+    "Its scientific name means \"night light\".",
+    "It glows when disturbed.",
+    "Swarms of it close Mediterranean beaches.",
+    "It is a pinkish-purple colour.",
+    "The answer has 2 words (5, 7 letters).",
+    "It starts with the letter M."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/326992039/medium.jpeg",
+      "w": 500,
+      "h": 281,
+      "credit": "Yves Bas",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/326992039"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/34666059/medium.jpeg",
+      "w": 500,
+      "h": 375,
+      "credit": "Michiel de Groot",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/34666059"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/146367422/medium.jpg",
+      "w": 375,
+      "h": 500,
+      "credit": "biodiversitygr",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/146367422"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "pacific-sea-nettle",
+   "name": "Pacific sea nettle",
+   "alt": [
+    "sea nettle"
+   ],
+   "sci": "Chrysaora fuscescens",
+   "group": "true jellyfish",
+   "facts": {
+    "danger": "Painful sting",
+    "kind": "Jellyfish"
+   },
+   "blurb": "A golden-brown jellyfish with long maroon arms, common off the west coast of North America and in big aquariums.",
+   "clues": [
+    "Class: Scyphozoa.",
+    "Family: Pelagiidae.",
+    "It is a favourite in big public aquariums.",
+    "It lives off California and Oregon.",
+    "It has long, frilly maroon arms.",
+    "Its sting is very painful.",
+    "Its bell is golden-brown.",
+    "It is named after a stinging plant.",
+    "The answer has 3 words (7, 3, 6 letters).",
+    "It starts with the letter P."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/95663153/medium.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Ed Bierman",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/95663153"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/190780422/medium.jpg",
+      "w": 500,
+      "h": 341,
+      "credit": "Ray in Manila",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/190780422"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/185936712/medium.jpg",
+      "w": 500,
+      "h": 313,
+      "credit": "Stig Nygaard",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/185936712"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "blue-blubber-jellyfish",
+   "name": "Blue blubber jellyfish",
+   "alt": [
+    "blue blubber"
+   ],
+   "sci": "Catostylus mosaicus",
+   "group": "true jellyfish",
+   "facts": {
+    "danger": "Mild sting",
+    "kind": "Jellyfish"
+   },
+   "blurb": "A round, rubbery jellyfish of eastern Australia that can be blue, brown or white. Its sting is mild.",
+   "clues": [
+    "Class: Scyphozoa.",
+    "Family: Catostylidae.",
+    "It has no long tentacles, only eight frilly arms.",
+    "It lives in estuaries of eastern Australia.",
+    "Its sting is mild.",
+    "Its name sounds like whale fat.",
+    "The answer has 3 words (4, 7, 9 letters).",
+    "It starts with the letter B."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/1977362/medium.jpeg",
+      "w": 500,
+      "h": 375,
+      "credit": "Peter Campbell",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/1977362"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/4707420/medium.jpg",
+      "w": 500,
+      "h": 446,
+      "credit": "gailhampshire",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/4707420"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/29773621/medium.jpeg",
+      "w": 375,
+      "h": 500,
+      "credit": "no rights reserved",
+      "license": "CC0 1.0",
+      "page": "https://www.inaturalist.org/photos/29773621"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "by-the-wind-sailor",
+   "name": "By-the-wind sailor",
+   "alt": [
+    "velella"
+   ],
+   "sci": "Velella velella",
+   "group": "hydrozoan",
+   "facts": {
+    "danger": "Harmless",
+    "kind": "Hydrozoan"
+   },
+   "lookalikes": [
+    "portuguese-man-o-war",
+    "blue-button"
+   ],
+   "blurb": "A small blue floating animal with a stiff sail on top. Millions sometimes wash up on beaches at once.",
+   "clues": [
+    "Class: Hydrozoa.",
+    "Family: Porpitidae.",
+    "It is a floating colony of tiny animals.",
+    "Millions can wash up on one beach.",
+    "It is harmless to people.",
+    "It is pushed around by moving air.",
+    "The answer has 4 words (2, 3, 4, 6 letters).",
+    "It starts with the letter B."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/94738913/medium.jpg",
+      "w": 500,
+      "h": 347,
+      "credit": "Niki Hubbard",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/94738913"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/112102094/medium.jpg",
+      "w": 500,
+      "h": 331,
+      "credit": "Sherri Barras",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/112102094"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/93447593/medium.jpeg",
+      "w": 500,
+      "h": 375,
+      "credit": "no rights reserved",
+      "license": "CC0 1.0",
+      "page": "https://www.inaturalist.org/photos/93447593"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "blue-button",
+   "name": "Blue button",
+   "sci": "Porpita porpita",
+   "group": "hydrozoan",
+   "facts": {
+    "danger": "Mild sting",
+    "kind": "Hydrozoan"
+   },
+   "lookalikes": [
+    "by-the-wind-sailor",
+    "bluebottle"
+   ],
+   "blurb": "A small, round, floating animal with a golden disc and blue tentacles. It is not a true jellyfish.",
+   "clues": [
+    "Class: Hydrozoa.",
+    "Family: Porpitidae.",
+    "It is a colony of tiny animals.",
+    "It floats at the sea surface.",
+    "Its centre is a golden-brown disc.",
+    "Its sting is mild.",
+    "It is round and small, like a fastener on a shirt.",
+    "The answer has 2 words (4, 6 letters).",
+    "It starts with the letter B."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/206228902/medium.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Emily Roberts",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/206228902"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/152108659/medium.jpg",
+      "w": 375,
+      "h": 500,
+      "credit": "Emme Carroll",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/152108659"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/254278213/medium.jpeg",
+      "w": 375,
+      "h": 500,
+      "credit": "Brandon Corder",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/254278213"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "crystal-jelly",
+   "name": "Crystal jelly",
+   "sci": "Aequorea victoria",
+   "group": "hydrozoan",
+   "facts": {
+    "danger": "Harmless",
+    "kind": "Hydrozoan"
+   },
+   "blurb": "A clear jellyfish of the North American Pacific coast. A glowing protein found in it won a Nobel Prize and changed biology.",
+   "clues": [
+    "Class: Hydrozoa.",
+    "Family: Aequoreidae.",
+    "A protein from it won the 2008 Nobel Prize in Chemistry.",
+    "Its green fluorescent protein is used to make cells glow in labs.",
+    "It glows green around its edge.",
+    "It is harmless to people.",
+    "It lives off the west coast of North America.",
+    "It is almost totally see-through, like glass.",
+    "The answer has 2 words (7, 5 letters).",
+    "It starts with the letter C."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/144174729/medium.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Totti",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/144174729"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/668181196/medium.jpg",
+      "w": 500,
+      "h": 366,
+      "credit": "Cricket Raspet",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/668181196"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/8764613/medium.png",
+      "w": 500,
+      "h": 333,
+      "credit": "David Badke",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/8764613"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "golden-jellyfish",
+   "name": "Golden jellyfish",
+   "sci": "Mastigias papua",
+   "group": "true jellyfish",
+   "facts": {
+    "danger": "Harmless",
+    "kind": "Jellyfish"
+   },
+   "blurb": "Millions of these jellyfish live in Jellyfish Lake in Palau, following the sun across the lake each day.",
+   "clues": [
+    "Class: Scyphozoa.",
+    "Family: Mastigiidae.",
+    "Millions live in a marine lake in Palau.",
+    "They swim across the lake each day following the sun.",
+    "Algae inside them make food from sunlight.",
+    "It is harmless to people.",
+    "Tourists snorkel among them.",
+    "They are a yellow colour.",
+    "The answer has 2 words (6, 9 letters).",
+    "It starts with the letter G."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/41903890/medium.jpeg",
+      "w": 500,
+      "h": 375,
+      "credit": "Thibaud Aronson",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/41903890"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/65343900/medium.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Kai Squires",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/65343900"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/65344120/medium.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Kai Squires",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/65344120"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "cannonball-jellyfish",
+   "name": "Cannonball jellyfish",
+   "sci": "Stomolophus meleagris",
+   "group": "true jellyfish",
+   "facts": {
+    "danger": "Mild sting",
+    "kind": "Jellyfish"
+   },
+   "blurb": "A firm, round jellyfish common off the south-eastern USA. It is caught and dried for food in Asia.",
+   "clues": [
+    "Class: Scyphozoa.",
+    "Family: Stomolophidae.",
+    "It is exported to Asia as food.",
+    "It has no long tentacles.",
+    "Its bell is round and hard.",
+    "Its sting is mild.",
+    "It is common off Georgia and Florida.",
+    "It is named after an old iron ball fired from guns.",
+    "The answer has 2 words (10, 9 letters).",
+    "It starts with the letter C."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/76277914/medium.jpeg",
+      "w": 500,
+      "h": 333,
+      "credit": "Richard Stovall",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/76277914"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/368252768/medium.jpeg",
+      "w": 281,
+      "h": 500,
+      "credit": "no rights reserved",
+      "license": "CC0 1.0",
+      "page": "https://www.inaturalist.org/photos/368252768"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/368252055/medium.jpeg",
+      "w": 281,
+      "h": 500,
+      "credit": "no rights reserved",
+      "license": "CC0 1.0",
+      "page": "https://www.inaturalist.org/photos/368252055"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "stonefish",
+   "name": "Stonefish",
+   "alt": [
+    "reef stonefish"
+   ],
+   "sci": "Synanceia verrucosa",
+   "group": "fish",
+   "facts": {
+    "danger": "Potentially deadly",
+    "kind": "Fish"
+   },
+   "lookalikes": [
+    "red-lionfish"
+   ],
+   "blurb": "The most venomous fish in the world. It looks just like a lumpy rock, and its spines sting people who step on it.",
+   "clues": [
+    "Class: Actinopterygii.",
+    "Family: Synanceiidae.",
+    "It has 13 venomous spines on its back.",
+    "It can survive out of water for hours.",
+    "People are stung when they step on it.",
+    "Its venom can kill a person.",
+    "It is the most venomous fish in the world.",
+    "It looks just like a rock.",
+    "The answer is one word of 9 letters.",
+    "It starts with the letter S."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/127651323/medium.jpeg",
+      "w": 500,
+      "h": 334,
+      "credit": "Ewout Knoester",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/127651323"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/199611213/medium.jpeg",
+      "w": 500,
+      "h": 375,
+      "credit": "Ewout Knoester",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/199611213"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/253038608/medium.jpeg",
+      "w": 375,
+      "h": 500,
+      "credit": "Debra Baker",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/253038608"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "red-lionfish",
+   "name": "Red lionfish",
+   "alt": [
+    "lionfish"
+   ],
+   "sci": "Pterois volitans",
+   "group": "fish",
+   "facts": {
+    "danger": "Painful sting",
+    "kind": "Fish"
+   },
+   "lookalikes": [
+    "stonefish"
+   ],
+   "blurb": "A striped fish with long venomous spines. It has invaded the Caribbean, where it eats many native fish.",
+   "clues": [
+    "Class: Actinopterygii.",
+    "Family: Scorpaenidae.",
+    "It is invading the Caribbean and Atlantic.",
+    "It comes from the Indian and Pacific Oceans.",
+    "Its fins spread out like feathers.",
+    "Its sting is very painful.",
+    "It is named after a big cat with a mane.",
+    "The answer has 2 words (3, 8 letters).",
+    "It starts with the letter R."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/70521568/medium.png",
+      "w": 500,
+      "h": 362,
+      "credit": "Jens Petersen",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/70521568"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/113880693/medium.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "no rights reserved",
+      "license": "CC0 1.0",
+      "page": "https://www.inaturalist.org/photos/113880693"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/439718648/medium.jpeg",
+      "w": 500,
+      "h": 377,
+      "credit": "Dan Schofield",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/439718648"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "blue-ringed-octopus",
+   "name": "Blue-ringed octopus",
+   "sci": "Hapalochlaena lunulata",
+   "group": "mollusc",
+   "facts": {
+    "danger": "Potentially deadly",
+    "kind": "Octopus"
+   },
+   "lookalikes": [
+    "geography-cone"
+   ],
+   "blurb": "A tiny octopus that flashes bright blue rings when alarmed. Its bite contains a venom with no antidote.",
+   "clues": [
+    "Class: Cephalopoda.",
+    "Its venom is the same toxin found in pufferfish.",
+    "There is no antivenom for its bite.",
+    "It is only about the size of a golf ball.",
+    "Its venom can kill a person.",
+    "It lives in rock pools in Australia and Asia.",
+    "The answer has 3 words (4, 6, 7 letters).",
+    "It starts with the letter B."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/40594012/medium.jpg",
+      "w": 500,
+      "h": 365,
+      "credit": "desertnaturalist",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/40594012"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/60648752/medium.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Kai Squires",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/60648752"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/257441934/medium.jpg",
+      "w": 375,
+      "h": 500,
+      "credit": "Nadezhda Bortnikova",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/257441934"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "geography-cone",
+   "name": "Geography cone",
+   "alt": [
+    "cone snail"
+   ],
+   "sci": "Conus geographus",
+   "group": "mollusc",
+   "facts": {
+    "danger": "Potentially deadly",
+    "kind": "Sea snail"
+   },
+   "lookalikes": [
+    "blue-ringed-octopus"
+   ],
+   "blurb": "A sea snail with a beautiful patterned shell that fires a venomous harpoon. It has killed people.",
+   "clues": [
+    "Class: Gastropoda.",
+    "Family: Conidae.",
+    "It fires a harpoon-like tooth.",
+    "Its venom can kill a person.",
+    "Collectors are stung picking up its shell.",
+    "It is named after the study of maps.",
+    "The answer has 2 words (9, 4 letters).",
+    "It starts with the letter G."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/258290671/medium.jpg",
+      "w": 230,
+      "h": 500,
+      "credit": "James St. John",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/258290671"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/116455008/medium.jpeg",
+      "w": 261,
+      "h": 500,
+      "credit": "Walliang C.",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/116455008"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/2851851/medium.jpg",
+      "w": 500,
+      "h": 400,
+      "credit": "Almed2",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/2851851"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "crown-of-thorns-starfish",
+   "name": "Crown-of-thorns starfish",
+   "sci": "Acanthaster planci",
+   "group": "echinoderm",
+   "facts": {
+    "danger": "Painful sting",
+    "kind": "Starfish"
+   },
+   "blurb": "A big starfish covered in venomous spines. Outbreaks of it eat large areas of coral on the Great Barrier Reef.",
+   "clues": [
+    "Class: Asteroidea.",
+    "Family: Acanthasteridae.",
+    "It can have up to 21 arms.",
+    "It eats coral by pushing its stomach out over it.",
+    "Outbreaks damage the Great Barrier Reef.",
+    "Its sting is very painful.",
+    "It is covered in sharp venomous spines.",
+    "It is named after something worn by Jesus at the crucifixion.",
+    "The answer has 4 words (5, 2, 6, 8 letters).",
+    "It starts with the letter C."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/525906136/medium.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Nathan",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/525906136"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/190286887/medium.jpeg",
+      "w": 500,
+      "h": 375,
+      "credit": "luluchouette",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/190286887"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/591493819/medium.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Jakkarin Burananit",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/591493819"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "fire-coral",
+   "name": "Fire coral",
+   "sci": "Millepora",
+   "group": "hydrozoan",
+   "facts": {
+    "danger": "Painful sting",
+    "kind": "Hydrozoan"
+   },
+   "blurb": "It looks like coral, but it is related to jellyfish. Touching it gives a burning sting.",
+   "clues": [
+    "Class: Hydrozoa.",
+    "Family: Milleporidae.",
+    "Its surface is covered in tiny pores.",
+    "It is yellow-brown with white tips.",
+    "Its sting is very painful.",
+    "Divers get stung when they brush against it.",
+    "Its sting feels like a burn.",
+    "The answer has 2 words (4, 5 letters).",
+    "It starts with the letter F."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/520923201/medium.jpg",
+      "w": 375,
+      "h": 500,
+      "credit": "Pauline Walsh Jacobson",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/520923201"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/261236596/medium.jpg",
+      "w": 500,
+      "h": 282,
+      "credit": "Robin White",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/261236596"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/612947569/medium.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Turner Brockman",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/612947569"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "bluespotted-ribbontail-ray",
+   "name": "Bluespotted ribbontail ray",
+   "sci": "Taeniura lymma",
+   "group": "ray",
+   "facts": {
+    "danger": "Painful sting",
+    "kind": "Fish"
+   },
+   "blurb": "A small, colourful stingray of Indo-Pacific reefs with bright blue spots and venomous tail spines.",
+   "clues": [
+    "Class: Chondrichthyes.",
+    "Family: Dasyatidae.",
+    "It has one or two venomous spines on its tail.",
+    "It lives on Indo-Pacific coral reefs.",
+    "It is a kind of stingray.",
+    "Its sting is very painful.",
+    "Its body is covered in bright blue spots.",
+    "Its tail has blue stripes on the sides.",
+    "The answer has 3 words (11, 10, 3 letters).",
+    "It starts with the letter B."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/229213941/medium.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Daniel Benák",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/229213941"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/7419720/medium.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Geoff Shuetrim",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/7419720"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/335169718/medium.jpeg",
+      "w": 500,
+      "h": 375,
+      "credit": "Gergely Nigg",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/335169718"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "warty-comb-jelly",
+   "name": "Warty comb jelly",
+   "alt": [
+    "sea walnut"
+   ],
+   "sci": "Mnemiopsis leidyi",
+   "group": "comb jelly",
+   "facts": {
+    "danger": "Harmless",
+    "kind": "Comb jelly"
+   },
+   "lookalikes": [
+    "moon-jellyfish"
+   ],
+   "blurb": "A see-through comb jelly with rows of shimmering hairs. It is not a jellyfish and cannot sting.",
+   "clues": [
+    "Class: Tentaculata.",
+    "Family: Bolinopsidae.",
+    "It has no stinging cells.",
+    "Rows of tiny hairs flash rainbow colours as it swims.",
+    "It is harmless to people.",
+    "It is not a true jellyfish.",
+    "The answer has 3 words (5, 4, 5 letters).",
+    "It starts with the letter W."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/173832279/medium.jpg",
+      "w": 500,
+      "h": 334,
+      "credit": "Klaus Kevin Kristensen",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/173832279"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/256097139/medium.jpeg",
+      "w": 364,
+      "h": 500,
+      "credit": "Daniela Martínez",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/256097139"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/198193589/medium.jpeg",
+      "w": 500,
+      "h": 333,
+      "credit": "Julien Renoult",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/198193589"
+     }
+    ]
+   },
+   "difficulty": 3
+  }
+ ],
+ "questions": [
+  {
+   "id": "q1",
+   "kind": "tf",
+   "prompt": "Jellyfish have no brain.",
+   "answer": true,
+   "explain": "They have a simple net of nerves instead of a brain.",
+   "difficulty": 1
+  },
+  {
+   "id": "q2",
+   "kind": "tf",
+   "prompt": "A jellyfish is a fish.",
+   "answer": false,
+   "explain": "Jellyfish are cnidarians, related to corals and sea anemones.",
+   "difficulty": 1
+  },
+  {
+   "id": "q3",
+   "kind": "mc",
+   "prompt": "Which Australian jellyfish has a cube-shaped bell and a deadly sting?",
+   "answer": "Box jellyfish",
+   "wrong": [
+    "Moon jellyfish",
+    "Blue blubber jellyfish",
+    "Lion's mane jellyfish"
+   ],
+   "explain": "Chironex fleckeri is among the most venomous animals known.",
+   "difficulty": 1
+  },
+  {
+   "id": "q4",
+   "kind": "mc",
+   "prompt": "Lifeguards in northern Australia pour what on box jellyfish stings?",
+   "answer": "Vinegar",
+   "wrong": [
+    "Fresh water",
+    "Milk",
+    "Lemonade"
+   ],
+   "explain": "Vinegar stops unfired stinging cells from firing. Always follow local first-aid advice.",
+   "difficulty": 2
+  },
+  {
+   "id": "q5",
+   "kind": "tf",
+   "prompt": "The Portuguese man o' war is a single animal.",
+   "answer": false,
+   "explain": "It is a colony of specialised zooids working together.",
+   "difficulty": 2
+  },
+  {
+   "id": "q6",
+   "kind": "mc",
+   "prompt": "Which is the most venomous fish in the world?",
+   "answer": "Stonefish",
+   "wrong": [
+    "Lionfish",
+    "Great white shark",
+    "Piranha"
+   ],
+   "explain": "Its back spines inject venom when stepped on.",
+   "difficulty": 1
+  },
+  {
+   "id": "q7",
+   "kind": "mc",
+   "prompt": "Which jellyfish can turn back into its young form?",
+   "answer": "Immortal jellyfish",
+   "wrong": [
+    "Moon jellyfish",
+    "Box jellyfish",
+    "Barrel jellyfish"
+   ],
+   "explain": "Turritopsis dohrnii can revert from medusa to polyp.",
+   "difficulty": 2
+  },
+  {
+   "id": "q8",
+   "kind": "mc",
+   "prompt": "What does a blue-ringed octopus do when it is alarmed?",
+   "answer": "Flashes bright blue rings",
+   "wrong": [
+    "Squirts red ink",
+    "Puffs up like a ball",
+    "Changes into a starfish shape"
+   ],
+   "explain": "The rings warn predators of its deadly venom.",
+   "difficulty": 1
+  },
+  {
+   "id": "q9",
+   "kind": "mc",
+   "prompt": "What kind of animal is a jellyfish most closely related to?",
+   "answer": "Coral",
+   "wrong": [
+    "Squid",
+    "Fish",
+    "Crab"
+   ],
+   "explain": "Jellyfish, corals and sea anemones are all cnidarians with stinging cells.",
+   "difficulty": 2
+  },
+  {
+   "id": "q10",
+   "kind": "mc",
+   "prompt": "Which famous glowing protein came from a jellyfish and won a Nobel Prize?",
+   "answer": "Green fluorescent protein",
+   "wrong": [
+    "Insulin",
+    "Penicillin",
+    "Haemoglobin"
+   ],
+   "explain": "GFP from the crystal jelly earned the 2008 Nobel Prize in Chemistry.",
+   "difficulty": 3
+  }
+ ],
+ "fakes": [
+  "Glass crown jellyfish",
+  "Spotted thunder jelly",
+  "Northern ribbon stinger",
+  "Golden man o' war",
+  "Silver box jelly",
+  "Coral lantern stinger"
+ ],
+ "sources": [
+  {
+   "name": "iNaturalist",
+   "url": "https://www.inaturalist.org"
+  },
+  {
+   "name": "Wikidata",
+   "url": "https://www.wikidata.org"
+  }
+ ]
+}

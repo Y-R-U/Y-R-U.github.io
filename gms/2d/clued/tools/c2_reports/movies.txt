@@ -1,0 +1,22 @@
+gross differs The Empire Strikes Back: 550016086 (Wikipedia: List of highest-grossing films (by year)) vs 538375067 (Wikipedia: 1980s in film) -> keeping larger (lifetime)
+gross differs Back to the Future: 402420713 (Wikipedia: List of highest-grossing films (by year)) vs 381109762 (Wikipedia: 1980s in film) -> keeping larger (lifetime)
+gross differs Return of the Jedi: 482466382 (Wikipedia: List of highest-grossing films (by year)) vs 374593074 (Wikipedia: 1980s in film) -> keeping larger (lifetime)
+gross differs Raiders of the Lost Ark: 389925971 (Wikipedia: List of highest-grossing films (by year)) vs 353988025 (Wikipedia: 1980s in film) -> keeping larger (lifetime)
+gross differs Titanic: 2257906828 (Wikipedia: List of highest-grossing films (by year)) vs 1843201268 (Wikipedia: 1990s in film) -> keeping larger (lifetime)
+gross differs Star Wars: Episode I – The Phantom Menace: 1046515409 (Wikipedia: List of highest-grossing films (by year)) vs 924317558 (Wikipedia: 1990s in film) -> keeping larger (lifetime)
+gross differs Jurassic Park: 1037535230 (Wikipedia: List of highest-grossing films (by year)) vs 914691118 (Wikipedia: 1990s in film) -> keeping larger (lifetime)
+gross differs The Lion King: 970946637 (Wikipedia: List of highest-grossing films (by year)) vs 763455561 (Wikipedia: 1990s in film) -> keeping larger (lifetime)
+gross differs Avatar: 2923710708 (Wikipedia: List of highest-grossing films (by year)) vs 2743577587 (Wikipedia: 2000s in film) -> keeping larger (lifetime)
+gross differs Harry Potter and the Philosopher's Stone: 1014382248 (Wikipedia: List of highest-grossing films (by year)) vs 974755371 (Wikipedia: 2000s in film) -> keeping larger (lifetime)
+gross differs Avengers: Endgame: 2925000000 (Wikipedia: List of highest-grossing films (by year)) vs 2797800564 (Wikipedia: 2010s in film) -> keeping larger (lifetime)
+gross differs Ne Zha 2: 2217758382 (Wikipedia: List of highest-grossing films (by year)) vs 2270700370 (Wikipedia: 2020s in film) -> keeping larger (lifetime)
+box office Ghostbusters: used 370000000, wikidata max 295200000
+box office Titanic: used 2257906828, wikidata max 1850197130
+box office Demon Slayer: Kimetsu no Yaiba – The Movie: Mugen Train: used 515417627, wikidata max 40430000000
+box office Inside Out 2: used 1698863816, wikidata max 835300000
+box office Frozen II: used 1450026933, wikidata max 1119151068
+quote NOT verified Star Wars: Episode I – The Phantom Menace: Now this is podracing!
+quote NOT verified The Lord of the Rings: The Two Towers: Po-tay-toes! Boil 'em, mash 'em, stick 'em in a stew.
+quote NOT verified Pirates of the Caribbean: Dead Man's Chest: I've got a jar of dirt!
+quote NOT verified Avengers: Infinity War: Perfectly balanced, as all things should be.
+quote NOT verified Batman: Have you ever danced with the devil in the pale moonlight?

@@ -1,0 +1,62 @@
+@id hits-1970s
+@title Hits of the 1970s
+@icon 🕺
+@sources [{"name":"Billboard Year-End Hot 100 singles (1970–1979)","url":"https://en.wikipedia.org/wiki/Billboard_Year-End_Hot_100_singles_of_1970"},{"name":"UK best-selling singles by year","url":"https://en.wikipedia.org/wiki/List_of_best-selling_singles_by_year_(UK)"}]
+1970 | Simon & Garfunkel | Bridge Over Troubled Water | d=1
+1970 | Carpenters | (They Long to Be) Close to You | alt=Close to You
+1970 | The Guess Who | American Woman
+1970 | Edwin Starr | War
+1970 | The Jackson 5 | ABC | d=1
+1970 | The Beatles | Let It Be | d=1
+1971 | Three Dog Night | Joy to the World
+1971 | Rod Stewart | Maggie May
+1971 | Carole King | It's Too Late
+1971 | Bee Gees | How Can You Mend a Broken Heart
+1971 | The Rolling Stones | Brown Sugar
+1971 | John Lennon | Imagine | d=1
+1971 | Don McLean | American Pie | d=1
+1972 | Gilbert O'Sullivan | Alone Again (Naturally)
+1972 | Bill Withers | Lean on Me | d=1
+1971 | Al Green | Let's Stay Together
+1971 | Nilsson | Without You | am=nilsson
+1972 | Elton John | Crocodile Rock
+1972 | Carly Simon | You're So Vain
+1973 | Tony Orlando & Dawn | Tie a Yellow Ribbon Round the Ole Oak Tree | am=dawn
+1973 | Roberta Flack | Killing Me Softly with His Song
+1973 | Marvin Gaye | Let's Get It On
+1973 | Jim Croce | Bad, Bad Leroy Brown
+1974 | ABBA | Waterloo | d=1
+1974 | Carl Douglas | Kung Fu Fighting | d=1
+1973 | Redbone | Come and Get Your Love
+1973 | Barbra Streisand | The Way We Were
+1975 | Captain & Tennille | Love Will Keep Us Together | am=captain
+1975 | Glen Campbell | Rhinestone Cowboy
+1975 | Bee Gees | Jive Talkin'
+1975 | David Bowie | Fame
+1975 | Eagles | One of These Nights
+1974 | Labelle | Lady Marmalade
+1975 | Queen | Bohemian Rhapsody | d=1
+1976 | Wings | Silly Love Songs
+1976 | Elton John & Kiki Dee | Don't Go Breaking My Heart | am=elton
+1976 | Wild Cherry | Play That Funky Music
+1976 | ABBA | Dancing Queen | d=1
+1976 | Stevie Wonder | Sir Duke
+1976 | Eagles | Hotel California | d=1
+1976 | Rod Stewart | Tonight's the Night (Gonna Be Alright) | tm=tonight.?s the night
+1977 | Andy Gibb | I Just Want to Be Your Everything
+1977 | The Emotions | Best of My Love
+1977 | Fleetwood Mac | Go Your Own Way | d=1
+1977 | Bee Gees | Stayin' Alive | d=1
+1978 | Andy Gibb | Shadow Dancing
+1977 | Bee Gees | Night Fever | d=1
+1978 | Chic | Le Freak | d=1
+1978 | John Travolta & Olivia Newton-John | You're the One That I Want | am=travolta; d=1
+1978 | Frankie Valli | Grease
+1978 | Gloria Gaynor | I Will Survive | d=1
+1978 | Village People | Y.M.C.A. | d=1; alt=YMCA
+1979 | The Knack | My Sharona
+1979 | Donna Summer | Hot Stuff
+1979 | Anita Ward | Ring My Bell
+1978 | Blondie | Heart of Glass
+1979 | Michael Jackson | Don't Stop 'Til You Get Enough
+1979 | Pink Floyd | Another Brick in the Wall, Pt. 2 | tm=another brick in the wall.*2

@@ -1,0 +1,904 @@
+{
+ "id": "_dev",
+ "title": "Dev sampler",
+ "theme": "general",
+ "icon": "🧪",
+ "kids": false,
+ "version": 1,
+ "notice": "Development pack. Lane C will delete this.",
+ "imgPrompt": "Which of these is {aName}?",
+ "nameImgPrompt": "What animal is this?",
+ "factsMeta": {
+  "class": {
+   "type": "cat",
+   "label": "Animal class",
+   "ask": "Which class of animal does the {lname} belong to?",
+   "stmt": "The {lname} is {aValue}."
+  },
+  "venomous": {
+   "type": "bool",
+   "label": "Venomous",
+   "yes": "Venomous",
+   "no": "Not venomous",
+   "askBool": "Which of these is venomous?",
+   "stmt": "The {lname} is venomous."
+  },
+  "massKg": {
+   "type": "num",
+   "label": "Typical adult mass",
+   "unit": "kg",
+   "higherLabel": "Heavier",
+   "askHigh": "Which of these is the heaviest?",
+   "askLow": "Which of these is the lightest?",
+   "minRatio": 1.8
+  },
+  "capital": {
+   "type": "cat",
+   "label": "Capital",
+   "ask": "What is the capital of {name}?",
+   "askReverse": "{value} is the capital of which country?",
+   "stmt": "The capital of {name} is {value}."
+  },
+  "continent": {
+   "type": "cat",
+   "label": "Continent",
+   "ask": "Which continent is {name} in?",
+   "stmt": "{name} is in {value}."
+  }
+ },
+ "items": [
+  {
+   "id": "tiger",
+   "name": "Tiger",
+   "alt": [
+    "bengal tiger"
+   ],
+   "sci": "Panthera tigris",
+   "group": "animal",
+   "facts": {
+    "class": "Mammal",
+    "venomous": false,
+    "massKg": 200
+   },
+   "blurb": "The largest living cat. Each tiger's stripe pattern is unique.",
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/b/b0/Bengal_tiger_%28Panthera_tigris_tigris%29_female_3_crop.jpg/500px-Bengal_tiger_%28Panthera_tigris_tigris%29_female_3_crop.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Charles J. Sharp",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Bengal_tiger_(Panthera_tigris_tigris)_female_3_crop.jpg"
+     }
+    ]
+   },
+   "difficulty": 1,
+   "clues": [
+    "Its scientific genus is Panthera.",
+    "It is the largest living species of cat.",
+    "Its stripe pattern is unique to each individual.",
+    "One subspecies lives in India and Bangladesh.",
+    "It is a big orange cat with black stripes."
+   ]
+  },
+  {
+   "id": "african-bush-elephant",
+   "name": "African bush elephant",
+   "alt": [
+    "african elephant",
+    "elephant"
+   ],
+   "sci": "Loxodonta africana",
+   "group": "animal",
+   "facts": {
+    "class": "Mammal",
+    "venomous": false,
+    "massKg": 6000
+   },
+   "blurb": "The largest living land animal. Both males and females can grow tusks.",
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/9/94/178_Male_African_bush_elephant_in_Etosha_National_Park_Photo_by_Giles_Laurent.jpg/500px-178_Male_African_bush_elephant_in_Etosha_National_Park_Photo_by_Giles_Laurent.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Giles Laurent",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:178_Male_African_bush_elephant_in_Etosha_National_Park_Photo_by_Giles_Laurent.jpg"
+     }
+    ]
+   },
+   "difficulty": 1,
+   "clues": [
+    "Its genus is Loxodonta.",
+    "It is the largest living land animal.",
+    "Its large ears help it to lose body heat.",
+    "Both males and females can have tusks.",
+    "It is a huge grey animal with a trunk."
+   ],
+   "lname": "African bush elephant"
+  },
+  {
+   "id": "giant-panda",
+   "name": "Giant panda",
+   "alt": [
+    "panda"
+   ],
+   "sci": "Ailuropoda melanoleuca",
+   "group": "animal",
+   "facts": {
+    "class": "Mammal",
+    "venomous": false,
+    "massKg": 100
+   },
+   "blurb": "A bear from the mountain forests of central China that eats almost nothing but bamboo.",
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/0/0f/Grosser_Panda.JPG/500px-Grosser_Panda.JPG",
+      "w": 500,
+      "h": 333,
+      "credit": "J. Patrick Fischer",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Grosser_Panda.JPG"
+     }
+    ]
+   },
+   "difficulty": 1,
+   "clues": [
+    "It belongs to the bear family, Ursidae.",
+    "It has a 'pseudo-thumb' made from an enlarged wrist bone.",
+    "It lives in mountain forests in central China.",
+    "Bamboo makes up almost all of its diet.",
+    "It is a black-and-white bear."
+   ]
+  },
+  {
+   "id": "emperor-penguin",
+   "name": "Emperor penguin",
+   "alt": [],
+   "sci": "Aptenodytes forsteri",
+   "group": "animal",
+   "facts": {
+    "class": "Bird",
+    "venomous": false,
+    "massKg": 30
+   },
+   "blurb": "The tallest and heaviest penguin. Males keep the egg warm on their feet through the Antarctic winter.",
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/a/a3/Aptenodytes_forsteri_-Snow_Hill_Island%2C_Antarctica_-adults_and_juvenile-8.jpg/500px-Aptenodytes_forsteri_-Snow_Hill_Island%2C_Antarctica_-adults_and_juvenile-8.jpg",
+      "w": 500,
+      "h": 803,
+      "credit": "Ian Duffy from UK",
+      "license": "CC BY 2.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Aptenodytes_forsteri_-Snow_Hill_Island,_Antarctica_-adults_and_juvenile-8.jpg"
+     }
+    ]
+   },
+   "difficulty": 1,
+   "clues": [
+    "Its scientific name is Aptenodytes forsteri.",
+    "Males keep the egg warm on their feet through the Antarctic winter.",
+    "It is the tallest and heaviest of all the flightless seabirds of its family.",
+    "It cannot fly but is an excellent swimmer.",
+    "It is a large black-and-white seabird with yellow-orange ear patches."
+   ]
+  },
+  {
+   "id": "bald-eagle",
+   "name": "Bald eagle",
+   "alt": [
+    "american eagle"
+   ],
+   "sci": "Haliaeetus leucocephalus",
+   "group": "animal",
+   "facts": {
+    "class": "Bird",
+    "venomous": false,
+    "massKg": 5
+   },
+   "blurb": "The national bird of the United States. Its head is covered in white feathers, not bald.",
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/d/db/Bald_eagle_about_to_fly_in_Alaska_%282016%29.jpg/500px-Bald_eagle_about_to_fly_in_Alaska_%282016%29.jpg",
+      "w": 500,
+      "h": 400,
+      "credit": "Andy Morffew from Itchen Abbas, Hampshire, UK",
+      "license": "CC BY 2.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Bald_eagle_about_to_fly_in_Alaska_(2016).jpg"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "inland-taipan",
+   "name": "Inland taipan",
+   "alt": [
+    "fierce snake"
+   ],
+   "sci": "Oxyuranus microlepidotus",
+   "group": "animal",
+   "facts": {
+    "class": "Reptile",
+    "venomous": true
+   },
+   "blurb": "An Australian snake with the most toxic venom of any land snake. It is shy and rarely bites people.",
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/f/fe/Fierce_Snake-Oxyuranus_microlepidotus.jpg/500px-Fierce_Snake-Oxyuranus_microlepidotus.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Photo by XLerate",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Fierce_Snake-Oxyuranus_microlepidotus.jpg"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "green-sea-turtle",
+   "name": "Green sea turtle",
+   "alt": [
+    "green turtle"
+   ],
+   "sci": "Chelonia mydas",
+   "group": "animal",
+   "facts": {
+    "class": "Reptile",
+    "venomous": false
+   },
+   "blurb": "A large sea turtle named for the greenish colour of its fat, not its shell.",
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/a/a3/Green_sea_turtle_%28Chelonia_mydas%29_Moorea.jpg/500px-Green_sea_turtle_%28Chelonia_mydas%29_Moorea.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Charles J. Sharp",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Green_sea_turtle_(Chelonia_mydas)_Moorea.jpg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "great-white-shark",
+   "name": "Great white shark",
+   "alt": [
+    "white shark",
+    "great white"
+   ],
+   "sci": "Carcharodon carcharias",
+   "group": "animal",
+   "facts": {
+    "class": "Fish",
+    "venomous": false,
+    "massKg": 1000
+   },
+   "blurb": "The largest predatory fish alive today.",
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/5/56/White_shark.jpg/500px-White_shark.jpg",
+      "w": 500,
+      "h": 348,
+      "credit": "Pterantula (Terry Goss) at en.wikipedia",
+      "license": "CC BY 2.5",
+      "page": "https://commons.wikimedia.org/wiki/File:White_shark.jpg"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "monarch-butterfly",
+   "name": "Monarch butterfly",
+   "alt": [
+    "monarch"
+   ],
+   "sci": "Danaus plexippus",
+   "group": "animal",
+   "facts": {
+    "class": "Insect",
+    "venomous": false,
+    "massKg": 0.0005
+   },
+   "blurb": "Famous for its long migration across North America each year.",
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/6/63/Monarch_In_May.jpg/500px-Monarch_In_May.jpg",
+      "w": 500,
+      "h": 332,
+      "credit": "Kenneth Dwain Harrelson",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Monarch_In_May.jpg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "axolotl",
+   "name": "Axolotl",
+   "alt": [],
+   "sci": "Ambystoma mexicanum",
+   "group": "animal",
+   "facts": {
+    "class": "Amphibian",
+    "venomous": false,
+    "massKg": 0.08
+   },
+   "blurb": "A salamander from lakes near Mexico City that keeps its feathery gills as an adult and can regrow lost limbs.",
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/0/00/Axolotl_ganz.jpg/500px-Axolotl_ganz.jpg",
+      "w": 500,
+      "h": 279,
+      "credit": "LoKiLeCh",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Axolotl_ganz.jpg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "france",
+   "name": "France",
+   "alt": [],
+   "group": "country",
+   "facts": {
+    "capital": "Paris",
+    "continent": "Europe"
+   },
+   "blurb": "France is in Europe. Its capital is Paris.",
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/c/c3/Flag_of_France.svg/500px-Flag_of_France.svg.png",
+      "w": 500,
+      "h": 333,
+      "credit": "Original: Unknown Vector:  SKopp",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Flag_of_France.svg"
+     }
+    ]
+   },
+   "difficulty": 1,
+   "imgPrompt": "Which is the flag of {name}?",
+   "nameImgPrompt": "Which country's flag is this?",
+   "tfImgPrompt": "This is the flag of {name}.",
+   "clues": [
+    "Its national motto is 'Liberty, Equality, Fraternity'.",
+    "It has more time zones than any other country, thanks to its overseas territories.",
+    "Its national anthem is 'La Marseillaise'.",
+    "The Eiffel Tower stands in its capital.",
+    "Its capital is Paris."
+   ]
+  },
+  {
+   "id": "japan",
+   "name": "Japan",
+   "alt": [],
+   "group": "country",
+   "facts": {
+    "capital": "Tokyo",
+    "continent": "Asia"
+   },
+   "blurb": "Japan is in Asia. Its capital is Tokyo.",
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/9/9e/Flag_of_Japan.svg/500px-Flag_of_Japan.svg.png",
+      "w": 500,
+      "h": 333,
+      "credit": "Various",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Flag_of_Japan.svg"
+     }
+    ]
+   },
+   "difficulty": 1,
+   "imgPrompt": "Which is the flag of {name}?",
+   "nameImgPrompt": "Which country's flag is this?",
+   "tfImgPrompt": "This is the flag of {name}.",
+   "clues": [
+    "Its national parliament is called the Diet.",
+    "It is made up of more than 14,000 islands.",
+    "Mount Fuji is its highest mountain.",
+    "Its capital is Tokyo.",
+    "Its flag is a red circle on a white background."
+   ]
+  },
+  {
+   "id": "brazil",
+   "name": "Brazil",
+   "alt": [],
+   "group": "country",
+   "facts": {
+    "capital": "Brasília",
+    "continent": "South America"
+   },
+   "blurb": "Brazil is in South America. Its capital is Brasília.",
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/0/05/Flag_of_Brazil.svg/500px-Flag_of_Brazil.svg.png",
+      "w": 500,
+      "h": 350,
+      "credit": "Raimundo Teixeira Mendes",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Flag_of_Brazil.svg"
+     }
+    ]
+   },
+   "difficulty": 2,
+   "imgPrompt": "Which is the flag of {name}?",
+   "nameImgPrompt": "Which country's flag is this?",
+   "tfImgPrompt": "This is the flag of {name}."
+  },
+  {
+   "id": "australia",
+   "name": "Australia",
+   "alt": [],
+   "group": "country",
+   "facts": {
+    "capital": "Canberra",
+    "continent": "Oceania"
+   },
+   "blurb": "Australia is in Oceania. Its capital is Canberra.",
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/b/b9/Flag_of_Australia.svg/500px-Flag_of_Australia.svg.png",
+      "w": 500,
+      "h": 250,
+      "credit": "Original: Ivor Evans, Leslie John Hawkins, Egbert John Nuttall, Annie Dorrington",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Flag_of_Australia.svg"
+     }
+    ]
+   },
+   "difficulty": 2,
+   "imgPrompt": "Which is the flag of {name}?",
+   "nameImgPrompt": "Which country's flag is this?",
+   "tfImgPrompt": "This is the flag of {name}.",
+   "clues": [
+    "Its capital city was purpose-built as a compromise between two rival cities.",
+    "The Great Barrier Reef lies off its north-east coast.",
+    "Kangaroos and koalas are native here.",
+    "Its largest city is Sydney.",
+    "Its capital is Canberra."
+   ]
+  },
+  {
+   "id": "canada",
+   "name": "Canada",
+   "alt": [],
+   "group": "country",
+   "facts": {
+    "capital": "Ottawa",
+    "continent": "North America"
+   },
+   "blurb": "Canada is in North America. Its capital is Ottawa.",
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/c/cf/Flag_of_Canada.svg/500px-Flag_of_Canada.svg.png",
+      "w": 500,
+      "h": 250,
+      "credit": "Created by George F. G. Stanley /  E Pluribus Anthony / User:Mzajac",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Flag_of_Canada.svg"
+     }
+    ]
+   },
+   "difficulty": 2,
+   "imgPrompt": "Which is the flag of {name}?",
+   "nameImgPrompt": "Which country's flag is this?",
+   "tfImgPrompt": "This is the flag of {name}."
+  },
+  {
+   "id": "egypt",
+   "name": "Egypt",
+   "alt": [],
+   "group": "country",
+   "facts": {
+    "capital": "Cairo",
+    "continent": "Africa"
+   },
+   "blurb": "Egypt is in Africa. Its capital is Cairo.",
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/f/fe/Flag_of_Egypt.svg/500px-Flag_of_Egypt.svg.png",
+      "w": 500,
+      "h": 333,
+      "credit": "See File history below for details.",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Flag_of_Egypt.svg"
+     }
+    ]
+   },
+   "difficulty": 1,
+   "imgPrompt": "Which is the flag of {name}?",
+   "nameImgPrompt": "Which country's flag is this?",
+   "tfImgPrompt": "This is the flag of {name}."
+  },
+  {
+   "id": "kenya",
+   "name": "Kenya",
+   "alt": [],
+   "group": "country",
+   "facts": {
+    "capital": "Nairobi",
+    "continent": "Africa"
+   },
+   "blurb": "Kenya is in Africa. Its capital is Nairobi.",
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/4/49/Flag_of_Kenya.svg/500px-Flag_of_Kenya.svg.png",
+      "w": 500,
+      "h": 333,
+      "credit": "User:Pumbaa80",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Flag_of_Kenya.svg"
+     }
+    ]
+   },
+   "difficulty": 2,
+   "imgPrompt": "Which is the flag of {name}?",
+   "nameImgPrompt": "Which country's flag is this?",
+   "tfImgPrompt": "This is the flag of {name}."
+  },
+  {
+   "id": "italy",
+   "name": "Italy",
+   "alt": [],
+   "group": "country",
+   "facts": {
+    "capital": "Rome",
+    "continent": "Europe"
+   },
+   "blurb": "Italy is in Europe. Its capital is Rome.",
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/0/03/Flag_of_Italy.svg/500px-Flag_of_Italy.svg.png",
+      "w": 500,
+      "h": 333,
+      "credit": "See below.",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Flag_of_Italy.svg"
+     }
+    ]
+   },
+   "difficulty": 1,
+   "imgPrompt": "Which is the flag of {name}?",
+   "nameImgPrompt": "Which country's flag is this?",
+   "tfImgPrompt": "This is the flag of {name}."
+  },
+  {
+   "id": "india",
+   "name": "India",
+   "alt": [],
+   "group": "country",
+   "facts": {
+    "capital": "New Delhi",
+    "continent": "Asia"
+   },
+   "blurb": "India is in Asia. Its capital is New Delhi.",
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/4/41/Flag_of_India.svg/500px-Flag_of_India.svg.png",
+      "w": 500,
+      "h": 333,
+      "credit": "Government of India",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Flag_of_India.svg"
+     }
+    ]
+   },
+   "difficulty": 2,
+   "imgPrompt": "Which is the flag of {name}?",
+   "nameImgPrompt": "Which country's flag is this?",
+   "tfImgPrompt": "This is the flag of {name}."
+  },
+  {
+   "id": "mexico",
+   "name": "Mexico",
+   "alt": [],
+   "group": "country",
+   "facts": {
+    "capital": "Mexico City",
+    "continent": "North America"
+   },
+   "blurb": "Mexico is in North America. Its capital is Mexico City.",
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/f/fc/Flag_of_Mexico.svg/500px-Flag_of_Mexico.svg.png",
+      "w": 500,
+      "h": 286,
+      "credit": "Omar Alejandro Covarrubias Neri, 9 April 2006. Based on the 1968 arms by Francis",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Flag_of_Mexico.svg"
+     }
+    ]
+   },
+   "difficulty": 2,
+   "imgPrompt": "Which is the flag of {name}?",
+   "nameImgPrompt": "Which country's flag is this?",
+   "tfImgPrompt": "This is the flag of {name}."
+  }
+ ],
+ "questions": [
+  {
+   "id": "red-planet",
+   "kind": "mc",
+   "prompt": "Which planet is known as the Red Planet?",
+   "answer": "Mars",
+   "wrong": [
+    "Venus",
+    "Jupiter",
+    "Saturn"
+   ],
+   "explain": "Iron oxide (rust) in its soil gives Mars its red colour.",
+   "difficulty": 1
+  },
+  {
+   "id": "largest-ocean",
+   "kind": "mc",
+   "prompt": "What is the largest ocean on Earth?",
+   "answer": "Pacific Ocean",
+   "wrong": [
+    "Atlantic Ocean",
+    "Indian Ocean",
+    "Arctic Ocean"
+   ],
+   "explain": "The Pacific covers about a third of Earth's surface.",
+   "difficulty": 1
+  },
+  {
+   "id": "spider-legs",
+   "kind": "mc",
+   "prompt": "How many legs does a spider have?",
+   "answer": "8",
+   "wrong": [
+    "6",
+    "10",
+    "12"
+   ],
+   "explain": "Spiders are arachnids, which have eight legs. Insects have six.",
+   "difficulty": 1
+  },
+  {
+   "id": "photosynthesis",
+   "kind": "mc",
+   "prompt": "Which gas do plants take in from the air for photosynthesis?",
+   "answer": "Carbon dioxide",
+   "wrong": [
+    "Oxygen",
+    "Nitrogen",
+    "Hydrogen"
+   ],
+   "explain": "Plants use carbon dioxide, water and light to make sugar, and give off oxygen.",
+   "difficulty": 1
+  },
+  {
+   "id": "mona-lisa",
+   "kind": "mc",
+   "prompt": "Who painted the Mona Lisa?",
+   "answer": "Leonardo da Vinci",
+   "wrong": [
+    "Michelangelo",
+    "Raphael",
+    "Rembrandt"
+   ],
+   "explain": "Leonardo worked on it in the early 1500s. It hangs in the Louvre in Paris.",
+   "difficulty": 1
+  },
+  {
+   "id": "gold-symbol",
+   "kind": "mc",
+   "prompt": "What is the chemical symbol for gold?",
+   "answer": "Au",
+   "wrong": [
+    "Ag",
+    "Gd",
+    "Go"
+   ],
+   "explain": "Au comes from 'aurum', the Latin word for gold. Ag is silver.",
+   "difficulty": 2
+  },
+  {
+   "id": "titanic",
+   "kind": "mc",
+   "prompt": "In which year did the Titanic sink?",
+   "answer": "1912",
+   "wrong": [
+    "1905",
+    "1918",
+    "1921"
+   ],
+   "explain": "It sank on 15 April 1912 after hitting an iceberg on its first voyage.",
+   "difficulty": 2
+  },
+  {
+   "id": "hardest",
+   "kind": "mc",
+   "prompt": "What is the hardest natural substance?",
+   "answer": "Diamond",
+   "wrong": [
+    "Quartz",
+    "Topaz",
+    "Granite"
+   ],
+   "explain": "Diamond scores 10, the top of the Mohs hardness scale.",
+   "difficulty": 1
+  },
+  {
+   "id": "smallest-planet",
+   "kind": "mc",
+   "prompt": "Which is the smallest planet in our Solar System?",
+   "answer": "Mercury",
+   "wrong": [
+    "Mars",
+    "Venus",
+    "Earth"
+   ],
+   "explain": "Mercury is only a little larger than our Moon.",
+   "difficulty": 2
+  },
+  {
+   "id": "biggest-cat",
+   "kind": "mc",
+   "prompt": "This big cat is the largest living cat species. What is it?",
+   "answer": "Tiger",
+   "wrong": [
+    "Lion",
+    "Jaguar",
+    "Leopard"
+   ],
+   "explain": "Tigers are the largest of the cats, slightly bigger on average than lions.",
+   "difficulty": 1,
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/b/b0/Bengal_tiger_%28Panthera_tigris_tigris%29_female_3_crop.jpg/500px-Bengal_tiger_%28Panthera_tigris_tigris%29_female_3_crop.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Charles J. Sharp",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Bengal_tiger_(Panthera_tigris_tigris)_female_3_crop.jpg"
+     }
+    ]
+   }
+  },
+  {
+   "id": "atomic-1",
+   "kind": "mc",
+   "prompt": "Which element has the atomic number 1?",
+   "answer": "Hydrogen",
+   "wrong": [
+    "Helium",
+    "Oxygen",
+    "Carbon"
+   ],
+   "explain": "Hydrogen is the lightest and most common element in the universe.",
+   "difficulty": 2
+  },
+  {
+   "id": "hexagon",
+   "kind": "mc",
+   "prompt": "How many sides does a hexagon have?",
+   "answer": "6",
+   "wrong": [
+    "5",
+    "7",
+    "8"
+   ],
+   "explain": "Hex- means six. Honeycomb cells are hexagons.",
+   "difficulty": 1
+  },
+  {
+   "id": "femur",
+   "kind": "mc",
+   "prompt": "What is the longest bone in the human body?",
+   "answer": "Femur",
+   "wrong": [
+    "Tibia",
+    "Humerus",
+    "Fibula"
+   ],
+   "explain": "The femur is the thigh bone.",
+   "difficulty": 2
+  },
+  {
+   "id": "bats",
+   "kind": "tf",
+   "prompt": "Bats are mammals.",
+   "answer": true,
+   "explain": "Bats are the only mammals capable of true flight.",
+   "difficulty": 1
+  },
+  {
+   "id": "great-wall",
+   "kind": "tf",
+   "prompt": "The Great Wall of China can be seen from the Moon with the naked eye.",
+   "answer": false,
+   "explain": "It is far too narrow. Astronauts have confirmed it can't be seen from the Moon.",
+   "difficulty": 2
+  },
+  {
+   "id": "sound-water",
+   "kind": "tf",
+   "prompt": "Sound travels faster in water than in air.",
+   "answer": true,
+   "explain": "Sound moves about four times faster in water than in air.",
+   "difficulty": 2
+  },
+  {
+   "id": "octopus",
+   "kind": "tf",
+   "prompt": "An octopus has three hearts.",
+   "answer": true,
+   "explain": "Two hearts pump blood to the gills and one pumps it around the body.",
+   "difficulty": 2
+  },
+  {
+   "id": "lightning",
+   "kind": "tf",
+   "prompt": "Lightning never strikes the same place twice.",
+   "answer": false,
+   "explain": "Tall buildings like the Empire State Building are struck many times a year.",
+   "difficulty": 1
+  },
+  {
+   "id": "moon-landing",
+   "kind": "number",
+   "prompt": "In what year did people first land on the Moon?",
+   "answer": 1969,
+   "unit": "",
+   "tolerance": 2,
+   "explain": "Apollo 11 landed on 20 July 1969.",
+   "difficulty": 1
+  },
+  {
+   "id": "planet-order",
+   "kind": "order",
+   "prompt": "Put these planets in order from the Sun, nearest first.",
+   "answer": [
+    "Mercury",
+    "Venus",
+    "Earth",
+    "Mars"
+   ],
+   "orderLabel": "Nearest the Sun first",
+   "explain": "The four rocky planets, from the Sun outwards.",
+   "difficulty": 1
+  }
+ ],
+ "fakes": [
+  "Striped frost panther",
+  "Blue-billed cave eagle"
+ ],
+ "sources": [
+  {
+   "name": "Wikimedia Commons",
+   "url": "https://commons.wikimedia.org"
+  }
+ ]
+}

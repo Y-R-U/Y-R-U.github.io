@@ -1,0 +1,31 @@
+@id kids-film-tv
+@title Kids' film & TV songs
+@icon 🧸
+@kind themes
+@kids true
+@difficulty 1
+@sources [{"name":"Curated by Clued from original soundtrack albums on Apple Music"}]
+2013 | Idina Menzel | Let It Go | film=Frozen; composer=Kristen Anderson-Lopez & Robert Lopez
+2013 | Kristen Bell | Do You Want to Build a Snowman? | film=Frozen; am=kristen bell; composer=Kristen Anderson-Lopez & Robert Lopez; alt=Frozen
+1994 | Nathan Lane | Hakuna Matata | film=The Lion King; am=nathan lane|ernie sabella|jason weaver; composer=Elton John & Tim Rice
+1995 | Randy Newman | You've Got a Friend in Me | film=Toy Story; composer=Randy Newman
+2016 | Auliʻi Cravalho | How Far I'll Go | film=Moana; am=cravalho; composer=Lin-Manuel Miranda
+2021 | Carolina Gaitán | We Don't Talk About Bruno | film=Encanto; am=gait.n|mauro castillo|encanto; q=we don't talk about bruno encanto; composer=Lin-Manuel Miranda
+1989 | Samuel E. Wright | Under the Sea | film=The Little Mermaid; am=samuel e\.? wright; composer=Alan Menken & Howard Ashman
+1992 | Brad Kane & Lea Salonga | A Whole New World | film=Aladdin; am=brad kane|lea salonga; composer=Alan Menken & Tim Rice
+1991 | Jerry Orbach | Be Our Guest | film=Beauty and the Beast; am=orbach|angela lansbury; composer=Alan Menken & Howard Ashman
+1967 | Phil Harris | The Bare Necessities | film=The Jungle Book; am=phil harris|bruce reitherman; composer=Terry Gilkyson
+1964 | Julie Andrews | Supercalifragilisticexpialidocious | film=Mary Poppins; am=julie andrews|dick van dyke; composer=Richard M. Sherman & Robert B. Sherman
+2004 | Counting Crows | Accidentally in Love | film=Shrek 2; composer=Counting Crows
+2017 | Anthony Gonzalez | Remember Me (Lullaby) | film=Coco; tm=remember me; am=gonzalez|benjamin bratt|gael; composer=Kristen Anderson-Lopez & Robert Lopez
+2016 | Shakira | Try Everything | film=Zootopia; composer=Shakira, Sia & Stargate; alt=Zootropolis
+2014 | Tegan and Sara | Everything Is Awesome | film=The Lego Movie; am=tegan; composer=Shawn Patterson; alt=Lego Movie
+2013 | Pharrell Williams | Happy | film=Despicable Me 2; tm=^happy; composer=Pharrell Williams
+2016 | Justin Timberlake | CAN'T STOP THE FEELING! | film=Trolls; tm=can.?t stop the feeling; composer=Justin Timberlake, Max Martin & Shellback
+2025 | HUNTR/X | Golden | film=KPop Demon Hunters; am=huntr; composer=EJAE, Mark Sonnenblick & co.
+1998 | Jason Paige | Pokémon Theme | film=Pokémon; type=tv; tm=pok.mon theme; am=jason paige|pok; composer=John Siegler & John Loeffler
+2016 | Pinkfong | Baby Shark | film=Baby Shark (Pinkfong); type=tv; tm=^baby shark$; am=pinkfong; composer=Pinkfong (traditional)
+1999 | SpongeBob SquarePants | SpongeBob SquarePants Theme Song | film=SpongeBob SquarePants; type=tv; tm=spongebob.*theme; am=spongebob|painty; composer=Mark Harrison, Blaise Smith, Stephen Hillenburg & Derek Drymon
+2018 | Joff Bush | Bluey Theme Tune | film=Bluey; type=tv; tm=bluey theme; am=joff bush|bluey; composer=Joff Bush
+2013 | PAW Patrol | PAW Patrol Theme | film=PAW Patrol; type=tv; tm=paw patrol.*theme|theme.*paw patrol; am=paw patrol; composer=Michael "Smidi" Smith & Scott Krippayne
+2017 | Hugh Jackman | The Greatest Show | film=The Greatest Showman; am=jackman|keala|zac efron; composer=Benj Pasek & Justin Paul

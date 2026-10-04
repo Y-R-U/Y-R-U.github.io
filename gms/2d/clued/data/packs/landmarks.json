@@ -1,0 +1,5847 @@
+{
+ "id": "landmarks",
+ "title": "Landmarks",
+ "theme": "geography",
+ "icon": "🗿",
+ "kids": true,
+ "version": 1,
+ "leakExempt": [
+  "tower",
+  "bridge",
+  "mosque",
+  "temple",
+  "castle",
+  "palace",
+  "cathedral",
+  "basilica",
+  "mountain",
+  "mount",
+  "statue",
+  "gate",
+  "building",
+  "house",
+  "opera",
+  "grand",
+  "lakes",
+  "national",
+  "park",
+  "church",
+  "churches",
+  "glacier",
+  "falls",
+  "canal",
+  "pagoda",
+  "arch",
+  "sign",
+  "needle",
+  "towers",
+  "islands",
+  "crater",
+  "reef",
+  "barrier",
+  "canyon",
+  "wall",
+  "fountain",
+  "army",
+  "pyramid",
+  "conservation",
+  "area",
+  "salt",
+  "mine",
+  "temples",
+  "gateway",
+  "bay",
+  "giant",
+  "peter",
+  "little",
+  "white",
+  "golden",
+  "space",
+  "sound",
+  "rock",
+  "blue",
+  "people",
+  "peoples",
+  "republic",
+  "state",
+  "states",
+  "united",
+  "islands",
+  "island",
+  "kingdom",
+  "democratic",
+  "federal",
+  "federated",
+  "saint",
+  "new",
+  "north",
+  "south",
+  "east",
+  "west",
+  "central",
+  "great"
+ ],
+ "nameImgPrompt": "Which landmark is this?",
+ "imgPrompt": "Which of these is {lname}?",
+ "tfImgPrompt": "This is {lname}.",
+ "factsMeta": {
+  "country": {
+   "type": "cat",
+   "label": "Country",
+   "ask": "In which country is {lname}?",
+   "askReverse": "Which of these is in {value}?",
+   "stmt": "{lname} is in {value}."
+  },
+  "continent": {
+   "type": "cat",
+   "label": "Continent",
+   "ask": "On which continent is {lname}?",
+   "stmt": "{lname} is in {value}."
+  },
+  "kind": {
+   "type": "cat",
+   "label": "Type",
+   "exclusive": false
+  },
+  "built": {
+   "type": "year",
+   "label": "Completed",
+   "higherLabel": "Newer",
+   "askHigh": "Which of these was completed most recently?",
+   "askLow": "Which of these is the oldest?"
+  }
+ },
+ "items": [
+  {
+   "id": "eiffel-tower",
+   "name": "Eiffel Tower",
+   "lname": "the Eiffel Tower",
+   "alt": [],
+   "iso3": "FRA",
+   "group": "tower",
+   "geo": {
+    "lat": 48.8583,
+    "lon": 2.2945
+   },
+   "facts": {
+    "country": "France",
+    "continent": "Europe",
+    "kind": "tower",
+    "built": 1889
+   },
+   "blurb": "Eiffel Tower, France. It stands on the Champ de Mars in Paris. It was completed in 1889.",
+   "clues": [
+    "Built as the entrance arch for a world's fair.",
+    "The engineer whose company built it also designed the internal frame of the Statue of Liberty.",
+    "It is made of wrought iron and was once the tallest structure in the world.",
+    "It was completed in 1889.",
+    "It is in Europe.",
+    "It is in France.",
+    "It stands on the Champ de Mars in Paris."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a8/Tour_Eiffel_Wikimedia_Commons.jpg/330px-Tour_Eiffel_Wikimedia_Commons.jpg",
+      "w": 330,
+      "h": 611,
+      "credit": "Benh LIEU SONG",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Tour_Eiffel_Wikimedia_Commons.jpg"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "statue-of-liberty",
+   "name": "Statue of Liberty",
+   "lname": "the Statue of Liberty",
+   "alt": [
+    "Lady Liberty"
+   ],
+   "iso3": "USA",
+   "group": "statue",
+   "geo": {
+    "lat": 40.6892,
+    "lon": -74.0444
+   },
+   "facts": {
+    "country": "United States",
+    "continent": "North America",
+    "kind": "statue",
+    "built": 1886
+   },
+   "blurb": "Statue of Liberty, United States. It stands on an island in New York Harbor. It holds a torch in its raised right hand.",
+   "clues": [
+    "It was a gift from France.",
+    "Its copper skin has turned green over time.",
+    "It holds a torch in its raised right hand.",
+    "It is in North America.",
+    "It is in the United States.",
+    "It stands on an island in New York Harbor."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/93/Statue_of_Liberty_and_a_sightseeing_boat%2C_Liberty_Island%2C_New_York.jpg/500px-Statue_of_Liberty_and_a_sightseeing_boat%2C_Liberty_Island%2C_New_York.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Christian David",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Statue_of_Liberty_and_a_sightseeing_boat,_Liberty_Island,_New_York.jpg"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "great-wall-of-china",
+   "name": "Great Wall of China",
+   "lname": "the Great Wall of China",
+   "alt": [
+    "Great Wall"
+   ],
+   "iso3": "CHN",
+   "group": "ancient",
+   "geo": {
+    "lat": 40.4314,
+    "lon": 116.5644
+   },
+   "facts": {
+    "country": "China",
+    "continent": "Asia",
+    "kind": "ancient"
+   },
+   "blurb": "Great Wall of China, China. It snakes across northern China. It was built to protect against raids from the northern steppe.",
+   "clues": [
+    "Parts of it date back more than 2,000 years.",
+    "Much of the best-known section was built under the Ming dynasty.",
+    "Its total length with all branches is over 20,000 km.",
+    "It was built to protect against raids from the northern steppe.",
+    "It is in Asia."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/2/23/The_Great_Wall_of_China_at_Jinshanling-edit.jpg/500px-The_Great_Wall_of_China_at_Jinshanling-edit.jpg",
+      "w": 500,
+      "h": 332,
+      "credit": "Severin.stalder",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:The_Great_Wall_of_China_at_Jinshanling-edit.jpg"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "taj-mahal",
+   "name": "Taj Mahal",
+   "lname": "the Taj Mahal",
+   "alt": [],
+   "iso3": "IND",
+   "group": "religious",
+   "geo": {
+    "lat": 27.175,
+    "lon": 78.0419
+   },
+   "facts": {
+    "country": "India",
+    "continent": "Asia",
+    "kind": "religious"
+   },
+   "blurb": "Taj Mahal, India. It stands on the bank of the Yamuna river in Agra. It is made of white marble.",
+   "clues": [
+    "Its building was ordered by the emperor Shah Jahan.",
+    "It is made of white marble.",
+    "It is in Asia.",
+    "It is in India.",
+    "It stands on the bank of the Yamuna river in Agra."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/b/bd/Taj_Mahal%2C_Agra%2C_India_edit3.jpg/500px-Taj_Mahal%2C_Agra%2C_India_edit3.jpg",
+      "w": 500,
+      "h": 346,
+      "credit": "Taj_Mahal,_Agra,_India_edit2.jpg: Yann; edited by King of Hearts derivative work: Jbart…",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Taj_Mahal,_Agra,_India_edit3.jpg"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "colosseum",
+   "name": "Colosseum",
+   "lname": "the Colosseum",
+   "alt": [
+    "Coliseum",
+    "Flavian Amphitheatre"
+   ],
+   "iso3": "ITA",
+   "group": "ancient",
+   "geo": {
+    "lat": 41.8903,
+    "lon": 12.4922
+   },
+   "facts": {
+    "country": "Italy",
+    "continent": "Europe",
+    "kind": "ancient"
+   },
+   "blurb": "Colosseum, Italy. It is a huge oval amphitheatre in the centre of Rome. Gladiators fought here.",
+   "clues": [
+    "It was opened under the emperor Titus.",
+    "It could seat around 50,000 spectators.",
+    "Gladiators fought here.",
+    "It is in Europe.",
+    "It is in Italy."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/d/de/Colosseo_2020.jpg/500px-Colosseo_2020.jpg",
+      "w": 500,
+      "h": 350,
+      "credit": "FeaturedPics",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Colosseo_2020.jpg"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "machu-picchu",
+   "name": "Machu Picchu",
+   "lname": "Machu Picchu",
+   "alt": [],
+   "iso3": "PER",
+   "group": "ancient",
+   "geo": {
+    "lat": -13.1633,
+    "lon": -72.5456
+   },
+   "facts": {
+    "country": "Peru",
+    "continent": "South America",
+    "kind": "ancient"
+   },
+   "blurb": "Machu Picchu, Peru. It is a 15th-century Inca citadel in the Andes. It sits on a mountain ridge above the Urubamba valley.",
+   "clues": [
+    "It was brought to international attention by Hiram Bingham in 1911.",
+    "It was built for the emperor Pachacuti.",
+    "It sits on a mountain ridge above the Urubamba valley.",
+    "It is in South America.",
+    "It is in Peru.",
+    "It is a 15th-century Inca citadel in the Andes."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/b/bb/Machu_Picchu%2C_2023_%28012%29.jpg/500px-Machu_Picchu%2C_2023_%28012%29.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Draceane",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Machu_Picchu,_2023_(012).jpg"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "christ-the-redeemer",
+   "name": "Christ the Redeemer",
+   "lname": "Christ the Redeemer",
+   "alt": [
+    "Cristo Redentor"
+   ],
+   "iso3": "BRA",
+   "group": "statue",
+   "geo": {
+    "lat": -22.9519,
+    "lon": -43.2105
+   },
+   "facts": {
+    "country": "Brazil",
+    "continent": "South America",
+    "kind": "statue",
+    "built": 1931
+   },
+   "blurb": "Christ the Redeemer, Brazil. It looks over Rio de Janeiro from Corcovado mountain. It stands about 30 metres tall with its arms outstretched.",
+   "clues": [
+    "It was made of reinforced concrete and soapstone.",
+    "It was completed in 1931.",
+    "It stands about 30 metres tall with its arms outstretched.",
+    "It is in South America.",
+    "It is in Brazil.",
+    "It looks over Rio de Janeiro from Corcovado mountain."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4f/Christ_the_Redeemer_-_Cristo_Redentor.jpg/330px-Christ_the_Redeemer_-_Cristo_Redentor.jpg",
+      "w": 330,
+      "h": 495,
+      "credit": "Arne Müseler",
+      "license": "CC BY-SA 3.0 de",
+      "page": "https://commons.wikimedia.org/wiki/File:Christ_the_Redeemer_-_Cristo_Redentor.jpg"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "petra",
+   "name": "Petra",
+   "lname": "Petra",
+   "alt": [
+    "Rose City"
+   ],
+   "iso3": "JOR",
+   "group": "ancient",
+   "geo": {
+    "lat": 30.3289,
+    "lon": 35.4403
+   },
+   "facts": {
+    "country": "Jordan",
+    "continent": "Asia",
+    "kind": "ancient"
+   },
+   "blurb": "Petra, Jordan. It is called the Rose City for the colour of its stone. Its most famous facade is the Treasury, carved into rock.",
+   "clues": [
+    "It was the capital of the Nabataean kingdom.",
+    "It is reached through a narrow gorge called the Siq.",
+    "Its most famous facade is the Treasury, carved into rock.",
+    "It is in Asia.",
+    "It is in Jordan."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7c/The_Treasury%2C_Petra%2C_Jordan5.jpg/330px-The_Treasury%2C_Petra%2C_Jordan5.jpg",
+      "w": 330,
+      "h": 545,
+      "credit": "Diego Delso",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:The_Treasury,_Petra,_Jordan5.jpg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "great-pyramid-of-giza",
+   "name": "Great Pyramid of Giza",
+   "lname": "the Great Pyramid of Giza",
+   "alt": [
+    "Pyramid of Khufu",
+    "Pyramid of Cheops"
+   ],
+   "iso3": "EGY",
+   "group": "ancient",
+   "geo": {
+    "lat": 29.9792,
+    "lon": 31.1342
+   },
+   "facts": {
+    "country": "Egypt",
+    "continent": "Africa",
+    "kind": "ancient"
+   },
+   "blurb": "Great Pyramid of Giza, Egypt. It is the largest of the three pyramids on the plateau outside Cairo. For about 3,800 years it was the tallest human-made structure.",
+   "clues": [
+    "It is the only one of the Seven Wonders of the Ancient World still largely intact.",
+    "For about 3,800 years it was the tallest human-made structure.",
+    "It is in Africa.",
+    "It is in Egypt.",
+    "It is the largest of the three pyramids on the plateau outside Cairo."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e3/Kheops-Pyramid.jpg/500px-Kheops-Pyramid.jpg",
+      "w": 500,
+      "h": 307,
+      "credit": "Nina",
+      "license": "CC BY 2.5",
+      "page": "https://commons.wikimedia.org/wiki/File:Kheops-Pyramid.jpg"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "sydney-opera-house",
+   "name": "Sydney Opera House",
+   "lname": "the Sydney Opera House",
+   "alt": [],
+   "iso3": "AUS",
+   "group": "building",
+   "geo": {
+    "lat": -33.8571,
+    "lon": 151.2149
+   },
+   "facts": {
+    "country": "Australia",
+    "continent": "Oceania",
+    "kind": "building",
+    "built": 1973
+   },
+   "blurb": "Sydney Opera House, Australia. It sits on Bennelong Point in Sydney Harbour. Its roof is made of shells covered in white tiles.",
+   "clues": [
+    "Its Danish architect, Jørn Utzon, left the project before it was finished.",
+    "It opened in 1973.",
+    "Its roof is made of shells covered in white tiles.",
+    "It is in Oceania.",
+    "It is in Australia."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/4/40/Sydney_Opera_House_Sails.jpg/500px-Sydney_Opera_House_Sails.jpg",
+      "w": 500,
+      "h": 331,
+      "credit": "No machine-readable author provided. Roybb95~commonswiki assumed (based on copyright cl…",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Sydney_Opera_House_Sails.jpg"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "big-ben",
+   "name": "Big Ben",
+   "lname": "Big Ben",
+   "alt": [
+    "Elizabeth Tower"
+   ],
+   "iso3": "GBR",
+   "group": "tower",
+   "geo": {
+    "lat": 51.5007,
+    "lon": -0.1246
+   },
+   "facts": {
+    "country": "United Kingdom",
+    "continent": "Europe",
+    "kind": "tower",
+    "built": 1859
+   },
+   "blurb": "Big Ben, United Kingdom. It is at the north end of the Palace of Westminster in London. Its clock has four faces.",
+   "clues": [
+    "Its name strictly belongs to the great bell inside.",
+    "Its clock has four faces.",
+    "It is in Europe.",
+    "It is in the United Kingdom.",
+    "It is at the north end of the Palace of Westminster in London."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/05/Elizabeth_Tower_and_the_north_front_of_the_Palace_of_Westminster%2C_London.jpg/330px-Elizabeth_Tower_and_the_north_front_of_the_Palace_of_Westminster%2C_London.jpg",
+      "w": 330,
+      "h": 587,
+      "credit": "Christian David",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Elizabeth_Tower_and_the_north_front_of_the_Palace_of_Westminster,_London.jpg"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "stonehenge",
+   "name": "Stonehenge",
+   "lname": "Stonehenge",
+   "alt": [],
+   "iso3": "GBR",
+   "group": "ancient",
+   "geo": {
+    "lat": 51.1789,
+    "lon": -1.8261
+   },
+   "facts": {
+    "country": "United Kingdom",
+    "continent": "Europe",
+    "kind": "ancient"
+   },
+   "blurb": "Stonehenge, United Kingdom. It stands on Salisbury Plain in England. It is a prehistoric ring of standing stones.",
+   "clues": [
+    "Some of its smaller stones were brought from the Preseli Hills in Wales.",
+    "Its stones line up with the sunrise at the summer solstice.",
+    "It is a prehistoric ring of standing stones.",
+    "It is in Europe.",
+    "It is in the United Kingdom.",
+    "It stands on Salisbury Plain in England."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/6/6b/Stonehenge_Total.jpg/500px-Stonehenge_Total.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Stefan Kühn",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Stonehenge_Total.jpg"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "leaning-tower-of-pisa",
+   "name": "Leaning Tower of Pisa",
+   "lname": "the Leaning Tower of Pisa",
+   "alt": [
+    "Tower of Pisa"
+   ],
+   "iso3": "ITA",
+   "group": "tower",
+   "geo": {
+    "lat": 43.723,
+    "lon": 10.3966
+   },
+   "facts": {
+    "country": "Italy",
+    "continent": "Europe",
+    "kind": "tower"
+   },
+   "blurb": "Leaning Tower of Pisa, Italy. It is a famously tilting white marble tower in Tuscany. Engineers reduced its tilt in a project that ended in 2001.",
+   "clues": [
+    "It is the bell tower of a cathedral.",
+    "Engineers reduced its tilt in a project that ended in 2001.",
+    "It is in Europe.",
+    "It is in Italy.",
+    "It is a famously tilting white marble tower in Tuscany."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b2/Campanile_D%C3%B4me_-_Pise_%28IT52%29_-_2022-08-31_-_20.jpg/250px-Campanile_D%C3%B4me_-_Pise_%28IT52%29_-_2022-08-31_-_20.jpg",
+      "w": 250,
+      "h": 554,
+      "credit": "Chabe01",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Campanile_D%C3%B4me_-_Pise_(IT52)_-_2022-08-31_-_20.jpg"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "sagrada-familia",
+   "name": "Sagrada Família",
+   "lname": "the Sagrada Família",
+   "alt": [
+    "Sagrada Familia"
+   ],
+   "iso3": "ESP",
+   "group": "religious",
+   "geo": {
+    "lat": 41.4037,
+    "lon": 2.1743
+   },
+   "facts": {
+    "country": "Spain",
+    "continent": "Europe",
+    "kind": "religious"
+   },
+   "blurb": "Sagrada Família, Spain. It is a giant basilica in Barcelona. It was designed by Antoni Gaudí.",
+   "clues": [
+    "Construction began in 1882 and has lasted well over a century.",
+    "Its main architect is buried in its crypt.",
+    "It was designed by Antoni Gaudí.",
+    "It is in Europe.",
+    "It is in Spain.",
+    "It is a giant basilica in Barcelona."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/7/78/SF_maig_2026.jpg/500px-SF_maig_2026.jpg",
+      "w": 500,
+      "h": 345,
+      "credit": "Canaan",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:SF_maig_2026.jpg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "parthenon",
+   "name": "Parthenon",
+   "lname": "the Parthenon",
+   "alt": [],
+   "iso3": "GRC",
+   "group": "ancient",
+   "geo": {
+    "lat": 37.9715,
+    "lon": 23.7266
+   },
+   "facts": {
+    "country": "Greece",
+    "continent": "Europe",
+    "kind": "ancient"
+   },
+   "blurb": "Parthenon, Greece. It is a marble temple on the Acropolis of Athens. It was completed in the 5th century BC.",
+   "clues": [
+    "It was dedicated to the goddess Athena.",
+    "Some of its sculptures are in the British Museum.",
+    "It was completed in the 5th century BC.",
+    "It is in Europe.",
+    "It is in Greece.",
+    "It is a marble temple on the Acropolis of Athens."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/d/da/The_Parthenon_in_Athens.jpg/500px-The_Parthenon_in_Athens.jpg",
+      "w": 500,
+      "h": 351,
+      "credit": "Steve Swayne",
+      "license": "CC BY 2.0",
+      "page": "https://commons.wikimedia.org/wiki/File:The_Parthenon_in_Athens.jpg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "angkor-wat",
+   "name": "Angkor Wat",
+   "lname": "Angkor Wat",
+   "alt": [],
+   "iso3": "KHM",
+   "group": "religious",
+   "geo": {
+    "lat": 13.4125,
+    "lon": 103.8667
+   },
+   "facts": {
+    "country": "Cambodia",
+    "continent": "Asia",
+    "kind": "religious"
+   },
+   "blurb": "Angkor Wat, Cambodia. It is a vast temple complex near Siem Reap. It appears on its country's national flag.",
+   "clues": [
+    "It was built in the early 12th century by King Suryavarman II.",
+    "It was first dedicated to the Hindu god Vishnu.",
+    "It appears on its country's national flag.",
+    "It is in Asia.",
+    "It is in Cambodia.",
+    "It is a vast temple complex near Siem Reap."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/7/72/Angkor_wat_temple.jpg/330px-Angkor_wat_temple.jpg",
+      "w": 330,
+      "h": 248,
+      "credit": "The original uploader was Fuzheado at English Wikipedia.",
+      "license": "CC BY-SA 2.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Angkor_wat_temple.jpg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "mount-fuji",
+   "name": "Mount Fuji",
+   "lname": "Mount Fuji",
+   "alt": [
+    "Fuji",
+    "Fujisan"
+   ],
+   "iso3": "JPN",
+   "group": "natural",
+   "geo": {
+    "lat": 35.3606,
+    "lon": 138.7275
+   },
+   "facts": {
+    "country": "Japan",
+    "continent": "Asia",
+    "kind": "natural"
+   },
+   "blurb": "Mount Fuji, Japan. It is the highest mountain in Japan. It is an active volcano famous for its snow-capped cone.",
+   "clues": [
+    "It last erupted in 1707.",
+    "It is 3,776 metres tall.",
+    "It is an active volcano famous for its snow-capped cone.",
+    "It is in Asia.",
+    "It is in Japan.",
+    "It is the highest mountain in Japan."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c1/Kodaki_fuji_frm_shojinko_refurb.jpg/500px-Kodaki_fuji_frm_shojinko_refurb.jpg",
+      "w": 500,
+      "h": 335,
+      "credit": "名古屋太郎, (edited by Hannes_24)",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Kodaki_fuji_frm_shojinko_refurb.jpg"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "burj-khalifa",
+   "name": "Burj Khalifa",
+   "lname": "Burj Khalifa",
+   "alt": [],
+   "iso3": "ARE",
+   "group": "tower",
+   "geo": {
+    "lat": 25.1972,
+    "lon": 55.2742
+   },
+   "facts": {
+    "country": "United Arab Emirates",
+    "continent": "Asia",
+    "kind": "tower",
+    "built": 2010
+   },
+   "blurb": "Burj Khalifa, United Arab Emirates. It towers over downtown Dubai. It became the world's tallest building when it opened.",
+   "clues": [
+    "It opened in 2010.",
+    "It is 828 metres tall.",
+    "It became the world's tallest building when it opened.",
+    "It is in Asia.",
+    "It is in the United Arab Emirates.",
+    "It towers over downtown Dubai."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/4/43/Dubai_skyline_2015_%28crop%29.jpg/500px-Dubai_skyline_2015_%28crop%29.jpg",
+      "w": 500,
+      "h": 378,
+      "credit": "Tim.Reckmann",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Dubai_skyline_2015_(crop).jpg"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "golden-gate-bridge",
+   "name": "Golden Gate Bridge",
+   "lname": "the Golden Gate Bridge",
+   "alt": [],
+   "iso3": "USA",
+   "group": "bridge",
+   "geo": {
+    "lat": 37.8197,
+    "lon": -122.4786
+   },
+   "facts": {
+    "country": "United States",
+    "continent": "North America",
+    "kind": "bridge",
+    "built": 1937
+   },
+   "blurb": "Golden Gate Bridge, United States. It spans the strait at the entrance to San Francisco Bay. It is a suspension bridge.",
+   "clues": [
+    "It opened in 1937.",
+    "Its colour is called International Orange.",
+    "It is a suspension bridge.",
+    "It is in North America.",
+    "It is in the United States.",
+    "It spans the strait at the entrance to San Francisco Bay."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/0c/GoldenGateBridge-001.jpg/500px-GoldenGateBridge-001.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Rich Niewiroski Jr.",
+      "license": "CC BY 2.5",
+      "page": "https://commons.wikimedia.org/wiki/File:GoldenGateBridge-001.jpg"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "saint-basil-s-cathedral",
+   "name": "Saint Basil's Cathedral",
+   "lname": "Saint Basil's Cathedral",
+   "alt": [
+    "St Basil's Cathedral"
+   ],
+   "iso3": "RUS",
+   "group": "religious",
+   "geo": {
+    "lat": 55.7525,
+    "lon": 37.6231
+   },
+   "facts": {
+    "country": "Russia",
+    "continent": "Europe",
+    "kind": "religious"
+   },
+   "blurb": "Saint Basil's Cathedral, Russia. It stands on Red Square in Moscow. It is famous for its colourful onion domes.",
+   "clues": [
+    "It was ordered by Ivan the Terrible.",
+    "It was completed in 1561.",
+    "It is famous for its colourful onion domes.",
+    "It is in Europe.",
+    "It is in Russia.",
+    "It stands on Red Square in Moscow."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/d/df/00_0568_Saint_Basil%27s_Cathedral_-_Moscow.jpg/330px-00_0568_Saint_Basil%27s_Cathedral_-_Moscow.jpg",
+      "w": 330,
+      "h": 495,
+      "credit": "W. Bulach",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:00_0568_Saint_Basil%27s_Cathedral_-_Moscow.jpg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "neuschwanstein-castle",
+   "name": "Neuschwanstein Castle",
+   "lname": "Neuschwanstein Castle",
+   "alt": [
+    "Neuschwanstein"
+   ],
+   "iso3": "DEU",
+   "group": "castle",
+   "geo": {
+    "lat": 47.5575,
+    "lon": 10.7494
+   },
+   "facts": {
+    "country": "Germany",
+    "continent": "Europe",
+    "kind": "castle"
+   },
+   "blurb": "Neuschwanstein Castle, Germany. It is a fairy-tale castle in the Bavarian Alps. It is said to have inspired a famous Disney castle.",
+   "clues": [
+    "It was built for King Ludwig II.",
+    "It was started in 1869.",
+    "It is said to have inspired a famous Disney castle.",
+    "It is in Europe.",
+    "It is in Germany.",
+    "It is a fairy-tale castle in the Bavarian Alps."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3c/Neuschwanstein_Castle_2024-02.jpg/500px-Neuschwanstein_Castle_2024-02.jpg",
+      "w": 500,
+      "h": 340,
+      "credit": "Wilfredor",
+      "license": "CC0",
+      "page": "https://commons.wikimedia.org/wiki/File:Neuschwanstein_Castle_2024-02.jpg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "brandenburg-gate",
+   "name": "Brandenburg Gate",
+   "lname": "the Brandenburg Gate",
+   "alt": [],
+   "iso3": "DEU",
+   "group": "monument",
+   "geo": {
+    "lat": 52.5163,
+    "lon": 13.3777
+   },
+   "facts": {
+    "country": "Germany",
+    "continent": "Europe",
+    "kind": "monument",
+    "built": 1791
+   },
+   "blurb": "Brandenburg Gate, Germany. It is a neoclassical gate in the centre of Berlin. It stood beside the Berlin Wall during the Cold War.",
+   "clues": [
+    "It is topped by a chariot pulled by four horses.",
+    "It was completed in 1791.",
+    "It stood beside the Berlin Wall during the Cold War.",
+    "It is in Europe.",
+    "It is in Germany.",
+    "It is a neoclassical gate in the centre of Berlin."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b1/Brandenburger_Tor_morgens.jpg/500px-Brandenburger_Tor_morgens.jpg",
+      "w": 500,
+      "h": 334,
+      "credit": "Thomas Wolf, www.foto-tw.de",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Brandenburger_Tor_morgens.jpg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "chichen-itza",
+   "name": "Chichen Itza",
+   "lname": "Chichen Itza",
+   "alt": [
+    "Chichén Itzá"
+   ],
+   "iso3": "MEX",
+   "group": "ancient",
+   "geo": {
+    "lat": 20.6831,
+    "lon": -88.5686
+   },
+   "facts": {
+    "country": "Mexico",
+    "continent": "North America",
+    "kind": "ancient"
+   },
+   "blurb": "Chichen Itza, Mexico. It is on the Yucatán Peninsula. It was a large Maya city.",
+   "clues": [
+    "Its great pyramid is known as El Castillo.",
+    "At the equinoxes a shadow like a serpent appears on the pyramid's steps.",
+    "It was a large Maya city.",
+    "It is in North America.",
+    "It is in Mexico.",
+    "It is on the Yucatán Peninsula."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/5/51/Chichen_Itza_3.jpg/500px-Chichen_Itza_3.jpg",
+      "w": 500,
+      "h": 266,
+      "credit": "Daniel Schwen",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Chichen_Itza_3.jpg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "moai-of-easter-island",
+   "name": "Moai of Easter Island",
+   "lname": "the Moai of Easter Island",
+   "alt": [
+    "Moai",
+    "Easter Island heads",
+    "Easter Island statues"
+   ],
+   "iso3": "CHL",
+   "group": "ancient",
+   "geo": {
+    "lat": -27.1213,
+    "lon": -109.2894
+   },
+   "facts": {
+    "country": "Chile",
+    "continent": "South America",
+    "kind": "ancient"
+   },
+   "blurb": "Moai of Easter Island, Chile. They are giant stone figures with oversized heads on Easter Island. There are almost a thousand of them.",
+   "clues": [
+    "Most of them were carved from volcanic tuff at the Rano Raraku quarry.",
+    "They were carved by the Rapa Nui people.",
+    "There are almost a thousand of them.",
+    "It is in South America.",
+    "It is in Chile."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/7/72/Ahu_Tongariki.jpg/500px-Ahu_Tongariki.jpg",
+      "w": 500,
+      "h": 332,
+      "credit": "Rivi",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Ahu_Tongariki.jpg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "grand-canyon",
+   "name": "Grand Canyon",
+   "lname": "the Grand Canyon",
+   "alt": [],
+   "iso3": "USA",
+   "group": "natural",
+   "geo": {
+    "lat": 36.0975,
+    "lon": -112.0953
+   },
+   "facts": {
+    "country": "United States",
+    "continent": "North America",
+    "kind": "natural"
+   },
+   "blurb": "Grand Canyon, United States. It is a huge gorge in Arizona. It was carved by the Colorado River.",
+   "clues": [
+    "It is up to about 1,800 metres deep.",
+    "Its rocks record nearly two billion years of geological history.",
+    "It was carved by the Colorado River.",
+    "It is in North America.",
+    "It is in the United States.",
+    "It is a huge gorge in Arizona."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/a/af/Grand_Canyon_view_from_Pima_Point_2010.jpg/330px-Grand_Canyon_view_from_Pima_Point_2010.jpg",
+      "w": 330,
+      "h": 497,
+      "credit": "Chensiyuan",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Grand_Canyon_view_from_Pima_Point_2010.jpg"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "uluru",
+   "name": "Uluru",
+   "lname": "Uluru",
+   "alt": [
+    "Ayers Rock"
+   ],
+   "iso3": "AUS",
+   "group": "natural",
+   "geo": {
+    "lat": -25.345,
+    "lon": 131.0361
+   },
+   "facts": {
+    "country": "Australia",
+    "continent": "Oceania",
+    "kind": "natural"
+   },
+   "blurb": "Uluru, Australia. It stands in the desert of Australia's Northern Territory. It is a huge sandstone rock that glows red at sunset.",
+   "clues": [
+    "Climbing it was banned in 2019.",
+    "It is sacred to the Aṉangu people.",
+    "It is a huge sandstone rock that glows red at sunset.",
+    "It is in Oceania.",
+    "It is in Australia.",
+    "It stands in the desert of Australia's Northern Territory."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/3/30/Sunset_at_Uluru_on_July_30%2C_2005.jpg/500px-Sunset_at_Uluru_on_July_30%2C_2005.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Thomas Schoch",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Sunset_at_Uluru_on_July_30,_2005.jpg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "table-mountain",
+   "name": "Table Mountain",
+   "lname": "Table Mountain",
+   "alt": [],
+   "iso3": "ZAF",
+   "group": "natural",
+   "geo": {
+    "lat": -33.9622,
+    "lon": 18.4135
+   },
+   "facts": {
+    "country": "South Africa",
+    "continent": "Africa",
+    "kind": "natural"
+   },
+   "blurb": "Table Mountain, South Africa. It overlooks Cape Town. It has a flat top about 3 km across.",
+   "clues": [
+    "A cable car has run to its top since 1929.",
+    "It has a flat top about 3 km across.",
+    "It is in Africa.",
+    "It is in South Africa.",
+    "It overlooks Cape Town."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/d/dc/Table_Mountain_DanieVDM.jpg/500px-Table_Mountain_DanieVDM.jpg",
+      "w": 500,
+      "h": 327,
+      "credit": "Danie van der Merwe from Cape Town, South Africa",
+      "license": "CC BY 2.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Table_Mountain_DanieVDM.jpg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "mount-kilimanjaro",
+   "name": "Mount Kilimanjaro",
+   "lname": "Mount Kilimanjaro",
+   "alt": [
+    "Kilimanjaro"
+   ],
+   "iso3": "TZA",
+   "group": "natural",
+   "geo": {
+    "lat": -3.0667,
+    "lon": 37.3592
+   },
+   "facts": {
+    "country": "Tanzania",
+    "continent": "Africa",
+    "kind": "natural"
+   },
+   "blurb": "Mount Kilimanjaro, Tanzania. It rises above the plains of northern Tanzania. At 5,895 metres it is the highest mountain in Africa.",
+   "clues": [
+    "Its highest point is Uhuru Peak.",
+    "It is a dormant volcano with three cones.",
+    "At 5,895 metres it is the highest mountain in Africa.",
+    "It is in Africa.",
+    "It is in Tanzania.",
+    "It rises above the plains of northern Tanzania."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/5/51/Mt._Kilimanjaro_12.2006.jpg/500px-Mt._Kilimanjaro_12.2006.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Unknown",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Mt._Kilimanjaro_12.2006.jpg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "hagia-sophia",
+   "name": "Hagia Sophia",
+   "lname": "Hagia Sophia",
+   "alt": [
+    "Ayasofya"
+   ],
+   "iso3": "TUR",
+   "group": "religious",
+   "geo": {
+    "lat": 41.0083,
+    "lon": 28.98
+   },
+   "facts": {
+    "country": "Turkey",
+    "continent": "Asia",
+    "kind": "religious",
+    "built": 537
+   },
+   "blurb": "Hagia Sophia, Turkey. It stands in Istanbul. Its huge dome was an engineering marvel.",
+   "clues": [
+    "It was completed in 537 under the emperor Justinian.",
+    "It was a church, then a mosque, then a museum, and is a mosque again.",
+    "Its huge dome was an engineering marvel.",
+    "It is in Asia.",
+    "It is in Turkey.",
+    "It stands in Istanbul."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/2/22/Hagia_Sophia_Mars_2013.jpg/500px-Hagia_Sophia_Mars_2013.jpg",
+      "w": 500,
+      "h": 334,
+      "credit": "Arild Vågen",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Hagia_Sophia_Mars_2013.jpg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "blue-mosque",
+   "name": "Blue Mosque",
+   "lname": "the Blue Mosque",
+   "alt": [
+    "Sultan Ahmed Mosque"
+   ],
+   "iso3": "TUR",
+   "group": "religious",
+   "geo": {
+    "lat": 41.0054,
+    "lon": 28.9768
+   },
+   "facts": {
+    "country": "Turkey",
+    "continent": "Asia",
+    "kind": "religious",
+    "built": 1616
+   },
+   "blurb": "Blue Mosque, Turkey. It faces Hagia Sophia in Istanbul. Its nickname comes from the blue tiles inside.",
+   "clues": [
+    "It was completed in 1616.",
+    "It has six minarets.",
+    "Its nickname comes from the blue tiles inside.",
+    "It is in Asia.",
+    "It is in Turkey.",
+    "It faces Hagia Sophia in Istanbul."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/1/12/Exterior_of_Sultan_Ahmed_I_Mosque_in_Istanbul%2C_Turkey_002.jpg/500px-Exterior_of_Sultan_Ahmed_I_Mosque_in_Istanbul%2C_Turkey_002.jpg",
+      "w": 500,
+      "h": 326,
+      "credit": "Moonik",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Exterior_of_Sultan_Ahmed_I_Mosque_in_Istanbul,_Turkey_002.jpg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "tower-bridge",
+   "name": "Tower Bridge",
+   "lname": "Tower Bridge",
+   "alt": [],
+   "iso3": "GBR",
+   "group": "bridge",
+   "geo": {
+    "lat": 51.5056,
+    "lon": -0.0753
+   },
+   "facts": {
+    "country": "United Kingdom",
+    "continent": "Europe",
+    "kind": "bridge",
+    "built": 1894
+   },
+   "blurb": "Tower Bridge, United Kingdom. It crosses the River Thames in London. It has two Gothic towers linked by high walkways.",
+   "clues": [
+    "It opened in 1894.",
+    "Its road deck lifts to let tall ships pass.",
+    "It has two Gothic towers linked by high walkways.",
+    "It is in Europe.",
+    "It is in the United Kingdom.",
+    "It crosses the River Thames in London."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/7/71/London_-_London_Tower_Bridge_-_140806_171049.jpg/500px-London_-_London_Tower_Bridge_-_140806_171049.jpg",
+      "w": 500,
+      "h": 281,
+      "credit": "Barcex",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:London_-_London_Tower_Bridge_-_140806_171049.jpg"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "notre-dame-de-paris",
+   "name": "Notre-Dame de Paris",
+   "lname": "Notre-Dame de Paris",
+   "alt": [
+    "Notre-Dame Cathedral",
+    "Notre Dame"
+   ],
+   "iso3": "FRA",
+   "group": "religious",
+   "geo": {
+    "lat": 48.853,
+    "lon": 2.3498
+   },
+   "facts": {
+    "country": "France",
+    "continent": "Europe",
+    "kind": "religious"
+   },
+   "blurb": "Notre-Dame de Paris, France. It is a Gothic cathedral on the Île de la Cité. Victor Hugo set a famous novel about a bell-ringer here.",
+   "clues": [
+    "A fire destroyed its roof and spire in 2019.",
+    "It reopened in December 2024.",
+    "Victor Hugo set a famous novel about a bell-ringer here.",
+    "It is in Europe.",
+    "It is in France.",
+    "It is a Gothic cathedral on the Île de la Cité."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/a/af/Notre-Dame_de_Paris_2013-07-24.jpg/330px-Notre-Dame_de_Paris_2013-07-24.jpg",
+      "w": 330,
+      "h": 445,
+      "credit": "P e z i",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Notre-Dame_de_Paris_2013-07-24.jpg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "louvre-pyramid",
+   "name": "Louvre Pyramid",
+   "lname": "the Louvre Pyramid",
+   "alt": [],
+   "iso3": "FRA",
+   "group": "building",
+   "geo": {
+    "lat": 48.861,
+    "lon": 2.3359
+   },
+   "facts": {
+    "country": "France",
+    "continent": "Europe",
+    "kind": "building",
+    "built": 1989
+   },
+   "blurb": "Louvre Pyramid, France. It is the main entrance to the world's most-visited art museum in Paris. It is made of glass and metal.",
+   "clues": [
+    "It was designed by I. M. Pei.",
+    "It opened in 1989.",
+    "It is made of glass and metal.",
+    "It is in Europe.",
+    "It is in France.",
+    "It is the main entrance to the world's most-visited art museum in Paris."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/6/66/Louvre_Museum_Wikimedia_Commons.jpg/500px-Louvre_Museum_Wikimedia_Commons.jpg",
+      "w": 500,
+      "h": 210,
+      "credit": "Benh LIEU SONG (Flickr)",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Louvre_Museum_Wikimedia_Commons.jpg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "mont-saint-michel",
+   "name": "Mont-Saint-Michel",
+   "lname": "Mont-Saint-Michel",
+   "alt": [
+    "Mont Saint-Michel"
+   ],
+   "iso3": "FRA",
+   "group": "religious",
+   "geo": {
+    "lat": 48.6358,
+    "lon": -1.5103
+   },
+   "facts": {
+    "country": "France",
+    "continent": "Europe",
+    "kind": "religious"
+   },
+   "blurb": "Mont-Saint-Michel, France. It is a rocky tidal island in Normandy. It becomes an island at high tide.",
+   "clues": [
+    "Its tides are among the strongest in Europe.",
+    "An abbey sits at its peak.",
+    "It becomes an island at high tide.",
+    "It is in Europe.",
+    "It is in France.",
+    "It is a rocky tidal island in Normandy."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d1/Mont_St_Michel_3%2C_Brittany%2C_France_-_July_2011.jpg/500px-Mont_St_Michel_3%2C_Brittany%2C_France_-_July_2011.jpg",
+      "w": 500,
+      "h": 355,
+      "credit": "Diliff",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Mont_St_Michel_3,_Brittany,_France_-_July_2011.jpg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "arc-de-triomphe",
+   "name": "Arc de Triomphe",
+   "lname": "the Arc de Triomphe",
+   "alt": [],
+   "iso3": "FRA",
+   "group": "monument",
+   "geo": {
+    "lat": 48.8738,
+    "lon": 2.295
+   },
+   "facts": {
+    "country": "France",
+    "continent": "Europe",
+    "kind": "monument",
+    "built": 1836
+   },
+   "blurb": "Arc de Triomphe, France. Twelve avenues radiate from it at the top of the Champs-Élysées. The Tomb of the Unknown Soldier lies beneath it.",
+   "clues": [
+    "It was ordered by Napoleon after the Battle of Austerlitz.",
+    "It was completed in 1836.",
+    "The Tomb of the Unknown Soldier lies beneath it.",
+    "It is in Europe.",
+    "It is in France.",
+    "Twelve avenues radiate from it at the top of the Champs-Élysées."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/1/1a/Arc_de_Triomphe_-_Ao%C3%BBt_2026.jpg/500px-Arc_de_Triomphe_-_Ao%C3%BBt_2026.jpg",
+      "w": 500,
+      "h": 334,
+      "credit": "ZeusUpsistos",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Arc_de_Triomphe_-_Ao%C3%BBt_2026.jpg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "alhambra",
+   "name": "Alhambra",
+   "lname": "the Alhambra",
+   "alt": [],
+   "iso3": "ESP",
+   "group": "castle",
+   "geo": {
+    "lat": 37.1763,
+    "lon": -3.5882
+   },
+   "facts": {
+    "country": "Spain",
+    "continent": "Europe",
+    "kind": "castle"
+   },
+   "blurb": "Alhambra, Spain. It is a Moorish palace and fortress in Granada. Its Court of the Lions is famous.",
+   "clues": [
+    "Its name means the red one in Arabic.",
+    "It was the palace of the Nasrid emirs.",
+    "Its Court of the Lions is famous.",
+    "It is in Europe.",
+    "It is in Spain.",
+    "It is a Moorish palace and fortress in Granada."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8a/Alhambra_detail.jpg/500px-Alhambra_detail.jpg",
+      "w": 500,
+      "h": 339,
+      "credit": "Jebulon",
+      "license": "CC0",
+      "page": "https://commons.wikimedia.org/wiki/File:Alhambra_detail.jpg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "trevi-fountain",
+   "name": "Trevi Fountain",
+   "lname": "the Trevi Fountain",
+   "alt": [
+    "Fontana di Trevi"
+   ],
+   "iso3": "ITA",
+   "group": "monument",
+   "geo": {
+    "lat": 41.9009,
+    "lon": 12.4833
+   },
+   "facts": {
+    "country": "Italy",
+    "continent": "Europe",
+    "kind": "monument",
+    "built": 1762
+   },
+   "blurb": "Trevi Fountain, Italy. It is the largest Baroque fountain in Rome. Tradition says throwing a coin in means you will return.",
+   "clues": [
+    "It was completed in 1762.",
+    "Its centre shows the sea god Oceanus.",
+    "Tradition says throwing a coin in means you will return.",
+    "It is in Europe.",
+    "It is in Italy.",
+    "It is the largest Baroque fountain in Rome."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c7/Trevi_Fountain_-_Roma.jpg/500px-Trevi_Fountain_-_Roma.jpg",
+      "w": 500,
+      "h": 271,
+      "credit": "NikonZ7II",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Trevi_Fountain_-_Roma.jpg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "st-peter-s-basilica",
+   "name": "St. Peter's Basilica",
+   "lname": "St. Peter's Basilica",
+   "alt": [
+    "Saint Peter's Basilica"
+   ],
+   "iso3": "VAT",
+   "group": "religious",
+   "geo": {
+    "lat": 41.9022,
+    "lon": 12.4534
+   },
+   "facts": {
+    "country": "Vatican City",
+    "continent": "Europe",
+    "kind": "religious"
+   },
+   "blurb": "St. Peter's Basilica, Vatican City. It stands in Vatican City. It is one of the largest churches in the world.",
+   "clues": [
+    "Michelangelo designed its dome.",
+    "It was consecrated in 1626.",
+    "It is one of the largest churches in the world.",
+    "It is in Europe.",
+    "It is in Vatican City.",
+    "It stands in Vatican City."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f5/Basilica_di_San_Pietro_in_Vaticano_September_2015-1a.jpg/500px-Basilica_di_San_Pietro_in_Vaticano_September_2015-1a.jpg",
+      "w": 500,
+      "h": 261,
+      "credit": "Alvesgaspar",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Basilica_di_San_Pietro_in_Vaticano_September_2015-1a.jpg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "atomium",
+   "name": "Atomium",
+   "lname": "the Atomium",
+   "alt": [],
+   "iso3": "BEL",
+   "group": "monument",
+   "geo": {
+    "lat": 50.895,
+    "lon": 4.3414
+   },
+   "facts": {
+    "country": "Belgium",
+    "continent": "Europe",
+    "kind": "monument",
+    "built": 1958
+   },
+   "blurb": "Atomium, Belgium. It stands in Brussels. It is made of nine linked steel spheres.",
+   "clues": [
+    "It was built for the 1958 world's fair.",
+    "It represents an iron crystal magnified 165 billion times.",
+    "It is made of nine linked steel spheres.",
+    "It is in Europe.",
+    "It is in Belgium.",
+    "It stands in Brussels."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/08/Laeken_Atomium_06.jpg/500px-Laeken_Atomium_06.jpg",
+      "w": 500,
+      "h": 483,
+      "credit": "Zairon",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Laeken_Atomium_06.jpg"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "the-little-mermaid",
+   "name": "The Little Mermaid",
+   "lname": "the Little Mermaid",
+   "alt": [
+    "Little Mermaid"
+   ],
+   "iso3": "DNK",
+   "group": "statue",
+   "geo": {
+    "lat": 55.6929,
+    "lon": 12.5993
+   },
+   "facts": {
+    "country": "Denmark",
+    "continent": "Europe",
+    "kind": "statue",
+    "built": 1913
+   },
+   "blurb": "The Little Mermaid, Denmark. It sits on a rock by the waterside in Copenhagen. It is based on a fairy tale by Hans Christian Andersen.",
+   "clues": [
+    "It was unveiled in 1913.",
+    "It has been beheaded by vandals more than once.",
+    "It is based on a fairy tale by Hans Christian Andersen.",
+    "It is in Europe.",
+    "It is in Denmark.",
+    "It sits on a rock by the waterside in Copenhagen."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/5/55/Petite_sir%C3%A8ne_de_Copenhague_%28conforme_%C3%A0_la_loi_danoise%29.JPG/500px-Petite_sir%C3%A8ne_de_Copenhague_%28conforme_%C3%A0_la_loi_danoise%29.JPG",
+      "w": 500,
+      "h": 429,
+      "credit": "Benoît Prieur",
+      "license": "CC0",
+      "page": "https://commons.wikimedia.org/wiki/File:Petite_sir%C3%A8ne_de_Copenhague_(conforme_%C3%A0_la_loi_danoise).JPG"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "cn-tower",
+   "name": "CN Tower",
+   "lname": "the CN Tower",
+   "alt": [],
+   "iso3": "CAN",
+   "group": "tower",
+   "geo": {
+    "lat": 43.6428,
+    "lon": -79.3871
+   },
+   "facts": {
+    "country": "Canada",
+    "continent": "North America",
+    "kind": "tower",
+    "built": 1976
+   },
+   "blurb": "CN Tower, Canada. It is a communications tower in Toronto. It was the world's tallest free-standing structure for over 30 years.",
+   "clues": [
+    "It opened in 1976.",
+    "It has a glass floor and an outdoor edge walk.",
+    "It was the world's tallest free-standing structure for over 30 years.",
+    "It is in North America.",
+    "It is in Canada.",
+    "It is a communications tower in Toronto."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b7/CN_Tower_from_Puente_de_Luz%2C_Toronto%2C_Ontario%2C_2025-08-25_01.jpg/250px-CN_Tower_from_Puente_de_Luz%2C_Toronto%2C_Ontario%2C_2025-08-25_01.jpg",
+      "w": 250,
+      "h": 637,
+      "credit": "Chris Woodrich",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:CN_Tower_from_Puente_de_Luz,_Toronto,_Ontario,_2025-08-25_01.jpg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "empire-state-building",
+   "name": "Empire State Building",
+   "lname": "the Empire State Building",
+   "alt": [],
+   "iso3": "USA",
+   "group": "tower",
+   "geo": {
+    "lat": 40.7483,
+    "lon": -73.9856
+   },
+   "facts": {
+    "country": "United States",
+    "continent": "North America",
+    "kind": "tower",
+    "built": 1931
+   },
+   "blurb": "Empire State Building, United States. It is an Art Deco skyscraper in Manhattan. It was the world's tallest building for nearly 40 years.",
+   "clues": [
+    "It was finished in 1931 after just over a year of building.",
+    "A giant ape climbs it in a 1933 film.",
+    "It was the world's tallest building for nearly 40 years.",
+    "It is in North America.",
+    "It is in the United States.",
+    "It is an Art Deco skyscraper in Manhattan."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/1/10/Empire_State_Building_%28aerial_view%29.jpg/330px-Empire_State_Building_%28aerial_view%29.jpg",
+      "w": 330,
+      "h": 495,
+      "credit": "Sam Valadi",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Empire_State_Building_(aerial_view).jpg"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "mount-rushmore",
+   "name": "Mount Rushmore",
+   "lname": "Mount Rushmore",
+   "alt": [],
+   "iso3": "USA",
+   "group": "monument",
+   "geo": {
+    "lat": 43.8789,
+    "lon": -103.4592
+   },
+   "facts": {
+    "country": "United States",
+    "continent": "North America",
+    "kind": "monument"
+   },
+   "blurb": "Mount Rushmore, United States. It shows four US presidents carved into a mountain in South Dakota. Each carved face is about 18 metres tall.",
+   "clues": [
+    "It was finished in 1941.",
+    "Its sculptor was Gutzon Borglum.",
+    "Each carved face is about 18 metres tall.",
+    "It is in North America.",
+    "It is in the United States.",
+    "It shows four US presidents carved into a mountain in South Dakota."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/87/Mount_Rushmore_detail_view_%28100MP%29.jpg/500px-Mount_Rushmore_detail_view_%28100MP%29.jpg",
+      "w": 500,
+      "h": 340,
+      "credit": "Thomas Wolf, www.foto-tw.de",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Mount_Rushmore_detail_view_(100MP).jpg"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "petronas-towers",
+   "name": "Petronas Towers",
+   "lname": "the Petronas Towers",
+   "alt": [],
+   "iso3": "MYS",
+   "group": "tower",
+   "geo": {
+    "lat": 3.1578,
+    "lon": 101.7117
+   },
+   "facts": {
+    "country": "Malaysia",
+    "continent": "Asia",
+    "kind": "tower"
+   },
+   "blurb": "Petronas Towers, Malaysia. They are twin skyscrapers in Kuala Lumpur. Their floor plan is based on an eight-pointed star.",
+   "clues": [
+    "They were the world's tallest buildings from 1998 to 2004.",
+    "A sky bridge joins them on the 41st and 42nd floors.",
+    "Their floor plan is based on an eight-pointed star.",
+    "It is in Asia.",
+    "It is in Malaysia.",
+    "They are twin skyscrapers in Kuala Lumpur."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/7/74/Kuala_Lumpur_-_panoramio_%2818%29.jpg/330px-Kuala_Lumpur_-_panoramio_%2818%29.jpg",
+      "w": 330,
+      "h": 495,
+      "credit": "AwOiSoAk KaOsIoWa",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Kuala_Lumpur_-_panoramio_(18).jpg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "marina-bay-sands",
+   "name": "Marina Bay Sands",
+   "lname": "Marina Bay Sands",
+   "alt": [],
+   "iso3": "SGP",
+   "group": "building",
+   "geo": {
+    "lat": 1.2825,
+    "lon": 103.86
+   },
+   "facts": {
+    "country": "Singapore",
+    "continent": "Asia",
+    "kind": "building",
+    "built": 2010
+   },
+   "blurb": "Marina Bay Sands, Singapore. It overlooks Marina Bay in Singapore. Its three hotel towers are joined by a giant platform that looks like a ship.",
+   "clues": [
+    "It opened in 2010.",
+    "It has a huge infinity pool on its roof.",
+    "Its three hotel towers are joined by a giant platform that looks like a ship.",
+    "It is in Asia.",
+    "It is in Singapore."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/3/33/Marina_Bay_Sands_Hotel_3_%2831345110894%29.jpg/500px-Marina_Bay_Sands_Hotel_3_%2831345110894%29.jpg",
+      "w": 500,
+      "h": 310,
+      "credit": "Tony Hisgett from Birmingham, UK",
+      "license": "CC BY 2.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Marina_Bay_Sands_Hotel_3_(31345110894).jpg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "forbidden-city",
+   "name": "Forbidden City",
+   "lname": "the Forbidden City",
+   "alt": [
+    "Palace Museum"
+   ],
+   "iso3": "CHN",
+   "group": "castle",
+   "geo": {
+    "lat": 39.9158,
+    "lon": 116.3908
+   },
+   "facts": {
+    "country": "China",
+    "continent": "Asia",
+    "kind": "castle",
+    "built": 1420
+   },
+   "blurb": "Forbidden City, China. It is a vast palace complex in the heart of Beijing. It is now the Palace Museum.",
+   "clues": [
+    "It was completed in 1420.",
+    "It was home to 24 emperors of the Ming and Qing dynasties.",
+    "It is in Asia.",
+    "It is in China.",
+    "It is a vast palace complex in the heart of Beijing."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/2/23/Hall_of_Supreme_Harmony_%2820241127120000%29.jpg/500px-Hall_of_Supreme_Harmony_%2820241127120000%29.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "N509FZ",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Hall_of_Supreme_Harmony_(20241127120000).jpg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "terracotta-army",
+   "name": "Terracotta Army",
+   "lname": "the Terracotta Army",
+   "alt": [
+    "Terracotta Warriors"
+   ],
+   "iso3": "CHN",
+   "group": "ancient",
+   "geo": {
+    "lat": 34.385,
+    "lon": 109.2731
+   },
+   "facts": {
+    "country": "China",
+    "continent": "Asia",
+    "kind": "ancient"
+   },
+   "blurb": "Terracotta Army, China. It is an army of clay soldiers near Xi'an. It was buried with China's first emperor, Qin Shi Huang.",
+   "clues": [
+    "It was discovered by farmers digging a well in 1974.",
+    "No two soldiers' faces are exactly alike.",
+    "It was buried with China's first emperor, Qin Shi Huang.",
+    "It is in Asia.",
+    "It is in China.",
+    "It is an army of clay soldiers near Xi'an."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/88/51714-Terracota-Army.jpg/500px-51714-Terracota-Army.jpg",
+      "w": 500,
+      "h": 331,
+      "credit": "xiquinhosilva",
+      "license": "CC BY 2.0",
+      "page": "https://commons.wikimedia.org/wiki/File:51714-Terracota-Army.jpg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "potala-palace",
+   "name": "Potala Palace",
+   "lname": "the Potala Palace",
+   "alt": [],
+   "iso3": "CHN",
+   "group": "castle",
+   "geo": {
+    "lat": 29.6578,
+    "lon": 91.1169
+   },
+   "facts": {
+    "country": "China",
+    "continent": "Asia",
+    "kind": "castle"
+   },
+   "blurb": "Potala Palace, China. It towers over Lhasa in Tibet. It was the winter home of the Dalai Lamas.",
+   "clues": [
+    "It has more than 1,000 rooms.",
+    "It stands on Marpo Ri hill at about 3,700 metres.",
+    "It was the winter home of the Dalai Lamas.",
+    "It is in Asia.",
+    "It is in China.",
+    "It towers over Lhasa in Tibet."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4f/Potala.jpg/500px-Potala.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Ondřej Žváček",
+      "license": "CC BY 2.5",
+      "page": "https://commons.wikimedia.org/wiki/File:Potala.jpg"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "borobudur",
+   "name": "Borobudur",
+   "lname": "Borobudur",
+   "alt": [],
+   "iso3": "IDN",
+   "group": "religious",
+   "geo": {
+    "lat": -7.6079,
+    "lon": 110.2038
+   },
+   "facts": {
+    "country": "Indonesia",
+    "continent": "Asia",
+    "kind": "religious"
+   },
+   "blurb": "Borobudur, Indonesia. It is on the island of Java. It is the world's largest Buddhist temple.",
+   "clues": [
+    "It was built in the 9th century.",
+    "It was hidden under volcanic ash and jungle for centuries.",
+    "It is the world's largest Buddhist temple.",
+    "It is in Asia.",
+    "It is in Indonesia.",
+    "It is on the island of Java."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8c/Borobudur-Nothwest-view.jpg/500px-Borobudur-Nothwest-view.jpg",
+      "w": 500,
+      "h": 197,
+      "credit": "Gunawan Kartapranata",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Borobudur-Nothwest-view.jpg"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "shwedagon-pagoda",
+   "name": "Shwedagon Pagoda",
+   "lname": "the Shwedagon Pagoda",
+   "alt": [],
+   "iso3": "MMR",
+   "group": "religious",
+   "geo": {
+    "lat": 16.7983,
+    "lon": 96.1494
+   },
+   "facts": {
+    "country": "Myanmar",
+    "continent": "Asia",
+    "kind": "religious"
+   },
+   "blurb": "Shwedagon Pagoda, Myanmar. It is a gilded stupa in Yangon. It is covered in gold.",
+   "clues": [
+    "Its spire is tipped with thousands of diamonds.",
+    "It is said to hold relics of four Buddhas.",
+    "It is covered in gold.",
+    "It is in Asia.",
+    "It is in Myanmar.",
+    "It is a gilded stupa in Yangon."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a3/Yangon_-_Shwedagon_Pagoda_03.jpg/500px-Yangon_-_Shwedagon_Pagoda_03.jpg",
+      "w": 500,
+      "h": 324,
+      "credit": "Stefan Fussan",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Yangon_-_Shwedagon_Pagoda_03.jpg"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "ha-long-bay",
+   "name": "Ha Long Bay",
+   "lname": "Ha Long Bay",
+   "alt": [
+    "Halong Bay"
+   ],
+   "iso3": "VNM",
+   "group": "natural",
+   "geo": {
+    "lat": 20.9,
+    "lon": 107.2
+   },
+   "facts": {
+    "country": "Vietnam",
+    "continent": "Asia",
+    "kind": "natural"
+   },
+   "blurb": "Ha Long Bay, Vietnam. It is in the Gulf of Tonkin in northern Vietnam. Its islands are limestone pillars rising from the sea.",
+   "clues": [
+    "Its name means where the dragon descends.",
+    "It has around 1,600 islands and islets.",
+    "Its islands are limestone pillars rising from the sea.",
+    "It is in Asia.",
+    "It is in Vietnam.",
+    "It is in the Gulf of Tonkin in northern Vietnam."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e4/Halong_ensemble_%28colour_corrected%29.jpg/500px-Halong_ensemble_%28colour_corrected%29.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Thierry Boriecolour adjusted by Lycaon",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Halong_ensemble_(colour_corrected).jpg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "golden-temple",
+   "name": "Golden Temple",
+   "lname": "the Golden Temple",
+   "alt": [
+    "Harmandir Sahib"
+   ],
+   "iso3": "IND",
+   "group": "religious",
+   "geo": {
+    "lat": 31.62,
+    "lon": 74.8767
+   },
+   "facts": {
+    "country": "India",
+    "continent": "Asia",
+    "kind": "religious"
+   },
+   "blurb": "Golden Temple, India. It stands in a sacred pool in Amritsar. Its upper floors are covered in gold.",
+   "clues": [
+    "Its community kitchen serves free meals to tens of thousands of people every day.",
+    "It is the holiest gurdwara of Sikhism.",
+    "Its upper floors are covered in gold.",
+    "It is in Asia.",
+    "It is in India.",
+    "It stands in a sacred pool in Amritsar."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4d/Hamandir_Sahib_%28Golden_Temple%29.jpg/500px-Hamandir_Sahib_%28Golden_Temple%29.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "This picture has been taken by Oleg Yunakov. Contact e-mail: yunakovgmail.com. Image ca…",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Hamandir_Sahib_(Golden_Temple).jpg"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "gateway-of-india",
+   "name": "Gateway of India",
+   "lname": "the Gateway of India",
+   "alt": [],
+   "iso3": "IND",
+   "group": "monument",
+   "geo": {
+    "lat": 18.9218,
+    "lon": 72.8347
+   },
+   "facts": {
+    "country": "India",
+    "continent": "Asia",
+    "kind": "monument",
+    "built": 1924
+   },
+   "blurb": "Gateway of India, India. It is an arch on the waterfront in Mumbai. The last British troops left India through it in 1948.",
+   "clues": [
+    "It was completed in 1924.",
+    "It commemorates the landing of King George V and Queen Mary in 1911.",
+    "It was designed by George Wittet.",
+    "It is built of yellow basalt.",
+    "It is in Asia.",
+    "It is an arch on the waterfront in Mumbai."
+   ],
+   "media": {
+    "img": [
+     {
+      "file": "Gateway of India Port Mumbai 4.jpg",
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/5/55/Gateway_of_India_Port_Mumbai_4.jpg/500px-Gateway_of_India_Port_Mumbai_4.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Gannu03",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Gateway_of_India_Port_Mumbai_4.jpg"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "abu-simbel",
+   "name": "Abu Simbel",
+   "lname": "Abu Simbel",
+   "alt": [
+    "Abu Simbel temples"
+   ],
+   "iso3": "EGY",
+   "group": "ancient",
+   "geo": {
+    "lat": 22.3369,
+    "lon": 31.6256
+   },
+   "facts": {
+    "country": "Egypt",
+    "continent": "Africa",
+    "kind": "ancient"
+   },
+   "blurb": "Abu Simbel, Egypt. It is a pair of rock temples near Lake Nasser. Twice a year the sun lights the inner sanctuary.",
+   "clues": [
+    "In the 1960s the whole site was cut up and moved to escape a rising reservoir.",
+    "Its four colossal statues show Ramesses II.",
+    "Twice a year the sun lights the inner sanctuary.",
+    "It is in Africa.",
+    "It is in Egypt.",
+    "It is a pair of rock temples near Lake Nasser."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/2/2e/Gro%C3%9Fer_Tempel_%28Abu_Simbel%29_31.jpg/500px-Gro%C3%9Fer_Tempel_%28Abu_Simbel%29_31.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Olaf Tausch",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Gro%C3%9Fer_Tempel_(Abu_Simbel)_31.jpg"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "great-sphinx-of-giza",
+   "name": "Great Sphinx of Giza",
+   "lname": "the Great Sphinx of Giza",
+   "alt": [
+    "Sphinx",
+    "The Sphinx"
+   ],
+   "iso3": "EGY",
+   "group": "ancient",
+   "geo": {
+    "lat": 29.9753,
+    "lon": 31.1377
+   },
+   "facts": {
+    "country": "Egypt",
+    "continent": "Africa",
+    "kind": "ancient"
+   },
+   "blurb": "Great Sphinx of Giza, Egypt. It guards the pyramids outside Cairo. It has a lion's body and a human head.",
+   "clues": [
+    "Its nose has been missing for centuries.",
+    "It is carved from a single ridge of limestone.",
+    "It has a lion's body and a human head.",
+    "It is in Africa.",
+    "It is in Egypt.",
+    "It guards the pyramids outside Cairo."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d3/Great_Sphinx_of_Giza_May_2015.JPG/500px-Great_Sphinx_of_Giza_May_2015.JPG",
+      "w": 500,
+      "h": 333,
+      "credit": "MusikAnimal",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Great_Sphinx_of_Giza_May_2015.JPG"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "burj-al-arab",
+   "name": "Burj Al Arab",
+   "lname": "the Burj Al Arab",
+   "alt": [],
+   "iso3": "ARE",
+   "group": "building",
+   "geo": {
+    "lat": 25.1414,
+    "lon": 55.1853
+   },
+   "facts": {
+    "country": "United Arab Emirates",
+    "continent": "Asia",
+    "kind": "building",
+    "built": 1999
+   },
+   "blurb": "Burj Al Arab, United Arab Emirates. It is a luxury hotel on the Dubai coast. Its shape is designed to look like a ship's sail.",
+   "clues": [
+    "It opened in 1999.",
+    "It stands on its own artificial island.",
+    "Its shape is designed to look like a ship's sail.",
+    "It is in Asia.",
+    "It is a luxury hotel on the Dubai coast."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/1/1c/Burj_Al_Arab_and_Jumeirah_Beach_%289601659067%29.jpg/500px-Burj_Al_Arab_and_Jumeirah_Beach_%289601659067%29.jpg",
+      "w": 500,
+      "h": 284,
+      "credit": "Yacine Hary",
+      "license": "CC BY 2.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Burj_Al_Arab_and_Jumeirah_Beach_(9601659067).jpg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "sheikh-zayed-grand-mosque",
+   "name": "Sheikh Zayed Grand Mosque",
+   "lname": "the Sheikh Zayed Grand Mosque",
+   "alt": [],
+   "iso3": "ARE",
+   "group": "religious",
+   "geo": {
+    "lat": 24.412,
+    "lon": 54.474
+   },
+   "facts": {
+    "country": "United Arab Emirates",
+    "continent": "Asia",
+    "kind": "religious",
+    "built": 2007
+   },
+   "blurb": "Sheikh Zayed Grand Mosque, United Arab Emirates. It is the largest mosque in the United Arab Emirates. It has 82 white domes.",
+   "clues": [
+    "It opened in 2007.",
+    "It has one of the world's largest hand-knotted carpets.",
+    "It has 82 white domes.",
+    "It is in Asia.",
+    "It is in the United Arab Emirates.",
+    "It is the largest mosque in the United Arab Emirates."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/01/Sheikh_Zayed_Mosque_Silhouette.jpg/500px-Sheikh_Zayed_Mosque_Silhouette.jpg",
+      "w": 500,
+      "h": 281,
+      "credit": "PotatoWitch",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Sheikh_Zayed_Mosque_Silhouette.jpg"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "teotihuacan",
+   "name": "Teotihuacan",
+   "lname": "Teotihuacan",
+   "alt": [
+    "Teotihuacán"
+   ],
+   "iso3": "MEX",
+   "group": "ancient",
+   "geo": {
+    "lat": 19.6925,
+    "lon": -98.8439
+   },
+   "facts": {
+    "country": "Mexico",
+    "continent": "North America",
+    "kind": "ancient"
+   },
+   "blurb": "Teotihuacan, Mexico. It is an ancient city near Mexico City. Its Pyramid of the Sun is one of the largest in the Americas.",
+   "clues": [
+    "Its main street is called the Avenue of the Dead.",
+    "Its builders are still a mystery.",
+    "Its Pyramid of the Sun is one of the largest in the Americas.",
+    "It is in North America.",
+    "It is in Mexico.",
+    "It is an ancient city near Mexico City."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a7/ZA77_Teotihuac%C3%A1n_edo_de_mex_Herberto_de_la_rosa.jpg/500px-ZA77_Teotihuac%C3%A1n_edo_de_mex_Herberto_de_la_rosa.jpg",
+      "w": 500,
+      "h": 332,
+      "credit": "Hdlrosa",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:ZA77_Teotihuac%C3%A1n_edo_de_mex_Herberto_de_la_rosa.jpg"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "tikal",
+   "name": "Tikal",
+   "lname": "Tikal",
+   "alt": [],
+   "iso3": "GTM",
+   "group": "ancient",
+   "geo": {
+    "lat": 17.2221,
+    "lon": -89.6236
+   },
+   "facts": {
+    "country": "Guatemala",
+    "continent": "North America",
+    "kind": "ancient"
+   },
+   "blurb": "Tikal, Guatemala. It lies in the rainforest of northern Guatemala. It was one of the largest Maya cities.",
+   "clues": [
+    "It was used as a filming location in Star Wars.",
+    "Its tallest temple rises about 70 metres.",
+    "It was one of the largest Maya cities.",
+    "It is in North America.",
+    "It is in Guatemala.",
+    "It lies in the rainforest of northern Guatemala."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/7/75/Tikal_3.jpg/500px-Tikal_3.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Mundo Maya",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Tikal_3.jpg"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "panama-canal",
+   "name": "Panama Canal",
+   "lname": "the Panama Canal",
+   "alt": [],
+   "iso3": "PAN",
+   "group": "engineering",
+   "geo": {
+    "lat": 9.12,
+    "lon": -79.75
+   },
+   "facts": {
+    "country": "Panama",
+    "continent": "North America",
+    "kind": "engineering",
+    "built": 1914
+   },
+   "blurb": "Panama Canal, Panama. It links the Atlantic and Pacific oceans across a narrow isthmus. It was controlled by the United States until 1999.",
+   "clues": [
+    "It opened in 1914.",
+    "Ships are raised and lowered by locks.",
+    "It was controlled by the United States until 1999.",
+    "It is in North America.",
+    "It links the Atlantic and Pacific oceans across a narrow isthmus."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f7/Panama_Canal_Gatun_Locks.jpg/500px-Panama_Canal_Gatun_Locks.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "User:Stan Shebs",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Panama_Canal_Gatun_Locks.jpg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "galapagos-islands",
+   "name": "Galápagos Islands",
+   "lname": "the Galápagos Islands",
+   "alt": [
+    "Galapagos Islands",
+    "Galapagos"
+   ],
+   "iso3": "ECU",
+   "group": "natural",
+   "geo": {
+    "lat": -0.6667,
+    "lon": -90.55
+   },
+   "facts": {
+    "country": "Ecuador",
+    "continent": "South America",
+    "kind": "natural"
+   },
+   "blurb": "Galápagos Islands, Ecuador. They lie in the Pacific about 900 km west of Ecuador. They are volcanic islands on the equator.",
+   "clues": [
+    "Charles Darwin visited them in 1835.",
+    "They are home to giant tortoises and marine iguanas.",
+    "They are volcanic islands on the equator.",
+    "It is in South America.",
+    "It is in Ecuador.",
+    "They lie in the Pacific about 900 km west of Ecuador."
+   ],
+   "media": {
+    "img": []
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "salar-de-uyuni",
+   "name": "Salar de Uyuni",
+   "lname": "Salar de Uyuni",
+   "alt": [
+    "Uyuni salt flat"
+   ],
+   "iso3": "BOL",
+   "group": "natural",
+   "geo": {
+    "lat": -20.3333,
+    "lon": -67.7
+   },
+   "facts": {
+    "country": "Bolivia",
+    "continent": "South America",
+    "kind": "natural"
+   },
+   "blurb": "Salar de Uyuni, Bolivia. It is in the Andes of south-west Bolivia. It is the world's largest salt flat.",
+   "clues": [
+    "After rain it becomes a giant mirror.",
+    "It holds a large share of the world's known lithium.",
+    "It is in South America.",
+    "It is in Bolivia.",
+    "It is in the Andes of south-west Bolivia."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/95/Salar_de_Uyuni_-_panoramio_%2810%29.jpg/500px-Salar_de_Uyuni_-_panoramio_%2810%29.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Pavel Špindler",
+      "license": "CC BY 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Salar_de_Uyuni_-_panoramio_(10).jpg"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "perito-moreno-glacier",
+   "name": "Perito Moreno Glacier",
+   "lname": "the Perito Moreno Glacier",
+   "alt": [
+    "Perito Moreno"
+   ],
+   "iso3": "ARG",
+   "group": "natural",
+   "geo": {
+    "lat": -50.4932,
+    "lon": -73.128
+   },
+   "facts": {
+    "country": "Argentina",
+    "continent": "South America",
+    "kind": "natural"
+   },
+   "blurb": "Perito Moreno Glacier, Argentina. It is in Los Glaciares National Park in Patagonia. Huge chunks of ice regularly crash from its face into the lake.",
+   "clues": [
+    "Its ice wall towers about 70 metres above the water.",
+    "Huge chunks of ice regularly crash from its face into the lake.",
+    "It is in South America.",
+    "It is in Argentina.",
+    "It is in Los Glaciares National Park in Patagonia."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c8/Perito_Moreno_Glacier_2023.jpg/500px-Perito_Moreno_Glacier_2023.jpg",
+      "w": 500,
+      "h": 214,
+      "credit": "Fernando",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Perito_Moreno_Glacier_2023.jpg"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "sugarloaf-mountain",
+   "name": "Sugarloaf Mountain",
+   "lname": "Sugarloaf Mountain",
+   "alt": [
+    "Pão de Açúcar"
+   ],
+   "iso3": "BRA",
+   "group": "natural",
+   "geo": {
+    "lat": -22.9494,
+    "lon": -43.1567
+   },
+   "facts": {
+    "country": "Brazil",
+    "continent": "South America",
+    "kind": "natural"
+   },
+   "blurb": "Sugarloaf Mountain, Brazil. It stands at the mouth of Guanabara Bay in Rio de Janeiro. It is named after the shape of old sugar moulds.",
+   "clues": [
+    "A cable car has carried visitors to its top since 1912.",
+    "It rises 396 metres from the water's edge.",
+    "It is named after the shape of old sugar moulds.",
+    "It is in South America.",
+    "It is in Brazil.",
+    "It stands at the mouth of Guanabara Bay in Rio de Janeiro."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/f/fc/Vista_do_Morro_Dona_Marta.jpg/500px-Vista_do_Morro_Dona_Marta.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Ccarelo",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Vista_do_Morro_Dona_Marta.jpg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "hollywood-sign",
+   "name": "Hollywood Sign",
+   "lname": "the Hollywood Sign",
+   "alt": [],
+   "iso3": "USA",
+   "group": "monument",
+   "geo": {
+    "lat": 34.1341,
+    "lon": -118.3217
+   },
+   "facts": {
+    "country": "United States",
+    "continent": "North America",
+    "kind": "monument",
+    "built": 1923
+   },
+   "blurb": "Hollywood Sign, United States. It sits on Mount Lee above Los Angeles. Each letter is about 14 metres tall.",
+   "clues": [
+    "It was put up in 1923 to advertise a housing development.",
+    "It originally had extra letters at the end.",
+    "Each letter is about 14 metres tall.",
+    "It is in North America.",
+    "It is in the United States.",
+    "It sits on Mount Lee above Los Angeles."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5a/Hollywood_Sign_%28Zuschnitt%29.jpg/500px-Hollywood_Sign_%28Zuschnitt%29.jpg",
+      "w": 500,
+      "h": 313,
+      "credit": "Thomas Wolf, www.foto-tw.de",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Hollywood_Sign_(Zuschnitt).jpg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "space-needle",
+   "name": "Space Needle",
+   "lname": "the Space Needle",
+   "alt": [],
+   "iso3": "USA",
+   "group": "tower",
+   "geo": {
+    "lat": 47.6204,
+    "lon": -122.3491
+   },
+   "facts": {
+    "country": "United States",
+    "continent": "North America",
+    "kind": "tower",
+    "built": 1962
+   },
+   "blurb": "Space Needle, United States. It is an observation tower in Seattle. Its shape resembles a flying saucer on stilts.",
+   "clues": [
+    "It was built for the 1962 World's Fair.",
+    "It has a rotating glass floor near the top.",
+    "Its shape resembles a flying saucer on stilts.",
+    "It is in North America.",
+    "It is in the United States.",
+    "It is an observation tower in Seattle."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/2/2d/Seattle%2C_October_6%2C_2023_-_60.jpg/330px-Seattle%2C_October_6%2C_2023_-_60.jpg",
+      "w": 330,
+      "h": 440,
+      "credit": "Another Believer",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Seattle,_October_6,_2023_-_60.jpg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "gateway-arch",
+   "name": "Gateway Arch",
+   "lname": "the Gateway Arch",
+   "alt": [],
+   "iso3": "USA",
+   "group": "monument",
+   "geo": {
+    "lat": 38.6246,
+    "lon": -90.185
+   },
+   "facts": {
+    "country": "United States",
+    "continent": "North America",
+    "kind": "monument",
+    "built": 1965
+   },
+   "blurb": "Gateway Arch, United States. It stands on the banks of the Mississippi in St. Louis. At 192 metres it is the world's tallest arch.",
+   "clues": [
+    "It was completed in 1965.",
+    "Small tram pods carry visitors to the top.",
+    "At 192 metres it is the world's tallest arch.",
+    "It is in North America.",
+    "It is in the United States.",
+    "It stands on the banks of the Mississippi in St. Louis."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b9/St_Louis_Gateway_Arch.jpg/500px-St_Louis_Gateway_Arch.jpg",
+      "w": 500,
+      "h": 388,
+      "credit": "[https://www.flickr.com/photos/11399912@N00 B0iwehijro2i0- ] `1l]] from Davis, CA, USA",
+      "license": "CC BY 2.0",
+      "page": "https://commons.wikimedia.org/wiki/File:St_Louis_Gateway_Arch.jpg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "edinburgh-castle",
+   "name": "Edinburgh Castle",
+   "lname": "Edinburgh Castle",
+   "alt": [],
+   "iso3": "GBR",
+   "group": "castle",
+   "geo": {
+    "lat": 55.9487,
+    "lon": -3.2007
+   },
+   "facts": {
+    "country": "United Kingdom",
+    "continent": "Europe",
+    "kind": "castle"
+   },
+   "blurb": "Edinburgh Castle, United Kingdom. It towers over the Scottish capital. It sits on an extinct volcano called Castle Rock.",
+   "clues": [
+    "The One O'Clock Gun is fired from it most days.",
+    "The Honours of Scotland are kept here.",
+    "It sits on an extinct volcano called Castle Rock.",
+    "It is in Europe.",
+    "It is in the United Kingdom.",
+    "It towers over the Scottish capital."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4c/Edinburgh_Castle_from_the_Grassmarket.jpg/500px-Edinburgh_Castle_from_the_Grassmarket.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Stephencdickson",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Edinburgh_Castle_from_the_Grassmarket.jpg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "buckingham-palace",
+   "name": "Buckingham Palace",
+   "lname": "Buckingham Palace",
+   "alt": [],
+   "iso3": "GBR",
+   "group": "castle",
+   "geo": {
+    "lat": 51.501,
+    "lon": -0.142
+   },
+   "facts": {
+    "country": "United Kingdom",
+    "continent": "Europe",
+    "kind": "castle"
+   },
+   "blurb": "Buckingham Palace, United Kingdom. It is the London home of the British monarch. It has 775 rooms.",
+   "clues": [
+    "It became the official royal residence when Queen Victoria moved in in 1837.",
+    "The Changing of the Guard takes place outside.",
+    "It has 775 rooms.",
+    "It is in Europe.",
+    "It is in the United Kingdom.",
+    "It is the London home of the British monarch."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b4/Buckingham_Palace%2C_London_-_April_2009.jpg/500px-Buckingham_Palace%2C_London_-_April_2009.jpg",
+      "w": 500,
+      "h": 327,
+      "credit": "Diliff",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Buckingham_Palace,_London_-_April_2009.jpg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "cliffs-of-moher",
+   "name": "Cliffs of Moher",
+   "lname": "the Cliffs of Moher",
+   "alt": [],
+   "iso3": "IRL",
+   "group": "natural",
+   "geo": {
+    "lat": 52.9361,
+    "lon": -9.4708
+   },
+   "facts": {
+    "country": "Ireland",
+    "continent": "Europe",
+    "kind": "natural"
+   },
+   "blurb": "Cliffs of Moher, Ireland. They are sea cliffs on the west coast of Ireland. They run for about 14 km along the coast of County Clare.",
+   "clues": [
+    "They appear in Harry Potter and the Half-Blood Prince.",
+    "They rise up to 214 metres above the Atlantic.",
+    "They run for about 14 km along the coast of County Clare.",
+    "It is in Europe.",
+    "It is in Ireland."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/1/13/Ireland_Cliffs_of_Moher_BW_2025-09-11_14-27-51.jpg/500px-Ireland_Cliffs_of_Moher_BW_2025-09-11_14-27-51.jpg",
+      "w": 500,
+      "h": 281,
+      "credit": "Berthold Werner",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Ireland_Cliffs_of_Moher_BW_2025-09-11_14-27-51.jpg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "giant-s-causeway",
+   "name": "Giant's Causeway",
+   "lname": "the Giant's Causeway",
+   "alt": [],
+   "iso3": "GBR",
+   "group": "natural",
+   "geo": {
+    "lat": 55.2408,
+    "lon": -6.5117
+   },
+   "facts": {
+    "country": "United Kingdom",
+    "continent": "Europe",
+    "kind": "natural"
+   },
+   "blurb": "Giant's Causeway, United Kingdom. It is on the coast of County Antrim in Northern Ireland. Its columns are mostly six-sided and formed by cooling lava.",
+   "clues": [
+    "Legend says it was built by the giant Finn McCool.",
+    "It is made of about 40,000 interlocking columns.",
+    "Its columns are mostly six-sided and formed by cooling lava.",
+    "It is in Europe.",
+    "It is in the United Kingdom.",
+    "It is on the coast of County Antrim in Northern Ireland."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/0a/Giant%27s_Causeway_%2836834542085%29.jpg/500px-Giant%27s_Causeway_%2836834542085%29.jpg",
+      "w": 500,
+      "h": 337,
+      "credit": "Lindy Buckley from Nanjing, China",
+      "license": "CC BY 2.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Giant%27s_Causeway_(36834542085).jpg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "charles-bridge",
+   "name": "Charles Bridge",
+   "lname": "the Charles Bridge",
+   "alt": [],
+   "iso3": "CZE",
+   "group": "bridge",
+   "geo": {
+    "lat": 50.0864,
+    "lon": 14.4119
+   },
+   "facts": {
+    "country": "Czechia",
+    "continent": "Europe",
+    "kind": "bridge"
+   },
+   "blurb": "Charles Bridge, Czechia. It crosses the Vltava river in Prague. It is open only to people on foot.",
+   "clues": [
+    "Construction began in 1357.",
+    "It is lined with 30 Baroque statues.",
+    "It is open only to people on foot.",
+    "It is in Europe.",
+    "It is in Czechia.",
+    "It crosses the Vltava river in Prague."
+   ],
+   "media": {
+    "img": [
+     {
+      "file": "North view of Charles Bridge from Mánesův most, Prague 20160808 1.jpg",
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/7/72/North_view_of_Charles_Bridge_from_M%C3%A1nes%C5%AFv_most%2C_Prague_20160808_1.jpg/500px-North_view_of_Charles_Bridge_from_M%C3%A1nes%C5%AFv_most%2C_Prague_20160808_1.jpg",
+      "w": 500,
+      "h": 281,
+      "credit": "DXR",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:North_view_of_Charles_Bridge_from_M%C3%A1nes%C5%AFv_most,_Prague_20160808_1.jpg"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "hallgrimskirkja",
+   "name": "Hallgrímskirkja",
+   "lname": "Hallgrímskirkja",
+   "alt": [
+    "Hallgrimskirkja"
+   ],
+   "iso3": "ISL",
+   "group": "religious",
+   "geo": {
+    "lat": 64.1419,
+    "lon": -21.9269
+   },
+   "facts": {
+    "country": "Iceland",
+    "continent": "Europe",
+    "kind": "religious",
+    "built": 1986
+   },
+   "blurb": "Hallgrímskirkja, Iceland. It is a Lutheran church on a hill in Reykjavík. It is one of the tallest buildings in its country.",
+   "clues": [
+    "It was completed in 1986.",
+    "Its design was inspired by basalt columns.",
+    "It is one of the tallest buildings in its country.",
+    "It is in Europe.",
+    "It is in Iceland.",
+    "It is a Lutheran church on a hill in Reykjavík."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8b/Hallgrimskirkja_mai_2026.jpg/500px-Hallgrimskirkja_mai_2026.jpg",
+      "w": 500,
+      "h": 439,
+      "credit": "Steinninn",
+      "license": "CC BY 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Hallgrimskirkja_mai_2026.jpg"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "bran-castle",
+   "name": "Bran Castle",
+   "lname": "Bran Castle",
+   "alt": [],
+   "iso3": "ROU",
+   "group": "castle",
+   "geo": {
+    "lat": 45.515,
+    "lon": 25.3671
+   },
+   "facts": {
+    "country": "Romania",
+    "continent": "Europe",
+    "kind": "castle"
+   },
+   "blurb": "Bran Castle, Romania. It is a castle in Transylvania. It was once a residence of Queen Marie.",
+   "clues": [
+    "It is marketed as Dracula's Castle.",
+    "It guards a mountain pass in the Carpathians.",
+    "It was once a residence of Queen Marie.",
+    "It is in Europe.",
+    "It is in Romania.",
+    "It is a castle in Transylvania."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/b/bb/Bran_Castle_TB1.jpg/500px-Bran_Castle_TB1.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Todor Bozhinov",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Bran_Castle_TB1.jpg"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "kinderdijk",
+   "name": "Kinderdijk",
+   "lname": "Kinderdijk",
+   "alt": [],
+   "iso3": "NLD",
+   "group": "engineering",
+   "geo": {
+    "lat": 51.8833,
+    "lon": 4.6333
+   },
+   "facts": {
+    "country": "Netherlands",
+    "continent": "Europe",
+    "kind": "engineering"
+   },
+   "blurb": "Kinderdijk, Netherlands. It is a village near Rotterdam famous for windmills. It is a UNESCO World Heritage Site.",
+   "clues": [
+    "It has 19 windmills built in the 18th century.",
+    "Its windmills were used to drain the land.",
+    "It is a UNESCO World Heritage Site.",
+    "It is in Europe.",
+    "It is in the Netherlands.",
+    "It is a village near Rotterdam famous for windmills."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/f/ff/KinderdijkMolens02.jpg/500px-KinderdijkMolens02.jpg",
+      "w": 500,
+      "h": 374,
+      "credit": "Lucas Hirschegger",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:KinderdijkMolens02.jpg"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "wieliczka-salt-mine",
+   "name": "Wieliczka Salt Mine",
+   "lname": "the Wieliczka Salt Mine",
+   "alt": [],
+   "iso3": "POL",
+   "group": "engineering",
+   "geo": {
+    "lat": 49.9831,
+    "lon": 20.0557
+   },
+   "facts": {
+    "country": "Poland",
+    "continent": "Europe",
+    "kind": "engineering"
+   },
+   "blurb": "Wieliczka Salt Mine, Poland. It is near Kraków. It reaches over 300 metres deep.",
+   "clues": [
+    "It has a chapel with chandeliers carved from salt.",
+    "It was mined from the 13th century until 1996.",
+    "It reaches over 300 metres deep.",
+    "It is in Europe.",
+    "It is in Poland.",
+    "It is near Kraków."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/80/%CE%91%CE%BB%CE%B1%CF%84%CF%89%CF%81%CF%85%CF%87%CE%B5%CE%AF%CE%B1_%CE%92%CE%B9%CE%B5%CE%BB%CE%AF%CF%84%CF%83%CE%BA%CE%B1_5021.jpg/500px-%CE%91%CE%BB%CE%B1%CF%84%CF%89%CF%81%CF%85%CF%87%CE%B5%CE%AF%CE%B1_%CE%92%CE%B9%CE%B5%CE%BB%CE%AF%CF%84%CF%83%CE%BA%CE%B1_5021.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "C messier",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:%CE%91%CE%BB%CE%B1%CF%84%CF%89%CF%81%CF%85%CF%87%CE%B5%CE%AF%CE%B1_%CE%92%CE%B9%CE%B5%CE%BB%CE%AF%CF%84%CF%83%CE%BA%CE%B1_5021.jpg"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "cologne-cathedral",
+   "name": "Cologne Cathedral",
+   "lname": "Cologne Cathedral",
+   "alt": [],
+   "iso3": "DEU",
+   "group": "religious",
+   "geo": {
+    "lat": 50.9414,
+    "lon": 6.9583
+   },
+   "facts": {
+    "country": "Germany",
+    "continent": "Europe",
+    "kind": "religious"
+   },
+   "blurb": "Cologne Cathedral, Germany. It stands beside the Rhine in Cologne. Its twin spires are 157 metres tall.",
+   "clues": [
+    "Building started in 1248 and was finished in 1880.",
+    "It holds a shrine said to contain relics of the Three Kings.",
+    "Its twin spires are 157 metres tall.",
+    "It is in Europe.",
+    "It is in Germany."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/0d/K%C3%B6lner_Dom_von_Osten.jpg/330px-K%C3%B6lner_Dom_von_Osten.jpg",
+      "w": 330,
+      "h": 519,
+      "credit": "Thomas Wolf, www.foto-tw.de",
+      "license": "CC BY-SA 3.0 de",
+      "page": "https://commons.wikimedia.org/wiki/File:K%C3%B6lner_Dom_von_Osten.jpg"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "meteora",
+   "name": "Meteora",
+   "lname": "Meteora",
+   "alt": [],
+   "iso3": "GRC",
+   "group": "religious",
+   "geo": {
+    "lat": 39.7125,
+    "lon": 21.6267
+   },
+   "facts": {
+    "country": "Greece",
+    "continent": "Europe",
+    "kind": "religious"
+   },
+   "blurb": "Meteora, Greece. They are monasteries perched on rock pillars in Thessaly. Six monasteries are still active there.",
+   "clues": [
+    "Monks once reached them using nets and rope ladders.",
+    "Its name means suspended in the air.",
+    "Six monasteries are still active there.",
+    "It is in Europe.",
+    "It is in Greece.",
+    "They are monasteries perched on rock pillars in Thessaly."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/cc/00_0541_Kloster_Ag%C3%ADa_Tri%C3%A1da_%28Meteora%29_-_Griechenland.jpg/330px-00_0541_Kloster_Ag%C3%ADa_Tri%C3%A1da_%28Meteora%29_-_Griechenland.jpg",
+      "w": 330,
+      "h": 495,
+      "credit": "W. Bulach",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:00_0541_Kloster_Ag%C3%ADa_Tri%C3%A1da_(Meteora)_-_Griechenland.jpg"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "pamukkale",
+   "name": "Pamukkale",
+   "lname": "Pamukkale",
+   "alt": [],
+   "iso3": "TUR",
+   "group": "natural",
+   "geo": {
+    "lat": 37.9236,
+    "lon": 29.1223
+   },
+   "facts": {
+    "country": "Turkey",
+    "continent": "Asia",
+    "kind": "natural"
+   },
+   "blurb": "Pamukkale, Turkey. It is in the province of Denizli in Turkey. Its white terraces are formed by mineral-rich hot springs.",
+   "clues": [
+    "The ancient city of Hierapolis sits above it.",
+    "Its name means cotton castle.",
+    "Its white terraces are formed by mineral-rich hot springs.",
+    "It is in Asia.",
+    "It is in Turkey.",
+    "It is in the province of Denizli in Turkey."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5d/Pamukkale%2C_Denizli_2026_68.jpg/500px-Pamukkale%2C_Denizli_2026_68.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Biologg",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Pamukkale,_Denizli_2026_68.jpg"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "lalibela-churches",
+   "name": "Lalibela churches",
+   "lname": "the Lalibela churches",
+   "alt": [
+    "Lalibela"
+   ],
+   "iso3": "ETH",
+   "group": "religious",
+   "geo": {
+    "lat": 12.0294,
+    "lon": 39.0404
+   },
+   "facts": {
+    "country": "Ethiopia",
+    "continent": "Africa",
+    "kind": "religious"
+   },
+   "blurb": "Lalibela churches, Ethiopia. They are in the highlands of Ethiopia. The Church of St George is cross-shaped and sunk into the ground.",
+   "clues": [
+    "They were carved from solid rock.",
+    "The Church of St George is cross-shaped and sunk into the ground.",
+    "It is in Africa.",
+    "It is in Ethiopia.",
+    "They are in the highlands of Ethiopia."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a3/Lalibela%2C_san_giorgio%2C_esterno_07.jpg/500px-Lalibela%2C_san_giorgio%2C_esterno_07.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Sailko",
+      "license": "CC BY 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Lalibela,_san_giorgio,_esterno_07.jpg"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "great-mosque-of-djenne",
+   "name": "Great Mosque of Djenné",
+   "lname": "the Great Mosque of Djenné",
+   "alt": [
+    "Djenné mosque"
+   ],
+   "iso3": "MLI",
+   "group": "religious",
+   "geo": {
+    "lat": 13.9053,
+    "lon": -4.5556
+   },
+   "facts": {
+    "country": "Mali",
+    "continent": "Africa",
+    "kind": "religious",
+    "built": 1907
+   },
+   "blurb": "Great Mosque of Djenné, Mali. It stands in the town of Djenné in Mali. It is the largest mud-brick building in the world.",
+   "clues": [
+    "The current building dates from 1907.",
+    "Townspeople replaster it each year in a festival.",
+    "It is the largest mud-brick building in the world.",
+    "It is in Africa.",
+    "It is in Mali."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/ce/Great_Mosque_of_Djenn%C3%A9_1.jpg/500px-Great_Mosque_of_Djenn%C3%A9_1.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Andy Gilham",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Great_Mosque_of_Djenn%C3%A9_1.jpg"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "milford-sound",
+   "name": "Milford Sound",
+   "lname": "Milford Sound",
+   "alt": [],
+   "iso3": "NZL",
+   "group": "natural",
+   "geo": {
+    "lat": -44.6167,
+    "lon": 167.8667
+   },
+   "facts": {
+    "country": "New Zealand",
+    "continent": "Oceania",
+    "kind": "natural"
+   },
+   "blurb": "Milford Sound, New Zealand. It is in Fiordland on New Zealand's South Island. It is a fjord carved by glaciers.",
+   "clues": [
+    "Mitre Peak rises from its waters.",
+    "It is a fjord carved by glaciers.",
+    "It is in Oceania.",
+    "It is in New Zealand.",
+    "It is in Fiordland on New Zealand's South Island."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/86/00_1371_New_Zealand_-_Milford_Sound.jpg/500px-00_1371_New_Zealand_-_Milford_Sound.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "W. Bulach",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:00_1371_New_Zealand_-_Milford_Sound.jpg"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "great-barrier-reef",
+   "name": "Great Barrier Reef",
+   "lname": "the Great Barrier Reef",
+   "alt": [],
+   "iso3": "AUS",
+   "group": "natural",
+   "geo": {
+    "lat": -16.4,
+    "lon": 145.8
+   },
+   "facts": {
+    "country": "Australia",
+    "continent": "Oceania",
+    "kind": "natural"
+   },
+   "blurb": "Great Barrier Reef, Australia. It lies off the coast of Queensland. It is the world's largest coral reef system.",
+   "clues": [
+    "It is made of nearly 3,000 individual reefs.",
+    "It can be seen from space.",
+    "It is the world's largest coral reef system.",
+    "It is in Oceania.",
+    "It is in Australia.",
+    "It lies off the coast of Queensland."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/1/1b/GreatBarrierReef-EO.JPG/500px-GreatBarrierReef-EO.JPG",
+      "w": 500,
+      "h": 500,
+      "credit": "NASA, by MISR",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:GreatBarrierReef-EO.JPG"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "fushimi-inari-taisha",
+   "name": "Fushimi Inari-taisha",
+   "lname": "Fushimi Inari-taisha",
+   "alt": [
+    "Fushimi Inari"
+   ],
+   "iso3": "JPN",
+   "group": "religious",
+   "geo": {
+    "lat": 34.9672,
+    "lon": 135.7734
+   },
+   "facts": {
+    "country": "Japan",
+    "continent": "Asia",
+    "kind": "religious"
+   },
+   "blurb": "Fushimi Inari-taisha, Japan. It is a Shinto shrine in Kyoto. Thousands of red torii gates line its paths up a mountain.",
+   "clues": [
+    "Fox statues guard its grounds.",
+    "It is dedicated to the god of rice.",
+    "Thousands of red torii gates line its paths up a mountain.",
+    "It is in Asia.",
+    "It is in Japan.",
+    "It is a Shinto shrine in Kyoto."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/d/de/Fushimiinari-taisha%2C_naihaiden-1.jpg/500px-Fushimiinari-taisha%2C_naihaiden-1.jpg",
+      "w": 500,
+      "h": 331,
+      "credit": "Saigen Jiro",
+      "license": "CC0",
+      "page": "https://commons.wikimedia.org/wiki/File:Fushimiinari-taisha,_naihaiden-1.jpg"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "tokyo-skytree",
+   "name": "Tokyo Skytree",
+   "lname": "Tokyo Skytree",
+   "alt": [
+    "Skytree"
+   ],
+   "iso3": "JPN",
+   "group": "tower",
+   "geo": {
+    "lat": 35.7101,
+    "lon": 139.8107
+   },
+   "facts": {
+    "country": "Japan",
+    "continent": "Asia",
+    "kind": "tower",
+    "built": 2012
+   },
+   "blurb": "Tokyo Skytree, Japan. It stands in Sumida, Tokyo. It is a broadcasting and observation tower.",
+   "clues": [
+    "It opened in 2012.",
+    "At 634 metres it is the tallest tower in the world.",
+    "It is a broadcasting and observation tower.",
+    "It is in Asia.",
+    "It is in Japan."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/6/64/Tokyo_Skytree_2023.jpg/330px-Tokyo_Skytree_2023.jpg",
+      "w": 330,
+      "h": 587,
+      "credit": "Akonnchiroll",
+      "license": "CC0",
+      "page": "https://commons.wikimedia.org/wiki/File:Tokyo_Skytree_2023.jpg"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "kinkaku-ji",
+   "name": "Kinkaku-ji",
+   "lname": "Kinkaku-ji",
+   "alt": [
+    "Golden Pavilion",
+    "Kinkakuji"
+   ],
+   "iso3": "JPN",
+   "group": "religious",
+   "geo": {
+    "lat": 35.0395,
+    "lon": 135.7285
+   },
+   "facts": {
+    "country": "Japan",
+    "continent": "Asia",
+    "kind": "religious"
+   },
+   "blurb": "Kinkaku-ji, Japan. It is a Zen temple in Kyoto. Its top two floors are covered in gold leaf.",
+   "clues": [
+    "It was burned down by a monk in 1950 and rebuilt.",
+    "It was originally a retirement villa for a shogun.",
+    "Its top two floors are covered in gold leaf.",
+    "It is in Asia.",
+    "It is in Japan.",
+    "It is a Zen temple in Kyoto."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/d/de/Water_reflection_of_Kinkaku-ji_Temple_a_sunny_day%2C_Kyoto%2C_Japan.jpg/500px-Water_reflection_of_Kinkaku-ji_Temple_a_sunny_day%2C_Kyoto%2C_Japan.jpg",
+      "w": 500,
+      "h": 281,
+      "credit": "Basile Morin",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Water_reflection_of_Kinkaku-ji_Temple_a_sunny_day,_Kyoto,_Japan.jpg"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "gyeongbokgung",
+   "name": "Gyeongbokgung",
+   "lname": "Gyeongbokgung",
+   "alt": [
+    "Gyeongbok Palace"
+   ],
+   "iso3": "KOR",
+   "group": "castle",
+   "geo": {
+    "lat": 37.5799,
+    "lon": 126.9768
+   },
+   "facts": {
+    "country": "South Korea",
+    "continent": "Asia",
+    "kind": "castle"
+   },
+   "blurb": "Gyeongbokgung, South Korea. It is a palace in central Seoul. Guards in traditional dress change shifts at its gate.",
+   "clues": [
+    "It was first built in 1395.",
+    "It was the main royal palace of the Joseon dynasty.",
+    "Guards in traditional dress change shifts at its gate.",
+    "It is in Asia.",
+    "It is in South Korea.",
+    "It is a palace in central Seoul."
+   ],
+   "media": {
+    "img": [
+     {
+      "file": "Front view of the Imperial Throne Hall Geunjeongjeon at Gyeongbokgung Palace with blue sky in Seoul.jpg",
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a4/Front_view_of_the_Imperial_Throne_Hall_Geunjeongjeon_at_Gyeongbokgung_Palace_with_blue_sky_in_Seoul.jpg/500px-Front_view_of_the_Imperial_Throne_Hall_Geunjeongjeon_at_Gyeongbokgung_Palace_with_blue_sky_in_Seoul.jpg",
+      "w": 500,
+      "h": 281,
+      "credit": "Basile Morin",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Front_view_of_the_Imperial_Throne_Hall_Geunjeongjeon_at_Gyeongbokgung_Palace_with_blue_sky_in_Seoul.jpg"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "sydney-harbour-bridge",
+   "name": "Sydney Harbour Bridge",
+   "lname": "the Sydney Harbour Bridge",
+   "alt": [],
+   "iso3": "AUS",
+   "group": "bridge",
+   "geo": {
+    "lat": -33.8522,
+    "lon": 151.2107
+   },
+   "facts": {
+    "country": "Australia",
+    "continent": "Oceania",
+    "kind": "bridge",
+    "built": 1932
+   },
+   "blurb": "Sydney Harbour Bridge, Australia. It crosses the harbour beside the Opera House. Visitors can climb over its steel arch.",
+   "clues": [
+    "It opened in 1932.",
+    "Locals nicknamed it the Coathanger.",
+    "Visitors can climb over its steel arch.",
+    "It is in Oceania.",
+    "It is in Australia."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/cf/SydneyHarbourBridge1_gobeirne.jpg/500px-SydneyHarbourBridge1_gobeirne.jpg",
+      "w": 500,
+      "h": 276,
+      "credit": "Photograph by Greg O'Beirne",
+      "license": "CC BY 2.5",
+      "page": "https://commons.wikimedia.org/wiki/File:SydneyHarbourBridge1_gobeirne.jpg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "lotus-temple",
+   "name": "Lotus Temple",
+   "lname": "the Lotus Temple",
+   "alt": [],
+   "iso3": "IND",
+   "group": "religious",
+   "geo": {
+    "lat": 28.5533,
+    "lon": 77.2586
+   },
+   "facts": {
+    "country": "India",
+    "continent": "Asia",
+    "kind": "religious",
+    "built": 1986
+   },
+   "blurb": "Lotus Temple, India. It is in New Delhi. Its 27 marble petals form the shape of a flower.",
+   "clues": [
+    "It opened in 1986.",
+    "It is a Baháʼí House of Worship open to people of all religions.",
+    "Its 27 marble petals form the shape of a flower.",
+    "It is in Asia.",
+    "It is in India.",
+    "It is in New Delhi."
+   ],
+   "media": {
+    "img": [
+     {
+      "file": "Lotus Temple-Panoroma-Visit During WCI 2016- IMG 6471.jpg",
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f7/Lotus_Temple-Panoroma-Visit_During_WCI_2016-_IMG_6471.jpg/500px-Lotus_Temple-Panoroma-Visit_During_WCI_2016-_IMG_6471.jpg",
+      "w": 500,
+      "h": 273,
+      "credit": "Bijay chaurasia",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Lotus_Temple-Panoroma-Visit_During_WCI_2016-_IMG_6471.jpg"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "wat-arun",
+   "name": "Wat Arun",
+   "lname": "Wat Arun",
+   "alt": [
+    "Temple of Dawn"
+   ],
+   "iso3": "THA",
+   "group": "religious",
+   "geo": {
+    "lat": 13.7437,
+    "lon": 100.4889
+   },
+   "facts": {
+    "country": "Thailand",
+    "continent": "Asia",
+    "kind": "religious"
+   },
+   "blurb": "Wat Arun, Thailand. It stands on the west bank of the Chao Phraya in Bangkok. It is known as the Temple of Dawn.",
+   "clues": [
+    "It is a Buddhist temple facing the Grand Palace area across the river.",
+    "Its central spire is decorated with broken porcelain.",
+    "It is in Asia.",
+    "It is in Thailand.",
+    "It stands on the west bank of the Chao Phraya in Bangkok."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/b/bd/Wat_Arun_from_Chao_Phraya_River.jpg/500px-Wat_Arun_from_Chao_Phraya_River.jpg",
+      "w": 500,
+      "h": 334,
+      "credit": "Diliff",
+      "license": "CC BY 2.5",
+      "page": "https://commons.wikimedia.org/wiki/File:Wat_Arun_from_Chao_Phraya_River.jpg"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "bagan",
+   "name": "Bagan",
+   "lname": "Bagan",
+   "alt": [],
+   "iso3": "MMR",
+   "group": "religious",
+   "geo": {
+    "lat": 21.1725,
+    "lon": 94.86
+   },
+   "facts": {
+    "country": "Myanmar",
+    "continent": "Asia",
+    "kind": "religious"
+   },
+   "blurb": "Bagan, Myanmar. It is an ancient city in central Myanmar. Hot-air balloons float over it at sunrise.",
+   "clues": [
+    "It was the capital of the Pagan Kingdom.",
+    "Over 2,000 temples and pagodas survive on its plain.",
+    "Hot-air balloons float over it at sunrise.",
+    "It is in Asia.",
+    "It is in Myanmar.",
+    "It is an ancient city in central Myanmar."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/6/6c/Old_Bagan%2C_Myanmar%2C_Bagan_plains_at_sunset.jpg/500px-Old_Bagan%2C_Myanmar%2C_Bagan_plains_at_sunset.jpg",
+      "w": 500,
+      "h": 281,
+      "credit": "Vyacheslav Argenberg",
+      "license": "CC BY 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Old_Bagan,_Myanmar,_Bagan_plains_at_sunset.jpg"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "moscow-kremlin",
+   "name": "Moscow Kremlin",
+   "lname": "the Moscow Kremlin",
+   "alt": [
+    "Kremlin"
+   ],
+   "iso3": "RUS",
+   "group": "castle",
+   "geo": {
+    "lat": 55.7517,
+    "lon": 37.6178
+   },
+   "facts": {
+    "country": "Russia",
+    "continent": "Europe",
+    "kind": "castle"
+   },
+   "blurb": "Moscow Kremlin, Russia. It is a fortress beside Red Square. It is the official residence of the Russian president.",
+   "clues": [
+    "It contains five palaces and four cathedrals.",
+    "Its red brick walls have 20 towers.",
+    "It is the official residence of the Russian president.",
+    "It is in Europe.",
+    "It is in Russia.",
+    "It is a fortress beside Red Square."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f5/Moscow_05-2012_Kremlin_22.jpg/500px-Moscow_05-2012_Kremlin_22.jpg",
+      "w": 500,
+      "h": 316,
+      "credit": "A.Savin",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Moscow_05-2012_Kremlin_22.jpg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "winter-palace",
+   "name": "Winter Palace",
+   "lname": "the Winter Palace",
+   "alt": [],
+   "iso3": "RUS",
+   "group": "castle",
+   "geo": {
+    "lat": 59.9403,
+    "lon": 30.3139
+   },
+   "facts": {
+    "country": "Russia",
+    "continent": "Europe",
+    "kind": "castle"
+   },
+   "blurb": "Winter Palace, Russia. It stands on the Neva river in Saint Petersburg. It was the official home of the Russian tsars.",
+   "clues": [
+    "It was stormed in the 1917 revolution.",
+    "Its rooms house part of the Hermitage Museum.",
+    "It was the official home of the Russian tsars.",
+    "It is in Europe.",
+    "It is in Russia.",
+    "It stands on the Neva river in Saint Petersburg."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c9/Winter_Palace_Panorama_3.jpg/500px-Winter_Palace_Panorama_3.jpg",
+      "w": 500,
+      "h": 300,
+      "credit": "Florstein (Telegram:WikiPhoto.Space)",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Winter_Palace_Panorama_3.jpg"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "plitvice-lakes",
+   "name": "Plitvice Lakes",
+   "lname": "the Plitvice Lakes",
+   "alt": [
+    "Plitvice"
+   ],
+   "iso3": "HRV",
+   "group": "natural",
+   "geo": {
+    "lat": 44.8804,
+    "lon": 15.616
+   },
+   "facts": {
+    "country": "Croatia",
+    "continent": "Europe",
+    "kind": "natural"
+   },
+   "blurb": "Plitvice Lakes, Croatia. It is a national park in Croatia. It has 16 terraced lakes joined by waterfalls.",
+   "clues": [
+    "Wooden walkways wind between its pools.",
+    "Its lakes are divided by natural travertine dams.",
+    "It has 16 terraced lakes joined by waterfalls.",
+    "It is in Europe.",
+    "It is in Croatia.",
+    "It is a national park in Croatia."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/9d/Plitvice_Lakes_National_Park_%282%29.jpg/500px-Plitvice_Lakes_National_Park_%282%29.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Pablo BM from London, England",
+      "license": "CC BY 2.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Plitvice_Lakes_National_Park_(2).jpg"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "persepolis",
+   "name": "Persepolis",
+   "lname": "Persepolis",
+   "alt": [],
+   "iso3": "IRN",
+   "group": "ancient",
+   "geo": {
+    "lat": 29.935,
+    "lon": 52.89
+   },
+   "facts": {
+    "country": "Iran",
+    "continent": "Asia",
+    "kind": "ancient"
+   },
+   "blurb": "Persepolis, Iran. Its ruins are near Shiraz. It was the ceremonial capital of the Achaemenid Empire.",
+   "clues": [
+    "It was burned by Alexander the Great in 330 BC.",
+    "Its Gate of All Nations is guarded by winged bulls.",
+    "It was the ceremonial capital of the Achaemenid Empire.",
+    "It is in Asia.",
+    "It is in Iran.",
+    "Its ruins are near Shiraz."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/3/39/Gate_of_All_Nations%2C_Persepolis.jpg/500px-Gate_of_All_Nations%2C_Persepolis.jpg",
+      "w": 500,
+      "h": 327,
+      "credit": "Alborzagros",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Gate_of_All_Nations,_Persepolis.jpg"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "sigiriya",
+   "name": "Sigiriya",
+   "lname": "Sigiriya",
+   "alt": [
+    "Lion Rock"
+   ],
+   "iso3": "LKA",
+   "group": "ancient",
+   "geo": {
+    "lat": 7.9569,
+    "lon": 80.7597
+   },
+   "facts": {
+    "country": "Sri Lanka",
+    "continent": "Asia",
+    "kind": "ancient"
+   },
+   "blurb": "Sigiriya, Sri Lanka. It is a rock fortress in central Sri Lanka. A palace once stood on its flat top.",
+   "clues": [
+    "Its walls once held a gallery of painted maidens.",
+    "A palace once stood on its flat top.",
+    "It is in Asia.",
+    "It is in Sri Lanka.",
+    "It is a rock fortress in central Sri Lanka."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4c/Beauty_of_Sigiriya_by_Binuka.jpg/500px-Beauty_of_Sigiriya_by_Binuka.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Binuka poojan",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Beauty_of_Sigiriya_by_Binuka.jpg"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "chateau-frontenac",
+   "name": "Château Frontenac",
+   "lname": "the Château Frontenac",
+   "alt": [
+    "Chateau Frontenac"
+   ],
+   "iso3": "CAN",
+   "group": "building",
+   "geo": {
+    "lat": 46.8118,
+    "lon": -71.2054
+   },
+   "facts": {
+    "country": "Canada",
+    "continent": "North America",
+    "kind": "building",
+    "built": 1893
+   },
+   "blurb": "Château Frontenac, Canada. It overlooks the St. Lawrence River in Quebec City. Its copper roofs have turned green.",
+   "clues": [
+    "It opened in 1893 as a railway hotel.",
+    "It is said to be the most photographed hotel in the world.",
+    "Its copper roofs have turned green.",
+    "It is in North America.",
+    "It is in Canada.",
+    "It overlooks the St. Lawrence River in Quebec City."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7f/Ch%C3%A2teau_Frontenac01.jpg/500px-Ch%C3%A2teau_Frontenac01.jpg",
+      "w": 500,
+      "h": 362,
+      "credit": "Bernard Gagnon",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Ch%C3%A2teau_Frontenac01.jpg"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "white-house",
+   "name": "White House",
+   "lname": "the White House",
+   "alt": [],
+   "iso3": "USA",
+   "group": "building",
+   "geo": {
+    "lat": 38.8978,
+    "lon": -77.0367
+   },
+   "facts": {
+    "country": "United States",
+    "continent": "North America",
+    "kind": "building",
+    "built": 1800
+   },
+   "blurb": "White House, United States. It is the home and office of the US president in Washington, D.C.. Its address is 1600 Pennsylvania Avenue.",
+   "clues": [
+    "It was set on fire by British troops in 1814.",
+    "John Adams was the first president to live there.",
+    "Its address is 1600 Pennsylvania Avenue.",
+    "It is in North America.",
+    "It is in the United States.",
+    "It is the home and office of the US president in Washington, D.C."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/a/af/WhiteHouseSouthFacade.JPG/500px-WhiteHouseSouthFacade.JPG",
+      "w": 500,
+      "h": 371,
+      "credit": "This image or media was taken or created by Matt H. Wade. To see his entire portfolio, …",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:WhiteHouseSouthFacade.JPG"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "ngorongoro-crater",
+   "name": "Ngorongoro Crater",
+   "lname": "the Ngorongoro Crater",
+   "alt": [
+    "Ngorongoro"
+   ],
+   "iso3": "TZA",
+   "group": "natural",
+   "geo": {
+    "lat": -3.21,
+    "lon": 35.46
+   },
+   "facts": {
+    "country": "Tanzania",
+    "continent": "Africa",
+    "kind": "natural"
+   },
+   "blurb": "Ngorongoro Crater, Tanzania. It is in northern Tanzania near the Serengeti. It is the world's largest unbroken volcanic caldera that is not filled with water.",
+   "clues": [
+    "It is about 20 km across.",
+    "Its floor is home to lions, elephants and rhinos.",
+    "It is the world's largest unbroken volcanic caldera that is not filled with water.",
+    "It is in Africa.",
+    "It is in Tanzania.",
+    "It is in northern Tanzania near the Serengeti."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/d/dd/Ngorongo_1.jpg/500px-Ngorongo_1.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Jantjeerkamp at Dutch Wikipedia",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Ngorongo_1.jpg"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "hassan-ii-mosque",
+   "name": "Hassan II Mosque",
+   "lname": "the Hassan II Mosque",
+   "alt": [],
+   "iso3": "MAR",
+   "group": "religious",
+   "geo": {
+    "lat": 33.6073,
+    "lon": -7.6326
+   },
+   "facts": {
+    "country": "Morocco",
+    "continent": "Africa",
+    "kind": "religious",
+    "built": 1993
+   },
+   "blurb": "Hassan II Mosque, Morocco. It is in Casablanca. Part of its floor is built over the Atlantic Ocean.",
+   "clues": [
+    "It was completed in 1993.",
+    "Its minaret is about 210 metres tall.",
+    "Part of its floor is built over the Atlantic Ocean.",
+    "It is in Africa.",
+    "It is in Morocco.",
+    "It is in Casablanca."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8a/Sunshine_on_mosque_Hassan_II_in_Casablanca%2C_Morocco_-_Flickr_-_Milamber%27s_portfolio.jpg/500px-Sunshine_on_mosque_Hassan_II_in_Casablanca%2C_Morocco_-_Flickr_-_Milamber%27s_portfolio.jpg",
+      "w": 500,
+      "h": 332,
+      "credit": "Milamber's portfolio",
+      "license": "CC BY 2.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Sunshine_on_mosque_Hassan_II_in_Casablanca,_Morocco_-_Flickr_-_Milamber%27s_portfolio.jpg"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "carthage",
+   "name": "Carthage",
+   "lname": "Carthage",
+   "alt": [],
+   "iso3": "TUN",
+   "group": "ancient",
+   "geo": {
+    "lat": 36.8526,
+    "lon": 10.3235
+   },
+   "facts": {
+    "country": "Tunisia",
+    "continent": "Africa",
+    "kind": "ancient"
+   },
+   "blurb": "Carthage, Tunisia. Its ruins lie near Tunis. It was founded by Phoenicians.",
+   "clues": [
+    "Rome destroyed it in 146 BC.",
+    "Hannibal led its armies over the Alps.",
+    "It was founded by Phoenicians.",
+    "It is in Africa.",
+    "It is in Tunisia.",
+    "Its ruins lie near Tunis."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a7/Tunisie_Carthage_Ruines_08.JPG/500px-Tunisie_Carthage_Ruines_08.JPG",
+      "w": 500,
+      "h": 332,
+      "credit": "Calips",
+      "license": "CC BY 2.5",
+      "page": "https://commons.wikimedia.org/wiki/File:Tunisie_Carthage_Ruines_08.JPG"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "leptis-magna",
+   "name": "Leptis Magna",
+   "lname": "Leptis Magna",
+   "alt": [],
+   "iso3": "LBY",
+   "group": "ancient",
+   "geo": {
+    "lat": 32.6383,
+    "lon": 14.2905
+   },
+   "facts": {
+    "country": "Libya",
+    "continent": "Africa",
+    "kind": "ancient"
+   },
+   "blurb": "Leptis Magna, Libya. It is on the coast of Libya. Its ruins are among the best-preserved Roman sites in the Mediterranean.",
+   "clues": [
+    "The emperor Septimius Severus was born here.",
+    "It was one of the finest cities of the Roman Empire.",
+    "Its ruins are among the best-preserved Roman sites in the Mediterranean.",
+    "It is in Africa.",
+    "It is in Libya.",
+    "It is on the coast of Libya."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/3/33/Leptis_Magna_%2829%29_%288288918733%29.jpg/500px-Leptis_Magna_%2829%29_%288288918733%29.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "joepyrek from Richmond, Va, USA",
+      "license": "CC BY-SA 2.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Leptis_Magna_(29)_(8288918733).jpg"
+     }
+    ]
+   },
+   "difficulty": 3
+  }
+ ],
+ "questions": [
+  {
+   "id": "lmc-eiffel-tower",
+   "kind": "mc",
+   "prompt": "In which country is the Eiffel Tower?",
+   "answer": "France",
+   "wrong": [
+    "Japan",
+    "Ethiopia",
+    "Vietnam"
+   ],
+   "explain": "Eiffel Tower, France. It stands on the Champ de Mars in Paris. It was completed in 1889.",
+   "difficulty": 1,
+   "refs": [
+    "landmarks/eiffel-tower"
+   ]
+  },
+  {
+   "id": "lmc-statue-of-liberty",
+   "kind": "mc",
+   "prompt": "In which country is the Statue of Liberty?",
+   "answer": "United States",
+   "wrong": [
+    "Argentina",
+    "United Kingdom",
+    "Denmark"
+   ],
+   "explain": "Statue of Liberty, United States. It stands on an island in New York Harbor. It holds a torch in its raised right hand.",
+   "difficulty": 1,
+   "refs": [
+    "landmarks/statue-of-liberty"
+   ]
+  },
+  {
+   "id": "lmc-great-wall-of-china",
+   "kind": "mc",
+   "prompt": "In which country is the Great Wall of China?",
+   "answer": "China",
+   "wrong": [
+    "Bolivia",
+    "Malaysia",
+    "Guatemala"
+   ],
+   "explain": "Great Wall of China, China. It snakes across northern China. It was built to protect against raids from the northern steppe.",
+   "difficulty": 1,
+   "refs": [
+    "landmarks/great-wall-of-china"
+   ]
+  },
+  {
+   "id": "lmc-taj-mahal",
+   "kind": "mc",
+   "prompt": "In which country is the Taj Mahal?",
+   "answer": "India",
+   "wrong": [
+    "Tunisia",
+    "Panama",
+    "Vatican City"
+   ],
+   "explain": "Taj Mahal, India. It stands on the bank of the Yamuna river in Agra. It is made of white marble.",
+   "difficulty": 1,
+   "refs": [
+    "landmarks/taj-mahal"
+   ]
+  },
+  {
+   "id": "lmc-colosseum",
+   "kind": "mc",
+   "prompt": "In which country is the Colosseum?",
+   "answer": "Italy",
+   "wrong": [
+    "Morocco",
+    "Cambodia",
+    "Brazil"
+   ],
+   "explain": "Colosseum, Italy. It is a huge oval amphitheatre in the centre of Rome. Gladiators fought here.",
+   "difficulty": 1,
+   "refs": [
+    "landmarks/colosseum"
+   ]
+  },
+  {
+   "id": "lmc-machu-picchu",
+   "kind": "mc",
+   "prompt": "In which country is Machu Picchu?",
+   "answer": "Peru",
+   "wrong": [
+    "Iran",
+    "Libya",
+    "United Arab Emirates"
+   ],
+   "explain": "Machu Picchu, Peru. It is a 15th-century Inca citadel in the Andes. It sits on a mountain ridge above the Urubamba valley.",
+   "difficulty": 1,
+   "refs": [
+    "landmarks/machu-picchu"
+   ]
+  },
+  {
+   "id": "lmc-christ-the-redeemer",
+   "kind": "mc",
+   "prompt": "In which country is Christ the Redeemer?",
+   "answer": "Brazil",
+   "wrong": [
+    "Ethiopia",
+    "Ecuador",
+    "Guatemala"
+   ],
+   "explain": "Christ the Redeemer, Brazil. It looks over Rio de Janeiro from Corcovado mountain. It stands about 30 metres tall with its arms outstretched.",
+   "difficulty": 1,
+   "refs": [
+    "landmarks/christ-the-redeemer"
+   ]
+  },
+  {
+   "id": "lmc-petra",
+   "kind": "mc",
+   "prompt": "In which country is Petra?",
+   "answer": "Jordan",
+   "wrong": [
+    "Greece",
+    "Tunisia",
+    "Italy"
+   ],
+   "explain": "Petra, Jordan. It is called the Rose City for the colour of its stone. Its most famous facade is the Treasury, carved into rock.",
+   "difficulty": 2,
+   "refs": [
+    "landmarks/petra"
+   ]
+  },
+  {
+   "id": "lmc-great-pyramid-of-giza",
+   "kind": "mc",
+   "prompt": "In which country is the Great Pyramid of Giza?",
+   "answer": "Egypt",
+   "wrong": [
+    "Greece",
+    "Myanmar",
+    "Tunisia"
+   ],
+   "explain": "Great Pyramid of Giza, Egypt. It is the largest of the three pyramids on the plateau outside Cairo. For about 3,800 years it was the tallest human-made structure.",
+   "difficulty": 1,
+   "refs": [
+    "landmarks/great-pyramid-of-giza"
+   ]
+  },
+  {
+   "id": "lmc-sydney-opera-house",
+   "kind": "mc",
+   "prompt": "In which country is the Sydney Opera House?",
+   "answer": "Australia",
+   "wrong": [
+    "India",
+    "Peru",
+    "Vatican City"
+   ],
+   "explain": "Sydney Opera House, Australia. It sits on Bennelong Point in Sydney Harbour. Its roof is made of shells covered in white tiles.",
+   "difficulty": 1,
+   "refs": [
+    "landmarks/sydney-opera-house"
+   ]
+  },
+  {
+   "id": "lmc-big-ben",
+   "kind": "mc",
+   "prompt": "In which country is Big Ben?",
+   "answer": "United Kingdom",
+   "wrong": [
+    "Tanzania",
+    "Romania",
+    "Tunisia"
+   ],
+   "explain": "Big Ben, United Kingdom. It is at the north end of the Palace of Westminster in London. Its clock has four faces.",
+   "difficulty": 1,
+   "refs": [
+    "landmarks/big-ben"
+   ]
+  },
+  {
+   "id": "lmc-stonehenge",
+   "kind": "mc",
+   "prompt": "In which country is Stonehenge?",
+   "answer": "United Kingdom",
+   "wrong": [
+    "Egypt",
+    "Russia",
+    "Mexico"
+   ],
+   "explain": "Stonehenge, United Kingdom. It stands on Salisbury Plain in England. It is a prehistoric ring of standing stones.",
+   "difficulty": 1,
+   "refs": [
+    "landmarks/stonehenge"
+   ]
+  },
+  {
+   "id": "lmc-leaning-tower-of-pisa",
+   "kind": "mc",
+   "prompt": "In which country is the Leaning Tower of Pisa?",
+   "answer": "Italy",
+   "wrong": [
+    "Panama",
+    "China",
+    "Australia"
+   ],
+   "explain": "Leaning Tower of Pisa, Italy. It is a famously tilting white marble tower in Tuscany. Engineers reduced its tilt in a project that ended in 2001.",
+   "difficulty": 1,
+   "refs": [
+    "landmarks/leaning-tower-of-pisa"
+   ]
+  },
+  {
+   "id": "lmc-sagrada-familia",
+   "kind": "mc",
+   "prompt": "In which country is the Sagrada Família?",
+   "answer": "Spain",
+   "wrong": [
+    "Australia",
+    "Tunisia",
+    "India"
+   ],
+   "explain": "Sagrada Família, Spain. It is a giant basilica in Barcelona. It was designed by Antoni Gaudí.",
+   "difficulty": 2,
+   "refs": [
+    "landmarks/sagrada-familia"
+   ]
+  },
+  {
+   "id": "lmc-parthenon",
+   "kind": "mc",
+   "prompt": "In which country is the Parthenon?",
+   "answer": "Greece",
+   "wrong": [
+    "Spain",
+    "Japan",
+    "Poland"
+   ],
+   "explain": "Parthenon, Greece. It is a marble temple on the Acropolis of Athens. It was completed in the 5th century BC.",
+   "difficulty": 2,
+   "refs": [
+    "landmarks/parthenon"
+   ]
+  },
+  {
+   "id": "lmc-angkor-wat",
+   "kind": "mc",
+   "prompt": "In which country is Angkor Wat?",
+   "answer": "Cambodia",
+   "wrong": [
+    "South Korea",
+    "Belgium",
+    "Myanmar"
+   ],
+   "explain": "Angkor Wat, Cambodia. It is a vast temple complex near Siem Reap. It appears on its country's national flag.",
+   "difficulty": 2,
+   "refs": [
+    "landmarks/angkor-wat"
+   ]
+  },
+  {
+   "id": "lmc-mount-fuji",
+   "kind": "mc",
+   "prompt": "In which country is Mount Fuji?",
+   "answer": "Japan",
+   "wrong": [
+    "Singapore",
+    "Panama",
+    "Germany"
+   ],
+   "explain": "Mount Fuji, Japan. It is the highest mountain in Japan. It is an active volcano famous for its snow-capped cone.",
+   "difficulty": 1,
+   "refs": [
+    "landmarks/mount-fuji"
+   ]
+  },
+  {
+   "id": "lmc-burj-khalifa",
+   "kind": "mc",
+   "prompt": "In which country is Burj Khalifa?",
+   "answer": "United Arab Emirates",
+   "wrong": [
+    "Indonesia",
+    "Italy",
+    "Australia"
+   ],
+   "explain": "Burj Khalifa, United Arab Emirates. It towers over downtown Dubai. It became the world's tallest building when it opened.",
+   "difficulty": 1,
+   "refs": [
+    "landmarks/burj-khalifa"
+   ]
+  },
+  {
+   "id": "lmc-golden-gate-bridge",
+   "kind": "mc",
+   "prompt": "In which country is the Golden Gate Bridge?",
+   "answer": "United States",
+   "wrong": [
+    "Ecuador",
+    "Germany",
+    "Singapore"
+   ],
+   "explain": "Golden Gate Bridge, United States. It spans the strait at the entrance to San Francisco Bay. It is a suspension bridge.",
+   "difficulty": 1,
+   "refs": [
+    "landmarks/golden-gate-bridge"
+   ]
+  },
+  {
+   "id": "lmc-saint-basil-s-cathedral",
+   "kind": "mc",
+   "prompt": "In which country is Saint Basil's Cathedral?",
+   "answer": "Russia",
+   "wrong": [
+    "New Zealand",
+    "Tunisia",
+    "Morocco"
+   ],
+   "explain": "Saint Basil's Cathedral, Russia. It stands on Red Square in Moscow. It is famous for its colourful onion domes.",
+   "difficulty": 2,
+   "refs": [
+    "landmarks/saint-basil-s-cathedral"
+   ]
+  },
+  {
+   "id": "lmc-neuschwanstein-castle",
+   "kind": "mc",
+   "prompt": "In which country is Neuschwanstein Castle?",
+   "answer": "Germany",
+   "wrong": [
+    "Egypt",
+    "Indonesia",
+    "Tanzania"
+   ],
+   "explain": "Neuschwanstein Castle, Germany. It is a fairy-tale castle in the Bavarian Alps. It is said to have inspired a famous Disney castle.",
+   "difficulty": 2,
+   "refs": [
+    "landmarks/neuschwanstein-castle"
+   ]
+  },
+  {
+   "id": "lmc-brandenburg-gate",
+   "kind": "mc",
+   "prompt": "In which country is the Brandenburg Gate?",
+   "answer": "Germany",
+   "wrong": [
+    "India",
+    "Romania",
+    "Indonesia"
+   ],
+   "explain": "Brandenburg Gate, Germany. It is a neoclassical gate in the centre of Berlin. It stood beside the Berlin Wall during the Cold War.",
+   "difficulty": 2,
+   "refs": [
+    "landmarks/brandenburg-gate"
+   ]
+  },
+  {
+   "id": "lmc-chichen-itza",
+   "kind": "mc",
+   "prompt": "In which country is Chichen Itza?",
+   "answer": "Mexico",
+   "wrong": [
+    "Malaysia",
+    "Guatemala",
+    "Australia"
+   ],
+   "explain": "Chichen Itza, Mexico. It is on the Yucatán Peninsula. It was a large Maya city.",
+   "difficulty": 2,
+   "refs": [
+    "landmarks/chichen-itza"
+   ]
+  },
+  {
+   "id": "lmc-moai-of-easter-island",
+   "kind": "mc",
+   "prompt": "In which country is the Moai of Easter Island?",
+   "answer": "Chile",
+   "wrong": [
+    "Thailand",
+    "Tanzania",
+    "Panama"
+   ],
+   "explain": "Moai of Easter Island, Chile. They are giant stone figures with oversized heads on Easter Island. There are almost a thousand of them.",
+   "difficulty": 2,
+   "refs": [
+    "landmarks/moai-of-easter-island"
+   ]
+  },
+  {
+   "id": "lmc-grand-canyon",
+   "kind": "mc",
+   "prompt": "In which country is the Grand Canyon?",
+   "answer": "United States",
+   "wrong": [
+    "France",
+    "Iceland",
+    "Ecuador"
+   ],
+   "explain": "Grand Canyon, United States. It is a huge gorge in Arizona. It was carved by the Colorado River.",
+   "difficulty": 1,
+   "refs": [
+    "landmarks/grand-canyon"
+   ]
+  },
+  {
+   "id": "lmc-uluru",
+   "kind": "mc",
+   "prompt": "In which country is Uluru?",
+   "answer": "Australia",
+   "wrong": [
+    "France",
+    "Vatican City",
+    "Cambodia"
+   ],
+   "explain": "Uluru, Australia. It stands in the desert of Australia's Northern Territory. It is a huge sandstone rock that glows red at sunset.",
+   "difficulty": 2,
+   "refs": [
+    "landmarks/uluru"
+   ]
+  },
+  {
+   "id": "lmc-table-mountain",
+   "kind": "mc",
+   "prompt": "In which country is Table Mountain?",
+   "answer": "South Africa",
+   "wrong": [
+    "Brazil",
+    "Mexico",
+    "Argentina"
+   ],
+   "explain": "Table Mountain, South Africa. It overlooks Cape Town. It has a flat top about 3 km across.",
+   "difficulty": 2,
+   "refs": [
+    "landmarks/table-mountain"
+   ]
+  },
+  {
+   "id": "lmc-mount-kilimanjaro",
+   "kind": "mc",
+   "prompt": "In which country is Mount Kilimanjaro?",
+   "answer": "Tanzania",
+   "wrong": [
+    "Canada",
+    "Egypt",
+    "Denmark"
+   ],
+   "explain": "Mount Kilimanjaro, Tanzania. It rises above the plains of northern Tanzania. At 5,895 metres it is the highest mountain in Africa.",
+   "difficulty": 2,
+   "refs": [
+    "landmarks/mount-kilimanjaro"
+   ]
+  },
+  {
+   "id": "lmc-hagia-sophia",
+   "kind": "mc",
+   "prompt": "In which country is Hagia Sophia?",
+   "answer": "Turkey",
+   "wrong": [
+    "Italy",
+    "Netherlands",
+    "Ethiopia"
+   ],
+   "explain": "Hagia Sophia, Turkey. It stands in Istanbul. Its huge dome was an engineering marvel.",
+   "difficulty": 2,
+   "refs": [
+    "landmarks/hagia-sophia"
+   ]
+  },
+  {
+   "id": "lmc-blue-mosque",
+   "kind": "mc",
+   "prompt": "In which country is the Blue Mosque?",
+   "answer": "Turkey",
+   "wrong": [
+    "Vietnam",
+    "Mexico",
+    "Poland"
+   ],
+   "explain": "Blue Mosque, Turkey. It faces Hagia Sophia in Istanbul. Its nickname comes from the blue tiles inside.",
+   "difficulty": 2,
+   "refs": [
+    "landmarks/blue-mosque"
+   ]
+  },
+  {
+   "id": "lmc-tower-bridge",
+   "kind": "mc",
+   "prompt": "In which country is Tower Bridge?",
+   "answer": "United Kingdom",
+   "wrong": [
+    "Japan",
+    "Brazil",
+    "Mexico"
+   ],
+   "explain": "Tower Bridge, United Kingdom. It crosses the River Thames in London. It has two Gothic towers linked by high walkways.",
+   "difficulty": 1,
+   "refs": [
+    "landmarks/tower-bridge"
+   ]
+  },
+  {
+   "id": "lmc-notre-dame-de-paris",
+   "kind": "mc",
+   "prompt": "In which country is Notre-Dame de Paris?",
+   "answer": "France",
+   "wrong": [
+    "Indonesia",
+    "Mexico",
+    "Thailand"
+   ],
+   "explain": "Notre-Dame de Paris, France. It is a Gothic cathedral on the Île de la Cité. Victor Hugo set a famous novel about a bell-ringer here.",
+   "difficulty": 2,
+   "refs": [
+    "landmarks/notre-dame-de-paris"
+   ]
+  },
+  {
+   "id": "lmc-louvre-pyramid",
+   "kind": "mc",
+   "prompt": "In which country is the Louvre Pyramid?",
+   "answer": "France",
+   "wrong": [
+    "Turkey",
+    "South Korea",
+    "New Zealand"
+   ],
+   "explain": "Louvre Pyramid, France. It is the main entrance to the world's most-visited art museum in Paris. It is made of glass and metal.",
+   "difficulty": 2,
+   "refs": [
+    "landmarks/louvre-pyramid"
+   ]
+  },
+  {
+   "id": "lmc-mont-saint-michel",
+   "kind": "mc",
+   "prompt": "In which country is Mont-Saint-Michel?",
+   "answer": "France",
+   "wrong": [
+    "Germany",
+    "Mali",
+    "United Arab Emirates"
+   ],
+   "explain": "Mont-Saint-Michel, France. It is a rocky tidal island in Normandy. It becomes an island at high tide.",
+   "difficulty": 2,
+   "refs": [
+    "landmarks/mont-saint-michel"
+   ]
+  },
+  {
+   "id": "lmc-arc-de-triomphe",
+   "kind": "mc",
+   "prompt": "In which country is the Arc de Triomphe?",
+   "answer": "France",
+   "wrong": [
+    "Egypt",
+    "Ethiopia",
+    "Chile"
+   ],
+   "explain": "Arc de Triomphe, France. Twelve avenues radiate from it at the top of the Champs-Élysées. The Tomb of the Unknown Soldier lies beneath it.",
+   "difficulty": 2,
+   "refs": [
+    "landmarks/arc-de-triomphe"
+   ]
+  },
+  {
+   "id": "lmc-alhambra",
+   "kind": "mc",
+   "prompt": "In which country is the Alhambra?",
+   "answer": "Spain",
+   "wrong": [
+    "Netherlands",
+    "Iran",
+    "Sri Lanka"
+   ],
+   "explain": "Alhambra, Spain. It is a Moorish palace and fortress in Granada. Its Court of the Lions is famous.",
+   "difficulty": 2,
+   "refs": [
+    "landmarks/alhambra"
+   ]
+  },
+  {
+   "id": "lmc-trevi-fountain",
+   "kind": "mc",
+   "prompt": "In which country is the Trevi Fountain?",
+   "answer": "Italy",
+   "wrong": [
+    "Peru",
+    "Jordan",
+    "Egypt"
+   ],
+   "explain": "Trevi Fountain, Italy. It is the largest Baroque fountain in Rome. Tradition says throwing a coin in means you will return.",
+   "difficulty": 2,
+   "refs": [
+    "landmarks/trevi-fountain"
+   ]
+  },
+  {
+   "id": "lmc-st-peter-s-basilica",
+   "kind": "mc",
+   "prompt": "In which country is St. Peter's Basilica?",
+   "answer": "Vatican City",
+   "wrong": [
+    "France",
+    "Canada",
+    "Cambodia"
+   ],
+   "explain": "St. Peter's Basilica, Vatican City. It stands in Vatican City. It is one of the largest churches in the world.",
+   "difficulty": 2,
+   "refs": [
+    "landmarks/st-peter-s-basilica"
+   ]
+  },
+  {
+   "id": "lmc-atomium",
+   "kind": "mc",
+   "prompt": "In which country is the Atomium?",
+   "answer": "Belgium",
+   "wrong": [
+    "Indonesia",
+    "Tunisia",
+    "Japan"
+   ],
+   "explain": "Atomium, Belgium. It stands in Brussels. It is made of nine linked steel spheres.",
+   "difficulty": 3,
+   "refs": [
+    "landmarks/atomium"
+   ]
+  },
+  {
+   "id": "lmc-the-little-mermaid",
+   "kind": "mc",
+   "prompt": "In which country is the Little Mermaid?",
+   "answer": "Denmark",
+   "wrong": [
+    "Malaysia",
+    "Greece",
+    "Ethiopia"
+   ],
+   "explain": "The Little Mermaid, Denmark. It sits on a rock by the waterside in Copenhagen. It is based on a fairy tale by Hans Christian Andersen.",
+   "difficulty": 2,
+   "refs": [
+    "landmarks/the-little-mermaid"
+   ]
+  },
+  {
+   "id": "lmc-cn-tower",
+   "kind": "mc",
+   "prompt": "In which country is the CN Tower?",
+   "answer": "Canada",
+   "wrong": [
+    "China",
+    "South Africa",
+    "Peru"
+   ],
+   "explain": "CN Tower, Canada. It is a communications tower in Toronto. It was the world's tallest free-standing structure for over 30 years.",
+   "difficulty": 2,
+   "refs": [
+    "landmarks/cn-tower"
+   ]
+  },
+  {
+   "id": "lmc-empire-state-building",
+   "kind": "mc",
+   "prompt": "In which country is the Empire State Building?",
+   "answer": "United States",
+   "wrong": [
+    "Canada",
+    "Morocco",
+    "Ecuador"
+   ],
+   "explain": "Empire State Building, United States. It is an Art Deco skyscraper in Manhattan. It was the world's tallest building for nearly 40 years.",
+   "difficulty": 1,
+   "refs": [
+    "landmarks/empire-state-building"
+   ]
+  },
+  {
+   "id": "lmc-mount-rushmore",
+   "kind": "mc",
+   "prompt": "In which country is Mount Rushmore?",
+   "answer": "United States",
+   "wrong": [
+    "Indonesia",
+    "Mexico",
+    "Ireland"
+   ],
+   "explain": "Mount Rushmore, United States. It shows four US presidents carved into a mountain in South Dakota. Each carved face is about 18 metres tall.",
+   "difficulty": 1,
+   "refs": [
+    "landmarks/mount-rushmore"
+   ]
+  },
+  {
+   "id": "lmc-petronas-towers",
+   "kind": "mc",
+   "prompt": "In which country is the Petronas Towers?",
+   "answer": "Malaysia",
+   "wrong": [
+    "Australia",
+    "Peru",
+    "Indonesia"
+   ],
+   "explain": "Petronas Towers, Malaysia. They are twin skyscrapers in Kuala Lumpur. Their floor plan is based on an eight-pointed star.",
+   "difficulty": 2,
+   "refs": [
+    "landmarks/petronas-towers"
+   ]
+  },
+  {
+   "id": "lmc-marina-bay-sands",
+   "kind": "mc",
+   "prompt": "In which country is Marina Bay Sands?",
+   "answer": "Singapore",
+   "wrong": [
+    "Argentina",
+    "Jordan",
+    "Bolivia"
+   ],
+   "explain": "Marina Bay Sands, Singapore. It overlooks Marina Bay in Singapore. Its three hotel towers are joined by a giant platform that looks like a ship.",
+   "difficulty": 2,
+   "refs": [
+    "landmarks/marina-bay-sands"
+   ]
+  },
+  {
+   "id": "lmc-forbidden-city",
+   "kind": "mc",
+   "prompt": "In which country is the Forbidden City?",
+   "answer": "China",
+   "wrong": [
+    "Jordan",
+    "Chile",
+    "Panama"
+   ],
+   "explain": "Forbidden City, China. It is a vast palace complex in the heart of Beijing. It is now the Palace Museum.",
+   "difficulty": 2,
+   "refs": [
+    "landmarks/forbidden-city"
+   ]
+  },
+  {
+   "id": "lmc-terracotta-army",
+   "kind": "mc",
+   "prompt": "In which country is the Terracotta Army?",
+   "answer": "China",
+   "wrong": [
+    "Egypt",
+    "Germany",
+    "Cambodia"
+   ],
+   "explain": "Terracotta Army, China. It is an army of clay soldiers near Xi'an. It was buried with China's first emperor, Qin Shi Huang.",
+   "difficulty": 2,
+   "refs": [
+    "landmarks/terracotta-army"
+   ]
+  },
+  {
+   "id": "lmc-potala-palace",
+   "kind": "mc",
+   "prompt": "In which country is the Potala Palace?",
+   "answer": "China",
+   "wrong": [
+    "Peru",
+    "France",
+    "Brazil"
+   ],
+   "explain": "Potala Palace, China. It towers over Lhasa in Tibet. It was the winter home of the Dalai Lamas.",
+   "difficulty": 3,
+   "refs": [
+    "landmarks/potala-palace"
+   ]
+  },
+  {
+   "id": "lmc-borobudur",
+   "kind": "mc",
+   "prompt": "In which country is Borobudur?",
+   "answer": "Indonesia",
+   "wrong": [
+    "United Kingdom",
+    "United States",
+    "Tunisia"
+   ],
+   "explain": "Borobudur, Indonesia. It is on the island of Java. It is the world's largest Buddhist temple.",
+   "difficulty": 3,
+   "refs": [
+    "landmarks/borobudur"
+   ]
+  },
+  {
+   "id": "lmc-shwedagon-pagoda",
+   "kind": "mc",
+   "prompt": "In which country is the Shwedagon Pagoda?",
+   "answer": "Myanmar",
+   "wrong": [
+    "Morocco",
+    "Belgium",
+    "Canada"
+   ],
+   "explain": "Shwedagon Pagoda, Myanmar. It is a gilded stupa in Yangon. It is covered in gold.",
+   "difficulty": 3,
+   "refs": [
+    "landmarks/shwedagon-pagoda"
+   ]
+  },
+  {
+   "id": "lmc-ha-long-bay",
+   "kind": "mc",
+   "prompt": "In which country is Ha Long Bay?",
+   "answer": "Vietnam",
+   "wrong": [
+    "United Arab Emirates",
+    "Greece",
+    "Sri Lanka"
+   ],
+   "explain": "Ha Long Bay, Vietnam. It is in the Gulf of Tonkin in northern Vietnam. Its islands are limestone pillars rising from the sea.",
+   "difficulty": 2,
+   "refs": [
+    "landmarks/ha-long-bay"
+   ]
+  },
+  {
+   "id": "lmc-golden-temple",
+   "kind": "mc",
+   "prompt": "In which country is the Golden Temple?",
+   "answer": "India",
+   "wrong": [
+    "Peru",
+    "Germany",
+    "Malaysia"
+   ],
+   "explain": "Golden Temple, India. It stands in a sacred pool in Amritsar. Its upper floors are covered in gold.",
+   "difficulty": 3,
+   "refs": [
+    "landmarks/golden-temple"
+   ]
+  },
+  {
+   "id": "lmc-gateway-of-india",
+   "kind": "mc",
+   "prompt": "In which country is the Gateway of India?",
+   "answer": "India",
+   "wrong": [
+    "Croatia",
+    "Guatemala",
+    "Morocco"
+   ],
+   "explain": "Gateway of India, India. It is an arch on the waterfront in Mumbai. The last British troops left India through it in 1948.",
+   "difficulty": 3,
+   "refs": [
+    "landmarks/gateway-of-india"
+   ]
+  },
+  {
+   "id": "lmc-abu-simbel",
+   "kind": "mc",
+   "prompt": "In which country is Abu Simbel?",
+   "answer": "Egypt",
+   "wrong": [
+    "Japan",
+    "Sri Lanka",
+    "Turkey"
+   ],
+   "explain": "Abu Simbel, Egypt. It is a pair of rock temples near Lake Nasser. Twice a year the sun lights the inner sanctuary.",
+   "difficulty": 3,
+   "refs": [
+    "landmarks/abu-simbel"
+   ]
+  },
+  {
+   "id": "lmc-great-sphinx-of-giza",
+   "kind": "mc",
+   "prompt": "In which country is the Great Sphinx of Giza?",
+   "answer": "Egypt",
+   "wrong": [
+    "Greece",
+    "Russia",
+    "Chile"
+   ],
+   "explain": "Great Sphinx of Giza, Egypt. It guards the pyramids outside Cairo. It has a lion's body and a human head.",
+   "difficulty": 1,
+   "refs": [
+    "landmarks/great-sphinx-of-giza"
+   ]
+  },
+  {
+   "id": "lmc-burj-al-arab",
+   "kind": "mc",
+   "prompt": "In which country is the Burj Al Arab?",
+   "answer": "United Arab Emirates",
+   "wrong": [
+    "Poland",
+    "Singapore",
+    "Russia"
+   ],
+   "explain": "Burj Al Arab, United Arab Emirates. It is a luxury hotel on the Dubai coast. Its shape is designed to look like a ship's sail.",
+   "difficulty": 2,
+   "refs": [
+    "landmarks/burj-al-arab"
+   ]
+  },
+  {
+   "id": "lmc-sheikh-zayed-grand-mosque",
+   "kind": "mc",
+   "prompt": "In which country is the Sheikh Zayed Grand Mosque?",
+   "answer": "United Arab Emirates",
+   "wrong": [
+    "Denmark",
+    "China",
+    "Ethiopia"
+   ],
+   "explain": "Sheikh Zayed Grand Mosque, United Arab Emirates. It is the largest mosque in the United Arab Emirates. It has 82 white domes.",
+   "difficulty": 3,
+   "refs": [
+    "landmarks/sheikh-zayed-grand-mosque"
+   ]
+  },
+  {
+   "id": "lmc-teotihuacan",
+   "kind": "mc",
+   "prompt": "In which country is Teotihuacan?",
+   "answer": "Mexico",
+   "wrong": [
+    "Romania",
+    "Belgium",
+    "Singapore"
+   ],
+   "explain": "Teotihuacan, Mexico. It is an ancient city near Mexico City. Its Pyramid of the Sun is one of the largest in the Americas.",
+   "difficulty": 3,
+   "refs": [
+    "landmarks/teotihuacan"
+   ]
+  },
+  {
+   "id": "lmc-tikal",
+   "kind": "mc",
+   "prompt": "In which country is Tikal?",
+   "answer": "Guatemala",
+   "wrong": [
+    "Iran",
+    "Mexico",
+    "Morocco"
+   ],
+   "explain": "Tikal, Guatemala. It lies in the rainforest of northern Guatemala. It was one of the largest Maya cities.",
+   "difficulty": 3,
+   "refs": [
+    "landmarks/tikal"
+   ]
+  },
+  {
+   "id": "lmc-panama-canal",
+   "kind": "mc",
+   "prompt": "In which country is the Panama Canal?",
+   "answer": "Panama",
+   "wrong": [
+    "Bolivia",
+    "Canada",
+    "Denmark"
+   ],
+   "explain": "Panama Canal, Panama. It links the Atlantic and Pacific oceans across a narrow isthmus. It was controlled by the United States until 1999.",
+   "difficulty": 2,
+   "refs": [
+    "landmarks/panama-canal"
+   ]
+  },
+  {
+   "id": "lmc-galapagos-islands",
+   "kind": "mc",
+   "prompt": "In which country is the Galápagos Islands?",
+   "answer": "Ecuador",
+   "wrong": [
+    "Guatemala",
+    "Libya",
+    "Iceland"
+   ],
+   "explain": "Galápagos Islands, Ecuador. They lie in the Pacific about 900 km west of Ecuador. They are volcanic islands on the equator.",
+   "difficulty": 2,
+   "refs": [
+    "landmarks/galapagos-islands"
+   ]
+  },
+  {
+   "id": "lmc-salar-de-uyuni",
+   "kind": "mc",
+   "prompt": "In which country is Salar de Uyuni?",
+   "answer": "Bolivia",
+   "wrong": [
+    "China",
+    "New Zealand",
+    "Vatican City"
+   ],
+   "explain": "Salar de Uyuni, Bolivia. It is in the Andes of south-west Bolivia. It is the world's largest salt flat.",
+   "difficulty": 3,
+   "refs": [
+    "landmarks/salar-de-uyuni"
+   ]
+  },
+  {
+   "id": "lmc-perito-moreno-glacier",
+   "kind": "mc",
+   "prompt": "In which country is the Perito Moreno Glacier?",
+   "answer": "Argentina",
+   "wrong": [
+    "Guatemala",
+    "Turkey",
+    "Australia"
+   ],
+   "explain": "Perito Moreno Glacier, Argentina. It is in Los Glaciares National Park in Patagonia. Huge chunks of ice regularly crash from its face into the lake.",
+   "difficulty": 3,
+   "refs": [
+    "landmarks/perito-moreno-glacier"
+   ]
+  },
+  {
+   "id": "lmc-sugarloaf-mountain",
+   "kind": "mc",
+   "prompt": "In which country is Sugarloaf Mountain?",
+   "answer": "Brazil",
+   "wrong": [
+    "New Zealand",
+    "Ecuador",
+    "Iceland"
+   ],
+   "explain": "Sugarloaf Mountain, Brazil. It stands at the mouth of Guanabara Bay in Rio de Janeiro. It is named after the shape of old sugar moulds.",
+   "difficulty": 2,
+   "refs": [
+    "landmarks/sugarloaf-mountain"
+   ]
+  },
+  {
+   "id": "lmc-hollywood-sign",
+   "kind": "mc",
+   "prompt": "In which country is the Hollywood Sign?",
+   "answer": "United States",
+   "wrong": [
+    "Turkey",
+    "Guatemala",
+    "United Arab Emirates"
+   ],
+   "explain": "Hollywood Sign, United States. It sits on Mount Lee above Los Angeles. Each letter is about 14 metres tall.",
+   "difficulty": 2,
+   "refs": [
+    "landmarks/hollywood-sign"
+   ]
+  },
+  {
+   "id": "lmc-space-needle",
+   "kind": "mc",
+   "prompt": "In which country is the Space Needle?",
+   "answer": "United States",
+   "wrong": [
+    "Tunisia",
+    "Spain",
+    "Libya"
+   ],
+   "explain": "Space Needle, United States. It is an observation tower in Seattle. Its shape resembles a flying saucer on stilts.",
+   "difficulty": 2,
+   "refs": [
+    "landmarks/space-needle"
+   ]
+  },
+  {
+   "id": "lmc-gateway-arch",
+   "kind": "mc",
+   "prompt": "In which country is the Gateway Arch?",
+   "answer": "United States",
+   "wrong": [
+    "Canada",
+    "Australia",
+    "Vietnam"
+   ],
+   "explain": "Gateway Arch, United States. It stands on the banks of the Mississippi in St. Louis. At 192 metres it is the world's tallest arch.",
+   "difficulty": 2,
+   "refs": [
+    "landmarks/gateway-arch"
+   ]
+  },
+  {
+   "id": "lmc-edinburgh-castle",
+   "kind": "mc",
+   "prompt": "In which country is Edinburgh Castle?",
+   "answer": "United Kingdom",
+   "wrong": [
+    "Canada",
+    "Jordan",
+    "Turkey"
+   ],
+   "explain": "Edinburgh Castle, United Kingdom. It towers over the Scottish capital. It sits on an extinct volcano called Castle Rock.",
+   "difficulty": 2,
+   "refs": [
+    "landmarks/edinburgh-castle"
+   ]
+  },
+  {
+   "id": "lmc-buckingham-palace",
+   "kind": "mc",
+   "prompt": "In which country is Buckingham Palace?",
+   "answer": "United Kingdom",
+   "wrong": [
+    "Tanzania",
+    "Netherlands",
+    "Czechia"
+   ],
+   "explain": "Buckingham Palace, United Kingdom. It is the London home of the British monarch. It has 775 rooms.",
+   "difficulty": 2,
+   "refs": [
+    "landmarks/buckingham-palace"
+   ]
+  },
+  {
+   "id": "lmc-cliffs-of-moher",
+   "kind": "mc",
+   "prompt": "In which country is the Cliffs of Moher?",
+   "answer": "Ireland",
+   "wrong": [
+    "Spain",
+    "Romania",
+    "United States"
+   ],
+   "explain": "Cliffs of Moher, Ireland. They are sea cliffs on the west coast of Ireland. They run for about 14 km along the coast of County Clare.",
+   "difficulty": 2,
+   "refs": [
+    "landmarks/cliffs-of-moher"
+   ]
+  },
+  {
+   "id": "lmc-giant-s-causeway",
+   "kind": "mc",
+   "prompt": "In which country is the Giant's Causeway?",
+   "answer": "United Kingdom",
+   "wrong": [
+    "Netherlands",
+    "Thailand",
+    "Jordan"
+   ],
+   "explain": "Giant's Causeway, United Kingdom. It is on the coast of County Antrim in Northern Ireland. Its columns are mostly six-sided and formed by cooling lava.",
+   "difficulty": 2,
+   "refs": [
+    "landmarks/giant-s-causeway"
+   ]
+  },
+  {
+   "id": "lmc-charles-bridge",
+   "kind": "mc",
+   "prompt": "In which country is the Charles Bridge?",
+   "answer": "Czechia",
+   "wrong": [
+    "Belgium",
+    "Spain",
+    "United States"
+   ],
+   "explain": "Charles Bridge, Czechia. It crosses the Vltava river in Prague. It is open only to people on foot.",
+   "difficulty": 3,
+   "refs": [
+    "landmarks/charles-bridge"
+   ]
+  },
+  {
+   "id": "lmc-hallgrimskirkja",
+   "kind": "mc",
+   "prompt": "In which country is Hallgrímskirkja?",
+   "answer": "Iceland",
+   "wrong": [
+    "Spain",
+    "Canada",
+    "Vietnam"
+   ],
+   "explain": "Hallgrímskirkja, Iceland. It is a Lutheran church on a hill in Reykjavík. It is one of the tallest buildings in its country.",
+   "difficulty": 3,
+   "refs": [
+    "landmarks/hallgrimskirkja"
+   ]
+  },
+  {
+   "id": "lmc-bran-castle",
+   "kind": "mc",
+   "prompt": "In which country is Bran Castle?",
+   "answer": "Romania",
+   "wrong": [
+    "South Africa",
+    "Iceland",
+    "Russia"
+   ],
+   "explain": "Bran Castle, Romania. It is a castle in Transylvania. It was once a residence of Queen Marie.",
+   "difficulty": 3,
+   "refs": [
+    "landmarks/bran-castle"
+   ]
+  },
+  {
+   "id": "lmc-kinderdijk",
+   "kind": "mc",
+   "prompt": "In which country is Kinderdijk?",
+   "answer": "Netherlands",
+   "wrong": [
+    "Vatican City",
+    "Thailand",
+    "New Zealand"
+   ],
+   "explain": "Kinderdijk, Netherlands. It is a village near Rotterdam famous for windmills. It is a UNESCO World Heritage Site.",
+   "difficulty": 3,
+   "refs": [
+    "landmarks/kinderdijk"
+   ]
+  },
+  {
+   "id": "lmc-wieliczka-salt-mine",
+   "kind": "mc",
+   "prompt": "In which country is the Wieliczka Salt Mine?",
+   "answer": "Poland",
+   "wrong": [
+    "Indonesia",
+    "Greece",
+    "United States"
+   ],
+   "explain": "Wieliczka Salt Mine, Poland. It is near Kraków. It reaches over 300 metres deep.",
+   "difficulty": 3,
+   "refs": [
+    "landmarks/wieliczka-salt-mine"
+   ]
+  },
+  {
+   "id": "lmc-cologne-cathedral",
+   "kind": "mc",
+   "prompt": "In which country is Cologne Cathedral?",
+   "answer": "Germany",
+   "wrong": [
+    "Singapore",
+    "Jordan",
+    "Guatemala"
+   ],
+   "explain": "Cologne Cathedral, Germany. It stands beside the Rhine in Cologne. Its twin spires are 157 metres tall.",
+   "difficulty": 3,
+   "refs": [
+    "landmarks/cologne-cathedral"
+   ]
+  },
+  {
+   "id": "lmc-meteora",
+   "kind": "mc",
+   "prompt": "In which country is Meteora?",
+   "answer": "Greece",
+   "wrong": [
+    "United Kingdom",
+    "Malaysia",
+    "Japan"
+   ],
+   "explain": "Meteora, Greece. They are monasteries perched on rock pillars in Thessaly. Six monasteries are still active there.",
+   "difficulty": 3,
+   "refs": [
+    "landmarks/meteora"
+   ]
+  },
+  {
+   "id": "lmc-pamukkale",
+   "kind": "mc",
+   "prompt": "In which country is Pamukkale?",
+   "answer": "Turkey",
+   "wrong": [
+    "United Arab Emirates",
+    "Iran",
+    "Indonesia"
+   ],
+   "explain": "Pamukkale, Turkey. It is in the province of Denizli in Turkey. Its white terraces are formed by mineral-rich hot springs.",
+   "difficulty": 3,
+   "refs": [
+    "landmarks/pamukkale"
+   ]
+  },
+  {
+   "id": "lmc-lalibela-churches",
+   "kind": "mc",
+   "prompt": "In which country is the Lalibela churches?",
+   "answer": "Ethiopia",
+   "wrong": [
+    "Sri Lanka",
+    "Germany",
+    "Ireland"
+   ],
+   "explain": "Lalibela churches, Ethiopia. They are in the highlands of Ethiopia. The Church of St George is cross-shaped and sunk into the ground.",
+   "difficulty": 3,
+   "refs": [
+    "landmarks/lalibela-churches"
+   ]
+  },
+  {
+   "id": "lmc-great-mosque-of-djenne",
+   "kind": "mc",
+   "prompt": "In which country is the Great Mosque of Djenné?",
+   "answer": "Mali",
+   "wrong": [
+    "Romania",
+    "Iceland",
+    "United States"
+   ],
+   "explain": "Great Mosque of Djenné, Mali. It stands in the town of Djenné in Mali. It is the largest mud-brick building in the world.",
+   "difficulty": 3,
+   "refs": [
+    "landmarks/great-mosque-of-djenne"
+   ]
+  },
+  {
+   "id": "lmc-milford-sound",
+   "kind": "mc",
+   "prompt": "In which country is Milford Sound?",
+   "answer": "New Zealand",
+   "wrong": [
+    "Ecuador",
+    "France",
+    "Vietnam"
+   ],
+   "explain": "Milford Sound, New Zealand. It is in Fiordland on New Zealand's South Island. It is a fjord carved by glaciers.",
+   "difficulty": 3,
+   "refs": [
+    "landmarks/milford-sound"
+   ]
+  },
+  {
+   "id": "lmc-great-barrier-reef",
+   "kind": "mc",
+   "prompt": "In which country is the Great Barrier Reef?",
+   "answer": "Australia",
+   "wrong": [
+    "Ethiopia",
+    "Turkey",
+    "Jordan"
+   ],
+   "explain": "Great Barrier Reef, Australia. It lies off the coast of Queensland. It is the world's largest coral reef system.",
+   "difficulty": 2,
+   "refs": [
+    "landmarks/great-barrier-reef"
+   ]
+  },
+  {
+   "id": "lmc-fushimi-inari-taisha",
+   "kind": "mc",
+   "prompt": "In which country is Fushimi Inari-taisha?",
+   "answer": "Japan",
+   "wrong": [
+    "Tanzania",
+    "Iran",
+    "Sri Lanka"
+   ],
+   "explain": "Fushimi Inari-taisha, Japan. It is a Shinto shrine in Kyoto. Thousands of red torii gates line its paths up a mountain.",
+   "difficulty": 3,
+   "refs": [
+    "landmarks/fushimi-inari-taisha"
+   ]
+  },
+  {
+   "id": "lmc-tokyo-skytree",
+   "kind": "mc",
+   "prompt": "In which country is Tokyo Skytree?",
+   "answer": "Japan",
+   "wrong": [
+    "Thailand",
+    "Croatia",
+    "Netherlands"
+   ],
+   "explain": "Tokyo Skytree, Japan. It stands in Sumida, Tokyo. It is a broadcasting and observation tower.",
+   "difficulty": 3,
+   "refs": [
+    "landmarks/tokyo-skytree"
+   ]
+  },
+  {
+   "id": "lmc-kinkaku-ji",
+   "kind": "mc",
+   "prompt": "In which country is Kinkaku-ji?",
+   "answer": "Japan",
+   "wrong": [
+    "Singapore",
+    "Bolivia",
+    "Ireland"
+   ],
+   "explain": "Kinkaku-ji, Japan. It is a Zen temple in Kyoto. Its top two floors are covered in gold leaf.",
+   "difficulty": 3,
+   "refs": [
+    "landmarks/kinkaku-ji"
+   ]
+  },
+  {
+   "id": "lmc-gyeongbokgung",
+   "kind": "mc",
+   "prompt": "In which country is Gyeongbokgung?",
+   "answer": "South Korea",
+   "wrong": [
+    "Morocco",
+    "United Arab Emirates",
+    "Australia"
+   ],
+   "explain": "Gyeongbokgung, South Korea. It is a palace in central Seoul. Guards in traditional dress change shifts at its gate.",
+   "difficulty": 3,
+   "refs": [
+    "landmarks/gyeongbokgung"
+   ]
+  },
+  {
+   "id": "lmc-sydney-harbour-bridge",
+   "kind": "mc",
+   "prompt": "In which country is the Sydney Harbour Bridge?",
+   "answer": "Australia",
+   "wrong": [
+    "Mexico",
+    "Egypt",
+    "United States"
+   ],
+   "explain": "Sydney Harbour Bridge, Australia. It crosses the harbour beside the Opera House. Visitors can climb over its steel arch.",
+   "difficulty": 2,
+   "refs": [
+    "landmarks/sydney-harbour-bridge"
+   ]
+  },
+  {
+   "id": "lmc-lotus-temple",
+   "kind": "mc",
+   "prompt": "In which country is the Lotus Temple?",
+   "answer": "India",
+   "wrong": [
+    "United Arab Emirates",
+    "United States",
+    "Iceland"
+   ],
+   "explain": "Lotus Temple, India. It is in New Delhi. Its 27 marble petals form the shape of a flower.",
+   "difficulty": 3,
+   "refs": [
+    "landmarks/lotus-temple"
+   ]
+  },
+  {
+   "id": "lmc-wat-arun",
+   "kind": "mc",
+   "prompt": "In which country is Wat Arun?",
+   "answer": "Thailand",
+   "wrong": [
+    "Tanzania",
+    "Cambodia",
+    "Ethiopia"
+   ],
+   "explain": "Wat Arun, Thailand. It stands on the west bank of the Chao Phraya in Bangkok. It is known as the Temple of Dawn.",
+   "difficulty": 3,
+   "refs": [
+    "landmarks/wat-arun"
+   ]
+  },
+  {
+   "id": "lmc-bagan",
+   "kind": "mc",
+   "prompt": "In which country is Bagan?",
+   "answer": "Myanmar",
+   "wrong": [
+    "United Kingdom",
+    "India",
+    "Croatia"
+   ],
+   "explain": "Bagan, Myanmar. It is an ancient city in central Myanmar. Hot-air balloons float over it at sunrise.",
+   "difficulty": 3,
+   "refs": [
+    "landmarks/bagan"
+   ]
+  },
+  {
+   "id": "lmc-moscow-kremlin",
+   "kind": "mc",
+   "prompt": "In which country is the Moscow Kremlin?",
+   "answer": "Russia",
+   "wrong": [
+    "Greece",
+    "Denmark",
+    "Ecuador"
+   ],
+   "explain": "Moscow Kremlin, Russia. It is a fortress beside Red Square. It is the official residence of the Russian president.",
+   "difficulty": 2,
+   "refs": [
+    "landmarks/moscow-kremlin"
+   ]
+  },
+  {
+   "id": "lmc-winter-palace",
+   "kind": "mc",
+   "prompt": "In which country is the Winter Palace?",
+   "answer": "Russia",
+   "wrong": [
+    "Turkey",
+    "Poland",
+    "India"
+   ],
+   "explain": "Winter Palace, Russia. It stands on the Neva river in Saint Petersburg. It was the official home of the Russian tsars.",
+   "difficulty": 3,
+   "refs": [
+    "landmarks/winter-palace"
+   ]
+  },
+  {
+   "id": "lmc-plitvice-lakes",
+   "kind": "mc",
+   "prompt": "In which country is the Plitvice Lakes?",
+   "answer": "Croatia",
+   "wrong": [
+    "Mali",
+    "Peru",
+    "South Africa"
+   ],
+   "explain": "Plitvice Lakes, Croatia. It is a national park in Croatia. It has 16 terraced lakes joined by waterfalls.",
+   "difficulty": 3,
+   "refs": [
+    "landmarks/plitvice-lakes"
+   ]
+  },
+  {
+   "id": "lmc-persepolis",
+   "kind": "mc",
+   "prompt": "In which country is Persepolis?",
+   "answer": "Iran",
+   "wrong": [
+    "Vietnam",
+    "Poland",
+    "Mali"
+   ],
+   "explain": "Persepolis, Iran. Its ruins are near Shiraz. It was the ceremonial capital of the Achaemenid Empire.",
+   "difficulty": 3,
+   "refs": [
+    "landmarks/persepolis"
+   ]
+  },
+  {
+   "id": "lmc-sigiriya",
+   "kind": "mc",
+   "prompt": "In which country is Sigiriya?",
+   "answer": "Sri Lanka",
+   "wrong": [
+    "Singapore",
+    "Czechia",
+    "Poland"
+   ],
+   "explain": "Sigiriya, Sri Lanka. It is a rock fortress in central Sri Lanka. A palace once stood on its flat top.",
+   "difficulty": 3,
+   "refs": [
+    "landmarks/sigiriya"
+   ]
+  },
+  {
+   "id": "lmc-chateau-frontenac",
+   "kind": "mc",
+   "prompt": "In which country is the Château Frontenac?",
+   "answer": "Canada",
+   "wrong": [
+    "Ethiopia",
+    "Vatican City",
+    "South Korea"
+   ],
+   "explain": "Château Frontenac, Canada. It overlooks the St. Lawrence River in Quebec City. Its copper roofs have turned green.",
+   "difficulty": 3,
+   "refs": [
+    "landmarks/chateau-frontenac"
+   ]
+  },
+  {
+   "id": "lmc-white-house",
+   "kind": "mc",
+   "prompt": "In which country is the White House?",
+   "answer": "United States",
+   "wrong": [
+    "Sri Lanka",
+    "Ireland",
+    "Thailand"
+   ],
+   "explain": "White House, United States. It is the home and office of the US president in Washington, D.C.. Its address is 1600 Pennsylvania Avenue.",
+   "difficulty": 1,
+   "refs": [
+    "landmarks/white-house"
+   ]
+  },
+  {
+   "id": "lmc-ngorongoro-crater",
+   "kind": "mc",
+   "prompt": "In which country is the Ngorongoro Crater?",
+   "answer": "Tanzania",
+   "wrong": [
+    "Panama",
+    "Bolivia",
+    "Brazil"
+   ],
+   "explain": "Ngorongoro Crater, Tanzania. It is in northern Tanzania near the Serengeti. It is the world's largest unbroken volcanic caldera that is not filled with water.",
+   "difficulty": 3,
+   "refs": [
+    "landmarks/ngorongoro-crater"
+   ]
+  },
+  {
+   "id": "lmc-hassan-ii-mosque",
+   "kind": "mc",
+   "prompt": "In which country is the Hassan II Mosque?",
+   "answer": "Morocco",
+   "wrong": [
+    "Jordan",
+    "Iran",
+    "India"
+   ],
+   "explain": "Hassan II Mosque, Morocco. It is in Casablanca. Part of its floor is built over the Atlantic Ocean.",
+   "difficulty": 3,
+   "refs": [
+    "landmarks/hassan-ii-mosque"
+   ]
+  },
+  {
+   "id": "lmc-carthage",
+   "kind": "mc",
+   "prompt": "In which country is Carthage?",
+   "answer": "Tunisia",
+   "wrong": [
+    "Malaysia",
+    "Greece",
+    "Cambodia"
+   ],
+   "explain": "Carthage, Tunisia. Its ruins lie near Tunis. It was founded by Phoenicians.",
+   "difficulty": 3,
+   "refs": [
+    "landmarks/carthage"
+   ]
+  },
+  {
+   "id": "lmc-leptis-magna",
+   "kind": "mc",
+   "prompt": "In which country is Leptis Magna?",
+   "answer": "Libya",
+   "wrong": [
+    "Czechia",
+    "Japan",
+    "Sri Lanka"
+   ],
+   "explain": "Leptis Magna, Libya. It is on the coast of Libya. Its ruins are among the best-preserved Roman sites in the Mediterranean.",
+   "difficulty": 3,
+   "refs": [
+    "landmarks/leptis-magna"
+   ]
+  }
+ ],
+ "sources": [
+  {
+   "name": "Wikidata (coordinates, dates)",
+   "url": "https://www.wikidata.org"
+  },
+  {
+   "name": "Wikimedia Commons (photos)",
+   "url": "https://commons.wikimedia.org"
+  }
+ ]
+}

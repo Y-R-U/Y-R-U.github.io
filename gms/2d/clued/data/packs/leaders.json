@@ -1,0 +1,2240 @@
+{
+ "id": "leaders",
+ "title": "Leaders and rulers",
+ "theme": "people",
+ "icon": "👑",
+ "kids": false,
+ "version": 1,
+ "imgPrompt": "Which of these is {name}?",
+ "nameImgPrompt": "Who is this?",
+ "tfImgPrompt": "This is {name}.",
+ "factsMeta": {
+  "born": {
+   "type": "year",
+   "label": "Born",
+   "higherLabel": "Born later",
+   "askHigh": "Who of these was born most recently?",
+   "askLow": "Who of these was born first?"
+  },
+  "died": {
+   "type": "year",
+   "label": "Died",
+   "higherLabel": "Died later",
+   "askHigh": "Who of these died most recently?",
+   "askLow": "Who of these died first?"
+  },
+  "nationality": {
+   "type": "cat",
+   "label": "Nationality",
+   "exclusive": false,
+   "ask": "What nationality is {name}?",
+   "stmt": "{name}’s nationality: {value}."
+  },
+  "era": {
+   "type": "cat",
+   "label": "Born in",
+   "ask": "When was {name} born?",
+   "stmt": "{name} was born in the {value}."
+  },
+  "field": {
+   "type": "cat",
+   "label": "Field",
+   "ask": "What field is {name} best known for?",
+   "stmt": "{name} is best known for {value}."
+  }
+ },
+ "items": [
+  {
+   "id": "julius-caesar",
+   "name": "Julius Caesar",
+   "alt": [
+    "Caesar"
+   ],
+   "group": "leadership",
+   "facts": {
+    "born": -100,
+    "died": -44,
+    "nationality": "Roman",
+    "era": "ancient world",
+    "field": "leadership"
+   },
+   "blurb": "Julius Caesar (100 BC–44 BC): A famous Roman general and dictator.",
+   "clues": [
+    "He was kidnapped by pirates as a young man.",
+    "He crossed the Rubicon river with his army.",
+    "He was stabbed to death on the Ides of March.",
+    "Born in 100 BC.",
+    "Nationality: Roman.",
+    "He was a famous Roman general and dictator."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/6/62/Retrato_de_Julio_C%C3%A9sar_%2826724093101%29_%28cropped%29.jpg/330px-Retrato_de_Julio_C%C3%A9sar_%2826724093101%29_%28cropped%29.jpg",
+      "w": 330,
+      "h": 448,
+      "credit": "Ángel M. Felicísimo from Mérida, España",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Retrato_de_Julio_C%C3%A9sar_(26724093101)_(cropped).jpg"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "cleopatra",
+   "name": "Cleopatra",
+   "alt": [
+    "Cleopatra VII"
+   ],
+   "group": "leadership",
+   "facts": {
+    "born": -69,
+    "died": -30,
+    "nationality": "Egyptian",
+    "era": "ancient world",
+    "field": "leadership"
+   },
+   "blurb": "Cleopatra (69 BC–30 BC): A queen of ancient Egypt.",
+   "clues": [
+    "She was of Macedonian Greek descent.",
+    "She had relationships with Julius Caesar and Mark Antony.",
+    "She was the last active ruler of the Ptolemaic kingdom.",
+    "Born in 69 BC.",
+    "Nationality: Egyptian.",
+    "She was a queen of ancient Egypt."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3e/Kleopatra-VII.-Altes-Museum-Berlin1.jpg/330px-Kleopatra-VII.-Altes-Museum-Berlin1.jpg",
+      "w": 330,
+      "h": 437,
+      "credit": "Louis le Grand",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Kleopatra-VII.-Altes-Museum-Berlin1.jpg"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "alexander-the-great",
+   "name": "Alexander the Great",
+   "alt": [
+    "Alexander III of Macedon"
+   ],
+   "group": "leadership",
+   "facts": {
+    "born": -356,
+    "died": -323,
+    "nationality": "Macedonian",
+    "era": "ancient world",
+    "field": "leadership"
+   },
+   "blurb": "Alexander the Great (356 BC–323 BC): Built an empire from Greece to India.",
+   "clues": [
+    "He was taught by Aristotle.",
+    "His horse was called Bucephalus.",
+    "He founded a famous city in Egypt named after himself.",
+    "Born in 356 BC.",
+    "He built an empire from Greece to India."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/84/Alexander_the_Great_mosaic_%28cropped%29.jpg/330px-Alexander_the_Great_mosaic_%28cropped%29.jpg",
+      "w": 330,
+      "h": 441,
+      "credit": "Unknown authorUnknown author",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Alexander_the_Great_mosaic_(cropped).jpg"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "augustus",
+   "name": "Augustus",
+   "alt": [
+    "Octavian",
+    "Caesar Augustus"
+   ],
+   "group": "leadership",
+   "facts": {
+    "born": -63,
+    "died": 14,
+    "nationality": "Roman",
+    "era": "ancient world",
+    "field": "leadership"
+   },
+   "blurb": "Augustus (63 BC–14): The first Roman emperor.",
+   "clues": [
+    "He boasted that he found Rome a city of brick and left it a city of marble.",
+    "He defeated Antony and Cleopatra at Actium.",
+    "Born in 63 BC.",
+    "Nationality: Roman.",
+    "He was the first Roman emperor."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5e/Augustus_of_Prima_Porta_%28inv._2290%29.jpg/330px-Augustus_of_Prima_Porta_%28inv._2290%29.jpg",
+      "w": 330,
+      "h": 528,
+      "credit": "Joel Bellviure",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Augustus_of_Prima_Porta_(inv._2290).jpg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "qin-shi-huang",
+   "name": "Qin Shi Huang",
+   "alt": [
+    "Shi Huangdi"
+   ],
+   "group": "leadership",
+   "facts": {
+    "born": -259,
+    "died": -210,
+    "nationality": "Chinese",
+    "era": "ancient world",
+    "field": "leadership"
+   },
+   "blurb": "Qin Shi Huang (259 BC–210 BC): The first emperor of a unified China.",
+   "clues": [
+    "He standardised writing, coins and measurements.",
+    "He linked older walls into an early Great Wall.",
+    "He was buried with the Terracotta Army.",
+    "Born in 259 BC.",
+    "Nationality: Chinese.",
+    "He was the first emperor of a unified China."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/a/ab/Qinshihuangdi3.jpg",
+      "w": 224,
+      "h": 235,
+      "credit": "Unknown",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Qinshihuangdi3.jpg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "genghis-khan",
+   "name": "Genghis Khan",
+   "alt": [
+    "Temujin",
+    "Chinggis Khan"
+   ],
+   "group": "leadership",
+   "facts": {
+    "died": 1227,
+    "nationality": "Mongol",
+    "field": "leadership"
+   },
+   "blurb": "Genghis Khan: Founded the Mongol Empire.",
+   "clues": [
+    "He died in 1227.",
+    "He united the Mongol tribes in 1206.",
+    "His empire became the largest connected land empire in history after his death.",
+    "Nationality: Mongol.",
+    "He founded the Mongol Empire."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/3/35/YuanEmperorAlbumGenghisPortrait.jpg/500px-YuanEmperorAlbumGenghisPortrait.jpg",
+      "w": 500,
+      "h": 635,
+      "credit": "Unknown authorUnknown author",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:YuanEmperorAlbumGenghisPortrait.jpg"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "charlemagne",
+   "name": "Charlemagne",
+   "alt": [
+    "Charles the Great"
+   ],
+   "group": "leadership",
+   "facts": {
+    "died": 814,
+    "nationality": "Frankish",
+    "field": "leadership"
+   },
+   "blurb": "Charlemagne: King of the Franks.",
+   "clues": [
+    "He died in 814.",
+    "He was crowned emperor by the Pope on Christmas Day 800.",
+    "He ruled from Aachen.",
+    "Nationality: Frankish.",
+    "He was King of the Franks."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/f/fb/Charlemagne_denier_Mayence_812_814.jpg/500px-Charlemagne_denier_Mayence_812_814.jpg",
+      "w": 500,
+      "h": 500,
+      "credit": "Charlemagne. Autorité émettrice de monnaie indéterminé. Atelier monétaire. Émetteur",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Charlemagne_denier_Mayence_812_814.jpg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "henry-viii",
+   "name": "Henry VIII",
+   "alt": [
+    "King Henry VIII"
+   ],
+   "group": "leadership",
+   "facts": {
+    "born": 1491,
+    "died": 1547,
+    "nationality": "English",
+    "era": "Middle Ages",
+    "field": "leadership"
+   },
+   "blurb": "Henry VIII (1491–1547): A Tudor king who married six times.",
+   "clues": [
+    "He wrote a book defending the Pope before breaking with Rome.",
+    "His navy included the warship Mary Rose.",
+    "He broke away from the Catholic Church.",
+    "Born in 1491.",
+    "Nationality: English."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c7/Hans_Holbein%2C_the_Younger%2C_Around_1497-1543_-_Portrait_of_Henry_VIII_of_England_-_Google_Art_Project.jpg/330px-Hans_Holbein%2C_the_Younger%2C_Around_1497-1543_-_Portrait_of_Henry_VIII_of_England_-_Google_Art_Project.jpg",
+      "w": 330,
+      "h": 463,
+      "credit": "Hans Holbein the Younger",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Hans_Holbein,_the_Younger,_Around_1497-1543_-_Portrait_of_Henry_VIII_of_England_-_Google_Art_Project.jpg"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "elizabeth-i",
+   "name": "Elizabeth I",
+   "alt": [
+    "Queen Elizabeth I"
+   ],
+   "group": "leadership",
+   "facts": {
+    "born": 1533,
+    "died": 1603,
+    "nationality": "English",
+    "era": "1500s to 1700s",
+    "field": "leadership"
+   },
+   "blurb": "Elizabeth I (1533–1603): The last Tudor monarch.",
+   "clues": [
+    "Her mother was Anne Boleyn.",
+    "Her navy defeated the Spanish Armada in 1588.",
+    "Born in 1533.",
+    "Nationality: English.",
+    "She was the last Tudor monarch."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e5/Elizabeth1England.jpg/500px-Elizabeth1England.jpg",
+      "w": 500,
+      "h": 607,
+      "credit": "Attributed to William Segar / Attributed to George Gower / Formerly attributed to Nicho…",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Elizabeth1England.jpg"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "louis-xiv",
+   "name": "Louis XIV",
+   "alt": [
+    "Sun King"
+   ],
+   "group": "leadership",
+   "facts": {
+    "born": 1638,
+    "died": 1715,
+    "nationality": "French",
+    "era": "1500s to 1700s",
+    "field": "leadership"
+   },
+   "blurb": "Louis XIV (1638–1715): Called the Sun King.",
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5f/Louis_XIV_of_France.jpg/330px-Louis_XIV_of_France.jpg",
+      "w": 330,
+      "h": 469,
+      "credit": "Hyacinthe Rigaud",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Louis_XIV_of_France.jpg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "peter-the-great",
+   "name": "Peter the Great",
+   "alt": [
+    "Peter I of Russia"
+   ],
+   "group": "leadership",
+   "facts": {
+    "born": 1672,
+    "died": 1725,
+    "nationality": "Russian",
+    "era": "1500s to 1700s",
+    "field": "leadership"
+   },
+   "blurb": "Peter the Great (1672–1725): A tsar who modernised Russia.",
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d6/Inconnu_d%27apr%C3%A8s_J.-M._Nattier%2C_Portrait_de_Pierre_Ier_%28mus%C3%A9e_de_l%E2%80%99Ermitage%29.jpg/330px-Inconnu_d%27apr%C3%A8s_J.-M._Nattier%2C_Portrait_de_Pierre_Ier_%28mus%C3%A9e_de_l%E2%80%99Ermitage%29.jpg",
+      "w": 330,
+      "h": 436,
+      "credit": "Attributed to Jean-Marc Nattier",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Inconnu_d%27apr%C3%A8s_J.-M._Nattier,_Portrait_de_Pierre_Ier_(mus%C3%A9e_de_l%E2%80%99Ermitage).jpg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "catherine-the-great",
+   "name": "Catherine the Great",
+   "alt": [
+    "Catherine II"
+   ],
+   "group": "leadership",
+   "facts": {
+    "born": 1729,
+    "died": 1796,
+    "nationality": "Russian",
+    "era": "1500s to 1700s",
+    "field": "leadership"
+   },
+   "blurb": "Catherine the Great (1729–1796): The longest-ruling female leader of Russia.",
+   "clues": [
+    "She was born a German princess.",
+    "She seized the throne from her husband Peter III.",
+    "She founded the collection of the Hermitage Museum.",
+    "Born in 1729.",
+    "Nationality: Russian.",
+    "She was the longest-ruling female leader of Russia."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/7/72/Catherine_II_after_Roslin%2C_Rokotov_%281780s%2C_Kunsthistorisches_Museum%29.jpg/500px-Catherine_II_after_Roslin%2C_Rokotov_%281780s%2C_Kunsthistorisches_Museum%29.jpg",
+      "w": 500,
+      "h": 596,
+      "credit": "After Alexander Roslin",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Catherine_II_after_Roslin,_Rokotov_(1780s,_Kunsthistorisches_Museum).jpg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "george-washington",
+   "name": "George Washington",
+   "alt": [
+    "Washington"
+   ],
+   "group": "leadership",
+   "facts": {
+    "born": 1732,
+    "died": 1799,
+    "nationality": "American",
+    "era": "1500s to 1700s",
+    "field": "leadership"
+   },
+   "blurb": "George Washington (1732–1799): The first president of the United States.",
+   "clues": [
+    "He had false teeth made partly from human and animal teeth.",
+    "He led the Continental Army in the American Revolution.",
+    "His face is on the one-dollar bill.",
+    "Born in 1732.",
+    "Nationality: American.",
+    "He was the first president of the United States."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b6/Gilbert_Stuart_Williamstown_Portrait_of_George_Washington.jpg/500px-Gilbert_Stuart_Williamstown_Portrait_of_George_Washington.jpg",
+      "w": 500,
+      "h": 607,
+      "credit": "Gilbert Stuart",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Gilbert_Stuart_Williamstown_Portrait_of_George_Washington.jpg"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "napoleon-bonaparte",
+   "name": "Napoleon Bonaparte",
+   "alt": [
+    "Napoleon",
+    "Napoleon I"
+   ],
+   "group": "leadership",
+   "facts": {
+    "born": 1769,
+    "died": 1821,
+    "nationality": "French",
+    "era": "1500s to 1700s",
+    "field": "leadership"
+   },
+   "blurb": "Napoleon Bonaparte (1769–1821): Crowned himself Emperor of the French.",
+   "clues": [
+    "He was born on Corsica.",
+    "He sold the Louisiana Territory to the United States.",
+    "He was defeated at the Battle of Waterloo in 1815.",
+    "Born in 1769.",
+    "Nationality: French.",
+    "He crowned himself Emperor of the French."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/5/50/Jacques-Louis_David_-_The_Emperor_Napoleon_in_His_Study_at_the_Tuileries_-_Google_Art_Project.jpg/330px-Jacques-Louis_David_-_The_Emperor_Napoleon_in_His_Study_at_the_Tuileries_-_Google_Art_Project.jpg",
+      "w": 330,
+      "h": 550,
+      "credit": "Jacques-Louis David",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Jacques-Louis_David_-_The_Emperor_Napoleon_in_His_Study_at_the_Tuileries_-_Google_Art_Project.jpg"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "simon-bolivar",
+   "name": "Simón Bolívar",
+   "alt": [
+    "Simon Bolivar",
+    "El Libertador"
+   ],
+   "group": "leadership",
+   "facts": {
+    "born": 1783,
+    "died": 1830,
+    "nationality": "Venezuelan",
+    "era": "1500s to 1700s",
+    "field": "leadership"
+   },
+   "blurb": "Simón Bolívar (1783–1830): Led several South American countries to independence from Spain.",
+   "clues": [
+    "A country is named after him.",
+    "He was born in Caracas.",
+    "Born in 1783.",
+    "Nationality: Venezuelan.",
+    "He led several South American countries to independence from Spain."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a9/Sim%C3%B3n_Bol%C3%ADvar_by_Acevedo_Bernal%2C_1922.jpg/330px-Sim%C3%B3n_Bol%C3%ADvar_by_Acevedo_Bernal%2C_1922.jpg",
+      "w": 330,
+      "h": 476,
+      "credit": "Ricardo Acevedo Bernal",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Sim%C3%B3n_Bol%C3%ADvar_by_Acevedo_Bernal,_1922.jpg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "queen-victoria",
+   "name": "Queen Victoria",
+   "alt": [
+    "Victoria"
+   ],
+   "group": "leadership",
+   "facts": {
+    "born": 1819,
+    "died": 1901,
+    "nationality": "British",
+    "era": "1800s",
+    "field": "leadership"
+   },
+   "blurb": "Queen Victoria (1819–1901): An era of British history is named after her.",
+   "clues": [
+    "She was also Empress of India.",
+    "She married her cousin Prince Albert.",
+    "She reigned for over 63 years.",
+    "Born in 1819.",
+    "Nationality: British.",
+    "An era of British history is named after her."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e3/Queen_Victoria_by_Bassano.jpg/330px-Queen_Victoria_by_Bassano.jpg",
+      "w": 330,
+      "h": 466,
+      "credit": "Alexander Bassano",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Queen_Victoria_by_Bassano.jpg"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "abraham-lincoln",
+   "name": "Abraham Lincoln",
+   "alt": [
+    "Lincoln",
+    "Abe Lincoln"
+   ],
+   "group": "leadership",
+   "facts": {
+    "born": 1809,
+    "died": 1865,
+    "nationality": "American",
+    "era": "1800s",
+    "field": "leadership"
+   },
+   "blurb": "Abraham Lincoln (1809–1865): The 16th US president, assassinated in 1865.",
+   "clues": [
+    "He grew up in a log cabin in Kentucky and Indiana.",
+    "He gave the Gettysburg Address.",
+    "He led the Union during the Civil War and abolished slavery.",
+    "Born in 1809.",
+    "Nationality: American.",
+    "He was the 16th US president, assassinated in 1865."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/a/ab/Abraham_Lincoln_O-77_matte_collodion_print.jpg/330px-Abraham_Lincoln_O-77_matte_collodion_print.jpg",
+      "w": 330,
+      "h": 425,
+      "credit": "Alexander Gardner",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Abraham_Lincoln_O-77_matte_collodion_print.jpg"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "otto-von-bismarck",
+   "name": "Otto von Bismarck",
+   "alt": [
+    "Bismarck"
+   ],
+   "group": "leadership",
+   "facts": {
+    "born": 1815,
+    "died": 1898,
+    "nationality": "German",
+    "era": "1800s",
+    "field": "leadership"
+   },
+   "blurb": "Otto von Bismarck (1815–1898): The first chancellor of the German Empire.",
+   "clues": [
+    "A battleship and a US state capital share his name.",
+    "He was called the Iron Chancellor.",
+    "He worked to unify Germany in 1871.",
+    "Born in 1815.",
+    "Nationality: German.",
+    "He was the first chancellor of the German Empire."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/1/10/Bundesarchiv_Bild_146-2005-0057%2C_Otto_von_Bismarck.jpg/330px-Bundesarchiv_Bild_146-2005-0057%2C_Otto_von_Bismarck.jpg",
+      "w": 330,
+      "h": 490,
+      "credit": "Jacques Pilartz",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Bundesarchiv_Bild_146-2005-0057,_Otto_von_Bismarck.jpg"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "theodore-roosevelt",
+   "name": "Theodore Roosevelt",
+   "alt": [
+    "Teddy Roosevelt",
+    "TR"
+   ],
+   "group": "leadership",
+   "facts": {
+    "born": 1858,
+    "died": 1919,
+    "nationality": "American",
+    "era": "1800s",
+    "field": "leadership"
+   },
+   "blurb": "Theodore Roosevelt (1858–1919): The 26th US president.",
+   "clues": [
+    "He led the Rough Riders in the Spanish-American War.",
+    "He became president after William McKinley was assassinated.",
+    "Born in 1858.",
+    "Nationality: American.",
+    "He was the 26th US president."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5b/Theodore_Roosevelt_by_the_Pach_Bros.jpg/500px-Theodore_Roosevelt_by_the_Pach_Bros.jpg",
+      "w": 500,
+      "h": 597,
+      "credit": "Adam Cuerden",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Theodore_Roosevelt_by_the_Pach_Bros.jpg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "winston-churchill",
+   "name": "Winston Churchill",
+   "alt": [
+    "Churchill"
+   ],
+   "group": "leadership",
+   "facts": {
+    "born": 1874,
+    "died": 1965,
+    "nationality": "British",
+    "era": "1800s",
+    "field": "leadership"
+   },
+   "blurb": "Winston Churchill (1874–1965): Britain's prime minister during most of the Second World War.",
+   "clues": [
+    "He won the Nobel Prize in Literature in 1953.",
+    "He was famous for his cigars and V-for-victory sign.",
+    "He promised blood, toil, tears and sweat.",
+    "Born in 1874.",
+    "Nationality: British.",
+    "He was Britain's prime minister during most of the Second World War."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/02/Sir_Winston_Churchill_-_19086236948_%28restored%29.jpg/500px-Sir_Winston_Churchill_-_19086236948_%28restored%29.jpg",
+      "w": 500,
+      "h": 622,
+      "credit": "Unknown",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Sir_Winston_Churchill_-_19086236948_(restored).jpg"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "mahatma-gandhi",
+   "name": "Mahatma Gandhi",
+   "alt": [
+    "Gandhi",
+    "Mohandas Gandhi"
+   ],
+   "group": "leadership",
+   "facts": {
+    "born": 1869,
+    "died": 1948,
+    "nationality": "Indian",
+    "era": "1800s",
+    "field": "leadership"
+   },
+   "blurb": "Mahatma Gandhi (1869–1948): Led India's independence movement against British rule.",
+   "clues": [
+    "He worked as a lawyer in South Africa.",
+    "He led the Salt March in 1930.",
+    "He used non-violent protest.",
+    "Born in 1869.",
+    "Nationality: Indian.",
+    "He led India's independence movement against British rule."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7a/Mahatma-Gandhi%2C_studio%2C_1931.jpg/500px-Mahatma-Gandhi%2C_studio%2C_1931.jpg",
+      "w": 500,
+      "h": 624,
+      "credit": "Elliott & Fry",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Mahatma-Gandhi,_studio,_1931.jpg"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "franklin-d-roosevelt",
+   "name": "Franklin D. Roosevelt",
+   "alt": [
+    "FDR",
+    "Franklin Roosevelt"
+   ],
+   "group": "leadership",
+   "facts": {
+    "born": 1882,
+    "died": 1945,
+    "nationality": "American",
+    "era": "1800s",
+    "field": "leadership"
+   },
+   "blurb": "Franklin D. Roosevelt (1882–1945): The only US president elected four times.",
+   "clues": [
+    "He gave radio talks called fireside chats.",
+    "He used a wheelchair after polio.",
+    "He introduced the New Deal.",
+    "Born in 1882.",
+    "Nationality: American.",
+    "He was the only US president elected four times."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/4/42/FDR_1944_Color_Portrait.jpg/330px-FDR_1944_Color_Portrait.jpg",
+      "w": 330,
+      "h": 476,
+      "credit": "Leon Perskie",
+      "license": "CC BY 2.0",
+      "page": "https://commons.wikimedia.org/wiki/File:FDR_1944_Color_Portrait.jpg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "haile-selassie",
+   "name": "Haile Selassie",
+   "alt": [],
+   "group": "leadership",
+   "facts": {
+    "born": 1892,
+    "died": 1975,
+    "nationality": "Ethiopian",
+    "era": "1800s",
+    "field": "leadership"
+   },
+   "blurb": "Haile Selassie (1892–1975): The last emperor of Ethiopia.",
+   "clues": [
+    "He is revered as a messiah by the Rastafari movement.",
+    "He spoke at the League of Nations in 1936.",
+    "His name before he was crowned was Ras Tafari.",
+    "Born in 1892.",
+    "Nationality: Ethiopian.",
+    "He was the last emperor of Ethiopia."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/81/Haile_Selassie_in_full_dress.jpg/250px-Haile_Selassie_in_full_dress.jpg",
+      "w": 250,
+      "h": 489,
+      "credit": "unknown; according to [1] and [2] an official portrait of which b/w copies were distrib…",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Haile_Selassie_in_full_dress.jpg"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "mao-zedong",
+   "name": "Mao Zedong",
+   "alt": [
+    "Chairman Mao"
+   ],
+   "group": "leadership",
+   "facts": {
+    "born": 1893,
+    "died": 1976,
+    "nationality": "Chinese",
+    "era": "1800s",
+    "field": "leadership"
+   },
+   "blurb": "Mao Zedong (1893–1976): Founded the People's Republic of China.",
+   "clues": [
+    "His sayings were collected in the Little Red Book.",
+    "He led the Long March.",
+    "He proclaimed the People's Republic of China in 1949.",
+    "Born in 1893.",
+    "Nationality: Chinese.",
+    "He founded the People's Republic of China."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/9b/Mao_Tse_Tung.jpg/330px-Mao_Tse_Tung.jpg",
+      "w": 330,
+      "h": 457,
+      "credit": "Chen Zhengqing (1917–1966)",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Mao_Tse_Tung.jpg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "charles-de-gaulle",
+   "name": "Charles de Gaulle",
+   "alt": [
+    "De Gaulle"
+   ],
+   "group": "leadership",
+   "facts": {
+    "born": 1890,
+    "died": 1970,
+    "nationality": "French",
+    "era": "1800s",
+    "field": "leadership"
+   },
+   "blurb": "Charles de Gaulle (1890–1970): President of France from 1959 to 1969.",
+   "clues": [
+    "Paris's main airport is named after him.",
+    "He led the Free French from London during the Second World War.",
+    "He founded the Fifth Republic.",
+    "Born in 1890.",
+    "Nationality: French.",
+    "He was President of France from 1959 to 1969."
+   ],
+   "media": {
+    "img": []
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "john-f-kennedy",
+   "name": "John F. Kennedy",
+   "alt": [
+    "JFK",
+    "Kennedy"
+   ],
+   "group": "leadership",
+   "facts": {
+    "born": 1917,
+    "died": 1963,
+    "nationality": "American",
+    "era": "1900s or later",
+    "field": "leadership"
+   },
+   "blurb": "John F. Kennedy (1917–1963): The 35th US president, assassinated in Dallas in 1963.",
+   "clues": [
+    "He wrote Profiles in Courage.",
+    "He faced the Cuban Missile Crisis.",
+    "He promised to land a man on the Moon.",
+    "Born in 1917.",
+    "Nationality: American.",
+    "He was the 35th US president, assassinated in Dallas in 1963."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c3/John_F._Kennedy%2C_White_House_color_photo_portrait.jpg/330px-John_F._Kennedy%2C_White_House_color_photo_portrait.jpg",
+      "w": 330,
+      "h": 428,
+      "credit": "Cecil W. Stoughton",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:John_F._Kennedy,_White_House_color_photo_portrait.jpg"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "nelson-mandela",
+   "name": "Nelson Mandela",
+   "alt": [
+    "Mandela",
+    "Madiba"
+   ],
+   "group": "leadership",
+   "facts": {
+    "born": 1918,
+    "died": 2013,
+    "nationality": "South African",
+    "era": "1900s or later",
+    "field": "leadership"
+   },
+   "blurb": "Nelson Mandela (1918–2013): South Africa's first Black president.",
+   "clues": [
+    "He spent 27 years in prison, many on Robben Island.",
+    "He shared the Nobel Peace Prize in 1993.",
+    "Born in 1918.",
+    "Nationality: South African.",
+    "He was South Africa's first Black president."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/02/Nelson_Mandela_1994.jpg/330px-Nelson_Mandela_1994.jpg",
+      "w": 330,
+      "h": 427,
+      "credit": "Kingkongphoto & www.celebrity-photos.com from Laurel",
+      "license": "CC BY-SA 2.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Nelson_Mandela_1994.jpg"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "indira-gandhi",
+   "name": "Indira Gandhi",
+   "alt": [],
+   "group": "leadership",
+   "facts": {
+    "born": 1917,
+    "died": 1984,
+    "nationality": "Indian",
+    "era": "1900s or later",
+    "field": "leadership"
+   },
+   "blurb": "Indira Gandhi (1917–1984): India's first female prime minister.",
+   "media": {
+    "img": []
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "golda-meir",
+   "name": "Golda Meir",
+   "alt": [],
+   "group": "leadership",
+   "facts": {
+    "born": 1898,
+    "died": 1978,
+    "nationality": "Israeli",
+    "era": "1800s",
+    "field": "leadership"
+   },
+   "blurb": "Golda Meir (1898–1978): Israel's first female prime minister.",
+   "clues": [
+    "She was born in Kyiv and grew up in Milwaukee.",
+    "She was nicknamed the Iron Lady of Israeli politics.",
+    "She signed Israel's Declaration of Independence.",
+    "Born in 1898.",
+    "Nationality: Israeli.",
+    "She was Israel's first female prime minister."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c7/Golda_Meir_03265u-2_%28cropped%29.jpg/330px-Golda_Meir_03265u-2_%28cropped%29.jpg",
+      "w": 330,
+      "h": 471,
+      "credit": "Talmoryair (talk) after Marion S. Trikosko",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Golda_Meir_03265u-2_(cropped).jpg"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "margaret-thatcher",
+   "name": "Margaret Thatcher",
+   "alt": [
+    "Thatcher"
+   ],
+   "group": "leadership",
+   "facts": {
+    "born": 1925,
+    "died": 2013,
+    "nationality": "British",
+    "era": "1900s or later",
+    "field": "leadership"
+   },
+   "blurb": "Margaret Thatcher (1925–2013): Britain's first female prime minister.",
+   "clues": [
+    "She trained as a chemist.",
+    "She was nicknamed the Iron Lady.",
+    "She led Britain during the Falklands War.",
+    "Born in 1925.",
+    "Nationality: British.",
+    "She was Britain's first female prime minister."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f9/Margaret_Thatcher_%281983%29.jpg/330px-Margaret_Thatcher_%281983%29.jpg",
+      "w": 330,
+      "h": 440,
+      "credit": "Rob Bogaerts",
+      "license": "CC0",
+      "page": "https://commons.wikimedia.org/wiki/File:Margaret_Thatcher_(1983).jpg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "angela-merkel",
+   "name": "Angela Merkel",
+   "alt": [
+    "Merkel"
+   ],
+   "group": "leadership",
+   "facts": {
+    "born": 1954,
+    "nationality": "German",
+    "era": "1900s or later",
+    "field": "leadership"
+   },
+   "blurb": "Angela Merkel (1954): Germany's first female chancellor.",
+   "clues": [
+    "She trained as a quantum chemist.",
+    "She grew up in East Germany.",
+    "She led Germany from 2005 to 2021.",
+    "Born in 1954.",
+    "Nationality: German.",
+    "She was Germany's first female chancellor."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/b/bf/Angela_Merkel._Tallinn_Digital_Summit.jpg/330px-Angela_Merkel._Tallinn_Digital_Summit.jpg",
+      "w": 330,
+      "h": 456,
+      "credit": "EU2017EE Estonian Presidency",
+      "license": "CC BY 2.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Angela_Merkel._Tallinn_Digital_Summit.jpg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "barack-obama",
+   "name": "Barack Obama",
+   "alt": [
+    "Obama"
+   ],
+   "group": "leadership",
+   "facts": {
+    "born": 1961,
+    "nationality": "American",
+    "era": "1900s or later",
+    "field": "leadership"
+   },
+   "blurb": "Barack Obama (1961): The 44th and first African American US president.",
+   "clues": [
+    "He was born in Hawaii.",
+    "He won the Nobel Peace Prize in 2009.",
+    "His campaign slogan was Yes We Can.",
+    "Born in 1961.",
+    "Nationality: American.",
+    "He was the 44th and first African American US president."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8d/President_Barack_Obama.jpg/500px-President_Barack_Obama.jpg",
+      "w": 500,
+      "h": 624,
+      "credit": "Official White House Photo by Pete Souza",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:President_Barack_Obama.jpg"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "elizabeth-ii",
+   "name": "Elizabeth II",
+   "alt": [
+    "Queen Elizabeth II"
+   ],
+   "group": "leadership",
+   "facts": {
+    "born": 1926,
+    "died": 2022,
+    "nationality": "British",
+    "era": "1900s or later",
+    "field": "leadership"
+   },
+   "blurb": "Elizabeth II (1926–2022): The longest-reigning British monarch.",
+   "clues": [
+    "She served as a mechanic in the Second World War.",
+    "She reigned for 70 years.",
+    "Born in 1926.",
+    "Nationality: British.",
+    "She was the longest-reigning British monarch."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/1/11/Queen_Elizabeth_II_official_portrait_for_1959_tour_%28retouched%29_%28cropped%29_%283-to-4_aspect_ratio%29.jpg/330px-Queen_Elizabeth_II_official_portrait_for_1959_tour_%28retouched%29_%28cropped%29_%283-to-4_aspect_ratio%29.jpg",
+      "w": 330,
+      "h": 440,
+      "credit": "Donald McKague",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Queen_Elizabeth_II_official_portrait_for_1959_tour_(retouched)_(cropped)_(3-to-4_aspect_ratio).jpg"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "akbar",
+   "name": "Akbar",
+   "alt": [
+    "Akbar the Great"
+   ],
+   "group": "leadership",
+   "facts": {
+    "born": 1542,
+    "died": 1605,
+    "nationality": "Mughal",
+    "era": "1500s to 1700s",
+    "field": "leadership"
+   },
+   "blurb": "Akbar (1542–1605): The third Mughal emperor of India.",
+   "clues": [
+    "He founded a new capital at Fatehpur Sikri.",
+    "He held debates between people of different religions.",
+    "He became emperor at 13.",
+    "Born in 1542.",
+    "Nationality: Mughal.",
+    "He was the third Mughal emperor of India."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7e/Contemporary_seated_portrait_of_Akbar%2C_1605.jpg/250px-Contemporary_seated_portrait_of_Akbar%2C_1605.jpg",
+      "w": 250,
+      "h": 526,
+      "credit": "1605 artist",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Contemporary_seated_portrait_of_Akbar,_1605.jpg"
+     }
+    ]
+   },
+   "difficulty": 3
+  }
+ ],
+ "questions": [
+  {
+   "id": "who-julius-caesar",
+   "kind": "mc",
+   "prompt": "Who is this? He was a famous Roman general and dictator.",
+   "answer": "Julius Caesar",
+   "wrong": [
+    "Peter the Great",
+    "Otto von Bismarck",
+    "Charlemagne"
+   ],
+   "explain": "Julius Caesar (100 BC–44 BC): A famous Roman general and dictator.",
+   "difficulty": 1,
+   "refs": [
+    "leaders/julius-caesar"
+   ]
+  },
+  {
+   "id": "who-cleopatra",
+   "kind": "mc",
+   "prompt": "Who is this? She was a queen of ancient Egypt.",
+   "answer": "Cleopatra",
+   "wrong": [
+    "Otto von Bismarck",
+    "Augustus",
+    "Barack Obama"
+   ],
+   "explain": "Cleopatra (69 BC–30 BC): A queen of ancient Egypt.",
+   "difficulty": 1,
+   "refs": [
+    "leaders/cleopatra"
+   ]
+  },
+  {
+   "id": "who-alexander-the-great",
+   "kind": "mc",
+   "prompt": "Who is this? He built an empire from Greece to India.",
+   "answer": "Alexander the Great",
+   "wrong": [
+    "Qin Shi Huang",
+    "Winston Churchill",
+    "Peter the Great"
+   ],
+   "explain": "Alexander the Great (356 BC–323 BC): Built an empire from Greece to India.",
+   "difficulty": 1,
+   "refs": [
+    "leaders/alexander-the-great"
+   ]
+  },
+  {
+   "id": "who-augustus",
+   "kind": "mc",
+   "prompt": "Who is this? He was the first Roman emperor.",
+   "answer": "Augustus",
+   "wrong": [
+    "Cleopatra",
+    "Qin Shi Huang",
+    "Mao Zedong"
+   ],
+   "explain": "Augustus (63 BC–14): The first Roman emperor.",
+   "difficulty": 2,
+   "refs": [
+    "leaders/augustus"
+   ]
+  },
+  {
+   "id": "who-qin-shi-huang",
+   "kind": "mc",
+   "prompt": "Who is this? He was the first emperor of a unified China.",
+   "answer": "Qin Shi Huang",
+   "wrong": [
+    "Margaret Thatcher",
+    "Napoleon Bonaparte",
+    "Catherine the Great"
+   ],
+   "explain": "Qin Shi Huang (259 BC–210 BC): The first emperor of a unified China.",
+   "difficulty": 2,
+   "refs": [
+    "leaders/qin-shi-huang"
+   ]
+  },
+  {
+   "id": "who-genghis-khan",
+   "kind": "mc",
+   "prompt": "Who is this? He founded the Mongol Empire.",
+   "answer": "Genghis Khan",
+   "wrong": [
+    "Charles de Gaulle",
+    "Barack Obama",
+    "Otto von Bismarck"
+   ],
+   "explain": "Genghis Khan: Founded the Mongol Empire.",
+   "difficulty": 1,
+   "refs": [
+    "leaders/genghis-khan"
+   ]
+  },
+  {
+   "id": "who-charlemagne",
+   "kind": "mc",
+   "prompt": "Who is this? He was King of the Franks.",
+   "answer": "Charlemagne",
+   "wrong": [
+    "Queen Victoria",
+    "Henry VIII",
+    "Charles de Gaulle"
+   ],
+   "explain": "Charlemagne: King of the Franks.",
+   "difficulty": 2,
+   "refs": [
+    "leaders/charlemagne"
+   ]
+  },
+  {
+   "id": "who-henry-viii",
+   "kind": "mc",
+   "prompt": "Who is this? He was a Tudor king who married six times.",
+   "answer": "Henry VIII",
+   "wrong": [
+    "Franklin D. Roosevelt",
+    "Alexander the Great",
+    "Theodore Roosevelt"
+   ],
+   "explain": "Henry VIII (1491–1547): A Tudor king who married six times.",
+   "difficulty": 1,
+   "refs": [
+    "leaders/henry-viii"
+   ]
+  },
+  {
+   "id": "born-henry-viii",
+   "kind": "mc",
+   "prompt": "In which year was Henry VIII born?",
+   "answer": "1491",
+   "wrong": [
+    "1521",
+    "1501",
+    "1511"
+   ],
+   "explain": "Henry VIII (1491–1547): A Tudor king who married six times.",
+   "difficulty": 3,
+   "refs": [
+    "leaders/henry-viii"
+   ]
+  },
+  {
+   "id": "who-elizabeth-i",
+   "kind": "mc",
+   "prompt": "Who is this? She was the last Tudor monarch.",
+   "answer": "Elizabeth I",
+   "wrong": [
+    "Otto von Bismarck",
+    "Louis XIV",
+    "Golda Meir"
+   ],
+   "explain": "Elizabeth I (1533–1603): The last Tudor monarch.",
+   "difficulty": 1,
+   "refs": [
+    "leaders/elizabeth-i"
+   ]
+  },
+  {
+   "id": "born-elizabeth-i",
+   "kind": "mc",
+   "prompt": "In which year was Elizabeth I born?",
+   "answer": "1533",
+   "wrong": [
+    "1523",
+    "1543",
+    "1553"
+   ],
+   "explain": "Elizabeth I (1533–1603): The last Tudor monarch.",
+   "difficulty": 3,
+   "refs": [
+    "leaders/elizabeth-i"
+   ]
+  },
+  {
+   "id": "who-louis-xiv",
+   "kind": "mc",
+   "prompt": "Who is this? Nationality: French.",
+   "answer": "Louis XIV",
+   "wrong": [
+    "Catherine the Great",
+    "Simón Bolívar",
+    "Winston Churchill"
+   ],
+   "explain": "Louis XIV (1638–1715): Called the Sun King.",
+   "difficulty": 2,
+   "refs": [
+    "leaders/louis-xiv"
+   ]
+  },
+  {
+   "id": "born-louis-xiv",
+   "kind": "mc",
+   "prompt": "In which year was Louis XIV born?",
+   "answer": "1638",
+   "wrong": [
+    "1618",
+    "1648",
+    "1628"
+   ],
+   "explain": "Louis XIV (1638–1715): Called the Sun King.",
+   "difficulty": 3,
+   "refs": [
+    "leaders/louis-xiv"
+   ]
+  },
+  {
+   "id": "who-peter-the-great",
+   "kind": "mc",
+   "prompt": "Who is this? Born in 1672.",
+   "answer": "Peter the Great",
+   "wrong": [
+    "Queen Victoria",
+    "Catherine the Great",
+    "Julius Caesar"
+   ],
+   "explain": "Peter the Great (1672–1725): A tsar who modernised Russia.",
+   "difficulty": 2,
+   "refs": [
+    "leaders/peter-the-great"
+   ]
+  },
+  {
+   "id": "born-peter-the-great",
+   "kind": "mc",
+   "prompt": "In which year was Peter the Great born?",
+   "answer": "1672",
+   "wrong": [
+    "1662",
+    "1682",
+    "1702"
+   ],
+   "explain": "Peter the Great (1672–1725): A tsar who modernised Russia.",
+   "difficulty": 3,
+   "refs": [
+    "leaders/peter-the-great"
+   ]
+  },
+  {
+   "id": "who-catherine-the-great",
+   "kind": "mc",
+   "prompt": "Who is this? She was the longest-ruling female leader of Russia.",
+   "answer": "Catherine the Great",
+   "wrong": [
+    "Elizabeth I",
+    "Charles de Gaulle",
+    "Margaret Thatcher"
+   ],
+   "explain": "Catherine the Great (1729–1796): The longest-ruling female leader of Russia.",
+   "difficulty": 2,
+   "refs": [
+    "leaders/catherine-the-great"
+   ]
+  },
+  {
+   "id": "born-catherine-the-great",
+   "kind": "mc",
+   "prompt": "In which year was Catherine the Great born?",
+   "answer": "1729",
+   "wrong": [
+    "1759",
+    "1719",
+    "1749"
+   ],
+   "explain": "Catherine the Great (1729–1796): The longest-ruling female leader of Russia.",
+   "difficulty": 3,
+   "refs": [
+    "leaders/catherine-the-great"
+   ]
+  },
+  {
+   "id": "who-george-washington",
+   "kind": "mc",
+   "prompt": "Who is this? He was the first president of the United States.",
+   "answer": "George Washington",
+   "wrong": [
+    "Elizabeth I",
+    "Charlemagne",
+    "Theodore Roosevelt"
+   ],
+   "explain": "George Washington (1732–1799): The first president of the United States.",
+   "difficulty": 1,
+   "refs": [
+    "leaders/george-washington"
+   ]
+  },
+  {
+   "id": "born-george-washington",
+   "kind": "mc",
+   "prompt": "In which year was George Washington born?",
+   "answer": "1732",
+   "wrong": [
+    "1742",
+    "1702",
+    "1752"
+   ],
+   "explain": "George Washington (1732–1799): The first president of the United States.",
+   "difficulty": 3,
+   "refs": [
+    "leaders/george-washington"
+   ]
+  },
+  {
+   "id": "who-napoleon-bonaparte",
+   "kind": "mc",
+   "prompt": "Who is this? He crowned himself Emperor of the French.",
+   "answer": "Napoleon Bonaparte",
+   "wrong": [
+    "George Washington",
+    "Charles de Gaulle",
+    "Nelson Mandela"
+   ],
+   "explain": "Napoleon Bonaparte (1769–1821): Crowned himself Emperor of the French.",
+   "difficulty": 1,
+   "refs": [
+    "leaders/napoleon-bonaparte"
+   ]
+  },
+  {
+   "id": "born-napoleon-bonaparte",
+   "kind": "mc",
+   "prompt": "In which year was Napoleon Bonaparte born?",
+   "answer": "1769",
+   "wrong": [
+    "1799",
+    "1739",
+    "1789"
+   ],
+   "explain": "Napoleon Bonaparte (1769–1821): Crowned himself Emperor of the French.",
+   "difficulty": 3,
+   "refs": [
+    "leaders/napoleon-bonaparte"
+   ]
+  },
+  {
+   "id": "who-simon-bolivar",
+   "kind": "mc",
+   "prompt": "Who is this? He led several South American countries to independence from Spain.",
+   "answer": "Simón Bolívar",
+   "wrong": [
+    "Peter the Great",
+    "Elizabeth II",
+    "Abraham Lincoln"
+   ],
+   "explain": "Simón Bolívar (1783–1830): Led several South American countries to independence from Spain.",
+   "difficulty": 2,
+   "refs": [
+    "leaders/simon-bolivar"
+   ]
+  },
+  {
+   "id": "born-simon-bolivar",
+   "kind": "mc",
+   "prompt": "In which year was Simón Bolívar born?",
+   "answer": "1783",
+   "wrong": [
+    "1753",
+    "1763",
+    "1773"
+   ],
+   "explain": "Simón Bolívar (1783–1830): Led several South American countries to independence from Spain.",
+   "difficulty": 3,
+   "refs": [
+    "leaders/simon-bolivar"
+   ]
+  },
+  {
+   "id": "who-queen-victoria",
+   "kind": "mc",
+   "prompt": "Who is this? An era of British history is named after her.",
+   "answer": "Queen Victoria",
+   "wrong": [
+    "Catherine the Great",
+    "John F. Kennedy",
+    "Elizabeth I"
+   ],
+   "explain": "Queen Victoria (1819–1901): An era of British history is named after her.",
+   "difficulty": 1,
+   "refs": [
+    "leaders/queen-victoria"
+   ]
+  },
+  {
+   "id": "born-queen-victoria",
+   "kind": "mc",
+   "prompt": "In which year was Queen Victoria born?",
+   "answer": "1819",
+   "wrong": [
+    "1809",
+    "1799",
+    "1849"
+   ],
+   "explain": "Queen Victoria (1819–1901): An era of British history is named after her.",
+   "difficulty": 3,
+   "refs": [
+    "leaders/queen-victoria"
+   ]
+  },
+  {
+   "id": "who-abraham-lincoln",
+   "kind": "mc",
+   "prompt": "Who is this? He was the 16th US president, assassinated in 1865.",
+   "answer": "Abraham Lincoln",
+   "wrong": [
+    "Queen Victoria",
+    "Charles de Gaulle",
+    "Barack Obama"
+   ],
+   "explain": "Abraham Lincoln (1809–1865): The 16th US president, assassinated in 1865.",
+   "difficulty": 1,
+   "refs": [
+    "leaders/abraham-lincoln"
+   ]
+  },
+  {
+   "id": "born-abraham-lincoln",
+   "kind": "mc",
+   "prompt": "In which year was Abraham Lincoln born?",
+   "answer": "1809",
+   "wrong": [
+    "1829",
+    "1819",
+    "1789"
+   ],
+   "explain": "Abraham Lincoln (1809–1865): The 16th US president, assassinated in 1865.",
+   "difficulty": 3,
+   "refs": [
+    "leaders/abraham-lincoln"
+   ]
+  },
+  {
+   "id": "who-otto-von-bismarck",
+   "kind": "mc",
+   "prompt": "Who is this? He was the first chancellor of the German Empire.",
+   "answer": "Otto von Bismarck",
+   "wrong": [
+    "Napoleon Bonaparte",
+    "Barack Obama",
+    "Genghis Khan"
+   ],
+   "explain": "Otto von Bismarck (1815–1898): The first chancellor of the German Empire.",
+   "difficulty": 3,
+   "refs": [
+    "leaders/otto-von-bismarck"
+   ]
+  },
+  {
+   "id": "born-otto-von-bismarck",
+   "kind": "mc",
+   "prompt": "In which year was Otto von Bismarck born?",
+   "answer": "1815",
+   "wrong": [
+    "1835",
+    "1825",
+    "1805"
+   ],
+   "explain": "Otto von Bismarck (1815–1898): The first chancellor of the German Empire.",
+   "difficulty": 3,
+   "refs": [
+    "leaders/otto-von-bismarck"
+   ]
+  },
+  {
+   "id": "who-theodore-roosevelt",
+   "kind": "mc",
+   "prompt": "Who is this? He was the 26th US president.",
+   "answer": "Theodore Roosevelt",
+   "wrong": [
+    "Otto von Bismarck",
+    "Julius Caesar",
+    "Margaret Thatcher"
+   ],
+   "explain": "Theodore Roosevelt (1858–1919): The 26th US president.",
+   "difficulty": 2,
+   "refs": [
+    "leaders/theodore-roosevelt"
+   ]
+  },
+  {
+   "id": "born-theodore-roosevelt",
+   "kind": "mc",
+   "prompt": "In which year was Theodore Roosevelt born?",
+   "answer": "1858",
+   "wrong": [
+    "1828",
+    "1838",
+    "1888"
+   ],
+   "explain": "Theodore Roosevelt (1858–1919): The 26th US president.",
+   "difficulty": 3,
+   "refs": [
+    "leaders/theodore-roosevelt"
+   ]
+  },
+  {
+   "id": "who-winston-churchill",
+   "kind": "mc",
+   "prompt": "Who is this? He was Britain's prime minister during most of the Second World War.",
+   "answer": "Winston Churchill",
+   "wrong": [
+    "Abraham Lincoln",
+    "Margaret Thatcher",
+    "Nelson Mandela"
+   ],
+   "explain": "Winston Churchill (1874–1965): Britain's prime minister during most of the Second World War.",
+   "difficulty": 1,
+   "refs": [
+    "leaders/winston-churchill"
+   ]
+  },
+  {
+   "id": "born-winston-churchill",
+   "kind": "mc",
+   "prompt": "In which year was Winston Churchill born?",
+   "answer": "1874",
+   "wrong": [
+    "1884",
+    "1894",
+    "1864"
+   ],
+   "explain": "Winston Churchill (1874–1965): Britain's prime minister during most of the Second World War.",
+   "difficulty": 3,
+   "refs": [
+    "leaders/winston-churchill"
+   ]
+  },
+  {
+   "id": "who-mahatma-gandhi",
+   "kind": "mc",
+   "prompt": "Who is this? He led India's independence movement against British rule.",
+   "answer": "Mahatma Gandhi",
+   "wrong": [
+    "Cleopatra",
+    "Louis XIV",
+    "Nelson Mandela"
+   ],
+   "explain": "Mahatma Gandhi (1869–1948): Led India's independence movement against British rule.",
+   "difficulty": 1,
+   "refs": [
+    "leaders/mahatma-gandhi"
+   ]
+  },
+  {
+   "id": "born-mahatma-gandhi",
+   "kind": "mc",
+   "prompt": "In which year was Mahatma Gandhi born?",
+   "answer": "1869",
+   "wrong": [
+    "1839",
+    "1899",
+    "1879"
+   ],
+   "explain": "Mahatma Gandhi (1869–1948): Led India's independence movement against British rule.",
+   "difficulty": 3,
+   "refs": [
+    "leaders/mahatma-gandhi"
+   ]
+  },
+  {
+   "id": "who-franklin-d-roosevelt",
+   "kind": "mc",
+   "prompt": "Who is this? He was the only US president elected four times.",
+   "answer": "Franklin D. Roosevelt",
+   "wrong": [
+    "Abraham Lincoln",
+    "Louis XIV",
+    "Elizabeth II"
+   ],
+   "explain": "Franklin D. Roosevelt (1882–1945): The only US president elected four times.",
+   "difficulty": 2,
+   "refs": [
+    "leaders/franklin-d-roosevelt"
+   ]
+  },
+  {
+   "id": "born-franklin-d-roosevelt",
+   "kind": "mc",
+   "prompt": "In which year was Franklin D. Roosevelt born?",
+   "answer": "1882",
+   "wrong": [
+    "1872",
+    "1902",
+    "1862"
+   ],
+   "explain": "Franklin D. Roosevelt (1882–1945): The only US president elected four times.",
+   "difficulty": 3,
+   "refs": [
+    "leaders/franklin-d-roosevelt"
+   ]
+  },
+  {
+   "id": "who-haile-selassie",
+   "kind": "mc",
+   "prompt": "Who is this? He was the last emperor of Ethiopia.",
+   "answer": "Haile Selassie",
+   "wrong": [
+    "Barack Obama",
+    "Henry VIII",
+    "Margaret Thatcher"
+   ],
+   "explain": "Haile Selassie (1892–1975): The last emperor of Ethiopia.",
+   "difficulty": 3,
+   "refs": [
+    "leaders/haile-selassie"
+   ]
+  },
+  {
+   "id": "born-haile-selassie",
+   "kind": "mc",
+   "prompt": "In which year was Haile Selassie born?",
+   "answer": "1892",
+   "wrong": [
+    "1912",
+    "1882",
+    "1862"
+   ],
+   "explain": "Haile Selassie (1892–1975): The last emperor of Ethiopia.",
+   "difficulty": 3,
+   "refs": [
+    "leaders/haile-selassie"
+   ]
+  },
+  {
+   "id": "who-mao-zedong",
+   "kind": "mc",
+   "prompt": "Who is this? He founded the People's Republic of China.",
+   "answer": "Mao Zedong",
+   "wrong": [
+    "John F. Kennedy",
+    "Henry VIII",
+    "Napoleon Bonaparte"
+   ],
+   "explain": "Mao Zedong (1893–1976): Founded the People's Republic of China.",
+   "difficulty": 2,
+   "refs": [
+    "leaders/mao-zedong"
+   ]
+  },
+  {
+   "id": "born-mao-zedong",
+   "kind": "mc",
+   "prompt": "In which year was Mao Zedong born?",
+   "answer": "1893",
+   "wrong": [
+    "1913",
+    "1923",
+    "1863"
+   ],
+   "explain": "Mao Zedong (1893–1976): Founded the People's Republic of China.",
+   "difficulty": 3,
+   "refs": [
+    "leaders/mao-zedong"
+   ]
+  },
+  {
+   "id": "who-charles-de-gaulle",
+   "kind": "mc",
+   "prompt": "Who is this? He was President of France from 1959 to 1969.",
+   "answer": "Charles de Gaulle",
+   "wrong": [
+    "John F. Kennedy",
+    "Peter the Great",
+    "Julius Caesar"
+   ],
+   "explain": "Charles de Gaulle (1890–1970): President of France from 1959 to 1969.",
+   "difficulty": 3,
+   "refs": [
+    "leaders/charles-de-gaulle"
+   ]
+  },
+  {
+   "id": "born-charles-de-gaulle",
+   "kind": "mc",
+   "prompt": "In which year was Charles de Gaulle born?",
+   "answer": "1890",
+   "wrong": [
+    "1910",
+    "1920",
+    "1880"
+   ],
+   "explain": "Charles de Gaulle (1890–1970): President of France from 1959 to 1969.",
+   "difficulty": 3,
+   "refs": [
+    "leaders/charles-de-gaulle"
+   ]
+  },
+  {
+   "id": "who-john-f-kennedy",
+   "kind": "mc",
+   "prompt": "Who is this? He was the 35th US president, assassinated in Dallas in 1963.",
+   "answer": "John F. Kennedy",
+   "wrong": [
+    "Mahatma Gandhi",
+    "Charles de Gaulle",
+    "Akbar"
+   ],
+   "explain": "John F. Kennedy (1917–1963): The 35th US president, assassinated in Dallas in 1963.",
+   "difficulty": 1,
+   "refs": [
+    "leaders/john-f-kennedy"
+   ]
+  },
+  {
+   "id": "born-john-f-kennedy",
+   "kind": "mc",
+   "prompt": "In which year was John F. Kennedy born?",
+   "answer": "1917",
+   "wrong": [
+    "1947",
+    "1897",
+    "1887"
+   ],
+   "explain": "John F. Kennedy (1917–1963): The 35th US president, assassinated in Dallas in 1963.",
+   "difficulty": 3,
+   "refs": [
+    "leaders/john-f-kennedy"
+   ]
+  },
+  {
+   "id": "who-nelson-mandela",
+   "kind": "mc",
+   "prompt": "Who is this? He was South Africa's first Black president.",
+   "answer": "Nelson Mandela",
+   "wrong": [
+    "Mao Zedong",
+    "Elizabeth II",
+    "Margaret Thatcher"
+   ],
+   "explain": "Nelson Mandela (1918–2013): South Africa's first Black president.",
+   "difficulty": 1,
+   "refs": [
+    "leaders/nelson-mandela"
+   ]
+  },
+  {
+   "id": "born-nelson-mandela",
+   "kind": "mc",
+   "prompt": "In which year was Nelson Mandela born?",
+   "answer": "1918",
+   "wrong": [
+    "1948",
+    "1888",
+    "1938"
+   ],
+   "explain": "Nelson Mandela (1918–2013): South Africa's first Black president.",
+   "difficulty": 3,
+   "refs": [
+    "leaders/nelson-mandela"
+   ]
+  },
+  {
+   "id": "who-indira-gandhi",
+   "kind": "mc",
+   "prompt": "Who is this? She was India's first female prime minister.",
+   "answer": "Indira Gandhi",
+   "wrong": [
+    "Golda Meir",
+    "Augustus",
+    "Barack Obama"
+   ],
+   "explain": "Indira Gandhi (1917–1984): India's first female prime minister.",
+   "difficulty": 3,
+   "refs": [
+    "leaders/indira-gandhi"
+   ]
+  },
+  {
+   "id": "born-indira-gandhi",
+   "kind": "mc",
+   "prompt": "In which year was Indira Gandhi born?",
+   "answer": "1917",
+   "wrong": [
+    "1937",
+    "1907",
+    "1897"
+   ],
+   "explain": "Indira Gandhi (1917–1984): India's first female prime minister.",
+   "difficulty": 3,
+   "refs": [
+    "leaders/indira-gandhi"
+   ]
+  },
+  {
+   "id": "who-golda-meir",
+   "kind": "mc",
+   "prompt": "Who is this? She was Israel's first female prime minister.",
+   "answer": "Golda Meir",
+   "wrong": [
+    "Mao Zedong",
+    "Elizabeth II",
+    "Catherine the Great"
+   ],
+   "explain": "Golda Meir (1898–1978): Israel's first female prime minister.",
+   "difficulty": 3,
+   "refs": [
+    "leaders/golda-meir"
+   ]
+  },
+  {
+   "id": "born-golda-meir",
+   "kind": "mc",
+   "prompt": "In which year was Golda Meir born?",
+   "answer": "1898",
+   "wrong": [
+    "1878",
+    "1888",
+    "1908"
+   ],
+   "explain": "Golda Meir (1898–1978): Israel's first female prime minister.",
+   "difficulty": 3,
+   "refs": [
+    "leaders/golda-meir"
+   ]
+  },
+  {
+   "id": "who-margaret-thatcher",
+   "kind": "mc",
+   "prompt": "Who is this? She was Britain's first female prime minister.",
+   "answer": "Margaret Thatcher",
+   "wrong": [
+    "Mao Zedong",
+    "Henry VIII",
+    "Catherine the Great"
+   ],
+   "explain": "Margaret Thatcher (1925–2013): Britain's first female prime minister.",
+   "difficulty": 2,
+   "refs": [
+    "leaders/margaret-thatcher"
+   ]
+  },
+  {
+   "id": "born-margaret-thatcher",
+   "kind": "mc",
+   "prompt": "In which year was Margaret Thatcher born?",
+   "answer": "1925",
+   "wrong": [
+    "1955",
+    "1905",
+    "1895"
+   ],
+   "explain": "Margaret Thatcher (1925–2013): Britain's first female prime minister.",
+   "difficulty": 3,
+   "refs": [
+    "leaders/margaret-thatcher"
+   ]
+  },
+  {
+   "id": "who-angela-merkel",
+   "kind": "mc",
+   "prompt": "Who is this? She was Germany's first female chancellor.",
+   "answer": "Angela Merkel",
+   "wrong": [
+    "Louis XIV",
+    "Winston Churchill",
+    "Otto von Bismarck"
+   ],
+   "explain": "Angela Merkel (1954): Germany's first female chancellor.",
+   "difficulty": 2,
+   "refs": [
+    "leaders/angela-merkel"
+   ]
+  },
+  {
+   "id": "born-angela-merkel",
+   "kind": "mc",
+   "prompt": "In which year was Angela Merkel born?",
+   "answer": "1954",
+   "wrong": [
+    "1944",
+    "1974",
+    "1924"
+   ],
+   "explain": "Angela Merkel (1954): Germany's first female chancellor.",
+   "difficulty": 3,
+   "refs": [
+    "leaders/angela-merkel"
+   ]
+  },
+  {
+   "id": "who-barack-obama",
+   "kind": "mc",
+   "prompt": "Who is this? He was the 44th and first African American US president.",
+   "answer": "Barack Obama",
+   "wrong": [
+    "Louis XIV",
+    "Akbar",
+    "Theodore Roosevelt"
+   ],
+   "explain": "Barack Obama (1961): The 44th and first African American US president.",
+   "difficulty": 1,
+   "refs": [
+    "leaders/barack-obama"
+   ]
+  },
+  {
+   "id": "born-barack-obama",
+   "kind": "mc",
+   "prompt": "In which year was Barack Obama born?",
+   "answer": "1961",
+   "wrong": [
+    "1971",
+    "1931",
+    "1991"
+   ],
+   "explain": "Barack Obama (1961): The 44th and first African American US president.",
+   "difficulty": 3,
+   "refs": [
+    "leaders/barack-obama"
+   ]
+  },
+  {
+   "id": "who-elizabeth-ii",
+   "kind": "mc",
+   "prompt": "Who is this? She was the longest-reigning British monarch.",
+   "answer": "Elizabeth II",
+   "wrong": [
+    "Otto von Bismarck",
+    "Haile Selassie",
+    "Elizabeth I"
+   ],
+   "explain": "Elizabeth II (1926–2022): The longest-reigning British monarch.",
+   "difficulty": 1,
+   "refs": [
+    "leaders/elizabeth-ii"
+   ]
+  },
+  {
+   "id": "born-elizabeth-ii",
+   "kind": "mc",
+   "prompt": "In which year was Elizabeth II born?",
+   "answer": "1926",
+   "wrong": [
+    "1956",
+    "1906",
+    "1946"
+   ],
+   "explain": "Elizabeth II (1926–2022): The longest-reigning British monarch.",
+   "difficulty": 3,
+   "refs": [
+    "leaders/elizabeth-ii"
+   ]
+  },
+  {
+   "id": "who-akbar",
+   "kind": "mc",
+   "prompt": "Who is this? He was the third Mughal emperor of India.",
+   "answer": "Akbar",
+   "wrong": [
+    "Augustus",
+    "Indira Gandhi",
+    "Angela Merkel"
+   ],
+   "explain": "Akbar (1542–1605): The third Mughal emperor of India.",
+   "difficulty": 3,
+   "refs": [
+    "leaders/akbar"
+   ]
+  },
+  {
+   "id": "born-akbar",
+   "kind": "mc",
+   "prompt": "In which year was Akbar born?",
+   "answer": "1542",
+   "wrong": [
+    "1522",
+    "1552",
+    "1572"
+   ],
+   "explain": "Akbar (1542–1605): The third Mughal emperor of India.",
+   "difficulty": 3,
+   "refs": [
+    "leaders/akbar"
+   ]
+  }
+ ],
+ "sources": [
+  {
+   "name": "Wikidata (birth/death dates, portraits)",
+   "url": "https://www.wikidata.org"
+  },
+  {
+   "name": "Wikimedia Commons (portraits, licence-checked)",
+   "url": "https://commons.wikimedia.org"
+  }
+ ]
+}

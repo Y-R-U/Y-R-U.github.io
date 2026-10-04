@@ -1,0 +1,82 @@
+currencies/algerian-dinar: only 4 clean clues -> no ladder
+currencies/bahraini-dinar: only 4 clean clues -> no ladder
+currencies/belarusian-ruble: only 4 clean clues -> no ladder
+currencies/west-african-cfa-franc: only 4 clean clues -> no ladder
+currencies/bhutanese-ngultrum: only 4 clean clues -> no ladder
+currencies/bolivian-boliviano: only 4 clean clues -> no ladder
+currencies/bosnia-and-herzegovina-convertible-mark: only 4 clean clues -> no ladder
+currencies/botswana-pula: only 4 clean clues -> no ladder
+currencies/burundian-franc: only 4 clean clues -> no ladder
+currencies/central-african-cfa-franc: only 3 clean clues -> no ladder
+currencies/cape-verdean-escudo: only 4 clean clues -> no ladder
+currencies/comorian-franc: only 4 clean clues -> no ladder
+currencies/cuban-peso: dropped clue leaking "cuba": It is the currency of Cuba.
+currencies/djiboutian-franc: only 3 clean clues -> no ladder
+currencies/eritrean-nakfa: only 4 clean clues -> no ladder
+currencies/ethiopian-birr: only 4 clean clues -> no ladder
+currencies/fijian-dollar: dropped clue leaking "fiji": It is the currency of Fiji.
+currencies/gambian-dalasi: only 4 clean clues -> no ladder
+currencies/guatemalan-quetzal: only 3 clean clues -> no ladder
+currencies/guinean-franc: only 4 clean clues -> no ladder
+currencies/haitian-gourde: only 4 clean clues -> no ladder
+currencies/honduran-lempira: only 4 clean clues -> no ladder
+currencies/iranian-rial: dropped clue leaking "iran": It is the currency of Iran.
+currencies/iranian-rial: only 4 clean clues -> no ladder
+currencies/iraqi-dinar: dropped clue leaking "iraq": It is the currency of Iraq.
+currencies/iraqi-dinar: only 4 clean clues -> no ladder
+currencies/israeli-new-shekel: only 4 clean clues -> no ladder
+currencies/jordanian-dinar: only 4 clean clues -> no ladder
+currencies/kenyan-shilling: only 4 clean clues -> no ladder
+currencies/kuwaiti-dinar: only 3 clean clues -> no ladder
+currencies/kyrgyz-som: only 4 clean clues -> no ladder
+currencies/lebanese-pound: only 4 clean clues -> no ladder
+currencies/lesotho-loti: only 4 clean clues -> no ladder
+currencies/south-african-rand: only 4 clean clues -> no ladder
+currencies/libyan-dinar: only 4 clean clues -> no ladder
+currencies/malawian-kwacha: only 4 clean clues -> no ladder
+currencies/maldivian-rufiyaa: only 4 clean clues -> no ladder
+currencies/mauritanian-ouguiya: only 4 clean clues -> no ladder
+currencies/mauritian-rupee: only 4 clean clues -> no ladder
+currencies/mexican-peso: only 4 clean clues -> no ladder
+currencies/moldovan-leu: only 4 clean clues -> no ladder
+currencies/moroccan-dirham: only 4 clean clues -> no ladder
+currencies/mozambican-metical: only 4 clean clues -> no ladder
+currencies/myanmar-kyat: only 4 clean clues -> no ladder
+currencies/nepalese-rupee: only 4 clean clues -> no ladder
+currencies/nicaraguan-cordoba: only 4 clean clues -> no ladder
+currencies/macedonian-denar: only 4 clean clues -> no ladder
+currencies/omani-rial: dropped clue leaking "oman": It is the currency of Oman.
+currencies/omani-rial: only 4 clean clues -> no ladder
+currencies/pakistani-rupee: only 4 clean clues -> no ladder
+currencies/papua-new-guinean-kina: only 4 clean clues -> no ladder
+currencies/qatari-riyal: only 4 clean clues -> no ladder
+currencies/romanian-leu: only 4 clean clues -> no ladder
+currencies/rwandan-franc: only 4 clean clues -> no ladder
+currencies/samoan-tala: only 4 clean clues -> no ladder
+currencies/sao-tome-and-principe-dobra: only 3 clean clues -> no ladder
+currencies/saudi-riyal: dropped clue leaking "riya": You could spend it in Riyadh.
+currencies/saudi-riyal: only 3 clean clues -> no ladder
+currencies/serbian-dinar: only 4 clean clues -> no ladder
+currencies/seychellois-rupee: only 4 clean clues -> no ladder
+currencies/sierra-leonean-leone: only 4 clean clues -> no ladder
+currencies/singapore-dollar: only 4 clean clues -> no ladder
+currencies/somali-shilling: only 4 clean clues -> no ladder
+currencies/south-sudanese-pound: only 4 clean clues -> no ladder
+currencies/sri-lankan-rupee: dropped clue leaking "sri": You could spend it in Sri Jayawardenepura Kotte.
+currencies/sri-lankan-rupee: only 3 clean clues -> no ladder
+currencies/sudanese-pound: only 4 clean clues -> no ladder
+currencies/swedish-krona: dropped clue leaking "swed": It is the currency of Sweden.
+currencies/syrian-pound: only 4 clean clues -> no ladder
+currencies/tajikistani-somoni: only 4 clean clues -> no ladder
+currencies/tanzanian-shilling: only 4 clean clues -> no ladder
+currencies/tongan-pa-anga: only 4 clean clues -> no ladder
+currencies/tunisian-dinar: only 3 clean clues -> no ladder
+currencies/turkish-lira: dropped clue leaking "turk": It is the currency of Turkey.
+currencies/turkmenistan-manat: only 4 clean clues -> no ladder
+currencies/ugandan-shilling: only 4 clean clues -> no ladder
+currencies/uzbekistani-sum: only 4 clean clues -> no ladder
+currencies/vanuatu-vatu: only 4 clean clues -> no ladder
+currencies/venezuelan-bolivar: only 4 clean clues -> no ladder
+currencies/yemeni-rial: only 3 clean clues -> no ladder
+currencies/zambian-kwacha: only 4 clean clues -> no ladder
+currencies/zimbabwe-gold-zig: only 4 clean clues -> no ladder

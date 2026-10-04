@@ -1,0 +1,456 @@
+{
+ "dropped": [],
+ "offby": [
+  "2011 apple 2010 (earliest original 2010)  Maroon 5 — Moves Like Jagger  [Hands All Over (Deluxe Edition)]"
+ ],
+ "items": [
+  {
+   "id": "tik-tok-kesha",
+   "appleYear": 2009,
+   "album": "Animal (Expanded Edition)",
+   "appleArtist": "Kesha",
+   "appleTitle": "TiK ToK",
+   "year": 2009
+  },
+  {
+   "id": "hey-soul-sister-train",
+   "appleYear": 2009,
+   "album": "Save Me, San Francisco (Golden Gate Edition)",
+   "appleArtist": "Train",
+   "appleTitle": "Hey, Soul Sister",
+   "year": 2009
+  },
+  {
+   "id": "california-gurls-katy-perry",
+   "appleYear": 2010,
+   "album": "Teenage Dream (Deluxe Edition)",
+   "appleArtist": "Katy Perry",
+   "appleTitle": "California Gurls (feat. Snoop Dogg)",
+   "year": 2010
+  },
+  {
+   "id": "love-the-way-you-lie-eminem",
+   "appleYear": 2010,
+   "album": "Recovery",
+   "appleArtist": "Eminem",
+   "appleTitle": "Love the Way You Lie (feat. Rihanna)",
+   "year": 2010
+  },
+  {
+   "id": "just-the-way-you-are-bruno-mars",
+   "appleYear": 2010,
+   "album": "Doo-Wops & Hooligans",
+   "appleArtist": "Bruno Mars",
+   "appleTitle": "Just the Way You Are",
+   "year": 2010
+  },
+  {
+   "id": "grenade-bruno-mars",
+   "appleYear": 2010,
+   "album": "Doo-Wops & Hooligans",
+   "appleArtist": "Bruno Mars",
+   "appleTitle": "Grenade",
+   "year": 2010
+  },
+  {
+   "id": "firework-katy-perry",
+   "appleYear": 2010,
+   "album": "Teenage Dream",
+   "appleArtist": "Katy Perry",
+   "appleTitle": "Firework",
+   "year": 2010
+  },
+  {
+   "id": "rolling-in-the-deep-adele",
+   "appleYear": 2010,
+   "album": "21",
+   "appleArtist": "Adele",
+   "appleTitle": "Rolling in the Deep",
+   "year": 2010
+  },
+  {
+   "id": "someone-like-you-adele",
+   "appleYear": 2011,
+   "album": "21",
+   "appleArtist": "Adele",
+   "appleTitle": "Someone Like You",
+   "year": 2011
+  },
+  {
+   "id": "party-rock-anthem-lmfao",
+   "appleYear": 2011,
+   "album": "Sorry for Party Rocking (Deluxe Version)",
+   "appleArtist": "LMFAO",
+   "appleTitle": "Party Rock Anthem (feat. Lauren Bennett & GoonRock)",
+   "year": 2011
+  },
+  {
+   "id": "moves-like-jagger-maroon-5",
+   "appleYear": 2010,
+   "album": "Hands All Over (Deluxe Edition)",
+   "appleArtist": "Maroon 5",
+   "appleTitle": "Moves Like Jagger (feat. Christina Aguilera)",
+   "year": 2011
+  },
+  {
+   "id": "give-me-everything-pitbull",
+   "appleYear": 2011,
+   "album": "Planet Pit (Deluxe Version)",
+   "appleArtist": "Pitbull",
+   "appleTitle": "Give Me Everything (feat. Ne-Yo, Afrojack & Nayer)",
+   "year": 2011
+  },
+  {
+   "id": "somebody-that-i-used-to-know-gotye",
+   "appleYear": 2011,
+   "album": "Making Mirrors",
+   "appleArtist": "Gotye",
+   "appleTitle": "Somebody That I Used to Know (feat. Kimbra)",
+   "year": 2011
+  },
+  {
+   "id": "call-me-maybe-carly-rae-jepsen",
+   "appleYear": 2011,
+   "album": "Kiss (Deluxe Version)",
+   "appleArtist": "Carly Rae Jepsen",
+   "appleTitle": "Call Me Maybe",
+   "year": 2011
+  },
+  {
+   "id": "we-are-young-fun",
+   "appleYear": 2011,
+   "album": "Some Nights",
+   "appleArtist": "Fun.",
+   "appleTitle": "We Are Young (feat. Janelle Monáe)",
+   "year": 2011
+  },
+  {
+   "id": "we-found-love-rihanna",
+   "appleYear": 2011,
+   "album": "Talk That Talk",
+   "appleArtist": "Rihanna",
+   "appleTitle": "We Found Love (feat. Calvin Harris)",
+   "year": 2011
+  },
+  {
+   "id": "payphone-maroon-5",
+   "appleYear": 2012,
+   "album": "Overexposed (Deluxe Version)",
+   "appleArtist": "Maroon 5",
+   "appleTitle": "Payphone (feat. Wiz Khalifa)",
+   "year": 2012
+  },
+  {
+   "id": "gangnam-style-psy",
+   "appleYear": 2012,
+   "album": "Gangnam Style - Single",
+   "appleArtist": "PSY",
+   "appleTitle": "Gangnam Style",
+   "year": 2012
+  },
+  {
+   "id": "thrift-shop-macklemore-and-ryan-lewis",
+   "appleYear": 2012,
+   "album": "The Heist",
+   "appleArtist": "Macklemore & Ryan Lewis",
+   "appleTitle": "Thrift Shop (feat. Wanz)",
+   "year": 2012
+  },
+  {
+   "id": "radioactive-imagine-dragons",
+   "appleYear": 2012,
+   "album": "Night Visions",
+   "appleArtist": "Imagine Dragons",
+   "appleTitle": "Radioactive",
+   "year": 2012
+  },
+  {
+   "id": "blurred-lines-robin-thicke",
+   "appleYear": 2013,
+   "album": "Blurred Lines (Deluxe Version)",
+   "appleArtist": "Robin Thicke",
+   "appleTitle": "Blurred Lines (feat. T.I. & Pharrell)",
+   "year": 2013
+  },
+  {
+   "id": "get-lucky-daft-punk",
+   "appleYear": 2013,
+   "album": "Random Access Memories",
+   "appleArtist": "Daft Punk, Pharrell Williams & Nile Rodgers",
+   "appleTitle": "Get Lucky",
+   "year": 2013
+  },
+  {
+   "id": "royals-lorde",
+   "appleYear": 2013,
+   "album": "The Love Club EP",
+   "appleArtist": "Lorde",
+   "appleTitle": "Royals",
+   "year": 2013
+  },
+  {
+   "id": "wrecking-ball-miley-cyrus",
+   "appleYear": 2013,
+   "album": "Bangerz (Deluxe Version)",
+   "appleArtist": "Miley Cyrus",
+   "appleTitle": "Wrecking Ball",
+   "year": 2013
+  },
+  {
+   "id": "roar-katy-perry",
+   "appleYear": 2013,
+   "album": "PRISM (Deluxe Version)",
+   "appleArtist": "Katy Perry",
+   "appleTitle": "Roar",
+   "year": 2013
+  },
+  {
+   "id": "happy-pharrell-williams",
+   "appleYear": 2013,
+   "album": "G I R L",
+   "appleArtist": "Pharrell Williams",
+   "appleTitle": "Happy (From \"Despicable Me 2\")",
+   "year": 2013
+  },
+  {
+   "id": "all-of-me-john-legend",
+   "appleYear": 2013,
+   "album": "Love in the Future (Expanded Edition)",
+   "appleArtist": "John Legend",
+   "appleTitle": "All of Me",
+   "year": 2013
+  },
+  {
+   "id": "let-it-go-idina-menzel",
+   "appleYear": 2013,
+   "album": "Frozen (Original Motion Picture Soundtrack)",
+   "appleArtist": "Idina Menzel",
+   "appleTitle": "Let It Go",
+   "year": 2013
+  },
+  {
+   "id": "stay-with-me-sam-smith",
+   "appleYear": 2014,
+   "album": "In the Lonely Hour",
+   "appleArtist": "Sam Smith",
+   "appleTitle": "Stay With Me",
+   "year": 2014
+  },
+  {
+   "id": "shake-it-off-taylor-swift",
+   "appleYear": 2014,
+   "album": "1989 (Deluxe Edition)",
+   "appleArtist": "Taylor Swift",
+   "appleTitle": "Shake It Off",
+   "year": 2014
+  },
+  {
+   "id": "uptown-funk-mark-ronson",
+   "appleYear": 2014,
+   "album": "Uptown Special",
+   "appleArtist": "Mark Ronson",
+   "appleTitle": "Uptown Funk (feat. Bruno Mars)",
+   "year": 2014
+  },
+  {
+   "id": "thinking-out-loud-ed-sheeran",
+   "appleYear": 2014,
+   "album": "x (Wembley Edition)",
+   "appleArtist": "Ed Sheeran",
+   "appleTitle": "Thinking Out Loud",
+   "year": 2014
+  },
+  {
+   "id": "see-you-again-wiz-khalifa",
+   "appleYear": 2015,
+   "album": "Furious 7 (Original Motion Picture Soundtrack)",
+   "appleArtist": "Wiz Khalifa",
+   "appleTitle": "See You Again (feat. Charlie Puth)",
+   "year": 2015
+  },
+  {
+   "id": "hello-adele",
+   "appleYear": 2015,
+   "album": "25",
+   "appleArtist": "Adele",
+   "appleTitle": "Hello",
+   "year": 2015
+  },
+  {
+   "id": "shut-up-and-dance-walk-the-moon",
+   "appleYear": 2014,
+   "album": "TALKING IS HARD (Expanded Edition)",
+   "appleArtist": "WALK THE MOON",
+   "appleTitle": "Shut Up and Dance",
+   "year": 2014
+  },
+  {
+   "id": "love-yourself-justin-bieber",
+   "appleYear": 2015,
+   "album": "Purpose (Deluxe)",
+   "appleArtist": "Justin Bieber",
+   "appleTitle": "Love Yourself",
+   "year": 2015
+  },
+  {
+   "id": "sorry-justin-bieber",
+   "appleYear": 2015,
+   "album": "Purpose (Deluxe)",
+   "appleArtist": "Justin Bieber",
+   "appleTitle": "Sorry",
+   "year": 2015
+  },
+  {
+   "id": "one-dance-drake",
+   "appleYear": 2016,
+   "album": "Views",
+   "appleArtist": "Drake",
+   "appleTitle": "One Dance (feat. Wizkid & Kyla)",
+   "year": 2016
+  },
+  {
+   "id": "work-rihanna",
+   "appleYear": 2016,
+   "album": "ANTI",
+   "appleArtist": "Rihanna",
+   "appleTitle": "Work (feat. Drake)",
+   "year": 2016
+  },
+  {
+   "id": "cant-stop-the-feeling-justin-timberlake",
+   "appleYear": 2016,
+   "album": "TROLLS (Original Motion Picture Soundtrack)",
+   "appleArtist": "Justin Timberlake",
+   "appleTitle": "CAN'T STOP THE FEELING!",
+   "year": 2016
+  },
+  {
+   "id": "closer-the-chainsmokers",
+   "appleYear": 2016,
+   "album": "Collage - EP",
+   "appleArtist": "The Chainsmokers",
+   "appleTitle": "Closer (feat. Halsey)",
+   "year": 2016
+  },
+  {
+   "id": "cheap-thrills-sia",
+   "appleYear": 2016,
+   "album": "Cheap Thrills (feat. Sean Paul) - Single",
+   "appleArtist": "Sia",
+   "appleTitle": "Cheap Thrills (feat. Sean Paul)",
+   "year": 2016
+  },
+  {
+   "id": "shape-of-you-ed-sheeran",
+   "appleYear": 2017,
+   "album": "÷ (Deluxe)",
+   "appleArtist": "Ed Sheeran",
+   "appleTitle": "Shape of You",
+   "year": 2017
+  },
+  {
+   "id": "despacito-luis-fonsi-and-daddy-yankee",
+   "appleYear": 2017,
+   "album": "Despacito (Versión Urbana/Sky) - Single",
+   "appleArtist": "Luis Fonsi & Daddy Yankee",
+   "appleTitle": "Despacito (Versión Urbana/Sky)",
+   "year": 2017
+  },
+  {
+   "id": "humble-kendrick-lamar",
+   "appleYear": 2017,
+   "album": "DAMN.",
+   "appleArtist": "Kendrick Lamar",
+   "appleTitle": "HUMBLE.",
+   "year": 2017
+  },
+  {
+   "id": "believer-imagine-dragons",
+   "appleYear": 2017,
+   "album": "Evolve",
+   "appleArtist": "Imagine Dragons",
+   "appleTitle": "Believer",
+   "year": 2017
+  },
+  {
+   "id": "perfect-ed-sheeran",
+   "appleYear": 2017,
+   "album": "÷ (Deluxe)",
+   "appleArtist": "Ed Sheeran",
+   "appleTitle": "Perfect",
+   "year": 2017
+  },
+  {
+   "id": "havana-camila-cabello",
+   "appleYear": 2017,
+   "album": "Camila",
+   "appleArtist": "Camila Cabello",
+   "appleTitle": "Havana (feat. Young Thug)",
+   "year": 2017
+  },
+  {
+   "id": "gods-plan-drake",
+   "appleYear": 2018,
+   "album": "Scorpion",
+   "appleArtist": "Drake",
+   "appleTitle": "God's Plan",
+   "year": 2018
+  },
+  {
+   "id": "shallow-lady-gaga-and-bradley-cooper",
+   "appleYear": 2018,
+   "album": "A Star Is Born Soundtrack",
+   "appleArtist": "Lady Gaga & Bradley Cooper",
+   "appleTitle": "Shallow",
+   "year": 2018
+  },
+  {
+   "id": "sunflower-spider-man-into-the-spider-verse-post-malone-and-s",
+   "appleYear": 2018,
+   "album": "Spider-Man: Into the Spider-Verse (Soundtrack From & Inspired by the Motion Picture)",
+   "appleArtist": "Post Malone & Swae Lee",
+   "appleTitle": "Sunflower (Spider-Man: Into the Spider-Verse)",
+   "year": 2018
+  },
+  {
+   "id": "old-town-road-lil-nas-x",
+   "appleYear": 2018,
+   "album": "7",
+   "appleArtist": "Lil Nas X",
+   "appleTitle": "Old Town Road",
+   "year": 2018
+  },
+  {
+   "id": "bad-guy-billie-eilish",
+   "appleYear": 2019,
+   "album": "WHEN WE ALL FALL ASLEEP, WHERE DO WE GO?",
+   "appleArtist": "Billie Eilish",
+   "appleTitle": "bad guy",
+   "year": 2019
+  },
+  {
+   "id": "senorita-shawn-mendes-and-camila-cabello",
+   "appleYear": 2019,
+   "album": "Señorita - Single",
+   "appleArtist": "Shawn Mendes & Camila Cabello",
+   "appleTitle": "Señorita",
+   "year": 2019
+  },
+  {
+   "id": "someone-you-loved-lewis-capaldi",
+   "appleYear": 2018,
+   "album": "Divinely Uninspired To A Hellish Extent",
+   "appleArtist": "Lewis Capaldi",
+   "appleTitle": "Someone You Loved",
+   "year": 2018
+  },
+  {
+   "id": "blinding-lights-the-weeknd",
+   "appleYear": 2019,
+   "album": "After Hours (Deluxe)",
+   "appleArtist": "The Weeknd",
+   "appleTitle": "Blinding Lights",
+   "year": 2019
+  }
+ ]
+}

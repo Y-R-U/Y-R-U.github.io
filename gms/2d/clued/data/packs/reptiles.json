@@ -1,0 +1,2367 @@
+{
+ "id": "reptiles",
+ "title": "Frogs & reptiles",
+ "theme": "animals",
+ "icon": "🐸",
+ "kids": true,
+ "version": 1,
+ "leakExempt": [],
+ "factsMeta": {
+  "cls": {
+   "type": "cat",
+   "label": "Group",
+   "values": [
+    "Reptile",
+    "Amphibian"
+   ]
+  },
+  "region": {
+   "type": "cat",
+   "label": "Found in"
+  },
+  "lengthM": {
+   "type": "num",
+   "label": "Typical adult length",
+   "unit": "m",
+   "higherLabel": "Longer"
+  },
+  "venomous": {
+   "type": "bool",
+   "label": "Venomous or poisonous",
+   "yes": "Venomous or poisonous",
+   "no": "Harmless"
+  },
+  "status": {
+   "type": "cat",
+   "label": "Conservation status (IUCN)",
+   "hard": true
+  }
+ },
+ "items": [
+  {
+   "id": "saltwater-crocodile",
+   "name": "Saltwater crocodile",
+   "alt": [
+    "saltie",
+    "estuarine crocodile"
+   ],
+   "sci": "Crocodylus porosus",
+   "group": "crocodilian",
+   "facts": {
+    "cls": "Reptile",
+    "region": "Australia",
+    "lengthM": 5,
+    "venomous": false,
+    "status": "Least concern"
+   },
+   "lookalikes": [
+    "nile-crocodile",
+    "american-alligator",
+    "gharial"
+   ],
+   "blurb": "The biggest living reptile. It lives in rivers and coasts from India to northern Australia, and it can swim far out to sea.",
+   "clues": [
+    "Its IUCN conservation status is \"Least concern\".",
+    "It can swim hundreds of kilometres across the open sea.",
+    "Its bite is one of the strongest ever measured.",
+    "Large males can be over 6 metres long.",
+    "It is a reptile.",
+    "It lives in Australia.",
+    "Typical adult length: about 5 m.",
+    "It is common in northern Australian rivers.",
+    "It is the biggest living reptile.",
+    "The answer has 2 words (9, 9 letters).",
+    "It starts with the letter S."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/188080748/medium.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Bernard DUPONT",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/188080748"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/28434316/medium.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Julien Renoult",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/28434316"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/51609320/medium.jpeg",
+      "w": 500,
+      "h": 243,
+      "credit": "Dragonette",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/51609320"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "nile-crocodile",
+   "name": "Nile crocodile",
+   "sci": "Crocodylus niloticus",
+   "group": "crocodilian",
+   "facts": {
+    "cls": "Reptile",
+    "region": "Africa",
+    "lengthM": 4.5,
+    "venomous": false,
+    "status": "Least concern"
+   },
+   "lookalikes": [
+    "saltwater-crocodile"
+   ],
+   "blurb": "Africa's biggest crocodile. It ambushes zebras and wildebeest as they cross rivers.",
+   "clues": [
+    "Its IUCN conservation status is \"Least concern\".",
+    "Mothers carry their babies in their mouths.",
+    "It ambushes wildebeest crossing rivers.",
+    "It is a reptile.",
+    "It lives in Africa.",
+    "Typical adult length: about 4.5 m.",
+    "It is named after the world's longest river.",
+    "The answer has 2 words (4, 9 letters).",
+    "It starts with the letter N."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/288027350/medium.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Stephen Temple",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/288027350"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/1068147/medium.JPG",
+      "w": 500,
+      "h": 376,
+      "credit": "116916927065934112165",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/1068147"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/621846407/medium.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Tony King",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/621846407"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "american-alligator",
+   "name": "American alligator",
+   "alt": [
+    "alligator",
+    "gator"
+   ],
+   "sci": "Alligator mississippiensis",
+   "group": "crocodilian",
+   "facts": {
+    "cls": "Reptile",
+    "region": "North America",
+    "lengthM": 3.5,
+    "venomous": false,
+    "status": "Least concern"
+   },
+   "lookalikes": [
+    "saltwater-crocodile"
+   ],
+   "blurb": "A big reptile of the swamps of the south-eastern USA. It has a wide, rounded snout, unlike a crocodile's pointed one.",
+   "clues": [
+    "Its IUCN conservation status is \"Least concern\".",
+    "The temperature of the nest decides if babies are male or female.",
+    "It can live in freshwater swamps.",
+    "It is common in Florida and Louisiana.",
+    "It is a reptile.",
+    "Typical adult length: about 3.5 m.",
+    "Its snout is wide and U-shaped.",
+    "It is found in the swamps of the USA.",
+    "The answer has 2 words (8, 9 letters).",
+    "It starts with the letter A."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/32333837/medium.jpeg",
+      "w": 500,
+      "h": 375,
+      "credit": "Vijay Barve",
+      "license": "CC0 1.0",
+      "page": "https://www.inaturalist.org/photos/32333837"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/113342133/medium.jpeg",
+      "w": 500,
+      "h": 375,
+      "credit": "Kristen Diesburg",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/113342133"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/113744549/medium.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "no rights reserved",
+      "license": "CC0 1.0",
+      "page": "https://www.inaturalist.org/photos/113744549"
+     }
+    ],
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/b/bf/27alligator2bellow.ogg/27alligator2bellow.ogg.mp3",
+      "credit": "Wikimedia Commons",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:27alligator2bellow.ogg",
+      "start": 0
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "gharial",
+   "name": "Gharial",
+   "alt": [
+    "gavial"
+   ],
+   "sci": "Gavialis gangeticus",
+   "group": "crocodilian",
+   "facts": {
+    "cls": "Reptile",
+    "region": "Asia",
+    "lengthM": 4.5,
+    "venomous": false,
+    "status": "Critically endangered"
+   },
+   "lookalikes": [
+    "saltwater-crocodile"
+   ],
+   "blurb": "A crocodilian of Indian rivers with a very long, thin snout for catching fish.",
+   "clues": [
+    "Its IUCN conservation status is \"Critically endangered\".",
+    "Males have a pot-shaped lump on the snout tip.",
+    "It eats mostly fish.",
+    "It is critically endangered.",
+    "It is a reptile.",
+    "It lives in Asia.",
+    "Typical adult length: about 4.5 m.",
+    "It lives in rivers of India and Nepal.",
+    "Its snout is very long and thin.",
+    "The answer is one word of 7 letters.",
+    "It starts with the letter G."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/518604084/medium.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Ryan Somma",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/518604084"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/73811667/medium.jpeg",
+      "w": 500,
+      "h": 333,
+      "credit": "Fábio Olmos",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/73811667"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/73811430/medium.jpeg",
+      "w": 500,
+      "h": 333,
+      "credit": "Fábio Olmos",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/73811430"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "komodo-dragon",
+   "name": "Komodo dragon",
+   "sci": "Varanus komodoensis",
+   "group": "monitor",
+   "facts": {
+    "cls": "Reptile",
+    "region": "Asia",
+    "lengthM": 2.6,
+    "venomous": true
+   },
+   "lookalikes": [
+    "lace-monitor",
+    "perentie"
+   ],
+   "blurb": "The biggest lizard in the world, from a few Indonesian islands. It has a venomous bite.",
+   "clues": [
+    "Family: Varanidae.",
+    "Genus: Varanus.",
+    "Females can lay eggs without a male.",
+    "It can eat 80% of its body weight in one meal.",
+    "Its bite contains venom.",
+    "It lives in Asia.",
+    "Typical adult length: about 2.6 m.",
+    "It is poisonous or venomous.",
+    "It lives on a few Indonesian islands.",
+    "It is the biggest lizard in the world.",
+    "The answer has 2 words (6, 6 letters).",
+    "It starts with the letter K."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/370405210/medium.jpg",
+      "w": 500,
+      "h": 364,
+      "credit": "Unknown author",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/370405210"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/370405218/medium.jpeg",
+      "w": 500,
+      "h": 375,
+      "credit": "Midori",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/370405218"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/414069493/medium.jpeg",
+      "w": 500,
+      "h": 263,
+      "credit": "no rights reserved",
+      "license": "CC0 1.0",
+      "page": "https://www.inaturalist.org/photos/414069493"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "lace-monitor",
+   "name": "Lace monitor",
+   "alt": [
+    "goanna",
+    "tree goanna"
+   ],
+   "sci": "Varanus varius",
+   "group": "monitor",
+   "facts": {
+    "cls": "Reptile",
+    "region": "Australia",
+    "lengthM": 1.7,
+    "venomous": false,
+    "status": "Least concern"
+   },
+   "lookalikes": [
+    "perentie",
+    "komodo-dragon"
+   ],
+   "blurb": "A big goanna of eastern Australia that climbs trees and raids picnic grounds and bird nests.",
+   "clues": [
+    "Its IUCN conservation status is \"Least concern\".",
+    "Family: Varanidae.",
+    "Genus: Varanus.",
+    "It lays its eggs inside termite mounds.",
+    "It raids picnic grounds for food.",
+    "It is a reptile.",
+    "It lives in Australia.",
+    "Typical adult length: about 1.7 m.",
+    "It is the second-largest lizard in Australia.",
+    "The answer has 2 words (4, 7 letters).",
+    "It starts with the letter L."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/167349723/medium.jpeg",
+      "w": 460,
+      "h": 500,
+      "credit": "Tim",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/167349723"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/342810956/medium.jpg",
+      "w": 375,
+      "h": 500,
+      "credit": "Steve Llewellyn",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/342810956"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/624648858/medium.jpg",
+      "w": 382,
+      "h": 500,
+      "credit": "Petra Holland",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/624648858"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "perentie",
+   "name": "Perentie",
+   "sci": "Varanus giganteus",
+   "group": "monitor",
+   "facts": {
+    "cls": "Reptile",
+    "region": "Australia",
+    "lengthM": 2,
+    "venomous": false,
+    "status": "Least concern"
+   },
+   "lookalikes": [
+    "lace-monitor",
+    "komodo-dragon"
+   ],
+   "blurb": "Australia's biggest lizard, a goanna of the desert. It stands up on its back legs to look around.",
+   "clues": [
+    "Family: Varanidae.",
+    "Genus: Varanus.",
+    "Its species name means \"gigantic\".",
+    "It stands on its back legs to look around.",
+    "It lives in the red centre of Australia.",
+    "It is a reptile.",
+    "It lives in Australia.",
+    "Typical adult length: about 2 m.",
+    "It is the largest lizard in Australia.",
+    "It is a desert goanna.",
+    "The answer is one word of 8 letters.",
+    "It starts with the letter P."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/218083438/medium.jpeg",
+      "w": 500,
+      "h": 333,
+      "credit": "Thomas Mesaglio",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/218083438"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/219611915/medium.jpeg",
+      "w": 500,
+      "h": 400,
+      "credit": "Peter Crowcroft",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/219611915"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/126756246/medium.jpeg",
+      "w": 500,
+      "h": 375,
+      "credit": "no rights reserved",
+      "license": "CC0 1.0",
+      "page": "https://www.inaturalist.org/photos/126756246"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "green-iguana",
+   "name": "Green iguana",
+   "alt": [
+    "iguana"
+   ],
+   "sci": "Iguana iguana",
+   "group": "iguana",
+   "facts": {
+    "cls": "Reptile",
+    "region": "the Americas",
+    "lengthM": 1.5,
+    "venomous": false,
+    "status": "Least concern"
+   },
+   "lookalikes": [
+    "marine-iguana"
+   ],
+   "blurb": "A big green lizard of Central and South American forests. It eats leaves and can drop from trees into water.",
+   "clues": [
+    "Its IUCN conservation status is \"Least concern\".",
+    "It has a \"third eye\" on top of its head that senses light.",
+    "It can drop its tail to escape.",
+    "It is invasive in Florida.",
+    "It is a reptile.",
+    "It lives in the Americas.",
+    "Typical adult length: about 1.5 m.",
+    "It has spines down its back.",
+    "The answer has 2 words (5, 6 letters).",
+    "It starts with the letter G."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/12255959/medium.jpg",
+      "w": 375,
+      "h": 500,
+      "credit": "Judy Gallagher",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/12255959"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/382760285/medium.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Thomaz de Carvalho Callado",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/382760285"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/19063248/medium.jpeg",
+      "w": 500,
+      "h": 462,
+      "credit": "Richard Stovall",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/19063248"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "marine-iguana",
+   "name": "Marine iguana",
+   "sci": "Amblyrhynchus cristatus",
+   "group": "iguana",
+   "facts": {
+    "cls": "Reptile",
+    "region": "the Galápagos Islands",
+    "lengthM": 1,
+    "venomous": false,
+    "status": "Vulnerable"
+   },
+   "lookalikes": [
+    "green-iguana"
+   ],
+   "blurb": "The only lizard that feeds in the sea. It dives for seaweed off the Galápagos Islands and sneezes out salt.",
+   "clues": [
+    "Its IUCN conservation status is \"Vulnerable\".",
+    "Genus: Amblyrhynchus.",
+    "Darwin called it an \"imp of darkness\".",
+    "It can shrink its body when food is short.",
+    "It sneezes out salt.",
+    "It is a reptile.",
+    "It lives in the Galápagos Islands.",
+    "Typical adult length: about 1 m.",
+    "It dives for seaweed.",
+    "It is the only lizard that feeds in the sea.",
+    "The answer has 2 words (6, 6 letters).",
+    "It starts with the letter M."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/12462590/medium.jpeg",
+      "w": 500,
+      "h": 333,
+      "credit": "patrickc",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/12462590"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/29325122/medium.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Shawn O'Donnell",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/29325122"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/29325793/medium.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Shawn O'Donnell",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/29325793"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "frill-necked-lizard",
+   "name": "Frill-necked lizard",
+   "alt": [
+    "frilled lizard",
+    "frilled dragon"
+   ],
+   "sci": "Chlamydosaurus kingii",
+   "group": "dragon",
+   "facts": {
+    "cls": "Reptile",
+    "region": "Australia",
+    "lengthM": 0.85,
+    "venomous": false,
+    "status": "Least concern"
+   },
+   "blurb": "An Australian lizard that opens a huge frill around its neck to scare enemies, then runs away on its back legs.",
+   "clues": [
+    "Its IUCN conservation status is \"Least concern\".",
+    "Family: Agamidae.",
+    "Genus: Chlamydosaurus.",
+    "It was on the Australian two-cent coin.",
+    "It runs away on its back legs.",
+    "It hisses with its mouth wide open.",
+    "It is a reptile.",
+    "It lives in Australia.",
+    "Typical adult length: about 85 cm.",
+    "It lives in northern Australia.",
+    "The answer has 3 words (5, 6, 6 letters).",
+    "It starts with the letter F."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/292292243/medium.jpeg",
+      "w": 500,
+      "h": 375,
+      "credit": "no rights reserved",
+      "license": "CC0 1.0",
+      "page": "https://www.inaturalist.org/photos/292292243"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/543439339/medium.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Romain Boisseau",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/543439339"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/85963801/medium.jpg",
+      "w": 500,
+      "h": 380,
+      "credit": "Tony Eales",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/85963801"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "thorny-devil",
+   "name": "Thorny devil",
+   "alt": [
+    "thorny dragon",
+    "moloch"
+   ],
+   "sci": "Moloch horridus",
+   "group": "dragon",
+   "facts": {
+    "cls": "Reptile",
+    "region": "Australia",
+    "lengthM": 0.2,
+    "venomous": false,
+    "status": "Least concern"
+   },
+   "blurb": "A spiky desert lizard of Australia. It drinks by soaking up water through grooves in its skin.",
+   "clues": [
+    "Its IUCN conservation status is \"Least concern\".",
+    "Family: Agamidae.",
+    "It drinks through grooves in its skin.",
+    "It eats thousands of ants a day.",
+    "It has a false head on its neck.",
+    "It is a reptile.",
+    "It lives in Australia.",
+    "Typical adult length: about 20 cm.",
+    "It lives in Australian deserts.",
+    "It is covered in sharp spikes.",
+    "The answer has 2 words (6, 5 letters).",
+    "It starts with the letter T."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/48698/medium.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Steve Shattuck",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/48698"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/150790361/medium.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "dhfischer",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/150790361"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/108311312/medium.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Connor Margetts",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/108311312"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "eastern-blue-tongued-lizard",
+   "name": "Eastern blue-tongued lizard",
+   "alt": [
+    "blue-tongued skink",
+    "bluey",
+    "blue-tongue"
+   ],
+   "sci": "Tiliqua scincoides",
+   "group": "skink",
+   "facts": {
+    "cls": "Reptile",
+    "region": "Australia",
+    "lengthM": 0.5,
+    "venomous": false,
+    "status": "Least concern"
+   },
+   "blurb": "A big, slow Australian skink that sticks out its bright blue tongue to scare enemies. It eats snails in gardens.",
+   "clues": [
+    "Its IUCN conservation status is \"Least concern\".",
+    "Family: Scincidae.",
+    "Genus: Tiliqua.",
+    "It gives birth to live young.",
+    "It eats snails in gardens.",
+    "It has short legs and a fat tail.",
+    "It is a reptile.",
+    "It lives in Australia.",
+    "Typical adult length: about 50 cm.",
+    "The answer has 4 words (7, 4, 7, 6 letters).",
+    "It starts with the letter E."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/33787887/medium.jpeg",
+      "w": 467,
+      "h": 500,
+      "credit": "Thomas Mesaglio",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/33787887"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/336836540/medium.jpeg",
+      "w": 233,
+      "h": 500,
+      "credit": "no rights reserved",
+      "license": "CC0 1.0",
+      "page": "https://www.inaturalist.org/photos/336836540"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/389707734/medium.jpg",
+      "w": 500,
+      "h": 500,
+      "credit": "Sockrosma",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/389707734"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "central-bearded-dragon",
+   "name": "Central bearded dragon",
+   "alt": [
+    "bearded dragon",
+    "beardie"
+   ],
+   "sci": "Pogona vitticeps",
+   "group": "dragon",
+   "facts": {
+    "cls": "Reptile",
+    "region": "Australia",
+    "lengthM": 0.5,
+    "venomous": false,
+    "status": "Least concern"
+   },
+   "blurb": "A spiky Australian lizard that puffs out a dark \"beard\" when scared. It is a very popular pet.",
+   "clues": [
+    "Its IUCN conservation status is \"Least concern\".",
+    "Family: Agamidae.",
+    "Genus: Pogona.",
+    "It waves its arm to show it is not a threat.",
+    "It turns its throat black when stressed.",
+    "It is one of the most popular pet lizards.",
+    "It is a reptile.",
+    "It lives in Australia.",
+    "Typical adult length: about 50 cm.",
+    "It lives in inland Australia.",
+    "The answer has 3 words (7, 7, 6 letters).",
+    "It starts with the letter C."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/74009398/medium.jpeg",
+      "w": 500,
+      "h": 332,
+      "credit": "Chris Lindorff",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/74009398"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/450652528/medium.jpg",
+      "w": 500,
+      "h": 334,
+      "credit": "Will Brown",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/450652528"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/450652520/medium.jpg",
+      "w": 500,
+      "h": 385,
+      "credit": "Frank C. Müller",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/450652520"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "gila-monster",
+   "name": "Gila monster",
+   "sci": "Heloderma suspectum",
+   "group": "beaded lizard",
+   "facts": {
+    "cls": "Reptile",
+    "region": "North America",
+    "lengthM": 0.5,
+    "venomous": true,
+    "status": "Near threatened"
+   },
+   "blurb": "A venomous lizard of the south-western USA and Mexico with beaded pink-and-black skin. Its venom led to a diabetes drug.",
+   "clues": [
+    "Family: Helodermatidae.",
+    "Genus: Heloderma.",
+    "A diabetes and weight-loss drug came from its saliva.",
+    "It stores fat in its tail.",
+    "It is one of very few venomous lizards.",
+    "It lives in North America.",
+    "Typical adult length: about 50 cm.",
+    "It is poisonous or venomous.",
+    "Its skin is beaded black and pink.",
+    "It is named after a river in Arizona.",
+    "The answer has 2 words (4, 7 letters).",
+    "It starts with the letter G."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/86410815/medium.jpg",
+      "w": 500,
+      "h": 335,
+      "credit": "H. van der Ploeg",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/86410815"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/53156259/medium.jpeg",
+      "w": 375,
+      "h": 500,
+      "credit": "Matt Berger",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/53156259"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/707619622/medium.jpg",
+      "w": 375,
+      "h": 500,
+      "credit": "Guillermo Roque",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/707619622"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "panther-chameleon",
+   "name": "Panther chameleon",
+   "alt": [
+    "chameleon"
+   ],
+   "sci": "Furcifer pardalis",
+   "group": "chameleon",
+   "facts": {
+    "cls": "Reptile",
+    "region": "Africa",
+    "lengthM": 0.4,
+    "venomous": false,
+    "status": "Least concern"
+   },
+   "lookalikes": [
+    "veiled-chameleon"
+   ],
+   "blurb": "A colourful chameleon from Madagascar. It changes colour and catches insects with a super-fast tongue.",
+   "clues": [
+    "Family: Chamaeleonidae.",
+    "Genus: Furcifer.",
+    "Its tongue can be longer than its body.",
+    "Its eyes move separately.",
+    "It lives on Madagascar.",
+    "It is a reptile.",
+    "It lives in Africa.",
+    "Typical adult length: about 40 cm.",
+    "It grips branches with its tail.",
+    "It changes colour.",
+    "The answer has 2 words (7, 9 letters).",
+    "It starts with the letter P."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/19887/medium.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "McBeul",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/19887"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/188585705/medium.jpg",
+      "w": 500,
+      "h": 331,
+      "credit": "Marius Burger",
+      "license": "CC0 1.0",
+      "page": "https://www.inaturalist.org/photos/188585705"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/162222600/medium.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "no rights reserved",
+      "license": "CC0 1.0",
+      "page": "https://www.inaturalist.org/photos/162222600"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "veiled-chameleon",
+   "name": "Veiled chameleon",
+   "sci": "Chamaeleo calyptratus",
+   "group": "chameleon",
+   "facts": {
+    "cls": "Reptile",
+    "region": "Asia",
+    "lengthM": 0.45,
+    "venomous": false,
+    "status": "Least concern"
+   },
+   "lookalikes": [
+    "panther-chameleon"
+   ],
+   "blurb": "A chameleon from Yemen and Saudi Arabia with a tall casque on its head that helps it collect water.",
+   "clues": [
+    "Its IUCN conservation status is \"Least concern\".",
+    "Family: Chamaeleonidae.",
+    "Genus: Chamaeleo.",
+    "It comes from Yemen and Saudi Arabia.",
+    "Its tall casque funnels water to its mouth.",
+    "Its eyes swivel separately.",
+    "It is a reptile.",
+    "It lives in Asia.",
+    "Typical adult length: about 45 cm.",
+    "It has a tall helmet on its head.",
+    "The answer has 2 words (6, 9 letters).",
+    "It starts with the letter V."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/195949476/medium.jpeg",
+      "w": 375,
+      "h": 500,
+      "credit": "Daily Anole",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/195949476"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/253549365/medium.jpeg",
+      "w": 375,
+      "h": 500,
+      "credit": "Daily Anole",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/253549365"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/604352228/medium.jpg",
+      "w": 500,
+      "h": 358,
+      "credit": "no rights reserved",
+      "license": "CC0 1.0",
+      "page": "https://www.inaturalist.org/photos/604352228"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "leopard-gecko",
+   "name": "Leopard gecko",
+   "sci": "Eublepharis macularius",
+   "group": "gecko",
+   "facts": {
+    "cls": "Reptile",
+    "region": "Asia",
+    "lengthM": 0.2,
+    "venomous": false,
+    "status": "Least concern"
+   },
+   "lookalikes": [
+    "tokay-gecko"
+   ],
+   "blurb": "A spotted, gentle gecko from deserts of Pakistan and India. Unlike most geckos, it has eyelids and cannot climb glass.",
+   "clues": [
+    "Its IUCN conservation status is \"Least concern\".",
+    "Family: Eublepharidae.",
+    "Genus: Eublepharis.",
+    "It cannot climb glass.",
+    "It stores fat in its thick tail.",
+    "It is a reptile.",
+    "It lives in Asia.",
+    "Typical adult length: about 20 cm.",
+    "It is a popular pet.",
+    "It has spots like a big cat.",
+    "The answer has 2 words (7, 5 letters).",
+    "It starts with the letter L."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/450679060/medium.jpeg",
+      "w": 500,
+      "h": 333,
+      "credit": "Fritz Geller-Grimm",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/450679060"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/79298463/medium.jpg",
+      "w": 500,
+      "h": 277,
+      "credit": "Matt Reinbold",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/79298463"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/79298462/medium.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Psyon",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/79298462"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "tokay-gecko",
+   "name": "Tokay gecko",
+   "sci": "Gekko gecko",
+   "group": "gecko",
+   "facts": {
+    "cls": "Reptile",
+    "region": "Asia",
+    "lengthM": 0.3,
+    "venomous": false,
+    "status": "Least concern"
+   },
+   "lookalikes": [
+    "leopard-gecko"
+   ],
+   "blurb": "A big, blue-grey gecko with orange spots. Its loud \"to-kay\" call gives it its name.",
+   "clues": [
+    "Family: Gekkonidae.",
+    "Genus: Gekko.",
+    "It licks its eyes clean.",
+    "Its toe pads stick to walls with tiny hairs.",
+    "It bites hard.",
+    "It is a reptile.",
+    "It lives in Asia.",
+    "Typical adult length: about 30 cm.",
+    "It is blue-grey with orange spots.",
+    "Its name comes from its loud call.",
+    "The answer has 2 words (5, 5 letters).",
+    "It starts with the letter T."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/356069249/medium.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Bernard DUPONT",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/356069249"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/439998287/medium.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Kseniia Marianna Prondzynska",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/439998287"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/176014084/medium.jpg",
+      "w": 378,
+      "h": 500,
+      "credit": "no rights reserved",
+      "license": "CC0 1.0",
+      "page": "https://www.inaturalist.org/photos/176014084"
+     }
+    ],
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/9/91/Mating_call_of_a_male_Tokay_gecko_%28Gekko_gecko%29.ogg/Mating_call_of_a_male_Tokay_gecko_%28Gekko_gecko%29.ogg.mp3",
+      "credit": "Richard Ling &lt;wikipedia@rling.com&gt;",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Mating_call_of_a_male_Tokay_gecko_(Gekko_gecko).ogg",
+      "start": 0
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "galapagos-tortoise",
+   "name": "Galápagos tortoise",
+   "alt": [
+    "giant tortoise",
+    "Galapagos giant tortoise"
+   ],
+   "sci": "Chelonoidis niger",
+   "group": "tortoise",
+   "facts": {
+    "cls": "Reptile",
+    "region": "the Galápagos Islands",
+    "lengthM": 1.5,
+    "venomous": false,
+    "status": "Extinct"
+   },
+   "lookalikes": [
+    "alligator-snapping-turtle"
+   ],
+   "blurb": "A giant tortoise from the Galápagos Islands. It can live for over 100 years.",
+   "clues": [
+    "Its IUCN conservation status is \"Extinct\".",
+    "Family: Testudinidae.",
+    "Genus: Chelonoidis.",
+    "Lonesome George was the last of his kind.",
+    "Its shell shape differs from island to island.",
+    "It can live for over 100 years.",
+    "It is a reptile.",
+    "Typical adult length: about 1.5 m.",
+    "It can go a year without food or water.",
+    "The answer has 2 words (9, 8 letters).",
+    "It starts with the letter G."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/37748207/medium.jpg",
+      "w": 500,
+      "h": 357,
+      "credit": "John G. Phillips",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/37748207"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/355933997/medium.jpeg",
+      "w": 500,
+      "h": 333,
+      "credit": "Bill Levine",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/355933997"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/31286170/medium.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Carrie Seltzer",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/31286170"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "alligator-snapping-turtle",
+   "name": "Alligator snapping turtle",
+   "sci": "Macrochelys temminckii",
+   "group": "turtle",
+   "facts": {
+    "cls": "Reptile",
+    "region": "North America",
+    "lengthM": 0.7,
+    "venomous": false
+   },
+   "blurb": "A huge freshwater turtle of the USA. It lures fish with a worm-like pink tongue.",
+   "clues": [
+    "Family: Chelydridae.",
+    "Genus: Macrochelys.",
+    "Its tongue has a pink worm-shaped lure.",
+    "It sits still with its mouth open.",
+    "It is a reptile.",
+    "It lives in North America.",
+    "Typical adult length: about 70 cm.",
+    "It has a spiky shell and a hooked beak.",
+    "The answer has 3 words (9, 8, 6 letters).",
+    "It starts with the letter A."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/381196264/medium.jpg",
+      "w": 500,
+      "h": 250,
+      "credit": "Tina Li",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/381196264"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/187612074/medium.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Matěj Baťha",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/187612074"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/306289521/medium.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "no rights reserved",
+      "license": "CC0 1.0",
+      "page": "https://www.inaturalist.org/photos/306289521"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "tuatara",
+   "name": "Tuatara",
+   "sci": "Sphenodon punctatus",
+   "group": "tuatara",
+   "facts": {
+    "cls": "Reptile",
+    "region": "New Zealand",
+    "lengthM": 0.6,
+    "venomous": false,
+    "status": "Least concern"
+   },
+   "blurb": "A lizard-like reptile from New Zealand. It is the last survivor of a group that lived with the dinosaurs.",
+   "clues": [
+    "Family: Sphenodontidae.",
+    "Genus: Sphenodon.",
+    "It has a \"third eye\" on top of its head.",
+    "It can live for over 100 years.",
+    "It is the last of an ancient group.",
+    "It is a reptile.",
+    "It lives in New Zealand.",
+    "Typical adult length: about 60 cm.",
+    "It looks like a lizard but is not one.",
+    "It lives only in New Zealand.",
+    "The answer is one word of 7 letters.",
+    "It starts with the letter T."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/21532/medium.jpg",
+      "w": 500,
+      "h": 400,
+      "credit": "Sid Mosdell",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/21532"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/3666369/medium.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "A. Sparrow",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/3666369"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/3666370/medium.jpg",
+      "w": 500,
+      "h": 311,
+      "credit": "Brian Gratwicke",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/3666370"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "axolotl",
+   "name": "Axolotl",
+   "sci": "Ambystoma mexicanum",
+   "group": "salamander",
+   "facts": {
+    "cls": "Amphibian",
+    "region": "North America",
+    "lengthM": 0.25,
+    "venomous": false,
+    "status": "Critically endangered"
+   },
+   "blurb": "A Mexican salamander that keeps its feathery gills and stays in the water all its life. It can regrow lost legs.",
+   "clues": [
+    "Family: Ambystomatidae.",
+    "Genus: Ambystoma.",
+    "It can regrow legs, tail and even parts of its heart.",
+    "It is almost extinct in the wild.",
+    "It lives only in lakes near Mexico City.",
+    "It is an amphibian.",
+    "It lives in North America.",
+    "Typical adult length: about 25 cm.",
+    "It has feathery gills on its head.",
+    "It seems to smile.",
+    "The answer is one word of 7 letters.",
+    "It starts with the letter A."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/91821276/medium.jpg",
+      "w": 500,
+      "h": 343,
+      "credit": "Stan Shebs",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/91821276"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/272115050/medium.jpeg",
+      "w": 500,
+      "h": 282,
+      "credit": "Cedricguppy",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/272115050"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/186572555/medium.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Ruben Undheim",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/186572555"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "golden-poison-frog",
+   "name": "Golden poison frog",
+   "alt": [
+    "poison dart frog",
+    "golden poison dart frog"
+   ],
+   "sci": "Phyllobates terribilis",
+   "group": "frog",
+   "facts": {
+    "cls": "Amphibian",
+    "region": "South America",
+    "lengthM": 0.05,
+    "venomous": true
+   },
+   "lookalikes": [
+    "strawberry-poison-frog"
+   ],
+   "blurb": "A tiny bright yellow frog from Colombia. It is one of the most poisonous animals on Earth.",
+   "clues": [
+    "Family: Dendrobatidae.",
+    "Genus: Phyllobates.",
+    "It is an amphibian.",
+    "It lives in South America.",
+    "Typical adult length: about 5 cm.",
+    "It lives in the rainforests of Colombia.",
+    "The answer has 3 words (6, 6, 4 letters).",
+    "It starts with the letter G."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/95423919/medium.jpg",
+      "w": 500,
+      "h": 280,
+      "credit": "Brian Gratwicke",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/95423919"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/86411320/medium.jpg",
+      "w": 500,
+      "h": 373,
+      "credit": "http://www.tierlexikon.ch/",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/86411320"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/95423918/medium.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "孫鋒 林",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/95423918"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "strawberry-poison-frog",
+   "name": "Strawberry poison frog",
+   "alt": [
+    "strawberry poison-dart frog"
+   ],
+   "sci": "Oophaga pumilio",
+   "group": "frog",
+   "facts": {
+    "cls": "Amphibian",
+    "region": "the Americas",
+    "lengthM": 0.02,
+    "venomous": true,
+    "status": "Least concern"
+   },
+   "lookalikes": [
+    "golden-poison-frog"
+   ],
+   "blurb": "A tiny red frog with blue legs from Central America. Mothers carry their tadpoles up trees and feed them eggs.",
+   "clues": [
+    "Its IUCN conservation status is \"Least concern\".",
+    "Family: Dendrobatidae.",
+    "Genus: Oophaga.",
+    "Mothers feed their tadpoles unfertilised eggs.",
+    "It carries tadpoles up into trees.",
+    "It is an amphibian.",
+    "It lives in the Americas.",
+    "Typical adult length: about 2 cm.",
+    "It is red with blue legs.",
+    "It is named after a red fruit.",
+    "The answer has 3 words (10, 6, 4 letters).",
+    "It starts with the letter S."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/339638448/medium.jpg",
+      "w": 451,
+      "h": 500,
+      "credit": "Jackcsmall",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/339638448"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/339638450/medium.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Geoff Gallice",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/339638450"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/339638452/medium.jpg",
+      "w": 478,
+      "h": 500,
+      "credit": "Geoff Gallice",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/339638452"
+     }
+    ],
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/4/47/Oophaga_pumilio_call.ogg/Oophaga_pumilio_call.ogg.mp3",
+      "credit": "Captainstork",
+      "license": "CC BY 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Oophaga_pumilio_call.ogg",
+      "start": 0
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "red-eyed-tree-frog",
+   "name": "Red-eyed tree frog",
+   "sci": "Agalychnis callidryas",
+   "group": "frog",
+   "facts": {
+    "cls": "Amphibian",
+    "region": "the Americas",
+    "lengthM": 0.06,
+    "venomous": false,
+    "status": "Least concern"
+   },
+   "blurb": "A bright green tree frog with huge red eyes. It flashes its eyes to startle predators.",
+   "clues": [
+    "Its IUCN conservation status is \"Least concern\".",
+    "Family: Phyllomedusidae.",
+    "Genus: Agalychnis.",
+    "Its eggs can hatch early if a snake attacks them.",
+    "It flashes its eyes to startle predators.",
+    "It has orange feet and blue sides.",
+    "It is an amphibian.",
+    "It lives in the Americas.",
+    "Typical adult length: about 6 cm.",
+    "It lives in Central American rainforests.",
+    "The answer has 4 words (3, 4, 4, 4 letters).",
+    "It starts with the letter R."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/289704612/medium.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Luke Padon",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/289704612"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/26543774/medium.jpeg",
+      "w": 500,
+      "h": 375,
+      "credit": "Roger A. Morales-Flores",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/26543774"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/289704683/medium.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Luke Padon",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/289704683"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "cane-toad",
+   "name": "Cane toad",
+   "alt": [
+    "giant toad"
+   ],
+   "sci": "Rhinella marina",
+   "group": "toad",
+   "facts": {
+    "cls": "Amphibian",
+    "region": "South America",
+    "lengthM": 0.15,
+    "venomous": true,
+    "status": "Least concern"
+   },
+   "lookalikes": [
+    "common-toad"
+   ],
+   "blurb": "A big, poisonous toad from the Americas. It was brought to Australia in 1935 to eat beetles and became a pest.",
+   "clues": [
+    "Family: Bufonidae.",
+    "Genus: Rhinella.",
+    "It was released in Queensland in 1935.",
+    "Glands behind its eyes ooze poison.",
+    "It is an amphibian.",
+    "It lives in South America.",
+    "Typical adult length: about 15 cm.",
+    "It is poisonous or venomous.",
+    "It is a major pest in Australia.",
+    "It is named after a sugar crop.",
+    "The answer has 2 words (4, 4 letters).",
+    "It starts with the letter C."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/314305758/medium.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Connor Margetts",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/314305758"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/13398663/medium.jpg",
+      "w": 500,
+      "h": 337,
+      "credit": "Bernard DUPONT",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/13398663"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/28767825/medium.jpg",
+      "w": 500,
+      "h": 392,
+      "credit": "Steve Kerr",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/28767825"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "australian-green-tree-frog",
+   "name": "Australian green tree frog",
+   "alt": [
+    "green tree frog",
+    "White's tree frog",
+    "dumpy tree frog"
+   ],
+   "sci": "Ranoidea caerulea",
+   "group": "frog",
+   "facts": {
+    "cls": "Amphibian",
+    "region": "Australia",
+    "lengthM": 0.1,
+    "venomous": false,
+    "status": "Least concern"
+   },
+   "lookalikes": [
+    "red-eyed-tree-frog"
+   ],
+   "blurb": "A plump, friendly green frog of Australia that often lives in bathrooms, water tanks and drainpipes.",
+   "clues": [
+    "Its IUCN conservation status is \"Least concern\".",
+    "Genus: Ranoidea.",
+    "Its skin makes a substance studied for medicine.",
+    "It often lives in toilets and drainpipes.",
+    "It has big sticky toe pads.",
+    "It is an amphibian.",
+    "Typical adult length: about 10 cm.",
+    "It is plump and smiles.",
+    "The answer has 4 words (10, 5, 4, 4 letters).",
+    "It starts with the letter A."
+   ],
+   "difficulty": 1
+  },
+  {
+   "id": "southern-corroboree-frog",
+   "name": "Southern corroboree frog",
+   "alt": [
+    "corroboree frog"
+   ],
+   "sci": "Pseudophryne corroboree",
+   "group": "frog",
+   "facts": {
+    "cls": "Amphibian",
+    "region": "Australia",
+    "lengthM": 0.03,
+    "venomous": true,
+    "status": "Critically endangered"
+   },
+   "blurb": "A tiny, critically endangered frog of the Snowy Mountains with bright yellow and black stripes.",
+   "clues": [
+    "Family: Myobatrachidae.",
+    "Genus: Pseudophryne.",
+    "It lives in alpine bogs.",
+    "It is critically endangered.",
+    "It is an amphibian.",
+    "It lives in Australia.",
+    "Typical adult length: about 3 cm.",
+    "It is poisonous or venomous.",
+    "It lives in the Snowy Mountains.",
+    "It is striped yellow and black.",
+    "The answer has 3 words (8, 10, 4 letters).",
+    "It starts with the letter S."
+   ],
+   "difficulty": 3
+  },
+  {
+   "id": "american-bullfrog",
+   "name": "American bullfrog",
+   "alt": [
+    "bullfrog"
+   ],
+   "sci": "Lithobates catesbeianus",
+   "group": "frog",
+   "facts": {
+    "cls": "Amphibian",
+    "region": "North America",
+    "lengthM": 0.15,
+    "venomous": false,
+    "status": "Least concern"
+   },
+   "lookalikes": [
+    "common-frog"
+   ],
+   "blurb": "A huge North American frog with a deep call like a cow mooing. It eats almost anything it can swallow.",
+   "clues": [
+    "Its IUCN conservation status is \"Least concern\".",
+    "Family: Ranidae.",
+    "Genus: Lithobates.",
+    "It eats snakes, birds and other frogs.",
+    "Its tadpoles can take two years to change.",
+    "It is invasive in many countries.",
+    "It is an amphibian.",
+    "Typical adult length: about 15 cm.",
+    "Its call sounds like a cow mooing.",
+    "The answer has 2 words (8, 8 letters).",
+    "It starts with the letter A."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/2900500/medium.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Kelsey Low",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/2900500"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/161936314/medium.jpg",
+      "w": 500,
+      "h": 338,
+      "credit": "Nell Cant",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/161936314"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/38503110/medium.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Adam Cushen",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/38503110"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "common-frog",
+   "name": "Common frog",
+   "alt": [
+    "European common frog",
+    "grass frog",
+    "frog"
+   ],
+   "sci": "Rana temporaria",
+   "group": "frog",
+   "facts": {
+    "cls": "Amphibian",
+    "region": "Europe",
+    "lengthM": 0.08,
+    "venomous": false,
+    "status": "Least concern"
+   },
+   "lookalikes": [
+    "common-toad",
+    "american-bullfrog"
+   ],
+   "blurb": "The common frog of European ponds. It lays big clumps of frogspawn in early spring.",
+   "clues": [
+    "Its IUCN conservation status is \"Least concern\".",
+    "Family: Ranidae.",
+    "Genus: Rana.",
+    "It can breathe through its skin while it rests in pond mud in winter.",
+    "It lays clumps of spawn in early spring.",
+    "It has a dark patch behind each eye.",
+    "It is an amphibian.",
+    "Typical adult length: about 8 cm.",
+    "It hops with long back legs.",
+    "The answer has 2 words (6, 4 letters).",
+    "It starts with the letter C."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/171173/medium.jpg",
+      "w": 500,
+      "h": 443,
+      "credit": "Jörg Hempel",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/171173"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/54599133/medium.jpg",
+      "w": 500,
+      "h": 371,
+      "credit": "H. Krisp",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/54599133"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/359250602/medium.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Dr. Sven Gippner",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/359250602"
+     }
+    ],
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/d/d8/16_bruine_kikker_individu_Rana_temporaria_individual.wav/16_bruine_kikker_individu_Rana_temporaria_individual.wav.mp3",
+      "credit": "Odé, Baudewijn .mw-parser-output .messagebox{margin:4px 0;width:auto;border-collapse:co…",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:16_bruine_kikker_individu_Rana_temporaria_individual.wav",
+      "start": 0
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "common-toad",
+   "name": "Common toad",
+   "alt": [
+    "European toad",
+    "toad"
+   ],
+   "sci": "Bufo bufo",
+   "group": "toad",
+   "facts": {
+    "cls": "Amphibian",
+    "region": "Europe",
+    "lengthM": 0.1,
+    "venomous": true,
+    "status": "Least concern"
+   },
+   "lookalikes": [
+    "common-frog",
+    "cane-toad"
+   ],
+   "blurb": "A warty brown toad of Europe. Every spring, toads migrate back to the ponds where they hatched.",
+   "clues": [
+    "Its IUCN conservation status is \"Least concern\".",
+    "Family: Bufonidae.",
+    "Genus: Bufo.",
+    "Volunteers help them cross roads in spring.",
+    "It lays its eggs in long strings.",
+    "It walks more than it hops.",
+    "It is an amphibian.",
+    "Typical adult length: about 10 cm.",
+    "It is poisonous or venomous.",
+    "Its skin is dry and warty.",
+    "The answer has 2 words (6, 4 letters).",
+    "It starts with the letter C."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/42142219/medium.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "John Witton",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/42142219"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/235371826/medium.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "no rights reserved",
+      "license": "CC0 1.0",
+      "page": "https://www.inaturalist.org/photos/235371826"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/81587062/medium.jpg",
+      "w": 500,
+      "h": 281,
+      "credit": "no rights reserved",
+      "license": "CC0 1.0",
+      "page": "https://www.inaturalist.org/photos/81587062"
+     }
+    ],
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/a/a9/Common_Toad_%28Bufo_bufo%29_%28W_BUFO_BUFO_R3_C2%29.ogg/Common_Toad_%28Bufo_bufo%29_%28W_BUFO_BUFO_R3_C2%29.ogg.mp3",
+      "credit": "This file has been provided by the British Library from its digital collections. Links …",
+      "license": "CC BY 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Common_Toad_(Bufo_bufo)_(W_BUFO_BUFO_R3_C2).ogg",
+      "start": 0
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "glass-frog",
+   "name": "Glass frog",
+   "alt": [
+    "reticulated glass frog"
+   ],
+   "sci": "Hyalinobatrachium valerioi",
+   "group": "frog",
+   "facts": {
+    "cls": "Amphibian",
+    "region": "the Americas",
+    "lengthM": 0.025,
+    "venomous": false,
+    "status": "Least concern"
+   },
+   "blurb": "A tiny frog with see-through skin on its belly. You can see its heart beating.",
+   "clues": [
+    "Family: Centrolenidae.",
+    "Genus: Hyalinobatrachium.",
+    "Fathers guard the eggs on leaves.",
+    "It lives in Central American rainforests.",
+    "Its eggs are laid over streams.",
+    "It is an amphibian.",
+    "It lives in the Americas.",
+    "Typical adult length: about 3 cm.",
+    "You can see its heart beating.",
+    "Its belly skin is see-through.",
+    "The answer has 2 words (5, 4 letters).",
+    "It starts with the letter G."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/60123702/medium.jpg",
+      "w": 500,
+      "h": 281,
+      "credit": "Dan MacNeal",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/60123702"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/399304213/medium.jpg",
+      "w": 375,
+      "h": 500,
+      "credit": "Nick Tobler (Cowturtle)",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/399304213"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/399304615/medium.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Nick Tobler (Cowturtle)",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/399304615"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "goliath-frog",
+   "name": "Goliath frog",
+   "sci": "Conraua goliath",
+   "group": "frog",
+   "facts": {
+    "cls": "Amphibian",
+    "region": "Africa",
+    "lengthM": 0.3,
+    "venomous": false
+   },
+   "blurb": "The biggest frog in the world, from West Africa. It can weigh over 3 kg.",
+   "clues": [
+    "Family: Conrauidae.",
+    "Genus: Conraua.",
+    "It moves heavy rocks to build ponds for its eggs.",
+    "It has no vocal sac, so it does not croak.",
+    "It lives in Cameroon.",
+    "It is an amphibian.",
+    "It lives in Africa.",
+    "Typical adult length: about 30 cm.",
+    "It can weigh over 3 kg.",
+    "The answer has 2 words (7, 4 letters).",
+    "It starts with the letter G."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/92002/medium.JPG",
+      "w": 500,
+      "h": 376,
+      "credit": "116916927065934112165",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/92002"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/360001369/medium.jpeg",
+      "w": 500,
+      "h": 375,
+      "credit": "Ryan van Huyssteen",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/360001369"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/539752953/medium.jpg",
+      "w": 500,
+      "h": 339,
+      "credit": "jeanlouisamiet",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/539752953"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "fire-salamander",
+   "name": "Fire salamander",
+   "sci": "Salamandra salamandra",
+   "group": "salamander",
+   "facts": {
+    "cls": "Amphibian",
+    "region": "Europe",
+    "lengthM": 0.2,
+    "venomous": true,
+    "status": "Vulnerable"
+   },
+   "lookalikes": [
+    "great-crested-newt"
+   ],
+   "blurb": "A black-and-yellow salamander of European forests. Its skin oozes poison.",
+   "clues": [
+    "Its IUCN conservation status is \"Vulnerable\".",
+    "It gives birth to larvae in streams.",
+    "Its skin oozes toxins.",
+    "It is an amphibian.",
+    "It lives in Europe.",
+    "Typical adult length: about 20 cm.",
+    "It is poisonous or venomous.",
+    "It lives in damp European forests.",
+    "It is black with yellow spots.",
+    "The answer has 2 words (4, 10 letters).",
+    "It starts with the letter F."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/159805189/medium.jpg",
+      "w": 500,
+      "h": 347,
+      "credit": "Frank Vassen",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/159805189"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/186013159/medium.jpg",
+      "w": 500,
+      "h": 500,
+      "credit": "carnifex",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/186013159"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/593131690/medium.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Diego González Dopico",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/593131690"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "great-crested-newt",
+   "name": "Great crested newt",
+   "sci": "Triturus cristatus",
+   "group": "newt",
+   "facts": {
+    "cls": "Amphibian",
+    "region": "Europe",
+    "lengthM": 0.15,
+    "venomous": false,
+    "status": "Least concern"
+   },
+   "lookalikes": [
+    "fire-salamander"
+   ],
+   "blurb": "A big dark newt of Europe. In spring, males grow a jagged crest along their backs.",
+   "clues": [
+    "Its IUCN conservation status is \"Least concern\".",
+    "Family: Salamandridae.",
+    "Genus: Triturus.",
+    "It is protected by law in Britain.",
+    "Its belly is orange with black spots.",
+    "Females fold each egg into a leaf.",
+    "It is an amphibian.",
+    "It lives in Europe.",
+    "Typical adult length: about 15 cm.",
+    "It has warty dark skin.",
+    "The answer has 3 words (5, 7, 4 letters).",
+    "It starts with the letter G."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/304222333/medium.jpeg",
+      "w": 500,
+      "h": 333,
+      "credit": "Roy Lowry",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/304222333"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/188697048/medium.jpeg",
+      "w": 281,
+      "h": 500,
+      "credit": "Aurelijus Narbutas",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/188697048"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/368505629/medium.jpg",
+      "w": 500,
+      "h": 334,
+      "credit": "Joeb",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/368505629"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "pacman-frog",
+   "name": "Pacman frog",
+   "alt": [
+    "Argentine horned frog",
+    "horned frog"
+   ],
+   "sci": "Ceratophrys ornata",
+   "group": "frog",
+   "facts": {
+    "cls": "Amphibian",
+    "region": "South America",
+    "lengthM": 0.12,
+    "venomous": false,
+    "status": "Vulnerable"
+   },
+   "blurb": "A round frog with a huge mouth from South America. It will try to eat almost anything that moves past it.",
+   "clues": [
+    "Its IUCN conservation status is \"Vulnerable\".",
+    "Family: Ceratophryidae.",
+    "Genus: Ceratophrys.",
+    "It buries itself and ambushes prey.",
+    "It is an amphibian.",
+    "It lives in South America.",
+    "Typical adult length: about 12 cm.",
+    "Its mouth is almost as wide as its body.",
+    "It is named after a video game character.",
+    "The answer has 2 words (6, 4 letters).",
+    "It starts with the letter P."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/5482090/medium.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Leonel Roget",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/5482090"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/6849944/medium.jpeg",
+      "w": 500,
+      "h": 375,
+      "credit": "Leonel Roget",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/6849944"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/6849964/medium.jpeg",
+      "w": 500,
+      "h": 375,
+      "credit": "Leonel Roget",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/6849964"
+     }
+    ]
+   },
+   "difficulty": 2
+  }
+ ],
+ "questions": [
+  {
+   "id": "q1",
+   "kind": "mc",
+   "prompt": "What does a tadpole grow into?",
+   "answer": "A frog",
+   "wrong": [
+    "A fish",
+    "A lizard",
+    "A snake"
+   ],
+   "explain": "Tadpoles are baby frogs and toads that live in water.",
+   "difficulty": 1
+  },
+  {
+   "id": "q2",
+   "kind": "order",
+   "prompt": "Put a frog's life cycle in order.",
+   "answer": [
+    "Frogspawn",
+    "Tadpole",
+    "Froglet",
+    "Frog"
+   ],
+   "orderLabel": "First to last",
+   "explain": "Tadpoles grow legs and absorb their tails.",
+   "difficulty": 1
+  },
+  {
+   "id": "q3",
+   "kind": "mc",
+   "prompt": "How can you tell an alligator from a crocodile?",
+   "answer": "An alligator has a wide, U-shaped snout",
+   "wrong": [
+    "An alligator has wings",
+    "An alligator has no teeth",
+    "An alligator is always smaller"
+   ],
+   "explain": "Crocodiles have narrower, V-shaped snouts and show more teeth.",
+   "difficulty": 2
+  },
+  {
+   "id": "q4",
+   "kind": "mc",
+   "prompt": "What is the biggest living reptile?",
+   "answer": "Saltwater crocodile",
+   "wrong": [
+    "Komodo dragon",
+    "Galápagos tortoise",
+    "Green anaconda"
+   ],
+   "explain": "Big males can exceed 6 m and 1,000 kg.",
+   "difficulty": 1
+  },
+  {
+   "id": "q5",
+   "kind": "mc",
+   "prompt": "What is the biggest lizard?",
+   "answer": "Komodo dragon",
+   "wrong": [
+    "Green iguana",
+    "Perentie",
+    "Gila monster"
+   ],
+   "explain": "Komodo dragons can be about 3 m long.",
+   "difficulty": 1
+  },
+  {
+   "id": "q6",
+   "kind": "tf",
+   "prompt": "A frog is a reptile.",
+   "answer": false,
+   "explain": "Frogs are amphibians; they start life in water.",
+   "difficulty": 1
+  },
+  {
+   "id": "q7",
+   "kind": "tf",
+   "prompt": "Chameleons can move each eye on its own.",
+   "answer": true,
+   "explain": "They can look in two directions at once.",
+   "difficulty": 1
+  },
+  {
+   "id": "q8",
+   "kind": "mc",
+   "prompt": "Why were cane toads brought to Australia in 1935?",
+   "answer": "To eat beetles on sugar cane",
+   "wrong": [
+    "As pets",
+    "For food",
+    "To eat mosquitoes"
+   ],
+   "explain": "It failed, and the toads spread across northern Australia.",
+   "difficulty": 2
+  },
+  {
+   "id": "q9",
+   "kind": "mc",
+   "prompt": "Which animal can regrow its legs, tail and even parts of its heart?",
+   "answer": "Axolotl",
+   "wrong": [
+    "Tuatara",
+    "Cane toad",
+    "Gharial"
+   ],
+   "explain": "Axolotls are famous for regeneration.",
+   "difficulty": 2
+  },
+  {
+   "id": "q10",
+   "kind": "mc",
+   "prompt": "What decides whether baby alligators are male or female?",
+   "answer": "The temperature of the nest",
+   "wrong": [
+    "The size of the egg",
+    "The month they hatch",
+    "The colour of the mother"
+   ],
+   "explain": "Warmer and cooler nests produce different sexes.",
+   "difficulty": 3
+  },
+  {
+   "id": "q11",
+   "kind": "mc",
+   "prompt": "Which famous tortoise was the last of his kind on Pinta Island?",
+   "answer": "Lonesome George",
+   "wrong": [
+    "Harriet",
+    "Jonathan",
+    "Speedy"
+   ],
+   "explain": "He died in 2012.",
+   "difficulty": 3
+  }
+ ],
+ "fakes": [
+  "Crimson-backed water dragon toad",
+  "Golden marsh tuatara",
+  "Northern glass gecko-frog",
+  "Spotted thunder iguana",
+  "Blue-horned river skink",
+  "Desert velvet crocodile"
+ ],
+ "sources": [
+  {
+   "name": "iNaturalist",
+   "url": "https://www.inaturalist.org"
+  },
+  {
+   "name": "Wikidata",
+   "url": "https://www.wikidata.org"
+  },
+  {
+   "name": "Wikimedia Commons",
+   "url": "https://commons.wikimedia.org"
+  }
+ ]
+}

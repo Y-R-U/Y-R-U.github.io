@@ -1,0 +1,1030 @@
+{
+ "style": "painterly gouache illustration in the style of a vintage film poster, bold simplified shapes, visible brush texture, rich limited colour palette, dramatic cinematic lighting, cream paper border, no text, no letters, no words, no numbers, no logos, no signature",
+ "model": "flux2-klein-9b-mlx-4bit",
+ "steps": 4,
+ "width": 640,
+ "height": 432,
+ "films": [
+  {
+   "id": "moby-dick",
+   "name": "Moby-Dick",
+   "alt": [
+    "Moby Dick"
+   ],
+   "author": "Herman Melville",
+   "year": 1851,
+   "kids": false,
+   "blurb": "Captain Ahab hunts the white whale that took his leg.",
+   "scenes": [
+    {
+     "p": "a gigantic white sperm whale smashing a small wooden whaling rowboat in a stormy sea, harpoons flying, a three-masted whaling ship behind",
+     "d": 1,
+     "cap": "The white whale strikes"
+    },
+    {
+     "p": "a peg-legged sea captain seen from behind on the deck of a 19th-century whaling ship, staring out at a stormy sea",
+     "d": 3,
+     "cap": "The obsessed captain on deck"
+    }
+   ]
+  },
+  {
+   "id": "treasure-island",
+   "name": "Treasure Island",
+   "alt": [],
+   "author": "Robert Louis Stevenson",
+   "year": 1883,
+   "kids": true,
+   "blurb": "Young Jim Hawkins sails in search of buried treasure and meets the pirate Long John Silver.",
+   "scenes": [
+    {
+     "p": "an old parchment treasure map with a red X, a compass and a cutlass on a wooden table, a tropical island seen through a cabin window",
+     "d": 1,
+     "cap": "X marks the spot"
+    },
+    {
+     "p": "a one-legged pirate with a crutch and a green parrot on his shoulder seen from behind on a ship deck",
+     "d": 1,
+     "cap": "The one-legged cook and his parrot"
+    },
+    {
+     "p": "a boy hiding inside a big wooden apple barrel on a ship at night, listening",
+     "d": 3,
+     "cap": "Overheard from the apple barrel"
+    }
+   ]
+  },
+  {
+   "id": "alice-in-wonderland",
+   "name": "Alice's Adventures in Wonderland",
+   "alt": [
+    "Alice in Wonderland",
+    "Alice"
+   ],
+   "author": "Lewis Carroll",
+   "year": 1865,
+   "kids": true,
+   "blurb": "Alice follows a white rabbit down a rabbit hole into a nonsensical world.",
+   "scenes": [
+    {
+     "p": "a white rabbit in a waistcoat checking a pocket watch, hurrying towards a rabbit hole under a tree, a girl in a blue dress following",
+     "d": 1,
+     "cap": "Late! Following the white rabbit"
+    },
+    {
+     "p": "a chaotic outdoor tea party at a long table with a hare, a man in an enormous top hat and a sleepy dormouse in a teapot",
+     "d": 1,
+     "cap": "The mad tea party"
+    },
+    {
+     "p": "playing cards with arms and legs painting white roses red in a royal garden",
+     "d": 2,
+     "cap": "Painting the roses red"
+    }
+   ]
+  },
+  {
+   "id": "robinson-crusoe",
+   "name": "Robinson Crusoe",
+   "alt": [],
+   "author": "Daniel Defoe",
+   "year": 1719,
+   "kids": false,
+   "blurb": "A shipwrecked sailor survives alone for years on a remote island.",
+   "scenes": [
+    {
+     "p": "a single bare human footprint in wet sand on a deserted island beach, a castaway in goatskin clothes with a parasol seen from behind staring at it",
+     "d": 2,
+     "cap": "A footprint in the sand"
+    },
+    {
+     "p": "a castaway in a goatskin hat with a homemade umbrella and a parrot beside a hut and stockade on a tropical island",
+     "d": 2,
+     "cap": "The castaway's island home"
+    }
+   ]
+  },
+  {
+   "id": "frankenstein",
+   "name": "Frankenstein",
+   "alt": [
+    "Frankenstein; or, The Modern Prometheus"
+   ],
+   "author": "Mary Shelley",
+   "year": 1818,
+   "kids": false,
+   "blurb": "Scientist Victor Frankenstein creates a living being and is haunted by his creation.",
+   "scenes": [
+    {
+     "p": "a gothic laboratory in a stone tower during a thunderstorm, lightning striking a rod above a sheet-covered figure on a table, crackling electrical apparatus",
+     "d": 1,
+     "cap": "A creature brought to life"
+    },
+    {
+     "p": "a lone figure crossing a vast frozen Arctic ice field on a dog sled at twilight, a ship trapped in ice",
+     "d": 3,
+     "cap": "The chase across the Arctic ice"
+    }
+   ]
+  },
+  {
+   "id": "dracula",
+   "name": "Dracula",
+   "alt": [],
+   "author": "Bram Stoker",
+   "year": 1897,
+   "kids": false,
+   "blurb": "Count Dracula moves from Transylvania to England in search of new blood.",
+   "scenes": [
+    {
+     "p": "a jagged gothic castle on a crag in the Carpathian mountains under a full moon, bats flying, a horse-drawn coach on the winding road",
+     "d": 1,
+     "cap": "The count's castle in Transylvania"
+    },
+    {
+     "p": "a ship drifting into Whitby harbour in a storm, a huge black dog leaping ashore, ruined abbey on the cliff",
+     "d": 3,
+     "cap": "The ghost ship arrives at Whitby"
+    }
+   ]
+  },
+  {
+   "id": "the-hobbit",
+   "name": "The Hobbit",
+   "alt": [
+    "The Hobbit, or There and Back Again"
+   ],
+   "author": "J. R. R. Tolkien",
+   "year": 1937,
+   "kids": true,
+   "blurb": "Bilbo Baggins joins thirteen dwarves on a quest to reclaim treasure from a dragon.",
+   "scenes": [
+    {
+     "p": "a huge red-gold dragon sleeping on a vast hoard of gold coins and treasure inside a mountain hall, a tiny figure peeking in",
+     "d": 1,
+     "cap": "The dragon on his hoard"
+    },
+    {
+     "p": "a crowd of hooded dwarves and a tall wizard with a staff arriving at a round green door in a hillside at dusk",
+     "d": 2,
+     "cap": "An unexpected party"
+    },
+    {
+     "p": "dwarves floating down a river in wooden barrels away from an elven forest stronghold",
+     "d": 2,
+     "cap": "Barrels out of bond"
+    }
+   ]
+  },
+  {
+   "id": "around-the-world-in-eighty-days",
+   "name": "Around the World in Eighty Days",
+   "alt": [
+    "Around the World in 80 Days"
+   ],
+   "author": "Jules Verne",
+   "year": 1872,
+   "kids": true,
+   "blurb": "Phileas Fogg bets he can circle the globe in eighty days.",
+   "scenes": [
+    {
+     "p": "a Victorian gentleman in a top hat checking his pocket watch while riding an elephant through an Indian jungle, his valet beside him",
+     "d": 2,
+     "cap": "Racing the clock by elephant"
+    },
+    {
+     "p": "a Victorian gentleman in a top hat and his valet on a paddle steamer deck, a big globe beside them, ocean and steam",
+     "d": 3,
+     "cap": "A wager against the calendar"
+    }
+   ]
+  },
+  {
+   "id": "pride-and-prejudice",
+   "name": "Pride and Prejudice",
+   "alt": [],
+   "author": "Jane Austen",
+   "year": 1813,
+   "kids": false,
+   "blurb": "Elizabeth Bennet and the proud Mr Darcy overcome first impressions.",
+   "scenes": [
+    {
+     "p": "a Regency-era country ballroom with dancers in empire-waist gowns and tailcoats in rows, candle chandeliers",
+     "d": 2,
+     "cap": "The Meryton assembly ball"
+    },
+    {
+     "p": "a grand English country house across a lake in a landscaped park, a young woman in a Regency bonnet seen from behind gazing at it",
+     "d": 3,
+     "cap": "First sight of Pemberley"
+    }
+   ]
+  },
+  {
+   "id": "jane-eyre",
+   "name": "Jane Eyre",
+   "alt": [],
+   "author": "Charlotte Brontë",
+   "year": 1847,
+   "kids": false,
+   "blurb": "An orphaned governess falls in love with her brooding employer at Thornfield Hall.",
+   "scenes": [
+    {
+     "p": "a gothic English manor house on fire at night, flames from the battlements, a figure on the roof",
+     "d": 3,
+     "cap": "Thornfield Hall burns"
+    },
+    {
+     "p": "a young governess in a plain grey dress seen from behind walking up to a gloomy manor house on the moors",
+     "d": 3,
+     "cap": "The new governess arrives"
+    }
+   ]
+  },
+  {
+   "id": "wuthering-heights",
+   "name": "Wuthering Heights",
+   "alt": [],
+   "author": "Emily Brontë",
+   "year": 1847,
+   "kids": false,
+   "blurb": "A tale of passion and revenge between Heathcliff and Catherine on the Yorkshire moors.",
+   "scenes": [
+    {
+     "p": "a lonely stone farmhouse on bleak windswept Yorkshire moors, twisted trees bent by wind, stormy sky",
+     "d": 2,
+     "cap": "The windswept farmhouse on the moors"
+    },
+    {
+     "p": "a ghostly pale hand tapping at a frosted window at night in a storm",
+     "d": 3,
+     "cap": "Let me in!"
+    }
+   ]
+  },
+  {
+   "id": "great-expectations",
+   "name": "Great Expectations",
+   "alt": [],
+   "author": "Charles Dickens",
+   "year": 1861,
+   "kids": false,
+   "blurb": "Orphan Pip rises in society thanks to a mysterious benefactor.",
+   "scenes": [
+    {
+     "p": "an elderly woman in a yellowed wedding dress seen from behind in a dark room with stopped clocks and a rotting wedding cake covered in cobwebs",
+     "d": 2,
+     "cap": "The jilted bride and her wedding cake"
+    },
+    {
+     "p": "a convict in leg irons on misty Kent marshes at dusk beside a churchyard, a boy running",
+     "d": 3,
+     "cap": "The convict on the marshes"
+    }
+   ]
+  },
+  {
+   "id": "a-christmas-carol",
+   "name": "A Christmas Carol",
+   "alt": [],
+   "author": "Charles Dickens",
+   "year": 1843,
+   "kids": true,
+   "blurb": "Miser Ebenezer Scrooge is visited by ghosts on Christmas Eve.",
+   "scenes": [
+    {
+     "p": "a miserly old man in a nightcap in a Victorian bedroom recoiling from a glowing ghost wrapped in heavy chains and cash boxes",
+     "d": 1,
+     "cap": "Visited by a ghost in chains"
+    },
+    {
+     "p": "a poor Victorian family around a small Christmas goose, a little boy with a wooden crutch by the fire",
+     "d": 2,
+     "cap": "Christmas dinner with the Cratchits"
+    }
+   ]
+  },
+  {
+   "id": "oliver-twist",
+   "name": "Oliver Twist",
+   "alt": [],
+   "author": "Charles Dickens",
+   "year": 1838,
+   "kids": false,
+   "blurb": "An orphan escapes the workhouse and falls in with a gang of pickpockets in London.",
+   "scenes": [
+    {
+     "p": "a thin orphan boy in rags holding up an empty bowl to a large stern man at a cauldron in a Victorian workhouse dining hall",
+     "d": 1,
+     "cap": "Please, sir, I want some more"
+    },
+    {
+     "p": "boys picking a gentleman's pocket on a crowded Victorian London street",
+     "d": 2,
+     "cap": "Learning to pick pockets"
+    }
+   ]
+  },
+  {
+   "id": "charlottes-web",
+   "name": "Charlotte's Web",
+   "alt": [
+    "Charlottes Web"
+   ],
+   "author": "E. B. White",
+   "year": 1952,
+   "kids": true,
+   "blurb": "A spider saves her friend Wilbur the pig by writing words in her web.",
+   "scenes": [
+    {
+     "p": "a small pink pig in a barn doorway looking up at a large dewy spider web with a friendly grey spider, morning sun",
+     "d": 1,
+     "cap": "A pig and his spider friend"
+    },
+    {
+     "p": "a pig at a country fair with a prize ribbon, a ferris wheel behind",
+     "d": 3,
+     "cap": "Wilbur at the county fair"
+    }
+   ]
+  },
+  {
+   "id": "the-lion-the-witch-and-the-wardrobe",
+   "name": "The Lion, the Witch and the Wardrobe",
+   "alt": [
+    "The Lion the Witch and the Wardrobe",
+    "Narnia"
+   ],
+   "author": "C. S. Lewis",
+   "year": 1950,
+   "kids": true,
+   "blurb": "Four children step through a wardrobe into the snowy land of Narnia.",
+   "scenes": [
+    {
+     "p": "the open doors of an old wardrobe full of fur coats revealing a snowy forest with a glowing lamppost",
+     "d": 1,
+     "cap": "Through the wardrobe to Narnia"
+    },
+    {
+     "p": "a faun with an umbrella and parcels walking past a lamppost in a snowy forest",
+     "d": 2,
+     "cap": "Meeting a faun by the lamppost"
+    },
+    {
+     "p": "a great golden lion beside a cracked stone table at dawn",
+     "d": 3,
+     "cap": "The Stone Table"
+    }
+   ]
+  },
+  {
+   "id": "the-very-hungry-caterpillar",
+   "name": "The Very Hungry Caterpillar",
+   "alt": [],
+   "author": "Eric Carle",
+   "year": 1969,
+   "kids": true,
+   "blurb": "A caterpillar eats through a week of food before becoming a butterfly.",
+   "scenes": [
+    {
+     "p": "a fat green caterpillar eating holes through an apple, pears, plums, strawberries and oranges in a row",
+     "d": 1,
+     "cap": "Munching through the fruit"
+    },
+    {
+     "p": "a colourful butterfly emerging from a cocoon on a twig",
+     "d": 2,
+     "cap": "A beautiful butterfly"
+    }
+   ]
+  },
+  {
+   "id": "james-and-the-giant-peach",
+   "name": "James and the Giant Peach",
+   "alt": [],
+   "author": "Roald Dahl",
+   "year": 1961,
+   "kids": true,
+   "blurb": "An orphan crosses the ocean inside a giant peach with oversized insects.",
+   "scenes": [
+    {
+     "p": "a gigantic peach flying over the ocean lifted by a flock of seagulls tied with silk threads, a boy on top",
+     "d": 1,
+     "cap": "Carried across the ocean by seagulls"
+    },
+    {
+     "p": "a giant peach rolling down a hill through a village",
+     "d": 3,
+     "cap": "The peach rolls away"
+    }
+   ]
+  },
+  {
+   "id": "the-bfg",
+   "name": "The BFG",
+   "alt": [
+    "BFG",
+    "The Big Friendly Giant"
+   ],
+   "author": "Roald Dahl",
+   "year": 1982,
+   "kids": true,
+   "blurb": "A big friendly giant who catches dreams befriends an orphan girl.",
+   "scenes": [
+    {
+     "p": "an enormous giant with huge ears blowing glowing dreams through a long trumpet into a child's bedroom window at night in an English village",
+     "d": 1,
+     "cap": "Blowing dreams into a window"
+    },
+    {
+     "p": "shelves of glass jars each holding a glowing swirling dream in a giant's cave",
+     "d": 2,
+     "cap": "The jars of dreams"
+    }
+   ]
+  },
+  {
+   "id": "fantastic-mr-fox",
+   "name": "Fantastic Mr Fox",
+   "alt": [
+    "Fantastic Mr. Fox"
+   ],
+   "author": "Roald Dahl",
+   "year": 1970,
+   "kids": true,
+   "blurb": "A clever fox outwits three nasty farmers.",
+   "scenes": [
+    {
+     "p": "a fox family in an underground burrow tunnel beneath three farms, the farmers digging furiously above",
+     "d": 1,
+     "cap": "Tunnelling under the farmers"
+    },
+    {
+     "p": "three farmers, one fat, one short, one thin, with shotguns waiting at a fox hole at night",
+     "d": 2,
+     "cap": "Boggis, Bunce and Bean"
+    }
+   ]
+  },
+  {
+   "id": "the-secret-garden",
+   "name": "The Secret Garden",
+   "alt": [],
+   "author": "Frances Hodgson Burnett",
+   "year": 1911,
+   "kids": true,
+   "blurb": "An orphaned girl discovers a locked, neglected garden.",
+   "scenes": [
+    {
+     "p": "an old iron key and a hidden wooden door in an ivy-covered brick wall, a robin perched nearby",
+     "d": 1,
+     "cap": "The hidden door in the wall"
+    },
+    {
+     "p": "a blooming walled garden with roses, a girl and a boy in a wheelchair",
+     "d": 3,
+     "cap": "The garden comes alive"
+    }
+   ]
+  },
+  {
+   "id": "black-beauty",
+   "name": "Black Beauty",
+   "alt": [],
+   "author": "Anna Sewell",
+   "year": 1877,
+   "kids": true,
+   "blurb": "A horse tells his own life story, from happy pastures to London cab work.",
+   "scenes": [
+    {
+     "p": "a black horse with a white star on its forehead pulling a hansom cab through a foggy Victorian London street",
+     "d": 2,
+     "cap": "A black horse pulling a London cab"
+    },
+    {
+     "p": "a black foal with a white star galloping in a green English meadow beside its mother",
+     "d": 2,
+     "cap": "Growing up in the meadow"
+    }
+   ]
+  },
+  {
+   "id": "the-wind-in-the-willows",
+   "name": "The Wind in the Willows",
+   "alt": [
+    "Wind in the Willows"
+   ],
+   "author": "Kenneth Grahame",
+   "year": 1908,
+   "kids": true,
+   "blurb": "Mole, Ratty, Badger and the reckless Mr Toad have adventures by the river.",
+   "scenes": [
+    {
+     "p": "a toad in goggles recklessly driving an old open-topped motor car down a country lane, chickens scattering",
+     "d": 1,
+     "cap": "Poop-poop! Toad's motor car"
+    },
+    {
+     "p": "a mole and a water rat in a little rowing boat with a picnic basket on a willow-lined river",
+     "d": 2,
+     "cap": "Messing about in boats"
+    }
+   ]
+  },
+  {
+   "id": "gullivers-travels",
+   "name": "Gulliver's Travels",
+   "alt": [
+    "Gullivers Travels"
+   ],
+   "author": "Jonathan Swift",
+   "year": 1726,
+   "kids": false,
+   "blurb": "Lemuel Gulliver voyages to strange lands of tiny and giant people.",
+   "scenes": [
+    {
+     "p": "a giant man tied down on a beach by hundreds of ropes and pegs, swarms of tiny people climbing on him",
+     "d": 1,
+     "cap": "Tied down by tiny people in Lilliput"
+    },
+    {
+     "p": "a man the size of a doll standing on a giant's dining table",
+     "d": 2,
+     "cap": "Tiny among the giants"
+    }
+   ]
+  },
+  {
+   "id": "don-quixote",
+   "name": "Don Quixote",
+   "alt": [],
+   "author": "Miguel de Cervantes",
+   "year": 1605,
+   "kids": false,
+   "blurb": "An aging nobleman becomes a knight-errant with his squire Sancho Panza.",
+   "scenes": [
+    {
+     "p": "a thin knight in old armour on a bony horse charging with a lance at Spanish windmills, a short squire on a donkey behind",
+     "d": 1,
+     "cap": "Tilting at windmills"
+    }
+   ]
+  },
+  {
+   "id": "the-old-man-and-the-sea",
+   "name": "The Old Man and the Sea",
+   "alt": [],
+   "author": "Ernest Hemingway",
+   "year": 1952,
+   "kids": false,
+   "blurb": "An old Cuban fisherman battles a giant marlin far out at sea.",
+   "scenes": [
+    {
+     "p": "an old fisherman in a small wooden skiff with a giant marlin skeleton lashed alongside, sharks circling, Cuban coast at dawn",
+     "d": 2,
+     "cap": "Bringing home the marlin's skeleton"
+    },
+    {
+     "p": "an old fisherman in a small skiff holding a fishing line taut, a huge marlin leaping",
+     "d": 2,
+     "cap": "The battle with the marlin"
+    }
+   ]
+  },
+  {
+   "id": "lord-of-the-flies",
+   "name": "Lord of the Flies",
+   "alt": [],
+   "author": "William Golding",
+   "year": 1954,
+   "kids": false,
+   "blurb": "Schoolboys stranded on an island descend into savagery.",
+   "scenes": [
+    {
+     "p": "a large pink conch shell held up by a boy in a torn school uniform on a tropical beach, other boys gathered",
+     "d": 2,
+     "cap": "Whoever holds the conch may speak"
+    },
+    {
+     "p": "a pair of spectacles focusing sunlight to light a signal fire on a mountain top on an island",
+     "d": 3,
+     "cap": "Fire from the spectacles"
+    }
+   ]
+  },
+  {
+   "id": "the-great-gatsby",
+   "name": "The Great Gatsby",
+   "alt": [
+    "Great Gatsby"
+   ],
+   "author": "F. Scott Fitzgerald",
+   "year": 1925,
+   "kids": false,
+   "blurb": "Mysterious millionaire Jay Gatsby pines for Daisy Buchanan in Jazz Age Long Island.",
+   "scenes": [
+    {
+     "p": "a man in a white suit seen from behind at the end of a wooden dock at night, reaching toward a small green light across a bay",
+     "d": 2,
+     "cap": "The green light across the bay"
+    },
+    {
+     "p": "a lavish 1920s mansion party with flappers dancing, champagne towers and fireworks",
+     "d": 2,
+     "cap": "One of Gatsby's parties"
+    }
+   ]
+  },
+  {
+   "id": "to-kill-a-mockingbird",
+   "name": "To Kill a Mockingbird",
+   "alt": [],
+   "author": "Harper Lee",
+   "year": 1960,
+   "kids": false,
+   "blurb": "Scout Finch watches her lawyer father defend a Black man in 1930s Alabama.",
+   "scenes": [
+    {
+     "p": "the knothole of an old oak tree holding small gifts: two carved soap dolls, chewing gum and a pocket watch, a quiet Southern street",
+     "d": 3,
+     "cap": "Gifts in the knothole"
+    },
+    {
+     "p": "a lawyer in a 1930s suit seen from behind addressing a packed small-town Alabama courtroom",
+     "d": 3,
+     "cap": "The trial in Maycomb"
+    }
+   ]
+  },
+  {
+   "id": "nineteen-eighty-four",
+   "name": "Nineteen Eighty-Four",
+   "alt": [
+    "1984"
+   ],
+   "author": "George Orwell",
+   "year": 1949,
+   "kids": false,
+   "blurb": "Winston Smith rebels against the all-seeing Party.",
+   "scenes": [
+    {
+     "p": "giant stern watching eyes on a huge poster above a grey dystopian city street, telescreens, people in blue overalls",
+     "d": 2,
+     "cap": "Big Brother is watching"
+    },
+    {
+     "p": "a man seen from behind writing in a diary in an alcove hidden from a telescreen in a shabby flat",
+     "d": 3,
+     "cap": "The forbidden diary"
+    }
+   ]
+  },
+  {
+   "id": "animal-farm",
+   "name": "Animal Farm",
+   "alt": [],
+   "author": "George Orwell",
+   "year": 1945,
+   "kids": false,
+   "blurb": "Farm animals overthrow their farmer, but the pigs become tyrants.",
+   "scenes": [
+    {
+     "p": "pigs walking on their hind legs out of an English farmhouse, other farm animals watching in shock",
+     "d": 1,
+     "cap": "Four legs good, two legs better"
+    },
+    {
+     "p": "farm animals building a windmill on an English farm",
+     "d": 2,
+     "cap": "Building the windmill"
+    }
+   ]
+  },
+  {
+   "id": "fahrenheit-451",
+   "name": "Fahrenheit 451",
+   "alt": [],
+   "author": "Ray Bradbury",
+   "year": 1953,
+   "kids": false,
+   "blurb": "In a future where books are banned, a fireman starts to read.",
+   "scenes": [
+    {
+     "p": "firemen with flamethrowers burning a pile of books in a street at night, pages swirling in the flames",
+     "d": 2,
+     "cap": "Firemen who burn books"
+    }
+   ]
+  },
+  {
+   "id": "the-war-of-the-worlds",
+   "name": "The War of the Worlds",
+   "alt": [
+    "War of the Worlds"
+   ],
+   "author": "H. G. Wells",
+   "year": 1898,
+   "kids": false,
+   "blurb": "Martians invade Victorian England with tripod fighting machines.",
+   "scenes": [
+    {
+     "p": "giant three-legged Martian fighting machines striding over a Victorian English town firing heat rays, people fleeing",
+     "d": 1,
+     "cap": "Martian tripods attack"
+    },
+    {
+     "p": "a huge metal cylinder half-buried in a smoking crater on an English common at dawn, crowds watching",
+     "d": 3,
+     "cap": "The cylinder on Horsell Common"
+    }
+   ]
+  },
+  {
+   "id": "the-time-machine",
+   "name": "The Time Machine",
+   "alt": [],
+   "author": "H. G. Wells",
+   "year": 1895,
+   "kids": false,
+   "blurb": "A Victorian inventor travels to the year 802,701.",
+   "scenes": [
+    {
+     "p": "an ornate brass and wood Victorian time machine with a velvet seat and spinning dials glowing in a gentleman's study",
+     "d": 1,
+     "cap": "The Time Traveller's machine"
+    }
+   ]
+  },
+  {
+   "id": "little-women",
+   "name": "Little Women",
+   "alt": [],
+   "author": "Louisa May Alcott",
+   "year": 1868,
+   "kids": false,
+   "blurb": "Four March sisters grow up in Civil War-era Massachusetts.",
+   "scenes": [
+    {
+     "p": "four sisters in 1860s dresses gathered by the fireside at Christmas in a cosy New England parlour",
+     "d": 2,
+     "cap": "The four March sisters at Christmas"
+    }
+   ]
+  },
+  {
+   "id": "heidi",
+   "name": "Heidi",
+   "alt": [],
+   "author": "Johanna Spyri",
+   "year": 1881,
+   "kids": true,
+   "blurb": "An orphan girl lives with her grandfather in the Swiss Alps.",
+   "scenes": [
+    {
+     "p": "a little girl with goats on a flowery Swiss alpine meadow beside a wooden hut, snowy peaks",
+     "d": 1,
+     "cap": "Heidi and the goats in the Alps"
+    },
+    {
+     "p": "a girl lying in a hay loft looking out a round window at the stars over the Alps",
+     "d": 3,
+     "cap": "A bed in the hayloft"
+    }
+   ]
+  },
+  {
+   "id": "the-little-prince",
+   "name": "The Little Prince",
+   "alt": [
+    "Le Petit Prince"
+   ],
+   "author": "Antoine de Saint-Exupéry",
+   "year": 1943,
+   "kids": true,
+   "blurb": "A pilot stranded in the desert meets a little prince from a tiny asteroid.",
+   "scenes": [
+    {
+     "p": "a little boy with a long scarf standing on a tiny planet with three small volcanoes and a single rose under a glass dome, stars",
+     "d": 1,
+     "cap": "The prince on his tiny planet"
+    },
+    {
+     "p": "a small boy and a fox in the desert beside a crashed biplane",
+     "d": 2,
+     "cap": "Taming the fox in the desert"
+    }
+   ]
+  },
+  {
+   "id": "peter-rabbit",
+   "name": "The Tale of Peter Rabbit",
+   "alt": [
+    "Peter Rabbit"
+   ],
+   "author": "Beatrix Potter",
+   "year": 1902,
+   "kids": true,
+   "blurb": "A naughty rabbit sneaks into Mr McGregor's garden.",
+   "scenes": [
+    {
+     "p": "a little rabbit in a blue jacket squeezing under a garden gate in an English vegetable garden, cabbages, a farmer with a rake in the distance",
+     "d": 1,
+     "cap": "Into Mr McGregor's garden"
+    }
+   ]
+  },
+  {
+   "id": "the-hound-of-the-baskervilles",
+   "name": "The Hound of the Baskervilles",
+   "alt": [],
+   "author": "Arthur Conan Doyle",
+   "year": 1902,
+   "kids": false,
+   "blurb": "Sherlock Holmes investigates a legendary demon hound on Dartmoor.",
+   "scenes": [
+    {
+     "p": "a huge glowing spectral hound with fiery eyes leaping across a misty moor at night, granite tors",
+     "d": 2,
+     "cap": "The hound on the moor"
+    },
+    {
+     "p": "a detective in a deerstalker cap with a pipe seen from behind looking across foggy Dartmoor",
+     "d": 2,
+     "cap": "A detective on Dartmoor"
+    }
+   ]
+  },
+  {
+   "id": "journey-to-the-centre-of-the-earth",
+   "name": "Journey to the Centre of the Earth",
+   "alt": [
+    "Journey to the Center of the Earth"
+   ],
+   "author": "Jules Verne",
+   "year": 1864,
+   "kids": false,
+   "blurb": "A professor descends through an Icelandic volcano to an underground world.",
+   "scenes": [
+    {
+     "p": "explorers on a raft crossing a vast underground sea in a huge glowing cavern with giant mushrooms and sea monsters",
+     "d": 2,
+     "cap": "The underground sea"
+    }
+   ]
+  },
+  {
+   "id": "the-call-of-the-wild",
+   "name": "The Call of the Wild",
+   "alt": [
+    "Call of the Wild"
+   ],
+   "author": "Jack London",
+   "year": 1903,
+   "kids": false,
+   "blurb": "A pet dog is stolen and becomes a sled dog in the Yukon gold rush.",
+   "scenes": [
+    {
+     "p": "a big shaggy dog leading a dog sled team through the snowy Yukon wilderness, northern lights",
+     "d": 2,
+     "cap": "A sled dog in the Yukon"
+    }
+   ]
+  },
+  {
+   "id": "les-miserables",
+   "name": "Les Misérables",
+   "alt": [
+    "Les Miserables",
+    "Les Mis"
+   ],
+   "author": "Victor Hugo",
+   "year": 1862,
+   "kids": false,
+   "blurb": "Ex-convict Jean Valjean seeks redemption in 19th-century France.",
+   "scenes": [
+    {
+     "p": "young revolutionaries on a barricade of furniture across a narrow Paris street waving a red flag, smoke",
+     "d": 2,
+     "cap": "On the barricade"
+    },
+    {
+     "p": "a pair of silver candlesticks on a bishop's table by candlelight",
+     "d": 3,
+     "cap": "The bishop's silver candlesticks"
+    }
+   ]
+  },
+  {
+   "id": "the-hunchback-of-notre-dame",
+   "name": "The Hunchback of Notre-Dame",
+   "alt": [
+    "The Hunchback of Notre Dame",
+    "Notre-Dame de Paris"
+   ],
+   "author": "Victor Hugo",
+   "year": 1831,
+   "kids": false,
+   "blurb": "Bell-ringer Quasimodo loves Esmeralda in medieval Paris.",
+   "scenes": [
+    {
+     "p": "a hunched bell-ringer swinging on a huge bronze bell in a gothic cathedral tower, gargoyles and Paris rooftops",
+     "d": 1,
+     "cap": "The bell-ringer of the cathedral"
+    }
+   ]
+  },
+  {
+   "id": "the-count-of-monte-cristo",
+   "name": "The Count of Monte Cristo",
+   "alt": [],
+   "author": "Alexandre Dumas",
+   "year": 1844,
+   "kids": false,
+   "blurb": "Wrongly imprisoned, Edmond Dantès escapes and takes revenge.",
+   "scenes": [
+    {
+     "p": "a man escaping a grim island fortress prison by being thrown into the sea in a weighted sack at night",
+     "d": 2,
+     "cap": "Escape from the Château d'If"
+    },
+    {
+     "p": "a cave full of treasure chests on a rocky Mediterranean island",
+     "d": 3,
+     "cap": "The treasure of Monte Cristo"
+    }
+   ]
+  },
+  {
+   "id": "the-three-musketeers",
+   "name": "The Three Musketeers",
+   "alt": [],
+   "author": "Alexandre Dumas",
+   "year": 1844,
+   "kids": false,
+   "blurb": "Young d'Artagnan joins the King's musketeers.",
+   "scenes": [
+    {
+     "p": "four swordsmen in plumed hats and blue tabards crossing rapiers in the air, 17th-century Paris",
+     "d": 1,
+     "cap": "All for one and one for all"
+    }
+   ]
+  },
+  {
+   "id": "anne-of-green-gables",
+   "name": "Anne of Green Gables",
+   "alt": [],
+   "author": "L. M. Montgomery",
+   "year": 1908,
+   "kids": true,
+   "blurb": "Talkative orphan Anne Shirley is adopted by siblings on Prince Edward Island.",
+   "scenes": [
+    {
+     "p": "a red-haired orphan girl with two braids and a straw hat seen from behind with a carpet bag, a white farmhouse with green gables on Prince Edward Island",
+     "d": 2,
+     "cap": "Arriving at the farmhouse with green gables"
+    }
+   ]
+  },
+  {
+   "id": "hitchhikers-guide",
+   "name": "The Hitchhiker's Guide to the Galaxy",
+   "alt": [
+    "Hitchhikers Guide to the Galaxy",
+    "The Hitchhiker's Guide"
+   ],
+   "author": "Douglas Adams",
+   "year": 1979,
+   "kids": false,
+   "blurb": "Arthur Dent is rescued just before Earth is demolished for a hyperspace bypass.",
+   "scenes": [
+    {
+     "p": "a sperm whale and a bowl of petunias falling through the sky over an alien planet",
+     "d": 2,
+     "cap": "A whale and a bowl of petunias"
+    },
+    {
+     "p": "a man in a dressing gown seen from behind lying in front of a bulldozer outside a cottage, giant yellow spaceships above",
+     "d": 3,
+     "cap": "Bypass day"
+    }
+   ]
+  },
+  {
+   "id": "watership-down",
+   "name": "Watership Down",
+   "alt": [],
+   "author": "Richard Adams",
+   "year": 1972,
+   "kids": true,
+   "blurb": "A band of rabbits flee their doomed warren to find a new home.",
+   "scenes": [
+    {
+     "p": "a band of wild rabbits crossing rolling green English downs at sunset, a lone beech tree on the hill",
+     "d": 2,
+     "cap": "The rabbits' journey to the down"
+    }
+   ]
+  }
+ ]
+}

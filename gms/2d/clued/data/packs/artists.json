@@ -1,0 +1,2443 @@
+{
+ "id": "artists",
+ "title": "Artists",
+ "theme": "art",
+ "icon": "🎨",
+ "kids": false,
+ "version": 1,
+ "imgPrompt": "Which of these is {name}?",
+ "nameImgPrompt": "Who is this?",
+ "tfImgPrompt": "This is {name}.",
+ "factsMeta": {
+  "born": {
+   "type": "year",
+   "label": "Born",
+   "higherLabel": "Born later",
+   "askHigh": "Who of these was born most recently?",
+   "askLow": "Who of these was born first?"
+  },
+  "died": {
+   "type": "year",
+   "label": "Died",
+   "higherLabel": "Died later",
+   "askHigh": "Who of these died most recently?",
+   "askLow": "Who of these died first?"
+  },
+  "nationality": {
+   "type": "cat",
+   "label": "Nationality",
+   "exclusive": false,
+   "ask": "What nationality is {name}?",
+   "stmt": "{name}’s nationality: {value}."
+  },
+  "era": {
+   "type": "cat",
+   "label": "Born in",
+   "ask": "When was {name} born?",
+   "stmt": "{name} was born in the {value}."
+  },
+  "movement": {
+   "type": "cat",
+   "label": "Movement",
+   "exclusive": false,
+   "ask": "Which style or movement is {name} linked with?",
+   "stmt": "{name} is linked with {value}."
+  }
+ },
+ "items": [
+  {
+   "id": "leonardo-da-vinci",
+   "name": "Leonardo da Vinci",
+   "alt": [
+    "Leonardo",
+    "Da Vinci"
+   ],
+   "group": "Renaissance",
+   "facts": {
+    "born": 1452,
+    "died": 1519,
+    "nationality": "Italian",
+    "era": "Middle Ages",
+    "movement": "Renaissance"
+   },
+   "blurb": "Leonardo da Vinci (1452–1519): Painted the Mona Lisa.",
+   "clues": [
+    "He wrote his notes in mirror writing.",
+    "He drew designs for flying machines.",
+    "He painted The Last Supper.",
+    "Born in 1452.",
+    "Nationality: Italian.",
+    "Style or movement: Renaissance.",
+    "He painted the Mona Lisa."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/cb/Francesco_Melzi_-_Portrait_of_Leonardo.png/330px-Francesco_Melzi_-_Portrait_of_Leonardo.png",
+      "w": 330,
+      "h": 473,
+      "credit": "Attributed to Francesco Melzi",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Francesco_Melzi_-_Portrait_of_Leonardo.png"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "michelangelo",
+   "name": "Michelangelo",
+   "alt": [
+    "Michelangelo Buonarroti"
+   ],
+   "group": "Renaissance",
+   "facts": {
+    "born": 1475,
+    "died": 1564,
+    "nationality": "Italian",
+    "era": "Middle Ages",
+    "movement": "Renaissance"
+   },
+   "blurb": "Michelangelo (1475–1564): A great Italian Renaissance sculptor and painter.",
+   "clues": [
+    "He designed the dome of St Peter's Basilica.",
+    "He carved the statue of David.",
+    "He painted the ceiling of the Sistine Chapel.",
+    "Born in 1475.",
+    "Nationality: Italian.",
+    "Style or movement: Renaissance.",
+    "He was a great Italian Renaissance sculptor and painter."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/02/Michelangelo_Daniele_da_Volterra_%28dettaglio%29.jpg/500px-Michelangelo_Daniele_da_Volterra_%28dettaglio%29.jpg",
+      "w": 500,
+      "h": 579,
+      "credit": "Attributed to Daniele da Volterra",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Michelangelo_Daniele_da_Volterra_(dettaglio).jpg"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "raphael",
+   "name": "Raphael",
+   "alt": [
+    "Raffaello Sanzio"
+   ],
+   "group": "Renaissance",
+   "facts": {
+    "born": 1483,
+    "died": 1520,
+    "nationality": "Italian",
+    "era": "Middle Ages",
+    "movement": "Renaissance"
+   },
+   "blurb": "Raphael (1483–1520): One of the great painters of the High Renaissance.",
+   "clues": [
+    "He died on his 37th birthday.",
+    "He painted the Sistine Madonna.",
+    "He painted The School of Athens.",
+    "Born in 1483.",
+    "Nationality: Italian.",
+    "Style or movement: Renaissance.",
+    "He was one of the great painters of the High Renaissance."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f6/Raffaello_Sanzio.jpg/330px-Raffaello_Sanzio.jpg",
+      "w": 330,
+      "h": 450,
+      "credit": "Raphael",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Raffaello_Sanzio.jpg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "albrecht-durer",
+   "name": "Albrecht Dürer",
+   "alt": [
+    "Albrecht Durer",
+    "Dürer"
+   ],
+   "group": "Renaissance",
+   "facts": {
+    "born": 1471,
+    "died": 1528,
+    "nationality": "German",
+    "era": "Middle Ages",
+    "movement": "Renaissance"
+   },
+   "blurb": "Albrecht Dürer (1471–1528): A master of printmaking.",
+   "clues": [
+    "He made a famous woodcut of a rhinoceros he never saw.",
+    "He painted a famous watercolour of a young hare.",
+    "He was born in Nuremberg.",
+    "Born in 1471.",
+    "Nationality: German.",
+    "Style or movement: Renaissance.",
+    "He was a master of printmaking."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/4/40/D%C3%BCrer_Alte_Pinakothek.jpg/330px-D%C3%BCrer_Alte_Pinakothek.jpg",
+      "w": 330,
+      "h": 465,
+      "credit": "Albrecht Dürer",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:D%C3%BCrer_Alte_Pinakothek.jpg"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "caravaggio",
+   "name": "Caravaggio",
+   "alt": [
+    "Michelangelo Merisi da Caravaggio"
+   ],
+   "group": "Baroque",
+   "facts": {
+    "born": 1571,
+    "died": 1610,
+    "nationality": "Italian",
+    "era": "1500s to 1700s",
+    "movement": "Baroque"
+   },
+   "blurb": "Caravaggio (1571–1610): A rebellious Baroque painter.",
+   "clues": [
+    "He killed a man and fled Rome.",
+    "He painted The Calling of Saint Matthew.",
+    "He used dramatic light and shadow.",
+    "Born in 1571.",
+    "Nationality: Italian.",
+    "Style or movement: Baroque.",
+    "He was a rebellious Baroque painter."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/7/73/Bild-Ottavio_Leoni%2C_Caravaggio.jpg/330px-Bild-Ottavio_Leoni%2C_Caravaggio.jpg",
+      "w": 330,
+      "h": 461,
+      "credit": "Ottavio Leoni",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Bild-Ottavio_Leoni,_Caravaggio.jpg"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "diego-velazquez",
+   "name": "Diego Velázquez",
+   "alt": [
+    "Velazquez"
+   ],
+   "group": "Baroque",
+   "facts": {
+    "born": 1599,
+    "died": 1660,
+    "nationality": "Spanish",
+    "era": "1500s to 1700s",
+    "movement": "Baroque"
+   },
+   "blurb": "Diego Velázquez (1599–1660): A great Spanish painter.",
+   "clues": [
+    "He painted Pope Innocent X.",
+    "He was court painter to King Philip IV.",
+    "He painted himself at work in Las Meninas.",
+    "Born in 1599.",
+    "Nationality: Spanish.",
+    "Style or movement: Baroque.",
+    "He was a great Spanish painter."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/6/6c/Diego_Vel%C3%A1zquez_Autorretrato_45_x_38_cm_-_Colecci%C3%B3n_Real_Academia_de_Bellas_Artes_de_San_Carlos_-_Museo_de_Bellas_Artes_de_Valencia.jpg/500px-Diego_Vel%C3%A1zquez_Autorretrato_45_x_38_cm_-_Colecci%C3%B3n_Real_Academia_de_Bellas_Artes_de_San_Carlos_-_Museo_de_Bellas_Artes_de_Valencia.jpg",
+      "w": 500,
+      "h": 592,
+      "credit": "Diego Velázquez",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Diego_Vel%C3%A1zquez_Autorretrato_45_x_38_cm_-_Colecci%C3%B3n_Real_Academia_de_Bellas_Artes_de_San_Carlos_-_Museo_de_Bellas_Artes_de_Valencia.jpg"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "rembrandt",
+   "name": "Rembrandt",
+   "alt": [
+    "Rembrandt van Rijn"
+   ],
+   "group": "Baroque",
+   "facts": {
+    "born": 1606,
+    "died": 1669,
+    "nationality": "Dutch",
+    "era": "1500s to 1700s",
+    "movement": "Baroque"
+   },
+   "blurb": "Rembrandt (1606–1669): A master of the Dutch Golden Age.",
+   "clues": [
+    "He painted dozens of self-portraits.",
+    "He went bankrupt in 1656.",
+    "He painted The Night Watch.",
+    "Born in 1606.",
+    "Nationality: Dutch.",
+    "Style or movement: Baroque.",
+    "He was a master of the Dutch Golden Age."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/b/bd/Rembrandt_van_Rijn_-_Self-Portrait_-_Google_Art_Project.jpg/330px-Rembrandt_van_Rijn_-_Self-Portrait_-_Google_Art_Project.jpg",
+      "w": 330,
+      "h": 427,
+      "credit": "Rembrandt",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Rembrandt_van_Rijn_-_Self-Portrait_-_Google_Art_Project.jpg"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "johannes-vermeer",
+   "name": "Johannes Vermeer",
+   "alt": [
+    "Vermeer"
+   ],
+   "group": "Baroque",
+   "facts": {
+    "born": 1632,
+    "died": 1675,
+    "nationality": "Dutch",
+    "era": "1500s to 1700s",
+    "movement": "Baroque"
+   },
+   "blurb": "Johannes Vermeer (1632–1675): Painted Girl with a Pearl Earring.",
+   "clues": [
+    "Only around 35 of his paintings survive.",
+    "He worked in Delft.",
+    "He painted The Milkmaid.",
+    "Born in 1632.",
+    "Nationality: Dutch.",
+    "Style or movement: Baroque.",
+    "He painted Girl with a Pearl Earring."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/4/46/Cropped_version_of_Jan_Vermeer_van_Delft_002.jpg/330px-Cropped_version_of_Jan_Vermeer_van_Delft_002.jpg",
+      "w": 330,
+      "h": 459,
+      "credit": "Johannes Vermeer",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Cropped_version_of_Jan_Vermeer_van_Delft_002.jpg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "francisco-goya",
+   "name": "Francisco Goya",
+   "alt": [
+    "Goya"
+   ],
+   "group": "Romanticism",
+   "facts": {
+    "born": 1746,
+    "died": 1828,
+    "nationality": "Spanish",
+    "era": "1500s to 1700s",
+    "movement": "Romanticism"
+   },
+   "blurb": "Francisco Goya (1746–1828): A Spanish court painter.",
+   "clues": [
+    "He became deaf after an illness.",
+    "He painted dark pictures on the walls of his house.",
+    "He painted The Third of May 1808.",
+    "Born in 1746.",
+    "Nationality: Spanish.",
+    "Style or movement: Romanticism.",
+    "He was a Spanish court painter."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/b/bf/Vicente_L%C3%B3pez_Porta%C3%B1a_-_el_pintor_Francisco_de_Goya.jpg/500px-Vicente_L%C3%B3pez_Porta%C3%B1a_-_el_pintor_Francisco_de_Goya.jpg",
+      "w": 500,
+      "h": 617,
+      "credit": "Vicente López Portaña",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Vicente_L%C3%B3pez_Porta%C3%B1a_-_el_pintor_Francisco_de_Goya.jpg"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "katsushika-hokusai",
+   "name": "Katsushika Hokusai",
+   "alt": [
+    "Hokusai"
+   ],
+   "group": "Ukiyo-e",
+   "facts": {
+    "born": 1760,
+    "died": 1849,
+    "nationality": "Japanese",
+    "era": "1500s to 1700s",
+    "movement": "Ukiyo-e"
+   },
+   "blurb": "Katsushika Hokusai (1760–1849): Made The Great Wave off Kanagawa.",
+   "clues": [
+    "He used more than 30 different names.",
+    "He made a series called Thirty-six Views of Mount Fuji.",
+    "He was a master of woodblock prints.",
+    "Born in 1760.",
+    "Nationality: Japanese.",
+    "Style or movement: Ukiyo-e.",
+    "He made The Great Wave off Kanagawa."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/1/1c/Hokusai_as_an_old_man.jpg/250px-Hokusai_as_an_old_man.jpg",
+      "w": 250,
+      "h": 519,
+      "credit": "missing name",
+      "license": "CC0",
+      "page": "https://commons.wikimedia.org/wiki/File:Hokusai_as_an_old_man.jpg"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "j-m-w-turner",
+   "name": "J. M. W. Turner",
+   "alt": [
+    "Turner",
+    "JMW Turner"
+   ],
+   "group": "Romanticism",
+   "facts": {
+    "born": 1775,
+    "died": 1851,
+    "nationality": "English",
+    "era": "1500s to 1700s",
+    "movement": "Romanticism"
+   },
+   "blurb": "J. M. W. Turner (1775–1851): Famous for stormy seas and glowing light.",
+   "clues": [
+    "He is said to have had himself tied to a ship's mast to see a storm.",
+    "He appears on the Bank of England £20 note.",
+    "He painted The Fighting Temeraire.",
+    "Born in 1775.",
+    "Nationality: English.",
+    "Style or movement: Romanticism.",
+    "He was famous for stormy seas and glowing light."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/9f/Joseph_Mallord_William_Turner_auto-retrato.jpg/330px-Joseph_Mallord_William_Turner_auto-retrato.jpg",
+      "w": 330,
+      "h": 429,
+      "credit": "J. M. W. Turner",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Joseph_Mallord_William_Turner_auto-retrato.jpg"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "john-constable",
+   "name": "John Constable",
+   "alt": [
+    "Constable"
+   ],
+   "group": "Romanticism",
+   "facts": {
+    "born": 1776,
+    "died": 1837,
+    "nationality": "English",
+    "era": "1500s to 1700s",
+    "movement": "Romanticism"
+   },
+   "blurb": "John Constable (1776–1837): An English landscape painter.",
+   "clues": [
+    "He painted the countryside around the River Stour.",
+    "He rarely left England.",
+    "He painted The Hay Wain.",
+    "Born in 1776.",
+    "Nationality: English.",
+    "Style or movement: Romanticism.",
+    "He was an English landscape painter."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/4/46/John_Constable_by_Daniel_Gardner%2C_1796.JPG/330px-John_Constable_by_Daniel_Gardner%2C_1796.JPG",
+      "w": 330,
+      "h": 496,
+      "credit": "Stephencdickson",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:John_Constable_by_Daniel_Gardner,_1796.JPG"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "claude-monet",
+   "name": "Claude Monet",
+   "alt": [
+    "Monet"
+   ],
+   "group": "Impressionism",
+   "facts": {
+    "born": 1840,
+    "died": 1926,
+    "nationality": "French",
+    "era": "1800s",
+    "movement": "Impressionism"
+   },
+   "blurb": "Claude Monet (1840–1926): Painted water lilies.",
+   "clues": [
+    "His painting Impression, Sunrise gave a movement its name.",
+    "He painted haystacks and cathedrals at different times of day.",
+    "He built a garden with a Japanese bridge at Giverny.",
+    "Born in 1840.",
+    "Nationality: French.",
+    "Style or movement: Impressionism.",
+    "He painted water lilies."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a4/Claude_Monet_1899_Nadar_crop.jpg/330px-Claude_Monet_1899_Nadar_crop.jpg",
+      "w": 330,
+      "h": 440,
+      "credit": "Nadar",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Claude_Monet_1899_Nadar_crop.jpg"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "pierre-auguste-renoir",
+   "name": "Pierre-Auguste Renoir",
+   "alt": [
+    "Renoir"
+   ],
+   "group": "Impressionism",
+   "facts": {
+    "born": 1841,
+    "died": 1919,
+    "nationality": "French",
+    "era": "1800s",
+    "movement": "Impressionism"
+   },
+   "blurb": "Pierre-Auguste Renoir (1841–1919): A French Impressionist.",
+   "clues": [
+    "He kept painting with brushes strapped to his hands.",
+    "He painted Dance at Le Moulin de la Galette.",
+    "He painted Luncheon of the Boating Party.",
+    "Born in 1841.",
+    "Nationality: French.",
+    "Style or movement: Impressionism.",
+    "He was a French Impressionist."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/6/67/Pierre_Auguste_Renoir%2C_uncropped_image.jpg/500px-Pierre_Auguste_Renoir%2C_uncropped_image.jpg",
+      "w": 500,
+      "h": 619,
+      "credit": "UnknownUnknown Musée d'Orsay, Dist. RMN-Grand Palais / Patrice Schmidt",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Pierre_Auguste_Renoir,_uncropped_image.jpg"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "edgar-degas",
+   "name": "Edgar Degas",
+   "alt": [
+    "Degas"
+   ],
+   "group": "Impressionism",
+   "facts": {
+    "born": 1834,
+    "died": 1917,
+    "nationality": "French",
+    "era": "1800s",
+    "movement": "Impressionism"
+   },
+   "blurb": "Edgar Degas (1834–1917): Famous for paintings of ballet dancers.",
+   "clues": [
+    "His eyesight failed in later life.",
+    "He made a sculpture called Little Dancer Aged Fourteen.",
+    "He painted horse races.",
+    "Born in 1834.",
+    "Nationality: French.",
+    "Style or movement: Impressionism.",
+    "He is famous for paintings of ballet dancers."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c0/Edgar_Degas_self_portrait_1855FXD.jpg/330px-Edgar_Degas_self_portrait_1855FXD.jpg",
+      "w": 330,
+      "h": 416,
+      "credit": "Edgar Degas",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Edgar_Degas_self_portrait_1855FXD.jpg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "paul-cezanne",
+   "name": "Paul Cézanne",
+   "alt": [
+    "Cezanne"
+   ],
+   "group": "Post-Impressionism",
+   "facts": {
+    "born": 1839,
+    "died": 1906,
+    "nationality": "French",
+    "era": "1800s",
+    "movement": "Post-Impressionism"
+   },
+   "blurb": "Paul Cézanne (1839–1906): Famous for still lifes of apples.",
+   "clues": [
+    "He painted Mont Sainte-Victoire many times.",
+    "He painted The Card Players.",
+    "He is often called the father of modern art.",
+    "Born in 1839.",
+    "Nationality: French.",
+    "Style or movement: Post-Impressionism.",
+    "He was famous for still lifes of apples."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/c/c4/Paul-Cezanne.jpg",
+      "w": 250,
+      "h": 333,
+      "credit": "Unknown; Cézanne was born in 1839 and died in 1906",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Paul-Cezanne.jpg"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "paul-gauguin",
+   "name": "Paul Gauguin",
+   "alt": [
+    "Gauguin"
+   ],
+   "group": "Post-Impressionism",
+   "facts": {
+    "born": 1848,
+    "died": 1903,
+    "nationality": "French",
+    "era": "1800s",
+    "movement": "Post-Impressionism"
+   },
+   "blurb": "Paul Gauguin (1848–1903): Painted bright scenes of Polynesian life.",
+   "clues": [
+    "He once worked as a stockbroker.",
+    "He lived with Van Gogh in Arles for a few weeks.",
+    "He moved to Tahiti.",
+    "Born in 1848.",
+    "Nationality: French.",
+    "Style or movement: Post-Impressionism.",
+    "He painted bright scenes of Polynesian life."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/5/53/Paul_Gauguin_1891.png/500px-Paul_Gauguin_1891.png",
+      "w": 500,
+      "h": 635,
+      "credit": "Louis-Maurice Boutet de Monvel",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Paul_Gauguin_1891.png"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "vincent-van-gogh",
+   "name": "Vincent van Gogh",
+   "alt": [
+    "Van Gogh"
+   ],
+   "group": "Post-Impressionism",
+   "facts": {
+    "born": 1853,
+    "died": 1890,
+    "nationality": "Dutch",
+    "era": "1800s",
+    "movement": "Post-Impressionism"
+   },
+   "blurb": "Vincent van Gogh (1853–1890): Painted The Starry Night and Sunflowers.",
+   "clues": [
+    "His brother Theo supported him.",
+    "He sold very few paintings in his lifetime.",
+    "He cut off part of his own ear.",
+    "Born in 1853.",
+    "Nationality: Dutch.",
+    "Style or movement: Post-Impressionism.",
+    "He painted The Starry Night and Sunflowers."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d1/Self-portrait_-_Vincent_van_Gogh.jpg/330px-Self-portrait_-_Vincent_van_Gogh.jpg",
+      "w": 330,
+      "h": 451,
+      "credit": "Vincent van Gogh",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Self-portrait_-_Vincent_van_Gogh.jpg"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "georges-seurat",
+   "name": "Georges Seurat",
+   "alt": [
+    "Seurat"
+   ],
+   "group": "Post-Impressionism",
+   "facts": {
+    "born": 1859,
+    "died": 1891,
+    "nationality": "French",
+    "era": "1800s",
+    "movement": "Post-Impressionism"
+   },
+   "blurb": "Georges Seurat (1859–1891): Painted with tiny dots of colour.",
+   "clues": [
+    "He died at 31.",
+    "He painted Bathers at Asnières.",
+    "He painted A Sunday Afternoon on the Island of La Grande Jatte.",
+    "Born in 1859.",
+    "Nationality: French.",
+    "Style or movement: Post-Impressionism.",
+    "He painted with tiny dots of colour."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/1/14/Georges_Seurat_1888_%28cropped%29.jpg/330px-Georges_Seurat_1888_%28cropped%29.jpg",
+      "w": 330,
+      "h": 486,
+      "credit": "Unidentified photographer",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Georges_Seurat_1888_(cropped).jpg"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "gustav-klimt",
+   "name": "Gustav Klimt",
+   "alt": [
+    "Klimt"
+   ],
+   "group": "Art Nouveau",
+   "facts": {
+    "born": 1862,
+    "died": 1918,
+    "nationality": "Austrian",
+    "era": "1800s",
+    "movement": "Art Nouveau"
+   },
+   "blurb": "Gustav Klimt (1862–1918): Painted The Kiss.",
+   "clues": [
+    "He founded the Vienna Secession.",
+    "He painted a famous portrait of Adele Bloch-Bauer.",
+    "He used real gold leaf.",
+    "Born in 1862.",
+    "Nationality: Austrian.",
+    "Style or movement: Art Nouveau.",
+    "He painted The Kiss."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d8/Klimt.jpg/500px-Klimt.jpg",
+      "w": 500,
+      "h": 639,
+      "credit": "Josef Anton Trčka",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Klimt.jpg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "edvard-munch",
+   "name": "Edvard Munch",
+   "alt": [
+    "Munch"
+   ],
+   "group": "Expressionism",
+   "facts": {
+    "born": 1863,
+    "died": 1944,
+    "nationality": "Norwegian",
+    "era": "1800s",
+    "movement": "Expressionism"
+   },
+   "blurb": "Edvard Munch (1863–1944): Painted The Scream.",
+   "clues": [
+    "He painted Madonna and The Sick Child.",
+    "Versions of his most famous work have been stolen twice.",
+    "He made several versions of the same famous image.",
+    "Born in 1863.",
+    "Nationality: Norwegian.",
+    "Style or movement: Expressionism.",
+    "He painted The Scream."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4a/Edvard_Munch_1933-2.jpg/330px-Edvard_Munch_1933-2.jpg",
+      "w": 330,
+      "h": 472,
+      "credit": "Anders Beer Wilse",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Edvard_Munch_1933-2.jpg"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "wassily-kandinsky",
+   "name": "Wassily Kandinsky",
+   "alt": [
+    "Kandinsky"
+   ],
+   "group": "Abstract",
+   "facts": {
+    "born": 1866,
+    "died": 1944,
+    "nationality": "Russian",
+    "era": "1800s",
+    "movement": "Abstract"
+   },
+   "blurb": "Wassily Kandinsky (1866–1944): A pioneer of abstract art.",
+   "clues": [
+    "He taught at the Bauhaus.",
+    "He linked colours to musical sounds.",
+    "He was born in Moscow.",
+    "Born in 1866.",
+    "Nationality: Russian.",
+    "Style or movement: Abstract.",
+    "He was a pioneer of abstract art."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d6/Wassily_kandinsky.jpg/330px-Wassily_kandinsky.jpg",
+      "w": 330,
+      "h": 477,
+      "credit": "未知上傳者",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Wassily_kandinsky.jpg"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "henri-matisse",
+   "name": "Henri Matisse",
+   "alt": [
+    "Matisse"
+   ],
+   "group": "Fauvism",
+   "facts": {
+    "born": 1869,
+    "died": 1954,
+    "nationality": "French",
+    "era": "1800s",
+    "movement": "Fauvism"
+   },
+   "blurb": "Henri Matisse (1869–1954): Famous for bold, bright colour.",
+   "clues": [
+    "In later life he made art from painted paper cut-outs.",
+    "He painted The Dance.",
+    "He led the Fauves, or wild beasts.",
+    "Born in 1869.",
+    "Nationality: French.",
+    "Style or movement: Fauvism.",
+    "He was famous for bold, bright colour."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b1/Portrait_of_Henri_Matisse_1933_May_20.jpg/330px-Portrait_of_Henri_Matisse_1933_May_20.jpg",
+      "w": 330,
+      "h": 432,
+      "credit": "Carl Van Vechten",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Portrait_of_Henri_Matisse_1933_May_20.jpg"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "pablo-picasso",
+   "name": "Pablo Picasso",
+   "alt": [
+    "Picasso"
+   ],
+   "group": "Cubism",
+   "facts": {
+    "born": 1881,
+    "died": 1973,
+    "nationality": "Spanish",
+    "era": "1800s",
+    "movement": "Cubism"
+   },
+   "blurb": "Pablo Picasso (1881–1973): Co-founded Cubism.",
+   "clues": [
+    "His full name has more than 20 words.",
+    "He went through a Blue Period.",
+    "He painted Guernica.",
+    "Born in 1881.",
+    "Nationality: Spanish.",
+    "Style or movement: Cubism.",
+    "He co-founded Cubism."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/98/Pablo_picasso_1.jpg/500px-Pablo_picasso_1.jpg",
+      "w": 500,
+      "h": 584,
+      "credit": "Argentina. Revista Vea y Lea",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Pablo_picasso_1.jpg"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "edward-hopper",
+   "name": "Edward Hopper",
+   "alt": [
+    "Hopper"
+   ],
+   "group": "Realism",
+   "facts": {
+    "born": 1882,
+    "died": 1967,
+    "nationality": "American",
+    "era": "1800s",
+    "movement": "Realism"
+   },
+   "blurb": "Edward Hopper (1882–1967): Painted Nighthawks.",
+   "clues": [
+    "He painted lonely city scenes.",
+    "He painted Automat.",
+    "He painted people in a late-night diner.",
+    "Born in 1882.",
+    "Nationality: American.",
+    "Style or movement: Realism.",
+    "He painted Nighthawks."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b7/Edward_Hopper%2C_New_York_artist_LCCN2016871478_%28cropped%29.jpg/330px-Edward_Hopper%2C_New_York_artist_LCCN2016871478_%28cropped%29.jpg",
+      "w": 330,
+      "h": 494,
+      "credit": "Harris & Ewing, photographer",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Edward_Hopper,_New_York_artist_LCCN2016871478_(cropped).jpg"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "georgia-o-keeffe",
+   "name": "Georgia O'Keeffe",
+   "alt": [
+    "O'Keeffe"
+   ],
+   "group": "Modernism",
+   "facts": {
+    "born": 1887,
+    "died": 1986,
+    "nationality": "American",
+    "era": "1800s",
+    "movement": "Modernism"
+   },
+   "blurb": "Georgia O'Keeffe (1887–1986): Painted giant close-up flowers.",
+   "clues": [
+    "She was married to the photographer Alfred Stieglitz.",
+    "She lived in New Mexico.",
+    "She painted animal skulls in the desert.",
+    "Born in 1887.",
+    "Nationality: American.",
+    "Style or movement: Modernism.",
+    "She painted giant close-up flowers."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a2/Georgia_O%27Keeffe_MET_DP230868.jpg/500px-Georgia_O%27Keeffe_MET_DP230868.jpg",
+      "w": 500,
+      "h": 619,
+      "credit": "Alfred Stieglitz",
+      "license": "CC0",
+      "page": "https://commons.wikimedia.org/wiki/File:Georgia_O%27Keeffe_MET_DP230868.jpg"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "grant-wood",
+   "name": "Grant Wood",
+   "alt": [
+    "Wood"
+   ],
+   "group": "Regionalism",
+   "facts": {
+    "born": 1891,
+    "died": 1942,
+    "nationality": "American",
+    "era": "1800s",
+    "movement": "Regionalism"
+   },
+   "blurb": "Grant Wood (1891–1942): Painted American Gothic.",
+   "clues": [
+    "He came from Iowa.",
+    "His most famous models were his sister and his dentist.",
+    "He painted a farmer holding a pitchfork.",
+    "Born in 1891.",
+    "Nationality: American.",
+    "Style or movement: Regionalism.",
+    "He painted American Gothic."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/02/Grant_Wood.jpg/500px-Grant_Wood.jpg",
+      "w": 500,
+      "h": 602,
+      "credit": "Grant Wood",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Grant_Wood.jpg"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "rene-magritte",
+   "name": "René Magritte",
+   "alt": [
+    "Magritte",
+    "Rene Magritte"
+   ],
+   "group": "Surrealism",
+   "facts": {
+    "born": 1898,
+    "died": 1967,
+    "nationality": "Belgian",
+    "era": "1800s",
+    "movement": "Surrealism"
+   },
+   "blurb": "René Magritte (1898–1967): A Belgian Surrealist.",
+   "clues": [
+    "He painted a pipe with the words This is not a pipe.",
+    "He painted men in bowler hats.",
+    "He painted a man with an apple in front of his face.",
+    "Born in 1898.",
+    "Nationality: Belgian.",
+    "Style or movement: Surrealism.",
+    "He was a Belgian Surrealist."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/4/46/Ren%C3%A9_Magritte_in_1961.jpg/330px-Ren%C3%A9_Magritte_in_1961.jpg",
+      "w": 330,
+      "h": 435,
+      "credit": "Unknown authorUnknown author Restored by Giovanni Cardinali",
+      "license": "CC0",
+      "page": "https://commons.wikimedia.org/wiki/File:Ren%C3%A9_Magritte_in_1961.jpg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "salvador-dali",
+   "name": "Salvador Dalí",
+   "alt": [
+    "Dali",
+    "Salvador Dali"
+   ],
+   "group": "Surrealism",
+   "facts": {
+    "born": 1904,
+    "died": 1989,
+    "nationality": "Spanish",
+    "era": "1900s or later",
+    "movement": "Surrealism"
+   },
+   "blurb": "Salvador Dalí (1904–1989): A famous Surrealist.",
+   "clues": [
+    "He designed the Chupa Chups logo.",
+    "He had a long, upturned moustache.",
+    "He painted melting clocks in The Persistence of Memory.",
+    "Born in 1904.",
+    "Nationality: Spanish.",
+    "Style or movement: Surrealism.",
+    "He was a famous Surrealist."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/2/24/Salvador_Dal%C3%AD_1939.jpg/330px-Salvador_Dal%C3%AD_1939.jpg",
+      "w": 330,
+      "h": 424,
+      "credit": "Van Vechten, Carl, 1880-1964.",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Salvador_Dal%C3%AD_1939.jpg"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "frida-kahlo",
+   "name": "Frida Kahlo",
+   "alt": [
+    "Kahlo"
+   ],
+   "group": "Surrealism",
+   "facts": {
+    "born": 1907,
+    "died": 1954,
+    "nationality": "Mexican",
+    "era": "1900s or later",
+    "movement": "Surrealism"
+   },
+   "blurb": "Frida Kahlo (1907–1954): Painted many self-portraits with flowers in her hair.",
+   "clues": [
+    "She was badly injured in a bus accident as a teenager.",
+    "She married the painter Diego Rivera.",
+    "She lived in the Blue House in Mexico City.",
+    "Born in 1907.",
+    "Nationality: Mexican.",
+    "Style or movement: Surrealism.",
+    "She painted many self-portraits with flowers in her hair."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/09/Frida_Kahlo%2C_by_Guillermo_Kahlo_%28cropped%29.jpg/500px-Frida_Kahlo%2C_by_Guillermo_Kahlo_%28cropped%29.jpg",
+      "w": 500,
+      "h": 602,
+      "credit": "Guillermo Kahlo",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Frida_Kahlo,_by_Guillermo_Kahlo_(cropped).jpg"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "jackson-pollock",
+   "name": "Jackson Pollock",
+   "alt": [
+    "Pollock"
+   ],
+   "group": "Abstract Expressionism",
+   "facts": {
+    "born": 1912,
+    "died": 1956,
+    "nationality": "American",
+    "era": "1900s or later",
+    "movement": "Abstract Expressionism"
+   },
+   "blurb": "Jackson Pollock (1912–1956): A leading Abstract Expressionist.",
+   "clues": [
+    "He worked with his canvases laid flat on the floor.",
+    "He dripped and poured paint.",
+    "Born in 1912.",
+    "Nationality: American.",
+    "Style or movement: Abstract Expressionism.",
+    "He was a leading Abstract Expressionist."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/6/6d/Jackson_Pollock_by_Hans_Namuth.jpg/330px-Jackson_Pollock_by_Hans_Namuth.jpg",
+      "w": 330,
+      "h": 440,
+      "credit": "Hans Namuth",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Jackson_Pollock_by_Hans_Namuth.jpg"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "roy-lichtenstein",
+   "name": "Roy Lichtenstein",
+   "alt": [
+    "Lichtenstein"
+   ],
+   "group": "Pop Art",
+   "facts": {
+    "born": 1923,
+    "died": 1997,
+    "nationality": "American",
+    "era": "1900s or later",
+    "movement": "Pop Art"
+   },
+   "blurb": "Roy Lichtenstein (1923–1997): An American Pop artist.",
+   "clues": [
+    "He painted Whaam!.",
+    "He copied the dots used in cheap printing.",
+    "He made paintings that look like comic strips.",
+    "Born in 1923.",
+    "Nationality: American.",
+    "Style or movement: Pop Art.",
+    "He was an American Pop artist."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/2/28/Roy_Lichtenstein%2C_painter_1969_%28cropped%29.jpg/330px-Roy_Lichtenstein%2C_painter_1969_%28cropped%29.jpg",
+      "w": 330,
+      "h": 441,
+      "credit": "Gotfryd, Bernard, photographer",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Roy_Lichtenstein,_painter_1969_(cropped).jpg"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "andy-warhol",
+   "name": "Andy Warhol",
+   "alt": [
+    "Warhol"
+   ],
+   "group": "Pop Art",
+   "facts": {
+    "born": 1928,
+    "died": 1987,
+    "nationality": "American",
+    "era": "1900s or later",
+    "movement": "Pop Art"
+   },
+   "blurb": "Andy Warhol (1928–1987): Painted Campbell's soup cans.",
+   "clues": [
+    "His studio was called the Factory.",
+    "He said everyone would be famous for 15 minutes.",
+    "He made colourful prints of Marilyn Monroe.",
+    "Born in 1928.",
+    "Nationality: American.",
+    "Style or movement: Pop Art.",
+    "He painted Campbell's soup cans."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5b/Andy_Warhol_at_the_Jewish_Museum_%28by_Bernard_Gotfryd%29_%E2%80%93_LOC.jpg/330px-Andy_Warhol_at_the_Jewish_Museum_%28by_Bernard_Gotfryd%29_%E2%80%93_LOC.jpg",
+      "w": 330,
+      "h": 480,
+      "credit": "Bernard Gotfryd",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Andy_Warhol_at_the_Jewish_Museum_(by_Bernard_Gotfryd)_%E2%80%93_LOC.jpg"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "yayoi-kusama",
+   "name": "Yayoi Kusama",
+   "alt": [],
+   "group": "Contemporary",
+   "facts": {
+    "born": 1929,
+    "died": 2026,
+    "nationality": "Japanese",
+    "era": "1900s or later",
+    "movement": "Contemporary"
+   },
+   "blurb": "Yayoi Kusama (1929–2026): Famous for polka dots.",
+   "clues": [
+    "She has lived by choice in a psychiatric hospital in Tokyo since 1977.",
+    "She makes mirror rooms that seem to go on forever.",
+    "She makes giant pumpkin sculptures.",
+    "Born in 1929.",
+    "Nationality: Japanese.",
+    "Style or movement: Contemporary.",
+    "She is famous for polka dots."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/1/12/Yayoi_Kusama_in_2005.jpg/500px-Yayoi_Kusama_in_2005.jpg",
+      "w": 500,
+      "h": 373,
+      "credit": "Muriel Guingand",
+      "license": "CC BY 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Yayoi_Kusama_in_2005.jpg"
+     }
+    ]
+   },
+   "difficulty": 3
+  }
+ ],
+ "questions": [
+  {
+   "id": "who-leonardo-da-vinci",
+   "kind": "mc",
+   "prompt": "Who is this? He painted the Mona Lisa.",
+   "answer": "Leonardo da Vinci",
+   "wrong": [
+    "Albrecht Dürer",
+    "Raphael",
+    "Johannes Vermeer"
+   ],
+   "explain": "Leonardo da Vinci (1452–1519): Painted the Mona Lisa.",
+   "difficulty": 1,
+   "refs": [
+    "artists/leonardo-da-vinci"
+   ]
+  },
+  {
+   "id": "born-leonardo-da-vinci",
+   "kind": "mc",
+   "prompt": "In which year was Leonardo da Vinci born?",
+   "answer": "1452",
+   "wrong": [
+    "1462",
+    "1472",
+    "1442"
+   ],
+   "explain": "Leonardo da Vinci (1452–1519): Painted the Mona Lisa.",
+   "difficulty": 3,
+   "refs": [
+    "artists/leonardo-da-vinci"
+   ]
+  },
+  {
+   "id": "who-michelangelo",
+   "kind": "mc",
+   "prompt": "Who is this? He was a great Italian Renaissance sculptor and painter.",
+   "answer": "Michelangelo",
+   "wrong": [
+    "Raphael",
+    "Henri Matisse",
+    "Paul Gauguin"
+   ],
+   "explain": "Michelangelo (1475–1564): A great Italian Renaissance sculptor and painter.",
+   "difficulty": 1,
+   "refs": [
+    "artists/michelangelo"
+   ]
+  },
+  {
+   "id": "born-michelangelo",
+   "kind": "mc",
+   "prompt": "In which year was Michelangelo born?",
+   "answer": "1475",
+   "wrong": [
+    "1495",
+    "1505",
+    "1445"
+   ],
+   "explain": "Michelangelo (1475–1564): A great Italian Renaissance sculptor and painter.",
+   "difficulty": 3,
+   "refs": [
+    "artists/michelangelo"
+   ]
+  },
+  {
+   "id": "who-raphael",
+   "kind": "mc",
+   "prompt": "Who is this? He was one of the great painters of the High Renaissance.",
+   "answer": "Raphael",
+   "wrong": [
+    "Albrecht Dürer",
+    "Leonardo da Vinci",
+    "J. M. W. Turner"
+   ],
+   "explain": "Raphael (1483–1520): One of the great painters of the High Renaissance.",
+   "difficulty": 2,
+   "refs": [
+    "artists/raphael"
+   ]
+  },
+  {
+   "id": "born-raphael",
+   "kind": "mc",
+   "prompt": "In which year was Raphael born?",
+   "answer": "1483",
+   "wrong": [
+    "1473",
+    "1453",
+    "1463"
+   ],
+   "explain": "Raphael (1483–1520): One of the great painters of the High Renaissance.",
+   "difficulty": 3,
+   "refs": [
+    "artists/raphael"
+   ]
+  },
+  {
+   "id": "who-albrecht-durer",
+   "kind": "mc",
+   "prompt": "Who is this? He was a master of printmaking.",
+   "answer": "Albrecht Dürer",
+   "wrong": [
+    "Caravaggio",
+    "Gustav Klimt",
+    "Michelangelo"
+   ],
+   "explain": "Albrecht Dürer (1471–1528): A master of printmaking.",
+   "difficulty": 3,
+   "refs": [
+    "artists/albrecht-durer"
+   ]
+  },
+  {
+   "id": "born-albrecht-durer",
+   "kind": "mc",
+   "prompt": "In which year was Albrecht Dürer born?",
+   "answer": "1471",
+   "wrong": [
+    "1481",
+    "1501",
+    "1461"
+   ],
+   "explain": "Albrecht Dürer (1471–1528): A master of printmaking.",
+   "difficulty": 3,
+   "refs": [
+    "artists/albrecht-durer"
+   ]
+  },
+  {
+   "id": "who-caravaggio",
+   "kind": "mc",
+   "prompt": "Who is this? He was a rebellious Baroque painter.",
+   "answer": "Caravaggio",
+   "wrong": [
+    "Georges Seurat",
+    "Jackson Pollock",
+    "Henri Matisse"
+   ],
+   "explain": "Caravaggio (1571–1610): A rebellious Baroque painter.",
+   "difficulty": 3,
+   "refs": [
+    "artists/caravaggio"
+   ]
+  },
+  {
+   "id": "born-caravaggio",
+   "kind": "mc",
+   "prompt": "In which year was Caravaggio born?",
+   "answer": "1571",
+   "wrong": [
+    "1601",
+    "1581",
+    "1541"
+   ],
+   "explain": "Caravaggio (1571–1610): A rebellious Baroque painter.",
+   "difficulty": 3,
+   "refs": [
+    "artists/caravaggio"
+   ]
+  },
+  {
+   "id": "who-diego-velazquez",
+   "kind": "mc",
+   "prompt": "Who is this? He was a great Spanish painter.",
+   "answer": "Diego Velázquez",
+   "wrong": [
+    "Paul Gauguin",
+    "Pierre-Auguste Renoir",
+    "Andy Warhol"
+   ],
+   "explain": "Diego Velázquez (1599–1660): A great Spanish painter.",
+   "difficulty": 3,
+   "refs": [
+    "artists/diego-velazquez"
+   ]
+  },
+  {
+   "id": "born-diego-velazquez",
+   "kind": "mc",
+   "prompt": "In which year was Diego Velázquez born?",
+   "answer": "1599",
+   "wrong": [
+    "1609",
+    "1569",
+    "1579"
+   ],
+   "explain": "Diego Velázquez (1599–1660): A great Spanish painter.",
+   "difficulty": 3,
+   "refs": [
+    "artists/diego-velazquez"
+   ]
+  },
+  {
+   "id": "who-rembrandt",
+   "kind": "mc",
+   "prompt": "Who is this? He was a master of the Dutch Golden Age.",
+   "answer": "Rembrandt",
+   "wrong": [
+    "Diego Velázquez",
+    "Francisco Goya",
+    "Leonardo da Vinci"
+   ],
+   "explain": "Rembrandt (1606–1669): A master of the Dutch Golden Age.",
+   "difficulty": 1,
+   "refs": [
+    "artists/rembrandt"
+   ]
+  },
+  {
+   "id": "born-rembrandt",
+   "kind": "mc",
+   "prompt": "In which year was Rembrandt born?",
+   "answer": "1606",
+   "wrong": [
+    "1586",
+    "1576",
+    "1596"
+   ],
+   "explain": "Rembrandt (1606–1669): A master of the Dutch Golden Age.",
+   "difficulty": 3,
+   "refs": [
+    "artists/rembrandt"
+   ]
+  },
+  {
+   "id": "who-johannes-vermeer",
+   "kind": "mc",
+   "prompt": "Who is this? He painted Girl with a Pearl Earring.",
+   "answer": "Johannes Vermeer",
+   "wrong": [
+    "Caravaggio",
+    "Leonardo da Vinci",
+    "Jackson Pollock"
+   ],
+   "explain": "Johannes Vermeer (1632–1675): Painted Girl with a Pearl Earring.",
+   "difficulty": 2,
+   "refs": [
+    "artists/johannes-vermeer"
+   ]
+  },
+  {
+   "id": "born-johannes-vermeer",
+   "kind": "mc",
+   "prompt": "In which year was Johannes Vermeer born?",
+   "answer": "1632",
+   "wrong": [
+    "1662",
+    "1622",
+    "1642"
+   ],
+   "explain": "Johannes Vermeer (1632–1675): Painted Girl with a Pearl Earring.",
+   "difficulty": 3,
+   "refs": [
+    "artists/johannes-vermeer"
+   ]
+  },
+  {
+   "id": "who-francisco-goya",
+   "kind": "mc",
+   "prompt": "Who is this? He was a Spanish court painter.",
+   "answer": "Francisco Goya",
+   "wrong": [
+    "Georgia O'Keeffe",
+    "Claude Monet",
+    "John Constable"
+   ],
+   "explain": "Francisco Goya (1746–1828): A Spanish court painter.",
+   "difficulty": 3,
+   "refs": [
+    "artists/francisco-goya"
+   ]
+  },
+  {
+   "id": "born-francisco-goya",
+   "kind": "mc",
+   "prompt": "In which year was Francisco Goya born?",
+   "answer": "1746",
+   "wrong": [
+    "1736",
+    "1756",
+    "1726"
+   ],
+   "explain": "Francisco Goya (1746–1828): A Spanish court painter.",
+   "difficulty": 3,
+   "refs": [
+    "artists/francisco-goya"
+   ]
+  },
+  {
+   "id": "who-katsushika-hokusai",
+   "kind": "mc",
+   "prompt": "Who is this? He made The Great Wave off Kanagawa.",
+   "answer": "Katsushika Hokusai",
+   "wrong": [
+    "Georgia O'Keeffe",
+    "Leonardo da Vinci",
+    "Wassily Kandinsky"
+   ],
+   "explain": "Katsushika Hokusai (1760–1849): Made The Great Wave off Kanagawa.",
+   "difficulty": 1,
+   "refs": [
+    "artists/katsushika-hokusai"
+   ]
+  },
+  {
+   "id": "born-katsushika-hokusai",
+   "kind": "mc",
+   "prompt": "In which year was Katsushika Hokusai born?",
+   "answer": "1760",
+   "wrong": [
+    "1730",
+    "1770",
+    "1790"
+   ],
+   "explain": "Katsushika Hokusai (1760–1849): Made The Great Wave off Kanagawa.",
+   "difficulty": 3,
+   "refs": [
+    "artists/katsushika-hokusai"
+   ]
+  },
+  {
+   "id": "who-j-m-w-turner",
+   "kind": "mc",
+   "prompt": "Who is this? He was famous for stormy seas and glowing light.",
+   "answer": "J. M. W. Turner",
+   "wrong": [
+    "John Constable",
+    "Diego Velázquez",
+    "Georgia O'Keeffe"
+   ],
+   "explain": "J. M. W. Turner (1775–1851): Famous for stormy seas and glowing light.",
+   "difficulty": 3,
+   "refs": [
+    "artists/j-m-w-turner"
+   ]
+  },
+  {
+   "id": "born-j-m-w-turner",
+   "kind": "mc",
+   "prompt": "In which year was J. M. W. Turner born?",
+   "answer": "1775",
+   "wrong": [
+    "1745",
+    "1795",
+    "1805"
+   ],
+   "explain": "J. M. W. Turner (1775–1851): Famous for stormy seas and glowing light.",
+   "difficulty": 3,
+   "refs": [
+    "artists/j-m-w-turner"
+   ]
+  },
+  {
+   "id": "who-john-constable",
+   "kind": "mc",
+   "prompt": "Who is this? He was an English landscape painter.",
+   "answer": "John Constable",
+   "wrong": [
+    "J. M. W. Turner",
+    "René Magritte",
+    "Albrecht Dürer"
+   ],
+   "explain": "John Constable (1776–1837): An English landscape painter.",
+   "difficulty": 3,
+   "refs": [
+    "artists/john-constable"
+   ]
+  },
+  {
+   "id": "born-john-constable",
+   "kind": "mc",
+   "prompt": "In which year was John Constable born?",
+   "answer": "1776",
+   "wrong": [
+    "1806",
+    "1766",
+    "1796"
+   ],
+   "explain": "John Constable (1776–1837): An English landscape painter.",
+   "difficulty": 3,
+   "refs": [
+    "artists/john-constable"
+   ]
+  },
+  {
+   "id": "who-claude-monet",
+   "kind": "mc",
+   "prompt": "Who is this? He painted water lilies.",
+   "answer": "Claude Monet",
+   "wrong": [
+    "John Constable",
+    "Grant Wood",
+    "Frida Kahlo"
+   ],
+   "explain": "Claude Monet (1840–1926): Painted water lilies.",
+   "difficulty": 1,
+   "refs": [
+    "artists/claude-monet"
+   ]
+  },
+  {
+   "id": "born-claude-monet",
+   "kind": "mc",
+   "prompt": "In which year was Claude Monet born?",
+   "answer": "1840",
+   "wrong": [
+    "1810",
+    "1850",
+    "1860"
+   ],
+   "explain": "Claude Monet (1840–1926): Painted water lilies.",
+   "difficulty": 3,
+   "refs": [
+    "artists/claude-monet"
+   ]
+  },
+  {
+   "id": "who-pierre-auguste-renoir",
+   "kind": "mc",
+   "prompt": "Who is this? He was a French Impressionist.",
+   "answer": "Pierre-Auguste Renoir",
+   "wrong": [
+    "René Magritte",
+    "Michelangelo",
+    "Edgar Degas"
+   ],
+   "explain": "Pierre-Auguste Renoir (1841–1919): A French Impressionist.",
+   "difficulty": 3,
+   "refs": [
+    "artists/pierre-auguste-renoir"
+   ]
+  },
+  {
+   "id": "born-pierre-auguste-renoir",
+   "kind": "mc",
+   "prompt": "In which year was Pierre-Auguste Renoir born?",
+   "answer": "1841",
+   "wrong": [
+    "1811",
+    "1861",
+    "1851"
+   ],
+   "explain": "Pierre-Auguste Renoir (1841–1919): A French Impressionist.",
+   "difficulty": 3,
+   "refs": [
+    "artists/pierre-auguste-renoir"
+   ]
+  },
+  {
+   "id": "who-edgar-degas",
+   "kind": "mc",
+   "prompt": "Who is this? He is famous for paintings of ballet dancers.",
+   "answer": "Edgar Degas",
+   "wrong": [
+    "Andy Warhol",
+    "Grant Wood",
+    "Roy Lichtenstein"
+   ],
+   "explain": "Edgar Degas (1834–1917): Famous for paintings of ballet dancers.",
+   "difficulty": 2,
+   "refs": [
+    "artists/edgar-degas"
+   ]
+  },
+  {
+   "id": "born-edgar-degas",
+   "kind": "mc",
+   "prompt": "In which year was Edgar Degas born?",
+   "answer": "1834",
+   "wrong": [
+    "1864",
+    "1804",
+    "1854"
+   ],
+   "explain": "Edgar Degas (1834–1917): Famous for paintings of ballet dancers.",
+   "difficulty": 3,
+   "refs": [
+    "artists/edgar-degas"
+   ]
+  },
+  {
+   "id": "who-paul-cezanne",
+   "kind": "mc",
+   "prompt": "Who is this? He was famous for still lifes of apples.",
+   "answer": "Paul Cézanne",
+   "wrong": [
+    "René Magritte",
+    "Vincent van Gogh",
+    "John Constable"
+   ],
+   "explain": "Paul Cézanne (1839–1906): Famous for still lifes of apples.",
+   "difficulty": 3,
+   "refs": [
+    "artists/paul-cezanne"
+   ]
+  },
+  {
+   "id": "born-paul-cezanne",
+   "kind": "mc",
+   "prompt": "In which year was Paul Cézanne born?",
+   "answer": "1839",
+   "wrong": [
+    "1829",
+    "1809",
+    "1849"
+   ],
+   "explain": "Paul Cézanne (1839–1906): Famous for still lifes of apples.",
+   "difficulty": 3,
+   "refs": [
+    "artists/paul-cezanne"
+   ]
+  },
+  {
+   "id": "who-paul-gauguin",
+   "kind": "mc",
+   "prompt": "Who is this? He painted bright scenes of Polynesian life.",
+   "answer": "Paul Gauguin",
+   "wrong": [
+    "Johannes Vermeer",
+    "Gustav Klimt",
+    "Katsushika Hokusai"
+   ],
+   "explain": "Paul Gauguin (1848–1903): Painted bright scenes of Polynesian life.",
+   "difficulty": 3,
+   "refs": [
+    "artists/paul-gauguin"
+   ]
+  },
+  {
+   "id": "born-paul-gauguin",
+   "kind": "mc",
+   "prompt": "In which year was Paul Gauguin born?",
+   "answer": "1848",
+   "wrong": [
+    "1868",
+    "1818",
+    "1878"
+   ],
+   "explain": "Paul Gauguin (1848–1903): Painted bright scenes of Polynesian life.",
+   "difficulty": 3,
+   "refs": [
+    "artists/paul-gauguin"
+   ]
+  },
+  {
+   "id": "who-vincent-van-gogh",
+   "kind": "mc",
+   "prompt": "Who is this? He painted The Starry Night and Sunflowers.",
+   "answer": "Vincent van Gogh",
+   "wrong": [
+    "Paul Gauguin",
+    "Katsushika Hokusai",
+    "Pierre-Auguste Renoir"
+   ],
+   "explain": "Vincent van Gogh (1853–1890): Painted The Starry Night and Sunflowers.",
+   "difficulty": 1,
+   "refs": [
+    "artists/vincent-van-gogh"
+   ]
+  },
+  {
+   "id": "born-vincent-van-gogh",
+   "kind": "mc",
+   "prompt": "In which year was Vincent van Gogh born?",
+   "answer": "1853",
+   "wrong": [
+    "1843",
+    "1883",
+    "1863"
+   ],
+   "explain": "Vincent van Gogh (1853–1890): Painted The Starry Night and Sunflowers.",
+   "difficulty": 3,
+   "refs": [
+    "artists/vincent-van-gogh"
+   ]
+  },
+  {
+   "id": "who-georges-seurat",
+   "kind": "mc",
+   "prompt": "Who is this? He painted with tiny dots of colour.",
+   "answer": "Georges Seurat",
+   "wrong": [
+    "Georgia O'Keeffe",
+    "Claude Monet",
+    "Michelangelo"
+   ],
+   "explain": "Georges Seurat (1859–1891): Painted with tiny dots of colour.",
+   "difficulty": 3,
+   "refs": [
+    "artists/georges-seurat"
+   ]
+  },
+  {
+   "id": "born-georges-seurat",
+   "kind": "mc",
+   "prompt": "In which year was Georges Seurat born?",
+   "answer": "1859",
+   "wrong": [
+    "1849",
+    "1869",
+    "1889"
+   ],
+   "explain": "Georges Seurat (1859–1891): Painted with tiny dots of colour.",
+   "difficulty": 3,
+   "refs": [
+    "artists/georges-seurat"
+   ]
+  },
+  {
+   "id": "who-gustav-klimt",
+   "kind": "mc",
+   "prompt": "Who is this? He painted The Kiss.",
+   "answer": "Gustav Klimt",
+   "wrong": [
+    "Michelangelo",
+    "Yayoi Kusama",
+    "Salvador Dalí"
+   ],
+   "explain": "Gustav Klimt (1862–1918): Painted The Kiss.",
+   "difficulty": 2,
+   "refs": [
+    "artists/gustav-klimt"
+   ]
+  },
+  {
+   "id": "born-gustav-klimt",
+   "kind": "mc",
+   "prompt": "In which year was Gustav Klimt born?",
+   "answer": "1862",
+   "wrong": [
+    "1832",
+    "1892",
+    "1872"
+   ],
+   "explain": "Gustav Klimt (1862–1918): Painted The Kiss.",
+   "difficulty": 3,
+   "refs": [
+    "artists/gustav-klimt"
+   ]
+  },
+  {
+   "id": "who-edvard-munch",
+   "kind": "mc",
+   "prompt": "Who is this? He painted The Scream.",
+   "answer": "Edvard Munch",
+   "wrong": [
+    "Diego Velázquez",
+    "Caravaggio",
+    "John Constable"
+   ],
+   "explain": "Edvard Munch (1863–1944): Painted The Scream.",
+   "difficulty": 1,
+   "refs": [
+    "artists/edvard-munch"
+   ]
+  },
+  {
+   "id": "born-edvard-munch",
+   "kind": "mc",
+   "prompt": "In which year was Edvard Munch born?",
+   "answer": "1863",
+   "wrong": [
+    "1893",
+    "1873",
+    "1883"
+   ],
+   "explain": "Edvard Munch (1863–1944): Painted The Scream.",
+   "difficulty": 3,
+   "refs": [
+    "artists/edvard-munch"
+   ]
+  },
+  {
+   "id": "who-wassily-kandinsky",
+   "kind": "mc",
+   "prompt": "Who is this? He was a pioneer of abstract art.",
+   "answer": "Wassily Kandinsky",
+   "wrong": [
+    "Edgar Degas",
+    "Albrecht Dürer",
+    "Rembrandt"
+   ],
+   "explain": "Wassily Kandinsky (1866–1944): A pioneer of abstract art.",
+   "difficulty": 3,
+   "refs": [
+    "artists/wassily-kandinsky"
+   ]
+  },
+  {
+   "id": "born-wassily-kandinsky",
+   "kind": "mc",
+   "prompt": "In which year was Wassily Kandinsky born?",
+   "answer": "1866",
+   "wrong": [
+    "1886",
+    "1896",
+    "1876"
+   ],
+   "explain": "Wassily Kandinsky (1866–1944): A pioneer of abstract art.",
+   "difficulty": 3,
+   "refs": [
+    "artists/wassily-kandinsky"
+   ]
+  },
+  {
+   "id": "who-henri-matisse",
+   "kind": "mc",
+   "prompt": "Who is this? He was famous for bold, bright colour.",
+   "answer": "Henri Matisse",
+   "wrong": [
+    "Edward Hopper",
+    "Vincent van Gogh",
+    "Edgar Degas"
+   ],
+   "explain": "Henri Matisse (1869–1954): Famous for bold, bright colour.",
+   "difficulty": 1,
+   "refs": [
+    "artists/henri-matisse"
+   ]
+  },
+  {
+   "id": "born-henri-matisse",
+   "kind": "mc",
+   "prompt": "In which year was Henri Matisse born?",
+   "answer": "1869",
+   "wrong": [
+    "1889",
+    "1899",
+    "1839"
+   ],
+   "explain": "Henri Matisse (1869–1954): Famous for bold, bright colour.",
+   "difficulty": 3,
+   "refs": [
+    "artists/henri-matisse"
+   ]
+  },
+  {
+   "id": "who-pablo-picasso",
+   "kind": "mc",
+   "prompt": "Who is this? He co-founded Cubism.",
+   "answer": "Pablo Picasso",
+   "wrong": [
+    "Johannes Vermeer",
+    "Michelangelo",
+    "Wassily Kandinsky"
+   ],
+   "explain": "Pablo Picasso (1881–1973): Co-founded Cubism.",
+   "difficulty": 1,
+   "refs": [
+    "artists/pablo-picasso"
+   ]
+  },
+  {
+   "id": "born-pablo-picasso",
+   "kind": "mc",
+   "prompt": "In which year was Pablo Picasso born?",
+   "answer": "1881",
+   "wrong": [
+    "1851",
+    "1871",
+    "1891"
+   ],
+   "explain": "Pablo Picasso (1881–1973): Co-founded Cubism.",
+   "difficulty": 3,
+   "refs": [
+    "artists/pablo-picasso"
+   ]
+  },
+  {
+   "id": "who-edward-hopper",
+   "kind": "mc",
+   "prompt": "Who is this? He painted Nighthawks.",
+   "answer": "Edward Hopper",
+   "wrong": [
+    "Frida Kahlo",
+    "Michelangelo",
+    "Pierre-Auguste Renoir"
+   ],
+   "explain": "Edward Hopper (1882–1967): Painted Nighthawks.",
+   "difficulty": 3,
+   "refs": [
+    "artists/edward-hopper"
+   ]
+  },
+  {
+   "id": "born-edward-hopper",
+   "kind": "mc",
+   "prompt": "In which year was Edward Hopper born?",
+   "answer": "1882",
+   "wrong": [
+    "1862",
+    "1892",
+    "1902"
+   ],
+   "explain": "Edward Hopper (1882–1967): Painted Nighthawks.",
+   "difficulty": 3,
+   "refs": [
+    "artists/edward-hopper"
+   ]
+  },
+  {
+   "id": "who-georgia-o-keeffe",
+   "kind": "mc",
+   "prompt": "Who is this? She painted giant close-up flowers.",
+   "answer": "Georgia O'Keeffe",
+   "wrong": [
+    "Edgar Degas",
+    "Katsushika Hokusai",
+    "Yayoi Kusama"
+   ],
+   "explain": "Georgia O'Keeffe (1887–1986): Painted giant close-up flowers.",
+   "difficulty": 3,
+   "refs": [
+    "artists/georgia-o-keeffe"
+   ]
+  },
+  {
+   "id": "born-georgia-o-keeffe",
+   "kind": "mc",
+   "prompt": "In which year was Georgia O'Keeffe born?",
+   "answer": "1887",
+   "wrong": [
+    "1897",
+    "1877",
+    "1907"
+   ],
+   "explain": "Georgia O'Keeffe (1887–1986): Painted giant close-up flowers.",
+   "difficulty": 3,
+   "refs": [
+    "artists/georgia-o-keeffe"
+   ]
+  },
+  {
+   "id": "who-grant-wood",
+   "kind": "mc",
+   "prompt": "Who is this? He painted American Gothic.",
+   "answer": "Grant Wood",
+   "wrong": [
+    "Johannes Vermeer",
+    "Michelangelo",
+    "Katsushika Hokusai"
+   ],
+   "explain": "Grant Wood (1891–1942): Painted American Gothic.",
+   "difficulty": 3,
+   "refs": [
+    "artists/grant-wood"
+   ]
+  },
+  {
+   "id": "born-grant-wood",
+   "kind": "mc",
+   "prompt": "In which year was Grant Wood born?",
+   "answer": "1891",
+   "wrong": [
+    "1861",
+    "1901",
+    "1921"
+   ],
+   "explain": "Grant Wood (1891–1942): Painted American Gothic.",
+   "difficulty": 3,
+   "refs": [
+    "artists/grant-wood"
+   ]
+  },
+  {
+   "id": "who-rene-magritte",
+   "kind": "mc",
+   "prompt": "Who is this? He was a Belgian Surrealist.",
+   "answer": "René Magritte",
+   "wrong": [
+    "Albrecht Dürer",
+    "Katsushika Hokusai",
+    "Henri Matisse"
+   ],
+   "explain": "René Magritte (1898–1967): A Belgian Surrealist.",
+   "difficulty": 2,
+   "refs": [
+    "artists/rene-magritte"
+   ]
+  },
+  {
+   "id": "born-rene-magritte",
+   "kind": "mc",
+   "prompt": "In which year was René Magritte born?",
+   "answer": "1898",
+   "wrong": [
+    "1918",
+    "1878",
+    "1868"
+   ],
+   "explain": "René Magritte (1898–1967): A Belgian Surrealist.",
+   "difficulty": 3,
+   "refs": [
+    "artists/rene-magritte"
+   ]
+  },
+  {
+   "id": "who-salvador-dali",
+   "kind": "mc",
+   "prompt": "Who is this? He was a famous Surrealist.",
+   "answer": "Salvador Dalí",
+   "wrong": [
+    "Jackson Pollock",
+    "Paul Gauguin",
+    "Vincent van Gogh"
+   ],
+   "explain": "Salvador Dalí (1904–1989): A famous Surrealist.",
+   "difficulty": 1,
+   "refs": [
+    "artists/salvador-dali"
+   ]
+  },
+  {
+   "id": "born-salvador-dali",
+   "kind": "mc",
+   "prompt": "In which year was Salvador Dalí born?",
+   "answer": "1904",
+   "wrong": [
+    "1884",
+    "1874",
+    "1914"
+   ],
+   "explain": "Salvador Dalí (1904–1989): A famous Surrealist.",
+   "difficulty": 3,
+   "refs": [
+    "artists/salvador-dali"
+   ]
+  },
+  {
+   "id": "who-frida-kahlo",
+   "kind": "mc",
+   "prompt": "Who is this? She painted many self-portraits with flowers in her hair.",
+   "answer": "Frida Kahlo",
+   "wrong": [
+    "René Magritte",
+    "Georges Seurat",
+    "Pierre-Auguste Renoir"
+   ],
+   "explain": "Frida Kahlo (1907–1954): Painted many self-portraits with flowers in her hair.",
+   "difficulty": 1,
+   "refs": [
+    "artists/frida-kahlo"
+   ]
+  },
+  {
+   "id": "born-frida-kahlo",
+   "kind": "mc",
+   "prompt": "In which year was Frida Kahlo born?",
+   "answer": "1907",
+   "wrong": [
+    "1927",
+    "1877",
+    "1897"
+   ],
+   "explain": "Frida Kahlo (1907–1954): Painted many self-portraits with flowers in her hair.",
+   "difficulty": 3,
+   "refs": [
+    "artists/frida-kahlo"
+   ]
+  },
+  {
+   "id": "who-jackson-pollock",
+   "kind": "mc",
+   "prompt": "Who is this? He was a leading Abstract Expressionist.",
+   "answer": "Jackson Pollock",
+   "wrong": [
+    "Paul Cézanne",
+    "Gustav Klimt",
+    "Raphael"
+   ],
+   "explain": "Jackson Pollock (1912–1956): A leading Abstract Expressionist.",
+   "difficulty": 3,
+   "refs": [
+    "artists/jackson-pollock"
+   ]
+  },
+  {
+   "id": "born-jackson-pollock",
+   "kind": "mc",
+   "prompt": "In which year was Jackson Pollock born?",
+   "answer": "1912",
+   "wrong": [
+    "1922",
+    "1942",
+    "1902"
+   ],
+   "explain": "Jackson Pollock (1912–1956): A leading Abstract Expressionist.",
+   "difficulty": 3,
+   "refs": [
+    "artists/jackson-pollock"
+   ]
+  },
+  {
+   "id": "who-roy-lichtenstein",
+   "kind": "mc",
+   "prompt": "Who is this? He was an American Pop artist.",
+   "answer": "Roy Lichtenstein",
+   "wrong": [
+    "Michelangelo",
+    "Rembrandt",
+    "Johannes Vermeer"
+   ],
+   "explain": "Roy Lichtenstein (1923–1997): An American Pop artist.",
+   "difficulty": 3,
+   "refs": [
+    "artists/roy-lichtenstein"
+   ]
+  },
+  {
+   "id": "born-roy-lichtenstein",
+   "kind": "mc",
+   "prompt": "In which year was Roy Lichtenstein born?",
+   "answer": "1923",
+   "wrong": [
+    "1913",
+    "1943",
+    "1933"
+   ],
+   "explain": "Roy Lichtenstein (1923–1997): An American Pop artist.",
+   "difficulty": 3,
+   "refs": [
+    "artists/roy-lichtenstein"
+   ]
+  },
+  {
+   "id": "who-andy-warhol",
+   "kind": "mc",
+   "prompt": "Who is this? He painted Campbell's soup cans.",
+   "answer": "Andy Warhol",
+   "wrong": [
+    "Roy Lichtenstein",
+    "Michelangelo",
+    "John Constable"
+   ],
+   "explain": "Andy Warhol (1928–1987): Painted Campbell's soup cans.",
+   "difficulty": 1,
+   "refs": [
+    "artists/andy-warhol"
+   ]
+  },
+  {
+   "id": "born-andy-warhol",
+   "kind": "mc",
+   "prompt": "In which year was Andy Warhol born?",
+   "answer": "1928",
+   "wrong": [
+    "1908",
+    "1958",
+    "1898"
+   ],
+   "explain": "Andy Warhol (1928–1987): Painted Campbell's soup cans.",
+   "difficulty": 3,
+   "refs": [
+    "artists/andy-warhol"
+   ]
+  },
+  {
+   "id": "who-yayoi-kusama",
+   "kind": "mc",
+   "prompt": "Who is this? She is famous for polka dots.",
+   "answer": "Yayoi Kusama",
+   "wrong": [
+    "Katsushika Hokusai",
+    "Roy Lichtenstein",
+    "Jackson Pollock"
+   ],
+   "explain": "Yayoi Kusama (1929–2026): Famous for polka dots.",
+   "difficulty": 3,
+   "refs": [
+    "artists/yayoi-kusama"
+   ]
+  },
+  {
+   "id": "born-yayoi-kusama",
+   "kind": "mc",
+   "prompt": "In which year was Yayoi Kusama born?",
+   "answer": "1929",
+   "wrong": [
+    "1949",
+    "1959",
+    "1919"
+   ],
+   "explain": "Yayoi Kusama (1929–2026): Famous for polka dots.",
+   "difficulty": 3,
+   "refs": [
+    "artists/yayoi-kusama"
+   ]
+  }
+ ],
+ "sources": [
+  {
+   "name": "Wikidata (birth/death dates, portraits)",
+   "url": "https://www.wikidata.org"
+  },
+  {
+   "name": "Wikimedia Commons (portraits, licence-checked)",
+   "url": "https://commons.wikimedia.org"
+  }
+ ]
+}

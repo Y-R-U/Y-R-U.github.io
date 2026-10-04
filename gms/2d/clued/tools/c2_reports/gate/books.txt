@@ -1,0 +1,1 @@
+books/the-diary-of-a-young-girl: dropped clue leaking "anne": It was written by Anne Frank.

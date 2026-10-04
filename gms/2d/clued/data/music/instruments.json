@@ -1,0 +1,1452 @@
+{
+ "id": "instruments",
+ "title": "Musical instruments",
+ "theme": "music",
+ "icon": "🎻",
+ "kids": false,
+ "version": 1,
+ "listenPrompt": "Which instrument is this?",
+ "factsMeta": {
+  "family": {
+   "type": "cat",
+   "label": "Family"
+  }
+ },
+ "items": [
+  {
+   "id": "piano",
+   "name": "Piano",
+   "group": "keyboard",
+   "facts": {
+    "family": "keyboard"
+   },
+   "blurb": "The sound of the piano.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/4/48/Ludwig_van_Beethoven_-_sonata_no._14_in_c_sharp_minor_%27moonlight%27%2C_op._27_no._2_-_i._adagio_sostenuto.ogg/Ludwig_van_Beethoven_-_sonata_no._14_in_c_sharp_minor_%27moonlight%27%2C_op._27_no._2_-_i._adagio_sostenuto.ogg.mp3",
+      "credit": "Ludwig van Beethoven",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Ludwig_van_Beethoven_-_sonata_no._14_in_c_sharp_minor_%27moonlight%27,_op._27_no._2_-_i._adagio_sostenuto.ogg",
+      "dur": 335.8
+     }
+    ],
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/8/8d/Steinway_%26_Sons_concert_grand_piano%2C_model_D-274%2C_manufactured_at_Steinway%27s_factory_in_Hamburg%2C_Germany.png/960px-Steinway_%26_Sons_concert_grand_piano%2C_model_D-274%2C_manufactured_at_Steinway%27s_factory_in_Hamburg%2C_Germany.png?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+      "w": 640,
+      "h": 616,
+      "credit": "Steinway & Sons, 10 Rondenbarg, Hamburg D-22525, Germany, eu.steinway.com.Steinway & Sons, 1 Steinway Place, Long Island City, New York 11105, The United States, www.steinway.com.",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Steinway_%26_Sons_concert_grand_piano,_model_D-274,_manufactured_at_Steinway%27s_factory_in_Hamburg,_Germany.png"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "guitar",
+   "name": "Guitar",
+   "group": "strings",
+   "facts": {
+    "family": "strings"
+   },
+   "blurb": "The sound of the guitar.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/8/89/Romanza_espa%C3%B1ola.ogg/Romanza_espa%C3%B1ola.ogg.mp3",
+      "credit": "Composer Unknown. Courtesy of Alias Guitar",
+      "license": "CC0",
+      "page": "https://commons.wikimedia.org/wiki/File:Romanza_espa%C3%B1ola.ogg",
+      "dur": 150.4
+     }
+    ],
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/e/e8/Classical_Guitar_two_views.jpg/960px-Classical_Guitar_two_views.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+      "w": 640,
+      "h": 974,
+      "credit": "Martin Möller",
+      "license": "CC BY-SA 2.0 de",
+      "page": "https://commons.wikimedia.org/wiki/File:Classical_Guitar_two_views.jpg"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "bagpipes",
+   "name": "Bagpipes",
+   "group": "woodwind",
+   "facts": {
+    "family": "woodwind"
+   },
+   "blurb": "The sound of the bagpipes.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/6/6d/Mari_Bagpipe_-_Erik_Juzykain.wav/Mari_Bagpipe_-_Erik_Juzykain.wav.mp3",
+      "credit": "Cseremisz Elian",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Mari_Bagpipe_-_Erik_Juzykain.wav",
+      "dur": 81.5
+     }
+    ],
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/4/44/Scotland_Independence_March%2C_28_March_2026_%2832%29.jpg/960px-Scotland_Independence_March%2C_28_March_2026_%2832%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+      "w": 640,
+      "h": 427,
+      "credit": "Lucas Kendall",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Scotland_Independence_March,_28_March_2026_(32).jpg"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "trombone",
+   "name": "Trombone",
+   "group": "brass",
+   "facts": {
+    "family": "brass"
+   },
+   "blurb": "The sound of the trombone.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/b/b8/110%2C1_Drikkevise_spillet_p%C3%A5_basun.flac/110%2C1_Drikkevise_spillet_p%C3%A5_basun.flac.mp3",
+      "credit": "Gottfried Ruben, Ruben-samlingen, Statsbiblioteket",
+      "license": "CC0",
+      "page": "https://commons.wikimedia.org/wiki/File:110,1_Drikkevise_spillet_p%C3%A5_basun.flac",
+      "dur": 127.2
+     }
+    ],
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/6/62/Yamaha_Tenor_trombone_YSL-891Z.tif/lossy-page1-960px-Yamaha_Tenor_trombone_YSL-891Z.tif.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+      "w": 640,
+      "h": 150,
+      "credit": "Yamaha Corporation",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Yamaha_Tenor_trombone_YSL-891Z.tif"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "violin",
+   "name": "Violin",
+   "group": "strings",
+   "facts": {
+    "family": "strings"
+   },
+   "blurb": "The sound of the violin.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/e/eb/Whiskey-youre-the-devil-violin.ogg/Whiskey-youre-the-devil-violin.ogg.mp3",
+      "credit": "Unknown (see source page)",
+      "license": "CC BY-SA 2.0 de",
+      "page": "https://commons.wikimedia.org/wiki/File:Whiskey-youre-the-devil-violin.ogg",
+      "dur": 58.2
+     }
+    ],
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/1/1b/Violin_VL100.png?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail_unscaled",
+      "w": 640,
+      "h": 869,
+      "credit": "Just plain Bill",
+      "license": "CC0",
+      "page": "https://commons.wikimedia.org/wiki/File:Violin_VL100.png"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "cello",
+   "name": "Cello",
+   "group": "strings",
+   "facts": {
+    "family": "strings"
+   },
+   "blurb": "The sound of the cello.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/4/43/JOHN_MICHEL_CELLO-J_S_BACH_CELLO_SUITE_1_in_G_Prelude.ogg/JOHN_MICHEL_CELLO-J_S_BACH_CELLO_SUITE_1_in_G_Prelude.ogg.mp3",
+      "credit": "Johann Sebastian Bach",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:JOHN_MICHEL_CELLO-J_S_BACH_CELLO_SUITE_1_in_G_Prelude.ogg",
+      "dur": 130.3
+     }
+    ],
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/5/5f/Cello_front_side.png?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail_unscaled",
+      "w": 640,
+      "h": 970,
+      "credit": "Georg Feitscher",
+      "license": "CC BY 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Cello_front_side.png"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "oboe",
+   "name": "Oboe",
+   "group": "woodwind",
+   "facts": {
+    "family": "woodwind"
+   },
+   "blurb": "The sound of the oboe.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/4/44/Ferling_Oboe_Study_No_28_Aaron_Hill.ogg/Ferling_Oboe_Study_No_28_Aaron_Hill.ogg.mp3",
+      "credit": "Aaron Hill Oboe / Franz Wilhelm Ferling (1796–1874) Bearbeitung (Video entfernt): Lewenstein",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Ferling_Oboe_Study_No_28_Aaron_Hill.ogg",
+      "dur": 51.6
+     }
+    ],
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/e/e2/M%C3%B6nnig%2C_Oboe_Modell_155_Albrecht_Mayer.jpg/960px-M%C3%B6nnig%2C_Oboe_Modell_155_Albrecht_Mayer.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+      "w": 640,
+      "h": 640,
+      "credit": "Gebrüder Mönnig, Markneukirchen",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:M%C3%B6nnig,_Oboe_Modell_155_Albrecht_Mayer.jpg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "drum",
+   "name": "Drum",
+   "group": "percussion",
+   "facts": {
+    "family": "percussion"
+   },
+   "blurb": "The sound of the drum.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/8/8a/Bass_drum.ogg/Bass_drum.ogg.mp3",
+      "credit": "No machine-readable author provided. Clngre~commonswiki assumed (based on copyright claims).",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Bass_drum.ogg",
+      "dur": 5.4
+     }
+    ],
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/2/2a/DrumMozartRegiment.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail_unscaled",
+      "w": 640,
+      "h": 588,
+      "credit": "NPS",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:DrumMozartRegiment.jpg"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "flute",
+   "name": "Flute",
+   "group": "woodwind",
+   "facts": {
+    "family": "woodwind"
+   },
+   "blurb": "The sound of the flute.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/0/05/Flute.ogg/Flute.ogg.mp3",
+      "credit": "hokuspokus",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Flute.ogg",
+      "dur": 13.1
+     }
+    ],
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/f/f0/Fluiers.jpg/960px-Fluiers.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+      "w": 640,
+      "h": 1223,
+      "credit": "See source page",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Fluiers.jpg"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "harmonica",
+   "name": "Harmonica",
+   "group": "free reed",
+   "facts": {
+    "family": "free reed"
+   },
+   "blurb": "The sound of the harmonica.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/a/a2/Chromatik_Mundharmonika.ogg/Chromatik_Mundharmonika.ogg.mp3",
+      "credit": "Matthias.Gruber 20:44, 26 October 2006 (UTC)",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Chromatik_Mundharmonika.ogg",
+      "dur": 8.4
+     }
+    ],
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/e/ec/16-hole_chrom_10-hole_diatonic.jpg/960px-16-hole_chrom_10-hole_diatonic.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+      "w": 640,
+      "h": 483,
+      "credit": "George Leung",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:16-hole_chrom_10-hole_diatonic.jpg"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "ukulele",
+   "name": "Ukulele",
+   "group": "strings",
+   "facts": {
+    "family": "strings"
+   },
+   "blurb": "The sound of the ukulele.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/f/f3/Ukelele_-_Kailimai%27s_hene_-_Ukepedia.ogg/Ukelele_-_Kailimai%27s_hene_-_Ukepedia.ogg.mp3",
+      "credit": "Unknown (see source page)",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Ukelele_-_Kailimai%27s_hene_-_Ukepedia.ogg",
+      "dur": 30.6
+     }
+    ],
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/1/14/Ukulele4.png?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail_unscaled",
+      "w": 640,
+      "h": 1395,
+      "credit": "Kollektives Schreiben",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Ukulele4.png"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "zither",
+   "name": "Zither",
+   "group": "strings",
+   "facts": {
+    "family": "strings"
+   },
+   "blurb": "The sound of the zither.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/c/cf/Zither_solo_from_G%27schichten_aus_dem_Wienerwald_Op.325.ogg/Zither_solo_from_G%27schichten_aus_dem_Wienerwald_Op.325.ogg.mp3",
+      "credit": "Unknown authorUnknown author",
+      "license": "CC0",
+      "page": "https://commons.wikimedia.org/wiki/File:Zither_solo_from_G%27schichten_aus_dem_Wienerwald_Op.325.ogg",
+      "dur": 64.1
+     }
+    ],
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/0/03/Cithare.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail_unscaled",
+      "w": 640,
+      "h": 636,
+      "credit": "See source page",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Cithare.jpg"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "electric-guitar",
+   "name": "Electric guitar",
+   "group": "strings",
+   "facts": {
+    "family": "strings"
+   },
+   "blurb": "The sound of the electric guitar.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/7/7f/Clean-gain_demo_melody.ogg/Clean-gain_demo_melody.ogg.mp3",
+      "credit": "Julien Grandgagnage",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Clean-gain_demo_melody.ogg",
+      "dur": 16.8
+     }
+    ],
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/a/aa/Yngwie_Malmsteen%27s_electric_guitar.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail_unscaled",
+      "w": 640,
+      "h": 1641,
+      "credit": "francesco from Italia",
+      "license": "CC BY 2.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Yngwie_Malmsteen%27s_electric_guitar.jpg"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "accordion",
+   "name": "Accordion",
+   "group": "free reed",
+   "facts": {
+    "family": "free reed"
+   },
+   "blurb": "The sound of the accordion.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/b/b3/AccordionBellowsSounds.ogg/AccordionBellowsSounds.ogg.mp3",
+      "credit": "Necz0r",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:AccordionBellowsSounds.ogg",
+      "dur": 36.8
+     }
+    ],
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/7/79/A_converter_free-bass_piano-accordion_and_a_Russian_bayan.jpg/960px-A_converter_free-bass_piano-accordion_and_a_Russian_bayan.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+      "w": 640,
+      "h": 868,
+      "credit": "Necz0r",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:A_converter_free-bass_piano-accordion_and_a_Russian_bayan.jpg"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "viola",
+   "name": "Viola",
+   "group": "strings",
+   "facts": {
+    "family": "strings"
+   },
+   "blurb": "The sound of the viola.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/d/db/Viola.ogg/Viola.ogg.mp3",
+      "credit": "Unknown (see source page)",
+      "license": "CC BY-SA 2.5",
+      "page": "https://commons.wikimedia.org/wiki/File:Viola.ogg",
+      "dur": 55.4
+     }
+    ],
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/c/cd/Bratsche.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail_unscaled",
+      "w": 640,
+      "h": 1006,
+      "credit": "Just plain Bill",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Bratsche.jpg"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "harpsichord",
+   "name": "Harpsichord",
+   "group": "keyboard",
+   "facts": {
+    "family": "keyboard"
+   },
+   "blurb": "The sound of the harpsichord.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/1/16/Bach_C_Major_Prelude_Equal.ogg/Bach_C_Major_Prelude_Equal.ogg.mp3",
+      "credit": "No machine-readable author provided. Robert Schröter (Rs newhouse) assumed (based on copyright claims).",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Bach_C_Major_Prelude_Equal.ogg",
+      "dur": 121.7
+     }
+    ],
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/c/c5/Clavecin_flamand.png?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail_unscaled",
+      "w": 640,
+      "h": 785,
+      "credit": "Ratigan (instrument et photo)",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Clavecin_flamand.png"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "vuvuzela",
+   "name": "Vuvuzela",
+   "group": "brass",
+   "facts": {
+    "family": "brass"
+   },
+   "blurb": "The sound of the vuvuzela.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/b/b9/Vuvuzela_single_note.ogg/Vuvuzela_single_note.ogg.mp3",
+      "credit": "DisillusionedBitterAndKnackered",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Vuvuzela_single_note.ogg",
+      "dur": 4.1
+     }
+    ],
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/b/bc/Football_%28soccer%29_supporter_J3b.jpg/960px-Football_%28soccer%29_supporter_J3b.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+      "w": 640,
+      "h": 456,
+      "credit": "Jamain",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Football_(soccer)_supporter_J3b.jpg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "hammond-organ",
+   "name": "Hammond organ",
+   "group": "keyboard",
+   "facts": {
+    "family": "keyboard"
+   },
+   "blurb": "The sound of the hammond organ.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/3/31/LezlieCabinetSequence.ogg/LezlieCabinetSequence.ogg.mp3",
+      "credit": "Unknown (see source page)",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:LezlieCabinetSequence.ogg",
+      "dur": 26.1
+     }
+    ],
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/7/7e/Hammond_b3_con_leslie_122.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail_unscaled",
+      "w": 640,
+      "h": 431,
+      "credit": "it:user:Salli",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Hammond_b3_con_leslie_122.jpg"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "tuba",
+   "name": "Tuba",
+   "group": "brass",
+   "facts": {
+    "family": "brass"
+   },
+   "blurb": "The sound of the tuba.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/9/94/Tuba-range-C-high.ogg/Tuba-range-C-high.ogg.mp3",
+      "credit": "No machine-readable author provided. AntoineVE~commonswiki assumed (based on copyright claims).",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Tuba-range-C-high.ogg",
+      "dur": 8.3
+     },
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/3/30/Tuba-range-C-low.ogg/Tuba-range-C-low.ogg.mp3",
+      "credit": "No machine-readable author provided. AntoineVE~commonswiki assumed (based on copyright claims).",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Tuba-range-C-low.ogg",
+      "dur": 7.5
+     }
+    ],
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/1/11/Tuba_Melton_Meinl_Weston.png?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail_unscaled",
+      "w": 640,
+      "h": 1078,
+      "credit": "Buffet Crampon",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Tuba_Melton_Meinl_Weston.png"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "kantele",
+   "name": "Kantele",
+   "group": "strings",
+   "facts": {
+    "family": "strings"
+   },
+   "blurb": "The sound of the kantele.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/3/3e/DIY_kantele_sample_raw.ogg/DIY_kantele_sample_raw.ogg.mp3",
+      "credit": "Olli Niemitalo",
+      "license": "CC0",
+      "page": "https://commons.wikimedia.org/wiki/File:DIY_kantele_sample_raw.ogg",
+      "dur": 93.1
+     }
+    ],
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/c/c6/Concert_kantele.jpg/960px-Concert_kantele.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+      "w": 640,
+      "h": 291,
+      "credit": "Paul Lenz",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Concert_kantele.jpg"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "jew-s-harp",
+   "name": "Jew's harp",
+   "group": "other",
+   "facts": {
+    "family": "other"
+   },
+   "blurb": "The sound of the jew's harp.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/a/a4/Munniharppua.ogg/Munniharppua.ogg.mp3",
+      "credit": "ElectricToothpaste",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Munniharppua.ogg",
+      "dur": 41.4
+     }
+    ],
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/5/5e/Tronpa_edo_musugitarra.jpg/960px-Tronpa_edo_musugitarra.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+      "w": 640,
+      "h": 427,
+      "credit": "Soinuenea",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Tronpa_edo_musugitarra.jpg"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "ocarina",
+   "name": "Ocarina",
+   "group": "woodwind",
+   "facts": {
+    "family": "woodwind"
+   },
+   "blurb": "The sound of the ocarina.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/8/86/Ocarinasample.ogg/Ocarinasample.ogg.mp3",
+      "credit": "Ailes Grises at English Wikipedia",
+      "license": "CC BY 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Ocarinasample.ogg",
+      "dur": 25.5
+     }
+    ],
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/b/be/2016-01_Ocarina_front-back.jpg/960px-2016-01_Ocarina_front-back.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+      "w": 640,
+      "h": 915,
+      "credit": "0x010C",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:2016-01_Ocarina_front-back.jpg"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "recorder",
+   "name": "Recorder",
+   "group": "woodwind",
+   "facts": {
+    "family": "woodwind"
+   },
+   "blurb": "The sound of the recorder.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/6/69/SopranoRecorder.ogg/SopranoRecorder.ogg.mp3",
+      "credit": "User:Thparkth",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:SopranoRecorder.ogg",
+      "dur": 10
+     }
+    ],
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/8/84/18th_century_recorders_from_N%C3%BCrnberg.jpg/960px-18th_century_recorders_from_N%C3%BCrnberg.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+      "w": 640,
+      "h": 853,
+      "credit": "Vparrilla",
+      "license": "CC0",
+      "page": "https://commons.wikimedia.org/wiki/File:18th_century_recorders_from_N%C3%BCrnberg.jpg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "cymbal",
+   "name": "Cymbal",
+   "group": "percussion",
+   "facts": {
+    "family": "percussion"
+   },
+   "blurb": "The sound of the cymbal.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/e/ef/Crash_cymbal.ogg/Crash_cymbal.ogg.mp3",
+      "credit": "No machine-readable author provided. Clngre~commonswiki assumed (based on copyright claims).",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Crash_cymbal.ogg",
+      "dur": 4.9
+     }
+    ],
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/0/07/Aasizzler3.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail_unscaled",
+      "w": 640,
+      "h": 731,
+      "credit": "See source page",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Aasizzler3.jpg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "oud",
+   "name": "Oud",
+   "group": "strings",
+   "facts": {
+    "family": "strings"
+   },
+   "blurb": "The sound of the oud.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/0/03/OUD.ogg/OUD.ogg.mp3",
+      "credit": "Houssem bettaibi",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:OUD.ogg",
+      "dur": 49.6
+     }
+    ],
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/9/92/%C5%AAd_MET_DP340079.jpg/960px-%C5%AAd_MET_DP340079.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+      "w": 640,
+      "h": 868,
+      "credit": "Creator:Manol (Emmanuel Venios)",
+      "license": "CC0",
+      "page": "https://commons.wikimedia.org/wiki/File:%C5%AAd_MET_DP340079.jpg"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "tambourine",
+   "name": "Tambourine",
+   "group": "percussion",
+   "facts": {
+    "family": "percussion"
+   },
+   "blurb": "The sound of the tambourine.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/0/03/Headless_tambourine.wav/Headless_tambourine.wav.mp3",
+      "credit": "Michielderoo",
+      "license": "CC0",
+      "page": "https://commons.wikimedia.org/wiki/File:Headless_tambourine.wav",
+      "dur": 14.2
+     }
+    ],
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/a/a0/Deff_-_Tambourine%2C_p._579_in_Thomson%2C_1859.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail_unscaled",
+      "w": 640,
+      "h": 356,
+      "credit": "See source page",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Deff_-_Tambourine,_p._579_in_Thomson,_1859.jpg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "cornet",
+   "name": "Cornet",
+   "group": "brass",
+   "facts": {
+    "family": "brass"
+   },
+   "blurb": "The sound of the cornet.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/2/2b/100%2C1_Tre_melodier_spillet_p%C3%A5_kornet.flac/100%2C1_Tre_melodier_spillet_p%C3%A5_kornet.flac.mp3",
+      "credit": "Gottfried Ruben, Ruben-samlingen, Statsbiblioteket",
+      "license": "CC0",
+      "page": "https://commons.wikimedia.org/wiki/File:100,1_Tre_melodier_spillet_p%C3%A5_kornet.flac",
+      "dur": 137.8
+     }
+    ],
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/b/b6/Cornet-Bb-large.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail_unscaled",
+      "w": 640,
+      "h": 324,
+      "credit": "Nevilley",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Cornet-Bb-large.jpg"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "gong",
+   "name": "Gong",
+   "group": "percussion",
+   "facts": {
+    "family": "percussion"
+   },
+   "blurb": "The sound of the gong.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/f/fa/Gong_or_bell_vibrant.ogg/Gong_or_bell_vibrant.ogg.mp3",
+      "credit": "stephan",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Gong_or_bell_vibrant.ogg",
+      "dur": 64
+     }
+    ],
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/8/8d/19th_Century_Gong_on_display_at_the_National_Folk_Museum_of_Korea.jpg/960px-19th_Century_Gong_on_display_at_the_National_Folk_Museum_of_Korea.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+      "w": 640,
+      "h": 853,
+      "credit": "Ethan Doyle White",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:19th_Century_Gong_on_display_at_the_National_Folk_Museum_of_Korea.jpg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "bandoneon",
+   "name": "Bandoneon",
+   "group": "free reed",
+   "facts": {
+    "family": "free reed"
+   },
+   "blurb": "The sound of the bandoneon.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/a/ab/Bandone%C3%B3n.ogg/Bandone%C3%B3n.ogg.mp3",
+      "credit": "Poniol60",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Bandone%C3%B3n.ogg",
+      "dur": 18
+     }
+    ],
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/4/41/Bandoneon-curved.jpg/960px-Bandoneon-curved.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+      "w": 640,
+      "h": 453,
+      "credit": "See source page",
+      "license": "CC BY-SA 2.5",
+      "page": "https://commons.wikimedia.org/wiki/File:Bandoneon-curved.jpg"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "bodhran",
+   "name": "Bodhrán",
+   "group": "percussion",
+   "facts": {
+    "family": "percussion"
+   },
+   "blurb": "The sound of the bodhrán.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/8/83/Bodhran-improvisation_hinnerk-ruemenapf.ogg/Bodhran-improvisation_hinnerk-ruemenapf.ogg.mp3",
+      "credit": "Hinnerk R Hinnerk Rümenapf",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Bodhran-improvisation_hinnerk-ruemenapf.ogg",
+      "dur": 112
+     }
+    ],
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/1/1a/Bodhran.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail_unscaled",
+      "w": 640,
+      "h": 711,
+      "credit": "See source page",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Bodhran.jpg"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "banjo",
+   "name": "Banjo",
+   "group": "strings",
+   "facts": {
+    "family": "strings"
+   },
+   "blurb": "The sound of the banjo.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/f/f1/Banjo.ogg/Banjo.ogg.mp3",
+      "credit": "Poniol60",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Banjo.ogg",
+      "dur": 12.6
+     }
+    ],
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/b/b7/Bluegrass_banjo.png?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail_unscaled",
+      "w": 640,
+      "h": 1745,
+      "credit": "Arent",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Bluegrass_banjo.png"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "koto",
+   "name": "Koto",
+   "group": "strings",
+   "facts": {
+    "family": "strings"
+   },
+   "blurb": "The sound of the koto.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/2/2e/Koto_performance.ogg/Koto_performance.ogg.mp3",
+      "credit": "Torsodog",
+      "license": "CC BY 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Koto_performance.ogg",
+      "dur": 29.7
+     }
+    ],
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/7/76/Koto_by_Fumie_Hihara_2016.png/960px-Koto_by_Fumie_Hihara_2016.png?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+      "w": 640,
+      "h": 499,
+      "credit": "Jean-Pierre Dalbéra",
+      "license": "CC BY 2.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Koto_by_Fumie_Hihara_2016.png"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "celesta",
+   "name": "Celesta",
+   "group": "keyboard",
+   "facts": {
+    "family": "keyboard"
+   },
+   "blurb": "The sound of the celesta.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/0/0b/Dance_of_the_Sugar_Plum_Fairies_%28ISRC_USUAN1100270%29.oga/Dance_of_the_Sugar_Plum_Fairies_%28ISRC_USUAN1100270%29.oga.mp3",
+      "credit": "Pyotr Ilyich Tchaikovsky / Kevin MacLeod",
+      "license": "CC BY 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Dance_of_the_Sugar_Plum_Fairies_(ISRC_USUAN1100270).oga",
+      "dur": 106.3
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "carillon",
+   "name": "Carillon",
+   "group": "percussion",
+   "facts": {
+    "family": "percussion"
+   },
+   "blurb": "The sound of the carillon.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/e/e6/Carillon_St_Nic_Maudit_carillonneur.ogg/Carillon_St_Nic_Maudit_carillonneur.ogg.mp3",
+      "credit": "Musicaline",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Carillon_St_Nic_Maudit_carillonneur.ogg",
+      "dur": 20.7
+     }
+    ],
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/4/47/Carillon_Olympiapark_Muenchen.jpg/960px-Carillon_Olympiapark_Muenchen.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+      "w": 640,
+      "h": 540,
+      "credit": "Oliver Raupach",
+      "license": "CC BY-SA 2.5",
+      "page": "https://commons.wikimedia.org/wiki/File:Carillon_Olympiapark_Muenchen.jpg"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "melodica",
+   "name": "Melodica",
+   "group": "free reed",
+   "facts": {
+    "family": "free reed"
+   },
+   "blurb": "The sound of the melodica.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/4/45/Melodica_rakesofkildare.ogg/Melodica_rakesofkildare.ogg.mp3",
+      "credit": "Melodicas",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Melodica_rakesofkildare.ogg",
+      "dur": 46
+     }
+    ],
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/7/72/Melodicas.jpg/960px-Melodicas.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+      "w": 640,
+      "h": 480,
+      "credit": "The original uploader was Ukulele at French Wikipedia.",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Melodicas.jpg"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "shakuhachi",
+   "name": "Shakuhachi",
+   "group": "woodwind",
+   "facts": {
+    "family": "woodwind"
+   },
+   "blurb": "The sound of the shakuhachi.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/3/3e/Shikanotoone.ogg/Shikanotoone.ogg.mp3",
+      "credit": "Araki Kodō III (1879–1935)",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Shikanotoone.ogg",
+      "dur": 375.1
+     }
+    ],
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/9/93/JapaneseShakuhachiSection.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail_unscaled",
+      "w": 640,
+      "h": 1001,
+      "credit": "See source page",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:JapaneseShakuhachiSection.jpg"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "concertina",
+   "name": "Concertina",
+   "group": "free reed",
+   "facts": {
+    "family": "free reed"
+   },
+   "blurb": "The sound of the concertina.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/6/6d/Scotch_reels_%28Prince%2C_1909%29.mp3",
+      "credit": "Alexander Prince",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Scotch_reels_(Prince,_1909).mp3",
+      "dur": 138.7
+     }
+    ],
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/b/bf/Wheatstone_English_Concertina.jpg/960px-Wheatstone_English_Concertina.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+      "w": 640,
+      "h": 476,
+      "credit": "The original uploader was DannyChapman at English Wikipedia.",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Wheatstone_English_Concertina.jpg"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "guqin",
+   "name": "Guqin",
+   "group": "strings",
+   "facts": {
+    "family": "strings"
+   },
+   "blurb": "The sound of the guqin.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/5/52/Guqin-Zuiyu_Changwan.ogg/Guqin-Zuiyu_Changwan.ogg.mp3",
+      "credit": "CharlieHuang",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Guqin-Zuiyu_Changwan.ogg",
+      "dur": 287
+     }
+    ],
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/3/32/ZhongNiShi.jpg/960px-ZhongNiShi.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+      "w": 640,
+      "h": 217,
+      "credit": "The original uploader was CharlieHuang at English Wikipedia.",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:ZhongNiShi.jpg"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "duduk",
+   "name": "Duduk",
+   "group": "woodwind",
+   "facts": {
+    "family": "woodwind"
+   },
+   "blurb": "The sound of the duduk.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/c/cc/SERGO.TEL_-_April_-_duduk-improvisation2.ogg/SERGO.TEL_-_April_-_duduk-improvisation2.ogg.mp3",
+      "credit": "SERGO.TEL",
+      "license": "CC BY 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:SERGO.TEL_-_April_-_duduk-improvisation2.ogg",
+      "dur": 177.2
+     }
+    ],
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/f/f9/Duduk_%28landscape%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail_unscaled",
+      "w": 640,
+      "h": 60,
+      "credit": "No machine-readable author provided. Arent assumed (based on copyright claims).",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Duduk_(landscape).jpg"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "barrel-organ",
+   "name": "Barrel organ",
+   "group": "keyboard",
+   "facts": {
+    "family": "keyboard"
+   },
+   "blurb": "The sound of the barrel organ.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/7/76/AF_Street_organ.ogg/AF_Street_organ.ogg.mp3",
+      "credit": "Original uploader was Peter Ellis at en.wikipedia",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:AF_Street_organ.ogg",
+      "dur": 7.7
+     }
+    ],
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/5/53/Barrel_piano_-_%CE%9B%CE%B1%CF%84%CE%AD%CF%81%CE%BD%CE%B1%28laterna%29.JPG/960px-Barrel_piano_-_%CE%9B%CE%B1%CF%84%CE%AD%CF%81%CE%BD%CE%B1%28laterna%29.JPG?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+      "w": 640,
+      "h": 640,
+      "credit": "ZaxosKantadoros",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Barrel_piano_-_%CE%9B%CE%B1%CF%84%CE%AD%CF%81%CE%BD%CE%B1(laterna).JPG"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "cowbell",
+   "name": "Cowbell",
+   "group": "percussion",
+   "facts": {
+    "family": "percussion"
+   },
+   "blurb": "The sound of the cowbell.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/a/ab/Cowbell.ogg/Cowbell.ogg.mp3",
+      "credit": "Freddythehat at English Wikipedia",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Cowbell.ogg",
+      "dur": 10.1
+     }
+    ],
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/b/b8/Tuned_Chromatic_Cowbells_%28from_Emil_Richards_Collection%29.jpg/960px-Tuned_Chromatic_Cowbells_%28from_Emil_Richards_Collection%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+      "w": 640,
+      "h": 478,
+      "credit": "Xylosmygame",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Tuned_Chromatic_Cowbells_(from_Emil_Richards_Collection).jpg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "sheng",
+   "name": "Sheng",
+   "group": "free reed",
+   "facts": {
+    "family": "free reed"
+   },
+   "blurb": "The sound of the sheng.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/9/9f/Soprano_Sheng_Chromatic_Scale.ogg/Soprano_Sheng_Chromatic_Scale.ogg.mp3",
+      "credit": "S099001",
+      "license": "CC0",
+      "page": "https://commons.wikimedia.org/wiki/File:Soprano_Sheng_Chromatic_Scale.ogg",
+      "dur": 17
+     }
+    ],
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/5/5d/Sheng_%28Chinese_mouth_organ%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail_unscaled",
+      "w": 640,
+      "h": 1708,
+      "credit": "Seasonaldemand",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Sheng_(Chinese_mouth_organ).jpg"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "claves",
+   "name": "Claves",
+   "group": "percussion",
+   "facts": {
+    "family": "percussion"
+   },
+   "blurb": "The sound of the claves.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/c/c9/Claves.ogg/Claves.ogg.mp3",
+      "credit": "No machine-readable author provided. Wikipedia-ce assumed (based on copyright claims).",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Claves.ogg",
+      "dur": 13.4
+     }
+    ],
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/5/51/Playingclaves.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail_unscaled",
+      "w": 640,
+      "h": 647,
+      "credit": "Freddythehat at English Wikipedia",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Playingclaves.jpg"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "musical-saw",
+   "name": "Musical saw",
+   "group": "other",
+   "facts": {
+    "family": "other"
+   },
+   "blurb": "The sound of the musical saw.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/4/44/Zaagfragment.ogg/Zaagfragment.ogg.mp3",
+      "credit": "Original uploader was Pijnack at nl.wikipedia",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Zaagfragment.ogg",
+      "dur": 14.1
+     }
+    ],
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/2/27/Sega_Musicale_Pietro_Festa.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail_unscaled",
+      "w": 640,
+      "h": 480,
+      "credit": "Pietrofesta",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Sega_Musicale_Pietro_Festa.jpg"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "bugle",
+   "name": "Bugle",
+   "group": "brass",
+   "facts": {
+    "family": "brass"
+   },
+   "blurb": "The sound of the bugle.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/6/6d/Reveille_on_bugle.ogg/Reveille_on_bugle.ogg.mp3",
+      "credit": "United States Army Band",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Reveille_on_bugle.ogg",
+      "dur": 21.2
+     }
+    ],
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/1e/Bugle_in_C_MET_DP-12679-123.jpg/960px-Bugle_in_C_MET_DP-12679-123.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+      "w": 640,
+      "h": 404,
+      "credit": "Creator:Thomas Key",
+      "license": "CC0",
+      "page": "https://commons.wikimedia.org/wiki/File:Bugle_in_C_MET_DP-12679-123.jpg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "pipa",
+   "name": "Pipa",
+   "group": "strings",
+   "facts": {
+    "family": "strings"
+   },
+   "blurb": "The sound of the pipa.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/5/51/Pipa_-_sound.ogg/Pipa_-_sound.ogg.mp3",
+      "credit": "Francesc Fort",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Pipa_-_sound.ogg",
+      "dur": 11.4
+     }
+    ],
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/17/Pipa_MET_DP216711.jpg/960px-Pipa_MET_DP216711.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+      "w": 640,
+      "h": 1019,
+      "credit": "See source page",
+      "license": "CC0",
+      "page": "https://commons.wikimedia.org/wiki/File:Pipa_MET_DP216711.jpg"
+     }
+    ]
+   },
+   "difficulty": 3
+  }
+ ],
+ "questions": [],
+ "sources": [
+  {
+   "name": "Wikidata (instrument → audio, image)",
+   "url": "https://www.wikidata.org"
+  },
+  {
+   "name": "Wikimedia Commons",
+   "url": "https://commons.wikimedia.org"
+  }
+ ],
+ "built": "2026-10-04"
+}

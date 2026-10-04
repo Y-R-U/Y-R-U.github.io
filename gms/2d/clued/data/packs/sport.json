@@ -1,0 +1,3491 @@
+{
+ "id": "sport",
+ "title": "Sport",
+ "theme": "sport",
+ "icon": "⚽",
+ "kids": false,
+ "version": 1,
+ "factsMeta": {
+  "host": {
+   "type": "cat",
+   "label": "Host city",
+   "ask": "Which city hosted the {name}?",
+   "stmt": "The {name} were held in {value}."
+  },
+  "winner": {
+   "type": "cat",
+   "label": "Winner",
+   "ask": "Who won the {name}?",
+   "stmt": "The {name} was won by {value}."
+  },
+  "runnerUp": {
+   "type": "cat",
+   "label": "Runner-up",
+   "ask": "Who were the runners-up at the {name}?",
+   "stmt": "{value} were the runners-up at the {name}."
+  },
+  "wcHost": {
+   "type": "cat",
+   "label": "Host country",
+   "ask": "Which country hosted the {name}?",
+   "stmt": "The {name} was hosted by {value}."
+  },
+  "sport": {
+   "type": "cat",
+   "label": "Sport",
+   "ask": "Which sport is {name} famous for?",
+   "stmt": "{name}'s sport: {value}."
+  },
+  "nation": {
+   "type": "cat",
+   "label": "Country",
+   "ask": "Which country did {name} represent?",
+   "stmt": "{name} represented {value}."
+  }
+ },
+ "items": [
+  {
+   "id": "summer-1896",
+   "name": "1896 Summer Olympics",
+   "group": "olympics-summer",
+   "facts": {
+    "host": "Athens"
+   },
+   "blurb": "The 1896 Summer Olympics were held in Athens, Greece.",
+   "difficulty": 3
+  },
+  {
+   "id": "summer-1900",
+   "name": "1900 Summer Olympics",
+   "group": "olympics-summer",
+   "facts": {
+    "host": "Paris"
+   },
+   "blurb": "The 1900 Summer Olympics were held in Paris, France.",
+   "difficulty": 3
+  },
+  {
+   "id": "summer-1904",
+   "name": "1904 Summer Olympics",
+   "group": "olympics-summer",
+   "facts": {
+    "host": "St. Louis"
+   },
+   "blurb": "The 1904 Summer Olympics were held in St. Louis, United States.",
+   "difficulty": 3
+  },
+  {
+   "id": "summer-1908",
+   "name": "1908 Summer Olympics",
+   "group": "olympics-summer",
+   "facts": {
+    "host": "London"
+   },
+   "blurb": "The 1908 Summer Olympics were held in London, United Kingdom.",
+   "difficulty": 3
+  },
+  {
+   "id": "summer-1912",
+   "name": "1912 Summer Olympics",
+   "group": "olympics-summer",
+   "facts": {
+    "host": "Stockholm"
+   },
+   "blurb": "The 1912 Summer Olympics were held in Stockholm, Sweden.",
+   "difficulty": 3
+  },
+  {
+   "id": "summer-1920",
+   "name": "1920 Summer Olympics",
+   "group": "olympics-summer",
+   "facts": {
+    "host": "Antwerp"
+   },
+   "blurb": "The 1920 Summer Olympics were held in Antwerp, Belgium.",
+   "difficulty": 3
+  },
+  {
+   "id": "summer-1924",
+   "name": "1924 Summer Olympics",
+   "group": "olympics-summer",
+   "facts": {
+    "host": "Paris"
+   },
+   "blurb": "The 1924 Summer Olympics were held in Paris, France.",
+   "difficulty": 3
+  },
+  {
+   "id": "summer-1928",
+   "name": "1928 Summer Olympics",
+   "group": "olympics-summer",
+   "facts": {
+    "host": "Amsterdam"
+   },
+   "blurb": "The 1928 Summer Olympics were held in Amsterdam, Netherlands.",
+   "difficulty": 3
+  },
+  {
+   "id": "summer-1932",
+   "name": "1932 Summer Olympics",
+   "group": "olympics-summer",
+   "facts": {
+    "host": "Los Angeles"
+   },
+   "blurb": "The 1932 Summer Olympics were held in Los Angeles, United States.",
+   "difficulty": 3
+  },
+  {
+   "id": "summer-1936",
+   "name": "1936 Summer Olympics",
+   "group": "olympics-summer",
+   "facts": {
+    "host": "Berlin"
+   },
+   "blurb": "The 1936 Summer Olympics were held in Berlin, Germany.",
+   "difficulty": 3
+  },
+  {
+   "id": "summer-1948",
+   "name": "1948 Summer Olympics",
+   "group": "olympics-summer",
+   "facts": {
+    "host": "London"
+   },
+   "blurb": "The 1948 Summer Olympics were held in London, United Kingdom.",
+   "difficulty": 3
+  },
+  {
+   "id": "summer-1952",
+   "name": "1952 Summer Olympics",
+   "group": "olympics-summer",
+   "facts": {
+    "host": "Helsinki"
+   },
+   "blurb": "The 1952 Summer Olympics were held in Helsinki, Finland.",
+   "difficulty": 3
+  },
+  {
+   "id": "summer-1956",
+   "name": "1956 Summer Olympics",
+   "group": "olympics-summer",
+   "facts": {
+    "host": "Melbourne"
+   },
+   "blurb": "The 1956 Summer Olympics were held in Melbourne, Australia.",
+   "difficulty": 3
+  },
+  {
+   "id": "summer-1960",
+   "name": "1960 Summer Olympics",
+   "group": "olympics-summer",
+   "facts": {
+    "host": "Rome"
+   },
+   "blurb": "The 1960 Summer Olympics were held in Rome, Italy.",
+   "difficulty": 3
+  },
+  {
+   "id": "summer-1964",
+   "name": "1964 Summer Olympics",
+   "group": "olympics-summer",
+   "facts": {
+    "host": "Tokyo"
+   },
+   "blurb": "The 1964 Summer Olympics were held in Tokyo, Japan.",
+   "difficulty": 3
+  },
+  {
+   "id": "summer-1968",
+   "name": "1968 Summer Olympics",
+   "group": "olympics-summer",
+   "facts": {
+    "host": "Mexico City"
+   },
+   "blurb": "The 1968 Summer Olympics were held in Mexico City, Mexico.",
+   "difficulty": 3
+  },
+  {
+   "id": "summer-1972",
+   "name": "1972 Summer Olympics",
+   "group": "olympics-summer",
+   "facts": {
+    "host": "Munich"
+   },
+   "blurb": "The 1972 Summer Olympics were held in Munich, West Germany.",
+   "difficulty": 3
+  },
+  {
+   "id": "summer-1976",
+   "name": "1976 Summer Olympics",
+   "group": "olympics-summer",
+   "facts": {
+    "host": "Montreal"
+   },
+   "blurb": "The 1976 Summer Olympics were held in Montreal, Canada.",
+   "difficulty": 3
+  },
+  {
+   "id": "summer-1980",
+   "name": "1980 Summer Olympics",
+   "group": "olympics-summer",
+   "facts": {
+    "host": "Moscow"
+   },
+   "blurb": "The 1980 Summer Olympics were held in Moscow, Soviet Union.",
+   "difficulty": 3
+  },
+  {
+   "id": "summer-1984",
+   "name": "1984 Summer Olympics",
+   "group": "olympics-summer",
+   "facts": {
+    "host": "Los Angeles"
+   },
+   "blurb": "The 1984 Summer Olympics were held in Los Angeles, United States.",
+   "difficulty": 2
+  },
+  {
+   "id": "summer-1988",
+   "name": "1988 Summer Olympics",
+   "group": "olympics-summer",
+   "facts": {
+    "host": "Seoul"
+   },
+   "blurb": "The 1988 Summer Olympics were held in Seoul, South Korea.",
+   "difficulty": 2
+  },
+  {
+   "id": "summer-1992",
+   "name": "1992 Summer Olympics",
+   "group": "olympics-summer",
+   "facts": {
+    "host": "Barcelona"
+   },
+   "blurb": "The 1992 Summer Olympics were held in Barcelona, Spain.",
+   "difficulty": 2
+  },
+  {
+   "id": "summer-1996",
+   "name": "1996 Summer Olympics",
+   "group": "olympics-summer",
+   "facts": {
+    "host": "Atlanta"
+   },
+   "blurb": "The 1996 Summer Olympics were held in Atlanta, United States.",
+   "difficulty": 2
+  },
+  {
+   "id": "summer-2000",
+   "name": "2000 Summer Olympics",
+   "group": "olympics-summer",
+   "facts": {
+    "host": "Sydney"
+   },
+   "blurb": "The 2000 Summer Olympics were held in Sydney, Australia.",
+   "difficulty": 1
+  },
+  {
+   "id": "summer-2004",
+   "name": "2004 Summer Olympics",
+   "group": "olympics-summer",
+   "facts": {
+    "host": "Athens"
+   },
+   "blurb": "The 2004 Summer Olympics were held in Athens, Greece.",
+   "difficulty": 1
+  },
+  {
+   "id": "summer-2008",
+   "name": "2008 Summer Olympics",
+   "group": "olympics-summer",
+   "facts": {
+    "host": "Beijing"
+   },
+   "blurb": "The 2008 Summer Olympics were held in Beijing, China.",
+   "difficulty": 1
+  },
+  {
+   "id": "summer-2012",
+   "name": "2012 Summer Olympics",
+   "group": "olympics-summer",
+   "facts": {
+    "host": "London"
+   },
+   "blurb": "The 2012 Summer Olympics were held in London, United Kingdom.",
+   "difficulty": 1
+  },
+  {
+   "id": "summer-2016",
+   "name": "2016 Summer Olympics",
+   "group": "olympics-summer",
+   "facts": {
+    "host": "Rio de Janeiro"
+   },
+   "blurb": "The 2016 Summer Olympics were held in Rio de Janeiro, Brazil.",
+   "difficulty": 1
+  },
+  {
+   "id": "summer-2020",
+   "name": "2020 Summer Olympics",
+   "group": "olympics-summer",
+   "facts": {
+    "host": "Tokyo"
+   },
+   "blurb": "The 2020 Summer Olympics were held in Tokyo, Japan. They were postponed to 2021 because of the COVID-19 pandemic.",
+   "difficulty": 1
+  },
+  {
+   "id": "summer-2024",
+   "name": "2024 Summer Olympics",
+   "group": "olympics-summer",
+   "facts": {
+    "host": "Paris"
+   },
+   "blurb": "The 2024 Summer Olympics were held in Paris, France.",
+   "difficulty": 1
+  },
+  {
+   "id": "winter-1924",
+   "name": "1924 Winter Olympics",
+   "group": "olympics-winter",
+   "facts": {
+    "host": "Chamonix"
+   },
+   "blurb": "The 1924 Winter Olympics were held in Chamonix, France.",
+   "difficulty": 3
+  },
+  {
+   "id": "winter-1928",
+   "name": "1928 Winter Olympics",
+   "group": "olympics-winter",
+   "facts": {
+    "host": "St. Moritz"
+   },
+   "blurb": "The 1928 Winter Olympics were held in St. Moritz, Switzerland.",
+   "difficulty": 3
+  },
+  {
+   "id": "winter-1932",
+   "name": "1932 Winter Olympics",
+   "group": "olympics-winter",
+   "facts": {
+    "host": "Lake Placid"
+   },
+   "blurb": "The 1932 Winter Olympics were held in Lake Placid, United States.",
+   "difficulty": 3
+  },
+  {
+   "id": "winter-1936",
+   "name": "1936 Winter Olympics",
+   "group": "olympics-winter",
+   "facts": {
+    "host": "Garmisch-Partenkirchen"
+   },
+   "blurb": "The 1936 Winter Olympics were held in Garmisch-Partenkirchen, Germany.",
+   "difficulty": 3
+  },
+  {
+   "id": "winter-1948",
+   "name": "1948 Winter Olympics",
+   "group": "olympics-winter",
+   "facts": {
+    "host": "St. Moritz"
+   },
+   "blurb": "The 1948 Winter Olympics were held in St. Moritz, Switzerland.",
+   "difficulty": 3
+  },
+  {
+   "id": "winter-1952",
+   "name": "1952 Winter Olympics",
+   "group": "olympics-winter",
+   "facts": {
+    "host": "Oslo"
+   },
+   "blurb": "The 1952 Winter Olympics were held in Oslo, Norway.",
+   "difficulty": 3
+  },
+  {
+   "id": "winter-1956",
+   "name": "1956 Winter Olympics",
+   "group": "olympics-winter",
+   "facts": {
+    "host": "Cortina d'Ampezzo"
+   },
+   "blurb": "The 1956 Winter Olympics were held in Cortina d'Ampezzo, Italy.",
+   "difficulty": 3
+  },
+  {
+   "id": "winter-1960",
+   "name": "1960 Winter Olympics",
+   "group": "olympics-winter",
+   "facts": {
+    "host": "Squaw Valley"
+   },
+   "blurb": "The 1960 Winter Olympics were held in Squaw Valley, United States.",
+   "difficulty": 3
+  },
+  {
+   "id": "winter-1964",
+   "name": "1964 Winter Olympics",
+   "group": "olympics-winter",
+   "facts": {
+    "host": "Innsbruck"
+   },
+   "blurb": "The 1964 Winter Olympics were held in Innsbruck, Austria.",
+   "difficulty": 3
+  },
+  {
+   "id": "winter-1968",
+   "name": "1968 Winter Olympics",
+   "group": "olympics-winter",
+   "facts": {
+    "host": "Grenoble"
+   },
+   "blurb": "The 1968 Winter Olympics were held in Grenoble, France.",
+   "difficulty": 3
+  },
+  {
+   "id": "winter-1972",
+   "name": "1972 Winter Olympics",
+   "group": "olympics-winter",
+   "facts": {
+    "host": "Sapporo"
+   },
+   "blurb": "The 1972 Winter Olympics were held in Sapporo, Japan.",
+   "difficulty": 3
+  },
+  {
+   "id": "winter-1976",
+   "name": "1976 Winter Olympics",
+   "group": "olympics-winter",
+   "facts": {
+    "host": "Innsbruck"
+   },
+   "blurb": "The 1976 Winter Olympics were held in Innsbruck, Austria.",
+   "difficulty": 3
+  },
+  {
+   "id": "winter-1980",
+   "name": "1980 Winter Olympics",
+   "group": "olympics-winter",
+   "facts": {
+    "host": "Lake Placid"
+   },
+   "blurb": "The 1980 Winter Olympics were held in Lake Placid, United States.",
+   "difficulty": 3
+  },
+  {
+   "id": "winter-1984",
+   "name": "1984 Winter Olympics",
+   "group": "olympics-winter",
+   "facts": {
+    "host": "Sarajevo"
+   },
+   "blurb": "The 1984 Winter Olympics were held in Sarajevo, Yugoslavia.",
+   "difficulty": 3
+  },
+  {
+   "id": "winter-1988",
+   "name": "1988 Winter Olympics",
+   "group": "olympics-winter",
+   "facts": {
+    "host": "Calgary"
+   },
+   "blurb": "The 1988 Winter Olympics were held in Calgary, Canada.",
+   "difficulty": 3
+  },
+  {
+   "id": "winter-1992",
+   "name": "1992 Winter Olympics",
+   "group": "olympics-winter",
+   "facts": {
+    "host": "Albertville"
+   },
+   "blurb": "The 1992 Winter Olympics were held in Albertville, France.",
+   "difficulty": 3
+  },
+  {
+   "id": "winter-1994",
+   "name": "1994 Winter Olympics",
+   "group": "olympics-winter",
+   "facts": {
+    "host": "Lillehammer"
+   },
+   "blurb": "The 1994 Winter Olympics were held in Lillehammer, Norway.",
+   "difficulty": 3
+  },
+  {
+   "id": "winter-1998",
+   "name": "1998 Winter Olympics",
+   "group": "olympics-winter",
+   "facts": {
+    "host": "Nagano"
+   },
+   "blurb": "The 1998 Winter Olympics were held in Nagano, Japan.",
+   "difficulty": 3
+  },
+  {
+   "id": "winter-2002",
+   "name": "2002 Winter Olympics",
+   "group": "olympics-winter",
+   "facts": {
+    "host": "Salt Lake City"
+   },
+   "blurb": "The 2002 Winter Olympics were held in Salt Lake City, United States.",
+   "difficulty": 2
+  },
+  {
+   "id": "winter-2006",
+   "name": "2006 Winter Olympics",
+   "group": "olympics-winter",
+   "facts": {
+    "host": "Turin"
+   },
+   "blurb": "The 2006 Winter Olympics were held in Turin, Italy.",
+   "difficulty": 2
+  },
+  {
+   "id": "winter-2010",
+   "name": "2010 Winter Olympics",
+   "group": "olympics-winter",
+   "facts": {
+    "host": "Vancouver"
+   },
+   "blurb": "The 2010 Winter Olympics were held in Vancouver, Canada.",
+   "difficulty": 2
+  },
+  {
+   "id": "winter-2014",
+   "name": "2014 Winter Olympics",
+   "group": "olympics-winter",
+   "facts": {
+    "host": "Sochi"
+   },
+   "blurb": "The 2014 Winter Olympics were held in Sochi, Russia.",
+   "difficulty": 2
+  },
+  {
+   "id": "winter-2018",
+   "name": "2018 Winter Olympics",
+   "group": "olympics-winter",
+   "facts": {
+    "host": "Pyeongchang"
+   },
+   "blurb": "The 2018 Winter Olympics were held in Pyeongchang, South Korea.",
+   "difficulty": 2
+  },
+  {
+   "id": "winter-2022",
+   "name": "2022 Winter Olympics",
+   "group": "olympics-winter",
+   "facts": {
+    "host": "Beijing"
+   },
+   "blurb": "The 2022 Winter Olympics were held in Beijing, China.",
+   "difficulty": 2
+  },
+  {
+   "id": "world-cup-1930",
+   "name": "1930 FIFA World Cup",
+   "group": "world-cup",
+   "facts": {
+    "winner": "Uruguay",
+    "runnerUp": "Argentina",
+    "wcHost": "Uruguay"
+   },
+   "blurb": "Uruguay beat Argentina to win the 1930 World Cup, hosted by Uruguay.",
+   "difficulty": 3
+  },
+  {
+   "id": "world-cup-1934",
+   "name": "1934 FIFA World Cup",
+   "group": "world-cup",
+   "facts": {
+    "winner": "Italy",
+    "runnerUp": "Czechoslovakia",
+    "wcHost": "Italy"
+   },
+   "blurb": "Italy beat Czechoslovakia to win the 1934 World Cup, hosted by Italy.",
+   "difficulty": 3
+  },
+  {
+   "id": "world-cup-1938",
+   "name": "1938 FIFA World Cup",
+   "group": "world-cup",
+   "facts": {
+    "winner": "Italy",
+    "runnerUp": "Hungary",
+    "wcHost": "France"
+   },
+   "blurb": "Italy beat Hungary to win the 1938 World Cup, hosted by France.",
+   "difficulty": 3
+  },
+  {
+   "id": "world-cup-1950",
+   "name": "1950 FIFA World Cup",
+   "group": "world-cup",
+   "facts": {
+    "winner": "Uruguay",
+    "runnerUp": "Brazil",
+    "wcHost": "Brazil"
+   },
+   "blurb": "Uruguay beat Brazil to win the 1950 World Cup, hosted by Brazil. The 1950 title was decided by a final group, not a single final.",
+   "difficulty": 3
+  },
+  {
+   "id": "world-cup-1954",
+   "name": "1954 FIFA World Cup",
+   "group": "world-cup",
+   "facts": {
+    "winner": "Germany",
+    "runnerUp": "Hungary",
+    "wcHost": "Switzerland"
+   },
+   "blurb": "Germany (as West Germany) beat Hungary to win the 1954 World Cup, hosted by Switzerland.",
+   "difficulty": 3
+  },
+  {
+   "id": "world-cup-1958",
+   "name": "1958 FIFA World Cup",
+   "group": "world-cup",
+   "facts": {
+    "winner": "Brazil",
+    "runnerUp": "Sweden",
+    "wcHost": "Sweden"
+   },
+   "blurb": "Brazil beat Sweden to win the 1958 World Cup, hosted by Sweden.",
+   "difficulty": 3
+  },
+  {
+   "id": "world-cup-1962",
+   "name": "1962 FIFA World Cup",
+   "group": "world-cup",
+   "facts": {
+    "winner": "Brazil",
+    "runnerUp": "Czechoslovakia",
+    "wcHost": "Chile"
+   },
+   "blurb": "Brazil beat Czechoslovakia to win the 1962 World Cup, hosted by Chile.",
+   "difficulty": 3
+  },
+  {
+   "id": "world-cup-1966",
+   "name": "1966 FIFA World Cup",
+   "group": "world-cup",
+   "facts": {
+    "winner": "England",
+    "runnerUp": "Germany",
+    "wcHost": "England"
+   },
+   "blurb": "England beat Germany (as West Germany) to win the 1966 World Cup, hosted by England.",
+   "difficulty": 1
+  },
+  {
+   "id": "world-cup-1970",
+   "name": "1970 FIFA World Cup",
+   "group": "world-cup",
+   "facts": {
+    "winner": "Brazil",
+    "runnerUp": "Italy",
+    "wcHost": "Mexico"
+   },
+   "blurb": "Brazil beat Italy to win the 1970 World Cup, hosted by Mexico.",
+   "difficulty": 3
+  },
+  {
+   "id": "world-cup-1974",
+   "name": "1974 FIFA World Cup",
+   "group": "world-cup",
+   "facts": {
+    "winner": "Germany",
+    "runnerUp": "Netherlands",
+    "wcHost": "Germany"
+   },
+   "blurb": "Germany (as West Germany) beat Netherlands to win the 1974 World Cup, hosted by Germany (as West Germany).",
+   "difficulty": 3
+  },
+  {
+   "id": "world-cup-1978",
+   "name": "1978 FIFA World Cup",
+   "group": "world-cup",
+   "facts": {
+    "winner": "Argentina",
+    "runnerUp": "Netherlands",
+    "wcHost": "Argentina"
+   },
+   "blurb": "Argentina beat Netherlands to win the 1978 World Cup, hosted by Argentina.",
+   "difficulty": 3
+  },
+  {
+   "id": "world-cup-1982",
+   "name": "1982 FIFA World Cup",
+   "group": "world-cup",
+   "facts": {
+    "winner": "Italy",
+    "runnerUp": "Germany",
+    "wcHost": "Spain"
+   },
+   "blurb": "Italy beat Germany (as West Germany) to win the 1982 World Cup, hosted by Spain.",
+   "difficulty": 3
+  },
+  {
+   "id": "world-cup-1986",
+   "name": "1986 FIFA World Cup",
+   "group": "world-cup",
+   "facts": {
+    "winner": "Argentina",
+    "runnerUp": "Germany",
+    "wcHost": "Mexico"
+   },
+   "blurb": "Argentina beat Germany (as West Germany) to win the 1986 World Cup, hosted by Mexico.",
+   "difficulty": 2
+  },
+  {
+   "id": "world-cup-1990",
+   "name": "1990 FIFA World Cup",
+   "group": "world-cup",
+   "facts": {
+    "winner": "Germany",
+    "runnerUp": "Argentina",
+    "wcHost": "Italy"
+   },
+   "blurb": "Germany (as West Germany) beat Argentina to win the 1990 World Cup, hosted by Italy.",
+   "difficulty": 2
+  },
+  {
+   "id": "world-cup-1994",
+   "name": "1994 FIFA World Cup",
+   "group": "world-cup",
+   "facts": {
+    "winner": "Brazil",
+    "runnerUp": "Italy",
+    "wcHost": "United States"
+   },
+   "blurb": "Brazil beat Italy to win the 1994 World Cup, hosted by United States.",
+   "difficulty": 2
+  },
+  {
+   "id": "world-cup-1998",
+   "name": "1998 FIFA World Cup",
+   "group": "world-cup",
+   "facts": {
+    "winner": "France",
+    "runnerUp": "Brazil",
+    "wcHost": "France"
+   },
+   "blurb": "France beat Brazil to win the 1998 World Cup, hosted by France.",
+   "difficulty": 2
+  },
+  {
+   "id": "world-cup-2002",
+   "name": "2002 FIFA World Cup",
+   "group": "world-cup",
+   "facts": {
+    "winner": "Brazil",
+    "runnerUp": "Germany",
+    "wcHost": "South Korea and Japan"
+   },
+   "blurb": "Brazil beat Germany to win the 2002 World Cup, hosted by South Korea and Japan.",
+   "difficulty": 2
+  },
+  {
+   "id": "world-cup-2006",
+   "name": "2006 FIFA World Cup",
+   "group": "world-cup",
+   "facts": {
+    "winner": "Italy",
+    "runnerUp": "France",
+    "wcHost": "Germany"
+   },
+   "blurb": "Italy beat France to win the 2006 World Cup, hosted by Germany.",
+   "difficulty": 2
+  },
+  {
+   "id": "world-cup-2010",
+   "name": "2010 FIFA World Cup",
+   "group": "world-cup",
+   "facts": {
+    "winner": "Spain",
+    "runnerUp": "Netherlands",
+    "wcHost": "South Africa"
+   },
+   "blurb": "Spain beat Netherlands to win the 2010 World Cup, hosted by South Africa.",
+   "difficulty": 2
+  },
+  {
+   "id": "world-cup-2014",
+   "name": "2014 FIFA World Cup",
+   "group": "world-cup",
+   "facts": {
+    "winner": "Germany",
+    "runnerUp": "Argentina",
+    "wcHost": "Brazil"
+   },
+   "blurb": "Germany beat Argentina to win the 2014 World Cup, hosted by Brazil.",
+   "difficulty": 1
+  },
+  {
+   "id": "world-cup-2018",
+   "name": "2018 FIFA World Cup",
+   "group": "world-cup",
+   "facts": {
+    "winner": "France",
+    "runnerUp": "Croatia",
+    "wcHost": "Russia"
+   },
+   "blurb": "France beat Croatia to win the 2018 World Cup, hosted by Russia.",
+   "difficulty": 1
+  },
+  {
+   "id": "world-cup-2022",
+   "name": "2022 FIFA World Cup",
+   "group": "world-cup",
+   "facts": {
+    "winner": "Argentina",
+    "runnerUp": "France",
+    "wcHost": "Qatar"
+   },
+   "blurb": "Argentina beat France to win the 2022 World Cup, hosted by Qatar.",
+   "difficulty": 1
+  },
+  {
+   "id": "usain-bolt",
+   "name": "Usain Bolt",
+   "group": "athlete",
+   "facts": {
+    "sport": "Athletics",
+    "nation": "Jamaica"
+   },
+   "blurb": "Sprinter who set the 100 m and 200 m world records in 2009.",
+   "difficulty": 1
+  },
+  {
+   "id": "michael-phelps",
+   "name": "Michael Phelps",
+   "group": "athlete",
+   "facts": {
+    "sport": "Swimming",
+    "nation": "United States"
+   },
+   "blurb": "Swimmer with a record 23 Olympic gold medals.",
+   "difficulty": 1
+  },
+  {
+   "id": "serena-williams",
+   "name": "Serena Williams",
+   "group": "athlete",
+   "facts": {
+    "sport": "Tennis",
+    "nation": "United States"
+   },
+   "blurb": "Won 23 Grand Slam singles titles.",
+   "difficulty": 1
+  },
+  {
+   "id": "roger-federer",
+   "name": "Roger Federer",
+   "group": "athlete",
+   "facts": {
+    "sport": "Tennis",
+    "nation": "Switzerland"
+   },
+   "blurb": "Won a record eight Wimbledon men's singles titles.",
+   "difficulty": 1
+  },
+  {
+   "id": "rafael-nadal",
+   "name": "Rafael Nadal",
+   "group": "athlete",
+   "facts": {
+    "sport": "Tennis",
+    "nation": "Spain"
+   },
+   "blurb": "Won the French Open a record 14 times.",
+   "difficulty": 1
+  },
+  {
+   "id": "novak-djokovic",
+   "name": "Novak Djokovic",
+   "group": "athlete",
+   "facts": {
+    "sport": "Tennis",
+    "nation": "Serbia"
+   },
+   "blurb": "Had won a record 24 Grand Slam singles titles by the end of 2024.",
+   "difficulty": 2
+  },
+  {
+   "id": "pele",
+   "name": "Pelé",
+   "group": "athlete",
+   "facts": {
+    "sport": "Football",
+    "nation": "Brazil"
+   },
+   "blurb": "The only player to win three World Cups (1958, 1962, 1970).",
+   "difficulty": 1
+  },
+  {
+   "id": "diego-maradona",
+   "name": "Diego Maradona",
+   "group": "athlete",
+   "facts": {
+    "sport": "Football",
+    "nation": "Argentina"
+   },
+   "blurb": "Led Argentina to the 1986 World Cup.",
+   "difficulty": 1
+  },
+  {
+   "id": "lionel-messi",
+   "name": "Lionel Messi",
+   "group": "athlete",
+   "facts": {
+    "sport": "Football",
+    "nation": "Argentina"
+   },
+   "blurb": "Won the 2022 World Cup and a record eight Ballon d'Or awards (as of 2024).",
+   "difficulty": 1
+  },
+  {
+   "id": "cristiano-ronaldo",
+   "name": "Cristiano Ronaldo",
+   "group": "athlete",
+   "facts": {
+    "sport": "Football",
+    "nation": "Portugal"
+   },
+   "blurb": "Led Portugal to the Euro 2016 title.",
+   "difficulty": 1
+  },
+  {
+   "id": "michael-jordan",
+   "name": "Michael Jordan",
+   "group": "athlete",
+   "facts": {
+    "sport": "Basketball",
+    "nation": "United States"
+   },
+   "blurb": "Won six NBA championships with the Chicago Bulls.",
+   "difficulty": 1
+  },
+  {
+   "id": "lebron-james",
+   "name": "LeBron James",
+   "group": "athlete",
+   "facts": {
+    "sport": "Basketball",
+    "nation": "United States"
+   },
+   "blurb": "Became the NBA's all-time top points scorer in 2023.",
+   "difficulty": 1
+  },
+  {
+   "id": "muhammad-ali",
+   "name": "Muhammad Ali",
+   "group": "athlete",
+   "facts": {
+    "sport": "Boxing",
+    "nation": "United States"
+   },
+   "blurb": "Three-time world heavyweight champion, nicknamed \"The Greatest\".",
+   "difficulty": 1
+  },
+  {
+   "id": "tiger-woods",
+   "name": "Tiger Woods",
+   "group": "athlete",
+   "facts": {
+    "sport": "Golf",
+    "nation": "United States"
+   },
+   "blurb": "Won 15 men's major championships.",
+   "difficulty": 1
+  },
+  {
+   "id": "jack-nicklaus",
+   "name": "Jack Nicklaus",
+   "group": "athlete",
+   "facts": {
+    "sport": "Golf",
+    "nation": "United States"
+   },
+   "blurb": "Won a record 18 men's major championships.",
+   "difficulty": 2
+  },
+  {
+   "id": "wayne-gretzky",
+   "name": "Wayne Gretzky",
+   "group": "athlete",
+   "facts": {
+    "sport": "Ice hockey",
+    "nation": "Canada"
+   },
+   "blurb": "Nicknamed \"The Great One\"; holds the NHL record for career points.",
+   "difficulty": 2
+  },
+  {
+   "id": "sachin-tendulkar",
+   "name": "Sachin Tendulkar",
+   "group": "athlete",
+   "facts": {
+    "sport": "Cricket",
+    "nation": "India"
+   },
+   "blurb": "The first batter to score 100 international centuries.",
+   "difficulty": 2
+  },
+  {
+   "id": "don-bradman",
+   "name": "Don Bradman",
+   "group": "athlete",
+   "facts": {
+    "sport": "Cricket",
+    "nation": "Australia"
+   },
+   "blurb": "Finished with a Test batting average of 99.94.",
+   "difficulty": 2
+  },
+  {
+   "id": "babe-ruth",
+   "name": "Babe Ruth",
+   "group": "athlete",
+   "facts": {
+    "sport": "Baseball",
+    "nation": "United States"
+   },
+   "blurb": "Baseball's great home-run hitter of the 1920s and 1930s.",
+   "difficulty": 2
+  },
+  {
+   "id": "jesse-owens",
+   "name": "Jesse Owens",
+   "group": "athlete",
+   "facts": {
+    "sport": "Athletics",
+    "nation": "United States"
+   },
+   "blurb": "Won four gold medals at the 1936 Berlin Olympics.",
+   "difficulty": 2
+  },
+  {
+   "id": "nadia-comaneci",
+   "name": "Nadia Comăneci",
+   "group": "athlete",
+   "facts": {
+    "sport": "Gymnastics",
+    "nation": "Romania"
+   },
+   "blurb": "Scored the first perfect 10 in Olympic gymnastics, in 1976.",
+   "difficulty": 2
+  },
+  {
+   "id": "simone-biles",
+   "name": "Simone Biles",
+   "group": "athlete",
+   "facts": {
+    "sport": "Gymnastics",
+    "nation": "United States"
+   },
+   "blurb": "Has several gymnastics moves named after her.",
+   "difficulty": 1
+  },
+  {
+   "id": "lewis-hamilton",
+   "name": "Lewis Hamilton",
+   "group": "athlete",
+   "facts": {
+    "sport": "Formula One",
+    "nation": "United Kingdom"
+   },
+   "blurb": "Won seven Formula One world titles, level with Michael Schumacher.",
+   "difficulty": 1
+  },
+  {
+   "id": "michael-schumacher",
+   "name": "Michael Schumacher",
+   "group": "athlete",
+   "facts": {
+    "sport": "Formula One",
+    "nation": "Germany"
+   },
+   "blurb": "Won seven Formula One world titles, five of them in a row with Ferrari.",
+   "difficulty": 2
+  },
+  {
+   "id": "ayrton-senna",
+   "name": "Ayrton Senna",
+   "group": "athlete",
+   "facts": {
+    "sport": "Formula One",
+    "nation": "Brazil"
+   },
+   "blurb": "Three-time Formula One world champion (1988, 1990, 1991).",
+   "difficulty": 2
+  },
+  {
+   "id": "eddy-merckx",
+   "name": "Eddy Merckx",
+   "group": "athlete",
+   "facts": {
+    "sport": "Cycling",
+    "nation": "Belgium"
+   },
+   "blurb": "Won the Tour de France five times.",
+   "difficulty": 3
+  },
+  {
+   "id": "jonah-lomu",
+   "name": "Jonah Lomu",
+   "group": "athlete",
+   "facts": {
+    "sport": "Rugby union",
+    "nation": "New Zealand"
+   },
+   "blurb": "All Blacks winger who starred at the 1995 Rugby World Cup.",
+   "difficulty": 2
+  },
+  {
+   "id": "mark-spitz",
+   "name": "Mark Spitz",
+   "group": "athlete",
+   "facts": {
+    "sport": "Swimming",
+    "nation": "United States"
+   },
+   "blurb": "Won seven gold medals at the 1972 Munich Olympics.",
+   "difficulty": 3
+  },
+  {
+   "id": "ian-thorpe",
+   "name": "Ian Thorpe",
+   "group": "athlete",
+   "facts": {
+    "sport": "Swimming",
+    "nation": "Australia"
+   },
+   "blurb": "Won five Olympic gold medals, nicknamed \"Thorpedo\".",
+   "difficulty": 2
+  },
+  {
+   "id": "katie-ledecky",
+   "name": "Katie Ledecky",
+   "group": "athlete",
+   "facts": {
+    "sport": "Swimming",
+    "nation": "United States"
+   },
+   "blurb": "Distance freestyle swimmer with many Olympic golds.",
+   "difficulty": 2
+  },
+  {
+   "id": "steffi-graf",
+   "name": "Steffi Graf",
+   "group": "athlete",
+   "facts": {
+    "sport": "Tennis",
+    "nation": "Germany"
+   },
+   "blurb": "Won the \"Golden Slam\" in 1988: all four majors plus Olympic gold.",
+   "difficulty": 2
+  },
+  {
+   "id": "bjorn-borg",
+   "name": "Björn Borg",
+   "group": "athlete",
+   "facts": {
+    "sport": "Tennis",
+    "nation": "Sweden"
+   },
+   "blurb": "Won five Wimbledon titles in a row (1976–1980).",
+   "difficulty": 2
+  },
+  {
+   "id": "eliud-kipchoge",
+   "name": "Eliud Kipchoge",
+   "group": "athlete",
+   "facts": {
+    "sport": "Athletics",
+    "nation": "Kenya"
+   },
+   "blurb": "Marathon runner who won Olympic gold in 2016 and 2020.",
+   "difficulty": 2
+  },
+  {
+   "id": "mikaela-shiffrin",
+   "name": "Mikaela Shiffrin",
+   "group": "athlete",
+   "facts": {
+    "sport": "Alpine skiing",
+    "nation": "United States"
+   },
+   "blurb": "Holds the record for most Alpine Skiing World Cup race wins.",
+   "difficulty": 2
+  },
+  {
+   "id": "yuzuru-hanyu",
+   "name": "Yuzuru Hanyu",
+   "group": "athlete",
+   "facts": {
+    "sport": "Figure skating",
+    "nation": "Japan"
+   },
+   "blurb": "Won Olympic figure skating gold in 2014 and 2018.",
+   "difficulty": 3
+  },
+  {
+   "id": "shaun-white",
+   "name": "Shaun White",
+   "group": "athlete",
+   "facts": {
+    "sport": "Snowboarding",
+    "nation": "United States"
+   },
+   "blurb": "Won three Olympic halfpipe gold medals.",
+   "difficulty": 2
+  },
+  {
+   "id": "kelly-slater",
+   "name": "Kelly Slater",
+   "group": "athlete",
+   "facts": {
+    "sport": "Surfing",
+    "nation": "United States"
+   },
+   "blurb": "Won a record 11 surfing world titles.",
+   "difficulty": 3
+  },
+  {
+   "id": "tony-hawk",
+   "name": "Tony Hawk",
+   "group": "athlete",
+   "facts": {
+    "sport": "Skateboarding",
+    "nation": "United States"
+   },
+   "blurb": "Landed the first widely recognised 900 (two and a half spins) at the 1999 X Games.",
+   "difficulty": 2
+  },
+  {
+   "id": "chris-hoy",
+   "name": "Chris Hoy",
+   "group": "athlete",
+   "facts": {
+    "sport": "Cycling",
+    "nation": "United Kingdom"
+   },
+   "blurb": "Track cyclist with six Olympic gold medals.",
+   "difficulty": 3
+  },
+  {
+   "id": "mo-farah",
+   "name": "Mo Farah",
+   "group": "athlete",
+   "facts": {
+    "sport": "Athletics",
+    "nation": "United Kingdom"
+   },
+   "blurb": "Won the 5,000 m and 10,000 m at both the 2012 and 2016 Olympics.",
+   "difficulty": 2
+  },
+  {
+   "id": "carl-lewis",
+   "name": "Carl Lewis",
+   "group": "athlete",
+   "facts": {
+    "sport": "Athletics",
+    "nation": "United States"
+   },
+   "blurb": "Won nine Olympic gold medals in sprinting and long jump.",
+   "difficulty": 2
+  },
+  {
+   "id": "florence-griffith-joyner",
+   "name": "Florence Griffith-Joyner",
+   "group": "athlete",
+   "facts": {
+    "sport": "Athletics",
+    "nation": "United States"
+   },
+   "blurb": "Set the women's 100 m and 200 m world records in 1988.",
+   "difficulty": 3
+  },
+  {
+   "id": "magic-johnson",
+   "name": "Magic Johnson",
+   "group": "athlete",
+   "facts": {
+    "sport": "Basketball",
+    "nation": "United States"
+   },
+   "blurb": "Won five NBA championships with the Los Angeles Lakers.",
+   "difficulty": 2
+  },
+  {
+   "id": "martina-hingis",
+   "name": "Martina Hingis",
+   "group": "athlete",
+   "facts": {
+    "sport": "Tennis",
+    "nation": "Switzerland"
+   },
+   "blurb": "Became world number one at just 16 years old.",
+   "difficulty": 3
+  }
+ ],
+ "questions": [
+  {
+   "id": "spt-rules-8fd5b6",
+   "kind": "number",
+   "prompt": "How many players does each football (soccer) team have on the pitch?",
+   "answer": 11,
+   "unit": "players",
+   "tolerance": 0,
+   "explain": "Ten outfield players plus a goalkeeper.",
+   "difficulty": 1,
+   "tags": [
+    "sport"
+   ],
+   "topic": "rules"
+  },
+  {
+   "id": "spt-rules-516bbe",
+   "kind": "number",
+   "prompt": "How many players does each basketball team have on the court?",
+   "answer": 5,
+   "unit": "players",
+   "tolerance": 0,
+   "explain": "Five players per side are on court at once.",
+   "difficulty": 1,
+   "tags": [
+    "sport"
+   ],
+   "topic": "rules"
+  },
+  {
+   "id": "spt-rules-ab7d35",
+   "kind": "number",
+   "prompt": "How many players does each volleyball team have on the court?",
+   "answer": 6,
+   "unit": "players",
+   "tolerance": 0,
+   "explain": "Six players rotate positions on each side.",
+   "difficulty": 2,
+   "tags": [
+    "sport"
+   ],
+   "topic": "rules"
+  },
+  {
+   "id": "spt-rules-36fe55",
+   "kind": "number",
+   "prompt": "How many players are in a rugby union team on the field?",
+   "answer": 15,
+   "unit": "players",
+   "tolerance": 0,
+   "explain": "Rugby union uses 15 players; rugby league uses 13.",
+   "difficulty": 2,
+   "tags": [
+    "sport"
+   ],
+   "topic": "rules"
+  },
+  {
+   "id": "spt-rules-c63b2d",
+   "kind": "number",
+   "prompt": "How many players are in a rugby league team on the field?",
+   "answer": 13,
+   "unit": "players",
+   "tolerance": 0,
+   "explain": "Rugby league has two fewer players than rugby union.",
+   "difficulty": 3,
+   "tags": [
+    "sport"
+   ],
+   "topic": "rules"
+  },
+  {
+   "id": "spt-rules-519f3e",
+   "kind": "number",
+   "prompt": "How many players per side are on the ice in ice hockey, including the goaltender?",
+   "answer": 6,
+   "unit": "players",
+   "tolerance": 0,
+   "explain": "Five skaters and a goaltender.",
+   "difficulty": 2,
+   "tags": [
+    "sport"
+   ],
+   "topic": "rules"
+  },
+  {
+   "id": "spt-rules-683f9f",
+   "kind": "number",
+   "prompt": "How many players are in a baseball team's fielding line-up?",
+   "answer": 9,
+   "unit": "players",
+   "tolerance": 0,
+   "explain": "Nine fielders, including the pitcher and catcher.",
+   "difficulty": 2,
+   "tags": [
+    "sport"
+   ],
+   "topic": "rules"
+  },
+  {
+   "id": "spt-rules-861249",
+   "kind": "number",
+   "prompt": "How many players are on court for each netball team?",
+   "answer": 7,
+   "unit": "players",
+   "tolerance": 0,
+   "explain": "Each of the seven players has a position bib, like GS or WD.",
+   "difficulty": 2,
+   "tags": [
+    "sport"
+   ],
+   "topic": "rules"
+  },
+  {
+   "id": "spt-rules-4a3adf",
+   "kind": "number",
+   "prompt": "How many players are in a cricket team?",
+   "answer": 11,
+   "unit": "players",
+   "tolerance": 0,
+   "explain": "Each side fields eleven players.",
+   "difficulty": 1,
+   "tags": [
+    "sport"
+   ],
+   "topic": "rules"
+  },
+  {
+   "id": "spt-rules-e1dd19",
+   "kind": "number",
+   "prompt": "How many players per team are on court in indoor handball?",
+   "answer": 7,
+   "unit": "players",
+   "tolerance": 0,
+   "explain": "Six court players and a goalkeeper.",
+   "difficulty": 3,
+   "tags": [
+    "sport"
+   ],
+   "topic": "rules"
+  },
+  {
+   "id": "spt-rules-114d75",
+   "kind": "number",
+   "prompt": "How many players are on the field for each side in Australian rules football?",
+   "answer": 18,
+   "unit": "players",
+   "tolerance": 0,
+   "explain": "Aussie rules is played 18-a-side on an oval field.",
+   "difficulty": 3,
+   "tags": [
+    "sport"
+   ],
+   "topic": "rules"
+  },
+  {
+   "id": "spt-rules-886661",
+   "kind": "number",
+   "prompt": "How many holes are played in a standard round of golf?",
+   "answer": 18,
+   "unit": "holes",
+   "tolerance": 0,
+   "explain": "A standard course has 18 holes.",
+   "difficulty": 1,
+   "tags": [
+    "sport"
+   ],
+   "topic": "rules"
+  },
+  {
+   "id": "spt-rules-8c6bad",
+   "kind": "mc",
+   "prompt": "In tennis, what does 'love' mean?",
+   "answer": "Zero",
+   "wrong": [
+    "A tie",
+    "A winning shot",
+    "A fault"
+   ],
+   "explain": "A score of 15–love means 15–0.",
+   "difficulty": 1,
+   "tags": [
+    "sport"
+   ],
+   "topic": "rules"
+  },
+  {
+   "id": "spt-rules-602d18",
+   "kind": "mc",
+   "prompt": "In tennis, what is the score called when both players have 40?",
+   "answer": "Deuce",
+   "wrong": [
+    "Love",
+    "Advantage",
+    "Let"
+   ],
+   "explain": "From deuce, a player must win two points in a row.",
+   "difficulty": 2,
+   "tags": [
+    "sport"
+   ],
+   "topic": "rules"
+  },
+  {
+   "id": "spt-rules-e44a46",
+   "kind": "number",
+   "prompt": "How many Grand Slam tournaments are there in tennis each year?",
+   "answer": 4,
+   "unit": "",
+   "tolerance": 0,
+   "explain": "Australian Open, French Open, Wimbledon and the US Open.",
+   "difficulty": 1,
+   "tags": [
+    "sport"
+   ],
+   "topic": "rules"
+  },
+  {
+   "id": "spt-rules-48ade7",
+   "kind": "mc",
+   "prompt": "On what surface is Wimbledon played?",
+   "answer": "Grass",
+   "wrong": [
+    "Clay",
+    "Hard court",
+    "Carpet"
+   ],
+   "explain": "Wimbledon is the only Grand Slam still played on grass.",
+   "difficulty": 1,
+   "tags": [
+    "sport"
+   ],
+   "topic": "rules"
+  },
+  {
+   "id": "spt-rules-a9d710",
+   "kind": "mc",
+   "prompt": "On what surface is the French Open played?",
+   "answer": "Clay",
+   "wrong": [
+    "Grass",
+    "Hard court",
+    "Carpet"
+   ],
+   "explain": "Roland-Garros's red clay makes the ball bounce high and slow.",
+   "difficulty": 2,
+   "tags": [
+    "sport"
+   ],
+   "topic": "rules"
+  },
+  {
+   "id": "spt-rules-0e272b",
+   "kind": "mc",
+   "prompt": "In golf, what is a score of one under par on a hole called?",
+   "answer": "Birdie",
+   "wrong": [
+    "Eagle",
+    "Bogey",
+    "Albatross"
+   ],
+   "explain": "An eagle is two under par; a bogey is one over.",
+   "difficulty": 1,
+   "tags": [
+    "sport"
+   ],
+   "topic": "rules"
+  },
+  {
+   "id": "spt-rules-00c5cf",
+   "kind": "mc",
+   "prompt": "In golf, what is a score of two under par on a hole called?",
+   "answer": "Eagle",
+   "wrong": [
+    "Birdie",
+    "Albatross",
+    "Bogey"
+   ],
+   "explain": "An albatross is three under par.",
+   "difficulty": 2,
+   "tags": [
+    "sport"
+   ],
+   "topic": "rules"
+  },
+  {
+   "id": "spt-rules-73ca11",
+   "kind": "mc",
+   "prompt": "In golf, what is a score of one over par on a hole called?",
+   "answer": "Bogey",
+   "wrong": [
+    "Birdie",
+    "Eagle",
+    "Par"
+   ],
+   "explain": "A double bogey is two over par.",
+   "difficulty": 2,
+   "tags": [
+    "sport"
+   ],
+   "topic": "rules"
+  },
+  {
+   "id": "spt-rules-1d2ae4",
+   "kind": "number",
+   "prompt": "What is the highest score possible with three darts?",
+   "answer": 180,
+   "unit": "points",
+   "tolerance": 0,
+   "explain": "Three treble 20s make 180.",
+   "difficulty": 1,
+   "tags": [
+    "sport"
+   ],
+   "topic": "rules"
+  },
+  {
+   "id": "spt-rules-2c1047",
+   "kind": "number",
+   "prompt": "How many points is the inner bullseye worth in darts?",
+   "answer": 50,
+   "unit": "points",
+   "tolerance": 0,
+   "explain": "The outer bull is worth 25.",
+   "difficulty": 2,
+   "tags": [
+    "sport"
+   ],
+   "topic": "rules"
+  },
+  {
+   "id": "spt-rules-e6601c",
+   "kind": "number",
+   "prompt": "What is the maximum break in standard snooker?",
+   "answer": 147,
+   "unit": "points",
+   "tolerance": 0,
+   "explain": "15 reds each with the black, then all the colours.",
+   "difficulty": 2,
+   "tags": [
+    "sport"
+   ],
+   "topic": "rules"
+  },
+  {
+   "id": "spt-rules-d20fdb",
+   "kind": "number",
+   "prompt": "How many red balls are used at the start of a standard snooker frame?",
+   "answer": 15,
+   "unit": "balls",
+   "tolerance": 0,
+   "explain": "Plus six coloured balls and the white cue ball.",
+   "difficulty": 2,
+   "tags": [
+    "sport"
+   ],
+   "topic": "rules"
+  },
+  {
+   "id": "spt-rules-0de818",
+   "kind": "number",
+   "prompt": "How many points is the black ball worth in snooker?",
+   "answer": 7,
+   "unit": "points",
+   "tolerance": 0,
+   "explain": "Yellow 2, green 3, brown 4, blue 5, pink 6, black 7.",
+   "difficulty": 2,
+   "tags": [
+    "sport"
+   ],
+   "topic": "rules"
+  },
+  {
+   "id": "spt-rules-1a3c3f",
+   "kind": "number",
+   "prompt": "What is a perfect score in ten-pin bowling?",
+   "answer": 300,
+   "unit": "points",
+   "tolerance": 0,
+   "explain": "Twelve strikes in a row.",
+   "difficulty": 2,
+   "tags": [
+    "sport"
+   ],
+   "topic": "rules"
+  },
+  {
+   "id": "spt-rules-082c2c",
+   "kind": "number",
+   "prompt": "How many pins are used in ten-pin bowling?",
+   "answer": 10,
+   "unit": "pins",
+   "tolerance": 0,
+   "explain": "The clue is in the name.",
+   "difficulty": 1,
+   "tags": [
+    "sport"
+   ],
+   "topic": "rules"
+  },
+  {
+   "id": "spt-rules-622bc6",
+   "kind": "number",
+   "prompt": "How high is a regulation basketball hoop above the floor, in feet?",
+   "answer": 10,
+   "unit": "ft",
+   "tolerance": 0,
+   "explain": "The rim is 10 feet (3.05 m) high.",
+   "difficulty": 2,
+   "tags": [
+    "sport"
+   ],
+   "topic": "rules"
+  },
+  {
+   "id": "spt-rules-cb0edf",
+   "kind": "number",
+   "prompt": "How many rings are on the Olympic flag?",
+   "answer": 5,
+   "unit": "rings",
+   "tolerance": 0,
+   "explain": "The five rings represent the inhabited continents joined by the Olympics.",
+   "difficulty": 1,
+   "tags": [
+    "sport"
+   ],
+   "topic": "rules"
+  },
+  {
+   "id": "spt-rules-f54495",
+   "kind": "mc",
+   "prompt": "In which sport would you use a shuttlecock?",
+   "answer": "Badminton",
+   "wrong": [
+    "Squash",
+    "Table tennis",
+    "Tennis"
+   ],
+   "explain": "Shuttlecocks can fly at over 400 km/h when smashed.",
+   "difficulty": 1,
+   "tags": [
+    "sport"
+   ],
+   "topic": "rules"
+  },
+  {
+   "id": "spt-rules-b896bf",
+   "kind": "mc",
+   "prompt": "In which sport is a puck used?",
+   "answer": "Ice hockey",
+   "wrong": [
+    "Field hockey",
+    "Lacrosse",
+    "Curling"
+   ],
+   "explain": "A puck is a hard rubber disc.",
+   "difficulty": 1,
+   "tags": [
+    "sport"
+   ],
+   "topic": "rules"
+  },
+  {
+   "id": "spt-rules-7d3f59",
+   "kind": "mc",
+   "prompt": "In which sport do teams form a 'scrum'?",
+   "answer": "Rugby",
+   "wrong": [
+    "Basketball",
+    "Baseball",
+    "Volleyball"
+   ],
+   "explain": "Forwards bind together and push to win the ball.",
+   "difficulty": 1,
+   "tags": [
+    "sport"
+   ],
+   "topic": "rules"
+  },
+  {
+   "id": "spt-rules-8b058c",
+   "kind": "mc",
+   "prompt": "In cricket, how many balls are in a standard over?",
+   "answer": "6",
+   "wrong": [
+    "4",
+    "8",
+    "10"
+   ],
+   "explain": "A bowler delivers six legal balls in an over.",
+   "difficulty": 2,
+   "tags": [
+    "sport"
+   ],
+   "topic": "rules"
+  },
+  {
+   "id": "spt-rules-fe8845",
+   "kind": "mc",
+   "prompt": "In cricket, what does LBW stand for?",
+   "answer": "Leg before wicket",
+   "wrong": [
+    "Long ball wide",
+    "Low bowled wicket",
+    "Late bat wide"
+   ],
+   "explain": "A batter can be out if the ball would have hit the stumps but hit their leg.",
+   "difficulty": 2,
+   "tags": [
+    "sport"
+   ],
+   "topic": "rules"
+  },
+  {
+   "id": "spt-rules-af1adf",
+   "kind": "number",
+   "prompt": "How many stumps make up one wicket in cricket?",
+   "answer": 3,
+   "unit": "stumps",
+   "tolerance": 0,
+   "explain": "Three stumps topped by two bails.",
+   "difficulty": 2,
+   "tags": [
+    "sport"
+   ],
+   "topic": "rules"
+  },
+  {
+   "id": "spt-rules-072d21",
+   "kind": "number",
+   "prompt": "How many strikes make an out in baseball?",
+   "answer": 3,
+   "unit": "strikes",
+   "tolerance": 0,
+   "explain": "'Three strikes and you're out!'",
+   "difficulty": 2,
+   "tags": [
+    "sport"
+   ],
+   "topic": "rules"
+  },
+  {
+   "id": "spt-rules-2b04ff",
+   "kind": "number",
+   "prompt": "How many innings are in a standard professional baseball game?",
+   "answer": 9,
+   "unit": "innings",
+   "tolerance": 0,
+   "explain": "Extra innings are played if the score is tied.",
+   "difficulty": 2,
+   "tags": [
+    "sport"
+   ],
+   "topic": "rules"
+  },
+  {
+   "id": "spt-rules-4865e2",
+   "kind": "number",
+   "prompt": "How many points is a try worth in rugby union?",
+   "answer": 5,
+   "unit": "points",
+   "tolerance": 0,
+   "explain": "A conversion kick afterwards adds 2 more.",
+   "difficulty": 2,
+   "tags": [
+    "sport"
+   ],
+   "topic": "rules"
+  },
+  {
+   "id": "spt-rules-c1e812",
+   "kind": "number",
+   "prompt": "How many points is a touchdown worth in American football?",
+   "answer": 6,
+   "unit": "points",
+   "tolerance": 0,
+   "explain": "The extra point or two-point try comes afterwards.",
+   "difficulty": 2,
+   "tags": [
+    "sport"
+   ],
+   "topic": "rules"
+  },
+  {
+   "id": "spt-rules-566882",
+   "kind": "number",
+   "prompt": "How many runs is it when the ball is hit over the boundary in cricket without bouncing?",
+   "answer": 6,
+   "unit": "runs",
+   "tolerance": 0,
+   "explain": "If it bounces first, it's a four.",
+   "difficulty": 1,
+   "tags": [
+    "sport"
+   ],
+   "topic": "rules"
+  },
+  {
+   "id": "spt-rules-dda6f4",
+   "kind": "number",
+   "prompt": "To how many points is a standard game of table tennis played?",
+   "answer": 11,
+   "unit": "points",
+   "tolerance": 0,
+   "explain": "You must win by two clear points.",
+   "difficulty": 2,
+   "tags": [
+    "sport"
+   ],
+   "topic": "rules"
+  },
+  {
+   "id": "spt-rules-c422be",
+   "kind": "number",
+   "prompt": "To how many points is a standard game of badminton played?",
+   "answer": 21,
+   "unit": "points",
+   "tolerance": 0,
+   "explain": "Badminton games go to 21, with a two-point lead needed.",
+   "difficulty": 3,
+   "tags": [
+    "sport"
+   ],
+   "topic": "rules"
+  },
+  {
+   "id": "spt-rules-f3800c",
+   "kind": "number",
+   "prompt": "In indoor volleyball, to how many points are the main sets played?",
+   "answer": 25,
+   "unit": "points",
+   "tolerance": 0,
+   "explain": "A deciding fifth set goes to 15.",
+   "difficulty": 3,
+   "tags": [
+    "sport"
+   ],
+   "topic": "rules"
+  },
+  {
+   "id": "spt-rules-c5ac21",
+   "kind": "number",
+   "prompt": "How many periods are in a standard ice hockey game?",
+   "answer": 3,
+   "unit": "periods",
+   "tolerance": 0,
+   "explain": "Three periods of 20 minutes.",
+   "difficulty": 2,
+   "tags": [
+    "sport"
+   ],
+   "topic": "rules"
+  },
+  {
+   "id": "spt-rules-c0a842",
+   "kind": "number",
+   "prompt": "How many minutes does a standard football (soccer) match last, not counting added time?",
+   "answer": 90,
+   "unit": "minutes",
+   "tolerance": 0,
+   "explain": "Two halves of 45 minutes.",
+   "difficulty": 1,
+   "tags": [
+    "sport"
+   ],
+   "topic": "rules"
+  },
+  {
+   "id": "spt-rules-a738a9",
+   "kind": "number",
+   "prompt": "How many minutes does a standard rugby union match last?",
+   "answer": 80,
+   "unit": "minutes",
+   "tolerance": 0,
+   "explain": "Two halves of 40 minutes.",
+   "difficulty": 2,
+   "tags": [
+    "sport"
+   ],
+   "topic": "rules"
+  },
+  {
+   "id": "spt-rules-210cb4",
+   "kind": "number",
+   "prompt": "How many minutes long is each quarter of an NBA basketball game?",
+   "answer": 12,
+   "unit": "minutes",
+   "tolerance": 0,
+   "explain": "FIBA international games use 10-minute quarters.",
+   "difficulty": 3,
+   "tags": [
+    "sport"
+   ],
+   "topic": "rules"
+  },
+  {
+   "id": "spt-rules-6a1812",
+   "kind": "order",
+   "prompt": "Put the strokes of an individual medley swimming race in order.",
+   "answer": [
+    "Butterfly",
+    "Backstroke",
+    "Breaststroke",
+    "Freestyle"
+   ],
+   "orderLabel": "First stroke first",
+   "explain": "Individual medley order: fly, back, breast, free.",
+   "difficulty": 3,
+   "tags": [
+    "sport"
+   ],
+   "topic": "rules"
+  },
+  {
+   "id": "spt-rules-58a99f",
+   "kind": "number",
+   "prompt": "How long is an Olympic swimming pool?",
+   "answer": 50,
+   "unit": "m",
+   "tolerance": 0,
+   "explain": "Olympic pools are 50 metres long.",
+   "difficulty": 1,
+   "tags": [
+    "sport"
+   ],
+   "topic": "rules"
+  },
+  {
+   "id": "spt-rules-0ba56f",
+   "kind": "number",
+   "prompt": "How long is a marathon, in kilometres?",
+   "answer": 42.195,
+   "unit": "km",
+   "tolerance": 0.2,
+   "explain": "A marathon is 42.195 km (26.2 miles).",
+   "difficulty": 2,
+   "tags": [
+    "sport"
+   ],
+   "topic": "rules"
+  },
+  {
+   "id": "spt-rules-681e1c",
+   "kind": "mc",
+   "prompt": "In which order are the three parts of a triathlon?",
+   "answer": "Swim, cycle, run",
+   "wrong": [
+    "Run, swim, cycle",
+    "Cycle, run, swim",
+    "Swim, run, cycle"
+   ],
+   "explain": "Triathletes swim first, then cycle, then run.",
+   "difficulty": 1,
+   "tags": [
+    "sport"
+   ],
+   "topic": "rules"
+  },
+  {
+   "id": "spt-rules-137a35",
+   "kind": "number",
+   "prompt": "How many events are in an Olympic decathlon?",
+   "answer": 10,
+   "unit": "events",
+   "tolerance": 0,
+   "explain": "Deca means ten.",
+   "difficulty": 2,
+   "tags": [
+    "sport"
+   ],
+   "topic": "rules"
+  },
+  {
+   "id": "spt-rules-173303",
+   "kind": "number",
+   "prompt": "How many events are in the heptathlon?",
+   "answer": 7,
+   "unit": "events",
+   "tolerance": 0,
+   "explain": "Hepta means seven.",
+   "difficulty": 3,
+   "tags": [
+    "sport"
+   ],
+   "topic": "rules"
+  },
+  {
+   "id": "spt-rules-73e0e6",
+   "kind": "mc",
+   "prompt": "What colour jersey does the overall leader wear in the Tour de France?",
+   "answer": "Yellow",
+   "wrong": [
+    "Green",
+    "Pink",
+    "Red"
+   ],
+   "explain": "The yellow jersey is called the maillot jaune.",
+   "difficulty": 1,
+   "tags": [
+    "sport"
+   ],
+   "topic": "rules"
+  },
+  {
+   "id": "spt-rules-47be73",
+   "kind": "mc",
+   "prompt": "In the Tour de France, what does the polka-dot jersey reward?",
+   "answer": "Best climber",
+   "wrong": [
+    "Best young rider",
+    "Points leader",
+    "Most aggressive rider"
+   ],
+   "explain": "The red-on-white polka-dot jersey goes to the King of the Mountains.",
+   "difficulty": 3,
+   "tags": [
+    "sport"
+   ],
+   "topic": "rules"
+  },
+  {
+   "id": "spt-rules-597d89",
+   "kind": "mc",
+   "prompt": "Which of these is NOT one of the three Olympic fencing weapons?",
+   "answer": "Rapier",
+   "wrong": [
+    "Foil",
+    "Épée",
+    "Sabre"
+   ],
+   "explain": "Olympic fencing uses foil, épée and sabre.",
+   "difficulty": 2,
+   "tags": [
+    "sport"
+   ],
+   "topic": "rules"
+  },
+  {
+   "id": "spt-rules-c6be7d",
+   "kind": "mc",
+   "prompt": "Which country did judo come from?",
+   "answer": "Japan",
+   "wrong": [
+    "China",
+    "Korea",
+    "Thailand"
+   ],
+   "explain": "Jigoro Kano founded judo in 1882.",
+   "difficulty": 1,
+   "tags": [
+    "sport"
+   ],
+   "topic": "rules"
+  },
+  {
+   "id": "spt-rules-bcc125",
+   "kind": "mc",
+   "prompt": "Which country did taekwondo come from?",
+   "answer": "South Korea",
+   "wrong": [
+    "Japan",
+    "China",
+    "Vietnam"
+   ],
+   "explain": "Taekwondo became an Olympic sport in 2000.",
+   "difficulty": 2,
+   "tags": [
+    "sport"
+   ],
+   "topic": "rules"
+  },
+  {
+   "id": "spt-rules-1ed876",
+   "kind": "mc",
+   "prompt": "In which country is sumo wrestling the national sport?",
+   "answer": "Japan",
+   "wrong": [
+    "China",
+    "Mongolia",
+    "Thailand"
+   ],
+   "explain": "Sumo has been practised in Japan for centuries.",
+   "difficulty": 1,
+   "tags": [
+    "sport"
+   ],
+   "topic": "rules"
+  },
+  {
+   "id": "spt-rules-4b85e0",
+   "kind": "number",
+   "prompt": "How far is the penalty spot from the goal line in football, in metres?",
+   "answer": 11,
+   "unit": "m",
+   "tolerance": 0,
+   "explain": "That's 12 yards.",
+   "difficulty": 2,
+   "tags": [
+    "sport"
+   ],
+   "topic": "rules"
+  },
+  {
+   "id": "spt-rules-e6c9ef",
+   "kind": "mc",
+   "prompt": "Which flag means a motor race has finished?",
+   "answer": "Chequered flag",
+   "wrong": [
+    "Red flag",
+    "Yellow flag",
+    "Blue flag"
+   ],
+   "explain": "A red flag stops the race; yellow means danger, slow down.",
+   "difficulty": 2,
+   "tags": [
+    "sport"
+   ],
+   "topic": "rules"
+  },
+  {
+   "id": "spt-rules-b7ca64",
+   "kind": "mc",
+   "prompt": "In basketball, how many points is a shot from behind the arc worth?",
+   "answer": "3",
+   "wrong": [
+    "2",
+    "4",
+    "1"
+   ],
+   "explain": "A free throw is worth 1.",
+   "difficulty": 2,
+   "tags": [
+    "sport"
+   ],
+   "topic": "rules"
+  },
+  {
+   "id": "spt-rules-ec4797",
+   "kind": "mc",
+   "prompt": "In football (soccer), which player may handle the ball inside their own penalty area?",
+   "answer": "Goalkeeper",
+   "wrong": [
+    "Captain",
+    "Defender",
+    "Striker"
+   ],
+   "explain": "Outfield players may not use their hands or arms.",
+   "difficulty": 1,
+   "tags": [
+    "sport"
+   ],
+   "topic": "rules"
+  },
+  {
+   "id": "spt-rules-f5fa59",
+   "kind": "mc",
+   "prompt": "What does a referee show a football player to send them off?",
+   "answer": "A red card",
+   "wrong": [
+    "A yellow card",
+    "A green card",
+    "A blue card"
+   ],
+   "explain": "Two yellow cards also add up to a red.",
+   "difficulty": 2,
+   "tags": [
+    "sport"
+   ],
+   "topic": "rules"
+  },
+  {
+   "id": "spt-rules-ea9485",
+   "kind": "number",
+   "prompt": "How many players does each team have on the field in American football?",
+   "answer": 11,
+   "unit": "players",
+   "tolerance": 0,
+   "explain": "Each side has eleven on the field, with separate offence and defence units.",
+   "difficulty": 2,
+   "tags": [
+    "sport"
+   ],
+   "topic": "rules"
+  },
+  {
+   "id": "spt-rules-2b6acf",
+   "kind": "mc",
+   "prompt": "In curling, what is the target area called?",
+   "answer": "The house",
+   "wrong": [
+    "The nest",
+    "The pit",
+    "The ring"
+   ],
+   "explain": "The house is the set of circles at the end of the sheet.",
+   "difficulty": 3,
+   "tags": [
+    "sport"
+   ],
+   "topic": "rules"
+  },
+  {
+   "id": "spt-rules-35fd1f",
+   "kind": "number",
+   "prompt": "How many players are on each polo team?",
+   "answer": 4,
+   "unit": "players",
+   "tolerance": 0,
+   "explain": "Four riders per side.",
+   "difficulty": 3,
+   "tags": [
+    "sport"
+   ],
+   "topic": "rules"
+  },
+  {
+   "id": "spt-rules-f8e7c0",
+   "kind": "number",
+   "prompt": "How many players are on a water polo team in the pool?",
+   "answer": 7,
+   "unit": "players",
+   "tolerance": 0,
+   "explain": "Six field players and a goalkeeper.",
+   "difficulty": 2,
+   "tags": [
+    "sport"
+   ],
+   "topic": "rules"
+  },
+  {
+   "id": "spt-olympics-ad8bc8",
+   "kind": "mc",
+   "prompt": "In which country were the ancient Olympic Games held?",
+   "answer": "Greece",
+   "wrong": [
+    "Italy",
+    "Egypt",
+    "Turkey"
+   ],
+   "explain": "They were held at Olympia from 776 BC.",
+   "difficulty": 1,
+   "tags": [
+    "sport"
+   ],
+   "topic": "olympics"
+  },
+  {
+   "id": "spt-olympics-cb98f6",
+   "kind": "mc",
+   "prompt": "Who founded the modern Olympic Games?",
+   "answer": "Pierre de Coubertin",
+   "wrong": [
+    "Avery Brundage",
+    "Juan Antonio Samaranch",
+    "Jacques Rogge"
+   ],
+   "explain": "De Coubertin founded the International Olympic Committee in 1894.",
+   "difficulty": 2,
+   "tags": [
+    "sport"
+   ],
+   "topic": "olympics"
+  },
+  {
+   "id": "spt-olympics-71e52f",
+   "kind": "mc",
+   "prompt": "What do the Olympic Latin words 'Citius, Altius, Fortius' mean?",
+   "answer": "Faster, Higher, Stronger",
+   "wrong": [
+    "Bigger, Better, Bolder",
+    "Brave, Strong, True",
+    "Run, Jump, Throw"
+   ],
+   "explain": "In 2021 'Communiter' (Together) was added.",
+   "difficulty": 2,
+   "tags": [
+    "sport"
+   ],
+   "topic": "olympics"
+  },
+  {
+   "id": "spt-olympics-eac9cc",
+   "kind": "mc",
+   "prompt": "Which city was the first to host both the Summer and Winter Olympics?",
+   "answer": "Beijing",
+   "wrong": [
+    "Tokyo",
+    "Los Angeles",
+    "Paris"
+   ],
+   "explain": "Beijing hosted the Summer Games in 2008 and the Winter Games in 2022.",
+   "difficulty": 2,
+   "tags": [
+    "sport"
+   ],
+   "topic": "olympics"
+  },
+  {
+   "id": "spt-olympics-6f1b4a",
+   "kind": "mc",
+   "prompt": "As of 2024, which city was chosen to host the 2028 Summer Olympics?",
+   "answer": "Los Angeles",
+   "wrong": [
+    "Brisbane",
+    "Paris",
+    "Madrid"
+   ],
+   "explain": "LA will host for the third time, after 1932 and 1984.",
+   "difficulty": 1,
+   "tags": [
+    "sport"
+   ],
+   "topic": "olympics"
+  },
+  {
+   "id": "spt-olympics-f51d50",
+   "kind": "mc",
+   "prompt": "As of 2024, which city was chosen to host the 2032 Summer Olympics?",
+   "answer": "Brisbane",
+   "wrong": [
+    "Doha",
+    "Sydney",
+    "Melbourne"
+   ],
+   "explain": "Brisbane was chosen in 2021.",
+   "difficulty": 2,
+   "tags": [
+    "sport"
+   ],
+   "topic": "olympics"
+  },
+  {
+   "id": "spt-olympics-90ed50",
+   "kind": "tf",
+   "prompt": "Skateboarding and surfing made their Olympic debut at the Tokyo 2020 Games.",
+   "answer": true,
+   "explain": "Sport climbing and karate also debuted in Tokyo.",
+   "difficulty": 2,
+   "tags": [
+    "sport"
+   ],
+   "topic": "olympics"
+  },
+  {
+   "id": "spt-olympics-cc6515",
+   "kind": "tf",
+   "prompt": "Breaking (breakdancing) made its Olympic debut at Paris 2024.",
+   "answer": true,
+   "explain": "Breaking was added for Paris 2024.",
+   "difficulty": 2,
+   "tags": [
+    "sport"
+   ],
+   "topic": "olympics"
+  },
+  {
+   "id": "spt-olympics-ef5384",
+   "kind": "tf",
+   "prompt": "The 2020 Tokyo Olympics were actually held in 2021.",
+   "answer": true,
+   "explain": "They were postponed by a year because of the COVID-19 pandemic.",
+   "difficulty": 3,
+   "tags": [
+    "sport"
+   ],
+   "topic": "olympics"
+  },
+  {
+   "id": "spt-olympics-443487",
+   "kind": "mc",
+   "prompt": "Which country has won the most Summer Olympic medals overall?",
+   "answer": "United States",
+   "wrong": [
+    "China",
+    "Russia",
+    "United Kingdom"
+   ],
+   "explain": "The US has won over 2,500 Summer Olympic medals.",
+   "difficulty": 2,
+   "tags": [
+    "sport"
+   ],
+   "topic": "olympics"
+  },
+  {
+   "id": "spt-olympics-23226b",
+   "kind": "mc",
+   "prompt": "In which city were the first official Paralympic Games held, in 1960?",
+   "answer": "Rome",
+   "wrong": [
+    "London",
+    "Tokyo",
+    "Stoke Mandeville"
+   ],
+   "explain": "They followed the Rome Olympics; the earlier Stoke Mandeville Games inspired them.",
+   "difficulty": 3,
+   "tags": [
+    "sport"
+   ],
+   "topic": "olympics"
+  },
+  {
+   "id": "spt-olympics-7a5906",
+   "kind": "order",
+   "prompt": "Put these Summer Olympic host cities in order of their first Games, earliest first.",
+   "answer": [
+    "Berlin",
+    "Rome",
+    "Seoul",
+    "Sydney"
+   ],
+   "orderLabel": "Hosted first",
+   "explain": "Berlin 1936, Rome 1960, Seoul 1988, Sydney 2000.",
+   "difficulty": 3,
+   "tags": [
+    "sport"
+   ],
+   "topic": "olympics"
+  },
+  {
+   "id": "spt-olympics-95f13e",
+   "kind": "number",
+   "prompt": "How many gold medals did Michael Phelps win at the Olympics?",
+   "answer": 23,
+   "unit": "golds",
+   "tolerance": 0,
+   "explain": "He won 28 medals in all, between 2004 and 2016.",
+   "difficulty": 2,
+   "tags": [
+    "sport"
+   ],
+   "topic": "olympics"
+  },
+  {
+   "id": "spt-olympics-22737d",
+   "kind": "number",
+   "prompt": "How many Olympic gold medals did Usain Bolt finish with?",
+   "answer": 8,
+   "unit": "golds",
+   "tolerance": 0,
+   "explain": "He won nine, but one relay gold was taken away because of a teammate's doping.",
+   "difficulty": 3,
+   "tags": [
+    "sport"
+   ],
+   "topic": "olympics"
+  },
+  {
+   "id": "spt-olympics-3ed58f",
+   "kind": "number",
+   "prompt": "How many gold medals did Jesse Owens win at the 1936 Berlin Olympics?",
+   "answer": 4,
+   "unit": "golds",
+   "tolerance": 0,
+   "explain": "100 m, 200 m, long jump and the 4 × 100 m relay.",
+   "difficulty": 2,
+   "tags": [
+    "sport"
+   ],
+   "topic": "olympics"
+  },
+  {
+   "id": "spt-olympics-05c5a2",
+   "kind": "mc",
+   "prompt": "At which Olympics did Nadia Comăneci score the first perfect 10 in gymnastics?",
+   "answer": "Montreal 1976",
+   "wrong": [
+    "Moscow 1980",
+    "Munich 1972",
+    "Los Angeles 1984"
+   ],
+   "explain": "She was 14 years old.",
+   "difficulty": 2,
+   "tags": [
+    "sport"
+   ],
+   "topic": "olympics"
+  },
+  {
+   "id": "spt-olympics-26a92e",
+   "kind": "tf",
+   "prompt": "Ethiopia's Abebe Bikila won the 1960 Olympic marathon running barefoot.",
+   "answer": true,
+   "explain": "He won in Rome and won again in Tokyo in 1964, that time in shoes.",
+   "difficulty": 3,
+   "tags": [
+    "sport"
+   ],
+   "topic": "olympics"
+  },
+  {
+   "id": "spt-olympics-ce8c17",
+   "kind": "mc",
+   "prompt": "In which sport did the 'Miracle on Ice' happen at the 1980 Winter Olympics?",
+   "answer": "Ice hockey",
+   "wrong": [
+    "Figure skating",
+    "Speed skating",
+    "Curling"
+   ],
+   "explain": "A team of US college players beat the Soviet Union.",
+   "difficulty": 2,
+   "tags": [
+    "sport"
+   ],
+   "topic": "olympics"
+  },
+  {
+   "id": "spt-olympics-4d19cb",
+   "kind": "mc",
+   "prompt": "Which country topped the medal table at the 2022 Winter Olympics in Beijing?",
+   "answer": "Norway",
+   "wrong": [
+    "China",
+    "Germany",
+    "United States"
+   ],
+   "explain": "Norway won 16 gold medals.",
+   "difficulty": 3,
+   "tags": [
+    "sport"
+   ],
+   "topic": "olympics"
+  },
+  {
+   "id": "spt-football-b9de82",
+   "kind": "mc",
+   "prompt": "As of 2024, which country had won the men's FIFA World Cup the most times?",
+   "answer": "Brazil",
+   "wrong": [
+    "Germany",
+    "Italy",
+    "Argentina"
+   ],
+   "explain": "Brazil had five titles: 1958, 1962, 1970, 1994 and 2002.",
+   "difficulty": 1,
+   "tags": [
+    "sport"
+   ],
+   "topic": "football"
+  },
+  {
+   "id": "spt-football-7ad71c",
+   "kind": "tf",
+   "prompt": "Brazil had played in every men's World Cup tournament up to 2022.",
+   "answer": true,
+   "explain": "Brazil is the only team to have qualified for every World Cup.",
+   "difficulty": 2,
+   "tags": [
+    "sport"
+   ],
+   "topic": "football"
+  },
+  {
+   "id": "spt-football-a76c62",
+   "kind": "mc",
+   "prompt": "How many teams did FIFA decide would play at the 2026 World Cup?",
+   "answer": "48",
+   "wrong": [
+    "32",
+    "40",
+    "64"
+   ],
+   "explain": "The tournament grew from 32 to 48 teams.",
+   "difficulty": 2,
+   "tags": [
+    "sport"
+   ],
+   "topic": "football"
+  },
+  {
+   "id": "spt-football-4177ef",
+   "kind": "mc",
+   "prompt": "Which three countries were chosen to co-host the 2026 FIFA World Cup?",
+   "answer": "United States, Canada and Mexico",
+   "wrong": [
+    "United States, Mexico and Costa Rica",
+    "Canada, United States and Cuba",
+    "Mexico, Colombia and United States"
+   ],
+   "explain": "It was the first World Cup shared by three countries.",
+   "difficulty": 2,
+   "tags": [
+    "sport"
+   ],
+   "topic": "football"
+  },
+  {
+   "id": "spt-football-3aee77",
+   "kind": "mc",
+   "prompt": "In which year was the Football Association (FA) founded in England?",
+   "answer": "1863",
+   "wrong": [
+    "1888",
+    "1904",
+    "1823"
+   ],
+   "explain": "The FA wrote the first widely used rules of football.",
+   "difficulty": 2,
+   "tags": [
+    "sport"
+   ],
+   "topic": "football"
+  },
+  {
+   "id": "spt-football-20bff4",
+   "kind": "mc",
+   "prompt": "As of 2024, how many Ballon d'Or awards had Lionel Messi won?",
+   "answer": "8",
+   "wrong": [
+    "5",
+    "6",
+    "7"
+   ],
+   "explain": "His eighth came in 2023.",
+   "difficulty": 2,
+   "tags": [
+    "sport"
+   ],
+   "topic": "football"
+  },
+  {
+   "id": "spt-football-c9ce76",
+   "kind": "mc",
+   "prompt": "What is the name of the trophy given to the winners of the men's World Cup since 1974?",
+   "answer": "FIFA World Cup Trophy",
+   "wrong": [
+    "Jules Rimet Trophy",
+    "Henri Delaunay Trophy",
+    "Copa América"
+   ],
+   "explain": "The earlier Jules Rimet Trophy was given to Brazil to keep after their third win, in 1970.",
+   "difficulty": 1,
+   "tags": [
+    "sport"
+   ],
+   "topic": "football"
+  },
+  {
+   "id": "spt-football-b8cfe7",
+   "kind": "mc",
+   "prompt": "Which country won the first Women's World Cup, in 1991?",
+   "answer": "United States",
+   "wrong": [
+    "Norway",
+    "Germany",
+    "China"
+   ],
+   "explain": "The final was played in China.",
+   "difficulty": 2,
+   "tags": [
+    "sport"
+   ],
+   "topic": "football"
+  },
+  {
+   "id": "spt-football-13c77c",
+   "kind": "mc",
+   "prompt": "Which country won the 2023 FIFA Women's World Cup?",
+   "answer": "Spain",
+   "wrong": [
+    "England",
+    "United States",
+    "Sweden"
+   ],
+   "explain": "Spain beat England 1–0 in the final in Sydney.",
+   "difficulty": 3,
+   "tags": [
+    "sport"
+   ],
+   "topic": "football"
+  },
+  {
+   "id": "spt-football-5e4846",
+   "kind": "mc",
+   "prompt": "Which country won UEFA Euro 2024?",
+   "answer": "Spain",
+   "wrong": [
+    "England",
+    "France",
+    "Germany"
+   ],
+   "explain": "Spain beat England 2–1 in the final in Berlin.",
+   "difficulty": 2,
+   "tags": [
+    "sport"
+   ],
+   "topic": "football"
+  },
+  {
+   "id": "spt-football-72d07d",
+   "kind": "mc",
+   "prompt": "Which country won the European Championship in 2016?",
+   "answer": "Portugal",
+   "wrong": [
+    "France",
+    "Germany",
+    "Spain"
+   ],
+   "explain": "Portugal beat hosts France 1–0 in the final.",
+   "difficulty": 3,
+   "tags": [
+    "sport"
+   ],
+   "topic": "football"
+  },
+  {
+   "id": "spt-football-f1751a",
+   "kind": "mc",
+   "prompt": "Who scored a famous goal in the 1986 World Cup that he called the 'Hand of God'?",
+   "answer": "Diego Maradona",
+   "wrong": [
+    "Pelé",
+    "Gary Lineker",
+    "Michel Platini"
+   ],
+   "explain": "It came against England in the quarter-final.",
+   "difficulty": 2,
+   "tags": [
+    "sport"
+   ],
+   "topic": "football"
+  },
+  {
+   "id": "spt-football-183576",
+   "kind": "mc",
+   "prompt": "Which English club plays home games at Anfield?",
+   "answer": "Liverpool",
+   "wrong": [
+    "Everton",
+    "Manchester United",
+    "Arsenal"
+   ],
+   "explain": "Everton's stadium is less than a mile away.",
+   "difficulty": 2,
+   "tags": [
+    "sport"
+   ],
+   "topic": "football"
+  },
+  {
+   "id": "spt-football-be6c6f",
+   "kind": "mc",
+   "prompt": "Which club plays home games at the Camp Nou?",
+   "answer": "FC Barcelona",
+   "wrong": [
+    "Real Madrid",
+    "Atlético Madrid",
+    "Valencia"
+   ],
+   "explain": "Real Madrid plays at the Santiago Bernabéu.",
+   "difficulty": 2,
+   "tags": [
+    "sport"
+   ],
+   "topic": "football"
+  },
+  {
+   "id": "spt-football-4421ea",
+   "kind": "mc",
+   "prompt": "Who scored a hat-trick in the 1966 World Cup final?",
+   "answer": "Geoff Hurst",
+   "wrong": [
+    "Bobby Charlton",
+    "Bobby Moore",
+    "Martin Peters"
+   ],
+   "explain": "England beat West Germany 4–2 after extra time.",
+   "difficulty": 3,
+   "tags": [
+    "sport"
+   ],
+   "topic": "football"
+  },
+  {
+   "id": "spt-records-8775e8",
+   "kind": "mc",
+   "prompt": "As of 2024, what was Usain Bolt's 100 m world record time?",
+   "answer": "9.58 seconds",
+   "wrong": [
+    "9.63 seconds",
+    "9.69 seconds",
+    "9.72 seconds"
+   ],
+   "explain": "He set it in Berlin in 2009.",
+   "difficulty": 2,
+   "tags": [
+    "sport"
+   ],
+   "topic": "records"
+  },
+  {
+   "id": "spt-records-e8ca80",
+   "kind": "mc",
+   "prompt": "Who held the women's 100 m world record as of 2024?",
+   "answer": "Florence Griffith-Joyner",
+   "wrong": [
+    "Shelly-Ann Fraser-Pryce",
+    "Marion Jones",
+    "Elaine Thompson-Herah"
+   ],
+   "explain": "She ran 10.49 seconds in 1988.",
+   "difficulty": 3,
+   "tags": [
+    "sport"
+   ],
+   "topic": "records"
+  },
+  {
+   "id": "spt-records-a85f75",
+   "kind": "mc",
+   "prompt": "Who ran the first mile in under four minutes, in 1954?",
+   "answer": "Roger Bannister",
+   "wrong": [
+    "Sebastian Coe",
+    "Steve Ovett",
+    "Hicham El Guerrouj"
+   ],
+   "explain": "He ran 3:59.4 in Oxford.",
+   "difficulty": 2,
+   "tags": [
+    "sport"
+   ],
+   "topic": "records"
+  },
+  {
+   "id": "spt-records-2145e0",
+   "kind": "mc",
+   "prompt": "As of the end of 2024, how many Grand Slam singles titles had Novak Djokovic won?",
+   "answer": "24",
+   "wrong": [
+    "20",
+    "22",
+    "23"
+   ],
+   "explain": "That was the men's record.",
+   "difficulty": 2,
+   "tags": [
+    "sport"
+   ],
+   "topic": "records"
+  },
+  {
+   "id": "spt-records-977318",
+   "kind": "number",
+   "prompt": "How many Grand Slam singles titles did Serena Williams win?",
+   "answer": 23,
+   "unit": "titles",
+   "tolerance": 0,
+   "explain": "That's the most of any player in the Open Era.",
+   "difficulty": 2,
+   "tags": [
+    "sport"
+   ],
+   "topic": "records"
+  },
+  {
+   "id": "spt-records-6899ba",
+   "kind": "number",
+   "prompt": "How many times did Rafael Nadal win the French Open men's singles?",
+   "answer": 14,
+   "unit": "times",
+   "tolerance": 0,
+   "explain": "No player has won any Grand Slam event more often.",
+   "difficulty": 2,
+   "tags": [
+    "sport"
+   ],
+   "topic": "records"
+  },
+  {
+   "id": "spt-records-6f4854",
+   "kind": "number",
+   "prompt": "How many men's major golf championships did Jack Nicklaus win?",
+   "answer": 18,
+   "unit": "majors",
+   "tolerance": 0,
+   "explain": "Tiger Woods is second with 15.",
+   "difficulty": 2,
+   "tags": [
+    "sport"
+   ],
+   "topic": "records"
+  },
+  {
+   "id": "spt-records-4eff77",
+   "kind": "mc",
+   "prompt": "What was Don Bradman's Test batting average?",
+   "answer": "99.94",
+   "wrong": [
+    "89.94",
+    "79.94",
+    "100.00"
+   ],
+   "explain": "He needed only 4 runs in his last innings to average 100, but was out for 0.",
+   "difficulty": 3,
+   "tags": [
+    "sport"
+   ],
+   "topic": "records"
+  },
+  {
+   "id": "spt-records-3e901e",
+   "kind": "tf",
+   "prompt": "Pelé is the only player to have won three men's World Cups.",
+   "answer": true,
+   "explain": "He won in 1958, 1962 and 1970.",
+   "difficulty": 2,
+   "tags": [
+    "sport"
+   ],
+   "topic": "records"
+  },
+  {
+   "id": "spt-records-f73e37",
+   "kind": "number",
+   "prompt": "How many Formula One world titles did Lewis Hamilton win by the end of 2024?",
+   "answer": 7,
+   "unit": "titles",
+   "tolerance": 0,
+   "explain": "Level with Michael Schumacher's record of seven.",
+   "difficulty": 3,
+   "tags": [
+    "sport"
+   ],
+   "topic": "records"
+  },
+  {
+   "id": "spt-records-4cf3a4",
+   "kind": "tf",
+   "prompt": "As of 2024, the New England Patriots and the Pittsburgh Steelers shared the record for most Super Bowl wins, with six each.",
+   "answer": true,
+   "explain": "Both had six Lombardi Trophies.",
+   "difficulty": 3,
+   "tags": [
+    "sport"
+   ],
+   "topic": "records"
+  },
+  {
+   "id": "spt-records-23bb92",
+   "kind": "mc",
+   "prompt": "As of 2024, which country had won the men's Rugby World Cup the most times?",
+   "answer": "South Africa",
+   "wrong": [
+    "New Zealand",
+    "Australia",
+    "England"
+   ],
+   "explain": "South Africa won in 1995, 2007, 2019 and 2023.",
+   "difficulty": 3,
+   "tags": [
+    "sport"
+   ],
+   "topic": "records"
+  },
+  {
+   "id": "spt-records-fe2280",
+   "kind": "mc",
+   "prompt": "As of 2024, which country had won the men's Cricket World Cup (one-day) the most times?",
+   "answer": "Australia",
+   "wrong": [
+    "India",
+    "West Indies",
+    "England"
+   ],
+   "explain": "Australia won its sixth title in 2023.",
+   "difficulty": 3,
+   "tags": [
+    "sport"
+   ],
+   "topic": "records"
+  },
+  {
+   "id": "spt-records-134e25",
+   "kind": "mc",
+   "prompt": "Who set the men's marathon world record of 2:00:35 in Chicago in 2023?",
+   "answer": "Kelvin Kiptum",
+   "wrong": [
+    "Eliud Kipchoge",
+    "Kenenisa Bekele",
+    "Haile Gebrselassie"
+   ],
+   "explain": "It was ratified as the world record in 2024.",
+   "difficulty": 3,
+   "tags": [
+    "sport"
+   ],
+   "topic": "records"
+  },
+  {
+   "id": "spt-rules-97fcf3",
+   "kind": "mc",
+   "prompt": "In which sport is the Super Bowl played?",
+   "answer": "American football",
+   "wrong": [
+    "Baseball",
+    "Basketball",
+    "Ice hockey"
+   ],
+   "explain": "It decides the NFL champion each year.",
+   "difficulty": 1,
+   "tags": [
+    "sport"
+   ],
+   "topic": "rules"
+  },
+  {
+   "id": "spt-rules-67d88d",
+   "kind": "mc",
+   "prompt": "In which sport is the Stanley Cup awarded?",
+   "answer": "Ice hockey",
+   "wrong": [
+    "Baseball",
+    "Golf",
+    "Basketball"
+   ],
+   "explain": "It is the NHL's championship trophy.",
+   "difficulty": 1,
+   "tags": [
+    "sport"
+   ],
+   "topic": "rules"
+  },
+  {
+   "id": "spt-rules-ce1551",
+   "kind": "mc",
+   "prompt": "Which two sides compete for golf's Ryder Cup?",
+   "answer": "Europe and the United States",
+   "wrong": [
+    "England and Scotland",
+    "Australia and the United States",
+    "Europe and the Rest of the World"
+   ],
+   "explain": "It is played every two years.",
+   "difficulty": 2,
+   "tags": [
+    "sport"
+   ],
+   "topic": "rules"
+  },
+  {
+   "id": "spt-rules-e19756",
+   "kind": "mc",
+   "prompt": "In which sport is the America's Cup contested?",
+   "answer": "Sailing",
+   "wrong": [
+    "Rowing",
+    "Polo",
+    "Golf"
+   ],
+   "explain": "It dates back to 1851 and is the oldest trophy in international sport.",
+   "difficulty": 2,
+   "tags": [
+    "sport"
+   ],
+   "topic": "rules"
+  },
+  {
+   "id": "spt-rules-cf5ee7",
+   "kind": "mc",
+   "prompt": "Which two countries play cricket for the Ashes?",
+   "answer": "England and Australia",
+   "wrong": [
+    "England and India",
+    "Australia and New Zealand",
+    "India and Pakistan"
+   ],
+   "explain": "The tiny Ashes urn dates from 1882–83.",
+   "difficulty": 2,
+   "tags": [
+    "sport"
+   ],
+   "topic": "rules"
+  },
+  {
+   "id": "spt-rules-17ecc7",
+   "kind": "number",
+   "prompt": "How many teams compete in rugby union's Six Nations Championship?",
+   "answer": 6,
+   "unit": "teams",
+   "tolerance": 0,
+   "explain": "England, France, Ireland, Italy, Scotland and Wales.",
+   "difficulty": 2,
+   "tags": [
+    "sport"
+   ],
+   "topic": "rules"
+  },
+  {
+   "id": "spt-rules-f4f850",
+   "kind": "mc",
+   "prompt": "In which city is Wimbledon played?",
+   "answer": "London",
+   "wrong": [
+    "Manchester",
+    "Birmingham",
+    "Edinburgh"
+   ],
+   "explain": "The All England Club is in south-west London.",
+   "difficulty": 1,
+   "tags": [
+    "sport"
+   ],
+   "topic": "rules"
+  },
+  {
+   "id": "spt-rules-a233cf",
+   "kind": "mc",
+   "prompt": "What colour jacket is given to the winner of the Masters golf tournament?",
+   "answer": "Green",
+   "wrong": [
+    "Red",
+    "Blue",
+    "Gold"
+   ],
+   "explain": "The Masters is played at Augusta, Georgia.",
+   "difficulty": 2,
+   "tags": [
+    "sport"
+   ],
+   "topic": "rules"
+  },
+  {
+   "id": "spt-rules-aa4e2d",
+   "kind": "mc",
+   "prompt": "In which sport is the Indianapolis 500 raced?",
+   "answer": "Motor racing",
+   "wrong": [
+    "Cycling",
+    "Horse racing",
+    "Running"
+   ],
+   "explain": "It is 500 miles: 200 laps of a 2.5-mile oval.",
+   "difficulty": 2,
+   "tags": [
+    "sport"
+   ],
+   "topic": "rules"
+  },
+  {
+   "id": "spt-rules-080550",
+   "kind": "mc",
+   "prompt": "In which country is the 24 Hours of Le Mans car race held?",
+   "answer": "France",
+   "wrong": [
+    "Belgium",
+    "Italy",
+    "Germany"
+   ],
+   "explain": "Teams of drivers race for a whole day and night.",
+   "difficulty": 2,
+   "tags": [
+    "sport"
+   ],
+   "topic": "rules"
+  },
+  {
+   "id": "spt-rules-cb80a8",
+   "kind": "mc",
+   "prompt": "The Kentucky Derby is a famous race in which sport?",
+   "answer": "Horse racing",
+   "wrong": [
+    "Motor racing",
+    "Rowing",
+    "Cycling"
+   ],
+   "explain": "It is held each May at Churchill Downs.",
+   "difficulty": 2,
+   "tags": [
+    "sport"
+   ],
+   "topic": "rules"
+  },
+  {
+   "id": "spt-rules-b654ba",
+   "kind": "mc",
+   "prompt": "At which racecourse is the Grand National run?",
+   "answer": "Aintree",
+   "wrong": [
+    "Ascot",
+    "Epsom",
+    "Cheltenham"
+   ],
+   "explain": "Aintree is near Liverpool.",
+   "difficulty": 3,
+   "tags": [
+    "sport"
+   ],
+   "topic": "rules"
+  },
+  {
+   "id": "spt-rules-331e1a",
+   "kind": "mc",
+   "prompt": "Which Scottish town is known as 'the home of golf'?",
+   "answer": "St Andrews",
+   "wrong": [
+    "Gleneagles",
+    "Troon",
+    "Carnoustie"
+   ],
+   "explain": "Golf has been played there since the 1400s.",
+   "difficulty": 2,
+   "tags": [
+    "sport"
+   ],
+   "topic": "rules"
+  },
+  {
+   "id": "spt-rules-5133c9",
+   "kind": "mc",
+   "prompt": "Who invented basketball in 1891?",
+   "answer": "James Naismith",
+   "wrong": [
+    "Abner Doubleday",
+    "William Morgan",
+    "Walter Camp"
+   ],
+   "explain": "He used peach baskets as the first hoops.",
+   "difficulty": 2,
+   "tags": [
+    "sport"
+   ],
+   "topic": "rules"
+  },
+  {
+   "id": "spt-rules-62095b",
+   "kind": "mc",
+   "prompt": "Who invented volleyball in 1895?",
+   "answer": "William G. Morgan",
+   "wrong": [
+    "James Naismith",
+    "Walter Camp",
+    "Abner Doubleday"
+   ],
+   "explain": "He first called it 'mintonette'.",
+   "difficulty": 3,
+   "tags": [
+    "sport"
+   ],
+   "topic": "rules"
+  },
+  {
+   "id": "spt-rules-089950",
+   "kind": "mc",
+   "prompt": "Which English school is said to have given its name to a sport in the 1800s?",
+   "answer": "Rugby School",
+   "wrong": [
+    "Eton College",
+    "Harrow School",
+    "Winchester College"
+   ],
+   "explain": "The legend says a pupil picked up the ball and ran with it in 1823.",
+   "difficulty": 2,
+   "tags": [
+    "sport"
+   ],
+   "topic": "rules"
+  },
+  {
+   "id": "spt-rules-5305e6",
+   "kind": "mc",
+   "prompt": "In which year was the first Wimbledon Championship held?",
+   "answer": "1877",
+   "wrong": [
+    "1897",
+    "1867",
+    "1901"
+   ],
+   "explain": "It is the oldest tennis tournament in the world.",
+   "difficulty": 3,
+   "tags": [
+    "sport"
+   ],
+   "topic": "rules"
+  },
+  {
+   "id": "spt-rules-3bcc50",
+   "kind": "mc",
+   "prompt": "In which year was the first Tour de France held?",
+   "answer": "1903",
+   "wrong": [
+    "1913",
+    "1923",
+    "1896"
+   ],
+   "explain": "It was started by a sports newspaper to boost sales.",
+   "difficulty": 3,
+   "tags": [
+    "sport"
+   ],
+   "topic": "rules"
+  },
+  {
+   "id": "spt-rules-0bbf62",
+   "kind": "mc",
+   "prompt": "Which sport uses the terms 'spare' and 'strike'?",
+   "answer": "Ten-pin bowling",
+   "wrong": [
+    "Golf",
+    "Cricket",
+    "Archery"
+   ],
+   "explain": "Strikes and spares earn bonus points.",
+   "difficulty": 2,
+   "tags": [
+    "sport"
+   ],
+   "topic": "rules"
+  },
+  {
+   "id": "spt-rules-afb763",
+   "kind": "mc",
+   "prompt": "Which sport uses the terms 'ace', 'let' and 'volley'?",
+   "answer": "Tennis",
+   "wrong": [
+    "Football",
+    "Rugby",
+    "Golf"
+   ],
+   "explain": "An ace is a serve the opponent cannot touch.",
+   "difficulty": 2,
+   "tags": [
+    "sport"
+   ],
+   "topic": "rules"
+  },
+  {
+   "id": "spt-rules-81c639",
+   "kind": "mc",
+   "prompt": "How many races make up the US Triple Crown of horse racing?",
+   "answer": "3",
+   "wrong": [
+    "2",
+    "4",
+    "5"
+   ],
+   "explain": "The Kentucky Derby, the Preakness Stakes and the Belmont Stakes.",
+   "difficulty": 3,
+   "tags": [
+    "sport"
+   ],
+   "topic": "rules"
+  }
+ ],
+ "sources": [
+  {
+   "name": "Wikipedia: List of Olympic Games host cities",
+   "url": "https://en.wikipedia.org/wiki/List_of_Olympic_Games_host_cities"
+  },
+  {
+   "name": "Wikipedia: List of FIFA World Cup finals",
+   "url": "https://en.wikipedia.org/wiki/List_of_FIFA_World_Cup_finals"
+  }
+ ]
+}

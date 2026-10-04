@@ -1,0 +1,1420 @@
+{
+ "id": "screen-themes",
+ "title": "Movie & TV themes",
+ "theme": "music",
+ "icon": "🎬",
+ "kids": false,
+ "version": 1,
+ "ask": "name",
+ "notice": "30-second previews stream from Apple Music.",
+ "factsMeta": {
+  "composer": {
+   "type": "cat",
+   "label": "Composer / artist"
+  },
+  "year": {
+   "type": "year",
+   "label": "Film or show year",
+   "higherLabel": "Newer"
+  },
+  "decade": {
+   "type": "cat",
+   "label": "Decade"
+  },
+  "track": {
+   "type": "text",
+   "label": "Track"
+  },
+  "type": {
+   "type": "cat",
+   "label": "Film or TV"
+  }
+ },
+ "items": [
+  {
+   "id": "star-wars",
+   "name": "Star Wars",
+   "group": "film",
+   "facts": {
+    "composer": "John Williams",
+    "year": 1977,
+    "decade": "1970s",
+    "track": "Main Title",
+    "type": "film"
+   },
+   "blurb": "\"Main Title\" from Star Wars (1977), by John Williams.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/e3/e1/fd/e3e1fdec-3483-fb83-3041-d01577fd1415/mzaf_13690916780854407664.plus.aac.p.m4a",
+      "credit": "John Williams: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/main-title/1375814280?i=1375814284&uo=4",
+      "apple": {
+       "trackId": 1375814284,
+       "url": "https://music.apple.com/us/album/main-title/1375814280?i=1375814284&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music116/v4/29/1c/17/291c1798-5d54-9b64-4b89-a19805cec0f8/18UMGIM22119.rgb.jpg/300x300bb.jpg",
+       "term": "John Williams & London Symphony Orchestra Main Title"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "the-empire-strikes-back",
+   "name": "The Empire Strikes Back",
+   "group": "film",
+   "facts": {
+    "composer": "John Williams",
+    "year": 1980,
+    "decade": "1980s",
+    "track": "The Imperial March",
+    "type": "film"
+   },
+   "blurb": "\"The Imperial March\" from The Empire Strikes Back (1980), by John Williams.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/ac/74/e4/ac74e4a8-c0cc-d1be-c860-69b4352aa5bb/mzaf_929035722676796506.plus.aac.p.m4a",
+      "credit": "John Williams: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/the-imperial-march-darth-vaders-theme/1375815586?i=1375815602&uo=4",
+      "apple": {
+       "trackId": 1375815602,
+       "url": "https://music.apple.com/us/album/the-imperial-march-darth-vaders-theme/1375815586?i=1375815602&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music116/v4/0a/5d/af/0a5daf0f-34f0-6413-9b8c-fe668663b3dd/18UMGIM22122.rgb.jpg/300x300bb.jpg",
+       "term": "John Williams & London Symphony Orchestra The Imperial March"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "jaws",
+   "name": "Jaws",
+   "group": "film",
+   "facts": {
+    "composer": "John Williams",
+    "year": 1975,
+    "decade": "1970s",
+    "track": "Main Title (Theme From \"Jaws\")",
+    "type": "film"
+   },
+   "blurb": "\"Main Title (Theme From \"Jaws\")\" from Jaws (1975), by John Williams.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/ab/67/f4/ab67f441-b14f-1902-f353-4100c6e932aa/mzaf_4470349713199856556.plus.aac.p.m4a",
+      "credit": "John Williams: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/main-title-theme-from-jaws/1443483107?i=1443483126&uo=4",
+      "apple": {
+       "trackId": 1443483126,
+       "url": "https://music.apple.com/us/album/main-title-theme-from-jaws/1443483107?i=1443483126&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/76/9d/65/769d65d8-53b3-7824-8fba-5042bf1fff48/14UMGIM58433.rgb.jpg/300x300bb.jpg",
+       "term": "John Williams Main Title"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "raiders-of-the-lost-ark",
+   "name": "Raiders of the Lost Ark",
+   "group": "film",
+   "facts": {
+    "composer": "John Williams",
+    "year": 1981,
+    "decade": "1980s",
+    "track": "Raiders March",
+    "type": "film"
+   },
+   "blurb": "\"Raiders March\" from Raiders of the Lost Ark (1981), by John Williams.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/5f/da/a1/5fdaa17e-2b8e-7240-9ced-b5a59d71b8aa/mzaf_5886253074178060588.plus.aac.p.m4a",
+      "credit": "John Williams: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/washington-ending-raiders-march/1400508084?i=1400508834&uo=4",
+      "apple": {
+       "trackId": 1400508834,
+       "url": "https://music.apple.com/us/album/washington-ending-raiders-march/1400508084?i=1400508834&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music114/v4/5e/9d/73/5e9d73fe-3652-ced6-d720-54e842889a9b/00050087398620.rgb.jpg/300x300bb.jpg",
+       "term": "John Williams & London Symphony Orchestra Washington Ending / Raiders March"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "jurassic-park",
+   "name": "Jurassic Park",
+   "group": "film",
+   "facts": {
+    "composer": "John Williams",
+    "year": 1993,
+    "decade": "1990s",
+    "track": "Theme from Jurassic Park",
+    "type": "film"
+   },
+   "blurb": "\"Theme from Jurassic Park\" from Jurassic Park (1993), by John Williams.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/45/0c/30/450c30bc-c7c9-6ceb-352a-a78c4304eebf/mzaf_6333901715385654004.plus.aac.p.m4a",
+      "credit": "John Williams: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/theme-from-jurassic-park/1440860715?i=1440860872&uo=4",
+      "apple": {
+       "trackId": 1440860872,
+       "url": "https://music.apple.com/us/album/theme-from-jurassic-park/1440860715?i=1440860872&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/3a/96/a6/3a96a66e-d54d-5f36-39b3-064b03812649/00602537348855.rgb.jpg/300x300bb.jpg",
+       "term": "John Williams Theme from Jurassic Park"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "e-t-the-extra-terrestrial",
+   "name": "E.T. the Extra-Terrestrial",
+   "alt": [
+    "ET",
+    "E.T."
+   ],
+   "group": "film",
+   "facts": {
+    "composer": "John Williams",
+    "year": 1982,
+    "decade": "1980s",
+    "track": "Flying Theme",
+    "type": "film"
+   },
+   "blurb": "\"Flying Theme\" from E.T. the Extra-Terrestrial (1982), by John Williams.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/60/9c/90/609c902a-1f4e-ff4a-84d1-34f23923e525/mzaf_16728705773241854275.plus.aac.p.m4a",
+      "credit": "John Williams: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/flying/1442885023?i=1442885035&uo=4",
+      "apple": {
+       "trackId": 1442885035,
+       "url": "https://music.apple.com/us/album/flying/1442885023?i=1442885035&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music128/v4/8c/1a/6a/8c1a6af9-1e63-3009-45c1-01d72d62c5bc/00602547167330.rgb.jpg/300x300bb.jpg",
+       "term": "John Williams Flying"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "superman",
+   "name": "Superman",
+   "group": "film",
+   "facts": {
+    "composer": "John Williams",
+    "year": 1978,
+    "decade": "1970s",
+    "track": "Main Title",
+    "type": "film"
+   },
+   "blurb": "\"Main Title\" from Superman (1978), by John Williams.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/2e/35/c6/2e35c686-f9db-8dae-7c69-193825d61348/mzaf_16394167172560017728.plus.aac.p.m4a",
+      "credit": "John Williams: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/prelude-main-title-march/50235853?i=50235862&uo=4",
+      "apple": {
+       "trackId": 50235862,
+       "url": "https://music.apple.com/us/album/prelude-main-title-march/50235853?i=50235862&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music/y2005/m03/d14/h21/s06.dvzlmtvq.jpg/300x300bb.jpg",
+       "term": "John Williams & London Symphony Orchestra Prelude / Main Title March"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "harry-potter-and-the-philosophers-stone",
+   "name": "Harry Potter and the Philosopher's Stone",
+   "alt": [
+    "Harry Potter"
+   ],
+   "group": "film",
+   "facts": {
+    "composer": "John Williams",
+    "year": 2001,
+    "decade": "2000s",
+    "track": "Hedwig's Theme",
+    "type": "film"
+   },
+   "blurb": "\"Hedwig's Theme\" from Harry Potter and the Philosopher's Stone (2001), by John Williams.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/81/ee/ae/81eeae0a-da63-1fc7-42c1-21b498b85de8/mzaf_13621452881875123588.plus.aac.p.m4a",
+      "credit": "John Williams: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/hedwigs-theme/89286124?i=89285956&uo=4",
+      "apple": {
+       "trackId": 89285956,
+       "url": "https://music.apple.com/us/album/hedwigs-theme/89286124?i=89285956&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music114/v4/02/0c/90/020c90c5-abe9-e441-e3b6-110c51d9d0f3/mzi.odxaqexu.jpg/300x300bb.jpg",
+       "term": "John Williams Hedwig's Theme"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "schindlers-list",
+   "name": "Schindler's List",
+   "group": "film",
+   "facts": {
+    "composer": "John Williams",
+    "year": 1993,
+    "decade": "1990s",
+    "track": "Theme from Schindler's List",
+    "type": "film"
+   },
+   "blurb": "\"Theme from Schindler's List\" from Schindler's List (1993), by John Williams.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/87/66/5f/87665fc0-803f-a5a9-e2c8-1650fa8d2971/mzaf_2983154669099044974.plus.aac.p.m4a",
+      "credit": "John Williams: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/theme-from-schindlers-list/1440502968?i=1440502971&uo=4",
+      "apple": {
+       "trackId": 1440502971,
+       "url": "https://music.apple.com/us/album/theme-from-schindlers-list/1440502968?i=1440502971&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/5b/9e/40/5b9e404f-0c3e-1950-f83d-19ea359c6e34/00008811096922.rgb.jpg/300x300bb.jpg",
+       "term": "John Williams, Itzhak Perlman & Boston Symphony Orchestra Theme from Schindler's List"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "pirates-of-the-caribbean-the-curse-of-the-black-pearl",
+   "name": "Pirates of the Caribbean: The Curse of the Black Pearl",
+   "group": "film",
+   "facts": {
+    "composer": "Klaus Badelt",
+    "year": 2003,
+    "decade": "2000s",
+    "track": "He's a Pirate",
+    "type": "film"
+   },
+   "blurb": "\"He's a Pirate\" from Pirates of the Caribbean: The Curse of the Black Pearl (2003), by Klaus Badelt.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/0d/21/07/0d2107c4-573b-6649-229e-e715501010cc/mzaf_8361386078907471110.plus.aac.p.m4a",
+      "credit": "Klaus Badelt: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/hes-a-pirate/1440649561?i=1440650203&uo=4",
+      "apple": {
+       "trackId": 1440650203,
+       "url": "https://music.apple.com/us/album/hes-a-pirate/1440649561?i=1440650203&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music125/v4/9a/0c/05/9a0c056b-9a6a-9446-5aa2-939aa2486ef3/00050086008971.rgb.jpg/300x300bb.jpg",
+       "term": "Klaus Badelt He's a Pirate"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "gladiator",
+   "name": "Gladiator",
+   "group": "film",
+   "facts": {
+    "composer": "Hans Zimmer",
+    "year": 2000,
+    "decade": "2000s",
+    "track": "Now We Are Free",
+    "type": "film"
+   },
+   "blurb": "\"Now We Are Free\" from Gladiator (2000), by Hans Zimmer.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/08/1c/62/081c6242-de2e-80ef-d1d6-51c21620fbf1/mzaf_8911425336835289037.plus.aac.p.m4a",
+      "credit": "Hans Zimmer: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/now-we-are-free/1440563157?i=1440563274&uo=4",
+      "apple": {
+       "trackId": 1440563274,
+       "url": "https://music.apple.com/us/album/now-we-are-free/1440563157?i=1440563274&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music112/v4/22/2a/1d/222a1d18-6d21-fec2-3ef0-ce0f7988ed65/06UMGIM05485.rgb.jpg/300x300bb.jpg",
+       "term": "Lisa Gerrard, Gavin Greenaway, The Lyndhurst Orchestra, Bruce Fowler, Yvonne S. Moriarty, Walt Fowler, Ladd McIntosh, Elizabeth Finch, Jack Smalley & Hans Zimmer Now We Are Free"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "inception",
+   "name": "Inception",
+   "group": "film",
+   "facts": {
+    "composer": "Hans Zimmer",
+    "year": 2010,
+    "decade": "2010s",
+    "track": "Time",
+    "type": "film"
+   },
+   "blurb": "\"Time\" from Inception (2010), by Hans Zimmer.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/e0/1d/a4/e01da4a2-a75f-7ebf-9971-3d49e17efc57/mzaf_10500078769097048384.plus.aac.p.m4a",
+      "credit": "Hans Zimmer: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/time/380349905?i=380350246&uo=4",
+      "apple": {
+       "trackId": 380350246,
+       "url": "https://music.apple.com/us/album/time/380349905?i=380350246&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/2b/62/eb/2b62ebd7-aa99-988a-0fee-714162f6fbeb/093624965008.jpg/300x300bb.jpg",
+       "term": "Hans Zimmer Time"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "interstellar",
+   "name": "Interstellar",
+   "group": "film",
+   "facts": {
+    "composer": "Hans Zimmer",
+    "year": 2014,
+    "decade": "2010s",
+    "track": "Cornfield Chase",
+    "type": "film"
+   },
+   "blurb": "\"Cornfield Chase\" from Interstellar (2014), by Hans Zimmer.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/3a/ee/23/3aee2300-f6f7-a006-e20f-28092e814cbe/mzaf_1624587954644600228.plus.aac.p.m4a",
+      "credit": "Hans Zimmer: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/cornfield-chase/1533983552?i=1533984393&uo=4",
+      "apple": {
+       "trackId": 1533984393,
+       "url": "https://music.apple.com/us/album/cornfield-chase/1533983552?i=1533984393&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music125/v4/f4/5b/73/f45b735a-8d7a-9713-b217-0f8e1593c28b/794043201943.jpg/300x300bb.jpg",
+       "term": "Hans Zimmer Cornfield Chase"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "the-lion-king",
+   "name": "The Lion King",
+   "group": "film",
+   "facts": {
+    "composer": "Hans Zimmer",
+    "year": 1994,
+    "decade": "1990s",
+    "track": "Circle of Life",
+    "type": "film"
+   },
+   "blurb": "\"Circle of Life\" from The Lion King (1994), by Hans Zimmer.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/d2/29/55/d229559e-5fc7-7cb0-2567-847ec15feabc/mzaf_2397341119625965340.plus.aac.p.m4a",
+      "credit": "Hans Zimmer: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/circle-of-life/1445732923?i=1445732924&uo=4",
+      "apple": {
+       "trackId": 1445732924,
+       "url": "https://music.apple.com/us/album/circle-of-life/1445732923?i=1445732924&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music116/v4/ce/80/89/ce808921-d594-fa7f-03e8-adcc92a69de8/06PNDIM00020.rgb.jpg/300x300bb.jpg",
+       "term": "Carmen Twillie & Lebo M Circle of Life"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "rocky",
+   "name": "Rocky",
+   "group": "film",
+   "facts": {
+    "composer": "Bill Conti",
+    "year": 1976,
+    "decade": "1970s",
+    "track": "Gonna Fly Now",
+    "type": "film"
+   },
+   "blurb": "\"Gonna Fly Now\" from Rocky (1976), by Bill Conti.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/ea/02/6d/ea026df4-5a5d-f6a0-c526-2a9958c4c22a/mzaf_6885755452086543650.plus.aac.p.m4a",
+      "credit": "Bill Conti: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/gonna-fly-now-theme-from-rocky/1440832384?i=1440832696&uo=4",
+      "apple": {
+       "trackId": 1440832696,
+       "url": "https://music.apple.com/us/album/gonna-fly-now-theme-from-rocky/1440832384?i=1440832696&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music125/v4/66/5d/4e/665d4e4b-223d-4e8e-ceac-79c0c502d749/00602547272881.rgb.jpg/300x300bb.jpg",
+       "term": "Bill Conti Gonna Fly Now"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "dr-no",
+   "name": "Dr. No",
+   "group": "film",
+   "facts": {
+    "composer": "Monty Norman",
+    "year": 1962,
+    "decade": "1960s",
+    "track": "James Bond Theme",
+    "type": "film"
+   },
+   "blurb": "\"James Bond Theme\" from Dr. No (1962), by Monty Norman.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview118/v4/d1/f3/a5/d1f3a52e-4548-b7a8-fb47-b4748acda80d/mzaf_5510081548625101046.plus.aac.p.m4a",
+      "credit": "Monty Norman: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/the-james-bond-theme-remastered/1443115365?i=1443115660&uo=4",
+      "apple": {
+       "trackId": 1443115660,
+       "url": "https://music.apple.com/us/album/the-james-bond-theme-remastered/1443115365?i=1443115660&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music128/v4/26/6a/cc/266acc13-4ffd-2356-e940-da4f61359ef6/00602547739452.rgb.jpg/300x300bb.jpg",
+       "term": "Monty Norman The James Bond Theme"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "the-good-the-bad-and-the-ugly",
+   "name": "The Good, the Bad and the Ugly",
+   "group": "film",
+   "facts": {
+    "composer": "Ennio Morricone",
+    "year": 1966,
+    "decade": "1960s",
+    "track": "The Good, the Bad and the Ugly (Main Title)",
+    "type": "film"
+   },
+   "blurb": "\"The Good, the Bad and the Ugly (Main Title)\" from The Good, the Bad and the Ugly (1966), by Ennio Morricone.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/b0/99/86/b09986f5-ef2c-801f-ec3a-f6f2e7189826/mzaf_9640375822381239964.plus.aac.p.m4a",
+      "credit": "Ennio Morricone: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/the-good-the-bad-the-ugly-main-title/715628596?i=715628797&uo=4",
+      "apple": {
+       "trackId": 715628797,
+       "url": "https://music.apple.com/us/album/the-good-the-bad-the-ugly-main-title/715628596?i=715628797&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/4f/1b/0a/4f1b0a74-1951-bd22-3b1a-ad516eb0ec13/00724359862156.rgb.jpg/300x300bb.jpg",
+       "term": "Ennio Morricone The Good, The Bad & The Ugly"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "chariots-of-fire",
+   "name": "Chariots of Fire",
+   "group": "film",
+   "facts": {
+    "composer": "Vangelis",
+    "year": 1981,
+    "decade": "1980s",
+    "track": "Chariots of Fire",
+    "type": "film"
+   },
+   "blurb": "\"Chariots of Fire\" from Chariots of Fire (1981), by Vangelis.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/30/88/44/308844c4-a813-aa22-1da2-c5cd7657adad/mzaf_11412573995450483451.plus.aac.p.m4a",
+      "credit": "Vangelis: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/chariots-of-fire/1450958543?i=1450958914&uo=4",
+      "apple": {
+       "trackId": 1450958914,
+       "url": "https://music.apple.com/us/album/chariots-of-fire/1450958543?i=1450958914&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music114/v4/d5/c0/fd/d5c0fd98-23f0-c11b-5c32-06d9bacfe2e0/00602567803492.rgb.jpg/300x300bb.jpg",
+       "term": "Vangelis Chariots of Fire"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "the-godfather",
+   "name": "The Godfather",
+   "group": "film",
+   "facts": {
+    "composer": "Nino Rota",
+    "year": 1972,
+    "decade": "1970s",
+    "track": "Love Theme from The Godfather",
+    "type": "film"
+   },
+   "blurb": "\"Love Theme from The Godfather\" from The Godfather (1972), by Nino Rota.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/e2/24/ae/e224ae62-6b7c-b659-8d8d-5e3c19eea17e/mzaf_4624736163810955756.plus.aac.p.m4a",
+      "credit": "Nino Rota: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/love-theme-from-the-godfather/1440844661?i=1440844677&uo=4",
+      "apple": {
+       "trackId": 1440844677,
+       "url": "https://music.apple.com/us/album/love-theme-from-the-godfather/1440844661?i=1440844677&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music125/v4/2f/60/1d/2f601d13-4531-dbdc-bb25-334be4a1018f/00602547196729.rgb.jpg/300x300bb.jpg",
+       "term": "Nino Rota & Carlo Savina Love Theme from \"The Godfather\""
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "back-to-the-future",
+   "name": "Back to the Future",
+   "group": "film",
+   "facts": {
+    "composer": "Alan Silvestri",
+    "year": 1985,
+    "decade": "1980s",
+    "track": "Back to the Future",
+    "type": "film"
+   },
+   "blurb": "\"Back to the Future\" from Back to the Future (1985), by Alan Silvestri.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/d8/8a/db/d88adb3a-3277-47a9-3fef-01496d3749dd/mzaf_8817507585046088482.plus.aac.p.m4a",
+      "credit": "Alan Silvestri: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/back-to-the-future-pt-iii-end-credits/1440650986?i=1440651117&uo=4",
+      "apple": {
+       "trackId": 1440651117,
+       "url": "https://music.apple.com/us/album/back-to-the-future-pt-iii-end-credits/1440650986?i=1440651117&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/c9/64/64/c96464e1-6130-e7dc-85be-b98893afaf9d/00030206595024.rgb.jpg/300x300bb.jpg",
+       "term": "Alan Silvestri Back To the Future, Pt. III: End Credits"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "ghostbusters",
+   "name": "Ghostbusters",
+   "group": "film",
+   "facts": {
+    "composer": "Ray Parker Jr.",
+    "year": 1984,
+    "decade": "1980s",
+    "track": "Ghostbusters",
+    "type": "film"
+   },
+   "blurb": "\"Ghostbusters\" from Ghostbusters (1984), by Ray Parker Jr..",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/63/8b/e3/638be3a1-2f5e-5cff-9b58-085e3b793cbd/mzaf_10733010531783613784.plus.aac.p.m4a",
+      "credit": "Ray Parker Jr.: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/ghostbusters/1484413132?i=1484413134&uo=4",
+      "apple": {
+       "trackId": 1484413134,
+       "url": "https://music.apple.com/us/album/ghostbusters/1484413132?i=1484413134&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/c5/96/63/c596638c-a823-1a5e-dba0-6f1df67ab671/886447946862.jpg/300x300bb.jpg",
+       "term": "Ray Parker Jr. Ghostbusters"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "the-pink-panther",
+   "name": "The Pink Panther",
+   "group": "film",
+   "facts": {
+    "composer": "Henry Mancini",
+    "year": 1963,
+    "decade": "1960s",
+    "track": "The Pink Panther Theme",
+    "type": "film"
+   },
+   "blurb": "\"The Pink Panther Theme\" from The Pink Panther (1963), by Henry Mancini.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/2c/10/cd/2c10cdf1-bcb0-5dc2-20ea-856527d23de3/mzaf_862093285845532728.plus.aac.p.m4a",
+      "credit": "Henry Mancini: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/the-pink-panther-theme-remastered/310724834?i=310724835&uo=4",
+      "apple": {
+       "trackId": 310724835,
+       "url": "https://music.apple.com/us/album/the-pink-panther-theme-remastered/310724834?i=310724835&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/63/75/1e/63751e32-9260-7fd9-69b5-713cd8b788d8/mzi.gvnicbic.jpg/300x300bb.jpg",
+       "term": "Henry Mancini The Pink Panther Theme"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "psycho",
+   "name": "Psycho",
+   "group": "film",
+   "facts": {
+    "composer": "Bernard Herrmann",
+    "year": 1960,
+    "decade": "1960s",
+    "track": "The Murder",
+    "type": "film"
+   },
+   "blurb": "\"The Murder\" from Psycho (1960), by Bernard Herrmann.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview116/v4/bf/f2/cc/bff2cc24-29f5-3014-1842-2331a6c7ce0b/mzaf_16060523236107978814.plus.aac.p.m4a",
+      "credit": "Bernard Herrmann: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/psycho-a-narrative-for-orchestra-the-murder/1591033660?i=1591033888&uo=4",
+      "apple": {
+       "trackId": 1591033888,
+       "url": "https://music.apple.com/us/album/psycho-a-narrative-for-orchestra-the-murder/1591033660?i=1591033888&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music125/v4/52/5c/c1/525cc148-21ef-d2f6-2e50-82a2fbb25e68/21UMGIM35979.rgb.jpg/300x300bb.jpg",
+       "term": "London Philharmonic Orchestra & Bernard Herrmann Psycho: The Murder"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "the-lord-of-the-rings-the-fellowship-of-the-ring",
+   "name": "The Lord of the Rings: The Fellowship of the Ring",
+   "alt": [
+    "Lord of the Rings"
+   ],
+   "group": "film",
+   "facts": {
+    "composer": "Howard Shore",
+    "year": 2001,
+    "decade": "2000s",
+    "track": "Concerning Hobbits",
+    "type": "film"
+   },
+   "blurb": "\"Concerning Hobbits\" from The Lord of the Rings: The Fellowship of the Ring (2001), by Howard Shore.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/cd/1e/2c/cd1e2c74-a074-aa60-ec24-8abee7dcec43/mzaf_12399500222028997548.plus.aac.p.m4a",
+      "credit": "Howard Shore: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/concerning-hobbits/323714092?i=323714096&uo=4",
+      "apple": {
+       "trackId": 323714096,
+       "url": "https://music.apple.com/us/album/concerning-hobbits/323714092?i=323714096&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/cd/de/f5/cddef582-a63b-1119-8983-53105a8f494d/mzi.bwecfgra.jpg/300x300bb.jpg",
+       "term": "Howard Shore Concerning Hobbits"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "top-gun",
+   "name": "Top Gun",
+   "group": "film",
+   "facts": {
+    "composer": "Harold Faltermeyer",
+    "year": 1986,
+    "decade": "1980s",
+    "track": "Top Gun Anthem",
+    "type": "film"
+   },
+   "blurb": "\"Top Gun Anthem\" from Top Gun (1986), by Harold Faltermeyer.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/8b/cf/f3/8bcff3d6-26a3-13ab-fe5e-1f5a9d735a0a/mzaf_15545924808980820816.plus.aac.p.m4a",
+      "credit": "Harold Faltermeyer: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/top-gun-anthem/387193895?i=387194700&uo=4",
+      "apple": {
+       "trackId": 387194700,
+       "url": "https://music.apple.com/us/album/top-gun-anthem/387193895?i=387194700&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/81/2f/27/812f27f8-4c88-7b16-8a54-5113fa169781/dj.jvcruggi.jpg/300x300bb.jpg",
+       "term": "Harold Faltermeyer & Steve Stevens Top Gun Anthem"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "beverly-hills-cop",
+   "name": "Beverly Hills Cop",
+   "group": "film",
+   "facts": {
+    "composer": "Harold Faltermeyer",
+    "year": 1984,
+    "decade": "1980s",
+    "track": "Axel F",
+    "type": "film"
+   },
+   "blurb": "\"Axel F\" from Beverly Hills Cop (1984), by Harold Faltermeyer.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/99/22/7d/99227d90-ec56-52ed-56ce-f11a37a69d55/mzaf_15818004293228255506.plus.aac.p.m4a",
+      "credit": "Harold Faltermeyer: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/axel-f/1458388091?i=1458388103&uo=4",
+      "apple": {
+       "trackId": 1458388103,
+       "url": "https://music.apple.com/us/album/axel-f/1458388091?i=1458388103&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/6b/2b/b0/6b2bb09c-b5bc-d78e-a5cf-fad9e51f78e5/00602577636356.rgb.jpg/300x300bb.jpg",
+       "term": "Harold Faltermeyer Axel F"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "halloween",
+   "name": "Halloween",
+   "group": "film",
+   "facts": {
+    "composer": "John Carpenter",
+    "year": 1978,
+    "decade": "1970s",
+    "track": "Halloween Theme",
+    "type": "film"
+   },
+   "blurb": "\"Halloween Theme\" from Halloween (1978), by John Carpenter.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/31/95/ee/3195ee83-af95-24ed-d100-782fe04a0a8b/mzaf_10780965963290105834.plus.aac.p.m4a",
+      "credit": "John Carpenter: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/halloween-theme-1978-original-motion-picture-soundtrack/6780426919?i=6780426921&uo=4",
+      "apple": {
+       "trackId": 6780426921,
+       "url": "https://music.apple.com/us/album/halloween-theme-1978-original-motion-picture-soundtrack/6780426919?i=6780426921&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/96/16/f8/9616f892-dab2-9ded-93bd-5227000a3299/823375238034_Cover.jpg/300x300bb.jpg",
+       "term": "John Carpenter Halloween Theme 1978"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "the-exorcist",
+   "name": "The Exorcist",
+   "group": "film",
+   "facts": {
+    "composer": "Mike Oldfield",
+    "year": 1973,
+    "decade": "1970s",
+    "track": "Tubular Bells (Part One)",
+    "type": "film"
+   },
+   "blurb": "\"Tubular Bells (Part One)\" from The Exorcist (1973), by Mike Oldfield.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/d0/ad/9f/d0ad9ffc-9b15-847c-857f-c82546f4fe31/mzaf_5838067582588501290.plus.aac.p.m4a",
+      "credit": "Mike Oldfield: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/tubular-bells-pt-i/1440852773?i=1440852782&uo=4",
+      "apple": {
+       "trackId": 1440852782,
+       "url": "https://music.apple.com/us/album/tubular-bells-pt-i/1440852773?i=1440852782&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music128/v4/36/51/2c/36512c3e-b23c-eed6-2179-731768d05107/00602547380067.rgb.jpg/300x300bb.jpg",
+       "term": "Mike Oldfield Tubular Bells, Pt. I"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "titanic",
+   "name": "Titanic",
+   "group": "film",
+   "facts": {
+    "composer": "James Horner (music), Will Jennings (lyrics)",
+    "year": 1997,
+    "decade": "1990s",
+    "track": "My Heart Will Go On",
+    "type": "film"
+   },
+   "blurb": "\"My Heart Will Go On\" from Titanic (1997), by James Horner (music), Will Jennings (lyrics).",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/54/5b/f7/545bf75d-1ea1-07f0-0c4e-a6d3bca7c092/mzaf_1410328638164863411.plus.aac.p.m4a",
+      "credit": "Celine Dion: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/my-heart-will-go-on-love-theme-from-titanic/507536640?i=507536740&uo=4",
+      "apple": {
+       "trackId": 507536740,
+       "url": "https://music.apple.com/us/album/my-heart-will-go-on-love-theme-from-titanic/507536640?i=507536740&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/ab/5a/96/ab5a9681-e891-8449-53d2-7d358501f97f/mzi.zbauexhy.jpg/300x300bb.jpg",
+       "term": "Céline Dion & James Horner My Heart Will Go On"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "batman",
+   "name": "Batman",
+   "group": "film",
+   "facts": {
+    "composer": "Danny Elfman",
+    "year": 1989,
+    "decade": "1980s",
+    "track": "The Batman Theme",
+    "type": "film"
+   },
+   "blurb": "\"The Batman Theme\" from Batman (1989), by Danny Elfman.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/a1/c5/42/a1c54215-5e59-1092-20f0-f9afd40a5754/mzaf_10926022040203612918.plus.aac.p.m4a",
+      "credit": "Danny Elfman: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/the-batman-theme/41229136?i=41229142&uo=4",
+      "apple": {
+       "trackId": 41229142,
+       "url": "https://music.apple.com/us/album/the-batman-theme/41229136?i=41229142&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music114/v4/ad/65/a6/ad65a6de-0b3c-0dc7-0ff3-900300db7c76/s06.covbfpzf.jpg/300x300bb.jpg",
+       "term": "Danny Elfman The Batman Theme"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "the-avengers",
+   "name": "The Avengers",
+   "group": "film",
+   "facts": {
+    "composer": "Alan Silvestri",
+    "year": 2012,
+    "decade": "2010s",
+    "track": "The Avengers",
+    "type": "film"
+   },
+   "blurb": "\"The Avengers\" from The Avengers (2012), by Alan Silvestri.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/bf/a7/9f/bfa79f79-b635-0f8c-d72f-e59db79108af/mzaf_9009025771638181825.plus.aac.p.m4a",
+      "credit": "Alan Silvestri: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/the-avengers/1440663549?i=1440663698&uo=4",
+      "apple": {
+       "trackId": 1440663698,
+       "url": "https://music.apple.com/us/album/the-avengers/1440663549?i=1440663698&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/67/26/1e/67261e17-cd3e-8448-77b5-3e38d3aa3766/00050087281557.rgb.jpg/300x300bb.jpg",
+       "term": "Alan Silvestri The Avengers"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "casino-royale",
+   "name": "Casino Royale",
+   "group": "film",
+   "facts": {
+    "composer": "David Arnold",
+    "year": 2006,
+    "decade": "2000s",
+    "track": "African Rundown",
+    "type": "film"
+   },
+   "blurb": "\"African Rundown\" from Casino Royale (2006), by David Arnold.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/1b/72/2e/1b722ecd-9d56-3d94-f1fb-4db6b1b8b5df/mzaf_1115646356023313690.plus.aac.p.m4a",
+      "credit": "David Arnold: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/african-rundown/203963852?i=203963855&uo=4",
+      "apple": {
+       "trackId": 203963855,
+       "url": "https://music.apple.com/us/album/african-rundown/203963852?i=203963855&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Features124/v4/1d/25/67/1d256797-6b28-e910-05fe-c7d12a68d9ec/dj.qtiwncgf.jpg/300x300bb.jpg",
+       "term": "David Arnold & Nicholas Dodd African Rundown"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "friends",
+   "name": "Friends",
+   "group": "tv",
+   "facts": {
+    "composer": "The Rembrandts",
+    "year": 1995,
+    "decade": "1990s",
+    "track": "I'll Be There for You",
+    "type": "tv"
+   },
+   "blurb": "\"I'll Be There for You\" from Friends (1995), by The Rembrandts.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/d1/e4/9e/d1e49e0b-ff45-ed0e-fa77-5b6e9a5a7ecd/mzaf_10467587259594931193.plus.aac.p.m4a",
+      "credit": "The Rembrandts: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/ill-be-there-for-you-theme-from-friends/373220996?i=373221221&uo=4",
+      "apple": {
+       "trackId": 373221221,
+       "url": "https://music.apple.com/us/album/ill-be-there-for-you-theme-from-friends/373220996?i=373221221&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music125/v4/10/b0/d0/10b0d0fd-008c-b493-b9e2-ac579eb87393/mzi.unizvawf.jpg/300x300bb.jpg",
+       "term": "The Rembrandts I'll Be There for You"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "game-of-thrones",
+   "name": "Game of Thrones",
+   "group": "tv",
+   "facts": {
+    "composer": "Ramin Djawadi",
+    "year": 2011,
+    "decade": "2010s",
+    "track": "Main Title",
+    "type": "tv"
+   },
+   "blurb": "\"Main Title\" from Game of Thrones (2011), by Ramin Djawadi.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/61/28/ad/6128ade4-d49a-3811-df92-b231bb3b3803/mzaf_1140403213038657471.plus.aac.p.m4a",
+      "credit": "Ramin Djawadi: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/main-title/1440798940?i=1440799057&uo=4",
+      "apple": {
+       "trackId": 1440799057,
+       "url": "https://music.apple.com/us/album/main-title/1440798940?i=1440799057&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/20/75/39/207539da-60d1-8ac1-7f4f-9f7e534c8c85/00030206709728.rgb.jpg/300x300bb.jpg",
+       "term": "Ramin Djawadi Main Title"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "stranger-things",
+   "name": "Stranger Things",
+   "group": "tv",
+   "facts": {
+    "composer": "Kyle Dixon & Michael Stein",
+    "year": 2016,
+    "decade": "2010s",
+    "track": "Stranger Things",
+    "type": "tv"
+   },
+   "blurb": "\"Stranger Things\" from Stranger Things (2016), by Kyle Dixon & Michael Stein.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/92/6f/ed/926fed10-ec76-2790-4b24-7fa4af34cea0/mzaf_10795859141048042074.plus.aac.p.m4a",
+      "credit": "Kyle Dixon & Michael Stein: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/stranger-things/1143131526?i=1143131699&uo=4",
+      "apple": {
+       "trackId": 1143131699,
+       "url": "https://music.apple.com/us/album/stranger-things/1143131526?i=1143131699&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/e0/fe/29/e0fe29b5-d7fe-e0d7-04e5-dd0b989a8675/780163484526.jpg/300x300bb.jpg",
+       "term": "Kyle Dixon & Michael Stein Stranger Things"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "the-x-files",
+   "name": "The X-Files",
+   "group": "tv",
+   "facts": {
+    "composer": "Mark Snow",
+    "year": 1993,
+    "decade": "1990s",
+    "track": "The X-Files",
+    "type": "tv"
+   },
+   "blurb": "\"The X-Files\" from The X-Files (1993), by Mark Snow.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/db/2b/05/db2b055a-a4ae-43dd-1a76-a8506d327e76/mzaf_16942281551703488024.plus.aac.p.m4a",
+      "credit": "Mark Snow: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/materia-primoris-the-x-files-theme-main-title/95845583?i=95844236&uo=4",
+      "apple": {
+       "trackId": 95844236,
+       "url": "https://music.apple.com/us/album/materia-primoris-the-x-files-theme-main-title/95845583?i=95844236&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/8f/4d/6e/8f4d6e87-beb3-b95f-d2ef-17ab4c296073/mzi.oppgthel.jpg/300x300bb.jpg",
+       "term": "Mark Snow & Chris Carter Materia Primoris: The X-Files Theme"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "twin-peaks",
+   "name": "Twin Peaks",
+   "group": "tv",
+   "facts": {
+    "composer": "Angelo Badalamenti",
+    "year": 1990,
+    "decade": "1990s",
+    "track": "Twin Peaks Theme",
+    "type": "tv"
+   },
+   "blurb": "\"Twin Peaks Theme\" from Twin Peaks (1990), by Angelo Badalamenti.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/85/e3/3d/85e33d82-6a63-0117-5907-931677ba10e3/mzaf_17387001389429707570.plus.aac.p.m4a",
+      "credit": "Angelo Badalamenti: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/twin-peaks-theme/374382340?i=374382372&uo=4",
+      "apple": {
+       "trackId": 374382372,
+       "url": "https://music.apple.com/us/album/twin-peaks-theme/374382340?i=374382372&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Features124/v4/91/95/49/91954948-c2f7-579a-7ec6-61d4b8f02bdd/dj.pprunfmw.jpg/300x300bb.jpg",
+       "term": "Angelo Badalamenti Twin Peaks Theme"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "cheers",
+   "name": "Cheers",
+   "group": "tv",
+   "facts": {
+    "composer": "Gary Portnoy & Judy Hart Angelo",
+    "year": 1982,
+    "decade": "1980s",
+    "track": "Where Everybody Knows Your Name",
+    "type": "tv"
+   },
+   "blurb": "\"Where Everybody Knows Your Name\" from Cheers (1982), by Gary Portnoy & Judy Hart Angelo.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview125/v4/fb/2e/65/fb2e6526-0bd7-d34a-4ff0-9f752c5fa63c/mzaf_9074660708503435870.plus.aac.p.m4a",
+      "credit": "Gary Portnoy: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/where-everybody-knows-your-name-cheers-theme/7197561?i=7197543&uo=4",
+      "apple": {
+       "trackId": 7197543,
+       "url": "https://music.apple.com/us/album/where-everybody-knows-your-name-cheers-theme/7197561?i=7197543&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music114/v4/48/ab/eb/48abeb4d-02eb-caab-570c-2c9c13590747/803680327807.jpg/300x300bb.jpg",
+       "term": "Gary Portnoy Where Everybody Knows Your Name"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "breaking-bad",
+   "name": "Breaking Bad",
+   "group": "tv",
+   "facts": {
+    "composer": "Dave Porter",
+    "year": 2008,
+    "decade": "2000s",
+    "track": "Breaking Bad Main Title Theme (Extended)",
+    "type": "tv"
+   },
+   "blurb": "\"Breaking Bad Main Title Theme (Extended)\" from Breaking Bad (2008), by Dave Porter.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/2f/d2/4c/2fd24c76-fe15-1674-7199-dc6348b712eb/mzaf_17815772063370693887.plus.aac.p.m4a",
+      "credit": "Dave Porter: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/breaking-bad-main-title-theme-extended-version/370928500?i=370928560&uo=4",
+      "apple": {
+       "trackId": 370928560,
+       "url": "https://music.apple.com/us/album/breaking-bad-main-title-theme-extended-version/370928500?i=370928560&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/83/32/3e/83323ee6-7ad6-3a17-f485-757500b18202/mzi.zczqlvxw.jpg/300x300bb.jpg",
+       "term": "Dave Porter Breaking Bad"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "succession",
+   "name": "Succession",
+   "group": "tv",
+   "facts": {
+    "composer": "Nicholas Britell",
+    "year": 2018,
+    "decade": "2010s",
+    "track": "Succession (Main Title Theme)",
+    "type": "tv"
+   },
+   "blurb": "\"Succession (Main Title Theme)\" from Succession (2018), by Nicholas Britell.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/1a/56/0d/1a560db6-2ec9-e160-3bc5-bbb3bb9940ea/mzaf_10340756199296060404.plus.aac.p.m4a",
+      "credit": "Nicholas Britell: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/succession-main-title-theme/1500926125?i=1500926127&uo=4",
+      "apple": {
+       "trackId": 1500926127,
+       "url": "https://music.apple.com/us/album/succession-main-title-theme/1500926125?i=1500926127&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music114/v4/f4/08/d2/f408d2f6-1ed1-08a4-664c-977faa4e3442/731383709463.jpg/300x300bb.jpg",
+       "term": "Nicholas Britell Succession"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "the-sopranos",
+   "name": "The Sopranos",
+   "group": "tv",
+   "facts": {
+    "composer": "Alabama 3",
+    "year": 1997,
+    "decade": "1990s",
+    "track": "Woke Up This Morning (Chosen One Mix)",
+    "type": "tv"
+   },
+   "blurb": "\"Woke Up This Morning (Chosen One Mix)\" from The Sopranos (1997), by Alabama 3.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/b6/79/30/b67930a2-1f51-b868-c323-d6f302fbfb44/mzaf_15782060638357607311.plus.aac.p.m4a",
+      "credit": "Alabama 3: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/woke-up-this-morning/1774641926?i=1774641929&uo=4",
+      "apple": {
+       "trackId": 1774641929,
+       "url": "https://music.apple.com/us/album/woke-up-this-morning/1774641926?i=1774641929&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/66/13/75/6613753c-f9c5-5d11-536b-bcb03fa3f6c6/5016958107369.png/300x300bb.jpg",
+       "term": "Alabama 3 Woke up This Morning"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "peaky-blinders",
+   "name": "Peaky Blinders",
+   "group": "tv",
+   "facts": {
+    "composer": "Nick Cave & The Bad Seeds",
+    "year": 2013,
+    "decade": "2010s",
+    "track": "Red Right Hand",
+    "type": "tv"
+   },
+   "blurb": "Nick Cave & The Bad Seeds' 1994 song \"Red Right Hand\" is the theme of Peaky Blinders (2013).",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview115/v4/30/96/fc/3096fc68-f594-ad58-cedf-e5800fcb84e2/mzaf_14643321404520928138.plus.aac.p.m4a",
+      "credit": "Nick Cave & The Bad Seeds: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/red-right-hand-scream-3-version/1439538999?i=1439539311&uo=4",
+      "apple": {
+       "trackId": 1439539311,
+       "url": "https://music.apple.com/us/album/red-right-hand-scream-3-version/1439538999?i=1439539311&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music128/v4/31/9e/ce/319ecee8-c0cc-ce13-dcc9-14dffb0e7197/5099968618254.jpg/300x300bb.jpg",
+       "term": "Nick Cave & The Bad Seeds Red Right Hand"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "downton-abbey",
+   "name": "Downton Abbey",
+   "group": "tv",
+   "facts": {
+    "composer": "John Lunn",
+    "year": 2010,
+    "decade": "2010s",
+    "track": "Downton Abbey - The Suite",
+    "type": "tv"
+   },
+   "blurb": "\"Downton Abbey - The Suite\" from Downton Abbey (2010), by John Lunn.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/d4/b0/02/d4b00202-5f13-cbfb-eabd-4f3dcc8e7b70/mzaf_11882275998113660854.plus.aac.p.m4a",
+      "credit": "John Lunn: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/one-hundred-years-of-downton-from-downton-abbey/1478351940?i=1478352149&uo=4",
+      "apple": {
+       "trackId": 1478352149,
+       "url": "https://music.apple.com/us/album/one-hundred-years-of-downton-from-downton-abbey/1478351940?i=1478352149&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/b3/94/14/b39414e2-469b-1c45-3e08-8630771cf2e0/19UMGIM72424.rgb.jpg/300x300bb.jpg",
+       "term": "John Lunn & The Chamber Orchestra of London One Hundred Years of Downton"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "star-trek",
+   "name": "Star Trek",
+   "group": "tv",
+   "facts": {
+    "composer": "Alexander Courage",
+    "year": 1966,
+    "decade": "1960s",
+    "track": "Star Trek Main Title",
+    "type": "tv"
+   },
+   "blurb": "\"Star Trek Main Title\" from Star Trek (1966), by Alexander Courage.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview115/v4/46/ad/c8/46adc83b-591c-0b06-b871-6728ff94e18e/mzaf_12745918624776423220.plus.aac.p.m4a",
+      "credit": "Alexander Courage: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/star-trek-main-theme-from-star-trek/1444065072?i=1444065075&uo=4",
+      "apple": {
+       "trackId": 1444065075,
+       "url": "https://music.apple.com/us/album/star-trek-main-theme-from-star-trek/1444065072?i=1444065075&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music118/v4/14/87/c5/1487c574-b229-e9e1-d3d8-155fe9bf74a1/00030206616392.rgb.jpg/300x300bb.jpg",
+       "term": "Alexander Courage, Fred Steiner & Royal Philharmonic Orchestra Star Trek: Main Theme"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  }
+ ],
+ "questions": [],
+ "sources": [
+  {
+   "name": "Curated by Clued from original soundtrack albums on Apple Music"
+  },
+  {
+   "name": "Apple iTunes Search API (previews, artwork, links)",
+   "url": "https://performance-partners.apple.com/search-api"
+  }
+ ],
+ "built": "2026-10-04"
+}

@@ -1,0 +1,4007 @@
+{
+ "id": "anthems",
+ "title": "National anthems",
+ "theme": "music",
+ "icon": "🎺",
+ "kids": false,
+ "version": 1,
+ "listenPrompt": "Which country's national anthem is this?",
+ "factsMeta": {
+  "anthem": {
+   "type": "text",
+   "label": "Anthem"
+  },
+  "continent": {
+   "type": "cat",
+   "label": "Continent"
+  }
+ },
+ "items": [
+  {
+   "id": "albania",
+   "name": "Albania",
+   "group": "Europe",
+   "facts": {
+    "anthem": "Himni i Flamurit",
+    "continent": "Europe"
+   },
+   "blurb": "\"Himni i Flamurit\" is the national anthem of Albania.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/5/52/Hymni_i_Flamurit_instrumental.ogg/Hymni_i_Flamurit_instrumental.ogg.mp3",
+      "credit": "United States Navy Band",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Hymni_i_Flamurit_instrumental.ogg",
+      "dur": 65.9,
+      "minStart": 1
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "algeria",
+   "name": "Algeria",
+   "group": "Africa",
+   "facts": {
+    "anthem": "Kassaman",
+    "continent": "Africa"
+   },
+   "blurb": "\"Kassaman\" is the national anthem of Algeria.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/4/48/Kassaman_instrumental.ogg/Kassaman_instrumental.ogg.mp3",
+      "credit": "United States Navy Band",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Kassaman_instrumental.ogg",
+      "dur": 73.2,
+      "minStart": 1
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "andorra",
+   "name": "Andorra",
+   "group": "Europe",
+   "facts": {
+    "anthem": "El gran Carlemany",
+    "continent": "Europe"
+   },
+   "blurb": "\"El gran Carlemany\" is the national anthem of Andorra.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/5/5b/El_Gran_Carlemany.ogg/El_Gran_Carlemany.ogg.mp3",
+      "credit": "Juan Benlloch i Vivó / Enric Marfany Bons",
+      "license": "CC0",
+      "page": "https://commons.wikimedia.org/wiki/File:El_Gran_Carlemany.ogg",
+      "dur": 66.3,
+      "minStart": 1
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "angola",
+   "name": "Angola",
+   "group": "Africa",
+   "facts": {
+    "anthem": "Angola Avante",
+    "continent": "Africa"
+   },
+   "blurb": "The national anthem of Angola.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/d/dd/Angolan-National-Anthem-_US-Navy-Band.ogg/Angolan-National-Anthem-_US-Navy-Band.ogg.mp3",
+      "credit": "US navy band",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Angolan-National-Anthem-_US-Navy-Band.ogg",
+      "dur": 81.9,
+      "minStart": 1
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "antigua-and-barbuda",
+   "name": "Antigua and Barbuda",
+   "group": "North America",
+   "facts": {
+    "anthem": "Fair Antigua, We Salute Thee",
+    "continent": "North America"
+   },
+   "blurb": "The national anthem of Antigua and Barbuda.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/2/27/Antigua_and_Barbuda_National_Anthem.ogg/Antigua_and_Barbuda_National_Anthem.ogg.mp3",
+      "credit": "United States Navy Band",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Antigua_and_Barbuda_National_Anthem.ogg",
+      "dur": 60.7,
+      "minStart": 1
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "argentina",
+   "name": "Argentina",
+   "group": "South America",
+   "facts": {
+    "anthem": "Argentine National Anthem",
+    "continent": "South America"
+   },
+   "blurb": "\"Argentine National Anthem\" is the national anthem of Argentina.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/c/cd/Himno_Nacional_Argentino_instrumental.ogg/Himno_Nacional_Argentino_instrumental.ogg.mp3",
+      "credit": "United States Navy Band",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Himno_Nacional_Argentino_instrumental.ogg",
+      "dur": 213.3,
+      "minStart": 1
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "armenia",
+   "name": "Armenia",
+   "group": "Asia",
+   "facts": {
+    "anthem": "Mer Hayrenik",
+    "continent": "Asia"
+   },
+   "blurb": "\"Mer Hayrenik\" is the national anthem of Armenia.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/c/c7/Mer_Hayrenik_instrumental.ogg/Mer_Hayrenik_instrumental.ogg.mp3",
+      "credit": "United States Navy Band",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Mer_Hayrenik_instrumental.ogg",
+      "dur": 28,
+      "minStart": 1
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "australia",
+   "name": "Australia",
+   "group": "Oceania",
+   "facts": {
+    "anthem": "Advance Australia Fair",
+    "continent": "Oceania"
+   },
+   "blurb": "The national anthem of Australia.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/f/fc/Advance_Australia_Fair_%281927%29.ogg/Advance_Australia_Fair_%281927%29.ogg.mp3",
+      "credit": "Peter Dawson",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Advance_Australia_Fair_(1927).ogg",
+      "dur": 194.1,
+      "minStart": 1
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "austria",
+   "name": "Austria",
+   "group": "Europe",
+   "facts": {
+    "anthem": "Land der Berge, Land am Strome",
+    "continent": "Europe"
+   },
+   "blurb": "\"Land der Berge, Land am Strome\" is the national anthem of Austria.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/7/7c/Land_der_Berge_Land_am_Strome_instrumental.ogg/Land_der_Berge_Land_am_Strome_instrumental.ogg.mp3",
+      "credit": "United States Navy Band",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Land_der_Berge_Land_am_Strome_instrumental.ogg",
+      "dur": 89.5,
+      "minStart": 1
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "azerbaijan",
+   "name": "Azerbaijan",
+   "group": "Asia",
+   "facts": {
+    "anthem": "Azərbaycan marşı",
+    "continent": "Asia"
+   },
+   "blurb": "\"Azərbaycan marşı\" is the national anthem of Azerbaijan.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/3/31/Azerbaijan_national_anthem_%28vocal_version%29.ogg/Azerbaijan_national_anthem_%28vocal_version%29.ogg.mp3",
+      "credit": "Government of Azerbaijan",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Azerbaijan_national_anthem_(vocal_version).ogg",
+      "dur": 133.3,
+      "minStart": 1
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "bahamas",
+   "name": "Bahamas",
+   "group": "North America",
+   "facts": {
+    "anthem": "March On, Bahamaland",
+    "continent": "North America"
+   },
+   "blurb": "\"March On, Bahamaland\" is the national anthem of Bahamas.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/6/62/National_anthem_of_the_Bahamas.oga/National_anthem_of_the_Bahamas.oga.mp3",
+      "credit": "United States Navy Band",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:National_anthem_of_the_Bahamas.oga",
+      "dur": 74.8,
+      "minStart": 1
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "bahrain",
+   "name": "Bahrain",
+   "group": "Asia",
+   "facts": {
+    "anthem": "Bahrainona",
+    "continent": "Asia"
+   },
+   "blurb": "The national anthem of Bahrain.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/6/61/Bahrainona_%28vocal%29.ogg/Bahrainona_%28vocal%29.ogg.mp3",
+      "credit": "Choir of the Royal Bahraini Army and the Bahrain Orchestra on behalf of the Government of Bahrain",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Bahrainona_(vocal).ogg",
+      "dur": 49,
+      "minStart": 1
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "bangladesh",
+   "name": "Bangladesh",
+   "group": "Asia",
+   "facts": {
+    "anthem": "Amar Sonar Bangla",
+    "continent": "Asia"
+   },
+   "blurb": "\"Amar Sonar Bangla\" is the national anthem of Bangladesh.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/b/bc/Amar_Sonar_Bangla_-_official_vocal_music_of_the_National_anthem_of_Bangladesh.ogg/Amar_Sonar_Bangla_-_official_vocal_music_of_the_National_anthem_of_Bangladesh.ogg.mp3",
+      "credit": "Press Information Department",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Amar_Sonar_Bangla_-_official_vocal_music_of_the_National_anthem_of_Bangladesh.ogg",
+      "dur": 175,
+      "minStart": 1
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "barbados",
+   "name": "Barbados",
+   "group": "North America",
+   "facts": {
+    "anthem": "National Anthem of Barbados",
+    "continent": "North America"
+   },
+   "blurb": "The national anthem of Barbados.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/9/95/United_States_Navy_Band_-_In_Plenty_and_In_Time_of_Need.ogg/United_States_Navy_Band_-_In_Plenty_and_In_Time_of_Need.ogg.mp3",
+      "credit": "United States Navy Band",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:United_States_Navy_Band_-_In_Plenty_and_In_Time_of_Need.ogg",
+      "dur": 78.6,
+      "minStart": 1
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "belarus",
+   "name": "Belarus",
+   "group": "Europe",
+   "facts": {
+    "anthem": "My Belarusy",
+    "continent": "Europe"
+   },
+   "blurb": "The national anthem of Belarus.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/4/46/My_Belarusy.ogg/My_Belarusy.ogg.mp3",
+      "credit": "United States Navy Band",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:My_Belarusy.ogg",
+      "dur": 115.6,
+      "minStart": 1
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "belgium",
+   "name": "Belgium",
+   "group": "Europe",
+   "facts": {
+    "anthem": "The Brabançonne",
+    "continent": "Europe"
+   },
+   "blurb": "\"The Brabançonne\" is the national anthem of Belgium.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/e/e8/La_Braban%C3%A7onne.oga/La_Braban%C3%A7onne.oga.mp3",
+      "credit": "United States Navy Band",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:La_Braban%C3%A7onne.oga",
+      "dur": 63.1,
+      "minStart": 1
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "belize",
+   "name": "Belize",
+   "group": "North America",
+   "facts": {
+    "anthem": "Land of the Free",
+    "continent": "North America"
+   },
+   "blurb": "\"Land of the Free\" is the national anthem of Belize.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/0/00/Land_of_the_Free_instrumental.ogg/Land_of_the_Free_instrumental.ogg.mp3",
+      "credit": "United States Navy Band",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Land_of_the_Free_instrumental.ogg",
+      "dur": 162.4,
+      "minStart": 1
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "benin",
+   "name": "Benin",
+   "group": "Africa",
+   "facts": {
+    "anthem": "L'Aube Nouvelle",
+    "continent": "Africa"
+   },
+   "blurb": "\"L'Aube Nouvelle\" is the national anthem of Benin.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/7/74/L%27Aube_Nouvelle.ogg/L%27Aube_Nouvelle.ogg.mp3",
+      "credit": "United States Navy Band",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:L%27Aube_Nouvelle.ogg",
+      "dur": 67.8,
+      "minStart": 1
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "bolivia",
+   "name": "Bolivia",
+   "group": "South America",
+   "facts": {
+    "anthem": "National Anthem of Bolivia",
+    "continent": "South America"
+   },
+   "blurb": "The national anthem of Bolivia.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/5/54/Himno_Nacional_de_Bolivia_instrumental.ogg/Himno_Nacional_de_Bolivia_instrumental.ogg.mp3",
+      "credit": "United States Navy Band",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Himno_Nacional_de_Bolivia_instrumental.ogg",
+      "dur": 100.6,
+      "minStart": 1
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "botswana",
+   "name": "Botswana",
+   "group": "Africa",
+   "facts": {
+    "anthem": "Fatshe leno la rona",
+    "continent": "Africa"
+   },
+   "blurb": "\"Fatshe leno la rona\" is the national anthem of Botswana.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/c/cb/United_States_Navy_Band_-_Fatshe_leno_la_rona.ogg/United_States_Navy_Band_-_Fatshe_leno_la_rona.ogg.mp3",
+      "credit": "United States Navy Band",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:United_States_Navy_Band_-_Fatshe_leno_la_rona.ogg",
+      "dur": 56.5,
+      "minStart": 1
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "brazil",
+   "name": "Brazil",
+   "group": "South America",
+   "facts": {
+    "anthem": "Brazilian National Anthem",
+    "continent": "South America"
+   },
+   "blurb": "The national anthem of Brazil.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/0/0d/Hino-Nacional-Brasil-instrumental-mec.ogg/Hino-Nacional-Brasil-instrumental-mec.ogg.mp3",
+      "credit": "Unknown (see source page)",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Hino-Nacional-Brasil-instrumental-mec.ogg",
+      "dur": 201.2,
+      "minStart": 1
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "brunei",
+   "name": "Brunei",
+   "group": "Asia",
+   "facts": {
+    "anthem": "Allah Peliharakan Sultan",
+    "continent": "Asia"
+   },
+   "blurb": "\"Allah Peliharakan Sultan\" is the national anthem of Brunei.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/b/b2/United_States_Navy_Band_-_Allah_Peliharakan_Sultan.oga/United_States_Navy_Band_-_Allah_Peliharakan_Sultan.oga.mp3",
+      "credit": "Performed by the United States Navy Band (part of the US Federal Government).",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:United_States_Navy_Band_-_Allah_Peliharakan_Sultan.oga",
+      "dur": 64.8,
+      "minStart": 1
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "bulgaria",
+   "name": "Bulgaria",
+   "group": "Europe",
+   "facts": {
+    "anthem": "Mila Rodino",
+    "continent": "Europe"
+   },
+   "blurb": "\"Mila Rodino\" is the national anthem of Bulgaria.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/9/9c/Mila_Rodino.ogg/Mila_Rodino.ogg.mp3",
+      "credit": "Tsvetan Radoslavov",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Mila_Rodino.ogg",
+      "dur": 86.8,
+      "minStart": 1
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "burkina-faso",
+   "name": "Burkina Faso",
+   "group": "Africa",
+   "facts": {
+    "anthem": "Une Seule Nuit",
+    "continent": "Africa"
+   },
+   "blurb": "\"Une Seule Nuit\" is the national anthem of Burkina Faso.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/b/b0/National_anthem_of_Burkina_Faso.oga/National_anthem_of_Burkina_Faso.oga.mp3",
+      "credit": "Thomas Sankara",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:National_anthem_of_Burkina_Faso.oga",
+      "dur": 107.2,
+      "minStart": 1
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "cambodia",
+   "name": "Cambodia",
+   "group": "Asia",
+   "facts": {
+    "anthem": "Nokor Reach",
+    "continent": "Asia"
+   },
+   "blurb": "\"Nokor Reach\" is the national anthem of Cambodia.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/a/af/United_States_Navy_Band_-_Nokoreach.ogg/United_States_Navy_Band_-_Nokoreach.ogg.mp3",
+      "credit": "United States Navy Band",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:United_States_Navy_Band_-_Nokoreach.ogg",
+      "dur": 90.1,
+      "minStart": 1
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "canada",
+   "name": "Canada",
+   "group": "North America",
+   "facts": {
+    "anthem": "O Canada",
+    "continent": "North America"
+   },
+   "blurb": "The national anthem of Canada.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/b/b4/United_States_Navy_Band_-_O_Canada.ogg/United_States_Navy_Band_-_O_Canada.ogg.mp3",
+      "credit": "United States Navy Band",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:United_States_Navy_Band_-_O_Canada.ogg",
+      "dur": 78.9,
+      "minStart": 1
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "cape-verde",
+   "name": "Cape Verde",
+   "group": "Africa",
+   "facts": {
+    "anthem": "Cântico da Liberdade",
+    "continent": "Africa"
+   },
+   "blurb": "\"Cântico da Liberdade\" is the national anthem of Cape Verde.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/b/b6/C%C3%A2ntico_da_Liberdade_%28instrumental%29.ogg/C%C3%A2ntico_da_Liberdade_%28instrumental%29.ogg.mp3",
+      "credit": "United States Navy Band",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:C%C3%A2ntico_da_Liberdade_(instrumental).ogg",
+      "dur": 71.2,
+      "minStart": 1
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "central-african-republic",
+   "name": "Central African Republic",
+   "group": "Africa",
+   "facts": {
+    "anthem": "La Renaissance",
+    "continent": "Africa"
+   },
+   "blurb": "\"La Renaissance\" is the national anthem of Central African Republic.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/a/af/La_Renaissance_%281960s_recording%29.ogg/La_Renaissance_%281960s_recording%29.ogg.mp3",
+      "credit": "Herbert Pepper",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:La_Renaissance_(1960s_recording).ogg",
+      "dur": 69.3,
+      "minStart": 1
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "chad",
+   "name": "Chad",
+   "group": "Africa",
+   "facts": {
+    "anthem": "La Tchadienne",
+    "continent": "Africa"
+   },
+   "blurb": "The national anthem of Chad.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/8/8d/La_Tchadienne_%28instrumental%29.ogg/La_Tchadienne_%28instrumental%29.ogg.mp3",
+      "credit": "United States Navy Band",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:La_Tchadienne_(instrumental).ogg",
+      "dur": 61.1,
+      "minStart": 1
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "chile",
+   "name": "Chile",
+   "group": "South America",
+   "facts": {
+    "anthem": "National Anthem of Chile",
+    "continent": "South America"
+   },
+   "blurb": "The national anthem of Chile.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/4/4d/Gob_2022-2026_Material_audiovisual_Himno_Nacional_Cantado.mp3",
+      "credit": "Gobierno de Chile",
+      "license": "CC BY 3.0 cl",
+      "page": "https://commons.wikimedia.org/wiki/File:Gob_2022-2026_Material_audiovisual_Himno_Nacional_Cantado.mp3",
+      "dur": 131,
+      "minStart": 1
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "china",
+   "name": "China",
+   "group": "Asia",
+   "facts": {
+    "anthem": "March of the Volunteers",
+    "continent": "Asia"
+   },
+   "blurb": "\"March of the Volunteers\" is the national anthem of China.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/b/b9/March_of_the_Volunteers_instrumental.ogg/March_of_the_Volunteers_instrumental.ogg.mp3",
+      "credit": "United States Navy Band",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:March_of_the_Volunteers_instrumental.ogg",
+      "dur": 43.9,
+      "minStart": 1
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "colombia",
+   "name": "Colombia",
+   "group": "South America",
+   "facts": {
+    "anthem": "National Anthem of Colombia",
+    "continent": "South America"
+   },
+   "blurb": "The national anthem of Colombia.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/5/55/United_States_Navy_Band_-_%C2%A1Oh%2C_gloria_inmarcesible%21.ogg/United_States_Navy_Band_-_%C2%A1Oh%2C_gloria_inmarcesible%21.ogg.mp3",
+      "credit": "United States Navy Band",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:United_States_Navy_Band_-_%C2%A1Oh,_gloria_inmarcesible!.ogg",
+      "dur": 160.9,
+      "minStart": 1
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "comoros",
+   "name": "Comoros",
+   "group": "Africa",
+   "facts": {
+    "anthem": "Udzima wa ya Masiwa",
+    "continent": "Africa"
+   },
+   "blurb": "\"Udzima wa ya Masiwa\" is the national anthem of Comoros.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/a/ad/National_anthem_of_the_Comoros%2C_performed_by_the_U.S._Navy_Band.oga/National_anthem_of_the_Comoros%2C_performed_by_the_U.S._Navy_Band.oga.mp3",
+      "credit": "United States Navy Band",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:National_anthem_of_the_Comoros,_performed_by_the_U.S._Navy_Band.oga",
+      "dur": 96.7,
+      "minStart": 1
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "costa-rica",
+   "name": "Costa Rica",
+   "group": "North America",
+   "facts": {
+    "anthem": "Noble patria, tu hermosa bandera",
+    "continent": "North America"
+   },
+   "blurb": "\"Noble patria, tu hermosa bandera\" is the national anthem of Costa Rica.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/7/79/Costa_Rica_National_Anthem.ogg/Costa_Rica_National_Anthem.ogg.mp3",
+      "credit": "José María Zeledón Brenes / Manuel María Gutiérrez / United States Navy Band",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Costa_Rica_National_Anthem.ogg",
+      "dur": 110,
+      "minStart": 1
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "croatia",
+   "name": "Croatia",
+   "group": "Europe",
+   "facts": {
+    "anthem": "Lijepa naša domovino",
+    "continent": "Europe"
+   },
+   "blurb": "\"Lijepa naša domovino\" is the national anthem of Croatia.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/d/df/Lijepa_nasa_domovino_instrumental.ogg/Lijepa_nasa_domovino_instrumental.ogg.mp3",
+      "credit": "United States Navy Band",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Lijepa_nasa_domovino_instrumental.ogg",
+      "dur": 59.4,
+      "minStart": 1
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "cuba",
+   "name": "Cuba",
+   "group": "North America",
+   "facts": {
+    "anthem": "El Himno de Bayamo",
+    "continent": "North America"
+   },
+   "blurb": "\"El Himno de Bayamo\" is the national anthem of Cuba.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/c/cf/United_States_Navy_Band_-_La_Bayamesa.ogg/United_States_Navy_Band_-_La_Bayamesa.ogg.mp3",
+      "credit": "United States Navy Band",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:United_States_Navy_Band_-_La_Bayamesa.ogg",
+      "dur": 70.2,
+      "minStart": 1
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "czech-republic",
+   "name": "Czech Republic",
+   "group": "Europe",
+   "facts": {
+    "anthem": "Kde domov můj",
+    "continent": "Europe"
+   },
+   "blurb": "\"Kde domov můj\" is the national anthem of Czech Republic.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/c/c9/Kde_domov_m%C5%AFj.mid/Kde_domov_m%C5%AFj.mid.mp3",
+      "credit": "František Škroup (hudba), Adolf Cmíral (úprava)",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Kde_domov_m%C5%AFj.mid",
+      "dur": 45,
+      "minStart": 1
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "denmark",
+   "name": "Denmark",
+   "group": "Europe",
+   "facts": {
+    "anthem": "Der er et yndigt land",
+    "continent": "Europe"
+   },
+   "blurb": "\"Der er et yndigt land\" is the national anthem of Denmark.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/0/06/United_States_Navy_Band_-_Der_er_et_yndigt_land.ogg/United_States_Navy_Band_-_Der_er_et_yndigt_land.ogg.mp3",
+      "credit": "Performed by the United States Navy Band",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:United_States_Navy_Band_-_Der_er_et_yndigt_land.ogg",
+      "dur": 79.4,
+      "minStart": 1
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "djibouti",
+   "name": "Djibouti",
+   "group": "Africa",
+   "facts": {
+    "anthem": "Djibouti",
+    "continent": "Africa"
+   },
+   "blurb": "The national anthem of Djibouti.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/5/55/Djibouti_anthem_Somali_lyrics.ogg/Djibouti_anthem_Somali_lyrics.ogg.mp3",
+      "credit": "Skilla1st",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Djibouti_anthem_Somali_lyrics.ogg",
+      "dur": 87.5,
+      "minStart": 1
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "dominica",
+   "name": "Dominica",
+   "group": "North America",
+   "facts": {
+    "anthem": "Isle of Beauty, Isle of Splendour",
+    "continent": "North America"
+   },
+   "blurb": "\"Isle of Beauty, Isle of Splendour\" is the national anthem of Dominica.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/9/9a/National_Anthem_of_Dominica_by_US_Navy_Band.ogg/National_Anthem_of_Dominica_by_US_Navy_Band.ogg.mp3",
+      "credit": "United States Navy Band",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:National_Anthem_of_Dominica_by_US_Navy_Band.ogg",
+      "dur": 49,
+      "minStart": 1
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "dominican-republic",
+   "name": "Dominican Republic",
+   "group": "North America",
+   "facts": {
+    "anthem": "National Anthem of the Dominican Republic",
+    "continent": "North America"
+   },
+   "blurb": "The national anthem of Dominican Republic.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/b/bb/Dominican_Republic_National_Anthem.ogg/Dominican_Republic_National_Anthem.ogg.mp3",
+      "credit": "José Rufino Reyes Siancas (lyrics by Emilio Prud'Homme)",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Dominican_Republic_National_Anthem.ogg",
+      "dur": 96.8,
+      "minStart": 1
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "ecuador",
+   "name": "Ecuador",
+   "group": "South America",
+   "facts": {
+    "anthem": "Salve, Oh Patria",
+    "continent": "South America"
+   },
+   "blurb": "\"Salve, Oh Patria\" is the national anthem of Ecuador.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/6/6e/Anthem_of_Ecuador.ogg/Anthem_of_Ecuador.ogg.mp3",
+      "credit": "United States Navy Band",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Anthem_of_Ecuador.ogg",
+      "dur": 198.9,
+      "minStart": 1
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "egypt",
+   "name": "Egypt",
+   "group": "Africa",
+   "facts": {
+    "anthem": "Bilady, Bilady, Bilady",
+    "continent": "Africa"
+   },
+   "blurb": "\"Bilady, Bilady, Bilady\" is the national anthem of Egypt.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/f/f2/Bilady%2C_Bilady%2C_Bilady.ogg/Bilady%2C_Bilady%2C_Bilady.ogg.mp3",
+      "credit": "United States Navy Band",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Bilady,_Bilady,_Bilady.ogg",
+      "dur": 85.8,
+      "minStart": 1
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "el-salvador",
+   "name": "El Salvador",
+   "group": "North America",
+   "facts": {
+    "anthem": "National anthem of El Salvador",
+    "continent": "North America"
+   },
+   "blurb": "The national anthem of El Salvador.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/4/4e/El_Salvador_National_Anthem.ogg/El_Salvador_National_Anthem.ogg.mp3",
+      "credit": "United States Navy Band",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:El_Salvador_National_Anthem.ogg",
+      "dur": 254.3,
+      "minStart": 1
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "equatorial-guinea",
+   "name": "Equatorial Guinea",
+   "group": "Africa",
+   "facts": {
+    "anthem": "Caminemos pisando las sendas de nuestra inmensa felicidad",
+    "continent": "Africa"
+   },
+   "blurb": "\"Caminemos pisando las sendas de nuestra inmensa felicidad\" is the national anthem of Equatorial Guinea.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/2/2c/Equatorial_Guinea%27s_national_anthem%2C_performed_by_the_United_States_Navy_Band.oga/Equatorial_Guinea%27s_national_anthem%2C_performed_by_the_United_States_Navy_Band.oga.mp3",
+      "credit": "United States Navy Band",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Equatorial_Guinea%27s_national_anthem,_performed_by_the_United_States_Navy_Band.oga",
+      "dur": 113.5,
+      "minStart": 1
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "eritrea",
+   "name": "Eritrea",
+   "group": "Africa",
+   "facts": {
+    "anthem": "Ertra, Ertra, Ertra",
+    "continent": "Africa"
+   },
+   "blurb": "\"Ertra, Ertra, Ertra\" is the national anthem of Eritrea.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/4/4f/National_Anthem_of_Eritrea_by_US_Navy_Band.ogg/National_Anthem_of_Eritrea_by_US_Navy_Band.ogg.mp3",
+      "credit": "United States Navy Band",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:National_Anthem_of_Eritrea_by_US_Navy_Band.ogg",
+      "dur": 119,
+      "minStart": 1
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "estonia",
+   "name": "Estonia",
+   "group": "Europe",
+   "facts": {
+    "anthem": "Mu isamaa, mu õnn ja rõõm",
+    "continent": "Europe"
+   },
+   "blurb": "\"Mu isamaa, mu õnn ja rõõm\" is the national anthem of Estonia.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/9/98/Mu_isamaa%2C_mu_%C3%B5nn_ja_r%C3%B5%C3%B5m_%28first_vocal_recording%29.ogg/Mu_isamaa%2C_mu_%C3%B5nn_ja_r%C3%B5%C3%B5m_%28first_vocal_recording%29.ogg.mp3",
+      "credit": "Zonophone Record",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Mu_isamaa,_mu_%C3%B5nn_ja_r%C3%B5%C3%B5m_(first_vocal_recording).ogg",
+      "dur": 107.1,
+      "minStart": 1
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "eswatini",
+   "name": "Eswatini",
+   "group": "Africa",
+   "facts": {
+    "anthem": "Nkulunkulu Mnikati wetibusiso temaSwati",
+    "continent": "Africa"
+   },
+   "blurb": "\"Nkulunkulu Mnikati wetibusiso temaSwati\" is the national anthem of Eswatini.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/6/6a/National_anthem_of_the_Kingdom_of_Eswatini.ogg/National_anthem_of_the_Kingdom_of_Eswatini.ogg.mp3",
+      "credit": "United States Navy Band",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:National_anthem_of_the_Kingdom_of_Eswatini.ogg",
+      "dur": 67.7,
+      "minStart": 1
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "ethiopia",
+   "name": "Ethiopia",
+   "group": "Africa",
+   "facts": {
+    "anthem": "March Forward, Dear Mother Ethiopia",
+    "continent": "Africa"
+   },
+   "blurb": "The national anthem of Ethiopia.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/8/83/Wedefit_Gesgeshi_Widd_Innat_Ittyoppya.ogg/Wedefit_Gesgeshi_Widd_Innat_Ittyoppya.ogg.mp3",
+      "credit": "United States Navy Band, uploaded to Wikimedia by Arbegne",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Wedefit_Gesgeshi_Widd_Innat_Ittyoppya.ogg",
+      "dur": 83.6,
+      "minStart": 1
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "federated-states-of-micronesia",
+   "name": "Federated States of Micronesia",
+   "group": "Oceania",
+   "facts": {
+    "anthem": "Patriots of Micronesia",
+    "continent": "Oceania"
+   },
+   "blurb": "\"Patriots of Micronesia\" is the national anthem of Federated States of Micronesia.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/c/c6/National_anthem_of_the_Federated_States_of_Micronesia_%28one_verse%29%2C_performed_by_the_U.S._Navy_Band.ogg/National_anthem_of_the_Federated_States_of_Micronesia_%28one_verse%29%2C_performed_by_the_U.S._Navy_Band.ogg.mp3",
+      "credit": "United States Navy Band",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:National_anthem_of_the_Federated_States_of_Micronesia_(one_verse),_performed_by_the_U.S._Navy_Band.ogg",
+      "dur": 81.3,
+      "minStart": 1
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "fiji",
+   "name": "Fiji",
+   "group": "Insular Oceania",
+   "facts": {
+    "anthem": "God Bless Fiji",
+    "continent": "Insular Oceania"
+   },
+   "blurb": "The national anthem of Fiji.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/c/ca/Fiji_National_Anthem.ogg/Fiji_National_Anthem.ogg.mp3",
+      "credit": "Charles Austin Miles",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Fiji_National_Anthem.ogg",
+      "dur": 86.2,
+      "minStart": 1
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "finland",
+   "name": "Finland",
+   "group": "Europe",
+   "facts": {
+    "anthem": "Maamme",
+    "continent": "Europe"
+   },
+   "blurb": "\"Maamme\" is the national anthem of Finland.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/6/61/United_States_Navy_Band_-_Maamme.ogg/United_States_Navy_Band_-_Maamme.ogg.mp3",
+      "credit": "United States Navy Band",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:United_States_Navy_Band_-_Maamme.ogg",
+      "dur": 46.4,
+      "minStart": 1
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "france",
+   "name": "France",
+   "group": "Europe",
+   "facts": {
+    "anthem": "La Marseillaise",
+    "continent": "Europe"
+   },
+   "blurb": "\"La Marseillaise\" is the national anthem of France.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/3/30/La_Marseillaise.ogg/La_Marseillaise.ogg.mp3",
+      "credit": "United States Navy Band",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:La_Marseillaise.ogg",
+      "dur": 79.3,
+      "minStart": 1
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "gabon",
+   "name": "Gabon",
+   "group": "Africa",
+   "facts": {
+    "anthem": "La Concorde",
+    "continent": "Africa"
+   },
+   "blurb": "\"La Concorde\" is the national anthem of Gabon.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/f/fc/La_Concorde.ogg/La_Concorde.ogg.mp3",
+      "credit": "United States Navy Band",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:La_Concorde.ogg",
+      "dur": 104.8,
+      "minStart": 1
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "georgia",
+   "name": "Georgia",
+   "group": "Europe",
+   "facts": {
+    "anthem": "Tavisupleba",
+    "continent": "Europe"
+   },
+   "blurb": "\"Tavisupleba\" is the national anthem of Georgia.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/e/e3/Tavisupleba_instrumental.ogg/Tavisupleba_instrumental.ogg.mp3",
+      "credit": "Unknown (see source page)",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Tavisupleba_instrumental.ogg",
+      "dur": 80.6,
+      "minStart": 1
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "germany",
+   "name": "Germany",
+   "group": "Europe",
+   "facts": {
+    "anthem": "Deutschlandlied (third stanza)",
+    "continent": "Europe"
+   },
+   "blurb": "\"Deutschlandlied (third stanza)\" is the national anthem of Germany.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/a/a6/German_national_anthem_performed_by_the_US_Navy_Band.ogg/German_national_anthem_performed_by_the_US_Navy_Band.ogg.mp3",
+      "credit": "United States Navy Band",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:German_national_anthem_performed_by_the_US_Navy_Band.ogg",
+      "dur": 74.1,
+      "minStart": 1
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "ghana",
+   "name": "Ghana",
+   "group": "Africa",
+   "facts": {
+    "anthem": "God Bless Our Homeland Ghana",
+    "continent": "Africa"
+   },
+   "blurb": "The national anthem of Ghana.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/4/43/National_Anthem_of_Ghana.ogg/National_Anthem_of_Ghana.ogg.mp3",
+      "credit": "United States Navy Band",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:National_Anthem_of_Ghana.ogg",
+      "dur": 57.1,
+      "minStart": 1
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "greece",
+   "name": "Greece",
+   "group": "Europe",
+   "facts": {
+    "anthem": "Hymn to Liberty",
+    "continent": "Europe"
+   },
+   "blurb": "\"Hymn to Liberty\" is the national anthem of Greece.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/d/db/Hymn_to_liberty_instrumental.oga/Hymn_to_liberty_instrumental.oga.mp3",
+      "credit": "United States Navy Band",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Hymn_to_liberty_instrumental.oga",
+      "dur": 45.3,
+      "minStart": 1
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "grenada",
+   "name": "Grenada",
+   "group": "North America",
+   "facts": {
+    "anthem": "Hail Grenada",
+    "continent": "North America"
+   },
+   "blurb": "The national anthem of Grenada.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/7/76/HailGrenada.ogg/HailGrenada.ogg.mp3",
+      "credit": "Zuanzuanfuwa",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:HailGrenada.ogg",
+      "dur": 77.3,
+      "minStart": 1
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "guatemala",
+   "name": "Guatemala",
+   "group": "North America",
+   "facts": {
+    "anthem": "National Anthem of Guatemala",
+    "continent": "North America"
+   },
+   "blurb": "The national anthem of Guatemala.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/8/8f/National_anthem_of_Guatemala%2C_by_the_U.S._Navy_Band.oga/National_anthem_of_Guatemala%2C_by_the_U.S._Navy_Band.oga.mp3",
+      "credit": "United States Navy Band",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:National_anthem_of_Guatemala,_by_the_U.S._Navy_Band.oga",
+      "dur": 97.6,
+      "minStart": 1
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "guinea",
+   "name": "Guinea",
+   "group": "Africa",
+   "facts": {
+    "anthem": "Liberté",
+    "continent": "Africa"
+   },
+   "blurb": "\"Liberté\" is the national anthem of Guinea.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/3/3c/Libert%C3%A9.oga/Libert%C3%A9.oga.mp3",
+      "credit": "United States Navy Band",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Libert%C3%A9.oga",
+      "dur": 72.3,
+      "minStart": 1
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "guyana",
+   "name": "Guyana",
+   "group": "South America",
+   "facts": {
+    "anthem": "National anthem of Guyana",
+    "continent": "South America"
+   },
+   "blurb": "The national anthem of Guyana.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/8/85/National_Anthem_of_Guyana.ogg/National_Anthem_of_Guyana.ogg.mp3",
+      "credit": "Robert Cyril Gladstone Potter",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:National_Anthem_of_Guyana.ogg",
+      "dur": 53.3,
+      "minStart": 1
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "haiti",
+   "name": "Haiti",
+   "group": "North America",
+   "facts": {
+    "anthem": "La Dessalinienne",
+    "continent": "North America"
+   },
+   "blurb": "\"La Dessalinienne\" is the national anthem of Haiti.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/4/4f/Haiti_National_Anthem.ogg/Haiti_National_Anthem.ogg.mp3",
+      "credit": "United States Navy Band",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Haiti_National_Anthem.ogg",
+      "dur": 36.9,
+      "minStart": 1
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "honduras",
+   "name": "Honduras",
+   "group": "North America",
+   "facts": {
+    "anthem": "National Anthem of Honduras",
+    "continent": "North America"
+   },
+   "blurb": "The national anthem of Honduras.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/b/b3/Honduras_National_Anthem.ogg/Honduras_National_Anthem.ogg.mp3",
+      "credit": "Augusto Coello / Carlos Hartling / United States Navy Band",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Honduras_National_Anthem.ogg",
+      "dur": 166.6,
+      "minStart": 1
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "hungary",
+   "name": "Hungary",
+   "group": "Europe",
+   "facts": {
+    "anthem": "Himnusz",
+    "continent": "Europe"
+   },
+   "blurb": "\"Himnusz\" is the national anthem of Hungary.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/6/61/Himnusz_1920s.ogg/Himnusz_1920s.ogg.mp3",
+      "credit": "Military Band of Hungary",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Himnusz_1920s.ogg",
+      "dur": 64.5,
+      "minStart": 1
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "iceland",
+   "name": "Iceland",
+   "group": "Europe",
+   "facts": {
+    "anthem": "Lofsöngur",
+    "continent": "Europe"
+   },
+   "blurb": "\"Lofsöngur\" is the national anthem of Iceland.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/2/20/Lofs%C3%B6ngur_%28first_recording%29.ogg/Lofs%C3%B6ngur_%28first_recording%29.ogg.mp3",
+      "credit": "Unknown (see source page)",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Lofs%C3%B6ngur_(first_recording).ogg",
+      "dur": 86.2,
+      "minStart": 1
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "india",
+   "name": "India",
+   "group": "Asia",
+   "facts": {
+    "anthem": "Jana Gana Mana",
+    "continent": "Asia"
+   },
+   "blurb": "\"Jana Gana Mana\" is the national anthem of India.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/9/94/Jana_Gana_Mana_instrumental.ogg/Jana_Gana_Mana_instrumental.ogg.mp3",
+      "credit": "United States Navy Band",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Jana_Gana_Mana_instrumental.ogg",
+      "dur": 63.7,
+      "minStart": 1
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "indonesia",
+   "name": "Indonesia",
+   "group": "Asia",
+   "facts": {
+    "anthem": "Indonesia Raya",
+    "continent": "Asia"
+   },
+   "blurb": "The national anthem of Indonesia.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/1/1e/Indonesia_Raya_instrumental.ogg/Indonesia_Raya_instrumental.ogg.mp3",
+      "credit": "United States Navy Band",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Indonesia_Raya_instrumental.ogg",
+      "dur": 109.1,
+      "minStart": 1
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "iran",
+   "name": "Iran",
+   "group": "Asia",
+   "facts": {
+    "anthem": "National Anthem of the Islamic Republic of Iran",
+    "continent": "Asia"
+   },
+   "blurb": "The national anthem of Iran.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/f/f2/Sorud-e_Mell%C3%AD-e_Yomhur%C3%AD-e_Eslam%C3%AD-e_Ir%C3%A1n_%28instrumental%29.oga/Sorud-e_Mell%C3%AD-e_Yomhur%C3%AD-e_Eslam%C3%AD-e_Ir%C3%A1n_%28instrumental%29.oga.mp3",
+      "credit": "Unknown (see source page)",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Sorud-e_Mell%C3%AD-e_Yomhur%C3%AD-e_Eslam%C3%AD-e_Ir%C3%A1n_(instrumental).oga",
+      "dur": 55.9,
+      "minStart": 1
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "iraq",
+   "name": "Iraq",
+   "group": "Asia",
+   "facts": {
+    "anthem": "Mawtini",
+    "continent": "Asia"
+   },
+   "blurb": "\"Mawtini\" is the national anthem of Iraq.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/c/c5/Iraqi_national_anthem%2C_performed_by_the_U.S._Navy_Band.wav/Iraqi_national_anthem%2C_performed_by_the_U.S._Navy_Band.wav.mp3",
+      "credit": "United States Navy Band",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Iraqi_national_anthem,_performed_by_the_U.S._Navy_Band.wav",
+      "dur": 105.3,
+      "minStart": 1
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "ireland",
+   "name": "Ireland",
+   "group": "Europe",
+   "facts": {
+    "anthem": "Amhrán na bhFiann",
+    "continent": "Europe"
+   },
+   "blurb": "\"Amhrán na bhFiann\" is the national anthem of Ireland.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/7/7c/United_States_Navy_Band_-_Amhr%C3%A1n_na_bhFiann.ogg/United_States_Navy_Band_-_Amhr%C3%A1n_na_bhFiann.ogg.mp3",
+      "credit": "United States Navy Band",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:United_States_Navy_Band_-_Amhr%C3%A1n_na_bhFiann.ogg",
+      "dur": 59.5,
+      "minStart": 1
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "israel",
+   "name": "Israel",
+   "group": "Asia",
+   "facts": {
+    "anthem": "Hatikvah",
+    "continent": "Asia"
+   },
+   "blurb": "\"Hatikvah\" is the national anthem of Israel.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/2/26/Hatikvah_instrumental.ogg/Hatikvah_instrumental.ogg.mp3",
+      "credit": "United States Navy Band",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Hatikvah_instrumental.ogg",
+      "dur": 74.2,
+      "minStart": 1
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "italy",
+   "name": "Italy",
+   "group": "Europe",
+   "facts": {
+    "anthem": "Il Canto degli Italiani",
+    "continent": "Europe"
+   },
+   "blurb": "\"Il Canto degli Italiani\" is the national anthem of Italy.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/b/b1/National_anthem_of_Italy_-_U.S._Navy_Band_%28short_version%29.ogg/National_anthem_of_Italy_-_U.S._Navy_Band_%28short_version%29.ogg.mp3",
+      "credit": "Composition: Michele Novaro Performance: U.S. Navy Band",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:National_anthem_of_Italy_-_U.S._Navy_Band_(short_version).ogg",
+      "dur": 82.1,
+      "minStart": 1
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "jamaica",
+   "name": "Jamaica",
+   "group": "North America",
+   "facts": {
+    "anthem": "Jamaica, Land We Love",
+    "continent": "North America"
+   },
+   "blurb": "The national anthem of Jamaica.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/7/7a/%22Jamaica%2C_Land_We_Love%22%2C_performed_by_the_United_States_Navy_Band.oga/%22Jamaica%2C_Land_We_Love%22%2C_performed_by_the_United_States_Navy_Band.oga.mp3",
+      "credit": "United States Navy Band",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:%22Jamaica,_Land_We_Love%22,_performed_by_the_United_States_Navy_Band.oga",
+      "dur": 80.8,
+      "minStart": 1
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "japan",
+   "name": "Japan",
+   "group": "Asia",
+   "facts": {
+    "anthem": "Kimigayo",
+    "continent": "Asia"
+   },
+   "blurb": "\"Kimigayo\" is the national anthem of Japan.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/a/a3/Kimi_ga_Yo_instrumental.ogg/Kimi_ga_Yo_instrumental.ogg.mp3",
+      "credit": "United States Navy Band",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Kimi_ga_Yo_instrumental.ogg",
+      "dur": 58.7,
+      "minStart": 1
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "jordan",
+   "name": "Jordan",
+   "group": "Asia",
+   "facts": {
+    "anthem": "The Royal Anthem of Jordan",
+    "continent": "Asia"
+   },
+   "blurb": "The national anthem of Jordan.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/e/ee/National_anthem_of_Jordan_instrumental.ogg/National_anthem_of_Jordan_instrumental.ogg.mp3",
+      "credit": "United States Navy Band, uploaded to Wikimedia by Bart133",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:National_anthem_of_Jordan_instrumental.ogg",
+      "dur": 36.5,
+      "minStart": 1
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "kazakhstan",
+   "name": "Kazakhstan",
+   "group": "Europe",
+   "facts": {
+    "anthem": "Menıñ Qazaqstanym"
+   },
+   "blurb": "\"Menıñ Qazaqstanym\" is the national anthem of Kazakhstan.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/a/a9/Kazakhstan_National_Anthem_2012.ogg/Kazakhstan_National_Anthem_2012.ogg.mp3",
+      "credit": "Government of Kazakhstan",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Kazakhstan_National_Anthem_2012.ogg",
+      "dur": 92.1,
+      "minStart": 1
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "kenya",
+   "name": "Kenya",
+   "group": "Africa",
+   "facts": {
+    "anthem": "Ee Mungu Nguvu Yetu",
+    "continent": "Africa"
+   },
+   "blurb": "\"Ee Mungu Nguvu Yetu\" is the national anthem of Kenya.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/2/29/National_anthem_of_Kenya%2C_performed_by_the_United_States_Navy_Band.wav/National_anthem_of_Kenya%2C_performed_by_the_United_States_Navy_Band.wav.mp3",
+      "credit": "United States Navy Band",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:National_anthem_of_Kenya,_performed_by_the_United_States_Navy_Band.wav",
+      "dur": 112.5,
+      "minStart": 1
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "kiribati",
+   "name": "Kiribati",
+   "group": "Insular Oceania",
+   "facts": {
+    "anthem": "Kunan Kiribati"
+   },
+   "blurb": "The national anthem of Kiribati.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/2/20/Kiribati_Anthem_Performed_by_US_Navy_Band.oga/Kiribati_Anthem_Performed_by_US_Navy_Band.oga.mp3",
+      "credit": "US Navy Band",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Kiribati_Anthem_Performed_by_US_Navy_Band.oga",
+      "dur": 44.9,
+      "minStart": 1
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "kuwait",
+   "name": "Kuwait",
+   "group": "Asia",
+   "facts": {
+    "anthem": "National Anthem of Kuwait",
+    "continent": "Asia"
+   },
+   "blurb": "The national anthem of Kuwait.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/d/d4/National_anthem_of_Kuwait_%28instrumental%29.ogg/National_anthem_of_Kuwait_%28instrumental%29.ogg.mp3",
+      "credit": "United States Navy Band",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:National_anthem_of_Kuwait_(instrumental).ogg",
+      "dur": 34.6,
+      "minStart": 1
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "kyrgyzstan",
+   "name": "Kyrgyzstan",
+   "group": "Asia",
+   "facts": {
+    "anthem": "State Anthem of the Kyrgyz Republic",
+    "continent": "Asia"
+   },
+   "blurb": "\"State Anthem of the Kyrgyz Republic\" is the national anthem of Kyrgyzstan.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/a/a6/Kyrgyzstan_National_Anthem.ogg/Kyrgyzstan_National_Anthem.ogg.mp3",
+      "credit": "Government of Kyrgyzstan",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Kyrgyzstan_National_Anthem.ogg",
+      "dur": 168,
+      "minStart": 1
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "laos",
+   "name": "Laos",
+   "group": "Asia",
+   "facts": {
+    "anthem": "Pheng Xat Lao",
+    "continent": "Asia"
+   },
+   "blurb": "\"Pheng Xat Lao\" is the national anthem of Laos.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/e/ee/National_Anthem_of_Laos.ogg/National_Anthem_of_Laos.ogg.mp3",
+      "credit": "United States Navy Band",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:National_Anthem_of_Laos.ogg",
+      "dur": 50.3,
+      "minStart": 1
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "latvia",
+   "name": "Latvia",
+   "group": "Europe",
+   "facts": {
+    "anthem": "Dievs, svētī Latviju!",
+    "continent": "Europe"
+   },
+   "blurb": "\"Dievs, svētī Latviju!\" is the national anthem of Latvia.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/5/55/Latvian_National_Anthem.ogg/Latvian_National_Anthem.ogg.mp3",
+      "credit": "Unknown (see source page)",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Latvian_National_Anthem.ogg",
+      "dur": 105.1,
+      "minStart": 1
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "lebanon",
+   "name": "Lebanon",
+   "group": "Asia",
+   "facts": {
+    "anthem": "Lebanese national anthem",
+    "continent": "Asia"
+   },
+   "blurb": "\"Lebanese national anthem\" is the national anthem of Lebanon.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/9/97/Lebanese_national_anthem.ogg/Lebanese_national_anthem.ogg.mp3",
+      "credit": "Rashid Nakhle / Wadia Sabra / United States Navy Band",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Lebanese_national_anthem.ogg",
+      "dur": 50.6,
+      "minStart": 1
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "lesotho",
+   "name": "Lesotho",
+   "group": "Africa",
+   "facts": {
+    "anthem": "Lesotho Fatse La Bontata Rona",
+    "continent": "Africa"
+   },
+   "blurb": "The national anthem of Lesotho.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/a/aa/National_anthem_of_Lesotho%2C_performed_by_the_U.S._Navy_Band.wav/National_anthem_of_Lesotho%2C_performed_by_the_U.S._Navy_Band.wav.mp3",
+      "credit": "United States Navy Band",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:National_anthem_of_Lesotho,_performed_by_the_U.S._Navy_Band.wav",
+      "dur": 43.2,
+      "minStart": 1
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "liberia",
+   "name": "Liberia",
+   "group": "Africa",
+   "facts": {
+    "anthem": "All Hail, Liberia, Hail!",
+    "continent": "Africa"
+   },
+   "blurb": "The national anthem of Liberia.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/6/65/Liberia_National_Anthem.ogg/Liberia_National_Anthem.ogg.mp3",
+      "credit": "Olmstead Luca (lyrics by Daniel Bashiel Warner not included)",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Liberia_National_Anthem.ogg",
+      "dur": 88.2,
+      "minStart": 1
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "libya",
+   "name": "Libya",
+   "group": "Africa",
+   "facts": {
+    "anthem": "Libya, Libya, Libya",
+    "continent": "Africa"
+   },
+   "blurb": "The national anthem of Libya.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/1/1d/Libya%2C_Libya%2C_Libya_instrumental.ogg/Libya%2C_Libya%2C_Libya_instrumental.ogg.mp3",
+      "credit": "United States Navy Band",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Libya,_Libya,_Libya_instrumental.ogg",
+      "dur": 67.6,
+      "minStart": 1
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "lithuania",
+   "name": "Lithuania",
+   "group": "Europe",
+   "facts": {
+    "anthem": "Tautiška giesmė",
+    "continent": "Europe"
+   },
+   "blurb": "\"Tautiška giesmė\" is the national anthem of Lithuania.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/a/ab/Tauti%C5%A1ka_giesme_instrumental.oga/Tauti%C5%A1ka_giesme_instrumental.oga.mp3",
+      "credit": "United States Navy Band",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Tauti%C5%A1ka_giesme_instrumental.oga",
+      "dur": 107.2,
+      "minStart": 1
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "luxembourg",
+   "name": "Luxembourg",
+   "group": "Europe",
+   "facts": {
+    "anthem": "Ons Heemecht",
+    "continent": "Europe"
+   },
+   "blurb": "\"Ons Heemecht\" is the national anthem of Luxembourg.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/4/45/Luxembourg_National_Anthem.ogg/Luxembourg_National_Anthem.ogg.mp3",
+      "credit": "United States Navy Band",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Luxembourg_National_Anthem.ogg",
+      "dur": 83.8,
+      "minStart": 1
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "madagascar",
+   "name": "Madagascar",
+   "group": "Africa",
+   "facts": {
+    "anthem": "Ry Tanindrazanay malala ô!",
+    "continent": "Africa"
+   },
+   "blurb": "\"Ry Tanindrazanay malala ô!\" is the national anthem of Madagascar.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/d/dd/Ry_Tanindrazanay_malala_%C3%B4%21_%28instrumental%29.ogg/Ry_Tanindrazanay_malala_%C3%B4%21_%28instrumental%29.ogg.mp3",
+      "credit": "United States Navy Band",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Ry_Tanindrazanay_malala_%C3%B4!_(instrumental).ogg",
+      "dur": 62.2,
+      "minStart": 1
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "malaysia",
+   "name": "Malaysia",
+   "group": "Asia",
+   "facts": {
+    "anthem": "Negaraku",
+    "continent": "Asia"
+   },
+   "blurb": "\"Negaraku\" is the national anthem of Malaysia.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/e/ee/Negaraku_instrumental.ogg/Negaraku_instrumental.ogg.mp3",
+      "credit": "United States Navy Band",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Negaraku_instrumental.ogg",
+      "dur": 58.6,
+      "minStart": 1
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "maldives",
+   "name": "Maldives",
+   "group": "Asia",
+   "facts": {
+    "anthem": "Gaumiii salaaam",
+    "continent": "Asia"
+   },
+   "blurb": "\"Gaumiii salaaam\" is the national anthem of Maldives.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/c/c4/Gaumii_salaam.ogg/Gaumii_salaam.ogg.mp3",
+      "credit": "United States Navy Band",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Gaumii_salaam.ogg",
+      "dur": 68,
+      "minStart": 1
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "mali",
+   "name": "Mali",
+   "group": "Africa",
+   "facts": {
+    "anthem": "Pour l'Afrique et pour toi",
+    "continent": "Africa"
+   },
+   "blurb": "\"Pour l'Afrique et pour toi\" is the national anthem of Mali.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/f/f7/Malian_national_anthem%2C_performed_by_the_United_States_Navy_Band.oga/Malian_national_anthem%2C_performed_by_the_United_States_Navy_Band.oga.mp3",
+      "credit": "United States Navy Band",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Malian_national_anthem,_performed_by_the_United_States_Navy_Band.oga",
+      "dur": 78.8,
+      "minStart": 1
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "malta",
+   "name": "Malta",
+   "group": "Europe",
+   "facts": {
+    "anthem": "L-Innu Malti",
+    "continent": "Europe"
+   },
+   "blurb": "\"L-Innu Malti\" is the national anthem of Malta.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/8/80/Malta_anthem_%28instrumental%29.ogg/Malta_anthem_%28instrumental%29.ogg.mp3",
+      "credit": "Manoel Theatre on behalf of the Government of Malta",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Malta_anthem_(instrumental).ogg",
+      "dur": 80.9,
+      "minStart": 1
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "marshall-islands",
+   "name": "Marshall Islands",
+   "group": "Oceania",
+   "facts": {
+    "anthem": "Forever Marshall Islands",
+    "continent": "Oceania"
+   },
+   "blurb": "The national anthem of Marshall Islands.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/a/a3/National_Anthem_of_Marshall_Islands_by_US_Navy_Band.ogg/National_Anthem_of_Marshall_Islands_by_US_Navy_Band.ogg.mp3",
+      "credit": "United States Navy Band",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:National_Anthem_of_Marshall_Islands_by_US_Navy_Band.ogg",
+      "dur": 138.3,
+      "minStart": 1
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "mauritania",
+   "name": "Mauritania",
+   "group": "Africa",
+   "facts": {
+    "anthem": "National anthem of Mauritania",
+    "continent": "Africa"
+   },
+   "blurb": "The national anthem of Mauritania.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/9/93/United_States_Navy_Band_-_Bil%C4%81da_l-%CA%BEub%C4%81ti_l-hud%C4%81ti_l-kir%C4%81m.ogg/United_States_Navy_Band_-_Bil%C4%81da_l-%CA%BEub%C4%81ti_l-hud%C4%81ti_l-kir%C4%81m.ogg.mp3",
+      "credit": "United States Navy Band",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:United_States_Navy_Band_-_Bil%C4%81da_l-%CA%BEub%C4%81ti_l-hud%C4%81ti_l-kir%C4%81m.ogg",
+      "dur": 86.6,
+      "minStart": 1
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "mauritius",
+   "name": "Mauritius",
+   "group": "Africa",
+   "facts": {
+    "anthem": "Motherland",
+    "continent": "Africa"
+   },
+   "blurb": "\"Motherland\" is the national anthem of Mauritius.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/7/75/Motherland_%28instrumental%29.ogg/Motherland_%28instrumental%29.ogg.mp3",
+      "credit": "United States Navy Band",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Motherland_(instrumental).ogg",
+      "dur": 58.8,
+      "minStart": 1
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "mexico",
+   "name": "Mexico",
+   "group": "North America",
+   "facts": {
+    "anthem": "Himno Nacional Mexicano",
+    "continent": "North America"
+   },
+   "blurb": "\"Himno Nacional Mexicano\" is the national anthem of Mexico.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/9/9d/Himno_Nacional_Mexicano_instrumental.ogg/Himno_Nacional_Mexicano_instrumental.ogg.mp3",
+      "credit": "United States Navy Band",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Himno_Nacional_Mexicano_instrumental.ogg",
+      "dur": 101.7,
+      "minStart": 1
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "moldova",
+   "name": "Moldova",
+   "group": "Europe",
+   "facts": {
+    "anthem": "Limba noastră",
+    "continent": "Europe"
+   },
+   "blurb": "\"Limba noastră\" is the national anthem of Moldova.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/a/ad/Imnul_Republicii_Moldova_US_NAVY.ogg/Imnul_Republicii_Moldova_US_NAVY.ogg.mp3",
+      "credit": "United States Navy Band",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Imnul_Republicii_Moldova_US_NAVY.ogg",
+      "dur": 71,
+      "minStart": 1
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "monaco",
+   "name": "Monaco",
+   "group": "Europe",
+   "facts": {
+    "anthem": "Hymne monégasque",
+    "continent": "Europe"
+   },
+   "blurb": "\"Hymne monégasque\" is the national anthem of Monaco.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/c/c2/Monaco_National_Anthem.ogg/Monaco_National_Anthem.ogg.mp3",
+      "credit": "United States Navy Band",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Monaco_National_Anthem.ogg",
+      "dur": 77.5,
+      "minStart": 1
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "montenegro",
+   "name": "Montenegro",
+   "group": "Europe",
+   "facts": {
+    "anthem": "Oj, svijetla majska zoro",
+    "continent": "Europe"
+   },
+   "blurb": "\"Oj, svijetla majska zoro\" is the national anthem of Montenegro.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/a/a2/National_Anthem_of_Montenegro.ogg/National_Anthem_of_Montenegro.ogg.mp3",
+      "credit": "United States Navy Band",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:National_Anthem_of_Montenegro.ogg",
+      "dur": 125.1,
+      "minStart": 1
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "morocco",
+   "name": "Morocco",
+   "group": "Africa",
+   "facts": {
+    "anthem": "Cherifian Anthem",
+    "continent": "Africa"
+   },
+   "blurb": "\"Cherifian Anthem\" is the national anthem of Morocco.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/3/3f/National_Anthem_of_Morocco.ogg/National_Anthem_of_Morocco.ogg.mp3",
+      "credit": "United States Navy Band",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:National_Anthem_of_Morocco.ogg",
+      "dur": 67.7,
+      "minStart": 1
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "mozambique",
+   "name": "Mozambique",
+   "group": "Africa",
+   "facts": {
+    "anthem": "Pátria Amada",
+    "continent": "Africa"
+   },
+   "blurb": "\"Pátria Amada\" is the national anthem of Mozambique.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/9/9f/Mozambican_national_anthem%2C_performed_by_the_United_States_Navy_Band.wav/Mozambican_national_anthem%2C_performed_by_the_United_States_Navy_Band.wav.mp3",
+      "credit": "United States Navy Band",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Mozambican_national_anthem,_performed_by_the_United_States_Navy_Band.wav",
+      "dur": 60.9,
+      "minStart": 1
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "myanmar",
+   "name": "Myanmar",
+   "group": "Asia",
+   "facts": {
+    "anthem": "Kaba Ma Kyei",
+    "continent": "Asia"
+   },
+   "blurb": "\"Kaba Ma Kyei\" is the national anthem of Myanmar.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/d/db/U.S._Navy_Band_-_Kaba_Ma_Kyei.oga/U.S._Navy_Band_-_Kaba_Ma_Kyei.oga.mp3",
+      "credit": "United States Navy Band",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:U.S._Navy_Band_-_Kaba_Ma_Kyei.oga",
+      "dur": 39.3,
+      "minStart": 1
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "namibia",
+   "name": "Namibia",
+   "group": "Africa",
+   "facts": {
+    "anthem": "Namibia, Land of the Brave",
+    "continent": "Africa"
+   },
+   "blurb": "The national anthem of Namibia.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/4/40/Namibia%2C_Land_of_the_Brave_%28OGG%29.ogg/Namibia%2C_Land_of_the_Brave_%28OGG%29.ogg.mp3",
+      "credit": "For the anthem who made this: Axali Doëseb (1954 – 27 October 2023)",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Namibia,_Land_of_the_Brave_(OGG).ogg",
+      "dur": 88.4,
+      "minStart": 1
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "nauru",
+   "name": "Nauru",
+   "group": "Oceania",
+   "facts": {
+    "anthem": "Nauru Bwiema",
+    "continent": "Oceania"
+   },
+   "blurb": "The national anthem of Nauru.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/c/c0/Nauru_Bwiema.ogg/Nauru_Bwiema.ogg.mp3",
+      "credit": "Keith Terrett",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Nauru_Bwiema.ogg",
+      "dur": 78.9,
+      "minStart": 1
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "nepal",
+   "name": "Nepal",
+   "group": "Asia",
+   "facts": {
+    "anthem": "Sayaun Thunga Phulka",
+    "continent": "Asia"
+   },
+   "blurb": "\"Sayaun Thunga Phulka\" is the national anthem of Nepal.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/e/ef/Sayaun_Thunga_Phool_Ka_%28instrumental%29.ogg/Sayaun_Thunga_Phool_Ka_%28instrumental%29.ogg.mp3",
+      "credit": "United States Navy Band",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Sayaun_Thunga_Phool_Ka_(instrumental).ogg",
+      "dur": 69.8,
+      "minStart": 1
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "netherlands",
+   "name": "Netherlands",
+   "group": "Europe",
+   "facts": {
+    "anthem": "Wilhelmus",
+    "continent": "Europe"
+   },
+   "blurb": "\"Wilhelmus\" is the national anthem of Netherlands.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/a/a1/Dutch_national_anthem_performed_by_the_United_States_Navy_Band.mp3",
+      "credit": "United States Navy Band",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Dutch_national_anthem_performed_by_the_United_States_Navy_Band.mp3",
+      "dur": 48.6,
+      "minStart": 1
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "new-zealand",
+   "name": "New Zealand",
+   "group": "Oceania",
+   "facts": {
+    "anthem": "God Defend New Zealand",
+    "continent": "Oceania"
+   },
+   "blurb": "The national anthem of New Zealand.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/2/23/New_Zealand_national_anthem%2C_performed_by_the_United_States_Navy_Band.wav/New_Zealand_national_anthem%2C_performed_by_the_United_States_Navy_Band.wav.mp3",
+      "credit": "United States Navy Band",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:New_Zealand_national_anthem,_performed_by_the_United_States_Navy_Band.wav",
+      "dur": 62.8,
+      "minStart": 1
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "nicaragua",
+   "name": "Nicaragua",
+   "group": "North America",
+   "facts": {
+    "anthem": "Salve a ti",
+    "continent": "North America"
+   },
+   "blurb": "\"Salve a ti\" is the national anthem of Nicaragua.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/d/db/National_Anthem_of_Nicaragua_by_US_Navy_Band.ogg/National_Anthem_of_Nicaragua_by_US_Navy_Band.ogg.mp3",
+      "credit": "United States Navy Band",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:National_Anthem_of_Nicaragua_by_US_Navy_Band.ogg",
+      "dur": 56.3,
+      "minStart": 1
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "niger",
+   "name": "Niger",
+   "group": "Africa",
+   "facts": {
+    "anthem": "L'Honneur de la Patrie",
+    "continent": "Africa"
+   },
+   "blurb": "\"L'Honneur de la Patrie\" is the national anthem of Niger.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/1/10/THE_HONOR_OF_THE_FATHERLAND.ogg/THE_HONOR_OF_THE_FATHERLAND.ogg.mp3",
+      "credit": "Camelista27",
+      "license": "CC0",
+      "page": "https://commons.wikimedia.org/wiki/File:THE_HONOR_OF_THE_FATHERLAND.ogg",
+      "dur": 108.4,
+      "minStart": 1
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "nigeria",
+   "name": "Nigeria",
+   "group": "Africa",
+   "facts": {
+    "anthem": "Nigeria, We Hail Thee",
+    "continent": "Africa"
+   },
+   "blurb": "The national anthem of Nigeria.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/2/26/Nigeria_We_Hail_Thee.ogg/Nigeria_We_Hail_Thee.ogg.mp3",
+      "credit": "Nigerian Army Band Corps",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Nigeria_We_Hail_Thee.ogg",
+      "dur": 88.1,
+      "minStart": 1
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "norway",
+   "name": "Norway",
+   "group": "Europe",
+   "facts": {
+    "anthem": "Ja, vi elsker dette landet",
+    "continent": "Europe"
+   },
+   "blurb": "\"Ja, vi elsker dette landet\" is the national anthem of Norway.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/f/f6/Norway_%28National_Anthem%29.ogg/Norway_%28National_Anthem%29.ogg.mp3",
+      "credit": "United States Navy Band",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Norway_(National_Anthem).ogg",
+      "dur": 62.2,
+      "minStart": 1
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "oman",
+   "name": "Oman",
+   "group": "Asia",
+   "facts": {
+    "anthem": "Nashid as-Salaam as-Sultani",
+    "continent": "Asia"
+   },
+   "blurb": "\"Nashid as-Salaam as-Sultani\" is the national anthem of Oman.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/5/5a/Peace_to_the_Sultan_%28%D9%86%D8%B4%D9%8A%D8%AF_%D8%A7%D9%84%D8%B3%D9%84%D8%A7%D9%85_%D8%A7%D9%84%D8%B3%D9%84%D8%B7%D8%A7%D9%86%D9%8A%29.ogg/Peace_to_the_Sultan_%28%D9%86%D8%B4%D9%8A%D8%AF_%D8%A7%D9%84%D8%B3%D9%84%D8%A7%D9%85_%D8%A7%D9%84%D8%B3%D9%84%D8%B7%D8%A7%D9%86%D9%8A%29.ogg.mp3",
+      "credit": "United States Navy Band",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Peace_to_the_Sultan_(%D9%86%D8%B4%D9%8A%D8%AF_%D8%A7%D9%84%D8%B3%D9%84%D8%A7%D9%85_%D8%A7%D9%84%D8%B3%D9%84%D8%B7%D8%A7%D9%86%D9%8A).ogg",
+      "dur": 113.9,
+      "minStart": 1
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "pakistan",
+   "name": "Pakistan",
+   "group": "Asia",
+   "facts": {
+    "anthem": "Qaumi Taranah",
+    "continent": "Asia"
+   },
+   "blurb": "\"Qaumi Taranah\" is the national anthem of Pakistan.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/3/3a/Pakistani_national_anthem_-_United_States_Navy_Band.ogg/Pakistani_national_anthem_-_United_States_Navy_Band.ogg.mp3",
+      "credit": "United States Navy Band",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Pakistani_national_anthem_-_United_States_Navy_Band.ogg",
+      "dur": 82.2,
+      "minStart": 1
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "palau",
+   "name": "Palau",
+   "group": "Insular Oceania",
+   "facts": {
+    "anthem": "Belau rekid"
+   },
+   "blurb": "\"Belau rekid\" is the national anthem of Palau.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/8/8b/Belau_rekid_%28instrumental%29.oga/Belau_rekid_%28instrumental%29.oga.mp3",
+      "credit": "United States Navy Band",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Belau_rekid_(instrumental).oga",
+      "dur": 51.6,
+      "minStart": 1
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "panama",
+   "name": "Panama",
+   "group": "North America",
+   "facts": {
+    "anthem": "National anthem of Panama",
+    "continent": "North America"
+   },
+   "blurb": "The national anthem of Panama.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/4/4a/Panama_National_Anthem.ogg/Panama_National_Anthem.ogg.mp3",
+      "credit": "United States Navy Band",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Panama_National_Anthem.ogg",
+      "dur": 109.8,
+      "minStart": 1
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "paraguay",
+   "name": "Paraguay",
+   "group": "South America",
+   "facts": {
+    "anthem": "national anthem of Paraguay",
+    "continent": "South America"
+   },
+   "blurb": "The national anthem of Paraguay.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/a/a6/Paraguayan_National_Anthem.oga/Paraguayan_National_Anthem.oga.mp3",
+      "credit": "United States Navy Band",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Paraguayan_National_Anthem.oga",
+      "dur": 190.7,
+      "minStart": 1
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "peru",
+   "name": "Peru",
+   "group": "South America",
+   "facts": {
+    "anthem": "National Anthem of Peru",
+    "continent": "South America"
+   },
+   "blurb": "The national anthem of Peru.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/c/cc/United_States_Navy_Band_-_Marcha_Nacional_del_Per%C3%BA.ogg/United_States_Navy_Band_-_Marcha_Nacional_del_Per%C3%BA.ogg.mp3",
+      "credit": "United States Navy Band (performer) José de la Torre Ugarte (lyrics) José Bernardo Alcedo (music) Encoded in OGG by Linfocito B",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:United_States_Navy_Band_-_Marcha_Nacional_del_Per%C3%BA.ogg",
+      "dur": 189.3,
+      "minStart": 1
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "philippines",
+   "name": "Philippines",
+   "group": "Asia",
+   "facts": {
+    "anthem": "Lupang Hinirang",
+    "continent": "Asia"
+   },
+   "blurb": "\"Lupang Hinirang\" is the national anthem of Philippines.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/2/2b/Lupang_Hinirang_instrumental.ogg/Lupang_Hinirang_instrumental.ogg.mp3",
+      "credit": "United States Navy Band",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Lupang_Hinirang_instrumental.ogg",
+      "dur": 62,
+      "minStart": 1
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "poland",
+   "name": "Poland",
+   "group": "Europe",
+   "facts": {
+    "anthem": "Poland Is Not Yet Lost",
+    "continent": "Europe"
+   },
+   "blurb": "The national anthem of Poland.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/5/52/Mazurek_D%C4%85browskiego_%28official_instrumental%29.oga/Mazurek_D%C4%85browskiego_%28official_instrumental%29.oga.mp3",
+      "credit": "Unknown authorUnknown author",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Mazurek_D%C4%85browskiego_(official_instrumental).oga",
+      "dur": 45.8,
+      "minStart": 1
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "portugal",
+   "name": "Portugal",
+   "group": "Europe",
+   "facts": {
+    "anthem": "A Portuguesa",
+    "continent": "Europe"
+   },
+   "blurb": "\"A Portuguesa\" is the national anthem of Portugal.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/5/58/A_Portuguesa.ogg/A_Portuguesa.ogg.mp3",
+      "credit": "United States Navy Band",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:A_Portuguesa.ogg",
+      "dur": 70.1,
+      "minStart": 1
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "qatar",
+   "name": "Qatar",
+   "group": "Asia",
+   "facts": {
+    "anthem": "As Salam al Amiri",
+    "continent": "Asia"
+   },
+   "blurb": "\"As Salam al Amiri\" is the national anthem of Qatar.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/e/ec/National_anthem_of_Qatar.ogg/National_anthem_of_Qatar.ogg.mp3",
+      "credit": "United States Navy Band",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:National_anthem_of_Qatar.ogg",
+      "dur": 86.6,
+      "minStart": 1
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "republic-of-the-congo",
+   "name": "Republic of the Congo",
+   "group": "Africa",
+   "facts": {
+    "anthem": "La Congolaise",
+    "continent": "Africa"
+   },
+   "blurb": "\"La Congolaise\" is the national anthem of Republic of the Congo.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/d/dc/National_anthem_of_the_Republic_of_the_Congo.oga/National_anthem_of_the_Republic_of_the_Congo.oga.mp3",
+      "credit": "United States Navy Band",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:National_anthem_of_the_Republic_of_the_Congo.oga",
+      "dur": 75.3,
+      "minStart": 1
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "romania",
+   "name": "Romania",
+   "group": "Europe",
+   "facts": {
+    "anthem": "Deșteaptă-te, române!",
+    "continent": "Europe"
+   },
+   "blurb": "\"Deșteaptă-te, române!\" is the national anthem of Romania.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/7/77/Desteapta-te%2C_romane%21.ogg/Desteapta-te%2C_romane%21.ogg.mp3",
+      "credit": "United States Navy Band",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Desteapta-te,_romane!.ogg",
+      "dur": 138.7,
+      "minStart": 1
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "russia",
+   "name": "Russia",
+   "group": "Europe",
+   "facts": {
+    "anthem": "State Anthem of the Russian Federation"
+   },
+   "blurb": "The national anthem of Russia.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/f/f2/National_anthem_of_Russia%2C_performed_by_the_United_States_Navy_Band.wav/National_anthem_of_Russia%2C_performed_by_the_United_States_Navy_Band.wav.mp3",
+      "credit": "United States Navy Band",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:National_anthem_of_Russia,_performed_by_the_United_States_Navy_Band.wav",
+      "dur": 67.5,
+      "minStart": 1
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "rwanda",
+   "name": "Rwanda",
+   "group": "Africa",
+   "facts": {
+    "anthem": "Rwanda Nziza",
+    "continent": "Africa"
+   },
+   "blurb": "The national anthem of Rwanda.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/0/0e/Hymne_National_du_Rwanda.ogg/Hymne_National_du_Rwanda.ogg.mp3",
+      "credit": "United States Navy Band",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Hymne_National_du_Rwanda.ogg",
+      "dur": 138.6,
+      "minStart": 1
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "saint-kitts-and-nevis",
+   "name": "Saint Kitts and Nevis",
+   "group": "North America",
+   "facts": {
+    "anthem": "O Land of Beauty!",
+    "continent": "North America"
+   },
+   "blurb": "\"O Land of Beauty!\" is the national anthem of Saint Kitts and Nevis.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/3/3f/United_States_Navy_Band_-_O_Land_of_Beauty.ogg/United_States_Navy_Band_-_O_Land_of_Beauty.ogg.mp3",
+      "credit": "United States Navy Band",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:United_States_Navy_Band_-_O_Land_of_Beauty.ogg",
+      "dur": 62.8,
+      "minStart": 1
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "saint-lucia",
+   "name": "Saint Lucia",
+   "group": "North America",
+   "facts": {
+    "anthem": "Sons and Daughters of Saint Lucia",
+    "continent": "North America"
+   },
+   "blurb": "The national anthem of Saint Lucia.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/6/6f/National_Anthem_of_Saint_Lucia.ogg/National_Anthem_of_Saint_Lucia.ogg.mp3",
+      "credit": "United States Navy Band",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:National_Anthem_of_Saint_Lucia.ogg",
+      "dur": 43,
+      "minStart": 1
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "saint-vincent-and-the-grenadines",
+   "name": "Saint Vincent and the Grenadines",
+   "group": "North America",
+   "facts": {
+    "anthem": "Saint Vincent, Land so Beautiful",
+    "continent": "North America"
+   },
+   "blurb": "The national anthem of Saint Vincent and the Grenadines.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/b/b3/National_anthem_of_Saint_Vincent_and_the_Grenadines%2C_performed_by_the_United_States_Navy_Band.oga/National_anthem_of_Saint_Vincent_and_the_Grenadines%2C_performed_by_the_United_States_Navy_Band.oga.mp3",
+      "credit": "United States Navy Band",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:National_anthem_of_Saint_Vincent_and_the_Grenadines,_performed_by_the_United_States_Navy_Band.oga",
+      "dur": 51.4,
+      "minStart": 1
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "sao-tome-and-principe",
+   "name": "São Tomé and Príncipe",
+   "group": "Africa",
+   "facts": {
+    "anthem": "Independência total",
+    "continent": "Africa"
+   },
+   "blurb": "\"Independência total\" is the national anthem of São Tomé and Príncipe.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/a/a5/Independ%C3%AAncia_total_%28instrumental%29.ogg/Independ%C3%AAncia_total_%28instrumental%29.ogg.mp3",
+      "credit": "United States Navy Band",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Independ%C3%AAncia_total_(instrumental).ogg",
+      "dur": 124.7,
+      "minStart": 1
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "saudi-arabia",
+   "name": "Saudi Arabia",
+   "group": "Asia",
+   "facts": {
+    "anthem": "Chant of the Saudi Nation",
+    "continent": "Asia"
+   },
+   "blurb": "The national anthem of Saudi Arabia.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/6/6d/Saudi_Arabian_national_anthem%2C_performed_by_the_United_States_Navy_Band.oga/Saudi_Arabian_national_anthem%2C_performed_by_the_United_States_Navy_Band.oga.mp3",
+      "credit": "United States Navy Band",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Saudi_Arabian_national_anthem,_performed_by_the_United_States_Navy_Band.oga",
+      "dur": 38.3,
+      "minStart": 1
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "senegal",
+   "name": "Senegal",
+   "group": "Africa",
+   "facts": {
+    "anthem": "Le Lion rouge",
+    "continent": "Africa"
+   },
+   "blurb": "\"Le Lion rouge\" is the national anthem of Senegal.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/8/8c/National_Anthem_of_Senegal.ogg/National_Anthem_of_Senegal.ogg.mp3",
+      "credit": "Lyrics: Léopold Sédar Senghor Music: Herbert Pepper Performed by: United States Navy Band",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:National_Anthem_of_Senegal.ogg",
+      "dur": 55.8,
+      "minStart": 1
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "serbia",
+   "name": "Serbia",
+   "group": "Europe",
+   "facts": {
+    "anthem": "Bože pravde",
+    "continent": "Europe"
+   },
+   "blurb": "\"Bože pravde\" is the national anthem of Serbia.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/8/8e/Serbian_national_anthem%2C_instrumental.oga/Serbian_national_anthem%2C_instrumental.oga.mp3",
+      "credit": "United States Navy Band",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Serbian_national_anthem,_instrumental.oga",
+      "dur": 103.2,
+      "minStart": 1
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "seychelles",
+   "name": "Seychelles",
+   "group": "Africa",
+   "facts": {
+    "anthem": "Koste Seselwa",
+    "continent": "Africa"
+   },
+   "blurb": "\"Koste Seselwa\" is the national anthem of Seychelles.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/8/81/Koste_Seselwa_%28instrumental%29.ogg/Koste_Seselwa_%28instrumental%29.ogg.mp3",
+      "credit": "United States Navy Band",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Koste_Seselwa_(instrumental).ogg",
+      "dur": 67.2,
+      "minStart": 1
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "sierra-leone",
+   "name": "Sierra Leone",
+   "group": "Africa",
+   "facts": {
+    "anthem": "High We Exalt Thee, Realm of the Free",
+    "continent": "Africa"
+   },
+   "blurb": "\"High We Exalt Thee, Realm of the Free\" is the national anthem of Sierra Leone.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/6/69/Sierra_Leone%27s_national_anthem.ogg/Sierra_Leone%27s_national_anthem.ogg.mp3",
+      "credit": "Unknown (see source page)",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Sierra_Leone%27s_national_anthem.ogg",
+      "dur": 46.1,
+      "minStart": 1
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "singapore",
+   "name": "Singapore",
+   "group": "Asia",
+   "facts": {
+    "anthem": "Onward Singapore",
+    "continent": "Asia"
+   },
+   "blurb": "The national anthem of Singapore.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/7/74/Majulah_Singapura.ogg/Majulah_Singapura.ogg.mp3",
+      "credit": "United States Navy Band",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Majulah_Singapura.ogg",
+      "dur": 79.4,
+      "minStart": 1
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "slovakia",
+   "name": "Slovakia",
+   "group": "Europe",
+   "facts": {
+    "anthem": "Nad Tatrou sa blýska",
+    "continent": "Europe"
+   },
+   "blurb": "\"Nad Tatrou sa blýska\" is the national anthem of Slovakia.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/e/e8/Nad_Tatrou_sa_bl%C3%BDska.ogg/Nad_Tatrou_sa_bl%C3%BDska.ogg.mp3",
+      "credit": "Unknown (see source page)",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Nad_Tatrou_sa_bl%C3%BDska.ogg",
+      "dur": 33.2,
+      "minStart": 1
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "slovenia",
+   "name": "Slovenia",
+   "group": "Europe",
+   "facts": {
+    "anthem": "Zdravljica",
+    "continent": "Europe"
+   },
+   "blurb": "\"Zdravljica\" is the national anthem of Slovenia.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/3/30/Slovenia%27s_national_anthem%2C_performed_by_the_United_States_Navy_Band.oga/Slovenia%27s_national_anthem%2C_performed_by_the_United_States_Navy_Band.oga.mp3",
+      "credit": "United States Navy Band",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Slovenia%27s_national_anthem,_performed_by_the_United_States_Navy_Band.oga",
+      "dur": 56.1,
+      "minStart": 1
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "somalia",
+   "name": "Somalia",
+   "group": "Africa",
+   "facts": {
+    "anthem": "Qolobaa Calankeed",
+    "continent": "Africa"
+   },
+   "blurb": "\"Qolobaa Calankeed\" is the national anthem of Somalia.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/4/4e/Somali_national_anthem%2C_performed_by_the_United_States_Navy_Band.oga/Somali_national_anthem%2C_performed_by_the_United_States_Navy_Band.oga.mp3",
+      "credit": "United States Navy Band",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Somali_national_anthem,_performed_by_the_United_States_Navy_Band.oga",
+      "dur": 65.5,
+      "minStart": 1
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "south-africa",
+   "name": "South Africa",
+   "group": "Africa",
+   "facts": {
+    "anthem": "national anthem of Mzansi",
+    "continent": "Africa"
+   },
+   "blurb": "The national anthem of South Africa.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/1/1d/South_African_national_anthem.oga/South_African_national_anthem.oga.mp3",
+      "credit": "United States Navy Band",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:South_African_national_anthem.oga",
+      "dur": 122.6,
+      "minStart": 1
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "south-korea",
+   "name": "South Korea",
+   "group": "Asia",
+   "facts": {
+    "anthem": "Aegukga",
+    "continent": "Asia"
+   },
+   "blurb": "\"Aegukga\" is the national anthem of South Korea.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/0/0d/National_anthem_of_South_Korea%2C_performed_by_the_United_States_Navy_Band.wav/National_anthem_of_South_Korea%2C_performed_by_the_United_States_Navy_Band.wav.mp3",
+      "credit": "United States Navy Band",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:National_anthem_of_South_Korea,_performed_by_the_United_States_Navy_Band.wav",
+      "dur": 57.1,
+      "minStart": 1
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "south-sudan",
+   "name": "South Sudan",
+   "group": "Africa",
+   "facts": {
+    "anthem": "South Sudan Oyee!",
+    "continent": "Africa"
+   },
+   "blurb": "The national anthem of South Sudan.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/1/16/South_Sudan_Oyee%21_%28instrumental%29.ogg/South_Sudan_Oyee%21_%28instrumental%29.ogg.mp3",
+      "credit": "United States Navy Band",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:South_Sudan_Oyee!_(instrumental).ogg",
+      "dur": 77,
+      "minStart": 1
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "spain",
+   "name": "Spain",
+   "group": "Europe",
+   "facts": {
+    "anthem": "Marcha Real",
+    "continent": "Europe"
+   },
+   "blurb": "\"Marcha Real\" is the national anthem of Spain.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/c/c8/Marcha_Real-Royal_March_by_US_Navy_Band.ogg/Marcha_Real-Royal_March_by_US_Navy_Band.ogg.mp3",
+      "credit": "United States Navy Band",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Marcha_Real-Royal_March_by_US_Navy_Band.ogg",
+      "dur": 61.9,
+      "minStart": 1
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "sri-lanka",
+   "name": "Sri Lanka",
+   "group": "Asia",
+   "facts": {
+    "anthem": "Sri Lanka Matha",
+    "continent": "Asia"
+   },
+   "blurb": "The national anthem of Sri Lanka.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/8/8c/Sri_Lankan_national_anthem%2C_performed_by_the_United_States_Navy_Band.oga/Sri_Lankan_national_anthem%2C_performed_by_the_United_States_Navy_Band.oga.mp3",
+      "credit": "United States Navy Band",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Sri_Lankan_national_anthem,_performed_by_the_United_States_Navy_Band.oga",
+      "dur": 173.4,
+      "minStart": 1
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "sudan",
+   "name": "Sudan",
+   "group": "Africa",
+   "facts": {
+    "anthem": "Nahnu Jund Allah Jund Al-watan",
+    "continent": "Africa"
+   },
+   "blurb": "\"Nahnu Jund Allah Jund Al-watan\" is the national anthem of Sudan.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/9/9c/Sudanese_national_anthem%2C_performed_by_the_U.S._Navy_Band.oga/Sudanese_national_anthem%2C_performed_by_the_U.S._Navy_Band.oga.mp3",
+      "credit": "United States Navy Band",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Sudanese_national_anthem,_performed_by_the_U.S._Navy_Band.oga",
+      "dur": 45.6,
+      "minStart": 1
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "suriname",
+   "name": "Suriname",
+   "group": "South America",
+   "facts": {
+    "anthem": "God zij met ons Suriname",
+    "continent": "South America"
+   },
+   "blurb": "The national anthem of Suriname.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/d/d9/Surinamese_national_anthem%2C_performed_by_the_U.S._Navy_Band.ogg/Surinamese_national_anthem%2C_performed_by_the_U.S._Navy_Band.ogg.mp3",
+      "credit": "United States Navy Band",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Surinamese_national_anthem,_performed_by_the_U.S._Navy_Band.ogg",
+      "dur": 53.6,
+      "minStart": 1
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "sweden",
+   "name": "Sweden",
+   "group": "Europe",
+   "facts": {
+    "anthem": "Du gamla, du fria",
+    "continent": "Europe"
+   },
+   "blurb": "\"Du gamla, du fria\" is the national anthem of Sweden.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/0/02/United_States_Navy_Band_-_Sweden.ogg/United_States_Navy_Band_-_Sweden.ogg.mp3",
+      "credit": "United States Navy Band",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:United_States_Navy_Band_-_Sweden.ogg",
+      "dur": 87.6,
+      "minStart": 1
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "switzerland",
+   "name": "Switzerland",
+   "group": "Europe",
+   "facts": {
+    "anthem": "Swiss Psalm",
+    "continent": "Europe"
+   },
+   "blurb": "\"Swiss Psalm\" is the national anthem of Switzerland.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/0/00/Swiss_Psalm.ogg/Swiss_Psalm.ogg.mp3",
+      "credit": "United States Navy Band",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Swiss_Psalm.ogg",
+      "dur": 84.3,
+      "minStart": 1
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "syria",
+   "name": "Syria",
+   "group": "Asia",
+   "facts": {
+    "anthem": "Humat ad-Diyar",
+    "continent": "Asia"
+   },
+   "blurb": "\"Humat ad-Diyar\" is the national anthem of Syria.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/f/fc/National_Anthem_of_Syria.ogg/National_Anthem_of_Syria.ogg.mp3",
+      "credit": "United States Navy Band",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:National_Anthem_of_Syria.ogg",
+      "dur": 66.4,
+      "minStart": 1
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "tajikistan",
+   "name": "Tajikistan",
+   "group": "Asia",
+   "facts": {
+    "anthem": "National anthem of Tajikistan",
+    "continent": "Asia"
+   },
+   "blurb": "The national anthem of Tajikistan.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/b/b9/Tajikistan_anthem.ogg/Tajikistan_anthem.ogg.mp3",
+      "credit": "Unknown authorUnknown author",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Tajikistan_anthem.ogg",
+      "dur": 114.6,
+      "minStart": 1
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "tanzania",
+   "name": "Tanzania",
+   "group": "Africa",
+   "facts": {
+    "anthem": "Mungu ibariki Afrika",
+    "continent": "Africa"
+   },
+   "blurb": "\"Mungu ibariki Afrika\" is the national anthem of Tanzania.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/c/c4/Tanzanian_national_anthem%2C_performed_by_the_United_States_Navy_Band.oga/Tanzanian_national_anthem%2C_performed_by_the_United_States_Navy_Band.oga.mp3",
+      "credit": "United States Navy Band",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Tanzanian_national_anthem,_performed_by_the_United_States_Navy_Band.oga",
+      "dur": 51.6,
+      "minStart": 1
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "thailand",
+   "name": "Thailand",
+   "group": "Asia",
+   "facts": {
+    "anthem": "Thai National Anthem",
+    "continent": "Asia"
+   },
+   "blurb": "\"Thai National Anthem\" is the national anthem of Thailand.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/4/45/Phleng_Chat_Thai_%28Fine_Art_Department_Orchestra%29_-_Rabbit_Gramophone_record_N.123.ogg/Phleng_Chat_Thai_%28Fine_Art_Department_Orchestra%29_-_Rabbit_Gramophone_record_N.123.ogg.mp3",
+      "credit": "The Orchestra of the Fine Arts Department of Thailand, Government Public Relations Department (PRD)",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Phleng_Chat_Thai_(Fine_Art_Department_Orchestra)_-_Rabbit_Gramophone_record_N.123.ogg",
+      "dur": 95.5,
+      "minStart": 1
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "the-gambia",
+   "name": "The Gambia",
+   "group": "Africa",
+   "facts": {
+    "anthem": "For The Gambia Our Homeland",
+    "continent": "Africa"
+   },
+   "blurb": "The national anthem of The Gambia.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/0/05/For_The_Gambia_Our_Homeland_%28instrumental%29.ogg/For_The_Gambia_Our_Homeland_%28instrumental%29.ogg.mp3",
+      "credit": "United States Navy Band",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:For_The_Gambia_Our_Homeland_(instrumental).ogg",
+      "dur": 79.9,
+      "minStart": 1
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "timor-leste",
+   "name": "Timor-Leste",
+   "group": "Asia",
+   "facts": {
+    "anthem": "Pátria",
+    "continent": "Asia"
+   },
+   "blurb": "\"Pátria\" is the national anthem of Timor-Leste.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/2/20/East_Timorese_national_anthem.wav/East_Timorese_national_anthem.wav.mp3",
+      "credit": "United States Navy Band",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:East_Timorese_national_anthem.wav",
+      "dur": 129.2,
+      "minStart": 1
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "tonga",
+   "name": "Tonga",
+   "group": "Oceania",
+   "facts": {
+    "anthem": "Ko e fasi 'o e tu'i 'o e 'Otu Tonga",
+    "continent": "Oceania"
+   },
+   "blurb": "The national anthem of Tonga.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/1/18/Ko_e_fasi_%CA%BBo_e_tu%CA%BBi_%CA%BBo_e_%CA%BBOtu_Tonga.ogg/Ko_e_fasi_%CA%BBo_e_tu%CA%BBi_%CA%BBo_e_%CA%BBOtu_Tonga.ogg.mp3",
+      "credit": "Lyricist: Prince Uelingatoni Ngū Tupoumalohi Composer: Karl Gustavus Schmitt",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Ko_e_fasi_%CA%BBo_e_tu%CA%BBi_%CA%BBo_e_%CA%BBOtu_Tonga.ogg",
+      "dur": 49,
+      "minStart": 1
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "tunisia",
+   "name": "Tunisia",
+   "group": "Africa",
+   "facts": {
+    "anthem": "Humat Al Hima",
+    "continent": "Africa"
+   },
+   "blurb": "\"Humat Al Hima\" is the national anthem of Tunisia.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/2/23/Humat_al-Hima.ogg/Humat_al-Hima.ogg.mp3",
+      "credit": "United States Navy Band",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Humat_al-Hima.ogg",
+      "dur": 52.4,
+      "minStart": 1
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "turkey",
+   "name": "Turkey",
+   "group": "Europe",
+   "facts": {
+    "anthem": "İstiklâl Marşı"
+   },
+   "blurb": "\"İstiklâl Marşı\" is the national anthem of Turkey.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/9/99/Istikl%C3%A2l_Marsi_instrumetal.ogg/Istikl%C3%A2l_Marsi_instrumetal.ogg.mp3",
+      "credit": "United States Navy Band",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Istikl%C3%A2l_Marsi_instrumetal.ogg",
+      "dur": 76.3,
+      "minStart": 1
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "turkmenistan",
+   "name": "Turkmenistan",
+   "group": "Asia",
+   "facts": {
+    "anthem": "National anthem of Turkmenistan",
+    "continent": "Asia"
+   },
+   "blurb": "The national anthem of Turkmenistan.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/f/f0/National_anthem_of_Turkmenistan%2C_performed_by_the_United_States_Navy_Band.oga/National_anthem_of_Turkmenistan%2C_performed_by_the_United_States_Navy_Band.oga.mp3",
+      "credit": "United States Navy Band",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:National_anthem_of_Turkmenistan,_performed_by_the_United_States_Navy_Band.oga",
+      "dur": 119.9,
+      "minStart": 1
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "uganda",
+   "name": "Uganda",
+   "group": "Africa",
+   "facts": {
+    "anthem": "Oh Uganda, Land of Beauty",
+    "continent": "Africa"
+   },
+   "blurb": "The national anthem of Uganda.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/6/64/Ugandan_national_anthem%2C_performed_by_the_U.S._Navy_Band.ogg/Ugandan_national_anthem%2C_performed_by_the_U.S._Navy_Band.ogg.mp3",
+      "credit": "United States Navy Band",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Ugandan_national_anthem,_performed_by_the_U.S._Navy_Band.ogg",
+      "dur": 43.6,
+      "minStart": 1
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "ukraine",
+   "name": "Ukraine",
+   "group": "Europe",
+   "facts": {
+    "anthem": "Shche ne vmerla Ukrainy i slava, i volia",
+    "continent": "Europe"
+   },
+   "blurb": "\"Shche ne vmerla Ukrainy i slava, i volia\" is the national anthem of Ukraine.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/0/09/Ukrainian_National_Anthem_played_by_U.S._Navy_Band.mp3",
+      "credit": "United States Navy Band",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Ukrainian_National_Anthem_played_by_U.S._Navy_Band.mp3",
+      "dur": 79.4,
+      "minStart": 1
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "united-arab-emirates",
+   "name": "United Arab Emirates",
+   "group": "Asia",
+   "facts": {
+    "anthem": "Ishy Bilady",
+    "continent": "Asia"
+   },
+   "blurb": "\"Ishy Bilady\" is the national anthem of United Arab Emirates.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/9/92/UAE_national_anthem.ogg/UAE_national_anthem.ogg.mp3",
+      "credit": "United States Navy Band",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:UAE_national_anthem.ogg",
+      "dur": 48.5,
+      "minStart": 1
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "united-kingdom",
+   "name": "United Kingdom",
+   "group": "Europe",
+   "facts": {
+    "anthem": "God Save the King",
+    "continent": "Europe"
+   },
+   "blurb": "\"God Save the King\" is the national anthem of United Kingdom.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/7/71/U.S._Navy_Band_-_God_Save_the_King.oga/U.S._Navy_Band_-_God_Save_the_King.oga.mp3",
+      "credit": "United States Navy Band",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:U.S._Navy_Band_-_God_Save_the_King.oga",
+      "dur": 49.9,
+      "minStart": 1
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "united-states",
+   "name": "United States",
+   "group": "North America",
+   "facts": {
+    "anthem": "The Star-Spangled Banner",
+    "continent": "North America"
+   },
+   "blurb": "\"The Star-Spangled Banner\" is the national anthem of United States.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/2/25/%22The_Star-Spangled_Banner%22_performed_by_the_United_States_Navy_Band.mp3",
+      "credit": "United States Navy Band",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:%22The_Star-Spangled_Banner%22_performed_by_the_United_States_Navy_Band.mp3",
+      "dur": 77.7,
+      "minStart": 1
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "uruguay",
+   "name": "Uruguay",
+   "group": "South America",
+   "facts": {
+    "anthem": "National Anthem of Uruguay",
+    "continent": "South America"
+   },
+   "blurb": "The national anthem of Uruguay.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/b/bb/HimnoNacionalUruguay.ogg/HimnoNacionalUruguay.ogg.mp3",
+      "credit": "Unknown (see source page)",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:HimnoNacionalUruguay.ogg",
+      "dur": 270.6,
+      "minStart": 1
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "uzbekistan",
+   "name": "Uzbekistan",
+   "group": "Asia",
+   "facts": {
+    "anthem": "National Anthem of Uzbekistan",
+    "continent": "Asia"
+   },
+   "blurb": "The national anthem of Uzbekistan.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/a/af/Uzbekistan_anthem.ogg/Uzbekistan_anthem.ogg.mp3",
+      "credit": "Mutal Burhonov / Abdulla Oripov",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Uzbekistan_anthem.ogg",
+      "dur": 148.7,
+      "minStart": 1
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "vanuatu",
+   "name": "Vanuatu",
+   "group": "Insular Oceania",
+   "facts": {
+    "anthem": "Yumi, Yumi",
+    "continent": "Insular Oceania"
+   },
+   "blurb": "\"Yumi, Yumi\" is the national anthem of Vanuatu.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/7/7f/United_States_Navy_Band_-_Yumi%2C_Yumi%2C_Yumi.ogg/United_States_Navy_Band_-_Yumi%2C_Yumi%2C_Yumi.ogg.mp3",
+      "credit": "Performed by the United States Navy Band",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:United_States_Navy_Band_-_Yumi,_Yumi,_Yumi.ogg",
+      "dur": 59.1,
+      "minStart": 1
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "vatican-city",
+   "name": "Vatican City",
+   "group": "Europe",
+   "facts": {
+    "anthem": "Inno e Marcia Pontificale",
+    "continent": "Europe"
+   },
+   "blurb": "\"Inno e Marcia Pontificale\" is the national anthem of Vatican City.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/d/d1/United_States_Navy_Band_-_Inno_e_Marcia_Pontificale.ogg/United_States_Navy_Band_-_Inno_e_Marcia_Pontificale.ogg.mp3",
+      "credit": "United States Navy Band",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:United_States_Navy_Band_-_Inno_e_Marcia_Pontificale.ogg",
+      "dur": 193.4,
+      "minStart": 1
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "venezuela",
+   "name": "Venezuela",
+   "group": "South America",
+   "facts": {
+    "anthem": "gloria al bravo pueblo",
+    "continent": "South America"
+   },
+   "blurb": "\"gloria al bravo pueblo\" is the national anthem of Venezuela.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/6/6f/Gloria_al_Bravo_Pueblo_instrumental.ogg/Gloria_al_Bravo_Pueblo_instrumental.ogg.mp3",
+      "credit": "United States Navy Band",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Gloria_al_Bravo_Pueblo_instrumental.ogg",
+      "dur": 90.8,
+      "minStart": 1
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "vietnam",
+   "name": "Vietnam",
+   "group": "Asia",
+   "facts": {
+    "anthem": "Tiến Quân Ca",
+    "continent": "Asia"
+   },
+   "blurb": "\"Tiến Quân Ca\" is the national anthem of Vietnam.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/c/c0/Vietnamese_Ti%E1%BA%BFn_Qu%C3%A2n_Ca.ogg/Vietnamese_Ti%E1%BA%BFn_Qu%C3%A2n_Ca.ogg.mp3",
+      "credit": "Nguyễn Văn Cao",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Vietnamese_Ti%E1%BA%BFn_Qu%C3%A2n_Ca.ogg",
+      "dur": 62.1,
+      "minStart": 1
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "yemen",
+   "name": "Yemen",
+   "group": "Asia",
+   "facts": {
+    "anthem": "National anthem of Yemen",
+    "continent": "Asia"
+   },
+   "blurb": "The national anthem of Yemen.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/3/35/National_Anthem_of_the_Republic_of_Yemen.oga/National_Anthem_of_the_Republic_of_Yemen.oga.mp3",
+      "credit": "Ayoob Tarish / Abdullah Abdulwahab Noman",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:National_Anthem_of_the_Republic_of_Yemen.oga",
+      "dur": 95.1,
+      "minStart": 1
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "zambia",
+   "name": "Zambia",
+   "group": "Africa",
+   "facts": {
+    "anthem": "Stand and Sing of Zambia, Proud and Free",
+    "continent": "Africa"
+   },
+   "blurb": "The national anthem of Zambia.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/2/25/National_anthem_of_Zambia.oga/National_anthem_of_Zambia.oga.mp3",
+      "credit": "Unknown (see source page)",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:National_anthem_of_Zambia.oga",
+      "dur": 117,
+      "minStart": 1
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "zimbabwe",
+   "name": "Zimbabwe",
+   "group": "Africa",
+   "facts": {
+    "anthem": "National Anthem of Zimbabwe",
+    "continent": "Africa"
+   },
+   "blurb": "The national anthem of Zimbabwe.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/9/97/National_Anthem_of_Zimbabwe.ogg/National_Anthem_of_Zimbabwe.ogg.mp3",
+      "credit": "Fred Lecture Changundega",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:National_Anthem_of_Zimbabwe.ogg",
+      "dur": 97,
+      "minStart": 1
+     }
+    ]
+   },
+   "difficulty": 3
+  }
+ ],
+ "questions": [],
+ "sources": [
+  {
+   "name": "Wikidata (country → anthem → audio)",
+   "url": "https://www.wikidata.org"
+  },
+  {
+   "name": "Wikimedia Commons; most recordings by the United States Navy Band (US government work, public domain)",
+   "url": "https://commons.wikimedia.org/wiki/Category:Audio_files_of_national_anthems_performed_by_the_United_States_Navy_Band"
+  }
+ ],
+ "built": "2026-10-04"
+}

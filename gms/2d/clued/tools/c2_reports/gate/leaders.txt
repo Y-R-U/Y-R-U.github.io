@@ -1,0 +1,12 @@
+leaders/henry-viii: dropped clue leaking "king": He was a Tudor king who married six times.
+leaders/elizabeth-i: dropped clue leaking "quee": She never married and was called the Virgin Queen.
+leaders/louis-xiv: dropped clue leaking "king": He became king at the age of four.
+leaders/louis-xiv: only 4 clean clues -> no ladder
+leaders/peter-the-great: dropped clue leaking "grea": He defeated Sweden in the Great Northern War.
+leaders/peter-the-great: only 4 clean clues -> no ladder
+leaders/charles-de-gaulle: dropped img with licence "No restrictions"
+leaders/indira-gandhi: dropped clue leaking "indi": Her father was India's first prime minister.
+leaders/indira-gandhi: dropped clue leaking "indi": Nationality: Indian.
+leaders/indira-gandhi: dropped clue leaking "indi": She was India's first female prime minister.
+leaders/indira-gandhi: only 3 clean clues -> no ladder
+leaders/elizabeth-ii: dropped clue leaking "quee": She became queen while in Kenya in 1952.

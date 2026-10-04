@@ -1,0 +1,733 @@
+{
+ "id": "kids-film-tv",
+ "title": "Kids' film & TV songs",
+ "theme": "music",
+ "icon": "🧸",
+ "kids": true,
+ "version": 1,
+ "notice": "30-second previews stream from Apple Music.",
+ "factsMeta": {
+  "composer": {
+   "type": "cat",
+   "label": "Composer / artist"
+  },
+  "year": {
+   "type": "year",
+   "label": "Film or show year",
+   "higherLabel": "Newer"
+  },
+  "decade": {
+   "type": "cat",
+   "label": "Decade"
+  },
+  "track": {
+   "type": "text",
+   "label": "Track"
+  },
+  "type": {
+   "type": "cat",
+   "label": "Film or TV"
+  }
+ },
+ "items": [
+  {
+   "id": "frozen",
+   "name": "Frozen",
+   "group": "film",
+   "facts": {
+    "composer": "Kristen Anderson-Lopez & Robert Lopez",
+    "year": 2013,
+    "decade": "2010s",
+    "track": "Let It Go",
+    "type": "film"
+   },
+   "blurb": "\"Let It Go\" from Frozen (2013), by Kristen Anderson-Lopez & Robert Lopez.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/43/5f/36/435f3609-ddd5-bc10-3dbb-ddf5872b93ce/mzaf_9461789858996596537.plus.aac.p.m4a",
+      "credit": "Idina Menzel: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/let-it-go/1440618177?i=1440618281&uo=4",
+      "apple": {
+       "trackId": 1440618281,
+       "url": "https://music.apple.com/us/album/let-it-go/1440618177?i=1440618281&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music126/v4/4c/5d/31/4c5d3166-3a4b-fb3c-473e-1776ff947466/13DMGIM04437.rgb.jpg/300x300bb.jpg",
+       "term": "Idina Menzel Let It Go"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "the-lion-king",
+   "name": "The Lion King",
+   "group": "film",
+   "facts": {
+    "composer": "Nathan Lane",
+    "year": 1994,
+    "decade": "1990s",
+    "track": "Hakuna Matata",
+    "type": "film"
+   },
+   "blurb": "\"Hakuna Matata\" from The Lion King (1994), by Nathan Lane.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/23/c5/e0/23c5e015-8cdb-c342-f0e9-9b837887e524/mzaf_9531298863799073219.plus.aac.p.m4a",
+      "credit": "Nathan Lane: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/hakuna-matata/1440669121?i=1440669270&uo=4",
+      "apple": {
+       "trackId": 1440669270,
+       "url": "https://music.apple.com/us/album/hakuna-matata/1440669121?i=1440669270&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music126/v4/70/74/17/70741736-506d-4d62-4302-b4b0525df73b/06UMGIM20243.rgb.jpg/300x300bb.jpg",
+       "term": "Joseph Williams, Nathan Lane, Ernie Sabella & Jason Weaver Hakuna Matata"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "toy-story",
+   "name": "Toy Story",
+   "group": "film",
+   "facts": {
+    "composer": "Randy Newman",
+    "year": 1995,
+    "decade": "1990s",
+    "track": "You've Got a Friend in Me",
+    "type": "film"
+   },
+   "blurb": "\"You've Got a Friend in Me\" from Toy Story (1995), by Randy Newman.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/74/33/7d/74337de2-3b51-db2e-3f46-2b4159212c89/mzaf_1795543695107107317.plus.aac.p.m4a",
+      "credit": "Randy Newman: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/youve-got-a-friend-in-me/1452873008?i=1452873021&uo=4",
+      "apple": {
+       "trackId": 1452873021,
+       "url": "https://music.apple.com/us/album/youve-got-a-friend-in-me/1452873008?i=1452873021&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music116/v4/c5/e3/b2/c5e3b283-202e-ab76-fef2-3300b83c22e1/06PNDIM00030.rgb.jpg/300x300bb.jpg",
+       "term": "Randy Newman You've Got a Friend In Me"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "moana",
+   "name": "Moana",
+   "group": "film",
+   "facts": {
+    "composer": "Lin-Manuel Miranda",
+    "year": 2016,
+    "decade": "2010s",
+    "track": "How Far I'll Go",
+    "type": "film"
+   },
+   "blurb": "\"How Far I'll Go\" from Moana (2016), by Lin-Manuel Miranda.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/2b/7b/5f/2b7b5ff6-105b-4772-db16-6aadd2abbc7e/mzaf_11643522365606798515.plus.aac.p.m4a",
+      "credit": "Auliʻi Cravalho: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/how-far-ill-go-reprise/1440639027?i=1440639390&uo=4",
+      "apple": {
+       "trackId": 1440639390,
+       "url": "https://music.apple.com/us/album/how-far-ill-go-reprise/1440639027?i=1440639390&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music116/v4/70/69/4b/70694ba8-a93d-433c-a33b-617afef0d89d/16UMGIM75346.rgb.jpg/300x300bb.jpg",
+       "term": "Auli'i Cravalho How Far I'll Go"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "encanto",
+   "name": "Encanto",
+   "group": "film",
+   "facts": {
+    "composer": "Carolina Gaitán",
+    "year": 2021,
+    "decade": "2020s",
+    "track": "We Don't Talk About Bruno",
+    "type": "film"
+   },
+   "blurb": "\"We Don't Talk About Bruno\" from Encanto (2021), by Carolina Gaitán.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/55/0a/76/550a76f2-cf9c-3e07-8b9c-5c210e73af44/mzaf_13858819433882654714.plus.aac.p.m4a",
+      "credit": "Carolina Gaitán: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/we-dont-talk-about-bruno/1594677532?i=1594677760&uo=4",
+      "apple": {
+       "trackId": 1594677760,
+       "url": "https://music.apple.com/us/album/we-dont-talk-about-bruno/1594677532?i=1594677760&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music126/v4/94/4d/9a/944d9a8d-0549-f537-5706-5b083bd84a7d/21UM1IM38949.rgb.jpg/300x300bb.jpg",
+       "term": "Carolina Gaitán - La Gaita, Mauro Castillo, Adassa, Rhenzy Feliz, Diane Guerrero, Stephanie Beatriz & Encanto - Cast We Don't Talk About Bruno"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "the-little-mermaid",
+   "name": "The Little Mermaid",
+   "group": "film",
+   "facts": {
+    "composer": "Alan Menken & Howard Ashman",
+    "year": 1989,
+    "decade": "1980s",
+    "track": "Under the Sea",
+    "type": "film"
+   },
+   "blurb": "\"Under the Sea\" from The Little Mermaid (1989), by Alan Menken & Howard Ashman.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/96/8b/31/968b311d-5de1-6e41-6d7c-232531c5f6b7/mzaf_14548831440903679312.plus.aac.p.m4a",
+      "credit": "Samuel E. Wright: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/under-the-sea-soundtrack-version/1440800202?i=1440800842&uo=4",
+      "apple": {
+       "trackId": 1440800842,
+       "url": "https://music.apple.com/us/album/under-the-sea-soundtrack-version/1440800202?i=1440800842&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music116/v4/9d/ac/c7/9dacc74e-b872-6876-e5f8-15cf467e8673/06PNDIM00132.rgb.jpg/300x300bb.jpg",
+       "term": "Samuel E. Wright Under the Sea"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "aladdin",
+   "name": "Aladdin",
+   "group": "film",
+   "facts": {
+    "composer": "Brad Kane & Lea Salonga",
+    "year": 1992,
+    "decade": "1990s",
+    "track": "A Whole New World",
+    "type": "film"
+   },
+   "blurb": "\"A Whole New World\" from Aladdin (1992), by Brad Kane & Lea Salonga.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/7e/96/7c/7e967cd9-5173-9b3e-ae63-ae447ed54bf9/mzaf_3070032430026156155.plus.aac.p.m4a",
+      "credit": "Brad Kane & Lea Salonga: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/a-whole-new-world-soundtrack-version/1445883238?i=1445883291&uo=4",
+      "apple": {
+       "trackId": 1445883291,
+       "url": "https://music.apple.com/us/album/a-whole-new-world-soundtrack-version/1445883238?i=1445883291&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music126/v4/df/fc/e2/dffce2e5-96b6-52e5-a2d3-6034b5d59fe7/06PNDIM00287.rgb.jpg/300x300bb.jpg",
+       "term": "Lea Salonga & Brad Kane A Whole New World"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "beauty-and-the-beast",
+   "name": "Beauty and the Beast",
+   "group": "film",
+   "facts": {
+    "composer": "Jerry Orbach",
+    "year": 1991,
+    "decade": "1990s",
+    "track": "Be Our Guest",
+    "type": "film"
+   },
+   "blurb": "\"Be Our Guest\" from Beauty and the Beast (1991), by Jerry Orbach.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/2b/9b/ff/2b9bff5c-399c-f3a6-01ff-2b693536e77a/mzaf_6445695624391292657.plus.aac.p.m4a",
+      "credit": "Jerry Orbach: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/be-our-guest/1442223901?i=1442224230&uo=4",
+      "apple": {
+       "trackId": 1442224230,
+       "url": "https://music.apple.com/us/album/be-our-guest/1442223901?i=1442224230&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music116/v4/48/a7/96/48a79622-ac37-7301-815d-2122a01a2c2d/09DMGIM00256.rgb.jpg/300x300bb.jpg",
+       "term": "Angela Lansbury & Jerry Orbach Be Our Guest"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "the-jungle-book",
+   "name": "The Jungle Book",
+   "group": "film",
+   "facts": {
+    "composer": "Phil Harris",
+    "year": 1967,
+    "decade": "1960s",
+    "track": "The Bare Necessities",
+    "type": "film"
+   },
+   "blurb": "\"The Bare Necessities\" from The Jungle Book (1967), by Phil Harris.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/0c/bb/1f/0cbb1f9a-02ea-b941-7c84-dea0b6014d64/mzaf_17888398751453113835.plus.aac.p.m4a",
+      "credit": "Phil Harris: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/the-bare-necessities/1442849458?i=1442849462&uo=4",
+      "apple": {
+       "trackId": 1442849462,
+       "url": "https://music.apple.com/us/album/the-bare-necessities/1442849458?i=1442849462&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music125/v4/08/91/c8/0891c870-dcdb-0eab-f5b1-e69a9d120050/00050087305062.rgb.jpg/300x300bb.jpg",
+       "term": "Phil Harris & Bruce Reitherman The Bare Necessities"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "mary-poppins",
+   "name": "Mary Poppins",
+   "group": "film",
+   "facts": {
+    "composer": "Julie Andrews",
+    "year": 1964,
+    "decade": "1960s",
+    "track": "Supercalifragilisticexpialidocious",
+    "type": "film"
+   },
+   "blurb": "\"Supercalifragilisticexpialidocious\" from Mary Poppins (1964), by Julie Andrews.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/4f/a3/8a/4fa38aa4-9f06-6d13-ed88-d76e31c3432f/mzaf_12162048678624997974.plus.aac.p.m4a",
+      "credit": "Julie Andrews: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/supercalifragilisticexpialidocious/1440796512?i=1440796668&uo=4",
+      "apple": {
+       "trackId": 1440796668,
+       "url": "https://music.apple.com/us/album/supercalifragilisticexpialidocious/1440796512?i=1440796668&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/67/2e/9b/672e9bf3-5683-c815-a11c-891c1ca70afe/00050086070671.rgb.jpg/300x300bb.jpg",
+       "term": "Julie Andrews, Dick Van Dyke & The Pearly Chorus Supercalifragilisticexpialidocious"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "shrek-2",
+   "name": "Shrek 2",
+   "group": "film",
+   "facts": {
+    "composer": "Counting Crows",
+    "year": 2004,
+    "decade": "2000s",
+    "track": "Accidentally in Love",
+    "type": "film"
+   },
+   "blurb": "\"Accidentally in Love\" from Shrek 2 (2004), by Counting Crows.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/2c/22/84/2c22841f-e537-04ab-66c7-161bf4ed82a3/mzaf_1236889440739051979.plus.aac.p.m4a",
+      "credit": "Counting Crows: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/accidentally-in-love/1440894190?i=1440894560&uo=4",
+      "apple": {
+       "trackId": 1440894560,
+       "url": "https://music.apple.com/us/album/accidentally-in-love/1440894190?i=1440894560&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music114/v4/ad/d8/60/add860cf-25d5-1867-29c9-0ffa9c7f1435/17UMGIM83107.rgb.jpg/300x300bb.jpg",
+       "term": "Counting Crows Accidentally In Love"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "coco",
+   "name": "Coco",
+   "group": "film",
+   "facts": {
+    "composer": "Anthony Gonzalez",
+    "year": 2017,
+    "decade": "2010s",
+    "track": "Remember Me (Lullaby)",
+    "type": "film"
+   },
+   "blurb": "\"Remember Me (Lullaby)\" from Coco (2017), by Anthony Gonzalez.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/5f/be/5c/5fbe5c03-98de-6b8f-d097-802288ec2dac/mzaf_7941742492039834890.plus.aac.p.m4a",
+      "credit": "Anthony Gonzalez: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/remember-me-reunion/1440671241?i=1440671628&uo=4",
+      "apple": {
+       "trackId": 1440671628,
+       "url": "https://music.apple.com/us/album/remember-me-reunion/1440671241?i=1440671628&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music116/v4/de/77/a2/de77a26f-b88b-48a7-cd70-5e3cfdda4340/17UM1IM33595.rgb.jpg/300x300bb.jpg",
+       "term": "Anthony Gonzalez & Ana Ofelia Murguía Remember Me"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "zootopia",
+   "name": "Zootopia",
+   "alt": [
+    "Zootropolis"
+   ],
+   "group": "film",
+   "facts": {
+    "composer": "Shakira, Sia & Stargate",
+    "year": 2016,
+    "decade": "2010s",
+    "track": "Try Everything",
+    "type": "film"
+   },
+   "blurb": "\"Try Everything\" from Zootopia (2016), by Shakira, Sia & Stargate.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/28/c8/2d/28c82d58-fe60-4517-a0da-e322fe96e979/mzaf_16490713264143380765.plus.aac.p.m4a",
+      "credit": "Shakira: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/try-everything/1440666610?i=1440667007&uo=4",
+      "apple": {
+       "trackId": 1440667007,
+       "url": "https://music.apple.com/us/album/try-everything/1440666610?i=1440667007&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music125/v4/fc/ee/c0/fceec0ae-a090-e3c5-4610-6737e64ac37e/00050087343491.rgb.jpg/300x300bb.jpg",
+       "term": "Shakira Try Everything"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "the-lego-movie",
+   "name": "The Lego Movie",
+   "alt": [
+    "Lego Movie"
+   ],
+   "group": "film",
+   "facts": {
+    "composer": "Shawn Patterson",
+    "year": 2014,
+    "decade": "2010s",
+    "track": "Everything Is Awesome",
+    "type": "film"
+   },
+   "blurb": "\"Everything Is Awesome\" from The Lego Movie (2014), by Shawn Patterson.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/8f/cb/cb/8fcbcb32-5e44-19c6-dfc0-e2c6816a5e39/mzaf_4286585567839047743.plus.aac.p.m4a",
+      "credit": "Tegan and Sara: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/everything-is-awesome-feat-the-lonely-island/1455294723?i=1455294724&uo=4",
+      "apple": {
+       "trackId": 1455294724,
+       "url": "https://music.apple.com/us/album/everything-is-awesome-feat-the-lonely-island/1455294723?i=1455294724&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/45/2b/77/452b7757-a5c0-7124-cc5e-3f47dd03ba37/794043174278.jpg/300x300bb.jpg",
+       "term": "Tegan and Sara Everything Is AWESOME!!!"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "despicable-me-2",
+   "name": "Despicable Me 2",
+   "group": "film",
+   "facts": {
+    "composer": "Pharrell Williams",
+    "year": 2013,
+    "decade": "2010s",
+    "track": "Happy",
+    "type": "film"
+   },
+   "blurb": "\"Happy\" from Despicable Me 2 (2013), by Pharrell Williams.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/ed/a0/19/eda019cf-2794-66d1-208d-2e2e74c26c3d/mzaf_16469762943852039623.plus.aac.p.m4a",
+      "credit": "Pharrell Williams: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/happy-from-despicable-me-2/863835302?i=863835363&uo=4",
+      "apple": {
+       "trackId": 863835363,
+       "url": "https://music.apple.com/us/album/happy-from-despicable-me-2/863835302?i=863835363&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/76/ff/5e/76ff5ee0-7ab4-2ac2-2598-486a9ccc06e1/886444516877.jpg/300x300bb.jpg",
+       "term": "Pharrell Williams Happy"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "trolls",
+   "name": "Trolls",
+   "group": "film",
+   "facts": {
+    "composer": "Justin Timberlake, Max Martin & Shellback",
+    "year": 2016,
+    "decade": "2010s",
+    "track": "CAN'T STOP THE FEELING!",
+    "type": "film"
+   },
+   "blurb": "\"CAN'T STOP THE FEELING!\" from Trolls (2016), by Justin Timberlake, Max Martin & Shellback.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/86/41/2d/86412d20-2f4d-39fc-221b-3f643d7c99c6/mzaf_9909715182585785919.plus.aac.p.m4a",
+      "credit": "Justin Timberlake: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/cant-stop-the-feeling/1154238159?i=1154239184&uo=4",
+      "apple": {
+       "trackId": 1154239184,
+       "url": "https://music.apple.com/us/album/cant-stop-the-feeling/1154238159?i=1154239184&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music125/v4/68/19/43/68194388-efa7-3afe-8a15-a4c3eebef1f6/886445915211.jpg/300x300bb.jpg",
+       "term": "Justin Timberlake CAN'T STOP THE FEELING!"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "kpop-demon-hunters",
+   "name": "KPop Demon Hunters",
+   "group": "film",
+   "facts": {
+    "composer": "EJAE, Mark Sonnenblick & co.",
+    "year": 2025,
+    "decade": "2020s",
+    "track": "Golden",
+    "type": "film"
+   },
+   "blurb": "\"Golden\" from KPop Demon Hunters (2025), by EJAE, Mark Sonnenblick & co..",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/4a/9d/a1/4a9da1c4-096f-8f45-4a3b-c883c45ca451/mzaf_3059921854949935161.plus.aac.p.m4a",
+      "credit": "HUNTR/X: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/golden/1820264137?i=1820264150&uo=4",
+      "apple": {
+       "trackId": 1820264150,
+       "url": "https://music.apple.com/us/album/golden/1820264137?i=1820264150&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/e1/15/42/e1154273-8ecd-5702-e6e6-597f28001681/25UMGIM82363.rgb.jpg/300x300bb.jpg",
+       "term": "HUNTR/X, EJAE, AUDREY NUNA, REI AMI & KPop Demon Hunters Cast Golden"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "baby-shark-pinkfong",
+   "name": "Baby Shark (Pinkfong)",
+   "group": "tv",
+   "facts": {
+    "composer": "Pinkfong (traditional)",
+    "year": 2016,
+    "decade": "2010s",
+    "track": "Baby Shark",
+    "type": "tv"
+   },
+   "blurb": "\"Baby Shark\" from Baby Shark (Pinkfong) (2016), by Pinkfong (traditional).",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview122/v4/ce/14/03/ce140319-f694-6add-7154-1b27081754f2/mzaf_18090742853773046350.plus.aac.p.m4a",
+      "credit": "Pinkfong: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/baby-shark/1659934562?i=1659936145&uo=4",
+      "apple": {
+       "trackId": 1659936145,
+       "url": "https://music.apple.com/us/album/baby-shark/1659934562?i=1659936145&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music122/v4/b9/73/21/b97321cd-e2c8-d163-4e28-683f42868e9e/197187708697.jpg/300x300bb.jpg",
+       "term": "Pinkfong Baby Shark"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "spongebob-squarepants",
+   "name": "SpongeBob SquarePants",
+   "group": "tv",
+   "facts": {
+    "composer": "SpongeBob SquarePants",
+    "year": 1999,
+    "decade": "1990s",
+    "track": "SpongeBob SquarePants Theme Song",
+    "type": "tv"
+   },
+   "blurb": "\"SpongeBob SquarePants Theme Song\" from SpongeBob SquarePants (1999), by SpongeBob SquarePants.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/05/80/08/05800899-f4f8-13c2-21d3-2562986a0a22/mzaf_6342369800636876740.plus.aac.p.m4a",
+      "credit": "SpongeBob SquarePants: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/spongebob-squarepants-theme-song/283379708?i=283379766&uo=4",
+      "apple": {
+       "trackId": 283379766,
+       "url": "https://music.apple.com/us/album/spongebob-squarepants-theme-song/283379708?i=283379766&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/28/a7/22/28a72224-17e2-1a8c-ad05-c7e7e641f94b/mzi.tdharqvw.jpg/300x300bb.jpg",
+       "term": "SpongeBob SquarePants SpongeBob SquarePants Theme Song"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "bluey",
+   "name": "Bluey",
+   "group": "tv",
+   "facts": {
+    "composer": "Joff Bush",
+    "year": 2018,
+    "decade": "2010s",
+    "track": "Bluey Theme Tune",
+    "type": "tv"
+   },
+   "blurb": "\"Bluey Theme Tune\" from Bluey (2018), by Joff Bush.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview124/v4/97/9d/ae/979dae4e-57b6-bd32-f508-c6f1a2416c3d/mzaf_6714119277373559954.plus.aac.p.m4a",
+      "credit": "Joff Bush: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/bluey-theme-tune-instrument-parade/1539220729?i=1539220734&uo=4",
+      "apple": {
+       "trackId": 1539220734,
+       "url": "https://music.apple.com/us/album/bluey-theme-tune-instrument-parade/1539220729?i=1539220734&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/aa/81/36/aa8136b3-621a-3aab-6946-cdb9cf09f053/5032698639649.jpg/300x300bb.jpg",
+       "term": "Bluey & Joff Bush Bluey Theme Tune"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "paw-patrol",
+   "name": "PAW Patrol",
+   "group": "tv",
+   "facts": {
+    "composer": "PAW Patrol",
+    "year": 2013,
+    "decade": "2010s",
+    "track": "PAW Patrol Theme",
+    "type": "tv"
+   },
+   "blurb": "\"PAW Patrol Theme\" from PAW Patrol (2013), by PAW Patrol.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/0e/23/a8/0e23a8ae-2cb1-8fdc-8a6b-0172e521fd09/mzaf_12034050214155489332.plus.aac.p.m4a",
+      "credit": "PAW Patrol: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/paw-patrol-opening-theme/1655415605?i=1655415610&uo=4",
+      "apple": {
+       "trackId": 1655415610,
+       "url": "https://music.apple.com/us/album/paw-patrol-opening-theme/1655415605?i=1655415610&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music122/v4/f0/95/ac/f095ac35-9a2e-7f99-2d97-f1f7a25fdc9b/22UMGIM93123.rgb.jpg/300x300bb.jpg",
+       "term": "PAW Patrol PAW Patrol Opening Theme"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "the-greatest-showman",
+   "name": "The Greatest Showman",
+   "group": "film",
+   "facts": {
+    "composer": "Hugh Jackman",
+    "year": 2017,
+    "decade": "2010s",
+    "track": "The Greatest Show",
+    "type": "film"
+   },
+   "blurb": "\"The Greatest Show\" from The Greatest Showman (2017), by Hugh Jackman.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/5a/54/57/5a5457cf-b8b6-b4b6-519a-3b5c51935874/mzaf_16006901226336003675.plus.aac.p.m4a",
+      "credit": "Hugh Jackman: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/the-greatest-show/1436091603?i=1436091607&uo=4",
+      "apple": {
+       "trackId": 1436091607,
+       "url": "https://music.apple.com/us/album/the-greatest-show/1436091603?i=1436091607&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music125/v4/cf/91/b0/cf91b07c-aca2-4511-e61c-63d13b8d1117/075679868770.jpg/300x300bb.jpg",
+       "term": "Hugh Jackman, Keala Settle, Zac Efron, Zendaya & The Greatest Showman Ensemble The Greatest Show"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 1
+  }
+ ],
+ "questions": [],
+ "sources": [
+  {
+   "name": "Curated by Clued from original soundtrack albums on Apple Music"
+  },
+  {
+   "name": "Apple iTunes Search API (previews, artwork, links)",
+   "url": "https://performance-partners.apple.com/search-api"
+  }
+ ],
+ "built": "2026-10-04"
+}

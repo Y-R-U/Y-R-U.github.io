@@ -1,0 +1,7911 @@
+{
+ "id": "capitals",
+ "title": "Capitals",
+ "theme": "geography",
+ "icon": "🏛️",
+ "kids": false,
+ "version": 1,
+ "notice": "Contested capitals (Israel, Palestine, Yemen) and Nauru (no official capital) are left out.",
+ "leakExempt": [
+  "people",
+  "peoples",
+  "republic",
+  "state",
+  "states",
+  "united",
+  "islands",
+  "island",
+  "kingdom",
+  "democratic",
+  "federal",
+  "federated",
+  "saint",
+  "new",
+  "north",
+  "south",
+  "east",
+  "west",
+  "central",
+  "great"
+ ],
+ "factsMeta": {
+  "country": {
+   "type": "text",
+   "label": "Country"
+  },
+  "continent": {
+   "type": "cat",
+   "label": "Continent",
+   "ask": "Which continent is {name} in?",
+   "stmt": "{name} is in {value}."
+  }
+ },
+ "items": [
+  {
+   "id": "kabul",
+   "name": "Kabul",
+   "alt": [],
+   "iso3": "AFG",
+   "group": "Asia",
+   "facts": {
+    "country": "Afghanistan",
+    "continent": "Asia"
+   },
+   "blurb": "Kabul is the capital of Afghanistan.",
+   "difficulty": 2
+  },
+  {
+   "id": "tirana",
+   "name": "Tirana",
+   "alt": [],
+   "iso3": "ALB",
+   "group": "Europe",
+   "facts": {
+    "country": "Albania",
+    "continent": "Europe"
+   },
+   "blurb": "Tirana is the capital of Albania.",
+   "difficulty": 3
+  },
+  {
+   "id": "algiers",
+   "name": "Algiers",
+   "alt": [],
+   "iso3": "DZA",
+   "group": "Africa",
+   "facts": {
+    "country": "Algeria",
+    "continent": "Africa"
+   },
+   "blurb": "Algiers is the capital of Algeria.",
+   "difficulty": 2
+  },
+  {
+   "id": "andorra-la-vella",
+   "name": "Andorra la Vella",
+   "alt": [],
+   "iso3": "AND",
+   "group": "Europe",
+   "facts": {
+    "country": "Andorra",
+    "continent": "Europe"
+   },
+   "blurb": "Andorra la Vella is the capital of Andorra.",
+   "difficulty": 3
+  },
+  {
+   "id": "luanda",
+   "name": "Luanda",
+   "alt": [],
+   "iso3": "AGO",
+   "group": "Africa",
+   "facts": {
+    "country": "Angola",
+    "continent": "Africa"
+   },
+   "blurb": "Luanda is the capital of Angola.",
+   "difficulty": 2
+  },
+  {
+   "id": "st-john-s",
+   "name": "St. John's",
+   "alt": [],
+   "iso3": "ATG",
+   "group": "North America",
+   "facts": {
+    "country": "Antigua and Barbuda",
+    "continent": "North America"
+   },
+   "blurb": "St. John's is the capital of Antigua and Barbuda.",
+   "difficulty": 3
+  },
+  {
+   "id": "buenos-aires",
+   "name": "Buenos Aires",
+   "alt": [],
+   "iso3": "ARG",
+   "group": "South America",
+   "facts": {
+    "country": "Argentina",
+    "continent": "South America"
+   },
+   "blurb": "Buenos Aires is the capital of Argentina.",
+   "difficulty": 1
+  },
+  {
+   "id": "yerevan",
+   "name": "Yerevan",
+   "alt": [],
+   "iso3": "ARM",
+   "group": "Asia",
+   "facts": {
+    "country": "Armenia",
+    "continent": "Asia"
+   },
+   "blurb": "Yerevan is the capital of Armenia.",
+   "difficulty": 2
+  },
+  {
+   "id": "canberra",
+   "name": "Canberra",
+   "alt": [],
+   "iso3": "AUS",
+   "group": "Oceania",
+   "facts": {
+    "country": "Australia",
+    "continent": "Oceania"
+   },
+   "blurb": "Canberra is the capital of Australia.",
+   "difficulty": 1
+  },
+  {
+   "id": "vienna",
+   "name": "Vienna",
+   "alt": [],
+   "iso3": "AUT",
+   "group": "Europe",
+   "facts": {
+    "country": "Austria",
+    "continent": "Europe"
+   },
+   "blurb": "Vienna is the capital of Austria.",
+   "difficulty": 1
+  },
+  {
+   "id": "baku",
+   "name": "Baku",
+   "alt": [],
+   "iso3": "AZE",
+   "group": "Asia",
+   "facts": {
+    "country": "Azerbaijan",
+    "continent": "Asia"
+   },
+   "blurb": "Baku is the capital of Azerbaijan.",
+   "difficulty": 2
+  },
+  {
+   "id": "nassau",
+   "name": "Nassau",
+   "alt": [],
+   "iso3": "BHS",
+   "group": "North America",
+   "facts": {
+    "country": "Bahamas",
+    "continent": "North America"
+   },
+   "blurb": "Nassau is the capital of Bahamas.",
+   "difficulty": 3
+  },
+  {
+   "id": "manama",
+   "name": "Manama",
+   "alt": [],
+   "iso3": "BHR",
+   "group": "Asia",
+   "facts": {
+    "country": "Bahrain",
+    "continent": "Asia"
+   },
+   "blurb": "Manama is the capital of Bahrain.",
+   "difficulty": 3
+  },
+  {
+   "id": "dhaka",
+   "name": "Dhaka",
+   "alt": [],
+   "iso3": "BGD",
+   "group": "Asia",
+   "facts": {
+    "country": "Bangladesh",
+    "continent": "Asia"
+   },
+   "blurb": "Dhaka is the capital of Bangladesh.",
+   "difficulty": 2
+  },
+  {
+   "id": "bridgetown",
+   "name": "Bridgetown",
+   "alt": [],
+   "iso3": "BRB",
+   "group": "North America",
+   "facts": {
+    "country": "Barbados",
+    "continent": "North America"
+   },
+   "blurb": "Bridgetown is the capital of Barbados.",
+   "difficulty": 3
+  },
+  {
+   "id": "minsk",
+   "name": "Minsk",
+   "alt": [],
+   "iso3": "BLR",
+   "group": "Europe",
+   "facts": {
+    "country": "Belarus",
+    "continent": "Europe"
+   },
+   "blurb": "Minsk is the capital of Belarus.",
+   "difficulty": 2
+  },
+  {
+   "id": "brussels",
+   "name": "Brussels",
+   "alt": [],
+   "iso3": "BEL",
+   "group": "Europe",
+   "facts": {
+    "country": "Belgium",
+    "continent": "Europe"
+   },
+   "blurb": "Brussels is the capital of Belgium.",
+   "difficulty": 1
+  },
+  {
+   "id": "belmopan",
+   "name": "Belmopan",
+   "alt": [],
+   "iso3": "BLZ",
+   "group": "North America",
+   "facts": {
+    "country": "Belize",
+    "continent": "North America"
+   },
+   "blurb": "Belmopan is the capital of Belize.",
+   "difficulty": 3
+  },
+  {
+   "id": "porto-novo",
+   "name": "Porto-Novo",
+   "alt": [],
+   "iso3": "BEN",
+   "group": "Africa",
+   "facts": {
+    "country": "Benin",
+    "continent": "Africa"
+   },
+   "blurb": "Porto-Novo is the capital of Benin. Porto-Novo is the official capital; Cotonou is the seat of government.",
+   "difficulty": 2
+  },
+  {
+   "id": "thimphu",
+   "name": "Thimphu",
+   "alt": [],
+   "iso3": "BTN",
+   "group": "Asia",
+   "facts": {
+    "country": "Bhutan",
+    "continent": "Asia"
+   },
+   "blurb": "Thimphu is the capital of Bhutan.",
+   "difficulty": 3
+  },
+  {
+   "id": "sucre",
+   "name": "Sucre",
+   "alt": [
+    "La Paz"
+   ],
+   "iso3": "BOL",
+   "group": "South America",
+   "facts": {
+    "country": "Bolivia",
+    "continent": "South America"
+   },
+   "blurb": "Sucre is the capital of Bolivia. Sucre is the constitutional capital; La Paz is the seat of government.",
+   "difficulty": 2
+  },
+  {
+   "id": "sarajevo",
+   "name": "Sarajevo",
+   "alt": [],
+   "iso3": "BIH",
+   "group": "Europe",
+   "facts": {
+    "country": "Bosnia and Herzegovina",
+    "continent": "Europe"
+   },
+   "blurb": "Sarajevo is the capital of Bosnia and Herzegovina.",
+   "difficulty": 2
+  },
+  {
+   "id": "gaborone",
+   "name": "Gaborone",
+   "alt": [],
+   "iso3": "BWA",
+   "group": "Africa",
+   "facts": {
+    "country": "Botswana",
+    "continent": "Africa"
+   },
+   "blurb": "Gaborone is the capital of Botswana.",
+   "difficulty": 3
+  },
+  {
+   "id": "brasilia",
+   "name": "Brasília",
+   "alt": [],
+   "iso3": "BRA",
+   "group": "South America",
+   "facts": {
+    "country": "Brazil",
+    "continent": "South America"
+   },
+   "blurb": "Brasília is the capital of Brazil.",
+   "difficulty": 1
+  },
+  {
+   "id": "bandar-seri-begawan",
+   "name": "Bandar Seri Begawan",
+   "alt": [],
+   "iso3": "BRN",
+   "group": "Asia",
+   "facts": {
+    "country": "Brunei",
+    "continent": "Asia"
+   },
+   "blurb": "Bandar Seri Begawan is the capital of Brunei.",
+   "difficulty": 3
+  },
+  {
+   "id": "sofia",
+   "name": "Sofia",
+   "alt": [],
+   "iso3": "BGR",
+   "group": "Europe",
+   "facts": {
+    "country": "Bulgaria",
+    "continent": "Europe"
+   },
+   "blurb": "Sofia is the capital of Bulgaria.",
+   "difficulty": 2
+  },
+  {
+   "id": "ouagadougou",
+   "name": "Ouagadougou",
+   "alt": [],
+   "iso3": "BFA",
+   "group": "Africa",
+   "facts": {
+    "country": "Burkina Faso",
+    "continent": "Africa"
+   },
+   "blurb": "Ouagadougou is the capital of Burkina Faso.",
+   "difficulty": 2
+  },
+  {
+   "id": "gitega",
+   "name": "Gitega",
+   "alt": [],
+   "iso3": "BDI",
+   "group": "Africa",
+   "facts": {
+    "country": "Burundi",
+    "continent": "Africa"
+   },
+   "blurb": "Gitega is the capital of Burundi. Gitega became the political capital in 2019; Bujumbura remains the economic capital.",
+   "difficulty": 2
+  },
+  {
+   "id": "phnom-penh",
+   "name": "Phnom Penh",
+   "alt": [],
+   "iso3": "KHM",
+   "group": "Asia",
+   "facts": {
+    "country": "Cambodia",
+    "continent": "Asia"
+   },
+   "blurb": "Phnom Penh is the capital of Cambodia.",
+   "difficulty": 2
+  },
+  {
+   "id": "yaounde",
+   "name": "Yaoundé",
+   "alt": [],
+   "iso3": "CMR",
+   "group": "Africa",
+   "facts": {
+    "country": "Cameroon",
+    "continent": "Africa"
+   },
+   "blurb": "Yaoundé is the capital of Cameroon.",
+   "difficulty": 2
+  },
+  {
+   "id": "ottawa",
+   "name": "Ottawa",
+   "alt": [],
+   "iso3": "CAN",
+   "group": "North America",
+   "facts": {
+    "country": "Canada",
+    "continent": "North America"
+   },
+   "blurb": "Ottawa is the capital of Canada.",
+   "difficulty": 1
+  },
+  {
+   "id": "praia",
+   "name": "Praia",
+   "alt": [],
+   "iso3": "CPV",
+   "group": "Africa",
+   "facts": {
+    "country": "Cape Verde",
+    "continent": "Africa"
+   },
+   "blurb": "Praia is the capital of Cape Verde.",
+   "difficulty": 3
+  },
+  {
+   "id": "bangui",
+   "name": "Bangui",
+   "alt": [],
+   "iso3": "CAF",
+   "group": "Africa",
+   "facts": {
+    "country": "Central African Republic",
+    "continent": "Africa"
+   },
+   "blurb": "Bangui is the capital of Central African Republic.",
+   "difficulty": 2
+  },
+  {
+   "id": "n-djamena",
+   "name": "N'Djamena",
+   "alt": [],
+   "iso3": "TCD",
+   "group": "Africa",
+   "facts": {
+    "country": "Chad",
+    "continent": "Africa"
+   },
+   "blurb": "N'Djamena is the capital of Chad.",
+   "difficulty": 2
+  },
+  {
+   "id": "santiago",
+   "name": "Santiago",
+   "alt": [],
+   "iso3": "CHL",
+   "group": "South America",
+   "facts": {
+    "country": "Chile",
+    "continent": "South America"
+   },
+   "blurb": "Santiago is the capital of Chile.",
+   "difficulty": 1
+  },
+  {
+   "id": "beijing",
+   "name": "Beijing",
+   "alt": [],
+   "iso3": "CHN",
+   "group": "Asia",
+   "facts": {
+    "country": "China",
+    "continent": "Asia"
+   },
+   "blurb": "Beijing is the capital of China.",
+   "difficulty": 1
+  },
+  {
+   "id": "bogota",
+   "name": "Bogotá",
+   "alt": [],
+   "iso3": "COL",
+   "group": "South America",
+   "facts": {
+    "country": "Colombia",
+    "continent": "South America"
+   },
+   "blurb": "Bogotá is the capital of Colombia.",
+   "difficulty": 2
+  },
+  {
+   "id": "moroni",
+   "name": "Moroni",
+   "alt": [],
+   "iso3": "COM",
+   "group": "Africa",
+   "facts": {
+    "country": "Comoros",
+    "continent": "Africa"
+   },
+   "blurb": "Moroni is the capital of Comoros.",
+   "difficulty": 3
+  },
+  {
+   "id": "kinshasa",
+   "name": "Kinshasa",
+   "alt": [],
+   "iso3": "COD",
+   "group": "Africa",
+   "facts": {
+    "country": "Democratic Republic of the Congo",
+    "continent": "Africa"
+   },
+   "blurb": "Kinshasa is the capital of Democratic Republic of the Congo.",
+   "difficulty": 2
+  },
+  {
+   "id": "brazzaville",
+   "name": "Brazzaville",
+   "alt": [],
+   "iso3": "COG",
+   "group": "Africa",
+   "facts": {
+    "country": "Republic of the Congo",
+    "continent": "Africa"
+   },
+   "blurb": "Brazzaville is the capital of Republic of the Congo.",
+   "difficulty": 2
+  },
+  {
+   "id": "san-jose",
+   "name": "San José",
+   "alt": [],
+   "iso3": "CRI",
+   "group": "North America",
+   "facts": {
+    "country": "Costa Rica",
+    "continent": "North America"
+   },
+   "blurb": "San José is the capital of Costa Rica.",
+   "difficulty": 2
+  },
+  {
+   "id": "yamoussoukro",
+   "name": "Yamoussoukro",
+   "alt": [],
+   "iso3": "CIV",
+   "group": "Africa",
+   "facts": {
+    "country": "Ivory Coast",
+    "continent": "Africa"
+   },
+   "blurb": "Yamoussoukro is the capital of Ivory Coast. Yamoussoukro is the official capital; Abidjan is the largest city.",
+   "difficulty": 2
+  },
+  {
+   "id": "zagreb",
+   "name": "Zagreb",
+   "alt": [],
+   "iso3": "HRV",
+   "group": "Europe",
+   "facts": {
+    "country": "Croatia",
+    "continent": "Europe"
+   },
+   "blurb": "Zagreb is the capital of Croatia.",
+   "difficulty": 2
+  },
+  {
+   "id": "havana",
+   "name": "Havana",
+   "alt": [],
+   "iso3": "CUB",
+   "group": "North America",
+   "facts": {
+    "country": "Cuba",
+    "continent": "North America"
+   },
+   "blurb": "Havana is the capital of Cuba.",
+   "difficulty": 1
+  },
+  {
+   "id": "nicosia",
+   "name": "Nicosia",
+   "alt": [],
+   "iso3": "CYP",
+   "group": "Asia",
+   "facts": {
+    "country": "Cyprus",
+    "continent": "Asia"
+   },
+   "blurb": "Nicosia is the capital of Cyprus.",
+   "difficulty": 3
+  },
+  {
+   "id": "prague",
+   "name": "Prague",
+   "alt": [],
+   "iso3": "CZE",
+   "group": "Europe",
+   "facts": {
+    "country": "Czechia",
+    "continent": "Europe"
+   },
+   "blurb": "Prague is the capital of Czechia.",
+   "difficulty": 2
+  },
+  {
+   "id": "copenhagen",
+   "name": "Copenhagen",
+   "alt": [],
+   "iso3": "DNK",
+   "group": "Europe",
+   "facts": {
+    "country": "Denmark",
+    "continent": "Europe"
+   },
+   "blurb": "Copenhagen is the capital of Denmark.",
+   "difficulty": 1
+  },
+  {
+   "id": "djibouti-city",
+   "name": "Djibouti",
+   "alt": [],
+   "iso3": "DJI",
+   "group": "Africa",
+   "facts": {
+    "country": "Djibouti",
+    "continent": "Africa"
+   },
+   "blurb": "Djibouti is the capital of Djibouti.",
+   "difficulty": 3
+  },
+  {
+   "id": "roseau",
+   "name": "Roseau",
+   "alt": [],
+   "iso3": "DMA",
+   "group": "North America",
+   "facts": {
+    "country": "Dominica",
+    "continent": "North America"
+   },
+   "blurb": "Roseau is the capital of Dominica.",
+   "difficulty": 3
+  },
+  {
+   "id": "santo-domingo",
+   "name": "Santo Domingo",
+   "alt": [],
+   "iso3": "DOM",
+   "group": "North America",
+   "facts": {
+    "country": "Dominican Republic",
+    "continent": "North America"
+   },
+   "blurb": "Santo Domingo is the capital of Dominican Republic.",
+   "difficulty": 2
+  },
+  {
+   "id": "quito",
+   "name": "Quito",
+   "alt": [],
+   "iso3": "ECU",
+   "group": "South America",
+   "facts": {
+    "country": "Ecuador",
+    "continent": "South America"
+   },
+   "blurb": "Quito is the capital of Ecuador.",
+   "difficulty": 2
+  },
+  {
+   "id": "cairo",
+   "name": "Cairo",
+   "alt": [],
+   "iso3": "EGY",
+   "group": "Africa",
+   "facts": {
+    "country": "Egypt",
+    "continent": "Africa"
+   },
+   "blurb": "Cairo is the capital of Egypt.",
+   "difficulty": 1
+  },
+  {
+   "id": "san-salvador",
+   "name": "San Salvador",
+   "alt": [],
+   "iso3": "SLV",
+   "group": "North America",
+   "facts": {
+    "country": "El Salvador",
+    "continent": "North America"
+   },
+   "blurb": "San Salvador is the capital of El Salvador.",
+   "difficulty": 2
+  },
+  {
+   "id": "asmara",
+   "name": "Asmara",
+   "alt": [],
+   "iso3": "ERI",
+   "group": "Africa",
+   "facts": {
+    "country": "Eritrea",
+    "continent": "Africa"
+   },
+   "blurb": "Asmara is the capital of Eritrea.",
+   "difficulty": 2
+  },
+  {
+   "id": "tallinn",
+   "name": "Tallinn",
+   "alt": [],
+   "iso3": "EST",
+   "group": "Europe",
+   "facts": {
+    "country": "Estonia",
+    "continent": "Europe"
+   },
+   "blurb": "Tallinn is the capital of Estonia.",
+   "difficulty": 3
+  },
+  {
+   "id": "mbabane",
+   "name": "Mbabane",
+   "alt": [
+    "Lobamba"
+   ],
+   "iso3": "SWZ",
+   "group": "Africa",
+   "facts": {
+    "country": "Eswatini",
+    "continent": "Africa"
+   },
+   "blurb": "Mbabane is the capital of Eswatini. Mbabane is the executive capital; Lobamba is the royal and legislative capital.",
+   "difficulty": 3
+  },
+  {
+   "id": "addis-ababa",
+   "name": "Addis Ababa",
+   "alt": [],
+   "iso3": "ETH",
+   "group": "Africa",
+   "facts": {
+    "country": "Ethiopia",
+    "continent": "Africa"
+   },
+   "blurb": "Addis Ababa is the capital of Ethiopia.",
+   "difficulty": 2
+  },
+  {
+   "id": "suva",
+   "name": "Suva",
+   "alt": [],
+   "iso3": "FJI",
+   "group": "Oceania",
+   "facts": {
+    "country": "Fiji",
+    "continent": "Oceania"
+   },
+   "blurb": "Suva is the capital of Fiji.",
+   "difficulty": 3
+  },
+  {
+   "id": "helsinki",
+   "name": "Helsinki",
+   "alt": [],
+   "iso3": "FIN",
+   "group": "Europe",
+   "facts": {
+    "country": "Finland",
+    "continent": "Europe"
+   },
+   "blurb": "Helsinki is the capital of Finland.",
+   "difficulty": 1
+  },
+  {
+   "id": "paris",
+   "name": "Paris",
+   "alt": [],
+   "iso3": "FRA",
+   "group": "Europe",
+   "facts": {
+    "country": "France",
+    "continent": "Europe"
+   },
+   "blurb": "Paris is the capital of France.",
+   "difficulty": 1
+  },
+  {
+   "id": "libreville",
+   "name": "Libreville",
+   "alt": [],
+   "iso3": "GAB",
+   "group": "Africa",
+   "facts": {
+    "country": "Gabon",
+    "continent": "Africa"
+   },
+   "blurb": "Libreville is the capital of Gabon.",
+   "difficulty": 3
+  },
+  {
+   "id": "banjul",
+   "name": "Banjul",
+   "alt": [],
+   "iso3": "GMB",
+   "group": "Africa",
+   "facts": {
+    "country": "Gambia",
+    "continent": "Africa"
+   },
+   "blurb": "Banjul is the capital of Gambia.",
+   "difficulty": 3
+  },
+  {
+   "id": "tbilisi",
+   "name": "Tbilisi",
+   "alt": [],
+   "iso3": "GEO",
+   "group": "Asia",
+   "facts": {
+    "country": "Georgia",
+    "continent": "Asia"
+   },
+   "blurb": "Tbilisi is the capital of Georgia.",
+   "difficulty": 2
+  },
+  {
+   "id": "berlin",
+   "name": "Berlin",
+   "alt": [],
+   "iso3": "DEU",
+   "group": "Europe",
+   "facts": {
+    "country": "Germany",
+    "continent": "Europe"
+   },
+   "blurb": "Berlin is the capital of Germany.",
+   "difficulty": 1
+  },
+  {
+   "id": "accra",
+   "name": "Accra",
+   "alt": [],
+   "iso3": "GHA",
+   "group": "Africa",
+   "facts": {
+    "country": "Ghana",
+    "continent": "Africa"
+   },
+   "blurb": "Accra is the capital of Ghana.",
+   "difficulty": 2
+  },
+  {
+   "id": "athens",
+   "name": "Athens",
+   "alt": [],
+   "iso3": "GRC",
+   "group": "Europe",
+   "facts": {
+    "country": "Greece",
+    "continent": "Europe"
+   },
+   "blurb": "Athens is the capital of Greece.",
+   "difficulty": 1
+  },
+  {
+   "id": "st-george-s",
+   "name": "St. George's",
+   "alt": [],
+   "iso3": "GRD",
+   "group": "North America",
+   "facts": {
+    "country": "Grenada",
+    "continent": "North America"
+   },
+   "blurb": "St. George's is the capital of Grenada.",
+   "difficulty": 3
+  },
+  {
+   "id": "guatemala-city",
+   "name": "Guatemala City",
+   "alt": [],
+   "iso3": "GTM",
+   "group": "North America",
+   "facts": {
+    "country": "Guatemala",
+    "continent": "North America"
+   },
+   "blurb": "Guatemala City is the capital of Guatemala.",
+   "difficulty": 2
+  },
+  {
+   "id": "conakry",
+   "name": "Conakry",
+   "alt": [],
+   "iso3": "GIN",
+   "group": "Africa",
+   "facts": {
+    "country": "Guinea",
+    "continent": "Africa"
+   },
+   "blurb": "Conakry is the capital of Guinea.",
+   "difficulty": 2
+  },
+  {
+   "id": "bissau",
+   "name": "Bissau",
+   "alt": [],
+   "iso3": "GNB",
+   "group": "Africa",
+   "facts": {
+    "country": "Guinea-Bissau",
+    "continent": "Africa"
+   },
+   "blurb": "Bissau is the capital of Guinea-Bissau.",
+   "difficulty": 3
+  },
+  {
+   "id": "georgetown",
+   "name": "Georgetown",
+   "alt": [],
+   "iso3": "GUY",
+   "group": "South America",
+   "facts": {
+    "country": "Guyana",
+    "continent": "South America"
+   },
+   "blurb": "Georgetown is the capital of Guyana.",
+   "difficulty": 3
+  },
+  {
+   "id": "port-au-prince",
+   "name": "Port-au-Prince",
+   "alt": [],
+   "iso3": "HTI",
+   "group": "North America",
+   "facts": {
+    "country": "Haiti",
+    "continent": "North America"
+   },
+   "blurb": "Port-au-Prince is the capital of Haiti.",
+   "difficulty": 2
+  },
+  {
+   "id": "tegucigalpa",
+   "name": "Tegucigalpa",
+   "alt": [],
+   "iso3": "HND",
+   "group": "North America",
+   "facts": {
+    "country": "Honduras",
+    "continent": "North America"
+   },
+   "blurb": "Tegucigalpa is the capital of Honduras.",
+   "difficulty": 2
+  },
+  {
+   "id": "budapest",
+   "name": "Budapest",
+   "alt": [],
+   "iso3": "HUN",
+   "group": "Europe",
+   "facts": {
+    "country": "Hungary",
+    "continent": "Europe"
+   },
+   "blurb": "Budapest is the capital of Hungary.",
+   "difficulty": 2
+  },
+  {
+   "id": "reykjavik",
+   "name": "Reykjavík",
+   "alt": [],
+   "iso3": "ISL",
+   "group": "Europe",
+   "facts": {
+    "country": "Iceland",
+    "continent": "Europe"
+   },
+   "blurb": "Reykjavík is the capital of Iceland.",
+   "difficulty": 1
+  },
+  {
+   "id": "new-delhi",
+   "name": "New Delhi",
+   "alt": [],
+   "iso3": "IND",
+   "group": "Asia",
+   "facts": {
+    "country": "India",
+    "continent": "Asia"
+   },
+   "blurb": "New Delhi is the capital of India.",
+   "difficulty": 1
+  },
+  {
+   "id": "jakarta",
+   "name": "Jakarta",
+   "alt": [],
+   "iso3": "IDN",
+   "group": "Asia",
+   "facts": {
+    "country": "Indonesia",
+    "continent": "Asia"
+   },
+   "blurb": "Jakarta is the capital of Indonesia. Jakarta is the capital; a move to the new city of Nusantara is under way.",
+   "difficulty": 2
+  },
+  {
+   "id": "tehran",
+   "name": "Tehran",
+   "alt": [],
+   "iso3": "IRN",
+   "group": "Asia",
+   "facts": {
+    "country": "Iran",
+    "continent": "Asia"
+   },
+   "blurb": "Tehran is the capital of Iran.",
+   "difficulty": 2
+  },
+  {
+   "id": "baghdad",
+   "name": "Baghdad",
+   "alt": [],
+   "iso3": "IRQ",
+   "group": "Asia",
+   "facts": {
+    "country": "Iraq",
+    "continent": "Asia"
+   },
+   "blurb": "Baghdad is the capital of Iraq.",
+   "difficulty": 2
+  },
+  {
+   "id": "dublin",
+   "name": "Dublin",
+   "alt": [],
+   "iso3": "IRL",
+   "group": "Europe",
+   "facts": {
+    "country": "Ireland",
+    "continent": "Europe"
+   },
+   "blurb": "Dublin is the capital of Ireland.",
+   "difficulty": 1
+  },
+  {
+   "id": "rome",
+   "name": "Rome",
+   "alt": [],
+   "iso3": "ITA",
+   "group": "Europe",
+   "facts": {
+    "country": "Italy",
+    "continent": "Europe"
+   },
+   "blurb": "Rome is the capital of Italy.",
+   "difficulty": 1
+  },
+  {
+   "id": "kingston",
+   "name": "Kingston",
+   "alt": [],
+   "iso3": "JAM",
+   "group": "North America",
+   "facts": {
+    "country": "Jamaica",
+    "continent": "North America"
+   },
+   "blurb": "Kingston is the capital of Jamaica.",
+   "difficulty": 1
+  },
+  {
+   "id": "tokyo",
+   "name": "Tokyo",
+   "alt": [],
+   "iso3": "JPN",
+   "group": "Asia",
+   "facts": {
+    "country": "Japan",
+    "continent": "Asia"
+   },
+   "blurb": "Tokyo is the capital of Japan.",
+   "difficulty": 1
+  },
+  {
+   "id": "amman",
+   "name": "Amman",
+   "alt": [],
+   "iso3": "JOR",
+   "group": "Asia",
+   "facts": {
+    "country": "Jordan",
+    "continent": "Asia"
+   },
+   "blurb": "Amman is the capital of Jordan.",
+   "difficulty": 2
+  },
+  {
+   "id": "astana",
+   "name": "Astana",
+   "alt": [],
+   "iso3": "KAZ",
+   "group": "Asia",
+   "facts": {
+    "country": "Kazakhstan",
+    "continent": "Asia"
+   },
+   "blurb": "Astana is the capital of Kazakhstan.",
+   "difficulty": 2
+  },
+  {
+   "id": "nairobi",
+   "name": "Nairobi",
+   "alt": [],
+   "iso3": "KEN",
+   "group": "Africa",
+   "facts": {
+    "country": "Kenya",
+    "continent": "Africa"
+   },
+   "blurb": "Nairobi is the capital of Kenya.",
+   "difficulty": 1
+  },
+  {
+   "id": "south-tarawa",
+   "name": "South Tarawa",
+   "alt": [],
+   "iso3": "KIR",
+   "group": "Oceania",
+   "facts": {
+    "country": "Kiribati",
+    "continent": "Oceania"
+   },
+   "blurb": "South Tarawa is the capital of Kiribati.",
+   "difficulty": 3
+  },
+  {
+   "id": "kuwait-city",
+   "name": "Kuwait City",
+   "alt": [],
+   "iso3": "KWT",
+   "group": "Asia",
+   "facts": {
+    "country": "Kuwait",
+    "continent": "Asia"
+   },
+   "blurb": "Kuwait City is the capital of Kuwait.",
+   "difficulty": 2
+  },
+  {
+   "id": "bishkek",
+   "name": "Bishkek",
+   "alt": [],
+   "iso3": "KGZ",
+   "group": "Asia",
+   "facts": {
+    "country": "Kyrgyzstan",
+    "continent": "Asia"
+   },
+   "blurb": "Bishkek is the capital of Kyrgyzstan.",
+   "difficulty": 2
+  },
+  {
+   "id": "vientiane",
+   "name": "Vientiane",
+   "alt": [],
+   "iso3": "LAO",
+   "group": "Asia",
+   "facts": {
+    "country": "Laos",
+    "continent": "Asia"
+   },
+   "blurb": "Vientiane is the capital of Laos.",
+   "difficulty": 2
+  },
+  {
+   "id": "riga",
+   "name": "Riga",
+   "alt": [],
+   "iso3": "LVA",
+   "group": "Europe",
+   "facts": {
+    "country": "Latvia",
+    "continent": "Europe"
+   },
+   "blurb": "Riga is the capital of Latvia.",
+   "difficulty": 3
+  },
+  {
+   "id": "beirut",
+   "name": "Beirut",
+   "alt": [],
+   "iso3": "LBN",
+   "group": "Asia",
+   "facts": {
+    "country": "Lebanon",
+    "continent": "Asia"
+   },
+   "blurb": "Beirut is the capital of Lebanon.",
+   "difficulty": 2
+  },
+  {
+   "id": "maseru",
+   "name": "Maseru",
+   "alt": [],
+   "iso3": "LSO",
+   "group": "Africa",
+   "facts": {
+    "country": "Lesotho",
+    "continent": "Africa"
+   },
+   "blurb": "Maseru is the capital of Lesotho.",
+   "difficulty": 3
+  },
+  {
+   "id": "monrovia",
+   "name": "Monrovia",
+   "alt": [],
+   "iso3": "LBR",
+   "group": "Africa",
+   "facts": {
+    "country": "Liberia",
+    "continent": "Africa"
+   },
+   "blurb": "Monrovia is the capital of Liberia.",
+   "difficulty": 2
+  },
+  {
+   "id": "tripoli",
+   "name": "Tripoli",
+   "alt": [],
+   "iso3": "LBY",
+   "group": "Africa",
+   "facts": {
+    "country": "Libya",
+    "continent": "Africa"
+   },
+   "blurb": "Tripoli is the capital of Libya.",
+   "difficulty": 2
+  },
+  {
+   "id": "vaduz",
+   "name": "Vaduz",
+   "alt": [],
+   "iso3": "LIE",
+   "group": "Europe",
+   "facts": {
+    "country": "Liechtenstein",
+    "continent": "Europe"
+   },
+   "blurb": "Vaduz is the capital of Liechtenstein.",
+   "difficulty": 3
+  },
+  {
+   "id": "vilnius",
+   "name": "Vilnius",
+   "alt": [],
+   "iso3": "LTU",
+   "group": "Europe",
+   "facts": {
+    "country": "Lithuania",
+    "continent": "Europe"
+   },
+   "blurb": "Vilnius is the capital of Lithuania.",
+   "difficulty": 3
+  },
+  {
+   "id": "luxembourg-city",
+   "name": "Luxembourg",
+   "alt": [],
+   "iso3": "LUX",
+   "group": "Europe",
+   "facts": {
+    "country": "Luxembourg",
+    "continent": "Europe"
+   },
+   "blurb": "Luxembourg is the capital of Luxembourg.",
+   "difficulty": 3
+  },
+  {
+   "id": "antananarivo",
+   "name": "Antananarivo",
+   "alt": [],
+   "iso3": "MDG",
+   "group": "Africa",
+   "facts": {
+    "country": "Madagascar",
+    "continent": "Africa"
+   },
+   "blurb": "Antananarivo is the capital of Madagascar.",
+   "difficulty": 2
+  },
+  {
+   "id": "lilongwe",
+   "name": "Lilongwe",
+   "alt": [],
+   "iso3": "MWI",
+   "group": "Africa",
+   "facts": {
+    "country": "Malawi",
+    "continent": "Africa"
+   },
+   "blurb": "Lilongwe is the capital of Malawi.",
+   "difficulty": 2
+  },
+  {
+   "id": "kuala-lumpur",
+   "name": "Kuala Lumpur",
+   "alt": [],
+   "iso3": "MYS",
+   "group": "Asia",
+   "facts": {
+    "country": "Malaysia",
+    "continent": "Asia"
+   },
+   "blurb": "Kuala Lumpur is the capital of Malaysia. Kuala Lumpur is the capital; Putrajaya is the administrative centre.",
+   "difficulty": 2
+  },
+  {
+   "id": "male",
+   "name": "Malé",
+   "alt": [],
+   "iso3": "MDV",
+   "group": "Asia",
+   "facts": {
+    "country": "Maldives",
+    "continent": "Asia"
+   },
+   "blurb": "Malé is the capital of Maldives.",
+   "difficulty": 3
+  },
+  {
+   "id": "bamako",
+   "name": "Bamako",
+   "alt": [],
+   "iso3": "MLI",
+   "group": "Africa",
+   "facts": {
+    "country": "Mali",
+    "continent": "Africa"
+   },
+   "blurb": "Bamako is the capital of Mali.",
+   "difficulty": 2
+  },
+  {
+   "id": "valletta",
+   "name": "Valletta",
+   "alt": [],
+   "iso3": "MLT",
+   "group": "Europe",
+   "facts": {
+    "country": "Malta",
+    "continent": "Europe"
+   },
+   "blurb": "Valletta is the capital of Malta.",
+   "difficulty": 3
+  },
+  {
+   "id": "majuro",
+   "name": "Majuro",
+   "alt": [],
+   "iso3": "MHL",
+   "group": "Oceania",
+   "facts": {
+    "country": "Marshall Islands",
+    "continent": "Oceania"
+   },
+   "blurb": "Majuro is the capital of Marshall Islands.",
+   "difficulty": 3
+  },
+  {
+   "id": "nouakchott",
+   "name": "Nouakchott",
+   "alt": [],
+   "iso3": "MRT",
+   "group": "Africa",
+   "facts": {
+    "country": "Mauritania",
+    "continent": "Africa"
+   },
+   "blurb": "Nouakchott is the capital of Mauritania.",
+   "difficulty": 2
+  },
+  {
+   "id": "port-louis",
+   "name": "Port Louis",
+   "alt": [],
+   "iso3": "MUS",
+   "group": "Africa",
+   "facts": {
+    "country": "Mauritius",
+    "continent": "Africa"
+   },
+   "blurb": "Port Louis is the capital of Mauritius.",
+   "difficulty": 3
+  },
+  {
+   "id": "mexico-city",
+   "name": "Mexico City",
+   "alt": [],
+   "iso3": "MEX",
+   "group": "North America",
+   "facts": {
+    "country": "Mexico",
+    "continent": "North America"
+   },
+   "blurb": "Mexico City is the capital of Mexico.",
+   "difficulty": 1
+  },
+  {
+   "id": "palikir",
+   "name": "Palikir",
+   "alt": [],
+   "iso3": "FSM",
+   "group": "Oceania",
+   "facts": {
+    "country": "Micronesia",
+    "continent": "Oceania"
+   },
+   "blurb": "Palikir is the capital of Micronesia.",
+   "difficulty": 3
+  },
+  {
+   "id": "chisinau",
+   "name": "Chișinău",
+   "alt": [],
+   "iso3": "MDA",
+   "group": "Europe",
+   "facts": {
+    "country": "Moldova",
+    "continent": "Europe"
+   },
+   "blurb": "Chișinău is the capital of Moldova.",
+   "difficulty": 3
+  },
+  {
+   "id": "monaco-city",
+   "name": "Monaco",
+   "alt": [],
+   "iso3": "MCO",
+   "group": "Europe",
+   "facts": {
+    "country": "Monaco",
+    "continent": "Europe"
+   },
+   "blurb": "Monaco is the capital of Monaco.",
+   "difficulty": 3
+  },
+  {
+   "id": "ulaanbaatar",
+   "name": "Ulaanbaatar",
+   "alt": [],
+   "iso3": "MNG",
+   "group": "Asia",
+   "facts": {
+    "country": "Mongolia",
+    "continent": "Asia"
+   },
+   "blurb": "Ulaanbaatar is the capital of Mongolia.",
+   "difficulty": 2
+  },
+  {
+   "id": "podgorica",
+   "name": "Podgorica",
+   "alt": [],
+   "iso3": "MNE",
+   "group": "Europe",
+   "facts": {
+    "country": "Montenegro",
+    "continent": "Europe"
+   },
+   "blurb": "Podgorica is the capital of Montenegro.",
+   "difficulty": 3
+  },
+  {
+   "id": "rabat",
+   "name": "Rabat",
+   "alt": [],
+   "iso3": "MAR",
+   "group": "Africa",
+   "facts": {
+    "country": "Morocco",
+    "continent": "Africa"
+   },
+   "blurb": "Rabat is the capital of Morocco.",
+   "difficulty": 2
+  },
+  {
+   "id": "maputo",
+   "name": "Maputo",
+   "alt": [],
+   "iso3": "MOZ",
+   "group": "Africa",
+   "facts": {
+    "country": "Mozambique",
+    "continent": "Africa"
+   },
+   "blurb": "Maputo is the capital of Mozambique.",
+   "difficulty": 2
+  },
+  {
+   "id": "naypyidaw",
+   "name": "Naypyidaw",
+   "alt": [],
+   "iso3": "MMR",
+   "group": "Asia",
+   "facts": {
+    "country": "Myanmar",
+    "continent": "Asia"
+   },
+   "blurb": "Naypyidaw is the capital of Myanmar.",
+   "difficulty": 2
+  },
+  {
+   "id": "windhoek",
+   "name": "Windhoek",
+   "alt": [],
+   "iso3": "NAM",
+   "group": "Africa",
+   "facts": {
+    "country": "Namibia",
+    "continent": "Africa"
+   },
+   "blurb": "Windhoek is the capital of Namibia.",
+   "difficulty": 2
+  },
+  {
+   "id": "kathmandu",
+   "name": "Kathmandu",
+   "alt": [],
+   "iso3": "NPL",
+   "group": "Asia",
+   "facts": {
+    "country": "Nepal",
+    "continent": "Asia"
+   },
+   "blurb": "Kathmandu is the capital of Nepal.",
+   "difficulty": 2
+  },
+  {
+   "id": "amsterdam",
+   "name": "Amsterdam",
+   "alt": [],
+   "iso3": "NLD",
+   "group": "Europe",
+   "facts": {
+    "country": "Netherlands",
+    "continent": "Europe"
+   },
+   "blurb": "Amsterdam is the capital of Netherlands. Amsterdam is the constitutional capital; the government sits in The Hague.",
+   "difficulty": 1
+  },
+  {
+   "id": "wellington",
+   "name": "Wellington",
+   "alt": [],
+   "iso3": "NZL",
+   "group": "Oceania",
+   "facts": {
+    "country": "New Zealand",
+    "continent": "Oceania"
+   },
+   "blurb": "Wellington is the capital of New Zealand.",
+   "difficulty": 1
+  },
+  {
+   "id": "managua",
+   "name": "Managua",
+   "alt": [],
+   "iso3": "NIC",
+   "group": "North America",
+   "facts": {
+    "country": "Nicaragua",
+    "continent": "North America"
+   },
+   "blurb": "Managua is the capital of Nicaragua.",
+   "difficulty": 2
+  },
+  {
+   "id": "niamey",
+   "name": "Niamey",
+   "alt": [],
+   "iso3": "NER",
+   "group": "Africa",
+   "facts": {
+    "country": "Niger",
+    "continent": "Africa"
+   },
+   "blurb": "Niamey is the capital of Niger.",
+   "difficulty": 2
+  },
+  {
+   "id": "abuja",
+   "name": "Abuja",
+   "alt": [],
+   "iso3": "NGA",
+   "group": "Africa",
+   "facts": {
+    "country": "Nigeria",
+    "continent": "Africa"
+   },
+   "blurb": "Abuja is the capital of Nigeria.",
+   "difficulty": 1
+  },
+  {
+   "id": "pyongyang",
+   "name": "Pyongyang",
+   "alt": [],
+   "iso3": "PRK",
+   "group": "Asia",
+   "facts": {
+    "country": "North Korea",
+    "continent": "Asia"
+   },
+   "blurb": "Pyongyang is the capital of North Korea.",
+   "difficulty": 2
+  },
+  {
+   "id": "skopje",
+   "name": "Skopje",
+   "alt": [],
+   "iso3": "MKD",
+   "group": "Europe",
+   "facts": {
+    "country": "North Macedonia",
+    "continent": "Europe"
+   },
+   "blurb": "Skopje is the capital of North Macedonia.",
+   "difficulty": 3
+  },
+  {
+   "id": "oslo",
+   "name": "Oslo",
+   "alt": [],
+   "iso3": "NOR",
+   "group": "Europe",
+   "facts": {
+    "country": "Norway",
+    "continent": "Europe"
+   },
+   "blurb": "Oslo is the capital of Norway.",
+   "difficulty": 1
+  },
+  {
+   "id": "muscat",
+   "name": "Muscat",
+   "alt": [],
+   "iso3": "OMN",
+   "group": "Asia",
+   "facts": {
+    "country": "Oman",
+    "continent": "Asia"
+   },
+   "blurb": "Muscat is the capital of Oman.",
+   "difficulty": 2
+  },
+  {
+   "id": "islamabad",
+   "name": "Islamabad",
+   "alt": [],
+   "iso3": "PAK",
+   "group": "Asia",
+   "facts": {
+    "country": "Pakistan",
+    "continent": "Asia"
+   },
+   "blurb": "Islamabad is the capital of Pakistan.",
+   "difficulty": 2
+  },
+  {
+   "id": "ngerulmud",
+   "name": "Ngerulmud",
+   "alt": [],
+   "iso3": "PLW",
+   "group": "Oceania",
+   "facts": {
+    "country": "Palau",
+    "continent": "Oceania"
+   },
+   "blurb": "Ngerulmud is the capital of Palau.",
+   "difficulty": 3
+  },
+  {
+   "id": "panama-city",
+   "name": "Panama City",
+   "alt": [],
+   "iso3": "PAN",
+   "group": "North America",
+   "facts": {
+    "country": "Panama",
+    "continent": "North America"
+   },
+   "blurb": "Panama City is the capital of Panama.",
+   "difficulty": 2
+  },
+  {
+   "id": "port-moresby",
+   "name": "Port Moresby",
+   "alt": [],
+   "iso3": "PNG",
+   "group": "Oceania",
+   "facts": {
+    "country": "Papua New Guinea",
+    "continent": "Oceania"
+   },
+   "blurb": "Port Moresby is the capital of Papua New Guinea.",
+   "difficulty": 2
+  },
+  {
+   "id": "asuncion",
+   "name": "Asunción",
+   "alt": [],
+   "iso3": "PRY",
+   "group": "South America",
+   "facts": {
+    "country": "Paraguay",
+    "continent": "South America"
+   },
+   "blurb": "Asunción is the capital of Paraguay.",
+   "difficulty": 2
+  },
+  {
+   "id": "lima",
+   "name": "Lima",
+   "alt": [],
+   "iso3": "PER",
+   "group": "South America",
+   "facts": {
+    "country": "Peru",
+    "continent": "South America"
+   },
+   "blurb": "Lima is the capital of Peru.",
+   "difficulty": 1
+  },
+  {
+   "id": "manila",
+   "name": "Manila",
+   "alt": [],
+   "iso3": "PHL",
+   "group": "Asia",
+   "facts": {
+    "country": "Philippines",
+    "continent": "Asia"
+   },
+   "blurb": "Manila is the capital of Philippines.",
+   "difficulty": 2
+  },
+  {
+   "id": "warsaw",
+   "name": "Warsaw",
+   "alt": [],
+   "iso3": "POL",
+   "group": "Europe",
+   "facts": {
+    "country": "Poland",
+    "continent": "Europe"
+   },
+   "blurb": "Warsaw is the capital of Poland.",
+   "difficulty": 1
+  },
+  {
+   "id": "lisbon",
+   "name": "Lisbon",
+   "alt": [],
+   "iso3": "PRT",
+   "group": "Europe",
+   "facts": {
+    "country": "Portugal",
+    "continent": "Europe"
+   },
+   "blurb": "Lisbon is the capital of Portugal.",
+   "difficulty": 1
+  },
+  {
+   "id": "doha",
+   "name": "Doha",
+   "alt": [],
+   "iso3": "QAT",
+   "group": "Asia",
+   "facts": {
+    "country": "Qatar",
+    "continent": "Asia"
+   },
+   "blurb": "Doha is the capital of Qatar.",
+   "difficulty": 3
+  },
+  {
+   "id": "bucharest",
+   "name": "Bucharest",
+   "alt": [],
+   "iso3": "ROU",
+   "group": "Europe",
+   "facts": {
+    "country": "Romania",
+    "continent": "Europe"
+   },
+   "blurb": "Bucharest is the capital of Romania.",
+   "difficulty": 2
+  },
+  {
+   "id": "moscow",
+   "name": "Moscow",
+   "alt": [],
+   "iso3": "RUS",
+   "group": "Europe",
+   "facts": {
+    "country": "Russia",
+    "continent": "Europe"
+   },
+   "blurb": "Moscow is the capital of Russia.",
+   "difficulty": 1
+  },
+  {
+   "id": "kigali",
+   "name": "Kigali",
+   "alt": [],
+   "iso3": "RWA",
+   "group": "Africa",
+   "facts": {
+    "country": "Rwanda",
+    "continent": "Africa"
+   },
+   "blurb": "Kigali is the capital of Rwanda.",
+   "difficulty": 2
+  },
+  {
+   "id": "basseterre",
+   "name": "Basseterre",
+   "alt": [],
+   "iso3": "KNA",
+   "group": "North America",
+   "facts": {
+    "country": "Saint Kitts and Nevis",
+    "continent": "North America"
+   },
+   "blurb": "Basseterre is the capital of Saint Kitts and Nevis.",
+   "difficulty": 3
+  },
+  {
+   "id": "castries",
+   "name": "Castries",
+   "alt": [],
+   "iso3": "LCA",
+   "group": "North America",
+   "facts": {
+    "country": "Saint Lucia",
+    "continent": "North America"
+   },
+   "blurb": "Castries is the capital of Saint Lucia.",
+   "difficulty": 3
+  },
+  {
+   "id": "kingstown",
+   "name": "Kingstown",
+   "alt": [],
+   "iso3": "VCT",
+   "group": "North America",
+   "facts": {
+    "country": "Saint Vincent and the Grenadines",
+    "continent": "North America"
+   },
+   "blurb": "Kingstown is the capital of Saint Vincent and the Grenadines.",
+   "difficulty": 3
+  },
+  {
+   "id": "apia",
+   "name": "Apia",
+   "alt": [],
+   "iso3": "WSM",
+   "group": "Oceania",
+   "facts": {
+    "country": "Samoa",
+    "continent": "Oceania"
+   },
+   "blurb": "Apia is the capital of Samoa.",
+   "difficulty": 3
+  },
+  {
+   "id": "san-marino-city",
+   "name": "San Marino",
+   "alt": [],
+   "iso3": "SMR",
+   "group": "Europe",
+   "facts": {
+    "country": "San Marino",
+    "continent": "Europe"
+   },
+   "blurb": "San Marino is the capital of San Marino.",
+   "difficulty": 3
+  },
+  {
+   "id": "sao-tome",
+   "name": "São Tomé",
+   "alt": [],
+   "iso3": "STP",
+   "group": "Africa",
+   "facts": {
+    "country": "São Tomé and Príncipe",
+    "continent": "Africa"
+   },
+   "blurb": "São Tomé is the capital of São Tomé and Príncipe.",
+   "difficulty": 3
+  },
+  {
+   "id": "riyadh",
+   "name": "Riyadh",
+   "alt": [],
+   "iso3": "SAU",
+   "group": "Asia",
+   "facts": {
+    "country": "Saudi Arabia",
+    "continent": "Asia"
+   },
+   "blurb": "Riyadh is the capital of Saudi Arabia.",
+   "difficulty": 2
+  },
+  {
+   "id": "dakar",
+   "name": "Dakar",
+   "alt": [],
+   "iso3": "SEN",
+   "group": "Africa",
+   "facts": {
+    "country": "Senegal",
+    "continent": "Africa"
+   },
+   "blurb": "Dakar is the capital of Senegal.",
+   "difficulty": 2
+  },
+  {
+   "id": "belgrade",
+   "name": "Belgrade",
+   "alt": [],
+   "iso3": "SRB",
+   "group": "Europe",
+   "facts": {
+    "country": "Serbia",
+    "continent": "Europe"
+   },
+   "blurb": "Belgrade is the capital of Serbia.",
+   "difficulty": 2
+  },
+  {
+   "id": "victoria",
+   "name": "Victoria",
+   "alt": [],
+   "iso3": "SYC",
+   "group": "Africa",
+   "facts": {
+    "country": "Seychelles",
+    "continent": "Africa"
+   },
+   "blurb": "Victoria is the capital of Seychelles.",
+   "difficulty": 3
+  },
+  {
+   "id": "freetown",
+   "name": "Freetown",
+   "alt": [],
+   "iso3": "SLE",
+   "group": "Africa",
+   "facts": {
+    "country": "Sierra Leone",
+    "continent": "Africa"
+   },
+   "blurb": "Freetown is the capital of Sierra Leone.",
+   "difficulty": 2
+  },
+  {
+   "id": "singapore-city",
+   "name": "Singapore",
+   "alt": [],
+   "iso3": "SGP",
+   "group": "Asia",
+   "facts": {
+    "country": "Singapore",
+    "continent": "Asia"
+   },
+   "blurb": "Singapore is the capital of Singapore.",
+   "difficulty": 2
+  },
+  {
+   "id": "bratislava",
+   "name": "Bratislava",
+   "alt": [],
+   "iso3": "SVK",
+   "group": "Europe",
+   "facts": {
+    "country": "Slovakia",
+    "continent": "Europe"
+   },
+   "blurb": "Bratislava is the capital of Slovakia.",
+   "difficulty": 2
+  },
+  {
+   "id": "ljubljana",
+   "name": "Ljubljana",
+   "alt": [],
+   "iso3": "SVN",
+   "group": "Europe",
+   "facts": {
+    "country": "Slovenia",
+    "continent": "Europe"
+   },
+   "blurb": "Ljubljana is the capital of Slovenia.",
+   "difficulty": 3
+  },
+  {
+   "id": "honiara",
+   "name": "Honiara",
+   "alt": [],
+   "iso3": "SLB",
+   "group": "Oceania",
+   "facts": {
+    "country": "Solomon Islands",
+    "continent": "Oceania"
+   },
+   "blurb": "Honiara is the capital of Solomon Islands.",
+   "difficulty": 3
+  },
+  {
+   "id": "mogadishu",
+   "name": "Mogadishu",
+   "alt": [],
+   "iso3": "SOM",
+   "group": "Africa",
+   "facts": {
+    "country": "Somalia",
+    "continent": "Africa"
+   },
+   "blurb": "Mogadishu is the capital of Somalia.",
+   "difficulty": 2
+  },
+  {
+   "id": "pretoria",
+   "name": "Pretoria",
+   "alt": [
+    "Cape Town",
+    "Bloemfontein"
+   ],
+   "iso3": "ZAF",
+   "group": "Africa",
+   "facts": {
+    "country": "South Africa",
+    "continent": "Africa"
+   },
+   "blurb": "Pretoria is the capital of South Africa. Pretoria is the executive capital; Cape Town is legislative and Bloemfontein judicial.",
+   "difficulty": 1
+  },
+  {
+   "id": "seoul",
+   "name": "Seoul",
+   "alt": [],
+   "iso3": "KOR",
+   "group": "Asia",
+   "facts": {
+    "country": "South Korea",
+    "continent": "Asia"
+   },
+   "blurb": "Seoul is the capital of South Korea.",
+   "difficulty": 1
+  },
+  {
+   "id": "juba",
+   "name": "Juba",
+   "alt": [],
+   "iso3": "SSD",
+   "group": "Africa",
+   "facts": {
+    "country": "South Sudan",
+    "continent": "Africa"
+   },
+   "blurb": "Juba is the capital of South Sudan.",
+   "difficulty": 2
+  },
+  {
+   "id": "madrid",
+   "name": "Madrid",
+   "alt": [],
+   "iso3": "ESP",
+   "group": "Europe",
+   "facts": {
+    "country": "Spain",
+    "continent": "Europe"
+   },
+   "blurb": "Madrid is the capital of Spain.",
+   "difficulty": 1
+  },
+  {
+   "id": "sri-jayawardenepura-kotte",
+   "name": "Sri Jayawardenepura Kotte",
+   "alt": [
+    "Kotte"
+   ],
+   "iso3": "LKA",
+   "group": "Asia",
+   "facts": {
+    "country": "Sri Lanka",
+    "continent": "Asia"
+   },
+   "blurb": "Sri Jayawardenepura Kotte is the capital of Sri Lanka. Sri Jayawardenepura Kotte is the legislative capital; Colombo is the commercial capital.",
+   "difficulty": 2
+  },
+  {
+   "id": "khartoum",
+   "name": "Khartoum",
+   "alt": [],
+   "iso3": "SDN",
+   "group": "Africa",
+   "facts": {
+    "country": "Sudan",
+    "continent": "Africa"
+   },
+   "blurb": "Khartoum is the capital of Sudan.",
+   "difficulty": 2
+  },
+  {
+   "id": "paramaribo",
+   "name": "Paramaribo",
+   "alt": [],
+   "iso3": "SUR",
+   "group": "South America",
+   "facts": {
+    "country": "Suriname",
+    "continent": "South America"
+   },
+   "blurb": "Paramaribo is the capital of Suriname.",
+   "difficulty": 3
+  },
+  {
+   "id": "stockholm",
+   "name": "Stockholm",
+   "alt": [],
+   "iso3": "SWE",
+   "group": "Europe",
+   "facts": {
+    "country": "Sweden",
+    "continent": "Europe"
+   },
+   "blurb": "Stockholm is the capital of Sweden.",
+   "difficulty": 1
+  },
+  {
+   "id": "bern",
+   "name": "Bern",
+   "alt": [],
+   "iso3": "CHE",
+   "group": "Europe",
+   "facts": {
+    "country": "Switzerland",
+    "continent": "Europe"
+   },
+   "blurb": "Bern is the capital of Switzerland. Switzerland has no de jure capital; Bern is the federal city and seat of government.",
+   "difficulty": 1
+  },
+  {
+   "id": "damascus",
+   "name": "Damascus",
+   "alt": [],
+   "iso3": "SYR",
+   "group": "Asia",
+   "facts": {
+    "country": "Syria",
+    "continent": "Asia"
+   },
+   "blurb": "Damascus is the capital of Syria.",
+   "difficulty": 2
+  },
+  {
+   "id": "dushanbe",
+   "name": "Dushanbe",
+   "alt": [],
+   "iso3": "TJK",
+   "group": "Asia",
+   "facts": {
+    "country": "Tajikistan",
+    "continent": "Asia"
+   },
+   "blurb": "Dushanbe is the capital of Tajikistan.",
+   "difficulty": 2
+  },
+  {
+   "id": "dodoma",
+   "name": "Dodoma",
+   "alt": [],
+   "iso3": "TZA",
+   "group": "Africa",
+   "facts": {
+    "country": "Tanzania",
+    "continent": "Africa"
+   },
+   "blurb": "Dodoma is the capital of Tanzania. Dodoma is the official capital; Dar es Salaam is the largest city.",
+   "difficulty": 2
+  },
+  {
+   "id": "bangkok",
+   "name": "Bangkok",
+   "alt": [],
+   "iso3": "THA",
+   "group": "Asia",
+   "facts": {
+    "country": "Thailand",
+    "continent": "Asia"
+   },
+   "blurb": "Bangkok is the capital of Thailand.",
+   "difficulty": 1
+  },
+  {
+   "id": "dili",
+   "name": "Dili",
+   "alt": [],
+   "iso3": "TLS",
+   "group": "Asia",
+   "facts": {
+    "country": "Timor-Leste",
+    "continent": "Asia"
+   },
+   "blurb": "Dili is the capital of Timor-Leste.",
+   "difficulty": 3
+  },
+  {
+   "id": "lome",
+   "name": "Lomé",
+   "alt": [],
+   "iso3": "TGO",
+   "group": "Africa",
+   "facts": {
+    "country": "Togo",
+    "continent": "Africa"
+   },
+   "blurb": "Lomé is the capital of Togo.",
+   "difficulty": 2
+  },
+  {
+   "id": "nuku-alofa",
+   "name": "Nukuʻalofa",
+   "alt": [],
+   "iso3": "TON",
+   "group": "Oceania",
+   "facts": {
+    "country": "Tonga",
+    "continent": "Oceania"
+   },
+   "blurb": "Nukuʻalofa is the capital of Tonga.",
+   "difficulty": 3
+  },
+  {
+   "id": "port-of-spain",
+   "name": "Port of Spain",
+   "alt": [],
+   "iso3": "TTO",
+   "group": "North America",
+   "facts": {
+    "country": "Trinidad and Tobago",
+    "continent": "North America"
+   },
+   "blurb": "Port of Spain is the capital of Trinidad and Tobago.",
+   "difficulty": 3
+  },
+  {
+   "id": "tunis",
+   "name": "Tunis",
+   "alt": [],
+   "iso3": "TUN",
+   "group": "Africa",
+   "facts": {
+    "country": "Tunisia",
+    "continent": "Africa"
+   },
+   "blurb": "Tunis is the capital of Tunisia.",
+   "difficulty": 2
+  },
+  {
+   "id": "ankara",
+   "name": "Ankara",
+   "alt": [],
+   "iso3": "TUR",
+   "group": "Asia",
+   "facts": {
+    "country": "Turkey",
+    "continent": "Asia"
+   },
+   "blurb": "Ankara is the capital of Turkey.",
+   "difficulty": 1
+  },
+  {
+   "id": "ashgabat",
+   "name": "Ashgabat",
+   "alt": [],
+   "iso3": "TKM",
+   "group": "Asia",
+   "facts": {
+    "country": "Turkmenistan",
+    "continent": "Asia"
+   },
+   "blurb": "Ashgabat is the capital of Turkmenistan.",
+   "difficulty": 2
+  },
+  {
+   "id": "funafuti",
+   "name": "Funafuti",
+   "alt": [],
+   "iso3": "TUV",
+   "group": "Oceania",
+   "facts": {
+    "country": "Tuvalu",
+    "continent": "Oceania"
+   },
+   "blurb": "Funafuti is the capital of Tuvalu.",
+   "difficulty": 3
+  },
+  {
+   "id": "kampala",
+   "name": "Kampala",
+   "alt": [],
+   "iso3": "UGA",
+   "group": "Africa",
+   "facts": {
+    "country": "Uganda",
+    "continent": "Africa"
+   },
+   "blurb": "Kampala is the capital of Uganda.",
+   "difficulty": 2
+  },
+  {
+   "id": "kyiv",
+   "name": "Kyiv",
+   "alt": [],
+   "iso3": "UKR",
+   "group": "Europe",
+   "facts": {
+    "country": "Ukraine",
+    "continent": "Europe"
+   },
+   "blurb": "Kyiv is the capital of Ukraine.",
+   "difficulty": 2
+  },
+  {
+   "id": "abu-dhabi",
+   "name": "Abu Dhabi",
+   "alt": [],
+   "iso3": "ARE",
+   "group": "Asia",
+   "facts": {
+    "country": "United Arab Emirates",
+    "continent": "Asia"
+   },
+   "blurb": "Abu Dhabi is the capital of United Arab Emirates.",
+   "difficulty": 2
+  },
+  {
+   "id": "london",
+   "name": "London",
+   "alt": [],
+   "iso3": "GBR",
+   "group": "Europe",
+   "facts": {
+    "country": "United Kingdom",
+    "continent": "Europe"
+   },
+   "blurb": "London is the capital of United Kingdom.",
+   "difficulty": 1
+  },
+  {
+   "id": "washington-d-c",
+   "name": "Washington, D.C.",
+   "alt": [],
+   "iso3": "USA",
+   "group": "North America",
+   "facts": {
+    "country": "United States",
+    "continent": "North America"
+   },
+   "blurb": "Washington, D.C. is the capital of United States.",
+   "difficulty": 1
+  },
+  {
+   "id": "montevideo",
+   "name": "Montevideo",
+   "alt": [],
+   "iso3": "URY",
+   "group": "South America",
+   "facts": {
+    "country": "Uruguay",
+    "continent": "South America"
+   },
+   "blurb": "Montevideo is the capital of Uruguay.",
+   "difficulty": 2
+  },
+  {
+   "id": "tashkent",
+   "name": "Tashkent",
+   "alt": [],
+   "iso3": "UZB",
+   "group": "Asia",
+   "facts": {
+    "country": "Uzbekistan",
+    "continent": "Asia"
+   },
+   "blurb": "Tashkent is the capital of Uzbekistan.",
+   "difficulty": 2
+  },
+  {
+   "id": "port-vila",
+   "name": "Port Vila",
+   "alt": [],
+   "iso3": "VUT",
+   "group": "Oceania",
+   "facts": {
+    "country": "Vanuatu",
+    "continent": "Oceania"
+   },
+   "blurb": "Port Vila is the capital of Vanuatu.",
+   "difficulty": 3
+  },
+  {
+   "id": "vatican-city-city",
+   "name": "Vatican City",
+   "alt": [],
+   "iso3": "VAT",
+   "group": "Europe",
+   "facts": {
+    "country": "Vatican City",
+    "continent": "Europe"
+   },
+   "blurb": "Vatican City is the capital of Vatican City.",
+   "difficulty": 3
+  },
+  {
+   "id": "caracas",
+   "name": "Caracas",
+   "alt": [],
+   "iso3": "VEN",
+   "group": "South America",
+   "facts": {
+    "country": "Venezuela",
+    "continent": "South America"
+   },
+   "blurb": "Caracas is the capital of Venezuela.",
+   "difficulty": 2
+  },
+  {
+   "id": "hanoi",
+   "name": "Hanoi",
+   "alt": [],
+   "iso3": "VNM",
+   "group": "Asia",
+   "facts": {
+    "country": "Vietnam",
+    "continent": "Asia"
+   },
+   "blurb": "Hanoi is the capital of Vietnam.",
+   "difficulty": 2
+  },
+  {
+   "id": "lusaka",
+   "name": "Lusaka",
+   "alt": [],
+   "iso3": "ZMB",
+   "group": "Africa",
+   "facts": {
+    "country": "Zambia",
+    "continent": "Africa"
+   },
+   "blurb": "Lusaka is the capital of Zambia.",
+   "difficulty": 2
+  },
+  {
+   "id": "harare",
+   "name": "Harare",
+   "alt": [],
+   "iso3": "ZWE",
+   "group": "Africa",
+   "facts": {
+    "country": "Zimbabwe",
+    "continent": "Africa"
+   },
+   "blurb": "Harare is the capital of Zimbabwe.",
+   "difficulty": 2
+  }
+ ],
+ "questions": [
+  {
+   "id": "cap-kabul",
+   "kind": "mc",
+   "prompt": "What is the capital of Afghanistan?",
+   "answer": "Kabul",
+   "wrong": [
+    "Amman",
+    "Baghdad",
+    "Dushanbe"
+   ],
+   "explain": "Kabul is the capital of Afghanistan.",
+   "difficulty": 2,
+   "refs": [
+    "capitals/kabul"
+   ]
+  },
+  {
+   "id": "capr-kabul",
+   "kind": "mc",
+   "prompt": "Kabul is the capital of which country?",
+   "answer": "Afghanistan",
+   "wrong": [
+    "Sri Lanka",
+    "South Korea",
+    "Cyprus"
+   ],
+   "explain": "Kabul is the capital of Afghanistan.",
+   "difficulty": 2,
+   "refs": [
+    "capitals/kabul"
+   ]
+  },
+  {
+   "id": "cap-tirana",
+   "kind": "mc",
+   "prompt": "What is the capital of Albania?",
+   "answer": "Tirana",
+   "wrong": [
+    "Minsk",
+    "Oslo",
+    "Reykjavík"
+   ],
+   "explain": "Tirana is the capital of Albania.",
+   "difficulty": 3,
+   "refs": [
+    "capitals/tirana"
+   ]
+  },
+  {
+   "id": "cap-algiers",
+   "kind": "mc",
+   "prompt": "What is the capital of Algeria?",
+   "answer": "Algiers",
+   "wrong": [
+    "Pretoria",
+    "Khartoum",
+    "Antananarivo"
+   ],
+   "explain": "Algiers is the capital of Algeria.",
+   "difficulty": 2,
+   "refs": [
+    "capitals/algiers"
+   ]
+  },
+  {
+   "id": "capr-algiers",
+   "kind": "mc",
+   "prompt": "Algiers is the capital of which country?",
+   "answer": "Algeria",
+   "wrong": [
+    "Seychelles",
+    "Lesotho",
+    "Benin"
+   ],
+   "explain": "Algiers is the capital of Algeria.",
+   "difficulty": 2,
+   "refs": [
+    "capitals/algiers"
+   ]
+  },
+  {
+   "id": "cap-andorra-la-vella",
+   "kind": "mc",
+   "prompt": "What is the capital of Andorra?",
+   "answer": "Andorra la Vella",
+   "wrong": [
+    "Athens",
+    "Sarajevo",
+    "Bratislava"
+   ],
+   "explain": "Andorra la Vella is the capital of Andorra.",
+   "difficulty": 3,
+   "refs": [
+    "capitals/andorra-la-vella"
+   ]
+  },
+  {
+   "id": "cap-luanda",
+   "kind": "mc",
+   "prompt": "What is the capital of Angola?",
+   "answer": "Luanda",
+   "wrong": [
+    "Banjul",
+    "Gaborone",
+    "Maseru"
+   ],
+   "explain": "Luanda is the capital of Angola.",
+   "difficulty": 2,
+   "refs": [
+    "capitals/luanda"
+   ]
+  },
+  {
+   "id": "capr-luanda",
+   "kind": "mc",
+   "prompt": "Luanda is the capital of which country?",
+   "answer": "Angola",
+   "wrong": [
+    "Nigeria",
+    "Comoros",
+    "Morocco"
+   ],
+   "explain": "Luanda is the capital of Angola.",
+   "difficulty": 2,
+   "refs": [
+    "capitals/luanda"
+   ]
+  },
+  {
+   "id": "cap-st-john-s",
+   "kind": "mc",
+   "prompt": "What is the capital of Antigua and Barbuda?",
+   "answer": "St. John's",
+   "wrong": [
+    "Kingstown",
+    "Basseterre",
+    "Nassau"
+   ],
+   "explain": "St. John's is the capital of Antigua and Barbuda.",
+   "difficulty": 3,
+   "refs": [
+    "capitals/st-john-s"
+   ]
+  },
+  {
+   "id": "cap-buenos-aires",
+   "kind": "mc",
+   "prompt": "What is the capital of Argentina?",
+   "answer": "Buenos Aires",
+   "wrong": [
+    "Santiago",
+    "Paramaribo",
+    "Bogotá"
+   ],
+   "explain": "Buenos Aires is the capital of Argentina.",
+   "difficulty": 1,
+   "refs": [
+    "capitals/buenos-aires"
+   ]
+  },
+  {
+   "id": "capr-buenos-aires",
+   "kind": "mc",
+   "prompt": "Buenos Aires is the capital of which country?",
+   "answer": "Argentina",
+   "wrong": [
+    "Venezuela",
+    "Bolivia",
+    "Colombia"
+   ],
+   "explain": "Buenos Aires is the capital of Argentina.",
+   "difficulty": 1,
+   "refs": [
+    "capitals/buenos-aires"
+   ]
+  },
+  {
+   "id": "cap-yerevan",
+   "kind": "mc",
+   "prompt": "What is the capital of Armenia?",
+   "answer": "Yerevan",
+   "wrong": [
+    "Doha",
+    "Kuala Lumpur",
+    "Dhaka"
+   ],
+   "explain": "Yerevan is the capital of Armenia.",
+   "difficulty": 2,
+   "refs": [
+    "capitals/yerevan"
+   ]
+  },
+  {
+   "id": "capr-yerevan",
+   "kind": "mc",
+   "prompt": "Yerevan is the capital of which country?",
+   "answer": "Armenia",
+   "wrong": [
+    "Bangladesh",
+    "India",
+    "Vietnam"
+   ],
+   "explain": "Yerevan is the capital of Armenia.",
+   "difficulty": 2,
+   "refs": [
+    "capitals/yerevan"
+   ]
+  },
+  {
+   "id": "cap-canberra",
+   "kind": "mc",
+   "prompt": "What is the capital of Australia?",
+   "answer": "Canberra",
+   "wrong": [
+    "Palikir",
+    "Ngerulmud",
+    "Port Vila"
+   ],
+   "explain": "Canberra is the capital of Australia.",
+   "difficulty": 1,
+   "refs": [
+    "capitals/canberra"
+   ]
+  },
+  {
+   "id": "capr-canberra",
+   "kind": "mc",
+   "prompt": "Canberra is the capital of which country?",
+   "answer": "Australia",
+   "wrong": [
+    "Tonga",
+    "Fiji",
+    "Kiribati"
+   ],
+   "explain": "Canberra is the capital of Australia.",
+   "difficulty": 1,
+   "refs": [
+    "capitals/canberra"
+   ]
+  },
+  {
+   "id": "cap-vienna",
+   "kind": "mc",
+   "prompt": "What is the capital of Austria?",
+   "answer": "Vienna",
+   "wrong": [
+    "Bucharest",
+    "Kyiv",
+    "Tallinn"
+   ],
+   "explain": "Vienna is the capital of Austria.",
+   "difficulty": 1,
+   "refs": [
+    "capitals/vienna"
+   ]
+  },
+  {
+   "id": "capr-vienna",
+   "kind": "mc",
+   "prompt": "Vienna is the capital of which country?",
+   "answer": "Austria",
+   "wrong": [
+    "Sweden",
+    "North Macedonia",
+    "San Marino"
+   ],
+   "explain": "Vienna is the capital of Austria.",
+   "difficulty": 1,
+   "refs": [
+    "capitals/vienna"
+   ]
+  },
+  {
+   "id": "cap-baku",
+   "kind": "mc",
+   "prompt": "What is the capital of Azerbaijan?",
+   "answer": "Baku",
+   "wrong": [
+    "Ankara",
+    "Beirut",
+    "Riyadh"
+   ],
+   "explain": "Baku is the capital of Azerbaijan.",
+   "difficulty": 2,
+   "refs": [
+    "capitals/baku"
+   ]
+  },
+  {
+   "id": "capr-baku",
+   "kind": "mc",
+   "prompt": "Baku is the capital of which country?",
+   "answer": "Azerbaijan",
+   "wrong": [
+    "Kuwait",
+    "Bhutan",
+    "Kyrgyzstan"
+   ],
+   "explain": "Baku is the capital of Azerbaijan.",
+   "difficulty": 2,
+   "refs": [
+    "capitals/baku"
+   ]
+  },
+  {
+   "id": "cap-nassau",
+   "kind": "mc",
+   "prompt": "What is the capital of Bahamas?",
+   "answer": "Nassau",
+   "wrong": [
+    "Tegucigalpa",
+    "San Salvador",
+    "Havana"
+   ],
+   "explain": "Nassau is the capital of Bahamas.",
+   "difficulty": 3,
+   "refs": [
+    "capitals/nassau"
+   ]
+  },
+  {
+   "id": "cap-manama",
+   "kind": "mc",
+   "prompt": "What is the capital of Bahrain?",
+   "answer": "Manama",
+   "wrong": [
+    "Ulaanbaatar",
+    "Pyongyang",
+    "Doha"
+   ],
+   "explain": "Manama is the capital of Bahrain.",
+   "difficulty": 3,
+   "refs": [
+    "capitals/manama"
+   ]
+  },
+  {
+   "id": "cap-dhaka",
+   "kind": "mc",
+   "prompt": "What is the capital of Bangladesh?",
+   "answer": "Dhaka",
+   "wrong": [
+    "Sri Jayawardenepura Kotte",
+    "Phnom Penh",
+    "Yerevan"
+   ],
+   "explain": "Dhaka is the capital of Bangladesh.",
+   "difficulty": 2,
+   "refs": [
+    "capitals/dhaka"
+   ]
+  },
+  {
+   "id": "capr-dhaka",
+   "kind": "mc",
+   "prompt": "Dhaka is the capital of which country?",
+   "answer": "Bangladesh",
+   "wrong": [
+    "India",
+    "Indonesia",
+    "Singapore"
+   ],
+   "explain": "Dhaka is the capital of Bangladesh.",
+   "difficulty": 2,
+   "refs": [
+    "capitals/dhaka"
+   ]
+  },
+  {
+   "id": "cap-bridgetown",
+   "kind": "mc",
+   "prompt": "What is the capital of Barbados?",
+   "answer": "Bridgetown",
+   "wrong": [
+    "St. John's",
+    "San Salvador",
+    "Santo Domingo"
+   ],
+   "explain": "Bridgetown is the capital of Barbados.",
+   "difficulty": 3,
+   "refs": [
+    "capitals/bridgetown"
+   ]
+  },
+  {
+   "id": "cap-minsk",
+   "kind": "mc",
+   "prompt": "What is the capital of Belarus?",
+   "answer": "Minsk",
+   "wrong": [
+    "Riga",
+    "Rome",
+    "Skopje"
+   ],
+   "explain": "Minsk is the capital of Belarus.",
+   "difficulty": 2,
+   "refs": [
+    "capitals/minsk"
+   ]
+  },
+  {
+   "id": "capr-minsk",
+   "kind": "mc",
+   "prompt": "Minsk is the capital of which country?",
+   "answer": "Belarus",
+   "wrong": [
+    "Albania",
+    "Switzerland",
+    "Italy"
+   ],
+   "explain": "Minsk is the capital of Belarus.",
+   "difficulty": 2,
+   "refs": [
+    "capitals/minsk"
+   ]
+  },
+  {
+   "id": "cap-brussels",
+   "kind": "mc",
+   "prompt": "What is the capital of Belgium?",
+   "answer": "Brussels",
+   "wrong": [
+    "Oslo",
+    "Bucharest",
+    "Sofia"
+   ],
+   "explain": "Brussels is the capital of Belgium.",
+   "difficulty": 1,
+   "refs": [
+    "capitals/brussels"
+   ]
+  },
+  {
+   "id": "capr-brussels",
+   "kind": "mc",
+   "prompt": "Brussels is the capital of which country?",
+   "answer": "Belgium",
+   "wrong": [
+    "Albania",
+    "Romania",
+    "Bosnia and Herzegovina"
+   ],
+   "explain": "Brussels is the capital of Belgium.",
+   "difficulty": 1,
+   "refs": [
+    "capitals/brussels"
+   ]
+  },
+  {
+   "id": "cap-belmopan",
+   "kind": "mc",
+   "prompt": "What is the capital of Belize?",
+   "answer": "Belmopan",
+   "wrong": [
+    "Castries",
+    "Basseterre",
+    "Nassau"
+   ],
+   "explain": "Belmopan is the capital of Belize.",
+   "difficulty": 3,
+   "refs": [
+    "capitals/belmopan"
+   ]
+  },
+  {
+   "id": "cap-porto-novo",
+   "kind": "mc",
+   "prompt": "What is the capital of Benin?",
+   "answer": "Porto-Novo",
+   "wrong": [
+    "Port Louis",
+    "Khartoum",
+    "Monrovia"
+   ],
+   "explain": "Porto-Novo is the capital of Benin. Porto-Novo is the official capital; Cotonou is the seat of government.",
+   "difficulty": 2,
+   "refs": [
+    "capitals/porto-novo"
+   ]
+  },
+  {
+   "id": "capr-porto-novo",
+   "kind": "mc",
+   "prompt": "Porto-Novo is the capital of which country?",
+   "answer": "Benin",
+   "wrong": [
+    "Egypt",
+    "Malawi",
+    "Niger"
+   ],
+   "explain": "Porto-Novo is the capital of Benin. Porto-Novo is the official capital; Cotonou is the seat of government.",
+   "difficulty": 2,
+   "refs": [
+    "capitals/porto-novo"
+   ]
+  },
+  {
+   "id": "cap-thimphu",
+   "kind": "mc",
+   "prompt": "What is the capital of Bhutan?",
+   "answer": "Thimphu",
+   "wrong": [
+    "Naypyidaw",
+    "Sri Jayawardenepura Kotte",
+    "Jakarta"
+   ],
+   "explain": "Thimphu is the capital of Bhutan.",
+   "difficulty": 3,
+   "refs": [
+    "capitals/thimphu"
+   ]
+  },
+  {
+   "id": "cap-sucre",
+   "kind": "mc",
+   "prompt": "What is the capital of Bolivia?",
+   "answer": "Sucre",
+   "wrong": [
+    "Georgetown",
+    "Montevideo",
+    "Brasília"
+   ],
+   "explain": "Sucre is the capital of Bolivia. Sucre is the constitutional capital; La Paz is the seat of government.",
+   "difficulty": 2,
+   "refs": [
+    "capitals/sucre"
+   ]
+  },
+  {
+   "id": "capr-sucre",
+   "kind": "mc",
+   "prompt": "Sucre is the capital of which country?",
+   "answer": "Bolivia",
+   "wrong": [
+    "Paraguay",
+    "Colombia",
+    "Argentina"
+   ],
+   "explain": "Sucre is the capital of Bolivia. Sucre is the constitutional capital; La Paz is the seat of government.",
+   "difficulty": 2,
+   "refs": [
+    "capitals/sucre"
+   ]
+  },
+  {
+   "id": "cap-sarajevo",
+   "kind": "mc",
+   "prompt": "What is the capital of Bosnia and Herzegovina?",
+   "answer": "Sarajevo",
+   "wrong": [
+    "Zagreb",
+    "Vatican City",
+    "London"
+   ],
+   "explain": "Sarajevo is the capital of Bosnia and Herzegovina.",
+   "difficulty": 2,
+   "refs": [
+    "capitals/sarajevo"
+   ]
+  },
+  {
+   "id": "capr-sarajevo",
+   "kind": "mc",
+   "prompt": "Sarajevo is the capital of which country?",
+   "answer": "Bosnia and Herzegovina",
+   "wrong": [
+    "Ireland",
+    "North Macedonia",
+    "Germany"
+   ],
+   "explain": "Sarajevo is the capital of Bosnia and Herzegovina.",
+   "difficulty": 2,
+   "refs": [
+    "capitals/sarajevo"
+   ]
+  },
+  {
+   "id": "cap-gaborone",
+   "kind": "mc",
+   "prompt": "What is the capital of Botswana?",
+   "answer": "Gaborone",
+   "wrong": [
+    "Cairo",
+    "Porto-Novo",
+    "Port Louis"
+   ],
+   "explain": "Gaborone is the capital of Botswana.",
+   "difficulty": 3,
+   "refs": [
+    "capitals/gaborone"
+   ]
+  },
+  {
+   "id": "cap-brasilia",
+   "kind": "mc",
+   "prompt": "What is the capital of Brazil?",
+   "answer": "Brasília",
+   "wrong": [
+    "Quito",
+    "Paramaribo",
+    "Santiago"
+   ],
+   "explain": "Brasília is the capital of Brazil.",
+   "difficulty": 1,
+   "refs": [
+    "capitals/brasilia"
+   ]
+  },
+  {
+   "id": "capr-brasilia",
+   "kind": "mc",
+   "prompt": "Brasília is the capital of which country?",
+   "answer": "Brazil",
+   "wrong": [
+    "Peru",
+    "Uruguay",
+    "Colombia"
+   ],
+   "explain": "Brasília is the capital of Brazil.",
+   "difficulty": 1,
+   "refs": [
+    "capitals/brasilia"
+   ]
+  },
+  {
+   "id": "cap-bandar-seri-begawan",
+   "kind": "mc",
+   "prompt": "What is the capital of Brunei?",
+   "answer": "Bandar Seri Begawan",
+   "wrong": [
+    "Kuala Lumpur",
+    "Muscat",
+    "Beirut"
+   ],
+   "explain": "Bandar Seri Begawan is the capital of Brunei.",
+   "difficulty": 3,
+   "refs": [
+    "capitals/bandar-seri-begawan"
+   ]
+  },
+  {
+   "id": "cap-sofia",
+   "kind": "mc",
+   "prompt": "What is the capital of Bulgaria?",
+   "answer": "Sofia",
+   "wrong": [
+    "Riga",
+    "Vaduz",
+    "Stockholm"
+   ],
+   "explain": "Sofia is the capital of Bulgaria.",
+   "difficulty": 2,
+   "refs": [
+    "capitals/sofia"
+   ]
+  },
+  {
+   "id": "capr-sofia",
+   "kind": "mc",
+   "prompt": "Sofia is the capital of which country?",
+   "answer": "Bulgaria",
+   "wrong": [
+    "Belarus",
+    "Andorra",
+    "Czechia"
+   ],
+   "explain": "Sofia is the capital of Bulgaria.",
+   "difficulty": 2,
+   "refs": [
+    "capitals/sofia"
+   ]
+  },
+  {
+   "id": "cap-ouagadougou",
+   "kind": "mc",
+   "prompt": "What is the capital of Burkina Faso?",
+   "answer": "Ouagadougou",
+   "wrong": [
+    "Moroni",
+    "Banjul",
+    "Rabat"
+   ],
+   "explain": "Ouagadougou is the capital of Burkina Faso.",
+   "difficulty": 2,
+   "refs": [
+    "capitals/ouagadougou"
+   ]
+  },
+  {
+   "id": "capr-ouagadougou",
+   "kind": "mc",
+   "prompt": "Ouagadougou is the capital of which country?",
+   "answer": "Burkina Faso",
+   "wrong": [
+    "Namibia",
+    "Kenya",
+    "Gabon"
+   ],
+   "explain": "Ouagadougou is the capital of Burkina Faso.",
+   "difficulty": 2,
+   "refs": [
+    "capitals/ouagadougou"
+   ]
+  },
+  {
+   "id": "cap-gitega",
+   "kind": "mc",
+   "prompt": "What is the capital of Burundi?",
+   "answer": "Gitega",
+   "wrong": [
+    "Maputo",
+    "Dakar",
+    "Lusaka"
+   ],
+   "explain": "Gitega is the capital of Burundi. Gitega became the political capital in 2019; Bujumbura remains the economic capital.",
+   "difficulty": 2,
+   "refs": [
+    "capitals/gitega"
+   ]
+  },
+  {
+   "id": "capr-gitega",
+   "kind": "mc",
+   "prompt": "Gitega is the capital of which country?",
+   "answer": "Burundi",
+   "wrong": [
+    "Central African Republic",
+    "Mauritania",
+    "Egypt"
+   ],
+   "explain": "Gitega is the capital of Burundi. Gitega became the political capital in 2019; Bujumbura remains the economic capital.",
+   "difficulty": 2,
+   "refs": [
+    "capitals/gitega"
+   ]
+  },
+  {
+   "id": "cap-phnom-penh",
+   "kind": "mc",
+   "prompt": "What is the capital of Cambodia?",
+   "answer": "Phnom Penh",
+   "wrong": [
+    "Seoul",
+    "Vientiane",
+    "Kabul"
+   ],
+   "explain": "Phnom Penh is the capital of Cambodia.",
+   "difficulty": 2,
+   "refs": [
+    "capitals/phnom-penh"
+   ]
+  },
+  {
+   "id": "capr-phnom-penh",
+   "kind": "mc",
+   "prompt": "Phnom Penh is the capital of which country?",
+   "answer": "Cambodia",
+   "wrong": [
+    "Pakistan",
+    "Kyrgyzstan",
+    "United Arab Emirates"
+   ],
+   "explain": "Phnom Penh is the capital of Cambodia.",
+   "difficulty": 2,
+   "refs": [
+    "capitals/phnom-penh"
+   ]
+  },
+  {
+   "id": "cap-yaounde",
+   "kind": "mc",
+   "prompt": "What is the capital of Cameroon?",
+   "answer": "Yaoundé",
+   "wrong": [
+    "Rabat",
+    "Libreville",
+    "Moroni"
+   ],
+   "explain": "Yaoundé is the capital of Cameroon.",
+   "difficulty": 2,
+   "refs": [
+    "capitals/yaounde"
+   ]
+  },
+  {
+   "id": "capr-yaounde",
+   "kind": "mc",
+   "prompt": "Yaoundé is the capital of which country?",
+   "answer": "Cameroon",
+   "wrong": [
+    "Senegal",
+    "Republic of the Congo",
+    "Togo"
+   ],
+   "explain": "Yaoundé is the capital of Cameroon.",
+   "difficulty": 2,
+   "refs": [
+    "capitals/yaounde"
+   ]
+  },
+  {
+   "id": "cap-ottawa",
+   "kind": "mc",
+   "prompt": "What is the capital of Canada?",
+   "answer": "Ottawa",
+   "wrong": [
+    "St. George's",
+    "Santo Domingo",
+    "San José"
+   ],
+   "explain": "Ottawa is the capital of Canada.",
+   "difficulty": 1,
+   "refs": [
+    "capitals/ottawa"
+   ]
+  },
+  {
+   "id": "capr-ottawa",
+   "kind": "mc",
+   "prompt": "Ottawa is the capital of which country?",
+   "answer": "Canada",
+   "wrong": [
+    "Antigua and Barbuda",
+    "United States",
+    "Saint Vincent and the Grenadines"
+   ],
+   "explain": "Ottawa is the capital of Canada.",
+   "difficulty": 1,
+   "refs": [
+    "capitals/ottawa"
+   ]
+  },
+  {
+   "id": "cap-praia",
+   "kind": "mc",
+   "prompt": "What is the capital of Cape Verde?",
+   "answer": "Praia",
+   "wrong": [
+    "Maputo",
+    "Windhoek",
+    "Maseru"
+   ],
+   "explain": "Praia is the capital of Cape Verde.",
+   "difficulty": 3,
+   "refs": [
+    "capitals/praia"
+   ]
+  },
+  {
+   "id": "cap-bangui",
+   "kind": "mc",
+   "prompt": "What is the capital of Central African Republic?",
+   "answer": "Bangui",
+   "wrong": [
+    "Libreville",
+    "Djibouti",
+    "Nouakchott"
+   ],
+   "explain": "Bangui is the capital of Central African Republic.",
+   "difficulty": 2,
+   "refs": [
+    "capitals/bangui"
+   ]
+  },
+  {
+   "id": "capr-bangui",
+   "kind": "mc",
+   "prompt": "Bangui is the capital of which country?",
+   "answer": "Central African Republic",
+   "wrong": [
+    "Togo",
+    "Cameroon",
+    "Kenya"
+   ],
+   "explain": "Bangui is the capital of Central African Republic.",
+   "difficulty": 2,
+   "refs": [
+    "capitals/bangui"
+   ]
+  },
+  {
+   "id": "cap-n-djamena",
+   "kind": "mc",
+   "prompt": "What is the capital of Chad?",
+   "answer": "N'Djamena",
+   "wrong": [
+    "Praia",
+    "Lusaka",
+    "Dodoma"
+   ],
+   "explain": "N'Djamena is the capital of Chad.",
+   "difficulty": 2,
+   "refs": [
+    "capitals/n-djamena"
+   ]
+  },
+  {
+   "id": "capr-n-djamena",
+   "kind": "mc",
+   "prompt": "N'Djamena is the capital of which country?",
+   "answer": "Chad",
+   "wrong": [
+    "Burundi",
+    "Ivory Coast",
+    "Gambia"
+   ],
+   "explain": "N'Djamena is the capital of Chad.",
+   "difficulty": 2,
+   "refs": [
+    "capitals/n-djamena"
+   ]
+  },
+  {
+   "id": "cap-santiago",
+   "kind": "mc",
+   "prompt": "What is the capital of Chile?",
+   "answer": "Santiago",
+   "wrong": [
+    "Quito",
+    "Bogotá",
+    "Lima"
+   ],
+   "explain": "Santiago is the capital of Chile.",
+   "difficulty": 1,
+   "refs": [
+    "capitals/santiago"
+   ]
+  },
+  {
+   "id": "capr-santiago",
+   "kind": "mc",
+   "prompt": "Santiago is the capital of which country?",
+   "answer": "Chile",
+   "wrong": [
+    "Venezuela",
+    "Suriname",
+    "Guyana"
+   ],
+   "explain": "Santiago is the capital of Chile.",
+   "difficulty": 1,
+   "refs": [
+    "capitals/santiago"
+   ]
+  },
+  {
+   "id": "cap-beijing",
+   "kind": "mc",
+   "prompt": "What is the capital of China?",
+   "answer": "Beijing",
+   "wrong": [
+    "Islamabad",
+    "Dili",
+    "Sri Jayawardenepura Kotte"
+   ],
+   "explain": "Beijing is the capital of China.",
+   "difficulty": 1,
+   "refs": [
+    "capitals/beijing"
+   ]
+  },
+  {
+   "id": "capr-beijing",
+   "kind": "mc",
+   "prompt": "Beijing is the capital of which country?",
+   "answer": "China",
+   "wrong": [
+    "India",
+    "Azerbaijan",
+    "Japan"
+   ],
+   "explain": "Beijing is the capital of China.",
+   "difficulty": 1,
+   "refs": [
+    "capitals/beijing"
+   ]
+  },
+  {
+   "id": "cap-bogota",
+   "kind": "mc",
+   "prompt": "What is the capital of Colombia?",
+   "answer": "Bogotá",
+   "wrong": [
+    "Montevideo",
+    "Caracas",
+    "Buenos Aires"
+   ],
+   "explain": "Bogotá is the capital of Colombia.",
+   "difficulty": 2,
+   "refs": [
+    "capitals/bogota"
+   ]
+  },
+  {
+   "id": "capr-bogota",
+   "kind": "mc",
+   "prompt": "Bogotá is the capital of which country?",
+   "answer": "Colombia",
+   "wrong": [
+    "Brazil",
+    "Guyana",
+    "Ecuador"
+   ],
+   "explain": "Bogotá is the capital of Colombia.",
+   "difficulty": 2,
+   "refs": [
+    "capitals/bogota"
+   ]
+  },
+  {
+   "id": "cap-moroni",
+   "kind": "mc",
+   "prompt": "What is the capital of Comoros?",
+   "answer": "Moroni",
+   "wrong": [
+    "Mogadishu",
+    "Kinshasa",
+    "Bangui"
+   ],
+   "explain": "Moroni is the capital of Comoros.",
+   "difficulty": 3,
+   "refs": [
+    "capitals/moroni"
+   ]
+  },
+  {
+   "id": "cap-kinshasa",
+   "kind": "mc",
+   "prompt": "What is the capital of Democratic Republic of the Congo?",
+   "answer": "Kinshasa",
+   "wrong": [
+    "Bissau",
+    "Mbabane",
+    "Luanda"
+   ],
+   "explain": "Kinshasa is the capital of Democratic Republic of the Congo.",
+   "difficulty": 2,
+   "refs": [
+    "capitals/kinshasa"
+   ]
+  },
+  {
+   "id": "capr-kinshasa",
+   "kind": "mc",
+   "prompt": "Kinshasa is the capital of which country?",
+   "answer": "Democratic Republic of the Congo",
+   "wrong": [
+    "Guinea",
+    "Sierra Leone",
+    "Egypt"
+   ],
+   "explain": "Kinshasa is the capital of Democratic Republic of the Congo.",
+   "difficulty": 2,
+   "refs": [
+    "capitals/kinshasa"
+   ]
+  },
+  {
+   "id": "cap-brazzaville",
+   "kind": "mc",
+   "prompt": "What is the capital of Republic of the Congo?",
+   "answer": "Brazzaville",
+   "wrong": [
+    "Victoria",
+    "Algiers",
+    "Juba"
+   ],
+   "explain": "Brazzaville is the capital of Republic of the Congo.",
+   "difficulty": 2,
+   "refs": [
+    "capitals/brazzaville"
+   ]
+  },
+  {
+   "id": "capr-brazzaville",
+   "kind": "mc",
+   "prompt": "Brazzaville is the capital of which country?",
+   "answer": "Republic of the Congo",
+   "wrong": [
+    "Sierra Leone",
+    "Eswatini",
+    "Ethiopia"
+   ],
+   "explain": "Brazzaville is the capital of Republic of the Congo.",
+   "difficulty": 2,
+   "refs": [
+    "capitals/brazzaville"
+   ]
+  },
+  {
+   "id": "cap-san-jose",
+   "kind": "mc",
+   "prompt": "What is the capital of Costa Rica?",
+   "answer": "San José",
+   "wrong": [
+    "Kingston",
+    "Panama City",
+    "Tegucigalpa"
+   ],
+   "explain": "San José is the capital of Costa Rica.",
+   "difficulty": 2,
+   "refs": [
+    "capitals/san-jose"
+   ]
+  },
+  {
+   "id": "capr-san-jose",
+   "kind": "mc",
+   "prompt": "San José is the capital of which country?",
+   "answer": "Costa Rica",
+   "wrong": [
+    "Saint Vincent and the Grenadines",
+    "Jamaica",
+    "Belize"
+   ],
+   "explain": "San José is the capital of Costa Rica.",
+   "difficulty": 2,
+   "refs": [
+    "capitals/san-jose"
+   ]
+  },
+  {
+   "id": "cap-yamoussoukro",
+   "kind": "mc",
+   "prompt": "What is the capital of Ivory Coast?",
+   "answer": "Yamoussoukro",
+   "wrong": [
+    "Praia",
+    "Ouagadougou",
+    "Freetown"
+   ],
+   "explain": "Yamoussoukro is the capital of Ivory Coast. Yamoussoukro is the official capital; Abidjan is the largest city.",
+   "difficulty": 2,
+   "refs": [
+    "capitals/yamoussoukro"
+   ]
+  },
+  {
+   "id": "capr-yamoussoukro",
+   "kind": "mc",
+   "prompt": "Yamoussoukro is the capital of which country?",
+   "answer": "Ivory Coast",
+   "wrong": [
+    "Malawi",
+    "Cameroon",
+    "Somalia"
+   ],
+   "explain": "Yamoussoukro is the capital of Ivory Coast. Yamoussoukro is the official capital; Abidjan is the largest city.",
+   "difficulty": 2,
+   "refs": [
+    "capitals/yamoussoukro"
+   ]
+  },
+  {
+   "id": "cap-zagreb",
+   "kind": "mc",
+   "prompt": "What is the capital of Croatia?",
+   "answer": "Zagreb",
+   "wrong": [
+    "Chișinău",
+    "Minsk",
+    "Brussels"
+   ],
+   "explain": "Zagreb is the capital of Croatia.",
+   "difficulty": 2,
+   "refs": [
+    "capitals/zagreb"
+   ]
+  },
+  {
+   "id": "capr-zagreb",
+   "kind": "mc",
+   "prompt": "Zagreb is the capital of which country?",
+   "answer": "Croatia",
+   "wrong": [
+    "Montenegro",
+    "Liechtenstein",
+    "Romania"
+   ],
+   "explain": "Zagreb is the capital of Croatia.",
+   "difficulty": 2,
+   "refs": [
+    "capitals/zagreb"
+   ]
+  },
+  {
+   "id": "cap-havana",
+   "kind": "mc",
+   "prompt": "What is the capital of Cuba?",
+   "answer": "Havana",
+   "wrong": [
+    "Bridgetown",
+    "Basseterre",
+    "Castries"
+   ],
+   "explain": "Havana is the capital of Cuba.",
+   "difficulty": 1,
+   "refs": [
+    "capitals/havana"
+   ]
+  },
+  {
+   "id": "capr-havana",
+   "kind": "mc",
+   "prompt": "Havana is the capital of which country?",
+   "answer": "Cuba",
+   "wrong": [
+    "El Salvador",
+    "Grenada",
+    "Saint Lucia"
+   ],
+   "explain": "Havana is the capital of Cuba.",
+   "difficulty": 1,
+   "refs": [
+    "capitals/havana"
+   ]
+  },
+  {
+   "id": "cap-nicosia",
+   "kind": "mc",
+   "prompt": "What is the capital of Cyprus?",
+   "answer": "Nicosia",
+   "wrong": [
+    "Manila",
+    "Kabul",
+    "Ulaanbaatar"
+   ],
+   "explain": "Nicosia is the capital of Cyprus.",
+   "difficulty": 3,
+   "refs": [
+    "capitals/nicosia"
+   ]
+  },
+  {
+   "id": "cap-prague",
+   "kind": "mc",
+   "prompt": "What is the capital of Czechia?",
+   "answer": "Prague",
+   "wrong": [
+    "Brussels",
+    "Copenhagen",
+    "Podgorica"
+   ],
+   "explain": "Prague is the capital of Czechia.",
+   "difficulty": 2,
+   "refs": [
+    "capitals/prague"
+   ]
+  },
+  {
+   "id": "capr-prague",
+   "kind": "mc",
+   "prompt": "Prague is the capital of which country?",
+   "answer": "Czechia",
+   "wrong": [
+    "Russia",
+    "Latvia",
+    "Andorra"
+   ],
+   "explain": "Prague is the capital of Czechia.",
+   "difficulty": 2,
+   "refs": [
+    "capitals/prague"
+   ]
+  },
+  {
+   "id": "cap-copenhagen",
+   "kind": "mc",
+   "prompt": "What is the capital of Denmark?",
+   "answer": "Copenhagen",
+   "wrong": [
+    "Chișinău",
+    "Sofia",
+    "Valletta"
+   ],
+   "explain": "Copenhagen is the capital of Denmark.",
+   "difficulty": 1,
+   "refs": [
+    "capitals/copenhagen"
+   ]
+  },
+  {
+   "id": "capr-copenhagen",
+   "kind": "mc",
+   "prompt": "Copenhagen is the capital of which country?",
+   "answer": "Denmark",
+   "wrong": [
+    "Lithuania",
+    "Spain",
+    "Ireland"
+   ],
+   "explain": "Copenhagen is the capital of Denmark.",
+   "difficulty": 1,
+   "refs": [
+    "capitals/copenhagen"
+   ]
+  },
+  {
+   "id": "cap-djibouti-city",
+   "kind": "mc",
+   "prompt": "What is the capital of Djibouti?",
+   "answer": "Djibouti",
+   "wrong": [
+    "Bangui",
+    "Freetown",
+    "Ouagadougou"
+   ],
+   "explain": "Djibouti is the capital of Djibouti.",
+   "difficulty": 3,
+   "refs": [
+    "capitals/djibouti-city"
+   ]
+  },
+  {
+   "id": "cap-roseau",
+   "kind": "mc",
+   "prompt": "What is the capital of Dominica?",
+   "answer": "Roseau",
+   "wrong": [
+    "St. John's",
+    "Managua",
+    "Castries"
+   ],
+   "explain": "Roseau is the capital of Dominica.",
+   "difficulty": 3,
+   "refs": [
+    "capitals/roseau"
+   ]
+  },
+  {
+   "id": "cap-santo-domingo",
+   "kind": "mc",
+   "prompt": "What is the capital of Dominican Republic?",
+   "answer": "Santo Domingo",
+   "wrong": [
+    "Guatemala City",
+    "Managua",
+    "Bridgetown"
+   ],
+   "explain": "Santo Domingo is the capital of Dominican Republic.",
+   "difficulty": 2,
+   "refs": [
+    "capitals/santo-domingo"
+   ]
+  },
+  {
+   "id": "capr-santo-domingo",
+   "kind": "mc",
+   "prompt": "Santo Domingo is the capital of which country?",
+   "answer": "Dominican Republic",
+   "wrong": [
+    "Jamaica",
+    "Nicaragua",
+    "Panama"
+   ],
+   "explain": "Santo Domingo is the capital of Dominican Republic.",
+   "difficulty": 2,
+   "refs": [
+    "capitals/santo-domingo"
+   ]
+  },
+  {
+   "id": "cap-quito",
+   "kind": "mc",
+   "prompt": "What is the capital of Ecuador?",
+   "answer": "Quito",
+   "wrong": [
+    "Lima",
+    "Caracas",
+    "Sucre"
+   ],
+   "explain": "Quito is the capital of Ecuador.",
+   "difficulty": 2,
+   "refs": [
+    "capitals/quito"
+   ]
+  },
+  {
+   "id": "capr-quito",
+   "kind": "mc",
+   "prompt": "Quito is the capital of which country?",
+   "answer": "Ecuador",
+   "wrong": [
+    "Argentina",
+    "Uruguay",
+    "Suriname"
+   ],
+   "explain": "Quito is the capital of Ecuador.",
+   "difficulty": 2,
+   "refs": [
+    "capitals/quito"
+   ]
+  },
+  {
+   "id": "cap-cairo",
+   "kind": "mc",
+   "prompt": "What is the capital of Egypt?",
+   "answer": "Cairo",
+   "wrong": [
+    "Moroni",
+    "Monrovia",
+    "Kigali"
+   ],
+   "explain": "Cairo is the capital of Egypt.",
+   "difficulty": 1,
+   "refs": [
+    "capitals/cairo"
+   ]
+  },
+  {
+   "id": "capr-cairo",
+   "kind": "mc",
+   "prompt": "Cairo is the capital of which country?",
+   "answer": "Egypt",
+   "wrong": [
+    "Libya",
+    "Ethiopia",
+    "São Tomé and Príncipe"
+   ],
+   "explain": "Cairo is the capital of Egypt.",
+   "difficulty": 1,
+   "refs": [
+    "capitals/cairo"
+   ]
+  },
+  {
+   "id": "cap-san-salvador",
+   "kind": "mc",
+   "prompt": "What is the capital of El Salvador?",
+   "answer": "San Salvador",
+   "wrong": [
+    "Kingston",
+    "Guatemala City",
+    "Port-au-Prince"
+   ],
+   "explain": "San Salvador is the capital of El Salvador.",
+   "difficulty": 2,
+   "refs": [
+    "capitals/san-salvador"
+   ]
+  },
+  {
+   "id": "capr-san-salvador",
+   "kind": "mc",
+   "prompt": "San Salvador is the capital of which country?",
+   "answer": "El Salvador",
+   "wrong": [
+    "Bahamas",
+    "Saint Vincent and the Grenadines",
+    "Mexico"
+   ],
+   "explain": "San Salvador is the capital of El Salvador.",
+   "difficulty": 2,
+   "refs": [
+    "capitals/san-salvador"
+   ]
+  },
+  {
+   "id": "cap-asmara",
+   "kind": "mc",
+   "prompt": "What is the capital of Eritrea?",
+   "answer": "Asmara",
+   "wrong": [
+    "Yamoussoukro",
+    "Banjul",
+    "Kampala"
+   ],
+   "explain": "Asmara is the capital of Eritrea.",
+   "difficulty": 2,
+   "refs": [
+    "capitals/asmara"
+   ]
+  },
+  {
+   "id": "capr-asmara",
+   "kind": "mc",
+   "prompt": "Asmara is the capital of which country?",
+   "answer": "Eritrea",
+   "wrong": [
+    "Angola",
+    "Burkina Faso",
+    "Madagascar"
+   ],
+   "explain": "Asmara is the capital of Eritrea.",
+   "difficulty": 2,
+   "refs": [
+    "capitals/asmara"
+   ]
+  },
+  {
+   "id": "cap-tallinn",
+   "kind": "mc",
+   "prompt": "What is the capital of Estonia?",
+   "answer": "Tallinn",
+   "wrong": [
+    "Andorra la Vella",
+    "Bratislava",
+    "Bern"
+   ],
+   "explain": "Tallinn is the capital of Estonia.",
+   "difficulty": 3,
+   "refs": [
+    "capitals/tallinn"
+   ]
+  },
+  {
+   "id": "cap-mbabane",
+   "kind": "mc",
+   "prompt": "What is the capital of Eswatini?",
+   "answer": "Mbabane",
+   "wrong": [
+    "Maputo",
+    "Gitega",
+    "Libreville"
+   ],
+   "explain": "Mbabane is the capital of Eswatini. Mbabane is the executive capital; Lobamba is the royal and legislative capital.",
+   "difficulty": 3,
+   "refs": [
+    "capitals/mbabane"
+   ]
+  },
+  {
+   "id": "cap-addis-ababa",
+   "kind": "mc",
+   "prompt": "What is the capital of Ethiopia?",
+   "answer": "Addis Ababa",
+   "wrong": [
+    "Cairo",
+    "Tripoli",
+    "Yaoundé"
+   ],
+   "explain": "Addis Ababa is the capital of Ethiopia.",
+   "difficulty": 2,
+   "refs": [
+    "capitals/addis-ababa"
+   ]
+  },
+  {
+   "id": "capr-addis-ababa",
+   "kind": "mc",
+   "prompt": "Addis Ababa is the capital of which country?",
+   "answer": "Ethiopia",
+   "wrong": [
+    "Benin",
+    "Democratic Republic of the Congo",
+    "Central African Republic"
+   ],
+   "explain": "Addis Ababa is the capital of Ethiopia.",
+   "difficulty": 2,
+   "refs": [
+    "capitals/addis-ababa"
+   ]
+  },
+  {
+   "id": "cap-suva",
+   "kind": "mc",
+   "prompt": "What is the capital of Fiji?",
+   "answer": "Suva",
+   "wrong": [
+    "Funafuti",
+    "Canberra",
+    "South Tarawa"
+   ],
+   "explain": "Suva is the capital of Fiji.",
+   "difficulty": 3,
+   "refs": [
+    "capitals/suva"
+   ]
+  },
+  {
+   "id": "cap-helsinki",
+   "kind": "mc",
+   "prompt": "What is the capital of Finland?",
+   "answer": "Helsinki",
+   "wrong": [
+    "Rome",
+    "Bratislava",
+    "Berlin"
+   ],
+   "explain": "Helsinki is the capital of Finland.",
+   "difficulty": 1,
+   "refs": [
+    "capitals/helsinki"
+   ]
+  },
+  {
+   "id": "capr-helsinki",
+   "kind": "mc",
+   "prompt": "Helsinki is the capital of which country?",
+   "answer": "Finland",
+   "wrong": [
+    "Czechia",
+    "Serbia",
+    "Slovakia"
+   ],
+   "explain": "Helsinki is the capital of Finland.",
+   "difficulty": 1,
+   "refs": [
+    "capitals/helsinki"
+   ]
+  },
+  {
+   "id": "cap-paris",
+   "kind": "mc",
+   "prompt": "What is the capital of France?",
+   "answer": "Paris",
+   "wrong": [
+    "Vatican City",
+    "Amsterdam",
+    "Valletta"
+   ],
+   "explain": "Paris is the capital of France.",
+   "difficulty": 1,
+   "refs": [
+    "capitals/paris"
+   ]
+  },
+  {
+   "id": "capr-paris",
+   "kind": "mc",
+   "prompt": "Paris is the capital of which country?",
+   "answer": "France",
+   "wrong": [
+    "Bulgaria",
+    "San Marino",
+    "Poland"
+   ],
+   "explain": "Paris is the capital of France.",
+   "difficulty": 1,
+   "refs": [
+    "capitals/paris"
+   ]
+  },
+  {
+   "id": "cap-libreville",
+   "kind": "mc",
+   "prompt": "What is the capital of Gabon?",
+   "answer": "Libreville",
+   "wrong": [
+    "Lilongwe",
+    "Mbabane",
+    "Juba"
+   ],
+   "explain": "Libreville is the capital of Gabon.",
+   "difficulty": 3,
+   "refs": [
+    "capitals/libreville"
+   ]
+  },
+  {
+   "id": "cap-banjul",
+   "kind": "mc",
+   "prompt": "What is the capital of Gambia?",
+   "answer": "Banjul",
+   "wrong": [
+    "Khartoum",
+    "Bissau",
+    "Praia"
+   ],
+   "explain": "Banjul is the capital of Gambia.",
+   "difficulty": 3,
+   "refs": [
+    "capitals/banjul"
+   ]
+  },
+  {
+   "id": "cap-tbilisi",
+   "kind": "mc",
+   "prompt": "What is the capital of Georgia?",
+   "answer": "Tbilisi",
+   "wrong": [
+    "Singapore",
+    "Manila",
+    "Manama"
+   ],
+   "explain": "Tbilisi is the capital of Georgia.",
+   "difficulty": 2,
+   "refs": [
+    "capitals/tbilisi"
+   ]
+  },
+  {
+   "id": "capr-tbilisi",
+   "kind": "mc",
+   "prompt": "Tbilisi is the capital of which country?",
+   "answer": "Georgia",
+   "wrong": [
+    "Mongolia",
+    "Syria",
+    "Vietnam"
+   ],
+   "explain": "Tbilisi is the capital of Georgia.",
+   "difficulty": 2,
+   "refs": [
+    "capitals/tbilisi"
+   ]
+  },
+  {
+   "id": "cap-berlin",
+   "kind": "mc",
+   "prompt": "What is the capital of Germany?",
+   "answer": "Berlin",
+   "wrong": [
+    "Vatican City",
+    "Bratislava",
+    "Luxembourg"
+   ],
+   "explain": "Berlin is the capital of Germany.",
+   "difficulty": 1,
+   "refs": [
+    "capitals/berlin"
+   ]
+  },
+  {
+   "id": "capr-berlin",
+   "kind": "mc",
+   "prompt": "Berlin is the capital of which country?",
+   "answer": "Germany",
+   "wrong": [
+    "Austria",
+    "Montenegro",
+    "San Marino"
+   ],
+   "explain": "Berlin is the capital of Germany.",
+   "difficulty": 1,
+   "refs": [
+    "capitals/berlin"
+   ]
+  },
+  {
+   "id": "cap-accra",
+   "kind": "mc",
+   "prompt": "What is the capital of Ghana?",
+   "answer": "Accra",
+   "wrong": [
+    "Gitega",
+    "Kampala",
+    "Asmara"
+   ],
+   "explain": "Accra is the capital of Ghana.",
+   "difficulty": 2,
+   "refs": [
+    "capitals/accra"
+   ]
+  },
+  {
+   "id": "capr-accra",
+   "kind": "mc",
+   "prompt": "Accra is the capital of which country?",
+   "answer": "Ghana",
+   "wrong": [
+    "Republic of the Congo",
+    "Burundi",
+    "Nigeria"
+   ],
+   "explain": "Accra is the capital of Ghana.",
+   "difficulty": 2,
+   "refs": [
+    "capitals/accra"
+   ]
+  },
+  {
+   "id": "cap-athens",
+   "kind": "mc",
+   "prompt": "What is the capital of Greece?",
+   "answer": "Athens",
+   "wrong": [
+    "Podgorica",
+    "Luxembourg",
+    "Vilnius"
+   ],
+   "explain": "Athens is the capital of Greece.",
+   "difficulty": 1,
+   "refs": [
+    "capitals/athens"
+   ]
+  },
+  {
+   "id": "capr-athens",
+   "kind": "mc",
+   "prompt": "Athens is the capital of which country?",
+   "answer": "Greece",
+   "wrong": [
+    "Slovenia",
+    "Germany",
+    "Vatican City"
+   ],
+   "explain": "Athens is the capital of Greece.",
+   "difficulty": 1,
+   "refs": [
+    "capitals/athens"
+   ]
+  },
+  {
+   "id": "cap-st-george-s",
+   "kind": "mc",
+   "prompt": "What is the capital of Grenada?",
+   "answer": "St. George's",
+   "wrong": [
+    "Castries",
+    "Tegucigalpa",
+    "St. John's"
+   ],
+   "explain": "St. George's is the capital of Grenada.",
+   "difficulty": 3,
+   "refs": [
+    "capitals/st-george-s"
+   ]
+  },
+  {
+   "id": "cap-guatemala-city",
+   "kind": "mc",
+   "prompt": "What is the capital of Guatemala?",
+   "answer": "Guatemala City",
+   "wrong": [
+    "Havana",
+    "Santo Domingo",
+    "Belmopan"
+   ],
+   "explain": "Guatemala City is the capital of Guatemala.",
+   "difficulty": 2,
+   "refs": [
+    "capitals/guatemala-city"
+   ]
+  },
+  {
+   "id": "capr-guatemala-city",
+   "kind": "mc",
+   "prompt": "Guatemala City is the capital of which country?",
+   "answer": "Guatemala",
+   "wrong": [
+    "Dominican Republic",
+    "Trinidad and Tobago",
+    "Nicaragua"
+   ],
+   "explain": "Guatemala City is the capital of Guatemala.",
+   "difficulty": 2,
+   "refs": [
+    "capitals/guatemala-city"
+   ]
+  },
+  {
+   "id": "cap-conakry",
+   "kind": "mc",
+   "prompt": "What is the capital of Guinea?",
+   "answer": "Conakry",
+   "wrong": [
+    "Bamako",
+    "Porto-Novo",
+    "Moroni"
+   ],
+   "explain": "Conakry is the capital of Guinea.",
+   "difficulty": 2,
+   "refs": [
+    "capitals/conakry"
+   ]
+  },
+  {
+   "id": "capr-conakry",
+   "kind": "mc",
+   "prompt": "Conakry is the capital of which country?",
+   "answer": "Guinea",
+   "wrong": [
+    "Algeria",
+    "Mozambique",
+    "Gambia"
+   ],
+   "explain": "Conakry is the capital of Guinea.",
+   "difficulty": 2,
+   "refs": [
+    "capitals/conakry"
+   ]
+  },
+  {
+   "id": "cap-bissau",
+   "kind": "mc",
+   "prompt": "What is the capital of Guinea-Bissau?",
+   "answer": "Bissau",
+   "wrong": [
+    "Juba",
+    "Victoria",
+    "Khartoum"
+   ],
+   "explain": "Bissau is the capital of Guinea-Bissau.",
+   "difficulty": 3,
+   "refs": [
+    "capitals/bissau"
+   ]
+  },
+  {
+   "id": "cap-georgetown",
+   "kind": "mc",
+   "prompt": "What is the capital of Guyana?",
+   "answer": "Georgetown",
+   "wrong": [
+    "Quito",
+    "Buenos Aires",
+    "Paramaribo"
+   ],
+   "explain": "Georgetown is the capital of Guyana.",
+   "difficulty": 3,
+   "refs": [
+    "capitals/georgetown"
+   ]
+  },
+  {
+   "id": "cap-port-au-prince",
+   "kind": "mc",
+   "prompt": "What is the capital of Haiti?",
+   "answer": "Port-au-Prince",
+   "wrong": [
+    "St. John's",
+    "Washington, D.C.",
+    "Kingston"
+   ],
+   "explain": "Port-au-Prince is the capital of Haiti.",
+   "difficulty": 2,
+   "refs": [
+    "capitals/port-au-prince"
+   ]
+  },
+  {
+   "id": "capr-port-au-prince",
+   "kind": "mc",
+   "prompt": "Port-au-Prince is the capital of which country?",
+   "answer": "Haiti",
+   "wrong": [
+    "Guatemala",
+    "Antigua and Barbuda",
+    "Costa Rica"
+   ],
+   "explain": "Port-au-Prince is the capital of Haiti.",
+   "difficulty": 2,
+   "refs": [
+    "capitals/port-au-prince"
+   ]
+  },
+  {
+   "id": "cap-tegucigalpa",
+   "kind": "mc",
+   "prompt": "What is the capital of Honduras?",
+   "answer": "Tegucigalpa",
+   "wrong": [
+    "Panama City",
+    "Port-au-Prince",
+    "Basseterre"
+   ],
+   "explain": "Tegucigalpa is the capital of Honduras.",
+   "difficulty": 2,
+   "refs": [
+    "capitals/tegucigalpa"
+   ]
+  },
+  {
+   "id": "capr-tegucigalpa",
+   "kind": "mc",
+   "prompt": "Tegucigalpa is the capital of which country?",
+   "answer": "Honduras",
+   "wrong": [
+    "Bahamas",
+    "Panama",
+    "Saint Lucia"
+   ],
+   "explain": "Tegucigalpa is the capital of Honduras.",
+   "difficulty": 2,
+   "refs": [
+    "capitals/tegucigalpa"
+   ]
+  },
+  {
+   "id": "cap-budapest",
+   "kind": "mc",
+   "prompt": "What is the capital of Hungary?",
+   "answer": "Budapest",
+   "wrong": [
+    "Prague",
+    "Stockholm",
+    "London"
+   ],
+   "explain": "Budapest is the capital of Hungary.",
+   "difficulty": 2,
+   "refs": [
+    "capitals/budapest"
+   ]
+  },
+  {
+   "id": "capr-budapest",
+   "kind": "mc",
+   "prompt": "Budapest is the capital of which country?",
+   "answer": "Hungary",
+   "wrong": [
+    "Russia",
+    "San Marino",
+    "Poland"
+   ],
+   "explain": "Budapest is the capital of Hungary.",
+   "difficulty": 2,
+   "refs": [
+    "capitals/budapest"
+   ]
+  },
+  {
+   "id": "cap-reykjavik",
+   "kind": "mc",
+   "prompt": "What is the capital of Iceland?",
+   "answer": "Reykjavík",
+   "wrong": [
+    "Bratislava",
+    "Minsk",
+    "Kyiv"
+   ],
+   "explain": "Reykjavík is the capital of Iceland.",
+   "difficulty": 1,
+   "refs": [
+    "capitals/reykjavik"
+   ]
+  },
+  {
+   "id": "capr-reykjavik",
+   "kind": "mc",
+   "prompt": "Reykjavík is the capital of which country?",
+   "answer": "Iceland",
+   "wrong": [
+    "Bulgaria",
+    "Spain",
+    "Finland"
+   ],
+   "explain": "Reykjavík is the capital of Iceland.",
+   "difficulty": 1,
+   "refs": [
+    "capitals/reykjavik"
+   ]
+  },
+  {
+   "id": "cap-new-delhi",
+   "kind": "mc",
+   "prompt": "What is the capital of India?",
+   "answer": "New Delhi",
+   "wrong": [
+    "Sri Jayawardenepura Kotte",
+    "Bishkek",
+    "Seoul"
+   ],
+   "explain": "New Delhi is the capital of India.",
+   "difficulty": 1,
+   "refs": [
+    "capitals/new-delhi"
+   ]
+  },
+  {
+   "id": "capr-new-delhi",
+   "kind": "mc",
+   "prompt": "New Delhi is the capital of which country?",
+   "answer": "India",
+   "wrong": [
+    "Turkmenistan",
+    "Azerbaijan",
+    "Myanmar"
+   ],
+   "explain": "New Delhi is the capital of India.",
+   "difficulty": 1,
+   "refs": [
+    "capitals/new-delhi"
+   ]
+  },
+  {
+   "id": "cap-jakarta",
+   "kind": "mc",
+   "prompt": "What is the capital of Indonesia?",
+   "answer": "Jakarta",
+   "wrong": [
+    "Pyongyang",
+    "Sri Jayawardenepura Kotte",
+    "Doha"
+   ],
+   "explain": "Jakarta is the capital of Indonesia. Jakarta is the capital; a move to the new city of Nusantara is under way.",
+   "difficulty": 2,
+   "refs": [
+    "capitals/jakarta"
+   ]
+  },
+  {
+   "id": "capr-jakarta",
+   "kind": "mc",
+   "prompt": "Jakarta is the capital of which country?",
+   "answer": "Indonesia",
+   "wrong": [
+    "United Arab Emirates",
+    "South Korea",
+    "North Korea"
+   ],
+   "explain": "Jakarta is the capital of Indonesia. Jakarta is the capital; a move to the new city of Nusantara is under way.",
+   "difficulty": 2,
+   "refs": [
+    "capitals/jakarta"
+   ]
+  },
+  {
+   "id": "cap-tehran",
+   "kind": "mc",
+   "prompt": "What is the capital of Iran?",
+   "answer": "Tehran",
+   "wrong": [
+    "Naypyidaw",
+    "Tbilisi",
+    "Yerevan"
+   ],
+   "explain": "Tehran is the capital of Iran.",
+   "difficulty": 2,
+   "refs": [
+    "capitals/tehran"
+   ]
+  },
+  {
+   "id": "capr-tehran",
+   "kind": "mc",
+   "prompt": "Tehran is the capital of which country?",
+   "answer": "Iran",
+   "wrong": [
+    "Pakistan",
+    "Malaysia",
+    "Saudi Arabia"
+   ],
+   "explain": "Tehran is the capital of Iran.",
+   "difficulty": 2,
+   "refs": [
+    "capitals/tehran"
+   ]
+  },
+  {
+   "id": "cap-baghdad",
+   "kind": "mc",
+   "prompt": "What is the capital of Iraq?",
+   "answer": "Baghdad",
+   "wrong": [
+    "Bishkek",
+    "Kuala Lumpur",
+    "Nicosia"
+   ],
+   "explain": "Baghdad is the capital of Iraq.",
+   "difficulty": 2,
+   "refs": [
+    "capitals/baghdad"
+   ]
+  },
+  {
+   "id": "capr-baghdad",
+   "kind": "mc",
+   "prompt": "Baghdad is the capital of which country?",
+   "answer": "Iraq",
+   "wrong": [
+    "Indonesia",
+    "Bangladesh",
+    "United Arab Emirates"
+   ],
+   "explain": "Baghdad is the capital of Iraq.",
+   "difficulty": 2,
+   "refs": [
+    "capitals/baghdad"
+   ]
+  },
+  {
+   "id": "cap-dublin",
+   "kind": "mc",
+   "prompt": "What is the capital of Ireland?",
+   "answer": "Dublin",
+   "wrong": [
+    "Monaco",
+    "Moscow",
+    "Paris"
+   ],
+   "explain": "Dublin is the capital of Ireland.",
+   "difficulty": 1,
+   "refs": [
+    "capitals/dublin"
+   ]
+  },
+  {
+   "id": "capr-dublin",
+   "kind": "mc",
+   "prompt": "Dublin is the capital of which country?",
+   "answer": "Ireland",
+   "wrong": [
+    "Montenegro",
+    "Iceland",
+    "Switzerland"
+   ],
+   "explain": "Dublin is the capital of Ireland.",
+   "difficulty": 1,
+   "refs": [
+    "capitals/dublin"
+   ]
+  },
+  {
+   "id": "cap-rome",
+   "kind": "mc",
+   "prompt": "What is the capital of Italy?",
+   "answer": "Rome",
+   "wrong": [
+    "Tirana",
+    "Tallinn",
+    "Sarajevo"
+   ],
+   "explain": "Rome is the capital of Italy.",
+   "difficulty": 1,
+   "refs": [
+    "capitals/rome"
+   ]
+  },
+  {
+   "id": "capr-rome",
+   "kind": "mc",
+   "prompt": "Rome is the capital of which country?",
+   "answer": "Italy",
+   "wrong": [
+    "Croatia",
+    "Poland",
+    "Serbia"
+   ],
+   "explain": "Rome is the capital of Italy.",
+   "difficulty": 1,
+   "refs": [
+    "capitals/rome"
+   ]
+  },
+  {
+   "id": "cap-kingston",
+   "kind": "mc",
+   "prompt": "What is the capital of Jamaica?",
+   "answer": "Kingston",
+   "wrong": [
+    "St. George's",
+    "Guatemala City",
+    "Tegucigalpa"
+   ],
+   "explain": "Kingston is the capital of Jamaica.",
+   "difficulty": 1,
+   "refs": [
+    "capitals/kingston"
+   ]
+  },
+  {
+   "id": "capr-kingston",
+   "kind": "mc",
+   "prompt": "Kingston is the capital of which country?",
+   "answer": "Jamaica",
+   "wrong": [
+    "Haiti",
+    "Trinidad and Tobago",
+    "Bahamas"
+   ],
+   "explain": "Kingston is the capital of Jamaica.",
+   "difficulty": 1,
+   "refs": [
+    "capitals/kingston"
+   ]
+  },
+  {
+   "id": "cap-tokyo",
+   "kind": "mc",
+   "prompt": "What is the capital of Japan?",
+   "answer": "Tokyo",
+   "wrong": [
+    "Ulaanbaatar",
+    "Beirut",
+    "Baku"
+   ],
+   "explain": "Tokyo is the capital of Japan.",
+   "difficulty": 1,
+   "refs": [
+    "capitals/tokyo"
+   ]
+  },
+  {
+   "id": "capr-tokyo",
+   "kind": "mc",
+   "prompt": "Tokyo is the capital of which country?",
+   "answer": "Japan",
+   "wrong": [
+    "Bahrain",
+    "Nepal",
+    "Turkey"
+   ],
+   "explain": "Tokyo is the capital of Japan.",
+   "difficulty": 1,
+   "refs": [
+    "capitals/tokyo"
+   ]
+  },
+  {
+   "id": "cap-amman",
+   "kind": "mc",
+   "prompt": "What is the capital of Jordan?",
+   "answer": "Amman",
+   "wrong": [
+    "Kuala Lumpur",
+    "Tashkent",
+    "Jakarta"
+   ],
+   "explain": "Amman is the capital of Jordan.",
+   "difficulty": 2,
+   "refs": [
+    "capitals/amman"
+   ]
+  },
+  {
+   "id": "capr-amman",
+   "kind": "mc",
+   "prompt": "Amman is the capital of which country?",
+   "answer": "Jordan",
+   "wrong": [
+    "Maldives",
+    "Iraq",
+    "North Korea"
+   ],
+   "explain": "Amman is the capital of Jordan.",
+   "difficulty": 2,
+   "refs": [
+    "capitals/amman"
+   ]
+  },
+  {
+   "id": "cap-astana",
+   "kind": "mc",
+   "prompt": "What is the capital of Kazakhstan?",
+   "answer": "Astana",
+   "wrong": [
+    "Doha",
+    "Kathmandu",
+    "Baghdad"
+   ],
+   "explain": "Astana is the capital of Kazakhstan.",
+   "difficulty": 2,
+   "refs": [
+    "capitals/astana"
+   ]
+  },
+  {
+   "id": "capr-astana",
+   "kind": "mc",
+   "prompt": "Astana is the capital of which country?",
+   "answer": "Kazakhstan",
+   "wrong": [
+    "Vietnam",
+    "Kyrgyzstan",
+    "United Arab Emirates"
+   ],
+   "explain": "Astana is the capital of Kazakhstan.",
+   "difficulty": 2,
+   "refs": [
+    "capitals/astana"
+   ]
+  },
+  {
+   "id": "cap-nairobi",
+   "kind": "mc",
+   "prompt": "What is the capital of Kenya?",
+   "answer": "Nairobi",
+   "wrong": [
+    "Niamey",
+    "Victoria",
+    "Abuja"
+   ],
+   "explain": "Nairobi is the capital of Kenya.",
+   "difficulty": 1,
+   "refs": [
+    "capitals/nairobi"
+   ]
+  },
+  {
+   "id": "capr-nairobi",
+   "kind": "mc",
+   "prompt": "Nairobi is the capital of which country?",
+   "answer": "Kenya",
+   "wrong": [
+    "Cameroon",
+    "Namibia",
+    "Mauritius"
+   ],
+   "explain": "Nairobi is the capital of Kenya.",
+   "difficulty": 1,
+   "refs": [
+    "capitals/nairobi"
+   ]
+  },
+  {
+   "id": "cap-south-tarawa",
+   "kind": "mc",
+   "prompt": "What is the capital of Kiribati?",
+   "answer": "South Tarawa",
+   "wrong": [
+    "Port Vila",
+    "Ngerulmud",
+    "Suva"
+   ],
+   "explain": "South Tarawa is the capital of Kiribati.",
+   "difficulty": 3,
+   "refs": [
+    "capitals/south-tarawa"
+   ]
+  },
+  {
+   "id": "cap-kuwait-city",
+   "kind": "mc",
+   "prompt": "What is the capital of Kuwait?",
+   "answer": "Kuwait City",
+   "wrong": [
+    "Bangkok",
+    "Astana",
+    "Tokyo"
+   ],
+   "explain": "Kuwait City is the capital of Kuwait.",
+   "difficulty": 2,
+   "refs": [
+    "capitals/kuwait-city"
+   ]
+  },
+  {
+   "id": "capr-kuwait-city",
+   "kind": "mc",
+   "prompt": "Kuwait City is the capital of which country?",
+   "answer": "Kuwait",
+   "wrong": [
+    "Lebanon",
+    "Laos",
+    "United Arab Emirates"
+   ],
+   "explain": "Kuwait City is the capital of Kuwait.",
+   "difficulty": 2,
+   "refs": [
+    "capitals/kuwait-city"
+   ]
+  },
+  {
+   "id": "cap-bishkek",
+   "kind": "mc",
+   "prompt": "What is the capital of Kyrgyzstan?",
+   "answer": "Bishkek",
+   "wrong": [
+    "Kabul",
+    "Jakarta",
+    "Nicosia"
+   ],
+   "explain": "Bishkek is the capital of Kyrgyzstan.",
+   "difficulty": 2,
+   "refs": [
+    "capitals/bishkek"
+   ]
+  },
+  {
+   "id": "capr-bishkek",
+   "kind": "mc",
+   "prompt": "Bishkek is the capital of which country?",
+   "answer": "Kyrgyzstan",
+   "wrong": [
+    "Syria",
+    "Turkey",
+    "Jordan"
+   ],
+   "explain": "Bishkek is the capital of Kyrgyzstan.",
+   "difficulty": 2,
+   "refs": [
+    "capitals/bishkek"
+   ]
+  },
+  {
+   "id": "cap-vientiane",
+   "kind": "mc",
+   "prompt": "What is the capital of Laos?",
+   "answer": "Vientiane",
+   "wrong": [
+    "Astana",
+    "Kathmandu",
+    "Kabul"
+   ],
+   "explain": "Vientiane is the capital of Laos.",
+   "difficulty": 2,
+   "refs": [
+    "capitals/vientiane"
+   ]
+  },
+  {
+   "id": "capr-vientiane",
+   "kind": "mc",
+   "prompt": "Vientiane is the capital of which country?",
+   "answer": "Laos",
+   "wrong": [
+    "Bhutan",
+    "Nepal",
+    "Georgia"
+   ],
+   "explain": "Vientiane is the capital of Laos.",
+   "difficulty": 2,
+   "refs": [
+    "capitals/vientiane"
+   ]
+  },
+  {
+   "id": "cap-riga",
+   "kind": "mc",
+   "prompt": "What is the capital of Latvia?",
+   "answer": "Riga",
+   "wrong": [
+    "London",
+    "Warsaw",
+    "Vienna"
+   ],
+   "explain": "Riga is the capital of Latvia.",
+   "difficulty": 3,
+   "refs": [
+    "capitals/riga"
+   ]
+  },
+  {
+   "id": "cap-beirut",
+   "kind": "mc",
+   "prompt": "What is the capital of Lebanon?",
+   "answer": "Beirut",
+   "wrong": [
+    "Thimphu",
+    "Seoul",
+    "Naypyidaw"
+   ],
+   "explain": "Beirut is the capital of Lebanon.",
+   "difficulty": 2,
+   "refs": [
+    "capitals/beirut"
+   ]
+  },
+  {
+   "id": "capr-beirut",
+   "kind": "mc",
+   "prompt": "Beirut is the capital of which country?",
+   "answer": "Lebanon",
+   "wrong": [
+    "Uzbekistan",
+    "Malaysia",
+    "North Korea"
+   ],
+   "explain": "Beirut is the capital of Lebanon.",
+   "difficulty": 2,
+   "refs": [
+    "capitals/beirut"
+   ]
+  },
+  {
+   "id": "cap-maseru",
+   "kind": "mc",
+   "prompt": "What is the capital of Lesotho?",
+   "answer": "Maseru",
+   "wrong": [
+    "Lomé",
+    "Banjul",
+    "Port Louis"
+   ],
+   "explain": "Maseru is the capital of Lesotho.",
+   "difficulty": 3,
+   "refs": [
+    "capitals/maseru"
+   ]
+  },
+  {
+   "id": "cap-monrovia",
+   "kind": "mc",
+   "prompt": "What is the capital of Liberia?",
+   "answer": "Monrovia",
+   "wrong": [
+    "Juba",
+    "Abuja",
+    "Tripoli"
+   ],
+   "explain": "Monrovia is the capital of Liberia.",
+   "difficulty": 2,
+   "refs": [
+    "capitals/monrovia"
+   ]
+  },
+  {
+   "id": "capr-monrovia",
+   "kind": "mc",
+   "prompt": "Monrovia is the capital of which country?",
+   "answer": "Liberia",
+   "wrong": [
+    "Sierra Leone",
+    "Cameroon",
+    "Comoros"
+   ],
+   "explain": "Monrovia is the capital of Liberia.",
+   "difficulty": 2,
+   "refs": [
+    "capitals/monrovia"
+   ]
+  },
+  {
+   "id": "cap-tripoli",
+   "kind": "mc",
+   "prompt": "What is the capital of Libya?",
+   "answer": "Tripoli",
+   "wrong": [
+    "Dakar",
+    "Nairobi",
+    "Kampala"
+   ],
+   "explain": "Tripoli is the capital of Libya.",
+   "difficulty": 2,
+   "refs": [
+    "capitals/tripoli"
+   ]
+  },
+  {
+   "id": "capr-tripoli",
+   "kind": "mc",
+   "prompt": "Tripoli is the capital of which country?",
+   "answer": "Libya",
+   "wrong": [
+    "Sudan",
+    "Angola",
+    "Niger"
+   ],
+   "explain": "Tripoli is the capital of Libya.",
+   "difficulty": 2,
+   "refs": [
+    "capitals/tripoli"
+   ]
+  },
+  {
+   "id": "cap-vaduz",
+   "kind": "mc",
+   "prompt": "What is the capital of Liechtenstein?",
+   "answer": "Vaduz",
+   "wrong": [
+    "Brussels",
+    "Andorra la Vella",
+    "Helsinki"
+   ],
+   "explain": "Vaduz is the capital of Liechtenstein.",
+   "difficulty": 3,
+   "refs": [
+    "capitals/vaduz"
+   ]
+  },
+  {
+   "id": "cap-vilnius",
+   "kind": "mc",
+   "prompt": "What is the capital of Lithuania?",
+   "answer": "Vilnius",
+   "wrong": [
+    "Belgrade",
+    "Tirana",
+    "Bucharest"
+   ],
+   "explain": "Vilnius is the capital of Lithuania.",
+   "difficulty": 3,
+   "refs": [
+    "capitals/vilnius"
+   ]
+  },
+  {
+   "id": "cap-luxembourg-city",
+   "kind": "mc",
+   "prompt": "What is the capital of Luxembourg?",
+   "answer": "Luxembourg",
+   "wrong": [
+    "Helsinki",
+    "Paris",
+    "Valletta"
+   ],
+   "explain": "Luxembourg is the capital of Luxembourg.",
+   "difficulty": 3,
+   "refs": [
+    "capitals/luxembourg-city"
+   ]
+  },
+  {
+   "id": "cap-antananarivo",
+   "kind": "mc",
+   "prompt": "What is the capital of Madagascar?",
+   "answer": "Antananarivo",
+   "wrong": [
+    "Nairobi",
+    "Yaoundé",
+    "Addis Ababa"
+   ],
+   "explain": "Antananarivo is the capital of Madagascar.",
+   "difficulty": 2,
+   "refs": [
+    "capitals/antananarivo"
+   ]
+  },
+  {
+   "id": "capr-antananarivo",
+   "kind": "mc",
+   "prompt": "Antananarivo is the capital of which country?",
+   "answer": "Madagascar",
+   "wrong": [
+    "Tunisia",
+    "Mauritania",
+    "Eritrea"
+   ],
+   "explain": "Antananarivo is the capital of Madagascar.",
+   "difficulty": 2,
+   "refs": [
+    "capitals/antananarivo"
+   ]
+  },
+  {
+   "id": "cap-lilongwe",
+   "kind": "mc",
+   "prompt": "What is the capital of Malawi?",
+   "answer": "Lilongwe",
+   "wrong": [
+    "Kinshasa",
+    "N'Djamena",
+    "Niamey"
+   ],
+   "explain": "Lilongwe is the capital of Malawi.",
+   "difficulty": 2,
+   "refs": [
+    "capitals/lilongwe"
+   ]
+  },
+  {
+   "id": "capr-lilongwe",
+   "kind": "mc",
+   "prompt": "Lilongwe is the capital of which country?",
+   "answer": "Malawi",
+   "wrong": [
+    "Mauritania",
+    "Mali",
+    "Uganda"
+   ],
+   "explain": "Lilongwe is the capital of Malawi.",
+   "difficulty": 2,
+   "refs": [
+    "capitals/lilongwe"
+   ]
+  },
+  {
+   "id": "cap-kuala-lumpur",
+   "kind": "mc",
+   "prompt": "What is the capital of Malaysia?",
+   "answer": "Kuala Lumpur",
+   "wrong": [
+    "Baku",
+    "Nicosia",
+    "Dili"
+   ],
+   "explain": "Kuala Lumpur is the capital of Malaysia. Kuala Lumpur is the capital; Putrajaya is the administrative centre.",
+   "difficulty": 2,
+   "refs": [
+    "capitals/kuala-lumpur"
+   ]
+  },
+  {
+   "id": "capr-kuala-lumpur",
+   "kind": "mc",
+   "prompt": "Kuala Lumpur is the capital of which country?",
+   "answer": "Malaysia",
+   "wrong": [
+    "Pakistan",
+    "Bhutan",
+    "Armenia"
+   ],
+   "explain": "Kuala Lumpur is the capital of Malaysia. Kuala Lumpur is the capital; Putrajaya is the administrative centre.",
+   "difficulty": 2,
+   "refs": [
+    "capitals/kuala-lumpur"
+   ]
+  },
+  {
+   "id": "cap-male",
+   "kind": "mc",
+   "prompt": "What is the capital of Maldives?",
+   "answer": "Malé",
+   "wrong": [
+    "Hanoi",
+    "Islamabad",
+    "Bandar Seri Begawan"
+   ],
+   "explain": "Malé is the capital of Maldives.",
+   "difficulty": 3,
+   "refs": [
+    "capitals/male"
+   ]
+  },
+  {
+   "id": "cap-bamako",
+   "kind": "mc",
+   "prompt": "What is the capital of Mali?",
+   "answer": "Bamako",
+   "wrong": [
+    "Luanda",
+    "Bissau",
+    "Port Louis"
+   ],
+   "explain": "Bamako is the capital of Mali.",
+   "difficulty": 2,
+   "refs": [
+    "capitals/bamako"
+   ]
+  },
+  {
+   "id": "capr-bamako",
+   "kind": "mc",
+   "prompt": "Bamako is the capital of which country?",
+   "answer": "Mali",
+   "wrong": [
+    "Eritrea",
+    "Tanzania",
+    "South Africa"
+   ],
+   "explain": "Bamako is the capital of Mali.",
+   "difficulty": 2,
+   "refs": [
+    "capitals/bamako"
+   ]
+  },
+  {
+   "id": "cap-valletta",
+   "kind": "mc",
+   "prompt": "What is the capital of Malta?",
+   "answer": "Valletta",
+   "wrong": [
+    "Amsterdam",
+    "London",
+    "Prague"
+   ],
+   "explain": "Valletta is the capital of Malta.",
+   "difficulty": 3,
+   "refs": [
+    "capitals/valletta"
+   ]
+  },
+  {
+   "id": "cap-majuro",
+   "kind": "mc",
+   "prompt": "What is the capital of Marshall Islands?",
+   "answer": "Majuro",
+   "wrong": [
+    "South Tarawa",
+    "Port Moresby",
+    "Nukuʻalofa"
+   ],
+   "explain": "Majuro is the capital of Marshall Islands.",
+   "difficulty": 3,
+   "refs": [
+    "capitals/majuro"
+   ]
+  },
+  {
+   "id": "cap-nouakchott",
+   "kind": "mc",
+   "prompt": "What is the capital of Mauritania?",
+   "answer": "Nouakchott",
+   "wrong": [
+    "Monrovia",
+    "Lusaka",
+    "Accra"
+   ],
+   "explain": "Nouakchott is the capital of Mauritania.",
+   "difficulty": 2,
+   "refs": [
+    "capitals/nouakchott"
+   ]
+  },
+  {
+   "id": "capr-nouakchott",
+   "kind": "mc",
+   "prompt": "Nouakchott is the capital of which country?",
+   "answer": "Mauritania",
+   "wrong": [
+    "Kenya",
+    "Rwanda",
+    "Somalia"
+   ],
+   "explain": "Nouakchott is the capital of Mauritania.",
+   "difficulty": 2,
+   "refs": [
+    "capitals/nouakchott"
+   ]
+  },
+  {
+   "id": "cap-port-louis",
+   "kind": "mc",
+   "prompt": "What is the capital of Mauritius?",
+   "answer": "Port Louis",
+   "wrong": [
+    "Addis Ababa",
+    "Dakar",
+    "Bissau"
+   ],
+   "explain": "Port Louis is the capital of Mauritius.",
+   "difficulty": 3,
+   "refs": [
+    "capitals/port-louis"
+   ]
+  },
+  {
+   "id": "cap-mexico-city",
+   "kind": "mc",
+   "prompt": "What is the capital of Mexico?",
+   "answer": "Mexico City",
+   "wrong": [
+    "Washington, D.C.",
+    "Belmopan",
+    "Basseterre"
+   ],
+   "explain": "Mexico City is the capital of Mexico.",
+   "difficulty": 1,
+   "refs": [
+    "capitals/mexico-city"
+   ]
+  },
+  {
+   "id": "capr-mexico-city",
+   "kind": "mc",
+   "prompt": "Mexico City is the capital of which country?",
+   "answer": "Mexico",
+   "wrong": [
+    "Antigua and Barbuda",
+    "Dominica",
+    "Honduras"
+   ],
+   "explain": "Mexico City is the capital of Mexico.",
+   "difficulty": 1,
+   "refs": [
+    "capitals/mexico-city"
+   ]
+  },
+  {
+   "id": "cap-palikir",
+   "kind": "mc",
+   "prompt": "What is the capital of Micronesia?",
+   "answer": "Palikir",
+   "wrong": [
+    "Funafuti",
+    "Apia",
+    "Canberra"
+   ],
+   "explain": "Palikir is the capital of Micronesia.",
+   "difficulty": 3,
+   "refs": [
+    "capitals/palikir"
+   ]
+  },
+  {
+   "id": "cap-chisinau",
+   "kind": "mc",
+   "prompt": "What is the capital of Moldova?",
+   "answer": "Chișinău",
+   "wrong": [
+    "San Marino",
+    "Riga",
+    "Reykjavík"
+   ],
+   "explain": "Chișinău is the capital of Moldova.",
+   "difficulty": 3,
+   "refs": [
+    "capitals/chisinau"
+   ]
+  },
+  {
+   "id": "cap-monaco-city",
+   "kind": "mc",
+   "prompt": "What is the capital of Monaco?",
+   "answer": "Monaco",
+   "wrong": [
+    "Bratislava",
+    "Vilnius",
+    "Bern"
+   ],
+   "explain": "Monaco is the capital of Monaco.",
+   "difficulty": 3,
+   "refs": [
+    "capitals/monaco-city"
+   ]
+  },
+  {
+   "id": "cap-ulaanbaatar",
+   "kind": "mc",
+   "prompt": "What is the capital of Mongolia?",
+   "answer": "Ulaanbaatar",
+   "wrong": [
+    "Muscat",
+    "Nicosia",
+    "Tbilisi"
+   ],
+   "explain": "Ulaanbaatar is the capital of Mongolia.",
+   "difficulty": 2,
+   "refs": [
+    "capitals/ulaanbaatar"
+   ]
+  },
+  {
+   "id": "capr-ulaanbaatar",
+   "kind": "mc",
+   "prompt": "Ulaanbaatar is the capital of which country?",
+   "answer": "Mongolia",
+   "wrong": [
+    "Afghanistan",
+    "Kyrgyzstan",
+    "Bahrain"
+   ],
+   "explain": "Ulaanbaatar is the capital of Mongolia.",
+   "difficulty": 2,
+   "refs": [
+    "capitals/ulaanbaatar"
+   ]
+  },
+  {
+   "id": "cap-podgorica",
+   "kind": "mc",
+   "prompt": "What is the capital of Montenegro?",
+   "answer": "Podgorica",
+   "wrong": [
+    "San Marino",
+    "Vilnius",
+    "Andorra la Vella"
+   ],
+   "explain": "Podgorica is the capital of Montenegro.",
+   "difficulty": 3,
+   "refs": [
+    "capitals/podgorica"
+   ]
+  },
+  {
+   "id": "cap-rabat",
+   "kind": "mc",
+   "prompt": "What is the capital of Morocco?",
+   "answer": "Rabat",
+   "wrong": [
+    "Windhoek",
+    "Dakar",
+    "Libreville"
+   ],
+   "explain": "Rabat is the capital of Morocco.",
+   "difficulty": 2,
+   "refs": [
+    "capitals/rabat"
+   ]
+  },
+  {
+   "id": "capr-rabat",
+   "kind": "mc",
+   "prompt": "Rabat is the capital of which country?",
+   "answer": "Morocco",
+   "wrong": [
+    "Eswatini",
+    "Zimbabwe",
+    "Liberia"
+   ],
+   "explain": "Rabat is the capital of Morocco.",
+   "difficulty": 2,
+   "refs": [
+    "capitals/rabat"
+   ]
+  },
+  {
+   "id": "cap-maputo",
+   "kind": "mc",
+   "prompt": "What is the capital of Mozambique?",
+   "answer": "Maputo",
+   "wrong": [
+    "Monrovia",
+    "Niamey",
+    "Asmara"
+   ],
+   "explain": "Maputo is the capital of Mozambique.",
+   "difficulty": 2,
+   "refs": [
+    "capitals/maputo"
+   ]
+  },
+  {
+   "id": "capr-maputo",
+   "kind": "mc",
+   "prompt": "Maputo is the capital of which country?",
+   "answer": "Mozambique",
+   "wrong": [
+    "Seychelles",
+    "Rwanda",
+    "Zimbabwe"
+   ],
+   "explain": "Maputo is the capital of Mozambique.",
+   "difficulty": 2,
+   "refs": [
+    "capitals/maputo"
+   ]
+  },
+  {
+   "id": "cap-naypyidaw",
+   "kind": "mc",
+   "prompt": "What is the capital of Myanmar?",
+   "answer": "Naypyidaw",
+   "wrong": [
+    "Sri Jayawardenepura Kotte",
+    "Vientiane",
+    "Kabul"
+   ],
+   "explain": "Naypyidaw is the capital of Myanmar.",
+   "difficulty": 2,
+   "refs": [
+    "capitals/naypyidaw"
+   ]
+  },
+  {
+   "id": "capr-naypyidaw",
+   "kind": "mc",
+   "prompt": "Naypyidaw is the capital of which country?",
+   "answer": "Myanmar",
+   "wrong": [
+    "Kazakhstan",
+    "Lebanon",
+    "Maldives"
+   ],
+   "explain": "Naypyidaw is the capital of Myanmar.",
+   "difficulty": 2,
+   "refs": [
+    "capitals/naypyidaw"
+   ]
+  },
+  {
+   "id": "cap-windhoek",
+   "kind": "mc",
+   "prompt": "What is the capital of Namibia?",
+   "answer": "Windhoek",
+   "wrong": [
+    "Abuja",
+    "Lomé",
+    "Djibouti"
+   ],
+   "explain": "Windhoek is the capital of Namibia.",
+   "difficulty": 2,
+   "refs": [
+    "capitals/windhoek"
+   ]
+  },
+  {
+   "id": "capr-windhoek",
+   "kind": "mc",
+   "prompt": "Windhoek is the capital of which country?",
+   "answer": "Namibia",
+   "wrong": [
+    "Benin",
+    "Malawi",
+    "Tunisia"
+   ],
+   "explain": "Windhoek is the capital of Namibia.",
+   "difficulty": 2,
+   "refs": [
+    "capitals/windhoek"
+   ]
+  },
+  {
+   "id": "cap-kathmandu",
+   "kind": "mc",
+   "prompt": "What is the capital of Nepal?",
+   "answer": "Kathmandu",
+   "wrong": [
+    "Muscat",
+    "Phnom Penh",
+    "Hanoi"
+   ],
+   "explain": "Kathmandu is the capital of Nepal.",
+   "difficulty": 2,
+   "refs": [
+    "capitals/kathmandu"
+   ]
+  },
+  {
+   "id": "capr-kathmandu",
+   "kind": "mc",
+   "prompt": "Kathmandu is the capital of which country?",
+   "answer": "Nepal",
+   "wrong": [
+    "Kazakhstan",
+    "Laos",
+    "Mongolia"
+   ],
+   "explain": "Kathmandu is the capital of Nepal.",
+   "difficulty": 2,
+   "refs": [
+    "capitals/kathmandu"
+   ]
+  },
+  {
+   "id": "cap-amsterdam",
+   "kind": "mc",
+   "prompt": "What is the capital of Netherlands?",
+   "answer": "Amsterdam",
+   "wrong": [
+    "Chișinău",
+    "Madrid",
+    "Rome"
+   ],
+   "explain": "Amsterdam is the capital of Netherlands. Amsterdam is the constitutional capital; the government sits in The Hague.",
+   "difficulty": 1,
+   "refs": [
+    "capitals/amsterdam"
+   ]
+  },
+  {
+   "id": "capr-amsterdam",
+   "kind": "mc",
+   "prompt": "Amsterdam is the capital of which country?",
+   "answer": "Netherlands",
+   "wrong": [
+    "Luxembourg",
+    "Belarus",
+    "Sweden"
+   ],
+   "explain": "Amsterdam is the capital of Netherlands. Amsterdam is the constitutional capital; the government sits in The Hague.",
+   "difficulty": 1,
+   "refs": [
+    "capitals/amsterdam"
+   ]
+  },
+  {
+   "id": "cap-wellington",
+   "kind": "mc",
+   "prompt": "What is the capital of New Zealand?",
+   "answer": "Wellington",
+   "wrong": [
+    "Honiara",
+    "Ngerulmud",
+    "Port Moresby"
+   ],
+   "explain": "Wellington is the capital of New Zealand.",
+   "difficulty": 1,
+   "refs": [
+    "capitals/wellington"
+   ]
+  },
+  {
+   "id": "capr-wellington",
+   "kind": "mc",
+   "prompt": "Wellington is the capital of which country?",
+   "answer": "New Zealand",
+   "wrong": [
+    "Micronesia",
+    "Tonga",
+    "Fiji"
+   ],
+   "explain": "Wellington is the capital of New Zealand.",
+   "difficulty": 1,
+   "refs": [
+    "capitals/wellington"
+   ]
+  },
+  {
+   "id": "cap-managua",
+   "kind": "mc",
+   "prompt": "What is the capital of Nicaragua?",
+   "answer": "Managua",
+   "wrong": [
+    "Basseterre",
+    "Mexico City",
+    "Castries"
+   ],
+   "explain": "Managua is the capital of Nicaragua.",
+   "difficulty": 2,
+   "refs": [
+    "capitals/managua"
+   ]
+  },
+  {
+   "id": "capr-managua",
+   "kind": "mc",
+   "prompt": "Managua is the capital of which country?",
+   "answer": "Nicaragua",
+   "wrong": [
+    "United States",
+    "Belize",
+    "Trinidad and Tobago"
+   ],
+   "explain": "Managua is the capital of Nicaragua.",
+   "difficulty": 2,
+   "refs": [
+    "capitals/managua"
+   ]
+  },
+  {
+   "id": "cap-niamey",
+   "kind": "mc",
+   "prompt": "What is the capital of Niger?",
+   "answer": "Niamey",
+   "wrong": [
+    "Brazzaville",
+    "Monrovia",
+    "Tripoli"
+   ],
+   "explain": "Niamey is the capital of Niger.",
+   "difficulty": 2,
+   "refs": [
+    "capitals/niamey"
+   ]
+  },
+  {
+   "id": "capr-niamey",
+   "kind": "mc",
+   "prompt": "Niamey is the capital of which country?",
+   "answer": "Niger",
+   "wrong": [
+    "Senegal",
+    "Angola",
+    "Egypt"
+   ],
+   "explain": "Niamey is the capital of Niger.",
+   "difficulty": 2,
+   "refs": [
+    "capitals/niamey"
+   ]
+  },
+  {
+   "id": "cap-abuja",
+   "kind": "mc",
+   "prompt": "What is the capital of Nigeria?",
+   "answer": "Abuja",
+   "wrong": [
+    "Brazzaville",
+    "Libreville",
+    "Yaoundé"
+   ],
+   "explain": "Abuja is the capital of Nigeria.",
+   "difficulty": 1,
+   "refs": [
+    "capitals/abuja"
+   ]
+  },
+  {
+   "id": "capr-abuja",
+   "kind": "mc",
+   "prompt": "Abuja is the capital of which country?",
+   "answer": "Nigeria",
+   "wrong": [
+    "Guinea",
+    "Mauritius",
+    "Niger"
+   ],
+   "explain": "Abuja is the capital of Nigeria.",
+   "difficulty": 1,
+   "refs": [
+    "capitals/abuja"
+   ]
+  },
+  {
+   "id": "cap-pyongyang",
+   "kind": "mc",
+   "prompt": "What is the capital of North Korea?",
+   "answer": "Pyongyang",
+   "wrong": [
+    "Dushanbe",
+    "Islamabad",
+    "Dhaka"
+   ],
+   "explain": "Pyongyang is the capital of North Korea.",
+   "difficulty": 2,
+   "refs": [
+    "capitals/pyongyang"
+   ]
+  },
+  {
+   "id": "capr-pyongyang",
+   "kind": "mc",
+   "prompt": "Pyongyang is the capital of which country?",
+   "answer": "North Korea",
+   "wrong": [
+    "Maldives",
+    "China",
+    "Sri Lanka"
+   ],
+   "explain": "Pyongyang is the capital of North Korea.",
+   "difficulty": 2,
+   "refs": [
+    "capitals/pyongyang"
+   ]
+  },
+  {
+   "id": "cap-skopje",
+   "kind": "mc",
+   "prompt": "What is the capital of North Macedonia?",
+   "answer": "Skopje",
+   "wrong": [
+    "Andorra la Vella",
+    "Brussels",
+    "Athens"
+   ],
+   "explain": "Skopje is the capital of North Macedonia.",
+   "difficulty": 3,
+   "refs": [
+    "capitals/skopje"
+   ]
+  },
+  {
+   "id": "cap-oslo",
+   "kind": "mc",
+   "prompt": "What is the capital of Norway?",
+   "answer": "Oslo",
+   "wrong": [
+    "San Marino",
+    "Prague",
+    "Vienna"
+   ],
+   "explain": "Oslo is the capital of Norway.",
+   "difficulty": 1,
+   "refs": [
+    "capitals/oslo"
+   ]
+  },
+  {
+   "id": "capr-oslo",
+   "kind": "mc",
+   "prompt": "Oslo is the capital of which country?",
+   "answer": "Norway",
+   "wrong": [
+    "Albania",
+    "Ukraine",
+    "Austria"
+   ],
+   "explain": "Oslo is the capital of Norway.",
+   "difficulty": 1,
+   "refs": [
+    "capitals/oslo"
+   ]
+  },
+  {
+   "id": "cap-muscat",
+   "kind": "mc",
+   "prompt": "What is the capital of Oman?",
+   "answer": "Muscat",
+   "wrong": [
+    "Ulaanbaatar",
+    "Amman",
+    "Abu Dhabi"
+   ],
+   "explain": "Muscat is the capital of Oman.",
+   "difficulty": 2,
+   "refs": [
+    "capitals/muscat"
+   ]
+  },
+  {
+   "id": "capr-muscat",
+   "kind": "mc",
+   "prompt": "Muscat is the capital of which country?",
+   "answer": "Oman",
+   "wrong": [
+    "Iran",
+    "Azerbaijan",
+    "Indonesia"
+   ],
+   "explain": "Muscat is the capital of Oman.",
+   "difficulty": 2,
+   "refs": [
+    "capitals/muscat"
+   ]
+  },
+  {
+   "id": "cap-islamabad",
+   "kind": "mc",
+   "prompt": "What is the capital of Pakistan?",
+   "answer": "Islamabad",
+   "wrong": [
+    "Amman",
+    "Tokyo",
+    "Ashgabat"
+   ],
+   "explain": "Islamabad is the capital of Pakistan.",
+   "difficulty": 2,
+   "refs": [
+    "capitals/islamabad"
+   ]
+  },
+  {
+   "id": "capr-islamabad",
+   "kind": "mc",
+   "prompt": "Islamabad is the capital of which country?",
+   "answer": "Pakistan",
+   "wrong": [
+    "China",
+    "Timor-Leste",
+    "United Arab Emirates"
+   ],
+   "explain": "Islamabad is the capital of Pakistan.",
+   "difficulty": 2,
+   "refs": [
+    "capitals/islamabad"
+   ]
+  },
+  {
+   "id": "cap-ngerulmud",
+   "kind": "mc",
+   "prompt": "What is the capital of Palau?",
+   "answer": "Ngerulmud",
+   "wrong": [
+    "Port Vila",
+    "Palikir",
+    "Apia"
+   ],
+   "explain": "Ngerulmud is the capital of Palau.",
+   "difficulty": 3,
+   "refs": [
+    "capitals/ngerulmud"
+   ]
+  },
+  {
+   "id": "cap-panama-city",
+   "kind": "mc",
+   "prompt": "What is the capital of Panama?",
+   "answer": "Panama City",
+   "wrong": [
+    "San Salvador",
+    "Roseau",
+    "Guatemala City"
+   ],
+   "explain": "Panama City is the capital of Panama.",
+   "difficulty": 2,
+   "refs": [
+    "capitals/panama-city"
+   ]
+  },
+  {
+   "id": "capr-panama-city",
+   "kind": "mc",
+   "prompt": "Panama City is the capital of which country?",
+   "answer": "Panama",
+   "wrong": [
+    "United States",
+    "Honduras",
+    "Nicaragua"
+   ],
+   "explain": "Panama City is the capital of Panama.",
+   "difficulty": 2,
+   "refs": [
+    "capitals/panama-city"
+   ]
+  },
+  {
+   "id": "cap-port-moresby",
+   "kind": "mc",
+   "prompt": "What is the capital of Papua New Guinea?",
+   "answer": "Port Moresby",
+   "wrong": [
+    "Apia",
+    "Suva",
+    "Wellington"
+   ],
+   "explain": "Port Moresby is the capital of Papua New Guinea.",
+   "difficulty": 2,
+   "refs": [
+    "capitals/port-moresby"
+   ]
+  },
+  {
+   "id": "capr-port-moresby",
+   "kind": "mc",
+   "prompt": "Port Moresby is the capital of which country?",
+   "answer": "Papua New Guinea",
+   "wrong": [
+    "Samoa",
+    "Solomon Islands",
+    "Kiribati"
+   ],
+   "explain": "Port Moresby is the capital of Papua New Guinea.",
+   "difficulty": 2,
+   "refs": [
+    "capitals/port-moresby"
+   ]
+  },
+  {
+   "id": "cap-asuncion",
+   "kind": "mc",
+   "prompt": "What is the capital of Paraguay?",
+   "answer": "Asunción",
+   "wrong": [
+    "Quito",
+    "Georgetown",
+    "Buenos Aires"
+   ],
+   "explain": "Asunción is the capital of Paraguay.",
+   "difficulty": 2,
+   "refs": [
+    "capitals/asuncion"
+   ]
+  },
+  {
+   "id": "capr-asuncion",
+   "kind": "mc",
+   "prompt": "Asunción is the capital of which country?",
+   "answer": "Paraguay",
+   "wrong": [
+    "Peru",
+    "Guyana",
+    "Bolivia"
+   ],
+   "explain": "Asunción is the capital of Paraguay.",
+   "difficulty": 2,
+   "refs": [
+    "capitals/asuncion"
+   ]
+  },
+  {
+   "id": "cap-lima",
+   "kind": "mc",
+   "prompt": "What is the capital of Peru?",
+   "answer": "Lima",
+   "wrong": [
+    "Caracas",
+    "Buenos Aires",
+    "Asunción"
+   ],
+   "explain": "Lima is the capital of Peru.",
+   "difficulty": 1,
+   "refs": [
+    "capitals/lima"
+   ]
+  },
+  {
+   "id": "capr-lima",
+   "kind": "mc",
+   "prompt": "Lima is the capital of which country?",
+   "answer": "Peru",
+   "wrong": [
+    "Guyana",
+    "Paraguay",
+    "Venezuela"
+   ],
+   "explain": "Lima is the capital of Peru.",
+   "difficulty": 1,
+   "refs": [
+    "capitals/lima"
+   ]
+  },
+  {
+   "id": "cap-manila",
+   "kind": "mc",
+   "prompt": "What is the capital of Philippines?",
+   "answer": "Manila",
+   "wrong": [
+    "Bandar Seri Begawan",
+    "Seoul",
+    "Dushanbe"
+   ],
+   "explain": "Manila is the capital of Philippines.",
+   "difficulty": 2,
+   "refs": [
+    "capitals/manila"
+   ]
+  },
+  {
+   "id": "capr-manila",
+   "kind": "mc",
+   "prompt": "Manila is the capital of which country?",
+   "answer": "Philippines",
+   "wrong": [
+    "Azerbaijan",
+    "Armenia",
+    "Indonesia"
+   ],
+   "explain": "Manila is the capital of Philippines.",
+   "difficulty": 2,
+   "refs": [
+    "capitals/manila"
+   ]
+  },
+  {
+   "id": "cap-warsaw",
+   "kind": "mc",
+   "prompt": "What is the capital of Poland?",
+   "answer": "Warsaw",
+   "wrong": [
+    "Vatican City",
+    "Minsk",
+    "Sarajevo"
+   ],
+   "explain": "Warsaw is the capital of Poland.",
+   "difficulty": 1,
+   "refs": [
+    "capitals/warsaw"
+   ]
+  },
+  {
+   "id": "capr-warsaw",
+   "kind": "mc",
+   "prompt": "Warsaw is the capital of which country?",
+   "answer": "Poland",
+   "wrong": [
+    "Malta",
+    "Belarus",
+    "Czechia"
+   ],
+   "explain": "Warsaw is the capital of Poland.",
+   "difficulty": 1,
+   "refs": [
+    "capitals/warsaw"
+   ]
+  },
+  {
+   "id": "cap-lisbon",
+   "kind": "mc",
+   "prompt": "What is the capital of Portugal?",
+   "answer": "Lisbon",
+   "wrong": [
+    "Bucharest",
+    "Belgrade",
+    "Vatican City"
+   ],
+   "explain": "Lisbon is the capital of Portugal.",
+   "difficulty": 1,
+   "refs": [
+    "capitals/lisbon"
+   ]
+  },
+  {
+   "id": "capr-lisbon",
+   "kind": "mc",
+   "prompt": "Lisbon is the capital of which country?",
+   "answer": "Portugal",
+   "wrong": [
+    "Bulgaria",
+    "Slovakia",
+    "Liechtenstein"
+   ],
+   "explain": "Lisbon is the capital of Portugal.",
+   "difficulty": 1,
+   "refs": [
+    "capitals/lisbon"
+   ]
+  },
+  {
+   "id": "cap-doha",
+   "kind": "mc",
+   "prompt": "What is the capital of Qatar?",
+   "answer": "Doha",
+   "wrong": [
+    "Yerevan",
+    "Ankara",
+    "Beijing"
+   ],
+   "explain": "Doha is the capital of Qatar.",
+   "difficulty": 3,
+   "refs": [
+    "capitals/doha"
+   ]
+  },
+  {
+   "id": "cap-bucharest",
+   "kind": "mc",
+   "prompt": "What is the capital of Romania?",
+   "answer": "Bucharest",
+   "wrong": [
+    "Reykjavík",
+    "Minsk",
+    "Budapest"
+   ],
+   "explain": "Bucharest is the capital of Romania.",
+   "difficulty": 2,
+   "refs": [
+    "capitals/bucharest"
+   ]
+  },
+  {
+   "id": "capr-bucharest",
+   "kind": "mc",
+   "prompt": "Bucharest is the capital of which country?",
+   "answer": "Romania",
+   "wrong": [
+    "Norway",
+    "Slovakia",
+    "Malta"
+   ],
+   "explain": "Bucharest is the capital of Romania.",
+   "difficulty": 2,
+   "refs": [
+    "capitals/bucharest"
+   ]
+  },
+  {
+   "id": "cap-moscow",
+   "kind": "mc",
+   "prompt": "What is the capital of Russia?",
+   "answer": "Moscow",
+   "wrong": [
+    "London",
+    "Belgrade",
+    "Rome"
+   ],
+   "explain": "Moscow is the capital of Russia.",
+   "difficulty": 1,
+   "refs": [
+    "capitals/moscow"
+   ]
+  },
+  {
+   "id": "capr-moscow",
+   "kind": "mc",
+   "prompt": "Moscow is the capital of which country?",
+   "answer": "Russia",
+   "wrong": [
+    "France",
+    "Slovenia",
+    "Bosnia and Herzegovina"
+   ],
+   "explain": "Moscow is the capital of Russia.",
+   "difficulty": 1,
+   "refs": [
+    "capitals/moscow"
+   ]
+  },
+  {
+   "id": "cap-kigali",
+   "kind": "mc",
+   "prompt": "What is the capital of Rwanda?",
+   "answer": "Kigali",
+   "wrong": [
+    "Cairo",
+    "Porto-Novo",
+    "Banjul"
+   ],
+   "explain": "Kigali is the capital of Rwanda.",
+   "difficulty": 2,
+   "refs": [
+    "capitals/kigali"
+   ]
+  },
+  {
+   "id": "capr-kigali",
+   "kind": "mc",
+   "prompt": "Kigali is the capital of which country?",
+   "answer": "Rwanda",
+   "wrong": [
+    "Lesotho",
+    "Seychelles",
+    "Algeria"
+   ],
+   "explain": "Kigali is the capital of Rwanda.",
+   "difficulty": 2,
+   "refs": [
+    "capitals/kigali"
+   ]
+  },
+  {
+   "id": "cap-basseterre",
+   "kind": "mc",
+   "prompt": "What is the capital of Saint Kitts and Nevis?",
+   "answer": "Basseterre",
+   "wrong": [
+    "Panama City",
+    "Ottawa",
+    "Guatemala City"
+   ],
+   "explain": "Basseterre is the capital of Saint Kitts and Nevis.",
+   "difficulty": 3,
+   "refs": [
+    "capitals/basseterre"
+   ]
+  },
+  {
+   "id": "cap-castries",
+   "kind": "mc",
+   "prompt": "What is the capital of Saint Lucia?",
+   "answer": "Castries",
+   "wrong": [
+    "St. John's",
+    "Washington, D.C.",
+    "Nassau"
+   ],
+   "explain": "Castries is the capital of Saint Lucia.",
+   "difficulty": 3,
+   "refs": [
+    "capitals/castries"
+   ]
+  },
+  {
+   "id": "cap-kingstown",
+   "kind": "mc",
+   "prompt": "What is the capital of Saint Vincent and the Grenadines?",
+   "answer": "Kingstown",
+   "wrong": [
+    "St. George's",
+    "St. John's",
+    "Washington, D.C."
+   ],
+   "explain": "Kingstown is the capital of Saint Vincent and the Grenadines.",
+   "difficulty": 3,
+   "refs": [
+    "capitals/kingstown"
+   ]
+  },
+  {
+   "id": "cap-apia",
+   "kind": "mc",
+   "prompt": "What is the capital of Samoa?",
+   "answer": "Apia",
+   "wrong": [
+    "Honiara",
+    "Port Moresby",
+    "Nukuʻalofa"
+   ],
+   "explain": "Apia is the capital of Samoa.",
+   "difficulty": 3,
+   "refs": [
+    "capitals/apia"
+   ]
+  },
+  {
+   "id": "cap-san-marino-city",
+   "kind": "mc",
+   "prompt": "What is the capital of San Marino?",
+   "answer": "San Marino",
+   "wrong": [
+    "Athens",
+    "Luxembourg",
+    "Bucharest"
+   ],
+   "explain": "San Marino is the capital of San Marino.",
+   "difficulty": 3,
+   "refs": [
+    "capitals/san-marino-city"
+   ]
+  },
+  {
+   "id": "cap-sao-tome",
+   "kind": "mc",
+   "prompt": "What is the capital of São Tomé and Príncipe?",
+   "answer": "São Tomé",
+   "wrong": [
+    "Asmara",
+    "Pretoria",
+    "Bangui"
+   ],
+   "explain": "São Tomé is the capital of São Tomé and Príncipe.",
+   "difficulty": 3,
+   "refs": [
+    "capitals/sao-tome"
+   ]
+  },
+  {
+   "id": "cap-riyadh",
+   "kind": "mc",
+   "prompt": "What is the capital of Saudi Arabia?",
+   "answer": "Riyadh",
+   "wrong": [
+    "Nicosia",
+    "Beijing",
+    "Sri Jayawardenepura Kotte"
+   ],
+   "explain": "Riyadh is the capital of Saudi Arabia.",
+   "difficulty": 2,
+   "refs": [
+    "capitals/riyadh"
+   ]
+  },
+  {
+   "id": "capr-riyadh",
+   "kind": "mc",
+   "prompt": "Riyadh is the capital of which country?",
+   "answer": "Saudi Arabia",
+   "wrong": [
+    "South Korea",
+    "Cambodia",
+    "Vietnam"
+   ],
+   "explain": "Riyadh is the capital of Saudi Arabia.",
+   "difficulty": 2,
+   "refs": [
+    "capitals/riyadh"
+   ]
+  },
+  {
+   "id": "cap-dakar",
+   "kind": "mc",
+   "prompt": "What is the capital of Senegal?",
+   "answer": "Dakar",
+   "wrong": [
+    "Cairo",
+    "Lusaka",
+    "Abuja"
+   ],
+   "explain": "Dakar is the capital of Senegal.",
+   "difficulty": 2,
+   "refs": [
+    "capitals/dakar"
+   ]
+  },
+  {
+   "id": "capr-dakar",
+   "kind": "mc",
+   "prompt": "Dakar is the capital of which country?",
+   "answer": "Senegal",
+   "wrong": [
+    "Tanzania",
+    "Angola",
+    "Lesotho"
+   ],
+   "explain": "Dakar is the capital of Senegal.",
+   "difficulty": 2,
+   "refs": [
+    "capitals/dakar"
+   ]
+  },
+  {
+   "id": "cap-belgrade",
+   "kind": "mc",
+   "prompt": "What is the capital of Serbia?",
+   "answer": "Belgrade",
+   "wrong": [
+    "Stockholm",
+    "Budapest",
+    "Sarajevo"
+   ],
+   "explain": "Belgrade is the capital of Serbia.",
+   "difficulty": 2,
+   "refs": [
+    "capitals/belgrade"
+   ]
+  },
+  {
+   "id": "capr-belgrade",
+   "kind": "mc",
+   "prompt": "Belgrade is the capital of which country?",
+   "answer": "Serbia",
+   "wrong": [
+    "Monaco",
+    "Lithuania",
+    "Latvia"
+   ],
+   "explain": "Belgrade is the capital of Serbia.",
+   "difficulty": 2,
+   "refs": [
+    "capitals/belgrade"
+   ]
+  },
+  {
+   "id": "cap-victoria",
+   "kind": "mc",
+   "prompt": "What is the capital of Seychelles?",
+   "answer": "Victoria",
+   "wrong": [
+    "Yaoundé",
+    "Kampala",
+    "Lilongwe"
+   ],
+   "explain": "Victoria is the capital of Seychelles.",
+   "difficulty": 3,
+   "refs": [
+    "capitals/victoria"
+   ]
+  },
+  {
+   "id": "cap-freetown",
+   "kind": "mc",
+   "prompt": "What is the capital of Sierra Leone?",
+   "answer": "Freetown",
+   "wrong": [
+    "Accra",
+    "Addis Ababa",
+    "Nairobi"
+   ],
+   "explain": "Freetown is the capital of Sierra Leone.",
+   "difficulty": 2,
+   "refs": [
+    "capitals/freetown"
+   ]
+  },
+  {
+   "id": "capr-freetown",
+   "kind": "mc",
+   "prompt": "Freetown is the capital of which country?",
+   "answer": "Sierra Leone",
+   "wrong": [
+    "Seychelles",
+    "Niger",
+    "Central African Republic"
+   ],
+   "explain": "Freetown is the capital of Sierra Leone.",
+   "difficulty": 2,
+   "refs": [
+    "capitals/freetown"
+   ]
+  },
+  {
+   "id": "cap-singapore-city",
+   "kind": "mc",
+   "prompt": "What is the capital of Singapore?",
+   "answer": "Singapore",
+   "wrong": [
+    "Beirut",
+    "Tashkent",
+    "Kuala Lumpur"
+   ],
+   "explain": "Singapore is the capital of Singapore.",
+   "difficulty": 2,
+   "refs": [
+    "capitals/singapore-city"
+   ]
+  },
+  {
+   "id": "cap-bratislava",
+   "kind": "mc",
+   "prompt": "What is the capital of Slovakia?",
+   "answer": "Bratislava",
+   "wrong": [
+    "Budapest",
+    "Reykjavík",
+    "Monaco"
+   ],
+   "explain": "Bratislava is the capital of Slovakia.",
+   "difficulty": 2,
+   "refs": [
+    "capitals/bratislava"
+   ]
+  },
+  {
+   "id": "capr-bratislava",
+   "kind": "mc",
+   "prompt": "Bratislava is the capital of which country?",
+   "answer": "Slovakia",
+   "wrong": [
+    "Russia",
+    "Netherlands",
+    "Portugal"
+   ],
+   "explain": "Bratislava is the capital of Slovakia.",
+   "difficulty": 2,
+   "refs": [
+    "capitals/bratislava"
+   ]
+  },
+  {
+   "id": "cap-ljubljana",
+   "kind": "mc",
+   "prompt": "What is the capital of Slovenia?",
+   "answer": "Ljubljana",
+   "wrong": [
+    "Rome",
+    "Helsinki",
+    "Andorra la Vella"
+   ],
+   "explain": "Ljubljana is the capital of Slovenia.",
+   "difficulty": 3,
+   "refs": [
+    "capitals/ljubljana"
+   ]
+  },
+  {
+   "id": "cap-honiara",
+   "kind": "mc",
+   "prompt": "What is the capital of Solomon Islands?",
+   "answer": "Honiara",
+   "wrong": [
+    "Wellington",
+    "Ngerulmud",
+    "Canberra"
+   ],
+   "explain": "Honiara is the capital of Solomon Islands.",
+   "difficulty": 3,
+   "refs": [
+    "capitals/honiara"
+   ]
+  },
+  {
+   "id": "cap-mogadishu",
+   "kind": "mc",
+   "prompt": "What is the capital of Somalia?",
+   "answer": "Mogadishu",
+   "wrong": [
+    "Yamoussoukro",
+    "Nouakchott",
+    "Libreville"
+   ],
+   "explain": "Mogadishu is the capital of Somalia.",
+   "difficulty": 2,
+   "refs": [
+    "capitals/mogadishu"
+   ]
+  },
+  {
+   "id": "capr-mogadishu",
+   "kind": "mc",
+   "prompt": "Mogadishu is the capital of which country?",
+   "answer": "Somalia",
+   "wrong": [
+    "Republic of the Congo",
+    "Seychelles",
+    "Tunisia"
+   ],
+   "explain": "Mogadishu is the capital of Somalia.",
+   "difficulty": 2,
+   "refs": [
+    "capitals/mogadishu"
+   ]
+  },
+  {
+   "id": "cap-pretoria",
+   "kind": "mc",
+   "prompt": "What is the capital of South Africa?",
+   "answer": "Pretoria",
+   "wrong": [
+    "Conakry",
+    "Lilongwe",
+    "Asmara"
+   ],
+   "explain": "Pretoria is the capital of South Africa. Pretoria is the executive capital; Cape Town is legislative and Bloemfontein judicial.",
+   "difficulty": 1,
+   "refs": [
+    "capitals/pretoria"
+   ]
+  },
+  {
+   "id": "capr-pretoria",
+   "kind": "mc",
+   "prompt": "Pretoria is the capital of which country?",
+   "answer": "South Africa",
+   "wrong": [
+    "Gabon",
+    "Guinea",
+    "Guinea-Bissau"
+   ],
+   "explain": "Pretoria is the capital of South Africa. Pretoria is the executive capital; Cape Town is legislative and Bloemfontein judicial.",
+   "difficulty": 1,
+   "refs": [
+    "capitals/pretoria"
+   ]
+  },
+  {
+   "id": "cap-seoul",
+   "kind": "mc",
+   "prompt": "What is the capital of South Korea?",
+   "answer": "Seoul",
+   "wrong": [
+    "Sri Jayawardenepura Kotte",
+    "Tashkent",
+    "Doha"
+   ],
+   "explain": "Seoul is the capital of South Korea.",
+   "difficulty": 1,
+   "refs": [
+    "capitals/seoul"
+   ]
+  },
+  {
+   "id": "capr-seoul",
+   "kind": "mc",
+   "prompt": "Seoul is the capital of which country?",
+   "answer": "South Korea",
+   "wrong": [
+    "Indonesia",
+    "Uzbekistan",
+    "Philippines"
+   ],
+   "explain": "Seoul is the capital of South Korea.",
+   "difficulty": 1,
+   "refs": [
+    "capitals/seoul"
+   ]
+  },
+  {
+   "id": "cap-juba",
+   "kind": "mc",
+   "prompt": "What is the capital of South Sudan?",
+   "answer": "Juba",
+   "wrong": [
+    "Yaoundé",
+    "Yamoussoukro",
+    "Lomé"
+   ],
+   "explain": "Juba is the capital of South Sudan.",
+   "difficulty": 2,
+   "refs": [
+    "capitals/juba"
+   ]
+  },
+  {
+   "id": "capr-juba",
+   "kind": "mc",
+   "prompt": "Juba is the capital of which country?",
+   "answer": "South Sudan",
+   "wrong": [
+    "Niger",
+    "Uganda",
+    "Togo"
+   ],
+   "explain": "Juba is the capital of South Sudan.",
+   "difficulty": 2,
+   "refs": [
+    "capitals/juba"
+   ]
+  },
+  {
+   "id": "cap-madrid",
+   "kind": "mc",
+   "prompt": "What is the capital of Spain?",
+   "answer": "Madrid",
+   "wrong": [
+    "Helsinki",
+    "Prague",
+    "Amsterdam"
+   ],
+   "explain": "Madrid is the capital of Spain.",
+   "difficulty": 1,
+   "refs": [
+    "capitals/madrid"
+   ]
+  },
+  {
+   "id": "capr-madrid",
+   "kind": "mc",
+   "prompt": "Madrid is the capital of which country?",
+   "answer": "Spain",
+   "wrong": [
+    "Moldova",
+    "Netherlands",
+    "Czechia"
+   ],
+   "explain": "Madrid is the capital of Spain.",
+   "difficulty": 1,
+   "refs": [
+    "capitals/madrid"
+   ]
+  },
+  {
+   "id": "cap-sri-jayawardenepura-kotte",
+   "kind": "mc",
+   "prompt": "What is the capital of Sri Lanka?",
+   "answer": "Sri Jayawardenepura Kotte",
+   "wrong": [
+    "Phnom Penh",
+    "Kathmandu",
+    "Muscat"
+   ],
+   "explain": "Sri Jayawardenepura Kotte is the capital of Sri Lanka. Sri Jayawardenepura Kotte is the legislative capital; Colombo is the commercial capital.",
+   "difficulty": 2,
+   "refs": [
+    "capitals/sri-jayawardenepura-kotte"
+   ]
+  },
+  {
+   "id": "capr-sri-jayawardenepura-kotte",
+   "kind": "mc",
+   "prompt": "Sri Jayawardenepura Kotte is the capital of which country?",
+   "answer": "Sri Lanka",
+   "wrong": [
+    "Mongolia",
+    "Qatar",
+    "Georgia"
+   ],
+   "explain": "Sri Jayawardenepura Kotte is the capital of Sri Lanka. Sri Jayawardenepura Kotte is the legislative capital; Colombo is the commercial capital.",
+   "difficulty": 2,
+   "refs": [
+    "capitals/sri-jayawardenepura-kotte"
+   ]
+  },
+  {
+   "id": "cap-khartoum",
+   "kind": "mc",
+   "prompt": "What is the capital of Sudan?",
+   "answer": "Khartoum",
+   "wrong": [
+    "Libreville",
+    "Yamoussoukro",
+    "Gitega"
+   ],
+   "explain": "Khartoum is the capital of Sudan.",
+   "difficulty": 2,
+   "refs": [
+    "capitals/khartoum"
+   ]
+  },
+  {
+   "id": "capr-khartoum",
+   "kind": "mc",
+   "prompt": "Khartoum is the capital of which country?",
+   "answer": "Sudan",
+   "wrong": [
+    "Botswana",
+    "Tanzania",
+    "Guinea-Bissau"
+   ],
+   "explain": "Khartoum is the capital of Sudan.",
+   "difficulty": 2,
+   "refs": [
+    "capitals/khartoum"
+   ]
+  },
+  {
+   "id": "cap-paramaribo",
+   "kind": "mc",
+   "prompt": "What is the capital of Suriname?",
+   "answer": "Paramaribo",
+   "wrong": [
+    "Lima",
+    "Quito",
+    "Montevideo"
+   ],
+   "explain": "Paramaribo is the capital of Suriname.",
+   "difficulty": 3,
+   "refs": [
+    "capitals/paramaribo"
+   ]
+  },
+  {
+   "id": "cap-stockholm",
+   "kind": "mc",
+   "prompt": "What is the capital of Sweden?",
+   "answer": "Stockholm",
+   "wrong": [
+    "Andorra la Vella",
+    "Copenhagen",
+    "Tirana"
+   ],
+   "explain": "Stockholm is the capital of Sweden.",
+   "difficulty": 1,
+   "refs": [
+    "capitals/stockholm"
+   ]
+  },
+  {
+   "id": "capr-stockholm",
+   "kind": "mc",
+   "prompt": "Stockholm is the capital of which country?",
+   "answer": "Sweden",
+   "wrong": [
+    "Moldova",
+    "Belarus",
+    "Lithuania"
+   ],
+   "explain": "Stockholm is the capital of Sweden.",
+   "difficulty": 1,
+   "refs": [
+    "capitals/stockholm"
+   ]
+  },
+  {
+   "id": "cap-bern",
+   "kind": "mc",
+   "prompt": "What is the capital of Switzerland?",
+   "answer": "Bern",
+   "wrong": [
+    "Tirana",
+    "Rome",
+    "Vilnius"
+   ],
+   "explain": "Bern is the capital of Switzerland. Switzerland has no de jure capital; Bern is the federal city and seat of government.",
+   "difficulty": 1,
+   "refs": [
+    "capitals/bern"
+   ]
+  },
+  {
+   "id": "capr-bern",
+   "kind": "mc",
+   "prompt": "Bern is the capital of which country?",
+   "answer": "Switzerland",
+   "wrong": [
+    "Moldova",
+    "Austria",
+    "Hungary"
+   ],
+   "explain": "Bern is the capital of Switzerland. Switzerland has no de jure capital; Bern is the federal city and seat of government.",
+   "difficulty": 1,
+   "refs": [
+    "capitals/bern"
+   ]
+  },
+  {
+   "id": "cap-damascus",
+   "kind": "mc",
+   "prompt": "What is the capital of Syria?",
+   "answer": "Damascus",
+   "wrong": [
+    "Kuala Lumpur",
+    "Kabul",
+    "Manila"
+   ],
+   "explain": "Damascus is the capital of Syria.",
+   "difficulty": 2,
+   "refs": [
+    "capitals/damascus"
+   ]
+  },
+  {
+   "id": "capr-damascus",
+   "kind": "mc",
+   "prompt": "Damascus is the capital of which country?",
+   "answer": "Syria",
+   "wrong": [
+    "Singapore",
+    "North Korea",
+    "Timor-Leste"
+   ],
+   "explain": "Damascus is the capital of Syria.",
+   "difficulty": 2,
+   "refs": [
+    "capitals/damascus"
+   ]
+  },
+  {
+   "id": "cap-dushanbe",
+   "kind": "mc",
+   "prompt": "What is the capital of Tajikistan?",
+   "answer": "Dushanbe",
+   "wrong": [
+    "Phnom Penh",
+    "Naypyidaw",
+    "Kuwait City"
+   ],
+   "explain": "Dushanbe is the capital of Tajikistan.",
+   "difficulty": 2,
+   "refs": [
+    "capitals/dushanbe"
+   ]
+  },
+  {
+   "id": "capr-dushanbe",
+   "kind": "mc",
+   "prompt": "Dushanbe is the capital of which country?",
+   "answer": "Tajikistan",
+   "wrong": [
+    "United Arab Emirates",
+    "Laos",
+    "Cambodia"
+   ],
+   "explain": "Dushanbe is the capital of Tajikistan.",
+   "difficulty": 2,
+   "refs": [
+    "capitals/dushanbe"
+   ]
+  },
+  {
+   "id": "cap-dodoma",
+   "kind": "mc",
+   "prompt": "What is the capital of Tanzania?",
+   "answer": "Dodoma",
+   "wrong": [
+    "Luanda",
+    "Kampala",
+    "Gaborone"
+   ],
+   "explain": "Dodoma is the capital of Tanzania. Dodoma is the official capital; Dar es Salaam is the largest city.",
+   "difficulty": 2,
+   "refs": [
+    "capitals/dodoma"
+   ]
+  },
+  {
+   "id": "capr-dodoma",
+   "kind": "mc",
+   "prompt": "Dodoma is the capital of which country?",
+   "answer": "Tanzania",
+   "wrong": [
+    "Mozambique",
+    "Namibia",
+    "Ethiopia"
+   ],
+   "explain": "Dodoma is the capital of Tanzania. Dodoma is the official capital; Dar es Salaam is the largest city.",
+   "difficulty": 2,
+   "refs": [
+    "capitals/dodoma"
+   ]
+  },
+  {
+   "id": "cap-bangkok",
+   "kind": "mc",
+   "prompt": "What is the capital of Thailand?",
+   "answer": "Bangkok",
+   "wrong": [
+    "Malé",
+    "Kuala Lumpur",
+    "Hanoi"
+   ],
+   "explain": "Bangkok is the capital of Thailand.",
+   "difficulty": 1,
+   "refs": [
+    "capitals/bangkok"
+   ]
+  },
+  {
+   "id": "capr-bangkok",
+   "kind": "mc",
+   "prompt": "Bangkok is the capital of which country?",
+   "answer": "Thailand",
+   "wrong": [
+    "Syria",
+    "South Korea",
+    "Jordan"
+   ],
+   "explain": "Bangkok is the capital of Thailand.",
+   "difficulty": 1,
+   "refs": [
+    "capitals/bangkok"
+   ]
+  },
+  {
+   "id": "cap-dili",
+   "kind": "mc",
+   "prompt": "What is the capital of Timor-Leste?",
+   "answer": "Dili",
+   "wrong": [
+    "Damascus",
+    "Seoul",
+    "Vientiane"
+   ],
+   "explain": "Dili is the capital of Timor-Leste.",
+   "difficulty": 3,
+   "refs": [
+    "capitals/dili"
+   ]
+  },
+  {
+   "id": "cap-lome",
+   "kind": "mc",
+   "prompt": "What is the capital of Togo?",
+   "answer": "Lomé",
+   "wrong": [
+    "Conakry",
+    "Algiers",
+    "Porto-Novo"
+   ],
+   "explain": "Lomé is the capital of Togo.",
+   "difficulty": 2,
+   "refs": [
+    "capitals/lome"
+   ]
+  },
+  {
+   "id": "capr-lome",
+   "kind": "mc",
+   "prompt": "Lomé is the capital of which country?",
+   "answer": "Togo",
+   "wrong": [
+    "Senegal",
+    "Ethiopia",
+    "Angola"
+   ],
+   "explain": "Lomé is the capital of Togo.",
+   "difficulty": 2,
+   "refs": [
+    "capitals/lome"
+   ]
+  },
+  {
+   "id": "cap-nuku-alofa",
+   "kind": "mc",
+   "prompt": "What is the capital of Tonga?",
+   "answer": "Nukuʻalofa",
+   "wrong": [
+    "South Tarawa",
+    "Ngerulmud",
+    "Port Vila"
+   ],
+   "explain": "Nukuʻalofa is the capital of Tonga.",
+   "difficulty": 3,
+   "refs": [
+    "capitals/nuku-alofa"
+   ]
+  },
+  {
+   "id": "cap-port-of-spain",
+   "kind": "mc",
+   "prompt": "What is the capital of Trinidad and Tobago?",
+   "answer": "Port of Spain",
+   "wrong": [
+    "St. John's",
+    "Havana",
+    "Mexico City"
+   ],
+   "explain": "Port of Spain is the capital of Trinidad and Tobago.",
+   "difficulty": 3,
+   "refs": [
+    "capitals/port-of-spain"
+   ]
+  },
+  {
+   "id": "cap-tunis",
+   "kind": "mc",
+   "prompt": "What is the capital of Tunisia?",
+   "answer": "Tunis",
+   "wrong": [
+    "Mogadishu",
+    "Harare",
+    "Yaoundé"
+   ],
+   "explain": "Tunis is the capital of Tunisia.",
+   "difficulty": 2,
+   "refs": [
+    "capitals/tunis"
+   ]
+  },
+  {
+   "id": "capr-tunis",
+   "kind": "mc",
+   "prompt": "Tunis is the capital of which country?",
+   "answer": "Tunisia",
+   "wrong": [
+    "Gambia",
+    "Democratic Republic of the Congo",
+    "Eritrea"
+   ],
+   "explain": "Tunis is the capital of Tunisia.",
+   "difficulty": 2,
+   "refs": [
+    "capitals/tunis"
+   ]
+  },
+  {
+   "id": "cap-ankara",
+   "kind": "mc",
+   "prompt": "What is the capital of Turkey?",
+   "answer": "Ankara",
+   "wrong": [
+    "Kabul",
+    "Bishkek",
+    "Islamabad"
+   ],
+   "explain": "Ankara is the capital of Turkey.",
+   "difficulty": 1,
+   "refs": [
+    "capitals/ankara"
+   ]
+  },
+  {
+   "id": "capr-ankara",
+   "kind": "mc",
+   "prompt": "Ankara is the capital of which country?",
+   "answer": "Turkey",
+   "wrong": [
+    "Qatar",
+    "Maldives",
+    "India"
+   ],
+   "explain": "Ankara is the capital of Turkey.",
+   "difficulty": 1,
+   "refs": [
+    "capitals/ankara"
+   ]
+  },
+  {
+   "id": "cap-ashgabat",
+   "kind": "mc",
+   "prompt": "What is the capital of Turkmenistan?",
+   "answer": "Ashgabat",
+   "wrong": [
+    "Bishkek",
+    "Manama",
+    "Riyadh"
+   ],
+   "explain": "Ashgabat is the capital of Turkmenistan.",
+   "difficulty": 2,
+   "refs": [
+    "capitals/ashgabat"
+   ]
+  },
+  {
+   "id": "capr-ashgabat",
+   "kind": "mc",
+   "prompt": "Ashgabat is the capital of which country?",
+   "answer": "Turkmenistan",
+   "wrong": [
+    "Georgia",
+    "Kuwait",
+    "Maldives"
+   ],
+   "explain": "Ashgabat is the capital of Turkmenistan.",
+   "difficulty": 2,
+   "refs": [
+    "capitals/ashgabat"
+   ]
+  },
+  {
+   "id": "cap-funafuti",
+   "kind": "mc",
+   "prompt": "What is the capital of Tuvalu?",
+   "answer": "Funafuti",
+   "wrong": [
+    "Palikir",
+    "Apia",
+    "Wellington"
+   ],
+   "explain": "Funafuti is the capital of Tuvalu.",
+   "difficulty": 3,
+   "refs": [
+    "capitals/funafuti"
+   ]
+  },
+  {
+   "id": "cap-kampala",
+   "kind": "mc",
+   "prompt": "What is the capital of Uganda?",
+   "answer": "Kampala",
+   "wrong": [
+    "Rabat",
+    "Praia",
+    "Antananarivo"
+   ],
+   "explain": "Kampala is the capital of Uganda.",
+   "difficulty": 2,
+   "refs": [
+    "capitals/kampala"
+   ]
+  },
+  {
+   "id": "capr-kampala",
+   "kind": "mc",
+   "prompt": "Kampala is the capital of which country?",
+   "answer": "Uganda",
+   "wrong": [
+    "Rwanda",
+    "Central African Republic",
+    "Ethiopia"
+   ],
+   "explain": "Kampala is the capital of Uganda.",
+   "difficulty": 2,
+   "refs": [
+    "capitals/kampala"
+   ]
+  },
+  {
+   "id": "cap-kyiv",
+   "kind": "mc",
+   "prompt": "What is the capital of Ukraine?",
+   "answer": "Kyiv",
+   "wrong": [
+    "Vatican City",
+    "Vilnius",
+    "Berlin"
+   ],
+   "explain": "Kyiv is the capital of Ukraine.",
+   "difficulty": 2,
+   "refs": [
+    "capitals/kyiv"
+   ]
+  },
+  {
+   "id": "capr-kyiv",
+   "kind": "mc",
+   "prompt": "Kyiv is the capital of which country?",
+   "answer": "Ukraine",
+   "wrong": [
+    "Greece",
+    "Portugal",
+    "Netherlands"
+   ],
+   "explain": "Kyiv is the capital of Ukraine.",
+   "difficulty": 2,
+   "refs": [
+    "capitals/kyiv"
+   ]
+  },
+  {
+   "id": "cap-abu-dhabi",
+   "kind": "mc",
+   "prompt": "What is the capital of United Arab Emirates?",
+   "answer": "Abu Dhabi",
+   "wrong": [
+    "Dhaka",
+    "Beirut",
+    "Tehran"
+   ],
+   "explain": "Abu Dhabi is the capital of United Arab Emirates.",
+   "difficulty": 2,
+   "refs": [
+    "capitals/abu-dhabi"
+   ]
+  },
+  {
+   "id": "capr-abu-dhabi",
+   "kind": "mc",
+   "prompt": "Abu Dhabi is the capital of which country?",
+   "answer": "United Arab Emirates",
+   "wrong": [
+    "Afghanistan",
+    "Bhutan",
+    "Uzbekistan"
+   ],
+   "explain": "Abu Dhabi is the capital of United Arab Emirates.",
+   "difficulty": 2,
+   "refs": [
+    "capitals/abu-dhabi"
+   ]
+  },
+  {
+   "id": "cap-london",
+   "kind": "mc",
+   "prompt": "What is the capital of United Kingdom?",
+   "answer": "London",
+   "wrong": [
+    "Brussels",
+    "Prague",
+    "Berlin"
+   ],
+   "explain": "London is the capital of United Kingdom.",
+   "difficulty": 1,
+   "refs": [
+    "capitals/london"
+   ]
+  },
+  {
+   "id": "capr-london",
+   "kind": "mc",
+   "prompt": "London is the capital of which country?",
+   "answer": "United Kingdom",
+   "wrong": [
+    "Albania",
+    "Hungary",
+    "Malta"
+   ],
+   "explain": "London is the capital of United Kingdom.",
+   "difficulty": 1,
+   "refs": [
+    "capitals/london"
+   ]
+  },
+  {
+   "id": "cap-washington-d-c",
+   "kind": "mc",
+   "prompt": "What is the capital of United States?",
+   "answer": "Washington, D.C.",
+   "wrong": [
+    "Ottawa",
+    "Kingstown",
+    "Basseterre"
+   ],
+   "explain": "Washington, D.C. is the capital of United States.",
+   "difficulty": 1,
+   "refs": [
+    "capitals/washington-d-c"
+   ]
+  },
+  {
+   "id": "capr-washington-d-c",
+   "kind": "mc",
+   "prompt": "Washington, D.C. is the capital of which country?",
+   "answer": "United States",
+   "wrong": [
+    "Mexico",
+    "El Salvador",
+    "Costa Rica"
+   ],
+   "explain": "Washington, D.C. is the capital of United States.",
+   "difficulty": 1,
+   "refs": [
+    "capitals/washington-d-c"
+   ]
+  },
+  {
+   "id": "cap-montevideo",
+   "kind": "mc",
+   "prompt": "What is the capital of Uruguay?",
+   "answer": "Montevideo",
+   "wrong": [
+    "Sucre",
+    "Caracas",
+    "Paramaribo"
+   ],
+   "explain": "Montevideo is the capital of Uruguay.",
+   "difficulty": 2,
+   "refs": [
+    "capitals/montevideo"
+   ]
+  },
+  {
+   "id": "capr-montevideo",
+   "kind": "mc",
+   "prompt": "Montevideo is the capital of which country?",
+   "answer": "Uruguay",
+   "wrong": [
+    "Argentina",
+    "Brazil",
+    "Venezuela"
+   ],
+   "explain": "Montevideo is the capital of Uruguay.",
+   "difficulty": 2,
+   "refs": [
+    "capitals/montevideo"
+   ]
+  },
+  {
+   "id": "cap-tashkent",
+   "kind": "mc",
+   "prompt": "What is the capital of Uzbekistan?",
+   "answer": "Tashkent",
+   "wrong": [
+    "Muscat",
+    "Kuala Lumpur",
+    "Vientiane"
+   ],
+   "explain": "Tashkent is the capital of Uzbekistan.",
+   "difficulty": 2,
+   "refs": [
+    "capitals/tashkent"
+   ]
+  },
+  {
+   "id": "capr-tashkent",
+   "kind": "mc",
+   "prompt": "Tashkent is the capital of which country?",
+   "answer": "Uzbekistan",
+   "wrong": [
+    "Cambodia",
+    "Saudi Arabia",
+    "China"
+   ],
+   "explain": "Tashkent is the capital of Uzbekistan.",
+   "difficulty": 2,
+   "refs": [
+    "capitals/tashkent"
+   ]
+  },
+  {
+   "id": "cap-port-vila",
+   "kind": "mc",
+   "prompt": "What is the capital of Vanuatu?",
+   "answer": "Port Vila",
+   "wrong": [
+    "Suva",
+    "Ngerulmud",
+    "Palikir"
+   ],
+   "explain": "Port Vila is the capital of Vanuatu.",
+   "difficulty": 3,
+   "refs": [
+    "capitals/port-vila"
+   ]
+  },
+  {
+   "id": "cap-vatican-city-city",
+   "kind": "mc",
+   "prompt": "What is the capital of Vatican City?",
+   "answer": "Vatican City",
+   "wrong": [
+    "Bratislava",
+    "London",
+    "Oslo"
+   ],
+   "explain": "Vatican City is the capital of Vatican City.",
+   "difficulty": 3,
+   "refs": [
+    "capitals/vatican-city-city"
+   ]
+  },
+  {
+   "id": "cap-caracas",
+   "kind": "mc",
+   "prompt": "What is the capital of Venezuela?",
+   "answer": "Caracas",
+   "wrong": [
+    "Brasília",
+    "Georgetown",
+    "Bogotá"
+   ],
+   "explain": "Caracas is the capital of Venezuela.",
+   "difficulty": 2,
+   "refs": [
+    "capitals/caracas"
+   ]
+  },
+  {
+   "id": "capr-caracas",
+   "kind": "mc",
+   "prompt": "Caracas is the capital of which country?",
+   "answer": "Venezuela",
+   "wrong": [
+    "Ecuador",
+    "Guyana",
+    "Argentina"
+   ],
+   "explain": "Caracas is the capital of Venezuela.",
+   "difficulty": 2,
+   "refs": [
+    "capitals/caracas"
+   ]
+  },
+  {
+   "id": "cap-hanoi",
+   "kind": "mc",
+   "prompt": "What is the capital of Vietnam?",
+   "answer": "Hanoi",
+   "wrong": [
+    "Riyadh",
+    "New Delhi",
+    "Malé"
+   ],
+   "explain": "Hanoi is the capital of Vietnam.",
+   "difficulty": 2,
+   "refs": [
+    "capitals/hanoi"
+   ]
+  },
+  {
+   "id": "capr-hanoi",
+   "kind": "mc",
+   "prompt": "Hanoi is the capital of which country?",
+   "answer": "Vietnam",
+   "wrong": [
+    "Cyprus",
+    "Kyrgyzstan",
+    "Nepal"
+   ],
+   "explain": "Hanoi is the capital of Vietnam.",
+   "difficulty": 2,
+   "refs": [
+    "capitals/hanoi"
+   ]
+  },
+  {
+   "id": "cap-lusaka",
+   "kind": "mc",
+   "prompt": "What is the capital of Zambia?",
+   "answer": "Lusaka",
+   "wrong": [
+    "Port Louis",
+    "Gitega",
+    "Tripoli"
+   ],
+   "explain": "Lusaka is the capital of Zambia.",
+   "difficulty": 2,
+   "refs": [
+    "capitals/lusaka"
+   ]
+  },
+  {
+   "id": "capr-lusaka",
+   "kind": "mc",
+   "prompt": "Lusaka is the capital of which country?",
+   "answer": "Zambia",
+   "wrong": [
+    "Zimbabwe",
+    "Kenya",
+    "Senegal"
+   ],
+   "explain": "Lusaka is the capital of Zambia.",
+   "difficulty": 2,
+   "refs": [
+    "capitals/lusaka"
+   ]
+  },
+  {
+   "id": "cap-harare",
+   "kind": "mc",
+   "prompt": "What is the capital of Zimbabwe?",
+   "answer": "Harare",
+   "wrong": [
+    "Antananarivo",
+    "Cairo",
+    "Brazzaville"
+   ],
+   "explain": "Harare is the capital of Zimbabwe.",
+   "difficulty": 2,
+   "refs": [
+    "capitals/harare"
+   ]
+  },
+  {
+   "id": "capr-harare",
+   "kind": "mc",
+   "prompt": "Harare is the capital of which country?",
+   "answer": "Zimbabwe",
+   "wrong": [
+    "Morocco",
+    "Gambia",
+    "Egypt"
+   ],
+   "explain": "Harare is the capital of Zimbabwe.",
+   "difficulty": 2,
+   "refs": [
+    "capitals/harare"
+   ]
+  },
+  {
+   "id": "trap-australia",
+   "kind": "mc",
+   "prompt": "Trick question: what is the capital of Australia?",
+   "answer": "Canberra",
+   "wrong": [
+    "Sydney",
+    "Melbourne",
+    "Perth"
+   ],
+   "explain": "The capital of Australia is Canberra, not its largest or best-known city.",
+   "difficulty": 2
+  },
+  {
+   "id": "trap-canada",
+   "kind": "mc",
+   "prompt": "Trick question: what is the capital of Canada?",
+   "answer": "Ottawa",
+   "wrong": [
+    "Toronto",
+    "Montreal",
+    "Vancouver"
+   ],
+   "explain": "The capital of Canada is Ottawa, not its largest or best-known city.",
+   "difficulty": 2
+  },
+  {
+   "id": "trap-turkey",
+   "kind": "mc",
+   "prompt": "Trick question: what is the capital of Turkey?",
+   "answer": "Ankara",
+   "wrong": [
+    "Istanbul",
+    "Izmir",
+    "Antalya"
+   ],
+   "explain": "The capital of Turkey is Ankara, not its largest or best-known city.",
+   "difficulty": 2
+  },
+  {
+   "id": "trap-brazil",
+   "kind": "mc",
+   "prompt": "Trick question: what is the capital of Brazil?",
+   "answer": "Brasília",
+   "wrong": [
+    "Rio de Janeiro",
+    "São Paulo",
+    "Salvador"
+   ],
+   "explain": "The capital of Brazil is Brasília, not its largest or best-known city.",
+   "difficulty": 2
+  },
+  {
+   "id": "trap-new-zealand",
+   "kind": "mc",
+   "prompt": "Trick question: what is the capital of New Zealand?",
+   "answer": "Wellington",
+   "wrong": [
+    "Auckland",
+    "Christchurch",
+    "Queenstown"
+   ],
+   "explain": "The capital of New Zealand is Wellington, not its largest or best-known city.",
+   "difficulty": 2
+  },
+  {
+   "id": "trap-switzerland",
+   "kind": "mc",
+   "prompt": "Trick question: what is the capital of Switzerland?",
+   "answer": "Bern",
+   "wrong": [
+    "Zurich",
+    "Geneva",
+    "Basel"
+   ],
+   "explain": "The capital of Switzerland is Bern, not its largest or best-known city.",
+   "difficulty": 2
+  },
+  {
+   "id": "trap-nigeria",
+   "kind": "mc",
+   "prompt": "Trick question: what is the capital of Nigeria?",
+   "answer": "Abuja",
+   "wrong": [
+    "Lagos",
+    "Kano",
+    "Ibadan"
+   ],
+   "explain": "The capital of Nigeria is Abuja, not its largest or best-known city.",
+   "difficulty": 2
+  },
+  {
+   "id": "trap-morocco",
+   "kind": "mc",
+   "prompt": "Trick question: what is the capital of Morocco?",
+   "answer": "Rabat",
+   "wrong": [
+    "Casablanca",
+    "Marrakesh",
+    "Fez"
+   ],
+   "explain": "The capital of Morocco is Rabat, not its largest or best-known city.",
+   "difficulty": 2
+  },
+  {
+   "id": "trap-vietnam",
+   "kind": "mc",
+   "prompt": "Trick question: what is the capital of Vietnam?",
+   "answer": "Hanoi",
+   "wrong": [
+    "Ho Chi Minh City",
+    "Da Nang",
+    "Hue"
+   ],
+   "explain": "The capital of Vietnam is Hanoi, not its largest or best-known city.",
+   "difficulty": 2
+  },
+  {
+   "id": "trap-pakistan",
+   "kind": "mc",
+   "prompt": "Trick question: what is the capital of Pakistan?",
+   "answer": "Islamabad",
+   "wrong": [
+    "Karachi",
+    "Lahore",
+    "Peshawar"
+   ],
+   "explain": "The capital of Pakistan is Islamabad, not its largest or best-known city.",
+   "difficulty": 2
+  },
+  {
+   "id": "trap-united-states",
+   "kind": "mc",
+   "prompt": "Trick question: what is the capital of United States?",
+   "answer": "Washington, D.C.",
+   "wrong": [
+    "New York City",
+    "Los Angeles",
+    "Chicago"
+   ],
+   "explain": "The capital of United States is Washington, D.C., not its largest or best-known city.",
+   "difficulty": 2
+  },
+  {
+   "id": "trap-myanmar",
+   "kind": "mc",
+   "prompt": "Trick question: what is the capital of Myanmar?",
+   "answer": "Naypyidaw",
+   "wrong": [
+    "Yangon",
+    "Mandalay",
+    "Bago"
+   ],
+   "explain": "The capital of Myanmar is Naypyidaw, not its largest or best-known city.",
+   "difficulty": 2
+  },
+  {
+   "id": "trap-kazakhstan",
+   "kind": "mc",
+   "prompt": "Trick question: what is the capital of Kazakhstan?",
+   "answer": "Astana",
+   "wrong": [
+    "Almaty",
+    "Shymkent",
+    "Karaganda"
+   ],
+   "explain": "The capital of Kazakhstan is Astana, not its largest or best-known city.",
+   "difficulty": 2
+  },
+  {
+   "id": "trap-tanzania",
+   "kind": "mc",
+   "prompt": "Trick question: what is the capital of Tanzania?",
+   "answer": "Dodoma",
+   "wrong": [
+    "Dar es Salaam",
+    "Zanzibar City",
+    "Arusha"
+   ],
+   "explain": "The capital of Tanzania is Dodoma, not its largest or best-known city.",
+   "difficulty": 2
+  },
+  {
+   "id": "trap-ivory-coast",
+   "kind": "mc",
+   "prompt": "Trick question: what is the capital of Ivory Coast?",
+   "answer": "Yamoussoukro",
+   "wrong": [
+    "Abidjan",
+    "Bouaké",
+    "San-Pédro"
+   ],
+   "explain": "The capital of Ivory Coast is Yamoussoukro, not its largest or best-known city.",
+   "difficulty": 2
+  }
+ ],
+ "sources": [
+  {
+   "name": "World Bank Open Data (SP.POP.TOTL)",
+   "url": "https://data.worldbank.org"
+  },
+  {
+   "name": "Wikipedia: List of countries and dependencies by area",
+   "url": "https://en.wikipedia.org/wiki/List_of_countries_and_dependencies_by_area"
+  },
+  {
+   "name": "Wikidata",
+   "url": "https://www.wikidata.org"
+  },
+  {
+   "name": "Wikimedia Commons",
+   "url": "https://commons.wikimedia.org"
+  },
+  {
+   "name": "UN M49 regions",
+   "url": "https://unstats.un.org/unsd/methodology/m49/"
+  }
+ ]
+}

@@ -1,0 +1,4136 @@
+{
+ "id": "quotes",
+ "title": "Famous quotes",
+ "theme": "books",
+ "icon": "💬",
+ "kids": false,
+ "version": 1,
+ "notice": "Every quote is checked against Wikiquote. Famous misquotes appear as true-or-false questions.",
+ "factsMeta": {
+  "field": {
+   "type": "cat",
+   "label": "Known for",
+   "exclusive": false
+  }
+ },
+ "items": [
+  {
+   "id": "winston-churchill",
+   "name": "Winston Churchill",
+   "group": "leader",
+   "facts": {
+    "field": "leader"
+   },
+   "quote": "We shall fight on the beaches",
+   "quotes": [
+    {
+     "text": "We shall fight on the beaches",
+     "context": "From a speech to Parliament in June 1940, after Dunkirk",
+     "source": "https://en.wikiquote.org/wiki/Winston_Churchill",
+     "difficulty": 1
+    },
+    {
+     "text": "I have nothing to offer but blood, toil, tears and sweat.",
+     "context": "His first speech as prime minister, May 1940",
+     "source": "https://en.wikiquote.org/wiki/Winston_Churchill",
+     "difficulty": 2
+    },
+    {
+     "text": "Never in the field of human conflict was so much owed by so many to so few.",
+     "context": "Praising RAF pilots during the Battle of Britain, 1940",
+     "source": "https://en.wikiquote.org/wiki/Winston_Churchill",
+     "difficulty": 2
+    },
+    {
+     "text": "An iron curtain has descended across the Continent",
+     "context": "A 1946 speech in Fulton, Missouri",
+     "source": "https://en.wikiquote.org/wiki/Winston_Churchill",
+     "difficulty": 3
+    },
+    {
+     "text": "Now this is not the end. It is not even the beginning of the end. But it is, perhaps, the end of the beginning.",
+     "context": "After victory at El Alamein, 1942",
+     "source": "https://en.wikiquote.org/wiki/Winston_Churchill",
+     "difficulty": 3
+    }
+   ],
+   "blurb": "Winston Churchill: “We shall fight on the beaches” (From a speech to Parliament in June 1940, after Dunkirk).",
+   "difficulty": 1
+  },
+  {
+   "id": "abraham-lincoln",
+   "name": "Abraham Lincoln",
+   "group": "leader",
+   "facts": {
+    "field": "leader"
+   },
+   "quote": "Four score and seven years ago",
+   "quotes": [
+    {
+     "text": "Four score and seven years ago",
+     "context": "The opening of the Gettysburg Address, 1863",
+     "source": "https://en.wikiquote.org/wiki/Abraham_Lincoln",
+     "difficulty": 2
+    },
+    {
+     "text": "Government of the people, by the people, for the people, shall not perish from the earth",
+     "context": "The close of the Gettysburg Address, 1863",
+     "source": "https://en.wikiquote.org/wiki/Abraham_Lincoln",
+     "difficulty": 2
+    },
+    {
+     "text": "A house divided against itself cannot stand.",
+     "context": "An 1858 speech on slavery, echoing the Bible",
+     "source": "https://en.wikiquote.org/wiki/Abraham_Lincoln",
+     "difficulty": 3
+    },
+    {
+     "text": "With malice toward none, with charity for all",
+     "context": "His second inaugural address, 1865",
+     "source": "https://en.wikiquote.org/wiki/Abraham_Lincoln",
+     "difficulty": 3
+    }
+   ],
+   "blurb": "Abraham Lincoln: “Four score and seven years ago” (The opening of the Gettysburg Address, 1863).",
+   "difficulty": 2
+  },
+  {
+   "id": "john-f-kennedy",
+   "name": "John F. Kennedy",
+   "group": "leader",
+   "facts": {
+    "field": "leader"
+   },
+   "quote": "Ask not what your country can do for you — ask what you can do for your country",
+   "quotes": [
+    {
+     "text": "Ask not what your country can do for you — ask what you can do for your country",
+     "context": "His inaugural address, January 1961",
+     "source": "https://en.wikiquote.org/wiki/John_F._Kennedy",
+     "difficulty": 1
+    },
+    {
+     "text": "Ich bin ein Berliner.",
+     "context": "A 1963 speech in West Berlin",
+     "source": "https://en.wikiquote.org/wiki/John_F._Kennedy",
+     "difficulty": 2
+    },
+    {
+     "text": "We choose to go to the Moon in this decade and do the other things, not because they are easy, but because they are hard",
+     "context": "A 1962 speech at Rice University",
+     "source": "https://en.wikiquote.org/wiki/John_F._Kennedy",
+     "difficulty": 2
+    }
+   ],
+   "blurb": "John F. Kennedy: “Ask not what your country can do for you — ask what you can do for your country” (His inaugural address, January 1961).",
+   "difficulty": 1
+  },
+  {
+   "id": "martin-luther-king-jr",
+   "name": "Martin Luther King Jr.",
+   "group": "activist",
+   "facts": {
+    "field": "activist"
+   },
+   "quote": "I have a dream",
+   "quotes": [
+    {
+     "text": "I have a dream",
+     "context": "His 1963 speech at the March on Washington",
+     "source": "https://en.wikiquote.org/wiki/Martin_Luther_King_Jr.",
+     "difficulty": 1
+    },
+    {
+     "text": "Injustice anywhere is a threat to justice everywhere.",
+     "context": "Letter from Birmingham Jail, 1963",
+     "source": "https://en.wikiquote.org/wiki/Martin_Luther_King_Jr.",
+     "difficulty": 2
+    },
+    {
+     "text": "Darkness cannot drive out darkness; only light can do that. Hate cannot drive out hate; only love can do that.",
+     "context": "Strength to Love, 1963",
+     "source": "https://en.wikiquote.org/wiki/Martin_Luther_King_Jr.",
+     "difficulty": 2
+    }
+   ],
+   "blurb": "Martin Luther King Jr.: “I have a dream” (His 1963 speech at the March on Washington).",
+   "difficulty": 1
+  },
+  {
+   "id": "franklin-d-roosevelt",
+   "name": "Franklin D. Roosevelt",
+   "group": "leader",
+   "facts": {
+    "field": "leader"
+   },
+   "quote": "The only thing we have to fear is fear itself",
+   "quotes": [
+    {
+     "text": "The only thing we have to fear is fear itself",
+     "context": "His first inaugural address, 1933",
+     "source": "https://en.wikiquote.org/wiki/Franklin_D._Roosevelt",
+     "difficulty": 2
+    },
+    {
+     "text": "A date which will live in infamy",
+     "context": "Speaking to Congress the day after Pearl Harbor, 1941",
+     "source": "https://en.wikiquote.org/wiki/Franklin_D._Roosevelt",
+     "difficulty": 3
+    }
+   ],
+   "blurb": "Franklin D. Roosevelt: “The only thing we have to fear is fear itself” (His first inaugural address, 1933).",
+   "difficulty": 2
+  },
+  {
+   "id": "neil-armstrong",
+   "name": "Neil Armstrong",
+   "group": "explorer",
+   "facts": {
+    "field": "explorer"
+   },
+   "quote": "That's one small step for man, one giant leap for mankind.",
+   "quotes": [
+    {
+     "text": "That's one small step for man, one giant leap for mankind.",
+     "context": "Stepping onto the Moon, 20 July 1969",
+     "source": "https://en.wikiquote.org/wiki/Neil_Armstrong",
+     "difficulty": 1
+    },
+    {
+     "text": "Houston, Tranquility Base here. The Eagle has landed.",
+     "context": "The moment the lunar module touched down, 1969",
+     "source": "https://en.wikiquote.org/wiki/Neil_Armstrong",
+     "difficulty": 2
+    }
+   ],
+   "blurb": "Neil Armstrong: “That's one small step for man, one giant leap for mankind.” (Stepping onto the Moon, 20 July 1969).",
+   "difficulty": 1
+  },
+  {
+   "id": "julius-caesar",
+   "name": "Julius Caesar",
+   "group": "leader",
+   "facts": {
+    "field": "leader"
+   },
+   "quote": "Veni, vidi, vici.",
+   "quotes": [
+    {
+     "text": "Veni, vidi, vici.",
+     "context": "\"I came, I saw, I conquered\": reporting a quick victory in 47 BC",
+     "source": "https://en.wikiquote.org/wiki/Julius_Caesar",
+     "difficulty": 1
+    },
+    {
+     "text": "The die is cast.",
+     "context": "Crossing the Rubicon with his army in 49 BC",
+     "source": "https://en.wikiquote.org/wiki/Julius_Caesar",
+     "difficulty": 2
+    }
+   ],
+   "blurb": "Julius Caesar: “Veni, vidi, vici.” (\"I came, I saw, I conquered\": reporting a quick victory in 47 BC).",
+   "difficulty": 1
+  },
+  {
+   "id": "nelson-mandela",
+   "name": "Nelson Mandela",
+   "group": "leader",
+   "facts": {
+    "field": "leader"
+   },
+   "quote": "It is an ideal for which I am prepared to die.",
+   "quotes": [
+    {
+     "text": "It is an ideal for which I am prepared to die.",
+     "context": "Closing his statement at the Rivonia Trial, 1964",
+     "source": "https://en.wikiquote.org/wiki/Nelson_Mandela",
+     "difficulty": 3
+    },
+    {
+     "text": "Education is the most powerful weapon we can use to change the world",
+     "context": "A 2003 speech launching an education network",
+     "source": "https://en.wikiquote.org/wiki/Nelson_Mandela",
+     "difficulty": 2
+    }
+   ],
+   "blurb": "Nelson Mandela: “It is an ideal for which I am prepared to die.” (Closing his statement at the Rivonia Trial, 1964).",
+   "difficulty": 2
+  },
+  {
+   "id": "mahatma-gandhi",
+   "name": "Mahatma Gandhi",
+   "group": "leader",
+   "facts": {
+    "field": "leader"
+   },
+   "quote": "The weak can never forgive. Forgiveness is the attribute of the strong.",
+   "quotes": [
+    {
+     "text": "The weak can never forgive. Forgiveness is the attribute of the strong.",
+     "context": "Writing in Young India, 1931",
+     "source": "https://en.wikiquote.org/wiki/Mahatma_Gandhi",
+     "difficulty": 3
+    }
+   ],
+   "blurb": "Mahatma Gandhi: “The weak can never forgive. Forgiveness is the attribute of the strong.” (Writing in Young India, 1931).",
+   "difficulty": 3
+  },
+  {
+   "id": "albert-einstein",
+   "name": "Albert Einstein",
+   "group": "scientist",
+   "facts": {
+    "field": "scientist"
+   },
+   "quote": "Imagination is more important than knowledge.",
+   "quotes": [
+    {
+     "text": "Imagination is more important than knowledge.",
+     "context": "A 1929 newspaper interview",
+     "source": "https://en.wikiquote.org/wiki/Albert_Einstein",
+     "difficulty": 2
+    },
+    {
+     "text": "I, at any rate, am convinced that He does not throw dice.",
+     "context": "A 1926 letter to Max Born about quantum theory",
+     "source": "https://en.wikiquote.org/wiki/Albert_Einstein",
+     "difficulty": 3
+    },
+    {
+     "text": "Science without religion is lame, religion without science is blind.",
+     "context": "A 1941 essay",
+     "source": "https://en.wikiquote.org/wiki/Albert_Einstein",
+     "difficulty": 3
+    }
+   ],
+   "blurb": "Albert Einstein: “Imagination is more important than knowledge.” (A 1929 newspaper interview).",
+   "difficulty": 2
+  },
+  {
+   "id": "isaac-newton",
+   "name": "Isaac Newton",
+   "group": "scientist",
+   "facts": {
+    "field": "scientist"
+   },
+   "quote": "If I have seen further it is by standing on the shoulders of Giants.",
+   "quotes": [
+    {
+     "text": "If I have seen further it is by standing on the shoulders of Giants.",
+     "context": "A 1675 letter to Robert Hooke",
+     "source": "https://en.wikiquote.org/wiki/Isaac_Newton",
+     "difficulty": 2
+    }
+   ],
+   "blurb": "Isaac Newton: “If I have seen further it is by standing on the shoulders of Giants.” (A 1675 letter to Robert Hooke).",
+   "difficulty": 2
+  },
+  {
+   "id": "rene-descartes",
+   "name": "René Descartes",
+   "group": "philosopher",
+   "facts": {
+    "field": "philosopher"
+   },
+   "quote": "I think, therefore I am.",
+   "quotes": [
+    {
+     "text": "I think, therefore I am.",
+     "context": "His philosophical starting point, 1637",
+     "source": "https://en.wikiquote.org/wiki/Ren%C3%A9_Descartes",
+     "difficulty": 1
+    }
+   ],
+   "blurb": "René Descartes: “I think, therefore I am.” (His philosophical starting point, 1637).",
+   "difficulty": 1
+  },
+  {
+   "id": "socrates",
+   "name": "Socrates",
+   "group": "philosopher",
+   "facts": {
+    "field": "philosopher"
+   },
+   "quote": "The unexamined life is not worth living",
+   "quotes": [
+    {
+     "text": "The unexamined life is not worth living",
+     "context": "His trial in 399 BC, as told by Plato",
+     "source": "https://en.wikiquote.org/wiki/Apology_(Plato)",
+     "difficulty": 2
+    }
+   ],
+   "blurb": "Socrates: “The unexamined life is not worth living” (His trial in 399 BC, as told by Plato).",
+   "difficulty": 2
+  },
+  {
+   "id": "laozi",
+   "name": "Laozi",
+   "group": "philosopher",
+   "facts": {
+    "field": "philosopher"
+   },
+   "quote": "A journey of a thousand miles starts with a single step.",
+   "quotes": [
+    {
+     "text": "A journey of a thousand miles starts with a single step.",
+     "context": "The Tao Te Ching",
+     "source": "https://en.wikiquote.org/wiki/Laozi",
+     "difficulty": 2
+    }
+   ],
+   "blurb": "Laozi: “A journey of a thousand miles starts with a single step.” (The Tao Te Ching).",
+   "difficulty": 2
+  },
+  {
+   "id": "archimedes",
+   "name": "Archimedes",
+   "group": "scientist",
+   "facts": {
+    "field": "scientist"
+   },
+   "quote": "Eureka!",
+   "quotes": [
+    {
+     "text": "Eureka!",
+     "context": "\"I have found it!\": said to have been shouted after a discovery in his bath",
+     "source": "https://en.wikiquote.org/wiki/Archimedes",
+     "difficulty": 1
+    },
+    {
+     "text": "Give me the place to stand, and I shall move the earth.",
+     "context": "On the power of the lever",
+     "source": "https://en.wikiquote.org/wiki/Archimedes",
+     "difficulty": 3
+    }
+   ],
+   "blurb": "Archimedes: “Eureka!” (\"I have found it!\": said to have been shouted after a discovery in his bath).",
+   "difficulty": 1
+  },
+  {
+   "id": "william-shakespeare",
+   "name": "William Shakespeare",
+   "group": "writer",
+   "facts": {
+    "field": "writer"
+   },
+   "quote": "To be, or not to be: that is the question…",
+   "quotes": [
+    {
+     "text": "To be, or not to be: that is the question…",
+     "context": "Hamlet's soliloquy in Hamlet",
+     "source": "https://en.wikiquote.org/wiki/Hamlet",
+     "difficulty": 1
+    },
+    {
+     "text": "All the world's a stage…",
+     "context": "Jaques in As You Like It",
+     "source": "https://en.wikiquote.org/wiki/As_You_Like_It",
+     "difficulty": 2
+    },
+    {
+     "text": "O Romeo, Romeo! wherefore art thou Romeo?",
+     "context": "Juliet on her balcony in Romeo and Juliet",
+     "source": "https://en.wikiquote.org/wiki/Romeo_and_Juliet",
+     "difficulty": 1
+    },
+    {
+     "text": "Friends, Romans, countrymen, lend me your ears…",
+     "context": "Mark Antony's funeral speech in Julius Caesar",
+     "source": "https://en.wikiquote.org/wiki/Julius_Caesar_(play)",
+     "difficulty": 2
+    },
+    {
+     "text": "A horse! a horse! my kingdom for a horse!",
+     "context": "The king's last cry in battle in Richard III",
+     "source": "https://en.wikiquote.org/wiki/Richard_III_(play)",
+     "difficulty": 2
+    },
+    {
+     "text": "The course of true love never did run smooth…",
+     "context": "Lysander in A Midsummer Night's Dream",
+     "source": "https://en.wikiquote.org/wiki/A_Midsummer_Night's_Dream",
+     "difficulty": 3
+    },
+    {
+     "text": "Neither a borrower nor a lender be…",
+     "context": "Polonius's advice to his son in Hamlet",
+     "source": "https://en.wikiquote.org/wiki/Hamlet",
+     "difficulty": 2
+    },
+    {
+     "text": "Something is rotten in the state of Denmark.",
+     "context": "Marcellus in Hamlet",
+     "source": "https://en.wikiquote.org/wiki/Hamlet",
+     "difficulty": 2
+    },
+    {
+     "text": "Brevity is the soul of wit…",
+     "context": "Polonius in Hamlet",
+     "source": "https://en.wikiquote.org/wiki/Hamlet",
+     "difficulty": 2
+    },
+    {
+     "text": "The lady doth protest too much, methinks.",
+     "context": "Queen Gertrude in Hamlet",
+     "source": "https://en.wikiquote.org/wiki/Hamlet",
+     "difficulty": 3
+    },
+    {
+     "text": "If music be the food of love, play on…",
+     "context": "Duke Orsino's opening line in Twelfth Night",
+     "source": "https://en.wikiquote.org/wiki/Twelfth_Night",
+     "difficulty": 2
+    },
+    {
+     "text": "Some are born great, some achieve greatness, and some have greatness thrust upon 'em",
+     "context": "A forged letter read by Malvolio in Twelfth Night",
+     "source": "https://en.wikiquote.org/wiki/Twelfth_Night",
+     "difficulty": 3
+    },
+    {
+     "text": "Now is the winter of our discontent",
+     "context": "The opening line of Richard III",
+     "source": "https://en.wikiquote.org/wiki/Richard_III_(play)",
+     "difficulty": 2
+    },
+    {
+     "text": "Double, double toil and trouble…",
+     "context": "The witches' chant in Macbeth",
+     "source": "https://en.wikiquote.org/wiki/Macbeth",
+     "difficulty": 1
+    },
+    {
+     "text": "Out, damned spot!",
+     "context": "Lady Macbeth sleepwalking in Macbeth",
+     "source": "https://en.wikiquote.org/wiki/Macbeth",
+     "difficulty": 2
+    },
+    {
+     "text": "What's in a name?",
+     "context": "Juliet on her balcony in Romeo and Juliet",
+     "source": "https://en.wikiquote.org/wiki/Romeo_and_Juliet",
+     "difficulty": 2
+    },
+    {
+     "text": "Parting is such sweet sorrow",
+     "context": "Juliet saying goodnight in Romeo and Juliet",
+     "source": "https://en.wikiquote.org/wiki/Romeo_and_Juliet",
+     "difficulty": 2
+    },
+    {
+     "text": "Beware the ides of March.",
+     "context": "A soothsayer's warning in Julius Caesar",
+     "source": "https://en.wikiquote.org/wiki/Julius_Caesar_(play)",
+     "difficulty": 2
+    }
+   ],
+   "blurb": "William Shakespeare: “To be, or not to be: that is the question…” (Hamlet's soliloquy in Hamlet).",
+   "difficulty": 1
+  },
+  {
+   "id": "oscar-wilde",
+   "name": "Oscar Wilde",
+   "group": "writer",
+   "facts": {
+    "field": "writer"
+   },
+   "quote": "I can resist everything except temptation.",
+   "quotes": [
+    {
+     "text": "I can resist everything except temptation.",
+     "context": "Lord Darlington in Lady Windermere's Fan, 1892",
+     "source": "https://en.wikiquote.org/wiki/Oscar_Wilde",
+     "difficulty": 2
+    },
+    {
+     "text": "We are all in the gutter, but some of us are looking at the stars.",
+     "context": "Lady Windermere's Fan, 1892",
+     "source": "https://en.wikiquote.org/wiki/Oscar_Wilde",
+     "difficulty": 2
+    },
+    {
+     "text": "There is only one thing in the world worse than being talked about, and that is not being talked about.",
+     "context": "Lord Henry in The Picture of Dorian Gray, 1890",
+     "source": "https://en.wikiquote.org/wiki/The_Picture_of_Dorian_Gray",
+     "difficulty": 2
+    },
+    {
+     "text": "The truth is rarely pure and never simple.",
+     "context": "Algernon in The Importance of Being Earnest, 1895",
+     "source": "https://en.wikiquote.org/wiki/Oscar_Wilde",
+     "difficulty": 3
+    }
+   ],
+   "blurb": "Oscar Wilde: “I can resist everything except temptation.” (Lord Darlington in Lady Windermere's Fan, 1892).",
+   "difficulty": 2
+  },
+  {
+   "id": "mark-twain",
+   "name": "Mark Twain",
+   "group": "writer",
+   "facts": {
+    "field": "writer"
+   },
+   "quote": "The report of my death was an exaggeration.",
+   "quotes": [
+    {
+     "text": "The report of my death was an exaggeration.",
+     "context": "Responding to a false report that he had died, 1897",
+     "source": "https://en.wikiquote.org/wiki/Mark_Twain",
+     "difficulty": 2
+    }
+   ],
+   "blurb": "Mark Twain: “The report of my death was an exaggeration.” (Responding to a false report that he had died, 1897).",
+   "difficulty": 2
+  },
+  {
+   "id": "benjamin-franklin",
+   "name": "Benjamin Franklin",
+   "group": "leader",
+   "facts": {
+    "field": "leader"
+   },
+   "quote": "In this world nothing can be said to be certain, except death and taxes",
+   "quotes": [
+    {
+     "text": "In this world nothing can be said to be certain, except death and taxes",
+     "context": "A 1789 letter",
+     "source": "https://en.wikiquote.org/wiki/Benjamin_Franklin",
+     "difficulty": 2
+    },
+    {
+     "text": "Early to bed and early to rise, makes a man healthy, wealthy and wise.",
+     "context": "Poor Richard's Almanack, 1757 version",
+     "source": "https://en.wikiquote.org/wiki/Poor_Richard's_Almanack",
+     "difficulty": 2
+    },
+    {
+     "text": "Well done is better than well said.",
+     "context": "Poor Richard's Almanack, 1737",
+     "source": "https://en.wikiquote.org/wiki/Poor_Richard's_Almanack",
+     "difficulty": 3
+    }
+   ],
+   "blurb": "Benjamin Franklin: “In this world nothing can be said to be certain, except death and taxes” (A 1789 letter).",
+   "difficulty": 2
+  },
+  {
+   "id": "thomas-edison",
+   "name": "Thomas Edison",
+   "group": "scientist",
+   "facts": {
+    "field": "scientist"
+   },
+   "quote": "Genius is one per cent inspiration, ninety-nine per cent perspiration.",
+   "quotes": [
+    {
+     "text": "Genius is one per cent inspiration, ninety-nine per cent perspiration.",
+     "context": "His explanation of invention, around 1903",
+     "source": "https://en.wikiquote.org/wiki/Thomas_Edison",
+     "difficulty": 2
+    }
+   ],
+   "blurb": "Thomas Edison: “Genius is one per cent inspiration, ninety-nine per cent perspiration.” (His explanation of invention, around 1903).",
+   "difficulty": 2
+  },
+  {
+   "id": "theodore-roosevelt",
+   "name": "Theodore Roosevelt",
+   "group": "leader",
+   "facts": {
+    "field": "leader"
+   },
+   "quote": "Speak softly and carry a big stick; you will go far",
+   "quotes": [
+    {
+     "text": "Speak softly and carry a big stick; you will go far",
+     "context": "Quoting what he called a West African proverb, 1900",
+     "source": "https://en.wikiquote.org/wiki/Theodore_Roosevelt",
+     "difficulty": 2
+    }
+   ],
+   "blurb": "Theodore Roosevelt: “Speak softly and carry a big stick; you will go far” (Quoting what he called a West African proverb, 1900).",
+   "difficulty": 2
+  },
+  {
+   "id": "margaret-thatcher",
+   "name": "Margaret Thatcher",
+   "group": "leader",
+   "facts": {
+    "field": "leader"
+   },
+   "quote": "The lady's not for turning.",
+   "quotes": [
+    {
+     "text": "The lady's not for turning.",
+     "context": "Her 1980 party conference speech",
+     "source": "https://en.wikiquote.org/wiki/Margaret_Thatcher",
+     "difficulty": 2
+    }
+   ],
+   "blurb": "Margaret Thatcher: “The lady's not for turning.” (Her 1980 party conference speech).",
+   "difficulty": 2
+  },
+  {
+   "id": "ronald-reagan",
+   "name": "Ronald Reagan",
+   "group": "leader",
+   "facts": {
+    "field": "leader"
+   },
+   "quote": "Mr. Gorbachev, tear down this wall!",
+   "quotes": [
+    {
+     "text": "Mr. Gorbachev, tear down this wall!",
+     "context": "At the Brandenburg Gate in Berlin, 1987",
+     "source": "https://en.wikiquote.org/wiki/Ronald_Reagan",
+     "difficulty": 2
+    }
+   ],
+   "blurb": "Ronald Reagan: “Mr. Gorbachev, tear down this wall!” (At the Brandenburg Gate in Berlin, 1987).",
+   "difficulty": 2
+  },
+  {
+   "id": "elizabeth-i",
+   "name": "Elizabeth I",
+   "group": "leader",
+   "facts": {
+    "field": "leader"
+   },
+   "quote": "I know I have the body but of a weak and feeble woman; but I have the heart and stomach of a king",
+   "quotes": [
+    {
+     "text": "I know I have the body but of a weak and feeble woman; but I have the heart and stomach of a king",
+     "context": "Addressing troops at Tilbury before the Spanish Armada, 1588",
+     "source": "https://en.wikiquote.org/wiki/Elizabeth_I_of_England",
+     "difficulty": 3
+    }
+   ],
+   "blurb": "Elizabeth I: “I know I have the body but of a weak and feeble woman; but I have the heart and stomach of a king” (Addressing troops at Tilbury before the Spanish Armada, 1588).",
+   "difficulty": 3
+  },
+  {
+   "id": "patrick-henry",
+   "name": "Patrick Henry",
+   "group": "leader",
+   "facts": {
+    "field": "leader"
+   },
+   "quote": "Give me liberty, or give me death!",
+   "quotes": [
+    {
+     "text": "Give me liberty, or give me death!",
+     "context": "A 1775 speech urging Virginia to arm against Britain",
+     "source": "https://en.wikiquote.org/wiki/Patrick_Henry",
+     "difficulty": 2
+    }
+   ],
+   "blurb": "Patrick Henry: “Give me liberty, or give me death!” (A 1775 speech urging Virginia to arm against Britain).",
+   "difficulty": 2
+  },
+  {
+   "id": "sun-tzu",
+   "name": "Sun Tzu",
+   "group": "philosopher",
+   "facts": {
+    "field": "philosopher"
+   },
+   "quote": "All warfare is based on deception.",
+   "quotes": [
+    {
+     "text": "All warfare is based on deception.",
+     "context": "The Art of War",
+     "source": "https://en.wikiquote.org/wiki/Sun_Tzu",
+     "difficulty": 3
+    }
+   ],
+   "blurb": "Sun Tzu: “All warfare is based on deception.” (The Art of War).",
+   "difficulty": 3
+  },
+  {
+   "id": "muhammad-ali",
+   "name": "Muhammad Ali",
+   "group": "sport",
+   "facts": {
+    "field": "sport"
+   },
+   "quote": "I am the greatest!",
+   "quotes": [
+    {
+     "text": "I am the greatest!",
+     "context": "His famous boast, 1960s",
+     "source": "https://en.wikiquote.org/wiki/Muhammad_Ali",
+     "difficulty": 1
+    }
+   ],
+   "blurb": "Muhammad Ali: “I am the greatest!” (His famous boast, 1960s).",
+   "difficulty": 1
+  },
+  {
+   "id": "yogi-berra",
+   "name": "Yogi Berra",
+   "group": "sport",
+   "facts": {
+    "field": "sport"
+   },
+   "quote": "It ain't over till it's over.",
+   "quotes": [
+    {
+     "text": "It ain't over till it's over.",
+     "context": "About a baseball pennant race, 1973",
+     "source": "https://en.wikiquote.org/wiki/Yogi_Berra",
+     "difficulty": 2
+    }
+   ],
+   "blurb": "Yogi Berra: “It ain't over till it's over.” (About a baseball pennant race, 1973).",
+   "difficulty": 2
+  },
+  {
+   "id": "marie-curie",
+   "name": "Marie Curie",
+   "group": "scientist",
+   "facts": {
+    "field": "scientist"
+   },
+   "quote": "In life, there's nothing to be feared, everything is to be understood.",
+   "quotes": [
+    {
+     "text": "In life, there's nothing to be feared, everything is to be understood.",
+     "context": "Her outlook on science and life",
+     "source": "https://en.wikiquote.org/wiki/Marie_Curie",
+     "difficulty": 2
+    }
+   ],
+   "blurb": "Marie Curie: “In life, there's nothing to be feared, everything is to be understood.” (Her outlook on science and life).",
+   "difficulty": 2
+  },
+  {
+   "id": "steve-jobs",
+   "name": "Steve Jobs",
+   "group": "business",
+   "facts": {
+    "field": "business"
+   },
+   "quote": "Stay Hungry. Stay Foolish.",
+   "quotes": [
+    {
+     "text": "Stay Hungry. Stay Foolish.",
+     "context": "Ending his 2005 Stanford speech, borrowing a magazine's farewell",
+     "source": "https://en.wikiquote.org/wiki/Steve_Jobs",
+     "difficulty": 2
+    }
+   ],
+   "blurb": "Steve Jobs: “Stay Hungry. Stay Foolish.” (Ending his 2005 Stanford speech, borrowing a magazine's farewell).",
+   "difficulty": 2
+  },
+  {
+   "id": "henry-ford",
+   "name": "Henry Ford",
+   "group": "business",
+   "facts": {
+    "field": "business"
+   },
+   "quote": "Any customer can have a car painted any color that he wants so long as it is black.",
+   "quotes": [
+    {
+     "text": "Any customer can have a car painted any color that he wants so long as it is black.",
+     "context": "About the Model T, in his 1922 memoir",
+     "source": "https://en.wikiquote.org/wiki/Henry_Ford",
+     "difficulty": 2
+    }
+   ],
+   "blurb": "Henry Ford: “Any customer can have a car painted any color that he wants so long as it is black.” (About the Model T, in his 1922 memoir).",
+   "difficulty": 2
+  },
+  {
+   "id": "thomas-jefferson",
+   "name": "Thomas Jefferson",
+   "group": "leader",
+   "facts": {
+    "field": "leader"
+   },
+   "quote": "We hold these truths to be self-evident, that all men are created equal",
+   "quotes": [
+    {
+     "text": "We hold these truths to be self-evident, that all men are created equal",
+     "context": "The Declaration of Independence, 1776",
+     "source": "https://en.wikiquote.org/wiki/Thomas_Jefferson",
+     "difficulty": 2
+    }
+   ],
+   "blurb": "Thomas Jefferson: “We hold these truths to be self-evident, that all men are created equal” (The Declaration of Independence, 1776).",
+   "difficulty": 2
+  },
+  {
+   "id": "karl-marx",
+   "name": "Karl Marx",
+   "group": "philosopher",
+   "facts": {
+    "field": "philosopher"
+   },
+   "quote": "Workers of the world, unite!",
+   "quotes": [
+    {
+     "text": "Workers of the world, unite!",
+     "context": "The rallying cry of The Communist Manifesto, 1848",
+     "source": "https://en.wikiquote.org/wiki/Karl_Marx",
+     "difficulty": 2
+    }
+   ],
+   "blurb": "Karl Marx: “Workers of the world, unite!” (The rallying cry of The Communist Manifesto, 1848).",
+   "difficulty": 2
+  },
+  {
+   "id": "friedrich-nietzsche",
+   "name": "Friedrich Nietzsche",
+   "group": "philosopher",
+   "facts": {
+    "field": "philosopher"
+   },
+   "quote": "God is dead.",
+   "quotes": [
+    {
+     "text": "God is dead.",
+     "context": "A line from The Gay Science, 1882",
+     "source": "https://en.wikiquote.org/wiki/Friedrich_Nietzsche",
+     "difficulty": 2
+    },
+    {
+     "text": "What does not kill me makes me stronger.",
+     "context": "Twilight of the Idols, 1888",
+     "source": "https://en.wikiquote.org/wiki/Friedrich_Nietzsche",
+     "difficulty": 2
+    }
+   ],
+   "blurb": "Friedrich Nietzsche: “God is dead.” (A line from The Gay Science, 1882).",
+   "difficulty": 2
+  },
+  {
+   "id": "malala-yousafzai",
+   "name": "Malala Yousafzai",
+   "group": "activist",
+   "facts": {
+    "field": "activist"
+   },
+   "quote": "One child, one teacher, one book, one pen can change the world.",
+   "quotes": [
+    {
+     "text": "One child, one teacher, one book, one pen can change the world.",
+     "context": "Her 2013 speech to the United Nations",
+     "source": "https://en.wikiquote.org/wiki/Malala_Yousafzai",
+     "difficulty": 2
+    }
+   ],
+   "blurb": "Malala Yousafzai: “One child, one teacher, one book, one pen can change the world.” (Her 2013 speech to the United Nations).",
+   "difficulty": 2
+  },
+  {
+   "id": "frederick-douglass",
+   "name": "Frederick Douglass",
+   "group": "activist",
+   "facts": {
+    "field": "activist"
+   },
+   "quote": "If there is no struggle, there is no progress.",
+   "quotes": [
+    {
+     "text": "If there is no struggle, there is no progress.",
+     "context": "An 1857 speech",
+     "source": "https://en.wikiquote.org/wiki/Frederick_Douglass",
+     "difficulty": 3
+    }
+   ],
+   "blurb": "Frederick Douglass: “If there is no struggle, there is no progress.” (An 1857 speech).",
+   "difficulty": 3
+  },
+  {
+   "id": "napoleon",
+   "name": "Napoleon",
+   "group": "leader",
+   "facts": {
+    "field": "leader"
+   },
+   "quote": "Impossible is a word to be found only in the dictionary of fools.",
+   "quotes": [
+    {
+     "text": "Impossible is a word to be found only in the dictionary of fools.",
+     "context": "A saying credited to him in his letters",
+     "source": "https://en.wikiquote.org/wiki/Napoleon",
+     "difficulty": 3
+    }
+   ],
+   "blurb": "Napoleon: “Impossible is a word to be found only in the dictionary of fools.” (A saying credited to him in his letters).",
+   "difficulty": 3
+  },
+  {
+   "id": "john-donne",
+   "name": "John Donne",
+   "group": "writer",
+   "facts": {
+    "field": "writer"
+   },
+   "quote": "No man is an island, entire of itself",
+   "quotes": [
+    {
+     "text": "No man is an island, entire of itself",
+     "context": "Devotions upon Emergent Occasions, 1624",
+     "source": "https://en.wikiquote.org/wiki/John_Donne",
+     "difficulty": 2
+    }
+   ],
+   "blurb": "John Donne: “No man is an island, entire of itself” (Devotions upon Emergent Occasions, 1624).",
+   "difficulty": 2
+  },
+  {
+   "id": "alexander-pope",
+   "name": "Alexander Pope",
+   "group": "writer",
+   "facts": {
+    "field": "writer"
+   },
+   "quote": "To err is human, to forgive divine.",
+   "quotes": [
+    {
+     "text": "To err is human, to forgive divine.",
+     "context": "An Essay on Criticism, 1711",
+     "source": "https://en.wikiquote.org/wiki/Alexander_Pope",
+     "difficulty": 2
+    }
+   ],
+   "blurb": "Alexander Pope: “To err is human, to forgive divine.” (An Essay on Criticism, 1711).",
+   "difficulty": 2
+  },
+  {
+   "id": "lord-acton",
+   "name": "Lord Acton",
+   "group": "writer",
+   "facts": {
+    "field": "writer"
+   },
+   "quote": "Power tends to corrupt, and absolute power corrupts absolutely.",
+   "quotes": [
+    {
+     "text": "Power tends to corrupt, and absolute power corrupts absolutely.",
+     "context": "An 1887 letter",
+     "source": "https://en.wikiquote.org/wiki/John_Dalberg-Acton%2C_1st_Baron_Acton",
+     "difficulty": 2
+    }
+   ],
+   "blurb": "Lord Acton: “Power tends to corrupt, and absolute power corrupts absolutely.” (An 1887 letter).",
+   "difficulty": 2
+  },
+  {
+   "id": "edward-bulwer-lytton",
+   "name": "Edward Bulwer-Lytton",
+   "group": "writer",
+   "facts": {
+    "field": "writer"
+   },
+   "quote": "The pen is mightier than the sword.",
+   "quotes": [
+    {
+     "text": "The pen is mightier than the sword.",
+     "context": "His 1839 play Richelieu",
+     "source": "https://en.wikiquote.org/wiki/Edward_Bulwer-Lytton",
+     "difficulty": 3
+    }
+   ],
+   "blurb": "Edward Bulwer-Lytton: “The pen is mightier than the sword.” (His 1839 play Richelieu).",
+   "difficulty": 3
+  },
+  {
+   "id": "samuel-johnson",
+   "name": "Samuel Johnson",
+   "group": "writer",
+   "facts": {
+    "field": "writer"
+   },
+   "quote": "When a man is tired of London, he is tired of life",
+   "quotes": [
+    {
+     "text": "When a man is tired of London, he is tired of life",
+     "context": "As recorded by his biographer Boswell, 1777",
+     "source": "https://en.wikiquote.org/wiki/Samuel_Johnson",
+     "difficulty": 2
+    }
+   ],
+   "blurb": "Samuel Johnson: “When a man is tired of London, he is tired of life” (As recorded by his biographer Boswell, 1777).",
+   "difficulty": 2
+  },
+  {
+   "id": "neville-chamberlain",
+   "name": "Neville Chamberlain",
+   "group": "leader",
+   "facts": {
+    "field": "leader"
+   },
+   "quote": "Peace for our time",
+   "quotes": [
+    {
+     "text": "Peace for our time",
+     "context": "Returning from Munich, 1938",
+     "source": "https://en.wikiquote.org/wiki/Neville_Chamberlain",
+     "difficulty": 3
+    }
+   ],
+   "blurb": "Neville Chamberlain: “Peace for our time” (Returning from Munich, 1938).",
+   "difficulty": 3
+  },
+  {
+   "id": "emma-lazarus",
+   "name": "Emma Lazarus",
+   "group": "writer",
+   "facts": {
+    "field": "writer"
+   },
+   "quote": "Give me your tired, your poor, Your huddled masses yearning to breathe free",
+   "quotes": [
+    {
+     "text": "Give me your tired, your poor, Your huddled masses yearning to breathe free",
+     "context": "Her poem on the Statue of Liberty, 1883",
+     "source": "https://en.wikiquote.org/wiki/Emma_Lazarus",
+     "difficulty": 2
+    }
+   ],
+   "blurb": "Emma Lazarus: “Give me your tired, your poor, Your huddled masses yearning to breathe free” (Her poem on the Statue of Liberty, 1883).",
+   "difficulty": 2
+  },
+  {
+   "id": "hippocrates",
+   "name": "Hippocrates",
+   "group": "scientist",
+   "facts": {
+    "field": "scientist"
+   },
+   "quote": "Life is short, and Art long",
+   "quotes": [
+    {
+     "text": "Life is short, and Art long",
+     "context": "The opening of his Aphorisms",
+     "source": "https://en.wikiquote.org/wiki/Hippocrates",
+     "difficulty": 3
+    }
+   ],
+   "blurb": "Hippocrates: “Life is short, and Art long” (The opening of his Aphorisms).",
+   "difficulty": 3
+  },
+  {
+   "id": "juvenal",
+   "name": "Juvenal",
+   "group": "writer",
+   "facts": {
+    "field": "writer"
+   },
+   "quote": "Who is to guard the guards themselves?",
+   "quotes": [
+    {
+     "text": "Who is to guard the guards themselves?",
+     "context": "His Satires",
+     "source": "https://en.wikiquote.org/wiki/Juvenal",
+     "difficulty": 3
+    }
+   ],
+   "blurb": "Juvenal: “Who is to guard the guards themselves?” (His Satires).",
+   "difficulty": 3
+  },
+  {
+   "id": "virgil",
+   "name": "Virgil",
+   "group": "writer",
+   "facts": {
+    "field": "writer"
+   },
+   "quote": "I fear the Greeks even when they bring gifts.",
+   "quotes": [
+    {
+     "text": "I fear the Greeks even when they bring gifts.",
+     "context": "A warning about the Trojan Horse in the Aeneid",
+     "source": "https://en.wikiquote.org/wiki/Virgil",
+     "difficulty": 3
+    }
+   ],
+   "blurb": "Virgil: “I fear the Greeks even when they bring gifts.” (A warning about the Trojan Horse in the Aeneid).",
+   "difficulty": 3
+  },
+  {
+   "id": "richard-nixon",
+   "name": "Richard Nixon",
+   "group": "leader",
+   "facts": {
+    "field": "leader"
+   },
+   "quote": "I am not a crook.",
+   "quotes": [
+    {
+     "text": "I am not a crook.",
+     "context": "A 1973 press conference during Watergate",
+     "source": "https://en.wikiquote.org/wiki/Richard_Nixon",
+     "difficulty": 2
+    }
+   ],
+   "blurb": "Richard Nixon: “I am not a crook.” (A 1973 press conference during Watergate).",
+   "difficulty": 2
+  },
+  {
+   "id": "douglas-macarthur",
+   "name": "Douglas MacArthur",
+   "group": "leader",
+   "facts": {
+    "field": "leader"
+   },
+   "quote": "I shall return.",
+   "quotes": [
+    {
+     "text": "I shall return.",
+     "context": "After leaving the Philippines in 1942",
+     "source": "https://en.wikiquote.org/wiki/Douglas_MacArthur",
+     "difficulty": 2
+    }
+   ],
+   "blurb": "Douglas MacArthur: “I shall return.” (After leaving the Philippines in 1942).",
+   "difficulty": 2
+  },
+  {
+   "id": "yuri-gagarin",
+   "name": "Yuri Gagarin",
+   "group": "explorer",
+   "facts": {
+    "field": "explorer"
+   },
+   "quote": "Poyekhali!",
+   "quotes": [
+    {
+     "text": "Poyekhali!",
+     "context": "\"Let's go!\": as his rocket lifted off, 1961",
+     "source": "https://en.wikiquote.org/wiki/Yuri_Gagarin",
+     "difficulty": 3
+    }
+   ],
+   "blurb": "Yuri Gagarin: “Poyekhali!” (\"Let's go!\": as his rocket lifted off, 1961).",
+   "difficulty": 3
+  },
+  {
+   "id": "robert-burns",
+   "name": "Robert Burns",
+   "group": "writer",
+   "facts": {
+    "field": "writer"
+   },
+   "quote": "The best laid schemes o' mice and men",
+   "quotes": [
+    {
+     "text": "The best laid schemes o' mice and men",
+     "context": "His poem To a Mouse, 1785",
+     "source": "https://en.wikiquote.org/wiki/Robert_Burns",
+     "difficulty": 3
+    }
+   ],
+   "blurb": "Robert Burns: “The best laid schemes o' mice and men” (His poem To a Mouse, 1785).",
+   "difficulty": 3
+  },
+  {
+   "id": "francis-bacon",
+   "name": "Francis Bacon",
+   "group": "philosopher",
+   "facts": {
+    "field": "philosopher"
+   },
+   "quote": "Knowledge itself is power",
+   "quotes": [
+    {
+     "text": "Knowledge itself is power",
+     "context": "Meditationes Sacrae, 1597",
+     "source": "https://en.wikiquote.org/wiki/Francis_Bacon",
+     "difficulty": 3
+    }
+   ],
+   "blurb": "Francis Bacon: “Knowledge itself is power” (Meditationes Sacrae, 1597).",
+   "difficulty": 3
+  },
+  {
+   "id": "george-orwell",
+   "name": "George Orwell",
+   "group": "writer",
+   "facts": {
+    "field": "writer"
+   },
+   "quote": "Big Brother is watching you",
+   "quotes": [
+    {
+     "text": "Big Brother is watching you",
+     "context": "The slogan on posters in Nineteen Eighty-Four",
+     "source": "https://en.wikiquote.org/wiki/Nineteen_Eighty-Four",
+     "difficulty": 1
+    },
+    {
+     "text": "All animals are equal, but some animals are more equal than others.",
+     "context": "The pigs' rewritten rule in Animal Farm",
+     "source": "https://en.wikiquote.org/wiki/Animal_Farm",
+     "difficulty": 2
+    }
+   ],
+   "blurb": "George Orwell: “Big Brother is watching you” (The slogan on posters in Nineteen Eighty-Four).",
+   "difficulty": 1
+  },
+  {
+   "id": "charles-dickens",
+   "name": "Charles Dickens",
+   "group": "writer",
+   "facts": {
+    "field": "writer"
+   },
+   "quote": "Please, sir, I want some more.",
+   "quotes": [
+    {
+     "text": "Please, sir, I want some more.",
+     "context": "Oliver asks for more gruel in Oliver Twist",
+     "source": "https://en.wikiquote.org/wiki/Oliver_Twist",
+     "difficulty": 1
+    },
+    {
+     "text": "God bless Us, Every One!",
+     "context": "Tiny Tim in A Christmas Carol",
+     "source": "https://en.wikiquote.org/wiki/A_Christmas_Carol",
+     "difficulty": 1
+    }
+   ],
+   "blurb": "Charles Dickens: “Please, sir, I want some more.” (Oliver asks for more gruel in Oliver Twist).",
+   "difficulty": 1
+  },
+  {
+   "id": "lewis-carroll",
+   "name": "Lewis Carroll",
+   "group": "writer",
+   "facts": {
+    "field": "writer"
+   },
+   "quote": "Curiouser and curiouser!",
+   "quotes": [
+    {
+     "text": "Curiouser and curiouser!",
+     "context": "Alice in Alice's Adventures in Wonderland",
+     "source": "https://en.wikiquote.org/wiki/Alice's_Adventures_in_Wonderland",
+     "difficulty": 2
+    },
+    {
+     "text": "Off with her head!",
+     "context": "The Queen of Hearts in Alice's Adventures in Wonderland",
+     "source": "https://en.wikiquote.org/wiki/Alice's_Adventures_in_Wonderland",
+     "difficulty": 1
+    },
+    {
+     "text": "We're all mad here.",
+     "context": "The Cheshire Cat in Alice's Adventures in Wonderland",
+     "source": "https://en.wikiquote.org/wiki/Alice's_Adventures_in_Wonderland",
+     "difficulty": 2
+    }
+   ],
+   "blurb": "Lewis Carroll: “Curiouser and curiouser!” (Alice in Alice's Adventures in Wonderland).",
+   "difficulty": 1
+  },
+  {
+   "id": "jane-austen",
+   "name": "Jane Austen",
+   "group": "writer",
+   "facts": {
+    "field": "writer"
+   },
+   "quote": "It is a truth universally acknowledged, that a single man in possession of a good fortune, must be in want of a wife.",
+   "quotes": [
+    {
+     "text": "It is a truth universally acknowledged, that a single man in possession of a good fortune, must be in want of a wife.",
+     "context": "The opening of Pride and Prejudice",
+     "source": "https://en.wikiquote.org/wiki/Pride_and_Prejudice",
+     "difficulty": 2
+    }
+   ],
+   "blurb": "Jane Austen: “It is a truth universally acknowledged, that a single man in possession of a good fortune, must be in want of a wife.” (The opening of Pride and Prejudice).",
+   "difficulty": 2
+  },
+  {
+   "id": "herman-melville",
+   "name": "Herman Melville",
+   "group": "writer",
+   "facts": {
+    "field": "writer"
+   },
+   "quote": "Call me Ishmael.",
+   "quotes": [
+    {
+     "text": "Call me Ishmael.",
+     "context": "The opening of Moby-Dick",
+     "source": "https://en.wikiquote.org/wiki/Moby-Dick",
+     "difficulty": 2
+    }
+   ],
+   "blurb": "Herman Melville: “Call me Ishmael.” (The opening of Moby-Dick).",
+   "difficulty": 2
+  },
+  {
+   "id": "arthur-conan-doyle",
+   "name": "Arthur Conan Doyle",
+   "group": "writer",
+   "facts": {
+    "field": "writer"
+   },
+   "quote": "When you have eliminated the impossible, whatever remains, however improbable, must be the truth",
+   "quotes": [
+    {
+     "text": "When you have eliminated the impossible, whatever remains, however improbable, must be the truth",
+     "context": "Sherlock Holmes in The Sign of the Four, 1890",
+     "source": "https://en.wikiquote.org/wiki/Sherlock_Holmes",
+     "difficulty": 2
+    }
+   ],
+   "blurb": "Arthur Conan Doyle: “When you have eliminated the impossible, whatever remains, however improbable, must be the truth” (Sherlock Holmes in The Sign of the Four, 1890).",
+   "difficulty": 2
+  },
+  {
+   "id": "charles-darwin",
+   "name": "Charles Darwin",
+   "group": "scientist",
+   "facts": {
+    "field": "scientist"
+   },
+   "quote": "There is grandeur in this view of life",
+   "quotes": [
+    {
+     "text": "There is grandeur in this view of life",
+     "context": "The closing passage of On the Origin of Species, 1859",
+     "source": "https://en.wikiquote.org/wiki/Charles_Darwin",
+     "difficulty": 3
+    }
+   ],
+   "blurb": "Charles Darwin: “There is grandeur in this view of life” (The closing passage of On the Origin of Species, 1859).",
+   "difficulty": 3
+  },
+  {
+   "id": "queen-elizabeth-ii",
+   "name": "Queen Elizabeth II",
+   "group": "leader",
+   "facts": {
+    "field": "leader"
+   },
+   "quote": "Annus horribilis",
+   "quotes": [
+    {
+     "text": "Annus horribilis",
+     "context": "Looking back on a bad year for the royal family, 1992",
+     "source": "https://en.wikiquote.org/wiki/Elizabeth_II",
+     "difficulty": 3
+    },
+    {
+     "text": "I declare before you all that my whole life whether it be long or short shall be devoted to your service",
+     "context": "Her 21st birthday broadcast, 1947",
+     "source": "https://en.wikiquote.org/wiki/Elizabeth_II",
+     "difficulty": 3
+    }
+   ],
+   "blurb": "Queen Elizabeth II: “Annus horribilis” (Looking back on a bad year for the royal family, 1992).",
+   "difficulty": 3
+  },
+  {
+   "id": "alexander-graham-bell",
+   "name": "Alexander Graham Bell",
+   "group": "scientist",
+   "facts": {
+    "field": "scientist"
+   },
+   "quote": "Mr. Watson, come here, I want to see you.",
+   "quotes": [
+    {
+     "text": "Mr. Watson, come here, I want to see you.",
+     "context": "The first words spoken over his telephone, 1876",
+     "source": "https://en.wikiquote.org/wiki/Alexander_Graham_Bell",
+     "difficulty": 2
+    }
+   ],
+   "blurb": "Alexander Graham Bell: “Mr. Watson, come here, I want to see you.” (The first words spoken over his telephone, 1876).",
+   "difficulty": 2
+  },
+  {
+   "id": "samuel-morse",
+   "name": "Samuel Morse",
+   "group": "scientist",
+   "facts": {
+    "field": "scientist"
+   },
+   "quote": "What hath God wrought",
+   "quotes": [
+    {
+     "text": "What hath God wrought",
+     "context": "The first long-distance telegraph message, 1844",
+     "source": "https://en.wikiquote.org/wiki/Samuel_F._B._Morse",
+     "difficulty": 3
+    }
+   ],
+   "blurb": "Samuel Morse: “What hath God wrought” (The first long-distance telegraph message, 1844).",
+   "difficulty": 3
+  },
+  {
+   "id": "rosa-parks",
+   "name": "Rosa Parks",
+   "group": "activist",
+   "facts": {
+    "field": "activist"
+   },
+   "quote": "The only tired I was, was tired of giving in",
+   "quotes": [
+    {
+     "text": "The only tired I was, was tired of giving in",
+     "context": "Recalling why she refused to give up her bus seat in 1955",
+     "source": "https://en.wikiquote.org/wiki/Rosa_Parks",
+     "difficulty": 3
+    }
+   ],
+   "blurb": "Rosa Parks: “The only tired I was, was tired of giving in” (Recalling why she refused to give up her bus seat in 1955).",
+   "difficulty": 3
+  },
+  {
+   "id": "susan-b-anthony",
+   "name": "Susan B. Anthony",
+   "group": "activist",
+   "facts": {
+    "field": "activist"
+   },
+   "quote": "Failure is impossible.",
+   "quotes": [
+    {
+     "text": "Failure is impossible.",
+     "context": "Her last public words, 1906",
+     "source": "https://en.wikiquote.org/wiki/Susan_B._Anthony",
+     "difficulty": 3
+    }
+   ],
+   "blurb": "Susan B. Anthony: “Failure is impossible.” (Her last public words, 1906).",
+   "difficulty": 3
+  },
+  {
+   "id": "helen-keller",
+   "name": "Helen Keller",
+   "group": "activist",
+   "facts": {
+    "field": "activist"
+   },
+   "quote": "Alone we can do so little; together we can do so much.",
+   "quotes": [
+    {
+     "text": "Alone we can do so little; together we can do so much.",
+     "context": "On working together",
+     "source": "https://en.wikiquote.org/wiki/Helen_Keller",
+     "difficulty": 2
+    }
+   ],
+   "blurb": "Helen Keller: “Alone we can do so little; together we can do so much.” (On working together).",
+   "difficulty": 2
+  },
+  {
+   "id": "aristotle",
+   "name": "Aristotle",
+   "group": "philosopher",
+   "facts": {
+    "field": "philosopher"
+   },
+   "quote": "Man is by nature a political animal",
+   "quotes": [
+    {
+     "text": "Man is by nature a political animal",
+     "context": "His Politics",
+     "source": "https://en.wikiquote.org/wiki/Politics_(Aristotle)",
+     "difficulty": 3
+    }
+   ],
+   "blurb": "Aristotle: “Man is by nature a political animal” (His Politics).",
+   "difficulty": 3
+  },
+  {
+   "id": "horace",
+   "name": "Horace",
+   "group": "writer",
+   "facts": {
+    "field": "writer"
+   },
+   "quote": "Seize the day",
+   "quotes": [
+    {
+     "text": "Seize the day",
+     "context": "Carpe diem, from his Odes",
+     "source": "https://en.wikiquote.org/wiki/Horace",
+     "difficulty": 2
+    }
+   ],
+   "blurb": "Horace: “Seize the day” (Carpe diem, from his Odes).",
+   "difficulty": 2
+  },
+  {
+   "id": "jean-jacques-rousseau",
+   "name": "Jean-Jacques Rousseau",
+   "group": "philosopher",
+   "facts": {
+    "field": "philosopher"
+   },
+   "quote": "Man is born free, and everywhere he is in chains.",
+   "quotes": [
+    {
+     "text": "Man is born free, and everywhere he is in chains.",
+     "context": "The opening of The Social Contract, 1762",
+     "source": "https://en.wikiquote.org/wiki/Jean-Jacques_Rousseau",
+     "difficulty": 2
+    }
+   ],
+   "blurb": "Jean-Jacques Rousseau: “Man is born free, and everywhere he is in chains.” (The opening of The Social Contract, 1762).",
+   "difficulty": 2
+  },
+  {
+   "id": "percy-bysshe-shelley",
+   "name": "Percy Bysshe Shelley",
+   "group": "writer",
+   "facts": {
+    "field": "writer"
+   },
+   "quote": "Look on my works, ye Mighty, and despair!",
+   "quotes": [
+    {
+     "text": "Look on my works, ye Mighty, and despair!",
+     "context": "The inscription in his poem Ozymandias, 1818",
+     "source": "https://en.wikiquote.org/wiki/Percy_Bysshe_Shelley",
+     "difficulty": 2
+    }
+   ],
+   "blurb": "Percy Bysshe Shelley: “Look on my works, ye Mighty, and despair!” (The inscription in his poem Ozymandias, 1818).",
+   "difficulty": 2
+  },
+  {
+   "id": "william-wordsworth",
+   "name": "William Wordsworth",
+   "group": "writer",
+   "facts": {
+    "field": "writer"
+   },
+   "quote": "I wandered lonely as a cloud",
+   "quotes": [
+    {
+     "text": "I wandered lonely as a cloud",
+     "context": "His poem about daffodils, 1807",
+     "source": "https://en.wikiquote.org/wiki/William_Wordsworth",
+     "difficulty": 2
+    }
+   ],
+   "blurb": "William Wordsworth: “I wandered lonely as a cloud” (His poem about daffodils, 1807).",
+   "difficulty": 2
+  },
+  {
+   "id": "alfred-lord-tennyson",
+   "name": "Alfred, Lord Tennyson",
+   "group": "writer",
+   "facts": {
+    "field": "writer"
+   },
+   "quote": "'Tis better to have loved and lost Than never to have loved at all.",
+   "quotes": [
+    {
+     "text": "'Tis better to have loved and lost Than never to have loved at all.",
+     "context": "In Memoriam A.H.H., 1850",
+     "source": "https://en.wikiquote.org/wiki/Alfred%2C_Lord_Tennyson",
+     "difficulty": 2
+    }
+   ],
+   "blurb": "Alfred, Lord Tennyson: “'Tis better to have loved and lost Than never to have loved at all.” (In Memoriam A.H.H., 1850).",
+   "difficulty": 2
+  },
+  {
+   "id": "samuel-taylor-coleridge",
+   "name": "Samuel Taylor Coleridge",
+   "group": "writer",
+   "facts": {
+    "field": "writer"
+   },
+   "quote": "Water, water, every where, Nor any drop to drink.",
+   "quotes": [
+    {
+     "text": "Water, water, every where, Nor any drop to drink.",
+     "context": "The Rime of the Ancient Mariner, 1798",
+     "source": "https://en.wikiquote.org/wiki/The_Rime_of_the_Ancient_Mariner",
+     "difficulty": 2
+    }
+   ],
+   "blurb": "Samuel Taylor Coleridge: “Water, water, every where, Nor any drop to drink.” (The Rime of the Ancient Mariner, 1798).",
+   "difficulty": 2
+  },
+  {
+   "id": "robert-frost",
+   "name": "Robert Frost",
+   "group": "writer",
+   "facts": {
+    "field": "writer"
+   },
+   "quote": "Two roads diverged in a wood",
+   "quotes": [
+    {
+     "text": "Two roads diverged in a wood",
+     "context": "The Road Not Taken, 1916",
+     "source": "https://en.wikiquote.org/wiki/Robert_Frost",
+     "difficulty": 2
+    }
+   ],
+   "blurb": "Robert Frost: “Two roads diverged in a wood” (The Road Not Taken, 1916).",
+   "difficulty": 2
+  },
+  {
+   "id": "walt-whitman",
+   "name": "Walt Whitman",
+   "group": "writer",
+   "facts": {
+    "field": "writer"
+   },
+   "quote": "O Captain! my Captain!",
+   "quotes": [
+    {
+     "text": "O Captain! my Captain!",
+     "context": "His elegy for Abraham Lincoln, 1865",
+     "source": "https://en.wikiquote.org/wiki/Walt_Whitman",
+     "difficulty": 2
+    }
+   ],
+   "blurb": "Walt Whitman: “O Captain! my Captain!” (His elegy for Abraham Lincoln, 1865).",
+   "difficulty": 2
+  },
+  {
+   "id": "edgar-allan-poe",
+   "name": "Edgar Allan Poe",
+   "group": "writer",
+   "facts": {
+    "field": "writer"
+   },
+   "quote": "Quoth the Raven, \"Nevermore.\"",
+   "quotes": [
+    {
+     "text": "Quoth the Raven, \"Nevermore.\"",
+     "context": "His poem The Raven, 1845",
+     "source": "https://en.wikiquote.org/wiki/Edgar_Allan_Poe",
+     "difficulty": 1
+    }
+   ],
+   "blurb": "Edgar Allan Poe: “Quoth the Raven, \"Nevermore.\"” (His poem The Raven, 1845).",
+   "difficulty": 1
+  },
+  {
+   "id": "john-milton",
+   "name": "John Milton",
+   "group": "writer",
+   "facts": {
+    "field": "writer"
+   },
+   "quote": "Better to reign in Hell, than serve in Heaven.",
+   "quotes": [
+    {
+     "text": "Better to reign in Hell, than serve in Heaven.",
+     "context": "Satan in Paradise Lost, 1667",
+     "source": "https://en.wikiquote.org/wiki/Paradise_Lost",
+     "difficulty": 3
+    }
+   ],
+   "blurb": "John Milton: “Better to reign in Hell, than serve in Heaven.” (Satan in Paradise Lost, 1667).",
+   "difficulty": 3
+  },
+  {
+   "id": "christopher-marlowe",
+   "name": "Christopher Marlowe",
+   "group": "writer",
+   "facts": {
+    "field": "writer"
+   },
+   "quote": "Was this the face that launch'd a thousand ships",
+   "quotes": [
+    {
+     "text": "Was this the face that launch'd a thousand ships",
+     "context": "Faustus on Helen of Troy in Doctor Faustus",
+     "source": "https://en.wikiquote.org/wiki/Doctor_Faustus",
+     "difficulty": 3
+    }
+   ],
+   "blurb": "Christopher Marlowe: “Was this the face that launch'd a thousand ships” (Faustus on Helen of Troy in Doctor Faustus).",
+   "difficulty": 3
+  },
+  {
+   "id": "rudyard-kipling",
+   "name": "Rudyard Kipling",
+   "group": "writer",
+   "facts": {
+    "field": "writer"
+   },
+   "quote": "If you can keep your head when all about you",
+   "quotes": [
+    {
+     "text": "If you can keep your head when all about you",
+     "context": "The opening of his poem If—, 1910",
+     "source": "https://en.wikiquote.org/wiki/Rudyard_Kipling",
+     "difficulty": 2
+    }
+   ],
+   "blurb": "Rudyard Kipling: “If you can keep your head when all about you” (The opening of his poem If—, 1910).",
+   "difficulty": 2
+  },
+  {
+   "id": "carl-sagan",
+   "name": "Carl Sagan",
+   "group": "scientist",
+   "facts": {
+    "field": "scientist"
+   },
+   "quote": "Extraordinary claims require extraordinary evidence",
+   "quotes": [
+    {
+     "text": "Extraordinary claims require extraordinary evidence",
+     "context": "From Cosmos, 1980",
+     "source": "https://en.wikiquote.org/wiki/Carl_Sagan",
+     "difficulty": 3
+    }
+   ],
+   "blurb": "Carl Sagan: “Extraordinary claims require extraordinary evidence” (From Cosmos, 1980).",
+   "difficulty": 3
+  },
+  {
+   "id": "henry-morton-stanley",
+   "name": "Henry Morton Stanley",
+   "group": "explorer",
+   "facts": {
+    "field": "explorer"
+   },
+   "quote": "Dr. Livingstone, I presume?",
+   "quotes": [
+    {
+     "text": "Dr. Livingstone, I presume?",
+     "context": "On finding the missing explorer in Africa, 1871",
+     "source": "https://en.wikiquote.org/wiki/Henry_Morton_Stanley",
+     "difficulty": 1
+    }
+   ],
+   "blurb": "Henry Morton Stanley: “Dr. Livingstone, I presume?” (On finding the missing explorer in Africa, 1871).",
+   "difficulty": 1
+  },
+  {
+   "id": "mao-zedong",
+   "name": "Mao Zedong",
+   "group": "leader",
+   "facts": {
+    "field": "leader"
+   },
+   "quote": "Political power grows out of the barrel of a gun.",
+   "quotes": [
+    {
+     "text": "Political power grows out of the barrel of a gun.",
+     "context": "A 1938 speech",
+     "source": "https://en.wikiquote.org/wiki/Mao_Zedong",
+     "difficulty": 3
+    }
+   ],
+   "blurb": "Mao Zedong: “Political power grows out of the barrel of a gun.” (A 1938 speech).",
+   "difficulty": 3
+  },
+  {
+   "id": "barack-obama",
+   "name": "Barack Obama",
+   "group": "leader",
+   "facts": {
+    "field": "leader"
+   },
+   "quote": "Yes, we can.",
+   "quotes": [
+    {
+     "text": "Yes, we can.",
+     "context": "His 2008 campaign slogan and victory-night refrain",
+     "source": "https://en.wikiquote.org/wiki/Barack_Obama",
+     "difficulty": 1
+    }
+   ],
+   "blurb": "Barack Obama: “Yes, we can.” (His 2008 campaign slogan and victory-night refrain).",
+   "difficulty": 1
+  }
+ ],
+ "questions": [
+  {
+   "id": "who-winston-churchill-0",
+   "kind": "mc",
+   "prompt": "Who said or wrote: “We shall fight on the beaches”",
+   "answer": "Winston Churchill",
+   "wrong": [
+    "Nelson Mandela",
+    "Patrick Henry",
+    "Barack Obama"
+   ],
+   "explain": "Winston Churchill: From a speech to Parliament in June 1940, after Dunkirk.",
+   "difficulty": 1,
+   "refs": [
+    "quotes/winston-churchill"
+   ]
+  },
+  {
+   "id": "who-winston-churchill-1",
+   "kind": "mc",
+   "prompt": "Who said or wrote: “I have nothing to offer but blood, toil, tears and sweat.”",
+   "answer": "Winston Churchill",
+   "wrong": [
+    "Richard Nixon",
+    "Mahatma Gandhi",
+    "Barack Obama"
+   ],
+   "explain": "Winston Churchill: His first speech as prime minister, May 1940.",
+   "difficulty": 2,
+   "refs": [
+    "quotes/winston-churchill"
+   ]
+  },
+  {
+   "id": "who-winston-churchill-2",
+   "kind": "mc",
+   "prompt": "Who said or wrote: “Never in the field of human conflict was so much owed by so many to so few.”",
+   "answer": "Winston Churchill",
+   "wrong": [
+    "Elizabeth I",
+    "Patrick Henry",
+    "John F. Kennedy"
+   ],
+   "explain": "Winston Churchill: Praising RAF pilots during the Battle of Britain, 1940.",
+   "difficulty": 2,
+   "refs": [
+    "quotes/winston-churchill"
+   ]
+  },
+  {
+   "id": "who-winston-churchill-3",
+   "kind": "mc",
+   "prompt": "Who said or wrote: “An iron curtain has descended across the Continent”",
+   "answer": "Winston Churchill",
+   "wrong": [
+    "Margaret Thatcher",
+    "Abraham Lincoln",
+    "Richard Nixon"
+   ],
+   "explain": "Winston Churchill: A 1946 speech in Fulton, Missouri.",
+   "difficulty": 3,
+   "refs": [
+    "quotes/winston-churchill"
+   ]
+  },
+  {
+   "id": "who-winston-churchill-4",
+   "kind": "mc",
+   "prompt": "Who said or wrote: “Now this is not the end. It is not even the beginning of the end. But it is, perhaps, the end of the beginning.”",
+   "answer": "Winston Churchill",
+   "wrong": [
+    "Douglas MacArthur",
+    "Richard Nixon",
+    "Napoleon"
+   ],
+   "explain": "Winston Churchill: After victory at El Alamein, 1942.",
+   "difficulty": 3,
+   "refs": [
+    "quotes/winston-churchill"
+   ]
+  },
+  {
+   "id": "who-abraham-lincoln-0",
+   "kind": "mc",
+   "prompt": "Who said or wrote: “Four score and seven years ago”",
+   "answer": "Abraham Lincoln",
+   "wrong": [
+    "Nelson Mandela",
+    "Franklin D. Roosevelt",
+    "Margaret Thatcher"
+   ],
+   "explain": "Abraham Lincoln: The opening of the Gettysburg Address, 1863.",
+   "difficulty": 2,
+   "refs": [
+    "quotes/abraham-lincoln"
+   ]
+  },
+  {
+   "id": "who-abraham-lincoln-1",
+   "kind": "mc",
+   "prompt": "Who said or wrote: “Government of the people, by the people, for the people, shall not perish from the earth”",
+   "answer": "Abraham Lincoln",
+   "wrong": [
+    "Benjamin Franklin",
+    "Thomas Jefferson",
+    "Queen Elizabeth II"
+   ],
+   "explain": "Abraham Lincoln: The close of the Gettysburg Address, 1863.",
+   "difficulty": 2,
+   "refs": [
+    "quotes/abraham-lincoln"
+   ]
+  },
+  {
+   "id": "who-abraham-lincoln-2",
+   "kind": "mc",
+   "prompt": "Who said or wrote: “A house divided against itself cannot stand.”",
+   "answer": "Abraham Lincoln",
+   "wrong": [
+    "John F. Kennedy",
+    "Winston Churchill",
+    "Mao Zedong"
+   ],
+   "explain": "Abraham Lincoln: An 1858 speech on slavery, echoing the Bible.",
+   "difficulty": 3,
+   "refs": [
+    "quotes/abraham-lincoln"
+   ]
+  },
+  {
+   "id": "who-abraham-lincoln-3",
+   "kind": "mc",
+   "prompt": "Who said or wrote: “With malice toward none, with charity for all”",
+   "answer": "Abraham Lincoln",
+   "wrong": [
+    "Richard Nixon",
+    "Thomas Jefferson",
+    "Barack Obama"
+   ],
+   "explain": "Abraham Lincoln: His second inaugural address, 1865.",
+   "difficulty": 3,
+   "refs": [
+    "quotes/abraham-lincoln"
+   ]
+  },
+  {
+   "id": "who-john-f-kennedy-0",
+   "kind": "mc",
+   "prompt": "Who said or wrote: “Ask not what your country can do for you — ask what you can do for your country”",
+   "answer": "John F. Kennedy",
+   "wrong": [
+    "Julius Caesar",
+    "Franklin D. Roosevelt",
+    "Thomas Jefferson"
+   ],
+   "explain": "John F. Kennedy: His inaugural address, January 1961.",
+   "difficulty": 1,
+   "refs": [
+    "quotes/john-f-kennedy"
+   ]
+  },
+  {
+   "id": "who-john-f-kennedy-1",
+   "kind": "mc",
+   "prompt": "Who said or wrote: “Ich bin ein Berliner.”",
+   "answer": "John F. Kennedy",
+   "wrong": [
+    "Julius Caesar",
+    "Benjamin Franklin",
+    "Franklin D. Roosevelt"
+   ],
+   "explain": "John F. Kennedy: A 1963 speech in West Berlin.",
+   "difficulty": 2,
+   "refs": [
+    "quotes/john-f-kennedy"
+   ]
+  },
+  {
+   "id": "who-john-f-kennedy-2",
+   "kind": "mc",
+   "prompt": "Who said or wrote: “We choose to go to the Moon in this decade and do the other things, not because they are easy, but because they are hard”",
+   "answer": "John F. Kennedy",
+   "wrong": [
+    "Barack Obama",
+    "Margaret Thatcher",
+    "Mahatma Gandhi"
+   ],
+   "explain": "John F. Kennedy: A 1962 speech at Rice University.",
+   "difficulty": 2,
+   "refs": [
+    "quotes/john-f-kennedy"
+   ]
+  },
+  {
+   "id": "who-martin-luther-king-jr-0",
+   "kind": "mc",
+   "prompt": "Who said or wrote: “I have a dream”",
+   "answer": "Martin Luther King Jr.",
+   "wrong": [
+    "Frederick Douglass",
+    "Rosa Parks",
+    "Malala Yousafzai"
+   ],
+   "explain": "Martin Luther King Jr.: His 1963 speech at the March on Washington.",
+   "difficulty": 1,
+   "refs": [
+    "quotes/martin-luther-king-jr"
+   ]
+  },
+  {
+   "id": "who-martin-luther-king-jr-1",
+   "kind": "mc",
+   "prompt": "Who said or wrote: “Injustice anywhere is a threat to justice everywhere.”",
+   "answer": "Martin Luther King Jr.",
+   "wrong": [
+    "Rosa Parks",
+    "Frederick Douglass",
+    "Helen Keller"
+   ],
+   "explain": "Martin Luther King Jr.: Letter from Birmingham Jail, 1963.",
+   "difficulty": 2,
+   "refs": [
+    "quotes/martin-luther-king-jr"
+   ]
+  },
+  {
+   "id": "who-martin-luther-king-jr-2",
+   "kind": "mc",
+   "prompt": "Who said or wrote: “Darkness cannot drive out darkness; only light can do that. Hate cannot drive out hate; only love can do that.”",
+   "answer": "Martin Luther King Jr.",
+   "wrong": [
+    "Rosa Parks",
+    "Malala Yousafzai",
+    "Frederick Douglass"
+   ],
+   "explain": "Martin Luther King Jr.: Strength to Love, 1963.",
+   "difficulty": 2,
+   "refs": [
+    "quotes/martin-luther-king-jr"
+   ]
+  },
+  {
+   "id": "who-franklin-d-roosevelt-0",
+   "kind": "mc",
+   "prompt": "Who said or wrote: “The only thing we have to fear is fear itself”",
+   "answer": "Franklin D. Roosevelt",
+   "wrong": [
+    "Mahatma Gandhi",
+    "Theodore Roosevelt",
+    "Richard Nixon"
+   ],
+   "explain": "Franklin D. Roosevelt: His first inaugural address, 1933.",
+   "difficulty": 2,
+   "refs": [
+    "quotes/franklin-d-roosevelt"
+   ]
+  },
+  {
+   "id": "who-franklin-d-roosevelt-1",
+   "kind": "mc",
+   "prompt": "Who said or wrote: “A date which will live in infamy”",
+   "answer": "Franklin D. Roosevelt",
+   "wrong": [
+    "Ronald Reagan",
+    "Douglas MacArthur",
+    "Patrick Henry"
+   ],
+   "explain": "Franklin D. Roosevelt: Speaking to Congress the day after Pearl Harbor, 1941.",
+   "difficulty": 3,
+   "refs": [
+    "quotes/franklin-d-roosevelt"
+   ]
+  },
+  {
+   "id": "who-neil-armstrong-0",
+   "kind": "mc",
+   "prompt": "Who said or wrote: “That's one small step for man, one giant leap for mankind.”",
+   "answer": "Neil Armstrong",
+   "wrong": [
+    "Edward Bulwer-Lytton",
+    "Neville Chamberlain",
+    "Elizabeth I"
+   ],
+   "explain": "Neil Armstrong: Stepping onto the Moon, 20 July 1969.",
+   "difficulty": 1,
+   "refs": [
+    "quotes/neil-armstrong"
+   ]
+  },
+  {
+   "id": "who-neil-armstrong-1",
+   "kind": "mc",
+   "prompt": "Who said or wrote: “Houston, Tranquility Base here. The Eagle has landed.”",
+   "answer": "Neil Armstrong",
+   "wrong": [
+    "Walt Whitman",
+    "Charles Dickens",
+    "Arthur Conan Doyle"
+   ],
+   "explain": "Neil Armstrong: The moment the lunar module touched down, 1969.",
+   "difficulty": 2,
+   "refs": [
+    "quotes/neil-armstrong"
+   ]
+  },
+  {
+   "id": "who-julius-caesar-0",
+   "kind": "mc",
+   "prompt": "Who said or wrote: “Veni, vidi, vici.”",
+   "answer": "Julius Caesar",
+   "wrong": [
+    "Ronald Reagan",
+    "Barack Obama",
+    "Neville Chamberlain"
+   ],
+   "explain": "Julius Caesar: \"I came, I saw, I conquered\": reporting a quick victory in 47 BC.",
+   "difficulty": 1,
+   "refs": [
+    "quotes/julius-caesar"
+   ]
+  },
+  {
+   "id": "who-julius-caesar-1",
+   "kind": "mc",
+   "prompt": "Who said or wrote: “The die is cast.”",
+   "answer": "Julius Caesar",
+   "wrong": [
+    "Winston Churchill",
+    "Margaret Thatcher",
+    "Theodore Roosevelt"
+   ],
+   "explain": "Julius Caesar: Crossing the Rubicon with his army in 49 BC.",
+   "difficulty": 2,
+   "refs": [
+    "quotes/julius-caesar"
+   ]
+  },
+  {
+   "id": "who-nelson-mandela-0",
+   "kind": "mc",
+   "prompt": "Who said or wrote: “It is an ideal for which I am prepared to die.”",
+   "answer": "Nelson Mandela",
+   "wrong": [
+    "Winston Churchill",
+    "Benjamin Franklin",
+    "Patrick Henry"
+   ],
+   "explain": "Nelson Mandela: Closing his statement at the Rivonia Trial, 1964.",
+   "difficulty": 3,
+   "refs": [
+    "quotes/nelson-mandela"
+   ]
+  },
+  {
+   "id": "who-nelson-mandela-1",
+   "kind": "mc",
+   "prompt": "Who said or wrote: “Education is the most powerful weapon we can use to change the world”",
+   "answer": "Nelson Mandela",
+   "wrong": [
+    "Abraham Lincoln",
+    "Patrick Henry",
+    "Margaret Thatcher"
+   ],
+   "explain": "Nelson Mandela: A 2003 speech launching an education network.",
+   "difficulty": 2,
+   "refs": [
+    "quotes/nelson-mandela"
+   ]
+  },
+  {
+   "id": "who-mahatma-gandhi-0",
+   "kind": "mc",
+   "prompt": "Who said or wrote: “The weak can never forgive. Forgiveness is the attribute of the strong.”",
+   "answer": "Mahatma Gandhi",
+   "wrong": [
+    "Winston Churchill",
+    "John F. Kennedy",
+    "Mao Zedong"
+   ],
+   "explain": "Mahatma Gandhi: Writing in Young India, 1931.",
+   "difficulty": 3,
+   "refs": [
+    "quotes/mahatma-gandhi"
+   ]
+  },
+  {
+   "id": "who-albert-einstein-0",
+   "kind": "mc",
+   "prompt": "Who said or wrote: “Imagination is more important than knowledge.”",
+   "answer": "Albert Einstein",
+   "wrong": [
+    "Archimedes",
+    "Carl Sagan",
+    "Marie Curie"
+   ],
+   "explain": "Albert Einstein: A 1929 newspaper interview.",
+   "difficulty": 2,
+   "refs": [
+    "quotes/albert-einstein"
+   ]
+  },
+  {
+   "id": "who-albert-einstein-1",
+   "kind": "mc",
+   "prompt": "Who said or wrote: “I, at any rate, am convinced that He does not throw dice.”",
+   "answer": "Albert Einstein",
+   "wrong": [
+    "Thomas Edison",
+    "Samuel Morse",
+    "Marie Curie"
+   ],
+   "explain": "Albert Einstein: A 1926 letter to Max Born about quantum theory.",
+   "difficulty": 3,
+   "refs": [
+    "quotes/albert-einstein"
+   ]
+  },
+  {
+   "id": "who-albert-einstein-2",
+   "kind": "mc",
+   "prompt": "Who said or wrote: “Science without religion is lame, religion without science is blind.”",
+   "answer": "Albert Einstein",
+   "wrong": [
+    "Marie Curie",
+    "Carl Sagan",
+    "Charles Darwin"
+   ],
+   "explain": "Albert Einstein: A 1941 essay.",
+   "difficulty": 3,
+   "refs": [
+    "quotes/albert-einstein"
+   ]
+  },
+  {
+   "id": "who-isaac-newton-0",
+   "kind": "mc",
+   "prompt": "Who said or wrote: “If I have seen further it is by standing on the shoulders of Giants.”",
+   "answer": "Isaac Newton",
+   "wrong": [
+    "Alexander Graham Bell",
+    "Archimedes",
+    "Thomas Edison"
+   ],
+   "explain": "Isaac Newton: A 1675 letter to Robert Hooke.",
+   "difficulty": 2,
+   "refs": [
+    "quotes/isaac-newton"
+   ]
+  },
+  {
+   "id": "who-rene-descartes-0",
+   "kind": "mc",
+   "prompt": "Who said or wrote: “I think, therefore I am.”",
+   "answer": "René Descartes",
+   "wrong": [
+    "Karl Marx",
+    "Francis Bacon",
+    "Socrates"
+   ],
+   "explain": "René Descartes: His philosophical starting point, 1637.",
+   "difficulty": 1,
+   "refs": [
+    "quotes/rene-descartes"
+   ]
+  },
+  {
+   "id": "who-socrates-0",
+   "kind": "mc",
+   "prompt": "Who said or wrote: “The unexamined life is not worth living”",
+   "answer": "Socrates",
+   "wrong": [
+    "René Descartes",
+    "Jean-Jacques Rousseau",
+    "Francis Bacon"
+   ],
+   "explain": "Socrates: His trial in 399 BC, as told by Plato.",
+   "difficulty": 2,
+   "refs": [
+    "quotes/socrates"
+   ]
+  },
+  {
+   "id": "who-laozi-0",
+   "kind": "mc",
+   "prompt": "Who said or wrote: “A journey of a thousand miles starts with a single step.”",
+   "answer": "Laozi",
+   "wrong": [
+    "Friedrich Nietzsche",
+    "Socrates",
+    "Sun Tzu"
+   ],
+   "explain": "Laozi: The Tao Te Ching.",
+   "difficulty": 2,
+   "refs": [
+    "quotes/laozi"
+   ]
+  },
+  {
+   "id": "who-archimedes-0",
+   "kind": "mc",
+   "prompt": "Who said or wrote: “Eureka!”",
+   "answer": "Archimedes",
+   "wrong": [
+    "Albert Einstein",
+    "Hippocrates",
+    "Isaac Newton"
+   ],
+   "explain": "Archimedes: \"I have found it!\": said to have been shouted after a discovery in his bath.",
+   "difficulty": 1,
+   "refs": [
+    "quotes/archimedes"
+   ]
+  },
+  {
+   "id": "who-archimedes-1",
+   "kind": "mc",
+   "prompt": "Who said or wrote: “Give me the place to stand, and I shall move the earth.”",
+   "answer": "Archimedes",
+   "wrong": [
+    "Albert Einstein",
+    "Charles Darwin",
+    "Carl Sagan"
+   ],
+   "explain": "Archimedes: On the power of the lever.",
+   "difficulty": 3,
+   "refs": [
+    "quotes/archimedes"
+   ]
+  },
+  {
+   "id": "who-william-shakespeare-0",
+   "kind": "mc",
+   "prompt": "Who said or wrote: “To be, or not to be: that is the question…”",
+   "answer": "William Shakespeare",
+   "wrong": [
+    "Edgar Allan Poe",
+    "Lewis Carroll",
+    "Samuel Johnson"
+   ],
+   "explain": "William Shakespeare: Hamlet's soliloquy in Hamlet.",
+   "difficulty": 1,
+   "refs": [
+    "quotes/william-shakespeare"
+   ]
+  },
+  {
+   "id": "who-william-shakespeare-1",
+   "kind": "mc",
+   "prompt": "Who said or wrote: “All the world's a stage…”",
+   "answer": "William Shakespeare",
+   "wrong": [
+    "Oscar Wilde",
+    "Lord Acton",
+    "Robert Frost"
+   ],
+   "explain": "William Shakespeare: Jaques in As You Like It.",
+   "difficulty": 2,
+   "refs": [
+    "quotes/william-shakespeare"
+   ]
+  },
+  {
+   "id": "who-william-shakespeare-2",
+   "kind": "mc",
+   "prompt": "Who said or wrote: “O Romeo, Romeo! wherefore art thou Romeo?”",
+   "answer": "William Shakespeare",
+   "wrong": [
+    "Arthur Conan Doyle",
+    "Samuel Johnson",
+    "Lewis Carroll"
+   ],
+   "explain": "William Shakespeare: Juliet on her balcony in Romeo and Juliet.",
+   "difficulty": 1,
+   "refs": [
+    "quotes/william-shakespeare"
+   ]
+  },
+  {
+   "id": "who-william-shakespeare-3",
+   "kind": "mc",
+   "prompt": "Who said or wrote: “Friends, Romans, countrymen, lend me your ears…”",
+   "answer": "William Shakespeare",
+   "wrong": [
+    "Alexander Pope",
+    "Herman Melville",
+    "William Wordsworth"
+   ],
+   "explain": "William Shakespeare: Mark Antony's funeral speech in Julius Caesar.",
+   "difficulty": 2,
+   "refs": [
+    "quotes/william-shakespeare"
+   ]
+  },
+  {
+   "id": "who-william-shakespeare-4",
+   "kind": "mc",
+   "prompt": "Who said or wrote: “A horse! a horse! my kingdom for a horse!”",
+   "answer": "William Shakespeare",
+   "wrong": [
+    "Rudyard Kipling",
+    "Mark Twain",
+    "George Orwell"
+   ],
+   "explain": "William Shakespeare: The king's last cry in battle in Richard III.",
+   "difficulty": 2,
+   "refs": [
+    "quotes/william-shakespeare"
+   ]
+  },
+  {
+   "id": "who-william-shakespeare-5",
+   "kind": "mc",
+   "prompt": "Who said or wrote: “The course of true love never did run smooth…”",
+   "answer": "William Shakespeare",
+   "wrong": [
+    "Jane Austen",
+    "Virgil",
+    "Percy Bysshe Shelley"
+   ],
+   "explain": "William Shakespeare: Lysander in A Midsummer Night's Dream.",
+   "difficulty": 3,
+   "refs": [
+    "quotes/william-shakespeare"
+   ]
+  },
+  {
+   "id": "who-william-shakespeare-6",
+   "kind": "mc",
+   "prompt": "Who said or wrote: “Neither a borrower nor a lender be…”",
+   "answer": "William Shakespeare",
+   "wrong": [
+    "Jane Austen",
+    "Charles Dickens",
+    "Mark Twain"
+   ],
+   "explain": "William Shakespeare: Polonius's advice to his son in Hamlet.",
+   "difficulty": 2,
+   "refs": [
+    "quotes/william-shakespeare"
+   ]
+  },
+  {
+   "id": "who-william-shakespeare-7",
+   "kind": "mc",
+   "prompt": "Who said or wrote: “Something is rotten in the state of Denmark.”",
+   "answer": "William Shakespeare",
+   "wrong": [
+    "George Orwell",
+    "John Milton",
+    "Lewis Carroll"
+   ],
+   "explain": "William Shakespeare: Marcellus in Hamlet.",
+   "difficulty": 2,
+   "refs": [
+    "quotes/william-shakespeare"
+   ]
+  },
+  {
+   "id": "who-william-shakespeare-8",
+   "kind": "mc",
+   "prompt": "Who said or wrote: “Brevity is the soul of wit…”",
+   "answer": "William Shakespeare",
+   "wrong": [
+    "William Wordsworth",
+    "Percy Bysshe Shelley",
+    "Emma Lazarus"
+   ],
+   "explain": "William Shakespeare: Polonius in Hamlet.",
+   "difficulty": 2,
+   "refs": [
+    "quotes/william-shakespeare"
+   ]
+  },
+  {
+   "id": "who-william-shakespeare-9",
+   "kind": "mc",
+   "prompt": "Who said or wrote: “The lady doth protest too much, methinks.”",
+   "answer": "William Shakespeare",
+   "wrong": [
+    "Herman Melville",
+    "Jane Austen",
+    "John Donne"
+   ],
+   "explain": "William Shakespeare: Queen Gertrude in Hamlet.",
+   "difficulty": 3,
+   "refs": [
+    "quotes/william-shakespeare"
+   ]
+  },
+  {
+   "id": "who-william-shakespeare-10",
+   "kind": "mc",
+   "prompt": "Who said or wrote: “If music be the food of love, play on…”",
+   "answer": "William Shakespeare",
+   "wrong": [
+    "Horace",
+    "Oscar Wilde",
+    "Percy Bysshe Shelley"
+   ],
+   "explain": "William Shakespeare: Duke Orsino's opening line in Twelfth Night.",
+   "difficulty": 2,
+   "refs": [
+    "quotes/william-shakespeare"
+   ]
+  },
+  {
+   "id": "who-william-shakespeare-11",
+   "kind": "mc",
+   "prompt": "Who said or wrote: “Some are born great, some achieve greatness, and some have greatness thrust upon 'em”",
+   "answer": "William Shakespeare",
+   "wrong": [
+    "Samuel Taylor Coleridge",
+    "Walt Whitman",
+    "Horace"
+   ],
+   "explain": "William Shakespeare: A forged letter read by Malvolio in Twelfth Night.",
+   "difficulty": 3,
+   "refs": [
+    "quotes/william-shakespeare"
+   ]
+  },
+  {
+   "id": "who-william-shakespeare-12",
+   "kind": "mc",
+   "prompt": "Who said or wrote: “Now is the winter of our discontent”",
+   "answer": "William Shakespeare",
+   "wrong": [
+    "John Milton",
+    "Samuel Johnson",
+    "Lewis Carroll"
+   ],
+   "explain": "William Shakespeare: The opening line of Richard III.",
+   "difficulty": 2,
+   "refs": [
+    "quotes/william-shakespeare"
+   ]
+  },
+  {
+   "id": "who-william-shakespeare-13",
+   "kind": "mc",
+   "prompt": "Who said or wrote: “Double, double toil and trouble…”",
+   "answer": "William Shakespeare",
+   "wrong": [
+    "Mark Twain",
+    "Alfred, Lord Tennyson",
+    "Percy Bysshe Shelley"
+   ],
+   "explain": "William Shakespeare: The witches' chant in Macbeth.",
+   "difficulty": 1,
+   "refs": [
+    "quotes/william-shakespeare"
+   ]
+  },
+  {
+   "id": "who-william-shakespeare-14",
+   "kind": "mc",
+   "prompt": "Who said or wrote: “Out, damned spot!”",
+   "answer": "William Shakespeare",
+   "wrong": [
+    "Lewis Carroll",
+    "Lord Acton",
+    "Oscar Wilde"
+   ],
+   "explain": "William Shakespeare: Lady Macbeth sleepwalking in Macbeth.",
+   "difficulty": 2,
+   "refs": [
+    "quotes/william-shakespeare"
+   ]
+  },
+  {
+   "id": "who-william-shakespeare-15",
+   "kind": "mc",
+   "prompt": "Who said or wrote: “What's in a name?”",
+   "answer": "William Shakespeare",
+   "wrong": [
+    "George Orwell",
+    "Charles Dickens",
+    "Arthur Conan Doyle"
+   ],
+   "explain": "William Shakespeare: Juliet on her balcony in Romeo and Juliet.",
+   "difficulty": 2,
+   "refs": [
+    "quotes/william-shakespeare"
+   ]
+  },
+  {
+   "id": "who-william-shakespeare-16",
+   "kind": "mc",
+   "prompt": "Who said or wrote: “Parting is such sweet sorrow”",
+   "answer": "William Shakespeare",
+   "wrong": [
+    "Mark Twain",
+    "Robert Frost",
+    "Edgar Allan Poe"
+   ],
+   "explain": "William Shakespeare: Juliet saying goodnight in Romeo and Juliet.",
+   "difficulty": 2,
+   "refs": [
+    "quotes/william-shakespeare"
+   ]
+  },
+  {
+   "id": "who-william-shakespeare-17",
+   "kind": "mc",
+   "prompt": "Who said or wrote: “Beware the ides of March.”",
+   "answer": "William Shakespeare",
+   "wrong": [
+    "Samuel Johnson",
+    "Charles Dickens",
+    "Walt Whitman"
+   ],
+   "explain": "William Shakespeare: A soothsayer's warning in Julius Caesar.",
+   "difficulty": 2,
+   "refs": [
+    "quotes/william-shakespeare"
+   ]
+  },
+  {
+   "id": "who-oscar-wilde-0",
+   "kind": "mc",
+   "prompt": "Who said or wrote: “I can resist everything except temptation.”",
+   "answer": "Oscar Wilde",
+   "wrong": [
+    "Rudyard Kipling",
+    "Herman Melville",
+    "Percy Bysshe Shelley"
+   ],
+   "explain": "Oscar Wilde: Lord Darlington in Lady Windermere's Fan, 1892.",
+   "difficulty": 2,
+   "refs": [
+    "quotes/oscar-wilde"
+   ]
+  },
+  {
+   "id": "who-oscar-wilde-1",
+   "kind": "mc",
+   "prompt": "Who said or wrote: “We are all in the gutter, but some of us are looking at the stars.”",
+   "answer": "Oscar Wilde",
+   "wrong": [
+    "William Wordsworth",
+    "Robert Burns",
+    "Samuel Taylor Coleridge"
+   ],
+   "explain": "Oscar Wilde: Lady Windermere's Fan, 1892.",
+   "difficulty": 2,
+   "refs": [
+    "quotes/oscar-wilde"
+   ]
+  },
+  {
+   "id": "who-oscar-wilde-2",
+   "kind": "mc",
+   "prompt": "Who said or wrote: “There is only one thing in the world worse than being talked about, and that is not being talked about.”",
+   "answer": "Oscar Wilde",
+   "wrong": [
+    "Alfred, Lord Tennyson",
+    "Robert Frost",
+    "Mark Twain"
+   ],
+   "explain": "Oscar Wilde: Lord Henry in The Picture of Dorian Gray, 1890.",
+   "difficulty": 2,
+   "refs": [
+    "quotes/oscar-wilde"
+   ]
+  },
+  {
+   "id": "who-oscar-wilde-3",
+   "kind": "mc",
+   "prompt": "Who said or wrote: “The truth is rarely pure and never simple.”",
+   "answer": "Oscar Wilde",
+   "wrong": [
+    "Herman Melville",
+    "Robert Frost",
+    "Alfred, Lord Tennyson"
+   ],
+   "explain": "Oscar Wilde: Algernon in The Importance of Being Earnest, 1895.",
+   "difficulty": 3,
+   "refs": [
+    "quotes/oscar-wilde"
+   ]
+  },
+  {
+   "id": "who-mark-twain-0",
+   "kind": "mc",
+   "prompt": "Who said or wrote: “The report of my death was an exaggeration.”",
+   "answer": "Mark Twain",
+   "wrong": [
+    "Samuel Johnson",
+    "Edgar Allan Poe",
+    "Lewis Carroll"
+   ],
+   "explain": "Mark Twain: Responding to a false report that he had died, 1897.",
+   "difficulty": 2,
+   "refs": [
+    "quotes/mark-twain"
+   ]
+  },
+  {
+   "id": "who-benjamin-franklin-0",
+   "kind": "mc",
+   "prompt": "Who said or wrote: “In this world nothing can be said to be certain, except death and taxes”",
+   "answer": "Benjamin Franklin",
+   "wrong": [
+    "Queen Elizabeth II",
+    "Franklin D. Roosevelt",
+    "Richard Nixon"
+   ],
+   "explain": "Benjamin Franklin: A 1789 letter.",
+   "difficulty": 2,
+   "refs": [
+    "quotes/benjamin-franklin"
+   ]
+  },
+  {
+   "id": "who-benjamin-franklin-1",
+   "kind": "mc",
+   "prompt": "Who said or wrote: “Early to bed and early to rise, makes a man healthy, wealthy and wise.”",
+   "answer": "Benjamin Franklin",
+   "wrong": [
+    "Ronald Reagan",
+    "Mao Zedong",
+    "Thomas Jefferson"
+   ],
+   "explain": "Benjamin Franklin: Poor Richard's Almanack, 1757 version.",
+   "difficulty": 2,
+   "refs": [
+    "quotes/benjamin-franklin"
+   ]
+  },
+  {
+   "id": "who-benjamin-franklin-2",
+   "kind": "mc",
+   "prompt": "Who said or wrote: “Well done is better than well said.”",
+   "answer": "Benjamin Franklin",
+   "wrong": [
+    "Thomas Jefferson",
+    "Elizabeth I",
+    "Julius Caesar"
+   ],
+   "explain": "Benjamin Franklin: Poor Richard's Almanack, 1737.",
+   "difficulty": 3,
+   "refs": [
+    "quotes/benjamin-franklin"
+   ]
+  },
+  {
+   "id": "who-thomas-edison-0",
+   "kind": "mc",
+   "prompt": "Who said or wrote: “Genius is one per cent inspiration, ninety-nine per cent perspiration.”",
+   "answer": "Thomas Edison",
+   "wrong": [
+    "Hippocrates",
+    "Charles Darwin",
+    "Samuel Morse"
+   ],
+   "explain": "Thomas Edison: His explanation of invention, around 1903.",
+   "difficulty": 2,
+   "refs": [
+    "quotes/thomas-edison"
+   ]
+  },
+  {
+   "id": "who-theodore-roosevelt-0",
+   "kind": "mc",
+   "prompt": "Who said or wrote: “Speak softly and carry a big stick; you will go far”",
+   "answer": "Theodore Roosevelt",
+   "wrong": [
+    "Elizabeth I",
+    "Winston Churchill",
+    "Barack Obama"
+   ],
+   "explain": "Theodore Roosevelt: Quoting what he called a West African proverb, 1900.",
+   "difficulty": 2,
+   "refs": [
+    "quotes/theodore-roosevelt"
+   ]
+  },
+  {
+   "id": "who-margaret-thatcher-0",
+   "kind": "mc",
+   "prompt": "Who said or wrote: “The lady's not for turning.”",
+   "answer": "Margaret Thatcher",
+   "wrong": [
+    "Mao Zedong",
+    "Franklin D. Roosevelt",
+    "Benjamin Franklin"
+   ],
+   "explain": "Margaret Thatcher: Her 1980 party conference speech.",
+   "difficulty": 2,
+   "refs": [
+    "quotes/margaret-thatcher"
+   ]
+  },
+  {
+   "id": "who-ronald-reagan-0",
+   "kind": "mc",
+   "prompt": "Who said or wrote: “Mr. Gorbachev, tear down this wall!”",
+   "answer": "Ronald Reagan",
+   "wrong": [
+    "Queen Elizabeth II",
+    "Douglas MacArthur",
+    "Thomas Jefferson"
+   ],
+   "explain": "Ronald Reagan: At the Brandenburg Gate in Berlin, 1987.",
+   "difficulty": 2,
+   "refs": [
+    "quotes/ronald-reagan"
+   ]
+  },
+  {
+   "id": "who-elizabeth-i-0",
+   "kind": "mc",
+   "prompt": "Who said or wrote: “I know I have the body but of a weak and feeble woman; but I have the heart and stomach of a king”",
+   "answer": "Elizabeth I",
+   "wrong": [
+    "Abraham Lincoln",
+    "Queen Elizabeth II",
+    "Patrick Henry"
+   ],
+   "explain": "Elizabeth I: Addressing troops at Tilbury before the Spanish Armada, 1588.",
+   "difficulty": 3,
+   "refs": [
+    "quotes/elizabeth-i"
+   ]
+  },
+  {
+   "id": "who-patrick-henry-0",
+   "kind": "mc",
+   "prompt": "Who said or wrote: “Give me liberty, or give me death!”",
+   "answer": "Patrick Henry",
+   "wrong": [
+    "Ronald Reagan",
+    "Richard Nixon",
+    "Elizabeth I"
+   ],
+   "explain": "Patrick Henry: A 1775 speech urging Virginia to arm against Britain.",
+   "difficulty": 2,
+   "refs": [
+    "quotes/patrick-henry"
+   ]
+  },
+  {
+   "id": "who-sun-tzu-0",
+   "kind": "mc",
+   "prompt": "Who said or wrote: “All warfare is based on deception.”",
+   "answer": "Sun Tzu",
+   "wrong": [
+    "Laozi",
+    "Aristotle",
+    "René Descartes"
+   ],
+   "explain": "Sun Tzu: The Art of War.",
+   "difficulty": 3,
+   "refs": [
+    "quotes/sun-tzu"
+   ]
+  },
+  {
+   "id": "who-muhammad-ali-0",
+   "kind": "mc",
+   "prompt": "Who said or wrote: “I am the greatest!”",
+   "answer": "Muhammad Ali",
+   "wrong": [
+    "Rudyard Kipling",
+    "Neil Armstrong",
+    "Albert Einstein"
+   ],
+   "explain": "Muhammad Ali: His famous boast, 1960s.",
+   "difficulty": 1,
+   "refs": [
+    "quotes/muhammad-ali"
+   ]
+  },
+  {
+   "id": "who-yogi-berra-0",
+   "kind": "mc",
+   "prompt": "Who said or wrote: “It ain't over till it's over.”",
+   "answer": "Yogi Berra",
+   "wrong": [
+    "Aristotle",
+    "Patrick Henry",
+    "René Descartes"
+   ],
+   "explain": "Yogi Berra: About a baseball pennant race, 1973.",
+   "difficulty": 2,
+   "refs": [
+    "quotes/yogi-berra"
+   ]
+  },
+  {
+   "id": "who-marie-curie-0",
+   "kind": "mc",
+   "prompt": "Who said or wrote: “In life, there's nothing to be feared, everything is to be understood.”",
+   "answer": "Marie Curie",
+   "wrong": [
+    "Alexander Graham Bell",
+    "Thomas Edison",
+    "Samuel Morse"
+   ],
+   "explain": "Marie Curie: Her outlook on science and life.",
+   "difficulty": 2,
+   "refs": [
+    "quotes/marie-curie"
+   ]
+  },
+  {
+   "id": "who-steve-jobs-0",
+   "kind": "mc",
+   "prompt": "Who said or wrote: “Stay Hungry. Stay Foolish.”",
+   "answer": "Steve Jobs",
+   "wrong": [
+    "Charles Darwin",
+    "Henry Morton Stanley",
+    "Horace"
+   ],
+   "explain": "Steve Jobs: Ending his 2005 Stanford speech, borrowing a magazine's farewell.",
+   "difficulty": 2,
+   "refs": [
+    "quotes/steve-jobs"
+   ]
+  },
+  {
+   "id": "who-henry-ford-0",
+   "kind": "mc",
+   "prompt": "Who said or wrote: “Any customer can have a car painted any color that he wants so long as it is black.”",
+   "answer": "Henry Ford",
+   "wrong": [
+    "Alexander Graham Bell",
+    "Jean-Jacques Rousseau",
+    "Herman Melville"
+   ],
+   "explain": "Henry Ford: About the Model T, in his 1922 memoir.",
+   "difficulty": 2,
+   "refs": [
+    "quotes/henry-ford"
+   ]
+  },
+  {
+   "id": "who-thomas-jefferson-0",
+   "kind": "mc",
+   "prompt": "Who said or wrote: “We hold these truths to be self-evident, that all men are created equal”",
+   "answer": "Thomas Jefferson",
+   "wrong": [
+    "Julius Caesar",
+    "Mao Zedong",
+    "Douglas MacArthur"
+   ],
+   "explain": "Thomas Jefferson: The Declaration of Independence, 1776.",
+   "difficulty": 2,
+   "refs": [
+    "quotes/thomas-jefferson"
+   ]
+  },
+  {
+   "id": "who-karl-marx-0",
+   "kind": "mc",
+   "prompt": "Who said or wrote: “Workers of the world, unite!”",
+   "answer": "Karl Marx",
+   "wrong": [
+    "René Descartes",
+    "Friedrich Nietzsche",
+    "Francis Bacon"
+   ],
+   "explain": "Karl Marx: The rallying cry of The Communist Manifesto, 1848.",
+   "difficulty": 2,
+   "refs": [
+    "quotes/karl-marx"
+   ]
+  },
+  {
+   "id": "who-friedrich-nietzsche-0",
+   "kind": "mc",
+   "prompt": "Who said or wrote: “God is dead.”",
+   "answer": "Friedrich Nietzsche",
+   "wrong": [
+    "Laozi",
+    "Jean-Jacques Rousseau",
+    "René Descartes"
+   ],
+   "explain": "Friedrich Nietzsche: A line from The Gay Science, 1882.",
+   "difficulty": 2,
+   "refs": [
+    "quotes/friedrich-nietzsche"
+   ]
+  },
+  {
+   "id": "who-friedrich-nietzsche-1",
+   "kind": "mc",
+   "prompt": "Who said or wrote: “What does not kill me makes me stronger.”",
+   "answer": "Friedrich Nietzsche",
+   "wrong": [
+    "Francis Bacon",
+    "Socrates",
+    "Sun Tzu"
+   ],
+   "explain": "Friedrich Nietzsche: Twilight of the Idols, 1888.",
+   "difficulty": 2,
+   "refs": [
+    "quotes/friedrich-nietzsche"
+   ]
+  },
+  {
+   "id": "who-malala-yousafzai-0",
+   "kind": "mc",
+   "prompt": "Who said or wrote: “One child, one teacher, one book, one pen can change the world.”",
+   "answer": "Malala Yousafzai",
+   "wrong": [
+    "Frederick Douglass",
+    "Susan B. Anthony",
+    "Helen Keller"
+   ],
+   "explain": "Malala Yousafzai: Her 2013 speech to the United Nations.",
+   "difficulty": 2,
+   "refs": [
+    "quotes/malala-yousafzai"
+   ]
+  },
+  {
+   "id": "who-frederick-douglass-0",
+   "kind": "mc",
+   "prompt": "Who said or wrote: “If there is no struggle, there is no progress.”",
+   "answer": "Frederick Douglass",
+   "wrong": [
+    "Malala Yousafzai",
+    "Helen Keller",
+    "Martin Luther King Jr."
+   ],
+   "explain": "Frederick Douglass: An 1857 speech.",
+   "difficulty": 3,
+   "refs": [
+    "quotes/frederick-douglass"
+   ]
+  },
+  {
+   "id": "who-napoleon-0",
+   "kind": "mc",
+   "prompt": "Who said or wrote: “Impossible is a word to be found only in the dictionary of fools.”",
+   "answer": "Napoleon",
+   "wrong": [
+    "Patrick Henry",
+    "Franklin D. Roosevelt",
+    "Elizabeth I"
+   ],
+   "explain": "Napoleon: A saying credited to him in his letters.",
+   "difficulty": 3,
+   "refs": [
+    "quotes/napoleon"
+   ]
+  },
+  {
+   "id": "who-john-donne-0",
+   "kind": "mc",
+   "prompt": "Who said or wrote: “No man is an island, entire of itself”",
+   "answer": "John Donne",
+   "wrong": [
+    "Oscar Wilde",
+    "Juvenal",
+    "Edgar Allan Poe"
+   ],
+   "explain": "John Donne: Devotions upon Emergent Occasions, 1624.",
+   "difficulty": 2,
+   "refs": [
+    "quotes/john-donne"
+   ]
+  },
+  {
+   "id": "who-alexander-pope-0",
+   "kind": "mc",
+   "prompt": "Who said or wrote: “To err is human, to forgive divine.”",
+   "answer": "Alexander Pope",
+   "wrong": [
+    "William Wordsworth",
+    "Robert Frost",
+    "Juvenal"
+   ],
+   "explain": "Alexander Pope: An Essay on Criticism, 1711.",
+   "difficulty": 2,
+   "refs": [
+    "quotes/alexander-pope"
+   ]
+  },
+  {
+   "id": "who-lord-acton-0",
+   "kind": "mc",
+   "prompt": "Who said or wrote: “Power tends to corrupt, and absolute power corrupts absolutely.”",
+   "answer": "Lord Acton",
+   "wrong": [
+    "Jane Austen",
+    "Alexander Pope",
+    "Herman Melville"
+   ],
+   "explain": "Lord Acton: An 1887 letter.",
+   "difficulty": 2,
+   "refs": [
+    "quotes/lord-acton"
+   ]
+  },
+  {
+   "id": "who-edward-bulwer-lytton-0",
+   "kind": "mc",
+   "prompt": "Who said or wrote: “The pen is mightier than the sword.”",
+   "answer": "Edward Bulwer-Lytton",
+   "wrong": [
+    "William Shakespeare",
+    "Arthur Conan Doyle",
+    "John Donne"
+   ],
+   "explain": "Edward Bulwer-Lytton: His 1839 play Richelieu.",
+   "difficulty": 3,
+   "refs": [
+    "quotes/edward-bulwer-lytton"
+   ]
+  },
+  {
+   "id": "who-samuel-johnson-0",
+   "kind": "mc",
+   "prompt": "Who said or wrote: “When a man is tired of London, he is tired of life”",
+   "answer": "Samuel Johnson",
+   "wrong": [
+    "Emma Lazarus",
+    "Herman Melville",
+    "Percy Bysshe Shelley"
+   ],
+   "explain": "Samuel Johnson: As recorded by his biographer Boswell, 1777.",
+   "difficulty": 2,
+   "refs": [
+    "quotes/samuel-johnson"
+   ]
+  },
+  {
+   "id": "who-neville-chamberlain-0",
+   "kind": "mc",
+   "prompt": "Who said or wrote: “Peace for our time”",
+   "answer": "Neville Chamberlain",
+   "wrong": [
+    "Douglas MacArthur",
+    "Elizabeth I",
+    "Mahatma Gandhi"
+   ],
+   "explain": "Neville Chamberlain: Returning from Munich, 1938.",
+   "difficulty": 3,
+   "refs": [
+    "quotes/neville-chamberlain"
+   ]
+  },
+  {
+   "id": "who-emma-lazarus-0",
+   "kind": "mc",
+   "prompt": "Who said or wrote: “Give me your tired, your poor, Your huddled masses yearning to breathe free”",
+   "answer": "Emma Lazarus",
+   "wrong": [
+    "John Donne",
+    "Charles Dickens",
+    "Jane Austen"
+   ],
+   "explain": "Emma Lazarus: Her poem on the Statue of Liberty, 1883.",
+   "difficulty": 2,
+   "refs": [
+    "quotes/emma-lazarus"
+   ]
+  },
+  {
+   "id": "who-hippocrates-0",
+   "kind": "mc",
+   "prompt": "Who said or wrote: “Life is short, and Art long”",
+   "answer": "Hippocrates",
+   "wrong": [
+    "Albert Einstein",
+    "Isaac Newton",
+    "Charles Darwin"
+   ],
+   "explain": "Hippocrates: The opening of his Aphorisms.",
+   "difficulty": 3,
+   "refs": [
+    "quotes/hippocrates"
+   ]
+  },
+  {
+   "id": "who-juvenal-0",
+   "kind": "mc",
+   "prompt": "Who said or wrote: “Who is to guard the guards themselves?”",
+   "answer": "Juvenal",
+   "wrong": [
+    "Jane Austen",
+    "Alfred, Lord Tennyson",
+    "John Milton"
+   ],
+   "explain": "Juvenal: His Satires.",
+   "difficulty": 3,
+   "refs": [
+    "quotes/juvenal"
+   ]
+  },
+  {
+   "id": "who-virgil-0",
+   "kind": "mc",
+   "prompt": "Who said or wrote: “I fear the Greeks even when they bring gifts.”",
+   "answer": "Virgil",
+   "wrong": [
+    "Robert Burns",
+    "William Wordsworth",
+    "Charles Dickens"
+   ],
+   "explain": "Virgil: A warning about the Trojan Horse in the Aeneid.",
+   "difficulty": 3,
+   "refs": [
+    "quotes/virgil"
+   ]
+  },
+  {
+   "id": "who-richard-nixon-0",
+   "kind": "mc",
+   "prompt": "Who said or wrote: “I am not a crook.”",
+   "answer": "Richard Nixon",
+   "wrong": [
+    "Theodore Roosevelt",
+    "Franklin D. Roosevelt",
+    "Margaret Thatcher"
+   ],
+   "explain": "Richard Nixon: A 1973 press conference during Watergate.",
+   "difficulty": 2,
+   "refs": [
+    "quotes/richard-nixon"
+   ]
+  },
+  {
+   "id": "who-douglas-macarthur-0",
+   "kind": "mc",
+   "prompt": "Who said or wrote: “I shall return.”",
+   "answer": "Douglas MacArthur",
+   "wrong": [
+    "Napoleon",
+    "Franklin D. Roosevelt",
+    "Richard Nixon"
+   ],
+   "explain": "Douglas MacArthur: After leaving the Philippines in 1942.",
+   "difficulty": 2,
+   "refs": [
+    "quotes/douglas-macarthur"
+   ]
+  },
+  {
+   "id": "who-yuri-gagarin-0",
+   "kind": "mc",
+   "prompt": "Who said or wrote: “Poyekhali!”",
+   "answer": "Yuri Gagarin",
+   "wrong": [
+    "Mao Zedong",
+    "Lord Acton",
+    "Samuel Morse"
+   ],
+   "explain": "Yuri Gagarin: \"Let's go!\": as his rocket lifted off, 1961.",
+   "difficulty": 3,
+   "refs": [
+    "quotes/yuri-gagarin"
+   ]
+  },
+  {
+   "id": "who-robert-burns-0",
+   "kind": "mc",
+   "prompt": "Who said or wrote: “The best laid schemes o' mice and men”",
+   "answer": "Robert Burns",
+   "wrong": [
+    "Oscar Wilde",
+    "Lewis Carroll",
+    "Samuel Taylor Coleridge"
+   ],
+   "explain": "Robert Burns: His poem To a Mouse, 1785.",
+   "difficulty": 3,
+   "refs": [
+    "quotes/robert-burns"
+   ]
+  },
+  {
+   "id": "who-francis-bacon-0",
+   "kind": "mc",
+   "prompt": "Who said or wrote: “Knowledge itself is power”",
+   "answer": "Francis Bacon",
+   "wrong": [
+    "Karl Marx",
+    "René Descartes",
+    "Socrates"
+   ],
+   "explain": "Francis Bacon: Meditationes Sacrae, 1597.",
+   "difficulty": 3,
+   "refs": [
+    "quotes/francis-bacon"
+   ]
+  },
+  {
+   "id": "who-george-orwell-0",
+   "kind": "mc",
+   "prompt": "Who said or wrote: “Big Brother is watching you”",
+   "answer": "George Orwell",
+   "wrong": [
+    "Rudyard Kipling",
+    "Lord Acton",
+    "Herman Melville"
+   ],
+   "explain": "George Orwell: The slogan on posters in Nineteen Eighty-Four.",
+   "difficulty": 1,
+   "refs": [
+    "quotes/george-orwell"
+   ]
+  },
+  {
+   "id": "who-george-orwell-1",
+   "kind": "mc",
+   "prompt": "Who said or wrote: “All animals are equal, but some animals are more equal than others.”",
+   "answer": "George Orwell",
+   "wrong": [
+    "Lord Acton",
+    "Oscar Wilde",
+    "Alexander Pope"
+   ],
+   "explain": "George Orwell: The pigs' rewritten rule in Animal Farm.",
+   "difficulty": 2,
+   "refs": [
+    "quotes/george-orwell"
+   ]
+  },
+  {
+   "id": "who-charles-dickens-0",
+   "kind": "mc",
+   "prompt": "Who said or wrote: “Please, sir, I want some more.”",
+   "answer": "Charles Dickens",
+   "wrong": [
+    "Alfred, Lord Tennyson",
+    "Samuel Taylor Coleridge",
+    "Herman Melville"
+   ],
+   "explain": "Charles Dickens: Oliver asks for more gruel in Oliver Twist.",
+   "difficulty": 1,
+   "refs": [
+    "quotes/charles-dickens"
+   ]
+  },
+  {
+   "id": "who-charles-dickens-1",
+   "kind": "mc",
+   "prompt": "Who said or wrote: “God bless Us, Every One!”",
+   "answer": "Charles Dickens",
+   "wrong": [
+    "William Shakespeare",
+    "Horace",
+    "Walt Whitman"
+   ],
+   "explain": "Charles Dickens: Tiny Tim in A Christmas Carol.",
+   "difficulty": 1,
+   "refs": [
+    "quotes/charles-dickens"
+   ]
+  },
+  {
+   "id": "who-lewis-carroll-0",
+   "kind": "mc",
+   "prompt": "Who said or wrote: “Curiouser and curiouser!”",
+   "answer": "Lewis Carroll",
+   "wrong": [
+    "Walt Whitman",
+    "Robert Burns",
+    "Samuel Johnson"
+   ],
+   "explain": "Lewis Carroll: Alice in Alice's Adventures in Wonderland.",
+   "difficulty": 2,
+   "refs": [
+    "quotes/lewis-carroll"
+   ]
+  },
+  {
+   "id": "who-lewis-carroll-1",
+   "kind": "mc",
+   "prompt": "Who said or wrote: “Off with her head!”",
+   "answer": "Lewis Carroll",
+   "wrong": [
+    "William Wordsworth",
+    "Oscar Wilde",
+    "Walt Whitman"
+   ],
+   "explain": "Lewis Carroll: The Queen of Hearts in Alice's Adventures in Wonderland.",
+   "difficulty": 1,
+   "refs": [
+    "quotes/lewis-carroll"
+   ]
+  },
+  {
+   "id": "who-lewis-carroll-2",
+   "kind": "mc",
+   "prompt": "Who said or wrote: “We're all mad here.”",
+   "answer": "Lewis Carroll",
+   "wrong": [
+    "Walt Whitman",
+    "Samuel Johnson",
+    "Arthur Conan Doyle"
+   ],
+   "explain": "Lewis Carroll: The Cheshire Cat in Alice's Adventures in Wonderland.",
+   "difficulty": 2,
+   "refs": [
+    "quotes/lewis-carroll"
+   ]
+  },
+  {
+   "id": "who-jane-austen-0",
+   "kind": "mc",
+   "prompt": "Who said or wrote: “It is a truth universally acknowledged, that a single man in possession of a good fortune, must be in want of a wife.”",
+   "answer": "Jane Austen",
+   "wrong": [
+    "Juvenal",
+    "Herman Melville",
+    "Arthur Conan Doyle"
+   ],
+   "explain": "Jane Austen: The opening of Pride and Prejudice.",
+   "difficulty": 2,
+   "refs": [
+    "quotes/jane-austen"
+   ]
+  },
+  {
+   "id": "who-herman-melville-0",
+   "kind": "mc",
+   "prompt": "Who said or wrote: “Call me Ishmael.”",
+   "answer": "Herman Melville",
+   "wrong": [
+    "Mark Twain",
+    "George Orwell",
+    "Christopher Marlowe"
+   ],
+   "explain": "Herman Melville: The opening of Moby-Dick.",
+   "difficulty": 2,
+   "refs": [
+    "quotes/herman-melville"
+   ]
+  },
+  {
+   "id": "who-arthur-conan-doyle-0",
+   "kind": "mc",
+   "prompt": "Who said or wrote: “When you have eliminated the impossible, whatever remains, however improbable, must be the truth”",
+   "answer": "Arthur Conan Doyle",
+   "wrong": [
+    "Lewis Carroll",
+    "Charles Dickens",
+    "John Donne"
+   ],
+   "explain": "Arthur Conan Doyle: Sherlock Holmes in The Sign of the Four, 1890.",
+   "difficulty": 2,
+   "refs": [
+    "quotes/arthur-conan-doyle"
+   ]
+  },
+  {
+   "id": "who-charles-darwin-0",
+   "kind": "mc",
+   "prompt": "Who said or wrote: “There is grandeur in this view of life”",
+   "answer": "Charles Darwin",
+   "wrong": [
+    "Thomas Edison",
+    "Isaac Newton",
+    "Archimedes"
+   ],
+   "explain": "Charles Darwin: The closing passage of On the Origin of Species, 1859.",
+   "difficulty": 3,
+   "refs": [
+    "quotes/charles-darwin"
+   ]
+  },
+  {
+   "id": "who-queen-elizabeth-ii-0",
+   "kind": "mc",
+   "prompt": "Who said or wrote: “Annus horribilis”",
+   "answer": "Queen Elizabeth II",
+   "wrong": [
+    "Patrick Henry",
+    "Franklin D. Roosevelt",
+    "Napoleon"
+   ],
+   "explain": "Queen Elizabeth II: Looking back on a bad year for the royal family, 1992.",
+   "difficulty": 3,
+   "refs": [
+    "quotes/queen-elizabeth-ii"
+   ]
+  },
+  {
+   "id": "who-queen-elizabeth-ii-1",
+   "kind": "mc",
+   "prompt": "Who said or wrote: “I declare before you all that my whole life whether it be long or short shall be devoted to your service”",
+   "answer": "Queen Elizabeth II",
+   "wrong": [
+    "Mao Zedong",
+    "Douglas MacArthur",
+    "John F. Kennedy"
+   ],
+   "explain": "Queen Elizabeth II: Her 21st birthday broadcast, 1947.",
+   "difficulty": 3,
+   "refs": [
+    "quotes/queen-elizabeth-ii"
+   ]
+  },
+  {
+   "id": "who-alexander-graham-bell-0",
+   "kind": "mc",
+   "prompt": "Who said or wrote: “Mr. Watson, come here, I want to see you.”",
+   "answer": "Alexander Graham Bell",
+   "wrong": [
+    "Carl Sagan",
+    "Isaac Newton",
+    "Charles Darwin"
+   ],
+   "explain": "Alexander Graham Bell: The first words spoken over his telephone, 1876.",
+   "difficulty": 2,
+   "refs": [
+    "quotes/alexander-graham-bell"
+   ]
+  },
+  {
+   "id": "who-samuel-morse-0",
+   "kind": "mc",
+   "prompt": "Who said or wrote: “What hath God wrought”",
+   "answer": "Samuel Morse",
+   "wrong": [
+    "Hippocrates",
+    "Marie Curie",
+    "Isaac Newton"
+   ],
+   "explain": "Samuel Morse: The first long-distance telegraph message, 1844.",
+   "difficulty": 3,
+   "refs": [
+    "quotes/samuel-morse"
+   ]
+  },
+  {
+   "id": "who-rosa-parks-0",
+   "kind": "mc",
+   "prompt": "Who said or wrote: “The only tired I was, was tired of giving in”",
+   "answer": "Rosa Parks",
+   "wrong": [
+    "Frederick Douglass",
+    "Susan B. Anthony",
+    "Malala Yousafzai"
+   ],
+   "explain": "Rosa Parks: Recalling why she refused to give up her bus seat in 1955.",
+   "difficulty": 3,
+   "refs": [
+    "quotes/rosa-parks"
+   ]
+  },
+  {
+   "id": "who-susan-b-anthony-0",
+   "kind": "mc",
+   "prompt": "Who said or wrote: “Failure is impossible.”",
+   "answer": "Susan B. Anthony",
+   "wrong": [
+    "Frederick Douglass",
+    "Martin Luther King Jr.",
+    "Malala Yousafzai"
+   ],
+   "explain": "Susan B. Anthony: Her last public words, 1906.",
+   "difficulty": 3,
+   "refs": [
+    "quotes/susan-b-anthony"
+   ]
+  },
+  {
+   "id": "who-helen-keller-0",
+   "kind": "mc",
+   "prompt": "Who said or wrote: “Alone we can do so little; together we can do so much.”",
+   "answer": "Helen Keller",
+   "wrong": [
+    "Susan B. Anthony",
+    "Rosa Parks",
+    "Martin Luther King Jr."
+   ],
+   "explain": "Helen Keller: On working together.",
+   "difficulty": 2,
+   "refs": [
+    "quotes/helen-keller"
+   ]
+  },
+  {
+   "id": "who-aristotle-0",
+   "kind": "mc",
+   "prompt": "Who said or wrote: “Man is by nature a political animal”",
+   "answer": "Aristotle",
+   "wrong": [
+    "Jean-Jacques Rousseau",
+    "Francis Bacon",
+    "Sun Tzu"
+   ],
+   "explain": "Aristotle: His Politics.",
+   "difficulty": 3,
+   "refs": [
+    "quotes/aristotle"
+   ]
+  },
+  {
+   "id": "who-horace-0",
+   "kind": "mc",
+   "prompt": "Who said or wrote: “Seize the day”",
+   "answer": "Horace",
+   "wrong": [
+    "Mark Twain",
+    "Christopher Marlowe",
+    "Alexander Pope"
+   ],
+   "explain": "Horace: Carpe diem, from his Odes.",
+   "difficulty": 2,
+   "refs": [
+    "quotes/horace"
+   ]
+  },
+  {
+   "id": "who-jean-jacques-rousseau-0",
+   "kind": "mc",
+   "prompt": "Who said or wrote: “Man is born free, and everywhere he is in chains.”",
+   "answer": "Jean-Jacques Rousseau",
+   "wrong": [
+    "Karl Marx",
+    "René Descartes",
+    "Friedrich Nietzsche"
+   ],
+   "explain": "Jean-Jacques Rousseau: The opening of The Social Contract, 1762.",
+   "difficulty": 2,
+   "refs": [
+    "quotes/jean-jacques-rousseau"
+   ]
+  },
+  {
+   "id": "who-percy-bysshe-shelley-0",
+   "kind": "mc",
+   "prompt": "Who said or wrote: “Look on my works, ye Mighty, and despair!”",
+   "answer": "Percy Bysshe Shelley",
+   "wrong": [
+    "William Wordsworth",
+    "Horace",
+    "Samuel Taylor Coleridge"
+   ],
+   "explain": "Percy Bysshe Shelley: The inscription in his poem Ozymandias, 1818.",
+   "difficulty": 2,
+   "refs": [
+    "quotes/percy-bysshe-shelley"
+   ]
+  },
+  {
+   "id": "who-william-wordsworth-0",
+   "kind": "mc",
+   "prompt": "Who said or wrote: “I wandered lonely as a cloud”",
+   "answer": "William Wordsworth",
+   "wrong": [
+    "Alfred, Lord Tennyson",
+    "Charles Dickens",
+    "Emma Lazarus"
+   ],
+   "explain": "William Wordsworth: His poem about daffodils, 1807.",
+   "difficulty": 2,
+   "refs": [
+    "quotes/william-wordsworth"
+   ]
+  },
+  {
+   "id": "who-alfred-lord-tennyson-0",
+   "kind": "mc",
+   "prompt": "Who said or wrote: “'Tis better to have loved and lost Than never to have loved at all.”",
+   "answer": "Alfred, Lord Tennyson",
+   "wrong": [
+    "Horace",
+    "Christopher Marlowe",
+    "Robert Burns"
+   ],
+   "explain": "Alfred, Lord Tennyson: In Memoriam A.H.H., 1850.",
+   "difficulty": 2,
+   "refs": [
+    "quotes/alfred-lord-tennyson"
+   ]
+  },
+  {
+   "id": "who-samuel-taylor-coleridge-0",
+   "kind": "mc",
+   "prompt": "Who said or wrote: “Water, water, every where, Nor any drop to drink.”",
+   "answer": "Samuel Taylor Coleridge",
+   "wrong": [
+    "Percy Bysshe Shelley",
+    "Herman Melville",
+    "Robert Burns"
+   ],
+   "explain": "Samuel Taylor Coleridge: The Rime of the Ancient Mariner, 1798.",
+   "difficulty": 2,
+   "refs": [
+    "quotes/samuel-taylor-coleridge"
+   ]
+  },
+  {
+   "id": "who-robert-frost-0",
+   "kind": "mc",
+   "prompt": "Who said or wrote: “Two roads diverged in a wood”",
+   "answer": "Robert Frost",
+   "wrong": [
+    "Samuel Johnson",
+    "Arthur Conan Doyle",
+    "Alexander Pope"
+   ],
+   "explain": "Robert Frost: The Road Not Taken, 1916.",
+   "difficulty": 2,
+   "refs": [
+    "quotes/robert-frost"
+   ]
+  },
+  {
+   "id": "who-walt-whitman-0",
+   "kind": "mc",
+   "prompt": "Who said or wrote: “O Captain! my Captain!”",
+   "answer": "Walt Whitman",
+   "wrong": [
+    "Samuel Johnson",
+    "Arthur Conan Doyle",
+    "Oscar Wilde"
+   ],
+   "explain": "Walt Whitman: His elegy for Abraham Lincoln, 1865.",
+   "difficulty": 2,
+   "refs": [
+    "quotes/walt-whitman"
+   ]
+  },
+  {
+   "id": "who-edgar-allan-poe-0",
+   "kind": "mc",
+   "prompt": "Who said or wrote: “Quoth the Raven, \"Nevermore.\"”",
+   "answer": "Edgar Allan Poe",
+   "wrong": [
+    "Rudyard Kipling",
+    "Samuel Johnson",
+    "Walt Whitman"
+   ],
+   "explain": "Edgar Allan Poe: His poem The Raven, 1845.",
+   "difficulty": 1,
+   "refs": [
+    "quotes/edgar-allan-poe"
+   ]
+  },
+  {
+   "id": "who-john-milton-0",
+   "kind": "mc",
+   "prompt": "Who said or wrote: “Better to reign in Hell, than serve in Heaven.”",
+   "answer": "John Milton",
+   "wrong": [
+    "Horace",
+    "Robert Frost",
+    "Lord Acton"
+   ],
+   "explain": "John Milton: Satan in Paradise Lost, 1667.",
+   "difficulty": 3,
+   "refs": [
+    "quotes/john-milton"
+   ]
+  },
+  {
+   "id": "who-christopher-marlowe-0",
+   "kind": "mc",
+   "prompt": "Who said or wrote: “Was this the face that launch'd a thousand ships”",
+   "answer": "Christopher Marlowe",
+   "wrong": [
+    "Robert Burns",
+    "Edward Bulwer-Lytton",
+    "Arthur Conan Doyle"
+   ],
+   "explain": "Christopher Marlowe: Faustus on Helen of Troy in Doctor Faustus.",
+   "difficulty": 3,
+   "refs": [
+    "quotes/christopher-marlowe"
+   ]
+  },
+  {
+   "id": "who-rudyard-kipling-0",
+   "kind": "mc",
+   "prompt": "Who said or wrote: “If you can keep your head when all about you”",
+   "answer": "Rudyard Kipling",
+   "wrong": [
+    "Christopher Marlowe",
+    "Samuel Taylor Coleridge",
+    "William Shakespeare"
+   ],
+   "explain": "Rudyard Kipling: The opening of his poem If—, 1910.",
+   "difficulty": 2,
+   "refs": [
+    "quotes/rudyard-kipling"
+   ]
+  },
+  {
+   "id": "who-carl-sagan-0",
+   "kind": "mc",
+   "prompt": "Who said or wrote: “Extraordinary claims require extraordinary evidence”",
+   "answer": "Carl Sagan",
+   "wrong": [
+    "Alexander Graham Bell",
+    "Archimedes",
+    "Thomas Edison"
+   ],
+   "explain": "Carl Sagan: From Cosmos, 1980.",
+   "difficulty": 3,
+   "refs": [
+    "quotes/carl-sagan"
+   ]
+  },
+  {
+   "id": "who-henry-morton-stanley-0",
+   "kind": "mc",
+   "prompt": "Who said or wrote: “Dr. Livingstone, I presume?”",
+   "answer": "Henry Morton Stanley",
+   "wrong": [
+    "Benjamin Franklin",
+    "Theodore Roosevelt",
+    "John F. Kennedy"
+   ],
+   "explain": "Henry Morton Stanley: On finding the missing explorer in Africa, 1871.",
+   "difficulty": 1,
+   "refs": [
+    "quotes/henry-morton-stanley"
+   ]
+  },
+  {
+   "id": "who-mao-zedong-0",
+   "kind": "mc",
+   "prompt": "Who said or wrote: “Political power grows out of the barrel of a gun.”",
+   "answer": "Mao Zedong",
+   "wrong": [
+    "Winston Churchill",
+    "Mahatma Gandhi",
+    "Franklin D. Roosevelt"
+   ],
+   "explain": "Mao Zedong: A 1938 speech.",
+   "difficulty": 3,
+   "refs": [
+    "quotes/mao-zedong"
+   ]
+  },
+  {
+   "id": "who-barack-obama-0",
+   "kind": "mc",
+   "prompt": "Who said or wrote: “Yes, we can.”",
+   "answer": "Barack Obama",
+   "wrong": [
+    "Theodore Roosevelt",
+    "Benjamin Franklin",
+    "Thomas Jefferson"
+   ],
+   "explain": "Barack Obama: His 2008 campaign slogan and victory-night refrain.",
+   "difficulty": 1,
+   "refs": [
+    "quotes/barack-obama"
+   ]
+  },
+  {
+   "id": "mis-e805acee",
+   "kind": "tf",
+   "prompt": "Marie Antoinette really said \"Let them eat cake\".",
+   "difficulty": 1,
+   "answer": false,
+   "explain": "There is no evidence she said it; a similar line appears in Rousseau's Confessions, written when she was a child."
+  },
+  {
+   "id": "mis-efc95885",
+   "kind": "tf",
+   "prompt": "Mahatma Gandhi wrote \"Be the change you wish to see in the world\".",
+   "difficulty": 2,
+   "answer": false,
+   "explain": "The line is a modern paraphrase; nothing like it appears in his writings in those words."
+  },
+  {
+   "id": "mis-c8b1b87e",
+   "kind": "tf",
+   "prompt": "Albert Einstein defined insanity as doing the same thing over and over and expecting different results.",
+   "difficulty": 2,
+   "answer": false,
+   "explain": "The saying is not found in Einstein's writings; it appears in recovery literature from the 1980s."
+  },
+  {
+   "id": "mis-bec12ede",
+   "kind": "tf",
+   "prompt": "Voltaire wrote \"I disapprove of what you say, but I will defend to the death your right to say it\".",
+   "difficulty": 2,
+   "answer": false,
+   "explain": "It was written by his biographer Evelyn Beatrice Hall in 1906 to sum up his attitude."
+  },
+  {
+   "id": "mis-2a64acd8",
+   "kind": "tf",
+   "prompt": "Sherlock Holmes says \"Elementary, my dear Watson\" in Arthur Conan Doyle's stories.",
+   "difficulty": 2,
+   "answer": false,
+   "explain": "The exact phrase never appears in the original stories; it was popularised by later films."
+  },
+  {
+   "id": "mis-2040b95e",
+   "kind": "tf",
+   "prompt": "In Casablanca, Humphrey Bogart says \"Play it again, Sam\".",
+   "difficulty": 1,
+   "answer": false,
+   "explain": "The actual lines are closer to \"Play it, Sam\" and \"You played it for her, you can play it for me\"."
+  },
+  {
+   "id": "mis-142c1c37",
+   "kind": "tf",
+   "prompt": "In The Empire Strikes Back, Darth Vader says \"Luke, I am your father\".",
+   "difficulty": 2,
+   "answer": false,
+   "explain": "The line in the film is \"No, I am your father.\""
+  },
+  {
+   "id": "mis-527ceef5",
+   "kind": "tf",
+   "prompt": "Captain Kirk says \"Beam me up, Scotty\" in the original Star Trek series.",
+   "difficulty": 2,
+   "answer": false,
+   "explain": "That exact phrase was never said in the series, although similar orders were."
+  },
+  {
+   "id": "mis-0a0b3c8c",
+   "kind": "tf",
+   "prompt": "Apollo 13's crew radioed \"Houston, we have a problem\".",
+   "difficulty": 2,
+   "answer": false,
+   "explain": "The real words were \"Houston, we've had a problem\"; the present-tense version comes from the 1995 film."
+  },
+  {
+   "id": "mis-92321ade",
+   "kind": "tf",
+   "prompt": "Charles Darwin coined the phrase \"survival of the fittest\".",
+   "difficulty": 3,
+   "answer": false,
+   "explain": "Herbert Spencer coined it in 1864; Darwin adopted it in later editions of On the Origin of Species."
+  },
+  {
+   "id": "mis-9a2b1847",
+   "kind": "tf",
+   "prompt": "Winston Churchill said \"Success is not final, failure is not fatal: it is the courage to continue that counts\".",
+   "difficulty": 2,
+   "answer": false,
+   "explain": "The International Churchill Society finds no evidence he said it."
+  },
+  {
+   "id": "mis-89977445",
+   "kind": "tf",
+   "prompt": "Aristotle wrote \"We are what we repeatedly do. Excellence, then, is not an act, but a habit\".",
+   "difficulty": 3,
+   "answer": false,
+   "explain": "The words are historian Will Durant's 1926 summary of Aristotle's ideas."
+  },
+  {
+   "id": "mis-c31b9d46",
+   "kind": "tf",
+   "prompt": "Leonardo da Vinci said \"Simplicity is the ultimate sophistication\".",
+   "difficulty": 2,
+   "answer": false,
+   "explain": "There is no source linking the saying to Leonardo; it surfaced centuries later."
+  },
+  {
+   "id": "mis-37fd7386",
+   "kind": "tf",
+   "prompt": "Walt Disney said \"If you can dream it, you can do it\".",
+   "difficulty": 2,
+   "answer": false,
+   "explain": "The line was written by Disney Imagineer Tom Fitzgerald for an Epcot attraction in 1983."
+  },
+  {
+   "id": "mis-068d464f",
+   "kind": "tf",
+   "prompt": "Henry Ford said \"If I had asked people what they wanted, they would have said faster horses\".",
+   "difficulty": 2,
+   "answer": false,
+   "explain": "No record of Ford saying it has been found; it appears only decades after his death."
+  },
+  {
+   "id": "mis-459330cc",
+   "kind": "tf",
+   "prompt": "Bill Gates said \"640K ought to be enough for anybody\".",
+   "difficulty": 2,
+   "answer": false,
+   "explain": "Gates has denied ever saying it, and no source has been found."
+  },
+  {
+   "id": "mis-59be4e74",
+   "kind": "tf",
+   "prompt": "As a boy, George Washington confessed \"I cannot tell a lie\" about chopping down a cherry tree.",
+   "difficulty": 1,
+   "answer": false,
+   "explain": "The story was invented by his biographer Mason Locke Weems, published after Washington's death."
+  },
+  {
+   "id": "mis-a9f6efac",
+   "kind": "tf",
+   "prompt": "King Louis XIV declared \"L'État, c'est moi\" (\"I am the state\").",
+   "difficulty": 3,
+   "answer": false,
+   "explain": "Historians regard it as apocryphal; there is no reliable record of him saying it."
+  },
+  {
+   "id": "mis-9c78ebe6",
+   "kind": "tf",
+   "prompt": "Galileo muttered \"And yet it moves\" after recanting before the Inquisition.",
+   "difficulty": 3,
+   "answer": false,
+   "explain": "The story first appears more than a century after his death."
+  },
+  {
+   "id": "mis-e5ed5581",
+   "kind": "tf",
+   "prompt": "Albert Einstein said \"Two things are infinite: the universe and human stupidity\".",
+   "difficulty": 2,
+   "answer": false,
+   "explain": "The quote is unsourced and does not appear in Einstein's writings."
+  },
+  {
+   "id": "mis-6400d96a",
+   "kind": "tf",
+   "prompt": "Edmund Burke wrote \"The only thing necessary for the triumph of evil is for good men to do nothing\".",
+   "difficulty": 2,
+   "answer": false,
+   "explain": "It is not in Burke's writings; the earliest versions date from the 20th century."
+  },
+  {
+   "id": "mis-903eaf3d",
+   "kind": "tf",
+   "prompt": "\"Et tu, Brute?\" is a line written by William Shakespeare.",
+   "difficulty": 1,
+   "answer": true,
+   "explain": "Caesar says it in Shakespeare's play Julius Caesar; there is no evidence the real Caesar said it."
+  },
+  {
+   "id": "mis-2379f149",
+   "kind": "tf",
+   "prompt": "Neil Armstrong was the first person to speak words from the surface of the Moon.",
+   "difficulty": 1,
+   "answer": true,
+   "explain": "His famous line came as he stepped onto the surface in July 1969."
+  },
+  {
+   "id": "mis-04a2d21f",
+   "kind": "tf",
+   "prompt": "\"The pen is mightier than the sword\" was first written by William Shakespeare.",
+   "difficulty": 2,
+   "answer": false,
+   "explain": "The phrase comes from Edward Bulwer-Lytton's play Richelieu (1839)."
+  },
+  {
+   "id": "mis-11728185",
+   "kind": "tf",
+   "prompt": "\"I think, therefore I am\" was written by René Descartes.",
+   "difficulty": 2,
+   "answer": true,
+   "explain": "It appears in his Discourse on the Method (1637), first in French."
+  },
+  {
+   "id": "mis-e25613f9",
+   "kind": "tf",
+   "prompt": "Mark Twain wrote \"The coldest winter I ever spent was a summer in San Francisco\".",
+   "difficulty": 2,
+   "answer": false,
+   "explain": "No evidence links it to Twain; it began circulating long after his death."
+  },
+  {
+   "id": "mis-ebe28d52",
+   "kind": "tf",
+   "prompt": "Queen Victoria is reliably recorded saying \"We are not amused\".",
+   "difficulty": 3,
+   "answer": false,
+   "explain": "The only source is a much later diary account; her biographers doubt she said it."
+  },
+  {
+   "id": "mis-035c05aa",
+   "kind": "tf",
+   "prompt": "\"Elementary\" appears in the Sherlock Holmes stories, even though \"Elementary, my dear Watson\" does not.",
+   "difficulty": 2,
+   "answer": true,
+   "explain": "Holmes says \"Elementary\" in The Crooked Man (1893), but never with \"my dear Watson\" attached."
+  }
+ ],
+ "sources": [
+  {
+   "name": "Wikiquote",
+   "url": "https://en.wikiquote.org"
+  },
+  {
+   "name": "Quote Investigator (misattributions)",
+   "url": "https://quoteinvestigator.com"
+  }
+ ]
+}

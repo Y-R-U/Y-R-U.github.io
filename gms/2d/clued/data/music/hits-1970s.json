@@ -1,0 +1,1730 @@
+{
+ "id": "hits-1970s",
+ "title": "Hits of the 1970s",
+ "theme": "music",
+ "icon": "🕺",
+ "kids": false,
+ "version": 1,
+ "notice": "30-second previews stream from Apple Music.",
+ "factsMeta": {
+  "artist": {
+   "type": "cat",
+   "label": "Artist"
+  },
+  "year": {
+   "type": "year",
+   "label": "Released",
+   "higherLabel": "Newer"
+  },
+  "decade": {
+   "type": "cat",
+   "label": "Decade"
+  }
+ },
+ "items": [
+  {
+   "id": "bridge-over-troubled-water-simon-and-garfunkel",
+   "name": "Bridge Over Troubled Water",
+   "group": "1970s",
+   "facts": {
+    "artist": "Simon & Garfunkel",
+    "year": 1970,
+    "decade": "1970s"
+   },
+   "blurb": "\"Bridge Over Troubled Water\" by Simon & Garfunkel, released in 1970.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/e7/9b/60/e79b60c4-4971-aed9-92aa-db57d453cd42/mzaf_12057489393656620288.plus.aac.p.m4a",
+      "credit": "Simon & Garfunkel: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/bridge-over-troubled-water/324127933?i=324127934&uo=4",
+      "apple": {
+       "trackId": 324127934,
+       "url": "https://music.apple.com/us/album/bridge-over-troubled-water/324127933?i=324127934&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music125/v4/a3/84/0a/a3840a6d-44e8-0afe-fc3e-316c517dddfe/5099749521421.jpg/300x300bb.jpg",
+       "term": "Simon & Garfunkel Bridge Over Troubled Water"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "they-long-to-be-close-to-you-carpenters",
+   "name": "(They Long to Be) Close to You",
+   "alt": [
+    "Close to You"
+   ],
+   "group": "1970s",
+   "facts": {
+    "artist": "Carpenters",
+    "year": 1970,
+    "decade": "1970s"
+   },
+   "blurb": "\"(They Long to Be) Close to You\" by Carpenters, released in 1970.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/ed/82/89/ed828936-269e-6f2f-d39b-7d9c71649828/mzaf_5855442924190887522.plus.aac.p.m4a",
+      "credit": "Carpenters: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/they-long-to-be-close-to-you/1423766994?i=1423767002&uo=4",
+      "apple": {
+       "trackId": 1423767002,
+       "url": "https://music.apple.com/us/album/they-long-to-be-close-to-you/1423766994?i=1423767002&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music126/v4/65/c4/a2/65c4a28c-132d-fc45-1921-def3612790d7/06UMGIM18518.rgb.jpg/300x300bb.jpg",
+       "term": "Carpenters  Close To You"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "american-woman-the-guess-who",
+   "name": "American Woman",
+   "group": "1970s",
+   "facts": {
+    "artist": "The Guess Who",
+    "year": 1970,
+    "decade": "1970s"
+   },
+   "blurb": "\"American Woman\" by The Guess Who, released in 1970.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/ba/24/2f/ba242f45-d43e-8e2a-2152-5a9467a61c33/mzaf_12301083418868269341.plus.aac.p.m4a",
+      "credit": "The Guess Who: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/american-woman/1514641963?i=1514641970&uo=4",
+      "apple": {
+       "trackId": 1514641970,
+       "url": "https://music.apple.com/us/album/american-woman/1514641963?i=1514641970&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/2c/f5/68/2cf5681a-1378-c8f6-8f87-22b9fa55254c/886447881972.jpg/300x300bb.jpg",
+       "term": "The Guess Who American Woman"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "war-edwin-starr",
+   "name": "War",
+   "group": "1970s",
+   "facts": {
+    "artist": "Edwin Starr",
+    "year": 1970,
+    "decade": "1970s"
+   },
+   "blurb": "\"War\" by Edwin Starr, released in 1970.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/01/65/45/016545a7-aa47-134d-d299-9f989ed8f978/mzaf_8733612695383396264.plus.aac.p.m4a",
+      "credit": "Edwin Starr: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/war/1454734913?i=1454735075&uo=4",
+      "apple": {
+       "trackId": 1454735075,
+       "url": "https://music.apple.com/us/album/war/1454734913?i=1454735075&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/19/12/aa/1912aa08-743e-7554-e0a5-58882b53ac16/00602577177316.rgb.jpg/300x300bb.jpg",
+       "term": "Edwin Starr War"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "abc-the-jackson-5",
+   "name": "ABC",
+   "group": "1970s",
+   "facts": {
+    "artist": "The Jackson 5",
+    "year": 1970,
+    "decade": "1970s"
+   },
+   "blurb": "\"ABC\" by The Jackson 5, released in 1970.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/41/6b/48/416b48d1-f562-0a8f-3e6b-eeaa56ac1653/mzaf_7557739725500007524.plus.aac.p.m4a",
+      "credit": "The Jackson 5: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/abc/1443169819?i=1443169831&uo=4",
+      "apple": {
+       "trackId": 1443169831,
+       "url": "https://music.apple.com/us/album/abc/1443169819?i=1443169831&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/e5/af/ad/e5afad1f-549f-94e2-cbb0-b9110f008f60/14UMGIM33964.rgb.jpg/300x300bb.jpg",
+       "term": "Jackson 5 ABC"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "let-it-be-the-beatles",
+   "name": "Let It Be",
+   "group": "1970s",
+   "facts": {
+    "artist": "The Beatles",
+    "year": 1970,
+    "decade": "1970s"
+   },
+   "blurb": "\"Let It Be\" by The Beatles, released in 1970.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/60/76/fd/6076fd8f-422a-d5e3-7b02-5953bc93cfbd/mzaf_3945462995290301839.plus.aac.p.m4a",
+      "credit": "The Beatles: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/let-it-be/1441164495?i=1441164738&uo=4",
+      "apple": {
+       "trackId": 1441164738,
+       "url": "https://music.apple.com/us/album/let-it-be/1441164495?i=1441164738&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/ae/98/4c/ae984c7a-cd06-a7cd-e8bf-32cb15ba698d/00602567705475.rgb.jpg/300x300bb.jpg",
+       "term": "The Beatles Let It Be"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "joy-to-the-world-three-dog-night",
+   "name": "Joy to the World",
+   "group": "1970s",
+   "facts": {
+    "artist": "Three Dog Night",
+    "year": 1971,
+    "decade": "1970s"
+   },
+   "blurb": "\"Joy to the World\" by Three Dog Night, released in 1971.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/05/3c/6f/053c6fe4-d661-ca71-d28d-9b6dd88d6275/mzaf_13999481678492835624.plus.aac.p.m4a",
+      "credit": "Three Dog Night: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/joy-to-the-world/1443890529?i=1443890867&uo=4",
+      "apple": {
+       "trackId": 1443890867,
+       "url": "https://music.apple.com/us/album/joy-to-the-world/1443890529?i=1443890867&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music114/v4/44/d5/28/44d528cf-bb8f-263b-e76e-537a40838e4b/00076743135521.rgb.jpg/300x300bb.jpg",
+       "term": "Three Dog Night Joy to the World"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "maggie-may-rod-stewart",
+   "name": "Maggie May",
+   "group": "1970s",
+   "facts": {
+    "artist": "Rod Stewart",
+    "year": 1971,
+    "decade": "1970s"
+   },
+   "blurb": "\"Maggie May\" by Rod Stewart, released in 1971.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/11/ca/ad/11caadea-48a9-71a2-7994-8bc22d43f52c/mzaf_10244066595524092310.plus.aac.p.m4a",
+      "credit": "Rod Stewart: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/maggie-may-remastered-version/295535258?i=295535268&uo=4",
+      "apple": {
+       "trackId": 295535268,
+       "url": "https://music.apple.com/us/album/maggie-may-remastered-version/295535258?i=295535268&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music114/v4/ea/89/8d/ea898dc7-79a3-f8c7-fdcd-8fed21bf9973/mzi.fyjtoqdz.jpg/300x300bb.jpg",
+       "term": "Rod Stewart Maggie May"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "its-too-late-carole-king",
+   "name": "It's Too Late",
+   "group": "1970s",
+   "facts": {
+    "artist": "Carole King",
+    "year": 1971,
+    "decade": "1970s"
+   },
+   "blurb": "\"It's Too Late\" by Carole King, released in 1971.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/9c/52/56/9c52568b-9efc-8572-b7fe-047317154ee2/mzaf_10611586259190988943.plus.aac.p.m4a",
+      "credit": "Carole King: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/its-too-late/747087657?i=747087665&uo=4",
+      "apple": {
+       "trackId": 747087665,
+       "url": "https://music.apple.com/us/album/its-too-late/747087657?i=747087665&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/68/b6/0e/68b60e89-9d41-e8a1-bba2-05c750f0832b/dj.hwpyamqm.jpg/300x300bb.jpg",
+       "term": "Carole King It's Too Late"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "how-can-you-mend-a-broken-heart-bee-gees",
+   "name": "How Can You Mend a Broken Heart",
+   "group": "1970s",
+   "facts": {
+    "artist": "Bee Gees",
+    "year": 1971,
+    "decade": "1970s"
+   },
+   "blurb": "\"How Can You Mend a Broken Heart\" by Bee Gees, released in 1971.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/39/11/a2/3911a2a3-0323-1357-b4c8-8a023d3da72d/mzaf_15186725402005833862.plus.aac.p.m4a",
+      "credit": "Bee Gees: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/how-can-you-mend-a-broken-heart/1444155081?i=1444155178&uo=4",
+      "apple": {
+       "trackId": 1444155178,
+       "url": "https://music.apple.com/us/album/how-can-you-mend-a-broken-heart/1444155081?i=1444155178&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music126/v4/2d/12/aa/2d12aa24-1a0e-f177-84c1-8ffd06bbe495/06UMGIM52004.rgb.jpg/300x300bb.jpg",
+       "term": "Bee Gees How Can You Mend a Broken Heart"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "brown-sugar-the-rolling-stones",
+   "name": "Brown Sugar",
+   "group": "1970s",
+   "facts": {
+    "artist": "The Rolling Stones",
+    "year": 1971,
+    "decade": "1970s"
+   },
+   "blurb": "\"Brown Sugar\" by The Rolling Stones, released in 1971.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/e6/14/11/e6141184-302a-254e-ba1f-cbdde99db88d/mzaf_4535470187684948249.plus.aac.p.m4a",
+      "credit": "The Rolling Stones: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/brown-sugar/1440830882?i=1440830886&uo=4",
+      "apple": {
+       "trackId": 1440830886,
+       "url": "https://music.apple.com/us/album/brown-sugar/1440830882?i=1440830886&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/fa/26/c9/fa26c9e4-e598-5019-9bd0-ce8321245cc5/15UMGIM15404.rgb.jpg/300x300bb.jpg",
+       "term": "The Rolling Stones Brown Sugar"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "imagine-john-lennon",
+   "name": "Imagine",
+   "group": "1970s",
+   "facts": {
+    "artist": "John Lennon",
+    "year": 1971,
+    "decade": "1970s"
+   },
+   "blurb": "\"Imagine\" by John Lennon, released in 1971.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/7d/4e/8c/7d4e8ced-a37b-fab9-c66a-f3b4d6f043cb/mzaf_1566428042492234227.plus.aac.p.m4a",
+      "credit": "John Lennon: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/imagine/1440853752?i=1440853776&uo=4",
+      "apple": {
+       "trackId": 1440853776,
+       "url": "https://music.apple.com/us/album/imagine/1440853752?i=1440853776&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music126/v4/21/e3/b0/21e3b048-c917-92c4-bd7d-ace44797b388/13UABIM52808.rgb.jpg/300x300bb.jpg",
+       "term": "John Lennon Imagine"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "american-pie-don-mclean",
+   "name": "American Pie",
+   "group": "1970s",
+   "facts": {
+    "artist": "Don McLean",
+    "year": 1971,
+    "decade": "1970s"
+   },
+   "blurb": "\"American Pie\" by Don McLean, released in 1971.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/63/dd/79/63dd791d-7e2e-1d3a-f2fa-01c5be6b9d5e/mzaf_8148438283557855281.plus.aac.p.m4a",
+      "credit": "Don McLean: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/american-pie-full-length-version/1440834532?i=1440834619&uo=4",
+      "apple": {
+       "trackId": 1440834619,
+       "url": "https://music.apple.com/us/album/american-pie-full-length-version/1440834532?i=1440834619&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music116/v4/1a/54/65/1a546518-5709-5c11-3f30-90528331fbf6/15UMGIM65659.rgb.jpg/300x300bb.jpg",
+       "term": "Don Mclean American Pie"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "alone-again-naturally-gilbert-osullivan",
+   "name": "Alone Again (Naturally)",
+   "group": "1970s",
+   "facts": {
+    "artist": "Gilbert O'Sullivan",
+    "year": 1972,
+    "decade": "1970s"
+   },
+   "blurb": "\"Alone Again (Naturally)\" by Gilbert O'Sullivan, released in 1972.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/75/b5/c7/75b5c703-b88c-d98e-f796-672cac3517c2/mzaf_16983745972261344933.plus.aac.p.m4a",
+      "credit": "Gilbert O'Sullivan: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/alone-again-naturally/1716093460?i=1716094421&uo=4",
+      "apple": {
+       "trackId": 1716094421,
+       "url": "https://music.apple.com/us/album/alone-again-naturally/1716093460?i=1716094421&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music116/v4/16/e9/24/16e924b8-2433-9567-99e7-617087187a53/0698458815484.jpg/300x300bb.jpg",
+       "term": "Gilbert O'Sullivan Alone Again"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "lean-on-me-bill-withers",
+   "name": "Lean on Me",
+   "group": "1970s",
+   "facts": {
+    "artist": "Bill Withers",
+    "year": 1972,
+    "decade": "1970s"
+   },
+   "blurb": "\"Lean on Me\" by Bill Withers, released in 1972.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/42/e5/ab/42e5ab54-2402-8975-92a8-3bbf749975b1/mzaf_15104769135310409133.plus.aac.p.m4a",
+      "credit": "Bill Withers: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/lean-on-me-single-version/192703797?i=192704627&uo=4",
+      "apple": {
+       "trackId": 192704627,
+       "url": "https://music.apple.com/us/album/lean-on-me-single-version/192703797?i=192704627&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/42/11/2a/42112aa6-06e0-1aa5-5c3d-69c731248dab/mzi.bitaqdrh.jpg/300x300bb.jpg",
+       "term": "Bill Withers Lean On Me"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "lets-stay-together-al-green",
+   "name": "Let's Stay Together",
+   "group": "1970s",
+   "facts": {
+    "artist": "Al Green",
+    "year": 1971,
+    "decade": "1970s"
+   },
+   "blurb": "\"Let's Stay Together\" by Al Green, released in 1971.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/a1/cc/b3/a1ccb365-d4a7-f371-7e6c-c4b745b41acc/mzaf_2282300440028225493.plus.aac.p.m4a",
+      "credit": "Al Green: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/lets-stay-together/976362815?i=976362823&uo=4",
+      "apple": {
+       "trackId": 976362823,
+       "url": "https://music.apple.com/us/album/lets-stay-together/976362815?i=976362823&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music112/v4/d8/ec/4f/d8ec4f92-0691-9151-1738-9fbe2e19a270/886445144888.jpg/300x300bb.jpg",
+       "term": "Al Green Let's Stay Together"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "without-you-nilsson",
+   "name": "Without You",
+   "group": "1970s",
+   "facts": {
+    "artist": "Nilsson",
+    "year": 1971,
+    "decade": "1970s"
+   },
+   "blurb": "\"Without You\" by Nilsson, released in 1971.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/ac/e5/81/ace58105-af73-fb6f-6390-d2ea48b6745d/mzaf_9619479168798293848.plus.aac.p.m4a",
+      "credit": "Nilsson: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/without-you/304815001?i=304815013&uo=4",
+      "apple": {
+       "trackId": 304815013,
+       "url": "https://music.apple.com/us/album/without-you/304815001?i=304815013&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/f7/f1/bf/f7f1bf43-3324-6c2d-d7e0-368d506fd56d/078635451528.jpg/300x300bb.jpg",
+       "term": "Harry Nilsson Without You"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "crocodile-rock-elton-john",
+   "name": "Crocodile Rock",
+   "group": "1970s",
+   "facts": {
+    "artist": "Elton John",
+    "year": 1972,
+    "decade": "1970s"
+   },
+   "blurb": "\"Crocodile Rock\" by Elton John, released in 1972.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/a9/80/15/a98015e5-06c2-101f-5c8d-7c5c627a1d9c/mzaf_6788803206095592994.plus.aac.p.m4a",
+      "credit": "Elton John: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/crocodile-rock/1440925614?i=1440926343&uo=4",
+      "apple": {
+       "trackId": 1440926343,
+       "url": "https://music.apple.com/us/album/crocodile-rock/1440925614?i=1440926343&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music116/v4/49/cd/b8/49cdb8de-4752-8cec-f795-b7547930990d/06UMGIM34697.rgb.jpg/300x300bb.jpg",
+       "term": "Elton John Crocodile Rock"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "youre-so-vain-carly-simon",
+   "name": "You're So Vain",
+   "group": "1970s",
+   "facts": {
+    "artist": "Carly Simon",
+    "year": 1972,
+    "decade": "1970s"
+   },
+   "blurb": "\"You're So Vain\" by Carly Simon, released in 1972.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/59/ed/3c/59ed3c73-a1bf-42b9-f522-005a5967dad4/mzaf_16168047215121566257.plus.aac.p.m4a",
+      "credit": "Carly Simon: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/youre-so-vain/1057307808?i=1057307827&uo=4",
+      "apple": {
+       "trackId": 1057307827,
+       "url": "https://music.apple.com/us/album/youre-so-vain/1057307808?i=1057307827&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/c1/f4/71/c1f471c9-1000-cc5c-71b9-394208a30122/mzm.gzpqrqro.jpg/300x300bb.jpg",
+       "term": "Carly Simon You're So Vain"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "tie-a-yellow-ribbon-round-the-ole-oak-tree-tony-orlando-and-",
+   "name": "Tie a Yellow Ribbon Round the Ole Oak Tree",
+   "group": "1970s",
+   "facts": {
+    "artist": "Tony Orlando & Dawn",
+    "year": 1973,
+    "decade": "1970s"
+   },
+   "blurb": "\"Tie a Yellow Ribbon Round the Ole Oak Tree\" by Tony Orlando & Dawn, released in 1973.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/b1/d0/cf/b1d0cfe5-5b0a-1135-ee71-cc1fe7332ac7/mzaf_7968876313549364830.plus.aac.p.m4a",
+      "credit": "Tony Orlando & Dawn: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/tie-a-yellow-ribbon-round-the-ole-oak-tree/278349433?i=278349579&uo=4",
+      "apple": {
+       "trackId": 278349579,
+       "url": "https://music.apple.com/us/album/tie-a-yellow-ribbon-round-the-ole-oak-tree/278349433?i=278349579&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/6f/cb/e7/6fcbe725-5036-02d3-297e-123ae155990b/mzi.kaezjyhv.jpg/300x300bb.jpg",
+       "term": "Dawn Tie a Yellow Ribbon Round the Ole Oak Tree"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "killing-me-softly-with-his-song-roberta-flack",
+   "name": "Killing Me Softly with His Song",
+   "group": "1970s",
+   "facts": {
+    "artist": "Roberta Flack",
+    "year": 1973,
+    "decade": "1970s"
+   },
+   "blurb": "\"Killing Me Softly with His Song\" by Roberta Flack, released in 1973.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/9b/eb/00/9beb00a2-fe8a-808d-951e-b0ae09dc2bee/mzaf_15554659559486311039.plus.aac.p.m4a",
+      "credit": "Roberta Flack: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/killing-me-softly-with-his-song/355038498?i=355038523&uo=4",
+      "apple": {
+       "trackId": 355038523,
+       "url": "https://music.apple.com/us/album/killing-me-softly-with-his-song/355038498?i=355038523&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music/e4/71/97/mzi.mgwzviyu.jpg/300x300bb.jpg",
+       "term": "Roberta Flack Killing Me Softly With His Song"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "lets-get-it-on-marvin-gaye",
+   "name": "Let's Get It On",
+   "group": "1970s",
+   "facts": {
+    "artist": "Marvin Gaye",
+    "year": 1973,
+    "decade": "1970s"
+   },
+   "blurb": "\"Let's Get It On\" by Marvin Gaye, released in 1973.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/aa/88/40/aa884016-f860-cd11-e4ed-4fe50d509ff9/mzaf_14524715883435750084.plus.aac.p.m4a",
+      "credit": "Marvin Gaye: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/lets-get-it-on/1445094266?i=1445094678&uo=4",
+      "apple": {
+       "trackId": 1445094678,
+       "url": "https://music.apple.com/us/album/lets-get-it-on/1445094266?i=1445094678&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music116/v4/3f/eb/3c/3feb3cc6-7f78-7cef-8f30-dfd3cd3472b9/07UMGIM03026.rgb.jpg/300x300bb.jpg",
+       "term": "Marvin Gaye Let's Get It On"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "bad-bad-leroy-brown-jim-croce",
+   "name": "Bad, Bad Leroy Brown",
+   "group": "1970s",
+   "facts": {
+    "artist": "Jim Croce",
+    "year": 1973,
+    "decade": "1970s"
+   },
+   "blurb": "\"Bad, Bad Leroy Brown\" by Jim Croce, released in 1973.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/b4/19/20/b4192095-2095-1b1a-49c7-7e6266b9e7b9/mzaf_2009111998005711932.plus.aac.p.m4a",
+      "credit": "Jim Croce: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/bad-bad-leroy-brown/1674575337?i=1674575345&uo=4",
+      "apple": {
+       "trackId": 1674575345,
+       "url": "https://music.apple.com/us/album/bad-bad-leroy-brown/1674575337?i=1674575345&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/ab/9c/8b/ab9c8b40-2b62-dfb9-036b-2f4598400e04/5032698667338.jpg/300x300bb.jpg",
+       "term": "Jim Croce Bad, Bad Leroy Brown"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "waterloo-abba",
+   "name": "Waterloo",
+   "group": "1970s",
+   "facts": {
+    "artist": "ABBA",
+    "year": 1974,
+    "decade": "1970s"
+   },
+   "blurb": "\"Waterloo\" by ABBA, released in 1974.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/45/3c/0e/453c0ee5-c11c-c939-ab63-5f11c34ecc40/mzaf_6340572945570753130.plus.aac.p.m4a",
+      "credit": "ABBA: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/waterloo/1530391535?i=1530392253&uo=4",
+      "apple": {
+       "trackId": 1530392253,
+       "url": "https://music.apple.com/us/album/waterloo/1530391535?i=1530392253&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/71/31/8c/71318c54-5bb0-58d8-1034-d2d09edbef0c/20UMGIM76140.rgb.jpg/300x300bb.jpg",
+       "term": "ABBA Waterloo"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "kung-fu-fighting-carl-douglas",
+   "name": "Kung Fu Fighting",
+   "group": "1970s",
+   "facts": {
+    "artist": "Carl Douglas",
+    "year": 1974,
+    "decade": "1970s"
+   },
+   "blurb": "\"Kung Fu Fighting\" by Carl Douglas, released in 1974.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/2d/26/c6/2d26c66d-eb2e-c861-40d9-b2a762196208/mzaf_8897577051555614309.plus.aac.p.m4a",
+      "credit": "Carl Douglas: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/kung-fu-fighting/1436092812?i=1436092826&uo=4",
+      "apple": {
+       "trackId": 1436092826,
+       "url": "https://music.apple.com/us/album/kung-fu-fighting/1436092812?i=1436092826&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music128/v4/a3/39/d0/a339d06c-ec27-a414-ed4e-a8783d474d4b/5414939482373.jpg/300x300bb.jpg",
+       "term": "Carl Douglas Kung Fu Fighting"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "come-and-get-your-love-redbone",
+   "name": "Come and Get Your Love",
+   "group": "1970s",
+   "facts": {
+    "artist": "Redbone",
+    "year": 1973,
+    "decade": "1970s"
+   },
+   "blurb": "\"Come and Get Your Love\" by Redbone, released in 1973.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/97/ad/d6/97add60f-11c1-b4ba-bf80-0bf91d081cc5/mzaf_5554682491106040961.plus.aac.p.m4a",
+      "credit": "Redbone: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/come-and-get-your-love/1268712117?i=1268712504&uo=4",
+      "apple": {
+       "trackId": 1268712504,
+       "url": "https://music.apple.com/us/album/come-and-get-your-love/1268712117?i=1268712504&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music125/v4/30/3c/aa/303caaab-ca00-00d5-38bc-566538727080/886446685496.jpg/300x300bb.jpg",
+       "term": "Redbone Come and Get Your Love"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "the-way-we-were-barbra-streisand",
+   "name": "The Way We Were",
+   "group": "1970s",
+   "facts": {
+    "artist": "Barbra Streisand",
+    "year": 1973,
+    "decade": "1970s"
+   },
+   "blurb": "\"The Way We Were\" by Barbra Streisand, released in 1973.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/68/61/1e/68611ec9-1dd5-cdfe-6cdf-b249f67701d9/mzaf_8471848861989189940.plus.aac.p.m4a",
+      "credit": "Barbra Streisand: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/the-way-we-were/193021926?i=193022060&uo=4",
+      "apple": {
+       "trackId": 193022060,
+       "url": "https://music.apple.com/us/album/the-way-we-were/193021926?i=193022060&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music125/v4/1d/db/7f/1ddb7f0b-b6d4-ff4e-475a-61c453ab94e1/dj.kefgnnir.jpg/300x300bb.jpg",
+       "term": "Barbra Streisand The Way We Were"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "love-will-keep-us-together-captain-and-tennille",
+   "name": "Love Will Keep Us Together",
+   "group": "1970s",
+   "facts": {
+    "artist": "Captain & Tennille",
+    "year": 1975,
+    "decade": "1970s"
+   },
+   "blurb": "\"Love Will Keep Us Together\" by Captain & Tennille, released in 1975.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/d0/55/da/d055da8d-0cb5-a57b-0467-ceeefc42f603/mzaf_13277792148035335251.plus.aac.p.m4a",
+      "credit": "Captain & Tennille: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/love-will-keep-us-together/1442300587?i=1442300589&uo=4",
+      "apple": {
+       "trackId": 1442300589,
+       "url": "https://music.apple.com/us/album/love-will-keep-us-together/1442300587?i=1442300589&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music128/v4/f0/d4/15/f0d41508-27b4-386b-06f6-c294b3e137ef/00602537747191.rgb.jpg/300x300bb.jpg",
+       "term": "Captain & Tennille Love Will Keep Us Together"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "rhinestone-cowboy-glen-campbell",
+   "name": "Rhinestone Cowboy",
+   "group": "1970s",
+   "facts": {
+    "artist": "Glen Campbell",
+    "year": 1975,
+    "decade": "1970s"
+   },
+   "blurb": "\"Rhinestone Cowboy\" by Glen Campbell, released in 1975.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/ea/95/a4/ea95a43d-26ee-048d-dfbf-dd4b75c9f872/mzaf_5763727911598680756.plus.aac.p.m4a",
+      "credit": "Glen Campbell: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/rhinestone-cowboy/1442453148?i=1442453158&uo=4",
+      "apple": {
+       "trackId": 1442453158,
+       "url": "https://music.apple.com/us/album/rhinestone-cowboy/1442453148?i=1442453158&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music126/v4/3a/0f/bd/3a0fbd0c-fa61-8295-68a4-16c44aadeda6/15UMGIM01121.rgb.jpg/300x300bb.jpg",
+       "term": "Glen Campbell Rhinestone Cowboy"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "jive-talkin-bee-gees",
+   "name": "Jive Talkin'",
+   "group": "1970s",
+   "facts": {
+    "artist": "Bee Gees",
+    "year": 1975,
+    "decade": "1970s"
+   },
+   "blurb": "\"Jive Talkin'\" by Bee Gees, released in 1975.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/9f/69/c4/9f69c491-e8be-3994-04b2-6e8c4c7da6fb/mzaf_11380368093396289825.plus.aac.p.m4a",
+      "credit": "Bee Gees: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/jive-talkin/1442433679?i=1442433686&uo=4",
+      "apple": {
+       "trackId": 1442433686,
+       "url": "https://music.apple.com/us/album/jive-talkin/1442433679?i=1442433686&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music123/v4/bb/15/72/bb157228-9c5f-c368-e952-cb94e80ffd69/06UMGIM31816.rgb.jpg/300x300bb.jpg",
+       "term": "Bee Gees Jive Talkin'"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "fame-david-bowie",
+   "name": "Fame",
+   "group": "1970s",
+   "facts": {
+    "artist": "David Bowie",
+    "year": 1975,
+    "decade": "1970s"
+   },
+   "blurb": "\"Fame\" by David Bowie, released in 1975.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/5d/d2/6c/5dd26c98-e570-0e06-e6c5-3519ea8fa8fd/mzaf_5762442227328650773.plus.aac.p.m4a",
+      "credit": "David Bowie: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/fame/1195107061?i=1195110202&uo=4",
+      "apple": {
+       "trackId": 1195110202,
+       "url": "https://music.apple.com/us/album/fame/1195107061?i=1195110202&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/0a/a7/0c/0aa70c09-e325-3900-6a5e-1557ff7ce710/190295990329.jpg/300x300bb.jpg",
+       "term": "David Bowie Fame"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "one-of-these-nights-eagles",
+   "name": "One of These Nights",
+   "group": "1970s",
+   "facts": {
+    "artist": "Eagles",
+    "year": 1975,
+    "decade": "1970s"
+   },
+   "blurb": "\"One of These Nights\" by Eagles, released in 1975.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/ea/f5/94/eaf59472-f764-9273-62f1-ec2e46317937/mzaf_12555576977988600331.plus.aac.p.m4a",
+      "credit": "Eagles: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/one-of-these-nights/635829971?i=635830022&uo=4",
+      "apple": {
+       "trackId": 635830022,
+       "url": "https://music.apple.com/us/album/one-of-these-nights/635829971?i=635830022&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/db/d5/c4/dbd5c44a-a30f-08ff-256b-1e9b2ed6d4cd/075596032926.jpg/300x300bb.jpg",
+       "term": "Eagles One of These Nights"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "lady-marmalade-labelle",
+   "name": "Lady Marmalade",
+   "group": "1970s",
+   "facts": {
+    "artist": "Labelle",
+    "year": 1974,
+    "decade": "1970s"
+   },
+   "blurb": "\"Lady Marmalade\" by Labelle, released in 1974.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview122/v4/4c/df/d1/4cdfd1de-12e9-2bf7-75e2-22a1910709d0/mzaf_12093545615546689681.plus.aac.p.m4a",
+      "credit": "Labelle: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/lady-marmalade/188249320?i=188249353&uo=4",
+      "apple": {
+       "trackId": 188249353,
+       "url": "https://music.apple.com/us/album/lady-marmalade/188249320?i=188249353&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music125/v4/28/93/b7/2893b79d-320e-adc5-2be7-cefb5b830042/074643307529.jpg/300x300bb.jpg",
+       "term": "LaBelle Lady Marmalade"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "bohemian-rhapsody-queen",
+   "name": "Bohemian Rhapsody",
+   "group": "1970s",
+   "facts": {
+    "artist": "Queen",
+    "year": 1975,
+    "decade": "1970s"
+   },
+   "blurb": "\"Bohemian Rhapsody\" by Queen, released in 1975.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/17/fc/1e/17fc1eba-946d-84a9-710b-a0e88ea64209/mzaf_3049006317693088799.plus.aac.p.m4a",
+      "credit": "Queen: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/bohemian-rhapsody/6781024026?i=6781024437&uo=4",
+      "apple": {
+       "trackId": 6781024437,
+       "url": "https://music.apple.com/us/album/bohemian-rhapsody/6781024026?i=6781024437&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/8b/0a/ea/8b0aea60-6f4a-195b-5958-cdf459c2333b/602527644271.jpg/300x300bb.jpg",
+       "term": "Queen Bohemian Rhapsody"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "silly-love-songs-wings",
+   "name": "Silly Love Songs",
+   "group": "1970s",
+   "facts": {
+    "artist": "Wings",
+    "year": 1976,
+    "decade": "1970s"
+   },
+   "blurb": "\"Silly Love Songs\" by Wings, released in 1976.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/a3/cb/47/a3cb4730-8920-3415-3f82-f8e153a25972/mzaf_3440749485822900176.plus.aac.p.m4a",
+      "credit": "Wings: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/silly-love-songs/1440943395?i=1440943745&uo=4",
+      "apple": {
+       "trackId": 1440943745,
+       "url": "https://music.apple.com/us/album/silly-love-songs/1440943395?i=1440943745&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music112/v4/53/52/84/535284ca-ffeb-e464-0d6f-de91ea3493cd/14CMGIM01145.rgb.jpg/300x300bb.jpg",
+       "term": "Wings Silly Love Songs"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "dont-go-breaking-my-heart-elton-john-and-kiki-dee",
+   "name": "Don't Go Breaking My Heart",
+   "group": "1970s",
+   "facts": {
+    "artist": "Elton John & Kiki Dee",
+    "year": 1976,
+    "decade": "1970s"
+   },
+   "blurb": "\"Don't Go Breaking My Heart\" by Elton John & Kiki Dee, released in 1976.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/0f/b8/90/0fb8900a-1557-3a34-15fb-b5a843786788/mzaf_12204588102771735682.plus.aac.p.m4a",
+      "credit": "Elton John & Kiki Dee: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/dont-go-breaking-my-heart-remastered/1652668529?i=1652668831&uo=4",
+      "apple": {
+       "trackId": 1652668831,
+       "url": "https://music.apple.com/us/album/dont-go-breaking-my-heart-remastered/1652668529?i=1652668831&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music122/v4/58/c4/0e/58c40e30-98f8-1215-42f9-82ea7eec6918/22UM1IM16650.rgb.jpg/300x300bb.jpg",
+       "term": "Elton John & Kiki Dee Don't Go Breaking My Heart"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "play-that-funky-music-wild-cherry",
+   "name": "Play That Funky Music",
+   "group": "1970s",
+   "facts": {
+    "artist": "Wild Cherry",
+    "year": 1976,
+    "decade": "1970s"
+   },
+   "blurb": "\"Play That Funky Music\" by Wild Cherry, released in 1976.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/84/9a/e3/849ae35d-acdc-8f93-7c59-760d7594c406/mzaf_2143528349432358338.plus.aac.p.m4a",
+      "credit": "Wild Cherry: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/play-that-funky-music/198226103?i=198226129&uo=4",
+      "apple": {
+       "trackId": 198226129,
+       "url": "https://music.apple.com/us/album/play-that-funky-music/198226103?i=198226129&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music125/v4/af/f6/0c/aff60ca6-7385-e47d-7681-e5f73910665c/mzi.fjlfxpyy.jpg/300x300bb.jpg",
+       "term": "Wild Cherry Play That Funky Music"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "dancing-queen-abba",
+   "name": "Dancing Queen",
+   "group": "1970s",
+   "facts": {
+    "artist": "ABBA",
+    "year": 1976,
+    "decade": "1970s"
+   },
+   "blurb": "\"Dancing Queen\" by ABBA, released in 1976.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/d2/9d/e3/d29de3af-c080-8558-6c41-823b9ab5bb6b/mzaf_18371402234402526781.plus.aac.p.m4a",
+      "credit": "ABBA: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/dancing-queen/1440820126?i=1440820267&uo=4",
+      "apple": {
+       "trackId": 1440820267,
+       "url": "https://music.apple.com/us/album/dancing-queen/1440820126?i=1440820267&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music125/v4/69/4d/b4/694db440-1fdd-0112-16a0-ae501501cb32/14UMGIM07610.rgb.jpg/300x300bb.jpg",
+       "term": "ABBA Dancing Queen"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "sir-duke-stevie-wonder",
+   "name": "Sir Duke",
+   "group": "1970s",
+   "facts": {
+    "artist": "Stevie Wonder",
+    "year": 1976,
+    "decade": "1970s"
+   },
+   "blurb": "\"Sir Duke\" by Stevie Wonder, released in 1976.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/19/f1/cc/19f1ccc5-f10c-8b88-ddfa-b97acf5009b2/mzaf_16382814554090706144.plus.aac.p.m4a",
+      "credit": "Stevie Wonder: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/sir-duke/1440788438?i=1440788542&uo=4",
+      "apple": {
+       "trackId": 1440788542,
+       "url": "https://music.apple.com/us/album/sir-duke/1440788438?i=1440788542&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music118/v4/eb/1f/12/eb1f12ec-474c-63aa-43af-09282f423b9d/00602537004737.rgb.jpg/300x300bb.jpg",
+       "term": "Stevie Wonder Sir Duke"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "hotel-california-eagles",
+   "name": "Hotel California",
+   "group": "1970s",
+   "facts": {
+    "artist": "Eagles",
+    "year": 1976,
+    "decade": "1970s"
+   },
+   "blurb": "\"Hotel California\" by Eagles, released in 1976.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/17/30/06/1730066d-13fb-6803-0e52-46d4762b94e0/mzaf_8068080726527063383.plus.aac.p.m4a",
+      "credit": "Eagles: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/hotel-california/635770200?i=635770202&uo=4",
+      "apple": {
+       "trackId": 635770202,
+       "url": "https://music.apple.com/us/album/hotel-california/635770200?i=635770202&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/88/16/2c/88162c3d-46db-8321-61f3-3a47404cfe76/075596050920.jpg/300x300bb.jpg",
+       "term": "Eagles Hotel California"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "tonights-the-night-gonna-be-alright-rod-stewart",
+   "name": "Tonight's the Night (Gonna Be Alright)",
+   "group": "1970s",
+   "facts": {
+    "artist": "Rod Stewart",
+    "year": 1976,
+    "decade": "1970s"
+   },
+   "blurb": "\"Tonight's the Night (Gonna Be Alright)\" by Rod Stewart, released in 1976.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/38/f9/04/38f90441-9477-550e-54fe-e6a5aaf5b485/mzaf_16894062807460005153.plus.aac.p.m4a",
+      "credit": "Rod Stewart: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/tonights-the-night-gonna-be-alright-2008-remaster/295535258?i=295535297&uo=4",
+      "apple": {
+       "trackId": 295535297,
+       "url": "https://music.apple.com/us/album/tonights-the-night-gonna-be-alright-2008-remaster/295535258?i=295535297&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music114/v4/ea/89/8d/ea898dc7-79a3-f8c7-fdcd-8fed21bf9973/mzi.fyjtoqdz.jpg/300x300bb.jpg",
+       "term": "Rod Stewart Tonight's the Night"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "i-just-want-to-be-your-everything-andy-gibb",
+   "name": "I Just Want to Be Your Everything",
+   "group": "1970s",
+   "facts": {
+    "artist": "Andy Gibb",
+    "year": 1977,
+    "decade": "1970s"
+   },
+   "blurb": "\"I Just Want to Be Your Everything\" by Andy Gibb, released in 1977.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/fa/e1/c6/fae1c675-aef4-e8a9-77c5-2f44ea1c4172/mzaf_6304299791889888785.plus.aac.p.m4a",
+      "credit": "Andy Gibb: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/i-just-want-to-be-your-everything/1442252219?i=1442252230&uo=4",
+      "apple": {
+       "trackId": 1442252230,
+       "url": "https://music.apple.com/us/album/i-just-want-to-be-your-everything/1442252219?i=1442252230&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music125/v4/38/0e/91/380e9192-cce8-5892-b3e7-0ecf3177ddfe/00602557881974.rgb.jpg/300x300bb.jpg",
+       "term": "Andy Gibb I Just Want To Be Your Everything"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "best-of-my-love-the-emotions",
+   "name": "Best of My Love",
+   "group": "1970s",
+   "facts": {
+    "artist": "The Emotions",
+    "year": 1977,
+    "decade": "1970s"
+   },
+   "blurb": "\"Best of My Love\" by The Emotions, released in 1977.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/71/a5/b9/71a5b917-7e1f-c7db-7111-4da911af2f53/mzaf_6660689211464587357.plus.aac.p.m4a",
+      "credit": "The Emotions: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/best-of-my-love/882955356?i=882955357&uo=4",
+      "apple": {
+       "trackId": 882955357,
+       "url": "https://music.apple.com/us/album/best-of-my-love/882955356?i=882955357&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/95/32/d4/9532d4e2-44db-79c1-abd0-14c6cf99f1d3/886444372596.jpg/300x300bb.jpg",
+       "term": "The Emotions Best of My Love"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "go-your-own-way-fleetwood-mac",
+   "name": "Go Your Own Way",
+   "group": "1970s",
+   "facts": {
+    "artist": "Fleetwood Mac",
+    "year": 1977,
+    "decade": "1970s"
+   },
+   "blurb": "\"Go Your Own Way\" by Fleetwood Mac, released in 1977.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/81/ad/cb/81adcb57-ed6a-1d7c-b38a-ea67ac543a3b/mzaf_6536399458016199570.plus.aac.p.m4a",
+      "credit": "Fleetwood Mac: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/go-your-own-way-sessions-roughs-outtakes/651879763?i=651880197&uo=4",
+      "apple": {
+       "trackId": 651880197,
+       "url": "https://music.apple.com/us/album/go-your-own-way-sessions-roughs-outtakes/651879763?i=651880197&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music125/v4/2a/eb/dc/2aebdc18-c2c0-0fdd-fb85-07538a925700/603497925766.jpg/300x300bb.jpg",
+       "term": "Fleetwood Mac Go Your Own Way"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "stayin-alive-bee-gees",
+   "name": "Stayin' Alive",
+   "group": "1970s",
+   "facts": {
+    "artist": "Bee Gees",
+    "year": 1977,
+    "decade": "1970s"
+   },
+   "blurb": "\"Stayin' Alive\" by Bee Gees, released in 1977.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/72/f8/ca/72f8ca41-e760-6fb4-009d-a8b2b6b287bb/mzaf_18123089491337557034.plus.aac.p.m4a",
+      "credit": "Bee Gees: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/stayin-alive-from-saturday-night-fever-soundtrack/1445668458?i=1445668462&uo=4",
+      "apple": {
+       "trackId": 1445668462,
+       "url": "https://music.apple.com/us/album/stayin-alive-from-saturday-night-fever-soundtrack/1445668458?i=1445668462&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music113/v4/74/c1/73/74c17380-b75d-4d74-31d8-99f8e8b20c36/17UM1IM27905.rgb.jpg/300x300bb.jpg",
+       "term": "Bee Gees Stayin' Alive"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "shadow-dancing-andy-gibb",
+   "name": "Shadow Dancing",
+   "group": "1970s",
+   "facts": {
+    "artist": "Andy Gibb",
+    "year": 1978,
+    "decade": "1970s"
+   },
+   "blurb": "\"Shadow Dancing\" by Andy Gibb, released in 1978.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/f5/68/7e/f5687e90-15f2-5998-ab57-8f05ee38e057/mzaf_13425259342939072842.plus.aac.p.m4a",
+      "credit": "Andy Gibb: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/shadow-dancing/1442254032?i=1442254272&uo=4",
+      "apple": {
+       "trackId": 1442254272,
+       "url": "https://music.apple.com/us/album/shadow-dancing/1442254032?i=1442254272&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music114/v4/1e/67/e8/1e67e83d-674f-97bb-1059-8c2658e1694b/00602557881998.rgb.jpg/300x300bb.jpg",
+       "term": "Andy Gibb Shadow Dancing"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "night-fever-bee-gees",
+   "name": "Night Fever",
+   "group": "1970s",
+   "facts": {
+    "artist": "Bee Gees",
+    "year": 1977,
+    "decade": "1970s"
+   },
+   "blurb": "\"Night Fever\" by Bee Gees, released in 1977.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/91/86/6c/91866cb4-28e3-1d84-13f8-3f7eb098e113/mzaf_13718989237479764313.plus.aac.p.m4a",
+      "credit": "Bee Gees: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/night-fever/1442259177?i=1442259373&uo=4",
+      "apple": {
+       "trackId": 1442259373,
+       "url": "https://music.apple.com/us/album/night-fever/1442259177?i=1442259373&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music113/v4/45/db/1d/45db1dac-fe00-3681-b216-266deea6e4cc/17UM1IM26789.rgb.jpg/300x300bb.jpg",
+       "term": "Bee Gees Night Fever"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "le-freak-chic",
+   "name": "Le Freak",
+   "group": "1970s",
+   "facts": {
+    "artist": "Chic",
+    "year": 1978,
+    "decade": "1970s"
+   },
+   "blurb": "\"Le Freak\" by Chic, released in 1978.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/76/18/dd/7618dd92-b61f-65c7-a1a5-6d08dc7d8b2d/mzaf_10536878235644314919.plus.aac.p.m4a",
+      "credit": "Chic: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/le-freak-2018-remaster/1442990558?i=1442990560&uo=4",
+      "apple": {
+       "trackId": 1442990560,
+       "url": "https://music.apple.com/us/album/le-freak-2018-remaster/1442990558?i=1442990560&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music118/v4/23/5b/b2/235bb2c3-abaa-22e2-753d-afa8b1806dfe/603497853588.jpg/300x300bb.jpg",
+       "term": "Chic Le Freak"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "youre-the-one-that-i-want-john-travolta-and-olivia-newton-jo",
+   "name": "You're the One That I Want",
+   "group": "1970s",
+   "facts": {
+    "artist": "John Travolta & Olivia Newton-John",
+    "year": 1978,
+    "decade": "1970s"
+   },
+   "blurb": "\"You're the One That I Want\" by John Travolta & Olivia Newton-John, released in 1978.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/f0/c9/3a/f0c93aff-230f-a7f6-d1b6-37ebcc02d62c/mzaf_5514414658492873704.plus.aac.p.m4a",
+      "credit": "John Travolta & Olivia Newton-John: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/youre-the-one-that-i-want/1440844625?i=1440844700&uo=4",
+      "apple": {
+       "trackId": 1440844700,
+       "url": "https://music.apple.com/us/album/youre-the-one-that-i-want/1440844625?i=1440844700&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music125/v4/25/d5/dc/25d5dc67-bf45-6e42-510e-bcf6bcee1cda/00602547377951.rgb.jpg/300x300bb.jpg",
+       "term": "John Travolta & Olivia Newton-John You're the One That I Want"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "grease-frankie-valli",
+   "name": "Grease",
+   "group": "1970s",
+   "facts": {
+    "artist": "Frankie Valli",
+    "year": 1978,
+    "decade": "1970s"
+   },
+   "blurb": "\"Grease\" by Frankie Valli, released in 1978.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/51/d5/f5/51d5f532-aa85-dc2a-941a-1dbb2218a140/mzaf_9928285905198487282.plus.aac.p.m4a",
+      "credit": "Frankie Valli: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/grease/360749543?i=360749620&uo=4",
+      "apple": {
+       "trackId": 360749620,
+       "url": "https://music.apple.com/us/album/grease/360749543?i=360749620&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/3e/7f/2f/3e7f2f28-acec-d061-9a20-060cdb7f0656/mzi.gqdfphwb.jpg/300x300bb.jpg",
+       "term": "Frankie Valli Grease"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "i-will-survive-gloria-gaynor",
+   "name": "I Will Survive",
+   "group": "1970s",
+   "facts": {
+    "artist": "Gloria Gaynor",
+    "year": 1978,
+    "decade": "1970s"
+   },
+   "blurb": "\"I Will Survive\" by Gloria Gaynor, released in 1978.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/a1/11/66/a11166ea-7643-336c-db96-98ffcd874d57/mzaf_15521852895022689669.plus.aac.p.m4a",
+      "credit": "Gloria Gaynor: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/i-will-survive-extended-version/1475169095?i=1475169112&uo=4",
+      "apple": {
+       "trackId": 1475169112,
+       "url": "https://music.apple.com/us/album/i-will-survive-extended-version/1475169095?i=1475169112&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music126/v4/f8/89/3c/f8893ce7-260b-2d3f-a361-984158d5bf72/19UMGIM66006.rgb.jpg/300x300bb.jpg",
+       "term": "Gloria Gaynor I Will Survive"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "y-m-c-a-village-people",
+   "name": "Y.M.C.A.",
+   "alt": [
+    "YMCA"
+   ],
+   "group": "1970s",
+   "facts": {
+    "artist": "Village People",
+    "year": 1978,
+    "decade": "1970s"
+   },
+   "blurb": "\"Y.M.C.A.\" by Village People, released in 1978.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/94/72/87/94728713-09f4-ef88-fae9-af6d4ecfc403/mzaf_10291052222883938486.plus.aac.p.m4a",
+      "credit": "Village People: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/y-m-c-a-single-version/1440895349?i=1440895662&uo=4",
+      "apple": {
+       "trackId": 1440895662,
+       "url": "https://music.apple.com/us/album/y-m-c-a-single-version/1440895349?i=1440895662&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music114/v4/d6/53/60/d65360e0-5e02-595f-543a-2abb83d69dd9/17UMGIM08636.rgb.jpg/300x300bb.jpg",
+       "term": "Village People Y.M.C.A."
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "my-sharona-the-knack",
+   "name": "My Sharona",
+   "group": "1970s",
+   "facts": {
+    "artist": "The Knack",
+    "year": 1979,
+    "decade": "1970s"
+   },
+   "blurb": "\"My Sharona\" by The Knack, released in 1979.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/bf/7e/72/bf7e7202-35f4-e081-4219-f802450dd60a/mzaf_15190309208679198585.plus.aac.p.m4a",
+      "credit": "The Knack: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/my-sharona/716268020?i=716268684&uo=4",
+      "apple": {
+       "trackId": 716268684,
+       "url": "https://music.apple.com/us/album/my-sharona/716268020?i=716268684&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/d2/8c/a9/d28ca97f-f577-4bee-fb12-716570d076da/05099922669056.rgb.jpg/300x300bb.jpg",
+       "term": "The Knack My Sharona"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "hot-stuff-donna-summer",
+   "name": "Hot Stuff",
+   "group": "1970s",
+   "facts": {
+    "artist": "Donna Summer",
+    "year": 1979,
+    "decade": "1970s"
+   },
+   "blurb": "\"Hot Stuff\" by Donna Summer, released in 1979.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/33/3c/28/333c2803-51c5-4bc6-d841-3f36a22e8f1f/mzaf_7814669585703286529.plus.aac.p.m4a",
+      "credit": "Donna Summer: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/hot-stuff/6793735689?i=6793735690&uo=4",
+      "apple": {
+       "trackId": 6793735690,
+       "url": "https://music.apple.com/us/album/hot-stuff/6793735689?i=6793735690&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/10/07/f5/1007f5f4-71b2-6ba1-65e0-52e75b450980/602567826309_Cover.jpg/300x300bb.jpg",
+       "term": "Donna Summer Hot Stuff"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "ring-my-bell-anita-ward",
+   "name": "Ring My Bell",
+   "group": "1970s",
+   "facts": {
+    "artist": "Anita Ward",
+    "year": 1979,
+    "decade": "1970s"
+   },
+   "blurb": "\"Ring My Bell\" by Anita Ward, released in 1979.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/95/80/ce/9580ceda-8e14-5a49-c2de-8e34a247f8d2/mzaf_13039657559809236991.plus.aac.p.m4a",
+      "credit": "Anita Ward: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/ring-my-bell/1296251633?i=1296251642&uo=4",
+      "apple": {
+       "trackId": 1296251642,
+       "url": "https://music.apple.com/us/album/ring-my-bell/1296251633?i=1296251642&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/de/43/c1/de43c192-b66d-7f45-a60f-0db0368584ea/AnitaWard_RingMyBell.jpg/300x300bb.jpg",
+       "term": "Anita Ward Ring My Bell"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "heart-of-glass-blondie",
+   "name": "Heart of Glass",
+   "group": "1970s",
+   "facts": {
+    "artist": "Blondie",
+    "year": 1978,
+    "decade": "1970s"
+   },
+   "blurb": "\"Heart of Glass\" by Blondie, released in 1978.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/46/46/d8/4646d8fd-86d7-fbaa-c1e2-8e41fbe92618/mzaf_4475341847035934850.plus.aac.p.m4a",
+      "credit": "Blondie: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/heart-of-glass/1440929735?i=1440930363&uo=4",
+      "apple": {
+       "trackId": 1440930363,
+       "url": "https://music.apple.com/us/album/heart-of-glass/1440929735?i=1440930363&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/2f/0b/25/2f0b252d-838e-4f19-3c08-91e49b269564/15UMGIM18445.rgb.jpg/300x300bb.jpg",
+       "term": "Blondie Heart of Glass"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "dont-stop-til-you-get-enough-michael-jackson",
+   "name": "Don't Stop 'Til You Get Enough",
+   "group": "1970s",
+   "facts": {
+    "artist": "Michael Jackson",
+    "year": 1979,
+    "decade": "1970s"
+   },
+   "blurb": "\"Don't Stop 'Til You Get Enough\" by Michael Jackson, released in 1979.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/fe/39/d7/fe39d75c-155a-34eb-9745-313247dab08b/mzaf_15208351175821838859.plus.aac.p.m4a",
+      "credit": "Michael Jackson: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/dont-stop-til-you-get-enough/1883769984?i=1883770172&uo=4",
+      "apple": {
+       "trackId": 1883770172,
+       "url": "https://music.apple.com/us/album/dont-stop-til-you-get-enough/1883769984?i=1883770172&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/54/f2/ef/54f2ef79-c668-8d6f-28cd-ae48c45009b7/196874193211.jpg/300x300bb.jpg",
+       "term": "Michael Jackson Don't Stop 'Til You Get Enough"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "another-brick-in-the-wall-pt-2-pink-floyd",
+   "name": "Another Brick in the Wall, Pt. 2",
+   "group": "1970s",
+   "facts": {
+    "artist": "Pink Floyd",
+    "year": 1979,
+    "decade": "1970s"
+   },
+   "blurb": "\"Another Brick in the Wall, Pt. 2\" by Pink Floyd, released in 1979.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/8a/21/41/8a214193-f9e0-fbeb-aad5-6ca8b8420dbb/mzaf_2628810625325580575.plus.aac.p.m4a",
+      "credit": "Pink Floyd: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/another-brick-in-the-wall-pt-2/1065975633?i=1065975638&uo=4",
+      "apple": {
+       "trackId": 1065975638,
+       "url": "https://music.apple.com/us/album/another-brick-in-the-wall-pt-2/1065975633?i=1065975638&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/3e/17/ec/3e17ec6d-f980-c64f-19e0-a6fd8bbf0c10/886445635850.jpg/300x300bb.jpg",
+       "term": "Pink Floyd Another Brick In the Wall, Pt. 2"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  }
+ ],
+ "questions": [],
+ "sources": [
+  {
+   "name": "Billboard Year-End Hot 100 singles (1970–1979)",
+   "url": "https://en.wikipedia.org/wiki/Billboard_Year-End_Hot_100_singles_of_1970"
+  },
+  {
+   "name": "UK best-selling singles by year",
+   "url": "https://en.wikipedia.org/wiki/List_of_best-selling_singles_by_year_(UK)"
+  },
+  {
+   "name": "Apple iTunes Search API (previews, artwork, links)",
+   "url": "https://performance-partners.apple.com/search-api"
+  }
+ ],
+ "built": "2026-10-04"
+}

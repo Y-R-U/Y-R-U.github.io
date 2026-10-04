@@ -1,0 +1,2113 @@
+{
+ "id": "sharks",
+ "title": "Sharks",
+ "theme": "animals",
+ "icon": "🦈",
+ "kids": true,
+ "version": 1,
+ "leakExempt": [
+  "shark",
+  "sharks"
+ ],
+ "factsMeta": {
+  "lengthM": {
+   "type": "num",
+   "label": "Typical length",
+   "unit": "m",
+   "higherLabel": "Longer"
+  },
+  "danger": {
+   "type": "cat",
+   "label": "Danger to people",
+   "values": [
+    "Harmless",
+    "Bites if provoked",
+    "Dangerous",
+    "Potentially deadly"
+   ]
+  },
+  "habitat": {
+   "type": "cat",
+   "label": "Lives in"
+  },
+  "status": {
+   "type": "cat",
+   "label": "Conservation status (IUCN)",
+   "hard": true
+  }
+ },
+ "items": [
+  {
+   "id": "great-white-shark",
+   "name": "Great white shark",
+   "alt": [
+    "great white",
+    "white pointer",
+    "white shark"
+   ],
+   "sci": "Carcharodon carcharias",
+   "group": "mackerel shark",
+   "facts": {
+    "lengthM": 4.5,
+    "danger": "Potentially deadly",
+    "habitat": "Coasts",
+    "status": "Vulnerable"
+   },
+   "lookalikes": [
+    "shortfin-mako",
+    "sand-tiger-shark"
+   ],
+   "blurb": "The biggest predatory fish in the sea. It hunts seals and sometimes leaps right out of the water.",
+   "clues": [
+    "Family: Lamnidae.",
+    "Genus: Carcharodon.",
+    "It can sense the tiny electric fields of hidden animals.",
+    "Off South Africa it leaps clear of the water to catch seals.",
+    "It was the star of the film \"Jaws\".",
+    "Typical length: about 4.5 m.",
+    "It has killed people.",
+    "It lives in coastal waters.",
+    "It is responsible for more unprovoked bites on people than any other shark.",
+    "It is grey on top with a pale belly.",
+    "The answer has 3 words (5, 5, 5 letters).",
+    "It starts with the letter G."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/5289261/medium.jpeg",
+      "w": 500,
+      "h": 255,
+      "credit": "Adam J. Searcy",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/5289261"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/30351620/medium.jpg",
+      "w": 500,
+      "h": 282,
+      "credit": "biodiversitygr",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/30351620"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/325558501/medium.jpg",
+      "w": 425,
+      "h": 500,
+      "credit": "Cassidy Best",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/325558501"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "tiger-shark",
+   "name": "Tiger shark",
+   "sci": "Galeocerdo cuvier",
+   "group": "requiem shark",
+   "facts": {
+    "lengthM": 4,
+    "danger": "Potentially deadly",
+    "habitat": "Coasts",
+    "status": "Near threatened"
+   },
+   "lookalikes": [
+    "bull-shark"
+   ],
+   "blurb": "A big shark that eats almost anything, from turtles to tyres. Young ones have dark stripes.",
+   "clues": [
+    "Family: Galeocerdonidae.",
+    "Genus: Galeocerdo.",
+    "Number plates and tyres have been found in their stomachs.",
+    "It eats sea turtles, cracking their shells.",
+    "It is second only to the great white for bites on people.",
+    "Typical length: about 4 m.",
+    "It has killed people.",
+    "It lives in coastal waters.",
+    "Its stripes fade as it grows older.",
+    "It is named after a striped big cat.",
+    "The answer has 2 words (5, 5 letters).",
+    "It starts with the letter T."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/19051907/medium.jpg",
+      "w": 500,
+      "h": 281,
+      "credit": "Kris-Mikael Krister",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/19051907"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/587546933/medium.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Jay Brasher",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/587546933"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/15700602/medium.jpg",
+      "w": 500,
+      "h": 355,
+      "credit": "Georgina Jones",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/15700602"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "bull-shark",
+   "name": "Bull shark",
+   "sci": "Carcharhinus leucas",
+   "group": "requiem shark",
+   "facts": {
+    "lengthM": 2.4,
+    "danger": "Potentially deadly",
+    "habitat": "Coasts",
+    "status": "Vulnerable"
+   },
+   "lookalikes": [
+    "tiger-shark"
+   ],
+   "blurb": "A stocky shark that can live in fresh water as well as the sea. It swims far up rivers like the Amazon and Mississippi.",
+   "clues": [
+    "Family: Carcharhinidae.",
+    "Genus: Carcharhinus.",
+    "It has been found thousands of kilometres up the Amazon.",
+    "It lives in a lake in Nicaragua.",
+    "It can live in both salt water and fresh water.",
+    "Typical length: about 2.4 m.",
+    "It has killed people.",
+    "It lives in coastal waters.",
+    "It is stocky with a short, blunt snout.",
+    "It is named after a male cow.",
+    "The answer has 2 words (4, 5 letters).",
+    "It starts with the letter B."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/438498979/medium.jpeg",
+      "w": 500,
+      "h": 174,
+      "credit": "James-LaFontaine",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/438498979"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/43520885/medium.jpg",
+      "w": 500,
+      "h": 324,
+      "credit": "no rights reserved",
+      "license": "CC0 1.0",
+      "page": "https://www.inaturalist.org/photos/43520885"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/168237268/medium.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Ewout Knoester",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/168237268"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "oceanic-whitetip-shark",
+   "name": "Oceanic whitetip shark",
+   "sci": "Carcharhinus longimanus",
+   "group": "requiem shark",
+   "facts": {
+    "lengthM": 3,
+    "danger": "Potentially deadly",
+    "habitat": "Open ocean",
+    "status": "Critically endangered"
+   },
+   "blurb": "A bold shark of the open ocean with long, rounded, white-tipped fins. It is now critically endangered.",
+   "clues": [
+    "Its IUCN conservation status is \"Critically endangered\".",
+    "Family: Carcharhinidae.",
+    "Genus: Carcharhinus.",
+    "It was blamed for many deaths after ships sank in World War II.",
+    "Its fins are hugely valued for shark-fin soup.",
+    "Its pectoral fins are long and rounded.",
+    "Typical length: about 3 m.",
+    "It has killed people.",
+    "Its fins have pale tips.",
+    "The answer has 3 words (7, 8, 5 letters).",
+    "It starts with the letter O."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/70683499/medium.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Cvf-ps",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/70683499"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/60554251/medium.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Peterkoelbl",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/60554251"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/70683500/medium.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Alexander Vasenin",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/70683500"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "whale-shark",
+   "name": "Whale shark",
+   "sci": "Rhincodon typus",
+   "group": "carpet shark",
+   "facts": {
+    "lengthM": 10,
+    "danger": "Harmless",
+    "habitat": "Open ocean"
+   },
+   "lookalikes": [
+    "basking-shark"
+   ],
+   "blurb": "The biggest fish in the world. It is gentle and eats tiny plankton.",
+   "clues": [
+    "Family: Rhincodontidae.",
+    "Genus: Rhincodon.",
+    "Divers swim with it at Ningaloo Reef.",
+    "Each one has a unique pattern of spots.",
+    "It filters plankton from the water.",
+    "Typical length: about 10 m.",
+    "It is harmless to people.",
+    "It lives in the open ocean.",
+    "It is the largest fish on Earth.",
+    "It is named after the largest kind of sea mammal.",
+    "The answer has 2 words (5, 5 letters).",
+    "It starts with the letter W."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/229381770/medium.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Daniel Benák",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/229381770"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/335706911/medium.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Zac Wolf",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/335706911"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/90242284/medium.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Shaunak Modi",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/90242284"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "basking-shark",
+   "name": "Basking shark",
+   "sci": "Cetorhinus maximus",
+   "group": "mackerel shark",
+   "facts": {
+    "lengthM": 8,
+    "danger": "Harmless",
+    "habitat": "Coasts"
+   },
+   "lookalikes": [
+    "whale-shark",
+    "megamouth-shark"
+   ],
+   "blurb": "The second-largest fish in the world. It swims slowly with its huge mouth wide open to filter plankton.",
+   "clues": [
+    "Family: Cetorhinidae.",
+    "Genus: Cetorhinus.",
+    "It is common off the coasts of Cornwall and Scotland in summer.",
+    "Its gill slits almost circle its head.",
+    "It swims with its huge mouth wide open.",
+    "Typical length: about 8 m.",
+    "It is harmless to people.",
+    "It lives in coastal waters.",
+    "It is the second-largest fish in the world.",
+    "It is named after lying in the sun.",
+    "The answer has 2 words (7, 5 letters).",
+    "It starts with the letter B."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/73724669/medium.jpg",
+      "w": 500,
+      "h": 281,
+      "credit": "Fábio Olmos",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/73724669"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/204425017/medium.jpg",
+      "w": 500,
+      "h": 493,
+      "credit": "Sandra Keller",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/204425017"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/432986602/medium.jpeg",
+      "w": 281,
+      "h": 500,
+      "credit": "Sidonio Paes",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/432986602"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "megamouth-shark",
+   "name": "Megamouth shark",
+   "sci": "Megachasma pelagios",
+   "group": "mackerel shark",
+   "facts": {
+    "lengthM": 5,
+    "danger": "Harmless",
+    "habitat": "Deep sea",
+    "status": "Least concern"
+   },
+   "lookalikes": [
+    "basking-shark"
+   ],
+   "blurb": "A rare filter-feeding shark first found in 1976, when one got tangled in a ship's anchor off Hawaii.",
+   "clues": [
+    "Family: Megachasmidae.",
+    "Genus: Megachasma.",
+    "It was unknown to science until 1976.",
+    "Only a few hundred have ever been seen.",
+    "It rises at night to feed on shrimp-like krill.",
+    "Typical length: about 5 m.",
+    "It is harmless to people.",
+    "It lives in the deep sea.",
+    "Its head is large and rounded.",
+    "Its name means big mouth.",
+    "The answer has 2 words (9, 5 letters).",
+    "It starts with the letter M."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/563057612/medium.jpg",
+      "w": 500,
+      "h": 500,
+      "credit": "opencage",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/563057612"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/438047600/medium.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "GordonMakryllos",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/438047600"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/438047617/medium.jpg",
+      "w": 500,
+      "h": 224,
+      "credit": "OpenCage",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/438047617"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "great-hammerhead",
+   "name": "Great hammerhead",
+   "alt": [
+    "great hammerhead shark"
+   ],
+   "sci": "Sphyrna mokarran",
+   "group": "hammerhead",
+   "facts": {
+    "lengthM": 4,
+    "danger": "Dangerous",
+    "habitat": "Coasts",
+    "status": "Critically endangered"
+   },
+   "lookalikes": [
+    "scalloped-hammerhead",
+    "bonnethead"
+   ],
+   "blurb": "The biggest hammerhead. Its wide, flat head helps it find stingrays hiding in the sand.",
+   "clues": [
+    "Family: Sphyrnidae.",
+    "Genus: Sphyrna.",
+    "It eats stingrays and is not bothered by their stings.",
+    "Its tall dorsal fin is shaped like a sickle.",
+    "Its wide head spreads out its senses like a metal detector.",
+    "Typical length: about 4 m.",
+    "It has bitten people unprovoked.",
+    "It lives in coastal waters.",
+    "It is the largest of its kind.",
+    "Its head is shaped like a tool for hitting nails.",
+    "The answer has 2 words (5, 10 letters).",
+    "It starts with the letter G."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/86554863/medium.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Jake Mohan",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/86554863"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/471864928/medium.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Dan Schofield",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/471864928"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/353767237/medium.jpg",
+      "w": 500,
+      "h": 500,
+      "credit": "Robin White",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/353767237"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "scalloped-hammerhead",
+   "name": "Scalloped hammerhead",
+   "sci": "Sphyrna lewini",
+   "group": "hammerhead",
+   "facts": {
+    "lengthM": 3,
+    "danger": "Bites if provoked",
+    "habitat": "Coasts",
+    "status": "Critically endangered"
+   },
+   "lookalikes": [
+    "great-hammerhead"
+   ],
+   "blurb": "A hammerhead that gathers in huge schools around underwater mountains, such as near the Galápagos.",
+   "clues": [
+    "Family: Sphyrnidae.",
+    "Genus: Sphyrna.",
+    "Hundreds gather near the Galápagos and Cocos Island.",
+    "It is critically endangered.",
+    "The front edge of its head has a wavy outline.",
+    "Typical length: about 3 m.",
+    "It only bites people if provoked.",
+    "It lives in coastal waters.",
+    "It forms big schools by day.",
+    "Its head is shaped like a T-shaped tool.",
+    "The answer has 2 words (9, 10 letters).",
+    "It starts with the letter S."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/86555463/medium.jpeg",
+      "w": 500,
+      "h": 281,
+      "credit": "Kris Mikael Krister",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/86555463"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/253901905/medium.jpeg",
+      "w": 500,
+      "h": 379,
+      "credit": "ecovore",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/253901905"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/31652382/medium.jpeg",
+      "w": 500,
+      "h": 375,
+      "credit": "coenobita",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/31652382"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "bonnethead",
+   "name": "Bonnethead",
+   "alt": [
+    "bonnethead shark"
+   ],
+   "sci": "Sphyrna tiburo",
+   "group": "hammerhead",
+   "facts": {
+    "lengthM": 0.9,
+    "danger": "Harmless",
+    "habitat": "Coasts"
+   },
+   "lookalikes": [
+    "great-hammerhead"
+   ],
+   "blurb": "A small hammerhead with a rounded, shovel-shaped head. It is the only shark known to eat a lot of seagrass.",
+   "clues": [
+    "Family: Sphyrnidae.",
+    "Genus: Sphyrna.",
+    "It can digest seagrass.",
+    "Females can reproduce without males.",
+    "It is one of the smallest hammerheads.",
+    "Typical length: about 90 cm.",
+    "It is harmless to people.",
+    "It lives in coastal waters.",
+    "Its head is rounded like a shovel.",
+    "It is named after an old-fashioned hat.",
+    "The answer is one word of 10 letters.",
+    "It starts with the letter B."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/251717685/medium.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Will Pittenger",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/251717685"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/342735870/medium.jpeg",
+      "w": 500,
+      "h": 375,
+      "credit": "Quinn",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/342735870"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/405405485/medium.jpg",
+      "w": 500,
+      "h": 281,
+      "credit": "Sawyer Baran",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/405405485"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "shortfin-mako",
+   "name": "Shortfin mako",
+   "alt": [
+    "mako shark",
+    "mako"
+   ],
+   "sci": "Isurus oxyrinchus",
+   "group": "mackerel shark",
+   "facts": {
+    "lengthM": 3.2,
+    "danger": "Dangerous",
+    "habitat": "Open ocean"
+   },
+   "lookalikes": [
+    "great-white-shark"
+   ],
+   "blurb": "The fastest shark in the sea, with bursts of over 50 km/h. It can leap high out of the water.",
+   "clues": [
+    "Family: Lamnidae.",
+    "Genus: Isurus.",
+    "It is a close relative of the great white.",
+    "It can leap several metres out of the water.",
+    "It is prized by sport fishers.",
+    "Typical length: about 3.2 m.",
+    "It has bitten people unprovoked.",
+    "It lives in the open ocean.",
+    "It has a bright metallic blue back.",
+    "It is the fastest shark.",
+    "The answer has 2 words (8, 4 letters).",
+    "It starts with the letter S."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/74638241/medium.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Fábio Olmos",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/74638241"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/732287708/medium.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "出羽雀台",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/732287708"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/30369448/medium.jpg",
+      "w": 500,
+      "h": 500,
+      "credit": "biodiversitygr",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/30369448"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "blue-shark",
+   "name": "Blue shark",
+   "sci": "Prionace glauca",
+   "group": "requiem shark",
+   "facts": {
+    "lengthM": 3,
+    "danger": "Dangerous",
+    "habitat": "Open ocean",
+    "status": "Near threatened"
+   },
+   "blurb": "A slim, long-finned shark of the open ocean that crosses whole oceans. Millions are caught each year.",
+   "clues": [
+    "Family: Carcharhinidae.",
+    "Genus: Prionace.",
+    "It migrates right across the Atlantic.",
+    "Millions are caught each year for fins and meat.",
+    "It has very long pectoral fins.",
+    "Typical length: about 3 m.",
+    "It has bitten people unprovoked.",
+    "It lives in the open ocean.",
+    "It is slim with big eyes.",
+    "Its back is a deep indigo colour.",
+    "The answer has 2 words (4, 5 letters).",
+    "It starts with the letter B."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/358688436/medium.jpg",
+      "w": 500,
+      "h": 351,
+      "credit": "Patrick Doll",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/358688436"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/92126694/medium.jpeg",
+      "w": 500,
+      "h": 335,
+      "credit": "Marion Kraschl",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/92126694"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/660564942/medium.jpg",
+      "w": 238,
+      "h": 500,
+      "credit": "Alidz31",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/660564942"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "thresher-shark",
+   "name": "Thresher shark",
+   "alt": [
+    "common thresher"
+   ],
+   "sci": "Alopias vulpinus",
+   "group": "mackerel shark",
+   "facts": {
+    "lengthM": 5,
+    "danger": "Harmless",
+    "habitat": "Open ocean",
+    "status": "Vulnerable"
+   },
+   "blurb": "A shark whose tail can be as long as its body. It whips its tail to stun fish.",
+   "clues": [
+    "Family: Alopiidae.",
+    "Genus: Alopias.",
+    "Its scientific name means \"fox\".",
+    "Its upper tail fin can be as long as its body.",
+    "It stuns fish by slapping them with its tail.",
+    "Typical length: about 5 m.",
+    "It is harmless to people.",
+    "It lives in the open ocean.",
+    "It has been seen leaping clear of the water.",
+    "It is named after beating grain to separate it.",
+    "The answer has 2 words (8, 5 letters).",
+    "It starts with the letter T."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/242252421/medium.jpg",
+      "w": 366,
+      "h": 500,
+      "credit": "alicia penney",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/242252421"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/1181941/medium.jpg",
+      "w": 375,
+      "h": 500,
+      "credit": "Jon Sullivan",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/1181941"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/242255842/medium.jpeg",
+      "w": 500,
+      "h": 375,
+      "credit": "alicia penney",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/242255842"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "greenland-shark",
+   "name": "Greenland shark",
+   "sci": "Somniosus microcephalus",
+   "group": "sleeper shark",
+   "facts": {
+    "lengthM": 5,
+    "danger": "Harmless",
+    "habitat": "Deep sea",
+    "status": "Vulnerable"
+   },
+   "blurb": "A slow shark of icy Arctic waters that may live for 250 to 500 years, longer than any other animal with a backbone.",
+   "clues": [
+    "Family: Somniosidae.",
+    "Genus: Somniosus.",
+    "It may live for more than 250 years.",
+    "It swims at under 3 km/h.",
+    "Its flesh is poisonous unless it is dried for months.",
+    "Typical length: about 5 m.",
+    "It is harmless to people.",
+    "It lives in the deep sea.",
+    "A tiny animal often hangs from its eyes.",
+    "It lives in the icy North Atlantic and Arctic.",
+    "The answer has 2 words (9, 5 letters).",
+    "It starts with the letter G."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/62876037/medium.jpg",
+      "w": 500,
+      "h": 334,
+      "credit": "Hemming1952",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/62876037"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/62876039/medium.jpg",
+      "w": 500,
+      "h": 334,
+      "credit": "Julian Idrobo",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/62876039"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/446406287/medium.jpeg",
+      "w": 500,
+      "h": 375,
+      "credit": "Julien Savoie",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/446406287"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "goblin-shark",
+   "name": "Goblin shark",
+   "sci": "Mitsukurina owstoni",
+   "group": "mackerel shark",
+   "facts": {
+    "lengthM": 3.5,
+    "danger": "Harmless",
+    "habitat": "Deep sea",
+    "status": "Least concern"
+   },
+   "blurb": "A strange pink deep-sea shark with a long flat snout. Its jaws shoot forward to catch prey.",
+   "clues": [
+    "Family: Mitsukurinidae.",
+    "Genus: Mitsukurina.",
+    "It is called a \"living fossil\".",
+    "Its jaws shoot forward like a catapult.",
+    "Its skin is pinkish.",
+    "Typical length: about 3.5 m.",
+    "It is harmless to people.",
+    "It lives in the deep sea.",
+    "It has a long, flat, blade-like snout.",
+    "It is named after a creature from folk tales.",
+    "The answer has 2 words (6, 5 letters).",
+    "It starts with the letter G."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/53695137/medium.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "anonymous",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/53695137"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "frilled-shark",
+   "name": "Frilled shark",
+   "sci": "Chlamydoselachus anguineus",
+   "group": "frilled shark",
+   "facts": {
+    "lengthM": 1.5,
+    "danger": "Harmless",
+    "habitat": "Deep sea",
+    "status": "Least concern"
+   },
+   "blurb": "An eel-like deep-sea shark with frilly gills and 300 needle-like teeth. It has changed little in millions of years.",
+   "clues": [
+    "Family: Chlamydoselachidae.",
+    "Genus: Chlamydoselachus.",
+    "Its pregnancy may last over three years.",
+    "It has about 300 three-pointed teeth.",
+    "It is long and thin like an eel.",
+    "Typical length: about 1.5 m.",
+    "It is harmless to people.",
+    "It lives in the deep sea.",
+    "It lives deep in the ocean.",
+    "Its gills have ruffled edges.",
+    "The answer has 2 words (7, 5 letters).",
+    "It starts with the letter F."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/69990809/medium.jpg",
+      "w": 500,
+      "h": 202,
+      "credit": "anonymous",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/69990809"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/3049851/medium.JPG",
+      "w": 500,
+      "h": 333,
+      "credit": "Duarte Frade",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/3049851"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "port-jackson-shark",
+   "name": "Port Jackson shark",
+   "sci": "Heterodontus portusjacksoni",
+   "group": "bullhead shark",
+   "facts": {
+    "lengthM": 1.3,
+    "danger": "Harmless",
+    "habitat": "Coasts",
+    "status": "Least concern"
+   },
+   "blurb": "A blunt-headed shark of southern Australia that crunches sea urchins with flat teeth. Its eggs are spiral-shaped.",
+   "clues": [
+    "Family: Heterodontidae.",
+    "Genus: Heterodontus.",
+    "Its egg cases are screw-shaped.",
+    "It crushes sea urchins with flat back teeth.",
+    "It has a dark harness-shaped pattern.",
+    "Typical length: about 1.3 m.",
+    "It is harmless to people.",
+    "It lives in coastal waters.",
+    "It lives in southern Australia.",
+    "It is named after Sydney Harbour.",
+    "The answer has 3 words (4, 7, 5 letters).",
+    "It starts with the letter P."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/553150641/medium.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Lawrence Hylton",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/553150641"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/533158552/medium.jpg",
+      "w": 375,
+      "h": 500,
+      "credit": "Josh Nitschke",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/533158552"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/90570698/medium.jpg",
+      "w": 375,
+      "h": 500,
+      "credit": "Thomas Mesaglio",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/90570698"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "spotted-wobbegong",
+   "name": "Spotted wobbegong",
+   "alt": [
+    "wobbegong"
+   ],
+   "sci": "Orectolobus maculatus",
+   "group": "carpet shark",
+   "facts": {
+    "lengthM": 1.7,
+    "danger": "Bites if provoked",
+    "habitat": "Coasts",
+    "status": "Least concern"
+   },
+   "blurb": "A flat, patterned shark that lies on the sea floor in Australia. Weedy flaps around its mouth help it hide.",
+   "clues": [
+    "Its IUCN conservation status is \"Least concern\".",
+    "Family: Orectolobidae.",
+    "Genus: Orectolobus.",
+    "Its name is thought to mean \"shaggy beard\".",
+    "It has weed-like flaps around its mouth.",
+    "It lies still on the sea floor waiting for fish.",
+    "Typical length: about 1.7 m.",
+    "It only bites people if provoked.",
+    "It lives in coastal waters.",
+    "It bites people who step on it.",
+    "The answer has 2 words (7, 9 letters).",
+    "It starts with the letter S."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/466454652/medium.jpg",
+      "w": 375,
+      "h": 500,
+      "credit": "Sockrosma",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/466454652"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/101185477/medium.jpeg",
+      "w": 500,
+      "h": 375,
+      "credit": "no rights reserved",
+      "license": "CC0 1.0",
+      "page": "https://www.inaturalist.org/photos/101185477"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/485835072/medium.jpg",
+      "w": 500,
+      "h": 334,
+      "credit": "Lawrence Hylton",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/485835072"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "lemon-shark",
+   "name": "Lemon shark",
+   "sci": "Negaprion brevirostris",
+   "group": "requiem shark",
+   "facts": {
+    "lengthM": 2.6,
+    "danger": "Bites if provoked",
+    "habitat": "Coasts",
+    "status": "Vulnerable"
+   },
+   "blurb": "A shark of shallow mangrove coasts. Young ones grow up in mangrove nurseries such as Bimini in the Bahamas.",
+   "clues": [
+    "Family: Carcharhinidae.",
+    "Genus: Negaprion.",
+    "It is one of the best-studied sharks.",
+    "Its pups grow up in mangroves at Bimini.",
+    "It has two dorsal fins of almost the same size.",
+    "Typical length: about 2.6 m.",
+    "It only bites people if provoked.",
+    "It lives in coastal waters.",
+    "It lives in shallow water.",
+    "It is named for its yellowish colour, like a citrus fruit.",
+    "The answer has 2 words (5, 5 letters).",
+    "It starts with the letter L."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/70552759/medium.jpg",
+      "w": 500,
+      "h": 313,
+      "credit": "Albert kok",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/70552759"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/62048233/medium.jpeg",
+      "w": 500,
+      "h": 281,
+      "credit": "Chris Quirin",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/62048233"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/71528231/medium.jpg",
+      "w": 375,
+      "h": 500,
+      "credit": "John William Bailly",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/71528231"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "nurse-shark",
+   "name": "Nurse shark",
+   "sci": "Ginglymostoma cirratum",
+   "group": "carpet shark",
+   "facts": {
+    "lengthM": 2.5,
+    "danger": "Bites if provoked",
+    "habitat": "Coasts",
+    "status": "Vulnerable"
+   },
+   "blurb": "A slow shark that rests on the sea floor by day and sucks prey out of holes. Divers often see it sleeping in piles.",
+   "clues": [
+    "Family: Ginglymostomatidae.",
+    "Genus: Ginglymostoma.",
+    "It sucks prey out of holes like a vacuum cleaner.",
+    "It can pump water over its gills while resting.",
+    "It has two whiskers under its snout.",
+    "Typical length: about 2.5 m.",
+    "It only bites people if provoked.",
+    "It lives in coastal waters.",
+    "It rests on the sea floor in groups.",
+    "It shares its name with someone who works in a hospital.",
+    "The answer has 2 words (5, 5 letters).",
+    "It starts with the letter N."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/379827271/medium.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "R Vasconcellos",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/379827271"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/95362085/medium.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Gary Rinaldi",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/95362085"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/179498581/medium.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Pauline Walsh Jacobson",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/179498581"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "blacktip-reef-shark",
+   "name": "Blacktip reef shark",
+   "sci": "Carcharhinus melanopterus",
+   "group": "requiem shark",
+   "facts": {
+    "lengthM": 1.4,
+    "danger": "Bites if provoked",
+    "habitat": "Coral reefs",
+    "status": "Vulnerable"
+   },
+   "lookalikes": [
+    "whitetip-reef-shark",
+    "grey-reef-shark"
+   ],
+   "blurb": "A small reef shark often seen in very shallow water, with its black-tipped fin above the surface.",
+   "clues": [
+    "Its IUCN conservation status is \"Vulnerable\".",
+    "Family: Carcharhinidae.",
+    "Genus: Carcharhinus.",
+    "It often swims in water only knee-deep.",
+    "Its dorsal fin often sticks out of the water.",
+    "Typical length: about 1.4 m.",
+    "It only bites people if provoked.",
+    "Its fins have dark tips.",
+    "The answer has 3 words (8, 4, 5 letters).",
+    "It starts with the letter B."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/87114974/medium.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Leon Brocard",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/87114974"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/300415741/medium.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Pauline Walsh Jacobson",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/300415741"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/300415730/medium.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Pauline Walsh Jacobson",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/300415730"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "whitetip-reef-shark",
+   "name": "Whitetip reef shark",
+   "sci": "Triaenodon obesus",
+   "group": "requiem shark",
+   "facts": {
+    "lengthM": 1.6,
+    "danger": "Harmless",
+    "habitat": "Coral reefs",
+    "status": "Vulnerable"
+   },
+   "lookalikes": [
+    "blacktip-reef-shark",
+    "oceanic-whitetip-shark"
+   ],
+   "blurb": "A slender reef shark that rests in caves by day and hunts in reef crevices at night.",
+   "clues": [
+    "Its IUCN conservation status is \"Vulnerable\".",
+    "Family: Carcharhinidae.",
+    "Genus: Triaenodon.",
+    "It can rest still on the bottom, unlike many sharks.",
+    "It hunts in groups at night.",
+    "It squeezes into crevices after fish.",
+    "Typical length: about 1.6 m.",
+    "It is harmless to people.",
+    "Its fins have pale tips.",
+    "The answer has 3 words (8, 4, 5 letters).",
+    "It starts with the letter W."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/229382841/medium.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Daniel Benák",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/229382841"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/5709037/medium.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Doug Macaulay",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/5709037"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/463941600/medium.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Ewout Knoester",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/463941600"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "grey-reef-shark",
+   "name": "Grey reef shark",
+   "sci": "Carcharhinus amblyrhynchos",
+   "group": "requiem shark",
+   "facts": {
+    "lengthM": 1.8,
+    "danger": "Bites if provoked",
+    "habitat": "Coral reefs"
+   },
+   "lookalikes": [
+    "blacktip-reef-shark"
+   ],
+   "blurb": "A common shark of Indo-Pacific coral reefs. When threatened, it hunches its back and swims in a stiff, jerky way.",
+   "clues": [
+    "Family: Carcharhinidae.",
+    "Genus: Carcharhinus.",
+    "Its threat display is a hunched, jerky swim.",
+    "Its tail has a black rear edge.",
+    "Typical length: about 1.8 m.",
+    "It only bites people if provoked.",
+    "Its colour is between black and white.",
+    "The answer has 3 words (4, 4, 5 letters).",
+    "It starts with the letter G."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/343594696/medium.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "cello caruso-turiello",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/343594696"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/368050138/medium.jpeg",
+      "w": 500,
+      "h": 375,
+      "credit": "Debra Baker",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/368050138"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/343618923/medium.jpg",
+      "w": 432,
+      "h": 500,
+      "credit": "norcalmc",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/343618923"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "zebra-shark",
+   "name": "Zebra shark",
+   "sci": "Stegostoma tigrinum",
+   "group": "carpet shark",
+   "facts": {
+    "lengthM": 2.2,
+    "danger": "Harmless",
+    "habitat": "Coral reefs"
+   },
+   "blurb": "A gentle reef shark with ridges along its body. Young ones are striped, but adults are spotted.",
+   "clues": [
+    "Family: Stegostomatidae.",
+    "Genus: Stegostoma.",
+    "Females have reproduced without males in aquariums.",
+    "It has ridges running along its body.",
+    "Its tail is about half its length.",
+    "Typical length: about 2.2 m.",
+    "It is harmless to people.",
+    "It lives around coral reefs.",
+    "Adults are spotted, but babies are striped.",
+    "It is named after a striped African animal.",
+    "The answer has 2 words (5, 5 letters).",
+    "It starts with the letter Z."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/541321728/medium.jpg",
+      "w": 500,
+      "h": 438,
+      "credit": "陳德範（Chen, De-Fan）",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/541321728"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/60848973/medium.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Kai Squires",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/60848973"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/577251304/medium.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Daniel Eisenhauer",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/577251304"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "epaulette-shark",
+   "name": "Epaulette shark",
+   "sci": "Hemiscyllium ocellatum",
+   "group": "carpet shark",
+   "facts": {
+    "lengthM": 0.8,
+    "danger": "Harmless",
+    "habitat": "Coral reefs",
+    "status": "Least concern"
+   },
+   "blurb": "A small reef shark that can \"walk\" on its fins across rock pools and survive for hours with little oxygen.",
+   "clues": [
+    "Family: Hemiscylliidae.",
+    "Genus: Hemiscyllium.",
+    "It can survive hours with very little oxygen.",
+    "It lives on the Great Barrier Reef.",
+    "It walks on its fins across rock pools.",
+    "Typical length: about 80 cm.",
+    "It is harmless to people.",
+    "It lives around coral reefs.",
+    "It has a big black spot behind each front fin.",
+    "It is named after a shoulder decoration on uniforms.",
+    "The answer has 2 words (9, 5 letters).",
+    "It starts with the letter E."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/84588251/medium.jpg",
+      "w": 500,
+      "h": 332,
+      "credit": "Anne Hoggett / Lizard Island Research Station",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/84588251"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/14942342/medium.jpeg",
+      "w": 500,
+      "h": 333,
+      "credit": "coenobita",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/14942342"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/578764809/medium.jpg",
+      "w": 500,
+      "h": 334,
+      "credit": "Daniel Eisenhauer",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/578764809"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "cookiecutter-shark",
+   "name": "Cookiecutter shark",
+   "sci": "Isistius brasiliensis",
+   "group": "dogfish shark",
+   "facts": {
+    "lengthM": 0.45,
+    "danger": "Harmless",
+    "habitat": "Deep sea",
+    "status": "Least concern"
+   },
+   "blurb": "A small shark that bites round plugs of flesh out of whales, big fish and even submarines.",
+   "clues": [
+    "Family: Dalatiidae.",
+    "Genus: Isistius.",
+    "It has bitten submarines' rubber parts.",
+    "Its belly glows in the dark.",
+    "It bites round chunks out of whales and dolphins.",
+    "Typical length: about 45 cm.",
+    "It is harmless to people.",
+    "It lives in the deep sea.",
+    "It is only about half a metre long.",
+    "It is named after a baking tool.",
+    "The answer has 2 words (12, 5 letters).",
+    "It starts with the letter C."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/227050924/medium.jpg",
+      "w": 423,
+      "h": 500,
+      "credit": "Cricket Raspet",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/227050924"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/200683776/medium.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Cricket Raspet",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/200683776"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/423690769/medium.jpeg",
+      "w": 375,
+      "h": 500,
+      "credit": "no rights reserved",
+      "license": "CC0 1.0",
+      "page": "https://www.inaturalist.org/photos/423690769"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "spiny-dogfish",
+   "name": "Spiny dogfish",
+   "sci": "Squalus acanthias",
+   "group": "dogfish shark",
+   "facts": {
+    "lengthM": 1,
+    "danger": "Harmless",
+    "habitat": "Coasts",
+    "status": "Vulnerable"
+   },
+   "blurb": "A small shark with a sharp spine in front of each dorsal fin. Its pregnancy lasts nearly two years.",
+   "clues": [
+    "Its IUCN conservation status is \"Vulnerable\".",
+    "Family: Squalidae.",
+    "Genus: Squalus.",
+    "Its pregnancy lasts about two years.",
+    "It may live for over 50 years.",
+    "It was widely sold as fish and chips.",
+    "Typical length: about 1 m.",
+    "It is harmless to people.",
+    "It lives in coastal waters.",
+    "Its name is partly a pet animal.",
+    "The answer has 2 words (5, 7 letters).",
+    "It starts with the letter S."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/86554426/medium.jpg",
+      "w": 500,
+      "h": 335,
+      "credit": "Ecomare/Salko de Wolf",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/86554426"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/190530813/medium.jpg",
+      "w": 375,
+      "h": 500,
+      "credit": "Uwe Schneehagen",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/190530813"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/102351331/medium.jpeg",
+      "w": 500,
+      "h": 335,
+      "credit": "Zihao Wang",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/102351331"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "sand-tiger-shark",
+   "name": "Sand tiger shark",
+   "alt": [
+    "grey nurse shark",
+    "ragged-tooth shark"
+   ],
+   "sci": "Carcharias taurus",
+   "group": "mackerel shark",
+   "facts": {
+    "lengthM": 2.5,
+    "danger": "Bites if provoked",
+    "habitat": "Coasts",
+    "status": "Critically endangered"
+   },
+   "lookalikes": [
+    "great-white-shark"
+   ],
+   "blurb": "A fierce-looking but calm shark with ragged teeth. In Australia it is called the grey nurse shark.",
+   "clues": [
+    "Its IUCN conservation status is \"Critically endangered\".",
+    "Family: Carchariidae.",
+    "Genus: Carcharias.",
+    "The biggest unborn pup eats its brothers and sisters in the womb.",
+    "It gulps air to float without moving.",
+    "Its crooked teeth stick out of its mouth.",
+    "Typical length: about 2.5 m.",
+    "It only bites people if provoked.",
+    "It lives in coastal waters.",
+    "The answer has 3 words (4, 5, 5 letters).",
+    "It starts with the letter S."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/597220264/medium.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Ventus55",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/597220264"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/441886621/medium.jpg",
+      "w": 500,
+      "h": 334,
+      "credit": "Georgina Jones",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/441886621"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/112889377/medium.jpeg",
+      "w": 500,
+      "h": 375,
+      "credit": "Rukaya Johaadien",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/112889377"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "angelshark",
+   "name": "Angelshark",
+   "alt": [
+    "angel shark"
+   ],
+   "sci": "Squatina squatina",
+   "group": "angel shark",
+   "facts": {
+    "lengthM": 1.5,
+    "danger": "Bites if provoked",
+    "habitat": "Coasts",
+    "status": "Critically endangered"
+   },
+   "blurb": "A flat shark that buries itself in sand and ambushes fish. It is critically endangered in Europe.",
+   "clues": [
+    "Family: Squatinidae.",
+    "Genus: Squatina.",
+    "The Canary Islands are one of its last strongholds.",
+    "It is critically endangered.",
+    "It buries itself in sand to ambush fish.",
+    "Typical length: about 1.5 m.",
+    "It only bites people if provoked.",
+    "It lives in coastal waters.",
+    "It is flat like a ray.",
+    "Its fins spread out like wings.",
+    "The answer is one word of 10 letters.",
+    "It starts with the letter A."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/254848662/medium.jpeg",
+      "w": 500,
+      "h": 373,
+      "credit": "Ben Jobson",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/254848662"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/466779464/medium.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Michael Bommerer",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/466779464"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/347191734/medium.jpeg",
+      "w": 500,
+      "h": 333,
+      "credit": "Michael Bommerer",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/347191734"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "silky-shark",
+   "name": "Silky shark",
+   "sci": "Carcharhinus falciformis",
+   "group": "requiem shark",
+   "facts": {
+    "lengthM": 2.5,
+    "danger": "Dangerous",
+    "habitat": "Open ocean",
+    "status": "Vulnerable"
+   },
+   "blurb": "A slender ocean shark with smooth, satiny skin. It often gathers around floating objects at sea.",
+   "clues": [
+    "Family: Carcharhinidae.",
+    "Genus: Carcharhinus.",
+    "It often follows schools of tuna.",
+    "It gathers under floating logs and buoys.",
+    "It is one of the most common ocean sharks.",
+    "Typical length: about 2.5 m.",
+    "It has bitten people unprovoked.",
+    "It lives in the open ocean.",
+    "It is slim with a rounded snout.",
+    "Its skin feels smooth, like a soft fabric.",
+    "The answer has 2 words (5, 5 letters).",
+    "It starts with the letter S."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/170832075/medium.jpeg",
+      "w": 500,
+      "h": 375,
+      "credit": "José Francisco Colorado-Dapa",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/170832075"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/17635551/medium.jpg",
+      "w": 375,
+      "h": 500,
+      "credit": "Bill Levine",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/17635551"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/58234987/medium.jpeg",
+      "w": 375,
+      "h": 500,
+      "credit": "Martín Sánchez Vilchis",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/58234987"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "leopard-shark",
+   "name": "Leopard shark",
+   "sci": "Triakis semifasciata",
+   "group": "houndshark",
+   "facts": {
+    "lengthM": 1.5,
+    "danger": "Harmless",
+    "habitat": "Coasts",
+    "status": "Least concern"
+   },
+   "blurb": "A spotted shark of the Pacific coast of North America. Schools gather in warm, shallow bays.",
+   "clues": [
+    "Family: Triakidae.",
+    "Genus: Triakis.",
+    "Pregnant females gather in warm shallow water at La Jolla.",
+    "It lives off California.",
+    "It eats clams, crabs and worms.",
+    "Typical length: about 1.5 m.",
+    "It is harmless to people.",
+    "It lives in coastal waters.",
+    "It has dark saddle-shaped spots.",
+    "It is named after a spotted big cat.",
+    "The answer has 2 words (7, 5 letters).",
+    "It starts with the letter L."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/520058155/medium.jpg",
+      "w": 500,
+      "h": 287,
+      "credit": "Mfield",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/520058155"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/22868665/medium.jpg",
+      "w": 500,
+      "h": 309,
+      "credit": "Brian Gratwicke",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/22868665"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/51346720/medium.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "dmoders",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/51346720"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "small-spotted-catshark",
+   "name": "Small-spotted catshark",
+   "alt": [
+    "lesser spotted dogfish"
+   ],
+   "sci": "Scyliorhinus canicula",
+   "group": "catshark",
+   "facts": {
+    "lengthM": 0.6,
+    "danger": "Harmless",
+    "habitat": "Coasts",
+    "status": "Least concern"
+   },
+   "blurb": "A small, spotty shark common around Britain. Its egg cases wash up on beaches as \"mermaid's purses\".",
+   "clues": [
+    "Its IUCN conservation status is \"Least concern\".",
+    "Family: Scyliorhinidae.",
+    "Genus: Scyliorhinus.",
+    "Its empty egg cases are called mermaid's purses.",
+    "It is common around the British Isles.",
+    "It has rough skin like sandpaper.",
+    "Typical length: about 60 cm.",
+    "It is harmless to people.",
+    "It lives in coastal waters.",
+    "It is named after a pet that purrs.",
+    "The answer has 3 words (5, 7, 8 letters).",
+    "It starts with the letter S."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/317560062/medium.jpg",
+      "w": 375,
+      "h": 500,
+      "credit": "norgram",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/317560062"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/264501030/medium.jpeg",
+      "w": 500,
+      "h": 378,
+      "credit": "Petr Knotek",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/264501030"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/353512776/medium.jpeg",
+      "w": 375,
+      "h": 500,
+      "credit": "Aaron Chidwick",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/353512776"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "bluntnose-sixgill-shark",
+   "name": "Bluntnose sixgill shark",
+   "alt": [
+    "sixgill shark"
+   ],
+   "sci": "Hexanchus griseus",
+   "group": "cow shark",
+   "facts": {
+    "lengthM": 4.5,
+    "danger": "Harmless",
+    "habitat": "Deep sea",
+    "status": "Near threatened"
+   },
+   "blurb": "A large, primitive deep-sea shark with six gill slits instead of five.",
+   "clues": [
+    "Family: Hexanchidae.",
+    "Genus: Hexanchus.",
+    "Most sharks have one gill slit fewer than it does.",
+    "It rises to shallower water at night.",
+    "It has bright green eyes.",
+    "Typical length: about 4.5 m.",
+    "It is harmless to people.",
+    "It lives in the deep sea.",
+    "It lives in deep water.",
+    "Its snout is rounded, not pointed.",
+    "The answer has 3 words (9, 7, 5 letters).",
+    "It starts with the letter B."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/340689858/medium.jpg",
+      "w": 375,
+      "h": 500,
+      "credit": "GayleIsTired",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/340689858"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/30421020/medium.jpg",
+      "w": 278,
+      "h": 500,
+      "credit": "biodiversitygr",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/30421020"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/30422274/medium.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "biodiversitygr",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/30422274"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "dwarf-lanternshark",
+   "name": "Dwarf lanternshark",
+   "sci": "Etmopterus perryi",
+   "group": "dogfish shark",
+   "facts": {
+    "lengthM": 0.2,
+    "danger": "Harmless",
+    "habitat": "Deep sea",
+    "status": "Least concern"
+   },
+   "blurb": "One of the smallest sharks in the world, about as long as a pencil. Its belly glows in the dark.",
+   "clues": [
+    "Family: Etmopteridae.",
+    "Genus: Etmopterus.",
+    "It lives off Colombia and Venezuela.",
+    "It could fit in your hand.",
+    "Its belly glows to hide its shadow.",
+    "Typical length: about 20 cm.",
+    "It is harmless to people.",
+    "It lives in the deep sea.",
+    "It is one of the smallest sharks in the world.",
+    "It is named after a small glowing light.",
+    "The answer has 2 words (5, 12 letters).",
+    "It starts with the letter D."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/95279854/medium.jpeg",
+      "w": 500,
+      "h": 102,
+      "credit": "Tambja",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/95279854"
+     }
+    ]
+   },
+   "difficulty": 3
+  }
+ ],
+ "questions": [
+  {
+   "id": "q1",
+   "kind": "mc",
+   "prompt": "What is the biggest fish in the world?",
+   "answer": "Whale shark",
+   "wrong": [
+    "Great white shark",
+    "Basking shark",
+    "Blue whale"
+   ],
+   "explain": "Whale sharks can be over 12 m long. Blue whales are mammals, not fish.",
+   "difficulty": 1
+  },
+  {
+   "id": "q2",
+   "kind": "tf",
+   "prompt": "A shark is a fish.",
+   "answer": true,
+   "explain": "Sharks are fish with skeletons made of cartilage.",
+   "difficulty": 1
+  },
+  {
+   "id": "q3",
+   "kind": "mc",
+   "prompt": "Shark skeletons are made of what?",
+   "answer": "Cartilage",
+   "wrong": [
+    "Bone",
+    "Shell",
+    "Wood-like fibre"
+   ],
+   "explain": "Cartilage is the bendy material in your nose and ears.",
+   "difficulty": 2
+  },
+  {
+   "id": "q4",
+   "kind": "mc",
+   "prompt": "Which shark can live in rivers and lakes as well as the sea?",
+   "answer": "Bull shark",
+   "wrong": [
+    "Great white shark",
+    "Whale shark",
+    "Thresher shark"
+   ],
+   "explain": "Bull sharks have been found far up the Amazon and Mississippi.",
+   "difficulty": 2
+  },
+  {
+   "id": "q5",
+   "kind": "mc",
+   "prompt": "Which shark may live longer than any other animal with a backbone?",
+   "answer": "Greenland shark",
+   "wrong": [
+    "Whale shark",
+    "Great white shark",
+    "Nurse shark"
+   ],
+   "explain": "Studies of eye lenses suggest they may live 250 to 500 years.",
+   "difficulty": 2
+  },
+  {
+   "id": "q6",
+   "kind": "mc",
+   "prompt": "Which is the fastest shark?",
+   "answer": "Shortfin mako",
+   "wrong": [
+    "Great white shark",
+    "Blue shark",
+    "Tiger shark"
+   ],
+   "explain": "Makos can burst to over 50 km/h.",
+   "difficulty": 2
+  },
+  {
+   "id": "q7",
+   "kind": "tf",
+   "prompt": "Sharks lose and replace their teeth throughout their lives.",
+   "answer": true,
+   "explain": "New rows of teeth keep moving forward to replace lost ones.",
+   "difficulty": 1
+  },
+  {
+   "id": "q8",
+   "kind": "mc",
+   "prompt": "Which shark was the star of the 1975 film \"Jaws\"?",
+   "answer": "Great white shark",
+   "wrong": [
+    "Tiger shark",
+    "Bull shark",
+    "Hammerhead"
+   ],
+   "explain": "The film was based on Peter Benchley's novel.",
+   "difficulty": 1
+  },
+  {
+   "id": "q9",
+   "kind": "mc",
+   "prompt": "What are \"mermaid's purses\" found on beaches?",
+   "answer": "Shark and ray egg cases",
+   "wrong": [
+    "Seaweed pods",
+    "Jellyfish",
+    "Crab shells"
+   ],
+   "explain": "Catsharks, skates and some others lay eggs in leathery cases.",
+   "difficulty": 2
+  },
+  {
+   "id": "q10",
+   "kind": "mc",
+   "prompt": "Which shark uses its very long tail to stun fish?",
+   "answer": "Thresher shark",
+   "wrong": [
+    "Whale shark",
+    "Nurse shark",
+    "Goblin shark"
+   ],
+   "explain": "Its upper tail fin can be as long as the rest of its body.",
+   "difficulty": 2
+  }
+ ],
+ "fakes": [
+  "Velvet reef shark",
+  "Pacific glass shark",
+  "Northern ghost hammerhead",
+  "Crimson-finned mako",
+  "Spotted ribbon shark",
+  "Golden lantern hammerhead",
+  "Arctic sword shark"
+ ],
+ "sources": [
+  {
+   "name": "iNaturalist",
+   "url": "https://www.inaturalist.org"
+  },
+  {
+   "name": "Wikidata",
+   "url": "https://www.wikidata.org"
+  }
+ ]
+}

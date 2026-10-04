@@ -1,0 +1,3291 @@
+{
+ "style": "painterly gouache illustration in the style of a vintage film poster, bold simplified shapes, visible brush texture, rich limited colour palette, dramatic cinematic lighting, cream paper border, no text, no letters, no words, no numbers, no logos, no signature",
+ "model": "flux2-klein-9b-mlx-4bit",
+ "steps": 4,
+ "width": 640,
+ "height": 432,
+ "films": [
+  {
+   "id": "the-wizard-of-oz",
+   "name": "The Wizard of Oz",
+   "alt": [
+    "Wizard of Oz"
+   ],
+   "year": 1939,
+   "director": "Victor Fleming",
+   "kids": true,
+   "blurb": "Kansas farm girl Dorothy is swept by a tornado to the land of Oz and follows the yellow brick road to find a way home.",
+   "scenes": [
+    {
+     "p": "a girl in a blue gingham dress walking down a winding yellow brick road with a scarecrow, a tin man and a lion, toward a distant glittering emerald-green city, red poppy fields",
+     "d": 1,
+     "cap": "Follow the yellow brick road to the Emerald City"
+    },
+    {
+     "p": "a pair of sparkling ruby-red slippers on a wooden floor beside a small black terrier dog, a farmhouse window showing a swirling grey tornado",
+     "d": 2,
+     "cap": "Ruby slippers, Toto, and the twister that started it all"
+    },
+    {
+     "p": "a wooden Kansas farmhouse spinning high inside a huge grey tornado funnel above flat sepia prairie, a cow and a bicycle flying past",
+     "d": 3,
+     "cap": "The farmhouse caught in the cyclone"
+    }
+   ]
+  },
+  {
+   "id": "king-kong",
+   "name": "King Kong",
+   "alt": [],
+   "year": 1933,
+   "director": "Merian C. Cooper, Ernest B. Schoedsack",
+   "kids": false,
+   "blurb": "A film crew brings a giant ape from Skull Island to New York, where he escapes and climbs the Empire State Building.",
+   "scenes": [
+    {
+     "p": "a gigantic gorilla clinging to the top of an art deco skyscraper spire at dawn, swatting at old 1930s biplanes circling around him, New York skyline below",
+     "d": 1,
+     "cap": "The giant ape atop the Empire State Building"
+    },
+    {
+     "p": "a huge ancient wooden wall with an enormous gate on a misty jungle island, tiny explorers in 1930s clothes watching from the beach, a steamship anchored offshore",
+     "d": 2,
+     "cap": "The great wall on Skull Island"
+    },
+    {
+     "p": "a giant hairy hand gently holding a tiny woman in a flowing white dress, seen from a distance against a jungle at night",
+     "d": 3,
+     "cap": "Beauty in the beast's hand"
+    }
+   ]
+  },
+  {
+   "id": "snow-white",
+   "name": "Snow White and the Seven Dwarfs",
+   "alt": [
+    "Snow White"
+   ],
+   "year": 1937,
+   "director": "David Hand",
+   "kids": true,
+   "blurb": "Disney's first full-length animated feature: a princess hides from her jealous stepmother in the cottage of seven miners.",
+   "scenes": [
+    {
+     "p": "seven small bearded miners in pointed caps marching in a line home from a sparkling gem mine through a forest at dusk, pickaxes over their shoulders, a cosy cottage ahead",
+     "d": 1,
+     "cap": "Seven miners heading home from work"
+    },
+    {
+     "p": "a single glossy red apple held in a gnarled old hand in a dark forest, a cloaked hunched figure in shadow",
+     "d": 2,
+     "cap": "The poisoned apple"
+    },
+    {
+     "p": "an ornate gold-framed magic mirror on a castle wall glowing with green smoke, a crowned queen in a high collar seen from behind",
+     "d": 2,
+     "cap": "Mirror, mirror, on the wall"
+    }
+   ]
+  },
+  {
+   "id": "gone-with-the-wind",
+   "name": "Gone with the Wind",
+   "alt": [],
+   "year": 1939,
+   "director": "Victor Fleming",
+   "kids": false,
+   "blurb": "Scarlett O'Hara fights to survive the American Civil War and its aftermath in Georgia.",
+   "scenes": [
+    {
+     "p": "silhouette of a woman in a wide hooped dress standing beside a lone oak tree on a hill, a white-columned Southern plantation mansion behind, enormous blazing orange and red sunset sky",
+     "d": 2,
+     "cap": "Tara, under a burning sky"
+    },
+    {
+     "p": "a horse-drawn wagon racing through a burning 1860s Southern city at night, warehouses engulfed in towering flames",
+     "d": 3,
+     "cap": "Fleeing the burning of Atlanta"
+    }
+   ]
+  },
+  {
+   "id": "pinocchio",
+   "name": "Pinocchio",
+   "alt": [],
+   "year": 1940,
+   "director": "Ben Sharpsteen, Hamilton Luske",
+   "kids": true,
+   "blurb": "A woodcarver's puppet is brought to life and must prove himself brave, truthful and unselfish to become a real boy.",
+   "scenes": [
+    {
+     "p": "a wooden marionette puppet boy with visible wooden joints, red shorts and a little feathered alpine hat, his long pointed wooden nose growing with leaves and a bird's nest on it, in a cosy old woodcarver's workshop full of cuckoo clocks",
+     "d": 1,
+     "cap": "A nose that grows with every lie"
+    },
+    {
+     "p": "a gigantic whale bursting out of a stormy sea, mouth wide open, chasing a tiny wooden raft",
+     "d": 2,
+     "cap": "Escaping the giant whale"
+    },
+    {
+     "p": "a small green cricket insect wearing a tiny top hat and holding a folded umbrella, standing on a windowsill under one bright wishing star, an Italian village at night",
+     "d": 3,
+     "cap": "When you wish upon a star"
+    }
+   ]
+  },
+  {
+   "id": "fantasia",
+   "name": "Fantasia",
+   "alt": [],
+   "year": 1940,
+   "director": null,
+   "kids": true,
+   "blurb": "Disney's concert film sets animation to classical music, including The Sorcerer's Apprentice.",
+   "scenes": [
+    {
+     "p": "an army of enchanted walking broomsticks with little arms carrying wooden buckets of water down stone stairs into a flooding sorcerer's cavern, glowing magic stars",
+     "d": 1,
+     "cap": "The Sorcerer's Apprentice and the marching brooms"
+    },
+    {
+     "p": "hippos in pink tutus doing ballet beside crocodiles in a marble palace courtyard, whimsical",
+     "d": 3,
+     "cap": "Dance of the Hours"
+    }
+   ]
+  },
+  {
+   "id": "dumbo",
+   "name": "Dumbo",
+   "alt": [],
+   "year": 1941,
+   "director": "Ben Sharpsteen",
+   "kids": true,
+   "blurb": "A baby circus elephant mocked for his enormous ears discovers he can fly.",
+   "scenes": [
+    {
+     "p": "a baby elephant with enormous ears flying high above a striped circus big top, holding a single black feather in its trunk, crowds below",
+     "d": 1,
+     "cap": "The little elephant who could fly"
+    },
+    {
+     "p": "a vintage circus train painted red and gold with stars, open cage wagons with a giraffe, a lion and elephants peeking out, a rolled-up striped big top tent on a flatcar, chugging through green hills",
+     "d": 3,
+     "cap": "The circus train rolls into town"
+    }
+   ]
+  },
+  {
+   "id": "bambi",
+   "name": "Bambi",
+   "alt": [],
+   "year": 1942,
+   "director": "David Hand",
+   "kids": true,
+   "blurb": "A young deer grows up in the forest with his friends, a rabbit and a skunk.",
+   "scenes": [
+    {
+     "p": "a wobbly spotted baby fawn learning to walk on a frozen pond, a little grey rabbit laughing beside it, snowy forest",
+     "d": 1,
+     "cap": "Learning to skate on the frozen pond"
+    },
+    {
+     "p": "a spotted fawn, a grey rabbit and a small skunk among spring flowers in a sunlit forest meadow",
+     "d": 2,
+     "cap": "Three friends in the forest"
+    }
+   ]
+  },
+  {
+   "id": "casablanca",
+   "name": "Casablanca",
+   "alt": [],
+   "year": 1942,
+   "director": "Michael Curtiz",
+   "kids": false,
+   "blurb": "In wartime Morocco, nightclub owner Rick must choose between love and helping his old flame escape the Nazis.",
+   "scenes": [
+    {
+     "p": "a foggy airport runway at night, a 1940s propeller airliner waiting, two silhouetted figures in trench coats and fedoras walking away into the mist",
+     "d": 2,
+     "cap": "The foggy goodbye on the runway"
+    },
+    {
+     "p": "a smoky 1940s nightclub in North Africa, a pianist at an upright piano under ceiling fans and Moorish arches, palm fronds, glasses of champagne",
+     "d": 3,
+     "cap": "Rick's Café, where they play it again"
+    }
+   ]
+  },
+  {
+   "id": "citizen-kane",
+   "name": "Citizen Kane",
+   "alt": [],
+   "year": 1941,
+   "director": "Orson Welles",
+   "kids": false,
+   "blurb": "A reporter tries to decode the dying word of newspaper tycoon Charles Foster Kane.",
+   "scenes": [
+    {
+     "p": "a child's wooden sled with plain red runners burning in a furnace among crates and antiques in a vast cluttered mansion basement",
+     "d": 3,
+     "cap": "The sled thrown into the furnace"
+    },
+    {
+     "p": "a snow globe with a tiny cottage falling from an open hand, about to shatter on the floor, dark gothic bedroom",
+     "d": 3,
+     "cap": "The dropped snow globe"
+    }
+   ]
+  },
+  {
+   "id": "its-a-wonderful-life",
+   "name": "It's a Wonderful Life",
+   "alt": [
+    "Its a Wonderful Life"
+   ],
+   "year": 1946,
+   "director": "Frank Capra",
+   "kids": false,
+   "blurb": "An angel shows a despairing George Bailey what his small town would be like if he had never been born.",
+   "scenes": [
+    {
+     "p": "a man in a 1940s coat seen from behind running joyfully down the snowy main street of a small American town at Christmas, lit shop windows, a cinema marquee without letters",
+     "d": 3,
+     "cap": "Running through Bedford Falls on Christmas Eve"
+    },
+    {
+     "p": "an old snowy iron bridge over a dark river at night in a small 1940s town, falling snow, a lone figure at the railing",
+     "d": 3,
+     "cap": "The bridge where an angel earns his wings"
+    }
+   ]
+  },
+  {
+   "id": "cinderella",
+   "name": "Cinderella",
+   "alt": [],
+   "year": 1950,
+   "director": "Clyde Geronimi, Wilfred Jackson, Hamilton Luske",
+   "kids": true,
+   "blurb": "With help from her fairy godmother, a mistreated young woman goes to the royal ball and loses a glass slipper.",
+   "scenes": [
+    {
+     "p": "a single sparkling glass slipper left on a grand palace staircase at midnight, a large clock tower in the background",
+     "d": 1,
+     "cap": "The glass slipper left behind at midnight"
+    },
+    {
+     "p": "a big orange pumpkin transforming into a glittering golden carriage with white horses, sparkles of magic, moonlit garden",
+     "d": 1,
+     "cap": "Bibbidi-bobbidi-boo: a pumpkin becomes a coach"
+    },
+    {
+     "p": "little mice in tiny caps sewing a pink ball gown in an attic, ribbons and beads",
+     "d": 2,
+     "cap": "Mice sewing a dress for the ball"
+    }
+   ]
+  },
+  {
+   "id": "singin-in-the-rain",
+   "name": "Singin' in the Rain",
+   "alt": [
+    "Singing in the Rain"
+   ],
+   "year": 1952,
+   "director": "Gene Kelly, Stanley Donen",
+   "kids": false,
+   "blurb": "A silent-movie star falls in love as Hollywood switches to talking pictures.",
+   "scenes": [
+    {
+     "p": "a man in a grey suit and hat swinging joyfully from a lamppost on a rainy night street, holding a closed umbrella, puddles reflecting shop lights, 1920s",
+     "d": 2,
+     "cap": "Dancing and singing in the rain"
+    },
+    {
+     "p": "three dancers in raincoats with umbrellas silhouetted in a heavy downpour on a glistening city street at night",
+     "d": 3,
+     "cap": "Good mornin', even in a downpour"
+    }
+   ]
+  },
+  {
+   "id": "peter-pan",
+   "name": "Peter Pan",
+   "alt": [],
+   "year": 1953,
+   "director": "Clyde Geronimi, Wilfred Jackson, Hamilton Luske",
+   "kids": true,
+   "blurb": "Three London children fly to Neverland with the boy who never grows up.",
+   "scenes": [
+    {
+     "p": "silhouettes of children flying over a moonlit London past a big clock tower, a tiny glowing fairy leading the way, starry night",
+     "d": 1,
+     "cap": "Second star to the right: flying over London"
+    },
+    {
+     "p": "a large pirate galleon anchored by a tropical island shaped like a skull rock, a crocodile in the water with a ticking alarm clock",
+     "d": 2,
+     "cap": "Skull Rock and the ticking crocodile"
+    }
+   ]
+  },
+  {
+   "id": "rear-window",
+   "name": "Rear Window",
+   "alt": [],
+   "year": 1954,
+   "director": "Alfred Hitchcock",
+   "kids": false,
+   "blurb": "A photographer stuck in a wheelchair spies on his neighbours and suspects one of murder.",
+   "scenes": [
+    {
+     "p": "view from a dark apartment across a Greenwich Village courtyard at night into many lit windows of neighbours, a camera with a long telephoto lens on the sill, a leg in a plaster cast",
+     "d": 2,
+     "cap": "Spying on the neighbours across the courtyard"
+    },
+    {
+     "p": "a man in a wheelchair with a leg in a plaster cast, silhouetted at an open window holding binoculars, hot summer evening",
+     "d": 3,
+     "cap": "The photographer at the window"
+    }
+   ]
+  },
+  {
+   "id": "godzilla",
+   "name": "Godzilla",
+   "alt": [
+    "Gojira"
+   ],
+   "year": 1954,
+   "director": "Ishirō Honda",
+   "kids": false,
+   "blurb": "A giant prehistoric monster awakened by nuclear testing attacks Tokyo.",
+   "scenes": [
+    {
+     "p": "a colossal dark reptilian monster with jagged dorsal plates rising from Tokyo Bay at night, breathing a glowing blue beam, 1950s city in flames, black and white tones",
+     "d": 1,
+     "cap": "The giant monster rises from Tokyo Bay"
+    },
+    {
+     "p": "a small 1950s Japanese fishing boat at night on a calm sea suddenly lit by a blinding white flash on the horizon",
+     "d": 3,
+     "cap": "The fishing boat and the flash at sea"
+    }
+   ]
+  },
+  {
+   "id": "lady-and-the-tramp",
+   "name": "Lady and the Tramp",
+   "alt": [],
+   "year": 1955,
+   "director": "Clyde Geronimi, Wilfred Jackson, Hamilton Luske",
+   "kids": true,
+   "blurb": "A pampered cocker spaniel falls for a streetwise mutt.",
+   "scenes": [
+    {
+     "p": "two dogs, a golden cocker spaniel and a scruffy grey mongrel, sharing one long strand of spaghetti from a plate of meatballs at a candlelit table behind an Italian restaurant, accordion player",
+     "d": 1,
+     "cap": "Sharing spaghetti, Bella Notte"
+    },
+    {
+     "p": "a cocker spaniel puppy with a big blue bow in a hatbox under a Christmas tree in a Victorian house",
+     "d": 3,
+     "cap": "A Christmas puppy in a hatbox"
+    }
+   ]
+  },
+  {
+   "id": "the-ten-commandments",
+   "name": "The Ten Commandments",
+   "alt": [],
+   "year": 1956,
+   "director": "Cecil B. DeMille",
+   "kids": false,
+   "blurb": "Moses leads the Hebrews out of slavery in Egypt.",
+   "scenes": [
+    {
+     "p": "a bearded robed figure with a staff raised high as a sea parts into two towering walls of water, a vast crowd crossing the dry seabed",
+     "d": 1,
+     "cap": "The parting of the Red Sea"
+    },
+    {
+     "p": "two stone tablets glowing atop a fiery mountain under a stormy sky, a robed figure seen from behind",
+     "d": 2,
+     "cap": "Tablets on the mountain"
+    }
+   ]
+  },
+  {
+   "id": "20000-leagues-under-the-sea",
+   "name": "20,000 Leagues Under the Sea",
+   "alt": [
+    "20000 Leagues Under the Sea",
+    "Twenty Thousand Leagues Under the Sea"
+   ],
+   "year": 1954,
+   "director": "Richard Fleischer",
+   "kids": false,
+   "blurb": "Captain Nemo's submarine Nautilus terrorises the seas in Disney's Jules Verne adventure.",
+   "scenes": [
+    {
+     "p": "an ornate Victorian riveted iron submarine with fins attacked by a giant squid with huge tentacles in a stormy sea",
+     "d": 2,
+     "cap": "The Nautilus fights a giant squid"
+    },
+    {
+     "p": "divers in brass diving helmets walking on the sea floor in an underwater garden, an iron submarine above",
+     "d": 3,
+     "cap": "A walk on the sea floor"
+    }
+   ]
+  },
+  {
+   "id": "north-by-northwest",
+   "name": "North by Northwest",
+   "alt": [],
+   "year": 1959,
+   "director": "Alfred Hitchcock",
+   "kids": false,
+   "blurb": "An advertising man mistaken for a spy is chased across America.",
+   "scenes": [
+    {
+     "p": "a man in a grey suit running across a flat empty field of farmland as a yellow crop-duster biplane swoops low behind him, dusty roadside, bright sky",
+     "d": 2,
+     "cap": "Chased by the crop-duster"
+    },
+    {
+     "p": "a man in a grey suit waiting alone by a dusty empty highway crossroads in flat Midwest farmland, a bus driving away",
+     "d": 3,
+     "cap": "Waiting at the lonely crossroads"
+    }
+   ]
+  },
+  {
+   "id": "ben-hur",
+   "name": "Ben-Hur",
+   "alt": [
+    "Ben Hur"
+   ],
+   "year": 1959,
+   "director": "William Wyler",
+   "kids": false,
+   "blurb": "A Jewish prince betrayed by his Roman friend seeks revenge, culminating in a famous chariot race.",
+   "scenes": [
+    {
+     "p": "ancient Roman chariots pulled by galloping white horses racing around a huge sandy arena with giant statues and roaring crowds",
+     "d": 1,
+     "cap": "The great chariot race"
+    },
+    {
+     "p": "rows of galley slaves rowing in the dark hold of a Roman warship, shafts of light, drums",
+     "d": 3,
+     "cap": "Chained to the oars of a galley"
+    }
+   ]
+  },
+  {
+   "id": "sleeping-beauty",
+   "name": "Sleeping Beauty",
+   "alt": [],
+   "year": 1959,
+   "director": "Clyde Geronimi",
+   "kids": true,
+   "blurb": "Cursed by an evil fairy, Princess Aurora pricks her finger on a spinning wheel and falls into an enchanted sleep.",
+   "scenes": [
+    {
+     "p": "an old wooden spinning wheel glowing eerily green in a dark castle tower room, a sharp spindle catching the light",
+     "d": 1,
+     "cap": "The cursed spinning wheel"
+    },
+    {
+     "p": "a prince on a white horse with a sword battling a huge black dragon breathing green fire before a castle covered in thorny briars",
+     "d": 2,
+     "cap": "The prince battles the dragon through the thorns"
+    },
+    {
+     "p": "three small fairies in red, green and blue gowns waving wands over a birthday cake in a woodland cottage",
+     "d": 3,
+     "cap": "Three good fairies baking a cake"
+    }
+   ]
+  },
+  {
+   "id": "101-dalmatians",
+   "name": "One Hundred and One Dalmatians",
+   "alt": [
+    "101 Dalmatians",
+    "Dalmatians"
+   ],
+   "year": 1961,
+   "director": "Clyde Geronimi, Hamilton Luske, Wolfgang Reitherman",
+   "kids": true,
+   "blurb": "Pongo and Perdita rescue their puppies from a villain who wants a spotted fur coat.",
+   "scenes": [
+    {
+     "p": "dozens of spotted dalmatian puppies sitting in front of an old television in a London living room",
+     "d": 1,
+     "cap": "A living room full of dalmatian puppies"
+    },
+    {
+     "p": "a long line of spotted puppies trudging through deep snow at night behind two adult dalmatians, a farmhouse in the distance",
+     "d": 2,
+     "cap": "The great escape through the snow"
+    },
+    {
+     "p": "a long sleek vintage car with huge headlights speeding along a snowy country road at night, cigarette smoke curling from the window",
+     "d": 3,
+     "cap": "The villain's car on the chase"
+    }
+   ]
+  },
+  {
+   "id": "breakfast-at-tiffanys",
+   "name": "Breakfast at Tiffany's",
+   "alt": [
+    "Breakfast at Tiffanys"
+   ],
+   "year": 1961,
+   "director": "Blake Edwards",
+   "kids": false,
+   "blurb": "Socialite Holly Golightly charms New York and her writer neighbour.",
+   "scenes": [
+    {
+     "p": "a slender woman seen from behind in a long black evening dress, pearls and an updo, holding a paper coffee cup and pastry, gazing into a jewellery store window on an empty Fifth Avenue at dawn",
+     "d": 2,
+     "cap": "Breakfast at the jewellery store window"
+    },
+    {
+     "p": "a ginger cat sitting in the rain in a New York alleyway between crates",
+     "d": 3,
+     "cap": "Cat, the nameless cat, in the rain"
+    }
+   ]
+  },
+  {
+   "id": "lawrence-of-arabia",
+   "name": "Lawrence of Arabia",
+   "alt": [],
+   "year": 1962,
+   "director": "David Lean",
+   "kids": false,
+   "blurb": "A British officer unites Arab tribes against the Ottoman Empire in World War I.",
+   "scenes": [
+    {
+     "p": "a tiny figure on a camel emerging from a shimmering mirage across vast golden sand dunes under a huge white sun",
+     "d": 2,
+     "cap": "A rider appears out of the desert mirage"
+    },
+    {
+     "p": "a figure in flowing white desert robes standing on top of a derailed steam train in the desert, arms raised",
+     "d": 3,
+     "cap": "Standing on the captured train"
+    }
+   ]
+  },
+  {
+   "id": "the-birds",
+   "name": "The Birds",
+   "alt": [],
+   "year": 1963,
+   "director": "Alfred Hitchcock",
+   "kids": false,
+   "blurb": "A California seaside town is inexplicably attacked by flocks of birds.",
+   "scenes": [
+    {
+     "p": "hundreds of black crows perched ominously on a school playground climbing frame, a small schoolhouse behind, grey overcast sky",
+     "d": 2,
+     "cap": "Crows gathering on the playground"
+    },
+    {
+     "p": "a woman in a green 1960s suit seen from behind shielding herself from swarms of seagulls in a seaside town street",
+     "d": 3,
+     "cap": "The birds attack Bodega Bay"
+    }
+   ]
+  },
+  {
+   "id": "the-great-escape",
+   "name": "The Great Escape",
+   "alt": [],
+   "year": 1963,
+   "director": "John Sturges",
+   "kids": false,
+   "blurb": "Allied prisoners of war plan a mass breakout from a German camp.",
+   "scenes": [
+    {
+     "p": "a man on a vintage motorcycle leaping high over a barbed-wire fence in green alpine meadows, soldiers in the distance",
+     "d": 2,
+     "cap": "The motorcycle jump at the border fence"
+    },
+    {
+     "p": "a narrow wooden escape tunnel lit by lamps, a little rail trolley on tracks, men crawling, sand spilling",
+     "d": 3,
+     "cap": "Digging the tunnel"
+    }
+   ]
+  },
+  {
+   "id": "mary-poppins",
+   "name": "Mary Poppins",
+   "alt": [],
+   "year": 1964,
+   "director": "Robert Stevenson",
+   "kids": true,
+   "blurb": "A magical nanny brings fun and order to the Banks family in Edwardian London.",
+   "scenes": [
+    {
+     "p": "a nanny in a long coat and flowered hat floating down from the clouds holding an open black umbrella and a carpet bag, Edwardian London rooftops below",
+     "d": 1,
+     "cap": "The nanny who arrives by umbrella"
+    },
+    {
+     "p": "chimney sweeps with brushes dancing across sooty London rooftops at dusk, smoke curling from chimney pots, St Paul's dome in the distance",
+     "d": 2,
+     "cap": "Step in time on the rooftops"
+    },
+    {
+     "p": "two children and a nanny flying a red kite in a London park, kites in the sky",
+     "d": 3,
+     "cap": "Let's go fly a kite"
+    }
+   ]
+  },
+  {
+   "id": "the-sound-of-music",
+   "name": "The Sound of Music",
+   "alt": [],
+   "year": 1965,
+   "director": "Robert Wise",
+   "kids": true,
+   "blurb": "A governess brings music to the seven von Trapp children in Austria as the Nazis rise to power.",
+   "scenes": [
+    {
+     "p": "a young woman in a simple pinafore dress seen from behind, spinning with open arms on a lush green Austrian alpine meadow, snowy mountains",
+     "d": 1,
+     "cap": "The hills are alive"
+    },
+    {
+     "p": "seven children in matching outfits made from old green curtains, standing on steps in height order in an Austrian villa garden",
+     "d": 2,
+     "cap": "Seven children in curtain play clothes"
+    },
+    {
+     "p": "a gazebo of glass panes in a garden at night, rain on the glass",
+     "d": 3,
+     "cap": "Sixteen going on seventeen in the gazebo"
+    }
+   ]
+  },
+  {
+   "id": "the-jungle-book",
+   "name": "The Jungle Book",
+   "alt": [
+    "Jungle Book"
+   ],
+   "year": 1967,
+   "director": "Wolfgang Reitherman",
+   "kids": true,
+   "blurb": "Raised by wolves, the boy Mowgli is guided through the Indian jungle by a panther and a carefree bear.",
+   "scenes": [
+    {
+     "p": "a jungle boy in a red loincloth floating down a lazy river lying on the belly of a big happy grey bear, lush Indian jungle",
+     "d": 1,
+     "cap": "Bare necessities on the river"
+    },
+    {
+     "p": "a large python with swirling hypnotic eyes coiled around a tree branch above a sleeping boy in the jungle at night",
+     "d": 2,
+     "cap": "Trust in me: the hypnotic python"
+    },
+    {
+     "p": "monkeys dancing in the ruins of an overgrown ancient temple in the jungle, an orangutan king on a throne",
+     "d": 3,
+     "cap": "The monkey king's ruined temple"
+    }
+   ]
+  },
+  {
+   "id": "2001-a-space-odyssey",
+   "name": "2001: A Space Odyssey",
+   "alt": [
+    "2001 A Space Odyssey",
+    "2001"
+   ],
+   "year": 1968,
+   "director": "Stanley Kubrick",
+   "kids": false,
+   "blurb": "A mysterious black monolith guides human evolution, from apes to a voyage to Jupiter.",
+   "scenes": [
+    {
+     "p": "a single red glowing circular camera eye lens set in a sleek white panel, cold spaceship interior",
+     "d": 2,
+     "cap": "The unblinking red eye of the ship's computer"
+    },
+    {
+     "p": "a tall smooth black rectangular monolith standing in a rocky prehistoric desert at dawn, apes gathered around it",
+     "d": 2,
+     "cap": "The monolith at the dawn of man"
+    },
+    {
+     "p": "a huge spinning wheel-shaped space station orbiting Earth, a small shuttle approaching, starfield",
+     "d": 3,
+     "cap": "The space station waltz"
+    }
+   ]
+  },
+  {
+   "id": "planet-of-the-apes",
+   "name": "Planet of the Apes",
+   "alt": [],
+   "year": 1968,
+   "director": "Franklin J. Schaffner",
+   "kids": false,
+   "blurb": "An astronaut lands on a planet ruled by intelligent apes and makes a shocking discovery.",
+   "scenes": [
+    {
+     "p": "the ruined torch-bearing head and crown of the Statue of Liberty half buried in sand on a deserted beach, a lone rider on a horse in the distance, sunset",
+     "d": 1,
+     "cap": "The ruined statue on the beach: it was Earth all along"
+    },
+    {
+     "p": "apes on horseback in leather armour hunting through a cornfield, primitive humans fleeing",
+     "d": 2,
+     "cap": "Ape soldiers on horseback"
+    }
+   ]
+  },
+  {
+   "id": "chitty-chitty-bang-bang",
+   "name": "Chitty Chitty Bang Bang",
+   "alt": [],
+   "year": 1968,
+   "director": "Ken Hughes",
+   "kids": true,
+   "blurb": "An inventor restores a race car that can fly and float, taking his family to a land where children are banned.",
+   "scenes": [
+    {
+     "p": "an old-fashioned vintage racing car with wings unfolded flying over cliffs and the sea, a family waving inside",
+     "d": 1,
+     "cap": "The magical flying car"
+    },
+    {
+     "p": "a fairy-tale Bavarian castle on a hill where the streets are empty of children, a sinister figure with a net lurking",
+     "d": 3,
+     "cap": "Vulgaria, where children are banned"
+    }
+   ]
+  },
+  {
+   "id": "willy-wonka",
+   "name": "Willy Wonka & the Chocolate Factory",
+   "alt": [
+    "Willy Wonka and the Chocolate Factory",
+    "Willy Wonka"
+   ],
+   "year": 1971,
+   "director": "Mel Stuart",
+   "kids": true,
+   "blurb": "Charlie Bucket finds a golden ticket and tours the eccentric candy maker's fantastical factory.",
+   "scenes": [
+    {
+     "p": "a gleaming golden ticket peeking out from a torn chocolate bar wrapper held by a small boy's hands, grey snowy town behind",
+     "d": 1,
+     "cap": "Finding a golden ticket"
+    },
+    {
+     "p": "a wondrous candy room with a flowing chocolate river and a waterfall, giant lollipop trees and candy mushrooms",
+     "d": 1,
+     "cap": "The chocolate river room"
+    },
+    {
+     "p": "a girl swelling up into a giant round blueberry, purple-blue, in a candy factory",
+     "d": 2,
+     "cap": "The girl who turned into a blueberry"
+    }
+   ]
+  },
+  {
+   "id": "the-godfather",
+   "name": "The Godfather",
+   "alt": [
+    "Godfather"
+   ],
+   "year": 1972,
+   "director": "Francis Ford Coppola",
+   "kids": false,
+   "blurb": "The aging head of a Mafia family hands control of his empire to his reluctant youngest son.",
+   "scenes": [
+    {
+     "p": "a dim wood-panelled study with shuttered blinds, a man in a black tuxedo with a red rose seen from behind in a leather armchair, stroking a grey cat, a wedding party outside",
+     "d": 2,
+     "cap": "Hearing requests on his daughter's wedding day"
+    },
+    {
+     "p": "a puppeteer's hand holding marionette strings over a black background",
+     "d": 3,
+     "cap": "The puppet master's strings"
+    },
+    {
+     "p": "a sunlit Sicilian village square with an orange tree, an old stone church and a 1940s car",
+     "d": 3,
+     "cap": "Sicily, the old country"
+    }
+   ]
+  },
+  {
+   "id": "jaws",
+   "name": "Jaws",
+   "alt": [],
+   "year": 1975,
+   "director": "Steven Spielberg",
+   "kids": false,
+   "blurb": "A great white shark terrorises the beach town of Amity Island.",
+   "scenes": [
+    {
+     "p": "underwater view of a giant great white shark rising from the dark depths toward a lone swimmer silhouetted on the bright surface above",
+     "d": 1,
+     "cap": "The great white rises beneath a swimmer"
+    },
+    {
+     "p": "a small wooden fishing boat with a tall mast on a calm sea, a yellow barrel bobbing in its wake, a huge shark fin approaching",
+     "d": 2,
+     "cap": "You're gonna need a bigger boat"
+    },
+    {
+     "p": "a crowded 1970s summer beach with striped umbrellas, a lifeguard tower, and people suddenly running out of the water in panic",
+     "d": 3,
+     "cap": "Panic on the Amity beach"
+    }
+   ]
+  },
+  {
+   "id": "rocky",
+   "name": "Rocky",
+   "alt": [],
+   "year": 1976,
+   "director": "John G. Avildsen",
+   "kids": false,
+   "blurb": "Small-time Philadelphia boxer Rocky Balboa gets a shot at the heavyweight title.",
+   "scenes": [
+    {
+     "p": "a man in a grey sweatsuit seen from behind with both fists raised in triumph at the top of a long flight of museum stone steps at dawn, a city skyline",
+     "d": 2,
+     "cap": "Triumph at the top of the museum steps"
+    },
+    {
+     "p": "a boxer punching sides of beef hanging in a cold meat locker, breath fogging",
+     "d": 3,
+     "cap": "Training on frozen beef"
+    }
+   ]
+  },
+  {
+   "id": "star-wars",
+   "name": "Star Wars",
+   "alt": [
+    "Star Wars: A New Hope",
+    "A New Hope",
+    "Star Wars Episode IV"
+   ],
+   "year": 1977,
+   "director": "George Lucas",
+   "kids": false,
+   "blurb": "Farm boy Luke Skywalker joins a rebellion to defeat the Empire's Death Star.",
+   "scenes": [
+    {
+     "p": "a lone young man in pale robes seen from behind gazing at twin suns setting over a desert planet, domed adobe farm buildings",
+     "d": 1,
+     "cap": "The twin suns of the desert planet"
+    },
+    {
+     "p": "a gigantic grey spherical battle station with a large concave dish, looming over a small planet in space, tiny fighter craft",
+     "d": 1,
+     "cap": "That's no moon"
+    },
+    {
+     "p": "a smoky rowdy alien cantina with a band of strange musicians, hooded patrons drinking at a curved bar",
+     "d": 3,
+     "cap": "A wretched hive at the cantina"
+    }
+   ]
+  },
+  {
+   "id": "close-encounters",
+   "name": "Close Encounters of the Third Kind",
+   "alt": [
+    "Close Encounters"
+   ],
+   "year": 1977,
+   "director": "Steven Spielberg",
+   "kids": false,
+   "blurb": "Ordinary people are drawn to a Wyoming mountain where a UFO makes contact.",
+   "scenes": [
+    {
+     "p": "an enormous glowing flying saucer covered in coloured lights descending at night behind a flat-topped rocky butte tower, tiny silhouetted people watching",
+     "d": 2,
+     "cap": "The mothership at Devils Tower"
+    },
+    {
+     "p": "a man at a dinner table sculpting a tall flat-topped mountain out of mashed potatoes, puzzled family",
+     "d": 3,
+     "cap": "The mashed-potato mountain"
+    }
+   ]
+  },
+  {
+   "id": "saturday-night-fever",
+   "name": "Saturday Night Fever",
+   "alt": [],
+   "year": 1977,
+   "director": "John Badham",
+   "kids": false,
+   "blurb": "A Brooklyn paint-store clerk lives for the weekends at the disco.",
+   "scenes": [
+    {
+     "p": "a man in a white three-piece suit seen from behind striking a dance pose with one arm pointing up on a light-up multicoloured disco floor, mirror ball",
+     "d": 2,
+     "cap": "Night fever on the light-up dance floor"
+    },
+    {
+     "p": "a long suspension bridge glowing at night over a river, 1970s Brooklyn",
+     "d": 3,
+     "cap": "The Verrazzano bridge at night"
+    }
+   ]
+  },
+  {
+   "id": "grease",
+   "name": "Grease",
+   "alt": [],
+   "year": 1978,
+   "director": "Randal Kleiser",
+   "kids": false,
+   "blurb": "Greaser Danny and good girl Sandy fall for each other at Rydell High in the 1950s.",
+   "scenes": [
+    {
+     "p": "a gleaming red 1950s hot rod with flame decals racing in a concrete storm drain riverbed, greasers in leather jackets cheering",
+     "d": 2,
+     "cap": "Greased Lightnin' races in the drain"
+    },
+    {
+     "p": "a 1950s high school fair at sunset with a ferris wheel and carnival rides, a couple in black leather dancing",
+     "d": 2,
+     "cap": "You're the one that I want, at the carnival"
+    }
+   ]
+  },
+  {
+   "id": "alien",
+   "name": "Alien",
+   "alt": [],
+   "year": 1979,
+   "director": "Ridley Scott",
+   "kids": false,
+   "blurb": "The crew of the spaceship Nostromo is hunted by a deadly creature.",
+   "scenes": [
+    {
+     "p": "a dark cavernous alien ship hold filled with rows of leathery eggs under a misty blue light, a tiny astronaut with a torch",
+     "d": 2,
+     "cap": "The chamber of eggs"
+    },
+    {
+     "p": "a vast industrial mining spaceship towing a refinery through deep space",
+     "d": 3,
+     "cap": "The towing ship Nostromo"
+    }
+   ]
+  },
+  {
+   "id": "apocalypse-now",
+   "name": "Apocalypse Now",
+   "alt": [],
+   "year": 1979,
+   "director": "Francis Ford Coppola",
+   "kids": false,
+   "blurb": "A US Army captain travels upriver in Vietnam to find a rogue colonel.",
+   "scenes": [
+    {
+     "p": "a formation of military helicopters silhouetted against a blazing orange sunset over a jungle river, palm trees",
+     "d": 2,
+     "cap": "Helicopters over the jungle at sunset"
+    },
+    {
+     "p": "a small patrol boat travelling up a misty jungle river toward ancient stone temple ruins",
+     "d": 3,
+     "cap": "Upriver into the heart of darkness"
+    }
+   ]
+  },
+  {
+   "id": "the-shining",
+   "name": "The Shining",
+   "alt": [
+    "Shining"
+   ],
+   "year": 1980,
+   "director": "Stanley Kubrick",
+   "kids": false,
+   "blurb": "A writer caretaking a snowbound hotel for the winter descends into madness.",
+   "scenes": [
+    {
+     "p": "a small boy riding a tricycle down a long hotel corridor with a bold geometric orange and brown hexagon carpet",
+     "d": 2,
+     "cap": "The tricycle in the hotel corridor"
+    },
+    {
+     "p": "a huge hedge maze covered in snow at night beside an isolated grand mountain hotel",
+     "d": 2,
+     "cap": "The snowy hedge maze"
+    },
+    {
+     "p": "an old typewriter on a desk in a vast empty hotel lounge with a stack of typed paper",
+     "d": 3,
+     "cap": "All work and no play"
+    }
+   ]
+  },
+  {
+   "id": "raiders-of-the-lost-ark",
+   "name": "Raiders of the Lost Ark",
+   "alt": [
+    "Indiana Jones and the Raiders of the Lost Ark",
+    "Indiana Jones"
+   ],
+   "year": 1981,
+   "director": "Steven Spielberg",
+   "kids": false,
+   "blurb": "Archaeologist Indiana Jones races the Nazis to find the Ark of the Covenant.",
+   "scenes": [
+    {
+     "p": "an adventurer in a fedora and leather jacket seen from behind sprinting down a temple tunnel as a gigantic stone boulder rolls after him",
+     "d": 1,
+     "cap": "Outrunning the giant boulder"
+    },
+    {
+     "p": "a golden idol statue on a stone pedestal in a dark jungle temple, a bag of sand beside it, shafts of light",
+     "d": 2,
+     "cap": "Swapping the golden idol"
+    },
+    {
+     "p": "a dark Egyptian tomb chamber floor completely covered with writhing snakes, a torch held from above",
+     "d": 3,
+     "cap": "Snakes. Why'd it have to be snakes?"
+    }
+   ]
+  },
+  {
+   "id": "et",
+   "name": "E.T. the Extra-Terrestrial",
+   "alt": [
+    "E.T.",
+    "ET"
+   ],
+   "year": 1982,
+   "director": "Steven Spielberg",
+   "kids": true,
+   "blurb": "A boy befriends a stranded alien and helps him get home.",
+   "scenes": [
+    {
+     "p": "silhouette of a boy riding a BMX bicycle flying across a huge full moon, a small bundled figure in the front basket, pine forest below",
+     "d": 1,
+     "cap": "Flying across the moon on a bicycle"
+    },
+    {
+     "p": "a trail of colourful round sweets leading through a dark suburban back garden into a misty forest at night",
+     "d": 2,
+     "cap": "A trail of sweets to lure a visitor"
+    },
+    {
+     "p": "a homemade communicator built from a speak-and-spell toy, a saw blade and an umbrella, on a forest hilltop at night",
+     "d": 3,
+     "cap": "Phoning home"
+    }
+   ]
+  },
+  {
+   "id": "ghostbusters",
+   "name": "Ghostbusters",
+   "alt": [],
+   "year": 1984,
+   "director": "Ivan Reitman",
+   "kids": false,
+   "blurb": "Three parapsychologists start a ghost-catching business in New York City.",
+   "scenes": [
+    {
+     "p": "four people in beige jumpsuits with bulky backpacks shooting crackling energy streams at a glowing green ghost in a grand hotel ballroom, chandeliers",
+     "d": 2,
+     "cap": "Busting a ghost in the hotel ballroom"
+    },
+    {
+     "p": "an old white 1950s ambulance-style car with a roof full of gadgets and red lights outside a brick firehouse in New York at night",
+     "d": 2,
+     "cap": "The ghost-catching car outside the firehouse"
+    },
+    {
+     "p": "a giant sailor-hatted marshmallow figure stomping between New York skyscrapers at night, seen from far below",
+     "d": 2,
+     "cap": "The giant marshmallow man"
+    }
+   ]
+  },
+  {
+   "id": "the-karate-kid",
+   "name": "The Karate Kid",
+   "alt": [
+    "Karate Kid"
+   ],
+   "year": 1984,
+   "director": "John G. Avildsen",
+   "kids": false,
+   "blurb": "A bullied teenager learns karate from a wise handyman.",
+   "scenes": [
+    {
+     "p": "a teenage boy silhouetted balancing on one leg in a crane-kick pose on a wooden post on a beach at sunset",
+     "d": 2,
+     "cap": "The crane kick"
+    },
+    {
+     "p": "a hand waxing a vintage car with a cloth in circles, wax on wax off, sunny Californian yard with bonsai trees",
+     "d": 2,
+     "cap": "Wax on, wax off"
+    }
+   ]
+  },
+  {
+   "id": "the-terminator",
+   "name": "The Terminator",
+   "alt": [
+    "Terminator"
+   ],
+   "year": 1984,
+   "director": "James Cameron",
+   "kids": false,
+   "blurb": "A cyborg assassin is sent back in time to kill the mother of humanity's future saviour.",
+   "scenes": [
+    {
+     "p": "a gleaming chrome robot skeleton with glowing red eyes walking through a ruined future city at night, laser fire in the sky",
+     "d": 2,
+     "cap": "The machine war of the future"
+    },
+    {
+     "p": "a crackling sphere of blue lightning in a dark city alley at night, rubbish swirling",
+     "d": 3,
+     "cap": "Arriving from the future in a ball of lightning"
+    }
+   ]
+  },
+  {
+   "id": "the-neverending-story",
+   "name": "The NeverEnding Story",
+   "alt": [
+    "Neverending Story",
+    "The Never Ending Story"
+   ],
+   "year": 1984,
+   "director": "Wolfgang Petersen",
+   "kids": true,
+   "blurb": "A boy reading a magical book is drawn into the land of Fantasia.",
+   "scenes": [
+    {
+     "p": "a boy riding on the back of a huge flying white furry dragon with a friendly dog-like face, soaring above clouds",
+     "d": 1,
+     "cap": "Riding the luckdragon"
+    },
+    {
+     "p": "a boy reading an old book by candlelight in a school attic, gym mats and a stuffed owl",
+     "d": 3,
+     "cap": "Reading in the school attic"
+    }
+   ]
+  },
+  {
+   "id": "back-to-the-future",
+   "name": "Back to the Future",
+   "alt": [],
+   "year": 1985,
+   "director": "Robert Zemeckis",
+   "kids": true,
+   "blurb": "Teenager Marty McFly is sent back to 1955 in a time-travelling car.",
+   "scenes": [
+    {
+     "p": "a stainless-steel gull-wing sports car speeding away at night, leaving two blazing trails of fire on the road and a burst of blue lightning",
+     "d": 1,
+     "cap": "Hitting 88 mph: twin trails of fire"
+    },
+    {
+     "p": "a town square clock tower struck by a huge lightning bolt on a stormy night, a wire stretched down to the street",
+     "d": 2,
+     "cap": "Lightning strikes the clock tower"
+    },
+    {
+     "p": "a teenager in a puffy red vest seen from behind skateboarding while holding onto the back of a 1950s pickup truck in a small-town square",
+     "d": 3,
+     "cap": "Skateboarding through 1955"
+    }
+   ]
+  },
+  {
+   "id": "the-goonies",
+   "name": "The Goonies",
+   "alt": [
+    "Goonies"
+   ],
+   "year": 1985,
+   "director": "Richard Donner",
+   "kids": true,
+   "blurb": "A group of kids follow a treasure map to a pirate ship hidden under their town.",
+   "scenes": [
+    {
+     "p": "an old pirate galleon with tattered sails hidden in a vast sea cave lagoon, treasure glittering, children in silhouette",
+     "d": 1,
+     "cap": "The pirate ship in the cave"
+    },
+    {
+     "p": "a group of kids with torches studying an old treasure map and a doubloon in an attic, Oregon coast rocks through window",
+     "d": 2,
+     "cap": "Finding the treasure map"
+    }
+   ]
+  },
+  {
+   "id": "top-gun",
+   "name": "Top Gun",
+   "alt": [],
+   "year": 1986,
+   "director": "Tony Scott",
+   "kids": false,
+   "blurb": "A hotshot naval aviator trains at the elite fighter weapons school.",
+   "scenes": [
+    {
+     "p": "two sleek jet fighters banking against a hazy golden sunset over an aircraft carrier deck, deck crew silhouetted",
+     "d": 2,
+     "cap": "Danger zone at sunset"
+    },
+    {
+     "p": "a pilot in a leather bomber jacket and aviator sunglasses seen from behind riding a sports motorcycle alongside a runway as a jet takes off",
+     "d": 2,
+     "cap": "Racing a jet on the motorbike"
+    }
+   ]
+  },
+  {
+   "id": "dirty-dancing",
+   "name": "Dirty Dancing",
+   "alt": [],
+   "year": 1987,
+   "director": "Emile Ardolino",
+   "kids": false,
+   "blurb": "A teenager falls for her dance instructor at a 1960s summer resort.",
+   "scenes": [
+    {
+     "p": "a man lifting a woman high above his head as she balances with arms outstretched, standing waist-deep in a lake surrounded by forest, summer",
+     "d": 2,
+     "cap": "Practising the lift in the lake"
+    },
+    {
+     "p": "a 1960s summer holiday resort in the Catskills with a lake, cabins and a dance hall at dusk",
+     "d": 3,
+     "cap": "Summer at Kellerman's resort"
+    }
+   ]
+  },
+  {
+   "id": "the-princess-bride",
+   "name": "The Princess Bride",
+   "alt": [
+    "Princess Bride"
+   ],
+   "year": 1987,
+   "director": "Rob Reiner",
+   "kids": false,
+   "blurb": "A farmhand turned pirate rescues his true love from an evil prince.",
+   "scenes": [
+    {
+     "p": "two swordsmen dueling on the edge of towering sheer sea cliffs, one dressed all in black with a mask, a rope dangling",
+     "d": 2,
+     "cap": "The duel atop the Cliffs of Insanity"
+    },
+    {
+     "p": "a gloomy swamp with bursts of fire spurting from the ground and quicksand, a couple in silhouette",
+     "d": 3,
+     "cap": "The Fire Swamp"
+    }
+   ]
+  },
+  {
+   "id": "ferris-buellers-day-off",
+   "name": "Ferris Bueller's Day Off",
+   "alt": [
+    "Ferris Buellers Day Off"
+   ],
+   "year": 1986,
+   "director": "John Hughes",
+   "kids": false,
+   "blurb": "A high-schooler skips school for a day of adventure in Chicago.",
+   "scenes": [
+    {
+     "p": "a gleaming red vintage sports convertible crashing backwards out of the glass wall of a modern garage into a wooded ravine",
+     "d": 3,
+     "cap": "The red Ferrari goes through the window"
+    },
+    {
+     "p": "a teenager seen from behind singing on a parade float in a crowded Chicago street, confetti",
+     "d": 3,
+     "cap": "Twist and shout on the parade float"
+    }
+   ]
+  },
+  {
+   "id": "big",
+   "name": "Big",
+   "alt": [],
+   "year": 1988,
+   "director": "Penny Marshall",
+   "kids": false,
+   "blurb": "A boy wishes to be big and wakes up as a grown man.",
+   "scenes": [
+    {
+     "p": "two adults in suits dancing on a giant walk-on floor piano keyboard in a huge toy store",
+     "d": 2,
+     "cap": "Playing the giant floor piano"
+    },
+    {
+     "p": "an old fortune-teller arcade machine with a mechanical mystic in a glass booth at a night carnival",
+     "d": 3,
+     "cap": "Making a wish on the fortune machine"
+    }
+   ]
+  },
+  {
+   "id": "die-hard",
+   "name": "Die Hard",
+   "alt": [],
+   "year": 1988,
+   "director": "John McTiernan",
+   "kids": false,
+   "blurb": "A New York cop takes on terrorists who seize a Los Angeles skyscraper on Christmas Eve.",
+   "scenes": [
+    {
+     "p": "a modern skyscraper at night with fire and an explosion on one high floor, Christmas lights, a barefoot man in a vest crawling through an air duct",
+     "d": 2,
+     "cap": "Christmas Eve at Nakatomi Plaza"
+    },
+    {
+     "p": "a man in a white vest leaping from a skyscraper rooftop with a fire hose tied around his waist as a fireball erupts behind",
+     "d": 2,
+     "cap": "The rooftop leap with the fire hose"
+    }
+   ]
+  },
+  {
+   "id": "the-little-mermaid",
+   "name": "The Little Mermaid",
+   "alt": [
+    "Little Mermaid"
+   ],
+   "year": 1989,
+   "director": "Ron Clements, John Musker",
+   "kids": true,
+   "blurb": "A mermaid princess trades her voice to a sea witch to become human.",
+   "scenes": [
+    {
+     "p": "a red-haired mermaid with a green tail seen from behind sitting on a rock as waves crash, a castle and a ship on the horizon at sunset",
+     "d": 1,
+     "cap": "A mermaid dreams of the world above"
+    },
+    {
+     "p": "an undergrounds coral grotto full of human treasures, forks, pipes and candlesticks, shafts of blue light",
+     "d": 2,
+     "cap": "The grotto of human treasures"
+    },
+    {
+     "p": "a crab conducting an orchestra of sea creatures on a coral reef, fish playing instruments",
+     "d": 2,
+     "cap": "Under the sea"
+    }
+   ]
+  },
+  {
+   "id": "field-of-dreams",
+   "name": "Field of Dreams",
+   "alt": [],
+   "year": 1989,
+   "director": "Phil Alden Robinson",
+   "kids": false,
+   "blurb": "An Iowa farmer builds a baseball field in his cornfield after hearing a voice.",
+   "scenes": [
+    {
+     "p": "a baseball diamond in the middle of a golden Iowa cornfield at dusk, old-time ballplayers in vintage uniforms walking out of the corn, floodlights",
+     "d": 2,
+     "cap": "If you build it, they will come"
+    },
+    {
+     "p": "a white farmhouse beside a small baseball field and bleachers in endless cornfields, evening light",
+     "d": 3,
+     "cap": "A ballpark on the farm"
+    }
+   ]
+  },
+  {
+   "id": "dead-poets-society",
+   "name": "Dead Poets Society",
+   "alt": [],
+   "year": 1989,
+   "director": "Peter Weir",
+   "kids": false,
+   "blurb": "An inspiring English teacher urges students at a strict boarding school to seize the day.",
+   "scenes": [
+    {
+     "p": "schoolboys in blazers standing on their desks in a wood-panelled classroom, a teacher seen from behind at the door",
+     "d": 2,
+     "cap": "O Captain! My Captain! on the desks"
+    },
+    {
+     "p": "boys with torches gathered in a misty cave at night reading poetry from a book",
+     "d": 3,
+     "cap": "A secret poetry club in a cave"
+    }
+   ]
+  },
+  {
+   "id": "honey-i-shrunk-the-kids",
+   "name": "Honey, I Shrunk the Kids",
+   "alt": [
+    "Honey I Shrunk the Kids"
+   ],
+   "year": 1989,
+   "director": "Joe Johnston",
+   "kids": true,
+   "blurb": "An inventor accidentally shrinks the children, who must cross the back garden to get home.",
+   "scenes": [
+    {
+     "p": "tiny children the size of ants riding on the back of a giant ant through towering blades of grass in a suburban back garden",
+     "d": 1,
+     "cap": "Riding an ant through the jungle of the lawn"
+    },
+    {
+     "p": "tiny children floating in a giant breakfast cereal bowl, a huge spoon descending",
+     "d": 2,
+     "cap": "Nearly eaten with the cereal"
+    }
+   ]
+  },
+  {
+   "id": "kikis-delivery-service",
+   "name": "Kiki's Delivery Service",
+   "alt": [
+    "Kikis Delivery Service"
+   ],
+   "year": 1989,
+   "director": "Hayao Miyazaki",
+   "kids": true,
+   "blurb": "A young witch moves to a seaside town and starts a flying delivery business.",
+   "scenes": [
+    {
+     "p": "a young witch girl in a dark dress with a big red bow on her head, flying on a broomstick with a black cat over a European seaside town of red roofs and a clock tower",
+     "d": 1,
+     "cap": "A young witch flying over a seaside town"
+    },
+    {
+     "p": "a cosy bakery with bread in the window on a hilly cobbled European street, a broom leaning by the door",
+     "d": 3,
+     "cap": "The bakery she lives above"
+    }
+   ]
+  },
+  {
+   "id": "home-alone",
+   "name": "Home Alone",
+   "alt": [],
+   "year": 1990,
+   "director": "Chris Columbus",
+   "kids": true,
+   "blurb": "An eight-year-old left behind at Christmas defends his house from two burglars.",
+   "scenes": [
+    {
+     "p": "a big brick suburban house decorated for Christmas at night with snow, booby traps visible: a paint can swinging on a rope, toy cars on the stairs, a small boy at the window",
+     "d": 1,
+     "cap": "Booby traps for the Wet Bandits"
+    },
+    {
+     "p": "a little boy alone at a huge dinner table eating macaroni in an empty Christmas house",
+     "d": 2,
+     "cap": "Left home alone at Christmas"
+    },
+    {
+     "p": "a crowded airport terminal with a family running with suitcases, Christmas 1990",
+     "d": 3,
+     "cap": "The family racing for the plane to Paris"
+    }
+   ]
+  },
+  {
+   "id": "ghost",
+   "name": "Ghost",
+   "alt": [],
+   "year": 1990,
+   "director": "Jerry Zucker",
+   "kids": false,
+   "blurb": "A murdered man's spirit stays behind to protect his girlfriend with help from a psychic.",
+   "scenes": [
+    {
+     "p": "close-up of hands shaping wet clay on a spinning pottery wheel, a second pair of hands embracing from behind, warm lamplight in a loft",
+     "d": 2,
+     "cap": "The pottery wheel"
+    },
+    {
+     "p": "a glowing translucent figure in a dark New York loft apartment watching over a sleeping woman",
+     "d": 3,
+     "cap": "Watching over her from the other side"
+    }
+   ]
+  },
+  {
+   "id": "edward-scissorhands",
+   "name": "Edward Scissorhands",
+   "alt": [],
+   "year": 1990,
+   "director": "Tim Burton",
+   "kids": false,
+   "blurb": "An artificial man with scissors for hands is taken in by a pastel suburban town.",
+   "scenes": [
+    {
+     "p": "pastel-coloured suburban houses with elaborate topiary hedges cut into dinosaurs and animals, a dark gothic castle on a hill above",
+     "d": 2,
+     "cap": "Topiary art in pastel suburbia"
+    },
+    {
+     "p": "snow-like flakes of ice falling as a pale figure carves an ice angel with blades for fingers, a girl dancing below",
+     "d": 2,
+     "cap": "Ice-carving snow"
+    }
+   ]
+  },
+  {
+   "id": "beauty-and-the-beast",
+   "name": "Beauty and the Beast",
+   "alt": [],
+   "year": 1991,
+   "director": "Gary Trousdale, Kirk Wise",
+   "kids": true,
+   "blurb": "A bookish young woman is held captive in the castle of a cursed prince.",
+   "scenes": [
+    {
+     "p": "a single glowing red rose under a glass bell jar on a table in a dark castle tower, petals falling",
+     "d": 1,
+     "cap": "The enchanted rose"
+    },
+    {
+     "p": "a woman in a flowing golden ball gown dancing with a huge horned furry beast in a blue coat in a vast candlelit ballroom",
+     "d": 1,
+     "cap": "Tale as old as time"
+    },
+    {
+     "p": "a living candelabra, a mantel clock and a teapot with a chipped teacup on a castle dining table",
+     "d": 2,
+     "cap": "Be our guest: the enchanted household"
+    }
+   ]
+  },
+  {
+   "id": "aladdin",
+   "name": "Aladdin",
+   "alt": [],
+   "year": 1992,
+   "director": "Ron Clements, John Musker",
+   "kids": true,
+   "blurb": "A street urchin finds a magic lamp containing a wish-granting genie.",
+   "scenes": [
+    {
+     "p": "a young man and a princess riding a flying magic carpet over a moonlit Arabian palace with domes and minarets, stars",
+     "d": 1,
+     "cap": "A whole new world on a magic carpet"
+    },
+    {
+     "p": "an old brass oil lamp emitting blue magical smoke in a cave of glittering gold treasure",
+     "d": 1,
+     "cap": "The magic lamp in the Cave of Wonders"
+    },
+    {
+     "p": "a giant tiger-head shaped cave entrance rising out of night desert sand dunes with glowing eyes",
+     "d": 2,
+     "cap": "The Cave of Wonders"
+    }
+   ]
+  },
+  {
+   "id": "jurassic-park",
+   "name": "Jurassic Park",
+   "alt": [],
+   "year": 1993,
+   "director": "Steven Spielberg",
+   "kids": false,
+   "blurb": "Cloned dinosaurs escape at a theme park on a remote island.",
+   "scenes": [
+    {
+     "p": "a huge tyrannosaurus roaring in the rain at night beside a broken electric fence, a jeep with headlights on",
+     "d": 1,
+     "cap": "The T. rex breaks out"
+    },
+    {
+     "p": "ripples trembling in a glass of water on a car dashboard at night",
+     "d": 2,
+     "cap": "The rippling glass of water"
+    },
+    {
+     "p": "a prehistoric mosquito trapped in a polished amber stone on a cane handle",
+     "d": 2,
+     "cap": "Dinosaur DNA in amber"
+    }
+   ]
+  },
+  {
+   "id": "mrs-doubtfire",
+   "name": "Mrs. Doubtfire",
+   "alt": [
+    "Mrs Doubtfire"
+   ],
+   "year": 1993,
+   "director": "Chris Columbus",
+   "kids": false,
+   "blurb": "A divorced dad disguises himself as an elderly British nanny to see his children.",
+   "scenes": [
+    {
+     "p": "an elderly nanny in a floral dress and cardigan seen from behind, face in a fluffy white cream pie, kitchen of a San Francisco house",
+     "d": 3,
+     "cap": "A face full of cream"
+    },
+    {
+     "p": "a nanny in a flowery dress and pearls seen from behind hoovering a living room while dancing with the vacuum cleaner",
+     "d": 2,
+     "cap": "Dancing with the vacuum cleaner"
+    }
+   ]
+  },
+  {
+   "id": "groundhog-day",
+   "name": "Groundhog Day",
+   "alt": [],
+   "year": 1993,
+   "director": "Harold Ramis",
+   "kids": false,
+   "blurb": "A cynical weatherman relives the same day over and over.",
+   "scenes": [
+    {
+     "p": "a groundhog peeking out of a wooden box on a stage in a snowy small-town square crowded with people in winter hats",
+     "d": 2,
+     "cap": "The groundhog sees his shadow"
+    },
+    {
+     "p": "an old clock radio flipping from 5:59 to 6:00 in a cosy bed-and-breakfast bedroom, digits shown as plain shapes",
+     "d": 3,
+     "cap": "The same morning, again"
+    }
+   ]
+  },
+  {
+   "id": "free-willy",
+   "name": "Free Willy",
+   "alt": [],
+   "year": 1993,
+   "director": "Simon Wincer",
+   "kids": true,
+   "blurb": "A boy helps a captive orca escape to the ocean.",
+   "scenes": [
+    {
+     "p": "a huge orca killer whale leaping over a boy standing on a rocky harbour breakwater, ocean spray, sunset",
+     "d": 1,
+     "cap": "The leap to freedom"
+    },
+    {
+     "p": "a boy and an orca nose to nose at the glass of a small theme park tank",
+     "d": 2,
+     "cap": "A boy befriends a captive orca"
+    }
+   ]
+  },
+  {
+   "id": "the-lion-king",
+   "name": "The Lion King",
+   "alt": [
+    "Lion King"
+   ],
+   "year": 1994,
+   "director": "Roger Allers, Rob Minkoff",
+   "kids": true,
+   "blurb": "A lion cub flees his kingdom after his father's death and returns to reclaim it.",
+   "scenes": [
+    {
+     "p": "a baboon holding up a newborn lion cub at the edge of a jutting rock outcrop at sunrise, herds of African animals bowing below",
+     "d": 1,
+     "cap": "The circle of life at Pride Rock"
+    },
+    {
+     "p": "a vast stampede of wildebeest thundering through a narrow rocky gorge, dust clouds",
+     "d": 2,
+     "cap": "The wildebeest stampede"
+    },
+    {
+     "p": "a meerkat, a warthog and a young lion walking across a log over a jungle stream",
+     "d": 2,
+     "cap": "Hakuna matata"
+    }
+   ]
+  },
+  {
+   "id": "forrest-gump",
+   "name": "Forrest Gump",
+   "alt": [],
+   "year": 1994,
+   "director": "Robert Zemeckis",
+   "kids": false,
+   "blurb": "A kind-hearted Alabama man drifts through decades of American history.",
+   "scenes": [
+    {
+     "p": "a man in a white suit seen from behind sitting on a park bench at a bus stop with an open box of chocolates, a white feather floating down, Southern street",
+     "d": 2,
+     "cap": "Life is like a box of chocolates"
+    },
+    {
+     "p": "a bearded man running down an empty desert highway in Monument Valley with a crowd of runners following",
+     "d": 2,
+     "cap": "Running across America"
+    },
+    {
+     "p": "a shrimp fishing boat on a calm Gulf bay after a storm, every other boat wrecked",
+     "d": 3,
+     "cap": "The shrimp boat that survived the hurricane"
+    }
+   ]
+  },
+  {
+   "id": "the-shawshank-redemption",
+   "name": "The Shawshank Redemption",
+   "alt": [
+    "Shawshank Redemption",
+    "Shawshank"
+   ],
+   "year": 1994,
+   "director": "Frank Darabont",
+   "kids": false,
+   "blurb": "A banker wrongly jailed for murder befriends a fellow inmate and plans his escape.",
+   "scenes": [
+    {
+     "p": "a man seen from behind standing in a muddy stream at night in a thunderstorm, arms raised to the pouring rain, a grim stone prison behind him",
+     "d": 2,
+     "cap": "Free, in the rain"
+    },
+    {
+     "p": "a small rock hammer and a poster on a prison cell wall partly peeled back revealing a tunnel",
+     "d": 3,
+     "cap": "The tunnel behind the poster"
+    },
+    {
+     "p": "a sunny Mexican beach with a man sanding an old wooden boat, turquoise sea",
+     "d": 3,
+     "cap": "Zihuatanejo"
+    }
+   ]
+  },
+  {
+   "id": "speed",
+   "name": "Speed",
+   "alt": [],
+   "year": 1994,
+   "director": "Jan de Bont",
+   "kids": false,
+   "blurb": "A bomb on a Los Angeles bus will explode if it drops below 50 mph.",
+   "scenes": [
+    {
+     "p": "a city bus flying through the air across a gap in an unfinished elevated freeway, Los Angeles",
+     "d": 2,
+     "cap": "The bus jumps the freeway gap"
+    },
+    {
+     "p": "a speeding city bus weaving through Los Angeles traffic with police cars chasing",
+     "d": 3,
+     "cap": "Pop quiz, hotshot: don't slow down"
+    }
+   ]
+  },
+  {
+   "id": "toy-story",
+   "name": "Toy Story",
+   "alt": [],
+   "year": 1995,
+   "director": "John Lasseter",
+   "kids": true,
+   "blurb": "A cowboy doll is jealous when a new space-ranger action figure becomes his owner's favourite.",
+   "scenes": [
+    {
+     "p": "toys coming alive in a child's bedroom with cloud-patterned blue wallpaper: a cowboy rag doll, a toy spaceman, a plastic dinosaur and green plastic toy soldiers",
+     "d": 1,
+     "cap": "The toys come alive when nobody's looking"
+    },
+    {
+     "p": "a toy spaceman with wings leaping off a bedpost, falling with style, viewed from below",
+     "d": 2,
+     "cap": "Falling with style"
+    },
+    {
+     "p": "a claw crane arcade machine full of three-eyed green alien toys looking up at the claw",
+     "d": 2,
+     "cap": "The claw at Pizza Planet"
+    }
+   ]
+  },
+  {
+   "id": "jumanji",
+   "name": "Jumanji",
+   "alt": [],
+   "year": 1995,
+   "director": "Joe Johnston",
+   "kids": true,
+   "blurb": "A magical board game unleashes jungle dangers on a small town.",
+   "scenes": [
+    {
+     "p": "an ornate carved wooden jungle board game glowing on a table, a stampede of rhinos and elephants bursting through the walls of a house",
+     "d": 1,
+     "cap": "The board game unleashes a stampede"
+    },
+    {
+     "p": "monkeys wrecking a kitchen and driving a police car, vines bursting through the floor",
+     "d": 2,
+     "cap": "Jungle chaos in town"
+    }
+   ]
+  },
+  {
+   "id": "babe",
+   "name": "Babe",
+   "alt": [],
+   "year": 1995,
+   "director": "Chris Noonan",
+   "kids": true,
+   "blurb": "A piglet raised by sheepdogs learns to herd sheep.",
+   "scenes": [
+    {
+     "p": "a little pink piglet herding a flock of sheep into a pen at a sheepdog trial in green countryside, a farmer watching",
+     "d": 1,
+     "cap": "The sheep-pig wins the trial"
+    },
+    {
+     "p": "a piglet curled up asleep with a border collie and her puppies in a barn",
+     "d": 2,
+     "cap": "Adopted by the sheepdog"
+    }
+   ]
+  },
+  {
+   "id": "apollo-13",
+   "name": "Apollo 13",
+   "alt": [],
+   "year": 1995,
+   "director": "Ron Howard",
+   "kids": false,
+   "blurb": "Three astronauts struggle home after an explosion cripples their Moon mission.",
+   "scenes": [
+    {
+     "p": "a damaged 1970s Apollo command module and service module venting gas in space, the Moon looming, Earth small in the distance",
+     "d": 2,
+     "cap": "Houston, we have a problem"
+    },
+    {
+     "p": "engineers around a table with a cardboard box of spacecraft parts, hoses and duct tape, 1970s mission control",
+     "d": 3,
+     "cap": "Fitting a square filter into a round hole"
+    }
+   ]
+  },
+  {
+   "id": "independence-day",
+   "name": "Independence Day",
+   "alt": [],
+   "year": 1996,
+   "director": "Roland Emmerich",
+   "kids": false,
+   "blurb": "Humanity fights back against a massive alien invasion on the Fourth of July.",
+   "scenes": [
+    {
+     "p": "a colossal dark disc-shaped alien mothership hovering over a white domed government building, a blinding beam firing down",
+     "d": 1,
+     "cap": "The alien ship over the White House"
+    },
+    {
+     "p": "enormous alien saucers casting shadows over New York skyscrapers, people looking up from the street",
+     "d": 2,
+     "cap": "Shadows over the city"
+    }
+   ]
+  },
+  {
+   "id": "twister",
+   "name": "Twister",
+   "alt": [],
+   "year": 1996,
+   "director": "Jan de Bont",
+   "kids": false,
+   "blurb": "Storm chasers race to put sensors into the heart of a tornado.",
+   "scenes": [
+    {
+     "p": "a red pickup truck racing along a dirt road toward a huge black tornado over Oklahoma farmland, a cow flying through the air",
+     "d": 1,
+     "cap": "Chasing the tornado (with a flying cow)"
+    },
+    {
+     "p": "hundreds of small sensor balls being sucked up into a spinning tornado funnel",
+     "d": 3,
+     "cap": "Dorothy's sensors fly into the twister"
+    }
+   ]
+  },
+  {
+   "id": "matilda",
+   "name": "Matilda",
+   "alt": [],
+   "year": 1996,
+   "director": "Danny DeVito",
+   "kids": true,
+   "blurb": "A brilliant girl with telekinetic powers stands up to her awful parents and headmistress.",
+   "scenes": [
+    {
+     "p": "a small girl reading in a library chair as books float magically around her in the air",
+     "d": 1,
+     "cap": "A girl whose books float"
+    },
+    {
+     "p": "a boy at a school assembly eating a gigantic chocolate cake, schoolchildren cheering",
+     "d": 2,
+     "cap": "The giant chocolate cake"
+    },
+    {
+     "p": "a stern headmistress figure seen from behind swinging a girl by her pigtails in a schoolyard",
+     "d": 3,
+     "cap": "The hammer throw"
+    }
+   ]
+  },
+  {
+   "id": "titanic",
+   "name": "Titanic",
+   "alt": [],
+   "year": 1997,
+   "director": "James Cameron",
+   "kids": false,
+   "blurb": "A love story aboard the doomed ocean liner on its maiden voyage in 1912.",
+   "scenes": [
+    {
+     "p": "a colossal ocean liner with four funnels at night gliding toward a towering iceberg under a starry sky, tiny glowing portholes, calm black sea",
+     "d": 1,
+     "cap": "The ship that 'could not sink' meets an iceberg"
+    },
+    {
+     "p": "a couple seen from behind at the very bow of a great ship, the woman with arms outstretched like flying, golden sunset over the ocean",
+     "d": 1,
+     "cap": "I'm flying! at the ship's bow"
+    },
+    {
+     "p": "a sparkling blue heart-shaped diamond necklace on a velvet cloth beside a charcoal sketchbook",
+     "d": 2,
+     "cap": "The Heart of the Ocean"
+    }
+   ]
+  },
+  {
+   "id": "men-in-black",
+   "name": "Men in Black",
+   "alt": [],
+   "year": 1997,
+   "director": "Barry Sonnenfeld",
+   "kids": false,
+   "blurb": "Two secret agents police alien immigrants living on Earth.",
+   "scenes": [
+    {
+     "p": "two agents in black suits and dark sunglasses seen from behind, one holding up a small silver flash device, New York street at night",
+     "d": 2,
+     "cap": "Look into the neuralyzer"
+    },
+    {
+     "p": "a busy secret alien immigration hall with strange creatures queuing at desks, retro-futuristic",
+     "d": 3,
+     "cap": "Alien immigration at headquarters"
+    }
+   ]
+  },
+  {
+   "id": "mulan",
+   "name": "Mulan",
+   "alt": [],
+   "year": 1998,
+   "director": "Tony Bancroft, Barry Cook",
+   "kids": true,
+   "blurb": "A young woman disguises herself as a man to take her father's place in the Chinese army.",
+   "scenes": [
+    {
+     "p": "a young woman cutting her long black hair with a sword by moonlight beside a stone dragon statue in a Chinese courtyard",
+     "d": 1,
+     "cap": "Taking her father's place"
+    },
+    {
+     "p": "a huge avalanche roaring down a snowy mountain pass onto an army on horseback, a lone soldier with a cannon",
+     "d": 2,
+     "cap": "The avalanche in the mountain pass"
+    },
+    {
+     "p": "a tiny red dragon and a cricket in a cage riding on a horse, Chinese mountain landscape",
+     "d": 2,
+     "cap": "A small red dragon guardian"
+    }
+   ]
+  },
+  {
+   "id": "armageddon",
+   "name": "Armageddon",
+   "alt": [],
+   "year": 1998,
+   "director": "Michael Bay",
+   "kids": false,
+   "blurb": "Oil drillers are sent to blow up an asteroid heading for Earth.",
+   "scenes": [
+    {
+     "p": "a massive jagged asteroid hurtling toward Earth, a space shuttle landing on its surface, fiery debris",
+     "d": 2,
+     "cap": "Drillers to the asteroid"
+    },
+    {
+     "p": "a crew of drillers in orange spacesuits walking in slow motion toward a launch pad",
+     "d": 3,
+     "cap": "The walk to the launch pad"
+    }
+   ]
+  },
+  {
+   "id": "the-matrix",
+   "name": "The Matrix",
+   "alt": [
+    "Matrix"
+   ],
+   "year": 1999,
+   "director": "The Wachowskis",
+   "kids": false,
+   "blurb": "A hacker learns the world is a simulation and joins a rebellion against the machines.",
+   "scenes": [
+    {
+     "p": "a man in a long black coat and sunglasses leaning far backwards dodging bullets with ripple trails in mid-air on a rooftop, green tint",
+     "d": 1,
+     "cap": "Dodging bullets in slow motion"
+    },
+    {
+     "p": "an open palm offering a red pill and a blue pill in a dark room lit by green light",
+     "d": 1,
+     "cap": "Red pill or blue pill?"
+    },
+    {
+     "p": "a vast field of pods holding sleeping humans connected by cables, towers stretching into a dark sky",
+     "d": 2,
+     "cap": "The human battery fields"
+    }
+   ]
+  },
+  {
+   "id": "the-iron-giant",
+   "name": "The Iron Giant",
+   "alt": [
+    "Iron Giant"
+   ],
+   "year": 1999,
+   "director": "Brad Bird",
+   "kids": true,
+   "blurb": "A boy in 1950s Maine befriends a giant robot from outer space.",
+   "scenes": [
+    {
+     "p": "a towering friendly iron robot sitting in a Maine forest at night beside a small boy, a 1950s car junkyard, starry sky",
+     "d": 1,
+     "cap": "A boy and his giant robot"
+    },
+    {
+     "p": "a giant iron robot flying up into space like a rocket, 1950s town below",
+     "d": 3,
+     "cap": "Superman: the robot's sacrifice"
+    }
+   ]
+  },
+  {
+   "id": "stuart-little",
+   "name": "Stuart Little",
+   "alt": [],
+   "year": 1999,
+   "director": "Rob Minkoff",
+   "kids": true,
+   "blurb": "A New York family adopts a mouse, who wins over everyone except the cat.",
+   "scenes": [
+    {
+     "p": "a small mouse in a red jumper sailing a toy sailboat in a race on a Central Park pond, boys watching from the edge",
+     "d": 1,
+     "cap": "The mouse who sailed in the boat race"
+    },
+    {
+     "p": "a mouse driving a tiny toy red sports car through a busy New York street",
+     "d": 2,
+     "cap": "A mouse in a toy roadster"
+    }
+   ]
+  },
+  {
+   "id": "gladiator",
+   "name": "Gladiator",
+   "alt": [],
+   "year": 2000,
+   "director": "Ridley Scott",
+   "kids": false,
+   "blurb": "A betrayed Roman general becomes a gladiator and seeks revenge on the emperor.",
+   "scenes": [
+    {
+     "p": "a gladiator in armour seen from behind standing alone in the sand of the vast Colosseum arena, the crowd roaring, rose petals",
+     "d": 1,
+     "cap": "Are you not entertained?"
+    },
+    {
+     "p": "a hand brushing through tall golden wheat in a sunlit field, cypress trees",
+     "d": 2,
+     "cap": "A hand through the wheat field"
+    }
+   ]
+  },
+  {
+   "id": "cast-away",
+   "name": "Cast Away",
+   "alt": [
+    "Castaway"
+   ],
+   "year": 2000,
+   "director": "Robert Zemeckis",
+   "kids": false,
+   "blurb": "A courier stranded on a deserted island survives alone for four years.",
+   "scenes": [
+    {
+     "p": "a white volleyball with a painted red handprint face on a rock on a deserted tropical island beach, a crude raft on the sand",
+     "d": 1,
+     "cap": "A volleyball for a friend"
+    },
+    {
+     "p": "a bearded man on a tiny makeshift raft alone in a vast ocean, a giant whale surfacing beside him",
+     "d": 2,
+     "cap": "Adrift on the raft"
+    },
+    {
+     "p": "an unopened brown parcel with wings drawn on it on a cave shelf beside a fire",
+     "d": 3,
+     "cap": "The parcel he never opened"
+    }
+   ]
+  },
+  {
+   "id": "chicken-run",
+   "name": "Chicken Run",
+   "alt": [],
+   "year": 2000,
+   "director": "Peter Lord, Nick Park",
+   "kids": true,
+   "blurb": "Chickens on a Yorkshire farm plan a daring escape.",
+   "scenes": [
+    {
+     "p": "a flock of plasticine-style chickens flying a homemade wooden aeroplane out of a barbed-wire chicken farm at night",
+     "d": 1,
+     "cap": "The great chicken escape by plane"
+    },
+    {
+     "p": "a chicken farm with rows of wooden huts behind barbed-wire fences like a prison camp, searchlights",
+     "d": 2,
+     "cap": "The farm that looks like a prison camp"
+    }
+   ]
+  },
+  {
+   "id": "shrek",
+   "name": "Shrek",
+   "alt": [],
+   "year": 2001,
+   "director": "Andrew Adamson, Vicky Jenson",
+   "kids": true,
+   "blurb": "A grumpy ogre and a talking donkey set out to rescue a princess.",
+   "scenes": [
+    {
+     "p": "a big fierce dragon guarding a dark castle surrounded by bubbling lava, a burly figure and a little grey donkey crossing a rickety rope bridge",
+     "d": 1,
+     "cap": "Crossing the bridge to the dragon's castle"
+    },
+    {
+     "p": "a mossy wooden outhouse and a stump house in a misty green swamp, fairy-tale creatures arriving",
+     "d": 2,
+     "cap": "A swamp invaded by fairy-tale creatures"
+    },
+    {
+     "p": "a frightened little gingerbread man with gumdrop buttons on a baking tray in a gloomy castle kitchen",
+     "d": 2,
+     "cap": "Not my gumdrop buttons!"
+    }
+   ]
+  },
+  {
+   "id": "harry-potter-1",
+   "name": "Harry Potter and the Philosopher's Stone",
+   "alt": [
+    "Harry Potter and the Sorcerer's Stone",
+    "Harry Potter"
+   ],
+   "year": 2001,
+   "director": "Chris Columbus",
+   "kids": true,
+   "blurb": "An orphan discovers he is a wizard and goes to Hogwarts.",
+   "scenes": [
+    {
+     "p": "hundreds of letters with wax seals flying out of a fireplace in a suburban living room, a snowy owl at the window",
+     "d": 1,
+     "cap": "The letters that wouldn't stop coming"
+    },
+    {
+     "p": "a vast great hall with hundreds of floating candles over long wooden tables under a starry enchanted ceiling, a castle",
+     "d": 1,
+     "cap": "The floating candles of the Great Hall"
+    },
+    {
+     "p": "a boy pushing a luggage trolley with an owl cage running at a brick wall between railway platforms, a red steam engine",
+     "d": 2,
+     "cap": "Through the wall to Platform 9¾"
+    }
+   ]
+  },
+  {
+   "id": "lotr-fellowship",
+   "name": "The Lord of the Rings: The Fellowship of the Ring",
+   "alt": [
+    "The Fellowship of the Ring",
+    "Lord of the Rings",
+    "The Lord of the Rings"
+   ],
+   "year": 2001,
+   "director": "Peter Jackson",
+   "kids": false,
+   "blurb": "A hobbit begins the quest to destroy the One Ring.",
+   "scenes": [
+    {
+     "p": "a plain gold ring lying in an open palm, glowing faintly, a dark volcanic mountain smouldering in the background",
+     "d": 1,
+     "cap": "One ring to rule them all"
+    },
+    {
+     "p": "a round green door set into a grassy hillside home, lush garden, a small figure with pipe on the bench",
+     "d": 2,
+     "cap": "A hobbit hole in the Shire"
+    },
+    {
+     "p": "a wizard with a staff confronting a huge fiery shadow demon on a narrow stone bridge in a cavernous dwarven hall",
+     "d": 2,
+     "cap": "You shall not pass"
+    }
+   ]
+  },
+  {
+   "id": "monsters-inc",
+   "name": "Monsters, Inc.",
+   "alt": [
+    "Monsters Inc"
+   ],
+   "year": 2001,
+   "director": "Pete Docter",
+   "kids": true,
+   "blurb": "Monsters who scare children for power discover a little girl in their world.",
+   "scenes": [
+    {
+     "p": "thousands of colourful bedroom closet doors hanging from an enormous factory conveyor rail stretching into the distance",
+     "d": 1,
+     "cap": "The door vault"
+    },
+    {
+     "p": "a factory floor with yellow scream canisters and doorways, a little girl's sock hanging off a hairy furry arm",
+     "d": 3,
+     "cap": "The scare floor"
+    }
+   ]
+  },
+  {
+   "id": "spirited-away",
+   "name": "Spirited Away",
+   "alt": [],
+   "year": 2001,
+   "director": "Hayao Miyazaki",
+   "kids": true,
+   "blurb": "A girl trapped in a spirit world works in a bathhouse to save her parents.",
+   "scenes": [
+    {
+     "p": "a towering red Japanese bathhouse glowing with lanterns at night across a bridge, steam rising, mysterious spirits",
+     "d": 1,
+     "cap": "The spirits' bathhouse"
+    },
+    {
+     "p": "an old train gliding across a shallow sea that stretches to the horizon, a girl sitting beside a shadowy masked passenger",
+     "d": 2,
+     "cap": "The train across the sea"
+    },
+    {
+     "p": "a man and a woman who have turned into pigs eating at a deserted food stall",
+     "d": 2,
+     "cap": "Her parents turned into pigs"
+    }
+   ]
+  },
+  {
+   "id": "ice-age",
+   "name": "Ice Age",
+   "alt": [],
+   "year": 2002,
+   "director": "Chris Wedge",
+   "kids": true,
+   "blurb": "A mammoth, a sloth and a sabre-toothed tiger return a human baby to his tribe.",
+   "scenes": [
+    {
+     "p": "a woolly mammoth, a sabre-toothed cat and a goofy sloth walking across a glacier carrying a bundled baby",
+     "d": 1,
+     "cap": "An unlikely herd crossing the ice"
+    },
+    {
+     "p": "a wide-eyed prehistoric squirrel clinging desperately to an acorn on a cracking glacier",
+     "d": 1,
+     "cap": "The squirrel and the acorn"
+    }
+   ]
+  },
+  {
+   "id": "finding-nemo",
+   "name": "Finding Nemo",
+   "alt": [],
+   "year": 2003,
+   "director": "Andrew Stanton",
+   "kids": true,
+   "blurb": "A clownfish crosses the ocean to find his son, captured by a diver.",
+   "scenes": [
+    {
+     "p": "a small orange-and-white striped clownfish with a little fin and a blue tang fish swimming through a sea anemone in a bright coral reef",
+     "d": 1,
+     "cap": "A clownfish and a blue tang"
+    },
+    {
+     "p": "a group of sea turtles riding a swirling blue ocean current like a highway",
+     "d": 2,
+     "cap": "Riding the East Australian Current"
+    },
+    {
+     "p": "a fish tank in a dentist's office overlooking Sydney Harbour",
+     "d": 3,
+     "cap": "The dentist's fish tank in Sydney"
+    }
+   ]
+  },
+  {
+   "id": "pirates-of-the-caribbean",
+   "name": "Pirates of the Caribbean: The Curse of the Black Pearl",
+   "alt": [
+    "Pirates of the Caribbean",
+    "The Curse of the Black Pearl"
+   ],
+   "year": 2003,
+   "director": "Gore Verbinski",
+   "kids": false,
+   "blurb": "A blacksmith teams up with an eccentric pirate captain to rescue the governor's daughter from cursed pirates.",
+   "scenes": [
+    {
+     "p": "skeleton pirates in tattered clothes revealed in moonlight on the deck of a black-sailed pirate ship",
+     "d": 2,
+     "cap": "Cursed pirates in the moonlight"
+    },
+    {
+     "p": "a pirate with dreadlocks and a tricorn hat seen from behind standing proudly on the mast of a small sinking boat as it docks",
+     "d": 2,
+     "cap": "Arriving on a sinking boat"
+    },
+    {
+     "p": "a stone chest of Aztec gold coins in a treasure cave",
+     "d": 3,
+     "cap": "The cursed Aztec gold"
+    }
+   ]
+  },
+  {
+   "id": "elf",
+   "name": "Elf",
+   "alt": [],
+   "year": 2003,
+   "director": "Jon Favreau",
+   "kids": true,
+   "blurb": "A human raised by Santa's elves travels to New York to find his real father.",
+   "scenes": [
+    {
+     "p": "a tall man in a green elf costume and yellow tights seen from behind amid the tiny houses of a North Pole workshop, elves at work",
+     "d": 1,
+     "cap": "A very tall elf at the North Pole"
+    },
+    {
+     "p": "a tall man in an elf costume walking through a snowy New York street at Christmas past yellow taxis",
+     "d": 2,
+     "cap": "An elf in New York"
+    }
+   ]
+  },
+  {
+   "id": "the-polar-express",
+   "name": "The Polar Express",
+   "alt": [
+    "Polar Express"
+   ],
+   "year": 2004,
+   "director": "Robert Zemeckis",
+   "kids": true,
+   "blurb": "A boy boards a magical train to the North Pole on Christmas Eve.",
+   "scenes": [
+    {
+     "p": "a magnificent black steam locomotive stopped in the snow outside a suburban house on Christmas Eve, a boy in pyjamas on the porch",
+     "d": 1,
+     "cap": "All aboard the train to the North Pole"
+    },
+    {
+     "p": "a single silver sleigh bell in a child's hand, snow falling",
+     "d": 3,
+     "cap": "The first gift of Christmas"
+    }
+   ]
+  },
+  {
+   "id": "madagascar",
+   "name": "Madagascar",
+   "alt": [],
+   "year": 2005,
+   "director": "Eric Darnell, Tom McGrath",
+   "kids": true,
+   "blurb": "Four pampered zoo animals end up stranded on Madagascar.",
+   "scenes": [
+    {
+     "p": "a cartoon lion, zebra, giraffe and hippo washed up on a tropical beach in Madagascar, shipping crates around them, lemurs watching",
+     "d": 1,
+     "cap": "Zoo animals stranded on the beach"
+    },
+    {
+     "p": "four penguins steering a cargo ship across the ocean",
+     "d": 2,
+     "cap": "The penguins take over the ship"
+    }
+   ]
+  },
+  {
+   "id": "cars",
+   "name": "Cars",
+   "alt": [],
+   "year": 2006,
+   "director": "John Lasseter",
+   "kids": true,
+   "blurb": "A hotshot race car gets stranded in a forgotten Route 66 town.",
+   "scenes": [
+    {
+     "p": "a shiny red stock racing car with lightning bolt stripes on a desert highway beside a sleepy old Route 66 town with neon motels and red rock mesas",
+     "d": 1,
+     "cap": "Stranded on Route 66"
+    },
+    {
+     "p": "tractors tipping over in a field at night",
+     "d": 3,
+     "cap": "Tractor tipping"
+    }
+   ]
+  },
+  {
+   "id": "happy-feet",
+   "name": "Happy Feet",
+   "alt": [],
+   "year": 2006,
+   "director": "George Miller",
+   "kids": true,
+   "blurb": "An emperor penguin who can't sing finds his heart song in tap dancing.",
+   "scenes": [
+    {
+     "p": "a fluffy grey baby emperor penguin tap-dancing on the ice in front of a huge colony of penguins in Antarctica",
+     "d": 1,
+     "cap": "The tap-dancing penguin"
+    },
+    {
+     "p": "penguins sliding on their bellies down an icy slope in Antarctica",
+     "d": 3,
+     "cap": "Tobogganing across the ice"
+    }
+   ]
+  },
+  {
+   "id": "night-at-the-museum",
+   "name": "Night at the Museum",
+   "alt": [],
+   "year": 2006,
+   "director": "Shawn Levy",
+   "kids": true,
+   "blurb": "A night guard discovers the museum exhibits come to life after dark.",
+   "scenes": [
+    {
+     "p": "a giant tyrannosaurus skeleton playfully chasing a night guard holding a torch through the marble hall of a natural history museum at night",
+     "d": 1,
+     "cap": "The T. rex skeleton wants to play fetch"
+    },
+    {
+     "p": "tiny cowboys and Roman soldiers from museum dioramas battling on a display case at night",
+     "d": 2,
+     "cap": "Miniature dioramas come to life"
+    }
+   ]
+  },
+  {
+   "id": "ratatouille",
+   "name": "Ratatouille",
+   "alt": [],
+   "year": 2007,
+   "director": "Brad Bird",
+   "kids": true,
+   "blurb": "A rat who dreams of being a chef teams up with a kitchen boy in Paris.",
+   "scenes": [
+    {
+     "p": "a small grey rat in a tiny white chef's hat stirring a pot of soup in a busy Paris restaurant kitchen",
+     "d": 1,
+     "cap": "A rat who loves to cook"
+    },
+    {
+     "p": "a rat looking out over the night skyline of Paris with the Eiffel Tower from a rooftop",
+     "d": 2,
+     "cap": "A rat's view of Paris"
+    },
+    {
+     "p": "a plate of layered sliced vegetables in a ratatouille spiral, a stern food critic's pen dropping",
+     "d": 2,
+     "cap": "The dish that won the critic"
+    }
+   ]
+  },
+  {
+   "id": "wall-e",
+   "name": "WALL-E",
+   "alt": [
+    "Wall-E",
+    "WALLE"
+   ],
+   "year": 2008,
+   "director": "Andrew Stanton",
+   "kids": true,
+   "blurb": "A lonely trash-compacting robot on an abandoned Earth falls in love.",
+   "scenes": [
+    {
+     "p": "a small rusty boxy robot seen from behind among skyscraper-high towers of cubed rubbish under a dusty orange sky, a tiny green seedling in an old boot",
+     "d": 1,
+     "cap": "Cleaning up an abandoned Earth"
+    },
+    {
+     "p": "a sleek white egg-shaped flying robot dancing in space with a little rusty robot using a fire extinguisher",
+     "d": 2,
+     "cap": "Dancing in space"
+    }
+   ]
+  },
+  {
+   "id": "kung-fu-panda",
+   "name": "Kung Fu Panda",
+   "alt": [],
+   "year": 2008,
+   "director": "John Stevenson, Mark Osborne",
+   "kids": true,
+   "blurb": "A clumsy noodle-loving panda is chosen as the Dragon Warrior.",
+   "scenes": [
+    {
+     "p": "a chubby giant panda in kung fu pose on top of a mountain temple's thousand steps, Chinese misty peaks",
+     "d": 1,
+     "cap": "The panda who became a kung fu master"
+    },
+    {
+     "p": "a peach tree on a misty mountain with falling blossoms, an old tortoise beneath",
+     "d": 3,
+     "cap": "The sacred peach tree"
+    }
+   ]
+  },
+  {
+   "id": "mamma-mia",
+   "name": "Mamma Mia!",
+   "alt": [
+    "Mamma Mia"
+   ],
+   "year": 2008,
+   "director": "Phyllida Lloyd",
+   "kids": false,
+   "blurb": "A bride-to-be invites three possible fathers to her wedding on a Greek island, set to ABBA songs.",
+   "scenes": [
+    {
+     "p": "a whitewashed chapel on a cliff top of a Greek island with blue sea, people in white dancing on a jetty",
+     "d": 3,
+     "cap": "A wedding on a Greek island"
+    },
+    {
+     "p": "women in flared 1970s jumpsuits dancing on a rustic Greek taverna terrace by the sea",
+     "d": 3,
+     "cap": "Dancing queens"
+    }
+   ]
+  },
+  {
+   "id": "up",
+   "name": "Up",
+   "alt": [],
+   "year": 2009,
+   "director": "Pete Docter",
+   "kids": true,
+   "blurb": "An old widower ties balloons to his house to fly to South America.",
+   "scenes": [
+    {
+     "p": "a small wooden house lifted into the sky by thousands of colourful helium balloons, floating over a city",
+     "d": 1,
+     "cap": "A house carried away by balloons"
+    },
+    {
+     "p": "a house perched beside a towering waterfall on a South American mesa",
+     "d": 2,
+     "cap": "Paradise Falls"
+    },
+    {
+     "p": "a golden retriever wearing a collar device, a squirrel in the jungle",
+     "d": 3,
+     "cap": "Squirrel!"
+    }
+   ]
+  },
+  {
+   "id": "avatar",
+   "name": "Avatar",
+   "alt": [],
+   "year": 2009,
+   "director": "James Cameron",
+   "kids": false,
+   "blurb": "A marine on the moon Pandora joins the blue-skinned Na'vi.",
+   "scenes": [
+    {
+     "p": "floating mountains with waterfalls drifting over a lush alien jungle, giant winged creatures flying",
+     "d": 1,
+     "cap": "The floating mountains of Pandora"
+    },
+    {
+     "p": "a glowing bioluminescent alien forest at night with a huge sacred willow tree",
+     "d": 2,
+     "cap": "The glowing forest at night"
+    }
+   ]
+  },
+  {
+   "id": "inception",
+   "name": "Inception",
+   "alt": [],
+   "year": 2010,
+   "director": "Christopher Nolan",
+   "kids": false,
+   "blurb": "A thief enters people's dreams to plant an idea.",
+   "scenes": [
+    {
+     "p": "a city street folding up and over onto itself in a dreamscape, people seen from behind walking",
+     "d": 1,
+     "cap": "The city folding over in a dream"
+    },
+    {
+     "p": "a small spinning top wobbling on a wooden table",
+     "d": 2,
+     "cap": "Is it still spinning?"
+    },
+    {
+     "p": "a hotel corridor rotating, men fighting on the walls and ceiling",
+     "d": 2,
+     "cap": "The rotating hallway fight"
+    }
+   ]
+  },
+  {
+   "id": "tangled",
+   "name": "Tangled",
+   "alt": [],
+   "year": 2010,
+   "director": "Nathan Greno, Byron Howard",
+   "kids": true,
+   "blurb": "A princess with magical long hair leaves her tower to see the floating lanterns.",
+   "scenes": [
+    {
+     "p": "a young woman with extremely long golden hair seen from behind in a small boat with a young man, thousands of glowing floating lanterns rising over a lake at night",
+     "d": 1,
+     "cap": "I see the light: the floating lanterns"
+    },
+    {
+     "p": "an isolated stone tower in a secret valley, a very long golden braid hanging from the window",
+     "d": 2,
+     "cap": "Let down your hair"
+    }
+   ]
+  },
+  {
+   "id": "how-to-train-your-dragon",
+   "name": "How to Train Your Dragon",
+   "alt": [],
+   "year": 2010,
+   "director": "Dean DeBlois, Chris Sanders",
+   "kids": true,
+   "blurb": "A young Viking befriends an injured dragon.",
+   "scenes": [
+    {
+     "p": "a skinny viking boy riding a sleek black dragon with a prosthetic tail fin, soaring over a viking village on sea stacks",
+     "d": 1,
+     "cap": "A viking boy rides his dragon"
+    },
+    {
+     "p": "a viking village on rocky cliffs being raided by dragons at night",
+     "d": 2,
+     "cap": "Dragon raid on Berk"
+    }
+   ]
+  },
+  {
+   "id": "life-of-pi",
+   "name": "Life of Pi",
+   "alt": [],
+   "year": 2012,
+   "director": "Ang Lee",
+   "kids": false,
+   "blurb": "A boy survives a shipwreck in a lifeboat with a Bengal tiger.",
+   "scenes": [
+    {
+     "p": "a Bengal tiger and a young man in a lifeboat on a calm glassy ocean at night, the stars reflected",
+     "d": 1,
+     "cap": "Adrift with a tiger"
+    },
+    {
+     "p": "a lifeboat drifting through glowing jellyfish as a huge whale leaps",
+     "d": 2,
+     "cap": "The glowing ocean night"
+    }
+   ]
+  },
+  {
+   "id": "brave",
+   "name": "Brave",
+   "alt": [],
+   "year": 2012,
+   "director": "Mark Andrews, Brenda Chapman",
+   "kids": true,
+   "blurb": "A Scottish princess defies tradition and her mother turns into a bear.",
+   "scenes": [
+    {
+     "p": "a girl with wild curly red hair seen from behind aiming a bow and arrow on horseback in the misty Scottish highlands, stone circle",
+     "d": 1,
+     "cap": "The red-haired archer of the highlands"
+    },
+    {
+     "p": "glowing blue will-o'-the-wisps in a misty Scottish forest",
+     "d": 2,
+     "cap": "Follow the wisps"
+    }
+   ]
+  },
+  {
+   "id": "the-hunger-games",
+   "name": "The Hunger Games",
+   "alt": [
+    "Hunger Games"
+   ],
+   "year": 2012,
+   "director": "Gary Ross",
+   "kids": false,
+   "blurb": "A girl volunteers to take her sister's place in a televised fight to the death.",
+   "scenes": [
+    {
+     "p": "a young woman with a long side braid seen from behind holding a bow in a forest",
+     "d": 2,
+     "cap": "The girl on fire in the arena"
+    },
+    {
+     "p": "a golden horn-shaped structure full of weapons and supplies in a forest clearing",
+     "d": 3,
+     "cap": "The Cornucopia"
+    }
+   ]
+  },
+  {
+   "id": "frozen",
+   "name": "Frozen",
+   "alt": [],
+   "year": 2013,
+   "director": "Chris Buck, Jennifer Lee",
+   "kids": true,
+   "blurb": "A queen with ice powers flees her kingdom and her sister follows to bring her home.",
+   "scenes": [
+    {
+     "p": "a woman in a sparkling icy blue gown with a long platinum braid seen from behind, conjuring a glittering ice palace on a snowy mountain",
+     "d": 1,
+     "cap": "Let it go: building the ice palace"
+    },
+    {
+     "p": "a happy little snowman with a carrot nose and twig arms dreaming of summer on a sunny beach",
+     "d": 1,
+     "cap": "A snowman who loves summer"
+    },
+    {
+     "p": "a frozen fjord kingdom at night, ships trapped in ice",
+     "d": 2,
+     "cap": "An eternal winter on the fjord"
+    }
+   ]
+  },
+  {
+   "id": "gravity",
+   "name": "Gravity",
+   "alt": [],
+   "year": 2013,
+   "director": "Alfonso Cuarón",
+   "kids": false,
+   "blurb": "An astronaut is stranded in orbit after debris destroys her shuttle.",
+   "scenes": [
+    {
+     "p": "a lone astronaut tumbling through space tethered to nothing, Earth huge below, debris flying",
+     "d": 2,
+     "cap": "Lost in orbit"
+    },
+    {
+     "p": "a space capsule splashing down in a lake, a woman crawling onto the shore",
+     "d": 3,
+     "cap": "Back on solid ground"
+    }
+   ]
+  },
+  {
+   "id": "interstellar",
+   "name": "Interstellar",
+   "alt": [],
+   "year": 2014,
+   "director": "Christopher Nolan",
+   "kids": false,
+   "blurb": "Astronauts travel through a wormhole to find a new home for humanity.",
+   "scenes": [
+    {
+     "p": "a black hole with a glowing ring of light, a small spaceship near it",
+     "d": 2,
+     "cap": "The black hole Gargantua"
+    },
+    {
+     "p": "an astronaut on a shallow ocean planet facing a gigantic tidal wave",
+     "d": 2,
+     "cap": "The planet of giant waves"
+    },
+    {
+     "p": "a dusty cornfield farmhouse with a bookshelf, dust patterns on the floor",
+     "d": 3,
+     "cap": "The dust and the bookshelf"
+    }
+   ]
+  },
+  {
+   "id": "paddington",
+   "name": "Paddington",
+   "alt": [],
+   "year": 2014,
+   "director": "Paul King",
+   "kids": true,
+   "blurb": "A polite bear from Peru arrives in London looking for a home.",
+   "scenes": [
+    {
+     "p": "a jar of marmalade and an old battered suitcase with a luggage tag on a London railway station bench",
+     "d": 2,
+     "cap": "A bear's luggage at the station"
+    },
+    {
+     "p": "a small brown bear in a blue duffle coat and a red bush hat sitting on an old suitcase on a London railway station platform, steam and iron arches, a jar of marmalade",
+     "d": 1,
+     "cap": "A bear from darkest Peru arrives in London"
+    }
+   ]
+  },
+  {
+   "id": "the-grand-budapest-hotel",
+   "name": "The Grand Budapest Hotel",
+   "alt": [
+    "Grand Budapest Hotel"
+   ],
+   "year": 2014,
+   "director": "Wes Anderson",
+   "kids": false,
+   "blurb": "A concierge and his lobby boy are caught up in a stolen-painting caper.",
+   "scenes": [
+    {
+     "p": "a pink wedding-cake-style grand hotel perched on a mountainside, funicular railway",
+     "d": 2,
+     "cap": "The pink hotel"
+    },
+    {
+     "p": "a pastel pink box of pastries with blue ribbon",
+     "d": 3,
+     "cap": "Mendl's pastries"
+    }
+   ]
+  },
+  {
+   "id": "mad-max-fury-road",
+   "name": "Mad Max: Fury Road",
+   "alt": [
+    "Fury Road",
+    "Mad Max"
+   ],
+   "year": 2015,
+   "director": "George Miller",
+   "kids": false,
+   "blurb": "In a desert wasteland, a rebel warrior and a drifter flee a tyrant in a war rig.",
+   "scenes": [
+    {
+     "p": "a huge armoured war rig truck and spiked cars racing across orange desert dunes into a sandstorm, a guitarist on a truck shooting flames",
+     "d": 1,
+     "cap": "The flame-throwing guitar war party"
+    },
+    {
+     "p": "a massive dust storm with lightning swallowing tiny vehicles",
+     "d": 2,
+     "cap": "Into the sandstorm"
+    }
+   ]
+  },
+  {
+   "id": "inside-out",
+   "name": "Inside Out",
+   "alt": [],
+   "year": 2015,
+   "director": "Pete Docter",
+   "kids": true,
+   "blurb": "Five emotions guide a girl's mind as her family moves.",
+   "scenes": [
+    {
+     "p": "shelves of glowing coloured memory orbs inside a mind headquarters, a control console",
+     "d": 1,
+     "cap": "Headquarters and the memory orbs"
+    },
+    {
+     "p": "islands floating in a mind: hockey island, family island, goofball island",
+     "d": 2,
+     "cap": "The personality islands"
+    }
+   ]
+  },
+  {
+   "id": "the-martian",
+   "name": "The Martian",
+   "alt": [
+    "Martian"
+   ],
+   "year": 2015,
+   "director": "Ridley Scott",
+   "kids": false,
+   "blurb": "An astronaut stranded on Mars grows potatoes to survive.",
+   "scenes": [
+    {
+     "p": "an astronaut tending potato plants under grow lights inside a habitat dome on Mars",
+     "d": 1,
+     "cap": "Growing potatoes on Mars"
+    },
+    {
+     "p": "an astronaut in a rover on a red Martian desert",
+     "d": 2,
+     "cap": "Driving across Mars"
+    }
+   ]
+  },
+  {
+   "id": "la-la-land",
+   "name": "La La Land",
+   "alt": [],
+   "year": 2016,
+   "director": "Damien Chazelle",
+   "kids": false,
+   "blurb": "A jazz pianist and an aspiring actress fall in love in Los Angeles.",
+   "scenes": [
+    {
+     "p": "a couple in a yellow dress and a white shirt silhouetted dancing on a hilltop at twilight above Los Angeles lights, purple sky",
+     "d": 2,
+     "cap": "Dancing above the city at twilight"
+    },
+    {
+     "p": "cars stuck on a sunny LA freeway interchange, people dancing on the car roofs",
+     "d": 2,
+     "cap": "Another day of sun on the freeway"
+    }
+   ]
+  },
+  {
+   "id": "moana",
+   "name": "Moana",
+   "alt": [
+    "Vaiana"
+   ],
+   "year": 2016,
+   "director": "Ron Clements, John Musker",
+   "kids": true,
+   "blurb": "A Polynesian chief's daughter sails across the ocean to restore the heart of Te Fiti.",
+   "scenes": [
+    {
+     "p": "a Polynesian girl seen from behind sailing a small outrigger canoe across a turquoise ocean, a living wave",
+     "d": 1,
+     "cap": "Sailing beyond the reef"
+    },
+    {
+     "p": "a small glowing green spiral stone in an open palm on a beach",
+     "d": 2,
+     "cap": "The heart of Te Fiti"
+    },
+    {
+     "p": "a giant tattooed demigod with a magic fishhook, pulling up an island",
+     "d": 2,
+     "cap": "The demigod and his fishhook"
+    }
+   ]
+  },
+  {
+   "id": "zootopia",
+   "name": "Zootopia",
+   "alt": [
+    "Zootropolis"
+   ],
+   "year": 2016,
+   "director": "Byron Howard, Rich Moore",
+   "kids": true,
+   "blurb": "A rabbit police officer and a con-artist fox crack a conspiracy in a city of animals.",
+   "scenes": [
+    {
+     "p": "a rabbit police officer and a fox in a shirt and tie standing in a vibrant animal metropolis",
+     "d": 1,
+     "cap": "A rabbit cop and a fox"
+    },
+    {
+     "p": "a sloth working at a DMV desk very slowly",
+     "d": 2,
+     "cap": "The sloth at the DMV"
+    }
+   ]
+  },
+  {
+   "id": "coco",
+   "name": "Coco",
+   "alt": [],
+   "year": 2017,
+   "director": "Lee Unkrich",
+   "kids": true,
+   "blurb": "A boy who dreams of music enters the Land of the Dead.",
+   "scenes": [
+    {
+     "p": "a bridge made of glowing orange marigold petals leading into a towering colourful city of lights",
+     "d": 1,
+     "cap": "The marigold bridge to the Land of the Dead"
+    },
+    {
+     "p": "a guitar resting against a family altar with photos and candles",
+     "d": 2,
+     "cap": "The ofrenda and the guitar"
+    }
+   ]
+  },
+  {
+   "id": "dunkirk",
+   "name": "Dunkirk",
+   "alt": [],
+   "year": 2017,
+   "director": "Christopher Nolan",
+   "kids": false,
+   "blurb": "Allied soldiers are evacuated from the beaches of Dunkirk.",
+   "scenes": [
+    {
+     "p": "long lines of soldiers waiting on a wide grey beach and a wooden mole, small civilian boats arriving",
+     "d": 2,
+     "cap": "Waiting on the beach"
+    },
+    {
+     "p": "a Spitfire gliding over a beach with its propeller stopped",
+     "d": 3,
+     "cap": "The Spitfire's last glide"
+    }
+   ]
+  },
+  {
+   "id": "dune",
+   "name": "Dune",
+   "alt": [
+    "Dune: Part One"
+   ],
+   "year": 2021,
+   "director": "Denis Villeneuve",
+   "kids": false,
+   "blurb": "A young noble on the desert planet Arrakis becomes caught up in a war.",
+   "scenes": [
+    {
+     "p": "a colossal sandworm rising from desert sand dunes, its gaping circular mouth, a tiny figure",
+     "d": 1,
+     "cap": "The giant sandworm of Arrakis"
+    },
+    {
+     "p": "dragonfly-winged aircraft flying over a vast desert",
+     "d": 2,
+     "cap": "Ornithopters over the dunes"
+    }
+   ]
+  },
+  {
+   "id": "encanto",
+   "name": "Encanto",
+   "alt": [],
+   "year": 2021,
+   "director": "Jared Bush, Byron Howard",
+   "kids": true,
+   "blurb": "In a magical Colombian house, the only family member without a gift tries to save the magic.",
+   "scenes": [
+    {
+     "p": "a colourful magical house with yellow butterflies in the Colombian mountains, a glowing candle in the window",
+     "d": 1,
+     "cap": "The magical house"
+    },
+    {
+     "p": "a girl in round glasses in a colourful embroidered skirt among magical doors",
+     "d": 2,
+     "cap": "The girl without a gift"
+    }
+   ]
+  },
+  {
+   "id": "luca",
+   "name": "Luca",
+   "alt": [],
+   "year": 2021,
+   "director": "Enrico Casarosa",
+   "kids": true,
+   "blurb": "A young sea monster spends a summer on the Italian Riviera.",
+   "scenes": [
+    {
+     "p": "two boys riding a rickety homemade scooter down a hill into the Italian Riviera sea, town of colourful houses",
+     "d": 1,
+     "cap": "Silenzio, Bruno!"
+    },
+    {
+     "p": "a sea monster boy with scales peeking out of the water at a Vespa poster",
+     "d": 2,
+     "cap": "A sea monster who dreams of a Vespa"
+    }
+   ]
+  },
+  {
+   "id": "turning-red",
+   "name": "Turning Red",
+   "alt": [],
+   "year": 2022,
+   "director": "Domee Shi",
+   "kids": true,
+   "blurb": "A girl turns into a giant red panda when she gets too excited.",
+   "scenes": [
+    {
+     "p": "a giant fluffy red panda on top of a Toronto rooftop with the CN Tower in the background",
+     "d": 1,
+     "cap": "A giant red panda in Toronto"
+    },
+    {
+     "p": "a crowded pop concert arena with a giant red panda on stage",
+     "d": 2,
+     "cap": "The boyband concert"
+    }
+   ]
+  },
+  {
+   "id": "everything-everywhere-all-at-once",
+   "name": "Everything Everywhere All at Once",
+   "alt": [],
+   "year": 2022,
+   "director": "Daniel Kwan, Daniel Scheinert",
+   "kids": false,
+   "blurb": "A laundromat owner discovers she can access parallel universes.",
+   "scenes": [
+    {
+     "p": "a giant swirling black everything bagel and googly eyes",
+     "d": 2,
+     "cap": "The everything bagel and googly eyes"
+    },
+    {
+     "p": "two rocks with googly eyes on a cliff",
+     "d": 3,
+     "cap": "The universe where they're rocks"
+    }
+   ]
+  },
+  {
+   "id": "oppenheimer",
+   "name": "Oppenheimer",
+   "alt": [],
+   "year": 2023,
+   "director": "Christopher Nolan",
+   "kids": false,
+   "blurb": "The story of the physicist who led the Manhattan Project.",
+   "scenes": [
+    {
+     "p": "a huge fireball rising over a desert test tower at dawn",
+     "d": 2,
+     "cap": "The Trinity test"
+    },
+    {
+     "p": "a man in a wide-brimmed pork pie hat seen from behind",
+     "d": 3,
+     "cap": "The man in the hat"
+    }
+   ]
+  },
+  {
+   "id": "the-wild-robot",
+   "name": "The Wild Robot",
+   "alt": [
+    "Wild Robot"
+   ],
+   "year": 2024,
+   "director": "Chris Sanders",
+   "kids": true,
+   "blurb": "A robot shipwrecked on a wild island raises an orphaned gosling.",
+   "scenes": [
+    {
+     "p": "a tall gentle robot standing in a wild island forest with a little gosling and geese flying",
+     "d": 1,
+     "cap": "A robot mother and her gosling"
+    },
+    {
+     "p": "a flock of geese migrating over a futuristic city",
+     "d": 3,
+     "cap": "The migration"
+    }
+   ]
+  },
+  {
+   "id": "wicked",
+   "name": "Wicked",
+   "alt": [],
+   "year": 2024,
+   "director": "Jon M. Chu",
+   "kids": true,
+   "blurb": "The untold story of the witches of Oz.",
+   "scenes": [
+    {
+     "p": "a witch in a black dress and a pointed hat flying on a broomstick over a glowing emerald city",
+     "d": 1,
+     "cap": "Defying gravity over the Emerald City"
+    },
+    {
+     "p": "a pink bubble floating over a fairytale university",
+     "d": 3,
+     "cap": "Arriving at Shiz"
+    }
+   ]
+  }
+ ]
+}

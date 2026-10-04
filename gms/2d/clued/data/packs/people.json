@@ -1,0 +1,6528 @@
+{
+ "id": "people",
+ "title": "Famous people",
+ "theme": "people",
+ "icon": "🧑‍🔬",
+ "kids": false,
+ "version": 1,
+ "imgPrompt": "Which of these is {name}?",
+ "nameImgPrompt": "Who is this?",
+ "tfImgPrompt": "This is {name}.",
+ "factsMeta": {
+  "born": {
+   "type": "year",
+   "label": "Born",
+   "higherLabel": "Born later",
+   "askHigh": "Who of these was born most recently?",
+   "askLow": "Who of these was born first?"
+  },
+  "died": {
+   "type": "year",
+   "label": "Died",
+   "higherLabel": "Died later",
+   "askHigh": "Who of these died most recently?",
+   "askLow": "Who of these died first?"
+  },
+  "nationality": {
+   "type": "cat",
+   "label": "Nationality",
+   "exclusive": false,
+   "ask": "What nationality is {name}?",
+   "stmt": "{name}’s nationality: {value}."
+  },
+  "era": {
+   "type": "cat",
+   "label": "Born in",
+   "ask": "When was {name} born?",
+   "stmt": "{name} was born in the {value}."
+  },
+  "field": {
+   "type": "cat",
+   "label": "Field",
+   "ask": "What field is {name} best known for?",
+   "stmt": "{name} is best known for {value}."
+  }
+ },
+ "items": [
+  {
+   "id": "albert-einstein",
+   "name": "Albert Einstein",
+   "alt": [
+    "Einstein"
+   ],
+   "group": "science",
+   "facts": {
+    "born": 1879,
+    "died": 1955,
+    "nationality": "German-born",
+    "era": "1800s",
+    "field": "science"
+   },
+   "blurb": "Albert Einstein (1879–1955): Developed the theory of relativity.",
+   "clues": [
+    "He won the Nobel Prize in Physics for explaining the photoelectric effect.",
+    "He left Germany in 1933 and settled in the United States.",
+    "His most famous equation links energy and mass.",
+    "Born in 1879.",
+    "Nationality: German-born.",
+    "He developed the theory of relativity."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/2/28/Albert_Einstein_Head_cleaned.jpg/500px-Albert_Einstein_Head_cleaned.jpg",
+      "w": 500,
+      "h": 619,
+      "credit": "Oren Jack Turner",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Albert_Einstein_Head_cleaned.jpg"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "isaac-newton",
+   "name": "Isaac Newton",
+   "alt": [
+    "Newton",
+    "Sir Isaac Newton"
+   ],
+   "group": "science",
+   "facts": {
+    "born": 1642,
+    "died": 1727,
+    "nationality": "English",
+    "era": "1500s to 1700s",
+    "field": "science"
+   },
+   "blurb": "Isaac Newton (1642–1727): A falling apple is said to have inspired his theory of gravity.",
+   "clues": [
+    "He also served as Warden of the Royal Mint.",
+    "He built one of the first reflecting telescopes.",
+    "He wrote the Principia, describing three laws of motion.",
+    "Born in 1642.",
+    "Nationality: English.",
+    "A falling apple is said to have inspired his theory of gravity."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/3/39/GodfreyKneller-IsaacNewton-1689.jpg/330px-GodfreyKneller-IsaacNewton-1689.jpg",
+      "w": 330,
+      "h": 464,
+      "credit": "Godfrey Kneller",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:GodfreyKneller-IsaacNewton-1689.jpg"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "marie-curie",
+   "name": "Marie Curie",
+   "alt": [
+    "Madame Curie"
+   ],
+   "group": "science",
+   "facts": {
+    "born": 1867,
+    "died": 1934,
+    "nationality": "Polish-French",
+    "era": "1800s",
+    "field": "science"
+   },
+   "blurb": "Marie Curie (1867–1934): A pioneer of research into radioactivity.",
+   "clues": [
+    "She discovered the elements polonium and radium.",
+    "She was the first person to win Nobel Prizes in two different sciences.",
+    "Born in 1867.",
+    "Nationality: Polish-French.",
+    "She was a pioneer of research into radioactivity."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/7/77/Marie_Curie_%281900%29_%28cropped%29.jpg/330px-Marie_Curie_%281900%29_%28cropped%29.jpg",
+      "w": 330,
+      "h": 484,
+      "credit": "Unknown authorUnknown author",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Marie_Curie_(1900)_(cropped).jpg"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "charles-darwin",
+   "name": "Charles Darwin",
+   "alt": [
+    "Darwin"
+   ],
+   "group": "science",
+   "facts": {
+    "born": 1809,
+    "died": 1882,
+    "nationality": "English",
+    "era": "1800s",
+    "field": "science"
+   },
+   "blurb": "Charles Darwin (1809–1882): Developed the theory of evolution by natural selection.",
+   "clues": [
+    "He spent years studying barnacles and earthworms.",
+    "He sailed around the world on HMS Beagle.",
+    "He wrote On the Origin of Species.",
+    "Born in 1809.",
+    "Nationality: English.",
+    "He developed the theory of evolution by natural selection."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f1/Charles_Darwin_portrait.jpg/330px-Charles_Darwin_portrait.jpg",
+      "w": 330,
+      "h": 464,
+      "credit": "Herbert Rose Barraud",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Charles_Darwin_portrait.jpg"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "galileo-galilei",
+   "name": "Galileo Galilei",
+   "alt": [
+    "Galileo"
+   ],
+   "group": "science",
+   "facts": {
+    "born": 1564,
+    "died": 1642,
+    "nationality": "Italian",
+    "era": "1500s to 1700s",
+    "field": "science"
+   },
+   "blurb": "Galileo Galilei (1564–1642): Supported the idea that the Earth goes around the Sun.",
+   "clues": [
+    "He was tried by the Roman Inquisition and kept under house arrest.",
+    "He discovered the four largest moons of Jupiter.",
+    "He improved the telescope and used it to study the sky.",
+    "Born in 1564.",
+    "Nationality: Italian.",
+    "He supported the idea that the Earth goes around the Sun."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/cc/Galileo.arp.300pix.jpg/500px-Galileo.arp.300pix.jpg",
+      "w": 500,
+      "h": 614,
+      "credit": "Justus Sustermans",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Galileo.arp.300pix.jpg"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "nikola-tesla",
+   "name": "Nikola Tesla",
+   "alt": [
+    "Tesla"
+   ],
+   "group": "science",
+   "facts": {
+    "born": 1856,
+    "died": 1943,
+    "nationality": "Serbian-American",
+    "era": "1800s",
+    "field": "science"
+   },
+   "blurb": "Nikola Tesla (1856–1943): An electric car company is named after him.",
+   "clues": [
+    "The SI unit of magnetic flux density is named after him.",
+    "He worked briefly for Thomas Edison.",
+    "He championed alternating current (AC) electricity.",
+    "Born in 1856.",
+    "Nationality: Serbian-American.",
+    "An electric car company is named after him."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/7/79/Tesla_circa_1890.jpeg/330px-Tesla_circa_1890.jpeg",
+      "w": 330,
+      "h": 442,
+      "credit": "Napoleon Sarony",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Tesla_circa_1890.jpeg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "thomas-edison",
+   "name": "Thomas Edison",
+   "alt": [
+    "Edison",
+    "Thomas Alva Edison"
+   ],
+   "group": "science",
+   "facts": {
+    "born": 1847,
+    "died": 1931,
+    "nationality": "American",
+    "era": "1800s",
+    "field": "science"
+   },
+   "blurb": "Thomas Edison (1847–1931): Famous for developing a practical electric light bulb.",
+   "clues": [
+    "His laboratory was at Menlo Park, New Jersey.",
+    "He held over 1,000 patents.",
+    "He invented the phonograph.",
+    "Born in 1847.",
+    "Nationality: American.",
+    "He is famous for developing a practical electric light bulb."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/9d/Thomas_Edison2.jpg/500px-Thomas_Edison2.jpg",
+      "w": 500,
+      "h": 640,
+      "credit": "Louis Bachrach, Bachrach Studios, restored by Michel Vuijlsteke",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Thomas_Edison2.jpg"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "stephen-hawking",
+   "name": "Stephen Hawking",
+   "alt": [
+    "Hawking"
+   ],
+   "group": "science",
+   "facts": {
+    "born": 1942,
+    "died": 2018,
+    "nationality": "English",
+    "era": "1900s or later",
+    "field": "science"
+   },
+   "blurb": "Stephen Hawking (1942–2018): Wrote A Brief History of Time.",
+   "clues": [
+    "He held the same Cambridge professorship once held by Isaac Newton.",
+    "He predicted that black holes give off radiation.",
+    "He spoke using a computer voice.",
+    "Born in 1942.",
+    "Nationality: English.",
+    "He wrote A Brief History of Time."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/e/eb/Stephen_Hawking.StarChild.jpg",
+      "w": 250,
+      "h": 359,
+      "credit": "NASA",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Stephen_Hawking.StarChild.jpg"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "ada-lovelace",
+   "name": "Ada Lovelace",
+   "alt": [
+    "Lovelace",
+    "Ada Byron"
+   ],
+   "group": "science",
+   "facts": {
+    "born": 1815,
+    "died": 1852,
+    "nationality": "English",
+    "era": "1800s",
+    "field": "science"
+   },
+   "blurb": "Ada Lovelace (1815–1852): Often called the first computer programmer.",
+   "clues": [
+    "She worked with Charles Babbage on his Analytical Engine.",
+    "A programming language is named after her.",
+    "Born in 1815.",
+    "Nationality: English.",
+    "She is often called the first computer programmer."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b7/Ada_Byron_daguerreotype_by_Antoine_Claudet_1843_or_1850_-_cropped.png/500px-Ada_Byron_daguerreotype_by_Antoine_Claudet_1843_or_1850_-_cropped.png",
+      "w": 500,
+      "h": 625,
+      "credit": "Antoine Claudet",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Ada_Byron_daguerreotype_by_Antoine_Claudet_1843_or_1850_-_cropped.png"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "alan-turing",
+   "name": "Alan Turing",
+   "alt": [
+    "Turing"
+   ],
+   "group": "science",
+   "facts": {
+    "born": 1912,
+    "died": 1954,
+    "nationality": "English",
+    "era": "1900s or later",
+    "field": "science"
+   },
+   "blurb": "Alan Turing (1912–1954): A founder of computer science.",
+   "clues": [
+    "He proposed a test of whether a machine can think.",
+    "He worked at Bletchley Park during the Second World War.",
+    "He helped break the German Enigma code.",
+    "Born in 1912.",
+    "Nationality: English.",
+    "He is a founder of computer science."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/6/66/Alan_Turing_%281951%29_%28crop%29.jpg/330px-Alan_Turing_%281951%29_%28crop%29.jpg",
+      "w": 330,
+      "h": 440,
+      "credit": "Elliott & Fry",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Alan_Turing_(1951)_(crop).jpg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "louis-pasteur",
+   "name": "Louis Pasteur",
+   "alt": [
+    "Pasteur"
+   ],
+   "group": "science",
+   "facts": {
+    "born": 1822,
+    "died": 1895,
+    "nationality": "French",
+    "era": "1800s",
+    "field": "science"
+   },
+   "blurb": "Louis Pasteur (1822–1895): A French chemist and microbiologist.",
+   "clues": [
+    "He developed a vaccine against rabies.",
+    "He proved that germs cause disease.",
+    "A process of heating milk to kill germs is named after him.",
+    "Born in 1822.",
+    "Nationality: French.",
+    "He was a French chemist and microbiologist."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e3/Louis_Pasteur_%281822_-_1895%29%2C_microbiologist_and_chemist_Wellcome_V0026980.jpg/330px-Louis_Pasteur_%281822_-_1895%29%2C_microbiologist_and_chemist_Wellcome_V0026980.jpg",
+      "w": 330,
+      "h": 465,
+      "credit": "Paul Nadar",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Louis_Pasteur_(1822_-_1895),_microbiologist_and_chemist_Wellcome_V0026980.jpg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "alexander-fleming",
+   "name": "Alexander Fleming",
+   "alt": [
+    "Fleming"
+   ],
+   "group": "science",
+   "facts": {
+    "born": 1881,
+    "died": 1955,
+    "nationality": "Scottish",
+    "era": "1800s",
+    "field": "science"
+   },
+   "blurb": "Alexander Fleming (1881–1955): Discovered penicillin.",
+   "clues": [
+    "He shared the 1945 Nobel Prize in Medicine.",
+    "He noticed mould killing bacteria in a dish in 1928.",
+    "He worked at St Mary's Hospital in London.",
+    "Born in 1881.",
+    "Nationality: Scottish.",
+    "He discovered penicillin."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/b/bf/Synthetic_Production_of_Penicillin_TR1468.jpg/330px-Synthetic_Production_of_Penicillin_TR1468.jpg",
+      "w": 330,
+      "h": 469,
+      "credit": "Official photographer",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Synthetic_Production_of_Penicillin_TR1468.jpg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "rosalind-franklin",
+   "name": "Rosalind Franklin",
+   "alt": [
+    "Franklin"
+   ],
+   "group": "science",
+   "facts": {
+    "born": 1920,
+    "died": 1958,
+    "nationality": "English",
+    "era": "1900s or later",
+    "field": "science"
+   },
+   "blurb": "Rosalind Franklin (1920–1958): Her work revealed the double helix structure of DNA.",
+   "clues": [
+    "She died in 1958 at the age of 37.",
+    "She worked at King's College London.",
+    "Her X-ray image called Photo 51 was key to a famous discovery.",
+    "Born in 1920.",
+    "Nationality: English.",
+    "Her work revealed the double helix structure of DNA."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/97/Rosalind_Franklin.jpg/500px-Rosalind_Franklin.jpg",
+      "w": 500,
+      "h": 601,
+      "credit": "MRC Laboratory of Molecular Biology",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Rosalind_Franklin.jpg"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "gregor-mendel",
+   "name": "Gregor Mendel",
+   "alt": [
+    "Mendel"
+   ],
+   "group": "science",
+   "facts": {
+    "born": 1822,
+    "died": 1884,
+    "nationality": "Austrian",
+    "era": "1800s",
+    "field": "science"
+   },
+   "blurb": "Gregor Mendel (1822–1884): Called the father of genetics.",
+   "clues": [
+    "He was a monk and later abbot in Brno.",
+    "His work was ignored until 1900.",
+    "He bred thousands of pea plants.",
+    "Born in 1822.",
+    "Nationality: Austrian.",
+    "He is called the father of genetics."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/b/ba/Gregor_Mendel_2.jpg/330px-Gregor_Mendel_2.jpg",
+      "w": 330,
+      "h": 448,
+      "credit": "Unknown authorUnknown author",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Gregor_Mendel_2.jpg"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "dmitri-mendeleev",
+   "name": "Dmitri Mendeleev",
+   "alt": [
+    "Mendeleev"
+   ],
+   "group": "science",
+   "facts": {
+    "born": 1834,
+    "died": 1907,
+    "nationality": "Russian",
+    "era": "1800s",
+    "field": "science"
+   },
+   "blurb": "Dmitri Mendeleev (1834–1907): Created the periodic table of the elements.",
+   "clues": [
+    "Element 101 is named after him.",
+    "He left gaps for elements not yet discovered.",
+    "He was a Russian chemist.",
+    "Born in 1834.",
+    "Nationality: Russian.",
+    "He created the periodic table of the elements."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/a/af/Dmitri_Mendeleev.jpg/330px-Dmitri_Mendeleev.jpg",
+      "w": 330,
+      "h": 454,
+      "credit": "Original: Unknown authorUnknown author Upload: Germansociety2014",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Dmitri_Mendeleev.jpg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "nicolaus-copernicus",
+   "name": "Nicolaus Copernicus",
+   "alt": [
+    "Copernicus"
+   ],
+   "group": "science",
+   "facts": {
+    "born": 1473,
+    "died": 1543,
+    "nationality": "Polish",
+    "era": "Middle Ages",
+    "field": "science"
+   },
+   "blurb": "Nicolaus Copernicus (1473–1543): Proposed that the Earth goes around the Sun.",
+   "clues": [
+    "He was also a church official and a doctor.",
+    "His great book was published in the year of his death, 1543.",
+    "He came from Toruń.",
+    "Born in 1473.",
+    "Nationality: Polish.",
+    "He proposed that the Earth goes around the Sun."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e2/Nikolaus_Kopernikus_MOT.jpg/500px-Nikolaus_Kopernikus_MOT.jpg",
+      "w": 500,
+      "h": 625,
+      "credit": "Unknown authorUnknown author",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Nikolaus_Kopernikus_MOT.jpg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "michael-faraday",
+   "name": "Michael Faraday",
+   "alt": [
+    "Faraday"
+   ],
+   "group": "science",
+   "facts": {
+    "born": 1791,
+    "died": 1867,
+    "nationality": "English",
+    "era": "1500s to 1700s",
+    "field": "science"
+   },
+   "blurb": "Michael Faraday (1791–1867): Discovered electromagnetic induction.",
+   "clues": [
+    "He started work as a bookbinder's apprentice.",
+    "He began the Royal Institution's Christmas Lectures.",
+    "The unit of electrical capacitance is named after him.",
+    "Born in 1791.",
+    "Nationality: English.",
+    "He discovered electromagnetic induction."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/88/M_Faraday_Th_Phillips_oil_1842.jpg/330px-M_Faraday_Th_Phillips_oil_1842.jpg",
+      "w": 330,
+      "h": 427,
+      "credit": "Thomas Phillips",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:M_Faraday_Th_Phillips_oil_1842.jpg"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "alexander-graham-bell",
+   "name": "Alexander Graham Bell",
+   "alt": [
+    "Graham Bell"
+   ],
+   "group": "science",
+   "facts": {
+    "born": 1847,
+    "died": 1922,
+    "nationality": "Scottish-born",
+    "era": "1800s",
+    "field": "science"
+   },
+   "blurb": "Alexander Graham Bell (1847–1922): Credited with inventing the telephone.",
+   "clues": [
+    "He taught deaf students in Boston.",
+    "The unit used to measure sound levels, the decibel, honours him.",
+    "He was born in Edinburgh.",
+    "Born in 1847.",
+    "Nationality: Scottish-born.",
+    "He is credited with inventing the telephone."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/1/10/Alexander_Graham_Bell.jpg/330px-Alexander_Graham_Bell.jpg",
+      "w": 330,
+      "h": 429,
+      "credit": "Moffett Studio",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Alexander_Graham_Bell.jpg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "katherine-johnson",
+   "name": "Katherine Johnson",
+   "alt": [],
+   "group": "science",
+   "facts": {
+    "born": 1918,
+    "died": 2020,
+    "nationality": "American",
+    "era": "1900s or later",
+    "field": "science"
+   },
+   "blurb": "Katherine Johnson (1918–2020): A mathematician who checked John Glenn's flight path.",
+   "clues": [
+    "She was awarded the Presidential Medal of Freedom in 2015.",
+    "Her story is told in the film Hidden Figures.",
+    "She calculated orbits for NASA's early crewed flights.",
+    "Born in 1918.",
+    "Nationality: American."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/6/6d/Katherine_Johnson_1983.jpg/500px-Katherine_Johnson_1983.jpg",
+      "w": 500,
+      "h": 625,
+      "credit": "NASA",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Katherine_Johnson_1983.jpg"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "jane-goodall",
+   "name": "Jane Goodall",
+   "alt": [
+    "Goodall"
+   ],
+   "group": "science",
+   "facts": {
+    "born": 1934,
+    "died": 2025,
+    "nationality": "English",
+    "era": "1900s or later",
+    "field": "science"
+   },
+   "blurb": "Jane Goodall (1934–2025): Spent decades studying wild chimpanzees.",
+   "clues": [
+    "She began her research at Gombe Stream in Tanzania in 1960.",
+    "She was the first to observe chimpanzees making tools.",
+    "She was a UN Messenger of Peace.",
+    "Born in 1934.",
+    "Nationality: English.",
+    "She spent decades studying wild chimpanzees."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/98/Deputy_Secretary_Higginbottom_Poses_for_a_Photo_With_Dr._Jane_Goodall_and_the_State_Department%27s_Global_Health_Diplomacy_Director_Jordan_in_Washington_%2822365513310%29_%282%29_%28cropped_2%29.jpg/330px-Deputy_Secretary_Higginbottom_Poses_for_a_Photo_With_Dr._Jane_Goodall_and_the_State_Department%27s_Global_Health_Diplomacy_Director_Jordan_in_Washington_%2822365513310%29_%282%29_%28cropped_2%29.jpg",
+      "w": 330,
+      "h": 442,
+      "credit": "U.S. Department of State from United States",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Deputy_Secretary_Higginbottom_Poses_for_a_Photo_With_Dr._Jane_Goodall_and_the_State_Department%27s_Global_Health_Diplomacy_Director_Jordan_in_Washington_(22365513310)_(2)_(cropped_2).jpg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "carl-sagan",
+   "name": "Carl Sagan",
+   "alt": [
+    "Sagan"
+   ],
+   "group": "science",
+   "facts": {
+    "born": 1934,
+    "died": 1996,
+    "nationality": "American",
+    "era": "1900s or later",
+    "field": "science"
+   },
+   "blurb": "Carl Sagan (1934–1996): An American astronomer and science communicator.",
+   "clues": [
+    "He helped design the Golden Records carried by the Voyager probes.",
+    "He described Earth as a pale blue dot.",
+    "He presented the TV series Cosmos.",
+    "Born in 1934.",
+    "Nationality: American.",
+    "He was an American astronomer and science communicator."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/b/be/Carl_Sagan_Planetary_Society.JPG/250px-Carl_Sagan_Planetary_Society.JPG",
+      "w": 250,
+      "h": 341,
+      "credit": "NASA/JPL",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Carl_Sagan_Planetary_Society.JPG"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "tim-berners-lee",
+   "name": "Tim Berners-Lee",
+   "alt": [
+    "Berners-Lee"
+   ],
+   "group": "science",
+   "facts": {
+    "born": 1955,
+    "nationality": "English",
+    "era": "1900s or later",
+    "field": "science"
+   },
+   "blurb": "Tim Berners-Lee (1955): Invented the World Wide Web.",
+   "clues": [
+    "He was working at CERN when he made his big invention.",
+    "He wrote the first web browser.",
+    "He was knighted in 2004.",
+    "Born in 1955.",
+    "Nationality: English.",
+    "He invented the World Wide Web."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8d/LS3_4919_%28cropped%29.jpg/500px-LS3_4919_%28cropped%29.jpg",
+      "w": 500,
+      "h": 634,
+      "credit": "Web Summit",
+      "license": "CC BY 2.0",
+      "page": "https://commons.wikimedia.org/wiki/File:LS3_4919_(cropped).jpg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "edward-jenner",
+   "name": "Edward Jenner",
+   "alt": [
+    "Jenner"
+   ],
+   "group": "science",
+   "facts": {
+    "born": 1749,
+    "died": 1823,
+    "nationality": "English",
+    "era": "1500s to 1700s",
+    "field": "science"
+   },
+   "blurb": "Edward Jenner (1749–1823): Pioneered the first vaccine.",
+   "clues": [
+    "He was a country doctor in Gloucestershire.",
+    "He used cowpox to protect a boy against smallpox.",
+    "The word vaccine comes from the Latin for cow.",
+    "Born in 1749.",
+    "Nationality: English.",
+    "He pioneered the first vaccine."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/85/Edward_Jenner_by_James_Northcote.jpg/500px-Edward_Jenner_by_James_Northcote.jpg",
+      "w": 500,
+      "h": 625,
+      "credit": "James Northcote",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Edward_Jenner_by_James_Northcote.jpg"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "florence-nightingale",
+   "name": "Florence Nightingale",
+   "alt": [
+    "Nightingale"
+   ],
+   "group": "science",
+   "facts": {
+    "born": 1820,
+    "died": 1910,
+    "nationality": "British",
+    "era": "1800s",
+    "field": "science"
+   },
+   "blurb": "Florence Nightingale (1820–1910): Known as the Lady with the Lamp.",
+   "clues": [
+    "She was named after the Italian city where she was born.",
+    "She used statistics and charts to push for better hospitals.",
+    "She nursed soldiers in the Crimean War.",
+    "Born in 1820.",
+    "Nationality: British.",
+    "She was known as the Lady with the Lamp."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/a/ab/Florence_Nightingale_%28H_Hering_NPG_x82368%29.jpg/330px-Florence_Nightingale_%28H_Hering_NPG_x82368%29.jpg",
+      "w": 330,
+      "h": 459,
+      "credit": "Henry Hering (1814-1893)",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Florence_Nightingale_(H_Hering_NPG_x82368).jpg"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "mary-anning",
+   "name": "Mary Anning",
+   "alt": [
+    "Anning"
+   ],
+   "group": "science",
+   "facts": {
+    "born": 1799,
+    "died": 1847,
+    "nationality": "English",
+    "era": "1500s to 1700s",
+    "field": "science"
+   },
+   "blurb": "Mary Anning (1799–1847): A pioneering fossil collector.",
+   "clues": [
+    "A tongue-twister about selling seashells is said to be about her.",
+    "She found the first ichthyosaur skeleton to be correctly identified.",
+    "She hunted fossils on the cliffs of Lyme Regis.",
+    "Born in 1799.",
+    "Nationality: English.",
+    "She was a pioneering fossil collector."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e7/Mary_Anning_painting.jpg/330px-Mary_Anning_painting.jpg",
+      "w": 330,
+      "h": 427,
+      "credit": "Credited to 'Mr. Grey' in Crispin Tickell's book 'Mary Anning of Lyme Regis' (1996)",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Mary_Anning_painting.jpg"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "niels-bohr",
+   "name": "Niels Bohr",
+   "alt": [
+    "Bohr"
+   ],
+   "group": "science",
+   "facts": {
+    "born": 1885,
+    "died": 1962,
+    "nationality": "Danish",
+    "era": "1800s",
+    "field": "science"
+   },
+   "blurb": "Niels Bohr (1885–1962): Created a famous model of the atom.",
+   "clues": [
+    "He won the Nobel Prize in Physics in 1922.",
+    "He founded an institute in Copenhagen.",
+    "Born in 1885.",
+    "Nationality: Danish.",
+    "He created a famous model of the atom."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/6/6d/Niels_Bohr.jpg/330px-Niels_Bohr.jpg",
+      "w": 330,
+      "h": 464,
+      "credit": "The American Institute of Physics credits the photo [1] to AB Lagrelius & Westphal, whi…",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Niels_Bohr.jpg"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "richard-feynman",
+   "name": "Richard Feynman",
+   "alt": [
+    "Feynman"
+   ],
+   "group": "science",
+   "facts": {
+    "born": 1918,
+    "died": 1988,
+    "nationality": "American",
+    "era": "1900s or later",
+    "field": "science"
+   },
+   "blurb": "Richard Feynman (1918–1988): An American physicist who won the Nobel Prize in 1965.",
+   "clues": [
+    "He played the bongo drums.",
+    "He investigated the Challenger space shuttle disaster.",
+    "He drew diagrams of particle interactions that are named after him.",
+    "Born in 1918.",
+    "Nationality: American.",
+    "He was an American physicist who won the Nobel Prize in 1965."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/1/1a/RichardFeynman-PaineMansionWoods1984_copyrightTamikoThiel_bw.jpg/330px-RichardFeynman-PaineMansionWoods1984_copyrightTamikoThiel_bw.jpg",
+      "w": 330,
+      "h": 380,
+      "credit": "Copyright Tamiko Thiel 1984",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:RichardFeynman-PaineMansionWoods1984_copyrightTamikoThiel_bw.jpg"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "johannes-kepler",
+   "name": "Johannes Kepler",
+   "alt": [
+    "Kepler"
+   ],
+   "group": "science",
+   "facts": {
+    "born": 1571,
+    "died": 1630,
+    "nationality": "German",
+    "era": "1500s to 1700s",
+    "field": "science"
+   },
+   "blurb": "Johannes Kepler (1571–1630): Described three laws of planetary motion.",
+   "clues": [
+    "He worked as an assistant to Tycho Brahe.",
+    "A NASA planet-hunting telescope was named after him.",
+    "He showed that planets move in ellipses.",
+    "Born in 1571.",
+    "Nationality: German.",
+    "He described three laws of planetary motion."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8b/Johannes_Kepler_by_Hans_von_Aachen.jpg/250px-Johannes_Kepler_by_Hans_von_Aachen.jpg",
+      "w": 250,
+      "h": 349,
+      "credit": "Hans von Aachen",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Johannes_Kepler_by_Hans_von_Aachen.jpg"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "william-shakespeare",
+   "name": "William Shakespeare",
+   "alt": [
+    "Shakespeare",
+    "The Bard"
+   ],
+   "group": "literature",
+   "facts": {
+    "born": 1564,
+    "died": 1616,
+    "nationality": "English",
+    "era": "1500s to 1700s",
+    "field": "literature"
+   },
+   "blurb": "William Shakespeare (1564–1616): Wrote Romeo and Juliet and Hamlet.",
+   "clues": [
+    "He was born and died in Stratford-upon-Avon.",
+    "His company performed at the Globe Theatre.",
+    "He wrote about 39 plays and 154 sonnets.",
+    "Born in 1564.",
+    "Nationality: English.",
+    "He wrote Romeo and Juliet and Hamlet."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a2/Shakespeare.jpg/500px-Shakespeare.jpg",
+      "w": 500,
+      "h": 637,
+      "credit": "Attributed to John Taylor",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Shakespeare.jpg"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "jane-austen",
+   "name": "Jane Austen",
+   "alt": [
+    "Austen"
+   ],
+   "group": "literature",
+   "facts": {
+    "born": 1775,
+    "died": 1817,
+    "nationality": "English",
+    "era": "1500s to 1700s",
+    "field": "literature"
+   },
+   "blurb": "Jane Austen (1775–1817): Wrote Pride and Prejudice.",
+   "clues": [
+    "She lived for a time in Bath.",
+    "Her books were first published without her name.",
+    "She appears on the Bank of England £10 note.",
+    "Born in 1775.",
+    "Nationality: English.",
+    "She wrote Pride and Prejudice."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/cc/CassandraAusten-JaneAusten%28c.1810%29_hires.jpg/330px-CassandraAusten-JaneAusten%28c.1810%29_hires.jpg",
+      "w": 330,
+      "h": 426,
+      "credit": "Cassandra Austen",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:CassandraAusten-JaneAusten(c.1810)_hires.jpg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "charles-dickens",
+   "name": "Charles Dickens",
+   "alt": [
+    "Dickens"
+   ],
+   "group": "literature",
+   "facts": {
+    "born": 1812,
+    "died": 1870,
+    "nationality": "English",
+    "era": "1800s",
+    "field": "literature"
+   },
+   "blurb": "Charles Dickens (1812–1870): Wrote Oliver Twist and A Christmas Carol.",
+   "clues": [
+    "As a boy he worked in a factory pasting labels on pots of boot polish.",
+    "Many of his novels first came out in monthly parts.",
+    "He created Ebenezer Scrooge.",
+    "Born in 1812.",
+    "Nationality: English.",
+    "He wrote Oliver Twist and A Christmas Carol."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/a/aa/Dickens_Gurney_head.jpg/330px-Dickens_Gurney_head.jpg",
+      "w": 330,
+      "h": 482,
+      "credit": "Jeremiah Gurney",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Dickens_Gurney_head.jpg"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "mark-twain",
+   "name": "Mark Twain",
+   "alt": [
+    "Samuel Clemens",
+    "Samuel Langhorne Clemens"
+   ],
+   "group": "literature",
+   "facts": {
+    "born": 1835,
+    "died": 1910,
+    "nationality": "American",
+    "era": "1800s",
+    "field": "literature"
+   },
+   "blurb": "Mark Twain (1835–1910): Created Tom Sawyer.",
+   "clues": [
+    "He once worked as a riverboat pilot on the Mississippi.",
+    "He wrote Adventures of Huckleberry Finn.",
+    "Born in 1835.",
+    "Nationality: American.",
+    "He created Tom Sawyer."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/3/31/MarkTwain.LOC.jpg/500px-MarkTwain.LOC.jpg",
+      "w": 500,
+      "h": 620,
+      "credit": "Unknown authorUnknown author",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:MarkTwain.LOC.jpg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "agatha-christie",
+   "name": "Agatha Christie",
+   "alt": [
+    "Christie"
+   ],
+   "group": "literature",
+   "facts": {
+    "born": 1890,
+    "died": 1976,
+    "nationality": "English",
+    "era": "1800s",
+    "field": "literature"
+   },
+   "blurb": "Agatha Christie (1890–1976): Created the Belgian detective Hercule Poirot.",
+   "clues": [
+    "She mysteriously disappeared for 11 days in 1926.",
+    "Her play The Mousetrap has run in London since 1952.",
+    "She created Miss Marple.",
+    "Born in 1890.",
+    "Nationality: English.",
+    "She created the Belgian detective Hercule Poirot."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f7/Agatha_Christie_in_Nederland_%28detectiveschrijfster%29%2C_bij_aankomst_op_Schiphol_me%2C_Bestanddeelnr_916-8898_%28cropped%29.jpg/330px-Agatha_Christie_in_Nederland_%28detectiveschrijfster%29%2C_bij_aankomst_op_Schiphol_me%2C_Bestanddeelnr_916-8898_%28cropped%29.jpg",
+      "w": 330,
+      "h": 468,
+      "credit": "Joop van Bilsen for Anefo",
+      "license": "CC0",
+      "page": "https://commons.wikimedia.org/wiki/File:Agatha_Christie_in_Nederland_(detectiveschrijfster),_bij_aankomst_op_Schiphol_me,_Bestanddeelnr_916-8898_(cropped).jpg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "j-k-rowling",
+   "name": "J. K. Rowling",
+   "alt": [
+    "JK Rowling",
+    "Joanne Rowling"
+   ],
+   "group": "literature",
+   "facts": {
+    "born": 1965,
+    "nationality": "British",
+    "era": "1900s or later",
+    "field": "literature"
+   },
+   "blurb": "J. K. Rowling (1965): Wrote the Harry Potter books.",
+   "clues": [
+    "She wrote crime novels under the name Robert Galbraith.",
+    "She began her most famous book in Edinburgh cafés.",
+    "Her first book was rejected by many publishers.",
+    "Born in 1965.",
+    "Nationality: British.",
+    "She wrote the Harry Potter books."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5d/J._K._Rowling_2010.jpg/500px-J._K._Rowling_2010.jpg",
+      "w": 500,
+      "h": 617,
+      "credit": "Daniel Ogren",
+      "license": "CC BY 2.0",
+      "page": "https://commons.wikimedia.org/wiki/File:J._K._Rowling_2010.jpg"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "hans-christian-andersen",
+   "name": "Hans Christian Andersen",
+   "alt": [
+    "Andersen"
+   ],
+   "group": "literature",
+   "facts": {
+    "born": 1805,
+    "died": 1875,
+    "nationality": "Danish",
+    "era": "1800s",
+    "field": "literature"
+   },
+   "blurb": "Hans Christian Andersen (1805–1875): Wrote fairy tales including The Little Mermaid.",
+   "clues": [
+    "He was born in Odense.",
+    "A statue in Copenhagen harbour honours one of his characters.",
+    "He wrote The Ugly Duckling.",
+    "Born in 1805.",
+    "Nationality: Danish.",
+    "He wrote fairy tales including The Little Mermaid."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/1/18/Hans_Christian_Andersen_by_Thora_Hallager_1869.jpg/330px-Hans_Christian_Andersen_by_Thora_Hallager_1869.jpg",
+      "w": 330,
+      "h": 503,
+      "credit": "Thora Hallager",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Hans_Christian_Andersen_by_Thora_Hallager_1869.jpg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "roald-dahl",
+   "name": "Roald Dahl",
+   "alt": [
+    "Dahl"
+   ],
+   "group": "literature",
+   "facts": {
+    "born": 1916,
+    "died": 1990,
+    "nationality": "British",
+    "era": "1900s or later",
+    "field": "literature"
+   },
+   "blurb": "Roald Dahl (1916–1990): Wrote Charlie and the Chocolate Factory.",
+   "clues": [
+    "He was a fighter pilot in the Second World War.",
+    "His parents were Norwegian.",
+    "He wrote The BFG and Matilda.",
+    "Born in 1916.",
+    "Nationality: British.",
+    "He wrote Charlie and the Chocolate Factory."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/2/29/Roald_Dahl.jpg/330px-Roald_Dahl.jpg",
+      "w": 330,
+      "h": 441,
+      "credit": "Carl Van Vechten",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Roald_Dahl.jpg"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "j-r-r-tolkien",
+   "name": "J. R. R. Tolkien",
+   "alt": [
+    "Tolkien",
+    "JRR Tolkien"
+   ],
+   "group": "literature",
+   "facts": {
+    "born": 1892,
+    "died": 1973,
+    "nationality": "English",
+    "era": "1800s",
+    "field": "literature"
+   },
+   "blurb": "J. R. R. Tolkien (1892–1973): Wrote The Lord of the Rings.",
+   "clues": [
+    "He was a professor of Anglo-Saxon at Oxford.",
+    "He invented several languages for his stories.",
+    "He wrote The Hobbit.",
+    "Born in 1892.",
+    "Nationality: English.",
+    "He wrote The Lord of the Rings."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d4/J._R._R._Tolkien%2C_ca._1925.jpg/330px-J._R._R._Tolkien%2C_ca._1925.jpg",
+      "w": 330,
+      "h": 440,
+      "credit": "Unknown photo studio commissioned by Tolkien's students 1925/6 (private communication f…",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:J._R._R._Tolkien,_ca._1925.jpg"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "maya-angelou",
+   "name": "Maya Angelou",
+   "alt": [
+    "Angelou"
+   ],
+   "group": "literature",
+   "facts": {
+    "born": 1928,
+    "died": 2014,
+    "nationality": "American",
+    "era": "1900s or later",
+    "field": "literature"
+   },
+   "blurb": "Maya Angelou (1928–2014): An American poet and civil rights activist.",
+   "clues": [
+    "She read a poem at Bill Clinton's 1993 inauguration.",
+    "She worked with Martin Luther King Jr. and Malcolm X.",
+    "Her memoir is called I Know Why the Caged Bird Sings.",
+    "Born in 1928.",
+    "Nationality: American.",
+    "She was an American poet and civil rights activist."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a7/Portrait_photograph_of_Maya_Angelou%2C_c._1974.webp/330px-Portrait_photograph_of_Maya_Angelou%2C_c._1974.webp",
+      "w": 330,
+      "h": 495,
+      "credit": "Unknown authorUnknown author",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Portrait_photograph_of_Maya_Angelou,_c._1974.webp"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "dr-seuss",
+   "name": "Dr. Seuss",
+   "alt": [
+    "Theodor Seuss Geisel"
+   ],
+   "group": "literature",
+   "facts": {
+    "born": 1904,
+    "died": 1991,
+    "nationality": "American",
+    "era": "1900s or later",
+    "field": "literature"
+   },
+   "blurb": "Dr. Seuss (1904–1991): Created The Cat in the Hat.",
+   "clues": [
+    "He wrote one of his books using only 50 different words.",
+    "He wrote Green Eggs and Ham.",
+    "Born in 1904.",
+    "Nationality: American.",
+    "He created The Cat in the Hat."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/5/55/Ted_Geisel_NYWTS_2_crop.jpg/500px-Ted_Geisel_NYWTS_2_crop.jpg",
+      "w": 500,
+      "h": 584,
+      "credit": "Al Ravenna, New York World-Telegram and the Sun staff photographer",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Ted_Geisel_NYWTS_2_crop.jpg"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "wolfgang-amadeus-mozart",
+   "name": "Wolfgang Amadeus Mozart",
+   "alt": [
+    "Mozart"
+   ],
+   "group": "music",
+   "facts": {
+    "born": 1756,
+    "died": 1791,
+    "nationality": "Austrian",
+    "era": "1500s to 1700s",
+    "field": "music"
+   },
+   "blurb": "Wolfgang Amadeus Mozart (1756–1791): A famous composer of the Classical era.",
+   "clues": [
+    "He was born in Salzburg.",
+    "He wrote the operas The Magic Flute and Don Giovanni.",
+    "He toured Europe as a child prodigy.",
+    "Born in 1756.",
+    "Nationality: Austrian.",
+    "He was a famous composer of the Classical era."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/1/1e/Wolfgang-amadeus-mozart_1.jpg/330px-Wolfgang-amadeus-mozart_1.jpg",
+      "w": 330,
+      "h": 423,
+      "credit": "Barbara Krafft",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Wolfgang-amadeus-mozart_1.jpg"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "ludwig-van-beethoven",
+   "name": "Ludwig van Beethoven",
+   "alt": [
+    "Beethoven"
+   ],
+   "group": "music",
+   "facts": {
+    "born": 1770,
+    "died": 1827,
+    "nationality": "German",
+    "era": "1500s to 1700s",
+    "field": "music"
+   },
+   "blurb": "Ludwig van Beethoven (1770–1827): Kept composing after he became deaf.",
+   "clues": [
+    "He was born in Bonn and lived in Vienna.",
+    "He wrote Für Elise.",
+    "His Ninth Symphony includes the Ode to Joy.",
+    "Born in 1770.",
+    "Nationality: German.",
+    "He kept composing after he became deaf."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/6/6f/Beethoven.jpg/500px-Beethoven.jpg",
+      "w": 500,
+      "h": 601,
+      "credit": "Joseph Karl Stieler",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Beethoven.jpg"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "johann-sebastian-bach",
+   "name": "Johann Sebastian Bach",
+   "alt": [
+    "Bach"
+   ],
+   "group": "music",
+   "facts": {
+    "born": 1685,
+    "died": 1750,
+    "nationality": "German",
+    "era": "1500s to 1700s",
+    "field": "music"
+   },
+   "blurb": "Johann Sebastian Bach (1685–1750): A great Baroque composer and organist.",
+   "clues": [
+    "He had 20 children.",
+    "He worked as music director in Leipzig.",
+    "He wrote the Brandenburg Concertos.",
+    "Born in 1685.",
+    "Nationality: German.",
+    "He was a great Baroque composer and organist."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5e/Johann_Sebastian_Bach.png/330px-Johann_Sebastian_Bach.png",
+      "w": 330,
+      "h": 428,
+      "credit": "Elias Gottlob Haussmann",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Johann_Sebastian_Bach.png"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "antonio-vivaldi",
+   "name": "Antonio Vivaldi",
+   "alt": [
+    "Vivaldi"
+   ],
+   "group": "music",
+   "facts": {
+    "born": 1678,
+    "died": 1741,
+    "nationality": "Italian",
+    "era": "1500s to 1700s",
+    "field": "music"
+   },
+   "blurb": "Antonio Vivaldi (1678–1741): Wrote The Four Seasons.",
+   "clues": [
+    "He was a priest nicknamed the Red Priest for his hair.",
+    "He taught music at an orphanage in Venice.",
+    "He was a Baroque composer and violinist.",
+    "Born in 1678.",
+    "Nationality: Italian.",
+    "He wrote The Four Seasons."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/4/40/Onbekend_-_Antonio_Vivaldi_-_Bologna_Museo_Internationale_e_biblioteca_della_musica_di_bologna_28-04-2012_9-21-050.jpg/330px-Onbekend_-_Antonio_Vivaldi_-_Bologna_Museo_Internationale_e_biblioteca_della_musica_di_bologna_28-04-2012_9-21-050.jpg",
+      "w": 330,
+      "h": 438,
+      "credit": "Unknown authorUnknown author",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Onbekend_-_Antonio_Vivaldi_-_Bologna_Museo_Internationale_e_biblioteca_della_musica_di_bologna_28-04-2012_9-21-050.jpg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "pyotr-ilyich-tchaikovsky",
+   "name": "Pyotr Ilyich Tchaikovsky",
+   "alt": [
+    "Tchaikovsky"
+   ],
+   "group": "music",
+   "facts": {
+    "born": 1840,
+    "died": 1893,
+    "nationality": "Russian",
+    "era": "1800s",
+    "field": "music"
+   },
+   "blurb": "Pyotr Ilyich Tchaikovsky (1840–1893): Wrote the ballet Swan Lake.",
+   "clues": [
+    "He wrote the 1812 Overture.",
+    "He wrote Sleeping Beauty.",
+    "He wrote The Nutcracker.",
+    "Born in 1840.",
+    "Nationality: Russian.",
+    "He wrote the ballet Swan Lake."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d7/Portr%C3%A4t_des_Komponisten_Pjotr_I._Tschaikowski_%281840-1893%29.jpg/330px-Portr%C3%A4t_des_Komponisten_Pjotr_I._Tschaikowski_%281840-1893%29.jpg",
+      "w": 330,
+      "h": 424,
+      "credit": "Nikolai Kuznetsov",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Portr%C3%A4t_des_Komponisten_Pjotr_I._Tschaikowski_(1840-1893).jpg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "frederic-chopin",
+   "name": "Frédéric Chopin",
+   "alt": [
+    "Chopin"
+   ],
+   "group": "music",
+   "facts": {
+    "born": 1810,
+    "died": 1849,
+    "nationality": "Polish",
+    "era": "1800s",
+    "field": "music"
+   },
+   "blurb": "Frédéric Chopin (1810–1849): A Romantic composer famous for piano music.",
+   "clues": [
+    "His heart is kept in a church in Warsaw.",
+    "He lived in Paris for most of his adult life.",
+    "He wrote many mazurkas, nocturnes and polonaises.",
+    "Born in 1810.",
+    "Nationality: Polish.",
+    "He was a Romantic composer famous for piano music."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e8/Frederic_Chopin_photo.jpeg/330px-Frederic_Chopin_photo.jpeg",
+      "w": 330,
+      "h": 465,
+      "credit": "Louis-Auguste Bisson",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Frederic_Chopin_photo.jpeg"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "elvis-presley",
+   "name": "Elvis Presley",
+   "alt": [
+    "Elvis"
+   ],
+   "group": "music",
+   "facts": {
+    "born": 1935,
+    "died": 1977,
+    "nationality": "American",
+    "era": "1900s or later",
+    "field": "music"
+   },
+   "blurb": "Elvis Presley (1935–1977): Called the King of Rock and Roll.",
+   "clues": [
+    "He served in the US Army in Germany.",
+    "His home in Memphis was called Graceland.",
+    "He sang Hound Dog and Jailhouse Rock.",
+    "Born in 1935.",
+    "Nationality: American.",
+    "He was called the King of Rock and Roll."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/6/6b/Elvis_Presley_Publicity_Photo_for_The_Trouble_with_Girls_1968.jpg/500px-Elvis_Presley_Publicity_Photo_for_The_Trouble_with_Girls_1968.jpg",
+      "w": 500,
+      "h": 612,
+      "credit": "MGM",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Elvis_Presley_Publicity_Photo_for_The_Trouble_with_Girls_1968.jpg"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "john-lennon",
+   "name": "John Lennon",
+   "alt": [
+    "Lennon"
+   ],
+   "group": "music",
+   "facts": {
+    "born": 1940,
+    "died": 1980,
+    "nationality": "English",
+    "era": "1900s or later",
+    "field": "music"
+   },
+   "blurb": "John Lennon (1940–1980): A founding member of the Beatles.",
+   "clues": [
+    "He was killed outside his New York apartment in 1980.",
+    "He married the artist Yoko Ono.",
+    "He wrote the song Imagine.",
+    "Born in 1940.",
+    "Nationality: English.",
+    "He was a founding member of the Beatles."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/05/John_Lennon%2C_1974_%28cropped%29.jpg/330px-John_Lennon%2C_1974_%28cropped%29.jpg",
+      "w": 330,
+      "h": 480,
+      "credit": "Tony Barnard, Los Angeles Times",
+      "license": "CC BY 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:John_Lennon,_1974_(cropped).jpg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "paul-mccartney",
+   "name": "Paul McCartney",
+   "alt": [
+    "McCartney"
+   ],
+   "group": "music",
+   "facts": {
+    "born": 1942,
+    "nationality": "English",
+    "era": "1900s or later",
+    "field": "music"
+   },
+   "blurb": "Paul McCartney (1942): A member of the Beatles from Liverpool.",
+   "clues": [
+    "He later formed the band Wings.",
+    "He played bass guitar in his first famous band.",
+    "He wrote Yesterday.",
+    "Born in 1942.",
+    "Nationality: English.",
+    "He was a member of the Beatles from Liverpool."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d6/Paul_McCartney_in_October_2018.jpg/330px-Paul_McCartney_in_October_2018.jpg",
+      "w": 330,
+      "h": 444,
+      "credit": "Raph_PH",
+      "license": "CC BY 2.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Paul_McCartney_in_October_2018.jpg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "michael-jackson",
+   "name": "Michael Jackson",
+   "alt": [
+    "MJ"
+   ],
+   "group": "music",
+   "facts": {
+    "born": 1958,
+    "died": 2009,
+    "nationality": "American",
+    "era": "1900s or later",
+    "field": "music"
+   },
+   "blurb": "Michael Jackson (1958–2009): Called the King of Pop.",
+   "clues": [
+    "He started out singing with his brothers.",
+    "His signature dance move was the moonwalk.",
+    "His album Thriller is among the best-selling albums ever.",
+    "Born in 1958.",
+    "Nationality: American.",
+    "He was called the King of Pop."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b9/Michael_Jackson_1983_%283x4_cropped%29_%28contrast%29.jpg/330px-Michael_Jackson_1983_%283x4_cropped%29_%28contrast%29.jpg",
+      "w": 330,
+      "h": 439,
+      "credit": "Matthew Rolston; Distributed by Epic Records",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Michael_Jackson_1983_(3x4_cropped)_(contrast).jpg"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "freddie-mercury",
+   "name": "Freddie Mercury",
+   "alt": [
+    "Farrokh Bulsara"
+   ],
+   "group": "music",
+   "facts": {
+    "born": 1946,
+    "died": 1991,
+    "nationality": "British",
+    "era": "1900s or later",
+    "field": "music"
+   },
+   "blurb": "Freddie Mercury (1946–1991): The lead singer of Queen.",
+   "clues": [
+    "His band played a famous set at Live Aid in 1985.",
+    "He wrote Bohemian Rhapsody.",
+    "Born in 1946.",
+    "Nationality: British.",
+    "He was the lead singer of Queen."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c3/Freddie_Mercury_at_Sheraton_Hotel_Buenos_Aires.jpg/330px-Freddie_Mercury_at_Sheraton_Hotel_Buenos_Aires.jpg",
+      "w": 330,
+      "h": 408,
+      "credit": "Unknown authorUnknown author",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Freddie_Mercury_at_Sheraton_Hotel_Buenos_Aires.jpg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "bob-marley",
+   "name": "Bob Marley",
+   "alt": [
+    "Marley"
+   ],
+   "group": "music",
+   "facts": {
+    "born": 1945,
+    "died": 1981,
+    "nationality": "Jamaican",
+    "era": "1900s or later",
+    "field": "music"
+   },
+   "blurb": "Bob Marley (1945–1981): Made reggae music famous around the world.",
+   "clues": [
+    "His band was called the Wailers.",
+    "His greatest-hits album is called Legend.",
+    "He sang One Love and No Woman, No Cry.",
+    "Born in 1945.",
+    "Nationality: Jamaican.",
+    "He made reggae music famous around the world."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4b/Bob_Marley_%281976%29.jpg/330px-Bob_Marley_%281976%29.jpg",
+      "w": 330,
+      "h": 440,
+      "credit": "Dennis Morris; Distributed by Island Records",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Bob_Marley_(1976).jpg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "madonna",
+   "name": "Madonna",
+   "alt": [],
+   "group": "music",
+   "facts": {
+    "born": 1958,
+    "nationality": "American",
+    "era": "1900s or later",
+    "field": "music"
+   },
+   "blurb": "Madonna (1958): Known as the Queen of Pop.",
+   "clues": [
+    "She starred in the film Evita.",
+    "She sang Like a Virgin and Vogue.",
+    "Born in 1958.",
+    "Nationality: American.",
+    "She is known as the Queen of Pop."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b1/Madonna_Rebel_Heart_Tour_2015_-_Stockholm_%2823051472299%29_%28cropped%29.jpg/330px-Madonna_Rebel_Heart_Tour_2015_-_Stockholm_%2823051472299%29_%28cropped%29.jpg",
+      "w": 330,
+      "h": 484,
+      "credit": "chrisweger",
+      "license": "CC BY-SA 2.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Madonna_Rebel_Heart_Tour_2015_-_Stockholm_(23051472299)_(cropped).jpg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "beyonce",
+   "name": "Beyoncé",
+   "alt": [
+    "Beyonce"
+   ],
+   "group": "music",
+   "facts": {
+    "born": 1981,
+    "nationality": "American",
+    "era": "1900s or later",
+    "field": "music"
+   },
+   "blurb": "Beyoncé (1981): Called Queen Bey.",
+   "clues": [
+    "Her surname is Knowles.",
+    "She first found fame with Destiny's Child.",
+    "She sang Single Ladies and Crazy in Love.",
+    "Born in 1981.",
+    "Nationality: American.",
+    "She is called Queen Bey."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b7/Beyonc%C3%A9_-_Tottenham_Hotspur_Stadium_-_1st_June_2023_%2810_of_118%29_%2852946364598%29_%28best_crop%29.jpg/330px-Beyonc%C3%A9_-_Tottenham_Hotspur_Stadium_-_1st_June_2023_%2810_of_118%29_%2852946364598%29_%28best_crop%29.jpg",
+      "w": 330,
+      "h": 440,
+      "credit": "Raph_PH",
+      "license": "CC BY 2.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Beyonc%C3%A9_-_Tottenham_Hotspur_Stadium_-_1st_June_2023_(10_of_118)_(52946364598)_(best_crop).jpg"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "taylor-swift",
+   "name": "Taylor Swift",
+   "alt": [],
+   "group": "music",
+   "facts": {
+    "born": 1989,
+    "nationality": "American",
+    "era": "1900s or later",
+    "field": "music"
+   },
+   "blurb": "Taylor Swift (1989): Started as a country singer before switching to pop.",
+   "clues": [
+    "She re-recorded her early albums.",
+    "Her Eras Tour became the highest-grossing concert tour ever.",
+    "Born in 1989.",
+    "Nationality: American.",
+    "She started as a country singer before switching to pop."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b1/Taylor_Swift_at_the_2023_MTV_Video_Music_Awards_%283%29.png/330px-Taylor_Swift_at_the_2023_MTV_Video_Music_Awards_%283%29.png",
+      "w": 330,
+      "h": 469,
+      "credit": "iHeartRadioCA",
+      "license": "CC BY 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Taylor_Swift_at_the_2023_MTV_Video_Music_Awards_(3).png"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "louis-armstrong",
+   "name": "Louis Armstrong",
+   "alt": [
+    "Satchmo"
+   ],
+   "group": "music",
+   "facts": {
+    "born": 1901,
+    "died": 1971,
+    "nationality": "American",
+    "era": "1900s or later",
+    "field": "music"
+   },
+   "blurb": "Louis Armstrong (1901–1971): A famous jazz trumpeter.",
+   "clues": [
+    "He grew up in New Orleans.",
+    "He sang What a Wonderful World.",
+    "Born in 1901.",
+    "Nationality: American.",
+    "He was a famous jazz trumpeter."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/0e/Louis_Armstrong_restored.jpg/500px-Louis_Armstrong_restored.jpg",
+      "w": 500,
+      "h": 390,
+      "credit": "World-Telegram staff photographer",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Louis_Armstrong_restored.jpg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "dolly-parton",
+   "name": "Dolly Parton",
+   "alt": [],
+   "group": "music",
+   "facts": {
+    "born": 1946,
+    "died": 2026,
+    "nationality": "American",
+    "era": "1900s or later",
+    "field": "music"
+   },
+   "blurb": "Dolly Parton (1946–2026): A country music star from Tennessee.",
+   "clues": [
+    "Her Imagination Library sends free books to children.",
+    "She wrote 9 to 5 and I Will Always Love You.",
+    "Born in 1946.",
+    "Nationality: American.",
+    "She is a country music star from Tennessee."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a3/Young-Dolly-Parton.jpg/500px-Young-Dolly-Parton.jpg",
+      "w": 500,
+      "h": 615,
+      "credit": "David Gahr",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Young-Dolly-Parton.jpg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "walt-disney",
+   "name": "Walt Disney",
+   "alt": [
+    "Disney"
+   ],
+   "group": "film",
+   "facts": {
+    "born": 1901,
+    "died": 1966,
+    "nationality": "American",
+    "era": "1900s or later",
+    "field": "film"
+   },
+   "blurb": "Walt Disney (1901–1966): Co-created Mickey Mouse.",
+   "clues": [
+    "He opened his first theme park in California in 1955.",
+    "His company released Snow White and the Seven Dwarfs.",
+    "He was the original voice of a famous cartoon mouse.",
+    "Born in 1901.",
+    "Nationality: American.",
+    "He co-created Mickey Mouse."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/d/df/Walt_Disney_1946.JPG/330px-Walt_Disney_1946.JPG",
+      "w": 330,
+      "h": 495,
+      "credit": "Boy Scouts of America",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Walt_Disney_1946.JPG"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "charlie-chaplin",
+   "name": "Charlie Chaplin",
+   "alt": [
+    "Chaplin"
+   ],
+   "group": "film",
+   "facts": {
+    "born": 1889,
+    "died": 1977,
+    "nationality": "English",
+    "era": "1800s",
+    "field": "film"
+   },
+   "blurb": "Charlie Chaplin (1889–1977): A famous star of silent comedy films.",
+   "clues": [
+    "He was born in London and worked in Hollywood.",
+    "He directed and starred in Modern Times.",
+    "Born in 1889.",
+    "Nationality: English.",
+    "He was a famous star of silent comedy films."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/82/Charlie_Chaplin_portrait_Getty_1739411952.jpg/330px-Charlie_Chaplin_portrait_Getty_1739411952.jpg",
+      "w": 330,
+      "h": 470,
+      "credit": "Strauss-Peyton Studio",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Charlie_Chaplin_portrait_Getty_1739411952.jpg"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "usain-bolt",
+   "name": "Usain Bolt",
+   "alt": [
+    "Bolt"
+   ],
+   "group": "sport",
+   "facts": {
+    "born": 1986,
+    "nationality": "Jamaican",
+    "era": "1900s or later",
+    "field": "sport"
+   },
+   "blurb": "Usain Bolt (1986): The fastest sprinter ever timed.",
+   "clues": [
+    "He won the 100 m at three Olympic Games in a row.",
+    "He set the 100 m world record of 9.58 seconds in 2009.",
+    "Born in 1986.",
+    "Nationality: Jamaican.",
+    "He is the fastest sprinter ever timed."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f3/Usain_Bolt_Rio_100m_final_2016k.jpg/330px-Usain_Bolt_Rio_100m_final_2016k.jpg",
+      "w": 330,
+      "h": 567,
+      "credit": "Fernando Frazão/Agência Brasil",
+      "license": "CC BY 3.0 br",
+      "page": "https://commons.wikimedia.org/wiki/File:Usain_Bolt_Rio_100m_final_2016k.jpg"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "pele",
+   "name": "Pelé",
+   "alt": [
+    "Pele"
+   ],
+   "group": "sport",
+   "facts": {
+    "born": 1940,
+    "died": 2022,
+    "nationality": "Brazilian",
+    "era": "1900s or later",
+    "field": "sport"
+   },
+   "blurb": "Pelé (1940–2022): A Brazilian football legend.",
+   "clues": [
+    "His real name was Edson Arantes do Nascimento.",
+    "He played most of his career for Santos.",
+    "He won the World Cup three times.",
+    "Born in 1940.",
+    "Nationality: Brazilian.",
+    "He is a Brazilian football legend."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5e/Pele_con_brasil_%28cropped%29.jpg/330px-Pele_con_brasil_%28cropped%29.jpg",
+      "w": 330,
+      "h": 447,
+      "credit": "Unknown authorUnknown author",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Pele_con_brasil_(cropped).jpg"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "diego-maradona",
+   "name": "Diego Maradona",
+   "alt": [
+    "Maradona"
+   ],
+   "group": "sport",
+   "facts": {
+    "born": 1960,
+    "died": 2020,
+    "nationality": "Argentine",
+    "era": "1900s or later",
+    "field": "sport"
+   },
+   "blurb": "Diego Maradona (1960–2020): Captained Argentina to the 1986 World Cup.",
+   "clues": [
+    "He played for Napoli and Barcelona.",
+    "He scored the Goal of the Century against England.",
+    "He scored the Hand of God goal in 1986.",
+    "Born in 1960.",
+    "Nationality: Argentine.",
+    "He captained Argentina to the 1986 World Cup."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/4/48/Argentina_celebrando_copa_%28cropped%29.jpg/330px-Argentina_celebrando_copa_%28cropped%29.jpg",
+      "w": 330,
+      "h": 517,
+      "credit": "Unknown authorUnknown author",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Argentina_celebrando_copa_(cropped).jpg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "lionel-messi",
+   "name": "Lionel Messi",
+   "alt": [
+    "Messi",
+    "Leo Messi"
+   ],
+   "group": "sport",
+   "facts": {
+    "born": 1987,
+    "nationality": "Argentine",
+    "era": "1900s or later",
+    "field": "sport"
+   },
+   "blurb": "Lionel Messi (1987): An Argentine footballer.",
+   "clues": [
+    "He moved to Barcelona as a boy of 13.",
+    "He won his eighth Ballon d'Or in 2023.",
+    "He captained Argentina to the 2022 World Cup.",
+    "Born in 1987.",
+    "Nationality: Argentine.",
+    "He is an Argentine footballer."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c8/Leo_Messi_Argentina_v_Egypt_7_July_2026-1.jpg/330px-Leo_Messi_Argentina_v_Egypt_7_July_2026-1.jpg",
+      "w": 330,
+      "h": 495,
+      "credit": "Bryan Berlin",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Leo_Messi_Argentina_v_Egypt_7_July_2026-1.jpg"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "cristiano-ronaldo",
+   "name": "Cristiano Ronaldo",
+   "alt": [
+    "Ronaldo",
+    "CR7"
+   ],
+   "group": "sport",
+   "facts": {
+    "born": 1985,
+    "nationality": "Portuguese",
+    "era": "1900s or later",
+    "field": "sport"
+   },
+   "blurb": "Cristiano Ronaldo (1985): Portugal's record goalscorer.",
+   "clues": [
+    "He was born on the island of Madeira.",
+    "He has played for Manchester United, Real Madrid and Juventus.",
+    "His shirt is often number 7.",
+    "Born in 1985.",
+    "Nationality: Portuguese.",
+    "He is Portugal's record goalscorer."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/2/26/Cristiano_Ronaldo_Croatia_v_Portugal_2_July_2026-075_%28cropped%29.jpg/330px-Cristiano_Ronaldo_Croatia_v_Portugal_2_July_2026-075_%28cropped%29.jpg",
+      "w": 330,
+      "h": 495,
+      "credit": "Bryan Berlin",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Cristiano_Ronaldo_Croatia_v_Portugal_2_July_2026-075_(cropped).jpg"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "serena-williams",
+   "name": "Serena Williams",
+   "alt": [
+    "Serena"
+   ],
+   "group": "sport",
+   "facts": {
+    "born": 1981,
+    "nationality": "American",
+    "era": "1900s or later",
+    "field": "sport"
+   },
+   "blurb": "Serena Williams (1981): One of the greatest tennis players ever.",
+   "clues": [
+    "She won an Olympic gold medal in singles in 2012.",
+    "She won 23 Grand Slam singles titles.",
+    "Her sister Venus is also a champion.",
+    "Born in 1981.",
+    "Nationality: American.",
+    "She is one of the greatest tennis players ever."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4b/Serena_Williams_at_2013_US_Open.jpg/330px-Serena_Williams_at_2013_US_Open.jpg",
+      "w": 330,
+      "h": 435,
+      "credit": "Edwin Martinez",
+      "license": "CC BY 2.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Serena_Williams_at_2013_US_Open.jpg"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "roger-federer",
+   "name": "Roger Federer",
+   "alt": [
+    "Federer"
+   ],
+   "group": "sport",
+   "facts": {
+    "born": 1981,
+    "nationality": "Swiss",
+    "era": "1900s or later",
+    "field": "sport"
+   },
+   "blurb": "Roger Federer (1981): A Swiss tennis great.",
+   "clues": [
+    "He retired in 2022.",
+    "He was born in Basel.",
+    "He won Wimbledon eight times.",
+    "Born in 1981.",
+    "Nationality: Swiss.",
+    "He is a Swiss tennis great."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/b/bd/Federer_WM16_%2837%29_%2828136155830%29.jpg/330px-Federer_WM16_%2837%29_%2828136155830%29.jpg",
+      "w": 330,
+      "h": 446,
+      "credit": "si.robi",
+      "license": "CC BY-SA 2.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Federer_WM16_(37)_(28136155830).jpg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "rafael-nadal",
+   "name": "Rafael Nadal",
+   "alt": [
+    "Nadal",
+    "Rafa Nadal"
+   ],
+   "group": "sport",
+   "facts": {
+    "born": 1986,
+    "nationality": "Spanish",
+    "era": "1900s or later",
+    "field": "sport"
+   },
+   "blurb": "Rafael Nadal (1986): Called the King of Clay.",
+   "clues": [
+    "He was born on Mallorca.",
+    "He retired in 2024.",
+    "He won the French Open 14 times.",
+    "Born in 1986.",
+    "Nationality: Spanish.",
+    "He is called the King of Clay."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/7/71/Rafael_Nadal_en_2024_%28cropped%29.jpg/330px-Rafael_Nadal_en_2024_%28cropped%29.jpg",
+      "w": 330,
+      "h": 444,
+      "credit": "Barcex",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Rafael_Nadal_en_2024_(cropped).jpg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "muhammad-ali",
+   "name": "Muhammad Ali",
+   "alt": [
+    "Cassius Clay"
+   ],
+   "group": "sport",
+   "facts": {
+    "born": 1942,
+    "died": 2016,
+    "nationality": "American",
+    "era": "1900s or later",
+    "field": "sport"
+   },
+   "blurb": "Muhammad Ali (1942–2016): A heavyweight boxing champion.",
+   "clues": [
+    "He fought in the Rumble in the Jungle.",
+    "He said he would float like a butterfly, sting like a bee.",
+    "Born in 1942.",
+    "Nationality: American.",
+    "He was a heavyweight boxing champion."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/3/33/Muhammad_Ali%2C_gtfy.00140.jpg/500px-Muhammad_Ali%2C_gtfy.00140.jpg",
+      "w": 500,
+      "h": 613,
+      "credit": "Bernard Gotfryd",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Muhammad_Ali,_gtfy.00140.jpg"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "michael-jordan",
+   "name": "Michael Jordan",
+   "alt": [
+    "Jordan"
+   ],
+   "group": "sport",
+   "facts": {
+    "born": 1963,
+    "nationality": "American",
+    "era": "1900s or later",
+    "field": "sport"
+   },
+   "blurb": "Michael Jordan (1963): A basketball legend.",
+   "clues": [
+    "He briefly played professional baseball.",
+    "He starred in the film Space Jam.",
+    "He won six NBA titles with the Chicago Bulls.",
+    "Born in 1963.",
+    "Nationality: American.",
+    "He is a basketball legend."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/a/ae/Michael_Jordan_in_2014.jpg/330px-Michael_Jordan_in_2014.jpg",
+      "w": 330,
+      "h": 471,
+      "credit": "DOD photo by D. Myles Cullen",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Michael_Jordan_in_2014.jpg"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "simone-biles",
+   "name": "Simone Biles",
+   "alt": [
+    "Biles"
+   ],
+   "group": "sport",
+   "facts": {
+    "born": 1997,
+    "nationality": "American",
+    "era": "1900s or later",
+    "field": "sport"
+   },
+   "blurb": "Simone Biles (1997): An American gymnast.",
+   "clues": [
+    "Several gymnastics moves are named after her.",
+    "She won four gold medals at the 2016 Olympics.",
+    "She is one of the most decorated gymnasts in history.",
+    "Born in 1997.",
+    "Nationality: American.",
+    "She is an American gymnast."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f6/Simone_Biles_National_Team_2024.jpg/330px-Simone_Biles_National_Team_2024.jpg",
+      "w": 330,
+      "h": 476,
+      "credit": "Ocoudis",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Simone_Biles_National_Team_2024.jpg"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "michael-phelps",
+   "name": "Michael Phelps",
+   "alt": [
+    "Phelps"
+   ],
+   "group": "sport",
+   "facts": {
+    "born": 1985,
+    "nationality": "American",
+    "era": "1900s or later",
+    "field": "sport"
+   },
+   "blurb": "Michael Phelps (1985): The most decorated Olympian of all time.",
+   "clues": [
+    "He won eight gold medals at the 2008 Olympics.",
+    "He has won 23 Olympic gold medals.",
+    "He is nicknamed the Baltimore Bullet.",
+    "Born in 1985.",
+    "Nationality: American.",
+    "He is the most decorated Olympian of all time."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c6/Michael_Phelps_August_2016.jpg/330px-Michael_Phelps_August_2016.jpg",
+      "w": 330,
+      "h": 461,
+      "credit": "Agência Brasil Fotografias",
+      "license": "CC BY 2.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Michael_Phelps_August_2016.jpg"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "tiger-woods",
+   "name": "Tiger Woods",
+   "alt": [
+    "Eldrick Woods"
+   ],
+   "group": "sport",
+   "facts": {
+    "born": 1975,
+    "nationality": "American",
+    "era": "1900s or later",
+    "field": "sport"
+   },
+   "blurb": "Tiger Woods (1975): A famous golfer.",
+   "clues": [
+    "He won the Masters in 1997 at age 21.",
+    "He has won 15 major championships.",
+    "Born in 1975.",
+    "Nationality: American.",
+    "He is a famous golfer."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3e/Tiger_Woods_in_May_2019.jpg/330px-Tiger_Woods_in_May_2019.jpg",
+      "w": 330,
+      "h": 469,
+      "credit": "The White House from Washington, DC",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Tiger_Woods_in_May_2019.jpg"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "jesse-owens",
+   "name": "Jesse Owens",
+   "alt": [
+    "Owens"
+   ],
+   "group": "sport",
+   "facts": {
+    "born": 1913,
+    "died": 1980,
+    "nationality": "American",
+    "era": "1900s or later",
+    "field": "sport"
+   },
+   "blurb": "Jesse Owens (1913–1980): An American sprinter and long jumper.",
+   "clues": [
+    "He set three world records in 45 minutes in 1935.",
+    "He was a star of Ohio State University.",
+    "He won four gold medals at the 1936 Berlin Olympics.",
+    "Born in 1913.",
+    "Nationality: American.",
+    "He was an American sprinter and long jumper."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/1/19/Jesse_Owens_1936.jpg/330px-Jesse_Owens_1936.jpg",
+      "w": 330,
+      "h": 453,
+      "credit": "Acme News Photos",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Jesse_Owens_1936.jpg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "nadia-comaneci",
+   "name": "Nadia Comăneci",
+   "alt": [
+    "Nadia Comaneci"
+   ],
+   "group": "sport",
+   "facts": {
+    "born": 1961,
+    "nationality": "Romanian",
+    "era": "1900s or later",
+    "field": "sport"
+   },
+   "blurb": "Nadia Comăneci (1961): A Romanian gymnast.",
+   "clues": [
+    "The scoreboard could only show her perfect score as 1.00.",
+    "She was just 14 at the 1976 Montreal Olympics.",
+    "She was the first gymnast to score a perfect 10 at the Olympics.",
+    "Born in 1961.",
+    "Nationality: Romanian.",
+    "She is a Romanian gymnast."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/7/75/Nadia_Com%C4%83neci_Moscow1980.jpeg/330px-Nadia_Com%C4%83neci_Moscow1980.jpeg",
+      "w": 330,
+      "h": 455,
+      "credit": "Unknown (Comitetul Olimpic si Sportiv Roman)",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Nadia_Com%C4%83neci_Moscow1980.jpeg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "wayne-gretzky",
+   "name": "Wayne Gretzky",
+   "alt": [
+    "Gretzky"
+   ],
+   "group": "sport",
+   "facts": {
+    "born": 1961,
+    "nationality": "Canadian",
+    "era": "1900s or later",
+    "field": "sport"
+   },
+   "blurb": "Wayne Gretzky (1961): An ice hockey legend.",
+   "clues": [
+    "He wore the number 99, now retired across the whole league.",
+    "He played for the Edmonton Oilers.",
+    "He is called the Great One.",
+    "Born in 1961.",
+    "Nationality: Canadian.",
+    "He is an ice hockey legend."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/4/41/Wgretz_%28cropped3%29.jpg/500px-Wgretz_%28cropped3%29.jpg",
+      "w": 500,
+      "h": 611,
+      "credit": "The original uploader was Hakandahlstrom at English Wikipedia. Later versions were uplo…",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Wgretz_(cropped3).jpg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "sachin-tendulkar",
+   "name": "Sachin Tendulkar",
+   "alt": [
+    "Tendulkar"
+   ],
+   "group": "sport",
+   "facts": {
+    "born": 1973,
+    "nationality": "Indian",
+    "era": "1900s or later",
+    "field": "sport"
+   },
+   "blurb": "Sachin Tendulkar (1973): An Indian cricket legend.",
+   "clues": [
+    "He played his first Test match at 16.",
+    "He scored 100 international centuries.",
+    "He is nicknamed the Little Master.",
+    "Born in 1973.",
+    "Nationality: Indian.",
+    "He is an Indian cricket legend."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/3/35/Sachin_at_Castrol_Golden_Spanner_Awards_%28crop%29.jpg",
+      "w": 190,
+      "h": 260,
+      "credit": "Bollywood Hungama",
+      "license": "CC BY 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Sachin_at_Castrol_Golden_Spanner_Awards_(crop).jpg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "lewis-hamilton",
+   "name": "Lewis Hamilton",
+   "alt": [
+    "Hamilton"
+   ],
+   "group": "sport",
+   "facts": {
+    "born": 1985,
+    "nationality": "British",
+    "era": "1900s or later",
+    "field": "sport"
+   },
+   "blurb": "Lewis Hamilton (1985): A British racing driver.",
+   "clues": [
+    "He moved to Ferrari in 2025.",
+    "He won six of his titles with Mercedes.",
+    "He has won seven Formula One world titles.",
+    "Born in 1985.",
+    "Nationality: British.",
+    "He is a British racing driver."
+   ],
+   "media": {
+    "img": []
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "babe-ruth",
+   "name": "Babe Ruth",
+   "alt": [
+    "George Herman Ruth"
+   ],
+   "group": "sport",
+   "facts": {
+    "born": 1895,
+    "died": 1948,
+    "nationality": "American",
+    "era": "1800s",
+    "field": "sport"
+   },
+   "blurb": "Babe Ruth (1895–1948): A baseball home-run legend.",
+   "clues": [
+    "He was sold from the Boston Red Sox to the New York Yankees.",
+    "He was nicknamed the Sultan of Swat.",
+    "Born in 1895.",
+    "Nationality: American.",
+    "He was a baseball home-run legend."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d7/Babe_Ruth%2C_1933.jpg/500px-Babe_Ruth%2C_1933.jpg",
+      "w": 500,
+      "h": 587,
+      "credit": "Charles M. Conlon",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Babe_Ruth,_1933.jpg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "don-bradman",
+   "name": "Don Bradman",
+   "alt": [
+    "Bradman",
+    "Sir Donald Bradman"
+   ],
+   "group": "sport",
+   "facts": {
+    "born": 1908,
+    "died": 2001,
+    "nationality": "Australian",
+    "era": "1900s or later",
+    "field": "sport"
+   },
+   "blurb": "Don Bradman (1908–2001): Regarded as the greatest cricket batsman ever.",
+   "clues": [
+    "He needed only four runs in his last innings for an average of 100.",
+    "His Test batting average was 99.94.",
+    "Born in 1908.",
+    "Nationality: Australian.",
+    "He is regarded as the greatest cricket batsman ever."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d8/Don_Bradman_1930.jpg/330px-Don_Bradman_1930.jpg",
+      "w": 330,
+      "h": 431,
+      "credit": "State Library of South Australia from Australia",
+      "license": "CC BY 2.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Don_Bradman_1930.jpg"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "martin-luther-king-jr",
+   "name": "Martin Luther King Jr.",
+   "alt": [
+    "MLK",
+    "Martin Luther King"
+   ],
+   "group": "activism",
+   "facts": {
+    "born": 1929,
+    "died": 1968,
+    "nationality": "American",
+    "era": "1900s or later",
+    "field": "activism"
+   },
+   "blurb": "Martin Luther King Jr. (1929–1968): A leader of the US civil rights movement.",
+   "clues": [
+    "He led the Montgomery bus boycott.",
+    "He won the Nobel Peace Prize in 1964.",
+    "He gave the I Have a Dream speech.",
+    "Born in 1929.",
+    "Nationality: American.",
+    "He was a leader of the US civil rights movement."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/1/1c/The_Rev._Dr._Martin_Luther_King_Jr._Color_Portrait_%28high_quality%29.jpg/330px-The_Rev._Dr._Martin_Luther_King_Jr._Color_Portrait_%28high_quality%29.jpg",
+      "w": 330,
+      "h": 487,
+      "credit": "Associated Press",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:The_Rev._Dr._Martin_Luther_King_Jr._Color_Portrait_(high_quality).jpg"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "rosa-parks",
+   "name": "Rosa Parks",
+   "alt": [
+    "Parks"
+   ],
+   "group": "activism",
+   "facts": {
+    "born": 1913,
+    "died": 2005,
+    "nationality": "American",
+    "era": "1900s or later",
+    "field": "activism"
+   },
+   "blurb": "Rosa Parks (1913–2005): Called the mother of the civil rights movement.",
+   "clues": [
+    "She was a secretary of the NAACP in Montgomery.",
+    "She was arrested in December 1955.",
+    "She refused to give up her bus seat.",
+    "Born in 1913.",
+    "Nationality: American.",
+    "She is called the mother of the civil rights movement."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/e/ee/Rosa_Parks_1997.jpg/330px-Rosa_Parks_1997.jpg",
+      "w": 330,
+      "h": 468,
+      "credit": "John Mathew Smith & www.celebrity-photos.com from Laurel Maryland, USA",
+      "license": "CC BY-SA 2.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Rosa_Parks_1997.jpg"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "anne-frank",
+   "name": "Anne Frank",
+   "alt": [],
+   "group": "activism",
+   "facts": {
+    "born": 1929,
+    "died": 1945,
+    "nationality": "German-born",
+    "era": "1900s or later",
+    "field": "activism"
+   },
+   "blurb": "Anne Frank (1929–1945): Her diary is one of the most-read books about the Holocaust.",
+   "clues": [
+    "Her family moved from Germany to the Netherlands in the 1930s.",
+    "She died in Bergen-Belsen concentration camp.",
+    "Born in 1929.",
+    "Nationality: German-born.",
+    "Her diary is one of the most-read books about the Holocaust."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/1/14/Anne_Frank_%28cropped%29.jpg/250px-Anne_Frank_%28cropped%29.jpg",
+      "w": 250,
+      "h": 358,
+      "credit": "AnonymousUnknown author",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Anne_Frank_(cropped).jpg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "malala-yousafzai",
+   "name": "Malala Yousafzai",
+   "alt": [
+    "Malala"
+   ],
+   "group": "activism",
+   "facts": {
+    "born": 1997,
+    "nationality": "Pakistani",
+    "era": "1900s or later",
+    "field": "activism"
+   },
+   "blurb": "Malala Yousafzai (1997): Campaigns for girls' education.",
+   "clues": [
+    "She was shot by the Taliban in 2012.",
+    "She studied at Oxford University.",
+    "She became the youngest Nobel Prize winner.",
+    "Born in 1997.",
+    "Nationality: Pakistani.",
+    "She campaigns for girls' education."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/e/ec/Malala_Yousafzai_at_the_2024_Toronto_International_Film_Festival_5.jpg/330px-Malala_Yousafzai_at_the_2024_Toronto_International_Film_Festival_5.jpg",
+      "w": 330,
+      "h": 495,
+      "credit": "Adam Chitayat",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Malala_Yousafzai_at_the_2024_Toronto_International_Film_Festival_5.jpg"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "mother-teresa",
+   "name": "Mother Teresa",
+   "alt": [
+    "Saint Teresa of Calcutta"
+   ],
+   "group": "religion",
+   "facts": {
+    "born": 1910,
+    "died": 1997,
+    "nationality": "Albanian-Indian",
+    "era": "1900s or later",
+    "field": "religion"
+   },
+   "blurb": "Mother Teresa (1910–1997): Cared for the poor in Kolkata.",
+   "clues": [
+    "She was born in Skopje.",
+    "She won the Nobel Peace Prize in 1979.",
+    "Born in 1910.",
+    "Nationality: Albanian-Indian.",
+    "She cared for the poor in Kolkata."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8e/MotherTeresa_090.jpg/330px-MotherTeresa_090.jpg",
+      "w": 330,
+      "h": 440,
+      "credit": "Túrelio",
+      "license": "CC BY-SA 2.0 de",
+      "page": "https://commons.wikimedia.org/wiki/File:MotherTeresa_090.jpg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "joan-of-arc",
+   "name": "Joan of Arc",
+   "alt": [
+    "Jeanne d'Arc",
+    "Maid of Orléans"
+   ],
+   "group": "history",
+   "facts": {
+    "born": 1412,
+    "died": 1431,
+    "nationality": "French",
+    "era": "Middle Ages",
+    "field": "history"
+   },
+   "blurb": "Joan of Arc (1412–1431): A teenage French heroine of the Hundred Years' War.",
+   "clues": [
+    "She was burned at the stake in Rouen in 1431.",
+    "She said she heard the voices of saints.",
+    "Born in 1412.",
+    "Nationality: French.",
+    "She was a teenage French heroine of the Hundred Years' War."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/6/6e/Contemporaine_afb_jeanne_d_arc.png/330px-Contemporaine_afb_jeanne_d_arc.png",
+      "w": 330,
+      "h": 496,
+      "credit": "Clément de Fauquembergue",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Contemporaine_afb_jeanne_d_arc.png"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "helen-keller",
+   "name": "Helen Keller",
+   "alt": [],
+   "group": "activism",
+   "facts": {
+    "born": 1880,
+    "died": 1968,
+    "nationality": "American",
+    "era": "1800s",
+    "field": "activism"
+   },
+   "blurb": "Helen Keller (1880–1968): Lost her sight and hearing as a baby.",
+   "clues": [
+    "She was the first deafblind person to earn a bachelor's degree.",
+    "Her teacher was Anne Sullivan.",
+    "She learned to communicate by finger-spelling into her hand.",
+    "Born in 1880.",
+    "Nationality: American.",
+    "She lost her sight and hearing as a baby."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3e/Helen_Keller_circa_1920_-_restored.jpg/500px-Helen_Keller_circa_1920_-_restored.jpg",
+      "w": 500,
+      "h": 640,
+      "credit": "Los Angeles Times; restored by User:Rhododendrites",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Helen_Keller_circa_1920_-_restored.jpg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "emmeline-pankhurst",
+   "name": "Emmeline Pankhurst",
+   "alt": [
+    "Pankhurst"
+   ],
+   "group": "activism",
+   "facts": {
+    "born": 1858,
+    "died": 1928,
+    "nationality": "British",
+    "era": "1800s",
+    "field": "activism"
+   },
+   "blurb": "Emmeline Pankhurst (1858–1928): Led the fight for women's right to vote in Britain.",
+   "clues": [
+    "Her daughters Christabel and Sylvia also campaigned.",
+    "She founded the Women's Social and Political Union in 1903.",
+    "Her followers were called suffragettes.",
+    "Born in 1858.",
+    "Nationality: British.",
+    "She led the fight for women's right to vote in Britain."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/2/25/Emmeline_Pankhurst%2C_seated_%281913%29.jpg/330px-Emmeline_Pankhurst%2C_seated_%281913%29.jpg",
+      "w": 330,
+      "h": 435,
+      "credit": "Adam Cuerden",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Emmeline_Pankhurst,_seated_(1913).jpg"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "aristotle",
+   "name": "Aristotle",
+   "alt": [],
+   "group": "philosophy",
+   "facts": {
+    "born": -384,
+    "died": -322,
+    "nationality": "Greek",
+    "era": "ancient world",
+    "field": "philosophy"
+   },
+   "blurb": "Aristotle (384 BC–322 BC): An ancient Greek philosopher.",
+   "clues": [
+    "He set up a school called the Lyceum.",
+    "He was a student of Plato.",
+    "He tutored Alexander the Great.",
+    "Born in 384 BC.",
+    "Nationality: Greek.",
+    "He was an ancient Greek philosopher."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/a/ae/Aristotle_Altemps_Inv8575.jpg/330px-Aristotle_Altemps_Inv8575.jpg",
+      "w": 330,
+      "h": 442,
+      "credit": "After Lysippos",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Aristotle_Altemps_Inv8575.jpg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "confucius",
+   "name": "Confucius",
+   "alt": [
+    "Kong Fuzi"
+   ],
+   "group": "philosophy",
+   "facts": {
+    "died": -479,
+    "nationality": "Chinese",
+    "field": "philosophy"
+   },
+   "blurb": "Confucius: An ancient Chinese philosopher.",
+   "clues": [
+    "His sayings were collected in the Analects.",
+    "He lived during the Spring and Autumn period.",
+    "He taught respect for family and elders.",
+    "Nationality: Chinese.",
+    "He was an ancient Chinese philosopher."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d5/Confucius%2C_fresco_from_a_Western_Han_tomb_of_Dongping_County%2C_Shandong_province%2C_China.jpg/330px-Confucius%2C_fresco_from_a_Western_Han_tomb_of_Dongping_County%2C_Shandong_province%2C_China.jpg",
+      "w": 330,
+      "h": 248,
+      "credit": "Anonymous Chinese painter of the Western Han period",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Confucius,_fresco_from_a_Western_Han_tomb_of_Dongping_County,_Shandong_province,_China.jpg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "karl-marx",
+   "name": "Karl Marx",
+   "alt": [
+    "Marx"
+   ],
+   "group": "philosophy",
+   "facts": {
+    "born": 1818,
+    "died": 1883,
+    "nationality": "German",
+    "era": "1800s",
+    "field": "philosophy"
+   },
+   "blurb": "Karl Marx (1818–1883): Co-wrote The Communist Manifesto.",
+   "clues": [
+    "He is buried in Highgate Cemetery in London.",
+    "He worked with Friedrich Engels.",
+    "He wrote Das Kapital.",
+    "Born in 1818.",
+    "Nationality: German.",
+    "He co-wrote The Communist Manifesto."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/cf/Karl_Marx_001_restored.jpg/330px-Karl_Marx_001_restored.jpg",
+      "w": 330,
+      "h": 473,
+      "credit": "John Jabez Edwin Mayall",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Karl_Marx_001_restored.jpg"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "sigmund-freud",
+   "name": "Sigmund Freud",
+   "alt": [
+    "Freud"
+   ],
+   "group": "science",
+   "facts": {
+    "born": 1856,
+    "died": 1939,
+    "nationality": "Austrian",
+    "era": "1800s",
+    "field": "science"
+   },
+   "blurb": "Sigmund Freud (1856–1939): Famous for his theories about the unconscious mind.",
+   "clues": [
+    "He fled Vienna for London in 1938.",
+    "He wrote The Interpretation of Dreams.",
+    "He developed psychoanalysis.",
+    "Born in 1856.",
+    "Nationality: Austrian.",
+    "He is famous for his theories about the unconscious mind."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/3/36/Sigmund_Freud%2C_by_Max_Halberstadt_%28cropped%29.jpg/330px-Sigmund_Freud%2C_by_Max_Halberstadt_%28cropped%29.jpg",
+      "w": 330,
+      "h": 449,
+      "credit": "Max Halberstadt",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Sigmund_Freud,_by_Max_Halberstadt_(cropped).jpg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "steve-jobs",
+   "name": "Steve Jobs",
+   "alt": [
+    "Jobs"
+   ],
+   "group": "business",
+   "facts": {
+    "born": 1955,
+    "died": 2011,
+    "nationality": "American",
+    "era": "1900s or later",
+    "field": "business"
+   },
+   "blurb": "Steve Jobs (1955–2011): Co-founded Apple.",
+   "clues": [
+    "He also led the animation studio Pixar.",
+    "He was pushed out of his own company in 1985 and later returned.",
+    "He introduced the iPhone in 2007.",
+    "Born in 1955.",
+    "Nationality: American.",
+    "He co-founded Apple."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f5/Steve_Jobs_Headshot_2010-CROP2.jpg/330px-Steve_Jobs_Headshot_2010-CROP2.jpg",
+      "w": 330,
+      "h": 528,
+      "credit": "MetalGearLiquid, based on File:Steve_Jobs_Headshot_2010-CROP.jpg made by Matt Yohe",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Steve_Jobs_Headshot_2010-CROP2.jpg"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "bill-gates",
+   "name": "Bill Gates",
+   "alt": [
+    "Gates"
+   ],
+   "group": "business",
+   "facts": {
+    "born": 1955,
+    "nationality": "American",
+    "era": "1900s or later",
+    "field": "business"
+   },
+   "blurb": "Bill Gates (1955): Co-founded Microsoft.",
+   "clues": [
+    "He dropped out of Harvard.",
+    "He set up a huge charitable foundation with his then-wife Melinda.",
+    "He co-founded his company with Paul Allen.",
+    "Born in 1955.",
+    "Nationality: American.",
+    "He co-founded Microsoft."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/88/Bill_Gates_at_the_European_Commission_-_2025_-_P067383-987995_%28cropped%29.jpg/330px-Bill_Gates_at_the_European_Commission_-_2025_-_P067383-987995_%28cropped%29.jpg",
+      "w": 330,
+      "h": 494,
+      "credit": "Bogdan Hoyaux / European Union",
+      "license": "CC BY 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Bill_Gates_at_the_European_Commission_-_2025_-_P067383-987995_(cropped).jpg"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "henry-ford",
+   "name": "Henry Ford",
+   "alt": [
+    "Ford"
+   ],
+   "group": "business",
+   "facts": {
+    "born": 1863,
+    "died": 1947,
+    "nationality": "American",
+    "era": "1800s",
+    "field": "business"
+   },
+   "blurb": "Henry Ford (1863–1947): Founded a famous car company.",
+   "clues": [
+    "He paid workers a then-high five dollars a day.",
+    "He introduced the moving assembly line.",
+    "He made the Model T.",
+    "Born in 1863.",
+    "Nationality: American.",
+    "He founded a famous car company."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/1/18/Henry_ford_1919.jpg/500px-Henry_ford_1919.jpg",
+      "w": 500,
+      "h": 638,
+      "credit": "Fred Hartsook",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Henry_ford_1919.jpg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "coco-chanel",
+   "name": "Coco Chanel",
+   "alt": [
+    "Chanel",
+    "Gabrielle Chanel"
+   ],
+   "group": "business",
+   "facts": {
+    "born": 1883,
+    "died": 1971,
+    "nationality": "French",
+    "era": "1800s",
+    "field": "business"
+   },
+   "blurb": "Coco Chanel (1883–1971): Founded a famous French fashion house.",
+   "clues": [
+    "She made the little black dress popular.",
+    "She launched the perfume No. 5.",
+    "Born in 1883.",
+    "Nationality: French.",
+    "She founded a famous French fashion house."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/2/22/Coco_Chanel_in_Los_Angeles%2C_1931_%28cropped%29.jpg/330px-Coco_Chanel_in_Los_Angeles%2C_1931_%28cropped%29.jpg",
+      "w": 330,
+      "h": 460,
+      "credit": "Los Angeles Times",
+      "license": "CC BY 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Coco_Chanel_in_Los_Angeles,_1931_(cropped).jpg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "martin-luther",
+   "name": "Martin Luther",
+   "alt": [
+    "Luther"
+   ],
+   "group": "religion",
+   "facts": {
+    "born": 1483,
+    "died": 1546,
+    "nationality": "German",
+    "era": "Middle Ages",
+    "field": "religion"
+   },
+   "blurb": "Martin Luther (1483–1546): Started the Protestant Reformation.",
+   "clues": [
+    "He translated the Bible into German.",
+    "He was excommunicated in 1521.",
+    "He is said to have nailed 95 theses to a church door.",
+    "Born in 1483.",
+    "Nationality: German.",
+    "He started the Protestant Reformation."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/90/Lucas_Cranach_d.%C3%84._-_Martin_Luther%2C_1528_%28Veste_Coburg%29.jpg/330px-Lucas_Cranach_d.%C3%84._-_Martin_Luther%2C_1528_%28Veste_Coburg%29.jpg",
+      "w": 330,
+      "h": 522,
+      "credit": "Lucas Cranach the Elder",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Lucas_Cranach_d.%C3%84._-_Martin_Luther,_1528_(Veste_Coburg).jpg"
+     }
+    ]
+   },
+   "difficulty": 3
+  }
+ ],
+ "questions": [
+  {
+   "id": "who-albert-einstein",
+   "kind": "mc",
+   "prompt": "Who is this? He developed the theory of relativity.",
+   "answer": "Albert Einstein",
+   "wrong": [
+    "Karl Marx",
+    "Alexander Fleming",
+    "Thomas Edison"
+   ],
+   "explain": "Albert Einstein (1879–1955): Developed the theory of relativity.",
+   "difficulty": 1,
+   "refs": [
+    "people/albert-einstein"
+   ]
+  },
+  {
+   "id": "born-albert-einstein",
+   "kind": "mc",
+   "prompt": "In which year was Albert Einstein born?",
+   "answer": "1879",
+   "wrong": [
+    "1889",
+    "1899",
+    "1849"
+   ],
+   "explain": "Albert Einstein (1879–1955): Developed the theory of relativity.",
+   "difficulty": 3,
+   "refs": [
+    "people/albert-einstein"
+   ]
+  },
+  {
+   "id": "who-isaac-newton",
+   "kind": "mc",
+   "prompt": "Who is this? A falling apple is said to have inspired his theory of gravity.",
+   "answer": "Isaac Newton",
+   "wrong": [
+    "Steve Jobs",
+    "Babe Ruth",
+    "Pelé"
+   ],
+   "explain": "Isaac Newton (1642–1727): A falling apple is said to have inspired his theory of gravity.",
+   "difficulty": 1,
+   "refs": [
+    "people/isaac-newton"
+   ]
+  },
+  {
+   "id": "born-isaac-newton",
+   "kind": "mc",
+   "prompt": "In which year was Isaac Newton born?",
+   "answer": "1642",
+   "wrong": [
+    "1612",
+    "1672",
+    "1632"
+   ],
+   "explain": "Isaac Newton (1642–1727): A falling apple is said to have inspired his theory of gravity.",
+   "difficulty": 3,
+   "refs": [
+    "people/isaac-newton"
+   ]
+  },
+  {
+   "id": "who-marie-curie",
+   "kind": "mc",
+   "prompt": "Who is this? She was a pioneer of research into radioactivity.",
+   "answer": "Marie Curie",
+   "wrong": [
+    "Charles Darwin",
+    "Bob Marley",
+    "Nikola Tesla"
+   ],
+   "explain": "Marie Curie (1867–1934): A pioneer of research into radioactivity.",
+   "difficulty": 1,
+   "refs": [
+    "people/marie-curie"
+   ]
+  },
+  {
+   "id": "born-marie-curie",
+   "kind": "mc",
+   "prompt": "In which year was Marie Curie born?",
+   "answer": "1867",
+   "wrong": [
+    "1857",
+    "1897",
+    "1887"
+   ],
+   "explain": "Marie Curie (1867–1934): A pioneer of research into radioactivity.",
+   "difficulty": 3,
+   "refs": [
+    "people/marie-curie"
+   ]
+  },
+  {
+   "id": "who-charles-darwin",
+   "kind": "mc",
+   "prompt": "Who is this? He developed the theory of evolution by natural selection.",
+   "answer": "Charles Darwin",
+   "wrong": [
+    "Mark Twain",
+    "Rosa Parks",
+    "Albert Einstein"
+   ],
+   "explain": "Charles Darwin (1809–1882): Developed the theory of evolution by natural selection.",
+   "difficulty": 1,
+   "refs": [
+    "people/charles-darwin"
+   ]
+  },
+  {
+   "id": "born-charles-darwin",
+   "kind": "mc",
+   "prompt": "In which year was Charles Darwin born?",
+   "answer": "1809",
+   "wrong": [
+    "1839",
+    "1829",
+    "1819"
+   ],
+   "explain": "Charles Darwin (1809–1882): Developed the theory of evolution by natural selection.",
+   "difficulty": 3,
+   "refs": [
+    "people/charles-darwin"
+   ]
+  },
+  {
+   "id": "who-galileo-galilei",
+   "kind": "mc",
+   "prompt": "Who is this? He supported the idea that the Earth goes around the Sun.",
+   "answer": "Galileo Galilei",
+   "wrong": [
+    "Johannes Kepler",
+    "Carl Sagan",
+    "Rosa Parks"
+   ],
+   "explain": "Galileo Galilei (1564–1642): Supported the idea that the Earth goes around the Sun.",
+   "difficulty": 1,
+   "refs": [
+    "people/galileo-galilei"
+   ]
+  },
+  {
+   "id": "born-galileo-galilei",
+   "kind": "mc",
+   "prompt": "In which year was Galileo Galilei born?",
+   "answer": "1564",
+   "wrong": [
+    "1534",
+    "1584",
+    "1594"
+   ],
+   "explain": "Galileo Galilei (1564–1642): Supported the idea that the Earth goes around the Sun.",
+   "difficulty": 3,
+   "refs": [
+    "people/galileo-galilei"
+   ]
+  },
+  {
+   "id": "who-nikola-tesla",
+   "kind": "mc",
+   "prompt": "Who is this? An electric car company is named after him.",
+   "answer": "Nikola Tesla",
+   "wrong": [
+    "Albert Einstein",
+    "Carl Sagan",
+    "Marie Curie"
+   ],
+   "explain": "Nikola Tesla (1856–1943): An electric car company is named after him.",
+   "difficulty": 2,
+   "refs": [
+    "people/nikola-tesla"
+   ]
+  },
+  {
+   "id": "born-nikola-tesla",
+   "kind": "mc",
+   "prompt": "In which year was Nikola Tesla born?",
+   "answer": "1856",
+   "wrong": [
+    "1826",
+    "1866",
+    "1876"
+   ],
+   "explain": "Nikola Tesla (1856–1943): An electric car company is named after him.",
+   "difficulty": 3,
+   "refs": [
+    "people/nikola-tesla"
+   ]
+  },
+  {
+   "id": "who-thomas-edison",
+   "kind": "mc",
+   "prompt": "Who is this? He is famous for developing a practical electric light bulb.",
+   "answer": "Thomas Edison",
+   "wrong": [
+    "Nicolaus Copernicus",
+    "Sigmund Freud",
+    "Lewis Hamilton"
+   ],
+   "explain": "Thomas Edison (1847–1931): Famous for developing a practical electric light bulb.",
+   "difficulty": 1,
+   "refs": [
+    "people/thomas-edison"
+   ]
+  },
+  {
+   "id": "born-thomas-edison",
+   "kind": "mc",
+   "prompt": "In which year was Thomas Edison born?",
+   "answer": "1847",
+   "wrong": [
+    "1857",
+    "1877",
+    "1817"
+   ],
+   "explain": "Thomas Edison (1847–1931): Famous for developing a practical electric light bulb.",
+   "difficulty": 3,
+   "refs": [
+    "people/thomas-edison"
+   ]
+  },
+  {
+   "id": "who-stephen-hawking",
+   "kind": "mc",
+   "prompt": "Who is this? He wrote A Brief History of Time.",
+   "answer": "Stephen Hawking",
+   "wrong": [
+    "Isaac Newton",
+    "Anne Frank",
+    "Helen Keller"
+   ],
+   "explain": "Stephen Hawking (1942–2018): Wrote A Brief History of Time.",
+   "difficulty": 1,
+   "refs": [
+    "people/stephen-hawking"
+   ]
+  },
+  {
+   "id": "born-stephen-hawking",
+   "kind": "mc",
+   "prompt": "In which year was Stephen Hawking born?",
+   "answer": "1942",
+   "wrong": [
+    "1912",
+    "1932",
+    "1962"
+   ],
+   "explain": "Stephen Hawking (1942–2018): Wrote A Brief History of Time.",
+   "difficulty": 3,
+   "refs": [
+    "people/stephen-hawking"
+   ]
+  },
+  {
+   "id": "who-ada-lovelace",
+   "kind": "mc",
+   "prompt": "Who is this? She is often called the first computer programmer.",
+   "answer": "Ada Lovelace",
+   "wrong": [
+    "Richard Feynman",
+    "Pyotr Ilyich Tchaikovsky",
+    "Tim Berners-Lee"
+   ],
+   "explain": "Ada Lovelace (1815–1852): Often called the first computer programmer.",
+   "difficulty": 2,
+   "refs": [
+    "people/ada-lovelace"
+   ]
+  },
+  {
+   "id": "born-ada-lovelace",
+   "kind": "mc",
+   "prompt": "In which year was Ada Lovelace born?",
+   "answer": "1815",
+   "wrong": [
+    "1805",
+    "1825",
+    "1795"
+   ],
+   "explain": "Ada Lovelace (1815–1852): Often called the first computer programmer.",
+   "difficulty": 3,
+   "refs": [
+    "people/ada-lovelace"
+   ]
+  },
+  {
+   "id": "who-alan-turing",
+   "kind": "mc",
+   "prompt": "Who is this? He is a founder of computer science.",
+   "answer": "Alan Turing",
+   "wrong": [
+    "Edward Jenner",
+    "Jane Goodall",
+    "Aristotle"
+   ],
+   "explain": "Alan Turing (1912–1954): A founder of computer science.",
+   "difficulty": 2,
+   "refs": [
+    "people/alan-turing"
+   ]
+  },
+  {
+   "id": "born-alan-turing",
+   "kind": "mc",
+   "prompt": "In which year was Alan Turing born?",
+   "answer": "1912",
+   "wrong": [
+    "1932",
+    "1902",
+    "1892"
+   ],
+   "explain": "Alan Turing (1912–1954): A founder of computer science.",
+   "difficulty": 3,
+   "refs": [
+    "people/alan-turing"
+   ]
+  },
+  {
+   "id": "who-louis-pasteur",
+   "kind": "mc",
+   "prompt": "Who is this? He was a French chemist and microbiologist.",
+   "answer": "Louis Pasteur",
+   "wrong": [
+    "Thomas Edison",
+    "Nikola Tesla",
+    "Katherine Johnson"
+   ],
+   "explain": "Louis Pasteur (1822–1895): A French chemist and microbiologist.",
+   "difficulty": 2,
+   "refs": [
+    "people/louis-pasteur"
+   ]
+  },
+  {
+   "id": "born-louis-pasteur",
+   "kind": "mc",
+   "prompt": "In which year was Louis Pasteur born?",
+   "answer": "1822",
+   "wrong": [
+    "1802",
+    "1852",
+    "1792"
+   ],
+   "explain": "Louis Pasteur (1822–1895): A French chemist and microbiologist.",
+   "difficulty": 3,
+   "refs": [
+    "people/louis-pasteur"
+   ]
+  },
+  {
+   "id": "who-alexander-fleming",
+   "kind": "mc",
+   "prompt": "Who is this? He discovered penicillin.",
+   "answer": "Alexander Fleming",
+   "wrong": [
+    "Rosalind Franklin",
+    "Stephen Hawking",
+    "Thomas Edison"
+   ],
+   "explain": "Alexander Fleming (1881–1955): Discovered penicillin.",
+   "difficulty": 2,
+   "refs": [
+    "people/alexander-fleming"
+   ]
+  },
+  {
+   "id": "born-alexander-fleming",
+   "kind": "mc",
+   "prompt": "In which year was Alexander Fleming born?",
+   "answer": "1881",
+   "wrong": [
+    "1851",
+    "1871",
+    "1911"
+   ],
+   "explain": "Alexander Fleming (1881–1955): Discovered penicillin.",
+   "difficulty": 3,
+   "refs": [
+    "people/alexander-fleming"
+   ]
+  },
+  {
+   "id": "who-rosalind-franklin",
+   "kind": "mc",
+   "prompt": "Who is this? Her work revealed the double helix structure of DNA.",
+   "answer": "Rosalind Franklin",
+   "wrong": [
+    "Dmitri Mendeleev",
+    "Carl Sagan",
+    "Frédéric Chopin"
+   ],
+   "explain": "Rosalind Franklin (1920–1958): Her work revealed the double helix structure of DNA.",
+   "difficulty": 3,
+   "refs": [
+    "people/rosalind-franklin"
+   ]
+  },
+  {
+   "id": "born-rosalind-franklin",
+   "kind": "mc",
+   "prompt": "In which year was Rosalind Franklin born?",
+   "answer": "1920",
+   "wrong": [
+    "1890",
+    "1900",
+    "1940"
+   ],
+   "explain": "Rosalind Franklin (1920–1958): Her work revealed the double helix structure of DNA.",
+   "difficulty": 3,
+   "refs": [
+    "people/rosalind-franklin"
+   ]
+  },
+  {
+   "id": "who-gregor-mendel",
+   "kind": "mc",
+   "prompt": "Who is this? He is called the father of genetics.",
+   "answer": "Gregor Mendel",
+   "wrong": [
+    "Dr. Seuss",
+    "Johannes Kepler",
+    "Nicolaus Copernicus"
+   ],
+   "explain": "Gregor Mendel (1822–1884): Called the father of genetics.",
+   "difficulty": 3,
+   "refs": [
+    "people/gregor-mendel"
+   ]
+  },
+  {
+   "id": "born-gregor-mendel",
+   "kind": "mc",
+   "prompt": "In which year was Gregor Mendel born?",
+   "answer": "1822",
+   "wrong": [
+    "1792",
+    "1832",
+    "1802"
+   ],
+   "explain": "Gregor Mendel (1822–1884): Called the father of genetics.",
+   "difficulty": 3,
+   "refs": [
+    "people/gregor-mendel"
+   ]
+  },
+  {
+   "id": "who-dmitri-mendeleev",
+   "kind": "mc",
+   "prompt": "Who is this? He created the periodic table of the elements.",
+   "answer": "Dmitri Mendeleev",
+   "wrong": [
+    "Katherine Johnson",
+    "Agatha Christie",
+    "Alan Turing"
+   ],
+   "explain": "Dmitri Mendeleev (1834–1907): Created the periodic table of the elements.",
+   "difficulty": 2,
+   "refs": [
+    "people/dmitri-mendeleev"
+   ]
+  },
+  {
+   "id": "born-dmitri-mendeleev",
+   "kind": "mc",
+   "prompt": "In which year was Dmitri Mendeleev born?",
+   "answer": "1834",
+   "wrong": [
+    "1814",
+    "1824",
+    "1864"
+   ],
+   "explain": "Dmitri Mendeleev (1834–1907): Created the periodic table of the elements.",
+   "difficulty": 3,
+   "refs": [
+    "people/dmitri-mendeleev"
+   ]
+  },
+  {
+   "id": "who-nicolaus-copernicus",
+   "kind": "mc",
+   "prompt": "Who is this? He proposed that the Earth goes around the Sun.",
+   "answer": "Nicolaus Copernicus",
+   "wrong": [
+    "Roger Federer",
+    "Helen Keller",
+    "Mother Teresa"
+   ],
+   "explain": "Nicolaus Copernicus (1473–1543): Proposed that the Earth goes around the Sun.",
+   "difficulty": 2,
+   "refs": [
+    "people/nicolaus-copernicus"
+   ]
+  },
+  {
+   "id": "born-nicolaus-copernicus",
+   "kind": "mc",
+   "prompt": "In which year was Nicolaus Copernicus born?",
+   "answer": "1473",
+   "wrong": [
+    "1503",
+    "1483",
+    "1493"
+   ],
+   "explain": "Nicolaus Copernicus (1473–1543): Proposed that the Earth goes around the Sun.",
+   "difficulty": 3,
+   "refs": [
+    "people/nicolaus-copernicus"
+   ]
+  },
+  {
+   "id": "who-michael-faraday",
+   "kind": "mc",
+   "prompt": "Who is this? He discovered electromagnetic induction.",
+   "answer": "Michael Faraday",
+   "wrong": [
+    "Gregor Mendel",
+    "Albert Einstein",
+    "Isaac Newton"
+   ],
+   "explain": "Michael Faraday (1791–1867): Discovered electromagnetic induction.",
+   "difficulty": 3,
+   "refs": [
+    "people/michael-faraday"
+   ]
+  },
+  {
+   "id": "born-michael-faraday",
+   "kind": "mc",
+   "prompt": "In which year was Michael Faraday born?",
+   "answer": "1791",
+   "wrong": [
+    "1811",
+    "1781",
+    "1821"
+   ],
+   "explain": "Michael Faraday (1791–1867): Discovered electromagnetic induction.",
+   "difficulty": 3,
+   "refs": [
+    "people/michael-faraday"
+   ]
+  },
+  {
+   "id": "who-alexander-graham-bell",
+   "kind": "mc",
+   "prompt": "Who is this? He is credited with inventing the telephone.",
+   "answer": "Alexander Graham Bell",
+   "wrong": [
+    "Richard Feynman",
+    "Mother Teresa",
+    "Bill Gates"
+   ],
+   "explain": "Alexander Graham Bell (1847–1922): Credited with inventing the telephone.",
+   "difficulty": 2,
+   "refs": [
+    "people/alexander-graham-bell"
+   ]
+  },
+  {
+   "id": "born-alexander-graham-bell",
+   "kind": "mc",
+   "prompt": "In which year was Alexander Graham Bell born?",
+   "answer": "1847",
+   "wrong": [
+    "1877",
+    "1837",
+    "1827"
+   ],
+   "explain": "Alexander Graham Bell (1847–1922): Credited with inventing the telephone.",
+   "difficulty": 3,
+   "refs": [
+    "people/alexander-graham-bell"
+   ]
+  },
+  {
+   "id": "who-katherine-johnson",
+   "kind": "mc",
+   "prompt": "Who is this? She was a mathematician who checked John Glenn's flight path.",
+   "answer": "Katherine Johnson",
+   "wrong": [
+    "Karl Marx",
+    "Simone Biles",
+    "Sachin Tendulkar"
+   ],
+   "explain": "Katherine Johnson (1918–2020): A mathematician who checked John Glenn's flight path.",
+   "difficulty": 3,
+   "refs": [
+    "people/katherine-johnson"
+   ]
+  },
+  {
+   "id": "born-katherine-johnson",
+   "kind": "mc",
+   "prompt": "In which year was Katherine Johnson born?",
+   "answer": "1918",
+   "wrong": [
+    "1948",
+    "1888",
+    "1908"
+   ],
+   "explain": "Katherine Johnson (1918–2020): A mathematician who checked John Glenn's flight path.",
+   "difficulty": 3,
+   "refs": [
+    "people/katherine-johnson"
+   ]
+  },
+  {
+   "id": "who-jane-goodall",
+   "kind": "mc",
+   "prompt": "Who is this? She spent decades studying wild chimpanzees.",
+   "answer": "Jane Goodall",
+   "wrong": [
+    "Emmeline Pankhurst",
+    "Dr. Seuss",
+    "Michael Faraday"
+   ],
+   "explain": "Jane Goodall (1934–2025): Spent decades studying wild chimpanzees.",
+   "difficulty": 2,
+   "refs": [
+    "people/jane-goodall"
+   ]
+  },
+  {
+   "id": "born-jane-goodall",
+   "kind": "mc",
+   "prompt": "In which year was Jane Goodall born?",
+   "answer": "1934",
+   "wrong": [
+    "1954",
+    "1904",
+    "1944"
+   ],
+   "explain": "Jane Goodall (1934–2025): Spent decades studying wild chimpanzees.",
+   "difficulty": 3,
+   "refs": [
+    "people/jane-goodall"
+   ]
+  },
+  {
+   "id": "who-carl-sagan",
+   "kind": "mc",
+   "prompt": "Who is this? He was an American astronomer and science communicator.",
+   "answer": "Carl Sagan",
+   "wrong": [
+    "Stephen Hawking",
+    "Coco Chanel",
+    "Roald Dahl"
+   ],
+   "explain": "Carl Sagan (1934–1996): An American astronomer and science communicator.",
+   "difficulty": 3,
+   "refs": [
+    "people/carl-sagan"
+   ]
+  },
+  {
+   "id": "born-carl-sagan",
+   "kind": "mc",
+   "prompt": "In which year was Carl Sagan born?",
+   "answer": "1934",
+   "wrong": [
+    "1904",
+    "1944",
+    "1964"
+   ],
+   "explain": "Carl Sagan (1934–1996): An American astronomer and science communicator.",
+   "difficulty": 3,
+   "refs": [
+    "people/carl-sagan"
+   ]
+  },
+  {
+   "id": "who-tim-berners-lee",
+   "kind": "mc",
+   "prompt": "Who is this? He invented the World Wide Web.",
+   "answer": "Tim Berners-Lee",
+   "wrong": [
+    "Florence Nightingale",
+    "Charles Darwin",
+    "Thomas Edison"
+   ],
+   "explain": "Tim Berners-Lee (1955): Invented the World Wide Web.",
+   "difficulty": 2,
+   "refs": [
+    "people/tim-berners-lee"
+   ]
+  },
+  {
+   "id": "born-tim-berners-lee",
+   "kind": "mc",
+   "prompt": "In which year was Tim Berners-Lee born?",
+   "answer": "1955",
+   "wrong": [
+    "1945",
+    "1965",
+    "1985"
+   ],
+   "explain": "Tim Berners-Lee (1955): Invented the World Wide Web.",
+   "difficulty": 3,
+   "refs": [
+    "people/tim-berners-lee"
+   ]
+  },
+  {
+   "id": "who-edward-jenner",
+   "kind": "mc",
+   "prompt": "Who is this? He pioneered the first vaccine.",
+   "answer": "Edward Jenner",
+   "wrong": [
+    "J. K. Rowling",
+    "Richard Feynman",
+    "Alexander Graham Bell"
+   ],
+   "explain": "Edward Jenner (1749–1823): Pioneered the first vaccine.",
+   "difficulty": 3,
+   "refs": [
+    "people/edward-jenner"
+   ]
+  },
+  {
+   "id": "born-edward-jenner",
+   "kind": "mc",
+   "prompt": "In which year was Edward Jenner born?",
+   "answer": "1749",
+   "wrong": [
+    "1739",
+    "1719",
+    "1769"
+   ],
+   "explain": "Edward Jenner (1749–1823): Pioneered the first vaccine.",
+   "difficulty": 3,
+   "refs": [
+    "people/edward-jenner"
+   ]
+  },
+  {
+   "id": "who-florence-nightingale",
+   "kind": "mc",
+   "prompt": "Who is this? She was known as the Lady with the Lamp.",
+   "answer": "Florence Nightingale",
+   "wrong": [
+    "Thomas Edison",
+    "Michael Phelps",
+    "Henry Ford"
+   ],
+   "explain": "Florence Nightingale (1820–1910): Known as the Lady with the Lamp.",
+   "difficulty": 1,
+   "refs": [
+    "people/florence-nightingale"
+   ]
+  },
+  {
+   "id": "born-florence-nightingale",
+   "kind": "mc",
+   "prompt": "In which year was Florence Nightingale born?",
+   "answer": "1820",
+   "wrong": [
+    "1800",
+    "1810",
+    "1830"
+   ],
+   "explain": "Florence Nightingale (1820–1910): Known as the Lady with the Lamp.",
+   "difficulty": 3,
+   "refs": [
+    "people/florence-nightingale"
+   ]
+  },
+  {
+   "id": "who-mary-anning",
+   "kind": "mc",
+   "prompt": "Who is this? She was a pioneering fossil collector.",
+   "answer": "Mary Anning",
+   "wrong": [
+    "Stephen Hawking",
+    "John Lennon",
+    "Beyoncé"
+   ],
+   "explain": "Mary Anning (1799–1847): A pioneering fossil collector.",
+   "difficulty": 3,
+   "refs": [
+    "people/mary-anning"
+   ]
+  },
+  {
+   "id": "born-mary-anning",
+   "kind": "mc",
+   "prompt": "In which year was Mary Anning born?",
+   "answer": "1799",
+   "wrong": [
+    "1809",
+    "1829",
+    "1779"
+   ],
+   "explain": "Mary Anning (1799–1847): A pioneering fossil collector.",
+   "difficulty": 3,
+   "refs": [
+    "people/mary-anning"
+   ]
+  },
+  {
+   "id": "who-niels-bohr",
+   "kind": "mc",
+   "prompt": "Who is this? He created a famous model of the atom.",
+   "answer": "Niels Bohr",
+   "wrong": [
+    "Martin Luther",
+    "Louis Pasteur",
+    "Thomas Edison"
+   ],
+   "explain": "Niels Bohr (1885–1962): Created a famous model of the atom.",
+   "difficulty": 3,
+   "refs": [
+    "people/niels-bohr"
+   ]
+  },
+  {
+   "id": "born-niels-bohr",
+   "kind": "mc",
+   "prompt": "In which year was Niels Bohr born?",
+   "answer": "1885",
+   "wrong": [
+    "1865",
+    "1915",
+    "1855"
+   ],
+   "explain": "Niels Bohr (1885–1962): Created a famous model of the atom.",
+   "difficulty": 3,
+   "refs": [
+    "people/niels-bohr"
+   ]
+  },
+  {
+   "id": "who-richard-feynman",
+   "kind": "mc",
+   "prompt": "Who is this? He was an American physicist who won the Nobel Prize in 1965.",
+   "answer": "Richard Feynman",
+   "wrong": [
+    "Muhammad Ali",
+    "Edward Jenner",
+    "Galileo Galilei"
+   ],
+   "explain": "Richard Feynman (1918–1988): An American physicist who won the Nobel Prize in 1965.",
+   "difficulty": 3,
+   "refs": [
+    "people/richard-feynman"
+   ]
+  },
+  {
+   "id": "born-richard-feynman",
+   "kind": "mc",
+   "prompt": "In which year was Richard Feynman born?",
+   "answer": "1918",
+   "wrong": [
+    "1938",
+    "1948",
+    "1908"
+   ],
+   "explain": "Richard Feynman (1918–1988): An American physicist who won the Nobel Prize in 1965.",
+   "difficulty": 3,
+   "refs": [
+    "people/richard-feynman"
+   ]
+  },
+  {
+   "id": "who-johannes-kepler",
+   "kind": "mc",
+   "prompt": "Who is this? He described three laws of planetary motion.",
+   "answer": "Johannes Kepler",
+   "wrong": [
+    "Rosa Parks",
+    "Walt Disney",
+    "Thomas Edison"
+   ],
+   "explain": "Johannes Kepler (1571–1630): Described three laws of planetary motion.",
+   "difficulty": 3,
+   "refs": [
+    "people/johannes-kepler"
+   ]
+  },
+  {
+   "id": "born-johannes-kepler",
+   "kind": "mc",
+   "prompt": "In which year was Johannes Kepler born?",
+   "answer": "1571",
+   "wrong": [
+    "1591",
+    "1551",
+    "1601"
+   ],
+   "explain": "Johannes Kepler (1571–1630): Described three laws of planetary motion.",
+   "difficulty": 3,
+   "refs": [
+    "people/johannes-kepler"
+   ]
+  },
+  {
+   "id": "who-william-shakespeare",
+   "kind": "mc",
+   "prompt": "Who is this? He wrote Romeo and Juliet and Hamlet.",
+   "answer": "William Shakespeare",
+   "wrong": [
+    "Martin Luther",
+    "Joan of Arc",
+    "Beyoncé"
+   ],
+   "explain": "William Shakespeare (1564–1616): Wrote Romeo and Juliet and Hamlet.",
+   "difficulty": 1,
+   "refs": [
+    "people/william-shakespeare"
+   ]
+  },
+  {
+   "id": "born-william-shakespeare",
+   "kind": "mc",
+   "prompt": "In which year was William Shakespeare born?",
+   "answer": "1564",
+   "wrong": [
+    "1594",
+    "1574",
+    "1534"
+   ],
+   "explain": "William Shakespeare (1564–1616): Wrote Romeo and Juliet and Hamlet.",
+   "difficulty": 3,
+   "refs": [
+    "people/william-shakespeare"
+   ]
+  },
+  {
+   "id": "who-jane-austen",
+   "kind": "mc",
+   "prompt": "Who is this? She wrote Pride and Prejudice.",
+   "answer": "Jane Austen",
+   "wrong": [
+    "Nicolaus Copernicus",
+    "Beyoncé",
+    "Jane Goodall"
+   ],
+   "explain": "Jane Austen (1775–1817): Wrote Pride and Prejudice.",
+   "difficulty": 2,
+   "refs": [
+    "people/jane-austen"
+   ]
+  },
+  {
+   "id": "born-jane-austen",
+   "kind": "mc",
+   "prompt": "In which year was Jane Austen born?",
+   "answer": "1775",
+   "wrong": [
+    "1765",
+    "1745",
+    "1785"
+   ],
+   "explain": "Jane Austen (1775–1817): Wrote Pride and Prejudice.",
+   "difficulty": 3,
+   "refs": [
+    "people/jane-austen"
+   ]
+  },
+  {
+   "id": "who-charles-dickens",
+   "kind": "mc",
+   "prompt": "Who is this? He wrote Oliver Twist and A Christmas Carol.",
+   "answer": "Charles Dickens",
+   "wrong": [
+    "Hans Christian Andersen",
+    "Johann Sebastian Bach",
+    "Agatha Christie"
+   ],
+   "explain": "Charles Dickens (1812–1870): Wrote Oliver Twist and A Christmas Carol.",
+   "difficulty": 1,
+   "refs": [
+    "people/charles-dickens"
+   ]
+  },
+  {
+   "id": "born-charles-dickens",
+   "kind": "mc",
+   "prompt": "In which year was Charles Dickens born?",
+   "answer": "1812",
+   "wrong": [
+    "1822",
+    "1782",
+    "1802"
+   ],
+   "explain": "Charles Dickens (1812–1870): Wrote Oliver Twist and A Christmas Carol.",
+   "difficulty": 3,
+   "refs": [
+    "people/charles-dickens"
+   ]
+  },
+  {
+   "id": "who-mark-twain",
+   "kind": "mc",
+   "prompt": "Who is this? He created Tom Sawyer.",
+   "answer": "Mark Twain",
+   "wrong": [
+    "Charlie Chaplin",
+    "Gregor Mendel",
+    "Don Bradman"
+   ],
+   "explain": "Mark Twain (1835–1910): Created Tom Sawyer.",
+   "difficulty": 2,
+   "refs": [
+    "people/mark-twain"
+   ]
+  },
+  {
+   "id": "born-mark-twain",
+   "kind": "mc",
+   "prompt": "In which year was Mark Twain born?",
+   "answer": "1835",
+   "wrong": [
+    "1845",
+    "1825",
+    "1805"
+   ],
+   "explain": "Mark Twain (1835–1910): Created Tom Sawyer.",
+   "difficulty": 3,
+   "refs": [
+    "people/mark-twain"
+   ]
+  },
+  {
+   "id": "who-agatha-christie",
+   "kind": "mc",
+   "prompt": "Who is this? She created the Belgian detective Hercule Poirot.",
+   "answer": "Agatha Christie",
+   "wrong": [
+    "Dr. Seuss",
+    "Emmeline Pankhurst",
+    "Michael Phelps"
+   ],
+   "explain": "Agatha Christie (1890–1976): Created the Belgian detective Hercule Poirot.",
+   "difficulty": 2,
+   "refs": [
+    "people/agatha-christie"
+   ]
+  },
+  {
+   "id": "born-agatha-christie",
+   "kind": "mc",
+   "prompt": "In which year was Agatha Christie born?",
+   "answer": "1890",
+   "wrong": [
+    "1870",
+    "1880",
+    "1920"
+   ],
+   "explain": "Agatha Christie (1890–1976): Created the Belgian detective Hercule Poirot.",
+   "difficulty": 3,
+   "refs": [
+    "people/agatha-christie"
+   ]
+  },
+  {
+   "id": "who-j-k-rowling",
+   "kind": "mc",
+   "prompt": "Who is this? She wrote the Harry Potter books.",
+   "answer": "J. K. Rowling",
+   "wrong": [
+    "Nadia Comăneci",
+    "Louis Armstrong",
+    "Madonna"
+   ],
+   "explain": "J. K. Rowling (1965): Wrote the Harry Potter books.",
+   "difficulty": 1,
+   "refs": [
+    "people/j-k-rowling"
+   ]
+  },
+  {
+   "id": "born-j-k-rowling",
+   "kind": "mc",
+   "prompt": "In which year was J. K. Rowling born?",
+   "answer": "1965",
+   "wrong": [
+    "1975",
+    "1955",
+    "1945"
+   ],
+   "explain": "J. K. Rowling (1965): Wrote the Harry Potter books.",
+   "difficulty": 3,
+   "refs": [
+    "people/j-k-rowling"
+   ]
+  },
+  {
+   "id": "who-hans-christian-andersen",
+   "kind": "mc",
+   "prompt": "Who is this? He wrote fairy tales including The Little Mermaid.",
+   "answer": "Hans Christian Andersen",
+   "wrong": [
+    "Joan of Arc",
+    "Isaac Newton",
+    "Jane Austen"
+   ],
+   "explain": "Hans Christian Andersen (1805–1875): Wrote fairy tales including The Little Mermaid.",
+   "difficulty": 2,
+   "refs": [
+    "people/hans-christian-andersen"
+   ]
+  },
+  {
+   "id": "born-hans-christian-andersen",
+   "kind": "mc",
+   "prompt": "In which year was Hans Christian Andersen born?",
+   "answer": "1805",
+   "wrong": [
+    "1825",
+    "1785",
+    "1835"
+   ],
+   "explain": "Hans Christian Andersen (1805–1875): Wrote fairy tales including The Little Mermaid.",
+   "difficulty": 3,
+   "refs": [
+    "people/hans-christian-andersen"
+   ]
+  },
+  {
+   "id": "who-roald-dahl",
+   "kind": "mc",
+   "prompt": "Who is this? He wrote Charlie and the Chocolate Factory.",
+   "answer": "Roald Dahl",
+   "wrong": [
+    "Bill Gates",
+    "Niels Bohr",
+    "Dmitri Mendeleev"
+   ],
+   "explain": "Roald Dahl (1916–1990): Wrote Charlie and the Chocolate Factory.",
+   "difficulty": 1,
+   "refs": [
+    "people/roald-dahl"
+   ]
+  },
+  {
+   "id": "born-roald-dahl",
+   "kind": "mc",
+   "prompt": "In which year was Roald Dahl born?",
+   "answer": "1916",
+   "wrong": [
+    "1906",
+    "1946",
+    "1936"
+   ],
+   "explain": "Roald Dahl (1916–1990): Wrote Charlie and the Chocolate Factory.",
+   "difficulty": 3,
+   "refs": [
+    "people/roald-dahl"
+   ]
+  },
+  {
+   "id": "who-j-r-r-tolkien",
+   "kind": "mc",
+   "prompt": "Who is this? He wrote The Lord of the Rings.",
+   "answer": "J. R. R. Tolkien",
+   "wrong": [
+    "Charlie Chaplin",
+    "Aristotle",
+    "Henry Ford"
+   ],
+   "explain": "J. R. R. Tolkien (1892–1973): Wrote The Lord of the Rings.",
+   "difficulty": 1,
+   "refs": [
+    "people/j-r-r-tolkien"
+   ]
+  },
+  {
+   "id": "born-j-r-r-tolkien",
+   "kind": "mc",
+   "prompt": "In which year was J. R. R. Tolkien born?",
+   "answer": "1892",
+   "wrong": [
+    "1862",
+    "1922",
+    "1882"
+   ],
+   "explain": "J. R. R. Tolkien (1892–1973): Wrote The Lord of the Rings.",
+   "difficulty": 3,
+   "refs": [
+    "people/j-r-r-tolkien"
+   ]
+  },
+  {
+   "id": "who-maya-angelou",
+   "kind": "mc",
+   "prompt": "Who is this? She was an American poet and civil rights activist.",
+   "answer": "Maya Angelou",
+   "wrong": [
+    "Taylor Swift",
+    "Muhammad Ali",
+    "Alexander Graham Bell"
+   ],
+   "explain": "Maya Angelou (1928–2014): An American poet and civil rights activist.",
+   "difficulty": 3,
+   "refs": [
+    "people/maya-angelou"
+   ]
+  },
+  {
+   "id": "born-maya-angelou",
+   "kind": "mc",
+   "prompt": "In which year was Maya Angelou born?",
+   "answer": "1928",
+   "wrong": [
+    "1918",
+    "1898",
+    "1908"
+   ],
+   "explain": "Maya Angelou (1928–2014): An American poet and civil rights activist.",
+   "difficulty": 3,
+   "refs": [
+    "people/maya-angelou"
+   ]
+  },
+  {
+   "id": "who-dr-seuss",
+   "kind": "mc",
+   "prompt": "Who is this? He created The Cat in the Hat.",
+   "answer": "Dr. Seuss",
+   "wrong": [
+    "Mark Twain",
+    "Hans Christian Andersen",
+    "Johann Sebastian Bach"
+   ],
+   "explain": "Dr. Seuss (1904–1991): Created The Cat in the Hat.",
+   "difficulty": 1,
+   "refs": [
+    "people/dr-seuss"
+   ]
+  },
+  {
+   "id": "born-dr-seuss",
+   "kind": "mc",
+   "prompt": "In which year was Dr. Seuss born?",
+   "answer": "1904",
+   "wrong": [
+    "1924",
+    "1874",
+    "1884"
+   ],
+   "explain": "Dr. Seuss (1904–1991): Created The Cat in the Hat.",
+   "difficulty": 3,
+   "refs": [
+    "people/dr-seuss"
+   ]
+  },
+  {
+   "id": "who-wolfgang-amadeus-mozart",
+   "kind": "mc",
+   "prompt": "Who is this? He was a famous composer of the Classical era.",
+   "answer": "Wolfgang Amadeus Mozart",
+   "wrong": [
+    "Martin Luther King Jr.",
+    "Rosa Parks",
+    "Charles Darwin"
+   ],
+   "explain": "Wolfgang Amadeus Mozart (1756–1791): A famous composer of the Classical era.",
+   "difficulty": 1,
+   "refs": [
+    "people/wolfgang-amadeus-mozart"
+   ]
+  },
+  {
+   "id": "born-wolfgang-amadeus-mozart",
+   "kind": "mc",
+   "prompt": "In which year was Wolfgang Amadeus Mozart born?",
+   "answer": "1756",
+   "wrong": [
+    "1746",
+    "1786",
+    "1766"
+   ],
+   "explain": "Wolfgang Amadeus Mozart (1756–1791): A famous composer of the Classical era.",
+   "difficulty": 3,
+   "refs": [
+    "people/wolfgang-amadeus-mozart"
+   ]
+  },
+  {
+   "id": "who-ludwig-van-beethoven",
+   "kind": "mc",
+   "prompt": "Who is this? He kept composing after he became deaf.",
+   "answer": "Ludwig van Beethoven",
+   "wrong": [
+    "Alan Turing",
+    "Confucius",
+    "Bob Marley"
+   ],
+   "explain": "Ludwig van Beethoven (1770–1827): Kept composing after he became deaf.",
+   "difficulty": 1,
+   "refs": [
+    "people/ludwig-van-beethoven"
+   ]
+  },
+  {
+   "id": "born-ludwig-van-beethoven",
+   "kind": "mc",
+   "prompt": "In which year was Ludwig van Beethoven born?",
+   "answer": "1770",
+   "wrong": [
+    "1740",
+    "1750",
+    "1780"
+   ],
+   "explain": "Ludwig van Beethoven (1770–1827): Kept composing after he became deaf.",
+   "difficulty": 3,
+   "refs": [
+    "people/ludwig-van-beethoven"
+   ]
+  },
+  {
+   "id": "who-johann-sebastian-bach",
+   "kind": "mc",
+   "prompt": "Who is this? He was a great Baroque composer and organist.",
+   "answer": "Johann Sebastian Bach",
+   "wrong": [
+    "Dolly Parton",
+    "Bob Marley",
+    "Paul McCartney"
+   ],
+   "explain": "Johann Sebastian Bach (1685–1750): A great Baroque composer and organist.",
+   "difficulty": 2,
+   "refs": [
+    "people/johann-sebastian-bach"
+   ]
+  },
+  {
+   "id": "born-johann-sebastian-bach",
+   "kind": "mc",
+   "prompt": "In which year was Johann Sebastian Bach born?",
+   "answer": "1685",
+   "wrong": [
+    "1655",
+    "1675",
+    "1715"
+   ],
+   "explain": "Johann Sebastian Bach (1685–1750): A great Baroque composer and organist.",
+   "difficulty": 3,
+   "refs": [
+    "people/johann-sebastian-bach"
+   ]
+  },
+  {
+   "id": "who-antonio-vivaldi",
+   "kind": "mc",
+   "prompt": "Who is this? He wrote The Four Seasons.",
+   "answer": "Antonio Vivaldi",
+   "wrong": [
+    "Charlie Chaplin",
+    "Dr. Seuss",
+    "Madonna"
+   ],
+   "explain": "Antonio Vivaldi (1678–1741): Wrote The Four Seasons.",
+   "difficulty": 2,
+   "refs": [
+    "people/antonio-vivaldi"
+   ]
+  },
+  {
+   "id": "born-antonio-vivaldi",
+   "kind": "mc",
+   "prompt": "In which year was Antonio Vivaldi born?",
+   "answer": "1678",
+   "wrong": [
+    "1668",
+    "1708",
+    "1648"
+   ],
+   "explain": "Antonio Vivaldi (1678–1741): Wrote The Four Seasons.",
+   "difficulty": 3,
+   "refs": [
+    "people/antonio-vivaldi"
+   ]
+  },
+  {
+   "id": "who-pyotr-ilyich-tchaikovsky",
+   "kind": "mc",
+   "prompt": "Who is this? He wrote the ballet Swan Lake.",
+   "answer": "Pyotr Ilyich Tchaikovsky",
+   "wrong": [
+    "Rosa Parks",
+    "Stephen Hawking",
+    "Louis Armstrong"
+   ],
+   "explain": "Pyotr Ilyich Tchaikovsky (1840–1893): Wrote the ballet Swan Lake.",
+   "difficulty": 2,
+   "refs": [
+    "people/pyotr-ilyich-tchaikovsky"
+   ]
+  },
+  {
+   "id": "born-pyotr-ilyich-tchaikovsky",
+   "kind": "mc",
+   "prompt": "In which year was Pyotr Ilyich Tchaikovsky born?",
+   "answer": "1840",
+   "wrong": [
+    "1850",
+    "1820",
+    "1860"
+   ],
+   "explain": "Pyotr Ilyich Tchaikovsky (1840–1893): Wrote the ballet Swan Lake.",
+   "difficulty": 3,
+   "refs": [
+    "people/pyotr-ilyich-tchaikovsky"
+   ]
+  },
+  {
+   "id": "who-frederic-chopin",
+   "kind": "mc",
+   "prompt": "Who is this? He was a Romantic composer famous for piano music.",
+   "answer": "Frédéric Chopin",
+   "wrong": [
+    "Roald Dahl",
+    "Dr. Seuss",
+    "Lionel Messi"
+   ],
+   "explain": "Frédéric Chopin (1810–1849): A Romantic composer famous for piano music.",
+   "difficulty": 3,
+   "refs": [
+    "people/frederic-chopin"
+   ]
+  },
+  {
+   "id": "born-frederic-chopin",
+   "kind": "mc",
+   "prompt": "In which year was Frédéric Chopin born?",
+   "answer": "1810",
+   "wrong": [
+    "1830",
+    "1800",
+    "1780"
+   ],
+   "explain": "Frédéric Chopin (1810–1849): A Romantic composer famous for piano music.",
+   "difficulty": 3,
+   "refs": [
+    "people/frederic-chopin"
+   ]
+  },
+  {
+   "id": "who-elvis-presley",
+   "kind": "mc",
+   "prompt": "Who is this? He was called the King of Rock and Roll.",
+   "answer": "Elvis Presley",
+   "wrong": [
+    "Beyoncé",
+    "Frédéric Chopin",
+    "Paul McCartney"
+   ],
+   "explain": "Elvis Presley (1935–1977): Called the King of Rock and Roll.",
+   "difficulty": 1,
+   "refs": [
+    "people/elvis-presley"
+   ]
+  },
+  {
+   "id": "born-elvis-presley",
+   "kind": "mc",
+   "prompt": "In which year was Elvis Presley born?",
+   "answer": "1935",
+   "wrong": [
+    "1925",
+    "1955",
+    "1965"
+   ],
+   "explain": "Elvis Presley (1935–1977): Called the King of Rock and Roll.",
+   "difficulty": 3,
+   "refs": [
+    "people/elvis-presley"
+   ]
+  },
+  {
+   "id": "who-john-lennon",
+   "kind": "mc",
+   "prompt": "Who is this? He was a founding member of the Beatles.",
+   "answer": "John Lennon",
+   "wrong": [
+    "Johann Sebastian Bach",
+    "Mother Teresa",
+    "Rosalind Franklin"
+   ],
+   "explain": "John Lennon (1940–1980): A founding member of the Beatles.",
+   "difficulty": 2,
+   "refs": [
+    "people/john-lennon"
+   ]
+  },
+  {
+   "id": "born-john-lennon",
+   "kind": "mc",
+   "prompt": "In which year was John Lennon born?",
+   "answer": "1940",
+   "wrong": [
+    "1930",
+    "1970",
+    "1910"
+   ],
+   "explain": "John Lennon (1940–1980): A founding member of the Beatles.",
+   "difficulty": 3,
+   "refs": [
+    "people/john-lennon"
+   ]
+  },
+  {
+   "id": "who-paul-mccartney",
+   "kind": "mc",
+   "prompt": "Who is this? He was a member of the Beatles from Liverpool.",
+   "answer": "Paul McCartney",
+   "wrong": [
+    "Maya Angelou",
+    "Pyotr Ilyich Tchaikovsky",
+    "Usain Bolt"
+   ],
+   "explain": "Paul McCartney (1942): A member of the Beatles from Liverpool.",
+   "difficulty": 2,
+   "refs": [
+    "people/paul-mccartney"
+   ]
+  },
+  {
+   "id": "born-paul-mccartney",
+   "kind": "mc",
+   "prompt": "In which year was Paul McCartney born?",
+   "answer": "1942",
+   "wrong": [
+    "1912",
+    "1922",
+    "1962"
+   ],
+   "explain": "Paul McCartney (1942): A member of the Beatles from Liverpool.",
+   "difficulty": 3,
+   "refs": [
+    "people/paul-mccartney"
+   ]
+  },
+  {
+   "id": "who-michael-jackson",
+   "kind": "mc",
+   "prompt": "Who is this? He was called the King of Pop.",
+   "answer": "Michael Jackson",
+   "wrong": [
+    "Pelé",
+    "Pyotr Ilyich Tchaikovsky",
+    "Wolfgang Amadeus Mozart"
+   ],
+   "explain": "Michael Jackson (1958–2009): Called the King of Pop.",
+   "difficulty": 1,
+   "refs": [
+    "people/michael-jackson"
+   ]
+  },
+  {
+   "id": "born-michael-jackson",
+   "kind": "mc",
+   "prompt": "In which year was Michael Jackson born?",
+   "answer": "1958",
+   "wrong": [
+    "1968",
+    "1978",
+    "1938"
+   ],
+   "explain": "Michael Jackson (1958–2009): Called the King of Pop.",
+   "difficulty": 3,
+   "refs": [
+    "people/michael-jackson"
+   ]
+  },
+  {
+   "id": "who-freddie-mercury",
+   "kind": "mc",
+   "prompt": "Who is this? He was the lead singer of Queen.",
+   "answer": "Freddie Mercury",
+   "wrong": [
+    "Isaac Newton",
+    "Beyoncé",
+    "J. K. Rowling"
+   ],
+   "explain": "Freddie Mercury (1946–1991): The lead singer of Queen.",
+   "difficulty": 2,
+   "refs": [
+    "people/freddie-mercury"
+   ]
+  },
+  {
+   "id": "born-freddie-mercury",
+   "kind": "mc",
+   "prompt": "In which year was Freddie Mercury born?",
+   "answer": "1946",
+   "wrong": [
+    "1966",
+    "1916",
+    "1976"
+   ],
+   "explain": "Freddie Mercury (1946–1991): The lead singer of Queen.",
+   "difficulty": 3,
+   "refs": [
+    "people/freddie-mercury"
+   ]
+  },
+  {
+   "id": "who-bob-marley",
+   "kind": "mc",
+   "prompt": "Who is this? He made reggae music famous around the world.",
+   "answer": "Bob Marley",
+   "wrong": [
+    "Gregor Mendel",
+    "Michael Jackson",
+    "Dr. Seuss"
+   ],
+   "explain": "Bob Marley (1945–1981): Made reggae music famous around the world.",
+   "difficulty": 2,
+   "refs": [
+    "people/bob-marley"
+   ]
+  },
+  {
+   "id": "born-bob-marley",
+   "kind": "mc",
+   "prompt": "In which year was Bob Marley born?",
+   "answer": "1945",
+   "wrong": [
+    "1925",
+    "1915",
+    "1965"
+   ],
+   "explain": "Bob Marley (1945–1981): Made reggae music famous around the world.",
+   "difficulty": 3,
+   "refs": [
+    "people/bob-marley"
+   ]
+  },
+  {
+   "id": "who-madonna",
+   "kind": "mc",
+   "prompt": "Who is this? She is known as the Queen of Pop.",
+   "answer": "Madonna",
+   "wrong": [
+    "Coco Chanel",
+    "Gregor Mendel",
+    "Babe Ruth"
+   ],
+   "explain": "Madonna (1958): Known as the Queen of Pop.",
+   "difficulty": 2,
+   "refs": [
+    "people/madonna"
+   ]
+  },
+  {
+   "id": "born-madonna",
+   "kind": "mc",
+   "prompt": "In which year was Madonna born?",
+   "answer": "1958",
+   "wrong": [
+    "1948",
+    "1978",
+    "1988"
+   ],
+   "explain": "Madonna (1958): Known as the Queen of Pop.",
+   "difficulty": 3,
+   "refs": [
+    "people/madonna"
+   ]
+  },
+  {
+   "id": "who-beyonce",
+   "kind": "mc",
+   "prompt": "Who is this? She is called Queen Bey.",
+   "answer": "Beyoncé",
+   "wrong": [
+    "Alan Turing",
+    "Dr. Seuss",
+    "J. R. R. Tolkien"
+   ],
+   "explain": "Beyoncé (1981): Called Queen Bey.",
+   "difficulty": 1,
+   "refs": [
+    "people/beyonce"
+   ]
+  },
+  {
+   "id": "born-beyonce",
+   "kind": "mc",
+   "prompt": "In which year was Beyoncé born?",
+   "answer": "1981",
+   "wrong": [
+    "1951",
+    "1991",
+    "1961"
+   ],
+   "explain": "Beyoncé (1981): Called Queen Bey.",
+   "difficulty": 3,
+   "refs": [
+    "people/beyonce"
+   ]
+  },
+  {
+   "id": "who-taylor-swift",
+   "kind": "mc",
+   "prompt": "Who is this? She started as a country singer before switching to pop.",
+   "answer": "Taylor Swift",
+   "wrong": [
+    "Pyotr Ilyich Tchaikovsky",
+    "Freddie Mercury",
+    "Stephen Hawking"
+   ],
+   "explain": "Taylor Swift (1989): Started as a country singer before switching to pop.",
+   "difficulty": 1,
+   "refs": [
+    "people/taylor-swift"
+   ]
+  },
+  {
+   "id": "born-taylor-swift",
+   "kind": "mc",
+   "prompt": "In which year was Taylor Swift born?",
+   "answer": "1989",
+   "wrong": [
+    "1979",
+    "1969",
+    "2009"
+   ],
+   "explain": "Taylor Swift (1989): Started as a country singer before switching to pop.",
+   "difficulty": 3,
+   "refs": [
+    "people/taylor-swift"
+   ]
+  },
+  {
+   "id": "who-louis-armstrong",
+   "kind": "mc",
+   "prompt": "Who is this? He was a famous jazz trumpeter.",
+   "answer": "Louis Armstrong",
+   "wrong": [
+    "Coco Chanel",
+    "Johann Sebastian Bach",
+    "Michael Faraday"
+   ],
+   "explain": "Louis Armstrong (1901–1971): A famous jazz trumpeter.",
+   "difficulty": 2,
+   "refs": [
+    "people/louis-armstrong"
+   ]
+  },
+  {
+   "id": "born-louis-armstrong",
+   "kind": "mc",
+   "prompt": "In which year was Louis Armstrong born?",
+   "answer": "1901",
+   "wrong": [
+    "1911",
+    "1931",
+    "1871"
+   ],
+   "explain": "Louis Armstrong (1901–1971): A famous jazz trumpeter.",
+   "difficulty": 3,
+   "refs": [
+    "people/louis-armstrong"
+   ]
+  },
+  {
+   "id": "who-dolly-parton",
+   "kind": "mc",
+   "prompt": "Who is this? She is a country music star from Tennessee.",
+   "answer": "Dolly Parton",
+   "wrong": [
+    "Walt Disney",
+    "Ludwig van Beethoven",
+    "Paul McCartney"
+   ],
+   "explain": "Dolly Parton (1946–2026): A country music star from Tennessee.",
+   "difficulty": 2,
+   "refs": [
+    "people/dolly-parton"
+   ]
+  },
+  {
+   "id": "born-dolly-parton",
+   "kind": "mc",
+   "prompt": "In which year was Dolly Parton born?",
+   "answer": "1946",
+   "wrong": [
+    "1956",
+    "1926",
+    "1936"
+   ],
+   "explain": "Dolly Parton (1946–2026): A country music star from Tennessee.",
+   "difficulty": 3,
+   "refs": [
+    "people/dolly-parton"
+   ]
+  },
+  {
+   "id": "who-walt-disney",
+   "kind": "mc",
+   "prompt": "Who is this? He co-created Mickey Mouse.",
+   "answer": "Walt Disney",
+   "wrong": [
+    "Dolly Parton",
+    "Antonio Vivaldi",
+    "Agatha Christie"
+   ],
+   "explain": "Walt Disney (1901–1966): Co-created Mickey Mouse.",
+   "difficulty": 1,
+   "refs": [
+    "people/walt-disney"
+   ]
+  },
+  {
+   "id": "born-walt-disney",
+   "kind": "mc",
+   "prompt": "In which year was Walt Disney born?",
+   "answer": "1901",
+   "wrong": [
+    "1871",
+    "1911",
+    "1921"
+   ],
+   "explain": "Walt Disney (1901–1966): Co-created Mickey Mouse.",
+   "difficulty": 3,
+   "refs": [
+    "people/walt-disney"
+   ]
+  },
+  {
+   "id": "who-charlie-chaplin",
+   "kind": "mc",
+   "prompt": "Who is this? He was a famous star of silent comedy films.",
+   "answer": "Charlie Chaplin",
+   "wrong": [
+    "Karl Marx",
+    "Alan Turing",
+    "Marie Curie"
+   ],
+   "explain": "Charlie Chaplin (1889–1977): A famous star of silent comedy films.",
+   "difficulty": 1,
+   "refs": [
+    "people/charlie-chaplin"
+   ]
+  },
+  {
+   "id": "born-charlie-chaplin",
+   "kind": "mc",
+   "prompt": "In which year was Charlie Chaplin born?",
+   "answer": "1889",
+   "wrong": [
+    "1879",
+    "1919",
+    "1859"
+   ],
+   "explain": "Charlie Chaplin (1889–1977): A famous star of silent comedy films.",
+   "difficulty": 3,
+   "refs": [
+    "people/charlie-chaplin"
+   ]
+  },
+  {
+   "id": "who-usain-bolt",
+   "kind": "mc",
+   "prompt": "Who is this? He is the fastest sprinter ever timed.",
+   "answer": "Usain Bolt",
+   "wrong": [
+    "Lionel Messi",
+    "Pelé",
+    "Karl Marx"
+   ],
+   "explain": "Usain Bolt (1986): The fastest sprinter ever timed.",
+   "difficulty": 1,
+   "refs": [
+    "people/usain-bolt"
+   ]
+  },
+  {
+   "id": "born-usain-bolt",
+   "kind": "mc",
+   "prompt": "In which year was Usain Bolt born?",
+   "answer": "1986",
+   "wrong": [
+    "1976",
+    "1966",
+    "1996"
+   ],
+   "explain": "Usain Bolt (1986): The fastest sprinter ever timed.",
+   "difficulty": 3,
+   "refs": [
+    "people/usain-bolt"
+   ]
+  },
+  {
+   "id": "who-pele",
+   "kind": "mc",
+   "prompt": "Who is this? He is a Brazilian football legend.",
+   "answer": "Pelé",
+   "wrong": [
+    "Lionel Messi",
+    "Pyotr Ilyich Tchaikovsky",
+    "Jesse Owens"
+   ],
+   "explain": "Pelé (1940–2022): A Brazilian football legend.",
+   "difficulty": 1,
+   "refs": [
+    "people/pele"
+   ]
+  },
+  {
+   "id": "born-pele",
+   "kind": "mc",
+   "prompt": "In which year was Pelé born?",
+   "answer": "1940",
+   "wrong": [
+    "1920",
+    "1950",
+    "1930"
+   ],
+   "explain": "Pelé (1940–2022): A Brazilian football legend.",
+   "difficulty": 3,
+   "refs": [
+    "people/pele"
+   ]
+  },
+  {
+   "id": "who-diego-maradona",
+   "kind": "mc",
+   "prompt": "Who is this? He captained Argentina to the 1986 World Cup.",
+   "answer": "Diego Maradona",
+   "wrong": [
+    "Sachin Tendulkar",
+    "Lewis Hamilton",
+    "Cristiano Ronaldo"
+   ],
+   "explain": "Diego Maradona (1960–2020): Captained Argentina to the 1986 World Cup.",
+   "difficulty": 2,
+   "refs": [
+    "people/diego-maradona"
+   ]
+  },
+  {
+   "id": "born-diego-maradona",
+   "kind": "mc",
+   "prompt": "In which year was Diego Maradona born?",
+   "answer": "1960",
+   "wrong": [
+    "1930",
+    "1980",
+    "1970"
+   ],
+   "explain": "Diego Maradona (1960–2020): Captained Argentina to the 1986 World Cup.",
+   "difficulty": 3,
+   "refs": [
+    "people/diego-maradona"
+   ]
+  },
+  {
+   "id": "who-lionel-messi",
+   "kind": "mc",
+   "prompt": "Who is this? He is an Argentine footballer.",
+   "answer": "Lionel Messi",
+   "wrong": [
+    "Michael Jordan",
+    "Roger Federer",
+    "Babe Ruth"
+   ],
+   "explain": "Lionel Messi (1987): An Argentine footballer.",
+   "difficulty": 1,
+   "refs": [
+    "people/lionel-messi"
+   ]
+  },
+  {
+   "id": "born-lionel-messi",
+   "kind": "mc",
+   "prompt": "In which year was Lionel Messi born?",
+   "answer": "1987",
+   "wrong": [
+    "1967",
+    "2007",
+    "1977"
+   ],
+   "explain": "Lionel Messi (1987): An Argentine footballer.",
+   "difficulty": 3,
+   "refs": [
+    "people/lionel-messi"
+   ]
+  },
+  {
+   "id": "who-cristiano-ronaldo",
+   "kind": "mc",
+   "prompt": "Who is this? He is Portugal's record goalscorer.",
+   "answer": "Cristiano Ronaldo",
+   "wrong": [
+    "Roger Federer",
+    "Jesse Owens",
+    "Usain Bolt"
+   ],
+   "explain": "Cristiano Ronaldo (1985): Portugal's record goalscorer.",
+   "difficulty": 1,
+   "refs": [
+    "people/cristiano-ronaldo"
+   ]
+  },
+  {
+   "id": "born-cristiano-ronaldo",
+   "kind": "mc",
+   "prompt": "In which year was Cristiano Ronaldo born?",
+   "answer": "1985",
+   "wrong": [
+    "2005",
+    "1965",
+    "1975"
+   ],
+   "explain": "Cristiano Ronaldo (1985): Portugal's record goalscorer.",
+   "difficulty": 3,
+   "refs": [
+    "people/cristiano-ronaldo"
+   ]
+  },
+  {
+   "id": "who-serena-williams",
+   "kind": "mc",
+   "prompt": "Who is this? She is one of the greatest tennis players ever.",
+   "answer": "Serena Williams",
+   "wrong": [
+    "Bill Gates",
+    "Martin Luther King Jr.",
+    "J. R. R. Tolkien"
+   ],
+   "explain": "Serena Williams (1981): One of the greatest tennis players ever.",
+   "difficulty": 1,
+   "refs": [
+    "people/serena-williams"
+   ]
+  },
+  {
+   "id": "born-serena-williams",
+   "kind": "mc",
+   "prompt": "In which year was Serena Williams born?",
+   "answer": "1981",
+   "wrong": [
+    "2001",
+    "1951",
+    "1971"
+   ],
+   "explain": "Serena Williams (1981): One of the greatest tennis players ever.",
+   "difficulty": 3,
+   "refs": [
+    "people/serena-williams"
+   ]
+  },
+  {
+   "id": "who-roger-federer",
+   "kind": "mc",
+   "prompt": "Who is this? He is a Swiss tennis great.",
+   "answer": "Roger Federer",
+   "wrong": [
+    "Lionel Messi",
+    "Wayne Gretzky",
+    "Beyoncé"
+   ],
+   "explain": "Roger Federer (1981): A Swiss tennis great.",
+   "difficulty": 2,
+   "refs": [
+    "people/roger-federer"
+   ]
+  },
+  {
+   "id": "born-roger-federer",
+   "kind": "mc",
+   "prompt": "In which year was Roger Federer born?",
+   "answer": "1981",
+   "wrong": [
+    "1991",
+    "2001",
+    "1951"
+   ],
+   "explain": "Roger Federer (1981): A Swiss tennis great.",
+   "difficulty": 3,
+   "refs": [
+    "people/roger-federer"
+   ]
+  },
+  {
+   "id": "who-rafael-nadal",
+   "kind": "mc",
+   "prompt": "Who is this? He is called the King of Clay.",
+   "answer": "Rafael Nadal",
+   "wrong": [
+    "Usain Bolt",
+    "Michael Jordan",
+    "Martin Luther King Jr."
+   ],
+   "explain": "Rafael Nadal (1986): Called the King of Clay.",
+   "difficulty": 2,
+   "refs": [
+    "people/rafael-nadal"
+   ]
+  },
+  {
+   "id": "born-rafael-nadal",
+   "kind": "mc",
+   "prompt": "In which year was Rafael Nadal born?",
+   "answer": "1986",
+   "wrong": [
+    "1976",
+    "1996",
+    "1966"
+   ],
+   "explain": "Rafael Nadal (1986): Called the King of Clay.",
+   "difficulty": 3,
+   "refs": [
+    "people/rafael-nadal"
+   ]
+  },
+  {
+   "id": "who-muhammad-ali",
+   "kind": "mc",
+   "prompt": "Who is this? He was a heavyweight boxing champion.",
+   "answer": "Muhammad Ali",
+   "wrong": [
+    "Ludwig van Beethoven",
+    "Alexander Graham Bell",
+    "Serena Williams"
+   ],
+   "explain": "Muhammad Ali (1942–2016): A heavyweight boxing champion.",
+   "difficulty": 1,
+   "refs": [
+    "people/muhammad-ali"
+   ]
+  },
+  {
+   "id": "born-muhammad-ali",
+   "kind": "mc",
+   "prompt": "In which year was Muhammad Ali born?",
+   "answer": "1942",
+   "wrong": [
+    "1962",
+    "1932",
+    "1952"
+   ],
+   "explain": "Muhammad Ali (1942–2016): A heavyweight boxing champion.",
+   "difficulty": 3,
+   "refs": [
+    "people/muhammad-ali"
+   ]
+  },
+  {
+   "id": "who-michael-jordan",
+   "kind": "mc",
+   "prompt": "Who is this? He is a basketball legend.",
+   "answer": "Michael Jordan",
+   "wrong": [
+    "Cristiano Ronaldo",
+    "Richard Feynman",
+    "Rosalind Franklin"
+   ],
+   "explain": "Michael Jordan (1963): A basketball legend.",
+   "difficulty": 1,
+   "refs": [
+    "people/michael-jordan"
+   ]
+  },
+  {
+   "id": "born-michael-jordan",
+   "kind": "mc",
+   "prompt": "In which year was Michael Jordan born?",
+   "answer": "1963",
+   "wrong": [
+    "1983",
+    "1933",
+    "1953"
+   ],
+   "explain": "Michael Jordan (1963): A basketball legend.",
+   "difficulty": 3,
+   "refs": [
+    "people/michael-jordan"
+   ]
+  },
+  {
+   "id": "who-simone-biles",
+   "kind": "mc",
+   "prompt": "Who is this? She is an American gymnast.",
+   "answer": "Simone Biles",
+   "wrong": [
+    "Sigmund Freud",
+    "Frédéric Chopin",
+    "Henry Ford"
+   ],
+   "explain": "Simone Biles (1997): An American gymnast.",
+   "difficulty": 1,
+   "refs": [
+    "people/simone-biles"
+   ]
+  },
+  {
+   "id": "born-simone-biles",
+   "kind": "mc",
+   "prompt": "In which year was Simone Biles born?",
+   "answer": "1997",
+   "wrong": [
+    "2007",
+    "1967",
+    "1977"
+   ],
+   "explain": "Simone Biles (1997): An American gymnast.",
+   "difficulty": 3,
+   "refs": [
+    "people/simone-biles"
+   ]
+  },
+  {
+   "id": "who-michael-phelps",
+   "kind": "mc",
+   "prompt": "Who is this? He is the most decorated Olympian of all time.",
+   "answer": "Michael Phelps",
+   "wrong": [
+    "Karl Marx",
+    "Bill Gates",
+    "Mother Teresa"
+   ],
+   "explain": "Michael Phelps (1985): The most decorated Olympian of all time.",
+   "difficulty": 1,
+   "refs": [
+    "people/michael-phelps"
+   ]
+  },
+  {
+   "id": "born-michael-phelps",
+   "kind": "mc",
+   "prompt": "In which year was Michael Phelps born?",
+   "answer": "1985",
+   "wrong": [
+    "1995",
+    "1955",
+    "2005"
+   ],
+   "explain": "Michael Phelps (1985): The most decorated Olympian of all time.",
+   "difficulty": 3,
+   "refs": [
+    "people/michael-phelps"
+   ]
+  },
+  {
+   "id": "who-tiger-woods",
+   "kind": "mc",
+   "prompt": "Who is this? He is a famous golfer.",
+   "answer": "Tiger Woods",
+   "wrong": [
+    "Alan Turing",
+    "Babe Ruth",
+    "William Shakespeare"
+   ],
+   "explain": "Tiger Woods (1975): A famous golfer.",
+   "difficulty": 1,
+   "refs": [
+    "people/tiger-woods"
+   ]
+  },
+  {
+   "id": "born-tiger-woods",
+   "kind": "mc",
+   "prompt": "In which year was Tiger Woods born?",
+   "answer": "1975",
+   "wrong": [
+    "1945",
+    "1965",
+    "2005"
+   ],
+   "explain": "Tiger Woods (1975): A famous golfer.",
+   "difficulty": 3,
+   "refs": [
+    "people/tiger-woods"
+   ]
+  },
+  {
+   "id": "who-jesse-owens",
+   "kind": "mc",
+   "prompt": "Who is this? He was an American sprinter and long jumper.",
+   "answer": "Jesse Owens",
+   "wrong": [
+    "Malala Yousafzai",
+    "Lionel Messi",
+    "Rosalind Franklin"
+   ],
+   "explain": "Jesse Owens (1913–1980): An American sprinter and long jumper.",
+   "difficulty": 2,
+   "refs": [
+    "people/jesse-owens"
+   ]
+  },
+  {
+   "id": "born-jesse-owens",
+   "kind": "mc",
+   "prompt": "In which year was Jesse Owens born?",
+   "answer": "1913",
+   "wrong": [
+    "1943",
+    "1923",
+    "1893"
+   ],
+   "explain": "Jesse Owens (1913–1980): An American sprinter and long jumper.",
+   "difficulty": 3,
+   "refs": [
+    "people/jesse-owens"
+   ]
+  },
+  {
+   "id": "who-nadia-comaneci",
+   "kind": "mc",
+   "prompt": "Who is this? She is a Romanian gymnast.",
+   "answer": "Nadia Comăneci",
+   "wrong": [
+    "Wolfgang Amadeus Mozart",
+    "Emmeline Pankhurst",
+    "Madonna"
+   ],
+   "explain": "Nadia Comăneci (1961): A Romanian gymnast.",
+   "difficulty": 2,
+   "refs": [
+    "people/nadia-comaneci"
+   ]
+  },
+  {
+   "id": "born-nadia-comaneci",
+   "kind": "mc",
+   "prompt": "In which year was Nadia Comăneci born?",
+   "answer": "1961",
+   "wrong": [
+    "1981",
+    "1941",
+    "1991"
+   ],
+   "explain": "Nadia Comăneci (1961): A Romanian gymnast.",
+   "difficulty": 3,
+   "refs": [
+    "people/nadia-comaneci"
+   ]
+  },
+  {
+   "id": "who-wayne-gretzky",
+   "kind": "mc",
+   "prompt": "Who is this? He is an ice hockey legend.",
+   "answer": "Wayne Gretzky",
+   "wrong": [
+    "Jesse Owens",
+    "Sachin Tendulkar",
+    "Katherine Johnson"
+   ],
+   "explain": "Wayne Gretzky (1961): An ice hockey legend.",
+   "difficulty": 2,
+   "refs": [
+    "people/wayne-gretzky"
+   ]
+  },
+  {
+   "id": "born-wayne-gretzky",
+   "kind": "mc",
+   "prompt": "In which year was Wayne Gretzky born?",
+   "answer": "1961",
+   "wrong": [
+    "1971",
+    "1931",
+    "1941"
+   ],
+   "explain": "Wayne Gretzky (1961): An ice hockey legend.",
+   "difficulty": 3,
+   "refs": [
+    "people/wayne-gretzky"
+   ]
+  },
+  {
+   "id": "who-sachin-tendulkar",
+   "kind": "mc",
+   "prompt": "Who is this? He is an Indian cricket legend.",
+   "answer": "Sachin Tendulkar",
+   "wrong": [
+    "Joan of Arc",
+    "Alexander Fleming",
+    "Michael Faraday"
+   ],
+   "explain": "Sachin Tendulkar (1973): An Indian cricket legend.",
+   "difficulty": 2,
+   "refs": [
+    "people/sachin-tendulkar"
+   ]
+  },
+  {
+   "id": "born-sachin-tendulkar",
+   "kind": "mc",
+   "prompt": "In which year was Sachin Tendulkar born?",
+   "answer": "1973",
+   "wrong": [
+    "1983",
+    "2003",
+    "1943"
+   ],
+   "explain": "Sachin Tendulkar (1973): An Indian cricket legend.",
+   "difficulty": 3,
+   "refs": [
+    "people/sachin-tendulkar"
+   ]
+  },
+  {
+   "id": "who-lewis-hamilton",
+   "kind": "mc",
+   "prompt": "Who is this? He is a British racing driver.",
+   "answer": "Lewis Hamilton",
+   "wrong": [
+    "Bob Marley",
+    "Simone Biles",
+    "Dolly Parton"
+   ],
+   "explain": "Lewis Hamilton (1985): A British racing driver.",
+   "difficulty": 1,
+   "refs": [
+    "people/lewis-hamilton"
+   ]
+  },
+  {
+   "id": "born-lewis-hamilton",
+   "kind": "mc",
+   "prompt": "In which year was Lewis Hamilton born?",
+   "answer": "1985",
+   "wrong": [
+    "2005",
+    "1965",
+    "1955"
+   ],
+   "explain": "Lewis Hamilton (1985): A British racing driver.",
+   "difficulty": 3,
+   "refs": [
+    "people/lewis-hamilton"
+   ]
+  },
+  {
+   "id": "who-babe-ruth",
+   "kind": "mc",
+   "prompt": "Who is this? He was a baseball home-run legend.",
+   "answer": "Babe Ruth",
+   "wrong": [
+    "Usain Bolt",
+    "Lionel Messi",
+    "Sigmund Freud"
+   ],
+   "explain": "Babe Ruth (1895–1948): A baseball home-run legend.",
+   "difficulty": 2,
+   "refs": [
+    "people/babe-ruth"
+   ]
+  },
+  {
+   "id": "born-babe-ruth",
+   "kind": "mc",
+   "prompt": "In which year was Babe Ruth born?",
+   "answer": "1895",
+   "wrong": [
+    "1905",
+    "1875",
+    "1915"
+   ],
+   "explain": "Babe Ruth (1895–1948): A baseball home-run legend.",
+   "difficulty": 3,
+   "refs": [
+    "people/babe-ruth"
+   ]
+  },
+  {
+   "id": "who-don-bradman",
+   "kind": "mc",
+   "prompt": "Who is this? He is regarded as the greatest cricket batsman ever.",
+   "answer": "Don Bradman",
+   "wrong": [
+    "Dmitri Mendeleev",
+    "Cristiano Ronaldo",
+    "Paul McCartney"
+   ],
+   "explain": "Don Bradman (1908–2001): Regarded as the greatest cricket batsman ever.",
+   "difficulty": 3,
+   "refs": [
+    "people/don-bradman"
+   ]
+  },
+  {
+   "id": "born-don-bradman",
+   "kind": "mc",
+   "prompt": "In which year was Don Bradman born?",
+   "answer": "1908",
+   "wrong": [
+    "1918",
+    "1888",
+    "1898"
+   ],
+   "explain": "Don Bradman (1908–2001): Regarded as the greatest cricket batsman ever.",
+   "difficulty": 3,
+   "refs": [
+    "people/don-bradman"
+   ]
+  },
+  {
+   "id": "who-martin-luther-king-jr",
+   "kind": "mc",
+   "prompt": "Who is this? He was a leader of the US civil rights movement.",
+   "answer": "Martin Luther King Jr.",
+   "wrong": [
+    "Malala Yousafzai",
+    "Thomas Edison",
+    "Gregor Mendel"
+   ],
+   "explain": "Martin Luther King Jr. (1929–1968): A leader of the US civil rights movement.",
+   "difficulty": 1,
+   "refs": [
+    "people/martin-luther-king-jr"
+   ]
+  },
+  {
+   "id": "born-martin-luther-king-jr",
+   "kind": "mc",
+   "prompt": "In which year was Martin Luther King Jr. born?",
+   "answer": "1929",
+   "wrong": [
+    "1959",
+    "1939",
+    "1919"
+   ],
+   "explain": "Martin Luther King Jr. (1929–1968): A leader of the US civil rights movement.",
+   "difficulty": 3,
+   "refs": [
+    "people/martin-luther-king-jr"
+   ]
+  },
+  {
+   "id": "who-rosa-parks",
+   "kind": "mc",
+   "prompt": "Who is this? She is called the mother of the civil rights movement.",
+   "answer": "Rosa Parks",
+   "wrong": [
+    "Nicolaus Copernicus",
+    "Emmeline Pankhurst",
+    "Martin Luther King Jr."
+   ],
+   "explain": "Rosa Parks (1913–2005): Called the mother of the civil rights movement.",
+   "difficulty": 1,
+   "refs": [
+    "people/rosa-parks"
+   ]
+  },
+  {
+   "id": "born-rosa-parks",
+   "kind": "mc",
+   "prompt": "In which year was Rosa Parks born?",
+   "answer": "1913",
+   "wrong": [
+    "1923",
+    "1903",
+    "1893"
+   ],
+   "explain": "Rosa Parks (1913–2005): Called the mother of the civil rights movement.",
+   "difficulty": 3,
+   "refs": [
+    "people/rosa-parks"
+   ]
+  },
+  {
+   "id": "who-anne-frank",
+   "kind": "mc",
+   "prompt": "Who is this? Her diary is one of the most-read books about the Holocaust.",
+   "answer": "Anne Frank",
+   "wrong": [
+    "Wolfgang Amadeus Mozart",
+    "Gregor Mendel",
+    "Beyoncé"
+   ],
+   "explain": "Anne Frank (1929–1945): Her diary is one of the most-read books about the Holocaust.",
+   "difficulty": 2,
+   "refs": [
+    "people/anne-frank"
+   ]
+  },
+  {
+   "id": "born-anne-frank",
+   "kind": "mc",
+   "prompt": "In which year was Anne Frank born?",
+   "answer": "1929",
+   "wrong": [
+    "1899",
+    "1919",
+    "1939"
+   ],
+   "explain": "Anne Frank (1929–1945): Her diary is one of the most-read books about the Holocaust.",
+   "difficulty": 3,
+   "refs": [
+    "people/anne-frank"
+   ]
+  },
+  {
+   "id": "who-malala-yousafzai",
+   "kind": "mc",
+   "prompt": "Who is this? She campaigns for girls' education.",
+   "answer": "Malala Yousafzai",
+   "wrong": [
+    "Dmitri Mendeleev",
+    "Paul McCartney",
+    "Richard Feynman"
+   ],
+   "explain": "Malala Yousafzai (1997): Campaigns for girls' education.",
+   "difficulty": 1,
+   "refs": [
+    "people/malala-yousafzai"
+   ]
+  },
+  {
+   "id": "born-malala-yousafzai",
+   "kind": "mc",
+   "prompt": "In which year was Malala Yousafzai born?",
+   "answer": "1997",
+   "wrong": [
+    "2007",
+    "1987",
+    "1967"
+   ],
+   "explain": "Malala Yousafzai (1997): Campaigns for girls' education.",
+   "difficulty": 3,
+   "refs": [
+    "people/malala-yousafzai"
+   ]
+  },
+  {
+   "id": "who-mother-teresa",
+   "kind": "mc",
+   "prompt": "Who is this? She cared for the poor in Kolkata.",
+   "answer": "Mother Teresa",
+   "wrong": [
+    "Gregor Mendel",
+    "Elvis Presley",
+    "Edward Jenner"
+   ],
+   "explain": "Mother Teresa (1910–1997): Cared for the poor in Kolkata.",
+   "difficulty": 2,
+   "refs": [
+    "people/mother-teresa"
+   ]
+  },
+  {
+   "id": "born-mother-teresa",
+   "kind": "mc",
+   "prompt": "In which year was Mother Teresa born?",
+   "answer": "1910",
+   "wrong": [
+    "1920",
+    "1890",
+    "1940"
+   ],
+   "explain": "Mother Teresa (1910–1997): Cared for the poor in Kolkata.",
+   "difficulty": 3,
+   "refs": [
+    "people/mother-teresa"
+   ]
+  },
+  {
+   "id": "who-joan-of-arc",
+   "kind": "mc",
+   "prompt": "Who is this? She was a teenage French heroine of the Hundred Years' War.",
+   "answer": "Joan of Arc",
+   "wrong": [
+    "Alan Turing",
+    "Maya Angelou",
+    "Jane Goodall"
+   ],
+   "explain": "Joan of Arc (1412–1431): A teenage French heroine of the Hundred Years' War.",
+   "difficulty": 2,
+   "refs": [
+    "people/joan-of-arc"
+   ]
+  },
+  {
+   "id": "born-joan-of-arc",
+   "kind": "mc",
+   "prompt": "In which year was Joan of Arc born?",
+   "answer": "1412",
+   "wrong": [
+    "1432",
+    "1422",
+    "1382"
+   ],
+   "explain": "Joan of Arc (1412–1431): A teenage French heroine of the Hundred Years' War.",
+   "difficulty": 3,
+   "refs": [
+    "people/joan-of-arc"
+   ]
+  },
+  {
+   "id": "who-helen-keller",
+   "kind": "mc",
+   "prompt": "Who is this? She lost her sight and hearing as a baby.",
+   "answer": "Helen Keller",
+   "wrong": [
+    "Babe Ruth",
+    "Malala Yousafzai",
+    "Karl Marx"
+   ],
+   "explain": "Helen Keller (1880–1968): Lost her sight and hearing as a baby.",
+   "difficulty": 2,
+   "refs": [
+    "people/helen-keller"
+   ]
+  },
+  {
+   "id": "born-helen-keller",
+   "kind": "mc",
+   "prompt": "In which year was Helen Keller born?",
+   "answer": "1880",
+   "wrong": [
+    "1900",
+    "1870",
+    "1910"
+   ],
+   "explain": "Helen Keller (1880–1968): Lost her sight and hearing as a baby.",
+   "difficulty": 3,
+   "refs": [
+    "people/helen-keller"
+   ]
+  },
+  {
+   "id": "who-emmeline-pankhurst",
+   "kind": "mc",
+   "prompt": "Who is this? She led the fight for women's right to vote in Britain.",
+   "answer": "Emmeline Pankhurst",
+   "wrong": [
+    "Mother Teresa",
+    "Nikola Tesla",
+    "Joan of Arc"
+   ],
+   "explain": "Emmeline Pankhurst (1858–1928): Led the fight for women's right to vote in Britain.",
+   "difficulty": 3,
+   "refs": [
+    "people/emmeline-pankhurst"
+   ]
+  },
+  {
+   "id": "born-emmeline-pankhurst",
+   "kind": "mc",
+   "prompt": "In which year was Emmeline Pankhurst born?",
+   "answer": "1858",
+   "wrong": [
+    "1838",
+    "1878",
+    "1848"
+   ],
+   "explain": "Emmeline Pankhurst (1858–1928): Led the fight for women's right to vote in Britain.",
+   "difficulty": 3,
+   "refs": [
+    "people/emmeline-pankhurst"
+   ]
+  },
+  {
+   "id": "who-aristotle",
+   "kind": "mc",
+   "prompt": "Who is this? He was an ancient Greek philosopher.",
+   "answer": "Aristotle",
+   "wrong": [
+    "Wolfgang Amadeus Mozart",
+    "J. R. R. Tolkien",
+    "J. K. Rowling"
+   ],
+   "explain": "Aristotle (384 BC–322 BC): An ancient Greek philosopher.",
+   "difficulty": 2,
+   "refs": [
+    "people/aristotle"
+   ]
+  },
+  {
+   "id": "who-confucius",
+   "kind": "mc",
+   "prompt": "Who is this? He was an ancient Chinese philosopher.",
+   "answer": "Confucius",
+   "wrong": [
+    "Maya Angelou",
+    "Hans Christian Andersen",
+    "Cristiano Ronaldo"
+   ],
+   "explain": "Confucius: An ancient Chinese philosopher.",
+   "difficulty": 2,
+   "refs": [
+    "people/confucius"
+   ]
+  },
+  {
+   "id": "who-karl-marx",
+   "kind": "mc",
+   "prompt": "Who is this? He co-wrote The Communist Manifesto.",
+   "answer": "Karl Marx",
+   "wrong": [
+    "Florence Nightingale",
+    "Bob Marley",
+    "Michael Phelps"
+   ],
+   "explain": "Karl Marx (1818–1883): Co-wrote The Communist Manifesto.",
+   "difficulty": 3,
+   "refs": [
+    "people/karl-marx"
+   ]
+  },
+  {
+   "id": "born-karl-marx",
+   "kind": "mc",
+   "prompt": "In which year was Karl Marx born?",
+   "answer": "1818",
+   "wrong": [
+    "1798",
+    "1808",
+    "1848"
+   ],
+   "explain": "Karl Marx (1818–1883): Co-wrote The Communist Manifesto.",
+   "difficulty": 3,
+   "refs": [
+    "people/karl-marx"
+   ]
+  },
+  {
+   "id": "who-sigmund-freud",
+   "kind": "mc",
+   "prompt": "Who is this? He is famous for his theories about the unconscious mind.",
+   "answer": "Sigmund Freud",
+   "wrong": [
+    "Walt Disney",
+    "Jesse Owens",
+    "Johannes Kepler"
+   ],
+   "explain": "Sigmund Freud (1856–1939): Famous for his theories about the unconscious mind.",
+   "difficulty": 2,
+   "refs": [
+    "people/sigmund-freud"
+   ]
+  },
+  {
+   "id": "born-sigmund-freud",
+   "kind": "mc",
+   "prompt": "In which year was Sigmund Freud born?",
+   "answer": "1856",
+   "wrong": [
+    "1826",
+    "1866",
+    "1886"
+   ],
+   "explain": "Sigmund Freud (1856–1939): Famous for his theories about the unconscious mind.",
+   "difficulty": 3,
+   "refs": [
+    "people/sigmund-freud"
+   ]
+  },
+  {
+   "id": "who-steve-jobs",
+   "kind": "mc",
+   "prompt": "Who is this? He co-founded Apple.",
+   "answer": "Steve Jobs",
+   "wrong": [
+    "Confucius",
+    "Dr. Seuss",
+    "Jane Goodall"
+   ],
+   "explain": "Steve Jobs (1955–2011): Co-founded Apple.",
+   "difficulty": 1,
+   "refs": [
+    "people/steve-jobs"
+   ]
+  },
+  {
+   "id": "born-steve-jobs",
+   "kind": "mc",
+   "prompt": "In which year was Steve Jobs born?",
+   "answer": "1955",
+   "wrong": [
+    "1925",
+    "1945",
+    "1965"
+   ],
+   "explain": "Steve Jobs (1955–2011): Co-founded Apple.",
+   "difficulty": 3,
+   "refs": [
+    "people/steve-jobs"
+   ]
+  },
+  {
+   "id": "who-bill-gates",
+   "kind": "mc",
+   "prompt": "Who is this? He co-founded Microsoft.",
+   "answer": "Bill Gates",
+   "wrong": [
+    "Simone Biles",
+    "Taylor Swift",
+    "Malala Yousafzai"
+   ],
+   "explain": "Bill Gates (1955): Co-founded Microsoft.",
+   "difficulty": 1,
+   "refs": [
+    "people/bill-gates"
+   ]
+  },
+  {
+   "id": "born-bill-gates",
+   "kind": "mc",
+   "prompt": "In which year was Bill Gates born?",
+   "answer": "1955",
+   "wrong": [
+    "1975",
+    "1945",
+    "1935"
+   ],
+   "explain": "Bill Gates (1955): Co-founded Microsoft.",
+   "difficulty": 3,
+   "refs": [
+    "people/bill-gates"
+   ]
+  },
+  {
+   "id": "who-henry-ford",
+   "kind": "mc",
+   "prompt": "Who is this? He founded a famous car company.",
+   "answer": "Henry Ford",
+   "wrong": [
+    "Muhammad Ali",
+    "Bill Gates",
+    "Sachin Tendulkar"
+   ],
+   "explain": "Henry Ford (1863–1947): Founded a famous car company.",
+   "difficulty": 2,
+   "refs": [
+    "people/henry-ford"
+   ]
+  },
+  {
+   "id": "born-henry-ford",
+   "kind": "mc",
+   "prompt": "In which year was Henry Ford born?",
+   "answer": "1863",
+   "wrong": [
+    "1833",
+    "1853",
+    "1893"
+   ],
+   "explain": "Henry Ford (1863–1947): Founded a famous car company.",
+   "difficulty": 3,
+   "refs": [
+    "people/henry-ford"
+   ]
+  },
+  {
+   "id": "who-coco-chanel",
+   "kind": "mc",
+   "prompt": "Who is this? She founded a famous French fashion house.",
+   "answer": "Coco Chanel",
+   "wrong": [
+    "Albert Einstein",
+    "Tiger Woods",
+    "Malala Yousafzai"
+   ],
+   "explain": "Coco Chanel (1883–1971): Founded a famous French fashion house.",
+   "difficulty": 2,
+   "refs": [
+    "people/coco-chanel"
+   ]
+  },
+  {
+   "id": "born-coco-chanel",
+   "kind": "mc",
+   "prompt": "In which year was Coco Chanel born?",
+   "answer": "1883",
+   "wrong": [
+    "1903",
+    "1893",
+    "1853"
+   ],
+   "explain": "Coco Chanel (1883–1971): Founded a famous French fashion house.",
+   "difficulty": 3,
+   "refs": [
+    "people/coco-chanel"
+   ]
+  },
+  {
+   "id": "who-martin-luther",
+   "kind": "mc",
+   "prompt": "Who is this? He started the Protestant Reformation.",
+   "answer": "Martin Luther",
+   "wrong": [
+    "Niels Bohr",
+    "Nadia Comăneci",
+    "Marie Curie"
+   ],
+   "explain": "Martin Luther (1483–1546): Started the Protestant Reformation.",
+   "difficulty": 3,
+   "refs": [
+    "people/martin-luther"
+   ]
+  },
+  {
+   "id": "born-martin-luther",
+   "kind": "mc",
+   "prompt": "In which year was Martin Luther born?",
+   "answer": "1483",
+   "wrong": [
+    "1513",
+    "1453",
+    "1503"
+   ],
+   "explain": "Martin Luther (1483–1546): Started the Protestant Reformation.",
+   "difficulty": 3,
+   "refs": [
+    "people/martin-luther"
+   ]
+  }
+ ],
+ "sources": [
+  {
+   "name": "Wikidata (birth/death dates, portraits)",
+   "url": "https://www.wikidata.org"
+  },
+  {
+   "name": "Wikimedia Commons (portraits, licence-checked)",
+   "url": "https://commons.wikimedia.org"
+  }
+ ]
+}

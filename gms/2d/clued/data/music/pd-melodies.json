@@ -1,0 +1,326 @@
+{
+ "id": "pd-melodies",
+ "title": "Old songs & carols",
+ "theme": "music",
+ "icon": "🎼",
+ "kids": false,
+ "version": 1,
+ "factsMeta": {
+  "composer": {
+   "type": "cat",
+   "label": "Composer"
+  },
+  "year": {
+   "type": "year",
+   "label": "Written",
+   "higherLabel": "Later"
+  },
+  "origin": {
+   "type": "cat",
+   "label": "Kind of song"
+  }
+ },
+ "items": [
+  {
+   "id": "jingle-bells",
+   "name": "Jingle Bells",
+   "facts": {
+    "composer": "James Lord Pierpont",
+    "year": 1857,
+    "origin": "Christmas"
+   },
+   "blurb": "Jingle Bells, by James Lord Pierpont (1857).",
+   "lyrics": [
+    "Jingle bells, jingle bells",
+    "Jingle all the way",
+    "Oh, what fun it is to ride",
+    "In a one-horse open sleigh"
+   ],
+   "media": {
+    "audio": [
+     {
+      "type": "piano",
+      "src": "data/music/notes/jingle-bells.json",
+      "credit": "James Lord Pierpont (composer); transcribed by Clued from public-domain sources; Salamander Grand Piano samples by Alexander Holm (CC BY 3.0)",
+      "license": "PD",
+      "page": "https://en.wikipedia.org/wiki/Special:Search?search=Jingle%20Bells",
+      "start": 0,
+      "dur": 29
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "silent-night",
+   "name": "Silent Night",
+   "facts": {
+    "composer": "Franz Xaver Gruber",
+    "year": 1818,
+    "origin": "Christmas"
+   },
+   "blurb": "Silent Night, by Franz Xaver Gruber (1818).",
+   "lyrics": [
+    "Silent night, holy night",
+    "All is calm, all is bright",
+    "Round yon virgin mother and child",
+    "Holy infant so tender and mild"
+   ],
+   "media": {
+    "audio": [
+     {
+      "type": "piano",
+      "src": "data/music/notes/silent-night.json",
+      "credit": "Franz Xaver Gruber (composer); transcribed by Clued from public-domain sources; Salamander Grand Piano samples by Alexander Holm (CC BY 3.0)",
+      "license": "PD",
+      "page": "https://en.wikipedia.org/wiki/Special:Search?search=Silent%20Night",
+      "start": 0,
+      "dur": 51
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "deck-the-halls",
+   "name": "Deck the Halls",
+   "facts": {
+    "origin": "Christmas"
+   },
+   "blurb": "A Welsh melody from the 1700s with English words from 1862.",
+   "lyrics": [
+    "Deck the halls with boughs of holly",
+    "Fa la la la la, la la la la",
+    "'Tis the season to be jolly",
+    "Fa la la la la, la la la la"
+   ],
+   "media": {
+    "audio": [
+     {
+      "type": "piano",
+      "src": "data/music/notes/deck-the-halls.json",
+      "credit": "Traditional (composer); transcribed by Clued from public-domain sources; Salamander Grand Piano samples by Alexander Holm (CC BY 3.0)",
+      "license": "PD",
+      "page": "https://en.wikipedia.org/wiki/Special:Search?search=Deck%20the%20Halls",
+      "start": 0,
+      "dur": 32
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "we-wish-you",
+   "name": "We Wish You a Merry Christmas",
+   "facts": {
+    "origin": "Christmas"
+   },
+   "blurb": "We Wish You a Merry Christmas.",
+   "lyrics": [
+    "We wish you a Merry Christmas",
+    "We wish you a Merry Christmas",
+    "We wish you a Merry Christmas",
+    "And a Happy New Year"
+   ],
+   "media": {
+    "audio": [
+     {
+      "type": "piano",
+      "src": "data/music/notes/we-wish-you.json",
+      "credit": "Traditional (composer); transcribed by Clued from public-domain sources; Salamander Grand Piano samples by Alexander Holm (CC BY 3.0)",
+      "license": "PD",
+      "page": "https://en.wikipedia.org/wiki/Special:Search?search=We%20Wish%20You%20a%20Merry%20Christmas",
+      "start": 0,
+      "dur": 11
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "joy-to-the-world",
+   "name": "Joy to the World",
+   "facts": {
+    "composer": "Lowell Mason",
+    "year": 1839,
+    "origin": "Christmas"
+   },
+   "blurb": "Joy to the World, by Lowell Mason (tune \"Antioch\"), words by Isaac Watts (1839).",
+   "lyrics": [
+    "Joy to the world, the Lord is come",
+    "Let earth receive her King"
+   ],
+   "media": {
+    "audio": [
+     {
+      "type": "piano",
+      "src": "data/music/notes/joy-to-the-world.json",
+      "credit": "Lowell Mason (tune \"Antioch\"), words by Isaac Watts (composer); transcribed by Clued from public-domain sources; Salamander Grand Piano samples by Alexander Holm (CC BY 3.0)",
+      "license": "PD",
+      "page": "https://en.wikipedia.org/wiki/Special:Search?search=Joy%20to%20the%20World",
+      "start": 0,
+      "dur": 10
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "greensleeves",
+   "name": "Greensleeves",
+   "facts": {
+    "origin": "Folk"
+   },
+   "blurb": "An English folk tune from the 1500s, later used for the carol \"What Child Is This?\".",
+   "lyrics": [
+    "Alas, my love, you do me wrong",
+    "To cast me off discourteously"
+   ],
+   "media": {
+    "audio": [
+     {
+      "type": "piano",
+      "src": "data/music/notes/greensleeves.json",
+      "credit": "Traditional (composer); transcribed by Clued from public-domain sources; Salamander Grand Piano samples by Alexander Holm (CC BY 3.0)",
+      "license": "PD",
+      "page": "https://en.wikipedia.org/wiki/Special:Search?search=Greensleeves",
+      "start": 0,
+      "dur": 21
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "amazing-grace",
+   "name": "Amazing Grace",
+   "facts": {
+    "year": 1835,
+    "origin": "Hymn"
+   },
+   "blurb": "Words by John Newton (1779), sung to the American tune \"New Britain\" (1835).",
+   "lyrics": [
+    "Amazing grace, how sweet the sound",
+    "That saved a wretch like me",
+    "I once was lost, but now am found",
+    "Was blind, but now I see"
+   ],
+   "media": {
+    "audio": [
+     {
+      "type": "piano",
+      "src": "data/music/notes/amazing-grace.json",
+      "credit": "Traditional American tune \"New Britain\"; words by John Newton (composer); transcribed by Clued from public-domain sources; Salamander Grand Piano samples by Alexander Holm (CC BY 3.0)",
+      "license": "PD",
+      "page": "https://en.wikipedia.org/wiki/Special:Search?search=Amazing%20Grace",
+      "start": 0,
+      "dur": 31
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "oh-susanna",
+   "name": "Oh! Susanna",
+   "facts": {
+    "composer": "Stephen Foster",
+    "year": 1848,
+    "origin": "American song"
+   },
+   "blurb": "Oh! Susanna, by Stephen Foster (1848).",
+   "lyrics": [
+    "I come from Alabama with my banjo on my knee",
+    "I'm going to Louisiana, my true love for to see"
+   ],
+   "media": {
+    "audio": [
+     {
+      "type": "piano",
+      "src": "data/music/notes/oh-susanna.json",
+      "credit": "Stephen Foster (composer); transcribed by Clued from public-domain sources; Salamander Grand Piano samples by Alexander Holm (CC BY 3.0)",
+      "license": "PD",
+      "page": "https://en.wikipedia.org/wiki/Special:Search?search=Oh!%20Susanna",
+      "start": 0,
+      "dur": 16
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "daisy-bell",
+   "name": "Daisy Bell (Bicycle Built for Two)",
+   "alt": [
+    "Daisy Bell",
+    "Bicycle Built for Two",
+    "Daisy, Daisy"
+   ],
+   "facts": {
+    "composer": "Harry Dacre",
+    "year": 1892,
+    "origin": "Music hall"
+   },
+   "blurb": "Daisy Bell (Bicycle Built for Two), by Harry Dacre (1892).",
+   "lyrics": [
+    "Daisy, Daisy, give me your answer, do",
+    "I'm half crazy all for the love of you"
+   ],
+   "media": {
+    "audio": [
+     {
+      "type": "piano",
+      "src": "data/music/notes/daisy-bell.json",
+      "credit": "Harry Dacre (composer); transcribed by Clued from public-domain sources; Salamander Grand Piano samples by Alexander Holm (CC BY 3.0)",
+      "license": "PD",
+      "page": "https://en.wikipedia.org/wiki/Special:Search?search=Daisy%20Bell",
+      "start": 0,
+      "dur": 18
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "take-me-out",
+   "name": "Take Me Out to the Ball Game",
+   "facts": {
+    "composer": "Albert Von Tilzer",
+    "year": 1908,
+    "origin": "American song"
+   },
+   "blurb": "Take Me Out to the Ball Game, by Albert Von Tilzer (1908).",
+   "lyrics": [
+    "Take me out to the ball game",
+    "Take me out with the crowd",
+    "Buy me some peanuts and Cracker Jack",
+    "I don't care if I never get back"
+   ],
+   "media": {
+    "audio": [
+     {
+      "type": "piano",
+      "src": "data/music/notes/take-me-out.json",
+      "credit": "Albert Von Tilzer (composer); transcribed by Clued from public-domain sources; Salamander Grand Piano samples by Alexander Holm (CC BY 3.0)",
+      "license": "PD",
+      "page": "https://en.wikipedia.org/wiki/Special:Search?search=Take%20Me%20Out%20to%20the%20Ball%20Game",
+      "start": 0,
+      "dur": 17
+     }
+    ]
+   },
+   "difficulty": 2
+  }
+ ],
+ "questions": [],
+ "sources": [
+  {
+   "name": "Salamander Grand Piano V3 by Alexander Holm (CC BY 3.0)",
+   "url": "https://archive.org/details/SalamanderGrandPianoV3"
+  },
+  {
+   "name": "Clued transcriptions of public-domain melodies (published before 1931 or traditional)"
+  }
+ ],
+ "notice": "Public-domain melodies played on a sampled piano."
+}

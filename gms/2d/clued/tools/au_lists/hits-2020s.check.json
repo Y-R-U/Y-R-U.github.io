@@ -1,0 +1,390 @@
+{
+ "dropped": [],
+ "offby": [],
+ "items": [
+  {
+   "id": "dont-start-now-dua-lipa",
+   "appleYear": 2019,
+   "album": "Don't Start Now - Single",
+   "appleArtist": "Dua Lipa",
+   "appleTitle": "Don't Start Now",
+   "year": 2019
+  },
+  {
+   "id": "circles-post-malone",
+   "appleYear": 2019,
+   "album": "Hollywood's Bleeding",
+   "appleArtist": "Post Malone",
+   "appleTitle": "Circles",
+   "year": 2019
+  },
+  {
+   "id": "watermelon-sugar-harry-styles",
+   "appleYear": 2019,
+   "album": "Fine Line",
+   "appleArtist": "Harry Styles",
+   "appleTitle": "Watermelon Sugar",
+   "year": 2019
+  },
+  {
+   "id": "adore-you-harry-styles",
+   "appleYear": 2019,
+   "album": "Fine Line",
+   "appleArtist": "Harry Styles",
+   "appleTitle": "Adore You",
+   "year": 2019
+  },
+  {
+   "id": "dynamite-bts",
+   "appleYear": 2020,
+   "album": "Proof",
+   "appleArtist": "BTS",
+   "appleTitle": "Dynamite",
+   "year": 2020
+  },
+  {
+   "id": "levitating-dua-lipa",
+   "appleYear": 2020,
+   "album": "Future Nostalgia",
+   "appleArtist": "Dua Lipa",
+   "appleTitle": "Levitating",
+   "year": 2020
+  },
+  {
+   "id": "save-your-tears-the-weeknd",
+   "appleYear": 2020,
+   "album": "After Hours (Deluxe)",
+   "appleArtist": "The Weeknd",
+   "appleTitle": "Save Your Tears",
+   "year": 2020
+  },
+  {
+   "id": "mood-24kgoldn",
+   "appleYear": 2020,
+   "album": "El Dorado",
+   "appleArtist": "24kGoldn",
+   "appleTitle": "Mood (feat. iann dior)",
+   "year": 2020
+  },
+  {
+   "id": "savage-love-laxed-siren-beat-jawsh-685-and-jason-derulo",
+   "appleYear": 2020,
+   "album": "Savage Love (Laxed - Siren Beat) - Single",
+   "appleArtist": "Jawsh 685 x Jason Derulo",
+   "appleTitle": "Savage Love (Laxed - Siren Beat)",
+   "year": 2020
+  },
+  {
+   "id": "heat-waves-glass-animals",
+   "appleYear": 2020,
+   "album": "Dreamland",
+   "appleArtist": "Glass Animals",
+   "appleTitle": "Heat Waves",
+   "year": 2020
+  },
+  {
+   "id": "drivers-license-olivia-rodrigo",
+   "appleYear": 2021,
+   "album": "SOUR",
+   "appleArtist": "Olivia Rodrigo",
+   "appleTitle": "drivers license",
+   "year": 2021
+  },
+  {
+   "id": "good-4-u-olivia-rodrigo",
+   "appleYear": 2021,
+   "album": "SOUR (Video Version)",
+   "appleArtist": "Olivia Rodrigo",
+   "appleTitle": "good 4 u",
+   "year": 2021
+  },
+  {
+   "id": "stay-the-kid-laroi-and-justin-bieber",
+   "appleYear": 2021,
+   "album": "STAY - Single",
+   "appleArtist": "The Kid LAROI & Justin Bieber",
+   "appleTitle": "STAY",
+   "year": 2021
+  },
+  {
+   "id": "montero-call-me-by-your-name-lil-nas-x",
+   "appleYear": 2021,
+   "album": "MONTERO (Call Me By Your Name) - Single",
+   "appleArtist": "Lil Nas X",
+   "appleTitle": "MONTERO (Call Me By Your Name)",
+   "year": 2021
+  },
+  {
+   "id": "peaches-justin-bieber",
+   "appleYear": 2021,
+   "album": "Justice",
+   "appleArtist": "Justin Bieber",
+   "appleTitle": "Peaches (feat. Daniel Caesar & GIVĒON)",
+   "year": 2021
+  },
+  {
+   "id": "kiss-me-more-doja-cat",
+   "appleYear": 2021,
+   "album": "Planet Her (Deluxe)",
+   "appleArtist": "Doja Cat",
+   "appleTitle": "Kiss Me More (feat. SZA)",
+   "year": 2021
+  },
+  {
+   "id": "leave-the-door-open-silk-sonic",
+   "appleYear": 2021,
+   "album": "An Evening With Silk Sonic",
+   "appleArtist": "Silk Sonic, Bruno Mars & Anderson .Paak",
+   "appleTitle": "Leave The Door Open",
+   "year": 2021
+  },
+  {
+   "id": "easy-on-me-adele",
+   "appleYear": 2021,
+   "album": "30",
+   "appleArtist": "Adele",
+   "appleTitle": "Easy On Me",
+   "year": 2021
+  },
+  {
+   "id": "bad-habits-ed-sheeran",
+   "appleYear": 2021,
+   "album": "Bad Habits - Single",
+   "appleArtist": "Ed Sheeran",
+   "appleTitle": "Bad Habits",
+   "year": 2021
+  },
+  {
+   "id": "shivers-ed-sheeran",
+   "appleYear": 2021,
+   "album": "=",
+   "appleArtist": "Ed Sheeran",
+   "appleTitle": "Shivers",
+   "year": 2021
+  },
+  {
+   "id": "as-it-was-harry-styles",
+   "appleYear": 2022,
+   "album": "Harry's House",
+   "appleArtist": "Harry Styles",
+   "appleTitle": "As It Was",
+   "year": 2022
+  },
+  {
+   "id": "first-class-jack-harlow",
+   "appleYear": 2022,
+   "album": "Come Home The Kids Miss You",
+   "appleArtist": "Jack Harlow",
+   "appleTitle": "First Class",
+   "year": 2022
+  },
+  {
+   "id": "anti-hero-taylor-swift",
+   "appleYear": 2022,
+   "album": "Midnights",
+   "appleArtist": "Taylor Swift",
+   "appleTitle": "Anti-Hero",
+   "year": 2022
+  },
+  {
+   "id": "about-damn-time-lizzo",
+   "appleYear": 2022,
+   "album": "Special",
+   "appleArtist": "Lizzo",
+   "appleTitle": "About Damn Time",
+   "year": 2022
+  },
+  {
+   "id": "kill-bill-sza",
+   "appleYear": 2022,
+   "album": "SOS",
+   "appleArtist": "SZA",
+   "appleTitle": "Kill Bill",
+   "year": 2022
+  },
+  {
+   "id": "calm-down-rema-and-selena-gomez",
+   "appleYear": 2022,
+   "album": "Calm Down - Single",
+   "appleArtist": "Rema & Selena Gomez",
+   "appleTitle": "Calm Down",
+   "year": 2022
+  },
+  {
+   "id": "unholy-sam-smith-and-kim-petras",
+   "appleYear": 2022,
+   "album": "Gloria (Special Edition)",
+   "appleArtist": "Sam Smith & Kim Petras",
+   "appleTitle": "Unholy",
+   "year": 2022
+  },
+  {
+   "id": "creepin-metro-boomin-the-weeknd-and-21-savage",
+   "appleYear": 2022,
+   "album": "HEROES & VILLAINS",
+   "appleArtist": "Metro Boomin, The Weeknd & 21 Savage",
+   "appleTitle": "Creepin'",
+   "year": 2022
+  },
+  {
+   "id": "flowers-miley-cyrus",
+   "appleYear": 2023,
+   "album": "Endless Summer Vacation",
+   "appleArtist": "Miley Cyrus",
+   "appleTitle": "Flowers",
+   "year": 2023
+  },
+  {
+   "id": "last-night-morgan-wallen",
+   "appleYear": 2023,
+   "album": "One Thing At A Time",
+   "appleArtist": "Morgan Wallen",
+   "appleTitle": "Last Night",
+   "year": 2023
+  },
+  {
+   "id": "vampire-olivia-rodrigo",
+   "appleYear": 2023,
+   "album": "GUTS (spilled)",
+   "appleArtist": "Olivia Rodrigo",
+   "appleTitle": "vampire",
+   "year": 2023
+  },
+  {
+   "id": "lose-control-teddy-swims",
+   "appleYear": 2023,
+   "album": "I've Tried Everything But Therapy (Part 1)",
+   "appleArtist": "Teddy Swims",
+   "appleTitle": "Lose Control",
+   "year": 2023
+  },
+  {
+   "id": "lovin-on-me-jack-harlow",
+   "appleYear": 2023,
+   "album": "Lovin On Me - Single",
+   "appleArtist": "Jack Harlow",
+   "appleTitle": "Lovin On Me",
+   "year": 2023
+  },
+  {
+   "id": "a-bar-song-tipsy-shaboozey",
+   "appleYear": 2024,
+   "album": "Where I've Been, Isn't Where I'm Going",
+   "appleArtist": "Shaboozey",
+   "appleTitle": "A Bar Song (Tipsy)",
+   "year": 2024
+  },
+  {
+   "id": "beautiful-things-benson-boone",
+   "appleYear": 2024,
+   "album": "Beautiful Things - Single",
+   "appleArtist": "Benson Boone",
+   "appleTitle": "Beautiful Things",
+   "year": 2024
+  },
+  {
+   "id": "i-had-some-help-post-malone-and-morgan-wallen",
+   "appleYear": 2024,
+   "album": "I Had Some Help (feat. Morgan Wallen) - Single",
+   "appleArtist": "Post Malone",
+   "appleTitle": "I Had Some Help (feat. Morgan Wallen)",
+   "year": 2024
+  },
+  {
+   "id": "espresso-sabrina-carpenter",
+   "appleYear": 2024,
+   "album": "Short n' Sweet",
+   "appleArtist": "Sabrina Carpenter",
+   "appleTitle": "Espresso",
+   "year": 2024
+  },
+  {
+   "id": "please-please-please-sabrina-carpenter",
+   "appleYear": 2024,
+   "album": "Short n' Sweet (Deluxe)",
+   "appleArtist": "Sabrina Carpenter & Dolly Parton",
+   "appleTitle": "Please Please Please",
+   "year": 2024
+  },
+  {
+   "id": "not-like-us-kendrick-lamar",
+   "appleYear": 2024,
+   "album": "Not Like Us - Single",
+   "appleArtist": "Kendrick Lamar",
+   "appleTitle": "Not Like Us",
+   "year": 2024
+  },
+  {
+   "id": "too-sweet-hozier",
+   "appleYear": 2024,
+   "album": "Unheard - EP",
+   "appleArtist": "Hozier",
+   "appleTitle": "Too Sweet",
+   "year": 2024
+  },
+  {
+   "id": "birds-of-a-feather-billie-eilish",
+   "appleYear": 2024,
+   "album": "HIT ME HARD AND SOFT",
+   "appleArtist": "Billie Eilish",
+   "appleTitle": "BIRDS OF A FEATHER",
+   "year": 2024
+  },
+  {
+   "id": "texas-hold-em-beyonce",
+   "appleYear": 2024,
+   "album": "TEXAS HOLD 'EM - Single",
+   "appleArtist": "Beyoncé",
+   "appleTitle": "TEXAS HOLD 'EM",
+   "year": 2024
+  },
+  {
+   "id": "die-with-a-smile-lady-gaga-and-bruno-mars",
+   "appleYear": 2024,
+   "album": "Die With A Smile - Single",
+   "appleArtist": "Lady Gaga & Bruno Mars",
+   "appleTitle": "Die With A Smile",
+   "year": 2024
+  },
+  {
+   "id": "apt-rose-and-bruno-mars",
+   "appleYear": 2024,
+   "album": "APT. - Single",
+   "appleArtist": "ROSÉ & Bruno Mars",
+   "appleTitle": "APT.",
+   "year": 2024
+  },
+  {
+   "id": "good-luck-babe-chappell-roan",
+   "appleYear": 2024,
+   "album": "Good Luck, Babe! - Single",
+   "appleArtist": "Chappell Roan",
+   "appleTitle": "Good Luck, Babe!",
+   "year": 2024
+  },
+  {
+   "id": "ordinary-alex-warren",
+   "appleYear": 2025,
+   "album": "Ordinary (Wedding Version) - Single",
+   "appleArtist": "Alex Warren",
+   "appleTitle": "Ordinary (Wedding Version)",
+   "year": 2025
+  },
+  {
+   "id": "abracadabra-lady-gaga",
+   "appleYear": 2025,
+   "album": "MAYHEM",
+   "appleArtist": "Lady Gaga",
+   "appleTitle": "Abracadabra",
+   "year": 2025
+  },
+  {
+   "id": "manchild-sabrina-carpenter",
+   "appleYear": 2025,
+   "album": "Manchild - Single",
+   "appleArtist": "Sabrina Carpenter",
+   "appleTitle": "Manchild",
+   "year": 2025
+  }
+ ]
+}

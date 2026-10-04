@@ -1,0 +1,258 @@
+{
+ "id": "movie-moments",
+ "title": "Movie Moments",
+ "theme": "screen",
+ "icon": "🎬",
+ "notice": "Original illustrations of famous film scenes, not real stills.",
+ "nameImgPrompt": "Which movie is this scene from?",
+ "imgPrompt": "Which scene is from {name}?",
+ "factsMeta": {
+  "year": {
+   "type": "year",
+   "label": "Released"
+  },
+  "decade": {
+   "type": "cat",
+   "label": "Decade"
+  },
+  "director": {
+   "type": "cat",
+   "label": "Directed by"
+  },
+  "kids": {
+   "type": "bool",
+   "label": "Family film",
+   "yes": "Family film",
+   "no": "Not a family film"
+  }
+ },
+ "kids": false,
+ "version": 1,
+ "items": [
+  {
+   "id": "the-wizard-of-oz",
+   "name": "The Wizard of Oz",
+   "alt": [
+    "Wizard of Oz"
+   ],
+   "facts": {
+    "year": 1939,
+    "decade": "1930s",
+    "director": "Victor Fleming",
+    "kids": true
+   },
+   "blurb": "Kansas farm girl Dorothy is swept by a tornado to the land of Oz and follows the yellow brick road to find a way home.",
+   "media": {
+    "img": [
+     {
+      "src": "media/moments/the-wizard-of-oz-1.webp",
+      "w": 640,
+      "h": 427,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 1,
+      "caption": "Follow the yellow brick road to the Emerald City"
+     },
+     {
+      "src": "media/moments/the-wizard-of-oz-2.webp",
+      "w": 640,
+      "h": 427,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 2,
+      "caption": "Ruby slippers, Toto, and the twister that started it all"
+     },
+     {
+      "src": "media/moments/the-wizard-of-oz-3.webp",
+      "w": 640,
+      "h": 427,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 3,
+      "caption": "The farmhouse caught in the cyclone"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "king-kong",
+   "name": "King Kong",
+   "alt": [],
+   "facts": {
+    "year": 1933,
+    "decade": "1930s",
+    "director": "Merian C. Cooper, Ernest B. Schoedsack",
+    "kids": false
+   },
+   "blurb": "A film crew brings a giant ape from Skull Island to New York, where he escapes and climbs the Empire State Building.",
+   "media": {
+    "img": [
+     {
+      "src": "media/moments/king-kong-1.webp",
+      "w": 640,
+      "h": 427,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 1,
+      "caption": "The giant ape atop the Empire State Building"
+     },
+     {
+      "src": "media/moments/king-kong-2.webp",
+      "w": 640,
+      "h": 427,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 2,
+      "caption": "The great wall on Skull Island"
+     },
+     {
+      "src": "media/moments/king-kong-3.webp",
+      "w": 640,
+      "h": 427,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 3,
+      "caption": "Beauty in the beast's hand"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "snow-white",
+   "name": "Snow White and the Seven Dwarfs",
+   "alt": [
+    "Snow White"
+   ],
+   "facts": {
+    "year": 1937,
+    "decade": "1930s",
+    "director": "David Hand",
+    "kids": true
+   },
+   "blurb": "Disney's first full-length animated feature: a princess hides from her jealous stepmother in the cottage of seven miners.",
+   "media": {
+    "img": [
+     {
+      "src": "media/moments/snow-white-1.webp",
+      "w": 640,
+      "h": 427,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 1,
+      "caption": "Seven miners heading home from work"
+     },
+     {
+      "src": "media/moments/snow-white-2.webp",
+      "w": 640,
+      "h": 427,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 2,
+      "caption": "The poisoned apple"
+     },
+     {
+      "src": "media/moments/snow-white-3.webp",
+      "w": 640,
+      "h": 427,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 2,
+      "caption": "Mirror, mirror, on the wall"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "gone-with-the-wind",
+   "name": "Gone with the Wind",
+   "alt": [],
+   "facts": {
+    "year": 1939,
+    "decade": "1930s",
+    "director": "Victor Fleming",
+    "kids": false
+   },
+   "blurb": "Scarlett O'Hara fights to survive the American Civil War and its aftermath in Georgia.",
+   "media": {
+    "img": [
+     {
+      "src": "media/moments/gone-with-the-wind-1.webp",
+      "w": 640,
+      "h": 427,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 2,
+      "caption": "Tara, under a burning sky"
+     },
+     {
+      "src": "media/moments/gone-with-the-wind-2.webp",
+      "w": 640,
+      "h": 427,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 3,
+      "caption": "Fleeing the burning of Atlanta"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "pinocchio",
+   "name": "Pinocchio",
+   "alt": [],
+   "facts": {
+    "year": 1940,
+    "decade": "1940s",
+    "director": "Ben Sharpsteen, Hamilton Luske",
+    "kids": true
+   },
+   "blurb": "A woodcarver's puppet is brought to life and must prove himself brave, truthful and unselfish to become a real boy.",
+   "media": {
+    "img": [
+     {
+      "src": "media/moments/pinocchio-1.webp",
+      "w": 640,
+      "h": 427,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 1,
+      "caption": "A nose that grows with every lie"
+     },
+     {
+      "src": "media/moments/pinocchio-2.webp",
+      "w": 640,
+      "h": 427,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 2,
+      "caption": "Escaping the giant whale"
+     }
+    ]
+   },
+   "difficulty": 1
+  }
+ ],
+ "sources": [
+  {
+   "name": "Generated locally with FLUX.2 [klein] (Clued house style)",
+   "url": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md"
+  }
+ ]
+}

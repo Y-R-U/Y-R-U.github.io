@@ -1,0 +1,12 @@
+paintings/the-starry-night: dropped clue leaking "star": Swirling stars fill a deep blue night sky above a village.
+paintings/girl-with-a-pearl-earring: dropped clue leaking "girl": The girl wears a blue and yellow turban.
+paintings/the-night-watch: dropped clue leaking "nigh": It was not originally a night scene but darkened varnish made it look like one.
+paintings/liberty-leading-the-people: dropped clue leaking "lead": A woman in a red cap leads people over a barricade.
+paintings/wanderer-above-the-sea-of-fog: dropped clue leaking "mist": A man stands on a rock gazing over a landscape covered in mist.
+paintings/luncheon-of-the-boating-party: dropped clue leaking "boat": Some of the figures wear straw boater hats.
+paintings/cafe-terrace-at-night: dropped clue leaking "nigh": It was painted on the spot at night in Arles.
+paintings/woman-with-a-parasol: dropped clue leaking "son": The boy is the painter's son Jean.
+paintings/woman-with-a-parasol: dropped clue leaking "her": Wind ruffles her veil and dress on a grassy hill.
+paintings/woman-with-a-parasol: only 3 clean clues -> no ladder
+paintings/lady-with-an-ermine: dropped clue leaking "portr": It is one of only four surviving female portraits by its painter.
+paintings/the-night-cafe: dropped clue leaking "nigh": He stayed up three nights to paint it.

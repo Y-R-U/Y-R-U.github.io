@@ -1,0 +1,11 @@
+countries/china: dropped clue leaking "chin": Main language: Mandarin Chinese.
+countries/greece: dropped clue leaking "gree": Main language: Greek.
+countries/italy: dropped clue leaking "ital": Main language: Italian.
+countries/malta: dropped clue leaking "malt": Main languages: Maltese and English.
+countries/myanmar: dropped clue leaking "burm": Main language: Burmese.
+countries/norway: dropped clue leaking "norw": Its currency is the Norwegian krone.
+countries/norway: dropped clue leaking "norw": Main language: Norwegian.
+countries/south-africa: dropped clue leaking "afri": Main languages: Zulu, Xhosa, Afrikaans and English.
+countries/sri-lanka: dropped clue leaking "sri": Its capital is Sri Jayawardenepura Kotte.
+countries/sweden: dropped clue leaking "swed": Its currency is the Swedish krona.
+countries/sweden: dropped clue leaking "swed": Main language: Swedish.

@@ -1,0 +1,5570 @@
+{
+ "id": "flags",
+ "title": "Flags",
+ "theme": "geography",
+ "icon": "🏳️",
+ "version": 1,
+ "kids": true,
+ "factsMeta": {
+  "continent": {
+   "type": "cat",
+   "label": "Continent",
+   "ask": "Which continent is {lname} in?",
+   "stmt": "{lname} is in {value}."
+  }
+ },
+ "imgPrompt": "Which is the flag of {lname}?",
+ "nameImgPrompt": "Which country has this flag?",
+ "tfImgPrompt": "This is the flag of {lname}.",
+ "items": [
+  {
+   "id": "afghanistan",
+   "name": "Afghanistan",
+   "lname": "Afghanistan",
+   "alt": [],
+   "iso2": "AF",
+   "iso3": "AFG",
+   "group": "Asia",
+   "facts": {
+    "continent": "Asia"
+   },
+   "blurb": "The national flag of Afghanistan.",
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5c/Flag_of_the_Taliban.svg/330px-Flag_of_the_Taliban.svg.png",
+      "w": 330,
+      "h": 165,
+      "credit": "Original: Taliban Vector: Lexicon",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Flag_of_the_Taliban.svg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "albania",
+   "name": "Albania",
+   "lname": "Albania",
+   "alt": [],
+   "iso2": "AL",
+   "iso3": "ALB",
+   "group": "Europe",
+   "facts": {
+    "continent": "Europe"
+   },
+   "blurb": "The national flag of Albania.",
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/3/36/Flag_of_Albania.svg/330px-Flag_of_Albania.svg.png",
+      "w": 330,
+      "h": 236,
+      "credit": "Sadik Kaceli",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Flag_of_Albania.svg"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "algeria",
+   "name": "Algeria",
+   "lname": "Algeria",
+   "alt": [],
+   "iso2": "DZ",
+   "iso3": "DZA",
+   "group": "Africa",
+   "facts": {
+    "continent": "Africa"
+   },
+   "blurb": "The national flag of Algeria.",
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/7/77/Flag_of_Algeria.svg/330px-Flag_of_Algeria.svg.png",
+      "w": 330,
+      "h": 220,
+      "credit": "Original: National Liberation Front of Algeria Vector: SKopp",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Flag_of_Algeria.svg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "andorra",
+   "name": "Andorra",
+   "lname": "Andorra",
+   "alt": [],
+   "iso2": "AD",
+   "iso3": "AND",
+   "group": "Europe",
+   "facts": {
+    "continent": "Europe"
+   },
+   "blurb": "The national flag of Andorra.",
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/1/19/Flag_of_Andorra.svg/330px-Flag_of_Andorra.svg.png",
+      "w": 330,
+      "h": 231,
+      "credit": "Original: Napoleon III Vector: HansenBCN",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Flag_of_Andorra.svg"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "angola",
+   "name": "Angola",
+   "lname": "Angola",
+   "alt": [],
+   "iso2": "AO",
+   "iso3": "AGO",
+   "group": "Africa",
+   "facts": {
+    "continent": "Africa"
+   },
+   "blurb": "The national flag of Angola.",
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/9d/Flag_of_Angola.svg/330px-Flag_of_Angola.svg.png",
+      "w": 330,
+      "h": 220,
+      "credit": "Original: Henrique de Carvalho Santos Vector: SKopp",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Flag_of_Angola.svg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "antigua-and-barbuda",
+   "name": "Antigua and Barbuda",
+   "lname": "Antigua and Barbuda",
+   "alt": [
+    "Antigua"
+   ],
+   "iso2": "AG",
+   "iso3": "ATG",
+   "group": "North America",
+   "facts": {
+    "continent": "North America"
+   },
+   "blurb": "The national flag of Antigua and Barbuda.",
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/89/Flag_of_Antigua_and_Barbuda.svg/330px-Flag_of_Antigua_and_Barbuda.svg.png",
+      "w": 330,
+      "h": 220,
+      "credit": "Original: Sir Reginald Samuel Vector: David Benbennick",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Flag_of_Antigua_and_Barbuda.svg"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "argentina",
+   "name": "Argentina",
+   "lname": "Argentina",
+   "alt": [],
+   "iso2": "AR",
+   "iso3": "ARG",
+   "group": "South America",
+   "facts": {
+    "continent": "South America"
+   },
+   "blurb": "The national flag of Argentina.",
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/1/1a/Flag_of_Argentina.svg/330px-Flag_of_Argentina.svg.png",
+      "w": 330,
+      "h": 206,
+      "credit": "Manuel Belgrano",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Flag_of_Argentina.svg"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "armenia",
+   "name": "Armenia",
+   "lname": "Armenia",
+   "alt": [],
+   "iso2": "AM",
+   "iso3": "ARM",
+   "group": "Asia",
+   "facts": {
+    "continent": [
+     "Asia",
+     "Europe"
+    ]
+   },
+   "blurb": "The national flag of Armenia.",
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/2/2f/Flag_of_Armenia.svg/330px-Flag_of_Armenia.svg.png",
+      "w": 330,
+      "h": 165,
+      "credit": "Original: Stepan Malkhasyants Vector: SKopp",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Flag_of_Armenia.svg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "australia",
+   "name": "Australia",
+   "lname": "Australia",
+   "alt": [],
+   "iso2": "AU",
+   "iso3": "AUS",
+   "group": "Oceania",
+   "facts": {
+    "continent": "Oceania"
+   },
+   "blurb": "The national flag of Australia.",
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/88/Flag_of_Australia_%28converted%29.svg/330px-Flag_of_Australia_%28converted%29.svg.png",
+      "w": 330,
+      "h": 165,
+      "credit": "Unknown (Vector graphics image by Ian Fieggen) (only minor code changes by uploader.)",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Flag_of_Australia_(converted).svg"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "austria",
+   "name": "Austria",
+   "lname": "Austria",
+   "alt": [],
+   "iso2": "AT",
+   "iso3": "AUT",
+   "group": "Europe",
+   "facts": {
+    "continent": "Europe"
+   },
+   "blurb": "The national flag of Austria.",
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/4/41/Flag_of_Austria.svg/330px-Flag_of_Austria.svg.png",
+      "w": 330,
+      "h": 220,
+      "credit": "Bundesministerium für Landesverteidigung",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Flag_of_Austria.svg"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "azerbaijan",
+   "name": "Azerbaijan",
+   "lname": "Azerbaijan",
+   "alt": [],
+   "iso2": "AZ",
+   "iso3": "AZE",
+   "group": "Asia",
+   "facts": {
+    "continent": [
+     "Asia",
+     "Europe"
+    ]
+   },
+   "blurb": "The national flag of Azerbaijan.",
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/d/dd/Flag_of_Azerbaijan.svg/330px-Flag_of_Azerbaijan.svg.png",
+      "w": 330,
+      "h": 165,
+      "credit": "SKopp and others",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Flag_of_Azerbaijan.svg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "bahamas",
+   "name": "Bahamas",
+   "lname": "the Bahamas",
+   "alt": [
+    "The Bahamas"
+   ],
+   "iso2": "BS",
+   "iso3": "BHS",
+   "group": "North America",
+   "facts": {
+    "continent": "North America"
+   },
+   "blurb": "The national flag of Bahamas.",
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/93/Flag_of_the_Bahamas.svg/330px-Flag_of_the_Bahamas.svg.png",
+      "w": 330,
+      "h": 165,
+      "credit": "Government of Bahamas",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Flag_of_the_Bahamas.svg"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "bahrain",
+   "name": "Bahrain",
+   "lname": "Bahrain",
+   "alt": [],
+   "iso2": "BH",
+   "iso3": "BHR",
+   "group": "Asia",
+   "facts": {
+    "continent": "Asia"
+   },
+   "blurb": "The national flag of Bahrain.",
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/2/2c/Flag_of_Bahrain.svg/330px-Flag_of_Bahrain.svg.png",
+      "w": 330,
+      "h": 198,
+      "credit": "Source: Drawn by SKopp, rewritten by Zscout370",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Flag_of_Bahrain.svg"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "bangladesh",
+   "name": "Bangladesh",
+   "lname": "Bangladesh",
+   "alt": [],
+   "iso2": "BD",
+   "iso3": "BGD",
+   "group": "Asia",
+   "facts": {
+    "continent": "Asia"
+   },
+   "blurb": "The national flag of Bangladesh.",
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f9/Flag_of_Bangladesh.svg/330px-Flag_of_Bangladesh.svg.png",
+      "w": 330,
+      "h": 198,
+      "credit": "See File history below for details.",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Flag_of_Bangladesh.svg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "barbados",
+   "name": "Barbados",
+   "lname": "Barbados",
+   "alt": [],
+   "iso2": "BB",
+   "iso3": "BRB",
+   "group": "North America",
+   "facts": {
+    "continent": "North America"
+   },
+   "blurb": "The national flag of Barbados.",
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/e/ef/Flag_of_Barbados.svg/330px-Flag_of_Barbados.svg.png",
+      "w": 330,
+      "h": 220,
+      "credit": "User:Denelson83",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Flag_of_Barbados.svg"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "belarus",
+   "name": "Belarus",
+   "lname": "Belarus",
+   "alt": [],
+   "iso2": "BY",
+   "iso3": "BLR",
+   "group": "Europe",
+   "facts": {
+    "continent": "Europe"
+   },
+   "blurb": "The national flag of Belarus.",
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/85/Flag_of_Belarus.svg/330px-Flag_of_Belarus.svg.png",
+      "w": 330,
+      "h": 165,
+      "credit": "See File history below for details.",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Flag_of_Belarus.svg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "belgium",
+   "name": "Belgium",
+   "lname": "Belgium",
+   "alt": [],
+   "iso2": "BE",
+   "iso3": "BEL",
+   "group": "Europe",
+   "facts": {
+    "continent": "Europe"
+   },
+   "blurb": "The national flag of Belgium.",
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/6/65/Flag_of_Belgium.svg/330px-Flag_of_Belgium.svg.png",
+      "w": 330,
+      "h": 286,
+      "credit": "Dbenbenn and others",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Flag_of_Belgium.svg"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "belize",
+   "name": "Belize",
+   "lname": "Belize",
+   "alt": [],
+   "iso2": "BZ",
+   "iso3": "BLZ",
+   "group": "North America",
+   "facts": {
+    "continent": "North America"
+   },
+   "blurb": "The national flag of Belize.",
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e7/Flag_of_Belize.svg/330px-Flag_of_Belize.svg.png",
+      "w": 330,
+      "h": 198,
+      "credit": "Caleb Moore",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Flag_of_Belize.svg"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "benin",
+   "name": "Benin",
+   "lname": "Benin",
+   "alt": [],
+   "iso2": "BJ",
+   "iso3": "BEN",
+   "group": "Africa",
+   "facts": {
+    "continent": "Africa"
+   },
+   "blurb": "The national flag of Benin.",
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/0a/Flag_of_Benin.svg/330px-Flag_of_Benin.svg.png",
+      "w": 330,
+      "h": 220,
+      "credit": "Drawn by User:SKopp, rewritten by User:Gabbe",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Flag_of_Benin.svg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "bhutan",
+   "name": "Bhutan",
+   "lname": "Bhutan",
+   "alt": [],
+   "iso2": "BT",
+   "iso3": "BTN",
+   "group": "Asia",
+   "facts": {
+    "continent": "Asia"
+   },
+   "blurb": "The national flag of Bhutan.",
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/91/Flag_of_Bhutan.svg/330px-Flag_of_Bhutan.svg.png",
+      "w": 330,
+      "h": 220,
+      "credit": "See File history below for details.",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Flag_of_Bhutan.svg"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "bolivia",
+   "name": "Bolivia",
+   "lname": "Bolivia",
+   "alt": [],
+   "iso2": "BO",
+   "iso3": "BOL",
+   "group": "South America",
+   "facts": {
+    "continent": "South America"
+   },
+   "blurb": "The national flag of Bolivia.",
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/4/48/Flag_of_Bolivia.svg/330px-Flag_of_Bolivia.svg.png",
+      "w": 330,
+      "h": 225,
+      "credit": "See file history' below for details.",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Flag_of_Bolivia.svg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "bosnia-and-herzegovina",
+   "name": "Bosnia and Herzegovina",
+   "lname": "Bosnia and Herzegovina",
+   "alt": [
+    "Bosnia"
+   ],
+   "iso2": "BA",
+   "iso3": "BIH",
+   "group": "Europe",
+   "facts": {
+    "continent": "Europe"
+   },
+   "blurb": "The national flag of Bosnia and Herzegovina.",
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/b/bf/Flag_of_Bosnia_and_Herzegovina.svg/330px-Flag_of_Bosnia_and_Herzegovina.svg.png",
+      "w": 330,
+      "h": 165,
+      "credit": "Mladen Kolobarić",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Flag_of_Bosnia_and_Herzegovina.svg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "botswana",
+   "name": "Botswana",
+   "lname": "Botswana",
+   "alt": [],
+   "iso2": "BW",
+   "iso3": "BWA",
+   "group": "Africa",
+   "facts": {
+    "continent": "Africa"
+   },
+   "blurb": "The national flag of Botswana.",
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/f/fa/Flag_of_Botswana.svg/330px-Flag_of_Botswana.svg.png",
+      "w": 330,
+      "h": 220,
+      "credit": "SKopp, Gabbe, Madden",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Flag_of_Botswana.svg"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "brazil",
+   "name": "Brazil",
+   "lname": "Brazil",
+   "alt": [],
+   "iso2": "BR",
+   "iso3": "BRA",
+   "group": "South America",
+   "facts": {
+    "continent": "South America"
+   },
+   "blurb": "The national flag of Brazil.",
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/05/Flag_of_Brazil.svg/330px-Flag_of_Brazil.svg.png",
+      "w": 330,
+      "h": 231,
+      "credit": "Raimundo Teixeira Mendes",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Flag_of_Brazil.svg"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "brunei",
+   "name": "Brunei",
+   "lname": "Brunei",
+   "alt": [],
+   "iso2": "BN",
+   "iso3": "BRN",
+   "group": "Asia",
+   "facts": {
+    "continent": "Asia"
+   },
+   "blurb": "The national flag of Brunei.",
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/9c/Flag_of_Brunei.svg/330px-Flag_of_Brunei.svg.png",
+      "w": 330,
+      "h": 165,
+      "credit": "Nightstallion",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Flag_of_Brunei.svg"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "bulgaria",
+   "name": "Bulgaria",
+   "lname": "Bulgaria",
+   "alt": [],
+   "iso2": "BG",
+   "iso3": "BGR",
+   "group": "Europe",
+   "facts": {
+    "continent": "Europe"
+   },
+   "blurb": "The national flag of Bulgaria.",
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/9a/Flag_of_Bulgaria.svg/330px-Flag_of_Bulgaria.svg.png",
+      "w": 330,
+      "h": 198,
+      "credit": "SKopp",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Flag_of_Bulgaria.svg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "burkina-faso",
+   "name": "Burkina Faso",
+   "lname": "Burkina Faso",
+   "alt": [],
+   "iso2": "BF",
+   "iso3": "BFA",
+   "group": "Africa",
+   "facts": {
+    "continent": "Africa"
+   },
+   "blurb": "The national flag of Burkina Faso.",
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/3/31/Flag_of_Burkina_Faso.svg/330px-Flag_of_Burkina_Faso.svg.png",
+      "w": 330,
+      "h": 220,
+      "credit": "Drawn by SKopp, rewritten by Gabbe and Андрей Перцев",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Flag_of_Burkina_Faso.svg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "burundi",
+   "name": "Burundi",
+   "lname": "Burundi",
+   "alt": [],
+   "iso2": "BI",
+   "iso3": "BDI",
+   "group": "Africa",
+   "facts": {
+    "continent": "Africa"
+   },
+   "blurb": "The national flag of Burundi.",
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/5/50/Flag_of_Burundi.svg/330px-Flag_of_Burundi.svg.png",
+      "w": 330,
+      "h": 198,
+      "credit": "See File history below for details.",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Flag_of_Burundi.svg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "cambodia",
+   "name": "Cambodia",
+   "lname": "Cambodia",
+   "alt": [],
+   "iso2": "KH",
+   "iso3": "KHM",
+   "group": "Asia",
+   "facts": {
+    "continent": "Asia"
+   },
+   "blurb": "The national flag of Cambodia.",
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/83/Flag_of_Cambodia.svg/330px-Flag_of_Cambodia.svg.png",
+      "w": 330,
+      "h": 211,
+      "credit": "Unknown authorUnknown author",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Flag_of_Cambodia.svg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "cameroon",
+   "name": "Cameroon",
+   "lname": "Cameroon",
+   "alt": [],
+   "iso2": "CM",
+   "iso3": "CMR",
+   "group": "Africa",
+   "facts": {
+    "continent": "Africa"
+   },
+   "blurb": "The national flag of Cameroon.",
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4f/Flag_of_Cameroon.svg/330px-Flag_of_Cameroon.svg.png",
+      "w": 330,
+      "h": 220,
+      "credit": "(of code) -xfi-",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Flag_of_Cameroon.svg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "canada",
+   "name": "Canada",
+   "lname": "Canada",
+   "alt": [],
+   "iso2": "CA",
+   "iso3": "CAN",
+   "group": "North America",
+   "facts": {
+    "continent": "North America"
+   },
+   "blurb": "The national flag of Canada.",
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d9/Flag_of_Canada_%28Pantone%29.svg/330px-Flag_of_Canada_%28Pantone%29.svg.png",
+      "w": 330,
+      "h": 165,
+      "credit": "Original: George F. G. Stanley Modified by: The original uploader was Illegitimate Barr…",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Flag_of_Canada_(Pantone).svg"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "cape-verde",
+   "name": "Cape Verde",
+   "lname": "Cape Verde",
+   "alt": [
+    "Cabo Verde"
+   ],
+   "iso2": "CV",
+   "iso3": "CPV",
+   "group": "Africa",
+   "facts": {
+    "continent": "Africa"
+   },
+   "blurb": "The national flag of Cape Verde.",
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/6/65/Flag_of_Cape_Verde_%2810-17%29.svg/330px-Flag_of_Cape_Verde_%2810-17%29.svg.png",
+      "w": 330,
+      "h": 194,
+      "credit": "Original: Pedro Gregório Vector: SKopp",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Flag_of_Cape_Verde_(10-17).svg"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "central-african-republic",
+   "name": "Central African Republic",
+   "lname": "the Central African Republic",
+   "alt": [
+    "CAR"
+   ],
+   "iso2": "CF",
+   "iso3": "CAF",
+   "group": "Africa",
+   "facts": {
+    "continent": "Africa"
+   },
+   "blurb": "The national flag of Central African Republic.",
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/6/6f/Flag_of_the_Central_African_Republic.svg/330px-Flag_of_the_Central_African_Republic.svg.png",
+      "w": 330,
+      "h": 220,
+      "credit": "Barthélemy Boganda",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Flag_of_the_Central_African_Republic.svg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "chad",
+   "name": "Chad",
+   "lname": "Chad",
+   "alt": [],
+   "iso2": "TD",
+   "iso3": "TCD",
+   "group": "Africa",
+   "facts": {
+    "continent": "Africa"
+   },
+   "blurb": "The national flag of Chad.",
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4b/Flag_of_Chad.svg/330px-Flag_of_Chad.svg.png",
+      "w": 330,
+      "h": 220,
+      "credit": "SKopp & others (see upload log)",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Flag_of_Chad.svg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "chile",
+   "name": "Chile",
+   "lname": "Chile",
+   "alt": [],
+   "iso2": "CL",
+   "iso3": "CHL",
+   "group": "South America",
+   "facts": {
+    "continent": "South America"
+   },
+   "blurb": "The national flag of Chile.",
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/7/78/Flag_of_Chile.svg/330px-Flag_of_Chile.svg.png",
+      "w": 330,
+      "h": 220,
+      "credit": "See file history below for details.",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Flag_of_Chile.svg"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "china",
+   "name": "China",
+   "lname": "China",
+   "alt": [
+    "People's Republic of China"
+   ],
+   "iso2": "CN",
+   "iso3": "CHN",
+   "group": "Asia",
+   "facts": {
+    "continent": "Asia"
+   },
+   "blurb": "The national flag of China.",
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/f/fa/Flag_of_the_People%27s_Republic_of_China.svg/330px-Flag_of_the_People%27s_Republic_of_China.svg.png",
+      "w": 330,
+      "h": 220,
+      "credit": "Zeng Liansong",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Flag_of_the_People%27s_Republic_of_China.svg"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "colombia",
+   "name": "Colombia",
+   "lname": "Colombia",
+   "alt": [],
+   "iso2": "CO",
+   "iso3": "COL",
+   "group": "South America",
+   "facts": {
+    "continent": "South America"
+   },
+   "blurb": "The national flag of Colombia.",
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/2/21/Flag_of_Colombia.svg/330px-Flag_of_Colombia.svg.png",
+      "w": 330,
+      "h": 220,
+      "credit": "See File history below for details.",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Flag_of_Colombia.svg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "comoros",
+   "name": "Comoros",
+   "lname": "the Comoros",
+   "alt": [],
+   "iso2": "KM",
+   "iso3": "COM",
+   "group": "Africa",
+   "facts": {
+    "continent": "Africa"
+   },
+   "blurb": "The national flag of Comoros.",
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/94/Flag_of_the_Comoros.svg/330px-Flag_of_the_Comoros.svg.png",
+      "w": 330,
+      "h": 198,
+      "credit": "Original: Comoros; Vector: see file history",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Flag_of_the_Comoros.svg"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "democratic-republic-of-the-congo",
+   "name": "Democratic Republic of the Congo",
+   "lname": "the Democratic Republic of the Congo",
+   "alt": [
+    "DR Congo",
+    "DRC",
+    "Congo-Kinshasa"
+   ],
+   "iso2": "CD",
+   "iso3": "COD",
+   "group": "Africa",
+   "facts": {
+    "continent": "Africa"
+   },
+   "blurb": "The national flag of Democratic Republic of the Congo.",
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/6/6f/Flag_of_the_Democratic_Republic_of_the_Congo.svg/330px-Flag_of_the_Democratic_Republic_of_the_Congo.svg.png",
+      "w": 330,
+      "h": 248,
+      "credit": "Nightstallion",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Flag_of_the_Democratic_Republic_of_the_Congo.svg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "republic-of-the-congo",
+   "name": "Republic of the Congo",
+   "lname": "the Republic of the Congo",
+   "alt": [
+    "Congo",
+    "Congo-Brazzaville"
+   ],
+   "iso2": "CG",
+   "iso3": "COG",
+   "group": "Africa",
+   "facts": {
+    "continent": "Africa"
+   },
+   "blurb": "The national flag of Republic of the Congo.",
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/92/Flag_of_the_Republic_of_the_Congo.svg/330px-Flag_of_the_Republic_of_the_Congo.svg.png",
+      "w": 330,
+      "h": 220,
+      "credit": "See File history below for details.",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Flag_of_the_Republic_of_the_Congo.svg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "costa-rica",
+   "name": "Costa Rica",
+   "lname": "Costa Rica",
+   "alt": [],
+   "iso2": "CR",
+   "iso3": "CRI",
+   "group": "North America",
+   "facts": {
+    "continent": "North America"
+   },
+   "blurb": "The national flag of Costa Rica.",
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f2/Flag_of_Costa_Rica.svg/330px-Flag_of_Costa_Rica.svg.png",
+      "w": 330,
+      "h": 198,
+      "credit": "See File history below for details.",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Flag_of_Costa_Rica.svg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "ivory-coast",
+   "name": "Ivory Coast",
+   "lname": "Ivory Coast",
+   "alt": [
+    "Côte d'Ivoire"
+   ],
+   "iso2": "CI",
+   "iso3": "CIV",
+   "group": "Africa",
+   "facts": {
+    "continent": "Africa"
+   },
+   "blurb": "The national flag of Ivory Coast.",
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/f/fe/Flag_of_C%C3%B4te_d%27Ivoire.svg/330px-Flag_of_C%C3%B4te_d%27Ivoire.svg.png",
+      "w": 330,
+      "h": 220,
+      "credit": "See File history below for details.",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Flag_of_C%C3%B4te_d%27Ivoire.svg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "croatia",
+   "name": "Croatia",
+   "lname": "Croatia",
+   "alt": [],
+   "iso2": "HR",
+   "iso3": "HRV",
+   "group": "Europe",
+   "facts": {
+    "continent": "Europe"
+   },
+   "blurb": "The national flag of Croatia.",
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/1/1b/Flag_of_Croatia.svg/330px-Flag_of_Croatia.svg.png",
+      "w": 330,
+      "h": 165,
+      "credit": "Nightstallion, Elephantus, Neoneo13, Denelson83, Rainman, R-41, Minestrone, Lupo, Zscou…",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Flag_of_Croatia.svg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "cuba",
+   "name": "Cuba",
+   "lname": "Cuba",
+   "alt": [],
+   "iso2": "CU",
+   "iso3": "CUB",
+   "group": "North America",
+   "facts": {
+    "continent": "North America"
+   },
+   "blurb": "The national flag of Cuba.",
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/b/bd/Flag_of_Cuba.svg/330px-Flag_of_Cuba.svg.png",
+      "w": 330,
+      "h": 165,
+      "credit": "Miguel Teurbe Tolón and Narciso López",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Flag_of_Cuba.svg"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "cyprus",
+   "name": "Cyprus",
+   "lname": "Cyprus",
+   "alt": [],
+   "iso2": "CY",
+   "iso3": "CYP",
+   "group": "Asia",
+   "facts": {
+    "continent": [
+     "Asia",
+     "Europe"
+    ]
+   },
+   "blurb": "The national flag of Cyprus.",
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d4/Flag_of_Cyprus.svg/330px-Flag_of_Cyprus.svg.png",
+      "w": 330,
+      "h": 220,
+      "credit": "İsmet Güney, SVG by User:Vzb83~commonswiki",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Flag_of_Cyprus.svg"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "czechia",
+   "name": "Czechia",
+   "lname": "Czechia",
+   "alt": [
+    "Czech Republic"
+   ],
+   "iso2": "CZ",
+   "iso3": "CZE",
+   "group": "Europe",
+   "facts": {
+    "continent": "Europe"
+   },
+   "blurb": "The national flag of Czechia.",
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/cb/Flag_of_the_Czech_Republic.svg/330px-Flag_of_the_Czech_Republic.svg.png",
+      "w": 330,
+      "h": 220,
+      "credit": "Jaroslav Kursa",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Flag_of_the_Czech_Republic.svg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "denmark",
+   "name": "Denmark",
+   "lname": "Denmark",
+   "alt": [],
+   "iso2": "DK",
+   "iso3": "DNK",
+   "group": "Europe",
+   "facts": {
+    "continent": "Europe"
+   },
+   "blurb": "The national flag of Denmark.",
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/9c/Flag_of_Denmark.svg/330px-Flag_of_Denmark.svg.png",
+      "w": 330,
+      "h": 249,
+      "credit": "Madden and others",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Flag_of_Denmark.svg"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "djibouti",
+   "name": "Djibouti",
+   "lname": "Djibouti",
+   "alt": [],
+   "iso2": "DJ",
+   "iso3": "DJI",
+   "group": "Africa",
+   "facts": {
+    "continent": "Africa"
+   },
+   "blurb": "The national flag of Djibouti.",
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/3/34/Flag_of_Djibouti.svg/330px-Flag_of_Djibouti.svg.png",
+      "w": 330,
+      "h": 220,
+      "credit": "Unknown authorUnknown author",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Flag_of_Djibouti.svg"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "dominica",
+   "name": "Dominica",
+   "lname": "Dominica",
+   "alt": [],
+   "iso2": "DM",
+   "iso3": "DMA",
+   "group": "North America",
+   "facts": {
+    "continent": "North America"
+   },
+   "blurb": "The national flag of Dominica.",
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c4/Flag_of_Dominica.svg/330px-Flag_of_Dominica.svg.png",
+      "w": 330,
+      "h": 165,
+      "credit": "Alwin Bully",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Flag_of_Dominica.svg"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "dominican-republic",
+   "name": "Dominican Republic",
+   "lname": "the Dominican Republic",
+   "alt": [],
+   "iso2": "DO",
+   "iso3": "DOM",
+   "group": "North America",
+   "facts": {
+    "continent": "North America"
+   },
+   "blurb": "The national flag of Dominican Republic.",
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/9f/Flag_of_the_Dominican_Republic.svg/330px-Flag_of_the_Dominican_Republic.svg.png",
+      "w": 330,
+      "h": 220,
+      "credit": "Juan Pablo Duarte",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Flag_of_the_Dominican_Republic.svg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "ecuador",
+   "name": "Ecuador",
+   "lname": "Ecuador",
+   "alt": [],
+   "iso2": "EC",
+   "iso3": "ECU",
+   "group": "South America",
+   "facts": {
+    "continent": "South America"
+   },
+   "blurb": "The national flag of Ecuador.",
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e8/Flag_of_Ecuador.svg/330px-Flag_of_Ecuador.svg.png",
+      "w": 330,
+      "h": 220,
+      "credit": "President of the Republic of Ecuador, first uploaded by Denelson83 as Flag of Ecuador.s…",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Flag_of_Ecuador.svg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "egypt",
+   "name": "Egypt",
+   "lname": "Egypt",
+   "alt": [],
+   "iso2": "EG",
+   "iso3": "EGY",
+   "group": "Africa",
+   "facts": {
+    "continent": [
+     "Africa",
+     "Asia"
+    ]
+   },
+   "blurb": "The national flag of Egypt.",
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/f/fe/Flag_of_Egypt.svg/330px-Flag_of_Egypt.svg.png",
+      "w": 330,
+      "h": 220,
+      "credit": "See File history below for details.",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Flag_of_Egypt.svg"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "el-salvador",
+   "name": "El Salvador",
+   "lname": "El Salvador",
+   "alt": [],
+   "iso2": "SV",
+   "iso3": "SLV",
+   "group": "North America",
+   "facts": {
+    "continent": "North America"
+   },
+   "blurb": "The national flag of El Salvador.",
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/3/34/Flag_of_El_Salvador.svg/330px-Flag_of_El_Salvador.svg.png",
+      "w": 330,
+      "h": 186,
+      "credit": "See File history below for details.",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Flag_of_El_Salvador.svg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "equatorial-guinea",
+   "name": "Equatorial Guinea",
+   "lname": "Equatorial Guinea",
+   "alt": [],
+   "iso2": "GQ",
+   "iso3": "GNQ",
+   "group": "Africa",
+   "facts": {
+    "continent": "Africa"
+   },
+   "blurb": "The national flag of Equatorial Guinea.",
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/3/31/Flag_of_Equatorial_Guinea.svg/330px-Flag_of_Equatorial_Guinea.svg.png",
+      "w": 330,
+      "h": 220,
+      "credit": "See File history below for details.",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Flag_of_Equatorial_Guinea.svg"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "eritrea",
+   "name": "Eritrea",
+   "lname": "Eritrea",
+   "alt": [],
+   "iso2": "ER",
+   "iso3": "ERI",
+   "group": "Africa",
+   "facts": {
+    "continent": "Africa"
+   },
+   "blurb": "The national flag of Eritrea.",
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/2/29/Flag_of_Eritrea.svg/330px-Flag_of_Eritrea.svg.png",
+      "w": 330,
+      "h": 165,
+      "credit": "Unknown authorUnknown author",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Flag_of_Eritrea.svg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "estonia",
+   "name": "Estonia",
+   "lname": "Estonia",
+   "alt": [],
+   "iso2": "EE",
+   "iso3": "EST",
+   "group": "Europe",
+   "facts": {
+    "continent": "Europe"
+   },
+   "blurb": "The national flag of Estonia.",
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8f/Flag_of_Estonia.svg/330px-Flag_of_Estonia.svg.png",
+      "w": 330,
+      "h": 210,
+      "credit": "Original: Unknown author Vector: SKopp, PeepP and ‍others",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Flag_of_Estonia.svg"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "eswatini",
+   "name": "Eswatini",
+   "lname": "Eswatini",
+   "alt": [
+    "Swaziland"
+   ],
+   "iso2": "SZ",
+   "iso3": "SWZ",
+   "group": "Africa",
+   "facts": {
+    "continent": "Africa"
+   },
+   "blurb": "The national flag of Eswatini.",
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/f/fb/Flag_of_Eswatini.svg/330px-Flag_of_Eswatini.svg.png",
+      "w": 330,
+      "h": 220,
+      "credit": "Sobhuza II",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Flag_of_Eswatini.svg"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "ethiopia",
+   "name": "Ethiopia",
+   "lname": "Ethiopia",
+   "alt": [],
+   "iso2": "ET",
+   "iso3": "ETH",
+   "group": "Africa",
+   "facts": {
+    "continent": "Africa"
+   },
+   "blurb": "The national flag of Ethiopia.",
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/7/71/Flag_of_Ethiopia.svg/330px-Flag_of_Ethiopia.svg.png",
+      "w": 330,
+      "h": 165,
+      "credit": "Drawn by User:SKopp",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Flag_of_Ethiopia.svg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "fiji",
+   "name": "Fiji",
+   "lname": "Fiji",
+   "alt": [],
+   "iso2": "FJ",
+   "iso3": "FJI",
+   "group": "Oceania",
+   "facts": {
+    "continent": "Oceania"
+   },
+   "blurb": "The national flag of Fiji.",
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/b/ba/Flag_of_Fiji.svg/330px-Flag_of_Fiji.svg.png",
+      "w": 330,
+      "h": 165,
+      "credit": "Tessa Mackenzie",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Flag_of_Fiji.svg"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "finland",
+   "name": "Finland",
+   "lname": "Finland",
+   "alt": [],
+   "iso2": "FI",
+   "iso3": "FIN",
+   "group": "Europe",
+   "facts": {
+    "continent": "Europe"
+   },
+   "blurb": "The national flag of Finland.",
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/b/bc/Flag_of_Finland.svg/330px-Flag_of_Finland.svg.png",
+      "w": 330,
+      "h": 202,
+      "credit": "Unknown",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Flag_of_Finland.svg"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "france",
+   "name": "France",
+   "lname": "France",
+   "alt": [],
+   "iso2": "FR",
+   "iso3": "FRA",
+   "group": "Europe",
+   "facts": {
+    "continent": "Europe"
+   },
+   "blurb": "The national flag of France.",
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c3/Flag_of_France.svg/330px-Flag_of_France.svg.png",
+      "w": 330,
+      "h": 220,
+      "credit": "Original: Unknown Vector: SKopp",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Flag_of_France.svg"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "gabon",
+   "name": "Gabon",
+   "lname": "Gabon",
+   "alt": [],
+   "iso2": "GA",
+   "iso3": "GAB",
+   "group": "Africa",
+   "facts": {
+    "continent": "Africa"
+   },
+   "blurb": "The national flag of Gabon.",
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/04/Flag_of_Gabon.svg/330px-Flag_of_Gabon.svg.png",
+      "w": 330,
+      "h": 248,
+      "credit": "Léon Augé and Pierre Claver Eyeghe",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Flag_of_Gabon.svg"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "gambia",
+   "name": "Gambia",
+   "lname": "the Gambia",
+   "alt": [
+    "The Gambia"
+   ],
+   "iso2": "GM",
+   "iso3": "GMB",
+   "group": "Africa",
+   "facts": {
+    "continent": "Africa"
+   },
+   "blurb": "The national flag of Gambia.",
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/7/77/Flag_of_The_Gambia.svg/330px-Flag_of_The_Gambia.svg.png",
+      "w": 330,
+      "h": 220,
+      "credit": "Vzb83 iThe source code of the previous SVG was invalid due to 39 errors.",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Flag_of_The_Gambia.svg"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "georgia",
+   "name": "Georgia",
+   "lname": "Georgia",
+   "alt": [],
+   "iso2": "GE",
+   "iso3": "GEO",
+   "group": "Asia",
+   "facts": {
+    "continent": [
+     "Asia",
+     "Europe"
+    ]
+   },
+   "blurb": "The national flag of Georgia.",
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/0f/Flag_of_Georgia.svg/330px-Flag_of_Georgia.svg.png",
+      "w": 330,
+      "h": 220,
+      "credit": "Last update by MapGrid SKopp",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Flag_of_Georgia.svg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "germany",
+   "name": "Germany",
+   "lname": "Germany",
+   "alt": [],
+   "iso2": "DE",
+   "iso3": "DEU",
+   "group": "Europe",
+   "facts": {
+    "continent": "Europe"
+   },
+   "blurb": "The national flag of Germany.",
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/b/ba/Flag_of_Germany.svg/330px-Flag_of_Germany.svg.png",
+      "w": 330,
+      "h": 198,
+      "credit": "User:SKopp, User:Madden, and other users",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Flag_of_Germany.svg"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "ghana",
+   "name": "Ghana",
+   "lname": "Ghana",
+   "alt": [],
+   "iso2": "GH",
+   "iso3": "GHA",
+   "group": "Africa",
+   "facts": {
+    "continent": "Africa"
+   },
+   "blurb": "The national flag of Ghana.",
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/1/19/Flag_of_Ghana.svg/330px-Flag_of_Ghana.svg.png",
+      "w": 330,
+      "h": 220,
+      "credit": "Theodosia Okoh",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Flag_of_Ghana.svg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "greece",
+   "name": "Greece",
+   "lname": "Greece",
+   "alt": [],
+   "iso2": "GR",
+   "iso3": "GRC",
+   "group": "Europe",
+   "facts": {
+    "continent": "Europe"
+   },
+   "blurb": "The national flag of Greece.",
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5c/Flag_of_Greece.svg/330px-Flag_of_Greece.svg.png",
+      "w": 330,
+      "h": 220,
+      "credit": "Unknown authorUnknown author",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Flag_of_Greece.svg"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "grenada",
+   "name": "Grenada",
+   "lname": "Grenada",
+   "alt": [],
+   "iso2": "GD",
+   "iso3": "GRD",
+   "group": "North America",
+   "facts": {
+    "continent": "North America"
+   },
+   "blurb": "The national flag of Grenada.",
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/b/bc/Flag_of_Grenada.svg/330px-Flag_of_Grenada.svg.png",
+      "w": 330,
+      "h": 198,
+      "credit": "See file history below for details.",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Flag_of_Grenada.svg"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "guatemala",
+   "name": "Guatemala",
+   "lname": "Guatemala",
+   "alt": [],
+   "iso2": "GT",
+   "iso3": "GTM",
+   "group": "North America",
+   "facts": {
+    "continent": "North America"
+   },
+   "blurb": "The national flag of Guatemala.",
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/e/ec/Flag_of_Guatemala.svg/330px-Flag_of_Guatemala.svg.png",
+      "w": 330,
+      "h": 206,
+      "credit": "K21edgo",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Flag_of_Guatemala.svg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "guinea",
+   "name": "Guinea",
+   "lname": "Guinea",
+   "alt": [],
+   "iso2": "GN",
+   "iso3": "GIN",
+   "group": "Africa",
+   "facts": {
+    "continent": "Africa"
+   },
+   "blurb": "The national flag of Guinea.",
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/e/ed/Flag_of_Guinea.svg/330px-Flag_of_Guinea.svg.png",
+      "w": 330,
+      "h": 220,
+      "credit": "Unknown",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Flag_of_Guinea.svg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "guinea-bissau",
+   "name": "Guinea-Bissau",
+   "lname": "Guinea-Bissau",
+   "alt": [],
+   "iso2": "GW",
+   "iso3": "GNB",
+   "group": "Africa",
+   "facts": {
+    "continent": "Africa"
+   },
+   "blurb": "The national flag of Guinea-Bissau.",
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/01/Flag_of_Guinea-Bissau.svg/330px-Flag_of_Guinea-Bissau.svg.png",
+      "w": 330,
+      "h": 165,
+      "credit": "Unknown",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Flag_of_Guinea-Bissau.svg"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "guyana",
+   "name": "Guyana",
+   "lname": "Guyana",
+   "alt": [],
+   "iso2": "GY",
+   "iso3": "GUY",
+   "group": "South America",
+   "facts": {
+    "continent": "South America"
+   },
+   "blurb": "The national flag of Guyana.",
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/99/Flag_of_Guyana.svg/330px-Flag_of_Guyana.svg.png",
+      "w": 330,
+      "h": 198,
+      "credit": "Whitney Smith",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Flag_of_Guyana.svg"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "haiti",
+   "name": "Haiti",
+   "lname": "Haiti",
+   "alt": [],
+   "iso2": "HT",
+   "iso3": "HTI",
+   "group": "North America",
+   "facts": {
+    "continent": "North America"
+   },
+   "blurb": "The national flag of Haiti.",
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/5/56/Flag_of_Haiti.svg/330px-Flag_of_Haiti.svg.png",
+      "w": 330,
+      "h": 198,
+      "credit": "(colours and size changes of the now deleted versions) Madden, Vzb83, Denelson83, Chanh…",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Flag_of_Haiti.svg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "honduras",
+   "name": "Honduras",
+   "lname": "Honduras",
+   "alt": [],
+   "iso2": "HN",
+   "iso3": "HND",
+   "group": "North America",
+   "facts": {
+    "continent": "North America"
+   },
+   "blurb": "The national flag of Honduras.",
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/7/79/Flag_of_Honduras_%281949%E2%80%932022%2C_2026%E2%80%93present%29.svg/330px-Flag_of_Honduras_%281949%E2%80%932022%2C_2026%E2%80%93present%29.svg.png",
+      "w": 330,
+      "h": 165,
+      "credit": "Kes47",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Flag_of_Honduras_(1949%E2%80%932022,_2026%E2%80%93present).svg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "hungary",
+   "name": "Hungary",
+   "lname": "Hungary",
+   "alt": [],
+   "iso2": "HU",
+   "iso3": "HUN",
+   "group": "Europe",
+   "facts": {
+    "continent": "Europe"
+   },
+   "blurb": "The national flag of Hungary.",
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c1/Flag_of_Hungary.svg/330px-Flag_of_Hungary.svg.png",
+      "w": 330,
+      "h": 165,
+      "credit": "SKopp",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Flag_of_Hungary.svg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "iceland",
+   "name": "Iceland",
+   "lname": "Iceland",
+   "alt": [],
+   "iso2": "IS",
+   "iso3": "ISL",
+   "group": "Europe",
+   "facts": {
+    "continent": "Europe"
+   },
+   "blurb": "The national flag of Iceland.",
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/ce/Flag_of_Iceland.svg/330px-Flag_of_Iceland.svg.png",
+      "w": 330,
+      "h": 238,
+      "credit": "Original: Matthías Þórðarson Vector: Árni Dagur and Magasjukur2",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Flag_of_Iceland.svg"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "india",
+   "name": "India",
+   "lname": "India",
+   "alt": [],
+   "iso2": "IN",
+   "iso3": "IND",
+   "group": "Asia",
+   "facts": {
+    "continent": "Asia"
+   },
+   "blurb": "The national flag of India.",
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/4/41/Flag_of_India.svg/330px-Flag_of_India.svg.png",
+      "w": 330,
+      "h": 220,
+      "credit": "Government of India",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Flag_of_India.svg"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "indonesia",
+   "name": "Indonesia",
+   "lname": "Indonesia",
+   "alt": [],
+   "iso2": "ID",
+   "iso3": "IDN",
+   "group": "Asia",
+   "facts": {
+    "continent": [
+     "Asia",
+     "Oceania"
+    ]
+   },
+   "blurb": "The national flag of Indonesia.",
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/9f/Flag_of_Indonesia.svg/330px-Flag_of_Indonesia.svg.png",
+      "w": 330,
+      "h": 220,
+      "credit": "Jayakatwang",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Flag_of_Indonesia.svg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "iran",
+   "name": "Iran",
+   "lname": "Iran",
+   "alt": [],
+   "iso2": "IR",
+   "iso3": "IRN",
+   "group": "Asia",
+   "facts": {
+    "continent": "Asia"
+   },
+   "blurb": "The national flag of Iran.",
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/ca/Flag_of_Iran.svg/330px-Flag_of_Iran.svg.png",
+      "w": 330,
+      "h": 189,
+      "credit": "SVG file: SiBr4Designer: Hamid NadimiConstruction: ISIRI",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Flag_of_Iran.svg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "iraq",
+   "name": "Iraq",
+   "lname": "Iraq",
+   "alt": [],
+   "iso2": "IQ",
+   "iso3": "IRQ",
+   "group": "Asia",
+   "facts": {
+    "continent": "Asia"
+   },
+   "blurb": "The national flag of Iraq.",
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f6/Flag_of_Iraq.svg/330px-Flag_of_Iraq.svg.png",
+      "w": 330,
+      "h": 220,
+      "credit": "See File history below for details.",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Flag_of_Iraq.svg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "ireland",
+   "name": "Ireland",
+   "lname": "Ireland",
+   "alt": [
+    "Republic of Ireland"
+   ],
+   "iso2": "IE",
+   "iso3": "IRL",
+   "group": "Europe",
+   "facts": {
+    "continent": "Europe"
+   },
+   "blurb": "The national flag of Ireland.",
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/4/45/Flag_of_Ireland.svg/330px-Flag_of_Ireland.svg.png",
+      "w": 330,
+      "h": 165,
+      "credit": "Éire",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Flag_of_Ireland.svg"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "israel",
+   "name": "Israel",
+   "lname": "Israel",
+   "alt": [],
+   "iso2": "IL",
+   "iso3": "ISR",
+   "group": "Asia",
+   "facts": {
+    "continent": "Asia"
+   },
+   "blurb": "The national flag of Israel.",
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d4/Flag_of_Israel.svg/330px-Flag_of_Israel.svg.png",
+      "w": 330,
+      "h": 240,
+      "credit": "Israel Belkind and Fanny Abramovitch (original) “The Provisional Council of State Procl…",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Flag_of_Israel.svg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "italy",
+   "name": "Italy",
+   "lname": "Italy",
+   "alt": [],
+   "iso2": "IT",
+   "iso3": "ITA",
+   "group": "Europe",
+   "facts": {
+    "continent": "Europe"
+   },
+   "blurb": "The national flag of Italy.",
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/03/Flag_of_Italy.svg/330px-Flag_of_Italy.svg.png",
+      "w": 330,
+      "h": 220,
+      "credit": "See below.",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Flag_of_Italy.svg"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "jamaica",
+   "name": "Jamaica",
+   "lname": "Jamaica",
+   "alt": [],
+   "iso2": "JM",
+   "iso3": "JAM",
+   "group": "North America",
+   "facts": {
+    "continent": "North America"
+   },
+   "blurb": "The national flag of Jamaica.",
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/0a/Flag_of_Jamaica.svg/330px-Flag_of_Jamaica.svg.png",
+      "w": 330,
+      "h": 165,
+      "credit": "The SVG code is valid. This vector image was created with Inkscape by SKopp, and then m…",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Flag_of_Jamaica.svg"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "japan",
+   "name": "Japan",
+   "lname": "Japan",
+   "alt": [],
+   "iso2": "JP",
+   "iso3": "JPN",
+   "group": "Asia",
+   "facts": {
+    "continent": "Asia"
+   },
+   "blurb": "The national flag of Japan.",
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/9e/Flag_of_Japan.svg/330px-Flag_of_Japan.svg.png",
+      "w": 330,
+      "h": 220,
+      "credit": "Various",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Flag_of_Japan.svg"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "jordan",
+   "name": "Jordan",
+   "lname": "Jordan",
+   "alt": [],
+   "iso2": "JO",
+   "iso3": "JOR",
+   "group": "Asia",
+   "facts": {
+    "continent": "Asia"
+   },
+   "blurb": "The national flag of Jordan.",
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c0/Flag_of_Jordan.svg/330px-Flag_of_Jordan.svg.png",
+      "w": 330,
+      "h": 165,
+      "credit": "Unknown",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Flag_of_Jordan.svg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "kazakhstan",
+   "name": "Kazakhstan",
+   "lname": "Kazakhstan",
+   "alt": [],
+   "iso2": "KZ",
+   "iso3": "KAZ",
+   "group": "Asia",
+   "facts": {
+    "continent": [
+     "Asia",
+     "Europe"
+    ]
+   },
+   "blurb": "The national flag of Kazakhstan.",
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d3/Flag_of_Kazakhstan.svg/330px-Flag_of_Kazakhstan.svg.png",
+      "w": 330,
+      "h": 165,
+      "credit": "Shaken Niyazbekop",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Flag_of_Kazakhstan.svg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "kenya",
+   "name": "Kenya",
+   "lname": "Kenya",
+   "alt": [],
+   "iso2": "KE",
+   "iso3": "KEN",
+   "group": "Africa",
+   "facts": {
+    "continent": "Africa"
+   },
+   "blurb": "The national flag of Kenya.",
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/4/49/Flag_of_Kenya.svg/330px-Flag_of_Kenya.svg.png",
+      "w": 330,
+      "h": 220,
+      "credit": "User:Pumbaa80",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Flag_of_Kenya.svg"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "kiribati",
+   "name": "Kiribati",
+   "lname": "Kiribati",
+   "alt": [],
+   "iso2": "KI",
+   "iso3": "KIR",
+   "group": "Oceania",
+   "facts": {
+    "continent": "Oceania"
+   },
+   "blurb": "The national flag of Kiribati.",
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d3/Flag_of_Kiribati.svg/330px-Flag_of_Kiribati.svg.png",
+      "w": 330,
+      "h": 165,
+      "credit": "User:Hanzlan",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Flag_of_Kiribati.svg"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "kuwait",
+   "name": "Kuwait",
+   "lname": "Kuwait",
+   "alt": [],
+   "iso2": "KW",
+   "iso3": "KWT",
+   "group": "Asia",
+   "facts": {
+    "continent": "Asia"
+   },
+   "blurb": "The national flag of Kuwait.",
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/a/aa/Flag_of_Kuwait.svg/330px-Flag_of_Kuwait.svg.png",
+      "w": 330,
+      "h": 165,
+      "credit": "Unknown",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Flag_of_Kuwait.svg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "kyrgyzstan",
+   "name": "Kyrgyzstan",
+   "lname": "Kyrgyzstan",
+   "alt": [],
+   "iso2": "KG",
+   "iso3": "KGZ",
+   "group": "Asia",
+   "facts": {
+    "continent": "Asia"
+   },
+   "blurb": "The national flag of Kyrgyzstan.",
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c7/Flag_of_Kyrgyzstan.svg/330px-Flag_of_Kyrgyzstan.svg.png",
+      "w": 330,
+      "h": 198,
+      "credit": "Shakiev N.T., Primov U.B.",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Flag_of_Kyrgyzstan.svg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "laos",
+   "name": "Laos",
+   "lname": "Laos",
+   "alt": [],
+   "iso2": "LA",
+   "iso3": "LAO",
+   "group": "Asia",
+   "facts": {
+    "continent": "Asia"
+   },
+   "blurb": "The national flag of Laos.",
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/5/56/Flag_of_Laos.svg/330px-Flag_of_Laos.svg.png",
+      "w": 330,
+      "h": 220,
+      "credit": "SKopp",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Flag_of_Laos.svg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "latvia",
+   "name": "Latvia",
+   "lname": "Latvia",
+   "alt": [],
+   "iso2": "LV",
+   "iso3": "LVA",
+   "group": "Europe",
+   "facts": {
+    "continent": "Europe"
+   },
+   "blurb": "The national flag of Latvia.",
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/84/Flag_of_Latvia.svg/330px-Flag_of_Latvia.svg.png",
+      "w": 330,
+      "h": 165,
+      "credit": "Original: Ansis Cīrulis Vector: SKopp",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Flag_of_Latvia.svg"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "lebanon",
+   "name": "Lebanon",
+   "lname": "Lebanon",
+   "alt": [],
+   "iso2": "LB",
+   "iso3": "LBN",
+   "group": "Asia",
+   "facts": {
+    "continent": "Asia"
+   },
+   "blurb": "The national flag of Lebanon.",
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/5/59/Flag_of_Lebanon.svg/330px-Flag_of_Lebanon.svg.png",
+      "w": 330,
+      "h": 220,
+      "credit": "Henri Pharaon",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Flag_of_Lebanon.svg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "lesotho",
+   "name": "Lesotho",
+   "lname": "Lesotho",
+   "alt": [],
+   "iso2": "LS",
+   "iso3": "LSO",
+   "group": "Africa",
+   "facts": {
+    "continent": "Africa"
+   },
+   "blurb": "The national flag of Lesotho.",
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4a/Flag_of_Lesotho.svg/330px-Flag_of_Lesotho.svg.png",
+      "w": 330,
+      "h": 220,
+      "credit": "See File history below for details.",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Flag_of_Lesotho.svg"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "liberia",
+   "name": "Liberia",
+   "lname": "Liberia",
+   "alt": [],
+   "iso2": "LR",
+   "iso3": "LBR",
+   "group": "Africa",
+   "facts": {
+    "continent": "Africa"
+   },
+   "blurb": "The national flag of Liberia.",
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b8/Flag_of_Liberia.svg/330px-Flag_of_Liberia.svg.png",
+      "w": 330,
+      "h": 174,
+      "credit": "Government of Liberia",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Flag_of_Liberia.svg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "libya",
+   "name": "Libya",
+   "lname": "Libya",
+   "alt": [],
+   "iso2": "LY",
+   "iso3": "LBY",
+   "group": "Africa",
+   "facts": {
+    "continent": "Africa"
+   },
+   "blurb": "The national flag of Libya.",
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/05/Flag_of_Libya.svg/330px-Flag_of_Libya.svg.png",
+      "w": 330,
+      "h": 165,
+      "credit": "Various The SVG code is valid. This vector image was created with a text editor.",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Flag_of_Libya.svg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "liechtenstein",
+   "name": "Liechtenstein",
+   "lname": "Liechtenstein",
+   "alt": [],
+   "iso2": "LI",
+   "iso3": "LIE",
+   "group": "Europe",
+   "facts": {
+    "continent": "Europe"
+   },
+   "blurb": "The national flag of Liechtenstein.",
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/4/47/Flag_of_Liechtenstein.svg/330px-Flag_of_Liechtenstein.svg.png",
+      "w": 330,
+      "h": 198,
+      "credit": "Mnmazur and others",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Flag_of_Liechtenstein.svg"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "lithuania",
+   "name": "Lithuania",
+   "lname": "Lithuania",
+   "alt": [],
+   "iso2": "LT",
+   "iso3": "LTU",
+   "group": "Europe",
+   "facts": {
+    "continent": "Europe"
+   },
+   "blurb": "The national flag of Lithuania.",
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/1/11/Flag_of_Lithuania.svg/330px-Flag_of_Lithuania.svg.png",
+      "w": 330,
+      "h": 198,
+      "credit": "Original: Jonas Basanavičius, Tadas Daugirdas and Antanas Žmuidzinavičius Vector: SKopp…",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Flag_of_Lithuania.svg"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "luxembourg",
+   "name": "Luxembourg",
+   "lname": "Luxembourg",
+   "alt": [],
+   "iso2": "LU",
+   "iso3": "LUX",
+   "group": "Europe",
+   "facts": {
+    "continent": "Europe"
+   },
+   "blurb": "The national flag of Luxembourg.",
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/d/da/Flag_of_Luxembourg.svg/330px-Flag_of_Luxembourg.svg.png",
+      "w": 330,
+      "h": 198,
+      "credit": "Drawn by User:SKopp",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Flag_of_Luxembourg.svg"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "madagascar",
+   "name": "Madagascar",
+   "lname": "Madagascar",
+   "alt": [],
+   "iso2": "MG",
+   "iso3": "MDG",
+   "group": "Africa",
+   "facts": {
+    "continent": "Africa"
+   },
+   "blurb": "The national flag of Madagascar.",
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/b/bc/Flag_of_Madagascar.svg/330px-Flag_of_Madagascar.svg.png",
+      "w": 330,
+      "h": 220,
+      "credit": "Unknown",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Flag_of_Madagascar.svg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "malawi",
+   "name": "Malawi",
+   "lname": "Malawi",
+   "alt": [],
+   "iso2": "MW",
+   "iso3": "MWI",
+   "group": "Africa",
+   "facts": {
+    "continent": "Africa"
+   },
+   "blurb": "The national flag of Malawi.",
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d1/Flag_of_Malawi.svg/330px-Flag_of_Malawi.svg.png",
+      "w": 330,
+      "h": 220,
+      "credit": "Original: Unknown author Vector: Achim1999",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Flag_of_Malawi.svg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "malaysia",
+   "name": "Malaysia",
+   "lname": "Malaysia",
+   "alt": [],
+   "iso2": "MY",
+   "iso3": "MYS",
+   "group": "Asia",
+   "facts": {
+    "continent": "Asia"
+   },
+   "blurb": "The national flag of Malaysia.",
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/6/66/Flag_of_Malaysia.svg/330px-Flag_of_Malaysia.svg.png",
+      "w": 330,
+      "h": 165,
+      "credit": "MapGrid (old version SKopp, Zscout370 and Ranking Update)",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Flag_of_Malaysia.svg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "maldives",
+   "name": "Maldives",
+   "lname": "the Maldives",
+   "alt": [],
+   "iso2": "MV",
+   "iso3": "MDV",
+   "group": "Asia",
+   "facts": {
+    "continent": "Asia"
+   },
+   "blurb": "The national flag of Maldives.",
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/0f/Flag_of_Maldives.svg/330px-Flag_of_Maldives.svg.png",
+      "w": 330,
+      "h": 220,
+      "credit": "See File history, below, for details.",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Flag_of_Maldives.svg"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "mali",
+   "name": "Mali",
+   "lname": "Mali",
+   "alt": [],
+   "iso2": "ML",
+   "iso3": "MLI",
+   "group": "Africa",
+   "facts": {
+    "continent": "Africa"
+   },
+   "blurb": "The national flag of Mali.",
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/92/Flag_of_Mali.svg/330px-Flag_of_Mali.svg.png",
+      "w": 330,
+      "h": 220,
+      "credit": "SKopp",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Flag_of_Mali.svg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "malta",
+   "name": "Malta",
+   "lname": "Malta",
+   "alt": [],
+   "iso2": "MT",
+   "iso3": "MLT",
+   "group": "Europe",
+   "facts": {
+    "continent": "Europe"
+   },
+   "blurb": "The national flag of Malta.",
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/7/73/Flag_of_Malta.svg/330px-Flag_of_Malta.svg.png",
+      "w": 330,
+      "h": 220,
+      "credit": "See File history below for details.",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Flag_of_Malta.svg"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "marshall-islands",
+   "name": "Marshall Islands",
+   "lname": "the Marshall Islands",
+   "alt": [],
+   "iso2": "MH",
+   "iso3": "MHL",
+   "group": "Oceania",
+   "facts": {
+    "continent": "Oceania"
+   },
+   "blurb": "The national flag of Marshall Islands.",
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/2/2e/Flag_of_the_Marshall_Islands.svg/330px-Flag_of_the_Marshall_Islands.svg.png",
+      "w": 330,
+      "h": 174,
+      "credit": "No machine-readable author provided. SKopp assumed (based on copyright claims).",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Flag_of_the_Marshall_Islands.svg"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "mauritania",
+   "name": "Mauritania",
+   "lname": "Mauritania",
+   "alt": [],
+   "iso2": "MR",
+   "iso3": "MRT",
+   "group": "Africa",
+   "facts": {
+    "continent": "Africa"
+   },
+   "blurb": "The national flag of Mauritania.",
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/4/43/Flag_of_Mauritania.svg/330px-Flag_of_Mauritania.svg.png",
+      "w": 330,
+      "h": 220,
+      "credit": "See File history below for details.",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Flag_of_Mauritania.svg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "mauritius",
+   "name": "Mauritius",
+   "lname": "Mauritius",
+   "alt": [],
+   "iso2": "MU",
+   "iso3": "MUS",
+   "group": "Africa",
+   "facts": {
+    "continent": "Africa"
+   },
+   "blurb": "The national flag of Mauritius.",
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/7/77/Flag_of_Mauritius.svg/330px-Flag_of_Mauritius.svg.png",
+      "w": 330,
+      "h": 220,
+      "credit": "Zscout370",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Flag_of_Mauritius.svg"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "mexico",
+   "name": "Mexico",
+   "lname": "Mexico",
+   "alt": [],
+   "iso2": "MX",
+   "iso3": "MEX",
+   "group": "North America",
+   "facts": {
+    "continent": "North America"
+   },
+   "blurb": "The national flag of Mexico.",
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/f/fc/Flag_of_Mexico.svg/330px-Flag_of_Mexico.svg.png",
+      "w": 330,
+      "h": 189,
+      "credit": "Omar Alejandro Covarrubias Neri, 9 April 2006. Based on the 1968 arms by Francisco Eppe…",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Flag_of_Mexico.svg"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "micronesia",
+   "name": "Micronesia",
+   "lname": "Micronesia",
+   "alt": [
+    "Federated States of Micronesia"
+   ],
+   "iso2": "FM",
+   "iso3": "FSM",
+   "group": "Oceania",
+   "facts": {
+    "continent": "Oceania"
+   },
+   "blurb": "The national flag of Micronesia.",
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e4/Flag_of_the_Federated_States_of_Micronesia.svg/330px-Flag_of_the_Federated_States_of_Micronesia.svg.png",
+      "w": 330,
+      "h": 174,
+      "credit": "Unknown",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Flag_of_the_Federated_States_of_Micronesia.svg"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "moldova",
+   "name": "Moldova",
+   "lname": "Moldova",
+   "alt": [],
+   "iso2": "MD",
+   "iso3": "MDA",
+   "group": "Europe",
+   "facts": {
+    "continent": "Europe"
+   },
+   "blurb": "The national flag of Moldova.",
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/2/27/Flag_of_Moldova.svg/330px-Flag_of_Moldova.svg.png",
+      "w": 330,
+      "h": 165,
+      "credit": "Gheorghe Vrabie",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Flag_of_Moldova.svg"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "monaco",
+   "name": "Monaco",
+   "lname": "Monaco",
+   "alt": [],
+   "iso2": "MC",
+   "iso3": "MCO",
+   "group": "Europe",
+   "facts": {
+    "continent": "Europe"
+   },
+   "blurb": "The national flag of Monaco.",
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/e/ea/Flag_of_Monaco.svg/330px-Flag_of_Monaco.svg.png",
+      "w": 330,
+      "h": 264,
+      "credit": "Drawn by User:SKopp",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Flag_of_Monaco.svg"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "mongolia",
+   "name": "Mongolia",
+   "lname": "Mongolia",
+   "alt": [],
+   "iso2": "MN",
+   "iso3": "MNG",
+   "group": "Asia",
+   "facts": {
+    "continent": "Asia"
+   },
+   "blurb": "The national flag of Mongolia.",
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4c/Flag_of_Mongolia.svg/330px-Flag_of_Mongolia.svg.png",
+      "w": 330,
+      "h": 165,
+      "credit": "See File history below for details.",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Flag_of_Mongolia.svg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "montenegro",
+   "name": "Montenegro",
+   "lname": "Montenegro",
+   "alt": [],
+   "iso2": "ME",
+   "iso3": "MNE",
+   "group": "Europe",
+   "facts": {
+    "continent": "Europe"
+   },
+   "blurb": "The national flag of Montenegro.",
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/6/64/Flag_of_Montenegro.svg/330px-Flag_of_Montenegro.svg.png",
+      "w": 330,
+      "h": 165,
+      "credit": "B1mbo, Froztbyte, Great Brightstar",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Flag_of_Montenegro.svg"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "morocco",
+   "name": "Morocco",
+   "lname": "Morocco",
+   "alt": [],
+   "iso2": "MA",
+   "iso3": "MAR",
+   "group": "Africa",
+   "facts": {
+    "continent": "Africa"
+   },
+   "blurb": "The national flag of Morocco.",
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/2/2c/Flag_of_Morocco.svg/330px-Flag_of_Morocco.svg.png",
+      "w": 330,
+      "h": 220,
+      "credit": "Denelson83, Zscout370",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Flag_of_Morocco.svg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "mozambique",
+   "name": "Mozambique",
+   "lname": "Mozambique",
+   "alt": [],
+   "iso2": "MZ",
+   "iso3": "MOZ",
+   "group": "Africa",
+   "facts": {
+    "continent": "Africa"
+   },
+   "blurb": "The national flag of Mozambique.",
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d0/Flag_of_Mozambique.svg/330px-Flag_of_Mozambique.svg.png",
+      "w": 330,
+      "h": 220,
+      "credit": "FRELIMO",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Flag_of_Mozambique.svg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "myanmar",
+   "name": "Myanmar",
+   "lname": "Myanmar",
+   "alt": [
+    "Burma"
+   ],
+   "iso2": "MM",
+   "iso3": "MMR",
+   "group": "Asia",
+   "facts": {
+    "continent": "Asia"
+   },
+   "blurb": "The national flag of Myanmar.",
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8c/Flag_of_Myanmar.svg/330px-Flag_of_Myanmar.svg.png",
+      "w": 330,
+      "h": 220,
+      "credit": "Unknown authorUnknown author",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Flag_of_Myanmar.svg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "namibia",
+   "name": "Namibia",
+   "lname": "Namibia",
+   "alt": [],
+   "iso2": "NA",
+   "iso3": "NAM",
+   "group": "Africa",
+   "facts": {
+    "continent": "Africa"
+   },
+   "blurb": "The national flag of Namibia.",
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/00/Flag_of_Namibia.svg/330px-Flag_of_Namibia.svg.png",
+      "w": 330,
+      "h": 220,
+      "credit": "SVG by Vzb83~commonswiki et al.",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Flag_of_Namibia.svg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "nauru",
+   "name": "Nauru",
+   "lname": "Nauru",
+   "alt": [],
+   "iso2": "NR",
+   "iso3": "NRU",
+   "group": "Oceania",
+   "facts": {
+    "continent": "Oceania"
+   },
+   "blurb": "The national flag of Nauru.",
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/3/30/Flag_of_Nauru.svg/330px-Flag_of_Nauru.svg.png",
+      "w": 330,
+      "h": 165,
+      "credit": "User:Skimel",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Flag_of_Nauru.svg"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "nepal",
+   "name": "Nepal",
+   "lname": "Nepal",
+   "alt": [],
+   "iso2": "NP",
+   "iso3": "NPL",
+   "group": "Asia",
+   "facts": {
+    "continent": "Asia"
+   },
+   "blurb": "The national flag of Nepal.",
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/9b/Flag_of_Nepal.svg/250px-Flag_of_Nepal.svg.png",
+      "w": 250,
+      "h": 305,
+      "credit": "Drawn by Pumbaa80, Achim1999",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Flag_of_Nepal.svg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "netherlands",
+   "name": "Netherlands",
+   "lname": "the Netherlands",
+   "alt": [
+    "Holland"
+   ],
+   "iso2": "NL",
+   "iso3": "NLD",
+   "group": "Europe",
+   "facts": {
+    "continent": "Europe"
+   },
+   "blurb": "The national flag of Netherlands.",
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/2/20/Flag_of_the_Netherlands.svg/330px-Flag_of_the_Netherlands.svg.png",
+      "w": 330,
+      "h": 220,
+      "credit": "Zscout370",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Flag_of_the_Netherlands.svg"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "new-zealand",
+   "name": "New Zealand",
+   "lname": "New Zealand",
+   "alt": [],
+   "iso2": "NZ",
+   "iso3": "NZL",
+   "group": "Oceania",
+   "facts": {
+    "continent": "Oceania"
+   },
+   "blurb": "The national flag of New Zealand.",
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3e/Flag_of_New_Zealand.svg/330px-Flag_of_New_Zealand.svg.png",
+      "w": 330,
+      "h": 165,
+      "credit": "Original: Albert Hastings Markham Vector: Zscout370, Hugh Jass, s. File history",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Flag_of_New_Zealand.svg"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "nicaragua",
+   "name": "Nicaragua",
+   "lname": "Nicaragua",
+   "alt": [],
+   "iso2": "NI",
+   "iso3": "NIC",
+   "group": "North America",
+   "facts": {
+    "continent": "North America"
+   },
+   "blurb": "The national flag of Nicaragua.",
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/1/19/Flag_of_Nicaragua.svg/330px-Flag_of_Nicaragua.svg.png",
+      "w": 330,
+      "h": 198,
+      "credit": "C records",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Flag_of_Nicaragua.svg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "niger",
+   "name": "Niger",
+   "lname": "Niger",
+   "alt": [],
+   "iso2": "NE",
+   "iso3": "NER",
+   "group": "Africa",
+   "facts": {
+    "continent": "Africa"
+   },
+   "blurb": "The national flag of Niger.",
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f4/Flag_of_Niger.svg/330px-Flag_of_Niger.svg.png",
+      "w": 330,
+      "h": 283,
+      "credit": "Made by: Philippe Verdy User:verdy_p, see also fr:Utilisateur:verdy_p.",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Flag_of_Niger.svg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "nigeria",
+   "name": "Nigeria",
+   "lname": "Nigeria",
+   "alt": [],
+   "iso2": "NG",
+   "iso3": "NGA",
+   "group": "Africa",
+   "facts": {
+    "continent": "Africa"
+   },
+   "blurb": "The national flag of Nigeria.",
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/7/79/Flag_of_Nigeria.svg/330px-Flag_of_Nigeria.svg.png",
+      "w": 330,
+      "h": 165,
+      "credit": "Jon Harald Søby.",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Flag_of_Nigeria.svg"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "north-korea",
+   "name": "North Korea",
+   "lname": "North Korea",
+   "alt": [
+    "DPRK"
+   ],
+   "iso2": "KP",
+   "iso3": "PRK",
+   "group": "Asia",
+   "facts": {
+    "continent": "Asia"
+   },
+   "blurb": "The national flag of North Korea.",
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/5/51/Flag_of_North_Korea.svg/330px-Flag_of_North_Korea.svg.png",
+      "w": 330,
+      "h": 165,
+      "credit": "Original: Unknown author Vector: Zscout370",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Flag_of_North_Korea.svg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "north-macedonia",
+   "name": "North Macedonia",
+   "lname": "North Macedonia",
+   "alt": [
+    "Macedonia"
+   ],
+   "iso2": "MK",
+   "iso3": "MKD",
+   "group": "Europe",
+   "facts": {
+    "continent": "Europe"
+   },
+   "blurb": "The national flag of North Macedonia.",
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/7/79/Flag_of_North_Macedonia.svg/330px-Flag_of_North_Macedonia.svg.png",
+      "w": 330,
+      "h": 165,
+      "credit": "User:SKopp, redrawn by User:Gabbe",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Flag_of_North_Macedonia.svg"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "norway",
+   "name": "Norway",
+   "lname": "Norway",
+   "alt": [],
+   "iso2": "NO",
+   "iso3": "NOR",
+   "group": "Europe",
+   "facts": {
+    "continent": "Europe"
+   },
+   "blurb": "The national flag of Norway.",
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d9/Flag_of_Norway.svg/330px-Flag_of_Norway.svg.png",
+      "w": 330,
+      "h": 240,
+      "credit": "Original: Fredrik Meltzer Vector: Gutten på Hemsen",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Flag_of_Norway.svg"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "pakistan",
+   "name": "Pakistan",
+   "lname": "Pakistan",
+   "alt": [],
+   "iso2": "PK",
+   "iso3": "PAK",
+   "group": "Asia",
+   "facts": {
+    "continent": "Asia"
+   },
+   "blurb": "The national flag of Pakistan.",
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/3/32/Flag_of_Pakistan.svg/330px-Flag_of_Pakistan.svg.png",
+      "w": 330,
+      "h": 220,
+      "credit": "User:Zscout370",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Flag_of_Pakistan.svg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "palau",
+   "name": "Palau",
+   "lname": "Palau",
+   "alt": [],
+   "iso2": "PW",
+   "iso3": "PLW",
+   "group": "Oceania",
+   "facts": {
+    "continent": "Oceania"
+   },
+   "blurb": "The national flag of Palau.",
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/4/48/Flag_of_Palau.svg/330px-Flag_of_Palau.svg.png",
+      "w": 330,
+      "h": 206,
+      "credit": "Original: John Blau Skebong Vector: Nightstallion",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Flag_of_Palau.svg"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "palestine",
+   "name": "Palestine",
+   "lname": "Palestine",
+   "alt": [
+    "State of Palestine"
+   ],
+   "iso2": "PS",
+   "iso3": "PSE",
+   "group": "Asia",
+   "facts": {
+    "continent": "Asia"
+   },
+   "blurb": "The national flag of Palestine.",
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/00/Flag_of_Palestine.svg/330px-Flag_of_Palestine.svg.png",
+      "w": 330,
+      "h": 165,
+      "credit": "Orionist, previous versions by Makaristos, Mysid, etc.",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Flag_of_Palestine.svg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "panama",
+   "name": "Panama",
+   "lname": "Panama",
+   "alt": [],
+   "iso2": "PA",
+   "iso3": "PAN",
+   "group": "North America",
+   "facts": {
+    "continent": [
+     "North America",
+     "South America"
+    ]
+   },
+   "blurb": "The national flag of Panama.",
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/a/ab/Flag_of_Panama.svg/330px-Flag_of_Panama.svg.png",
+      "w": 330,
+      "h": 220,
+      "credit": "Zscout370 et al.",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Flag_of_Panama.svg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "papua-new-guinea",
+   "name": "Papua New Guinea",
+   "lname": "Papua New Guinea",
+   "alt": [
+    "PNG"
+   ],
+   "iso2": "PG",
+   "iso3": "PNG",
+   "group": "Oceania",
+   "facts": {
+    "continent": [
+     "Oceania",
+     "Asia"
+    ]
+   },
+   "blurb": "The national flag of Papua New Guinea.",
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e3/Flag_of_Papua_New_Guinea.svg/330px-Flag_of_Papua_New_Guinea.svg.png",
+      "w": 330,
+      "h": 248,
+      "credit": "User:Nightstallion",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Flag_of_Papua_New_Guinea.svg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "paraguay",
+   "name": "Paraguay",
+   "lname": "Paraguay",
+   "alt": [],
+   "iso2": "PY",
+   "iso3": "PRY",
+   "group": "South America",
+   "facts": {
+    "continent": "South America"
+   },
+   "blurb": "The national flag of Paraguay.",
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/2/27/Flag_of_Paraguay.svg/330px-Flag_of_Paraguay.svg.png",
+      "w": 330,
+      "h": 182,
+      "credit": "Republica del Paraguay",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Flag_of_Paraguay.svg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "peru",
+   "name": "Peru",
+   "lname": "Peru",
+   "alt": [],
+   "iso2": "PE",
+   "iso3": "PER",
+   "group": "South America",
+   "facts": {
+    "continent": "South America"
+   },
+   "blurb": "The national flag of Peru.",
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/cf/Flag_of_Peru.svg/330px-Flag_of_Peru.svg.png",
+      "w": 330,
+      "h": 220,
+      "credit": "David Benbennick",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Flag_of_Peru.svg"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "philippines",
+   "name": "Philippines",
+   "lname": "the Philippines",
+   "alt": [],
+   "iso2": "PH",
+   "iso3": "PHL",
+   "group": "Asia",
+   "facts": {
+    "continent": "Asia"
+   },
+   "blurb": "The national flag of Philippines.",
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/99/Flag_of_the_Philippines.svg/330px-Flag_of_the_Philippines.svg.png",
+      "w": 330,
+      "h": 165,
+      "credit": "See File history below for details.",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Flag_of_the_Philippines.svg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "poland",
+   "name": "Poland",
+   "lname": "Poland",
+   "alt": [],
+   "iso2": "PL",
+   "iso3": "POL",
+   "group": "Europe",
+   "facts": {
+    "continent": "Europe"
+   },
+   "blurb": "The national flag of Poland.",
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/1/12/Flag_of_Poland.svg/330px-Flag_of_Poland.svg.png",
+      "w": 330,
+      "h": 206,
+      "credit": "See below.",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Flag_of_Poland.svg"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "portugal",
+   "name": "Portugal",
+   "lname": "Portugal",
+   "alt": [],
+   "iso2": "PT",
+   "iso3": "PRT",
+   "group": "Europe",
+   "facts": {
+    "continent": "Europe"
+   },
+   "blurb": "The national flag of Portugal.",
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a8/Flag_of_Portugal_%28official%29.svg/330px-Flag_of_Portugal_%28official%29.svg.png",
+      "w": 330,
+      "h": 220,
+      "credit": "Original: Columbano Bordalo Pinheiro Vector: Vítor Luís Rodrigues, António Martins-Tuvá…",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Flag_of_Portugal_(official).svg"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "qatar",
+   "name": "Qatar",
+   "lname": "Qatar",
+   "alt": [],
+   "iso2": "QA",
+   "iso3": "QAT",
+   "group": "Asia",
+   "facts": {
+    "continent": "Asia"
+   },
+   "blurb": "The national flag of Qatar.",
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/6/65/Flag_of_Qatar.svg/330px-Flag_of_Qatar.svg.png",
+      "w": 330,
+      "h": 130,
+      "credit": "See File history below for details.",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Flag_of_Qatar.svg"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "romania",
+   "name": "Romania",
+   "lname": "Romania",
+   "alt": [],
+   "iso2": "RO",
+   "iso3": "ROU",
+   "group": "Europe",
+   "facts": {
+    "continent": "Europe"
+   },
+   "blurb": "The national flag of Romania.",
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/7/73/Flag_of_Romania.svg/330px-Flag_of_Romania.svg.png",
+      "w": 330,
+      "h": 220,
+      "credit": "AdiJapan",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Flag_of_Romania.svg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "russia",
+   "name": "Russia",
+   "lname": "Russia",
+   "alt": [
+    "Russian Federation"
+   ],
+   "iso2": "RU",
+   "iso3": "RUS",
+   "group": "Europe",
+   "facts": {
+    "continent": [
+     "Europe",
+     "Asia"
+    ]
+   },
+   "blurb": "The national flag of Russia.",
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f3/Flag_of_Russia.svg/330px-Flag_of_Russia.svg.png",
+      "w": 330,
+      "h": 220,
+      "credit": "Peter the Great",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Flag_of_Russia.svg"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "rwanda",
+   "name": "Rwanda",
+   "lname": "Rwanda",
+   "alt": [],
+   "iso2": "RW",
+   "iso3": "RWA",
+   "group": "Africa",
+   "facts": {
+    "continent": "Africa"
+   },
+   "blurb": "The national flag of Rwanda.",
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/1/17/Flag_of_Rwanda.svg/330px-Flag_of_Rwanda.svg.png",
+      "w": 330,
+      "h": 220,
+      "credit": "Original: Unknown Vector: Zscout370",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Flag_of_Rwanda.svg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "saint-kitts-and-nevis",
+   "name": "Saint Kitts and Nevis",
+   "lname": "Saint Kitts and Nevis",
+   "alt": [
+    "St Kitts and Nevis"
+   ],
+   "iso2": "KN",
+   "iso3": "KNA",
+   "group": "North America",
+   "facts": {
+    "continent": "North America"
+   },
+   "blurb": "The national flag of Saint Kitts and Nevis.",
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/f/fe/Flag_of_Saint_Kitts_and_Nevis.svg/330px-Flag_of_Saint_Kitts_and_Nevis.svg.png",
+      "w": 330,
+      "h": 220,
+      "credit": "Edrice Lewis",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Flag_of_Saint_Kitts_and_Nevis.svg"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "saint-lucia",
+   "name": "Saint Lucia",
+   "lname": "Saint Lucia",
+   "alt": [
+    "St Lucia"
+   ],
+   "iso2": "LC",
+   "iso3": "LCA",
+   "group": "North America",
+   "facts": {
+    "continent": "North America"
+   },
+   "blurb": "The national flag of Saint Lucia.",
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/9f/Flag_of_Saint_Lucia.svg/330px-Flag_of_Saint_Lucia.svg.png",
+      "w": 330,
+      "h": 165,
+      "credit": "Dunstan St Omer",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Flag_of_Saint_Lucia.svg"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "saint-vincent-and-the-grenadines",
+   "name": "Saint Vincent and the Grenadines",
+   "lname": "Saint Vincent and the Grenadines",
+   "alt": [
+    "St Vincent and the Grenadines"
+   ],
+   "iso2": "VC",
+   "iso3": "VCT",
+   "group": "North America",
+   "facts": {
+    "continent": "North America"
+   },
+   "blurb": "The national flag of Saint Vincent and the Grenadines.",
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/6/6d/Flag_of_Saint_Vincent_and_the_Grenadines.svg/330px-Flag_of_Saint_Vincent_and_the_Grenadines.svg.png",
+      "w": 330,
+      "h": 220,
+      "credit": "No machine-readable author provided. SKopp assumed (based on copyright claims).",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Flag_of_Saint_Vincent_and_the_Grenadines.svg"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "samoa",
+   "name": "Samoa",
+   "lname": "Samoa",
+   "alt": [],
+   "iso2": "WS",
+   "iso3": "WSM",
+   "group": "Oceania",
+   "facts": {
+    "continent": "Oceania"
+   },
+   "blurb": "The national flag of Samoa.",
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/3/31/Flag_of_Samoa.svg/330px-Flag_of_Samoa.svg.png",
+      "w": 330,
+      "h": 165,
+      "credit": "Original: Malietoa Tanumafili II and Tupua Tamasese Meaʻole Vector: See the file histor…",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Flag_of_Samoa.svg"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "san-marino",
+   "name": "San Marino",
+   "lname": "San Marino",
+   "alt": [],
+   "iso2": "SM",
+   "iso3": "SMR",
+   "group": "Europe",
+   "facts": {
+    "continent": "Europe"
+   },
+   "blurb": "The national flag of San Marino.",
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b1/Flag_of_San_Marino.svg/330px-Flag_of_San_Marino.svg.png",
+      "w": 330,
+      "h": 248,
+      "credit": "Zscout370",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Flag_of_San_Marino.svg"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "sao-tome-and-principe",
+   "name": "São Tomé and Príncipe",
+   "lname": "São Tomé and Príncipe",
+   "alt": [
+    "Sao Tome and Principe"
+   ],
+   "iso2": "ST",
+   "iso3": "STP",
+   "group": "Africa",
+   "facts": {
+    "continent": "Africa"
+   },
+   "blurb": "The national flag of São Tomé and Príncipe.",
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/0a/Flag_of_S%C3%A3o_Tom%C3%A9_and_Pr%C3%ADncipe.svg/330px-Flag_of_S%C3%A3o_Tom%C3%A9_and_Pr%C3%ADncipe.svg.png",
+      "w": 330,
+      "h": 165,
+      "credit": "See File history below for details.",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Flag_of_S%C3%A3o_Tom%C3%A9_and_Pr%C3%ADncipe.svg"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "saudi-arabia",
+   "name": "Saudi Arabia",
+   "lname": "Saudi Arabia",
+   "alt": [],
+   "iso2": "SA",
+   "iso3": "SAU",
+   "group": "Asia",
+   "facts": {
+    "continent": "Asia"
+   },
+   "blurb": "The national flag of Saudi Arabia.",
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/0d/Flag_of_Saudi_Arabia.svg/330px-Flag_of_Saudi_Arabia.svg.png",
+      "w": 330,
+      "h": 220,
+      "credit": "The Shura Council",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Flag_of_Saudi_Arabia.svg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "senegal",
+   "name": "Senegal",
+   "lname": "Senegal",
+   "alt": [],
+   "iso2": "SN",
+   "iso3": "SEN",
+   "group": "Africa",
+   "facts": {
+    "continent": "Africa"
+   },
+   "blurb": "The national flag of Senegal.",
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/f/fd/Flag_of_Senegal.svg/330px-Flag_of_Senegal.svg.png",
+      "w": 330,
+      "h": 220,
+      "credit": "Original upload by Nightstallion",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Flag_of_Senegal.svg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "serbia",
+   "name": "Serbia",
+   "lname": "Serbia",
+   "alt": [],
+   "iso2": "RS",
+   "iso3": "SRB",
+   "group": "Europe",
+   "facts": {
+    "continent": "Europe"
+   },
+   "blurb": "The national flag of Serbia.",
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/f/ff/Flag_of_Serbia.svg/330px-Flag_of_Serbia.svg.png",
+      "w": 330,
+      "h": 220,
+      "credit": "See File history below for details.",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Flag_of_Serbia.svg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "seychelles",
+   "name": "Seychelles",
+   "lname": "the Seychelles",
+   "alt": [],
+   "iso2": "SC",
+   "iso3": "SYC",
+   "group": "Africa",
+   "facts": {
+    "continent": "Africa"
+   },
+   "blurb": "The national flag of Seychelles.",
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/f/fc/Flag_of_Seychelles.svg/330px-Flag_of_Seychelles.svg.png",
+      "w": 330,
+      "h": 165,
+      "credit": "User:Vxb83",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Flag_of_Seychelles.svg"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "sierra-leone",
+   "name": "Sierra Leone",
+   "lname": "Sierra Leone",
+   "alt": [],
+   "iso2": "SL",
+   "iso3": "SLE",
+   "group": "Africa",
+   "facts": {
+    "continent": "Africa"
+   },
+   "blurb": "The national flag of Sierra Leone.",
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/1/17/Flag_of_Sierra_Leone.svg/330px-Flag_of_Sierra_Leone.svg.png",
+      "w": 330,
+      "h": 220,
+      "credit": "Zscout370",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Flag_of_Sierra_Leone.svg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "singapore",
+   "name": "Singapore",
+   "lname": "Singapore",
+   "alt": [],
+   "iso2": "SG",
+   "iso3": "SGP",
+   "group": "Asia",
+   "facts": {
+    "continent": "Asia"
+   },
+   "blurb": "The national flag of Singapore.",
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/4/48/Flag_of_Singapore.svg/330px-Flag_of_Singapore.svg.png",
+      "w": 330,
+      "h": 220,
+      "credit": "Original: Government of Singapore Vector: Zscout370",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Flag_of_Singapore.svg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "slovakia",
+   "name": "Slovakia",
+   "lname": "Slovakia",
+   "alt": [],
+   "iso2": "SK",
+   "iso3": "SVK",
+   "group": "Europe",
+   "facts": {
+    "continent": "Europe"
+   },
+   "blurb": "The national flag of Slovakia.",
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e6/Flag_of_Slovakia.svg/330px-Flag_of_Slovakia.svg.png",
+      "w": 330,
+      "h": 220,
+      "credit": "Original: Ladislav Čisárik and Ladislav Vrtel Vector: SKopp",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Flag_of_Slovakia.svg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "slovenia",
+   "name": "Slovenia",
+   "lname": "Slovenia",
+   "alt": [],
+   "iso2": "SI",
+   "iso3": "SVN",
+   "group": "Europe",
+   "facts": {
+    "continent": "Europe"
+   },
+   "blurb": "The national flag of Slovenia.",
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f0/Flag_of_Slovenia.svg/330px-Flag_of_Slovenia.svg.png",
+      "w": 330,
+      "h": 165,
+      "credit": "Original: Marko Pogačnik Vector: Achim1999",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Flag_of_Slovenia.svg"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "solomon-islands",
+   "name": "Solomon Islands",
+   "lname": "the Solomon Islands",
+   "alt": [],
+   "iso2": "SB",
+   "iso3": "SLB",
+   "group": "Oceania",
+   "facts": {
+    "continent": "Oceania"
+   },
+   "blurb": "The national flag of Solomon Islands.",
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/7/74/Flag_of_the_Solomon_Islands.svg/330px-Flag_of_the_Solomon_Islands.svg.png",
+      "w": 330,
+      "h": 165,
+      "credit": "User:SKopp",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Flag_of_the_Solomon_Islands.svg"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "somalia",
+   "name": "Somalia",
+   "lname": "Somalia",
+   "alt": [],
+   "iso2": "SO",
+   "iso3": "SOM",
+   "group": "Africa",
+   "facts": {
+    "continent": "Africa"
+   },
+   "blurb": "The national flag of Somalia.",
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a0/Flag_of_Somalia.svg/330px-Flag_of_Somalia.svg.png",
+      "w": 330,
+      "h": 220,
+      "credit": "see upload history",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Flag_of_Somalia.svg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "south-africa",
+   "name": "South Africa",
+   "lname": "South Africa",
+   "alt": [],
+   "iso2": "ZA",
+   "iso3": "ZAF",
+   "group": "Africa",
+   "facts": {
+    "continent": "Africa"
+   },
+   "blurb": "The national flag of South Africa.",
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/a/af/Flag_of_South_Africa.svg/330px-Flag_of_South_Africa.svg.png",
+      "w": 330,
+      "h": 220,
+      "credit": "Flag design by Frederick Brownell, image by Wikimedia Commons users",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Flag_of_South_Africa.svg"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "south-korea",
+   "name": "South Korea",
+   "lname": "South Korea",
+   "alt": [
+    "Republic of Korea"
+   ],
+   "iso2": "KR",
+   "iso3": "KOR",
+   "group": "Asia",
+   "facts": {
+    "continent": "Asia"
+   },
+   "blurb": "The national flag of South Korea.",
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/09/Flag_of_South_Korea.svg/330px-Flag_of_South_Korea.svg.png",
+      "w": 330,
+      "h": 220,
+      "credit": "Original: Government of the Republic of Korea Vector: Great Brightstar and others",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Flag_of_South_Korea.svg"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "south-sudan",
+   "name": "South Sudan",
+   "lname": "South Sudan",
+   "alt": [],
+   "iso2": "SS",
+   "iso3": "SSD",
+   "group": "Africa",
+   "facts": {
+    "continent": "Africa"
+   },
+   "blurb": "The national flag of South Sudan.",
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7a/Flag_of_South_Sudan.svg/330px-Flag_of_South_Sudan.svg.png",
+      "w": 330,
+      "h": 165,
+      "credit": "Achim1999",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Flag_of_South_Sudan.svg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "spain",
+   "name": "Spain",
+   "lname": "Spain",
+   "alt": [],
+   "iso2": "ES",
+   "iso3": "ESP",
+   "group": "Europe",
+   "facts": {
+    "continent": "Europe"
+   },
+   "blurb": "The national flag of Spain.",
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/9a/Flag_of_Spain.svg/330px-Flag_of_Spain.svg.png",
+      "w": 330,
+      "h": 220,
+      "credit": "RelShot 263, Echando una mano; earlier version was Pedro A. Gracia Fajardo, escudo de M…",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Flag_of_Spain.svg"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "sri-lanka",
+   "name": "Sri Lanka",
+   "lname": "Sri Lanka",
+   "alt": [],
+   "iso2": "LK",
+   "iso3": "LKA",
+   "group": "Asia",
+   "facts": {
+    "continent": "Asia"
+   },
+   "blurb": "The national flag of Sri Lanka.",
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/1/11/Flag_of_Sri_Lanka.svg/330px-Flag_of_Sri_Lanka.svg.png",
+      "w": 330,
+      "h": 165,
+      "credit": "Original: Sri Lanka Vectorization: Zscout370, Mike Rohsopht",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Flag_of_Sri_Lanka.svg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "sudan",
+   "name": "Sudan",
+   "lname": "Sudan",
+   "alt": [],
+   "iso2": "SD",
+   "iso3": "SDN",
+   "group": "Africa",
+   "facts": {
+    "continent": "Africa"
+   },
+   "blurb": "The national flag of Sudan.",
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/01/Flag_of_Sudan.svg/330px-Flag_of_Sudan.svg.png",
+      "w": 330,
+      "h": 165,
+      "credit": "See File history below for details.",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Flag_of_Sudan.svg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "suriname",
+   "name": "Suriname",
+   "lname": "Suriname",
+   "alt": [],
+   "iso2": "SR",
+   "iso3": "SUR",
+   "group": "South America",
+   "facts": {
+    "continent": "South America"
+   },
+   "blurb": "The national flag of Suriname.",
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/6/60/Flag_of_Suriname.svg/330px-Flag_of_Suriname.svg.png",
+      "w": 330,
+      "h": 220,
+      "credit": "See File history below for details.",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Flag_of_Suriname.svg"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "sweden",
+   "name": "Sweden",
+   "lname": "Sweden",
+   "alt": [],
+   "iso2": "SE",
+   "iso3": "SWE",
+   "group": "Europe",
+   "facts": {
+    "continent": "Europe"
+   },
+   "blurb": "The national flag of Sweden.",
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4c/Flag_of_Sweden.svg/330px-Flag_of_Sweden.svg.png",
+      "w": 330,
+      "h": 206,
+      "credit": "Jon Harald Søby and others.",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Flag_of_Sweden.svg"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "switzerland",
+   "name": "Switzerland",
+   "lname": "Switzerland",
+   "alt": [],
+   "iso2": "CH",
+   "iso3": "CHE",
+   "group": "Europe",
+   "facts": {
+    "continent": "Europe"
+   },
+   "blurb": "The national flag of Switzerland.",
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f3/Flag_of_Switzerland.svg/330px-Flag_of_Switzerland.svg.png",
+      "w": 330,
+      "h": 330,
+      "credit": "Original: Unknown Vector: User:Marc Mongenet Credits: User:-xfi- User:Zscout370",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Flag_of_Switzerland.svg"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "syria",
+   "name": "Syria",
+   "lname": "Syria",
+   "alt": [],
+   "iso2": "SY",
+   "iso3": "SYR",
+   "group": "Asia",
+   "facts": {
+    "continent": "Asia"
+   },
+   "blurb": "The national flag of Syria.",
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/5/54/Flag_of_Syria_%282025-%29.svg/330px-Flag_of_Syria_%282025-%29.svg.png",
+      "w": 330,
+      "h": 220,
+      "credit": "Modification by AnonMoos of PD image File:Flag of Syria (1930–1958, 1961–1963).svg (pre…",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Flag_of_Syria_(2025-).svg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "tajikistan",
+   "name": "Tajikistan",
+   "lname": "Tajikistan",
+   "alt": [],
+   "iso2": "TJ",
+   "iso3": "TJK",
+   "group": "Asia",
+   "facts": {
+    "continent": "Asia"
+   },
+   "blurb": "The national flag of Tajikistan.",
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d0/Flag_of_Tajikistan.svg/330px-Flag_of_Tajikistan.svg.png",
+      "w": 330,
+      "h": 165,
+      "credit": "Unknown authorUnknown author",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Flag_of_Tajikistan.svg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "tanzania",
+   "name": "Tanzania",
+   "lname": "Tanzania",
+   "alt": [],
+   "iso2": "TZ",
+   "iso3": "TZA",
+   "group": "Africa",
+   "facts": {
+    "continent": "Africa"
+   },
+   "blurb": "The national flag of Tanzania.",
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/3/38/Flag_of_Tanzania.svg/330px-Flag_of_Tanzania.svg.png",
+      "w": 330,
+      "h": 220,
+      "credit": "Unknown",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Flag_of_Tanzania.svg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "thailand",
+   "name": "Thailand",
+   "lname": "Thailand",
+   "alt": [],
+   "iso2": "TH",
+   "iso3": "THA",
+   "group": "Asia",
+   "facts": {
+    "continent": "Asia"
+   },
+   "blurb": "The national flag of Thailand.",
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a9/Flag_of_Thailand.svg/330px-Flag_of_Thailand.svg.png",
+      "w": 330,
+      "h": 220,
+      "credit": "Zscout370",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Flag_of_Thailand.svg"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "timor-leste",
+   "name": "Timor-Leste",
+   "lname": "Timor-Leste",
+   "alt": [
+    "East Timor"
+   ],
+   "iso2": "TL",
+   "iso3": "TLS",
+   "group": "Asia",
+   "facts": {
+    "continent": [
+     "Asia",
+     "Oceania"
+    ]
+   },
+   "blurb": "The national flag of Timor-Leste.",
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/2/26/Flag_of_East_Timor.svg/330px-Flag_of_East_Timor.svg.png",
+      "w": 330,
+      "h": 165,
+      "credit": "See File history, below, for details.",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Flag_of_East_Timor.svg"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "togo",
+   "name": "Togo",
+   "lname": "Togo",
+   "alt": [],
+   "iso2": "TG",
+   "iso3": "TGO",
+   "group": "Africa",
+   "facts": {
+    "continent": "Africa"
+   },
+   "blurb": "The national flag of Togo.",
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7a/Flag_of_Togo_%283-2%29.svg/330px-Flag_of_Togo_%283-2%29.svg.png",
+      "w": 330,
+      "h": 220,
+      "credit": "Sangjinhwa",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Flag_of_Togo_(3-2).svg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "tonga",
+   "name": "Tonga",
+   "lname": "Tonga",
+   "alt": [],
+   "iso2": "TO",
+   "iso3": "TON",
+   "group": "Oceania",
+   "facts": {
+    "continent": "Oceania"
+   },
+   "blurb": "The national flag of Tonga.",
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/9a/Flag_of_Tonga.svg/330px-Flag_of_Tonga.svg.png",
+      "w": 330,
+      "h": 165,
+      "credit": "Uelingatoni Ngu Tupoumalohi",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Flag_of_Tonga.svg"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "trinidad-and-tobago",
+   "name": "Trinidad and Tobago",
+   "lname": "Trinidad and Tobago",
+   "alt": [
+    "Trinidad"
+   ],
+   "iso2": "TT",
+   "iso3": "TTO",
+   "group": "North America",
+   "facts": {
+    "continent": [
+     "North America",
+     "South America"
+    ]
+   },
+   "blurb": "The national flag of Trinidad and Tobago.",
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/6/64/Flag_of_Trinidad_and_Tobago.svg/330px-Flag_of_Trinidad_and_Tobago.svg.png",
+      "w": 330,
+      "h": 198,
+      "credit": "See File history, below, for details.",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Flag_of_Trinidad_and_Tobago.svg"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "tunisia",
+   "name": "Tunisia",
+   "lname": "Tunisia",
+   "alt": [],
+   "iso2": "TN",
+   "iso3": "TUN",
+   "group": "Africa",
+   "facts": {
+    "continent": "Africa"
+   },
+   "blurb": "The national flag of Tunisia.",
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/ce/Flag_of_Tunisia.svg/330px-Flag_of_Tunisia.svg.png",
+      "w": 330,
+      "h": 220,
+      "credit": "Various Wikimedia Commons' contributors",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Flag_of_Tunisia.svg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "turkey",
+   "name": "Turkey",
+   "lname": "Turkey",
+   "alt": [
+    "Türkiye"
+   ],
+   "iso2": "TR",
+   "iso3": "TUR",
+   "group": "Asia",
+   "facts": {
+    "continent": [
+     "Asia",
+     "Europe"
+    ]
+   },
+   "blurb": "The national flag of Turkey.",
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b4/Flag_of_Turkey.svg/330px-Flag_of_Turkey.svg.png",
+      "w": 330,
+      "h": 220,
+      "credit": "David Benbennick (original author)",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Flag_of_Turkey.svg"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "turkmenistan",
+   "name": "Turkmenistan",
+   "lname": "Turkmenistan",
+   "alt": [],
+   "iso2": "TM",
+   "iso3": "TKM",
+   "group": "Asia",
+   "facts": {
+    "continent": "Asia"
+   },
+   "blurb": "The national flag of Turkmenistan.",
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/1/1b/Flag_of_Turkmenistan.svg/330px-Flag_of_Turkmenistan.svg.png",
+      "w": 330,
+      "h": 220,
+      "credit": "Unknown",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Flag_of_Turkmenistan.svg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "tuvalu",
+   "name": "Tuvalu",
+   "lname": "Tuvalu",
+   "alt": [],
+   "iso2": "TV",
+   "iso3": "TUV",
+   "group": "Oceania",
+   "facts": {
+    "continent": "Oceania"
+   },
+   "blurb": "The national flag of Tuvalu.",
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/3/38/Flag_of_Tuvalu.svg/330px-Flag_of_Tuvalu.svg.png",
+      "w": 330,
+      "h": 165,
+      "credit": "Unknown authorUnknown author",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Flag_of_Tuvalu.svg"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "uganda",
+   "name": "Uganda",
+   "lname": "Uganda",
+   "alt": [],
+   "iso2": "UG",
+   "iso3": "UGA",
+   "group": "Africa",
+   "facts": {
+    "continent": "Africa"
+   },
+   "blurb": "The national flag of Uganda.",
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4e/Flag_of_Uganda.svg/330px-Flag_of_Uganda.svg.png",
+      "w": 330,
+      "h": 220,
+      "credit": "tobias",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Flag_of_Uganda.svg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "ukraine",
+   "name": "Ukraine",
+   "lname": "Ukraine",
+   "alt": [],
+   "iso2": "UA",
+   "iso3": "UKR",
+   "group": "Europe",
+   "facts": {
+    "continent": "Europe"
+   },
+   "blurb": "The national flag of Ukraine.",
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/4/49/Flag_of_Ukraine.svg/330px-Flag_of_Ukraine.svg.png",
+      "w": 330,
+      "h": 220,
+      "credit": "Government of Ukraine",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Flag_of_Ukraine.svg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "united-arab-emirates",
+   "name": "United Arab Emirates",
+   "lname": "the United Arab Emirates",
+   "alt": [
+    "UAE"
+   ],
+   "iso2": "AE",
+   "iso3": "ARE",
+   "group": "Asia",
+   "facts": {
+    "continent": "Asia"
+   },
+   "blurb": "The national flag of United Arab Emirates.",
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/cb/Flag_of_the_United_Arab_Emirates.svg/330px-Flag_of_the_United_Arab_Emirates.svg.png",
+      "w": 330,
+      "h": 165,
+      "credit": "Abdulla Mohammed Al Maainah",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Flag_of_the_United_Arab_Emirates.svg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "united-kingdom",
+   "name": "United Kingdom",
+   "lname": "the United Kingdom",
+   "alt": [
+    "UK",
+    "Britain",
+    "Great Britain"
+   ],
+   "iso2": "GB",
+   "iso3": "GBR",
+   "group": "Europe",
+   "facts": {
+    "continent": "Europe"
+   },
+   "blurb": "The national flag of United Kingdom.",
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/83/Flag_of_the_United_Kingdom_%283-5%29.svg/330px-Flag_of_the_United_Kingdom_%283-5%29.svg.png",
+      "w": 330,
+      "h": 198,
+      "credit": "Original: Acts of Union 1800 Vector: Yaddah",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Flag_of_the_United_Kingdom_(3-5).svg"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "united-states",
+   "name": "United States",
+   "lname": "the United States",
+   "alt": [
+    "USA",
+    "United States of America",
+    "America",
+    "US"
+   ],
+   "iso2": "US",
+   "iso3": "USA",
+   "group": "North America",
+   "facts": {
+    "continent": "North America"
+   },
+   "blurb": "The national flag of United States.",
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/96/Flag_of_the_United_States_%28DDD-F-416E_specifications%29.svg/330px-Flag_of_the_United_States_%28DDD-F-416E_specifications%29.svg.png",
+      "w": 330,
+      "h": 174,
+      "credit": "Vector file created by Dbenbenn, Zscout370, Jacobolus, Indolences, and Technion.",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Flag_of_the_United_States_(DDD-F-416E_specifications).svg"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "uruguay",
+   "name": "Uruguay",
+   "lname": "Uruguay",
+   "alt": [],
+   "iso2": "UY",
+   "iso3": "URY",
+   "group": "South America",
+   "facts": {
+    "continent": "South America"
+   },
+   "blurb": "The national flag of Uruguay.",
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/f/fe/Flag_of_Uruguay.svg/330px-Flag_of_Uruguay.svg.png",
+      "w": 330,
+      "h": 220,
+      "credit": "See File history below for details.",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Flag_of_Uruguay.svg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "uzbekistan",
+   "name": "Uzbekistan",
+   "lname": "Uzbekistan",
+   "alt": [],
+   "iso2": "UZ",
+   "iso3": "UZB",
+   "group": "Asia",
+   "facts": {
+    "continent": "Asia"
+   },
+   "blurb": "The national flag of Uzbekistan.",
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/84/Flag_of_Uzbekistan.svg/330px-Flag_of_Uzbekistan.svg.png",
+      "w": 330,
+      "h": 165,
+      "credit": "Farhod Yoʻldoshev",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Flag_of_Uzbekistan.svg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "vanuatu",
+   "name": "Vanuatu",
+   "lname": "Vanuatu",
+   "alt": [],
+   "iso2": "VU",
+   "iso3": "VUT",
+   "group": "Oceania",
+   "facts": {
+    "continent": "Oceania"
+   },
+   "blurb": "The national flag of Vanuatu.",
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/b/bc/Flag_of_Vanuatu.svg/330px-Flag_of_Vanuatu.svg.png",
+      "w": 330,
+      "h": 198,
+      "credit": "Kalontas Mahlon",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Flag_of_Vanuatu.svg"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "vatican-city",
+   "name": "Vatican City",
+   "lname": "Vatican City",
+   "alt": [
+    "Holy See",
+    "Vatican"
+   ],
+   "iso2": "VA",
+   "iso3": "VAT",
+   "group": "Europe",
+   "facts": {
+    "continent": "Europe"
+   },
+   "blurb": "The national flag of Vatican City.",
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b3/Flag_of_Vatican_City_%282023%E2%80%93present%29.svg/330px-Flag_of_Vatican_City_%282023%E2%80%93present%29.svg.png",
+      "w": 330,
+      "h": 330,
+      "credit": "Goran_tek-en",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Flag_of_Vatican_City_(2023%E2%80%93present).svg"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "venezuela",
+   "name": "Venezuela",
+   "lname": "Venezuela",
+   "alt": [],
+   "iso2": "VE",
+   "iso3": "VEN",
+   "group": "South America",
+   "facts": {
+    "continent": "South America"
+   },
+   "blurb": "The national flag of Venezuela.",
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/06/Flag_of_Venezuela.svg/330px-Flag_of_Venezuela.svg.png",
+      "w": 330,
+      "h": 220,
+      "credit": "Various, see File history below for details.",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Flag_of_Venezuela.svg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "vietnam",
+   "name": "Vietnam",
+   "lname": "Vietnam",
+   "alt": [
+    "Viet Nam"
+   ],
+   "iso2": "VN",
+   "iso3": "VNM",
+   "group": "Asia",
+   "facts": {
+    "continent": "Asia"
+   },
+   "blurb": "The national flag of Vietnam.",
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/2/21/Flag_of_Vietnam.svg/330px-Flag_of_Vietnam.svg.png",
+      "w": 330,
+      "h": 220,
+      "credit": "See File history below for details.",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Flag_of_Vietnam.svg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "yemen",
+   "name": "Yemen",
+   "lname": "Yemen",
+   "alt": [],
+   "iso2": "YE",
+   "iso3": "YEM",
+   "group": "Asia",
+   "facts": {
+    "continent": "Asia"
+   },
+   "blurb": "The national flag of Yemen.",
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/89/Flag_of_Yemen.svg/330px-Flag_of_Yemen.svg.png",
+      "w": 330,
+      "h": 220,
+      "credit": "Nightstallion et al., see File history below for details.",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Flag_of_Yemen.svg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "zambia",
+   "name": "Zambia",
+   "lname": "Zambia",
+   "alt": [],
+   "iso2": "ZM",
+   "iso3": "ZMB",
+   "group": "Africa",
+   "facts": {
+    "continent": "Africa"
+   },
+   "blurb": "The national flag of Zambia.",
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/06/Flag_of_Zambia.svg/330px-Flag_of_Zambia.svg.png",
+      "w": 330,
+      "h": 220,
+      "credit": "Gabriel Ellison",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Flag_of_Zambia.svg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "zimbabwe",
+   "name": "Zimbabwe",
+   "lname": "Zimbabwe",
+   "alt": [],
+   "iso2": "ZW",
+   "iso3": "ZWE",
+   "group": "Africa",
+   "facts": {
+    "continent": "Africa"
+   },
+   "blurb": "The national flag of Zimbabwe.",
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/6/6a/Flag_of_Zimbabwe.svg/330px-Flag_of_Zimbabwe.svg.png",
+      "w": 330,
+      "h": 165,
+      "credit": "See File history below for details.",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Flag_of_Zimbabwe.svg"
+     }
+    ]
+   },
+   "difficulty": 2
+  }
+ ],
+ "questions": [
+  {
+   "id": "f-nepal",
+   "kind": "mc",
+   "prompt": "Which country has a national flag that is not a rectangle?",
+   "answer": "Nepal",
+   "wrong": [
+    "Bhutan",
+    "Switzerland",
+    "Qatar"
+   ],
+   "explain": "Nepal's flag is two stacked pennants.",
+   "difficulty": 2
+  },
+  {
+   "id": "f-square",
+   "kind": "mc",
+   "prompt": "Which two countries have square national flags?",
+   "answer": "Switzerland and Vatican City",
+   "wrong": [
+    "Denmark and Norway",
+    "Japan and South Korea",
+    "Austria and Monaco"
+   ],
+   "explain": "Switzerland and Vatican City both use square flags.",
+   "difficulty": 2
+  },
+  {
+   "id": "f-dannebrog",
+   "kind": "mc",
+   "prompt": "Which country has the oldest national flag still in continuous use, according to tradition?",
+   "answer": "Denmark",
+   "wrong": [
+    "Scotland",
+    "Austria",
+    "Netherlands"
+   ],
+   "explain": "The Danish Dannebrog is traditionally dated to 1219.",
+   "difficulty": 3
+  },
+  {
+   "id": "f-maple",
+   "kind": "mc",
+   "prompt": "Which country has a red maple leaf on its flag?",
+   "answer": "Canada",
+   "wrong": [
+    "Lebanon",
+    "Japan",
+    "Switzerland"
+   ],
+   "explain": "The maple leaf flag was adopted in 1965.",
+   "difficulty": 1
+  },
+  {
+   "id": "f-cedar",
+   "kind": "mc",
+   "prompt": "Which country has a green cedar tree on its flag?",
+   "answer": "Lebanon",
+   "wrong": [
+    "Canada",
+    "Cyprus",
+    "Israel"
+   ],
+   "explain": "The Lebanon cedar is the national emblem.",
+   "difficulty": 2
+  },
+  {
+   "id": "f-ak47",
+   "kind": "mc",
+   "prompt": "Which country has an AK-47 rifle on its flag?",
+   "answer": "Mozambique",
+   "wrong": [
+    "Angola",
+    "Zimbabwe",
+    "Eritrea"
+   ],
+   "explain": "Mozambique's flag shows a rifle, a hoe and a book.",
+   "difficulty": 3
+  },
+  {
+   "id": "f-cyprus",
+   "kind": "mc",
+   "prompt": "Which country shows a map of itself on its flag?",
+   "answer": "Cyprus",
+   "wrong": [
+    "Malta",
+    "Iceland",
+    "Sri Lanka"
+   ],
+   "explain": "The flag of Cyprus shows the island in copper-orange.",
+   "difficulty": 2
+  },
+  {
+   "id": "f-stars-us",
+   "kind": "mc",
+   "prompt": "How many stars are on the flag of the United States?",
+   "answer": "50",
+   "wrong": [
+    "48",
+    "52",
+    "13"
+   ],
+   "explain": "One star for each state; the 13 stripes are the original colonies.",
+   "difficulty": 1
+  },
+  {
+   "id": "f-stripes-us",
+   "kind": "mc",
+   "prompt": "How many stripes are on the flag of the United States?",
+   "answer": "13",
+   "wrong": [
+    "50",
+    "7",
+    "12"
+   ],
+   "explain": "The 13 stripes stand for the original colonies.",
+   "difficulty": 2
+  },
+  {
+   "id": "f-wheel",
+   "kind": "mc",
+   "prompt": "Which country has a 24-spoke wheel in the centre of its flag?",
+   "answer": "India",
+   "wrong": [
+    "Sri Lanka",
+    "Bangladesh",
+    "Nepal"
+   ],
+   "explain": "The Ashoka Chakra sits on the white band.",
+   "difficulty": 2
+  },
+  {
+   "id": "f-dragon-bt",
+   "kind": "mc",
+   "prompt": "Which country has a white dragon on its flag?",
+   "answer": "Bhutan",
+   "wrong": [
+    "Wales",
+    "China",
+    "Malta"
+   ],
+   "explain": "The Druk, or thunder dragon, appears on Bhutan's flag.",
+   "difficulty": 2
+  },
+  {
+   "id": "f-sun-jp",
+   "kind": "mc",
+   "prompt": "Which country’s flag is a red disc on a white background?",
+   "answer": "Japan",
+   "wrong": [
+    "Bangladesh",
+    "Palau",
+    "South Korea"
+   ],
+   "explain": "The Hinomaru represents the sun.",
+   "difficulty": 1
+  },
+  {
+   "id": "f-bd",
+   "kind": "mc",
+   "prompt": "Which country’s flag is a red disc on a green background?",
+   "answer": "Bangladesh",
+   "wrong": [
+    "Japan",
+    "Palau",
+    "Pakistan"
+   ],
+   "explain": "The disc is slightly off-centre towards the hoist.",
+   "difficulty": 2
+  },
+  {
+   "id": "f-union",
+   "kind": "mc",
+   "prompt": "The Union Jack appears in the corner of the flag of which of these countries?",
+   "answer": "Australia",
+   "wrong": [
+    "Canada",
+    "Ireland",
+    "South Africa"
+   ],
+   "explain": "Australia, New Zealand, Fiji and Tuvalu all carry it.",
+   "difficulty": 1
+  },
+  {
+   "id": "f-tricolour-ie",
+   "kind": "mc",
+   "prompt": "Which country’s flag is a green, white and orange vertical tricolour?",
+   "answer": "Ireland",
+   "wrong": [
+    "Italy",
+    "Ivory Coast",
+    "India"
+   ],
+   "explain": "Ivory Coast uses the same colours in the opposite order.",
+   "difficulty": 2
+  },
+  {
+   "id": "f-ci",
+   "kind": "mc",
+   "prompt": "Which country’s flag is an orange, white and green vertical tricolour?",
+   "answer": "Ivory Coast",
+   "wrong": [
+    "Ireland",
+    "Niger",
+    "India"
+   ],
+   "explain": "It is the mirror image of the Irish flag.",
+   "difficulty": 3
+  },
+  {
+   "id": "f-saltire",
+   "kind": "mc",
+   "prompt": "Which country’s flag is a white diagonal cross on a blue field?",
+   "answer": "Scotland",
+   "wrong": [
+    "Finland",
+    "Greece",
+    "Jamaica"
+   ],
+   "explain": "The Saltire is St Andrew's cross.",
+   "difficulty": 2
+  },
+  {
+   "id": "f-jm",
+   "kind": "mc",
+   "prompt": "Which country’s flag has a gold diagonal cross with green and black triangles?",
+   "answer": "Jamaica",
+   "wrong": [
+    "Ghana",
+    "Brazil",
+    "Grenada"
+   ],
+   "explain": "Jamaica's flag was adopted in 1962.",
+   "difficulty": 2
+  },
+  {
+   "id": "f-br",
+   "kind": "mc",
+   "prompt": "Which country’s flag shows a blue globe of stars on a yellow diamond?",
+   "answer": "Brazil",
+   "wrong": [
+    "Argentina",
+    "Colombia",
+    "Rwanda"
+   ],
+   "explain": "The night sky over Rio on 15 November 1889 is shown.",
+   "difficulty": 1
+  },
+  {
+   "id": "f-ko",
+   "kind": "mc",
+   "prompt": "Which country’s flag has a red and blue yin-yang symbol and four black trigrams?",
+   "answer": "South Korea",
+   "wrong": [
+    "North Korea",
+    "Mongolia",
+    "Japan"
+   ],
+   "explain": "The flag is called the Taegukgi.",
+   "difficulty": 2
+  },
+  {
+   "id": "f-ca-leaf",
+   "kind": "mc",
+   "prompt": "What is the central symbol on the flag of Argentina?",
+   "answer": "A sun with a face",
+   "wrong": [
+    "A star",
+    "An eagle",
+    "A condor"
+   ],
+   "explain": "The Sun of May.",
+   "difficulty": 2
+  },
+  {
+   "id": "f-mx",
+   "kind": "mc",
+   "prompt": "What does the eagle on the flag of Mexico hold in its beak?",
+   "answer": "A snake",
+   "wrong": [
+    "A fish",
+    "An olive branch",
+    "Arrows"
+   ],
+   "explain": "It stands on a cactus, from the Aztec founding legend.",
+   "difficulty": 2
+  },
+  {
+   "id": "f-kh",
+   "kind": "mc",
+   "prompt": "Which country’s flag shows a temple?",
+   "answer": "Cambodia",
+   "wrong": [
+    "Thailand",
+    "Myanmar",
+    "Laos"
+   ],
+   "explain": "Angkor Wat appears on the flag.",
+   "difficulty": 2
+  },
+  {
+   "id": "f-ki",
+   "kind": "mc",
+   "prompt": "Which country’s flag shows a frigatebird flying over a rising sun?",
+   "answer": "Kiribati",
+   "wrong": [
+    "Papua New Guinea",
+    "Fiji",
+    "Dominica"
+   ],
+   "explain": "The waves below stand for the Pacific Ocean.",
+   "difficulty": 3
+  },
+  {
+   "id": "f-dm",
+   "kind": "mc",
+   "prompt": "Which country’s flag shows a parrot?",
+   "answer": "Dominica",
+   "wrong": [
+    "Kiribati",
+    "Grenada",
+    "Saint Lucia"
+   ],
+   "explain": "The sisserou parrot is the national bird.",
+   "difficulty": 3
+  },
+  {
+   "id": "f-tf-ch",
+   "kind": "tf",
+   "prompt": "The flags of Switzerland and Denmark both show a white cross on red.",
+   "answer": true,
+   "explain": "Switzerland has a square flag with a centred cross; Denmark has a rectangle with an off-centre cross.",
+   "difficulty": 2
+  },
+  {
+   "id": "f-tf-libya",
+   "kind": "tf",
+   "prompt": "The flag of Libya has been a plain green field since 2011.",
+   "answer": false,
+   "explain": "The plain green flag was used from 1977 to 2011; Libya now uses a red, black and green flag with a crescent and star.",
+   "difficulty": 3
+  },
+  {
+   "id": "f-tf-nordic",
+   "kind": "tf",
+   "prompt": "The flag of Finland has a blue cross on a white background.",
+   "answer": true,
+   "explain": "It is a Nordic cross flag.",
+   "difficulty": 2
+  },
+  {
+   "id": "f-tf-ru",
+   "kind": "tf",
+   "prompt": "The flag of Russia has horizontal stripes of white, blue and red.",
+   "answer": true,
+   "explain": "White on top, blue in the middle, red at the bottom.",
+   "difficulty": 2
+  },
+  {
+   "id": "f-tf-de",
+   "kind": "tf",
+   "prompt": "The flag of Germany has red at the top.",
+   "answer": false,
+   "explain": "From top: black, red, gold.",
+   "difficulty": 1
+  },
+  {
+   "id": "f-tf-it",
+   "kind": "tf",
+   "prompt": "The flag of Italy is a green, white and red vertical tricolour.",
+   "answer": true,
+   "explain": "Green at the hoist, then white, then red.",
+   "difficulty": 1
+  },
+  {
+   "id": "f-tf-gr",
+   "kind": "tf",
+   "prompt": "The flag of Greece has nine blue and white stripes.",
+   "answer": true,
+   "explain": "They are often said to stand for the syllables of the motto \"Freedom or Death\".",
+   "difficulty": 3
+  }
+ ],
+ "sources": [
+  {
+   "name": "Wikimedia Commons national flags",
+   "url": "https://commons.wikimedia.org/wiki/Category:SVG_flags_by_country"
+  }
+ ]
+}

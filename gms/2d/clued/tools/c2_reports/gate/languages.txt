@@ -1,0 +1,17 @@
+languages/swedish: dropped clue leaking "swed": It is a main language of Finland and Sweden.
+languages/italian: dropped clue leaking "ital": It is a main language of Italy, San Marino and Switzerland.
+languages/romanian: only 4 clean clues -> no ladder
+languages/russian: dropped clue leaking "russ": Its speakers call it "russkiy" (romanised).
+languages/slovak: dropped clue leaking "slov": Its speakers call it "slovenčina".
+languages/greek: dropped clue leaking "gree": It is a main language of Cyprus and Greece.
+languages/armenian: only 4 clean clues -> no ladder
+languages/maltese: dropped clue leaking "malt": Its speakers call it "Malti".
+languages/maltese: dropped clue leaking "malt": It is a main language of Malta.
+languages/turkish: dropped clue leaking "turk": Its speakers call it "Türkçe".
+languages/turkish: dropped clue leaking "turk": It is a main language of Cyprus and Turkey.
+languages/turkish: only 4 clean clues -> no ladder
+languages/mandarin-chinese: dropped clue leaking "chin": It is a main language of China and Singapore.
+languages/thai: only 4 clean clues -> no ladder
+languages/lao: only 4 clean clues -> no ladder
+languages/khmer: only 4 clean clues -> no ladder
+languages/mongolian: only 4 clean clues -> no ladder

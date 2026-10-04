@@ -1,0 +1,1669 @@
+{
+ "id": "hits-1990s",
+ "title": "Hits of the 1990s",
+ "theme": "music",
+ "icon": "💿",
+ "kids": false,
+ "version": 1,
+ "notice": "30-second previews stream from Apple Music.",
+ "factsMeta": {
+  "artist": {
+   "type": "cat",
+   "label": "Artist"
+  },
+  "year": {
+   "type": "year",
+   "label": "Released",
+   "higherLabel": "Newer"
+  },
+  "decade": {
+   "type": "cat",
+   "label": "Decade"
+  }
+ },
+ "items": [
+  {
+   "id": "hold-on-wilson-phillips",
+   "name": "Hold On",
+   "group": "1990s",
+   "facts": {
+    "artist": "Wilson Phillips",
+    "year": 1990,
+    "decade": "1990s"
+   },
+   "blurb": "\"Hold On\" by Wilson Phillips, released in 1990.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/d7/2f/60/d72f604f-bc19-2c5d-686e-2ce2876b6ae1/mzaf_6171953782431728191.plus.aac.p.m4a",
+      "credit": "Wilson Phillips: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/hold-on/723895185?i=723895262&uo=4",
+      "apple": {
+       "trackId": 723895262,
+       "url": "https://music.apple.com/us/album/hold-on/723895185?i=723895262&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music122/v4/56/aa/52/56aa52d0-e99b-c2fb-1bad-3403aea633f4/13UABIM53393.rgb.jpg/300x300bb.jpg",
+       "term": "Wilson Phillips Hold On"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "nothing-compares-2-u-sinead-oconnor",
+   "name": "Nothing Compares 2 U",
+   "group": "1990s",
+   "facts": {
+    "artist": "Sinéad O'Connor",
+    "year": 1990,
+    "decade": "1990s"
+   },
+   "blurb": "\"Nothing Compares 2 U\" by Sinéad O'Connor, released in 1990.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/1f/ea/d0/1fead06e-6edf-4415-61a9-f1a2cd7bd4aa/mzaf_8555394426401719010.plus.aac.p.m4a",
+      "credit": "Sinéad O'Connor: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/nothing-compares-2-u/1629185300?i=1629185307&uo=4",
+      "apple": {
+       "trackId": 1629185307,
+       "url": "https://music.apple.com/us/album/nothing-compares-2-u/1629185300?i=1629185307&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/fa/19/3f/fa193fc7-f9cf-c84e-c7ef-77b2fceb3a3e/5054526647565.png/300x300bb.jpg",
+       "term": "Sinéad O'Connor Nothing Compares 2 U"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "vogue-madonna",
+   "name": "Vogue",
+   "group": "1990s",
+   "facts": {
+    "artist": "Madonna",
+    "year": 1990,
+    "decade": "1990s"
+   },
+   "blurb": "\"Vogue\" by Madonna, released in 1990.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/53/b2/ee/53b2ee92-354a-e3e2-e23c-a4c95a26206c/mzaf_18177219075819280580.plus.aac.p.m4a",
+      "credit": "Madonna: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/vogue-edit-version/83371916?i=83371738&uo=4",
+      "apple": {
+       "trackId": 83371738,
+       "url": "https://music.apple.com/us/album/vogue-edit-version/83371916?i=83371738&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/9a/c1/fd/9ac1fdc9-bc47-2ed9-f84a-a272caf5a6cf/mzi.rybubacs.jpg/300x300bb.jpg",
+       "term": "Madonna Vogue"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "vision-of-love-mariah-carey",
+   "name": "Vision of Love",
+   "group": "1990s",
+   "facts": {
+    "artist": "Mariah Carey",
+    "year": 1990,
+    "decade": "1990s"
+   },
+   "blurb": "\"Vision of Love\" by Mariah Carey, released in 1990.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/b2/80/dd/b280ddcf-a4af-8381-4a9f-87c4145578e2/mzaf_12053898083777309824.plus.aac.p.m4a",
+      "credit": "Mariah Carey: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/vision-of-love/169605890?i=169605940&uo=4",
+      "apple": {
+       "trackId": 169605940,
+       "url": "https://music.apple.com/us/album/vision-of-love/169605890?i=169605940&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/58/5c/bc/585cbcc5-efca-dd51-c8dc-69e44f01b27f/mzi.xgrszxsu.jpg/300x300bb.jpg",
+       "term": "Mariah Carey Vision of Love"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "u-cant-touch-this-mc-hammer",
+   "name": "U Can't Touch This",
+   "group": "1990s",
+   "facts": {
+    "artist": "MC Hammer",
+    "year": 1990,
+    "decade": "1990s"
+   },
+   "blurb": "\"U Can't Touch This\" by MC Hammer, released in 1990.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/1d/96/9d/1d969d6a-f800-e343-ce9c-60b9b2087299/mzaf_14173052132822020241.plus.aac.p.m4a",
+      "credit": "MC Hammer: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/u-cant-touch-this/724314907?i=724315201&uo=4",
+      "apple": {
+       "trackId": 724315201,
+       "url": "https://music.apple.com/us/album/u-cant-touch-this/724314907?i=724315201&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music112/v4/88/3d/74/883d74ea-aa53-99d8-e00c-f38fbba93d1d/13UABIM56742.rgb.jpg/300x300bb.jpg",
+       "term": "MC Hammer U Can't Touch This"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "ice-ice-baby-vanilla-ice",
+   "name": "Ice Ice Baby",
+   "group": "1990s",
+   "facts": {
+    "artist": "Vanilla Ice",
+    "year": 1990,
+    "decade": "1990s"
+   },
+   "blurb": "\"Ice Ice Baby\" by Vanilla Ice, released in 1990.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/2d/e2/7c/2de27ce7-0673-f8e0-30e7-c79084ea5a11/mzaf_9504996243608700414.plus.aac.p.m4a",
+      "credit": "Vanilla Ice: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/ice-ice-baby/716691386?i=716691562&uo=4",
+      "apple": {
+       "trackId": 716691562,
+       "url": "https://music.apple.com/us/album/ice-ice-baby/716691386?i=716691562&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/a1/6f/fb/a16ffb26-747f-5509-1233-2e472c293a89/13UABIM50850.rgb.jpg/300x300bb.jpg",
+       "term": "Vanilla Ice Ice Ice Baby"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "groove-is-in-the-heart-deee-lite",
+   "name": "Groove Is in the Heart",
+   "group": "1990s",
+   "facts": {
+    "artist": "Deee-Lite",
+    "year": 1990,
+    "decade": "1990s"
+   },
+   "blurb": "\"Groove Is in the Heart\" by Deee-Lite, released in 1990.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/f3/3e/76/f33e769d-13c9-f31d-706d-1d419779ce2a/mzaf_5305677381400026069.plus.aac.p.m4a",
+      "credit": "Deee-Lite: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/groove-is-in-the-heart/72784411?i=72784339&uo=4",
+      "apple": {
+       "trackId": 72784339,
+       "url": "https://music.apple.com/us/album/groove-is-in-the-heart/72784411?i=72784339&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music125/v4/80/e2/27/80e227e7-df3f-a753-fb49-2b85ee811cca/s07.ixthhqeh.jpg/300x300bb.jpg",
+       "term": "Deee-Lite Groove Is In the Heart"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "everything-i-do-i-do-it-for-you-bryan-adams",
+   "name": "(Everything I Do) I Do It for You",
+   "group": "1990s",
+   "facts": {
+    "artist": "Bryan Adams",
+    "year": 1991,
+    "decade": "1990s"
+   },
+   "blurb": "\"(Everything I Do) I Do It for You\" by Bryan Adams, released in 1991.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/b6/1b/ef/b61befa0-78e2-302e-6e11-61b9b1ccfb4a/mzaf_6549192166299634383.plus.aac.p.m4a",
+      "credit": "Bryan Adams: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/everything-i-do-i-do-it-for-you/1440756670?i=1440756952&uo=4",
+      "apple": {
+       "trackId": 1440756952,
+       "url": "https://music.apple.com/us/album/everything-i-do-i-do-it-for-you/1440756670?i=1440756952&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music112/v4/b0/f7/5d/b0f75dab-7e01-d4c6-61c3-e6253a2cae22/06UMGIM18645.rgb.jpg/300x300bb.jpg",
+       "term": "Bryan Adams  I Do It for You"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "smells-like-teen-spirit-nirvana",
+   "name": "Smells Like Teen Spirit",
+   "group": "1990s",
+   "facts": {
+    "artist": "Nirvana",
+    "year": 1991,
+    "decade": "1990s"
+   },
+   "blurb": "\"Smells Like Teen Spirit\" by Nirvana, released in 1991.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/65/49/4e/65494e02-b6d3-26d8-6b0c-9bd98dcf4d5d/mzaf_7665413316386155700.plus.aac.p.m4a",
+      "credit": "Nirvana: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/smells-like-teen-spirit/1440783617?i=1440783625&uo=4",
+      "apple": {
+       "trackId": 1440783625,
+       "url": "https://music.apple.com/us/album/smells-like-teen-spirit/1440783617?i=1440783625&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/95/fd/b9/95fdb9b2-6d2b-92a6-97f2-51c1a6d77f1a/00602527874609.rgb.jpg/300x300bb.jpg",
+       "term": "Nirvana Smells Like Teen Spirit"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "losing-my-religion-r-e-m",
+   "name": "Losing My Religion",
+   "group": "1990s",
+   "facts": {
+    "artist": "R.E.M.",
+    "year": 1991,
+    "decade": "1990s"
+   },
+   "blurb": "\"Losing My Religion\" by R.E.M., released in 1991.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/4f/14/45/4f1445c7-c1e3-ef07-878c-f016839cef6b/mzaf_15501181977794875858.plus.aac.p.m4a",
+      "credit": "R.E.M.: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/losing-my-religion/1440945025?i=1440945283&uo=4",
+      "apple": {
+       "trackId": 1440945283,
+       "url": "https://music.apple.com/us/album/losing-my-religion/1440945025?i=1440945283&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music125/v4/05/ae/86/05ae8650-7bce-2377-8959-78ea033a99d9/00888072013711.rgb.jpg/300x300bb.jpg",
+       "term": "R.E.M. Losing My Religion"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "black-or-white-michael-jackson",
+   "name": "Black or White",
+   "group": "1990s",
+   "facts": {
+    "artist": "Michael Jackson",
+    "year": 1991,
+    "decade": "1990s"
+   },
+   "blurb": "\"Black or White\" by Michael Jackson, released in 1991.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/ef/71/76/ef717670-6537-8aba-3189-a19aebe97b9f/mzaf_7635423875196733249.plus.aac.p.m4a",
+      "credit": "Michael Jackson: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/black-or-white-single-version/273598907?i=273598926&uo=4",
+      "apple": {
+       "trackId": 273598926,
+       "url": "https://music.apple.com/us/album/black-or-white-single-version/273598907?i=273598926&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/67/c6/c9/67c6c9b0-e879-7e4d-fcda-dc52f758ec43/888880457066.jpg/300x300bb.jpg",
+       "term": "Michael Jackson Black Or White"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "gonna-make-you-sweat-everybody-dance-now-c-c-music-factory",
+   "name": "Gonna Make You Sweat (Everybody Dance Now)",
+   "group": "1990s",
+   "facts": {
+    "artist": "C+C Music Factory",
+    "year": 1990,
+    "decade": "1990s"
+   },
+   "blurb": "\"Gonna Make You Sweat (Everybody Dance Now)\" by C+C Music Factory, released in 1990.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/14/0b/ad/140bad3e-88d7-4b61-0760-9f4827f10b9c/mzaf_8758483335788751849.plus.aac.p.m4a",
+      "credit": "C+C Music Factory: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/gonna-make-you-sweat-everybody-dance-now-feat-freedom/193044507?i=193044536&uo=4",
+      "apple": {
+       "trackId": 193044536,
+       "url": "https://music.apple.com/us/album/gonna-make-you-sweat-everybody-dance-now-feat-freedom/193044507?i=193044536&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/2c/b0/8f/2cb08f9a-5d78-1742-125f-99db30768100/mzi.qzhckwut.jpg/300x300bb.jpg",
+       "term": "C+C Music Factory Gonna Make You Sweat"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "end-of-the-road-boyz-ii-men",
+   "name": "End of the Road",
+   "group": "1990s",
+   "facts": {
+    "artist": "Boyz II Men",
+    "year": 1992,
+    "decade": "1990s"
+   },
+   "blurb": "\"End of the Road\" by Boyz II Men, released in 1992.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/01/d4/be/01d4be43-07dc-dc62-bf3c-c9e9b2a24d56/mzaf_5545953554635319231.plus.aac.p.m4a",
+      "credit": "Boyz II Men: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/end-of-the-road/258605994?i=258607696&uo=4",
+      "apple": {
+       "trackId": 258607696,
+       "url": "https://music.apple.com/us/album/end-of-the-road/258605994?i=258607696&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Features124/v4/04/a9/73/04a973d9-0479-f68e-2a1d-cfcfc12c41b5/dj.qkymbdbw.jpg/300x300bb.jpg",
+       "term": "Boyz II Men End of the Road"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "baby-got-back-sir-mix-a-lot",
+   "name": "Baby Got Back",
+   "group": "1990s",
+   "facts": {
+    "artist": "Sir Mix-a-Lot",
+    "year": 1992,
+    "decade": "1990s"
+   },
+   "blurb": "\"Baby Got Back\" by Sir Mix-a-Lot, released in 1992.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview62/v4/51/1f/4a/511f4a13-5f2c-51da-c6d4-d84feef1af4a/mzaf_7177890414283063323.plus.aac.p.m4a",
+      "credit": "Sir Mix-a-Lot: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/baby-got-back/716374900?i=716376092&uo=4",
+      "apple": {
+       "trackId": 716376092,
+       "url": "https://music.apple.com/us/album/baby-got-back/716374900?i=716376092&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music4/v4/d9/cd/37/d9cd3736-ce1d-f118-c02d-cb7b04893785/05099962637053.jpg/300x300bb.jpg",
+       "term": "Sir Mix-A-Lot Baby Got Back"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "jump-kris-kross",
+   "name": "Jump",
+   "group": "1990s",
+   "facts": {
+    "artist": "Kris Kross",
+    "year": 1992,
+    "decade": "1990s"
+   },
+   "blurb": "\"Jump\" by Kris Kross, released in 1992.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/ba/5b/2c/ba5b2c8a-6c06-d124-b5f4-52693513d23d/mzaf_3684504517524894673.plus.aac.p.m4a",
+      "credit": "Kris Kross: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/jump/170146852?i=170147030&uo=4",
+      "apple": {
+       "trackId": 170147030,
+       "url": "https://music.apple.com/us/album/jump/170146852?i=170147030&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music125/v4/ea/03/30/ea033079-3254-3a3c-e2a6-504b30095ca6/dj.wutawrld.jpg/300x300bb.jpg",
+       "term": "Kris Kross Jump"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "i-will-always-love-you-whitney-houston",
+   "name": "I Will Always Love You",
+   "group": "1990s",
+   "facts": {
+    "artist": "Whitney Houston",
+    "year": 1992,
+    "decade": "1990s"
+   },
+   "blurb": "\"I Will Always Love You\" by Whitney Houston, released in 1992.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/03/d2/1a/03d21aca-c69e-09af-03ef-118004e68ab5/mzaf_17408932698913708736.plus.aac.p.m4a",
+      "credit": "Whitney Houston: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/i-will-always-love-you/388151892?i=388151901&uo=4",
+      "apple": {
+       "trackId": 388151901,
+       "url": "https://music.apple.com/us/album/i-will-always-love-you/388151892?i=388151901&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/82/f3/e9/82f3e968-8174-c5eb-7fc5-36384d050129/dj.mdauihuy.jpg/300x300bb.jpg",
+       "term": "Whitney Houston I Will Always Love You"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "achy-breaky-heart-billy-ray-cyrus",
+   "name": "Achy Breaky Heart",
+   "group": "1990s",
+   "facts": {
+    "artist": "Billy Ray Cyrus",
+    "year": 1992,
+    "decade": "1990s"
+   },
+   "blurb": "\"Achy Breaky Heart\" by Billy Ray Cyrus, released in 1992.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/6a/0a/10/6a0a1012-86f5-c100-d443-31f95dba24bb/mzaf_12266939131850217262.plus.aac.p.m4a",
+      "credit": "Billy Ray Cyrus: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/achy-breaky-heart/1440756021?i=1440756026&uo=4",
+      "apple": {
+       "trackId": 1440756026,
+       "url": "https://music.apple.com/us/album/achy-breaky-heart/1440756021?i=1440756026&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/cd/e3/f5/cde3f5a9-2fa5-6ece-c31d-8bbb4e0e2d37/06UMGIM23363.rgb.jpg/300x300bb.jpg",
+       "term": "Billy Ray Cyrus Achy Breaky Heart"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "under-the-bridge-red-hot-chili-peppers",
+   "name": "Under the Bridge",
+   "group": "1990s",
+   "facts": {
+    "artist": "Red Hot Chili Peppers",
+    "year": 1991,
+    "decade": "1990s"
+   },
+   "blurb": "\"Under the Bridge\" by Red Hot Chili Peppers, released in 1991.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/ff/5e/6c/ff5e6c34-4b2c-fa5b-232c-194183e5310f/mzaf_18293543166089220451.plus.aac.p.m4a",
+      "credit": "Red Hot Chili Peppers: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/under-the-bridge/948460531?i=948460560&uo=4",
+      "apple": {
+       "trackId": 948460560,
+       "url": "https://music.apple.com/us/album/under-the-bridge/948460531?i=948460560&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music125/v4/c9/c8/b2/c9c8b20d-42b8-a2a6-1678-54b997e845f5/093624931973.jpg/300x300bb.jpg",
+       "term": "Red Hot Chili Peppers Under the Bridge"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "what-is-love-haddaway",
+   "name": "What Is Love",
+   "group": "1990s",
+   "facts": {
+    "artist": "Haddaway",
+    "year": 1993,
+    "decade": "1990s"
+   },
+   "blurb": "\"What Is Love\" by Haddaway, released in 1993.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/de/11/c7/de11c7c1-770b-c58d-b89b-aedf95a13397/mzaf_1403254055137538628.plus.aac.p.m4a",
+      "credit": "Haddaway: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/what-is-love-klaas-radio-edit/1731389214?i=1731389223&uo=4",
+      "apple": {
+       "trackId": 1731389223,
+       "url": "https://music.apple.com/us/album/what-is-love-klaas-radio-edit/1731389214?i=1731389223&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music122/v4/79/1c/8d/791c8d82-ad0b-d4ff-21a2-3836694116f2/4250282804049.jpg/300x300bb.jpg",
+       "term": "Klaas & Haddaway What Is Love"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "i-cant-help-falling-in-love-with-you-ub40",
+   "name": "(I Can't Help) Falling in Love with You",
+   "group": "1990s",
+   "facts": {
+    "artist": "UB40",
+    "year": 1993,
+    "decade": "1990s"
+   },
+   "blurb": "\"(I Can't Help) Falling in Love with You\" by UB40, released in 1993.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/21/1d/59/211d59bf-d54d-38bd-f1bc-c3d28fc30782/mzaf_15306937792465741387.plus.aac.p.m4a",
+      "credit": "UB40: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/i-cant-help-falling-in-love-with-you/724098987?i=724099087&uo=4",
+      "apple": {
+       "trackId": 724099087,
+       "url": "https://music.apple.com/us/album/i-cant-help-falling-in-love-with-you/724098987?i=724099087&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/af/bb/79/afbb7946-da06-42ad-645f-9b409e9b41be/00077778822950.jpg/300x300bb.jpg",
+       "term": "UB40  Falling in Love With You"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "id-do-anything-for-love-but-i-wont-do-that-meat-loaf",
+   "name": "I'd Do Anything for Love (But I Won't Do That)",
+   "group": "1990s",
+   "facts": {
+    "artist": "Meat Loaf",
+    "year": 1993,
+    "decade": "1990s"
+   },
+   "blurb": "\"I'd Do Anything for Love (But I Won't Do That)\" by Meat Loaf, released in 1993.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/93/07/6f/93076f5e-1a45-93f3-4f72-10a63a2af445/mzaf_1416965803676461349.plus.aac.p.m4a",
+      "credit": "Meat Loaf: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/id-do-anything-for-love-but-i-wont-do-that/1452850182?i=1452850188&uo=4",
+      "apple": {
+       "trackId": 1452850188,
+       "url": "https://music.apple.com/us/album/id-do-anything-for-love-but-i-wont-do-that/1452850182?i=1452850188&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/ca/46/04/ca460464-b911-0fdb-ff1a-a5b735c22cfe/00008811281021.rgb.jpg/300x300bb.jpg",
+       "term": "Meat Loaf I'd Do Anything for Love"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "whoomp-there-it-is-tag-team",
+   "name": "Whoomp! (There It Is)",
+   "group": "1990s",
+   "facts": {
+    "artist": "Tag Team",
+    "year": 1993,
+    "decade": "1990s"
+   },
+   "blurb": "\"Whoomp! (There It Is)\" by Tag Team, released in 1993.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/dc/5a/ad/dc5aad16-88ec-17d2-9b22-e22cd267b309/mzaf_13827207163666383865.plus.aac.p.m4a",
+      "credit": "Tag Team: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/whoomp-there-it-is/1244743467?i=1244743915&uo=4",
+      "apple": {
+       "trackId": 1244743915,
+       "url": "https://music.apple.com/us/album/whoomp-there-it-is/1244743467?i=1244743915&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/bf/88/33/bf88335b-e75a-66e3-009d-744010bbe1ac/5055373531441.png/300x300bb.jpg",
+       "term": "Tag Team Whoomp! There It Is"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "the-sign-ace-of-base",
+   "name": "The Sign",
+   "group": "1990s",
+   "facts": {
+    "artist": "Ace of Base",
+    "year": 1993,
+    "decade": "1990s"
+   },
+   "blurb": "\"The Sign\" by Ace of Base, released in 1993.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/1f/cc/91/1fcc916e-a50f-0df8-8e3b-9ac479b71aff/mzaf_11069912349531880921.plus.aac.p.m4a",
+      "credit": "Ace of Base: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/the-sign-2015-remastered-version/959563976?i=959563981&uo=4",
+      "apple": {
+       "trackId": 959563981,
+       "url": "https://music.apple.com/us/album/the-sign-2015-remastered-version/959563976?i=959563981&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music126/v4/42/59/8b/42598b61-bd54-aaa3-5280-d711569800b6/cover.jpg/300x300bb.jpg",
+       "term": "Ace of Base The Sign"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "i-swear-all-4-one",
+   "name": "I Swear",
+   "group": "1990s",
+   "facts": {
+    "artist": "All-4-One",
+    "year": 1994,
+    "decade": "1990s"
+   },
+   "blurb": "\"I Swear\" by All-4-One, released in 1994.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/3b/78/e5/3b78e587-ac97-a67b-7248-e9601597790e/mzaf_4303932103866681902.plus.aac.p.m4a",
+      "credit": "All-4-One: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/i-swear/300974540?i=300974587&uo=4",
+      "apple": {
+       "trackId": 300974587,
+       "url": "https://music.apple.com/us/album/i-swear/300974540?i=300974587&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music125/v4/1c/7a/93/1c7a93ce-6787-61f0-2baf-c51937349f41/mzi.vwripflv.jpg/300x300bb.jpg",
+       "term": "All-4-One I Swear"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "ill-make-love-to-you-boyz-ii-men",
+   "name": "I'll Make Love to You",
+   "group": "1990s",
+   "facts": {
+    "artist": "Boyz II Men",
+    "year": 1994,
+    "decade": "1990s"
+   },
+   "blurb": "\"I'll Make Love to You\" by Boyz II Men, released in 1994.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/e4/cd/28/e4cd28a3-d9a3-736f-f6b9-ec557c4d8754/mzaf_327722686786550264.plus.aac.p.m4a",
+      "credit": "Boyz II Men: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/ill-make-love-to-you/1440925670?i=1440926391&uo=4",
+      "apple": {
+       "trackId": 1440926391,
+       "url": "https://music.apple.com/us/album/ill-make-love-to-you/1440925670?i=1440926391&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music112/v4/e4/82/d0/e482d0d0-7d1e-9615-ffba-60f973f25527/06UMGIM04523.rgb.jpg/300x300bb.jpg",
+       "term": "Boyz II Men I'll Make Love to You"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "love-is-all-around-wet-wet-wet",
+   "name": "Love Is All Around",
+   "group": "1990s",
+   "facts": {
+    "artist": "Wet Wet Wet",
+    "year": 1994,
+    "decade": "1990s"
+   },
+   "blurb": "\"Love Is All Around\" by Wet Wet Wet, released in 1994.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/01/70/43/0170438c-b657-b40b-5020-ff32d85030c7/mzaf_6018349042539557580.plus.aac.p.m4a",
+      "credit": "Wet Wet Wet: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/love-is-all-around/1444131427?i=1444131899&uo=4",
+      "apple": {
+       "trackId": 1444131899,
+       "url": "https://music.apple.com/us/album/love-is-all-around/1444131427?i=1444131899&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music126/v4/ed/c5/ea/edc5eafc-392a-907e-8d53-2d02fcb05252/15UMGIM44403.rgb.jpg/300x300bb.jpg",
+       "term": "Wet Wet Wet Love Is All Around"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "stay-i-missed-you-lisa-loeb",
+   "name": "Stay (I Missed You)",
+   "group": "1990s",
+   "facts": {
+    "artist": "Lisa Loeb",
+    "year": 1994,
+    "decade": "1990s"
+   },
+   "blurb": "\"Stay (I Missed You)\" by Lisa Loeb, released in 1994.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/74/91/64/74916451-f389-e79b-c824-eff94100b242/mzaf_8948785060428244470.plus.aac.p.m4a",
+      "credit": "Lisa Loeb: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/stay-i-missed-you/1270065316?i=1270065322&uo=4",
+      "apple": {
+       "trackId": 1270065322,
+       "url": "https://music.apple.com/us/album/stay-i-missed-you/1270065316?i=1270065322&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/ef/c2/3d/efc23d02-4be5-a10e-91bc-f0a3093adea7/859722698961_cover.jpg/300x300bb.jpg",
+       "term": "Lisa Loeb Stay"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "gangstas-paradise-coolio",
+   "name": "Gangsta's Paradise",
+   "group": "1990s",
+   "facts": {
+    "artist": "Coolio",
+    "year": 1995,
+    "decade": "1990s"
+   },
+   "blurb": "\"Gangsta's Paradise\" by Coolio, released in 1995.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/c1/28/9e/c1289efd-07f3-d33c-4f83-ee46496b131c/mzaf_1464096825618179366.plus.aac.p.m4a",
+      "credit": "Coolio: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/gangstas-paradise-feat-l-v-2023-remaster/1605189366?i=1605189373&uo=4",
+      "apple": {
+       "trackId": 1605189373,
+       "url": "https://music.apple.com/us/album/gangstas-paradise-feat-l-v-2023-remaster/1605189366?i=1605189373&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/c2/23/0b/c2230b5f-e753-e9b0-c032-b9ea0713450f/016998513262.png/300x300bb.jpg",
+       "term": "Coolio Gangsta's Paradise"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "waterfalls-tlc",
+   "name": "Waterfalls",
+   "group": "1990s",
+   "facts": {
+    "artist": "TLC",
+    "year": 1995,
+    "decade": "1990s"
+   },
+   "blurb": "\"Waterfalls\" by TLC, released in 1995.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/e3/e6/06/e3e606fe-f28c-6d5f-290b-fa96d4296033/mzaf_1027846661823445006.plus.aac.p.m4a",
+      "credit": "TLC: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/waterfalls-no-rap-radio-edit/429846425?i=429846549&uo=4",
+      "apple": {
+       "trackId": 429846549,
+       "url": "https://music.apple.com/us/album/waterfalls-no-rap-radio-edit/429846425?i=429846549&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/99/c4/6b/99c46b10-5f35-00a6-a1d6-209393f35c27/mzi.oggwnefb.jpg/300x300bb.jpg",
+       "term": "TLC Waterfalls"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "kiss-from-a-rose-seal",
+   "name": "Kiss from a Rose",
+   "group": "1990s",
+   "facts": {
+    "artist": "Seal",
+    "year": 1994,
+    "decade": "1990s"
+   },
+   "blurb": "\"Kiss from a Rose\" by Seal, released in 1994.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/5b/32/60/5b32607f-683f-4298-1c4c-3f2086508444/mzaf_572188254823172236.plus.aac.p.m4a",
+      "credit": "Seal: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/kiss-from-a-rose/30475342?i=30475379&uo=4",
+      "apple": {
+       "trackId": 30475379,
+       "url": "https://music.apple.com/us/album/kiss-from-a-rose/30475342?i=30475379&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/9c/b5/79/9cb579e1-0b40-3fd1-961e-2e0a65e69f4a/s06.mfkmyngx.jpg/300x300bb.jpg",
+       "term": "Seal Kiss from a Rose"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "one-sweet-day-mariah-carey-and-boyz-ii-men",
+   "name": "One Sweet Day",
+   "group": "1990s",
+   "facts": {
+    "artist": "Mariah Carey & Boyz II Men",
+    "year": 1995,
+    "decade": "1990s"
+   },
+   "blurb": "\"One Sweet Day\" by Mariah Carey & Boyz II Men, released in 1995.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/fb/01/53/fb0153d1-18bf-315c-0e6e-4bc6222adb14/mzaf_3877132085912471331.plus.aac.p.m4a",
+      "credit": "Mariah Carey & Boyz II Men: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/one-sweet-day-feat-boyz-ii-men/169962059?i=169962196&uo=4",
+      "apple": {
+       "trackId": 169962196,
+       "url": "https://music.apple.com/us/album/one-sweet-day-feat-boyz-ii-men/169962059?i=169962196&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/01/c7/07/01c70785-7c45-a82b-7d9a-49f521e4d373/074646670026.jpg/300x300bb.jpg",
+       "term": "Mariah Carey One Sweet Day"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "wonderwall-oasis",
+   "name": "Wonderwall",
+   "group": "1990s",
+   "facts": {
+    "artist": "Oasis",
+    "year": 1995,
+    "decade": "1990s"
+   },
+   "blurb": "\"Wonderwall\" by Oasis, released in 1995.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/ab/16/93/ab16933c-6203-3db9-9da9-513ff1c8496d/mzaf_16993612140334549994.plus.aac.p.m4a",
+      "credit": "Oasis: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/wonderwall/1517447039?i=1517447333&uo=4",
+      "apple": {
+       "trackId": 1517447333,
+       "url": "https://music.apple.com/us/album/wonderwall/1517447039?i=1517447333&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music113/v4/04/92/e0/0492e08b-cbcc-9969-9ad6-8f5a0888068c/5051961007107.jpg/300x300bb.jpg",
+       "term": "Oasis Wonderwall"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "ironic-alanis-morissette",
+   "name": "Ironic",
+   "group": "1990s",
+   "facts": {
+    "artist": "Alanis Morissette",
+    "year": 1995,
+    "decade": "1990s"
+   },
+   "blurb": "\"Ironic\" by Alanis Morissette, released in 1995.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/05/99/bb/0599bb8c-2dc2-14f6-213f-1ee69c72e4ed/mzaf_17860950106664762758.plus.aac.p.m4a",
+      "credit": "Alanis Morissette: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/ironic/1031419290?i=1031419968&uo=4",
+      "apple": {
+       "trackId": 1031419968,
+       "url": "https://music.apple.com/us/album/ironic/1031419290?i=1031419968&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Features124/v4/5f/3b/ca/5f3bca60-024c-d4aa-d638-6d58e7e81461/mza_1406686761081396977.jpg/300x300bb.jpg",
+       "term": "Alanis Morissette Ironic"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "because-you-loved-me-celine-dion",
+   "name": "Because You Loved Me",
+   "group": "1990s",
+   "facts": {
+    "artist": "Celine Dion",
+    "year": 1996,
+    "decade": "1990s"
+   },
+   "blurb": "\"Because You Loved Me\" by Celine Dion, released in 1996.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/2a/f1/84/2af184e4-e7c0-f5cb-6ec2-6ffc68a572a7/mzaf_13855375006191175068.plus.aac.p.m4a",
+      "credit": "Celine Dion: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/because-you-loved-me/160021509?i=160022706&uo=4",
+      "apple": {
+       "trackId": 160022706,
+       "url": "https://music.apple.com/us/album/because-you-loved-me/160021509?i=160022706&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/48/59/bd/4859bde2-c345-d637-1079-26cb78c4e7e8/074646579428.jpg/300x300bb.jpg",
+       "term": "Céline Dion Because You Loved Me"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "killing-me-softly-with-his-song-fugees",
+   "name": "Killing Me Softly with His Song",
+   "group": "1990s",
+   "facts": {
+    "artist": "Fugees",
+    "year": 1996,
+    "decade": "1990s"
+   },
+   "blurb": "\"Killing Me Softly with His Song\" by Fugees, released in 1996.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/88/40/26/88402662-329d-8c34-ef72-863f9f2926bf/mzaf_3130005416732108579.plus.aac.p.m4a",
+      "credit": "Fugees: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/killing-me-softly-with-his-song/1054461239?i=1054461710&uo=4",
+      "apple": {
+       "trackId": 1054461710,
+       "url": "https://music.apple.com/us/album/killing-me-softly-with-his-song/1054461239?i=1054461710&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/0e/d1/5b/0ed15b14-271c-35d5-5909-49f18fbfb32b/886445600605.jpg/300x300bb.jpg",
+       "term": "Fugees Killing Me Softly with His Song"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "wannabe-spice-girls",
+   "name": "Wannabe",
+   "group": "1990s",
+   "facts": {
+    "artist": "Spice Girls",
+    "year": 1996,
+    "decade": "1990s"
+   },
+   "blurb": "\"Wannabe\" by Spice Girls, released in 1996.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/db/cb/c6/dbcbc688-8277-b365-8deb-1da3c30da079/mzaf_7842872759474974048.plus.aac.p.m4a",
+      "credit": "Spice Girls: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/wannabe/1573849246?i=1573849255&uo=4",
+      "apple": {
+       "trackId": 1573849255,
+       "url": "https://music.apple.com/us/album/wannabe/1573849246?i=1573849255&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/e1/92/8f/e1928fcb-0204-ca19-597a-6edaf8e6ebc8/21UMGIM16233.rgb.jpg/300x300bb.jpg",
+       "term": "Spice Girls Wannabe"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "no-diggity-blackstreet",
+   "name": "No Diggity",
+   "group": "1990s",
+   "facts": {
+    "artist": "Blackstreet",
+    "year": 1996,
+    "decade": "1990s"
+   },
+   "blurb": "\"No Diggity\" by Blackstreet, released in 1996.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/96/d7/27/96d727a5-e22b-a526-cec5-5d185180c8a0/mzaf_8685114639537905202.plus.aac.p.m4a",
+      "credit": "Blackstreet: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/no-diggity-feat-dr-dre-queen-pen/1440908643?i=1440908981&uo=4",
+      "apple": {
+       "trackId": 1440908981,
+       "url": "https://music.apple.com/us/album/no-diggity-feat-dr-dre-queen-pen/1440908643?i=1440908981&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music112/v4/9f/b4/45/9fb4457e-7ab5-0484-a81f-4666ba8fae80/06UMGIM01977.rgb.jpg/300x300bb.jpg",
+       "term": "Blackstreet No Diggity"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "un-break-my-heart-toni-braxton",
+   "name": "Un-Break My Heart",
+   "group": "1990s",
+   "facts": {
+    "artist": "Toni Braxton",
+    "year": 1996,
+    "decade": "1990s"
+   },
+   "blurb": "\"Un-Break My Heart\" by Toni Braxton, released in 1996.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/a8/38/e6/a838e6ff-b342-84b5-583a-b8b9ca31ba1e/mzaf_12057564509516020060.plus.aac.p.m4a",
+      "credit": "Toni Braxton: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/un-break-my-heart/526521410?i=526521417&uo=4",
+      "apple": {
+       "trackId": 526521417,
+       "url": "https://music.apple.com/us/album/un-break-my-heart/526521410?i=526521417&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music125/v4/fd/61/1f/fd611f8f-1edc-8c6a-ce32-2882441f5f82/886443468986.jpg/300x300bb.jpg",
+       "term": "Toni Braxton Un-Break My Heart"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "ill-be-missing-you-puff-daddy",
+   "name": "I'll Be Missing You",
+   "group": "1990s",
+   "facts": {
+    "artist": "Puff Daddy",
+    "year": 1997,
+    "decade": "1990s"
+   },
+   "blurb": "\"I'll Be Missing You\" by Puff Daddy, released in 1997.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/6f/ee/8d/6fee8df4-128b-4d7d-ba21-62f2b629cd10/mzaf_14674789633028378189.plus.aac.p.m4a",
+      "credit": "Puff Daddy: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/ill-be-missing-you-feat-faith-evans-112/906589196?i=906589235&uo=4",
+      "apple": {
+       "trackId": 906589235,
+       "url": "https://music.apple.com/us/album/ill-be-missing-you-feat-faith-evans-112/906589196?i=906589235&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music125/v4/f3/7a/df/f37adf7e-b4ad-68a7-9c01-6f9e32a6a9fe/603497898749.jpg/300x300bb.jpg",
+       "term": "Puff Daddy I'll Be Missing You"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "mmmbop-hanson",
+   "name": "MMMBop",
+   "group": "1990s",
+   "facts": {
+    "artist": "Hanson",
+    "year": 1997,
+    "decade": "1990s"
+   },
+   "blurb": "\"MMMBop\" by Hanson, released in 1997.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/8c/6d/db/8c6ddba0-e5ba-977e-5258-1512a1fbb1cd/mzaf_7353445484288718038.plus.aac.p.m4a",
+      "credit": "Hanson: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/mmmbop/1440790049?i=1440790544&uo=4",
+      "apple": {
+       "trackId": 1440790544,
+       "url": "https://music.apple.com/us/album/mmmbop/1440790049?i=1440790544&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music112/v4/2d/00/8c/2d008c91-a13d-c60a-9ed1-ed715c583f7c/06UMGIM20991.rgb.jpg/300x300bb.jpg",
+       "term": "Hanson MMMBop"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "barbie-girl-aqua",
+   "name": "Barbie Girl",
+   "group": "1990s",
+   "facts": {
+    "artist": "Aqua",
+    "year": 1997,
+    "decade": "1990s"
+   },
+   "blurb": "\"Barbie Girl\" by Aqua, released in 1997.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/3d/b7/7d/3db77df0-d9a3-b60e-0714-41fd79b9ebff/mzaf_3692738463507322199.plus.aac.p.m4a",
+      "credit": "Aqua: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/barbie-girl/1443758468?i=1443758761&uo=4",
+      "apple": {
+       "trackId": 1443758761,
+       "url": "https://music.apple.com/us/album/barbie-girl/1443758468?i=1443758761&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music114/v4/77/57/ba/7757ba77-0163-a195-950b-95786aa7a90e/17UMGIM98492.rgb.jpg/300x300bb.jpg",
+       "term": "Aqua Barbie Girl"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "bitter-sweet-symphony-the-verve",
+   "name": "Bitter Sweet Symphony",
+   "group": "1990s",
+   "facts": {
+    "artist": "The Verve",
+    "year": 1997,
+    "decade": "1990s"
+   },
+   "blurb": "\"Bitter Sweet Symphony\" by The Verve, released in 1997.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/2b/85/d9/2b85d9ff-6d3a-528a-2fdc-66cd66111e87/mzaf_13620494321838247126.plus.aac.p.m4a",
+      "credit": "The Verve: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/bitter-sweet-symphony/1443258184?i=1443258189&uo=4",
+      "apple": {
+       "trackId": 1443258189,
+       "url": "https://music.apple.com/us/album/bitter-sweet-symphony/1443258184?i=1443258189&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/5c/b1/85/5cb18512-9cbd-7b84-4042-37f23bc2ae45/17UMGIM89555.rgb.jpg/300x300bb.jpg",
+       "term": "The Verve Bitter Sweet Symphony"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "tubthumping-chumbawamba",
+   "name": "Tubthumping",
+   "group": "1990s",
+   "facts": {
+    "artist": "Chumbawamba",
+    "year": 1997,
+    "decade": "1990s"
+   },
+   "blurb": "\"Tubthumping\" by Chumbawamba, released in 1997.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview115/v4/b6/d2/ac/b6d2ac02-2784-81f6-d763-08e0b2be1dfe/mzaf_12670863909406805270.plus.aac.p.m4a",
+      "credit": "Chumbawamba: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/tubthumping/713773439?i=713773457&uo=4",
+      "apple": {
+       "trackId": 713773457,
+       "url": "https://music.apple.com/us/album/tubthumping/713773439?i=713773457&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music125/v4/e0/a1/ef/e0a1ef4a-6aa6-f614-6351-05a348fd4b56/13UABIM57031.rgb.jpg/300x300bb.jpg",
+       "term": "Chumbawamba Tubthumping"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "my-heart-will-go-on-celine-dion",
+   "name": "My Heart Will Go On",
+   "group": "1990s",
+   "facts": {
+    "artist": "Celine Dion",
+    "year": 1997,
+    "decade": "1990s"
+   },
+   "blurb": "\"My Heart Will Go On\" by Celine Dion, released in 1997.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/54/5b/f7/545bf75d-1ea1-07f0-0c4e-a6d3bca7c092/mzaf_1410328638164863411.plus.aac.p.m4a",
+      "credit": "Celine Dion: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/my-heart-will-go-on-love-theme-from-titanic/507536640?i=507536740&uo=4",
+      "apple": {
+       "trackId": 507536740,
+       "url": "https://music.apple.com/us/album/my-heart-will-go-on-love-theme-from-titanic/507536640?i=507536740&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/ab/5a/96/ab5a9681-e891-8449-53d2-7d358501f97f/mzi.zbauexhy.jpg/300x300bb.jpg",
+       "term": "Céline Dion & James Horner My Heart Will Go On"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "truly-madly-deeply-savage-garden",
+   "name": "Truly Madly Deeply",
+   "group": "1990s",
+   "facts": {
+    "artist": "Savage Garden",
+    "year": 1997,
+    "decade": "1990s"
+   },
+   "blurb": "\"Truly Madly Deeply\" by Savage Garden, released in 1997.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/9f/21/e3/9f21e388-57e7-4a0a-f184-df5b6127dd13/mzaf_4312247336291606094.plus.aac.p.m4a",
+      "credit": "Savage Garden: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/truly-madly-deeply/157485058?i=157485088&uo=4",
+      "apple": {
+       "trackId": 157485088,
+       "url": "https://music.apple.com/us/album/truly-madly-deeply/157485058?i=157485088&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/5c/1c/c1/5c1cc11b-c477-0fc7-e9f0-740264cb0d01/mzi.gfeicsof.jpg/300x300bb.jpg",
+       "term": "Savage Garden Truly Madly Deeply"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "believe-cher",
+   "name": "Believe",
+   "group": "1990s",
+   "facts": {
+    "artist": "Cher",
+    "year": 1998,
+    "decade": "1990s"
+   },
+   "blurb": "\"Believe\" by Cher, released in 1998.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/9c/52/d8/9c52d83d-242e-abc4-68fc-273eeb8f0358/mzaf_10714034642820090237.plus.aac.p.m4a",
+      "credit": "Cher: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/believe/73273758?i=73273491&uo=4",
+      "apple": {
+       "trackId": 73273491,
+       "url": "https://music.apple.com/us/album/believe/73273758?i=73273491&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music125/v4/bb/90/f3/bb90f392-b78d-f180-ba6b-f04d2d1e62fd/s05.kfnyrece.jpg/300x300bb.jpg",
+       "term": "Cher Believe"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "baby-one-more-time-britney-spears",
+   "name": "...Baby One More Time",
+   "alt": [
+    "Baby One More Time"
+   ],
+   "group": "1990s",
+   "facts": {
+    "artist": "Britney Spears",
+    "year": 1998,
+    "decade": "1990s"
+   },
+   "blurb": "\"...Baby One More Time\" by Britney Spears, released in 1998.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/2a/ef/e5/2aefe5c7-e83b-07b1-227e-117347aa3006/mzaf_11333878250757508664.plus.aac.p.m4a",
+      "credit": "Britney Spears: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/baby-one-more-time/273143723?i=273143820&uo=4",
+      "apple": {
+       "trackId": 273143820,
+       "url": "https://music.apple.com/us/album/baby-one-more-time/273143723?i=273143820&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/51/73/28/5173280b-9b5e-c5e4-d3f8-a2612d044543/888880423368.jpg/300x300bb.jpg",
+       "term": "Britney Spears ...Baby One More Time"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "iris-goo-goo-dolls",
+   "name": "Iris",
+   "group": "1990s",
+   "facts": {
+    "artist": "Goo Goo Dolls",
+    "year": 1998,
+    "decade": "1990s"
+   },
+   "blurb": "\"Iris\" by Goo Goo Dolls, released in 1998.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/60/17/35/60173512-3d5c-1d6f-549e-d8ddafa93e07/mzaf_5281658494050788067.plus.aac.p.m4a",
+      "credit": "Goo Goo Dolls: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/iris/1109658139?i=1109658204&uo=4",
+      "apple": {
+       "trackId": 1109658204,
+       "url": "https://music.apple.com/us/album/iris/1109658139?i=1109658204&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/2c/13/18/2c131801-00af-58b1-3cc2-13abf4ad5416/093624919162.jpg/300x300bb.jpg",
+       "term": "The Goo Goo Dolls Iris"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "no-scrubs-tlc",
+   "name": "No Scrubs",
+   "group": "1990s",
+   "facts": {
+    "artist": "TLC",
+    "year": 1999,
+    "decade": "1990s"
+   },
+   "blurb": "\"No Scrubs\" by TLC, released in 1999.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/c9/64/38/c964385e-f18a-fd99-638c-76d4f9bdd4e2/mzaf_4744709234124158764.plus.aac.p.m4a",
+      "credit": "TLC: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/no-scrubs/309066782?i=309066884&uo=4",
+      "apple": {
+       "trackId": 309066884,
+       "url": "https://music.apple.com/us/album/no-scrubs/309066782?i=309066884&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/2d/19/0c/2d190ce6-a157-6364-b5b4-e9b00265d313/mzi.ucefobwj.jpg/300x300bb.jpg",
+       "term": "TLC No Scrubs"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "smooth-santana",
+   "name": "Smooth",
+   "group": "1990s",
+   "facts": {
+    "artist": "Santana",
+    "year": 1999,
+    "decade": "1990s"
+   },
+   "blurb": "\"Smooth\" by Santana, released in 1999.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/5e/00/f4/5e00f40c-5f4b-7043-a499-c842019c39b9/mzaf_14454759577232643774.plus.aac.p.m4a",
+      "credit": "Santana: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/smooth-feat-rob-thomas/354579273?i=354579303&uo=4",
+      "apple": {
+       "trackId": 354579303,
+       "url": "https://music.apple.com/us/album/smooth-feat-rob-thomas/354579273?i=354579303&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/f5/97/4c/f5974c1e-06cb-f84c-1da9-5f7505a20a0c/mzi.etsqfvqq.jpg/300x300bb.jpg",
+       "term": "Santana Smooth"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "livin-la-vida-loca-ricky-martin",
+   "name": "Livin' la Vida Loca",
+   "group": "1990s",
+   "facts": {
+    "artist": "Ricky Martin",
+    "year": 1999,
+    "decade": "1990s"
+   },
+   "blurb": "\"Livin' la Vida Loca\" by Ricky Martin, released in 1999.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/b6/09/71/b60971c6-8dc4-275b-4442-e894b83415bd/mzaf_2571876592631039304.plus.aac.p.m4a",
+      "credit": "Ricky Martin: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/livin-la-vida-loca-spanish-version/192821565?i=192822739&uo=4",
+      "apple": {
+       "trackId": 192822739,
+       "url": "https://music.apple.com/us/album/livin-la-vida-loca-spanish-version/192821565?i=192822739&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/ab/3c/ed/ab3cedd0-03a6-0802-ec42-2f48c4eb118c/074646989128.jpg/300x300bb.jpg",
+       "term": "Ricky Martin Livin' la Vida Loca"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "genie-in-a-bottle-christina-aguilera",
+   "name": "Genie in a Bottle",
+   "group": "1990s",
+   "facts": {
+    "artist": "Christina Aguilera",
+    "year": 1999,
+    "decade": "1990s"
+   },
+   "blurb": "\"Genie in a Bottle\" by Christina Aguilera, released in 1999.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/e9/63/7c/e9637c84-3cbe-ad95-a5be-b6962ed54e08/mzaf_11300153256112368673.plus.aac.p.m4a",
+      "credit": "Christina Aguilera: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/genie-in-a-bottle/1308542675?i=1308542773&uo=4",
+      "apple": {
+       "trackId": 1308542773,
+       "url": "https://music.apple.com/us/album/genie-in-a-bottle/1308542675?i=1308542773&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music125/v4/6b/25/9b/6b259bc3-3e53-4339-80b0-5b50131c8901/888880771674.jpg/300x300bb.jpg",
+       "term": "Christina Aguilera Genie in a Bottle"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "i-want-it-that-way-backstreet-boys",
+   "name": "I Want It That Way",
+   "group": "1990s",
+   "facts": {
+    "artist": "Backstreet Boys",
+    "year": 1999,
+    "decade": "1990s"
+   },
+   "blurb": "\"I Want It That Way\" by Backstreet Boys, released in 1999.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/12/cd/f8/12cdf81c-f174-cd45-9a56-9b2388df9e63/mzaf_2642298639219088626.plus.aac.p.m4a",
+      "credit": "Backstreet Boys: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/i-want-it-that-way/283567119?i=283567164&uo=4",
+      "apple": {
+       "trackId": 283567164,
+       "url": "https://music.apple.com/us/album/i-want-it-that-way/283567119?i=283567164&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/5f/6b/e9/5f6be919-1b9e-30ef-45b7-cc27fc428fd5/012414167224.jpg/300x300bb.jpg",
+       "term": "Backstreet Boys I Want It That Way"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "all-star-smash-mouth",
+   "name": "All Star",
+   "group": "1990s",
+   "facts": {
+    "artist": "Smash Mouth",
+    "year": 1999,
+    "decade": "1990s"
+   },
+   "blurb": "\"All Star\" by Smash Mouth, released in 1999.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/b0/03/ef/b003ef4c-1a22-6b15-e851-fb106ad96a3b/mzaf_3320656447657988367.plus.aac.p.m4a",
+      "credit": "Smash Mouth: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/all-star/1440915299?i=1440915693&uo=4",
+      "apple": {
+       "trackId": 1440915693,
+       "url": "https://music.apple.com/us/album/all-star/1440915299?i=1440915693&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music126/v4/ab/6f/5f/ab6f5f79-fe60-a6b9-c47c-cecf0e491be0/06UMGIM04334.rgb.jpg/300x300bb.jpg",
+       "term": "Smash Mouth All Star"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "mambo-no-5-a-little-bit-of-lou-bega",
+   "name": "Mambo No. 5 (A Little Bit Of...)",
+   "group": "1990s",
+   "facts": {
+    "artist": "Lou Bega",
+    "year": 1999,
+    "decade": "1990s"
+   },
+   "blurb": "\"Mambo No. 5 (A Little Bit Of...)\" by Lou Bega, released in 1999.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/95/12/14/951214ff-a3f2-7b9c-094c-385b382b5a14/mzaf_6010878480642586774.plus.aac.p.m4a",
+      "credit": "Lou Bega: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/mambo-no-5-a-little-bit-of/1322068623?i=1322068804&uo=4",
+      "apple": {
+       "trackId": 1322068804,
+       "url": "https://music.apple.com/us/album/mambo-no-5-a-little-bit-of/1322068623?i=1322068804&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music125/v4/68/59/96/68599610-92f1-4400-8db3-4e794e2f2757/886446819020.jpg/300x300bb.jpg",
+       "term": "Lou Bega Mambo No. 5"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "blue-da-ba-dee-eiffel-65",
+   "name": "Blue (Da Ba Dee)",
+   "group": "1990s",
+   "facts": {
+    "artist": "Eiffel 65",
+    "year": 1999,
+    "decade": "1990s"
+   },
+   "blurb": "\"Blue (Da Ba Dee)\" by Eiffel 65, released in 1999.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/e8/53/84/e85384b1-b2cc-41fa-140b-f7341234a4ca/mzaf_15329390040173012367.plus.aac.p.m4a",
+      "credit": "Eiffel 65: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/blue/1791038984?i=1791038986&uo=4",
+      "apple": {
+       "trackId": 1791038986,
+       "url": "https://music.apple.com/us/album/blue/1791038984?i=1791038986&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/dc/fc/5c/dcfc5ca2-f9a7-e457-a125-bd38e674cdf5/4065328582955.png/300x300bb.jpg",
+       "term": "Mat1ne, PED1NE & Eiffel 65 Blue"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  }
+ ],
+ "questions": [],
+ "sources": [
+  {
+   "name": "Billboard Year-End Hot 100 singles (1990–1999)",
+   "url": "https://en.wikipedia.org/wiki/Billboard_Year-End_Hot_100_singles_of_1990"
+  },
+  {
+   "name": "UK best-selling singles by year",
+   "url": "https://en.wikipedia.org/wiki/List_of_best-selling_singles_by_year_(UK)"
+  },
+  {
+   "name": "Apple iTunes Search API (previews, artwork, links)",
+   "url": "https://performance-partners.apple.com/search-api"
+  }
+ ],
+ "built": "2026-10-04"
+}

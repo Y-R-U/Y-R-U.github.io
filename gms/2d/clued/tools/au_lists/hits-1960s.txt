@@ -1,0 +1,60 @@
+@id hits-1960s
+@title Hits of the 1960s
+@icon 🎙️
+@sources [{"name":"Billboard Year-End Hot 100 singles (1960–1969)","url":"https://en.wikipedia.org/wiki/Billboard_Year-End_Hot_100_singles_of_1960"},{"name":"UK best-selling singles by year","url":"https://en.wikipedia.org/wiki/List_of_best-selling_singles_by_year_(UK)"}]
+# YEAR = original release year (verified against Apple's release dates by au_resolve)
+1959 | Percy Faith | Theme from "A Summer Place" | q=percy faith summer place; tm=summer place
+1959 | Jim Reeves | He'll Have to Go
+1960 | The Everly Brothers | Cathy's Clown
+1960 | Elvis Presley | It's Now or Never | d=1
+1960 | Chubby Checker | The Twist | d=1
+1961 | Ben E. King | Stand by Me | d=1
+1961 | Patsy Cline | Crazy | d=1
+1961 | Del Shannon | Runaway
+1961 | Dion | Runaround Sue
+1962 | Ray Charles | I Can't Stop Loving You
+1962 | The Four Seasons | Sherry
+1962 | The Four Seasons | Big Girls Don't Cry
+1962 | Little Eva | The Loco-Motion
+1963 | The Beach Boys | Surfin' U.S.A.
+1963 | The Chiffons | He's So Fine
+1963 | The Kingsmen | Louie Louie
+1963 | The Ronettes | Be My Baby | d=1
+1963 | The Beatles | She Loves You | d=1
+1963 | The Beatles | I Want to Hold Your Hand | d=1
+1964 | Louis Armstrong | Hello, Dolly!
+1964 | Roy Orbison | Oh, Pretty Woman | d=1; alt=Pretty Woman
+1964 | The Beach Boys | I Get Around
+1964 | The Supremes | Where Did Our Love Go
+1964 | The Animals | The House of the Rising Sun | d=1
+1964 | The Beatles | Can't Buy Me Love
+1964 | The Temptations | My Girl | d=1
+1965 | The Rolling Stones | (I Can't Get No) Satisfaction | d=1; alt=Satisfaction
+1965 | Four Tops | I Can't Help Myself (Sugar Pie Honey Bunch)
+1965 | The Byrds | Mr. Tambourine Man
+1965 | The Beatles | Help!
+1964 | The Righteous Brothers | You've Lost That Lovin' Feelin'
+1965 | The Mamas & The Papas | California Dreamin' | d=1
+1966 | The Beach Boys | Good Vibrations | d=1
+1966 | Four Tops | Reach Out I'll Be There
+1966 | The Rolling Stones | Paint It Black
+1966 | Nancy Sinatra | These Boots Are Made for Walkin'
+1966 | The Monkees | I'm a Believer
+1967 | Aretha Franklin | Respect | d=1
+1967 | The Box Tops | The Letter
+1967 | The Turtles | Happy Together
+1967 | The Doors | Light My Fire
+1967 | Bobbie Gentry | Ode to Billie Joe
+1967 | Procol Harum | A Whiter Shade of Pale
+1967 | Van Morrison | Brown Eyed Girl | d=1
+1968 | The Beatles | Hey Jude | d=1
+1968 | Otis Redding | (Sittin' On) The Dock of the Bay | alt=Dock of the Bay
+1968 | Simon & Garfunkel | Mrs. Robinson | d=1
+1968 | Marvin Gaye | I Heard It Through the Grapevine
+1968 | Steppenwolf | Born to Be Wild
+1969 | The Archies | Sugar, Sugar
+1969 | The 5th Dimension | Aquarius / Let the Sunshine In | tm=aquarius
+1969 | The Rolling Stones | Honky Tonk Women
+1969 | Zager & Evans | In the Year 2525
+1969 | David Bowie | Space Oddity | d=1
+1969 | B.J. Thomas | Raindrops Keep Fallin' on My Head

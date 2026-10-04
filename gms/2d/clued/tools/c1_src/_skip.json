@@ -1,0 +1,126 @@
+{
+ "snakes": {
+  "inland-taipan": [
+   "https://www.inaturalist.org/photos/1206214"
+  ],
+  "coastal-taipan": [
+   "https://www.inaturalist.org/photos/633202983"
+  ],
+  "eastern-brown-snake": [
+   "https://www.inaturalist.org/photos/346795945",
+   "https://www.inaturalist.org/photos/323206572"
+  ],
+  "dugite": [
+   "https://www.inaturalist.org/photos/624413630",
+   "https://www.inaturalist.org/photos/449844453"
+  ],
+  "tiger-snake": [
+   "https://www.inaturalist.org/photos/242571404",
+   "https://www.inaturalist.org/photos/338957133"
+  ],
+  "mulga-snake": [
+   "https://www.inaturalist.org/photos/244898307"
+  ],
+  "olive-python": [
+   "https://www.inaturalist.org/photos/340911736"
+  ],
+  "childrens-python": [
+   "https://www.inaturalist.org/photos/260641879"
+  ],
+  "spotted-python": [
+   "https://www.inaturalist.org/photos/624486858"
+  ],
+  "common-tree-snake": [
+   "https://www.inaturalist.org/photos/63484417"
+  ],
+  "brown-tree-snake": [
+   "https://www.inaturalist.org/photos/122330406"
+  ],
+  "olive-sea-snake": [
+   "https://www.inaturalist.org/photos/447199740",
+   "https://www.inaturalist.org/photos/669423935"
+  ],
+  "common-krait": [
+   "https://www.inaturalist.org/photos/445688552",
+   "https://www.inaturalist.org/photos/332631651"
+  ],
+  "banded-krait": [
+   "https://www.inaturalist.org/photos/516078854",
+   "https://www.inaturalist.org/photos/703338270"
+  ],
+  "russells-viper": [
+   "https://www.inaturalist.org/photos/165793765",
+   "https://www.inaturalist.org/photos/92823438",
+   "https://www.inaturalist.org/photos/90940531",
+   "https://www.inaturalist.org/photos/106564749"
+  ],
+  "saw-scaled-viper": [
+   "https://www.inaturalist.org/photos/68228870"
+  ],
+  "gaboon-viper": [
+   "https://www.inaturalist.org/photos/171300495"
+  ],
+  "timber-rattlesnake": [
+   "https://www.inaturalist.org/photos/663038667"
+  ],
+  "sidewinder": [
+   "https://www.inaturalist.org/photos/631497413",
+   "https://www.inaturalist.org/photos/432169584"
+  ],
+  "copperhead": [
+   "https://www.inaturalist.org/photos/151861657"
+  ],
+  "ball-python": [
+   "https://www.inaturalist.org/photos/108396454",
+   "https://www.inaturalist.org/photos/265012243"
+  ],
+  "african-rock-python": [
+   "https://www.inaturalist.org/photos/58653619"
+  ],
+  "gopher-snake": [
+   "https://www.inaturalist.org/photos/25171938",
+   "https://www.inaturalist.org/photos/511282342",
+   "https://www.inaturalist.org/photos/293179436"
+  ],
+  "fer-de-lance": [
+   "https://www.inaturalist.org/photos/311736120",
+   "https://www.inaturalist.org/photos/26010733",
+   "https://www.inaturalist.org/photos/53430"
+  ],
+  "bushmaster": [
+   "https://www.inaturalist.org/photos/434107226",
+   "https://www.inaturalist.org/photos/314932719"
+  ],
+  "eyelash-viper": [
+   "https://www.inaturalist.org/photos/347741337"
+  ],
+  "south-american-rattlesnake": [
+   "https://www.inaturalist.org/photos/127098226"
+  ],
+  "green-anaconda": [
+   "https://www.inaturalist.org/photos/12213433"
+  ],
+  "common-european-adder": [
+   "https://www.inaturalist.org/photos/188344513"
+  ],
+  "corn-snake": [
+   "https://www.inaturalist.org/photos/116401885"
+  ],
+  "banded-sea-krait": [
+   "https://www.inaturalist.org/photos/339176844"
+  ],
+  "black-mamba": [
+   "https://www.inaturalist.org/photos/66502572"
+  ],
+  "_max": {
+   "eastern-brown-snake": 2,
+   "dugite": 2,
+   "tiger-snake": 2,
+   "russells-viper": 1,
+   "gopher-snake": 2,
+   "fer-de-lance": 2,
+   "common-krait": 2,
+   "sidewinder": 2
+  }
+ }
+}

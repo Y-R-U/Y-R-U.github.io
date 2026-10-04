@@ -1,0 +1,729 @@
+{
+ "style": "painterly gouache illustration in the style of a vintage film poster, bold simplified shapes, visible brush texture, rich limited colour palette, dramatic cinematic lighting, cream paper border, no text, no letters, no words, no numbers, no logos, no signature",
+ "model": "flux2-klein-9b-mlx-4bit",
+ "steps": 4,
+ "width": 640,
+ "height": 432,
+ "films": [
+  {
+   "id": "yellow-submarine",
+   "name": "Yellow Submarine",
+   "alt": [],
+   "artist": "The Beatles",
+   "year": 1966,
+   "kids": true,
+   "blurb": "Sung by Ringo Starr on the album Revolver.",
+   "scenes": [
+    {
+     "p": "a cheerful bright yellow submarine with portholes under a deep blue sea, bubbles and fish",
+     "d": 1,
+     "cap": "A yellow submarine under the sea"
+    }
+   ]
+  },
+  {
+   "id": "purple-rain",
+   "name": "Purple Rain",
+   "alt": [],
+   "artist": "Prince",
+   "year": 1984,
+   "kids": true,
+   "blurb": "Title song of Prince's 1984 film and album.",
+   "scenes": [
+    {
+     "p": "heavy purple rain falling from violet clouds over a city street at night, puddles glowing purple, a lone figure with a guitar seen from behind",
+     "d": 1,
+     "cap": "Rain that falls purple"
+    }
+   ]
+  },
+  {
+   "id": "hotel-california",
+   "name": "Hotel California",
+   "alt": [],
+   "artist": "Eagles",
+   "year": 1977,
+   "kids": false,
+   "blurb": "The Eagles' best-known song, from the album of the same name.",
+   "scenes": [
+    {
+     "p": "a lonely Spanish mission-style hotel lit up on a dark desert highway at dusk, palm trees, a shimmering light in the distance",
+     "d": 2,
+     "cap": "A hotel on a dark desert highway"
+    }
+   ]
+  },
+  {
+   "id": "smoke-on-the-water",
+   "name": "Smoke on the Water",
+   "alt": [],
+   "artist": "Deep Purple",
+   "year": 1972,
+   "kids": false,
+   "blurb": "About a fire at the casino in Montreux, Switzerland, during a Frank Zappa concert.",
+   "scenes": [
+    {
+     "p": "thick billowing smoke rolling across a lake at night from a burning building on the shore, mountains behind, lake reflections",
+     "d": 2,
+     "cap": "Smoke drifting over a lake"
+    }
+   ]
+  },
+  {
+   "id": "stairway-to-heaven",
+   "name": "Stairway to Heaven",
+   "alt": [],
+   "artist": "Led Zeppelin",
+   "year": 1971,
+   "kids": true,
+   "blurb": "An eight-minute rock epic from Led Zeppelin's untitled fourth album.",
+   "scenes": [
+    {
+     "p": "a long golden spiral staircase rising up through glowing clouds into heavenly light",
+     "d": 1,
+     "cap": "A staircase climbing into the clouds"
+    }
+   ]
+  },
+  {
+   "id": "strawberry-fields-forever",
+   "name": "Strawberry Fields Forever",
+   "alt": [],
+   "artist": "The Beatles",
+   "year": 1967,
+   "kids": true,
+   "blurb": "Named after a Salvation Army children's home near John Lennon's childhood home in Liverpool.",
+   "scenes": [
+    {
+     "p": "endless rolling fields of strawberry plants with giant ripe strawberries stretching to a psychedelic horizon, an iron gate",
+     "d": 2,
+     "cap": "Fields of strawberries forever"
+    }
+   ]
+  },
+  {
+   "id": "here-comes-the-sun",
+   "name": "Here Comes the Sun",
+   "alt": [],
+   "artist": "The Beatles",
+   "year": 1969,
+   "kids": true,
+   "blurb": "Written by George Harrison for Abbey Road.",
+   "scenes": [
+    {
+     "p": "a smiling golden sun rising over a frosty English garden as the snow melts, flowers opening",
+     "d": 1,
+     "cap": "The sun comes out after winter"
+    }
+   ]
+  },
+  {
+   "id": "octopuss-garden",
+   "name": "Octopus's Garden",
+   "alt": [],
+   "artist": "The Beatles",
+   "year": 1969,
+   "kids": true,
+   "blurb": "Written and sung by Ringo Starr on Abbey Road.",
+   "scenes": [
+    {
+     "p": "a friendly orange octopus tending a colourful garden of coral and sea flowers on the ocean floor",
+     "d": 1,
+     "cap": "An octopus's garden under the sea"
+    }
+   ]
+  },
+  {
+   "id": "blue-suede-shoes",
+   "name": "Blue Suede Shoes",
+   "alt": [],
+   "artist": "Carl Perkins",
+   "year": 1956,
+   "kids": true,
+   "blurb": "A rockabilly classic, also a hit for Elvis Presley.",
+   "scenes": [
+    {
+     "p": "a pair of bright blue suede shoes on a 1950s dance floor, spotlight, jukebox glow",
+     "d": 1,
+     "cap": "A pair of blue suede shoes"
+    }
+   ]
+  },
+  {
+   "id": "jailhouse-rock",
+   "name": "Jailhouse Rock",
+   "alt": [],
+   "artist": "Elvis Presley",
+   "year": 1957,
+   "kids": true,
+   "blurb": "Title song from Elvis Presley's 1957 film.",
+   "scenes": [
+    {
+     "p": "prisoners in striped uniforms dancing in a jail cell block, a guitar, big rock music notes",
+     "d": 2,
+     "cap": "Dancing in the jailhouse"
+    }
+   ]
+  },
+  {
+   "id": "rocket-man",
+   "name": "Rocket Man",
+   "alt": [],
+   "artist": "Elton John",
+   "year": 1972,
+   "kids": true,
+   "blurb": "Inspired by a Ray Bradbury short story about astronauts.",
+   "scenes": [
+    {
+     "p": "a lone astronaut in a retro spacesuit seen from behind looking out of a 1970s rocket window at the stars and Earth",
+     "d": 2,
+     "cap": "A lonely man in a rocket"
+    }
+   ]
+  },
+  {
+   "id": "crocodile-rock",
+   "name": "Crocodile Rock",
+   "alt": [],
+   "artist": "Elton John",
+   "year": 1972,
+   "kids": true,
+   "blurb": "Elton John's nostalgic tribute to 1950s rock and roll.",
+   "scenes": [
+    {
+     "p": "a big green crocodile in sunglasses dancing on a rock in a swamp, 1950s dance party",
+     "d": 1,
+     "cap": "A crocodile rocking out"
+    }
+   ]
+  },
+  {
+   "id": "another-brick-in-the-wall",
+   "name": "Another Brick in the Wall",
+   "alt": [],
+   "artist": "Pink Floyd",
+   "year": 1979,
+   "kids": false,
+   "blurb": "From Pink Floyd's rock opera The Wall.",
+   "scenes": [
+    {
+     "p": "a single brick being laid into an enormous endless grey brick wall, a trowel, gloomy sky",
+     "d": 2,
+     "cap": "Just another brick in the wall"
+    }
+   ]
+  },
+  {
+   "id": "riders-on-the-storm",
+   "name": "Riders on the Storm",
+   "alt": [],
+   "artist": "The Doors",
+   "year": 1971,
+   "kids": false,
+   "blurb": "The last song recorded by The Doors with Jim Morrison.",
+   "scenes": [
+    {
+     "p": "silhouetted horse riders galloping through a thunderstorm on a desert plain, forks of lightning, rain",
+     "d": 2,
+     "cap": "Riders in the thunderstorm"
+    }
+   ]
+  },
+  {
+   "id": "paint-it-black",
+   "name": "Paint It Black",
+   "alt": [],
+   "artist": "The Rolling Stones",
+   "year": 1966,
+   "kids": false,
+   "blurb": "Features Brian Jones playing the sitar.",
+   "scenes": [
+    {
+     "p": "a hand painting a red door completely black with a big paintbrush, black paint dripping",
+     "d": 2,
+     "cap": "Painting it black"
+    }
+   ]
+  },
+  {
+   "id": "umbrella",
+   "name": "Umbrella",
+   "alt": [],
+   "artist": "Rihanna",
+   "year": 2007,
+   "kids": true,
+   "blurb": "A global number one for Rihanna, featuring Jay-Z.",
+   "scenes": [
+    {
+     "p": "a single shiny black umbrella sheltering in a heavy rainstorm in a dark city street, glittering drops",
+     "d": 2,
+     "cap": "Under my umbrella"
+    }
+   ]
+  },
+  {
+   "id": "firework",
+   "name": "Firework",
+   "alt": [],
+   "artist": "Katy Perry",
+   "year": 2010,
+   "kids": true,
+   "blurb": "From Katy Perry's album Teenage Dream.",
+   "scenes": [
+    {
+     "p": "a single spectacular firework bursting into colours over a city skyline at night",
+     "d": 1,
+     "cap": "A firework lights up the sky"
+    }
+   ]
+  },
+  {
+   "id": "roar",
+   "name": "Roar",
+   "alt": [],
+   "artist": "Katy Perry",
+   "year": 2013,
+   "kids": true,
+   "blurb": "Lead single from Katy Perry's album Prism.",
+   "scenes": [
+    {
+     "p": "a huge tiger roaring in a lush jungle, mouth wide open, leaves shaking",
+     "d": 1,
+     "cap": "A tiger's roar"
+    }
+   ]
+  },
+  {
+   "id": "mr-blue-sky",
+   "name": "Mr. Blue Sky",
+   "alt": [],
+   "artist": "Electric Light Orchestra",
+   "year": 1977,
+   "kids": true,
+   "blurb": "From ELO's double album Out of the Blue.",
+   "scenes": [
+    {
+     "p": "a cheerful man made of clouds in a top hat smiling in a brilliant blue sky as storm clouds roll away over a town",
+     "d": 2,
+     "cap": "Hey there, Mr Blue Sky"
+    }
+   ]
+  },
+  {
+   "id": "waterloo",
+   "name": "Waterloo",
+   "alt": [],
+   "artist": "ABBA",
+   "year": 1974,
+   "kids": true,
+   "blurb": "ABBA's Eurovision Song Contest winner.",
+   "scenes": [
+    {
+     "p": "Napoleonic-era soldiers and cavalry on a battlefield with cannons and smoke, a defeated general on a white horse",
+     "d": 2,
+     "cap": "The Battle of Waterloo"
+    }
+   ]
+  },
+  {
+   "id": "dancing-queen",
+   "name": "Dancing Queen",
+   "alt": [],
+   "artist": "ABBA",
+   "year": 1976,
+   "kids": true,
+   "blurb": "ABBA's only US number one.",
+   "scenes": [
+    {
+     "p": "a young queen in a sparkling crown and glittering gown dancing under a disco mirror ball",
+     "d": 1,
+     "cap": "A queen on the dance floor"
+    }
+   ]
+  },
+  {
+   "id": "bridge-over-troubled-water",
+   "name": "Bridge over Troubled Water",
+   "alt": [],
+   "artist": "Simon & Garfunkel",
+   "year": 1970,
+   "kids": true,
+   "blurb": "The title track of Simon & Garfunkel's final studio album.",
+   "scenes": [
+    {
+     "p": "a graceful stone bridge arching over a raging stormy river, rapids and spray, dramatic sky",
+     "d": 2,
+     "cap": "A bridge over troubled water"
+    }
+   ]
+  },
+  {
+   "id": "black-hole-sun",
+   "name": "Black Hole Sun",
+   "alt": [],
+   "artist": "Soundgarden",
+   "year": 1994,
+   "kids": false,
+   "blurb": "Soundgarden's biggest hit, from Superunknown.",
+   "scenes": [
+    {
+     "p": "a black sun ringed with fire hanging over a suburban neighbourhood, eerie sky",
+     "d": 2,
+     "cap": "A black hole for a sun"
+    }
+   ]
+  },
+  {
+   "id": "ring-of-fire",
+   "name": "Ring of Fire",
+   "alt": [],
+   "artist": "Johnny Cash",
+   "year": 1963,
+   "kids": false,
+   "blurb": "Co-written by June Carter.",
+   "scenes": [
+    {
+     "p": "a great circle of flames burning on a dark desert floor at night",
+     "d": 2,
+     "cap": "A ring of fire"
+    }
+   ]
+  },
+  {
+   "id": "big-yellow-taxi",
+   "name": "Big Yellow Taxi",
+   "alt": [],
+   "artist": "Joni Mitchell",
+   "year": 1970,
+   "kids": true,
+   "blurb": "Famous for the line about paving paradise to put up a parking lot.",
+   "scenes": [
+    {
+     "p": "a big yellow taxi driving past a paradise of trees beside a newly paved parking lot",
+     "d": 2,
+     "cap": "They paved paradise"
+    }
+   ]
+  },
+  {
+   "id": "starman",
+   "name": "Starman",
+   "alt": [],
+   "artist": "David Bowie",
+   "year": 1972,
+   "kids": true,
+   "blurb": "From The Rise and Fall of Ziggy Stardust and the Spiders from Mars.",
+   "scenes": [
+    {
+     "p": "a glowing figure made of stars waiting in the night sky above a suburban bedroom where a teenager listens to a radio",
+     "d": 2,
+     "cap": "A starman waiting in the sky"
+    }
+   ]
+  },
+  {
+   "id": "space-oddity",
+   "name": "Space Oddity",
+   "alt": [],
+   "artist": "David Bowie",
+   "year": 1969,
+   "kids": true,
+   "blurb": "Released days before the Apollo 11 Moon landing.",
+   "scenes": [
+    {
+     "p": "a lone astronaut floating in space beside a small tin-can capsule, Earth blue below",
+     "d": 2,
+     "cap": "An astronaut adrift in space"
+    }
+   ]
+  },
+  {
+   "id": "hungry-like-the-wolf",
+   "name": "Hungry Like the Wolf",
+   "alt": [],
+   "artist": "Duran Duran",
+   "year": 1982,
+   "kids": false,
+   "blurb": "Known for its music video filmed in Sri Lanka.",
+   "scenes": [
+    {
+     "p": "a hungry grey wolf prowling through a moonlit jungle, eyes glowing",
+     "d": 2,
+     "cap": "Hungry like the wolf"
+    }
+   ]
+  },
+  {
+   "id": "eye-of-the-tiger",
+   "name": "Eye of the Tiger",
+   "alt": [],
+   "artist": "Survivor",
+   "year": 1982,
+   "kids": true,
+   "blurb": "Written for the film Rocky III.",
+   "scenes": [
+    {
+     "p": "an extreme close-up of a fierce tiger's eye, amber and gold, reflecting a boxing ring",
+     "d": 1,
+     "cap": "The eye of the tiger"
+    }
+   ]
+  },
+  {
+   "id": "wrecking-ball",
+   "name": "Wrecking Ball",
+   "alt": [],
+   "artist": "Miley Cyrus",
+   "year": 2013,
+   "kids": false,
+   "blurb": "Miley Cyrus's first number one on the Billboard Hot 100.",
+   "scenes": [
+    {
+     "p": "a huge iron wrecking ball swinging into a brick wall, bricks exploding outward, construction crane",
+     "d": 1,
+     "cap": "A wrecking ball"
+    }
+   ]
+  },
+  {
+   "id": "island-in-the-sun",
+   "name": "Island in the Sun",
+   "alt": [],
+   "artist": "Weezer",
+   "year": 2001,
+   "kids": true,
+   "blurb": "From Weezer's Green Album.",
+   "scenes": [
+    {
+     "p": "a small tropical island with a single palm tree bathed in warm sun on a turquoise sea",
+     "d": 2,
+     "cap": "An island in the sun"
+    }
+   ]
+  },
+  {
+   "id": "bad-moon-rising",
+   "name": "Bad Moon Rising",
+   "alt": [],
+   "artist": "Creedence Clearwater Revival",
+   "year": 1969,
+   "kids": false,
+   "blurb": "CCR's warning of trouble ahead.",
+   "scenes": [
+    {
+     "p": "a huge ominous blood-orange moon rising over a bayou, storm clouds, lightning on the horizon",
+     "d": 2,
+     "cap": "A bad moon on the rise"
+    }
+   ]
+  },
+  {
+   "id": "sunflower",
+   "name": "Sunflower",
+   "alt": [],
+   "artist": "Post Malone & Swae Lee",
+   "year": 2018,
+   "kids": true,
+   "blurb": "Written for the animated film Spider-Man: Into the Spider-Verse.",
+   "scenes": [
+    {
+     "p": "a single giant sunflower in a field under a bright sky, glowing petals",
+     "d": 2,
+     "cap": "A sunflower"
+    }
+   ]
+  },
+  {
+   "id": "counting-stars",
+   "name": "Counting Stars",
+   "alt": [],
+   "artist": "OneRepublic",
+   "year": 2013,
+   "kids": true,
+   "blurb": "A worldwide hit from OneRepublic's album Native.",
+   "scenes": [
+    {
+     "p": "a person lying on a hill at night seen from behind, counting a sky full of bright stars",
+     "d": 2,
+     "cap": "Counting the stars"
+    }
+   ]
+  },
+  {
+   "id": "blinding-lights",
+   "name": "Blinding Lights",
+   "alt": [],
+   "artist": "The Weeknd",
+   "year": 2019,
+   "kids": false,
+   "blurb": "Became the Billboard Hot 100's top song of all time in 2021.",
+   "scenes": [
+    {
+     "p": "a red sports car racing through a city at night, blinding white headlights and neon",
+     "d": 2,
+     "cap": "Blinded by the lights"
+    }
+   ]
+  },
+  {
+   "id": "levitating",
+   "name": "Levitating",
+   "alt": [],
+   "artist": "Dua Lipa",
+   "year": 2020,
+   "kids": true,
+   "blurb": "From Dua Lipa's album Future Nostalgia.",
+   "scenes": [
+    {
+     "p": "a girl in a sparkly outfit floating in mid-air among planets and stars, a disco moon",
+     "d": 2,
+     "cap": "Levitating among the stars"
+    }
+   ]
+  },
+  {
+   "id": "rhinestone-cowboy",
+   "name": "Rhinestone Cowboy",
+   "alt": [],
+   "artist": "Glen Campbell",
+   "year": 1975,
+   "kids": true,
+   "blurb": "Glen Campbell's signature country-pop hit.",
+   "scenes": [
+    {
+     "p": "a cowboy in a glittering rhinestone-covered suit and hat seen from behind riding a horse into a city of bright lights",
+     "d": 2,
+     "cap": "A cowboy covered in rhinestones"
+    }
+   ]
+  },
+  {
+   "id": "purple-haze",
+   "name": "Purple Haze",
+   "alt": [],
+   "artist": "The Jimi Hendrix Experience",
+   "year": 1967,
+   "kids": false,
+   "blurb": "Jimi Hendrix's second single, with its famous opening riff.",
+   "scenes": [
+    {
+     "p": "a dense swirling purple haze over a psychedelic landscape, a guitar silhouette",
+     "d": 2,
+     "cap": "A purple haze"
+    }
+   ]
+  },
+  {
+   "id": "white-christmas",
+   "name": "White Christmas",
+   "alt": [],
+   "artist": "Bing Crosby",
+   "year": 1942,
+   "kids": true,
+   "blurb": "Written by Irving Berlin; one of the best-selling singles of all time.",
+   "scenes": [
+    {
+     "p": "a snowy village at Christmas with snow-covered trees, sleigh bells and glowing windows",
+     "d": 1,
+     "cap": "A white Christmas"
+    }
+   ]
+  },
+  {
+   "id": "message-in-a-bottle",
+   "name": "Message in a Bottle",
+   "alt": [],
+   "artist": "The Police",
+   "year": 1979,
+   "kids": true,
+   "blurb": "The Police's first UK number one.",
+   "scenes": [
+    {
+     "p": "a glass bottle containing a rolled-up message washed up on a deserted beach, dozens more bottles arriving",
+     "d": 1,
+     "cap": "A message in a bottle"
+    }
+   ]
+  },
+  {
+   "id": "walking-on-the-moon",
+   "name": "Walking on the Moon",
+   "alt": [],
+   "artist": "The Police",
+   "year": 1979,
+   "kids": true,
+   "blurb": "From The Police's album Reggatta de Blanc.",
+   "scenes": [
+    {
+     "p": "an astronaut taking big bouncing steps on the moon's surface, Earth rising",
+     "d": 1,
+     "cap": "Walking on the moon"
+    }
+   ]
+  },
+  {
+   "id": "diamonds",
+   "name": "Diamonds",
+   "alt": [],
+   "artist": "Rihanna",
+   "year": 2012,
+   "kids": true,
+   "blurb": "Co-written by Sia.",
+   "scenes": [
+    {
+     "p": "brilliant diamonds glittering across a night sky like stars",
+     "d": 2,
+     "cap": "Shine bright like a diamond"
+    }
+   ]
+  },
+  {
+   "id": "wonderwall",
+   "name": "Wonderwall",
+   "alt": [],
+   "artist": "Oasis",
+   "year": 1995,
+   "kids": false,
+   "blurb": "From (What's the Story) Morning Glory?",
+   "scenes": [
+    {
+     "p": "a magical wall covered in glowing doors, vines and stars in a quiet city street at night",
+     "d": 3,
+     "cap": "A wall full of wonders"
+    }
+   ]
+  },
+  {
+   "id": "candle-in-the-wind",
+   "name": "Candle in the Wind",
+   "alt": [],
+   "artist": "Elton John",
+   "year": 1973,
+   "kids": true,
+   "blurb": "Originally written about Marilyn Monroe.",
+   "scenes": [
+    {
+     "p": "a single candle flame flickering in the wind on a windowsill at night",
+     "d": 2,
+     "cap": "A candle in the wind"
+    }
+   ]
+  },
+  {
+   "id": "lucy-in-the-sky-with-diamonds",
+   "name": "Lucy in the Sky with Diamonds",
+   "alt": [],
+   "artist": "The Beatles",
+   "year": 1967,
+   "kids": false,
+   "blurb": "From Sgt. Pepper's Lonely Hearts Club Band.",
+   "scenes": [
+    {
+     "p": "a girl floating in a psychedelic sky full of sparkling diamonds, tangerine trees and marmalade skies",
+     "d": 2,
+     "cap": "Lucy in the sky with diamonds"
+    }
+   ]
+  }
+ ]
+}

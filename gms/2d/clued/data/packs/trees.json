@@ -1,0 +1,2704 @@
+{
+ "id": "trees",
+ "title": "Trees",
+ "theme": "nature",
+ "icon": "🌳",
+ "kids": true,
+ "version": 1,
+ "leakExempt": [
+  "tree",
+  "trees"
+ ],
+ "factsMeta": {
+  "region": {
+   "type": "cat",
+   "label": "Native to"
+  },
+  "evergreen": {
+   "type": "bool",
+   "label": "Evergreen",
+   "yes": "Evergreen",
+   "no": "Loses its leaves"
+  },
+  "conifer": {
+   "type": "bool",
+   "label": "Conifer",
+   "yes": "Conifer",
+   "no": "Not a conifer"
+  },
+  "heightM": {
+   "type": "num",
+   "label": "Typical mature height",
+   "unit": "m",
+   "higherLabel": "Taller"
+  }
+ },
+ "items": [
+  {
+   "id": "english-oak",
+   "name": "English oak",
+   "alt": [
+    "oak",
+    "pedunculate oak",
+    "common oak"
+   ],
+   "sci": "Quercus robur",
+   "group": "broadleaf",
+   "facts": {
+    "region": "Europe",
+    "evergreen": false,
+    "conifer": false,
+    "heightM": 30
+   },
+   "lookalikes": [
+    "cork-oak"
+   ],
+   "blurb": "A big, long-lived tree that grows acorns. One oak can be home to hundreds of kinds of insects.",
+   "clues": [
+    "Family: Fagaceae.",
+    "Genus: Quercus.",
+    "It can support over 2,000 other species.",
+    "Some living ones are over 1,000 years old.",
+    "Its leaves have rounded lobes.",
+    "It is native to Europe.",
+    "It loses its leaves each year.",
+    "It typically grows to about 30 m tall.",
+    "It was used to build wooden warships.",
+    "Its nuts are called acorns.",
+    "The answer has 2 words (7, 3 letters).",
+    "It starts with the letter E."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/326660041/medium.jpeg",
+      "w": 500,
+      "h": 500,
+      "credit": "Veronica Jendrick",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/326660041"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/467469040/medium.jpg",
+      "w": 500,
+      "h": 353,
+      "credit": "zebedeugalinha",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/467469040"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/654174819/medium.jpg",
+      "w": 375,
+      "h": 500,
+      "credit": "Wolfgang Jauch",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/654174819"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "silver-birch",
+   "name": "Silver birch",
+   "alt": [
+    "birch"
+   ],
+   "sci": "Betula pendula",
+   "group": "broadleaf",
+   "facts": {
+    "region": "Europe",
+    "evergreen": false,
+    "conifer": false,
+    "heightM": 25
+   },
+   "blurb": "A slender tree with white, papery bark and drooping twigs. It is one of the first trees to grow on bare land.",
+   "clues": [
+    "Family: Betulaceae.",
+    "Genus: Betula.",
+    "It is a pioneer tree that colonises cleared land.",
+    "Its sap can be tapped and drunk in spring.",
+    "Its twigs droop at the tips.",
+    "It is native to Europe.",
+    "It loses its leaves each year.",
+    "It typically grows to about 25 m tall.",
+    "Its leaves are small and triangular.",
+    "Its bark is white and papery.",
+    "The answer has 2 words (6, 5 letters).",
+    "It starts with the letter S."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/175067773/medium.jpg",
+      "w": 500,
+      "h": 335,
+      "credit": "Douglas Goldman",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/175067773"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/4734583/medium.jpeg",
+      "w": 500,
+      "h": 333,
+      "credit": "Fabien Piednoir",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/4734583"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/114260890/medium.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Oleg Kosterin",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/114260890"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "european-beech",
+   "name": "European beech",
+   "alt": [
+    "beech",
+    "common beech"
+   ],
+   "sci": "Fagus sylvatica",
+   "group": "broadleaf",
+   "facts": {
+    "region": "Europe",
+    "evergreen": false,
+    "conifer": false,
+    "heightM": 35
+   },
+   "blurb": "A tall tree with smooth grey bark. Its dense leaves make beech woods dark and shady.",
+   "clues": [
+    "Family: Fagaceae.",
+    "Genus: Fagus.",
+    "Young trees often keep dead leaves through winter.",
+    "Its nuts are called mast.",
+    "Its bark is smooth and grey.",
+    "It loses its leaves each year.",
+    "It typically grows to about 35 m tall.",
+    "It is often grown as a hedge.",
+    "Its name begins like a sandy seaside.",
+    "The answer has 2 words (8, 5 letters).",
+    "It starts with the letter E."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/394535806/medium.jpeg",
+      "w": 375,
+      "h": 500,
+      "credit": "Rebecca Gimenez Husted",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/394535806"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/408459425/medium.jpeg",
+      "w": 500,
+      "h": 333,
+      "credit": "no rights reserved",
+      "license": "CC0 1.0",
+      "page": "https://www.inaturalist.org/photos/408459425"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/349506389/medium.jpeg",
+      "w": 375,
+      "h": 500,
+      "credit": "Erwin Gruber",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/349506389"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "horse-chestnut",
+   "name": "Horse chestnut",
+   "alt": [
+    "conker tree"
+   ],
+   "sci": "Aesculus hippocastanum",
+   "group": "broadleaf",
+   "facts": {
+    "region": "Europe",
+    "evergreen": false,
+    "conifer": false,
+    "heightM": 30
+   },
+   "blurb": "A big tree with leaves like an open hand and spiky cases holding shiny brown seeds called conkers.",
+   "clues": [
+    "Family: Sapindaceae.",
+    "Genus: Aesculus.",
+    "It comes from the Balkans.",
+    "Its flowers stand up like candles in spring.",
+    "Its leaves have five to seven leaflets like fingers.",
+    "It is native to Europe.",
+    "It loses its leaves each year.",
+    "It typically grows to about 30 m tall.",
+    "Children play a game with its seeds on strings.",
+    "The answer has 2 words (5, 8 letters).",
+    "It starts with the letter H."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/236277620/medium.jpeg",
+      "w": 375,
+      "h": 500,
+      "credit": "Onondaga Earth Corps",
+      "license": "CC0 1.0",
+      "page": "https://www.inaturalist.org/photos/236277620"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/1183047/medium.jpg",
+      "w": 310,
+      "h": 500,
+      "credit": "Chestnut District",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/1183047"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/1183046/medium.jpg",
+      "w": 375,
+      "h": 500,
+      "credit": "Maja Dumat",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/1183046"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "sugar-maple",
+   "name": "Sugar maple",
+   "alt": [
+    "maple"
+   ],
+   "sci": "Acer saccharum",
+   "group": "broadleaf",
+   "facts": {
+    "region": "North America",
+    "evergreen": false,
+    "conifer": false,
+    "heightM": 30
+   },
+   "lookalikes": [
+    "japanese-maple"
+   ],
+   "blurb": "A North American tree whose sap is boiled down to make maple syrup. Its leaves turn brilliant colours in autumn.",
+   "clues": [
+    "Family: Sapindaceae.",
+    "Genus: Acer.",
+    "It takes about 40 litres of sap to make 1 litre of syrup.",
+    "Its leaves turn orange and red in autumn.",
+    "Its seeds spin like helicopters.",
+    "It is native to North America.",
+    "It loses its leaves each year.",
+    "It typically grows to about 30 m tall.",
+    "Its leaf is on the flag of Canada.",
+    "Its sap makes a sweet syrup for pancakes.",
+    "The answer has 2 words (5, 5 letters).",
+    "It starts with the letter S."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/270771956/medium.jpg",
+      "w": 500,
+      "h": 414,
+      "credit": "James St. John",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/270771956"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/237322690/medium.jpeg",
+      "w": 375,
+      "h": 500,
+      "credit": "Tom Norton",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/237322690"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/476491608/medium.jpg",
+      "w": 375,
+      "h": 500,
+      "credit": "oksanaetal",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/476491608"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "japanese-maple",
+   "name": "Japanese maple",
+   "sci": "Acer palmatum",
+   "group": "broadleaf",
+   "facts": {
+    "region": "Asia",
+    "evergreen": false,
+    "conifer": false,
+    "heightM": 8
+   },
+   "lookalikes": [
+    "sugar-maple"
+   ],
+   "blurb": "A small, graceful tree with finely cut leaves that turn fiery red in autumn. It is popular in gardens.",
+   "clues": [
+    "Family: Sapindaceae.",
+    "Genus: Acer.",
+    "Thousands of garden varieties exist.",
+    "Its leaves look like little hands.",
+    "It is often used for bonsai.",
+    "It is native to Asia.",
+    "It loses its leaves each year.",
+    "It typically grows to about 8 m tall.",
+    "Its leaves turn bright red in autumn.",
+    "The answer has 2 words (8, 5 letters).",
+    "It starts with the letter J."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/2651499/medium.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "harum.koh",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/2651499"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/135870395/medium.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Timur Kalininsky",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/135870395"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/146544542/medium.jpeg",
+      "w": 500,
+      "h": 281,
+      "credit": "Gavin Slater",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/146544542"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "weeping-willow",
+   "name": "Weeping willow",
+   "alt": [
+    "willow"
+   ],
+   "sci": "Salix babylonica",
+   "group": "broadleaf",
+   "facts": {
+    "region": "Asia",
+    "evergreen": false,
+    "conifer": false,
+    "heightM": 15
+   },
+   "blurb": "A tree with long, drooping branches that often grows by rivers and lakes.",
+   "clues": [
+    "Family: Salicaceae.",
+    "Genus: Salix.",
+    "It comes from northern China.",
+    "It grows well near water.",
+    "It is native to Asia.",
+    "It loses its leaves each year.",
+    "It typically grows to about 15 m tall.",
+    "Its long branches hang down to the ground.",
+    "Its name sounds sad, as if it is crying.",
+    "The answer has 2 words (7, 6 letters).",
+    "It starts with the letter W."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/57094810/medium.jpeg",
+      "w": 500,
+      "h": 333,
+      "credit": "Tony Rebelo",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/57094810"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/63337211/medium.jpeg",
+      "w": 500,
+      "h": 333,
+      "credit": "Tony Rebelo",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/63337211"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/272253549/medium.jpeg",
+      "w": 243,
+      "h": 500,
+      "credit": "Rob Cruickshank",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/272253549"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "scots-pine",
+   "name": "Scots pine",
+   "sci": "Pinus sylvestris",
+   "group": "conifer",
+   "facts": {
+    "region": "Europe",
+    "evergreen": true,
+    "conifer": true,
+    "heightM": 30
+   },
+   "lookalikes": [
+    "norway-spruce"
+   ],
+   "blurb": "A pine with orange-red bark near the top and blue-green needles in pairs. It is often called Scotland's national tree.",
+   "clues": [
+    "Family: Pinaceae.",
+    "Genus: Pinus.",
+    "Its upper bark is orange-red.",
+    "Its needles grow in pairs.",
+    "It is native to Europe.",
+    "It keeps its leaves all year.",
+    "It is a conifer.",
+    "It typically grows to about 30 m tall.",
+    "The answer has 2 words (5, 4 letters).",
+    "It starts with the letter S."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/268451762/medium.jpg",
+      "w": 335,
+      "h": 500,
+      "credit": "Douglas Goldman",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/268451762"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/71529/medium.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "anemoneprojectors (no internet at the moment)",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/71529"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/66534708/medium.jpg",
+      "w": 375,
+      "h": 500,
+      "credit": "Patrick Cox",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/66534708"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "norway-spruce",
+   "name": "Norway spruce",
+   "alt": [
+    "Christmas tree",
+    "spruce"
+   ],
+   "sci": "Picea abies",
+   "group": "conifer",
+   "facts": {
+    "region": "Europe",
+    "evergreen": true,
+    "conifer": true,
+    "heightM": 40
+   },
+   "lookalikes": [
+    "scots-pine"
+   ],
+   "blurb": "A tall, cone-shaped conifer. It is the traditional Christmas tree in Europe.",
+   "clues": [
+    "Family: Pinaceae.",
+    "Genus: Picea.",
+    "Its wood is used to make violins.",
+    "Its cones hang downwards.",
+    "It is native to Europe.",
+    "It keeps its leaves all year.",
+    "It is a conifer.",
+    "It typically grows to about 40 m tall.",
+    "It is shaped like a cone.",
+    "The answer has 2 words (6, 6 letters).",
+    "It starts with the letter N."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/547109733/medium.jpg",
+      "w": 335,
+      "h": 500,
+      "credit": "Douglas Goldman",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/547109733"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/424612110/medium.jpg",
+      "w": 500,
+      "h": 374,
+      "credit": "Edward Ricemeyer",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/424612110"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/369736539/medium.jpg",
+      "w": 375,
+      "h": 500,
+      "credit": "Katrin Simon",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/369736539"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "coast-redwood",
+   "name": "Coast redwood",
+   "alt": [
+    "redwood",
+    "California redwood"
+   ],
+   "sci": "Sequoia sempervirens",
+   "group": "conifer",
+   "facts": {
+    "region": "North America",
+    "evergreen": true,
+    "conifer": true,
+    "heightM": 90
+   },
+   "lookalikes": [
+    "giant-sequoia"
+   ],
+   "blurb": "The tallest tree in the world. The tallest one, named Hyperion, is over 115 metres tall.",
+   "clues": [
+    "Family: Cupressaceae.",
+    "Genus: Sequoia.",
+    "The tallest known one is called Hyperion.",
+    "It gets water from fog.",
+    "Its thick bark resists fire.",
+    "It is native to North America.",
+    "It keeps its leaves all year.",
+    "It is a conifer.",
+    "It typically grows to about 90 m tall.",
+    "It is the tallest tree in the world.",
+    "The answer has 2 words (5, 7 letters).",
+    "It starts with the letter C."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/24613306/medium.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Miguel Vieira",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/24613306"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/29121312/medium.jpeg",
+      "w": 238,
+      "h": 500,
+      "credit": "Annie Chang",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/29121312"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/326787967/medium.jpg",
+      "w": 375,
+      "h": 500,
+      "credit": "no rights reserved",
+      "license": "CC0 1.0",
+      "page": "https://www.inaturalist.org/photos/326787967"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "giant-sequoia",
+   "name": "Giant sequoia",
+   "alt": [
+    "giant redwood",
+    "Wellingtonia"
+   ],
+   "sci": "Sequoiadendron giganteum",
+   "group": "conifer",
+   "facts": {
+    "region": "North America",
+    "evergreen": true,
+    "conifer": true,
+    "heightM": 80
+   },
+   "lookalikes": [
+    "coast-redwood"
+   ],
+   "blurb": "The biggest tree in the world by volume. The largest, General Sherman, is over 2,000 years old.",
+   "clues": [
+    "Family: Cupressaceae.",
+    "The heat of fires helps its cones release seeds.",
+    "The biggest one is called General Sherman.",
+    "It can live for over 3,000 years.",
+    "It is native to North America.",
+    "It keeps its leaves all year.",
+    "It is a conifer.",
+    "It typically grows to about 80 m tall.",
+    "It grows in California's Sierra Nevada.",
+    "It is the biggest tree in the world by volume.",
+    "The answer has 2 words (5, 7 letters).",
+    "It starts with the letter G."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/84769950/medium.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Laura Camp",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/84769950"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/50434/medium.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "folini",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/50434"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/103304895/medium.jpg",
+      "w": 341,
+      "h": 500,
+      "credit": "Jeff Lahr",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/103304895"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "douglas-fir",
+   "name": "Douglas fir",
+   "sci": "Pseudotsuga menziesii",
+   "group": "conifer",
+   "facts": {
+    "region": "North America",
+    "evergreen": true,
+    "conifer": true,
+    "heightM": 70
+   },
+   "blurb": "A huge conifer of western North America and a very important timber tree. Its cones have three-pointed bracts.",
+   "clues": [
+    "Family: Pinaceae.",
+    "Genus: Pseudotsuga.",
+    "Its cones have three-pointed \"mouse tails\" sticking out.",
+    "It is a popular Christmas tree in the USA.",
+    "It is native to North America.",
+    "It keeps its leaves all year.",
+    "It is a conifer.",
+    "It typically grows to about 70 m tall.",
+    "It is one of the world's most important timber trees.",
+    "The answer has 2 words (7, 3 letters).",
+    "It starts with the letter D."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/146021534/medium.jpeg",
+      "w": 500,
+      "h": 375,
+      "credit": "Danny Steaven",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/146021534"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/159545535/medium.jpeg",
+      "w": 500,
+      "h": 375,
+      "credit": "Ellyne Geurts",
+      "license": "CC0 1.0",
+      "page": "https://www.inaturalist.org/photos/159545535"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/34300450/medium.jpeg",
+      "w": 500,
+      "h": 375,
+      "credit": "Randal",
+      "license": "CC0 1.0",
+      "page": "https://www.inaturalist.org/photos/34300450"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "monkey-puzzle-tree",
+   "name": "Monkey puzzle tree",
+   "alt": [
+    "monkey puzzle",
+    "Chilean pine"
+   ],
+   "sci": "Araucaria araucana",
+   "group": "conifer",
+   "facts": {
+    "region": "South America",
+    "evergreen": true,
+    "conifer": true,
+    "heightM": 30
+   },
+   "blurb": "A strange conifer from Chile covered in sharp, scale-like leaves. It is said that even a monkey would find it puzzling to climb.",
+   "clues": [
+    "Family: Araucariaceae.",
+    "Genus: Araucaria.",
+    "Its seeds were a staple food of the Mapuche people.",
+    "Its leaves are hard, sharp triangles.",
+    "It is native to South America.",
+    "It keeps its leaves all year.",
+    "It is a conifer.",
+    "It typically grows to about 30 m tall.",
+    "It is a \"living fossil\" from dinosaur times.",
+    "Its name suggests an animal would find it hard to climb.",
+    "The answer has 3 words (6, 6, 4 letters).",
+    "It starts with the letter M."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/16303515/medium.jpg",
+      "w": 375,
+      "h": 500,
+      "credit": "Francisco E. Fonturbel",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/16303515"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/59786970/medium.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Nelson Atencio",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/59786970"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/117500375/medium.jpeg",
+      "w": 375,
+      "h": 500,
+      "credit": "Nicolas Olejnik",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/117500375"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "ginkgo",
+   "name": "Ginkgo",
+   "alt": [
+    "maidenhair tree",
+    "gingko"
+   ],
+   "sci": "Ginkgo biloba",
+   "group": "ancient",
+   "facts": {
+    "region": "Asia",
+    "evergreen": false,
+    "conifer": false,
+    "heightM": 25
+   },
+   "blurb": "A \"living fossil\" tree with fan-shaped leaves. Six survived the Hiroshima atomic bomb.",
+   "clues": [
+    "Some survived the Hiroshima atomic bomb.",
+    "Its seeds smell like rotten butter.",
+    "It has no close living relatives.",
+    "It is native to Asia.",
+    "It loses its leaves each year.",
+    "It typically grows to about 25 m tall.",
+    "Its leaves turn golden yellow in autumn.",
+    "Its leaves are shaped like fans.",
+    "The answer is one word of 6 letters.",
+    "It starts with the letter G."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/343545534/medium.jpg",
+      "w": 500,
+      "h": 335,
+      "credit": "Douglas Goldman",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/343545534"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/69936348/medium.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Marco Mussita",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/69936348"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/119137630/medium.jpeg",
+      "w": 500,
+      "h": 333,
+      "credit": "Wang.QG",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/119137630"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "african-baobab",
+   "name": "African baobab",
+   "alt": [
+    "baobab"
+   ],
+   "sci": "Adansonia digitata",
+   "group": "broadleaf",
+   "facts": {
+    "region": "Africa",
+    "evergreen": false,
+    "conifer": false,
+    "heightM": 20
+   },
+   "lookalikes": [
+    "boab"
+   ],
+   "blurb": "A huge, thick-trunked African tree that stores water in its trunk. It is called the \"upside-down tree\".",
+   "clues": [
+    "Family: Malvaceae.",
+    "Genus: Adansonia.",
+    "Its fruit is called monkey bread.",
+    "Some are thought to be over 2,000 years old.",
+    "Its trunk stores water.",
+    "It loses its leaves each year.",
+    "It typically grows to about 20 m tall.",
+    "It is called the \"upside-down tree\".",
+    "Its trunk is very fat and its branches look like roots.",
+    "The answer has 2 words (7, 6 letters).",
+    "It starts with the letter A."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/155601064/medium.jpeg",
+      "w": 500,
+      "h": 333,
+      "credit": "Karthik Thrikkadeeri",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/155601064"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/15521975/medium.jpg",
+      "w": 500,
+      "h": 352,
+      "credit": "Robert Taylor",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/15521975"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/49587711/medium.jpg",
+      "w": 500,
+      "h": 331,
+      "credit": "no rights reserved",
+      "license": "CC0 1.0",
+      "page": "https://www.inaturalist.org/photos/49587711"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "boab",
+   "name": "Boab",
+   "alt": [
+    "Australian baobab"
+   ],
+   "sci": "Adansonia gregorii",
+   "group": "broadleaf",
+   "facts": {
+    "region": "Australia",
+    "evergreen": false,
+    "conifer": false,
+    "heightM": 12
+   },
+   "lookalikes": [
+    "african-baobab"
+   ],
+   "blurb": "Australia's only baobab, found in the Kimberley. One hollow boab was used as a prison.",
+   "clues": [
+    "Family: Malvaceae.",
+    "Genus: Adansonia.",
+    "A hollow one near Derby is called the \"Prison Tree\".",
+    "It loses its leaves in the dry season.",
+    "It grows in the Kimberley region.",
+    "It loses its leaves each year.",
+    "It typically grows to about 12 m tall.",
+    "Its trunk is bottle-shaped.",
+    "The answer is one word of 4 letters.",
+    "It starts with the letter B."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/42496268/medium.jpeg",
+      "w": 500,
+      "h": 333,
+      "credit": "Thibaud Aronson",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/42496268"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/100635287/medium.jpeg",
+      "w": 500,
+      "h": 375,
+      "credit": "Ben Lewis",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/100635287"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/590128340/medium.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Wolfgang Ahlmer",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/590128340"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "mountain-ash",
+   "name": "Mountain ash",
+   "alt": [
+    "swamp gum",
+    "Victorian ash"
+   ],
+   "sci": "Eucalyptus regnans",
+   "group": "eucalypt",
+   "facts": {
+    "region": "Australia",
+    "evergreen": true,
+    "conifer": false,
+    "heightM": 85
+   },
+   "blurb": "The tallest flowering plant in the world, a giant eucalypt of Victoria and Tasmania.",
+   "clues": [
+    "Family: Myrtaceae.",
+    "Genus: Eucalyptus.",
+    "The tallest known one, Centurion, is about 100 m tall.",
+    "It is killed by fire but its seeds sprout afterwards.",
+    "It is native to Australia.",
+    "It keeps its leaves all year.",
+    "It typically grows to about 85 m tall.",
+    "It is the tallest flowering plant.",
+    "The answer has 2 words (8, 3 letters).",
+    "It starts with the letter M."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/31210907/medium.jpeg",
+      "w": 500,
+      "h": 281,
+      "credit": "naturewatchwidow",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/31210907"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/389503546/medium.jpg",
+      "w": 375,
+      "h": 500,
+      "credit": "Donald Davesne",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/389503546"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/47328384/medium.jpeg",
+      "w": 243,
+      "h": 500,
+      "credit": "Yoav Daniel Bar-Ness",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/47328384"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "river-red-gum",
+   "name": "River red gum",
+   "alt": [
+    "red gum"
+   ],
+   "sci": "Eucalyptus camaldulensis",
+   "group": "eucalypt",
+   "facts": {
+    "region": "Australia",
+    "evergreen": true,
+    "conifer": false,
+    "heightM": 30
+   },
+   "blurb": "A big, spreading gum tree that grows along rivers across Australia. It can drop heavy branches without warning.",
+   "clues": [
+    "Family: Myrtaceae.",
+    "Genus: Eucalyptus.",
+    "It is the most widespread eucalypt in Australia.",
+    "It can drop big branches without warning.",
+    "Hollows in it are homes for birds and possums.",
+    "It is native to Australia.",
+    "It keeps its leaves all year.",
+    "It typically grows to about 30 m tall.",
+    "The answer has 3 words (5, 3, 3 letters).",
+    "It starts with the letter R."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/90931379/medium.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "MargaretRDonald",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/90931379"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/235843377/medium.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Sydney Oats",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/235843377"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/235843372/medium.jpg",
+      "w": 375,
+      "h": 500,
+      "credit": "I Am birdsaspoetry.com ",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/235843372"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "tasmanian-blue-gum",
+   "name": "Tasmanian blue gum",
+   "alt": [
+    "blue gum",
+    "eucalyptus"
+   ],
+   "sci": "Eucalyptus globulus",
+   "group": "eucalypt",
+   "facts": {
+    "region": "Australia",
+    "evergreen": true,
+    "conifer": false,
+    "heightM": 45
+   },
+   "blurb": "A fast-growing eucalypt with blue-grey young leaves. Its oil is used in cough sweets and inhalers.",
+   "clues": [
+    "Family: Myrtaceae.",
+    "It is planted for timber and paper around the world.",
+    "Its oil is used in cough medicines.",
+    "It is native to Australia.",
+    "It keeps its leaves all year.",
+    "It typically grows to about 45 m tall.",
+    "Koalas eat leaves from trees like it.",
+    "The answer has 3 words (9, 4, 3 letters).",
+    "It starts with the letter T."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/138155692/medium.jpg",
+      "w": 500,
+      "h": 374,
+      "credit": "Forest and Kim Starr",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/138155692"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/13601383/medium.jpeg",
+      "w": 500,
+      "h": 375,
+      "credit": "whichchick",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/13601383"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/344581901/medium.jpeg",
+      "w": 500,
+      "h": 223,
+      "credit": "Gabriel Campbell-Martinez",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/344581901"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "snow-gum",
+   "name": "Snow gum",
+   "sci": "Eucalyptus pauciflora",
+   "group": "eucalypt",
+   "facts": {
+    "region": "Australia",
+    "evergreen": true,
+    "conifer": false,
+    "heightM": 10
+   },
+   "blurb": "A twisted, colourful gum tree that grows high in the Australian Alps, where it survives snow and freezing winds.",
+   "clues": [
+    "Family: Myrtaceae.",
+    "Genus: Eucalyptus.",
+    "Its bark is streaked with red, green and cream.",
+    "It grows higher up mountains than any other eucalypt.",
+    "It often has twisted, crooked trunks.",
+    "It is native to Australia.",
+    "It keeps its leaves all year.",
+    "It typically grows to about 10 m tall.",
+    "Its name includes winter weather.",
+    "The answer has 2 words (4, 3 letters).",
+    "It starts with the letter S."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/471275469/medium.jpeg",
+      "w": 333,
+      "h": 500,
+      "credit": "Gary Williams",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/471275469"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/400947651/medium.jpeg",
+      "w": 500,
+      "h": 333,
+      "credit": "Wairambar Rainforest",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/400947651"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/368090369/medium.jpg",
+      "w": 376,
+      "h": 500,
+      "credit": "no rights reserved",
+      "license": "CC0 1.0",
+      "page": "https://www.inaturalist.org/photos/368090369"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "moreton-bay-fig",
+   "name": "Moreton Bay fig",
+   "sci": "Ficus macrophylla",
+   "group": "fig",
+   "facts": {
+    "region": "Australia",
+    "evergreen": true,
+    "conifer": false,
+    "heightM": 40
+   },
+   "lookalikes": [
+    "banyan"
+   ],
+   "blurb": "A huge fig tree of eastern Australia with buttress roots. It often starts life growing on another tree.",
+   "clues": [
+    "Family: Moraceae.",
+    "Genus: Ficus.",
+    "It often starts as a seed in another tree's branches.",
+    "A tiny wasp pollinates it.",
+    "It has huge buttress roots.",
+    "It is native to Australia.",
+    "It keeps its leaves all year.",
+    "It typically grows to about 40 m tall.",
+    "It is planted in parks across Australia.",
+    "The answer has 3 words (7, 3, 3 letters).",
+    "It starts with the letter M."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/289755926/medium.jpeg",
+      "w": 500,
+      "h": 333,
+      "credit": "Greg Tasney",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/289755926"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/289755989/medium.jpeg",
+      "w": 500,
+      "h": 333,
+      "credit": "Greg Tasney",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/289755989"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/286086529/medium.jpeg",
+      "w": 500,
+      "h": 375,
+      "credit": "no rights reserved",
+      "license": "CC0 1.0",
+      "page": "https://www.inaturalist.org/photos/286086529"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "wollemi-pine",
+   "name": "Wollemi pine",
+   "sci": "Wollemia nobilis",
+   "group": "conifer",
+   "facts": {
+    "region": "Australia",
+    "evergreen": true,
+    "conifer": true,
+    "heightM": 35
+   },
+   "blurb": "A \"dinosaur tree\" known only from fossils until 1994, when a few were found in a hidden gorge near Sydney.",
+   "clues": [
+    "Family: Araucariaceae.",
+    "Firefighters saved the wild trees during the 2019 bushfires.",
+    "Its location is kept secret.",
+    "It was found in 1994 by a bushwalker.",
+    "It is native to Australia.",
+    "It keeps its leaves all year.",
+    "It is a conifer.",
+    "It typically grows to about 35 m tall.",
+    "Fewer than 100 grow in the wild.",
+    "It is called the \"dinosaur tree\".",
+    "The answer has 2 words (7, 4 letters).",
+    "It starts with the letter W."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/57215581/medium.jpeg",
+      "w": 500,
+      "h": 334,
+      "credit": "Grzegorz Grzejszczak",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/57215581"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/30403985/medium.jpeg",
+      "w": 500,
+      "h": 282,
+      "credit": "Andra Waagmeester",
+      "license": "CC0 1.0",
+      "page": "https://www.inaturalist.org/photos/30403985"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/694967707/medium.jpg",
+      "w": 376,
+      "h": 500,
+      "credit": "no rights reserved",
+      "license": "CC0 1.0",
+      "page": "https://www.inaturalist.org/photos/694967707"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "jacaranda",
+   "name": "Jacaranda",
+   "sci": "Jacaranda mimosifolia",
+   "group": "broadleaf",
+   "facts": {
+    "region": "South America",
+    "evergreen": false,
+    "conifer": false,
+    "heightM": 15
+   },
+   "blurb": "A tree covered in purple-blue flowers in late spring. In Australia, students say it blooms at exam time.",
+   "clues": [
+    "Family: Bignoniaceae.",
+    "Grafton in New South Wales holds a festival for it.",
+    "It comes from South America.",
+    "Students joke that it blooms at exam time.",
+    "It is native to South America.",
+    "It loses its leaves each year.",
+    "It typically grows to about 15 m tall.",
+    "Its fallen flowers make purple carpets.",
+    "It is covered in purple flowers.",
+    "The answer is one word of 9 letters.",
+    "It starts with the letter J."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/102444/medium.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "mauroguanandi",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/102444"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/125575926/medium.jpeg",
+      "w": 500,
+      "h": 375,
+      "credit": "Gustavo Puente",
+      "license": "CC0 1.0",
+      "page": "https://www.inaturalist.org/photos/125575926"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/57156533/medium.jpeg",
+      "w": 500,
+      "h": 375,
+      "credit": "Alan demian benadia",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/57156533"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "coconut-palm",
+   "name": "Coconut palm",
+   "alt": [
+    "coconut tree"
+   ],
+   "sci": "Cocos nucifera",
+   "group": "palm",
+   "facts": {
+    "region": "the tropics",
+    "evergreen": true,
+    "conifer": false,
+    "heightM": 25
+   },
+   "lookalikes": [
+    "date-palm"
+   ],
+   "blurb": "A tall tropical palm that grows coconuts. Coconuts can float across oceans to new beaches.",
+   "clues": [
+    "Family: Arecaceae.",
+    "Its seeds can float across oceans.",
+    "Every part of it can be used by people.",
+    "It grows on tropical beaches.",
+    "It is native to the tropics.",
+    "It keeps its leaves all year.",
+    "It typically grows to about 25 m tall.",
+    "Its fruit holds sweet water.",
+    "Its fruit is a big hairy nut.",
+    "The answer has 2 words (7, 4 letters).",
+    "It starts with the letter C."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/234982213/medium.jpg",
+      "w": 500,
+      "h": 335,
+      "credit": "Douglas Goldman",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/234982213"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/103610074/medium.jpg",
+      "w": 500,
+      "h": 331,
+      "credit": "David Anderson",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/103610074"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/237428590/medium.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Diogo Luiz",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/237428590"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "date-palm",
+   "name": "Date palm",
+   "sci": "Phoenix dactylifera",
+   "group": "palm",
+   "facts": {
+    "region": "the Middle East",
+    "evergreen": true,
+    "conifer": false,
+    "heightM": 20
+   },
+   "lookalikes": [
+    "coconut-palm"
+   ],
+   "blurb": "A desert palm that has been grown for its sweet fruit for thousands of years.",
+   "clues": [
+    "Family: Arecaceae.",
+    "Genus: Phoenix.",
+    "A seed 2,000 years old was grown into a tree.",
+    "It has been farmed for about 7,000 years.",
+    "It grows in desert oases.",
+    "It is native to the Middle East.",
+    "It keeps its leaves all year.",
+    "It typically grows to about 20 m tall.",
+    "Its sweet fruit grows in big bunches.",
+    "Its fruit shares a name with a day on the calendar.",
+    "The answer has 2 words (4, 4 letters).",
+    "It starts with the letter D."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/160414571/medium.jpg",
+      "w": 500,
+      "h": 330,
+      "credit": "Ashley Basil",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/160414571"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/7603161/medium.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Jon Mortin",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/7603161"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/412786024/medium.jpeg",
+      "w": 500,
+      "h": 375,
+      "credit": "Nachman bones",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/412786024"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "banyan",
+   "name": "Banyan",
+   "alt": [
+    "banyan tree"
+   ],
+   "sci": "Ficus benghalensis",
+   "group": "fig",
+   "facts": {
+    "region": "Asia",
+    "evergreen": true,
+    "conifer": false,
+    "heightM": 25
+   },
+   "lookalikes": [
+    "moreton-bay-fig"
+   ],
+   "blurb": "A fig tree that drops roots from its branches, which become new trunks. One banyan can cover a whole field.",
+   "clues": [
+    "Family: Moraceae.",
+    "Genus: Ficus.",
+    "One in India covers about 1.9 hectares.",
+    "It is the national tree of India.",
+    "Its hanging roots become new trunks.",
+    "It is native to Asia.",
+    "It keeps its leaves all year.",
+    "It typically grows to about 25 m tall.",
+    "It spreads out like a forest from one tree.",
+    "It is a kind of fig.",
+    "The answer is one word of 6 letters.",
+    "It starts with the letter B."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/7695/medium.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "jess n",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/7695"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/192133322/medium.jpg",
+      "w": 500,
+      "h": 281,
+      "credit": "Yoav Daniel Bar-Ness",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/192133322"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/192795211/medium.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Yoav Daniel Bar-Ness",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/192795211"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "olive-tree",
+   "name": "Olive tree",
+   "alt": [
+    "olive"
+   ],
+   "sci": "Olea europaea",
+   "group": "broadleaf",
+   "facts": {
+    "region": "the Mediterranean",
+    "evergreen": true,
+    "conifer": false,
+    "heightM": 10
+   },
+   "blurb": "A twisted, silvery-leaved tree of the Mediterranean. Its fruit is pressed to make oil.",
+   "clues": [
+    "Family: Oleaceae.",
+    "Genus: Olea.",
+    "Some are thought to be over 2,000 years old.",
+    "Its branch is a symbol of peace.",
+    "Its leaves are silvery underneath.",
+    "It is native to the Mediterranean.",
+    "It keeps its leaves all year.",
+    "It typically grows to about 10 m tall.",
+    "Its fruit is pressed for oil.",
+    "It grows around the Mediterranean.",
+    "The answer has 2 words (5, 4 letters).",
+    "It starts with the letter O."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/95624108/medium.jpeg",
+      "w": 375,
+      "h": 500,
+      "credit": "viridian",
+      "license": "CC0 1.0",
+      "page": "https://www.inaturalist.org/photos/95624108"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/712174255/medium.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "zebedeugalinha",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/712174255"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/602303597/medium.jpg",
+      "w": 500,
+      "h": 260,
+      "credit": "zebedeugalinha",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/602303597"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "japanese-cherry",
+   "name": "Japanese cherry",
+   "alt": [
+    "cherry blossom",
+    "sakura"
+   ],
+   "sci": "Prunus serrulata",
+   "group": "broadleaf",
+   "facts": {
+    "region": "Asia",
+    "evergreen": false,
+    "conifer": false,
+    "heightM": 10
+   },
+   "blurb": "A tree famous for clouds of pink and white blossom in spring. In Japan, people hold picnics under it.",
+   "clues": [
+    "Family: Rosaceae.",
+    "Genus: Prunus.",
+    "Its flowers last only about a week.",
+    "It is native to Asia.",
+    "It loses its leaves each year.",
+    "It typically grows to about 10 m tall.",
+    "The answer has 2 words (8, 6 letters).",
+    "It starts with the letter J."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/30084777/medium.jpeg",
+      "w": 500,
+      "h": 375,
+      "credit": "Jenny Christianson",
+      "license": "CC0 1.0",
+      "page": "https://www.inaturalist.org/photos/30084777"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/33925758/medium.jpeg",
+      "w": 500,
+      "h": 375,
+      "credit": "Jenny Christianson",
+      "license": "CC0 1.0",
+      "page": "https://www.inaturalist.org/photos/33925758"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/366717203/medium.jpeg",
+      "w": 500,
+      "h": 375,
+      "credit": "W Rao",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/366717203"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "apple-tree",
+   "name": "Apple tree",
+   "alt": [
+    "apple"
+   ],
+   "sci": "Malus domestica",
+   "group": "broadleaf",
+   "facts": {
+    "region": "Asia",
+    "evergreen": false,
+    "conifer": false,
+    "heightM": 6
+   },
+   "blurb": "A fruit tree first grown in Central Asia. There are thousands of kinds of apple.",
+   "clues": [
+    "Family: Rosaceae.",
+    "Genus: Malus.",
+    "Its wild ancestor comes from Kazakhstan.",
+    "There are over 7,000 varieties.",
+    "A falling fruit is said to have inspired Isaac Newton.",
+    "It is native to Asia.",
+    "It loses its leaves each year.",
+    "It typically grows to about 6 m tall.",
+    "Its blossom is pink and white.",
+    "It grows a crunchy red or green fruit.",
+    "The answer has 2 words (5, 4 letters).",
+    "It starts with the letter A."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/399127934/medium.jpg",
+      "w": 375,
+      "h": 500,
+      "credit": "Kieran Hanrahan",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/399127934"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/491893168/medium.jpg",
+      "w": 500,
+      "h": 500,
+      "credit": "Alexander Dubynin",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/491893168"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/55570314/medium.jpeg",
+      "w": 500,
+      "h": 333,
+      "credit": "no rights reserved",
+      "license": "CC0 1.0",
+      "page": "https://www.inaturalist.org/photos/55570314"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "golden-wattle",
+   "name": "Golden wattle",
+   "alt": [
+    "wattle"
+   ],
+   "sci": "Acacia pycnantha",
+   "group": "wattle",
+   "facts": {
+    "region": "Australia",
+    "evergreen": true,
+    "conifer": false,
+    "heightM": 6
+   },
+   "blurb": "A small tree covered in fluffy golden flowers. It is Australia's national flower.",
+   "clues": [
+    "Family: Fabaceae.",
+    "Genus: Acacia.",
+    "Australia celebrates it on 1 September.",
+    "Its leaves are really flattened stems.",
+    "It is a kind of acacia.",
+    "It is native to Australia.",
+    "It keeps its leaves all year.",
+    "It typically grows to about 6 m tall.",
+    "It is Australia's floral emblem.",
+    "The answer has 2 words (6, 6 letters).",
+    "It starts with the letter G."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/111113985/medium.jpeg",
+      "w": 500,
+      "h": 350,
+      "credit": "Tony Rebelo",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/111113985"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/131659410/medium.jpeg",
+      "w": 500,
+      "h": 333,
+      "credit": "Tony Rebelo",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/131659410"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/538889167/medium.jpg",
+      "w": 281,
+      "h": 500,
+      "credit": "Rosalie Lawrence",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/538889167"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "norfolk-island-pine",
+   "name": "Norfolk Island pine",
+   "sci": "Araucaria heterophylla",
+   "group": "conifer",
+   "facts": {
+    "region": "Australia",
+    "evergreen": true,
+    "conifer": true,
+    "heightM": 50
+   },
+   "lookalikes": [
+    "monkey-puzzle-tree"
+   ],
+   "blurb": "A tall, symmetrical conifer from Norfolk Island that lines many beaches in Australia.",
+   "clues": [
+    "Family: Araucariaceae.",
+    "Genus: Araucaria.",
+    "Captain Cook hoped to use it for ship masts.",
+    "It leans towards the equator.",
+    "Its branches grow in neat tiers.",
+    "It is native to Australia.",
+    "It keeps its leaves all year.",
+    "It is a conifer.",
+    "It typically grows to about 50 m tall.",
+    "It lines many Australian beaches.",
+    "The answer has 3 words (7, 6, 4 letters).",
+    "It starts with the letter N."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/250438081/medium.jpg",
+      "w": 500,
+      "h": 347,
+      "credit": "bertknot",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/250438081"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/373978451/medium.jpg",
+      "w": 375,
+      "h": 500,
+      "credit": "Donna Belder",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/373978451"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/266147351/medium.jpeg",
+      "w": 375,
+      "h": 500,
+      "credit": "Leon Perrie",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/266147351"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "kauri",
+   "name": "Kauri",
+   "alt": [
+    "New Zealand kauri"
+   ],
+   "sci": "Agathis australis",
+   "group": "conifer",
+   "facts": {
+    "region": "New Zealand",
+    "evergreen": true,
+    "conifer": true,
+    "heightM": 40
+   },
+   "blurb": "A giant New Zealand conifer. The biggest, Tāne Mahuta, is thought to be well over 1,000 years old.",
+   "clues": [
+    "Family: Araucariaceae.",
+    "Genus: Agathis.",
+    "Its gum was dug up and sold for varnish.",
+    "The biggest is called Tāne Mahuta, \"lord of the forest\".",
+    "It keeps its leaves all year.",
+    "It is a conifer.",
+    "It typically grows to about 40 m tall.",
+    "Its trunk has no branches until high up.",
+    "The answer is one word of 5 letters.",
+    "It starts with the letter K."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/62568619/medium.jpeg",
+      "w": 500,
+      "h": 375,
+      "credit": "Jacqui Geux",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/62568619"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/62497940/medium.jpeg",
+      "w": 500,
+      "h": 333,
+      "credit": "Jacqui Geux",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/62497940"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/3153402/medium.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "J Brew",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/3153402"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "rowan",
+   "name": "Rowan",
+   "alt": [
+    "mountain ash",
+    "European rowan"
+   ],
+   "sci": "Sorbus aucuparia",
+   "group": "broadleaf",
+   "facts": {
+    "region": "Europe",
+    "evergreen": false,
+    "conifer": false,
+    "heightM": 12
+   },
+   "blurb": "A small tree with clusters of bright red berries in autumn. Folklore says it protects against witches.",
+   "clues": [
+    "Family: Rosaceae.",
+    "Genus: Sorbus.",
+    "Folklore says it protects against witches.",
+    "Birds love its berries.",
+    "It loses its leaves each year.",
+    "It typically grows to about 12 m tall.",
+    "Its leaves are feather-like.",
+    "It has bunches of bright red berries.",
+    "The answer is one word of 5 letters.",
+    "It starts with the letter R."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/10450/medium.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Hans Kylberg",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/10450"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/10451/medium.jpg",
+      "w": 500,
+      "h": 369,
+      "credit": "per",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/10451"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/10453/medium.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Miika Silfverberg",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/10453"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "english-yew",
+   "name": "English yew",
+   "alt": [
+    "yew",
+    "common yew"
+   ],
+   "sci": "Taxus baccata",
+   "group": "conifer",
+   "facts": {
+    "region": "Europe",
+    "evergreen": true,
+    "conifer": true,
+    "heightM": 15
+   },
+   "blurb": "A dark, long-lived evergreen often found in churchyards. Almost every part of it is poisonous.",
+   "clues": [
+    "Family: Taxaceae.",
+    "Genus: Taxus.",
+    "Its wood was used for longbows.",
+    "A cancer drug was made from yews.",
+    "Almost every part is poisonous.",
+    "It keeps its leaves all year.",
+    "It is a conifer.",
+    "It typically grows to about 15 m tall.",
+    "It is often found in churchyards.",
+    "Some are thought to be thousands of years old.",
+    "The answer has 2 words (7, 3 letters).",
+    "It starts with the letter E."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/79446798/medium.jpg",
+      "w": 500,
+      "h": 341,
+      "credit": "Douglas Goldman",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/79446798"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/69373138/medium.jpeg",
+      "w": 500,
+      "h": 375,
+      "credit": "Florin Feneru",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/69373138"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/1203032/medium.",
+      "w": 500,
+      "h": 333,
+      "credit": "Colin Meurk",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/1203032"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "holly",
+   "name": "Holly",
+   "alt": [
+    "English holly"
+   ],
+   "sci": "Ilex aquifolium",
+   "group": "broadleaf",
+   "facts": {
+    "region": "Europe",
+    "evergreen": true,
+    "conifer": false,
+    "heightM": 10
+   },
+   "blurb": "An evergreen with shiny, spiky leaves and red berries. It is used as a Christmas decoration.",
+   "clues": [
+    "Family: Aquifoliaceae.",
+    "Genus: Ilex.",
+    "Only female trees have berries.",
+    "Its berries are poisonous to people.",
+    "Higher leaves are often less spiky.",
+    "It is native to Europe.",
+    "It keeps its leaves all year.",
+    "It typically grows to about 10 m tall.",
+    "It is a Christmas decoration.",
+    "It has spiky leaves and red berries.",
+    "The answer is one word of 5 letters.",
+    "It starts with the letter H."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/70264116/medium.jpg",
+      "w": 375,
+      "h": 500,
+      "credit": "no rights reserved",
+      "license": "CC0 1.0",
+      "page": "https://www.inaturalist.org/photos/70264116"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/448317645/medium.jpeg",
+      "w": 500,
+      "h": 375,
+      "credit": "zebedeugalinha",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/448317645"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/602751275/medium.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Kieran Roy Powell",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/602751275"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "london-plane",
+   "name": "London plane",
+   "alt": [
+    "plane tree"
+   ],
+   "sci": "Platanus × hispanica",
+   "group": "broadleaf",
+   "facts": {
+    "region": "Europe",
+    "evergreen": false,
+    "conifer": false,
+    "heightM": 30
+   },
+   "blurb": "A tough city tree with patchy, flaking bark. It lines the streets of London and many other cities.",
+   "clues": [
+    "Family: Platanaceae.",
+    "Genus: Platanus.",
+    "It is a hybrid of two other trees.",
+    "Its seeds hang like little spiky balls.",
+    "Its bark flakes off in patches.",
+    "It is native to Europe.",
+    "It loses its leaves each year.",
+    "It typically grows to about 30 m tall.",
+    "It copes well with city pollution.",
+    "It lines the streets of the UK capital.",
+    "The answer has 2 words (6, 5 letters).",
+    "It starts with the letter L."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/734521948/medium.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "zebedeugalinha",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/734521948"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/111448285/medium.jpg",
+      "w": 375,
+      "h": 500,
+      "credit": "no rights reserved",
+      "license": "CC0 1.0",
+      "page": "https://www.inaturalist.org/photos/111448285"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/679234298/medium.jpg",
+      "w": 333,
+      "h": 500,
+      "credit": "James Heal",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/679234298"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "cedar-of-lebanon",
+   "name": "Cedar of Lebanon",
+   "alt": [
+    "Lebanon cedar"
+   ],
+   "sci": "Cedrus libani",
+   "group": "conifer",
+   "facts": {
+    "region": "the Middle East",
+    "evergreen": true,
+    "conifer": true,
+    "heightM": 35
+   },
+   "blurb": "A majestic conifer with flat, spreading layers of branches. It appears on the flag of Lebanon.",
+   "clues": [
+    "Family: Pinaceae.",
+    "Genus: Cedrus.",
+    "Its wood was used in ancient temples.",
+    "Its branches grow in flat layers.",
+    "It is mentioned in the Bible.",
+    "It keeps its leaves all year.",
+    "It is a conifer.",
+    "It typically grows to about 35 m tall.",
+    "Its cones sit upright like barrels.",
+    "It appears on the flag of a Middle Eastern country.",
+    "The answer has 3 words (5, 2, 7 letters).",
+    "It starts with the letter C."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/179936964/medium.jpeg",
+      "w": 375,
+      "h": 500,
+      "credit": "Zeke Marshall",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/179936964"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/212970981/medium.jpeg",
+      "w": 376,
+      "h": 500,
+      "credit": "Michael, Antoni and Nihat Hinczewski",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/212970981"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/44324764/medium.jpg",
+      "w": 375,
+      "h": 500,
+      "credit": "James Hardcastle",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/44324764"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "great-basin-bristlecone-pine",
+   "name": "Great Basin bristlecone pine",
+   "alt": [
+    "bristlecone pine"
+   ],
+   "sci": "Pinus longaeva",
+   "group": "conifer",
+   "facts": {
+    "region": "North America",
+    "evergreen": true,
+    "conifer": true,
+    "heightM": 10
+   },
+   "blurb": "A twisted pine of the American West. One called Methuselah is over 4,800 years old.",
+   "clues": [
+    "Family: Pinaceae.",
+    "Genus: Pinus.",
+    "One called Methuselah is over 4,800 years old.",
+    "It grows high in the mountains of Nevada and California.",
+    "Its needles can last 40 years.",
+    "It keeps its leaves all year.",
+    "It is a conifer.",
+    "It typically grows to about 10 m tall.",
+    "Its trunk is twisted and weathered.",
+    "It is one of the oldest living things on Earth.",
+    "The answer has 4 words (5, 5, 11, 4 letters).",
+    "It starts with the letter G."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/51385754/medium.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Jim Morefield",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/51385754"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/441396173/medium.jpeg",
+      "w": 357,
+      "h": 500,
+      "credit": "Roberto Daniel Avila",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/441396173"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/441396217/medium.jpeg",
+      "w": 333,
+      "h": 500,
+      "credit": "Roberto Daniel Avila",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/441396217"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "dragons-blood-tree",
+   "name": "Dragon's blood tree",
+   "alt": [
+    "Socotra dragon tree"
+   ],
+   "sci": "Dracaena cinnabari",
+   "group": "broadleaf",
+   "facts": {
+    "region": "the Middle East",
+    "evergreen": true,
+    "conifer": false,
+    "heightM": 10
+   },
+   "blurb": "An umbrella-shaped tree from the island of Socotra. Its red resin was used as dye and medicine.",
+   "clues": [
+    "Family: Asparagaceae.",
+    "Genus: Dracaena.",
+    "Its red resin was used as medicine and dye.",
+    "Its crown is shaped like an upturned umbrella.",
+    "It is native to the Middle East.",
+    "It keeps its leaves all year.",
+    "It typically grows to about 10 m tall.",
+    "It is named after a mythical beast's red resin.",
+    "The answer has 3 words (7, 5, 4 letters).",
+    "It starts with the letter D."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/181436443/medium.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Morten Ross",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/181436443"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/111803110/medium.jpeg",
+      "w": 500,
+      "h": 333,
+      "credit": "Manuel Schwarz",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/111803110"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/177678724/medium.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Morten Ross",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/177678724"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "joshua-tree",
+   "name": "Joshua tree",
+   "sci": "Yucca brevifolia",
+   "group": "yucca",
+   "facts": {
+    "region": "North America",
+    "evergreen": true,
+    "conifer": false,
+    "heightM": 10
+   },
+   "blurb": "A spiky desert tree of the Mojave Desert. Mormon settlers named it after Joshua from the Bible.",
+   "clues": [
+    "Family: Asparagaceae.",
+    "Genus: Yucca.",
+    "A rock band named an album after it.",
+    "A small moth pollinates it.",
+    "It grows only in the Mojave Desert.",
+    "It is native to North America.",
+    "It keeps its leaves all year.",
+    "It typically grows to about 10 m tall.",
+    "It is a kind of yucca.",
+    "It is named after a figure from the Bible.",
+    "The answer has 2 words (6, 4 letters).",
+    "It starts with the letter J."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/18708210/medium.jpeg",
+      "w": 375,
+      "h": 500,
+      "credit": "Rod",
+      "license": "CC0 1.0",
+      "page": "https://www.inaturalist.org/photos/18708210"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/862/medium.jpg",
+      "w": 374,
+      "h": 500,
+      "credit": "Larry Page",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/862"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/475121830/medium.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Roberto Daniel Avila",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/475121830"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "cork-oak",
+   "name": "Cork oak",
+   "sci": "Quercus suber",
+   "group": "broadleaf",
+   "facts": {
+    "region": "the Mediterranean",
+    "evergreen": true,
+    "conifer": false,
+    "heightM": 20
+   },
+   "lookalikes": [
+    "english-oak"
+   ],
+   "blurb": "An evergreen oak whose thick bark is peeled off every nine years or so to make wine corks.",
+   "clues": [
+    "Family: Fagaceae.",
+    "Genus: Quercus.",
+    "Portugal produces about half the world's supply of its product.",
+    "Its bark is stripped every nine years or so.",
+    "Stripping the bark does not kill it.",
+    "It is native to the Mediterranean.",
+    "It keeps its leaves all year.",
+    "It typically grows to about 20 m tall.",
+    "Its bark is used to seal wine bottles.",
+    "The answer has 2 words (4, 3 letters).",
+    "It starts with the letter C."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/159050222/medium.jpeg",
+      "w": 500,
+      "h": 375,
+      "credit": "Duarte Frade",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/159050222"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/383856062/medium.jpeg",
+      "w": 500,
+      "h": 375,
+      "credit": "Duarte Frade",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/383856062"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/23574718/medium.jpeg",
+      "w": 500,
+      "h": 375,
+      "credit": "Crap Fou",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/23574718"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "southern-magnolia",
+   "name": "Southern magnolia",
+   "alt": [
+    "magnolia"
+   ],
+   "sci": "Magnolia grandiflora",
+   "group": "broadleaf",
+   "facts": {
+    "region": "North America",
+    "evergreen": true,
+    "conifer": false,
+    "heightM": 25
+   },
+   "blurb": "An evergreen tree of the south-eastern USA with huge, scented white flowers and glossy leaves.",
+   "clues": [
+    "It is the state flower of Mississippi.",
+    "Its leaves are glossy and leathery.",
+    "It is native to North America.",
+    "It keeps its leaves all year.",
+    "It typically grows to about 25 m tall.",
+    "Its white flowers are huge and scented.",
+    "The answer has 2 words (8, 8 letters).",
+    "It starts with the letter S."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/557171383/medium.jpg",
+      "w": 335,
+      "h": 500,
+      "credit": "Douglas Goldman",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/557171383"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/70227915/medium.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Pmsyyz",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/70227915"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/82254016/medium.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Kurt Stueber",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/82254016"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "rubber-tree",
+   "name": "Rubber tree",
+   "alt": [
+    "Pará rubber tree"
+   ],
+   "sci": "Hevea brasiliensis",
+   "group": "broadleaf",
+   "facts": {
+    "region": "South America",
+    "evergreen": true,
+    "conifer": false,
+    "heightM": 30
+   },
+   "blurb": "A tree from the Amazon whose milky sap, called latex, is made into natural rubber.",
+   "clues": [
+    "Family: Euphorbiaceae.",
+    "Genus: Hevea.",
+    "Seeds were smuggled from Brazil to Asia in 1876.",
+    "Its milky sap is called latex.",
+    "It is native to South America.",
+    "It keeps its leaves all year.",
+    "It typically grows to about 30 m tall.",
+    "Workers cut its bark to collect sap.",
+    "Its sap makes tyres and balloons.",
+    "The answer has 2 words (6, 4 letters).",
+    "It starts with the letter R."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/60706943/medium.jpeg",
+      "w": 375,
+      "h": 500,
+      "credit": "Cheongweei Gan",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/60706943"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/48142234/medium.jpeg",
+      "w": 500,
+      "h": 375,
+      "credit": "Ong Jyh Seng",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/48142234"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/146559031/medium.jpeg",
+      "w": 375,
+      "h": 500,
+      "credit": "Ong Jyh Seng",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/146559031"
+     }
+    ]
+   },
+   "difficulty": 2
+  }
+ ],
+ "questions": [
+  {
+   "id": "q1",
+   "kind": "mc",
+   "prompt": "What is the tallest kind of tree in the world?",
+   "answer": "Coast redwood",
+   "wrong": [
+    "Giant sequoia",
+    "Mountain ash",
+    "Douglas fir"
+   ],
+   "explain": "The tallest known, Hyperion, is over 115 m.",
+   "difficulty": 2
+  },
+  {
+   "id": "q2",
+   "kind": "mc",
+   "prompt": "Which tree's leaf is on the flag of Canada?",
+   "answer": "Maple",
+   "wrong": [
+    "Oak",
+    "Birch",
+    "Pine"
+   ],
+   "explain": "The red maple leaf became the flag in 1965.",
+   "difficulty": 1
+  },
+  {
+   "id": "q3",
+   "kind": "mc",
+   "prompt": "Which tree grows acorns?",
+   "answer": "Oak",
+   "wrong": [
+    "Pine",
+    "Willow",
+    "Palm"
+   ],
+   "explain": "Acorns are oak nuts.",
+   "difficulty": 1
+  },
+  {
+   "id": "q4",
+   "kind": "mc",
+   "prompt": "What do you call a tree that keeps its leaves all year?",
+   "answer": "Evergreen",
+   "wrong": [
+    "Deciduous",
+    "Conifer",
+    "Perennial"
+   ],
+   "explain": "Deciduous trees drop their leaves each year.",
+   "difficulty": 1
+  },
+  {
+   "id": "q5",
+   "kind": "mc",
+   "prompt": "What gas do trees take in to make food?",
+   "answer": "Carbon dioxide",
+   "wrong": [
+    "Oxygen",
+    "Helium",
+    "Nitrogen"
+   ],
+   "explain": "Photosynthesis uses carbon dioxide, water and sunlight, and releases oxygen.",
+   "difficulty": 1
+  },
+  {
+   "id": "q6",
+   "kind": "mc",
+   "prompt": "You can tell a tree's age by counting what?",
+   "answer": "Its growth rings",
+   "wrong": [
+    "Its leaves",
+    "Its branches",
+    "Its roots"
+   ],
+   "explain": "Most trees add one ring of wood a year.",
+   "difficulty": 1
+  },
+  {
+   "id": "q7",
+   "kind": "mc",
+   "prompt": "Which tree, known only from fossils, was found alive near Sydney in 1994?",
+   "answer": "Wollemi pine",
+   "wrong": [
+    "Monkey puzzle tree",
+    "Ginkgo",
+    "Kauri"
+   ],
+   "explain": "Fewer than 100 grow in the wild, in a secret gorge.",
+   "difficulty": 2
+  },
+  {
+   "id": "q8",
+   "kind": "mc",
+   "prompt": "Which tree's bark is used to make wine corks?",
+   "answer": "Cork oak",
+   "wrong": [
+    "Birch",
+    "Yew",
+    "Plane"
+   ],
+   "explain": "It can be stripped every nine years or so without killing the tree.",
+   "difficulty": 2
+  },
+  {
+   "id": "q9",
+   "kind": "tf",
+   "prompt": "Maple syrup is made from tree sap.",
+   "answer": true,
+   "explain": "Sap from sugar maples is boiled down.",
+   "difficulty": 1
+  },
+  {
+   "id": "q10",
+   "kind": "mc",
+   "prompt": "What is Australia's national floral emblem?",
+   "answer": "Golden wattle",
+   "wrong": [
+    "Waratah",
+    "Jacaranda",
+    "Eucalyptus"
+   ],
+   "explain": "It was proclaimed in 1988; Wattle Day is 1 September.",
+   "difficulty": 2
+  }
+ ],
+ "fakes": [
+  "Silver thorn cedar",
+  "Crimson bark redwood",
+  "Golden fan pine",
+  "Northern glass birch",
+  "Spotted ghost oak",
+  "Velvet-leaf mountain gum"
+ ],
+ "sources": [
+  {
+   "name": "iNaturalist",
+   "url": "https://www.inaturalist.org"
+  },
+  {
+   "name": "Wikidata",
+   "url": "https://www.wikidata.org"
+  }
+ ]
+}

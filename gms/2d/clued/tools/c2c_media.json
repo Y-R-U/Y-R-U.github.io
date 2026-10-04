@@ -1,0 +1,227 @@
+{
+ "Masai giraffe": {
+  "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/6/64/Masai_giraffes_%28Giraffa_tippelskirchi%29_Arusha.jpg/960px-Masai_giraffes_%28Giraffa_tippelskirchi%29_Arusha.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+  "w": 640,
+  "h": 427,
+  "credit": "Charles J. Sharp",
+  "license": "CC BY-SA 4.0",
+  "page": "https://commons.wikimedia.org/wiki/File:Masai_giraffes_(Giraffa_tippelskirchi)_Arusha.jpg",
+  "file": "Masai_giraffes_(Giraffa_tippelskirchi)_Arusha.jpg"
+ },
+ "Plains zebra": {
+  "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/4/45/Equus_quagga_burchellii_-_Etosha%2C_2014.jpg/960px-Equus_quagga_burchellii_-_Etosha%2C_2014.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+  "w": 640,
+  "h": 427,
+  "credit": "Yathin S Krishnappa",
+  "license": "CC BY-SA 3.0",
+  "page": "https://commons.wikimedia.org/wiki/File:Equus_quagga_burchellii_-_Etosha,_2014.jpg",
+  "file": "Equus_quagga_burchellii_-_Etosha,_2014.jpg"
+ },
+ "Emperor penguin": {
+  "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/a/a3/Aptenodytes_forsteri_-Snow_Hill_Island%2C_Antarctica_-adults_and_juvenile-8.jpg/500px-Aptenodytes_forsteri_-Snow_Hill_Island%2C_Antarctica_-adults_and_juvenile-8.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+  "w": 398,
+  "h": 639,
+  "credit": "Ian Duffy from UK",
+  "license": "CC BY 2.0",
+  "page": "https://commons.wikimedia.org/wiki/File:Aptenodytes_forsteri_-Snow_Hill_Island,_Antarctica_-adults_and_juvenile-8.jpg",
+  "file": "Aptenodytes_forsteri_-Snow_Hill_Island,_Antarctica_-adults_and_juvenile-8.jpg"
+ },
+ "Koala": {
+  "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/4/49/Koala_climbing_tree.jpg/960px-Koala_climbing_tree.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+  "w": 640,
+  "h": 629,
+  "credit": "Diliff",
+  "license": "CC BY-SA 3.0",
+  "page": "https://commons.wikimedia.org/wiki/File:Koala_climbing_tree.jpg",
+  "file": "Koala_climbing_tree.jpg"
+ },
+ "American flamingo": {
+  "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/2/21/American_Flamingo_JG.jpg/960px-American_Flamingo_JG.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+  "w": 640,
+  "h": 480,
+  "credit": "JeffreyGammon",
+  "license": "CC BY 4.0",
+  "page": "https://commons.wikimedia.org/wiki/File:American_Flamingo_JG.jpg",
+  "file": "American_Flamingo_JG.jpg"
+ },
+ "Common octopus": {
+  "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/5/57/Octopus2.jpg/960px-Octopus2.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+  "w": 640,
+  "h": 487,
+  "credit": "albert kok",
+  "license": "CC BY-SA 3.0",
+  "page": "https://commons.wikimedia.org/wiki/File:Octopus2.jpg",
+  "file": "Octopus2.jpg"
+ },
+ "European hedgehog": {
+  "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/e/e1/Erinaceus_europaeus_LC0119.jpg/960px-Erinaceus_europaeus_LC0119.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+  "w": 640,
+  "h": 480,
+  "credit": "Jörg Hempel",
+  "license": "CC BY-SA 2.0",
+  "page": "https://commons.wikimedia.org/wiki/File:Erinaceus_europaeus_LC0119.jpg",
+  "file": "Erinaceus_europaeus_LC0119.jpg"
+ },
+ "Polar bear": {
+  "src": "https://upload.wikimedia.org/wikipedia/commons/6/66/Polar_Bear_-_Alaska_%28cropped%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail_unscaled",
+  "w": 637,
+  "h": 639,
+  "credit": "Alan Wilson",
+  "license": "CC BY-SA 3.0",
+  "page": "https://commons.wikimedia.org/wiki/File:Polar_Bear_-_Alaska_(cropped).jpg",
+  "file": "Polar_Bear_-_Alaska_(cropped).jpg"
+ },
+ "Giant panda": {
+  "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/0/0f/Grosser_Panda.JPG/960px-Grosser_Panda.JPG?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+  "w": 640,
+  "h": 427,
+  "credit": "J. Patrick Fischer",
+  "license": "CC BY-SA 3.0",
+  "page": "https://commons.wikimedia.org/wiki/File:Grosser_Panda.JPG",
+  "file": "Grosser_Panda.JPG"
+ },
+ "African bush elephant": {
+  "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/9/94/178_Male_African_bush_elephant_in_Etosha_National_Park_Photo_by_Giles_Laurent.jpg/960px-178_Male_African_bush_elephant_in_Etosha_National_Park_Photo_by_Giles_Laurent.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+  "w": 640,
+  "h": 427,
+  "credit": "Giles Laurent",
+  "license": "CC BY-SA 4.0",
+  "page": "https://commons.wikimedia.org/wiki/File:178_Male_African_bush_elephant_in_Etosha_National_Park_Photo_by_Giles_Laurent.jpg",
+  "file": "178_Male_African_bush_elephant_in_Etosha_National_Park_Photo_by_Giles_Laurent.jpg"
+ },
+ "Eastern grey kangaroo": {
+  "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/9/9e/Macropus_giganteus_-_Brunkerville.jpg/960px-Macropus_giganteus_-_Brunkerville.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+  "w": 640,
+  "h": 639,
+  "credit": "JJ Harrison (https://www.jjharrison.com.au/)",
+  "license": "CC BY-SA 4.0",
+  "page": "https://commons.wikimedia.org/wiki/File:Macropus_giganteus_-_Brunkerville.jpg",
+  "file": "Macropus_giganteus_-_Brunkerville.jpg"
+ },
+ "Tiger": {
+  "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/b/b0/Bengal_tiger_%28Panthera_tigris_tigris%29_female_3_crop.jpg/960px-Bengal_tiger_%28Panthera_tigris_tigris%29_female_3_crop.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+  "w": 640,
+  "h": 427,
+  "credit": "Charles J. Sharp",
+  "license": "CC BY-SA 4.0",
+  "page": "https://commons.wikimedia.org/wiki/File:Bengal_tiger_(Panthera_tigris_tigris)_female_3_crop.jpg",
+  "file": "Bengal_tiger_(Panthera_tigris_tigris)_female_3_crop.jpg"
+ },
+ "Barn owl": {
+  "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/9/9e/American_Barn_Owl_%28Tyto_furcata_guatemalae%29%2C_Orange_Walk.jpg/500px-American_Barn_Owl_%28Tyto_furcata_guatemalae%29%2C_Orange_Walk.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+  "w": 426,
+  "h": 639,
+  "credit": "Charles J. Sharp",
+  "license": "CC BY-SA 4.0",
+  "page": "https://commons.wikimedia.org/wiki/File:American_Barn_Owl_(Tyto_furcata_guatemalae),_Orange_Walk.jpg",
+  "file": "American_Barn_Owl_(Tyto_furcata_guatemalae),_Orange_Walk.jpg"
+ },
+ "Coccinella septempunctata": {
+  "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/0/08/7-Spotted-Ladybug-Coccinella-septempunctata-sq1.jpg/960px-7-Spotted-Ladybug-Coccinella-septempunctata-sq1.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+  "w": 640,
+  "h": 640,
+  "credit": "Photographer: Dominik Stodulski Graphic Processing: User:MathKnight",
+  "license": "CC BY-SA 3.0",
+  "page": "https://commons.wikimedia.org/wiki/File:7-Spotted-Ladybug-Coccinella-septempunctata-sq1.jpg",
+  "file": "7-Spotted-Ladybug-Coccinella-septempunctata-sq1.jpg"
+ },
+ "Dromedary": {
+  "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/c/c4/Camelus_dromedarius_in_Nuweiba.jpg/960px-Camelus_dromedarius_in_Nuweiba.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+  "w": 640,
+  "h": 428,
+  "credit": "Florian Prischl",
+  "license": "CC BY-SA 3.0",
+  "page": "https://commons.wikimedia.org/wiki/File:Camelus_dromedarius_in_Nuweiba.jpg",
+  "file": "Camelus_dromedarius_in_Nuweiba.jpg"
+ },
+ "Galápagos tortoise": {
+  "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/4/42/Galapagos_giant_tortoise_Geochelone_elephantopus.jpg/960px-Galapagos_giant_tortoise_Geochelone_elephantopus.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+  "w": 640,
+  "h": 427,
+  "credit": "Mfield, Matthew Field, http://www.photography.mattfield.com",
+  "license": "CC BY-SA 3.0",
+  "page": "https://commons.wikimedia.org/wiki/File:Galapagos_giant_tortoise_Geochelone_elephantopus.jpg",
+  "file": "Galapagos_giant_tortoise_Geochelone_elephantopus.jpg"
+ },
+ "Saturn": {
+  "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/4/43/Saturn_global_view_from_Cassini%2C_rings_open_Better_Colour.png/960px-Saturn_global_view_from_Cassini%2C_rings_open_Better_Colour.png?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+  "w": 640,
+  "h": 256,
+  "credit": "NASA / JPL-Caltech / SSI / color composite by Gordan Ugarkovic",
+  "license": "Public domain",
+  "page": "https://commons.wikimedia.org/wiki/File:Saturn_global_view_from_Cassini,_rings_open_Better_Colour.png",
+  "file": "Saturn_global_view_from_Cassini,_rings_open_Better_Colour.png"
+ },
+ "Moon": {
+  "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/e/e1/FullMoon2010.jpg/960px-FullMoon2010.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+  "w": 640,
+  "h": 608,
+  "credit": "Gregory H. Revera",
+  "license": "CC BY-SA 3.0",
+  "page": "https://commons.wikimedia.org/wiki/File:FullMoon2010.jpg",
+  "file": "FullMoon2010.jpg"
+ },
+ "Eiffel Tower": {
+  "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/8/85/Tour_Eiffel_Wikimedia_Commons_%28cropped%29.jpg/500px-Tour_Eiffel_Wikimedia_Commons_%28cropped%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+  "w": 384,
+  "h": 640,
+  "credit": "Benh LIEU SONG",
+  "license": "Public domain",
+  "page": "https://commons.wikimedia.org/wiki/File:Tour_Eiffel_Wikimedia_Commons_(cropped).jpg",
+  "file": "Tour_Eiffel_Wikimedia_Commons_(cropped).jpg"
+ },
+ "Giza pyramid complex": {
+  "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/9/96/Pyramids_of_the_Giza_Necropolis.jpg/960px-Pyramids_of_the_Giza_Necropolis.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+  "w": 640,
+  "h": 267,
+  "credit": "KennyOMG",
+  "license": "CC BY-SA 4.0",
+  "page": "https://commons.wikimedia.org/wiki/File:Pyramids_of_the_Giza_Necropolis.jpg",
+  "file": "Pyramids_of_the_Giza_Necropolis.jpg"
+ },
+ "Great Wall of China": {
+  "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/2/23/The_Great_Wall_of_China_at_Jinshanling-edit.jpg/960px-The_Great_Wall_of_China_at_Jinshanling-edit.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+  "w": 640,
+  "h": 425,
+  "credit": "Severin.stalder",
+  "license": "CC BY-SA 3.0",
+  "page": "https://commons.wikimedia.org/wiki/File:The_Great_Wall_of_China_at_Jinshanling-edit.jpg",
+  "file": "The_Great_Wall_of_China_at_Jinshanling-edit.jpg"
+ },
+ "Statue of Liberty": {
+  "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/8/89/Front_view_of_Statue_of_Liberty_%28cropped%29.jpg/500px-Front_view_of_Statue_of_Liberty_%28cropped%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+  "w": 417,
+  "h": 639,
+  "credit": "AskALotl",
+  "license": "CC0",
+  "page": "https://commons.wikimedia.org/wiki/File:Front_view_of_Statue_of_Liberty_(cropped).jpg",
+  "file": "Front_view_of_Statue_of_Liberty_(cropped).jpg"
+ },
+ "Rainbow": {
+  "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/5/5c/Double-alaskan-rainbow.jpg/960px-Double-alaskan-rainbow.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+  "w": 640,
+  "h": 336,
+  "credit": "Eric Rolph at English Wikipedia",
+  "license": "CC BY-SA 2.5",
+  "page": "https://commons.wikimedia.org/wiki/File:Double-alaskan-rainbow.jpg",
+  "file": "Double-alaskan-rainbow.jpg"
+ },
+ "Lightning": {
+  "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/c/c2/Port_and_lighthouse_overnight_storm_with_lightning_in_Port-la-Nouvelle.jpg/960px-Port_and_lighthouse_overnight_storm_with_lightning_in_Port-la-Nouvelle.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+  "w": 640,
+  "h": 360,
+  "credit": "Maxime Raynal from France",
+  "license": "CC BY 2.0",
+  "page": "https://commons.wikimedia.org/wiki/File:Port_and_lighthouse_overnight_storm_with_lightning_in_Port-la-Nouvelle.jpg",
+  "file": "Port_and_lighthouse_overnight_storm_with_lightning_in_Port-la-Nouvelle.jpg"
+ },
+ "Volcano": {
+  "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/4/48/Augustine_volcano_Jan_24_2006_-_Cyrus_Read.jpg/960px-Augustine_volcano_Jan_24_2006_-_Cyrus_Read.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+  "w": 640,
+  "h": 480,
+  "credit": "Cyrus Read Geophysicist USGS, Alaska Volcano Observatory",
+  "license": "Public domain",
+  "page": "https://commons.wikimedia.org/wiki/File:Augustine_volcano_Jan_24_2006_-_Cyrus_Read.jpg",
+  "file": "Augustine_volcano_Jan_24_2006_-_Cyrus_Read.jpg"
+ }
+}

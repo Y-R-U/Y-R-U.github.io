@@ -1,0 +1,110 @@
+{
+ "the-wizard-of-oz-1": {
+  "seed": 87642,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-04T15:02:01.949Z"
+ },
+ "the-wizard-of-oz-2": {
+  "seed": 50023,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-04T15:03:52.228Z"
+ },
+ "the-wizard-of-oz-3": {
+  "seed": 12404,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-04T15:06:07.663Z"
+ },
+ "king-kong-1": {
+  "seed": 76290,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-04T15:08:21.097Z"
+ },
+ "king-kong-2": {
+  "seed": 38671,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-04T15:10:47.102Z"
+ },
+ "king-kong-3": {
+  "seed": 1052,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-04T15:13:18.219Z"
+ },
+ "snow-white-1": {
+  "seed": 54264,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-04T15:15:44.452Z"
+ },
+ "snow-white-2": {
+  "seed": 77121,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-04T15:18:30.966Z"
+ },
+ "snow-white-3": {
+  "seed": 39502,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-04T15:21:05.613Z"
+ },
+ "gone-with-the-wind-1": {
+  "seed": 73762,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-04T15:23:34.296Z"
+ },
+ "gone-with-the-wind-2": {
+  "seed": 36143,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-04T15:26:05.031Z"
+ },
+ "pinocchio-1": {
+  "seed": 79262,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-04T15:52:02.156Z",
+  "attempt": 1
+ },
+ "pinocchio-2": {
+  "seed": 18962,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-04T15:31:07.069Z"
+ },
+ "pinocchio-3": {
+  "seed": 56581,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-04T15:35:26.541Z",
+  "attempt": 1
+ },
+ "fantasia-1": {
+  "seed": 2966,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-04T15:39:17.381Z"
+ },
+ "fantasia-2": {
+  "seed": 55347,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-04T15:41:22.255Z"
+ },
+ "dumbo-1": {
+  "seed": 57856,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-04T15:43:28.212Z"
+ },
+ "dumbo-2": {
+  "seed": 80713,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-04T15:45:30.623Z",
+  "attempt": 1
+ },
+ "bambi-1": {
+  "seed": 5960,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-04T15:53:56.091Z"
+ },
+ "casablanca-1": {
+  "seed": 62978,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-04T15:55:52.348Z"
+ },
+ "citizen-kane-1": {
+  "seed": 38069,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-04T15:57:48.949Z"
+ }
+}

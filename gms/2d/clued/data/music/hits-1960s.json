@@ -1,0 +1,1646 @@
+{
+ "id": "hits-1960s",
+ "title": "Hits of the 1960s",
+ "theme": "music",
+ "icon": "🎙️",
+ "kids": false,
+ "version": 1,
+ "notice": "30-second previews stream from Apple Music.",
+ "factsMeta": {
+  "artist": {
+   "type": "cat",
+   "label": "Artist"
+  },
+  "year": {
+   "type": "year",
+   "label": "Released",
+   "higherLabel": "Newer"
+  },
+  "decade": {
+   "type": "cat",
+   "label": "Decade"
+  }
+ },
+ "items": [
+  {
+   "id": "theme-from-a-summer-place-percy-faith",
+   "name": "Theme from \"A Summer Place\"",
+   "group": "1950s",
+   "facts": {
+    "artist": "Percy Faith",
+    "year": 1959,
+    "decade": "1950s"
+   },
+   "blurb": "\"Theme from \"A Summer Place\"\" by Percy Faith, released in 1959.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/72/c7/4b/72c74bb1-58eb-c5b7-1213-0ec7dc7aea24/mzaf_1214931067647920253.plus.aac.p.m4a",
+      "credit": "Percy Faith: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/theme-from-a-summer-place-single-version/191435770?i=191435788&uo=4",
+      "apple": {
+       "trackId": 191435788,
+       "url": "https://music.apple.com/us/album/theme-from-a-summer-place-single-version/191435770?i=191435788&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/3b/5c/30/3b5c3089-4c4d-fcf6-cdad-1e9f7858190a/mzi.wryxcbuo.jpg/300x300bb.jpg",
+       "term": "Percy Faith Theme from \"A Summer Place\""
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "hell-have-to-go-jim-reeves",
+   "name": "He'll Have to Go",
+   "group": "1950s",
+   "facts": {
+    "artist": "Jim Reeves",
+    "year": 1959,
+    "decade": "1950s"
+   },
+   "blurb": "\"He'll Have to Go\" by Jim Reeves, released in 1959.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/ec/3e/c6/ec3ec65c-273b-72a3-139e-9a67aa798072/mzaf_12129917324349206025.plus.aac.p.m4a",
+      "credit": "Jim Reeves: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/hell-have-to-go/1884680468?i=1884680469&uo=4",
+      "apple": {
+       "trackId": 1884680469,
+       "url": "https://music.apple.com/us/album/hell-have-to-go/1884680468?i=1884680469&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/fe/1c/aa/fe1caa96-359e-3e46-44f7-dee84349c0e7/196874094501.jpg/300x300bb.jpg",
+       "term": "Jim Reeves He'll Have to Go"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "cathys-clown-the-everly-brothers",
+   "name": "Cathy's Clown",
+   "group": "1960s",
+   "facts": {
+    "artist": "The Everly Brothers",
+    "year": 1960,
+    "decade": "1960s"
+   },
+   "blurb": "\"Cathy's Clown\" by The Everly Brothers, released in 1960.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/a3/c8/b6/a3c8b6a8-f644-4e32-58d3-40b3e54cd59a/mzaf_7295706907091875169.plus.aac.p.m4a",
+      "credit": "The Everly Brothers: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/cathys-clown/322092870?i=322092890&uo=4",
+      "apple": {
+       "trackId": 322092890,
+       "url": "https://music.apple.com/us/album/cathys-clown/322092870?i=322092890&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music123/v4/ed/3b/b2/ed3bb2f3-e911-ae3d-16dc-29abe64b79ef/603497972159.jpg/300x300bb.jpg",
+       "term": "The Everly Brothers Cathy's Clown"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "its-now-or-never-elvis-presley",
+   "name": "It's Now or Never",
+   "group": "1960s",
+   "facts": {
+    "artist": "Elvis Presley",
+    "year": 1960,
+    "decade": "1960s"
+   },
+   "blurb": "\"It's Now or Never\" by Elvis Presley, released in 1960.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/2e/12/23/2e1223ce-554f-dce2-b463-813215bc8fca/mzaf_7544303406808744481.plus.aac.p.m4a",
+      "credit": "Elvis Presley: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/its-now-or-never/951157990?i=951162996&uo=4",
+      "apple": {
+       "trackId": 951162996,
+       "url": "https://music.apple.com/us/album/its-now-or-never/951157990?i=951162996&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/c8/94/6d/c8946d44-19ef-d662-9a76-2373c03d19ba/886445009880.jpg/300x300bb.jpg",
+       "term": "Elvis Presley It's Now or Never"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "the-twist-chubby-checker",
+   "name": "The Twist",
+   "group": "1960s",
+   "facts": {
+    "artist": "Chubby Checker",
+    "year": 1960,
+    "decade": "1960s"
+   },
+   "blurb": "\"The Twist\" by Chubby Checker, released in 1960.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/2e/06/cc/2e06ccf5-a2bf-59b7-c2b6-ae14acd70881/mzaf_4891635790175728094.plus.aac.p.m4a",
+      "credit": "Chubby Checker: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/the-twist/1531774089?i=1531774328&uo=4",
+      "apple": {
+       "trackId": 1531774328,
+       "url": "https://music.apple.com/us/album/the-twist/1531774089?i=1531774328&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/58/d9/0b/58d90b11-3609-824a-da0b-64598d0694ef/20UMGIM70154.rgb.jpg/300x300bb.jpg",
+       "term": "Chubby Checker The Twist"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "stand-by-me-ben-e-king",
+   "name": "Stand by Me",
+   "group": "1960s",
+   "facts": {
+    "artist": "Ben E. King",
+    "year": 1961,
+    "decade": "1960s"
+   },
+   "blurb": "\"Stand by Me\" by Ben E. King, released in 1961.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/9b/e0/d6/9be0d691-738f-6a8d-4902-d2ebd9c710ce/mzaf_6796354718353412659.plus.aac.p.m4a",
+      "credit": "Ben E. King: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/stand-by-me/129022667?i=129022587&uo=4",
+      "apple": {
+       "trackId": 129022587,
+       "url": "https://music.apple.com/us/album/stand-by-me/129022667?i=129022587&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/72/d9/f8/72d9f8dc-672d-2c35-e6a1-4e38d405420c/mzi.ymtshcyn.jpg/300x300bb.jpg",
+       "term": "Ben E. King Stand By Me"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "crazy-patsy-cline",
+   "name": "Crazy",
+   "group": "1960s",
+   "facts": {
+    "artist": "Patsy Cline",
+    "year": 1961,
+    "decade": "1960s"
+   },
+   "blurb": "\"Crazy\" by Patsy Cline, released in 1961.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/2e/d4/9f/2ed49f47-cbce-c644-f69b-df4eaeafdeff/mzaf_17889384985762062881.plus.aac.p.m4a",
+      "credit": "Patsy Cline: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/crazy-feat-the-jordanaires/1485036494?i=1485036818&uo=4",
+      "apple": {
+       "trackId": 1485036818,
+       "url": "https://music.apple.com/us/album/crazy-feat-the-jordanaires/1485036494?i=1485036818&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music126/v4/c4/e4/63/c4e463f7-6bf5-fa4b-a01e-2af6ae17b9c2/19UMGIM97633.rgb.jpg/300x300bb.jpg",
+       "term": "Patsy Cline Crazy"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "runaway-del-shannon",
+   "name": "Runaway",
+   "group": "1960s",
+   "facts": {
+    "artist": "Del Shannon",
+    "year": 1961,
+    "decade": "1960s"
+   },
+   "blurb": "\"Runaway\" by Del Shannon, released in 1961.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/3a/b1/3e/3ab13ecb-2dbc-54bf-eae1-e8d561af6b22/mzaf_14324126656753941518.plus.aac.p.m4a",
+      "credit": "Del Shannon: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/runaway/381035800?i=381035812&uo=4",
+      "apple": {
+       "trackId": 381035812,
+       "url": "https://music.apple.com/us/album/runaway/381035800?i=381035812&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music/ff/3b/5d/mzi.hjovibrf.tif/300x300bb.jpg",
+       "term": "Del Shannon Runaway"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "runaround-sue-dion",
+   "name": "Runaround Sue",
+   "group": "1960s",
+   "facts": {
+    "artist": "Dion",
+    "year": 1961,
+    "decade": "1960s"
+   },
+   "blurb": "\"Runaround Sue\" by Dion, released in 1961.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/38/69/8e/38698e8c-e9ae-dc89-415a-4dfbff7be0d3/mzaf_2443183271850384577.plus.aac.p.m4a",
+      "credit": "Dion: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/runaround-sue/724907936?i=724908352&uo=4",
+      "apple": {
+       "trackId": 724908352,
+       "url": "https://music.apple.com/us/album/runaround-sue/724907936?i=724908352&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/eb/0a/cc/eb0acc87-aec2-66f2-6ffb-7f0d05169077/00724382730453.rgb.jpg/300x300bb.jpg",
+       "term": "Dion Runaround Sue"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "i-cant-stop-loving-you-ray-charles",
+   "name": "I Can't Stop Loving You",
+   "group": "1960s",
+   "facts": {
+    "artist": "Ray Charles",
+    "year": 1962,
+    "decade": "1960s"
+   },
+   "blurb": "\"I Can't Stop Loving You\" by Ray Charles, released in 1962.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/76/3a/27/763a279f-b339-7b63-4e1a-73ce06118bc1/mzaf_18104323577809356003.plus.aac.p.m4a",
+      "credit": "Ray Charles: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/i-cant-stop-loving-you/369406962?i=369407104&uo=4",
+      "apple": {
+       "trackId": 369407104,
+       "url": "https://music.apple.com/us/album/i-cant-stop-loving-you/369406962?i=369407104&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/a3/0b/6a/a30b6ae2-5a41-aeff-eec6-2126d7e2b80a/mzi.ussqueuw.jpg/300x300bb.jpg",
+       "term": "Ray Charles I Can't Stop Loving You"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "sherry-the-four-seasons",
+   "name": "Sherry",
+   "group": "1960s",
+   "facts": {
+    "artist": "The Four Seasons",
+    "year": 1962,
+    "decade": "1960s"
+   },
+   "blurb": "\"Sherry\" by The Four Seasons, released in 1962.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/db/b4/1c/dbb41cd8-1016-55e8-2d9f-291304fd3d64/mzaf_4988608990336152259.plus.aac.p.m4a",
+      "credit": "The Four Seasons: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/sherry/255895206?i=255895246&uo=4",
+      "apple": {
+       "trackId": 255895246,
+       "url": "https://music.apple.com/us/album/sherry/255895206?i=255895246&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music/9f/64/e9/mzi.zbopiird.jpg/300x300bb.jpg",
+       "term": "Frankie Valli & The Four Seasons Sherry"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "big-girls-dont-cry-the-four-seasons",
+   "name": "Big Girls Don't Cry",
+   "group": "1960s",
+   "facts": {
+    "artist": "The Four Seasons",
+    "year": 1962,
+    "decade": "1960s"
+   },
+   "blurb": "\"Big Girls Don't Cry\" by The Four Seasons, released in 1962.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/62/f1/e2/62f1e2ac-e0d8-90a3-b18c-1184f60b8401/mzaf_4253037166341111162.plus.aac.p.m4a",
+      "credit": "The Four Seasons: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/big-girls-dont-cry/89320673?i=89319428&uo=4",
+      "apple": {
+       "trackId": 89319428,
+       "url": "https://music.apple.com/us/album/big-girls-dont-cry/89320673?i=89319428&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music125/v4/39/0f/f9/390ff9e4-d76e-eeda-ee06-2b28472950f6/mzi.lrtdfnaz.jpg/300x300bb.jpg",
+       "term": "The Four Seasons Big Girls Don't Cry"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "the-loco-motion-little-eva",
+   "name": "The Loco-Motion",
+   "group": "1960s",
+   "facts": {
+    "artist": "Little Eva",
+    "year": 1962,
+    "decade": "1960s"
+   },
+   "blurb": "\"The Loco-Motion\" by Little Eva, released in 1962.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/Music/03/39/66/mzi.hcrrjtif.aac.p.m4a",
+      "credit": "Little Eva: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/the-loco-motion/196797964?i=196801431&uo=4",
+      "apple": {
+       "trackId": 196801431,
+       "url": "https://music.apple.com/us/album/the-loco-motion/196797964?i=196801431&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Features/v4/d8/9b/a7/d89ba710-408a-681f-f14a-d720f2bac8c5/V4HttpAssetRepositoryClient-ticket.hbwiuzim.jpg-3583024128702857569.jpg/300x300bb.jpg",
+       "term": "Little Eva The Loco-Motion"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "surfin-u-s-a-the-beach-boys",
+   "name": "Surfin' U.S.A.",
+   "group": "1960s",
+   "facts": {
+    "artist": "The Beach Boys",
+    "year": 1963,
+    "decade": "1960s"
+   },
+   "blurb": "\"Surfin' U.S.A.\" by The Beach Boys, released in 1963.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/34/79/a9/3479a9e8-d01b-0f1a-fc2f-3ec876b04808/mzaf_2183123274094781408.plus.aac.p.m4a",
+      "credit": "The Beach Boys: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/surfin-u-s-a/716018399?i=716018776&uo=4",
+      "apple": {
+       "trackId": 716018776,
+       "url": "https://music.apple.com/us/album/surfin-u-s-a/716018399?i=716018776&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music112/v4/fa/41/66/fa416692-acf6-8b2c-af74-245ab6335ead/14ULAIM03759.rgb.jpg/300x300bb.jpg",
+       "term": "The Beach Boys Surfin' U.S.A."
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "hes-so-fine-the-chiffons",
+   "name": "He's So Fine",
+   "group": "1960s",
+   "facts": {
+    "artist": "The Chiffons",
+    "year": 1963,
+    "decade": "1960s"
+   },
+   "blurb": "\"He's So Fine\" by The Chiffons, released in 1963.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/b3/eb/86/b3eb862b-7fee-20a6-83bc-74d9c7b9f6c7/mzaf_17754739456109929347.plus.aac.p.m4a",
+      "credit": "The Chiffons: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/hes-so-fine/715531665?i=715531876&uo=4",
+      "apple": {
+       "trackId": 715531876,
+       "url": "https://music.apple.com/us/album/hes-so-fine/715531665?i=715531876&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music/v4/a8/c0/50/a8c050c7-5e07-b43e-5e2a-09a7d14f4eb7/00724358270556.jpg/300x300bb.jpg",
+       "term": "The Chiffons He's So Fine"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "louie-louie-the-kingsmen",
+   "name": "Louie Louie",
+   "group": "1960s",
+   "facts": {
+    "artist": "The Kingsmen",
+    "year": 1963,
+    "decade": "1960s"
+   },
+   "blurb": "\"Louie Louie\" by The Kingsmen, released in 1963.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/63/9c/19/639c19ef-5abe-9291-5a9e-063f3dbff474/mzaf_6815945080907603361.plus.aac.p.m4a",
+      "credit": "The Kingsmen: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/louie-louie/121695681?i=121695005&uo=4",
+      "apple": {
+       "trackId": 121695005,
+       "url": "https://music.apple.com/us/album/louie-louie/121695681?i=121695005&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music123/v4/60/67/f0/6067f0f4-d7c6-7399-6163-b886e5223912/669910737156.jpg/300x300bb.jpg",
+       "term": "The Kingsmen Louie Louie"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "be-my-baby-the-ronettes",
+   "name": "Be My Baby",
+   "group": "1960s",
+   "facts": {
+    "artist": "The Ronettes",
+    "year": 1963,
+    "decade": "1960s"
+   },
+   "blurb": "\"Be My Baby\" by The Ronettes, released in 1963.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/06/ce/70/06ce701e-ac41-6211-e2f5-2d8ad2c9a214/mzaf_1045130405855876957.plus.aac.p.m4a",
+      "credit": "The Ronettes: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/be-my-baby/518081279?i=518081286&uo=4",
+      "apple": {
+       "trackId": 518081286,
+       "url": "https://music.apple.com/us/album/be-my-baby/518081279?i=518081286&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/17/05/50/17055031-c0c1-7e73-42d9-5e3517236f02/886443431355.jpg/300x300bb.jpg",
+       "term": "The Ronettes Be My Baby"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "she-loves-you-the-beatles",
+   "name": "She Loves You",
+   "group": "1960s",
+   "facts": {
+    "artist": "The Beatles",
+    "year": 1963,
+    "decade": "1960s"
+   },
+   "blurb": "\"She Loves You\" by The Beatles, released in 1963.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/61/e2/17/61e21729-ed12-48f9-4ae7-07e6d59ada9a/mzaf_7974996827786664690.plus.aac.p.m4a",
+      "credit": "The Beatles: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/she-loves-you/1441133181?i=1441133611&uo=4",
+      "apple": {
+       "trackId": 1441133611,
+       "url": "https://music.apple.com/us/album/she-loves-you/1441133181?i=1441133611&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music114/v4/01/69/02/01690216-48fc-1c54-b1de-48170d16b1c3/00602567725268.rgb.jpg/300x300bb.jpg",
+       "term": "The Beatles She Loves You"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "i-want-to-hold-your-hand-the-beatles",
+   "name": "I Want to Hold Your Hand",
+   "group": "1960s",
+   "facts": {
+    "artist": "The Beatles",
+    "year": 1963,
+    "decade": "1960s"
+   },
+   "blurb": "\"I Want to Hold Your Hand\" by The Beatles, released in 1963.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/99/d4/84/99d48419-cbd2-4d45-ad5c-60a581ff126e/mzaf_10364932228692401724.plus.aac.p.m4a",
+      "credit": "The Beatles: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/i-want-to-hold-your-hand/1441132965?i=1441133348&uo=4",
+      "apple": {
+       "trackId": 1441133348,
+       "url": "https://music.apple.com/us/album/i-want-to-hold-your-hand/1441132965?i=1441133348&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music122/v4/2a/4a/e6/2a4ae63d-ada7-fa57-6f16-02eebcf72f95/18UMGIM29770.rgb.jpg/300x300bb.jpg",
+       "term": "The Beatles I Want to Hold Your Hand"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "hello-dolly-louis-armstrong",
+   "name": "Hello, Dolly!",
+   "group": "1960s",
+   "facts": {
+    "artist": "Louis Armstrong",
+    "year": 1964,
+    "decade": "1960s"
+   },
+   "blurb": "\"Hello, Dolly!\" by Louis Armstrong, released in 1964.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/5e/93/eb/5e93ebf4-7529-d3cf-ab3d-70bd0b537a56/mzaf_2205926903823456003.plus.aac.p.m4a",
+      "credit": "Louis Armstrong: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/hello-dolly/1422000964?i=1422000970&uo=4",
+      "apple": {
+       "trackId": 1422000970,
+       "url": "https://music.apple.com/us/album/hello-dolly/1422000964?i=1422000970&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/08/7d/40/087d4000-5a0f-2803-61d6-4adfc9401ff8/06UMGIM02668.rgb.jpg/300x300bb.jpg",
+       "term": "Louis Armstrong Hello, Dolly!"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "oh-pretty-woman-roy-orbison",
+   "name": "Oh, Pretty Woman",
+   "alt": [
+    "Pretty Woman"
+   ],
+   "group": "1960s",
+   "facts": {
+    "artist": "Roy Orbison",
+    "year": 1964,
+    "decade": "1960s"
+   },
+   "blurb": "\"Oh, Pretty Woman\" by Roy Orbison, released in 1964.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/bc/45/c5/bc45c5e4-61d9-8074-df34-6117fb8146c2/mzaf_17905078581365919431.plus.aac.p.m4a",
+      "credit": "Roy Orbison: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/oh-pretty-woman/872478304?i=872478306&uo=4",
+      "apple": {
+       "trackId": 872478306,
+       "url": "https://music.apple.com/us/album/oh-pretty-woman/872478304?i=872478306&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music125/v4/30/a2/b6/30a2b6ef-d9fb-738c-07e5-97028b39d430/dj.hcobukpd.jpg/300x300bb.jpg",
+       "term": "Roy Orbison Oh, Pretty Woman"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "i-get-around-the-beach-boys",
+   "name": "I Get Around",
+   "group": "1960s",
+   "facts": {
+    "artist": "The Beach Boys",
+    "year": 1964,
+    "decade": "1960s"
+   },
+   "blurb": "\"I Get Around\" by The Beach Boys, released in 1964.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/be/72/83/be728392-331c-f15a-12f6-c3dbfaf47b9c/mzaf_12167566381878335089.plus.aac.p.m4a",
+      "credit": "The Beach Boys: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/i-get-around/1443160899?i=1443161018&uo=4",
+      "apple": {
+       "trackId": 1443161018,
+       "url": "https://music.apple.com/us/album/i-get-around/1443160899?i=1443161018&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music114/v4/21/f1/32/21f13205-b60b-9afa-742e-4b15dc1dd767/13UMGIM24815.rgb.jpg/300x300bb.jpg",
+       "term": "The Beach Boys I Get Around"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "where-did-our-love-go-the-supremes",
+   "name": "Where Did Our Love Go",
+   "group": "1960s",
+   "facts": {
+    "artist": "The Supremes",
+    "year": 1964,
+    "decade": "1960s"
+   },
+   "blurb": "\"Where Did Our Love Go\" by The Supremes, released in 1964.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/d5/80/a7/d580a739-e524-989c-768c-cff5972e4bc6/mzaf_15755444933100972375.plus.aac.p.m4a",
+      "credit": "The Supremes: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/where-did-our-love-go/1443150912?i=1443150931&uo=4",
+      "apple": {
+       "trackId": 1443150931,
+       "url": "https://music.apple.com/us/album/where-did-our-love-go/1443150912?i=1443150931&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music123/v4/5d/c2/4d/5dc24de8-15d7-16e0-7585-72a2bcc721de/14UMGIM62198.rgb.jpg/300x300bb.jpg",
+       "term": "The Supremes Where Did Our Love Go"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "the-house-of-the-rising-sun-the-animals",
+   "name": "The House of the Rising Sun",
+   "group": "1960s",
+   "facts": {
+    "artist": "The Animals",
+    "year": 1964,
+    "decade": "1960s"
+   },
+   "blurb": "\"The House of the Rising Sun\" by The Animals, released in 1964.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/ae/9b/93/ae9b9361-78a6-243b-67ae-3e3cbb45de26/mzaf_713207122839919111.plus.aac.p.m4a",
+      "credit": "The Animals: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/house-of-the-rising-sun/1440781967?i=1440781975&uo=4",
+      "apple": {
+       "trackId": 1440781975,
+       "url": "https://music.apple.com/us/album/house-of-the-rising-sun/1440781967?i=1440781975&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/b9/8e/e1/b98ee1e2-71a2-158f-4ccb-787acc34e9c8/13ABKIM00091.rgb.jpg/300x300bb.jpg",
+       "term": "The Animals House of the Rising Sun"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "cant-buy-me-love-the-beatles",
+   "name": "Can't Buy Me Love",
+   "group": "1960s",
+   "facts": {
+    "artist": "The Beatles",
+    "year": 1964,
+    "decade": "1960s"
+   },
+   "blurb": "\"Can't Buy Me Love\" by The Beatles, released in 1964.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/1c/1d/4b/1c1d4b36-db20-02bd-d867-0808fdbb120d/mzaf_12888580731973632250.plus.aac.p.m4a",
+      "credit": "The Beatles: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/cant-buy-me-love/1441164416?i=1441164423&uo=4",
+      "apple": {
+       "trackId": 1441164423,
+       "url": "https://music.apple.com/us/album/cant-buy-me-love/1441164416?i=1441164423&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/db/a2/7a/dba27a46-3685-508d-d32e-a0e73cc82251/00602567713296.rgb.jpg/300x300bb.jpg",
+       "term": "The Beatles Can't Buy Me Love"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "my-girl-the-temptations",
+   "name": "My Girl",
+   "group": "1960s",
+   "facts": {
+    "artist": "The Temptations",
+    "year": 1964,
+    "decade": "1960s"
+   },
+   "blurb": "\"My Girl\" by The Temptations, released in 1964.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/99/b3/ef/99b3ef00-3e74-5dfa-0d2e-4128ef5a9f0c/mzaf_12879689053309664622.plus.aac.p.m4a",
+      "credit": "The Temptations: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/my-girl/1423301162?i=1423301921&uo=4",
+      "apple": {
+       "trackId": 1423301921,
+       "url": "https://music.apple.com/us/album/my-girl/1423301162?i=1423301921&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music123/v4/84/2d/f1/842df19d-e5f4-3b9f-9405-6779bbc43fe0/06UMGIM07353.rgb.jpg/300x300bb.jpg",
+       "term": "The Temptations My Girl"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "i-cant-get-no-satisfaction-the-rolling-stones",
+   "name": "(I Can't Get No) Satisfaction",
+   "alt": [
+    "Satisfaction"
+   ],
+   "group": "1960s",
+   "facts": {
+    "artist": "The Rolling Stones",
+    "year": 1965,
+    "decade": "1960s"
+   },
+   "blurb": "\"(I Can't Get No) Satisfaction\" by The Rolling Stones, released in 1965.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/ee/4d/28/ee4d28cd-a465-1334-2863-efda9ea9669b/mzaf_8440807812349084607.plus.aac.p.m4a",
+      "credit": "The Rolling Stones: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/i-cant-get-no-satisfaction/1440743344?i=1440743544&uo=4",
+      "apple": {
+       "trackId": 1440743544,
+       "url": "https://music.apple.com/us/album/i-cant-get-no-satisfaction/1440743344?i=1440743544&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music113/v4/6b/8c/5b/6b8c5bc2-cbf3-5d48-ac10-565dd728802b/13ABKIM00023.rgb.jpg/300x300bb.jpg",
+       "term": "The Rolling Stones  Satisfaction"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "i-cant-help-myself-sugar-pie-honey-bunch-four-tops",
+   "name": "I Can't Help Myself (Sugar Pie Honey Bunch)",
+   "group": "1960s",
+   "facts": {
+    "artist": "Four Tops",
+    "year": 1965,
+    "decade": "1960s"
+   },
+   "blurb": "\"I Can't Help Myself (Sugar Pie Honey Bunch)\" by Four Tops, released in 1965.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/c8/45/40/c845408f-b73d-2c35-c16b-afc82b97e602/mzaf_1210379351414939844.plus.aac.p.m4a",
+      "credit": "Four Tops: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/i-cant-help-myself-sugar-pie-honey-bunch/1443096418?i=1443096422&uo=4",
+      "apple": {
+       "trackId": 1443096422,
+       "url": "https://music.apple.com/us/album/i-cant-help-myself-sugar-pie-honey-bunch/1443096418?i=1443096422&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music116/v4/10/46/99/104699e4-b496-c8ed-42e9-5395aabd07eb/06UMGIM42215.rgb.jpg/300x300bb.jpg",
+       "term": "Four Tops I Can't Help Myself"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "mr-tambourine-man-the-byrds",
+   "name": "Mr. Tambourine Man",
+   "group": "1960s",
+   "facts": {
+    "artist": "The Byrds",
+    "year": 1965,
+    "decade": "1960s"
+   },
+   "blurb": "\"Mr. Tambourine Man\" by The Byrds, released in 1965.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/fa/12/d0/fa12d074-a5ed-1b7a-a4c0-284ddd262607/mzaf_4080848081330245947.plus.aac.p.m4a",
+      "credit": "The Byrds: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/mr-tambourine-man/153421296?i=153421332&uo=4",
+      "apple": {
+       "trackId": 153421332,
+       "url": "https://music.apple.com/us/album/mr-tambourine-man/153421296?i=153421332&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music/d6/b7/81/mzi.mcvxlkfy.jpg/300x300bb.jpg",
+       "term": "The Byrds Mr. Tambourine Man"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "help-the-beatles",
+   "name": "Help!",
+   "group": "1960s",
+   "facts": {
+    "artist": "The Beatles",
+    "year": 1965,
+    "decade": "1960s"
+   },
+   "blurb": "\"Help!\" by The Beatles, released in 1965.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/90/c1/c1/90c1c133-02e3-255d-3a0d-e70c5a404bc5/mzaf_14127376946151186172.plus.aac.p.m4a",
+      "credit": "The Beatles: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/help/1441164524?i=1441164536&uo=4",
+      "apple": {
+       "trackId": 1441164536,
+       "url": "https://music.apple.com/us/album/help/1441164524?i=1441164536&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music122/v4/1a/19/db/1a19db26-17ad-b986-11a9-f72ac7a6194b/18UMGIM31214.rgb.jpg/300x300bb.jpg",
+       "term": "The Beatles Help!"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "youve-lost-that-lovin-feelin-the-righteous-brothers",
+   "name": "You've Lost That Lovin' Feelin'",
+   "group": "1960s",
+   "facts": {
+    "artist": "The Righteous Brothers",
+    "year": 1964,
+    "decade": "1960s"
+   },
+   "blurb": "\"You've Lost That Lovin' Feelin'\" by The Righteous Brothers, released in 1964.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/Music/a4/3d/75/mzm.lxnyrgcg.aac.p.m4a",
+      "credit": "The Righteous Brothers: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/youve-lost-that-lovin-feelin-single-version/474853316?i=474853651&uo=4",
+      "apple": {
+       "trackId": 474853651,
+       "url": "https://music.apple.com/us/album/youve-lost-that-lovin-feelin-single-version/474853316?i=474853651&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music127/v4/82/c6/f3/82c6f354-25cb-c39e-4ddf-6730231d1852/886443181649.jpg/300x300bb.jpg",
+       "term": "The Righteous Brothers You've Lost That Lovin' Feelin'"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "california-dreamin-the-mamas-and-the-papas",
+   "name": "California Dreamin'",
+   "group": "1960s",
+   "facts": {
+    "artist": "The Mamas & The Papas",
+    "year": 1965,
+    "decade": "1960s"
+   },
+   "blurb": "\"California Dreamin'\" by The Mamas & The Papas, released in 1965.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/c5/aa/41/c5aa4115-c757-c774-ccb9-7106d0e4d942/mzaf_12048979929246032919.plus.aac.p.m4a",
+      "credit": "The Mamas & The Papas: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/california-dreamin-single-version/1444125154?i=1444127010&uo=4",
+      "apple": {
+       "trackId": 1444127010,
+       "url": "https://music.apple.com/us/album/california-dreamin-single-version/1444125154?i=1444127010&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/3c/64/90/3c649085-c8ef-1fcf-f867-5719944f3dad/16UMGIM85486.rgb.jpg/300x300bb.jpg",
+       "term": "The Mamas & The Papas California Dreamin'"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "good-vibrations-the-beach-boys",
+   "name": "Good Vibrations",
+   "group": "1960s",
+   "facts": {
+    "artist": "The Beach Boys",
+    "year": 1966,
+    "decade": "1960s"
+   },
+   "blurb": "\"Good Vibrations\" by The Beach Boys, released in 1966.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/4f/a1/b2/4fa1b2fe-7f99-8a4c-72a9-0804c77f2b58/mzaf_7135940363914090298.plus.aac.p.m4a",
+      "credit": "The Beach Boys: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/good-vibrations/1442864862?i=1442865074&uo=4",
+      "apple": {
+       "trackId": 1442865074,
+       "url": "https://music.apple.com/us/album/good-vibrations/1442864862?i=1442865074&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/94/62/6c/94626c44-4657-739e-e639-39ae55e6d2cc/13UABIM03827.rgb.jpg/300x300bb.jpg",
+       "term": "The Beach Boys Good Vibrations"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "reach-out-ill-be-there-four-tops",
+   "name": "Reach Out I'll Be There",
+   "group": "1960s",
+   "facts": {
+    "artist": "Four Tops",
+    "year": 1966,
+    "decade": "1960s"
+   },
+   "blurb": "\"Reach Out I'll Be There\" by Four Tops, released in 1966.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/02/5b/38/025b383f-aa12-0fb9-c18d-7895587c1e72/mzaf_6669944714115752261.plus.aac.p.m4a",
+      "credit": "Four Tops: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/reach-out-ill-be-there/1443092485?i=1443092687&uo=4",
+      "apple": {
+       "trackId": 1443092687,
+       "url": "https://music.apple.com/us/album/reach-out-ill-be-there/1443092485?i=1443092687&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music114/v4/97/4c/58/974c5833-8190-ced8-f2d0-3ca9bd270248/14UMGIM28821.rgb.jpg/300x300bb.jpg",
+       "term": "Four Tops Reach Out, I'll Be There"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "paint-it-black-the-rolling-stones",
+   "name": "Paint It Black",
+   "group": "1960s",
+   "facts": {
+    "artist": "The Rolling Stones",
+    "year": 1966,
+    "decade": "1960s"
+   },
+   "blurb": "\"Paint It Black\" by The Rolling Stones, released in 1966.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/da/f5/ec/daf5ece2-6853-c6a4-d481-389001453f75/mzaf_3869995397273029315.plus.aac.p.m4a",
+      "credit": "The Rolling Stones: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/paint-it-black/1440745549?i=1440745782&uo=4",
+      "apple": {
+       "trackId": 1440745782,
+       "url": "https://music.apple.com/us/album/paint-it-black/1440745549?i=1440745782&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/cd/89/04/cd890449-e58f-7257-2c60-9c8c31f24ce3/13ABKIM00063.rgb.jpg/300x300bb.jpg",
+       "term": "The Rolling Stones Paint It, Black"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "these-boots-are-made-for-walkin-nancy-sinatra",
+   "name": "These Boots Are Made for Walkin'",
+   "group": "1960s",
+   "facts": {
+    "artist": "Nancy Sinatra",
+    "year": 1966,
+    "decade": "1960s"
+   },
+   "blurb": "\"These Boots Are Made for Walkin'\" by Nancy Sinatra, released in 1966.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/34/3e/31/343e31db-9746-9ef2-602a-ac16513f0429/mzaf_14538077395875273996.plus.aac.p.m4a",
+      "credit": "Nancy Sinatra: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/these-boots-are-made-for-walkin/1576574712?i=1576574977&uo=4",
+      "apple": {
+       "trackId": 1576574977,
+       "url": "https://music.apple.com/us/album/these-boots-are-made-for-walkin/1576574712?i=1576574977&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/95/e0/e0/95e0e041-fe07-d5c1-1b28-95e3ccf36f88/196292057867.jpg/300x300bb.jpg",
+       "term": "Nancy Sinatra These Boots Are Made for Walkin'"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "im-a-believer-the-monkees",
+   "name": "I'm a Believer",
+   "group": "1960s",
+   "facts": {
+    "artist": "The Monkees",
+    "year": 1966,
+    "decade": "1960s"
+   },
+   "blurb": "\"I'm a Believer\" by The Monkees, released in 1966.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/a0/68/0e/a0680e95-f7a6-2e70-b1c3-0cf69edf22d5/mzaf_13705371680645994642.plus.aac.p.m4a",
+      "credit": "The Monkees: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/im-a-believer/176079756?i=176080628&uo=4",
+      "apple": {
+       "trackId": 176080628,
+       "url": "https://music.apple.com/us/album/im-a-believer/176079756?i=176080628&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/d3/10/fb/d310fbca-90ae-3911-4fff-667fa7830f1a/dj.hqvvfwtf.jpg/300x300bb.jpg",
+       "term": "The Monkees I'm a Believer"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "respect-aretha-franklin",
+   "name": "Respect",
+   "group": "1960s",
+   "facts": {
+    "artist": "Aretha Franklin",
+    "year": 1967,
+    "decade": "1960s"
+   },
+   "blurb": "\"Respect\" by Aretha Franklin, released in 1967.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/99/74/40/997440f5-f543-165d-321a-5a64245a6c1c/mzaf_7740075940996149397.plus.aac.p.m4a",
+      "credit": "Aretha Franklin: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/respect/937107826?i=937107838&uo=4",
+      "apple": {
+       "trackId": 937107838,
+       "url": "https://music.apple.com/us/album/respect/937107826?i=937107838&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/d1/31/ee/d131eec4-614c-d661-b580-3dc32b8547e8/603497896622.jpg/300x300bb.jpg",
+       "term": "Aretha Franklin Respect"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "the-letter-the-box-tops",
+   "name": "The Letter",
+   "group": "1960s",
+   "facts": {
+    "artist": "The Box Tops",
+    "year": 1967,
+    "decade": "1960s"
+   },
+   "blurb": "\"The Letter\" by The Box Tops, released in 1967.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/df/e1/b0/dfe1b06d-6083-fccf-5031-a6dcbbd2821d/mzaf_529841061100627458.plus.aac.p.m4a",
+      "credit": "The Box Tops: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/the-letter/284043484?i=284043488&uo=4",
+      "apple": {
+       "trackId": 284043488,
+       "url": "https://music.apple.com/us/album/the-letter/284043484?i=284043488&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music125/v4/9f/12/e2/9f12e2fd-fb2c-6e70-6f62-7534c3ae3c53/mzi.zhfwqhdj.jpg/300x300bb.jpg",
+       "term": "The Box Tops The Letter"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "happy-together-the-turtles",
+   "name": "Happy Together",
+   "group": "1960s",
+   "facts": {
+    "artist": "The Turtles",
+    "year": 1967,
+    "decade": "1960s"
+   },
+   "blurb": "\"Happy Together\" by The Turtles, released in 1967.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/14/48/23/14482339-0094-4661-a759-5a63725d4b64/mzaf_10375692303356175728.plus.aac.p.m4a",
+      "credit": "The Turtles: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/happy-together/79087172?i=79087150&uo=4",
+      "apple": {
+       "trackId": 79087150,
+       "url": "https://music.apple.com/us/album/happy-together/79087172?i=79087150&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/28/95/77/289577d1-0b0a-400d-0698-17b784b76c15/dj.kwkktnnd.jpg/300x300bb.jpg",
+       "term": "The Turtles Happy Together"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "light-my-fire-the-doors",
+   "name": "Light My Fire",
+   "group": "1960s",
+   "facts": {
+    "artist": "The Doors",
+    "year": 1967,
+    "decade": "1960s"
+   },
+   "blurb": "\"Light My Fire\" by The Doors, released in 1967.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/e2/2e/99/e22e9993-9f0c-df04-4aec-133a7045bce5/mzaf_14103368404409074100.plus.aac.p.m4a",
+      "credit": "The Doors: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/light-my-fire/1192962129?i=1192962303&uo=4",
+      "apple": {
+       "trackId": 1192962303,
+       "url": "https://music.apple.com/us/album/light-my-fire/1192962129?i=1192962303&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/43/f6/14/43f61467-931b-21af-6b22-13717edc8ed9/603497870295.jpg/300x300bb.jpg",
+       "term": "The Doors Light My Fire"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "ode-to-billie-joe-bobbie-gentry",
+   "name": "Ode to Billie Joe",
+   "group": "1960s",
+   "facts": {
+    "artist": "Bobbie Gentry",
+    "year": 1967,
+    "decade": "1960s"
+   },
+   "blurb": "\"Ode to Billie Joe\" by Bobbie Gentry, released in 1967.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/0a/f3/22/0af3224b-1b8b-f816-bb68-66c970c288ec/mzaf_7882452024215121989.plus.aac.p.m4a",
+      "credit": "Bobbie Gentry: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/ode-to-billie-joe/714615100?i=714615292&uo=4",
+      "apple": {
+       "trackId": 714615292,
+       "url": "https://music.apple.com/us/album/ode-to-billie-joe/714615100?i=714615292&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music125/v4/5c/61/72/5c617270-8904-3c70-0566-0bbb7b3cba6e/00094638630050.jpg/300x300bb.jpg",
+       "term": "Bobbie Gentry Ode to Billie Joe"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "a-whiter-shade-of-pale-procol-harum",
+   "name": "A Whiter Shade of Pale",
+   "group": "1960s",
+   "facts": {
+    "artist": "Procol Harum",
+    "year": 1967,
+    "decade": "1960s"
+   },
+   "blurb": "\"A Whiter Shade of Pale\" by Procol Harum, released in 1967.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/e0/8e/ba/e08ebab8-b084-03c6-f6ba-3769f82a87cd/mzaf_11261740043524231344.plus.aac.p.m4a",
+      "credit": "Procol Harum: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/a-whiter-shade-of-pale-original-single-version/1682051353?i=1682051688&uo=4",
+      "apple": {
+       "trackId": 1682051688,
+       "url": "https://music.apple.com/us/album/a-whiter-shade-of-pale-original-single-version/1682051353?i=1682051688&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music126/v4/ef/02/c5/ef02c52a-653c-0329-c4e9-2186bae65514/7.jpg/300x300bb.jpg",
+       "term": "Procol Harum A Whiter Shade of Pale)"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "brown-eyed-girl-van-morrison",
+   "name": "Brown Eyed Girl",
+   "group": "1960s",
+   "facts": {
+    "artist": "Van Morrison",
+    "year": 1967,
+    "decade": "1960s"
+   },
+   "blurb": "\"Brown Eyed Girl\" by Van Morrison, released in 1967.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/51/e0/d1/51e0d17b-652e-fb14-39ff-4d9e901b3702/mzaf_7837875213651732823.plus.aac.p.m4a",
+      "credit": "Van Morrison: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/brown-eyed-girl/1828716608?i=1828716610&uo=4",
+      "apple": {
+       "trackId": 1828716610,
+       "url": "https://music.apple.com/us/album/brown-eyed-girl/1828716608?i=1828716610&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/49/54/07/4954073b-9f8c-0f62-0d38-35845b530f08/886445460452_Cover.jpg/300x300bb.jpg",
+       "term": "Van Morrison Brown Eyed Girl"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "hey-jude-the-beatles",
+   "name": "Hey Jude",
+   "group": "1960s",
+   "facts": {
+    "artist": "The Beatles",
+    "year": 1968,
+    "decade": "1960s"
+   },
+   "blurb": "\"Hey Jude\" by The Beatles, released in 1968.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/3d/08/f5/3d08f5d7-1e0a-99d9-1085-d50ecc972bb9/mzaf_1689604474306790314.plus.aac.p.m4a",
+      "credit": "The Beatles: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/hey-jude/1441133100?i=1441133277&uo=4",
+      "apple": {
+       "trackId": 1441133277,
+       "url": "https://music.apple.com/us/album/hey-jude/1441133100?i=1441133277&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music126/v4/a6/8b/65/a68b657c-cac6-68e6-3bde-b79d58fbc795/18UMGIM30762.rgb.jpg/300x300bb.jpg",
+       "term": "The Beatles Hey Jude"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "sittin-on-the-dock-of-the-bay-otis-redding",
+   "name": "(Sittin' On) The Dock of the Bay",
+   "alt": [
+    "Dock of the Bay"
+   ],
+   "group": "1960s",
+   "facts": {
+    "artist": "Otis Redding",
+    "year": 1968,
+    "decade": "1960s"
+   },
+   "blurb": "\"(Sittin' On) The Dock of the Bay\" by Otis Redding, released in 1968.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/20/7f/14/207f141a-f7e5-26c1-9e5a-b4556444e467/mzaf_18196714768063505974.plus.aac.p.m4a",
+      "credit": "Otis Redding: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/sittin-on-the-dock-of-the-bay/995809797?i=995809798&uo=4",
+      "apple": {
+       "trackId": 995809798,
+       "url": "https://music.apple.com/us/album/sittin-on-the-dock-of-the-bay/995809797?i=995809798&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/83/e1/02/83e102bb-b5b8-78ea-10ce-8f210211a9a8/603497889945.jpg/300x300bb.jpg",
+       "term": "Otis Redding  The Dock of the Bay"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "mrs-robinson-simon-and-garfunkel",
+   "name": "Mrs. Robinson",
+   "group": "1960s",
+   "facts": {
+    "artist": "Simon & Garfunkel",
+    "year": 1968,
+    "decade": "1960s"
+   },
+   "blurb": "\"Mrs. Robinson\" by Simon & Garfunkel, released in 1968.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/dc/34/a1/dc34a184-84c0-fc47-712a-bb1ac83dec72/mzaf_4775604353249705315.plus.aac.p.m4a",
+      "credit": "Simon & Garfunkel: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/mrs-robinson/203303421?i=203304387&uo=4",
+      "apple": {
+       "trackId": 203304387,
+       "url": "https://music.apple.com/us/album/mrs-robinson/203303421?i=203304387&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music113/v4/1c/3c/09/1c3c0934-8ae5-fc87-2647-e104057d41f4/074640952920.jpg/300x300bb.jpg",
+       "term": "Simon & Garfunkel Mrs. Robinson"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "i-heard-it-through-the-grapevine-marvin-gaye",
+   "name": "I Heard It Through the Grapevine",
+   "group": "1960s",
+   "facts": {
+    "artist": "Marvin Gaye",
+    "year": 1968,
+    "decade": "1960s"
+   },
+   "blurb": "\"I Heard It Through the Grapevine\" by Marvin Gaye, released in 1968.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/3b/7f/61/3b7f6109-9dda-c5e2-d228-18035e25fc7a/mzaf_15307067509964036717.plus.aac.p.m4a",
+      "credit": "Marvin Gaye: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/i-heard-it-through-the-grapevine/1426017031?i=1426017462&uo=4",
+      "apple": {
+       "trackId": 1426017462,
+       "url": "https://music.apple.com/us/album/i-heard-it-through-the-grapevine/1426017031?i=1426017462&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music112/v4/ad/af/d8/adafd8e3-a9d0-3e7d-beb3-4965db160183/06UMGIM01811.rgb.jpg/300x300bb.jpg",
+       "term": "Marvin Gaye I Heard It Through the Grapevine"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "born-to-be-wild-steppenwolf",
+   "name": "Born to Be Wild",
+   "group": "1960s",
+   "facts": {
+    "artist": "Steppenwolf",
+    "year": 1968,
+    "decade": "1960s"
+   },
+   "blurb": "\"Born to Be Wild\" by Steppenwolf, released in 1968.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/71/33/6d/71336d1f-e008-d0f8-5dff-25fa0974ef8d/mzaf_13245098132834526016.plus.aac.p.m4a",
+      "credit": "Steppenwolf: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/born-to-be-wild/1440859623?i=1440860171&uo=4",
+      "apple": {
+       "trackId": 1440860171,
+       "url": "https://music.apple.com/us/album/born-to-be-wild/1440859623?i=1440860171&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/ec/b2/63/ecb263f0-55dd-6430-a916-f8c6d14430a6/00602537845194.rgb.jpg/300x300bb.jpg",
+       "term": "Steppenwolf Born to Be Wild"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "sugar-sugar-the-archies",
+   "name": "Sugar, Sugar",
+   "group": "1960s",
+   "facts": {
+    "artist": "The Archies",
+    "year": 1969,
+    "decade": "1960s"
+   },
+   "blurb": "\"Sugar, Sugar\" by The Archies, released in 1969.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/a6/c0/24/a6c024fd-bd8a-ff9d-4eba-73767609ad90/mzaf_16484569894417758736.plus.aac.p.m4a",
+      "credit": "The Archies: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/sugar-sugar/214805379?i=214805381&uo=4",
+      "apple": {
+       "trackId": 214805381,
+       "url": "https://music.apple.com/us/album/sugar-sugar/214805379?i=214805381&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/3f/35/9c/3f359c1d-2f7e-2756-3261-a4b053c6c0e6/dj.ohpderqx.jpg/300x300bb.jpg",
+       "term": "The Archies Sugar, Sugar"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "aquarius-let-the-sunshine-in-the-5th-dimension",
+   "name": "Aquarius / Let the Sunshine In",
+   "group": "1960s",
+   "facts": {
+    "artist": "The 5th Dimension",
+    "year": 1969,
+    "decade": "1960s"
+   },
+   "blurb": "\"Aquarius / Let the Sunshine In\" by The 5th Dimension, released in 1969.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/7c/14/86/7c148689-85ab-964e-a4b1-c50595f84e5a/mzaf_17778885856522172830.plus.aac.p.m4a",
+      "credit": "The 5th Dimension: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/aquarius-let-the-sunshine-in/303078879?i=303078892&uo=4",
+      "apple": {
+       "trackId": 303078892,
+       "url": "https://music.apple.com/us/album/aquarius-let-the-sunshine-in/303078879?i=303078892&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/2d/73/43/2d734337-5ee2-d9eb-58b7-21cb094c1c9a/744659966620.jpg/300x300bb.jpg",
+       "term": "The 5th Dimension Aquarius/Let the Sunshine In"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "honky-tonk-women-the-rolling-stones",
+   "name": "Honky Tonk Women",
+   "group": "1960s",
+   "facts": {
+    "artist": "The Rolling Stones",
+    "year": 1969,
+    "decade": "1960s"
+   },
+   "blurb": "\"Honky Tonk Women\" by The Rolling Stones, released in 1969.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/81/b1/33/81b133ef-cb9a-10da-6e51-a64d6108c38f/mzaf_2988773462439004684.plus.aac.p.m4a",
+      "credit": "The Rolling Stones: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/honky-tonk-women/1440764786?i=1440765871&uo=4",
+      "apple": {
+       "trackId": 1440765871,
+       "url": "https://music.apple.com/us/album/honky-tonk-women/1440764786?i=1440765871&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music112/v4/29/b7/81/29b781e5-3773-c87e-c6a8-82581e53d270/13ABKIM00053.rgb.jpg/300x300bb.jpg",
+       "term": "The Rolling Stones Honky Tonk Women"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "in-the-year-2525-zager-and-evans",
+   "name": "In the Year 2525",
+   "group": "1960s",
+   "facts": {
+    "artist": "Zager & Evans",
+    "year": 1969,
+    "decade": "1960s"
+   },
+   "blurb": "\"In the Year 2525\" by Zager & Evans, released in 1969.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview115/v4/9d/bd/7f/9dbd7f3f-d5bb-6743-eae0-39a063371859/mzaf_10061041778653318765.plus.aac.p.m4a",
+      "credit": "Zager & Evans: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/in-the-year-2525-exordium-terminus/1268962643?i=1268962872&uo=4",
+      "apple": {
+       "trackId": 1268962872,
+       "url": "https://music.apple.com/us/album/in-the-year-2525-exordium-terminus/1268962643?i=1268962872&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music114/v4/d8/02/1d/d8021da7-dacd-81aa-1415-743eb333ed81/886445806359.jpg/300x300bb.jpg",
+       "term": "Zager & Evans In the Year 2525"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "space-oddity-david-bowie",
+   "name": "Space Oddity",
+   "group": "1960s",
+   "facts": {
+    "artist": "David Bowie",
+    "year": 1969,
+    "decade": "1960s"
+   },
+   "blurb": "\"Space Oddity\" by David Bowie, released in 1969.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/7e/b3/c4/7eb3c4fa-2716-5d8c-5c17-5bf13878d9d1/mzaf_18372047815099005449.plus.aac.p.m4a",
+      "credit": "David Bowie: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/space-oddity-love-you-til-tuesday-version/1683711407?i=1683711564&uo=4",
+      "apple": {
+       "trackId": 1683711564,
+       "url": "https://music.apple.com/us/album/space-oddity-love-you-til-tuesday-version/1683711407?i=1683711564&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music126/v4/b8/94/9c/b8949c1b-2d20-d3ab-0c25-46d69ebaf3ed/23UMGIM18326.rgb.jpg/300x300bb.jpg",
+       "term": "David Bowie Space Oddity"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "raindrops-keep-fallin-on-my-head-b-j-thomas",
+   "name": "Raindrops Keep Fallin' on My Head",
+   "group": "1960s",
+   "facts": {
+    "artist": "B.J. Thomas",
+    "year": 1969,
+    "decade": "1960s"
+   },
+   "blurb": "\"Raindrops Keep Fallin' on My Head\" by B.J. Thomas, released in 1969.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview115/v4/31/f0/ae/31f0aeac-3f59-2df7-1f6e-23b68422c368/mzaf_12036449981694075117.plus.aac.p.m4a",
+      "credit": "B.J. Thomas: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/raindrops-keep-fallin-on-my-head/405348813?i=405348837&uo=4",
+      "apple": {
+       "trackId": 405348837,
+       "url": "https://music.apple.com/us/album/raindrops-keep-fallin-on-my-head/405348813?i=405348837&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music/2a/2e/95/mzi.mqpcfxtg.jpg/300x300bb.jpg",
+       "term": "B.J. Thomas Raindrops Keep Fallin’ On My Head"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  }
+ ],
+ "questions": [],
+ "sources": [
+  {
+   "name": "Billboard Year-End Hot 100 singles (1960–1969)",
+   "url": "https://en.wikipedia.org/wiki/Billboard_Year-End_Hot_100_singles_of_1960"
+  },
+  {
+   "name": "UK best-selling singles by year",
+   "url": "https://en.wikipedia.org/wiki/List_of_best-selling_singles_by_year_(UK)"
+  },
+  {
+   "name": "Apple iTunes Search API (previews, artwork, links)",
+   "url": "https://performance-partners.apple.com/search-api"
+  }
+ ],
+ "built": "2026-10-04"
+}

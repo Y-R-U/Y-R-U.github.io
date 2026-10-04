@@ -1,0 +1,2942 @@
+{
+ "id": "insects",
+ "title": "Insects",
+ "theme": "animals",
+ "icon": "🐞",
+ "kids": true,
+ "version": 1,
+ "leakExempt": [
+  "insect",
+  "insects"
+ ],
+ "factsMeta": {
+  "order": {
+   "type": "cat",
+   "label": "Insect group"
+  },
+  "complete": {
+   "type": "bool",
+   "label": "Has a pupa stage",
+   "yes": "Egg, larva, pupa, adult",
+   "no": "Egg, nymph, adult"
+  }
+ },
+ "items": [
+  {
+   "id": "seven-spot-ladybird",
+   "name": "Seven-spot ladybird",
+   "alt": [
+    "ladybird",
+    "ladybug",
+    "seven-spotted lady beetle"
+   ],
+   "sci": "Coccinella septempunctata",
+   "group": "beetle",
+   "facts": {
+    "order": "Beetles",
+    "complete": true
+   },
+   "blurb": "A red beetle with seven black spots. Gardeners love it because it eats aphids.",
+   "clues": [
+    "Family: Coccinellidae.",
+    "Genus: Coccinella.",
+    "It can eat thousands of aphids in its life.",
+    "It oozes smelly yellow liquid from its legs when scared.",
+    "Its larvae look like tiny grey alligators.",
+    "It goes through a pupa stage as it grows.",
+    "The answer has 3 words (5, 4, 8 letters).",
+    "It starts with the letter S."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/220339613/medium.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Casey H. Richart",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/220339613"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/117983055/medium.jpeg",
+      "w": 500,
+      "h": 375,
+      "credit": "Gianni Del Bufalo bygdb",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/117983055"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/121969195/medium.jpeg",
+      "w": 500,
+      "h": 375,
+      "credit": "Alexis Tinker-Tsavalas",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/121969195"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "monarch-butterfly",
+   "name": "Monarch butterfly",
+   "alt": [
+    "monarch"
+   ],
+   "sci": "Danaus plexippus",
+   "group": "butterfly",
+   "facts": {
+    "order": "Butterflies & moths",
+    "complete": true
+   },
+   "lookalikes": [
+    "painted-lady"
+   ],
+   "blurb": "An orange-and-black butterfly famous for flying thousands of kilometres from North America to Mexico for winter.",
+   "clues": [
+    "Family: Nymphalidae.",
+    "Genus: Danaus.",
+    "Its caterpillars eat only milkweed.",
+    "Birds avoid it because it tastes bad.",
+    "Millions spend the winter in forests in Mexico.",
+    "It goes through a pupa stage as it grows.",
+    "It flies thousands of kilometres each year.",
+    "It is orange with black veins and shares its name with a king or queen.",
+    "The answer has 2 words (7, 9 letters).",
+    "It starts with the letter M."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/111043173/medium.jpg",
+      "w": 500,
+      "h": 353,
+      "credit": "Christine Young",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/111043173"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/1181829/medium.jpg",
+      "w": 500,
+      "h": 460,
+      "credit": "Jon Sullivan",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/1181829"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/20535817/medium.jpeg",
+      "w": 281,
+      "h": 500,
+      "credit": "naturewatchwidow",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/20535817"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "painted-lady",
+   "name": "Painted lady",
+   "sci": "Vanessa cardui",
+   "group": "butterfly",
+   "facts": {
+    "order": "Butterflies & moths",
+    "complete": true
+   },
+   "lookalikes": [
+    "monarch-butterfly",
+    "red-admiral"
+   ],
+   "blurb": "One of the most widespread butterflies on Earth. Some fly from Africa to Europe and back again each year.",
+   "clues": [
+    "Family: Nymphalidae.",
+    "Genus: Vanessa.",
+    "Some fly from Africa to Europe across the Sahara.",
+    "It is found on every continent except Antarctica and South America.",
+    "Its caterpillars often eat thistles.",
+    "It goes through a pupa stage as it grows.",
+    "It is orange with black and white spots.",
+    "The answer has 2 words (7, 4 letters).",
+    "It starts with the letter P."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/3347095/medium.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Joan C. Hinojosa",
+      "license": "CC0 1.0",
+      "page": "https://www.inaturalist.org/photos/3347095"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/225355906/medium.jpg",
+      "w": 500,
+      "h": 500,
+      "credit": "L.J. Lamera",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/225355906"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/54031036/medium.jpeg",
+      "w": 500,
+      "h": 375,
+      "credit": "Shirley Zundell",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/54031036"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "peacock-butterfly",
+   "name": "Peacock butterfly",
+   "sci": "Aglais io",
+   "group": "butterfly",
+   "facts": {
+    "order": "Butterflies & moths",
+    "complete": true
+   },
+   "blurb": "A red butterfly with big eye-spots on its wings. It flashes them to scare off birds.",
+   "clues": [
+    "Family: Nymphalidae.",
+    "Genus: Aglais.",
+    "It spends winter asleep in sheds and hollow trees.",
+    "It hisses by rubbing its wings together.",
+    "Its caterpillars eat stinging nettles.",
+    "It goes through a pupa stage as it grows.",
+    "It has four big eye-spots on its wings.",
+    "It is named after a showy bird.",
+    "The answer has 2 words (7, 9 letters).",
+    "It starts with the letter P."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/4710619/medium.jpg",
+      "w": 500,
+      "h": 433,
+      "credit": "S. Rae",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/4710619"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/359063525/medium.jpeg",
+      "w": 500,
+      "h": 375,
+      "credit": "Dimitǎr Boevski",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/359063525"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/566316447/medium.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Cheongweei Gan",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/566316447"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "red-admiral",
+   "name": "Red admiral",
+   "sci": "Vanessa atalanta",
+   "group": "butterfly",
+   "facts": {
+    "order": "Butterflies & moths",
+    "complete": true
+   },
+   "lookalikes": [
+    "painted-lady"
+   ],
+   "blurb": "A black butterfly with bright red bands and white spots. It is common in gardens in late summer.",
+   "clues": [
+    "Family: Nymphalidae.",
+    "Genus: Vanessa.",
+    "Its caterpillars eat nettles.",
+    "It likes feeding on rotting fruit.",
+    "Many fly north to Britain each spring.",
+    "It goes through a pupa stage as it grows.",
+    "It shares its name with a navy officer.",
+    "The answer has 2 words (3, 7 letters).",
+    "It starts with the letter R."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/53928483/medium.jpg",
+      "w": 500,
+      "h": 373,
+      "credit": "Gilles San Martin",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/53928483"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/376647594/medium.jpeg",
+      "w": 463,
+      "h": 500,
+      "credit": "Shirley Zundell",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/376647594"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/35221177/medium.jpeg",
+      "w": 500,
+      "h": 335,
+      "credit": "Gilles San Martin",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/35221177"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "small-white",
+   "name": "Small white",
+   "alt": [
+    "cabbage white",
+    "cabbage butterfly"
+   ],
+   "sci": "Pieris rapae",
+   "group": "butterfly",
+   "facts": {
+    "order": "Butterflies & moths",
+    "complete": true
+   },
+   "blurb": "A common white butterfly whose green caterpillars munch cabbages. It has spread around the world.",
+   "clues": [
+    "Family: Pieridae.",
+    "Genus: Pieris.",
+    "It has spread to North America, Australia and New Zealand.",
+    "Its green caterpillars are garden pests.",
+    "It has one or two black spots on each front wing.",
+    "It goes through a pupa stage as it grows.",
+    "The answer has 2 words (5, 5 letters).",
+    "It starts with the letter S."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/1179645/medium.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Jon Sullivan",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/1179645"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/303721649/medium.jpg",
+      "w": 500,
+      "h": 399,
+      "credit": "Corey Farwell",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/303721649"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/186022464/medium.jpg",
+      "w": 500,
+      "h": 400,
+      "credit": "Fyodor Pudovikov",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/186022464"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "blue-morpho",
+   "name": "Blue morpho",
+   "sci": "Morpho menelaus",
+   "group": "butterfly",
+   "facts": {
+    "order": "Butterflies & moths",
+    "complete": true
+   },
+   "blurb": "A big butterfly from South American rainforests with shining blue wings. The blue comes from tiny scales that reflect light, not from colour.",
+   "clues": [
+    "Family: Nymphalidae.",
+    "Its colour comes from the structure of its scales, not pigment.",
+    "The undersides of its wings are brown with eye-spots.",
+    "It drinks juice from rotting fruit.",
+    "It goes through a pupa stage as it grows.",
+    "It lives in Central and South American rainforests.",
+    "Its wings are a shining sky colour.",
+    "The answer has 2 words (4, 6 letters).",
+    "It starts with the letter B."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/274273860/medium.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Thomaz de Carvalho Callado",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/274273860"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/170852313/medium.jpeg",
+      "w": 500,
+      "h": 375,
+      "credit": "Lucas Kaminski",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/170852313"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/405850253/medium.jpg",
+      "w": 500,
+      "h": 376,
+      "credit": "desertnaturalist",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/405850253"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "old-world-swallowtail",
+   "name": "Old World swallowtail",
+   "alt": [
+    "swallowtail",
+    "common yellow swallowtail"
+   ],
+   "sci": "Papilio machaon",
+   "group": "butterfly",
+   "facts": {
+    "order": "Butterflies & moths",
+    "complete": true
+   },
+   "lookalikes": [
+    "ulysses-butterfly"
+   ],
+   "blurb": "A big yellow-and-black butterfly with tails on its back wings. In Britain it lives only in the Norfolk Broads.",
+   "clues": [
+    "Family: Papilionidae.",
+    "Genus: Papilio.",
+    "Its caterpillar pushes out orange \"horns\" that smell when scared.",
+    "In Britain it is found only in the Norfolk Broads.",
+    "Its caterpillars eat milk-parsley and fennel.",
+    "It goes through a pupa stage as it grows.",
+    "Its back wings have long tails.",
+    "It is named after a bird with a forked tail.",
+    "The answer has 3 words (3, 5, 11 letters).",
+    "It starts with the letter O."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/30565267/medium.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "lugachev_vitaly",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/30565267"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/198537155/medium.jpeg",
+      "w": 500,
+      "h": 333,
+      "credit": "Marino Linić",
+      "license": "CC0 1.0",
+      "page": "https://www.inaturalist.org/photos/198537155"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/280989662/medium.jpeg",
+      "w": 500,
+      "h": 400,
+      "credit": "Fyodor Pudovikov",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/280989662"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "ulysses-butterfly",
+   "name": "Ulysses butterfly",
+   "alt": [
+    "blue emperor"
+   ],
+   "sci": "Papilio ulysses",
+   "group": "butterfly",
+   "facts": {
+    "order": "Butterflies & moths",
+    "complete": true
+   },
+   "lookalikes": [
+    "blue-morpho",
+    "old-world-swallowtail"
+   ],
+   "blurb": "A large electric-blue swallowtail of north Queensland and New Guinea. It is a tourism symbol of Queensland.",
+   "clues": [
+    "Family: Papilionidae.",
+    "Genus: Papilio.",
+    "It is a symbol of tourism in Queensland.",
+    "Its back wings have tails.",
+    "It goes through a pupa stage as it grows.",
+    "It lives in north Queensland rainforest.",
+    "It is named after a Greek hero.",
+    "The answer has 2 words (7, 9 letters).",
+    "It starts with the letter U."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/7945775/medium.jpg",
+      "w": 357,
+      "h": 500,
+      "credit": "Bernard DUPONT",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/7945775"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/45110154/medium.jpeg",
+      "w": 375,
+      "h": 500,
+      "credit": "Terra Occ",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/45110154"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/383236105/medium.jpeg",
+      "w": 500,
+      "h": 328,
+      "credit": "Jane C Frost",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/383236105"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "atlas-moth",
+   "name": "Atlas moth",
+   "sci": "Attacus atlas",
+   "group": "moth",
+   "facts": {
+    "order": "Butterflies & moths",
+    "complete": true
+   },
+   "blurb": "One of the biggest moths in the world, from Asian forests. The tips of its wings look like snake heads.",
+   "clues": [
+    "Family: Saturniidae.",
+    "Genus: Attacus.",
+    "Adults have no working mouth and live only about a week.",
+    "Its wingtips look like snake heads.",
+    "Its cocoons have been used as purses in Taiwan.",
+    "It goes through a pupa stage as it grows.",
+    "It is named after a giant who held up the sky.",
+    "The answer has 2 words (5, 4 letters).",
+    "It starts with the letter A."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/4466442/medium.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Scott Loarie",
+      "license": "CC0 1.0",
+      "page": "https://www.inaturalist.org/photos/4466442"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/60643931/medium.jpg",
+      "w": 500,
+      "h": 374,
+      "credit": "Oleg Kosterin",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/60643931"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/139156344/medium.jpg",
+      "w": 500,
+      "h": 313,
+      "credit": "Lawrence Hylton",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/139156344"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "luna-moth",
+   "name": "Luna moth",
+   "sci": "Actias luna",
+   "group": "moth",
+   "facts": {
+    "order": "Butterflies & moths",
+    "complete": true
+   },
+   "blurb": "A pale green North American moth with long trailing tails on its back wings. Adults live only about a week.",
+   "clues": [
+    "Family: Saturniidae.",
+    "Genus: Actias.",
+    "Its long tails confuse bats' echolocation.",
+    "Adults cannot eat.",
+    "It lives in North American forests.",
+    "It goes through a pupa stage as it grows.",
+    "It is pale lime green.",
+    "Its name means moon.",
+    "The answer has 2 words (4, 4 letters).",
+    "It starts with the letter L."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/135382348/medium.jpeg",
+      "w": 500,
+      "h": 375,
+      "credit": "Bruce Cook",
+      "license": "CC0 1.0",
+      "page": "https://www.inaturalist.org/photos/135382348"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/362407735/medium.jpeg",
+      "w": 375,
+      "h": 500,
+      "credit": "Michael J. Papay",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/362407735"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/34980868/medium.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Michelle W. （鍾偉瑋）",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/34980868"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "deaths-head-hawkmoth",
+   "name": "Death's-head hawkmoth",
+   "sci": "Acherontia atropos",
+   "group": "moth",
+   "facts": {
+    "order": "Butterflies & moths",
+    "complete": true
+   },
+   "blurb": "A big moth with a skull-like pattern on its back. It squeaks loudly and raids beehives for honey.",
+   "clues": [
+    "Family: Sphingidae.",
+    "Genus: Acherontia.",
+    "It appears on the poster for \"The Silence of the Lambs\".",
+    "It sneaks into beehives to steal honey.",
+    "It squeaks when handled.",
+    "It goes through a pupa stage as it grows.",
+    "It is one of the largest moths in Europe.",
+    "It has a skull-like pattern on its back.",
+    "The answer has 3 words (6, 4, 8 letters).",
+    "It starts with the letter D."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/28549593/medium.jpg",
+      "w": 375,
+      "h": 500,
+      "credit": "Rubén F. A.",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/28549593"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/198536936/medium.jpeg",
+      "w": 500,
+      "h": 333,
+      "credit": "no rights reserved",
+      "license": "CC0 1.0",
+      "page": "https://www.inaturalist.org/photos/198536936"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/586365614/medium.jpg",
+      "w": 335,
+      "h": 500,
+      "credit": "Emad Tahaei",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/586365614"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "hummingbird-hawk-moth",
+   "name": "Hummingbird hawk-moth",
+   "sci": "Macroglossum stellatarum",
+   "group": "moth",
+   "facts": {
+    "order": "Butterflies & moths",
+    "complete": true
+   },
+   "blurb": "A day-flying moth that hovers in front of flowers and sips nectar with a long tongue, just like a tiny bird.",
+   "clues": [
+    "Family: Sphingidae.",
+    "Genus: Macroglossum.",
+    "Its wings beat so fast they hum.",
+    "It uncurls a long tongue to drink nectar.",
+    "It goes through a pupa stage as it grows.",
+    "It hovers in front of flowers.",
+    "It looks like a tiny bird from the Americas.",
+    "The answer has 3 words (11, 4, 4 letters).",
+    "It starts with the letter H."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/241949898/medium.jpeg",
+      "w": 375,
+      "h": 500,
+      "credit": "Céline",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/241949898"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/103024387/medium.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Smudge 9000",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/103024387"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/523184422/medium.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Hannes Dahm",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/523184422"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "bogong-moth",
+   "name": "Bogong moth",
+   "sci": "Agrotis infusa",
+   "group": "moth",
+   "facts": {
+    "order": "Butterflies & moths",
+    "complete": true
+   },
+   "blurb": "A brown Australian moth that flies to cool mountain caves for summer. Aboriginal people feasted on them there.",
+   "clues": [
+    "Family: Noctuidae.",
+    "Genus: Agrotis.",
+    "It can navigate using the stars.",
+    "Millions shelter in alpine caves in summer.",
+    "Aboriginal people roasted them as food.",
+    "It goes through a pupa stage as it grows.",
+    "Swarms have invaded Parliament House in Canberra.",
+    "The answer has 2 words (6, 4 letters).",
+    "It starts with the letter B."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/229178/medium.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Donald Hobern",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/229178"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/7750272/medium.jpg",
+      "w": 500,
+      "h": 285,
+      "credit": "Landcare Research New Zealand Ltd.",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/7750272"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/55886216/medium.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Andrew Allen",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/55886216"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "domestic-silk-moth",
+   "name": "Domestic silk moth",
+   "alt": [
+    "silkworm"
+   ],
+   "sci": "Bombyx mori",
+   "group": "moth",
+   "facts": {
+    "order": "Butterflies & moths",
+    "complete": true
+   },
+   "blurb": "A moth bred by people for 5,000 years. Its caterpillar spins a cocoon of the thread we use to make silk.",
+   "clues": [
+    "Family: Bombycidae.",
+    "Genus: Bombyx.",
+    "It no longer exists in the wild.",
+    "Adults cannot fly.",
+    "Its caterpillars eat mulberry leaves.",
+    "It goes through a pupa stage as it grows.",
+    "It was first farmed in China.",
+    "Its cocoon is unwound to make a smooth shiny cloth.",
+    "The answer has 3 words (8, 4, 4 letters).",
+    "It starts with the letter D."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/85471/medium.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "DavidHT",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/85471"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "stag-beetle",
+   "name": "Stag beetle",
+   "alt": [
+    "European stag beetle"
+   ],
+   "sci": "Lucanus cervus",
+   "group": "beetle",
+   "facts": {
+    "order": "Beetles",
+    "complete": true
+   },
+   "blurb": "A big beetle whose males have huge jaws like antlers. They use them to wrestle other males.",
+   "clues": [
+    "Family: Lucanidae.",
+    "Genus: Lucanus.",
+    "Its larvae live in rotting wood for up to six years.",
+    "Adults live only a few weeks.",
+    "Males wrestle with their giant jaws.",
+    "The male's jaws look like a deer's antlers.",
+    "The answer has 2 words (4, 6 letters).",
+    "It starts with the letter S."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/691121156/medium.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Diego González Dopico",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/691121156"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/47954195/medium.jpeg",
+      "w": 500,
+      "h": 375,
+      "credit": "Carminda Santos",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/47954195"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/520837429/medium.jpg",
+      "w": 500,
+      "h": 376,
+      "credit": "Elias",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/520837429"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "hercules-beetle",
+   "name": "Hercules beetle",
+   "sci": "Dynastes hercules",
+   "group": "beetle",
+   "facts": {
+    "order": "Beetles",
+    "complete": true
+   },
+   "lookalikes": [
+    "stag-beetle"
+   ],
+   "blurb": "One of the longest beetles in the world, from Central and South American rainforests. Males have a huge horn.",
+   "clues": [
+    "Family: Scarabaeidae.",
+    "Genus: Dynastes.",
+    "Males can be about 17 cm long including the horn.",
+    "It can change colour from olive to black with humidity.",
+    "Males use their horns to flip rivals.",
+    "It goes through a pupa stage as it grows.",
+    "It is named after a strong Greek hero.",
+    "The answer has 2 words (8, 6 letters).",
+    "It starts with the letter H."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/18333696/medium.jpeg",
+      "w": 500,
+      "h": 331,
+      "credit": "TOUROULT Julien",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/18333696"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/52637945/medium.jpeg",
+      "w": 500,
+      "h": 460,
+      "credit": "Philip Schaeffer",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/52637945"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/417651643/medium.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Lon Brehmer",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/417651643"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "goliath-beetle",
+   "name": "Goliath beetle",
+   "sci": "Goliathus goliatus",
+   "group": "beetle",
+   "facts": {
+    "order": "Beetles",
+    "complete": true
+   },
+   "blurb": "One of the heaviest insects in the world, from African rainforests. Its larvae can weigh up to 100 grams.",
+   "clues": [
+    "Family: Scarabaeidae.",
+    "Its larvae can weigh about 100 grams.",
+    "It lives in African rainforests.",
+    "It has bold black and white markings.",
+    "It goes through a pupa stage as it grows.",
+    "It is one of the heaviest insects.",
+    "It is named after a giant from the Bible.",
+    "The answer has 2 words (7, 6 letters).",
+    "It starts with the letter G."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/85652753/medium.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Anagoria",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/85652753"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/63715263/medium.jpeg",
+      "w": 500,
+      "h": 375,
+      "credit": "Hectonichus",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/63715263"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/660895088/medium.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Barry Stewart",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/660895088"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "sacred-scarab",
+   "name": "Sacred scarab",
+   "alt": [
+    "dung beetle",
+    "scarab beetle"
+   ],
+   "sci": "Scarabaeus sacer",
+   "group": "beetle",
+   "facts": {
+    "order": "Beetles",
+    "complete": true
+   },
+   "blurb": "A dung beetle that rolls balls of dung. Ancient Egyptians linked it with the sun god.",
+   "clues": [
+    "Ancient Egyptians saw it as a symbol of the rising sun.",
+    "Some of its relatives steer using the Milky Way.",
+    "It lays its eggs inside a ball of droppings.",
+    "It goes through a pupa stage as it grows.",
+    "It rolls a ball much bigger than itself.",
+    "It eats animal poo.",
+    "The answer has 2 words (6, 6 letters).",
+    "It starts with the letter S."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/603398840/medium.jpg",
+      "w": 500,
+      "h": 320,
+      "credit": "Lucas Benaiche",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/603398840"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/596504915/medium.jpg",
+      "w": 500,
+      "h": 282,
+      "credit": "no rights reserved",
+      "license": "CC0 1.0",
+      "page": "https://www.inaturalist.org/photos/596504915"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/504924866/medium.jpg",
+      "w": 375,
+      "h": 500,
+      "credit": "Sara Navarro",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/504924866"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "common-eastern-firefly",
+   "name": "Common eastern firefly",
+   "alt": [
+    "firefly",
+    "lightning bug"
+   ],
+   "sci": "Photinus pyralis",
+   "group": "beetle",
+   "facts": {
+    "order": "Beetles",
+    "complete": true
+   },
+   "blurb": "A beetle whose tail glows in the dark. Males flash their lights to talk to females on summer nights.",
+   "clues": [
+    "Family: Lampyridae.",
+    "Genus: Photinus.",
+    "It is really a beetle, not a fly.",
+    "Its light makes almost no heat.",
+    "Males flash a J-shaped pattern while flying.",
+    "It goes through a pupa stage as it grows.",
+    "It flashes on summer nights.",
+    "Its tail glows in the dark.",
+    "The answer has 3 words (6, 7, 7 letters).",
+    "It starts with the letter C."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/4202184/medium.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Katja Schulz",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/4202184"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/139632/medium.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Katja Schulz",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/139632"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/302090929/medium.jpg",
+      "w": 500,
+      "h": 242,
+      "credit": "Kim H",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/302090929"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "christmas-beetle",
+   "name": "Christmas beetle",
+   "sci": "Anoplognathus",
+   "group": "beetle",
+   "facts": {
+    "order": "Beetles",
+    "complete": true
+   },
+   "blurb": "Shiny golden-brown beetles that swarm around Australian gum trees in early summer.",
+   "clues": [
+    "Family: Scarabaeidae.",
+    "They eat eucalyptus leaves.",
+    "Their larvae are lawn grubs.",
+    "They buzz around lights on summer nights.",
+    "It goes through a pupa stage as it grows.",
+    "They are shiny gold or brown.",
+    "They appear in Australia around the end of December.",
+    "The answer has 2 words (9, 6 letters).",
+    "It starts with the letter C."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/247624808/medium.jpg",
+      "w": 500,
+      "h": 435,
+      "credit": "Greg Tasney",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/247624808"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/247623503/medium.jpeg",
+      "w": 459,
+      "h": 500,
+      "credit": "Martin Rady",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/247623503"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/453923639/medium.jpeg",
+      "w": 375,
+      "h": 500,
+      "credit": "Kai Squires",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/453923639"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "bombardier-beetle",
+   "name": "Bombardier beetle",
+   "sci": "Brachinus",
+   "group": "beetle",
+   "facts": {
+    "order": "Beetles",
+    "complete": true
+   },
+   "blurb": "A beetle that sprays a boiling-hot chemical spray from its tail with a popping sound.",
+   "clues": [
+    "Family: Carabidae.",
+    "Its spray reaches about 100 °C.",
+    "Two chemicals mix inside it and explode.",
+    "It can aim its spray in many directions.",
+    "It goes through a pupa stage as it grows.",
+    "It makes a popping sound.",
+    "It is named after a soldier who fires big guns.",
+    "The answer has 2 words (10, 6 letters).",
+    "It starts with the letter B."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/1089166/medium.jpg",
+      "w": 500,
+      "h": 357,
+      "credit": "Patrick Coin",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/1089166"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/11235545/medium.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Katja Schulz",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/11235545"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/2132043/medium.jpg",
+      "w": 361,
+      "h": 500,
+      "credit": "Don Loarie",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/2132043"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "colorado-potato-beetle",
+   "name": "Colorado potato beetle",
+   "sci": "Leptinotarsa decemlineata",
+   "group": "beetle",
+   "facts": {
+    "order": "Beetles",
+    "complete": true
+   },
+   "blurb": "A striped beetle that is a serious pest of potato crops. It has resisted many insecticides.",
+   "clues": [
+    "Family: Chrysomelidae.",
+    "Genus: Leptinotarsa.",
+    "It has 10 black stripes.",
+    "It has become resistant to many insecticides.",
+    "It spread from America to Europe.",
+    "It goes through a pupa stage as it grows.",
+    "It strips the leaves off spud plants.",
+    "It is named after an American state and a vegetable.",
+    "The answer has 3 words (8, 6, 6 letters).",
+    "It starts with the letter C."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/415215026/medium.jpeg",
+      "w": 500,
+      "h": 500,
+      "credit": "Catherine C. Galley",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/415215026"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/150877991/medium.jpeg",
+      "w": 500,
+      "h": 392,
+      "credit": "Sarah Faulwetter",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/150877991"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/241845103/medium.jpeg",
+      "w": 500,
+      "h": 493,
+      "credit": "Barry Cottam",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/241845103"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "acorn-weevil",
+   "name": "Acorn weevil",
+   "sci": "Curculio glandium",
+   "group": "beetle",
+   "facts": {
+    "order": "Beetles",
+    "complete": true
+   },
+   "blurb": "A small beetle with an extremely long snout. It drills into acorns to lay its eggs.",
+   "clues": [
+    "Family: Curculionidae.",
+    "Genus: Curculio.",
+    "Its snout can be as long as its body.",
+    "It drills holes in nuts to lay eggs.",
+    "Its larvae eat their way out of the nut.",
+    "It goes through a pupa stage as it grows.",
+    "It lays eggs in the nuts of oak trees.",
+    "The answer has 2 words (5, 6 letters).",
+    "It starts with the letter A."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/375558747/medium.jpg",
+      "w": 500,
+      "h": 339,
+      "credit": "Victor Heng",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/375558747"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/295768805/medium.jpeg",
+      "w": 500,
+      "h": 375,
+      "credit": "M Funnell",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/295768805"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/160041513/medium.jpeg",
+      "w": 500,
+      "h": 326,
+      "credit": "no rights reserved",
+      "license": "CC0 1.0",
+      "page": "https://www.inaturalist.org/photos/160041513"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "european-mantis",
+   "name": "European mantis",
+   "alt": [
+    "praying mantis",
+    "mantis"
+   ],
+   "sci": "Mantis religiosa",
+   "group": "mantis",
+   "facts": {
+    "order": "Mantises",
+    "complete": false
+   },
+   "lookalikes": [
+    "orchid-mantis"
+   ],
+   "blurb": "A green insect that holds its spiky front legs as if praying. It catches other insects in a flash.",
+   "clues": [
+    "It can turn its head to look over its shoulder.",
+    "Females sometimes eat males.",
+    "It ambushes insects with lightning-fast front legs.",
+    "Its young look like small adults; there is no pupa stage.",
+    "Its front legs fold up like a pocket knife.",
+    "It is a long green insect.",
+    "The answer has 2 words (8, 6 letters).",
+    "It starts with the letter E."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/264035768/medium.jpg",
+      "w": 500,
+      "h": 309,
+      "credit": "Charles J. Sharp",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/264035768"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/443658457/medium.jpeg",
+      "w": 432,
+      "h": 500,
+      "credit": "Ram Dayal Vaishnav",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/443658457"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/100489354/medium.jpeg",
+      "w": 500,
+      "h": 333,
+      "credit": "Henrik Kibak",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/100489354"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "orchid-mantis",
+   "name": "Orchid mantis",
+   "sci": "Hymenopus coronatus",
+   "group": "mantis",
+   "facts": {
+    "order": "Mantises",
+    "complete": false
+   },
+   "lookalikes": [
+    "european-mantis"
+   ],
+   "blurb": "A pink-and-white mantis from South-East Asia that looks like a flower. Insects that come to visit get eaten.",
+   "clues": [
+    "Family: Hymenopodidae.",
+    "Genus: Hymenopus.",
+    "Insects mistake it for a flower.",
+    "Its legs look like petals.",
+    "It lives in South-East Asian rainforests.",
+    "Its young look like small adults; there is no pupa stage.",
+    "It is pink and white.",
+    "It looks like a famous flower.",
+    "The answer has 2 words (6, 6 letters).",
+    "It starts with the letter O."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/53268667/medium.jpeg",
+      "w": 500,
+      "h": 333,
+      "credit": "Franz Anthony",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/53268667"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/356484614/medium.jpg",
+      "w": 500,
+      "h": 357,
+      "credit": "no rights reserved",
+      "license": "CC0 1.0",
+      "page": "https://www.inaturalist.org/photos/356484614"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/168345099/medium.jpeg",
+      "w": 500,
+      "h": 329,
+      "credit": "Cheryl Stinchcomb",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/168345099"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "spiny-leaf-insect",
+   "name": "Spiny leaf insect",
+   "alt": [
+    "giant prickly stick insect",
+    "Macleay's spectre"
+   ],
+   "sci": "Extatosoma tiaratum",
+   "group": "stick insect",
+   "facts": {
+    "order": "Stick & leaf insects",
+    "complete": false
+   },
+   "lookalikes": [
+    "leaf-insect"
+   ],
+   "blurb": "A big spiky Australian stick insect that curls its tail like a scorpion. Ants carry its eggs into their nests.",
+   "clues": [
+    "Family: Phasmatidae.",
+    "Genus: Extatosoma.",
+    "Ants carry its eggs into their nests.",
+    "It curls its tail like a scorpion.",
+    "It is a popular pet in Australia.",
+    "Its young look like small adults; there is no pupa stage.",
+    "It is covered in spikes.",
+    "The answer has 3 words (5, 4, 6 letters).",
+    "It starts with the letter S."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/154784/medium.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Sam Fraser-Smith",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/154784"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/243494428/medium.jpeg",
+      "w": 375,
+      "h": 500,
+      "credit": "Matt B",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/243494428"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/450888255/medium.jpeg",
+      "w": 500,
+      "h": 375,
+      "credit": "Sockrosma",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/450888255"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "leaf-insect",
+   "name": "Leaf insect",
+   "alt": [
+    "walking leaf"
+   ],
+   "sci": "Phyllium",
+   "group": "stick insect",
+   "facts": {
+    "order": "Stick & leaf insects",
+    "complete": false
+   },
+   "lookalikes": [
+    "spiny-leaf-insect"
+   ],
+   "blurb": "An insect so flat and green it looks exactly like a leaf, even with fake veins and bite marks.",
+   "clues": [
+    "Family: Phylliidae.",
+    "Some even have brown edges as if they are dying.",
+    "It sways gently as if blown by the wind.",
+    "It lives in South-East Asia.",
+    "Its young look like small adults; there is no pupa stage.",
+    "It is flat and green.",
+    "It looks just like part of a plant.",
+    "The answer has 2 words (4, 6 letters).",
+    "It starts with the letter L."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/523178388/medium.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "dhfischer",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/523178388"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/616211971/medium.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Jay Paroline",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/616211971"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/675918227/medium.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Kai Squires",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/675918227"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "emperor-dragonfly",
+   "name": "Emperor dragonfly",
+   "alt": [
+    "dragonfly"
+   ],
+   "sci": "Anax imperator",
+   "group": "dragonfly",
+   "facts": {
+    "order": "Dragonflies & damselflies",
+    "complete": false
+   },
+   "lookalikes": [
+    "banded-demoiselle"
+   ],
+   "blurb": "A big blue-and-green dragonfly that patrols ponds. It catches other insects in mid-air.",
+   "clues": [
+    "Family: Aeshnidae.",
+    "Genus: Anax.",
+    "Its young live underwater for a year or more.",
+    "It eats its prey while flying.",
+    "Its young look like small adults; there is no pupa stage.",
+    "Males have a bright blue body.",
+    "It is named after a ruler of an empire.",
+    "The answer has 2 words (7, 9 letters).",
+    "It starts with the letter E."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/205761223/medium.jpeg",
+      "w": 500,
+      "h": 375,
+      "credit": "Ludivine Lamare",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/205761223"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/45937582/medium.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Frank Sengpiel",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/45937582"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/17864439/medium.jpeg",
+      "w": 500,
+      "h": 444,
+      "credit": "Tony Rebelo",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/17864439"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "banded-demoiselle",
+   "name": "Banded demoiselle",
+   "alt": [
+    "damselfly"
+   ],
+   "sci": "Calopteryx splendens",
+   "group": "damselfly",
+   "facts": {
+    "order": "Dragonflies & damselflies",
+    "complete": false
+   },
+   "lookalikes": [
+    "emperor-dragonfly"
+   ],
+   "blurb": "A damselfly with a shining blue-green body. Males have a dark band on each wing and flutter like butterflies.",
+   "clues": [
+    "Family: Calopterygidae.",
+    "Genus: Calopteryx.",
+    "It folds its wings along its body at rest.",
+    "It flutters like a butterfly.",
+    "It lives along slow rivers.",
+    "Its young look like small adults; there is no pupa stage.",
+    "Males have a dark patch across each wing.",
+    "Its name means young lady.",
+    "The answer has 2 words (6, 10 letters).",
+    "It starts with the letter B."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/15603/medium.jpg",
+      "w": 500,
+      "h": 400,
+      "credit": "Lip Kee Yap",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/15603"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/19161400/medium.jpg",
+      "w": 471,
+      "h": 500,
+      "credit": "Barry Walter",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/19161400"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/364634361/medium.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Oleg Kosterin",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/364634361"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "desert-locust",
+   "name": "Desert locust",
+   "alt": [
+    "locust"
+   ],
+   "sci": "Schistocerca gregaria",
+   "group": "grasshopper",
+   "facts": {
+    "order": "Grasshoppers & crickets",
+    "complete": false
+   },
+   "blurb": "A grasshopper that can form enormous swarms. A swarm can eat as much food in a day as millions of people.",
+   "clues": [
+    "Family: Acrididae.",
+    "Genus: Schistocerca.",
+    "Crowding changes its colour and behaviour.",
+    "Swarms can contain billions of insects.",
+    "It is one of the plagues in the Bible story of Exodus.",
+    "Its young look like small adults; there is no pupa stage.",
+    "Swarms destroy crops in Africa and Asia.",
+    "It is a swarming grasshopper.",
+    "The answer has 2 words (6, 6 letters).",
+    "It starts with the letter D."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/147713544/medium.jpeg",
+      "w": 500,
+      "h": 332,
+      "credit": "Philipp",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/147713544"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/575342058/medium.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "no rights reserved",
+      "license": "CC0 1.0",
+      "page": "https://www.inaturalist.org/photos/575342058"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/77195713/medium.jpeg",
+      "w": 500,
+      "h": 375,
+      "credit": "Joey Bom",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/77195713"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "house-cricket",
+   "name": "House cricket",
+   "alt": [
+    "cricket"
+   ],
+   "sci": "Acheta domesticus",
+   "group": "cricket",
+   "facts": {
+    "order": "Grasshoppers & crickets",
+    "complete": false
+   },
+   "blurb": "A cricket that chirps by rubbing its wings. It is farmed as food for pets and people.",
+   "clues": [
+    "Family: Gryllidae.",
+    "Genus: Acheta.",
+    "Its ears are on its front legs.",
+    "It is farmed as food for reptiles.",
+    "Males chirp by rubbing their wings together.",
+    "Its young look like small adults; there is no pupa stage.",
+    "It has very long antennae.",
+    "It shares its name with a bat-and-ball game.",
+    "The answer has 2 words (5, 7 letters).",
+    "It starts with the letter H."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/56345930/medium.jpg",
+      "w": 375,
+      "h": 500,
+      "credit": "Scott Lewis",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/56345930"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/21834148/medium.jpeg",
+      "w": 500,
+      "h": 401,
+      "credit": "Gianni Del Bufalo bygdb",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/21834148"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/21835067/medium.jpeg",
+      "w": 500,
+      "h": 360,
+      "credit": "Gianni Del Bufalo bygdb",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/21835067"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "green-grocer-cicada",
+   "name": "Green grocer cicada",
+   "alt": [
+    "cicada",
+    "greengrocer"
+   ],
+   "sci": "Cyclochila australasiae",
+   "group": "cicada",
+   "facts": {
+    "order": "True bugs",
+    "complete": false
+   },
+   "blurb": "A big green Australian cicada. Males sing so loudly in summer they are among the loudest insects in the world.",
+   "clues": [
+    "Genus: Cyclochila.",
+    "Its young live underground for years.",
+    "Children collect the empty skins from tree trunks.",
+    "It is one of the loudest insects in the world.",
+    "Its young look like small adults; there is no pupa stage.",
+    "It sings on hot summer days in Australia.",
+    "The answer has 3 words (5, 6, 6 letters).",
+    "It starts with the letter G."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/5715535/medium.jpg",
+      "w": 280,
+      "h": 500,
+      "credit": "Toby Hudson",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/5715535"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/166542377/medium.jpg",
+      "w": 500,
+      "h": 443,
+      "credit": "Tony Eales",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/166542377"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/331997465/medium.jpg",
+      "w": 375,
+      "h": 500,
+      "credit": "Lukas Clews",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/331997465"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "periodical-cicada",
+   "name": "Periodical cicada",
+   "sci": "Magicicada septendecim",
+   "group": "cicada",
+   "facts": {
+    "order": "True bugs",
+    "complete": false
+   },
+   "lookalikes": [
+    "green-grocer-cicada"
+   ],
+   "blurb": "A red-eyed cicada of the eastern USA that lives underground for 17 years, then comes out in billions all at once.",
+   "clues": [
+    "Genus: Magicicada.",
+    "Its species name means seventeen.",
+    "Billions emerge in the same year.",
+    "It has bright red eyes.",
+    "Its young look like small adults; there is no pupa stage.",
+    "It lives underground for 17 years.",
+    "It appears only once every many years.",
+    "The answer has 2 words (10, 6 letters).",
+    "It starts with the letter P."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/370009134/medium.jpeg",
+      "w": 375,
+      "h": 500,
+      "credit": "Michael J. Papay",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/370009134"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/131632077/medium.jpeg",
+      "w": 375,
+      "h": 500,
+      "credit": "Tim Wasserman",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/131632077"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/134221283/medium.jpeg",
+      "w": 500,
+      "h": 252,
+      "credit": "no rights reserved",
+      "license": "CC0 1.0",
+      "page": "https://www.inaturalist.org/photos/134221283"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "bullet-ant",
+   "name": "Bullet ant",
+   "sci": "Paraponera clavata",
+   "group": "ant",
+   "facts": {
+    "order": "Ants, bees & wasps",
+    "complete": true
+   },
+   "blurb": "A large rainforest ant with the most painful sting of any insect, said to feel like being shot.",
+   "clues": [
+    "Family: Formicidae.",
+    "Genus: Paraponera.",
+    "The Sateré-Mawé people use it in a coming-of-age ritual.",
+    "The pain from its sting can last a whole day.",
+    "It lives in Central and South American rainforests.",
+    "It goes through a pupa stage as it grows.",
+    "It tops the Schmidt sting pain index.",
+    "Its sting is said to feel like being shot.",
+    "The answer has 2 words (6, 3 letters).",
+    "It starts with the letter B."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/168692301/medium.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Philipp Hoenle",
+      "license": "CC0 1.0",
+      "page": "https://www.inaturalist.org/photos/168692301"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/335602351/medium.jpeg",
+      "w": 500,
+      "h": 333,
+      "credit": "Jonghyun Park",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/335602351"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/166002296/medium.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Philipp Hoenle",
+      "license": "CC0 1.0",
+      "page": "https://www.inaturalist.org/photos/166002296"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "leafcutter-ant",
+   "name": "Leafcutter ant",
+   "sci": "Atta cephalotes",
+   "group": "ant",
+   "facts": {
+    "order": "Ants, bees & wasps",
+    "complete": true
+   },
+   "blurb": "Ants that carry pieces of leaf back to their nest. They do not eat the leaves but use them to farm a fungus.",
+   "clues": [
+    "Family: Formicidae.",
+    "Genus: Atta.",
+    "They grow a fungus garden for food.",
+    "A nest can hold millions of ants.",
+    "They carry loads far heavier than themselves.",
+    "It goes through a pupa stage as it grows.",
+    "Lines of them march through the rainforest.",
+    "They cut pieces out of leaves.",
+    "The answer has 2 words (10, 3 letters).",
+    "It starts with the letter L."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/180119/medium.jpg",
+      "w": 500,
+      "h": 408,
+      "credit": "Biosedbergh",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/180119"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/468166997/medium.jpg",
+      "w": 500,
+      "h": 411,
+      "credit": "avocat",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/468166997"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/431454036/medium.jpeg",
+      "w": 500,
+      "h": 375,
+      "credit": "Scott Allen Davis",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/431454036"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "green-tree-ant",
+   "name": "Green tree ant",
+   "alt": [
+    "weaver ant",
+    "green ant"
+   ],
+   "sci": "Oecophylla smaragdina",
+   "group": "ant",
+   "facts": {
+    "order": "Ants, bees & wasps",
+    "complete": true
+   },
+   "blurb": "A tropical ant that sews leaves together into nests using silk from its larvae. Its green rear end tastes of lime.",
+   "clues": [
+    "Family: Formicidae.",
+    "Genus: Oecophylla.",
+    "Its rear end tastes like lime.",
+    "Workers hold larvae that squeeze out silk.",
+    "They build nests by sewing leaves together.",
+    "It goes through a pupa stage as it grows.",
+    "The answer has 3 words (5, 4, 3 letters).",
+    "It starts with the letter G."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/5598545/medium.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Geoff Shuetrim",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/5598545"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/26882015/medium.jpg",
+      "w": 500,
+      "h": 436,
+      "credit": "portioid",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/26882015"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/77314274/medium.jpg",
+      "w": 500,
+      "h": 313,
+      "credit": "Reynante Martinez",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/77314274"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "red-imported-fire-ant",
+   "name": "Red imported fire ant",
+   "alt": [
+    "fire ant"
+   ],
+   "sci": "Solenopsis invicta",
+   "group": "ant",
+   "facts": {
+    "order": "Ants, bees & wasps",
+    "complete": true
+   },
+   "blurb": "A South American ant with a burning sting. It has invaded the USA, Australia and Asia.",
+   "clues": [
+    "Family: Formicidae.",
+    "Genus: Solenopsis.",
+    "Colonies form floating rafts in floods.",
+    "Its species name means unbeaten.",
+    "It has invaded Brisbane and the southern USA.",
+    "It goes through a pupa stage as it grows.",
+    "Its sting leaves white pimples.",
+    "Its sting burns like a flame.",
+    "The answer has 4 words (3, 8, 4, 3 letters).",
+    "It starts with the letter R."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/105103282/medium.jpg",
+      "w": 350,
+      "h": 500,
+      "credit": "Judy Gallagher",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/105103282"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/60230060/medium.jpg",
+      "w": 500,
+      "h": 336,
+      "credit": "Judy Gallagher",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/60230060"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/111906700/medium.jpeg",
+      "w": 500,
+      "h": 375,
+      "credit": "Sam Kieschnick",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/111906700"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "american-cockroach",
+   "name": "American cockroach",
+   "alt": [
+    "cockroach"
+   ],
+   "sci": "Periplaneta americana",
+   "group": "cockroach",
+   "facts": {
+    "order": "Cockroaches & termites",
+    "complete": false
+   },
+   "blurb": "A big reddish-brown cockroach that lives in drains and buildings around the world. It can run very fast.",
+   "clues": [
+    "Family: Blattidae.",
+    "Genus: Periplaneta.",
+    "It can live for a week without its head.",
+    "It can run about 50 body lengths a second.",
+    "It lives in sewers and warm buildings.",
+    "Its young look like small adults; there is no pupa stage.",
+    "It is a large reddish-brown kitchen pest.",
+    "Despite its name, it probably came from Africa.",
+    "The answer has 2 words (8, 9 letters).",
+    "It starts with the letter A."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/50490584/medium.jpg",
+      "w": 500,
+      "h": 362,
+      "credit": "Len Worthington",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/50490584"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/20941811/medium.jpg",
+      "w": 500,
+      "h": 332,
+      "credit": "dilettantiquity",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/20941811"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/270654692/medium.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Christina S. Baer",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/270654692"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "magnetic-termite",
+   "name": "Magnetic termite",
+   "alt": [
+    "termite"
+   ],
+   "sci": "Amitermes meridionalis",
+   "group": "termite",
+   "facts": {
+    "order": "Cockroaches & termites",
+    "complete": false
+   },
+   "blurb": "A termite of northern Australia that builds tall, flat mounds lined up north to south, which keeps them from overheating.",
+   "clues": [
+    "Genus: Amitermes.",
+    "Its mounds are thin and wedge-shaped.",
+    "You can see its mounds in Litchfield National Park.",
+    "Its mounds line up north to south.",
+    "Its young look like small adults; there is no pupa stage.",
+    "It eats grass.",
+    "Its mounds act like a compass.",
+    "The answer has 2 words (8, 7 letters).",
+    "It starts with the letter M."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/350137311/medium.jpeg",
+      "w": 500,
+      "h": 375,
+      "credit": "Sockrosma",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/350137311"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/569325756/medium.jpg",
+      "w": 500,
+      "h": 500,
+      "credit": "Luke Lythgoe",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/569325756"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/147650166/medium.jpg",
+      "w": 333,
+      "h": 500,
+      "credit": "Andrew Allen",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/147650166"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "housefly",
+   "name": "Housefly",
+   "alt": [
+    "house fly",
+    "fly"
+   ],
+   "sci": "Musca domestica",
+   "group": "fly",
+   "facts": {
+    "order": "Flies",
+    "complete": true
+   },
+   "blurb": "The common fly found in homes all over the world. It tastes with its feet and spits on food before eating it.",
+   "clues": [
+    "Family: Muscidae.",
+    "Genus: Musca.",
+    "It tastes food with its feet.",
+    "It spits on food to soften it.",
+    "Its eyes are made of thousands of lenses.",
+    "It goes through a pupa stage as it grows.",
+    "It buzzes around kitchens.",
+    "The answer is one word of 8 letters.",
+    "It starts with the letter H."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/79611144/medium.jpeg",
+      "w": 500,
+      "h": 334,
+      "credit": "Richard Fuller",
+      "license": "CC0 1.0",
+      "page": "https://www.inaturalist.org/photos/79611144"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/112795205/medium.jpeg",
+      "w": 500,
+      "h": 448,
+      "credit": "Helio Lourencini",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/112795205"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/61848581/medium.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "no rights reserved",
+      "license": "CC0 1.0",
+      "page": "https://www.inaturalist.org/photos/61848581"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "yellow-fever-mosquito",
+   "name": "Yellow fever mosquito",
+   "alt": [
+    "mosquito"
+   ],
+   "sci": "Aedes aegypti",
+   "group": "fly",
+   "facts": {
+    "order": "Flies",
+    "complete": true
+   },
+   "blurb": "A small black-and-white striped mosquito that spreads dengue, Zika and yellow fever. Only females bite.",
+   "clues": [
+    "Family: Culicidae.",
+    "Genus: Aedes.",
+    "It spreads dengue and Zika viruses.",
+    "Its eggs can survive dry for months.",
+    "Only the females drink blood.",
+    "It goes through a pupa stage as it grows.",
+    "Its legs have white bands.",
+    "Its bite leaves an itchy bump.",
+    "The answer has 3 words (6, 5, 8 letters).",
+    "It starts with the letter Y."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/362299804/medium.jpeg",
+      "w": 500,
+      "h": 400,
+      "credit": "Dan Mendelowitz",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/362299804"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/27141865/medium.jpg",
+      "w": 500,
+      "h": 382,
+      "credit": "Jesse Rorabaugh",
+      "license": "CC0 1.0",
+      "page": "https://www.inaturalist.org/photos/27141865"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/27141854/medium.jpg",
+      "w": 500,
+      "h": 431,
+      "credit": "Jesse Rorabaugh",
+      "license": "CC0 1.0",
+      "page": "https://www.inaturalist.org/photos/27141854"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "common-earwig",
+   "name": "Common earwig",
+   "alt": [
+    "earwig"
+   ],
+   "sci": "Forficula auricularia",
+   "group": "earwig",
+   "facts": {
+    "order": "Earwigs",
+    "complete": false
+   },
+   "blurb": "A brown insect with pincers on its tail. Despite the myth, it does not crawl into people's ears.",
+   "clues": [
+    "Family: Forficulidae.",
+    "Genus: Forficula.",
+    "Mothers guard and clean their eggs.",
+    "It can fly but rarely does.",
+    "Males have curved pincers.",
+    "Its young look like small adults; there is no pupa stage.",
+    "An old myth says it crawls into ears.",
+    "It has pincers on its tail end.",
+    "The answer has 2 words (6, 6 letters).",
+    "It starts with the letter C."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/102776701/medium.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Katja Schulz",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/102776701"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/102776704/medium.jpg",
+      "w": 500,
+      "h": 347,
+      "credit": "Judy Gallagher",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/102776704"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/549208953/medium.gif",
+      "w": 500,
+      "h": 500,
+      "credit": "Tynen Benson",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/549208953"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "giant-weta",
+   "name": "Giant wētā",
+   "alt": [
+    "weta",
+    "giant weta"
+   ],
+   "sci": "Deinacrida",
+   "group": "cricket",
+   "facts": {
+    "order": "Grasshoppers & crickets",
+    "complete": false
+   },
+   "blurb": "Huge flightless crickets from New Zealand. Some are among the heaviest insects in the world.",
+   "clues": [
+    "Family: Anostostomatidae.",
+    "One was recorded weighing 71 grams.",
+    "They cannot fly.",
+    "Many survive only on predator-free islands.",
+    "Its young look like small adults; there is no pupa stage.",
+    "They live in New Zealand.",
+    "Their Māori name is four letters long.",
+    "The answer has 2 words (5, 4 letters).",
+    "It starts with the letter G."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/47645/medium.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Sid Mosdell",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/47645"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/71543446/medium.jpg",
+      "w": 354,
+      "h": 500,
+      "credit": "Auckland War Memorial Museum",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/71543446"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/180871061/medium.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "no rights reserved",
+      "license": "CC0 1.0",
+      "page": "https://www.inaturalist.org/photos/180871061"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "common-pond-skater",
+   "name": "Common pond skater",
+   "alt": [
+    "water strider",
+    "pond skater"
+   ],
+   "sci": "Gerris lacustris",
+   "group": "bug",
+   "facts": {
+    "order": "True bugs",
+    "complete": false
+   },
+   "blurb": "A long-legged bug that skates across the surface of ponds without sinking, using surface tension.",
+   "clues": [
+    "Family: Gerridae.",
+    "Genus: Gerris.",
+    "It feels ripples to find insects that fall in.",
+    "It uses surface tension.",
+    "Its young look like small adults; there is no pupa stage.",
+    "It has long thin legs.",
+    "The answer has 3 words (6, 4, 6 letters).",
+    "It starts with the letter C."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/491491197/medium.jpeg",
+      "w": 375,
+      "h": 500,
+      "credit": "tmbtrain",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/491491197"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/642470984/medium.jpg",
+      "w": 435,
+      "h": 452,
+      "credit": "no rights reserved",
+      "license": "CC0 1.0",
+      "page": "https://www.inaturalist.org/photos/642470984"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/488312051/medium.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "no rights reserved",
+      "license": "CC0 1.0",
+      "page": "https://www.inaturalist.org/photos/488312051"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "green-shield-bug",
+   "name": "Green shield bug",
+   "alt": [
+    "stink bug",
+    "shield bug"
+   ],
+   "sci": "Palomena prasina",
+   "group": "bug",
+   "facts": {
+    "order": "True bugs",
+    "complete": false
+   },
+   "blurb": "A bright green bug shaped like a shield. It gives off a bad smell when it is disturbed.",
+   "clues": [
+    "Family: Pentatomidae.",
+    "Genus: Palomena.",
+    "It turns bronze in autumn.",
+    "It sucks juices from plants.",
+    "It gives off a bad smell when scared.",
+    "Its young look like small adults; there is no pupa stage.",
+    "The answer has 3 words (5, 6, 3 letters).",
+    "It starts with the letter G."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/88084247/medium.jpg",
+      "w": 401,
+      "h": 500,
+      "credit": "Darius Baužys",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/88084247"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/8487617/medium.jpg",
+      "w": 500,
+      "h": 436,
+      "credit": "portioid",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/8487617"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/88084249/medium.jpg",
+      "w": 463,
+      "h": 500,
+      "credit": "Lilly M",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/88084249"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "pea-aphid",
+   "name": "Pea aphid",
+   "alt": [
+    "aphid",
+    "greenfly"
+   ],
+   "sci": "Acyrthosiphon pisum",
+   "group": "bug",
+   "facts": {
+    "order": "True bugs",
+    "complete": false
+   },
+   "blurb": "A tiny green bug that sucks sap from plants. Females can give birth without mating.",
+   "clues": [
+    "Genus: Acyrthosiphon.",
+    "Ants \"farm\" it for its sugary honeydew.",
+    "Females can give birth to live young without males.",
+    "Ladybirds eat them by the hundreds.",
+    "Its young look like small adults; there is no pupa stage.",
+    "It sucks sap from plants.",
+    "It is a tiny sap-sucking pest of beans and clover.",
+    "The answer has 2 words (3, 5 letters).",
+    "It starts with the letter P."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/57973254/medium.jpeg",
+      "w": 500,
+      "h": 281,
+      "credit": "Mihajlo Tomić",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/57973254"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/199720952/medium.jpeg",
+      "w": 375,
+      "h": 500,
+      "credit": "Alexis Tinker-Tsavalas",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/199720952"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/156037669/medium.jpeg",
+      "w": 375,
+      "h": 500,
+      "credit": "no rights reserved",
+      "license": "CC0 1.0",
+      "page": "https://www.inaturalist.org/photos/156037669"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "silverfish",
+   "name": "Silverfish",
+   "sci": "Lepisma saccharinum",
+   "group": "silverfish",
+   "facts": {
+    "order": "Silverfish",
+    "complete": false
+   },
+   "blurb": "A wingless, silvery insect that wriggles like a fish. It eats starch in paper, glue and food.",
+   "clues": [
+    "Family: Lepismatidae.",
+    "Genus: Lepisma.",
+    "It can live for years.",
+    "It eats paper, glue and book bindings.",
+    "It has no wings.",
+    "Its young look like small adults; there is no pupa stage.",
+    "It wriggles like a fish when it runs.",
+    "It is covered in shiny grey scales.",
+    "The answer is one word of 10 letters.",
+    "It starts with the letter S."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/961001/medium.jpg",
+      "w": 500,
+      "h": 359,
+      "credit": "Christian Fischer",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/961001"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/961003/medium.jpg",
+      "w": 373,
+      "h": 500,
+      "credit": "anonymous",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/961003"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/97059742/medium.jpeg",
+      "w": 500,
+      "h": 281,
+      "credit": "no rights reserved",
+      "license": "CC0 1.0",
+      "page": "https://www.inaturalist.org/photos/97059742"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "antlion",
+   "name": "Antlion",
+   "sci": "Myrmeleontidae",
+   "group": "lacewing",
+   "facts": {
+    "order": "Lacewings & antlions",
+    "complete": true
+   },
+   "blurb": "Its larva digs a cone-shaped pit in sand and waits at the bottom for ants to fall in. Adults look like damselflies.",
+   "clues": [
+    "Family: Myrmeleontidae.",
+    "Its larva is also called a doodlebug.",
+    "Adults look like damselflies.",
+    "Its larva flicks sand at prey trying to climb out.",
+    "It goes through a pupa stage as it grows.",
+    "Its larva digs a pit trap in sand.",
+    "It is named after an insect and a big cat.",
+    "The answer is one word of 7 letters.",
+    "It starts with the letter A."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/287217788/medium.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Konstantin Grebennikov",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/287217788"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/11079517/medium.jpg",
+      "w": 459,
+      "h": 500,
+      "credit": "Kostas Zontanos",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/11079517"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/158193040/medium.jpeg",
+      "w": 500,
+      "h": 282,
+      "credit": "Julien Tchilinguirian",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/158193040"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "green-lacewing",
+   "name": "Green lacewing",
+   "alt": [
+    "lacewing"
+   ],
+   "sci": "Chrysoperla carnea",
+   "group": "lacewing",
+   "facts": {
+    "order": "Lacewings & antlions",
+    "complete": true
+   },
+   "blurb": "A delicate green insect with see-through, net-veined wings. Its larvae eat lots of aphids.",
+   "clues": [
+    "Family: Chrysopidae.",
+    "Genus: Chrysoperla.",
+    "It lays each egg on top of a thin stalk.",
+    "Its larvae are called aphid lions.",
+    "It has golden eyes.",
+    "It goes through a pupa stage as it grows.",
+    "Its wings are clear with a net of veins.",
+    "The answer has 2 words (5, 8 letters).",
+    "It starts with the letter G."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/26616087/medium.jpg",
+      "w": 500,
+      "h": 323,
+      "credit": "AJC1",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/26616087"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/102153565/medium.jpg",
+      "w": 375,
+      "h": 500,
+      "credit": "Doruk Ege Aksu",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/102153565"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/79560054/medium.jpg",
+      "w": 500,
+      "h": 347,
+      "credit": "no rights reserved",
+      "license": "CC0 1.0",
+      "page": "https://www.inaturalist.org/photos/79560054"
+     }
+    ]
+   },
+   "difficulty": 2
+  }
+ ],
+ "questions": [
+  {
+   "id": "q1",
+   "kind": "number",
+   "prompt": "How many legs does an insect have?",
+   "answer": 6,
+   "unit": "legs",
+   "tolerance": 0,
+   "explain": "All adult insects have six legs.",
+   "difficulty": 1
+  },
+  {
+   "id": "q2",
+   "kind": "number",
+   "prompt": "How many main body parts does an insect have?",
+   "answer": 3,
+   "unit": "parts",
+   "tolerance": 0,
+   "explain": "Head, thorax and abdomen.",
+   "difficulty": 2
+  },
+  {
+   "id": "q3",
+   "kind": "mc",
+   "prompt": "What does a caterpillar turn into?",
+   "answer": "A butterfly or moth",
+   "wrong": [
+    "A beetle",
+    "A spider",
+    "A dragonfly"
+   ],
+   "explain": "Caterpillars are the larvae of butterflies and moths.",
+   "difficulty": 1
+  },
+  {
+   "id": "q4",
+   "kind": "order",
+   "prompt": "Put a butterfly's life cycle in order.",
+   "answer": [
+    "Egg",
+    "Caterpillar",
+    "Chrysalis",
+    "Butterfly"
+   ],
+   "orderLabel": "First to last",
+   "explain": "The chrysalis is the pupa stage.",
+   "difficulty": 1
+  },
+  {
+   "id": "q5",
+   "kind": "tf",
+   "prompt": "A spider is an insect.",
+   "answer": false,
+   "explain": "Spiders have eight legs and are arachnids.",
+   "difficulty": 1
+  },
+  {
+   "id": "q6",
+   "kind": "mc",
+   "prompt": "Which of these is NOT an insect?",
+   "answer": "Spider",
+   "wrong": [
+    "Ant",
+    "Beetle",
+    "Butterfly"
+   ],
+   "explain": "Spiders are arachnids with eight legs.",
+   "difficulty": 1
+  },
+  {
+   "id": "q7",
+   "kind": "mc",
+   "prompt": "What do fireflies use their glowing lights for?",
+   "answer": "Signalling to find a mate",
+   "wrong": [
+    "Keeping warm",
+    "Seeing in the dark",
+    "Scaring bats"
+   ],
+   "explain": "Each species has its own flash pattern.",
+   "difficulty": 2
+  },
+  {
+   "id": "q8",
+   "kind": "tf",
+   "prompt": "A firefly is a kind of fly.",
+   "answer": false,
+   "explain": "Fireflies are beetles.",
+   "difficulty": 2
+  },
+  {
+   "id": "q9",
+   "kind": "tf",
+   "prompt": "A ladybird is a kind of beetle.",
+   "answer": true,
+   "explain": "Ladybirds belong to the beetle family Coccinellidae.",
+   "difficulty": 1
+  },
+  {
+   "id": "q10",
+   "kind": "mc",
+   "prompt": "Which insect group has the most known species?",
+   "answer": "Beetles",
+   "wrong": [
+    "Butterflies and moths",
+    "Flies",
+    "Ants, bees and wasps"
+   ],
+   "explain": "About 400,000 beetle species have been described.",
+   "difficulty": 2
+  },
+  {
+   "id": "q11",
+   "kind": "mc",
+   "prompt": "Which insect has the most painful sting, according to the Schmidt pain index?",
+   "answer": "Bullet ant",
+   "wrong": [
+    "Honey bee",
+    "Fire ant",
+    "Common wasp"
+   ],
+   "explain": "Its sting is said to feel like being shot.",
+   "difficulty": 2
+  },
+  {
+   "id": "q12",
+   "kind": "mc",
+   "prompt": "What do leafcutter ants do with the leaves they collect?",
+   "answer": "Grow fungus on them for food",
+   "wrong": [
+    "Eat them straight away",
+    "Build roofs with them",
+    "Feed them to aphids"
+   ],
+   "explain": "The ants eat the fungus, not the leaves.",
+   "difficulty": 2
+  },
+  {
+   "id": "q13",
+   "kind": "mc",
+   "prompt": "Which butterfly migrates from Canada and the USA to Mexico each winter?",
+   "answer": "Monarch butterfly",
+   "wrong": [
+    "Blue morpho",
+    "Small white",
+    "Peacock butterfly"
+   ],
+   "explain": "Millions gather in fir forests in central Mexico.",
+   "difficulty": 2
+  },
+  {
+   "id": "q14",
+   "kind": "mc",
+   "prompt": "Where are a cricket's ears?",
+   "answer": "On its front legs",
+   "wrong": [
+    "On its head",
+    "On its wings",
+    "It has no ears"
+   ],
+   "explain": "Crickets hear through eardrums just below the knees of their front legs.",
+   "difficulty": 3
+  },
+  {
+   "id": "q15",
+   "kind": "mc",
+   "prompt": "Only which mosquitoes bite to drink blood?",
+   "answer": "Females",
+   "wrong": [
+    "Males",
+    "Babies",
+    "Both males and females equally"
+   ],
+   "explain": "Females need the protein in blood to make eggs.",
+   "difficulty": 2
+  },
+  {
+   "id": "q16",
+   "kind": "mc",
+   "prompt": "What is a dragonfly's young called?",
+   "answer": "A nymph",
+   "wrong": [
+    "A caterpillar",
+    "A tadpole",
+    "A grub"
+   ],
+   "explain": "Dragonfly nymphs live underwater and hunt other small animals.",
+   "difficulty": 3
+  },
+  {
+   "id": "q17",
+   "kind": "tf",
+   "prompt": "Insects have their skeleton on the outside of their bodies.",
+   "answer": true,
+   "explain": "It is called an exoskeleton.",
+   "difficulty": 2
+  },
+  {
+   "id": "q18",
+   "kind": "mc",
+   "prompt": "How long do periodical cicadas of the eastern USA live underground, at most?",
+   "answer": "17 years",
+   "wrong": [
+    "1 year",
+    "5 years",
+    "50 years"
+   ],
+   "explain": "Some broods emerge every 13 years, others every 17.",
+   "difficulty": 3
+  }
+ ],
+ "fakes": [
+  "Crimson glass beetle",
+  "Northern thunder moth",
+  "Silver-winged stick mantis",
+  "Golden ribbon dragonfly beetle",
+  "Velvet comb cricket",
+  "Spotted lantern weevil-fly"
+ ],
+ "sources": [
+  {
+   "name": "iNaturalist",
+   "url": "https://www.inaturalist.org"
+  },
+  {
+   "name": "Wikidata",
+   "url": "https://www.wikidata.org"
+  }
+ ]
+}

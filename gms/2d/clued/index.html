@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content">
+<meta name="theme-color" content="#fff6e6">
+<title>Clued — trivia for curious minds</title>
+<meta name="description" content="Clued: a bright trivia and learning game. Pictures, maps, music, pub quizzes, party play and a daily challenge.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Ccircle cx='27' cy='27' r='20' fill='%23ffc23c' stroke='%231f1a4d' stroke-width='6'/%3E%3Cpath d='M41 41l14 14' stroke='%231f1a4d' stroke-width='9' stroke-linecap='round'/%3E%3Ctext x='27' y='36' font-size='26' text-anchor='middle' font-family='Arial' font-weight='900' fill='%231f1a4d'%3E%3F%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lilita+One&family=Nunito:wght@600;700;800;900&display=swap">
+<link rel="stylesheet" href="css/base.css?v=1">
+<link rel="stylesheet" href="css/screens.css?v=1">
+<link rel="stylesheet" href="css/play.css?v=1">
+<style>
+  #boot { position: fixed; inset: 0; z-index: 200; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 18px; background: #fff6e6; font-family: 'Nunito', system-ui, sans-serif; color: #1f1a4d; transition: opacity .3s; padding: 24px; text-align: center; }
+  #boot.gone { opacity: 0; pointer-events: none; }
+  #boot .b-logo { font: 400 52px 'Lilita One', 'Arial Rounded MT Bold', system-ui, sans-serif; letter-spacing: 1px; }
+  #boot .b-logo span { color: #ff5d5d; }
+  #boot .b-bar { width: 220px; height: 16px; border: 3px solid #1f1a4d; border-radius: 99px; overflow: hidden; background: #fff; }
+  #boot .b-bar i { display: block; height: 100%; width: 30%; background: #22c3a0; border-radius: 99px; animation: bslide 1.1s ease-in-out infinite alternate; }
+  @keyframes bslide { to { transform: translateX(240%); } }
+  #boot .b-err { display: none; max-width: 420px; background: #ffe8e8; border: 3px solid #1f1a4d; border-radius: 16px; padding: 14px; font-weight: 700; font-size: 14px; text-align: left; word-break: break-word; }
+  #boot.err .b-err { display: block; }
+  #boot.err .b-bar { display: none; }
+  #boot .b-err button { margin-top: 10px; min-height: 44px; padding: 8px 18px; border: 3px solid #1f1a4d; border-radius: 99px; background: #ff5d5d; color: #fff; font: 900 16px 'Nunito', system-ui, sans-serif; cursor: pointer; }
+  #boot .b-err pre { white-space: pre-wrap; font-size: 12px; margin: 8px 0 0; max-height: 160px; overflow: auto; }
+</style>
+<script>
+  // Inline boot guard: any error before the game reports ready shows here with a cache-busting reload.
+  (function () {
+    var shown = false, errs = [];
+    function box() { return document.getElementById('boot'); }
+    function show(msg) {
+      errs.push(String(msg));
+      var b = box();
+      if (!b || window.__cluedReady) return;
+      b.classList.add('err');
+      var pre = b.querySelector('pre');
+      if (pre) pre.textContent = errs.slice(-5).join('\n');
+      shown = true;
+    }
+    window.__cluedBootError = show;
+    window.__cluedReload = function () { location.replace(location.pathname + '?v=' + Date.now() + location.hash); };
+    window.addEventListener('error', function (e) {
+      var t = e.target;
+      if (t && t !== window && t.tagName && /IMG|AUDIO|VIDEO|SOURCE/.test(t.tagName)) return;
+      show((e.message || 'Error') + (e.filename ? ' @ ' + e.filename.split('/').slice(-2).join('/') + ':' + e.lineno : '') || 'A file failed to load');
+    }, true);
+    window.addEventListener('unhandledrejection', function (e) {
+      var r = e.reason; show('Promise: ' + (r && (r.stack || r.message) || r));
+    });
+    setTimeout(function () { if (!window.__cluedReady) show('Clued is taking too long to start. A stale cached file is the usual cause.'); }, 12000);
+  })();
+</script>
+</head>
+<body>
+<div id="boot" role="status">
+  <div class="b-logo">Clu<span>ed</span></div>
+  <div class="b-bar"><i></i></div>
+  <div class="b-err">Clued couldn't start.
+    <pre></pre>
+    <button type="button" onclick="window.__cluedReload()">Reload</button>
+  </div>
+</div>
+<main id="app"></main>
+<div id="popups"></div>
+<script type="module" src="js/main.js?v=1"></script>
+</body>
+</html>

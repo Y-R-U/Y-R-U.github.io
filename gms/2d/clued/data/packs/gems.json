@@ -1,0 +1,1604 @@
+{
+ "id": "gems",
+ "title": "Gemstones & minerals",
+ "theme": "nature",
+ "icon": "💎",
+ "kids": true,
+ "version": 1,
+ "leakExempt": [
+  "stone",
+  "gem",
+  "gemstone"
+ ],
+ "factsMeta": {
+  "kind": {
+   "type": "cat",
+   "label": "Kind",
+   "values": [
+    "Gemstone",
+    "Mineral",
+    "Organic",
+    "Rock",
+    "Metal"
+   ]
+  },
+  "colour": {
+   "type": "cat",
+   "label": "Best-known colour"
+  },
+  "mohs": {
+   "type": "num",
+   "label": "Mohs hardness",
+   "unit": "",
+   "higherLabel": "Harder"
+  },
+  "birthstone": {
+   "type": "cat",
+   "label": "Birthstone for",
+   "values": [
+    "January",
+    "February",
+    "March",
+    "April",
+    "May",
+    "June",
+    "July",
+    "August",
+    "September",
+    "October",
+    "November",
+    "December"
+   ]
+  }
+ },
+ "items": [
+  {
+   "id": "diamond",
+   "name": "Diamond",
+   "facts": {
+    "kind": "Gemstone",
+    "colour": "Colourless",
+    "mohs": 10,
+    "birthstone": "April"
+   },
+   "lookalikes": [
+    "quartz"
+   ],
+   "blurb": "The hardest natural material. It is pure carbon, squeezed deep underground over billions of years.",
+   "clues": [
+    "Its Mohs hardness is the top of the scale.",
+    "The Cullinan, found in 1905, is the largest gem-quality one ever found.",
+    "It is made of pure carbon, like pencil lead.",
+    "It is best known in colourless.",
+    "Its Mohs hardness is about 10.",
+    "It is a birthstone for April.",
+    "It is the hardest natural material.",
+    "It is the stone in most engagement rings.",
+    "The answer is one word of 7 letters.",
+    "It starts with the letter D."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/b/b7/Rough_Diamond.jpg/500px-Rough_Diamond.jpg",
+      "w": 500,
+      "h": 464,
+      "credit": "DGPC/ADF Luísa Oliveira",
+      "license": "CC0 1.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Rough_Diamond.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/3/39/Diamond_%28side_view%29.png/500px-Diamond_%28side_view%29.png",
+      "w": 500,
+      "h": 375,
+      "credit": "Pavel.Somov",
+      "license": "CC BY 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Diamond_(side_view).png"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "ruby",
+   "name": "Ruby",
+   "facts": {
+    "kind": "Gemstone",
+    "colour": "Red",
+    "mohs": 9,
+    "birthstone": "July"
+   },
+   "lookalikes": [
+    "garnet",
+    "sapphire"
+   ],
+   "blurb": "A red gemstone made of the mineral corundum. Its red colour comes from a trace of chromium.",
+   "clues": [
+    "It is the same mineral as sapphire.",
+    "Its colour comes from chromium.",
+    "The first laser in 1960 used a crystal of it.",
+    "It is best known in red.",
+    "Its Mohs hardness is about 9.",
+    "It is a birthstone for July.",
+    "Dorothy's slippers in the \"Wizard of Oz\" film are named after it.",
+    "It is a red gemstone.",
+    "The answer is one word of 4 letters.",
+    "It starts with the letter R."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/8/80/Ruby_-_Winza%2C_Tanzania.jpg/330px-Ruby_-_Winza%2C_Tanzania.jpg",
+      "w": 330,
+      "h": 440,
+      "credit": "StrangerThanKindness",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Ruby_-_Winza,_Tanzania.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/17/Corundum-215330.jpg/500px-Corundum-215330.jpg",
+      "w": 500,
+      "h": 470,
+      "credit": "Robert M. Lavinsky",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Corundum-215330.jpg"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "sapphire",
+   "name": "Sapphire",
+   "facts": {
+    "kind": "Gemstone",
+    "colour": "Blue",
+    "mohs": 9,
+    "birthstone": "September"
+   },
+   "lookalikes": [
+    "ruby",
+    "tanzanite"
+   ],
+   "blurb": "A gemstone made of corundum. It is most famous in blue, but it comes in almost every colour except red.",
+   "clues": [
+    "Red forms of the same mineral are called something else.",
+    "Princess Diana's engagement ring has a big one.",
+    "It is used in tough watch glass.",
+    "It is best known in blue.",
+    "Its Mohs hardness is about 9.",
+    "It is a birthstone for September.",
+    "Queensland and Sri Lanka are famous sources.",
+    "It is a famous blue gemstone.",
+    "The answer is one word of 8 letters.",
+    "It starts with the letter S."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/f/fc/Sapphire01.jpg/500px-Sapphire01.jpg",
+      "w": 500,
+      "h": 403,
+      "credit": "Azuncha",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Sapphire01.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/8/87/Logan_Sapphire_10956420_cropped.png/330px-Logan_Sapphire_10956420_cropped.png",
+      "w": 330,
+      "h": 446,
+      "credit": "Chip Clark, Smithsonian staff",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Logan_Sapphire_10956420_cropped.png"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "emerald",
+   "name": "Emerald",
+   "facts": {
+    "kind": "Gemstone",
+    "colour": "Green",
+    "mohs": 8,
+    "birthstone": "May"
+   },
+   "lookalikes": [
+    "peridot",
+    "jade"
+   ],
+   "blurb": "A deep green gemstone, a kind of the mineral beryl. Colombia produces the finest.",
+   "clues": [
+    "It is a kind of beryl.",
+    "Most have tiny flaws called \"jardin\", meaning garden.",
+    "Colombia is famous for the best ones.",
+    "It is best known in green.",
+    "Its Mohs hardness is about 8.",
+    "It is a birthstone for May.",
+    "Cleopatra loved it.",
+    "It is a deep green gemstone.",
+    "The answer is one word of 7 letters.",
+    "It starts with the letter E."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/a/a6/Emerald_cut.png/500px-Emerald_cut.png",
+      "w": 500,
+      "h": 369,
+      "credit": "Jan Arkesteijn",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Emerald_cut.png"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/d/df/B%C3%A9ryl_var._%C3%A9meraude_sur_gangue_%28Muzo_Mine_Boyaca_-_Colombie%29_2.jpg/500px-B%C3%A9ryl_var._%C3%A9meraude_sur_gangue_%28Muzo_Mine_Boyaca_-_Colombie%29_2.jpg",
+      "w": 500,
+      "h": 414,
+      "credit": "Géry PARENT",
+      "license": "CC0 1.0",
+      "page": "https://commons.wikimedia.org/wiki/File:B%C3%A9ryl_var._%C3%A9meraude_sur_gangue_(Muzo_Mine_Boyaca_-_Colombie)_2.jpg"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "amethyst",
+   "name": "Amethyst",
+   "facts": {
+    "kind": "Gemstone",
+    "colour": "Purple",
+    "mohs": 7,
+    "birthstone": "February"
+   },
+   "lookalikes": [
+    "quartz",
+    "tanzanite"
+   ],
+   "blurb": "A purple kind of quartz. The ancient Greeks believed it stopped you getting drunk.",
+   "clues": [
+    "Its name means \"not drunk\" in ancient Greek.",
+    "Heating it can turn it yellow.",
+    "Big geodes lined with it come from Brazil and Uruguay.",
+    "It is best known in purple.",
+    "Its Mohs hardness is about 7.",
+    "It is a birthstone for February.",
+    "It is a kind of quartz.",
+    "It is a purple gemstone.",
+    "The answer is one word of 8 letters.",
+    "It starts with the letter A."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/e/e2/Amethyst._Magaliesburg%2C_South_Africa.jpg/500px-Amethyst._Magaliesburg%2C_South_Africa.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "JJ Harrison (https://jjharrison.com.au/)",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Amethyst._Magaliesburg,_South_Africa.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/b/b5/Amatista_Laye_2.jpg/500px-Amatista_Laye_2.jpg",
+      "w": 500,
+      "h": 468,
+      "credit": "Gonzalo Devia",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Amatista_Laye_2.jpg"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "topaz",
+   "name": "Topaz",
+   "facts": {
+    "kind": "Gemstone",
+    "colour": "Blue",
+    "mohs": 8,
+    "birthstone": "November"
+   },
+   "blurb": "A hard gemstone that comes in many colours. Most blue topaz has been treated to make it blue.",
+   "clues": [
+    "It is used as the number 8 on the Mohs scale.",
+    "Most blue ones are treated with heat and radiation.",
+    "Imperial ones are golden-orange.",
+    "It is best known in blue.",
+    "Its Mohs hardness is about 8.",
+    "It is a birthstone for November.",
+    "Its name has five letters and starts with T.",
+    "The answer is one word of 5 letters.",
+    "It starts with the letter T."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/4/4b/Topaze_Br%C3%A9sil.jpg/500px-Topaze_Br%C3%A9sil.jpg",
+      "w": 500,
+      "h": 443,
+      "credit": "Didier Descouens",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Topaze_Br%C3%A9sil.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/2/24/Topaze%2C_quartz_fum%C3%A9_1.jpg/500px-Topaze%2C_quartz_fum%C3%A9_1.jpg",
+      "w": 500,
+      "h": 332,
+      "credit": "Parent Géry",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Topaze,_quartz_fum%C3%A9_1.jpg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "opal",
+   "name": "Opal",
+   "facts": {
+    "kind": "Gemstone",
+    "colour": "Multicoloured",
+    "mohs": 6,
+    "birthstone": "October"
+   },
+   "blurb": "A gemstone that flashes rainbow colours. Australia produces almost all the world's precious opal.",
+   "clues": [
+    "It contains water.",
+    "Coober Pedy residents live underground to mine it.",
+    "Its flashes of colour are called \"play of colour\".",
+    "It is best known in multicoloured.",
+    "Its Mohs hardness is about 6.",
+    "It is a birthstone for October.",
+    "Australia mines almost all of the world's supply.",
+    "It flashes all the colours of the rainbow.",
+    "The answer is one word of 4 letters.",
+    "It starts with the letter O."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/3/30/Opal_banded.jpg/500px-Opal_banded.jpg",
+      "w": 500,
+      "h": 316,
+      "credit": "Wikimedia Commons",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Opal_banded.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/f/fa/Opal-53714.jpg/500px-Opal-53714.jpg",
+      "w": 500,
+      "h": 327,
+      "credit": "Robert M. Lavinsky",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Opal-53714.jpg"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "pearl",
+   "name": "Pearl",
+   "facts": {
+    "kind": "Organic",
+    "colour": "White",
+    "mohs": 3,
+    "birthstone": "June"
+   },
+   "blurb": "A shiny gem made inside the shell of an oyster or mussel. It is the only gem made by a living animal.",
+   "clues": [
+    "Most sold today are farmed.",
+    "It dissolves in vinegar.",
+    "Layers of nacre build it up.",
+    "It is best known in white.",
+    "Its Mohs hardness is about 3.",
+    "It is a birthstone for June.",
+    "It forms inside an oyster.",
+    "It is a shiny white gem from the sea.",
+    "The answer is one word of 5 letters.",
+    "It starts with the letter P."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/5/5e/Various_pearls.jpg/500px-Various_pearls.jpg",
+      "w": 500,
+      "h": 500,
+      "credit": "MASAYUKI KATO",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Various_pearls.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/0/0f/1665_Girl_with_a_Pearl_Earring.jpg/500px-1665_Girl_with_a_Pearl_Earring.jpg",
+      "w": 500,
+      "h": 592,
+      "credit": "Johannes Vermeer",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:1665_Girl_with_a_Pearl_Earring.jpg"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "jade",
+   "name": "Jade",
+   "alt": [
+    "jadeite",
+    "nephrite"
+   ],
+   "facts": {
+    "kind": "Gemstone",
+    "colour": "Green",
+    "mohs": 6.5
+   },
+   "lookalikes": [
+    "emerald",
+    "malachite"
+   ],
+   "blurb": "A tough green stone treasured in China for thousands of years. The name covers two different minerals.",
+   "clues": [
+    "Its name covers two different minerals.",
+    "It is extremely tough and hard to break.",
+    "Ancient Chinese emperors were buried in suits of it.",
+    "It is best known in green.",
+    "Its Mohs hardness is about 6.5.",
+    "Māori carve it into pendants called pounamu.",
+    "It is a green stone prized in China.",
+    "The answer is one word of 4 letters.",
+    "It starts with the letter J."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/9/94/JadeColours.jpg/500px-JadeColours.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Simon",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:JadeColours.jpg"
+     },
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/0/00/Jadestein.jpg",
+      "w": 500,
+      "h": 612,
+      "credit": "Wikimedia Commons",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Jadestein.jpg"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "turquoise",
+   "name": "Turquoise",
+   "facts": {
+    "kind": "Gemstone",
+    "colour": "Blue",
+    "mohs": 5.5,
+    "birthstone": "December"
+   },
+   "lookalikes": [
+    "lapis-lazuli"
+   ],
+   "blurb": "A sky-blue to green stone prized for thousands of years in Persia, Egypt and the American Southwest.",
+   "clues": [
+    "Tutankhamun's mask is inlaid with it.",
+    "It contains copper.",
+    "It is prized in Native American jewellery.",
+    "It is best known in blue.",
+    "Its Mohs hardness is about 5.5.",
+    "It is a birthstone for December.",
+    "A colour is named after it.",
+    "It is a sky-blue stone.",
+    "The answer is one word of 9 letters.",
+    "It starts with the letter T."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/d/d9/Turquoise_with_quartz.jpg/500px-Turquoise_with_quartz.jpg",
+      "w": 500,
+      "h": 302,
+      "credit": "Wikimedia Commons",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Turquoise_with_quartz.jpg"
+     },
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/7/7d/Turquoise-40031.jpg",
+      "w": 500,
+      "h": 598,
+      "credit": "Robert M. Lavinsky",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Turquoise-40031.jpg"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "garnet",
+   "name": "Garnet",
+   "facts": {
+    "kind": "Gemstone",
+    "colour": "Red",
+    "mohs": 7,
+    "birthstone": "January"
+   },
+   "lookalikes": [
+    "ruby"
+   ],
+   "blurb": "A deep red gemstone. Its crystals often grow as twelve-sided balls.",
+   "clues": [
+    "Its crystals are often twelve-sided.",
+    "It is used to make sandpaper.",
+    "Its name comes from the Latin for pomegranate.",
+    "It is best known in red.",
+    "Its Mohs hardness is about 7.",
+    "It is a birthstone for January.",
+    "It is a deep red gemstone.",
+    "The answer is one word of 6 letters.",
+    "It starts with the letter G."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/5/53/GarnetCrystalUSGOV.jpg/500px-GarnetCrystalUSGOV.jpg",
+      "w": 500,
+      "h": 500,
+      "credit": "Unknown authorUnknown author",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:GarnetCrystalUSGOV.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/5/5e/Garnet_Andradite20.jpg/500px-Garnet_Andradite20.jpg",
+      "w": 500,
+      "h": 395,
+      "credit": "Moha112100",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Garnet_Andradite20.jpg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "aquamarine",
+   "name": "Aquamarine",
+   "facts": {
+    "kind": "Gemstone",
+    "colour": "Blue",
+    "mohs": 7.5,
+    "birthstone": "March"
+   },
+   "lookalikes": [
+    "topaz",
+    "sapphire"
+   ],
+   "blurb": "A pale sea-blue kind of beryl, the same mineral as emerald.",
+   "clues": [
+    "It is the same mineral as emerald.",
+    "Sailors carried it for luck at sea.",
+    "Its crystals can be huge.",
+    "It is best known in blue.",
+    "Its Mohs hardness is about 7.5.",
+    "It is a birthstone for March.",
+    "Its name means \"sea water\".",
+    "The answer is one word of 10 letters.",
+    "It starts with the letter A."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/8/81/%D0%A2%D0%B5%D0%BF%D0%BB%D0%BE%D1%85%D0%BE%D0%B4_%D0%90%D0%BA%D0%B2%D0%B0%D0%BC%D0%B0%D1%80%D0%B8%D0%BD.png/500px-%D0%A2%D0%B5%D0%BF%D0%BB%D0%BE%D1%85%D0%BE%D0%B4_%D0%90%D0%BA%D0%B2%D0%B0%D0%BC%D0%B0%D1%80%D0%B8%D0%BD.png",
+      "w": 500,
+      "h": 333,
+      "credit": "Никита Державин",
+      "license": "CC0 1.0",
+      "page": "https://commons.wikimedia.org/wiki/File:%D0%A2%D0%B5%D0%BF%D0%BB%D0%BE%D1%85%D0%BE%D0%B4_%D0%90%D0%BA%D0%B2%D0%B0%D0%BC%D0%B0%D1%80%D0%B8%D0%BD.png"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "peridot",
+   "name": "Peridot",
+   "facts": {
+    "kind": "Gemstone",
+    "colour": "Green",
+    "mohs": 6.5,
+    "birthstone": "August"
+   },
+   "lookalikes": [
+    "emerald"
+   ],
+   "blurb": "A lime-green gem of the mineral olivine. Some has been found in meteorites.",
+   "clues": [
+    "It has been found in meteorites.",
+    "It forms deep in the Earth's mantle.",
+    "Hawaii has green beaches made of it.",
+    "It is best known in green.",
+    "Its Mohs hardness is about 6.5.",
+    "It is a birthstone for August.",
+    "It is a kind of olivine.",
+    "It is lime green.",
+    "The answer is one word of 7 letters.",
+    "It starts with the letter P."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/2/2c/Gemperidot.JPG/500px-Gemperidot.JPG",
+      "w": 500,
+      "h": 412,
+      "credit": "Michelle Jo",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Gemperidot.JPG"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/a/ad/Forsterite-Olivine-tmu14a.jpg/330px-Forsterite-Olivine-tmu14a.jpg",
+      "w": 330,
+      "h": 455,
+      "credit": "Robert M. Lavinsky",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Forsterite-Olivine-tmu14a.jpg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "citrine",
+   "name": "Citrine",
+   "facts": {
+    "kind": "Gemstone",
+    "colour": "Yellow",
+    "mohs": 7,
+    "birthstone": "November"
+   },
+   "lookalikes": [
+    "topaz",
+    "amethyst"
+   ],
+   "blurb": "A yellow kind of quartz. Much of it is really amethyst that has been heated.",
+   "clues": [
+    "Much of it is heated amethyst.",
+    "It is a kind of quartz.",
+    "It is a birthstone for November.",
+    "It is best known in yellow.",
+    "Its Mohs hardness is about 7.",
+    "It is yellow to orange.",
+    "The answer is one word of 7 letters.",
+    "It starts with the letter C."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/3/32/Citrin_cut.jpg/500px-Citrin_cut.jpg",
+      "w": 500,
+      "h": 428,
+      "credit": "Wikimedia Commons",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Citrin_cut.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/d/d0/Citrine_taillee.jpg/500px-Citrine_taillee.jpg",
+      "w": 500,
+      "h": 396,
+      "credit": "Didier Descouens",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Citrine_taillee.jpg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "lapis-lazuli",
+   "name": "Lapis lazuli",
+   "alt": [
+    "lapis"
+   ],
+   "facts": {
+    "kind": "Rock",
+    "colour": "Blue",
+    "mohs": 5.5
+   },
+   "lookalikes": [
+    "turquoise"
+   ],
+   "blurb": "A deep blue rock with golden flecks of pyrite. It was ground up to make the paint ultramarine.",
+   "clues": [
+    "It was ground to make ultramarine paint.",
+    "It has golden flecks of pyrite.",
+    "It was mined in Afghanistan for 6,000 years.",
+    "It is best known in blue.",
+    "Its Mohs hardness is about 5.5.",
+    "Tutankhamun's mask contains it.",
+    "It is a deep blue rock.",
+    "The answer has 2 words (5, 6 letters).",
+    "It starts with the letter L."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/14/2_lapis_lazuli.jpg/500px-2_lapis_lazuli.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Adam Ognisty",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:2_lapis_lazuli.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/d/df/1Lapis_lazuli.jpeg/500px-1Lapis_lazuli.jpeg",
+      "w": 500,
+      "h": 375,
+      "credit": "No machine-readable author provided. Adam Ognisty assumed (based on copyright claims).",
+      "license": "CC BY 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:1Lapis_lazuli.jpeg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "moonstone",
+   "name": "Moonstone",
+   "facts": {
+    "kind": "Gemstone",
+    "colour": "White",
+    "mohs": 6,
+    "birthstone": "June"
+   },
+   "blurb": "A milky gemstone with a soft blue glow that seems to float inside it.",
+   "clues": [
+    "It is a kind of feldspar.",
+    "Its glow is called adularescence.",
+    "It is a birthstone for June.",
+    "It is best known in white.",
+    "Its Mohs hardness is about 6.",
+    "It has a soft, floating blue glow.",
+    "It is named after something in the night sky.",
+    "The answer is one word of 9 letters.",
+    "It starts with the letter M."
+   ],
+   "difficulty": 2
+  },
+  {
+   "id": "tanzanite",
+   "name": "Tanzanite",
+   "facts": {
+    "kind": "Gemstone",
+    "colour": "Violet-blue",
+    "mohs": 6.5,
+    "birthstone": "December"
+   },
+   "lookalikes": [
+    "sapphire",
+    "amethyst"
+   ],
+   "blurb": "A violet-blue gem found in only one place on Earth, near Mount Kilimanjaro in Tanzania.",
+   "clues": [
+    "It was discovered in 1967.",
+    "Tiffany & Co. named it.",
+    "It looks different colours from different angles.",
+    "It is best known in violet-blue.",
+    "Its Mohs hardness is about 6.5.",
+    "It is a birthstone for December.",
+    "It is found only near Mount Kilimanjaro.",
+    "It is named after an African country.",
+    "The answer is one word of 9 letters.",
+    "It starts with the letter T."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/4/49/Zo%C3%AFsite_%28Tanzanite%29.jpg/500px-Zo%C3%AFsite_%28Tanzanite%29.jpg",
+      "w": 500,
+      "h": 350,
+      "credit": "Didier Descouens",
+      "license": "CC BY 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Zo%C3%AFsite_(Tanzanite).jpg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "tigers-eye",
+   "name": "Tiger's eye",
+   "facts": {
+    "kind": "Gemstone",
+    "colour": "Golden brown",
+    "mohs": 7
+   },
+   "blurb": "A golden-brown stone with silky bands that seem to shift and shine as it moves.",
+   "clues": [
+    "Its shine is called chatoyancy.",
+    "It is a kind of quartz.",
+    "Much of it comes from South Africa.",
+    "It is best known in golden brown.",
+    "Its Mohs hardness is about 7.",
+    "Its bands shine as it moves.",
+    "The answer has 2 words (6, 3 letters).",
+    "It starts with the letter T."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/4/4a/Tigers-Eye.jpg",
+      "w": 500,
+      "h": 500,
+      "credit": "Mitchell Gore (Lestatdelc at en.wikipedia)",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Tigers-Eye.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/b/be/Tiger%27s_eye.jpg/500px-Tiger%27s_eye.jpg",
+      "w": 500,
+      "h": 398,
+      "credit": "Marek Novotnak",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Tiger%27s_eye.jpg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "malachite",
+   "name": "Malachite",
+   "facts": {
+    "kind": "Mineral",
+    "colour": "Green",
+    "mohs": 3.75
+   },
+   "lookalikes": [
+    "jade",
+    "turquoise"
+   ],
+   "blurb": "A green copper mineral with swirling bands. It was once ground to make green paint.",
+   "clues": [
+    "It was ground into green paint and eye make-up.",
+    "It is a copper mineral.",
+    "A room in the Winter Palace is covered in it.",
+    "It is best known in green.",
+    "Its Mohs hardness is about 3.75.",
+    "It has swirling light and dark bands.",
+    "It is bright green.",
+    "The answer is one word of 9 letters.",
+    "It starts with the letter M."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/7/7d/Malachit%2C_Kupferspat.jpg/500px-Malachit%2C_Kupferspat.jpg",
+      "w": 500,
+      "h": 350,
+      "credit": "Burkhard Mücke",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Malachit,_Kupferspat.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/5/55/Malachite%2C_Zaire.jpg/500px-Malachite%2C_Zaire.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "JJ Harrison (https://www.jjharrison.com.au/)",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Malachite,_Zaire.jpg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "obsidian",
+   "name": "Obsidian",
+   "facts": {
+    "kind": "Rock",
+    "colour": "Black",
+    "mohs": 5.5
+   },
+   "blurb": "A shiny black volcanic glass formed when lava cools very fast. Its edges can be sharper than steel.",
+   "clues": [
+    "Its edges can be sharper than steel scalpels.",
+    "The Aztecs used it for blades.",
+    "It forms when lava cools very fast.",
+    "It is best known in black.",
+    "Its Mohs hardness is about 5.5.",
+    "It is a natural glass.",
+    "It is shiny and black.",
+    "The answer is one word of 8 letters.",
+    "It starts with the letter O."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/e/ea/13_years_of_Russian_Wikinews_in_Moscow_21.jpg/500px-13_years_of_Russian_Wikinews_in_Moscow_21.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Krassotkin",
+      "license": "CC0 1.0",
+      "page": "https://commons.wikimedia.org/wiki/File:13_years_of_Russian_Wikinews_in_Moscow_21.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/0/06/A2613-Museum_Geologi-Obsidian.jpg/500px-A2613-Museum_Geologi-Obsidian.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "A2613",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:A2613-Museum_Geologi-Obsidian.jpg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "quartz",
+   "name": "Quartz",
+   "alt": [
+    "rock crystal",
+    "clear quartz"
+   ],
+   "facts": {
+    "kind": "Mineral",
+    "colour": "Colourless",
+    "mohs": 7
+   },
+   "lookalikes": [
+    "diamond",
+    "amethyst"
+   ],
+   "blurb": "One of the most common minerals on Earth. Tiny quartz crystals keep time in watches.",
+   "clues": [
+    "It is number 7 on the Mohs scale.",
+    "Sand is mostly made of it.",
+    "It is best known in colourless.",
+    "Its Mohs hardness is about 7.",
+    "Amethyst and citrine are kinds of it.",
+    "The answer is one word of 6 letters.",
+    "It starts with the letter Q."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/c/ce/Quartz_Br%C3%A9sil.jpg/500px-Quartz_Br%C3%A9sil.jpg",
+      "w": 500,
+      "h": 426,
+      "credit": "Didier Descouens",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Quartz_Br%C3%A9sil.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/14/Quartz%2C_Tibet.jpg/500px-Quartz%2C_Tibet.jpg",
+      "w": 500,
+      "h": 501,
+      "credit": "JJ Harrison (https://www.jjharrison.com.au/)",
+      "license": "CC BY-SA 2.5",
+      "page": "https://commons.wikimedia.org/wiki/File:Quartz,_Tibet.jpg"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "rose-quartz",
+   "name": "Rose quartz",
+   "facts": {
+    "kind": "Mineral",
+    "colour": "Pink",
+    "mohs": 7
+   },
+   "lookalikes": [
+    "quartz",
+    "amethyst"
+   ],
+   "blurb": "A pale pink kind of quartz, often polished into beads and carvings.",
+   "clues": [
+    "It rarely forms clear crystals.",
+    "It is often carved into beads.",
+    "Its colour can fade in strong sunlight.",
+    "It is best known in pink.",
+    "Its Mohs hardness is about 7.",
+    "It is pale pink.",
+    "The answer has 2 words (4, 6 letters).",
+    "It starts with the letter R."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/d/dc/Rose_quartz_Spain.jpg/500px-Rose_quartz_Spain.jpg",
+      "w": 500,
+      "h": 498,
+      "credit": "Bergminer",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Rose_quartz_Spain.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/3/3a/Rose_quartz_12.jpg/500px-Rose_quartz_12.jpg",
+      "w": 500,
+      "h": 381,
+      "credit": "James St. John",
+      "license": "CC BY 2.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Rose_quartz_12.jpg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "amber",
+   "name": "Amber",
+   "facts": {
+    "kind": "Organic",
+    "colour": "Orange",
+    "mohs": 2.25
+   },
+   "blurb": "Fossilised tree resin, often millions of years old. Some amber has insects trapped inside.",
+   "clues": [
+    "Rubbing it makes static electricity; \"electric\" comes from its Greek name.",
+    "It floats in salty water.",
+    "It is fossilised tree resin.",
+    "It is best known in orange.",
+    "Its Mohs hardness is about 2.25.",
+    "Insects can be trapped inside it.",
+    "It is golden orange.",
+    "The answer is one word of 5 letters.",
+    "It starts with the letter A."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/3/30/Amber_Bernstein_many_stones.jpg/500px-Amber_Bernstein_many_stones.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "uploaded with permission from User Lanzi by Ra'ike on de.wikipedia",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Amber_Bernstein_many_stones.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/b/b6/Amber2.jpg/330px-Amber2.jpg",
+      "w": 330,
+      "h": 495,
+      "credit": "Anders L. Damgaard - www.amber-inclusions.dk - Baltic-amber-beetle",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Amber2.jpg"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "pyrite",
+   "name": "Pyrite",
+   "alt": [
+    "fool's gold",
+    "iron pyrite"
+   ],
+   "facts": {
+    "kind": "Mineral",
+    "colour": "Gold",
+    "mohs": 6.25
+   },
+   "lookalikes": [
+    "gold"
+   ],
+   "blurb": "A shiny gold-coloured mineral that fooled miners into thinking they had found gold.",
+   "clues": [
+    "It can make sparks when struck.",
+    "It often forms perfect cubes.",
+    "Its Mohs hardness is about 6.25.",
+    "The answer is one word of 6 letters.",
+    "It starts with the letter P."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/9/91/Pyrite_-_Huanzala_mine%2C_Huallanca%2C_Bolognesi%2C_Ancash%2C_Peru.jpg/500px-Pyrite_-_Huanzala_mine%2C_Huallanca%2C_Bolognesi%2C_Ancash%2C_Peru.jpg",
+      "w": 500,
+      "h": 636,
+      "credit": "Ivar Leidus",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Pyrite_-_Huanzala_mine,_Huallanca,_Bolognesi,_Ancash,_Peru.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/4/43/Pyrit_01.jpg/500px-Pyrit_01.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Uoaei1",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Pyrit_01.jpg"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "gold",
+   "name": "Gold",
+   "alt": [
+    "native gold"
+   ],
+   "facts": {
+    "kind": "Metal",
+    "colour": "Gold",
+    "mohs": 2.75
+   },
+   "lookalikes": [
+    "pyrite"
+   ],
+   "blurb": "A soft, shiny yellow metal that never rusts. One gram can be beaten into a sheet about a square metre in size.",
+   "clues": [
+    "Its chemical symbol is Au.",
+    "One gram can be hammered into a sheet about a square metre.",
+    "The biggest nugget, the \"Welcome Stranger\", was found in Victoria.",
+    "Its Mohs hardness is about 2.75.",
+    "It never rusts or tarnishes.",
+    "Olympic winners get a medal of it.",
+    "The answer is one word of 4 letters.",
+    "It starts with the letter G."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/d/d7/Gold-crystals.jpg/500px-Gold-crystals.jpg",
+      "w": 500,
+      "h": 324,
+      "credit": "Alchemist-hp (talk) www.pse-mendelejew.de",
+      "license": "CC BY-SA 3.0 de",
+      "page": "https://commons.wikimedia.org/wiki/File:Gold-crystals.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/5/56/The_Sounds_of_Earth_Record_Cover_-_GPN-2000-001978.jpg/500px-The_Sounds_of_Earth_Record_Cover_-_GPN-2000-001978.jpg",
+      "w": 500,
+      "h": 500,
+      "credit": "NASA/JPL",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:The_Sounds_of_Earth_Record_Cover_-_GPN-2000-001978.jpg"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "hematite",
+   "name": "Hematite",
+   "alt": [
+    "haematite"
+   ],
+   "facts": {
+    "kind": "Mineral",
+    "colour": "Silver-grey",
+    "mohs": 5.75
+   },
+   "blurb": "The main ore of iron. It looks metallic grey but leaves a red-brown streak and makes red ochre.",
+   "clues": [
+    "Its name comes from the Greek for blood.",
+    "It leaves a red-brown streak.",
+    "It has been found on Mars.",
+    "It is best known in silver-grey.",
+    "Its Mohs hardness is about 5.75.",
+    "It is the main ore of iron.",
+    "It looks shiny and metallic grey.",
+    "The answer is one word of 8 letters.",
+    "It starts with the letter H."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/a/ae/Hematite.jpg/500px-Hematite.jpg",
+      "w": 500,
+      "h": 482,
+      "credit": "DanielCD~commonswiki",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Hematite.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/19/WLA_hmns_Hematite.jpg/500px-WLA_hmns_Hematite.jpg",
+      "w": 500,
+      "h": 377,
+      "credit": "Wikipedia Loves Art participant \"Assignment_Houston_One\"",
+      "license": "CC BY-SA 2.5",
+      "page": "https://commons.wikimedia.org/wiki/File:WLA_hmns_Hematite.jpg"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "fluorite",
+   "name": "Fluorite",
+   "facts": {
+    "kind": "Mineral",
+    "colour": "Purple",
+    "mohs": 4
+   },
+   "blurb": "A colourful mineral that often glows under ultraviolet light. The word \"fluorescent\" comes from it.",
+   "clues": [
+    "It is number 4 on the Mohs scale.",
+    "It is used to make steel.",
+    "It is best known in purple.",
+    "Its Mohs hardness is about 4.",
+    "It often forms cubes.",
+    "It glows under ultraviolet light.",
+    "The answer is one word of 8 letters.",
+    "It starts with the letter F."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/e/ef/Fluorine_MHNT.MIN.2010.16.1.jpg/500px-Fluorine_MHNT.MIN.2010.16.1.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Didier Descouens",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Fluorine_MHNT.MIN.2010.16.1.jpg"
+     },
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/1/1f/Fluorite_crystals_270x444.jpg",
+      "w": 500,
+      "h": 822,
+      "credit": "Ryan Salsbury (Ryanrs on English Wikipedia)",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Fluorite_crystals_270x444.jpg"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "calcite",
+   "name": "Calcite",
+   "facts": {
+    "kind": "Mineral",
+    "colour": "White",
+    "mohs": 3
+   },
+   "blurb": "A common mineral that makes up limestone, marble and chalk. A clear crystal of it makes you see double.",
+   "clues": [
+    "It is number 3 on the Mohs scale.",
+    "A clear piece makes things behind it look double.",
+    "It fizzes in weak acid.",
+    "It is best known in white.",
+    "Its Mohs hardness is about 3.",
+    "Limestone, chalk and marble are made of it.",
+    "The answer is one word of 7 letters.",
+    "It starts with the letter C."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/f/f9/Calcite_%28Mexique%29_.jpg/330px-Calcite_%28Mexique%29_.jpg",
+      "w": 330,
+      "h": 497,
+      "credit": "Géry PARENT",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Calcite_(Mexique)_.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/a/a6/Calcite_Variation.png/500px-Calcite_Variation.png",
+      "w": 500,
+      "h": 358,
+      "credit": "PaleoNeolitic (montage creator)",
+      "license": "CC BY 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Calcite_Variation.png"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "gypsum",
+   "name": "Gypsum",
+   "alt": [
+    "selenite",
+    "desert rose"
+   ],
+   "facts": {
+    "kind": "Mineral",
+    "colour": "White",
+    "mohs": 2
+   },
+   "blurb": "A soft mineral used to make plaster and plasterboard. A Mexican cave holds gypsum crystals 11 metres long.",
+   "clues": [
+    "It is number 2 on the Mohs scale.",
+    "You can scratch it with a fingernail.",
+    "It is used to make plaster of Paris.",
+    "It is best known in white.",
+    "Its Mohs hardness is about 2.",
+    "Giant crystals of it grow in a Mexican cave.",
+    "It is a soft white mineral.",
+    "The answer is one word of 6 letters.",
+    "It starts with the letter G."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/b/bb/Gypse_Caresse.jpg/500px-Gypse_Caresse.jpg",
+      "w": 500,
+      "h": 449,
+      "credit": "Didier Descouens",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Gypse_Caresse.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/6/66/Gypsum_-_Sieroszowice_mine%2C_Lubin%2C_Lower_Silesia%2C_Poland.jpg/500px-Gypsum_-_Sieroszowice_mine%2C_Lubin%2C_Lower_Silesia%2C_Poland.jpg",
+      "w": 500,
+      "h": 417,
+      "credit": "Ivar Leidus",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Gypsum_-_Sieroszowice_mine,_Lubin,_Lower_Silesia,_Poland.jpg"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "talc",
+   "name": "Talc",
+   "facts": {
+    "kind": "Mineral",
+    "colour": "White",
+    "mohs": 1
+   },
+   "blurb": "The softest mineral, at the bottom of the Mohs scale. It feels soapy and is ground into talcum powder.",
+   "clues": [
+    "Soapstone is mostly made of it.",
+    "It feels soapy or greasy.",
+    "It is ground into baby powder.",
+    "It is best known in white.",
+    "Its Mohs hardness is about 1.",
+    "It is number 1 on the Mohs scale.",
+    "It is the softest mineral.",
+    "The answer is one word of 4 letters.",
+    "It starts with the letter T."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/7/74/Talc.jpg/500px-Talc.jpg",
+      "w": 500,
+      "h": 267,
+      "credit": "Didier Descouens",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Talc.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/2/2c/Talc_mutnikSVK01.JPG/500px-Talc_mutnikSVK01.JPG",
+      "w": 500,
+      "h": 375,
+      "credit": "Pelex",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Talc_mutnikSVK01.JPG"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "halite",
+   "name": "Halite",
+   "alt": [
+    "rock salt"
+   ],
+   "facts": {
+    "kind": "Mineral",
+    "colour": "Colourless",
+    "mohs": 2.5
+   },
+   "blurb": "The mineral form of table salt. Its crystals form perfect cubes.",
+   "clues": [
+    "It forms cubes.",
+    "It dissolves in water.",
+    "It is best known in colourless.",
+    "Its Mohs hardness is about 2.5.",
+    "It is spread on icy roads.",
+    "The answer is one word of 6 letters.",
+    "It starts with the letter H."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/9/9f/SaltCrystaUSGOV.jpg/500px-SaltCrystaUSGOV.jpg",
+      "w": 500,
+      "h": 405,
+      "credit": "Wikimedia Commons",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:SaltCrystaUSGOV.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/8/89/Halit_%28NaCl%29_-_Kopalnia_soli_Wieliczka%2C_Polska.jpg/500px-Halit_%28NaCl%29_-_Kopalnia_soli_Wieliczka%2C_Polska.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Lech Darski",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Halit_(NaCl)_-_Kopalnia_soli_Wieliczka,_Polska.jpg"
+     }
+    ]
+   },
+   "difficulty": 2
+  }
+ ],
+ "questions": [
+  {
+   "id": "q1",
+   "kind": "mc",
+   "prompt": "What is the hardest natural material?",
+   "answer": "Diamond",
+   "wrong": [
+    "Quartz",
+    "Gold",
+    "Ruby"
+   ],
+   "explain": "Diamond is 10 on the Mohs scale.",
+   "difficulty": 1
+  },
+  {
+   "id": "q2",
+   "kind": "mc",
+   "prompt": "Which mineral is the softest, at number 1 on the Mohs scale?",
+   "answer": "Talc",
+   "wrong": [
+    "Gypsum",
+    "Gold",
+    "Calcite"
+   ],
+   "explain": "Talc can be scratched with a fingernail.",
+   "difficulty": 2
+  },
+  {
+   "id": "q3",
+   "kind": "mc",
+   "prompt": "Ruby and sapphire are both kinds of which mineral?",
+   "answer": "Corundum",
+   "wrong": [
+    "Quartz",
+    "Beryl",
+    "Feldspar"
+   ],
+   "explain": "Red corundum is ruby; other colours are sapphire.",
+   "difficulty": 2
+  },
+  {
+   "id": "q4",
+   "kind": "mc",
+   "prompt": "Diamonds are made of which element?",
+   "answer": "Carbon",
+   "wrong": [
+    "Silicon",
+    "Iron",
+    "Oxygen"
+   ],
+   "explain": "Graphite in pencils is carbon too.",
+   "difficulty": 2
+  },
+  {
+   "id": "q5",
+   "kind": "mc",
+   "prompt": "Which country produces almost all of the world's precious opal?",
+   "answer": "Australia",
+   "wrong": [
+    "Brazil",
+    "South Africa",
+    "Canada"
+   ],
+   "explain": "Coober Pedy and Lightning Ridge are famous opal towns.",
+   "difficulty": 2
+  },
+  {
+   "id": "q6",
+   "kind": "mc",
+   "prompt": "What is \"fool's gold\"?",
+   "answer": "Pyrite",
+   "wrong": [
+    "Copper",
+    "Amber",
+    "Quartz"
+   ],
+   "explain": "It is iron sulphide.",
+   "difficulty": 2
+  },
+  {
+   "id": "q7",
+   "kind": "mc",
+   "prompt": "Which gem forms inside an oyster?",
+   "answer": "Pearl",
+   "wrong": [
+    "Opal",
+    "Amber",
+    "Jade"
+   ],
+   "explain": "The oyster coats an irritant with layers of nacre.",
+   "difficulty": 1
+  },
+  {
+   "id": "q8",
+   "kind": "mc",
+   "prompt": "What is amber?",
+   "answer": "Fossilised tree resin",
+   "wrong": [
+    "Volcanic glass",
+    "Coloured quartz",
+    "Dried honey"
+   ],
+   "explain": "Some amber has insects trapped inside.",
+   "difficulty": 1
+  },
+  {
+   "id": "q9",
+   "kind": "mc",
+   "prompt": "What colour is an emerald?",
+   "answer": "Green",
+   "wrong": [
+    "Red",
+    "Blue",
+    "Purple"
+   ],
+   "explain": "Emerald is green beryl.",
+   "difficulty": 1
+  },
+  {
+   "id": "q10",
+   "kind": "mc",
+   "prompt": "What colour is a ruby?",
+   "answer": "Red",
+   "wrong": [
+    "Green",
+    "Blue",
+    "Yellow"
+   ],
+   "explain": "Chromium makes ruby red.",
+   "difficulty": 1
+  },
+  {
+   "id": "q11",
+   "kind": "mc",
+   "prompt": "What colour is an amethyst?",
+   "answer": "Purple",
+   "wrong": [
+    "Red",
+    "Green",
+    "Yellow"
+   ],
+   "explain": "It is purple quartz.",
+   "difficulty": 1
+  },
+  {
+   "id": "q12",
+   "kind": "order",
+   "prompt": "Put these in order from softest to hardest.",
+   "answer": [
+    "Talc",
+    "Calcite",
+    "Quartz",
+    "Diamond"
+   ],
+   "orderLabel": "Softest to hardest",
+   "explain": "Mohs hardness 1, 3, 7 and 10.",
+   "difficulty": 2
+  }
+ ],
+ "fakes": [
+  "Lunarite",
+  "Celestine opalite",
+  "Bluefire garnet",
+  "Draconite",
+  "Kryptonite",
+  "Starmoon beryl",
+  "Royal azurine"
+ ],
+ "sources": [
+  {
+   "name": "Wikidata",
+   "url": "https://www.wikidata.org"
+  },
+  {
+   "name": "Wikimedia Commons",
+   "url": "https://commons.wikimedia.org"
+  }
+ ]
+}

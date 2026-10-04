@@ -1,0 +1,5863 @@
+{
+ "id": "actors",
+ "title": "Actors",
+ "theme": "screen",
+ "icon": "🎭",
+ "kids": false,
+ "version": 1,
+ "imgPrompt": "Which of these is {name}?",
+ "nameImgPrompt": "Who is this?",
+ "tfImgPrompt": "This is {name}.",
+ "factsMeta": {
+  "born": {
+   "type": "year",
+   "label": "Born",
+   "higherLabel": "Born later",
+   "askHigh": "Who of these was born most recently?",
+   "askLow": "Who of these was born first?"
+  },
+  "died": {
+   "type": "year",
+   "label": "Died",
+   "higherLabel": "Died later",
+   "askHigh": "Who of these died most recently?",
+   "askLow": "Who of these died first?"
+  },
+  "nationality": {
+   "type": "cat",
+   "label": "Nationality",
+   "exclusive": false,
+   "ask": "What nationality is {name}?",
+   "stmt": "{name}’s nationality: {value}."
+  },
+  "era": {
+   "type": "cat",
+   "label": "Born in",
+   "ask": "When was {name} born?",
+   "stmt": "{name} was born in the {value}."
+  },
+  "films": {
+   "type": "text",
+   "label": "Known for"
+  }
+ },
+ "items": [
+  {
+   "id": "tom-hanks",
+   "name": "Tom Hanks",
+   "alt": [
+    "Hanks"
+   ],
+   "group": "1900s or later",
+   "facts": {
+    "born": 1956,
+    "nationality": "American",
+    "era": "1900s or later",
+    "films": "Forrest Gump, Cast Away, Toy Story"
+   },
+   "blurb": "Tom Hanks (1956): The voice of Woody in Toy Story.",
+   "clues": [
+    "He won back-to-back Best Actor Oscars in 1994 and 1995.",
+    "He was stranded on an island with a volleyball called Wilson.",
+    "He played a man who says life is like a box of chocolates.",
+    "Born in 1956.",
+    "Nationality: American.",
+    "Films include Forrest Gump and Cast Away.",
+    "He is the voice of Woody in Toy Story."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e7/Tom_Hanks_at_the_Elvis_Premiere_2022.jpg/250px-Tom_Hanks_at_the_Elvis_Premiere_2022.jpg",
+      "w": 250,
+      "h": 334,
+      "credit": "Eva Rinaldi from Abbotsford, Australia",
+      "license": "CC BY-SA 2.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Tom_Hanks_at_the_Elvis_Premiere_2022.jpg"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "meryl-streep",
+   "name": "Meryl Streep",
+   "alt": [
+    "Streep"
+   ],
+   "group": "1900s or later",
+   "facts": {
+    "born": 1949,
+    "nationality": "American",
+    "era": "1900s or later",
+    "films": "The Devil Wears Prada, Mamma Mia!, Sophie's Choice"
+   },
+   "blurb": "Meryl Streep (1949): Sang ABBA songs in Mamma Mia!.",
+   "clues": [
+    "She has more Oscar nominations than any other actor.",
+    "She played Margaret Thatcher in The Iron Lady.",
+    "She played a terrifying fashion editor.",
+    "Born in 1949.",
+    "Nationality: American.",
+    "Films include The Devil Wears Prada and Mamma Mia!.",
+    "She sang ABBA songs in Mamma Mia!."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e5/Meryl_Streep-_Press_conference_for_the_film_%22The_Devil_Wears_Prada_2%22_-_55194765350_%28cropped1%29.jpg/330px-Meryl_Streep-_Press_conference_for_the_film_%22The_Devil_Wears_Prada_2%22_-_55194765350_%28cropped1%29.jpg",
+      "w": 330,
+      "h": 440,
+      "credit": "Ministry of culture, sports and Tourism- Lee Jeong-woo",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Meryl_Streep-_Press_conference_for_the_film_%22The_Devil_Wears_Prada_2%22_-_55194765350_(cropped1).jpg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "leonardo-dicaprio",
+   "name": "Leonardo DiCaprio",
+   "alt": [
+    "DiCaprio",
+    "Leo DiCaprio"
+   ],
+   "group": "1900s or later",
+   "facts": {
+    "born": 1974,
+    "nationality": "American",
+    "era": "1900s or later",
+    "films": "Titanic, Inception, The Revenant"
+   },
+   "blurb": "Leonardo DiCaprio (1974): Played Jack in Titanic.",
+   "clues": [
+    "He finally won an Oscar for The Revenant.",
+    "He played a thief who enters people's dreams in Inception.",
+    "He starred in The Wolf of Wall Street.",
+    "Born in 1974.",
+    "Nationality: American.",
+    "Films include Titanic and Inception.",
+    "He played Jack in Titanic."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d0/Leonardo_DiCaprio_-_BFI_Southbank_3_%28crop%29.jpg/500px-Leonardo_DiCaprio_-_BFI_Southbank_3_%28crop%29.jpg",
+      "w": 500,
+      "h": 614,
+      "credit": "Raph_PH",
+      "license": "CC BY 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Leonardo_DiCaprio_-_BFI_Southbank_3_(crop).jpg"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "denzel-washington",
+   "name": "Denzel Washington",
+   "alt": [
+    "Washington"
+   ],
+   "group": "1900s or later",
+   "facts": {
+    "born": 1954,
+    "nationality": "American",
+    "era": "1900s or later",
+    "films": "Training Day, Glory, Malcolm X"
+   },
+   "blurb": "Denzel Washington (1954): Starred in Training Day and The Equalizer.",
+   "clues": [
+    "He won a supporting actor Oscar for Glory.",
+    "He played the civil rights leader Malcolm X.",
+    "He won Best Actor for playing a corrupt detective.",
+    "Born in 1954.",
+    "Nationality: American.",
+    "Films include Training Day and Glory.",
+    "He starred in Training Day and The Equalizer."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/cc/Denzel_Washington_at_the_2025_Cannes_Film_Festival.jpg/330px-Denzel_Washington_at_the_2025_Cannes_Film_Festival.jpg",
+      "w": 330,
+      "h": 462,
+      "credit": "Gabriel Hutchinson",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Denzel_Washington_at_the_2025_Cannes_Film_Festival.jpg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "morgan-freeman",
+   "name": "Morgan Freeman",
+   "alt": [
+    "Freeman"
+   ],
+   "group": "1900s or later",
+   "facts": {
+    "born": 1937,
+    "nationality": "American",
+    "era": "1900s or later",
+    "films": "The Shawshank Redemption, Million Dollar Baby, Driving Miss Daisy"
+   },
+   "blurb": "Morgan Freeman (1937): Famous for his deep narrating voice and played Red in The Shawshank Redemption.",
+   "clues": [
+    "He won an Oscar for Million Dollar Baby.",
+    "He played Nelson Mandela in Invictus.",
+    "He played God in Bruce Almighty.",
+    "Born in 1937.",
+    "Nationality: American.",
+    "Films include The Shawshank Redemption and Million Dollar Baby.",
+    "He is famous for his deep narrating voice and played Red in The Shawshank Redemption."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/4/42/Morgan_Freeman_at_The_Pentagon_on_2_August_2023_-_230802-D-PM193-3363_%28cropped%29.jpg/330px-Morgan_Freeman_at_The_Pentagon_on_2_August_2023_-_230802-D-PM193-3363_%28cropped%29.jpg",
+      "w": 330,
+      "h": 440,
+      "credit": "U.S. Secretary of Defense",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Morgan_Freeman_at_The_Pentagon_on_2_August_2023_-_230802-D-PM193-3363_(cropped).jpg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "julia-roberts",
+   "name": "Julia Roberts",
+   "alt": [
+    "Roberts"
+   ],
+   "group": "1900s or later",
+   "facts": {
+    "born": 1967,
+    "nationality": "American",
+    "era": "1900s or later",
+    "films": "Pretty Woman, Erin Brockovich, Notting Hill"
+   },
+   "blurb": "Julia Roberts (1967): Shot to fame in Pretty Woman.",
+   "clues": [
+    "She won an Oscar for playing a legal clerk who took on a power company.",
+    "She played a famous film star in Notting Hill.",
+    "She starred opposite Richard Gere.",
+    "Born in 1967.",
+    "Nationality: American.",
+    "Films include Pretty Woman and Erin Brockovich.",
+    "She shot to fame in Pretty Woman."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/a/ad/Julia_Roberts_2025_%28cropped%29.jpg/500px-Julia_Roberts_2025_%28cropped%29.jpg",
+      "w": 500,
+      "h": 591,
+      "credit": "Colleen Sturtevant",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Julia_Roberts_2025_(cropped).jpg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "will-smith",
+   "name": "Will Smith",
+   "alt": [
+    "Smith"
+   ],
+   "group": "1900s or later",
+   "facts": {
+    "born": 1968,
+    "nationality": "American",
+    "era": "1900s or later",
+    "films": "Men in Black, Independence Day, Aladdin"
+   },
+   "blurb": "Will Smith (1968): Starred in The Fresh Prince of Bel-Air and Men in Black.",
+   "clues": [
+    "He played the Genie in the 2019 Aladdin.",
+    "He fought aliens in Independence Day.",
+    "Born in 1968.",
+    "Nationality: American.",
+    "Films include Men in Black and Independence Day.",
+    "He starred in The Fresh Prince of Bel-Air and Men in Black."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3f/TechCrunch_Disrupt_2019_%2848834434641%29_%28cropped%29.jpg/330px-TechCrunch_Disrupt_2019_%2848834434641%29_%28cropped%29.jpg",
+      "w": 330,
+      "h": 490,
+      "credit": "TechCrunch",
+      "license": "CC BY 2.0",
+      "page": "https://commons.wikimedia.org/wiki/File:TechCrunch_Disrupt_2019_(48834434641)_(cropped).jpg"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "tom-cruise",
+   "name": "Tom Cruise",
+   "alt": [
+    "Cruise"
+   ],
+   "group": "1900s or later",
+   "facts": {
+    "born": 1962,
+    "nationality": "American",
+    "era": "1900s or later",
+    "films": "Top Gun, Mission: Impossible, Top Gun: Maverick"
+   },
+   "blurb": "Tom Cruise (1962): Played Maverick in Top Gun.",
+   "clues": [
+    "He hung off the side of a flying plane for a stunt.",
+    "He played a bartender in Cocktail.",
+    "He plays agent Ethan Hunt.",
+    "Born in 1962.",
+    "Nationality: American.",
+    "Films include Top Gun and Mission: Impossible.",
+    "He played Maverick in Top Gun."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/2/23/Tom_Cruise_at_53rd_Saturn_Awards_2026-01.jpg/500px-Tom_Cruise_at_53rd_Saturn_Awards_2026-01.jpg",
+      "w": 500,
+      "h": 625,
+      "credit": "Kevin Paul",
+      "license": "CC BY 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Tom_Cruise_at_53rd_Saturn_Awards_2026-01.jpg"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "brad-pitt",
+   "name": "Brad Pitt",
+   "alt": [
+    "Pitt"
+   ],
+   "group": "1900s or later",
+   "facts": {
+    "born": 1963,
+    "nationality": "American",
+    "era": "1900s or later",
+    "films": "Fight Club, Ocean's Eleven, Once Upon a Time in Hollywood"
+   },
+   "blurb": "Brad Pitt (1963): Starred in Ocean's Eleven with George Clooney.",
+   "clues": [
+    "He won an Oscar for playing a stuntman.",
+    "He played Achilles in Troy.",
+    "He played Tyler Durden in Fight Club.",
+    "Born in 1963.",
+    "Nationality: American.",
+    "Films include Fight Club and Ocean's Eleven.",
+    "He starred in Ocean's Eleven with George Clooney."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/90/Brad_Pitt-69858.jpg/330px-Brad_Pitt-69858.jpg",
+      "w": 330,
+      "h": 440,
+      "credit": "Harald Krichel",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Brad_Pitt-69858.jpg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "angelina-jolie",
+   "name": "Angelina Jolie",
+   "alt": [
+    "Jolie"
+   ],
+   "group": "1900s or later",
+   "facts": {
+    "born": 1975,
+    "nationality": "American",
+    "era": "1900s or later",
+    "films": "Maleficent, Lara Croft: Tomb Raider, Mr. & Mrs. Smith"
+   },
+   "blurb": "Angelina Jolie (1975): Played the wicked fairy Maleficent.",
+   "clues": [
+    "She won an Oscar for Girl, Interrupted.",
+    "She has been a special envoy for the UN refugee agency.",
+    "She played a video-game tomb raider.",
+    "Born in 1975.",
+    "Nationality: American.",
+    "Films include Maleficent and Lara Croft: Tomb Raider.",
+    "She played the wicked fairy Maleficent."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/1/12/Angelina_Jolie-643531_%28cropped%29.jpg/330px-Angelina_Jolie-643531_%28cropped%29.jpg",
+      "w": 330,
+      "h": 441,
+      "credit": "Harald Krichel",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Angelina_Jolie-643531_(cropped).jpg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "johnny-depp",
+   "name": "Johnny Depp",
+   "alt": [
+    "Depp"
+   ],
+   "group": "1900s or later",
+   "facts": {
+    "born": 1963,
+    "nationality": "American",
+    "era": "1900s or later",
+    "films": "Pirates of the Caribbean: The Curse of the Black Pearl, Edward Scissorhands, Charlie and the Chocolate Factory"
+   },
+   "blurb": "Johnny Depp (1963): Played Captain Jack Sparrow.",
+   "clues": [
+    "He first became famous in the TV series 21 Jump Street.",
+    "He played a man with scissors for hands.",
+    "He played Willy Wonka in 2005.",
+    "Born in 1963.",
+    "Nationality: American.",
+    "Films include Pirates of the Caribbean: The Curse of the Black Pearl and Edward Scissorhands.",
+    "He played Captain Jack Sparrow."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/2/21/Johnny_Depp_2020.jpg/330px-Johnny_Depp_2020.jpg",
+      "w": 330,
+      "h": 454,
+      "credit": "Harald Krichel",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Johnny_Depp_2020.jpg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "scarlett-johansson",
+   "name": "Scarlett Johansson",
+   "alt": [
+    "Johansson"
+   ],
+   "group": "1900s or later",
+   "facts": {
+    "born": 1984,
+    "nationality": "American",
+    "era": "1900s or later",
+    "films": "Lost in Translation, The Avengers, Lucy"
+   },
+   "blurb": "Scarlett Johansson (1984): Played Black Widow in the Marvel films.",
+   "clues": [
+    "She voiced the computer Samantha in Her.",
+    "She starred in Lost in Translation with Bill Murray.",
+    "She starred in Lucy as a woman who unlocks her brain.",
+    "Born in 1984.",
+    "Nationality: American.",
+    "Films include Lost in Translation and The Avengers.",
+    "She played Black Widow in the Marvel films."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/a/ad/Scarlett_Johansson-8588.jpg/330px-Scarlett_Johansson-8588.jpg",
+      "w": 330,
+      "h": 440,
+      "credit": "Harald Krichel",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Scarlett_Johansson-8588.jpg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "robert-downey-jr",
+   "name": "Robert Downey Jr.",
+   "alt": [
+    "RDJ",
+    "Downey"
+   ],
+   "group": "1900s or later",
+   "facts": {
+    "born": 1965,
+    "nationality": "American",
+    "era": "1900s or later",
+    "films": "Iron Man, Sherlock Holmes, Oppenheimer"
+   },
+   "blurb": "Robert Downey Jr. (1965): Played Tony Stark, Iron Man.",
+   "clues": [
+    "He won an Oscar for playing Lewis Strauss in Oppenheimer.",
+    "He played Charlie Chaplin in 1992.",
+    "He played Sherlock Holmes.",
+    "Born in 1965.",
+    "Nationality: American.",
+    "Films include Iron Man and Sherlock Holmes.",
+    "He played Tony Stark, Iron Man."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/94/Robert_Downey_Jr_2014_Comic_Con_%28cropped%29.jpg/330px-Robert_Downey_Jr_2014_Comic_Con_%28cropped%29.jpg",
+      "w": 330,
+      "h": 468,
+      "credit": "Gage Skidmore",
+      "license": "CC BY-SA 2.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Robert_Downey_Jr_2014_Comic_Con_(cropped).jpg"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "emma-watson",
+   "name": "Emma Watson",
+   "alt": [
+    "Watson"
+   ],
+   "group": "1900s or later",
+   "facts": {
+    "born": 1990,
+    "nationality": "British",
+    "era": "1900s or later",
+    "films": "Harry Potter and the Philosopher's Stone, Beauty and the Beast, Little Women"
+   },
+   "blurb": "Emma Watson (1990): Played Hermione Granger.",
+   "clues": [
+    "She was born in Paris.",
+    "She is a UN Women Goodwill Ambassador.",
+    "She played Belle in Beauty and the Beast.",
+    "Born in 1990.",
+    "Nationality: British.",
+    "Films include Harry Potter and the Philosopher's Stone and Beauty and the Beast.",
+    "She played Hermione Granger."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7f/Emma_Watson_2013.jpg/330px-Emma_Watson_2013.jpg",
+      "w": 330,
+      "h": 443,
+      "credit": "Georges Biard",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Emma_Watson_2013.jpg"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "daniel-radcliffe",
+   "name": "Daniel Radcliffe",
+   "alt": [
+    "Radcliffe"
+   ],
+   "group": "1900s or later",
+   "facts": {
+    "born": 1989,
+    "nationality": "British",
+    "era": "1900s or later",
+    "films": "Harry Potter and the Philosopher's Stone, Swiss Army Man, The Woman in Black"
+   },
+   "blurb": "Daniel Radcliffe (1989): Played Harry Potter.",
+   "clues": [
+    "He played a corpse in Swiss Army Man.",
+    "He starred in The Woman in Black.",
+    "He was 11 when cast in his most famous role.",
+    "Born in 1989.",
+    "Nationality: British.",
+    "Films include Harry Potter and the Philosopher's Stone and Swiss Army Man.",
+    "He played Harry Potter."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3b/Daniel_Radcliffe_in_July_2015.jpg/330px-Daniel_Radcliffe_in_July_2015.jpg",
+      "w": 330,
+      "h": 474,
+      "credit": "Gage Skidmore from Peoria, AZ, United States of America",
+      "license": "CC BY-SA 2.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Daniel_Radcliffe_in_July_2015.jpg"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "keanu-reeves",
+   "name": "Keanu Reeves",
+   "alt": [
+    "Reeves"
+   ],
+   "group": "1900s or later",
+   "facts": {
+    "born": 1964,
+    "nationality": "Canadian",
+    "era": "1900s or later",
+    "films": "The Matrix, John Wick, Speed"
+   },
+   "blurb": "Keanu Reeves (1964): Played Neo in The Matrix.",
+   "clues": [
+    "He was born in Beirut.",
+    "He drove a bus that could not slow down in Speed.",
+    "He plays a hitman seeking revenge for his dog.",
+    "Born in 1964.",
+    "Nationality: Canadian.",
+    "Films include The Matrix and John Wick.",
+    "He played Neo in The Matrix."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/99/Keanu_Reeves_%E2%80%93_Dogstar_%E2%80%93_Tons_of_Rock_2026-3.jpg/500px-Keanu_Reeves_%E2%80%93_Dogstar_%E2%80%93_Tons_of_Rock_2026-3.jpg",
+      "w": 500,
+      "h": 625,
+      "credit": "Birgit Fostervold",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Keanu_Reeves_%E2%80%93_Dogstar_%E2%80%93_Tons_of_Rock_2026-3.jpg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "harrison-ford",
+   "name": "Harrison Ford",
+   "alt": [
+    "Ford"
+   ],
+   "group": "1900s or later",
+   "facts": {
+    "born": 1942,
+    "nationality": "American",
+    "era": "1900s or later",
+    "films": "Star Wars, Raiders of the Lost Ark, Blade Runner"
+   },
+   "blurb": "Harrison Ford (1942): Played Han Solo in Star Wars.",
+   "clues": [
+    "He worked as a carpenter before fame.",
+    "He played Rick Deckard in Blade Runner.",
+    "He played Indiana Jones.",
+    "Born in 1942.",
+    "Nationality: American.",
+    "Films include Star Wars and Raiders of the Lost Ark.",
+    "He played Han Solo in Star Wars."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/81/Harrison_Ford_-_Televerse_2025-03.jpg/500px-Harrison_Ford_-_Televerse_2025-03.jpg",
+      "w": 500,
+      "h": 625,
+      "credit": "Kevin Paul",
+      "license": "CC BY 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Harrison_Ford_-_Televerse_2025-03.jpg"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "mark-hamill",
+   "name": "Mark Hamill",
+   "alt": [
+    "Hamill"
+   ],
+   "group": "1900s or later",
+   "facts": {
+    "born": 1951,
+    "nationality": "American",
+    "era": "1900s or later",
+    "films": "Star Wars, The Empire Strikes Back, Return of the Jedi"
+   },
+   "blurb": "Mark Hamill (1951): Played Luke Skywalker.",
+   "clues": [
+    "He is a famous voice of the Joker in Batman cartoons and games.",
+    "He returned to his role in The Last Jedi.",
+    "He played a farm boy who becomes a Jedi.",
+    "Born in 1951.",
+    "Nationality: American.",
+    "Films include Star Wars and The Empire Strikes Back.",
+    "He played Luke Skywalker."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/2/26/Mark_Hamill_at_the_2024_Toronto_International_Film_Festival_%28cropped%29.jpg/330px-Mark_Hamill_at_the_2024_Toronto_International_Film_Festival_%28cropped%29.jpg",
+      "w": 330,
+      "h": 440,
+      "credit": "John Sears",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Mark_Hamill_at_the_2024_Toronto_International_Film_Festival_(cropped).jpg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "carrie-fisher",
+   "name": "Carrie Fisher",
+   "alt": [
+    "Fisher"
+   ],
+   "group": "1900s or later",
+   "facts": {
+    "born": 1956,
+    "died": 2016,
+    "nationality": "American",
+    "era": "1900s or later",
+    "films": "Star Wars, The Empire Strikes Back, When Harry Met Sally..."
+   },
+   "blurb": "Carrie Fisher (1956–2016): Played Princess Leia.",
+   "clues": [
+    "Her mother was the actress Debbie Reynolds.",
+    "She wrote the book Postcards from the Edge.",
+    "She wore her hair in famous side buns.",
+    "Born in 1956.",
+    "Nationality: American.",
+    "Films include Star Wars and The Empire Strikes Back.",
+    "She played Princess Leia."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/03/Carrie_Fisher_2013-a_straightened.jpg/330px-Carrie_Fisher_2013-a_straightened.jpg",
+      "w": 330,
+      "h": 506,
+      "credit": "By Riccardo Ghilardi - Crop of File:Actress Carrie Fisher © Riccardo Ghilardi photograp…",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Carrie_Fisher_2013-a_straightened.jpg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "sigourney-weaver",
+   "name": "Sigourney Weaver",
+   "alt": [
+    "Weaver"
+   ],
+   "group": "1900s or later",
+   "facts": {
+    "born": 1949,
+    "nationality": "American",
+    "era": "1900s or later",
+    "films": "Alien, Aliens, Avatar"
+   },
+   "blurb": "Sigourney Weaver (1949): Played Ellen Ripley in Alien.",
+   "clues": [
+    "She played a scientist in Avatar.",
+    "She was in Ghostbusters.",
+    "She fought a deadly creature aboard the Nostromo.",
+    "Born in 1949.",
+    "Nationality: American.",
+    "Films include Alien and Aliens.",
+    "She played Ellen Ripley in Alien."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b9/Sigourney_Weaver_at_the_2025_Toronto_International_Film_Festival_%28cropped%29.jpg/330px-Sigourney_Weaver_at_the_2025_Toronto_International_Film_Festival_%28cropped%29.jpg",
+      "w": 330,
+      "h": 440,
+      "credit": "Desmond Herzfelder",
+      "license": "CC BY 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Sigourney_Weaver_at_the_2025_Toronto_International_Film_Festival_(cropped).jpg"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "arnold-schwarzenegger",
+   "name": "Arnold Schwarzenegger",
+   "alt": [
+    "Schwarzenegger",
+    "Arnie"
+   ],
+   "group": "1900s or later",
+   "facts": {
+    "born": 1947,
+    "nationality": "Austrian-American",
+    "era": "1900s or later",
+    "films": "The Terminator, Terminator 2: Judgment Day, Predator"
+   },
+   "blurb": "Arnold Schwarzenegger (1947): Played the Terminator.",
+   "clues": [
+    "He won the Mr. Olympia bodybuilding title seven times.",
+    "He was Governor of California.",
+    "He said I'll be back.",
+    "Born in 1947.",
+    "Nationality: Austrian-American.",
+    "Films include The Terminator and Terminator 2: Judgment Day.",
+    "He played the Terminator."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/4/44/Arnold_Schwarzenegger_2025_%28cropped%29.jpg/330px-Arnold_Schwarzenegger_2025_%28cropped%29.jpg",
+      "w": 330,
+      "h": 441,
+      "credit": "DHSgov",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Arnold_Schwarzenegger_2025_(cropped).jpg"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "sylvester-stallone",
+   "name": "Sylvester Stallone",
+   "alt": [
+    "Stallone",
+    "Sly Stallone"
+   ],
+   "group": "1900s or later",
+   "facts": {
+    "born": 1946,
+    "nationality": "American",
+    "era": "1900s or later",
+    "films": "Rocky, First Blood, The Expendables"
+   },
+   "blurb": "Sylvester Stallone (1946): Played the boxer Rocky Balboa.",
+   "clues": [
+    "He was nominated for an Oscar for writing Rocky.",
+    "He played the soldier John Rambo.",
+    "He ran up the steps in Philadelphia.",
+    "Born in 1946.",
+    "Nationality: American.",
+    "Films include Rocky and First Blood.",
+    "He played the boxer Rocky Balboa."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/84/Sylvester_Stallone_Cannes_2019.jpg/330px-Sylvester_Stallone_Cannes_2019.jpg",
+      "w": 330,
+      "h": 468,
+      "credit": "Georges Biard",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Sylvester_Stallone_Cannes_2019.jpg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "bruce-willis",
+   "name": "Bruce Willis",
+   "alt": [
+    "Willis"
+   ],
+   "group": "1900s or later",
+   "facts": {
+    "born": 1955,
+    "nationality": "American",
+    "era": "1900s or later",
+    "films": "Die Hard, The Sixth Sense, Armageddon"
+   },
+   "blurb": "Bruce Willis (1955): Fought terrorists in a skyscraper in Die Hard.",
+   "clues": [
+    "He starred in the TV series Moonlighting.",
+    "He played a child psychologist in The Sixth Sense.",
+    "He played John McClane.",
+    "Born in 1955.",
+    "Nationality: American.",
+    "Films include Die Hard and The Sixth Sense.",
+    "He fought terrorists in a skyscraper in Die Hard."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c4/Bruce_Willis_by_Gage_Skidmore_3.jpg/330px-Bruce_Willis_by_Gage_Skidmore_3.jpg",
+      "w": 330,
+      "h": 465,
+      "credit": "Gage Skidmore",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Bruce_Willis_by_Gage_Skidmore_3.jpg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "jim-carrey",
+   "name": "Jim Carrey",
+   "alt": [
+    "Carrey"
+   ],
+   "group": "1900s or later",
+   "facts": {
+    "born": 1962,
+    "nationality": "Canadian-American",
+    "era": "1900s or later",
+    "films": "The Mask, Ace Ventura: Pet Detective, The Truman Show"
+   },
+   "blurb": "Jim Carrey (1962): Wore a magic green mask.",
+   "clues": [
+    "He played the Grinch in 2000.",
+    "He played a man whose life is a TV show.",
+    "He played a pet detective.",
+    "Born in 1962.",
+    "Nationality: Canadian-American.",
+    "Films include The Mask and Ace Ventura: Pet Detective.",
+    "He wore a magic green mask."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/e/ed/Jim_Carrey_2020_cropped.jpg/330px-Jim_Carrey_2020_cropped.jpg",
+      "w": 330,
+      "h": 440,
+      "credit": "SHOWTIME",
+      "license": "CC BY 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Jim_Carrey_2020_cropped.jpg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "robin-williams",
+   "name": "Robin Williams",
+   "alt": [
+    "Williams"
+   ],
+   "group": "1900s or later",
+   "facts": {
+    "born": 1951,
+    "died": 2014,
+    "nationality": "American",
+    "era": "1900s or later",
+    "films": "Mrs. Doubtfire, Aladdin, Good Will Hunting"
+   },
+   "blurb": "Robin Williams (1951–2014): Voiced the Genie in Aladdin.",
+   "clues": [
+    "He won an Oscar for Good Will Hunting.",
+    "He played an alien in Mork & Mindy.",
+    "He dressed as an old Scottish nanny in Mrs. Doubtfire.",
+    "Born in 1951.",
+    "Nationality: American.",
+    "Films include Mrs. Doubtfire and Aladdin.",
+    "He voiced the Genie in Aladdin."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/05/Robin_Williams_2011a_%282%29.jpg/250px-Robin_Williams_2011a_%282%29.jpg",
+      "w": 250,
+      "h": 360,
+      "credit": "Eva Rinaldi",
+      "license": "CC BY-SA 2.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Robin_Williams_2011a_(2).jpg"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "eddie-murphy",
+   "name": "Eddie Murphy",
+   "alt": [
+    "Murphy"
+   ],
+   "group": "1900s or later",
+   "facts": {
+    "born": 1961,
+    "nationality": "American",
+    "era": "1900s or later",
+    "films": "Beverly Hills Cop, Shrek, Coming to America"
+   },
+   "blurb": "Eddie Murphy (1961): Voiced Donkey in Shrek.",
+   "clues": [
+    "He played many characters in The Nutty Professor.",
+    "He played a prince who goes to New York in Coming to America.",
+    "He played a Detroit cop in Beverly Hills Cop.",
+    "Born in 1961.",
+    "Nationality: American.",
+    "Films include Beverly Hills Cop and Shrek.",
+    "He voiced Donkey in Shrek."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5f/Eddie_Murphy_by_David_Shankbone.jpg/330px-Eddie_Murphy_by_David_Shankbone.jpg",
+      "w": 330,
+      "h": 479,
+      "credit": "David Shankbone",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Eddie_Murphy_by_David_Shankbone.jpg"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "cameron-diaz",
+   "name": "Cameron Diaz",
+   "alt": [
+    "Diaz"
+   ],
+   "group": "1900s or later",
+   "facts": {
+    "born": 1972,
+    "nationality": "American",
+    "era": "1900s or later",
+    "films": "There's Something About Mary, Shrek, Charlie's Angels"
+   },
+   "blurb": "Cameron Diaz (1972): Voiced Princess Fiona in Shrek.",
+   "clues": [
+    "Her first film was The Mask.",
+    "She played one of Charlie's Angels.",
+    "She starred in There's Something About Mary.",
+    "Born in 1972.",
+    "Nationality: American.",
+    "Films include There's Something About Mary and Shrek.",
+    "She voiced Princess Fiona in Shrek."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/99/Cameron_Diaz_at_WWD_Style_Awards_2026-1998.jpg/500px-Cameron_Diaz_at_WWD_Style_Awards_2026-1998.jpg",
+      "w": 500,
+      "h": 625,
+      "credit": "Kevin Paul",
+      "license": "CC BY 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Cameron_Diaz_at_WWD_Style_Awards_2026-1998.jpg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "mike-myers",
+   "name": "Mike Myers",
+   "alt": [
+    "Myers"
+   ],
+   "group": "1900s or later",
+   "facts": {
+    "born": 1963,
+    "nationality": "Canadian",
+    "era": "1900s or later",
+    "films": "Shrek, Austin Powers: International Man of Mystery, Wayne's World"
+   },
+   "blurb": "Mike Myers (1963): Voiced Shrek.",
+   "clues": [
+    "He was a regular on Saturday Night Live.",
+    "He co-starred in Wayne's World.",
+    "He played the spy Austin Powers.",
+    "Born in 1963.",
+    "Nationality: Canadian.",
+    "Films include Shrek and Austin Powers: International Man of Mystery.",
+    "He voiced Shrek."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c9/Mike_Myers_2017_%2837220071326%29_%28cropped%29.jpg/500px-Mike_Myers_2017_%2837220071326%29_%28cropped%29.jpg",
+      "w": 500,
+      "h": 438,
+      "credit": "DoD News",
+      "license": "CC BY 2.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Mike_Myers_2017_(37220071326)_(cropped).jpg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "jack-nicholson",
+   "name": "Jack Nicholson",
+   "alt": [
+    "Nicholson"
+   ],
+   "group": "1900s or later",
+   "facts": {
+    "born": 1937,
+    "nationality": "American",
+    "era": "1900s or later",
+    "films": "One Flew Over the Cuckoo's Nest, The Shining, Batman"
+   },
+   "blurb": "Jack Nicholson (1937): Starred in The Shining.",
+   "clues": [
+    "He has won three Oscars.",
+    "He played the Joker in 1989.",
+    "He broke through a door shouting Here's Johnny!.",
+    "Born in 1937.",
+    "Nationality: American.",
+    "Films include One Flew Over the Cuckoo's Nest and The Shining.",
+    "He starred in The Shining."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/e/ec/Jack_Nicholson_2001.jpg/330px-Jack_Nicholson_2001.jpg",
+      "w": 330,
+      "h": 502,
+      "credit": "Kingkongphoto & www.celebrity-photos.com from Laurel Maryland, USA",
+      "license": "CC BY-SA 2.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Jack_Nicholson_2001.jpg"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "al-pacino",
+   "name": "Al Pacino",
+   "alt": [
+    "Pacino"
+   ],
+   "group": "1900s or later",
+   "facts": {
+    "born": 1940,
+    "nationality": "American",
+    "era": "1900s or later",
+    "films": "The Godfather, Scarface, Scent of a Woman"
+   },
+   "blurb": "Al Pacino (1940): Played Michael Corleone in The Godfather.",
+   "clues": [
+    "He won his Oscar for playing a blind army officer.",
+    "He said Say hello to my little friend.",
+    "He played Tony Montana in Scarface.",
+    "Born in 1940.",
+    "Nationality: American.",
+    "Films include The Godfather and Scarface.",
+    "He played Michael Corleone in The Godfather."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/2/20/ALPACINO_0234e_%2830401875260%29_%28cropped%29.jpg/330px-ALPACINO_0234e_%2830401875260%29_%28cropped%29.jpg",
+      "w": 330,
+      "h": 458,
+      "credit": "Embajada de EEUU en la Argentina",
+      "license": "CC BY 2.0",
+      "page": "https://commons.wikimedia.org/wiki/File:ALPACINO_0234e_(30401875260)_(cropped).jpg"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "robert-de-niro",
+   "name": "Robert De Niro",
+   "alt": [
+    "De Niro"
+   ],
+   "group": "1900s or later",
+   "facts": {
+    "born": 1943,
+    "nationality": "American",
+    "era": "1900s or later",
+    "films": "Taxi Driver, Raging Bull, The Godfather Part II"
+   },
+   "blurb": "Robert De Niro (1943): Played Travis Bickle in Taxi Driver.",
+   "clues": [
+    "He won an Oscar for playing the young Vito Corleone.",
+    "He played boxer Jake LaMotta.",
+    "He asked You talkin' to me?.",
+    "Born in 1943.",
+    "Nationality: American.",
+    "Films include Taxi Driver and Raging Bull.",
+    "He played Travis Bickle in Taxi Driver."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c1/Robert_de_Niro_Cannes_Film_Festival_%283x4_cropped%29.jpg/330px-Robert_de_Niro_Cannes_Film_Festival_%283x4_cropped%29.jpg",
+      "w": 330,
+      "h": 441,
+      "credit": "Harald Krichel",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Robert_de_Niro_Cannes_Film_Festival_(3x4_cropped).jpg"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "marlon-brando",
+   "name": "Marlon Brando",
+   "alt": [
+    "Brando"
+   ],
+   "group": "1900s or later",
+   "facts": {
+    "born": 1924,
+    "died": 2004,
+    "nationality": "American",
+    "era": "1900s or later",
+    "films": "The Godfather, On the Waterfront, A Streetcar Named Desire"
+   },
+   "blurb": "Marlon Brando (1924–2004): Played Vito Corleone in The Godfather.",
+   "clues": [
+    "He refused his second Oscar in protest.",
+    "He said I coulda been a contender.",
+    "He played Stanley Kowalski.",
+    "Born in 1924.",
+    "Nationality: American.",
+    "Films include The Godfather and On the Waterfront.",
+    "He played Vito Corleone in The Godfather."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/5/53/Marlon_Brando_publicity_for_One-Eyed_Jacks.png/330px-Marlon_Brando_publicity_for_One-Eyed_Jacks.png",
+      "w": 330,
+      "h": 424,
+      "credit": "None visible/Paramount Pictures",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Marlon_Brando_publicity_for_One-Eyed_Jacks.png"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "audrey-hepburn",
+   "name": "Audrey Hepburn",
+   "alt": [
+    "Hepburn"
+   ],
+   "group": "1900s or later",
+   "facts": {
+    "born": 1929,
+    "died": 1993,
+    "nationality": "British",
+    "era": "1900s or later",
+    "films": "Breakfast at Tiffany's, Roman Holiday, My Fair Lady"
+   },
+   "blurb": "Audrey Hepburn (1929–1993): Played Holly Golightly in Breakfast at Tiffany's.",
+   "clues": [
+    "She was born in Brussels.",
+    "She was a UNICEF Goodwill Ambassador.",
+    "She played Eliza Doolittle in My Fair Lady.",
+    "Born in 1929.",
+    "Nationality: British.",
+    "Films include Breakfast at Tiffany's and Roman Holiday.",
+    "She played Holly Golightly in Breakfast at Tiffany's."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/6/6e/Audrey_Hepburn_in_1966.jpg/330px-Audrey_Hepburn_in_1966.jpg",
+      "w": 330,
+      "h": 455,
+      "credit": "Anefo",
+      "license": "CC BY-SA 3.0 nl",
+      "page": "https://commons.wikimedia.org/wiki/File:Audrey_Hepburn_in_1966.jpg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "marilyn-monroe",
+   "name": "Marilyn Monroe",
+   "alt": [
+    "Monroe"
+   ],
+   "group": "1900s or later",
+   "facts": {
+    "born": 1926,
+    "died": 1962,
+    "nationality": "American",
+    "era": "1900s or later",
+    "films": "Some Like It Hot, Gentlemen Prefer Blondes, The Seven Year Itch"
+   },
+   "blurb": "Marilyn Monroe (1926–1962): Sang Diamonds Are a Girl's Best Friend.",
+   "clues": [
+    "She was born Norma Jeane Mortenson.",
+    "She sang Happy Birthday to President Kennedy.",
+    "Her white dress blew up over a subway grate.",
+    "Born in 1926.",
+    "Nationality: American.",
+    "Films include Some Like It Hot and Gentlemen Prefer Blondes.",
+    "She sang Diamonds Are a Girl's Best Friend."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/2/2a/Marilyn_Monroe_in_How_to_Marry_a_Millionaire.jpg/500px-Marilyn_Monroe_in_How_to_Marry_a_Millionaire.jpg",
+      "w": 500,
+      "h": 597,
+      "credit": "Sam Shaw",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Marilyn_Monroe_in_How_to_Marry_a_Millionaire.jpg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "humphrey-bogart",
+   "name": "Humphrey Bogart",
+   "alt": [
+    "Bogart",
+    "Bogie"
+   ],
+   "group": "1800s",
+   "facts": {
+    "born": 1899,
+    "died": 1957,
+    "nationality": "American",
+    "era": "1800s",
+    "films": "Casablanca, The Maltese Falcon, The African Queen"
+   },
+   "blurb": "Humphrey Bogart (1899–1957): Played Rick in Casablanca.",
+   "clues": [
+    "He won his Oscar for The African Queen.",
+    "He played detective Sam Spade.",
+    "He married Lauren Bacall.",
+    "Born in 1899.",
+    "Nationality: American.",
+    "Films include Casablanca and The Maltese Falcon.",
+    "He played Rick in Casablanca."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/4/44/Humphrey_Bogart_1945.JPG/330px-Humphrey_Bogart_1945.JPG",
+      "w": 330,
+      "h": 437,
+      "credit": "WCCO (AM), a CBS affiliate--the network where the program originated. This local affili…",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Humphrey_Bogart_1945.JPG"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "judy-garland",
+   "name": "Judy Garland",
+   "alt": [
+    "Garland"
+   ],
+   "group": "1900s or later",
+   "facts": {
+    "born": 1922,
+    "died": 1969,
+    "nationality": "American",
+    "era": "1900s or later",
+    "films": "The Wizard of Oz, A Star Is Born, Meet Me in St. Louis"
+   },
+   "blurb": "Judy Garland (1922–1969): Played Dorothy in The Wizard of Oz.",
+   "clues": [
+    "Her daughter Liza Minnelli is also a star.",
+    "She sang The Trolley Song.",
+    "She sang Over the Rainbow.",
+    "Born in 1922.",
+    "Nationality: American.",
+    "Films include The Wizard of Oz and A Star Is Born.",
+    "She played Dorothy in The Wizard of Oz."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4f/Judy_Garland_The_Harvey_Girls_MGM_Publicity_still.jpeg/500px-Judy_Garland_The_Harvey_Girls_MGM_Publicity_still.jpeg",
+      "w": 500,
+      "h": 624,
+      "credit": "Eric Carpenter (1909-1976) for Metro-Goldwyn-Mayer.",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Judy_Garland_The_Harvey_Girls_MGM_Publicity_still.jpeg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "julie-andrews",
+   "name": "Julie Andrews",
+   "alt": [
+    "Andrews"
+   ],
+   "group": "1900s or later",
+   "facts": {
+    "born": 1935,
+    "nationality": "British",
+    "era": "1900s or later",
+    "films": "Mary Poppins, The Sound of Music, The Princess Diaries"
+   },
+   "blurb": "Julie Andrews (1935): Played Mary Poppins.",
+   "clues": [
+    "She played a queen in The Princess Diaries.",
+    "She has a four-octave voice.",
+    "She played Maria in The Sound of Music.",
+    "Born in 1935.",
+    "Nationality: British.",
+    "Films include Mary Poppins and The Sound of Music.",
+    "She played Mary Poppins."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/89/Julie_Andrews_Park_Hyatt%2C_Sydney%2C_Australia_2013.jpg/330px-Julie_Andrews_Park_Hyatt%2C_Sydney%2C_Australia_2013.jpg",
+      "w": 330,
+      "h": 495,
+      "credit": "Eva Rinaldi",
+      "license": "CC BY-SA 2.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Julie_Andrews_Park_Hyatt,_Sydney,_Australia_2013.jpg"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "clint-eastwood",
+   "name": "Clint Eastwood",
+   "alt": [
+    "Eastwood"
+   ],
+   "group": "1900s or later",
+   "facts": {
+    "born": 1930,
+    "nationality": "American",
+    "era": "1900s or later",
+    "films": "The Good, the Bad and the Ugly, Dirty Harry, Unforgiven"
+   },
+   "blurb": "Clint Eastwood (1930): Played Dirty Harry.",
+   "clues": [
+    "He was mayor of Carmel-by-the-Sea.",
+    "He won Best Director for Unforgiven and Million Dollar Baby.",
+    "He played the Man with No Name.",
+    "Born in 1930.",
+    "Nationality: American.",
+    "Films include The Good, the Bad and the Ugly and Dirty Harry.",
+    "He played Dirty Harry."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7e/Clint_Eastwood_at_2010_New_York_Film_Festival.jpg/330px-Clint_Eastwood_at_2010_New_York_Film_Festival.jpg",
+      "w": 330,
+      "h": 450,
+      "credit": "Raffi Asdourian",
+      "license": "CC BY 2.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Clint_Eastwood_at_2010_New_York_Film_Festival.jpg"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "jackie-chan",
+   "name": "Jackie Chan",
+   "alt": [
+    "Chan"
+   ],
+   "group": "1900s or later",
+   "facts": {
+    "born": 1954,
+    "nationality": "Hong Kong",
+    "era": "1900s or later",
+    "films": "Rush Hour, Police Story, Kung Fu Panda"
+   },
+   "blurb": "Jackie Chan (1954): A martial arts star who does his own stunts.",
+   "clues": [
+    "He trained at the China Drama Academy as a boy.",
+    "His films end with blooper reels of failed stunts.",
+    "He voiced Monkey in Kung Fu Panda.",
+    "Born in 1954.",
+    "Nationality: Hong Kong.",
+    "Films include Rush Hour and Police Story.",
+    "He is a martial arts star who does his own stunts."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/b/be/Jackie_Chan_-_2025_Locarno_Film_Festival.jpg/330px-Jackie_Chan_-_2025_Locarno_Film_Festival.jpg",
+      "w": 330,
+      "h": 455,
+      "credit": "Segolene Liger",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Jackie_Chan_-_2025_Locarno_Film_Festival.jpg"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "bruce-lee",
+   "name": "Bruce Lee",
+   "alt": [
+    "Lee"
+   ],
+   "group": "1900s or later",
+   "facts": {
+    "born": 1940,
+    "died": 1973,
+    "nationality": "Hong Kong-American",
+    "era": "1900s or later",
+    "films": "Enter the Dragon, The Big Boss, Fist of Fury"
+   },
+   "blurb": "Bruce Lee (1940–1973): Starred in Enter the Dragon.",
+   "clues": [
+    "He was born in San Francisco.",
+    "He played Kato in The Green Hornet.",
+    "He founded a martial art called Jeet Kune Do.",
+    "Born in 1940.",
+    "Nationality: Hong Kong-American.",
+    "Films include Enter the Dragon and The Big Boss.",
+    "He starred in Enter the Dragon."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f1/Bruce_Lee_1973_%28cropped%29.jpg/330px-Bruce_Lee_1973_%28cropped%29.jpg",
+      "w": 330,
+      "h": 413,
+      "credit": "National General Pictures",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Bruce_Lee_1973_(cropped).jpg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "michelle-yeoh",
+   "name": "Michelle Yeoh",
+   "alt": [
+    "Yeoh"
+   ],
+   "group": "1900s or later",
+   "facts": {
+    "born": 1962,
+    "nationality": "Malaysian",
+    "era": "1900s or later",
+    "films": "Everything Everywhere All at Once, Crouching Tiger, Hidden Dragon, Tomorrow Never Dies"
+   },
+   "blurb": "Michelle Yeoh (1962): The first Asian woman to win the Best Actress Oscar.",
+   "clues": [
+    "She was a Bond girl in Tomorrow Never Dies.",
+    "She trained as a ballet dancer.",
+    "She starred in Crouching Tiger, Hidden Dragon.",
+    "Born in 1962.",
+    "Nationality: Malaysian.",
+    "Films include Everything Everywhere All at Once and Crouching Tiger, Hidden Dragon.",
+    "She was the first Asian woman to win the Best Actress Oscar."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/6/68/Michelle_Yeoh-2268.jpg/330px-Michelle_Yeoh-2268.jpg",
+      "w": 330,
+      "h": 440,
+      "credit": "Harald Krichel",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Michelle_Yeoh-2268.jpg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "tom-holland",
+   "name": "Tom Holland",
+   "alt": [
+    "Holland"
+   ],
+   "group": "1900s or later",
+   "facts": {
+    "born": 1996,
+    "nationality": "British",
+    "era": "1900s or later",
+    "films": "Spider-Man: Homecoming, Spider-Man: No Way Home, Uncharted"
+   },
+   "blurb": "Tom Holland (1996): Played Spider-Man in the Marvel films.",
+   "clues": [
+    "He started out in Billy Elliot the Musical.",
+    "He played treasure hunter Nathan Drake.",
+    "He is British but plays a teenager from Queens.",
+    "Born in 1996.",
+    "Nationality: British.",
+    "Films include Spider-Man: Homecoming and Spider-Man: No Way Home.",
+    "He played Spider-Man in the Marvel films."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/1/18/TomHolland-byPhilipRomano.jpg/330px-TomHolland-byPhilipRomano.jpg",
+      "w": 330,
+      "h": 496,
+      "credit": "PhilipRomano",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:TomHolland-byPhilipRomano.jpg"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "zendaya",
+   "name": "Zendaya",
+   "alt": [],
+   "group": "1900s or later",
+   "facts": {
+    "born": 1996,
+    "nationality": "American",
+    "era": "1900s or later",
+    "films": "Dune, Spider-Man: Homecoming, The Greatest Showman"
+   },
+   "blurb": "Zendaya (1996): Played MJ in the Spider-Man films.",
+   "clues": [
+    "She won two Emmys for Euphoria.",
+    "She played a trapeze artist in The Greatest Showman.",
+    "She played Chani in Dune.",
+    "Born in 1996.",
+    "Nationality: American.",
+    "Films include Dune and Spider-Man: Homecoming.",
+    "She played MJ in the Spider-Man films."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5a/Zendaya-byPhilipRomano.jpg/330px-Zendaya-byPhilipRomano.jpg",
+      "w": 330,
+      "h": 496,
+      "credit": "PhilipRomano",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Zendaya-byPhilipRomano.jpg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "timothee-chalamet",
+   "name": "Timothée Chalamet",
+   "alt": [
+    "Timothee Chalamet",
+    "Chalamet"
+   ],
+   "group": "1900s or later",
+   "facts": {
+    "born": 1995,
+    "nationality": "American",
+    "era": "1900s or later",
+    "films": "Dune, Wonka, Call Me by Your Name"
+   },
+   "blurb": "Timothée Chalamet (1995): Played the young Willy Wonka.",
+   "clues": [
+    "He has French and American citizenship.",
+    "He played Bob Dylan in A Complete Unknown.",
+    "He played Paul Atreides in Dune.",
+    "Born in 1995.",
+    "Nationality: American.",
+    "Films include Dune and Wonka.",
+    "He played the young Willy Wonka."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/a/aa/Timoth%C3%A9e_Chalamet-63541_%28cropped%29.jpg/330px-Timoth%C3%A9e_Chalamet-63541_%28cropped%29.jpg",
+      "w": 330,
+      "h": 472,
+      "credit": "Harald Krichel",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Timoth%C3%A9e_Chalamet-63541_(cropped).jpg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "margot-robbie",
+   "name": "Margot Robbie",
+   "alt": [
+    "Robbie"
+   ],
+   "group": "1900s or later",
+   "facts": {
+    "born": 1990,
+    "nationality": "Australian",
+    "era": "1900s or later",
+    "films": "Barbie, The Wolf of Wall Street, I, Tonya"
+   },
+   "blurb": "Margot Robbie (1990): Played Barbie in 2023.",
+   "clues": [
+    "She first found fame in the soap opera Neighbours.",
+    "She played figure skater Tonya Harding.",
+    "She played Harley Quinn.",
+    "Born in 1990.",
+    "Nationality: Australian.",
+    "Films include Barbie and The Wolf of Wall Street.",
+    "She played Barbie in 2023."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/7/70/Margot_Robbie_at_the_Paris_premiere_of_%22Wuthering_Heights%22.jpg/500px-Margot_Robbie_at_the_Paris_premiere_of_%22Wuthering_Heights%22.jpg",
+      "w": 500,
+      "h": 625,
+      "credit": "Ondine Goat",
+      "license": "CC0",
+      "page": "https://commons.wikimedia.org/wiki/File:Margot_Robbie_at_the_Paris_premiere_of_%22Wuthering_Heights%22.jpg"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "ryan-gosling",
+   "name": "Ryan Gosling",
+   "alt": [
+    "Gosling"
+   ],
+   "group": "1900s or later",
+   "facts": {
+    "born": 1980,
+    "nationality": "Canadian",
+    "era": "1900s or later",
+    "films": "La La Land, Barbie, Drive"
+   },
+   "blurb": "Ryan Gosling (1980): Played Ken in Barbie.",
+   "clues": [
+    "He was a Mouseketeer on The Mickey Mouse Club.",
+    "He played a getaway driver in Drive.",
+    "He played a jazz pianist in La La Land.",
+    "Born in 1980.",
+    "Nationality: Canadian.",
+    "Films include La La Land and Barbie.",
+    "He played Ken in Barbie."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/6/62/GoslingBFI081223_%2822_of_30%29_%2853388157347%29_%28cropped%29.jpg/330px-GoslingBFI081223_%2822_of_30%29_%2853388157347%29_%28cropped%29.jpg",
+      "w": 330,
+      "h": 439,
+      "credit": "Raph_PH",
+      "license": "CC BY 2.0",
+      "page": "https://commons.wikimedia.org/wiki/File:GoslingBFI081223_(22_of_30)_(53388157347)_(cropped).jpg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "emma-stone",
+   "name": "Emma Stone",
+   "alt": [
+    "Stone"
+   ],
+   "group": "1900s or later",
+   "facts": {
+    "born": 1988,
+    "nationality": "American",
+    "era": "1900s or later",
+    "films": "La La Land, Poor Things, Cruella"
+   },
+   "blurb": "Emma Stone (1988): Played an aspiring actress in La La Land.",
+   "clues": [
+    "She won her second Oscar for Poor Things.",
+    "She played Gwen Stacy in The Amazing Spider-Man.",
+    "She played Cruella de Vil.",
+    "Born in 1988.",
+    "Nationality: American.",
+    "Films include La La Land and Poor Things.",
+    "She played an aspiring actress in La La Land."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/6/6d/Emma_Stone_at_the_2025_Cannes_Film_Festival_04.jpg/330px-Emma_Stone_at_the_2025_Cannes_Film_Festival_04.jpg",
+      "w": 330,
+      "h": 495,
+      "credit": "Gabriel Hutchinson",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Emma_Stone_at_the_2025_Cannes_Film_Festival_04.jpg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "jennifer-lawrence",
+   "name": "Jennifer Lawrence",
+   "alt": [
+    "Lawrence"
+   ],
+   "group": "1900s or later",
+   "facts": {
+    "born": 1990,
+    "nationality": "American",
+    "era": "1900s or later",
+    "films": "The Hunger Games, Silver Linings Playbook, X-Men: First Class"
+   },
+   "blurb": "Jennifer Lawrence (1990): Played Katniss Everdeen.",
+   "clues": [
+    "She won an Oscar for Silver Linings Playbook.",
+    "She played Mystique in the X-Men films.",
+    "She is from Kentucky.",
+    "Born in 1990.",
+    "Nationality: American.",
+    "Films include The Hunger Games and Silver Linings Playbook.",
+    "She played Katniss Everdeen."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/01/Jennifer_Lawrence%2C_Cannes_Film_Festival_2025.jpg/500px-Jennifer_Lawrence%2C_Cannes_Film_Festival_2025.jpg",
+      "w": 500,
+      "h": 618,
+      "credit": "Ciné Zooms 2",
+      "license": "CC BY 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Jennifer_Lawrence,_Cannes_Film_Festival_2025.jpg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "chris-hemsworth",
+   "name": "Chris Hemsworth",
+   "alt": [
+    "Hemsworth"
+   ],
+   "group": "1900s or later",
+   "facts": {
+    "born": 1983,
+    "nationality": "Australian",
+    "era": "1900s or later",
+    "films": "Thor, The Avengers, Extraction"
+   },
+   "blurb": "Chris Hemsworth (1983): Plays the thunder god Thor.",
+   "clues": [
+    "He first found fame in the soap Home and Away.",
+    "He played racing driver James Hunt in Rush.",
+    "He has two actor brothers.",
+    "Born in 1983.",
+    "Nationality: Australian.",
+    "Films include Thor and The Avengers.",
+    "He plays the thunder god Thor."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/86/Chris_Hemsworth_-_Crime_101.jpg/500px-Chris_Hemsworth_-_Crime_101.jpg",
+      "w": 500,
+      "h": 625,
+      "credit": "Kevin Paul",
+      "license": "CC BY 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Chris_Hemsworth_-_Crime_101.jpg"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "chris-pratt",
+   "name": "Chris Pratt",
+   "alt": [
+    "Pratt"
+   ],
+   "group": "1900s or later",
+   "facts": {
+    "born": 1979,
+    "nationality": "American",
+    "era": "1900s or later",
+    "films": "Guardians of the Galaxy, Jurassic World, The Super Mario Bros. Movie"
+   },
+   "blurb": "Chris Pratt (1979): Voiced Mario in The Super Mario Bros. Movie.",
+   "clues": [
+    "He played Andy in Parks and Recreation.",
+    "He trained raptors in Jurassic World.",
+    "He plays Star-Lord.",
+    "Born in 1979.",
+    "Nationality: American.",
+    "Films include Guardians of the Galaxy and Jurassic World.",
+    "He voiced Mario in The Super Mario Bros. Movie."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/99/Chris_Pratt_2018.jpg/330px-Chris_Pratt_2018.jpg",
+      "w": 330,
+      "h": 495,
+      "credit": "Dick Thomas Johnson from Tokyo, Japan",
+      "license": "CC BY 2.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Chris_Pratt_2018.jpg"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "dwayne-johnson",
+   "name": "Dwayne Johnson",
+   "alt": [
+    "The Rock"
+   ],
+   "group": "1900s or later",
+   "facts": {
+    "born": 1972,
+    "nationality": "American",
+    "era": "1900s or later",
+    "films": "Moana, Jumanji: Welcome to the Jungle, Fast Five"
+   },
+   "blurb": "Dwayne Johnson (1972): Voiced the demigod Maui in Moana.",
+   "clues": [
+    "He played college football at the University of Miami.",
+    "He starred in the Jumanji films.",
+    "Born in 1972.",
+    "Nationality: American.",
+    "Films include Moana and Jumanji: Welcome to the Jungle.",
+    "He voiced the demigod Maui in Moana."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/9d/Dwayne_Johnson-1809_%28cropped%29.jpg/330px-Dwayne_Johnson-1809_%28cropped%29.jpg",
+      "w": 330,
+      "h": 440,
+      "credit": "Harald Krichel",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Dwayne_Johnson-1809_(cropped).jpg"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "hugh-jackman",
+   "name": "Hugh Jackman",
+   "alt": [
+    "Jackman"
+   ],
+   "group": "1900s or later",
+   "facts": {
+    "born": 1968,
+    "nationality": "Australian",
+    "era": "1900s or later",
+    "films": "X-Men, The Greatest Showman, Les Misérables"
+   },
+   "blurb": "Hugh Jackman (1968): Played Wolverine.",
+   "clues": [
+    "He has hosted the Tony Awards several times.",
+    "He played Jean Valjean in Les Misérables.",
+    "He played P. T. Barnum in The Greatest Showman.",
+    "Born in 1968.",
+    "Nationality: Australian.",
+    "Films include X-Men and The Greatest Showman.",
+    "He played Wolverine."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d8/Hugh_Jackman_Is_This_Thing_On-68_%28cropped%29.jpg/330px-Hugh_Jackman_Is_This_Thing_On-68_%28cropped%29.jpg",
+      "w": 330,
+      "h": 440,
+      "credit": "Bryan Berlin",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Hugh_Jackman_Is_This_Thing_On-68_(cropped).jpg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "ian-mckellen",
+   "name": "Ian McKellen",
+   "alt": [
+    "McKellen",
+    "Sir Ian McKellen"
+   ],
+   "group": "1900s or later",
+   "facts": {
+    "born": 1939,
+    "nationality": "English",
+    "era": "1900s or later",
+    "films": "The Lord of the Rings: The Fellowship of the Ring, X-Men, Gods and Monsters"
+   },
+   "blurb": "Ian McKellen (1939): Played Gandalf.",
+   "clues": [
+    "He is a celebrated Shakespearean stage actor.",
+    "He played Magneto in X-Men.",
+    "He was knighted in 1991.",
+    "Born in 1939.",
+    "Nationality: English.",
+    "Films include The Lord of the Rings: The Fellowship of the Ring and X-Men.",
+    "He played Gandalf."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/86/McKellenRichmnd040219-5_%2846275370484%29_%28cropped%29.jpg/500px-McKellenRichmnd040219-5_%2846275370484%29_%28cropped%29.jpg",
+      "w": 500,
+      "h": 627,
+      "credit": "Raph_PH",
+      "license": "CC BY 2.0",
+      "page": "https://commons.wikimedia.org/wiki/File:McKellenRichmnd040219-5_(46275370484)_(cropped).jpg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "cate-blanchett",
+   "name": "Cate Blanchett",
+   "alt": [
+    "Blanchett"
+   ],
+   "group": "1900s or later",
+   "facts": {
+    "born": 1969,
+    "nationality": "Australian",
+    "era": "1900s or later",
+    "films": "The Lord of the Rings: The Fellowship of the Ring, Elizabeth, Blue Jasmine"
+   },
+   "blurb": "Cate Blanchett (1969): Played the elf queen Galadriel.",
+   "clues": [
+    "She won an Oscar for playing Katharine Hepburn.",
+    "She played Queen Elizabeth I twice.",
+    "She won Best Actress for Blue Jasmine.",
+    "Born in 1969.",
+    "Nationality: Australian.",
+    "Films include The Lord of the Rings: The Fellowship of the Ring and Elizabeth.",
+    "She played the elf queen Galadriel."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/2/2a/Cate_Blanchett-63298_%28cropped_2%29.jpg/330px-Cate_Blanchett-63298_%28cropped_2%29.jpg",
+      "w": 330,
+      "h": 440,
+      "credit": "Harald Krichel",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Cate_Blanchett-63298_(cropped_2).jpg"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "anthony-hopkins",
+   "name": "Anthony Hopkins",
+   "alt": [
+    "Hopkins",
+    "Sir Anthony Hopkins"
+   ],
+   "group": "1900s or later",
+   "facts": {
+    "born": 1937,
+    "nationality": "Welsh",
+    "era": "1900s or later",
+    "films": "The Silence of the Lambs, The Father, Thor"
+   },
+   "blurb": "Anthony Hopkins (1937): Played Hannibal Lecter.",
+   "clues": [
+    "He won a second Oscar at the age of 83.",
+    "He played Odin in Thor.",
+    "He was born in Port Talbot.",
+    "Born in 1937.",
+    "Nationality: Welsh.",
+    "Films include The Silence of the Lambs and The Father.",
+    "He played Hannibal Lecter."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/0a/Anthony_Hopkins_Red_Sea_Festival_2025_Portrait.jpg/500px-Anthony_Hopkins_Red_Sea_Festival_2025_Portrait.jpg",
+      "w": 500,
+      "h": 527,
+      "credit": "Omar David Sandoval Sida",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Anthony_Hopkins_Red_Sea_Festival_2025_Portrait.jpg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "helen-mirren",
+   "name": "Helen Mirren",
+   "alt": [
+    "Mirren"
+   ],
+   "group": "1900s or later",
+   "facts": {
+    "born": 1945,
+    "nationality": "English",
+    "era": "1900s or later",
+    "films": "The Queen, Gosford Park, Red"
+   },
+   "blurb": "Helen Mirren (1945): Won an Oscar for The Queen.",
+   "clues": [
+    "She starred in the TV series Prime Suspect.",
+    "She played a retired spy in RED.",
+    "She has played both Elizabeth I and Elizabeth II.",
+    "Born in 1945.",
+    "Nationality: English.",
+    "Films include The Queen and Gosford Park.",
+    "She won an Oscar for The Queen."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/5/51/MKr24815_Helen_Mirren_%28Golda%2C_Berlinale_2023%29.jpg/330px-MKr24815_Helen_Mirren_%28Golda%2C_Berlinale_2023%29.jpg",
+      "w": 330,
+      "h": 495,
+      "credit": "Martin Kraft",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:MKr24815_Helen_Mirren_(Golda,_Berlinale_2023).jpg"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "judi-dench",
+   "name": "Judi Dench",
+   "alt": [
+    "Dench",
+    "Dame Judi Dench"
+   ],
+   "group": "1900s or later",
+   "facts": {
+    "born": 1934,
+    "nationality": "English",
+    "era": "1900s or later",
+    "films": "GoldenEye, Shakespeare in Love, Skyfall"
+   },
+   "blurb": "Judi Dench (1934): Played M in the James Bond films.",
+   "clues": [
+    "She won an Oscar for about eight minutes on screen.",
+    "She played Queen Elizabeth I in Shakespeare in Love.",
+    "She played Queen Victoria twice.",
+    "Born in 1934.",
+    "Nationality: English.",
+    "Films include GoldenEye and Shakespeare in Love.",
+    "She played M in the James Bond films."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8b/Judi_Dench_at_the_BAFTAs_2007_%28cropped%29.jpg/330px-Judi_Dench_at_the_BAFTAs_2007_%28cropped%29.jpg",
+      "w": 330,
+      "h": 463,
+      "credit": "Caroline Bonarde Ucci at https://www.flickr.com/photos/caroline_bonarde/",
+      "license": "CC BY 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Judi_Dench_at_the_BAFTAs_2007_(cropped).jpg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "daniel-craig",
+   "name": "Daniel Craig",
+   "alt": [
+    "Craig"
+   ],
+   "group": "1900s or later",
+   "facts": {
+    "born": 1968,
+    "nationality": "English",
+    "era": "1900s or later",
+    "films": "Casino Royale, Skyfall, Knives Out"
+   },
+   "blurb": "Daniel Craig (1968): Played James Bond from 2006 to 2021.",
+   "clues": [
+    "He played detective Benoit Blanc.",
+    "He was the first blond actor to play his famous role.",
+    "He starred in Casino Royale.",
+    "Born in 1968.",
+    "Nationality: English.",
+    "Films include Casino Royale and Skyfall.",
+    "He played James Bond from 2006 to 2021."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/3/32/Daniel_Craig_TIFF_2025_Red_Carpet_%28cropped%29.jpg/500px-Daniel_Craig_TIFF_2025_Red_Carpet_%28cropped%29.jpg",
+      "w": 500,
+      "h": 627,
+      "credit": "Max Surprenant",
+      "license": "CC BY 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Daniel_Craig_TIFF_2025_Red_Carpet_(cropped).jpg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "sean-connery",
+   "name": "Sean Connery",
+   "alt": [
+    "Connery"
+   ],
+   "group": "1900s or later",
+   "facts": {
+    "born": 1930,
+    "died": 2020,
+    "nationality": "Scottish",
+    "era": "1900s or later",
+    "films": "Dr. No, Goldfinger, The Untouchables"
+   },
+   "blurb": "Sean Connery (1930–2020): The first actor to play James Bond in a film.",
+   "clues": [
+    "He once worked as a milkman in Edinburgh.",
+    "He won an Oscar for The Untouchables.",
+    "He played Indiana Jones's father.",
+    "Born in 1930.",
+    "Nationality: Scottish.",
+    "Films include Dr. No and Goldfinger.",
+    "He was the first actor to play James Bond in a film."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/96/Sean_Connery_%281983%29.jpg/330px-Sean_Connery_%281983%29.jpg",
+      "w": 330,
+      "h": 501,
+      "credit": "Rob Bogaerts for Anefo",
+      "license": "CC BY-SA 3.0 nl",
+      "page": "https://commons.wikimedia.org/wiki/File:Sean_Connery_(1983).jpg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "kate-winslet",
+   "name": "Kate Winslet",
+   "alt": [
+    "Winslet"
+   ],
+   "group": "1900s or later",
+   "facts": {
+    "born": 1975,
+    "nationality": "English",
+    "era": "1900s or later",
+    "films": "Titanic, The Reader, Sense and Sensibility"
+   },
+   "blurb": "Kate Winslet (1975): Played Rose in Titanic.",
+   "clues": [
+    "She won an Oscar for The Reader.",
+    "She learned to free-dive for Avatar: The Way of Water.",
+    "She was in Sense and Sensibility.",
+    "Born in 1975.",
+    "Nationality: English.",
+    "Films include Titanic and The Reader.",
+    "She played Rose in Titanic."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/5/53/KateWinslet_%28cropped%29.jpg/500px-KateWinslet_%28cropped%29.jpg",
+      "w": 500,
+      "h": 625,
+      "credit": "Colleen Sturtevant",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:KateWinslet_(cropped).jpg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "nicole-kidman",
+   "name": "Nicole Kidman",
+   "alt": [
+    "Kidman"
+   ],
+   "group": "1900s or later",
+   "facts": {
+    "born": 1967,
+    "nationality": "Australian-American",
+    "era": "1900s or later",
+    "films": "Moulin Rouge!, The Hours, Paddington"
+   },
+   "blurb": "Nicole Kidman (1967): Starred in Moulin Rouge!.",
+   "clues": [
+    "She was born in Hawaii.",
+    "She played the villain in Paddington.",
+    "She won an Oscar playing Virginia Woolf.",
+    "Born in 1967.",
+    "Nationality: Australian-American.",
+    "Films include Moulin Rouge! and The Hours.",
+    "She starred in Moulin Rouge!."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/9e/MKr384262_Nicole_Kidman_%28Women_In_Motion%2C_Cannes_2025%29.jpg/330px-MKr384262_Nicole_Kidman_%28Women_In_Motion%2C_Cannes_2025%29.jpg",
+      "w": 330,
+      "h": 495,
+      "credit": "Martin Kraft",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:MKr384262_Nicole_Kidman_(Women_In_Motion,_Cannes_2025).jpg"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "natalie-portman",
+   "name": "Natalie Portman",
+   "alt": [
+    "Portman"
+   ],
+   "group": "1900s or later",
+   "facts": {
+    "born": 1981,
+    "nationality": "Israeli-American",
+    "era": "1900s or later",
+    "films": "Black Swan, Star Wars: Episode I – The Phantom Menace, Léon: The Professional"
+   },
+   "blurb": "Natalie Portman (1981): Played Padmé Amidala in Star Wars.",
+   "clues": [
+    "She studied psychology at Harvard.",
+    "She played Jane Foster in Thor.",
+    "She won an Oscar for Black Swan.",
+    "Born in 1981.",
+    "Nationality: Israeli-American.",
+    "Films include Black Swan and Star Wars: Episode I – The Phantom Menace.",
+    "She played Padmé Amidala in Star Wars."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f9/NataliePortman.jpg/330px-NataliePortman.jpg",
+      "w": 330,
+      "h": 495,
+      "credit": "Colleen Sturtevant",
+      "license": "CC BY 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:NataliePortman.jpg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "anne-hathaway",
+   "name": "Anne Hathaway",
+   "alt": [
+    "Hathaway"
+   ],
+   "group": "1900s or later",
+   "facts": {
+    "born": 1982,
+    "nationality": "American",
+    "era": "1900s or later",
+    "films": "The Princess Diaries, The Devil Wears Prada, Les Misérables"
+   },
+   "blurb": "Anne Hathaway (1982): Played Mia in The Princess Diaries.",
+   "clues": [
+    "She won an Oscar for Les Misérables.",
+    "She shares her name with Shakespeare's wife.",
+    "She was an assistant to a fashion editor in The Devil Wears Prada.",
+    "Born in 1982.",
+    "Nationality: American.",
+    "Films include The Princess Diaries and The Devil Wears Prada.",
+    "She played Mia in The Princess Diaries."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/d/da/Anne_Hathaway-_Press_conference_for_the_film_%22The_Devil_Wears_Prada_2%22_-_55194764955_%28cropped%29.jpg/330px-Anne_Hathaway-_Press_conference_for_the_film_%22The_Devil_Wears_Prada_2%22_-_55194764955_%28cropped%29.jpg",
+      "w": 330,
+      "h": 441,
+      "credit": "Ministry of culture, sports and Tourism- Lee Jeong-woo",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Anne_Hathaway-_Press_conference_for_the_film_%22The_Devil_Wears_Prada_2%22_-_55194764955_(cropped).jpg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "sandra-bullock",
+   "name": "Sandra Bullock",
+   "alt": [
+    "Bullock"
+   ],
+   "group": "1900s or later",
+   "facts": {
+    "born": 1964,
+    "nationality": "American",
+    "era": "1900s or later",
+    "films": "Speed, Gravity, The Blind Side"
+   },
+   "blurb": "Sandra Bullock (1964): Played an astronaut stranded in space in Gravity.",
+   "clues": [
+    "She won an Oscar for The Blind Side.",
+    "She voiced Scarlet Overkill in Minions.",
+    "She drove the runaway bus in Speed.",
+    "Born in 1964.",
+    "Nationality: American.",
+    "Films include Speed and Gravity.",
+    "She played an astronaut stranded in space in Gravity."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/7/74/Sandra_Bullock_at_The_Egyptian_Theatre_2024.jpg/500px-Sandra_Bullock_at_The_Egyptian_Theatre_2024.jpg",
+      "w": 500,
+      "h": 625,
+      "credit": "Kevin Paul",
+      "license": "CC BY 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Sandra_Bullock_at_The_Egyptian_Theatre_2024.jpg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "whoopi-goldberg",
+   "name": "Whoopi Goldberg",
+   "alt": [
+    "Goldberg"
+   ],
+   "group": "1900s or later",
+   "facts": {
+    "born": 1955,
+    "nationality": "American",
+    "era": "1900s or later",
+    "films": "Ghost, Sister Act, The Color Purple"
+   },
+   "blurb": "Whoopi Goldberg (1955): Won an Oscar for Ghost.",
+   "clues": [
+    "She is one of the few people with an Emmy, Grammy, Oscar and Tony.",
+    "She played Guinan in Star Trek.",
+    "She hid as a nun in Sister Act.",
+    "Born in 1955.",
+    "Nationality: American.",
+    "Films include Ghost and Sister Act.",
+    "She won an Oscar for Ghost."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/5/50/Whoopi_Goldberg_Springsteen-71_%28cropped%29.jpg/330px-Whoopi_Goldberg_Springsteen-71_%28cropped%29.jpg",
+      "w": 330,
+      "h": 440,
+      "credit": "Bryan Berlin",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Whoopi_Goldberg_Springsteen-71_(cropped).jpg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "samuel-l-jackson",
+   "name": "Samuel L. Jackson",
+   "alt": [
+    "Samuel Jackson"
+   ],
+   "group": "1900s or later",
+   "facts": {
+    "born": 1948,
+    "nationality": "American",
+    "era": "1900s or later",
+    "films": "Pulp Fiction, Jurassic Park, The Avengers"
+   },
+   "blurb": "Samuel L. Jackson (1948): Plays Nick Fury in the Marvel films.",
+   "clues": [
+    "His films have earned more at the box office than almost any other actor's.",
+    "He played Mace Windu in Star Wars.",
+    "He was in Pulp Fiction.",
+    "Born in 1948.",
+    "Nationality: American.",
+    "Films include Pulp Fiction and Jurassic Park.",
+    "He plays Nick Fury in the Marvel films."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/2/29/SamuelLJackson.jpg/330px-SamuelLJackson.jpg",
+      "w": 330,
+      "h": 495,
+      "credit": "Philip Romano",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:SamuelLJackson.jpg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "viola-davis",
+   "name": "Viola Davis",
+   "alt": [
+    "Davis"
+   ],
+   "group": "1900s or later",
+   "facts": {
+    "born": 1965,
+    "nationality": "American",
+    "era": "1900s or later",
+    "films": "Fences, The Help, The Woman King"
+   },
+   "blurb": "Viola Davis (1965): Won an Oscar for Fences.",
+   "clues": [
+    "She completed the EGOT with a Grammy in 2023.",
+    "She played a warrior general in The Woman King.",
+    "She starred in How to Get Away with Murder.",
+    "Born in 1965.",
+    "Nationality: American.",
+    "Films include Fences and The Help.",
+    "She won an Oscar for Fences."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/b/bb/Viola_Davis_at_the_Air_Premiere_at_SXSW_%28cropped%29.jpg/330px-Viola_Davis_at_the_Air_Premiere_at_SXSW_%28cropped%29.jpg",
+      "w": 330,
+      "h": 476,
+      "credit": "Nomoretitanic",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Viola_Davis_at_the_Air_Premiere_at_SXSW_(cropped).jpg"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "lupita-nyong-o",
+   "name": "Lupita Nyong'o",
+   "alt": [
+    "Nyong'o"
+   ],
+   "group": "1900s or later",
+   "facts": {
+    "born": 1983,
+    "nationality": "Kenyan-Mexican",
+    "era": "1900s or later",
+    "films": "12 Years a Slave, Black Panther, Us"
+   },
+   "blurb": "Lupita Nyong'o (1983): Won an Oscar for her first feature film role.",
+   "clues": [
+    "She was born in Mexico City.",
+    "She played two roles in Jordan Peele's Us.",
+    "She played Nakia in Black Panther.",
+    "Born in 1983.",
+    "Nationality: Kenyan-Mexican.",
+    "Films include 12 Years a Slave and Black Panther.",
+    "She won an Oscar for her first feature film role."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c4/LupitaNyongo-byPhilipRomano3.jpg/330px-LupitaNyongo-byPhilipRomano3.jpg",
+      "w": 330,
+      "h": 496,
+      "credit": "PhilipRomano",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:LupitaNyongo-byPhilipRomano3.jpg"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "idris-elba",
+   "name": "Idris Elba",
+   "alt": [
+    "Elba"
+   ],
+   "group": "1900s or later",
+   "facts": {
+    "born": 1972,
+    "nationality": "English",
+    "era": "1900s or later",
+    "films": "Thor, Beasts of No Nation, Zootopia"
+   },
+   "blurb": "Idris Elba (1972): Played Nelson Mandela in Long Walk to Freedom.",
+   "clues": [
+    "He played detective John Luther on TV.",
+    "He voiced Chief Bogo in Zootopia.",
+    "He played Heimdall in Thor.",
+    "Born in 1972.",
+    "Nationality: English.",
+    "Films include Thor and Beasts of No Nation.",
+    "He played Nelson Mandela in Long Walk to Freedom."
+   ],
+   "media": {
+    "img": []
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "benedict-cumberbatch",
+   "name": "Benedict Cumberbatch",
+   "alt": [
+    "Cumberbatch"
+   ],
+   "group": "1900s or later",
+   "facts": {
+    "born": 1976,
+    "nationality": "English",
+    "era": "1900s or later",
+    "films": "Doctor Strange, The Imitation Game, The Power of the Dog"
+   },
+   "blurb": "Benedict Cumberbatch (1976): Plays Doctor Strange.",
+   "clues": [
+    "He voiced the dragon Smaug.",
+    "He played Alan Turing in The Imitation Game.",
+    "He played Sherlock in the BBC series.",
+    "Born in 1976.",
+    "Nationality: English.",
+    "Films include Doctor Strange and The Imitation Game.",
+    "He plays Doctor Strange."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/6/6e/BCumberbatch_Comic-Con_2019.jpg/330px-BCumberbatch_Comic-Con_2019.jpg",
+      "w": 330,
+      "h": 485,
+      "credit": "Gage Skidmore from Peoria, AZ, United States of America",
+      "license": "CC BY-SA 2.0",
+      "page": "https://commons.wikimedia.org/wiki/File:BCumberbatch_Comic-Con_2019.jpg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "gal-gadot",
+   "name": "Gal Gadot",
+   "alt": [
+    "Gadot"
+   ],
+   "group": "1900s or later",
+   "facts": {
+    "born": 1985,
+    "nationality": "Israeli",
+    "era": "1900s or later",
+    "films": "Wonder Woman, Fast & Furious, Red Notice"
+   },
+   "blurb": "Gal Gadot (1985): Played Wonder Woman.",
+   "clues": [
+    "She was Miss Israel in 2004.",
+    "She served in the Israel Defense Forces.",
+    "She played Gisele in the Fast & Furious films.",
+    "Born in 1985.",
+    "Nationality: Israeli.",
+    "Films include Wonder Woman and Fast & Furious.",
+    "She played Wonder Woman."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/08/Gal_Gadot_for_Revlon_%28cropped%29.jpg/500px-Gal_Gadot_for_Revlon_%28cropped%29.jpg",
+      "w": 500,
+      "h": 536,
+      "credit": "Rogue Artists",
+      "license": "CC BY 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Gal_Gadot_for_Revlon_(cropped).jpg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "keira-knightley",
+   "name": "Keira Knightley",
+   "alt": [
+    "Knightley"
+   ],
+   "group": "1900s or later",
+   "facts": {
+    "born": 1985,
+    "nationality": "English",
+    "era": "1900s or later",
+    "films": "Pirates of the Caribbean: The Curse of the Black Pearl, Pride & Prejudice, Love Actually"
+   },
+   "blurb": "Keira Knightley (1985): Played Elizabeth Swann in Pirates of the Caribbean.",
+   "clues": [
+    "She played Padmé's decoy in The Phantom Menace.",
+    "She starred in Bend It Like Beckham.",
+    "She played Elizabeth Bennet.",
+    "Born in 1985.",
+    "Nationality: English.",
+    "Films include Pirates of the Caribbean: The Curse of the Black Pearl and Pride & Prejudice.",
+    "She played Elizabeth Swann in Pirates of the Caribbean."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b1/KeiraKnightleyByAndreaRaffin2011_%28cropped%29.jpg/330px-KeiraKnightleyByAndreaRaffin2011_%28cropped%29.jpg",
+      "w": 330,
+      "h": 471,
+      "credit": "Andrea Raffin",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:KeiraKnightleyByAndreaRaffin2011_(cropped).jpg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "orlando-bloom",
+   "name": "Orlando Bloom",
+   "alt": [
+    "Bloom"
+   ],
+   "group": "1900s or later",
+   "facts": {
+    "born": 1977,
+    "nationality": "English",
+    "era": "1900s or later",
+    "films": "The Lord of the Rings: The Fellowship of the Ring, Pirates of the Caribbean: The Curse of the Black Pearl, Troy"
+   },
+   "blurb": "Orlando Bloom (1977): Played the elf Legolas.",
+   "clues": [
+    "He played Paris in Troy.",
+    "He studied at the Guildhall School in London.",
+    "He played Will Turner in Pirates of the Caribbean.",
+    "Born in 1977.",
+    "Nationality: English.",
+    "Films include The Lord of the Rings: The Fellowship of the Ring and Pirates of the Caribbean: The Curse of the Black Pearl.",
+    "He played the elf Legolas."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/d/da/Orlando_Bloom_at_the_2024_Toronto_International_Film_Festival_%28cropped2%29.jpg/330px-Orlando_Bloom_at_the_2024_Toronto_International_Film_Festival_%28cropped2%29.jpg",
+      "w": 330,
+      "h": 495,
+      "credit": "Kevin Payravi",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Orlando_Bloom_at_the_2024_Toronto_International_Film_Festival_(cropped2).jpg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "elijah-wood",
+   "name": "Elijah Wood",
+   "alt": [
+    "Wood"
+   ],
+   "group": "1900s or later",
+   "facts": {
+    "born": 1981,
+    "nationality": "American",
+    "era": "1900s or later",
+    "films": "The Lord of the Rings: The Fellowship of the Ring, The Lord of the Rings: The Return of the King, Happy Feet"
+   },
+   "blurb": "Elijah Wood (1981): Played the hobbit Frodo Baggins.",
+   "clues": [
+    "He voiced a dancing penguin in Happy Feet.",
+    "He was a child actor in Flipper.",
+    "He has large blue eyes.",
+    "Born in 1981.",
+    "Nationality: American.",
+    "Films include The Lord of the Rings: The Fellowship of the Ring and The Lord of the Rings: The Return of the King.",
+    "He played the hobbit Frodo Baggins."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c9/Elijah_Wood_%2847955397556%29_%28cropped%29.jpg/330px-Elijah_Wood_%2847955397556%29_%28cropped%29.jpg",
+      "w": 330,
+      "h": 456,
+      "credit": "Gage Skidmore from Peoria, AZ, United States of America",
+      "license": "CC BY-SA 2.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Elijah_Wood_(47955397556)_(cropped).jpg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "rowan-atkinson",
+   "name": "Rowan Atkinson",
+   "alt": [
+    "Atkinson"
+   ],
+   "group": "1900s or later",
+   "facts": {
+    "born": 1955,
+    "nationality": "English",
+    "era": "1900s or later",
+    "films": "Johnny English, Mr. Bean's Holiday, Love Actually"
+   },
+   "blurb": "Rowan Atkinson (1955): Plays Mr. Bean.",
+   "clues": [
+    "He studied electrical engineering at Oxford.",
+    "He played a bumbling spy called Johnny English.",
+    "He starred in Blackadder.",
+    "Born in 1955.",
+    "Nationality: English.",
+    "Films include Johnny English and Mr. Bean's Holiday.",
+    "He plays Mr. Bean."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a2/Rowan_Atkinson%2C_2011.jpg/500px-Rowan_Atkinson%2C_2011.jpg",
+      "w": 500,
+      "h": 608,
+      "credit": "Eva Rinaldi",
+      "license": "CC BY-SA 2.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Rowan_Atkinson,_2011.jpg"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "hugh-grant",
+   "name": "Hugh Grant",
+   "alt": [
+    "Grant"
+   ],
+   "group": "1900s or later",
+   "facts": {
+    "born": 1960,
+    "nationality": "English",
+    "era": "1900s or later",
+    "films": "Notting Hill, Four Weddings and a Funeral, Paddington 2"
+   },
+   "blurb": "Hugh Grant (1960): Starred in Four Weddings and a Funeral.",
+   "clues": [
+    "He played a vain actor in Paddington 2.",
+    "He played the British prime minister in Love Actually.",
+    "He ran a bookshop in Notting Hill.",
+    "Born in 1960.",
+    "Nationality: English.",
+    "Films include Notting Hill and Four Weddings and a Funeral.",
+    "He starred in Four Weddings and a Funeral."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/6/6a/Hugh_Grant_in_2014.jpg/330px-Hugh_Grant_in_2014.jpg",
+      "w": 330,
+      "h": 455,
+      "credit": "Kurt Kulac",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Hugh_Grant_in_2014.jpg"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "emma-thompson",
+   "name": "Emma Thompson",
+   "alt": [
+    "Thompson"
+   ],
+   "group": "1900s or later",
+   "facts": {
+    "born": 1959,
+    "nationality": "English",
+    "era": "1900s or later",
+    "films": "Sense and Sensibility, Love Actually, Nanny McPhee"
+   },
+   "blurb": "Emma Thompson (1959): Played Nanny McPhee.",
+   "clues": [
+    "She has won Oscars for both acting and writing.",
+    "She played Professor Trelawney in Harry Potter.",
+    "She played P. L. Travers in Saving Mr. Banks.",
+    "Born in 1959.",
+    "Nationality: English.",
+    "Films include Sense and Sensibility and Love Actually.",
+    "She played Nanny McPhee."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/2/2e/Emma_Thompson_at_the_78th_Locarno_Film_Festival_photocall_01.jpg/330px-Emma_Thompson_at_the_78th_Locarno_Film_Festival_photocall_01.jpg",
+      "w": 330,
+      "h": 462,
+      "credit": "Kalai Ramu",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Emma_Thompson_at_the_78th_Locarno_Film_Festival_photocall_01.jpg"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "shirley-temple",
+   "name": "Shirley Temple",
+   "alt": [
+    "Temple"
+   ],
+   "group": "1900s or later",
+   "facts": {
+    "born": 1928,
+    "died": 2014,
+    "nationality": "American",
+    "era": "1900s or later",
+    "films": "Bright Eyes, Heidi"
+   },
+   "blurb": "Shirley Temple (1928–2014): The biggest child star of the 1930s.",
+   "clues": [
+    "She later became a US ambassador.",
+    "She sang On the Good Ship Lollipop.",
+    "She was famous for her curls.",
+    "Born in 1928.",
+    "Nationality: American.",
+    "Films include Bright Eyes and Heidi.",
+    "She was the biggest child star of the 1930s."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/f/ff/Shirleytemple.jpg/500px-Shirleytemple.jpg",
+      "w": 500,
+      "h": 637,
+      "credit": "Unknown authorUnknown author",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Shirleytemple.jpg"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "paul-newman",
+   "name": "Paul Newman",
+   "alt": [
+    "Newman"
+   ],
+   "group": "1900s or later",
+   "facts": {
+    "born": 1925,
+    "died": 2008,
+    "nationality": "American",
+    "era": "1900s or later",
+    "films": "Butch Cassidy and the Sundance Kid, The Sting, Cars"
+   },
+   "blurb": "Paul Newman (1925–2008): Played Butch Cassidy.",
+   "clues": [
+    "He founded a food company that gives its profits to charity.",
+    "He was also a racing driver.",
+    "He voiced Doc Hudson in Cars.",
+    "Born in 1925.",
+    "Nationality: American.",
+    "Films include Butch Cassidy and the Sundance Kid and The Sting.",
+    "He played Butch Cassidy."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/6/67/Paul_Newman_-_1958.jpg/500px-Paul_Newman_-_1958.jpg",
+      "w": 500,
+      "h": 626,
+      "credit": "Unknown authorUnknown author, dedicated to Bettmann Archive",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Paul_Newman_-_1958.jpg"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "gene-kelly",
+   "name": "Gene Kelly",
+   "alt": [
+    "Kelly"
+   ],
+   "group": "1900s or later",
+   "facts": {
+    "born": 1912,
+    "died": 1996,
+    "nationality": "American",
+    "era": "1900s or later",
+    "films": "Singin' in the Rain, An American in Paris, Anchors Aweigh"
+   },
+   "blurb": "Gene Kelly (1912–1996): Starred in Singin' in the Rain.",
+   "clues": [
+    "He danced with Jerry the cartoon mouse.",
+    "He starred in An American in Paris.",
+    "He danced while splashing through puddles.",
+    "Born in 1912.",
+    "Nationality: American.",
+    "Films include Singin' in the Rain and An American in Paris.",
+    "He starred in Singin' in the Rain."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/4/40/Gene_kelly.jpg/330px-Gene_kelly.jpg",
+      "w": 330,
+      "h": 467,
+      "credit": "Metro-Goldwyn-Mayer",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Gene_kelly.jpg"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "fred-astaire",
+   "name": "Fred Astaire",
+   "alt": [
+    "Astaire"
+   ],
+   "group": "1800s",
+   "facts": {
+    "born": 1899,
+    "died": 1987,
+    "nationality": "American",
+    "era": "1800s",
+    "films": "Top Hat, Swing Time, Funny Face"
+   },
+   "blurb": "Fred Astaire (1899–1987): A famous dancer of Hollywood musicals.",
+   "clues": [
+    "His most famous dance partner was Ginger Rogers.",
+    "He danced on the walls and ceiling in Royal Wedding.",
+    "He wore a top hat and tails.",
+    "Born in 1899.",
+    "Nationality: American.",
+    "Films include Top Hat and Swing Time.",
+    "He was a famous dancer of Hollywood musicals."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7b/Fred_Astaire.png/330px-Fred_Astaire.png",
+      "w": 330,
+      "h": 427,
+      "credit": "Studio publicity still",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Fred_Astaire.png"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "jack-black",
+   "name": "Jack Black",
+   "alt": [
+    "Black"
+   ],
+   "group": "1900s or later",
+   "facts": {
+    "born": 1969,
+    "nationality": "American",
+    "era": "1900s or later",
+    "films": "School of Rock, Kung Fu Panda, Jumanji: Welcome to the Jungle"
+   },
+   "blurb": "Jack Black (1969): Voices Po in Kung Fu Panda.",
+   "clues": [
+    "He is half of the band Tenacious D.",
+    "He sang Peaches as Bowser.",
+    "He played a rock-loving substitute teacher.",
+    "Born in 1969.",
+    "Nationality: American.",
+    "Films include School of Rock and Kung Fu Panda.",
+    "He voices Po in Kung Fu Panda."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/3/32/Jack_Black_KCA_2025.png/500px-Jack_Black_KCA_2025.png",
+      "w": 500,
+      "h": 581,
+      "credit": "NickRewind",
+      "license": "CC BY 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Jack_Black_KCA_2025.png"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "vin-diesel",
+   "name": "Vin Diesel",
+   "alt": [
+    "Diesel"
+   ],
+   "group": "1900s or later",
+   "facts": {
+    "born": 1967,
+    "nationality": "American",
+    "era": "1900s or later",
+    "films": "The Fast and the Furious, Guardians of the Galaxy, Saving Private Ryan"
+   },
+   "blurb": "Vin Diesel (1967): Plays Dominic Toretto in the Fast & Furious films.",
+   "clues": [
+    "He was in Saving Private Ryan.",
+    "He voiced The Iron Giant.",
+    "He voices Groot.",
+    "Born in 1967.",
+    "Nationality: American.",
+    "Films include The Fast and the Furious and Guardians of the Galaxy.",
+    "He plays Dominic Toretto in the Fast & Furious films."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f3/Vin_Diesel_2013.jpg/500px-Vin_Diesel_2013.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Gage Skidmore from Peoria, AZ, United States of America",
+      "license": "CC BY-SA 2.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Vin_Diesel_2013.jpg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "cillian-murphy",
+   "name": "Cillian Murphy",
+   "alt": [
+    "Murphy"
+   ],
+   "group": "1900s or later",
+   "facts": {
+    "born": 1976,
+    "nationality": "Irish",
+    "era": "1900s or later",
+    "films": "Oppenheimer, 28 Days Later, Inception"
+   },
+   "blurb": "Cillian Murphy (1976): Won an Oscar for playing the father of the atomic bomb.",
+   "clues": [
+    "He was born in Cork.",
+    "He played the Scarecrow in Batman Begins.",
+    "He played Tommy Shelby in Peaky Blinders.",
+    "Born in 1976.",
+    "Nationality: Irish.",
+    "Films include Oppenheimer and 28 Days Later.",
+    "He won an Oscar for playing the father of the atomic bomb."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/9e/CillianMurphy-TIFF2025-01-Cropped_%28cropped%29.png/500px-CillianMurphy-TIFF2025-01-Cropped_%28cropped%29.png",
+      "w": 500,
+      "h": 603,
+      "credit": "JoshPopov",
+      "license": "CC BY 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:CillianMurphy-TIFF2025-01-Cropped_(cropped).png"
+     }
+    ]
+   },
+   "difficulty": 3
+  }
+ ],
+ "questions": [
+  {
+   "id": "who-tom-hanks",
+   "kind": "mc",
+   "prompt": "Who is this? He is the voice of Woody in Toy Story.",
+   "answer": "Tom Hanks",
+   "wrong": [
+    "Daniel Radcliffe",
+    "Julia Roberts",
+    "Chris Pratt"
+   ],
+   "explain": "Tom Hanks (1956): The voice of Woody in Toy Story.",
+   "difficulty": 1,
+   "refs": [
+    "actors/tom-hanks"
+   ]
+  },
+  {
+   "id": "born-tom-hanks",
+   "kind": "mc",
+   "prompt": "In which year was Tom Hanks born?",
+   "answer": "1956",
+   "wrong": [
+    "1926",
+    "1966",
+    "1936"
+   ],
+   "explain": "Tom Hanks (1956): The voice of Woody in Toy Story.",
+   "difficulty": 3,
+   "refs": [
+    "actors/tom-hanks"
+   ]
+  },
+  {
+   "id": "who-meryl-streep",
+   "kind": "mc",
+   "prompt": "Who is this? She sang ABBA songs in Mamma Mia!.",
+   "answer": "Meryl Streep",
+   "wrong": [
+    "Denzel Washington",
+    "Keanu Reeves",
+    "Anne Hathaway"
+   ],
+   "explain": "Meryl Streep (1949): Sang ABBA songs in Mamma Mia!.",
+   "difficulty": 2,
+   "refs": [
+    "actors/meryl-streep"
+   ]
+  },
+  {
+   "id": "born-meryl-streep",
+   "kind": "mc",
+   "prompt": "In which year was Meryl Streep born?",
+   "answer": "1949",
+   "wrong": [
+    "1969",
+    "1959",
+    "1919"
+   ],
+   "explain": "Meryl Streep (1949): Sang ABBA songs in Mamma Mia!.",
+   "difficulty": 3,
+   "refs": [
+    "actors/meryl-streep"
+   ]
+  },
+  {
+   "id": "who-leonardo-dicaprio",
+   "kind": "mc",
+   "prompt": "Who is this? He played Jack in Titanic.",
+   "answer": "Leonardo DiCaprio",
+   "wrong": [
+    "Timothée Chalamet",
+    "Julie Andrews",
+    "Samuel L. Jackson"
+   ],
+   "explain": "Leonardo DiCaprio (1974): Played Jack in Titanic.",
+   "difficulty": 1,
+   "refs": [
+    "actors/leonardo-dicaprio"
+   ]
+  },
+  {
+   "id": "born-leonardo-dicaprio",
+   "kind": "mc",
+   "prompt": "In which year was Leonardo DiCaprio born?",
+   "answer": "1974",
+   "wrong": [
+    "1984",
+    "1994",
+    "1954"
+   ],
+   "explain": "Leonardo DiCaprio (1974): Played Jack in Titanic.",
+   "difficulty": 3,
+   "refs": [
+    "actors/leonardo-dicaprio"
+   ]
+  },
+  {
+   "id": "who-denzel-washington",
+   "kind": "mc",
+   "prompt": "Who is this? He starred in Training Day and The Equalizer.",
+   "answer": "Denzel Washington",
+   "wrong": [
+    "Jim Carrey",
+    "Jennifer Lawrence",
+    "Marilyn Monroe"
+   ],
+   "explain": "Denzel Washington (1954): Starred in Training Day and The Equalizer.",
+   "difficulty": 2,
+   "refs": [
+    "actors/denzel-washington"
+   ]
+  },
+  {
+   "id": "born-denzel-washington",
+   "kind": "mc",
+   "prompt": "In which year was Denzel Washington born?",
+   "answer": "1954",
+   "wrong": [
+    "1964",
+    "1974",
+    "1944"
+   ],
+   "explain": "Denzel Washington (1954): Starred in Training Day and The Equalizer.",
+   "difficulty": 3,
+   "refs": [
+    "actors/denzel-washington"
+   ]
+  },
+  {
+   "id": "who-morgan-freeman",
+   "kind": "mc",
+   "prompt": "Who is this? He is famous for his deep narrating voice and played Red in The Shawshank Redemption.",
+   "answer": "Morgan Freeman",
+   "wrong": [
+    "Emma Stone",
+    "Dwayne Johnson",
+    "Scarlett Johansson"
+   ],
+   "explain": "Morgan Freeman (1937): Famous for his deep narrating voice and played Red in The Shawshank Redemption.",
+   "difficulty": 2,
+   "refs": [
+    "actors/morgan-freeman"
+   ]
+  },
+  {
+   "id": "born-morgan-freeman",
+   "kind": "mc",
+   "prompt": "In which year was Morgan Freeman born?",
+   "answer": "1937",
+   "wrong": [
+    "1967",
+    "1907",
+    "1927"
+   ],
+   "explain": "Morgan Freeman (1937): Famous for his deep narrating voice and played Red in The Shawshank Redemption.",
+   "difficulty": 3,
+   "refs": [
+    "actors/morgan-freeman"
+   ]
+  },
+  {
+   "id": "who-julia-roberts",
+   "kind": "mc",
+   "prompt": "Who is this? She shot to fame in Pretty Woman.",
+   "answer": "Julia Roberts",
+   "wrong": [
+    "Robert De Niro",
+    "Carrie Fisher",
+    "Angelina Jolie"
+   ],
+   "explain": "Julia Roberts (1967): Shot to fame in Pretty Woman.",
+   "difficulty": 2,
+   "refs": [
+    "actors/julia-roberts"
+   ]
+  },
+  {
+   "id": "born-julia-roberts",
+   "kind": "mc",
+   "prompt": "In which year was Julia Roberts born?",
+   "answer": "1967",
+   "wrong": [
+    "1947",
+    "1977",
+    "1987"
+   ],
+   "explain": "Julia Roberts (1967): Shot to fame in Pretty Woman.",
+   "difficulty": 3,
+   "refs": [
+    "actors/julia-roberts"
+   ]
+  },
+  {
+   "id": "who-will-smith",
+   "kind": "mc",
+   "prompt": "Who is this? He starred in The Fresh Prince of Bel-Air and Men in Black.",
+   "answer": "Will Smith",
+   "wrong": [
+    "Hugh Jackman",
+    "Audrey Hepburn",
+    "Eddie Murphy"
+   ],
+   "explain": "Will Smith (1968): Starred in The Fresh Prince of Bel-Air and Men in Black.",
+   "difficulty": 1,
+   "refs": [
+    "actors/will-smith"
+   ]
+  },
+  {
+   "id": "born-will-smith",
+   "kind": "mc",
+   "prompt": "In which year was Will Smith born?",
+   "answer": "1968",
+   "wrong": [
+    "1988",
+    "1978",
+    "1948"
+   ],
+   "explain": "Will Smith (1968): Starred in The Fresh Prince of Bel-Air and Men in Black.",
+   "difficulty": 3,
+   "refs": [
+    "actors/will-smith"
+   ]
+  },
+  {
+   "id": "who-tom-cruise",
+   "kind": "mc",
+   "prompt": "Who is this? He played Maverick in Top Gun.",
+   "answer": "Tom Cruise",
+   "wrong": [
+    "Chris Pratt",
+    "Hugh Grant",
+    "Shirley Temple"
+   ],
+   "explain": "Tom Cruise (1962): Played Maverick in Top Gun.",
+   "difficulty": 1,
+   "refs": [
+    "actors/tom-cruise"
+   ]
+  },
+  {
+   "id": "born-tom-cruise",
+   "kind": "mc",
+   "prompt": "In which year was Tom Cruise born?",
+   "answer": "1962",
+   "wrong": [
+    "1982",
+    "1932",
+    "1972"
+   ],
+   "explain": "Tom Cruise (1962): Played Maverick in Top Gun.",
+   "difficulty": 3,
+   "refs": [
+    "actors/tom-cruise"
+   ]
+  },
+  {
+   "id": "who-brad-pitt",
+   "kind": "mc",
+   "prompt": "Who is this? He starred in Ocean's Eleven with George Clooney.",
+   "answer": "Brad Pitt",
+   "wrong": [
+    "Robin Williams",
+    "Robert De Niro",
+    "Nicole Kidman"
+   ],
+   "explain": "Brad Pitt (1963): Starred in Ocean's Eleven with George Clooney.",
+   "difficulty": 2,
+   "refs": [
+    "actors/brad-pitt"
+   ]
+  },
+  {
+   "id": "born-brad-pitt",
+   "kind": "mc",
+   "prompt": "In which year was Brad Pitt born?",
+   "answer": "1963",
+   "wrong": [
+    "1943",
+    "1933",
+    "1973"
+   ],
+   "explain": "Brad Pitt (1963): Starred in Ocean's Eleven with George Clooney.",
+   "difficulty": 3,
+   "refs": [
+    "actors/brad-pitt"
+   ]
+  },
+  {
+   "id": "who-angelina-jolie",
+   "kind": "mc",
+   "prompt": "Who is this? She played the wicked fairy Maleficent.",
+   "answer": "Angelina Jolie",
+   "wrong": [
+    "Robert Downey Jr.",
+    "Will Smith",
+    "Leonardo DiCaprio"
+   ],
+   "explain": "Angelina Jolie (1975): Played the wicked fairy Maleficent.",
+   "difficulty": 2,
+   "refs": [
+    "actors/angelina-jolie"
+   ]
+  },
+  {
+   "id": "born-angelina-jolie",
+   "kind": "mc",
+   "prompt": "In which year was Angelina Jolie born?",
+   "answer": "1975",
+   "wrong": [
+    "1955",
+    "1945",
+    "1995"
+   ],
+   "explain": "Angelina Jolie (1975): Played the wicked fairy Maleficent.",
+   "difficulty": 3,
+   "refs": [
+    "actors/angelina-jolie"
+   ]
+  },
+  {
+   "id": "who-johnny-depp",
+   "kind": "mc",
+   "prompt": "Who is this? He played Captain Jack Sparrow.",
+   "answer": "Johnny Depp",
+   "wrong": [
+    "Mark Hamill",
+    "Idris Elba",
+    "Julia Roberts"
+   ],
+   "explain": "Johnny Depp (1963): Played Captain Jack Sparrow.",
+   "difficulty": 2,
+   "refs": [
+    "actors/johnny-depp"
+   ]
+  },
+  {
+   "id": "born-johnny-depp",
+   "kind": "mc",
+   "prompt": "In which year was Johnny Depp born?",
+   "answer": "1963",
+   "wrong": [
+    "1933",
+    "1973",
+    "1993"
+   ],
+   "explain": "Johnny Depp (1963): Played Captain Jack Sparrow.",
+   "difficulty": 3,
+   "refs": [
+    "actors/johnny-depp"
+   ]
+  },
+  {
+   "id": "who-scarlett-johansson",
+   "kind": "mc",
+   "prompt": "Who is this? She played Black Widow in the Marvel films.",
+   "answer": "Scarlett Johansson",
+   "wrong": [
+    "Marlon Brando",
+    "Marilyn Monroe",
+    "Tom Cruise"
+   ],
+   "explain": "Scarlett Johansson (1984): Played Black Widow in the Marvel films.",
+   "difficulty": 2,
+   "refs": [
+    "actors/scarlett-johansson"
+   ]
+  },
+  {
+   "id": "born-scarlett-johansson",
+   "kind": "mc",
+   "prompt": "In which year was Scarlett Johansson born?",
+   "answer": "1984",
+   "wrong": [
+    "2004",
+    "1974",
+    "1964"
+   ],
+   "explain": "Scarlett Johansson (1984): Played Black Widow in the Marvel films.",
+   "difficulty": 3,
+   "refs": [
+    "actors/scarlett-johansson"
+   ]
+  },
+  {
+   "id": "who-robert-downey-jr",
+   "kind": "mc",
+   "prompt": "Who is this? He played Tony Stark, Iron Man.",
+   "answer": "Robert Downey Jr.",
+   "wrong": [
+    "Carrie Fisher",
+    "Dwayne Johnson",
+    "Jackie Chan"
+   ],
+   "explain": "Robert Downey Jr. (1965): Played Tony Stark, Iron Man.",
+   "difficulty": 1,
+   "refs": [
+    "actors/robert-downey-jr"
+   ]
+  },
+  {
+   "id": "born-robert-downey-jr",
+   "kind": "mc",
+   "prompt": "In which year was Robert Downey Jr. born?",
+   "answer": "1965",
+   "wrong": [
+    "1955",
+    "1945",
+    "1935"
+   ],
+   "explain": "Robert Downey Jr. (1965): Played Tony Stark, Iron Man.",
+   "difficulty": 3,
+   "refs": [
+    "actors/robert-downey-jr"
+   ]
+  },
+  {
+   "id": "who-emma-watson",
+   "kind": "mc",
+   "prompt": "Who is this? She played Hermione Granger.",
+   "answer": "Emma Watson",
+   "wrong": [
+    "Chris Pratt",
+    "Robert Downey Jr.",
+    "Tom Hanks"
+   ],
+   "explain": "Emma Watson (1990): Played Hermione Granger.",
+   "difficulty": 1,
+   "refs": [
+    "actors/emma-watson"
+   ]
+  },
+  {
+   "id": "born-emma-watson",
+   "kind": "mc",
+   "prompt": "In which year was Emma Watson born?",
+   "answer": "1990",
+   "wrong": [
+    "2000",
+    "1970",
+    "2010"
+   ],
+   "explain": "Emma Watson (1990): Played Hermione Granger.",
+   "difficulty": 3,
+   "refs": [
+    "actors/emma-watson"
+   ]
+  },
+  {
+   "id": "who-daniel-radcliffe",
+   "kind": "mc",
+   "prompt": "Who is this? He played Harry Potter.",
+   "answer": "Daniel Radcliffe",
+   "wrong": [
+    "Cameron Diaz",
+    "Shirley Temple",
+    "Marilyn Monroe"
+   ],
+   "explain": "Daniel Radcliffe (1989): Played Harry Potter.",
+   "difficulty": 1,
+   "refs": [
+    "actors/daniel-radcliffe"
+   ]
+  },
+  {
+   "id": "born-daniel-radcliffe",
+   "kind": "mc",
+   "prompt": "In which year was Daniel Radcliffe born?",
+   "answer": "1989",
+   "wrong": [
+    "1999",
+    "1969",
+    "2009"
+   ],
+   "explain": "Daniel Radcliffe (1989): Played Harry Potter.",
+   "difficulty": 3,
+   "refs": [
+    "actors/daniel-radcliffe"
+   ]
+  },
+  {
+   "id": "who-keanu-reeves",
+   "kind": "mc",
+   "prompt": "Who is this? He played Neo in The Matrix.",
+   "answer": "Keanu Reeves",
+   "wrong": [
+    "Audrey Hepburn",
+    "Anne Hathaway",
+    "Robert Downey Jr."
+   ],
+   "explain": "Keanu Reeves (1964): Played Neo in The Matrix.",
+   "difficulty": 2,
+   "refs": [
+    "actors/keanu-reeves"
+   ]
+  },
+  {
+   "id": "born-keanu-reeves",
+   "kind": "mc",
+   "prompt": "In which year was Keanu Reeves born?",
+   "answer": "1964",
+   "wrong": [
+    "1984",
+    "1994",
+    "1974"
+   ],
+   "explain": "Keanu Reeves (1964): Played Neo in The Matrix.",
+   "difficulty": 3,
+   "refs": [
+    "actors/keanu-reeves"
+   ]
+  },
+  {
+   "id": "who-harrison-ford",
+   "kind": "mc",
+   "prompt": "Who is this? He played Han Solo in Star Wars.",
+   "answer": "Harrison Ford",
+   "wrong": [
+    "Hugh Jackman",
+    "Jack Black",
+    "Julie Andrews"
+   ],
+   "explain": "Harrison Ford (1942): Played Han Solo in Star Wars.",
+   "difficulty": 1,
+   "refs": [
+    "actors/harrison-ford"
+   ]
+  },
+  {
+   "id": "born-harrison-ford",
+   "kind": "mc",
+   "prompt": "In which year was Harrison Ford born?",
+   "answer": "1942",
+   "wrong": [
+    "1932",
+    "1912",
+    "1962"
+   ],
+   "explain": "Harrison Ford (1942): Played Han Solo in Star Wars.",
+   "difficulty": 3,
+   "refs": [
+    "actors/harrison-ford"
+   ]
+  },
+  {
+   "id": "who-mark-hamill",
+   "kind": "mc",
+   "prompt": "Who is this? He played Luke Skywalker.",
+   "answer": "Mark Hamill",
+   "wrong": [
+    "Julia Roberts",
+    "Whoopi Goldberg",
+    "Jackie Chan"
+   ],
+   "explain": "Mark Hamill (1951): Played Luke Skywalker.",
+   "difficulty": 2,
+   "refs": [
+    "actors/mark-hamill"
+   ]
+  },
+  {
+   "id": "born-mark-hamill",
+   "kind": "mc",
+   "prompt": "In which year was Mark Hamill born?",
+   "answer": "1951",
+   "wrong": [
+    "1961",
+    "1971",
+    "1921"
+   ],
+   "explain": "Mark Hamill (1951): Played Luke Skywalker.",
+   "difficulty": 3,
+   "refs": [
+    "actors/mark-hamill"
+   ]
+  },
+  {
+   "id": "who-carrie-fisher",
+   "kind": "mc",
+   "prompt": "Who is this? She played Princess Leia.",
+   "answer": "Carrie Fisher",
+   "wrong": [
+    "Anne Hathaway",
+    "Jack Black",
+    "Marlon Brando"
+   ],
+   "explain": "Carrie Fisher (1956–2016): Played Princess Leia.",
+   "difficulty": 2,
+   "refs": [
+    "actors/carrie-fisher"
+   ]
+  },
+  {
+   "id": "born-carrie-fisher",
+   "kind": "mc",
+   "prompt": "In which year was Carrie Fisher born?",
+   "answer": "1956",
+   "wrong": [
+    "1976",
+    "1966",
+    "1936"
+   ],
+   "explain": "Carrie Fisher (1956–2016): Played Princess Leia.",
+   "difficulty": 3,
+   "refs": [
+    "actors/carrie-fisher"
+   ]
+  },
+  {
+   "id": "who-sigourney-weaver",
+   "kind": "mc",
+   "prompt": "Who is this? She played Ellen Ripley in Alien.",
+   "answer": "Sigourney Weaver",
+   "wrong": [
+    "Gene Kelly",
+    "Judy Garland",
+    "Jackie Chan"
+   ],
+   "explain": "Sigourney Weaver (1949): Played Ellen Ripley in Alien.",
+   "difficulty": 3,
+   "refs": [
+    "actors/sigourney-weaver"
+   ]
+  },
+  {
+   "id": "born-sigourney-weaver",
+   "kind": "mc",
+   "prompt": "In which year was Sigourney Weaver born?",
+   "answer": "1949",
+   "wrong": [
+    "1919",
+    "1939",
+    "1929"
+   ],
+   "explain": "Sigourney Weaver (1949): Played Ellen Ripley in Alien.",
+   "difficulty": 3,
+   "refs": [
+    "actors/sigourney-weaver"
+   ]
+  },
+  {
+   "id": "who-arnold-schwarzenegger",
+   "kind": "mc",
+   "prompt": "Who is this? He played the Terminator.",
+   "answer": "Arnold Schwarzenegger",
+   "wrong": [
+    "Judi Dench",
+    "Zendaya",
+    "Hugh Jackman"
+   ],
+   "explain": "Arnold Schwarzenegger (1947): Played the Terminator.",
+   "difficulty": 1,
+   "refs": [
+    "actors/arnold-schwarzenegger"
+   ]
+  },
+  {
+   "id": "born-arnold-schwarzenegger",
+   "kind": "mc",
+   "prompt": "In which year was Arnold Schwarzenegger born?",
+   "answer": "1947",
+   "wrong": [
+    "1957",
+    "1917",
+    "1927"
+   ],
+   "explain": "Arnold Schwarzenegger (1947): Played the Terminator.",
+   "difficulty": 3,
+   "refs": [
+    "actors/arnold-schwarzenegger"
+   ]
+  },
+  {
+   "id": "who-sylvester-stallone",
+   "kind": "mc",
+   "prompt": "Who is this? He played the boxer Rocky Balboa.",
+   "answer": "Sylvester Stallone",
+   "wrong": [
+    "Robin Williams",
+    "Samuel L. Jackson",
+    "Dwayne Johnson"
+   ],
+   "explain": "Sylvester Stallone (1946): Played the boxer Rocky Balboa.",
+   "difficulty": 2,
+   "refs": [
+    "actors/sylvester-stallone"
+   ]
+  },
+  {
+   "id": "born-sylvester-stallone",
+   "kind": "mc",
+   "prompt": "In which year was Sylvester Stallone born?",
+   "answer": "1946",
+   "wrong": [
+    "1966",
+    "1916",
+    "1926"
+   ],
+   "explain": "Sylvester Stallone (1946): Played the boxer Rocky Balboa.",
+   "difficulty": 3,
+   "refs": [
+    "actors/sylvester-stallone"
+   ]
+  },
+  {
+   "id": "who-bruce-willis",
+   "kind": "mc",
+   "prompt": "Who is this? He fought terrorists in a skyscraper in Die Hard.",
+   "answer": "Bruce Willis",
+   "wrong": [
+    "Dwayne Johnson",
+    "Gene Kelly",
+    "Mike Myers"
+   ],
+   "explain": "Bruce Willis (1955): Fought terrorists in a skyscraper in Die Hard.",
+   "difficulty": 2,
+   "refs": [
+    "actors/bruce-willis"
+   ]
+  },
+  {
+   "id": "born-bruce-willis",
+   "kind": "mc",
+   "prompt": "In which year was Bruce Willis born?",
+   "answer": "1955",
+   "wrong": [
+    "1965",
+    "1945",
+    "1985"
+   ],
+   "explain": "Bruce Willis (1955): Fought terrorists in a skyscraper in Die Hard.",
+   "difficulty": 3,
+   "refs": [
+    "actors/bruce-willis"
+   ]
+  },
+  {
+   "id": "who-jim-carrey",
+   "kind": "mc",
+   "prompt": "Who is this? He wore a magic green mask.",
+   "answer": "Jim Carrey",
+   "wrong": [
+    "Jack Black",
+    "Bruce Willis",
+    "Denzel Washington"
+   ],
+   "explain": "Jim Carrey (1962): Wore a magic green mask.",
+   "difficulty": 2,
+   "refs": [
+    "actors/jim-carrey"
+   ]
+  },
+  {
+   "id": "born-jim-carrey",
+   "kind": "mc",
+   "prompt": "In which year was Jim Carrey born?",
+   "answer": "1962",
+   "wrong": [
+    "1992",
+    "1972",
+    "1982"
+   ],
+   "explain": "Jim Carrey (1962): Wore a magic green mask.",
+   "difficulty": 3,
+   "refs": [
+    "actors/jim-carrey"
+   ]
+  },
+  {
+   "id": "who-robin-williams",
+   "kind": "mc",
+   "prompt": "Who is this? He voiced the Genie in Aladdin.",
+   "answer": "Robin Williams",
+   "wrong": [
+    "Sandra Bullock",
+    "Michelle Yeoh",
+    "Judi Dench"
+   ],
+   "explain": "Robin Williams (1951–2014): Voiced the Genie in Aladdin.",
+   "difficulty": 1,
+   "refs": [
+    "actors/robin-williams"
+   ]
+  },
+  {
+   "id": "born-robin-williams",
+   "kind": "mc",
+   "prompt": "In which year was Robin Williams born?",
+   "answer": "1951",
+   "wrong": [
+    "1931",
+    "1941",
+    "1971"
+   ],
+   "explain": "Robin Williams (1951–2014): Voiced the Genie in Aladdin.",
+   "difficulty": 3,
+   "refs": [
+    "actors/robin-williams"
+   ]
+  },
+  {
+   "id": "who-eddie-murphy",
+   "kind": "mc",
+   "prompt": "Who is this? He voiced Donkey in Shrek.",
+   "answer": "Eddie Murphy",
+   "wrong": [
+    "Daniel Radcliffe",
+    "Kate Winslet",
+    "Angelina Jolie"
+   ],
+   "explain": "Eddie Murphy (1961): Voiced Donkey in Shrek.",
+   "difficulty": 1,
+   "refs": [
+    "actors/eddie-murphy"
+   ]
+  },
+  {
+   "id": "born-eddie-murphy",
+   "kind": "mc",
+   "prompt": "In which year was Eddie Murphy born?",
+   "answer": "1961",
+   "wrong": [
+    "1971",
+    "1941",
+    "1981"
+   ],
+   "explain": "Eddie Murphy (1961): Voiced Donkey in Shrek.",
+   "difficulty": 3,
+   "refs": [
+    "actors/eddie-murphy"
+   ]
+  },
+  {
+   "id": "who-cameron-diaz",
+   "kind": "mc",
+   "prompt": "Who is this? She voiced Princess Fiona in Shrek.",
+   "answer": "Cameron Diaz",
+   "wrong": [
+    "Whoopi Goldberg",
+    "Zendaya",
+    "Keanu Reeves"
+   ],
+   "explain": "Cameron Diaz (1972): Voiced Princess Fiona in Shrek.",
+   "difficulty": 2,
+   "refs": [
+    "actors/cameron-diaz"
+   ]
+  },
+  {
+   "id": "born-cameron-diaz",
+   "kind": "mc",
+   "prompt": "In which year was Cameron Diaz born?",
+   "answer": "1972",
+   "wrong": [
+    "1942",
+    "1982",
+    "1992"
+   ],
+   "explain": "Cameron Diaz (1972): Voiced Princess Fiona in Shrek.",
+   "difficulty": 3,
+   "refs": [
+    "actors/cameron-diaz"
+   ]
+  },
+  {
+   "id": "who-mike-myers",
+   "kind": "mc",
+   "prompt": "Who is this? He voiced Shrek.",
+   "answer": "Mike Myers",
+   "wrong": [
+    "Morgan Freeman",
+    "Helen Mirren",
+    "Judi Dench"
+   ],
+   "explain": "Mike Myers (1963): Voiced Shrek.",
+   "difficulty": 2,
+   "refs": [
+    "actors/mike-myers"
+   ]
+  },
+  {
+   "id": "born-mike-myers",
+   "kind": "mc",
+   "prompt": "In which year was Mike Myers born?",
+   "answer": "1963",
+   "wrong": [
+    "1993",
+    "1933",
+    "1953"
+   ],
+   "explain": "Mike Myers (1963): Voiced Shrek.",
+   "difficulty": 3,
+   "refs": [
+    "actors/mike-myers"
+   ]
+  },
+  {
+   "id": "who-jack-nicholson",
+   "kind": "mc",
+   "prompt": "Who is this? He starred in The Shining.",
+   "answer": "Jack Nicholson",
+   "wrong": [
+    "Leonardo DiCaprio",
+    "Cate Blanchett",
+    "Emma Stone"
+   ],
+   "explain": "Jack Nicholson (1937): Starred in The Shining.",
+   "difficulty": 3,
+   "refs": [
+    "actors/jack-nicholson"
+   ]
+  },
+  {
+   "id": "born-jack-nicholson",
+   "kind": "mc",
+   "prompt": "In which year was Jack Nicholson born?",
+   "answer": "1937",
+   "wrong": [
+    "1947",
+    "1907",
+    "1967"
+   ],
+   "explain": "Jack Nicholson (1937): Starred in The Shining.",
+   "difficulty": 3,
+   "refs": [
+    "actors/jack-nicholson"
+   ]
+  },
+  {
+   "id": "who-al-pacino",
+   "kind": "mc",
+   "prompt": "Who is this? He played Michael Corleone in The Godfather.",
+   "answer": "Al Pacino",
+   "wrong": [
+    "Hugh Jackman",
+    "Natalie Portman",
+    "Zendaya"
+   ],
+   "explain": "Al Pacino (1940): Played Michael Corleone in The Godfather.",
+   "difficulty": 3,
+   "refs": [
+    "actors/al-pacino"
+   ]
+  },
+  {
+   "id": "born-al-pacino",
+   "kind": "mc",
+   "prompt": "In which year was Al Pacino born?",
+   "answer": "1940",
+   "wrong": [
+    "1950",
+    "1960",
+    "1920"
+   ],
+   "explain": "Al Pacino (1940): Played Michael Corleone in The Godfather.",
+   "difficulty": 3,
+   "refs": [
+    "actors/al-pacino"
+   ]
+  },
+  {
+   "id": "who-robert-de-niro",
+   "kind": "mc",
+   "prompt": "Who is this? He played Travis Bickle in Taxi Driver.",
+   "answer": "Robert De Niro",
+   "wrong": [
+    "Morgan Freeman",
+    "Hugh Grant",
+    "Helen Mirren"
+   ],
+   "explain": "Robert De Niro (1943): Played Travis Bickle in Taxi Driver.",
+   "difficulty": 3,
+   "refs": [
+    "actors/robert-de-niro"
+   ]
+  },
+  {
+   "id": "born-robert-de-niro",
+   "kind": "mc",
+   "prompt": "In which year was Robert De Niro born?",
+   "answer": "1943",
+   "wrong": [
+    "1923",
+    "1913",
+    "1933"
+   ],
+   "explain": "Robert De Niro (1943): Played Travis Bickle in Taxi Driver.",
+   "difficulty": 3,
+   "refs": [
+    "actors/robert-de-niro"
+   ]
+  },
+  {
+   "id": "who-marlon-brando",
+   "kind": "mc",
+   "prompt": "Who is this? He played Vito Corleone in The Godfather.",
+   "answer": "Marlon Brando",
+   "wrong": [
+    "Audrey Hepburn",
+    "Cillian Murphy",
+    "Michelle Yeoh"
+   ],
+   "explain": "Marlon Brando (1924–2004): Played Vito Corleone in The Godfather.",
+   "difficulty": 3,
+   "refs": [
+    "actors/marlon-brando"
+   ]
+  },
+  {
+   "id": "born-marlon-brando",
+   "kind": "mc",
+   "prompt": "In which year was Marlon Brando born?",
+   "answer": "1924",
+   "wrong": [
+    "1934",
+    "1894",
+    "1944"
+   ],
+   "explain": "Marlon Brando (1924–2004): Played Vito Corleone in The Godfather.",
+   "difficulty": 3,
+   "refs": [
+    "actors/marlon-brando"
+   ]
+  },
+  {
+   "id": "who-audrey-hepburn",
+   "kind": "mc",
+   "prompt": "Who is this? She played Holly Golightly in Breakfast at Tiffany's.",
+   "answer": "Audrey Hepburn",
+   "wrong": [
+    "Scarlett Johansson",
+    "Jack Nicholson",
+    "Sylvester Stallone"
+   ],
+   "explain": "Audrey Hepburn (1929–1993): Played Holly Golightly in Breakfast at Tiffany's.",
+   "difficulty": 2,
+   "refs": [
+    "actors/audrey-hepburn"
+   ]
+  },
+  {
+   "id": "born-audrey-hepburn",
+   "kind": "mc",
+   "prompt": "In which year was Audrey Hepburn born?",
+   "answer": "1929",
+   "wrong": [
+    "1959",
+    "1949",
+    "1909"
+   ],
+   "explain": "Audrey Hepburn (1929–1993): Played Holly Golightly in Breakfast at Tiffany's.",
+   "difficulty": 3,
+   "refs": [
+    "actors/audrey-hepburn"
+   ]
+  },
+  {
+   "id": "who-marilyn-monroe",
+   "kind": "mc",
+   "prompt": "Who is this? She sang Diamonds Are a Girl's Best Friend.",
+   "answer": "Marilyn Monroe",
+   "wrong": [
+    "Daniel Radcliffe",
+    "Emma Stone",
+    "Tom Hanks"
+   ],
+   "explain": "Marilyn Monroe (1926–1962): Sang Diamonds Are a Girl's Best Friend.",
+   "difficulty": 2,
+   "refs": [
+    "actors/marilyn-monroe"
+   ]
+  },
+  {
+   "id": "born-marilyn-monroe",
+   "kind": "mc",
+   "prompt": "In which year was Marilyn Monroe born?",
+   "answer": "1926",
+   "wrong": [
+    "1956",
+    "1936",
+    "1916"
+   ],
+   "explain": "Marilyn Monroe (1926–1962): Sang Diamonds Are a Girl's Best Friend.",
+   "difficulty": 3,
+   "refs": [
+    "actors/marilyn-monroe"
+   ]
+  },
+  {
+   "id": "who-humphrey-bogart",
+   "kind": "mc",
+   "prompt": "Who is this? He played Rick in Casablanca.",
+   "answer": "Humphrey Bogart",
+   "wrong": [
+    "Sigourney Weaver",
+    "Clint Eastwood",
+    "Judi Dench"
+   ],
+   "explain": "Humphrey Bogart (1899–1957): Played Rick in Casablanca.",
+   "difficulty": 3,
+   "refs": [
+    "actors/humphrey-bogart"
+   ]
+  },
+  {
+   "id": "born-humphrey-bogart",
+   "kind": "mc",
+   "prompt": "In which year was Humphrey Bogart born?",
+   "answer": "1899",
+   "wrong": [
+    "1929",
+    "1869",
+    "1879"
+   ],
+   "explain": "Humphrey Bogart (1899–1957): Played Rick in Casablanca.",
+   "difficulty": 3,
+   "refs": [
+    "actors/humphrey-bogart"
+   ]
+  },
+  {
+   "id": "who-judy-garland",
+   "kind": "mc",
+   "prompt": "Who is this? She played Dorothy in The Wizard of Oz.",
+   "answer": "Judy Garland",
+   "wrong": [
+    "Benedict Cumberbatch",
+    "Rowan Atkinson",
+    "Morgan Freeman"
+   ],
+   "explain": "Judy Garland (1922–1969): Played Dorothy in The Wizard of Oz.",
+   "difficulty": 2,
+   "refs": [
+    "actors/judy-garland"
+   ]
+  },
+  {
+   "id": "born-judy-garland",
+   "kind": "mc",
+   "prompt": "In which year was Judy Garland born?",
+   "answer": "1922",
+   "wrong": [
+    "1952",
+    "1942",
+    "1892"
+   ],
+   "explain": "Judy Garland (1922–1969): Played Dorothy in The Wizard of Oz.",
+   "difficulty": 3,
+   "refs": [
+    "actors/judy-garland"
+   ]
+  },
+  {
+   "id": "who-julie-andrews",
+   "kind": "mc",
+   "prompt": "Who is this? She played Mary Poppins.",
+   "answer": "Julie Andrews",
+   "wrong": [
+    "Keira Knightley",
+    "Viola Davis",
+    "Bruce Willis"
+   ],
+   "explain": "Julie Andrews (1935): Played Mary Poppins.",
+   "difficulty": 1,
+   "refs": [
+    "actors/julie-andrews"
+   ]
+  },
+  {
+   "id": "born-julie-andrews",
+   "kind": "mc",
+   "prompt": "In which year was Julie Andrews born?",
+   "answer": "1935",
+   "wrong": [
+    "1945",
+    "1955",
+    "1925"
+   ],
+   "explain": "Julie Andrews (1935): Played Mary Poppins.",
+   "difficulty": 3,
+   "refs": [
+    "actors/julie-andrews"
+   ]
+  },
+  {
+   "id": "who-clint-eastwood",
+   "kind": "mc",
+   "prompt": "Who is this? He played Dirty Harry.",
+   "answer": "Clint Eastwood",
+   "wrong": [
+    "Lupita Nyong'o",
+    "Judy Garland",
+    "Denzel Washington"
+   ],
+   "explain": "Clint Eastwood (1930): Played Dirty Harry.",
+   "difficulty": 3,
+   "refs": [
+    "actors/clint-eastwood"
+   ]
+  },
+  {
+   "id": "born-clint-eastwood",
+   "kind": "mc",
+   "prompt": "In which year was Clint Eastwood born?",
+   "answer": "1930",
+   "wrong": [
+    "1920",
+    "1950",
+    "1960"
+   ],
+   "explain": "Clint Eastwood (1930): Played Dirty Harry.",
+   "difficulty": 3,
+   "refs": [
+    "actors/clint-eastwood"
+   ]
+  },
+  {
+   "id": "who-jackie-chan",
+   "kind": "mc",
+   "prompt": "Who is this? He is a martial arts star who does his own stunts.",
+   "answer": "Jackie Chan",
+   "wrong": [
+    "Hugh Jackman",
+    "Judi Dench",
+    "Daniel Craig"
+   ],
+   "explain": "Jackie Chan (1954): A martial arts star who does his own stunts.",
+   "difficulty": 1,
+   "refs": [
+    "actors/jackie-chan"
+   ]
+  },
+  {
+   "id": "born-jackie-chan",
+   "kind": "mc",
+   "prompt": "In which year was Jackie Chan born?",
+   "answer": "1954",
+   "wrong": [
+    "1984",
+    "1974",
+    "1964"
+   ],
+   "explain": "Jackie Chan (1954): A martial arts star who does his own stunts.",
+   "difficulty": 3,
+   "refs": [
+    "actors/jackie-chan"
+   ]
+  },
+  {
+   "id": "who-bruce-lee",
+   "kind": "mc",
+   "prompt": "Who is this? He starred in Enter the Dragon.",
+   "answer": "Bruce Lee",
+   "wrong": [
+    "Jack Black",
+    "Bruce Willis",
+    "Emma Stone"
+   ],
+   "explain": "Bruce Lee (1940–1973): Starred in Enter the Dragon.",
+   "difficulty": 2,
+   "refs": [
+    "actors/bruce-lee"
+   ]
+  },
+  {
+   "id": "born-bruce-lee",
+   "kind": "mc",
+   "prompt": "In which year was Bruce Lee born?",
+   "answer": "1940",
+   "wrong": [
+    "1920",
+    "1970",
+    "1930"
+   ],
+   "explain": "Bruce Lee (1940–1973): Starred in Enter the Dragon.",
+   "difficulty": 3,
+   "refs": [
+    "actors/bruce-lee"
+   ]
+  },
+  {
+   "id": "who-michelle-yeoh",
+   "kind": "mc",
+   "prompt": "Who is this? She was the first Asian woman to win the Best Actress Oscar.",
+   "answer": "Michelle Yeoh",
+   "wrong": [
+    "Cillian Murphy",
+    "Whoopi Goldberg",
+    "Julie Andrews"
+   ],
+   "explain": "Michelle Yeoh (1962): The first Asian woman to win the Best Actress Oscar.",
+   "difficulty": 2,
+   "refs": [
+    "actors/michelle-yeoh"
+   ]
+  },
+  {
+   "id": "born-michelle-yeoh",
+   "kind": "mc",
+   "prompt": "In which year was Michelle Yeoh born?",
+   "answer": "1962",
+   "wrong": [
+    "1942",
+    "1982",
+    "1972"
+   ],
+   "explain": "Michelle Yeoh (1962): The first Asian woman to win the Best Actress Oscar.",
+   "difficulty": 3,
+   "refs": [
+    "actors/michelle-yeoh"
+   ]
+  },
+  {
+   "id": "who-tom-holland",
+   "kind": "mc",
+   "prompt": "Who is this? He played Spider-Man in the Marvel films.",
+   "answer": "Tom Holland",
+   "wrong": [
+    "Daniel Radcliffe",
+    "Julie Andrews",
+    "Lupita Nyong'o"
+   ],
+   "explain": "Tom Holland (1996): Played Spider-Man in the Marvel films.",
+   "difficulty": 1,
+   "refs": [
+    "actors/tom-holland"
+   ]
+  },
+  {
+   "id": "born-tom-holland",
+   "kind": "mc",
+   "prompt": "In which year was Tom Holland born?",
+   "answer": "1996",
+   "wrong": [
+    "1986",
+    "2006",
+    "1976"
+   ],
+   "explain": "Tom Holland (1996): Played Spider-Man in the Marvel films.",
+   "difficulty": 3,
+   "refs": [
+    "actors/tom-holland"
+   ]
+  },
+  {
+   "id": "who-zendaya",
+   "kind": "mc",
+   "prompt": "Who is this? She played MJ in the Spider-Man films.",
+   "answer": "Zendaya",
+   "wrong": [
+    "Ian McKellen",
+    "Cate Blanchett",
+    "Marlon Brando"
+   ],
+   "explain": "Zendaya (1996): Played MJ in the Spider-Man films.",
+   "difficulty": 2,
+   "refs": [
+    "actors/zendaya"
+   ]
+  },
+  {
+   "id": "born-zendaya",
+   "kind": "mc",
+   "prompt": "In which year was Zendaya born?",
+   "answer": "1996",
+   "wrong": [
+    "1976",
+    "1966",
+    "2006"
+   ],
+   "explain": "Zendaya (1996): Played MJ in the Spider-Man films.",
+   "difficulty": 3,
+   "refs": [
+    "actors/zendaya"
+   ]
+  },
+  {
+   "id": "who-timothee-chalamet",
+   "kind": "mc",
+   "prompt": "Who is this? He played the young Willy Wonka.",
+   "answer": "Timothée Chalamet",
+   "wrong": [
+    "Judi Dench",
+    "Cameron Diaz",
+    "Elijah Wood"
+   ],
+   "explain": "Timothée Chalamet (1995): Played the young Willy Wonka.",
+   "difficulty": 2,
+   "refs": [
+    "actors/timothee-chalamet"
+   ]
+  },
+  {
+   "id": "born-timothee-chalamet",
+   "kind": "mc",
+   "prompt": "In which year was Timothée Chalamet born?",
+   "answer": "1995",
+   "wrong": [
+    "1975",
+    "2005",
+    "1965"
+   ],
+   "explain": "Timothée Chalamet (1995): Played the young Willy Wonka.",
+   "difficulty": 3,
+   "refs": [
+    "actors/timothee-chalamet"
+   ]
+  },
+  {
+   "id": "who-margot-robbie",
+   "kind": "mc",
+   "prompt": "Who is this? She played Barbie in 2023.",
+   "answer": "Margot Robbie",
+   "wrong": [
+    "Marlon Brando",
+    "Hugh Grant",
+    "Fred Astaire"
+   ],
+   "explain": "Margot Robbie (1990): Played Barbie in 2023.",
+   "difficulty": 1,
+   "refs": [
+    "actors/margot-robbie"
+   ]
+  },
+  {
+   "id": "born-margot-robbie",
+   "kind": "mc",
+   "prompt": "In which year was Margot Robbie born?",
+   "answer": "1990",
+   "wrong": [
+    "1980",
+    "1970",
+    "2000"
+   ],
+   "explain": "Margot Robbie (1990): Played Barbie in 2023.",
+   "difficulty": 3,
+   "refs": [
+    "actors/margot-robbie"
+   ]
+  },
+  {
+   "id": "who-ryan-gosling",
+   "kind": "mc",
+   "prompt": "Who is this? He played Ken in Barbie.",
+   "answer": "Ryan Gosling",
+   "wrong": [
+    "Shirley Temple",
+    "Sandra Bullock",
+    "Jim Carrey"
+   ],
+   "explain": "Ryan Gosling (1980): Played Ken in Barbie.",
+   "difficulty": 2,
+   "refs": [
+    "actors/ryan-gosling"
+   ]
+  },
+  {
+   "id": "born-ryan-gosling",
+   "kind": "mc",
+   "prompt": "In which year was Ryan Gosling born?",
+   "answer": "1980",
+   "wrong": [
+    "2010",
+    "1960",
+    "1990"
+   ],
+   "explain": "Ryan Gosling (1980): Played Ken in Barbie.",
+   "difficulty": 3,
+   "refs": [
+    "actors/ryan-gosling"
+   ]
+  },
+  {
+   "id": "who-emma-stone",
+   "kind": "mc",
+   "prompt": "Who is this? She played an aspiring actress in La La Land.",
+   "answer": "Emma Stone",
+   "wrong": [
+    "Chris Hemsworth",
+    "Rowan Atkinson",
+    "Leonardo DiCaprio"
+   ],
+   "explain": "Emma Stone (1988): Played an aspiring actress in La La Land.",
+   "difficulty": 2,
+   "refs": [
+    "actors/emma-stone"
+   ]
+  },
+  {
+   "id": "born-emma-stone",
+   "kind": "mc",
+   "prompt": "In which year was Emma Stone born?",
+   "answer": "1988",
+   "wrong": [
+    "1968",
+    "1978",
+    "1998"
+   ],
+   "explain": "Emma Stone (1988): Played an aspiring actress in La La Land.",
+   "difficulty": 3,
+   "refs": [
+    "actors/emma-stone"
+   ]
+  },
+  {
+   "id": "who-jennifer-lawrence",
+   "kind": "mc",
+   "prompt": "Who is this? She played Katniss Everdeen.",
+   "answer": "Jennifer Lawrence",
+   "wrong": [
+    "Chris Hemsworth",
+    "Arnold Schwarzenegger",
+    "Sandra Bullock"
+   ],
+   "explain": "Jennifer Lawrence (1990): Played Katniss Everdeen.",
+   "difficulty": 2,
+   "refs": [
+    "actors/jennifer-lawrence"
+   ]
+  },
+  {
+   "id": "born-jennifer-lawrence",
+   "kind": "mc",
+   "prompt": "In which year was Jennifer Lawrence born?",
+   "answer": "1990",
+   "wrong": [
+    "1960",
+    "1980",
+    "2000"
+   ],
+   "explain": "Jennifer Lawrence (1990): Played Katniss Everdeen.",
+   "difficulty": 3,
+   "refs": [
+    "actors/jennifer-lawrence"
+   ]
+  },
+  {
+   "id": "who-chris-hemsworth",
+   "kind": "mc",
+   "prompt": "Who is this? He plays the thunder god Thor.",
+   "answer": "Chris Hemsworth",
+   "wrong": [
+    "Al Pacino",
+    "Brad Pitt",
+    "Samuel L. Jackson"
+   ],
+   "explain": "Chris Hemsworth (1983): Plays the thunder god Thor.",
+   "difficulty": 1,
+   "refs": [
+    "actors/chris-hemsworth"
+   ]
+  },
+  {
+   "id": "born-chris-hemsworth",
+   "kind": "mc",
+   "prompt": "In which year was Chris Hemsworth born?",
+   "answer": "1983",
+   "wrong": [
+    "1953",
+    "1963",
+    "1973"
+   ],
+   "explain": "Chris Hemsworth (1983): Plays the thunder god Thor.",
+   "difficulty": 3,
+   "refs": [
+    "actors/chris-hemsworth"
+   ]
+  },
+  {
+   "id": "who-chris-pratt",
+   "kind": "mc",
+   "prompt": "Who is this? He voiced Mario in The Super Mario Bros. Movie.",
+   "answer": "Chris Pratt",
+   "wrong": [
+    "Paul Newman",
+    "Viola Davis",
+    "Emma Thompson"
+   ],
+   "explain": "Chris Pratt (1979): Voiced Mario in The Super Mario Bros. Movie.",
+   "difficulty": 1,
+   "refs": [
+    "actors/chris-pratt"
+   ]
+  },
+  {
+   "id": "born-chris-pratt",
+   "kind": "mc",
+   "prompt": "In which year was Chris Pratt born?",
+   "answer": "1979",
+   "wrong": [
+    "1999",
+    "2009",
+    "1959"
+   ],
+   "explain": "Chris Pratt (1979): Voiced Mario in The Super Mario Bros. Movie.",
+   "difficulty": 3,
+   "refs": [
+    "actors/chris-pratt"
+   ]
+  },
+  {
+   "id": "who-dwayne-johnson",
+   "kind": "mc",
+   "prompt": "Who is this? He voiced the demigod Maui in Moana.",
+   "answer": "Dwayne Johnson",
+   "wrong": [
+    "Daniel Craig",
+    "Carrie Fisher",
+    "Emma Watson"
+   ],
+   "explain": "Dwayne Johnson (1972): Voiced the demigod Maui in Moana.",
+   "difficulty": 1,
+   "refs": [
+    "actors/dwayne-johnson"
+   ]
+  },
+  {
+   "id": "born-dwayne-johnson",
+   "kind": "mc",
+   "prompt": "In which year was Dwayne Johnson born?",
+   "answer": "1972",
+   "wrong": [
+    "1962",
+    "1992",
+    "1982"
+   ],
+   "explain": "Dwayne Johnson (1972): Voiced the demigod Maui in Moana.",
+   "difficulty": 3,
+   "refs": [
+    "actors/dwayne-johnson"
+   ]
+  },
+  {
+   "id": "who-hugh-jackman",
+   "kind": "mc",
+   "prompt": "Who is this? He played Wolverine.",
+   "answer": "Hugh Jackman",
+   "wrong": [
+    "Scarlett Johansson",
+    "Margot Robbie",
+    "Sandra Bullock"
+   ],
+   "explain": "Hugh Jackman (1968): Played Wolverine.",
+   "difficulty": 2,
+   "refs": [
+    "actors/hugh-jackman"
+   ]
+  },
+  {
+   "id": "born-hugh-jackman",
+   "kind": "mc",
+   "prompt": "In which year was Hugh Jackman born?",
+   "answer": "1968",
+   "wrong": [
+    "1938",
+    "1988",
+    "1948"
+   ],
+   "explain": "Hugh Jackman (1968): Played Wolverine.",
+   "difficulty": 3,
+   "refs": [
+    "actors/hugh-jackman"
+   ]
+  },
+  {
+   "id": "who-ian-mckellen",
+   "kind": "mc",
+   "prompt": "Who is this? He played Gandalf.",
+   "answer": "Ian McKellen",
+   "wrong": [
+    "Marilyn Monroe",
+    "Rowan Atkinson",
+    "Sigourney Weaver"
+   ],
+   "explain": "Ian McKellen (1939): Played Gandalf.",
+   "difficulty": 2,
+   "refs": [
+    "actors/ian-mckellen"
+   ]
+  },
+  {
+   "id": "born-ian-mckellen",
+   "kind": "mc",
+   "prompt": "In which year was Ian McKellen born?",
+   "answer": "1939",
+   "wrong": [
+    "1949",
+    "1969",
+    "1929"
+   ],
+   "explain": "Ian McKellen (1939): Played Gandalf.",
+   "difficulty": 3,
+   "refs": [
+    "actors/ian-mckellen"
+   ]
+  },
+  {
+   "id": "who-cate-blanchett",
+   "kind": "mc",
+   "prompt": "Who is this? She played the elf queen Galadriel.",
+   "answer": "Cate Blanchett",
+   "wrong": [
+    "Leonardo DiCaprio",
+    "Margot Robbie",
+    "Daniel Craig"
+   ],
+   "explain": "Cate Blanchett (1969): Played the elf queen Galadriel.",
+   "difficulty": 3,
+   "refs": [
+    "actors/cate-blanchett"
+   ]
+  },
+  {
+   "id": "born-cate-blanchett",
+   "kind": "mc",
+   "prompt": "In which year was Cate Blanchett born?",
+   "answer": "1969",
+   "wrong": [
+    "1979",
+    "1989",
+    "1939"
+   ],
+   "explain": "Cate Blanchett (1969): Played the elf queen Galadriel.",
+   "difficulty": 3,
+   "refs": [
+    "actors/cate-blanchett"
+   ]
+  },
+  {
+   "id": "who-anthony-hopkins",
+   "kind": "mc",
+   "prompt": "Who is this? He played Hannibal Lecter.",
+   "answer": "Anthony Hopkins",
+   "wrong": [
+    "Lupita Nyong'o",
+    "Helen Mirren",
+    "Mike Myers"
+   ],
+   "explain": "Anthony Hopkins (1937): Played Hannibal Lecter.",
+   "difficulty": 2,
+   "refs": [
+    "actors/anthony-hopkins"
+   ]
+  },
+  {
+   "id": "born-anthony-hopkins",
+   "kind": "mc",
+   "prompt": "In which year was Anthony Hopkins born?",
+   "answer": "1937",
+   "wrong": [
+    "1947",
+    "1967",
+    "1907"
+   ],
+   "explain": "Anthony Hopkins (1937): Played Hannibal Lecter.",
+   "difficulty": 3,
+   "refs": [
+    "actors/anthony-hopkins"
+   ]
+  },
+  {
+   "id": "who-helen-mirren",
+   "kind": "mc",
+   "prompt": "Who is this? She won an Oscar for The Queen.",
+   "answer": "Helen Mirren",
+   "wrong": [
+    "Zendaya",
+    "Tom Cruise",
+    "Robin Williams"
+   ],
+   "explain": "Helen Mirren (1945): Won an Oscar for The Queen.",
+   "difficulty": 3,
+   "refs": [
+    "actors/helen-mirren"
+   ]
+  },
+  {
+   "id": "born-helen-mirren",
+   "kind": "mc",
+   "prompt": "In which year was Helen Mirren born?",
+   "answer": "1945",
+   "wrong": [
+    "1915",
+    "1935",
+    "1955"
+   ],
+   "explain": "Helen Mirren (1945): Won an Oscar for The Queen.",
+   "difficulty": 3,
+   "refs": [
+    "actors/helen-mirren"
+   ]
+  },
+  {
+   "id": "who-judi-dench",
+   "kind": "mc",
+   "prompt": "Who is this? She played M in the James Bond films.",
+   "answer": "Judi Dench",
+   "wrong": [
+    "Audrey Hepburn",
+    "Eddie Murphy",
+    "Daniel Craig"
+   ],
+   "explain": "Judi Dench (1934): Played M in the James Bond films.",
+   "difficulty": 2,
+   "refs": [
+    "actors/judi-dench"
+   ]
+  },
+  {
+   "id": "born-judi-dench",
+   "kind": "mc",
+   "prompt": "In which year was Judi Dench born?",
+   "answer": "1934",
+   "wrong": [
+    "1954",
+    "1964",
+    "1904"
+   ],
+   "explain": "Judi Dench (1934): Played M in the James Bond films.",
+   "difficulty": 3,
+   "refs": [
+    "actors/judi-dench"
+   ]
+  },
+  {
+   "id": "who-daniel-craig",
+   "kind": "mc",
+   "prompt": "Who is this? He played James Bond from 2006 to 2021.",
+   "answer": "Daniel Craig",
+   "wrong": [
+    "Jack Nicholson",
+    "Samuel L. Jackson",
+    "Gal Gadot"
+   ],
+   "explain": "Daniel Craig (1968): Played James Bond from 2006 to 2021.",
+   "difficulty": 2,
+   "refs": [
+    "actors/daniel-craig"
+   ]
+  },
+  {
+   "id": "born-daniel-craig",
+   "kind": "mc",
+   "prompt": "In which year was Daniel Craig born?",
+   "answer": "1968",
+   "wrong": [
+    "1978",
+    "1948",
+    "1938"
+   ],
+   "explain": "Daniel Craig (1968): Played James Bond from 2006 to 2021.",
+   "difficulty": 3,
+   "refs": [
+    "actors/daniel-craig"
+   ]
+  },
+  {
+   "id": "who-sean-connery",
+   "kind": "mc",
+   "prompt": "Who is this? He was the first actor to play James Bond in a film.",
+   "answer": "Sean Connery",
+   "wrong": [
+    "Samuel L. Jackson",
+    "Julia Roberts",
+    "Elijah Wood"
+   ],
+   "explain": "Sean Connery (1930–2020): The first actor to play James Bond in a film.",
+   "difficulty": 2,
+   "refs": [
+    "actors/sean-connery"
+   ]
+  },
+  {
+   "id": "born-sean-connery",
+   "kind": "mc",
+   "prompt": "In which year was Sean Connery born?",
+   "answer": "1930",
+   "wrong": [
+    "1940",
+    "1960",
+    "1950"
+   ],
+   "explain": "Sean Connery (1930–2020): The first actor to play James Bond in a film.",
+   "difficulty": 3,
+   "refs": [
+    "actors/sean-connery"
+   ]
+  },
+  {
+   "id": "who-kate-winslet",
+   "kind": "mc",
+   "prompt": "Who is this? She played Rose in Titanic.",
+   "answer": "Kate Winslet",
+   "wrong": [
+    "Daniel Craig",
+    "Cillian Murphy",
+    "Clint Eastwood"
+   ],
+   "explain": "Kate Winslet (1975): Played Rose in Titanic.",
+   "difficulty": 2,
+   "refs": [
+    "actors/kate-winslet"
+   ]
+  },
+  {
+   "id": "born-kate-winslet",
+   "kind": "mc",
+   "prompt": "In which year was Kate Winslet born?",
+   "answer": "1975",
+   "wrong": [
+    "1995",
+    "1955",
+    "1965"
+   ],
+   "explain": "Kate Winslet (1975): Played Rose in Titanic.",
+   "difficulty": 3,
+   "refs": [
+    "actors/kate-winslet"
+   ]
+  },
+  {
+   "id": "who-nicole-kidman",
+   "kind": "mc",
+   "prompt": "Who is this? She starred in Moulin Rouge!.",
+   "answer": "Nicole Kidman",
+   "wrong": [
+    "Audrey Hepburn",
+    "Marilyn Monroe",
+    "Shirley Temple"
+   ],
+   "explain": "Nicole Kidman (1967): Starred in Moulin Rouge!.",
+   "difficulty": 3,
+   "refs": [
+    "actors/nicole-kidman"
+   ]
+  },
+  {
+   "id": "born-nicole-kidman",
+   "kind": "mc",
+   "prompt": "In which year was Nicole Kidman born?",
+   "answer": "1967",
+   "wrong": [
+    "1977",
+    "1987",
+    "1957"
+   ],
+   "explain": "Nicole Kidman (1967): Starred in Moulin Rouge!.",
+   "difficulty": 3,
+   "refs": [
+    "actors/nicole-kidman"
+   ]
+  },
+  {
+   "id": "who-natalie-portman",
+   "kind": "mc",
+   "prompt": "Who is this? She played Padmé Amidala in Star Wars.",
+   "answer": "Natalie Portman",
+   "wrong": [
+    "Bruce Willis",
+    "Daniel Radcliffe",
+    "Angelina Jolie"
+   ],
+   "explain": "Natalie Portman (1981): Played Padmé Amidala in Star Wars.",
+   "difficulty": 2,
+   "refs": [
+    "actors/natalie-portman"
+   ]
+  },
+  {
+   "id": "born-natalie-portman",
+   "kind": "mc",
+   "prompt": "In which year was Natalie Portman born?",
+   "answer": "1981",
+   "wrong": [
+    "1961",
+    "1991",
+    "1951"
+   ],
+   "explain": "Natalie Portman (1981): Played Padmé Amidala in Star Wars.",
+   "difficulty": 3,
+   "refs": [
+    "actors/natalie-portman"
+   ]
+  },
+  {
+   "id": "who-anne-hathaway",
+   "kind": "mc",
+   "prompt": "Who is this? She played Mia in The Princess Diaries.",
+   "answer": "Anne Hathaway",
+   "wrong": [
+    "Nicole Kidman",
+    "Johnny Depp",
+    "Margot Robbie"
+   ],
+   "explain": "Anne Hathaway (1982): Played Mia in The Princess Diaries.",
+   "difficulty": 2,
+   "refs": [
+    "actors/anne-hathaway"
+   ]
+  },
+  {
+   "id": "born-anne-hathaway",
+   "kind": "mc",
+   "prompt": "In which year was Anne Hathaway born?",
+   "answer": "1982",
+   "wrong": [
+    "1972",
+    "1992",
+    "2002"
+   ],
+   "explain": "Anne Hathaway (1982): Played Mia in The Princess Diaries.",
+   "difficulty": 3,
+   "refs": [
+    "actors/anne-hathaway"
+   ]
+  },
+  {
+   "id": "who-sandra-bullock",
+   "kind": "mc",
+   "prompt": "Who is this? She played an astronaut stranded in space in Gravity.",
+   "answer": "Sandra Bullock",
+   "wrong": [
+    "Leonardo DiCaprio",
+    "Brad Pitt",
+    "Lupita Nyong'o"
+   ],
+   "explain": "Sandra Bullock (1964): Played an astronaut stranded in space in Gravity.",
+   "difficulty": 2,
+   "refs": [
+    "actors/sandra-bullock"
+   ]
+  },
+  {
+   "id": "born-sandra-bullock",
+   "kind": "mc",
+   "prompt": "In which year was Sandra Bullock born?",
+   "answer": "1964",
+   "wrong": [
+    "1974",
+    "1994",
+    "1984"
+   ],
+   "explain": "Sandra Bullock (1964): Played an astronaut stranded in space in Gravity.",
+   "difficulty": 3,
+   "refs": [
+    "actors/sandra-bullock"
+   ]
+  },
+  {
+   "id": "who-whoopi-goldberg",
+   "kind": "mc",
+   "prompt": "Who is this? She won an Oscar for Ghost.",
+   "answer": "Whoopi Goldberg",
+   "wrong": [
+    "Sylvester Stallone",
+    "Bruce Willis",
+    "Gene Kelly"
+   ],
+   "explain": "Whoopi Goldberg (1955): Won an Oscar for Ghost.",
+   "difficulty": 2,
+   "refs": [
+    "actors/whoopi-goldberg"
+   ]
+  },
+  {
+   "id": "born-whoopi-goldberg",
+   "kind": "mc",
+   "prompt": "In which year was Whoopi Goldberg born?",
+   "answer": "1955",
+   "wrong": [
+    "1925",
+    "1935",
+    "1965"
+   ],
+   "explain": "Whoopi Goldberg (1955): Won an Oscar for Ghost.",
+   "difficulty": 3,
+   "refs": [
+    "actors/whoopi-goldberg"
+   ]
+  },
+  {
+   "id": "who-samuel-l-jackson",
+   "kind": "mc",
+   "prompt": "Who is this? He plays Nick Fury in the Marvel films.",
+   "answer": "Samuel L. Jackson",
+   "wrong": [
+    "Emma Watson",
+    "Elijah Wood",
+    "Idris Elba"
+   ],
+   "explain": "Samuel L. Jackson (1948): Plays Nick Fury in the Marvel films.",
+   "difficulty": 2,
+   "refs": [
+    "actors/samuel-l-jackson"
+   ]
+  },
+  {
+   "id": "born-samuel-l-jackson",
+   "kind": "mc",
+   "prompt": "In which year was Samuel L. Jackson born?",
+   "answer": "1948",
+   "wrong": [
+    "1978",
+    "1958",
+    "1968"
+   ],
+   "explain": "Samuel L. Jackson (1948): Plays Nick Fury in the Marvel films.",
+   "difficulty": 3,
+   "refs": [
+    "actors/samuel-l-jackson"
+   ]
+  },
+  {
+   "id": "who-viola-davis",
+   "kind": "mc",
+   "prompt": "Who is this? She won an Oscar for Fences.",
+   "answer": "Viola Davis",
+   "wrong": [
+    "Paul Newman",
+    "Robert Downey Jr.",
+    "Brad Pitt"
+   ],
+   "explain": "Viola Davis (1965): Won an Oscar for Fences.",
+   "difficulty": 3,
+   "refs": [
+    "actors/viola-davis"
+   ]
+  },
+  {
+   "id": "born-viola-davis",
+   "kind": "mc",
+   "prompt": "In which year was Viola Davis born?",
+   "answer": "1965",
+   "wrong": [
+    "1945",
+    "1995",
+    "1975"
+   ],
+   "explain": "Viola Davis (1965): Won an Oscar for Fences.",
+   "difficulty": 3,
+   "refs": [
+    "actors/viola-davis"
+   ]
+  },
+  {
+   "id": "who-lupita-nyong-o",
+   "kind": "mc",
+   "prompt": "Who is this? She won an Oscar for her first feature film role.",
+   "answer": "Lupita Nyong'o",
+   "wrong": [
+    "Harrison Ford",
+    "Bruce Willis",
+    "Al Pacino"
+   ],
+   "explain": "Lupita Nyong'o (1983): Won an Oscar for her first feature film role.",
+   "difficulty": 3,
+   "refs": [
+    "actors/lupita-nyong-o"
+   ]
+  },
+  {
+   "id": "born-lupita-nyong-o",
+   "kind": "mc",
+   "prompt": "In which year was Lupita Nyong'o born?",
+   "answer": "1983",
+   "wrong": [
+    "1963",
+    "1973",
+    "1993"
+   ],
+   "explain": "Lupita Nyong'o (1983): Won an Oscar for her first feature film role.",
+   "difficulty": 3,
+   "refs": [
+    "actors/lupita-nyong-o"
+   ]
+  },
+  {
+   "id": "who-idris-elba",
+   "kind": "mc",
+   "prompt": "Who is this? He played Nelson Mandela in Long Walk to Freedom.",
+   "answer": "Idris Elba",
+   "wrong": [
+    "Margot Robbie",
+    "Keanu Reeves",
+    "Orlando Bloom"
+   ],
+   "explain": "Idris Elba (1972): Played Nelson Mandela in Long Walk to Freedom.",
+   "difficulty": 3,
+   "refs": [
+    "actors/idris-elba"
+   ]
+  },
+  {
+   "id": "born-idris-elba",
+   "kind": "mc",
+   "prompt": "In which year was Idris Elba born?",
+   "answer": "1972",
+   "wrong": [
+    "1942",
+    "1952",
+    "1982"
+   ],
+   "explain": "Idris Elba (1972): Played Nelson Mandela in Long Walk to Freedom.",
+   "difficulty": 3,
+   "refs": [
+    "actors/idris-elba"
+   ]
+  },
+  {
+   "id": "who-benedict-cumberbatch",
+   "kind": "mc",
+   "prompt": "Who is this? He plays Doctor Strange.",
+   "answer": "Benedict Cumberbatch",
+   "wrong": [
+    "Tom Cruise",
+    "Paul Newman",
+    "Jack Black"
+   ],
+   "explain": "Benedict Cumberbatch (1976): Plays Doctor Strange.",
+   "difficulty": 2,
+   "refs": [
+    "actors/benedict-cumberbatch"
+   ]
+  },
+  {
+   "id": "born-benedict-cumberbatch",
+   "kind": "mc",
+   "prompt": "In which year was Benedict Cumberbatch born?",
+   "answer": "1976",
+   "wrong": [
+    "1986",
+    "1996",
+    "2006"
+   ],
+   "explain": "Benedict Cumberbatch (1976): Plays Doctor Strange.",
+   "difficulty": 3,
+   "refs": [
+    "actors/benedict-cumberbatch"
+   ]
+  },
+  {
+   "id": "who-gal-gadot",
+   "kind": "mc",
+   "prompt": "Who is this? She played Wonder Woman.",
+   "answer": "Gal Gadot",
+   "wrong": [
+    "Chris Hemsworth",
+    "Bruce Lee",
+    "Sandra Bullock"
+   ],
+   "explain": "Gal Gadot (1985): Played Wonder Woman.",
+   "difficulty": 2,
+   "refs": [
+    "actors/gal-gadot"
+   ]
+  },
+  {
+   "id": "born-gal-gadot",
+   "kind": "mc",
+   "prompt": "In which year was Gal Gadot born?",
+   "answer": "1985",
+   "wrong": [
+    "1995",
+    "1965",
+    "1975"
+   ],
+   "explain": "Gal Gadot (1985): Played Wonder Woman.",
+   "difficulty": 3,
+   "refs": [
+    "actors/gal-gadot"
+   ]
+  },
+  {
+   "id": "who-keira-knightley",
+   "kind": "mc",
+   "prompt": "Who is this? She played Elizabeth Swann in Pirates of the Caribbean.",
+   "answer": "Keira Knightley",
+   "wrong": [
+    "Gene Kelly",
+    "Judy Garland",
+    "Lupita Nyong'o"
+   ],
+   "explain": "Keira Knightley (1985): Played Elizabeth Swann in Pirates of the Caribbean.",
+   "difficulty": 2,
+   "refs": [
+    "actors/keira-knightley"
+   ]
+  },
+  {
+   "id": "born-keira-knightley",
+   "kind": "mc",
+   "prompt": "In which year was Keira Knightley born?",
+   "answer": "1985",
+   "wrong": [
+    "1965",
+    "1995",
+    "1955"
+   ],
+   "explain": "Keira Knightley (1985): Played Elizabeth Swann in Pirates of the Caribbean.",
+   "difficulty": 3,
+   "refs": [
+    "actors/keira-knightley"
+   ]
+  },
+  {
+   "id": "who-orlando-bloom",
+   "kind": "mc",
+   "prompt": "Who is this? He played the elf Legolas.",
+   "answer": "Orlando Bloom",
+   "wrong": [
+    "Whoopi Goldberg",
+    "Gal Gadot",
+    "Jackie Chan"
+   ],
+   "explain": "Orlando Bloom (1977): Played the elf Legolas.",
+   "difficulty": 2,
+   "refs": [
+    "actors/orlando-bloom"
+   ]
+  },
+  {
+   "id": "born-orlando-bloom",
+   "kind": "mc",
+   "prompt": "In which year was Orlando Bloom born?",
+   "answer": "1977",
+   "wrong": [
+    "1997",
+    "1967",
+    "1957"
+   ],
+   "explain": "Orlando Bloom (1977): Played the elf Legolas.",
+   "difficulty": 3,
+   "refs": [
+    "actors/orlando-bloom"
+   ]
+  },
+  {
+   "id": "who-elijah-wood",
+   "kind": "mc",
+   "prompt": "Who is this? He played the hobbit Frodo Baggins.",
+   "answer": "Elijah Wood",
+   "wrong": [
+    "Brad Pitt",
+    "Keira Knightley",
+    "Will Smith"
+   ],
+   "explain": "Elijah Wood (1981): Played the hobbit Frodo Baggins.",
+   "difficulty": 2,
+   "refs": [
+    "actors/elijah-wood"
+   ]
+  },
+  {
+   "id": "born-elijah-wood",
+   "kind": "mc",
+   "prompt": "In which year was Elijah Wood born?",
+   "answer": "1981",
+   "wrong": [
+    "1961",
+    "1991",
+    "2001"
+   ],
+   "explain": "Elijah Wood (1981): Played the hobbit Frodo Baggins.",
+   "difficulty": 3,
+   "refs": [
+    "actors/elijah-wood"
+   ]
+  },
+  {
+   "id": "who-rowan-atkinson",
+   "kind": "mc",
+   "prompt": "Who is this? He plays Mr. Bean.",
+   "answer": "Rowan Atkinson",
+   "wrong": [
+    "Scarlett Johansson",
+    "Whoopi Goldberg",
+    "Michelle Yeoh"
+   ],
+   "explain": "Rowan Atkinson (1955): Plays Mr. Bean.",
+   "difficulty": 1,
+   "refs": [
+    "actors/rowan-atkinson"
+   ]
+  },
+  {
+   "id": "born-rowan-atkinson",
+   "kind": "mc",
+   "prompt": "In which year was Rowan Atkinson born?",
+   "answer": "1955",
+   "wrong": [
+    "1965",
+    "1925",
+    "1935"
+   ],
+   "explain": "Rowan Atkinson (1955): Plays Mr. Bean.",
+   "difficulty": 3,
+   "refs": [
+    "actors/rowan-atkinson"
+   ]
+  },
+  {
+   "id": "who-hugh-grant",
+   "kind": "mc",
+   "prompt": "Who is this? He starred in Four Weddings and a Funeral.",
+   "answer": "Hugh Grant",
+   "wrong": [
+    "Jackie Chan",
+    "Anne Hathaway",
+    "Viola Davis"
+   ],
+   "explain": "Hugh Grant (1960): Starred in Four Weddings and a Funeral.",
+   "difficulty": 3,
+   "refs": [
+    "actors/hugh-grant"
+   ]
+  },
+  {
+   "id": "born-hugh-grant",
+   "kind": "mc",
+   "prompt": "In which year was Hugh Grant born?",
+   "answer": "1960",
+   "wrong": [
+    "1980",
+    "1970",
+    "1990"
+   ],
+   "explain": "Hugh Grant (1960): Starred in Four Weddings and a Funeral.",
+   "difficulty": 3,
+   "refs": [
+    "actors/hugh-grant"
+   ]
+  },
+  {
+   "id": "who-emma-thompson",
+   "kind": "mc",
+   "prompt": "Who is this? She played Nanny McPhee.",
+   "answer": "Emma Thompson",
+   "wrong": [
+    "Anne Hathaway",
+    "Gene Kelly",
+    "Sandra Bullock"
+   ],
+   "explain": "Emma Thompson (1959): Played Nanny McPhee.",
+   "difficulty": 3,
+   "refs": [
+    "actors/emma-thompson"
+   ]
+  },
+  {
+   "id": "born-emma-thompson",
+   "kind": "mc",
+   "prompt": "In which year was Emma Thompson born?",
+   "answer": "1959",
+   "wrong": [
+    "1939",
+    "1949",
+    "1929"
+   ],
+   "explain": "Emma Thompson (1959): Played Nanny McPhee.",
+   "difficulty": 3,
+   "refs": [
+    "actors/emma-thompson"
+   ]
+  },
+  {
+   "id": "who-shirley-temple",
+   "kind": "mc",
+   "prompt": "Who is this? She was the biggest child star of the 1930s.",
+   "answer": "Shirley Temple",
+   "wrong": [
+    "Idris Elba",
+    "Robert De Niro",
+    "Judi Dench"
+   ],
+   "explain": "Shirley Temple (1928–2014): The biggest child star of the 1930s.",
+   "difficulty": 3,
+   "refs": [
+    "actors/shirley-temple"
+   ]
+  },
+  {
+   "id": "born-shirley-temple",
+   "kind": "mc",
+   "prompt": "In which year was Shirley Temple born?",
+   "answer": "1928",
+   "wrong": [
+    "1908",
+    "1918",
+    "1898"
+   ],
+   "explain": "Shirley Temple (1928–2014): The biggest child star of the 1930s.",
+   "difficulty": 3,
+   "refs": [
+    "actors/shirley-temple"
+   ]
+  },
+  {
+   "id": "who-paul-newman",
+   "kind": "mc",
+   "prompt": "Who is this? He played Butch Cassidy.",
+   "answer": "Paul Newman",
+   "wrong": [
+    "Emma Stone",
+    "Cameron Diaz",
+    "Nicole Kidman"
+   ],
+   "explain": "Paul Newman (1925–2008): Played Butch Cassidy.",
+   "difficulty": 3,
+   "refs": [
+    "actors/paul-newman"
+   ]
+  },
+  {
+   "id": "born-paul-newman",
+   "kind": "mc",
+   "prompt": "In which year was Paul Newman born?",
+   "answer": "1925",
+   "wrong": [
+    "1895",
+    "1955",
+    "1905"
+   ],
+   "explain": "Paul Newman (1925–2008): Played Butch Cassidy.",
+   "difficulty": 3,
+   "refs": [
+    "actors/paul-newman"
+   ]
+  },
+  {
+   "id": "who-gene-kelly",
+   "kind": "mc",
+   "prompt": "Who is this? He starred in Singin' in the Rain.",
+   "answer": "Gene Kelly",
+   "wrong": [
+    "Clint Eastwood",
+    "Chris Pratt",
+    "Anthony Hopkins"
+   ],
+   "explain": "Gene Kelly (1912–1996): Starred in Singin' in the Rain.",
+   "difficulty": 3,
+   "refs": [
+    "actors/gene-kelly"
+   ]
+  },
+  {
+   "id": "born-gene-kelly",
+   "kind": "mc",
+   "prompt": "In which year was Gene Kelly born?",
+   "answer": "1912",
+   "wrong": [
+    "1892",
+    "1902",
+    "1932"
+   ],
+   "explain": "Gene Kelly (1912–1996): Starred in Singin' in the Rain.",
+   "difficulty": 3,
+   "refs": [
+    "actors/gene-kelly"
+   ]
+  },
+  {
+   "id": "who-fred-astaire",
+   "kind": "mc",
+   "prompt": "Who is this? He was a famous dancer of Hollywood musicals.",
+   "answer": "Fred Astaire",
+   "wrong": [
+    "Orlando Bloom",
+    "Robert De Niro",
+    "Robin Williams"
+   ],
+   "explain": "Fred Astaire (1899–1987): A famous dancer of Hollywood musicals.",
+   "difficulty": 3,
+   "refs": [
+    "actors/fred-astaire"
+   ]
+  },
+  {
+   "id": "born-fred-astaire",
+   "kind": "mc",
+   "prompt": "In which year was Fred Astaire born?",
+   "answer": "1899",
+   "wrong": [
+    "1879",
+    "1909",
+    "1889"
+   ],
+   "explain": "Fred Astaire (1899–1987): A famous dancer of Hollywood musicals.",
+   "difficulty": 3,
+   "refs": [
+    "actors/fred-astaire"
+   ]
+  },
+  {
+   "id": "who-jack-black",
+   "kind": "mc",
+   "prompt": "Who is this? He voices Po in Kung Fu Panda.",
+   "answer": "Jack Black",
+   "wrong": [
+    "Eddie Murphy",
+    "Hugh Jackman",
+    "Carrie Fisher"
+   ],
+   "explain": "Jack Black (1969): Voices Po in Kung Fu Panda.",
+   "difficulty": 1,
+   "refs": [
+    "actors/jack-black"
+   ]
+  },
+  {
+   "id": "born-jack-black",
+   "kind": "mc",
+   "prompt": "In which year was Jack Black born?",
+   "answer": "1969",
+   "wrong": [
+    "1989",
+    "1939",
+    "1979"
+   ],
+   "explain": "Jack Black (1969): Voices Po in Kung Fu Panda.",
+   "difficulty": 3,
+   "refs": [
+    "actors/jack-black"
+   ]
+  },
+  {
+   "id": "who-vin-diesel",
+   "kind": "mc",
+   "prompt": "Who is this? He plays Dominic Toretto in the Fast & Furious films.",
+   "answer": "Vin Diesel",
+   "wrong": [
+    "Sandra Bullock",
+    "Idris Elba",
+    "Ryan Gosling"
+   ],
+   "explain": "Vin Diesel (1967): Plays Dominic Toretto in the Fast & Furious films.",
+   "difficulty": 2,
+   "refs": [
+    "actors/vin-diesel"
+   ]
+  },
+  {
+   "id": "born-vin-diesel",
+   "kind": "mc",
+   "prompt": "In which year was Vin Diesel born?",
+   "answer": "1967",
+   "wrong": [
+    "1977",
+    "1987",
+    "1947"
+   ],
+   "explain": "Vin Diesel (1967): Plays Dominic Toretto in the Fast & Furious films.",
+   "difficulty": 3,
+   "refs": [
+    "actors/vin-diesel"
+   ]
+  },
+  {
+   "id": "who-cillian-murphy",
+   "kind": "mc",
+   "prompt": "Who is this? He won an Oscar for playing the father of the atomic bomb.",
+   "answer": "Cillian Murphy",
+   "wrong": [
+    "Keanu Reeves",
+    "Leonardo DiCaprio",
+    "Tom Cruise"
+   ],
+   "explain": "Cillian Murphy (1976): Won an Oscar for playing the father of the atomic bomb.",
+   "difficulty": 3,
+   "refs": [
+    "actors/cillian-murphy"
+   ]
+  },
+  {
+   "id": "born-cillian-murphy",
+   "kind": "mc",
+   "prompt": "In which year was Cillian Murphy born?",
+   "answer": "1976",
+   "wrong": [
+    "1946",
+    "1996",
+    "2006"
+   ],
+   "explain": "Cillian Murphy (1976): Won an Oscar for playing the father of the atomic bomb.",
+   "difficulty": 3,
+   "refs": [
+    "actors/cillian-murphy"
+   ]
+  }
+ ],
+ "sources": [
+  {
+   "name": "Wikidata (birth/death dates, portraits)",
+   "url": "https://www.wikidata.org"
+  },
+  {
+   "name": "Wikimedia Commons (portraits, licence-checked)",
+   "url": "https://commons.wikimedia.org"
+  }
+ ]
+}

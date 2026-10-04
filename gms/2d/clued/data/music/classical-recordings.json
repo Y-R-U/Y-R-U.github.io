@@ -1,0 +1,518 @@
+{
+ "id": "classical-recordings",
+ "title": "Classical recordings",
+ "theme": "music",
+ "icon": "🎻",
+ "kids": false,
+ "version": 1,
+ "factsMeta": {
+  "composer": {
+   "type": "cat",
+   "label": "Composer"
+  },
+  "year": {
+   "type": "year",
+   "label": "Written",
+   "higherLabel": "Later"
+  }
+ },
+ "items": [
+  {
+   "id": "morning-mood-peer-gynt",
+   "name": "Morning Mood (Peer Gynt)",
+   "alt": [
+    "Morning Mood",
+    "Morning"
+   ],
+   "group": "Edvard Grieg",
+   "facts": {
+    "composer": "Edvard Grieg",
+    "year": 1875
+   },
+   "blurb": "Morning Mood (Peer Gynt) by Edvard Grieg (1875). Recording: Edvard Grieg.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/c/c2/Grieg_-_Peer_Gynt_Suite_No._1%2C_Op._46_-_I._Morning_Mood_%28Musopen_Symphony%29.flac/Grieg_-_Peer_Gynt_Suite_No._1%2C_Op._46_-_I._Morning_Mood_%28Musopen_Symphony%29.flac.mp3",
+      "credit": "Edvard Grieg",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Grieg_-_Peer_Gynt_Suite_No._1,_Op._46_-_I._Morning_Mood_(Musopen_Symphony).flac",
+      "dur": 229.2,
+      "minStart": 2,
+      "maxStart": 40
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "in-the-hall-of-the-mountain-king",
+   "name": "In the Hall of the Mountain King",
+   "group": "Edvard Grieg",
+   "facts": {
+    "composer": "Edvard Grieg",
+    "year": 1875
+   },
+   "blurb": "In the Hall of the Mountain King by Edvard Grieg (1875). Recording: Edvard Grieg.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/8/84/Grieg_-_Peer_Gynt_Suite_No._1%2C_Op._46_-_IV._In_the_Hall_of_the_Mountain_King_%28Musopen_Symphony%29.flac/Grieg_-_Peer_Gynt_Suite_No._1%2C_Op._46_-_IV._In_the_Hall_of_the_Mountain_King_%28Musopen_Symphony%29.flac.mp3",
+      "credit": "Edvard Grieg",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Grieg_-_Peer_Gynt_Suite_No._1,_Op._46_-_IV._In_the_Hall_of_the_Mountain_King_(Musopen_Symphony).flac",
+      "dur": 154.1,
+      "minStart": 2,
+      "maxStart": 60
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "anitra-s-dance-peer-gynt",
+   "name": "Anitra's Dance (Peer Gynt)",
+   "alt": [
+    "Anitra's Dance"
+   ],
+   "group": "Edvard Grieg",
+   "facts": {
+    "composer": "Edvard Grieg",
+    "year": 1875
+   },
+   "blurb": "Anitra's Dance (Peer Gynt) by Edvard Grieg (1875). Recording: Edvard Grieg.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/4/4a/Grieg_-_Peer_Gynt_Suite_No._1%2C_Op._46_-_III._Anitra%27s_Dance_%28Musopen_Symphony%29.flac/Grieg_-_Peer_Gynt_Suite_No._1%2C_Op._46_-_III._Anitra%27s_Dance_%28Musopen_Symphony%29.flac.mp3",
+      "credit": "Edvard Grieg",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Grieg_-_Peer_Gynt_Suite_No._1,_Op._46_-_III._Anitra%27s_Dance_(Musopen_Symphony).flac",
+      "dur": 239.7,
+      "minStart": 2,
+      "maxStart": 60
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "the-blue-danube",
+   "name": "The Blue Danube",
+   "alt": [
+    "Blue Danube",
+    "An der schönen blauen Donau"
+   ],
+   "group": "Johann Strauss II",
+   "facts": {
+    "composer": "Johann Strauss II",
+    "year": 1866
+   },
+   "blurb": "The Blue Danube by Johann Strauss II (1866). Recording: United States Marine Band.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/d/de/%22An_der_sch%C3%B6nen%2C_blauen_Donau%22%2C_performed_by_the_US_Marine_Band.mp3",
+      "credit": "United States Marine Band",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:%22An_der_sch%C3%B6nen,_blauen_Donau%22,_performed_by_the_US_Marine_Band.mp3",
+      "dur": 539.6,
+      "minStart": 35,
+      "maxStart": 120
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "pomp-and-circumstance-march-no-1",
+   "name": "Pomp and Circumstance March No. 1",
+   "alt": [
+    "Pomp and Circumstance",
+    "Land of Hope and Glory"
+   ],
+   "group": "Edward Elgar",
+   "facts": {
+    "composer": "Edward Elgar",
+    "year": 1901
+   },
+   "blurb": "Pomp and Circumstance March No. 1 by Edward Elgar (1901). Recording: United States Marine Band.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/2/28/ELGAR_Pomp_and_Circumstance_in_D%2C_Opus_39%2C_No._1_-_United_States_Marine_Band.mp3",
+      "credit": "United States Marine Band",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:ELGAR_Pomp_and_Circumstance_in_D,_Opus_39,_No._1_-_United_States_Marine_Band.mp3",
+      "dur": 345.6,
+      "minStart": 2,
+      "maxStart": 60
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "clair-de-lune",
+   "name": "Clair de lune",
+   "group": "Claude Debussy",
+   "facts": {
+    "composer": "Claude Debussy",
+    "year": 1905
+   },
+   "blurb": "Clair de lune by Claude Debussy (1905). Recording: Composition: Claude Debussy; Performance: United States Air Force Band of Flight, Wright Brass; Recording: United States Air Force.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/6/63/Clair_de_Lune_-_Wright_Brass_-_United_States_Air_Force_Band_of_Flight.mp3",
+      "credit": "Composition: Claude Debussy; Performance: United States Air Force Band of Flight, Wright Brass; Recording: United States Air Force",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Clair_de_Lune_-_Wright_Brass_-_United_States_Air_Force_Band_of_Flight.mp3",
+      "dur": 242.1,
+      "minStart": 2,
+      "maxStart": 40
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "canon-in-d",
+   "name": "Canon in D",
+   "alt": [
+    "Pachelbel's Canon"
+   ],
+   "group": "Johann Pachelbel",
+   "facts": {
+    "composer": "Johann Pachelbel",
+    "year": 1690
+   },
+   "blurb": "Canon in D by Johann Pachelbel (1690). Recording: Composition: Johann Pachelbel; Arrangement: Frank Hudson; Performance: United States Air Force Band, Strolling Strings; Recording: United States Air Force.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/1/12/Canon_%282004%29_-_Strolling_Strings_-_United_States_Air_Force_Band.mp3",
+      "credit": "Composition: Johann Pachelbel; Arrangement: Frank Hudson; Performance: United States Air Force Band, Strolling Strings; Recording: United States Air Force",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Canon_(2004)_-_Strolling_Strings_-_United_States_Air_Force_Band.mp3",
+      "dur": 228.8,
+      "minStart": 20,
+      "maxStart": 90
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "requiem-lacrimosa",
+   "name": "Requiem: Lacrimosa",
+   "alt": [
+    "Lacrimosa",
+    "Requiem"
+   ],
+   "group": "Wolfgang Amadeus Mozart",
+   "facts": {
+    "composer": "Wolfgang Amadeus Mozart",
+    "year": 1791
+   },
+   "blurb": "Requiem: Lacrimosa by Wolfgang Amadeus Mozart (1791). Recording: Wolfgang Amadeus Mozart.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/a/a9/Mozart_-_Requiem_%28Krips%29_-_VIII._Lacrimosa.flac/Mozart_-_Requiem_%28Krips%29_-_VIII._Lacrimosa.flac.mp3",
+      "credit": "Wolfgang Amadeus Mozart",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Mozart_-_Requiem_(Krips)_-_VIII._Lacrimosa.flac",
+      "dur": 233,
+      "minStart": 2,
+      "maxStart": 60
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "hallelujah-chorus-messiah",
+   "name": "Hallelujah Chorus (Messiah)",
+   "alt": [
+    "Hallelujah Chorus",
+    "Hallelujah",
+    "Messiah"
+   ],
+   "group": "George Frideric Handel",
+   "facts": {
+    "composer": "George Frideric Handel",
+    "year": 1741
+   },
+   "blurb": "Hallelujah Chorus (Messiah) by George Frideric Handel (1741). Recording: Unknown (see source page).",
+   "media": {
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/9/90/PDP-CH_-_Royal_Choral_Society_-_Malcolm_Sargent_-_Messiah_-_Hallelujah_Chorus_-_Electrola-ej39-04871.flac/PDP-CH_-_Royal_Choral_Society_-_Malcolm_Sargent_-_Messiah_-_Hallelujah_Chorus_-_Electrola-ej39-04871.flac.mp3",
+      "credit": "Unknown (see source page)",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:PDP-CH_-_Royal_Choral_Society_-_Malcolm_Sargent_-_Messiah_-_Hallelujah_Chorus_-_Electrola-ej39-04871.flac",
+      "dur": 265.1,
+      "minStart": 5,
+      "maxStart": 60
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "swan-lake",
+   "name": "Swan Lake",
+   "group": "Pyotr Ilyich Tchaikovsky",
+   "facts": {
+    "composer": "Pyotr Ilyich Tchaikovsky",
+    "year": 1876
+   },
+   "blurb": "Swan Lake by Pyotr Ilyich Tchaikovsky (1876). Recording: Pyotr Ilyich Tchaikovsky; Antal Dorati; London Philharmonic Orchestra.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/3/3c/Pyotr_Ilyich_Tchaikovsky-_Swan_Lake-_Extract_from_Act_4.flac/Pyotr_Ilyich_Tchaikovsky-_Swan_Lake-_Extract_from_Act_4.flac.mp3",
+      "credit": "Pyotr Ilyich Tchaikovsky; Antal Dorati; London Philharmonic Orchestra",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Pyotr_Ilyich_Tchaikovsky-_Swan_Lake-_Extract_from_Act_4.flac",
+      "dur": 259.2,
+      "minStart": 2,
+      "maxStart": 60
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "russian-dance-the-nutcracker",
+   "name": "Russian Dance (The Nutcracker)",
+   "alt": [
+    "Russian Dance",
+    "Trepak",
+    "The Nutcracker"
+   ],
+   "group": "Pyotr Ilyich Tchaikovsky",
+   "facts": {
+    "composer": "Pyotr Ilyich Tchaikovsky",
+    "year": 1892
+   },
+   "blurb": "Russian Dance (The Nutcracker) by Pyotr Ilyich Tchaikovsky (1892). Recording: Music by Pyotr Ilyich Tchaikovsky in 1892; Conducted by Philip Milman and funded by Ludwig Ahgren and Jschlatt..",
+   "media": {
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/7/7a/Tchaikovsky_-_Nutcracker_Suite_-_Russian_Dance_-_Philip_Milman_-_Lud_and_Schlatts_Musical_Emporium.wav/Tchaikovsky_-_Nutcracker_Suite_-_Russian_Dance_-_Philip_Milman_-_Lud_and_Schlatts_Musical_Emporium.wav.mp3",
+      "credit": "Music by Pyotr Ilyich Tchaikovsky in 1892; Conducted by Philip Milman and funded by Ludwig Ahgren and Jschlatt.",
+      "license": "CC BY 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Tchaikovsky_-_Nutcracker_Suite_-_Russian_Dance_-_Philip_Milman_-_Lud_and_Schlatts_Musical_Emporium.wav",
+      "dur": 74.3,
+      "minStart": 2,
+      "maxStart": 40
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "waltz-of-the-flowers-the-nutcracker",
+   "name": "Waltz of the Flowers (The Nutcracker)",
+   "alt": [
+    "Waltz of the Flowers"
+   ],
+   "group": "Pyotr Ilyich Tchaikovsky",
+   "facts": {
+    "composer": "Pyotr Ilyich Tchaikovsky",
+    "year": 1892
+   },
+   "blurb": "Waltz of the Flowers (The Nutcracker) by Pyotr Ilyich Tchaikovsky (1892). Recording: Unknown (see source page).",
+   "media": {
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/9/9a/PDP-CH_-_Philadelphia_Orchestra_-_Leopold_Stokowski_-_Nutcracker_Suite%2C_Opus_71A_-_Tchaikovsky_-_Waltz_of_the_Flowers%2C_Part_1_-_Hmv-db2542-2a87004.flac/PDP-CH_-_Philadelphia_Orchestra_-_Leopold_Stokowski_-_Nutcracker_Suite%2C_Opus_71A_-_Tchaikovsky_-_Waltz_of_the_Flowers%2C_Part_1_-_Hmv-db2542-2a87004.flac.mp3",
+      "credit": "Unknown (see source page)",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:PDP-CH_-_Philadelphia_Orchestra_-_Leopold_Stokowski_-_Nutcracker_Suite,_Opus_71A_-_Tchaikovsky_-_Waltz_of_the_Flowers,_Part_1_-_Hmv-db2542-2a87004.flac",
+      "dur": 208.6,
+      "minStart": 60,
+      "maxStart": 150
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "brandenburg-concerto-no-4",
+   "name": "Brandenburg Concerto No. 4",
+   "alt": [
+    "Brandenburg Concerto"
+   ],
+   "group": "Johann Sebastian Bach",
+   "facts": {
+    "composer": "Johann Sebastian Bach",
+    "year": 1721
+   },
+   "blurb": "Brandenburg Concerto No. 4 by Johann Sebastian Bach (1721). Recording: Original Composition: Bach ; Brandenburg Concerto No. 4 in G, Movement I (Allegro), BWV 1049; Arrangment and performance: Kevin MacLeod.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/f/ff/Brandenburg_Concerto_No._4_in_G%2C_Movement_I_%28Allegro%29%2C_BWV_1049_%28ISRC_USUAN1100303%29.mp3",
+      "credit": "Original Composition: Bach ; Brandenburg Concerto No. 4 in G, Movement I (Allegro), BWV 1049; Arrangment and performance: Kevin MacLeod",
+      "license": "CC BY 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Brandenburg_Concerto_No._4_in_G,_Movement_I_(Allegro),_BWV_1049_(ISRC_USUAN1100303).mp3",
+      "dur": 437.6,
+      "minStart": 2,
+      "maxStart": 60
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "autumn-the-four-seasons",
+   "name": "Autumn (The Four Seasons)",
+   "alt": [
+    "Autumn",
+    "The Four Seasons"
+   ],
+   "group": "Antonio Vivaldi",
+   "facts": {
+    "composer": "Antonio Vivaldi",
+    "year": 1725
+   },
+   "blurb": "Autumn (The Four Seasons) by Antonio Vivaldi (1725). Recording: The Modena Chamber Orchestra.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/3/38/Vivaldi_The_Four_Seasons%2C_Op._8_-_The_Modena_Chamber_Orchestra_-_Violin_Concerto_in_F_major_RV_293_Autumn.mp3",
+      "credit": "The Modena Chamber Orchestra",
+      "license": "PDM-owner",
+      "page": "https://commons.wikimedia.org/wiki/File:Vivaldi_The_Four_Seasons,_Op._8_-_The_Modena_Chamber_Orchestra_-_Violin_Concerto_in_F_major_RV_293_Autumn.mp3",
+      "dur": 733.3,
+      "minStart": 2,
+      "maxStart": 40
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "symphony-no-9-from-the-new-world-largo",
+   "name": "Symphony No. 9 \"From the New World\": Largo",
+   "alt": [
+    "New World Symphony",
+    "Largo"
+   ],
+   "group": "Antonín Dvořák",
+   "facts": {
+    "composer": "Antonín Dvořák",
+    "year": 1893
+   },
+   "blurb": "Symphony No. 9 \"From the New World\": Largo by Antonín Dvořák (1893). Recording: Unknown (see source page).",
+   "media": {
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/6/6a/PDP-CH_-_Royal_Albert_Hall_Orchestra_-_Landon_Ronald_-_Symphony_No._9%2C_in_E_minor%2C_op._95_-_2nd_Movement%2C_Largo%2C_3rd_record_-_Anton%C3%ADn_Dvo%C5%99%C3%A1k_-_Hmv-d1252-5-0518.flac/PDP-CH_-_Royal_Albert_Hall_Orchestra_-_Landon_Ronald_-_Symphony_No._9%2C_in_E_minor%2C_op._95_-_2nd_Movement%2C_Largo%2C_3rd_record_-_Anton%C3%ADn_Dvo%C5%99%C3%A1k_-_Hmv-d1252-5-0518.flac.mp3",
+      "credit": "Unknown (see source page)",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:PDP-CH_-_Royal_Albert_Hall_Orchestra_-_Landon_Ronald_-_Symphony_No._9,_in_E_minor,_op._95_-_2nd_Movement,_Largo,_3rd_record_-_Anton%C3%ADn_Dvo%C5%99%C3%A1k_-_Hmv-d1252-5-0518.flac",
+      "dur": 227,
+      "minStart": 2,
+      "maxStart": 60
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "cello-suite-no-1-prelude",
+   "name": "Cello Suite No. 1: Prelude",
+   "alt": [
+    "Cello Suite No. 1",
+    "Cello Suite"
+   ],
+   "group": "Johann Sebastian Bach",
+   "facts": {
+    "composer": "Johann Sebastian Bach",
+    "year": 1720
+   },
+   "blurb": "Cello Suite No. 1: Prelude by Johann Sebastian Bach (c. 1720). Recording: Kevin MacLeod.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/e/e6/Cello_Suite_-1_in_G_-_Prelude_%28ISRC_USUAN1100298%29.mp3",
+      "credit": "Kevin MacLeod",
+      "license": "CC BY 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Cello_Suite_-1_in_G_-_Prelude_(ISRC_USUAN1100298).mp3",
+      "dur": 128.9,
+      "minStart": 2,
+      "maxStart": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "habanera-carmen",
+   "name": "Habanera (Carmen)",
+   "alt": [
+    "Habanera",
+    "Carmen"
+   ],
+   "group": "Georges Bizet",
+   "facts": {
+    "composer": "Georges Bizet",
+    "year": 1875
+   },
+   "blurb": "Habanera (Carmen) by Georges Bizet (1875). Recording: Aria composed by : Georges Bizet; Singer: Jenny Lee Mitchell. ; Kevin MacLeod.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/e/e8/Habanera_%28ISRC_USUAN1100656%29.mp3",
+      "credit": "Aria composed by : Georges Bizet; Singer: Jenny Lee Mitchell. ; Kevin MacLeod",
+      "license": "CC BY 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Habanera_(ISRC_USUAN1100656).mp3",
+      "dur": 247.7,
+      "minStart": 10,
+      "maxStart": 60
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "chaconne-in-d-minor-partita-no-2",
+   "name": "Chaconne in D minor (Partita No. 2)",
+   "alt": [
+    "Chaconne"
+   ],
+   "group": "Johann Sebastian Bach",
+   "facts": {
+    "composer": "Johann Sebastian Bach",
+    "year": 1720
+   },
+   "blurb": "Chaconne in D minor (Partita No. 2) by Johann Sebastian Bach (1720). Recording: Jascha Heifetz.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/3/34/Bach%3B_Chaconne_d-moll_Heifetz.flac/Bach%3B_Chaconne_d-moll_Heifetz.flac.mp3",
+      "credit": "Jascha Heifetz",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Bach;_Chaconne_d-moll_Heifetz.flac",
+      "dur": 782.3,
+      "minStart": 2,
+      "maxStart": 40
+     }
+    ]
+   },
+   "difficulty": 3
+  }
+ ],
+ "questions": [],
+ "sources": [
+  {
+   "name": "Wikimedia Commons (Musopen, US military bands, PDP-CH and CC BY recordings; licence per file)",
+   "url": "https://commons.wikimedia.org"
+  }
+ ],
+ "built": "2026-10-04"
+}

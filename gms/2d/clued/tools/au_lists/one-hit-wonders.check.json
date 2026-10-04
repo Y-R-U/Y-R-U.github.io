@@ -1,0 +1,288 @@
+{
+ "dropped": [],
+ "offby": [
+  "1972 apple 1989 (earliest original 2000)  Hot Butter — Popcorn  [That '70s Show (Music Inspired By The TV Series)]",
+  "1972 apple 1972 (earliest original 1900)  Looking Glass — Brandy (You're a Fine Girl)  [Looking Glass]",
+  "1979 apple 1979 (earliest original 1974)  The Buggles — Video Killed the Radio Star  [The Age of Plastic]",
+  "1979 apple 1980 (earliest original 1980)  The Sugarhill Gang — Rapper's Delight  [Disco]",
+  "1981 apple 1982 (earliest original 1982)  Toni Basil — Mickey  [Mickey - Single]",
+  "1982 apple 1981 (earliest original 1981)  Men Without Hats — The Safety Dance  [Rhythm of Youth (Expanded Edition)]",
+  "1982 apple 1982 (earliest original 1974)  Dexys Midnight Runners — Come On Eileen  [Too Rye Ay]",
+  "2002 apple 2002 (earliest original 1995)  Las Ketchup — The Ketchup Song (Aserejé)  [Aserejé (The Ketchup Song) - Single]",
+  "2006 apple 2005 (earliest original 2005)  Gnarls Barkley — Crazy  [St. Elsewhere]"
+ ],
+ "items": [
+  {
+   "id": "spirit-in-the-sky-norman-greenbaum",
+   "appleYear": 1969,
+   "album": "Spirit In the Sky (Deluxe Edition)",
+   "appleArtist": "Norman Greenbaum",
+   "appleTitle": "Spirit In the Sky",
+   "year": 1969
+  },
+  {
+   "id": "in-the-year-2525-zager-and-evans",
+   "appleYear": 1969,
+   "album": "In the Year 2525 (Exordium Terminus)",
+   "appleArtist": "Zager & Evans",
+   "appleTitle": "In the Year 2525 (Exordium & Terminus)",
+   "year": 1969
+  },
+  {
+   "id": "popcorn-hot-butter",
+   "appleYear": 1989,
+   "album": "That '70s Show (Music Inspired By The TV Series)",
+   "appleArtist": "Hot Buttered Popcorn",
+   "appleTitle": "Popcorn",
+   "year": 1972
+  },
+  {
+   "id": "brandy-youre-a-fine-girl-looking-glass",
+   "appleYear": 1972,
+   "album": "Looking Glass",
+   "appleArtist": "Looking Glass",
+   "appleTitle": "Brandy (You're A Fine Girl)",
+   "year": 1972
+  },
+  {
+   "id": "kung-fu-fighting-carl-douglas",
+   "appleYear": 1974,
+   "album": "The Soul of the Kung Fu Fighter",
+   "appleArtist": "Carl Douglas",
+   "appleTitle": "Kung Fu Fighting",
+   "year": 1974
+  },
+  {
+   "id": "play-that-funky-music-wild-cherry",
+   "appleYear": 1976,
+   "album": "Wild Cherry",
+   "appleArtist": "Wild Cherry",
+   "appleTitle": "Play That Funky Music",
+   "year": 1976
+  },
+  {
+   "id": "video-killed-the-radio-star-the-buggles",
+   "appleYear": 1979,
+   "album": "The Age of Plastic",
+   "appleArtist": "The Buggles",
+   "appleTitle": "Video Killed the Radio Star",
+   "year": 1979
+  },
+  {
+   "id": "rappers-delight-the-sugarhill-gang",
+   "appleYear": 1980,
+   "album": "Disco",
+   "appleArtist": "The Sugarhill Gang",
+   "appleTitle": "Rapper's Delight (Single Version)",
+   "year": 1979
+  },
+  {
+   "id": "pop-muzik-m",
+   "appleYear": 1979,
+   "album": "New York, London, Paris, Munich",
+   "appleArtist": "M",
+   "appleTitle": "Pop Muzik (Nik Launay '79 12\")",
+   "year": 1979
+  },
+  {
+   "id": "turning-japanese-the-vapors",
+   "appleYear": 1980,
+   "album": "New Clear Days",
+   "appleArtist": "The Vapors",
+   "appleTitle": "Turning Japanese (Non Stop Edit)",
+   "year": 1980
+  },
+  {
+   "id": "funkytown-lipps-inc",
+   "appleYear": 1979,
+   "album": "Funkytown",
+   "appleArtist": "Lipps, Inc.",
+   "appleTitle": "Funkytown (Long Version)",
+   "year": 1979
+  },
+  {
+   "id": "mickey-toni-basil",
+   "appleYear": 1982,
+   "album": "Mickey - Single",
+   "appleArtist": "Toni Basil",
+   "appleTitle": "Mickey",
+   "year": 1981
+  },
+  {
+   "id": "the-safety-dance-men-without-hats",
+   "appleYear": 1981,
+   "album": "Rhythm of Youth (Expanded Edition)",
+   "appleArtist": "Men Without Hats",
+   "appleTitle": "The Safety Dance (Short Version)",
+   "year": 1982
+  },
+  {
+   "id": "99-luftballons-nena",
+   "appleYear": 1983,
+   "album": "99 Luftballons",
+   "appleArtist": "Nena",
+   "appleTitle": "99 Luftballons",
+   "year": 1983
+  },
+  {
+   "id": "come-on-eileen-dexys-midnight-runners",
+   "appleYear": 1982,
+   "album": "Too Rye Ay",
+   "appleArtist": "Dexys Midnight Runners",
+   "appleTitle": "Come On Eileen",
+   "year": 1982
+  },
+  {
+   "id": "dont-worry-be-happy-bobby-mcferrin",
+   "appleYear": 1988,
+   "album": "Simple Pleasures",
+   "appleArtist": "Bobby McFerrin",
+   "appleTitle": "Don't Worry, Be Happy",
+   "year": 1988
+  },
+  {
+   "id": "groove-is-in-the-heart-deee-lite",
+   "appleYear": 1990,
+   "album": "World Clique",
+   "appleArtist": "Deee-Lite",
+   "appleTitle": "Groove Is In the Heart",
+   "year": 1990
+  },
+  {
+   "id": "im-too-sexy-right-said-fred",
+   "appleYear": 1991,
+   "album": "Up",
+   "appleArtist": "Right Said Fred",
+   "appleTitle": "I'm Too Sexy",
+   "year": 1991
+  },
+  {
+   "id": "how-bizarre-omc",
+   "appleYear": 1995,
+   "album": "How Bizarre (Deluxe Version)",
+   "appleArtist": "OMC",
+   "appleTitle": "How Bizarre",
+   "year": 1995
+  },
+  {
+   "id": "tubthumping-chumbawamba",
+   "appleYear": 1997,
+   "album": "Tubthumper",
+   "appleArtist": "Chumbawamba",
+   "appleTitle": "Tubthumping",
+   "year": 1997
+  },
+  {
+   "id": "steal-my-sunshine-len",
+   "appleYear": 1999,
+   "album": "Steal My Sunshine - Single",
+   "appleArtist": "LEN",
+   "appleTitle": "Steal My Sunshine",
+   "year": 1999
+  },
+  {
+   "id": "mambo-no-5-a-little-bit-of-lou-bega",
+   "appleYear": 1999,
+   "album": "A Little Bit of Mambo",
+   "appleArtist": "Lou Bega",
+   "appleTitle": "Mambo No. 5 (a Little Bit of...)",
+   "year": 1999
+  },
+  {
+   "id": "blue-da-ba-dee-eiffel-65",
+   "appleYear": 1999,
+   "album": "Blue - Single",
+   "appleArtist": "Mat1ne, PED1NE & Eiffel 65",
+   "appleTitle": "Blue",
+   "year": 1999
+  },
+  {
+   "id": "who-let-the-dogs-out-baha-men",
+   "appleYear": 2000,
+   "album": "Who Let the Dogs Out",
+   "appleArtist": "Baha Men",
+   "appleTitle": "Who Let the Dogs Out",
+   "year": 2000
+  },
+  {
+   "id": "the-ketchup-song-asereje-las-ketchup",
+   "appleYear": 2002,
+   "album": "Aserejé (The Ketchup Song) - Single",
+   "appleArtist": "Las Ketchup",
+   "appleTitle": "The Ketchup Song (Aserejé) [Chiringuito Club Single Edit]",
+   "year": 2002
+  },
+  {
+   "id": "stacys-mom-fountains-of-wayne",
+   "appleYear": 2003,
+   "album": "Welcome Interstate Managers",
+   "appleArtist": "Fountains Of Wayne",
+   "appleTitle": "Stacy's Mom",
+   "year": 2003
+  },
+  {
+   "id": "bad-day-daniel-powter",
+   "appleYear": 2005,
+   "album": "Daniel Powter",
+   "appleArtist": "Daniel Powter",
+   "appleTitle": "Bad Day",
+   "year": 2005
+  },
+  {
+   "id": "crazy-gnarls-barkley",
+   "appleYear": 2005,
+   "album": "St. Elsewhere",
+   "appleArtist": "Gnarls Barkley",
+   "appleTitle": "Crazy",
+   "year": 2006
+  },
+  {
+   "id": "somebody-that-i-used-to-know-gotye",
+   "appleYear": 2011,
+   "album": "Making Mirrors",
+   "appleArtist": "Gotye",
+   "appleTitle": "Somebody That I Used to Know (feat. Kimbra)",
+   "year": 2011
+  },
+  {
+   "id": "gangnam-style-psy",
+   "appleYear": 2012,
+   "album": "Gangnam Style - Single",
+   "appleArtist": "PSY",
+   "appleTitle": "Gangnam Style",
+   "year": 2012
+  },
+  {
+   "id": "harlem-shake-baauer",
+   "appleYear": 2012,
+   "album": "Harlem Shake - Single",
+   "appleArtist": "Baauer",
+   "appleTitle": "Harlem Shake",
+   "year": 2012
+  },
+  {
+   "id": "rude-magic",
+   "appleYear": 2013,
+   "album": "Don't Kill the Magic",
+   "appleArtist": "MAGIC!",
+   "appleTitle": "Rude",
+   "year": 2013
+  },
+  {
+   "id": "cheerleader-felix-jaehn-remix-omi",
+   "appleYear": 2014,
+   "album": "Verano 2016",
+   "appleArtist": "Omi",
+   "appleTitle": "Cheerleader",
+   "year": 2014
+  },
+  {
+   "id": "the-fox-what-does-the-fox-say-ylvis",
+   "appleYear": 2013,
+   "album": "The Fox (What Does the Fox Say?) - Single",
+   "appleArtist": "Ylvis",
+   "appleTitle": "The Fox (What Does the Fox Say?)",
+   "year": 2013
+  }
+ ]
+}

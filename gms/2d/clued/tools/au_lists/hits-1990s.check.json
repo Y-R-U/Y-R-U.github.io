@@ -1,0 +1,457 @@
+{
+ "dropped": [],
+ "offby": [
+  "1993 apple 1998 (earliest original 1998)  Tag Team — Whoomp! (There It Is)  [Twice as Nice]",
+  "1994 apple 1995 (earliest original 1995)  Boyz II Men — I'll Make Love to You  [II]"
+ ],
+ "items": [
+  {
+   "id": "hold-on-wilson-phillips",
+   "appleYear": 1990,
+   "album": "Wilson Phillips",
+   "appleArtist": "Wilson Phillips",
+   "appleTitle": "Hold On",
+   "year": 1990
+  },
+  {
+   "id": "nothing-compares-2-u-sinead-oconnor",
+   "appleYear": 1990,
+   "album": "I Do Not Want What I Haven't Got",
+   "appleArtist": "Sinéad O'Connor",
+   "appleTitle": "Nothing Compares 2 U",
+   "year": 1990
+  },
+  {
+   "id": "vogue-madonna",
+   "appleYear": 1990,
+   "album": "I'm Breathless (Music from and Inspired By the Film Dick Tracy)",
+   "appleArtist": "Madonna",
+   "appleTitle": "Vogue (Edit Version)",
+   "year": 1990
+  },
+  {
+   "id": "vision-of-love-mariah-carey",
+   "appleYear": 1990,
+   "album": "Mariah Carey",
+   "appleArtist": "Mariah Carey",
+   "appleTitle": "Vision of Love",
+   "year": 1990
+  },
+  {
+   "id": "u-cant-touch-this-mc-hammer",
+   "appleYear": 1990,
+   "album": "Please Hammer Don't Hurt 'Em",
+   "appleArtist": "MC Hammer",
+   "appleTitle": "U Can't Touch This",
+   "year": 1990
+  },
+  {
+   "id": "ice-ice-baby-vanilla-ice",
+   "appleYear": 1990,
+   "album": "To the Extreme",
+   "appleArtist": "Vanilla Ice",
+   "appleTitle": "Ice Ice Baby",
+   "year": 1990
+  },
+  {
+   "id": "groove-is-in-the-heart-deee-lite",
+   "appleYear": 1990,
+   "album": "World Clique",
+   "appleArtist": "Deee-Lite",
+   "appleTitle": "Groove Is In the Heart",
+   "year": 1990
+  },
+  {
+   "id": "everything-i-do-i-do-it-for-you-bryan-adams",
+   "appleYear": 1991,
+   "album": "Waking Up the Neighbours",
+   "appleArtist": "Bryan Adams",
+   "appleTitle": "(Everything I Do) I Do It for You",
+   "year": 1991
+  },
+  {
+   "id": "smells-like-teen-spirit-nirvana",
+   "appleYear": 1991,
+   "album": "Nevermind",
+   "appleArtist": "Nirvana",
+   "appleTitle": "Smells Like Teen Spirit",
+   "year": 1991
+  },
+  {
+   "id": "losing-my-religion-r-e-m",
+   "appleYear": 1991,
+   "album": "Out of Time (2016 Remaster)",
+   "appleArtist": "R.E.M.",
+   "appleTitle": "Losing My Religion",
+   "year": 1991
+  },
+  {
+   "id": "black-or-white-michael-jackson",
+   "appleYear": 1991,
+   "album": "Number Ones",
+   "appleArtist": "Michael Jackson",
+   "appleTitle": "Black Or White (Single Version)",
+   "year": 1991
+  },
+  {
+   "id": "gonna-make-you-sweat-everybody-dance-now-c-c-music-factory",
+   "appleYear": 1990,
+   "album": "Gonna Make You Sweat",
+   "appleArtist": "C+C Music Factory",
+   "appleTitle": "Gonna Make You Sweat (Everybody Dance Now) [feat. Freedom Williams]",
+   "year": 1990
+  },
+  {
+   "id": "end-of-the-road-boyz-ii-men",
+   "appleYear": 1992,
+   "album": "Boomerang (Original Soundtrack)",
+   "appleArtist": "Boyz II Men",
+   "appleTitle": "End of the Road",
+   "year": 1992
+  },
+  {
+   "id": "baby-got-back-sir-mix-a-lot",
+   "appleYear": 1992,
+   "album": "NOW That's What I Call the 90's",
+   "appleArtist": "Sir Mix-A-Lot",
+   "appleTitle": "Baby Got Back",
+   "year": 1992
+  },
+  {
+   "id": "jump-kris-kross",
+   "appleYear": 1992,
+   "album": "Totally Krossed Out",
+   "appleArtist": "Kris Kross",
+   "appleTitle": "Jump",
+   "year": 1992
+  },
+  {
+   "id": "i-will-always-love-you-whitney-houston",
+   "appleYear": 1992,
+   "album": "The Bodyguard (Original Soundtrack Album)",
+   "appleArtist": "Whitney Houston",
+   "appleTitle": "I Will Always Love You",
+   "year": 1992
+  },
+  {
+   "id": "achy-breaky-heart-billy-ray-cyrus",
+   "appleYear": 1992,
+   "album": "Some Gave All",
+   "appleArtist": "Billy Ray Cyrus",
+   "appleTitle": "Achy Breaky Heart",
+   "year": 1992
+  },
+  {
+   "id": "under-the-bridge-red-hot-chili-peppers",
+   "appleYear": 1991,
+   "album": "Blood Sugar Sex Magik (Deluxe Edition)",
+   "appleArtist": "Red Hot Chili Peppers",
+   "appleTitle": "Under the Bridge",
+   "year": 1991
+  },
+  {
+   "id": "what-is-love-haddaway",
+   "appleYear": 1993,
+   "album": "What Is Love 2K9",
+   "appleArtist": "Klaas & Haddaway",
+   "appleTitle": "What Is Love (Klaas Radio Edit)",
+   "year": 1993
+  },
+  {
+   "id": "i-cant-help-falling-in-love-with-you-ub40",
+   "appleYear": 1993,
+   "album": "Promises and Lies",
+   "appleArtist": "UB40",
+   "appleTitle": "(I Can't Help) Falling in Love With You",
+   "year": 1993
+  },
+  {
+   "id": "id-do-anything-for-love-but-i-wont-do-that-meat-loaf",
+   "appleYear": 1993,
+   "album": "Bat Out of Hell II: Back Into Hell (Deluxe Edition)",
+   "appleArtist": "Meat Loaf",
+   "appleTitle": "I'd Do Anything for Love (But I Won't Do That)",
+   "year": 1993
+  },
+  {
+   "id": "whoomp-there-it-is-tag-team",
+   "appleYear": 1998,
+   "album": "Twice as Nice",
+   "appleArtist": "Tag Team",
+   "appleTitle": "Whoomp! There It Is",
+   "year": 1993
+  },
+  {
+   "id": "the-sign-ace-of-base",
+   "appleYear": 1993,
+   "album": "The Sign (2015 Remastered Version)",
+   "appleArtist": "Ace of Base",
+   "appleTitle": "The Sign (2015 Remastered Version)",
+   "year": 1993
+  },
+  {
+   "id": "i-swear-all-4-one",
+   "appleYear": 1994,
+   "album": "All-4-One",
+   "appleArtist": "All-4-One",
+   "appleTitle": "I Swear",
+   "year": 1994
+  },
+  {
+   "id": "ill-make-love-to-you-boyz-ii-men",
+   "appleYear": 1995,
+   "album": "II",
+   "appleArtist": "Boyz II Men",
+   "appleTitle": "I'll Make Love to You",
+   "year": 1994
+  },
+  {
+   "id": "love-is-all-around-wet-wet-wet",
+   "appleYear": 1994,
+   "album": "Picture This (20th Anniversary Edition)",
+   "appleArtist": "Wet Wet Wet",
+   "appleTitle": "Love Is All Around",
+   "year": 1994
+  },
+  {
+   "id": "stay-i-missed-you-lisa-loeb",
+   "appleYear": 1994,
+   "album": "Stay (I Missed You) - Single",
+   "appleArtist": "Lisa Loeb",
+   "appleTitle": "Stay (I Missed You)",
+   "year": 1994
+  },
+  {
+   "id": "gangstas-paradise-coolio",
+   "appleYear": 1995,
+   "album": "Gangsta's Paradise (Deluxe Edition)",
+   "appleArtist": "Coolio",
+   "appleTitle": "Gangsta's Paradise (feat. L.V.) [2023 Remaster]",
+   "year": 1995
+  },
+  {
+   "id": "waterfalls-tlc",
+   "appleYear": 1995,
+   "album": "Essential: Soul Love",
+   "appleArtist": "TLC",
+   "appleTitle": "Waterfalls (No Rap Radio Edit)",
+   "year": 1995
+  },
+  {
+   "id": "kiss-from-a-rose-seal",
+   "appleYear": 1994,
+   "album": "Seal: Best 1991-2004 (Deluxe Version)",
+   "appleArtist": "Seal",
+   "appleTitle": "Kiss from a Rose",
+   "year": 1994
+  },
+  {
+   "id": "one-sweet-day-mariah-carey-and-boyz-ii-men",
+   "appleYear": 1995,
+   "album": "Daydream",
+   "appleArtist": "Mariah Carey",
+   "appleTitle": "One Sweet Day (feat. Boyz II Men)",
+   "year": 1995
+  },
+  {
+   "id": "wonderwall-oasis",
+   "appleYear": 1995,
+   "album": "(What's the Story) Morning Glory?",
+   "appleArtist": "Oasis",
+   "appleTitle": "Wonderwall",
+   "year": 1995
+  },
+  {
+   "id": "ironic-alanis-morissette",
+   "appleYear": 1995,
+   "album": "Jagged Little Pill",
+   "appleArtist": "Alanis Morissette",
+   "appleTitle": "Ironic",
+   "year": 1995
+  },
+  {
+   "id": "because-you-loved-me-celine-dion",
+   "appleYear": 1996,
+   "album": "Pop Music: The Modern Era 1976-1999",
+   "appleArtist": "Céline Dion",
+   "appleTitle": "Because You Loved Me",
+   "year": 1996
+  },
+  {
+   "id": "killing-me-softly-with-his-song-fugees",
+   "appleYear": 1996,
+   "album": "The Score",
+   "appleArtist": "Fugees",
+   "appleTitle": "Killing Me Softly with His Song",
+   "year": 1996
+  },
+  {
+   "id": "wannabe-spice-girls",
+   "appleYear": 1996,
+   "album": "Wannabe 25 - EP",
+   "appleArtist": "Spice Girls",
+   "appleTitle": "Wannabe",
+   "year": 1996
+  },
+  {
+   "id": "no-diggity-blackstreet",
+   "appleYear": 1996,
+   "album": "Another Level",
+   "appleArtist": "Blackstreet",
+   "appleTitle": "No Diggity (feat. Dr. Dre & Queen Pen)",
+   "year": 1996
+  },
+  {
+   "id": "un-break-my-heart-toni-braxton",
+   "appleYear": 1996,
+   "album": "Secrets",
+   "appleArtist": "Toni Braxton",
+   "appleTitle": "Un-Break My Heart",
+   "year": 1996
+  },
+  {
+   "id": "ill-be-missing-you-puff-daddy",
+   "appleYear": 1997,
+   "album": "No Way Out (Remastered Edition)",
+   "appleArtist": "Puff Daddy",
+   "appleTitle": "I'll Be Missing You (feat. Faith Evans & 112)",
+   "year": 1997
+  },
+  {
+   "id": "mmmbop-hanson",
+   "appleYear": 1997,
+   "album": "Middle of Nowhere",
+   "appleArtist": "Hanson",
+   "appleTitle": "MMMBop",
+   "year": 1997
+  },
+  {
+   "id": "barbie-girl-aqua",
+   "appleYear": 1997,
+   "album": "Barbie Girl - Single",
+   "appleArtist": "Aqua",
+   "appleTitle": "Barbie Girl",
+   "year": 1997
+  },
+  {
+   "id": "bitter-sweet-symphony-the-verve",
+   "appleYear": 1997,
+   "album": "Urban Hymns (Deluxe / Remastered 2016)",
+   "appleArtist": "The Verve",
+   "appleTitle": "Bitter Sweet Symphony",
+   "year": 1997
+  },
+  {
+   "id": "tubthumping-chumbawamba",
+   "appleYear": 1997,
+   "album": "Tubthumper",
+   "appleArtist": "Chumbawamba",
+   "appleTitle": "Tubthumping",
+   "year": 1997
+  },
+  {
+   "id": "my-heart-will-go-on-celine-dion",
+   "appleYear": 1997,
+   "album": "Titanic (Music from the Motion Picture) [Collector's Anniversary Edition]",
+   "appleArtist": "Céline Dion & James Horner",
+   "appleTitle": "My Heart Will Go On (Love Theme from \"Titanic\")",
+   "year": 1997
+  },
+  {
+   "id": "truly-madly-deeply-savage-garden",
+   "appleYear": 1997,
+   "album": "Savage Garden",
+   "appleArtist": "Savage Garden",
+   "appleTitle": "Truly Madly Deeply",
+   "year": 1997
+  },
+  {
+   "id": "believe-cher",
+   "appleYear": 1998,
+   "album": "Believe",
+   "appleArtist": "Cher",
+   "appleTitle": "Believe",
+   "year": 1998
+  },
+  {
+   "id": "baby-one-more-time-britney-spears",
+   "appleYear": 1998,
+   "album": "...Baby One More Time (Deluxe Version)",
+   "appleArtist": "Britney Spears",
+   "appleTitle": "...Baby One More Time",
+   "year": 1998
+  },
+  {
+   "id": "iris-goo-goo-dolls",
+   "appleYear": 1998,
+   "album": "Dizzy Up the Girl",
+   "appleArtist": "The Goo Goo Dolls",
+   "appleTitle": "Iris",
+   "year": 1998
+  },
+  {
+   "id": "no-scrubs-tlc",
+   "appleYear": 1999,
+   "album": "FanMail",
+   "appleArtist": "TLC",
+   "appleTitle": "No Scrubs",
+   "year": 1999
+  },
+  {
+   "id": "smooth-santana",
+   "appleYear": 1999,
+   "album": "Supernatural (Remastered) [Bonus Track Version]",
+   "appleArtist": "Santana",
+   "appleTitle": "Smooth (feat. Rob Thomas)",
+   "year": 1999
+  },
+  {
+   "id": "livin-la-vida-loca-ricky-martin",
+   "appleYear": 1999,
+   "album": "Ricky Martin",
+   "appleArtist": "Ricky Martin",
+   "appleTitle": "Livin' la Vida Loca (Spanish Version)",
+   "year": 1999
+  },
+  {
+   "id": "genie-in-a-bottle-christina-aguilera",
+   "appleYear": 1999,
+   "album": "Christina Aguilera (Expanded Edition)",
+   "appleArtist": "Christina Aguilera",
+   "appleTitle": "Genie in a Bottle",
+   "year": 1999
+  },
+  {
+   "id": "i-want-it-that-way-backstreet-boys",
+   "appleYear": 1999,
+   "album": "Millennium",
+   "appleArtist": "Backstreet Boys",
+   "appleTitle": "I Want It That Way",
+   "year": 1999
+  },
+  {
+   "id": "all-star-smash-mouth",
+   "appleYear": 1999,
+   "album": "Astro Lounge",
+   "appleArtist": "Smash Mouth",
+   "appleTitle": "All Star",
+   "year": 1999
+  },
+  {
+   "id": "mambo-no-5-a-little-bit-of-lou-bega",
+   "appleYear": 1999,
+   "album": "A Little Bit of Mambo",
+   "appleArtist": "Lou Bega",
+   "appleTitle": "Mambo No. 5 (a Little Bit of...)",
+   "year": 1999
+  },
+  {
+   "id": "blue-da-ba-dee-eiffel-65",
+   "appleYear": 1999,
+   "album": "Blue - Single",
+   "appleArtist": "Mat1ne, PED1NE & Eiffel 65",
+   "appleTitle": "Blue",
+   "year": 1999
+  }
+ ]
+}

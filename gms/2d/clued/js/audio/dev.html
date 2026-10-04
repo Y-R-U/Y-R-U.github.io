@@ -1,0 +1,145 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Clued audio lab</title>
+<link rel="stylesheet" href="../../css/base.css?v=1">
+<link rel="stylesheet" href="../../css/play.css?v=1">
+<style>
+  body { overflow: auto; }
+  main { max-width: 900px; margin: 0 auto; padding: 16px; display: grid; gap: 16px; }
+  section { background: #fff; border: 3px solid var(--ink); border-radius: 18px; padding: 14px; box-shadow: 0 4px 0 var(--ink); }
+  h2 { margin-bottom: 8px; }
+  .row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+  .row button, select { min-height: 42px; padding: 6px 12px; border: 2px solid var(--ink); border-radius: 12px; background: var(--paper); font-weight: 800; }
+  .row button:active { transform: translateY(2px); }
+  #keys { display: flex; height: 120px; user-select: none; touch-action: none; }
+  #keys div { flex: 1; border: 1px solid var(--ink); background: #fff; border-radius: 0 0 6px 6px; position: relative; }
+  #keys div.b { background: var(--ink); flex: .7; margin: 0 -2%; height: 62%; z-index: 1; }
+  #keys div.on { background: var(--sun); }
+  #stage { min-height: 560px; display: flex; flex-direction: column; }
+  #rv { margin-top: 10px; }
+  #log { font: 12px/1.4 ui-monospace, monospace; white-space: pre-wrap; max-height: 200px; overflow: auto; }
+  .muted { color: var(--ink-3); }
+</style>
+</head>
+<body>
+<main>
+  <h1>Clued audio lab</h1>
+  <section>
+    <h2>Volume</h2>
+    <div class="row"><input id="vol" type="range" min="0" max="100" value="80"> <label><input id="mute" type="checkbox"> mute</label>
+      <label><input id="kids" type="checkbox"> kids skin</label></div>
+  </section>
+  <section><h2>Sound effects</h2><div class="row" id="sfx"></div></section>
+  <section>
+    <h2>Piano</h2>
+    <div class="row"><select id="pieces"></select><button id="pplay">▶ Play</button><button id="pstop">■ Stop</button><span id="pinfo" class="muted"></span></div>
+    <div id="keys"></div>
+  </section>
+  <section>
+    <h2>Clips</h2>
+    <div class="row"><select id="cpack"></select><button id="crand">▶ Random 5 s clip</button><button id="cstream">▶ Stream whole</button><button id="cstop">■ Stop</button></div>
+    <div id="cinfo" class="muted"></div>
+  </section>
+  <section>
+    <h2>Listen format</h2>
+    <div class="row"><select id="lpack" multiple size="4" style="min-width:220px"></select>
+      <select id="lclip"></select><select id="lart"><option>off</option><option>blur</option><option>on</option></select>
+      <label><input id="lkids" type="checkbox"> kids</label>
+      <button id="lgo">New question</button></div>
+    <div id="stage" class="play"></div>
+    <div id="rv"></div>
+  </section>
+  <section><h2>Log</h2><div id="log"></div></section>
+</main>
+<script type="module">
+import * as sfx from './sfx.js?v=1';
+import * as piano from './piano.js?v=1';
+import * as clip from './clip.js?v=1';
+import { revealHTML, BADGE_CSS } from './apple.js?v=1';
+import { setVolume, mute, getCtx } from './ctx.js?v=1';
+import listen from './listen.js?v=1';
+import { mulberry32 } from '../core/rng.js?v=1';
+
+const $ = (s) => document.querySelector(s);
+const log = (...a) => { $('#log').textContent += a.join(' ') + '\n'; $('#log').scrollTop = 1e9; };
+window.__au = { sfx, piano, clip, listen, log };
+document.head.append(Object.assign(document.createElement('style'), { textContent: BADGE_CSS }));
+
+$('#vol').oninput = (e) => setVolume(e.target.value / 100);
+$('#mute').onchange = (e) => mute(e.target.checked);
+$('#kids').onchange = (e) => sfx.setSkin(e.target.checked ? 'kids' : 'default');
+for (const n of ['correct', 'wrong', 'tick', 'timerLow', 'reveal', 'streak', 'fanfare', 'button', 'join', 'sparkle', 'star', 'kidsCorrect', 'kidsWrong', 'pop']) {
+  const b = document.createElement('button'); b.textContent = n; b.onclick = () => sfx.play(n, { force: true, level: 3 }); $('#sfx').append(b);
+}
+
+const MUSIC = ['classical-piano', 'pd-melodies', 'nursery-rhymes', 'hits-1960s', 'hits-1970s', 'hits-1980s', 'hits-1990s', 'hits-2000s', 'hits-2010s', 'hits-2020s',
+  'music-artists', 'screen-themes', 'kids-film-tv', 'one-hit-wonders', 'anthems', 'classical-recordings', 'instruments'];
+const packs = {};
+await Promise.all(MUSIC.map(async (id) => {
+  try { const r = await fetch(`../../data/music/${id}.json`, { cache: 'no-cache' }); if (r.ok) packs[id] = await r.json(); } catch {}
+}));
+log('packs:', Object.entries(packs).map(([k, p]) => `${k}(${p.items.length})`).join(' '));
+window.__au.packs = packs;
+
+for (const p of ['classical-piano', 'pd-melodies', 'nursery-rhymes']) for (const it of packs[p]?.items || []) {
+  const o = document.createElement('option'); o.value = it.media.audio[0].src; o.textContent = `${it.name} — ${it.facts.composer || 'trad.'}`; $('#pieces').append(o);
+}
+let ph = null;
+$('#pplay').onclick = async () => {
+  ph?.stop();
+  const piece = await piano.loadPiece($('#pieces').value);
+  $('#pinfo').textContent = `${piece.notes.length} notes · ${Math.round(piano.duration(piece))} s · ${piece.source?.license}`;
+  ph = await piano.play(piece);
+};
+$('#pstop').onclick = () => ph?.stop();
+
+const KEYS = [];
+for (let m = 48; m <= 72; m++) {
+  const b = [1, 3, 6, 8, 10].includes(m % 12);
+  const d = document.createElement('div'); d.className = b ? 'b' : ''; d.dataset.m = m; $('#keys').append(d); KEYS.push(d);
+}
+$('#keys').addEventListener('pointerdown', async (e) => {
+  const m = +e.target.dataset.m; if (!m) return;
+  e.target.classList.add('on'); setTimeout(() => e.target.classList.remove('on'), 200);
+  await piano.play({ bpm: 60, notes: [[0, m, 1.5, 90]] }, { lead: 0.005 });
+});
+
+for (const id of Object.keys(packs)) { $('#cpack').append(new Option(id, id)); $('#lpack').append(new Option(id, id)); }
+for (const s of [1, 2, 3, 5, 10, 15, 30]) $('#lclip').append(new Option(s + ' s', s));
+$('#lclip').value = 5;
+let ch = null;
+const randItem = () => { const p = packs[$('#cpack').value]; return p.items[Math.floor(Math.random() * p.items.length)]; };
+$('#crand').onclick = async () => {
+  const it = randItem(), a = it.media.audio[0];
+  const start = clip.pickStart(a, 5, Math.random());
+  $('#cinfo').innerHTML = `${it.name} · start ${start}s` + (a.apple ? revealHTML(a, { title: it.name, artist: it.facts.artist, year: it.facts.year }) : '');
+  ch = await clip.play(a, { start: clip.isPiano(a) ? 0 : start, len: 5 });
+  log('clip', it.id, 'len', ch.length);
+};
+$('#cstream').onclick = async () => { const it = randItem(); ch = await clip.stream(it.media.audio[0]); $('#cinfo').textContent = 'streaming ' + it.name; };
+$('#cstop').onclick = () => { ch?.stop(); clip.stopAll(); };
+
+let ctrl = null, seed = 1;
+$('#lgo').onclick = () => {
+  ctrl?.destroy();
+  const ids = [...$('#lpack').selectedOptions].map((o) => o.value);
+  const ps = (ids.length ? ids : Object.keys(packs)).map((id) => packs[id]).filter(Boolean);
+  const kids = $('#lkids').checked;
+  const qs = listen.generate({ rng: mulberry32(seed++ * 7919), packs: ps, count: 1, opts: { clip: +$('#lclip').value, art: $('#lart').value }, difficulty: 0, kids });
+  if (!qs.length) { log('no question'); return; }
+  const q = qs[0];
+  log('q', q.id, q.prompt, JSON.stringify(q.data.meta), 'start', q.data.start, 'len', q.data.len);
+  const stage = $('#stage'); stage.classList.toggle('kids', kids); $('#rv').innerHTML = '';
+  ctrl = listen.render(stage, q, {
+    kids, difficulty: 0, opts: {}, sfx: (n) => sfx.play(n),
+    timer: { start() {}, remaining: () => 0, limit: 0 },
+    reveal: (x) => $('#rv').append(typeof x === 'string' ? Object.assign(document.createElement('div'), { innerHTML: x }) : x),
+    answer: (r) => { log('answer', JSON.stringify(r)); sfx.play(r.correct ? 'correct' : 'wrong', { kids }); },
+  });
+};
+</script>
+</body>
+</html>

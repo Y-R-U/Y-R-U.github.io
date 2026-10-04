@@ -1,0 +1,1669 @@
+{
+ "id": "hits-2010s",
+ "title": "Hits of the 2010s",
+ "theme": "music",
+ "icon": "🎧",
+ "kids": false,
+ "version": 1,
+ "notice": "30-second previews stream from Apple Music.",
+ "factsMeta": {
+  "artist": {
+   "type": "cat",
+   "label": "Artist"
+  },
+  "year": {
+   "type": "year",
+   "label": "Released",
+   "higherLabel": "Newer"
+  },
+  "decade": {
+   "type": "cat",
+   "label": "Decade"
+  }
+ },
+ "items": [
+  {
+   "id": "tik-tok-kesha",
+   "name": "TiK ToK",
+   "group": "2000s",
+   "facts": {
+    "artist": "Kesha",
+    "year": 2009,
+    "decade": "2000s"
+   },
+   "blurb": "\"TiK ToK\" by Kesha, released in 2009.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/ca/c4/5d/cac45d18-3920-16ab-33b9-5b85cc5e394b/mzaf_18125601085374059686.plus.aac.p.m4a",
+      "credit": "Kesha: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/tik-tok/381237317?i=381237322&uo=4",
+      "apple": {
+       "trackId": 381237322,
+       "url": "https://music.apple.com/us/album/tik-tok/381237317?i=381237322&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/92/d2/a7/92d2a780-3aa9-8b58-b753-62e4175dd2ec/884977451856.jpg/300x300bb.jpg",
+       "term": "Kesha TiK ToK"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "hey-soul-sister-train",
+   "name": "Hey, Soul Sister",
+   "group": "2000s",
+   "facts": {
+    "artist": "Train",
+    "year": 2009,
+    "decade": "2000s"
+   },
+   "blurb": "\"Hey, Soul Sister\" by Train, released in 2009.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/22/b2/3b/22b23b2d-db40-0fa1-b714-140aff15ecbe/mzaf_699506205855316636.plus.aac.p.m4a",
+      "credit": "Train: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/hey-soul-sister/425320463?i=425320500&uo=4",
+      "apple": {
+       "trackId": 425320500,
+       "url": "https://music.apple.com/us/album/hey-soul-sister/425320463?i=425320500&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/fa/e8/28/fae8283a-ad10-a642-1d41-a4b3402da4ba/884977817027.jpg/300x300bb.jpg",
+       "term": "Train Hey, Soul Sister"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "california-gurls-katy-perry",
+   "name": "California Gurls",
+   "group": "2010s",
+   "facts": {
+    "artist": "Katy Perry",
+    "year": 2010,
+    "decade": "2010s"
+   },
+   "blurb": "\"California Gurls\" by Katy Perry, released in 2010.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/ed/8a/5e/ed8a5ecf-117a-ac20-c3e7-74b79ba23c77/mzaf_15567236028816246619.plus.aac.p.m4a",
+      "credit": "Katy Perry: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/california-gurls-feat-snoop-dogg/1013032931?i=1013032940&uo=4",
+      "apple": {
+       "trackId": 1013032940,
+       "url": "https://music.apple.com/us/album/california-gurls-feat-snoop-dogg/1013032931?i=1013032940&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music126/v4/75/97/31/759731eb-b429-dfe3-c41f-34435998d102/13UABIM57845.rgb.jpg/300x300bb.jpg",
+       "term": "Katy Perry California Gurls"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "love-the-way-you-lie-eminem",
+   "name": "Love the Way You Lie",
+   "group": "2010s",
+   "facts": {
+    "artist": "Eminem",
+    "year": 2010,
+    "decade": "2010s"
+   },
+   "blurb": "\"Love the Way You Lie\" by Eminem, released in 2010.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/25/68/d3/2568d37c-8cbe-f516-ce54-227abb515c40/mzaf_8226522686053529671.plus.aac.p.m4a",
+      "credit": "Eminem: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/love-the-way-you-lie-feat-rihanna/1440781199?i=1440782199&uo=4",
+      "apple": {
+       "trackId": 1440782199,
+       "url": "https://music.apple.com/us/album/love-the-way-you-lie-feat-rihanna/1440781199?i=1440782199&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music128/v4/95/a4/2c/95a42c0d-f3c8-c70d-3e3a-93cfa4a516d4/00602527394558.rgb.jpg/300x300bb.jpg",
+       "term": "Eminem Love the Way You Lie"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "just-the-way-you-are-bruno-mars",
+   "name": "Just the Way You Are",
+   "group": "2010s",
+   "facts": {
+    "artist": "Bruno Mars",
+    "year": 2010,
+    "decade": "2010s"
+   },
+   "blurb": "\"Just the Way You Are\" by Bruno Mars, released in 2010.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/04/c9/ee/04c9eeea-24ca-2198-17ea-c1c1436cb953/mzaf_16637738980836746910.plus.aac.p.m4a",
+      "credit": "Bruno Mars: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/just-the-way-you-are/576654788?i=576655095&uo=4",
+      "apple": {
+       "trackId": 576655095,
+       "url": "https://music.apple.com/us/album/just-the-way-you-are/576654788?i=576655095&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music114/v4/52/b1/45/52b1452b-229e-78db-231b-7b43fa0077cc/075679956491.jpg/300x300bb.jpg",
+       "term": "Bruno Mars Just the Way You Are"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "grenade-bruno-mars",
+   "name": "Grenade",
+   "group": "2010s",
+   "facts": {
+    "artist": "Bruno Mars",
+    "year": 2010,
+    "decade": "2010s"
+   },
+   "blurb": "\"Grenade\" by Bruno Mars, released in 2010.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/56/70/01/567001be-26a3-6c61-cfe2-8184800dc347/mzaf_12349500431513219850.plus.aac.p.m4a",
+      "credit": "Bruno Mars: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/grenade/576654788?i=576655094&uo=4",
+      "apple": {
+       "trackId": 576655094,
+       "url": "https://music.apple.com/us/album/grenade/576654788?i=576655094&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music114/v4/52/b1/45/52b1452b-229e-78db-231b-7b43fa0077cc/075679956491.jpg/300x300bb.jpg",
+       "term": "Bruno Mars Grenade"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "firework-katy-perry",
+   "name": "Firework",
+   "group": "2010s",
+   "facts": {
+    "artist": "Katy Perry",
+    "year": 2010,
+    "decade": "2010s"
+   },
+   "blurb": "\"Firework\" by Katy Perry, released in 2010.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/ab/27/3b/ab273b22-1eb1-dd49-5332-5ef70c35683b/mzaf_4912325324633099647.plus.aac.p.m4a",
+      "credit": "Katy Perry: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/firework/716192216?i=716192625&uo=4",
+      "apple": {
+       "trackId": 716192625,
+       "url": "https://music.apple.com/us/album/firework/716192216?i=716192625&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music116/v4/c8/d3/42/c8d342af-26d9-3ec2-c511-e1eaf860e299/13UABIM57787.rgb.jpg/300x300bb.jpg",
+       "term": "Katy Perry Firework"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "rolling-in-the-deep-adele",
+   "name": "Rolling in the Deep",
+   "group": "2010s",
+   "facts": {
+    "artist": "Adele",
+    "year": 2010,
+    "decade": "2010s"
+   },
+   "blurb": "\"Rolling in the Deep\" by Adele, released in 2010.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/4c/4f/03/4c4f032a-3d2b-853d-da81-996602355b42/mzaf_11625850023134180491.plus.aac.p.m4a",
+      "credit": "Adele: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/rolling-in-the-deep/1544491232?i=1544491233&uo=4",
+      "apple": {
+       "trackId": 1544491233,
+       "url": "https://music.apple.com/us/album/rolling-in-the-deep/1544491232?i=1544491233&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/eb/ca/25/ebca2596-cd1e-b295-91a3-771c868d0a79/191404113868.png/300x300bb.jpg",
+       "term": "Adele Rolling in the Deep"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "someone-like-you-adele",
+   "name": "Someone Like You",
+   "group": "2010s",
+   "facts": {
+    "artist": "Adele",
+    "year": 2011,
+    "decade": "2010s"
+   },
+   "blurb": "\"Someone Like You\" by Adele, released in 2011.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/08/22/2e/08222e25-43f5-20e6-a442-b8127ac83368/mzaf_1689070223363740216.plus.aac.p.m4a",
+      "credit": "Adele: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/someone-like-you/1544491232?i=1544491998&uo=4",
+      "apple": {
+       "trackId": 1544491998,
+       "url": "https://music.apple.com/us/album/someone-like-you/1544491232?i=1544491998&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/eb/ca/25/ebca2596-cd1e-b295-91a3-771c868d0a79/191404113868.png/300x300bb.jpg",
+       "term": "Adele Someone Like You"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "party-rock-anthem-lmfao",
+   "name": "Party Rock Anthem",
+   "group": "2010s",
+   "facts": {
+    "artist": "LMFAO",
+    "year": 2011,
+    "decade": "2010s"
+   },
+   "blurb": "\"Party Rock Anthem\" by LMFAO, released in 2011.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/fe/63/a1/fe63a1b8-091f-9d45-594f-bb982166297f/mzaf_8877172162075707701.plus.aac.p.m4a",
+      "credit": "LMFAO: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/party-rock-anthem-feat-lauren-bennett-goonrock/1440636622?i=1440636627&uo=4",
+      "apple": {
+       "trackId": 1440636627,
+       "url": "https://music.apple.com/us/album/party-rock-anthem-feat-lauren-bennett-goonrock/1440636622?i=1440636627&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music116/v4/21/d9/07/21d9076e-a52c-4f94-5176-011a9ec878e7/11UMGIM14032.rgb.jpg/300x300bb.jpg",
+       "term": "LMFAO Party Rock Anthem"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "moves-like-jagger-maroon-5",
+   "name": "Moves Like Jagger",
+   "group": "2010s",
+   "facts": {
+    "artist": "Maroon 5",
+    "year": 2011,
+    "decade": "2010s"
+   },
+   "blurb": "\"Moves Like Jagger\" by Maroon 5, released in 2011.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/1a/e8/be/1ae8bea8-8962-8168-80d5-65bf3b1478ba/mzaf_471500839444486606.plus.aac.p.m4a",
+      "credit": "Maroon 5: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/moves-like-jagger-feat-christina-aguilera/1440858689?i=1440859510&uo=4",
+      "apple": {
+       "trackId": 1440859510,
+       "url": "https://music.apple.com/us/album/moves-like-jagger-feat-christina-aguilera/1440858689?i=1440859510&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music122/v4/61/53/15/61531592-3e8b-1e85-b434-73a991d8143c/14UMGIM27067.rgb.jpg/300x300bb.jpg",
+       "term": "Maroon 5 Moves Like Jagger"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "give-me-everything-pitbull",
+   "name": "Give Me Everything",
+   "group": "2010s",
+   "facts": {
+    "artist": "Pitbull",
+    "year": 2011,
+    "decade": "2010s"
+   },
+   "blurb": "\"Give Me Everything\" by Pitbull, released in 2011.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/07/7a/58/077a5833-acac-306a-c927-f800f1e09d4d/mzaf_10663174745007601529.plus.aac.p.m4a",
+      "credit": "Pitbull: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/give-me-everything-feat-ne-yo-afrojack-nayer/440733026?i=440733032&uo=4",
+      "apple": {
+       "trackId": 440733032,
+       "url": "https://music.apple.com/us/album/give-me-everything-feat-ne-yo-afrojack-nayer/440733026?i=440733032&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/90/dd/f1/90ddf169-715d-ecd2-660f-bfc9d058c813/886443007154.jpg/300x300bb.jpg",
+       "term": "Pitbull Give Me Everything"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "somebody-that-i-used-to-know-gotye",
+   "name": "Somebody That I Used to Know",
+   "group": "2010s",
+   "facts": {
+    "artist": "Gotye",
+    "year": 2011,
+    "decade": "2010s"
+   },
+   "blurb": "\"Somebody That I Used to Know\" by Gotye, released in 2011.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/4a/63/85/4a6385ef-b80a-5e40-0bf2-245fa5b3dc52/mzaf_1146936378720252898.plus.aac.p.m4a",
+      "credit": "Gotye: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/somebody-that-i-used-to-know-feat-kimbra/1440754000?i=1440754487&uo=4",
+      "apple": {
+       "trackId": 1440754487,
+       "url": "https://music.apple.com/us/album/somebody-that-i-used-to-know-feat-kimbra/1440754000?i=1440754487&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/b3/8a/98/b38a9867-2a9c-de2f-2d80-c624fb2200ec/11UMGIM19347.rgb.jpg/300x300bb.jpg",
+       "term": "Gotye Somebody That I Used to Know"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "call-me-maybe-carly-rae-jepsen",
+   "name": "Call Me Maybe",
+   "group": "2010s",
+   "facts": {
+    "artist": "Carly Rae Jepsen",
+    "year": 2011,
+    "decade": "2010s"
+   },
+   "blurb": "\"Call Me Maybe\" by Carly Rae Jepsen, released in 2011.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/5e/0b/c4/5e0bc4b4-51fb-c992-4953-8cc13ecfb773/mzaf_4904797060238555261.plus.aac.p.m4a",
+      "credit": "Carly Rae Jepsen: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/call-me-maybe/1440873664?i=1440874008&uo=4",
+      "apple": {
+       "trackId": 1440874008,
+       "url": "https://music.apple.com/us/album/call-me-maybe/1440873664?i=1440874008&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music125/v4/14/54/19/145419b2-96f6-fc9e-3110-fbdc78022df6/12UMGIM48177.rgb.jpg/300x300bb.jpg",
+       "term": "Carly Rae Jepsen Call Me Maybe"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "we-are-young-fun",
+   "name": "We Are Young",
+   "group": "2010s",
+   "facts": {
+    "artist": "fun.",
+    "year": 2011,
+    "decade": "2010s"
+   },
+   "blurb": "\"We Are Young\" by fun., released in 2011.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/63/a9/ed/63a9ede2-1823-d75f-7ae3-061b91790395/mzaf_17932545875589323048.plus.aac.p.m4a",
+      "credit": "fun.: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/we-are-young-feat-janelle-mon%C3%A1e/486040153?i=486040195&uo=4",
+      "apple": {
+       "trackId": 486040195,
+       "url": "https://music.apple.com/us/album/we-are-young-feat-janelle-mon%C3%A1e/486040153?i=486040195&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Features115/v4/b2/df/a3/b2dfa32c-ea54-7983-0da1-6964e60a1bd7/dj.aqphuayl.jpg/300x300bb.jpg",
+       "term": "Fun. We Are Young"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "we-found-love-rihanna",
+   "name": "We Found Love",
+   "group": "2010s",
+   "facts": {
+    "artist": "Rihanna",
+    "year": 2011,
+    "decade": "2010s"
+   },
+   "blurb": "\"We Found Love\" by Rihanna, released in 2011.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/b0/4a/30/b04a30d4-edb9-a31c-2a0d-255c9c0a1b23/mzaf_6763945702626450264.plus.aac.p.m4a",
+      "credit": "Rihanna: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/we-found-love-feat-calvin-harris/1440758930?i=1440758945&uo=4",
+      "apple": {
+       "trackId": 1440758945,
+       "url": "https://music.apple.com/us/album/we-found-love-feat-calvin-harris/1440758930?i=1440758945&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music116/v4/74/23/7b/74237b93-8346-5fe1-b1eb-938808910c5d/11UMGIM38936.rgb.jpg/300x300bb.jpg",
+       "term": "Rihanna We Found Love"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "payphone-maroon-5",
+   "name": "Payphone",
+   "group": "2010s",
+   "facts": {
+    "artist": "Maroon 5",
+    "year": 2012,
+    "decade": "2010s"
+   },
+   "blurb": "\"Payphone\" by Maroon 5, released in 2012.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/ec/64/ef/ec64efe0-aa33-f8da-cf08-cff5a34f169f/mzaf_10418581457151079363.plus.aac.p.m4a",
+      "credit": "Maroon 5: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/payphone-feat-wiz-khalifa/1422675688?i=1422675690&uo=4",
+      "apple": {
+       "trackId": 1422675690,
+       "url": "https://music.apple.com/us/album/payphone-feat-wiz-khalifa/1422675688?i=1422675690&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music112/v4/4c/9a/f4/4c9af4b6-31d4-c856-a834-26f73f48d4a5/12UMGIM26179.rgb.jpg/300x300bb.jpg",
+       "term": "Maroon 5 Payphone"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "gangnam-style-psy",
+   "name": "Gangnam Style",
+   "group": "2010s",
+   "facts": {
+    "artist": "PSY",
+    "year": 2012,
+    "decade": "2010s"
+   },
+   "blurb": "\"Gangnam Style\" by PSY, released in 2012.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/00/53/c6/0053c6f7-6342-7a3d-37c5-60b896948bdb/mzaf_10727579274479911915.plus.aac.p.m4a",
+      "credit": "PSY: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/gangnam-style/1445144506?i=1445144527&uo=4",
+      "apple": {
+       "trackId": 1445144527,
+       "url": "https://music.apple.com/us/album/gangnam-style/1445144506?i=1445144527&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/7c/52/87/7c5287bc-818f-55ed-e607-08b052963632/12UMGIM50914.rgb.jpg/300x300bb.jpg",
+       "term": "PSY Gangnam Style"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "thrift-shop-macklemore-and-ryan-lewis",
+   "name": "Thrift Shop",
+   "group": "2010s",
+   "facts": {
+    "artist": "Macklemore & Ryan Lewis",
+    "year": 2012,
+    "decade": "2010s"
+   },
+   "blurb": "\"Thrift Shop\" by Macklemore & Ryan Lewis, released in 2012.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/ce/5c/aa/ce5caa72-ff73-221e-cc83-295c23bce434/mzaf_8353999015135739287.plus.aac.p.m4a",
+      "credit": "Macklemore & Ryan Lewis: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/thrift-shop-feat-wanz/560097246?i=560097550&uo=4",
+      "apple": {
+       "trackId": 560097550,
+       "url": "https://music.apple.com/us/album/thrift-shop-feat-wanz/560097246?i=560097550&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/44/40/83/44408300-636f-8cae-d508-9dd96db48cea/707541528191.jpg/300x300bb.jpg",
+       "term": "Macklemore & Ryan Lewis Thrift Shop"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "radioactive-imagine-dragons",
+   "name": "Radioactive",
+   "group": "2010s",
+   "facts": {
+    "artist": "Imagine Dragons",
+    "year": 2012,
+    "decade": "2010s"
+   },
+   "blurb": "\"Radioactive\" by Imagine Dragons, released in 2012.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/77/70/88/777088e9-60a1-c459-bfa5-6e66f2fd2695/mzaf_7685408661765681881.plus.aac.p.m4a",
+      "credit": "Imagine Dragons: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/radioactive/1440873107?i=1440873126&uo=4",
+      "apple": {
+       "trackId": 1440873126,
+       "url": "https://music.apple.com/us/album/radioactive/1440873107?i=1440873126&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music112/v4/1f/fa/09/1ffa092f-f52f-4a66-7d10-4cc5982dc747/12UMGIM46901.rgb.jpg/300x300bb.jpg",
+       "term": "Imagine Dragons Radioactive"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "blurred-lines-robin-thicke",
+   "name": "Blurred Lines",
+   "group": "2010s",
+   "facts": {
+    "artist": "Robin Thicke",
+    "year": 2013,
+    "decade": "2010s"
+   },
+   "blurb": "\"Blurred Lines\" by Robin Thicke, released in 2013.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/8d/7a/74/8d7a7475-5ab4-68c3-7a70-ba111d8358df/mzaf_18355636855815173576.plus.aac.p.m4a",
+      "credit": "Robin Thicke: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/blurred-lines-feat-t-i-pharrell/1442971651?i=1442971656&uo=4",
+      "apple": {
+       "trackId": 1442971656,
+       "url": "https://music.apple.com/us/album/blurred-lines-feat-t-i-pharrell/1442971651?i=1442971656&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music112/v4/9f/b1/b9/9fb1b976-bec0-1964-053d-001fed83a720/13UAAIM09929.rgb.jpg/300x300bb.jpg",
+       "term": "Robin Thicke Blurred Lines"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "get-lucky-daft-punk",
+   "name": "Get Lucky",
+   "group": "2010s",
+   "facts": {
+    "artist": "Daft Punk",
+    "year": 2013,
+    "decade": "2010s"
+   },
+   "blurb": "\"Get Lucky\" by Daft Punk, released in 2013.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/57/a5/85/57a585aa-f1bc-7619-881b-f8a04a5541d5/mzaf_6906185026678279401.plus.aac.p.m4a",
+      "credit": "Daft Punk: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/get-lucky/617154241?i=617154366&uo=4",
+      "apple": {
+       "trackId": 617154366,
+       "url": "https://music.apple.com/us/album/get-lucky/617154241?i=617154366&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/e8/43/5f/e8435ffa-b6b9-b171-40ab-4ff3959ab661/886443919266.jpg/300x300bb.jpg",
+       "term": "Daft Punk, Pharrell Williams & Nile Rodgers Get Lucky"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "royals-lorde",
+   "name": "Royals",
+   "group": "2010s",
+   "facts": {
+    "artist": "Lorde",
+    "year": 2013,
+    "decade": "2010s"
+   },
+   "blurb": "\"Royals\" by Lorde, released in 2013.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/4c/50/2e/4c502ee4-d63e-3f7c-11cc-61b2e0c92656/mzaf_4849324024240261165.plus.aac.p.m4a",
+      "credit": "Lorde: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/royals/1594982748?i=1594982922&uo=4",
+      "apple": {
+       "trackId": 1594982922,
+       "url": "https://music.apple.com/us/album/royals/1594982748?i=1594982922&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music126/v4/b9/e2/d0/b9e2d0af-8ce2-e078-d4e2-eccf24d7e206/12UMGIM55707.rgb.jpg/300x300bb.jpg",
+       "term": "Lorde Royals"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "wrecking-ball-miley-cyrus",
+   "name": "Wrecking Ball",
+   "group": "2010s",
+   "facts": {
+    "artist": "Miley Cyrus",
+    "year": 2013,
+    "decade": "2010s"
+   },
+   "blurb": "\"Wrecking Ball\" by Miley Cyrus, released in 2013.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/f8/e8/a2/f8e8a23c-b85d-17dd-9625-b39ec26b171f/mzaf_1866607988873686159.plus.aac.p.m4a",
+      "credit": "Miley Cyrus: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/wrecking-ball/1460315055?i=1460315319&uo=4",
+      "apple": {
+       "trackId": 1460315319,
+       "url": "https://music.apple.com/us/album/wrecking-ball/1460315055?i=1460315319&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/e3/e0/84/e3e08400-2d03-75f9-6b8b-a3345452aa98/886444197816.jpg/300x300bb.jpg",
+       "term": "Miley Cyrus Wrecking Ball"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "roar-katy-perry",
+   "name": "Roar",
+   "group": "2010s",
+   "facts": {
+    "artist": "Katy Perry",
+    "year": 2013,
+    "decade": "2010s"
+   },
+   "blurb": "\"Roar\" by Katy Perry, released in 2013.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/21/a8/76/21a87607-1fe3-2bd2-753c-0b4b73c22b90/mzaf_9666996724668759977.plus.aac.p.m4a",
+      "credit": "Katy Perry: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/roar/1440818542?i=1440818897&uo=4",
+      "apple": {
+       "trackId": 1440818897,
+       "url": "https://music.apple.com/us/album/roar/1440818542?i=1440818897&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/36/21/81/36218129-51b4-df22-cafb-8e9503b53147/13UAAIM70445.rgb.jpg/300x300bb.jpg",
+       "term": "Katy Perry Roar"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "happy-pharrell-williams",
+   "name": "Happy",
+   "group": "2010s",
+   "facts": {
+    "artist": "Pharrell Williams",
+    "year": 2013,
+    "decade": "2010s"
+   },
+   "blurb": "\"Happy\" by Pharrell Williams, released in 2013.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/ed/a0/19/eda019cf-2794-66d1-208d-2e2e74c26c3d/mzaf_16469762943852039623.plus.aac.p.m4a",
+      "credit": "Pharrell Williams: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/happy-from-despicable-me-2/863835302?i=863835363&uo=4",
+      "apple": {
+       "trackId": 863835363,
+       "url": "https://music.apple.com/us/album/happy-from-despicable-me-2/863835302?i=863835363&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/76/ff/5e/76ff5ee0-7ab4-2ac2-2598-486a9ccc06e1/886444516877.jpg/300x300bb.jpg",
+       "term": "Pharrell Williams Happy"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "all-of-me-john-legend",
+   "name": "All of Me",
+   "group": "2010s",
+   "facts": {
+    "artist": "John Legend",
+    "year": 2013,
+    "decade": "2010s"
+   },
+   "blurb": "\"All of Me\" by John Legend, released in 2013.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/ff/94/6c/ff946ca7-e49a-fdf8-ea5b-11e6f56a0417/mzaf_17369156110722174773.plus.aac.p.m4a",
+      "credit": "John Legend: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/all-of-me/1441844369?i=1441844542&uo=4",
+      "apple": {
+       "trackId": 1441844542,
+       "url": "https://music.apple.com/us/album/all-of-me/1441844369?i=1441844542&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music125/v4/22/71/b9/2271b906-85b3-06ee-e611-489b91df0b73/886444160742.jpg/300x300bb.jpg",
+       "term": "John Legend All of Me"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "let-it-go-idina-menzel",
+   "name": "Let It Go",
+   "group": "2010s",
+   "facts": {
+    "artist": "Idina Menzel",
+    "year": 2013,
+    "decade": "2010s"
+   },
+   "blurb": "\"Let It Go\" by Idina Menzel, released in 2013.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/43/5f/36/435f3609-ddd5-bc10-3dbb-ddf5872b93ce/mzaf_9461789858996596537.plus.aac.p.m4a",
+      "credit": "Idina Menzel: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/let-it-go/1440618177?i=1440618281&uo=4",
+      "apple": {
+       "trackId": 1440618281,
+       "url": "https://music.apple.com/us/album/let-it-go/1440618177?i=1440618281&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music126/v4/4c/5d/31/4c5d3166-3a4b-fb3c-473e-1776ff947466/13DMGIM04437.rgb.jpg/300x300bb.jpg",
+       "term": "Idina Menzel Let It Go"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "stay-with-me-sam-smith",
+   "name": "Stay with Me",
+   "group": "2010s",
+   "facts": {
+    "artist": "Sam Smith",
+    "year": 2014,
+    "decade": "2010s"
+   },
+   "blurb": "\"Stay with Me\" by Sam Smith, released in 2014.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/d8/90/ef/d890ef3d-95b8-2224-5ff2-4ed56a359449/mzaf_8285804271834164275.plus.aac.p.m4a",
+      "credit": "Sam Smith: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/stay-with-me/1440814069?i=1440814425&uo=4",
+      "apple": {
+       "trackId": 1440814425,
+       "url": "https://music.apple.com/us/album/stay-with-me/1440814069?i=1440814425&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/80/74/b6/8074b6bc-387f-6cc9-5ede-92b76396ad5f/13UAEIM58958.rgb.jpg/300x300bb.jpg",
+       "term": "Sam Smith Stay With Me"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "shake-it-off-taylor-swift",
+   "name": "Shake It Off",
+   "group": "2010s",
+   "facts": {
+    "artist": "Taylor Swift",
+    "year": 2014,
+    "decade": "2010s"
+   },
+   "blurb": "\"Shake It Off\" by Taylor Swift, released in 2014.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/11/d5/6d/11d56d4a-ce23-e793-8681-70dc4d35d931/mzaf_5886436202259848624.plus.aac.p.m4a",
+      "credit": "Taylor Swift: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/shake-it-off/1440933512?i=1440933651&uo=4",
+      "apple": {
+       "trackId": 1440933651,
+       "url": "https://music.apple.com/us/album/shake-it-off/1440933512?i=1440933651&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/a7/98/d8/a798d867-344d-2bf2-fbfe-d2d1412dcef8/14UMDIM03793.rgb.jpg/300x300bb.jpg",
+       "term": "Taylor Swift Shake It Off"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "uptown-funk-mark-ronson",
+   "name": "Uptown Funk",
+   "group": "2010s",
+   "facts": {
+    "artist": "Mark Ronson",
+    "year": 2014,
+    "decade": "2010s"
+   },
+   "blurb": "\"Uptown Funk\" by Mark Ronson, released in 2014.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/b9/96/2c/b9962c79-3662-235c-e55d-6c4b41457499/mzaf_18075623088273148288.plus.aac.p.m4a",
+      "credit": "Mark Ronson: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/uptown-funk-feat-bruno-mars/943946661?i=943946671&uo=4",
+      "apple": {
+       "trackId": 943946671,
+       "url": "https://music.apple.com/us/album/uptown-funk-feat-bruno-mars/943946661?i=943946671&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/7e/30/c5/7e30c572-aa47-5f7b-c6fd-42d50cd2c56d/886444959797.jpg/300x300bb.jpg",
+       "term": "Mark Ronson Uptown Funk"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "thinking-out-loud-ed-sheeran",
+   "name": "Thinking Out Loud",
+   "group": "2010s",
+   "facts": {
+    "artist": "Ed Sheeran",
+    "year": 2014,
+    "decade": "2010s"
+   },
+   "blurb": "\"Thinking Out Loud\" by Ed Sheeran, released in 2014.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/78/a5/f2/78a5f25e-ad1b-718d-82ad-b82e676c1855/mzaf_6133970271589343093.plus.aac.p.m4a",
+      "credit": "Ed Sheeran: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/thinking-out-loud/1050204616?i=1050204631&uo=4",
+      "apple": {
+       "trackId": 1050204631,
+       "url": "https://music.apple.com/us/album/thinking-out-loud/1050204616?i=1050204631&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music125/v4/2d/36/f9/2d36f9a7-2c3e-ce0f-7fb6-036feecb221f/825646974450.jpg/300x300bb.jpg",
+       "term": "Ed Sheeran Thinking Out Loud"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "see-you-again-wiz-khalifa",
+   "name": "See You Again",
+   "group": "2010s",
+   "facts": {
+    "artist": "Wiz Khalifa",
+    "year": 2015,
+    "decade": "2010s"
+   },
+   "blurb": "\"See You Again\" by Wiz Khalifa, released in 2015.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/ef/54/3d/ef543d55-58cb-320e-8dc7-084336d961d0/mzaf_15679467696516524072.plus.aac.p.m4a",
+      "credit": "Wiz Khalifa: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/see-you-again-feat-charlie-puth/966411595?i=966411602&uo=4",
+      "apple": {
+       "trackId": 966411602,
+       "url": "https://music.apple.com/us/album/see-you-again-feat-charlie-puth/966411595?i=966411602&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/e6/8a/68/e68a688e-129e-cb9d-938f-bc3ee37059ae/075679930910.jpg/300x300bb.jpg",
+       "term": "Wiz Khalifa See You Again"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "hello-adele",
+   "name": "Hello",
+   "group": "2010s",
+   "facts": {
+    "artist": "Adele",
+    "year": 2015,
+    "decade": "2010s"
+   },
+   "blurb": "\"Hello\" by Adele, released in 2015.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/10/7e/9d/107e9dc0-c13b-eace-2486-84a3c694b075/mzaf_6267923862748965591.plus.aac.p.m4a",
+      "credit": "Adele: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/hello/1544494115?i=1544494392&uo=4",
+      "apple": {
+       "trackId": 1544494392,
+       "url": "https://music.apple.com/us/album/hello/1544494115?i=1544494392&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music116/v4/08/8c/24/088c2405-2e33-801b-5c38-e967f2c01e69/191404113974.png/300x300bb.jpg",
+       "term": "Adele Hello"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "shut-up-and-dance-walk-the-moon",
+   "name": "Shut Up and Dance",
+   "group": "2010s",
+   "facts": {
+    "artist": "Walk the Moon",
+    "year": 2014,
+    "decade": "2010s"
+   },
+   "blurb": "\"Shut Up and Dance\" by Walk the Moon, released in 2014.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/fa/37/b0/fa37b02c-cccc-7ccb-3161-39a5f4c2d4e8/mzaf_1832266719592545746.plus.aac.p.m4a",
+      "credit": "Walk the Moon: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/shut-up-and-dance/961298415?i=961298418&uo=4",
+      "apple": {
+       "trackId": 961298418,
+       "url": "https://music.apple.com/us/album/shut-up-and-dance/961298415?i=961298418&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/bf/b6/76/bfb67621-b78d-3924-6d29-4f367697a674/886445045758.jpg/300x300bb.jpg",
+       "term": "WALK THE MOON Shut Up and Dance"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "love-yourself-justin-bieber",
+   "name": "Love Yourself",
+   "group": "2010s",
+   "facts": {
+    "artist": "Justin Bieber",
+    "year": 2015,
+    "decade": "2010s"
+   },
+   "blurb": "\"Love Yourself\" by Justin Bieber, released in 2015.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/b6/fc/58/b6fc5860-ee45-7966-3e22-d6445acc933e/mzaf_1716189482689106429.plus.aac.p.m4a",
+      "credit": "Justin Bieber: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/love-yourself/1440829460?i=1440829613&uo=4",
+      "apple": {
+       "trackId": 1440829613,
+       "url": "https://music.apple.com/us/album/love-yourself/1440829460?i=1440829613&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music116/v4/75/11/84/751184b0-77df-1eff-bb20-dac03247425d/15UMGIM59808.rgb.jpg/300x300bb.jpg",
+       "term": "Justin Bieber Love Yourself"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "sorry-justin-bieber",
+   "name": "Sorry",
+   "group": "2010s",
+   "facts": {
+    "artist": "Justin Bieber",
+    "year": 2015,
+    "decade": "2010s"
+   },
+   "blurb": "\"Sorry\" by Justin Bieber, released in 2015.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/66/eb/29/66eb29c0-c2f9-d9df-8af3-3bf2562c9d7c/mzaf_4099789285264521999.plus.aac.p.m4a",
+      "credit": "Justin Bieber: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/sorry/1440829460?i=1440829610&uo=4",
+      "apple": {
+       "trackId": 1440829610,
+       "url": "https://music.apple.com/us/album/sorry/1440829460?i=1440829610&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music116/v4/75/11/84/751184b0-77df-1eff-bb20-dac03247425d/15UMGIM59808.rgb.jpg/300x300bb.jpg",
+       "term": "Justin Bieber Sorry"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "one-dance-drake",
+   "name": "One Dance",
+   "group": "2010s",
+   "facts": {
+    "artist": "Drake",
+    "year": 2016,
+    "decade": "2010s"
+   },
+   "blurb": "\"One Dance\" by Drake, released in 2016.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/cb/ee/e3/cbeee354-21e5-2c44-daeb-bcd95e26fe6a/mzaf_5204581280747289469.plus.aac.p.m4a",
+      "credit": "Drake: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/one-dance-feat-wizkid-kyla/1440841363?i=1440841384&uo=4",
+      "apple": {
+       "trackId": 1440841384,
+       "url": "https://music.apple.com/us/album/one-dance-feat-wizkid-kyla/1440841363?i=1440841384&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/f2/0d/8b/f20d8bff-a927-ae98-6784-20a1f51cb23e/16UMGIM27642.rgb.jpg/300x300bb.jpg",
+       "term": "Drake One Dance"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "work-rihanna",
+   "name": "Work",
+   "group": "2010s",
+   "facts": {
+    "artist": "Rihanna",
+    "year": 2016,
+    "decade": "2010s"
+   },
+   "blurb": "\"Work\" by Rihanna, released in 2016.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/95/27/c5/9527c58a-b72d-c09e-51c8-0c36531f44a4/mzaf_16889711813657214394.plus.aac.p.m4a",
+      "credit": "Rihanna: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/work-feat-drake/1443230958?i=1443231169&uo=4",
+      "apple": {
+       "trackId": 1443231169,
+       "url": "https://music.apple.com/us/album/work-feat-drake/1443230958?i=1443231169&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music116/v4/13/27/57/132757ba-42e6-9584-7390-ca694292a20e/16UMGIM03372.rgb.jpg/300x300bb.jpg",
+       "term": "Rihanna Work"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "cant-stop-the-feeling-justin-timberlake",
+   "name": "CAN'T STOP THE FEELING!",
+   "group": "2010s",
+   "facts": {
+    "artist": "Justin Timberlake",
+    "year": 2016,
+    "decade": "2010s"
+   },
+   "blurb": "\"CAN'T STOP THE FEELING!\" by Justin Timberlake, released in 2016.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/86/41/2d/86412d20-2f4d-39fc-221b-3f643d7c99c6/mzaf_9909715182585785919.plus.aac.p.m4a",
+      "credit": "Justin Timberlake: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/cant-stop-the-feeling/1154238159?i=1154239184&uo=4",
+      "apple": {
+       "trackId": 1154239184,
+       "url": "https://music.apple.com/us/album/cant-stop-the-feeling/1154238159?i=1154239184&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music125/v4/68/19/43/68194388-efa7-3afe-8a15-a4c3eebef1f6/886445915211.jpg/300x300bb.jpg",
+       "term": "Justin Timberlake CAN'T STOP THE FEELING!"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "closer-the-chainsmokers",
+   "name": "Closer",
+   "group": "2010s",
+   "facts": {
+    "artist": "The Chainsmokers",
+    "year": 2016,
+    "decade": "2010s"
+   },
+   "blurb": "\"Closer\" by The Chainsmokers, released in 2016.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/bd/f9/b9/bdf9b9b2-eaa4-4461-6079-aaacc6df7316/mzaf_17327312786932455493.plus.aac.p.m4a",
+      "credit": "The Chainsmokers: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/closer-feat-halsey/1170699510?i=1170699703&uo=4",
+      "apple": {
+       "trackId": 1170699703,
+       "url": "https://music.apple.com/us/album/closer-feat-halsey/1170699510?i=1170699703&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music125/v4/41/f8/38/41f8380b-9b56-d5d4-31f7-a6411c0c9aaa/886446102054.jpg/300x300bb.jpg",
+       "term": "The Chainsmokers Closer"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "cheap-thrills-sia",
+   "name": "Cheap Thrills",
+   "group": "2010s",
+   "facts": {
+    "artist": "Sia",
+    "year": 2016,
+    "decade": "2010s"
+   },
+   "blurb": "\"Cheap Thrills\" by Sia, released in 2016.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/86/f3/f8/86f3f89a-1d64-6178-826e-0f98e813e216/mzaf_15547448419187473148.plus.aac.p.m4a",
+      "credit": "Sia: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/cheap-thrills-feat-sean-paul/1082505789?i=1082506273&uo=4",
+      "apple": {
+       "trackId": 1082506273,
+       "url": "https://music.apple.com/us/album/cheap-thrills-feat-sean-paul/1082505789?i=1082506273&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/1f/60/44/1f604422-0062-b3c6-7e52-867f496619e8/886445739930.jpg/300x300bb.jpg",
+       "term": "Sia Cheap Thrills"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "shape-of-you-ed-sheeran",
+   "name": "Shape of You",
+   "group": "2010s",
+   "facts": {
+    "artist": "Ed Sheeran",
+    "year": 2017,
+    "decade": "2010s"
+   },
+   "blurb": "\"Shape of You\" by Ed Sheeran, released in 2017.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/44/c7/4f/44c74f0d-72dc-6143-d4d0-ba14d661ca0d/mzaf_9566898362556366703.plus.aac.p.m4a",
+      "credit": "Ed Sheeran: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/shape-of-you/1193701079?i=1193701392&uo=4",
+      "apple": {
+       "trackId": 1193701392,
+       "url": "https://music.apple.com/us/album/shape-of-you/1193701079?i=1193701392&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/15/e6/e8/15e6e8a4-4190-6a8b-86c3-ab4a51b88288/190295851286.jpg/300x300bb.jpg",
+       "term": "Ed Sheeran Shape of You"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "despacito-luis-fonsi-and-daddy-yankee",
+   "name": "Despacito",
+   "group": "2010s",
+   "facts": {
+    "artist": "Luis Fonsi & Daddy Yankee",
+    "year": 2017,
+    "decade": "2010s"
+   },
+   "blurb": "\"Despacito\" by Luis Fonsi & Daddy Yankee, released in 2017.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/01/55/6f/01556f75-ea92-0267-c6d4-09ee6fd8ff26/mzaf_15962911936959580358.plus.aac.p.m4a",
+      "credit": "Luis Fonsi & Daddy Yankee: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/despacito-versi%C3%B3n-urbana-sky/1445011791?i=1445011795&uo=4",
+      "apple": {
+       "trackId": 1445011795,
+       "url": "https://music.apple.com/us/album/despacito-versi%C3%B3n-urbana-sky/1445011791?i=1445011795&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/11/d6/58/11d658ed-2ee0-31bb-da65-3377b879f7fe/00602557543537.rgb.jpg/300x300bb.jpg",
+       "term": "Luis Fonsi & Daddy Yankee Despacito"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "humble-kendrick-lamar",
+   "name": "HUMBLE.",
+   "group": "2010s",
+   "facts": {
+    "artist": "Kendrick Lamar",
+    "year": 2017,
+    "decade": "2010s"
+   },
+   "blurb": "\"HUMBLE.\" by Kendrick Lamar, released in 2017.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/1f/2e/37/1f2e37be-bdd0-d770-6ea4-091011a6aade/mzaf_2360827885900940865.plus.aac.p.m4a",
+      "credit": "Kendrick Lamar: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/humble/1440881722?i=1440882165&uo=4",
+      "apple": {
+       "trackId": 1440882165,
+       "url": "https://music.apple.com/us/album/humble/1440881722?i=1440882165&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music112/v4/ab/16/ef/ab16efe9-e7f1-66ec-021c-5592a23f0f9e/17UMGIM88793.rgb.jpg/300x300bb.jpg",
+       "term": "Kendrick Lamar HUMBLE."
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "believer-imagine-dragons",
+   "name": "Believer",
+   "group": "2010s",
+   "facts": {
+    "artist": "Imagine Dragons",
+    "year": 2017,
+    "decade": "2010s"
+   },
+   "blurb": "\"Believer\" by Imagine Dragons, released in 2017.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/c0/3f/36/c03f367a-b66b-fd0a-a54c-30f8250c4410/mzaf_12768434238801682952.plus.aac.p.m4a",
+      "credit": "Imagine Dragons: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/believer/1411625594?i=1411628233&uo=4",
+      "apple": {
+       "trackId": 1411628233,
+       "url": "https://music.apple.com/us/album/believer/1411625594?i=1411628233&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music126/v4/11/7a/b8/117ab805-6811-8929-18b9-0fad7baf0c25/17UMGIM98210.rgb.jpg/300x300bb.jpg",
+       "term": "Imagine Dragons Believer"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "perfect-ed-sheeran",
+   "name": "Perfect",
+   "group": "2010s",
+   "facts": {
+    "artist": "Ed Sheeran",
+    "year": 2017,
+    "decade": "2010s"
+   },
+   "blurb": "\"Perfect\" by Ed Sheeran, released in 2017.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/c7/ba/bc/c7babc66-f598-aaa6-bcf6-307281795817/mzaf_16337361235117168274.plus.aac.p.m4a",
+      "credit": "Ed Sheeran: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/perfect/1193701079?i=1193701400&uo=4",
+      "apple": {
+       "trackId": 1193701400,
+       "url": "https://music.apple.com/us/album/perfect/1193701079?i=1193701400&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/15/e6/e8/15e6e8a4-4190-6a8b-86c3-ab4a51b88288/190295851286.jpg/300x300bb.jpg",
+       "term": "Ed Sheeran Perfect"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "havana-camila-cabello",
+   "name": "Havana",
+   "group": "2010s",
+   "facts": {
+    "artist": "Camila Cabello",
+    "year": 2017,
+    "decade": "2010s"
+   },
+   "blurb": "\"Havana\" by Camila Cabello, released in 2017.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/7d/42/fe/7d42fe40-78b9-c546-861e-bda5788bba4e/mzaf_7434858341023410545.plus.aac.p.m4a",
+      "credit": "Camila Cabello: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/havana-feat-young-thug/1321216767?i=1321217032&uo=4",
+      "apple": {
+       "trackId": 1321217032,
+       "url": "https://music.apple.com/us/album/havana-feat-young-thug/1321216767?i=1321217032&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music125/v4/85/28/70/85287029-19b9-cbe3-d1ab-300781875bf4/886446870298.jpg/300x300bb.jpg",
+       "term": "Camila Cabello Havana"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "gods-plan-drake",
+   "name": "God's Plan",
+   "group": "2010s",
+   "facts": {
+    "artist": "Drake",
+    "year": 2018,
+    "decade": "2010s"
+   },
+   "blurb": "\"God's Plan\" by Drake, released in 2018.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/c6/4a/be/c64abe74-adb4-cff5-005d-0fab3d72a806/mzaf_10276154697254415719.plus.aac.p.m4a",
+      "credit": "Drake: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/gods-plan/1406109769?i=1406109863&uo=4",
+      "apple": {
+       "trackId": 1406109863,
+       "url": "https://music.apple.com/us/album/gods-plan/1406109769?i=1406109863&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/bb/6d/8f/bb6d8f67-6d04-10b5-dd62-eb5809ac54fc/00602567879152.rgb.jpg/300x300bb.jpg",
+       "term": "Drake God's Plan"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "shallow-lady-gaga-and-bradley-cooper",
+   "name": "Shallow",
+   "group": "2010s",
+   "facts": {
+    "artist": "Lady Gaga & Bradley Cooper",
+    "year": 2018,
+    "decade": "2010s"
+   },
+   "blurb": "\"Shallow\" by Lady Gaga & Bradley Cooper, released in 2018.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/0c/cc/ed/0ccced59-6e6f-f0a0-0c9a-d20bfd475052/mzaf_26600833784075363.plus.aac.p.m4a",
+      "credit": "Lady Gaga & Bradley Cooper: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/shallow/1434371867?i=1434371887&uo=4",
+      "apple": {
+       "trackId": 1434371887,
+       "url": "https://music.apple.com/us/album/shallow/1434371867?i=1434371887&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/b1/9f/ef/b19fef51-79de-a940-e8ab-9e4e07b04d96/18UMGIM53752.rgb.jpg/300x300bb.jpg",
+       "term": "Lady Gaga & Bradley Cooper Shallow"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "sunflower-spider-man-into-the-spider-verse-post-malone-and-s",
+   "name": "Sunflower (Spider-Man: Into the Spider-Verse)",
+   "group": "2010s",
+   "facts": {
+    "artist": "Post Malone & Swae Lee",
+    "year": 2018,
+    "decade": "2010s"
+   },
+   "blurb": "\"Sunflower (Spider-Man: Into the Spider-Verse)\" by Post Malone & Swae Lee, released in 2018.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/98/f0/d6/98f0d67e-f8bf-762d-cac7-1c6b3b6b35dd/mzaf_4543283896248560946.plus.aac.p.m4a",
+      "credit": "Post Malone & Swae Lee: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/sunflower-spider-man-into-the-spider-verse/1445949265?i=1445949267&uo=4",
+      "apple": {
+       "trackId": 1445949267,
+       "url": "https://music.apple.com/us/album/sunflower-spider-man-into-the-spider-verse/1445949265?i=1445949267&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music125/v4/4b/30/2c/4b302cb6-7a14-5464-4e97-0577e9d0be49/18UMGIM82277.rgb.jpg/300x300bb.jpg",
+       "term": "Post Malone & Swae Lee Sunflower"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "old-town-road-lil-nas-x",
+   "name": "Old Town Road",
+   "group": "2010s",
+   "facts": {
+    "artist": "Lil Nas X",
+    "year": 2018,
+    "decade": "2010s"
+   },
+   "blurb": "\"Old Town Road\" by Lil Nas X, released in 2018.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/32/9c/42/329c4214-8cce-5382-aa92-fe87e013f3d5/mzaf_14962210134357559640.plus.aac.p.m4a",
+      "credit": "Lil Nas X: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/old-town-road/1468166325?i=1468166468&uo=4",
+      "apple": {
+       "trackId": 1468166468,
+       "url": "https://music.apple.com/us/album/old-town-road/1468166325?i=1468166468&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/07/d4/c3/07d4c33e-b793-d78f-bb1b-52f1e224da88/886447788264.jpg/300x300bb.jpg",
+       "term": "Lil Nas X Old Town Road"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "bad-guy-billie-eilish",
+   "name": "bad guy",
+   "alt": [
+    "Bad Guy"
+   ],
+   "group": "2010s",
+   "facts": {
+    "artist": "Billie Eilish",
+    "year": 2019,
+    "decade": "2010s"
+   },
+   "blurb": "\"bad guy\" by Billie Eilish, released in 2019.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/c3/87/1f/c3871f7e-3260-d615-1c66-5fdca2c3a48f/mzaf_10721331211699880949.plus.aac.p.m4a",
+      "credit": "Billie Eilish: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/bad-guy/1450695723?i=1450695739&uo=4",
+      "apple": {
+       "trackId": 1450695739,
+       "url": "https://music.apple.com/us/album/bad-guy/1450695723?i=1450695739&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/1a/37/d1/1a37d1b1-8508-54f2-f541-bf4e437dda76/19UMGIM05028.rgb.jpg/300x300bb.jpg",
+       "term": "Billie Eilish bad guy"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "senorita-shawn-mendes-and-camila-cabello",
+   "name": "Señorita",
+   "group": "2010s",
+   "facts": {
+    "artist": "Shawn Mendes & Camila Cabello",
+    "year": 2019,
+    "decade": "2010s"
+   },
+   "blurb": "\"Señorita\" by Shawn Mendes & Camila Cabello, released in 2019.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/cf/06/d6/cf06d6fd-f7a0-2898-8363-67688df6c14f/mzaf_8234301186390421644.plus.aac.p.m4a",
+      "credit": "Shawn Mendes & Camila Cabello: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/se%C3%B1orita/1468910011?i=1468910018&uo=4",
+      "apple": {
+       "trackId": 1468910018,
+       "url": "https://music.apple.com/us/album/se%C3%B1orita/1468910011?i=1468910018&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music125/v4/46/fe/4a/46fe4a39-feb4-7b8b-97b9-0187d49a46bd/19UMGIM53914.rgb.jpg/300x300bb.jpg",
+       "term": "Shawn Mendes & Camila Cabello Señorita"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "someone-you-loved-lewis-capaldi",
+   "name": "Someone You Loved",
+   "group": "2010s",
+   "facts": {
+    "artist": "Lewis Capaldi",
+    "year": 2018,
+    "decade": "2010s"
+   },
+   "blurb": "\"Someone You Loved\" by Lewis Capaldi, released in 2018.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/e5/c8/17/e5c817e2-7830-091f-8686-d6276d5beaeb/mzaf_5586826958480073790.plus.aac.p.m4a",
+      "credit": "Lewis Capaldi: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/someone-you-loved/1452618876?i=1452619054&uo=4",
+      "apple": {
+       "trackId": 1452619054,
+       "url": "https://music.apple.com/us/album/someone-you-loved/1452618876?i=1452619054&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music116/v4/92/d7/8f/92d78fb1-df3d-049e-c81d-7022808b151f/19UMGIM02973.rgb.jpg/300x300bb.jpg",
+       "term": "Lewis Capaldi Someone You Loved"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "blinding-lights-the-weeknd",
+   "name": "Blinding Lights",
+   "group": "2010s",
+   "facts": {
+    "artist": "The Weeknd",
+    "year": 2019,
+    "decade": "2010s"
+   },
+   "blurb": "\"Blinding Lights\" by The Weeknd, released in 2019.",
+   "media": {
+    "audio": [
+     {
+      "src": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/1d/44/0d/1d440dbc-9832-08e6-080d-aa1e1bacf40c/mzaf_3600642016947675074.plus.aac.p.m4a",
+      "credit": "The Weeknd: 30-second preview courtesy of Apple Music",
+      "license": "Apple Music preview (streamed, not stored)",
+      "page": "https://music.apple.com/us/album/blinding-lights/1505683705?i=1505683988&uo=4",
+      "apple": {
+       "trackId": 1505683988,
+       "url": "https://music.apple.com/us/album/blinding-lights/1505683705?i=1505683988&uo=4",
+       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music125/v4/03/e1/67/03e167d6-ee05-eb32-55e9-c5040f55a8bf/20UMGIM21166.rgb.jpg/300x300bb.jpg",
+       "term": "The Weeknd Blinding Lights"
+      },
+      "dur": 30
+     }
+    ]
+   },
+   "difficulty": 1
+  }
+ ],
+ "questions": [],
+ "sources": [
+  {
+   "name": "Billboard Year-End Hot 100 singles (2010–2019)",
+   "url": "https://en.wikipedia.org/wiki/Billboard_Year-End_Hot_100_singles_of_2010"
+  },
+  {
+   "name": "UK best-selling singles by year",
+   "url": "https://en.wikipedia.org/wiki/List_of_best-selling_singles_by_year_(UK)"
+  },
+  {
+   "name": "Apple iTunes Search API (previews, artwork, links)",
+   "url": "https://performance-partners.apple.com/search-api"
+  }
+ ],
+ "built": "2026-10-04"
+}

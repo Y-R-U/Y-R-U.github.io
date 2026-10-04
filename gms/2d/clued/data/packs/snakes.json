@@ -1,0 +1,4797 @@
+{
+ "id": "snakes",
+ "title": "Snakes",
+ "theme": "animals",
+ "icon": "🐍",
+ "kids": true,
+ "version": 1,
+ "notice": "Not for real-world identification.",
+ "leakExempt": [
+  "snake",
+  "snakes"
+ ],
+ "factsMeta": {
+  "venomous": {
+   "type": "bool",
+   "label": "Venomous",
+   "yes": "Venomous",
+   "no": "Not venomous"
+  },
+  "danger": {
+   "type": "cat",
+   "label": "Danger to people",
+   "values": [
+    "Harmless",
+    "Mildly venomous",
+    "Dangerous",
+    "Potentially deadly"
+   ]
+  },
+  "lengthM": {
+   "type": "num",
+   "label": "Typical length",
+   "unit": "m",
+   "higherLabel": "Longer"
+  },
+  "region": {
+   "type": "cat",
+   "label": "Found in"
+  },
+  "status": {
+   "type": "cat",
+   "label": "Conservation status (IUCN)",
+   "hard": true
+  }
+ },
+ "items": [
+  {
+   "id": "inland-taipan",
+   "name": "Inland taipan",
+   "alt": [
+    "fierce snake",
+    "western taipan"
+   ],
+   "sci": "Oxyuranus microlepidotus",
+   "group": "elapid",
+   "facts": {
+    "venomous": true,
+    "lengthM": 1.8,
+    "region": "Australia",
+    "danger": "Potentially deadly",
+    "status": "Least concern"
+   },
+   "lookalikes": [
+    "coastal-taipan",
+    "eastern-brown-snake"
+   ],
+   "blurb": "Its venom is the most toxic of any land snake tested, yet it is shy and lives in remote semi-desert, so bites are very rare.",
+   "clues": [
+    "Family: Elapidae.",
+    "Genus: Oxyuranus.",
+    "It lives in the cracking clay floodplains of the Channel Country.",
+    "Its main prey is the long-haired rat.",
+    "Its skin darkens in winter and lightens in summer.",
+    "Typical length: about 1.8 m.",
+    "It is found in Australia.",
+    "Its bite or sting can kill a person.",
+    "One bite holds enough venom to kill many adult humans.",
+    "It is said to have the most toxic venom of any land snake.",
+    "The answer has 2 words (6, 6 letters).",
+    "It starts with the letter I."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/61170526/medium.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "XLerate",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/61170526"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/1206215/medium.jpg",
+      "w": 500,
+      "h": 356,
+      "credit": "Bjoertvedt",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/1206215"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/89006769/medium.jpg",
+      "w": 500,
+      "h": 412,
+      "credit": "dhfischer",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/89006769"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "coastal-taipan",
+   "name": "Coastal taipan",
+   "sci": "Oxyuranus scutellatus",
+   "group": "elapid",
+   "facts": {
+    "venomous": true,
+    "lengthM": 2,
+    "region": "Australia",
+    "danger": "Potentially deadly",
+    "status": "Least concern"
+   },
+   "lookalikes": [
+    "inland-taipan",
+    "eastern-brown-snake"
+   ],
+   "blurb": "A long, fast elapid of northern and eastern Australia and New Guinea. Before antivenom arrived in 1955, a bite was almost always fatal.",
+   "clues": [
+    "Family: Elapidae.",
+    "Genus: Oxyuranus.",
+    "Its antivenom was first produced in 1955.",
+    "It has a pale, almost coffin-shaped head.",
+    "It hunts rats in sugar-cane fields.",
+    "Typical length: about 2 m.",
+    "It is found in Australia.",
+    "Its bite or sting can kill a person.",
+    "It is the longest venomous snake in Australia.",
+    "Its inland cousin has the most toxic venom of any land snake.",
+    "The answer has 2 words (7, 6 letters).",
+    "It starts with the letter C."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/82211205/medium.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Sardaka",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/82211205"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/82211207/medium.jpg",
+      "w": 500,
+      "h": 325,
+      "credit": "Bernard DUPONT",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/82211207"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/244026573/medium.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Tom Field",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/244026573"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "eastern-brown-snake",
+   "name": "Eastern brown snake",
+   "sci": "Pseudonaja textilis",
+   "group": "elapid",
+   "facts": {
+    "venomous": true,
+    "lengthM": 1.5,
+    "region": "Australia",
+    "danger": "Potentially deadly",
+    "status": "Least concern"
+   },
+   "lookalikes": [
+    "inland-taipan",
+    "coastal-taipan",
+    "mulga-snake"
+   ],
+   "blurb": "Responsible for more snakebite deaths in Australia than any other snake. It is common around farms and outer suburbs on the east coast.",
+   "clues": [
+    "Family: Elapidae.",
+    "Genus: Pseudonaja.",
+    "Young ones are often banded and have a dark head patch.",
+    "It raises its neck in a tall S-shape when threatened.",
+    "It thrives where mice gather around farm sheds.",
+    "Typical length: about 1.5 m.",
+    "It is found in Australia.",
+    "Its bite or sting can kill a person.",
+    "Its venom has the second most toxic rating of any land snake.",
+    "It causes the most snakebite deaths in Australia.",
+    "The answer has 3 words (7, 5, 5 letters).",
+    "It starts with the letter E."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/86409111/medium.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Matt",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/86409111"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/94107713/medium.jpeg",
+      "w": 500,
+      "h": 366,
+      "credit": "Rod Lowther",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/94107713"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "dugite",
+   "name": "Dugite",
+   "sci": "Pseudonaja affinis",
+   "group": "elapid",
+   "facts": {
+    "venomous": true,
+    "lengthM": 1.5,
+    "region": "Australia",
+    "danger": "Potentially deadly",
+    "status": "Least concern"
+   },
+   "lookalikes": [
+    "eastern-brown-snake"
+   ],
+   "blurb": "A brown snake of south-western Australia, often met in Perth suburbs. Its venom is highly toxic.",
+   "clues": [
+    "Family: Elapidae.",
+    "Genus: Pseudonaja.",
+    "Its name comes from a Noongar word.",
+    "It is often speckled with black scales.",
+    "It lives around Perth and on Rottnest Island.",
+    "Typical length: about 1.5 m.",
+    "It is found in Australia.",
+    "Its bite or sting can kill a person.",
+    "It belongs to the brown snake group.",
+    "It is a highly venomous snake of Western Australia.",
+    "The answer is one word of 6 letters.",
+    "It starts with the letter D."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/576402849/medium.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Hugo Innes",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/576402849"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/238273787/medium.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Hugo Innes",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/238273787"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "tiger-snake",
+   "name": "Tiger snake",
+   "alt": [
+    "mainland tiger snake"
+   ],
+   "sci": "Notechis scutatus",
+   "group": "elapid",
+   "facts": {
+    "venomous": true,
+    "lengthM": 1.2,
+    "region": "Australia",
+    "danger": "Potentially deadly",
+    "status": "Least concern"
+   },
+   "blurb": "A stocky, often banded elapid of southern Australia and Tasmania. Island populations range from giants to jet-black dwarfs.",
+   "clues": [
+    "Family: Elapidae.",
+    "Genus: Notechis.",
+    "Populations on Chappell Island feed on mutton-bird chicks.",
+    "Some island forms are completely black.",
+    "It flattens its neck like a cobra when threatened.",
+    "Typical length: about 1.2 m.",
+    "It is found in Australia.",
+    "Its bite or sting can kill a person.",
+    "It likes swamps and wetlands of southern Australia.",
+    "Many are banded yellow and dark, like a big cat.",
+    "The answer has 2 words (5, 5 letters).",
+    "It starts with the letter T."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/127663785/medium.jpeg",
+      "w": 500,
+      "h": 375,
+      "credit": "Bruce Deagle",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/127663785"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/55158068/medium.jpeg",
+      "w": 342,
+      "h": 500,
+      "credit": "Peter Crowcroft",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/55158068"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "red-bellied-black-snake",
+   "name": "Red-bellied black snake",
+   "sci": "Pseudechis porphyriacus",
+   "group": "elapid",
+   "facts": {
+    "venomous": true,
+    "lengthM": 1.5,
+    "region": "Australia",
+    "danger": "Dangerous",
+    "status": "Least concern"
+   },
+   "lookalikes": [
+    "mulga-snake"
+   ],
+   "blurb": "A glossy black snake with a red or pink belly, common near water on the east coast of Australia. Its bite is painful but rarely serious.",
+   "clues": [
+    "Family: Elapidae.",
+    "Genus: Pseudechis.",
+    "It gives birth to live young rather than laying eggs.",
+    "It is often seen near creeks, dams and swamps.",
+    "It eats lots of frogs.",
+    "It is venomous.",
+    "Typical length: about 1.5 m.",
+    "It is found in Australia.",
+    "It can be dangerous to people.",
+    "Cane toads have caused declines in some populations.",
+    "The answer has 4 words (3, 7, 5, 5 letters).",
+    "It starts with the letter R."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/444805499/medium.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Connor Margetts",
+      "license": "CC0 1.0",
+      "page": "https://www.inaturalist.org/photos/444805499"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/72707/medium.jpg",
+      "w": 500,
+      "h": 332,
+      "credit": "Doug Beckers",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/72707"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/8470431/medium.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Donald Hobern",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/8470431"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "mulga-snake",
+   "name": "Mulga snake",
+   "alt": [
+    "king brown snake"
+   ],
+   "sci": "Pseudechis australis",
+   "group": "elapid",
+   "facts": {
+    "venomous": true,
+    "lengthM": 2,
+    "region": "Australia",
+    "danger": "Potentially deadly",
+    "status": "Least concern"
+   },
+   "lookalikes": [
+    "eastern-brown-snake",
+    "red-bellied-black-snake"
+   ],
+   "blurb": "One of the heaviest venomous snakes in Australia, found across most of the mainland. It delivers a very large amount of venom.",
+   "clues": [
+    "Family: Elapidae.",
+    "Genus: Pseudechis.",
+    "Despite its common nickname it is really a black snake.",
+    "It is named after a kind of acacia shrubland.",
+    "It can produce more venom per bite than almost any other snake.",
+    "It is venomous.",
+    "Typical length: about 2 m.",
+    "It is found in Australia.",
+    "Its bite or sting can kill a person.",
+    "It eats other snakes, even venomous ones.",
+    "The answer has 2 words (5, 5 letters).",
+    "It starts with the letter M."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/260646480/medium.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Belinda Forbes",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/260646480"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/444196493/medium.jpeg",
+      "w": 500,
+      "h": 375,
+      "credit": "no rights reserved",
+      "license": "CC0 1.0",
+      "page": "https://www.inaturalist.org/photos/444196493"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/195829450/medium.jpeg",
+      "w": 500,
+      "h": 233,
+      "credit": "no rights reserved",
+      "license": "CC0 1.0",
+      "page": "https://www.inaturalist.org/photos/195829450"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "common-death-adder",
+   "name": "Common death adder",
+   "sci": "Acanthophis antarcticus",
+   "group": "elapid",
+   "facts": {
+    "venomous": true,
+    "lengthM": 0.7,
+    "region": "Australia",
+    "danger": "Potentially deadly",
+    "status": "Least concern"
+   },
+   "blurb": "A short, thick Australian elapid that looks like a viper. It lies hidden in leaf litter and wiggles its tail tip to lure prey.",
+   "clues": [
+    "Family: Elapidae.",
+    "Genus: Acanthophis.",
+    "It is an elapid, not a true viper, despite its name.",
+    "It can strike faster than almost any other snake.",
+    "It wiggles a grub-like tail tip to lure lizards and birds.",
+    "Typical length: about 70 cm.",
+    "It is found in Australia.",
+    "Its bite or sting can kill a person.",
+    "It lies buried in leaf litter waiting for prey.",
+    "Its name sounds like it should be a viper.",
+    "The answer has 3 words (6, 5, 5 letters).",
+    "It starts with the letter C."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/468777831/medium.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Lawrence Hylton",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/468777831"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/452184255/medium.jpeg",
+      "w": 500,
+      "h": 500,
+      "credit": "Greg Tasney",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/452184255"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/465481945/medium.jpeg",
+      "w": 500,
+      "h": 333,
+      "credit": "Thomas Mesaglio",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/465481945"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "lowlands-copperhead",
+   "name": "Lowlands copperhead",
+   "sci": "Austrelaps superbus",
+   "group": "elapid",
+   "facts": {
+    "venomous": true,
+    "lengthM": 1.2,
+    "region": "Australia",
+    "danger": "Dangerous",
+    "status": "Least concern"
+   },
+   "lookalikes": [
+    "copperhead"
+   ],
+   "blurb": "A cold-tolerant elapid of south-eastern Australia and Tasmania. It is active even on cool days.",
+   "clues": [
+    "Family: Elapidae.",
+    "Genus: Austrelaps.",
+    "It is active at lower temperatures than most Australian snakes.",
+    "It lives in Tasmania and around Bass Strait islands.",
+    "It hunts frogs in swamps and grassland.",
+    "Typical length: about 1.2 m.",
+    "It is found in Australia.",
+    "It can be dangerous to people.",
+    "It shares a name with an unrelated North American pit viper.",
+    "Its head is often coppery brown.",
+    "The answer has 2 words (8, 10 letters).",
+    "It starts with the letter L."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/299730325/medium.jpeg",
+      "w": 500,
+      "h": 375,
+      "credit": "Max Tibby",
+      "license": "CC0 1.0",
+      "page": "https://www.inaturalist.org/photos/299730325"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/458394912/medium.jpeg",
+      "w": 375,
+      "h": 500,
+      "credit": "Tim Moran",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/458394912"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/430249355/medium.jpeg",
+      "w": 500,
+      "h": 376,
+      "credit": "Steve Llewellyn",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/430249355"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "rough-scaled-snake",
+   "name": "Rough-scaled snake",
+   "sci": "Tropidechis carinatus",
+   "group": "elapid",
+   "facts": {
+    "venomous": true,
+    "lengthM": 0.75,
+    "region": "Australia",
+    "danger": "Dangerous",
+    "status": "Least concern"
+   },
+   "lookalikes": [
+    "keelback"
+   ],
+   "blurb": "A rainforest elapid of eastern Australia whose keeled scales make it look like the harmless keelback.",
+   "clues": [
+    "Family: Elapidae.",
+    "Genus: Tropidechis.",
+    "It is the only member of its genus.",
+    "It lives in rainforest and wet forest of eastern Australia.",
+    "It is easily confused with the harmless keelback.",
+    "It is venomous.",
+    "Typical length: about 75 cm.",
+    "It is found in Australia.",
+    "It can be dangerous to people.",
+    "Its common name describes its bumpy skin.",
+    "The answer has 3 words (5, 6, 5 letters).",
+    "It starts with the letter R."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/347765904/medium.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Ged Tranter",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/347765904"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/315463580/medium.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Ged Tranter",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/315463580"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/629558847/medium.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "no rights reserved",
+      "license": "CC0 1.0",
+      "page": "https://www.inaturalist.org/photos/629558847"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "bandy-bandy",
+   "name": "Bandy-bandy",
+   "sci": "Vermicella annulata",
+   "group": "elapid",
+   "facts": {
+    "venomous": true,
+    "lengthM": 0.5,
+    "region": "Australia",
+    "danger": "Mildly venomous",
+    "status": "Least concern"
+   },
+   "lookalikes": [
+    "banded-krait"
+   ],
+   "blurb": "A small burrowing elapid ringed in bold black and white. It eats almost nothing but blind snakes.",
+   "clues": [
+    "Family: Elapidae.",
+    "Genus: Vermicella.",
+    "It feeds mainly on blind snakes.",
+    "When disturbed it throws its body into stiff hoops.",
+    "It is rarely seen except after rain at night.",
+    "It is venomous.",
+    "Typical length: about 50 cm.",
+    "It is found in Australia.",
+    "Its bite is only mildly venomous to people.",
+    "Its name repeats a word, joined by a hyphen.",
+    "The answer has 2 words (5, 5 letters).",
+    "It starts with the letter B."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/93105368/medium.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "dhfischer",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/93105368"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/93105371/medium.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "dhfischer",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/93105371"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/89870582/medium.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "dhfischer",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/89870582"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "carpet-python",
+   "name": "Carpet python",
+   "sci": "Morelia spilota",
+   "group": "python",
+   "facts": {
+    "venomous": false,
+    "lengthM": 2.5,
+    "region": "Australia",
+    "danger": "Harmless",
+    "status": "Least concern"
+   },
+   "lookalikes": [
+    "diamond-python"
+   ],
+   "blurb": "Australia's most widespread python, often found in roofs and sheds where it eats rats and possums.",
+   "clues": [
+    "Genus: Morelia.",
+    "Many subspecies exist, including the jungle and coastal forms.",
+    "Heat pits along its lips sense warm-blooded prey.",
+    "It often lives in roof spaces and eats rats.",
+    "It is not venomous.",
+    "Typical length: about 2.5 m.",
+    "It is found in Australia.",
+    "It is harmless to people.",
+    "Its blotched pattern looks like a woven rug.",
+    "It is a common non-venomous constrictor in Australia.",
+    "The answer has 2 words (6, 6 letters).",
+    "It starts with the letter C."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/435009120/medium.jpeg",
+      "w": 477,
+      "h": 500,
+      "credit": "Ruth Palsson",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/435009120"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/158055900/medium.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "dhfischer",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/158055900"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/735720848/medium.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Scott W. Gavins",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/735720848"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "diamond-python",
+   "name": "Diamond python",
+   "sci": "Morelia spilota spilota",
+   "group": "python",
+   "facts": {
+    "venomous": false,
+    "lengthM": 2,
+    "region": "Australia",
+    "danger": "Harmless"
+   },
+   "lookalikes": [
+    "carpet-python"
+   ],
+   "blurb": "A dark subspecies of the carpet python with clusters of cream spots, found in coastal New South Wales and Victoria.",
+   "clues": [
+    "Genus: Morelia.",
+    "It is found around Sydney.",
+    "It is not venomous.",
+    "Typical length: about 2 m.",
+    "It is found in Australia.",
+    "It is harmless to people.",
+    "Its black scales carry cream spots in rosette-like clusters.",
+    "It is named after a shape found on playing cards.",
+    "The answer has 2 words (7, 6 letters).",
+    "It starts with the letter D."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/96552958/medium.jpeg",
+      "w": 500,
+      "h": 375,
+      "credit": "Max Campbell",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/96552958"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/158055900/medium.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "dhfischer",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/158055900"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/28281253/medium.jpg",
+      "w": 500,
+      "h": 343,
+      "credit": "Ellen Rykers",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/28281253"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "scrub-python",
+   "name": "Scrub python",
+   "alt": [
+    "amethystine python"
+   ],
+   "sci": "Simalia kinghorni",
+   "group": "python",
+   "facts": {
+    "venomous": false,
+    "lengthM": 4,
+    "region": "Australia",
+    "danger": "Harmless"
+   },
+   "blurb": "Australia's longest snake, living in the rainforests of north Queensland. Large ones can eat wallabies.",
+   "clues": [
+    "Genus: Simalia.",
+    "It is the longest snake in Australia.",
+    "Big ones can swallow small wallabies.",
+    "Its scales have an iridescent purple sheen.",
+    "It is not venomous.",
+    "Typical length: about 4 m.",
+    "It is found in Australia.",
+    "It is harmless to people.",
+    "It lives in rainforest in far north Queensland.",
+    "The answer has 2 words (5, 6 letters).",
+    "It starts with the letter S."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/93096406/medium.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "dhfischer",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/93096406"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/1205741/medium.jpg",
+      "w": 500,
+      "h": 366,
+      "credit": "Bill Hughes",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/1205741"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/349800805/medium.jpg",
+      "w": 500,
+      "h": 347,
+      "credit": "Lachlan Copeland",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/349800805"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "olive-python",
+   "name": "Olive python",
+   "sci": "Liasis olivaceus",
+   "group": "python",
+   "facts": {
+    "venomous": false,
+    "lengthM": 3.5,
+    "region": "Australia",
+    "danger": "Harmless",
+    "status": "Least concern"
+   },
+   "blurb": "A large plain-coloured python of northern Australia that often lives near rocky waterholes.",
+   "clues": [
+    "Genus: Liasis.",
+    "The Pilbara subspecies is listed as threatened.",
+    "It ambushes animals coming to drink at waterholes.",
+    "It is one of the largest snakes in Australia.",
+    "It is not venomous.",
+    "Typical length: about 3.5 m.",
+    "It is found in Australia.",
+    "It is harmless to people.",
+    "It has no bold pattern at all.",
+    "It is named after the colour of a fruit used for oil.",
+    "The answer has 2 words (5, 6 letters).",
+    "It starts with the letter O."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/333551489/medium.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Connor Margetts",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/333551489"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/211692491/medium.jpeg",
+      "w": 500,
+      "h": 333,
+      "credit": "Hugo Innes",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/211692491"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/400168405/medium.jpeg",
+      "w": 500,
+      "h": 375,
+      "credit": "Alan Bell",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/400168405"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "black-headed-python",
+   "name": "Black-headed python",
+   "sci": "Aspidites melanocephalus",
+   "group": "python",
+   "facts": {
+    "venomous": false,
+    "lengthM": 1.5,
+    "region": "Australia",
+    "danger": "Harmless",
+    "status": "Least concern"
+   },
+   "lookalikes": [
+    "woma"
+   ],
+   "blurb": "A banded python of northern Australia whose glossy black head helps it warm up quickly in the sun.",
+   "clues": [
+    "Its IUCN conservation status is \"Least concern\".",
+    "Genus: Aspidites.",
+    "It eats other snakes, including venomous ones.",
+    "It is not venomous.",
+    "Typical length: about 1.5 m.",
+    "It is found in Australia.",
+    "It is harmless to people.",
+    "Its body is banded in cream and brown.",
+    "The answer has 3 words (5, 6, 6 letters).",
+    "It starts with the letter B."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/165800/medium.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "John Tann",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/165800"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/188045135/medium.jpeg",
+      "w": 500,
+      "h": 375,
+      "credit": "no rights reserved",
+      "license": "CC0 1.0",
+      "page": "https://www.inaturalist.org/photos/188045135"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/175780574/medium.jpeg",
+      "w": 500,
+      "h": 281,
+      "credit": "Nathan Ruser",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/175780574"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "woma",
+   "name": "Woma",
+   "alt": [
+    "woma python"
+   ],
+   "sci": "Aspidites ramsayi",
+   "group": "python",
+   "facts": {
+    "venomous": false,
+    "lengthM": 1.5,
+    "region": "Australia",
+    "danger": "Harmless",
+    "status": "Least concern"
+   },
+   "lookalikes": [
+    "black-headed-python"
+   ],
+   "blurb": "A banded desert python of central and western Australia. It hunts reptiles in burrows by squeezing them against the walls.",
+   "clues": [
+    "Its IUCN conservation status is \"Least concern\".",
+    "Genus: Aspidites.",
+    "It has no heat-sensing pits on its lips.",
+    "It pins prey against the walls of burrows.",
+    "It is endangered in parts of its range.",
+    "It is not venomous.",
+    "Typical length: about 1.5 m.",
+    "It is found in Australia.",
+    "It is harmless to people.",
+    "Its name is four letters, from an Aboriginal language.",
+    "The answer is one word of 4 letters.",
+    "It starts with the letter W."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/485009936/medium.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "no rights reserved",
+      "license": "CC0 1.0",
+      "page": "https://www.inaturalist.org/photos/485009936"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "childrens-python",
+   "name": "Children's python",
+   "sci": "Antaresia childreni",
+   "group": "python",
+   "facts": {
+    "venomous": false,
+    "lengthM": 1,
+    "region": "Australia",
+    "danger": "Harmless",
+    "status": "Least concern"
+   },
+   "lookalikes": [
+    "spotted-python"
+   ],
+   "blurb": "A small python of northern Australia, popular as a pet. It is named after the zoologist John George Children, not young people.",
+   "clues": [
+    "Its IUCN conservation status is \"Least concern\".",
+    "Genus: Antaresia.",
+    "It was named after a British zoologist at the British Museum.",
+    "It often shelters in caves and hunts bats.",
+    "It is not venomous.",
+    "Typical length: about 1 m.",
+    "It is found in Australia.",
+    "It is harmless to people.",
+    "It is a popular beginner's pet in Australia.",
+    "Its name sounds as if it is meant for kids.",
+    "The answer has 2 words (9, 6 letters).",
+    "It starts with the letter C."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/253267/medium.jpg",
+      "w": 353,
+      "h": 500,
+      "credit": "S J Bennett",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/253267"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/89556036/medium.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "dhfischer",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/89556036"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/245815745/medium.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "dhfischer",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/245815745"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "spotted-python",
+   "name": "Spotted python",
+   "sci": "Antaresia maculosa",
+   "group": "python",
+   "facts": {
+    "venomous": false,
+    "lengthM": 1,
+    "region": "Australia",
+    "danger": "Harmless",
+    "status": "Least concern"
+   },
+   "lookalikes": [
+    "childrens-python"
+   ],
+   "blurb": "A small, blotchy python of eastern Queensland that often hangs in cave entrances to catch bats.",
+   "clues": [
+    "Its IUCN conservation status is \"Least concern\".",
+    "Genus: Antaresia.",
+    "It catches bats at cave mouths.",
+    "It lives in eastern Queensland.",
+    "It is not venomous.",
+    "Typical length: about 1 m.",
+    "It is found in Australia.",
+    "It is harmless to people.",
+    "Its pale body is covered in dark blotches.",
+    "The answer has 2 words (7, 6 letters).",
+    "It starts with the letter S."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/89556036/medium.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "dhfischer",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/89556036"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/468796482/medium.jpeg",
+      "w": 375,
+      "h": 500,
+      "credit": "Lawrence Hylton",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/468796482"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/78404893/medium.jpeg",
+      "w": 500,
+      "h": 375,
+      "credit": "Daniel Montesinos",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/78404893"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "green-tree-python",
+   "name": "Green tree python",
+   "sci": "Morelia viridis",
+   "group": "python",
+   "facts": {
+    "venomous": false,
+    "lengthM": 1.5,
+    "region": "Australia",
+    "danger": "Harmless",
+    "status": "Least concern"
+   },
+   "lookalikes": [
+    "emerald-tree-boa"
+   ],
+   "blurb": "A bright green python of New Guinea and Cape York. Babies are yellow or red and turn green as they grow.",
+   "clues": [
+    "Its IUCN conservation status is \"Least concern\".",
+    "Genus: Morelia.",
+    "It lives in New Guinea and on Cape York Peninsula.",
+    "It rests looped over a branch in a tidy saddle shape.",
+    "It is not venomous.",
+    "Typical length: about 1.5 m.",
+    "It is found in Australia.",
+    "It is harmless to people.",
+    "It looks almost identical to a South American boa.",
+    "The answer has 3 words (5, 4, 6 letters).",
+    "It starts with the letter G."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/56450745/medium.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Edward Bell",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/56450745"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/435259669/medium.jpeg",
+      "w": 500,
+      "h": 375,
+      "credit": "Bryce Watts-Parker",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/435259669"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/725194064/medium.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "no rights reserved",
+      "license": "CC0 1.0",
+      "page": "https://www.inaturalist.org/photos/725194064"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "common-tree-snake",
+   "name": "Common tree snake",
+   "alt": [
+    "green tree snake"
+   ],
+   "sci": "Dendrelaphis punctulatus",
+   "group": "colubrid",
+   "facts": {
+    "venomous": false,
+    "lengthM": 1.2,
+    "region": "Australia",
+    "danger": "Harmless",
+    "status": "Least concern"
+   },
+   "blurb": "A slender, fast, harmless snake of northern and eastern Australia, often seen in gardens.",
+   "clues": [
+    "Its IUCN conservation status is \"Least concern\".",
+    "Family: Colubridae.",
+    "Genus: Dendrelaphis.",
+    "It inflates its neck to show blue skin between the scales when threatened.",
+    "It gives off a strong smell when handled.",
+    "It is very slender with big eyes.",
+    "It is not venomous.",
+    "Typical length: about 1.2 m.",
+    "It is found in Australia.",
+    "It is harmless to people.",
+    "The answer has 3 words (6, 4, 5 letters).",
+    "It starts with the letter C."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/90407544/medium.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "dhfischer",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/90407544"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/107893548/medium.jpeg",
+      "w": 500,
+      "h": 375,
+      "credit": "Tim",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/107893548"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/260047674/medium.jpeg",
+      "w": 375,
+      "h": 500,
+      "credit": "no rights reserved",
+      "license": "CC0 1.0",
+      "page": "https://www.inaturalist.org/photos/260047674"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "brown-tree-snake",
+   "name": "Brown tree snake",
+   "sci": "Boiga irregularis",
+   "group": "colubrid",
+   "facts": {
+    "venomous": true,
+    "lengthM": 1.5,
+    "region": "Australia",
+    "danger": "Mildly venomous",
+    "status": "Least concern"
+   },
+   "blurb": "A rear-fanged night hunter of northern Australia and New Guinea. Accidentally brought to Guam, it wiped out most of the island's native forest birds.",
+   "clues": [
+    "Family: Colubridae.",
+    "Genus: Boiga.",
+    "It caused power cuts on Guam by climbing power lines.",
+    "It reached Guam in cargo after World War II.",
+    "It is rear-fanged and mildly venomous.",
+    "It is venomous.",
+    "Typical length: about 1.5 m.",
+    "It is found in Australia.",
+    "Its bite is only mildly venomous to people.",
+    "It wiped out most of Guam's forest birds.",
+    "The answer has 3 words (5, 4, 5 letters).",
+    "It starts with the letter B."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/481272199/medium.jpeg",
+      "w": 233,
+      "h": 500,
+      "credit": "no rights reserved",
+      "license": "CC0 1.0",
+      "page": "https://www.inaturalist.org/photos/481272199"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/621876718/medium.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Greg Tasney",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/621876718"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/287530482/medium.jpeg",
+      "w": 233,
+      "h": 500,
+      "credit": "no rights reserved",
+      "license": "CC0 1.0",
+      "page": "https://www.inaturalist.org/photos/287530482"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "keelback",
+   "name": "Keelback",
+   "alt": [
+    "freshwater snake"
+   ],
+   "sci": "Tropidonophis mairii",
+   "group": "colubrid",
+   "facts": {
+    "venomous": false,
+    "lengthM": 0.75,
+    "region": "Australia",
+    "danger": "Harmless",
+    "status": "Least concern"
+   },
+   "lookalikes": [
+    "rough-scaled-snake"
+   ],
+   "blurb": "A harmless water snake of northern and eastern Australia. It can eat small cane toads without dying.",
+   "clues": [
+    "Family: Colubridae.",
+    "Genus: Tropidonophis.",
+    "It is related to the grass snakes of Europe.",
+    "It can survive eating young cane toads.",
+    "Its tail breaks off easily if grabbed.",
+    "Typical length: about 75 cm.",
+    "It is found in Australia.",
+    "It is harmless to people.",
+    "It is often confused with the venomous rough-scaled snake.",
+    "Its scales have ridges, a little like the bottom of a boat.",
+    "The answer is one word of 8 letters.",
+    "It starts with the letter K."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/41812558/medium.jpg",
+      "w": 500,
+      "h": 251,
+      "credit": "Greg Tasney",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/41812558"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/89157502/medium.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "dhfischer",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/89157502"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/102706318/medium.jpeg",
+      "w": 500,
+      "h": 375,
+      "credit": "Greg Tasney",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/102706318"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "beaked-sea-snake",
+   "name": "Beaked sea snake",
+   "sci": "Hydrophis schistosus",
+   "group": "sea snake",
+   "facts": {
+    "venomous": true,
+    "lengthM": 1.1,
+    "region": "Oceans",
+    "danger": "Potentially deadly",
+    "status": "Least concern"
+   },
+   "lookalikes": [
+    "yellow-bellied-sea-snake"
+   ],
+   "blurb": "A sea snake of tropical coasts from the Persian Gulf to Australia. It causes most sea snake bite deaths, often among fishers.",
+   "clues": [
+    "Its IUCN conservation status is \"Least concern\".",
+    "Family: Elapidae.",
+    "Genus: Hydrophis.",
+    "It is often caught in fishing nets in Asia.",
+    "Its snout has a hooked point.",
+    "It is venomous.",
+    "Typical length: about 1.1 m.",
+    "Its bite or sting can kill a person.",
+    "It has a paddle-shaped tail.",
+    "It lives in shallow tropical coastal waters.",
+    "The answer has 3 words (6, 3, 5 letters).",
+    "It starts with the letter B."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/48372448/medium.jpeg",
+      "w": 355,
+      "h": 500,
+      "credit": "Shaunak Modi",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/48372448"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/56101388/medium.jpg",
+      "w": 500,
+      "h": 500,
+      "credit": "Shaunak Modi",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/56101388"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/273023336/medium.jpeg",
+      "w": 375,
+      "h": 500,
+      "credit": "Malaika Mathew Chawla",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/273023336"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "yellow-bellied-sea-snake",
+   "name": "Yellow-bellied sea snake",
+   "sci": "Hydrophis platurus",
+   "group": "sea snake",
+   "facts": {
+    "venomous": true,
+    "lengthM": 0.8,
+    "region": "Oceans",
+    "danger": "Dangerous",
+    "status": "Least concern"
+   },
+   "lookalikes": [
+    "beaked-sea-snake"
+   ],
+   "blurb": "The most widespread snake on Earth, drifting in the open Pacific and Indian Oceans. It gathers in slicks of floating debris to ambush fish.",
+   "clues": [
+    "Its IUCN conservation status is \"Least concern\".",
+    "Family: Elapidae.",
+    "Genus: Hydrophis.",
+    "It is the only snake that spends its whole life in the open ocean.",
+    "It drifts in lines of floating debris to ambush fish.",
+    "It is venomous.",
+    "Typical length: about 80 cm.",
+    "It can be dangerous to people.",
+    "The answer has 4 words (6, 7, 3, 5 letters).",
+    "It starts with the letter Y."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/339304315/medium.jpg",
+      "w": 500,
+      "h": 408,
+      "credit": "Aloaiza",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/339304315"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/3751803/medium.jpg",
+      "w": 500,
+      "h": 280,
+      "credit": "Emily Roberts",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/3751803"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/473475942/medium.jpeg",
+      "w": 500,
+      "h": 375,
+      "credit": "no rights reserved",
+      "license": "CC0 1.0",
+      "page": "https://www.inaturalist.org/photos/473475942"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "olive-sea-snake",
+   "name": "Olive sea snake",
+   "sci": "Aipysurus laevis",
+   "group": "sea snake",
+   "facts": {
+    "venomous": true,
+    "lengthM": 1.5,
+    "region": "Oceans",
+    "danger": "Dangerous",
+    "status": "Least concern"
+   },
+   "blurb": "A large, curious sea snake of coral reefs in northern Australia, the Coral Sea and New Guinea.",
+   "clues": [
+    "Its IUCN conservation status is \"Least concern\".",
+    "Family: Elapidae.",
+    "Genus: Aipysurus.",
+    "It has light-sensitive cells in its tail.",
+    "It is often seen by divers on the Great Barrier Reef.",
+    "It hunts fish in reef crevices.",
+    "It is venomous.",
+    "Typical length: about 1.5 m.",
+    "It can be dangerous to people.",
+    "The answer has 3 words (5, 3, 5 letters).",
+    "It starts with the letter O."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/9059877/medium.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "John Barkla",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/9059877"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/539460735/medium.jpg",
+      "w": 500,
+      "h": 348,
+      "credit": "Debra Baker",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/539460735"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/538884887/medium.jpg",
+      "w": 500,
+      "h": 396,
+      "credit": "Debra Baker",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/538884887"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "king-cobra",
+   "name": "King cobra",
+   "alt": [
+    "hamadryad"
+   ],
+   "sci": "Ophiophagus hannah",
+   "group": "elapid",
+   "facts": {
+    "venomous": true,
+    "lengthM": 3.5,
+    "region": "Asia",
+    "danger": "Potentially deadly",
+    "status": "Vulnerable"
+   },
+   "lookalikes": [
+    "indian-cobra"
+   ],
+   "blurb": "The world's longest venomous snake, found in forests of India and South-East Asia. It mostly eats other snakes.",
+   "clues": [
+    "Family: Elapidae.",
+    "Genus: Ophiophagus.",
+    "Its genus name means \"snake eater\".",
+    "It is the only snake that builds a nest for its eggs.",
+    "It can lift a third of its body off the ground.",
+    "Typical length: about 3.5 m.",
+    "It is found in Asia.",
+    "Its bite or sting can kill a person.",
+    "It eats mostly other snakes.",
+    "It is the longest venomous snake in the world.",
+    "The answer has 2 words (4, 5 letters).",
+    "It starts with the letter K."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/157899882/medium.jpg",
+      "w": 400,
+      "h": 500,
+      "credit": "Lawrence Hylton",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/157899882"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/241177516/medium.jpeg",
+      "w": 375,
+      "h": 500,
+      "credit": "Lawrence Hylton",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/241177516"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/122692917/medium.jpg",
+      "w": 375,
+      "h": 500,
+      "credit": "Lawrence Hylton",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/122692917"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "indian-cobra",
+   "name": "Indian cobra",
+   "alt": [
+    "spectacled cobra"
+   ],
+   "sci": "Naja naja",
+   "group": "elapid",
+   "facts": {
+    "venomous": true,
+    "lengthM": 1.5,
+    "region": "Asia",
+    "danger": "Potentially deadly",
+    "status": "Least concern"
+   },
+   "lookalikes": [
+    "king-cobra",
+    "monocled-cobra"
+   ],
+   "blurb": "The cobra of snake charmers, with a spectacle-shaped mark on the back of its hood. It is one of India's \"Big Four\" deadly snakes.",
+   "clues": [
+    "Family: Elapidae.",
+    "Genus: Naja.",
+    "It is one of the \"Big Four\" responsible for most snakebite deaths in South Asia.",
+    "Snake charmers traditionally use it.",
+    "It is linked with the Hindu god Shiva.",
+    "Typical length: about 1.5 m.",
+    "It is found in Asia.",
+    "Its bite or sting can kill a person.",
+    "The back of its hood has a mark like a pair of glasses.",
+    "It is a hooded snake from South Asia.",
+    "The answer has 2 words (6, 5 letters).",
+    "It starts with the letter I."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/89762452/medium.jpg",
+      "w": 400,
+      "h": 500,
+      "credit": "Chayant Gonsalves",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/89762452"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/169465348/medium.jpeg",
+      "w": 500,
+      "h": 333,
+      "credit": "Aravinth",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/169465348"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/107288826/medium.jpeg",
+      "w": 375,
+      "h": 500,
+      "credit": "Chayant Gonsalves",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/107288826"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "monocled-cobra",
+   "name": "Monocled cobra",
+   "sci": "Naja kaouthia",
+   "group": "elapid",
+   "facts": {
+    "venomous": true,
+    "lengthM": 1.5,
+    "region": "Asia",
+    "danger": "Potentially deadly",
+    "status": "Least concern"
+   },
+   "lookalikes": [
+    "indian-cobra"
+   ],
+   "blurb": "A cobra of eastern India and South-East Asia with a single ring-shaped mark on the back of its hood.",
+   "clues": [
+    "Family: Elapidae.",
+    "Genus: Naja.",
+    "It is common around rice paddies in Thailand.",
+    "Some populations can spit venom.",
+    "It is found from eastern India to Vietnam.",
+    "Typical length: about 1.5 m.",
+    "It is found in Asia.",
+    "Its bite or sting can kill a person.",
+    "The mark on its hood is a single ring.",
+    "Its name refers to a one-lens eyeglass.",
+    "The answer has 2 words (8, 5 letters).",
+    "It starts with the letter M."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/267611643/medium.jpeg",
+      "w": 500,
+      "h": 334,
+      "credit": "Chris Oldnall",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/267611643"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/469688082/medium.jpg",
+      "w": 333,
+      "h": 500,
+      "credit": "Ramit Singal",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/469688082"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/442195191/medium.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Ian Dugdale",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/442195191"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "common-krait",
+   "name": "Common krait",
+   "sci": "Bungarus caeruleus",
+   "group": "elapid",
+   "facts": {
+    "venomous": true,
+    "lengthM": 1,
+    "region": "Asia",
+    "danger": "Potentially deadly",
+    "status": "Least concern"
+   },
+   "lookalikes": [
+    "banded-krait"
+   ],
+   "blurb": "A night-active snake of South Asia whose nearly painless bite often strikes people sleeping on the floor.",
+   "clues": [
+    "Family: Elapidae.",
+    "Genus: Bungarus.",
+    "It is one of India's \"Big Four\" medically important snakes.",
+    "Its bite is often painless, so victims may not wake.",
+    "It is active at night and enters homes.",
+    "Typical length: about 1 m.",
+    "It is found in Asia.",
+    "Its bite or sting can kill a person.",
+    "It is glossy black with thin white crossbands.",
+    "Its name is a short word starting with K.",
+    "The answer has 2 words (6, 5 letters).",
+    "It starts with the letter C."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/94325978/medium.jpeg",
+      "w": 500,
+      "h": 333,
+      "credit": "Prashantha Krishna M C",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/94325978"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/716433413/medium.jpg",
+      "w": 375,
+      "h": 500,
+      "credit": "Malaika Mathew Chawla",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/716433413"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "banded-krait",
+   "name": "Banded krait",
+   "sci": "Bungarus fasciatus",
+   "group": "elapid",
+   "facts": {
+    "venomous": true,
+    "lengthM": 1.5,
+    "region": "Asia",
+    "danger": "Potentially deadly",
+    "status": "Least concern"
+   },
+   "lookalikes": [
+    "common-krait",
+    "bandy-bandy"
+   ],
+   "blurb": "A boldly banded snake of South-East Asia. It is shy and slow by day, and rarely bites unless handled.",
+   "clues": [
+    "Family: Elapidae.",
+    "Genus: Bungarus.",
+    "Its tail ends bluntly rather than in a fine point.",
+    "Its back has a raised ridge, giving it a triangular cross-section.",
+    "It is sluggish by day and active at night.",
+    "It is venomous.",
+    "Typical length: about 1.5 m.",
+    "It is found in Asia.",
+    "Its bite or sting can kill a person.",
+    "It eats other snakes.",
+    "The answer has 2 words (6, 5 letters).",
+    "It starts with the letter B."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/573100257/medium.jpg",
+      "w": 375,
+      "h": 500,
+      "credit": "Ankur Nandi",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/573100257"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/365094030/medium.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Lawrence Hylton",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/365094030"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/419571175/medium.jpeg",
+      "w": 500,
+      "h": 333,
+      "credit": "Ryan van Huyssteen",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/419571175"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "russells-viper",
+   "name": "Russell's viper",
+   "sci": "Daboia russelii",
+   "group": "viper",
+   "facts": {
+    "venomous": true,
+    "lengthM": 1.2,
+    "region": "Asia",
+    "danger": "Potentially deadly",
+    "status": "Least concern"
+   },
+   "lookalikes": [
+    "saw-scaled-viper"
+   ],
+   "blurb": "A chain-patterned viper of South Asia and one of the deadliest snakes in the world by number of deaths.",
+   "clues": [
+    "Its IUCN conservation status is \"Least concern\".",
+    "Genus: Daboia.",
+    "It hisses louder than almost any other snake.",
+    "It causes many thousands of deaths in South Asia each year.",
+    "It is venomous.",
+    "Typical length: about 1.2 m.",
+    "It is found in Asia.",
+    "Its bite or sting can kill a person.",
+    "Its back has three rows of dark spots like chain links.",
+    "The answer has 2 words (8, 5 letters).",
+    "It starts with the letter R."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/53030899/medium.jpeg",
+      "w": 500,
+      "h": 342,
+      "credit": "Mittal Gala",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/53030899"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "saw-scaled-viper",
+   "name": "Saw-scaled viper",
+   "alt": [
+    "carpet viper"
+   ],
+   "sci": "Echis carinatus",
+   "group": "viper",
+   "facts": {
+    "venomous": true,
+    "lengthM": 0.5,
+    "region": "Asia",
+    "danger": "Potentially deadly",
+    "status": "Least concern"
+   },
+   "lookalikes": [
+    "russells-viper"
+   ],
+   "blurb": "A small, quick-tempered viper of dry regions from the Middle East to India. Its group may cause more deaths than any other snakes.",
+   "clues": [
+    "Its IUCN conservation status is \"Least concern\".",
+    "Genus: Echis.",
+    "It is one of India's \"Big Four\" deadly snakes.",
+    "It warns by rubbing its body coils together.",
+    "The warning noise sounds like water on a hot plate.",
+    "It is venomous.",
+    "Typical length: about 50 cm.",
+    "It is found in Asia.",
+    "Its bite or sting can kill a person.",
+    "Its name describes a toothed cutting tool.",
+    "The answer has 3 words (3, 6, 5 letters).",
+    "It starts with the letter S."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/388870652/medium.jpeg",
+      "w": 500,
+      "h": 444,
+      "credit": "Alexander A. Fomichev",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/388870652"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/322688160/medium.jpeg",
+      "w": 500,
+      "h": 334,
+      "credit": "no rights reserved",
+      "license": "CC0 1.0",
+      "page": "https://www.inaturalist.org/photos/322688160"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/357122536/medium.jpeg",
+      "w": 500,
+      "h": 375,
+      "credit": "Sam Kieschnick",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/357122536"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "malayan-pit-viper",
+   "name": "Malayan pit viper",
+   "sci": "Calloselasma rhodostoma",
+   "group": "viper",
+   "facts": {
+    "venomous": true,
+    "lengthM": 0.8,
+    "region": "Asia",
+    "danger": "Potentially deadly",
+    "status": "Least concern"
+   },
+   "blurb": "A ground-dwelling pit viper of South-East Asia, a major cause of snakebite on plantations.",
+   "clues": [
+    "Its IUCN conservation status is \"Least concern\".",
+    "Genus: Calloselasma.",
+    "It is the only species in its genus.",
+    "It often bites rubber-plantation workers.",
+    "It is venomous.",
+    "Typical length: about 80 cm.",
+    "It is found in Asia.",
+    "Its bite or sting can kill a person.",
+    "Its back has dark triangles along each side.",
+    "It is named after a South-East Asian peninsula.",
+    "The answer has 3 words (7, 3, 5 letters).",
+    "It starts with the letter M."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/54423754/medium.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Gerard Chartier",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/54423754"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/102037339/medium.jpg",
+      "w": 500,
+      "h": 334,
+      "credit": "Gerard Chartier",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/102037339"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/102037426/medium.jpg",
+      "w": 500,
+      "h": 500,
+      "credit": "Gerard Chartier",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/102037426"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "waglers-pit-viper",
+   "name": "Wagler's pit viper",
+   "alt": [
+    "temple viper"
+   ],
+   "sci": "Tropidolaemus wagleri",
+   "group": "viper",
+   "facts": {
+    "venomous": true,
+    "lengthM": 0.8,
+    "region": "Asia",
+    "danger": "Dangerous",
+    "status": "Least concern"
+   },
+   "blurb": "A tree-dwelling pit viper of South-East Asia. Many live at the Temple of the Azure Cloud in Penang.",
+   "clues": [
+    "Its IUCN conservation status is \"Least concern\".",
+    "Genus: Tropidolaemus.",
+    "Males are small and green while females are big, black and yellow.",
+    "It can sit still in one tree for days.",
+    "It is venomous.",
+    "Typical length: about 80 cm.",
+    "It is found in Asia.",
+    "It can be dangerous to people.",
+    "It is named after a German naturalist.",
+    "The answer has 3 words (7, 3, 5 letters).",
+    "It starts with the letter W."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/70494942/medium.jpg",
+      "w": 500,
+      "h": 335,
+      "credit": "diego_cue",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/70494942"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/61765895/medium.jpg",
+      "w": 345,
+      "h": 500,
+      "credit": "Guido Bohne",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/61765895"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/11273932/medium.jpg",
+      "w": 500,
+      "h": 463,
+      "credit": "no rights reserved",
+      "license": "CC0 1.0",
+      "page": "https://www.inaturalist.org/photos/11273932"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "reticulated-python",
+   "name": "Reticulated python",
+   "sci": "Malayopython reticulatus",
+   "group": "python",
+   "facts": {
+    "venomous": false,
+    "lengthM": 5,
+    "region": "Asia",
+    "danger": "Dangerous",
+    "status": "Least concern"
+   },
+   "lookalikes": [
+    "burmese-python",
+    "green-anaconda"
+   ],
+   "blurb": "The world's longest snake, found in South-East Asia. Very large ones have killed and eaten people.",
+   "clues": [
+    "Genus: Malayopython.",
+    "Its genus name honours its home region.",
+    "It is a strong swimmer and has colonised many islands.",
+    "Very large ones have eaten adult humans.",
+    "It is not venomous.",
+    "Typical length: about 5 m.",
+    "It is found in Asia.",
+    "It can be dangerous to people.",
+    "Its pattern is a complex net-like mesh.",
+    "It is the longest snake in the world.",
+    "The answer has 2 words (11, 6 letters).",
+    "It starts with the letter R."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/11395341/medium.jpg",
+      "w": 500,
+      "h": 334,
+      "credit": "Rushen",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/11395341"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/11395340/medium.jpg",
+      "w": 500,
+      "h": 346,
+      "credit": "Steve Wilson - over 9 million views Thanks !!",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/11395340"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/11395416/medium.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Kyle Zimmerman",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/11395416"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "burmese-python",
+   "name": "Burmese python",
+   "sci": "Python bivittatus",
+   "group": "python",
+   "facts": {
+    "venomous": false,
+    "lengthM": 4,
+    "region": "Asia",
+    "danger": "Dangerous",
+    "status": "Vulnerable"
+   },
+   "lookalikes": [
+    "reticulated-python",
+    "african-rock-python"
+   ],
+   "blurb": "One of the largest snakes on Earth, native to South-East Asia. Released pets now form a large invasive population in Florida's Everglades.",
+   "clues": [
+    "Its IUCN conservation status is \"Vulnerable\".",
+    "It is native to South-East Asia.",
+    "It is a big problem as an invasive species in Florida.",
+    "It has wiped out many mammals in the Everglades.",
+    "It is not venomous.",
+    "Typical length: about 4 m.",
+    "It is found in Asia.",
+    "It can be dangerous to people.",
+    "It is one of the five largest snakes in the world.",
+    "It is named after a country now called Myanmar.",
+    "The answer has 2 words (7, 6 letters).",
+    "It starts with the letter B."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/194433891/medium.jpg",
+      "w": 500,
+      "h": 313,
+      "credit": "Adam Cushen",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/194433891"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/146402018/medium.jpg",
+      "w": 500,
+      "h": 334,
+      "credit": "Lawrence Hylton",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/146402018"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/427368510/medium.jpeg",
+      "w": 281,
+      "h": 500,
+      "credit": "no rights reserved",
+      "license": "CC0 1.0",
+      "page": "https://www.inaturalist.org/photos/427368510"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "paradise-tree-snake",
+   "name": "Paradise tree snake",
+   "alt": [
+    "paradise flying snake"
+   ],
+   "sci": "Chrysopelea paradisi",
+   "group": "colubrid",
+   "facts": {
+    "venomous": true,
+    "lengthM": 1,
+    "region": "Asia",
+    "danger": "Mildly venomous",
+    "status": "Least concern"
+   },
+   "blurb": "A South-East Asian snake that can glide from tree to tree by flattening its body and undulating through the air.",
+   "clues": [
+    "Its IUCN conservation status is \"Least concern\".",
+    "Family: Colubridae.",
+    "Genus: Chrysopelea.",
+    "It can travel up to about 100 metres in one glide.",
+    "It flattens its ribs to make its body into a wing.",
+    "It is venomous.",
+    "Typical length: about 1 m.",
+    "It is found in Asia.",
+    "Its bite is only mildly venomous to people.",
+    "Its name refers to heaven.",
+    "The answer has 3 words (8, 4, 5 letters).",
+    "It starts with the letter P."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/218139/medium.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Alan Couch",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/218139"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/66822465/medium.jpeg",
+      "w": 500,
+      "h": 375,
+      "credit": "Johannes Schuster",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/66822465"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/363557903/medium.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Kristof Zyskowski",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/363557903"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "mangrove-snake",
+   "name": "Mangrove snake",
+   "alt": [
+    "gold-ringed cat snake"
+   ],
+   "sci": "Boiga dendrophila",
+   "group": "colubrid",
+   "facts": {
+    "venomous": true,
+    "lengthM": 2,
+    "region": "Asia",
+    "danger": "Mildly venomous",
+    "status": "Least concern"
+   },
+   "blurb": "A glossy black and yellow rear-fanged snake of South-East Asian forests and swamps.",
+   "clues": [
+    "Its IUCN conservation status is \"Least concern\".",
+    "Family: Colubridae.",
+    "Genus: Boiga.",
+    "It is rear-fanged and mildly venomous.",
+    "It hunts birds, lizards and frogs at night.",
+    "It is venomous.",
+    "Typical length: about 2 m.",
+    "It is found in Asia.",
+    "Its bite is only mildly venomous to people.",
+    "It is named after coastal swamp forests.",
+    "The answer has 2 words (8, 5 letters).",
+    "It starts with the letter M."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/429515331/medium.jpeg",
+      "w": 500,
+      "h": 334,
+      "credit": "no rights reserved",
+      "license": "CC0 1.0",
+      "page": "https://www.inaturalist.org/photos/429515331"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/628136263/medium.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Annika Lindqvist",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/628136263"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/414280174/medium.jpeg",
+      "w": 500,
+      "h": 312,
+      "credit": "ryan_potts",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/414280174"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "black-mamba",
+   "name": "Black mamba",
+   "sci": "Dendroaspis polylepis",
+   "group": "elapid",
+   "facts": {
+    "venomous": true,
+    "lengthM": 2.5,
+    "region": "Africa",
+    "danger": "Potentially deadly",
+    "status": "Least concern"
+   },
+   "lookalikes": [
+    "eastern-green-mamba"
+   ],
+   "blurb": "A long, fast African elapid named for the inky black inside of its mouth. Untreated bites are almost always fatal.",
+   "clues": [
+    "Family: Elapidae.",
+    "Genus: Dendroaspis.",
+    "It is the longest venomous snake in Africa.",
+    "It can move at around 15 km/h, among the fastest snakes.",
+    "Untreated bites are nearly always fatal.",
+    "It is venomous.",
+    "Typical length: about 2.5 m.",
+    "It is found in Africa.",
+    "Its bite or sting can kill a person.",
+    "Its body is actually grey or olive-brown.",
+    "The answer has 2 words (5, 5 letters).",
+    "It starts with the letter B."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/15583520/medium.jpg",
+      "w": 500,
+      "h": 381,
+      "credit": "Wynand Uys",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/15583520"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/189495916/medium.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "no rights reserved",
+      "license": "CC0 1.0",
+      "page": "https://www.inaturalist.org/photos/189495916"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/337131802/medium.jpg",
+      "w": 375,
+      "h": 500,
+      "credit": "Sunčana Bradley",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/337131802"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "eastern-green-mamba",
+   "name": "Eastern green mamba",
+   "sci": "Dendroaspis angusticeps",
+   "group": "elapid",
+   "facts": {
+    "venomous": true,
+    "lengthM": 1.8,
+    "region": "Africa",
+    "danger": "Potentially deadly",
+    "status": "Least concern"
+   },
+   "lookalikes": [
+    "black-mamba",
+    "boomslang"
+   ],
+   "blurb": "A shy, bright green tree snake of East and southern Africa. It is less aggressive than its black cousin.",
+   "clues": [
+    "Its IUCN conservation status is \"Least concern\".",
+    "Family: Elapidae.",
+    "Genus: Dendroaspis.",
+    "It is shy and spends most of its life in trees.",
+    "It is often confused with the harmless bush snakes.",
+    "It is venomous.",
+    "Typical length: about 1.8 m.",
+    "It is found in Africa.",
+    "Its bite or sting can kill a person.",
+    "The answer has 3 words (7, 5, 5 letters).",
+    "It starts with the letter E."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/2556129/medium.jpg",
+      "w": 500,
+      "h": 387,
+      "credit": "Dick Culbert",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/2556129"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/2556128/medium.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "AleGranholm",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/2556128"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/21837942/medium.jpg",
+      "w": 500,
+      "h": 338,
+      "credit": "Simon Tonge",
+      "license": "CC0 1.0",
+      "page": "https://www.inaturalist.org/photos/21837942"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "puff-adder",
+   "name": "Puff adder",
+   "sci": "Bitis arietans",
+   "group": "viper",
+   "facts": {
+    "venomous": true,
+    "lengthM": 1,
+    "region": "Africa",
+    "danger": "Potentially deadly",
+    "status": "Least concern"
+   },
+   "lookalikes": [
+    "gaboon-viper"
+   ],
+   "blurb": "A stout, sluggish viper common across Africa. It causes more serious bites in Africa than any other snake because it sits still when approached.",
+   "clues": [
+    "Family: Viperidae.",
+    "Genus: Bitis.",
+    "It relies on camouflage and sits still instead of fleeing.",
+    "It causes more bites in Africa than any other snake.",
+    "It has chevron markings along its back.",
+    "Typical length: about 1 m.",
+    "It is found in Africa.",
+    "Its bite or sting can kill a person.",
+    "It inflates its body and hisses loudly when threatened.",
+    "Its name describes blowing up with air.",
+    "The answer has 2 words (4, 5 letters).",
+    "It starts with the letter P."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/86411915/medium.jpg",
+      "w": 500,
+      "h": 335,
+      "credit": "Bernard DUPONT",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/86411915"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/86411916/medium.jpeg",
+      "w": 500,
+      "h": 375,
+      "credit": "4028mdk09",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/86411916"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/126447375/medium.jpeg",
+      "w": 500,
+      "h": 431,
+      "credit": "Tony Rebelo",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/126447375"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "gaboon-viper",
+   "name": "Gaboon viper",
+   "sci": "Bitis gabonica",
+   "group": "viper",
+   "facts": {
+    "venomous": true,
+    "lengthM": 1.3,
+    "region": "Africa",
+    "danger": "Potentially deadly",
+    "status": "Vulnerable"
+   },
+   "lookalikes": [
+    "puff-adder",
+    "rhinoceros-viper"
+   ],
+   "blurb": "A huge, beautifully patterned viper of African rainforest floors. It has the longest fangs of any snake.",
+   "clues": [
+    "Its IUCN conservation status is \"Vulnerable\".",
+    "Genus: Bitis.",
+    "Its pattern makes it vanish among fallen leaves.",
+    "Its fangs can be 5 cm long.",
+    "It is venomous.",
+    "Typical length: about 1.3 m.",
+    "It is found in Africa.",
+    "Its bite or sting can kill a person.",
+    "It has the longest fangs of any snake.",
+    "It is named after a country on Africa's west coast.",
+    "The answer has 2 words (6, 5 letters).",
+    "It starts with the letter G."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/15572304/medium.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Nick Schaller",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/15572304"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/15695713/medium.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Nick Schaller",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/15695713"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/81367802/medium.jpeg",
+      "w": 500,
+      "h": 331,
+      "credit": "no rights reserved",
+      "license": "CC0 1.0",
+      "page": "https://www.inaturalist.org/photos/81367802"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "rhinoceros-viper",
+   "name": "Rhinoceros viper",
+   "sci": "Bitis nasicornis",
+   "group": "viper",
+   "facts": {
+    "venomous": true,
+    "lengthM": 0.9,
+    "region": "Africa",
+    "danger": "Dangerous",
+    "status": "Vulnerable"
+   },
+   "lookalikes": [
+    "gaboon-viper"
+   ],
+   "blurb": "A gaudy blue, green and red viper of central African rainforests with horn-like scales on its snout.",
+   "clues": [
+    "Its IUCN conservation status is \"Vulnerable\".",
+    "Genus: Bitis.",
+    "It lives in West and Central African rainforests.",
+    "Its pattern mixes blue, green, red and black.",
+    "It is venomous.",
+    "Typical length: about 90 cm.",
+    "It is found in Africa.",
+    "It can be dangerous to people.",
+    "It has two or three pairs of horn-like scales on its nose.",
+    "It is named after a horned African mammal.",
+    "The answer has 2 words (10, 5 letters).",
+    "It starts with the letter R."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/395167898/medium.jpeg",
+      "w": 500,
+      "h": 331,
+      "credit": "no rights reserved",
+      "license": "CC0 1.0",
+      "page": "https://www.inaturalist.org/photos/395167898"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/219636029/medium.jpeg",
+      "w": 500,
+      "h": 333,
+      "credit": "no rights reserved",
+      "license": "CC0 1.0",
+      "page": "https://www.inaturalist.org/photos/219636029"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/81357307/medium.jpeg",
+      "w": 500,
+      "h": 331,
+      "credit": "no rights reserved",
+      "license": "CC0 1.0",
+      "page": "https://www.inaturalist.org/photos/81357307"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "boomslang",
+   "name": "Boomslang",
+   "sci": "Dispholidus typus",
+   "group": "colubrid",
+   "facts": {
+    "venomous": true,
+    "lengthM": 1.4,
+    "region": "Africa",
+    "danger": "Potentially deadly",
+    "status": "Least concern"
+   },
+   "lookalikes": [
+    "eastern-green-mamba"
+   ],
+   "blurb": "A rear-fanged African tree snake with huge eyes. Its slow-acting venom killed the herpetologist Karl Schmidt in 1957.",
+   "clues": [
+    "Family: Colubridae.",
+    "Genus: Dispholidus.",
+    "Karl Schmidt kept notes on his symptoms until he died from its bite.",
+    "Its venom stops blood from clotting.",
+    "It has unusually large eyes.",
+    "Typical length: about 1.4 m.",
+    "It is found in Africa.",
+    "Its bite or sting can kill a person.",
+    "It is one of the few dangerous rear-fanged snakes.",
+    "Its name is Afrikaans for \"tree snake\".",
+    "The answer is one word of 9 letters.",
+    "It starts with the letter B."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/54362492/medium.jpeg",
+      "w": 500,
+      "h": 333,
+      "credit": "Karen Eichholz",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/54362492"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/15165535/medium.jpg",
+      "w": 500,
+      "h": 327,
+      "credit": "Wynand Uys",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/15165535"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/638185376/medium.jpg",
+      "w": 371,
+      "h": 500,
+      "credit": "Robert Taylor",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/638185376"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "cape-cobra",
+   "name": "Cape cobra",
+   "sci": "Naja nivea",
+   "group": "elapid",
+   "facts": {
+    "venomous": true,
+    "lengthM": 1.3,
+    "region": "Africa",
+    "danger": "Potentially deadly",
+    "status": "Least concern"
+   },
+   "blurb": "A cobra of dry parts of southern Africa that comes in yellow, brown and speckled forms.",
+   "clues": [
+    "Its IUCN conservation status is \"Least concern\".",
+    "Family: Elapidae.",
+    "Genus: Naja.",
+    "It often raids sociable weaver nests for eggs and chicks.",
+    "It lives in the Karoo and Kalahari.",
+    "Some are butter-yellow, others brown or speckled.",
+    "It is venomous.",
+    "Typical length: about 1.3 m.",
+    "It is found in Africa.",
+    "Its bite or sting can kill a person.",
+    "The answer has 2 words (4, 5 letters).",
+    "It starts with the letter C."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/325326142/medium.jpg",
+      "w": 500,
+      "h": 359,
+      "credit": "Ryan van Huyssteen",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/325326142"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/262648880/medium.jpeg",
+      "w": 281,
+      "h": 500,
+      "credit": "Ryan van Huyssteen",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/262648880"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/449466343/medium.jpeg",
+      "w": 500,
+      "h": 371,
+      "credit": "Tony Rebelo",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/449466343"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "egyptian-cobra",
+   "name": "Egyptian cobra",
+   "sci": "Naja haje",
+   "group": "elapid",
+   "facts": {
+    "venomous": true,
+    "lengthM": 1.5,
+    "region": "Africa",
+    "danger": "Potentially deadly",
+    "status": "Least concern"
+   },
+   "blurb": "A large cobra of northern Africa. The \"asp\" of ancient Egypt and the rearing snake on the pharaohs' crowns.",
+   "clues": [
+    "Family: Elapidae.",
+    "Genus: Naja.",
+    "It is often said to be the asp linked with Cleopatra's death.",
+    "The uraeus on pharaohs' crowns shows it rearing up.",
+    "It lives across North and West Africa.",
+    "Typical length: about 1.5 m.",
+    "It is found in Africa.",
+    "Its bite or sting can kill a person.",
+    "It spreads a broad hood when threatened.",
+    "It is named after a country on the Nile.",
+    "The answer has 2 words (8, 5 letters).",
+    "It starts with the letter E."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/263860831/medium.jpeg",
+      "w": 500,
+      "h": 333,
+      "credit": "Mourad Harzallah",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/263860831"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/245583145/medium.jpeg",
+      "w": 500,
+      "h": 333,
+      "credit": "Mourad Harzallah",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/245583145"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/455450455/medium.jpeg",
+      "w": 500,
+      "h": 333,
+      "credit": "Samuel GUIRAUDOU",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/455450455"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "mozambique-spitting-cobra",
+   "name": "Mozambique spitting cobra",
+   "sci": "Naja mossambica",
+   "group": "elapid",
+   "facts": {
+    "venomous": true,
+    "lengthM": 1.1,
+    "region": "Africa",
+    "danger": "Dangerous",
+    "status": "Least concern"
+   },
+   "blurb": "A spitting cobra of south-eastern Africa that can aim venom at the eyes from over two metres away.",
+   "clues": [
+    "Family: Elapidae.",
+    "Genus: Naja.",
+    "It usually rears up before spraying venom.",
+    "Its venom causes tissue damage around a bite.",
+    "It aims at the eyes of a threat.",
+    "Typical length: about 1.1 m.",
+    "It is found in Africa.",
+    "It can be dangerous to people.",
+    "It is a hooded snake of south-eastern Africa.",
+    "It is named after an African country on the Indian Ocean.",
+    "The answer has 3 words (10, 8, 5 letters).",
+    "It starts with the letter M."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/1819604/medium.jpg",
+      "w": 500,
+      "h": 387,
+      "credit": "Ryan van Huyssteen",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/1819604"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/670486/medium.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "i_c_riddell",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/670486"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/476970345/medium.jpg",
+      "w": 398,
+      "h": 500,
+      "credit": "Sunčana Bradley",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/476970345"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "horned-viper",
+   "name": "Horned viper",
+   "alt": [
+    "desert horned viper",
+    "Saharan horned viper"
+   ],
+   "sci": "Cerastes cerastes",
+   "group": "viper",
+   "facts": {
+    "venomous": true,
+    "lengthM": 0.6,
+    "region": "Africa",
+    "danger": "Dangerous",
+    "status": "Least concern"
+   },
+   "lookalikes": [
+    "sidewinder"
+   ],
+   "blurb": "A small sand-coloured viper of the Sahara and Arabia that often has a spike-like scale above each eye.",
+   "clues": [
+    "Its IUCN conservation status is \"Least concern\".",
+    "Genus: Cerastes.",
+    "It moves across loose sand by sidewinding.",
+    "It buries itself in sand with only its eyes showing.",
+    "It is venomous.",
+    "Typical length: about 60 cm.",
+    "It is found in Africa.",
+    "It can be dangerous to people.",
+    "It is sand-coloured.",
+    "It has a spike-like scale above each eye.",
+    "The answer has 2 words (6, 5 letters).",
+    "It starts with the letter H."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/365113760/medium.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Bernard DUPONT",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/365113760"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/12887205/medium.jpeg",
+      "w": 500,
+      "h": 375,
+      "credit": "Julien Renoult",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/12887205"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/268851377/medium.jpeg",
+      "w": 500,
+      "h": 333,
+      "credit": "Mourad Harzallah",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/268851377"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "african-rock-python",
+   "name": "African rock python",
+   "sci": "Python sebae",
+   "group": "python",
+   "facts": {
+    "venomous": false,
+    "lengthM": 4,
+    "region": "Africa",
+    "danger": "Dangerous",
+    "status": "Near threatened"
+   },
+   "lookalikes": [
+    "burmese-python"
+   ],
+   "blurb": "Africa's largest snake. It can swallow antelopes and is known to have killed people.",
+   "clues": [
+    "Its IUCN conservation status is \"Near threatened\".",
+    "It can swallow small antelopes and crocodiles.",
+    "It lives in savanna and forest south of the Sahara.",
+    "It is not venomous.",
+    "Typical length: about 4 m.",
+    "It can be dangerous to people.",
+    "It has an arrow-shaped mark on top of its head.",
+    "Its name includes a word for stone.",
+    "The answer has 3 words (7, 4, 6 letters).",
+    "It starts with the letter A."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/21325985/medium.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Ewout Knoester",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/21325985"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/99400002/medium.jpeg",
+      "w": 500,
+      "h": 341,
+      "credit": "Lucy Keith-Diagne",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/99400002"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/334990811/medium.jpg",
+      "w": 375,
+      "h": 500,
+      "credit": "Ewout Knoester",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/334990811"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "ball-python",
+   "name": "Ball python",
+   "alt": [
+    "royal python"
+   ],
+   "sci": "Python regius",
+   "group": "python",
+   "facts": {
+    "venomous": false,
+    "lengthM": 1.2,
+    "region": "Africa",
+    "danger": "Harmless",
+    "status": "Near threatened"
+   },
+   "blurb": "A small, gentle West African python and one of the world's most popular pet snakes.",
+   "clues": [
+    "Its IUCN conservation status is \"Near threatened\".",
+    "Breeders have produced thousands of colour forms called morphs.",
+    "In some West African cultures it is sacred.",
+    "It is one of the most popular pet snakes.",
+    "It is not venomous.",
+    "Typical length: about 1.2 m.",
+    "It is found in Africa.",
+    "It is harmless to people.",
+    "When scared it curls into a tight sphere.",
+    "The answer has 2 words (4, 6 letters).",
+    "It starts with the letter B."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/668820307/medium.jpg",
+      "w": 500,
+      "h": 376,
+      "credit": "Philippe Hornus",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/668820307"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/552045435/medium.jpg",
+      "w": 500,
+      "h": 376,
+      "credit": "Zac Peterson",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/552045435"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "western-diamondback-rattlesnake",
+   "name": "Western diamondback rattlesnake",
+   "sci": "Crotalus atrox",
+   "group": "viper",
+   "facts": {
+    "venomous": true,
+    "lengthM": 1.2,
+    "region": "the Americas",
+    "danger": "Potentially deadly",
+    "status": "Least concern"
+   },
+   "lookalikes": [
+    "eastern-diamondback-rattlesnake"
+   ],
+   "blurb": "A big, bold rattlesnake of the south-western USA and Mexico, and one of the most dangerous snakes in North America.",
+   "clues": [
+    "Family: Viperidae.",
+    "Genus: Crotalus.",
+    "Its tail is ringed black and white, like a raccoon's.",
+    "It adds a new segment to its tail each time it sheds.",
+    "It is venomous.",
+    "Typical length: about 1.2 m.",
+    "It is found in the Americas.",
+    "Its bite or sting can kill a person.",
+    "It has diamond-shaped markings along its back.",
+    "It shakes a buzzing tail as a warning.",
+    "The answer has 3 words (7, 11, 11 letters).",
+    "It starts with the letter W."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/2785199/medium.JPG",
+      "w": 500,
+      "h": 375,
+      "credit": "Sam Kieschnick",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/2785199"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/667140/medium.JPG",
+      "w": 500,
+      "h": 379,
+      "credit": "Juan Cruzado Cortés",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/667140"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/1904884/medium.jpg",
+      "w": 500,
+      "h": 307,
+      "credit": "Mike Lewinski",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/1904884"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "eastern-diamondback-rattlesnake",
+   "name": "Eastern diamondback rattlesnake",
+   "sci": "Crotalus adamanteus",
+   "group": "viper",
+   "facts": {
+    "venomous": true,
+    "lengthM": 1.5,
+    "region": "the Americas",
+    "danger": "Potentially deadly",
+    "status": "Least concern"
+   },
+   "lookalikes": [
+    "western-diamondback-rattlesnake"
+   ],
+   "blurb": "The heaviest venomous snake in the Americas, found in pine woods of the south-eastern USA.",
+   "clues": [
+    "Family: Viperidae.",
+    "Genus: Crotalus.",
+    "It often shelters in gopher tortoise burrows.",
+    "It is the heaviest venomous snake in the Americas.",
+    "It is venomous.",
+    "Typical length: about 1.5 m.",
+    "It is found in the Americas.",
+    "Its bite or sting can kill a person.",
+    "Its back has bold diamonds edged in cream.",
+    "It warns with a buzzing tail.",
+    "The answer has 3 words (7, 11, 11 letters).",
+    "It starts with the letter E."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/93251976/medium.jpeg",
+      "w": 375,
+      "h": 500,
+      "credit": "Scott Allen Davis",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/93251976"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/88475195/medium.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "evangrimes",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/88475195"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/263201578/medium.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "William J. Deml",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/263201578"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "timber-rattlesnake",
+   "name": "Timber rattlesnake",
+   "sci": "Crotalus horridus",
+   "group": "viper",
+   "facts": {
+    "venomous": true,
+    "lengthM": 1.1,
+    "region": "the Americas",
+    "danger": "Potentially deadly",
+    "status": "Least concern"
+   },
+   "blurb": "A rattlesnake of forests in the eastern USA. It appeared on the \"Don't tread on me\" Gadsden flag.",
+   "clues": [
+    "Family: Viperidae.",
+    "Genus: Crotalus.",
+    "It appears on the \"Don't tread on me\" flag.",
+    "It shelters in rocky dens over winter, often in groups.",
+    "Its scientific name means \"dreadful\".",
+    "Typical length: about 1.1 m.",
+    "It is found in the Americas.",
+    "Its bite or sting can kill a person.",
+    "It has dark zig-zag crossbands.",
+    "It lives in eastern US woodlands and shakes its tail.",
+    "The answer has 2 words (6, 11 letters).",
+    "It starts with the letter T."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/218050793/medium.jpeg",
+      "w": 380,
+      "h": 500,
+      "credit": "no rights reserved",
+      "license": "CC0 1.0",
+      "page": "https://www.inaturalist.org/photos/218050793"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/162920279/medium.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Michael J. Papay",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/162920279"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/208458371/medium.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Evan M. Raskin",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/208458371"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "sidewinder",
+   "name": "Sidewinder",
+   "alt": [
+    "horned rattlesnake"
+   ],
+   "sci": "Crotalus cerastes",
+   "group": "viper",
+   "facts": {
+    "venomous": true,
+    "lengthM": 0.6,
+    "region": "the Americas",
+    "danger": "Dangerous",
+    "status": "Least concern"
+   },
+   "lookalikes": [
+    "horned-viper"
+   ],
+   "blurb": "A small desert rattlesnake of the south-western USA and Mexico that moves across sand in sideways loops.",
+   "clues": [
+    "Its IUCN conservation status is \"Least concern\".",
+    "Family: Viperidae.",
+    "Genus: Crotalus.",
+    "It lives in the Mojave and Sonoran deserts.",
+    "It leaves J-shaped tracks in the sand.",
+    "It is venomous.",
+    "Typical length: about 60 cm.",
+    "It is found in the Americas.",
+    "It can be dangerous to people.",
+    "It moves across sand by throwing its body sideways.",
+    "The answer is one word of 10 letters.",
+    "It starts with the letter S."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/369539626/medium.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "no rights reserved",
+      "license": "CC0 1.0",
+      "page": "https://www.inaturalist.org/photos/369539626"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/20345718/medium.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Ken-ichi Ueda",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/20345718"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "copperhead",
+   "name": "Copperhead",
+   "sci": "Agkistrodon contortrix",
+   "group": "viper",
+   "facts": {
+    "venomous": true,
+    "lengthM": 0.75,
+    "region": "the Americas",
+    "danger": "Dangerous",
+    "status": "Least concern"
+   },
+   "lookalikes": [
+    "cottonmouth",
+    "lowlands-copperhead"
+   ],
+   "blurb": "A pit viper of the eastern USA with hourglass-shaped bands. It bites more people in the US than any other snake, but deaths are very rare.",
+   "clues": [
+    "Family: Viperidae.",
+    "Genus: Agkistrodon.",
+    "Its young have bright yellow tail tips to lure frogs.",
+    "Its bands look like hourglasses from the side.",
+    "It bites more Americans than any other venomous snake.",
+    "Typical length: about 75 cm.",
+    "It is found in the Americas.",
+    "It can be dangerous to people.",
+    "Its bites are very rarely fatal.",
+    "Its head is the colour of a reddish metal.",
+    "The answer is one word of 10 letters.",
+    "It starts with the letter C."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/242284249/medium.jpg",
+      "w": 500,
+      "h": 367,
+      "credit": "Alan Rockefeller",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/242284249"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/246488661/medium.jpg",
+      "w": 500,
+      "h": 348,
+      "credit": "Mila C.",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/246488661"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/541369721/medium.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Michael J. Papay",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/541369721"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "cottonmouth",
+   "name": "Cottonmouth",
+   "alt": [
+    "water moccasin"
+   ],
+   "sci": "Agkistrodon piscivorus",
+   "group": "viper",
+   "facts": {
+    "venomous": true,
+    "lengthM": 0.9,
+    "region": "the Americas",
+    "danger": "Dangerous",
+    "status": "Least concern"
+   },
+   "lookalikes": [
+    "copperhead"
+   ],
+   "blurb": "A semi-aquatic pit viper of the south-eastern USA. It gapes to show the white lining of its mouth when threatened.",
+   "clues": [
+    "Its IUCN conservation status is \"Least concern\".",
+    "Family: Viperidae.",
+    "Genus: Agkistrodon.",
+    "Its scientific name means \"fish eater\".",
+    "It is venomous.",
+    "Typical length: about 90 cm.",
+    "It is found in the Americas.",
+    "It can be dangerous to people.",
+    "When threatened it opens its mouth to show the white inside.",
+    "The answer is one word of 11 letters.",
+    "It starts with the letter C."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/74336248/medium.jpg",
+      "w": 406,
+      "h": 500,
+      "credit": "kirk gardner",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/74336248"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/74336329/medium.jpg",
+      "w": 500,
+      "h": 389,
+      "credit": "kirk gardner",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/74336329"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/310878712/medium.jpg",
+      "w": 500,
+      "h": 500,
+      "credit": "Mila Turov",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/310878712"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "eastern-coral-snake",
+   "name": "Eastern coral snake",
+   "sci": "Micrurus fulvius",
+   "group": "elapid",
+   "facts": {
+    "venomous": true,
+    "lengthM": 0.75,
+    "region": "the Americas",
+    "danger": "Potentially deadly",
+    "status": "Least concern"
+   },
+   "lookalikes": [
+    "milk-snake",
+    "scarlet-kingsnake"
+   ],
+   "blurb": "A brightly ringed elapid of the south-eastern USA. Its red bands touch yellow ones, unlike its harmless lookalikes.",
+   "clues": [
+    "Family: Elapidae.",
+    "Genus: Micrurus.",
+    "Its bite can take hours before symptoms show.",
+    "It is related to cobras, not to rattlesnakes.",
+    "Its red bands touch yellow bands.",
+    "Typical length: about 75 cm.",
+    "It is found in the Americas.",
+    "Its bite or sting can kill a person.",
+    "The rhyme \"red touches yellow\" helps tell it from mimics in the USA.",
+    "It is ringed in red, yellow and black and shares its name with a reef animal.",
+    "The answer has 3 words (7, 5, 5 letters).",
+    "It starts with the letter E."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/286627672/medium.jpg",
+      "w": 500,
+      "h": 376,
+      "credit": "Daniel Estabrooks",
+      "license": "CC0 1.0",
+      "page": "https://www.inaturalist.org/photos/286627672"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/129443227/medium.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Court Harding",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/129443227"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/198238314/medium.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Siddarth Machado",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/198238314"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "milk-snake",
+   "name": "Milk snake",
+   "sci": "Lampropeltis triangulum",
+   "group": "colubrid",
+   "facts": {
+    "venomous": false,
+    "lengthM": 0.9,
+    "region": "the Americas",
+    "danger": "Harmless",
+    "status": "Least concern"
+   },
+   "lookalikes": [
+    "eastern-coral-snake",
+    "scarlet-kingsnake"
+   ],
+   "blurb": "A harmless North American snake whose red, black and yellow bands mimic the deadly coral snakes.",
+   "clues": [
+    "Family: Colubridae.",
+    "Genus: Lampropeltis.",
+    "Some forms copy the colours of a deadly snake.",
+    "In it, red bands touch black bands.",
+    "It eats rodents and other snakes.",
+    "It is not venomous.",
+    "Typical length: about 90 cm.",
+    "It is found in the Americas.",
+    "It is harmless to people.",
+    "Its name is a dairy drink.",
+    "The answer has 2 words (4, 5 letters).",
+    "It starts with the letter M."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/181102501/medium.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "evangrimes",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/181102501"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/113488348/medium.jpeg",
+      "w": 500,
+      "h": 333,
+      "credit": "Matt Berger",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/113488348"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/393889698/medium.jpeg",
+      "w": 500,
+      "h": 376,
+      "credit": "Zac Peterson",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/393889698"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "scarlet-kingsnake",
+   "name": "Scarlet kingsnake",
+   "sci": "Lampropeltis elapsoides",
+   "group": "colubrid",
+   "facts": {
+    "venomous": false,
+    "lengthM": 0.5,
+    "region": "the Americas",
+    "danger": "Harmless",
+    "status": "Least concern"
+   },
+   "lookalikes": [
+    "eastern-coral-snake",
+    "milk-snake"
+   ],
+   "blurb": "A small, harmless snake of the south-eastern USA whose red, black and yellow rings mimic the coral snake.",
+   "clues": [
+    "Family: Colubridae.",
+    "Genus: Lampropeltis.",
+    "It often hides under the bark of dead pine trees.",
+    "Its red bands are bordered by black.",
+    "It mimics the eastern coral snake.",
+    "It is not venomous.",
+    "Typical length: about 50 cm.",
+    "It is found in the Americas.",
+    "It is harmless to people.",
+    "It is named after a bright shade of red.",
+    "The answer has 2 words (7, 9 letters).",
+    "It starts with the letter S."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/114425943/medium.jpeg",
+      "w": 500,
+      "h": 333,
+      "credit": "evangrimes",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/114425943"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/114425938/medium.jpeg",
+      "w": 500,
+      "h": 333,
+      "credit": "evangrimes",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/114425938"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/59836118/medium.jpeg",
+      "w": 370,
+      "h": 500,
+      "credit": "Jennifer Styrsky",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/59836118"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "california-kingsnake",
+   "name": "California kingsnake",
+   "sci": "Lampropeltis californiae",
+   "group": "colubrid",
+   "facts": {
+    "venomous": false,
+    "lengthM": 1,
+    "region": "the Americas",
+    "danger": "Harmless",
+    "status": "Least concern"
+   },
+   "blurb": "A banded or striped kingsnake of the western USA and Mexico. It is immune to rattlesnake venom and eats rattlesnakes.",
+   "clues": [
+    "Family: Colubridae.",
+    "Genus: Lampropeltis.",
+    "It is resistant to rattlesnake venom.",
+    "It kills and eats rattlesnakes.",
+    "It is usually banded black and white.",
+    "Typical length: about 1 m.",
+    "It is found in the Americas.",
+    "It is harmless to people.",
+    "It is a popular pet.",
+    "It is named after a US state.",
+    "The answer has 2 words (10, 9 letters).",
+    "It starts with the letter C."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/171220855/medium.jpeg",
+      "w": 500,
+      "h": 333,
+      "credit": "Connor Long",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/171220855"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/171194222/medium.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Squamata55",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/171194222"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/171194224/medium.jpg",
+      "w": 500,
+      "h": 379,
+      "credit": "Ross Padilla",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/171194224"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "corn-snake",
+   "name": "Corn snake",
+   "alt": [
+    "red rat snake"
+   ],
+   "sci": "Pantherophis guttatus",
+   "group": "colubrid",
+   "facts": {
+    "venomous": false,
+    "lengthM": 1.2,
+    "region": "the Americas",
+    "danger": "Harmless",
+    "status": "Least concern"
+   },
+   "blurb": "A gentle, orange-red rat snake of the south-eastern USA and one of the most popular pet snakes.",
+   "clues": [
+    "Family: Colubridae.",
+    "Genus: Pantherophis.",
+    "Its belly has a checkerboard pattern.",
+    "It was often found around grain stores, where it hunted mice.",
+    "It is one of the most popular pet snakes.",
+    "It is not venomous.",
+    "Typical length: about 1.2 m.",
+    "It is found in the Americas.",
+    "It is harmless to people.",
+    "Its name is a cereal crop.",
+    "The answer has 2 words (4, 5 letters).",
+    "It starts with the letter C."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/64866146/medium.jpeg",
+      "w": 500,
+      "h": 333,
+      "credit": "evangrimes",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/64866146"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/347156071/medium.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Jeremiah Degenhardt",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/347156071"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/497415790/medium.jpeg",
+      "w": 500,
+      "h": 375,
+      "credit": "Russell Prince-Wright",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/497415790"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "common-garter-snake",
+   "name": "Common garter snake",
+   "sci": "Thamnophis sirtalis",
+   "group": "colubrid",
+   "facts": {
+    "venomous": false,
+    "lengthM": 0.7,
+    "region": "the Americas",
+    "danger": "Harmless",
+    "status": "Least concern"
+   },
+   "blurb": "North America's most widespread snake. In Manitoba, tens of thousands emerge together from winter dens.",
+   "clues": [
+    "Family: Colubridae.",
+    "Genus: Thamnophis.",
+    "Some populations can eat poisonous newts.",
+    "Tens of thousands mass at dens in Manitoba each spring.",
+    "It is found further north than any other North American reptile.",
+    "Typical length: about 70 cm.",
+    "It is found in the Americas.",
+    "It is harmless to people.",
+    "It usually has three pale stripes along its body.",
+    "Its name sounds like a gardener's snake.",
+    "The answer has 3 words (6, 6, 5 letters).",
+    "It starts with the letter C."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/172567155/medium.jpeg",
+      "w": 500,
+      "h": 333,
+      "credit": "Tom Kennedy",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/172567155"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/1520773/medium.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "kclarksdnhmorg",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/1520773"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/99085291/medium.jpg",
+      "w": 500,
+      "h": 281,
+      "credit": "Dan MacNeal",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/99085291"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "gopher-snake",
+   "name": "Gopher snake",
+   "alt": [
+    "bullsnake"
+   ],
+   "sci": "Pituophis catenifer",
+   "group": "colubrid",
+   "facts": {
+    "venomous": false,
+    "lengthM": 1.4,
+    "region": "the Americas",
+    "danger": "Harmless",
+    "status": "Least concern"
+   },
+   "lookalikes": [
+    "western-diamondback-rattlesnake"
+   ],
+   "blurb": "A large, harmless snake of western North America that bluffs by hissing and shaking its tail like a rattlesnake.",
+   "clues": [
+    "Family: Colubridae.",
+    "Genus: Pituophis.",
+    "It hisses loudly through a flap in its windpipe.",
+    "It vibrates its tail in dry leaves to mimic a rattle.",
+    "It is often killed by mistake as a rattlesnake.",
+    "Typical length: about 1.4 m.",
+    "It is found in the Americas.",
+    "It is harmless to people.",
+    "It hunts rodents in their burrows.",
+    "It is named after a burrowing rodent.",
+    "The answer has 2 words (6, 5 letters).",
+    "It starts with the letter G."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/244456541/medium.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Adrianh M. Orozco",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/244456541"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/667566710/medium.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "ayden",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/667566710"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "fer-de-lance",
+   "name": "Fer-de-lance",
+   "alt": [
+    "terciopelo",
+    "common lancehead"
+   ],
+   "sci": "Bothrops asper",
+   "group": "viper",
+   "facts": {
+    "venomous": true,
+    "lengthM": 1.5,
+    "region": "the Americas",
+    "danger": "Potentially deadly",
+    "status": "Least concern"
+   },
+   "blurb": "A large, irritable pit viper of Central and northern South America. It causes more serious bites there than any other snake.",
+   "clues": [
+    "Family: Viperidae.",
+    "Genus: Bothrops.",
+    "Females give birth to dozens of live young.",
+    "It causes most snakebites in Central America.",
+    "It is venomous.",
+    "Typical length: about 1.5 m.",
+    "It is found in the Americas.",
+    "Its bite or sting can kill a person.",
+    "It is often found near streams and farms.",
+    "Its French name means \"iron of the spear\".",
+    "The answer has 3 words (3, 2, 5 letters).",
+    "It starts with the letter F."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/167738223/medium.jpg",
+      "w": 500,
+      "h": 388,
+      "credit": "no rights reserved",
+      "license": "CC0 1.0",
+      "page": "https://www.inaturalist.org/photos/167738223"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/333961555/medium.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Court Harding",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/333961555"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "bushmaster",
+   "name": "Bushmaster",
+   "sci": "Lachesis muta",
+   "group": "viper",
+   "facts": {
+    "venomous": true,
+    "lengthM": 2.5,
+    "region": "the Americas",
+    "danger": "Potentially deadly",
+    "status": "Least concern"
+   },
+   "blurb": "The longest viper in the Americas, living on the floor of Amazon rainforest.",
+   "clues": [
+    "Family: Viperidae.",
+    "Genus: Lachesis.",
+    "Its genus is named after one of the three Fates.",
+    "Unlike most American vipers, it lays eggs.",
+    "Its tail ends in a spiny tip but no rattle.",
+    "Typical length: about 2.5 m.",
+    "It is found in the Americas.",
+    "Its bite or sting can kill a person.",
+    "It lives in the Amazon rainforest.",
+    "It is the longest viper in the Americas.",
+    "The answer is one word of 10 letters.",
+    "It starts with the letter B."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/73818541/medium.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Fábio Olmos",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/73818541"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/323583748/medium.jpeg",
+      "w": 500,
+      "h": 421,
+      "credit": "zookanthos",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/323583748"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/455893569/medium.jpeg",
+      "w": 500,
+      "h": 333,
+      "credit": "jakeschneider00",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/455893569"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "eyelash-viper",
+   "name": "Eyelash viper",
+   "sci": "Bothriechis schlegelii",
+   "group": "viper",
+   "facts": {
+    "venomous": true,
+    "lengthM": 0.6,
+    "region": "the Americas",
+    "danger": "Dangerous",
+    "status": "Least concern"
+   },
+   "blurb": "A small tree viper of Central and South America that comes in yellow, green and pink forms.",
+   "clues": [
+    "Its IUCN conservation status is \"Least concern\".",
+    "Genus: Bothriechis.",
+    "One colour form is bright golden yellow.",
+    "It ambushes hummingbirds at flowers.",
+    "It lives in trees in Central American rainforest.",
+    "It is venomous.",
+    "Typical length: about 60 cm.",
+    "It is found in the Americas.",
+    "It can be dangerous to people.",
+    "It has spiky scales above its eyes.",
+    "The answer has 2 words (7, 5 letters).",
+    "It starts with the letter E."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/84758579/medium.jpeg",
+      "w": 500,
+      "h": 333,
+      "credit": "Daniel Mesa",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/84758579"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/28759348/medium.jpeg",
+      "w": 500,
+      "h": 375,
+      "credit": "Oscar Marín",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/28759348"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/400352165/medium.jpg",
+      "w": 375,
+      "h": 500,
+      "credit": "Nicolás Baresch Uribe",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/400352165"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "south-american-rattlesnake",
+   "name": "South American rattlesnake",
+   "alt": [
+    "cascabel"
+   ],
+   "sci": "Crotalus durissus",
+   "group": "viper",
+   "facts": {
+    "venomous": true,
+    "lengthM": 1.2,
+    "region": "the Americas",
+    "danger": "Potentially deadly",
+    "status": "Least concern"
+   },
+   "blurb": "The rattlesnake of South America, whose venom attacks the nervous system more than most rattlesnakes'.",
+   "clues": [
+    "Its IUCN conservation status is \"Least concern\".",
+    "Family: Viperidae.",
+    "Genus: Crotalus.",
+    "Its venom can cause blindness and paralysis.",
+    "It lives in dry savanna, not rainforest.",
+    "It has two dark stripes down its neck.",
+    "It is venomous.",
+    "Typical length: about 1.2 m.",
+    "Its bite or sting can kill a person.",
+    "The answer has 3 words (5, 8, 11 letters).",
+    "It starts with the letter S."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/322908688/medium.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Salomão Janderson Ferreira Bispo",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/322908688"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/362003759/medium.png",
+      "w": 500,
+      "h": 333,
+      "credit": "Salomão Janderson Ferreira Bispo",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/362003759"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/31065509/medium.jpeg",
+      "w": 500,
+      "h": 333,
+      "credit": "Paul Prior",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/31065509"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "green-anaconda",
+   "name": "Green anaconda",
+   "sci": "Eunectes murinus",
+   "group": "boa",
+   "facts": {
+    "venomous": false,
+    "lengthM": 5,
+    "region": "the Americas",
+    "danger": "Dangerous",
+    "status": "Least concern"
+   },
+   "lookalikes": [
+    "reticulated-python"
+   ],
+   "blurb": "The heaviest snake in the world, living in the swamps and rivers of tropical South America.",
+   "clues": [
+    "Family: Boidae.",
+    "Genus: Eunectes.",
+    "Its scientific name means \"of mice\", though it eats caimans.",
+    "Its eyes and nostrils sit on top of its head.",
+    "It spends most of its time in water.",
+    "Typical length: about 5 m.",
+    "It is found in the Americas.",
+    "It can be dangerous to people.",
+    "It is the heaviest snake in the world.",
+    "It is an olive-coloured giant of the Amazon.",
+    "The answer has 2 words (5, 8 letters).",
+    "It starts with the letter G."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/265377542/medium.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Conrado Pável de Oliveira",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/265377542"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/160176914/medium.jpeg",
+      "w": 500,
+      "h": 333,
+      "credit": "Fábio Olmos",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/160176914"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/277170833/medium.jpeg",
+      "w": 500,
+      "h": 274,
+      "credit": "Paul Prior",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/277170833"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "boa-constrictor",
+   "name": "Boa constrictor",
+   "alt": [
+    "red-tailed boa",
+    "boa"
+   ],
+   "sci": "Boa constrictor",
+   "group": "boa",
+   "facts": {
+    "venomous": false,
+    "lengthM": 2.5,
+    "region": "the Americas",
+    "danger": "Harmless",
+    "status": "Least concern"
+   },
+   "blurb": "A large constrictor of Central and South America and one of the few animals whose scientific name is also its common name.",
+   "clues": [
+    "Its IUCN conservation status is \"Least concern\".",
+    "Family: Boidae.",
+    "Its scientific name is the same as its common name.",
+    "It gives birth to live young.",
+    "It is not venomous.",
+    "Typical length: about 2.5 m.",
+    "It is found in the Americas.",
+    "It is harmless to people.",
+    "It kills prey by squeezing.",
+    "It is a large South American snake that shares its name with a feather scarf.",
+    "The answer has 2 words (3, 11 letters).",
+    "It starts with the letter B."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/334994710/medium.jpeg",
+      "w": 500,
+      "h": 397,
+      "credit": "Gustavo Sandres",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/334994710"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/334994725/medium.jpeg",
+      "w": 375,
+      "h": 500,
+      "credit": "Gustavo Sandres",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/334994725"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/334994715/medium.jpeg",
+      "w": 411,
+      "h": 500,
+      "credit": "Gustavo Sandres",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/334994715"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "emerald-tree-boa",
+   "name": "Emerald tree boa",
+   "sci": "Corallus caninus",
+   "group": "boa",
+   "facts": {
+    "venomous": false,
+    "lengthM": 1.8,
+    "region": "the Americas",
+    "danger": "Harmless",
+    "status": "Least concern"
+   },
+   "lookalikes": [
+    "green-tree-python"
+   ],
+   "blurb": "A bright green boa of Amazon rainforest that coils over branches, looking almost identical to the green tree python.",
+   "clues": [
+    "Family: Boidae.",
+    "Genus: Corallus.",
+    "Its long front teeth help it grip birds.",
+    "It is green with white zig-zag marks along its back.",
+    "It lives in the Amazon canopy.",
+    "Typical length: about 1.8 m.",
+    "It is found in the Americas.",
+    "It is harmless to people.",
+    "It looks almost exactly like a python from New Guinea.",
+    "It is named after a green gemstone.",
+    "The answer has 3 words (7, 4, 3 letters).",
+    "It starts with the letter E."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/58592502/medium.jpeg",
+      "w": 500,
+      "h": 281,
+      "credit": "Tom Heijnen",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/58592502"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/94922027/medium.jpg",
+      "w": 500,
+      "h": 402,
+      "credit": "Dick Culbert",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/94922027"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/236509348/medium.jpeg",
+      "w": 500,
+      "h": 333,
+      "credit": "eloise kerroux",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/236509348"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "common-european-adder",
+   "name": "Common European adder",
+   "alt": [
+    "adder",
+    "common viper"
+   ],
+   "sci": "Vipera berus",
+   "group": "viper",
+   "facts": {
+    "venomous": true,
+    "lengthM": 0.6,
+    "region": "Europe",
+    "danger": "Dangerous",
+    "status": "Least concern"
+   },
+   "lookalikes": [
+    "smooth-snake",
+    "grass-snake"
+   ],
+   "blurb": "Britain's only venomous snake, with a zig-zag stripe down its back. It lives further north than any other snake, even beyond the Arctic Circle.",
+   "clues": [
+    "Its IUCN conservation status is \"Least concern\".",
+    "It is found north of the Arctic Circle in Scandinavia.",
+    "It is the only venomous snake in Britain.",
+    "It is venomous.",
+    "Typical length: about 60 cm.",
+    "It can be dangerous to people.",
+    "It has a dark zig-zag stripe down its back.",
+    "Its name begins with the word for \"ordinary\".",
+    "The answer has 3 words (6, 8, 5 letters).",
+    "It starts with the letter C."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/2732539/medium.jpg",
+      "w": 500,
+      "h": 305,
+      "credit": "Alexander A. Fomichev",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/2732539"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/676395824/medium.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Михаил Языков",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/676395824"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/623236066/medium.jpg",
+      "w": 233,
+      "h": 500,
+      "credit": "no rights reserved",
+      "license": "CC0 1.0",
+      "page": "https://www.inaturalist.org/photos/623236066"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "nose-horned-viper",
+   "name": "Nose-horned viper",
+   "alt": [
+    "long-nosed viper"
+   ],
+   "sci": "Vipera ammodytes",
+   "group": "viper",
+   "facts": {
+    "venomous": true,
+    "lengthM": 0.7,
+    "region": "Europe",
+    "danger": "Dangerous",
+    "status": "Least concern"
+   },
+   "blurb": "A viper of the Balkans and Italy often called Europe's most dangerous snake. It has a soft horn on its snout.",
+   "clues": [
+    "Its IUCN conservation status is \"Least concern\".",
+    "It lives in rocky hills of the Balkans.",
+    "Its scientific name means \"sand digger\".",
+    "It is often called the most dangerous snake in Europe.",
+    "It is venomous.",
+    "Typical length: about 70 cm.",
+    "It is found in Europe.",
+    "It can be dangerous to people.",
+    "It has a zig-zag stripe down its back.",
+    "The answer has 3 words (4, 6, 5 letters).",
+    "It starts with the letter N."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/575425392/medium.jpg",
+      "w": 500,
+      "h": 225,
+      "credit": "no rights reserved",
+      "license": "CC0 1.0",
+      "page": "https://www.inaturalist.org/photos/575425392"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/271841317/medium.jpg",
+      "w": 375,
+      "h": 500,
+      "credit": "no rights reserved",
+      "license": "CC0 1.0",
+      "page": "https://www.inaturalist.org/photos/271841317"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/570095431/medium.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Philip Schaffer",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/570095431"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "asp-viper",
+   "name": "Asp viper",
+   "alt": [
+    "aspic viper"
+   ],
+   "sci": "Vipera aspis",
+   "group": "viper",
+   "facts": {
+    "venomous": true,
+    "lengthM": 0.65,
+    "region": "Europe",
+    "danger": "Dangerous",
+    "status": "Vulnerable"
+   },
+   "blurb": "A viper of south-western Europe, found in France, Italy, Spain and Switzerland.",
+   "clues": [
+    "Its IUCN conservation status is \"Vulnerable\".",
+    "It lives in France, Italy and Switzerland.",
+    "Its snout is slightly upturned.",
+    "It gives birth to live young.",
+    "It is venomous.",
+    "Typical length: about 65 cm.",
+    "It is found in Europe.",
+    "It can be dangerous to people.",
+    "Its name shares a word with the snake linked to Cleopatra.",
+    "The answer has 2 words (3, 5 letters).",
+    "It starts with the letter A."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/146935774/medium.jpg",
+      "w": 500,
+      "h": 377,
+      "credit": "Gilles San Martin",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/146935774"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/278155053/medium.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Emanuele Santarelli",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/278155053"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/278154766/medium.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Emanuele Santarelli",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/278154766"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "grass-snake",
+   "name": "Grass snake",
+   "sci": "Natrix natrix",
+   "group": "colubrid",
+   "facts": {
+    "venomous": false,
+    "lengthM": 1,
+    "region": "Europe",
+    "danger": "Harmless",
+    "status": "Least concern"
+   },
+   "lookalikes": [
+    "common-european-adder"
+   ],
+   "blurb": "Europe's common harmless water snake, with a yellow collar behind its head. When cornered it often plays dead.",
+   "clues": [
+    "Family: Colubridae.",
+    "Genus: Natrix.",
+    "It lays its eggs in compost heaps for warmth.",
+    "It plays dead and gives off a foul smell when grabbed.",
+    "It swims well and hunts frogs and fish.",
+    "Typical length: about 1 m.",
+    "It is found in Europe.",
+    "It is harmless to people.",
+    "It has a yellow or cream collar behind its head.",
+    "Its name is a lawn plant.",
+    "The answer has 2 words (5, 5 letters).",
+    "It starts with the letter G."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/124845228/medium.jpeg",
+      "w": 500,
+      "h": 479,
+      "credit": "Micha Baum",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/124845228"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/39452028/medium.jpeg",
+      "w": 500,
+      "h": 335,
+      "credit": "franciscodocampo",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/39452028"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/319158753/medium.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Sylvain Montagner",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/319158753"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "smooth-snake",
+   "name": "Smooth snake",
+   "sci": "Coronella austriaca",
+   "group": "colubrid",
+   "facts": {
+    "venomous": false,
+    "lengthM": 0.6,
+    "region": "Europe",
+    "danger": "Harmless",
+    "status": "Least concern"
+   },
+   "lookalikes": [
+    "common-european-adder"
+   ],
+   "blurb": "A small, rare, harmless snake of European heathland. It constricts lizards and other small reptiles.",
+   "clues": [
+    "Family: Colubridae.",
+    "Genus: Coronella.",
+    "In Britain it lives only on a few southern heaths.",
+    "It constricts lizards and slow-worms.",
+    "It is often mistaken for an adder.",
+    "Typical length: about 60 cm.",
+    "It is found in Europe.",
+    "It is harmless to people.",
+    "It is one of only three native snakes in Britain.",
+    "Its scales have no ridges, so it feels sleek.",
+    "The answer has 2 words (6, 5 letters).",
+    "It starts with the letter S."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/212744485/medium.jpeg",
+      "w": 500,
+      "h": 333,
+      "credit": "B. P. White",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/212744485"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/50533718/medium.jpg",
+      "w": 500,
+      "h": 390,
+      "credit": "Conrad Altmann",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/50533718"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/212744483/medium.jpeg",
+      "w": 500,
+      "h": 333,
+      "credit": "B. P. White",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/212744483"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "aesculapian-snake",
+   "name": "Aesculapian snake",
+   "sci": "Zamenis longissimus",
+   "group": "colubrid",
+   "facts": {
+    "venomous": false,
+    "lengthM": 1.5,
+    "region": "Europe",
+    "danger": "Harmless",
+    "status": "Least concern"
+   },
+   "blurb": "A long, harmless climbing snake of Europe, linked with the Greek god of medicine.",
+   "clues": [
+    "Family: Colubridae.",
+    "Genus: Zamenis.",
+    "Its species name means \"longest\".",
+    "It is a good climber, often seen in trees.",
+    "It is one of the longest snakes in Europe.",
+    "Typical length: about 1.5 m.",
+    "It is found in Europe.",
+    "It is harmless to people.",
+    "It is linked with the rod of the Greek god of medicine.",
+    "It is named after a god of healing.",
+    "The answer has 2 words (11, 5 letters).",
+    "It starts with the letter A."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/39487326/medium.jpeg",
+      "w": 500,
+      "h": 375,
+      "credit": "Philipp Pavelka",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/39487326"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/8062656/medium.jpeg",
+      "w": 500,
+      "h": 333,
+      "credit": "Легкий Сергій Валерійович",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/8062656"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/500846581/medium.jpg",
+      "w": 500,
+      "h": 400,
+      "credit": "Léo Souillard",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/500846581"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "banded-sea-krait",
+   "name": "Banded sea krait",
+   "alt": [
+    "yellow-lipped sea krait"
+   ],
+   "sci": "Laticauda colubrina",
+   "group": "sea snake",
+   "facts": {
+    "venomous": true,
+    "lengthM": 1,
+    "region": "Oceans",
+    "danger": "Dangerous",
+    "status": "Least concern"
+   },
+   "lookalikes": [
+    "banded-krait"
+   ],
+   "blurb": "A blue-and-black banded sea snake of the western Pacific that hunts eels on reefs but comes ashore to rest and lay eggs.",
+   "clues": [
+    "Its IUCN conservation status is \"Least concern\".",
+    "Family: Elapidae.",
+    "Genus: Laticauda.",
+    "It comes ashore to digest food and lay eggs.",
+    "It hunts eels in coral reef crevices.",
+    "It is venomous.",
+    "Typical length: about 1 m.",
+    "It can be dangerous to people.",
+    "The answer has 3 words (6, 3, 5 letters).",
+    "It starts with the letter B."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/404361251/medium.jpg",
+      "w": 500,
+      "h": 329,
+      "credit": "Bernard DUPONT",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/404361251"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/71778672/medium.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Dan Schofield",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/71778672"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/339538487/medium.jpg",
+      "w": 500,
+      "h": 483,
+      "credit": "portioid",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/339538487"
+     }
+    ]
+   },
+   "difficulty": 3
+  }
+ ],
+ "questions": [
+  {
+   "id": "q1",
+   "kind": "mc",
+   "prompt": "Which snake has the most toxic venom of any land snake tested?",
+   "answer": "Inland taipan",
+   "wrong": [
+    "King cobra",
+    "Black mamba",
+    "Western diamondback rattlesnake"
+   ],
+   "explain": "The inland taipan of central Australia tops standard venom-toxicity tests on mice.",
+   "difficulty": 1
+  },
+  {
+   "id": "q2",
+   "kind": "mc",
+   "prompt": "What is the longest snake species in the world?",
+   "answer": "Reticulated python",
+   "wrong": [
+    "Green anaconda",
+    "King cobra",
+    "Burmese python"
+   ],
+   "explain": "The reticulated python is the longest; the green anaconda is the heaviest.",
+   "difficulty": 1
+  },
+  {
+   "id": "q3",
+   "kind": "mc",
+   "prompt": "Which is the heaviest snake in the world?",
+   "answer": "Green anaconda",
+   "wrong": [
+    "Reticulated python",
+    "Boa constrictor",
+    "King cobra"
+   ],
+   "explain": "Green anacondas are bulkier than reticulated pythons, even though they are shorter.",
+   "difficulty": 2
+  },
+  {
+   "id": "q4",
+   "kind": "tf",
+   "prompt": "The king cobra is the only snake that builds a nest for its eggs.",
+   "answer": true,
+   "explain": "Females pile leaves into a mound nest and guard it.",
+   "difficulty": 2
+  },
+  {
+   "id": "q5",
+   "kind": "tf",
+   "prompt": "Britain has three native venomous snakes.",
+   "answer": false,
+   "explain": "The adder is Britain's only venomous snake; the grass snake and smooth snake are harmless.",
+   "difficulty": 2
+  },
+  {
+   "id": "q6",
+   "kind": "mc",
+   "prompt": "Which island lost most of its forest birds to the introduced brown tree snake?",
+   "answer": "Guam",
+   "wrong": [
+    "Hawaii",
+    "Tasmania",
+    "Madagascar"
+   ],
+   "explain": "The snake arrived on Guam in cargo after World War II.",
+   "difficulty": 2
+  },
+  {
+   "id": "q7",
+   "kind": "mc",
+   "prompt": "Which snake causes the most snakebite deaths in Australia?",
+   "answer": "Eastern brown snake",
+   "wrong": [
+    "Inland taipan",
+    "Tiger snake",
+    "Common death adder"
+   ],
+   "explain": "Brown snakes live close to people on farms and city edges.",
+   "difficulty": 2
+  },
+  {
+   "id": "q8",
+   "kind": "tf",
+   "prompt": "The death adder is a true viper.",
+   "answer": false,
+   "explain": "Death adders are elapids, related to cobras, that evolved a viper-like body.",
+   "difficulty": 3
+  },
+  {
+   "id": "q9",
+   "kind": "mc",
+   "prompt": "Which snake has the longest fangs?",
+   "answer": "Gaboon viper",
+   "wrong": [
+    "King cobra",
+    "Black mamba",
+    "Inland taipan"
+   ],
+   "explain": "Gaboon viper fangs can reach about 5 cm.",
+   "difficulty": 2
+  },
+  {
+   "id": "q10",
+   "kind": "mc",
+   "prompt": "In the USA, the rhyme \"red touches yellow\" helps tell which snake from its harmless mimics?",
+   "answer": "Coral snake",
+   "wrong": [
+    "Copperhead",
+    "Cottonmouth",
+    "Garter snake"
+   ],
+   "explain": "In US coral snakes red bands touch yellow; in milk snakes and scarlet kingsnakes red touches black. It does not hold everywhere.",
+   "difficulty": 2
+  },
+  {
+   "id": "q11",
+   "kind": "mc",
+   "prompt": "Which invasive snake has become a serious problem in Florida's Everglades?",
+   "answer": "Burmese python",
+   "wrong": [
+    "King cobra",
+    "Green anaconda",
+    "Black mamba"
+   ],
+   "explain": "Released and escaped pets founded a breeding population.",
+   "difficulty": 1
+  },
+  {
+   "id": "q12",
+   "kind": "mc",
+   "prompt": "Snake charmers in India traditionally use which snake?",
+   "answer": "Indian cobra",
+   "wrong": [
+    "Russell's viper",
+    "Common krait",
+    "Reticulated python"
+   ],
+   "explain": "The spectacled Indian cobra rears and spreads its hood.",
+   "difficulty": 1
+  },
+  {
+   "id": "q13",
+   "kind": "tf",
+   "prompt": "The black mamba is named after the colour of its scales.",
+   "answer": false,
+   "explain": "It is usually grey or olive; the name comes from the inky black inside of its mouth.",
+   "difficulty": 2
+  }
+ ],
+ "fakes": [
+  "Glass-eyed adder",
+  "Crimson taipan",
+  "Silver mamba",
+  "Velvet-tailed cobra",
+  "Moonlight krait",
+  "Ironbark viper",
+  "Thunder python",
+  "Sapphire-bellied boa",
+  "Desert ghost mamba",
+  "Spotted tiger cobra"
+ ],
+ "sources": [
+  {
+   "name": "iNaturalist",
+   "url": "https://www.inaturalist.org"
+  },
+  {
+   "name": "Wikidata",
+   "url": "https://www.wikidata.org"
+  }
+ ]
+}

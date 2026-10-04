@@ -1,0 +1,2 @@
+landmarks/leaning-tower-of-pisa: dropped clue leaking "lean": Its lean began during construction in the 12th century because of soft ground.
+landmarks/galapagos-islands: dropped img with licence "Attribution"
