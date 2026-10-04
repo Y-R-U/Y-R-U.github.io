@@ -224,3 +224,25 @@ pale cream (ref: dark) — a hat-colour call for A/U.
 - The saloon plot's hitched horse is merged into its static mesh, so it still shows cut by the bottom edge in the
   dentist shot (camera stands in front of the saloon); needs P's `heroNear` tag (CONTRACT request).
 - Hub placeholder props still clutter the fling/brawl/opening frames (hidden only in the tour).
+
+## Round 6 (2026-10-04): playtest 2 + critic r5 C#1
+- **C#1 dust:** every puff/smoke/steam/splash is a soft camera-facing alpha billboard (`fx.js softDustMesh`: one instanced
+  draw, per-instance `aSoft` = alpha, roll, seed, hardness; lumpy soft edge, lit top; time-of-day tint `updateSoftTint`).
+  `parts.puff` kicks ~60% as many, larger sprites OUT along the ground from the impact so the body in the middle reads.
+  Cards: `softPuffs(kit, P, colourKey, n)` replaces the ball pools in saloon/construction/livery/undertaker/tubs.
+- **Duel (PT2#7):** DRAW at 5.3–7.0 s (was 10–11.5). OTS (`OTS` in scenes.js) stands 7.5 m back, 1.35 m aside, fov 19:
+  the Stranger's (capped, tipped) hat ≤ 0.17 of the frame (measured 0.10–0.17), opponent ~200 CSS px. The eye ECU is now a
+  head-and-shoulders close-up (brows, eye whites, squint read). Result shot is a high wide on the loser + Mortimer.
+  `duel()` exposes `pace`, `t`, `resultAt`. `drawAt` is still stamped on the DRAW frame.
+- **PT2#8:** spectacle actors within 3.2 m of the hero camera are skipped per render.
+- **Fling (PT2#9):** frontal medium hold (Mabel 3/4-on ~250 px, the drunk dangling at arm's length ~180 px, hat dropped);
+  the camera follows the throw and settles on the landing (camera side picked by the target), so the jail wagon, dentist
+  chair, Pomfrey's window and trough all land on screen. `fling().top` for U's ↑ chip.
+- **Cutscenes (PT2#11):** Deed is frontal and wide (the sign tears and falls between the two); Fake Your Death is shot
+  from ahead of the procession (faces), the Mulligans carry the coffin overhead onto the coach in frame, the reborn Stranger
+  pops up mid-ground with a capped hat; the stagecoach is low from the north boardwalk, passengers in a row facing the lens
+  in front of the whole coach + team (silly hats capped 0.85). Ghosts rise 6 m whenever `spectacle.hot`.
+- **R6a:** `ambientEject` in director.js — Pomfrey's-saloon ejection every 40–60 s while the saloon is not owned, cut to
+  the doors, varied landings without repeats, `bark {char:'mabel', trig:'eject'}`. Verified on a fresh save: 45 s, 98 s.
+Evidence: `docs/shots/spectacle/r6/` (dust_*, card_saloon_*, duel_*, fling_*, cut_*, amb_eject_*), harness in `r6/harness/`
+(`node run.mjs duel.json` etc.; `m.js` measures hat fraction and actor px).

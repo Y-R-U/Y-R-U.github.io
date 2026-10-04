@@ -121,7 +121,7 @@ export function createScenes(ctx) {
   // ======================================================= SALOON EJECTION + FLING (W4/W6)
   // Every landing spot is in the fling shot: trough ← left of the doors, Pete's chair → next door, Wendell's jail wagon ↓ in
   // the street, Pomfrey's room ↑ upstairs (his nameplate over the saloon's upper window).
-  const TARGET_ANCHOR = { trough: ['saloon', 'trough', -0.2], dentist: ['dentist', 'chairLanding', 0], jail: ['saloon', 'jailWagon', 1.3], pomfrey: ['saloon', 'pomfreyWindow', 0], haycart: ['saloon', 'haycart', 0.9] };
+  const TARGET_ANCHOR = { trough: ['saloon', 'trough', -0.2], dentist: ['dentist', 'chairLanding', 0], jail: ['saloon', 'jailWagon', 1.3], pomfrey: ['saloon', 'pomfreyWindow', 0], haycart: ['saloon', 'haycart', 0.9], street: ['saloon', 'street', 0] };
   const ALT = { jailWagon: 'wagon', pomfreyWindow: 'upstairs', chairLanding: 'chair' };
   function targetPos(id, out = [0, 0, 0]) {
     let [lid, name, dy] = TARGET_ANCHOR[id] || TARGET_ANCHOR.trough;
@@ -147,7 +147,7 @@ export function createScenes(ctx) {
     const bodies = [];
     const kind = args.kind || 'drunk';
     sc.begin = () => {
-      mabel = ctx.actor(sc, { char: 'mabel', x: MX, z: doors[2], h: 0, clip: CLIP.carry });
+      mabel = ctx.actor(sc, { char: 'mabel', x: MX, z: doors[2], h: over() ? 0 : PI / 2 - 0.5, clip: CLIP.carry });
       const table = kind !== 'goat' && kind !== 'pianist' && lv >= 100 && R() < 0.35;
       if (kind === 'goat') holdProp = PV.goat;
       else if (kind === 'pianist') { holdProp = PV.piano; bodies.push(ctx.actor(sc, { char: 'fingers', clip: CLIP.piano, speed: 9 })); }
@@ -157,23 +157,50 @@ export function createScenes(ctx) {
         for (let i = 0; i < n; i++) bodies.push(ctx.actor(sc, { char: i ? 'drunk' : EJECT_LOOK[kind] || 'drunk', clip: CLIP.flail, speed: 9 }));
       }
       for (let i = bodies.length - 1; i >= 0; i--) if (!bodies[i]) bodies.splice(i, 1);
+      // His hat drops into the dirt under him while he dangles (it hid Mabel's face).
+      if (!over()) for (const b of bodies) { heldPos(bodies.indexOf(b), _f); b.x = _f[0]; b.y = _f[1]; b.z = _f[2]; popHat(b, 0.3, 1.5, 0.4); }
       parts.puff([doors[0], 0.3, doors[2] + 0.4], 5, { line: 'saloon' });
       world.plots.get('saloon')?.kickDoors?.();
-      if ((!sc.cosmetic || args.frenzy) && args.id !== 'amb' && ctx.heroVisible) frameAt(sc, D, FLING_SHOT);
+      if (((!sc.cosmetic || args.frenzy) && args.id !== 'amb') || args.ambient) if (ctx.heroVisible) ctx.takeShot(sc, flingShot);
       if (args.thrown) sc.on('fling', args.thrown);
     };
-    const over = () => holdProp === PV.table || holdProp === PV.piano;
+    function over() { return holdProp === PV.table || holdProp === PV.piano; }
+    // PT2#9: Mabel stands side-on to the lens and dangles him by the collar at arm's length, feet off the ground, so his
+    // whole body reads clear of hers; a second drunk dangles from her other hand.
     function heldPos(i, out) {
-      const sway = Math.sin(sc.t * 9 + i) * 0.12;
+      const sway = Math.sin(sc.t * 7 + i) * 0.1;
       if (over()) { out[0] = MX + (i - 0.5) * 0.7; out[1] = 2.55 + (holdProp === PV.table ? 0.75 : 0.2); out[2] = doors[2] + 0.4; }
-      else { out[0] = MX + (i ? -0.7 : 0.55) + sway * 0.3; out[1] = 0.45 + Math.abs(sway); out[2] = doors[2] + 0.95; }
+      else { out[0] = MX + (i ? -1.3 : 1.4) + sway * 0.4; out[1] = 0.4 + Math.abs(sway) * 0.5; out[2] = doors[2] + 0.35; }
       return out;
+    }
+    // Hold: a frontal medium shot on Mabel + the dangling drunk (≥ 120 CSS px on the S22). Thrown: the camera follows the
+    // bundle and settles wide on the landing spot, so every target (the jail wagon too) lands on screen.
+    const _f = [0, 0, 0];
+    function flingShot(pose, dt) {
+      let lx, ly, lz, px, py, pz, fov;
+      const ZC = SOUTH - 1.2;
+      if (!flight) { heldPos(0, _f); lx = (MX + _f[0]) / 2 + 0.3; ly = 1.6; lz = doors[2] + 0.2; px = lx + 1.0; py = 5.0; pz = Math.min(ZC, lz + 8); fov = 46; }
+      else {
+        const u = Math.min(1, (sc.t - flight.t0) / flight.dur), p = arc(flight, u), to = flight.to;
+        const k = landAt >= 0 ? 1 : u;
+        lx = p[0] + (to[0] - p[0]) * k * 0.5; ly = Math.max(1, p[1] * 0.6); lz = p[2] + (to[2] - p[2]) * k * 0.5;
+        const up = flight.target === 'pomfrey';
+        px = lx + (to[0] < MX ? -6.5 : 6.5); py = up ? 4.5 : 6; pz = Math.min(ZC, Math.max(lz, doors[2]) + 8.5); fov = 46;
+      }
+      if (pose.snap || sc.t < 0.05) { pose.pos.set(px, py, pz); pose.look.set(lx, ly, lz); pose.fov = fov; pose.snap = false; return true; }
+      const a = 1 - Math.exp(-dt * (flight ? 5 : 3));
+      pose.pos.x += (px - pose.pos.x) * a; pose.pos.y += (py - pose.pos.y) * a; pose.pos.z += (pz - pose.pos.z) * a;
+      pose.look.x += (lx - pose.look.x) * a; pose.look.y += (ly - pose.look.y) * a; pose.look.z += (lz - pose.look.z) * a;
+      pose.fov += (fov - pose.fov) * a;
+      return true;
     }
     sc.flingInfo = () => {
       const c = heldPos(0, [0, 0, 0]);
-      const o = ctx.project(c);
+      const o = ctx.project([c[0], c[1] + 1.0, c[2]]);
+      const top = bodies[0] ? ctx.project(ctx.head(bodies[0], [0, 0, 0])).y : o.y - 40;
       const targets = ['trough', 'dentist', 'jail', 'pomfrey'].map((id) => { const p = targetPos(id); const s = p && ctx.project(p); return s ? { id, x: s.x, y: s.y, visible: s.visible } : null; }).filter(Boolean);
-      return { id: sc.ejectId, x: o.x, y: o.y, targets };
+      // top: the held body's head (hero px): U puts the ↑ chip above it, never on him.
+      return { id: sc.ejectId, x: o.x, y: o.y, top, targets };
     };
     // Swipe (dx, dy) in screen px → E's cardinal dir (left trough · right dentist · down jail · up Pomfrey), the same
     // mapping the UI's fling chips show. flingInfo().targets has each landing spot's true screen position.
@@ -181,7 +208,7 @@ export function createScenes(ctx) {
     sc.pick = (ray, _ctx, line) => {
       if (sc.phase !== 'hold' || sc.cosmetic || (line && line !== 'saloon')) return null;
       heldPos(0, _c);
-      const d = ctx.nearRay(ray, [_c[0], _c[1] + 0.6, _c[2]], 2.4);
+      const d = ctx.nearRay(ray, [_c[0], _c[1] + 1.0, _c[2]], 2.4);
       if (d < 0) return null;
       return { rank: 3, kind: 'fling', id: sc.ejectId, lineId: 'saloon', act: 'fling', payload: { dir: 'trough' }, dirFor, targets: sc.flingInfo().targets, dist: d };
     };
@@ -193,15 +220,16 @@ export function createScenes(ctx) {
       const dist = Math.hypot(to[0] - from[0], to[2] - from[2]);
       flight = { target: e.target, auto: !!e.auto, t0: sc.t, from, to, dur: clamp(dist / 9, 0.75, 1.5), apex: 1.6 + dist * 0.12 };
       if (mabel) { mabel.clip = CLIP.cheer; mabel.speed = 6; }
+      if (args.ambient) ctx.emit('bark', { char: 'mabel', trig: 'eject', src: 'spectacle' });
       parts.puff([doors[0], 0.4, doors[2] + 0.8], 6, { line: 'saloon' });
       for (const b of bodies) if (holdProp < 0) popHat(b, (to[0] - from[0]) * 0.2, 3, (to[2] - from[2]) * 0.2);
     };
     let auto = args.autoAfter ?? null;
     sc.update = (dt) => {
       if (sc.phase === 'hold') {
-        if (auto != null && sc.t >= auto) sc.on('fling', { target: pickOf(['trough', 'haycart', 'jail', 'pomfrey']), auto: true });
+        if (auto != null && sc.t >= auto) sc.on('fling', { target: args.target || pickOf(['trough', 'haycart', 'jail', 'pomfrey']), auto: true });
         if (sc.t > (args.hold || 2.2) + 3) return false;
-        bodies.forEach((b, i) => { heldPos(i, _c); b.x = _c[0]; b.y = _c[1]; b.z = _c[2]; b.h = 0; b.roll = Math.sin(sc.t * 9 + i) * 0.25; b.pitch = over() ? 0 : -0.2; });
+        bodies.forEach((b, i) => { heldPos(i, _c); b.x = _c[0]; b.y = _c[1]; b.z = _c[2]; b.h = 0.25 * (i ? 1 : -1); b.roll = Math.sin(sc.t * 7 + i) * 0.18; b.pitch = over() ? 0 : 0.08; hatPhysics(b, dt, true); });
         if (holdProp >= 0) { heldPos(0, _c); ctx.prop(holdProp, MX, over() ? 2.4 : 0.9 + Math.abs(Math.sin(sc.t * 9)) * 0.1, doors[2] + (over() ? 0.4 : 1.0), { ry: over() ? PI : 0.3, line: 'saloon', ph: sc.t * 3 }); }
         if (mabel) { mabel.clip = over() ? CLIP.cheer : CLIP.carry; mabel.speed = 2; }
         if (!sc.cosmetic && bodies[0]) ring(bodies[0], 1.25, 0, 0.8);
@@ -250,8 +278,6 @@ export function createScenes(ctx) {
     }
     return sc;
   };
-  // From the street south-west of the doors: the doors, trough, jail wagon, Pomfrey's window and Pete's chair next door.
-  const FLING_SHOT = { p: [-10.4, 9.8, 10.6], l: [4.2, 1.0, 2.4], fov: 49 };
 
   // ======================================================= BAR BRAWL (special, W9: also plays in the Saloon card)
   S.brawl = (args) => {
@@ -346,11 +372,16 @@ export function createScenes(ctx) {
       opp = ctx.actor(sc, { char: oppId, x: cx + 0.4, z, h: PI / 2 });
       if (!you || !opp) return;
       place(you, -0.4); place(opp, 0.4); you.h = -PI / 2 + ro; opp.h = PI / 2 + ro;
-      tDraw = (amb ? 5.4 : 8.0) + R() * 1.8;
-      if (!amb && R() < 0.6) { I.kind = pickOf(['horse', 'pickles', 'fly']); tDraw += 2.0; }
+      // PT2#7: a Hundred-Gallon brim seen from behind fills the lens; the duel Stranger wears it capped and tipped forward
+      // like the vignettes' foreground Stranger (the shot-off hat still flies at full size).
+      if (!amb) { you.hat.scale = Math.min(you.hat.scale, 0.62); you.hat.tilt = 0.34; you.hat.brim = 0.84; }
+      // PT2#7: DRAW lands ~5.3–7 s after the start (was 10–11.5 s); an interruption (40%) costs 0.8 s of that.
+      tDraw = (amb ? 5.0 : 5.3) + R() * 0.9;
+      if (!amb && R() < 0.4) { I.kind = pickOf(['horse', 'pickles', 'fly']); tDraw += 0.8; }
       if (!amb) ctx.takeShot(sc, shot);
     };
     const eye = (a, out) => ctx.local(a, 0, 1.0, 0.22, out);
+    const T = { p0: 0.6, p1: 3.0, e0: 3.9, e1: 5.0 };
     function shot(pose, dt) {
       if (!you || !opp) return false;
       const ph = sc.phase;
@@ -362,36 +393,38 @@ export function createScenes(ctx) {
         pose.look.x += (lx - pose.look.x) * k; pose.look.y += (ly - pose.look.y) * k; pose.look.z += (lz - pose.look.z) * k;
         pose.fov += (fov - pose.fov) * k;
       };
-      // PT#8: the over-the-shoulder shot steps up and aside by the brim so a Hundred-Gallon doesn't fill the lens.
-      const R = ctx.hatRadius(you), hr = Math.max(0.3, R * 0.5);
+      // PT2#7: the over-the-shoulder shot stands well back and high, so only the top of his brim sits in a lower
+      // corner (≤ 20% of the frame) and the opponent reads across the street; the close-up is head-and-shoulders.
+      const R = ctx.hatRadius(you);
       if (ph === 'intro' || ph === 'paces') set(cx - 15 - R * 3, 7.5 + R * 1.2, z + 3.2 + R * 0.6, cx, 1.0, z, 34);
-      else if (ph === 'ecu') { eye(opp, _c); set(_c[0] - 2.4, _c[1] + 0.05, _c[2] + 0.05, _c[0], _c[1] + 0.05, _c[2], 15, true); }
-      else if (ph === 'result' && sc.t - resultAt > 1.6) set(opp.x - 6, 2.8, z + 3.2, opp.x - 0.5, 0.6, z, 34);
-      else { eye(opp, _c); set(you.x - 2.2 - hr, 1.25 + R * 0.35, z + 1.1 + R * 1.1, _c[0], _c[1] - 0.5, _c[2], ph === 'draw' ? 32 : 28); }
+      else if (ph === 'ecu') { eye(opp, _c); set(_c[0] - OTS.cu[0], _c[1] + OTS.cu[1], _c[2] + OTS.cu[2], _c[0], _c[1] - 0.12, _c[2], OTS.cu[3], true); }
+      else if (ph === 'result' && sc.t - resultAt > 1.6) { const l = result === 'oppwins' || result === 'early' ? you : opp; set(l.x - 5.5, 5.2, Math.min(SOUTH - 0.6, z + 5.5), l.x + 0.8, 0.3, z, 40); }
+      else { eye(opp, _c); set(you.x - OTS.back - R * 1.5, 2.1 + OTS.up + R * 0.6, z + OTS.side + R * 0.4, _c[0], _c[1] - 0.9, _c[2], ph === 'draw' ? OTS.fov + 3 : OTS.fov); }
       return true;
     }
     sc.update = (dt) => {
       if (!you || !opp) return false;
       const t = sc.t;
       if (result == null) {
-        if (t < 1) sc.phase = 'intro';
-        else if (t < 4) {
+        if (t < T.p0) sc.phase = 'intro';
+        else if (t < T.p1) {
           sc.phase = 'paces';
-          const u = (t - 1) / 3, step = Math.floor(u * 10);
+          const u = (t - T.p0) / (T.p1 - T.p0), step = Math.floor(u * 10);
+          sc.pace = Math.min(10, step + 1);
           place(you, -0.4 - u * pace); place(opp, 0.4 + u * pace);
           you.clip = opp.clip = CLIP.walk; you.speed = opp.speed = 6;
           if (step !== sc.step) { sc.step = step; parts.puff([you.x, 0, you.z], 1, { r: 0.1, size: 0.18 }); parts.puff([opp.x, 0, opp.z], 1, { r: 0.1, size: 0.18 }); }
         } else {
-          if (t < 4.4) { you.h = PI / 2 * ((t - 4) / 0.4) * 2 - PI / 2 + ro; opp.h = PI / 2 - PI * ((t - 4) / 0.4) + ro; }
+          if (t < T.p1 + 0.4) { const w = (t - T.p1) / 0.4; you.h = PI * w - PI / 2 + ro; opp.h = PI / 2 - PI * w + ro; }
           else { you.h = PI / 2 + ro; opp.h = -PI / 2 + ro; }
           you.clip = opp.clip = sc.phase === 'draw' ? CLIP.draw : CLIP.duel;
-          sc.phase = !amb && t > 5.5 && t < 6.9 ? 'ecu' : t >= tDraw ? 'draw' : 'standoff';
-          if (t > 4.6 && t < 8) {
-            const u = (t - 4.6) / 3.4, b = 0.45 + Math.abs(Math.sin(t * 5)) * 0.4;
+          sc.phase = !amb && t > T.e0 && t < T.e1 ? 'ecu' : t >= tDraw ? 'draw' : 'standoff';
+          if (t > T.p1 + 0.5 && t < tDraw + 0.4) {
+            const u = (t - T.p1 - 0.5) / (tDraw - T.p1 + 0.1), b = 0.45 + Math.abs(Math.sin(t * 5)) * 0.4;
             if (staged) ctx.prop(PV.tumbleweed, cx + st.fx * (7 - u * 9), b, cz + 0.3 + st.fz * (7 - u * 9), { rx: t * 6, s: 0.9 });
             else ctx.prop(PV.tumbleweed, cx, b, z - 5 + u * 11, { rx: t * 6, s: 0.8 });
           }
-          if (I.kind && t > 7.1 && t < tDraw - 0.3) interruption(dt, t);
+          if (I.kind && t > T.e1 && t < tDraw - 0.3) interruption(dt, t);
         }
         if (sc.phase === 'draw' && !sc.drew) {
           sc.drew = true;
@@ -433,7 +466,7 @@ export function createScenes(ctx) {
     }
     function settle(r) {
       if (result) return;
-      result = r; resultAt = sc.t; sc.phase = 'result';
+      result = r; resultAt = sc.t; sc.resultAt = resultAt; sc.phase = 'result';
       ctx.emit('duel:phase', { id: ev?.id, phase: 'result', result: r });
       if (r === 'early') {
         ctx.local(you, 0.2, 0.05, 0.25, _c);
@@ -480,6 +513,11 @@ export function createScenes(ctx) {
     };
     return sc;
   };
+
+  // Duel cameras (tuned with docs/shots/spectacle/r6 measurements): OTS back/up/side metres from the Stranger, fov;
+  // cu = head-and-shoulders close-up offset from the opponent's eyes [back, up, side, fov].
+  const OTS = { back: 7.5, up: 0.9, side: 1.35, fov: 19, cu: [8.5, -0.35, 1.3, 19] };
+  S.OTS = OTS;
 
   // ======================================================= BANK ROBBERY CHASE (special)
   S.robbery = (args) => {
@@ -589,7 +627,8 @@ export function createScenes(ctx) {
       if (moving > 0.05 && Math.floor(t * 8) % 2 === 0) parts.puff([x + 1.5, 0, z], 1, { r: 0.6, size: 0.3 });
       if (leaveAt < 0 && t > 3.4 && pax.length < 3 && t > 3.4 + pax.length * 0.6) {
         const a = ctx.actor(sc, { ...townsfolk(pax.length, true), x: x - 0.2, z: z - 1.0, h: PI });
-        if (a) pax.push({ a, spot: [stopX - 2.4 + pax.length * 1.2, ROAD - 1.5 - pax.length * 1.7] });
+        if (a) a.hat.scale = Math.min(a.hat.scale, 0.85);
+        if (a) pax.push({ a, spot: [stopX - 3.4 + pax.length * 1.7, ROAD - 1.3 - (pax.length % 2) * 0.4] });
         else pax.push(null);
       }
       for (const p of pax) {
@@ -625,8 +664,9 @@ export function createScenes(ctx) {
     return sc;
   };
 
-  // From the north boardwalk looking across the street: passengers in front, the coach, Pomfrey's frontages behind.
-  const COACH_SHOT = { p: [-10.5, 10.5, -6.3], l: [0.4, 1.0, 0.4], fov: 48 };
+  // PT2#11: low from the north boardwalk, diagonal across the street: the passengers face the lens in a row in front,
+  // the whole coach and team stand behind them (no top-down giant hats).
+  const COACH_SHOT = { p: [-8.6, 3.9, -5.8], l: [0.2, 1.3, -0.2], fov: 50 };
 
   // ======================================================= OPENING (W15): thrown out face-first, derby upturned
   // Mabel throws him off the saloon step (slow-mo start), he belly-slides in the mud, the derby lands upturned ahead of
@@ -715,7 +755,6 @@ export function createScenes(ctx) {
   }
   // Low and side-on: a giant brim is seen edge-on above the faces instead of covering them.
   const BEAT_SHOT = { p: [-2.8, 2.4, 5.8], l: [0.3, 1.4, -0.4], fov: 46 };
-  const FYD_SHOT = { p: [-8.6, 6.6, 4.4], l: [1.4, 1.0, -0.6], fov: 52 };
   // Pull back for the Stranger's hat (a Twenty-Gallon is ~3× a derby) so the beat still shows his face.
   function hatShot(base, tier = ctx.game.state.hat || 0, at = null) {
     const h = hatDef(tier), k = clamp(0.4 + (h.scale || 1) * (h.type === HAT_TEN ? 1.05 : 0.6), 1, 3.2);
@@ -768,9 +807,12 @@ export function createScenes(ctx) {
     const at = stage();
     let you = null, pom = null, sign = { y: 3.6, rz: 0, vy: 0, fallen: false };
     sc.begin = () => {
-      you = ctx.actor(sc, strangerSpec({ x: at[0] - 1.8, z: at[2] + 0.4, h: PI / 2 }));
-      pom = ctx.actor(sc, { char: 'pomfrey', hat: pomfreyHat(POMFREY_HATS[(ctx.game.state.pomfrey ?? 1)]), x: at[0] + 1.8, z: at[2] + 0.4, h: -PI / 2 });
-      frameAt(sc, at, hatShot(BEAT_SHOT, undefined, at));
+      you = ctx.actor(sc, strangerSpec({ x: at[0] - 1.8, z: at[2] + 0.4, h: PI / 2 - 0.5 }));
+      pom = ctx.actor(sc, { char: 'pomfrey', hat: pomfreyHat(POMFREY_HATS[(ctx.game.state.pomfrey ?? 1)]), x: at[0] + 1.8, z: at[2] + 0.4, h: -PI / 2 + 0.5 });
+      if (you) { you.hat.scale = Math.min(you.hat.scale, 0.62); you.hat.tilt = 0.2; }
+      if (pom) pom.hat.scale = Math.min(pom.hat.scale, 0.75);
+      // PT2#11: frontal and wide enough that his sign (3.6 m up behind them) tears and falls in frame.
+      frameAt(sc, at, { p: [0.4, 2.4, Math.min(8.5, SOUTH - 1.2 - at[2])], l: [0, 2.1, -0.6], fov: 52 });
     };
     sc.update = (dt) => {
       const t = sc.t;
@@ -883,18 +925,19 @@ export function createScenes(ctx) {
   S.prestige = () => {
     const sc = { prio: 2, slot: true };
     const at = stage();
-    const z = ROAD - 1.8, x0 = at[0] - 6, coachX = at[0] + 6;
+    const z = ROAD - 0.6, x0 = at[0] - 7, coachX = at[0] - 0.8, cz1 = z - 2.6;
     const who = [];
     let stranger = null, coachGo = -1, coffinOn = false, swapAt = -1, stache = null;
     const gen = ctx.game.state.gen || 1;
     const prev = wornStache;
     void gen;
     sc.begin = () => {
-      for (const [c, dx, dz] of [['mortimer', 0, 0], ['mulligan', -1.6, -0.7], ['mulligan', -1.6, 0.7], ['mabel', -3.6, 0], ['pickles', -5, 0.4]]) {
+      for (const [c, dx, dz] of [['mortimer', -3.4, -1.0], ['mulligan', 0, -0.75], ['mulligan', 0, 0.75], ['mabel', -2.4, 0.9], ['pickles', -4.6, 0.3]]) {
         const a = ctx.actor(sc, { char: c, x: x0 + dx, z: z + dz, h: PI / 2 });
+        if (a && c === 'mortimer') a.hat.scale = Math.min(a.hat.scale, 0.8);
         who.push(a ? { a, dx, dz } : null);
       }
-      frameAt(sc, [at[0], 0, z], FYD_SHOT);
+      frameAt(sc, [at[0], 0, z], { p: [9.5, 6.0, Math.min(5.8, SOUTH - 1.2 - z)], l: [-2.2, 1.0, -1.0], fov: 46 });
     };
     sc.update = (dt) => {
       const t = sc.t;
@@ -907,21 +950,23 @@ export function createScenes(ctx) {
         if (a.char === 'mabel' && t < 7 && Math.floor(t * 3) % 2 === 0 && Math.floor((t - dt) * 3) % 2 === 1) { ctx.head(a, _h); parts.splash([_h[0], _h[1] - 0.4, _h[2]], 3); }
         if (a.char === 'mulligan' && t < 4.2) a.clip = CLIP.carry;
       }
-      let cx = walkX - 1.6, cy = 1.15, cz = z;
-      if (t > 4.2) { const u = Math.min(1, (t - 4.2) / 0.8); cx = walkX - 1.6 + (coachX - walkX + 1.6) * u; cy = 1.15 + u * 1.5; coffinOn = u >= 1; }
+      let cx = walkX, cy = 2.75, cz = z;
+      const cz0 = cz1;
+      if (t > 4.2) { const u = Math.min(1, (t - 4.2) / 0.8); cx = walkX + (coachX - walkX) * u; cy = 2.75 - u * 0.1; cz = z + (cz0 - z) * u; coffinOn = u >= 1; }
       if (t > 5.1 && coachGo < 0) coachGo = t;
       const cmx = coachGo < 0 ? coachX : coachX + Math.pow(t - coachGo, 2) * 3;
-      if (coffinOn) { cx = cmx; cy = 2.65; }
-      ctx.prop(PV.coach, cmx, 0, z + 0.2, { ry: PI / 2 });
-      for (const k of [0, 1]) ctx.prop(PV.horse, cmx + 4.4, coachGo < 0 ? 0 : Math.abs(Math.sin(t * 10 + k)) * 0.2, z + 0.2 + (k ? 0.75 : -0.75), { ry: PI / 2 });
-      if (coachGo >= 0 && Math.floor(t * 8) % 2 === 0) parts.puff([cmx - 1.5, 0, z], 1, { r: 0.6, size: 0.3 });
-      ctx.prop(PV.coffin, cx, cy, cz, { ry: PI / 2 });
+      if (coffinOn) { cx = cmx; cy = 2.65; cz = cz1; }
+      ctx.prop(PV.coach, cmx, 0, cz1, { ry: PI / 2 });
+      for (const k of [0, 1]) ctx.prop(PV.horse, cmx + 4.4, coachGo < 0 ? 0 : Math.abs(Math.sin(t * 10 + k)) * 0.2, cz1 + (k ? 0.75 : -0.75), { ry: PI / 2 });
+      if (coachGo >= 0 && Math.floor(t * 8) % 2 === 0) parts.puff([cmx - 1.5, 0, cz1], 1, { r: 0.6, size: 0.3 });
+      ctx.prop(PV.coffin, cx, cy, cz, { ry: coffinOn ? PI / 2 : 0, s: 1.35, rx: coffinOn ? 0 : Math.sin(t * 5) * 0.06 });
       // the barrel he was hiding in, then the moustache swap
-      const bx = at[0] + 3.4, bz = z + 2.0;
+      const bx = at[0] + 1.2, bz = z + 1.8;
       if (t > 6.2) ctx.prop(PV.barrel, bx + 0.9, 0, bz - 0.2, { ry: 0.4 });
       if (t > 6.6 && !stranger) {
         for (const w of who) if (w && w.a.char === 'mulligan') ctx.release(w.a);
-        stranger = ctx.actor(sc, strangerSpec({ x: bx, z: bz, h: -0.4, stache: prev ?? -1 }));
+        stranger = ctx.actor(sc, strangerSpec({ x: bx, z: bz, h: 0.9, stache: prev ?? -1 }));
+        if (stranger) { stranger.hat.scale = Math.min(stranger.hat.scale, 0.62); stranger.hat.tilt = 0.2; }
         if (stranger) parts.puff([bx, 0, bz], 10, { r: 1 });
         swapAt = t + 0.9;
       }
@@ -964,7 +1009,7 @@ export function createScenes(ctx) {
         x = a + (b - a) * u;
         if (st?.ok) { const k = x; x = st.x + st.ax * k + st.fx * 30; z = st.z + st.az * k + st.fz * 30; }
         // R5: while a vignette plays it rides high over the rooftops instead of crossing the gag.
-        lift += ((world.spectacle?.clear?.length ? 6 : 0) - lift) * Math.min(1, dt * 2);
+        lift += ((world.spectacle?.clear?.length || api?.hot ? 6 : 0) - lift) * Math.min(1, dt * 2);
         y = 1.5 + lift + Math.sin(t * 2.2) * 0.25;
         fade = Math.min(1, t / 0.6) * (out < 0 ? 1 : Math.max(0, 1 - (t - out) / 0.6));
         if (Math.floor(t * 3) !== Math.floor((t - dt) * 3)) parts.puff([x - Math.sign(b - a) * 0.4, y - 0.4, z], 1, { r: 0.15, size: 0.18, up: 0.3, col: PCOL.ECTO, life: 1.2 });

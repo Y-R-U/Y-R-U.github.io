@@ -1,10 +1,11 @@
 import * as THREE from 'three';
-import { white } from '../fx.js?v=20261004f';
+import { white, softDustMesh } from '../fx.js?v=20261004f';
 
-// Budgeted particles: soft clay dust/smoke/splash spheres (lit) and glowing cartoon stars/flashes/shards.
+// Budgeted particles: soft alpha dust/smoke/splash billboards (C#1: they spread and fade, never opaque balls) and
+// glowing cartoon stars/flashes/shards.
 // Two instanced draws. `budget()` returns how many may still spawn (W10: ≤ 256 in the hero, fx.js juice included).
 const C = (h) => new THREE.Color(h);
-const DUST = C('#f3e2c4'), SMOKE = C('#c9bfd6'), SPLASH = C('#bfe3f2'), STAR = C('#ffe45c'), FLASH = C('#fff3b0'), GLASS = C('#dff3ff');
+const DUST = C('#e2c7a0'), SMOKE = C('#c9bfd6'), SPLASH = C('#bfe3f2'), STAR = C('#ffe45c'), FLASH = C('#fff3b0'), GLASS = C('#dff3ff');
 export const PCOL = { DUST, SMOKE, SPLASH, STAR, FLASH, GLASS, SOOT: C('#4a4048'), GOLD: C('#ffd27a'), RED: C('#e8776a'), ECTO: C('#8ff0c0') };
 const _m = new THREE.Matrix4(), _q = new THREE.Quaternion(), _e = new THREE.Euler(), _p = new THREE.Vector3(), _s = new THREE.Vector3(), _c = new THREE.Color();
 
@@ -20,7 +21,8 @@ function starGeo() {
 }
 
 export function createParticles(kit, scene, cap = 2048) {
-  const dust = new THREE.InstancedMesh(white(new THREE.IcosahedronGeometry(1, 1)), kit.materials.lambertVCInst, cap);
+  const dust = softDustMesh(cap);
+  const soft = dust.geometry.attributes.aSoft;
   const glowMat = new THREE.MeshBasicMaterial({ toneMapped: false, fog: false });
   const glow = new THREE.InstancedMesh(starGeo(), glowMat, cap);
   for (const m of [dust, glow]) {
@@ -34,14 +36,14 @@ export function createParticles(kit, scene, cap = 2048) {
   }
   dust.name = 'spectacle:dust';
   glow.name = 'spectacle:glow';
-  const P = Array.from({ length: cap }, () => ({ on: false, glow: false, x: 0, y: 0, z: 0, vx: 0, vy: 0, vz: 0, g: 0, life: 0, max: 1, s: 1, col: DUST, line: null, spin: 0, ph: 0, orbit: null, follow: null, drag: 0 }));
+  const P = Array.from({ length: cap }, (_, i) => ({ seed: (i * 0.618034) % 1, hard: 0, on: false, glow: false, x: 0, y: 0, z: 0, vx: 0, vy: 0, vz: 0, g: 0, life: 0, max: 1, s: 1, col: DUST, line: null, spin: 0, ph: 0, orbit: null, follow: null, drag: 0 }));
   let live = 0, hi = 0, limit = 256, extern = () => 0;
 
   function take() {
     if (live + extern() >= limit) return null;
     for (let k = 0; k < cap; k++) {
       const p = P[k];
-      if (!p.on) { if (k >= hi) hi = k + 1; p.on = true; live++; p.orbit = p.follow = null; p.spin = 0; p.drag = 0; p.g = 0; return p; }
+      if (!p.on) { if (k >= hi) hi = k + 1; p.on = true; live++; p.orbit = p.follow = null; p.spin = 0; p.drag = 0; p.g = 0; p.hard = 0; return p; }
     }
     return null;
   }
@@ -52,17 +54,20 @@ export function createParticles(kit, scene, cap = 2048) {
     budget() { return Math.max(0, limit - live - extern()); },
     setLimit(n) { limit = n; },
     setExtern(fn) { extern = fn; },
-    // Cartoon dust puff: n cream spheres popping out and rising.
+    // Dust puff (C#1): a ring of soft billboards kicked OUT along the ground from the impact, so the body in the
+    // middle stays readable; they spread and fade. Fewer, larger sprites than the old clay spheres.
     puff(pos, n = 7, { r = 0.7, col = DUST, up = 1.2, line = null, size = 0.45, life = 0.9 } = {}) {
-      for (let i = 0; i < n; i++) {
+      const k = n > 3 ? Math.ceil(n * 0.6) : n;
+      for (let i = 0; i < k; i++) {
         const p = take();
         if (!p) return;
-        const a = R() * Math.PI * 2, d = R() * r;
+        const a = (i / k) * Math.PI * 2 + R() * 0.9, d = r * (0.45 + R() * 0.55);
         p.glow = false; p.col = col; p.line = line;
-        p.x = pos[0] + Math.cos(a) * d; p.y = (pos[1] || 0) + 0.2 + R() * 0.3; p.z = pos[2] + Math.sin(a) * d;
-        p.vx = Math.cos(a) * (0.6 + R()); p.vz = Math.sin(a) * (0.6 + R()); p.vy = up * (0.5 + R() * 0.6);
-        p.drag = 2.2;
-        p.max = p.life = life * (0.8 + R() * 0.5); p.s = size * (0.7 + R() * 0.6);
+        p.x = pos[0] + Math.cos(a) * d; p.y = (pos[1] || 0) + 0.1 + R() * 0.2; p.z = pos[2] + Math.sin(a) * d;
+        const sp = 1.0 + R() * 1.2 + r * 0.6;
+        p.vx = Math.cos(a) * sp; p.vz = Math.sin(a) * sp; p.vy = up * (0.25 + R() * 0.45);
+        p.drag = 2.6;
+        p.max = p.life = life * (1.0 + R() * 0.6); p.s = size * (0.75 + R() * 0.5);
       }
     },
     smoke(pos, n = 4, line = null) { api.puff(pos, n, { r: 0.15, col: SMOKE, up: 0.7, line, size: 0.22, life: 1.3 }); },
@@ -74,7 +79,7 @@ export function createParticles(kit, scene, cap = 2048) {
         p.glow = false; p.col = SPLASH; p.line = line;
         p.x = pos[0]; p.y = pos[1] || 0.5; p.z = pos[2];
         p.vx = Math.cos(a) * (1 + R() * 1.5); p.vz = Math.sin(a) * (1 + R() * 1.5); p.vy = 4 + R() * 3; p.g = 14;
-        p.max = p.life = 0.8 + R() * 0.3; p.s = 0.12 + R() * 0.1;
+        p.max = p.life = 0.8 + R() * 0.3; p.s = 0.12 + R() * 0.1; p.hard = 0.85;
       }
     },
     // A churning brawl cloud: spheres orbiting a centre for `life` seconds.
@@ -156,15 +161,20 @@ export function createParticles(kit, scene, cap = 2048) {
           glow.setMatrixAt(ng, _m);
           glow.setColorAt(ng++, p.col);
         } else {
-          const f = p.orbit ? Math.sin(Math.PI * Math.min(1, u * 1.3)) : Math.min(1, u * 6) * (1 - u * u) * 1.1;
-          _m.makeScale(p.s * f, p.s * f * 0.88, p.s * f).setPosition(p.x, p.y, p.z);
+          // Soft billboard: pops in, spreads (radius grows) and fades out; droplets stay small and crisp.
+          let r, al;
+          if (p.hard) { r = p.s * 1.4 * (1 - u * 0.3); al = Math.min(1, (1 - u) * 3); }
+          else if (p.orbit) { r = p.s * 1.5 * (0.75 + u * 0.6); al = 0.5 * Math.sin(Math.PI * Math.min(1, u * 1.15)); }
+          else { r = p.s * 1.25 * (0.6 + 1.0 * Math.sqrt(u)); al = 0.58 * Math.min(1, u * 10) * Math.pow(1 - u, 1.6); }
+          _m.makeScale(r, r, r).setPosition(p.x, p.y + (p.hard ? 0 : r * 0.3), p.z);
           dust.setMatrixAt(nd, _m);
-          dust.setColorAt(nd++, p.col);
+          dust.setColorAt(nd, p.col);
+          soft.setXYZW(nd++, al, p.seed * 6.28 + u * (p.seed - 0.5) * 2, p.seed, p.hard || 0.3);
         }
       }
       dust.count = nd; dust.visible = nd > 0;
       glow.count = ng; glow.visible = ng > 0;
-      if (nd) { dust.instanceMatrix.needsUpdate = true; dust.instanceColor.needsUpdate = true; }
+      if (nd) { dust.instanceMatrix.needsUpdate = true; dust.instanceColor.needsUpdate = true; soft.needsUpdate = true; }
       if (ng) { glow.instanceMatrix.needsUpdate = true; glow.instanceColor.needsUpdate = true; }
       return nd + ng;
     },

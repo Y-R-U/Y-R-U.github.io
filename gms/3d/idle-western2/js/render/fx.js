@@ -160,3 +160,101 @@ export function createFx(world, kit) {
   fxRegistry.current = api;
   return api;
 }
+
+// ---- C#1 soft dust: camera-facing alpha billboards (one instanced draw per pool), never opaque balls.
+// Per instance: instanceMatrix carries the position (col 3) and the radius (col 0 length); aSoft = (alpha, roll, seed, hard).
+// The lit tint follows the time of day (softTint), so puffs dim at night instead of glowing.
+export const softTint = new THREE.Color(1, 1, 1);
+const tintU = { value: softTint };
+let softMat = null;
+export function softDustMaterial() {
+  if (softMat) return softMat;
+  softMat = new THREE.MeshBasicMaterial({ transparent: true, depthWrite: false, fog: true });
+  softMat.onBeforeCompile = (sh) => {
+    sh.uniforms.uSoftTint = tintU;
+    sh.vertexShader = sh.vertexShader
+      .replace('#include <common>', '#include <common>\nattribute vec4 aSoft;\nvarying vec4 vSoft;\nvarying vec2 vQ;')
+      .replace('#include <project_vertex>', `
+        vec4 mvPosition = modelViewMatrix * vec4(instanceMatrix[3].xyz, 1.0);
+        float sz = length(instanceMatrix[0].xyz);
+        float cr = cos(aSoft.y), sr = sin(aSoft.y);
+        mvPosition.xy += vec2(cr * position.x - sr * position.y, sr * position.x + cr * position.y) * sz;
+        gl_Position = projectionMatrix * mvPosition;
+        vSoft = aSoft; vQ = position.xy;`);
+    sh.fragmentShader = sh.fragmentShader
+      .replace('#include <common>', '#include <common>\nuniform vec3 uSoftTint;\nvarying vec4 vSoft;\nvarying vec2 vQ;')
+      .replace('#include <color_fragment>', `#include <color_fragment>
+        float ang = atan(vQ.y, vQ.x), sd = vSoft.z * 6.2831;
+        float rr = length(vQ) + (sin(ang * 5.0 + sd) * 0.07 + sin(ang * 3.0 - sd * 1.7) * 0.06) * (1.0 - vSoft.w);
+        float edge = mix(0.25, 0.8, vSoft.w);
+        float al = 1.0 - smoothstep(edge, 1.0, rr);
+        al *= al * (3.0 - 2.0 * al);
+        float lit = clamp(0.62 + 0.4 * dot(normalize(vQ + vec2(0.0001)), vec2(-0.45, 0.89)) * smoothstep(0.1, 0.9, rr), 0.0, 1.1);
+        diffuseColor.rgb *= uSoftTint * mix(0.78, 1.08, lit);
+        diffuseColor.a *= al * vSoft.x;
+        if (diffuseColor.a < 0.004) discard;`);
+  };
+  return softMat;
+}
+export function softDustMesh(cap) {
+  const g = new THREE.PlaneGeometry(2, 2);
+  g.setAttribute('aSoft', new THREE.InstancedBufferAttribute(new Float32Array(cap * 4), 4).setUsage(THREE.DynamicDrawUsage));
+  const m = new THREE.InstancedMesh(g, softDustMaterial(), cap);
+  m.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
+  for (let i = 0; i < cap; i++) m.setColorAt(i, _c.set(0xffffff));
+  m.frustumCulled = false; m.castShadow = false; m.receiveShadow = false;
+  m.count = 0; m.renderOrder = 4;
+  return m;
+}
+// Time-of-day tint for the soft dust, from the lighting palette (world.rig.palette): ~1 by day, dim and blue at night.
+export function updateSoftTint(L) {
+  if (!L) return;
+  const k = Math.max(0.32, Math.min(1.05, 0.22 + (L.sun?.intensity ?? 6) / 7.2));
+  softTint.set(L.sun?.color || '#ffffff').lerp(_c.set(L.fill?.sky || '#ffffff'), 0.35).lerp(_c.set(0xffffff), 0.45).multiplyScalar(k);
+}
+
+// Drop-in for plots/western.js particles() dust/steam pools in the cards: same emit/step/clear API and the same
+// `.visible` contract (shown while wanted AND live), drawn as soft billboards. `col` = hex or a palette key.
+export function softPuffs(kit, P, col, count, { alpha = 0.8, grow = 1.5, hard = 0 } = {}) {
+  const m = softDustMesh(count);
+  const pv = col === 'dust' ? '#e2c7a0' : typeof col === 'string' && col[0] !== '#' ? P.pal?.[col] : col;
+  const c = (pv && typeof pv === 'object' ? pv.c : pv) ?? '#e2c7a0';
+  for (let i = 0; i < count; i++) m.setColorAt(i, _c.set(c));
+  m.instanceColor.needsUpdate = true;
+  m.count = count;
+  m.boundingSphere = new THREE.Sphere(new THREE.Vector3(0, 3, 0), 18);
+  const soft = m.geometry.attributes.aSoft;
+  for (let i = 0; i < count; i++) m.setMatrixAt(i, _m.makeScale(0, 0, 0));
+  P.group.add(m);
+  const live = Array.from({ length: count }, (_, i) => ({ t: 1, life: 0, x: 0, y: 0, z: 0, vx: 0, vy: 0, vz: 0, s: 1, g: 0, spin: 0, seed: (i * 0.618) % 1 }));
+  let next = 0, dirty = false, want = true;
+  Object.defineProperty(m, 'visible', { get: () => want && (m.manual || dirty), set: (v) => { want = !!v; }, configurable: true });
+  return Object.assign(m, {
+    emit(x, y, z, vx, vy, vz, life = 1, s = 0.3, g = 0, spin = 0) {
+      const p = live[next]; next = (next + 1) % count;
+      Object.assign(p, { t: 0, life: life * 1.15, x, y, z, vx, vy, vz, s, g: g * 0.3, spin: spin || (p.seed - 0.5) * 2 });
+      dirty = true;
+    },
+    step(dt, shape = null) {
+      if (!dirty) return;
+      dirty = false;
+      for (let i = 0; i < count; i++) {
+        const p = live[i];
+        if (p.t >= 1) { m.setMatrixAt(i, _m.makeScale(0, 0, 0)); soft.setX(i, 0); continue; }
+        dirty = true;
+        p.t += dt / p.life;
+        const k = Math.exp(-2.4 * dt);
+        p.vx *= k; p.vz *= k; p.vy = p.vy * k - p.g * dt;
+        p.x += p.vx * dt; p.y += p.vy * dt; p.z += p.vz * dt;
+        if (p.y < 0.05) { p.y = 0.05; p.vy = 0; }
+        const u = Math.min(1, p.t), sk = shape ? Math.max(0.35, Math.min(1.4, shape(u))) : 1;
+        const r = p.t >= 1 ? 0 : p.s * 1.25 * (0.7 + grow * Math.sqrt(u)) * (0.75 + 0.25 * sk);
+        m.setMatrixAt(i, _m.makeScale(r, r, r).setPosition(p.x, p.y + r * 0.35, p.z));
+        soft.setXYZW(i, alpha * Math.min(1, u * 9) * Math.pow(1 - u, 1.4), p.spin * u * 1.5 + p.seed * 6.28, p.seed, hard);
+      }
+      m.instanceMatrix.needsUpdate = true;
+      soft.needsUpdate = true;
+    },
+    clear() { for (const p of live) p.t = 1; },
+  });
+}

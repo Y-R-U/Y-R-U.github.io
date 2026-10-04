@@ -7,6 +7,7 @@ import { hatIndex, dressScale } from './cast.js?v=20261004f';
 import { createScenes } from './scenes.js?v=20261004f';
 import { createHalos, createGhosts } from './overlay.js?v=20261004f';
 import { FRONTS } from '../../data/plots.js?v=20261004f';
+import { updateSoftTint } from '../fx.js?v=20261004f';
 
 // The spectacle director (DESIGN W9/W10): ONE slot for the big moment (a special or a story beat), a hard actor budget
 // (≤ 6 animated + ≤ 24 crowd extras + ≤ 256 particles), a pre-allocated actor pool, blob shadows, hero picking in the
@@ -167,6 +168,7 @@ export function createSpectacle({ world, kit, host, game, bus, fx, street }) {
     return game.act(type, payload);
   }
 
+  const api0 = {};
   const ctx = {
     get t() { return t; }, game, world, bus, fx, parts, street, PV, lim,
     actor: (sc, spec) => alloc(sc, spec, false),
@@ -332,6 +334,24 @@ export function createSpectacle({ world, kit, host, game, bus, fx, street }) {
     S.pickGag?.();
   }
 
+  // R6a: before the player owns the Thirsty Gizzard it is Pomfrey's saloon, and Mabel still throws a drunk out every
+  // 40–60 s from minute 1. Unrewarded and cosmetic (E's eject/fling only run once the saloon is owned); the hero cuts
+  // to the doors for it, landings rotate without repeats, and Mabel barks (bus bark {char:'mabel', trig:'eject'}).
+  const AMB_EJECT = [40, 60], AMB_LAND = ['street', 'trough', 'haycart', 'jail', 'dentist', 'pomfrey'];
+  let nextAmbEject = 45;
+  const ambLand = [];
+  function ambientEject() {
+    if (t < nextAmbEject || lineOpen('saloon') || !world.plots.has('saloon')) return;
+    if (!heroVisible || !uiHero || beats.length || (shotOwner && scenes.includes(shotOwner)) || scenes.some((s) => s.slot || s.kind === 'eject' || s.kind === 'opening')) { nextAmbEject = t + 3; return; }
+    const pool = AMB_LAND.filter((x) => !ambLand.includes(x) && (x !== 'dentist' || lineOpen('dentist')));
+    const target = pool[Math.floor(R() * pool.length)];
+    for (const s of [...scenes]) if (STAGED(s)) end(s);
+    const sc = start('eject', { id: 'ambej' + Math.round(t), kind: 'drunk', level: 1, cosmetic: true, ambient: true, autoAfter: 1.7, target });
+    if (sc) { sc.ambEject = true; ambLand.push(target); if (ambLand.length > 3) ambLand.shift(); }
+    nextAmbEject = t + AMB_EJECT[0] + R() * (AMB_EJECT[1] - AMB_EJECT[0]);
+  }
+  api0.ambientEject = () => { nextAmbEject = 0; ambientEject(); };
+
   let beatGap = 0;
   function runBeats() {
     while (beats.length) {
@@ -355,7 +375,8 @@ export function createSpectacle({ world, kit, host, game, bus, fx, street }) {
     const g = game.state.season?.ghost;
     if (g && frame % 30 === 0 && !ghostLive(g)) start('ghost', { ghost: g });
     runBeats();
-    ambient();
+    ambientEject();
+    if (!scenes.some((s) => s.ambEject)) ambient();
     nprops = 0;
     halos.clear(); ghosts.clear();
     for (const sc of [...scenes]) {
@@ -367,6 +388,7 @@ export function createSpectacle({ world, kit, host, game, bus, fx, street }) {
     S.always?.(dt);
     clear.length = 0;
     for (const sc of scenes) if (sc.clear) for (const q of sc.clear) clear.push(q);
+    if (frame % 20 === 1) updateSoftTint(world.rig?.palette);
     parts.update(dt);
     fxLive = fx?.live ? fx.live() : 0;
     const na = count(false), ne = count(true), np = parts.live + fxLive;
@@ -381,10 +403,16 @@ export function createSpectacle({ world, kit, host, game, bus, fx, street }) {
   // ---- render: fill instance buffers once per (frame, camera filter)
   let showLine = null;
   // Hero-only scenes (R4 vignettes, the saloon ejection) never show in a card: the plot's own card gag plays there.
-  const show = (a) => !showLine || (a.line === showLine && !a.scene?.heroOnly);
-  function fill(line) {
-    if (filled === frame && filledLine === line) return;
-    filled = frame; filledLine = line;
+  // PT2#8: in the hero, an actor whose body is within NEAR m of the lens is skipped for that render (a camera that
+  // cuts back to the tour while a scene's cast still stands in the street must never sit inside a head).
+  const NEAR = 3.2;
+  let nearCam = null;
+  const tooNear = (a) => nearCam && (a.x - nearCam.x) ** 2 + (a.y + 1.1 * (a.s || 1) - nearCam.y) ** 2 + (a.z - nearCam.z) ** 2 < NEAR * NEAR;
+  const show = (a) => (!showLine || (a.line === showLine && !a.scene?.heroOnly)) && !tooNear(a);
+  function fill(line, camera) {
+    const nc = !line && camera === world.heroRig.camera ? camera.position : null;
+    if (filled === frame && filledLine === line && nc === nearCam) return;
+    filled = frame; filledLine = line; nearCam = nc;
     showLine = line;
     cast.write(pool, show);
     let n = 0;
@@ -399,7 +427,7 @@ export function createSpectacle({ world, kit, host, game, bus, fx, street }) {
   const prevBefore = scene.onBeforeRender;
   scene.onBeforeRender = function (renderer, sc, camera, rt) {
     prevBefore?.call(this, renderer, sc, camera, rt);
-    fill(camera.userData?.iw2Line || null);
+    fill(camera.userData?.iw2Line || null, camera);
   };
   const prevAfter = scene.onAfterRender;
   scene.onAfterRender = function (renderer, sc, camera, rt) {
@@ -549,10 +577,11 @@ export function createSpectacle({ world, kit, host, game, bus, fx, street }) {
     queueBeat,
     debug: stats,
     resetStats() { stats.maxActors = stats.maxExtras = stats.maxParticles = stats.denied = 0; stats.frames = 0; },
-    duel() { const s = scenes.find((x) => x.kind === 'duel' && !x.ambient); return s ? { phase: s.phase, drawAt: s.drawAt || 0, id: s.eventId } : null; },
+    duel() { const s = scenes.find((x) => x.kind === 'duel' && !x.ambient); return s ? { phase: s.phase, drawAt: s.drawAt || 0, id: s.eventId, pace: s.pace || 0, t: s.t, resultAt: s.resultAt || 0 } : null; },
     fling() { const s = scenes.find((x) => x.kind === 'eject' && x.phase === 'hold'); return s ? s.flingInfo?.(ctx) : null; },
     parts, cast, props, pool,
   };
+  Object.assign(api, api0);
   S.attach?.(api);
   return api;
 }

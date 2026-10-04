@@ -15,7 +15,9 @@ const SETUP = `(() => {
   window.__probe = (cam) => {
     const V = cam.position.constructor, b = __iw2.world.heroRig.bounds; let bad = 0;
     cam.updateMatrixWorld();
-    const hero = cam === __iw2.world.heroRig.camera;
+    // Facade card cameras (P r3+) frame a sky band on purpose, so like the hero only their lower frame must land.
+    const line = cam.userData?.iw2Line, facade = !!(line && __iw2.world.plots.get(line)?.camera?.facade);
+    const hero = cam === __iw2.world.heroRig.camera || facade;
     for (const [x, y] of hero ? [[-1, -1], [0, -1], [1, -1], [-1, -0.4], [1, -0.4]] : [[-1, 1], [0, 1], [1, 1], [-1, 0], [1, 0], [-1, -1], [1, -1]]) {
       const p = new V(x, y, 0.5).unproject(cam), d = p.sub(cam.position).normalize();
       if (d.y > -0.004) { bad++; continue; }
