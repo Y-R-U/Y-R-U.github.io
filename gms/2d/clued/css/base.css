@@ -187,3 +187,5 @@ input[type=range] { width: 100%; accent-color: var(--grape); }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: .001s !important; transition-duration: .001s !important; }
 }
+.icon-btn.off { opacity: .55; }
+.icon-btn.on { background: var(--ink); color: var(--card); }

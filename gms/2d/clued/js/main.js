@@ -12,6 +12,7 @@ import { sfx, haptic, confetti } from './ui/fx.js?v=1';
 import { shareText } from './ui/share.js?v=1';
 import { loadNet } from './ui/net.js?v=1';
 import { applyAll } from './ui/settings.js?v=1';
+import { armBgm } from './ui/toggles.js?v=1';
 import { setMatchCompleted } from './ui/results.js?v=1';
 import './ui/home.js?v=1';
 import './ui/setup.js?v=1';
@@ -39,18 +40,18 @@ function ready() {
 }
 
 async function route() {
-  const join = params.get('join'), chal = params.get('c');
+  const join = params.get('join'), chal = params.get('c'), p2p = params.get('p2p');
   const hash = /[#&]lc=/.test(location.hash) ? location.hash : '';
-  if (!join && !chal && !hash) return false;
+  if (!join && !chal && !hash && !p2p) return false;
   const keep = new URLSearchParams(location.search);
-  keep.delete('join'); keep.delete('c');
+  keep.delete('join'); keep.delete('c'); keep.delete('p2p');
   history.replaceState(history.state, '', location.pathname + (keep.size ? '?' + keep : ''));
   const net = await loadNet();
-  const fn = hash ? net?.openLinkChallenge : join ? net?.joinRoom : net?.openChallenge;
+  const fn = hash ? net?.openLinkChallenge : join ? net?.joinRoom : p2p ? net?.openP2P : net?.openChallenge;
   if (fn) {
-    try { await fn(hash || join || chal, ctx); return true; } catch (e) { console.error('[clued] net route failed', e); }
+    try { await fn(hash || join || p2p || chal, ctx); return true; } catch (e) { console.error('[clued] net route failed', e); }
   }
-  await popup({ title: join ? 'Join a game' : 'Challenge', body: 'Online play is not available right now. Try again soon!' });
+  await popup({ title: join || p2p ? 'Join a game' : 'Challenge', body: 'Online play is not available right now. Try again soon!' });
   return false;
 }
 
@@ -72,6 +73,7 @@ function hooks() {
 
 async function boot() {
   applyAll();
+  armBgm();
   const [fr] = await Promise.all([loadFormats(), loadIndex()]);
   if (fr.failed.length) console.warn('[clued] formats failed to load:', fr.failed.join(', '));
   mountApp(document.getElementById('app'));

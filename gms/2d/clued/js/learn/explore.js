@@ -81,7 +81,6 @@ export async function exploreScreen(el, params) {
         const { card, speech } = countryCard(S, iso, props, flags[iso]);
         side.innerHTML = '';
         side.append(card);
-        if (matchMedia('(max-aspect-ratio: 1/1)').matches) side.scrollIntoView?.({ behavior: 'smooth', block: 'nearest' });
         if (kidsOn()) say(speech);
       },
     });

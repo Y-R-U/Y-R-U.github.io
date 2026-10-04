@@ -123,17 +123,28 @@
     "Its capital is Kabul."
    ],
    "media": {
-    "img": [
-     {
-      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5c/Flag_of_the_Taliban.svg/330px-Flag_of_the_Taliban.svg.png",
-      "w": 330,
-      "h": 165,
-      "credit": "Original: Taliban Vector: Lexicon",
-      "license": "Public domain",
-      "page": "https://commons.wikimedia.org/wiki/File:Flag_of_the_Taliban.svg"
-     }
-    ]
+    "img": []
    },
+   "flagDisputed": true,
+   "flagNote": "Afghanistan has two flags in use: the white Taliban flag of the de facto government since 2021, and the black, red and green tricolour of the former Islamic Republic, which the UN and many embassies abroad still used as of 2025.",
+   "flagImages": [
+    {
+     "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5c/Flag_of_the_Taliban.svg/330px-Flag_of_the_Taliban.svg.png",
+     "w": 330,
+     "h": 165,
+     "credit": "Original: Taliban Vector: Lexicon",
+     "license": "Public domain",
+     "page": "https://commons.wikimedia.org/wiki/File:Flag_of_the_Taliban.svg"
+    },
+    {
+     "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e7/Flag_of_the_Islamic_Republic_of_Afghanistan.svg/330px-Flag_of_the_Islamic_Republic_of_Afghanistan.svg.png",
+     "w": 330,
+     "h": 220,
+     "credit": "Original: Unknown author Vector: Sabawoon Nezami",
+     "license": "Public domain",
+     "page": "https://commons.wikimedia.org/wiki/File:Flag_of_the_Islamic_Republic_of_Afghanistan.svg"
+    }
+   ],
    "difficulty": 2
   },
   {
@@ -5841,7 +5852,16 @@
     "Its capital is Muscat."
    ],
    "media": {
-    "img": []
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a0/Flag_of_Oman_%282-1%29.svg/330px-Flag_of_Oman_%282-1%29.svg.png",
+      "w": 330,
+      "h": 165,
+      "credit": "Original: Unknown Vector: FDRMRZUSA",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Flag_of_Oman_(2-1).svg"
+     }
+    ]
    },
    "difficulty": 2
   },

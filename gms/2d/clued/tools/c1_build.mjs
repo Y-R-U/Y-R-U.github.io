@@ -89,7 +89,9 @@ async function buildPack(id) {
 
   await inatPrefetch(S.items.filter(it => (it.media || mediaMode) === 'inat' || (S.autoTaxo && it.sci)).map(it => it.inat || it.sci));
   const wd = (S.status || S.audio || S.wdCheck) ? await wdTaxa(S.items.map(it => it.sci)) : {};
-  const wikiTitles = S.items.filter(it => (it.media || mediaMode) === 'wiki' || it.wp || it.files).map(it => it.wp || it.n);
+  // Kids-level items in iNat packs get the curated Wikipedia lead photo first (wikiD1), then iNat photos.
+  const wikiFirst = it => (it.media || mediaMode) === 'wiki' || (S.wikiD1 && it.d === 1) || S.wikiAll || it.wikiFirst;
+  const wikiTitles = S.items.filter(it => wikiFirst(it) || it.wp || it.files).map(it => it.wp || it.n);
   const wdWiki = wikiTitles.length ? await wdByEnwiki(wikiTitles) : {};
   const pageImgs = {};
   if (S.pageImage !== false) for (const [t, e] of Object.entries(wdWiki)) if (e._pageimage) pageImgs[t] = e._pageimage;
@@ -107,14 +109,14 @@ async function buildPack(id) {
     const files = [...(it.files || [])];
     let ent = null;
     if (it.qid) ent = qidEnt[it.qid];
-    else if (mode === 'wiki' || it.wp) {
+    else if (wikiFirst(it) || it.wp) {
       ent = wdWiki[it.wp || it.n];
       if (!ent) warn.push(`${idOf(it)}: no Wikidata entity for enwiki "${it.wp || it.n}"`);
     }
     if (S.depicts && mode === 'wiki' && ent?.id && !it.noAutoImg) {
       it._depicts = (await commonsDepicts(ent.id, 8).catch(() => [])).slice(0, S.depicts + 2);
     }
-    if (mode === 'wiki' && !it.noAutoImg) {
+    if (wikiFirst(it) && !it.noAutoImg) {
       for (const f of claimVals(ent, 'P18')) files.push(f);
       const pi = pageImgs[it.wp || it.n]; if (pi) files.push(pi.replace(/_/g, ' '));
     }
@@ -230,7 +232,10 @@ async function buildPack(id) {
     if (img.length) media.img = img.slice(0, cap).map(({ src, w, h, credit, license, page }) => mir({ src, w, h, credit, license, page }));
     else if (!S.noImages) warn.push(`${iid}: no images`);
     if (S.audio) {
-      let af = [...(it.audio || []), ...(w?.audio ? [...w.audio] : [])].slice(0, 2);
+      // Wikidata sometimes links a generic soundscape; keep only files whose title names this species
+      const words = [...(it.sci || '').toLowerCase().split(' '), ...it.n.toLowerCase().split(/[\s'-]+/).filter(x => x.length >= 4)];
+      const named = f => words.some(wd => wd && f.toLowerCase().replace(/_/g, ' ').includes(wd));
+      let af = [...(it.audio || []), ...(w?.audio ? [...w.audio].filter(named) : [])].slice(0, 2);
       if (!af.length && it.sci && !it.noAudio) {
         const found = await commonsAudioSearch(it.sci).catch(() => []);
         if (found.length) { Object.assign(info, await commonsInfo(found.slice(0, 3))); af = found.slice(0, 3); }

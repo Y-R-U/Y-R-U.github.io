@@ -1,0 +1,3204 @@
+{
+ "id": "sea",
+ "title": "Sea creatures",
+ "theme": "animals",
+ "icon": "🐋",
+ "kids": true,
+ "version": 1,
+ "imgPrompt": "Which of these is {aName}?",
+ "nameImgPrompt": "Which sea creature is this?",
+ "tfImgPrompt": "This is {aName}.",
+ "leakExempt": [],
+ "factsMeta": {
+  "kind": {
+   "type": "cat",
+   "label": "Kind of animal",
+   "values": [
+    "Mammal",
+    "Fish",
+    "Reptile",
+    "Mollusc",
+    "Crustacean",
+    "Echinoderm",
+    "Cnidarian",
+    "Chelicerate"
+   ],
+   "ask": "What kind of animal is the {lname}?",
+   "askReverse": "Which of these is a {lvalue}?",
+   "stmt": "The {lname} is a {lvalue}."
+  },
+  "breathesAir": {
+   "type": "bool",
+   "label": "Breathes air",
+   "yes": "Breathes air",
+   "no": "Breathes underwater",
+   "askBool": "Which of these sea creatures breathes air?",
+   "stmt": "The {lname} has to come to the surface to breathe air."
+  },
+  "lengthM": {
+   "type": "num",
+   "label": "Typical length",
+   "unit": "m",
+   "higherLabel": "Longer",
+   "askHigh": "Which of these grows the longest?",
+   "askLow": "Which of these is the smallest?",
+   "minRatio": 2
+  },
+  "status": {
+   "type": "cat",
+   "label": "Conservation status (IUCN)",
+   "ask": "What is the IUCN conservation status of the {lname}?",
+   "askReverse": "Which of these is listed as \"{value}\" by the IUCN?",
+   "stmt": "The {lname} is listed as \"{value}\" by the IUCN."
+  }
+ },
+ "items": [
+  {
+   "id": "blue-whale",
+   "name": "Blue whale",
+   "sci": "Balaenoptera musculus",
+   "group": "whale",
+   "facts": {
+    "kind": "Mammal",
+    "breathesAir": true,
+    "lengthM": 25
+   },
+   "lookalikes": [
+    "humpback-whale",
+    "sperm-whale"
+   ],
+   "blurb": "The biggest animal that has ever lived. It eats tiny shrimp-like krill, up to several tonnes a day.",
+   "clues": [
+    "Family: Balaenopteridae.",
+    "Genus: Balaenoptera.",
+    "Its heart is about the size of a small car.",
+    "It can eat about 4 tonnes of krill a day.",
+    "Its calls are among the loudest of any animal.",
+    "It is a mammal.",
+    "It must come to the surface to breathe air.",
+    "Typical length: about 25 m.",
+    "It filters food through plates called baleen.",
+    "It is the biggest animal ever.",
+    "The answer has 2 words (4, 5 letters).",
+    "Its first letter is B."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/3/3b/Anim1755_-_Flickr_-_NOAA_Photo_Library.jpg/500px-Anim1755_-_Flickr_-_NOAA_Photo_Library.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "NOAA Photo Library",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Anim1755_-_Flickr_-_NOAA_Photo_Library.jpg"
+     },
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/5/51/Faroe_stamp_402_blue_whale_%28Balaenoptera_musculus%29_crop.jpg",
+      "w": 500,
+      "h": 593,
+      "credit": "Postverk Føroya - Philatelic Office",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Faroe_stamp_402_blue_whale_(Balaenoptera_musculus)_crop.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/1c/Anim1754_-_Flickr_-_NOAA_Photo_Library.jpg/500px-Anim1754_-_Flickr_-_NOAA_Photo_Library.jpg",
+      "w": 500,
+      "h": 346,
+      "credit": "NOAA Photo Library",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Anim1754_-_Flickr_-_NOAA_Photo_Library.jpg"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "humpback-whale",
+   "name": "Humpback whale",
+   "sci": "Megaptera novaeangliae",
+   "group": "whale",
+   "facts": {
+    "kind": "Mammal",
+    "breathesAir": true,
+    "lengthM": 14,
+    "status": "Least concern"
+   },
+   "lookalikes": [
+    "blue-whale"
+   ],
+   "blurb": "A big whale famous for its songs and for leaping out of the water. It has very long flippers.",
+   "clues": [
+    "Family: Balaenopteridae.",
+    "Genus: Megaptera.",
+    "Its flippers can be a third of its body length.",
+    "Males sing long, complex songs.",
+    "Groups trap fish in nets of bubbles.",
+    "It is a mammal.",
+    "It must come to the surface to breathe air.",
+    "Typical length: about 14 m.",
+    "It often leaps right out of the water.",
+    "Its name describes the shape of its back when it dives.",
+    "The answer has 2 words (8, 5 letters).",
+    "Its first letter is H."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/8/8b/Humpback_whales_in_singing_position.jpg/500px-Humpback_whales_in_singing_position.jpg",
+      "w": 500,
+      "h": 338,
+      "credit": "Dr. Louis M. Herman.",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Humpback_whales_in_singing_position.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/d/d7/Humpback_whale_breaching_off_Cabo_San_Lucas.jpg/500px-Humpback_whale_breaching_off_Cabo_San_Lucas.jpg",
+      "w": 500,
+      "h": 350,
+      "credit": "Juan Cruzado Cortés",
+      "license": "CC BY 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Humpback_whale_breaching_off_Cabo_San_Lucas.jpg"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/2562747/medium.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Ken-ichi Ueda",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/2562747"
+     }
+    ],
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/9/9d/Humpback-Whale-Song-on-the-Southern-Ocean-Feeding-Grounds-Implications-for-Cultural-Transmission-pone.0079422.s003.oga/Humpback-Whale-Song-on-the-Southern-Ocean-Feeding-Grounds-Implications-for-Cultural-Transmission-pone.0079422.s003.oga.mp3",
+      "credit": "Garland E, Gedamke J, Rekdahl M, Noad M, Garrigue C, Gales N",
+      "license": "CC BY 2.5",
+      "page": "https://commons.wikimedia.org/wiki/File:Humpback-Whale-Song-on-the-Southern-Ocean-Feeding-Grounds-Implications-for-Cultural-Transmission-pone.0079422.s003.oga",
+      "start": 0
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "orca",
+   "name": "Orca",
+   "alt": [
+    "killer whale"
+   ],
+   "sci": "Orcinus orca",
+   "group": "dolphin",
+   "facts": {
+    "kind": "Mammal",
+    "breathesAir": true,
+    "lengthM": 7,
+    "status": "Data deficient"
+   },
+   "lookalikes": [
+    "common-bottlenose-dolphin"
+   ],
+   "blurb": "The biggest member of the dolphin family. Orcas live in family pods and hunt seals, fish and even whales.",
+   "clues": [
+    "Its IUCN conservation status is \"Data deficient\".",
+    "Family: Delphinidae.",
+    "Genus: Orcinus.",
+    "Some families hunt by making waves to wash seals off ice.",
+    "Pods have their own \"dialects\" of calls.",
+    "Males have a very tall dorsal fin.",
+    "It is a mammal.",
+    "It must come to the surface to breathe air.",
+    "Typical length: about 7 m.",
+    "It is black and white.",
+    "The answer is one word of 4 letters.",
+    "Its first letter is O."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/3/37/Killerwhales_jumping.jpg/500px-Killerwhales_jumping.jpg",
+      "w": 500,
+      "h": 332,
+      "credit": "Robert Pittman",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Killerwhales_jumping.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/8/84/Killer_Whale_Types.jpg/330px-Killer_Whale_Types.jpg",
+      "w": 330,
+      "h": 457,
+      "credit": "Albino.orca",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Killer_Whale_Types.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/0/0e/Anim1133_-_Flickr_-_NOAA_Photo_Library.jpg/500px-Anim1133_-_Flickr_-_NOAA_Photo_Library.jpg",
+      "w": 500,
+      "h": 336,
+      "credit": "Allen Shimada NOAA/NMFS/OST/AMD.",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Anim1133_-_Flickr_-_NOAA_Photo_Library.jpg"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "sperm-whale",
+   "name": "Sperm whale",
+   "sci": "Physeter macrocephalus",
+   "group": "whale",
+   "facts": {
+    "kind": "Mammal",
+    "breathesAir": true,
+    "lengthM": 16,
+    "status": "Vulnerable"
+   },
+   "lookalikes": [
+    "blue-whale"
+   ],
+   "blurb": "The biggest toothed animal, with a huge square head. It dives deeper than a kilometre to hunt giant squid.",
+   "clues": [
+    "Family: Physeteridae.",
+    "Genus: Physeter.",
+    "It has the largest brain of any animal.",
+    "Moby-Dick is a white one.",
+    "It dives over a kilometre deep.",
+    "It is a mammal.",
+    "It must come to the surface to breathe air.",
+    "Typical length: about 16 m.",
+    "It hunts giant squid.",
+    "It has a huge, square head.",
+    "The answer has 2 words (5, 5 letters).",
+    "Its first letter is S."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/b/b1/Mother_and_baby_sperm_whale.jpg/500px-Mother_and_baby_sperm_whale.jpg",
+      "w": 500,
+      "h": 281,
+      "credit": "Gabriel Barathieu",
+      "license": "CC BY-SA 2.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Mother_and_baby_sperm_whale.jpg"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/7690110/medium.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "harum.koh",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/7690110"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/59925420/medium.jpg",
+      "w": 500,
+      "h": 297,
+      "credit": "Anja J.",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/59925420"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "common-bottlenose-dolphin",
+   "name": "Common bottlenose dolphin",
+   "alt": [
+    "bottlenose dolphin",
+    "dolphin"
+   ],
+   "sci": "Tursiops truncatus",
+   "group": "dolphin",
+   "facts": {
+    "kind": "Mammal",
+    "breathesAir": true,
+    "lengthM": 3,
+    "status": "Least concern"
+   },
+   "lookalikes": [
+    "orca"
+   ],
+   "blurb": "A clever, playful dolphin found in warm seas around the world. Each dolphin has its own signature whistle, like a name.",
+   "clues": [
+    "Family: Delphinidae.",
+    "Genus: Tursiops.",
+    "Each one has a signature whistle, like a name.",
+    "Some use sponges to protect their noses while hunting.",
+    "It sleeps with half its brain at a time.",
+    "It is a mammal.",
+    "It must come to the surface to breathe air.",
+    "Typical length: about 3 m.",
+    "It finds food using echolocation.",
+    "It is a grey, smiling-looking sea mammal.",
+    "The answer has 3 words (6, 10, 7 letters).",
+    "Its first letter is C."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/b/bc/Tursiops_truncatus_01-cropped.jpg/500px-Tursiops_truncatus_01-cropped.jpg",
+      "w": 500,
+      "h": 370,
+      "credit": "NASA",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Tursiops_truncatus_01-cropped.jpg"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/186561621/medium.jpg",
+      "w": 500,
+      "h": 326,
+      "credit": "Laurent Bouveret",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/186561621"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/60251106/medium.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Benoit NABHOLZ",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/60251106"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "beluga",
+   "name": "Beluga",
+   "alt": [
+    "beluga whale",
+    "white whale"
+   ],
+   "sci": "Delphinapterus leucas",
+   "group": "whale",
+   "facts": {
+    "kind": "Mammal",
+    "breathesAir": true,
+    "lengthM": 4.5,
+    "status": "Least concern"
+   },
+   "lookalikes": [
+    "narwhal"
+   ],
+   "blurb": "A white Arctic whale nicknamed the \"sea canary\" because of its chirps and whistles.",
+   "clues": [
+    "Its IUCN conservation status is \"Least concern\".",
+    "Family: Monodontidae.",
+    "Genus: Delphinapterus.",
+    "Its forehead bulge is called a melon.",
+    "It is nicknamed the \"sea canary\".",
+    "It is a mammal.",
+    "It must come to the surface to breathe air.",
+    "Typical length: about 4.5 m.",
+    "It lives in Arctic seas.",
+    "The answer is one word of 6 letters.",
+    "Its first letter is B."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/66927700/medium.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Hafiz Issadeen",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/66927700"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/177555065/medium.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Lucy Keith-Diagne",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/177555065"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/566892172/medium.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Matt Muir",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/566892172"
+     }
+    ],
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/9/9f/Beluga_vocalizations.ogg/Beluga_vocalizations.ogg.mp3",
+      "credit": "Recorded by Fisheries Research Agency, Japan, with contract support from NOAA to Hubbs-…",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Beluga_vocalizations.ogg",
+      "start": 0
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "narwhal",
+   "name": "Narwhal",
+   "sci": "Monodon monoceros",
+   "group": "whale",
+   "facts": {
+    "kind": "Mammal",
+    "breathesAir": true,
+    "lengthM": 4.5,
+    "status": "Least concern"
+   },
+   "lookalikes": [
+    "beluga"
+   ],
+   "blurb": "An Arctic whale whose males have a long spiral tusk. Its tusk is really a tooth.",
+   "clues": [
+    "Family: Monodontidae.",
+    "Genus: Monodon.",
+    "Its tusks were once sold as unicorn horns.",
+    "The tusk is a tooth that can grow 3 metres long.",
+    "It is a close relative of the beluga.",
+    "It is a mammal.",
+    "It must come to the surface to breathe air.",
+    "Typical length: about 4.5 m.",
+    "It lives in Arctic waters.",
+    "It has a long spiral tusk.",
+    "The answer is one word of 7 letters.",
+    "Its first letter is N."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/b/bc/%D0%9D%D0%B0%D1%80%D0%B2%D0%B0%D0%BB_%D0%B2_%D1%80%D0%BE%D1%81%D1%81%D0%B8%D0%B9%D1%81%D0%BA%D0%BE%D0%B9_%D0%90%D1%80%D0%BA%D1%82%D0%B8%D0%BA%D0%B5.jpg/500px-%D0%9D%D0%B0%D1%80%D0%B2%D0%B0%D0%BB_%D0%B2_%D1%80%D0%BE%D1%81%D1%81%D0%B8%D0%B9%D1%81%D0%BA%D0%BE%D0%B9_%D0%90%D1%80%D0%BA%D1%82%D0%B8%D0%BA%D0%B5.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "пресс-служба ПАО \"Газпром нефть\"",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:%D0%9D%D0%B0%D1%80%D0%B2%D0%B0%D0%BB_%D0%B2_%D1%80%D0%BE%D1%81%D1%81%D0%B8%D0%B9%D1%81%D0%BA%D0%BE%D0%B9_%D0%90%D1%80%D0%BA%D1%82%D0%B8%D0%BA%D0%B5.jpg"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/66927345/medium.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "пресс-служба ПАО \"Газпром нефть\"",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/66927345"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/66927347/medium.jpg",
+      "w": 500,
+      "h": 341,
+      "credit": "пресс-служба ПАО \"Газпром нефть\"",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/66927347"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "dugong",
+   "name": "Dugong",
+   "alt": [
+    "sea cow"
+   ],
+   "sci": "Dugong dugon",
+   "group": "sea cow",
+   "facts": {
+    "kind": "Mammal",
+    "breathesAir": true,
+    "lengthM": 3,
+    "status": "Vulnerable"
+   },
+   "lookalikes": [
+    "west-indian-manatee"
+   ],
+   "blurb": "A gentle sea mammal that grazes on seagrass. Australia has the world's biggest population.",
+   "clues": [
+    "Its IUCN conservation status is \"Vulnerable\".",
+    "Sailors may have mistaken it for mermaids.",
+    "Australia has most of the world's population.",
+    "Its closest relatives on land are elephants.",
+    "It is a mammal.",
+    "It must come to the surface to breathe air.",
+    "Typical length: about 3 m.",
+    "Its tail is shaped like a dolphin's.",
+    "It grazes on seagrass.",
+    "The answer is one word of 6 letters.",
+    "Its first letter is D."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/50639803/medium.jpeg",
+      "w": 500,
+      "h": 333,
+      "credit": "Lord Mountbatten",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/50639803"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/15625387/medium.jpg",
+      "w": 500,
+      "h": 272,
+      "credit": "Wynand Uys",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/15625387"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/335161470/medium.jpeg",
+      "w": 500,
+      "h": 375,
+      "credit": "Gergely Nigg",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/335161470"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "west-indian-manatee",
+   "name": "West Indian manatee",
+   "alt": [
+    "manatee",
+    "sea cow"
+   ],
+   "sci": "Trichechus manatus",
+   "group": "sea cow",
+   "facts": {
+    "kind": "Mammal",
+    "breathesAir": true,
+    "lengthM": 3.2,
+    "status": "Vulnerable"
+   },
+   "lookalikes": [
+    "dugong"
+   ],
+   "blurb": "A big, slow sea mammal that eats water plants. It has a round, paddle-shaped tail.",
+   "clues": [
+    "Its IUCN conservation status is \"Vulnerable\".",
+    "Family: Trichechidae.",
+    "Genus: Trichechus.",
+    "It is related to elephants.",
+    "Boat propellers are a big danger to it.",
+    "It gathers at warm springs in Florida in winter.",
+    "It is a mammal.",
+    "It must come to the surface to breathe air.",
+    "Typical length: about 3.2 m.",
+    "Its tail is shaped like a paddle.",
+    "The answer has 3 words (4, 6, 7 letters).",
+    "Its first letter is W."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/9/99/Manatee_with_calf.PD_-_colour_corrected.jpg/500px-Manatee_with_calf.PD_-_colour_corrected.jpg",
+      "w": 500,
+      "h": 328,
+      "credit": "Galen Rathbun",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Manatee_with_calf.PD_-_colour_corrected.jpg"
+     },
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/8/81/Manatee.jpg",
+      "w": 500,
+      "h": 391,
+      "credit": "from http://www.csc.noaa.gov/benthic/resources/gallery/life/manatee.htm",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Manatee.jpg"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/17174106/medium.jpg",
+      "w": 500,
+      "h": 334,
+      "credit": "U.S. Fish and Wildlife Service Headquarters",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/17174106"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "walrus",
+   "name": "Walrus",
+   "sci": "Odobenus rosmarus",
+   "group": "seal",
+   "facts": {
+    "kind": "Mammal",
+    "breathesAir": true,
+    "lengthM": 3,
+    "status": "Vulnerable"
+   },
+   "blurb": "A huge Arctic sea mammal with long tusks and whiskers. It uses its tusks to haul itself onto ice.",
+   "clues": [
+    "Family: Odobenidae.",
+    "Genus: Odobenus.",
+    "Its scientific name means \"tooth-walking\".",
+    "It finds clams with its sensitive whiskers.",
+    "It uses its tusks to pull itself onto ice.",
+    "It is a mammal.",
+    "It must come to the surface to breathe air.",
+    "Typical length: about 3 m.",
+    "Both males and females have tusks.",
+    "It has long tusks and lives in the Arctic.",
+    "The answer is one word of 6 letters.",
+    "Its first letter is W."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/8/87/Walrus_in_the_Russian_Arctic_National_Park%2C_Novaya_Zemlya_2015-2.jpg/500px-Walrus_in_the_Russian_Arctic_National_Park%2C_Novaya_Zemlya_2015-2.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Nixette",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Walrus_in_the_Russian_Arctic_National_Park,_Novaya_Zemlya_2015-2.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/c/ce/Noaa-walrus22.jpg/500px-Noaa-walrus22.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Captain Budd Christman, NOAA Corps",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Noaa-walrus22.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/2/22/Pacific_Walrus_-_Bull_%288247646168%29.jpg/500px-Pacific_Walrus_-_Bull_%288247646168%29.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Joel Garlich-Miller, U.S. Fish and Wildlife Service",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Pacific_Walrus_-_Bull_(8247646168).jpg"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "harbour-seal",
+   "name": "Harbour seal",
+   "alt": [
+    "common seal",
+    "harbor seal",
+    "seal"
+   ],
+   "sci": "Phoca vitulina",
+   "group": "seal",
+   "facts": {
+    "kind": "Mammal",
+    "breathesAir": true,
+    "lengthM": 1.6,
+    "status": "Least concern"
+   },
+   "lookalikes": [
+    "california-sea-lion"
+   ],
+   "blurb": "A spotted seal of northern coasts that rests on sandbanks and rocks. It wriggles on its belly on land.",
+   "clues": [
+    "Its IUCN conservation status is \"Least concern\".",
+    "Family: Phocidae.",
+    "Genus: Phoca.",
+    "It has no ear flaps, only small holes.",
+    "It moves on land by wriggling on its belly.",
+    "It often rests in a \"banana\" pose.",
+    "It is a mammal.",
+    "It must come to the surface to breathe air.",
+    "Typical length: about 1.6 m.",
+    "It lives on northern coasts.",
+    "The answer has 2 words (7, 4 letters).",
+    "Its first letter is H."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/0/00/Common_Seal_Phoca_vitulina.jpg/500px-Common_Seal_Phoca_vitulina.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Andreas Trepte",
+      "license": "CC BY-SA 2.5",
+      "page": "https://commons.wikimedia.org/wiki/File:Common_Seal_Phoca_vitulina.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/5/50/Harbor_Seal%2C_Phoca_vitulina_-_Flickr_-_GregTheBusker.jpg/500px-Harbor_Seal%2C_Phoca_vitulina_-_Flickr_-_GregTheBusker.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Greg Schechter from San Francisco, USA",
+      "license": "CC BY 2.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Harbor_Seal,_Phoca_vitulina_-_Flickr_-_GregTheBusker.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/11/Harbor_seal_in_Holyoke%2C_MA._Connecticut_River._01.jpg/500px-Harbor_seal_in_Holyoke%2C_MA._Connecticut_River._01.jpg",
+      "w": 500,
+      "h": 560,
+      "credit": "LufkinF",
+      "license": "CC0 1.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Harbor_seal_in_Holyoke,_MA._Connecticut_River._01.jpg"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "leopard-seal",
+   "name": "Leopard seal",
+   "sci": "Hydrurga leptonyx",
+   "group": "seal",
+   "facts": {
+    "kind": "Mammal",
+    "breathesAir": true,
+    "lengthM": 3,
+    "status": "Least concern"
+   },
+   "blurb": "A big spotted Antarctic seal and a fierce hunter of penguins.",
+   "clues": [
+    "Its IUCN conservation status is \"Least concern\".",
+    "Family: Phocidae.",
+    "Genus: Hydrurga.",
+    "It has a huge mouth with sharp teeth.",
+    "It lives around Antarctica.",
+    "It is a mammal.",
+    "It must come to the surface to breathe air.",
+    "Typical length: about 3 m.",
+    "Its throat is covered in dark spots.",
+    "It is named after a spotted big cat.",
+    "The answer has 2 words (7, 4 letters).",
+    "Its first letter is L."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/19460647/medium.jpeg",
+      "w": 500,
+      "h": 331,
+      "credit": "Mike Bowie",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/19460647"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/374620739/medium.jpg",
+      "w": 482,
+      "h": 500,
+      "credit": "Sebastián Saiter V.",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/374620739"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/344221485/medium.png",
+      "w": 500,
+      "h": 375,
+      "credit": "Genevieve Early",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/344221485"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "california-sea-lion",
+   "name": "California sea lion",
+   "lname": "California sea lion",
+   "alt": [
+    "sea lion"
+   ],
+   "sci": "Zalophus californianus",
+   "group": "seal",
+   "facts": {
+    "kind": "Mammal",
+    "breathesAir": true,
+    "lengthM": 2,
+    "status": "Least concern"
+   },
+   "lookalikes": [
+    "harbour-seal"
+   ],
+   "blurb": "A noisy, playful sea lion that barks loudly. Unlike seals, sea lions can walk on their flippers.",
+   "clues": [
+    "Family: Otariidae.",
+    "Genus: Zalophus.",
+    "The US Navy trains them to find objects.",
+    "It barks loudly.",
+    "It has small ear flaps.",
+    "It is a mammal.",
+    "It must come to the surface to breathe air.",
+    "Typical length: about 2 m.",
+    "It can walk on all four flippers.",
+    "It is named after a US state and a big cat.",
+    "The answer has 3 words (10, 3, 4 letters).",
+    "Its first letter is C."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/0/03/Kalifornischer_Seel%C3%B6we_%28Zalophus_californianus%29%2C_Territorialverhalten.jpg/500px-Kalifornischer_Seel%C3%B6we_%28Zalophus_californianus%29%2C_Territorialverhalten.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "marneejill",
+      "license": "CC BY-SA 2.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Kalifornischer_Seel%C3%B6we_(Zalophus_californianus),_Territorialverhalten.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/2/26/California_sea_lions_in_La_Jolla_%2870539%29.jpg/500px-California_sea_lions_in_La_Jolla_%2870539%29.jpg",
+      "w": 500,
+      "h": 428,
+      "credit": "Rhododendrites",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:California_sea_lions_in_La_Jolla_(70539).jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/3/3f/California_Sea_Lion%2C_Monterey%2C_California%2C_United_States_imported_from_iNaturalist_photo_203598492.jpg/500px-California_Sea_Lion%2C_Monterey%2C_California%2C_United_States_imported_from_iNaturalist_photo_203598492.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "(c) Jonathan Eisen, some rights reserved (CC BY)",
+      "license": "CC BY 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:California_Sea_Lion,_Monterey,_California,_United_States_imported_from_iNaturalist_photo_203598492.jpg"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "sea-otter",
+   "name": "Sea otter",
+   "sci": "Enhydra lutris",
+   "group": "weasel",
+   "facts": {
+    "kind": "Mammal",
+    "breathesAir": true,
+    "lengthM": 1.3
+   },
+   "blurb": "An otter that floats on its back and cracks shellfish with a rock. It has the thickest fur of any animal.",
+   "clues": [
+    "Family: Mustelidae.",
+    "Genus: Enhydra.",
+    "It has the thickest fur of any animal.",
+    "It holds hands with others while sleeping so it does not drift.",
+    "It keeps a favourite rock in a skin pouch.",
+    "It is a mammal.",
+    "It must come to the surface to breathe air.",
+    "Typical length: about 1.3 m.",
+    "It cracks shells on its chest.",
+    "The answer has 2 words (3, 5 letters).",
+    "Its first letter is S."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/15/Sea_otter_cropped.jpg/500px-Sea_otter_cropped.jpg",
+      "w": 500,
+      "h": 389,
+      "credit": "Mike Baird from Morro Bay, USA",
+      "license": "CC BY 2.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Sea_otter_cropped.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/19/Otter_in_Seward%2C_Alaska%2C_April_2017.jpg/500px-Otter_in_Seward%2C_Alaska%2C_April_2017.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Jami430",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Otter_in_Seward,_Alaska,_April_2017.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/7/77/Sea_Otters.jpg/500px-Sea_Otters.jpg",
+      "w": 500,
+      "h": 332,
+      "credit": "Dave Bezaire & Susi Havens-Bezaire",
+      "license": "CC BY-SA 2.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Sea_Otters.jpg"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "green-sea-turtle",
+   "name": "Green sea turtle",
+   "alt": [
+    "green turtle"
+   ],
+   "sci": "Chelonia mydas",
+   "group": "turtle",
+   "facts": {
+    "kind": "Reptile",
+    "breathesAir": true,
+    "lengthM": 1.1,
+    "status": "Least concern"
+   },
+   "lookalikes": [
+    "loggerhead-sea-turtle",
+    "hawksbill-sea-turtle"
+   ],
+   "blurb": "A big sea turtle that eats seagrass and algae. It is named after the green colour of its fat.",
+   "clues": [
+    "Its IUCN conservation status is \"Least concern\".",
+    "Family: Cheloniidae.",
+    "Genus: Chelonia.",
+    "Raine Island on the Great Barrier Reef is a huge nesting site.",
+    "Females return to the beach where they hatched.",
+    "Adults eat seagrass and algae.",
+    "It is a reptile.",
+    "It must come to the surface to breathe air.",
+    "Typical length: about 1.1 m.",
+    "Its name comes from the colour of its fat.",
+    "The answer has 3 words (5, 3, 6 letters).",
+    "Its first letter is G."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/a/a3/Green_sea_turtle_%28Chelonia_mydas%29_Moorea.jpg/500px-Green_sea_turtle_%28Chelonia_mydas%29_Moorea.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Charles J. Sharp",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Green_sea_turtle_(Chelonia_mydas)_Moorea.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/b/bb/Hawaii_turtle_2.JPG/500px-Hawaii_turtle_2.JPG",
+      "w": 500,
+      "h": 375,
+      "credit": "Brocken Inaglory",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Hawaii_turtle_2.JPG"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/160686955/medium.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Paul Asman and Jill Lenoble",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/160686955"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "leatherback-sea-turtle",
+   "name": "Leatherback sea turtle",
+   "alt": [
+    "leatherback"
+   ],
+   "sci": "Dermochelys coriacea",
+   "group": "turtle",
+   "facts": {
+    "kind": "Reptile",
+    "breathesAir": true,
+    "lengthM": 2,
+    "status": "Vulnerable"
+   },
+   "blurb": "The biggest turtle in the world. It has a leathery shell instead of a hard one and eats jellyfish.",
+   "clues": [
+    "Its IUCN conservation status is \"Vulnerable\".",
+    "Family: Dermochelyidae.",
+    "Genus: Dermochelys.",
+    "It can dive over 1,000 metres deep.",
+    "It eats mainly jellyfish.",
+    "It can keep warm in cold water.",
+    "It is a reptile.",
+    "It must come to the surface to breathe air.",
+    "Typical length: about 2 m.",
+    "Its shell is leathery, not hard.",
+    "The answer has 3 words (11, 3, 6 letters).",
+    "Its first letter is L."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/32807091/medium.jpg",
+      "w": 500,
+      "h": 282,
+      "credit": "Bill Levine",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/32807091"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/23833432/medium.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Pam Kleinsasser",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/23833432"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/250159220/medium.jpeg",
+      "w": 375,
+      "h": 500,
+      "credit": "Jake McCumber",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/250159220"
+     }
+    ],
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/7/75/Dermochelys_coriacea_001.ogg/Dermochelys_coriacea_001.ogg.mp3",
+      "credit": "Philippe Kurlapski",
+      "license": "CC BY 2.5",
+      "page": "https://commons.wikimedia.org/wiki/File:Dermochelys_coriacea_001.ogg",
+      "start": 0
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "loggerhead-sea-turtle",
+   "name": "Loggerhead sea turtle",
+   "alt": [
+    "loggerhead"
+   ],
+   "sci": "Caretta caretta",
+   "group": "turtle",
+   "facts": {
+    "kind": "Reptile",
+    "breathesAir": true,
+    "lengthM": 0.9,
+    "status": "Vulnerable"
+   },
+   "lookalikes": [
+    "green-sea-turtle"
+   ],
+   "blurb": "A sea turtle with a big head and strong jaws for crushing shellfish. Many nest in Florida and Queensland.",
+   "clues": [
+    "Family: Cheloniidae.",
+    "Genus: Caretta.",
+    "Many nest at Mon Repos in Queensland.",
+    "Hatchlings use the Earth's magnetic field to navigate.",
+    "It crushes crabs and clams.",
+    "It is a reptile.",
+    "It must come to the surface to breathe air.",
+    "Typical length: about 90 cm.",
+    "Its shell is reddish-brown.",
+    "It has a very big head.",
+    "The answer has 3 words (10, 3, 6 letters).",
+    "Its first letter is L."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/355273645/medium.jpeg",
+      "w": 500,
+      "h": 333,
+      "credit": "Radu Teodoreanu",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/355273645"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/183028089/medium.jpeg",
+      "w": 500,
+      "h": 396,
+      "credit": "Jan Ebr &amp; Ivana Ebrová",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/183028089"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/428968449/medium.jpeg",
+      "w": 500,
+      "h": 333,
+      "credit": "Michael Bommerer",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/428968449"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "hawksbill-sea-turtle",
+   "name": "Hawksbill sea turtle",
+   "alt": [
+    "hawksbill"
+   ],
+   "sci": "Eretmochelys imbricata",
+   "group": "turtle",
+   "facts": {
+    "kind": "Reptile",
+    "breathesAir": true,
+    "lengthM": 0.8,
+    "status": "Critically endangered"
+   },
+   "lookalikes": [
+    "green-sea-turtle"
+   ],
+   "blurb": "A coral-reef turtle with a sharp, bird-like beak. It eats sponges. Its shell was once used to make \"tortoiseshell\".",
+   "clues": [
+    "Family: Cheloniidae.",
+    "Genus: Eretmochelys.",
+    "It eats sponges, some of them toxic.",
+    "Its shell was used for \"tortoiseshell\" combs.",
+    "It is critically endangered.",
+    "It is a reptile.",
+    "It must come to the surface to breathe air.",
+    "Typical length: about 80 cm.",
+    "It lives on coral reefs.",
+    "Its beak is pointed like a bird of prey's.",
+    "The answer has 3 words (9, 3, 6 letters).",
+    "Its first letter is H."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/464186508/medium.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "B.navez",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/464186508"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/44650/medium.jpeg",
+      "w": 500,
+      "h": 375,
+      "credit": "Kyle Van Houtan",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/44650"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/1375632/medium.JPG",
+      "w": 500,
+      "h": 375,
+      "credit": "Iván Cumpián",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/1375632"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "giant-pacific-octopus",
+   "name": "Giant Pacific octopus",
+   "sci": "Enteroctopus dofleini",
+   "group": "octopus",
+   "facts": {
+    "kind": "Mollusc",
+    "breathesAir": false,
+    "lengthM": 4,
+    "status": "Least concern"
+   },
+   "lookalikes": [
+    "common-octopus"
+   ],
+   "blurb": "The biggest octopus in the world, with arms spanning several metres. It is very clever and can escape from tanks.",
+   "clues": [
+    "Its IUCN conservation status is \"Least concern\".",
+    "Family: Enteroctopodidae.",
+    "Genus: Enteroctopus.",
+    "It has three hearts and blue blood.",
+    "It has escaped from aquarium tanks.",
+    "Its arms can span several metres.",
+    "It is a mollusc.",
+    "Typical length: about 4 m.",
+    "The answer has 3 words (5, 7, 7 letters).",
+    "Its first letter is G."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/104745742/medium.jpeg",
+      "w": 500,
+      "h": 341,
+      "credit": "Erin McKittrick",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/104745742"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/78439903/medium.jpeg",
+      "w": 500,
+      "h": 375,
+      "credit": "Matt Muir",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/78439903"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/161194229/medium.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Justin Flint",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/161194229"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "common-octopus",
+   "name": "Common octopus",
+   "alt": [
+    "octopus"
+   ],
+   "sci": "Octopus vulgaris",
+   "group": "octopus",
+   "facts": {
+    "kind": "Mollusc",
+    "breathesAir": false,
+    "lengthM": 1,
+    "status": "Least concern"
+   },
+   "lookalikes": [
+    "giant-pacific-octopus",
+    "common-cuttlefish"
+   ],
+   "blurb": "A clever sea animal with eight arms, three hearts and blue blood. It can change colour in a flash.",
+   "clues": [
+    "Its IUCN conservation status is \"Least concern\".",
+    "It can taste with its suckers.",
+    "It squirts ink to escape.",
+    "It has three hearts and blue blood.",
+    "It is a mollusc.",
+    "Typical length: about 1 m.",
+    "It can change colour and texture in a flash.",
+    "It has eight arms.",
+    "The answer has 2 words (6, 7 letters).",
+    "Its first letter is C."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/3/32/Octopus_vulgaris_Merculiano.jpg/500px-Octopus_vulgaris_Merculiano.jpg",
+      "w": 500,
+      "h": 556,
+      "credit": "Comingio Merculiano (1845-1915) in Jatta Giuseppe (1860-1903)",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Octopus_vulgaris_Merculiano.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/6/65/Octopus_vulgaris2.jpg/500px-Octopus_vulgaris2.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Beckmannjan",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Octopus_vulgaris2.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/5/57/Octopus2.jpg/500px-Octopus2.jpg",
+      "w": 500,
+      "h": 381,
+      "credit": "albert kok",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Octopus2.jpg"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "common-cuttlefish",
+   "name": "Common cuttlefish",
+   "alt": [
+    "cuttlefish"
+   ],
+   "sci": "Sepia officinalis",
+   "group": "cuttlefish",
+   "facts": {
+    "kind": "Mollusc",
+    "breathesAir": false,
+    "lengthM": 0.45,
+    "status": "Least concern"
+   },
+   "lookalikes": [
+    "common-octopus"
+   ],
+   "blurb": "A relative of the octopus with eight arms, two tentacles and W-shaped pupils. It changes colour to talk and hide.",
+   "clues": [
+    "Its IUCN conservation status is \"Least concern\".",
+    "Family: Sepiidae.",
+    "Genus: Sepia.",
+    "Its pupils are W-shaped.",
+    "Its internal shell is given to pet birds.",
+    "It flashes rippling colours.",
+    "It is a mollusc.",
+    "Typical length: about 45 cm.",
+    "Its ink was used to make sepia paint.",
+    "It is a squid-like animal with a frill of fin.",
+    "The answer has 2 words (6, 10 letters).",
+    "Its first letter is C."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/520832703/medium.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Charlotte Kirchner",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/520832703"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/48352484/medium.jpeg",
+      "w": 500,
+      "h": 375,
+      "credit": "Katerina Kalogerini",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/48352484"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/250529075/medium.jpeg",
+      "w": 500,
+      "h": 375,
+      "credit": "Samuele Papeschi",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/250529075"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "chambered-nautilus",
+   "name": "Chambered nautilus",
+   "alt": [
+    "nautilus"
+   ],
+   "sci": "Nautilus pompilius",
+   "group": "nautilus",
+   "facts": {
+    "kind": "Mollusc",
+    "breathesAir": false,
+    "lengthM": 0.2
+   },
+   "blurb": "A shelled relative of the octopus that has barely changed in millions of years. It floats by adjusting gas in its shell.",
+   "clues": [
+    "It has about 90 tentacles with no suckers.",
+    "It is called a \"living fossil\".",
+    "It is a mollusc.",
+    "Typical length: about 20 cm.",
+    "Its shell is coiled and striped.",
+    "Jules Verne named a submarine after it.",
+    "The answer has 2 words (9, 8 letters).",
+    "Its first letter is C."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/470639183/medium.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Bryce Watts-Parker",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/470639183"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/237114360/medium.jpeg",
+      "w": 500,
+      "h": 376,
+      "credit": "Tom Field",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/237114360"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/401108419/medium.jpeg",
+      "w": 375,
+      "h": 500,
+      "credit": "no rights reserved",
+      "license": "CC0 1.0",
+      "page": "https://www.inaturalist.org/photos/401108419"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "ocellaris-clownfish",
+   "name": "Ocellaris clownfish",
+   "alt": [
+    "clownfish",
+    "anemonefish",
+    "Nemo"
+   ],
+   "sci": "Amphiprion ocellaris",
+   "group": "reef fish",
+   "facts": {
+    "kind": "Fish",
+    "breathesAir": false,
+    "lengthM": 0.1,
+    "status": "Least concern"
+   },
+   "blurb": "A small orange fish with white stripes that lives safely among the stinging tentacles of a sea anemone.",
+   "clues": [
+    "Its IUCN conservation status is \"Least concern\".",
+    "Family: Pomacentridae.",
+    "Genus: Amphiprion.",
+    "All are born male; the biggest becomes female.",
+    "A slimy coat stops anemones stinging it.",
+    "It lives in sea anemones.",
+    "It is a fish.",
+    "Typical length: about 10 cm.",
+    "It is orange with white stripes.",
+    "The answer has 2 words (9, 9 letters).",
+    "Its first letter is O."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/e/ef/Clownfisch_%28Amphiprion_ocellaris%29.jpg/500px-Clownfisch_%28Amphiprion_ocellaris%29.jpg",
+      "w": 500,
+      "h": 358,
+      "credit": "Raimond Spekking",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Clownfisch_(Amphiprion_ocellaris).jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/f/f6/Clown_fish_in_the_Andaman_Coral_Reef.jpg/500px-Clown_fish_in_the_Andaman_Coral_Reef.jpg",
+      "w": 500,
+      "h": 335,
+      "credit": "Ritiks",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Clown_fish_in_the_Andaman_Coral_Reef.jpg"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/269009306/medium.jpg",
+      "w": 500,
+      "h": 461,
+      "credit": "portioid",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/269009306"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "blue-tang",
+   "name": "Blue tang",
+   "alt": [
+    "regal tang",
+    "palette surgeonfish",
+    "Dory"
+   ],
+   "sci": "Paracanthurus hepatus",
+   "group": "reef fish",
+   "facts": {
+    "kind": "Fish",
+    "breathesAir": false,
+    "lengthM": 0.25,
+    "status": "Least concern"
+   },
+   "blurb": "A bright blue reef fish with a yellow tail. It has sharp spines near its tail. Dory in \"Finding Nemo\" is one.",
+   "clues": [
+    "Its IUCN conservation status is \"Least concern\".",
+    "Family: Acanthuridae.",
+    "Genus: Paracanthurus.",
+    "It has a sharp spine like a scalpel near its tail.",
+    "It hides in coral when scared.",
+    "It has a yellow tail.",
+    "It is a fish.",
+    "Typical length: about 25 cm.",
+    "The answer has 2 words (4, 4 letters).",
+    "Its first letter is B."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/30261643/medium.jpg",
+      "w": 500,
+      "h": 311,
+      "credit": "H. Krisp",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/30261643"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/83847888/medium.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Cliff",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/83847888"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/259398810/medium.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Emanuele Santarelli",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/259398810"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "moorish-idol",
+   "name": "Moorish idol",
+   "lname": "Moorish idol",
+   "sci": "Zanclus cornutus",
+   "group": "reef fish",
+   "facts": {
+    "kind": "Fish",
+    "breathesAir": false,
+    "lengthM": 0.2,
+    "status": "Least concern"
+   },
+   "blurb": "A striking black, white and yellow reef fish with a long trailing fin. Gill in \"Finding Nemo\" is one.",
+   "clues": [
+    "Its IUCN conservation status is \"Least concern\".",
+    "Family: Zanclidae.",
+    "Genus: Zanclus.",
+    "It is the only member of its family.",
+    "It has a long snout.",
+    "A long white fin trails from its back.",
+    "It is a fish.",
+    "Typical length: about 20 cm.",
+    "It is banded black, white and yellow.",
+    "Gill in \"Finding Nemo\" is one.",
+    "The answer has 2 words (7, 4 letters).",
+    "Its first letter is M."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/223662857/medium.jpg",
+      "w": 375,
+      "h": 500,
+      "credit": "NOAA Photo Library",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/223662857"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/603847724/medium.jpg",
+      "w": 500,
+      "h": 399,
+      "credit": "Cricket Raspet",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/603847724"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/249154834/medium.jpeg",
+      "w": 500,
+      "h": 312,
+      "credit": "no rights reserved",
+      "license": "CC0 1.0",
+      "page": "https://www.inaturalist.org/photos/249154834"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "reef-manta-ray",
+   "name": "Reef manta ray",
+   "alt": [
+    "manta ray",
+    "manta"
+   ],
+   "sci": "Mobula alfredi",
+   "group": "ray",
+   "facts": {
+    "kind": "Fish",
+    "breathesAir": false,
+    "lengthM": 3.5,
+    "status": "Vulnerable"
+   },
+   "blurb": "A huge, gentle ray that glides through the sea eating plankton. It has the biggest brain of any fish.",
+   "clues": [
+    "Its IUCN conservation status is \"Vulnerable\".",
+    "Family: Mobulidae.",
+    "Genus: Mobula.",
+    "It has one of the biggest brains of any fish.",
+    "Divers swim with it at Lady Elliot Island.",
+    "It is a fish.",
+    "Typical length: about 3.5 m.",
+    "Its fins spread like wings.",
+    "The answer has 3 words (4, 5, 3 letters).",
+    "Its first letter is R."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/c/c5/Manta_alfredi_cruising_-_journal.pone.0046170.g002A.png/500px-Manta_alfredi_cruising_-_journal.pone.0046170.g002A.png",
+      "w": 500,
+      "h": 360,
+      "credit": "Jaine FRA, Couturier LIE, Weeks SJ, Townsend KA, Bennett MB, et al. (2012)",
+      "license": "CC BY 2.5",
+      "page": "https://commons.wikimedia.org/wiki/File:Manta_alfredi_cruising_-_journal.pone.0046170.g002A.png"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/3/30/Dharavandhoo_Thila_-_Manata_Black_Pearl.JPG/500px-Dharavandhoo_Thila_-_Manata_Black_Pearl.JPG",
+      "w": 500,
+      "h": 332,
+      "credit": "Shiyam ElkCloner",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Dharavandhoo_Thila_-_Manata_Black_Pearl.JPG"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/464494946/medium.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "R Vasconcellos",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/464494946"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "southern-stingray",
+   "name": "Southern stingray",
+   "alt": [
+    "stingray"
+   ],
+   "sci": "Hypanus americanus",
+   "group": "ray",
+   "facts": {
+    "kind": "Fish",
+    "breathesAir": false,
+    "lengthM": 1.5,
+    "status": "Near threatened"
+   },
+   "blurb": "A flat, diamond-shaped ray of the western Atlantic that buries itself in sand. Its tail has a venomous spine.",
+   "clues": [
+    "Its IUCN conservation status is \"Near threatened\".",
+    "Family: Dasyatidae.",
+    "Genus: Hypanus.",
+    "It buries itself in sand.",
+    "Its mouth is on its underside.",
+    "It is a fish.",
+    "Typical length: about 1.5 m.",
+    "Its tail has a venomous spine.",
+    "It is flat and diamond-shaped.",
+    "The answer has 2 words (8, 8 letters).",
+    "Its first letter is S."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/221379071/medium.jpeg",
+      "w": 500,
+      "h": 389,
+      "credit": "Isaac Chacón",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/221379071"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/221375130/medium.jpeg",
+      "w": 281,
+      "h": 500,
+      "credit": "Isaac Chacón",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/221375130"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/369395491/medium.jpeg",
+      "w": 500,
+      "h": 375,
+      "credit": "Alex Doyle",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/369395491"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "big-belly-seahorse",
+   "name": "Big-belly seahorse",
+   "alt": [
+    "seahorse",
+    "pot-bellied seahorse"
+   ],
+   "sci": "Hippocampus abdominalis",
+   "group": "seahorse",
+   "facts": {
+    "kind": "Fish",
+    "breathesAir": false,
+    "lengthM": 0.3,
+    "status": "Least concern"
+   },
+   "lookalikes": [
+    "leafy-seadragon",
+    "weedy-seadragon"
+   ],
+   "blurb": "One of the biggest seahorses, from Australia and New Zealand. As with all seahorses, the male gets pregnant.",
+   "clues": [
+    "Its IUCN conservation status is \"Least concern\".",
+    "Family: Syngnathidae.",
+    "Genus: Hippocampus.",
+    "The male carries the eggs in a pouch.",
+    "It grips seaweed with its curly tail.",
+    "It swims upright.",
+    "It is a fish.",
+    "Typical length: about 30 cm.",
+    "It is a kind of fish.",
+    "Its head looks like a horse's.",
+    "The answer has 3 words (3, 5, 8 letters).",
+    "Its first letter is B."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/7/74/Sketchbook_of_fishes_-_18._%28Pot_bellied%29_Sea_horse_-_William_Buelow_Gould%2C_c1832.jpg/330px-Sketchbook_of_fishes_-_18._%28Pot_bellied%29_Sea_horse_-_William_Buelow_Gould%2C_c1832.jpg",
+      "w": 330,
+      "h": 476,
+      "credit": "William Buelow Gould (1801 - 1853).Reproduction by the Allport Library and Museum of Fi…",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Sketchbook_of_fishes_-_18._(Pot_bellied)_Sea_horse_-_William_Buelow_Gould,_c1832.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/3/31/Hippocampus_abdominalis_%28white%29.jpg/500px-Hippocampus_abdominalis_%28white%29.jpg",
+      "w": 500,
+      "h": 499,
+      "credit": "Wikimedia Commons",
+      "license": "CC BY-SA 2.5",
+      "page": "https://commons.wikimedia.org/wiki/File:Hippocampus_abdominalis_(white).jpg"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/71449775/medium.jpeg",
+      "w": 500,
+      "h": 375,
+      "credit": "Saryu Mae 前 朝琉",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/71449775"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "leafy-seadragon",
+   "name": "Leafy seadragon",
+   "sci": "Phycodurus eques",
+   "group": "seahorse",
+   "facts": {
+    "kind": "Fish",
+    "breathesAir": false,
+    "lengthM": 0.3,
+    "status": "Least concern"
+   },
+   "lookalikes": [
+    "weedy-seadragon",
+    "big-belly-seahorse"
+   ],
+   "blurb": "A relative of the seahorse from southern Australia, covered in leaf-like flaps that make it look like seaweed.",
+   "clues": [
+    "Its IUCN conservation status is \"Least concern\".",
+    "Family: Syngnathidae.",
+    "Genus: Phycodurus.",
+    "It is South Australia's marine emblem.",
+    "The male carries the eggs.",
+    "It drifts like floating seaweed.",
+    "It is a fish.",
+    "Typical length: about 30 cm.",
+    "It is a seahorse relative named after a mythical beast.",
+    "The answer has 2 words (5, 9 letters).",
+    "Its first letter is L."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/148776236/medium.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Jennie Pistevos",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/148776236"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/509618902/medium.jpg",
+      "w": 500,
+      "h": 280,
+      "credit": "leonie_rennie",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/509618902"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/368390714/medium.jpeg",
+      "w": 500,
+      "h": 402,
+      "credit": "Belinda Forbes",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/368390714"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "weedy-seadragon",
+   "name": "Weedy seadragon",
+   "alt": [
+    "common seadragon"
+   ],
+   "sci": "Phyllopteryx taeniolatus",
+   "group": "seahorse",
+   "facts": {
+    "kind": "Fish",
+    "breathesAir": false,
+    "lengthM": 0.45,
+    "status": "Vulnerable"
+   },
+   "lookalikes": [
+    "leafy-seadragon"
+   ],
+   "blurb": "A colourful seahorse relative of southern Australia with small leafy flaps. It is Victoria's marine emblem.",
+   "clues": [
+    "Its IUCN conservation status is \"Vulnerable\".",
+    "Family: Syngnathidae.",
+    "Genus: Phyllopteryx.",
+    "It is Victoria's marine emblem.",
+    "It has red, yellow and purple colours.",
+    "Males carry eggs on their tails.",
+    "It is a fish.",
+    "Typical length: about 45 cm.",
+    "It has fewer, smaller flaps than its leafy cousin.",
+    "It is a seahorse relative from southern Australia.",
+    "The answer has 2 words (5, 9 letters).",
+    "Its first letter is W."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/59394920/medium.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Kai Squires",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/59394920"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/570311497/medium.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Lawrence Hylton",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/570311497"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/451286859/medium.jpeg",
+      "w": 500,
+      "h": 333,
+      "credit": "Thomas Mesaglio",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/451286859"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "guineafowl-puffer",
+   "name": "Guineafowl puffer",
+   "alt": [
+    "pufferfish",
+    "puffer fish",
+    "blowfish"
+   ],
+   "sci": "Arothron meleagris",
+   "group": "pufferfish",
+   "facts": {
+    "kind": "Fish",
+    "breathesAir": false,
+    "lengthM": 0.4,
+    "status": "Least concern"
+   },
+   "blurb": "A spotted pufferfish of coral reefs. Like other puffers, it swallows water to blow up like a ball, and it is poisonous to eat.",
+   "clues": [
+    "Its IUCN conservation status is \"Least concern\".",
+    "Family: Tetraodontidae.",
+    "Genus: Arothron.",
+    "Its flesh contains a deadly poison.",
+    "It can be black with white spots or bright yellow.",
+    "It eats coral tips with its beak-like teeth.",
+    "Typical length: about 40 cm.",
+    "It is covered in white spots.",
+    "It blows itself up like a balloon.",
+    "The answer has 2 words (10, 6 letters).",
+    "Its first letter is G."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/11/Arothron_meleagris_by_NPS_1.jpg/500px-Arothron_meleagris_by_NPS_1.jpg",
+      "w": 500,
+      "h": 444,
+      "credit": "NPS photo - Bill Eichenlaub",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Arothron_meleagris_by_NPS_1.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/a/a0/Botete_negro_%28Arothron_meleagris%29%2C_Cabo_Pulmo%2C_Baja_California%2C_M%C3%A9xico%2C_2024-12-19%2C_DD_54.jpg/500px-Botete_negro_%28Arothron_meleagris%29%2C_Cabo_Pulmo%2C_Baja_California%2C_M%C3%A9xico%2C_2024-12-19%2C_DD_54.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Diego Delso",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Botete_negro_(Arothron_meleagris),_Cabo_Pulmo,_Baja_California,_M%C3%A9xico,_2024-12-19,_DD_54.jpg"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/220525356/medium.jpeg",
+      "w": 500,
+      "h": 375,
+      "credit": "Alberto Alcalá",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/220525356"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "ocean-sunfish",
+   "name": "Ocean sunfish",
+   "alt": [
+    "mola",
+    "sunfish"
+   ],
+   "sci": "Mola mola",
+   "group": "sunfish",
+   "facts": {
+    "kind": "Fish",
+    "breathesAir": false,
+    "lengthM": 1.8,
+    "status": "Vulnerable"
+   },
+   "blurb": "The heaviest bony fish in the world. It looks like a giant swimming head and lies flat at the surface to warm up.",
+   "clues": [
+    "Its IUCN conservation status is \"Vulnerable\".",
+    "Family: Molidae.",
+    "It can lay 300 million eggs.",
+    "It has no proper tail.",
+    "It lies on its side at the surface to warm up.",
+    "It is a fish.",
+    "Typical length: about 1.8 m.",
+    "It is the heaviest bony fish.",
+    "It looks like a huge swimming head.",
+    "The answer has 2 words (5, 7 letters).",
+    "Its first letter is O."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/114458708/medium.jpg",
+      "w": 500,
+      "h": 500,
+      "credit": "Sidonio Paes",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/114458708"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/21315691/medium.jpg",
+      "w": 500,
+      "h": 500,
+      "credit": "Brook",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/21315691"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/404980939/medium.jpeg",
+      "w": 500,
+      "h": 375,
+      "credit": "Anyomus",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/404980939"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "swordfish",
+   "name": "Swordfish",
+   "sci": "Xiphias gladius",
+   "group": "billfish",
+   "facts": {
+    "kind": "Fish",
+    "breathesAir": false,
+    "lengthM": 3,
+    "status": "Near threatened"
+   },
+   "blurb": "A big, fast fish with a long, flat bill like a sword. It slashes at fish with its bill.",
+   "clues": [
+    "Its IUCN conservation status is \"Near threatened\".",
+    "Family: Xiphiidae.",
+    "Genus: Xiphias.",
+    "It has a special organ that warms its eyes and brain.",
+    "Its scientific name includes the word for a Roman sword.",
+    "Adults have no scales or teeth.",
+    "It is a fish.",
+    "Typical length: about 3 m.",
+    "It slashes prey with its bill.",
+    "Its long, flat bill looks like a blade.",
+    "The answer is one word of 9 letters.",
+    "Its first letter is S."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/7/7a/Xiphias_gladius_23056964.jpg/330px-Xiphias_gladius_23056964.jpg",
+      "w": 330,
+      "h": 440,
+      "credit": "vtzanatos",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Xiphias_gladius_23056964.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/9/98/Xiphias_gladius1.jpg/500px-Xiphias_gladius1.jpg",
+      "w": 500,
+      "h": 185,
+      "credit": "Wikimedia Commons",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Xiphias_gladius1.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/5/5b/Xiphias_gladius_Linnaeus%2C_1758_2599925021.jpg/500px-Xiphias_gladius_Linnaeus%2C_1758_2599925021.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Naturalis Biodiversity Center",
+      "license": "CC0 1.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Xiphias_gladius_Linnaeus,_1758_2599925021.jpg"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "atlantic-bluefin-tuna",
+   "name": "Atlantic bluefin tuna",
+   "lname": "Atlantic bluefin tuna",
+   "alt": [
+    "bluefin tuna",
+    "tuna"
+   ],
+   "sci": "Thunnus thynnus",
+   "group": "tuna",
+   "facts": {
+    "kind": "Fish",
+    "breathesAir": false,
+    "lengthM": 2.5,
+    "status": "Least concern"
+   },
+   "blurb": "A huge, fast, warm-bodied fish that crosses the Atlantic. One fish can sell for a fortune at Tokyo fish auctions.",
+   "clues": [
+    "Its IUCN conservation status is \"Least concern\".",
+    "Family: Scombridae.",
+    "Genus: Thunnus.",
+    "One sold for over US$3 million at a Tokyo auction.",
+    "It can keep its body warmer than the water.",
+    "It is a fish.",
+    "Typical length: about 2.5 m.",
+    "It is used for sushi.",
+    "The answer has 3 words (8, 7, 4 letters).",
+    "Its first letter is A."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/18/Bluefin-big.jpg/500px-Bluefin-big.jpg",
+      "w": 500,
+      "h": 330,
+      "credit": "Unknown authorUnknown author",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Bluefin-big.jpg"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/107933283/medium.jpg",
+      "w": 500,
+      "h": 379,
+      "credit": "Michel Frisch",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/107933283"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/318106996/medium.jpeg",
+      "w": 500,
+      "h": 286,
+      "credit": "Thomas Stjernegaard Jeppesen",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/318106996"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "great-barracuda",
+   "name": "Great barracuda",
+   "alt": [
+    "barracuda"
+   ],
+   "sci": "Sphyraena barracuda",
+   "group": "fish",
+   "facts": {
+    "kind": "Fish",
+    "breathesAir": false,
+    "lengthM": 1.5,
+    "status": "Least concern"
+   },
+   "blurb": "A long, silvery hunter with fang-like teeth. It is attracted to shiny things.",
+   "clues": [
+    "Its IUCN conservation status is \"Least concern\".",
+    "Family: Sphyraenidae.",
+    "Genus: Sphyraena.",
+    "It is attracted to shiny objects.",
+    "It can burst to about 40 km/h.",
+    "It has a jutting lower jaw full of fangs.",
+    "It is a fish.",
+    "Typical length: about 1.5 m.",
+    "It is long and silvery.",
+    "Its name starts with \"barra\".",
+    "The answer has 2 words (5, 9 letters).",
+    "Its first letter is G."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/249214732/medium.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Pauline Walsh Jacobson",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/249214732"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/151110522/medium.jpeg",
+      "w": 500,
+      "h": 359,
+      "credit": "Ashwin Srinivasan",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/151110522"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/72347699/medium.jpeg",
+      "w": 500,
+      "h": 375,
+      "credit": "no rights reserved",
+      "license": "CC0 1.0",
+      "page": "https://www.inaturalist.org/photos/72347699"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "green-moray",
+   "name": "Green moray",
+   "alt": [
+    "moray eel",
+    "moray"
+   ],
+   "sci": "Gymnothorax funebris",
+   "group": "eel",
+   "facts": {
+    "kind": "Fish",
+    "breathesAir": false,
+    "lengthM": 1.8,
+    "status": "Least concern"
+   },
+   "blurb": "A big eel that hides in reef crevices. Its skin is brown, but yellow slime makes it look green.",
+   "clues": [
+    "Its IUCN conservation status is \"Least concern\".",
+    "Family: Muraenidae.",
+    "Genus: Gymnothorax.",
+    "It has a second set of jaws in its throat.",
+    "It opens and closes its mouth to breathe.",
+    "It is a fish.",
+    "Typical length: about 1.8 m.",
+    "It hides in rock and coral holes.",
+    "The answer has 2 words (5, 5 letters).",
+    "Its first letter is G."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/249232725/medium.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Pauline Walsh Jacobson",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/249232725"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/169862096/medium.jpeg",
+      "w": 500,
+      "h": 375,
+      "credit": "Alison Northup",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/169862096"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/339978183/medium.jpeg",
+      "w": 500,
+      "h": 375,
+      "credit": "Jared Shorma",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/339978183"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "bumphead-parrotfish",
+   "name": "Bumphead parrotfish",
+   "alt": [
+    "parrotfish"
+   ],
+   "sci": "Bolbometopon muricatum",
+   "group": "reef fish",
+   "facts": {
+    "kind": "Fish",
+    "breathesAir": false,
+    "lengthM": 1.3,
+    "status": "Vulnerable"
+   },
+   "blurb": "The biggest parrotfish, with a bump on its head. It crunches coral and poos out sand.",
+   "clues": [
+    "Its IUCN conservation status is \"Vulnerable\".",
+    "Family: Labridae.",
+    "Genus: Bolbometopon.",
+    "It rams coral with its head.",
+    "It turns coral into fine sand.",
+    "Schools sleep together on reefs.",
+    "It is a fish.",
+    "Typical length: about 1.3 m.",
+    "It has a big bump on its forehead.",
+    "Its beak-like teeth look like a colourful bird's.",
+    "The answer has 2 words (8, 10 letters).",
+    "Its first letter is B."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/96717561/medium.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Rickard Zerpe",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/96717561"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/40899956/medium.jpg",
+      "w": 500,
+      "h": 359,
+      "credit": "desertnaturalist",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/40899956"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/463444969/medium.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Piotr Lukasik",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/463444969"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "giant-clam",
+   "name": "Giant clam",
+   "sci": "Tridacna gigas",
+   "group": "clam",
+   "facts": {
+    "kind": "Mollusc",
+    "breathesAir": false,
+    "lengthM": 1.2,
+    "status": "Critically endangered"
+   },
+   "blurb": "The biggest shellfish in the world, weighing over 200 kg. Algae living in its colourful lips make food from sunlight.",
+   "clues": [
+    "Its IUCN conservation status is \"Critically endangered\".",
+    "Family: Cardiidae.",
+    "Genus: Tridacna.",
+    "Algae in its body make food from sunlight.",
+    "It cannot snap shut on divers, despite old stories.",
+    "It can live for over 100 years.",
+    "It is a mollusc.",
+    "Typical length: about 1.2 m.",
+    "Its lips are bright blue or purple.",
+    "The answer has 2 words (5, 4 letters).",
+    "Its first letter is G."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/2765460/medium.JPG",
+      "w": 500,
+      "h": 375,
+      "credit": "botanygirl",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/2765460"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/350440855/medium.jpeg",
+      "w": 500,
+      "h": 375,
+      "credit": "Sockrosma",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/350440855"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/484062981/medium.jpeg",
+      "w": 500,
+      "h": 375,
+      "credit": "呂一起(Lyu yi-chi)",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/484062981"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "ochre-sea-star",
+   "name": "Ochre sea star",
+   "alt": [
+    "starfish",
+    "sea star"
+   ],
+   "sci": "Pisaster ochraceus",
+   "group": "starfish",
+   "facts": {
+    "kind": "Echinoderm",
+    "breathesAir": false,
+    "lengthM": 0.25
+   },
+   "blurb": "A purple or orange starfish of the Pacific coast of North America. It eats mussels by pushing its stomach into their shells.",
+   "clues": [
+    "Family: Asteriidae.",
+    "Genus: Pisaster.",
+    "It pushes its stomach out to eat mussels.",
+    "It can regrow lost arms.",
+    "It has no brain and no blood.",
+    "It is a echinoderm.",
+    "Typical length: about 25 cm.",
+    "It can be purple or orange.",
+    "It has five arms.",
+    "The answer has 3 words (5, 3, 4 letters).",
+    "Its first letter is O."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/8/89/Ochre_sea_star.jpg/500px-Ochre_sea_star.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "D. Gordon E. Robertson",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Ochre_sea_star.jpg"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/248324436/medium.jpg",
+      "w": 375,
+      "h": 500,
+      "credit": "laiet17",
+      "license": "CC0 1.0",
+      "page": "https://www.inaturalist.org/photos/248324436"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/473313403/medium.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Roberto Daniel Avila",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/473313403"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "purple-sea-urchin",
+   "name": "Purple sea urchin",
+   "alt": [
+    "sea urchin"
+   ],
+   "sci": "Strongylocentrotus purpuratus",
+   "group": "sea urchin",
+   "facts": {
+    "kind": "Echinoderm",
+    "breathesAir": false,
+    "lengthM": 0.1
+   },
+   "blurb": "A spiny purple ball that grazes on kelp. Without sea otters to eat them, urchins can destroy kelp forests.",
+   "clues": [
+    "Family: Strongylocentrotidae.",
+    "Genus: Strongylocentrotus.",
+    "Too many can wipe out kelp forests.",
+    "Its mouth is on its underside.",
+    "It is a echinoderm.",
+    "Typical length: about 10 cm.",
+    "It is covered in spines.",
+    "The answer has 3 words (6, 3, 6 letters).",
+    "Its first letter is P."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/60815629/medium.jpg",
+      "w": 500,
+      "h": 423,
+      "credit": "Jerry Kirkhart",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/60815629"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/473308958/medium.jpg",
+      "w": 375,
+      "h": 500,
+      "credit": "Roberto Daniel Avila",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/473308958"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/575337762/medium.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Garth Harwood",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/575337762"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "magnificent-sea-anemone",
+   "name": "Magnificent sea anemone",
+   "alt": [
+    "sea anemone"
+   ],
+   "sci": "Heteractis magnifica",
+   "group": "anemone",
+   "facts": {
+    "kind": "Cnidarian",
+    "breathesAir": false,
+    "lengthM": 0.5
+   },
+   "blurb": "A big sea anemone that clownfish live in. Its tentacles sting other fish.",
+   "clues": [
+    "Family: Stichodactylidae.",
+    "Genus: Radianthus.",
+    "It is related to jellyfish and coral.",
+    "It can slowly walk on its base.",
+    "Its tentacles sting small fish.",
+    "It is a cnidarian.",
+    "Typical length: about 50 cm.",
+    "Clownfish live among its tentacles.",
+    "It looks like a flower but is an animal.",
+    "The answer has 3 words (11, 3, 7 letters).",
+    "Its first letter is M."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/367492830/medium.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Tom Heijnen",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/367492830"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/297311606/medium.jpeg",
+      "w": 375,
+      "h": 500,
+      "credit": "Debra Baker",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/297311606"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/487913012/medium.jpeg",
+      "w": 500,
+      "h": 450,
+      "credit": "Micha Baum",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/487913012"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "atlantic-horseshoe-crab",
+   "name": "Atlantic horseshoe crab",
+   "lname": "Atlantic horseshoe crab",
+   "alt": [
+    "horseshoe crab"
+   ],
+   "sci": "Limulus polyphemus",
+   "group": "horseshoe crab",
+   "facts": {
+    "kind": "Chelicerate",
+    "breathesAir": false,
+    "lengthM": 0.6,
+    "status": "Vulnerable"
+   },
+   "blurb": "Not a true crab but a relative of spiders. Its blue blood is used to test medicines for germs.",
+   "clues": [
+    "Its IUCN conservation status is \"Vulnerable\".",
+    "Family: Limulidae.",
+    "Genus: Limulus.",
+    "Its blue blood is used to test vaccines.",
+    "It has ten eyes.",
+    "It is a chelicerate.",
+    "Typical length: about 60 cm.",
+    "It has existed for hundreds of millions of years.",
+    "Its shell is shaped like a lucky charm for a horse.",
+    "The answer has 3 words (8, 9, 4 letters).",
+    "Its first letter is A."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/1104162/medium.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Meghan Cassidy",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/1104162"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/281735049/medium.jpeg",
+      "w": 324,
+      "h": 500,
+      "credit": "Elizabeth Green",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/281735049"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/315678445/medium.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Martin Kaehrle",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/315678445"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "american-lobster",
+   "name": "American lobster",
+   "lname": "American lobster",
+   "alt": [
+    "lobster"
+   ],
+   "sci": "Homarus americanus",
+   "group": "lobster",
+   "facts": {
+    "kind": "Crustacean",
+    "breathesAir": false,
+    "lengthM": 0.5,
+    "status": "Least concern"
+   },
+   "blurb": "A big crustacean with two huge claws, one for crushing and one for cutting. It turns red only when cooked.",
+   "clues": [
+    "Its IUCN conservation status is \"Least concern\".",
+    "Family: Nephropidae.",
+    "Genus: Homarus.",
+    "One claw crushes and the other cuts.",
+    "Very rarely, one is born bright blue.",
+    "It can live for over 100 years.",
+    "It is a crustacean.",
+    "Typical length: about 50 cm.",
+    "It is dark green-brown until cooked.",
+    "It turns red when cooked.",
+    "The answer has 2 words (8, 7 letters).",
+    "Its first letter is A."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/d/d5/Nur01521_-_Flickr_-_NOAA_Photo_Library.jpg/500px-Nur01521_-_Flickr_-_NOAA_Photo_Library.jpg",
+      "w": 500,
+      "h": 330,
+      "credit": "OAR/National Undersea Research Program (NURP).",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Nur01521_-_Flickr_-_NOAA_Photo_Library.jpg"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/75691769/medium.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Roger Rittmaster",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/75691769"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/47062265/medium.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Lara Gibson",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/47062265"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "common-hermit-crab",
+   "name": "Common hermit crab",
+   "alt": [
+    "hermit crab"
+   ],
+   "sci": "Pagurus bernhardus",
+   "group": "crab",
+   "facts": {
+    "kind": "Crustacean",
+    "breathesAir": false,
+    "lengthM": 0.1
+   },
+   "blurb": "A crab with a soft body that lives inside an empty snail shell. It moves to a bigger shell as it grows.",
+   "clues": [
+    "Family: Paguridae.",
+    "Genus: Pagurus.",
+    "Sea anemones sometimes ride on its shell.",
+    "It queues to swap shells with others.",
+    "Its soft body curls into a spiral.",
+    "It is a crustacean.",
+    "Typical length: about 10 cm.",
+    "It moves to a bigger shell as it grows.",
+    "It lives inside an empty snail shell.",
+    "The answer has 3 words (6, 6, 4 letters).",
+    "Its first letter is C."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/e/ec/Pagurus_bernhardus.jpg/500px-Pagurus_bernhardus.jpg",
+      "w": 500,
+      "h": 396,
+      "credit": "Hans Hillewaert",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Pagurus_bernhardus.jpg"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/285264344/medium.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Donald Davesne",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/285264344"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/713327422/medium.jpg",
+      "w": 408,
+      "h": 500,
+      "credit": "Adam Kaya",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/713327422"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "peacock-mantis-shrimp",
+   "name": "Peacock mantis shrimp",
+   "alt": [
+    "mantis shrimp"
+   ],
+   "sci": "Odontodactylus scyllarus",
+   "group": "mantis shrimp",
+   "facts": {
+    "kind": "Crustacean",
+    "breathesAir": false,
+    "lengthM": 0.15
+   },
+   "blurb": "A colourful reef crustacean with one of the fastest punches in nature. Its club can crack aquarium glass.",
+   "clues": [
+    "Family: Odontodactylidae.",
+    "Genus: Odontodactylus.",
+    "Its eyes have up to 16 kinds of colour sensors.",
+    "Its punch can crack aquarium glass.",
+    "Its punch speeds up as fast as a bullet fired from a gun.",
+    "It is a crustacean.",
+    "Typical length: about 15 cm.",
+    "The answer has 3 words (7, 6, 6 letters).",
+    "Its first letter is P."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/67464333/medium.jpg",
+      "w": 500,
+      "h": 377,
+      "credit": "Silke Baron",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/67464333"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/55770/medium.jpg",
+      "w": 500,
+      "h": 374,
+      "credit": "Silke Baron",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/55770"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/107610481/medium.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "prilfish",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/107610481"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "red-king-crab",
+   "name": "Red king crab",
+   "alt": [
+    "king crab"
+   ],
+   "sci": "Paralithodes camtschaticus",
+   "group": "crab",
+   "facts": {
+    "kind": "Crustacean",
+    "breathesAir": false,
+    "lengthM": 1.8
+   },
+   "blurb": "A huge crab of cold northern seas, with legs spanning up to 1.8 metres. It is caught for food in the Bering Sea.",
+   "clues": [
+    "Family: Lithodidae.",
+    "Genus: Paralithodes.",
+    "It was introduced to the Barents Sea by Soviet scientists.",
+    "Its legs can span 1.8 metres.",
+    "The TV show \"Deadliest Catch\" features its fishery.",
+    "It is a crustacean.",
+    "Typical length: about 1.8 m.",
+    "It lives in cold northern seas.",
+    "The answer has 3 words (3, 4, 4 letters).",
+    "Its first letter is R."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/88776171/medium.jpg",
+      "w": 500,
+      "h": 500,
+      "credit": "Dag Endresen",
+      "license": "CC0 1.0",
+      "page": "https://www.inaturalist.org/photos/88776171"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/42426482/medium.jpg",
+      "w": 375,
+      "h": 500,
+      "credit": "James M. Maley",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/42426482"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/42426413/medium.jpg",
+      "w": 375,
+      "h": 500,
+      "credit": "James M. Maley",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/42426413"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "spanish-dancer",
+   "name": "Spanish dancer",
+   "lname": "Spanish dancer",
+   "sci": "Hexabranchus sanguineus",
+   "group": "sea slug",
+   "facts": {
+    "kind": "Mollusc",
+    "breathesAir": false,
+    "lengthM": 0.4
+   },
+   "blurb": "A big red sea slug that swims by flapping its body like a flamenco dancer's skirt.",
+   "clues": [
+    "Family: Hexabranchidae.",
+    "Genus: Hexabranchus.",
+    "It is a kind of nudibranch.",
+    "Its eggs form a pink rose-like ribbon.",
+    "It is one of the largest sea slugs.",
+    "It is a mollusc.",
+    "Typical length: about 40 cm.",
+    "It is bright red.",
+    "It swims like a twirling flamenco performer.",
+    "The answer has 2 words (7, 6 letters).",
+    "Its first letter is S."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/229212281/medium.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Daniel Benák",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/229212281"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/129152954/medium.jpeg",
+      "w": 500,
+      "h": 375,
+      "credit": "natomik",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/129152954"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/129297201/medium.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "natomik",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/129297201"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "eastern-blue-groper",
+   "name": "Eastern blue groper",
+   "alt": [
+    "blue groper"
+   ],
+   "sci": "Achoerodus viridis",
+   "group": "reef fish",
+   "facts": {
+    "kind": "Fish",
+    "breathesAir": false,
+    "lengthM": 1,
+    "status": "Near threatened"
+   },
+   "blurb": "A big, friendly blue fish of the New South Wales coast. Females can change into males.",
+   "clues": [
+    "Its IUCN conservation status is \"Near threatened\".",
+    "Family: Labridae.",
+    "Genus: Achoerodus.",
+    "It is the state fish of New South Wales.",
+    "It starts life female and can become male.",
+    "Divers find it friendly and curious.",
+    "It is a fish.",
+    "Typical length: about 1 m.",
+    "It is a kind of wrasse.",
+    "The answer has 3 words (7, 4, 6 letters).",
+    "Its first letter is E."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/379684902/medium.jpeg",
+      "w": 500,
+      "h": 408,
+      "credit": "Tim",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/379684902"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/485096347/medium.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Lawrence Hylton",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/485096347"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/542129723/medium.jpg",
+      "w": 500,
+      "h": 323,
+      "credit": "Lawrence Hylton",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/542129723"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "flying-fish",
+   "name": "Flying fish",
+   "alt": [
+    "tropical two-wing flyingfish"
+   ],
+   "sci": "Exocoetus volitans",
+   "group": "fish",
+   "facts": {
+    "kind": "Fish",
+    "breathesAir": false,
+    "lengthM": 0.25,
+    "status": "Least concern"
+   },
+   "blurb": "A fish that leaps out of the sea and glides on wing-like fins to escape predators.",
+   "clues": [
+    "Its IUCN conservation status is \"Least concern\".",
+    "Family: Exocoetidae.",
+    "Genus: Exocoetus.",
+    "It can glide about 50 metres.",
+    "It beats its tail on the water to take off again.",
+    "Typical length: about 25 cm.",
+    "It escapes predators by leaving the water.",
+    "It glides through the air.",
+    "The answer has 2 words (6, 4 letters).",
+    "Its first letter is F."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/f/f8/Cheilopogon_melanurusPCCA20070623-3956B.jpg/500px-Cheilopogon_melanurusPCCA20070623-3956B.jpg",
+      "w": 500,
+      "h": 378,
+      "credit": "Patrick Coin (Patrick Coin)",
+      "license": "CC BY-SA 2.5",
+      "page": "https://commons.wikimedia.org/wiki/File:Cheilopogon_melanurusPCCA20070623-3956B.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/7/72/Sailfin_flyingfish.jpg/500px-Sailfin_flyingfish.jpg",
+      "w": 500,
+      "h": 259,
+      "credit": "David Starr Jordan and Barton Warren Evermann",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Sailfin_flyingfish.jpg"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/403671903/medium.jpg",
+      "w": 500,
+      "h": 309,
+      "credit": "Steve Taylor",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/403671903"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "atlantic-cod",
+   "name": "Atlantic cod",
+   "lname": "Atlantic cod",
+   "alt": [
+    "cod"
+   ],
+   "sci": "Gadus morhua",
+   "group": "fish",
+   "facts": {
+    "kind": "Fish",
+    "breathesAir": false,
+    "lengthM": 1,
+    "status": "Vulnerable"
+   },
+   "blurb": "A big fish of the North Atlantic that was fished so heavily that Canada closed its cod fishery in 1992.",
+   "clues": [
+    "Its IUCN conservation status is \"Vulnerable\".",
+    "Family: Gadidae.",
+    "Genus: Gadus.",
+    "Canada closed its Grand Banks fishery in 1992.",
+    "It has a whisker on its chin.",
+    "Its liver oil is a health supplement.",
+    "It is a fish.",
+    "Typical length: about 1 m.",
+    "It is used for fish and chips.",
+    "The answer has 2 words (8, 3 letters).",
+    "Its first letter is A."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/101475386/medium.jpeg",
+      "w": 500,
+      "h": 375,
+      "credit": "Klaus Kevin Kristensen",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/101475386"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/10161618/medium.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Viktor V. Grøtan",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/10161618"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/3312268/medium.jpg",
+      "w": 500,
+      "h": 337,
+      "credit": "Wouter Koch",
+      "license": "CC0 1.0",
+      "page": "https://www.inaturalist.org/photos/3312268"
+     }
+    ]
+   },
+   "difficulty": 2
+  }
+ ],
+ "questions": [
+  {
+   "id": "q1",
+   "kind": "mc",
+   "prompt": "What is the biggest animal that has ever lived?",
+   "answer": "Blue whale",
+   "wrong": [
+    "Whale shark",
+    "Megalodon",
+    "Argentinosaurus"
+   ],
+   "explain": "Blue whales can be about 30 m long and 150 tonnes or more.",
+   "difficulty": 1
+  },
+  {
+   "id": "q2",
+   "kind": "tf",
+   "prompt": "A whale is a fish.",
+   "answer": false,
+   "explain": "Whales are mammals that breathe air and feed their young milk.",
+   "difficulty": 1
+  },
+  {
+   "id": "q3",
+   "kind": "tf",
+   "prompt": "A dolphin breathes air.",
+   "answer": true,
+   "explain": "Dolphins breathe through a blowhole on top of their heads.",
+   "difficulty": 1
+  },
+  {
+   "id": "q4",
+   "kind": "number",
+   "prompt": "How many hearts does an octopus have?",
+   "answer": 3,
+   "unit": "hearts",
+   "tolerance": 0,
+   "explain": "Two pump blood through the gills and one round the body.",
+   "difficulty": 2
+  },
+  {
+   "id": "q5",
+   "kind": "number",
+   "prompt": "How many arms does an octopus have?",
+   "answer": 8,
+   "unit": "arms",
+   "tolerance": 0,
+   "explain": "\"Octo\" means eight.",
+   "difficulty": 1
+  },
+  {
+   "id": "q6",
+   "kind": "mc",
+   "prompt": "In seahorses, which parent gives birth?",
+   "answer": "The father",
+   "wrong": [
+    "The mother",
+    "Both parents",
+    "Neither; eggs hatch in seaweed"
+   ],
+   "explain": "The female puts eggs into the male's pouch.",
+   "difficulty": 1
+  },
+  {
+   "id": "q7",
+   "kind": "mc",
+   "prompt": "What kind of fish is Nemo?",
+   "answer": "Clownfish",
+   "wrong": [
+    "Blue tang",
+    "Pufferfish",
+    "Goldfish"
+   ],
+   "explain": "Ocellaris clownfish live in sea anemones.",
+   "difficulty": 1
+  },
+  {
+   "id": "q8",
+   "kind": "mc",
+   "prompt": "What is a narwhal's tusk?",
+   "answer": "A long tooth",
+   "wrong": [
+    "A horn",
+    "A nose",
+    "A fin"
+   ],
+   "explain": "It is a spiral canine tooth, usually on males.",
+   "difficulty": 2
+  },
+  {
+   "id": "q9",
+   "kind": "mc",
+   "prompt": "Which animal has the thickest fur of any animal?",
+   "answer": "Sea otter",
+   "wrong": [
+    "Polar bear",
+    "Walrus",
+    "Harbour seal"
+   ],
+   "explain": "It has up to about a million hairs per square inch.",
+   "difficulty": 2
+  },
+  {
+   "id": "q10",
+   "kind": "mc",
+   "prompt": "What colour is a lobster before it is cooked?",
+   "answer": "Dark greenish-brown",
+   "wrong": [
+    "Bright red",
+    "White",
+    "Yellow"
+   ],
+   "explain": "Cooking breaks down a protein, revealing a red pigment.",
+   "difficulty": 2
+  },
+  {
+   "id": "q11",
+   "kind": "mc",
+   "prompt": "What do blue whales mainly eat?",
+   "answer": "Krill",
+   "wrong": [
+    "Sharks",
+    "Seals",
+    "Seaweed"
+   ],
+   "explain": "They filter tonnes of the small crustaceans each day.",
+   "difficulty": 1
+  },
+  {
+   "id": "q12",
+   "kind": "tf",
+   "prompt": "A starfish is a fish.",
+   "answer": false,
+   "explain": "Starfish, or sea stars, are echinoderms related to sea urchins.",
+   "difficulty": 1
+  },
+  {
+   "id": "q13",
+   "kind": "mc",
+   "prompt": "Which animal lives inside an empty snail shell?",
+   "answer": "Hermit crab",
+   "wrong": [
+    "Lobster",
+    "Seahorse",
+    "Octopus"
+   ],
+   "explain": "It moves to bigger shells as it grows.",
+   "difficulty": 1
+  }
+ ],
+ "fakes": [
+  "Spotted glass whale",
+  "Crimson sea mole",
+  "Northern velvet dolphin",
+  "Golden ribbon turtle",
+  "Silver-finned sea badger",
+  "Striped coral otter"
+ ],
+ "sources": [
+  {
+   "name": "iNaturalist",
+   "url": "https://www.inaturalist.org"
+  },
+  {
+   "name": "Wikidata",
+   "url": "https://www.wikidata.org"
+  },
+  {
+   "name": "Wikimedia Commons",
+   "url": "https://commons.wikimedia.org"
+  }
+ ]
+}

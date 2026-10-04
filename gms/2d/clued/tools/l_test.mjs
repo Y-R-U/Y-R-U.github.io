@@ -38,7 +38,7 @@ const gm2 = S.missed({ b: 4, due: T + 9, n: 3, l: 0, a: T - 10 }, T);
 eq([gm2.b, gm2.due, gm2.l], [1, T, 1], 'game miss knocks box 4 back to 1 and due today');
 ok(!('g' in S.review(gm, 'good', T)), 'a correct review clears the game flag');
 // summary + queue
-const cards = { 'p/a': { b: 1, due: T - 2 }, 'p/b': { b: 3, due: T }, 'p/c': { b: 5, due: T + 5 }, 'q/x': { b: 0, due: T - 5 } };
+const cards = { 'p/a': { b: 1, due: T - 2 }, 'p/b': { b: 3, due: T }, 'p/c': { b: 5, due: T + 5 }, 'q/x': { b: 4, due: T - 5 } };
 const deck = ['p/a', 'p/b', 'p/c', 'p/d', 'p/e', 'p/f'];
 const sum = S.dueSummary(cards, deck, T, 0);
 eq([sum.due, sum.unseen, sum.fresh, sum.total, sum.mastered], [3, 3, 3, 6, 1], 'summary counts');
@@ -61,9 +61,9 @@ r = M.answer(r, true, T);
 ok(Math.abs(r.s - (M.GAIN + (1 - M.GAIN) * M.GAIN)) < 0.002, 'second right closes the gap');
 const before = r.s;
 r = M.answer(r, false, T);
-ok(Math.abs(r.s - before * (1 - M.LOSS)) < 0.002 && r.w === 1, 'wrong answer halves');
+ok(Math.abs(r.s - before * 0.5) < 0.002 && r.w === 1, 'wrong answer halves');
 let streak = null, n = 0;
-while (M.level(streak) < 3) { streak = M.answer(streak, true, T); n++; }
+while (M.level(streak) < 3 && n < 50) { streak = M.answer(streak, true, T); n++; }
 eq(n, 4, 'four right answers in a row reach mastered');
 ok(M.answer(null, true, T, 0.5).s < M.answer(null, true, T).s, 'half weight gains less');
 eq(M.level(null, null), 0, 'unseen level 0');

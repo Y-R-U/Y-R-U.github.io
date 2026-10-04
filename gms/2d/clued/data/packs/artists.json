@@ -158,7 +158,7 @@
      }
     ]
    },
-   "difficulty": 2
+   "difficulty": 1
   },
   {
    "id": "albrecht-durer",
@@ -349,7 +349,7 @@
      }
     ]
    },
-   "difficulty": 2
+   "difficulty": 1
   },
   {
    "id": "francisco-goya",
@@ -806,7 +806,7 @@
      }
     ]
    },
-   "difficulty": 2
+   "difficulty": 1
   },
   {
    "id": "edvard-munch",
@@ -1416,7 +1416,7 @@
     "J. M. W. Turner"
    ],
    "explain": "Raphael (1483–1520): One of the great painters of the High Renaissance.",
-   "difficulty": 2,
+   "difficulty": 1,
    "refs": [
     "artists/raphael"
    ]
@@ -1576,7 +1576,7 @@
     "Jackson Pollock"
    ],
    "explain": "Johannes Vermeer (1632–1675): Painted Girl with a Pearl Earring.",
-   "difficulty": 2,
+   "difficulty": 1,
    "refs": [
     "artists/johannes-vermeer"
    ]
@@ -1960,7 +1960,7 @@
     "Salvador Dalí"
    ],
    "explain": "Gustav Klimt (1862–1918): Painted The Kiss.",
-   "difficulty": 2,
+   "difficulty": 1,
    "refs": [
     "artists/gustav-klimt"
    ]

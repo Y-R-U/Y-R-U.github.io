@@ -8,7 +8,7 @@ const f = order => ({ order, complete: FULL.has(order) });
 export default {
   id: 'insects', title: 'Insects', theme: 'animals', icon: '🐞', kids: true,
   leakExempt: ['insect', 'insects'],
-  autoTaxo: ['family', 'genus'],
+  wikiD1: true, autoTaxo: ['family', 'genus'],
   factsMeta: {
     order: { type: 'cat', label: 'Insect group', noClue: true },
     complete: { type: 'bool', label: 'Has a pupa stage', yes: 'Egg, larva, pupa, adult', no: 'Egg, nymph, adult', clue: v => (v ? 'It goes through a pupa stage as it grows.' : 'Its young look like small adults; there is no pupa stage.') },

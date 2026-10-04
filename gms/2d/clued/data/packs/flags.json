@@ -5,12 +5,19 @@
  "icon": "🏳️",
  "version": 1,
  "kids": true,
+ "notice": "Afghanistan’s flag is contested (two flags in use), so it appears on its learn card but not in flag questions.",
  "factsMeta": {
   "continent": {
    "type": "cat",
    "label": "Continent",
    "ask": "Which continent is {lname} in?",
    "stmt": "{lname} is in {value}."
+  },
+  "flagDisputed": {
+   "type": "bool",
+   "label": "Flag contested",
+   "yes": "Two flags in use",
+   "no": "One national flag"
   }
  },
  "imgPrompt": "Which is the flag of {lname}?",
@@ -26,21 +33,31 @@
    "iso3": "AFG",
    "group": "Asia",
    "facts": {
-    "continent": "Asia"
+    "continent": "Asia",
+    "flagDisputed": true
    },
-   "blurb": "The national flag of Afghanistan.",
+   "blurb": "Afghanistan has two flags in use: the white Taliban flag of the de facto government since 2021, and the black, red and green tricolour of the former Islamic Republic, which the UN and many embassies abroad still used as of 2025.",
    "media": {
-    "img": [
-     {
-      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5c/Flag_of_the_Taliban.svg/330px-Flag_of_the_Taliban.svg.png",
-      "w": 330,
-      "h": 165,
-      "credit": "Original: Taliban Vector: Lexicon",
-      "license": "Public domain",
-      "page": "https://commons.wikimedia.org/wiki/File:Flag_of_the_Taliban.svg"
-     }
-    ]
+    "img": []
    },
+   "flagImages": [
+    {
+     "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5c/Flag_of_the_Taliban.svg/330px-Flag_of_the_Taliban.svg.png",
+     "w": 330,
+     "h": 165,
+     "credit": "Original: Taliban Vector: Lexicon",
+     "license": "Public domain",
+     "page": "https://commons.wikimedia.org/wiki/File:Flag_of_the_Taliban.svg"
+    },
+    {
+     "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e7/Flag_of_the_Islamic_Republic_of_Afghanistan.svg/330px-Flag_of_the_Islamic_Republic_of_Afghanistan.svg.png",
+     "w": 330,
+     "h": 220,
+     "credit": "Original: Unknown author Vector: Sabawoon Nezami",
+     "license": "Public domain",
+     "page": "https://commons.wikimedia.org/wiki/File:Flag_of_the_Islamic_Republic_of_Afghanistan.svg"
+    }
+   ],
    "difficulty": 2
   },
   {
@@ -324,7 +341,7 @@
    "facts": {
     "continent": "North America"
    },
-   "blurb": "The national flag of Bahamas.",
+   "blurb": "The national flag of the Bahamas.",
    "media": {
     "img": [
      {
@@ -876,7 +893,7 @@
    "facts": {
     "continent": "Africa"
    },
-   "blurb": "The national flag of Central African Republic.",
+   "blurb": "The national flag of the Central African Republic.",
    "media": {
     "img": [
      {
@@ -1008,7 +1025,7 @@
    "facts": {
     "continent": "Africa"
    },
-   "blurb": "The national flag of Comoros.",
+   "blurb": "The national flag of the Comoros.",
    "media": {
     "img": [
      {
@@ -1038,7 +1055,7 @@
    "facts": {
     "continent": "Africa"
    },
-   "blurb": "The national flag of Democratic Republic of the Congo.",
+   "blurb": "The national flag of the Democratic Republic of the Congo.",
    "media": {
     "img": [
      {
@@ -1067,7 +1084,7 @@
    "facts": {
     "continent": "Africa"
    },
-   "blurb": "The national flag of Republic of the Congo.",
+   "blurb": "The national flag of the Republic of the Congo.",
    "media": {
     "img": [
      {
@@ -1334,7 +1351,7 @@
    "facts": {
     "continent": "North America"
    },
-   "blurb": "The national flag of Dominican Republic.",
+   "blurb": "The national flag of the Dominican Republic.",
    "media": {
     "img": [
      {
@@ -1679,7 +1696,7 @@
    "facts": {
     "continent": "Africa"
    },
-   "blurb": "The national flag of Gambia.",
+   "blurb": "The national flag of the Gambia.",
    "media": {
     "img": [
      {
@@ -2756,7 +2773,7 @@
    "facts": {
     "continent": "Asia"
    },
-   "blurb": "The national flag of Maldives.",
+   "blurb": "The national flag of the Maldives.",
    "media": {
     "img": [
      {
@@ -2834,7 +2851,7 @@
    "facts": {
     "continent": "Oceania"
    },
-   "blurb": "The national flag of Marshall Islands.",
+   "blurb": "The national flag of the Marshall Islands.",
    "media": {
     "img": [
      {
@@ -3230,7 +3247,7 @@
    "facts": {
     "continent": "Europe"
    },
-   "blurb": "The national flag of Netherlands.",
+   "blurb": "The national flag of the Netherlands.",
    "media": {
     "img": [
      {
@@ -3430,6 +3447,32 @@
     ]
    },
    "difficulty": 1
+  },
+  {
+   "id": "oman",
+   "name": "Oman",
+   "lname": "Oman",
+   "alt": [],
+   "iso2": "OM",
+   "iso3": "OMN",
+   "group": "Asia",
+   "facts": {
+    "continent": "Asia"
+   },
+   "blurb": "The national flag of Oman.",
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a0/Flag_of_Oman_%282-1%29.svg/330px-Flag_of_Oman_%282-1%29.svg.png",
+      "w": 330,
+      "h": 165,
+      "credit": "Original: Unknown Vector: FDRMRZUSA",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Flag_of_Oman_(2-1).svg"
+     }
+    ]
+   },
+   "difficulty": 2
   },
   {
    "id": "pakistan",
@@ -3634,7 +3677,7 @@
    "facts": {
     "continent": "Asia"
    },
-   "blurb": "The national flag of Philippines.",
+   "blurb": "The national flag of the Philippines.",
    "media": {
     "img": [
      {
@@ -4063,7 +4106,7 @@
    "facts": {
     "continent": "Africa"
    },
-   "blurb": "The national flag of Seychelles.",
+   "blurb": "The national flag of the Seychelles.",
    "media": {
     "img": [
      {
@@ -4193,7 +4236,7 @@
    "facts": {
     "continent": "Oceania"
    },
-   "blurb": "The national flag of Solomon Islands.",
+   "blurb": "The national flag of the Solomon Islands.",
    "media": {
     "img": [
      {
@@ -4862,7 +4905,7 @@
    "facts": {
     "continent": "Asia"
    },
-   "blurb": "The national flag of United Arab Emirates.",
+   "blurb": "The national flag of the United Arab Emirates.",
    "media": {
     "img": [
      {
@@ -4892,7 +4935,7 @@
    "facts": {
     "continent": "Europe"
    },
-   "blurb": "The national flag of United Kingdom.",
+   "blurb": "The national flag of the United Kingdom.",
    "media": {
     "img": [
      {
@@ -4923,7 +4966,7 @@
    "facts": {
     "continent": "North America"
    },
-   "blurb": "The national flag of United States.",
+   "blurb": "The national flag of the United States.",
    "media": {
     "img": [
      {

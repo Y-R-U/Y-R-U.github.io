@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// Validates every data/packs/*.json and writes data/index.json (CONTRACT.md). Packs with errors are left out and the exit code is 1.
+// Validates every data/packs/*.json and data/music/*.json and writes data/index.json (CONTRACT.md). Packs with errors are left out and the exit code is 1.
 // Usage: node tools/build_index.mjs [--quiet] [--strict]   (--strict also fails on warnings)
 import { readdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { join, dirname } from 'node:path';
@@ -7,7 +7,6 @@ import { fileURLToPath } from 'node:url';
 import { THEMES, validatePack, packCaps } from './c1_schema.mjs';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
-const PACKS = join(ROOT, 'data/packs');
 const quiet = process.argv.includes('--quiet'), strict = process.argv.includes('--strict');
 
 const THEME_META = {
@@ -17,22 +16,24 @@ const THEME_META = {
   general: ['General knowledge', '💡'], kids: ['Kids', '🧸'],
 };
 
-let files = [];
-try { files = readdirSync(PACKS).filter(f => f.endsWith('.json')).sort(); } catch {}
+const list = dir => { try { return readdirSync(join(ROOT, 'data', dir)).filter(f => f.endsWith('.json') && !f.startsWith('_')).sort().map(f => `${dir}/${f}`); } catch { return []; } };
+// packs/*.json (C1/C2) plus music/*.json (AU); `path` tells the loader where each lives
+const files = [...list('packs'), ...list('music')];
 const allErr = [], allWarn = [];
 const packs = {};
 const byTheme = Object.fromEntries(THEMES.map(t => [t, []]));
 
 for (const f of files) {
-  const id = f.replace(/\.json$/, '');
+  const id = f.replace(/^.*\//, '').replace(/\.json$/, '');
+  if (packs[id]) { allErr.push(`pack ${id}: duplicate id (${f} and ${packs[id].path})`); continue; }
   let pack;
-  try { pack = JSON.parse(readFileSync(join(PACKS, f), 'utf8')); }
+  try { pack = JSON.parse(readFileSync(join(ROOT, 'data', f), 'utf8')); }
   catch (e) { allErr.push(`pack ${id}: invalid JSON (${e.message})`); continue; }
   const { errors, warnings } = validatePack(pack, id);
   allErr.push(...errors); allWarn.push(...warnings);
   if (errors.length) continue;
   packs[id] = {
-    title: pack.title, theme: pack.theme, icon: pack.icon, kids: !!pack.kids,
+    path: f, title: pack.title, theme: pack.theme, icon: pack.icon, kids: !!pack.kids,
     items: (pack.items || []).length, questions: (pack.questions || []).length,
     ...(pack.notice ? { notice: pack.notice } : {}),
     ...(pack.kidsSafe === false ? { kidsSafe: false } : {}),
@@ -55,6 +56,6 @@ if (!quiet || allErr.length) {
 }
 // Broken packs are left out of the index (so one lane can't block the rest) but the run still fails.
 writeFileSync(join(ROOT, 'data/index.json'), JSON.stringify(index, null, 1) + '\n');
-const skipped = files.map(f => f.replace(/\.json$/, '')).filter(id => !packs[id]);
+const skipped = files.map(f => f.replace(/^.*\//, '').replace(/\.json$/, '')).filter(id => !packs[id]);
 console.log(`build_index: ${Object.keys(packs).length} packs indexed${skipped.length ? `, SKIPPED (errors): ${skipped.join(', ')}` : ''}; ${allErr.length} error(s), ${allWarn.length} warning(s) → data/index.json`);
 if (allErr.length || (strict && allWarn.length)) process.exit(1);

@@ -106,8 +106,14 @@ for (const r of rows) {
   const isLL = (e.claims.P31 || []).some(c => c.mainsnak.datavalue?.value?.id === 'Q123480');
   if (isLL !== r.landlocked) note(`landlocked ${r.iso3} mine=${r.landlocked} wd=${isLL}`);
 }
-// Calling codes: Wikidata gives NANP members "+1" plus area code inconsistently; keep as given but tidy.
-const flags = await commonsImages(Object.values(flagFiles), { maxDim: 330 });
+// Oman's main Commons file carries an Omani government licence C1 does not accept; this redraw is public domain.
+const FLAG_OVERRIDE = { OMN: 'Flag of Oman (2-1).svg' };
+Object.assign(flagFiles, FLAG_OVERRIDE);
+// Contested national flags: shown on learn cards with both versions, never used in flag-identification questions.
+const DISPUTED_FLAGS = {
+  AFG: { files: ['Flag of the Taliban.svg', 'Flag of the Islamic Republic of Afghanistan.svg'], note: 'Afghanistan has two flags in use: the white Taliban flag of the de facto government since 2021, and the black, red and green tricolour of the former Islamic Republic, which the UN and many embassies abroad still used as of 2025.' },
+};
+const flags = await commonsImages([...Object.values(flagFiles), ...Object.values(DISPUTED_FLAGS).flatMap(d => d.files)], { maxDim: 330 });
 
 // ---- Landmarks ----
 const lmRows = LANDMARKS.trim().split('\n').map(l => {
@@ -190,7 +196,8 @@ const countryItems = usable.map(r => {
     capitalNote: capN?.note, transcontinental: TRANSCONTINENTAL.includes(r.iso3) || undefined,
     blurb: `${r.name} is in ${cont}${capN?.skip ? '' : `, with ${r.capital} as its capital`}. About ${fmtPop(r.population)} people lived there in ${r.popYear}.`,
     clues,
-    media: { img: img(flagImg) },
+    media: { img: DISPUTED_FLAGS[r.iso3] ? [] : img(flagImg) },
+    ...(DISPUTED_FLAGS[r.iso3] ? { flagDisputed: true, flagNote: DISPUTED_FLAGS[r.iso3].note, flagImages: DISPUTED_FLAGS[r.iso3].files.map(f => flags[f]).filter(m => m && !m.rejected) } : {}),
     difficulty,
   };
 });
@@ -265,9 +272,13 @@ function countryQuestions() {
 // ---- flags pack ----
 writePack({
   id: 'flags', title: 'Flags', theme: 'geography', icon: '🏳️', version: 1,
-  kids: true, factsMeta: { continent: { type: 'cat', label: 'Continent', ask: 'Which continent is {lname} in?', stmt: '{lname} is in {value}.' } },
+  kids: true, notice: 'Afghanistan’s flag is contested (two flags in use), so it appears on its learn card but not in flag questions.',
+  factsMeta: { continent: { type: 'cat', label: 'Continent', ask: 'Which continent is {lname} in?', stmt: '{lname} is in {value}.' }, flagDisputed: { type: 'bool', label: 'Flag contested', yes: 'Two flags in use', no: 'One national flag' } },
   imgPrompt: 'Which is the flag of {lname}?', nameImgPrompt: 'Which country has this flag?', tfImgPrompt: 'This is the flag of {lname}.',
-  items: countryItems.filter(i => i.media.img.length).map(i => ({ id: i.id, name: i.name, lname: i.lname, alt: i.alt, iso2: i.iso2, iso3: i.iso3, group: i.group, facts: { continent: i.facts.continent }, blurb: `The national flag of ${i.name}.`, media: i.media, difficulty: i.difficulty })),
+  items: countryItems.filter(i => i.media.img.length || i.flagDisputed).map(i => ({ id: i.id, name: i.name, lname: i.lname, alt: i.alt, iso2: i.iso2, iso3: i.iso3, group: i.group,
+    facts: { continent: i.facts.continent, ...(i.flagDisputed ? { flagDisputed: true } : {}) },
+    blurb: i.flagDisputed ? i.flagNote : `The national flag of ${i.lname}.`, media: i.media,
+    ...(i.flagDisputed ? { flagImages: i.flagImages } : {}), difficulty: i.difficulty })),
   questions: flagQuestions(),
   sources: [{ name: 'Wikimedia Commons national flags', url: 'https://commons.wikimedia.org/wiki/Category:SVG_flags_by_country' }],
 });
@@ -318,7 +329,7 @@ const capItems = capRows.map(r => {
   return {
     id: slug(r.capital) + (r.capital === r.name ? '-city' : ''), name: r.capital, alt: [...(cn?.alt || [])].filter(a => a !== r.capital),
     iso3: r.iso3, group: CONT[r.cont], facts: { country: r.name, continent: CONT[r.cont] },
-    blurb: `${r.capital} is the capital of ${r.name}.${cn ? ' ' + cn.note : ''}`, difficulty: it.difficulty,
+    blurb: `${r.capital} is the capital of ${theName(r.name)}.${cn ? ' ' + cn.note : ''}`, difficulty: it.difficulty,
   };
 });
 // Capital named after the country shares a slug; make ids unique.
@@ -331,7 +342,7 @@ function capitalQuestions() {
     const pool = capItems.filter(x => x !== c && x.group === c.group && x.name !== c.facts.country && !(c.alt || []).includes(x.name));
     const wrong = sample(r, pool, 3).map(x => x.name);
     const exp = c.blurb;
-    qs.push({ id: `cap-${c.id}`, kind: 'mc', prompt: `What is the capital of ${c.facts.country}?`, answer: c.name, wrong, explain: exp, difficulty: c.difficulty, refs: [`capitals/${c.id}`] });
+    qs.push({ id: `cap-${c.id}`, kind: 'mc', prompt: `What is the capital of ${theName(c.facts.country)}?`, answer: c.name, wrong, explain: exp, difficulty: c.difficulty, refs: [`capitals/${c.id}`] });
     if (c.name !== c.facts.country && c.difficulty <= 2) {
       const wrongC = sample(r, capItems.filter(x => x !== c && x.group === c.group), 3).map(x => x.facts.country);
       qs.push({ id: `capr-${c.id}`, kind: 'mc', prompt: `${c.name} is the capital of which country?`, answer: c.facts.country, wrong: wrongC, explain: exp, difficulty: c.difficulty, refs: [`capitals/${c.id}`] });
@@ -343,7 +354,7 @@ function capitalQuestions() {
     ['Nigeria', 'Abuja', ['Lagos', 'Kano', 'Ibadan']], ['Morocco', 'Rabat', ['Casablanca', 'Marrakesh', 'Fez']], ['Vietnam', 'Hanoi', ['Ho Chi Minh City', 'Da Nang', 'Hue']],
     ['Pakistan', 'Islamabad', ['Karachi', 'Lahore', 'Peshawar']], ['United States', 'Washington, D.C.', ['New York City', 'Los Angeles', 'Chicago']], ['Myanmar', 'Naypyidaw', ['Yangon', 'Mandalay', 'Bago']],
     ['Kazakhstan', 'Astana', ['Almaty', 'Shymkent', 'Karaganda']], ['Tanzania', 'Dodoma', ['Dar es Salaam', 'Zanzibar City', 'Arusha']], ['Ivory Coast', 'Yamoussoukro', ['Abidjan', 'Bouaké', 'San-Pédro']]];
-  for (const [country, answer, wrong] of traps) qs.push({ id: `trap-${slug(country)}`, kind: 'mc', prompt: `Trick question: what is the capital of ${country}?`, answer, wrong, explain: `The capital of ${country} is ${answer}, not its largest or best-known city.`, difficulty: 2 });
+  for (const [country, answer, wrong] of traps) qs.push({ id: `trap-${slug(country)}`, kind: 'mc', prompt: `Trick question: what is the capital of ${theName(country)}?`, answer, wrong, explain: `The capital of ${theName(country)} is ${answer}, not its largest or best-known city.`, difficulty: 2 });
   return qs;
 }
 writePack({
@@ -422,7 +433,7 @@ const langItems = langRows.map(l => {
   ].filter(c => c && !leaks(c, names));
   return { id: slug(l.name), name: l.name, group: l.family, facts: { family: l.family, branch: l.branch, script: l.script, countries: users.length },
     blurb: `${l.name} is a${/^[AEIOU]/.test(l.family) ? 'n' : ''} ${l.family} language written in the ${l.script} script${users.length ? `, and a main language of ${listAnd(users.slice(0, 5).map(u => u.name))}${users.length > 5 ? ' and others' : ''}` : ''}.`,
-    clues, difficulty: users.length >= 5 || ['Mandarin Chinese', 'Japanese', 'Russian', 'German', 'Italian', 'Hindi'].includes(l.name) ? 1 : LANG_HARD.includes(l.name) ? 3 : 2 };
+    clues, difficulty: users.length >= 5 || ['Mandarin Chinese', 'Japanese', 'Russian', 'German', 'Italian', 'Hindi', 'Korean', 'Greek', 'Turkish', 'Dutch'].includes(l.name) ? 1 : LANG_HARD.includes(l.name) ? 3 : 2 };
 });
 function languageQuestions() {
   const r = rng('languages');
@@ -450,7 +461,7 @@ function languageQuestions() {
 writePack({
   id: 'languages', title: 'Languages', theme: 'geography', icon: '🗣️', kids: false, version: 1,
   notice: '"Main languages" are the official or most widely used languages of each country, simplified.',
-  factsMeta: { family: { type: 'cat', label: 'Language family', ask: 'Which language family does {name} belong to?', stmt: '{name} belongs to the {value} family.' }, branch: { type: 'cat', label: 'Branch', ask: 'Which branch of its family does {name} belong to?', stmt: '{name} belongs to the {value} branch of its language family.' }, script: { type: 'cat', label: 'Script', ask: 'Which script is {name} normally written in?', stmt: '{name} is normally written in the {value} script.' }, countries: { type: 'num', label: 'Countries where it is a main language', higherLabel: 'More countries' } },
+  factsMeta: { family: { type: 'cat', label: 'Language family', ask: 'Which language family does {name} belong to?', stmt: '{name} belongs to the {value} family.' }, branch: { type: 'cat', label: 'Branch', ask: 'Which branch of its family does {name} belong to?', stmt: '{name} belongs to the {value} branch of its language family.' }, script: { type: 'cat', label: 'Script', ask: 'Which script is {name} normally written in?', stmt: '{name} is normally written in the {value} script.' }, countries: { type: 'num', label: 'Countries where it is a main language', higherLabel: 'More countries', askHigh: 'Which of these is a main language in the most countries?' } },
   items: langItems, questions: languageQuestions(), sources: geoSources,
 });
 

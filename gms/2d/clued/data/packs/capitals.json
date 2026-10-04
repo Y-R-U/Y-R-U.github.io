@@ -194,7 +194,7 @@
     "country": "Bahamas",
     "continent": "North America"
    },
-   "blurb": "Nassau is the capital of Bahamas.",
+   "blurb": "Nassau is the capital of the Bahamas.",
    "difficulty": 3
   },
   {
@@ -469,7 +469,7 @@
     "country": "Central African Republic",
     "continent": "Africa"
    },
-   "blurb": "Bangui is the capital of Central African Republic.",
+   "blurb": "Bangui is the capital of the Central African Republic.",
    "difficulty": 2
   },
   {
@@ -534,7 +534,7 @@
     "country": "Comoros",
     "continent": "Africa"
    },
-   "blurb": "Moroni is the capital of Comoros.",
+   "blurb": "Moroni is the capital of the Comoros.",
    "difficulty": 3
   },
   {
@@ -547,7 +547,7 @@
     "country": "Democratic Republic of the Congo",
     "continent": "Africa"
    },
-   "blurb": "Kinshasa is the capital of Democratic Republic of the Congo.",
+   "blurb": "Kinshasa is the capital of the Democratic Republic of the Congo.",
    "difficulty": 2
   },
   {
@@ -560,7 +560,7 @@
     "country": "Republic of the Congo",
     "continent": "Africa"
    },
-   "blurb": "Brazzaville is the capital of Republic of the Congo.",
+   "blurb": "Brazzaville is the capital of the Republic of the Congo.",
    "difficulty": 2
   },
   {
@@ -690,7 +690,7 @@
     "country": "Dominican Republic",
     "continent": "North America"
    },
-   "blurb": "Santo Domingo is the capital of Dominican Republic.",
+   "blurb": "Santo Domingo is the capital of the Dominican Republic.",
    "difficulty": 2
   },
   {
@@ -848,7 +848,7 @@
     "country": "Gambia",
     "continent": "Africa"
    },
-   "blurb": "Banjul is the capital of Gambia.",
+   "blurb": "Banjul is the capital of the Gambia.",
    "difficulty": 3
   },
   {
@@ -1368,7 +1368,7 @@
     "country": "Maldives",
     "continent": "Asia"
    },
-   "blurb": "Malé is the capital of Maldives.",
+   "blurb": "Malé is the capital of the Maldives.",
    "difficulty": 3
   },
   {
@@ -1407,7 +1407,7 @@
     "country": "Marshall Islands",
     "continent": "Oceania"
    },
-   "blurb": "Majuro is the capital of Marshall Islands.",
+   "blurb": "Majuro is the capital of the Marshall Islands.",
    "difficulty": 3
   },
   {
@@ -1589,7 +1589,7 @@
     "country": "Netherlands",
     "continent": "Europe"
    },
-   "blurb": "Amsterdam is the capital of Netherlands. Amsterdam is the constitutional capital; the government sits in The Hague.",
+   "blurb": "Amsterdam is the capital of the Netherlands. Amsterdam is the constitutional capital; the government sits in The Hague.",
    "difficulty": 1
   },
   {
@@ -1784,7 +1784,7 @@
     "country": "Philippines",
     "continent": "Asia"
    },
-   "blurb": "Manila is the capital of Philippines.",
+   "blurb": "Manila is the capital of the Philippines.",
    "difficulty": 2
   },
   {
@@ -1992,7 +1992,7 @@
     "country": "Seychelles",
     "continent": "Africa"
    },
-   "blurb": "Victoria is the capital of Seychelles.",
+   "blurb": "Victoria is the capital of the Seychelles.",
    "difficulty": 3
   },
   {
@@ -2057,7 +2057,7 @@
     "country": "Solomon Islands",
     "continent": "Oceania"
    },
-   "blurb": "Honiara is the capital of Solomon Islands.",
+   "blurb": "Honiara is the capital of the Solomon Islands.",
    "difficulty": 3
   },
   {
@@ -2387,7 +2387,7 @@
     "country": "United Arab Emirates",
     "continent": "Asia"
    },
-   "blurb": "Abu Dhabi is the capital of United Arab Emirates.",
+   "blurb": "Abu Dhabi is the capital of the United Arab Emirates.",
    "difficulty": 2
   },
   {
@@ -2400,7 +2400,7 @@
     "country": "United Kingdom",
     "continent": "Europe"
    },
-   "blurb": "London is the capital of United Kingdom.",
+   "blurb": "London is the capital of the United Kingdom.",
    "difficulty": 1
   },
   {
@@ -2413,7 +2413,7 @@
     "country": "United States",
     "continent": "North America"
    },
-   "blurb": "Washington, D.C. is the capital of United States.",
+   "blurb": "Washington, D.C. is the capital of the United States.",
    "difficulty": 1
   },
   {
@@ -2829,14 +2829,14 @@
   {
    "id": "cap-nassau",
    "kind": "mc",
-   "prompt": "What is the capital of Bahamas?",
+   "prompt": "What is the capital of the Bahamas?",
    "answer": "Nassau",
    "wrong": [
     "Tegucigalpa",
     "San Salvador",
     "Havana"
    ],
-   "explain": "Nassau is the capital of Bahamas.",
+   "explain": "Nassau is the capital of the Bahamas.",
    "difficulty": 3,
    "refs": [
     "capitals/nassau"
@@ -3373,14 +3373,14 @@
   {
    "id": "cap-bangui",
    "kind": "mc",
-   "prompt": "What is the capital of Central African Republic?",
+   "prompt": "What is the capital of the Central African Republic?",
    "answer": "Bangui",
    "wrong": [
     "Libreville",
     "Djibouti",
     "Nouakchott"
    ],
-   "explain": "Bangui is the capital of Central African Republic.",
+   "explain": "Bangui is the capital of the Central African Republic.",
    "difficulty": 2,
    "refs": [
     "capitals/bangui"
@@ -3396,7 +3396,7 @@
     "Cameroon",
     "Kenya"
    ],
-   "explain": "Bangui is the capital of Central African Republic.",
+   "explain": "Bangui is the capital of the Central African Republic.",
    "difficulty": 2,
    "refs": [
     "capitals/bangui"
@@ -3533,14 +3533,14 @@
   {
    "id": "cap-moroni",
    "kind": "mc",
-   "prompt": "What is the capital of Comoros?",
+   "prompt": "What is the capital of the Comoros?",
    "answer": "Moroni",
    "wrong": [
     "Mogadishu",
     "Kinshasa",
     "Bangui"
    ],
-   "explain": "Moroni is the capital of Comoros.",
+   "explain": "Moroni is the capital of the Comoros.",
    "difficulty": 3,
    "refs": [
     "capitals/moroni"
@@ -3549,14 +3549,14 @@
   {
    "id": "cap-kinshasa",
    "kind": "mc",
-   "prompt": "What is the capital of Democratic Republic of the Congo?",
+   "prompt": "What is the capital of the Democratic Republic of the Congo?",
    "answer": "Kinshasa",
    "wrong": [
     "Bissau",
     "Mbabane",
     "Luanda"
    ],
-   "explain": "Kinshasa is the capital of Democratic Republic of the Congo.",
+   "explain": "Kinshasa is the capital of the Democratic Republic of the Congo.",
    "difficulty": 2,
    "refs": [
     "capitals/kinshasa"
@@ -3572,7 +3572,7 @@
     "Sierra Leone",
     "Egypt"
    ],
-   "explain": "Kinshasa is the capital of Democratic Republic of the Congo.",
+   "explain": "Kinshasa is the capital of the Democratic Republic of the Congo.",
    "difficulty": 2,
    "refs": [
     "capitals/kinshasa"
@@ -3581,14 +3581,14 @@
   {
    "id": "cap-brazzaville",
    "kind": "mc",
-   "prompt": "What is the capital of Republic of the Congo?",
+   "prompt": "What is the capital of the Republic of the Congo?",
    "answer": "Brazzaville",
    "wrong": [
     "Victoria",
     "Algiers",
     "Juba"
    ],
-   "explain": "Brazzaville is the capital of Republic of the Congo.",
+   "explain": "Brazzaville is the capital of the Republic of the Congo.",
    "difficulty": 2,
    "refs": [
     "capitals/brazzaville"
@@ -3604,7 +3604,7 @@
     "Eswatini",
     "Ethiopia"
    ],
-   "explain": "Brazzaville is the capital of Republic of the Congo.",
+   "explain": "Brazzaville is the capital of the Republic of the Congo.",
    "difficulty": 2,
    "refs": [
     "capitals/brazzaville"
@@ -3853,14 +3853,14 @@
   {
    "id": "cap-santo-domingo",
    "kind": "mc",
-   "prompt": "What is the capital of Dominican Republic?",
+   "prompt": "What is the capital of the Dominican Republic?",
    "answer": "Santo Domingo",
    "wrong": [
     "Guatemala City",
     "Managua",
     "Bridgetown"
    ],
-   "explain": "Santo Domingo is the capital of Dominican Republic.",
+   "explain": "Santo Domingo is the capital of the Dominican Republic.",
    "difficulty": 2,
    "refs": [
     "capitals/santo-domingo"
@@ -3876,7 +3876,7 @@
     "Nicaragua",
     "Panama"
    ],
-   "explain": "Santo Domingo is the capital of Dominican Republic.",
+   "explain": "Santo Domingo is the capital of the Dominican Republic.",
    "difficulty": 2,
    "refs": [
     "capitals/santo-domingo"
@@ -4173,14 +4173,14 @@
   {
    "id": "cap-banjul",
    "kind": "mc",
-   "prompt": "What is the capital of Gambia?",
+   "prompt": "What is the capital of the Gambia?",
    "answer": "Banjul",
    "wrong": [
     "Khartoum",
     "Bissau",
     "Praia"
    ],
-   "explain": "Banjul is the capital of Gambia.",
+   "explain": "Banjul is the capital of the Gambia.",
    "difficulty": 3,
    "refs": [
     "capitals/banjul"
@@ -5293,14 +5293,14 @@
   {
    "id": "cap-male",
    "kind": "mc",
-   "prompt": "What is the capital of Maldives?",
+   "prompt": "What is the capital of the Maldives?",
    "answer": "Malé",
    "wrong": [
     "Hanoi",
     "Islamabad",
     "Bandar Seri Begawan"
    ],
-   "explain": "Malé is the capital of Maldives.",
+   "explain": "Malé is the capital of the Maldives.",
    "difficulty": 3,
    "refs": [
     "capitals/male"
@@ -5357,14 +5357,14 @@
   {
    "id": "cap-majuro",
    "kind": "mc",
-   "prompt": "What is the capital of Marshall Islands?",
+   "prompt": "What is the capital of the Marshall Islands?",
    "answer": "Majuro",
    "wrong": [
     "South Tarawa",
     "Port Moresby",
     "Nukuʻalofa"
    ],
-   "explain": "Majuro is the capital of Marshall Islands.",
+   "explain": "Majuro is the capital of the Marshall Islands.",
    "difficulty": 3,
    "refs": [
     "capitals/majuro"
@@ -5709,14 +5709,14 @@
   {
    "id": "cap-amsterdam",
    "kind": "mc",
-   "prompt": "What is the capital of Netherlands?",
+   "prompt": "What is the capital of the Netherlands?",
    "answer": "Amsterdam",
    "wrong": [
     "Chișinău",
     "Madrid",
     "Rome"
    ],
-   "explain": "Amsterdam is the capital of Netherlands. Amsterdam is the constitutional capital; the government sits in The Hague.",
+   "explain": "Amsterdam is the capital of the Netherlands. Amsterdam is the constitutional capital; the government sits in The Hague.",
    "difficulty": 1,
    "refs": [
     "capitals/amsterdam"
@@ -5732,7 +5732,7 @@
     "Belarus",
     "Sweden"
    ],
-   "explain": "Amsterdam is the capital of Netherlands. Amsterdam is the constitutional capital; the government sits in The Hague.",
+   "explain": "Amsterdam is the capital of the Netherlands. Amsterdam is the constitutional capital; the government sits in The Hague.",
    "difficulty": 1,
    "refs": [
     "capitals/amsterdam"
@@ -6157,14 +6157,14 @@
   {
    "id": "cap-manila",
    "kind": "mc",
-   "prompt": "What is the capital of Philippines?",
+   "prompt": "What is the capital of the Philippines?",
    "answer": "Manila",
    "wrong": [
     "Bandar Seri Begawan",
     "Seoul",
     "Dushanbe"
    ],
-   "explain": "Manila is the capital of Philippines.",
+   "explain": "Manila is the capital of the Philippines.",
    "difficulty": 2,
    "refs": [
     "capitals/manila"
@@ -6180,7 +6180,7 @@
     "Armenia",
     "Indonesia"
    ],
-   "explain": "Manila is the capital of Philippines.",
+   "explain": "Manila is the capital of the Philippines.",
    "difficulty": 2,
    "refs": [
     "capitals/manila"
@@ -6557,14 +6557,14 @@
   {
    "id": "cap-victoria",
    "kind": "mc",
-   "prompt": "What is the capital of Seychelles?",
+   "prompt": "What is the capital of the Seychelles?",
    "answer": "Victoria",
    "wrong": [
     "Yaoundé",
     "Kampala",
     "Lilongwe"
    ],
-   "explain": "Victoria is the capital of Seychelles.",
+   "explain": "Victoria is the capital of the Seychelles.",
    "difficulty": 3,
    "refs": [
     "capitals/victoria"
@@ -6669,14 +6669,14 @@
   {
    "id": "cap-honiara",
    "kind": "mc",
-   "prompt": "What is the capital of Solomon Islands?",
+   "prompt": "What is the capital of the Solomon Islands?",
    "answer": "Honiara",
    "wrong": [
     "Wellington",
     "Ngerulmud",
     "Canberra"
    ],
-   "explain": "Honiara is the capital of Solomon Islands.",
+   "explain": "Honiara is the capital of the Solomon Islands.",
    "difficulty": 3,
    "refs": [
     "capitals/honiara"
@@ -7373,14 +7373,14 @@
   {
    "id": "cap-abu-dhabi",
    "kind": "mc",
-   "prompt": "What is the capital of United Arab Emirates?",
+   "prompt": "What is the capital of the United Arab Emirates?",
    "answer": "Abu Dhabi",
    "wrong": [
     "Dhaka",
     "Beirut",
     "Tehran"
    ],
-   "explain": "Abu Dhabi is the capital of United Arab Emirates.",
+   "explain": "Abu Dhabi is the capital of the United Arab Emirates.",
    "difficulty": 2,
    "refs": [
     "capitals/abu-dhabi"
@@ -7396,7 +7396,7 @@
     "Bhutan",
     "Uzbekistan"
    ],
-   "explain": "Abu Dhabi is the capital of United Arab Emirates.",
+   "explain": "Abu Dhabi is the capital of the United Arab Emirates.",
    "difficulty": 2,
    "refs": [
     "capitals/abu-dhabi"
@@ -7405,14 +7405,14 @@
   {
    "id": "cap-london",
    "kind": "mc",
-   "prompt": "What is the capital of United Kingdom?",
+   "prompt": "What is the capital of the United Kingdom?",
    "answer": "London",
    "wrong": [
     "Brussels",
     "Prague",
     "Berlin"
    ],
-   "explain": "London is the capital of United Kingdom.",
+   "explain": "London is the capital of the United Kingdom.",
    "difficulty": 1,
    "refs": [
     "capitals/london"
@@ -7428,7 +7428,7 @@
     "Hungary",
     "Malta"
    ],
-   "explain": "London is the capital of United Kingdom.",
+   "explain": "London is the capital of the United Kingdom.",
    "difficulty": 1,
    "refs": [
     "capitals/london"
@@ -7437,14 +7437,14 @@
   {
    "id": "cap-washington-d-c",
    "kind": "mc",
-   "prompt": "What is the capital of United States?",
+   "prompt": "What is the capital of the United States?",
    "answer": "Washington, D.C.",
    "wrong": [
     "Ottawa",
     "Kingstown",
     "Basseterre"
    ],
-   "explain": "Washington, D.C. is the capital of United States.",
+   "explain": "Washington, D.C. is the capital of the United States.",
    "difficulty": 1,
    "refs": [
     "capitals/washington-d-c"
@@ -7460,7 +7460,7 @@
     "El Salvador",
     "Costa Rica"
    ],
-   "explain": "Washington, D.C. is the capital of United States.",
+   "explain": "Washington, D.C. is the capital of the United States.",
    "difficulty": 1,
    "refs": [
     "capitals/washington-d-c"
@@ -7823,14 +7823,14 @@
   {
    "id": "trap-united-states",
    "kind": "mc",
-   "prompt": "Trick question: what is the capital of United States?",
+   "prompt": "Trick question: what is the capital of the United States?",
    "answer": "Washington, D.C.",
    "wrong": [
     "New York City",
     "Los Angeles",
     "Chicago"
    ],
-   "explain": "The capital of United States is Washington, D.C., not its largest or best-known city.",
+   "explain": "The capital of the United States is Washington, D.C., not its largest or best-known city.",
    "difficulty": 2
   },
   {

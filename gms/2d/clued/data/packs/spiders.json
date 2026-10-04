@@ -6,6 +6,9 @@
  "kids": true,
  "version": 1,
  "notice": "Not for real-world identification.",
+ "imgPrompt": "Which of these is {aName}?",
+ "nameImgPrompt": "Which spider is this?",
+ "tfImgPrompt": "This spider is {aName}.",
  "leakExempt": [
   "spider",
   "spiders"
@@ -19,29 +22,41 @@
     "Mildly venomous",
     "Dangerous",
     "Potentially deadly"
-   ]
+   ],
+   "ask": "How dangerous is a bite from the {lname}?",
+   "askReverse": "Which of these spiders is rated \"{lvalue}\" to people?",
+   "stmt": "A bite from the {lname} is rated \"{lvalue}\"."
   },
   "region": {
    "type": "cat",
-   "label": "Found in"
+   "label": "Found in",
+   "ask": "Where does the {lname} live?",
+   "askReverse": "Which of these spiders lives in {value}?",
+   "stmt": "The {lname} lives in {value}.",
+   "exclusive": false
   },
   "web": {
    "type": "bool",
    "label": "Catches prey in a web",
    "yes": "Web builder",
-   "no": "Hunts without a web"
+   "no": "Hunts without a web",
+   "askBool": "Which of these spiders catches its prey in a web?",
+   "stmt": "The {lname} catches its prey in a web."
   },
   "legSpanCm": {
    "type": "num",
    "label": "Leg span",
    "unit": "cm",
-   "higherLabel": "Bigger"
+   "higherLabel": "Bigger",
+   "askHigh": "Which of these spiders has the biggest leg span?",
+   "askLow": "Which of these spiders has the smallest leg span?"
   }
  },
  "items": [
   {
    "id": "sydney-funnel-web-spider",
    "name": "Sydney funnel-web spider",
+   "lname": "Sydney funnel-web spider",
    "alt": [
     "funnel-web",
     "Sydney funnel-web"
@@ -69,10 +84,26 @@
     "It lives in silk-lined burrows around Australia's biggest city.",
     "It is said to be the deadliest spider in the world.",
     "The answer has 4 words (6, 6, 3, 6 letters).",
-    "It starts with the letter S."
+    "Its first letter is S."
    ],
    "media": {
     "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/9/9f/Atrax_robustus.jpg/500px-Atrax_robustus.jpg",
+      "w": 500,
+      "h": 431,
+      "credit": "User:Tirin",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Atrax_robustus.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/f/f0/Atrax_Robustus.jpg/330px-Atrax_Robustus.jpg",
+      "w": 330,
+      "h": 440,
+      "credit": "Sputniktilt",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Atrax_Robustus.jpg"
+     },
      {
       "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/54337827/medium.jpeg",
       "w": 500,
@@ -80,22 +111,6 @@
       "credit": "Thomas Mesaglio",
       "license": "CC BY 4.0",
       "page": "https://www.inaturalist.org/photos/54337827"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/730150310/medium.jpg",
-      "w": 500,
-      "h": 400,
-      "credit": "Austen Armstrong",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/730150310"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/439587310/medium.jpg",
-      "w": 500,
-      "h": 500,
-      "credit": "James K. Douch",
-      "license": "CC BY-SA 4.0",
-      "page": "https://www.inaturalist.org/photos/439587310"
      }
     ]
    },
@@ -131,10 +146,26 @@
     "A pub song is about one hiding under a toilet seat.",
     "The female is shiny black with a red stripe.",
     "The answer has 2 words (7, 6 letters).",
-    "It starts with the letter R."
+    "Its first letter is R."
    ],
    "media": {
     "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/6/68/Latrodectus_hasselti_male.png/500px-Latrodectus_hasselti_male.png",
+      "w": 500,
+      "h": 354,
+      "credit": "Wocky",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Latrodectus_hasselti_male.png"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/a/a7/Latrodectus_hasselti_close.jpg/500px-Latrodectus_hasselti_close.jpg",
+      "w": 500,
+      "h": 265,
+      "credit": "Toby Hudson",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Latrodectus_hasselti_close.jpg"
+     },
      {
       "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/341431303/medium.jpg",
       "w": 500,
@@ -142,22 +173,6 @@
       "credit": "Paul Whitington",
       "license": "CC BY 4.0",
       "page": "https://www.inaturalist.org/photos/341431303"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/1219463/medium.",
-      "w": 500,
-      "h": 349,
-      "credit": "Steve Kerr",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/1219463"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/198549922/medium.jpeg",
-      "w": 500,
-      "h": 472,
-      "credit": "William Harland",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/198549922"
      }
     ]
    },
@@ -185,7 +200,7 @@
     "It hunts without a catching web.",
     "It has a cigar-shaped grey body.",
     "The answer has 3 words (5, 6, 6 letters).",
-    "It starts with the letter W."
+    "Its first letter is W."
    ],
    "media": {
     "img": [
@@ -244,10 +259,18 @@
     "The giant species from Laos has a leg span of about 30 cm.",
     "It is a large, hairy, flat spider common in Australian homes.",
     "The answer has 2 words (8, 6 letters).",
-    "It starts with the letter H."
+    "Its first letter is H."
    ],
    "media": {
     "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/f/f7/Sparassidae_Palystes_castaneus_mature_female_9923s.jpg/500px-Sparassidae_Palystes_castaneus_mature_female_9923s.jpg",
+      "w": 500,
+      "h": 388,
+      "credit": "JonRichfield",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Sparassidae_Palystes_castaneus_mature_female_9923s.jpg"
+     },
      {
       "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/7497532/medium.jpeg",
       "w": 500,
@@ -263,14 +286,6 @@
       "credit": "Matt Muir",
       "license": "CC BY 4.0",
       "page": "https://www.inaturalist.org/photos/5655389"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/3939983/medium.JPG",
-      "w": 500,
-      "h": 333,
-      "credit": "Juan Cruzado Cortés",
-      "license": "CC BY-SA 4.0",
-      "page": "https://www.inaturalist.org/photos/3939983"
      }
     ]
    },
@@ -279,6 +294,7 @@
   {
    "id": "australian-golden-orb-weaver",
    "name": "Australian golden orb-weaver",
+   "lname": "Australian golden orb-weaver",
    "alt": [
     "golden orb-weaver",
     "golden orb weaver"
@@ -305,18 +321,10 @@
     "The female has long legs with tufts at the joints.",
     "Its silk shines like a precious yellow metal.",
     "The answer has 4 words (10, 6, 3, 6 letters).",
-    "It starts with the letter A."
+    "Its first letter is A."
    ],
    "media": {
     "img": [
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/632219672/medium.jpg",
-      "w": 500,
-      "h": 333,
-      "credit": "no rights reserved",
-      "license": "CC0 1.0",
-      "page": "https://www.inaturalist.org/photos/632219672"
-     },
      {
       "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/488190687/medium.jpg",
       "w": 500,
@@ -332,6 +340,14 @@
       "credit": "jirau",
       "license": "CC BY-SA 4.0",
       "page": "https://www.inaturalist.org/photos/466303500"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/318418734/medium.jpeg",
+      "w": 378,
+      "h": 500,
+      "credit": "Carly Young",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/318418734"
      }
     ]
    },
@@ -366,7 +382,7 @@
     "Males often roam in daylight after rain.",
     "It is named after a small rodent.",
     "The answer has 3 words (7, 5, 6 letters).",
-    "It starts with the letter E."
+    "Its first letter is E."
    ],
    "media": {
     "img": [
@@ -423,7 +439,7 @@
     "It is often confused with the funnel-web.",
     "Its burrow has a hinged lid.",
     "The answer has 2 words (8, 6 letters).",
-    "It starts with the letter T."
+    "Its first letter is T."
    ],
    "media": {
     "img": [
@@ -480,10 +496,26 @@
     "They hunt on the ground at night.",
     "They are named after a wild dog that hunts in packs.",
     "The answer has 2 words (4, 6 letters).",
-    "It starts with the letter W."
+    "Its first letter is W."
    ],
    "media": {
     "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/2/25/Hogna_lenta_18.jpg/500px-Hogna_lenta_18.jpg",
+      "w": 500,
+      "h": 528,
+      "credit": "Patrick Edwin Moran",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Hogna_lenta_18.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/d/df/Wolf_spider_tunnel.jpg/500px-Wolf_spider_tunnel.jpg",
+      "w": 500,
+      "h": 465,
+      "credit": "Wikimedia Commons",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Wolf_spider_tunnel.jpg"
+     },
      {
       "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/491213904/medium.png",
       "w": 500,
@@ -491,22 +523,6 @@
       "credit": "Thomas Shahan",
       "license": "CC BY 4.0",
       "page": "https://www.inaturalist.org/photos/491213904"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/105142118/medium.jpg",
-      "w": 500,
-      "h": 313,
-      "credit": "Rudolph Steenkamp",
-      "license": "CC BY-SA 4.0",
-      "page": "https://www.inaturalist.org/photos/105142118"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/422908850/medium.jpg",
-      "w": 500,
-      "h": 375,
-      "credit": "Анатолий Озерной /Anatoly Ozernoy",
-      "license": "CC BY-SA 4.0",
-      "page": "https://www.inaturalist.org/photos/422908850"
      }
     ]
    },
@@ -535,17 +551,25 @@
     "The male shows off a bright fan on his back.",
     "It is named after a showy bird.",
     "The answer has 2 words (7, 6 letters).",
-    "It starts with the letter P."
+    "Its first letter is P."
    ],
    "media": {
     "img": [
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/9559732/medium.jpg",
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/5/53/MalePeacockSpider.jpg/500px-MalePeacockSpider.jpg",
       "w": 500,
-      "h": 333,
-      "credit": "Lek Khauv",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/9559732"
+      "h": 438,
+      "credit": "Jürgen Otto",
+      "license": "CC BY-SA 2.0",
+      "page": "https://commons.wikimedia.org/wiki/File:MalePeacockSpider.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/7/78/Maratus_vespertilio_female.jpg/500px-Maratus_vespertilio_female.jpg",
+      "w": 500,
+      "h": 334,
+      "credit": "Jean and Fred Hort from Perth, Australia",
+      "license": "CC BY 2.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Maratus_vespertilio_female.jpg"
      },
      {
       "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/74345276/medium.jpeg",
@@ -554,14 +578,6 @@
       "credit": "Mark Ridgway",
       "license": "CC BY 4.0",
       "page": "https://www.inaturalist.org/photos/74345276"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/160634068/medium.jpg",
-      "w": 500,
-      "h": 334,
-      "credit": "Nigel Main",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/160634068"
      }
     ]
    },
@@ -570,6 +586,7 @@
   {
    "id": "st-andrews-cross-spider",
    "name": "St Andrew's cross spider",
+   "lname": "St Andrew's cross spider",
    "sci": "Argiope keyserlingi",
    "group": "orb-weaver",
    "facts": {
@@ -592,7 +609,7 @@
     "It catches prey in a web.",
     "The bands form an X shape.",
     "The answer has 4 words (2, 7, 5, 6 letters).",
-    "It starts with the letter S."
+    "Its first letter is S."
    ],
    "media": {
     "img": [
@@ -650,7 +667,7 @@
     "Its bite is painful but not dangerous.",
     "It is a dark spider that lives on buildings.",
     "The answer has 3 words (5, 5, 6 letters).",
-    "It starts with the letter B."
+    "Its first letter is B."
    ],
    "media": {
     "img": [
@@ -708,33 +725,33 @@
     "It catches prey in a web.",
     "It lives in house corners and ceilings.",
     "The answer has 4 words (5, 4, 4, 6 letters).",
-    "It starts with the letter D."
+    "Its first letter is D."
    ],
    "media": {
     "img": [
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/411699/medium.jpg",
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/b/bf/Pholcus.phalangioides.6905.jpg/500px-Pholcus.phalangioides.6905.jpg",
       "w": 500,
-      "h": 347,
-      "credit": "no rights reserved",
-      "license": "CC0 1.0",
-      "page": "https://www.inaturalist.org/photos/411699"
+      "h": 333,
+      "credit": "Olei",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Pholcus.phalangioides.6905.jpg"
      },
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/221464692/medium.jpg",
-      "w": 400,
-      "h": 500,
-      "credit": "Rupert Lees",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/221464692"
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/6/6d/Pholcus.phalangioides.6908.jpg/500px-Pholcus.phalangioides.6908.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Olei",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Pholcus.phalangioides.6908.jpg"
      },
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/207839008/medium.jpeg",
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/d/dc/Smeringopus_natalensis_301141651_542639013.jpg/500px-Smeringopus_natalensis_301141651_542639013.jpg",
       "w": 500,
-      "h": 375,
-      "credit": "Gavin Slater",
+      "h": 424,
+      "credit": "Peter Webb",
       "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/207839008"
+      "page": "https://commons.wikimedia.org/wiki/File:Smeringopus_natalensis_301141651_542639013.jpg"
      }
     ]
    },
@@ -743,6 +760,7 @@
   {
    "id": "christmas-spider",
    "name": "Christmas spider",
+   "lname": "Christmas spider",
    "alt": [
     "jewel spider"
    ],
@@ -766,7 +784,7 @@
     "It is common in Australian gardens in December.",
     "It is named after a holiday.",
     "The answer has 2 words (9, 6 letters).",
-    "It starts with the letter C."
+    "Its first letter is C."
    ],
    "media": {
     "img": [
@@ -820,7 +838,7 @@
     "It hunts without a catching web.",
     "Predators ignore it because of how it looks.",
     "The answer has 3 words (4, 8, 6 letters).",
-    "It starts with the letter B."
+    "Its first letter is B."
    ],
    "media": {
     "img": [
@@ -883,33 +901,33 @@
     "Its belly has a red hourglass mark.",
     "Its name means a woman whose husband has died.",
     "The answer has 2 words (5, 5 letters).",
-    "It starts with the letter B."
+    "Its first letter is B."
    ],
    "media": {
     "img": [
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/107951399/medium.jpg",
-      "w": 500,
-      "h": 500,
-      "credit": "Haydeé Salmones",
-      "license": "CC BY-SA 4.0",
-      "page": "https://www.inaturalist.org/photos/107951399"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/479144847/medium.jpg",
-      "w": 500,
-      "h": 333,
-      "credit": "DiegoH",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/479144847"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/58786745/medium.jpeg",
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/3/3e/Latrodectus_tridecimguttatus.jpg/500px-Latrodectus_tridecimguttatus.jpg",
       "w": 500,
       "h": 375,
-      "credit": "Justin Quintanilla",
+      "credit": "Alfried H., Germany",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Latrodectus_tridecimguttatus.jpg"
+     },
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/c/cd/Black_Widow_11-06.jpg",
+      "w": 500,
+      "h": 325,
+      "credit": "Wikimedia Commons",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Black_Widow_11-06.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/9/9c/Latrodectus_hesperus_Berkeley%2C_California.jpg/500px-Latrodectus_hesperus_Berkeley%2C_California.jpg",
+      "w": 500,
+      "h": 373,
+      "credit": "Ken-ichi Ueda",
       "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/58786745"
+      "page": "https://commons.wikimedia.org/wiki/File:Latrodectus_hesperus_Berkeley,_California.jpg"
      }
     ]
    },
@@ -940,7 +958,7 @@
     "It catches prey in a web.",
     "Its venom is strong but it injects very little.",
     "The answer has 2 words (5, 5 letters).",
-    "It starts with the letter B."
+    "Its first letter is B."
    ],
    "media": {
     "img": [
@@ -998,7 +1016,7 @@
     "It hunts without a catching web.",
     "Its name means it likes to be alone.",
     "The answer has 2 words (5, 7 letters).",
-    "It starts with the letter B."
+    "Its first letter is B."
    ],
    "media": {
     "img": [
@@ -1033,6 +1051,7 @@
   {
    "id": "brazilian-wandering-spider",
    "name": "Brazilian wandering spider",
+   "lname": "Brazilian wandering spider",
    "alt": [
     "banana spider",
     "armed spider"
@@ -1056,7 +1075,7 @@
     "It hunts without a catching web.",
     "It comes from the largest country in South America.",
     "The answer has 3 words (9, 9, 6 letters).",
-    "It starts with the letter B."
+    "Its first letter is B."
    ],
    "media": {
     "img": [
@@ -1110,7 +1129,7 @@
     "It hunts without a catching web.",
     "It has fewer eyes than most spiders.",
     "The answer has 4 words (3, 4, 4, 6 letters).",
-    "It starts with the letter S."
+    "Its first letter is S."
    ],
    "media": {
     "img": [
@@ -1145,6 +1164,7 @@
   {
    "id": "goliath-birdeater",
    "name": "Goliath birdeater",
+   "lname": "Goliath birdeater",
    "sci": "Theraphosa blondi",
    "group": "tarantula",
    "facts": {
@@ -1169,10 +1189,18 @@
     "It is the heaviest spider in the world.",
     "It is named after a biblical giant.",
     "The answer has 2 words (7, 9 letters).",
-    "It starts with the letter G."
+    "Its first letter is G."
    ],
    "media": {
     "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/f/fa/Theraphosa_blondi_MHNT.jpg/330px-Theraphosa_blondi_MHNT.jpg",
+      "w": 330,
+      "h": 482,
+      "credit": "Didier Descouens",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Theraphosa_blondi_MHNT.jpg"
+     },
      {
       "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/248249214/medium.jpeg",
       "w": 500,
@@ -1188,14 +1216,6 @@
       "credit": "martin ingemansson",
       "license": "CC BY 4.0",
       "page": "https://www.inaturalist.org/photos/253266804"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/262923074/medium.jpg",
-      "w": 500,
-      "h": 333,
-      "credit": "Kristof Zyskowski",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/262923074"
      }
     ]
    },
@@ -1204,6 +1224,7 @@
   {
    "id": "mexican-red-knee-tarantula",
    "name": "Mexican red-knee tarantula",
+   "lname": "Mexican red-knee tarantula",
    "sci": "Brachypelma hamorii",
    "group": "tarantula",
    "facts": {
@@ -1229,7 +1250,7 @@
     "Its legs have orange bands at the joints.",
     "It comes from the country just south of the USA.",
     "The answer has 4 words (7, 3, 4, 9 letters).",
-    "It starts with the letter M."
+    "Its first letter is M."
    ],
    "media": {
     "img": [
@@ -1264,6 +1285,7 @@
   {
    "id": "chilean-rose-tarantula",
    "name": "Chilean rose tarantula",
+   "lname": "Chilean rose tarantula",
    "sci": "Grammostola rosea",
    "group": "tarantula",
    "facts": {
@@ -1288,7 +1310,7 @@
     "It comes from a long, thin country in South America.",
     "It is named after a flower.",
     "The answer has 3 words (7, 4, 9 letters).",
-    "It starts with the letter C."
+    "Its first letter is C."
    ],
    "media": {
     "img": [
@@ -1347,7 +1369,7 @@
     "Its legs are a bright metallic blue.",
     "It is named after a blue gemstone.",
     "The answer has 3 words (5, 8, 9 letters).",
-    "It starts with the letter G."
+    "Its first letter is G."
    ],
    "media": {
     "img": [
@@ -1374,6 +1396,7 @@
   {
    "id": "european-garden-spider",
    "name": "European garden spider",
+   "lname": "European garden spider",
    "alt": [
     "cross spider"
    ],
@@ -1397,10 +1420,26 @@
     "Its bite is harmless to people.",
     "It catches prey in a web.",
     "The answer has 3 words (8, 6, 6 letters).",
-    "It starts with the letter E."
+    "Its first letter is E."
    ],
    "media": {
     "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/b/b6/Araneus_diadematus%2C_male_%2837101899151%29.jpg/500px-Araneus_diadematus%2C_male_%2837101899151%29.jpg",
+      "w": 500,
+      "h": 426,
+      "credit": "gailhampshire from Cradley, Malvern, U.K",
+      "license": "CC BY 2.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Araneus_diadematus,_male_(37101899151).jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/16/Araneus_diadematus_MHNT_Femelle_Fronton.jpg/500px-Araneus_diadematus_MHNT_Femelle_Fronton.jpg",
+      "w": 500,
+      "h": 488,
+      "credit": "Didier Descouens",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Araneus_diadematus_MHNT_Femelle_Fronton.jpg"
+     },
      {
       "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/156036389/medium.jpg",
       "w": 500,
@@ -1408,22 +1447,6 @@
       "credit": "hedera.baltica",
       "license": "CC BY-SA 4.0",
       "page": "https://www.inaturalist.org/photos/156036389"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/156036390/medium.jpg",
-      "w": 500,
-      "h": 388,
-      "credit": "Thomas Bresson",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/156036390"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/163051738/medium.jpg",
-      "w": 500,
-      "h": 375,
-      "credit": "Анатолий Озерной /Anatoly Ozernoy",
-      "license": "CC BY-SA 4.0",
-      "page": "https://www.inaturalist.org/photos/163051738"
      }
     ]
    },
@@ -1456,33 +1479,33 @@
     "It is striped yellow and black.",
     "It is named after a stinging insect it looks like.",
     "The answer has 2 words (4, 6 letters).",
-    "It starts with the letter W."
+    "Its first letter is W."
    ],
    "media": {
     "img": [
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/29402710/medium.jpg",
-      "w": 500,
-      "h": 375,
-      "credit": "Анатолий Озерной /Anatoliy Ozernoy",
-      "license": "CC BY-SA 4.0",
-      "page": "https://www.inaturalist.org/photos/29402710"
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/4/47/Argiope_bruennichi_MichaD_6.jpg/330px-Argiope_bruennichi_MichaD_6.jpg",
+      "w": 330,
+      "h": 495,
+      "credit": "Michael Apel",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Argiope_bruennichi_MichaD_6.jpg"
      },
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/119144639/medium.jpg",
-      "w": 390,
-      "h": 500,
-      "credit": "Thomas Bresson",
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/4/44/%28MHNT%29_Argiope_bruennichi_female_dorsal.jpg/500px-%28MHNT%29_Argiope_bruennichi_female_dorsal.jpg",
+      "w": 500,
+      "h": 592,
+      "credit": "Didier Descouens",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:(MHNT)_Argiope_bruennichi_female_dorsal.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/b/ba/%D0%90%D1%80%D0%B3%D1%96%D0%BE%D0%BF%D0%B0_%D0%B1%D1%80%D1%8E%D0%BD%D1%96%D1%85%D0%B0.jpg/500px-%D0%90%D1%80%D0%B3%D1%96%D0%BE%D0%BF%D0%B0_%D0%B1%D1%80%D1%8E%D0%BD%D1%96%D1%85%D0%B0.jpg",
+      "w": 500,
+      "h": 499,
+      "credit": "Mmishkiina",
       "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/119144639"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/252504364/medium.jpg",
-      "w": 500,
-      "h": 375,
-      "credit": "Анатолий Озерной /Anatoly Ozernoy",
-      "license": "CC BY-SA 4.0",
-      "page": "https://www.inaturalist.org/photos/252504364"
+      "page": "https://commons.wikimedia.org/wiki/File:%D0%90%D1%80%D0%B3%D1%96%D0%BE%D0%BF%D0%B0_%D0%B1%D1%80%D1%8E%D0%BD%D1%96%D1%85%D0%B0.jpg"
      }
     ]
    },
@@ -1514,7 +1537,7 @@
     "It is found in the Americas.",
     "It catches prey in a web.",
     "The answer has 3 words (6, 6, 6 letters).",
-    "It starts with the letter Y."
+    "Its first letter is Y."
    ],
    "media": {
     "img": [
@@ -1572,33 +1595,33 @@
     "It is black with white stripes.",
     "It is named after a striped African animal.",
     "The answer has 3 words (5, 7, 6 letters).",
-    "It starts with the letter Z."
+    "Its first letter is Z."
    ],
    "media": {
     "img": [
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/306430245/medium.jpg",
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/b/b4/Kaldari_Salticus_scenicus_male_01.jpg/500px-Kaldari_Salticus_scenicus_male_01.jpg",
       "w": 500,
       "h": 375,
-      "credit": "Анатолий Озерной /Anatoly Ozernoy",
-      "license": "CC BY-SA 4.0",
-      "page": "https://www.inaturalist.org/photos/306430245"
+      "credit": "Kaldari",
+      "license": "CC0 1.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Kaldari_Salticus_scenicus_male_01.jpg"
      },
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/306430239/medium.jpg",
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/9/9b/Kaldari_Salticus_scenicus_female_01.jpg/500px-Kaldari_Salticus_scenicus_female_01.jpg",
       "w": 500,
       "h": 375,
-      "credit": "Анатолий Озерной /Anatoly Ozernoy",
-      "license": "CC BY-SA 4.0",
-      "page": "https://www.inaturalist.org/photos/306430239"
+      "credit": "Kaldari",
+      "license": "CC0 1.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Kaldari_Salticus_scenicus_female_01.jpg"
      },
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/410228598/medium.jpeg",
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/a/a9/Salticus.scenicus.6916.jpg/500px-Salticus.scenicus.6916.jpg",
       "w": 500,
-      "h": 375,
-      "credit": "Tyler Bishop",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/410228598"
+      "h": 500,
+      "credit": "Olei",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Salticus.scenicus.6916.jpg"
      }
     ]
    },
@@ -1631,7 +1654,7 @@
     "It is common in North America.",
     "Its name means daring.",
     "The answer has 3 words (4, 7, 6 letters).",
-    "It starts with the letter B."
+    "Its first letter is B."
    ],
    "media": {
     "img": [
@@ -1688,7 +1711,7 @@
     "It lives in Florida and the Caribbean.",
     "Its name means royal.",
     "The answer has 3 words (5, 7, 6 letters).",
-    "It starts with the letter R."
+    "Its first letter is R."
    ],
    "media": {
     "img": [
@@ -1745,7 +1768,7 @@
     "It lives in ponds in Europe and Asia.",
     "It is the only spider that lives underwater.",
     "The answer has 3 words (6, 4, 6 letters).",
-    "It starts with the letter D."
+    "Its first letter is D."
    ],
    "media": {
     "img": [
@@ -1800,7 +1823,7 @@
     "It walks on the surface of ponds.",
     "It is named after a floating platform.",
     "The answer has 2 words (4, 6 letters).",
-    "It starts with the letter R."
+    "Its first letter is R."
    ],
    "media": {
     "img": [
@@ -1835,6 +1858,7 @@
   {
    "id": "darwins-bark-spider",
    "name": "Darwin's bark spider",
+   "lname": "Darwin's bark spider",
    "sci": "Caerostris darwini",
    "group": "orb-weaver",
    "facts": {
@@ -1855,7 +1879,7 @@
     "It lives in Madagascar.",
     "It is named after a famous naturalist.",
     "The answer has 3 words (7, 4, 6 letters).",
-    "It starts with the letter D."
+    "Its first letter is D."
    ],
    "media": {
     "img": [
@@ -1911,7 +1935,7 @@
     "It holds a stretchy web between its front legs.",
     "It throws its web over prey.",
     "The answer has 3 words (3, 7, 6 letters).",
-    "It starts with the letter N."
+    "Its first letter is N."
    ],
    "media": {
     "img": [
@@ -1965,7 +1989,7 @@
     "It hunts without a catching web.",
     "It is named after a yellow flower.",
     "The answer has 3 words (9, 4, 6 letters).",
-    "It starts with the letter G."
+    "Its first letter is G."
    ],
    "media": {
     "img": [
@@ -2022,7 +2046,7 @@
     "It catches prey in a web.",
     "It builds round webs in gardens.",
     "The answer has 3 words (5, 3, 6 letters).",
-    "It starts with the letter S."
+    "Its first letter is S."
    ],
    "media": {
     "img": [
@@ -2083,7 +2107,7 @@
     "It catches prey in a web.",
     "It is the most venomous spider in Britain.",
     "The answer has 3 words (5, 5, 6 letters).",
-    "It starts with the letter F."
+    "Its first letter is F."
    ],
    "media": {
     "img": [
@@ -2141,7 +2165,7 @@
     "It is often found in baths.",
     "It is a large spider found indoors.",
     "The answer has 3 words (5, 5, 6 letters).",
-    "It starts with the letter G."
+    "Its first letter is G."
    ],
    "media": {
     "img": [
@@ -2199,7 +2223,7 @@
     "It is brown with a herringbone pattern.",
     "Its name is a word for a wandering worker.",
     "The answer has 2 words (4, 6 letters).",
-    "It starts with the letter H."
+    "Its first letter is H."
    ],
    "media": {
     "img": [
@@ -2254,7 +2278,7 @@
     "Its body is pale and shiny.",
     "It eats small grey crustaceans that roll into balls.",
     "The answer has 2 words (9, 6 letters).",
-    "It starts with the letter W."
+    "Its first letter is W."
    ],
    "media": {
     "img": [
@@ -2289,6 +2313,7 @@
   {
    "id": "indian-ornamental-tarantula",
    "name": "Indian ornamental tarantula",
+   "lname": "Indian ornamental tarantula",
    "sci": "Poecilotheria regalis",
    "group": "tarantula",
    "facts": {
@@ -2313,7 +2338,7 @@
     "Its leg span can reach about 18 cm.",
     "Its name means decorative.",
     "The answer has 3 words (6, 10, 9 letters).",
-    "It starts with the letter I."
+    "Its first letter is I."
    ],
    "media": {
     "img": [
@@ -2371,10 +2396,26 @@
     "Two of their eyes are huge and face forward.",
     "They leap onto their prey.",
     "The answer has 2 words (7, 6 letters).",
-    "It starts with the letter J."
+    "Its first letter is J."
    ],
    "media": {
     "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/9/9e/Phidippus_audax_male.jpg/500px-Phidippus_audax_male.jpg",
+      "w": 500,
+      "h": 381,
+      "credit": "Opoterser",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Phidippus_audax_male.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/6/6d/PlatycryptusUndatusFemale.jpg/500px-PlatycryptusUndatusFemale.jpg",
+      "w": 500,
+      "h": 328,
+      "credit": "Kevincollins123",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:PlatycryptusUndatusFemale.jpg"
+     },
      {
       "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/378835762/medium.jpg",
       "w": 500,
@@ -2382,22 +2423,6 @@
       "credit": "Thomas Shahan",
       "license": "CC BY 4.0",
       "page": "https://www.inaturalist.org/photos/378835762"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/223921337/medium.jpg",
-      "w": 500,
-      "h": 400,
-      "credit": "Alexis Tinker-Tsavalas",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/223921337"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/11760967/medium.jpg",
-      "w": 500,
-      "h": 281,
-      "credit": "Ryan Hodnett",
-      "license": "CC BY-SA 4.0",
-      "page": "https://www.inaturalist.org/photos/11760967"
      }
     ]
    },
@@ -2429,10 +2454,26 @@
     "Many are kept as pets.",
     "They are very big and hairy.",
     "The answer is one word of 9 letters.",
-    "It starts with the letter T."
+    "Its first letter is T."
    ],
    "media": {
     "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/d/d2/Brachypelma_edit.jpg/500px-Brachypelma_edit.jpg",
+      "w": 500,
+      "h": 451,
+      "credit": "User:Fir0002",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Brachypelma_edit.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/9/94/Brachypelma_vagans_p1.jpg/500px-Brachypelma_vagans_p1.jpg",
+      "w": 500,
+      "h": 355,
+      "credit": "Carlos Valenzuela Montuy",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Brachypelma_vagans_p1.jpg"
+     },
      {
       "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/34513003/medium.jpg",
       "w": 500,
@@ -2440,22 +2481,6 @@
       "credit": "Richard Adams",
       "license": "CC BY 4.0",
       "page": "https://www.inaturalist.org/photos/34513003"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/2357740/medium.jpg",
-      "w": 375,
-      "h": 500,
-      "credit": "115527224325819725585",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/2357740"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/34699757/medium.jpeg",
-      "w": 375,
-      "h": 500,
-      "credit": "Christiaan Viljoen",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/34699757"
      }
     ]
    },
@@ -2483,33 +2508,33 @@
     "On misty autumn mornings their webs cover fields.",
     "Folklore says one landing on you brings riches.",
     "The answer has 2 words (5, 6 letters).",
-    "It starts with the letter M."
+    "Its first letter is M."
    ],
    "media": {
     "img": [
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/167460378/medium.jpeg",
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/0/0c/Drapetisca_alteranda.JPG/500px-Drapetisca_alteranda.JPG",
       "w": 500,
-      "h": 363,
-      "credit": "Toby",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/167460378"
+      "h": 452,
+      "credit": "Bruce Marlin",
+      "license": "CC BY 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Drapetisca_alteranda.JPG"
      },
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/166377107/medium.jpeg",
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/b/b7/Linyphia.spec.6856.jpg/500px-Linyphia.spec.6856.jpg",
       "w": 500,
-      "h": 375,
-      "credit": "Toby",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/166377107"
+      "h": 333,
+      "credit": "Wikimedia Commons",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Linyphia.spec.6856.jpg"
      },
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/322225829/medium.jpeg",
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/1f/Neriene_radiata_1.JPG/500px-Neriene_radiata_1.JPG",
       "w": 500,
-      "h": 500,
-      "credit": "Ludivine Lamare",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/322225829"
+      "h": 608,
+      "credit": "Lucarelli",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Neriene_radiata_1.JPG"
      }
     ]
    },

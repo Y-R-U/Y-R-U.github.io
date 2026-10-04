@@ -1,6 +1,7 @@
 // Lane F shared helpers: CSS injection, timer stretch, fact maths, pointer drag. Used by F's formats only.
 import { normalize } from '../core/fuzzy.js?v=1';
 import { factText, shuffle } from './registry.js?v=1';
+import { basePoints } from '../core/scoring.js?v=1';
 
 export const norm = normalize;
 
@@ -23,6 +24,7 @@ const BASE_CSS = `
 .f-stage{flex:1;display:flex;flex-direction:column;gap:12px;width:100%;max-width:640px;margin:0 auto;min-height:0}
 .f-stage .q-prompt{font-size:clamp(20px,5.6vw,28px)}
 .play.kids .f-stage .q-prompt{font-size:clamp(24px,6.8vw,34px)}
+.f-more{align-self:center}
 .f-rv-list{display:flex;flex-direction:column;gap:4px;font-size:14px;color:var(--ink-2);margin:0;padding:0;list-style:none}
 .f-rv-list b{color:var(--ink)}
 @media (min-width:900px) and (min-height:560px){.f-stage{max-width:820px}.f-stage .q-prompt{font-size:30px}}
@@ -78,26 +80,33 @@ export function numericKeys(pack, { min = 4 } = {}) {
 }
 export const numOf = (it, key) => { const v = it?.facts?.[key]; return v == null || v === '' || !isFinite(Number(v)) ? null : Number(v); };
 
-// Two values are far enough apart to compare fairly at this difficulty.
-export function apart(meta, a, b, difficulty = 0) {
+// Two values are far enough apart to compare fairly at this difficulty. range = rangeOf(pack, key) switches
+// to an absolute gap when the scale has zero or negatives (temperatures), where ratios mean nothing.
+export function apart(meta, a, b, difficulty = 0, range = null) {
   if (a == null || b == null || a === b) return false;
   if (meta.type === 'year') {
-    const gap = [8, 25, 8, 3][difficulty] ?? 8;
+    const gap = [5, 20, 6, 2][difficulty] ?? 5;
     return Math.abs(a - b) >= Math.max(gap, meta.minGap || 0);
   }
+  if (range && range.min <= 0) return Math.abs(a - b) >= ([0.08, 0.2, 0.08, 0.03][difficulty] ?? 0.08) * (range.max - range.min);
+  if (a <= 0 || b <= 0) return false;
   const ratio = Math.max([1.5, 2.5, 1.5, 1.2][difficulty] ?? 1.5, meta.minRatio ? Math.min(meta.minRatio, 3) : 0);
-  const hi = Math.max(Math.abs(a), Math.abs(b)), lo = Math.min(Math.abs(a), Math.abs(b));
-  if (Math.sign(a) !== Math.sign(b)) return true;
-  return lo === 0 ? hi > 0 : hi / lo >= ratio;
+  return Math.max(a, b) / Math.min(a, b) >= ratio;
+}
+
+export function rangeOf(pack, key) {
+  let min = Infinity, max = -Infinity;
+  for (const it of pack.items || []) { const v = numOf(it, key); if (v != null) { if (v < min) min = v; if (v > max) max = v; } }
+  return { min, max };
 }
 
 // Pick n candidates whose values are pairwise apart.
-export function spreadSet(rng, cands, valueFn, meta, n, difficulty) {
+export function spreadSet(rng, cands, valueFn, meta, n, difficulty, range = null) {
   const out = [];
   for (const c of shuffle(rng, cands)) {
     const v = valueFn(c);
     if (v == null) continue;
-    if (out.every(o => apart(meta, v, valueFn(o), difficulty))) out.push(c);
+    if (out.every(o => apart(meta, v, valueFn(o), difficulty, range))) out.push(c);
     if (out.length >= n) return out;
   }
   return null;
@@ -148,3 +157,52 @@ export function drag(el, { onStart, onMove, onEnd, onTap, threshold = 6 } = {}) 
 
 export const plural = (n, w, ws = w + 's') => `${n} ${n === 1 ? w : ws}`;
 export const escHtml = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+
+// Progressive stages (CONTRACT "Progressive stages"). The runner owns the stage, the Show-more/vote button and the
+// points multiplier. Until the runner ships that, this falls back to a local button and applies the multiplier here.
+export const stageMultiplier = (stage, n) => (n > 1 ? 1 - 0.6 * Math.min(stage, n - 1) / (n - 1) : 1);
+export function stages(api, q, el, onChange, { label = 'Show more 👀', kidsEvery = 4000 } = {}) {
+  const n = q.stages || 1;
+  const native = typeof api.onStage === 'function';
+  let stage = native ? (api.stage || 0) : 0;
+  let locked = false, btn = null, timer = null;
+  const set = s => {
+    stage = Math.max(0, Math.min(n - 1, s));
+    if (btn) btn.disabled = locked || stage >= n - 1;
+    onChange(stage);
+  };
+  let unsub = null;
+  if (native) {
+    const r = api.onStage(s => set(s));
+    if (typeof r === 'function') unsub = r;
+  } else {
+    btn = typeof document !== 'undefined' ? document.createElement('button') : null;
+    if (btn) {
+      btn.type = 'button';
+      btn.className = 'btn small sun f-more';
+      btn.textContent = label;
+      btn.addEventListener('click', () => more());
+    }
+    if (api.kids) timer = setInterval(() => { if (!locked && stage < n - 1) set(stage + 1); }, kidsEvery);
+  }
+  function more() {
+    if (locked || stage >= n - 1) return;
+    if (typeof api.requestMore === 'function') api.requestMore(); else set(stage + 1);
+  }
+  set(stage);
+  return {
+    get stage() { return stage; }, n, button: btn, native, more,
+    lock() { locked = true; if (btn) btn.disabled = true; clearInterval(timer); },
+    // extra fields for api.answer: the runner scores stages itself when it supports them
+    points() {
+      if (native) return {};
+      let rem = 0, lim = 0;
+      try { rem = api.timer.remaining(); lim = api.timer.limit; } catch (e) {}
+      return { points: Math.round(basePoints({ timed: rem > 0 && lim > 0, remaining: rem, limit: lim }) * stageMultiplier(stage, n)) };
+    },
+    destroy() { clearInterval(timer); unsub && unsub(); },
+  };
+}
+
+// Pictures usable in a question: never a disputed flag (C2: facts.flagDisputed).
+export const hasImg = it => !!it?.media?.img?.length && !it.facts?.flagDisputed;

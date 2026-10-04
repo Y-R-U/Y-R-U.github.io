@@ -19,7 +19,8 @@ export const LISTEN_CSS = `
 .au-under{display:flex;align-items:center;gap:10px;min-height:34px;color:#fff;font-weight:800}
 .au-status{opacity:.85;font-size:15px}
 .au-again{min-height:36px;padding:4px 12px;border-radius:12px;border:2px solid #fff;background:#fff2;color:#fff;font-weight:800}
-.au-again[hidden]{display:none}
+.au-again[hidden],.au-more[hidden]{display:none}
+.au-more{min-height:36px;padding:4px 12px;border-radius:12px;border:2px solid var(--sun,#ffc23c);background:var(--sun,#ffc23c);color:var(--ink,#1f1a4d);font-weight:900}
 .au-rv{margin-top:8px}
 .au-rv .au-keep{margin-top:6px;min-height:40px;padding:6px 14px;border-radius:12px;border:var(--line,3px) solid var(--ink,#1f1a4d);background:#fff;font-weight:800;align-self:flex-start}
 .play.revealed .au-disc{width:min(15vh,130px)}

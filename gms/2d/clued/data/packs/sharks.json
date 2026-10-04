@@ -5,6 +5,9 @@
  "icon": "🦈",
  "kids": true,
  "version": 1,
+ "imgPrompt": "Which of these is {aName}?",
+ "nameImgPrompt": "Which shark is this?",
+ "tfImgPrompt": "This is {aName}.",
  "leakExempt": [
   "shark",
   "sharks"
@@ -14,7 +17,9 @@
    "type": "num",
    "label": "Typical length",
    "unit": "m",
-   "higherLabel": "Longer"
+   "higherLabel": "Longer",
+   "askHigh": "Which of these sharks grows the longest?",
+   "askLow": "Which of these sharks is the smallest?"
   },
   "danger": {
    "type": "cat",
@@ -24,16 +29,24 @@
     "Bites if provoked",
     "Dangerous",
     "Potentially deadly"
-   ]
+   ],
+   "ask": "How dangerous is the {lname} to people?",
+   "askReverse": "Which of these sharks is rated \"{lvalue}\"?",
+   "stmt": "The {lname} is rated \"{lvalue}\" to people."
   },
   "habitat": {
    "type": "cat",
-   "label": "Lives in"
+   "label": "Lives in",
+   "ask": "Where does the {lname} mainly live?",
+   "askReverse": "Which of these sharks mainly lives in {lvalue}?",
+   "stmt": "The {lname} mainly lives in {lvalue}."
   },
   "status": {
    "type": "cat",
    "label": "Conservation status (IUCN)",
-   "hard": true
+   "ask": "What is the IUCN conservation status of the {lname}?",
+   "askReverse": "Which of these is listed as \"{value}\" by the IUCN?",
+   "stmt": "The {lname} is listed as \"{value}\" by the IUCN."
   }
  },
  "items": [
@@ -70,17 +83,25 @@
     "It is responsible for more unprovoked bites on people than any other shark.",
     "It is grey on top with a pale belly.",
     "The answer has 3 words (5, 5, 5 letters).",
-    "It starts with the letter G."
+    "Its first letter is G."
    ],
    "media": {
     "img": [
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/5289261/medium.jpeg",
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/0/0e/Carcharodon_carcharias.jpg/500px-Carcharodon_carcharias.jpg",
       "w": 500,
-      "h": 255,
-      "credit": "Adam J. Searcy",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/5289261"
+      "h": 375,
+      "credit": "Sharkdiver.com",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Carcharodon_carcharias.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/5/56/White_shark.jpg/500px-White_shark.jpg",
+      "w": 500,
+      "h": 348,
+      "credit": "Pterantula (Terry Goss) at en.wikipedia",
+      "license": "CC BY 2.5",
+      "page": "https://commons.wikimedia.org/wiki/File:White_shark.jpg"
      },
      {
       "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/30351620/medium.jpg",
@@ -89,14 +110,6 @@
       "credit": "biodiversitygr",
       "license": "CC BY 4.0",
       "page": "https://www.inaturalist.org/photos/30351620"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/325558501/medium.jpg",
-      "w": 425,
-      "h": 500,
-      "credit": "Cassidy Best",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/325558501"
      }
     ]
    },
@@ -129,10 +142,26 @@
     "Its stripes fade as it grows older.",
     "It is named after a striped big cat.",
     "The answer has 2 words (5, 5 letters).",
-    "It starts with the letter T."
+    "Its first letter is T."
    ],
    "media": {
     "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/3/39/Tiger_shark.jpg/500px-Tiger_shark.jpg",
+      "w": 500,
+      "h": 371,
+      "credit": "Albert kok",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Tiger_shark.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/12/Scarface-tigershark.jpg/500px-Scarface-tigershark.jpg",
+      "w": 500,
+      "h": 351,
+      "credit": "Wikimedia Commons",
+      "license": "CC BY 2.5",
+      "page": "https://commons.wikimedia.org/wiki/File:Scarface-tigershark.jpg"
+     },
      {
       "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/19051907/medium.jpg",
       "w": 500,
@@ -140,22 +169,6 @@
       "credit": "Kris-Mikael Krister",
       "license": "CC BY 4.0",
       "page": "https://www.inaturalist.org/photos/19051907"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/587546933/medium.jpg",
-      "w": 500,
-      "h": 375,
-      "credit": "Jay Brasher",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/587546933"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/15700602/medium.jpg",
-      "w": 500,
-      "h": 355,
-      "credit": "Georgina Jones",
-      "license": "CC BY-SA 4.0",
-      "page": "https://www.inaturalist.org/photos/15700602"
      }
     ]
    },
@@ -188,10 +201,26 @@
     "It is stocky with a short, blunt snout.",
     "It is named after a male cow.",
     "The answer has 2 words (4, 5 letters).",
-    "It starts with the letter B."
+    "Its first letter is B."
    ],
    "media": {
     "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/8/8f/Bullshark_Beqa_Fiji_2007.jpg/500px-Bullshark_Beqa_Fiji_2007.jpg",
+      "w": 500,
+      "h": 353,
+      "credit": "Pterantula",
+      "license": "CC BY 2.5",
+      "page": "https://commons.wikimedia.org/wiki/File:Bullshark_Beqa_Fiji_2007.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/b/be/Bull_shark_%28Carcharhinus_leucas%29.jpg/500px-Bull_shark_%28Carcharhinus_leucas%29.jpg",
+      "w": 500,
+      "h": 302,
+      "credit": "João D'Andretta",
+      "license": "CC BY 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Bull_shark_(Carcharhinus_leucas).jpg"
+     },
      {
       "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/438498979/medium.jpeg",
       "w": 500,
@@ -199,22 +228,6 @@
       "credit": "James-LaFontaine",
       "license": "CC BY 4.0",
       "page": "https://www.inaturalist.org/photos/438498979"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/43520885/medium.jpg",
-      "w": 500,
-      "h": 324,
-      "credit": "no rights reserved",
-      "license": "CC0 1.0",
-      "page": "https://www.inaturalist.org/photos/43520885"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/168237268/medium.jpg",
-      "w": 500,
-      "h": 333,
-      "credit": "Ewout Knoester",
-      "license": "CC BY-SA 4.0",
-      "page": "https://www.inaturalist.org/photos/168237268"
      }
     ]
    },
@@ -243,7 +256,7 @@
     "It has killed people.",
     "Its fins have pale tips.",
     "The answer has 3 words (7, 8, 5 letters).",
-    "It starts with the letter O."
+    "Its first letter is O."
    ],
    "media": {
     "img": [
@@ -301,10 +314,26 @@
     "It is the largest fish on Earth.",
     "It is named after the largest kind of sea mammal.",
     "The answer has 2 words (5, 5 letters).",
-    "It starts with the letter W."
+    "Its first letter is W."
    ],
    "media": {
     "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/f/f1/Whale_shark_Georgia_aquarium.jpg/500px-Whale_shark_Georgia_aquarium.jpg",
+      "w": 500,
+      "h": 230,
+      "credit": "User:Zac Wolf (original), en:User:Stefan (cropping)",
+      "license": "CC BY-SA 2.5",
+      "page": "https://commons.wikimedia.org/wiki/File:Whale_shark_Georgia_aquarium.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/f/f6/Similan_Dive_Center_-_great_whale_shark.jpg/500px-Similan_Dive_Center_-_great_whale_shark.jpg",
+      "w": 500,
+      "h": 250,
+      "credit": "Abe Khao Lak",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Similan_Dive_Center_-_great_whale_shark.jpg"
+     },
      {
       "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/229381770/medium.jpg",
       "w": 500,
@@ -312,22 +341,6 @@
       "credit": "Daniel Benák",
       "license": "CC BY 4.0",
       "page": "https://www.inaturalist.org/photos/229381770"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/335706911/medium.jpg",
-      "w": 500,
-      "h": 333,
-      "credit": "Zac Wolf",
-      "license": "CC BY-SA 4.0",
-      "page": "https://www.inaturalist.org/photos/335706911"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/90242284/medium.jpg",
-      "w": 500,
-      "h": 375,
-      "credit": "Shaunak Modi",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/90242284"
      }
     ]
    },
@@ -360,7 +373,7 @@
     "It is the second-largest fish in the world.",
     "It is named after lying in the sun.",
     "The answer has 2 words (7, 5 letters).",
-    "It starts with the letter B."
+    "Its first letter is B."
    ],
    "media": {
     "img": [
@@ -419,7 +432,7 @@
     "Its head is large and rounded.",
     "Its name means big mouth.",
     "The answer has 2 words (9, 5 letters).",
-    "It starts with the letter M."
+    "Its first letter is M."
    ],
    "media": {
     "img": [
@@ -482,10 +495,26 @@
     "It is the largest of its kind.",
     "Its head is shaped like a tool for hitting nails.",
     "The answer has 2 words (5, 10 letters).",
-    "It starts with the letter G."
+    "Its first letter is G."
    ],
    "media": {
     "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/0/01/Sphyrna_mokarran_at_georgia.jpg/500px-Sphyrna_mokarran_at_georgia.jpg",
+      "w": 500,
+      "h": 252,
+      "credit": "Josh Hallett from Winter Haven, FL, USA",
+      "license": "CC BY 2.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Sphyrna_mokarran_at_georgia.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/b/bd/Great_hammerhead2.jpg/500px-Great_hammerhead2.jpg",
+      "w": 500,
+      "h": 291,
+      "credit": "Albert kok",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Great_hammerhead2.jpg"
+     },
      {
       "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/86554863/medium.jpg",
       "w": 500,
@@ -493,22 +522,6 @@
       "credit": "Jake Mohan",
       "license": "CC BY 4.0",
       "page": "https://www.inaturalist.org/photos/86554863"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/471864928/medium.jpg",
-      "w": 500,
-      "h": 375,
-      "credit": "Dan Schofield",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/471864928"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/353767237/medium.jpg",
-      "w": 500,
-      "h": 500,
-      "credit": "Robin White",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/353767237"
      }
     ]
    },
@@ -541,7 +554,7 @@
     "It forms big schools by day.",
     "Its head is shaped like a T-shaped tool.",
     "The answer has 2 words (9, 10 letters).",
-    "It starts with the letter S."
+    "Its first letter is S."
    ],
    "media": {
     "img": [
@@ -602,7 +615,7 @@
     "Its head is rounded like a shovel.",
     "It is named after an old-fashioned hat.",
     "The answer is one word of 10 letters.",
-    "It starts with the letter B."
+    "Its first letter is B."
    ],
    "media": {
     "img": [
@@ -664,7 +677,7 @@
     "It has a bright metallic blue back.",
     "It is the fastest shark.",
     "The answer has 2 words (8, 4 letters).",
-    "It starts with the letter S."
+    "Its first letter is S."
    ],
    "media": {
     "img": [
@@ -720,7 +733,7 @@
     "It is slim with big eyes.",
     "Its back is a deep indigo colour.",
     "The answer has 2 words (4, 5 letters).",
-    "It starts with the letter B."
+    "Its first letter is B."
    ],
    "media": {
     "img": [
@@ -779,7 +792,7 @@
     "It has been seen leaping clear of the water.",
     "It is named after beating grain to separate it.",
     "The answer has 2 words (8, 5 letters).",
-    "It starts with the letter T."
+    "Its first letter is T."
    ],
    "media": {
     "img": [
@@ -814,6 +827,7 @@
   {
    "id": "greenland-shark",
    "name": "Greenland shark",
+   "lname": "Greenland shark",
    "sci": "Somniosus microcephalus",
    "group": "sleeper shark",
    "facts": {
@@ -835,7 +849,7 @@
     "A tiny animal often hangs from its eyes.",
     "It lives in the icy North Atlantic and Arctic.",
     "The answer has 2 words (9, 5 letters).",
-    "It starts with the letter G."
+    "Its first letter is G."
    ],
    "media": {
     "img": [
@@ -891,7 +905,7 @@
     "It has a long, flat, blade-like snout.",
     "It is named after a creature from folk tales.",
     "The answer has 2 words (6, 5 letters).",
-    "It starts with the letter G."
+    "Its first letter is G."
    ],
    "media": {
     "img": [
@@ -931,7 +945,7 @@
     "It lives deep in the ocean.",
     "Its gills have ruffled edges.",
     "The answer has 2 words (7, 5 letters).",
-    "It starts with the letter F."
+    "Its first letter is F."
    ],
    "media": {
     "img": [
@@ -958,6 +972,7 @@
   {
    "id": "port-jackson-shark",
    "name": "Port Jackson shark",
+   "lname": "Port Jackson shark",
    "sci": "Heterodontus portusjacksoni",
    "group": "bullhead shark",
    "facts": {
@@ -979,7 +994,7 @@
     "It lives in southern Australia.",
     "It is named after Sydney Harbour.",
     "The answer has 3 words (4, 7, 5 letters).",
-    "It starts with the letter P."
+    "Its first letter is P."
    ],
    "media": {
     "img": [
@@ -1038,7 +1053,7 @@
     "It lives in coastal waters.",
     "It bites people who step on it.",
     "The answer has 2 words (7, 9 letters).",
-    "It starts with the letter S."
+    "Its first letter is S."
    ],
    "media": {
     "img": [
@@ -1094,7 +1109,7 @@
     "It lives in shallow water.",
     "It is named for its yellowish colour, like a citrus fruit.",
     "The answer has 2 words (5, 5 letters).",
-    "It starts with the letter L."
+    "Its first letter is L."
    ],
    "media": {
     "img": [
@@ -1150,33 +1165,33 @@
     "It rests on the sea floor in groups.",
     "It shares its name with someone who works in a hospital.",
     "The answer has 2 words (5, 5 letters).",
-    "It starts with the letter N."
+    "Its first letter is N."
    ],
    "media": {
     "img": [
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/379827271/medium.jpg",
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/d/d1/Nurse_shark.jpg/500px-Nurse_shark.jpg",
       "w": 500,
-      "h": 333,
-      "credit": "R Vasconcellos",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/379827271"
+      "h": 329,
+      "credit": "Wikimedia Commons",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Nurse_shark.jpg"
      },
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/95362085/medium.jpg",
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/c/cc/Grey_nurse_shark_2.jpg/500px-Grey_nurse_shark_2.jpg",
       "w": 500,
-      "h": 375,
-      "credit": "Gary Rinaldi",
+      "h": 334,
+      "credit": "The original uploader was Jlencion at English Wikipedia.",
+      "license": "CC BY-SA 2.5",
+      "page": "https://commons.wikimedia.org/wiki/File:Grey_nurse_shark_2.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/8/8a/Saddleback_NurseShark.JPG/500px-Saddleback_NurseShark.JPG",
+      "w": 500,
+      "h": 332,
+      "credit": "User: (WT-shared) Jpatokal at wts wikivoyage",
       "license": "CC BY-SA 4.0",
-      "page": "https://www.inaturalist.org/photos/95362085"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/179498581/medium.jpg",
-      "w": 500,
-      "h": 333,
-      "credit": "Pauline Walsh Jacobson",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/179498581"
+      "page": "https://commons.wikimedia.org/wiki/File:Saddleback_NurseShark.JPG"
      }
     ]
    },
@@ -1208,33 +1223,33 @@
     "It only bites people if provoked.",
     "Its fins have dark tips.",
     "The answer has 3 words (8, 4, 5 letters).",
-    "It starts with the letter B."
+    "Its first letter is B."
    ],
    "media": {
     "img": [
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/87114974/medium.jpg",
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/0/01/Carcharhinus_melanopterus_mirihi.jpg/500px-Carcharhinus_melanopterus_mirihi.jpg",
       "w": 500,
-      "h": 375,
-      "credit": "Leon Brocard",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/87114974"
+      "h": 281,
+      "credit": "https://www.whatsthatfish.com/profile/fishx6",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Carcharhinus_melanopterus_mirihi.jpg"
      },
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/300415741/medium.jpg",
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/d/d5/Carcharhinus_melanopterus_Luc_Viatour.jpg/500px-Carcharhinus_melanopterus_Luc_Viatour.jpg",
       "w": 500,
-      "h": 375,
-      "credit": "Pauline Walsh Jacobson",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/300415741"
+      "h": 333,
+      "credit": "Luc Viatour",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Carcharhinus_melanopterus_Luc_Viatour.jpg"
      },
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/300415730/medium.jpg",
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/9/9f/Blacktip_reef_shark_%28Carcharhinus_melanopterus%29_Moorea.jpg/500px-Blacktip_reef_shark_%28Carcharhinus_melanopterus%29_Moorea.jpg",
       "w": 500,
-      "h": 375,
-      "credit": "Pauline Walsh Jacobson",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/300415730"
+      "h": 333,
+      "credit": "Charles J. Sharp",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Blacktip_reef_shark_(Carcharhinus_melanopterus)_Moorea.jpg"
      }
     ]
    },
@@ -1267,7 +1282,7 @@
     "It is harmless to people.",
     "Its fins have pale tips.",
     "The answer has 3 words (8, 4, 5 letters).",
-    "It starts with the letter W."
+    "Its first letter is W."
    ],
    "media": {
     "img": [
@@ -1322,7 +1337,7 @@
     "It only bites people if provoked.",
     "Its colour is between black and white.",
     "The answer has 3 words (4, 4, 5 letters).",
-    "It starts with the letter G."
+    "Its first letter is G."
    ],
    "media": {
     "img": [
@@ -1377,7 +1392,7 @@
     "Adults are spotted, but babies are striped.",
     "It is named after a striped African animal.",
     "The answer has 2 words (5, 5 letters).",
-    "It starts with the letter Z."
+    "Its first letter is Z."
    ],
    "media": {
     "img": [
@@ -1433,7 +1448,7 @@
     "It has a big black spot behind each front fin.",
     "It is named after a shoulder decoration on uniforms.",
     "The answer has 2 words (9, 5 letters).",
-    "It starts with the letter E."
+    "Its first letter is E."
    ],
    "media": {
     "img": [
@@ -1489,7 +1504,7 @@
     "It is only about half a metre long.",
     "It is named after a baking tool.",
     "The answer has 2 words (12, 5 letters).",
-    "It starts with the letter C."
+    "Its first letter is C."
    ],
    "media": {
     "img": [
@@ -1545,7 +1560,7 @@
     "It lives in coastal waters.",
     "Its name is partly a pet animal.",
     "The answer has 2 words (5, 7 letters).",
-    "It starts with the letter S."
+    "Its first letter is S."
    ],
    "media": {
     "img": [
@@ -1607,7 +1622,7 @@
     "It only bites people if provoked.",
     "It lives in coastal waters.",
     "The answer has 3 words (4, 5, 5 letters).",
-    "It starts with the letter S."
+    "Its first letter is S."
    ],
    "media": {
     "img": [
@@ -1666,7 +1681,7 @@
     "It is flat like a ray.",
     "Its fins spread out like wings.",
     "The answer is one word of 10 letters.",
-    "It starts with the letter A."
+    "Its first letter is A."
    ],
    "media": {
     "img": [
@@ -1722,18 +1737,10 @@
     "It is slim with a rounded snout.",
     "Its skin feels smooth, like a soft fabric.",
     "The answer has 2 words (5, 5 letters).",
-    "It starts with the letter S."
+    "Its first letter is S."
    ],
    "media": {
     "img": [
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/170832075/medium.jpeg",
-      "w": 500,
-      "h": 375,
-      "credit": "José Francisco Colorado-Dapa",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/170832075"
-     },
      {
       "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/17635551/medium.jpg",
       "w": 375,
@@ -1749,6 +1756,14 @@
       "credit": "Martín Sánchez Vilchis",
       "license": "CC BY-SA 4.0",
       "page": "https://www.inaturalist.org/photos/58234987"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/428589176/medium.jpg",
+      "w": 500,
+      "h": 334,
+      "credit": "Rafael Rosa",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/428589176"
      }
     ]
    },
@@ -1778,7 +1793,7 @@
     "It has dark saddle-shaped spots.",
     "It is named after a spotted big cat.",
     "The answer has 2 words (7, 5 letters).",
-    "It starts with the letter L."
+    "Its first letter is L."
    ],
    "media": {
     "img": [
@@ -1837,18 +1852,10 @@
     "It lives in coastal waters.",
     "It is named after a pet that purrs.",
     "The answer has 3 words (5, 7, 8 letters).",
-    "It starts with the letter S."
+    "Its first letter is S."
    ],
    "media": {
     "img": [
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/317560062/medium.jpg",
-      "w": 375,
-      "h": 500,
-      "credit": "norgram",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/317560062"
-     },
      {
       "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/264501030/medium.jpeg",
       "w": 500,
@@ -1864,6 +1871,14 @@
       "credit": "Aaron Chidwick",
       "license": "CC BY 4.0",
       "page": "https://www.inaturalist.org/photos/353512776"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/364406954/medium.jpg",
+      "w": 500,
+      "h": 249,
+      "credit": "no rights reserved",
+      "license": "CC0 1.0",
+      "page": "https://www.inaturalist.org/photos/364406954"
      }
     ]
    },
@@ -1896,7 +1911,7 @@
     "It lives in deep water.",
     "Its snout is rounded, not pointed.",
     "The answer has 3 words (9, 7, 5 letters).",
-    "It starts with the letter B."
+    "Its first letter is B."
    ],
    "media": {
     "img": [
@@ -1952,7 +1967,7 @@
     "It is one of the smallest sharks in the world.",
     "It is named after a small glowing light.",
     "The answer has 2 words (5, 12 letters).",
-    "It starts with the letter D."
+    "Its first letter is D."
    ],
    "media": {
     "img": [
@@ -2089,6 +2104,53 @@
    ],
    "explain": "Its upper tail fin can be as long as the rest of its body.",
    "difficulty": 2
+  },
+  {
+   "id": "q11",
+   "kind": "mc",
+   "prompt": "Which shark has a head shaped like a hammer?",
+   "answer": "Hammerhead shark",
+   "wrong": [
+    "Whale shark",
+    "Tiger shark",
+    "Nurse shark"
+   ],
+   "explain": "Its wide head helps it find food hidden in the sand.",
+   "difficulty": 1
+  },
+  {
+   "id": "q12",
+   "kind": "mc",
+   "prompt": "What do sharks use to breathe underwater?",
+   "answer": "Gills",
+   "wrong": [
+    "Lungs",
+    "A blowhole",
+    "Their fins"
+   ],
+   "explain": "Water flows over their gills, which take in oxygen.",
+   "difficulty": 1
+  },
+  {
+   "id": "q13",
+   "kind": "tf",
+   "prompt": "All sharks are dangerous to people.",
+   "answer": false,
+   "explain": "Most sharks are harmless; whale sharks eat only tiny plankton.",
+   "difficulty": 1
+  },
+  {
+   "id": "q14",
+   "kind": "mc",
+   "prompt": "Which is bigger?",
+   "answer": "Whale shark",
+   "wrong": [
+    "Great white shark",
+    "Nurse shark",
+    "Hammerhead shark"
+   ],
+   "explain": "The whale shark is the biggest fish of all.",
+   "difficulty": 1
   }
  ],
  "fakes": [

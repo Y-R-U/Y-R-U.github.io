@@ -64,7 +64,8 @@ for (const id of ids) {
         if (!(await download(m.src, tmp))) continue;
         try {
           if (kind === 'img') {
-            execFileSync('sips', ['-s', 'format', 'jpeg', '-s', 'formatOptions', '80', '-Z', '640', tmp, '--out', join(ROOT, rel)], { stdio: 'ignore' });
+            const dims = execFileSync('sips', ['-g', 'pixelWidth', '-g', 'pixelHeight', tmp]).toString().match(/\d+/g).slice(-2).map(Number);
+            execFileSync('sips', ['-s', 'format', 'jpeg', '-s', 'formatOptions', '80', ...(Math.max(...dims) > 640 ? ['-Z', '640'] : []), tmp, '--out', join(ROOT, rel)], { stdio: 'ignore' });
             const out = execFileSync('sips', ['-g', 'pixelWidth', '-g', 'pixelHeight', join(ROOT, rel)]).toString();
             m.w = +out.match(/pixelWidth: (\d+)/)[1]; m.h = +out.match(/pixelHeight: (\d+)/)[1];
             unlinkSync(tmp);

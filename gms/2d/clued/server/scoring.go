@@ -30,6 +30,7 @@ type qMeta struct {
 	Format  string
 	Answer  json.RawMessage
 	LimitMs int
+	Stages  int // progressive question: stages 0…Stages-1 (0/1 = not progressive)
 }
 
 func parseMeta(raw json.RawMessage) qMeta {
@@ -37,9 +38,10 @@ func parseMeta(raw json.RawMessage) qMeta {
 		Format    string          `json:"format"`
 		Answer    json.RawMessage `json:"answer"`
 		TimeLimit float64         `json:"timeLimit"`
+		Stages    int             `json:"stages"`
 	}
 	json.Unmarshal(raw, &q)
-	m := qMeta{Format: q.Format, Answer: q.Answer}
+	m := qMeta{Format: q.Format, Answer: q.Answer, Stages: max(0, min(q.Stages, 50))}
 	// timeLimit may be seconds (small numbers) or ms.
 	switch {
 	case q.TimeLimit <= 0:
@@ -114,3 +116,19 @@ func withStreak(base, streak int) int {
 	pct := min(50, 10*(streak-1))
 	return int(math.Round(float64(base) * float64(100+pct) / 100))
 }
+
+// stageMultiplier per CONTRACT "Progressive stages": 1 at stage 0 down to 0.4 at the last stage.
+func stageMultiplier(stage, n int) float64 {
+	if n < 2 {
+		return 1
+	}
+	return 1 - 0.6*float64(min(stage, n-1))/float64(n-1)
+}
+
+// Progressive timing: initial = answer time × 1.5 (min 10 s); each stage advance extends to
+// max(deadline, advance + max(5 s, answer/2)); capped at 90 s from the question start.
+const (
+	progressiveInitial = 10000
+	stageExtendMin     = 5000
+	progressiveCap     = 90000
+)

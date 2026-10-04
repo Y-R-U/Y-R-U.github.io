@@ -1,5 +1,6 @@
 // Shared game flow: build questions from a spec, preflight media, run them, go to results.
 import { buildQuestions } from '../core/spec.js?v=1';
+import { getFormat } from '../formats/registry.js?v=1';
 import { urlsOf, preflight, swapFailed } from '../core/media.js?v=1';
 import { createRunner } from './runner.js?v=1';
 import { defineScreen, go, back, current } from '../ui/app.js?v=1';
@@ -15,6 +16,15 @@ const TIPS = [
   'Kids mode: bigger pictures, no timer, and stickers to collect.',
 ];
 
+// Lets formats refresh their media before preflight (e.g. listen re-resolves stale Apple previews).
+export async function prepareFormats(questions) {
+  const byFmt = new Map();
+  for (const q of questions) byFmt.set(q.format, [...(byFmt.get(q.format) || []), q]);
+  await Promise.all([...byFmt].map(async ([id, qs]) => {
+    try { await getFormat(id)?.prepare?.(qs); } catch (e) { console.warn('[clued] prepare failed', id, e); }
+  }));
+}
+
 // Renders a progress screen into el. Returns { questions, spares, dropped }.
 export async function prepare(spec, el, { sparesRatio = 0.4 } = {}) {
   el.innerHTML = '';
@@ -23,6 +33,7 @@ export async function prepare(spec, el, { sparesRatio = 0.4 } = {}) {
   el.append(h('div.pf', {}, h('div.pf-ico', {}, '🔎'), h('h2', {}, 'Getting ready'), bar, txt,
     h('p.pf-tip', {}, TIPS[Math.floor(Math.random() * TIPS.length)])));
   const { questions, spares } = await buildQuestions(spec, { sparesRatio });
+  await prepareFormats(questions);
   const urls = urlsOf(questions);
   let result = { questions, spares, dropped: 0 };
   if (urls.length) {

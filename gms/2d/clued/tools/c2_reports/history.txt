@@ -1,0 +1,11 @@
+no Wikidata date: Vikings raid Lindisfarne 793 (kept, checked by hand against Wikipedia)
+no Wikidata date: Charlemagne is crowned emperor 800 (kept, checked by hand against Wikipedia)
+hand-checked The Black Death reaches Europe 1347: Plague reached Sicily (Messina) in October 1347; Wikidata gives the pandemic span 1346–1352.
+no Wikidata date: The Mayflower reaches America 1620 (kept, checked by hand against Wikipedia)
+hand-checked Captain Cook reaches Botany Bay 1770: Endeavour anchored in Botany Bay on 29 April 1770; Wikidata gives the voyage span 1768–1771.
+hand-checked The First Fleet arrives in Australia 1788: The fleet reached Botany Bay on 18–20 January 1788 after leaving England in May 1787.
+no Wikidata date: Alexander Fleming discovers penicillin 1928 (kept, checked by hand against Wikipedia)
+no Wikidata date: Dolly the sheep is born 1996 (kept, checked by hand against Wikipedia)
+no Wikidata date: Euro notes and coins come into use 2002 (kept, checked by hand against Wikipedia)
+hand-checked The Human Genome Project is completed 2003: Declared complete in April 2003; Wikidata gives the 1990 start.
+hand-checked COVID-19 is declared a pandemic 2020: The WHO declared a pandemic on 11 March 2020; Wikidata gives the December 2019 outbreak start.

@@ -1,0 +1,185 @@
+{
+ "pieces": [
+  {
+   "id": "gymnopedie-1",
+   "title": "Gymnopédie No. 1",
+   "composer": "Erik Satie",
+   "src": "data/music/bgm/gymnopedie-1.json",
+   "license": "PD",
+   "page": "https://www.mutopiaproject.org/cgibin/piece-info.cgi?id=37",
+   "credit": "Erik Satie; MIDI from the Mutopia Project, maintained by Evin Robertson"
+  },
+  {
+   "id": "gymnopedie-2",
+   "title": "Gymnopédie No. 2",
+   "composer": "Erik Satie",
+   "src": "data/music/bgm/gymnopedie-2.json",
+   "license": "PD",
+   "page": "https://www.mutopiaproject.org/cgibin/piece-info.cgi?id=38",
+   "credit": "Erik Satie; MIDI from the Mutopia Project, maintained by Evin Robertson"
+  },
+  {
+   "id": "gymnopedie-3",
+   "title": "Gymnopédie No. 3",
+   "composer": "Erik Satie",
+   "src": "data/music/bgm/gymnopedie-3.json",
+   "license": "PD",
+   "page": "https://www.mutopiaproject.org/cgibin/piece-info.cgi?id=39",
+   "credit": "Erik Satie; MIDI from the Mutopia Project, maintained by Evin Robertson"
+  },
+  {
+   "id": "gnossienne-1",
+   "title": "Gnossienne No. 1",
+   "composer": "Erik Satie",
+   "src": "data/music/bgm/gnossienne-1.json",
+   "license": "CC BY-SA 4.0",
+   "page": "https://www.mutopiaproject.org/cgibin/piece-info.cgi?id=2035",
+   "credit": "Erik Satie; MIDI from the Mutopia Project, maintained by Knute Snortum"
+  },
+  {
+   "id": "gnossienne-3",
+   "title": "Gnossienne No. 3",
+   "composer": "Erik Satie",
+   "src": "data/music/bgm/gnossienne-3.json",
+   "license": "CC BY-SA 4.0",
+   "page": "https://www.mutopiaproject.org/cgibin/piece-info.cgi?id=2131",
+   "credit": "Erik Satie; MIDI from the Mutopia Project, maintained by Frédéric Duperray"
+  },
+  {
+   "id": "clair-de-lune",
+   "title": "Clair de lune",
+   "composer": "Claude Debussy",
+   "src": "data/music/bgm/clair-de-lune.json",
+   "license": "PD",
+   "page": "https://www.mutopiaproject.org/cgibin/piece-info.cgi?id=1778",
+   "credit": "Claude Debussy; MIDI from the Mutopia Project, maintained by Keith OHara"
+  },
+  {
+   "id": "prelude-in-c",
+   "title": "Prelude in C major, BWV 846",
+   "composer": "Johann Sebastian Bach",
+   "src": "data/music/bgm/prelude-in-c.json",
+   "license": "PD",
+   "page": "https://www.mutopiaproject.org/cgibin/piece-info.cgi?id=5",
+   "credit": "Johann Sebastian Bach; MIDI from the Mutopia Project, maintained by Tobias Erbsland"
+  },
+  {
+   "id": "traumerei",
+   "title": "Träumerei (Kinderszenen)",
+   "composer": "Robert Schumann",
+   "src": "data/music/bgm/traumerei.json",
+   "license": "PD",
+   "page": "https://www.mutopiaproject.org/cgibin/piece-info.cgi?id=504",
+   "credit": "Robert Schumann; MIDI from the Mutopia Project, maintained by Ying-Chun Liu"
+  },
+  {
+   "id": "von-fremden-landern",
+   "title": "Of Foreign Lands and Peoples (Kinderszenen)",
+   "composer": "Robert Schumann",
+   "src": "data/music/bgm/von-fremden-landern.json",
+   "license": "PD",
+   "page": "https://www.mutopiaproject.org/cgibin/piece-info.cgi?id=354",
+   "credit": "Robert Schumann; MIDI from the Mutopia Project, maintained by Ying-Chun Liu"
+  },
+  {
+   "id": "nocturne-op9-2",
+   "title": "Nocturne Op. 9 No. 2",
+   "composer": "Frédéric Chopin",
+   "src": "data/music/bgm/nocturne-op9-2.json",
+   "license": "CC BY-SA 3.0",
+   "page": "https://www.mutopiaproject.org/cgibin/piece-info.cgi?id=1590",
+   "credit": "Frédéric Chopin; MIDI from the Mutopia Project, maintained by Renato Biolcati Rinaldi"
+  },
+  {
+   "id": "nocturne-e-minor",
+   "title": "Nocturne in E minor, Op. 72 No. 1",
+   "composer": "Frédéric Chopin",
+   "src": "data/music/bgm/nocturne-e-minor.json",
+   "license": "CC BY-SA 4.0",
+   "page": "https://www.mutopiaproject.org/cgibin/piece-info.cgi?id=509",
+   "credit": "Frédéric Chopin; MIDI from the Mutopia Project, maintained by Benjamin D. Esham"
+  },
+  {
+   "id": "prelude-op28-4",
+   "title": "Prelude Op. 28 No. 4",
+   "composer": "Frédéric Chopin",
+   "src": "data/music/bgm/prelude-op28-4.json",
+   "license": "PD",
+   "page": "https://www.mutopiaproject.org/cgibin/piece-info.cgi?id=468",
+   "credit": "Frédéric Chopin; MIDI from the Mutopia Project, maintained by Magnus Lewis-Smith"
+  },
+  {
+   "id": "prelude-op28-15",
+   "title": "Prelude Op. 28 No. 15 \"Raindrop\"",
+   "composer": "Frédéric Chopin",
+   "src": "data/music/bgm/prelude-op28-15.json",
+   "license": "PD",
+   "page": "https://www.mutopiaproject.org/cgibin/piece-info.cgi?id=471",
+   "credit": "Frédéric Chopin; MIDI from the Mutopia Project, maintained by Magnus Lewis-Smith"
+  },
+  {
+   "id": "consolation-3",
+   "title": "Consolation No. 3",
+   "composer": "Franz Liszt",
+   "src": "data/music/bgm/consolation-3.json",
+   "license": "CC BY 3.0",
+   "page": "https://www.mutopiaproject.org/cgibin/piece-info.cgi?id=1647",
+   "credit": "Franz Liszt; MIDI from the Mutopia Project, maintained by Ryan Prince"
+  },
+  {
+   "id": "consolation-1",
+   "title": "Consolation No. 1",
+   "composer": "Franz Liszt",
+   "src": "data/music/bgm/consolation-1.json",
+   "license": "CC BY 3.0",
+   "page": "https://www.mutopiaproject.org/cgibin/piece-info.cgi?id=1654",
+   "credit": "Franz Liszt; MIDI from the Mutopia Project, maintained by Ryan Prince"
+  },
+  {
+   "id": "field-nocturne-5",
+   "title": "Nocturne No. 5",
+   "composer": "John Field",
+   "src": "data/music/bgm/field-nocturne-5.json",
+   "license": "CC BY-SA 4.0",
+   "page": "https://www.mutopiaproject.org/cgibin/piece-info.cgi?id=2137",
+   "credit": "John Field; MIDI from the Mutopia Project, maintained by Alex Schreiber"
+  },
+  {
+   "id": "gondellied",
+   "title": "Venetian Boat Song, Op. 30 No. 6",
+   "composer": "Felix Mendelssohn",
+   "src": "data/music/bgm/gondellied.json",
+   "license": "PD",
+   "page": "https://www.mutopiaproject.org/cgibin/piece-info.cgi?id=1741",
+   "credit": "Felix Mendelssohn; MIDI from the Mutopia Project, maintained by Ryan Prince"
+  },
+  {
+   "id": "morning-prayer",
+   "title": "Morning Prayer, Op. 39 No. 1",
+   "composer": "Pyotr Ilyich Tchaikovsky",
+   "src": "data/music/bgm/morning-prayer.json",
+   "license": "PD",
+   "page": "https://www.mutopiaproject.org/cgibin/piece-info.cgi?id=2032",
+   "credit": "Pyotr Ilyich Tchaikovsky; MIDI from the Mutopia Project, maintained by Rem Zolotykh"
+  },
+  {
+   "id": "old-french-song",
+   "title": "Old French Song, Op. 39 No. 16",
+   "composer": "Pyotr Ilyich Tchaikovsky",
+   "src": "data/music/bgm/old-french-song.json",
+   "license": "PD",
+   "page": "https://www.mutopiaproject.org/cgibin/piece-info.cgi?id=2080",
+   "credit": "Pyotr Ilyich Tchaikovsky; MIDI from the Mutopia Project, maintained by David McNamara"
+  },
+  {
+   "id": "albumblatt",
+   "title": "Albumblatt, Op. 12 No. 3",
+   "composer": "Edvard Grieg",
+   "src": "data/music/bgm/albumblatt.json",
+   "license": "CC BY-SA 4.0",
+   "page": "https://www.mutopiaproject.org/cgibin/piece-info.cgi?id=2194",
+   "credit": "Edvard Grieg; MIDI from the Mutopia Project, maintained by Knute Snortum"
+  }
+ ],
+ "piano": "Salamander Grand Piano V3 by Alexander Holm (CC BY 3.0)"
+}

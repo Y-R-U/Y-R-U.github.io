@@ -1,0 +1,3655 @@
+{
+ "id": "tv",
+ "title": "TV shows",
+ "theme": "screen",
+ "icon": "📺",
+ "kids": false,
+ "version": 1,
+ "factsMeta": {
+  "year": {
+   "type": "year",
+   "label": "First shown",
+   "higherLabel": "Newer",
+   "askHigh": "Which of these shows started most recently?",
+   "askLow": "Which of these shows started first?"
+  },
+  "country": {
+   "type": "cat",
+   "label": "Country of origin",
+   "ask": "Which country does {name} come from?",
+   "stmt": "Country of origin of {name}: {value}."
+  },
+  "decade": {
+   "type": "cat",
+   "label": "Decade",
+   "ask": "In which decade did {name} start?",
+   "stmt": "{name} started in the {value}."
+  },
+  "kids": {
+   "type": "bool",
+   "label": "Children's show",
+   "yes": "Children's show",
+   "no": "Not a children’s show",
+   "askBool": "Which of these is a children's show?",
+   "stmt": "{name} is a children's show."
+  }
+ },
+ "items": [
+  {
+   "id": "doctor-who",
+   "name": "Doctor Who",
+   "alt": [],
+   "group": "1960s",
+   "facts": {
+    "year": 1963,
+    "country": "United Kingdom",
+    "decade": "1960s",
+    "kids": true
+   },
+   "blurb": "Doctor Who (first shown 1963, United Kingdom). A time-travelling alien flies a ship that looks like a blue police box.",
+   "clues": [
+    "Its first episode aired the day after President Kennedy was shot.",
+    "Its hero regenerates into a new body instead of dying.",
+    "The enemies include the Daleks and the Cybermen.",
+    "It first aired in 1963.",
+    "It was made in the United Kingdom.",
+    "A time-travelling alien flies a ship that looks like a blue police box."
+   ],
+   "difficulty": 1
+  },
+  {
+   "id": "the-simpsons",
+   "name": "The Simpsons",
+   "alt": [
+    "Simpsons"
+   ],
+   "group": "1980s",
+   "facts": {
+    "year": 1989,
+    "country": "United States",
+    "decade": "1980s"
+   },
+   "blurb": "The Simpsons (first shown 1989, United States). A yellow cartoon family: Homer, Marge, Bart, Lisa and Maggie.",
+   "clues": [
+    "Its characters first appeared in short cartoons on The Tracey Ullman Show.",
+    "Its creator named characters after his own family.",
+    "The family lives in the town of Springfield.",
+    "It first aired in 1989.",
+    "It was made in the United States.",
+    "A yellow cartoon family: Homer, Marge, Bart, Lisa and Maggie."
+   ],
+   "difficulty": 1
+  },
+  {
+   "id": "friends",
+   "name": "Friends",
+   "alt": [],
+   "group": "1990s",
+   "facts": {
+    "year": 1994,
+    "country": "United States",
+    "decade": "1990s"
+   },
+   "blurb": "Friends (first shown 1994, United States). Six pals in their twenties share flats, jokes and love lives in Manhattan.",
+   "clues": [
+    "It ran for ten seasons, ending in 2004.",
+    "Joey's catchphrase is a cheeky greeting.",
+    "The six often hang out at the Central Perk coffee shop.",
+    "It first aired in 1994.",
+    "It was made in the United States.",
+    "Six pals in their twenties share flats, jokes and love lives in Manhattan."
+   ],
+   "difficulty": 1
+  },
+  {
+   "id": "star-trek",
+   "name": "Star Trek",
+   "alt": [
+    "Star Trek: The Original Series"
+   ],
+   "group": "1960s",
+   "facts": {
+    "year": 1966,
+    "country": "United States",
+    "decade": "1960s"
+   },
+   "blurb": "Star Trek (first shown 1966, United States). Captain Kirk and Mr Spock explore strange new worlds.",
+   "clues": [
+    "Its creator was Gene Roddenberry.",
+    "Its Vulcan officer greets people with a split-fingered salute.",
+    "The crew serve on the USS Enterprise.",
+    "It first aired in 1966.",
+    "It was made in the United States.",
+    "Captain Kirk and Mr Spock explore strange new worlds."
+   ],
+   "difficulty": 2
+  },
+  {
+   "id": "sesame-street",
+   "name": "Sesame Street",
+   "alt": [],
+   "group": "1960s",
+   "facts": {
+    "year": 1969,
+    "country": "United States",
+    "decade": "1960s",
+    "kids": true
+   },
+   "blurb": "Sesame Street (first shown 1969, United States). Muppets teach letters and numbers in a New York neighbourhood.",
+   "clues": [
+    "It was one of the first children's shows designed with help from educational researchers.",
+    "A grouchy character lives in a trash can.",
+    "Big Bird and Elmo live there.",
+    "It first aired in 1969.",
+    "It was made in the United States.",
+    "Muppets teach letters and numbers in a New York neighbourhood."
+   ],
+   "difficulty": 1
+  },
+  {
+   "id": "coronation-street",
+   "name": "Coronation Street",
+   "alt": [
+    "Corrie"
+   ],
+   "group": "1960s",
+   "facts": {
+    "year": 1960,
+    "country": "United Kingdom",
+    "decade": "1960s"
+   },
+   "blurb": "Coronation Street (first shown 1960, United Kingdom). A soap opera about life on a cobbled terrace near Manchester.",
+   "clues": [
+    "Guinness has called it the world's longest-running TV soap still in production.",
+    "Its pub is the Rovers Return.",
+    "It is set in the fictional town of Weatherfield.",
+    "It first aired in 1960.",
+    "It was made in the United Kingdom.",
+    "A soap opera about life on a cobbled terrace near Manchester."
+   ],
+   "difficulty": 2
+  },
+  {
+   "id": "eastenders",
+   "name": "EastEnders",
+   "alt": [],
+   "group": "1980s",
+   "facts": {
+    "year": 1985,
+    "country": "United Kingdom",
+    "decade": "1980s"
+   },
+   "blurb": "EastEnders (first shown 1985, United Kingdom). A BBC soap opera set around Albert Square in East London.",
+   "clues": [
+    "Its episodes famously end on a drum-beat cliffhanger.",
+    "Its pub is the Queen Vic.",
+    "It is set in the fictional borough of Walford.",
+    "It first aired in 1985.",
+    "It was made in the United Kingdom.",
+    "A BBC soap opera set around Albert Square in East London."
+   ],
+   "difficulty": 2
+  },
+  {
+   "id": "neighbours",
+   "name": "Neighbours",
+   "alt": [],
+   "group": "1980s",
+   "facts": {
+    "year": 1985,
+    "country": "Australia",
+    "decade": "1980s"
+   },
+   "blurb": "Neighbours (first shown 1985, Australia). An Australian soap about families on one suburban street.",
+   "clues": [
+    "Kylie Minogue and Jason Donovan became stars on it.",
+    "It is set in the suburb of Erinsborough.",
+    "The families live on Ramsay Street.",
+    "It first aired in 1985.",
+    "It was made in Australia.",
+    "An Australian soap about families on one suburban street."
+   ],
+   "difficulty": 2
+  },
+  {
+   "id": "game-of-thrones",
+   "name": "Game of Thrones",
+   "alt": [
+    "GoT"
+   ],
+   "group": "2010s",
+   "facts": {
+    "year": 2011,
+    "country": "United States",
+    "decade": "2010s"
+   },
+   "blurb": "Game of Thrones (first shown 2011, United States). Noble families battle to rule the Seven Kingdoms of Westeros.",
+   "clues": [
+    "It is based on A Song of Ice and Fire.",
+    "Its houses include Stark, Lannister and Targaryen.",
+    "Daenerys has three dragons.",
+    "It first aired in 2011.",
+    "It was made in the United States.",
+    "Noble families battle to rule the Seven Kingdoms of Westeros."
+   ],
+   "difficulty": 2
+  },
+  {
+   "id": "breaking-bad",
+   "name": "Breaking Bad",
+   "alt": [],
+   "group": "2000s",
+   "facts": {
+    "year": 2008,
+    "country": "United States",
+    "decade": "2000s"
+   },
+   "blurb": "Breaking Bad (first shown 2008, United States). A chemistry teacher turns to crime after a cancer diagnosis.",
+   "clues": [
+    "It is set in Albuquerque, New Mexico.",
+    "Its hero's partner is his former student Jesse Pinkman.",
+    "Walter White's drug-world alias is Heisenberg.",
+    "It first aired in 2008.",
+    "It was made in the United States.",
+    "A chemistry teacher turns to crime after a cancer diagnosis."
+   ],
+   "difficulty": 2
+  },
+  {
+   "id": "the-office-us",
+   "name": "The Office (US)",
+   "alt": [
+    "The Office"
+   ],
+   "group": "2000s",
+   "facts": {
+    "year": 2005,
+    "country": "United States",
+    "decade": "2000s"
+   },
+   "blurb": "The Office (US) (first shown 2005, United States). A mockumentary about workers at the Dunder Mifflin paper company.",
+   "clues": [
+    "It is a remake of a British show by Ricky Gervais and Stephen Merchant.",
+    "Jim keeps pranking his desk neighbour Dwight.",
+    "Its manager is Michael Scott.",
+    "It first aired in 2005.",
+    "It was made in the United States.",
+    "A mockumentary about workers at the Dunder Mifflin paper company."
+   ],
+   "difficulty": 2
+  },
+  {
+   "id": "seinfeld",
+   "name": "Seinfeld",
+   "alt": [],
+   "group": "1980s",
+   "facts": {
+    "year": 1989,
+    "country": "United States",
+    "decade": "1980s"
+   },
+   "blurb": "Seinfeld (first shown 1989, United States). A New York comedian and his friends obsess over small things.",
+   "clues": [
+    "It was often called a show about nothing.",
+    "Kramer bursts into his neighbour's flat.",
+    "Its friends are Jerry, George, Elaine and Kramer.",
+    "It first aired in 1989.",
+    "It was made in the United States.",
+    "A New York comedian and his friends obsess over small things."
+   ],
+   "difficulty": 2
+  },
+  {
+   "id": "fawlty-towers",
+   "name": "Fawlty Towers",
+   "alt": [],
+   "group": "1970s",
+   "facts": {
+    "year": 1975,
+    "country": "United Kingdom",
+    "decade": "1970s"
+   },
+   "blurb": "Fawlty Towers (first shown 1975, United Kingdom). John Cleese plays a rude hotel owner in Torquay.",
+   "clues": [
+    "Only twelve episodes were ever made.",
+    "Its hapless Spanish waiter is Manuel.",
+    "Basil runs it with his wife Sybil.",
+    "It first aired in 1975.",
+    "It was made in the United Kingdom.",
+    "John Cleese plays a rude hotel owner in Torquay."
+   ],
+   "difficulty": 2
+  },
+  {
+   "id": "only-fools-and-horses",
+   "name": "Only Fools and Horses",
+   "alt": [],
+   "group": "1980s",
+   "facts": {
+    "year": 1981,
+    "country": "United Kingdom",
+    "decade": "1980s"
+   },
+   "blurb": "Only Fools and Horses (first shown 1981, United Kingdom). Del Boy is a market trader in Peckham who dreams of being a millionaire.",
+   "clues": [
+    "Its family firm is Trotters Independent Traders.",
+    "Its brothers drive a yellow three-wheeled van.",
+    "Rodney is the younger brother.",
+    "It first aired in 1981.",
+    "It was made in the United Kingdom.",
+    "Del Boy is a market trader in Peckham who dreams of being a millionaire."
+   ],
+   "difficulty": 2
+  },
+  {
+   "id": "blue-peter",
+   "name": "Blue Peter",
+   "alt": [],
+   "group": "1950s",
+   "facts": {
+    "year": 1958,
+    "country": "United Kingdom",
+    "decade": "1950s",
+    "kids": true
+   },
+   "blurb": "Blue Peter (first shown 1958, United Kingdom). A long-running BBC magazine show for children.",
+   "clues": [
+    "Its theme tune is called Barnacle Bill.",
+    "Presenters show how to make things with sticky-backed plastic.",
+    "Children can win its famous badge.",
+    "It first aired in 1958.",
+    "It was made in the United Kingdom.",
+    "A long-running BBC magazine show for children."
+   ],
+   "difficulty": 2
+  },
+  {
+   "id": "top-gear",
+   "name": "Top Gear",
+   "alt": [],
+   "group": "2000s",
+   "facts": {
+    "year": 2002,
+    "country": "United Kingdom",
+    "decade": "2000s"
+   },
+   "blurb": "Top Gear (first shown 2002, United Kingdom). A BBC programme about cars and road trips.",
+   "clues": [
+    "Celebrities race round a test track in a reasonably priced car.",
+    "Its anonymous racing driver is called the Stig.",
+    "Its best-known presenters were Clarkson, Hammond and May.",
+    "It first aired in 2002.",
+    "It was made in the United Kingdom.",
+    "A BBC programme about cars and road trips."
+   ],
+   "difficulty": 2
+  },
+  {
+   "id": "the-x-files",
+   "name": "The X-Files",
+   "alt": [],
+   "group": "1990s",
+   "facts": {
+    "year": 1993,
+    "country": "United States",
+    "decade": "1990s"
+   },
+   "blurb": "The X-Files (first shown 1993, United States). Two FBI agents investigate the paranormal.",
+   "clues": [
+    "Its tagline is The Truth Is Out There.",
+    "A poster in an office says I Want to Believe.",
+    "Mulder believes and Scully doubts.",
+    "It first aired in 1993.",
+    "It was made in the United States.",
+    "Two FBI agents investigate the paranormal."
+   ],
+   "difficulty": 2
+  },
+  {
+   "id": "mr-bean",
+   "name": "Mr. Bean",
+   "alt": [
+    "Mr Bean"
+   ],
+   "group": "1990s",
+   "facts": {
+    "year": 1990,
+    "country": "United Kingdom",
+    "decade": "1990s",
+    "kids": true
+   },
+   "blurb": "Mr. Bean (first shown 1990, United Kingdom). Rowan Atkinson plays a clumsy, almost silent man.",
+   "clues": [
+    "Its hero has a teddy bear called Teddy.",
+    "He drives a green Mini.",
+    "He hardly ever speaks.",
+    "It first aired in 1990.",
+    "It was made in the United Kingdom.",
+    "Rowan Atkinson plays a clumsy, almost silent man."
+   ],
+   "difficulty": 1
+  },
+  {
+   "id": "thomas-and-friends",
+   "name": "Thomas & Friends",
+   "alt": [
+    "Thomas the Tank Engine"
+   ],
+   "group": "1980s",
+   "facts": {
+    "year": 1984,
+    "country": "United Kingdom",
+    "decade": "1980s",
+    "kids": true
+   },
+   "blurb": "Thomas & Friends (first shown 1984, United Kingdom). A cheeky little blue steam locomotive with the number 1.",
+   "clues": [
+    "It was based on books by the Reverend W. Awdry.",
+    "The Fat Controller runs the railway.",
+    "The locomotives live on the Island of Sodor.",
+    "It first aired in 1984.",
+    "It was made in the United Kingdom.",
+    "A cheeky little blue steam locomotive with the number 1."
+   ],
+   "difficulty": 1
+  },
+  {
+   "id": "peppa-pig",
+   "name": "Peppa Pig",
+   "alt": [],
+   "group": "2000s",
+   "facts": {
+    "year": 2004,
+    "country": "United Kingdom",
+    "decade": "2000s",
+    "kids": true
+   },
+   "blurb": "Peppa Pig (first shown 2004, United Kingdom). A cheerful little piglet and her family.",
+   "clues": [
+    "Her friends include Suzy Sheep and Danny Dog.",
+    "She loves jumping in muddy puddles.",
+    "Her little brother George loves his toy dinosaur.",
+    "It first aired in 2004.",
+    "It was made in the United Kingdom.",
+    "A cheerful little piglet and her family."
+   ],
+   "difficulty": 1
+  },
+  {
+   "id": "spongebob-squarepants",
+   "name": "SpongeBob SquarePants",
+   "alt": [
+    "SpongeBob"
+   ],
+   "group": "1990s",
+   "facts": {
+    "year": 1999,
+    "country": "United States",
+    "decade": "1990s",
+    "kids": true
+   },
+   "blurb": "SpongeBob SquarePants (first shown 1999, United States). A yellow, square sea creature lives in a pineapple under the sea.",
+   "clues": [
+    "Its creator was a marine biologist.",
+    "He works at the Krusty Krab.",
+    "His best friend is a starfish called Patrick.",
+    "It first aired in 1999.",
+    "It was made in the United States.",
+    "A yellow, square sea creature lives in a pineapple under the sea."
+   ],
+   "difficulty": 1
+  },
+  {
+   "id": "stranger-things",
+   "name": "Stranger Things",
+   "alt": [],
+   "group": "2010s",
+   "facts": {
+    "year": 2016,
+    "country": "United States",
+    "decade": "2010s"
+   },
+   "blurb": "Stranger Things (first shown 2016, United States). Children search for their missing friend Will.",
+   "clues": [
+    "It is set in the 1980s in Hawkins, Indiana.",
+    "A girl called Eleven has powers.",
+    "Monsters come from the Upside Down.",
+    "It first aired in 2016.",
+    "It was made in the United States.",
+    "Children search for their missing friend Will."
+   ],
+   "difficulty": 1
+  },
+  {
+   "id": "the-crown",
+   "name": "The Crown",
+   "alt": [],
+   "group": "2010s",
+   "facts": {
+    "year": 2016,
+    "country": "United Kingdom",
+    "decade": "2010s"
+   },
+   "blurb": "The Crown (first shown 2016, United Kingdom). A drama about the reign of Elizabeth II.",
+   "clues": [
+    "Three different actresses play the queen as she ages.",
+    "It was made for Netflix.",
+    "It begins with a royal wedding in 1947.",
+    "It first aired in 2016.",
+    "It was made in the United Kingdom.",
+    "A drama about the reign of Elizabeth II."
+   ],
+   "difficulty": 2
+  },
+  {
+   "id": "downton-abbey",
+   "name": "Downton Abbey",
+   "alt": [],
+   "group": "2010s",
+   "facts": {
+    "year": 2010,
+    "country": "United Kingdom",
+    "decade": "2010s"
+   },
+   "blurb": "Downton Abbey (first shown 2010, United Kingdom). A drama about an aristocratic family and their servants in the early 1900s.",
+   "clues": [
+    "It was filmed at Highclere Castle.",
+    "The butler is Mr Carson.",
+    "The Crawley family live upstairs.",
+    "It first aired in 2010.",
+    "It was made in the United Kingdom.",
+    "A drama about an aristocratic family and their servants in the early 1900s."
+   ],
+   "difficulty": 2
+  },
+  {
+   "id": "sherlock",
+   "name": "Sherlock",
+   "alt": [],
+   "group": "2010s",
+   "facts": {
+    "year": 2010,
+    "country": "United Kingdom",
+    "decade": "2010s"
+   },
+   "blurb": "Sherlock (first shown 2010, United Kingdom). A modern-day version of Conan Doyle's detective in London.",
+   "clues": [
+    "Its villain is Jim Moriarty.",
+    "Its detective uses texts and websites.",
+    "Benedict Cumberbatch and Martin Freeman star.",
+    "It first aired in 2010.",
+    "It was made in the United Kingdom.",
+    "A modern-day version of Conan Doyle's detective in London."
+   ],
+   "difficulty": 1
+  },
+  {
+   "id": "lost",
+   "name": "Lost",
+   "alt": [],
+   "group": "2000s",
+   "facts": {
+    "year": 2004,
+    "country": "United States",
+    "decade": "2000s"
+   },
+   "blurb": "Lost (first shown 2004, United States). Plane-crash survivors are stranded on a strange tropical island.",
+   "clues": [
+    "A mysterious set of numbers keeps reappearing.",
+    "A hatch hides an underground station.",
+    "Oceanic Flight 815 crashes.",
+    "It first aired in 2004.",
+    "It was made in the United States.",
+    "Plane-crash survivors are stranded on a strange tropical island."
+   ],
+   "difficulty": 2
+  },
+  {
+   "id": "the-sopranos",
+   "name": "The Sopranos",
+   "alt": [],
+   "group": "1990s",
+   "facts": {
+    "year": 1999,
+    "country": "United States",
+    "decade": "1990s"
+   },
+   "blurb": "The Sopranos (first shown 1999, United States). A New Jersey mob boss juggles family life and crime.",
+   "clues": [
+    "Its final scene cuts abruptly to black.",
+    "It is set in New Jersey.",
+    "Its hero sees a psychiatrist, Dr Melfi.",
+    "It first aired in 1999.",
+    "It was made in the United States.",
+    "A New Jersey mob boss juggles family life and crime."
+   ],
+   "difficulty": 3
+  },
+  {
+   "id": "twin-peaks",
+   "name": "Twin Peaks",
+   "alt": [],
+   "group": "1990s",
+   "facts": {
+    "year": 1990,
+    "country": "United States",
+    "decade": "1990s"
+   },
+   "blurb": "Twin Peaks (first shown 1990, United States). An FBI agent investigates a murder in a strange small town.",
+   "clues": [
+    "It was co-created by David Lynch.",
+    "Agent Cooper loves cherry pie and coffee.",
+    "Its mystery is who killed Laura Palmer.",
+    "It first aired in 1990.",
+    "It was made in the United States.",
+    "An FBI agent investigates a murder in a strange small town."
+   ],
+   "difficulty": 3
+  },
+  {
+   "id": "m-a-s-h",
+   "name": "M*A*S*H",
+   "alt": [
+    "MASH"
+   ],
+   "group": "1970s",
+   "facts": {
+    "year": 1972,
+    "country": "United States",
+    "decade": "1970s"
+   },
+   "blurb": "M*A*S*H (first shown 1972, United States). A comedy-drama about an army hospital unit.",
+   "clues": [
+    "Its final episode in 1983 was watched by a record US audience.",
+    "Hawkeye Pierce is a wisecracking surgeon.",
+    "It is set during the Korean War.",
+    "It first aired in 1972.",
+    "It was made in the United States.",
+    "A comedy-drama about an army hospital unit."
+   ],
+   "difficulty": 3
+  },
+  {
+   "id": "i-love-lucy",
+   "name": "I Love Lucy",
+   "alt": [],
+   "group": "1950s",
+   "facts": {
+    "year": 1951,
+    "country": "United States",
+    "decade": "1950s"
+   },
+   "blurb": "I Love Lucy (first shown 1951, United States). A classic 1950s sitcom about a scheming housewife.",
+   "clues": [
+    "It was one of the first shows filmed in front of a live audience with several cameras.",
+    "Its star's husband Ricky is a Cuban bandleader.",
+    "Lucille Ball and Desi Arnaz star.",
+    "It first aired in 1951.",
+    "It was made in the United States.",
+    "A classic 1950s sitcom about a scheming housewife."
+   ],
+   "difficulty": 3
+  },
+  {
+   "id": "the-muppet-show",
+   "name": "The Muppet Show",
+   "alt": [],
+   "group": "1970s",
+   "facts": {
+    "year": 1976,
+    "country": "United Kingdom",
+    "decade": "1970s",
+    "kids": true
+   },
+   "blurb": "The Muppet Show (first shown 1976, United Kingdom). Kermit the Frog hosts a chaotic variety programme.",
+   "clues": [
+    "It was made at studios in England.",
+    "Two old men heckle from a balcony.",
+    "Miss Piggy loves the host.",
+    "It first aired in 1976.",
+    "It was made in the United Kingdom.",
+    "Kermit the Frog hosts a chaotic variety programme."
+   ],
+   "difficulty": 2
+  },
+  {
+   "id": "bluey",
+   "name": "Bluey",
+   "alt": [],
+   "group": "2010s",
+   "facts": {
+    "year": 2018,
+    "country": "Australia",
+    "decade": "2010s",
+    "kids": true
+   },
+   "blurb": "Bluey (first shown 2018, Australia). A cattle-dog puppy loves playing imaginative games.",
+   "clues": [
+    "It is set in Brisbane.",
+    "Her dad Bandit joins in all the games.",
+    "Her little sister is Bingo.",
+    "It first aired in 2018.",
+    "It was made in Australia.",
+    "A cattle-dog puppy loves playing imaginative games."
+   ],
+   "difficulty": 1
+  },
+  {
+   "id": "pokemon",
+   "name": "Pokémon",
+   "alt": [
+    "Pokemon"
+   ],
+   "group": "1990s",
+   "facts": {
+    "year": 1997,
+    "country": "Japan",
+    "decade": "1990s",
+    "kids": true
+   },
+   "blurb": "Pokémon (first shown 1997, Japan). Ash Ketchum wants to be the very best trainer.",
+   "clues": [
+    "Team Rocket keeps trying to steal a special creature.",
+    "Its hero's rival is Gary.",
+    "Its hero's partner is Pikachu.",
+    "It first aired in 1997.",
+    "It was made in Japan.",
+    "Ash Ketchum wants to be the very best trainer."
+   ],
+   "difficulty": 1
+  },
+  {
+   "id": "squid-game",
+   "name": "Squid Game",
+   "alt": [],
+   "group": "2020s",
+   "facts": {
+    "year": 2021,
+    "country": "South Korea",
+    "decade": "2020s"
+   },
+   "blurb": "Squid Game (first shown 2021, South Korea). Debt-ridden contestants play for a huge cash prize.",
+   "clues": [
+    "Players wear green tracksuits.",
+    "Guards wear pink jumpsuits and masks.",
+    "Players compete in deadly versions of playground contests.",
+    "It first aired in 2021.",
+    "It was made in South Korea.",
+    "Debt-ridden contestants play for a huge cash prize."
+   ],
+   "difficulty": 2
+  },
+  {
+   "id": "grey-s-anatomy",
+   "name": "Grey's Anatomy",
+   "alt": [],
+   "group": "2000s",
+   "facts": {
+    "year": 2005,
+    "country": "United States",
+    "decade": "2000s"
+   },
+   "blurb": "Grey's Anatomy (first shown 2005, United States). A drama about young surgeons led by Meredith.",
+   "clues": [
+    "Its title is a pun on a famous medical textbook.",
+    "Its hero's nickname for her love is McDreamy.",
+    "It is set at a hospital in Seattle.",
+    "It first aired in 2005.",
+    "It was made in the United States.",
+    "A drama about young surgeons led by Meredith."
+   ],
+   "difficulty": 2
+  },
+  {
+   "id": "the-big-bang-theory",
+   "name": "The Big Bang Theory",
+   "alt": [],
+   "group": "2000s",
+   "facts": {
+    "year": 2007,
+    "country": "United States",
+    "decade": "2000s"
+   },
+   "blurb": "The Big Bang Theory (first shown 2007, United States). Nerdy scientists in Pasadena befriend their neighbour.",
+   "clues": [
+    "Its theme song is by Barenaked Ladies.",
+    "Sheldon has his own spot on the sofa.",
+    "Penny lives across the hall.",
+    "It first aired in 2007.",
+    "It was made in the United States.",
+    "Nerdy scientists in Pasadena befriend their neighbour."
+   ],
+   "difficulty": 1
+  },
+  {
+   "id": "strictly-come-dancing",
+   "name": "Strictly Come Dancing",
+   "alt": [
+    "Strictly"
+   ],
+   "group": "2000s",
+   "facts": {
+    "year": 2004,
+    "country": "United Kingdom",
+    "decade": "2000s"
+   },
+   "blurb": "Strictly Come Dancing (first shown 2004, United Kingdom). Celebrities learn the waltz, tango and salsa with professionals.",
+   "clues": [
+    "Most series include a special show from Blackpool's Tower Ballroom.",
+    "Its winners get the Glitterball trophy.",
+    "Judges hold up scores out of ten.",
+    "It first aired in 2004.",
+    "It was made in the United Kingdom.",
+    "Celebrities learn the waltz, tango and salsa with professionals."
+   ],
+   "difficulty": 2
+  },
+  {
+   "id": "who-wants-to-be-a-millionaire",
+   "name": "Who Wants to Be a Millionaire?",
+   "alt": [
+    "Millionaire"
+   ],
+   "group": "1990s",
+   "facts": {
+    "year": 1998,
+    "country": "United Kingdom",
+    "decade": "1990s"
+   },
+   "blurb": "Who Wants to Be a Millionaire? (first shown 1998, United Kingdom). A quiz show where fifteen questions lead to a top prize of a million pounds.",
+   "clues": [
+    "Its first host was Chris Tarrant.",
+    "Contestants can Ask the Audience or Phone a Friend.",
+    "Fifty-fifty removes two wrong answers.",
+    "It first aired in 1998.",
+    "It was made in the United Kingdom.",
+    "A quiz show where fifteen questions lead to a top prize of a million pounds."
+   ],
+   "difficulty": 2
+  },
+  {
+   "id": "the-great-british-bake-off",
+   "name": "The Great British Bake Off",
+   "alt": [
+    "Bake Off"
+   ],
+   "group": "2010s",
+   "facts": {
+    "year": 2010,
+    "country": "United Kingdom",
+    "decade": "2010s"
+   },
+   "blurb": "The Great British Bake Off (first shown 2010, United Kingdom). Amateur cooks compete to make cakes, bread and pastry.",
+   "clues": [
+    "Its first judges were Mary Berry and Paul Hollywood.",
+    "Each week one contestant is named the star of the week and another goes home.",
+    "It is filmed in a tent.",
+    "It first aired in 2010.",
+    "It was made in the United Kingdom.",
+    "Amateur cooks compete to make cakes, bread and pastry."
+   ],
+   "difficulty": 2
+  },
+  {
+   "id": "blackadder",
+   "name": "Blackadder",
+   "alt": [],
+   "group": "1980s",
+   "facts": {
+    "year": 1983,
+    "country": "United Kingdom",
+    "decade": "1980s"
+   },
+   "blurb": "Blackadder (first shown 1983, United Kingdom). Rowan Atkinson plays a scheming coward.",
+   "clues": [
+    "Each series is set in a different period of British history.",
+    "His servant Baldrick always has a cunning plan.",
+    "Its final series is set in the First World War trenches.",
+    "It first aired in 1983.",
+    "It was made in the United Kingdom.",
+    "Rowan Atkinson plays a scheming coward."
+   ],
+   "difficulty": 2
+  },
+  {
+   "id": "monty-python-s-flying-circus",
+   "name": "Monty Python's Flying Circus",
+   "alt": [
+    "Monty Python"
+   ],
+   "group": "1960s",
+   "facts": {
+    "year": 1969,
+    "country": "United Kingdom",
+    "decade": "1960s"
+   },
+   "blurb": "Monty Python's Flying Circus (first shown 1969, United Kingdom). A surreal BBC sketch comedy by six writer-performers.",
+   "clues": [
+    "Its American member made the animations.",
+    "A sketch features a dead parrot.",
+    "Its theme tune is a Sousa march.",
+    "It first aired in 1969.",
+    "It was made in the United Kingdom.",
+    "A surreal BBC sketch comedy by six writer-performers."
+   ],
+   "difficulty": 2
+  },
+  {
+   "id": "teletubbies",
+   "name": "Teletubbies",
+   "alt": [],
+   "group": "1990s",
+   "facts": {
+    "year": 1997,
+    "country": "United Kingdom",
+    "decade": "1990s",
+    "kids": true
+   },
+   "blurb": "Teletubbies (first shown 1997, United Kingdom). Four colourful creatures live in a grassy dome.",
+   "clues": [
+    "A baby's face shines in the sun.",
+    "They have televisions in their tummies.",
+    "They are called Tinky Winky, Dipsy, Laa-Laa and Po.",
+    "It first aired in 1997.",
+    "It was made in the United Kingdom.",
+    "Four colourful creatures live in a grassy dome."
+   ],
+   "difficulty": 1
+  },
+  {
+   "id": "scooby-doo-where-are-you",
+   "name": "Scooby-Doo, Where Are You!",
+   "alt": [
+    "Scooby-Doo"
+   ],
+   "group": "1960s",
+   "facts": {
+    "year": 1969,
+    "country": "United States",
+    "decade": "1960s",
+    "kids": true
+   },
+   "blurb": "Scooby-Doo, Where Are You! (first shown 1969, United States). A talking Great Dane and four teenagers solve mysteries.",
+   "clues": [
+    "The villains usually turn out to be people in masks.",
+    "Shaggy shares his snacks with the dog.",
+    "The gang drive the Mystery Machine.",
+    "It first aired in 1969.",
+    "It was made in the United States.",
+    "A talking Great Dane and four teenagers solve mysteries."
+   ],
+   "difficulty": 1
+  },
+  {
+   "id": "the-flintstones",
+   "name": "The Flintstones",
+   "alt": [],
+   "group": "1960s",
+   "facts": {
+    "year": 1960,
+    "country": "United States",
+    "decade": "1960s",
+    "kids": true
+   },
+   "blurb": "The Flintstones (first shown 1960, United States). A Stone Age family with dinosaur pets and gadgets.",
+   "clues": [
+    "It was the first animated series to run in prime time.",
+    "Fred works at a quarry.",
+    "Their neighbours are Barney and Betty Rubble.",
+    "It first aired in 1960.",
+    "It was made in the United States.",
+    "A Stone Age family with dinosaur pets and gadgets."
+   ],
+   "difficulty": 2
+  },
+  {
+   "id": "the-mandalorian",
+   "name": "The Mandalorian",
+   "alt": [],
+   "group": "2010s",
+   "facts": {
+    "year": 2019,
+    "country": "United States",
+    "decade": "2010s"
+   },
+   "blurb": "The Mandalorian (first shown 2019, United States). A bounty hunter in the Star Wars universe protects a small green child.",
+   "clues": [
+    "It was made for Disney+.",
+    "The hero never takes off his helmet.",
+    "Grogu is often called Baby Yoda.",
+    "It first aired in 2019.",
+    "It was made in the United States.",
+    "A bounty hunter in the Star Wars universe protects a small green child."
+   ],
+   "difficulty": 2
+  },
+  {
+   "id": "dad-s-army",
+   "name": "Dad's Army",
+   "alt": [],
+   "group": "1960s",
+   "facts": {
+    "year": 1968,
+    "country": "United Kingdom",
+    "decade": "1960s"
+   },
+   "blurb": "Dad's Army (first shown 1968, United Kingdom). A comedy about the Home Guard in the Second World War.",
+   "clues": [
+    "Corporal Jones keeps shouting Don't panic.",
+    "Captain Mainwaring leads the platoon.",
+    "It is set in the seaside town of Walmington-on-Sea.",
+    "It first aired in 1968.",
+    "It was made in the United Kingdom.",
+    "A comedy about the Home Guard in the Second World War."
+   ],
+   "difficulty": 2
+  },
+  {
+   "id": "frasier",
+   "name": "Frasier",
+   "alt": [],
+   "group": "1990s",
+   "facts": {
+    "year": 1993,
+    "country": "United States",
+    "decade": "1990s"
+   },
+   "blurb": "Frasier (first shown 1993, United States). A psychiatrist hosts a radio phone-in show.",
+   "clues": [
+    "His brother Niles is also a psychiatrist.",
+    "His father's dog is Eddie.",
+    "It is set in Seattle.",
+    "It first aired in 1993.",
+    "It was made in the United States.",
+    "A psychiatrist hosts a radio phone-in show."
+   ],
+   "difficulty": 2
+  },
+  {
+   "id": "baywatch",
+   "name": "Baywatch",
+   "alt": [],
+   "group": "1980s",
+   "facts": {
+    "year": 1989,
+    "country": "United States",
+    "decade": "1980s"
+   },
+   "blurb": "Baywatch (first shown 1989, United States). A drama about lifeguards.",
+   "clues": [
+    "It starred David Hasselhoff.",
+    "Its heroes wear red swimsuits.",
+    "It is set on Los Angeles beaches.",
+    "It first aired in 1989.",
+    "It was made in the United States.",
+    "A drama about lifeguards."
+   ],
+   "difficulty": 2
+  },
+  {
+   "id": "the-fresh-prince-of-bel-air",
+   "name": "The Fresh Prince of Bel-Air",
+   "alt": [
+    "Fresh Prince"
+   ],
+   "group": "1990s",
+   "facts": {
+    "year": 1990,
+    "country": "United States",
+    "decade": "1990s"
+   },
+   "blurb": "The Fresh Prince of Bel-Air (first shown 1990, United States). A teenager from West Philadelphia moves in with rich relatives.",
+   "clues": [
+    "Its butler is Geoffrey.",
+    "Its hero's cousin Carlton dances to Tom Jones.",
+    "Will Smith plays a version of himself.",
+    "It first aired in 1990.",
+    "It was made in the United States.",
+    "A teenager from West Philadelphia moves in with rich relatives."
+   ],
+   "difficulty": 2
+  },
+  {
+   "id": "thunderbirds",
+   "name": "Thunderbirds",
+   "alt": [],
+   "group": "1960s",
+   "facts": {
+    "year": 1965,
+    "country": "United Kingdom",
+    "decade": "1960s",
+    "kids": true
+   },
+   "blurb": "Thunderbirds (first shown 1965, United Kingdom). Puppet heroes fly rescue craft from a secret island.",
+   "clues": [
+    "Its makers called their puppet technique Supermarionation.",
+    "Lady Penelope has a pink Rolls-Royce.",
+    "The Tracy family run International Rescue.",
+    "It first aired in 1965.",
+    "It was made in the United Kingdom.",
+    "Puppet heroes fly rescue craft from a secret island."
+   ],
+   "difficulty": 2
+  },
+  {
+   "id": "postman-pat",
+   "name": "Postman Pat",
+   "alt": [],
+   "group": "1980s",
+   "facts": {
+    "year": 1981,
+    "country": "United Kingdom",
+    "decade": "1980s",
+    "kids": true
+   },
+   "blurb": "Postman Pat (first shown 1981, United Kingdom). A cheerful mail carrier delivers letters in the countryside.",
+   "clues": [
+    "It is set in the valley of Greendale.",
+    "He drives a red van.",
+    "His black and white cat is Jess.",
+    "It first aired in 1981.",
+    "It was made in the United Kingdom.",
+    "A cheerful mail carrier delivers letters in the countryside."
+   ],
+   "difficulty": 1
+  },
+  {
+   "id": "paw-patrol",
+   "name": "PAW Patrol",
+   "alt": [
+    "Paw Patrol"
+   ],
+   "group": "2010s",
+   "facts": {
+    "year": 2013,
+    "country": "Canada",
+    "decade": "2010s",
+    "kids": true
+   },
+   "blurb": "PAW Patrol (first shown 2013, Canada). Rescue puppies with special jobs save the day.",
+   "clues": [
+    "Its town is Adventure Bay.",
+    "Chase is a police pup.",
+    "A boy called Ryder leads the team.",
+    "It first aired in 2013.",
+    "It was made in Canada.",
+    "Rescue puppies with special jobs save the day."
+   ],
+   "difficulty": 1
+  },
+  {
+   "id": "ted-lasso",
+   "name": "Ted Lasso",
+   "alt": [],
+   "group": "2020s",
+   "facts": {
+    "year": 2020,
+    "country": "United States",
+    "decade": "2020s"
+   },
+   "blurb": "Ted Lasso (first shown 2020, United States). An American football coach takes over an English soccer team.",
+   "clues": [
+    "It was made for Apple TV+.",
+    "Its hero hangs a BELIEVE sign in the locker room.",
+    "Its club is AFC Richmond.",
+    "It first aired in 2020.",
+    "It was made in the United States.",
+    "An American football coach takes over an English soccer team."
+   ],
+   "difficulty": 2
+  }
+ ],
+ "questions": [
+  {
+   "id": "which-doctor-who",
+   "kind": "mc",
+   "prompt": "Which TV show is this? A time-travelling alien flies a ship that looks like a blue police box.",
+   "answer": "Doctor Who",
+   "wrong": [
+    "The Muppet Show",
+    "Scooby-Doo, Where Are You!",
+    "Mr. Bean"
+   ],
+   "explain": "Doctor Who (first shown 1963, United Kingdom). A time-travelling alien flies a ship that looks like a blue police box.",
+   "difficulty": 1,
+   "refs": [
+    "tv/doctor-who"
+   ]
+  },
+  {
+   "id": "year-doctor-who",
+   "kind": "mc",
+   "prompt": "In which year was Doctor Who first shown?",
+   "answer": "1963",
+   "wrong": [
+    "1957",
+    "1961",
+    "1965"
+   ],
+   "explain": "Doctor Who (first shown 1963, United Kingdom). A time-travelling alien flies a ship that looks like a blue police box.",
+   "difficulty": 3,
+   "refs": [
+    "tv/doctor-who"
+   ]
+  },
+  {
+   "id": "which-the-simpsons",
+   "kind": "mc",
+   "prompt": "Which TV show is this? A yellow cartoon family: Homer, Marge, Bart, Lisa and Maggie.",
+   "answer": "The Simpsons",
+   "wrong": [
+    "The X-Files",
+    "Only Fools and Horses",
+    "I Love Lucy"
+   ],
+   "explain": "The Simpsons (first shown 1989, United States). A yellow cartoon family: Homer, Marge, Bart, Lisa and Maggie.",
+   "difficulty": 1,
+   "refs": [
+    "tv/the-simpsons"
+   ]
+  },
+  {
+   "id": "year-the-simpsons",
+   "kind": "mc",
+   "prompt": "In which year was The Simpsons first shown?",
+   "answer": "1989",
+   "wrong": [
+    "1993",
+    "1983",
+    "1985"
+   ],
+   "explain": "The Simpsons (first shown 1989, United States). A yellow cartoon family: Homer, Marge, Bart, Lisa and Maggie.",
+   "difficulty": 3,
+   "refs": [
+    "tv/the-simpsons"
+   ]
+  },
+  {
+   "id": "which-friends",
+   "kind": "mc",
+   "prompt": "Which TV show is this? Six pals in their twenties share flats, jokes and love lives in Manhattan.",
+   "answer": "Friends",
+   "wrong": [
+    "Monty Python's Flying Circus",
+    "The Sopranos",
+    "The Simpsons"
+   ],
+   "explain": "Friends (first shown 1994, United States). Six pals in their twenties share flats, jokes and love lives in Manhattan.",
+   "difficulty": 1,
+   "refs": [
+    "tv/friends"
+   ]
+  },
+  {
+   "id": "year-friends",
+   "kind": "mc",
+   "prompt": "In which year was Friends first shown?",
+   "answer": "1994",
+   "wrong": [
+    "1996",
+    "1990",
+    "2000"
+   ],
+   "explain": "Friends (first shown 1994, United States). Six pals in their twenties share flats, jokes and love lives in Manhattan.",
+   "difficulty": 3,
+   "refs": [
+    "tv/friends"
+   ]
+  },
+  {
+   "id": "which-star-trek",
+   "kind": "mc",
+   "prompt": "Which TV show is this? Captain Kirk and Mr Spock explore strange new worlds.",
+   "answer": "Star Trek",
+   "wrong": [
+    "The Mandalorian",
+    "The Big Bang Theory",
+    "Seinfeld"
+   ],
+   "explain": "Star Trek (first shown 1966, United States). Captain Kirk and Mr Spock explore strange new worlds.",
+   "difficulty": 2,
+   "refs": [
+    "tv/star-trek"
+   ]
+  },
+  {
+   "id": "year-star-trek",
+   "kind": "mc",
+   "prompt": "In which year was Star Trek first shown?",
+   "answer": "1966",
+   "wrong": [
+    "1962",
+    "1972",
+    "1968"
+   ],
+   "explain": "Star Trek (first shown 1966, United States). Captain Kirk and Mr Spock explore strange new worlds.",
+   "difficulty": 3,
+   "refs": [
+    "tv/star-trek"
+   ]
+  },
+  {
+   "id": "which-sesame-street",
+   "kind": "mc",
+   "prompt": "Which TV show is this? Muppets teach letters and numbers in a New York neighbourhood.",
+   "answer": "Sesame Street",
+   "wrong": [
+    "Blue Peter",
+    "Teletubbies",
+    "Thunderbirds"
+   ],
+   "explain": "Sesame Street (first shown 1969, United States). Muppets teach letters and numbers in a New York neighbourhood.",
+   "difficulty": 1,
+   "refs": [
+    "tv/sesame-street"
+   ]
+  },
+  {
+   "id": "year-sesame-street",
+   "kind": "mc",
+   "prompt": "In which year was Sesame Street first shown?",
+   "answer": "1969",
+   "wrong": [
+    "1963",
+    "1965",
+    "1971"
+   ],
+   "explain": "Sesame Street (first shown 1969, United States). Muppets teach letters and numbers in a New York neighbourhood.",
+   "difficulty": 3,
+   "refs": [
+    "tv/sesame-street"
+   ]
+  },
+  {
+   "id": "which-coronation-street",
+   "kind": "mc",
+   "prompt": "Which TV show is this? A soap opera about life on a cobbled terrace near Manchester.",
+   "answer": "Coronation Street",
+   "wrong": [
+    "Only Fools and Horses",
+    "Squid Game",
+    "Baywatch"
+   ],
+   "explain": "Coronation Street (first shown 1960, United Kingdom). A soap opera about life on a cobbled terrace near Manchester.",
+   "difficulty": 2,
+   "refs": [
+    "tv/coronation-street"
+   ]
+  },
+  {
+   "id": "year-coronation-street",
+   "kind": "mc",
+   "prompt": "In which year was Coronation Street first shown?",
+   "answer": "1960",
+   "wrong": [
+    "1966",
+    "1954",
+    "1958"
+   ],
+   "explain": "Coronation Street (first shown 1960, United Kingdom). A soap opera about life on a cobbled terrace near Manchester.",
+   "difficulty": 3,
+   "refs": [
+    "tv/coronation-street"
+   ]
+  },
+  {
+   "id": "which-eastenders",
+   "kind": "mc",
+   "prompt": "Which TV show is this? A BBC soap opera set around Albert Square in East London.",
+   "answer": "EastEnders",
+   "wrong": [
+    "Dad's Army",
+    "Blackadder",
+    "Game of Thrones"
+   ],
+   "explain": "EastEnders (first shown 1985, United Kingdom). A BBC soap opera set around Albert Square in East London.",
+   "difficulty": 2,
+   "refs": [
+    "tv/eastenders"
+   ]
+  },
+  {
+   "id": "year-eastenders",
+   "kind": "mc",
+   "prompt": "In which year was EastEnders first shown?",
+   "answer": "1985",
+   "wrong": [
+    "1979",
+    "1983",
+    "1987"
+   ],
+   "explain": "EastEnders (first shown 1985, United Kingdom). A BBC soap opera set around Albert Square in East London.",
+   "difficulty": 3,
+   "refs": [
+    "tv/eastenders"
+   ]
+  },
+  {
+   "id": "which-neighbours",
+   "kind": "mc",
+   "prompt": "Which TV show is this? An Australian soap about families on one suburban street.",
+   "answer": "Neighbours",
+   "wrong": [
+    "The Sopranos",
+    "Squid Game",
+    "Only Fools and Horses"
+   ],
+   "explain": "Neighbours (first shown 1985, Australia). An Australian soap about families on one suburban street.",
+   "difficulty": 2,
+   "refs": [
+    "tv/neighbours"
+   ]
+  },
+  {
+   "id": "year-neighbours",
+   "kind": "mc",
+   "prompt": "In which year was Neighbours first shown?",
+   "answer": "1985",
+   "wrong": [
+    "1983",
+    "1981",
+    "1989"
+   ],
+   "explain": "Neighbours (first shown 1985, Australia). An Australian soap about families on one suburban street.",
+   "difficulty": 3,
+   "refs": [
+    "tv/neighbours"
+   ]
+  },
+  {
+   "id": "which-game-of-thrones",
+   "kind": "mc",
+   "prompt": "Which TV show is this? Noble families battle to rule the Seven Kingdoms of Westeros.",
+   "answer": "Game of Thrones",
+   "wrong": [
+    "Lost",
+    "Strictly Come Dancing",
+    "I Love Lucy"
+   ],
+   "explain": "Game of Thrones (first shown 2011, United States). Noble families battle to rule the Seven Kingdoms of Westeros.",
+   "difficulty": 2,
+   "refs": [
+    "tv/game-of-thrones"
+   ]
+  },
+  {
+   "id": "year-game-of-thrones",
+   "kind": "mc",
+   "prompt": "In which year was Game of Thrones first shown?",
+   "answer": "2011",
+   "wrong": [
+    "2009",
+    "2007",
+    "2015"
+   ],
+   "explain": "Game of Thrones (first shown 2011, United States). Noble families battle to rule the Seven Kingdoms of Westeros.",
+   "difficulty": 3,
+   "refs": [
+    "tv/game-of-thrones"
+   ]
+  },
+  {
+   "id": "which-breaking-bad",
+   "kind": "mc",
+   "prompt": "Which TV show is this? A chemistry teacher turns to crime after a cancer diagnosis.",
+   "answer": "Breaking Bad",
+   "wrong": [
+    "Frasier",
+    "Coronation Street",
+    "The Sopranos"
+   ],
+   "explain": "Breaking Bad (first shown 2008, United States). A chemistry teacher turns to crime after a cancer diagnosis.",
+   "difficulty": 2,
+   "refs": [
+    "tv/breaking-bad"
+   ]
+  },
+  {
+   "id": "year-breaking-bad",
+   "kind": "mc",
+   "prompt": "In which year was Breaking Bad first shown?",
+   "answer": "2008",
+   "wrong": [
+    "2010",
+    "2006",
+    "2004"
+   ],
+   "explain": "Breaking Bad (first shown 2008, United States). A chemistry teacher turns to crime after a cancer diagnosis.",
+   "difficulty": 3,
+   "refs": [
+    "tv/breaking-bad"
+   ]
+  },
+  {
+   "id": "which-the-office-us",
+   "kind": "mc",
+   "prompt": "Which TV show is this? A mockumentary about workers at the Dunder Mifflin paper company.",
+   "answer": "The Office (US)",
+   "wrong": [
+    "The Mandalorian",
+    "The Big Bang Theory",
+    "Coronation Street"
+   ],
+   "explain": "The Office (US) (first shown 2005, United States). A mockumentary about workers at the Dunder Mifflin paper company.",
+   "difficulty": 2,
+   "refs": [
+    "tv/the-office-us"
+   ]
+  },
+  {
+   "id": "year-the-office-us",
+   "kind": "mc",
+   "prompt": "In which year was The Office (US) first shown?",
+   "answer": "2005",
+   "wrong": [
+    "1999",
+    "2001",
+    "2009"
+   ],
+   "explain": "The Office (US) (first shown 2005, United States). A mockumentary about workers at the Dunder Mifflin paper company.",
+   "difficulty": 3,
+   "refs": [
+    "tv/the-office-us"
+   ]
+  },
+  {
+   "id": "which-seinfeld",
+   "kind": "mc",
+   "prompt": "Which TV show is this? A New York comedian and his friends obsess over small things.",
+   "answer": "Seinfeld",
+   "wrong": [
+    "Fawlty Towers",
+    "Neighbours",
+    "Downton Abbey"
+   ],
+   "explain": "Seinfeld (first shown 1989, United States). A New York comedian and his friends obsess over small things.",
+   "difficulty": 2,
+   "refs": [
+    "tv/seinfeld"
+   ]
+  },
+  {
+   "id": "year-seinfeld",
+   "kind": "mc",
+   "prompt": "In which year was Seinfeld first shown?",
+   "answer": "1989",
+   "wrong": [
+    "1985",
+    "1987",
+    "1993"
+   ],
+   "explain": "Seinfeld (first shown 1989, United States). A New York comedian and his friends obsess over small things.",
+   "difficulty": 3,
+   "refs": [
+    "tv/seinfeld"
+   ]
+  },
+  {
+   "id": "which-fawlty-towers",
+   "kind": "mc",
+   "prompt": "Which TV show is this? John Cleese plays a rude hotel owner in Torquay.",
+   "answer": "Fawlty Towers",
+   "wrong": [
+    "The Simpsons",
+    "The X-Files",
+    "Strictly Come Dancing"
+   ],
+   "explain": "Fawlty Towers (first shown 1975, United Kingdom). John Cleese plays a rude hotel owner in Torquay.",
+   "difficulty": 2,
+   "refs": [
+    "tv/fawlty-towers"
+   ]
+  },
+  {
+   "id": "year-fawlty-towers",
+   "kind": "mc",
+   "prompt": "In which year was Fawlty Towers first shown?",
+   "answer": "1975",
+   "wrong": [
+    "1973",
+    "1979",
+    "1971"
+   ],
+   "explain": "Fawlty Towers (first shown 1975, United Kingdom). John Cleese plays a rude hotel owner in Torquay.",
+   "difficulty": 3,
+   "refs": [
+    "tv/fawlty-towers"
+   ]
+  },
+  {
+   "id": "which-only-fools-and-horses",
+   "kind": "mc",
+   "prompt": "Which TV show is this? Del Boy is a market trader in Peckham who dreams of being a millionaire.",
+   "answer": "Only Fools and Horses",
+   "wrong": [
+    "EastEnders",
+    "The Simpsons",
+    "Downton Abbey"
+   ],
+   "explain": "Only Fools and Horses (first shown 1981, United Kingdom). Del Boy is a market trader in Peckham who dreams of being a millionaire.",
+   "difficulty": 2,
+   "refs": [
+    "tv/only-fools-and-horses"
+   ]
+  },
+  {
+   "id": "year-only-fools-and-horses",
+   "kind": "mc",
+   "prompt": "In which year was Only Fools and Horses first shown?",
+   "answer": "1981",
+   "wrong": [
+    "1983",
+    "1975",
+    "1985"
+   ],
+   "explain": "Only Fools and Horses (first shown 1981, United Kingdom). Del Boy is a market trader in Peckham who dreams of being a millionaire.",
+   "difficulty": 3,
+   "refs": [
+    "tv/only-fools-and-horses"
+   ]
+  },
+  {
+   "id": "which-blue-peter",
+   "kind": "mc",
+   "prompt": "Which TV show is this? A long-running BBC magazine show for children.",
+   "answer": "Blue Peter",
+   "wrong": [
+    "Postman Pat",
+    "PAW Patrol",
+    "Teletubbies"
+   ],
+   "explain": "Blue Peter (first shown 1958, United Kingdom). A long-running BBC magazine show for children.",
+   "difficulty": 2,
+   "refs": [
+    "tv/blue-peter"
+   ]
+  },
+  {
+   "id": "year-blue-peter",
+   "kind": "mc",
+   "prompt": "In which year was Blue Peter first shown?",
+   "answer": "1958",
+   "wrong": [
+    "1962",
+    "1964",
+    "1960"
+   ],
+   "explain": "Blue Peter (first shown 1958, United Kingdom). A long-running BBC magazine show for children.",
+   "difficulty": 3,
+   "refs": [
+    "tv/blue-peter"
+   ]
+  },
+  {
+   "id": "which-top-gear",
+   "kind": "mc",
+   "prompt": "Which TV show is this? A BBC programme about cars and road trips.",
+   "answer": "Top Gear",
+   "wrong": [
+    "Downton Abbey",
+    "The Office (US)",
+    "EastEnders"
+   ],
+   "explain": "Top Gear (first shown 2002, United Kingdom). A BBC programme about cars and road trips.",
+   "difficulty": 2,
+   "refs": [
+    "tv/top-gear"
+   ]
+  },
+  {
+   "id": "year-top-gear",
+   "kind": "mc",
+   "prompt": "In which year was Top Gear first shown?",
+   "answer": "2002",
+   "wrong": [
+    "2006",
+    "2000",
+    "1998"
+   ],
+   "explain": "Top Gear (first shown 2002, United Kingdom). A BBC programme about cars and road trips.",
+   "difficulty": 3,
+   "refs": [
+    "tv/top-gear"
+   ]
+  },
+  {
+   "id": "which-the-x-files",
+   "kind": "mc",
+   "prompt": "Which TV show is this? Two FBI agents investigate the paranormal.",
+   "answer": "The X-Files",
+   "wrong": [
+    "M*A*S*H",
+    "Game of Thrones",
+    "Seinfeld"
+   ],
+   "explain": "The X-Files (first shown 1993, United States). Two FBI agents investigate the paranormal.",
+   "difficulty": 2,
+   "refs": [
+    "tv/the-x-files"
+   ]
+  },
+  {
+   "id": "year-the-x-files",
+   "kind": "mc",
+   "prompt": "In which year was The X-Files first shown?",
+   "answer": "1993",
+   "wrong": [
+    "1995",
+    "1999",
+    "1997"
+   ],
+   "explain": "The X-Files (first shown 1993, United States). Two FBI agents investigate the paranormal.",
+   "difficulty": 3,
+   "refs": [
+    "tv/the-x-files"
+   ]
+  },
+  {
+   "id": "which-mr-bean",
+   "kind": "mc",
+   "prompt": "Which TV show is this? Rowan Atkinson plays a clumsy, almost silent man.",
+   "answer": "Mr. Bean",
+   "wrong": [
+    "Sesame Street",
+    "Bluey",
+    "Teletubbies"
+   ],
+   "explain": "Mr. Bean (first shown 1990, United Kingdom). Rowan Atkinson plays a clumsy, almost silent man.",
+   "difficulty": 1,
+   "refs": [
+    "tv/mr-bean"
+   ]
+  },
+  {
+   "id": "year-mr-bean",
+   "kind": "mc",
+   "prompt": "In which year was Mr. Bean first shown?",
+   "answer": "1990",
+   "wrong": [
+    "1994",
+    "1986",
+    "1996"
+   ],
+   "explain": "Mr. Bean (first shown 1990, United Kingdom). Rowan Atkinson plays a clumsy, almost silent man.",
+   "difficulty": 3,
+   "refs": [
+    "tv/mr-bean"
+   ]
+  },
+  {
+   "id": "which-thomas-and-friends",
+   "kind": "mc",
+   "prompt": "Which TV show is this? A cheeky little blue steam locomotive with the number 1.",
+   "answer": "Thomas & Friends",
+   "wrong": [
+    "The Flintstones",
+    "Teletubbies",
+    "SpongeBob SquarePants"
+   ],
+   "explain": "Thomas & Friends (first shown 1984, United Kingdom). A cheeky little blue steam locomotive with the number 1.",
+   "difficulty": 1,
+   "refs": [
+    "tv/thomas-and-friends"
+   ]
+  },
+  {
+   "id": "year-thomas-and-friends",
+   "kind": "mc",
+   "prompt": "In which year was Thomas & Friends first shown?",
+   "answer": "1984",
+   "wrong": [
+    "1978",
+    "1982",
+    "1980"
+   ],
+   "explain": "Thomas & Friends (first shown 1984, United Kingdom). A cheeky little blue steam locomotive with the number 1.",
+   "difficulty": 3,
+   "refs": [
+    "tv/thomas-and-friends"
+   ]
+  },
+  {
+   "id": "which-peppa-pig",
+   "kind": "mc",
+   "prompt": "Which TV show is this? A cheerful little piglet and her family.",
+   "answer": "Peppa Pig",
+   "wrong": [
+    "Postman Pat",
+    "The Flintstones",
+    "Thomas & Friends"
+   ],
+   "explain": "Peppa Pig (first shown 2004, United Kingdom). A cheerful little piglet and her family.",
+   "difficulty": 1,
+   "refs": [
+    "tv/peppa-pig"
+   ]
+  },
+  {
+   "id": "year-peppa-pig",
+   "kind": "mc",
+   "prompt": "In which year was Peppa Pig first shown?",
+   "answer": "2004",
+   "wrong": [
+    "2000",
+    "2008",
+    "2010"
+   ],
+   "explain": "Peppa Pig (first shown 2004, United Kingdom). A cheerful little piglet and her family.",
+   "difficulty": 3,
+   "refs": [
+    "tv/peppa-pig"
+   ]
+  },
+  {
+   "id": "which-spongebob-squarepants",
+   "kind": "mc",
+   "prompt": "Which TV show is this? A yellow, square sea creature lives in a pineapple under the sea.",
+   "answer": "SpongeBob SquarePants",
+   "wrong": [
+    "Bluey",
+    "Mr. Bean",
+    "Blue Peter"
+   ],
+   "explain": "SpongeBob SquarePants (first shown 1999, United States). A yellow, square sea creature lives in a pineapple under the sea.",
+   "difficulty": 1,
+   "refs": [
+    "tv/spongebob-squarepants"
+   ]
+  },
+  {
+   "id": "year-spongebob-squarepants",
+   "kind": "mc",
+   "prompt": "In which year was SpongeBob SquarePants first shown?",
+   "answer": "1999",
+   "wrong": [
+    "1995",
+    "2005",
+    "2001"
+   ],
+   "explain": "SpongeBob SquarePants (first shown 1999, United States). A yellow, square sea creature lives in a pineapple under the sea.",
+   "difficulty": 3,
+   "refs": [
+    "tv/spongebob-squarepants"
+   ]
+  },
+  {
+   "id": "which-stranger-things",
+   "kind": "mc",
+   "prompt": "Which TV show is this? Children search for their missing friend Will.",
+   "answer": "Stranger Things",
+   "wrong": [
+    "Breaking Bad",
+    "Frasier",
+    "The Crown"
+   ],
+   "explain": "Stranger Things (first shown 2016, United States). Children search for their missing friend Will.",
+   "difficulty": 1,
+   "refs": [
+    "tv/stranger-things"
+   ]
+  },
+  {
+   "id": "year-stranger-things",
+   "kind": "mc",
+   "prompt": "In which year was Stranger Things first shown?",
+   "answer": "2016",
+   "wrong": [
+    "2010",
+    "2022",
+    "2020"
+   ],
+   "explain": "Stranger Things (first shown 2016, United States). Children search for their missing friend Will.",
+   "difficulty": 3,
+   "refs": [
+    "tv/stranger-things"
+   ]
+  },
+  {
+   "id": "which-the-crown",
+   "kind": "mc",
+   "prompt": "Which TV show is this? A drama about the reign of Elizabeth II.",
+   "answer": "The Crown",
+   "wrong": [
+    "Sherlock",
+    "Who Wants to Be a Millionaire?",
+    "Twin Peaks"
+   ],
+   "explain": "The Crown (first shown 2016, United Kingdom). A drama about the reign of Elizabeth II.",
+   "difficulty": 2,
+   "refs": [
+    "tv/the-crown"
+   ]
+  },
+  {
+   "id": "year-the-crown",
+   "kind": "mc",
+   "prompt": "In which year was The Crown first shown?",
+   "answer": "2016",
+   "wrong": [
+    "2012",
+    "2018",
+    "2010"
+   ],
+   "explain": "The Crown (first shown 2016, United Kingdom). A drama about the reign of Elizabeth II.",
+   "difficulty": 3,
+   "refs": [
+    "tv/the-crown"
+   ]
+  },
+  {
+   "id": "which-downton-abbey",
+   "kind": "mc",
+   "prompt": "Which TV show is this? A drama about an aristocratic family and their servants in the early 1900s.",
+   "answer": "Downton Abbey",
+   "wrong": [
+    "Dad's Army",
+    "Who Wants to Be a Millionaire?",
+    "The Simpsons"
+   ],
+   "explain": "Downton Abbey (first shown 2010, United Kingdom). A drama about an aristocratic family and their servants in the early 1900s.",
+   "difficulty": 2,
+   "refs": [
+    "tv/downton-abbey"
+   ]
+  },
+  {
+   "id": "year-downton-abbey",
+   "kind": "mc",
+   "prompt": "In which year was Downton Abbey first shown?",
+   "answer": "2010",
+   "wrong": [
+    "2004",
+    "2006",
+    "2012"
+   ],
+   "explain": "Downton Abbey (first shown 2010, United Kingdom). A drama about an aristocratic family and their servants in the early 1900s.",
+   "difficulty": 3,
+   "refs": [
+    "tv/downton-abbey"
+   ]
+  },
+  {
+   "id": "which-sherlock",
+   "kind": "mc",
+   "prompt": "Which TV show is this? A modern-day version of Conan Doyle's detective in London.",
+   "answer": "Sherlock",
+   "wrong": [
+    "Twin Peaks",
+    "Baywatch",
+    "I Love Lucy"
+   ],
+   "explain": "Sherlock (first shown 2010, United Kingdom). A modern-day version of Conan Doyle's detective in London.",
+   "difficulty": 1,
+   "refs": [
+    "tv/sherlock"
+   ]
+  },
+  {
+   "id": "year-sherlock",
+   "kind": "mc",
+   "prompt": "In which year was Sherlock first shown?",
+   "answer": "2010",
+   "wrong": [
+    "2004",
+    "2008",
+    "2006"
+   ],
+   "explain": "Sherlock (first shown 2010, United Kingdom). A modern-day version of Conan Doyle's detective in London.",
+   "difficulty": 3,
+   "refs": [
+    "tv/sherlock"
+   ]
+  },
+  {
+   "id": "which-lost",
+   "kind": "mc",
+   "prompt": "Which TV show is this? Plane-crash survivors are stranded on a strange tropical island.",
+   "answer": "Lost",
+   "wrong": [
+    "The Crown",
+    "The Big Bang Theory",
+    "Seinfeld"
+   ],
+   "explain": "Lost (first shown 2004, United States). Plane-crash survivors are stranded on a strange tropical island.",
+   "difficulty": 2,
+   "refs": [
+    "tv/lost"
+   ]
+  },
+  {
+   "id": "year-lost",
+   "kind": "mc",
+   "prompt": "In which year was Lost first shown?",
+   "answer": "2004",
+   "wrong": [
+    "2008",
+    "2006",
+    "2010"
+   ],
+   "explain": "Lost (first shown 2004, United States). Plane-crash survivors are stranded on a strange tropical island.",
+   "difficulty": 3,
+   "refs": [
+    "tv/lost"
+   ]
+  },
+  {
+   "id": "which-the-sopranos",
+   "kind": "mc",
+   "prompt": "Which TV show is this? A New Jersey mob boss juggles family life and crime.",
+   "answer": "The Sopranos",
+   "wrong": [
+    "Frasier",
+    "The Great British Bake Off",
+    "Coronation Street"
+   ],
+   "explain": "The Sopranos (first shown 1999, United States). A New Jersey mob boss juggles family life and crime.",
+   "difficulty": 3,
+   "refs": [
+    "tv/the-sopranos"
+   ]
+  },
+  {
+   "id": "year-the-sopranos",
+   "kind": "mc",
+   "prompt": "In which year was The Sopranos first shown?",
+   "answer": "1999",
+   "wrong": [
+    "1995",
+    "2003",
+    "1993"
+   ],
+   "explain": "The Sopranos (first shown 1999, United States). A New Jersey mob boss juggles family life and crime.",
+   "difficulty": 3,
+   "refs": [
+    "tv/the-sopranos"
+   ]
+  },
+  {
+   "id": "which-twin-peaks",
+   "kind": "mc",
+   "prompt": "Which TV show is this? An FBI agent investigates a murder in a strange small town.",
+   "answer": "Twin Peaks",
+   "wrong": [
+    "M*A*S*H",
+    "The Big Bang Theory",
+    "Breaking Bad"
+   ],
+   "explain": "Twin Peaks (first shown 1990, United States). An FBI agent investigates a murder in a strange small town.",
+   "difficulty": 3,
+   "refs": [
+    "tv/twin-peaks"
+   ]
+  },
+  {
+   "id": "year-twin-peaks",
+   "kind": "mc",
+   "prompt": "In which year was Twin Peaks first shown?",
+   "answer": "1990",
+   "wrong": [
+    "1986",
+    "1988",
+    "1992"
+   ],
+   "explain": "Twin Peaks (first shown 1990, United States). An FBI agent investigates a murder in a strange small town.",
+   "difficulty": 3,
+   "refs": [
+    "tv/twin-peaks"
+   ]
+  },
+  {
+   "id": "which-m-a-s-h",
+   "kind": "mc",
+   "prompt": "Which TV show is this? A comedy-drama about an army hospital unit.",
+   "answer": "M*A*S*H",
+   "wrong": [
+    "Breaking Bad",
+    "Monty Python's Flying Circus",
+    "The X-Files"
+   ],
+   "explain": "M*A*S*H (first shown 1972, United States). A comedy-drama about an army hospital unit.",
+   "difficulty": 3,
+   "refs": [
+    "tv/m-a-s-h"
+   ]
+  },
+  {
+   "id": "year-m-a-s-h",
+   "kind": "mc",
+   "prompt": "In which year was M*A*S*H first shown?",
+   "answer": "1972",
+   "wrong": [
+    "1978",
+    "1968",
+    "1966"
+   ],
+   "explain": "M*A*S*H (first shown 1972, United States). A comedy-drama about an army hospital unit.",
+   "difficulty": 3,
+   "refs": [
+    "tv/m-a-s-h"
+   ]
+  },
+  {
+   "id": "which-i-love-lucy",
+   "kind": "mc",
+   "prompt": "Which TV show is this? A classic 1950s sitcom about a scheming housewife.",
+   "answer": "I Love Lucy",
+   "wrong": [
+    "Ted Lasso",
+    "Lost",
+    "Fawlty Towers"
+   ],
+   "explain": "I Love Lucy (first shown 1951, United States). A classic 1950s sitcom about a scheming housewife.",
+   "difficulty": 3,
+   "refs": [
+    "tv/i-love-lucy"
+   ]
+  },
+  {
+   "id": "year-i-love-lucy",
+   "kind": "mc",
+   "prompt": "In which year was I Love Lucy first shown?",
+   "answer": "1951",
+   "wrong": [
+    "1947",
+    "1949",
+    "1955"
+   ],
+   "explain": "I Love Lucy (first shown 1951, United States). A classic 1950s sitcom about a scheming housewife.",
+   "difficulty": 3,
+   "refs": [
+    "tv/i-love-lucy"
+   ]
+  },
+  {
+   "id": "which-the-muppet-show",
+   "kind": "mc",
+   "prompt": "Which TV show is this? Kermit the Frog hosts a chaotic variety programme.",
+   "answer": "The Muppet Show",
+   "wrong": [
+    "Peppa Pig",
+    "SpongeBob SquarePants",
+    "Doctor Who"
+   ],
+   "explain": "The Muppet Show (first shown 1976, United Kingdom). Kermit the Frog hosts a chaotic variety programme.",
+   "difficulty": 2,
+   "refs": [
+    "tv/the-muppet-show"
+   ]
+  },
+  {
+   "id": "year-the-muppet-show",
+   "kind": "mc",
+   "prompt": "In which year was The Muppet Show first shown?",
+   "answer": "1976",
+   "wrong": [
+    "1974",
+    "1980",
+    "1970"
+   ],
+   "explain": "The Muppet Show (first shown 1976, United Kingdom). Kermit the Frog hosts a chaotic variety programme.",
+   "difficulty": 3,
+   "refs": [
+    "tv/the-muppet-show"
+   ]
+  },
+  {
+   "id": "which-bluey",
+   "kind": "mc",
+   "prompt": "Which TV show is this? A cattle-dog puppy loves playing imaginative games.",
+   "answer": "Bluey",
+   "wrong": [
+    "Teletubbies",
+    "Pokémon",
+    "The Muppet Show"
+   ],
+   "explain": "Bluey (first shown 2018, Australia). A cattle-dog puppy loves playing imaginative games.",
+   "difficulty": 1,
+   "refs": [
+    "tv/bluey"
+   ]
+  },
+  {
+   "id": "year-bluey",
+   "kind": "mc",
+   "prompt": "In which year was Bluey first shown?",
+   "answer": "2018",
+   "wrong": [
+    "2016",
+    "2012",
+    "2020"
+   ],
+   "explain": "Bluey (first shown 2018, Australia). A cattle-dog puppy loves playing imaginative games.",
+   "difficulty": 3,
+   "refs": [
+    "tv/bluey"
+   ]
+  },
+  {
+   "id": "which-pokemon",
+   "kind": "mc",
+   "prompt": "Which TV show is this? Ash Ketchum wants to be the very best trainer.",
+   "answer": "Pokémon",
+   "wrong": [
+    "Peppa Pig",
+    "Postman Pat",
+    "Teletubbies"
+   ],
+   "explain": "Pokémon (first shown 1997, Japan). Ash Ketchum wants to be the very best trainer.",
+   "difficulty": 1,
+   "refs": [
+    "tv/pokemon"
+   ]
+  },
+  {
+   "id": "year-pokemon",
+   "kind": "mc",
+   "prompt": "In which year was Pokémon first shown?",
+   "answer": "1997",
+   "wrong": [
+    "1995",
+    "1993",
+    "1991"
+   ],
+   "explain": "Pokémon (first shown 1997, Japan). Ash Ketchum wants to be the very best trainer.",
+   "difficulty": 3,
+   "refs": [
+    "tv/pokemon"
+   ]
+  },
+  {
+   "id": "which-squid-game",
+   "kind": "mc",
+   "prompt": "Which TV show is this? Debt-ridden contestants play for a huge cash prize.",
+   "answer": "Squid Game",
+   "wrong": [
+    "Who Wants to Be a Millionaire?",
+    "The Office (US)",
+    "Friends"
+   ],
+   "explain": "Squid Game (first shown 2021, South Korea). Debt-ridden contestants play for a huge cash prize.",
+   "difficulty": 2,
+   "refs": [
+    "tv/squid-game"
+   ]
+  },
+  {
+   "id": "year-squid-game",
+   "kind": "mc",
+   "prompt": "In which year was Squid Game first shown?",
+   "answer": "2021",
+   "wrong": [
+    "2019",
+    "2015",
+    "2025"
+   ],
+   "explain": "Squid Game (first shown 2021, South Korea). Debt-ridden contestants play for a huge cash prize.",
+   "difficulty": 3,
+   "refs": [
+    "tv/squid-game"
+   ]
+  },
+  {
+   "id": "which-grey-s-anatomy",
+   "kind": "mc",
+   "prompt": "Which TV show is this? A drama about young surgeons led by Meredith.",
+   "answer": "Grey's Anatomy",
+   "wrong": [
+    "Fawlty Towers",
+    "Star Trek",
+    "Twin Peaks"
+   ],
+   "explain": "Grey's Anatomy (first shown 2005, United States). A drama about young surgeons led by Meredith.",
+   "difficulty": 2,
+   "refs": [
+    "tv/grey-s-anatomy"
+   ]
+  },
+  {
+   "id": "year-grey-s-anatomy",
+   "kind": "mc",
+   "prompt": "In which year was Grey's Anatomy first shown?",
+   "answer": "2005",
+   "wrong": [
+    "2003",
+    "2007",
+    "1999"
+   ],
+   "explain": "Grey's Anatomy (first shown 2005, United States). A drama about young surgeons led by Meredith.",
+   "difficulty": 3,
+   "refs": [
+    "tv/grey-s-anatomy"
+   ]
+  },
+  {
+   "id": "which-the-big-bang-theory",
+   "kind": "mc",
+   "prompt": "Which TV show is this? Nerdy scientists in Pasadena befriend their neighbour.",
+   "answer": "The Big Bang Theory",
+   "wrong": [
+    "Squid Game",
+    "The Crown",
+    "EastEnders"
+   ],
+   "explain": "The Big Bang Theory (first shown 2007, United States). Nerdy scientists in Pasadena befriend their neighbour.",
+   "difficulty": 1,
+   "refs": [
+    "tv/the-big-bang-theory"
+   ]
+  },
+  {
+   "id": "year-the-big-bang-theory",
+   "kind": "mc",
+   "prompt": "In which year was The Big Bang Theory first shown?",
+   "answer": "2007",
+   "wrong": [
+    "2011",
+    "2013",
+    "2001"
+   ],
+   "explain": "The Big Bang Theory (first shown 2007, United States). Nerdy scientists in Pasadena befriend their neighbour.",
+   "difficulty": 3,
+   "refs": [
+    "tv/the-big-bang-theory"
+   ]
+  },
+  {
+   "id": "which-strictly-come-dancing",
+   "kind": "mc",
+   "prompt": "Which TV show is this? Celebrities learn the waltz, tango and salsa with professionals.",
+   "answer": "Strictly Come Dancing",
+   "wrong": [
+    "Who Wants to Be a Millionaire?",
+    "Stranger Things",
+    "The Fresh Prince of Bel-Air"
+   ],
+   "explain": "Strictly Come Dancing (first shown 2004, United Kingdom). Celebrities learn the waltz, tango and salsa with professionals.",
+   "difficulty": 2,
+   "refs": [
+    "tv/strictly-come-dancing"
+   ]
+  },
+  {
+   "id": "year-strictly-come-dancing",
+   "kind": "mc",
+   "prompt": "In which year was Strictly Come Dancing first shown?",
+   "answer": "2004",
+   "wrong": [
+    "2006",
+    "2008",
+    "2010"
+   ],
+   "explain": "Strictly Come Dancing (first shown 2004, United Kingdom). Celebrities learn the waltz, tango and salsa with professionals.",
+   "difficulty": 3,
+   "refs": [
+    "tv/strictly-come-dancing"
+   ]
+  },
+  {
+   "id": "which-who-wants-to-be-a-millionaire",
+   "kind": "mc",
+   "prompt": "Which TV show is this? A quiz show where fifteen questions lead to a top prize of a million pounds.",
+   "answer": "Who Wants to Be a Millionaire?",
+   "wrong": [
+    "The Office (US)",
+    "The Mandalorian",
+    "Strictly Come Dancing"
+   ],
+   "explain": "Who Wants to Be a Millionaire? (first shown 1998, United Kingdom). A quiz show where fifteen questions lead to a top prize of a million pounds.",
+   "difficulty": 2,
+   "refs": [
+    "tv/who-wants-to-be-a-millionaire"
+   ]
+  },
+  {
+   "id": "year-who-wants-to-be-a-millionaire",
+   "kind": "mc",
+   "prompt": "In which year was Who Wants to Be a Millionaire? first shown?",
+   "answer": "1998",
+   "wrong": [
+    "2000",
+    "2002",
+    "1992"
+   ],
+   "explain": "Who Wants to Be a Millionaire? (first shown 1998, United Kingdom). A quiz show where fifteen questions lead to a top prize of a million pounds.",
+   "difficulty": 3,
+   "refs": [
+    "tv/who-wants-to-be-a-millionaire"
+   ]
+  },
+  {
+   "id": "which-the-great-british-bake-off",
+   "kind": "mc",
+   "prompt": "Which TV show is this? Amateur cooks compete to make cakes, bread and pastry.",
+   "answer": "The Great British Bake Off",
+   "wrong": [
+    "The Simpsons",
+    "Baywatch",
+    "The Office (US)"
+   ],
+   "explain": "The Great British Bake Off (first shown 2010, United Kingdom). Amateur cooks compete to make cakes, bread and pastry.",
+   "difficulty": 2,
+   "refs": [
+    "tv/the-great-british-bake-off"
+   ]
+  },
+  {
+   "id": "year-the-great-british-bake-off",
+   "kind": "mc",
+   "prompt": "In which year was The Great British Bake Off first shown?",
+   "answer": "2010",
+   "wrong": [
+    "2004",
+    "2012",
+    "2006"
+   ],
+   "explain": "The Great British Bake Off (first shown 2010, United Kingdom). Amateur cooks compete to make cakes, bread and pastry.",
+   "difficulty": 3,
+   "refs": [
+    "tv/the-great-british-bake-off"
+   ]
+  },
+  {
+   "id": "which-blackadder",
+   "kind": "mc",
+   "prompt": "Which TV show is this? Rowan Atkinson plays a scheming coward.",
+   "answer": "Blackadder",
+   "wrong": [
+    "Stranger Things",
+    "Star Trek",
+    "The X-Files"
+   ],
+   "explain": "Blackadder (first shown 1983, United Kingdom). Rowan Atkinson plays a scheming coward.",
+   "difficulty": 2,
+   "refs": [
+    "tv/blackadder"
+   ]
+  },
+  {
+   "id": "year-blackadder",
+   "kind": "mc",
+   "prompt": "In which year was Blackadder first shown?",
+   "answer": "1983",
+   "wrong": [
+    "1981",
+    "1989",
+    "1977"
+   ],
+   "explain": "Blackadder (first shown 1983, United Kingdom). Rowan Atkinson plays a scheming coward.",
+   "difficulty": 3,
+   "refs": [
+    "tv/blackadder"
+   ]
+  },
+  {
+   "id": "which-monty-python-s-flying-circus",
+   "kind": "mc",
+   "prompt": "Which TV show is this? A surreal BBC sketch comedy by six writer-performers.",
+   "answer": "Monty Python's Flying Circus",
+   "wrong": [
+    "I Love Lucy",
+    "Squid Game",
+    "The Fresh Prince of Bel-Air"
+   ],
+   "explain": "Monty Python's Flying Circus (first shown 1969, United Kingdom). A surreal BBC sketch comedy by six writer-performers.",
+   "difficulty": 2,
+   "refs": [
+    "tv/monty-python-s-flying-circus"
+   ]
+  },
+  {
+   "id": "year-monty-python-s-flying-circus",
+   "kind": "mc",
+   "prompt": "In which year was Monty Python's Flying Circus first shown?",
+   "answer": "1969",
+   "wrong": [
+    "1965",
+    "1973",
+    "1975"
+   ],
+   "explain": "Monty Python's Flying Circus (first shown 1969, United Kingdom). A surreal BBC sketch comedy by six writer-performers.",
+   "difficulty": 3,
+   "refs": [
+    "tv/monty-python-s-flying-circus"
+   ]
+  },
+  {
+   "id": "which-teletubbies",
+   "kind": "mc",
+   "prompt": "Which TV show is this? Four colourful creatures live in a grassy dome.",
+   "answer": "Teletubbies",
+   "wrong": [
+    "Postman Pat",
+    "Blue Peter",
+    "The Flintstones"
+   ],
+   "explain": "Teletubbies (first shown 1997, United Kingdom). Four colourful creatures live in a grassy dome.",
+   "difficulty": 1,
+   "refs": [
+    "tv/teletubbies"
+   ]
+  },
+  {
+   "id": "year-teletubbies",
+   "kind": "mc",
+   "prompt": "In which year was Teletubbies first shown?",
+   "answer": "1997",
+   "wrong": [
+    "1999",
+    "1991",
+    "1995"
+   ],
+   "explain": "Teletubbies (first shown 1997, United Kingdom). Four colourful creatures live in a grassy dome.",
+   "difficulty": 3,
+   "refs": [
+    "tv/teletubbies"
+   ]
+  },
+  {
+   "id": "which-scooby-doo-where-are-you",
+   "kind": "mc",
+   "prompt": "Which TV show is this? A talking Great Dane and four teenagers solve mysteries.",
+   "answer": "Scooby-Doo, Where Are You!",
+   "wrong": [
+    "Bluey",
+    "Mr. Bean",
+    "The Flintstones"
+   ],
+   "explain": "Scooby-Doo, Where Are You! (first shown 1969, United States). A talking Great Dane and four teenagers solve mysteries.",
+   "difficulty": 1,
+   "refs": [
+    "tv/scooby-doo-where-are-you"
+   ]
+  },
+  {
+   "id": "year-scooby-doo-where-are-you",
+   "kind": "mc",
+   "prompt": "In which year was Scooby-Doo, Where Are You! first shown?",
+   "answer": "1969",
+   "wrong": [
+    "1975",
+    "1971",
+    "1965"
+   ],
+   "explain": "Scooby-Doo, Where Are You! (first shown 1969, United States). A talking Great Dane and four teenagers solve mysteries.",
+   "difficulty": 3,
+   "refs": [
+    "tv/scooby-doo-where-are-you"
+   ]
+  },
+  {
+   "id": "which-the-flintstones",
+   "kind": "mc",
+   "prompt": "Which TV show is this? A Stone Age family with dinosaur pets and gadgets.",
+   "answer": "The Flintstones",
+   "wrong": [
+    "SpongeBob SquarePants",
+    "PAW Patrol",
+    "The Muppet Show"
+   ],
+   "explain": "The Flintstones (first shown 1960, United States). A Stone Age family with dinosaur pets and gadgets.",
+   "difficulty": 2,
+   "refs": [
+    "tv/the-flintstones"
+   ]
+  },
+  {
+   "id": "year-the-flintstones",
+   "kind": "mc",
+   "prompt": "In which year was The Flintstones first shown?",
+   "answer": "1960",
+   "wrong": [
+    "1954",
+    "1956",
+    "1962"
+   ],
+   "explain": "The Flintstones (first shown 1960, United States). A Stone Age family with dinosaur pets and gadgets.",
+   "difficulty": 3,
+   "refs": [
+    "tv/the-flintstones"
+   ]
+  },
+  {
+   "id": "which-the-mandalorian",
+   "kind": "mc",
+   "prompt": "Which TV show is this? A bounty hunter in the Star Wars universe protects a small green child.",
+   "answer": "The Mandalorian",
+   "wrong": [
+    "Stranger Things",
+    "Strictly Come Dancing",
+    "Neighbours"
+   ],
+   "explain": "The Mandalorian (first shown 2019, United States). A bounty hunter in the Star Wars universe protects a small green child.",
+   "difficulty": 2,
+   "refs": [
+    "tv/the-mandalorian"
+   ]
+  },
+  {
+   "id": "year-the-mandalorian",
+   "kind": "mc",
+   "prompt": "In which year was The Mandalorian first shown?",
+   "answer": "2019",
+   "wrong": [
+    "2013",
+    "2015",
+    "2017"
+   ],
+   "explain": "The Mandalorian (first shown 2019, United States). A bounty hunter in the Star Wars universe protects a small green child.",
+   "difficulty": 3,
+   "refs": [
+    "tv/the-mandalorian"
+   ]
+  },
+  {
+   "id": "which-dad-s-army",
+   "kind": "mc",
+   "prompt": "Which TV show is this? A comedy about the Home Guard in the Second World War.",
+   "answer": "Dad's Army",
+   "wrong": [
+    "The Office (US)",
+    "The Big Bang Theory",
+    "Ted Lasso"
+   ],
+   "explain": "Dad's Army (first shown 1968, United Kingdom). A comedy about the Home Guard in the Second World War.",
+   "difficulty": 2,
+   "refs": [
+    "tv/dad-s-army"
+   ]
+  },
+  {
+   "id": "year-dad-s-army",
+   "kind": "mc",
+   "prompt": "In which year was Dad's Army first shown?",
+   "answer": "1968",
+   "wrong": [
+    "1962",
+    "1974",
+    "1964"
+   ],
+   "explain": "Dad's Army (first shown 1968, United Kingdom). A comedy about the Home Guard in the Second World War.",
+   "difficulty": 3,
+   "refs": [
+    "tv/dad-s-army"
+   ]
+  },
+  {
+   "id": "which-frasier",
+   "kind": "mc",
+   "prompt": "Which TV show is this? A psychiatrist hosts a radio phone-in show.",
+   "answer": "Frasier",
+   "wrong": [
+    "Friends",
+    "EastEnders",
+    "Seinfeld"
+   ],
+   "explain": "Frasier (first shown 1993, United States). A psychiatrist hosts a radio phone-in show.",
+   "difficulty": 2,
+   "refs": [
+    "tv/frasier"
+   ]
+  },
+  {
+   "id": "year-frasier",
+   "kind": "mc",
+   "prompt": "In which year was Frasier first shown?",
+   "answer": "1993",
+   "wrong": [
+    "1997",
+    "1991",
+    "1995"
+   ],
+   "explain": "Frasier (first shown 1993, United States). A psychiatrist hosts a radio phone-in show.",
+   "difficulty": 3,
+   "refs": [
+    "tv/frasier"
+   ]
+  },
+  {
+   "id": "which-baywatch",
+   "kind": "mc",
+   "prompt": "Which TV show is this? A drama about lifeguards.",
+   "answer": "Baywatch",
+   "wrong": [
+    "Squid Game",
+    "M*A*S*H",
+    "Strictly Come Dancing"
+   ],
+   "explain": "Baywatch (first shown 1989, United States). A drama about lifeguards.",
+   "difficulty": 2,
+   "refs": [
+    "tv/baywatch"
+   ]
+  },
+  {
+   "id": "year-baywatch",
+   "kind": "mc",
+   "prompt": "In which year was Baywatch first shown?",
+   "answer": "1989",
+   "wrong": [
+    "1993",
+    "1991",
+    "1995"
+   ],
+   "explain": "Baywatch (first shown 1989, United States). A drama about lifeguards.",
+   "difficulty": 3,
+   "refs": [
+    "tv/baywatch"
+   ]
+  },
+  {
+   "id": "which-the-fresh-prince-of-bel-air",
+   "kind": "mc",
+   "prompt": "Which TV show is this? A teenager from West Philadelphia moves in with rich relatives.",
+   "answer": "The Fresh Prince of Bel-Air",
+   "wrong": [
+    "Stranger Things",
+    "Strictly Come Dancing",
+    "The Office (US)"
+   ],
+   "explain": "The Fresh Prince of Bel-Air (first shown 1990, United States). A teenager from West Philadelphia moves in with rich relatives.",
+   "difficulty": 2,
+   "refs": [
+    "tv/the-fresh-prince-of-bel-air"
+   ]
+  },
+  {
+   "id": "year-the-fresh-prince-of-bel-air",
+   "kind": "mc",
+   "prompt": "In which year was The Fresh Prince of Bel-Air first shown?",
+   "answer": "1990",
+   "wrong": [
+    "1986",
+    "1994",
+    "1988"
+   ],
+   "explain": "The Fresh Prince of Bel-Air (first shown 1990, United States). A teenager from West Philadelphia moves in with rich relatives.",
+   "difficulty": 3,
+   "refs": [
+    "tv/the-fresh-prince-of-bel-air"
+   ]
+  },
+  {
+   "id": "which-thunderbirds",
+   "kind": "mc",
+   "prompt": "Which TV show is this? Puppet heroes fly rescue craft from a secret island.",
+   "answer": "Thunderbirds",
+   "wrong": [
+    "PAW Patrol",
+    "The Muppet Show",
+    "Postman Pat"
+   ],
+   "explain": "Thunderbirds (first shown 1965, United Kingdom). Puppet heroes fly rescue craft from a secret island.",
+   "difficulty": 2,
+   "refs": [
+    "tv/thunderbirds"
+   ]
+  },
+  {
+   "id": "year-thunderbirds",
+   "kind": "mc",
+   "prompt": "In which year was Thunderbirds first shown?",
+   "answer": "1965",
+   "wrong": [
+    "1967",
+    "1971",
+    "1961"
+   ],
+   "explain": "Thunderbirds (first shown 1965, United Kingdom). Puppet heroes fly rescue craft from a secret island.",
+   "difficulty": 3,
+   "refs": [
+    "tv/thunderbirds"
+   ]
+  },
+  {
+   "id": "which-postman-pat",
+   "kind": "mc",
+   "prompt": "Which TV show is this? A cheerful mail carrier delivers letters in the countryside.",
+   "answer": "Postman Pat",
+   "wrong": [
+    "Blue Peter",
+    "Pokémon",
+    "Thunderbirds"
+   ],
+   "explain": "Postman Pat (first shown 1981, United Kingdom). A cheerful mail carrier delivers letters in the countryside.",
+   "difficulty": 1,
+   "refs": [
+    "tv/postman-pat"
+   ]
+  },
+  {
+   "id": "year-postman-pat",
+   "kind": "mc",
+   "prompt": "In which year was Postman Pat first shown?",
+   "answer": "1981",
+   "wrong": [
+    "1977",
+    "1985",
+    "1975"
+   ],
+   "explain": "Postman Pat (first shown 1981, United Kingdom). A cheerful mail carrier delivers letters in the countryside.",
+   "difficulty": 3,
+   "refs": [
+    "tv/postman-pat"
+   ]
+  },
+  {
+   "id": "which-paw-patrol",
+   "kind": "mc",
+   "prompt": "Which TV show is this? Rescue puppies with special jobs save the day.",
+   "answer": "PAW Patrol",
+   "wrong": [
+    "Peppa Pig",
+    "Thunderbirds",
+    "Doctor Who"
+   ],
+   "explain": "PAW Patrol (first shown 2013, Canada). Rescue puppies with special jobs save the day.",
+   "difficulty": 1,
+   "refs": [
+    "tv/paw-patrol"
+   ]
+  },
+  {
+   "id": "year-paw-patrol",
+   "kind": "mc",
+   "prompt": "In which year was PAW Patrol first shown?",
+   "answer": "2013",
+   "wrong": [
+    "2019",
+    "2007",
+    "2017"
+   ],
+   "explain": "PAW Patrol (first shown 2013, Canada). Rescue puppies with special jobs save the day.",
+   "difficulty": 3,
+   "refs": [
+    "tv/paw-patrol"
+   ]
+  },
+  {
+   "id": "which-ted-lasso",
+   "kind": "mc",
+   "prompt": "Which TV show is this? An American football coach takes over an English soccer team.",
+   "answer": "Ted Lasso",
+   "wrong": [
+    "Strictly Come Dancing",
+    "Grey's Anatomy",
+    "The Great British Bake Off"
+   ],
+   "explain": "Ted Lasso (first shown 2020, United States). An American football coach takes over an English soccer team.",
+   "difficulty": 2,
+   "refs": [
+    "tv/ted-lasso"
+   ]
+  },
+  {
+   "id": "year-ted-lasso",
+   "kind": "mc",
+   "prompt": "In which year was Ted Lasso first shown?",
+   "answer": "2020",
+   "wrong": [
+    "2018",
+    "2016",
+    "2014"
+   ],
+   "explain": "Ted Lasso (first shown 2020, United States). An American football coach takes over an English soccer team.",
+   "difficulty": 3,
+   "refs": [
+    "tv/ted-lasso"
+   ]
+  },
+  {
+   "id": "tvq-8fc5c66e",
+   "kind": "mc",
+   "prompt": "What colour is the TARDIS in Doctor Who?",
+   "difficulty": 1,
+   "answer": "Blue",
+   "wrong": [
+    "Red",
+    "Green",
+    "Black"
+   ],
+   "explain": "It is disguised as a 1960s police box."
+  },
+  {
+   "id": "tvq-ac7b60f4",
+   "kind": "mc",
+   "prompt": "Which actor played the first Doctor in Doctor Who in 1963?",
+   "difficulty": 3,
+   "answer": "William Hartnell",
+   "wrong": [
+    "Patrick Troughton",
+    "Jon Pertwee",
+    "Tom Baker"
+   ],
+   "explain": "Patrick Troughton took over in 1966."
+  },
+  {
+   "id": "tvq-761aa225",
+   "kind": "mc",
+   "prompt": "What does TARDIS stand for?",
+   "difficulty": 3,
+   "answer": "Time And Relative Dimension In Space",
+   "wrong": [
+    "Travel And Remote Destination In Space",
+    "Time And Rocket Device In Space",
+    "Temporal Area Relocation Device In Space"
+   ],
+   "explain": "The name was given in the first serial in 1963."
+  },
+  {
+   "id": "tvq-e6a72f88",
+   "kind": "mc",
+   "prompt": "In which town do the Simpsons live?",
+   "difficulty": 1,
+   "answer": "Springfield",
+   "wrong": [
+    "Shelbyville",
+    "Quahog",
+    "South Park"
+   ],
+   "explain": "Its state is never revealed."
+  },
+  {
+   "id": "tvq-7fe2fe3e",
+   "kind": "mc",
+   "prompt": "What is the name of the Simpsons' dog?",
+   "difficulty": 2,
+   "answer": "Santa's Little Helper",
+   "wrong": [
+    "Snowball",
+    "Scratchy",
+    "Lucky"
+   ],
+   "explain": "He arrives in the very first full episode, a Christmas special."
+  },
+  {
+   "id": "tvq-2ade4079",
+   "kind": "tf",
+   "prompt": "The Simpsons is the longest-running American animated series.",
+   "difficulty": 2,
+   "answer": true,
+   "explain": "It has run since 1989 and passed 750 episodes in the 2020s."
+  },
+  {
+   "id": "tvq-37c962ee",
+   "kind": "mc",
+   "prompt": "What is the name of the coffee shop in Friends?",
+   "difficulty": 1,
+   "answer": "Central Perk",
+   "wrong": [
+    "Java Joe's",
+    "The Grind",
+    "Moondance"
+   ],
+   "explain": "Gunther works behind the counter."
+  },
+  {
+   "id": "tvq-99800a55",
+   "kind": "mc",
+   "prompt": "In Friends, what is Ross Geller's job?",
+   "difficulty": 2,
+   "answer": "Palaeontologist",
+   "wrong": [
+    "Chef",
+    "Lawyer",
+    "Doctor"
+   ],
+   "explain": "He works at a museum and later teaches at a university."
+  },
+  {
+   "id": "tvq-2e063f7f",
+   "kind": "tf",
+   "prompt": "Friends ran for ten seasons.",
+   "difficulty": 2,
+   "answer": true,
+   "explain": "It ran from 1994 to 2004."
+  },
+  {
+   "id": "tvq-d7f96a25",
+   "kind": "mc",
+   "prompt": "In the 1966 Star Trek series, who is captain of the Enterprise?",
+   "difficulty": 1,
+   "answer": "James T. Kirk",
+   "wrong": [
+    "Jean-Luc Picard",
+    "Han Solo",
+    "Kathryn Janeway"
+   ],
+   "explain": "William Shatner played Kirk."
+  },
+  {
+   "id": "tvq-e2566177",
+   "kind": "mc",
+   "prompt": "Which Sesame Street character lives in a trash can?",
+   "difficulty": 1,
+   "answer": "Oscar the Grouch",
+   "wrong": [
+    "Big Bird",
+    "Cookie Monster",
+    "Elmo"
+   ],
+   "explain": "Oscar is famously grumpy."
+  },
+  {
+   "id": "tvq-b2833eb9",
+   "kind": "tf",
+   "prompt": "Sesame Street was first broadcast in 1969.",
+   "difficulty": 2,
+   "answer": true,
+   "explain": "It began on American public television in November 1969."
+  },
+  {
+   "id": "tvq-68994cba",
+   "kind": "mc",
+   "prompt": "Coronation Street, first shown in 1960, is set in which fictional town?",
+   "difficulty": 2,
+   "answer": "Weatherfield",
+   "wrong": [
+    "Walford",
+    "Erinsborough",
+    "Emmerdale"
+   ],
+   "explain": "Weatherfield is based on Salford, near Manchester."
+  },
+  {
+   "id": "tvq-cdb443a2",
+   "kind": "mc",
+   "prompt": "EastEnders is set in which fictional London borough?",
+   "difficulty": 2,
+   "answer": "Walford",
+   "wrong": [
+    "Weatherfield",
+    "Peckham",
+    "Holby"
+   ],
+   "explain": "Its heart is Albert Square."
+  },
+  {
+   "id": "tvq-6271c701",
+   "kind": "mc",
+   "prompt": "On which street does Neighbours take place?",
+   "difficulty": 2,
+   "answer": "Ramsay Street",
+   "wrong": [
+    "Albert Square",
+    "Coronation Street",
+    "Summer Bay"
+   ],
+   "explain": "It is in the fictional Melbourne suburb of Erinsborough."
+  },
+  {
+   "id": "tvq-6fc99b7d",
+   "kind": "mc",
+   "prompt": "In Game of Thrones, most of the story takes place on which continent?",
+   "difficulty": 2,
+   "answer": "Westeros",
+   "wrong": [
+    "Narnia",
+    "Middle-earth",
+    "Essos"
+   ],
+   "explain": "Daenerys spends much of the story across the sea in Essos."
+  },
+  {
+   "id": "tvq-bee9570b",
+   "kind": "tf",
+   "prompt": "Game of Thrones is based on books by George R. R. Martin.",
+   "difficulty": 1,
+   "answer": true,
+   "explain": "The book series is called A Song of Ice and Fire."
+  },
+  {
+   "id": "tvq-9bd9d601",
+   "kind": "mc",
+   "prompt": "In Breaking Bad, what subject does Walter White teach?",
+   "difficulty": 1,
+   "answer": "Chemistry",
+   "wrong": [
+    "Biology",
+    "Physics",
+    "History"
+   ],
+   "explain": "He teaches at a high school in Albuquerque."
+  },
+  {
+   "id": "tvq-8489e410",
+   "kind": "tf",
+   "prompt": "Breaking Bad is set in Las Vegas.",
+   "difficulty": 2,
+   "answer": false,
+   "explain": "It is set in Albuquerque, New Mexico."
+  },
+  {
+   "id": "tvq-f88656d1",
+   "kind": "mc",
+   "prompt": "In Fawlty Towers, what is the name of the Spanish waiter?",
+   "difficulty": 2,
+   "answer": "Manuel",
+   "wrong": [
+    "Pedro",
+    "Carlos",
+    "Miguel"
+   ],
+   "explain": "He is from Barcelona."
+  },
+  {
+   "id": "tvq-a5b770ba",
+   "kind": "mc",
+   "prompt": "In Only Fools and Horses, what is the Trotters' company called?",
+   "difficulty": 3,
+   "answer": "Trotters Independent Traders",
+   "wrong": [
+    "Peckham Traders Ltd",
+    "Del Boy Enterprises",
+    "Trotter & Son"
+   ],
+   "explain": "The van says New York, Paris, Peckham."
+  },
+  {
+   "id": "tvq-ef5386a0",
+   "kind": "mc",
+   "prompt": "In Top Gear (from 2002), what is the masked racing driver called?",
+   "difficulty": 2,
+   "answer": "The Stig",
+   "wrong": [
+    "The Hamster",
+    "Captain Slow",
+    "The Driver"
+   ],
+   "explain": "His identity was kept secret."
+  },
+  {
+   "id": "tvq-b30d6429",
+   "kind": "mc",
+   "prompt": "What are the surnames of the two FBI agents in The X-Files (1993)?",
+   "difficulty": 2,
+   "answer": "Mulder and Scully",
+   "wrong": [
+    "Starsky and Hutch",
+    "Cagney and Lacey",
+    "Cooper and Truman"
+   ],
+   "explain": "Fox Mulder and Dana Scully."
+  },
+  {
+   "id": "tvq-ac2a3c7b",
+   "kind": "mc",
+   "prompt": "What kind of car does Mr. Bean drive?",
+   "difficulty": 1,
+   "answer": "A Mini",
+   "wrong": [
+    "A Beetle",
+    "A Ferrari",
+    "A Land Rover"
+   ],
+   "explain": "His Mini is green, with a padlock on the door."
+  },
+  {
+   "id": "tvq-9ca8d42d",
+   "kind": "mc",
+   "prompt": "What number is painted on Thomas the Tank Engine?",
+   "difficulty": 2,
+   "answer": "1",
+   "wrong": [
+    "7",
+    "2",
+    "10"
+   ],
+   "explain": "Thomas is engine number 1."
+  },
+  {
+   "id": "tvq-2b2262a5",
+   "kind": "mc",
+   "prompt": "What is the name of Peppa Pig's little brother?",
+   "difficulty": 1,
+   "answer": "George",
+   "wrong": [
+    "Richard",
+    "Danny",
+    "Pedro"
+   ],
+   "explain": "George loves his toy dinosaur."
+  },
+  {
+   "id": "tvq-98f6126e",
+   "kind": "tf",
+   "prompt": "Peppa Pig is a British show.",
+   "difficulty": 1,
+   "answer": true,
+   "explain": "It was created in the UK and first shown in 2004."
+  },
+  {
+   "id": "tvq-a29c3718",
+   "kind": "mc",
+   "prompt": "What kind of home does SpongeBob SquarePants live in?",
+   "difficulty": 1,
+   "answer": "A pineapple",
+   "wrong": [
+    "A coconut",
+    "A shell",
+    "A rock"
+   ],
+   "explain": "It sits in the town of Bikini Bottom."
+  },
+  {
+   "id": "tvq-20cc2490",
+   "kind": "mc",
+   "prompt": "In Stranger Things, what is the dark parallel world called?",
+   "difficulty": 1,
+   "answer": "The Upside Down",
+   "wrong": [
+    "The Shadow Realm",
+    "The Other Side",
+    "The Nether"
+   ],
+   "explain": "It mirrors the town of Hawkins."
+  },
+  {
+   "id": "tvq-66db6615",
+   "kind": "mc",
+   "prompt": "The Crown (2016) dramatises the reign of which monarch?",
+   "difficulty": 1,
+   "answer": "Elizabeth II",
+   "wrong": [
+    "Victoria",
+    "Elizabeth I",
+    "George VI"
+   ],
+   "explain": "The series runs from 1947 into the 2000s."
+  },
+  {
+   "id": "tvq-4a6ff85a",
+   "kind": "mc",
+   "prompt": "What is the family's surname in Downton Abbey?",
+   "difficulty": 2,
+   "answer": "Crawley",
+   "wrong": [
+    "Bellamy",
+    "Grantham",
+    "Bennet"
+   ],
+   "explain": "Robert Crawley is the Earl of Grantham."
+  },
+  {
+   "id": "tvq-f7c03b31",
+   "kind": "mc",
+   "prompt": "Who plays Sherlock Holmes in the BBC's Sherlock (2010)?",
+   "difficulty": 1,
+   "answer": "Benedict Cumberbatch",
+   "wrong": [
+    "Martin Freeman",
+    "Robert Downey Jr.",
+    "Jonny Lee Miller"
+   ],
+   "explain": "Martin Freeman plays Dr Watson."
+  },
+  {
+   "id": "tvq-136bffb6",
+   "kind": "mc",
+   "prompt": "In Lost, the survivors were on which airline's Flight 815?",
+   "difficulty": 2,
+   "answer": "Oceanic",
+   "wrong": [
+    "Pan Am",
+    "Ajira",
+    "Trans-Pacific"
+   ],
+   "explain": "Oceanic Flight 815 broke apart over the island."
+  },
+  {
+   "id": "tvq-53d33673",
+   "kind": "mc",
+   "prompt": "In Twin Peaks (1990), whose murder sets off the story?",
+   "difficulty": 3,
+   "answer": "Laura Palmer",
+   "wrong": [
+    "Audrey Horne",
+    "Donna Hayward",
+    "Shelly Johnson"
+   ],
+   "explain": "Her body is found wrapped in plastic."
+  },
+  {
+   "id": "tvq-cc81f419",
+   "kind": "mc",
+   "prompt": "M*A*S*H (1972) is set during which war?",
+   "difficulty": 2,
+   "answer": "The Korean War",
+   "wrong": [
+    "The Vietnam War",
+    "The Second World War",
+    "The Gulf War"
+   ],
+   "explain": "The series ran longer than the war itself."
+  },
+  {
+   "id": "tvq-d8b25f60",
+   "kind": "mc",
+   "prompt": "Who hosts The Muppet Show?",
+   "difficulty": 1,
+   "answer": "Kermit the Frog",
+   "wrong": [
+    "Fozzie Bear",
+    "Miss Piggy",
+    "Gonzo"
+   ],
+   "explain": "Statler and Waldorf heckle from the balcony."
+  },
+  {
+   "id": "tvq-9fbf5009",
+   "kind": "mc",
+   "prompt": "What is the name of Bluey's little sister?",
+   "difficulty": 1,
+   "answer": "Bingo",
+   "wrong": [
+    "Muffin",
+    "Socks",
+    "Chloe"
+   ],
+   "explain": "Bingo is a red heeler."
+  },
+  {
+   "id": "tvq-d6254cfb",
+   "kind": "mc",
+   "prompt": "Which Pokémon is Ash's partner in the anime?",
+   "difficulty": 1,
+   "answer": "Pikachu",
+   "wrong": [
+    "Charmander",
+    "Squirtle",
+    "Bulbasaur"
+   ],
+   "explain": "Pikachu refuses to travel in a Poké Ball."
+  },
+  {
+   "id": "tvq-e01377c4",
+   "kind": "tf",
+   "prompt": "In 2021, Netflix said Squid Game was its biggest series launch ever.",
+   "difficulty": 3,
+   "answer": true,
+   "explain": "It said 111 million households watched in its first 28 days."
+  },
+  {
+   "id": "tvq-4eb36202",
+   "kind": "mc",
+   "prompt": "Squid Game (2021) comes from which country?",
+   "difficulty": 1,
+   "answer": "South Korea",
+   "wrong": [
+    "Japan",
+    "China",
+    "Thailand"
+   ],
+   "explain": "It was created by Hwang Dong-hyuk."
+  },
+  {
+   "id": "tvq-4c2e199d",
+   "kind": "mc",
+   "prompt": "In which city is Grey's Anatomy set?",
+   "difficulty": 2,
+   "answer": "Seattle",
+   "wrong": [
+    "Chicago",
+    "Boston",
+    "San Francisco"
+   ],
+   "explain": "The hospital was first called Seattle Grace."
+  },
+  {
+   "id": "tvq-c1ab4138",
+   "kind": "mc",
+   "prompt": "In The Big Bang Theory, which character's catchphrase is \"Bazinga!\"?",
+   "difficulty": 1,
+   "answer": "Sheldon Cooper",
+   "wrong": [
+    "Leonard Hofstadter",
+    "Howard Wolowitz",
+    "Raj Koothrappali"
+   ],
+   "explain": "Jim Parsons played Sheldon."
+  },
+  {
+   "id": "tvq-8d21b677",
+   "kind": "mc",
+   "prompt": "Who first hosted Who Wants to Be a Millionaire? in the UK in 1998?",
+   "difficulty": 2,
+   "answer": "Chris Tarrant",
+   "wrong": [
+    "Jeremy Clarkson",
+    "Bruce Forsyth",
+    "Anne Robinson"
+   ],
+   "explain": "Jeremy Clarkson hosted the 2018 revival."
+  },
+  {
+   "id": "tvq-05340d32",
+   "kind": "mc",
+   "prompt": "On Who Wants to Be a Millionaire?, which lifeline lets you ring someone?",
+   "difficulty": 1,
+   "answer": "Phone a Friend",
+   "wrong": [
+    "Ask the Audience",
+    "Fifty-fifty",
+    "Switch the Question"
+   ],
+   "explain": "The call lasted 30 seconds."
+  },
+  {
+   "id": "tvq-725327de",
+   "kind": "mc",
+   "prompt": "Who were the original judges on The Great British Bake Off in 2010?",
+   "difficulty": 2,
+   "answer": "Mary Berry and Paul Hollywood",
+   "wrong": [
+    "Prue Leith and Paul Hollywood",
+    "Mary Berry and Gordon Ramsay",
+    "Nigella Lawson and Paul Hollywood"
+   ],
+   "explain": "Prue Leith replaced Mary Berry in 2017."
+  },
+  {
+   "id": "tvq-4aee194a",
+   "kind": "mc",
+   "prompt": "Which actor plays Edmund Blackadder?",
+   "difficulty": 1,
+   "answer": "Rowan Atkinson",
+   "wrong": [
+    "Hugh Laurie",
+    "Stephen Fry",
+    "Tony Robinson"
+   ],
+   "explain": "Tony Robinson plays Baldrick."
+  },
+  {
+   "id": "tvq-b8b42044",
+   "kind": "mc",
+   "prompt": "Which Monty Python member was American?",
+   "difficulty": 3,
+   "answer": "Terry Gilliam",
+   "wrong": [
+    "John Cleese",
+    "Michael Palin",
+    "Eric Idle"
+   ],
+   "explain": "He made the show's cut-out animations."
+  },
+  {
+   "id": "tvq-b15d437e",
+   "kind": "number",
+   "prompt": "How many Teletubbies are there?",
+   "difficulty": 1,
+   "answer": 4,
+   "unit": "Teletubbies",
+   "tolerance": 0,
+   "explain": "Tinky Winky, Dipsy, Laa-Laa and Po."
+  },
+  {
+   "id": "tvq-47123cf6",
+   "kind": "mc",
+   "prompt": "What is the name of the van in Scooby-Doo?",
+   "difficulty": 1,
+   "answer": "The Mystery Machine",
+   "wrong": [
+    "The Ghost Wagon",
+    "The Scooby Van",
+    "The Groovy Bus"
+   ],
+   "explain": "It is painted with flowers."
+  },
+  {
+   "id": "tvq-700aaa2b",
+   "kind": "mc",
+   "prompt": "What is the name of Fred's wife in The Flintstones?",
+   "difficulty": 2,
+   "answer": "Wilma",
+   "wrong": [
+    "Betty",
+    "Pebbles",
+    "Daisy"
+   ],
+   "explain": "Barney is married to Betty."
+  },
+  {
+   "id": "tvq-860e3dae",
+   "kind": "mc",
+   "prompt": "In The Mandalorian, what is the real name of the child nicknamed Baby Yoda?",
+   "difficulty": 2,
+   "answer": "Grogu",
+   "wrong": [
+    "Din",
+    "Yaddle",
+    "Bo-Katan"
+   ],
+   "explain": "His name was revealed in 2020."
+  },
+  {
+   "id": "tvq-af12ac79",
+   "kind": "mc",
+   "prompt": "Dad's Army (1968) is about which wartime force?",
+   "difficulty": 2,
+   "answer": "The Home Guard",
+   "wrong": [
+    "The Royal Navy",
+    "The RAF",
+    "The Fire Brigade"
+   ],
+   "explain": "The Home Guard was a volunteer defence force in the Second World War."
+  },
+  {
+   "id": "tvq-455c5dfc",
+   "kind": "mc",
+   "prompt": "Frasier is a spin-off from which show?",
+   "difficulty": 2,
+   "answer": "Cheers",
+   "wrong": [
+    "Friends",
+    "Seinfeld",
+    "M*A*S*H"
+   ],
+   "explain": "Frasier Crane first appeared in the Boston bar of Cheers."
+  },
+  {
+   "id": "tvq-eb83dcdd",
+   "kind": "mc",
+   "prompt": "Baywatch is about people doing which job?",
+   "difficulty": 1,
+   "answer": "Lifeguards",
+   "wrong": [
+    "Police officers",
+    "Surfing instructors",
+    "Firefighters"
+   ],
+   "explain": "It is set on the beaches of Los Angeles."
+  },
+  {
+   "id": "tvq-f112e5b0",
+   "kind": "mc",
+   "prompt": "In Thunderbirds (1965), which family runs International Rescue?",
+   "difficulty": 2,
+   "answer": "The Tracy family",
+   "wrong": [
+    "The Thunder family",
+    "The Penelope family",
+    "The Parker family"
+   ],
+   "explain": "Lady Penelope's chauffeur is Parker."
+  },
+  {
+   "id": "tvq-293a9a83",
+   "kind": "mc",
+   "prompt": "What is the name of Postman Pat's cat?",
+   "difficulty": 1,
+   "answer": "Jess",
+   "wrong": [
+    "Tom",
+    "Smudge",
+    "Felix"
+   ],
+   "explain": "Jess is black and white."
+  },
+  {
+   "id": "tvq-9714cc99",
+   "kind": "mc",
+   "prompt": "Who leads the pups in PAW Patrol?",
+   "difficulty": 1,
+   "answer": "Ryder",
+   "wrong": [
+    "Chase",
+    "Marshall",
+    "Skye"
+   ],
+   "explain": "Ryder is a 10-year-old boy."
+  },
+  {
+   "id": "tvq-32b48899",
+   "kind": "mc",
+   "prompt": "Which football club does Ted Lasso coach?",
+   "difficulty": 2,
+   "answer": "AFC Richmond",
+   "wrong": [
+    "Kensington FC",
+    "Crystal Palace",
+    "West Ham United"
+   ],
+   "explain": "The club is fictional."
+  },
+  {
+   "id": "tvq-e712250e",
+   "kind": "tf",
+   "prompt": "Doctor Who's first episode aired the day after President Kennedy was assassinated.",
+   "difficulty": 3,
+   "answer": true,
+   "explain": "It was broadcast on 23 November 1963."
+  },
+  {
+   "id": "tvq-a351a326",
+   "kind": "tf",
+   "prompt": "Coronation Street began in 1960.",
+   "difficulty": 3,
+   "answer": true,
+   "explain": "Its first episode aired on 9 December 1960."
+  },
+  {
+   "id": "tvq-2210e434",
+   "kind": "mc",
+   "prompt": "In The Office (US, 2005), what is the paper company called?",
+   "difficulty": 2,
+   "answer": "Dunder Mifflin",
+   "wrong": [
+    "Wernham Hogg",
+    "Sabre",
+    "Staples"
+   ],
+   "explain": "The British original was set at Wernham Hogg."
+  }
+ ],
+ "sources": [
+  {
+   "name": "Wikidata (start dates)",
+   "url": "https://www.wikidata.org"
+  },
+  {
+   "name": "Wikipedia articles for each show",
+   "url": "https://en.wikipedia.org"
+  }
+ ]
+}

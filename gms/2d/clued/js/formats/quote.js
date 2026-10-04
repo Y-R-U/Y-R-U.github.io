@@ -52,13 +52,22 @@ function sources(pack) {
   return out;
 }
 
+// Every line an item owns: [{ text, context, difficulty }]
+function linesOf(it, kind) {
+  if (kind === 'first') return it.firstLine ? [{ text: it.firstLine, difficulty: it.difficulty }] : [];
+  const out = (it.quotes || []).map(x => (typeof x === 'string' ? { text: x } : x)).filter(x => x && x.text);
+  if (it.quote && !out.some(x => norm(x.text) === norm(it.quote))) out.unshift({ text: it.quote, difficulty: it.difficulty });
+  return out;
+}
+
 function fromItems(rng, pack, kind, n, difficulty) {
   const all = poolItems([pack]);
-  const lineOf = it => (kind === 'first' ? it.firstLine : it.quote || null);
-  const withLine = all.filter(c => (kind === 'first' ? c.item.firstLine : c.item.quote || c.item.quotes?.length));
+  const withLine = all.filter(c => linesOf(c.item, kind).length);
   const t = pick(rng, byDifficulty(withLine, difficulty, 3, c => c.item.difficulty || 2));
   if (!t) return null;
-  const line = lineOf(t.item) || pick(rng, t.item.quotes);
+  const pickLine = byDifficulty(linesOf(t.item, kind), difficulty, 1, x => x.difficulty || t.item.difficulty || 2);
+  const lineObj = pick(rng, pickLine);
+  const line = lineObj?.text;
   if (!line || leaks(line, [t.item.name, ...(t.item.alt || [])])) return null;
   let cands = all.filter(c => c !== t && !related(c.item.name, t.item.name));
   if (difficulty === 3 && t.item.group) {
@@ -77,7 +86,7 @@ function fromItems(rng, pack, kind, n, difficulty) {
   return {
     format: 'quote', id: `quote:${kind}:${t.ref}:${norm(line).slice(0, 24)}`,
     prompt: `“${trimQuote(line)}” ${promptFor(pack, kind)}`, options: options.map(c => ({ text: c.item.name })), answer, answerText: t.item.name,
-    explain: t.item.blurb, refs: [t.ref, ...wrong.map(c => c.ref)], pack: pack.id,
+    explain: lineObj.context ? `${t.item.name}: ${lineObj.context}.` : t.item.blurb, refs: [t.ref, ...wrong.map(c => c.ref)], pack: pack.id,
     data: { quote: trimQuote(line), tag, ask: promptFor(pack, kind) },
   };
 }

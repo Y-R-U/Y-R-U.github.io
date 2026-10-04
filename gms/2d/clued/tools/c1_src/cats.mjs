@@ -6,7 +6,7 @@ const f = (origin, coat) => ({ origin, coat });
 export default {
   id: 'cats', title: 'Cat breeds', theme: 'animals', icon: '🐈', kids: true,
   leakExempt: ['cat', 'cats', 'breed'],
-  media: 'wiki', photos: 3, depicts: 1, lname: 'asis',
+  media: 'wiki', photos: 3, depicts: 0, lname: 'asis',
   wdCheckLabel: { origin: 'P495' }, wdP31: ['Q43577'],
   factsMeta: {
     origin: { type: 'cat', label: 'Country of origin', clue: v => `The breed comes from ${v}.` },

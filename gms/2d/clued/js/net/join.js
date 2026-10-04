@@ -13,7 +13,7 @@ import { suggestedName, rememberName, tidyName, MAX_NAME } from './ident.js?v=1'
 import { ensureStyles, saveSeat, loadSeat, dropSeat, cleanCode, validCode, setQuery, TRUST_HINT, START_CHOICES, startLabel, mmss } from './util.js?v=1';
 import { timingPanel, choiceChips } from './board.js?v=1';
 import { packInfo } from '../core/packs.js?v=1';
-import { getTransport, canHostFromDevice, fallback } from './transport.js?v=1';
+import { getTransport, canHostFromDevice, fallback, hasTransport } from './transport.js?v=1';
 import { signInPrompt, isSignedIn, pausedText, busyText } from './signin.js?v=1';
 import { ensureFormats } from './room.js?v=1';
 
@@ -70,7 +70,9 @@ defineScreen('online', (el, params, cur) => {
     h('div.net-wrap', {},
       h('div.net-hero', {}, h('div', { style: { fontSize: '48px' } }, '🌐'), h('h2', {}, 'Play with friends'), h('p', {}, 'Host a game and share the link. Friends type a name and they’re in. No sign-in needed.')),
       h('div.panel.stack', {}, h('h3', {}, 'Host a game'), h('p.muted', { style: { margin: 0 } }, 'Pick a format and themes, then share the link or QR code.'),
-        h('button.btn.go.big.wide', { type: 'button', dataset: { act: 'host' }, onclick: () => go('formats', { structure: 'quick', title: 'Host: pick a format', onPick: f => go('host', { format: f.id }) }) }, 'Host a game')),
+        h('button.btn.go.big.wide', { type: 'button', dataset: { act: 'host' }, onclick: () => go('formats', { structure: 'quick', title: 'Host: pick a format', onPick: f => go('host', { format: f.id }) }) }, 'Host a game'),
+        hasTransport('p2p') ? h('button.btn.wide', { type: 'button', dataset: { act: 'host-device' }, onclick: () => go('formats', { structure: 'quick', title: 'Host from this device', onPick: f => go('host', { format: f.id, via: 'p2p' }) }) }, '📡 Host from this device (no server)') : null,
+        hasTransport('p2p') ? h('p.net-note', { style: { margin: 0 } }, 'Device rooms need no server: your phone or laptop runs the game for up to 8 players.') : null),
       h('div.panel', {}, joinForm),
       h('div.stack', {}, h('h3.sec-title', {}, 'Public games'), pubList),
       h('p.net-note', {}, 'Challenge links: finish any game and tap “Challenge a friend” to share the same questions.')));
@@ -94,8 +96,9 @@ defineScreen('online', (el, params, cur) => {
 });
 
 /* --------------------------------------------------------------- join */
-defineScreen('join', async (el, { code: raw = '', fresh = false }, cur) => {
+defineScreen('join', async (el, { code: raw = '', fresh = false, via = 'server' }, cur) => {
   ensureStyles();
+  const T = getTransport(via);
   const code = cleanCode(raw);
   el.append(header('Join a game'));
   const body = h('div.net-wrap');
@@ -118,8 +121,9 @@ defineScreen('join', async (el, { code: raw = '', fresh = false }, cur) => {
   }
   busy('Finding the room');
   let info;
-  try { info = await rooms.peek(code); } catch (e) {
+  try { info = await T.peek(code); } catch (e) {
     if (cur !== current()) return;
+    if (e.code === 'room_not_found' && via === 'server' && hasTransport('p2p')) { go('join', { code, via: 'p2p' }, { replace: true }); return; }
     if (e.code === 'room_not_found') notFound();
     else body.replaceChildren(h('div.panel.net-hero', {}, h('h2', {}, 'Can’t connect'), h('p', {}, friendly(e))),
       h('button.btn.primary.wide', { type: 'button', onclick: () => go('join', { code }, { replace: true }) }, 'Try again'));
@@ -149,11 +153,11 @@ defineScreen('join', async (el, { code: raw = '', fresh = false }, cur) => {
     if (!n) { err.textContent = 'Type a name first.'; name.focus(); return; }
     btn.disabled = true; err.textContent = '';
     try {
-      const r = await rooms.join(code, n);
-      saveSeat(code, { key: r.playerKey, id: r.playerId, via: 'server' });
+      const r = await T.join(code, n);
+      saveSeat(code, { key: r.playerKey, id: r.playerId, via: T.id });
       rememberName(n);
       sfx('join');
-      go('room', { code, key: r.playerKey, st: r.room }, { replace: true, skipGuard: true });
+      go('room', { code, key: r.playerKey, st: r.room, via: T.id }, { replace: true, skipGuard: true });
     } catch (ex) {
       btn.disabled = false;
       if (ex.code === 'signin_required') {
@@ -187,12 +191,14 @@ defineScreen('join', async (el, { code: raw = '', fresh = false }, cur) => {
 
 /* --------------------------------------------------------------- host */
 // params: { format } (from the format grid) or { spec, title } (from another screen, e.g. a pub quiz builder).
-defineScreen('host', async (el, { format, spec: given, title: givenTitle }, cur) => {
+// via: 'p2p' hosts from this device (lane P2P): no public listing, no server status.
+defineScreen('host', async (el, { format, spec: given, title: givenTitle, via = 'server' }, cur) => {
   ensureStyles();
   await ensureFormats();
   const kids = !!getSettings().kids;
   const fmt = format ? getFormat(format) : null;
-  el.append(header('Host a game'));
+  const device = via === 'p2p' && hasTransport('p2p');
+  el.append(header(device ? 'Host from this device' : 'Host a game'));
   const body = h('div.net-wrap');
   el.append(body);
   const name = nameField();
@@ -215,17 +221,18 @@ defineScreen('host', async (el, { format, spec: given, title: givenTitle }, cur)
   const vis = { public: false, startIn: 120 };
   const startRow = h('div', { hidden: true, dataset: { opt: 'start' } }, h('div.opt-label', {}, 'Start'),
     choiceChips(START_CHOICES, START_CHOICES.map(startLabel), vis.startIn, x => { vis.startIn = x; }));
-  body.append(h('div.panel.stack.net-timing', {},
+  if (!device) body.append(h('div.panel.stack.net-timing', {},
     h('div', { dataset: { opt: 'vis' } }, h('div.opt-label', {}, 'Who can join'),
       choiceChips([false, true], ['🔒 Private: link or code', '🌍 Public: listed online'], false, x => { vis.public = x; startRow.hidden = !x; })),
     startRow));
   const btn = h('button.btn.go.big.wide', { type: 'button', dataset: { act: 'create' } }, 'Create room');
   const status = h('div');
   body.append(err, btn, status, h('p.net-note', {}, TRUST_HINT));
-  const T = getTransport('server');
+  const T = getTransport(device ? 'p2p' : 'server');
   const statusNote = h('div');
   body.insertBefore(statusNote, body.firstChild.nextSibling);
-  rooms.status().then(s => {
+  if (device) statusNote.append(h('p.net-note', {}, '📡 No server: this device runs the room for up to 8 players. Keep this tab open and on screen while you play.'));
+  else rooms.status().then(s => {
     if (s.level >= 3) statusNote.append(h('p.net-note', {}, pausedText));
     else if (s.level >= 1) isSignedIn().then(ok => { if (!ok) statusNote.append(h('p.net-note', {}, '🔐 Hosting needs a free br8t sign-in right now; you’ll be asked when you create the room.')); });
   }).catch(() => {});
@@ -260,12 +267,13 @@ defineScreen('host', async (el, { format, spec: given, title: givenTitle }, cur)
     if (!n) { err.textContent = 'Type your name first.'; name.focus(); return; }
     err.textContent = '';
     btn.disabled = true;
-    let spec = given, title = givenTitle;
+    let spec = given ? { ...given, rounds: (given.rounds || []).map(r => ({ ...r, opts: { ...(r.opts || {}), online: true } })) } : given, title = givenTitle;
     if (panel) {
       panel.save();
       const c = panel.value();
       spec = specFor('online', c);
       if (kids) spec.rounds.forEach(r => { r.opts = { ...r.opts, kids: true }; r.difficulty = 1; });
+      spec.rounds.forEach(r => { r.opts = { ...r.opts, online: true }; }); // formats may tune for rooms (lane AU)
       title = fmtTitle(c.format);
     }
     try {

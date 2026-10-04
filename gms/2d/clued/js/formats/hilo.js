@@ -1,6 +1,6 @@
-import { register, poolItems, pickPack, byDifficulty, imageOf, hasImg, collect, pick } from './registry.js?v=1';
+import { register, poolItems, pickPack, byDifficulty, imageOf, collect, pick } from './registry.js?v=1';
 import { h, choiceGrid, imgEl, countUp } from '../ui/kit.js?v=1';
-import { numericKeys, numOf, apart, fmtFact, norm, injectCSS, baseCSS } from './fkit.js?v=1';
+import { numericKeys, numOf, apart, rangeOf, fmtFact, norm, injectCSS, baseCSS, hasImg } from './fkit.js?v=1';
 
 const CSS = `
 .hl-cards{display:grid;grid-template-columns:1fr auto 1fr;gap:8px;align-items:stretch}
@@ -15,7 +15,9 @@ const CSS = `
 .hl-label{text-align:center;font-weight:900;color:var(--ink-2);font-size:15px}
 .hl .choices.n2{grid-template-columns:1fr 1fr}
 .hl .choice{justify-content:center;font-family:var(--font-display);font-weight:400;font-size:22px;min-height:68px}
-.hl .choice .badge{position:absolute;left:8px;top:8px;width:24px;height:24px;font-size:13px}
+.hl .choice .icon{font-family:var(--font);font-size:18px}
+.hl{justify-content:center}
+.hl-card.noimg{justify-content:center}
 .play.kids .hl-name{font-size:24px}
 @media (orientation:landscape) and (max-height:520px){
  .hl{flex-direction:row;align-items:center;gap:16px}.hl-left{flex:1 1 58%}.hl-right{flex:1 1 42%;display:flex;flex-direction:column;gap:10px}
@@ -38,7 +40,7 @@ function make(rng, pack, key, difficulty, kids) {
   if (pool.length < 2) return null;
   const a = pick(rng, pool);
   const va = numOf(a.item, key);
-  const bs = pool.filter(c => c !== a && norm(c.item.name) !== norm(a.item.name) && apart(meta, va, numOf(c.item, key), kids ? 1 : difficulty));
+  const bs = pool.filter(c => c !== a && norm(c.item.name) !== norm(a.item.name) && apart(meta, va, numOf(c.item, key), kids ? 1 : difficulty, rangeOf(pack, key)));
   if (!bs.length) return null;
   const b = pick(rng, bs);
   const vb = numOf(b.item, key);
@@ -81,7 +83,7 @@ export default register({
     injectCSS('f-hilo-css', CSS); baseCSS();
     el.innerHTML = '';
     const d = q.data;
-    const card = (x, cls) => h(`div.hl-card.${cls}`, {}, x.img ? imgEl(x.img, { alt: x.name }) : null,
+    const card = (x, cls) => h(`div.hl-card.${cls}`, { class: x.img ? '' : 'noimg' }, x.img ? imgEl(x.img, { alt: x.name }) : null,
       h('div.hl-name', {}, x.name), h('div.hl-val', { class: cls === 'b' ? 'q' : '' }, cls === 'b' ? '?' : x.value));
     const A = card(d.a, 'a'), B = card(d.b, 'b');
     const left = h('div.hl-left', {}, h('div.hl-label', {}, d.label), h('div.hl-cards', {}, A, h('div.hl-vs', {}, 'vs'), B));

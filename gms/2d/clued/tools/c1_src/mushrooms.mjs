@@ -8,7 +8,7 @@ export default {
   id: 'mushrooms', title: 'Mushrooms & fungi', theme: 'nature', icon: '🍄', kids: false, kidsSafe: false,
   notice: 'Never use this to forage. Many deadly mushrooms look like edible ones. Not for real-world identification.',
   leakExempt: ['mushroom', 'mushrooms', 'fungus', 'fungi'],
-  autoTaxo: ['family', 'genus'],
+  wikiD1: true, autoTaxo: ['family', 'genus'],
   factsMeta: {
     edibility: { type: 'cat', label: 'Edibility', values: [E, I, P, X], clue: v => ({ [E]: 'It is eaten as food, but only when expertly identified.', [I]: 'It is not good to eat.', [P]: 'It is poisonous.', [X]: 'It can kill people who eat it.' }[v]) },
     region: { type: 'cat', label: 'Found in', clue: v => `It grows in ${v}.` },

@@ -1,0 +1,2964 @@
+{
+ "id": "dishes",
+ "title": "World dishes",
+ "theme": "food",
+ "icon": "🍜",
+ "kids": true,
+ "version": 1,
+ "imgPrompt": "Which of these is {lname}?",
+ "nameImgPrompt": "Which dish is this?",
+ "tfImgPrompt": "This dish is {lname}.",
+ "leakExempt": [],
+ "factsMeta": {
+  "country": {
+   "type": "cat",
+   "label": "Comes from",
+   "ask": "Which country does {lname} come from?",
+   "askReverse": "Which of these dishes comes from {value}?",
+   "stmt": "{name} comes from {value}."
+  },
+  "course": {
+   "type": "cat",
+   "label": "Kind of dish",
+   "values": [
+    "Main",
+    "Snack",
+    "Dessert",
+    "Soup",
+    "Side",
+    "Breakfast",
+    "Bread or pastry"
+   ],
+   "ask": "What kind of dish is {lname}?",
+   "askReverse": "Which of these is usually eaten as a {lvalue}?",
+   "stmt": "{name} is usually eaten as a {lvalue}.",
+   "exclusive": false
+  }
+ },
+ "items": [
+  {
+   "id": "sushi",
+   "name": "Sushi",
+   "facts": {
+    "country": "Japan",
+    "course": "Main"
+   },
+   "lookalikes": [
+    "sashimi"
+   ],
+   "blurb": "Vinegared rice with fish, seafood or vegetables, often rolled in seaweed. It began as a way of preserving fish.",
+   "clues": [
+    "It began as a way to preserve fish in fermented rice.",
+    "Rolls of it are wrapped in nori seaweed.",
+    "It is often eaten with wasabi and pickled ginger.",
+    "It comes from Japan.",
+    "It is usually a main meal.",
+    "Its rice is seasoned with vinegar.",
+    "It is a famous Japanese rice dish, often with raw fish.",
+    "The answer is one word of 5 letters.",
+    "Its first letter is S."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/7/7a/Various_sushi%2C_beautiful_October_night_at_midnight.jpg/500px-Various_sushi%2C_beautiful_October_night_at_midnight.jpg",
+      "w": 500,
+      "h": 335,
+      "credit": "Yumi Kimura",
+      "license": "CC BY-SA 2.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Various_sushi,_beautiful_October_night_at_midnight.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/6/60/Sushi_platter.jpg/500px-Sushi_platter.jpg",
+      "w": 500,
+      "h": 500,
+      "credit": "chidorian from Japan",
+      "license": "CC BY-SA 2.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Sushi_platter.jpg"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "sashimi",
+   "name": "Sashimi",
+   "facts": {
+    "country": "Japan",
+    "course": "Main"
+   },
+   "lookalikes": [
+    "sushi"
+   ],
+   "blurb": "Thin slices of very fresh raw fish or seafood, served without rice.",
+   "clues": [
+    "It is often served with shredded daikon radish.",
+    "Unlike sushi, it comes without rice.",
+    "It is dipped in soy sauce.",
+    "It comes from Japan.",
+    "It is usually a main meal.",
+    "It is sliced very thinly.",
+    "It is raw fish from Japan.",
+    "The answer is one word of 7 letters.",
+    "Its first letter is S."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/b/ba/Sushi_1.JPG/500px-Sushi_1.JPG",
+      "w": 500,
+      "h": 375,
+      "credit": "No machine-readable author provided. Arnaud 25 assumed (based on copyright claims).",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Sushi_1.JPG"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/2/2d/241109_Shigaraki_ware_Koga_Shiga_pref_Japan01s3.jpg/500px-241109_Shigaraki_ware_Koga_Shiga_pref_Japan01s3.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "663highland",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:241109_Shigaraki_ware_Koga_Shiga_pref_Japan01s3.jpg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "ramen",
+   "name": "Ramen",
+   "facts": {
+    "country": "Japan",
+    "course": "Soup"
+   },
+   "blurb": "Wheat noodles in a rich broth, topped with things like pork, egg and spring onion. It came to Japan from China.",
+   "clues": [
+    "Instant noodles were invented in Japan in 1958.",
+    "Its broth can be flavoured with soy, miso or pork bones.",
+    "It is often topped with a soft-boiled egg.",
+    "It comes from Japan.",
+    "It is a soup.",
+    "It came to Japan from China.",
+    "It is a Japanese noodle soup.",
+    "The answer is one word of 5 letters.",
+    "Its first letter is R."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/2/23/Ramen%2C_sopa_de_fideus.jpg/500px-Ramen%2C_sopa_de_fideus.jpg",
+      "w": 500,
+      "h": 484,
+      "credit": "Mariaaa05",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Ramen,_sopa_de_fideus.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/e/ec/Shoyu_ramen%2C_at_Kasukabe_Station_%282014.05.05%29_1.jpg/500px-Shoyu_ramen%2C_at_Kasukabe_Station_%282014.05.05%29_1.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Lombroso",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Shoyu_ramen,_at_Kasukabe_Station_(2014.05.05)_1.jpg"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "tempura",
+   "name": "Tempura",
+   "facts": {
+    "country": "Japan",
+    "course": "Main"
+   },
+   "blurb": "Seafood and vegetables dipped in a light batter and deep-fried. Portuguese visitors brought the idea to Japan.",
+   "clues": [
+    "Portuguese missionaries introduced the idea.",
+    "Its batter is made with ice-cold water.",
+    "Prawns are a classic choice.",
+    "It comes from Japan.",
+    "It is usually a main meal.",
+    "It is light and crispy.",
+    "It is a Japanese battered, deep-fried dish.",
+    "The answer is one word of 7 letters.",
+    "Its first letter is T."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/2/2e/Tempura_01.jpg/330px-Tempura_01.jpg",
+      "w": 330,
+      "h": 440,
+      "credit": "Yaco*",
+      "license": "CC BY 2.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Tempura_01.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/e/ed/Tempura_by_GinkgoTelegraph.jpg/330px-Tempura_by_GinkgoTelegraph.jpg",
+      "w": 330,
+      "h": 440,
+      "credit": "Lisa Pinehill from Osaka, Japan",
+      "license": "CC BY-SA 2.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Tempura_by_GinkgoTelegraph.jpg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "pizza",
+   "name": "Pizza",
+   "alt": [
+    "pizza Margherita",
+    "Margherita pizza"
+   ],
+   "facts": {
+    "country": "Italy",
+    "course": "Main"
+   },
+   "blurb": "A flat bread topped with tomato and cheese and baked in a hot oven. The Margherita is said to be named after an Italian queen.",
+   "clues": [
+    "Naples is famous for it.",
+    "It is baked very hot, often in a wood-fired oven.",
+    "It comes from Italy.",
+    "It is usually a main meal.",
+    "It is topped with tomato and mozzarella.",
+    "It is round, flat and cut into slices.",
+    "The answer is one word of 5 letters.",
+    "Its first letter is P."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/a/a3/Eq_it-na_pizza-margherita_sep2005_sml.jpg/500px-Eq_it-na_pizza-margherita_sep2005_sml.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Valerio Capello at English Wikipedia",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Eq_it-na_pizza-margherita_sep2005_sml.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/9/91/Pizza-3007395.jpg/500px-Pizza-3007395.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "igorovsyannykov",
+      "license": "CC0 1.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Pizza-3007395.jpg"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "lasagne",
+   "name": "Lasagne",
+   "alt": [
+    "lasagna"
+   ],
+   "facts": {
+    "country": "Italy",
+    "course": "Main"
+   },
+   "blurb": "Layers of flat pasta sheets with meat sauce, white sauce and cheese, baked in the oven.",
+   "clues": [
+    "Garfield the cat loves it.",
+    "It is baked in a deep dish.",
+    "It has a creamy white sauce called béchamel.",
+    "It comes from Italy.",
+    "It is usually a main meal.",
+    "It is made in layers.",
+    "It uses flat sheets of pasta.",
+    "The answer is one word of 7 letters.",
+    "Its first letter is L."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/0/06/Meaty_Lasagna_8of8_%288736299782%29.jpg/500px-Meaty_Lasagna_8of8_%288736299782%29.jpg",
+      "w": 500,
+      "h": 321,
+      "credit": "Breville USA",
+      "license": "CC BY 2.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Meaty_Lasagna_8of8_(8736299782).jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/b/ba/Lasagne_-_stonesoup.jpg/500px-Lasagne_-_stonesoup.jpg",
+      "w": 500,
+      "h": 513,
+      "credit": "jules / stonesoup",
+      "license": "CC BY 2.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Lasagne_-_stonesoup.jpg"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "risotto",
+   "name": "Risotto",
+   "facts": {
+    "country": "Italy",
+    "course": "Main"
+   },
+   "blurb": "A creamy northern Italian rice dish, stirred slowly while hot stock is added a little at a time.",
+   "clues": [
+    "Arborio rice is often used.",
+    "The Milanese version is coloured yellow with saffron.",
+    "Stock is added a ladle at a time.",
+    "It comes from Italy.",
+    "It is usually a main meal.",
+    "It is stirred until creamy.",
+    "It is an Italian rice dish.",
+    "The answer is one word of 7 letters.",
+    "Its first letter is R."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/8/8a/Risotto_Weihnachten_2020_13.jpg/500px-Risotto_Weihnachten_2020_13.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Burkhard Mücke",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Risotto_Weihnachten_2020_13.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/a/a5/Risotto_with_speck_and_goat_cheese_%286101067436%29.jpg/500px-Risotto_with_speck_and_goat_cheese_%286101067436%29.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Luca Nebuloni from Milan, Italy",
+      "license": "CC BY 2.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Risotto_with_speck_and_goat_cheese_(6101067436).jpg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "spaghetti-carbonara",
+   "name": "Spaghetti carbonara",
+   "alt": [
+    "carbonara"
+   ],
+   "facts": {
+    "country": "Italy",
+    "course": "Main"
+   },
+   "blurb": "A Roman pasta dish of spaghetti tossed with egg, hard cheese, cured pork and black pepper.",
+   "clues": [
+    "The traditional version has no cream.",
+    "It uses guanciale, a cured pork cheek.",
+    "It comes from Rome.",
+    "It comes from Italy.",
+    "It is usually a main meal.",
+    "Its sauce is made from egg and cheese.",
+    "The answer has 2 words (9, 9 letters).",
+    "Its first letter is S."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/3/33/Espaguetis_carbonara.jpg/500px-Espaguetis_carbonara.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Javier Somoza",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Espaguetis_carbonara.jpg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "tiramisu",
+   "name": "Tiramisu",
+   "alt": [
+    "tiramisù"
+   ],
+   "facts": {
+    "country": "Italy",
+    "course": "Dessert"
+   },
+   "blurb": "An Italian dessert of coffee-soaked biscuits layered with mascarpone cream and dusted with cocoa.",
+   "clues": [
+    "Its name means \"pick me up\".",
+    "It uses mascarpone cheese.",
+    "Its biscuits are dipped in coffee.",
+    "It comes from Italy.",
+    "It is a dessert or sweet treat.",
+    "It is dusted with cocoa powder.",
+    "It is a layered Italian dessert.",
+    "The answer is one word of 8 letters.",
+    "Its first letter is T."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/e/e7/Classic_Italian_Tiramisu-3_%2829989504485%29.jpg/500px-Classic_Italian_Tiramisu-3_%2829989504485%29.jpg",
+      "w": 500,
+      "h": 324,
+      "credit": "Sharon Chen from Austin, United States",
+      "license": "CC BY 2.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Classic_Italian_Tiramisu-3_(29989504485).jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/5/58/Tiramisu_-_Raffaele_Diomede.jpg/500px-Tiramisu_-_Raffaele_Diomede.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Raffaele Diomede from Pordenone, ITALIA",
+      "license": "CC BY 2.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Tiramisu_-_Raffaele_Diomede.jpg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "gelato",
+   "name": "Gelato",
+   "facts": {
+    "country": "Italy",
+    "course": "Dessert"
+   },
+   "blurb": "Italian ice cream. It is denser than most ice cream because less air is whipped in.",
+   "clues": [
+    "It is churned more slowly than other ice creams.",
+    "It has less air than other ice creams.",
+    "It is served from a flat spade.",
+    "It comes from Italy.",
+    "It is a dessert or sweet treat.",
+    "It is a frozen dessert.",
+    "It is Italian ice cream.",
+    "The answer is one word of 6 letters.",
+    "Its first letter is G."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/4/47/CafeMia.jpg",
+      "w": 500,
+      "h": 747,
+      "credit": "Cafemia",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:CafeMia.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/3/3a/Delicious_Gelato_on_display.jpg/500px-Delicious_Gelato_on_display.jpg",
+      "w": 500,
+      "h": 500,
+      "credit": "EquipmentAndConcepts",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Delicious_Gelato_on_display.jpg"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "paella",
+   "name": "Paella",
+   "facts": {
+    "country": "Spain",
+    "course": "Main"
+   },
+   "blurb": "A Spanish rice dish from Valencia, cooked in a wide, flat pan with saffron, meat or seafood.",
+   "clues": [
+    "The crispy rice at the bottom is called socarrat.",
+    "It is named after the pan it is cooked in.",
+    "Saffron makes it yellow.",
+    "It comes from Spain.",
+    "It is usually a main meal.",
+    "It comes from Valencia.",
+    "It is a Spanish rice dish.",
+    "The answer is one word of 6 letters.",
+    "Its first letter is P."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/d/d5/Cooking_a_paella.jpg/500px-Cooking_a_paella.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Jebulon",
+      "license": "CC0 1.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Cooking_a_paella.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/e/ed/01_Paella_Valenciana_original.jpg/500px-01_Paella_Valenciana_original.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Jan Harenburg",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:01_Paella_Valenciana_original.jpg"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "gazpacho",
+   "name": "Gazpacho",
+   "facts": {
+    "country": "Spain",
+    "course": "Soup"
+   },
+   "blurb": "A cold soup of blended raw tomatoes, peppers, cucumber, garlic and olive oil, from Andalusia.",
+   "clues": [
+    "It comes from Andalusia.",
+    "It is blended from raw vegetables.",
+    "Tomato is its main ingredient.",
+    "It comes from Spain.",
+    "It is a soup.",
+    "It is eaten on hot days.",
+    "It is a cold Spanish soup.",
+    "The answer is one word of 8 letters.",
+    "Its first letter is G."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/c/c0/Gazpacho_Cazuela_Barro.jpg/500px-Gazpacho_Cazuela_Barro.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Bocadorada",
+      "license": "CC BY-SA 2.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Gazpacho_Cazuela_Barro.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/9/99/Gazpacho_Malague%C3%B1o_con_su_%E2%80%9Cpica%C3%ADto%E2%80%9D_-_Moreno%2C_Playa_Burriana_%28cropped%29.jpg/500px-Gazpacho_Malague%C3%B1o_con_su_%E2%80%9Cpica%C3%ADto%E2%80%9D_-_Moreno%2C_Playa_Burriana_%28cropped%29.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Haydn Blackey",
+      "license": "CC BY-SA 2.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Gazpacho_Malague%C3%B1o_con_su_%E2%80%9Cpica%C3%ADto%E2%80%9D_-_Moreno,_Playa_Burriana_(cropped).jpg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "churros",
+   "name": "Churros",
+   "alt": [
+    "churro"
+   ],
+   "facts": {
+    "country": "Spain",
+    "course": "Snack"
+   },
+   "blurb": "Ridged sticks of fried dough dusted with sugar, often dipped in thick hot chocolate.",
+   "clues": [
+    "Its dough is piped through a star-shaped nozzle.",
+    "It is often eaten for breakfast in Spain.",
+    "It is dipped in thick hot chocolate.",
+    "It comes from Spain.",
+    "It is usually a snack or street food.",
+    "It is coated in sugar.",
+    "It is a long, ridged stick of fried dough.",
+    "The answer is one word of 7 letters.",
+    "Its first letter is C."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/4/42/Churros_en_vasos_en_Londres_-_A_Taste_of_Spain.jpg/500px-Churros_en_vasos_en_Londres_-_A_Taste_of_Spain.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Garry Knight from London, England",
+      "license": "CC BY-SA 2.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Churros_en_vasos_en_Londres_-_A_Taste_of_Spain.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/2/2f/2023-02-13_03_Masked_Churro_Man_at_Circus_Park_%E2%80%93_Puerto_Morelos%2C_Mexico.jpg/330px-2023-02-13_03_Masked_Churro_Man_at_Circus_Park_%E2%80%93_Puerto_Morelos%2C_Mexico.jpg",
+      "w": 330,
+      "h": 440,
+      "credit": "Gordon Leggett",
+      "license": "CC BY 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:2023-02-13_03_Masked_Churro_Man_at_Circus_Park_%E2%80%93_Puerto_Morelos,_Mexico.jpg"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "croissant",
+   "name": "Croissant",
+   "facts": {
+    "country": "France",
+    "course": "Bread or pastry"
+   },
+   "blurb": "A buttery, flaky, crescent-shaped pastry. It grew from the Austrian kipferl.",
+   "clues": [
+    "It developed from an Austrian pastry called the kipferl.",
+    "Its dough is folded with butter many times.",
+    "It is a breakfast favourite in France.",
+    "It comes from France.",
+    "It is a kind of bread or pastry.",
+    "It is flaky and buttery.",
+    "Its name means crescent.",
+    "The answer is one word of 9 letters.",
+    "Its first letter is C."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/d/dc/Croissants_au_beurre_%2818953292873%29.jpg/330px-Croissants_au_beurre_%2818953292873%29.jpg",
+      "w": 330,
+      "h": 440,
+      "credit": "Herry Wibisono (herryway)",
+      "license": "CC0 1.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Croissants_au_beurre_(18953292873).jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/2/2a/Croissant-Petr_Kratochvil.jpg/500px-Croissant-Petr_Kratochvil.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Petr Kratochvil",
+      "license": "CC0 1.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Croissant-Petr_Kratochvil.jpg"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "crepe",
+   "name": "Crêpe",
+   "alt": [
+    "crepe",
+    "crêpes"
+   ],
+   "facts": {
+    "country": "France",
+    "course": "Dessert"
+   },
+   "blurb": "A very thin French pancake, eaten sweet with sugar and lemon or savoury with ham and cheese.",
+   "clues": [
+    "Savoury buckwheat ones are called galettes.",
+    "Brittany is famous for them.",
+    "They are cooked on a flat round griddle.",
+    "It comes from France.",
+    "It is a dessert or sweet treat.",
+    "They are very thin.",
+    "It is a thin French pancake.",
+    "The answer is one word of 5 letters.",
+    "Its first letter is C."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/0/09/Crepes_dsc07085.jpg/500px-Crepes_dsc07085.jpg",
+      "w": 500,
+      "h": 302,
+      "credit": "David Monniaux",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Crepes_dsc07085.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/2/2e/Cr%C3%AApe_%C3%A0_la_confiture_de_fruit.jpg/500px-Cr%C3%AApe_%C3%A0_la_confiture_de_fruit.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Line 1921",
+      "license": "CC0 1.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Cr%C3%AApe_%C3%A0_la_confiture_de_fruit.jpg"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "ratatouille",
+   "name": "Ratatouille",
+   "facts": {
+    "country": "France",
+    "course": "Main"
+   },
+   "blurb": "A Provençal stew of summer vegetables such as aubergine, courgette, peppers and tomato. A Pixar film is named after it.",
+   "clues": [
+    "It comes from Nice in Provence.",
+    "It includes aubergine and courgette.",
+    "It is a vegetable stew.",
+    "It comes from France.",
+    "It is usually a main meal.",
+    "A Pixar film about a rat chef shares its name.",
+    "It is a French vegetable dish.",
+    "The answer is one word of 11 letters.",
+    "Its first letter is R."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/2/27/Ratatouille.jpg/500px-Ratatouille.jpg",
+      "w": 500,
+      "h": 420,
+      "credit": "Marcus Guimarães",
+      "license": "CC BY 2.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Ratatouille.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/3/37/Ratatouille_home_cooked.jpg/500px-Ratatouille_home_cooked.jpg",
+      "w": 500,
+      "h": 500,
+      "credit": "Jack145945",
+      "license": "CC0 1.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Ratatouille_home_cooked.jpg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "bouillabaisse",
+   "name": "Bouillabaisse",
+   "facts": {
+    "country": "France",
+    "course": "Soup"
+   },
+   "blurb": "A fish stew from the port of Marseille, flavoured with saffron and served with garlicky rouille.",
+   "clues": [
+    "It is served with a garlic sauce called rouille.",
+    "It is flavoured with saffron and fennel.",
+    "Fishermen made it from fish they could not sell.",
+    "It comes from France.",
+    "It is a soup.",
+    "It comes from Marseille.",
+    "It is a French fish stew.",
+    "The answer is one word of 13 letters.",
+    "Its first letter is B."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/2/24/Bullabessa.jpg/500px-Bullabessa.jpg",
+      "w": 500,
+      "h": 417,
+      "credit": "Slastic",
+      "license": "CC BY 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Bullabessa.jpg"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "macaron",
+   "name": "Macaron",
+   "alt": [
+    "French macaron"
+   ],
+   "facts": {
+    "country": "France",
+    "course": "Dessert"
+   },
+   "blurb": "A small, colourful almond meringue biscuit sandwiched with a creamy filling.",
+   "clues": [
+    "Its shells have frilly \"feet\".",
+    "It is made with almond flour.",
+    "Ladurée in Paris made it famous.",
+    "It comes from France.",
+    "It is a dessert or sweet treat.",
+    "It comes in bright colours.",
+    "It is a small sandwich of two meringue shells.",
+    "The answer is one word of 7 letters.",
+    "Its first letter is M."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/d/d1/Macarons_Marcolini_04.jpg/500px-Macarons_Marcolini_04.jpg",
+      "w": 500,
+      "h": 500,
+      "credit": "M0tty",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Macarons_Marcolini_04.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/4/43/French_macaroons.jpg/500px-French_macaroons.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Shisma (talk)",
+      "license": "CC0 1.0",
+      "page": "https://commons.wikimedia.org/wiki/File:French_macaroons.jpg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "fish-and-chips",
+   "name": "Fish and chips",
+   "facts": {
+    "country": "United Kingdom",
+    "course": "Main"
+   },
+   "blurb": "Battered fried fish with thick-cut chips. It has been a British takeaway favourite since the 1860s.",
+   "clues": [
+    "It was not rationed in World War II.",
+    "Cod and haddock are popular choices.",
+    "It is often eaten with mushy peas.",
+    "It comes from United Kingdom.",
+    "It is usually a main meal.",
+    "It is sprinkled with salt and vinegar.",
+    "The answer has 3 words (4, 3, 5 letters).",
+    "Its first letter is F."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/7/76/Fish_and_chips.jpg/500px-Fish_and_chips.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Andrew Dunn",
+      "license": "CC BY-SA 2.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Fish_and_chips.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/f/ff/Fish_and_chips_blackpool.jpg/500px-Fish_and_chips_blackpool.jpg",
+      "w": 500,
+      "h": 331,
+      "credit": "Matthias Meckel",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Fish_and_chips_blackpool.jpg"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "full-english-breakfast",
+   "name": "Full English breakfast",
+   "alt": [
+    "fry-up",
+    "full breakfast"
+   ],
+   "facts": {
+    "country": "United Kingdom",
+    "course": "Breakfast"
+   },
+   "blurb": "A big cooked breakfast of eggs, bacon, sausages, beans, tomato, mushrooms and toast.",
+   "clues": [
+    "It is served on one big plate.",
+    "It often comes with a cup of tea.",
+    "Hotels and cafés serve it in the morning.",
+    "It often includes black pudding.",
+    "It comes from United Kingdom.",
+    "It includes baked beans.",
+    "It has eggs, bacon and sausages.",
+    "The answer has 3 words (4, 7, 9 letters).",
+    "Its first letter is F."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/e/e6/Desayuno_ingl%C3%A9s.jpg/500px-Desayuno_ingl%C3%A9s.jpg",
+      "w": 500,
+      "h": 231,
+      "credit": "Rafax",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Desayuno_ingl%C3%A9s.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/d/d2/Full_English_breakfast_%28cropped%29.jpg/500px-Full_English_breakfast_%28cropped%29.jpg",
+      "w": 500,
+      "h": 502,
+      "credit": "Joadl",
+      "license": "CC BY-SA 3.0 at",
+      "page": "https://commons.wikimedia.org/wiki/File:Full_English_breakfast_(cropped).jpg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "shepherds-pie",
+   "name": "Shepherd's pie",
+   "lname": "Shepherd's pie",
+   "alt": [
+    "cottage pie"
+   ],
+   "facts": {
+    "country": "United Kingdom",
+    "course": "Main"
+   },
+   "blurb": "Minced lamb in gravy topped with mashed potato and baked. With beef it is called cottage pie.",
+   "clues": [
+    "Made with beef, it has a different name.",
+    "It is made with minced lamb.",
+    "It is topped with mashed potato.",
+    "It comes from United Kingdom.",
+    "It is usually a main meal.",
+    "It is baked in the oven.",
+    "It is named after someone who looks after sheep.",
+    "The answer has 2 words (9, 3 letters).",
+    "Its first letter is S."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/7/76/Shepherd%27s_pie_%2822470901009%29.jpg/500px-Shepherd%27s_pie_%2822470901009%29.jpg",
+      "w": 500,
+      "h": 580,
+      "credit": "Abhinaba Basu from Redmond, United States",
+      "license": "CC BY 2.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Shepherd%27s_pie_(22470901009).jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/5/52/Homerton_College_-_Shepherd%27s_pie_%28cropped%29.jpg/500px-Homerton_College_-_Shepherd%27s_pie_%28cropped%29.jpg",
+      "w": 500,
+      "h": 335,
+      "credit": "Oxfordian Kissuth",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Homerton_College_-_Shepherd%27s_pie_(cropped).jpg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "haggis",
+   "name": "Haggis",
+   "facts": {
+    "country": "United Kingdom",
+    "course": "Main"
+   },
+   "blurb": "Scotland's national dish, made from sheep's heart, liver and lungs with oats and spices.",
+   "clues": [
+    "It is traditionally cooked in a sheep's stomach.",
+    "It is eaten on Burns Night.",
+    "Robert Burns wrote a poem to it.",
+    "It comes from United Kingdom.",
+    "It is usually a main meal.",
+    "It is served with \"neeps and tatties\".",
+    "It is the national dish of Scotland.",
+    "The answer is one word of 6 letters.",
+    "Its first letter is H."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/6/6a/Haggis_Mo.jpg",
+      "w": 500,
+      "h": 357,
+      "credit": "Wikimedia Commons",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Haggis_Mo.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/a/a5/Scotland_Haggis.jpg/500px-Scotland_Haggis.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Chris Brown",
+      "license": "CC BY 2.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Scotland_Haggis.jpg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "bratwurst",
+   "name": "Bratwurst",
+   "facts": {
+    "country": "Germany",
+    "course": "Main"
+   },
+   "blurb": "A German sausage, usually pork, grilled or fried and often eaten in a bread roll with mustard.",
+   "clues": [
+    "Nuremberg is famous for small ones.",
+    "It is often eaten with sauerkraut.",
+    "It is served in a roll with mustard.",
+    "It comes from Germany.",
+    "It is usually a main meal.",
+    "It is usually made of pork.",
+    "It is a German sausage.",
+    "The answer is one word of 9 letters.",
+    "Its first letter is B."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/b/b0/German_Bratw%C3%BCrste.jpg/500px-German_Bratw%C3%BCrste.jpg",
+      "w": 500,
+      "h": 542,
+      "credit": "Gerbis",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:German_Bratw%C3%BCrste.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/b/bb/Jugendcamp_BFKUU_Bretterbauer_68_%2853046298653%29.jpg/500px-Jugendcamp_BFKUU_Bretterbauer_68_%2853046298653%29.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Pressestelle BFK Urfahr-Umgebung",
+      "license": "CC BY-SA 2.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Jugendcamp_BFKUU_Bretterbauer_68_(53046298653).jpg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "pretzel",
+   "name": "Pretzel",
+   "alt": [
+    "Brezel"
+   ],
+   "facts": {
+    "country": "Germany",
+    "course": "Bread or pastry"
+   },
+   "blurb": "A baked bread twisted into a knot and sprinkled with salt. It is dipped in lye before baking to make it brown and shiny.",
+   "clues": [
+    "It is dipped in lye before baking.",
+    "Its shape may come from arms folded in prayer.",
+    "It is sold at Oktoberfest.",
+    "It comes from Germany.",
+    "It is a kind of bread or pastry.",
+    "It is sprinkled with coarse salt.",
+    "It is a bread twisted into a knot.",
+    "The answer is one word of 7 letters.",
+    "Its first letter is P."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/0/06/Brezel_l_B%C3%A4ckerei-Raisch.jpg/500px-Brezel_l_B%C3%A4ckerei-Raisch.jpg",
+      "w": 500,
+      "h": 334,
+      "credit": "LenaRaisch",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Brezel_l_B%C3%A4ckerei-Raisch.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/3/30/BrezelnSalz02_%28cropped%29.JPG/500px-BrezelnSalz02_%28cropped%29.JPG",
+      "w": 500,
+      "h": 353,
+      "credit": "Sundar1",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:BrezelnSalz02_(cropped).JPG"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "black-forest-gateau",
+   "name": "Black Forest gateau",
+   "alt": [
+    "Black Forest cake",
+    "Schwarzwälder Kirschtorte"
+   ],
+   "facts": {
+    "country": "Germany",
+    "course": "Dessert"
+   },
+   "blurb": "A chocolate sponge layered with cream and cherries and soaked in cherry brandy.",
+   "clues": [
+    "It is soaked in kirsch, a cherry brandy.",
+    "It is decorated with chocolate shavings.",
+    "It has layers of whipped cream.",
+    "It comes from Germany.",
+    "It is a dessert or sweet treat.",
+    "It has cherries inside and on top.",
+    "The answer has 3 words (5, 6, 6 letters).",
+    "Its first letter is B."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/6/66/Black_Forest_gateau.jpg/500px-Black_Forest_gateau.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Mikelo",
+      "license": "CC BY-SA 2.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Black_Forest_gateau.jpg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "wiener-schnitzel",
+   "name": "Wiener schnitzel",
+   "alt": [
+    "schnitzel"
+   ],
+   "facts": {
+    "country": "Austria",
+    "course": "Main"
+   },
+   "blurb": "A thin slice of veal coated in breadcrumbs and fried. It is Austria's national dish.",
+   "clues": [
+    "By law in Austria it must be made of veal.",
+    "It is served with a lemon wedge.",
+    "It is pounded thin before frying.",
+    "It comes from Austria.",
+    "It is usually a main meal.",
+    "It is coated in breadcrumbs.",
+    "Its name means it comes from Vienna.",
+    "The answer has 2 words (6, 9 letters).",
+    "Its first letter is W."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/3/32/2022-12-29_Wiener_Schnitzel_im_Hotel_Kaiserin_Elisabeth.jpg/500px-2022-12-29_Wiener_Schnitzel_im_Hotel_Kaiserin_Elisabeth.jpg",
+      "w": 500,
+      "h": 308,
+      "credit": "Burkhard Mücke",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:2022-12-29_Wiener_Schnitzel_im_Hotel_Kaiserin_Elisabeth.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/a/ae/Wiener-Schnitzel02.jpg/500px-Wiener-Schnitzel02.jpg",
+      "w": 500,
+      "h": 367,
+      "credit": "Kobako",
+      "license": "CC BY-SA 2.5",
+      "page": "https://commons.wikimedia.org/wiki/File:Wiener-Schnitzel02.jpg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "goulash",
+   "name": "Goulash",
+   "alt": [
+    "gulyás"
+   ],
+   "facts": {
+    "country": "Hungary",
+    "course": "Soup"
+   },
+   "blurb": "A Hungarian stew or soup of beef and vegetables, flavoured with lots of paprika.",
+   "clues": [
+    "It was first made by cattle herders.",
+    "It is flavoured with paprika.",
+    "It is a beef stew or soup.",
+    "It comes from Hungary.",
+    "It is a soup.",
+    "It is red-brown in colour.",
+    "The answer is one word of 7 letters.",
+    "Its first letter is G."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/5/5c/Gulyas080.jpg/500px-Gulyas080.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Lily15",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Gulyas080.jpg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "pierogi",
+   "name": "Pierogi",
+   "alt": [
+    "pierogies",
+    "perogies"
+   ],
+   "facts": {
+    "country": "Poland",
+    "course": "Main"
+   },
+   "blurb": "Polish dumplings filled with potato and cheese, meat, cabbage or fruit, then boiled or fried.",
+   "clues": [
+    "Popular fillings include potato and cheese.",
+    "They can be sweet or savoury.",
+    "They are often topped with fried onions.",
+    "It comes from Poland.",
+    "It is usually a main meal.",
+    "They are half-moon shaped.",
+    "They are Polish dumplings.",
+    "The answer is one word of 7 letters.",
+    "Its first letter is P."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/b/b8/Slovensk%C3%A9_pirohy.jpg/500px-Slovensk%C3%A9_pirohy.jpg",
+      "w": 500,
+      "h": 271,
+      "credit": "Vojtasekd",
+      "license": "CC BY 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Slovensk%C3%A9_pirohy.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/0/0f/Pierogi_z_mas%C5%82em_-_2023.03.31.jpg/500px-Pierogi_z_mas%C5%82em_-_2023.03.31.jpg",
+      "w": 500,
+      "h": 498,
+      "credit": "Aw58",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Pierogi_z_mas%C5%82em_-_2023.03.31.jpg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "borscht",
+   "name": "Borscht",
+   "alt": [
+    "borshch"
+   ],
+   "facts": {
+    "country": "Ukraine",
+    "course": "Soup"
+   },
+   "blurb": "A sour soup coloured deep red by beetroot. UNESCO lists Ukrainian borscht cooking as cultural heritage.",
+   "clues": [
+    "It is often served with sour cream.",
+    "It can be eaten hot or cold.",
+    "It comes from Ukraine.",
+    "It is a soup.",
+    "It is deep red.",
+    "It is a beetroot soup.",
+    "The answer is one word of 7 letters.",
+    "Its first letter is B."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/17/Borscht_with_bread.jpg/500px-Borscht_with_bread.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Juerg Vollmer from Zürich, Schweiz",
+      "license": "CC BY-SA 2.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Borscht_with_bread.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/a/a7/Borscht_served.jpg/500px-Borscht_served.jpg",
+      "w": 500,
+      "h": 327,
+      "credit": "liz west from Boxborough, MA",
+      "license": "CC BY 2.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Borscht_served.jpg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "moussaka",
+   "name": "Moussaka",
+   "facts": {
+    "country": "Greece",
+    "course": "Main"
+   },
+   "blurb": "A baked Greek dish of layered aubergine and minced meat topped with creamy white sauce.",
+   "clues": [
+    "Its modern form was shaped by chef Nikolaos Tselementes.",
+    "It has a thick béchamel topping.",
+    "It contains minced lamb or beef.",
+    "It comes from Greece.",
+    "It is usually a main meal.",
+    "It is made with layers of aubergine.",
+    "It is a baked Greek dish.",
+    "The answer is one word of 8 letters.",
+    "Its first letter is M."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/d/d7/Mousakas.jpg/500px-Mousakas.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Fotograf: Dieter Mueller (dino1948) Kamera: de:Nikon 885",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Mousakas.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/a/a8/MussakasMeMelitsanesKePatates01.JPG/500px-MussakasMeMelitsanesKePatates01.JPG",
+      "w": 500,
+      "h": 333,
+      "credit": "Robert Kindermann aka RobertK",
+      "license": "CC BY-SA 2.5",
+      "page": "https://commons.wikimedia.org/wiki/File:MussakasMeMelitsanesKePatates01.JPG"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "gyros",
+   "name": "Gyros",
+   "alt": [
+    "gyro"
+   ],
+   "facts": {
+    "country": "Greece",
+    "course": "Snack"
+   },
+   "lookalikes": [
+    "doner-kebab"
+   ],
+   "blurb": "Greek meat cooked on a turning spit, sliced and wrapped in pitta with tomato, onion and tzatziki.",
+   "clues": [
+    "Its name means \"turn\".",
+    "It is served with tzatziki.",
+    "The meat is cooked on a vertical spit.",
+    "It comes from Greece.",
+    "It is usually a snack or street food.",
+    "It is wrapped in pitta bread.",
+    "It is Greek street food.",
+    "The answer is one word of 5 letters.",
+    "Its first letter is G."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/c/c7/Pita_giros.JPG/500px-Pita_giros.JPG",
+      "w": 500,
+      "h": 375,
+      "credit": "Antonio Fajardo i López",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Pita_giros.JPG"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "doner-kebab",
+   "name": "Doner kebab",
+   "alt": [
+    "döner kebab",
+    "kebab"
+   ],
+   "facts": {
+    "country": "Turkey",
+    "course": "Snack"
+   },
+   "lookalikes": [
+    "gyros"
+   ],
+   "blurb": "Meat roasted on a vertical spit, shaved off and served in bread with salad and sauce. The popular takeaway form took off in Berlin.",
+   "clues": [
+    "Its popular sandwich form took off in Berlin in the 1970s.",
+    "Its name means \"rotating roast\".",
+    "The meat is shaved off a turning spit.",
+    "It comes from Turkey.",
+    "It is usually a snack or street food.",
+    "It is a late-night takeaway favourite.",
+    "The answer has 2 words (5, 5 letters).",
+    "Its first letter is D."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/6/69/Zwei_Doener_Kebab.JPG/330px-Zwei_Doener_Kebab.JPG",
+      "w": 330,
+      "h": 475,
+      "credit": "Usien",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Zwei_Doener_Kebab.JPG"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/a/aa/D%C3%B6ner_Kebab%2C_Berlin%2C_2010_%2801%29.jpg/500px-D%C3%B6ner_Kebab%2C_Berlin%2C_2010_%2801%29.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "AleGranholm",
+      "license": "CC BY 2.0",
+      "page": "https://commons.wikimedia.org/wiki/File:D%C3%B6ner_Kebab,_Berlin,_2010_(01).jpg"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "falafel",
+   "name": "Falafel",
+   "facts": {
+    "course": "Snack"
+   },
+   "blurb": "Deep-fried balls of ground chickpeas or fava beans, popular across the Middle East.",
+   "clues": [
+    "Egypt makes it from fava beans.",
+    "It is often served in pitta with salad.",
+    "It is often eaten with tahini sauce.",
+    "It is usually a snack or street food.",
+    "It is made from chickpeas.",
+    "It is a fried ball from the Middle East.",
+    "The answer is one word of 7 letters.",
+    "Its first letter is F."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/5/5b/Falafel_beim_Isarinselfest_M%C3%BCnchen_2.jpg/500px-Falafel_beim_Isarinselfest_M%C3%BCnchen_2.jpg",
+      "w": 500,
+      "h": 271,
+      "credit": "Burkhard Mücke",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Falafel_beim_Isarinselfest_M%C3%BCnchen_2.jpg"
+     },
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/4/4f/Falafel.JPG",
+      "w": 500,
+      "h": 376,
+      "credit": "The original uploader was Jerem at French Wikipedia.",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Falafel.JPG"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "hummus",
+   "name": "Hummus",
+   "alt": [
+    "houmous"
+   ],
+   "facts": {
+    "course": "Side"
+   },
+   "blurb": "A creamy dip of mashed chickpeas, tahini, lemon and garlic, eaten across the Middle East.",
+   "clues": [
+    "Its name is Arabic for chickpea.",
+    "It contains tahini, a sesame paste.",
+    "It is often drizzled with olive oil.",
+    "It is usually a side dish or dip.",
+    "It is eaten with pitta bread.",
+    "It is a chickpea dip.",
+    "The answer is one word of 6 letters.",
+    "Its first letter is H."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/5/5c/Hummus_from_The_Nile.jpg/500px-Hummus_from_The_Nile.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Paul Goyette",
+      "license": "CC BY-SA 2.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Hummus_from_The_Nile.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/b/bf/Lebanese_style_hummus.jpg/500px-Lebanese_style_hummus.jpg",
+      "w": 500,
+      "h": 281,
+      "credit": "Beyrouthhh at English Wikipedia",
+      "license": "CC BY 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Lebanese_style_hummus.jpg"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "tagine",
+   "name": "Tagine",
+   "alt": [
+    "tajine"
+   ],
+   "facts": {
+    "country": "Morocco",
+    "course": "Main"
+   },
+   "blurb": "A slow-cooked North African stew named after the clay pot with a cone-shaped lid it is cooked in.",
+   "clues": [
+    "It often mixes meat with dried fruit.",
+    "Its pot has a cone-shaped lid.",
+    "It is cooked slowly.",
+    "It comes from Morocco.",
+    "It is usually a main meal.",
+    "It is named after its clay pot.",
+    "The answer is one word of 6 letters.",
+    "Its first letter is T."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/4/45/Tajine_marocain.jpg/500px-Tajine_marocain.jpg",
+      "w": 500,
+      "h": 321,
+      "credit": "Bawdeep2010",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Tajine_marocain.jpg"
+     },
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/d/d1/Une_femme_d%27Alger_en_d%C3%A9shabill%C3%A9_portant_un_tajine_-_XVII_si%C3%A8cle.jpg",
+      "w": 500,
+      "h": 771,
+      "credit": "BNF",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Une_femme_d%27Alger_en_d%C3%A9shabill%C3%A9_portant_un_tajine_-_XVII_si%C3%A8cle.jpg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "bobotie",
+   "name": "Bobotie",
+   "facts": {
+    "country": "South Africa",
+    "course": "Main"
+   },
+   "blurb": "A South African dish of spiced minced meat baked with an egg topping, often served with yellow rice.",
+   "clues": [
+    "It is flavoured with curry spices and dried fruit.",
+    "It has a baked egg topping.",
+    "It is served with yellow rice.",
+    "It comes from South Africa.",
+    "It is usually a main meal.",
+    "It is made with minced meat.",
+    "It is a national dish of South Africa.",
+    "The answer is one word of 7 letters.",
+    "Its first letter is B."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/3/3d/Bobotie-01.jpg/500px-Bobotie-01.jpg",
+      "w": 500,
+      "h": 525,
+      "credit": "cherrylet",
+      "license": "CC BY 2.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Bobotie-01.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/f/f1/Bobotie%2C_South_African_dish.jpg/500px-Bobotie%2C_South_African_dish.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Olga Ernst",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Bobotie,_South_African_dish.jpg"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "injera",
+   "name": "Injera",
+   "facts": {
+    "country": "Ethiopia",
+    "course": "Bread or pastry"
+   },
+   "blurb": "A spongy, sour flatbread made from teff flour. It is used as plate and spoon for stews.",
+   "clues": [
+    "It is made from teff, a tiny grain.",
+    "It is fermented, giving a sour taste.",
+    "It is used to scoop up stews.",
+    "It comes from Ethiopia.",
+    "It is a kind of bread or pastry.",
+    "It is spongy and full of holes.",
+    "It is a flatbread from Ethiopia.",
+    "The answer is one word of 6 letters.",
+    "Its first letter is I."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/f/fa/Injera_from_ivory_teff.jpg/500px-Injera_from_ivory_teff.jpg",
+      "w": 500,
+      "h": 334,
+      "credit": "Edsel Little",
+      "license": "CC BY-SA 2.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Injera_from_ivory_teff.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/f/f6/Injera_with_eight_kinds_of_stew.jpg/500px-Injera_with_eight_kinds_of_stew.jpg",
+      "w": 500,
+      "h": 490,
+      "credit": "Artem.G",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Injera_with_eight_kinds_of_stew.jpg"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "biryani",
+   "name": "Biryani",
+   "alt": [
+    "biriyani"
+   ],
+   "facts": {
+    "country": "India",
+    "course": "Main"
+   },
+   "blurb": "A rich rice dish layered with spiced meat or vegetables, saffron and fried onions.",
+   "clues": [
+    "Hyderabad and Lucknow are famous for it.",
+    "It is often sealed and cooked slowly.",
+    "It is flavoured with saffron.",
+    "It comes from India.",
+    "It is usually a main meal.",
+    "It layers rice with spiced meat.",
+    "It is a South Asian rice dish.",
+    "The answer is one word of 7 letters.",
+    "Its first letter is B."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/3/35/Biryani_Home.jpg/500px-Biryani_Home.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Shyamveer.singh1982",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Biryani_Home.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/3/38/Dum_Biryani_Plate.jpg/500px-Dum_Biryani_Plate.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Umesh Tongbra",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Dum_Biryani_Plate.jpg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "butter-chicken",
+   "name": "Butter chicken",
+   "alt": [
+    "murgh makhani"
+   ],
+   "facts": {
+    "country": "India",
+    "course": "Main"
+   },
+   "blurb": "Chicken in a mild, creamy tomato and butter sauce, created in Delhi in the mid-1900s.",
+   "clues": [
+    "It is often eaten with naan bread.",
+    "Its sauce is orange.",
+    "It was created at a Delhi restaurant.",
+    "It comes from India.",
+    "It is usually a main meal.",
+    "It is a mild curry.",
+    "The answer has 2 words (6, 7 letters).",
+    "Its first letter is B."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/3/3c/Chicken_makhani.jpg/500px-Chicken_makhani.jpg",
+      "w": 500,
+      "h": 332,
+      "credit": "stu_spivack",
+      "license": "CC BY-SA 2.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Chicken_makhani.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/4/41/Butter_Chicken_%26_Butter_Naan_-_Home_-_Chandigarh_-_India_-_0006.jpg/330px-Butter_Chicken_%26_Butter_Naan_-_Home_-_Chandigarh_-_India_-_0006.jpg",
+      "w": 330,
+      "h": 440,
+      "credit": "Yuvraj Singh 97",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Butter_Chicken_%26_Butter_Naan_-_Home_-_Chandigarh_-_India_-_0006.jpg"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "masala-dosa",
+   "name": "Masala dosa",
+   "alt": [
+    "dosa"
+   ],
+   "facts": {
+    "country": "India",
+    "course": "Breakfast"
+   },
+   "blurb": "A thin, crispy South Indian pancake of fermented rice and lentil batter, filled with spiced potato.",
+   "clues": [
+    "Its batter is fermented rice and lentils.",
+    "It is served with sambar and chutney.",
+    "It is filled with spiced potato.",
+    "It comes from India.",
+    "It is a breakfast dish.",
+    "It is very thin and crispy.",
+    "It comes from South India.",
+    "The answer has 2 words (6, 4 letters).",
+    "Its first letter is M."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/a/a4/Dosai_Chutney_Hotel_Saravana_Bhavan.jpg/500px-Dosai_Chutney_Hotel_Saravana_Bhavan.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Mike Linksvayer",
+      "license": "CC BY 2.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Dosai_Chutney_Hotel_Saravana_Bhavan.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/b/ba/Masala_Dosa_2023.jpg/500px-Masala_Dosa_2023.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Yakshitha",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Masala_Dosa_2023.jpg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "pad-thai",
+   "name": "Pad thai",
+   "facts": {
+    "country": "Thailand",
+    "course": "Main"
+   },
+   "blurb": "Stir-fried rice noodles with egg, tofu or prawns, bean sprouts, peanuts and tamarind. It became popular in the 1930s and 40s.",
+   "clues": [
+    "It may include prawns or tofu.",
+    "It is served with a wedge of lime.",
+    "It is often sold at street stalls.",
+    "It is usually a main meal.",
+    "It is flavoured with tamarind.",
+    "It is topped with crushed peanuts.",
+    "It uses flat rice noodles.",
+    "The answer has 2 words (3, 4 letters).",
+    "Its first letter is P."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/3/39/Phat_Thai_kung_Chang_Khien_street_stall.jpg/500px-Phat_Thai_kung_Chang_Khien_street_stall.jpg",
+      "w": 500,
+      "h": 500,
+      "credit": "Takeaway",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Phat_Thai_kung_Chang_Khien_street_stall.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/f/f8/Phat_thai_-_Chiang_Mai_-_2017-07-08_%28002%29.jpg/500px-Phat_thai_-_Chiang_Mai_-_2017-07-08_%28002%29.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Iudexvivorum",
+      "license": "CC0 1.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Phat_thai_-_Chiang_Mai_-_2017-07-08_(002).jpg"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "tom-yum",
+   "name": "Tom yum",
+   "alt": [
+    "tom yam"
+   ],
+   "facts": {
+    "country": "Thailand",
+    "course": "Soup"
+   },
+   "blurb": "A hot and sour Thai soup flavoured with lemongrass, lime leaves, galangal and chilli.",
+   "clues": [
+    "It is flavoured with lemongrass and galangal.",
+    "Prawns are a classic choice.",
+    "It is hot and sour.",
+    "It comes from Thailand.",
+    "It is a soup.",
+    "It uses kaffir lime leaves.",
+    "It is a Thai soup.",
+    "The answer has 2 words (3, 3 letters).",
+    "Its first letter is T."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/d/db/Tom_yum.jpg/500px-Tom_yum.jpg",
+      "w": 500,
+      "h": 500,
+      "credit": "OpenCage",
+      "license": "CC BY-SA 2.5",
+      "page": "https://commons.wikimedia.org/wiki/File:Tom_yum.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/e/e8/Tom_yam_kung_maenam.jpg/500px-Tom_yam_kung_maenam.jpg",
+      "w": 500,
+      "h": 331,
+      "credit": "Takeaway",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Tom_yam_kung_maenam.jpg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "thai-green-curry",
+   "name": "Thai green curry",
+   "alt": [
+    "green curry"
+   ],
+   "facts": {
+    "country": "Thailand",
+    "course": "Main"
+   },
+   "blurb": "A Thai curry made with green chilli paste and coconut milk.",
+   "clues": [
+    "It may include aubergine and bamboo shoots.",
+    "Chicken is a popular choice.",
+    "It can be very spicy.",
+    "It comes from South-East Asia.",
+    "It is usually a main meal.",
+    "It is made with coconut milk.",
+    "It is often served with jasmine rice.",
+    "The answer has 3 words (4, 5, 5 letters).",
+    "Its first letter is T."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/e/e5/Thai_green_chicken_curry_and_roti.jpg/500px-Thai_green_chicken_curry_and_roti.jpg",
+      "w": 500,
+      "h": 335,
+      "credit": "Takeaway",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Thai_green_chicken_curry_and_roti.jpg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "pho",
+   "name": "Phở",
+   "alt": [
+    "pho"
+   ],
+   "facts": {
+    "country": "Vietnam",
+    "course": "Soup"
+   },
+   "blurb": "A Vietnamese noodle soup of rice noodles in fragrant broth with beef or chicken and fresh herbs.",
+   "clues": [
+    "It developed near Hanoi in the early 1900s.",
+    "Its broth is spiced with star anise.",
+    "It is topped with fresh herbs and lime.",
+    "It comes from Vietnam.",
+    "It is a soup.",
+    "It uses flat rice noodles.",
+    "It is a Vietnamese noodle soup.",
+    "The answer is one word of 3 letters.",
+    "Its first letter is P."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/b/b2/M%C3%B3n_%C4%83n_%C4%90%C3%B4ng_H%C3%A0%2C_T%E1%BA%BFt_2022_%28ph%E1%BB%9F_L%C3%BD_Qu%E1%BB%91c_s%C6%B0_%E1%BB%9F_c%C3%B4ng_vi%C3%AAn_C%E1%BB%8D_D%E1%BA%A7u%29_%282%29.jpg/500px-M%C3%B3n_%C4%83n_%C4%90%C3%B4ng_H%C3%A0%2C_T%E1%BA%BFt_2022_%28ph%E1%BB%9F_L%C3%BD_Qu%E1%BB%91c_s%C6%B0_%E1%BB%9F_c%C3%B4ng_vi%C3%AAn_C%E1%BB%8D_D%E1%BA%A7u%29_%282%29.jpg",
+      "w": 500,
+      "h": 588,
+      "credit": "Phương Huy",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:M%C3%B3n_%C4%83n_%C4%90%C3%B4ng_H%C3%A0,_T%E1%BA%BFt_2022_(ph%E1%BB%9F_L%C3%BD_Qu%E1%BB%91c_s%C6%B0_%E1%BB%9F_c%C3%B4ng_vi%C3%AAn_C%E1%BB%8D_D%E1%BA%A7u)_(2).jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/6/6f/Feu_%285061986490%29.jpg/500px-Feu_%285061986490%29.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Christina Xu from Cambridge, USA",
+      "license": "CC BY 2.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Feu_(5061986490).jpg"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "banh-mi",
+   "name": "Bánh mì",
+   "alt": [
+    "banh mi"
+   ],
+   "facts": {
+    "country": "Vietnam",
+    "course": "Snack"
+   },
+   "blurb": "A Vietnamese sandwich in a crispy baguette, filled with meat, pickled vegetables, herbs and chilli.",
+   "clues": [
+    "Its bread comes from French colonial times.",
+    "It has pickled carrot and radish.",
+    "It has fresh coriander.",
+    "It comes from Vietnam.",
+    "It is usually a snack or street food.",
+    "It is made with a baguette.",
+    "It is a Vietnamese sandwich.",
+    "The answer has 2 words (4, 2 letters).",
+    "Its first letter is B."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/a/a2/Viet_McRib_Banh_Mi.jpg/500px-Viet_McRib_Banh_Mi.jpg",
+      "w": 500,
+      "h": 356,
+      "credit": "Andrea Nguyen",
+      "license": "CC BY 2.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Viet_McRib_Banh_Mi.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/0/0c/B%C3%A1nh_m%C3%AC_th%E1%BB%8Bt_n%C6%B0%E1%BB%9Bng.png/500px-B%C3%A1nh_m%C3%AC_th%E1%BB%8Bt_n%C6%B0%E1%BB%9Bng.png",
+      "w": 500,
+      "h": 472,
+      "credit": "nsaum75¡שיחת!‎",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:B%C3%A1nh_m%C3%AC_th%E1%BB%8Bt_n%C6%B0%E1%BB%9Bng.png"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "nasi-goreng",
+   "name": "Nasi goreng",
+   "facts": {
+    "country": "Indonesia",
+    "course": "Main"
+   },
+   "blurb": "Indonesian fried rice, sweetened with soy sauce and often topped with a fried egg.",
+   "clues": [
+    "Barack Obama mentioned it in a speech in Jakarta.",
+    "It uses sweet soy sauce.",
+    "It is often topped with a fried egg.",
+    "It comes from Indonesia.",
+    "It is usually a main meal.",
+    "Its name means \"fried rice\".",
+    "The answer has 2 words (4, 6 letters).",
+    "Its first letter is N."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/b/b3/Nasi_Goreng_Ikan_Asin.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Rizka Budiati from Leicester, United Kingdom",
+      "license": "CC BY 2.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Nasi_Goreng_Ikan_Asin.jpg"
+     },
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/f/fb/Nasi_goreng.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Sakurai Midori",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Nasi_goreng.jpg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "satay",
+   "name": "Satay",
+   "alt": [
+    "sate"
+   ],
+   "facts": {
+    "country": "Indonesia",
+    "course": "Snack"
+   },
+   "blurb": "Skewers of grilled meat served with a peanut sauce, popular across South-East Asia.",
+   "clues": [
+    "It is often cooked over charcoal.",
+    "It is popular in Malaysia and Singapore too.",
+    "It is served with peanut sauce.",
+    "It comes from Indonesia.",
+    "It is usually a snack or street food.",
+    "It is cooked on skewers.",
+    "It is grilled meat on sticks.",
+    "The answer is one word of 5 letters.",
+    "Its first letter is S."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/c/cc/Chicken_satay_on_banana_leaf_in_Java.jpg/500px-Chicken_satay_on_banana_leaf_in_Java.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Gunawan Kartapranata",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Chicken_satay_on_banana_leaf_in_Java.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/8/88/Sate_gaya_jawa_tengah_di_manokwari.jpg/330px-Sate_gaya_jawa_tengah_di_manokwari.jpg",
+      "w": 330,
+      "h": 440,
+      "credit": "Pungkas nurrohman",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Sate_gaya_jawa_tengah_di_manokwari.jpg"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "rendang",
+   "name": "Rendang",
+   "facts": {
+    "country": "Indonesia",
+    "course": "Main"
+   },
+   "blurb": "Beef slow-cooked in coconut milk and spices until almost dry. It comes from the Minangkabau people of Sumatra.",
+   "clues": [
+    "It comes from the Minangkabau people of Sumatra.",
+    "It is cooked for hours until almost dry.",
+    "It uses coconut milk.",
+    "It comes from Indonesia.",
+    "It is usually a main meal.",
+    "It is usually made with beef.",
+    "It is a rich, dry curry.",
+    "The answer is one word of 7 letters.",
+    "Its first letter is R."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/13/Lamb_rendang.jpg/500px-Lamb_rendang.jpg",
+      "w": 500,
+      "h": 332,
+      "credit": "Wikimedia Commons",
+      "license": "CC BY-SA 2.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Lamb_rendang.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/7/70/Rendang_daging_sapi_asli_Padang.JPG/500px-Rendang_daging_sapi_asli_Padang.JPG",
+      "w": 500,
+      "h": 335,
+      "credit": "Midori",
+      "license": "CC BY 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Rendang_daging_sapi_asli_Padang.JPG"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "peking-duck",
+   "name": "Peking duck",
+   "facts": {
+    "country": "China",
+    "course": "Main"
+   },
+   "blurb": "Roast duck with crispy skin from Beijing, served in thin pancakes with spring onion and sauce.",
+   "clues": [
+    "It was a dish of the imperial court.",
+    "Its skin is famously crispy.",
+    "It is eaten in thin pancakes with plum or hoisin sauce.",
+    "It comes from China.",
+    "It is usually a main meal.",
+    "It comes from Beijing.",
+    "The answer has 2 words (6, 4 letters).",
+    "Its first letter is P."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/b/bb/Vit-quay-bac-kinh-by-vit-quay-to-thi.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Vitquaytothi",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Vit-quay-bac-kinh-by-vit-quay-to-thi.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/d/d1/Peking_duck_by_Mr_Wabu_in_Beijing.jpg/500px-Peking_duck_by_Mr_Wabu_in_Beijing.jpg",
+      "w": 500,
+      "h": 376,
+      "credit": "Mr Wabu",
+      "license": "CC BY-SA 2.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Peking_duck_by_Mr_Wabu_in_Beijing.jpg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "jiaozi",
+   "name": "Jiaozi",
+   "alt": [
+    "dumplings",
+    "Chinese dumplings"
+   ],
+   "facts": {
+    "country": "China",
+    "course": "Main"
+   },
+   "blurb": "Chinese dumplings filled with meat and vegetables. Families make them together for Chinese New Year.",
+   "clues": [
+    "Their name sounds like an old word for changing to a new year.",
+    "They are often dipped in vinegar and soy sauce.",
+    "Some families hide a coin inside one.",
+    "Their dough is folded and pinched shut.",
+    "It is usually a main meal.",
+    "They are boiled, steamed or fried.",
+    "They are filled with meat and vegetables.",
+    "The answer is one word of 6 letters.",
+    "Its first letter is J."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/f/f5/Jiaozi-close-look.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Wikimedia Commons",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Jiaozi-close-look.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/d/d2/BoiledDumplings.jpg/500px-BoiledDumplings.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Bioniclepluslotr",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:BoiledDumplings.jpg"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "kung-pao-chicken",
+   "name": "Kung Pao chicken",
+   "alt": [
+    "kung po chicken",
+    "gong bao chicken"
+   ],
+   "facts": {
+    "country": "China",
+    "course": "Main"
+   },
+   "blurb": "A spicy stir-fry of chicken, peanuts and chillies from Sichuan.",
+   "clues": [
+    "It is named after a Qing dynasty official.",
+    "It uses Sichuan peppercorns.",
+    "It contains peanuts.",
+    "It comes from China.",
+    "It is usually a main meal.",
+    "It is spicy.",
+    "The answer has 3 words (4, 3, 7 letters).",
+    "Its first letter is K."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/8/8e/Kung_Pao_Chicken_at_Yujiayan_Restaurant_%2820230510123120%29.jpg/500px-Kung_Pao_Chicken_at_Yujiayan_Restaurant_%2820230510123120%29.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "N509FZ",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Kung_Pao_Chicken_at_Yujiayan_Restaurant_(20230510123120).jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/c/c2/Kung-pao-shanghai.jpg/500px-Kung-pao-shanghai.jpg",
+      "w": 500,
+      "h": 332,
+      "credit": "Steven G. Johnson",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Kung-pao-shanghai.jpg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "kimchi",
+   "name": "Kimchi",
+   "facts": {
+    "country": "Korea",
+    "course": "Side"
+   },
+   "blurb": "Spicy fermented vegetables, usually napa cabbage with chilli. It is served with almost every Korean meal.",
+   "clues": [
+    "Families make it together in autumn, called kimjang.",
+    "It is fermented.",
+    "It is usually made with napa cabbage.",
+    "It comes from Korea.",
+    "It is usually a side dish or dip.",
+    "It is spicy and red.",
+    "It is a Korean side dish.",
+    "The answer is one word of 6 letters.",
+    "Its first letter is K."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/a/a3/Gimchi.jpg/500px-Gimchi.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Nagyman, a flickr user",
+      "license": "CC BY-SA 2.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Gimchi.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/4/44/Triple_White_Kimchi_05.jpg/500px-Triple_White_Kimchi_05.jpg",
+      "w": 500,
+      "h": 315,
+      "credit": "korea.net",
+      "license": "CC BY-SA 2.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Triple_White_Kimchi_05.jpg"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "bibimbap",
+   "name": "Bibimbap",
+   "facts": {
+    "country": "Korea",
+    "course": "Main"
+   },
+   "blurb": "A Korean bowl of rice topped with vegetables, meat, egg and chilli paste, mixed together before eating.",
+   "clues": [
+    "It is often served in a hot stone bowl.",
+    "It is topped with gochujang chilli paste.",
+    "Its name means \"mixed rice\".",
+    "It comes from Korea.",
+    "It is usually a main meal.",
+    "It is topped with a fried egg.",
+    "It is a Korean rice bowl.",
+    "The answer is one word of 8 letters.",
+    "Its first letter is B."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/f/f5/Korean.food-Bibimbap-02.jpg/500px-Korean.food-Bibimbap-02.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "abex (a flickr user)",
+      "license": "CC BY-SA 2.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Korean.food-Bibimbap-02.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/4/44/Dolsot-bibimbap.jpg/500px-Dolsot-bibimbap.jpg",
+      "w": 500,
+      "h": 334,
+      "credit": "Sous Chef",
+      "license": "CC BY 2.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Dolsot-bibimbap.jpg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "tacos",
+   "name": "Tacos",
+   "alt": [
+    "taco"
+   ],
+   "facts": {
+    "country": "Mexico",
+    "course": "Snack"
+   },
+   "blurb": "Folded corn or wheat tortillas filled with meat, beans, salsa and other fillings.",
+   "clues": [
+    "Traditional tortillas are made from corn.",
+    "They are topped with salsa.",
+    "It comes from Mexico.",
+    "It is usually a snack or street food.",
+    "They are folded in half.",
+    "They are a Mexican street food.",
+    "The answer is one word of 5 letters.",
+    "Its first letter is T."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/7/71/Tacos_2.jpg/500px-Tacos_2.jpg",
+      "w": 500,
+      "h": 281,
+      "credit": "Popo le Chien",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Tacos_2.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/7/73/001_Tacos_de_carnitas%2C_carne_asada_y_al_pastor.jpg/500px-001_Tacos_de_carnitas%2C_carne_asada_y_al_pastor.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Larry Miller",
+      "license": "CC BY-SA 2.0",
+      "page": "https://commons.wikimedia.org/wiki/File:001_Tacos_de_carnitas,_carne_asada_y_al_pastor.jpg"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "guacamole",
+   "name": "Guacamole",
+   "facts": {
+    "country": "Mexico",
+    "course": "Side"
+   },
+   "blurb": "A dip of mashed avocado with lime, onion, chilli and coriander. The Aztecs first made it.",
+   "clues": [
+    "The Aztecs first made it.",
+    "It is often eaten with corn chips.",
+    "Lime stops it turning brown quickly.",
+    "It comes from Mexico.",
+    "It is usually a side dish or dip.",
+    "It is green.",
+    "It is mashed avocado.",
+    "The answer is one word of 9 letters.",
+    "Its first letter is G."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/3/30/Guacomole.jpg/500px-Guacomole.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Popo le Chien",
+      "license": "CC0 1.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Guacomole.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/7/7f/Guacamole_amb_%22nachos%22.jpg/500px-Guacamole_amb_%22nachos%22.jpg",
+      "w": 500,
+      "h": 324,
+      "credit": "Sarah Stierch from Sonoma, CA, USA",
+      "license": "CC BY 2.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Guacamole_amb_%22nachos%22.jpg"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "hamburger",
+   "name": "Hamburger",
+   "alt": [
+    "burger",
+    "cheeseburger"
+   ],
+   "facts": {
+    "country": "United States",
+    "course": "Main"
+   },
+   "blurb": "A minced beef patty in a bun, often with cheese, lettuce, tomato and sauce.",
+   "clues": [
+    "It is named after a city in Germany.",
+    "It became famous in the USA.",
+    "It is often eaten with fries.",
+    "It comes from United States.",
+    "It is usually a main meal.",
+    "It has a patty of minced beef.",
+    "It is served in a bun.",
+    "The answer is one word of 9 letters.",
+    "Its first letter is H."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/b/b7/Burger_King_double_cheeseburger.jpg/500px-Burger_King_double_cheeseburger.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Luke",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Burger_King_double_cheeseburger.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/6/62/NCI_Visuals_Food_Hamburger.jpg/500px-NCI_Visuals_Food_Hamburger.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Len Rizzi (photographer)",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:NCI_Visuals_Food_Hamburger.jpg"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "hot-dog",
+   "name": "Hot dog",
+   "alt": [
+    "hotdog"
+   ],
+   "facts": {
+    "country": "United States",
+    "course": "Snack"
+   },
+   "blurb": "A cooked sausage in a long bun, often topped with mustard and ketchup.",
+   "clues": [
+    "Coney Island is famous for them.",
+    "A famous eating contest is held every 4 July.",
+    "It is topped with mustard and ketchup.",
+    "It comes from United States.",
+    "It is usually a snack or street food.",
+    "It is a sausage in a long bun.",
+    "Its name sounds like a warm pet.",
+    "The answer has 2 words (3, 3 letters).",
+    "Its first letter is H."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/f/fb/Hotdog_-_Evan_Swigart.jpg/500px-Hotdog_-_Evan_Swigart.jpg",
+      "w": 500,
+      "h": 332,
+      "credit": "Evan Swigart from Chicago, USA",
+      "license": "CC BY 2.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Hotdog_-_Evan_Swigart.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/b/b1/Hot_dog_with_mustard.png/500px-Hot_dog_with_mustard.png",
+      "w": 500,
+      "h": 244,
+      "credit": "Czar, original photographed by Renee Comet",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Hot_dog_with_mustard.png"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "poutine",
+   "name": "Poutine",
+   "facts": {
+    "country": "Canada",
+    "course": "Snack"
+   },
+   "blurb": "Chips topped with cheese curds and hot gravy. It comes from Quebec.",
+   "clues": [
+    "Its cheese curds should squeak.",
+    "It comes from Quebec.",
+    "It is covered in gravy.",
+    "It comes from Canada.",
+    "It is usually a snack or street food.",
+    "It is topped with cheese curds.",
+    "It is a Canadian dish of chips.",
+    "The answer is one word of 7 letters.",
+    "Its first letter is P."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/c/cc/Food_at_WIkimanian_2017_02.jpg/500px-Food_at_WIkimanian_2017_02.jpg",
+      "w": 500,
+      "h": 281,
+      "credit": "Camelia.boban",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Food_at_WIkimanian_2017_02.jpg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "feijoada",
+   "name": "Feijoada",
+   "facts": {
+    "country": "Brazil",
+    "course": "Main"
+   },
+   "blurb": "A Brazilian stew of black beans with pork and beef, served with rice and orange slices.",
+   "clues": [
+    "It is often served with orange slices.",
+    "It is often eaten on Saturdays in Brazil.",
+    "It is served with rice and farofa.",
+    "It comes from Brazil.",
+    "It is usually a main meal.",
+    "It is made with black beans and pork.",
+    "It is the national dish of Brazil.",
+    "The answer is one word of 8 letters.",
+    "Its first letter is F."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/2/24/Feijoada_%C3%A0_brasileira_1.jpg/500px-Feijoada_%C3%A0_brasileira_1.jpg",
+      "w": 500,
+      "h": 353,
+      "credit": "Melsj",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Feijoada_%C3%A0_brasileira_1.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/9/90/Feijoada_%C3%A0_transmontada.jpg/500px-Feijoada_%C3%A0_transmontada.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Adrião",
+      "license": "CC BY 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Feijoada_%C3%A0_transmontada.jpg"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "ceviche",
+   "name": "Ceviche",
+   "alt": [
+    "cebiche"
+   ],
+   "facts": {
+    "country": "Peru",
+    "course": "Main"
+   },
+   "blurb": "Raw fish \"cooked\" in lime or lemon juice with chilli and onion. It is Peru's national dish.",
+   "clues": [
+    "Peru celebrates a national day for it.",
+    "The fish is \"cooked\" by acid, not heat.",
+    "It is marinated in lime juice.",
+    "It comes from Peru.",
+    "It is usually a main meal.",
+    "It uses raw fish.",
+    "It is the national dish of Peru.",
+    "The answer is one word of 7 letters.",
+    "Its first letter is C."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/f/fc/Ceviche_del_Per%C3%BA.jpg/500px-Ceviche_del_Per%C3%BA.jpg",
+      "w": 500,
+      "h": 363,
+      "credit": "No machine-readable author provided. Manuel González Olaechea assumed (based on copyrig…",
+      "license": "CC BY 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Ceviche_del_Per%C3%BA.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/1b/Ceviche_de_pescado_%28La_Punta%2C_Callao%29.jpg/500px-Ceviche_de_pescado_%28La_Punta%2C_Callao%29.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Jorge G. Mori",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Ceviche_de_pescado_(La_Punta,_Callao).jpg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "asado",
+   "name": "Asado",
+   "facts": {
+    "country": "Argentina",
+    "course": "Main"
+   },
+   "blurb": "An Argentine barbecue of beef and other meats slow-cooked over wood or charcoal.",
+   "clues": [
+    "It is usually served with chimichurri sauce.",
+    "Meat is cooked slowly over embers.",
+    "It comes from Argentina.",
+    "It is usually a main meal.",
+    "It is a big social gathering.",
+    "It is an Argentine barbecue.",
+    "The answer is one word of 5 letters.",
+    "Its first letter is A."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/12/Argentinean_asado.jpg/500px-Argentinean_asado.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Wikimedia Commons",
+      "license": "CC BY-SA 2.5",
+      "page": "https://commons.wikimedia.org/wiki/File:Argentinean_asado.jpg"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "meat-pie",
+   "name": "Meat pie",
+   "alt": [
+    "Australian meat pie",
+    "pie"
+   ],
+   "facts": {
+    "country": "Australia",
+    "course": "Snack"
+   },
+   "blurb": "A hand-sized pie of minced meat and gravy, an Australian favourite at the footy, often with tomato sauce.",
+   "clues": [
+    "Its pastry case holds a hot filling.",
+    "It is sold at bakeries and service stations.",
+    "It is often eaten with your hands.",
+    "It is usually a snack or street food.",
+    "It is eaten at football matches.",
+    "It is topped with tomato sauce.",
+    "It is filled with mince and gravy.",
+    "The answer has 2 words (4, 3 letters).",
+    "Its first letter is M."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/9/96/Fydzhin_cross-section.jpg/500px-Fydzhin_cross-section.jpg",
+      "w": 500,
+      "h": 366,
+      "credit": "Georgian Recipes at Georgia About",
+      "license": "CC BY 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Fydzhin_cross-section.jpg"
+     },
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/9/9d/A_Northern_Nigeria_snacks_called_meat_pie_20.jpg",
+      "w": 500,
+      "h": 553,
+      "credit": "Hajjare",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:A_Northern_Nigeria_snacks_called_meat_pie_20.jpg"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "lamington",
+   "name": "Lamington",
+   "facts": {
+    "country": "Australia",
+    "course": "Dessert"
+   },
+   "blurb": "A square of sponge cake dipped in chocolate and rolled in desiccated coconut. Some have jam in the middle.",
+   "clues": [
+    "Some have a layer of jam or cream.",
+    "It is rolled in coconut.",
+    "It comes from Australia.",
+    "It is a dessert or sweet treat.",
+    "It is dipped in chocolate icing.",
+    "It is an Australian sponge cake square.",
+    "The answer is one word of 9 letters.",
+    "Its first letter is L."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/2/23/NZ_Lamington.jpg/500px-NZ_Lamington.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Spacekadet at English Wikipedia",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:NZ_Lamington.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/c/c5/Mocha_Flake_amingtons.jpg/500px-Mocha_Flake_amingtons.jpg",
+      "w": 500,
+      "h": 459,
+      "credit": "Zeitgeistlondon",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Mocha_Flake_amingtons.jpg"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "pavlova",
+   "name": "Pavlova",
+   "facts": {
+    "course": "Dessert"
+   },
+   "blurb": "A meringue cake with a crisp shell and soft middle, topped with cream and fruit. Australia and New Zealand both claim it.",
+   "clues": [
+    "It is named after a Russian ballerina.",
+    "Australia and New Zealand both claim it.",
+    "It is topped with cream and fruit.",
+    "It is a dessert or sweet treat.",
+    "It has a crisp shell and soft centre.",
+    "It is a big meringue dessert.",
+    "The answer is one word of 7 letters.",
+    "Its first letter is P."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/6/67/Pavlova_dessert.JPG/500px-Pavlova_dessert.JPG",
+      "w": 500,
+      "h": 372,
+      "credit": "Hazel Fowler",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Pavlova_dessert.JPG"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "fairy-bread",
+   "name": "Fairy bread",
+   "facts": {
+    "country": "Australia",
+    "course": "Snack"
+   },
+   "blurb": "White bread spread with butter and covered in hundreds and thousands. It is a children's party classic in Australia.",
+   "clues": [
+    "It is cut into triangles.",
+    "It is a children's party classic.",
+    "It comes from Australia.",
+    "It is usually a snack or street food.",
+    "It is covered in sprinkles called hundreds and thousands.",
+    "It is named after a magical winged being.",
+    "The answer has 2 words (5, 5 letters).",
+    "Its first letter is F."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/e/ee/Fairy_Bread.jpg/500px-Fairy_Bread.jpg",
+      "w": 500,
+      "h": 332,
+      "credit": "Gemsling",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Fairy_Bread.jpg"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "vegemite",
+   "name": "Vegemite",
+   "facts": {
+    "country": "Australia",
+    "course": "Side"
+   },
+   "blurb": "A dark, salty Australian spread made from leftover brewer's yeast, first sold in 1923.",
+   "clues": [
+    "It was first made in Melbourne in 1923.",
+    "It is made from brewer's yeast extract.",
+    "It is rich in B vitamins.",
+    "It comes from Australia.",
+    "It is usually a side dish or dip.",
+    "It is spread thinly on toast.",
+    "It is a dark, salty Australian spread.",
+    "The answer is one word of 8 letters.",
+    "Its first letter is V."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/1/10/Vegemiteontoast_large.jpg",
+      "w": 500,
+      "h": 566,
+      "credit": "Tristanb",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Vegemiteontoast_large.jpg"
+     },
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/8/84/Vegemite_brand_logo.png",
+      "w": 500,
+      "h": 303,
+      "credit": "Unknown authorUnknown author",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Vegemite_brand_logo.png"
+     }
+    ]
+   },
+   "difficulty": 1
+  }
+ ],
+ "questions": [
+  {
+   "id": "q1",
+   "kind": "mc",
+   "prompt": "Which country is sushi from?",
+   "answer": "Japan",
+   "wrong": [
+    "China",
+    "Thailand",
+    "Korea"
+   ],
+   "explain": "Sushi grew from a Japanese way of preserving fish.",
+   "difficulty": 1
+  },
+  {
+   "id": "q2",
+   "kind": "mc",
+   "prompt": "Which country is pizza from?",
+   "answer": "Italy",
+   "wrong": [
+    "France",
+    "Greece",
+    "United States"
+   ],
+   "explain": "Modern pizza comes from Naples.",
+   "difficulty": 1
+  },
+  {
+   "id": "q3",
+   "kind": "mc",
+   "prompt": "Tacos come from which country?",
+   "answer": "Mexico",
+   "wrong": [
+    "Spain",
+    "Brazil",
+    "Peru"
+   ],
+   "explain": "Tortillas were traditionally made of corn.",
+   "difficulty": 1
+  },
+  {
+   "id": "q4",
+   "kind": "mc",
+   "prompt": "What is the main ingredient of guacamole?",
+   "answer": "Avocado",
+   "wrong": [
+    "Peas",
+    "Cucumber",
+    "Lime"
+   ],
+   "explain": "Lime, onion and chilli are added.",
+   "difficulty": 1
+  },
+  {
+   "id": "q5",
+   "kind": "mc",
+   "prompt": "What is hummus mainly made from?",
+   "answer": "Chickpeas",
+   "wrong": [
+    "Lentils",
+    "Potatoes",
+    "Rice"
+   ],
+   "explain": "It is blended with tahini, lemon and garlic.",
+   "difficulty": 2
+  },
+  {
+   "id": "q6",
+   "kind": "mc",
+   "prompt": "Which vegetable makes borscht red?",
+   "answer": "Beetroot",
+   "wrong": [
+    "Tomato",
+    "Red pepper",
+    "Red cabbage"
+   ],
+   "explain": "Borscht is a beetroot soup.",
+   "difficulty": 2
+  },
+  {
+   "id": "q7",
+   "kind": "mc",
+   "prompt": "Which spice makes paella yellow?",
+   "answer": "Saffron",
+   "wrong": [
+    "Turmeric",
+    "Paprika",
+    "Cumin"
+   ],
+   "explain": "Saffron comes from crocus flowers.",
+   "difficulty": 2
+  },
+  {
+   "id": "q8",
+   "kind": "mc",
+   "prompt": "Who is the pavlova named after?",
+   "answer": "A Russian ballerina",
+   "wrong": [
+    "A French chef",
+    "An Italian queen",
+    "A New Zealand prime minister"
+   ],
+   "explain": "Anna Pavlova toured Australia and New Zealand in the 1920s.",
+   "difficulty": 2
+  },
+  {
+   "id": "q9",
+   "kind": "mc",
+   "prompt": "Which city is the hamburger named after?",
+   "answer": "Hamburg",
+   "wrong": [
+    "Berlin",
+    "Frankfurt",
+    "New York"
+   ],
+   "explain": "It is linked to the \"Hamburg steak\".",
+   "difficulty": 2
+  },
+  {
+   "id": "q10",
+   "kind": "mc",
+   "prompt": "What does \"tiramisu\" mean in Italian?",
+   "answer": "Pick me up",
+   "wrong": [
+    "Sweet dream",
+    "Coffee cake",
+    "Little cloud"
+   ],
+   "explain": "It contains coffee and cocoa.",
+   "difficulty": 3
+  },
+  {
+   "id": "q11",
+   "kind": "mc",
+   "prompt": "What is Vegemite made from?",
+   "answer": "Brewer's yeast extract",
+   "wrong": [
+    "Black olives",
+    "Dried seaweed",
+    "Burnt sugar"
+   ],
+   "explain": "It was first made in Melbourne in 1923.",
+   "difficulty": 2
+  },
+  {
+   "id": "q12",
+   "kind": "mc",
+   "prompt": "What are the sprinkles on fairy bread called in Australia?",
+   "answer": "Hundreds and thousands",
+   "wrong": [
+    "Jimmies",
+    "Glitter drops",
+    "Rainbow crumbs"
+   ],
+   "explain": "Fairy bread is a party classic.",
+   "difficulty": 1
+  },
+  {
+   "id": "q13",
+   "kind": "tf",
+   "prompt": "Traditional spaghetti carbonara is made with cream.",
+   "answer": false,
+   "explain": "The sauce is egg, cheese, cured pork and pepper.",
+   "difficulty": 3
+  },
+  {
+   "id": "q14",
+   "kind": "mc",
+   "prompt": "Which country is kimchi from?",
+   "answer": "Korea",
+   "wrong": [
+    "Japan",
+    "China",
+    "Vietnam"
+   ],
+   "explain": "It is usually fermented napa cabbage with chilli.",
+   "difficulty": 1
+  }
+ ],
+ "fakes": [
+  "Glazed moonfish pie (Norway)",
+  "Sunberry dumplings (Peru)",
+  "Cloud noodles (Chile)",
+  "Velvet goat stew (Iceland)"
+ ],
+ "sources": [
+  {
+   "name": "Wikidata",
+   "url": "https://www.wikidata.org"
+  },
+  {
+   "name": "Wikimedia Commons",
+   "url": "https://commons.wikimedia.org"
+  }
+ ]
+}

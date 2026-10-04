@@ -1,4 +1,5 @@
 import { h, esc } from './kit.js?v=1';
+import { setBgm, canFullscreen, toggleFullscreen } from './toggles.js?v=1';
 import { defineScreen, header, back } from './app.js?v=1';
 import { getSettings, setSettings, ANSWER_TIMES } from '../core/store.js?v=1';
 import { getIndex, loadPacks, loadedPacks, allPackIds } from '../core/packs.js?v=1';
@@ -34,12 +35,14 @@ defineScreen('settings', el => {
     secs.append(c);
   }
   el.append(h('div.panel.set-list', {},
+    toggleRow('Background music', 'Soft classical, pauses for questions with sound', 'bgm', n => setBgm(n.bgm !== false)),
     toggleRow('Sound effects', null, 'sound', applyAll),
     h('div.opt-row', {}, h('span.lbl', {}, 'Music volume'), h('div', { style: { width: '50%' } }, vol)),
     toggleRow('Haptics', 'Buzz on right and wrong answers', 'haptics'),
     h('div.opt', {}, h('div.opt-label', {}, 'Default answer time'), secs),
     toggleRow('Reduced motion', 'Fewer animations, no confetti', 'reducedMotion', applyAll),
     canSpeak() ? toggleRow('Read questions aloud', 'Always on in kids mode', 'readAloud', n => n.readAloud && speak('Questions will be read aloud.')) : null,
+    canFullscreen() ? h('div.opt-row', {}, h('span.lbl', {}, 'Full screen'), h('button.btn.small', { type: 'button', onclick: () => toggleFullscreen() }, 'Toggle')) : null,
     toggleRow('Kids mode', 'Easy picture questions, no timer, stickers', 'kids', applyAll),
   ));
   el.append(h('p.muted.tiny.center', { style: { marginTop: '18px' } }, `Clued build ${BUILD} · ${Object.keys(getIndex()?.packs || {}).length} packs`));

@@ -11,6 +11,7 @@ function flagFor(packs, iso) {
   for (const p of packs || []) {
     if (p.id !== 'countries' && p.id !== 'flags') continue;
     const it = (p.items || []).find(x => x.iso3 === iso || x.id === iso || x.facts?.iso3 === iso);
+    if (it?.facts?.flagDisputed) return null;
     const img = it?.media?.img?.find(m => /flag/i.test(m.src + (m.page || '')));
     if (img) return img;
   }

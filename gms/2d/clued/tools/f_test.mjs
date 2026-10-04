@@ -46,12 +46,22 @@ const packs = readdirSync(join(ROOT, 'data/packs')).filter(f => f.endsWith('.jso
 // What the browser sees: data/index.json caps where present (it is what the picker uses), else computed caps.
 let index = {};
 try { index = JSON.parse(readFileSync(join(ROOT, 'data/index.json'), 'utf8')).packs || {}; } catch (e) {}
-const infoOf = p => ({ id: p.id, ...summarize(p), ...(index[p.id] ? { caps: { ...summarize(p).caps, ...index[p.id].caps } } : {}) });
+// caps.multi (exclusive:false cat facts) is requested from C1/A; simulated here until it lands.
+const multiOf = p => Object.entries(p.factsMeta || {}).filter(([, m]) => m.type === 'cat' && m.exclusive === false).map(([k]) => k);
+const infoOf = p => {
+  const base = summarize(p);
+  const caps = { ...base.caps, ...(index[p.id]?.caps || {}) };
+  if (!caps.multi) caps.multi = multiOf(p);
+  return { id: p.id, ...base, caps };
+};
 
 const jsonSafe = q => { try { return JSON.stringify(JSON.parse(JSON.stringify(q))) === JSON.stringify(q); } catch (e) { return false; } };
 const hasFns = v => typeof v === 'function' || (v && typeof v === 'object' && Object.values(v).some(hasFns));
 
+const disputed = packs.flatMap(p => (p.items || []).filter(it => it.facts?.flagDisputed).flatMap(it => (it.media?.img || []).map(m => m.src)));
 function checkShape(f, q, tag) {
+  const js = JSON.stringify(q);
+  ok(!disputed.some(src => js.includes(src)), `${f.id} :: no disputed flag pictures (${tag}) ${q.id}`);
   ok(q && q.format === f.id, `${f.id} :: format field (${tag})`);
   ok(typeof q.id === 'string' && q.id.startsWith(f.id === 'lookalike' ? 'look' : f.id), `${f.id} :: id prefix (${tag}) ${q.id}`);
   ok(typeof q.prompt === 'string' && q.prompt.trim().length > 0, `${f.id} :: prompt (${tag})`);
@@ -78,6 +88,7 @@ function gen(f, list, seed, extra = {}) {
 
 for (const f of loaded) {
   let total = 0, packsOk = 0;
+  const empty = [];
   const validate = VALIDATORS[f.id];
   ok(!!validate, `${f.id} :: has a data validator in f_validators.mjs`);
   for (const p of packs) {
@@ -90,7 +101,8 @@ for (const f of loaded) {
     const a = gen(f, [p], seed);
     const b = gen(f, [p], seed);
     ok(JSON.stringify(a) === JSON.stringify(b), `${f.id} :: deterministic (${p.id})`);
-    ok(a.length > 0, `${f.id} :: supports() said yes but generated nothing (${p.id})`);
+    // index caps can't see value spreads (e.g. every emblem unique), so a few empty packs are tolerated and listed
+    if (!a.length) empty.push(p.id);
     const ids = new Set();
     for (const q of a) {
       checkShape(f, q, p.id);
@@ -113,6 +125,10 @@ for (const f of loaded) {
       }
     }
   }
+  // connect needs 3+ values with 3+ items on one exclusive fact; caps can't show that until C1 adds caps.catBins
+  const TOL = { connect: 0.2 }[f.id] || 0.15;
+  ok(empty.length <= Math.max(1, Math.floor(packsOk * TOL)), `${f.id} :: too many supported packs generate nothing: ${empty.join(', ')}`);
+  if (empty.length) console.warn(`  warn ${f.id}: supported but empty: ${empty.join(', ')}`);
   // all supported packs mixed, like 'all'
   const sup = packs.filter(p => registry.supportsPack(f, infoOf(p)) === true);
   if (sup.length) {

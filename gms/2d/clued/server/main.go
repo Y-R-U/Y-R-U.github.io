@@ -174,6 +174,7 @@ func routes() http.Handler {
 	api.HandleFunc("GET /api/rooms/{code}/q/{i}", handleQuestion)
 	api.HandleFunc("POST /api/rooms/{code}/answer", handleAnswer)
 	api.HandleFunc("POST /api/rooms/{code}/leave", handleLeave)
+	api.HandleFunc("POST /api/rooms/{code}/vote", handleVote)
 	api.HandleFunc("POST /api/rooms/{code}/{action}", handleHostAction)
 	api.HandleFunc("POST /api/challenges", handleCreateChallenge)
 	api.HandleFunc("GET /api/challenges/{id}", handleGetChallenge)

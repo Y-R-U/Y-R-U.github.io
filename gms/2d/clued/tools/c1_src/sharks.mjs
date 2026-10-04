@@ -7,7 +7,7 @@ const f = (lengthM, danger, habitat) => ({ lengthM, danger, habitat });
 export default {
   id: 'sharks', title: 'Sharks', theme: 'animals', icon: '🦈', kids: true,
   leakExempt: ['shark', 'sharks'],
-  autoTaxo: ['family', 'genus'], status: true, wdCheck: { lengthM: 'P2043' },
+  wikiD1: true, autoTaxo: ['family', 'genus'], status: true, wdCheck: { lengthM: 'P2043' },
   ranges: { lengthM: [0.15, 13] },
   factsMeta: {
     lengthM: len(),

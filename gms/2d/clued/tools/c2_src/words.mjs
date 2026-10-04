@@ -12,10 +12,10 @@ tsunami|Japanese|ja|1|"Harbour wave"
 karaoke|Japanese|ja|2|"Empty orchestra"
 emoji|Japanese|ja|2|"Picture" plus "character"; the likeness to "emotion" is a coincidence
 tycoon|Japanese|ja|3|From a title meaning "great lord"
-kayak|Inuit|iu;kl;esx;ik|2|An Inuit word for a one-person hunting boat
+kayak|Inuit|iu;kl;esx;ik|1|An Inuit word for a one-person hunting boat
 igloo|Inuit|iu;ike|1|An Inuit word for "house"
-tomato|Nahuatl|nah;nci|2|From tomatl, via Spanish
-chocolate|Nahuatl|nah;nci|2|From a Nahuatl word, via Spanish
+tomato|Nahuatl|nah;nci|1|From tomatl, via Spanish
+chocolate|Nahuatl|nah;nci|1|From a Nahuatl word, via Spanish
 avocado|Nahuatl|nah;nci|3|From āhuacatl, via Spanish
 coyote|Nahuatl|nah;nci|3|From coyōtl, via Mexican Spanish
 safari|Swahili|sw|2|"Journey", itself from Arabic
@@ -43,7 +43,7 @@ mosquito|Spanish|es|2|"Little fly"
 alligator|Spanish|es|2|From el lagarto, "the lizard"
 hurricane|Taíno|tnq;crb|3|From a Caribbean word, via Spanish
 barbecue|Taíno|tnq|3|From a word for a wooden frame, via Spanish
-cookie|Dutch|nl|2|From koekje, "little cake"
+cookie|Dutch|nl|1|From koekje, "little cake"
 yacht|Dutch|nl;dum|3|From jacht, a fast pursuit ship
 boss|Dutch|nl|3|From baas, "master"
 sauna|Finnish|fi|1|A Finnish steam bath

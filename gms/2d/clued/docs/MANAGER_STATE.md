@@ -47,3 +47,27 @@ A trivia and learning game. Everything is in v1 (full mode list in DESIGN.md). A
 - Sign-in pill overlaps home gear (A noted). Empty space for no-image questions on landscape/desktop (A noted).
 - 2026-10-05 Lane M DONE: 7 map formats registered, world.json 184 KB, 242 features, 28 state files (dropped outdated NE states: Iran, Kenya, Indonesia, Norway, Russia, PH, VN, PK, UA), 234 flags; m_test 5433/5433, ui 65/65. CDP needs --use-angle=metal for maps. Afghanistan flag relayed to C2b.
 - QA BACKLOG: Credits page must credit "Natural Earth (public domain)" (A's file); map formats need a `packless` flag so they're selectable without a geography pack (A's picker).
+- 2026-10-05 Lane S DONE: server live (games.br8t.com/gms/2d/clued/api), ~10 MB RSS, caps/levels/stats/ntfy alerts, admin.html, link challenges, transport interface; 18 Go tests + e2e green. Manager fixed A's route() to keep non-join params. Checkpoint commit af91927c (local, not pushed). P2P lane launched (9411–9413).
+- SMTP untested (no creds; ntfy is primary). Ship admin.html with static deploy.
+- 2026-10-05 Aaron idea: vote-to-reveal-more (all vote → next stage; first guess locks votes) → DESIGN + CONTRACT 'Progressive stages'; messaged F, AU, P2P, S (S resumed for server + runner hooks).
+
+## RESUME (on "continue" after the usage limit, expected ~4am 2026-10-05/06)
+Lanes running when the limit hit (status per docs/notes/<lane>.md; a limit-killed agent leaves partial work on disk):
+- DONE: A (shell), M (maps), S (server; RESUMED for vote-to-reveal: server vote/stage/lock + runner hooks + scoring multiplier)
+- RUNNING: C1 nature packs, C2b books/quotes/words/history/tv + C2 review pass (+ factsMeta templates, Afghanistan flag),
+  C2c general/kids/sport banks, AU audio (+ listen options, progressive clip), MV movie moments (Flux; resumable via
+  tools/mv_state.json), F formats (+ progressive stages), L learning, P2P device rooms (+ vote/stage/lock).
+On resume: for each lane, read its notes file + `ls` its files; relaunch any killed lane with "continue from your
+notes; don't redo finished work" in the SAME turn (never ask Aaron). Then P3: QA lane (adversarial playtest at three
+viewports, a fact-check sample of 100 random questions, link check of all media) + integration fixes from QA BACKLOG,
+a_bump BUILD, commit, then P4 (projects.js + screenshot, push, STATIC=1 server/deploy.sh to games.br8t.com, hub card
+in games/js/games.js ONLY if that file is no longer dirty from another session, otherwise ask Aaron).
+- 2026-10-05 Aaron: progressive questions get more time (×1.5, min 10 s) + each successful vote extends the deadline by max(5 s, time/2), cap 90 s → S, P2P messaged.
+- 2026-10-05 Lane C2c DONE: general 587, kids 249 (25 pictures), sport 150 + 120 items; c2c_test falsified; build_index 40 packs 0 errors. Relayed its index-warning requests to C1.
+- QA BACKLOG: A's mc with 4 answers finds no kids questions (only 2 wrong) — fall back to 3 answers; theme picker should filter general questions by `tags`.
+- 2026-10-05 Aaron: soft background classical (auto-pause for sound) + full-screen toggle. Manager wrote js/ui/toggles.js + home/settings/main hooks; AU building js/audio/bgm.js.
+- 2026-10-05 Aaron: async progressive = correct with least revealed wins (DESIGN 'Async progressive scoring'). NOT yet sent to lanes (S owns challenge compare UI). UNVERIFIED: manager's toggles.js/home/settings/main edits — boot-test home first on resume.
+- 2026-10-05 Lane C2b DONE: books 90, quotes 82 speakers/155 q, words 70, history 112, tv 53; review pass fixed 10 packs that build_index was silently dropping; 46 packs indexed 0 errors. Request for M: skip flagDisputed in flag-map.
+- 2026-10-05 Lane AU DONE: 17 music packs (hits by decade, artists, themes, kids, one-hit wonders, classical piano, nursery, 173 anthems, recordings, instruments), Salamander piano 2.5 MB, listen format (stages, artwork, clip length), bgm.js (auto-pause via patched HTMLMediaElement.play + speech duck). Apple CORS works, no proxy needed.
+- 2026-10-05 RESUMED after limit (~4am): S (vote + AU runner requests + async rule), P2P, L, C1 (+ index data/music with path), F, MV all resumed via SendMessage. Manager: packs.js loads index `path` (data/music) + dev scan of music/; flag-map skips facts.flagDisputed; home boot verified (toggles OK); 📅 emoji (always "JUL 17") replaced with a live date badge.
+- 2026-10-05 Lane C1 DONE: 23 packs, 1,160 items, 413 q; c1_test 109/0; 62 packs indexed 0 errors; 2,750 media URLs OK; 79 animal calls. Additive fields documented in CONTRACT.

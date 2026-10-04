@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"log"
+	"math"
 	"sort"
 	"sync"
 	"time"
@@ -17,6 +18,7 @@ const (
 	defaultReveal  = 5000
 	defaultAnswer  = 10000
 	abandonedMs    = 10 * 60 * 1000 // an empty public lobby is dropped so the cap can't be squatted
+	kidsStageMs    = 4000           // kids rooms: progressive stages auto-advance
 	kidsAnswer     = 20000          // kids rooms default to a gentle timer and flat 100 per correct
 )
 
@@ -25,6 +27,7 @@ type Answer struct {
 	Correct bool            `json:"c"`
 	Points  int             `json:"p"`
 	Ms      int             `json:"ms"`
+	Stage   int             `json:"st,omitempty"`
 }
 
 type Player struct {
@@ -66,6 +69,10 @@ type Room struct {
 	Touched   int64             `json:"touched"`
 	NextOrder int               `json:"nextOrder"`
 	Game      int               `json:"game"` // bumps on "play again"
+	Stage     int               `json:"stage"`
+	StageAt   int64             `json:"stageAt"`
+	Votes     map[string]bool   `json:"votes,omitempty"`
+	Locked    bool              `json:"locked,omitempty"`
 	Kids      bool              `json:"kids,omitempty"`
 	Diff      int               `json:"difficulty,omitempty"`
 	Public    bool              `json:"public,omitempty"`
@@ -117,6 +124,9 @@ func (r *Room) buildMeta() {
 	for i, q := range r.Questions {
 		r.meta[i] = parseMeta(q)
 		r.meta[i].LimitMs = r.limitFor(r.meta[i].Format)
+		if n := r.meta[i].Stages; n >= 2 {
+			r.meta[i].LimitMs = max(r.meta[i].LimitMs, progressiveInitial, r.AnswerMs*3/2)
+		}
 	}
 }
 
@@ -311,7 +321,9 @@ func (r *Room) advance() {
 	}
 	r.Q++
 	r.Phase = "question"
+	r.Stage, r.Votes, r.Locked = 0, nil, false
 	r.QStart = now + leadInMs
+	r.StageAt = r.QStart
 	r.QDeadline = r.QStart + int64(r.meta[r.Q].LimitMs)
 	r.RevealAt = 0
 	r.changed()
@@ -391,11 +403,16 @@ func (r *Room) answer(p *Player, in answerIn) (*Answer, string) {
 	} else {
 		p.Streak = 0
 	}
+	stage := r.Stage
+	base = int(math.Round(float64(base) * stageMultiplier(stage, m.Stages)))
 	pts := withStreak(base, p.Streak)
 	if !correct {
 		pts = base
 	}
-	a := &Answer{Given: in.Given, Correct: correct, Points: pts, Ms: ms}
+	a := &Answer{Given: in.Given, Correct: correct, Points: pts, Ms: ms, Stage: stage}
+	if m.Stages >= 2 {
+		r.Locked = true // the first guess freezes the stage for everyone
+	}
 	p.Answers[r.Q] = a
 	p.Score += pts
 	p.LastSeen = now
@@ -484,6 +501,13 @@ func (r *Room) tick(now int64) bool {
 	}
 	switch r.Phase {
 	case "question":
+		if n := r.meta[r.Q].Stages; n >= 2 && !r.Locked && r.Stage < n-1 && now >= r.QStart {
+			if r.Kids && now-r.StageAt >= kidsStageMs {
+				r.setStage(r.Stage + 1)
+			} else if len(r.Votes) > 0 {
+				r.checkVotes(now)
+			}
+		}
 		if now > r.QDeadline+graceMs {
 			r.reveal()
 		} else if now >= r.QStart && r.allAnswered(now) {
@@ -630,6 +654,8 @@ type pubYou struct {
 	Gone    bool     `json:"gone,omitempty"`
 	Last    *pubLast `json:"last,omitempty"`
 	Rank    int      `json:"rank"`
+	Voted   bool     `json:"voted,omitempty"`
+	Stage   int      `json:"stage,omitempty"` // stage you answered at
 }
 
 type pubState struct {
@@ -659,6 +685,11 @@ type pubState struct {
 	Players   []pubPlayer     `json:"players"`
 	You       *pubYou         `json:"you,omitempty"`
 	Expired   bool            `json:"expired,omitempty"`
+	Stage     int             `json:"stage"`
+	Stages    int             `json:"stages,omitempty"`
+	VoteCount int             `json:"votes"`
+	Needed    int             `json:"needed"`
+	Locked    bool            `json:"locked"`
 }
 
 // stateFor must be called with r.mu held.
@@ -671,6 +702,11 @@ func (r *Room) stateFor(viewer *Player) pubState {
 	}
 	if r.Phase == "question" || r.Phase == "reveal" {
 		s.QStart, s.QDeadline, s.LimitMs = r.QStart, r.QDeadline, r.meta[r.Q].LimitMs
+		if n := r.meta[r.Q].Stages; n >= 2 {
+			s.Stage, s.Stages, s.Locked = r.Stage, n, r.Locked
+			s.LimitMs = int(r.QDeadline - r.QStart) // the ring re-targets after extensions
+			s.VoteCount, s.Needed = r.voteNeed(now)
+		}
 	}
 	if r.Phase == "reveal" && r.Auto {
 		s.RevealAt = r.RevealAt
@@ -705,8 +741,10 @@ func (r *Room) stateFor(viewer *Player) pubState {
 		if r.Q >= 0 {
 			if a := viewer.Answers[r.Q]; a != nil {
 				y.Last = &pubLast{a.Correct, a.Points, a.Ms}
+				y.Stage = a.Stage
 			}
 		}
+		y.Voted = r.Votes[viewer.ID]
 		y.Rank = 1
 		for _, p := range act {
 			if p.Score > viewer.Score {
@@ -716,4 +754,61 @@ func (r *Room) stateFor(viewer *Player) pubState {
 		s.You = y
 	}
 	return s
+}
+
+/* ------------------------------------------------------- vote to reveal */
+
+// voteNeed counts connected players who can still answer this question, and their votes.
+func (r *Room) voteNeed(now int64) (votes, needed int) {
+	for _, p := range r.Players {
+		if p.JoinedQ > r.Q || !p.online(now) || p.Answers[r.Q] != nil {
+			continue
+		}
+		needed++
+		if r.Votes[p.ID] {
+			votes++
+		}
+	}
+	return
+}
+
+// setStage advances and extends the deadline: max(current, now + max(5 s, answer/2)),
+// never beyond 90 s from the question start.
+func (r *Room) setStage(s int) {
+	now := nowMs()
+	r.Stage, r.StageAt, r.Votes = s, now, nil
+	ext := now + int64(max(stageExtendMin, r.AnswerMs/2))
+	r.QDeadline = min(max(r.QDeadline, ext), r.QStart+progressiveCap)
+	r.changed()
+}
+
+func (r *Room) checkVotes(now int64) {
+	if v, n := r.voteNeed(now); n > 0 && v >= n {
+		r.setStage(r.Stage + 1)
+	}
+}
+
+func (r *Room) vote(p *Player, q int) string {
+	now := nowMs()
+	switch {
+	case r.Phase != "question" || q != r.Q:
+		return "not_open"
+	case r.meta[r.Q].Stages < 2:
+		return "not_progressive"
+	case now < r.QStart:
+		return "not_open"
+	case r.Locked:
+		return "locked"
+	case r.Stage >= r.meta[r.Q].Stages-1:
+		return "last_stage"
+	case p.JoinedQ > r.Q || p.Answers[r.Q] != nil:
+		return "cannot_vote"
+	}
+	if r.Votes == nil {
+		r.Votes = map[string]bool{}
+	}
+	r.Votes[p.ID] = true
+	r.changed()
+	r.checkVotes(now)
+	return ""
 }

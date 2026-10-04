@@ -106,7 +106,7 @@ export async function packGrid(el, params, cur) {
   if (!single && packs.length > 1) defs.push({ key: '_pack', label: 'Pack', kind: 'chips', get: (it, e) => e.pack.id, opts: packs.map(p => ({ label: `${p.icon || ''} ${p.title}`, test: v => v === p.id })) });
 
   // toolbar
-  const search = h('input.field.l-search', { type: 'search', placeholder: kids ? 'Find…' : `Search ${entries.length}…`, 'aria-label': 'Search', value: st.q });
+  const search = h('input.field.l-search', { type: 'search', placeholder: kids ? 'Find…' : 'Search…', 'aria-label': 'Search', value: st.q });
   const fBtn = h('button.chip.l-fbtn', { type: 'button', 'aria-expanded': String(st.open) }, '⚙︎ Filters');
   const sortSel = h('select.l-sort', { 'aria-label': 'Sort' }, h('option', { value: 'name' }, 'A–Z'));
   const numKeys = single ? Object.entries(single.factsMeta || {}).filter(([k, m]) => (m.type === 'num' || m.type === 'year') && entries.some(e => e.item.facts?.[k] != null)) : [];
@@ -117,7 +117,7 @@ export async function packGrid(el, params, cur) {
   sortSel.value = [...sortSel.options].some(o => o.value === st.sort) ? st.sort : 'name';
   const count = h('span.l-count.muted.tiny');
   const panel = h('div.l-filters', { hidden: !st.open });
-  const tools = h('div.l-tools', {}, search, defs.length ? fBtn : null, h('label.l-sortw', {}, sortSel));
+  const tools = h('div.l-tools', {}, search, defs.length && !kids ? fBtn : null, h('label.l-sortw', {}, sortSel));
   el.append(h('div.l-toolbar', {}, tools, panel, count));
   if (kids) sortSel.parentNode.hidden = true;
 
@@ -157,7 +157,7 @@ export async function packGrid(el, params, cur) {
     const lv = itemLevel(e.ref, m, c);
     const cell = h('button.l-cell', { type: 'button', dataset: { ref: e.ref }, class: img ? '' : 'noimg' });
     if (img) {
-      const wide = img.w && img.h && img.w / img.h > 1.3;
+      const wide = /flag/i.test(img.src) || (img.w && img.h && img.w / img.h > 1.9);
       const im = h('img', { src: img.src, alt: '', loading: 'lazy', decoding: 'async', referrerpolicy: 'no-referrer', draggable: 'false', class: wide ? 'wide' : '' });
       im.addEventListener('error', () => cell.classList.add('broken'), { once: true });
       cell.append(h('span.c-img', {}, im));

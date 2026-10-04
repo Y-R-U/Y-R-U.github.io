@@ -5,6 +5,9 @@
  "icon": "🐞",
  "kids": true,
  "version": 1,
+ "imgPrompt": "Which of these is {aName}?",
+ "nameImgPrompt": "Which insect is this?",
+ "tfImgPrompt": "This is {aName}.",
  "leakExempt": [
   "insect",
   "insects"
@@ -12,13 +15,18 @@
  "factsMeta": {
   "order": {
    "type": "cat",
-   "label": "Insect group"
+   "label": "Insect group",
+   "ask": "Which insect group does the {lname} belong to?",
+   "askReverse": "Which of these belongs to the group \"{value}\"?",
+   "stmt": "The {lname} belongs to the group \"{value}\"."
   },
   "complete": {
    "type": "bool",
    "label": "Has a pupa stage",
    "yes": "Egg, larva, pupa, adult",
-   "no": "Egg, nymph, adult"
+   "no": "Egg, nymph, adult",
+   "askBool": "Which of these insects goes through a pupa stage?",
+   "stmt": "The {lname} goes through a pupa stage as it grows."
   }
  },
  "items": [
@@ -45,10 +53,26 @@
     "Its larvae look like tiny grey alligators.",
     "It goes through a pupa stage as it grows.",
     "The answer has 3 words (5, 4, 8 letters).",
-    "It starts with the letter S."
+    "Its first letter is S."
    ],
    "media": {
     "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/d/de/BIEDRONA.JPG/500px-BIEDRONA.JPG",
+      "w": 500,
+      "h": 500,
+      "credit": "Wikimedia Commons",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:BIEDRONA.JPG"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/0/08/7-Spotted-Ladybug-Coccinella-septempunctata-sq1.jpg/500px-7-Spotted-Ladybug-Coccinella-septempunctata-sq1.jpg",
+      "w": 500,
+      "h": 500,
+      "credit": "Photographer: Dominik Stodulski Graphic Processing: User:MathKnight",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:7-Spotted-Ladybug-Coccinella-septempunctata-sq1.jpg"
+     },
      {
       "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/220339613/medium.jpg",
       "w": 500,
@@ -56,22 +80,6 @@
       "credit": "Casey H. Richart",
       "license": "CC BY 4.0",
       "page": "https://www.inaturalist.org/photos/220339613"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/117983055/medium.jpeg",
-      "w": 500,
-      "h": 375,
-      "credit": "Gianni Del Bufalo bygdb",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/117983055"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/121969195/medium.jpeg",
-      "w": 500,
-      "h": 375,
-      "credit": "Alexis Tinker-Tsavalas",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/121969195"
      }
     ]
    },
@@ -103,33 +111,33 @@
     "It flies thousands of kilometres each year.",
     "It is orange with black veins and shares its name with a king or queen.",
     "The answer has 2 words (7, 9 letters).",
-    "It starts with the letter M."
+    "Its first letter is M."
    ],
    "media": {
     "img": [
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/111043173/medium.jpg",
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/0/0e/Danaus_plexippus_MHNT_femelle.jpg/500px-Danaus_plexippus_MHNT_femelle.jpg",
       "w": 500,
-      "h": 353,
-      "credit": "Christine Young",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/111043173"
+      "h": 620,
+      "credit": "Didier Descouens",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Danaus_plexippus_MHNT_femelle.jpg"
      },
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/1181829/medium.jpg",
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/e/e4/Danaus_plexippus_MHNT.jpg/500px-Danaus_plexippus_MHNT.jpg",
       "w": 500,
-      "h": 460,
-      "credit": "Jon Sullivan",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/1181829"
+      "h": 633,
+      "credit": "Didier Descouens",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Danaus_plexippus_MHNT.jpg"
      },
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/20535817/medium.jpeg",
-      "w": 281,
-      "h": 500,
-      "credit": "naturewatchwidow",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/20535817"
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/9/90/Monarch_caterpillar_%2823229%29.jpg/500px-Monarch_caterpillar_%2823229%29.jpg",
+      "w": 500,
+      "h": 371,
+      "credit": "Rhododendrites",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Monarch_caterpillar_(23229).jpg"
      }
     ]
    },
@@ -158,18 +166,10 @@
     "It goes through a pupa stage as it grows.",
     "It is orange with black and white spots.",
     "The answer has 2 words (7, 4 letters).",
-    "It starts with the letter P."
+    "Its first letter is P."
    ],
    "media": {
     "img": [
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/3347095/medium.jpg",
-      "w": 500,
-      "h": 375,
-      "credit": "Joan C. Hinojosa",
-      "license": "CC0 1.0",
-      "page": "https://www.inaturalist.org/photos/3347095"
-     },
      {
       "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/225355906/medium.jpg",
       "w": 500,
@@ -185,6 +185,14 @@
       "credit": "Shirley Zundell",
       "license": "CC BY 4.0",
       "page": "https://www.inaturalist.org/photos/54031036"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/40181266/medium.jpg",
+      "w": 500,
+      "h": 357,
+      "credit": "Jennifer Kepler",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/40181266"
      }
     ]
    },
@@ -210,7 +218,7 @@
     "It has four big eye-spots on its wings.",
     "It is named after a showy bird.",
     "The answer has 2 words (7, 9 letters).",
-    "It starts with the letter P."
+    "Its first letter is P."
    ],
    "media": {
     "img": [
@@ -264,7 +272,7 @@
     "It goes through a pupa stage as it grows.",
     "It shares its name with a navy officer.",
     "The answer has 2 words (3, 7 letters).",
-    "It starts with the letter R."
+    "Its first letter is R."
    ],
    "media": {
     "img": [
@@ -318,18 +326,10 @@
     "It has one or two black spots on each front wing.",
     "It goes through a pupa stage as it grows.",
     "The answer has 2 words (5, 5 letters).",
-    "It starts with the letter S."
+    "Its first letter is S."
    ],
    "media": {
     "img": [
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/1179645/medium.jpg",
-      "w": 500,
-      "h": 375,
-      "credit": "Jon Sullivan",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/1179645"
-     },
      {
       "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/303721649/medium.jpg",
       "w": 500,
@@ -345,6 +345,14 @@
       "credit": "Fyodor Pudovikov",
       "license": "CC BY 4.0",
       "page": "https://www.inaturalist.org/photos/186022464"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/435816667/medium.jpeg",
+      "w": 375,
+      "h": 500,
+      "credit": "Radu Teodoreanu",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/435816667"
      }
     ]
    },
@@ -369,7 +377,7 @@
     "It lives in Central and South American rainforests.",
     "Its wings are a shining sky colour.",
     "The answer has 2 words (4, 6 letters).",
-    "It starts with the letter B."
+    "Its first letter is B."
    ],
    "media": {
     "img": [
@@ -404,6 +412,7 @@
   {
    "id": "old-world-swallowtail",
    "name": "Old World swallowtail",
+   "lname": "Old World swallowtail",
    "alt": [
     "swallowtail",
     "common yellow swallowtail"
@@ -428,7 +437,7 @@
     "Its back wings have long tails.",
     "It is named after a bird with a forked tail.",
     "The answer has 3 words (3, 5, 11 letters).",
-    "It starts with the letter O."
+    "Its first letter is O."
    ],
    "media": {
     "img": [
@@ -463,6 +472,7 @@
   {
    "id": "ulysses-butterfly",
    "name": "Ulysses butterfly",
+   "lname": "Ulysses butterfly",
    "alt": [
     "blue emperor"
    ],
@@ -486,18 +496,10 @@
     "It lives in north Queensland rainforest.",
     "It is named after a Greek hero.",
     "The answer has 2 words (7, 9 letters).",
-    "It starts with the letter U."
+    "Its first letter is U."
    ],
    "media": {
     "img": [
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/7945775/medium.jpg",
-      "w": 357,
-      "h": 500,
-      "credit": "Bernard DUPONT",
-      "license": "CC BY-SA 4.0",
-      "page": "https://www.inaturalist.org/photos/7945775"
-     },
      {
       "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/45110154/medium.jpeg",
       "w": 375,
@@ -513,6 +515,14 @@
       "credit": "Jane C Frost",
       "license": "CC BY 4.0",
       "page": "https://www.inaturalist.org/photos/383236105"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/111699379/medium.jpg",
+      "w": 280,
+      "h": 500,
+      "credit": "Tony Eales",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/111699379"
      }
     ]
    },
@@ -521,6 +531,7 @@
   {
    "id": "atlas-moth",
    "name": "Atlas moth",
+   "lname": "Atlas moth",
    "sci": "Attacus atlas",
    "group": "moth",
    "facts": {
@@ -537,7 +548,7 @@
     "It goes through a pupa stage as it grows.",
     "It is named after a giant who held up the sky.",
     "The answer has 2 words (5, 4 letters).",
-    "It starts with the letter A."
+    "Its first letter is A."
    ],
    "media": {
     "img": [
@@ -589,7 +600,7 @@
     "It is pale lime green.",
     "Its name means moon.",
     "The answer has 2 words (4, 4 letters).",
-    "It starts with the letter L."
+    "Its first letter is L."
    ],
    "media": {
     "img": [
@@ -641,18 +652,10 @@
     "It is one of the largest moths in Europe.",
     "It has a skull-like pattern on its back.",
     "The answer has 3 words (6, 4, 8 letters).",
-    "It starts with the letter D."
+    "Its first letter is D."
    ],
    "media": {
     "img": [
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/28549593/medium.jpg",
-      "w": 375,
-      "h": 500,
-      "credit": "Rubén F. A.",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/28549593"
-     },
      {
       "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/198536936/medium.jpeg",
       "w": 500,
@@ -668,6 +671,14 @@
       "credit": "Emad Tahaei",
       "license": "CC BY 4.0",
       "page": "https://www.inaturalist.org/photos/586365614"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/116435397/medium.jpeg",
+      "w": 500,
+      "h": 249,
+      "credit": "Tony Rebelo",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/116435397"
      }
     ]
    },
@@ -692,7 +703,7 @@
     "It hovers in front of flowers.",
     "It looks like a tiny bird from the Americas.",
     "The answer has 3 words (11, 4, 4 letters).",
-    "It starts with the letter H."
+    "Its first letter is H."
    ],
    "media": {
     "img": [
@@ -727,6 +738,7 @@
   {
    "id": "bogong-moth",
    "name": "Bogong moth",
+   "lname": "Bogong moth",
    "sci": "Agrotis infusa",
    "group": "moth",
    "facts": {
@@ -743,7 +755,7 @@
     "It goes through a pupa stage as it grows.",
     "Swarms have invaded Parliament House in Canberra.",
     "The answer has 2 words (6, 4 letters).",
-    "It starts with the letter B."
+    "Its first letter is B."
    ],
    "media": {
     "img": [
@@ -798,7 +810,7 @@
     "It was first farmed in China.",
     "Its cocoon is unwound to make a smooth shiny cloth.",
     "The answer has 3 words (8, 4, 4 letters).",
-    "It starts with the letter D."
+    "Its first letter is D."
    ],
    "media": {
     "img": [
@@ -835,10 +847,18 @@
     "Males wrestle with their giant jaws.",
     "The male's jaws look like a deer's antlers.",
     "The answer has 2 words (4, 6 letters).",
-    "It starts with the letter S."
+    "Its first letter is S."
    ],
    "media": {
     "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/9/9d/Lucanus_cervus_ed.JPG/500px-Lucanus_cervus_ed.JPG",
+      "w": 500,
+      "h": 375,
+      "credit": "No machine-readable author provided. E.Dauscher assumed (based on copyright claims).",
+      "license": "CC BY-SA 2.5",
+      "page": "https://commons.wikimedia.org/wiki/File:Lucanus_cervus_ed.JPG"
+     },
      {
       "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/691121156/medium.jpg",
       "w": 500,
@@ -854,14 +874,6 @@
       "credit": "Carminda Santos",
       "license": "CC BY 4.0",
       "page": "https://www.inaturalist.org/photos/47954195"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/520837429/medium.jpg",
-      "w": 500,
-      "h": 376,
-      "credit": "Elias",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/520837429"
      }
     ]
    },
@@ -870,6 +882,7 @@
   {
    "id": "hercules-beetle",
    "name": "Hercules beetle",
+   "lname": "Hercules beetle",
    "sci": "Dynastes hercules",
    "group": "beetle",
    "facts": {
@@ -889,10 +902,18 @@
     "It goes through a pupa stage as it grows.",
     "It is named after a strong Greek hero.",
     "The answer has 2 words (8, 6 letters).",
-    "It starts with the letter H."
+    "Its first letter is H."
    ],
    "media": {
     "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/0/0e/Dynastes_hercules_ecuatorianus_MHNT.jpg/500px-Dynastes_hercules_ecuatorianus_MHNT.jpg",
+      "w": 500,
+      "h": 329,
+      "credit": "Didier Descouens",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Dynastes_hercules_ecuatorianus_MHNT.jpg"
+     },
      {
       "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/18333696/medium.jpeg",
       "w": 500,
@@ -908,14 +929,6 @@
       "credit": "Philip Schaeffer",
       "license": "CC BY 4.0",
       "page": "https://www.inaturalist.org/photos/52637945"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/417651643/medium.jpg",
-      "w": 500,
-      "h": 375,
-      "credit": "Lon Brehmer",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/417651643"
      }
     ]
    },
@@ -924,6 +937,7 @@
   {
    "id": "goliath-beetle",
    "name": "Goliath beetle",
+   "lname": "Goliath beetle",
    "sci": "Goliathus goliatus",
    "group": "beetle",
    "facts": {
@@ -940,7 +954,7 @@
     "It is one of the heaviest insects.",
     "It is named after a giant from the Bible.",
     "The answer has 2 words (7, 6 letters).",
-    "It starts with the letter G."
+    "Its first letter is G."
    ],
    "media": {
     "img": [
@@ -994,7 +1008,7 @@
     "It rolls a ball much bigger than itself.",
     "It eats animal poo.",
     "The answer has 2 words (6, 6 letters).",
-    "It starts with the letter S."
+    "Its first letter is S."
    ],
    "media": {
     "img": [
@@ -1050,10 +1064,18 @@
     "It flashes on summer nights.",
     "Its tail glows in the dark.",
     "The answer has 3 words (6, 7, 7 letters).",
-    "It starts with the letter C."
+    "Its first letter is C."
    ],
    "media": {
     "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/9/9a/Photinus_pyralis_Firefly_3.jpg/500px-Photinus_pyralis_Firefly_3.jpg",
+      "w": 500,
+      "h": 439,
+      "credit": "art farmer from evansville indiana, usa",
+      "license": "CC BY-SA 2.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Photinus_pyralis_Firefly_3.jpg"
+     },
      {
       "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/4202184/medium.jpg",
       "w": 500,
@@ -1069,14 +1091,6 @@
       "credit": "Katja Schulz",
       "license": "CC BY 4.0",
       "page": "https://www.inaturalist.org/photos/139632"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/302090929/medium.jpg",
-      "w": 500,
-      "h": 242,
-      "credit": "Kim H",
-      "license": "CC BY-SA 4.0",
-      "page": "https://www.inaturalist.org/photos/302090929"
      }
     ]
    },
@@ -1085,6 +1099,7 @@
   {
    "id": "christmas-beetle",
    "name": "Christmas beetle",
+   "lname": "Christmas beetle",
    "sci": "Anoplognathus",
    "group": "beetle",
    "facts": {
@@ -1101,7 +1116,7 @@
     "They are shiny gold or brown.",
     "They appear in Australia around the end of December.",
     "The answer has 2 words (9, 6 letters).",
-    "It starts with the letter C."
+    "Its first letter is C."
    ],
    "media": {
     "img": [
@@ -1152,7 +1167,7 @@
     "It makes a popping sound.",
     "It is named after a soldier who fires big guns.",
     "The answer has 2 words (10, 6 letters).",
-    "It starts with the letter B."
+    "Its first letter is B."
    ],
    "media": {
     "img": [
@@ -1187,6 +1202,7 @@
   {
    "id": "colorado-potato-beetle",
    "name": "Colorado potato beetle",
+   "lname": "Colorado potato beetle",
    "sci": "Leptinotarsa decemlineata",
    "group": "beetle",
    "facts": {
@@ -1204,7 +1220,7 @@
     "It strips the leaves off spud plants.",
     "It is named after an American state and a vegetable.",
     "The answer has 3 words (8, 6, 6 letters).",
-    "It starts with the letter C."
+    "Its first letter is C."
    ],
    "media": {
     "img": [
@@ -1255,7 +1271,7 @@
     "It goes through a pupa stage as it grows.",
     "It lays eggs in the nuts of oak trees.",
     "The answer has 2 words (5, 6 letters).",
-    "It starts with the letter A."
+    "Its first letter is A."
    ],
    "media": {
     "img": [
@@ -1290,6 +1306,7 @@
   {
    "id": "european-mantis",
    "name": "European mantis",
+   "lname": "European mantis",
    "alt": [
     "praying mantis",
     "mantis"
@@ -1312,33 +1329,33 @@
     "Its front legs fold up like a pocket knife.",
     "It is a long green insect.",
     "The answer has 2 words (8, 6 letters).",
-    "It starts with the letter E."
+    "Its first letter is E."
    ],
    "media": {
     "img": [
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/264035768/medium.jpg",
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/5/57/Mantis_religiosa_MHNT_enti%C3%A8re.jpg/500px-Mantis_religiosa_MHNT_enti%C3%A8re.jpg",
       "w": 500,
-      "h": 309,
-      "credit": "Charles J. Sharp",
+      "h": 349,
+      "credit": "Didier Descouens",
       "license": "CC BY-SA 4.0",
-      "page": "https://www.inaturalist.org/photos/264035768"
+      "page": "https://commons.wikimedia.org/wiki/File:Mantis_religiosa_MHNT_enti%C3%A8re.jpg"
      },
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/443658457/medium.jpeg",
-      "w": 432,
-      "h": 500,
-      "credit": "Ram Dayal Vaishnav",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/443658457"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/100489354/medium.jpeg",
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/a/a0/Mantid_August_2007-2.jpg/500px-Mantid_August_2007-2.jpg",
       "w": 500,
-      "h": 333,
-      "credit": "Henrik Kibak",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/100489354"
+      "h": 367,
+      "credit": "Alvesgaspar",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Mantid_August_2007-2.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/5/5d/Mantis_religiosa_%28Tsoutsouros%29.jpg/500px-Mantis_religiosa_%28Tsoutsouros%29.jpg",
+      "w": 500,
+      "h": 501,
+      "credit": "PawełMM",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Mantis_religiosa_(Tsoutsouros).jpg"
      }
     ]
    },
@@ -1367,18 +1384,10 @@
     "It is pink and white.",
     "It looks like a famous flower.",
     "The answer has 2 words (6, 6 letters).",
-    "It starts with the letter O."
+    "Its first letter is O."
    ],
    "media": {
     "img": [
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/53268667/medium.jpeg",
-      "w": 500,
-      "h": 333,
-      "credit": "Franz Anthony",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/53268667"
-     },
      {
       "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/356484614/medium.jpg",
       "w": 500,
@@ -1394,6 +1403,14 @@
       "credit": "Cheryl Stinchcomb",
       "license": "CC BY 4.0",
       "page": "https://www.inaturalist.org/photos/168345099"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/154549867/medium.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Cheongweei Gan",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/154549867"
      }
     ]
    },
@@ -1425,7 +1442,7 @@
     "Its young look like small adults; there is no pupa stage.",
     "It is covered in spikes.",
     "The answer has 3 words (5, 4, 6 letters).",
-    "It starts with the letter S."
+    "Its first letter is S."
    ],
    "media": {
     "img": [
@@ -1482,7 +1499,7 @@
     "It is flat and green.",
     "It looks just like part of a plant.",
     "The answer has 2 words (4, 6 letters).",
-    "It starts with the letter L."
+    "Its first letter is L."
    ],
    "media": {
     "img": [
@@ -1539,33 +1556,33 @@
     "Males have a bright blue body.",
     "It is named after a ruler of an empire.",
     "The answer has 2 words (7, 9 letters).",
-    "It starts with the letter E."
+    "Its first letter is E."
    ],
    "media": {
     "img": [
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/205761223/medium.jpeg",
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/0/06/Anax_imperator_qtl2.jpg/500px-Anax_imperator_qtl2.jpg",
       "w": 500,
-      "h": 375,
-      "credit": "Ludivine Lamare",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/205761223"
+      "h": 383,
+      "credit": "Quartl",
+      "license": "CC BY 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Anax_imperator_qtl2.jpg"
      },
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/45937582/medium.jpg",
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/5/5e/Emperor_dragonfly_%28Anax_imperator%29_female.JPG/500px-Emperor_dragonfly_%28Anax_imperator%29_female.JPG",
       "w": 500,
       "h": 333,
-      "credit": "Frank Sengpiel",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/45937582"
+      "credit": "Charles J. Sharp",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Emperor_dragonfly_(Anax_imperator)_female.JPG"
      },
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/17864439/medium.jpeg",
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/f/f9/Anax_imperator_qtl1.jpg/500px-Anax_imperator_qtl1.jpg",
       "w": 500,
-      "h": 444,
-      "credit": "Tony Rebelo",
-      "license": "CC BY-SA 4.0",
-      "page": "https://www.inaturalist.org/photos/17864439"
+      "h": 356,
+      "credit": "Quartl",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Anax_imperator_qtl1.jpg"
      }
     ]
    },
@@ -1597,7 +1614,7 @@
     "Males have a dark patch across each wing.",
     "Its name means young lady.",
     "The answer has 2 words (6, 10 letters).",
-    "It starts with the letter B."
+    "Its first letter is B."
    ],
    "media": {
     "img": [
@@ -1652,18 +1669,10 @@
     "Swarms destroy crops in Africa and Asia.",
     "It is a swarming grasshopper.",
     "The answer has 2 words (6, 6 letters).",
-    "It starts with the letter D."
+    "Its first letter is D."
    ],
    "media": {
     "img": [
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/147713544/medium.jpeg",
-      "w": 500,
-      "h": 332,
-      "credit": "Philipp",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/147713544"
-     },
      {
       "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/575342058/medium.jpg",
       "w": 500,
@@ -1679,6 +1688,14 @@
       "credit": "Joey Bom",
       "license": "CC BY 4.0",
       "page": "https://www.inaturalist.org/photos/77195713"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/575914453/medium.jpg",
+      "w": 500,
+      "h": 278,
+      "credit": "Bernard DUPONT",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/575914453"
      }
     ]
    },
@@ -1707,7 +1724,7 @@
     "It has very long antennae.",
     "It shares its name with a bat-and-ball game.",
     "The answer has 2 words (5, 7 letters).",
-    "It starts with the letter H."
+    "Its first letter is H."
    ],
    "media": {
     "img": [
@@ -1761,7 +1778,7 @@
     "Its young look like small adults; there is no pupa stage.",
     "It sings on hot summer days in Australia.",
     "The answer has 3 words (5, 6, 6 letters).",
-    "It starts with the letter G."
+    "Its first letter is G."
    ],
    "media": {
     "img": [
@@ -1815,7 +1832,7 @@
     "It lives underground for 17 years.",
     "It appears only once every many years.",
     "The answer has 2 words (10, 6 letters).",
-    "It starts with the letter P."
+    "Its first letter is P."
    ],
    "media": {
     "img": [
@@ -1867,7 +1884,7 @@
     "It tops the Schmidt sting pain index.",
     "Its sting is said to feel like being shot.",
     "The answer has 2 words (6, 3 letters).",
-    "It starts with the letter B."
+    "Its first letter is B."
    ],
    "media": {
     "img": [
@@ -1919,10 +1936,26 @@
     "Lines of them march through the rainforest.",
     "They cut pieces out of leaves.",
     "The answer has 2 words (10, 3 letters).",
-    "It starts with the letter L."
+    "Its first letter is L."
    ],
    "media": {
     "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/4/48/LeafAnt.jpg/500px-LeafAnt.jpg",
+      "w": 500,
+      "h": 532,
+      "credit": "Wikimedia Commons",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:LeafAnt.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/5/5f/Atta_cephalotes-pjt.jpg/500px-Atta_cephalotes-pjt.jpg",
+      "w": 500,
+      "h": 352,
+      "credit": "Pjt56",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Atta_cephalotes-pjt.jpg"
+     },
      {
       "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/180119/medium.jpg",
       "w": 500,
@@ -1930,22 +1963,6 @@
       "credit": "Biosedbergh",
       "license": "CC BY 4.0",
       "page": "https://www.inaturalist.org/photos/180119"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/468166997/medium.jpg",
-      "w": 500,
-      "h": 411,
-      "credit": "avocat",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/468166997"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/431454036/medium.jpeg",
-      "w": 500,
-      "h": 375,
-      "credit": "Scott Allen Davis",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/431454036"
      }
     ]
    },
@@ -1973,7 +1990,7 @@
     "They build nests by sewing leaves together.",
     "It goes through a pupa stage as it grows.",
     "The answer has 3 words (5, 4, 3 letters).",
-    "It starts with the letter G."
+    "Its first letter is G."
    ],
    "media": {
     "img": [
@@ -2028,7 +2045,7 @@
     "Its sting leaves white pimples.",
     "Its sting burns like a flame.",
     "The answer has 4 words (3, 8, 4, 3 letters).",
-    "It starts with the letter R."
+    "Its first letter is R."
    ],
    "media": {
     "img": [
@@ -2063,6 +2080,7 @@
   {
    "id": "american-cockroach",
    "name": "American cockroach",
+   "lname": "American cockroach",
    "alt": [
     "cockroach"
    ],
@@ -2083,10 +2101,18 @@
     "It is a large reddish-brown kitchen pest.",
     "Despite its name, it probably came from Africa.",
     "The answer has 2 words (8, 9 letters).",
-    "It starts with the letter A."
+    "Its first letter is A."
    ],
    "media": {
     "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/3/3b/American-cockroach.jpg/500px-American-cockroach.jpg",
+      "w": 500,
+      "h": 303,
+      "credit": "Gary Alpert",
+      "license": "CC BY 2.5",
+      "page": "https://commons.wikimedia.org/wiki/File:American-cockroach.jpg"
+     },
      {
       "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/50490584/medium.jpg",
       "w": 500,
@@ -2102,14 +2128,6 @@
       "credit": "dilettantiquity",
       "license": "CC BY-SA 4.0",
       "page": "https://www.inaturalist.org/photos/20941811"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/270654692/medium.jpg",
-      "w": 500,
-      "h": 375,
-      "credit": "Christina S. Baer",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/270654692"
      }
     ]
    },
@@ -2137,7 +2155,7 @@
     "It eats grass.",
     "Its mounds act like a compass.",
     "The answer has 2 words (8, 7 letters).",
-    "It starts with the letter M."
+    "Its first letter is M."
    ],
    "media": {
     "img": [
@@ -2192,10 +2210,26 @@
     "It goes through a pupa stage as it grows.",
     "It buzzes around kitchens.",
     "The answer is one word of 8 letters.",
-    "It starts with the letter H."
+    "Its first letter is H."
    ],
    "media": {
     "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/a/a9/Musca.domestica.female.jpg/500px-Musca.domestica.female.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "James K. Lindsey",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Musca.domestica.female.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/14/Common_house_fly%2C_Musca_domestica.jpg/500px-Common_house_fly%2C_Musca_domestica.jpg",
+      "w": 500,
+      "h": 379,
+      "credit": "USDAgov",
+      "license": "CC BY 2.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Common_house_fly,_Musca_domestica.jpg"
+     },
      {
       "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/79611144/medium.jpeg",
       "w": 500,
@@ -2203,22 +2237,6 @@
       "credit": "Richard Fuller",
       "license": "CC0 1.0",
       "page": "https://www.inaturalist.org/photos/79611144"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/112795205/medium.jpeg",
-      "w": 500,
-      "h": 448,
-      "credit": "Helio Lourencini",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/112795205"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/61848581/medium.jpg",
-      "w": 500,
-      "h": 375,
-      "credit": "no rights reserved",
-      "license": "CC0 1.0",
-      "page": "https://www.inaturalist.org/photos/61848581"
      }
     ]
    },
@@ -2247,10 +2265,18 @@
     "Its legs have white bands.",
     "Its bite leaves an itchy bump.",
     "The answer has 3 words (6, 5, 8 letters).",
-    "It starts with the letter Y."
+    "Its first letter is Y."
    ],
    "media": {
     "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/2/2c/Aedes_aegypti_CDC-Gathany.jpg/500px-Aedes_aegypti_CDC-Gathany.jpg",
+      "w": 500,
+      "h": 336,
+      "credit": "James Gathany",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Aedes_aegypti_CDC-Gathany.jpg"
+     },
      {
       "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/362299804/medium.jpeg",
       "w": 500,
@@ -2266,14 +2292,6 @@
       "credit": "Jesse Rorabaugh",
       "license": "CC0 1.0",
       "page": "https://www.inaturalist.org/photos/27141865"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/27141854/medium.jpg",
-      "w": 500,
-      "h": 431,
-      "credit": "Jesse Rorabaugh",
-      "license": "CC0 1.0",
-      "page": "https://www.inaturalist.org/photos/27141854"
      }
     ]
    },
@@ -2302,10 +2320,26 @@
     "An old myth says it crawls into ears.",
     "It has pincers on its tail end.",
     "The answer has 2 words (6, 6 letters).",
-    "It starts with the letter C."
+    "Its first letter is C."
    ],
    "media": {
     "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/6/6e/European_earwig_%2881241%29.jpg/500px-European_earwig_%2881241%29.jpg",
+      "w": 500,
+      "h": 618,
+      "credit": "Rhododendrites",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:European_earwig_(81241).jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/0/0d/%28MHNT%29_Forficula_auricularia_%28female%29.jpg/500px-%28MHNT%29_Forficula_auricularia_%28female%29.jpg",
+      "w": 500,
+      "h": 349,
+      "credit": "Didier Descouens",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:(MHNT)_Forficula_auricularia_(female).jpg"
+     },
      {
       "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/102776701/medium.jpg",
       "w": 500,
@@ -2313,22 +2347,6 @@
       "credit": "Katja Schulz",
       "license": "CC BY 4.0",
       "page": "https://www.inaturalist.org/photos/102776701"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/102776704/medium.jpg",
-      "w": 500,
-      "h": 347,
-      "credit": "Judy Gallagher",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/102776704"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/549208953/medium.gif",
-      "w": 500,
-      "h": 500,
-      "credit": "Tynen Benson",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/549208953"
      }
     ]
    },
@@ -2357,7 +2375,7 @@
     "They live in New Zealand.",
     "Their Māori name is four letters long.",
     "The answer has 2 words (5, 4 letters).",
-    "It starts with the letter G."
+    "Its first letter is G."
    ],
    "media": {
     "img": [
@@ -2411,7 +2429,7 @@
     "Its young look like small adults; there is no pupa stage.",
     "It has long thin legs.",
     "The answer has 3 words (6, 4, 6 letters).",
-    "It starts with the letter C."
+    "Its first letter is C."
    ],
    "media": {
     "img": [
@@ -2465,7 +2483,7 @@
     "It gives off a bad smell when scared.",
     "Its young look like small adults; there is no pupa stage.",
     "The answer has 3 words (5, 6, 3 letters).",
-    "It starts with the letter G."
+    "Its first letter is G."
    ],
    "media": {
     "img": [
@@ -2520,7 +2538,7 @@
     "It sucks sap from plants.",
     "It is a tiny sap-sucking pest of beans and clover.",
     "The answer has 2 words (3, 5 letters).",
-    "It starts with the letter P."
+    "Its first letter is P."
    ],
    "media": {
     "img": [
@@ -2572,7 +2590,7 @@
     "It wriggles like a fish when it runs.",
     "It is covered in shiny grey scales.",
     "The answer is one word of 10 letters.",
-    "It starts with the letter S."
+    "Its first letter is S."
    ],
    "media": {
     "img": [
@@ -2623,18 +2641,10 @@
     "Its larva digs a pit trap in sand.",
     "It is named after an insect and a big cat.",
     "The answer is one word of 7 letters.",
-    "It starts with the letter A."
+    "Its first letter is A."
    ],
    "media": {
     "img": [
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/287217788/medium.jpg",
-      "w": 500,
-      "h": 375,
-      "credit": "Konstantin Grebennikov",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/287217788"
-     },
      {
       "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/11079517/medium.jpg",
       "w": 459,
@@ -2650,6 +2660,14 @@
       "credit": "Julien Tchilinguirian",
       "license": "CC BY 4.0",
       "page": "https://www.inaturalist.org/photos/158193040"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/10800614/medium.jpeg",
+      "w": 455,
+      "h": 500,
+      "credit": "Kostas Zontanos",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/10800614"
      }
     ]
    },
@@ -2677,7 +2695,7 @@
     "It goes through a pupa stage as it grows.",
     "Its wings are clear with a net of veins.",
     "The answer has 2 words (5, 8 letters).",
-    "It starts with the letter G."
+    "Its first letter is G."
    ],
    "media": {
     "img": [

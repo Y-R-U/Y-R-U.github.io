@@ -1,0 +1,1670 @@
+{
+ "id": "kids-nature",
+ "title": "Kids: animals & nature",
+ "theme": "kids",
+ "icon": "🧸",
+ "kids": true,
+ "version": 1,
+ "factsMeta": {},
+ "items": [],
+ "questions": [
+  {
+   "id": "pic1",
+   "kind": "mc",
+   "prompt": "What is this?",
+   "answer": "Lion",
+   "wrong": [
+    "Tiger",
+    "Bear",
+    "Wolf"
+   ],
+   "explain": "Lions live in Africa. The males have a big mane.",
+   "difficulty": 1,
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/f/f8/Lion_in_masai_mara.jpg/500px-Lion_in_masai_mara.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Sumit.pamnani at English Wikipedia",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Lion_in_masai_mara.jpg"
+     }
+    ]
+   }
+  },
+  {
+   "id": "pic2",
+   "kind": "mc",
+   "prompt": "What is this?",
+   "answer": "Tiger",
+   "wrong": [
+    "Lion",
+    "Cheetah",
+    "Zebra"
+   ],
+   "explain": "Tigers are the biggest cats. Every tiger has different stripes.",
+   "difficulty": 1,
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/6/66/Adult_male_Royal_Bengal_tiger.jpg/500px-Adult_male_Royal_Bengal_tiger.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Seemaleena",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Adult_male_Royal_Bengal_tiger.jpg"
+     }
+    ]
+   }
+  },
+  {
+   "id": "pic3",
+   "kind": "mc",
+   "prompt": "What is this?",
+   "answer": "Elephant",
+   "wrong": [
+    "Hippo",
+    "Rhino",
+    "Giraffe"
+   ],
+   "explain": "Elephants use their trunks to drink and smell.",
+   "difficulty": 1,
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/9/94/178_Male_African_bush_elephant_in_Etosha_National_Park_Photo_by_Giles_Laurent.jpg/500px-178_Male_African_bush_elephant_in_Etosha_National_Park_Photo_by_Giles_Laurent.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Giles Laurent",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:178_Male_African_bush_elephant_in_Etosha_National_Park_Photo_by_Giles_Laurent.jpg"
+     }
+    ]
+   }
+  },
+  {
+   "id": "pic4",
+   "kind": "mc",
+   "prompt": "What is this?",
+   "answer": "Giraffe",
+   "wrong": [
+    "Zebra",
+    "Camel",
+    "Horse"
+   ],
+   "explain": "Giraffes are the tallest animals in the world.",
+   "difficulty": 1,
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/6/68/Giraffen.jpg/500px-Giraffen.jpg",
+      "w": 500,
+      "h": 444,
+      "credit": "John Walker",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Giraffen.jpg"
+     }
+    ]
+   }
+  },
+  {
+   "id": "pic5",
+   "kind": "mc",
+   "prompt": "What is this?",
+   "answer": "Zebra",
+   "wrong": [
+    "Horse",
+    "Giraffe",
+    "Tiger"
+   ],
+   "explain": "Zebras are wild horses with stripes.",
+   "difficulty": 1,
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/e/eb/GrantsZebra2.jpg/500px-GrantsZebra2.jpg",
+      "w": 500,
+      "h": 428,
+      "credit": "Ltshears",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:GrantsZebra2.jpg"
+     }
+    ]
+   }
+  },
+  {
+   "id": "pic6",
+   "kind": "mc",
+   "prompt": "What is this?",
+   "answer": "Kangaroo",
+   "wrong": [
+    "Koala",
+    "Rabbit",
+    "Wombat"
+   ],
+   "explain": "Kangaroos hop and carry their babies in a pouch.",
+   "difficulty": 1,
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/167963905/medium.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "dhfischer",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/167963905"
+     }
+    ]
+   }
+  },
+  {
+   "id": "pic7",
+   "kind": "mc",
+   "prompt": "What is this?",
+   "answer": "Koala",
+   "wrong": [
+    "Kangaroo",
+    "Panda",
+    "Wombat"
+   ],
+   "explain": "Koalas sleep a lot and eat gum leaves.",
+   "difficulty": 1,
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/4/49/Koala_climbing_tree.jpg/500px-Koala_climbing_tree.jpg",
+      "w": 500,
+      "h": 492,
+      "credit": "Diliff",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Koala_climbing_tree.jpg"
+     }
+    ]
+   }
+  },
+  {
+   "id": "pic8",
+   "kind": "mc",
+   "prompt": "What is this?",
+   "answer": "Panda",
+   "wrong": [
+    "Koala",
+    "Polar bear",
+    "Raccoon"
+   ],
+   "explain": "Pandas eat bamboo for most of the day.",
+   "difficulty": 1,
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/3/3c/Giant_Panda_2004-03-2.jpg/500px-Giant_Panda_2004-03-2.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Jeff Kubina",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Giant_Panda_2004-03-2.jpg"
+     }
+    ]
+   }
+  },
+  {
+   "id": "pic9",
+   "kind": "mc",
+   "prompt": "What is this?",
+   "answer": "Polar bear",
+   "wrong": [
+    "Panda",
+    "Wolf",
+    "Seal"
+   ],
+   "explain": "Polar bears live in the icy Arctic.",
+   "difficulty": 1,
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/6/66/Polar_Bear_-_Alaska_%28cropped%29.jpg/500px-Polar_Bear_-_Alaska_%28cropped%29.jpg",
+      "w": 500,
+      "h": 502,
+      "credit": "Alan Wilson",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Polar_Bear_-_Alaska_(cropped).jpg"
+     }
+    ]
+   }
+  },
+  {
+   "id": "pic10",
+   "kind": "mc",
+   "prompt": "What is this?",
+   "answer": "Platypus",
+   "wrong": [
+    "Duck",
+    "Beaver",
+    "Otter"
+   ],
+   "explain": "The platypus is a mammal that lays eggs.",
+   "difficulty": 1,
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/1a/Duck-billed_platypus_%28Ornithorhynchus_anatinus%29_Scottsdale.jpg/500px-Duck-billed_platypus_%28Ornithorhynchus_anatinus%29_Scottsdale.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Charles J. Sharp",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Duck-billed_platypus_(Ornithorhynchus_anatinus)_Scottsdale.jpg"
+     }
+    ]
+   }
+  },
+  {
+   "id": "pic11",
+   "kind": "mc",
+   "prompt": "What is this?",
+   "answer": "Penguin",
+   "wrong": [
+    "Puffin",
+    "Duck",
+    "Seagull"
+   ],
+   "explain": "Penguins cannot fly, but they swim very well.",
+   "difficulty": 1,
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/a/a3/Aptenodytes_forsteri_-Snow_Hill_Island%2C_Antarctica_-adults_and_juvenile-8.jpg/330px-Aptenodytes_forsteri_-Snow_Hill_Island%2C_Antarctica_-adults_and_juvenile-8.jpg",
+      "w": 330,
+      "h": 530,
+      "credit": "Ian Duffy from UK",
+      "license": "CC BY 2.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Aptenodytes_forsteri_-Snow_Hill_Island,_Antarctica_-adults_and_juvenile-8.jpg"
+     }
+    ]
+   }
+  },
+  {
+   "id": "pic12",
+   "kind": "mc",
+   "prompt": "What is this?",
+   "answer": "Flamingo",
+   "wrong": [
+    "Swan",
+    "Parrot",
+    "Stork"
+   ],
+   "explain": "Flamingos are pink because of the food they eat.",
+   "difficulty": 1,
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/15/Flamant_rose_Thyna009.jpg/330px-Flamant_rose_Thyna009.jpg",
+      "w": 330,
+      "h": 440,
+      "credit": "El Golli Mohamed",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Flamant_rose_Thyna009.jpg"
+     }
+    ]
+   }
+  },
+  {
+   "id": "pic13",
+   "kind": "mc",
+   "prompt": "What is this?",
+   "answer": "Parrot",
+   "wrong": [
+    "Owl",
+    "Penguin",
+    "Eagle"
+   ],
+   "explain": "This parrot is a scarlet macaw from South America.",
+   "difficulty": 1,
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/4/47/Scarlet_macaw_%28Ara_macao_cyanopterus%29_Copan.jpg/500px-Scarlet_macaw_%28Ara_macao_cyanopterus%29_Copan.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Charles J. Sharp",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Scarlet_macaw_(Ara_macao_cyanopterus)_Copan.jpg"
+     }
+    ]
+   }
+  },
+  {
+   "id": "pic14",
+   "kind": "mc",
+   "prompt": "What is this?",
+   "answer": "Owl",
+   "wrong": [
+    "Eagle",
+    "Parrot",
+    "Duck"
+   ],
+   "explain": "Owls hunt at night and have great hearing.",
+   "difficulty": 1,
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/9/9e/American_Barn_Owl_%28Tyto_furcata_guatemalae%29%2C_Orange_Walk.jpg/330px-American_Barn_Owl_%28Tyto_furcata_guatemalae%29%2C_Orange_Walk.jpg",
+      "w": 330,
+      "h": 495,
+      "credit": "Charles J. Sharp",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:American_Barn_Owl_(Tyto_furcata_guatemalae),_Orange_Walk.jpg"
+     }
+    ]
+   }
+  },
+  {
+   "id": "pic15",
+   "kind": "mc",
+   "prompt": "What is this?",
+   "answer": "Kookaburra",
+   "wrong": [
+    "Penguin",
+    "Emu",
+    "Flamingo"
+   ],
+   "explain": "A kookaburra's call sounds like laughing.",
+   "difficulty": 1,
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/19/Dacelo_novaeguineae_waterworks.jpg/500px-Dacelo_novaeguineae_waterworks.jpg",
+      "w": 500,
+      "h": 366,
+      "credit": "JJ Harrison (https://www.jjharrison.com.au/)",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Dacelo_novaeguineae_waterworks.jpg"
+     }
+    ]
+   }
+  },
+  {
+   "id": "pic16",
+   "kind": "mc",
+   "prompt": "What is this?",
+   "answer": "Emu",
+   "wrong": [
+    "Ostrich",
+    "Penguin",
+    "Kiwi"
+   ],
+   "explain": "Emus are Australian birds that cannot fly but run fast.",
+   "difficulty": 1,
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/9/9d/Emu_1_-_Tidbinbilla.jpg/500px-Emu_1_-_Tidbinbilla.jpg",
+      "w": 500,
+      "h": 400,
+      "credit": "JJ Harrison (https://www.jjharrison.com.au/)",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Emu_1_-_Tidbinbilla.jpg"
+     }
+    ]
+   }
+  },
+  {
+   "id": "pic17",
+   "kind": "mc",
+   "prompt": "What is this?",
+   "answer": "Shark",
+   "wrong": [
+    "Dolphin",
+    "Whale",
+    "Seal"
+   ],
+   "explain": "Sharks are fish with lots of sharp teeth.",
+   "difficulty": 1,
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/0/0e/Carcharodon_carcharias.jpg/500px-Carcharodon_carcharias.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Sharkdiver.com",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Carcharodon_carcharias.jpg"
+     }
+    ]
+   }
+  },
+  {
+   "id": "pic18",
+   "kind": "mc",
+   "prompt": "What is this?",
+   "answer": "Dolphin",
+   "wrong": [
+    "Shark",
+    "Seal",
+    "Penguin"
+   ],
+   "explain": "Dolphins are mammals that breathe air.",
+   "difficulty": 1,
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/b/bc/Tursiops_truncatus_01-cropped.jpg/500px-Tursiops_truncatus_01-cropped.jpg",
+      "w": 500,
+      "h": 370,
+      "credit": "NASA",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Tursiops_truncatus_01-cropped.jpg"
+     }
+    ]
+   }
+  },
+  {
+   "id": "pic19",
+   "kind": "mc",
+   "prompt": "What is this?",
+   "answer": "Octopus",
+   "wrong": [
+    "Jellyfish",
+    "Crab",
+    "Starfish"
+   ],
+   "explain": "An octopus has eight arms.",
+   "difficulty": 1,
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/3/32/Octopus_vulgaris_Merculiano.jpg/500px-Octopus_vulgaris_Merculiano.jpg",
+      "w": 500,
+      "h": 556,
+      "credit": "Comingio Merculiano (1845-1915) in Jatta Giuseppe (1860-1903)",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Octopus_vulgaris_Merculiano.jpg"
+     }
+    ]
+   }
+  },
+  {
+   "id": "pic20",
+   "kind": "mc",
+   "prompt": "What is this?",
+   "answer": "Turtle",
+   "wrong": [
+    "Crab",
+    "Seal",
+    "Fish"
+   ],
+   "explain": "Sea turtles lay their eggs on beaches.",
+   "difficulty": 1,
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/a/a3/Green_sea_turtle_%28Chelonia_mydas%29_Moorea.jpg/500px-Green_sea_turtle_%28Chelonia_mydas%29_Moorea.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Charles J. Sharp",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Green_sea_turtle_(Chelonia_mydas)_Moorea.jpg"
+     }
+    ]
+   }
+  },
+  {
+   "id": "pic21",
+   "kind": "mc",
+   "prompt": "What is this?",
+   "answer": "Clownfish",
+   "wrong": [
+    "Shark",
+    "Jellyfish",
+    "Turtle"
+   ],
+   "explain": "Clownfish live in sea anemones. Nemo is one!",
+   "difficulty": 1,
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/e/ef/Clownfisch_%28Amphiprion_ocellaris%29.jpg/500px-Clownfisch_%28Amphiprion_ocellaris%29.jpg",
+      "w": 500,
+      "h": 358,
+      "credit": "Raimond Spekking",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Clownfisch_(Amphiprion_ocellaris).jpg"
+     }
+    ]
+   }
+  },
+  {
+   "id": "pic22",
+   "kind": "mc",
+   "prompt": "What is this?",
+   "answer": "Starfish",
+   "wrong": [
+    "Crab",
+    "Octopus",
+    "Jellyfish"
+   ],
+   "explain": "Starfish can grow back lost arms.",
+   "difficulty": 1,
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/8/89/Ochre_sea_star.jpg/500px-Ochre_sea_star.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "D. Gordon E. Robertson",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Ochre_sea_star.jpg"
+     }
+    ]
+   }
+  },
+  {
+   "id": "pic23",
+   "kind": "mc",
+   "prompt": "What is this?",
+   "answer": "Jellyfish",
+   "wrong": [
+    "Octopus",
+    "Starfish",
+    "Fish"
+   ],
+   "explain": "Jellyfish have no brain and no bones.",
+   "difficulty": 1,
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/7/7c/Vandmaend.jpg/500px-Vandmaend.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Wikimedia Commons",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Vandmaend.jpg"
+     }
+    ]
+   }
+  },
+  {
+   "id": "pic24",
+   "kind": "mc",
+   "prompt": "What is this?",
+   "answer": "Ladybird",
+   "wrong": [
+    "Bee",
+    "Spider",
+    "Ant"
+   ],
+   "explain": "Ladybirds are beetles that eat garden pests.",
+   "difficulty": 1,
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/d/de/BIEDRONA.JPG/500px-BIEDRONA.JPG",
+      "w": 500,
+      "h": 500,
+      "credit": "Wikimedia Commons",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:BIEDRONA.JPG"
+     }
+    ]
+   }
+  },
+  {
+   "id": "pic25",
+   "kind": "mc",
+   "prompt": "What is this?",
+   "answer": "Butterfly",
+   "wrong": [
+    "Bee",
+    "Moth",
+    "Dragonfly"
+   ],
+   "explain": "Butterflies start life as caterpillars.",
+   "difficulty": 1,
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/0/0e/Danaus_plexippus_MHNT_femelle.jpg/500px-Danaus_plexippus_MHNT_femelle.jpg",
+      "w": 500,
+      "h": 620,
+      "credit": "Didier Descouens",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Danaus_plexippus_MHNT_femelle.jpg"
+     }
+    ]
+   }
+  },
+  {
+   "id": "pic26",
+   "kind": "mc",
+   "prompt": "What is this?",
+   "answer": "Bee",
+   "wrong": [
+    "Wasp",
+    "Fly",
+    "Ladybird"
+   ],
+   "explain": "Honey bees make honey from flower nectar.",
+   "difficulty": 1,
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/8/8e/Bees-wings.web.jpg/500px-Bees-wings.web.jpg",
+      "w": 500,
+      "h": 417,
+      "credit": "Wikimedia Commons",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Bees-wings.web.jpg"
+     }
+    ]
+   }
+  },
+  {
+   "id": "pic27",
+   "kind": "mc",
+   "prompt": "What is this?",
+   "answer": "Frog",
+   "wrong": [
+    "Lizard",
+    "Snake",
+    "Turtle"
+   ],
+   "explain": "Frogs start life as tadpoles.",
+   "difficulty": 1,
+   "media": {
+    "img": [
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/289704612/medium.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Luke Padon",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/289704612"
+     }
+    ]
+   }
+  },
+  {
+   "id": "pic28",
+   "kind": "mc",
+   "prompt": "What is this?",
+   "answer": "Crocodile",
+   "wrong": [
+    "Lizard",
+    "Snake",
+    "Turtle"
+   ],
+   "explain": "Crocodiles are reptiles with very strong jaws.",
+   "difficulty": 1,
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/7/78/Laurie%27s_crocodile_in_the_garden.jpg/500px-Laurie%27s_crocodile_in_the_garden.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Laubarr",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Laurie%27s_crocodile_in_the_garden.jpg"
+     }
+    ]
+   }
+  },
+  {
+   "id": "pic29",
+   "kind": "mc",
+   "prompt": "What is this?",
+   "answer": "Snake",
+   "wrong": [
+    "Lizard",
+    "Worm",
+    "Frog"
+   ],
+   "explain": "Snakes have no legs. This one is a green tree python.",
+   "difficulty": 1,
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/4/44/M._viridis.jpg/500px-M._viridis.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "TarnishedPath",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:M._viridis.jpg"
+     }
+    ]
+   }
+  },
+  {
+   "id": "pic30",
+   "kind": "mc",
+   "prompt": "What is this?",
+   "answer": "T. rex",
+   "wrong": [
+    "Triceratops",
+    "Stegosaurus",
+    "Diplodocus"
+   ],
+   "explain": "T. rex was a huge meat-eating dinosaur.",
+   "difficulty": 1,
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/d/d2/Tyrannosaurus_rex_Reconstruction_by_Nobu_Tamura.jpg/500px-Tyrannosaurus_rex_Reconstruction_by_Nobu_Tamura.jpg",
+      "w": 500,
+      "h": 202,
+      "credit": "Nobu Tamura",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Tyrannosaurus_rex_Reconstruction_by_Nobu_Tamura.jpg"
+     }
+    ]
+   }
+  },
+  {
+   "id": "pic31",
+   "kind": "mc",
+   "prompt": "What is this?",
+   "answer": "Sunflower",
+   "wrong": [
+    "Rose",
+    "Tulip",
+    "Daisy"
+   ],
+   "explain": "Sunflowers grow very tall and have big yellow heads.",
+   "difficulty": 1,
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/b/bd/Helianthus_annuus_exposed_2004-05-22.jpg/330px-Helianthus_annuus_exposed_2004-05-22.jpg",
+      "w": 330,
+      "h": 440,
+      "credit": "Jon Sullivan",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Helianthus_annuus_exposed_2004-05-22.jpg"
+     }
+    ]
+   }
+  },
+  {
+   "id": "pic32",
+   "kind": "mc",
+   "prompt": "What is this?",
+   "answer": "Tulip",
+   "wrong": [
+    "Rose",
+    "Sunflower",
+    "Daisy"
+   ],
+   "explain": "Tulips grow from bulbs in spring.",
+   "difficulty": 1,
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/e/ea/Tulipa_suaveolens_floriade_to_Canberra.jpg/330px-Tulipa_suaveolens_floriade_to_Canberra.jpg",
+      "w": 330,
+      "h": 440,
+      "credit": "John O'Neill",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Tulipa_suaveolens_floriade_to_Canberra.jpg"
+     }
+    ]
+   }
+  },
+  {
+   "id": "pic33",
+   "kind": "mc",
+   "prompt": "What is this?",
+   "answer": "Saturn",
+   "wrong": [
+    "Mars",
+    "Earth",
+    "Moon"
+   ],
+   "explain": "Saturn is the planet with the famous rings.",
+   "difficulty": 1,
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/f/fb/Saturn%2C_Four_Years_On%2C_by_ISS.tif/lossy-page1-500px-Saturn%2C_Four_Years_On%2C_by_ISS.tif.jpg",
+      "w": 500,
+      "h": 242,
+      "credit": "NASA",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Saturn,_Four_Years_On,_by_ISS.tif"
+     }
+    ]
+   }
+  },
+  {
+   "id": "pic34",
+   "kind": "mc",
+   "prompt": "What is this?",
+   "answer": "The Moon",
+   "wrong": [
+    "The Sun",
+    "Mars",
+    "A star"
+   ],
+   "explain": "The Moon goes around the Earth.",
+   "difficulty": 1,
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/e/e1/FullMoon2010.jpg/500px-FullMoon2010.jpg",
+      "w": 500,
+      "h": 475,
+      "credit": "Gregory H. Revera",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:FullMoon2010.jpg"
+     }
+    ]
+   }
+  },
+  {
+   "id": "snd1",
+   "kind": "mc",
+   "prompt": "Listen! Which animal makes this sound?",
+   "answer": "Lion",
+   "wrong": [
+    "Elephant",
+    "Wolf",
+    "Owl"
+   ],
+   "explain": "That was a lion.",
+   "difficulty": 1,
+   "media": {
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/7/7d/Lion_raring-sound1TamilNadu178.ogg/Lion_raring-sound1TamilNadu178.ogg.mp3",
+      "credit": "த*உழவன்",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Lion_raring-sound1TamilNadu178.ogg",
+      "start": 0
+     }
+    ]
+   }
+  },
+  {
+   "id": "snd2",
+   "kind": "mc",
+   "prompt": "Listen! Which animal makes this sound?",
+   "answer": "Wolf",
+   "wrong": [
+    "Lion",
+    "Frog",
+    "Elephant"
+   ],
+   "explain": "That was a wolf.",
+   "difficulty": 1,
+   "media": {
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/8/87/Wolf_howls.ogg/Wolf_howls.ogg.mp3",
+      "credit": "Wikimedia Commons",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Wolf_howls.ogg",
+      "start": 0
+     }
+    ]
+   }
+  },
+  {
+   "id": "snd3",
+   "kind": "mc",
+   "prompt": "Listen! Which animal makes this sound?",
+   "answer": "Elephant",
+   "wrong": [
+    "Lion",
+    "Wolf",
+    "Bird"
+   ],
+   "explain": "That was an elephant.",
+   "difficulty": 1,
+   "media": {
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/4/40/Elephant_voice_-_trumpeting.ogg/Elephant_voice_-_trumpeting.ogg.mp3",
+      "credit": "தகவலுழவன்",
+      "license": "CC0 1.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Elephant_voice_-_trumpeting.ogg",
+      "start": 0
+     }
+    ]
+   }
+  },
+  {
+   "id": "snd4",
+   "kind": "mc",
+   "prompt": "Listen! Which animal makes this sound?",
+   "answer": "Chimpanzee",
+   "wrong": [
+    "Lion",
+    "Elephant",
+    "Wolf"
+   ],
+   "explain": "That was a chimpanzee.",
+   "difficulty": 1,
+   "media": {
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/a/af/Chimpanzee-Alarm-Call-Production-Meets-Key-Criteria-for-Intentionality-pone.0076674.s005.oga/Chimpanzee-Alarm-Call-Production-Meets-Key-Criteria-for-Intentionality-pone.0076674.s005.oga.mp3",
+      "credit": "Schel A, Townsend S, Machanda Z, Zuberbuhler K, Slocombe K",
+      "license": "CC BY 2.5",
+      "page": "https://commons.wikimedia.org/wiki/File:Chimpanzee-Alarm-Call-Production-Meets-Key-Criteria-for-Intentionality-pone.0076674.s005.oga",
+      "start": 0
+     }
+    ]
+   }
+  },
+  {
+   "id": "snd5",
+   "kind": "mc",
+   "prompt": "Listen! Which animal makes this sound?",
+   "answer": "Kookaburra",
+   "wrong": [
+    "Owl",
+    "Duck",
+    "Frog"
+   ],
+   "explain": "That was a kookaburra.",
+   "difficulty": 1,
+   "media": {
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/c/c0/Dacelo_novaeguineae_ANWC_X00522.opus/Dacelo_novaeguineae_ANWC_X00522.opus.mp3",
+      "credit": "Powys, V.",
+      "license": "CC BY 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Dacelo_novaeguineae_ANWC_X00522.opus",
+      "start": 0
+     }
+    ]
+   }
+  },
+  {
+   "id": "snd6",
+   "kind": "mc",
+   "prompt": "Listen! Which animal makes this sound?",
+   "answer": "Owl",
+   "wrong": [
+    "Wolf",
+    "Frog",
+    "Elephant"
+   ],
+   "explain": "That was an owl.",
+   "difficulty": 1,
+   "media": {
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/2/2b/Barn_Owl_%28Tyto_alba%29_%28W_TYTO_ALBA_R1_C16%29.ogg/Barn_Owl_%28Tyto_alba%29_%28W_TYTO_ALBA_R1_C16%29.ogg.mp3",
+      "credit": "This file has been provided by the British Library from its digital collections. Links …",
+      "license": "CC BY 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Barn_Owl_(Tyto_alba)_(W_TYTO_ALBA_R1_C16).ogg",
+      "start": 0
+     }
+    ]
+   }
+  },
+  {
+   "id": "snd7",
+   "kind": "mc",
+   "prompt": "Listen! Which animal makes this sound?",
+   "answer": "Cuckoo",
+   "wrong": [
+    "Lion",
+    "Frog",
+    "Elephant"
+   ],
+   "explain": "That was a cuckoo.",
+   "difficulty": 1,
+   "media": {
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/a/a4/Common_Cuckoo_%28Cuculus_canorus%29_%28W1CDR0001463_BD1%29.ogg/Common_Cuckoo_%28Cuculus_canorus%29_%28W1CDR0001463_BD1%29.ogg.mp3",
+      "credit": "This file has been provided by the British Library from its digital collections. Links …",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Common_Cuckoo_(Cuculus_canorus)_(W1CDR0001463_BD1).ogg",
+      "start": 0
+     }
+    ]
+   }
+  },
+  {
+   "id": "snd8",
+   "kind": "mc",
+   "prompt": "Listen! Which animal makes this sound?",
+   "answer": "Frog",
+   "wrong": [
+    "Bird",
+    "Lion",
+    "Wolf"
+   ],
+   "explain": "That was a frog.",
+   "difficulty": 1,
+   "media": {
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/d/d8/16_bruine_kikker_individu_Rana_temporaria_individual.wav/16_bruine_kikker_individu_Rana_temporaria_individual.wav.mp3",
+      "credit": "Odé, Baudewijn .mw-parser-output .messagebox{margin:4px 0;width:auto;border-collapse:co…",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:16_bruine_kikker_individu_Rana_temporaria_individual.wav",
+      "start": 0
+     }
+    ]
+   }
+  },
+  {
+   "id": "f1",
+   "kind": "mc",
+   "prompt": "How many legs does a spider have?",
+   "answer": "8",
+   "wrong": [
+    "6",
+    "4",
+    "10"
+   ],
+   "explain": "All spiders have eight legs.",
+   "difficulty": 1
+  },
+  {
+   "id": "f2",
+   "kind": "mc",
+   "prompt": "How many legs does an insect have?",
+   "answer": "6",
+   "wrong": [
+    "8",
+    "4",
+    "2"
+   ],
+   "explain": "Insects like ants and bees have six legs.",
+   "difficulty": 1
+  },
+  {
+   "id": "f3",
+   "kind": "mc",
+   "prompt": "How many legs does a bird have?",
+   "answer": "2",
+   "wrong": [
+    "4",
+    "6",
+    "0"
+   ],
+   "explain": "Birds walk on two legs and have two wings.",
+   "difficulty": 1
+  },
+  {
+   "id": "f4",
+   "kind": "mc",
+   "prompt": "How many arms does an octopus have?",
+   "answer": "8",
+   "wrong": [
+    "6",
+    "10",
+    "4"
+   ],
+   "explain": "\"Octo\" means eight.",
+   "difficulty": 1
+  },
+  {
+   "id": "f5",
+   "kind": "mc",
+   "prompt": "Which animal lives in the sea?",
+   "answer": "Dolphin",
+   "wrong": [
+    "Lion",
+    "Camel",
+    "Kangaroo"
+   ],
+   "explain": "Dolphins live in the sea and breathe air.",
+   "difficulty": 1
+  },
+  {
+   "id": "f6",
+   "kind": "mc",
+   "prompt": "Which animal lives in the sea?",
+   "answer": "Starfish",
+   "wrong": [
+    "Giraffe",
+    "Koala",
+    "Squirrel"
+   ],
+   "explain": "Starfish live on the sea floor.",
+   "difficulty": 1
+  },
+  {
+   "id": "f7",
+   "kind": "mc",
+   "prompt": "Which animal can fly?",
+   "answer": "Bat",
+   "wrong": [
+    "Penguin",
+    "Elephant",
+    "Snake"
+   ],
+   "explain": "Bats are the only mammals that can really fly.",
+   "difficulty": 1
+  },
+  {
+   "id": "f8",
+   "kind": "mc",
+   "prompt": "Which bird cannot fly?",
+   "answer": "Penguin",
+   "wrong": [
+    "Eagle",
+    "Parrot",
+    "Owl"
+   ],
+   "explain": "Penguins use their wings to swim.",
+   "difficulty": 1
+  },
+  {
+   "id": "f9",
+   "kind": "mc",
+   "prompt": "What is a baby kangaroo called?",
+   "answer": "Joey",
+   "wrong": [
+    "Cub",
+    "Puppy",
+    "Chick"
+   ],
+   "explain": "A joey lives in its mother's pouch.",
+   "difficulty": 1
+  },
+  {
+   "id": "f10",
+   "kind": "mc",
+   "prompt": "What is a baby cat called?",
+   "answer": "Kitten",
+   "wrong": [
+    "Puppy",
+    "Calf",
+    "Foal"
+   ],
+   "explain": "Puppies are baby dogs.",
+   "difficulty": 1
+  },
+  {
+   "id": "f11",
+   "kind": "mc",
+   "prompt": "What is a baby dog called?",
+   "answer": "Puppy",
+   "wrong": [
+    "Kitten",
+    "Lamb",
+    "Chick"
+   ],
+   "explain": "Kittens are baby cats.",
+   "difficulty": 1
+  },
+  {
+   "id": "f12",
+   "kind": "mc",
+   "prompt": "What is a baby frog called?",
+   "answer": "Tadpole",
+   "wrong": [
+    "Kitten",
+    "Chick",
+    "Calf"
+   ],
+   "explain": "Tadpoles live in water and grow legs.",
+   "difficulty": 1
+  },
+  {
+   "id": "f13",
+   "kind": "mc",
+   "prompt": "What is a baby sheep called?",
+   "answer": "Lamb",
+   "wrong": [
+    "Calf",
+    "Kid",
+    "Foal"
+   ],
+   "explain": "A baby goat is a kid.",
+   "difficulty": 1
+  },
+  {
+   "id": "f14",
+   "kind": "mc",
+   "prompt": "What does a caterpillar turn into?",
+   "answer": "Butterfly",
+   "wrong": [
+    "Spider",
+    "Bee",
+    "Frog"
+   ],
+   "explain": "Caterpillars make a chrysalis, then turn into butterflies or moths.",
+   "difficulty": 1
+  },
+  {
+   "id": "f15",
+   "kind": "mc",
+   "prompt": "What do bees make?",
+   "answer": "Honey",
+   "wrong": [
+    "Milk",
+    "Silk",
+    "Wool"
+   ],
+   "explain": "Bees make honey from flower nectar.",
+   "difficulty": 1
+  },
+  {
+   "id": "f16",
+   "kind": "mc",
+   "prompt": "What do cows give us to drink?",
+   "answer": "Milk",
+   "wrong": [
+    "Juice",
+    "Honey",
+    "Water"
+   ],
+   "explain": "Milk is also made into cheese and butter.",
+   "difficulty": 1
+  },
+  {
+   "id": "f17",
+   "kind": "mc",
+   "prompt": "What do hens lay?",
+   "answer": "Eggs",
+   "wrong": [
+    "Apples",
+    "Stones",
+    "Seeds"
+   ],
+   "explain": "Hens lay eggs, sometimes one a day.",
+   "difficulty": 1
+  },
+  {
+   "id": "f18",
+   "kind": "mc",
+   "prompt": "What do pandas love to eat?",
+   "answer": "Bamboo",
+   "wrong": [
+    "Fish",
+    "Grass",
+    "Carrots"
+   ],
+   "explain": "Pandas eat bamboo for many hours a day.",
+   "difficulty": 1
+  },
+  {
+   "id": "f19",
+   "kind": "mc",
+   "prompt": "What do koalas eat?",
+   "answer": "Gum leaves",
+   "wrong": [
+    "Fish",
+    "Bananas",
+    "Insects"
+   ],
+   "explain": "Koalas eat eucalyptus leaves.",
+   "difficulty": 1
+  },
+  {
+   "id": "f20",
+   "kind": "mc",
+   "prompt": "Which animal has a very long neck?",
+   "answer": "Giraffe",
+   "wrong": [
+    "Hippo",
+    "Pig",
+    "Bear"
+   ],
+   "explain": "A giraffe's neck can be about 2 metres long.",
+   "difficulty": 1
+  },
+  {
+   "id": "f21",
+   "kind": "mc",
+   "prompt": "Which animal has a trunk?",
+   "answer": "Elephant",
+   "wrong": [
+    "Rhino",
+    "Lion",
+    "Monkey"
+   ],
+   "explain": "Elephants use their trunks like a hand.",
+   "difficulty": 1
+  },
+  {
+   "id": "f22",
+   "kind": "mc",
+   "prompt": "Which animal has black and white stripes?",
+   "answer": "Zebra",
+   "wrong": [
+    "Tiger",
+    "Leopard",
+    "Giraffe"
+   ],
+   "explain": "Every zebra has different stripes.",
+   "difficulty": 1
+  },
+  {
+   "id": "f23",
+   "kind": "mc",
+   "prompt": "Which animal is the biggest in the world?",
+   "answer": "Blue whale",
+   "wrong": [
+    "Elephant",
+    "Giraffe",
+    "Shark"
+   ],
+   "explain": "Blue whales are bigger than any dinosaur.",
+   "difficulty": 1
+  },
+  {
+   "id": "f24",
+   "kind": "mc",
+   "prompt": "Which animal is the fastest runner?",
+   "answer": "Cheetah",
+   "wrong": [
+    "Tortoise",
+    "Elephant",
+    "Snail"
+   ],
+   "explain": "Cheetahs can run as fast as a car on a highway.",
+   "difficulty": 1
+  },
+  {
+   "id": "f25",
+   "kind": "mc",
+   "prompt": "Which animal carries its home on its back?",
+   "answer": "Snail",
+   "wrong": [
+    "Rabbit",
+    "Bird",
+    "Fish"
+   ],
+   "explain": "A snail can hide inside its shell.",
+   "difficulty": 1
+  },
+  {
+   "id": "f26",
+   "kind": "mc",
+   "prompt": "Which animal is famous for being slow?",
+   "answer": "Sloth",
+   "wrong": [
+    "Cheetah",
+    "Rabbit",
+    "Horse"
+   ],
+   "explain": "Sloths move very slowly and hang upside down.",
+   "difficulty": 1
+  },
+  {
+   "id": "f27",
+   "kind": "mc",
+   "prompt": "Where do penguins mostly live?",
+   "answer": "Near the South Pole",
+   "wrong": [
+    "In the desert",
+    "In the jungle",
+    "On mountains"
+   ],
+   "explain": "Most penguins live in the southern half of the world.",
+   "difficulty": 1
+  },
+  {
+   "id": "f28",
+   "kind": "mc",
+   "prompt": "Where do polar bears live?",
+   "answer": "The Arctic",
+   "wrong": [
+    "The desert",
+    "The jungle",
+    "Australia"
+   ],
+   "explain": "Polar bears live near the North Pole.",
+   "difficulty": 1
+  },
+  {
+   "id": "f29",
+   "kind": "mc",
+   "prompt": "What colour is a ripe banana?",
+   "answer": "Yellow",
+   "wrong": [
+    "Blue",
+    "Purple",
+    "Red"
+   ],
+   "explain": "Green bananas are not ripe yet.",
+   "difficulty": 1
+  },
+  {
+   "id": "f30",
+   "kind": "mc",
+   "prompt": "What colour are most leaves in summer?",
+   "answer": "Green",
+   "wrong": [
+    "Blue",
+    "Pink",
+    "Black"
+   ],
+   "explain": "Leaves are green because of chlorophyll.",
+   "difficulty": 1
+  },
+  {
+   "id": "f31",
+   "kind": "mc",
+   "prompt": "What do plants need to grow?",
+   "answer": "Sunlight and water",
+   "wrong": [
+    "Sweets",
+    "Milk",
+    "Music"
+   ],
+   "explain": "Plants make their food from sunlight.",
+   "difficulty": 1
+  },
+  {
+   "id": "f32",
+   "kind": "mc",
+   "prompt": "What grows into a tree?",
+   "answer": "A seed",
+   "wrong": [
+    "A stone",
+    "A shell",
+    "A feather"
+   ],
+   "explain": "Acorns are oak tree seeds.",
+   "difficulty": 1
+  },
+  {
+   "id": "f33",
+   "kind": "mc",
+   "prompt": "What is the name of our planet?",
+   "answer": "Earth",
+   "wrong": [
+    "Mars",
+    "Jupiter",
+    "The Moon"
+   ],
+   "explain": "Earth is the third planet from the Sun.",
+   "difficulty": 1
+  },
+  {
+   "id": "f34",
+   "kind": "mc",
+   "prompt": "What shines in the sky in the daytime?",
+   "answer": "The Sun",
+   "wrong": [
+    "The Moon",
+    "Mars",
+    "A comet"
+   ],
+   "explain": "The Sun is a star.",
+   "difficulty": 1
+  },
+  {
+   "id": "f35",
+   "kind": "mc",
+   "prompt": "Which planet is called the red planet?",
+   "answer": "Mars",
+   "wrong": [
+    "Earth",
+    "Saturn",
+    "Neptune"
+   ],
+   "explain": "Mars looks red because of rusty dust.",
+   "difficulty": 1
+  },
+  {
+   "id": "f36",
+   "kind": "mc",
+   "prompt": "What do we breathe with?",
+   "answer": "Lungs",
+   "wrong": [
+    "Stomach",
+    "Ears",
+    "Feet"
+   ],
+   "explain": "Our lungs take in air.",
+   "difficulty": 1
+  },
+  {
+   "id": "f37",
+   "kind": "mc",
+   "prompt": "What pumps blood around your body?",
+   "answer": "Heart",
+   "wrong": [
+    "Brain",
+    "Stomach",
+    "Lungs"
+   ],
+   "explain": "Your heart is a strong muscle.",
+   "difficulty": 1
+  },
+  {
+   "id": "f38",
+   "kind": "mc",
+   "prompt": "What do you see with?",
+   "answer": "Eyes",
+   "wrong": [
+    "Ears",
+    "Nose",
+    "Hands"
+   ],
+   "explain": "We have two eyes.",
+   "difficulty": 1
+  },
+  {
+   "id": "f39",
+   "kind": "mc",
+   "prompt": "What do you hear with?",
+   "answer": "Ears",
+   "wrong": [
+    "Eyes",
+    "Nose",
+    "Mouth"
+   ],
+   "explain": "We have two ears.",
+   "difficulty": 1
+  },
+  {
+   "id": "f40",
+   "kind": "mc",
+   "prompt": "How many fingers are on one hand?",
+   "answer": "5",
+   "wrong": [
+    "4",
+    "6",
+    "10"
+   ],
+   "explain": "Four fingers and a thumb make five.",
+   "difficulty": 1
+  },
+  {
+   "id": "f41",
+   "kind": "mc",
+   "prompt": "Which fruit is red and grows on trees?",
+   "answer": "Apple",
+   "wrong": [
+    "Banana",
+    "Carrot",
+    "Potato"
+   ],
+   "explain": "Apples can be red, green or yellow.",
+   "difficulty": 1
+  },
+  {
+   "id": "f42",
+   "kind": "mc",
+   "prompt": "Which of these is a vegetable?",
+   "answer": "Carrot",
+   "wrong": [
+    "Apple",
+    "Banana",
+    "Strawberry"
+   ],
+   "explain": "Carrots are roots that we eat.",
+   "difficulty": 1
+  },
+  {
+   "id": "tf1",
+   "kind": "tf",
+   "prompt": "A whale is a fish.",
+   "answer": false,
+   "explain": "Whales are mammals that breathe air.",
+   "difficulty": 1
+  },
+  {
+   "id": "tf2",
+   "kind": "tf",
+   "prompt": "A spider is an insect.",
+   "answer": false,
+   "explain": "Spiders have eight legs; insects have six.",
+   "difficulty": 1
+  },
+  {
+   "id": "tf3",
+   "kind": "tf",
+   "prompt": "Frogs start life as tadpoles.",
+   "answer": true,
+   "explain": "Tadpoles live in water and grow legs.",
+   "difficulty": 1
+  },
+  {
+   "id": "tf4",
+   "kind": "tf",
+   "prompt": "Penguins can fly.",
+   "answer": false,
+   "explain": "Penguins swim instead.",
+   "difficulty": 1
+  },
+  {
+   "id": "tf5",
+   "kind": "tf",
+   "prompt": "The Sun is a star.",
+   "answer": true,
+   "explain": "It is the closest star to Earth.",
+   "difficulty": 1
+  },
+  {
+   "id": "tf6",
+   "kind": "tf",
+   "prompt": "Bats are birds.",
+   "answer": false,
+   "explain": "Bats are mammals with furry bodies.",
+   "difficulty": 1
+  },
+  {
+   "id": "tf7",
+   "kind": "tf",
+   "prompt": "A tomato is a fruit.",
+   "answer": true,
+   "explain": "Tomatoes grow from flowers and have seeds, so they are fruits.",
+   "difficulty": 1
+  },
+  {
+   "id": "tf8",
+   "kind": "tf",
+   "prompt": "Snakes have legs.",
+   "answer": false,
+   "explain": "Snakes slither on their bellies.",
+   "difficulty": 1
+  }
+ ],
+ "sources": [
+  {
+   "name": "Clued nature packs (photos and sounds credited per file)",
+   "url": "https://commons.wikimedia.org"
+  }
+ ]
+}

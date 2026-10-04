@@ -4,9 +4,15 @@ import { getSettings, setSettings, getStats, dailyDone } from '../core/store.js?
 import { kidsProgress } from './stickers.js?v=1';
 import { sfx } from './fx.js?v=1';
 import { loadNet } from './net.js?v=1';
+import { toolButtons } from './toggles.js?v=1';
 
 export const logo = (sm = false) => h('div.logo', { class: sm ? 'sm' : '', 'aria-label': 'Clued' },
   h('span.lens', {}, '?'), ...'lued'.split('').map(c => h('span.l', {}, c)));
+
+function calBadge(d = new Date()) {
+  return h('span.d-badge.cal', { 'aria-hidden': 'true' },
+    h('b', {}, d.toLocaleString('en', { month: 'short' }).toUpperCase()), h('i', {}, String(d.getDate())));
+}
 
 export function applyKids(on) {
   document.body.classList.toggle('kids-on', !!on);
@@ -36,7 +42,7 @@ defineScreen('home', el => {
   const daily = h('button.daily-card', { type: 'button', onclick: () => go('daily') },
     h('div', {}, h('h2', {}, kids ? 'Kids Daily' : 'Daily challenge'),
       h('p', {}, dailyDone(undefined, kids ? 'kids' : 'main') ? 'Done today ✓ tap to see your result' : `Today's 10 questions, same for everyone`)),
-    h('span.d-badge', {}, dailyDone(undefined, kids ? 'kids' : 'main') ? '✅' : '📅'));
+    dailyDone(undefined, kids ? 'kids' : 'main') ? h('span.d-badge', {}, '✅') : calBadge());
 
   const modes = MODES.filter(m => !kids || KID_MODES.includes(m[0]));
   const tiles = h('div.tiles', {}, ...modes.map(([id, ico, title, blurb]) =>
@@ -52,7 +58,7 @@ defineScreen('home', el => {
   }
 
   el.append(
-    h('div.home-top', {}, logo(), h('div.tools', {},
+    h('div.home-top', {}, logo(), h('div.tools', {}, ...toolButtons(),
       h('button.icon-btn', { type: 'button', 'aria-label': 'Settings', onclick: () => go('settings') }, '⚙️'))),
     h('p.tagline', {}, kids ? 'Big pictures, no rush, stickers to win!' : 'Trivia for curious minds.'),
     h('label.kids-toggle', {}, h('span.k-ico', {}, '🧸'),

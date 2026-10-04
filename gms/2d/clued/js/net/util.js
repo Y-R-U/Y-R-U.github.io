@@ -24,7 +24,7 @@ export const validCode = s => /^[ABCDEFGHJKMNPQRSTUVWXYZ23456789]{5}$/.test(s);
 export function setQuery(param, value) {
   try {
     const u = new URL(location.href);
-    ['join', 'c'].forEach(k => k !== param && u.searchParams.delete(k));
+    ['join', 'c', 'p2p'].forEach(k => k !== param && u.searchParams.delete(k));
     if (value) u.searchParams.set(param, value); else u.searchParams.delete(param);
     history.replaceState(history.state, '', u.pathname + u.search + u.hash);
   } catch (e) {}

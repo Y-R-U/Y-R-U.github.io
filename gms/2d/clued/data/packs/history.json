@@ -1,0 +1,5280 @@
+{
+ "id": "history",
+ "title": "History",
+ "theme": "history",
+ "icon": "🏛️",
+ "kids": false,
+ "version": 1,
+ "factsMeta": {
+  "year": {
+   "type": "year",
+   "label": "Year",
+   "higherLabel": "Later",
+   "askHigh": "Which of these happened most recently?",
+   "askLow": "Which of these happened first?"
+  },
+  "century": {
+   "type": "cat",
+   "label": "Century",
+   "ask": "In which century did this happen: {name}?",
+   "stmt": "This happened in the {value}: {name}."
+  },
+  "era": {
+   "type": "cat",
+   "label": "Era",
+   "exclusive": false
+  }
+ },
+ "items": [
+  {
+   "id": "the-first-recorded-ancient-olympic-games",
+   "name": "The first recorded ancient Olympic Games",
+   "group": "Ancient",
+   "facts": {
+    "year": -776,
+    "century": "8th century BC",
+    "era": "Ancient"
+   },
+   "blurb": "The first recorded ancient Olympic Games (776 BC). Tradition dates the first Games at Olympia, in Greece, to 776 BC.",
+   "difficulty": 3
+  },
+  {
+   "id": "the-battle-of-marathon",
+   "name": "The Battle of Marathon",
+   "group": "Ancient",
+   "facts": {
+    "year": -490,
+    "century": "5th century BC",
+    "era": "Ancient"
+   },
+   "blurb": "The Battle of Marathon (490 BC). Athens defeated a Persian invasion force on the plain of Marathon.",
+   "difficulty": 3
+  },
+  {
+   "id": "the-battle-of-thermopylae",
+   "name": "The Battle of Thermopylae",
+   "group": "Ancient",
+   "facts": {
+    "year": -480,
+    "century": "5th century BC",
+    "era": "Ancient"
+   },
+   "blurb": "The Battle of Thermopylae (480 BC). A small Greek force led by 300 Spartans held a narrow pass against the Persian army.",
+   "difficulty": 3
+  },
+  {
+   "id": "qin-shi-huang-unifies-china",
+   "name": "Qin Shi Huang unifies China",
+   "group": "Ancient",
+   "facts": {
+    "year": -221,
+    "century": "3rd century BC",
+    "era": "Ancient"
+   },
+   "blurb": "Qin Shi Huang unifies China (221 BC). The state of Qin conquered its rivals, creating the first unified Chinese empire.",
+   "difficulty": 3
+  },
+  {
+   "id": "the-assassination-of-julius-caesar",
+   "name": "The assassination of Julius Caesar",
+   "group": "Ancient",
+   "facts": {
+    "year": -44,
+    "century": "1st century BC",
+    "era": "Ancient"
+   },
+   "blurb": "The assassination of Julius Caesar (44 BC). Roman senators stabbed Caesar to death on the Ides of March.",
+   "difficulty": 2
+  },
+  {
+   "id": "vesuvius-buries-pompeii",
+   "name": "Vesuvius buries Pompeii",
+   "group": "Ancient",
+   "facts": {
+    "year": 79,
+    "century": "1st century",
+    "era": "Ancient"
+   },
+   "blurb": "Vesuvius buries Pompeii (AD 79). The volcano's eruption buried the Roman towns of Pompeii and Herculaneum under ash.",
+   "difficulty": 2
+  },
+  {
+   "id": "work-begins-on-hadrian-s-wall",
+   "name": "Work begins on Hadrian's Wall",
+   "group": "Ancient",
+   "facts": {
+    "year": 122,
+    "century": "2nd century",
+    "era": "Ancient"
+   },
+   "blurb": "Work begins on Hadrian's Wall (AD 122). The Roman emperor Hadrian ordered a wall across northern Britain.",
+   "difficulty": 3
+  },
+  {
+   "id": "the-fall-of-the-western-roman-empire",
+   "name": "The fall of the Western Roman Empire",
+   "group": "Ancient",
+   "facts": {
+    "year": 476,
+    "century": "5th century",
+    "era": "Ancient"
+   },
+   "blurb": "The fall of the Western Roman Empire (AD 476). The last western Roman emperor, Romulus Augustulus, was deposed.",
+   "difficulty": 3
+  },
+  {
+   "id": "vikings-raid-lindisfarne",
+   "name": "Vikings raid Lindisfarne",
+   "group": "Medieval",
+   "facts": {
+    "year": 793,
+    "century": "8th century",
+    "era": "Medieval"
+   },
+   "blurb": "Vikings raid Lindisfarne (AD 793). A Viking raid on the island monastery is often taken as the start of the Viking Age in Britain.",
+   "difficulty": 3
+  },
+  {
+   "id": "charlemagne-is-crowned-emperor",
+   "name": "Charlemagne is crowned emperor",
+   "group": "Medieval",
+   "facts": {
+    "year": 800,
+    "century": "8th century",
+    "era": "Medieval"
+   },
+   "blurb": "Charlemagne is crowned emperor (AD 800). The pope crowned the Frankish king Emperor of the Romans on Christmas Day.",
+   "difficulty": 3
+  },
+  {
+   "id": "the-battle-of-hastings",
+   "name": "The Battle of Hastings",
+   "group": "Medieval",
+   "facts": {
+    "year": 1066,
+    "century": "11th century",
+    "era": "Medieval"
+   },
+   "blurb": "The Battle of Hastings (1066). William of Normandy defeated King Harold II and conquered England.",
+   "difficulty": 1
+  },
+  {
+   "id": "magna-carta-is-sealed",
+   "name": "Magna Carta is sealed",
+   "group": "Medieval",
+   "facts": {
+    "year": 1215,
+    "century": "13th century",
+    "era": "Medieval"
+   },
+   "blurb": "Magna Carta is sealed (1215). King John agreed to a charter limiting royal power, at Runnymede.",
+   "difficulty": 2
+  },
+  {
+   "id": "the-black-death-reaches-europe",
+   "name": "The Black Death reaches Europe",
+   "group": "Medieval",
+   "facts": {
+    "year": 1347,
+    "century": "14th century",
+    "era": "Medieval"
+   },
+   "blurb": "The Black Death reaches Europe (1347). Bubonic plague arrived in Europe and killed perhaps a third of its people within a few years.",
+   "difficulty": 2
+  },
+  {
+   "id": "the-fall-of-constantinople",
+   "name": "The fall of Constantinople",
+   "group": "Medieval",
+   "facts": {
+    "year": 1453,
+    "century": "15th century",
+    "era": "Medieval"
+   },
+   "blurb": "The fall of Constantinople (1453). Ottoman forces captured the Byzantine capital, ending the Eastern Roman Empire.",
+   "difficulty": 2
+  },
+  {
+   "id": "the-battle-of-bosworth-field",
+   "name": "The Battle of Bosworth Field",
+   "group": "Medieval",
+   "facts": {
+    "year": 1485,
+    "century": "15th century",
+    "era": "Medieval"
+   },
+   "blurb": "The Battle of Bosworth Field (1485). Henry Tudor defeated Richard III, beginning the Tudor dynasty.",
+   "difficulty": 3
+  },
+  {
+   "id": "columbus-reaches-the-americas",
+   "name": "Columbus reaches the Americas",
+   "group": "Medieval",
+   "facts": {
+    "year": 1492,
+    "century": "15th century",
+    "era": "Medieval"
+   },
+   "blurb": "Columbus reaches the Americas (1492). Christopher Columbus landed in the Bahamas while trying to reach Asia by sailing west.",
+   "difficulty": 1
+  },
+  {
+   "id": "martin-luther-s-ninety-five-theses",
+   "name": "Martin Luther's Ninety-five Theses",
+   "group": "Early modern",
+   "facts": {
+    "year": 1517,
+    "century": "16th century",
+    "era": "Early modern"
+   },
+   "blurb": "Martin Luther's Ninety-five Theses (1517). Luther's challenge to the Church helped launch the Protestant Reformation.",
+   "difficulty": 2
+  },
+  {
+   "id": "the-first-voyage-around-the-world-is-completed",
+   "name": "The first voyage around the world is completed",
+   "group": "Early modern",
+   "facts": {
+    "year": 1522,
+    "century": "16th century",
+    "era": "Early modern"
+   },
+   "blurb": "The first voyage around the world is completed (1522). The survivors of Ferdinand Magellan's expedition returned to Spain; Magellan himself died on the way.",
+   "difficulty": 2
+  },
+  {
+   "id": "the-defeat-of-the-spanish-armada",
+   "name": "The defeat of the Spanish Armada",
+   "group": "Early modern",
+   "facts": {
+    "year": 1588,
+    "century": "16th century",
+    "era": "Early modern"
+   },
+   "blurb": "The defeat of the Spanish Armada (1588). A Spanish invasion fleet sent against England was beaten and scattered by storms.",
+   "difficulty": 2
+  },
+  {
+   "id": "the-gunpowder-plot",
+   "name": "The Gunpowder Plot",
+   "group": "Early modern",
+   "facts": {
+    "year": 1605,
+    "century": "17th century",
+    "era": "Early modern"
+   },
+   "blurb": "The Gunpowder Plot (1605). Plotters including Guy Fawkes tried and failed to blow up the English Parliament.",
+   "difficulty": 2
+  },
+  {
+   "id": "the-mayflower-reaches-america",
+   "name": "The Mayflower reaches America",
+   "group": "Early modern",
+   "facts": {
+    "year": 1620,
+    "century": "17th century",
+    "era": "Early modern"
+   },
+   "blurb": "The Mayflower reaches America (1620). English Pilgrims sailed to found Plymouth Colony in what is now Massachusetts.",
+   "difficulty": 2
+  },
+  {
+   "id": "the-peace-of-westphalia",
+   "name": "The Peace of Westphalia",
+   "group": "Early modern",
+   "facts": {
+    "year": 1648,
+    "century": "17th century",
+    "era": "Early modern"
+   },
+   "blurb": "The Peace of Westphalia (1648). Treaties ended the Thirty Years' War in Europe.",
+   "difficulty": 3
+  },
+  {
+   "id": "king-charles-i-is-executed",
+   "name": "King Charles I is executed",
+   "group": "Early modern",
+   "facts": {
+    "year": 1649,
+    "century": "17th century",
+    "era": "Early modern"
+   },
+   "blurb": "King Charles I is executed (1649). After the English Civil War, the king was beheaded in London.",
+   "difficulty": 3
+  },
+  {
+   "id": "the-great-fire-of-london",
+   "name": "The Great Fire of London",
+   "group": "Early modern",
+   "facts": {
+    "year": 1666,
+    "century": "17th century",
+    "era": "Early modern"
+   },
+   "blurb": "The Great Fire of London (1666). A fire starting in a bakery on Pudding Lane destroyed much of the city.",
+   "difficulty": 1
+  },
+  {
+   "id": "england-and-scotland-unite",
+   "name": "England and Scotland unite",
+   "group": "Early modern",
+   "facts": {
+    "year": 1707,
+    "century": "18th century",
+    "era": "Early modern"
+   },
+   "blurb": "England and Scotland unite (1707). The Acts of Union created the Kingdom of Great Britain.",
+   "difficulty": 3
+  },
+  {
+   "id": "captain-cook-reaches-botany-bay",
+   "name": "Captain Cook reaches Botany Bay",
+   "group": "Early modern",
+   "facts": {
+    "year": 1770,
+    "century": "18th century",
+    "era": "Early modern"
+   },
+   "blurb": "Captain Cook reaches Botany Bay (1770). James Cook's ship Endeavour landed on the east coast of Australia.",
+   "difficulty": 3
+  },
+  {
+   "id": "the-boston-tea-party",
+   "name": "The Boston Tea Party",
+   "group": "Early modern",
+   "facts": {
+    "year": 1773,
+    "century": "18th century",
+    "era": "Early modern"
+   },
+   "blurb": "The Boston Tea Party (1773). American colonists dumped British tea into Boston Harbor in protest at taxes.",
+   "difficulty": 2
+  },
+  {
+   "id": "the-us-declaration-of-independence",
+   "name": "The US Declaration of Independence",
+   "group": "Early modern",
+   "facts": {
+    "year": 1776,
+    "century": "18th century",
+    "era": "Early modern"
+   },
+   "blurb": "The US Declaration of Independence (1776). Thirteen American colonies declared themselves independent from Britain.",
+   "difficulty": 1
+  },
+  {
+   "id": "the-first-fleet-arrives-in-australia",
+   "name": "The First Fleet arrives in Australia",
+   "group": "Early modern",
+   "facts": {
+    "year": 1788,
+    "century": "18th century",
+    "era": "Early modern"
+   },
+   "blurb": "The First Fleet arrives in Australia (1788). British ships carrying convicts founded a colony at Sydney Cove.",
+   "difficulty": 3
+  },
+  {
+   "id": "the-storming-of-the-bastille",
+   "name": "The storming of the Bastille",
+   "group": "Early modern",
+   "facts": {
+    "year": 1789,
+    "century": "18th century",
+    "era": "Early modern"
+   },
+   "blurb": "The storming of the Bastille (1789). Parisians stormed a royal fortress and prison, a key moment of the French Revolution.",
+   "difficulty": 2
+  },
+  {
+   "id": "king-louis-xvi-is-executed",
+   "name": "King Louis XVI is executed",
+   "group": "Early modern",
+   "facts": {
+    "year": 1793,
+    "century": "18th century",
+    "era": "Early modern"
+   },
+   "blurb": "King Louis XVI is executed (1793). The French king was guillotined during the Revolution.",
+   "difficulty": 3
+  },
+  {
+   "id": "the-louisiana-purchase",
+   "name": "The Louisiana Purchase",
+   "group": "1800s",
+   "facts": {
+    "year": 1803,
+    "century": "19th century",
+    "era": "1800s"
+   },
+   "blurb": "The Louisiana Purchase (1803). The United States bought a vast territory west of the Mississippi from France.",
+   "difficulty": 3
+  },
+  {
+   "id": "napoleon-crowns-himself-emperor",
+   "name": "Napoleon crowns himself emperor",
+   "group": "1800s",
+   "facts": {
+    "year": 1804,
+    "century": "19th century",
+    "era": "1800s"
+   },
+   "blurb": "Napoleon crowns himself emperor (1804). Napoleon took the crown from the pope's hands at Notre-Dame in Paris.",
+   "difficulty": 3
+  },
+  {
+   "id": "the-battle-of-trafalgar",
+   "name": "The Battle of Trafalgar",
+   "group": "1800s",
+   "facts": {
+    "year": 1805,
+    "century": "19th century",
+    "era": "1800s"
+   },
+   "blurb": "The Battle of Trafalgar (1805). Nelson's British fleet defeated a French and Spanish fleet; Nelson was killed.",
+   "difficulty": 2
+  },
+  {
+   "id": "britain-abolishes-the-slave-trade",
+   "name": "Britain abolishes the slave trade",
+   "group": "1800s",
+   "facts": {
+    "year": 1807,
+    "century": "19th century",
+    "era": "1800s"
+   },
+   "blurb": "Britain abolishes the slave trade (1807). Parliament banned the trade in enslaved people across the British Empire.",
+   "difficulty": 3
+  },
+  {
+   "id": "the-battle-of-waterloo",
+   "name": "The Battle of Waterloo",
+   "group": "1800s",
+   "facts": {
+    "year": 1815,
+    "century": "19th century",
+    "era": "1800s"
+   },
+   "blurb": "The Battle of Waterloo (1815). Napoleon was finally defeated by Wellington and Blücher.",
+   "difficulty": 2
+  },
+  {
+   "id": "the-first-public-steam-railway-opens",
+   "name": "The first public steam railway opens",
+   "group": "1800s",
+   "facts": {
+    "year": 1825,
+    "century": "19th century",
+    "era": "1800s"
+   },
+   "blurb": "The first public steam railway opens (1825). The Stockton and Darlington Railway in England carried passengers behind a steam locomotive.",
+   "difficulty": 3
+  },
+  {
+   "id": "the-great-famine-begins-in-ireland",
+   "name": "The Great Famine begins in Ireland",
+   "group": "1800s",
+   "facts": {
+    "year": 1845,
+    "century": "19th century",
+    "era": "1800s"
+   },
+   "blurb": "The Great Famine begins in Ireland (1845). Potato blight caused a famine that killed about a million people.",
+   "difficulty": 3
+  },
+  {
+   "id": "the-california-gold-rush",
+   "name": "The California Gold Rush",
+   "group": "1800s",
+   "facts": {
+    "year": 1848,
+    "century": "19th century",
+    "era": "1800s"
+   },
+   "blurb": "The California Gold Rush (1848). The discovery of gold at Sutter's Mill drew hundreds of thousands of people west.",
+   "difficulty": 3
+  },
+  {
+   "id": "darwin-publishes-on-the-origin-of-species",
+   "name": "Darwin publishes On the Origin of Species",
+   "group": "1800s",
+   "facts": {
+    "year": 1859,
+    "century": "19th century",
+    "era": "1800s"
+   },
+   "blurb": "Darwin publishes On the Origin of Species (1859). Charles Darwin set out his theory of evolution by natural selection.",
+   "difficulty": 2
+  },
+  {
+   "id": "the-american-civil-war-begins",
+   "name": "The American Civil War begins",
+   "group": "1800s",
+   "facts": {
+    "year": 1861,
+    "century": "19th century",
+    "era": "1800s"
+   },
+   "blurb": "The American Civil War begins (1861). Fighting broke out between the Union and the Confederate states.",
+   "difficulty": 2
+  },
+  {
+   "id": "the-emancipation-proclamation",
+   "name": "The Emancipation Proclamation",
+   "group": "1800s",
+   "facts": {
+    "year": 1863,
+    "century": "19th century",
+    "era": "1800s"
+   },
+   "blurb": "The Emancipation Proclamation (1863). Abraham Lincoln declared enslaved people in the Confederate states to be free.",
+   "difficulty": 3
+  },
+  {
+   "id": "abraham-lincoln-is-assassinated",
+   "name": "Abraham Lincoln is assassinated",
+   "group": "1800s",
+   "facts": {
+    "year": 1865,
+    "century": "19th century",
+    "era": "1800s"
+   },
+   "blurb": "Abraham Lincoln is assassinated (1865). The president was shot at Ford's Theatre in Washington.",
+   "difficulty": 2
+  },
+  {
+   "id": "the-meiji-restoration-in-japan",
+   "name": "The Meiji Restoration in Japan",
+   "group": "1800s",
+   "facts": {
+    "year": 1868,
+    "century": "19th century",
+    "era": "1800s"
+   },
+   "blurb": "The Meiji Restoration in Japan (1868). Imperial rule was restored and Japan began rapid modernisation.",
+   "difficulty": 3
+  },
+  {
+   "id": "the-suez-canal-opens",
+   "name": "The Suez Canal opens",
+   "group": "1800s",
+   "facts": {
+    "year": 1869,
+    "century": "19th century",
+    "era": "1800s"
+   },
+   "blurb": "The Suez Canal opens (1869). The canal linked the Mediterranean and Red Seas, shortening the route from Europe to Asia.",
+   "difficulty": 2
+  },
+  {
+   "id": "bell-patents-the-telephone",
+   "name": "Bell patents the telephone",
+   "group": "1800s",
+   "facts": {
+    "year": 1876,
+    "century": "19th century",
+    "era": "1800s"
+   },
+   "blurb": "Bell patents the telephone (1876). Alexander Graham Bell received a patent for the telephone.",
+   "difficulty": 2
+  },
+  {
+   "id": "krakatoa-erupts",
+   "name": "Krakatoa erupts",
+   "group": "1800s",
+   "facts": {
+    "year": 1883,
+    "century": "19th century",
+    "era": "1800s"
+   },
+   "blurb": "Krakatoa erupts (1883). A huge volcanic eruption in Indonesia was heard thousands of kilometres away.",
+   "difficulty": 3
+  },
+  {
+   "id": "the-eiffel-tower-is-completed",
+   "name": "The Eiffel Tower is completed",
+   "group": "1800s",
+   "facts": {
+    "year": 1889,
+    "century": "19th century",
+    "era": "1800s"
+   },
+   "blurb": "The Eiffel Tower is completed (1889). The tower was built as the entrance to the World's Fair in Paris.",
+   "difficulty": 1
+  },
+  {
+   "id": "the-first-modern-olympic-games",
+   "name": "The first modern Olympic Games",
+   "group": "1800s",
+   "facts": {
+    "year": 1896,
+    "century": "19th century",
+    "era": "1800s"
+   },
+   "blurb": "The first modern Olympic Games (1896). The modern Olympics began in Athens.",
+   "difficulty": 2
+  },
+  {
+   "id": "the-wright-brothers-first-powered-flight",
+   "name": "The Wright brothers' first powered flight",
+   "group": "1900–1945",
+   "facts": {
+    "year": 1903,
+    "century": "20th century",
+    "era": "1900–1945"
+   },
+   "blurb": "The Wright brothers' first powered flight (1903). Orville and Wilbur Wright flew at Kitty Hawk, North Carolina.",
+   "difficulty": 1
+  },
+  {
+   "id": "the-san-francisco-earthquake",
+   "name": "The San Francisco earthquake",
+   "group": "1900–1945",
+   "facts": {
+    "year": 1906,
+    "century": "20th century",
+    "era": "1900–1945"
+   },
+   "blurb": "The San Francisco earthquake (1906). An earthquake and the fires that followed destroyed much of the city.",
+   "difficulty": 3
+  },
+  {
+   "id": "the-titanic-sinks",
+   "name": "The Titanic sinks",
+   "group": "1900–1945",
+   "facts": {
+    "year": 1912,
+    "century": "20th century",
+    "era": "1900–1945"
+   },
+   "blurb": "The Titanic sinks (1912). The liner struck an iceberg on its first voyage and sank with the loss of about 1,500 lives.",
+   "difficulty": 1
+  },
+  {
+   "id": "the-first-world-war-begins",
+   "name": "The First World War begins",
+   "group": "1900–1945",
+   "facts": {
+    "year": 1914,
+    "century": "20th century",
+    "era": "1900–1945"
+   },
+   "blurb": "The First World War begins (1914). War broke out in Europe after the assassination of Archduke Franz Ferdinand.",
+   "difficulty": 1
+  },
+  {
+   "id": "the-panama-canal-opens",
+   "name": "The Panama Canal opens",
+   "group": "1900–1945",
+   "facts": {
+    "year": 1914,
+    "century": "20th century",
+    "era": "1900–1945"
+   },
+   "blurb": "The Panama Canal opens (1914). The canal linked the Atlantic and Pacific Oceans across Panama.",
+   "difficulty": 3
+  },
+  {
+   "id": "the-lusitania-is-sunk",
+   "name": "The Lusitania is sunk",
+   "group": "1900–1945",
+   "facts": {
+    "year": 1915,
+    "century": "20th century",
+    "era": "1900–1945"
+   },
+   "blurb": "The Lusitania is sunk (1915). A German submarine sank the British liner off Ireland.",
+   "difficulty": 3
+  },
+  {
+   "id": "the-battle-of-the-somme",
+   "name": "The Battle of the Somme",
+   "group": "1900–1945",
+   "facts": {
+    "year": 1916,
+    "century": "20th century",
+    "era": "1900–1945"
+   },
+   "blurb": "The Battle of the Somme (1916). One of the bloodiest battles in history was fought in northern France.",
+   "difficulty": 2
+  },
+  {
+   "id": "the-russian-revolution",
+   "name": "The Russian Revolution",
+   "group": "1900–1945",
+   "facts": {
+    "year": 1917,
+    "century": "20th century",
+    "era": "1900–1945"
+   },
+   "blurb": "The Russian Revolution (1917). The Bolsheviks led by Lenin seized power in Russia.",
+   "difficulty": 2
+  },
+  {
+   "id": "the-first-world-war-ends",
+   "name": "The First World War ends",
+   "group": "1900–1945",
+   "facts": {
+    "year": 1918,
+    "century": "20th century",
+    "era": "1900–1945"
+   },
+   "blurb": "The First World War ends (1918). An armistice ended the fighting at 11 am on 11 November.",
+   "difficulty": 1
+  },
+  {
+   "id": "the-treaty-of-versailles",
+   "name": "The Treaty of Versailles",
+   "group": "1900–1945",
+   "facts": {
+    "year": 1919,
+    "century": "20th century",
+    "era": "1900–1945"
+   },
+   "blurb": "The Treaty of Versailles (1919). The peace treaty set the terms for Germany after the First World War.",
+   "difficulty": 2
+  },
+  {
+   "id": "tutankhamun-s-tomb-is-discovered",
+   "name": "Tutankhamun's tomb is discovered",
+   "group": "1900–1945",
+   "facts": {
+    "year": 1922,
+    "century": "20th century",
+    "era": "1900–1945"
+   },
+   "blurb": "Tutankhamun's tomb is discovered (1922). Howard Carter found the almost untouched tomb in Egypt's Valley of the Kings.",
+   "difficulty": 2
+  },
+  {
+   "id": "alexander-fleming-discovers-penicillin",
+   "name": "Alexander Fleming discovers penicillin",
+   "group": "1900–1945",
+   "facts": {
+    "year": 1928,
+    "century": "20th century",
+    "era": "1900–1945"
+   },
+   "blurb": "Alexander Fleming discovers penicillin (1928). Fleming noticed mould killing bacteria in a dish in his London laboratory.",
+   "difficulty": 2
+  },
+  {
+   "id": "the-wall-street-crash",
+   "name": "The Wall Street Crash",
+   "group": "1900–1945",
+   "facts": {
+    "year": 1929,
+    "century": "20th century",
+    "era": "1900–1945"
+   },
+   "blurb": "The Wall Street Crash (1929). A stock market collapse in New York helped trigger the Great Depression.",
+   "difficulty": 2
+  },
+  {
+   "id": "the-first-fifa-world-cup",
+   "name": "The first FIFA World Cup",
+   "group": "1900–1945",
+   "facts": {
+    "year": 1930,
+    "century": "20th century",
+    "era": "1900–1945"
+   },
+   "blurb": "The first FIFA World Cup (1930). Uruguay hosted and won the first football World Cup.",
+   "difficulty": 2
+  },
+  {
+   "id": "hitler-becomes-chancellor-of-germany",
+   "name": "Hitler becomes chancellor of Germany",
+   "group": "1900–1945",
+   "facts": {
+    "year": 1933,
+    "century": "20th century",
+    "era": "1900–1945"
+   },
+   "blurb": "Hitler becomes chancellor of Germany (1933). The Nazi leader was appointed chancellor and soon became dictator.",
+   "difficulty": 2
+  },
+  {
+   "id": "the-hindenburg-disaster",
+   "name": "The Hindenburg disaster",
+   "group": "1900–1945",
+   "facts": {
+    "year": 1937,
+    "century": "20th century",
+    "era": "1900–1945"
+   },
+   "blurb": "The Hindenburg disaster (1937). A German passenger airship caught fire while landing in New Jersey.",
+   "difficulty": 3
+  },
+  {
+   "id": "the-second-world-war-begins",
+   "name": "The Second World War begins",
+   "group": "1900–1945",
+   "facts": {
+    "year": 1939,
+    "century": "20th century",
+    "era": "1900–1945"
+   },
+   "blurb": "The Second World War begins (1939). Germany invaded Poland; Britain and France declared war.",
+   "difficulty": 1
+  },
+  {
+   "id": "the-attack-on-pearl-harbor",
+   "name": "The attack on Pearl Harbor",
+   "group": "1900–1945",
+   "facts": {
+    "year": 1941,
+    "century": "20th century",
+    "era": "1900–1945"
+   },
+   "blurb": "The attack on Pearl Harbor (1941). Japan attacked the US naval base in Hawaii, bringing the US into the war.",
+   "difficulty": 2
+  },
+  {
+   "id": "d-day-the-normandy-landings",
+   "name": "D-Day: the Normandy landings",
+   "group": "1900–1945",
+   "facts": {
+    "year": 1944,
+    "century": "20th century",
+    "era": "1900–1945"
+   },
+   "blurb": "D-Day: the Normandy landings (1944). Allied troops landed on the beaches of Normandy in France.",
+   "difficulty": 1
+  },
+  {
+   "id": "atomic-bombs-are-dropped-on-japan",
+   "name": "Atomic bombs are dropped on Japan",
+   "group": "1900–1945",
+   "facts": {
+    "year": 1945,
+    "century": "20th century",
+    "era": "1900–1945"
+   },
+   "blurb": "Atomic bombs are dropped on Japan (1945). The US dropped atomic bombs on Hiroshima and Nagasaki.",
+   "difficulty": 2
+  },
+  {
+   "id": "the-united-nations-is-founded",
+   "name": "The United Nations is founded",
+   "group": "1900–1945",
+   "facts": {
+    "year": 1945,
+    "century": "20th century",
+    "era": "1900–1945"
+   },
+   "blurb": "The United Nations is founded (1945). The UN was set up after the Second World War to keep international peace.",
+   "difficulty": 2
+  },
+  {
+   "id": "india-and-pakistan-become-independent",
+   "name": "India and Pakistan become independent",
+   "group": "Since 1945",
+   "facts": {
+    "year": 1947,
+    "century": "20th century",
+    "era": "Since 1945"
+   },
+   "blurb": "India and Pakistan become independent (1947). British rule ended and the subcontinent was divided into two countries.",
+   "difficulty": 2
+  },
+  {
+   "id": "the-nhs-is-founded",
+   "name": "The NHS is founded",
+   "group": "Since 1945",
+   "facts": {
+    "year": 1948,
+    "century": "20th century",
+    "era": "Since 1945"
+   },
+   "blurb": "The NHS is founded (1948). Britain's National Health Service began offering free healthcare.",
+   "difficulty": 3
+  },
+  {
+   "id": "the-people-s-republic-of-china-is-proclaimed",
+   "name": "The People's Republic of China is proclaimed",
+   "group": "Since 1945",
+   "facts": {
+    "year": 1949,
+    "century": "20th century",
+    "era": "Since 1945"
+   },
+   "blurb": "The People's Republic of China is proclaimed (1949). Mao Zedong declared the new state in Beijing.",
+   "difficulty": 3
+  },
+  {
+   "id": "the-korean-war-begins",
+   "name": "The Korean War begins",
+   "group": "Since 1945",
+   "facts": {
+    "year": 1950,
+    "century": "20th century",
+    "era": "Since 1945"
+   },
+   "blurb": "The Korean War begins (1950). North Korea invaded South Korea.",
+   "difficulty": 3
+  },
+  {
+   "id": "everest-is-climbed-for-the-first-time",
+   "name": "Everest is climbed for the first time",
+   "group": "Since 1945",
+   "facts": {
+    "year": 1953,
+    "century": "20th century",
+    "era": "Since 1945"
+   },
+   "blurb": "Everest is climbed for the first time (1953). Edmund Hillary and Tenzing Norgay reached the summit.",
+   "difficulty": 1
+  },
+  {
+   "id": "queen-elizabeth-ii-is-crowned",
+   "name": "Queen Elizabeth II is crowned",
+   "group": "Since 1945",
+   "facts": {
+    "year": 1953,
+    "century": "20th century",
+    "era": "Since 1945"
+   },
+   "blurb": "Queen Elizabeth II is crowned (1953). The coronation was watched on television by millions.",
+   "difficulty": 2
+  },
+  {
+   "id": "rosa-parks-and-the-montgomery-bus-boycott",
+   "name": "Rosa Parks and the Montgomery bus boycott",
+   "group": "Since 1945",
+   "facts": {
+    "year": 1955,
+    "century": "20th century",
+    "era": "Since 1945"
+   },
+   "blurb": "Rosa Parks and the Montgomery bus boycott (1955). Rosa Parks's arrest for keeping her bus seat sparked a year-long boycott.",
+   "difficulty": 2
+  },
+  {
+   "id": "sputnik-the-first-satellite-is-launched",
+   "name": "Sputnik, the first satellite, is launched",
+   "group": "Since 1945",
+   "facts": {
+    "year": 1957,
+    "century": "20th century",
+    "era": "Since 1945"
+   },
+   "blurb": "Sputnik, the first satellite, is launched (1957). The Soviet Union put the first artificial satellite into orbit.",
+   "difficulty": 2
+  },
+  {
+   "id": "yuri-gagarin-becomes-the-first-person-in-space",
+   "name": "Yuri Gagarin becomes the first person in space",
+   "group": "Since 1945",
+   "facts": {
+    "year": 1961,
+    "century": "20th century",
+    "era": "Since 1945"
+   },
+   "blurb": "Yuri Gagarin becomes the first person in space (1961). The Soviet cosmonaut orbited the Earth once.",
+   "difficulty": 1
+  },
+  {
+   "id": "the-berlin-wall-is-built",
+   "name": "The Berlin Wall is built",
+   "group": "Since 1945",
+   "facts": {
+    "year": 1961,
+    "century": "20th century",
+    "era": "Since 1945"
+   },
+   "blurb": "The Berlin Wall is built (1961). East Germany sealed off West Berlin with a wall.",
+   "difficulty": 2
+  },
+  {
+   "id": "the-cuban-missile-crisis",
+   "name": "The Cuban Missile Crisis",
+   "group": "Since 1945",
+   "facts": {
+    "year": 1962,
+    "century": "20th century",
+    "era": "Since 1945"
+   },
+   "blurb": "The Cuban Missile Crisis (1962). The US and the Soviet Union came close to nuclear war over missiles in Cuba.",
+   "difficulty": 2
+  },
+  {
+   "id": "martin-luther-king-jr-s-i-have-a-dream-speech",
+   "name": "Martin Luther King Jr.'s \"I Have a Dream\" speech",
+   "group": "Since 1945",
+   "facts": {
+    "year": 1963,
+    "century": "20th century",
+    "era": "Since 1945"
+   },
+   "blurb": "Martin Luther King Jr.'s \"I Have a Dream\" speech (1963). King spoke to about 250,000 people at the Lincoln Memorial.",
+   "difficulty": 2
+  },
+  {
+   "id": "president-kennedy-is-assassinated",
+   "name": "President Kennedy is assassinated",
+   "group": "Since 1945",
+   "facts": {
+    "year": 1963,
+    "century": "20th century",
+    "era": "Since 1945"
+   },
+   "blurb": "President Kennedy is assassinated (1963). John F. Kennedy was shot in Dallas, Texas.",
+   "difficulty": 2
+  },
+  {
+   "id": "apollo-11-lands-on-the-moon",
+   "name": "Apollo 11 lands on the Moon",
+   "group": "Since 1945",
+   "facts": {
+    "year": 1969,
+    "century": "20th century",
+    "era": "Since 1945"
+   },
+   "blurb": "Apollo 11 lands on the Moon (1969). Neil Armstrong and Buzz Aldrin became the first people to walk on the Moon.",
+   "difficulty": 1
+  },
+  {
+   "id": "the-apollo-13-rescue",
+   "name": "The Apollo 13 rescue",
+   "group": "Since 1945",
+   "facts": {
+    "year": 1970,
+    "century": "20th century",
+    "era": "Since 1945"
+   },
+   "blurb": "The Apollo 13 rescue (1970). An explosion forced the crew to abandon their Moon landing and loop home safely.",
+   "difficulty": 3
+  },
+  {
+   "id": "richard-nixon-resigns",
+   "name": "Richard Nixon resigns",
+   "group": "Since 1945",
+   "facts": {
+    "year": 1974,
+    "century": "20th century",
+    "era": "Since 1945"
+   },
+   "blurb": "Richard Nixon resigns (1974). The US president resigned over the Watergate scandal.",
+   "difficulty": 3
+  },
+  {
+   "id": "concorde-begins-passenger-flights",
+   "name": "Concorde begins passenger flights",
+   "group": "Since 1945",
+   "facts": {
+    "year": 1976,
+    "century": "20th century",
+    "era": "Since 1945"
+   },
+   "blurb": "Concorde begins passenger flights (1976). The supersonic airliner entered service with British Airways and Air France.",
+   "difficulty": 3
+  },
+  {
+   "id": "mount-st-helens-erupts",
+   "name": "Mount St. Helens erupts",
+   "group": "Since 1945",
+   "facts": {
+    "year": 1980,
+    "century": "20th century",
+    "era": "Since 1945"
+   },
+   "blurb": "Mount St. Helens erupts (1980). The volcano in Washington State blew out its side in a huge eruption.",
+   "difficulty": 3
+  },
+  {
+   "id": "the-challenger-disaster",
+   "name": "The Challenger disaster",
+   "group": "Since 1945",
+   "facts": {
+    "year": 1986,
+    "century": "20th century",
+    "era": "Since 1945"
+   },
+   "blurb": "The Challenger disaster (1986). The space shuttle broke apart shortly after launch.",
+   "difficulty": 3
+  },
+  {
+   "id": "the-chernobyl-disaster",
+   "name": "The Chernobyl disaster",
+   "group": "Since 1945",
+   "facts": {
+    "year": 1986,
+    "century": "20th century",
+    "era": "Since 1945"
+   },
+   "blurb": "The Chernobyl disaster (1986). A reactor exploded at a nuclear power plant in Soviet Ukraine.",
+   "difficulty": 2
+  },
+  {
+   "id": "the-fall-of-the-berlin-wall",
+   "name": "The fall of the Berlin Wall",
+   "group": "Since 1945",
+   "facts": {
+    "year": 1989,
+    "century": "20th century",
+    "era": "Since 1945"
+   },
+   "blurb": "The fall of the Berlin Wall (1989). Crowds crossed and began tearing down the wall as East Germany opened its borders.",
+   "difficulty": 1
+  },
+  {
+   "id": "the-hubble-space-telescope-is-launched",
+   "name": "The Hubble Space Telescope is launched",
+   "group": "Since 1945",
+   "facts": {
+    "year": 1990,
+    "century": "20th century",
+    "era": "Since 1945"
+   },
+   "blurb": "The Hubble Space Telescope is launched (1990). The telescope was carried into orbit by a space shuttle.",
+   "difficulty": 3
+  },
+  {
+   "id": "germany-is-reunified",
+   "name": "Germany is reunified",
+   "group": "Since 1945",
+   "facts": {
+    "year": 1990,
+    "century": "20th century",
+    "era": "Since 1945"
+   },
+   "blurb": "Germany is reunified (1990). East and West Germany became one country again.",
+   "difficulty": 2
+  },
+  {
+   "id": "the-soviet-union-breaks-up",
+   "name": "The Soviet Union breaks up",
+   "group": "Since 1945",
+   "facts": {
+    "year": 1991,
+    "century": "20th century",
+    "era": "Since 1945"
+   },
+   "blurb": "The Soviet Union breaks up (1991). The USSR split into fifteen independent countries.",
+   "difficulty": 2
+  },
+  {
+   "id": "nelson-mandela-becomes-president-of-south-africa",
+   "name": "Nelson Mandela becomes president of South Africa",
+   "group": "Since 1945",
+   "facts": {
+    "year": 1994,
+    "century": "20th century",
+    "era": "Since 1945"
+   },
+   "blurb": "Nelson Mandela becomes president of South Africa (1994). South Africa's first fully democratic election ended apartheid rule.",
+   "difficulty": 2
+  },
+  {
+   "id": "the-channel-tunnel-opens",
+   "name": "The Channel Tunnel opens",
+   "group": "Since 1945",
+   "facts": {
+    "year": 1994,
+    "century": "20th century",
+    "era": "Since 1945"
+   },
+   "blurb": "The Channel Tunnel opens (1994). A rail tunnel linked Britain and France under the sea.",
+   "difficulty": 2
+  },
+  {
+   "id": "dolly-the-sheep-is-born",
+   "name": "Dolly the sheep is born",
+   "group": "Since 1945",
+   "facts": {
+    "year": 1996,
+    "century": "20th century",
+    "era": "Since 1945"
+   },
+   "blurb": "Dolly the sheep is born (1996). Dolly was the first mammal cloned from an adult cell.",
+   "difficulty": 3
+  },
+  {
+   "id": "hong-kong-is-handed-back-to-china",
+   "name": "Hong Kong is handed back to China",
+   "group": "Since 1945",
+   "facts": {
+    "year": 1997,
+    "century": "20th century",
+    "era": "Since 1945"
+   },
+   "blurb": "Hong Kong is handed back to China (1997). Britain returned Hong Kong to China after more than 150 years.",
+   "difficulty": 2
+  },
+  {
+   "id": "wikipedia-is-launched",
+   "name": "Wikipedia is launched",
+   "group": "Since 1945",
+   "facts": {
+    "year": 2001,
+    "century": "21st century",
+    "era": "Since 1945"
+   },
+   "blurb": "Wikipedia is launched (2001). The free online encyclopedia anyone can edit went live.",
+   "difficulty": 2
+  },
+  {
+   "id": "the-september-11-attacks",
+   "name": "The September 11 attacks",
+   "group": "Since 1945",
+   "facts": {
+    "year": 2001,
+    "century": "21st century",
+    "era": "Since 1945"
+   },
+   "blurb": "The September 11 attacks (2001). Hijacked planes destroyed the World Trade Center in New York.",
+   "difficulty": 2
+  },
+  {
+   "id": "euro-notes-and-coins-come-into-use",
+   "name": "Euro notes and coins come into use",
+   "group": "Since 1945",
+   "facts": {
+    "year": 2002,
+    "century": "21st century",
+    "era": "Since 1945"
+   },
+   "blurb": "Euro notes and coins come into use (2002). Twelve European countries switched to euro cash.",
+   "difficulty": 2
+  },
+  {
+   "id": "the-human-genome-project-is-completed",
+   "name": "The Human Genome Project is completed",
+   "group": "Since 1945",
+   "facts": {
+    "year": 2003,
+    "century": "21st century",
+    "era": "Since 1945"
+   },
+   "blurb": "The Human Genome Project is completed (2003). Scientists finished mapping nearly all human genes.",
+   "difficulty": 3
+  },
+  {
+   "id": "facebook-is-founded",
+   "name": "Facebook is founded",
+   "group": "Since 1945",
+   "facts": {
+    "year": 2004,
+    "century": "21st century",
+    "era": "Since 1945"
+   },
+   "blurb": "Facebook is founded (2004). Mark Zuckerberg and fellow students launched it at Harvard.",
+   "difficulty": 2
+  },
+  {
+   "id": "the-indian-ocean-tsunami",
+   "name": "The Indian Ocean tsunami",
+   "group": "Since 1945",
+   "facts": {
+    "year": 2004,
+    "century": "21st century",
+    "era": "Since 1945"
+   },
+   "blurb": "The Indian Ocean tsunami (2004). An undersea earthquake caused tsunamis that killed about 230,000 people.",
+   "difficulty": 2
+  },
+  {
+   "id": "the-first-iphone-goes-on-sale",
+   "name": "The first iPhone goes on sale",
+   "group": "Since 1945",
+   "facts": {
+    "year": 2007,
+    "century": "21st century",
+    "era": "Since 1945"
+   },
+   "blurb": "The first iPhone goes on sale (2007). Apple released its first smartphone.",
+   "difficulty": 2
+  },
+  {
+   "id": "barack-obama-is-elected-us-president",
+   "name": "Barack Obama is elected US president",
+   "group": "Since 1945",
+   "facts": {
+    "year": 2008,
+    "century": "21st century",
+    "era": "Since 1945"
+   },
+   "blurb": "Barack Obama is elected US president (2008). Obama became the first African American president.",
+   "difficulty": 2
+  },
+  {
+   "id": "the-higgs-boson-is-discovered",
+   "name": "The Higgs boson is discovered",
+   "group": "Since 1945",
+   "facts": {
+    "year": 2012,
+    "century": "21st century",
+    "era": "Since 1945"
+   },
+   "blurb": "The Higgs boson is discovered (2012). Scientists at CERN announced the long-sought particle.",
+   "difficulty": 3
+  },
+  {
+   "id": "london-hosts-the-olympics-for-the-third-time",
+   "name": "London hosts the Olympics for the third time",
+   "group": "Since 1945",
+   "facts": {
+    "year": 2012,
+    "century": "21st century",
+    "era": "Since 1945"
+   },
+   "blurb": "London hosts the Olympics for the third time (2012). London had also hosted the Games in 1908 and 1948.",
+   "difficulty": 2
+  },
+  {
+   "id": "the-brexit-referendum",
+   "name": "The Brexit referendum",
+   "group": "Since 1945",
+   "facts": {
+    "year": 2016,
+    "century": "21st century",
+    "era": "Since 1945"
+   },
+   "blurb": "The Brexit referendum (2016). UK voters chose to leave the European Union.",
+   "difficulty": 2
+  },
+  {
+   "id": "covid-19-is-declared-a-pandemic",
+   "name": "COVID-19 is declared a pandemic",
+   "group": "Since 1945",
+   "facts": {
+    "year": 2020,
+    "century": "21st century",
+    "era": "Since 1945"
+   },
+   "blurb": "COVID-19 is declared a pandemic (2020). The World Health Organization declared the outbreak a pandemic in March.",
+   "difficulty": 1
+  },
+  {
+   "id": "the-james-webb-space-telescope-is-launched",
+   "name": "The James Webb Space Telescope is launched",
+   "group": "Since 1945",
+   "facts": {
+    "year": 2021,
+    "century": "21st century",
+    "era": "Since 1945"
+   },
+   "blurb": "The James Webb Space Telescope is launched (2021). The powerful infrared telescope was launched on Christmas Day.",
+   "difficulty": 3
+  },
+  {
+   "id": "queen-elizabeth-ii-dies",
+   "name": "Queen Elizabeth II dies",
+   "group": "Since 1945",
+   "facts": {
+    "year": 2022,
+    "century": "21st century",
+    "era": "Since 1945"
+   },
+   "blurb": "Queen Elizabeth II dies (2022). She died at Balmoral after a reign of 70 years.",
+   "difficulty": 2
+  }
+ ],
+ "questions": [
+  {
+   "id": "year-the-first-recorded-ancient-olympic-games",
+   "kind": "mc",
+   "prompt": "When did this happen? The first recorded ancient Olympic Games",
+   "answer": "776 BC",
+   "wrong": [
+    "926 BC",
+    "676 BC",
+    "726 BC"
+   ],
+   "explain": "The first recorded ancient Olympic Games (776 BC). Tradition dates the first Games at Olympia, in Greece, to 776 BC.",
+   "difficulty": 3,
+   "refs": [
+    "history/the-first-recorded-ancient-olympic-games"
+   ]
+  },
+  {
+   "id": "year-the-battle-of-marathon",
+   "kind": "mc",
+   "prompt": "When did this happen? The Battle of Marathon",
+   "answer": "490 BC",
+   "wrong": [
+    "590 BC",
+    "440 BC",
+    "390 BC"
+   ],
+   "explain": "The Battle of Marathon (490 BC). Athens defeated a Persian invasion force on the plain of Marathon.",
+   "difficulty": 3,
+   "refs": [
+    "history/the-battle-of-marathon"
+   ]
+  },
+  {
+   "id": "year-the-battle-of-thermopylae",
+   "kind": "mc",
+   "prompt": "When did this happen? The Battle of Thermopylae",
+   "answer": "480 BC",
+   "wrong": [
+    "430 BC",
+    "630 BC",
+    "530 BC"
+   ],
+   "explain": "The Battle of Thermopylae (480 BC). A small Greek force led by 300 Spartans held a narrow pass against the Persian army.",
+   "difficulty": 3,
+   "refs": [
+    "history/the-battle-of-thermopylae"
+   ]
+  },
+  {
+   "id": "year-qin-shi-huang-unifies-china",
+   "kind": "mc",
+   "prompt": "When did this happen? Qin Shi Huang unifies China",
+   "answer": "221 BC",
+   "wrong": [
+    "321 BC",
+    "271 BC",
+    "371 BC"
+   ],
+   "explain": "Qin Shi Huang unifies China (221 BC). The state of Qin conquered its rivals, creating the first unified Chinese empire.",
+   "difficulty": 3,
+   "refs": [
+    "history/qin-shi-huang-unifies-china"
+   ]
+  },
+  {
+   "id": "year-the-assassination-of-julius-caesar",
+   "kind": "mc",
+   "prompt": "When did this happen? The assassination of Julius Caesar",
+   "answer": "44 BC",
+   "wrong": [
+    "AD 106",
+    "144 BC",
+    "AD 56"
+   ],
+   "explain": "The assassination of Julius Caesar (44 BC). Roman senators stabbed Caesar to death on the Ides of March.",
+   "difficulty": 2,
+   "refs": [
+    "history/the-assassination-of-julius-caesar"
+   ]
+  },
+  {
+   "id": "year-vesuvius-buries-pompeii",
+   "kind": "mc",
+   "prompt": "When did this happen? Vesuvius buries Pompeii",
+   "answer": "AD 79",
+   "wrong": [
+    "71 BC",
+    "AD 179",
+    "21 BC"
+   ],
+   "explain": "Vesuvius buries Pompeii (AD 79). The volcano's eruption buried the Roman towns of Pompeii and Herculaneum under ash.",
+   "difficulty": 2,
+   "refs": [
+    "history/vesuvius-buries-pompeii"
+   ]
+  },
+  {
+   "id": "year-work-begins-on-hadrian-s-wall",
+   "kind": "mc",
+   "prompt": "When did this happen? Work begins on Hadrian's Wall",
+   "answer": "AD 122",
+   "wrong": [
+    "AD 272",
+    "AD 172",
+    "AD 72"
+   ],
+   "explain": "Work begins on Hadrian's Wall (AD 122). The Roman emperor Hadrian ordered a wall across northern Britain.",
+   "difficulty": 3,
+   "refs": [
+    "history/work-begins-on-hadrian-s-wall"
+   ]
+  },
+  {
+   "id": "year-the-fall-of-the-western-roman-empire",
+   "kind": "mc",
+   "prompt": "When did this happen? The fall of the Western Roman Empire",
+   "answer": "AD 476",
+   "wrong": [
+    "AD 526",
+    "AD 326",
+    "AD 576"
+   ],
+   "explain": "The fall of the Western Roman Empire (AD 476). The last western Roman emperor, Romulus Augustulus, was deposed.",
+   "difficulty": 3,
+   "refs": [
+    "history/the-fall-of-the-western-roman-empire"
+   ]
+  },
+  {
+   "id": "year-vikings-raid-lindisfarne",
+   "kind": "mc",
+   "prompt": "When did this happen? Vikings raid Lindisfarne",
+   "answer": "AD 793",
+   "wrong": [
+    "AD 693",
+    "AD 743",
+    "AD 643"
+   ],
+   "explain": "Vikings raid Lindisfarne (AD 793). A Viking raid on the island monastery is often taken as the start of the Viking Age in Britain.",
+   "difficulty": 3,
+   "refs": [
+    "history/vikings-raid-lindisfarne"
+   ]
+  },
+  {
+   "id": "year-charlemagne-is-crowned-emperor",
+   "kind": "mc",
+   "prompt": "When did this happen? Charlemagne is crowned emperor",
+   "answer": "AD 800",
+   "wrong": [
+    "AD 700",
+    "AD 850",
+    "AD 950"
+   ],
+   "explain": "Charlemagne is crowned emperor (AD 800). The pope crowned the Frankish king Emperor of the Romans on Christmas Day.",
+   "difficulty": 3,
+   "refs": [
+    "history/charlemagne-is-crowned-emperor"
+   ]
+  },
+  {
+   "id": "year-the-battle-of-hastings",
+   "kind": "mc",
+   "prompt": "When did this happen? The Battle of Hastings",
+   "answer": "1066",
+   "wrong": [
+    "1036",
+    "1046",
+    "1056"
+   ],
+   "explain": "The Battle of Hastings (1066). William of Normandy defeated King Harold II and conquered England.",
+   "difficulty": 1,
+   "refs": [
+    "history/the-battle-of-hastings"
+   ]
+  },
+  {
+   "id": "num-the-battle-of-hastings",
+   "kind": "number",
+   "prompt": "In what year? The Battle of Hastings",
+   "answer": 1066,
+   "unit": "",
+   "tolerance": 10,
+   "explain": "The Battle of Hastings (1066). William of Normandy defeated King Harold II and conquered England.",
+   "difficulty": 2,
+   "refs": [
+    "history/the-battle-of-hastings"
+   ]
+  },
+  {
+   "id": "year-magna-carta-is-sealed",
+   "kind": "mc",
+   "prompt": "When did this happen? Magna Carta is sealed",
+   "answer": "1215",
+   "wrong": [
+    "1195",
+    "1235",
+    "1225"
+   ],
+   "explain": "Magna Carta is sealed (1215). King John agreed to a charter limiting royal power, at Runnymede.",
+   "difficulty": 2,
+   "refs": [
+    "history/magna-carta-is-sealed"
+   ]
+  },
+  {
+   "id": "num-magna-carta-is-sealed",
+   "kind": "number",
+   "prompt": "In what year? Magna Carta is sealed",
+   "answer": 1215,
+   "unit": "",
+   "tolerance": 10,
+   "explain": "Magna Carta is sealed (1215). King John agreed to a charter limiting royal power, at Runnymede.",
+   "difficulty": 3,
+   "refs": [
+    "history/magna-carta-is-sealed"
+   ]
+  },
+  {
+   "id": "year-the-black-death-reaches-europe",
+   "kind": "mc",
+   "prompt": "When did this happen? The Black Death reaches Europe",
+   "answer": "1347",
+   "wrong": [
+    "1357",
+    "1317",
+    "1327"
+   ],
+   "explain": "The Black Death reaches Europe (1347). Bubonic plague arrived in Europe and killed perhaps a third of its people within a few years.",
+   "difficulty": 2,
+   "refs": [
+    "history/the-black-death-reaches-europe"
+   ]
+  },
+  {
+   "id": "num-the-black-death-reaches-europe",
+   "kind": "number",
+   "prompt": "In what year? The Black Death reaches Europe",
+   "answer": 1347,
+   "unit": "",
+   "tolerance": 10,
+   "explain": "The Black Death reaches Europe (1347). Bubonic plague arrived in Europe and killed perhaps a third of its people within a few years.",
+   "difficulty": 3,
+   "refs": [
+    "history/the-black-death-reaches-europe"
+   ]
+  },
+  {
+   "id": "year-the-fall-of-constantinople",
+   "kind": "mc",
+   "prompt": "When did this happen? The fall of Constantinople",
+   "answer": "1453",
+   "wrong": [
+    "1423",
+    "1483",
+    "1433"
+   ],
+   "explain": "The fall of Constantinople (1453). Ottoman forces captured the Byzantine capital, ending the Eastern Roman Empire.",
+   "difficulty": 2,
+   "refs": [
+    "history/the-fall-of-constantinople"
+   ]
+  },
+  {
+   "id": "num-the-fall-of-constantinople",
+   "kind": "number",
+   "prompt": "In what year? The fall of Constantinople",
+   "answer": 1453,
+   "unit": "",
+   "tolerance": 10,
+   "explain": "The fall of Constantinople (1453). Ottoman forces captured the Byzantine capital, ending the Eastern Roman Empire.",
+   "difficulty": 3,
+   "refs": [
+    "history/the-fall-of-constantinople"
+   ]
+  },
+  {
+   "id": "year-the-battle-of-bosworth-field",
+   "kind": "mc",
+   "prompt": "When did this happen? The Battle of Bosworth Field",
+   "answer": "1485",
+   "wrong": [
+    "1505",
+    "1495",
+    "1475"
+   ],
+   "explain": "The Battle of Bosworth Field (1485). Henry Tudor defeated Richard III, beginning the Tudor dynasty.",
+   "difficulty": 3,
+   "refs": [
+    "history/the-battle-of-bosworth-field"
+   ]
+  },
+  {
+   "id": "year-columbus-reaches-the-americas",
+   "kind": "mc",
+   "prompt": "When did this happen? Columbus reaches the Americas",
+   "answer": "1492",
+   "wrong": [
+    "1512",
+    "1482",
+    "1472"
+   ],
+   "explain": "Columbus reaches the Americas (1492). Christopher Columbus landed in the Bahamas while trying to reach Asia by sailing west.",
+   "difficulty": 1,
+   "refs": [
+    "history/columbus-reaches-the-americas"
+   ]
+  },
+  {
+   "id": "num-columbus-reaches-the-americas",
+   "kind": "number",
+   "prompt": "In what year? Columbus reaches the Americas",
+   "answer": 1492,
+   "unit": "",
+   "tolerance": 10,
+   "explain": "Columbus reaches the Americas (1492). Christopher Columbus landed in the Bahamas while trying to reach Asia by sailing west.",
+   "difficulty": 2,
+   "refs": [
+    "history/columbus-reaches-the-americas"
+   ]
+  },
+  {
+   "id": "year-martin-luther-s-ninety-five-theses",
+   "kind": "mc",
+   "prompt": "When did this happen? Martin Luther's Ninety-five Theses",
+   "answer": "1517",
+   "wrong": [
+    "1497",
+    "1527",
+    "1537"
+   ],
+   "explain": "Martin Luther's Ninety-five Theses (1517). Luther's challenge to the Church helped launch the Protestant Reformation.",
+   "difficulty": 2,
+   "refs": [
+    "history/martin-luther-s-ninety-five-theses"
+   ]
+  },
+  {
+   "id": "num-martin-luther-s-ninety-five-theses",
+   "kind": "number",
+   "prompt": "In what year? Martin Luther's Ninety-five Theses",
+   "answer": 1517,
+   "unit": "",
+   "tolerance": 10,
+   "explain": "Martin Luther's Ninety-five Theses (1517). Luther's challenge to the Church helped launch the Protestant Reformation.",
+   "difficulty": 3,
+   "refs": [
+    "history/martin-luther-s-ninety-five-theses"
+   ]
+  },
+  {
+   "id": "year-the-first-voyage-around-the-world-is-completed",
+   "kind": "mc",
+   "prompt": "When did this happen? The first voyage around the world is completed",
+   "answer": "1522",
+   "wrong": [
+    "1492",
+    "1502",
+    "1542"
+   ],
+   "explain": "The first voyage around the world is completed (1522). The survivors of Ferdinand Magellan's expedition returned to Spain; Magellan himself died on the way.",
+   "difficulty": 2,
+   "refs": [
+    "history/the-first-voyage-around-the-world-is-completed"
+   ]
+  },
+  {
+   "id": "num-the-first-voyage-around-the-world-is-completed",
+   "kind": "number",
+   "prompt": "In what year? The first voyage around the world is completed",
+   "answer": 1522,
+   "unit": "",
+   "tolerance": 10,
+   "explain": "The first voyage around the world is completed (1522). The survivors of Ferdinand Magellan's expedition returned to Spain; Magellan himself died on the way.",
+   "difficulty": 3,
+   "refs": [
+    "history/the-first-voyage-around-the-world-is-completed"
+   ]
+  },
+  {
+   "id": "year-the-defeat-of-the-spanish-armada",
+   "kind": "mc",
+   "prompt": "When did this happen? The defeat of the Spanish Armada",
+   "answer": "1588",
+   "wrong": [
+    "1598",
+    "1608",
+    "1618"
+   ],
+   "explain": "The defeat of the Spanish Armada (1588). A Spanish invasion fleet sent against England was beaten and scattered by storms.",
+   "difficulty": 2,
+   "refs": [
+    "history/the-defeat-of-the-spanish-armada"
+   ]
+  },
+  {
+   "id": "num-the-defeat-of-the-spanish-armada",
+   "kind": "number",
+   "prompt": "In what year? The defeat of the Spanish Armada",
+   "answer": 1588,
+   "unit": "",
+   "tolerance": 10,
+   "explain": "The defeat of the Spanish Armada (1588). A Spanish invasion fleet sent against England was beaten and scattered by storms.",
+   "difficulty": 3,
+   "refs": [
+    "history/the-defeat-of-the-spanish-armada"
+   ]
+  },
+  {
+   "id": "year-the-gunpowder-plot",
+   "kind": "mc",
+   "prompt": "When did this happen? The Gunpowder Plot",
+   "answer": "1605",
+   "wrong": [
+    "1575",
+    "1585",
+    "1615"
+   ],
+   "explain": "The Gunpowder Plot (1605). Plotters including Guy Fawkes tried and failed to blow up the English Parliament.",
+   "difficulty": 2,
+   "refs": [
+    "history/the-gunpowder-plot"
+   ]
+  },
+  {
+   "id": "num-the-gunpowder-plot",
+   "kind": "number",
+   "prompt": "In what year? The Gunpowder Plot",
+   "answer": 1605,
+   "unit": "",
+   "tolerance": 10,
+   "explain": "The Gunpowder Plot (1605). Plotters including Guy Fawkes tried and failed to blow up the English Parliament.",
+   "difficulty": 3,
+   "refs": [
+    "history/the-gunpowder-plot"
+   ]
+  },
+  {
+   "id": "year-the-mayflower-reaches-america",
+   "kind": "mc",
+   "prompt": "When did this happen? The Mayflower reaches America",
+   "answer": "1620",
+   "wrong": [
+    "1650",
+    "1590",
+    "1610"
+   ],
+   "explain": "The Mayflower reaches America (1620). English Pilgrims sailed to found Plymouth Colony in what is now Massachusetts.",
+   "difficulty": 2,
+   "refs": [
+    "history/the-mayflower-reaches-america"
+   ]
+  },
+  {
+   "id": "num-the-mayflower-reaches-america",
+   "kind": "number",
+   "prompt": "In what year? The Mayflower reaches America",
+   "answer": 1620,
+   "unit": "",
+   "tolerance": 10,
+   "explain": "The Mayflower reaches America (1620). English Pilgrims sailed to found Plymouth Colony in what is now Massachusetts.",
+   "difficulty": 3,
+   "refs": [
+    "history/the-mayflower-reaches-america"
+   ]
+  },
+  {
+   "id": "year-the-peace-of-westphalia",
+   "kind": "mc",
+   "prompt": "When did this happen? The Peace of Westphalia",
+   "answer": "1648",
+   "wrong": [
+    "1668",
+    "1618",
+    "1658"
+   ],
+   "explain": "The Peace of Westphalia (1648). Treaties ended the Thirty Years' War in Europe.",
+   "difficulty": 3,
+   "refs": [
+    "history/the-peace-of-westphalia"
+   ]
+  },
+  {
+   "id": "year-king-charles-i-is-executed",
+   "kind": "mc",
+   "prompt": "When did this happen? King Charles I is executed",
+   "answer": "1649",
+   "wrong": [
+    "1669",
+    "1659",
+    "1639"
+   ],
+   "explain": "King Charles I is executed (1649). After the English Civil War, the king was beheaded in London.",
+   "difficulty": 3,
+   "refs": [
+    "history/king-charles-i-is-executed"
+   ]
+  },
+  {
+   "id": "year-the-great-fire-of-london",
+   "kind": "mc",
+   "prompt": "When did this happen? The Great Fire of London",
+   "answer": "1666",
+   "wrong": [
+    "1696",
+    "1676",
+    "1646"
+   ],
+   "explain": "The Great Fire of London (1666). A fire starting in a bakery on Pudding Lane destroyed much of the city.",
+   "difficulty": 1,
+   "refs": [
+    "history/the-great-fire-of-london"
+   ]
+  },
+  {
+   "id": "num-the-great-fire-of-london",
+   "kind": "number",
+   "prompt": "In what year? The Great Fire of London",
+   "answer": 1666,
+   "unit": "",
+   "tolerance": 10,
+   "explain": "The Great Fire of London (1666). A fire starting in a bakery on Pudding Lane destroyed much of the city.",
+   "difficulty": 2,
+   "refs": [
+    "history/the-great-fire-of-london"
+   ]
+  },
+  {
+   "id": "year-england-and-scotland-unite",
+   "kind": "mc",
+   "prompt": "When did this happen? England and Scotland unite",
+   "answer": "1707",
+   "wrong": [
+    "1677",
+    "1687",
+    "1737"
+   ],
+   "explain": "England and Scotland unite (1707). The Acts of Union created the Kingdom of Great Britain.",
+   "difficulty": 3,
+   "refs": [
+    "history/england-and-scotland-unite"
+   ]
+  },
+  {
+   "id": "year-captain-cook-reaches-botany-bay",
+   "kind": "mc",
+   "prompt": "When did this happen? Captain Cook reaches Botany Bay",
+   "answer": "1770",
+   "wrong": [
+    "1780",
+    "1750",
+    "1790"
+   ],
+   "explain": "Captain Cook reaches Botany Bay (1770). James Cook's ship Endeavour landed on the east coast of Australia.",
+   "difficulty": 3,
+   "refs": [
+    "history/captain-cook-reaches-botany-bay"
+   ]
+  },
+  {
+   "id": "year-the-boston-tea-party",
+   "kind": "mc",
+   "prompt": "When did this happen? The Boston Tea Party",
+   "answer": "1773",
+   "wrong": [
+    "1783",
+    "1793",
+    "1753"
+   ],
+   "explain": "The Boston Tea Party (1773). American colonists dumped British tea into Boston Harbor in protest at taxes.",
+   "difficulty": 2,
+   "refs": [
+    "history/the-boston-tea-party"
+   ]
+  },
+  {
+   "id": "num-the-boston-tea-party",
+   "kind": "number",
+   "prompt": "In what year? The Boston Tea Party",
+   "answer": 1773,
+   "unit": "",
+   "tolerance": 10,
+   "explain": "The Boston Tea Party (1773). American colonists dumped British tea into Boston Harbor in protest at taxes.",
+   "difficulty": 3,
+   "refs": [
+    "history/the-boston-tea-party"
+   ]
+  },
+  {
+   "id": "year-the-us-declaration-of-independence",
+   "kind": "mc",
+   "prompt": "When did this happen? The US Declaration of Independence",
+   "answer": "1776",
+   "wrong": [
+    "1796",
+    "1806",
+    "1766"
+   ],
+   "explain": "The US Declaration of Independence (1776). Thirteen American colonies declared themselves independent from Britain.",
+   "difficulty": 1,
+   "refs": [
+    "history/the-us-declaration-of-independence"
+   ]
+  },
+  {
+   "id": "num-the-us-declaration-of-independence",
+   "kind": "number",
+   "prompt": "In what year? The US Declaration of Independence",
+   "answer": 1776,
+   "unit": "",
+   "tolerance": 10,
+   "explain": "The US Declaration of Independence (1776). Thirteen American colonies declared themselves independent from Britain.",
+   "difficulty": 2,
+   "refs": [
+    "history/the-us-declaration-of-independence"
+   ]
+  },
+  {
+   "id": "year-the-first-fleet-arrives-in-australia",
+   "kind": "mc",
+   "prompt": "When did this happen? The First Fleet arrives in Australia",
+   "answer": "1788",
+   "wrong": [
+    "1768",
+    "1758",
+    "1798"
+   ],
+   "explain": "The First Fleet arrives in Australia (1788). British ships carrying convicts founded a colony at Sydney Cove.",
+   "difficulty": 3,
+   "refs": [
+    "history/the-first-fleet-arrives-in-australia"
+   ]
+  },
+  {
+   "id": "year-the-storming-of-the-bastille",
+   "kind": "mc",
+   "prompt": "When did this happen? The storming of the Bastille",
+   "answer": "1789",
+   "wrong": [
+    "1769",
+    "1759",
+    "1819"
+   ],
+   "explain": "The storming of the Bastille (1789). Parisians stormed a royal fortress and prison, a key moment of the French Revolution.",
+   "difficulty": 2,
+   "refs": [
+    "history/the-storming-of-the-bastille"
+   ]
+  },
+  {
+   "id": "num-the-storming-of-the-bastille",
+   "kind": "number",
+   "prompt": "In what year? The storming of the Bastille",
+   "answer": 1789,
+   "unit": "",
+   "tolerance": 10,
+   "explain": "The storming of the Bastille (1789). Parisians stormed a royal fortress and prison, a key moment of the French Revolution.",
+   "difficulty": 3,
+   "refs": [
+    "history/the-storming-of-the-bastille"
+   ]
+  },
+  {
+   "id": "year-king-louis-xvi-is-executed",
+   "kind": "mc",
+   "prompt": "When did this happen? King Louis XVI is executed",
+   "answer": "1793",
+   "wrong": [
+    "1803",
+    "1773",
+    "1813"
+   ],
+   "explain": "King Louis XVI is executed (1793). The French king was guillotined during the Revolution.",
+   "difficulty": 3,
+   "refs": [
+    "history/king-louis-xvi-is-executed"
+   ]
+  },
+  {
+   "id": "year-the-louisiana-purchase",
+   "kind": "mc",
+   "prompt": "When did this happen? The Louisiana Purchase",
+   "answer": "1803",
+   "wrong": [
+    "1788",
+    "1818",
+    "1793"
+   ],
+   "explain": "The Louisiana Purchase (1803). The United States bought a vast territory west of the Mississippi from France.",
+   "difficulty": 3,
+   "refs": [
+    "history/the-louisiana-purchase"
+   ]
+  },
+  {
+   "id": "year-napoleon-crowns-himself-emperor",
+   "kind": "mc",
+   "prompt": "When did this happen? Napoleon crowns himself emperor",
+   "answer": "1804",
+   "wrong": [
+    "1809",
+    "1794",
+    "1789"
+   ],
+   "explain": "Napoleon crowns himself emperor (1804). Napoleon took the crown from the pope's hands at Notre-Dame in Paris.",
+   "difficulty": 3,
+   "refs": [
+    "history/napoleon-crowns-himself-emperor"
+   ]
+  },
+  {
+   "id": "year-the-battle-of-trafalgar",
+   "kind": "mc",
+   "prompt": "When did this happen? The Battle of Trafalgar",
+   "answer": "1805",
+   "wrong": [
+    "1800",
+    "1810",
+    "1795"
+   ],
+   "explain": "The Battle of Trafalgar (1805). Nelson's British fleet defeated a French and Spanish fleet; Nelson was killed.",
+   "difficulty": 2,
+   "refs": [
+    "history/the-battle-of-trafalgar"
+   ]
+  },
+  {
+   "id": "num-the-battle-of-trafalgar",
+   "kind": "number",
+   "prompt": "In what year? The Battle of Trafalgar",
+   "answer": 1805,
+   "unit": "",
+   "tolerance": 10,
+   "explain": "The Battle of Trafalgar (1805). Nelson's British fleet defeated a French and Spanish fleet; Nelson was killed.",
+   "difficulty": 3,
+   "refs": [
+    "history/the-battle-of-trafalgar"
+   ]
+  },
+  {
+   "id": "year-britain-abolishes-the-slave-trade",
+   "kind": "mc",
+   "prompt": "When did this happen? Britain abolishes the slave trade",
+   "answer": "1807",
+   "wrong": [
+    "1812",
+    "1792",
+    "1817"
+   ],
+   "explain": "Britain abolishes the slave trade (1807). Parliament banned the trade in enslaved people across the British Empire.",
+   "difficulty": 3,
+   "refs": [
+    "history/britain-abolishes-the-slave-trade"
+   ]
+  },
+  {
+   "id": "year-the-battle-of-waterloo",
+   "kind": "mc",
+   "prompt": "When did this happen? The Battle of Waterloo",
+   "answer": "1815",
+   "wrong": [
+    "1825",
+    "1805",
+    "1810"
+   ],
+   "explain": "The Battle of Waterloo (1815). Napoleon was finally defeated by Wellington and Blücher.",
+   "difficulty": 2,
+   "refs": [
+    "history/the-battle-of-waterloo"
+   ]
+  },
+  {
+   "id": "num-the-battle-of-waterloo",
+   "kind": "number",
+   "prompt": "In what year? The Battle of Waterloo",
+   "answer": 1815,
+   "unit": "",
+   "tolerance": 10,
+   "explain": "The Battle of Waterloo (1815). Napoleon was finally defeated by Wellington and Blücher.",
+   "difficulty": 3,
+   "refs": [
+    "history/the-battle-of-waterloo"
+   ]
+  },
+  {
+   "id": "year-the-first-public-steam-railway-opens",
+   "kind": "mc",
+   "prompt": "When did this happen? The first public steam railway opens",
+   "answer": "1825",
+   "wrong": [
+    "1815",
+    "1810",
+    "1830"
+   ],
+   "explain": "The first public steam railway opens (1825). The Stockton and Darlington Railway in England carried passengers behind a steam locomotive.",
+   "difficulty": 3,
+   "refs": [
+    "history/the-first-public-steam-railway-opens"
+   ]
+  },
+  {
+   "id": "year-the-great-famine-begins-in-ireland",
+   "kind": "mc",
+   "prompt": "When did this happen? The Great Famine begins in Ireland",
+   "answer": "1845",
+   "wrong": [
+    "1860",
+    "1835",
+    "1850"
+   ],
+   "explain": "The Great Famine begins in Ireland (1845). Potato blight caused a famine that killed about a million people.",
+   "difficulty": 3,
+   "refs": [
+    "history/the-great-famine-begins-in-ireland"
+   ]
+  },
+  {
+   "id": "year-the-california-gold-rush",
+   "kind": "mc",
+   "prompt": "When did this happen? The California Gold Rush",
+   "answer": "1848",
+   "wrong": [
+    "1863",
+    "1838",
+    "1858"
+   ],
+   "explain": "The California Gold Rush (1848). The discovery of gold at Sutter's Mill drew hundreds of thousands of people west.",
+   "difficulty": 3,
+   "refs": [
+    "history/the-california-gold-rush"
+   ]
+  },
+  {
+   "id": "year-darwin-publishes-on-the-origin-of-species",
+   "kind": "mc",
+   "prompt": "When did this happen? Darwin publishes On the Origin of Species",
+   "answer": "1859",
+   "wrong": [
+    "1849",
+    "1869",
+    "1844"
+   ],
+   "explain": "Darwin publishes On the Origin of Species (1859). Charles Darwin set out his theory of evolution by natural selection.",
+   "difficulty": 2,
+   "refs": [
+    "history/darwin-publishes-on-the-origin-of-species"
+   ]
+  },
+  {
+   "id": "num-darwin-publishes-on-the-origin-of-species",
+   "kind": "number",
+   "prompt": "In what year? Darwin publishes On the Origin of Species",
+   "answer": 1859,
+   "unit": "",
+   "tolerance": 10,
+   "explain": "Darwin publishes On the Origin of Species (1859). Charles Darwin set out his theory of evolution by natural selection.",
+   "difficulty": 3,
+   "refs": [
+    "history/darwin-publishes-on-the-origin-of-species"
+   ]
+  },
+  {
+   "id": "year-the-american-civil-war-begins",
+   "kind": "mc",
+   "prompt": "When did this happen? The American Civil War begins",
+   "answer": "1861",
+   "wrong": [
+    "1876",
+    "1871",
+    "1851"
+   ],
+   "explain": "The American Civil War begins (1861). Fighting broke out between the Union and the Confederate states.",
+   "difficulty": 2,
+   "refs": [
+    "history/the-american-civil-war-begins"
+   ]
+  },
+  {
+   "id": "num-the-american-civil-war-begins",
+   "kind": "number",
+   "prompt": "In what year? The American Civil War begins",
+   "answer": 1861,
+   "unit": "",
+   "tolerance": 10,
+   "explain": "The American Civil War begins (1861). Fighting broke out between the Union and the Confederate states.",
+   "difficulty": 3,
+   "refs": [
+    "history/the-american-civil-war-begins"
+   ]
+  },
+  {
+   "id": "year-the-emancipation-proclamation",
+   "kind": "mc",
+   "prompt": "When did this happen? The Emancipation Proclamation",
+   "answer": "1863",
+   "wrong": [
+    "1868",
+    "1878",
+    "1848"
+   ],
+   "explain": "The Emancipation Proclamation (1863). Abraham Lincoln declared enslaved people in the Confederate states to be free.",
+   "difficulty": 3,
+   "refs": [
+    "history/the-emancipation-proclamation"
+   ]
+  },
+  {
+   "id": "year-abraham-lincoln-is-assassinated",
+   "kind": "mc",
+   "prompt": "When did this happen? Abraham Lincoln is assassinated",
+   "answer": "1865",
+   "wrong": [
+    "1880",
+    "1875",
+    "1860"
+   ],
+   "explain": "Abraham Lincoln is assassinated (1865). The president was shot at Ford's Theatre in Washington.",
+   "difficulty": 2,
+   "refs": [
+    "history/abraham-lincoln-is-assassinated"
+   ]
+  },
+  {
+   "id": "num-abraham-lincoln-is-assassinated",
+   "kind": "number",
+   "prompt": "In what year? Abraham Lincoln is assassinated",
+   "answer": 1865,
+   "unit": "",
+   "tolerance": 10,
+   "explain": "Abraham Lincoln is assassinated (1865). The president was shot at Ford's Theatre in Washington.",
+   "difficulty": 3,
+   "refs": [
+    "history/abraham-lincoln-is-assassinated"
+   ]
+  },
+  {
+   "id": "year-the-meiji-restoration-in-japan",
+   "kind": "mc",
+   "prompt": "When did this happen? The Meiji Restoration in Japan",
+   "answer": "1868",
+   "wrong": [
+    "1883",
+    "1878",
+    "1863"
+   ],
+   "explain": "The Meiji Restoration in Japan (1868). Imperial rule was restored and Japan began rapid modernisation.",
+   "difficulty": 3,
+   "refs": [
+    "history/the-meiji-restoration-in-japan"
+   ]
+  },
+  {
+   "id": "year-the-suez-canal-opens",
+   "kind": "mc",
+   "prompt": "When did this happen? The Suez Canal opens",
+   "answer": "1869",
+   "wrong": [
+    "1884",
+    "1859",
+    "1879"
+   ],
+   "explain": "The Suez Canal opens (1869). The canal linked the Mediterranean and Red Seas, shortening the route from Europe to Asia.",
+   "difficulty": 2,
+   "refs": [
+    "history/the-suez-canal-opens"
+   ]
+  },
+  {
+   "id": "num-the-suez-canal-opens",
+   "kind": "number",
+   "prompt": "In what year? The Suez Canal opens",
+   "answer": 1869,
+   "unit": "",
+   "tolerance": 10,
+   "explain": "The Suez Canal opens (1869). The canal linked the Mediterranean and Red Seas, shortening the route from Europe to Asia.",
+   "difficulty": 3,
+   "refs": [
+    "history/the-suez-canal-opens"
+   ]
+  },
+  {
+   "id": "year-bell-patents-the-telephone",
+   "kind": "mc",
+   "prompt": "When did this happen? Bell patents the telephone",
+   "answer": "1876",
+   "wrong": [
+    "1871",
+    "1881",
+    "1886"
+   ],
+   "explain": "Bell patents the telephone (1876). Alexander Graham Bell received a patent for the telephone.",
+   "difficulty": 2,
+   "refs": [
+    "history/bell-patents-the-telephone"
+   ]
+  },
+  {
+   "id": "num-bell-patents-the-telephone",
+   "kind": "number",
+   "prompt": "In what year? Bell patents the telephone",
+   "answer": 1876,
+   "unit": "",
+   "tolerance": 10,
+   "explain": "Bell patents the telephone (1876). Alexander Graham Bell received a patent for the telephone.",
+   "difficulty": 3,
+   "refs": [
+    "history/bell-patents-the-telephone"
+   ]
+  },
+  {
+   "id": "year-krakatoa-erupts",
+   "kind": "mc",
+   "prompt": "When did this happen? Krakatoa erupts",
+   "answer": "1883",
+   "wrong": [
+    "1898",
+    "1888",
+    "1878"
+   ],
+   "explain": "Krakatoa erupts (1883). A huge volcanic eruption in Indonesia was heard thousands of kilometres away.",
+   "difficulty": 3,
+   "refs": [
+    "history/krakatoa-erupts"
+   ]
+  },
+  {
+   "id": "year-the-eiffel-tower-is-completed",
+   "kind": "mc",
+   "prompt": "When did this happen? The Eiffel Tower is completed",
+   "answer": "1889",
+   "wrong": [
+    "1874",
+    "1884",
+    "1879"
+   ],
+   "explain": "The Eiffel Tower is completed (1889). The tower was built as the entrance to the World's Fair in Paris.",
+   "difficulty": 1,
+   "refs": [
+    "history/the-eiffel-tower-is-completed"
+   ]
+  },
+  {
+   "id": "num-the-eiffel-tower-is-completed",
+   "kind": "number",
+   "prompt": "In what year? The Eiffel Tower is completed",
+   "answer": 1889,
+   "unit": "",
+   "tolerance": 10,
+   "explain": "The Eiffel Tower is completed (1889). The tower was built as the entrance to the World's Fair in Paris.",
+   "difficulty": 2,
+   "refs": [
+    "history/the-eiffel-tower-is-completed"
+   ]
+  },
+  {
+   "id": "year-the-first-modern-olympic-games",
+   "kind": "mc",
+   "prompt": "When did this happen? The first modern Olympic Games",
+   "answer": "1896",
+   "wrong": [
+    "1881",
+    "1911",
+    "1901"
+   ],
+   "explain": "The first modern Olympic Games (1896). The modern Olympics began in Athens.",
+   "difficulty": 2,
+   "refs": [
+    "history/the-first-modern-olympic-games"
+   ]
+  },
+  {
+   "id": "num-the-first-modern-olympic-games",
+   "kind": "number",
+   "prompt": "In what year? The first modern Olympic Games",
+   "answer": 1896,
+   "unit": "",
+   "tolerance": 10,
+   "explain": "The first modern Olympic Games (1896). The modern Olympics began in Athens.",
+   "difficulty": 3,
+   "refs": [
+    "history/the-first-modern-olympic-games"
+   ]
+  },
+  {
+   "id": "year-the-wright-brothers-first-powered-flight",
+   "kind": "mc",
+   "prompt": "When did this happen? The Wright brothers' first powered flight",
+   "answer": "1903",
+   "wrong": [
+    "1897",
+    "1905",
+    "1909"
+   ],
+   "explain": "The Wright brothers' first powered flight (1903). Orville and Wilbur Wright flew at Kitty Hawk, North Carolina.",
+   "difficulty": 1,
+   "refs": [
+    "history/the-wright-brothers-first-powered-flight"
+   ]
+  },
+  {
+   "id": "num-the-wright-brothers-first-powered-flight",
+   "kind": "number",
+   "prompt": "In what year? The Wright brothers' first powered flight",
+   "answer": 1903,
+   "unit": "",
+   "tolerance": 2,
+   "explain": "The Wright brothers' first powered flight (1903). Orville and Wilbur Wright flew at Kitty Hawk, North Carolina.",
+   "difficulty": 2,
+   "refs": [
+    "history/the-wright-brothers-first-powered-flight"
+   ]
+  },
+  {
+   "id": "year-the-san-francisco-earthquake",
+   "kind": "mc",
+   "prompt": "When did this happen? The San Francisco earthquake",
+   "answer": "1906",
+   "wrong": [
+    "1910",
+    "1912",
+    "1902"
+   ],
+   "explain": "The San Francisco earthquake (1906). An earthquake and the fires that followed destroyed much of the city.",
+   "difficulty": 3,
+   "refs": [
+    "history/the-san-francisco-earthquake"
+   ]
+  },
+  {
+   "id": "year-the-titanic-sinks",
+   "kind": "mc",
+   "prompt": "When did this happen? The Titanic sinks",
+   "answer": "1912",
+   "wrong": [
+    "1910",
+    "1914",
+    "1908"
+   ],
+   "explain": "The Titanic sinks (1912). The liner struck an iceberg on its first voyage and sank with the loss of about 1,500 lives.",
+   "difficulty": 1,
+   "refs": [
+    "history/the-titanic-sinks"
+   ]
+  },
+  {
+   "id": "num-the-titanic-sinks",
+   "kind": "number",
+   "prompt": "In what year? The Titanic sinks",
+   "answer": 1912,
+   "unit": "",
+   "tolerance": 2,
+   "explain": "The Titanic sinks (1912). The liner struck an iceberg on its first voyage and sank with the loss of about 1,500 lives.",
+   "difficulty": 2,
+   "refs": [
+    "history/the-titanic-sinks"
+   ]
+  },
+  {
+   "id": "year-the-first-world-war-begins",
+   "kind": "mc",
+   "prompt": "When did this happen? The First World War begins",
+   "answer": "1914",
+   "wrong": [
+    "1918",
+    "1908",
+    "1910"
+   ],
+   "explain": "The First World War begins (1914). War broke out in Europe after the assassination of Archduke Franz Ferdinand.",
+   "difficulty": 1,
+   "refs": [
+    "history/the-first-world-war-begins"
+   ]
+  },
+  {
+   "id": "num-the-first-world-war-begins",
+   "kind": "number",
+   "prompt": "In what year? The First World War begins",
+   "answer": 1914,
+   "unit": "",
+   "tolerance": 2,
+   "explain": "The First World War begins (1914). War broke out in Europe after the assassination of Archduke Franz Ferdinand.",
+   "difficulty": 2,
+   "refs": [
+    "history/the-first-world-war-begins"
+   ]
+  },
+  {
+   "id": "year-the-panama-canal-opens",
+   "kind": "mc",
+   "prompt": "When did this happen? The Panama Canal opens",
+   "answer": "1914",
+   "wrong": [
+    "1910",
+    "1920",
+    "1918"
+   ],
+   "explain": "The Panama Canal opens (1914). The canal linked the Atlantic and Pacific Oceans across Panama.",
+   "difficulty": 3,
+   "refs": [
+    "history/the-panama-canal-opens"
+   ]
+  },
+  {
+   "id": "year-the-lusitania-is-sunk",
+   "kind": "mc",
+   "prompt": "When did this happen? The Lusitania is sunk",
+   "answer": "1915",
+   "wrong": [
+    "1919",
+    "1911",
+    "1917"
+   ],
+   "explain": "The Lusitania is sunk (1915). A German submarine sank the British liner off Ireland.",
+   "difficulty": 3,
+   "refs": [
+    "history/the-lusitania-is-sunk"
+   ]
+  },
+  {
+   "id": "year-the-battle-of-the-somme",
+   "kind": "mc",
+   "prompt": "When did this happen? The Battle of the Somme",
+   "answer": "1916",
+   "wrong": [
+    "1912",
+    "1922",
+    "1914"
+   ],
+   "explain": "The Battle of the Somme (1916). One of the bloodiest battles in history was fought in northern France.",
+   "difficulty": 2,
+   "refs": [
+    "history/the-battle-of-the-somme"
+   ]
+  },
+  {
+   "id": "num-the-battle-of-the-somme",
+   "kind": "number",
+   "prompt": "In what year? The Battle of the Somme",
+   "answer": 1916,
+   "unit": "",
+   "tolerance": 2,
+   "explain": "The Battle of the Somme (1916). One of the bloodiest battles in history was fought in northern France.",
+   "difficulty": 3,
+   "refs": [
+    "history/the-battle-of-the-somme"
+   ]
+  },
+  {
+   "id": "year-the-russian-revolution",
+   "kind": "mc",
+   "prompt": "When did this happen? The Russian Revolution",
+   "answer": "1917",
+   "wrong": [
+    "1923",
+    "1915",
+    "1913"
+   ],
+   "explain": "The Russian Revolution (1917). The Bolsheviks led by Lenin seized power in Russia.",
+   "difficulty": 2,
+   "refs": [
+    "history/the-russian-revolution"
+   ]
+  },
+  {
+   "id": "num-the-russian-revolution",
+   "kind": "number",
+   "prompt": "In what year? The Russian Revolution",
+   "answer": 1917,
+   "unit": "",
+   "tolerance": 2,
+   "explain": "The Russian Revolution (1917). The Bolsheviks led by Lenin seized power in Russia.",
+   "difficulty": 3,
+   "refs": [
+    "history/the-russian-revolution"
+   ]
+  },
+  {
+   "id": "year-the-first-world-war-ends",
+   "kind": "mc",
+   "prompt": "When did this happen? The First World War ends",
+   "answer": "1918",
+   "wrong": [
+    "1912",
+    "1922",
+    "1914"
+   ],
+   "explain": "The First World War ends (1918). An armistice ended the fighting at 11 am on 11 November.",
+   "difficulty": 1,
+   "refs": [
+    "history/the-first-world-war-ends"
+   ]
+  },
+  {
+   "id": "num-the-first-world-war-ends",
+   "kind": "number",
+   "prompt": "In what year? The First World War ends",
+   "answer": 1918,
+   "unit": "",
+   "tolerance": 2,
+   "explain": "The First World War ends (1918). An armistice ended the fighting at 11 am on 11 November.",
+   "difficulty": 2,
+   "refs": [
+    "history/the-first-world-war-ends"
+   ]
+  },
+  {
+   "id": "year-the-treaty-of-versailles",
+   "kind": "mc",
+   "prompt": "When did this happen? The Treaty of Versailles",
+   "answer": "1919",
+   "wrong": [
+    "1921",
+    "1915",
+    "1917"
+   ],
+   "explain": "The Treaty of Versailles (1919). The peace treaty set the terms for Germany after the First World War.",
+   "difficulty": 2,
+   "refs": [
+    "history/the-treaty-of-versailles"
+   ]
+  },
+  {
+   "id": "num-the-treaty-of-versailles",
+   "kind": "number",
+   "prompt": "In what year? The Treaty of Versailles",
+   "answer": 1919,
+   "unit": "",
+   "tolerance": 2,
+   "explain": "The Treaty of Versailles (1919). The peace treaty set the terms for Germany after the First World War.",
+   "difficulty": 3,
+   "refs": [
+    "history/the-treaty-of-versailles"
+   ]
+  },
+  {
+   "id": "year-tutankhamun-s-tomb-is-discovered",
+   "kind": "mc",
+   "prompt": "When did this happen? Tutankhamun's tomb is discovered",
+   "answer": "1922",
+   "wrong": [
+    "1924",
+    "1916",
+    "1928"
+   ],
+   "explain": "Tutankhamun's tomb is discovered (1922). Howard Carter found the almost untouched tomb in Egypt's Valley of the Kings.",
+   "difficulty": 2,
+   "refs": [
+    "history/tutankhamun-s-tomb-is-discovered"
+   ]
+  },
+  {
+   "id": "num-tutankhamun-s-tomb-is-discovered",
+   "kind": "number",
+   "prompt": "In what year? Tutankhamun's tomb is discovered",
+   "answer": 1922,
+   "unit": "",
+   "tolerance": 2,
+   "explain": "Tutankhamun's tomb is discovered (1922). Howard Carter found the almost untouched tomb in Egypt's Valley of the Kings.",
+   "difficulty": 3,
+   "refs": [
+    "history/tutankhamun-s-tomb-is-discovered"
+   ]
+  },
+  {
+   "id": "year-alexander-fleming-discovers-penicillin",
+   "kind": "mc",
+   "prompt": "When did this happen? Alexander Fleming discovers penicillin",
+   "answer": "1928",
+   "wrong": [
+    "1934",
+    "1930",
+    "1924"
+   ],
+   "explain": "Alexander Fleming discovers penicillin (1928). Fleming noticed mould killing bacteria in a dish in his London laboratory.",
+   "difficulty": 2,
+   "refs": [
+    "history/alexander-fleming-discovers-penicillin"
+   ]
+  },
+  {
+   "id": "num-alexander-fleming-discovers-penicillin",
+   "kind": "number",
+   "prompt": "In what year? Alexander Fleming discovers penicillin",
+   "answer": 1928,
+   "unit": "",
+   "tolerance": 2,
+   "explain": "Alexander Fleming discovers penicillin (1928). Fleming noticed mould killing bacteria in a dish in his London laboratory.",
+   "difficulty": 3,
+   "refs": [
+    "history/alexander-fleming-discovers-penicillin"
+   ]
+  },
+  {
+   "id": "year-the-wall-street-crash",
+   "kind": "mc",
+   "prompt": "When did this happen? The Wall Street Crash",
+   "answer": "1929",
+   "wrong": [
+    "1933",
+    "1927",
+    "1935"
+   ],
+   "explain": "The Wall Street Crash (1929). A stock market collapse in New York helped trigger the Great Depression.",
+   "difficulty": 2,
+   "refs": [
+    "history/the-wall-street-crash"
+   ]
+  },
+  {
+   "id": "num-the-wall-street-crash",
+   "kind": "number",
+   "prompt": "In what year? The Wall Street Crash",
+   "answer": 1929,
+   "unit": "",
+   "tolerance": 2,
+   "explain": "The Wall Street Crash (1929). A stock market collapse in New York helped trigger the Great Depression.",
+   "difficulty": 3,
+   "refs": [
+    "history/the-wall-street-crash"
+   ]
+  },
+  {
+   "id": "year-the-first-fifa-world-cup",
+   "kind": "mc",
+   "prompt": "When did this happen? The first FIFA World Cup",
+   "answer": "1930",
+   "wrong": [
+    "1934",
+    "1924",
+    "1928"
+   ],
+   "explain": "The first FIFA World Cup (1930). Uruguay hosted and won the first football World Cup.",
+   "difficulty": 2,
+   "refs": [
+    "history/the-first-fifa-world-cup"
+   ]
+  },
+  {
+   "id": "num-the-first-fifa-world-cup",
+   "kind": "number",
+   "prompt": "In what year? The first FIFA World Cup",
+   "answer": 1930,
+   "unit": "",
+   "tolerance": 2,
+   "explain": "The first FIFA World Cup (1930). Uruguay hosted and won the first football World Cup.",
+   "difficulty": 3,
+   "refs": [
+    "history/the-first-fifa-world-cup"
+   ]
+  },
+  {
+   "id": "year-hitler-becomes-chancellor-of-germany",
+   "kind": "mc",
+   "prompt": "When did this happen? Hitler becomes chancellor of Germany",
+   "answer": "1933",
+   "wrong": [
+    "1927",
+    "1937",
+    "1939"
+   ],
+   "explain": "Hitler becomes chancellor of Germany (1933). The Nazi leader was appointed chancellor and soon became dictator.",
+   "difficulty": 2,
+   "refs": [
+    "history/hitler-becomes-chancellor-of-germany"
+   ]
+  },
+  {
+   "id": "num-hitler-becomes-chancellor-of-germany",
+   "kind": "number",
+   "prompt": "In what year? Hitler becomes chancellor of Germany",
+   "answer": 1933,
+   "unit": "",
+   "tolerance": 2,
+   "explain": "Hitler becomes chancellor of Germany (1933). The Nazi leader was appointed chancellor and soon became dictator.",
+   "difficulty": 3,
+   "refs": [
+    "history/hitler-becomes-chancellor-of-germany"
+   ]
+  },
+  {
+   "id": "year-the-hindenburg-disaster",
+   "kind": "mc",
+   "prompt": "When did this happen? The Hindenburg disaster",
+   "answer": "1937",
+   "wrong": [
+    "1939",
+    "1931",
+    "1943"
+   ],
+   "explain": "The Hindenburg disaster (1937). A German passenger airship caught fire while landing in New Jersey.",
+   "difficulty": 3,
+   "refs": [
+    "history/the-hindenburg-disaster"
+   ]
+  },
+  {
+   "id": "year-the-second-world-war-begins",
+   "kind": "mc",
+   "prompt": "When did this happen? The Second World War begins",
+   "answer": "1939",
+   "wrong": [
+    "1933",
+    "1945",
+    "1941"
+   ],
+   "explain": "The Second World War begins (1939). Germany invaded Poland; Britain and France declared war.",
+   "difficulty": 1,
+   "refs": [
+    "history/the-second-world-war-begins"
+   ]
+  },
+  {
+   "id": "num-the-second-world-war-begins",
+   "kind": "number",
+   "prompt": "In what year? The Second World War begins",
+   "answer": 1939,
+   "unit": "",
+   "tolerance": 2,
+   "explain": "The Second World War begins (1939). Germany invaded Poland; Britain and France declared war.",
+   "difficulty": 2,
+   "refs": [
+    "history/the-second-world-war-begins"
+   ]
+  },
+  {
+   "id": "year-the-attack-on-pearl-harbor",
+   "kind": "mc",
+   "prompt": "When did this happen? The attack on Pearl Harbor",
+   "answer": "1941",
+   "wrong": [
+    "1947",
+    "1943",
+    "1937"
+   ],
+   "explain": "The attack on Pearl Harbor (1941). Japan attacked the US naval base in Hawaii, bringing the US into the war.",
+   "difficulty": 2,
+   "refs": [
+    "history/the-attack-on-pearl-harbor"
+   ]
+  },
+  {
+   "id": "num-the-attack-on-pearl-harbor",
+   "kind": "number",
+   "prompt": "In what year? The attack on Pearl Harbor",
+   "answer": 1941,
+   "unit": "",
+   "tolerance": 2,
+   "explain": "The attack on Pearl Harbor (1941). Japan attacked the US naval base in Hawaii, bringing the US into the war.",
+   "difficulty": 3,
+   "refs": [
+    "history/the-attack-on-pearl-harbor"
+   ]
+  },
+  {
+   "id": "year-d-day-the-normandy-landings",
+   "kind": "mc",
+   "prompt": "When did this happen? D-Day: the Normandy landings",
+   "answer": "1944",
+   "wrong": [
+    "1946",
+    "1938",
+    "1940"
+   ],
+   "explain": "D-Day: the Normandy landings (1944). Allied troops landed on the beaches of Normandy in France.",
+   "difficulty": 1,
+   "refs": [
+    "history/d-day-the-normandy-landings"
+   ]
+  },
+  {
+   "id": "num-d-day-the-normandy-landings",
+   "kind": "number",
+   "prompt": "In what year? D-Day: the Normandy landings",
+   "answer": 1944,
+   "unit": "",
+   "tolerance": 2,
+   "explain": "D-Day: the Normandy landings (1944). Allied troops landed on the beaches of Normandy in France.",
+   "difficulty": 2,
+   "refs": [
+    "history/d-day-the-normandy-landings"
+   ]
+  },
+  {
+   "id": "year-atomic-bombs-are-dropped-on-japan",
+   "kind": "mc",
+   "prompt": "When did this happen? Atomic bombs are dropped on Japan",
+   "answer": "1945",
+   "wrong": [
+    "1943",
+    "1949",
+    "1947"
+   ],
+   "explain": "Atomic bombs are dropped on Japan (1945). The US dropped atomic bombs on Hiroshima and Nagasaki.",
+   "difficulty": 2,
+   "refs": [
+    "history/atomic-bombs-are-dropped-on-japan"
+   ]
+  },
+  {
+   "id": "num-atomic-bombs-are-dropped-on-japan",
+   "kind": "number",
+   "prompt": "In what year? Atomic bombs are dropped on Japan",
+   "answer": 1945,
+   "unit": "",
+   "tolerance": 2,
+   "explain": "Atomic bombs are dropped on Japan (1945). The US dropped atomic bombs on Hiroshima and Nagasaki.",
+   "difficulty": 3,
+   "refs": [
+    "history/atomic-bombs-are-dropped-on-japan"
+   ]
+  },
+  {
+   "id": "year-the-united-nations-is-founded",
+   "kind": "mc",
+   "prompt": "When did this happen? The United Nations is founded",
+   "answer": "1945",
+   "wrong": [
+    "1941",
+    "1943",
+    "1951"
+   ],
+   "explain": "The United Nations is founded (1945). The UN was set up after the Second World War to keep international peace.",
+   "difficulty": 2,
+   "refs": [
+    "history/the-united-nations-is-founded"
+   ]
+  },
+  {
+   "id": "num-the-united-nations-is-founded",
+   "kind": "number",
+   "prompt": "In what year? The United Nations is founded",
+   "answer": 1945,
+   "unit": "",
+   "tolerance": 2,
+   "explain": "The United Nations is founded (1945). The UN was set up after the Second World War to keep international peace.",
+   "difficulty": 3,
+   "refs": [
+    "history/the-united-nations-is-founded"
+   ]
+  },
+  {
+   "id": "year-india-and-pakistan-become-independent",
+   "kind": "mc",
+   "prompt": "When did this happen? India and Pakistan become independent",
+   "answer": "1947",
+   "wrong": [
+    "1949",
+    "1943",
+    "1945"
+   ],
+   "explain": "India and Pakistan become independent (1947). British rule ended and the subcontinent was divided into two countries.",
+   "difficulty": 2,
+   "refs": [
+    "history/india-and-pakistan-become-independent"
+   ]
+  },
+  {
+   "id": "num-india-and-pakistan-become-independent",
+   "kind": "number",
+   "prompt": "In what year? India and Pakistan become independent",
+   "answer": 1947,
+   "unit": "",
+   "tolerance": 2,
+   "explain": "India and Pakistan become independent (1947). British rule ended and the subcontinent was divided into two countries.",
+   "difficulty": 3,
+   "refs": [
+    "history/india-and-pakistan-become-independent"
+   ]
+  },
+  {
+   "id": "year-the-nhs-is-founded",
+   "kind": "mc",
+   "prompt": "When did this happen? The NHS is founded",
+   "answer": "1948",
+   "wrong": [
+    "1950",
+    "1952",
+    "1946"
+   ],
+   "explain": "The NHS is founded (1948). Britain's National Health Service began offering free healthcare.",
+   "difficulty": 3,
+   "refs": [
+    "history/the-nhs-is-founded"
+   ]
+  },
+  {
+   "id": "year-the-people-s-republic-of-china-is-proclaimed",
+   "kind": "mc",
+   "prompt": "When did this happen? The People's Republic of China is proclaimed",
+   "answer": "1949",
+   "wrong": [
+    "1951",
+    "1947",
+    "1953"
+   ],
+   "explain": "The People's Republic of China is proclaimed (1949). Mao Zedong declared the new state in Beijing.",
+   "difficulty": 3,
+   "refs": [
+    "history/the-people-s-republic-of-china-is-proclaimed"
+   ]
+  },
+  {
+   "id": "year-the-korean-war-begins",
+   "kind": "mc",
+   "prompt": "When did this happen? The Korean War begins",
+   "answer": "1950",
+   "wrong": [
+    "1946",
+    "1948",
+    "1952"
+   ],
+   "explain": "The Korean War begins (1950). North Korea invaded South Korea.",
+   "difficulty": 3,
+   "refs": [
+    "history/the-korean-war-begins"
+   ]
+  },
+  {
+   "id": "year-everest-is-climbed-for-the-first-time",
+   "kind": "mc",
+   "prompt": "When did this happen? Everest is climbed for the first time",
+   "answer": "1953",
+   "wrong": [
+    "1957",
+    "1959",
+    "1949"
+   ],
+   "explain": "Everest is climbed for the first time (1953). Edmund Hillary and Tenzing Norgay reached the summit.",
+   "difficulty": 1,
+   "refs": [
+    "history/everest-is-climbed-for-the-first-time"
+   ]
+  },
+  {
+   "id": "num-everest-is-climbed-for-the-first-time",
+   "kind": "number",
+   "prompt": "In what year? Everest is climbed for the first time",
+   "answer": 1953,
+   "unit": "",
+   "tolerance": 2,
+   "explain": "Everest is climbed for the first time (1953). Edmund Hillary and Tenzing Norgay reached the summit.",
+   "difficulty": 2,
+   "refs": [
+    "history/everest-is-climbed-for-the-first-time"
+   ]
+  },
+  {
+   "id": "year-queen-elizabeth-ii-is-crowned",
+   "kind": "mc",
+   "prompt": "When did this happen? Queen Elizabeth II is crowned",
+   "answer": "1953",
+   "wrong": [
+    "1959",
+    "1949",
+    "1951"
+   ],
+   "explain": "Queen Elizabeth II is crowned (1953). The coronation was watched on television by millions.",
+   "difficulty": 2,
+   "refs": [
+    "history/queen-elizabeth-ii-is-crowned"
+   ]
+  },
+  {
+   "id": "num-queen-elizabeth-ii-is-crowned",
+   "kind": "number",
+   "prompt": "In what year? Queen Elizabeth II is crowned",
+   "answer": 1953,
+   "unit": "",
+   "tolerance": 2,
+   "explain": "Queen Elizabeth II is crowned (1953). The coronation was watched on television by millions.",
+   "difficulty": 3,
+   "refs": [
+    "history/queen-elizabeth-ii-is-crowned"
+   ]
+  },
+  {
+   "id": "year-rosa-parks-and-the-montgomery-bus-boycott",
+   "kind": "mc",
+   "prompt": "When did this happen? Rosa Parks and the Montgomery bus boycott",
+   "answer": "1955",
+   "wrong": [
+    "1959",
+    "1949",
+    "1951"
+   ],
+   "explain": "Rosa Parks and the Montgomery bus boycott (1955). Rosa Parks's arrest for keeping her bus seat sparked a year-long boycott.",
+   "difficulty": 2,
+   "refs": [
+    "history/rosa-parks-and-the-montgomery-bus-boycott"
+   ]
+  },
+  {
+   "id": "num-rosa-parks-and-the-montgomery-bus-boycott",
+   "kind": "number",
+   "prompt": "In what year? Rosa Parks and the Montgomery bus boycott",
+   "answer": 1955,
+   "unit": "",
+   "tolerance": 2,
+   "explain": "Rosa Parks and the Montgomery bus boycott (1955). Rosa Parks's arrest for keeping her bus seat sparked a year-long boycott.",
+   "difficulty": 3,
+   "refs": [
+    "history/rosa-parks-and-the-montgomery-bus-boycott"
+   ]
+  },
+  {
+   "id": "year-sputnik-the-first-satellite-is-launched",
+   "kind": "mc",
+   "prompt": "When did this happen? Sputnik, the first satellite, is launched",
+   "answer": "1957",
+   "wrong": [
+    "1961",
+    "1955",
+    "1963"
+   ],
+   "explain": "Sputnik, the first satellite, is launched (1957). The Soviet Union put the first artificial satellite into orbit.",
+   "difficulty": 2,
+   "refs": [
+    "history/sputnik-the-first-satellite-is-launched"
+   ]
+  },
+  {
+   "id": "num-sputnik-the-first-satellite-is-launched",
+   "kind": "number",
+   "prompt": "In what year? Sputnik, the first satellite, is launched",
+   "answer": 1957,
+   "unit": "",
+   "tolerance": 2,
+   "explain": "Sputnik, the first satellite, is launched (1957). The Soviet Union put the first artificial satellite into orbit.",
+   "difficulty": 3,
+   "refs": [
+    "history/sputnik-the-first-satellite-is-launched"
+   ]
+  },
+  {
+   "id": "year-yuri-gagarin-becomes-the-first-person-in-space",
+   "kind": "mc",
+   "prompt": "When did this happen? Yuri Gagarin becomes the first person in space",
+   "answer": "1961",
+   "wrong": [
+    "1963",
+    "1959",
+    "1955"
+   ],
+   "explain": "Yuri Gagarin becomes the first person in space (1961). The Soviet cosmonaut orbited the Earth once.",
+   "difficulty": 1,
+   "refs": [
+    "history/yuri-gagarin-becomes-the-first-person-in-space"
+   ]
+  },
+  {
+   "id": "num-yuri-gagarin-becomes-the-first-person-in-space",
+   "kind": "number",
+   "prompt": "In what year? Yuri Gagarin becomes the first person in space",
+   "answer": 1961,
+   "unit": "",
+   "tolerance": 2,
+   "explain": "Yuri Gagarin becomes the first person in space (1961). The Soviet cosmonaut orbited the Earth once.",
+   "difficulty": 2,
+   "refs": [
+    "history/yuri-gagarin-becomes-the-first-person-in-space"
+   ]
+  },
+  {
+   "id": "year-the-berlin-wall-is-built",
+   "kind": "mc",
+   "prompt": "When did this happen? The Berlin Wall is built",
+   "answer": "1961",
+   "wrong": [
+    "1959",
+    "1955",
+    "1965"
+   ],
+   "explain": "The Berlin Wall is built (1961). East Germany sealed off West Berlin with a wall.",
+   "difficulty": 2,
+   "refs": [
+    "history/the-berlin-wall-is-built"
+   ]
+  },
+  {
+   "id": "num-the-berlin-wall-is-built",
+   "kind": "number",
+   "prompt": "In what year? The Berlin Wall is built",
+   "answer": 1961,
+   "unit": "",
+   "tolerance": 2,
+   "explain": "The Berlin Wall is built (1961). East Germany sealed off West Berlin with a wall.",
+   "difficulty": 3,
+   "refs": [
+    "history/the-berlin-wall-is-built"
+   ]
+  },
+  {
+   "id": "year-the-cuban-missile-crisis",
+   "kind": "mc",
+   "prompt": "When did this happen? The Cuban Missile Crisis",
+   "answer": "1962",
+   "wrong": [
+    "1956",
+    "1958",
+    "1960"
+   ],
+   "explain": "The Cuban Missile Crisis (1962). The US and the Soviet Union came close to nuclear war over missiles in Cuba.",
+   "difficulty": 2,
+   "refs": [
+    "history/the-cuban-missile-crisis"
+   ]
+  },
+  {
+   "id": "num-the-cuban-missile-crisis",
+   "kind": "number",
+   "prompt": "In what year? The Cuban Missile Crisis",
+   "answer": 1962,
+   "unit": "",
+   "tolerance": 2,
+   "explain": "The Cuban Missile Crisis (1962). The US and the Soviet Union came close to nuclear war over missiles in Cuba.",
+   "difficulty": 3,
+   "refs": [
+    "history/the-cuban-missile-crisis"
+   ]
+  },
+  {
+   "id": "year-martin-luther-king-jr-s-i-have-a-dream-speech",
+   "kind": "mc",
+   "prompt": "When did this happen? Martin Luther King Jr.'s \"I Have a Dream\" speech",
+   "answer": "1963",
+   "wrong": [
+    "1967",
+    "1957",
+    "1959"
+   ],
+   "explain": "Martin Luther King Jr.'s \"I Have a Dream\" speech (1963). King spoke to about 250,000 people at the Lincoln Memorial.",
+   "difficulty": 2,
+   "refs": [
+    "history/martin-luther-king-jr-s-i-have-a-dream-speech"
+   ]
+  },
+  {
+   "id": "num-martin-luther-king-jr-s-i-have-a-dream-speech",
+   "kind": "number",
+   "prompt": "In what year? Martin Luther King Jr.'s \"I Have a Dream\" speech",
+   "answer": 1963,
+   "unit": "",
+   "tolerance": 2,
+   "explain": "Martin Luther King Jr.'s \"I Have a Dream\" speech (1963). King spoke to about 250,000 people at the Lincoln Memorial.",
+   "difficulty": 3,
+   "refs": [
+    "history/martin-luther-king-jr-s-i-have-a-dream-speech"
+   ]
+  },
+  {
+   "id": "year-president-kennedy-is-assassinated",
+   "kind": "mc",
+   "prompt": "When did this happen? President Kennedy is assassinated",
+   "answer": "1963",
+   "wrong": [
+    "1959",
+    "1965",
+    "1969"
+   ],
+   "explain": "President Kennedy is assassinated (1963). John F. Kennedy was shot in Dallas, Texas.",
+   "difficulty": 2,
+   "refs": [
+    "history/president-kennedy-is-assassinated"
+   ]
+  },
+  {
+   "id": "num-president-kennedy-is-assassinated",
+   "kind": "number",
+   "prompt": "In what year? President Kennedy is assassinated",
+   "answer": 1963,
+   "unit": "",
+   "tolerance": 2,
+   "explain": "President Kennedy is assassinated (1963). John F. Kennedy was shot in Dallas, Texas.",
+   "difficulty": 3,
+   "refs": [
+    "history/president-kennedy-is-assassinated"
+   ]
+  },
+  {
+   "id": "year-apollo-11-lands-on-the-moon",
+   "kind": "mc",
+   "prompt": "When did this happen? Apollo 11 lands on the Moon",
+   "answer": "1969",
+   "wrong": [
+    "1971",
+    "1967",
+    "1965"
+   ],
+   "explain": "Apollo 11 lands on the Moon (1969). Neil Armstrong and Buzz Aldrin became the first people to walk on the Moon.",
+   "difficulty": 1,
+   "refs": [
+    "history/apollo-11-lands-on-the-moon"
+   ]
+  },
+  {
+   "id": "num-apollo-11-lands-on-the-moon",
+   "kind": "number",
+   "prompt": "In what year? Apollo 11 lands on the Moon",
+   "answer": 1969,
+   "unit": "",
+   "tolerance": 2,
+   "explain": "Apollo 11 lands on the Moon (1969). Neil Armstrong and Buzz Aldrin became the first people to walk on the Moon.",
+   "difficulty": 2,
+   "refs": [
+    "history/apollo-11-lands-on-the-moon"
+   ]
+  },
+  {
+   "id": "year-the-apollo-13-rescue",
+   "kind": "mc",
+   "prompt": "When did this happen? The Apollo 13 rescue",
+   "answer": "1970",
+   "wrong": [
+    "1976",
+    "1964",
+    "1968"
+   ],
+   "explain": "The Apollo 13 rescue (1970). An explosion forced the crew to abandon their Moon landing and loop home safely.",
+   "difficulty": 3,
+   "refs": [
+    "history/the-apollo-13-rescue"
+   ]
+  },
+  {
+   "id": "year-richard-nixon-resigns",
+   "kind": "mc",
+   "prompt": "When did this happen? Richard Nixon resigns",
+   "answer": "1974",
+   "wrong": [
+    "1978",
+    "1980",
+    "1976"
+   ],
+   "explain": "Richard Nixon resigns (1974). The US president resigned over the Watergate scandal.",
+   "difficulty": 3,
+   "refs": [
+    "history/richard-nixon-resigns"
+   ]
+  },
+  {
+   "id": "year-concorde-begins-passenger-flights",
+   "kind": "mc",
+   "prompt": "When did this happen? Concorde begins passenger flights",
+   "answer": "1976",
+   "wrong": [
+    "1982",
+    "1972",
+    "1978"
+   ],
+   "explain": "Concorde begins passenger flights (1976). The supersonic airliner entered service with British Airways and Air France.",
+   "difficulty": 3,
+   "refs": [
+    "history/concorde-begins-passenger-flights"
+   ]
+  },
+  {
+   "id": "year-mount-st-helens-erupts",
+   "kind": "mc",
+   "prompt": "When did this happen? Mount St. Helens erupts",
+   "answer": "1980",
+   "wrong": [
+    "1986",
+    "1978",
+    "1974"
+   ],
+   "explain": "Mount St. Helens erupts (1980). The volcano in Washington State blew out its side in a huge eruption.",
+   "difficulty": 3,
+   "refs": [
+    "history/mount-st-helens-erupts"
+   ]
+  },
+  {
+   "id": "year-the-challenger-disaster",
+   "kind": "mc",
+   "prompt": "When did this happen? The Challenger disaster",
+   "answer": "1986",
+   "wrong": [
+    "1980",
+    "1988",
+    "1992"
+   ],
+   "explain": "The Challenger disaster (1986). The space shuttle broke apart shortly after launch.",
+   "difficulty": 3,
+   "refs": [
+    "history/the-challenger-disaster"
+   ]
+  },
+  {
+   "id": "year-the-chernobyl-disaster",
+   "kind": "mc",
+   "prompt": "When did this happen? The Chernobyl disaster",
+   "answer": "1986",
+   "wrong": [
+    "1992",
+    "1984",
+    "1980"
+   ],
+   "explain": "The Chernobyl disaster (1986). A reactor exploded at a nuclear power plant in Soviet Ukraine.",
+   "difficulty": 2,
+   "refs": [
+    "history/the-chernobyl-disaster"
+   ]
+  },
+  {
+   "id": "num-the-chernobyl-disaster",
+   "kind": "number",
+   "prompt": "In what year? The Chernobyl disaster",
+   "answer": 1986,
+   "unit": "",
+   "tolerance": 2,
+   "explain": "The Chernobyl disaster (1986). A reactor exploded at a nuclear power plant in Soviet Ukraine.",
+   "difficulty": 3,
+   "refs": [
+    "history/the-chernobyl-disaster"
+   ]
+  },
+  {
+   "id": "year-the-fall-of-the-berlin-wall",
+   "kind": "mc",
+   "prompt": "When did this happen? The fall of the Berlin Wall",
+   "answer": "1989",
+   "wrong": [
+    "1995",
+    "1991",
+    "1993"
+   ],
+   "explain": "The fall of the Berlin Wall (1989). Crowds crossed and began tearing down the wall as East Germany opened its borders.",
+   "difficulty": 1,
+   "refs": [
+    "history/the-fall-of-the-berlin-wall"
+   ]
+  },
+  {
+   "id": "num-the-fall-of-the-berlin-wall",
+   "kind": "number",
+   "prompt": "In what year? The fall of the Berlin Wall",
+   "answer": 1989,
+   "unit": "",
+   "tolerance": 2,
+   "explain": "The fall of the Berlin Wall (1989). Crowds crossed and began tearing down the wall as East Germany opened its borders.",
+   "difficulty": 2,
+   "refs": [
+    "history/the-fall-of-the-berlin-wall"
+   ]
+  },
+  {
+   "id": "year-the-hubble-space-telescope-is-launched",
+   "kind": "mc",
+   "prompt": "When did this happen? The Hubble Space Telescope is launched",
+   "answer": "1990",
+   "wrong": [
+    "1986",
+    "1984",
+    "1994"
+   ],
+   "explain": "The Hubble Space Telescope is launched (1990). The telescope was carried into orbit by a space shuttle.",
+   "difficulty": 3,
+   "refs": [
+    "history/the-hubble-space-telescope-is-launched"
+   ]
+  },
+  {
+   "id": "year-germany-is-reunified",
+   "kind": "mc",
+   "prompt": "When did this happen? Germany is reunified",
+   "answer": "1990",
+   "wrong": [
+    "1988",
+    "1996",
+    "1992"
+   ],
+   "explain": "Germany is reunified (1990). East and West Germany became one country again.",
+   "difficulty": 2,
+   "refs": [
+    "history/germany-is-reunified"
+   ]
+  },
+  {
+   "id": "num-germany-is-reunified",
+   "kind": "number",
+   "prompt": "In what year? Germany is reunified",
+   "answer": 1990,
+   "unit": "",
+   "tolerance": 2,
+   "explain": "Germany is reunified (1990). East and West Germany became one country again.",
+   "difficulty": 3,
+   "refs": [
+    "history/germany-is-reunified"
+   ]
+  },
+  {
+   "id": "year-the-soviet-union-breaks-up",
+   "kind": "mc",
+   "prompt": "When did this happen? The Soviet Union breaks up",
+   "answer": "1991",
+   "wrong": [
+    "1993",
+    "1997",
+    "1989"
+   ],
+   "explain": "The Soviet Union breaks up (1991). The USSR split into fifteen independent countries.",
+   "difficulty": 2,
+   "refs": [
+    "history/the-soviet-union-breaks-up"
+   ]
+  },
+  {
+   "id": "num-the-soviet-union-breaks-up",
+   "kind": "number",
+   "prompt": "In what year? The Soviet Union breaks up",
+   "answer": 1991,
+   "unit": "",
+   "tolerance": 2,
+   "explain": "The Soviet Union breaks up (1991). The USSR split into fifteen independent countries.",
+   "difficulty": 3,
+   "refs": [
+    "history/the-soviet-union-breaks-up"
+   ]
+  },
+  {
+   "id": "year-nelson-mandela-becomes-president-of-south-africa",
+   "kind": "mc",
+   "prompt": "When did this happen? Nelson Mandela becomes president of South Africa",
+   "answer": "1994",
+   "wrong": [
+    "1988",
+    "1990",
+    "1992"
+   ],
+   "explain": "Nelson Mandela becomes president of South Africa (1994). South Africa's first fully democratic election ended apartheid rule.",
+   "difficulty": 2,
+   "refs": [
+    "history/nelson-mandela-becomes-president-of-south-africa"
+   ]
+  },
+  {
+   "id": "num-nelson-mandela-becomes-president-of-south-africa",
+   "kind": "number",
+   "prompt": "In what year? Nelson Mandela becomes president of South Africa",
+   "answer": 1994,
+   "unit": "",
+   "tolerance": 2,
+   "explain": "Nelson Mandela becomes president of South Africa (1994). South Africa's first fully democratic election ended apartheid rule.",
+   "difficulty": 3,
+   "refs": [
+    "history/nelson-mandela-becomes-president-of-south-africa"
+   ]
+  },
+  {
+   "id": "year-the-channel-tunnel-opens",
+   "kind": "mc",
+   "prompt": "When did this happen? The Channel Tunnel opens",
+   "answer": "1994",
+   "wrong": [
+    "1990",
+    "1998",
+    "1996"
+   ],
+   "explain": "The Channel Tunnel opens (1994). A rail tunnel linked Britain and France under the sea.",
+   "difficulty": 2,
+   "refs": [
+    "history/the-channel-tunnel-opens"
+   ]
+  },
+  {
+   "id": "num-the-channel-tunnel-opens",
+   "kind": "number",
+   "prompt": "In what year? The Channel Tunnel opens",
+   "answer": 1994,
+   "unit": "",
+   "tolerance": 2,
+   "explain": "The Channel Tunnel opens (1994). A rail tunnel linked Britain and France under the sea.",
+   "difficulty": 3,
+   "refs": [
+    "history/the-channel-tunnel-opens"
+   ]
+  },
+  {
+   "id": "year-dolly-the-sheep-is-born",
+   "kind": "mc",
+   "prompt": "When did this happen? Dolly the sheep is born",
+   "answer": "1996",
+   "wrong": [
+    "2002",
+    "1990",
+    "2000"
+   ],
+   "explain": "Dolly the sheep is born (1996). Dolly was the first mammal cloned from an adult cell.",
+   "difficulty": 3,
+   "refs": [
+    "history/dolly-the-sheep-is-born"
+   ]
+  },
+  {
+   "id": "year-hong-kong-is-handed-back-to-china",
+   "kind": "mc",
+   "prompt": "When did this happen? Hong Kong is handed back to China",
+   "answer": "1997",
+   "wrong": [
+    "1999",
+    "2001",
+    "1991"
+   ],
+   "explain": "Hong Kong is handed back to China (1997). Britain returned Hong Kong to China after more than 150 years.",
+   "difficulty": 2,
+   "refs": [
+    "history/hong-kong-is-handed-back-to-china"
+   ]
+  },
+  {
+   "id": "num-hong-kong-is-handed-back-to-china",
+   "kind": "number",
+   "prompt": "In what year? Hong Kong is handed back to China",
+   "answer": 1997,
+   "unit": "",
+   "tolerance": 2,
+   "explain": "Hong Kong is handed back to China (1997). Britain returned Hong Kong to China after more than 150 years.",
+   "difficulty": 3,
+   "refs": [
+    "history/hong-kong-is-handed-back-to-china"
+   ]
+  },
+  {
+   "id": "year-wikipedia-is-launched",
+   "kind": "mc",
+   "prompt": "When did this happen? Wikipedia is launched",
+   "answer": "2001",
+   "wrong": [
+    "2003",
+    "1999",
+    "1997"
+   ],
+   "explain": "Wikipedia is launched (2001). The free online encyclopedia anyone can edit went live.",
+   "difficulty": 2,
+   "refs": [
+    "history/wikipedia-is-launched"
+   ]
+  },
+  {
+   "id": "num-wikipedia-is-launched",
+   "kind": "number",
+   "prompt": "In what year? Wikipedia is launched",
+   "answer": 2001,
+   "unit": "",
+   "tolerance": 2,
+   "explain": "Wikipedia is launched (2001). The free online encyclopedia anyone can edit went live.",
+   "difficulty": 3,
+   "refs": [
+    "history/wikipedia-is-launched"
+   ]
+  },
+  {
+   "id": "year-the-september-11-attacks",
+   "kind": "mc",
+   "prompt": "When did this happen? The September 11 attacks",
+   "answer": "2001",
+   "wrong": [
+    "2005",
+    "2003",
+    "1995"
+   ],
+   "explain": "The September 11 attacks (2001). Hijacked planes destroyed the World Trade Center in New York.",
+   "difficulty": 2,
+   "refs": [
+    "history/the-september-11-attacks"
+   ]
+  },
+  {
+   "id": "num-the-september-11-attacks",
+   "kind": "number",
+   "prompt": "In what year? The September 11 attacks",
+   "answer": 2001,
+   "unit": "",
+   "tolerance": 2,
+   "explain": "The September 11 attacks (2001). Hijacked planes destroyed the World Trade Center in New York.",
+   "difficulty": 3,
+   "refs": [
+    "history/the-september-11-attacks"
+   ]
+  },
+  {
+   "id": "year-euro-notes-and-coins-come-into-use",
+   "kind": "mc",
+   "prompt": "When did this happen? Euro notes and coins come into use",
+   "answer": "2002",
+   "wrong": [
+    "1996",
+    "2008",
+    "2004"
+   ],
+   "explain": "Euro notes and coins come into use (2002). Twelve European countries switched to euro cash.",
+   "difficulty": 2,
+   "refs": [
+    "history/euro-notes-and-coins-come-into-use"
+   ]
+  },
+  {
+   "id": "num-euro-notes-and-coins-come-into-use",
+   "kind": "number",
+   "prompt": "In what year? Euro notes and coins come into use",
+   "answer": 2002,
+   "unit": "",
+   "tolerance": 2,
+   "explain": "Euro notes and coins come into use (2002). Twelve European countries switched to euro cash.",
+   "difficulty": 3,
+   "refs": [
+    "history/euro-notes-and-coins-come-into-use"
+   ]
+  },
+  {
+   "id": "year-the-human-genome-project-is-completed",
+   "kind": "mc",
+   "prompt": "When did this happen? The Human Genome Project is completed",
+   "answer": "2003",
+   "wrong": [
+    "2007",
+    "2005",
+    "1999"
+   ],
+   "explain": "The Human Genome Project is completed (2003). Scientists finished mapping nearly all human genes.",
+   "difficulty": 3,
+   "refs": [
+    "history/the-human-genome-project-is-completed"
+   ]
+  },
+  {
+   "id": "year-facebook-is-founded",
+   "kind": "mc",
+   "prompt": "When did this happen? Facebook is founded",
+   "answer": "2004",
+   "wrong": [
+    "2002",
+    "1998",
+    "2008"
+   ],
+   "explain": "Facebook is founded (2004). Mark Zuckerberg and fellow students launched it at Harvard.",
+   "difficulty": 2,
+   "refs": [
+    "history/facebook-is-founded"
+   ]
+  },
+  {
+   "id": "num-facebook-is-founded",
+   "kind": "number",
+   "prompt": "In what year? Facebook is founded",
+   "answer": 2004,
+   "unit": "",
+   "tolerance": 2,
+   "explain": "Facebook is founded (2004). Mark Zuckerberg and fellow students launched it at Harvard.",
+   "difficulty": 3,
+   "refs": [
+    "history/facebook-is-founded"
+   ]
+  },
+  {
+   "id": "year-the-indian-ocean-tsunami",
+   "kind": "mc",
+   "prompt": "When did this happen? The Indian Ocean tsunami",
+   "answer": "2004",
+   "wrong": [
+    "2010",
+    "2008",
+    "2000"
+   ],
+   "explain": "The Indian Ocean tsunami (2004). An undersea earthquake caused tsunamis that killed about 230,000 people.",
+   "difficulty": 2,
+   "refs": [
+    "history/the-indian-ocean-tsunami"
+   ]
+  },
+  {
+   "id": "num-the-indian-ocean-tsunami",
+   "kind": "number",
+   "prompt": "In what year? The Indian Ocean tsunami",
+   "answer": 2004,
+   "unit": "",
+   "tolerance": 2,
+   "explain": "The Indian Ocean tsunami (2004). An undersea earthquake caused tsunamis that killed about 230,000 people.",
+   "difficulty": 3,
+   "refs": [
+    "history/the-indian-ocean-tsunami"
+   ]
+  },
+  {
+   "id": "year-the-first-iphone-goes-on-sale",
+   "kind": "mc",
+   "prompt": "When did this happen? The first iPhone goes on sale",
+   "answer": "2007",
+   "wrong": [
+    "2009",
+    "2005",
+    "2011"
+   ],
+   "explain": "The first iPhone goes on sale (2007). Apple released its first smartphone.",
+   "difficulty": 2,
+   "refs": [
+    "history/the-first-iphone-goes-on-sale"
+   ]
+  },
+  {
+   "id": "num-the-first-iphone-goes-on-sale",
+   "kind": "number",
+   "prompt": "In what year? The first iPhone goes on sale",
+   "answer": 2007,
+   "unit": "",
+   "tolerance": 2,
+   "explain": "The first iPhone goes on sale (2007). Apple released its first smartphone.",
+   "difficulty": 3,
+   "refs": [
+    "history/the-first-iphone-goes-on-sale"
+   ]
+  },
+  {
+   "id": "year-barack-obama-is-elected-us-president",
+   "kind": "mc",
+   "prompt": "When did this happen? Barack Obama is elected US president",
+   "answer": "2008",
+   "wrong": [
+    "2002",
+    "2010",
+    "2012"
+   ],
+   "explain": "Barack Obama is elected US president (2008). Obama became the first African American president.",
+   "difficulty": 2,
+   "refs": [
+    "history/barack-obama-is-elected-us-president"
+   ]
+  },
+  {
+   "id": "num-barack-obama-is-elected-us-president",
+   "kind": "number",
+   "prompt": "In what year? Barack Obama is elected US president",
+   "answer": 2008,
+   "unit": "",
+   "tolerance": 2,
+   "explain": "Barack Obama is elected US president (2008). Obama became the first African American president.",
+   "difficulty": 3,
+   "refs": [
+    "history/barack-obama-is-elected-us-president"
+   ]
+  },
+  {
+   "id": "year-the-higgs-boson-is-discovered",
+   "kind": "mc",
+   "prompt": "When did this happen? The Higgs boson is discovered",
+   "answer": "2012",
+   "wrong": [
+    "2018",
+    "2010",
+    "2008"
+   ],
+   "explain": "The Higgs boson is discovered (2012). Scientists at CERN announced the long-sought particle.",
+   "difficulty": 3,
+   "refs": [
+    "history/the-higgs-boson-is-discovered"
+   ]
+  },
+  {
+   "id": "year-london-hosts-the-olympics-for-the-third-time",
+   "kind": "mc",
+   "prompt": "When did this happen? London hosts the Olympics for the third time",
+   "answer": "2012",
+   "wrong": [
+    "2006",
+    "2018",
+    "2014"
+   ],
+   "explain": "London hosts the Olympics for the third time (2012). London had also hosted the Games in 1908 and 1948.",
+   "difficulty": 2,
+   "refs": [
+    "history/london-hosts-the-olympics-for-the-third-time"
+   ]
+  },
+  {
+   "id": "num-london-hosts-the-olympics-for-the-third-time",
+   "kind": "number",
+   "prompt": "In what year? London hosts the Olympics for the third time",
+   "answer": 2012,
+   "unit": "",
+   "tolerance": 2,
+   "explain": "London hosts the Olympics for the third time (2012). London had also hosted the Games in 1908 and 1948.",
+   "difficulty": 3,
+   "refs": [
+    "history/london-hosts-the-olympics-for-the-third-time"
+   ]
+  },
+  {
+   "id": "year-the-brexit-referendum",
+   "kind": "mc",
+   "prompt": "When did this happen? The Brexit referendum",
+   "answer": "2016",
+   "wrong": [
+    "2010",
+    "2012",
+    "2020"
+   ],
+   "explain": "The Brexit referendum (2016). UK voters chose to leave the European Union.",
+   "difficulty": 2,
+   "refs": [
+    "history/the-brexit-referendum"
+   ]
+  },
+  {
+   "id": "num-the-brexit-referendum",
+   "kind": "number",
+   "prompt": "In what year? The Brexit referendum",
+   "answer": 2016,
+   "unit": "",
+   "tolerance": 2,
+   "explain": "The Brexit referendum (2016). UK voters chose to leave the European Union.",
+   "difficulty": 3,
+   "refs": [
+    "history/the-brexit-referendum"
+   ]
+  },
+  {
+   "id": "year-covid-19-is-declared-a-pandemic",
+   "kind": "mc",
+   "prompt": "When did this happen? COVID-19 is declared a pandemic",
+   "answer": "2020",
+   "wrong": [
+    "2022",
+    "2018",
+    "2016"
+   ],
+   "explain": "COVID-19 is declared a pandemic (2020). The World Health Organization declared the outbreak a pandemic in March.",
+   "difficulty": 1,
+   "refs": [
+    "history/covid-19-is-declared-a-pandemic"
+   ]
+  },
+  {
+   "id": "num-covid-19-is-declared-a-pandemic",
+   "kind": "number",
+   "prompt": "In what year? COVID-19 is declared a pandemic",
+   "answer": 2020,
+   "unit": "",
+   "tolerance": 2,
+   "explain": "COVID-19 is declared a pandemic (2020). The World Health Organization declared the outbreak a pandemic in March.",
+   "difficulty": 2,
+   "refs": [
+    "history/covid-19-is-declared-a-pandemic"
+   ]
+  },
+  {
+   "id": "year-the-james-webb-space-telescope-is-launched",
+   "kind": "mc",
+   "prompt": "When did this happen? The James Webb Space Telescope is launched",
+   "answer": "2021",
+   "wrong": [
+    "2019",
+    "2015",
+    "2017"
+   ],
+   "explain": "The James Webb Space Telescope is launched (2021). The powerful infrared telescope was launched on Christmas Day.",
+   "difficulty": 3,
+   "refs": [
+    "history/the-james-webb-space-telescope-is-launched"
+   ]
+  },
+  {
+   "id": "year-queen-elizabeth-ii-dies",
+   "kind": "mc",
+   "prompt": "When did this happen? Queen Elizabeth II dies",
+   "answer": "2022",
+   "wrong": [
+    "2016",
+    "2020",
+    "2018"
+   ],
+   "explain": "Queen Elizabeth II dies (2022). She died at Balmoral after a reign of 70 years.",
+   "difficulty": 2,
+   "refs": [
+    "history/queen-elizabeth-ii-dies"
+   ]
+  },
+  {
+   "id": "num-queen-elizabeth-ii-dies",
+   "kind": "number",
+   "prompt": "In what year? Queen Elizabeth II dies",
+   "answer": 2022,
+   "unit": "",
+   "tolerance": 2,
+   "explain": "Queen Elizabeth II dies (2022). She died at Balmoral after a reign of 70 years.",
+   "difficulty": 3,
+   "refs": [
+    "history/queen-elizabeth-ii-dies"
+   ]
+  },
+  {
+   "id": "order-the-battle-o-columbus-rea-the-titanic--yuri-gagarin",
+   "kind": "order",
+   "prompt": "Put these in order, earliest first.",
+   "answer": [
+    "The Battle of Hastings",
+    "Columbus reaches the Americas",
+    "The Titanic sinks",
+    "Yuri Gagarin becomes the first person in space"
+   ],
+   "orderLabel": "Earliest → latest",
+   "explain": "The Battle of Hastings: 1066 · Columbus reaches the Americas: 1492 · The Titanic sinks: 1912 · Yuri Gagarin becomes the first person in space: 1961",
+   "difficulty": 1,
+   "refs": [
+    "history/the-battle-of-hastings",
+    "history/columbus-reaches-the-americas",
+    "history/the-titanic-sinks",
+    "history/yuri-gagarin-becomes-the-first-person-in-space"
+   ]
+  },
+  {
+   "id": "order-darwin-publi-the-eiffel-t-queen-elizab-hong-kong-is",
+   "kind": "order",
+   "prompt": "Put these in order, earliest first.",
+   "answer": [
+    "Darwin publishes On the Origin of Species",
+    "The Eiffel Tower is completed",
+    "Queen Elizabeth II is crowned",
+    "Hong Kong is handed back to China"
+   ],
+   "orderLabel": "Earliest → latest",
+   "explain": "Darwin publishes On the Origin of Species: 1859 · The Eiffel Tower is completed: 1889 · Queen Elizabeth II is crowned: 1953 · Hong Kong is handed back to China: 1997",
+   "difficulty": 2,
+   "refs": [
+    "history/darwin-publishes-on-the-origin-of-species",
+    "history/the-eiffel-tower-is-completed",
+    "history/queen-elizabeth-ii-is-crowned",
+    "history/hong-kong-is-handed-back-to-china"
+   ]
+  },
+  {
+   "id": "order-captain-cook-napoleon-cro-the-american-the-united-n",
+   "kind": "order",
+   "prompt": "Put these in order, earliest first.",
+   "answer": [
+    "Captain Cook reaches Botany Bay",
+    "Napoleon crowns himself emperor",
+    "The American Civil War begins",
+    "The United Nations is founded"
+   ],
+   "orderLabel": "Earliest → latest",
+   "explain": "Captain Cook reaches Botany Bay: 1770 · Napoleon crowns himself emperor: 1804 · The American Civil War begins: 1861 · The United Nations is founded: 1945",
+   "difficulty": 3,
+   "refs": [
+    "history/captain-cook-reaches-botany-bay",
+    "history/napoleon-crowns-himself-emperor",
+    "history/the-american-civil-war-begins",
+    "history/the-united-nations-is-founded"
+   ]
+  },
+  {
+   "id": "order-the-titanic--everest-is-c-the-fall-of--covid-19-is-",
+   "kind": "order",
+   "prompt": "Put these in order, earliest first.",
+   "answer": [
+    "The Titanic sinks",
+    "Everest is climbed for the first time",
+    "The fall of the Berlin Wall",
+    "COVID-19 is declared a pandemic"
+   ],
+   "orderLabel": "Earliest → latest",
+   "explain": "The Titanic sinks: 1912 · Everest is climbed for the first time: 1953 · The fall of the Berlin Wall: 1989 · COVID-19 is declared a pandemic: 2020",
+   "difficulty": 1,
+   "refs": [
+    "history/the-titanic-sinks",
+    "history/everest-is-climbed-for-the-first-time",
+    "history/the-fall-of-the-berlin-wall",
+    "history/covid-19-is-declared-a-pandemic"
+   ]
+  },
+  {
+   "id": "order-the-american-the-suez-can-hitler-becom-covid-19-is-",
+   "kind": "order",
+   "prompt": "Put these in order, earliest first.",
+   "answer": [
+    "The American Civil War begins",
+    "The Suez Canal opens",
+    "Hitler becomes chancellor of Germany",
+    "COVID-19 is declared a pandemic"
+   ],
+   "orderLabel": "Earliest → latest",
+   "explain": "The American Civil War begins: 1861 · The Suez Canal opens: 1869 · Hitler becomes chancellor of Germany: 1933 · COVID-19 is declared a pandemic: 2020",
+   "difficulty": 2,
+   "refs": [
+    "history/the-american-civil-war-begins",
+    "history/the-suez-canal-opens",
+    "history/hitler-becomes-chancellor-of-germany",
+    "history/covid-19-is-declared-a-pandemic"
+   ]
+  },
+  {
+   "id": "order-bell-patents-the-first-wo-the-first-fi-the-apollo-1",
+   "kind": "order",
+   "prompt": "Put these in order, earliest first.",
+   "answer": [
+    "Bell patents the telephone",
+    "The First World War ends",
+    "The first FIFA World Cup",
+    "The Apollo 13 rescue"
+   ],
+   "orderLabel": "Earliest → latest",
+   "explain": "Bell patents the telephone: 1876 · The First World War ends: 1918 · The first FIFA World Cup: 1930 · The Apollo 13 rescue: 1970",
+   "difficulty": 3,
+   "refs": [
+    "history/bell-patents-the-telephone",
+    "history/the-first-world-war-ends",
+    "history/the-first-fifa-world-cup",
+    "history/the-apollo-13-rescue"
+   ]
+  },
+  {
+   "id": "order-the-battle-o-the-us-decla-the-first-wo-covid-19-is-",
+   "kind": "order",
+   "prompt": "Put these in order, earliest first.",
+   "answer": [
+    "The Battle of Hastings",
+    "The US Declaration of Independence",
+    "The First World War ends",
+    "COVID-19 is declared a pandemic"
+   ],
+   "orderLabel": "Earliest → latest",
+   "explain": "The Battle of Hastings: 1066 · The US Declaration of Independence: 1776 · The First World War ends: 1918 · COVID-19 is declared a pandemic: 2020",
+   "difficulty": 1,
+   "refs": [
+    "history/the-battle-of-hastings",
+    "history/the-us-declaration-of-independence",
+    "history/the-first-world-war-ends",
+    "history/covid-19-is-declared-a-pandemic"
+   ]
+  },
+  {
+   "id": "order-the-defeat-o-the-battle-o-the-united-n-the-indian-o",
+   "kind": "order",
+   "prompt": "Put these in order, earliest first.",
+   "answer": [
+    "The defeat of the Spanish Armada",
+    "The Battle of the Somme",
+    "The United Nations is founded",
+    "The Indian Ocean tsunami"
+   ],
+   "orderLabel": "Earliest → latest",
+   "explain": "The defeat of the Spanish Armada: 1588 · The Battle of the Somme: 1916 · The United Nations is founded: 1945 · The Indian Ocean tsunami: 2004",
+   "difficulty": 2,
+   "refs": [
+    "history/the-defeat-of-the-spanish-armada",
+    "history/the-battle-of-the-somme",
+    "history/the-united-nations-is-founded",
+    "history/the-indian-ocean-tsunami"
+   ]
+  },
+  {
+   "id": "order-charlemagne--the-battle-o-india-and-pa-the-cuban-mi",
+   "kind": "order",
+   "prompt": "Put these in order, earliest first.",
+   "answer": [
+    "Charlemagne is crowned emperor",
+    "The Battle of Trafalgar",
+    "India and Pakistan become independent",
+    "The Cuban Missile Crisis"
+   ],
+   "orderLabel": "Earliest → latest",
+   "explain": "Charlemagne is crowned emperor: AD 800 · The Battle of Trafalgar: 1805 · India and Pakistan become independent: 1947 · The Cuban Missile Crisis: 1962",
+   "difficulty": 3,
+   "refs": [
+    "history/charlemagne-is-crowned-emperor",
+    "history/the-battle-of-trafalgar",
+    "history/india-and-pakistan-become-independent",
+    "history/the-cuban-missile-crisis"
+   ]
+  },
+  {
+   "id": "order-the-eiffel-t-the-first-wo-the-second-w-the-fall-of-",
+   "kind": "order",
+   "prompt": "Put these in order, earliest first.",
+   "answer": [
+    "The Eiffel Tower is completed",
+    "The First World War begins",
+    "The Second World War begins",
+    "The fall of the Berlin Wall"
+   ],
+   "orderLabel": "Earliest → latest",
+   "explain": "The Eiffel Tower is completed: 1889 · The First World War begins: 1914 · The Second World War begins: 1939 · The fall of the Berlin Wall: 1989",
+   "difficulty": 1,
+   "refs": [
+    "history/the-eiffel-tower-is-completed",
+    "history/the-first-world-war-begins",
+    "history/the-second-world-war-begins",
+    "history/the-fall-of-the-berlin-wall"
+   ]
+  },
+  {
+   "id": "order-magna-carta--the-american-the-second-w-wikipedia-is",
+   "kind": "order",
+   "prompt": "Put these in order, earliest first.",
+   "answer": [
+    "Magna Carta is sealed",
+    "The American Civil War begins",
+    "The Second World War begins",
+    "Wikipedia is launched"
+   ],
+   "orderLabel": "Earliest → latest",
+   "explain": "Magna Carta is sealed: 1215 · The American Civil War begins: 1861 · The Second World War begins: 1939 · Wikipedia is launched: 2001",
+   "difficulty": 2,
+   "refs": [
+    "history/magna-carta-is-sealed",
+    "history/the-american-civil-war-begins",
+    "history/the-second-world-war-begins",
+    "history/wikipedia-is-launched"
+   ]
+  },
+  {
+   "id": "order-the-battle-o-the-first-mo-rosa-parks-a-covid-19-is-",
+   "kind": "order",
+   "prompt": "Put these in order, earliest first.",
+   "answer": [
+    "The Battle of Waterloo",
+    "The first modern Olympic Games",
+    "Rosa Parks and the Montgomery bus boycott",
+    "COVID-19 is declared a pandemic"
+   ],
+   "orderLabel": "Earliest → latest",
+   "explain": "The Battle of Waterloo: 1815 · The first modern Olympic Games: 1896 · Rosa Parks and the Montgomery bus boycott: 1955 · COVID-19 is declared a pandemic: 2020",
+   "difficulty": 3,
+   "refs": [
+    "history/the-battle-of-waterloo",
+    "history/the-first-modern-olympic-games",
+    "history/rosa-parks-and-the-montgomery-bus-boycott",
+    "history/covid-19-is-declared-a-pandemic"
+   ]
+  },
+  {
+   "id": "order-the-battle-o-columbus-rea-the-great-fi-the-first-wo",
+   "kind": "order",
+   "prompt": "Put these in order, earliest first.",
+   "answer": [
+    "The Battle of Hastings",
+    "Columbus reaches the Americas",
+    "The Great Fire of London",
+    "The First World War ends"
+   ],
+   "orderLabel": "Earliest → latest",
+   "explain": "The Battle of Hastings: 1066 · Columbus reaches the Americas: 1492 · The Great Fire of London: 1666 · The First World War ends: 1918",
+   "difficulty": 1,
+   "refs": [
+    "history/the-battle-of-hastings",
+    "history/columbus-reaches-the-americas",
+    "history/the-great-fire-of-london",
+    "history/the-first-world-war-ends"
+   ]
+  },
+  {
+   "id": "order-the-eiffel-t-hitler-becom-the-channel--london-hosts",
+   "kind": "order",
+   "prompt": "Put these in order, earliest first.",
+   "answer": [
+    "The Eiffel Tower is completed",
+    "Hitler becomes chancellor of Germany",
+    "The Channel Tunnel opens",
+    "London hosts the Olympics for the third time"
+   ],
+   "orderLabel": "Earliest → latest",
+   "explain": "The Eiffel Tower is completed: 1889 · Hitler becomes chancellor of Germany: 1933 · The Channel Tunnel opens: 1994 · London hosts the Olympics for the third time: 2012",
+   "difficulty": 2,
+   "refs": [
+    "history/the-eiffel-tower-is-completed",
+    "history/hitler-becomes-chancellor-of-germany",
+    "history/the-channel-tunnel-opens",
+    "history/london-hosts-the-olympics-for-the-third-time"
+   ]
+  },
+  {
+   "id": "order-the-mayflowe-d-day-the-no-the-korean-w-the-first-ip",
+   "kind": "order",
+   "prompt": "Put these in order, earliest first.",
+   "answer": [
+    "The Mayflower reaches America",
+    "D-Day: the Normandy landings",
+    "The Korean War begins",
+    "The first iPhone goes on sale"
+   ],
+   "orderLabel": "Earliest → latest",
+   "explain": "The Mayflower reaches America: 1620 · D-Day: the Normandy landings: 1944 · The Korean War begins: 1950 · The first iPhone goes on sale: 2007",
+   "difficulty": 3,
+   "refs": [
+    "history/the-mayflower-reaches-america",
+    "history/d-day-the-normandy-landings",
+    "history/the-korean-war-begins",
+    "history/the-first-iphone-goes-on-sale"
+   ]
+  },
+  {
+   "id": "order-the-great-fi-the-eiffel-t-the-titanic--everest-is-c",
+   "kind": "order",
+   "prompt": "Put these in order, earliest first.",
+   "answer": [
+    "The Great Fire of London",
+    "The Eiffel Tower is completed",
+    "The Titanic sinks",
+    "Everest is climbed for the first time"
+   ],
+   "orderLabel": "Earliest → latest",
+   "explain": "The Great Fire of London: 1666 · The Eiffel Tower is completed: 1889 · The Titanic sinks: 1912 · Everest is climbed for the first time: 1953",
+   "difficulty": 1,
+   "refs": [
+    "history/the-great-fire-of-london",
+    "history/the-eiffel-tower-is-completed",
+    "history/the-titanic-sinks",
+    "history/everest-is-climbed-for-the-first-time"
+   ]
+  },
+  {
+   "id": "order-columbus-rea-the-battle-o-the-first-fi-the-cuban-mi",
+   "kind": "order",
+   "prompt": "Put these in order, earliest first.",
+   "answer": [
+    "Columbus reaches the Americas",
+    "The Battle of Trafalgar",
+    "The first FIFA World Cup",
+    "The Cuban Missile Crisis"
+   ],
+   "orderLabel": "Earliest → latest",
+   "explain": "Columbus reaches the Americas: 1492 · The Battle of Trafalgar: 1805 · The first FIFA World Cup: 1930 · The Cuban Missile Crisis: 1962",
+   "difficulty": 2,
+   "refs": [
+    "history/columbus-reaches-the-americas",
+    "history/the-battle-of-trafalgar",
+    "history/the-first-fifa-world-cup",
+    "history/the-cuban-missile-crisis"
+   ]
+  },
+  {
+   "id": "order-the-battle-o-the-titanic--queen-elizab-dolly-the-sh",
+   "kind": "order",
+   "prompt": "Put these in order, earliest first.",
+   "answer": [
+    "The Battle of Trafalgar",
+    "The Titanic sinks",
+    "Queen Elizabeth II is crowned",
+    "Dolly the sheep is born"
+   ],
+   "orderLabel": "Earliest → latest",
+   "explain": "The Battle of Trafalgar: 1805 · The Titanic sinks: 1912 · Queen Elizabeth II is crowned: 1953 · Dolly the sheep is born: 1996",
+   "difficulty": 3,
+   "refs": [
+    "history/the-battle-of-trafalgar",
+    "history/the-titanic-sinks",
+    "history/queen-elizabeth-ii-is-crowned",
+    "history/dolly-the-sheep-is-born"
+   ]
+  },
+  {
+   "id": "order-the-battle-o-the-us-decla-the-wright-b-yuri-gagarin",
+   "kind": "order",
+   "prompt": "Put these in order, earliest first.",
+   "answer": [
+    "The Battle of Hastings",
+    "The US Declaration of Independence",
+    "The Wright brothers' first powered flight",
+    "Yuri Gagarin becomes the first person in space"
+   ],
+   "orderLabel": "Earliest → latest",
+   "explain": "The Battle of Hastings: 1066 · The US Declaration of Independence: 1776 · The Wright brothers' first powered flight: 1903 · Yuri Gagarin becomes the first person in space: 1961",
+   "difficulty": 1,
+   "refs": [
+    "history/the-battle-of-hastings",
+    "history/the-us-declaration-of-independence",
+    "history/the-wright-brothers-first-powered-flight",
+    "history/yuri-gagarin-becomes-the-first-person-in-space"
+   ]
+  },
+  {
+   "id": "order-the-us-decla-sputnik-the--the-cuban-mi-germany-is-r",
+   "kind": "order",
+   "prompt": "Put these in order, earliest first.",
+   "answer": [
+    "The US Declaration of Independence",
+    "Sputnik, the first satellite, is launched",
+    "The Cuban Missile Crisis",
+    "Germany is reunified"
+   ],
+   "orderLabel": "Earliest → latest",
+   "explain": "The US Declaration of Independence: 1776 · Sputnik, the first satellite, is launched: 1957 · The Cuban Missile Crisis: 1962 · Germany is reunified: 1990",
+   "difficulty": 2,
+   "refs": [
+    "history/the-us-declaration-of-independence",
+    "history/sputnik-the-first-satellite-is-launched",
+    "history/the-cuban-missile-crisis",
+    "history/germany-is-reunified"
+   ]
+  },
+  {
+   "id": "order-england-and--the-battle-o-abraham-linc-the-cuban-mi",
+   "kind": "order",
+   "prompt": "Put these in order, earliest first.",
+   "answer": [
+    "England and Scotland unite",
+    "The Battle of Waterloo",
+    "Abraham Lincoln is assassinated",
+    "The Cuban Missile Crisis"
+   ],
+   "orderLabel": "Earliest → latest",
+   "explain": "England and Scotland unite: 1707 · The Battle of Waterloo: 1815 · Abraham Lincoln is assassinated: 1865 · The Cuban Missile Crisis: 1962",
+   "difficulty": 3,
+   "refs": [
+    "history/england-and-scotland-unite",
+    "history/the-battle-of-waterloo",
+    "history/abraham-lincoln-is-assassinated",
+    "history/the-cuban-missile-crisis"
+   ]
+  },
+  {
+   "id": "order-the-great-fi-the-wright-b-d-day-the-no-apollo-11-la",
+   "kind": "order",
+   "prompt": "Put these in order, earliest first.",
+   "answer": [
+    "The Great Fire of London",
+    "The Wright brothers' first powered flight",
+    "D-Day: the Normandy landings",
+    "Apollo 11 lands on the Moon"
+   ],
+   "orderLabel": "Earliest → latest",
+   "explain": "The Great Fire of London: 1666 · The Wright brothers' first powered flight: 1903 · D-Day: the Normandy landings: 1944 · Apollo 11 lands on the Moon: 1969",
+   "difficulty": 1,
+   "refs": [
+    "history/the-great-fire-of-london",
+    "history/the-wright-brothers-first-powered-flight",
+    "history/d-day-the-normandy-landings",
+    "history/apollo-11-lands-on-the-moon"
+   ]
+  },
+  {
+   "id": "order-the-russian--germany-is-r-wikipedia-is-the-brexit-r",
+   "kind": "order",
+   "prompt": "Put these in order, earliest first.",
+   "answer": [
+    "The Russian Revolution",
+    "Germany is reunified",
+    "Wikipedia is launched",
+    "The Brexit referendum"
+   ],
+   "orderLabel": "Earliest → latest",
+   "explain": "The Russian Revolution: 1917 · Germany is reunified: 1990 · Wikipedia is launched: 2001 · The Brexit referendum: 2016",
+   "difficulty": 2,
+   "refs": [
+    "history/the-russian-revolution",
+    "history/germany-is-reunified",
+    "history/wikipedia-is-launched",
+    "history/the-brexit-referendum"
+   ]
+  },
+  {
+   "id": "order-the-gunpowde-the-san-fran-the-panama-c-the-soviet-u",
+   "kind": "order",
+   "prompt": "Put these in order, earliest first.",
+   "answer": [
+    "The Gunpowder Plot",
+    "The San Francisco earthquake",
+    "The Panama Canal opens",
+    "The Soviet Union breaks up"
+   ],
+   "orderLabel": "Earliest → latest",
+   "explain": "The Gunpowder Plot: 1605 · The San Francisco earthquake: 1906 · The Panama Canal opens: 1914 · The Soviet Union breaks up: 1991",
+   "difficulty": 3,
+   "refs": [
+    "history/the-gunpowder-plot",
+    "history/the-san-francisco-earthquake",
+    "history/the-panama-canal-opens",
+    "history/the-soviet-union-breaks-up"
+   ]
+  },
+  {
+   "id": "order-the-battle-o-the-first-wo-the-second-w-apollo-11-la",
+   "kind": "order",
+   "prompt": "Put these in order, earliest first.",
+   "answer": [
+    "The Battle of Hastings",
+    "The First World War begins",
+    "The Second World War begins",
+    "Apollo 11 lands on the Moon"
+   ],
+   "orderLabel": "Earliest → latest",
+   "explain": "The Battle of Hastings: 1066 · The First World War begins: 1914 · The Second World War begins: 1939 · Apollo 11 lands on the Moon: 1969",
+   "difficulty": 1,
+   "refs": [
+    "history/the-battle-of-hastings",
+    "history/the-first-world-war-begins",
+    "history/the-second-world-war-begins",
+    "history/apollo-11-lands-on-the-moon"
+   ]
+  },
+  {
+   "id": "order-the-american-the-first-wo-the-treaty-o-covid-19-is-",
+   "kind": "order",
+   "prompt": "Put these in order, earliest first.",
+   "answer": [
+    "The American Civil War begins",
+    "The First World War begins",
+    "The Treaty of Versailles",
+    "COVID-19 is declared a pandemic"
+   ],
+   "orderLabel": "Earliest → latest",
+   "explain": "The American Civil War begins: 1861 · The First World War begins: 1914 · The Treaty of Versailles: 1919 · COVID-19 is declared a pandemic: 2020",
+   "difficulty": 2,
+   "refs": [
+    "history/the-american-civil-war-begins",
+    "history/the-first-world-war-begins",
+    "history/the-treaty-of-versailles",
+    "history/covid-19-is-declared-a-pandemic"
+   ]
+  },
+  {
+   "id": "order-the-assassin-the-black-de-the-californ-the-higgs-bo",
+   "kind": "order",
+   "prompt": "Put these in order, earliest first.",
+   "answer": [
+    "The assassination of Julius Caesar",
+    "The Black Death reaches Europe",
+    "The California Gold Rush",
+    "The Higgs boson is discovered"
+   ],
+   "orderLabel": "Earliest → latest",
+   "explain": "The assassination of Julius Caesar: 44 BC · The Black Death reaches Europe: 1347 · The California Gold Rush: 1848 · The Higgs boson is discovered: 2012",
+   "difficulty": 3,
+   "refs": [
+    "history/the-assassination-of-julius-caesar",
+    "history/the-black-death-reaches-europe",
+    "history/the-california-gold-rush",
+    "history/the-higgs-boson-is-discovered"
+   ]
+  },
+  {
+   "id": "order-the-battle-o-columbus-rea-the-us-decla-the-first-wo",
+   "kind": "order",
+   "prompt": "Put these in order, earliest first.",
+   "answer": [
+    "The Battle of Hastings",
+    "Columbus reaches the Americas",
+    "The US Declaration of Independence",
+    "The First World War ends"
+   ],
+   "orderLabel": "Earliest → latest",
+   "explain": "The Battle of Hastings: 1066 · Columbus reaches the Americas: 1492 · The US Declaration of Independence: 1776 · The First World War ends: 1918",
+   "difficulty": 1,
+   "refs": [
+    "history/the-battle-of-hastings",
+    "history/columbus-reaches-the-americas",
+    "history/the-us-declaration-of-independence",
+    "history/the-first-world-war-ends"
+   ]
+  },
+  {
+   "id": "order-abraham-linc-the-first-wo-the-second-w-the-cuban-mi",
+   "kind": "order",
+   "prompt": "Put these in order, earliest first.",
+   "answer": [
+    "Abraham Lincoln is assassinated",
+    "The First World War ends",
+    "The Second World War begins",
+    "The Cuban Missile Crisis"
+   ],
+   "orderLabel": "Earliest → latest",
+   "explain": "Abraham Lincoln is assassinated: 1865 · The First World War ends: 1918 · The Second World War begins: 1939 · The Cuban Missile Crisis: 1962",
+   "difficulty": 2,
+   "refs": [
+    "history/abraham-lincoln-is-assassinated",
+    "history/the-first-world-war-ends",
+    "history/the-second-world-war-begins",
+    "history/the-cuban-missile-crisis"
+   ]
+  },
+  {
+   "id": "order-captain-cook-the-san-fran-the-second-w-the-korean-w",
+   "kind": "order",
+   "prompt": "Put these in order, earliest first.",
+   "answer": [
+    "Captain Cook reaches Botany Bay",
+    "The San Francisco earthquake",
+    "The Second World War begins",
+    "The Korean War begins"
+   ],
+   "orderLabel": "Earliest → latest",
+   "explain": "Captain Cook reaches Botany Bay: 1770 · The San Francisco earthquake: 1906 · The Second World War begins: 1939 · The Korean War begins: 1950",
+   "difficulty": 3,
+   "refs": [
+    "history/captain-cook-reaches-botany-bay",
+    "history/the-san-francisco-earthquake",
+    "history/the-second-world-war-begins",
+    "history/the-korean-war-begins"
+   ]
+  },
+  {
+   "id": "order-the-great-fi-the-first-wo-d-day-the-no-the-fall-of-",
+   "kind": "order",
+   "prompt": "Put these in order, earliest first.",
+   "answer": [
+    "The Great Fire of London",
+    "The First World War begins",
+    "D-Day: the Normandy landings",
+    "The fall of the Berlin Wall"
+   ],
+   "orderLabel": "Earliest → latest",
+   "explain": "The Great Fire of London: 1666 · The First World War begins: 1914 · D-Day: the Normandy landings: 1944 · The fall of the Berlin Wall: 1989",
+   "difficulty": 1,
+   "refs": [
+    "history/the-great-fire-of-london",
+    "history/the-first-world-war-begins",
+    "history/d-day-the-normandy-landings",
+    "history/the-fall-of-the-berlin-wall"
+   ]
+  },
+  {
+   "id": "order-the-boston-t-india-and-pa-martin-luthe-the-channel-",
+   "kind": "order",
+   "prompt": "Put these in order, earliest first.",
+   "answer": [
+    "The Boston Tea Party",
+    "India and Pakistan become independent",
+    "Martin Luther King Jr.'s \"I Have a Dream\" speech",
+    "The Channel Tunnel opens"
+   ],
+   "orderLabel": "Earliest → latest",
+   "explain": "The Boston Tea Party: 1773 · India and Pakistan become independent: 1947 · Martin Luther King Jr.'s \"I Have a Dream\" speech: 1963 · The Channel Tunnel opens: 1994",
+   "difficulty": 2,
+   "refs": [
+    "history/the-boston-tea-party",
+    "history/india-and-pakistan-become-independent",
+    "history/martin-luther-king-jr-s-i-have-a-dream-speech",
+    "history/the-channel-tunnel-opens"
+   ]
+  },
+  {
+   "id": "order-the-battle-o-the-suez-can-the-nhs-is-f-everest-is-c",
+   "kind": "order",
+   "prompt": "Put these in order, earliest first.",
+   "answer": [
+    "The Battle of Hastings",
+    "The Suez Canal opens",
+    "The NHS is founded",
+    "Everest is climbed for the first time"
+   ],
+   "orderLabel": "Earliest → latest",
+   "explain": "The Battle of Hastings: 1066 · The Suez Canal opens: 1869 · The NHS is founded: 1948 · Everest is climbed for the first time: 1953",
+   "difficulty": 3,
+   "refs": [
+    "history/the-battle-of-hastings",
+    "history/the-suez-canal-opens",
+    "history/the-nhs-is-founded",
+    "history/everest-is-climbed-for-the-first-time"
+   ]
+  },
+  {
+   "id": "order-the-battle-o-columbus-rea-the-great-fi-apollo-11-la",
+   "kind": "order",
+   "prompt": "Put these in order, earliest first.",
+   "answer": [
+    "The Battle of Hastings",
+    "Columbus reaches the Americas",
+    "The Great Fire of London",
+    "Apollo 11 lands on the Moon"
+   ],
+   "orderLabel": "Earliest → latest",
+   "explain": "The Battle of Hastings: 1066 · Columbus reaches the Americas: 1492 · The Great Fire of London: 1666 · Apollo 11 lands on the Moon: 1969",
+   "difficulty": 1,
+   "refs": [
+    "history/the-battle-of-hastings",
+    "history/columbus-reaches-the-americas",
+    "history/the-great-fire-of-london",
+    "history/apollo-11-lands-on-the-moon"
+   ]
+  },
+  {
+   "id": "order-tutankhamun--the-attack-o-facebook-is--queen-elizab",
+   "kind": "order",
+   "prompt": "Put these in order, earliest first.",
+   "answer": [
+    "Tutankhamun's tomb is discovered",
+    "The attack on Pearl Harbor",
+    "Facebook is founded",
+    "Queen Elizabeth II dies"
+   ],
+   "orderLabel": "Earliest → latest",
+   "explain": "Tutankhamun's tomb is discovered: 1922 · The attack on Pearl Harbor: 1941 · Facebook is founded: 2004 · Queen Elizabeth II dies: 2022",
+   "difficulty": 2,
+   "refs": [
+    "history/tutankhamun-s-tomb-is-discovered",
+    "history/the-attack-on-pearl-harbor",
+    "history/facebook-is-founded",
+    "history/queen-elizabeth-ii-dies"
+   ]
+  },
+  {
+   "id": "order-king-charles-the-battle-o-the-second-w-germany-is-r",
+   "kind": "order",
+   "prompt": "Put these in order, earliest first.",
+   "answer": [
+    "King Charles I is executed",
+    "The Battle of the Somme",
+    "The Second World War begins",
+    "Germany is reunified"
+   ],
+   "orderLabel": "Earliest → latest",
+   "explain": "King Charles I is executed: 1649 · The Battle of the Somme: 1916 · The Second World War begins: 1939 · Germany is reunified: 1990",
+   "difficulty": 3,
+   "refs": [
+    "history/king-charles-i-is-executed",
+    "history/the-battle-of-the-somme",
+    "history/the-second-world-war-begins",
+    "history/germany-is-reunified"
+   ]
+  },
+  {
+   "id": "order-columbus-rea-the-wright-b-d-day-the-no-apollo-11-la",
+   "kind": "order",
+   "prompt": "Put these in order, earliest first.",
+   "answer": [
+    "Columbus reaches the Americas",
+    "The Wright brothers' first powered flight",
+    "D-Day: the Normandy landings",
+    "Apollo 11 lands on the Moon"
+   ],
+   "orderLabel": "Earliest → latest",
+   "explain": "Columbus reaches the Americas: 1492 · The Wright brothers' first powered flight: 1903 · D-Day: the Normandy landings: 1944 · Apollo 11 lands on the Moon: 1969",
+   "difficulty": 1,
+   "refs": [
+    "history/columbus-reaches-the-americas",
+    "history/the-wright-brothers-first-powered-flight",
+    "history/d-day-the-normandy-landings",
+    "history/apollo-11-lands-on-the-moon"
+   ]
+  },
+  {
+   "id": "order-the-battle-o-abraham-linc-the-attack-o-president-ke",
+   "kind": "order",
+   "prompt": "Put these in order, earliest first.",
+   "answer": [
+    "The Battle of Waterloo",
+    "Abraham Lincoln is assassinated",
+    "The attack on Pearl Harbor",
+    "President Kennedy is assassinated"
+   ],
+   "orderLabel": "Earliest → latest",
+   "explain": "The Battle of Waterloo: 1815 · Abraham Lincoln is assassinated: 1865 · The attack on Pearl Harbor: 1941 · President Kennedy is assassinated: 1963",
+   "difficulty": 2,
+   "refs": [
+    "history/the-battle-of-waterloo",
+    "history/abraham-lincoln-is-assassinated",
+    "history/the-attack-on-pearl-harbor",
+    "history/president-kennedy-is-assassinated"
+   ]
+  },
+  {
+   "id": "order-the-assassin-charlemagne--the-gunpowde-queen-elizab",
+   "kind": "order",
+   "prompt": "Put these in order, earliest first.",
+   "answer": [
+    "The assassination of Julius Caesar",
+    "Charlemagne is crowned emperor",
+    "The Gunpowder Plot",
+    "Queen Elizabeth II is crowned"
+   ],
+   "orderLabel": "Earliest → latest",
+   "explain": "The assassination of Julius Caesar: 44 BC · Charlemagne is crowned emperor: AD 800 · The Gunpowder Plot: 1605 · Queen Elizabeth II is crowned: 1953",
+   "difficulty": 3,
+   "refs": [
+    "history/the-assassination-of-julius-caesar",
+    "history/charlemagne-is-crowned-emperor",
+    "history/the-gunpowder-plot",
+    "history/queen-elizabeth-ii-is-crowned"
+   ]
+  },
+  {
+   "id": "order-columbus-rea-the-eiffel-t-the-first-wo-d-day-the-no",
+   "kind": "order",
+   "prompt": "Put these in order, earliest first.",
+   "answer": [
+    "Columbus reaches the Americas",
+    "The Eiffel Tower is completed",
+    "The First World War begins",
+    "D-Day: the Normandy landings"
+   ],
+   "orderLabel": "Earliest → latest",
+   "explain": "Columbus reaches the Americas: 1492 · The Eiffel Tower is completed: 1889 · The First World War begins: 1914 · D-Day: the Normandy landings: 1944",
+   "difficulty": 1,
+   "refs": [
+    "history/columbus-reaches-the-americas",
+    "history/the-eiffel-tower-is-completed",
+    "history/the-first-world-war-begins",
+    "history/d-day-the-normandy-landings"
+   ]
+  },
+  {
+   "id": "first-alexander-fleming-discovers-penicillin-yuri-gagarin-becomes-the-first-person-in-space",
+   "kind": "mc",
+   "prompt": "Which happened first?",
+   "answer": "Alexander Fleming discovers penicillin",
+   "wrong": [
+    "Yuri Gagarin becomes the first person in space"
+   ],
+   "explain": "Alexander Fleming discovers penicillin: 1928. Yuri Gagarin becomes the first person in space: 1961.",
+   "difficulty": 2,
+   "refs": [
+    "history/alexander-fleming-discovers-penicillin",
+    "history/yuri-gagarin-becomes-the-first-person-in-space"
+   ]
+  },
+  {
+   "id": "first-the-assassination-of-julius-caesar-the-battle-of-waterloo",
+   "kind": "mc",
+   "prompt": "Which happened first?",
+   "answer": "The assassination of Julius Caesar",
+   "wrong": [
+    "The Battle of Waterloo"
+   ],
+   "explain": "The assassination of Julius Caesar: 44 BC. The Battle of Waterloo: 1815.",
+   "difficulty": 1,
+   "refs": [
+    "history/the-assassination-of-julius-caesar",
+    "history/the-battle-of-waterloo"
+   ]
+  },
+  {
+   "id": "first-magna-carta-is-sealed-the-first-voyage-around-the-world-is-completed",
+   "kind": "mc",
+   "prompt": "Which happened first?",
+   "answer": "Magna Carta is sealed",
+   "wrong": [
+    "The first voyage around the world is completed"
+   ],
+   "explain": "Magna Carta is sealed: 1215. The first voyage around the world is completed: 1522.",
+   "difficulty": 1,
+   "refs": [
+    "history/magna-carta-is-sealed",
+    "history/the-first-voyage-around-the-world-is-completed"
+   ]
+  },
+  {
+   "id": "first-the-wright-brothers-first-powered-flight-the-russian-revolution",
+   "kind": "mc",
+   "prompt": "Which happened first?",
+   "answer": "The Wright brothers' first powered flight",
+   "wrong": [
+    "The Russian Revolution"
+   ],
+   "explain": "The Wright brothers' first powered flight: 1903. The Russian Revolution: 1917.",
+   "difficulty": 2,
+   "refs": [
+    "history/the-wright-brothers-first-powered-flight",
+    "history/the-russian-revolution"
+   ]
+  },
+  {
+   "id": "first-atomic-bombs-are-dropped-on-japan-the-first-iphone-goes-on-sale",
+   "kind": "mc",
+   "prompt": "Which happened first?",
+   "answer": "Atomic bombs are dropped on Japan",
+   "wrong": [
+    "The first iPhone goes on sale"
+   ],
+   "explain": "Atomic bombs are dropped on Japan: 1945. The first iPhone goes on sale: 2007.",
+   "difficulty": 2,
+   "refs": [
+    "history/atomic-bombs-are-dropped-on-japan",
+    "history/the-first-iphone-goes-on-sale"
+   ]
+  },
+  {
+   "id": "first-the-wall-street-crash-yuri-gagarin-becomes-the-first-person-in-space",
+   "kind": "mc",
+   "prompt": "Which happened first?",
+   "answer": "The Wall Street Crash",
+   "wrong": [
+    "Yuri Gagarin becomes the first person in space"
+   ],
+   "explain": "The Wall Street Crash: 1929. Yuri Gagarin becomes the first person in space: 1961.",
+   "difficulty": 2,
+   "refs": [
+    "history/the-wall-street-crash",
+    "history/yuri-gagarin-becomes-the-first-person-in-space"
+   ]
+  },
+  {
+   "id": "first-the-boston-tea-party-the-first-iphone-goes-on-sale",
+   "kind": "mc",
+   "prompt": "Which happened first?",
+   "answer": "The Boston Tea Party",
+   "wrong": [
+    "The first iPhone goes on sale"
+   ],
+   "explain": "The Boston Tea Party: 1773. The first iPhone goes on sale: 2007.",
+   "difficulty": 1,
+   "refs": [
+    "history/the-boston-tea-party",
+    "history/the-first-iphone-goes-on-sale"
+   ]
+  },
+  {
+   "id": "first-magna-carta-is-sealed-the-berlin-wall-is-built",
+   "kind": "mc",
+   "prompt": "Which happened first?",
+   "answer": "Magna Carta is sealed",
+   "wrong": [
+    "The Berlin Wall is built"
+   ],
+   "explain": "Magna Carta is sealed: 1215. The Berlin Wall is built: 1961.",
+   "difficulty": 1,
+   "refs": [
+    "history/magna-carta-is-sealed",
+    "history/the-berlin-wall-is-built"
+   ]
+  },
+  {
+   "id": "first-everest-is-climbed-for-the-first-time-the-soviet-union-breaks-up",
+   "kind": "mc",
+   "prompt": "Which happened first?",
+   "answer": "Everest is climbed for the first time",
+   "wrong": [
+    "The Soviet Union breaks up"
+   ],
+   "explain": "Everest is climbed for the first time: 1953. The Soviet Union breaks up: 1991.",
+   "difficulty": 2,
+   "refs": [
+    "history/everest-is-climbed-for-the-first-time",
+    "history/the-soviet-union-breaks-up"
+   ]
+  },
+  {
+   "id": "first-the-wall-street-crash-the-first-iphone-goes-on-sale",
+   "kind": "mc",
+   "prompt": "Which happened first?",
+   "answer": "The Wall Street Crash",
+   "wrong": [
+    "The first iPhone goes on sale"
+   ],
+   "explain": "The Wall Street Crash: 1929. The first iPhone goes on sale: 2007.",
+   "difficulty": 2,
+   "refs": [
+    "history/the-wall-street-crash",
+    "history/the-first-iphone-goes-on-sale"
+   ]
+  },
+  {
+   "id": "first-the-wright-brothers-first-powered-flight-the-brexit-referendum",
+   "kind": "mc",
+   "prompt": "Which happened first?",
+   "answer": "The Wright brothers' first powered flight",
+   "wrong": [
+    "The Brexit referendum"
+   ],
+   "explain": "The Wright brothers' first powered flight: 1903. The Brexit referendum: 2016.",
+   "difficulty": 2,
+   "refs": [
+    "history/the-wright-brothers-first-powered-flight",
+    "history/the-brexit-referendum"
+   ]
+  },
+  {
+   "id": "first-the-gunpowder-plot-the-treaty-of-versailles",
+   "kind": "mc",
+   "prompt": "Which happened first?",
+   "answer": "The Gunpowder Plot",
+   "wrong": [
+    "The Treaty of Versailles"
+   ],
+   "explain": "The Gunpowder Plot: 1605. The Treaty of Versailles: 1919.",
+   "difficulty": 1,
+   "refs": [
+    "history/the-gunpowder-plot",
+    "history/the-treaty-of-versailles"
+   ]
+  },
+  {
+   "id": "first-the-black-death-reaches-europe-the-russian-revolution",
+   "kind": "mc",
+   "prompt": "Which happened first?",
+   "answer": "The Black Death reaches Europe",
+   "wrong": [
+    "The Russian Revolution"
+   ],
+   "explain": "The Black Death reaches Europe: 1347. The Russian Revolution: 1917.",
+   "difficulty": 1,
+   "refs": [
+    "history/the-black-death-reaches-europe",
+    "history/the-russian-revolution"
+   ]
+  },
+  {
+   "id": "first-magna-carta-is-sealed-tutankhamun-s-tomb-is-discovered",
+   "kind": "mc",
+   "prompt": "Which happened first?",
+   "answer": "Magna Carta is sealed",
+   "wrong": [
+    "Tutankhamun's tomb is discovered"
+   ],
+   "explain": "Magna Carta is sealed: 1215. Tutankhamun's tomb is discovered: 1922.",
+   "difficulty": 1,
+   "refs": [
+    "history/magna-carta-is-sealed",
+    "history/tutankhamun-s-tomb-is-discovered"
+   ]
+  },
+  {
+   "id": "first-hitler-becomes-chancellor-of-germany-the-united-nations-is-founded",
+   "kind": "mc",
+   "prompt": "Which happened first?",
+   "answer": "Hitler becomes chancellor of Germany",
+   "wrong": [
+    "The United Nations is founded"
+   ],
+   "explain": "Hitler becomes chancellor of Germany: 1933. The United Nations is founded: 1945.",
+   "difficulty": 2,
+   "refs": [
+    "history/hitler-becomes-chancellor-of-germany",
+    "history/the-united-nations-is-founded"
+   ]
+  },
+  {
+   "id": "first-the-russian-revolution-the-berlin-wall-is-built",
+   "kind": "mc",
+   "prompt": "Which happened first?",
+   "answer": "The Russian Revolution",
+   "wrong": [
+    "The Berlin Wall is built"
+   ],
+   "explain": "The Russian Revolution: 1917. The Berlin Wall is built: 1961.",
+   "difficulty": 2,
+   "refs": [
+    "history/the-russian-revolution",
+    "history/the-berlin-wall-is-built"
+   ]
+  },
+  {
+   "id": "first-atomic-bombs-are-dropped-on-japan-the-soviet-union-breaks-up",
+   "kind": "mc",
+   "prompt": "Which happened first?",
+   "answer": "Atomic bombs are dropped on Japan",
+   "wrong": [
+    "The Soviet Union breaks up"
+   ],
+   "explain": "Atomic bombs are dropped on Japan: 1945. The Soviet Union breaks up: 1991.",
+   "difficulty": 2,
+   "refs": [
+    "history/atomic-bombs-are-dropped-on-japan",
+    "history/the-soviet-union-breaks-up"
+   ]
+  },
+  {
+   "id": "first-the-gunpowder-plot-the-great-fire-of-london",
+   "kind": "mc",
+   "prompt": "Which happened first?",
+   "answer": "The Gunpowder Plot",
+   "wrong": [
+    "The Great Fire of London"
+   ],
+   "explain": "The Gunpowder Plot: 1605. The Great Fire of London: 1666.",
+   "difficulty": 2,
+   "refs": [
+    "history/the-gunpowder-plot",
+    "history/the-great-fire-of-london"
+   ]
+  },
+  {
+   "id": "first-darwin-publishes-on-the-origin-of-species-the-first-world-war-ends",
+   "kind": "mc",
+   "prompt": "Which happened first?",
+   "answer": "Darwin publishes On the Origin of Species",
+   "wrong": [
+    "The First World War ends"
+   ],
+   "explain": "Darwin publishes On the Origin of Species: 1859. The First World War ends: 1918.",
+   "difficulty": 2,
+   "refs": [
+    "history/darwin-publishes-on-the-origin-of-species",
+    "history/the-first-world-war-ends"
+   ]
+  },
+  {
+   "id": "first-the-gunpowder-plot-the-channel-tunnel-opens",
+   "kind": "mc",
+   "prompt": "Which happened first?",
+   "answer": "The Gunpowder Plot",
+   "wrong": [
+    "The Channel Tunnel opens"
+   ],
+   "explain": "The Gunpowder Plot: 1605. The Channel Tunnel opens: 1994.",
+   "difficulty": 1,
+   "refs": [
+    "history/the-gunpowder-plot",
+    "history/the-channel-tunnel-opens"
+   ]
+  },
+  {
+   "id": "first-the-american-civil-war-begins-wikipedia-is-launched",
+   "kind": "mc",
+   "prompt": "Which happened first?",
+   "answer": "The American Civil War begins",
+   "wrong": [
+    "Wikipedia is launched"
+   ],
+   "explain": "The American Civil War begins: 1861. Wikipedia is launched: 2001.",
+   "difficulty": 2,
+   "refs": [
+    "history/the-american-civil-war-begins",
+    "history/wikipedia-is-launched"
+   ]
+  },
+  {
+   "id": "first-the-great-fire-of-london-the-us-declaration-of-independence",
+   "kind": "mc",
+   "prompt": "Which happened first?",
+   "answer": "The Great Fire of London",
+   "wrong": [
+    "The US Declaration of Independence"
+   ],
+   "explain": "The Great Fire of London: 1666. The US Declaration of Independence: 1776.",
+   "difficulty": 2,
+   "refs": [
+    "history/the-great-fire-of-london",
+    "history/the-us-declaration-of-independence"
+   ]
+  },
+  {
+   "id": "first-the-russian-revolution-hong-kong-is-handed-back-to-china",
+   "kind": "mc",
+   "prompt": "Which happened first?",
+   "answer": "The Russian Revolution",
+   "wrong": [
+    "Hong Kong is handed back to China"
+   ],
+   "explain": "The Russian Revolution: 1917. Hong Kong is handed back to China: 1997.",
+   "difficulty": 2,
+   "refs": [
+    "history/the-russian-revolution",
+    "history/hong-kong-is-handed-back-to-china"
+   ]
+  },
+  {
+   "id": "first-the-battle-of-trafalgar-the-first-world-war-begins",
+   "kind": "mc",
+   "prompt": "Which happened first?",
+   "answer": "The Battle of Trafalgar",
+   "wrong": [
+    "The First World War begins"
+   ],
+   "explain": "The Battle of Trafalgar: 1805. The First World War begins: 1914.",
+   "difficulty": 2,
+   "refs": [
+    "history/the-battle-of-trafalgar",
+    "history/the-first-world-war-begins"
+   ]
+  },
+  {
+   "id": "first-the-wright-brothers-first-powered-flight-hong-kong-is-handed-back-to-china",
+   "kind": "mc",
+   "prompt": "Which happened first?",
+   "answer": "The Wright brothers' first powered flight",
+   "wrong": [
+    "Hong Kong is handed back to China"
+   ],
+   "explain": "The Wright brothers' first powered flight: 1903. Hong Kong is handed back to China: 1997.",
+   "difficulty": 2,
+   "refs": [
+    "history/the-wright-brothers-first-powered-flight",
+    "history/hong-kong-is-handed-back-to-china"
+   ]
+  },
+  {
+   "id": "first-the-first-world-war-ends-apollo-11-lands-on-the-moon",
+   "kind": "mc",
+   "prompt": "Which happened first?",
+   "answer": "The First World War ends",
+   "wrong": [
+    "Apollo 11 lands on the Moon"
+   ],
+   "explain": "The First World War ends: 1918. Apollo 11 lands on the Moon: 1969.",
+   "difficulty": 2,
+   "refs": [
+    "history/the-first-world-war-ends",
+    "history/apollo-11-lands-on-the-moon"
+   ]
+  },
+  {
+   "id": "first-darwin-publishes-on-the-origin-of-species-the-chernobyl-disaster",
+   "kind": "mc",
+   "prompt": "Which happened first?",
+   "answer": "Darwin publishes On the Origin of Species",
+   "wrong": [
+    "The Chernobyl disaster"
+   ],
+   "explain": "Darwin publishes On the Origin of Species: 1859. The Chernobyl disaster: 1986.",
+   "difficulty": 2,
+   "refs": [
+    "history/darwin-publishes-on-the-origin-of-species",
+    "history/the-chernobyl-disaster"
+   ]
+  }
+ ],
+ "sources": [
+  {
+   "name": "Wikidata (event dates)",
+   "url": "https://www.wikidata.org"
+  },
+  {
+   "name": "Wikipedia articles for each event",
+   "url": "https://en.wikipedia.org"
+  }
+ ]
+}

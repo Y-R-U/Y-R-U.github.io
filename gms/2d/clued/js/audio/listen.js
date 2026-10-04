@@ -7,13 +7,14 @@ import { h, choiceGrid, esc } from '../ui/kit.js?v=1';
 import { basePoints } from '../core/scoring.js?v=1';
 import * as clip from './clip.js?v=1';
 import { revealHTML, BADGE_CSS, art as artUrl, previewUrl } from './apple.js?v=1';
-import { getCtx, unlock } from './ctx.js?v=1';
+import { getCtx, unlock, begin, end } from './ctx.js?v=1';
 import { LISTEN_CSS } from './listen_css.js?v=1';
 
 const CLIPS = [1, 2, 3, 5, 10, 15, 30];
 const CLIP_MUL = { 1: 2, 2: 1.7, 3: 1.5, 5: 1.25, 10: 1, 15: 0.85, 30: 0.7 };
 const ART_MUL = { off: 1, blur: 0.85, on: 0.65 };
 const REPLAYS = 2, REPLAY_MUL = 0.85;
+export const STAGE_LENS = [1, 2, 4, 8, 15];
 
 const isSong = (it) => it.facts?.artist != null && it.facts?.year != null;
 const isTheme = (it) => it.facts?.track != null;
@@ -92,7 +93,9 @@ function clipLen(opts, difficulty, kids) {
   return len;
 }
 
-function generate({ rng, packs, count, opts = {}, difficulty = 0, kids = false, avoid }) {
+function generate({ rng, packs, count, opts = {}, difficulty = 0, kids = false, avoid, spec }) {
+  // 'auto' grows the clip in online rooms only (the host generates, so the choice ships with the questions)
+  const grow = opts.grow === 'on' || (opts.grow !== 'off' && (opts.online || spec?.online || spec?.mode === 'online' || spec?.room));
   const want = opts.ask || 'auto';
   const n = kids ? Math.min(3, +opts.answers || 3) : (+opts.answers || 4);
   const art = kids ? 'on' : (ART_MUL[opts.art] ? opts.art : 'off');
@@ -113,6 +116,8 @@ function generate({ rng, packs, count, opts = {}, difficulty = 0, kids = false, 
     const a = { ...a0 };
     if (clip.isPiano(a)) a.lazy = true;
     let len = clipLen(opts, difficulty, kids);
+    let stages = 0;
+    if (grow && kind !== 'lyrics') { len = STAGE_LENS[STAGE_LENS.length - 1]; stages = STAGE_LENS.length; }
     if (a.dur && a.dur < len && !a.apple) len = a.dur;
     const start = clip.isPiano(a) ? 0 : clip.pickStart(a, len, rng(), a.dur || 30);
     const f = t.item.facts || {};
@@ -125,6 +130,7 @@ function generate({ rng, packs, count, opts = {}, difficulty = 0, kids = false, 
       timeLimit: Math.round((len + (kind === 'lyrics' ? 20 : 15)) * 1000),
       data: { a, start, len, art: a.apple ? art : 'off', kind, replays: kids ? -1 : REPLAYS, meta, kids: !!kids },
     };
+    if (stages) { base.stages = stages; base.data.stageLens = STAGE_LENS.map((x) => Math.min(x, len)); base.timeLimit = Math.round((len + 20) * 1000); }
     if (a.apple?.art) base.data.artImg = { src: artUrl(a.apple.art, 300), credit: 'Artwork: Apple Music', license: 'Apple Music artwork', page: a.apple.url, kind: 'img' };
     if (kind === 'lyrics') {
       const lq = lyricQuestion(rng, t, pool, n);
@@ -153,8 +159,13 @@ function css() {
 function render(el, q, api) {
   css();
   const d = q.data;
+  const busyTag = 'listen:' + q.id;
+  begin(busyTag);
   const lyrics = d.kind === 'lyrics';
   let replaysLeft = d.replays, played = 0, handle = null, raf = 0, done = false, dead = false;
+  const staged = q.stages > 1 && d.stageLens;
+  let stage = staged ? Math.min(q.stages - 1, api.stage || 0) : 0;
+  const playLen = () => (staged ? d.stageLens[stage] : d.len);
   el.innerHTML = '';
   const wrap = h('div.q.has-media.au-listen', { class: d.layout === 'images' ? 'au-pics' : '' });
   const disc = h('div.au-disc', { class: `art-${d.art}` });
@@ -165,7 +176,9 @@ function render(el, q, api) {
   const status = h('div.au-status', {}, lyrics ? 'Tap to hear the song' : 'Loading…');
   const again = h('button.btn.au-again', { type: 'button', hidden: true }, '↻ Replay');
   disc.append(canvas, ring, play);
-  const mediaCol = h('figure.q-media.au-media', {}, disc, h('div.au-under', {}, status, again));
+  // shared vote button is the runner's; until it draws one (api.moreButton), offer our own
+  const more = staged && !api.moreButton ? h('button.btn.au-more', { type: 'button' }, 'Longer clip 👀') : null;
+  const mediaCol = h('figure.q-media.au-media', {}, disc, h('div.au-under', {}, status, again, more));
   const body = h('div.q-body');
   const answersEl = h('div.q-answers', { class: d.layout === 'images' ? 'compact' : '' });
   body.append(h('h2.q-prompt', {}, q.prompt), answersEl);
@@ -185,13 +198,15 @@ function render(el, q, api) {
   const ctx2d = canvas.getContext('2d');
   function draw() {
     if (dead) return;
+    if (!wrap.isConnected) { ctrlObj.destroy(); return; }  // the runner replaced the stage without calling destroy
     raf = requestAnimationFrame(draw);
     const W = canvas.width, H = canvas.height;
     ctx2d.clearRect(0, 0, W, H);
     const an = handle?.analyser;
-    const prog = handle ? Math.min(1, handle.elapsed() / (d.len || handle.length || 1)) : 0;
+    const prog = handle ? Math.min(1, handle.elapsed() / (playLen() || handle.length || 1)) : 0;
     ring.style.setProperty('--p', prog);
-    if (d.art === 'blur' && disc.firstChild?.tagName === 'IMG') disc.firstChild.style.filter = `blur(${Math.round(22 * (1 - prog))}px)`;
+    const sharp = staged ? stage / (q.stages - 1) : prog;
+    if (d.art === 'blur' && disc.firstChild?.tagName === 'IMG' && !done) disc.firstChild.style.filter = `blur(${Math.round(22 * (1 - sharp))}px)`;
     if (!an) return;
     const bins = new Uint8Array(an.frequencyBinCount);
     an.getByteFrequencyData(bins);
@@ -224,7 +239,7 @@ function render(el, q, api) {
       play.hidden = true;
       disc.classList.add('playing');
       setStatus('Loading…');
-      handle = await clip.play(d.a, { start: d.start, len: d.len });
+      handle = await clip.play(d.a, { start: d.start, len: d.len, playLen: playLen() });
       if (dead) { handle.stop(); return; }
       setStatus(isReplay ? 'Listening again…' : 'Listening…');
       played++;
@@ -248,6 +263,24 @@ function render(el, q, api) {
   });
   again.addEventListener('click', () => start(true));
 
+  function setStage(n) {
+    if (dead || done || n <= stage) return;
+    stage = Math.min(q.stages - 1, n);
+    if (more) more.hidden = stage >= q.stages - 1;
+    setStatus(`${playLen()} s clip`);
+    start(false);
+  }
+  if (staged) {
+    if (more) {
+      more.addEventListener('click', () => {
+        if (api.requestMore) api.requestMore();
+        else setStage(stage + 1);
+      });
+      more.hidden = stage >= q.stages - 1;
+    }
+    api.onStage?.((n) => setStage(n));
+  }
+
   // preload, then autoplay (the runner's tap on "Next" has already unlocked audio)
   clip.load(d.a, { start: d.start, len: d.len }).then(() => {
     if (dead) return;
@@ -262,6 +295,7 @@ function render(el, q, api) {
     const lim = api.timer?.limit, rem = api.timer?.remaining?.() ?? 0;
     const base = basePoints({ timed: !!lim && rem > 0, remaining: rem, limit: lim });
     if (lyrics) return base;
+    if (staged) return api.onStage ? undefined : Math.round(base * (1 - 0.6 * stage / (q.stages - 1)));
     const used = Math.max(0, played - 1);
     return Math.round(base * CLIP_MUL[d.len] * (ART_MUL[d.art] || 1) * Math.pow(REPLAY_MUL, d.replays < 0 ? 0 : used)) || base;
   }
@@ -286,23 +320,26 @@ function render(el, q, api) {
     if (handle && !lyrics) handle.stop(0.4);
     disc.classList.remove('playing');
     play.hidden = true;
+    if (more) more.hidden = true;
     if (d.artImg && !disc.querySelector('img')) disc.prepend(h('img.au-cover', { src: d.artImg.src, alt: '' }));
     disc.classList.add('revealed');
     const img = disc.querySelector('img'); if (img) img.style.filter = '';
     again.hidden = true;
     setStatus('');
     api.reveal(revealNode());
-    api.answer({ correct, given, points: points(correct), detail: { played, len: d.len, art: d.art } });
+    const pts = points(correct);
+    api.answer({ correct, given, ...(pts != null ? { points: pts } : {}), detail: { played, len: playLen(), art: d.art, stage } });
     if (lyrics) start(false);
   }
 
-  return {
-    destroy() { dead = true; cancelAnimationFrame(raf); if (handle) handle.stop(0.15); clip.stopAll(); grid.destroy(); },
+  const ctrlObj = {
+    destroy() { if (!dead) end(busyTag); dead = true; cancelAnimationFrame(raf); if (handle) handle.stop(0.15); clip.stopAll(); grid.destroy(); },
     timeout() { if (done) return; done = true; grid.lock(); grid.mark(q.answer, -1); if (handle) handle.stop(0.3); },
     eliminate(k = 2) { grid.eliminate(q.answer, k, api.rng || Math.random); },
     choose(x) { grid.pick(x === 'correct' ? q.answer : x === 'wrong' ? (q.answer + 1) % q.options.length : +x); },
     hint() { return d.meta.year ? `It came out in ${d.meta.year}` : d.meta.artist ? `Think of ${d.meta.artist}` : null; },
   };
+  return ctrlObj;
 }
 
 // optional hook for the shell: refresh stale Apple previews before media preflight
@@ -320,6 +357,7 @@ export default register({
   tags: ['choice', 'music'],
   kids: true,
   options: [
+    { key: 'grow', label: 'Grow the clip', type: 'choice', values: ['auto', 'on', 'off'], labels: ['Online only', 'On', 'Off'], default: 'auto', kidsHide: true, help: '1 → 2 → 4 → 8 → 15 s; ask for more, score less' },
     { key: 'clip', label: 'Clip length', type: 'choice', values: CLIPS, labels: CLIPS.map((s) => `${s}s`), default: 5, kidsValues: [5, 10, 15], kidsDefault: 10, help: 'Shorter clips score more' },
     { key: 'art', label: 'Album artwork', type: 'choice', values: ['off', 'blur', 'on'], labels: ['Off', 'Blurred', 'On'], default: 'off', kidsHide: true, help: 'Off scores most' },
     { key: 'ask', label: 'Ask for', type: 'choice', values: ['auto', 'title', 'artist', 'decade', 'composer', 'lyrics'], labels: ['Mix', 'Title', 'Artist', 'Decade', 'Composer', 'Next line'], default: 'auto', kidsHide: true },

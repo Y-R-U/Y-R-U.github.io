@@ -1,6 +1,8 @@
 // Pack schema validation shared by build_index.mjs and c1_test.mjs (see docs/CONTRACT.md).
 export const THEMES = ['animals', 'nature', 'geography', 'screen', 'music', 'books', 'people', 'science', 'art', 'history', 'sport', 'food', 'general', 'kids'];
-export const ALLOWED_LICENSE = /^(CC0( 1\.0)?|Public domain|PD|CC BY(-SA)? [1-4]\.[05]( [A-Za-z-]{2,})?)$/;
+export const ALLOWED_LICENSE = /^(CC0( 1\.0)?|Public domain|PD|PDM(-owner)?|CC BY(-SA)? [1-4]\.[05]( [A-Za-z-]{2,})?)$/;
+// Apple previews are streamed at play time, never stored (DESIGN.md media policy); allowed for audio only.
+const APPLE_PREVIEW = /^Apple Music preview/;
 const FACT_TYPES = ['bool', 'num', 'cat', 'year', 'date', 'text'];
 const Q_KINDS = ['mc', 'tf', 'number', 'order'];
 const STOP = new Set(['the', 'and', 'of', 'a', 'an', 'de', 'la', 'le', 'el', 'du', 'von', 'van', 'der', 'den', 'des', 'di', 'da', 'in', 'on', 'or', 'to', 'for', 'with', 'from']);
@@ -37,8 +39,8 @@ function checkMedia(media, where, errors, warnings) {
     media[kind].forEach((m, i) => {
       const w = `${where} media.${kind}[${i}]`;
       for (const k of ['src', 'credit', 'license', 'page']) if (!m || typeof m[k] !== 'string' || !m[k].trim()) errors.push(`${w}: missing ${k}`);
-      if (m?.license && !ALLOWED_LICENSE.test(m.license)) errors.push(`${w}: licence not allowed "${m.license}"`);
-      if (m?.src && !/^(https:\/\/|media\/)/.test(m.src)) errors.push(`${w}: src must be https:// or media/…`);
+      if (m?.license && !ALLOWED_LICENSE.test(m.license) && !(kind === 'audio' && APPLE_PREVIEW.test(m.license))) errors.push(`${w}: licence not allowed "${m.license}"`);
+      if (m?.src && !/^(https:\/\/|media\/|data\/music\/)/.test(m.src)) errors.push(`${w}: src must be https://, media/… or data/music/…`);
       if (kind === 'img' && (typeof m?.w !== 'number' || typeof m?.h !== 'number')) warnings.push(`${w}: no w/h`);
       if (kind === 'img' && Math.max(m?.w || 0, m?.h || 0) > 1024) warnings.push(`${w}: larger than 1024px`);
     });
@@ -120,7 +122,7 @@ export function validatePack(pack, fileId) {
       else {
         if (q.wrong.some(w => norm(w) === norm(q.answer || ''))) errors.push(`${W}: answer repeated in wrong[]`);
         if (new Set(q.wrong.map(norm)).size !== q.wrong.length) errors.push(`${W}: duplicate wrong answers`);
-        if (q.wrong.length < 3) warnings.push(`${W}: only ${q.wrong.length} wrong answers`);
+        if (q.wrong.length < 3 && !pack.kids) warnings.push(`${W}: only ${q.wrong.length} wrong answers`);
       }
     }
     if (q.kind === 'tf' && typeof q.answer !== 'boolean') errors.push(`${W}: tf answer must be boolean`);
@@ -157,8 +159,10 @@ export function packCaps(pack) {
   }
   const groups = new Set(items.map(i => i.group).filter(Boolean));
   return {
-    img: items.filter(i => i.media?.img?.length).length,
-    audio: items.filter(i => i.media?.audio?.length).length,
+    img: items.filter(i => i.media?.img?.length).length + (pack.questions || []).filter(q => q.media?.img?.length).length,
+    audio: items.filter(i => i.media?.audio?.length).length + (pack.questions || []).filter(q => q.media?.audio?.length).length,
+    itemImg: items.filter(i => i.media?.img?.length).length,
+    itemAudio: items.filter(i => i.media?.audio?.length).length,
     clues: items.filter(i => (i.clues?.length || 0) >= 5).length,
     facts,
     groups: groups.size,

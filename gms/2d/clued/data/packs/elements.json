@@ -5,31 +5,45 @@
  "icon": "⚗️",
  "kids": false,
  "version": 1,
+ "imgPrompt": "Which of these is {lname}?",
+ "nameImgPrompt": "Which element is this?",
+ "tfImgPrompt": "This is {lname}.",
  "leakExempt": [],
  "factsMeta": {
   "atomicNumber": {
    "type": "num",
    "label": "Atomic number",
    "unit": "",
-   "higherLabel": "Higher atomic number"
+   "higherLabel": "Higher atomic number",
+   "askHigh": "Which of these has the highest atomic number?",
+   "askLow": "Which of these has the lowest atomic number?",
+   "minRatio": 1.2
   },
   "symbol": {
    "type": "text",
-   "label": "Chemical symbol"
+   "label": "Chemical symbol",
+   "ask": "What is the chemical symbol for {lname}?",
+   "askReverse": "Which element has the symbol {value}?",
+   "stmt": "The chemical symbol for {lname} is {value}."
   },
   "block": {
    "type": "cat",
-   "label": "Element type"
+   "label": "Element type",
+   "ask": "What type of element is {lname}?",
+   "askReverse": "Which of these is {aValue}?",
+   "stmt": "{name} is {aValue}."
   },
   "period": {
    "type": "num",
    "label": "Period",
-   "unit": ""
+   "unit": "",
+   "askHigh": "Which of these is lowest down the periodic table?"
   },
   "group": {
    "type": "num",
    "label": "Group",
-   "unit": ""
+   "unit": "",
+   "askHigh": "Which of these is furthest right in the periodic table?"
   },
   "state": {
    "type": "cat",
@@ -38,35 +52,50 @@
     "Solid",
     "Liquid",
     "Gas"
-   ]
+   ],
+   "ask": "Is {lname} a solid, liquid or gas at room temperature?",
+   "askReverse": "Which of these is a {lvalue} at room temperature?",
+   "stmt": "{name} is a {lvalue} at room temperature."
   },
   "year": {
    "type": "year",
-   "label": "Discovered"
+   "label": "Discovered",
+   "askHigh": "Which of these was discovered most recently?",
+   "askLow": "Which of these was discovered first?",
+   "minRatio": 1.02
   },
   "ancient": {
    "type": "bool",
    "label": "Known since ancient times",
    "yes": "Known since ancient times",
-   "no": "Discovered later"
+   "no": "Discovered later",
+   "askBool": "Which of these has been known since ancient times?",
+   "stmt": "{name} has been known since ancient times."
   },
   "atomicMass": {
    "type": "num",
    "label": "Atomic mass",
    "unit": "u",
-   "higherLabel": "Heavier atoms"
+   "higherLabel": "Heavier atoms",
+   "askHigh": "Which of these has the heaviest atoms?",
+   "askLow": "Which of these has the lightest atoms?"
   },
   "meltingC": {
    "type": "num",
    "label": "Melting point",
    "unit": "°C",
-   "higherLabel": "Higher melting point"
+   "higherLabel": "Higher melting point",
+   "askHigh": "Which of these has the highest melting point?",
+   "askLow": "Which of these has the lowest melting point?",
+   "minRatio": 1.5
   },
   "density": {
    "type": "num",
    "label": "Density",
    "unit": "g/cm³",
-   "higherLabel": "Denser"
+   "higherLabel": "Denser",
+   "askHigh": "Which of these is the densest?",
+   "askLow": "Which of these is the least dense?"
   }
  },
  "items": [
@@ -98,7 +127,7 @@
     "Its atomic number is 1.",
     "Its chemical symbol is H.",
     "The answer is one word of 8 letters.",
-    "It starts with the letter H."
+    "Its first letter is H."
    ],
    "difficulty": 1
   },
@@ -130,7 +159,7 @@
     "Its atomic number is 2.",
     "Its chemical symbol is He.",
     "The answer is one word of 6 letters.",
-    "It starts with the letter H."
+    "Its first letter is H."
    ],
    "difficulty": 1
   },
@@ -162,7 +191,7 @@
     "Its atomic number is 3.",
     "Its chemical symbol is Li.",
     "The answer is one word of 7 letters.",
-    "It starts with the letter L."
+    "Its first letter is L."
    ],
    "media": {
     "img": [
@@ -205,7 +234,7 @@
     "Its atomic number is 4.",
     "Its chemical symbol is Be.",
     "The answer is one word of 9 letters.",
-    "It starts with the letter B."
+    "Its first letter is B."
    ],
    "media": {
     "img": [
@@ -230,7 +259,7 @@
     "symbol": "B",
     "block": "Metalloid",
     "period": 2,
-    "group": 12,
+    "group": 13,
     "state": "Solid",
     "year": 1808,
     "atomicMass": 10.81,
@@ -241,14 +270,14 @@
    "clues": [
     "Its atomic mass is about 10.81.",
     "It melts at about 2075 °C.",
-    "It is in period 2, group 12 of the periodic table.",
+    "It is in period 2, group 13 of the periodic table.",
     "It is a metalloid.",
     "It was discovered in 1808.",
     "At room temperature it is a solid.",
     "Its atomic number is 5.",
     "Its chemical symbol is B.",
     "The answer is one word of 5 letters.",
-    "It starts with the letter B."
+    "Its first letter is B."
    ],
    "media": {
     "img": [
@@ -273,7 +302,7 @@
     "symbol": "C",
     "block": "Nonmetal",
     "period": 2,
-    "group": 13,
+    "group": 14,
     "state": "Solid",
     "ancient": true,
     "atomicMass": 12.01,
@@ -292,7 +321,7 @@
     "Its atomic number is 6.",
     "Its chemical symbol is C.",
     "The answer is one word of 6 letters.",
-    "It starts with the letter C."
+    "Its first letter is C."
    ],
    "media": {
     "img": [
@@ -317,7 +346,7 @@
     "symbol": "N",
     "block": "Nonmetal",
     "period": 2,
-    "group": 14,
+    "group": 15,
     "state": "Gas",
     "year": 1772,
     "atomicMass": 14.01,
@@ -336,7 +365,7 @@
     "Its atomic number is 7.",
     "Its chemical symbol is N.",
     "The answer is one word of 8 letters.",
-    "It starts with the letter N."
+    "Its first letter is N."
    ],
    "media": {
     "img": [
@@ -361,7 +390,7 @@
     "symbol": "O",
     "block": "Nonmetal",
     "period": 2,
-    "group": 15,
+    "group": 16,
     "state": "Gas",
     "year": 1774,
     "atomicMass": 16,
@@ -380,7 +409,7 @@
     "Its atomic number is 8.",
     "Its chemical symbol is O.",
     "The answer is one word of 6 letters.",
-    "It starts with the letter O."
+    "Its first letter is O."
    ],
    "media": {
     "img": [
@@ -405,7 +434,7 @@
     "symbol": "F",
     "block": "Halogen",
     "period": 2,
-    "group": 16,
+    "group": 17,
     "state": "Gas",
     "year": 1670,
     "atomicMass": 19,
@@ -424,7 +453,7 @@
     "Its atomic number is 9.",
     "Its chemical symbol is F.",
     "The answer is one word of 8 letters.",
-    "It starts with the letter F."
+    "Its first letter is F."
    ],
    "media": {
     "img": [
@@ -449,7 +478,7 @@
     "symbol": "Ne",
     "block": "Noble gas",
     "period": 2,
-    "group": 17,
+    "group": 18,
     "state": "Gas",
     "year": 1898,
     "atomicMass": 20.18,
@@ -468,7 +497,7 @@
     "Its atomic number is 10.",
     "Its chemical symbol is Ne.",
     "The answer is one word of 4 letters.",
-    "It starts with the letter N."
+    "Its first letter is N."
    ],
    "media": {
     "img": [
@@ -512,7 +541,7 @@
     "Its atomic number is 11.",
     "Its chemical symbol is Na.",
     "The answer is one word of 6 letters.",
-    "It starts with the letter S."
+    "Its first letter is S."
    ],
    "media": {
     "img": [
@@ -556,7 +585,7 @@
     "Its atomic number is 12.",
     "Its chemical symbol is Mg.",
     "The answer is one word of 9 letters.",
-    "It starts with the letter M."
+    "Its first letter is M."
    ],
    "media": {
     "img": [
@@ -584,7 +613,7 @@
     "symbol": "Al",
     "block": "Post-transition metal",
     "period": 3,
-    "group": 12,
+    "group": 13,
     "state": "Solid",
     "ancient": true,
     "atomicMass": 26.98,
@@ -603,7 +632,7 @@
     "Its atomic number is 13.",
     "Its chemical symbol is Al.",
     "The answer is one word of 9 letters.",
-    "It starts with the letter A."
+    "Its first letter is A."
    ],
    "media": {
     "img": [
@@ -628,7 +657,7 @@
     "symbol": "Si",
     "block": "Metalloid",
     "period": 3,
-    "group": 13,
+    "group": 14,
     "state": "Solid",
     "year": 1854,
     "atomicMass": 28.09,
@@ -647,7 +676,7 @@
     "Its atomic number is 14.",
     "Its chemical symbol is Si.",
     "The answer is one word of 7 letters.",
-    "It starts with the letter S."
+    "Its first letter is S."
    ],
    "media": {
     "img": [
@@ -672,7 +701,7 @@
     "symbol": "P",
     "block": "Nonmetal",
     "period": 3,
-    "group": 14,
+    "group": 15,
     "state": "Solid",
     "year": 1669,
     "atomicMass": 30.97,
@@ -691,7 +720,7 @@
     "Its atomic number is 15.",
     "Its chemical symbol is P.",
     "The answer is one word of 10 letters.",
-    "It starts with the letter P."
+    "Its first letter is P."
    ],
    "media": {
     "img": [
@@ -719,7 +748,7 @@
     "symbol": "S",
     "block": "Nonmetal",
     "period": 3,
-    "group": 15,
+    "group": 16,
     "state": "Solid",
     "ancient": true,
     "atomicMass": 32.07,
@@ -738,7 +767,7 @@
     "Its atomic number is 16.",
     "Its chemical symbol is S.",
     "The answer is one word of 6 letters.",
-    "It starts with the letter S."
+    "Its first letter is S."
    ],
    "media": {
     "img": [
@@ -763,7 +792,7 @@
     "symbol": "Cl",
     "block": "Halogen",
     "period": 3,
-    "group": 16,
+    "group": 17,
     "state": "Gas",
     "year": 1774,
     "atomicMass": 35.45,
@@ -782,7 +811,7 @@
     "Its atomic number is 17.",
     "Its chemical symbol is Cl.",
     "The answer is one word of 8 letters.",
-    "It starts with the letter C."
+    "Its first letter is C."
    ],
    "media": {
     "img": [
@@ -807,7 +836,7 @@
     "symbol": "Ar",
     "block": "Noble gas",
     "period": 3,
-    "group": 17,
+    "group": 18,
     "state": "Gas",
     "year": 1894,
     "atomicMass": 39.9,
@@ -826,7 +855,7 @@
     "Its atomic number is 18.",
     "Its chemical symbol is Ar.",
     "The answer is one word of 5 letters.",
-    "It starts with the letter A."
+    "Its first letter is A."
    ],
    "media": {
     "img": [
@@ -870,7 +899,7 @@
     "Its atomic number is 19.",
     "Its chemical symbol is K.",
     "The answer is one word of 9 letters.",
-    "It starts with the letter P."
+    "Its first letter is P."
    ],
    "media": {
     "img": [
@@ -914,7 +943,7 @@
     "Its atomic number is 20.",
     "Its chemical symbol is Ca.",
     "The answer is one word of 7 letters.",
-    "It starts with the letter C."
+    "Its first letter is C."
    ],
    "media": {
     "img": [
@@ -957,7 +986,7 @@
     "Its atomic number is 21.",
     "Its chemical symbol is Sc.",
     "The answer is one word of 8 letters.",
-    "It starts with the letter S."
+    "Its first letter is S."
    ],
    "difficulty": 2
   },
@@ -988,7 +1017,7 @@
     "Its atomic number is 22.",
     "Its chemical symbol is Ti.",
     "The answer is one word of 8 letters.",
-    "It starts with the letter T."
+    "Its first letter is T."
    ],
    "media": {
     "img": [
@@ -1031,7 +1060,7 @@
     "Its atomic number is 23.",
     "Its chemical symbol is V.",
     "The answer is one word of 8 letters.",
-    "It starts with the letter V."
+    "Its first letter is V."
    ],
    "media": {
     "img": [
@@ -1075,7 +1104,7 @@
     "Its atomic number is 24.",
     "Its chemical symbol is Cr.",
     "The answer is one word of 8 letters.",
-    "It starts with the letter C."
+    "Its first letter is C."
    ],
    "difficulty": 2
   },
@@ -1106,7 +1135,7 @@
     "Its atomic number is 25.",
     "Its chemical symbol is Mn.",
     "The answer is one word of 9 letters.",
-    "It starts with the letter M."
+    "Its first letter is M."
    ],
    "difficulty": 2
   },
@@ -1138,7 +1167,7 @@
     "Its atomic number is 26.",
     "Its chemical symbol is Fe.",
     "The answer is one word of 4 letters.",
-    "It starts with the letter I."
+    "Its first letter is I."
    ],
    "difficulty": 1
   },
@@ -1170,7 +1199,7 @@
     "Its atomic number is 27.",
     "Its chemical symbol is Co.",
     "The answer is one word of 6 letters.",
-    "It starts with the letter C."
+    "Its first letter is C."
    ],
    "difficulty": 2
   },
@@ -1201,7 +1230,7 @@
     "Its atomic number is 28.",
     "Its chemical symbol is Ni.",
     "The answer is one word of 6 letters.",
-    "It starts with the letter N."
+    "Its first letter is N."
    ],
    "media": {
     "img": [
@@ -1245,7 +1274,7 @@
     "Its atomic number is 29.",
     "Its chemical symbol is Cu.",
     "The answer is one word of 6 letters.",
-    "It starts with the letter C."
+    "Its first letter is C."
    ],
    "media": {
     "img": [
@@ -1289,7 +1318,7 @@
     "Its atomic number is 30.",
     "Its chemical symbol is Zn.",
     "The answer is one word of 4 letters.",
-    "It starts with the letter Z."
+    "Its first letter is Z."
    ],
    "difficulty": 2
   },
@@ -1320,7 +1349,7 @@
     "Its atomic number is 31.",
     "Its chemical symbol is Ga.",
     "The answer is one word of 7 letters.",
-    "It starts with the letter G."
+    "Its first letter is G."
    ],
    "media": {
     "img": [
@@ -1363,7 +1392,7 @@
     "Its atomic number is 32.",
     "Its chemical symbol is Ge.",
     "The answer is one word of 9 letters.",
-    "It starts with the letter G."
+    "Its first letter is G."
    ],
    "media": {
     "img": [
@@ -1407,7 +1436,7 @@
     "Its atomic number is 33.",
     "Its chemical symbol is As.",
     "The answer is one word of 7 letters.",
-    "It starts with the letter A."
+    "Its first letter is A."
    ],
    "media": {
     "img": [
@@ -1450,7 +1479,7 @@
     "Its atomic number is 34.",
     "Its chemical symbol is Se.",
     "The answer is one word of 8 letters.",
-    "It starts with the letter S."
+    "Its first letter is S."
    ],
    "media": {
     "img": [
@@ -1494,7 +1523,7 @@
     "Its atomic number is 35.",
     "Its chemical symbol is Br.",
     "The answer is one word of 7 letters.",
-    "It starts with the letter B."
+    "Its first letter is B."
    ],
    "media": {
     "img": [
@@ -1538,7 +1567,7 @@
     "Its atomic number is 36.",
     "Its chemical symbol is Kr.",
     "The answer is one word of 7 letters.",
-    "It starts with the letter K."
+    "Its first letter is K."
    ],
    "media": {
     "img": [
@@ -1581,7 +1610,7 @@
     "Its atomic number is 37.",
     "Its chemical symbol is Rb.",
     "The answer is one word of 8 letters.",
-    "It starts with the letter R."
+    "Its first letter is R."
    ],
    "media": {
     "img": [
@@ -1624,7 +1653,7 @@
     "Its atomic number is 38.",
     "Its chemical symbol is Sr.",
     "The answer is one word of 9 letters.",
-    "It starts with the letter S."
+    "Its first letter is S."
    ],
    "difficulty": 3
   },
@@ -1655,7 +1684,7 @@
     "Its atomic number is 39.",
     "Its chemical symbol is Y.",
     "The answer is one word of 7 letters.",
-    "It starts with the letter Y."
+    "Its first letter is Y."
    ],
    "difficulty": 3
   },
@@ -1686,7 +1715,7 @@
     "Its atomic number is 40.",
     "Its chemical symbol is Zr.",
     "The answer is one word of 9 letters.",
-    "It starts with the letter Z."
+    "Its first letter is Z."
    ],
    "difficulty": 3
   },
@@ -1717,7 +1746,7 @@
     "Its atomic number is 41.",
     "Its chemical symbol is Nb.",
     "The answer is one word of 7 letters.",
-    "It starts with the letter N."
+    "Its first letter is N."
    ],
    "difficulty": 3
   },
@@ -1748,7 +1777,7 @@
     "Its atomic number is 42.",
     "Its chemical symbol is Mo.",
     "The answer is one word of 10 letters.",
-    "It starts with the letter M."
+    "Its first letter is M."
    ],
    "difficulty": 3
   },
@@ -1779,7 +1808,7 @@
     "Its atomic number is 43.",
     "Its chemical symbol is Tc.",
     "The answer is one word of 10 letters.",
-    "It starts with the letter T."
+    "Its first letter is T."
    ],
    "media": {
     "img": [
@@ -1822,7 +1851,7 @@
     "Its atomic number is 44.",
     "Its chemical symbol is Ru.",
     "The answer is one word of 9 letters.",
-    "It starts with the letter R."
+    "Its first letter is R."
    ],
    "difficulty": 3
   },
@@ -1853,7 +1882,7 @@
     "Its atomic number is 45.",
     "Its chemical symbol is Rh.",
     "The answer is one word of 7 letters.",
-    "It starts with the letter R."
+    "Its first letter is R."
    ],
    "media": {
     "img": [
@@ -1896,7 +1925,7 @@
     "Its atomic number is 46.",
     "Its chemical symbol is Pd.",
     "The answer is one word of 9 letters.",
-    "It starts with the letter P."
+    "Its first letter is P."
    ],
    "media": {
     "img": [
@@ -1940,7 +1969,7 @@
     "Its atomic number is 47.",
     "Its chemical symbol is Ag.",
     "The answer is one word of 6 letters.",
-    "It starts with the letter S."
+    "Its first letter is S."
    ],
    "media": {
     "img": [
@@ -1983,7 +2012,7 @@
     "Its atomic number is 48.",
     "Its chemical symbol is Cd.",
     "The answer is one word of 7 letters.",
-    "It starts with the letter C."
+    "Its first letter is C."
    ],
    "difficulty": 3
   },
@@ -2014,7 +2043,7 @@
     "Its atomic number is 49.",
     "Its chemical symbol is In.",
     "The answer is one word of 6 letters.",
-    "It starts with the letter I."
+    "Its first letter is I."
    ],
    "media": {
     "img": [
@@ -2058,7 +2087,7 @@
     "Its atomic number is 50.",
     "Its chemical symbol is Sn.",
     "The answer is one word of 3 letters.",
-    "It starts with the letter T."
+    "Its first letter is T."
    ],
    "media": {
     "img": [
@@ -2101,7 +2130,7 @@
     "Its atomic number is 51.",
     "Its chemical symbol is Sb.",
     "The answer is one word of 8 letters.",
-    "It starts with the letter A."
+    "Its first letter is A."
    ],
    "media": {
     "img": [
@@ -2144,7 +2173,7 @@
     "Its atomic number is 52.",
     "Its chemical symbol is Te.",
     "The answer is one word of 9 letters.",
-    "It starts with the letter T."
+    "Its first letter is T."
    ],
    "media": {
     "img": [
@@ -2188,7 +2217,7 @@
     "Its atomic number is 53.",
     "Its chemical symbol is I.",
     "The answer is one word of 6 letters.",
-    "It starts with the letter I."
+    "Its first letter is I."
    ],
    "media": {
     "img": [
@@ -2232,7 +2261,7 @@
     "Its atomic number is 54.",
     "Its chemical symbol is Xe.",
     "The answer is one word of 5 letters.",
-    "It starts with the letter X."
+    "Its first letter is X."
    ],
    "media": {
     "img": [
@@ -2279,7 +2308,7 @@
     "Its atomic number is 55.",
     "Its chemical symbol is Cs.",
     "The answer is one word of 7 letters.",
-    "It starts with the letter C."
+    "Its first letter is C."
    ],
    "media": {
     "img": [
@@ -2322,7 +2351,7 @@
     "Its atomic number is 56.",
     "Its chemical symbol is Ba.",
     "The answer is one word of 6 letters.",
-    "It starts with the letter B."
+    "Its first letter is B."
    ],
    "media": {
     "img": [
@@ -2363,7 +2392,7 @@
     "Its atomic number is 57.",
     "Its chemical symbol is La.",
     "The answer is one word of 9 letters.",
-    "It starts with the letter L."
+    "Its first letter is L."
    ],
    "media": {
     "img": [
@@ -2405,7 +2434,7 @@
     "Its atomic number is 58.",
     "Its chemical symbol is Ce.",
     "The answer is one word of 6 letters.",
-    "It starts with the letter C."
+    "Its first letter is C."
    ],
    "media": {
     "img": [
@@ -2447,7 +2476,7 @@
     "Its atomic number is 59.",
     "Its chemical symbol is Pr.",
     "The answer is one word of 12 letters.",
-    "It starts with the letter P."
+    "Its first letter is P."
    ],
    "media": {
     "img": [
@@ -2489,7 +2518,7 @@
     "Its atomic number is 60.",
     "Its chemical symbol is Nd.",
     "The answer is one word of 9 letters.",
-    "It starts with the letter N."
+    "Its first letter is N."
    ],
    "media": {
     "img": [
@@ -2531,7 +2560,7 @@
     "Its atomic number is 61.",
     "Its chemical symbol is Pm.",
     "The answer is one word of 10 letters.",
-    "It starts with the letter P."
+    "Its first letter is P."
    ],
    "media": {
     "img": [
@@ -2573,7 +2602,7 @@
     "Its atomic number is 62.",
     "Its chemical symbol is Sm.",
     "The answer is one word of 8 letters.",
-    "It starts with the letter S."
+    "Its first letter is S."
    ],
    "media": {
     "img": [
@@ -2615,7 +2644,7 @@
     "Its atomic number is 63.",
     "Its chemical symbol is Eu.",
     "The answer is one word of 8 letters.",
-    "It starts with the letter E."
+    "Its first letter is E."
    ],
    "media": {
     "img": [
@@ -2657,7 +2686,7 @@
     "Its atomic number is 64.",
     "Its chemical symbol is Gd.",
     "The answer is one word of 10 letters.",
-    "It starts with the letter G."
+    "Its first letter is G."
    ],
    "media": {
     "img": [
@@ -2699,7 +2728,7 @@
     "Its atomic number is 65.",
     "Its chemical symbol is Tb.",
     "The answer is one word of 7 letters.",
-    "It starts with the letter T."
+    "Its first letter is T."
    ],
    "media": {
     "img": [
@@ -2741,7 +2770,7 @@
     "Its atomic number is 66.",
     "Its chemical symbol is Dy.",
     "The answer is one word of 10 letters.",
-    "It starts with the letter D."
+    "Its first letter is D."
    ],
    "media": {
     "img": [
@@ -2783,7 +2812,7 @@
     "Its atomic number is 67.",
     "Its chemical symbol is Ho.",
     "The answer is one word of 7 letters.",
-    "It starts with the letter H."
+    "Its first letter is H."
    ],
    "media": {
     "img": [
@@ -2825,7 +2854,7 @@
     "Its atomic number is 68.",
     "Its chemical symbol is Er.",
     "The answer is one word of 6 letters.",
-    "It starts with the letter E."
+    "Its first letter is E."
    ],
    "media": {
     "img": [
@@ -2867,7 +2896,7 @@
     "Its atomic number is 69.",
     "Its chemical symbol is Tm.",
     "The answer is one word of 7 letters.",
-    "It starts with the letter T."
+    "Its first letter is T."
    ],
    "difficulty": 3
   },
@@ -2897,7 +2926,7 @@
     "Its atomic number is 70.",
     "Its chemical symbol is Yb.",
     "The answer is one word of 9 letters.",
-    "It starts with the letter Y."
+    "Its first letter is Y."
    ],
    "media": {
     "img": [
@@ -2939,7 +2968,7 @@
     "Its atomic number is 71.",
     "Its chemical symbol is Lu.",
     "The answer is one word of 8 letters.",
-    "It starts with the letter L."
+    "Its first letter is L."
    ],
    "difficulty": 3
   },
@@ -2970,7 +2999,7 @@
     "Its atomic number is 72.",
     "Its chemical symbol is Hf.",
     "The answer is one word of 7 letters.",
-    "It starts with the letter H."
+    "Its first letter is H."
    ],
    "media": {
     "img": [
@@ -3013,7 +3042,7 @@
     "Its atomic number is 73.",
     "Its chemical symbol is Ta.",
     "The answer is one word of 8 letters.",
-    "It starts with the letter T."
+    "Its first letter is T."
    ],
    "difficulty": 3
   },
@@ -3045,7 +3074,7 @@
     "Its atomic number is 74.",
     "Its chemical symbol is W.",
     "The answer is one word of 8 letters.",
-    "It starts with the letter T."
+    "Its first letter is T."
    ],
    "difficulty": 2
   },
@@ -3076,7 +3105,7 @@
     "Its atomic number is 75.",
     "Its chemical symbol is Re.",
     "The answer is one word of 7 letters.",
-    "It starts with the letter R."
+    "Its first letter is R."
    ],
    "difficulty": 3
   },
@@ -3107,7 +3136,7 @@
     "Its atomic number is 76.",
     "Its chemical symbol is Os.",
     "The answer is one word of 6 letters.",
-    "It starts with the letter O."
+    "Its first letter is O."
    ],
    "difficulty": 3
   },
@@ -3138,7 +3167,7 @@
     "Its atomic number is 77.",
     "Its chemical symbol is Ir.",
     "The answer is one word of 7 letters.",
-    "It starts with the letter I."
+    "Its first letter is I."
    ],
    "media": {
     "img": [
@@ -3182,7 +3211,7 @@
     "Its atomic number is 78.",
     "Its chemical symbol is Pt.",
     "The answer is one word of 8 letters.",
-    "It starts with the letter P."
+    "Its first letter is P."
    ],
    "media": {
     "img": [
@@ -3226,7 +3255,7 @@
     "Its atomic number is 79.",
     "Its chemical symbol is Au.",
     "The answer is one word of 4 letters.",
-    "It starts with the letter G."
+    "Its first letter is G."
    ],
    "media": {
     "img": [
@@ -3270,7 +3299,7 @@
     "Its atomic number is 80.",
     "Its chemical symbol is Hg.",
     "The answer is one word of 7 letters.",
-    "It starts with the letter M."
+    "Its first letter is M."
    ],
    "media": {
     "img": [
@@ -3313,7 +3342,7 @@
     "Its atomic number is 81.",
     "Its chemical symbol is Tl.",
     "The answer is one word of 8 letters.",
-    "It starts with the letter T."
+    "Its first letter is T."
    ],
    "media": {
     "img": [
@@ -3357,7 +3386,7 @@
     "Its atomic number is 82.",
     "Its chemical symbol is Pb.",
     "The answer is one word of 4 letters.",
-    "It starts with the letter L."
+    "Its first letter is L."
    ],
    "media": {
     "img": [
@@ -3400,7 +3429,7 @@
     "Its atomic number is 83.",
     "Its chemical symbol is Bi.",
     "The answer is one word of 7 letters.",
-    "It starts with the letter B."
+    "Its first letter is B."
    ],
    "difficulty": 3
   },
@@ -3431,7 +3460,7 @@
     "Its atomic number is 84.",
     "Its chemical symbol is Po.",
     "The answer is one word of 8 letters.",
-    "It starts with the letter P."
+    "Its first letter is P."
    ],
    "media": {
     "img": [
@@ -3474,7 +3503,7 @@
     "Its atomic number is 85.",
     "Its chemical symbol is At.",
     "The answer is one word of 8 letters.",
-    "It starts with the letter A."
+    "Its first letter is A."
    ],
    "media": {
     "img": [
@@ -3518,7 +3547,7 @@
     "Its atomic number is 86.",
     "Its chemical symbol is Rn.",
     "The answer is one word of 5 letters.",
-    "It starts with the letter R."
+    "Its first letter is R."
    ],
    "media": {
     "img": [
@@ -3560,7 +3589,7 @@
     "Its atomic number is 87.",
     "Its chemical symbol is Fr.",
     "The answer is one word of 8 letters.",
-    "It starts with the letter F."
+    "Its first letter is F."
    ],
    "media": {
     "img": [
@@ -3603,7 +3632,7 @@
     "Its atomic number is 88.",
     "Its chemical symbol is Ra.",
     "The answer is one word of 6 letters.",
-    "It starts with the letter R."
+    "Its first letter is R."
    ],
    "media": {
     "img": [
@@ -3644,7 +3673,7 @@
     "Its atomic number is 89.",
     "Its chemical symbol is Ac.",
     "The answer is one word of 8 letters.",
-    "It starts with the letter A."
+    "Its first letter is A."
    ],
    "media": {
     "img": [
@@ -3686,7 +3715,7 @@
     "Its atomic number is 90.",
     "Its chemical symbol is Th.",
     "The answer is one word of 7 letters.",
-    "It starts with the letter T."
+    "Its first letter is T."
    ],
    "difficulty": 3
   },
@@ -3716,7 +3745,7 @@
     "Its atomic number is 91.",
     "Its chemical symbol is Pa.",
     "The answer is one word of 12 letters.",
-    "It starts with the letter P."
+    "Its first letter is P."
    ],
    "media": {
     "img": [
@@ -3759,7 +3788,7 @@
     "Its atomic number is 92.",
     "Its chemical symbol is U.",
     "The answer is one word of 7 letters.",
-    "It starts with the letter U."
+    "Its first letter is U."
    ],
    "media": {
     "img": [
@@ -3801,7 +3830,7 @@
     "Its atomic number is 93.",
     "Its chemical symbol is Np.",
     "The answer is one word of 9 letters.",
-    "It starts with the letter N."
+    "Its first letter is N."
    ],
    "media": {
     "img": [
@@ -3844,7 +3873,7 @@
     "Its atomic number is 94.",
     "Its chemical symbol is Pu.",
     "The answer is one word of 9 letters.",
-    "It starts with the letter P."
+    "Its first letter is P."
    ],
    "difficulty": 2
   },
@@ -3874,7 +3903,7 @@
     "Its atomic number is 95.",
     "Its chemical symbol is Am.",
     "The answer is one word of 9 letters.",
-    "It starts with the letter A."
+    "Its first letter is A."
    ],
    "media": {
     "img": [
@@ -3917,7 +3946,7 @@
     "Its atomic number is 96.",
     "Its chemical symbol is Cm.",
     "The answer is one word of 6 letters.",
-    "It starts with the letter C."
+    "Its first letter is C."
    ],
    "media": {
     "img": [
@@ -3956,7 +3985,7 @@
     "Its atomic number is 97.",
     "Its chemical symbol is Bk.",
     "The answer is one word of 9 letters.",
-    "It starts with the letter B."
+    "Its first letter is B."
    ],
    "media": {
     "img": [
@@ -3995,7 +4024,7 @@
     "Its atomic number is 98.",
     "Its chemical symbol is Cf.",
     "The answer is one word of 11 letters.",
-    "It starts with the letter C."
+    "Its first letter is C."
    ],
    "media": {
     "img": [
@@ -4036,7 +4065,7 @@
     "Its atomic number is 99.",
     "Its chemical symbol is Es.",
     "The answer is one word of 11 letters.",
-    "It starts with the letter E."
+    "Its first letter is E."
    ],
    "media": {
     "img": [
@@ -4075,7 +4104,7 @@
     "Its atomic number is 100.",
     "Its chemical symbol is Fm.",
     "The answer is one word of 7 letters.",
-    "It starts with the letter F."
+    "Its first letter is F."
    ],
    "media": {
     "img": [
@@ -4116,7 +4145,7 @@
     "Its atomic number is 101.",
     "Its chemical symbol is Md.",
     "The answer is one word of 11 letters.",
-    "It starts with the letter M."
+    "Its first letter is M."
    ],
    "difficulty": 3
   },
@@ -4143,7 +4172,7 @@
     "Its atomic number is 102.",
     "Its chemical symbol is No.",
     "The answer is one word of 8 letters.",
-    "It starts with the letter N."
+    "Its first letter is N."
    ],
    "difficulty": 3
   },
@@ -4170,7 +4199,7 @@
     "Its atomic number is 103.",
     "Its chemical symbol is Lr.",
     "The answer is one word of 10 letters.",
-    "It starts with the letter L."
+    "Its first letter is L."
    ],
    "difficulty": 3
   },
@@ -4198,7 +4227,7 @@
     "Its atomic number is 104.",
     "Its chemical symbol is Rf.",
     "The answer is one word of 13 letters.",
-    "It starts with the letter R."
+    "Its first letter is R."
    ],
    "difficulty": 3
   },
@@ -4226,7 +4255,7 @@
     "Its atomic number is 105.",
     "Its chemical symbol is Db.",
     "The answer is one word of 7 letters.",
-    "It starts with the letter D."
+    "Its first letter is D."
    ],
    "difficulty": 3
   },
@@ -4254,7 +4283,7 @@
     "Its atomic number is 106.",
     "Its chemical symbol is Sg.",
     "The answer is one word of 10 letters.",
-    "It starts with the letter S."
+    "Its first letter is S."
    ],
    "difficulty": 3
   },
@@ -4282,7 +4311,7 @@
     "Its atomic number is 107.",
     "Its chemical symbol is Bh.",
     "The answer is one word of 7 letters.",
-    "It starts with the letter B."
+    "Its first letter is B."
    ],
    "difficulty": 3
   },
@@ -4310,7 +4339,7 @@
     "Its atomic number is 108.",
     "Its chemical symbol is Hs.",
     "The answer is one word of 7 letters.",
-    "It starts with the letter H."
+    "Its first letter is H."
    ],
    "difficulty": 3
   },
@@ -4338,7 +4367,7 @@
     "Its atomic number is 109.",
     "Its chemical symbol is Mt.",
     "The answer is one word of 10 letters.",
-    "It starts with the letter M."
+    "Its first letter is M."
    ],
    "difficulty": 3
   },
@@ -4364,7 +4393,7 @@
     "Its atomic number is 110.",
     "Its chemical symbol is Ds.",
     "The answer is one word of 12 letters.",
-    "It starts with the letter D."
+    "Its first letter is D."
    ],
    "difficulty": 3
   },
@@ -4390,7 +4419,7 @@
     "Its atomic number is 111.",
     "Its chemical symbol is Rg.",
     "The answer is one word of 11 letters.",
-    "It starts with the letter R."
+    "Its first letter is R."
    ],
    "difficulty": 3
   },
@@ -4416,7 +4445,7 @@
     "Its atomic number is 112.",
     "Its chemical symbol is Cn.",
     "The answer is one word of 11 letters.",
-    "It starts with the letter C."
+    "Its first letter is C."
    ],
    "difficulty": 3
   },
@@ -4442,7 +4471,7 @@
     "Its atomic number is 113.",
     "Its chemical symbol is Nh.",
     "The answer is one word of 8 letters.",
-    "It starts with the letter N."
+    "Its first letter is N."
    ],
    "difficulty": 3
   },
@@ -4468,7 +4497,7 @@
     "Its atomic number is 114.",
     "Its chemical symbol is Fl.",
     "The answer is one word of 9 letters.",
-    "It starts with the letter F."
+    "Its first letter is F."
    ],
    "difficulty": 3
   },
@@ -4494,7 +4523,7 @@
     "Its atomic number is 115.",
     "Its chemical symbol is Mc.",
     "The answer is one word of 9 letters.",
-    "It starts with the letter M."
+    "Its first letter is M."
    ],
    "media": {
     "img": [
@@ -4532,7 +4561,7 @@
     "Its atomic number is 116.",
     "Its chemical symbol is Lv.",
     "The answer is one word of 11 letters.",
-    "It starts with the letter L."
+    "Its first letter is L."
    ],
    "difficulty": 3
   },
@@ -4558,7 +4587,7 @@
     "Its atomic number is 117.",
     "Its chemical symbol is Ts.",
     "The answer is one word of 10 letters.",
-    "It starts with the letter T."
+    "Its first letter is T."
    ],
    "difficulty": 3
   },
@@ -4586,7 +4615,7 @@
     "Its atomic number is 118.",
     "Its chemical symbol is Og.",
     "The answer is one word of 9 letters.",
-    "It starts with the letter O."
+    "Its first letter is O."
    ],
    "difficulty": 3
   }

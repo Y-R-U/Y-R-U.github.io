@@ -11,6 +11,7 @@ function link(param, value) {
   return u.href;
 }
 export const joinUrl = code => link('join', code);
+export const p2pUrl = code => link('p2p', code);   // device-hosted rooms (lane P2P)
 export const challengeUrl = id => link('c', id);
 
 export async function copyText(text) {

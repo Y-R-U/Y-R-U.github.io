@@ -69,28 +69,37 @@
    "media": {
     "img": [
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/187562031/medium.jpg",
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/9/9d/Emu_1_-_Tidbinbilla.jpg/500px-Emu_1_-_Tidbinbilla.jpg",
       "w": 500,
-      "h": 333,
-      "credit": "patrickkavanagh",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/187562031"
+      "h": 400,
+      "credit": "JJ Harrison (https://www.jjharrison.com.au/)",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Emu_1_-_Tidbinbilla.jpg"
      },
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/368415620/medium.jpeg",
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/7/71/Dromaius_novaehollandiae%2C_Port_Campbell_National_Park_1.jpg/500px-Dromaius_novaehollandiae%2C_Port_Campbell_National_Park_1.jpg",
       "w": 500,
-      "h": 375,
-      "credit": "JR Ferrer-Paris",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/368415620"
+      "h": 360,
+      "credit": "fry_theonly",
+      "license": "CC BY-SA 2.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Dromaius_novaehollandiae,_Port_Campbell_National_Park_1.jpg"
      },
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/330240035/medium.jpeg",
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/b/b5/Dromaius_novaehollandiae_%2829619237017%29.jpg/500px-Dromaius_novaehollandiae_%2829619237017%29.jpg",
       "w": 500,
       "h": 375,
-      "credit": "Thomas Mesaglio",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/330240035"
+      "credit": "Donald Hobern from Copenhagen, Denmark",
+      "license": "CC BY 2.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Dromaius_novaehollandiae_(29619237017).jpg"
+     }
+    ],
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/3/3c/Dromaius_novaehollandiae_Lue0043_03.wav/Dromaius_novaehollandiae_Lue0043_03.wav.mp3",
+      "credit": "Lütgens, Hans",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Dromaius_novaehollandiae_Lue0043_03.wav",
+      "start": 0
      }
     ]
    },
@@ -131,28 +140,28 @@
    "media": {
     "img": [
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/32203941/medium.jpeg",
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/e/e7/Wild_cassowary_walking_at_Mission_Beach_IMG_3933.jpg/500px-Wild_cassowary_walking_at_Mission_Beach_IMG_3933.jpg",
+      "w": 500,
+      "h": 641,
+      "credit": "Wvbailey",
+      "license": "CC BY 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Wild_cassowary_walking_at_Mission_Beach_IMG_3933.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/5/5d/Double-wattled_Cassowary.jpg/330px-Double-wattled_Cassowary.jpg",
+      "w": 330,
+      "h": 466,
+      "credit": "en:User:Cburnett",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Double-wattled_Cassowary.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/5/54/Southern_Cassowary_7071.jpg/500px-Southern_Cassowary_7071.jpg",
       "w": 500,
       "h": 375,
-      "credit": "coenobita",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/32203941"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/161203172/medium.png",
-      "w": 500,
-      "h": 356,
-      "credit": "no rights reserved",
-      "license": "CC0 1.0",
-      "page": "https://www.inaturalist.org/photos/161203172"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/346814420/medium.jpeg",
-      "w": 500,
-      "h": 333,
-      "credit": "Oscar Dove",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/346814420"
+      "credit": "Summerdrought",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Southern_Cassowary_7071.jpg"
      }
     ]
    },
@@ -190,28 +199,28 @@
    "media": {
     "img": [
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/575470703/medium.jpg",
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/19/Dacelo_novaeguineae_waterworks.jpg/500px-Dacelo_novaeguineae_waterworks.jpg",
       "w": 500,
-      "h": 375,
-      "credit": "Emanuele Santarelli",
-      "license": "CC BY-SA 4.0",
-      "page": "https://www.inaturalist.org/photos/575470703"
+      "h": 366,
+      "credit": "JJ Harrison (https://www.jjharrison.com.au/)",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Dacelo_novaeguineae_waterworks.jpg"
      },
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/47348059/medium.jpg",
-      "w": 500,
-      "h": 313,
-      "credit": "mcamcamca",
-      "license": "CC BY-SA 4.0",
-      "page": "https://www.inaturalist.org/photos/47348059"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/112445203/medium.jpg",
-      "w": 500,
-      "h": 332,
-      "credit": "I Am birdsaspoetry.com ",
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/0/06/Kookaburra_in_a_tree_on_the_foreshore_of_Yorkeys_Knob%2C_2018_02.jpg/330px-Kookaburra_in_a_tree_on_the_foreshore_of_Yorkeys_Knob%2C_2018_02.jpg",
+      "w": 330,
+      "h": 587,
+      "credit": "Kerry Raymond",
       "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/112445203"
+      "page": "https://commons.wikimedia.org/wiki/File:Kookaburra_in_a_tree_on_the_foreshore_of_Yorkeys_Knob,_2018_02.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/7/71/Laughing_Kookaburra_1.jpg/330px-Laughing_Kookaburra_1.jpg",
+      "w": 330,
+      "h": 495,
+      "credit": "Photo by: Paulweberphoto - paulweberphoto.com",
+      "license": "CC BY 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Laughing_Kookaburra_1.jpg"
      }
     ],
     "audio": [
@@ -255,6 +264,14 @@
    "media": {
     "img": [
      {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/a/a9/Cacatua_galerita_Tas_2.jpg/330px-Cacatua_galerita_Tas_2.jpg",
+      "w": 330,
+      "h": 549,
+      "credit": "JJ Harrison (https://www.jjharrison.com.au/)",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Cacatua_galerita_Tas_2.jpg"
+     },
+     {
       "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/248913955/medium.jpg",
       "w": 500,
       "h": 281,
@@ -269,14 +286,6 @@
       "credit": "Terra Occ",
       "license": "CC BY 4.0",
       "page": "https://www.inaturalist.org/photos/31338798"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/508608907/medium.jpg",
-      "w": 500,
-      "h": 281,
-      "credit": "Austen Armstrong",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/508608907"
      }
     ]
    },
@@ -313,28 +322,37 @@
    "media": {
     "img": [
      {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/8/83/Eolophus_roseicapilla_AF.jpg/330px-Eolophus_roseicapilla_AF.jpg",
+      "w": 330,
+      "h": 526,
+      "credit": "JJ Harrison (https://www.jjharrison.com.au/)",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Eolophus_roseicapilla_AF.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/9/9d/Galah_%28Eolophus_roseicapilla_albiceps%29_male_Adelaide.jpg/500px-Galah_%28Eolophus_roseicapilla_albiceps%29_male_Adelaide.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Charles J. Sharp",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Galah_(Eolophus_roseicapilla_albiceps)_male_Adelaide.jpg"
+     },
+     {
       "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/147415773/medium.jpg",
       "w": 500,
       "h": 333,
       "credit": "Andrew Allen",
       "license": "CC BY 4.0",
       "page": "https://www.inaturalist.org/photos/147415773"
-     },
+     }
+    ],
+    "audio": [
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/72563384/medium.jpeg",
-      "w": 500,
-      "h": 375,
-      "credit": "Graham Winterflood",
+      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/1/1a/Eolophus_roseicapilla_-_Pink_and_grey_cockatoo_%28galah%29_call%2C_near_the_Swan_River_in_Perth%2C_Western_Australia.ogg/Eolophus_roseicapilla_-_Pink_and_grey_cockatoo_%28galah%29_call%2C_near_the_Swan_River_in_Perth%2C_Western_Australia.ogg.mp3",
+      "credit": "Ronnievonjohnson",
       "license": "CC BY-SA 4.0",
-      "page": "https://www.inaturalist.org/photos/72563384"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/157561709/medium.jpg",
-      "w": 500,
-      "h": 375,
-      "credit": "Andrea",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/157561709"
+      "page": "https://commons.wikimedia.org/wiki/File:Eolophus_roseicapilla_-_Pink_and_grey_cockatoo_(galah)_call,_near_the_Swan_River_in_Perth,_Western_Australia.ogg",
+      "start": 0
      }
     ]
    },
@@ -369,28 +387,28 @@
    "media": {
     "img": [
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/49571056/medium.jpg",
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/e/ef/Rainbow_Lorikeet_-_AndrewMercer_IMG08212.jpg/500px-Rainbow_Lorikeet_-_AndrewMercer_IMG08212.jpg",
       "w": 500,
       "h": 333,
-      "credit": "Andrew Allen",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/49571056"
+      "credit": "Andrew Mercer (www.baldwhiteguy.co.nz)",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Rainbow_Lorikeet_-_AndrewMercer_IMG08212.jpg"
      },
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/25878825/medium.jpg",
-      "w": 500,
-      "h": 362,
-      "credit": "Rolf Lawrenz",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/25878825"
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/2/2f/Rainbow_Lorikeet%2C_Bramble_Bay%2C_Queensland_%28328617162%29.jpg/330px-Rainbow_Lorikeet%2C_Bramble_Bay%2C_Queensland_%28328617162%29.jpg",
+      "w": 330,
+      "h": 485,
+      "credit": "Sheba_Also 43,000 photos",
+      "license": "CC BY-SA 2.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Rainbow_Lorikeet,_Bramble_Bay,_Queensland_(328617162).jpg"
      },
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/254802863/medium.jpg",
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/a/ad/Rainbow_lorikeet_%28Trichoglossus_moluccanus_moluccanus%29_Sydney.jpg/500px-Rainbow_lorikeet_%28Trichoglossus_moluccanus_moluccanus%29_Sydney.jpg",
       "w": 500,
-      "h": 333,
-      "credit": "Nathan Ruser",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/254802863"
+      "h": 647,
+      "credit": "Charles J. Sharp",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Rainbow_lorikeet_(Trichoglossus_moluccanus_moluccanus)_Sydney.jpg"
      }
     ]
    },
@@ -449,15 +467,6 @@
       "license": "CC BY 4.0",
       "page": "https://www.inaturalist.org/photos/159068171"
      }
-    ],
-    "audio": [
-     {
-      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/e/ed/Bird_song%2C_grassy_woodlands%2C_central_Victoria.ogg/Bird_song%2C_grassy_woodlands%2C_central_Victoria.ogg.mp3",
-      "credit": "billinghurst",
-      "license": "CC BY-SA 4.0",
-      "page": "https://commons.wikimedia.org/wiki/File:Bird_song,_grassy_woodlands,_central_Victoria.ogg",
-      "start": 0
-     }
     ]
    },
    "difficulty": 2
@@ -496,14 +505,6 @@
    "media": {
     "img": [
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/159057697/medium.jpg",
-      "w": 500,
-      "h": 333,
-      "credit": "http://www.comebirdwatching.blogspot.com/",
-      "license": "CC BY-SA 4.0",
-      "page": "https://www.inaturalist.org/photos/159057697"
-     },
-     {
       "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/10202359/medium.jpg",
       "w": 500,
       "h": 248,
@@ -518,6 +519,23 @@
       "credit": "no rights reserved",
       "license": "CC0 1.0",
       "page": "https://www.inaturalist.org/photos/310118233"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/315268732/medium.jpeg",
+      "w": 500,
+      "h": 281,
+      "credit": "JD Flores",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/315268732"
+     }
+    ],
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/f/f9/Melopsittacus_undulatus_imitating_konnichi_wa_-_pone.0038803.s001.oga/Melopsittacus_undulatus_imitating_konnichi_wa_-_pone.0038803.s001.oga.mp3",
+      "credit": "Eda-Fujiwara H, Imagawa T, Matsushita M, Matsuda Y, Takeuchi H, Satoh R, Watanabe A, Za…",
+      "license": "CC BY 2.5",
+      "page": "https://commons.wikimedia.org/wiki/File:Melopsittacus_undulatus_imitating_konnichi_wa_-_pone.0038803.s001.oga",
+      "start": 0
      }
     ]
    },
@@ -552,28 +570,37 @@
    "media": {
     "img": [
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/148720764/medium.jpg",
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/10/Wild_cockatiel_-_panoramio.jpg/500px-Wild_cockatiel_-_panoramio.jpg",
       "w": 500,
-      "h": 500,
-      "credit": "Third Silence",
+      "h": 332,
+      "credit": "Ganatron",
       "license": "CC BY-SA 4.0",
-      "page": "https://www.inaturalist.org/photos/148720764"
+      "page": "https://commons.wikimedia.org/wiki/File:Wild_cockatiel_-_panoramio.jpg"
      },
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/336257861/medium.jpeg",
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/6/6c/Cockatiel_2.jpg/500px-Cockatiel_2.jpg",
       "w": 500,
-      "h": 335,
-      "credit": "Alan Bell",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/336257861"
+      "h": 377,
+      "credit": "Jim Bendon from Karratha, Australia",
+      "license": "CC BY-SA 2.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Cockatiel_2.jpg"
      },
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/245807277/medium.jpg",
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/a/ac/Cockateil.jpg/500px-Cockateil.jpg",
       "w": 500,
-      "h": 333,
-      "credit": "dhfischer",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/245807277"
+      "h": 616,
+      "credit": "Jim Bendon",
+      "license": "CC BY-SA 2.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Cockateil.jpg"
+     }
+    ],
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/8/8e/Nymphicus_hollandicus_call.ogg/Nymphicus_hollandicus_call.ogg.mp3",
+      "credit": "ZooFari",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Nymphicus_hollandicus_call.ogg",
+      "start": 0
      }
     ]
    },
@@ -610,28 +637,37 @@
    "media": {
     "img": [
      {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/10/Cracticus_tibicen_hypoleuca_male_domain.jpg/500px-Cracticus_tibicen_hypoleuca_male_domain.jpg",
+      "w": 500,
+      "h": 513,
+      "credit": "JJ Harrison (https://www.jjharrison.com.au/)",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Cracticus_tibicen_hypoleuca_male_domain.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/0/0b/Magpie_samcem05.jpg/500px-Magpie_samcem05.jpg",
+      "w": 500,
+      "h": 508,
+      "credit": "Aviceda",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Magpie_samcem05.jpg"
+     },
+     {
       "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/314512932/medium.jpeg",
       "w": 500,
       "h": 375,
       "credit": "Saryu Mae 前 朝琉",
       "license": "CC BY 4.0",
       "page": "https://www.inaturalist.org/photos/314512932"
-     },
+     }
+    ],
+    "audio": [
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/50126314/medium.jpg",
-      "w": 500,
-      "h": 375,
-      "credit": "Donald Hobern",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/50126314"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/74496402/medium.jpeg",
-      "w": 500,
-      "h": 350,
-      "credit": "linleymcg",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/74496402"
+      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/4/4c/Juvenile_white-backed_Australian_magpie_%28Gymnorhina_tibicen_tyrannica%29_song.ogg/Juvenile_white-backed_Australian_magpie_%28Gymnorhina_tibicen_tyrannica%29_song.ogg.mp3",
+      "credit": "Ethmostigmus",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Juvenile_white-backed_Australian_magpie_(Gymnorhina_tibicen_tyrannica)_song.ogg",
+      "start": 0
      }
     ]
    },
@@ -667,14 +703,6 @@
    "media": {
     "img": [
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/90759569/medium.jpeg",
-      "w": 500,
-      "h": 435,
-      "credit": "Tim",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/90759569"
-     },
-     {
       "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/603950987/medium.jpg",
       "w": 500,
       "h": 375,
@@ -689,6 +717,14 @@
       "credit": "Russell Best",
       "license": "CC BY 4.0",
       "page": "https://www.inaturalist.org/photos/75697208"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/244185673/medium.jpeg",
+      "w": 500,
+      "h": 334,
+      "credit": "no rights reserved",
+      "license": "CC0 1.0",
+      "page": "https://www.inaturalist.org/photos/244185673"
      }
     ],
     "audio": [
@@ -733,37 +769,28 @@
    "media": {
     "img": [
      {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/f/fc/Malurus_cyaneus_PM.jpg/500px-Malurus_cyaneus_PM.jpg",
+      "w": 500,
+      "h": 400,
+      "credit": "JJ Harrison (https://www.jjharrison.com.au/)",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Malurus_cyaneus_PM.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/5/54/Malurus_cyaneus_cyanochlamys_.jpg/500px-Malurus_cyaneus_cyanochlamys_.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "JJ Harrison (https://www.jjharrison.com.au/)",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Malurus_cyaneus_cyanochlamys_.jpg"
+     },
+     {
       "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/249740626/medium.jpeg",
       "w": 500,
       "h": 339,
       "credit": "Nathan Ruser",
       "license": "CC BY 4.0",
       "page": "https://www.inaturalist.org/photos/249740626"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/162831939/medium.jpeg",
-      "w": 500,
-      "h": 333,
-      "credit": "Tim",
-      "license": "CC BY-SA 4.0",
-      "page": "https://www.inaturalist.org/photos/162831939"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/71276260/medium.jpg",
-      "w": 500,
-      "h": 331,
-      "credit": "Roy Lowry",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/71276260"
-     }
-    ],
-    "audio": [
-     {
-      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/e/ed/Bird_song%2C_grassy_woodlands%2C_central_Victoria.ogg/Bird_song%2C_grassy_woodlands%2C_central_Victoria.ogg.mp3",
-      "credit": "billinghurst",
-      "license": "CC BY-SA 4.0",
-      "page": "https://commons.wikimedia.org/wiki/File:Bird_song,_grassy_woodlands,_central_Victoria.ogg",
-      "start": 0
      }
     ]
    },
@@ -865,28 +892,28 @@
    "media": {
     "img": [
      {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/c/c4/Podargus_strigoides_Bonorong.jpg/330px-Podargus_strigoides_Bonorong.jpg",
+      "w": 330,
+      "h": 495,
+      "credit": "JJ Harrison (https://www.jjharrison.com.au/)",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Podargus_strigoides_Bonorong.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/6/68/Tawny_Frogmouth_-_Sydney_Olympic_Park.jpg/500px-Tawny_Frogmouth_-_Sydney_Olympic_Park.jpg",
+      "w": 500,
+      "h": 500,
+      "credit": "JJ Harrison (https://www.jjharrison.com.au/)",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Tawny_Frogmouth_-_Sydney_Olympic_Park.jpg"
+     },
+     {
       "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/350093729/medium.png",
       "w": 500,
       "h": 481,
       "credit": "Sockrosma",
       "license": "CC BY 4.0",
       "page": "https://www.inaturalist.org/photos/350093729"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/350090817/medium.png",
-      "w": 500,
-      "h": 334,
-      "credit": "Sockrosma",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/350090817"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/102140797/medium.jpg",
-      "w": 500,
-      "h": 420,
-      "credit": "graeme lunt",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/102140797"
      }
     ]
    },
@@ -919,14 +946,6 @@
    "media": {
     "img": [
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/350135160/medium.jpeg",
-      "w": 500,
-      "h": 375,
-      "credit": "Sockrosma",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/350135160"
-     },
-     {
       "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/245467722/medium.jpeg",
       "w": 281,
       "h": 500,
@@ -941,6 +960,14 @@
       "credit": "Sockrosma",
       "license": "CC BY 4.0",
       "page": "https://www.inaturalist.org/photos/411315483"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/333081926/medium.jpeg",
+      "w": 500,
+      "h": 500,
+      "credit": "pimelea",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/333081926"
      }
     ],
     "audio": [
@@ -982,28 +1009,28 @@
    "media": {
     "img": [
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/263627725/medium.jpg",
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/9/95/Australian_Pelicans.jpg/500px-Australian_Pelicans.jpg",
       "w": 500,
-      "h": 382,
-      "credit": "Toby Hudson",
+      "h": 350,
+      "credit": "JJ Harrison (https://www.jjharrison.com.au/)",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Australian_Pelicans.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/4/4d/00_3804_Water_bird_pelican.jpg/330px-00_3804_Water_bird_pelican.jpg",
+      "w": 330,
+      "h": 495,
+      "credit": "W. Bulach",
       "license": "CC BY-SA 4.0",
-      "page": "https://www.inaturalist.org/photos/263627725"
+      "page": "https://commons.wikimedia.org/wiki/File:00_3804_Water_bird_pelican.jpg"
      },
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/452413122/medium.jpeg",
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/1f/Pelecanus_conspicillatus_-_Doughboy_Head.jpg/500px-Pelecanus_conspicillatus_-_Doughboy_Head.jpg",
       "w": 500,
-      "h": 375,
-      "credit": "pimelea",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/452413122"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/40714891/medium.jpeg",
-      "w": 500,
-      "h": 333,
-      "credit": "Sean Frey",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/40714891"
+      "h": 625,
+      "credit": "JJ Harrison (https://tiny.jjharrison.com.au/t/j7XQOlEZP52BDn8g)",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Pelecanus_conspicillatus_-_Doughboy_Head.jpg"
      }
     ]
    },
@@ -1038,28 +1065,37 @@
    "media": {
     "img": [
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/96194594/medium.jpeg",
-      "w": 375,
-      "h": 500,
-      "credit": "Nils",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/96194594"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/494499183/medium.jpeg",
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/0/0c/00_2102_Trauerschw%C3%A4ne_%28Breisach_am_Rhein%29.jpg/500px-00_2102_Trauerschw%C3%A4ne_%28Breisach_am_Rhein%29.jpg",
       "w": 500,
-      "h": 395,
-      "credit": "Micha Baum",
+      "h": 333,
+      "credit": "W. Bulach",
       "license": "CC BY-SA 4.0",
-      "page": "https://www.inaturalist.org/photos/494499183"
+      "page": "https://commons.wikimedia.org/wiki/File:00_2102_Trauerschw%C3%A4ne_(Breisach_am_Rhein).jpg"
      },
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/29247529/medium.jpeg",
-      "w": 375,
-      "h": 500,
-      "credit": "Terra Occ",
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/b/b2/Cygnus_atratus_Running.jpg/330px-Cygnus_atratus_Running.jpg",
+      "w": 330,
+      "h": 495,
+      "credit": "JJ Harrison (https://www.jjharrison.com.au/)",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Cygnus_atratus_Running.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/3/3d/Black_Swan_in_Australia.JPG/500px-Black_Swan_in_Australia.JPG",
+      "w": 500,
+      "h": 333,
+      "credit": "EllieRH",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Black_Swan_in_Australia.JPG"
+     }
+    ],
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/4/42/Black_Swan_call_%28Cygnus_atratus%29.ogg/Black_Swan_call_%28Cygnus_atratus%29.ogg.mp3",
+      "credit": "Marc Anderson",
       "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/29247529"
+      "page": "https://commons.wikimedia.org/wiki/File:Black_Swan_call_(Cygnus_atratus).ogg",
+      "start": 0
      }
     ]
    },
@@ -1094,28 +1130,37 @@
    "media": {
     "img": [
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/101675446/medium.jpeg",
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/6/60/Threskiornis_molucca_-_Perth.jpg/500px-Threskiornis_molucca_-_Perth.jpg",
       "w": 500,
-      "h": 374,
-      "credit": "Tim",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/101675446"
+      "h": 400,
+      "credit": "JJ Harrison (https://www.jjharrison.com.au/)",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Threskiornis_molucca_-_Perth.jpg"
      },
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/150841415/medium.jpeg",
-      "w": 500,
-      "h": 333,
-      "credit": "Natasha Taylor",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/150841415"
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/3/39/%27Bin_chicken%27_%28Threskiornis_molucca%29_in_Belmore_Park%2C_Sydney.jpg/330px-%27Bin_chicken%27_%28Threskiornis_molucca%29_in_Belmore_Park%2C_Sydney.jpg",
+      "w": 330,
+      "h": 440,
+      "credit": "Aliceinthealice",
+      "license": "CC0 1.0",
+      "page": "https://commons.wikimedia.org/wiki/File:%27Bin_chicken%27_(Threskiornis_molucca)_in_Belmore_Park,_Sydney.jpg"
      },
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/116375953/medium.jpeg",
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/2/20/Australian_ibis_%28Threskiornis_molucca%29_Sydney.jpg/500px-Australian_ibis_%28Threskiornis_molucca%29_Sydney.jpg",
       "w": 500,
       "h": 333,
-      "credit": "Natasha Taylor",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/116375953"
+      "credit": "Charles J. Sharp",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Australian_ibis_(Threskiornis_molucca)_Sydney.jpg"
+     }
+    ],
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/9/95/Threskiornis_molucca_-_Australian_White_Ibis_XC591140.mp3",
+      "credit": "James Ray",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Threskiornis_molucca_-_Australian_White_Ibis_XC591140.mp3",
+      "start": 0
      }
     ]
    },
@@ -1280,6 +1325,15 @@
       "credit": "no rights reserved",
       "license": "CC0 1.0",
       "page": "https://www.inaturalist.org/photos/170190270"
+     }
+    ],
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/8/83/Manorina_melanocephala_-_Noisy_Miner_XC459075.mp3",
+      "credit": "James Ray",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Manorina_melanocephala_-_Noisy_Miner_XC459075.mp3",
+      "start": 0
      }
     ]
    },
@@ -1483,6 +1537,14 @@
    "media": {
     "img": [
      {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/3/38/Eudyptula_minor_Bruny_1.jpg/500px-Eudyptula_minor_Bruny_1.jpg",
+      "w": 500,
+      "h": 555,
+      "credit": "JJ Harrison (https://www.jjharrison.com.au/)",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Eudyptula_minor_Bruny_1.jpg"
+     },
+     {
       "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/63612085/medium.jpeg",
       "w": 500,
       "h": 333,
@@ -1497,14 +1559,6 @@
       "credit": "Jacqui Geux",
       "license": "CC BY 4.0",
       "page": "https://www.inaturalist.org/photos/72265398"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/64676218/medium.jpg",
-      "w": 375,
-      "h": 500,
-      "credit": "Spencer McIntyre",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/64676218"
      }
     ],
     "audio": [
@@ -1549,28 +1603,28 @@
    "media": {
     "img": [
      {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/0/02/Apteryx_mantelli_-Rotorua%2C_North_Island%2C_New_Zealand-8a.jpg/500px-Apteryx_mantelli_-Rotorua%2C_North_Island%2C_New_Zealand-8a.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "The.Rohit",
+      "license": "CC BY 2.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Apteryx_mantelli_-Rotorua,_North_Island,_New_Zealand-8a.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/8/82/TeTuatahianui.jpg/330px-TeTuatahianui.jpg",
+      "w": 330,
+      "h": 440,
+      "credit": "Maungatautari Ecological Island Trust",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:TeTuatahianui.jpg"
+     },
+     {
       "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/212223422/medium.jpg",
       "w": 500,
       "h": 334,
       "credit": "Tomáš Divilek",
       "license": "CC BY-SA 4.0",
       "page": "https://www.inaturalist.org/photos/212223422"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/200349099/medium.jpg",
-      "w": 500,
-      "h": 375,
-      "credit": "Shaun Lee",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/200349099"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/342982621/medium.jpeg",
-      "w": 500,
-      "h": 375,
-      "credit": "Emily Roberts",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/342982621"
      }
     ],
     "audio": [
@@ -1639,10 +1693,10 @@
     ],
     "audio": [
      {
-      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/c/cf/Kea-song.wav/Kea-song.wav.mp3",
-      "credit": "Unknown authorUnknown author",
+      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/7/74/Kea_%28Nestor_notabilis%29_song.ogg/Kea_%28Nestor_notabilis%29_song.ogg.mp3",
+      "credit": "Department of Conservation",
       "license": "CC BY 4.0",
-      "page": "https://commons.wikimedia.org/wiki/File:Kea-song.wav",
+      "page": "https://commons.wikimedia.org/wiki/File:Kea_(Nestor_notabilis)_song.ogg",
       "start": 0
      }
     ]
@@ -1742,28 +1796,28 @@
    "media": {
     "img": [
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/55506762/medium.jpg",
+      "src": "https://upload.wikimedia.org/wikipedia/commons/9/92/Ostriches_cape_point_cropped.jpg",
       "w": 500,
-      "h": 333,
-      "credit": "Andrew Allen",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/55506762"
+      "h": 352,
+      "credit": "Andrew massyn",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Ostriches_cape_point_cropped.jpg"
      },
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/110412944/medium.jpg",
-      "w": 500,
-      "h": 409,
-      "credit": "no rights reserved",
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/2/2a/Couple_autruche_eco-ferme_lokoli_a_sinemantiali.jpg/330px-Couple_autruche_eco-ferme_lokoli_a_sinemantiali.jpg",
+      "w": 330,
+      "h": 440,
+      "credit": "Carmellesoro",
       "license": "CC0 1.0",
-      "page": "https://www.inaturalist.org/photos/110412944"
+      "page": "https://commons.wikimedia.org/wiki/File:Couple_autruche_eco-ferme_lokoli_a_sinemantiali.jpg"
      },
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/97591380/medium.jpeg",
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/c/c9/Struthio_Diversity.jpg/500px-Struthio_Diversity.jpg",
       "w": 500,
-      "h": 416,
-      "credit": "no rights reserved",
-      "license": "CC0 1.0",
-      "page": "https://www.inaturalist.org/photos/97591380"
+      "h": 260,
+      "credit": "PaleoNeolitic (montage creator) Diego Delso ninara",
+      "license": "CC BY 2.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Struthio_Diversity.jpg"
      }
     ]
    },
@@ -1799,28 +1853,28 @@
    "media": {
     "img": [
      {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/a/a3/Aptenodytes_forsteri_-Snow_Hill_Island%2C_Antarctica_-adults_and_juvenile-8.jpg/330px-Aptenodytes_forsteri_-Snow_Hill_Island%2C_Antarctica_-adults_and_juvenile-8.jpg",
+      "w": 330,
+      "h": 530,
+      "credit": "Ian Duffy from UK",
+      "license": "CC BY 2.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Aptenodytes_forsteri_-Snow_Hill_Island,_Antarctica_-adults_and_juvenile-8.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/1d/Penguin_in_Antarctica_jumping_out_of_the_water.jpg/500px-Penguin_in_Antarctica_jumping_out_of_the_water.jpg",
+      "w": 500,
+      "h": 332,
+      "credit": "Christopher Michel",
+      "license": "CC BY 2.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Penguin_in_Antarctica_jumping_out_of_the_water.jpg"
+     },
+     {
       "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/111479650/medium.jpg",
       "w": 500,
       "h": 333,
       "credit": "Enzo Fiorelli",
       "license": "CC BY-SA 4.0",
       "page": "https://www.inaturalist.org/photos/111479650"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/85491479/medium.jpg",
-      "w": 500,
-      "h": 333,
-      "credit": "Ian Duffy",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/85491479"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/85492504/medium.jpg",
-      "w": 500,
-      "h": 353,
-      "credit": "Christopher Michel",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/85492504"
      }
     ]
    },
@@ -1857,6 +1911,14 @@
    "media": {
     "img": [
      {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/c/c4/Puffin_%28Fratercula_arctica%29.jpg/500px-Puffin_%28Fratercula_arctica%29.jpg",
+      "w": 500,
+      "h": 500,
+      "credit": "Charles J. Sharp",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Puffin_(Fratercula_arctica).jpg"
+     },
+     {
       "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/193715532/medium.jpg",
       "w": 500,
       "h": 333,
@@ -1871,14 +1933,6 @@
       "credit": "Diego González Dopico",
       "license": "CC BY 4.0",
       "page": "https://www.inaturalist.org/photos/498923702"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/467763437/medium.jpeg",
-      "w": 500,
-      "h": 333,
-      "credit": "allan5519",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/467763437"
      }
     ],
     "audio": [
@@ -1923,28 +1977,28 @@
    "media": {
     "img": [
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/384490244/medium.jpg",
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/8/88/Bald_Eagle_%28Haliaeetus_leucocephalus%29_Kachemak_Bay%2C_Alaska.jpg/500px-Bald_Eagle_%28Haliaeetus_leucocephalus%29_Kachemak_Bay%2C_Alaska.jpg",
       "w": 500,
-      "h": 333,
-      "credit": "Marcel_Pepin",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/384490244"
+      "h": 578,
+      "credit": "Andy Morffew from Itchen Abbas, Hampshire, UK",
+      "license": "CC BY 2.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Bald_Eagle_(Haliaeetus_leucocephalus)_Kachemak_Bay,_Alaska.jpg"
      },
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/598855376/medium.jpg",
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/6/6b/Juvenile_Bald_Eagle%2C_Conowingo_Dam%2C_Susquehanna_River%2C_MD_2016-01-03.jpg/500px-Juvenile_Bald_Eagle%2C_Conowingo_Dam%2C_Susquehanna_River%2C_MD_2016-01-03.jpg",
       "w": 500,
-      "h": 281,
-      "credit": "Daughter Dad",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/598855376"
+      "h": 625,
+      "credit": "michael_eitland",
+      "license": "CC BY 2.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Juvenile_Bald_Eagle,_Conowingo_Dam,_Susquehanna_River,_MD_2016-01-03.jpg"
      },
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/609117510/medium.jpg",
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/d/db/Bald_eagle_about_to_fly_in_Alaska_%282016%29.jpg/500px-Bald_eagle_about_to_fly_in_Alaska_%282016%29.jpg",
       "w": 500,
-      "h": 333,
-      "credit": "Justin Flint",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/609117510"
+      "h": 400,
+      "credit": "Andy Morffew from Itchen Abbas, Hampshire, UK",
+      "license": "CC BY 2.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Bald_eagle_about_to_fly_in_Alaska_(2016).jpg"
      }
     ],
     "audio": [
@@ -2054,28 +2108,28 @@
    "media": {
     "img": [
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/226608554/medium.jpg",
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/3/3f/Faucon_pelerin_7_mai.jpg/500px-Faucon_pelerin_7_mai.jpg",
       "w": 500,
-      "h": 400,
-      "credit": "Nicolás Villaseca Merino",
+      "h": 351,
+      "credit": "Georges Lignier (georges.lignier@wanadoo.fr)",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Faucon_pelerin_7_mai.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/5/54/American_Peregrine_Falcon_%28Falco_peregrinus%29_%2810700651733%29.jpg/500px-American_Peregrine_Falcon_%28Falco_peregrinus%29_%2810700651733%29.jpg",
+      "w": 500,
+      "h": 369,
+      "credit": "Gregory \"Slobirdr\" Smith",
+      "license": "CC BY-SA 2.0",
+      "page": "https://commons.wikimedia.org/wiki/File:American_Peregrine_Falcon_(Falco_peregrinus)_(10700651733).jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/9/91/Peregrine_Falcon_Nepal.jpg/330px-Peregrine_Falcon_Nepal.jpg",
+      "w": 330,
+      "h": 495,
+      "credit": "Creepanta",
       "license": "CC BY-SA 4.0",
-      "page": "https://www.inaturalist.org/photos/226608554"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/626747287/medium.jpg",
-      "w": 500,
-      "h": 348,
-      "credit": "sunnyjosef",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/626747287"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/243839915/medium.jpg",
-      "w": 400,
-      "h": 500,
-      "credit": "Andrea Poggi",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/243839915"
+      "page": "https://commons.wikimedia.org/wiki/File:Peregrine_Falcon_Nepal.jpg"
      }
     ]
    },
@@ -2195,6 +2249,15 @@
       "credit": "Ltshears",
       "license": "CC BY-SA 4.0",
       "page": "https://www.inaturalist.org/photos/208280149"
+     }
+    ],
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/a/a2/Andean_Condor_call_%28Vultur_gryphus%29.ogg/Andean_Condor_call_%28Vultur_gryphus%29.ogg.mp3",
+      "credit": "Fernando Castro",
+      "license": "CC BY 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Andean_Condor_call_(Vultur_gryphus).ogg",
+      "start": 0
      }
     ]
    },
@@ -2339,6 +2402,14 @@
    "media": {
     "img": [
      {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/9/9e/American_Barn_Owl_%28Tyto_furcata_guatemalae%29%2C_Orange_Walk.jpg/330px-American_Barn_Owl_%28Tyto_furcata_guatemalae%29%2C_Orange_Walk.jpg",
+      "w": 330,
+      "h": 495,
+      "credit": "Charles J. Sharp",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:American_Barn_Owl_(Tyto_furcata_guatemalae),_Orange_Walk.jpg"
+     },
+     {
       "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/165796939/medium.jpg",
       "w": 500,
       "h": 333,
@@ -2353,14 +2424,6 @@
       "credit": "john.purvis",
       "license": "CC BY 4.0",
       "page": "https://www.inaturalist.org/photos/165796940"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/66539287/medium.jpeg",
-      "w": 500,
-      "h": 375,
-      "credit": "Andrew Bazdyrev",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/66539287"
      }
     ],
     "audio": [
@@ -2403,28 +2466,28 @@
    "media": {
     "img": [
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/175457294/medium.jpg",
-      "w": 500,
-      "h": 333,
-      "credit": "Matt Felperin",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/175457294"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/263627380/medium.jpg",
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/8/84/Bubo_scandiacus_male_Muskegon.jpg/500px-Bubo_scandiacus_male_Muskegon.jpg",
       "w": 500,
       "h": 375,
-      "credit": "Bill Bouton",
-      "license": "CC BY-SA 4.0",
-      "page": "https://www.inaturalist.org/photos/263627380"
+      "credit": "Bill Bouton from San Luis Obispo, CA, USA",
+      "license": "CC BY-SA 2.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Bubo_scandiacus_male_Muskegon.jpg"
      },
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/175457284/medium.jpg",
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/8/86/Snowy_owl_%28Bubo_scandiacus%29%2C_Vlieland%2C_Netherlands.jpg/500px-Snowy_owl_%28Bubo_scandiacus%29%2C_Vlieland%2C_Netherlands.jpg",
       "w": 500,
       "h": 333,
-      "credit": "Matt Felperin",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/175457284"
+      "credit": "Frank Vassen",
+      "license": "CC BY 2.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Snowy_owl_(Bubo_scandiacus),_Vlieland,_Netherlands.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/f/f1/SnowyOwlAmericanBlackDuck.jpg/500px-SnowyOwlAmericanBlackDuck.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Chuck Homler d/b/a Focus On Wildlife",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:SnowyOwlAmericanBlackDuck.jpg"
      }
     ]
    },
@@ -2456,14 +2519,6 @@
    "media": {
     "img": [
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/79388250/medium.jpg",
-      "w": 375,
-      "h": 500,
-      "credit": "Ben Hayden",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/79388250"
-     },
-     {
       "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/264835127/medium.jpeg",
       "w": 500,
       "h": 408,
@@ -2478,6 +2533,14 @@
       "credit": "Michael Warner",
       "license": "CC BY 4.0",
       "page": "https://www.inaturalist.org/photos/408807127"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/427724222/medium.jpg",
+      "w": 344,
+      "h": 500,
+      "credit": "Michael Warner",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/427724222"
      }
     ],
     "audio": [
@@ -2522,28 +2585,37 @@
    "media": {
     "img": [
      {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/15/Flamant_rose_Thyna009.jpg/330px-Flamant_rose_Thyna009.jpg",
+      "w": 330,
+      "h": 440,
+      "credit": "El Golli Mohamed",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Flamant_rose_Thyna009.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/8/81/010_Greater_flamingos_male_and_female_in_the_Camargue_during_mating_season_Photo_by_Giles_Laurent.jpg/500px-010_Greater_flamingos_male_and_female_in_the_Camargue_during_mating_season_Photo_by_Giles_Laurent.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Giles Laurent",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:010_Greater_flamingos_male_and_female_in_the_Camargue_during_mating_season_Photo_by_Giles_Laurent.jpg"
+     },
+     {
       "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/346681268/medium.jpg",
       "w": 500,
       "h": 334,
       "credit": "Pierre-Marie Epiney",
       "license": "CC BY-SA 4.0",
       "page": "https://www.inaturalist.org/photos/346681268"
-     },
+     }
+    ],
+    "audio": [
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/85928015/medium.jpg",
-      "w": 500,
-      "h": 333,
-      "credit": "Diego Delso",
+      "src": "https://upload.wikimedia.org/wikipedia/commons/5/5d/Phoenicopterus_roseus_-_Greater_Flamingo_XC432217.mp3",
+      "credit": "Joost van Bruggen",
       "license": "CC BY-SA 4.0",
-      "page": "https://www.inaturalist.org/photos/85928015"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/85928017/medium.jpg",
-      "w": 500,
-      "h": 333,
-      "credit": "Bernard DUPONT",
-      "license": "CC BY-SA 4.0",
-      "page": "https://www.inaturalist.org/photos/85928017"
+      "page": "https://commons.wikimedia.org/wiki/File:Phoenicopterus_roseus_-_Greater_Flamingo_XC432217.mp3",
+      "start": 0
      }
     ]
    },
@@ -2579,28 +2651,28 @@
    "media": {
     "img": [
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/53458435/medium.jpg",
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/4/47/Scarlet_macaw_%28Ara_macao_cyanopterus%29_Copan.jpg/500px-Scarlet_macaw_%28Ara_macao_cyanopterus%29_Copan.jpg",
       "w": 500,
-      "h": 389,
-      "credit": "Matt Muir",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/53458435"
+      "h": 333,
+      "credit": "Charles J. Sharp",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Scarlet_macaw_(Ara_macao_cyanopterus)_Copan.jpg"
      },
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/591920768/medium.jpg",
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/12/Ara_macao_-Puntarenas_Province%2C_Costa_Rica-8.jpg/500px-Ara_macao_-Puntarenas_Province%2C_Costa_Rica-8.jpg",
       "w": 500,
-      "h": 400,
-      "credit": "no rights reserved",
-      "license": "CC0 1.0",
-      "page": "https://www.inaturalist.org/photos/591920768"
+      "h": 532,
+      "credit": "chuck624 from Upstate NY, USA",
+      "license": "CC BY-SA 2.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Ara_macao_-Puntarenas_Province,_Costa_Rica-8.jpg"
      },
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/395848909/medium.jpeg",
-      "w": 359,
-      "h": 500,
-      "credit": "Cricket Raspet",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/395848909"
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/7/79/Scharlachara_%28Ara_macao%29.jpg/330px-Scharlachara_%28Ara_macao%29.jpg",
+      "w": 330,
+      "h": 495,
+      "credit": "Dr. Thomas Liptak",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Scharlachara_(Ara_macao).jpg"
      }
     ]
    },
@@ -2659,6 +2731,15 @@
       "license": "CC BY 4.0",
       "page": "https://www.inaturalist.org/photos/432659299"
      }
+    ],
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/e/e1/Psittacus_erithacus_speaking.oga/Psittacus_erithacus_speaking.oga.mp3",
+      "credit": "Geoprofi Lars",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Psittacus_erithacus_speaking.oga",
+      "start": 0
+     }
     ]
    },
    "difficulty": 2
@@ -2693,6 +2774,14 @@
    "media": {
     "img": [
      {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/b/b0/006_Toco_toucan_in_Encontro_das_%C3%81guas_State_Park_Photo_by_Giles_Laurent.jpg/500px-006_Toco_toucan_in_Encontro_das_%C3%81guas_State_Park_Photo_by_Giles_Laurent.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Giles Laurent",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:006_Toco_toucan_in_Encontro_das_%C3%81guas_State_Park_Photo_by_Giles_Laurent.jpg"
+     },
+     {
       "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/95469825/medium.jpg",
       "w": 334,
       "h": 500,
@@ -2707,14 +2796,15 @@
       "credit": "Daniel Cavallari",
       "license": "CC BY-SA 4.0",
       "page": "https://www.inaturalist.org/photos/145999537"
-     },
+     }
+    ],
+    "audio": [
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/349077750/medium.jpeg",
-      "w": 500,
-      "h": 346,
-      "credit": "Gabriel Martínez",
+      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/a/a8/Toco_Toucan_call_%28Ramphastos_toco%29.ogg/Toco_Toucan_call_%28Ramphastos_toco%29.ogg.mp3",
+      "credit": "Fabrício Grigolin",
       "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/349077750"
+      "page": "https://commons.wikimedia.org/wiki/File:Toco_Toucan_call_(Ramphastos_toco).ogg",
+      "start": 0
      }
     ]
    },
@@ -2809,28 +2899,37 @@
    "media": {
     "img": [
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/239401590/medium.jpg",
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/13/Male_Ruby-Throated_Hummingbird_Hovering.jpg/500px-Male_Ruby-Throated_Hummingbird_Hovering.jpg",
       "w": 500,
-      "h": 376,
-      "credit": "Blake Ross",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/239401590"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/314800928/medium.jpeg",
-      "w": 500,
-      "h": 375,
-      "credit": "no rights reserved",
-      "license": "CC0 1.0",
-      "page": "https://www.inaturalist.org/photos/314800928"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/47442194/medium.jpg",
-      "w": 375,
       "h": 500,
-      "credit": "no rights reserved",
-      "license": "CC0 1.0",
-      "page": "https://www.inaturalist.org/photos/47442194"
+      "credit": "Pslawinski",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Male_Ruby-Throated_Hummingbird_Hovering.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/e/e1/Female_Ruby_Throated_Hummingbird.jpg/500px-Female_Ruby_Throated_Hummingbird.jpg",
+      "w": 500,
+      "h": 500,
+      "credit": "Pslawinski",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Female_Ruby_Throated_Hummingbird.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/7/7c/Archilochus_colubris_-flying_-male-8.jpg/500px-Archilochus_colubris_-flying_-male-8.jpg",
+      "w": 500,
+      "h": 548,
+      "credit": "jeffreyw",
+      "license": "CC BY 2.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Archilochus_colubris_-flying_-male-8.jpg"
+     }
+    ],
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/9/96/Archilochus_colubris_-_Ruby-throated_Hummingbird_XC109597.mp3",
+      "credit": "Jonathon Jongsma",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Archilochus_colubris_-_Ruby-throated_Hummingbird_XC109597.mp3",
+      "start": 0
      }
     ]
    },
@@ -2889,6 +2988,15 @@
       "license": "CC BY 4.0",
       "page": "https://www.inaturalist.org/photos/175739925"
      }
+    ],
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/9/91/Resplendent_Quetzal_song_%28Pharomachrus_mocinno%29.ogg/Resplendent_Quetzal_song_%28Pharomachrus_mocinno%29.ogg.mp3",
+      "credit": "Leander Khil",
+      "license": "CC BY 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Resplendent_Quetzal_song_(Pharomachrus_mocinno).ogg",
+      "start": 0
+     }
     ]
    },
    "difficulty": 2
@@ -2925,28 +3033,37 @@
    "media": {
     "img": [
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/407381945/medium.jpg",
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/19/Indian_Peacock_in_Tholpetty_Wildlife_Sanctuary_01.JPG/500px-Indian_Peacock_in_Tholpetty_Wildlife_Sanctuary_01.JPG",
+      "w": 500,
+      "h": 313,
+      "credit": "Praveenp",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Indian_Peacock_in_Tholpetty_Wildlife_Sanctuary_01.JPG"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/a/a9/Indian_peafowls_1.jpg/500px-Indian_peafowls_1.jpg",
       "w": 500,
       "h": 375,
-      "credit": "Sarah Stierch",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/407381945"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/407381941/medium.jpg",
-      "w": 291,
-      "h": 500,
-      "credit": "Shino jacob koottanad",
+      "credit": "Jameela P.",
       "license": "CC BY-SA 4.0",
-      "page": "https://www.inaturalist.org/photos/407381941"
+      "page": "https://commons.wikimedia.org/wiki/File:Indian_peafowls_1.jpg"
      },
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/70910408/medium.jpg",
-      "w": 500,
-      "h": 333,
-      "credit": "Becky Matsubara",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/70910408"
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/7/7f/Peacock_on_tree_%2852077240794%29.jpg/330px-Peacock_on_tree_%2852077240794%29.jpg",
+      "w": 330,
+      "h": 495,
+      "credit": "Kandukuru Nagarjun from Bangalore, India",
+      "license": "CC BY 2.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Peacock_on_tree_(52077240794).jpg"
+     }
+    ],
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/e/e2/DM550170_Pavo_cristatus_call_in_farm_Slovakia.oga/DM550170_Pavo_cristatus_call_in_farm_Slovakia.oga.mp3",
+      "credit": "SanoAK: Alexander Kürthy",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:DM550170_Pavo_cristatus_call_in_farm_Slovakia.oga",
+      "start": 0
      }
     ]
    },
@@ -3039,28 +3156,37 @@
    "media": {
     "img": [
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/95268822/medium.jpg",
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/0/0c/Male_mallard3.jpg/500px-Male_mallard3.jpg",
       "w": 500,
-      "h": 307,
-      "credit": "anonymous",
-      "license": "CC BY-SA 4.0",
-      "page": "https://www.inaturalist.org/photos/95268822"
+      "h": 323,
+      "credit": "Calibas (edit by Aqwis)",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Male_mallard3.jpg"
      },
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/45796333/medium.jpeg",
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/e/e1/Anas_platyrhynchos_%28mixed_pair%29_%2832428014687%29.jpg/500px-Anas_platyrhynchos_%28mixed_pair%29_%2832428014687%29.jpg",
       "w": 500,
-      "h": 375,
-      "credit": "Ron Pasieczna",
+      "h": 374,
+      "credit": "Rolf Dietrich Brecher from Germany",
+      "license": "CC BY 2.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Anas_platyrhynchos_(mixed_pair)_(32428014687).jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/8/8b/Anas_platyrhynchos_near_City_Lake%2C_Ivano-Frankivsk.jpg/500px-Anas_platyrhynchos_near_City_Lake%2C_Ivano-Frankivsk.jpg",
+      "w": 500,
+      "h": 281,
+      "credit": "Tetiana.iefimenko",
       "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/45796333"
-     },
+      "page": "https://commons.wikimedia.org/wiki/File:Anas_platyrhynchos_near_City_Lake,_Ivano-Frankivsk.jpg"
+     }
+    ],
+    "audio": [
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/94471985/medium.jpg",
-      "w": 500,
-      "h": 307,
-      "credit": "hedera.baltica",
+      "src": "https://upload.wikimedia.org/wikipedia/commons/b/bc/Anas_platyrhynchos_-_Mallard_XC518422.mp3",
+      "credit": "Marie-Lan Taÿ Pamart",
       "license": "CC BY-SA 4.0",
-      "page": "https://www.inaturalist.org/photos/94471985"
+      "page": "https://commons.wikimedia.org/wiki/File:Anas_platyrhynchos_-_Mallard_XC518422.mp3",
+      "start": 0
      }
     ]
    },
@@ -3095,28 +3221,28 @@
    "media": {
     "img": [
      {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/7/7b/Mute_Swan_Emsworth2.JPG/500px-Mute_Swan_Emsworth2.JPG",
+      "w": 500,
+      "h": 379,
+      "credit": "Geni",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Mute_Swan_Emsworth2.JPG"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/a/a2/CygneVaires.jpg/500px-CygneVaires.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Sanchezn",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:CygneVaires.jpg"
+     },
+     {
       "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/283242966/medium.jpg",
       "w": 500,
       "h": 375,
       "credit": "Laura Mae",
       "license": "CC BY 4.0",
       "page": "https://www.inaturalist.org/photos/283242966"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/113908808/medium.jpeg",
-      "w": 500,
-      "h": 331,
-      "credit": "Codrin Bucur",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/113908808"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/13855998/medium.jpg",
-      "w": 500,
-      "h": 398,
-      "credit": "carnifex",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/13855998"
      }
     ],
     "audio": [
@@ -3159,28 +3285,28 @@
    "media": {
     "img": [
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/247715952/medium.jpeg",
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/3/33/La_Roche-en-Ardenne_-_Bernache_du_Canada%2C_Branta_canadensis.jpg/500px-La_Roche-en-Ardenne_-_Bernache_du_Canada%2C_Branta_canadensis.jpg",
       "w": 500,
-      "h": 431,
-      "credit": "John Barkla",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/247715952"
+      "h": 333,
+      "credit": "JackyM59",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:La_Roche-en-Ardenne_-_Bernache_du_Canada,_Branta_canadensis.jpg"
      },
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/123908815/medium.jpg",
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/a/a9/Canada_Geese_-_Flickr_-_treegrow.jpg/500px-Canada_Geese_-_Flickr_-_treegrow.jpg",
       "w": 500,
-      "h": 284,
-      "credit": "no rights reserved",
-      "license": "CC0 1.0",
-      "page": "https://www.inaturalist.org/photos/123908815"
+      "h": 375,
+      "credit": "Katja Schulz from Washington, D. C., USA",
+      "license": "CC BY 2.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Canada_Geese_-_Flickr_-_treegrow.jpg"
      },
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/37800057/medium.jpeg",
-      "w": 455,
-      "h": 500,
-      "credit": "Henry Van T. Cotter",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/37800057"
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/3/31/Bernaches_du_Canada_02.jpg/500px-Bernaches_du_Canada_02.jpg",
+      "w": 500,
+      "h": 628,
+      "credit": "Pierre5018",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Bernaches_du_Canada_02.jpg"
      }
     ],
     "audio": [
@@ -3224,28 +3350,37 @@
    "media": {
     "img": [
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/114655826/medium.jpg",
-      "w": 500,
-      "h": 375,
-      "credit": "Judy Gallagher",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/114655826"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/19232661/medium.jpg",
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/a/ae/Wild_Turkey%2C_Creekside_Park%2C_8_May_2014_%2814145843695%29.jpg/500px-Wild_Turkey%2C_Creekside_Park%2C_8_May_2014_%2814145843695%29.jpg",
       "w": 500,
       "h": 333,
-      "credit": "Ken-ichi Ueda",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/19232661"
+      "credit": "Caleb Putnam",
+      "license": "CC BY-SA 2.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Wild_Turkey,_Creekside_Park,_8_May_2014_(14145843695).jpg"
      },
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/20497431/medium.jpeg",
-      "w": 281,
-      "h": 500,
-      "credit": "Tom Norton",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/20497431"
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/1d/Wild_Turkey_%28female%29_-_Meleagris_gallopavo%2C_Occoquan_Bay_National_Wildlife_Refuge%2C_Woodbridge%2C_Virginia.jpg/500px-Wild_Turkey_%28female%29_-_Meleagris_gallopavo%2C_Occoquan_Bay_National_Wildlife_Refuge%2C_Woodbridge%2C_Virginia.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Judy Gallagher",
+      "license": "CC BY 2.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Wild_Turkey_(female)_-_Meleagris_gallopavo,_Occoquan_Bay_National_Wildlife_Refuge,_Woodbridge,_Virginia.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/b/bc/20260428_tom_wild_turkey_matthaei_botanical_gardens_PD08952.jpg/500px-20260428_tom_wild_turkey_matthaei_botanical_gardens_PD08952.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Paul Danese",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:20260428_tom_wild_turkey_matthaei_botanical_gardens_PD08952.jpg"
+     }
+    ],
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/f/f3/Meleagris_gallopavo_-_Wild_Turkey_XC136045.ogg/Meleagris_gallopavo_-_Wild_Turkey_XC136045.ogg.mp3",
+      "credit": "Jonathon Jongsma",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Meleagris_gallopavo_-_Wild_Turkey_XC136045.ogg",
+      "start": 0
      }
     ]
    },
@@ -3281,28 +3416,28 @@
    "media": {
     "img": [
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/3784873/medium.jpg",
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/2/23/Red_jungle_fowl.png/500px-Red_jungle_fowl.png",
+      "w": 500,
+      "h": 343,
+      "credit": "Subramanya C K",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Red_jungle_fowl.png"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/5/5a/Red_Junglefowl_Sundarbans_Tiger_Reserve_West_Bengal_India_07.03.2015.jpg/500px-Red_Junglefowl_Sundarbans_Tiger_Reserve_West_Bengal_India_07.03.2015.jpg",
       "w": 500,
       "h": 333,
-      "credit": "Julien Renoult",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/3784873"
+      "credit": "Dibyendu Ash",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Red_Junglefowl_Sundarbans_Tiger_Reserve_West_Bengal_India_07.03.2015.jpg"
      },
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/43973343/medium.jpeg",
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/f/f9/Gallus_gallus_-Kaziranga_National_Park%2C_Assam%2C_India-8.jpg/500px-Gallus_gallus_-Kaziranga_National_Park%2C_Assam%2C_India-8.jpg",
       "w": 500,
-      "h": 375,
-      "credit": "Jacqui Geux",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/43973343"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/92534456/medium.jpg",
-      "w": 500,
-      "h": 375,
-      "credit": "Sebastian Doak",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/92534456"
+      "h": 400,
+      "credit": "Lip Kee Yap",
+      "license": "CC BY-SA 2.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Gallus_gallus_-Kaziranga_National_Park,_Assam,_India-8.jpg"
      }
     ]
    },
@@ -3339,6 +3474,14 @@
    "media": {
     "img": [
      {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/10/Columba_livia_%28Rock_Dove%2C_wild%29%2C_Duncansby_Head%2C_Caithness%2C_Scotland_1.jpg/500px-Columba_livia_%28Rock_Dove%2C_wild%29%2C_Duncansby_Head%2C_Caithness%2C_Scotland_1.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "william_stephens",
+      "license": "CC BY 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Columba_livia_(Rock_Dove,_wild),_Duncansby_Head,_Caithness,_Scotland_1.jpg"
+     },
+     {
       "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/466776975/medium.jpg",
       "w": 500,
       "h": 375,
@@ -3353,14 +3496,15 @@
       "credit": "Andrew Bazdyrev",
       "license": "CC BY 4.0",
       "page": "https://www.inaturalist.org/photos/66637915"
-     },
+     }
+    ],
+    "audio": [
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/466776981/medium.jpg",
-      "w": 375,
-      "h": 500,
-      "credit": "Birds of Gilgit-Baltistan",
-      "license": "CC BY-SA 4.0",
-      "page": "https://www.inaturalist.org/photos/466776981"
+      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/6/61/Palomar-eva2007-Columba_livia.ogg/Palomar-eva2007-Columba_livia.ogg.mp3",
+      "credit": "Own work",
+      "license": "CC BY-SA 2.5",
+      "page": "https://commons.wikimedia.org/wiki/File:Palomar-eva2007-Columba_livia.ogg",
+      "start": 0
      }
     ]
    },
@@ -3451,12 +3595,20 @@
    "media": {
     "img": [
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/452211474/medium.jpg",
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/8/8c/Cardinal_couple_-_Feb._2018_%28watermark_removed%29.jpg/500px-Cardinal_couple_-_Feb._2018_%28watermark_removed%29.jpg",
       "w": 500,
-      "h": 500,
-      "credit": "Paul Danese",
+      "h": 356,
+      "credit": "patricia pierce",
+      "license": "CC BY 2.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Cardinal_couple_-_Feb._2018_(watermark_removed).jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/5/5c/Male_northern_cardinal_in_Central_Park_%2852612%29.jpg/500px-Male_northern_cardinal_in_Central_Park_%2852612%29.jpg",
+      "w": 500,
+      "h": 657,
+      "credit": "Rhododendrites",
       "license": "CC BY-SA 4.0",
-      "page": "https://www.inaturalist.org/photos/452211474"
+      "page": "https://commons.wikimedia.org/wiki/File:Male_northern_cardinal_in_Central_Park_(52612).jpg"
      },
      {
       "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/452211470/medium.jpg",
@@ -3465,14 +3617,15 @@
       "credit": "Paul Danese",
       "license": "CC BY-SA 4.0",
       "page": "https://www.inaturalist.org/photos/452211470"
-     },
+     }
+    ],
+    "audio": [
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/452211478/medium.jpeg",
-      "w": 500,
-      "h": 363,
-      "credit": "Mykola Swarnyk",
-      "license": "CC BY-SA 4.0",
-      "page": "https://www.inaturalist.org/photos/452211478"
+      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/0/09/Cardinalis_cardinalis_cardinalis_-_Northern_Cardinal_-_XC71726.ogg/Cardinalis_cardinalis_cardinalis_-_Northern_Cardinal_-_XC71726.ogg.mp3",
+      "credit": "Jonathon Jongsma",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Cardinalis_cardinalis_cardinalis_-_Northern_Cardinal_-_XC71726.ogg",
+      "start": 0
      }
     ]
    },
@@ -3578,28 +3731,28 @@
    "media": {
     "img": [
      {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/f/f3/Erithacus_rubecula_with_cocked_head.jpg/500px-Erithacus_rubecula_with_cocked_head.jpg",
+      "w": 500,
+      "h": 400,
+      "credit": "Francis C. Franklin",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Erithacus_rubecula_with_cocked_head.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/d/d0/European_robin_%28Erithacus_rubecula%29_juvenile.jpg/500px-European_robin_%28Erithacus_rubecula%29_juvenile.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Charles J. Sharp",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:European_robin_(Erithacus_rubecula)_juvenile.jpg"
+     },
+     {
       "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/591732718/medium.jpg",
       "w": 333,
       "h": 500,
       "credit": "Arjan Haverkamp",
       "license": "CC BY 4.0",
       "page": "https://www.inaturalist.org/photos/591732718"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/30475942/medium.jpeg",
-      "w": 500,
-      "h": 375,
-      "credit": "Alexis Tinker-Tsavalas",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/30475942"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/30476100/medium.jpeg",
-      "w": 500,
-      "h": 375,
-      "credit": "Alexis Tinker-Tsavalas",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/30476100"
      }
     ],
     "audio": [
@@ -3663,6 +3816,15 @@
       "license": "CC BY 4.0",
       "page": "https://www.inaturalist.org/photos/243875927"
      }
+    ],
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/b/b9/Cyanocitta_cristata_-_Blue_Jay_XC81291.mp3",
+      "credit": "Jonathon Jongsma",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Cyanocitta_cristata_-_Blue_Jay_XC81291.mp3",
+      "start": 0
+     }
     ]
    },
    "difficulty": 2
@@ -3696,28 +3858,28 @@
    "media": {
     "img": [
      {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/9/9b/House_sparrow_male_in_Prospect_Park_%2853532%29.jpg/500px-House_sparrow_male_in_Prospect_Park_%2853532%29.jpg",
+      "w": 500,
+      "h": 389,
+      "credit": "Rhododendrites",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:House_sparrow_male_in_Prospect_Park_(53532).jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/5/52/House_Sparrow%2C_England_-_May_09.jpg/500px-House_Sparrow%2C_England_-_May_09.jpg",
+      "w": 500,
+      "h": 420,
+      "credit": "Diliff",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:House_Sparrow,_England_-_May_09.jpg"
+     },
+     {
       "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/136543105/medium.jpeg",
       "w": 500,
       "h": 375,
       "credit": "Esteban Poveda",
       "license": "CC BY 4.0",
       "page": "https://www.inaturalist.org/photos/136543105"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/454836800/medium.jpeg",
-      "w": 500,
-      "h": 333,
-      "credit": "jirau",
-      "license": "CC BY-SA 4.0",
-      "page": "https://www.inaturalist.org/photos/454836800"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/181802756/medium.jpg",
-      "w": 500,
-      "h": 333,
-      "credit": "hedera.baltica",
-      "license": "CC BY-SA 4.0",
-      "page": "https://www.inaturalist.org/photos/181802756"
      }
     ],
     "audio": [
@@ -3763,14 +3925,6 @@
    "media": {
     "img": [
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/365984069/medium.jpg",
-      "w": 500,
-      "h": 500,
-      "credit": "Shiva Shenoy",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/365984069"
-     },
-     {
       "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/488854941/medium.jpg",
       "w": 500,
       "h": 431,
@@ -3785,6 +3939,14 @@
       "credit": "Paolo Zucca",
       "license": "CC BY 4.0",
       "page": "https://www.inaturalist.org/photos/9368838"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/129167575/medium.jpeg",
+      "w": 500,
+      "h": 469,
+      "credit": "Whitney Mattila",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/129167575"
      }
     ],
     "audio": [
@@ -3829,28 +3991,28 @@
    "media": {
     "img": [
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/635249690/medium.jpg",
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/7/7d/Rauchschwalbe_Hirundo_rustica.jpg/500px-Rauchschwalbe_Hirundo_rustica.jpg",
       "w": 500,
       "h": 333,
-      "credit": "Donald Davesne",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/635249690"
+      "credit": "Andreas Trepte",
+      "license": "CC BY-SA 2.5",
+      "page": "https://commons.wikimedia.org/wiki/File:Rauchschwalbe_Hirundo_rustica.jpg"
      },
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/8209375/medium.jpeg",
-      "w": 470,
-      "h": 500,
-      "credit": "Robbie Hannawacker",
-      "license": "CC0 1.0",
-      "page": "https://www.inaturalist.org/photos/8209375"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/575999585/medium.jpg",
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/12/Barn_Swallow_%2895504589%29.jpeg/500px-Barn_Swallow_%2895504589%29.jpeg",
       "w": 500,
       "h": 333,
-      "credit": "Diego González Dopico",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/575999585"
+      "credit": "Morhaf Aljanee",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Barn_Swallow_(95504589).jpeg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/7/76/Hirundo-rustica-001.jpg/500px-Hirundo-rustica-001.jpg",
+      "w": 500,
+      "h": 362,
+      "credit": "Mdf at English Wikipedia",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Hirundo-rustica-001.jpg"
      }
     ],
     "audio": [
@@ -3898,28 +4060,37 @@
    "media": {
     "img": [
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/33183952/medium.jpg",
-      "w": 500,
-      "h": 357,
-      "credit": "Frank Sengpiel",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/33183952"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/347328453/medium.jpg",
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/9/9d/Alcedo_Atthis.jpg/500px-Alcedo_Atthis.jpg",
       "w": 500,
       "h": 375,
-      "credit": "SteveM4560",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/347328453"
+      "credit": "Artemy Voikhansky",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Alcedo_Atthis.jpg"
      },
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/163772236/medium.jpg",
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/5/58/Common_kingfisher_%28Alcedo_atthis_ispida%29_female.jpg/500px-Common_kingfisher_%28Alcedo_atthis_ispida%29_female.jpg",
+      "w": 500,
+      "h": 500,
+      "credit": "Charles J. Sharp",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Common_kingfisher_(Alcedo_atthis_ispida)_female.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/0/01/Alcedo_atthis_-_Riserve_naturali_e_aree_contigue_della_fascia_fluviale_del_Po.jpg/500px-Alcedo_atthis_-_Riserve_naturali_e_aree_contigue_della_fascia_fluviale_del_Po.jpg",
       "w": 500,
       "h": 333,
-      "credit": "Alexis Lours",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/163772236"
+      "credit": "Luca Casale",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Alcedo_atthis_-_Riserve_naturali_e_aree_contigue_della_fascia_fluviale_del_Po.jpg"
+     }
+    ],
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/a/a8/Alcedo_atthis_-_Common_Kingfisher_XC476785.mp3",
+      "credit": "Marie-Lan Taÿ Pamart",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Alcedo_atthis_-_Common_Kingfisher_XC476785.mp3",
+      "start": 0
      }
     ]
    },
@@ -3955,28 +4126,28 @@
    "media": {
     "img": [
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/405357242/medium.jpg",
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/2/29/ParusCaeruleus.jpg/500px-ParusCaeruleus.jpg",
       "w": 500,
       "h": 500,
-      "credit": "Bengt Nyman",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/405357242"
+      "credit": "Maximilian Dorsch",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:ParusCaeruleus.jpg"
      },
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/355702420/medium.jpg",
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/8/88/Parus_caeruleus1.jpg/500px-Parus_caeruleus1.jpg",
       "w": 500,
-      "h": 438,
-      "credit": "hedera.baltica",
-      "license": "CC BY-SA 4.0",
-      "page": "https://www.inaturalist.org/photos/355702420"
+      "h": 375,
+      "credit": "Sławek Staszczuk",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Parus_caeruleus1.jpg"
      },
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/405357261/medium.jpg",
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/8/86/Eurasian_blue_tit_Lancashire.jpg/500px-Eurasian_blue_tit_Lancashire.jpg",
       "w": 500,
-      "h": 325,
-      "credit": "pete beard",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/405357261"
+      "h": 375,
+      "credit": "Francis Franklin",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Eurasian_blue_tit_Lancashire.jpg"
      }
     ],
     "audio": [
@@ -4025,28 +4196,28 @@
    "media": {
     "img": [
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/199815492/medium.jpeg",
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/2/22/Eurasian_magpie_%2810860%29.jpg/500px-Eurasian_magpie_%2810860%29.jpg",
+      "w": 500,
+      "h": 369,
+      "credit": "Rhododendrites",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Eurasian_magpie_(10860).jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/3/34/Magpie_in_Madrid_%28Spain%29_74.jpg/500px-Magpie_in_Madrid_%28Spain%29_74.jpg",
+      "w": 500,
+      "h": 323,
+      "credit": "Luis García (Zaqarbal)",
+      "license": "CC BY-SA 3.0 es",
+      "page": "https://commons.wikimedia.org/wiki/File:Magpie_in_Madrid_(Spain)_74.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/b/be/Magpie_in_Ladakh.JPG/500px-Magpie_in_Ladakh.JPG",
       "w": 500,
       "h": 375,
-      "credit": "bitsnbirds",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/199815492"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/229929247/medium.jpeg",
-      "w": 500,
-      "h": 471,
-      "credit": "Noa",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/229929247"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/130771798/medium.jpg",
-      "w": 500,
-      "h": 500,
-      "credit": "euqirneto",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/130771798"
+      "credit": "T R Shankar Raman",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Magpie_in_Ladakh.JPG"
      }
     ],
     "audio": [
@@ -4091,28 +4262,28 @@
    "media": {
     "img": [
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/119994014/medium.jpg",
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/5/50/Corvus_corax_ad_berlin_090516.jpg/500px-Corvus_corax_ad_berlin_090516.jpg",
       "w": 500,
-      "h": 375,
-      "credit": "xulescu_g",
-      "license": "CC BY-SA 4.0",
-      "page": "https://www.inaturalist.org/photos/119994014"
+      "h": 323,
+      "credit": "Accipiter (R. Altenkamp, Berlin)",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Corvus_corax_ad_berlin_090516.jpg"
      },
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/462471314/medium.jpg",
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/3/36/Common_Raven_%28Corvus_corax%29_%2811793963694%29.jpg/500px-Common_Raven_%28Corvus_corax%29_%2811793963694%29.jpg",
       "w": 500,
-      "h": 333,
-      "credit": "cello caruso-turiello",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/462471314"
+      "h": 331,
+      "credit": "Franco Folini from San Francisco, USA",
+      "license": "CC BY-SA 2.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Common_Raven_(Corvus_corax)_(11793963694).jpg"
      },
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/381522855/medium.jpeg",
-      "w": 375,
-      "h": 500,
-      "credit": "Mila C.",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/381522855"
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/7/75/Common_Raven_%28Corvus_corax%29_%2839638261481%29.jpg/500px-Common_Raven_%28Corvus_corax%29_%2839638261481%29.jpg",
+      "w": 500,
+      "h": 366,
+      "credit": "Imran Shah from Islamabad, Pakistan",
+      "license": "CC BY-SA 2.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Common_Raven_(Corvus_corax)_(39638261481).jpg"
      }
     ],
     "audio": [
@@ -4210,6 +4381,14 @@
    "media": {
     "img": [
      {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/0/03/Alcatraz_Patiazul.jpg/500px-Alcatraz_Patiazul.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "SantiagoGG",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Alcatraz_Patiazul.jpg"
+     },
+     {
       "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/64237933/medium.jpg",
       "w": 500,
       "h": 375,
@@ -4224,14 +4403,6 @@
       "credit": "no rights reserved",
       "license": "CC0 1.0",
       "page": "https://www.inaturalist.org/photos/474042571"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/355651413/medium.jpeg",
-      "w": 500,
-      "h": 251,
-      "credit": "Bill Levine",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/355651413"
      }
     ]
    },
@@ -4267,14 +4438,6 @@
    "media": {
     "img": [
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/158806319/medium.jpeg",
-      "w": 500,
-      "h": 375,
-      "credit": "Megan Massa",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/158806319"
-     },
-     {
       "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/463807692/medium.jpeg",
       "w": 500,
       "h": 281,
@@ -4289,6 +4452,14 @@
       "credit": "no rights reserved",
       "license": "CC0 1.0",
       "page": "https://www.inaturalist.org/photos/471706486"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/31315286/medium.jpeg",
+      "w": 500,
+      "h": 334,
+      "credit": "José Garrido",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/31315286"
      }
     ]
    },
@@ -4382,36 +4553,36 @@
    "media": {
     "img": [
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/269104502/medium.jpg",
-      "w": 500,
-      "h": 375,
-      "credit": "xulescu_g",
-      "license": "CC BY-SA 4.0",
-      "page": "https://www.inaturalist.org/photos/269104502"
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/10/Ciconia_ciconia.jpg/330px-Ciconia_ciconia.jpg",
+      "w": 330,
+      "h": 469,
+      "credit": "Krzysztof Kin",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Ciconia_ciconia.jpg"
      },
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/53897081/medium.jpg",
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/f/fb/Ciconia_ciconia_-_01.jpg/500px-Ciconia_ciconia_-_01.jpg",
       "w": 500,
       "h": 333,
       "credit": "Carlos Delgado",
-      "license": "CC BY-SA 4.0",
-      "page": "https://www.inaturalist.org/photos/53897081"
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Ciconia_ciconia_-_01.jpg"
      },
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/53896903/medium.jpg",
-      "w": 500,
-      "h": 300,
-      "credit": "Bernard DUPONT",
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/0/00/00_4439_Storchennest_mit_K%C3%BCken.jpg/330px-00_4439_Storchennest_mit_K%C3%BCken.jpg",
+      "w": 330,
+      "h": 497,
+      "credit": "W. Bulach",
       "license": "CC BY-SA 4.0",
-      "page": "https://www.inaturalist.org/photos/53896903"
+      "page": "https://commons.wikimedia.org/wiki/File:00_4439_Storchennest_mit_K%C3%BCken.jpg"
      }
     ],
     "audio": [
      {
-      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/0/06/Klapperstorch.ogg/Klapperstorch.ogg.mp3",
-      "credit": "Jugrü",
+      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/2/2c/Ciconia_ciconia_bill-clattering.ogg/Ciconia_ciconia_bill-clattering.ogg.mp3",
+      "credit": "felix.blume",
       "license": "CC BY-SA 3.0",
-      "page": "https://commons.wikimedia.org/wiki/File:Klapperstorch.ogg",
+      "page": "https://commons.wikimedia.org/wiki/File:Ciconia_ciconia_bill-clattering.ogg",
       "start": 0
      }
     ]
@@ -4505,28 +4676,37 @@
    "media": {
     "img": [
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/11783387/medium.jpg",
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/8/87/Dendrocopos_major_EM1B2679_%2835219263071%29.jpg/500px-Dendrocopos_major_EM1B2679_%2835219263071%29.jpg",
       "w": 500,
-      "h": 333,
-      "credit": "Paolo Zucca",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/11783387"
+      "h": 500,
+      "credit": "Bengt Nyman from Vaxholm, Sweden",
+      "license": "CC BY 2.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Dendrocopos_major_EM1B2679_(35219263071).jpg"
      },
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/122215005/medium.jpg",
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/7/79/DendrocoposMajor.jpg/330px-DendrocoposMajor.jpg",
+      "w": 330,
+      "h": 440,
+      "credit": "Sławomir Staszczuk (info [AT] photoss.net)",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:DendrocoposMajor.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/a/aa/%D0%94%D1%8F%D1%82%D0%B5%D0%BB_%D0%B1%D0%BE%D0%BB%D1%8C%D1%88%D0%BE%D0%B9_%D0%BF%D1%91%D1%81%D1%82%D1%80%D1%8B%D0%B9_KR_01.jpg/500px-%D0%94%D1%8F%D1%82%D0%B5%D0%BB_%D0%B1%D0%BE%D0%BB%D1%8C%D1%88%D0%BE%D0%B9_%D0%BF%D1%91%D1%81%D1%82%D1%80%D1%8B%D0%B9_KR_01.jpg",
       "w": 500,
-      "h": 323,
-      "credit": "hedera.baltica",
+      "h": 335,
+      "credit": "Плешков Алексей",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:%D0%94%D1%8F%D1%82%D0%B5%D0%BB_%D0%B1%D0%BE%D0%BB%D1%8C%D1%88%D0%BE%D0%B9_%D0%BF%D1%91%D1%81%D1%82%D1%80%D1%8B%D0%B9_KR_01.jpg"
+     }
+    ],
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/c/cc/XC47350_-_Grote_Bonte_Specht_-_Dendrocopos_major.ogg/XC47350_-_Grote_Bonte_Specht_-_Dendrocopos_major.ogg.mp3",
+      "credit": "Sander Pieterse",
       "license": "CC BY-SA 4.0",
-      "page": "https://www.inaturalist.org/photos/122215005"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/28347741/medium.jpeg",
-      "w": 500,
-      "h": 297,
-      "credit": "Вячеслав Юсупов",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/28347741"
+      "page": "https://commons.wikimedia.org/wiki/File:XC47350_-_Grote_Bonte_Specht_-_Dendrocopos_major.ogg",
+      "start": 0
      }
     ]
    },
@@ -4562,28 +4742,28 @@
    "media": {
     "img": [
      {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/e/e8/Cuculus_canorus2.jpg/500px-Cuculus_canorus2.jpg",
+      "w": 500,
+      "h": 353,
+      "credit": "GabrielBuissart",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Cuculus_canorus2.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/b/b9/Cuckoo_%2851169010335%29.jpg/500px-Cuckoo_%2851169010335%29.jpg",
+      "w": 500,
+      "h": 400,
+      "credit": "Andy Morffew from Itchen Abbas, Hampshire, UK",
+      "license": "CC BY 2.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Cuckoo_(51169010335).jpg"
+     },
+     {
       "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/241715354/medium.jpeg",
       "w": 500,
       "h": 489,
       "credit": "Юрий Носков",
       "license": "CC0 1.0",
       "page": "https://www.inaturalist.org/photos/241715354"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/140638774/medium.jpg",
-      "w": 500,
-      "h": 500,
-      "credit": "Ramnarayan K",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/140638774"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/85456754/medium.jpg",
-      "w": 500,
-      "h": 333,
-      "credit": "Safina Rezeda",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/85456754"
      }
     ],
     "audio": [
@@ -4648,6 +4828,15 @@
       "license": "CC BY-SA 4.0",
       "page": "https://www.inaturalist.org/photos/173064735"
      }
+    ],
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/9/9f/Great_hornbill_%2C_Buceros_bicornis%2Ccall.wav/Great_hornbill_%2C_Buceros_bicornis%2Ccall.wav.mp3",
+      "credit": "Shino jacob koottanad",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Great_hornbill_,_Buceros_bicornis,call.wav",
+      "start": 0
+     }
     ]
    },
    "difficulty": 2
@@ -4700,6 +4889,15 @@
       "credit": "Alan Manson",
       "license": "CC BY 4.0",
       "page": "https://www.inaturalist.org/photos/238863351"
+     }
+    ],
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/5/5a/Coracias_caudatus_caudatus%2C_roep_in_vlug_te_Krokodilspruit%2C_2022-05-28_13h18%2C_a.mp3",
+      "credit": "JMK",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Coracias_caudatus_caudatus,_roep_in_vlug_te_Krokodilspruit,_2022-05-28_13h18,_a.mp3",
+      "start": 0
      }
     ]
    },

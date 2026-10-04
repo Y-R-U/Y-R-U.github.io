@@ -117,7 +117,7 @@
     "Elephant",
     "Polar bear"
    ],
-   "explain": "Blue whales are even bigger than the biggest dinosaurs were.",
+   "explain": "Blue whales are the heaviest animals known to have ever lived.",
    "difficulty": 1,
    "tags": [
     "kids",
@@ -423,7 +423,7 @@
     "Horse",
     "Lion"
    ],
-   "explain": "A cheetah can run as fast as a car on a busy road!",
+   "explain": "A cheetah can sprint as fast as a car on a fast road!",
    "difficulty": 1,
    "tags": [
     "kids",
@@ -3140,9 +3140,9 @@
    "topic": "weather"
   },
   {
-   "id": "kid-weather-f88f41",
+   "id": "kid-weather-6f4776",
    "kind": "mc",
-   "prompt": "What do you call the stripes of light you see in a storm?",
+   "prompt": "What is the bright flash of light in a thunderstorm called?",
    "answer": "Lightning",
    "wrong": [
     "Sunshine",
@@ -3357,10 +3357,10 @@
    "topic": "fairy tales"
   },
   {
-   "id": "kid-tale-4ca4de",
+   "id": "kid-tale-7dcc45",
    "kind": "mc",
    "prompt": "In 'Hansel and Gretel', what was the witch's house made of?",
-   "answer": "Sweets and gingerbread",
+   "answer": "Bread, cake and sweets",
    "wrong": [
     "Ice",
     "Straw"

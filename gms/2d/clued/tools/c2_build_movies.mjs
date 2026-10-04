@@ -75,7 +75,7 @@ for (const f of usable) {
 for (const f of usable) {
   const h = hand[f.title];
   if (!h.quote) continue;
-  if (h.quote.split(/\s+/).length > 15) { note(`quote too long ${f.title}`); continue; }
+  if (h.quote.split(/\s+/).length > 10) { note(`quote too long ${f.title}`); continue; }
   if (leaks(h.quote, [f.title.replace(/\s*\(\d{4}\)$/, '')], ['star', 'wars', 'king', 'story', 'harry', 'potter', 'lord', 'rings'])) { note(`quote leaks title ${f.title}`); }
   const base = f.href || f.title;
   const res = await wikiquoteCheck([base, f.title, `${f.title} (film)`, `${f.title} (${f.year} film)`], h.quote);

@@ -1,5 +1,5 @@
 {
- "build": "202610041548",
+ "build": "202610041825",
  "themes": [
   {
    "id": "animals",
@@ -15,6 +15,7 @@
     "jellyfish",
     "mammals",
     "reptiles",
+    "sea",
     "sharks",
     "snakes",
     "spiders"
@@ -51,7 +52,32 @@
    "packs": [
     "actors",
     "movie-moments",
-    "movies"
+    "movies",
+    "tv"
+   ]
+  },
+  {
+   "id": "music",
+   "title": "Music",
+   "icon": "🎵",
+   "packs": [
+    "anthems",
+    "classical-piano",
+    "classical-recordings",
+    "hits-1960s",
+    "hits-1970s",
+    "hits-1980s",
+    "hits-1990s",
+    "hits-2000s",
+    "hits-2010s",
+    "hits-2020s",
+    "instruments",
+    "kids-film-tv",
+    "music-artists",
+    "nursery-rhymes",
+    "one-hit-wonders",
+    "pd-melodies",
+    "screen-themes"
    ]
   },
   {
@@ -59,7 +85,9 @@
    "title": "Books & words",
    "icon": "📚",
    "packs": [
-    "books"
+    "books",
+    "quotes",
+    "words"
    ]
   },
   {
@@ -77,7 +105,10 @@
    "title": "Science",
    "icon": "🔬",
    "packs": [
-    "elements"
+    "body",
+    "elements",
+    "inventions",
+    "space"
    ]
   },
   {
@@ -90,11 +121,35 @@
    ]
   },
   {
+   "id": "history",
+   "title": "History",
+   "icon": "🏛️",
+   "packs": [
+    "history"
+   ]
+  },
+  {
+   "id": "sport",
+   "title": "Sport",
+   "icon": "⚽",
+   "packs": [
+    "sport"
+   ]
+  },
+  {
+   "id": "food",
+   "title": "Food & drink",
+   "icon": "🍜",
+   "packs": [
+    "dishes"
+   ]
+  },
+  {
    "id": "general",
    "title": "General knowledge",
    "icon": "💡",
    "packs": [
-    "_dev"
+    "general"
    ]
   },
   {
@@ -104,53 +159,36 @@
    "packs": [
     "bees",
     "birds",
+    "body",
     "cats",
     "dinosaurs",
+    "dishes",
     "dogs",
     "flags",
     "flowers",
     "gems",
     "insects",
+    "inventions",
     "jellyfish",
+    "kids-nature",
+    "kids",
     "landmarks",
     "mammals",
     "reptiles",
+    "sea",
     "sharks",
     "snakes",
+    "space",
     "spiders",
-    "trees"
+    "trees",
+    "kids-film-tv",
+    "nursery-rhymes"
    ]
   }
  ],
  "packs": {
-  "_dev": {
-   "title": "Dev sampler",
-   "theme": "general",
-   "icon": "🧪",
-   "kids": false,
-   "items": 20,
-   "questions": 20,
-   "notice": "Development pack. Lane C will delete this.",
-   "caps": {
-    "img": 20,
-    "audio": 0,
-    "clues": 7,
-    "facts": {
-     "class": "cat",
-     "venomous": "bool",
-     "massKg": "num",
-     "capital": "cat",
-     "continent": "cat"
-    },
-    "groups": 2,
-    "lookalikes": 0,
-    "fakes": 2,
-    "quotes": 0,
-    "easy": 22,
-    "kidsItems": 0
-   }
-  },
   "actors": {
+   "path": "packs/actors.json",
    "title": "Actors",
    "theme": "screen",
    "icon": "🎭",
@@ -160,6 +198,8 @@
    "caps": {
     "img": 83,
     "audio": 0,
+    "itemImg": 83,
+    "itemAudio": 0,
     "clues": 84,
     "facts": {
      "born": "year",
@@ -172,11 +212,15 @@
     "lookalikes": 0,
     "fakes": 0,
     "quotes": 0,
+    "qkinds": {
+     "mc": 168
+    },
     "easy": 40,
     "kidsItems": 0
    }
   },
   "artists": {
+   "path": "packs/artists.json",
    "title": "Artists",
    "theme": "art",
    "icon": "🎨",
@@ -186,6 +230,8 @@
    "caps": {
     "img": 34,
     "audio": 0,
+    "itemImg": 34,
+    "itemAudio": 0,
     "clues": 34,
     "facts": {
      "born": "year",
@@ -198,21 +244,27 @@
     "lookalikes": 0,
     "fakes": 0,
     "quotes": 0,
-    "easy": 24,
+    "qkinds": {
+     "mc": 68
+    },
+    "easy": 30,
     "kidsItems": 0
    }
   },
   "bees": {
+   "path": "packs/bees.json",
    "title": "Wasps, bees & hornets",
    "theme": "animals",
    "icon": "🐝",
    "kids": true,
    "items": 27,
-   "questions": 10,
+   "questions": 14,
    "notice": "Not for real-world identification.",
    "caps": {
     "img": 27,
     "audio": 0,
+    "itemImg": 27,
+    "itemAudio": 0,
     "clues": 27,
     "facts": {
      "kind": "cat",
@@ -223,11 +275,17 @@
     "lookalikes": 12,
     "fakes": 6,
     "quotes": 0,
-    "easy": 11,
+    "qkinds": {
+     "number": 1,
+     "mc": 9,
+     "tf": 4
+    },
+    "easy": 15,
     "kidsItems": 6
    }
   },
   "birds": {
+   "path": "packs/birds.json",
    "title": "Birds",
    "theme": "animals",
    "icon": "🐦",
@@ -236,7 +294,9 @@
    "questions": 15,
    "caps": {
     "img": 82,
-    "audio": 30,
+    "audio": 52,
+    "itemImg": 82,
+    "itemAudio": 52,
     "clues": 82,
     "facts": {
      "region": "cat",
@@ -247,11 +307,49 @@
     "lookalikes": 33,
     "fakes": 7,
     "quotes": 0,
+    "qkinds": {
+     "mc": 12,
+     "tf": 3
+    },
     "easy": 54,
     "kidsItems": 47
    }
   },
+  "body": {
+   "path": "packs/body.json",
+   "title": "Human body",
+   "theme": "science",
+   "icon": "🫀",
+   "kids": true,
+   "items": 36,
+   "questions": 32,
+   "caps": {
+    "img": 36,
+    "audio": 0,
+    "itemImg": 36,
+    "itemAudio": 0,
+    "clues": 36,
+    "facts": {
+     "kind": "cat",
+     "system": "cat",
+     "count": "num"
+    },
+    "groups": 0,
+    "lookalikes": 6,
+    "fakes": 0,
+    "quotes": 0,
+    "qkinds": {
+     "number": 4,
+     "mc": 24,
+     "tf": 3,
+     "order": 1
+    },
+    "easy": 27,
+    "kidsItems": 18
+   }
+  },
   "books": {
+   "path": "packs/books.json",
    "title": "Famous books",
    "theme": "books",
    "icon": "📚",
@@ -261,6 +359,8 @@
    "caps": {
     "img": 0,
     "audio": 0,
+    "itemImg": 0,
+    "itemAudio": 0,
     "clues": 90,
     "facts": {
      "author": "cat",
@@ -273,11 +373,16 @@
     "lookalikes": 0,
     "fakes": 8,
     "quotes": 0,
+    "qkinds": {
+     "mc": 308,
+     "tf": 5
+    },
     "easy": 104,
     "kidsItems": 27
    }
   },
   "capitals": {
+   "path": "packs/capitals.json",
    "title": "Capitals",
    "theme": "geography",
    "icon": "🏛️",
@@ -288,6 +393,8 @@
    "caps": {
     "img": 0,
     "audio": 0,
+    "itemImg": 0,
+    "itemAudio": 0,
     "clues": 0,
     "facts": {
      "country": "text",
@@ -297,20 +404,26 @@
     "lookalikes": 0,
     "fakes": 0,
     "quotes": 0,
+    "qkinds": {
+     "mc": 338
+    },
     "easy": 120,
     "kidsItems": 0
    }
   },
   "cats": {
+   "path": "packs/cats.json",
    "title": "Cat breeds",
    "theme": "animals",
    "icon": "🐈",
    "kids": true,
    "items": 37,
-   "questions": 9,
+   "questions": 13,
    "caps": {
     "img": 37,
     "audio": 0,
+    "itemImg": 37,
+    "itemAudio": 0,
     "clues": 37,
     "facts": {
      "origin": "cat",
@@ -320,11 +433,16 @@
     "lookalikes": 34,
     "fakes": 7,
     "quotes": 0,
-    "easy": 12,
+    "qkinds": {
+     "mc": 10,
+     "tf": 3
+    },
+    "easy": 16,
     "kidsItems": 8
    }
   },
   "countries": {
+   "path": "packs/countries.json",
    "title": "Countries",
    "theme": "geography",
    "icon": "🌍",
@@ -335,6 +453,8 @@
    "caps": {
     "img": 194,
     "audio": 0,
+    "itemImg": 194,
+    "itemAudio": 0,
     "clues": 195,
     "facts": {
      "population": "num",
@@ -352,11 +472,15 @@
     "lookalikes": 0,
     "fakes": 15,
     "quotes": 0,
+    "qkinds": {
+     "mc": 202
+    },
     "easy": 77,
     "kidsItems": 0
    }
   },
   "currencies": {
+   "path": "packs/currencies.json",
    "title": "Currencies",
    "theme": "geography",
    "icon": "💱",
@@ -366,6 +490,8 @@
    "caps": {
     "img": 0,
     "audio": 0,
+    "itemImg": 0,
+    "itemAudio": 0,
     "clues": 69,
     "facts": {
      "countries": "num",
@@ -377,11 +503,17 @@
     "lookalikes": 0,
     "fakes": 0,
     "quotes": 0,
+    "qkinds": {
+     "mc": 205,
+     "number": 1,
+     "tf": 4
+    },
     "easy": 72,
     "kidsItems": 0
    }
   },
   "dinosaurs": {
+   "path": "packs/dinosaurs.json",
    "title": "Dinosaurs & prehistoric life",
    "theme": "animals",
    "icon": "🦖",
@@ -391,6 +523,8 @@
    "caps": {
     "img": 51,
     "audio": 0,
+    "itemImg": 51,
+    "itemAudio": 0,
     "clues": 51,
     "facts": {
      "period": "cat",
@@ -404,11 +538,47 @@
     "lookalikes": 29,
     "fakes": 8,
     "quotes": 0,
+    "qkinds": {
+     "mc": 7,
+     "tf": 4,
+     "order": 1
+    },
     "easy": 18,
     "kidsItems": 14
    }
   },
+  "dishes": {
+   "path": "packs/dishes.json",
+   "title": "World dishes",
+   "theme": "food",
+   "icon": "🍜",
+   "kids": true,
+   "items": 66,
+   "questions": 14,
+   "caps": {
+    "img": 66,
+    "audio": 0,
+    "itemImg": 66,
+    "itemAudio": 0,
+    "clues": 66,
+    "facts": {
+     "country": "cat",
+     "course": "cat"
+    },
+    "groups": 0,
+    "lookalikes": 4,
+    "fakes": 4,
+    "quotes": 0,
+    "qkinds": {
+     "mc": 13,
+     "tf": 1
+    },
+    "easy": 35,
+    "kidsItems": 29
+   }
+  },
   "dogs": {
+   "path": "packs/dogs.json",
    "title": "Dog breeds",
    "theme": "animals",
    "icon": "🐕",
@@ -418,6 +588,8 @@
    "caps": {
     "img": 84,
     "audio": 0,
+    "itemImg": 84,
+    "itemAudio": 0,
     "clues": 84,
     "facts": {
      "origin": "cat",
@@ -429,11 +601,16 @@
     "lookalikes": 75,
     "fakes": 8,
     "quotes": 0,
+    "qkinds": {
+     "mc": 13,
+     "tf": 1
+    },
     "easy": 37,
     "kidsItems": 30
    }
   },
   "elements": {
+   "path": "packs/elements.json",
    "title": "Chemical elements",
    "theme": "science",
    "icon": "⚗️",
@@ -443,6 +620,8 @@
    "caps": {
     "img": 77,
     "audio": 0,
+    "itemImg": 77,
+    "itemAudio": 0,
     "clues": 118,
     "facts": {
      "atomicNumber": "num",
@@ -461,11 +640,17 @@
     "lookalikes": 0,
     "fakes": 0,
     "quotes": 0,
+    "qkinds": {
+     "mc": 15,
+     "number": 1,
+     "tf": 1
+    },
     "easy": 24,
     "kidsItems": 0
    }
   },
   "explorers": {
+   "path": "packs/explorers.json",
    "title": "Explorers",
    "theme": "people",
    "icon": "🧭",
@@ -475,6 +660,8 @@
    "caps": {
     "img": 23,
     "audio": 0,
+    "itemImg": 23,
+    "itemAudio": 0,
     "clues": 23,
     "facts": {
      "born": "year",
@@ -487,20 +674,27 @@
     "lookalikes": 0,
     "fakes": 0,
     "quotes": 0,
-    "easy": 26,
+    "qkinds": {
+     "mc": 46
+    },
+    "easy": 30,
     "kidsItems": 0
    }
   },
   "flags": {
+   "path": "packs/flags.json",
    "title": "Flags",
    "theme": "geography",
    "icon": "🏳️",
    "kids": true,
-   "items": 194,
+   "items": 195,
    "questions": 32,
+   "notice": "Afghanistan’s flag is contested (two flags in use), so it appears on its learn card but not in flag questions.",
    "caps": {
     "img": 194,
     "audio": 0,
+    "itemImg": 194,
+    "itemAudio": 0,
     "clues": 0,
     "facts": {
      "continent": "cat"
@@ -509,11 +703,16 @@
     "lookalikes": 0,
     "fakes": 0,
     "quotes": 0,
+    "qkinds": {
+     "mc": 25,
+     "tf": 7
+    },
     "easy": 47,
     "kidsItems": 40
    }
   },
   "flowers": {
+   "path": "packs/flowers.json",
    "title": "Flowers",
    "theme": "nature",
    "icon": "🌸",
@@ -521,8 +720,10 @@
    "items": 50,
    "questions": 10,
    "caps": {
-    "img": 47,
+    "img": 50,
     "audio": 0,
+    "itemImg": 50,
+    "itemAudio": 0,
     "clues": 50,
     "facts": {
      "colour": "cat",
@@ -533,11 +734,16 @@
     "lookalikes": 8,
     "fakes": 6,
     "quotes": 0,
+    "qkinds": {
+     "mc": 9,
+     "tf": 1
+    },
     "easy": 28,
     "kidsItems": 23
    }
   },
   "gems": {
+   "path": "packs/gems.json",
    "title": "Gemstones & minerals",
    "theme": "nature",
    "icon": "💎",
@@ -545,8 +751,10 @@
    "items": 31,
    "questions": 12,
    "caps": {
-    "img": 30,
+    "img": 31,
     "audio": 0,
+    "itemImg": 31,
+    "itemAudio": 0,
     "clues": 31,
     "facts": {
      "kind": "cat",
@@ -558,11 +766,77 @@
     "lookalikes": 18,
     "fakes": 7,
     "quotes": 0,
+    "qkinds": {
+     "mc": 11,
+     "order": 1
+    },
     "easy": 19,
     "kidsItems": 13
    }
   },
+  "general": {
+   "path": "packs/general.json",
+   "title": "General knowledge",
+   "theme": "general",
+   "icon": "💡",
+   "kids": false,
+   "items": 0,
+   "questions": 587,
+   "caps": {
+    "img": 0,
+    "audio": 0,
+    "itemImg": 0,
+    "itemAudio": 0,
+    "clues": 0,
+    "facts": {},
+    "groups": 0,
+    "lookalikes": 0,
+    "fakes": 0,
+    "quotes": 0,
+    "qkinds": {
+     "mc": 404,
+     "number": 96,
+     "tf": 72,
+     "order": 15
+    },
+    "easy": 204,
+    "kidsItems": 0
+   }
+  },
+  "history": {
+   "path": "packs/history.json",
+   "title": "History",
+   "theme": "history",
+   "icon": "🏛️",
+   "kids": false,
+   "items": 112,
+   "questions": 248,
+   "caps": {
+    "img": 0,
+    "audio": 0,
+    "itemImg": 0,
+    "itemAudio": 0,
+    "clues": 0,
+    "facts": {
+     "year": "year",
+     "century": "cat",
+     "era": "cat"
+    },
+    "groups": 6,
+    "lookalikes": 0,
+    "fakes": 0,
+    "quotes": 0,
+    "qkinds": {
+     "mc": 139,
+     "number": 69,
+     "order": 40
+    },
+    "easy": 54,
+    "kidsItems": 0
+   }
+  },
   "insects": {
+   "path": "packs/insects.json",
    "title": "Insects",
    "theme": "animals",
    "icon": "🐞",
@@ -572,6 +846,8 @@
    "caps": {
     "img": 50,
     "audio": 0,
+    "itemImg": 50,
+    "itemAudio": 0,
     "clues": 50,
     "facts": {
      "order": "cat",
@@ -581,21 +857,61 @@
     "lookalikes": 13,
     "fakes": 6,
     "quotes": 0,
+    "qkinds": {
+     "number": 2,
+     "mc": 11,
+     "order": 1,
+     "tf": 4
+    },
     "easy": 22,
     "kidsItems": 16
    }
   },
+  "inventions": {
+   "path": "packs/inventions.json",
+   "title": "Inventions",
+   "theme": "science",
+   "icon": "💡",
+   "kids": true,
+   "items": 52,
+   "questions": 14,
+   "caps": {
+    "img": 52,
+    "audio": 0,
+    "itemImg": 52,
+    "itemAudio": 0,
+    "clues": 52,
+    "facts": {
+     "year": "year",
+     "inventor": "text",
+     "country": "cat"
+    },
+    "groups": 0,
+    "lookalikes": 0,
+    "fakes": 4,
+    "quotes": 0,
+    "qkinds": {
+     "mc": 12,
+     "order": 2
+    },
+    "easy": 27,
+    "kidsItems": 21
+   }
+  },
   "jellyfish": {
+   "path": "packs/jellyfish.json",
    "title": "Jellyfish & stingers",
    "theme": "animals",
    "icon": "🪼",
    "kids": true,
    "items": 27,
-   "questions": 10,
+   "questions": 14,
    "notice": "Not for real-world identification. If stung, get first aid and follow local advice.",
    "caps": {
-    "img": 26,
+    "img": 27,
     "audio": 0,
+    "itemImg": 27,
+    "itemAudio": 0,
     "clues": 27,
     "facts": {
      "danger": "cat",
@@ -605,11 +921,70 @@
     "lookalikes": 12,
     "fakes": 6,
     "quotes": 0,
-    "easy": 12,
+    "qkinds": {
+     "tf": 5,
+     "mc": 9
+    },
+    "easy": 16,
     "kidsItems": 7
    }
   },
+  "kids-nature": {
+   "path": "packs/kids-nature.json",
+   "title": "Kids: animals & nature",
+   "theme": "kids",
+   "icon": "🧸",
+   "kids": true,
+   "items": 0,
+   "questions": 92,
+   "caps": {
+    "img": 34,
+    "audio": 8,
+    "itemImg": 0,
+    "itemAudio": 0,
+    "clues": 0,
+    "facts": {},
+    "groups": 0,
+    "lookalikes": 0,
+    "fakes": 0,
+    "quotes": 0,
+    "qkinds": {
+     "mc": 84,
+     "tf": 8
+    },
+    "easy": 92,
+    "kidsItems": 0
+   }
+  },
+  "kids": {
+   "path": "packs/kids.json",
+   "title": "Kids quiz",
+   "theme": "kids",
+   "icon": "🧸",
+   "kids": true,
+   "items": 0,
+   "questions": 249,
+   "caps": {
+    "img": 25,
+    "audio": 0,
+    "itemImg": 0,
+    "itemAudio": 0,
+    "clues": 0,
+    "facts": {},
+    "groups": 0,
+    "lookalikes": 0,
+    "fakes": 0,
+    "quotes": 0,
+    "qkinds": {
+     "mc": 229,
+     "tf": 20
+    },
+    "easy": 214,
+    "kidsItems": 0
+   }
+  },
   "landmarks": {
+   "path": "packs/landmarks.json",
    "title": "Landmarks",
    "theme": "geography",
    "icon": "🗿",
@@ -619,6 +994,8 @@
    "caps": {
     "img": 101,
     "audio": 0,
+    "itemImg": 101,
+    "itemAudio": 0,
     "clues": 102,
     "facts": {
      "country": "cat",
@@ -630,11 +1007,15 @@
     "lookalikes": 0,
     "fakes": 0,
     "quotes": 0,
+    "qkinds": {
+     "mc": 102
+    },
     "easy": 42,
     "kidsItems": 21
    }
   },
   "languages": {
+   "path": "packs/languages.json",
    "title": "Languages",
    "theme": "geography",
    "icon": "🗣️",
@@ -645,6 +1026,8 @@
    "caps": {
     "img": 0,
     "audio": 0,
+    "itemImg": 0,
+    "itemAudio": 0,
     "clues": 60,
     "facts": {
      "family": "cat",
@@ -656,11 +1039,15 @@
     "lookalikes": 0,
     "fakes": 0,
     "quotes": 0,
-    "easy": 60,
+    "qkinds": {
+     "mc": 327
+    },
+    "easy": 68,
     "kidsItems": 0
    }
   },
   "leaders": {
+   "path": "packs/leaders.json",
    "title": "Leaders and rulers",
    "theme": "people",
    "icon": "👑",
@@ -670,6 +1057,8 @@
    "caps": {
     "img": 32,
     "audio": 0,
+    "itemImg": 32,
+    "itemAudio": 0,
     "clues": 31,
     "facts": {
      "born": "year",
@@ -682,11 +1071,15 @@
     "lookalikes": 0,
     "fakes": 0,
     "quotes": 0,
+    "qkinds": {
+     "mc": 61
+    },
     "easy": 32,
     "kidsItems": 0
    }
   },
   "mammals": {
+   "path": "packs/mammals.json",
    "title": "Mammals",
    "theme": "animals",
    "icon": "🦁",
@@ -695,7 +1088,9 @@
    "questions": 15,
    "caps": {
     "img": 79,
-    "audio": 16,
+    "audio": 19,
+    "itemImg": 79,
+    "itemAudio": 19,
     "clues": 79,
     "facts": {
      "massKg": "num",
@@ -707,11 +1102,16 @@
     "lookalikes": 42,
     "fakes": 7,
     "quotes": 0,
+    "qkinds": {
+     "mc": 13,
+     "tf": 2
+    },
     "easy": 61,
     "kidsItems": 50
    }
   },
   "movie-moments": {
+   "path": "packs/movie-moments.json",
    "title": "Movie Moments",
    "theme": "screen",
    "icon": "🎬",
@@ -722,6 +1122,8 @@
    "caps": {
     "img": 5,
     "audio": 0,
+    "itemImg": 5,
+    "itemAudio": 0,
     "clues": 0,
     "facts": {
      "year": "year",
@@ -733,21 +1135,25 @@
     "lookalikes": 0,
     "fakes": 0,
     "quotes": 0,
+    "qkinds": {},
     "easy": 4,
     "kidsItems": 3
    }
   },
   "movies": {
+   "path": "packs/movies.json",
    "title": "Movies",
    "theme": "screen",
    "icon": "🎬",
    "kids": false,
    "items": 77,
-   "questions": 333,
+   "questions": 331,
    "notice": "Box office figures are worldwide grosses, not adjusted for inflation, as listed on Wikipedia in October 2026; they include re-releases where listed.",
    "caps": {
     "img": 0,
     "audio": 0,
+    "itemImg": 0,
+    "itemAudio": 0,
     "clues": 77,
     "facts": {
      "year": "year",
@@ -761,22 +1167,29 @@
     "groups": 6,
     "lookalikes": 0,
     "fakes": 10,
-    "quotes": 47,
+    "quotes": 45,
+    "qkinds": {
+     "mc": 331
+    },
     "easy": 74,
     "kidsItems": 16
    }
   },
   "mushrooms": {
+   "path": "packs/mushrooms.json",
    "title": "Mushrooms & fungi",
    "theme": "nature",
    "icon": "🍄",
    "kids": false,
    "items": 34,
-   "questions": 10,
+   "questions": 13,
    "notice": "Never use this to forage. Many deadly mushrooms look like edible ones. Not for real-world identification.",
+   "kidsSafe": false,
    "caps": {
     "img": 34,
     "audio": 0,
+    "itemImg": 34,
+    "itemAudio": 0,
     "clues": 34,
     "facts": {
      "edibility": "cat",
@@ -786,11 +1199,16 @@
     "lookalikes": 15,
     "fakes": 6,
     "quotes": 0,
-    "easy": 13,
+    "qkinds": {
+     "tf": 5,
+     "mc": 8
+    },
+    "easy": 16,
     "kidsItems": 0
    }
   },
   "paintings": {
+   "path": "packs/paintings.json",
    "title": "Famous paintings",
    "theme": "art",
    "icon": "🖼️",
@@ -798,8 +1216,10 @@
    "items": 57,
    "questions": 114,
    "caps": {
-    "img": 57,
+    "img": 171,
     "audio": 0,
+    "itemImg": 57,
+    "itemAudio": 0,
     "clues": 56,
     "facts": {
      "artist": "cat",
@@ -810,11 +1230,15 @@
     "lookalikes": 0,
     "fakes": 0,
     "quotes": 0,
-    "easy": 27,
+    "qkinds": {
+     "mc": 114
+    },
+    "easy": 45,
     "kidsItems": 0
    }
   },
   "people": {
+   "path": "packs/people.json",
    "title": "Famous people",
    "theme": "people",
    "icon": "🧑‍🔬",
@@ -824,6 +1248,8 @@
    "caps": {
     "img": 94,
     "audio": 0,
+    "itemImg": 94,
+    "itemAudio": 0,
     "clues": 95,
     "facts": {
      "born": "year",
@@ -836,11 +1262,45 @@
     "lookalikes": 0,
     "fakes": 0,
     "quotes": 0,
+    "qkinds": {
+     "mc": 188
+    },
     "easy": 76,
     "kidsItems": 0
    }
   },
+  "quotes": {
+   "path": "packs/quotes.json",
+   "title": "Famous quotes",
+   "theme": "books",
+   "icon": "💬",
+   "kids": false,
+   "items": 82,
+   "questions": 155,
+   "notice": "Every quote is checked against Wikiquote. Famous misquotes appear as true-or-false questions.",
+   "caps": {
+    "img": 0,
+    "audio": 0,
+    "itemImg": 0,
+    "itemAudio": 0,
+    "clues": 0,
+    "facts": {
+     "field": "cat"
+    },
+    "groups": 8,
+    "lookalikes": 0,
+    "fakes": 0,
+    "quotes": 82,
+    "qkinds": {
+     "mc": 127,
+     "tf": 28
+    },
+    "easy": 38,
+    "kidsItems": 0
+   }
+  },
   "reptiles": {
+   "path": "packs/reptiles.json",
    "title": "Frogs & reptiles",
    "theme": "animals",
    "icon": "🐸",
@@ -848,8 +1308,10 @@
    "items": 36,
    "questions": 11,
    "caps": {
-    "img": 34,
+    "img": 36,
     "audio": 5,
+    "itemImg": 36,
+    "itemAudio": 5,
     "clues": 36,
     "facts": {
      "cls": "cat",
@@ -862,20 +1324,61 @@
     "lookalikes": 23,
     "fakes": 6,
     "quotes": 0,
+    "qkinds": {
+     "mc": 8,
+     "order": 1,
+     "tf": 2
+    },
     "easy": 23,
     "kidsItems": 17
    }
   },
+  "sea": {
+   "path": "packs/sea.json",
+   "title": "Sea creatures",
+   "theme": "animals",
+   "icon": "🐋",
+   "kids": true,
+   "items": 50,
+   "questions": 13,
+   "caps": {
+    "img": 50,
+    "audio": 3,
+    "itemImg": 50,
+    "itemAudio": 3,
+    "clues": 50,
+    "facts": {
+     "kind": "cat",
+     "breathesAir": "bool",
+     "lengthM": "num",
+     "status": "cat"
+    },
+    "groups": 27,
+    "lookalikes": 20,
+    "fakes": 6,
+    "quotes": 0,
+    "qkinds": {
+     "mc": 8,
+     "tf": 3,
+     "number": 2
+    },
+    "easy": 32,
+    "kidsItems": 23
+   }
+  },
   "sharks": {
+   "path": "packs/sharks.json",
    "title": "Sharks",
    "theme": "animals",
    "icon": "🦈",
    "kids": true,
    "items": 34,
-   "questions": 10,
+   "questions": 14,
    "caps": {
     "img": 34,
     "audio": 0,
+    "itemImg": 34,
+    "itemAudio": 0,
     "clues": 34,
     "facts": {
      "lengthM": "num",
@@ -887,11 +1390,16 @@
     "lookalikes": 14,
     "fakes": 7,
     "quotes": 0,
-    "easy": 11,
+    "qkinds": {
+     "mc": 11,
+     "tf": 3
+    },
+    "easy": 15,
     "kidsItems": 7
    }
   },
   "snakes": {
+   "path": "packs/snakes.json",
    "title": "Snakes",
    "theme": "animals",
    "icon": "🐍",
@@ -902,6 +1410,8 @@
    "caps": {
     "img": 78,
     "audio": 0,
+    "itemImg": 78,
+    "itemAudio": 0,
     "clues": 78,
     "facts": {
      "venomous": "bool",
@@ -914,11 +1424,52 @@
     "lookalikes": 51,
     "fakes": 10,
     "quotes": 0,
+    "qkinds": {
+     "mc": 9,
+     "tf": 4
+    },
     "easy": 21,
     "kidsItems": 17
    }
   },
+  "space": {
+   "path": "packs/space.json",
+   "title": "Space",
+   "theme": "science",
+   "icon": "🪐",
+   "kids": true,
+   "items": 52,
+   "questions": 23,
+   "caps": {
+    "img": 52,
+    "audio": 0,
+    "itemImg": 52,
+    "itemAudio": 0,
+    "clues": 52,
+    "facts": {
+     "kind": "cat",
+     "diameterKm": "num",
+     "fromSun": "num",
+     "year": "year",
+     "planetType": "cat",
+     "orbits": "cat"
+    },
+    "groups": 0,
+    "lookalikes": 17,
+    "fakes": 6,
+    "quotes": 0,
+    "qkinds": {
+     "order": 2,
+     "number": 1,
+     "mc": 18,
+     "tf": 2
+    },
+    "easy": 31,
+    "kidsItems": 19
+   }
+  },
   "spiders": {
+   "path": "packs/spiders.json",
    "title": "Spiders",
    "theme": "animals",
    "icon": "🕷️",
@@ -929,6 +1480,8 @@
    "caps": {
     "img": 43,
     "audio": 0,
+    "itemImg": 43,
+    "itemAudio": 0,
     "clues": 43,
     "facts": {
      "danger": "cat",
@@ -940,11 +1493,53 @@
     "lookalikes": 26,
     "fakes": 8,
     "quotes": 0,
+    "qkinds": {
+     "number": 1,
+     "tf": 3,
+     "mc": 6
+    },
     "easy": 20,
     "kidsItems": 15
    }
   },
+  "sport": {
+   "path": "packs/sport.json",
+   "title": "Sport",
+   "theme": "sport",
+   "icon": "⚽",
+   "kids": false,
+   "items": 120,
+   "questions": 150,
+   "caps": {
+    "img": 0,
+    "audio": 0,
+    "itemImg": 0,
+    "itemAudio": 0,
+    "clues": 0,
+    "facts": {
+     "host": "cat",
+     "winner": "cat",
+     "runnerUp": "cat",
+     "wcHost": "cat",
+     "sport": "cat",
+     "nation": "cat"
+    },
+    "groups": 4,
+    "lookalikes": 0,
+    "fakes": 0,
+    "quotes": 0,
+    "qkinds": {
+     "number": 56,
+     "mc": 84,
+     "order": 2,
+     "tf": 8
+    },
+    "easy": 59,
+    "kidsItems": 0
+   }
+  },
   "trees": {
+   "path": "packs/trees.json",
    "title": "Trees",
    "theme": "nature",
    "icon": "🌳",
@@ -954,6 +1549,8 @@
    "caps": {
     "img": 43,
     "audio": 0,
+    "itemImg": 43,
+    "itemAudio": 0,
     "clues": 43,
     "facts": {
      "region": "cat",
@@ -965,8 +1562,561 @@
     "lookalikes": 15,
     "fakes": 6,
     "quotes": 0,
+    "qkinds": {
+     "mc": 9,
+     "tf": 1
+    },
     "easy": 22,
     "kidsItems": 16
+   }
+  },
+  "tv": {
+   "path": "packs/tv.json",
+   "title": "TV shows",
+   "theme": "screen",
+   "icon": "📺",
+   "kids": false,
+   "items": 53,
+   "questions": 167,
+   "caps": {
+    "img": 0,
+    "audio": 0,
+    "itemImg": 0,
+    "itemAudio": 0,
+    "clues": 53,
+    "facts": {
+     "year": "year",
+     "country": "cat",
+     "decade": "cat",
+     "kids": "bool"
+    },
+    "groups": 8,
+    "lookalikes": 0,
+    "fakes": 0,
+    "quotes": 0,
+    "qkinds": {
+     "mc": 157,
+     "tf": 9,
+     "number": 1
+    },
+    "easy": 60,
+    "kidsItems": 12
+   }
+  },
+  "words": {
+   "path": "packs/words.json",
+   "title": "Word origins",
+   "theme": "books",
+   "icon": "🔤",
+   "kids": false,
+   "items": 70,
+   "questions": 99,
+   "notice": "Origins are checked against Wiktionary etymologies; many words passed through other languages on the way to English.",
+   "caps": {
+    "img": 0,
+    "audio": 0,
+    "itemImg": 0,
+    "itemAudio": 0,
+    "clues": 0,
+    "facts": {
+     "origin": "cat",
+     "namedAfter": "text",
+     "kind": "cat"
+    },
+    "groups": 2,
+    "lookalikes": 0,
+    "fakes": 0,
+    "quotes": 0,
+    "qkinds": {
+     "mc": 79,
+     "tf": 20
+    },
+    "easy": 36,
+    "kidsItems": 0
+   }
+  },
+  "anthems": {
+   "path": "music/anthems.json",
+   "title": "National anthems",
+   "theme": "music",
+   "icon": "🎺",
+   "kids": false,
+   "items": 173,
+   "questions": 0,
+   "caps": {
+    "img": 0,
+    "audio": 173,
+    "itemImg": 0,
+    "itemAudio": 173,
+    "clues": 0,
+    "facts": {
+     "anthem": "text",
+     "continent": "cat"
+    },
+    "groups": 7,
+    "lookalikes": 0,
+    "fakes": 0,
+    "quotes": 0,
+    "qkinds": {},
+    "easy": 15,
+    "kidsItems": 0
+   }
+  },
+  "classical-piano": {
+   "path": "music/classical-piano.json",
+   "title": "Classical on piano",
+   "theme": "music",
+   "icon": "🎹",
+   "kids": false,
+   "items": 32,
+   "questions": 0,
+   "notice": "Played on a sampled grand piano from public-domain scores.",
+   "caps": {
+    "img": 0,
+    "audio": 32,
+    "itemImg": 0,
+    "itemAudio": 32,
+    "clues": 0,
+    "facts": {
+     "composer": "cat",
+     "year": "year"
+    },
+    "groups": 18,
+    "lookalikes": 0,
+    "fakes": 0,
+    "quotes": 0,
+    "qkinds": {},
+    "easy": 15,
+    "kidsItems": 0
+   }
+  },
+  "classical-recordings": {
+   "path": "music/classical-recordings.json",
+   "title": "Classical recordings",
+   "theme": "music",
+   "icon": "🎻",
+   "kids": false,
+   "items": 18,
+   "questions": 0,
+   "caps": {
+    "img": 0,
+    "audio": 18,
+    "itemImg": 0,
+    "itemAudio": 18,
+    "clues": 0,
+    "facts": {
+     "composer": "cat",
+     "year": "year"
+    },
+    "groups": 12,
+    "lookalikes": 0,
+    "fakes": 0,
+    "quotes": 0,
+    "qkinds": {},
+    "easy": 5,
+    "kidsItems": 0
+   }
+  },
+  "hits-1960s": {
+   "path": "music/hits-1960s.json",
+   "title": "Hits of the 1960s",
+   "theme": "music",
+   "icon": "🎙️",
+   "kids": false,
+   "items": 55,
+   "questions": 0,
+   "notice": "30-second previews stream from Apple Music.",
+   "caps": {
+    "img": 0,
+    "audio": 55,
+    "itemImg": 0,
+    "itemAudio": 55,
+    "clues": 0,
+    "facts": {
+     "artist": "cat",
+     "year": "year",
+     "decade": "cat"
+    },
+    "groups": 2,
+    "lookalikes": 0,
+    "fakes": 0,
+    "quotes": 0,
+    "qkinds": {},
+    "easy": 18,
+    "kidsItems": 0
+   }
+  },
+  "hits-1970s": {
+   "path": "music/hits-1970s.json",
+   "title": "Hits of the 1970s",
+   "theme": "music",
+   "icon": "🕺",
+   "kids": false,
+   "items": 58,
+   "questions": 0,
+   "notice": "30-second previews stream from Apple Music.",
+   "caps": {
+    "img": 0,
+    "audio": 58,
+    "itemImg": 0,
+    "itemAudio": 58,
+    "clues": 0,
+    "facts": {
+     "artist": "cat",
+     "year": "year",
+     "decade": "cat"
+    },
+    "groups": 1,
+    "lookalikes": 0,
+    "fakes": 0,
+    "quotes": 0,
+    "qkinds": {},
+    "easy": 18,
+    "kidsItems": 0
+   }
+  },
+  "hits-1980s": {
+   "path": "music/hits-1980s.json",
+   "title": "Hits of the 1980s",
+   "theme": "music",
+   "icon": "📼",
+   "kids": false,
+   "items": 62,
+   "questions": 0,
+   "notice": "30-second previews stream from Apple Music.",
+   "caps": {
+    "img": 0,
+    "audio": 62,
+    "itemImg": 0,
+    "itemAudio": 62,
+    "clues": 0,
+    "facts": {
+     "artist": "cat",
+     "year": "year",
+     "decade": "cat"
+    },
+    "groups": 2,
+    "lookalikes": 0,
+    "fakes": 0,
+    "quotes": 0,
+    "qkinds": {},
+    "easy": 16,
+    "kidsItems": 0
+   }
+  },
+  "hits-1990s": {
+   "path": "music/hits-1990s.json",
+   "title": "Hits of the 1990s",
+   "theme": "music",
+   "icon": "💿",
+   "kids": false,
+   "items": 56,
+   "questions": 0,
+   "notice": "30-second previews stream from Apple Music.",
+   "caps": {
+    "img": 0,
+    "audio": 56,
+    "itemImg": 0,
+    "itemAudio": 56,
+    "clues": 0,
+    "facts": {
+     "artist": "cat",
+     "year": "year",
+     "decade": "cat"
+    },
+    "groups": 1,
+    "lookalikes": 0,
+    "fakes": 0,
+    "quotes": 0,
+    "qkinds": {},
+    "easy": 15,
+    "kidsItems": 0
+   }
+  },
+  "hits-2000s": {
+   "path": "music/hits-2000s.json",
+   "title": "Hits of the 2000s",
+   "theme": "music",
+   "icon": "📱",
+   "kids": false,
+   "items": 61,
+   "questions": 0,
+   "notice": "30-second previews stream from Apple Music.",
+   "caps": {
+    "img": 0,
+    "audio": 61,
+    "itemImg": 0,
+    "itemAudio": 61,
+    "clues": 0,
+    "facts": {
+     "artist": "cat",
+     "year": "year",
+     "decade": "cat"
+    },
+    "groups": 2,
+    "lookalikes": 0,
+    "fakes": 0,
+    "quotes": 0,
+    "qkinds": {},
+    "easy": 18,
+    "kidsItems": 0
+   }
+  },
+  "hits-2010s": {
+   "path": "music/hits-2010s.json",
+   "title": "Hits of the 2010s",
+   "theme": "music",
+   "icon": "🎧",
+   "kids": false,
+   "items": 56,
+   "questions": 0,
+   "notice": "30-second previews stream from Apple Music.",
+   "caps": {
+    "img": 0,
+    "audio": 56,
+    "itemImg": 0,
+    "itemAudio": 56,
+    "clues": 0,
+    "facts": {
+     "artist": "cat",
+     "year": "year",
+     "decade": "cat"
+    },
+    "groups": 2,
+    "lookalikes": 0,
+    "fakes": 0,
+    "quotes": 0,
+    "qkinds": {},
+    "easy": 17,
+    "kidsItems": 0
+   }
+  },
+  "hits-2020s": {
+   "path": "music/hits-2020s.json",
+   "title": "Hits of the 2020s",
+   "theme": "music",
+   "icon": "🔥",
+   "kids": false,
+   "items": 48,
+   "questions": 0,
+   "notice": "30-second previews stream from Apple Music.",
+   "caps": {
+    "img": 0,
+    "audio": 48,
+    "itemImg": 0,
+    "itemAudio": 48,
+    "clues": 0,
+    "facts": {
+     "artist": "cat",
+     "year": "year",
+     "decade": "cat"
+    },
+    "groups": 2,
+    "lookalikes": 0,
+    "fakes": 0,
+    "quotes": 0,
+    "qkinds": {},
+    "easy": 18,
+    "kidsItems": 0
+   }
+  },
+  "instruments": {
+   "path": "music/instruments.json",
+   "title": "Musical instruments",
+   "theme": "music",
+   "icon": "🎻",
+   "kids": false,
+   "items": 46,
+   "questions": 0,
+   "caps": {
+    "img": 45,
+    "audio": 46,
+    "itemImg": 45,
+    "itemAudio": 46,
+    "clues": 0,
+    "facts": {
+     "family": "cat"
+    },
+    "groups": 7,
+    "lookalikes": 0,
+    "fakes": 0,
+    "quotes": 0,
+    "qkinds": {},
+    "easy": 10,
+    "kidsItems": 0
+   }
+  },
+  "kids-film-tv": {
+   "path": "music/kids-film-tv.json",
+   "title": "Kids' film & TV songs",
+   "theme": "music",
+   "icon": "🧸",
+   "kids": true,
+   "items": 22,
+   "questions": 0,
+   "notice": "30-second previews stream from Apple Music.",
+   "caps": {
+    "img": 0,
+    "audio": 22,
+    "itemImg": 0,
+    "itemAudio": 22,
+    "clues": 0,
+    "facts": {
+     "composer": "cat",
+     "year": "year",
+     "decade": "cat",
+     "track": "text",
+     "type": "cat"
+    },
+    "groups": 2,
+    "lookalikes": 0,
+    "fakes": 0,
+    "quotes": 0,
+    "qkinds": {},
+    "easy": 22,
+    "kidsItems": 22
+   }
+  },
+  "music-artists": {
+   "path": "music/music-artists.json",
+   "title": "Music artists",
+   "theme": "music",
+   "icon": "🎤",
+   "kids": false,
+   "items": 86,
+   "questions": 0,
+   "notice": "30-second previews stream from Apple Music.",
+   "caps": {
+    "img": 0,
+    "audio": 86,
+    "itemImg": 0,
+    "itemAudio": 86,
+    "clues": 0,
+    "facts": {
+     "origin": "cat",
+     "decade": "cat",
+     "songs": "text"
+    },
+    "groups": 9,
+    "lookalikes": 0,
+    "fakes": 0,
+    "quotes": 0,
+    "qkinds": {},
+    "easy": 21,
+    "kidsItems": 0
+   }
+  },
+  "nursery-rhymes": {
+   "path": "music/nursery-rhymes.json",
+   "title": "Nursery rhymes",
+   "theme": "music",
+   "icon": "🧸",
+   "kids": true,
+   "items": 10,
+   "questions": 0,
+   "caps": {
+    "img": 0,
+    "audio": 10,
+    "itemImg": 0,
+    "itemAudio": 10,
+    "clues": 0,
+    "facts": {},
+    "groups": 0,
+    "lookalikes": 0,
+    "fakes": 0,
+    "quotes": 0,
+    "qkinds": {},
+    "easy": 10,
+    "kidsItems": 10
+   }
+  },
+  "one-hit-wonders": {
+   "path": "music/one-hit-wonders.json",
+   "title": "One-hit wonders",
+   "theme": "music",
+   "icon": "🌠",
+   "kids": false,
+   "items": 34,
+   "questions": 0,
+   "notice": "30-second previews stream from Apple Music.",
+   "caps": {
+    "img": 0,
+    "audio": 34,
+    "itemImg": 0,
+    "itemAudio": 34,
+    "clues": 0,
+    "facts": {
+     "artist": "cat",
+     "year": "year",
+     "decade": "cat"
+    },
+    "groups": 6,
+    "lookalikes": 0,
+    "fakes": 0,
+    "quotes": 0,
+    "qkinds": {},
+    "easy": 8,
+    "kidsItems": 0
+   }
+  },
+  "pd-melodies": {
+   "path": "music/pd-melodies.json",
+   "title": "Old songs & carols",
+   "theme": "music",
+   "icon": "🎼",
+   "kids": false,
+   "items": 10,
+   "questions": 0,
+   "notice": "Public-domain melodies played on a sampled piano.",
+   "caps": {
+    "img": 0,
+    "audio": 10,
+    "itemImg": 0,
+    "itemAudio": 10,
+    "clues": 0,
+    "facts": {
+     "composer": "cat",
+     "year": "year",
+     "origin": "cat"
+    },
+    "groups": 0,
+    "lookalikes": 0,
+    "fakes": 0,
+    "quotes": 0,
+    "qkinds": {},
+    "easy": 5,
+    "kidsItems": 0
+   }
+  },
+  "screen-themes": {
+   "path": "music/screen-themes.json",
+   "title": "Movie & TV themes",
+   "theme": "music",
+   "icon": "🎬",
+   "kids": false,
+   "items": 44,
+   "questions": 0,
+   "notice": "30-second previews stream from Apple Music.",
+   "caps": {
+    "img": 0,
+    "audio": 44,
+    "itemImg": 0,
+    "itemAudio": 44,
+    "clues": 0,
+    "facts": {
+     "composer": "cat",
+     "year": "year",
+     "decade": "cat",
+     "track": "text",
+     "type": "cat"
+    },
+    "groups": 2,
+    "lookalikes": 0,
+    "fakes": 0,
+    "quotes": 0,
+    "qkinds": {},
+    "easy": 9,
+    "kidsItems": 0
    }
   }
  }

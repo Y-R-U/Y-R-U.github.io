@@ -198,3 +198,6 @@ body.kids-on .kids-toggle { border-style: solid; border-color: var(--ink); backg
   .tile { min-height: 84px; }
 }
 .res-score[data-stars]::after { content: ' ⭐'; -webkit-text-stroke: 0; text-shadow: none; }
+.daily-card .d-badge.cal { display: flex; flex-direction: column; overflow: hidden; background: var(--card); place-items: stretch; }
+.daily-card .d-badge.cal b { background: var(--coral, #f25c54); color: #fff; font: 900 13px/1 var(--font-body, sans-serif); letter-spacing: .08em; padding: 5px 0 4px; text-align: center; }
+.daily-card .d-badge.cal i { flex: 1; display: grid; place-items: center; font: 400 30px/1 var(--font-display, sans-serif); font-style: normal; color: var(--ink); }

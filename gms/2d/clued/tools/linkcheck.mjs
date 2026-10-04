@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// Checks every media URL in data/packs/*.json (or the named packs). Results are cached in tools/.linkcache.json.
+// Checks every media URL in data/packs/*.json and data/music/*.json (or the named packs). Results are cached in tools/.linkcache.json.
 // Usage: node tools/linkcheck.mjs [packId…] [--fresh] [--max-age=HOURS] [--concurrency=8] [--json]
 // A URL that has failed on two separate runs is marked "mirror" (tools/mirror.mjs picks those up).
 import { readdirSync, readFileSync, writeFileSync, existsSync } from 'node:fs';
@@ -17,8 +17,9 @@ const conc = +(opt('concurrency') || 8);
 const UA = 'CluedLinkcheck/1.0 (https://y-r-u.github.io/gms/2d/clued/)';
 
 let ids = argv.filter(a => !a.startsWith('--'));
-const all = readdirSync(join(ROOT, 'data/packs')).filter(f => f.endsWith('.json')).map(f => f.replace(/\.json$/, ''));
-if (!ids.length) ids = all;
+const where = {};
+for (const dir of ['packs', 'music']) { try { for (const f of readdirSync(join(ROOT, 'data', dir))) if (f.endsWith('.json') && !f.startsWith('_')) where[f.replace(/\.json$/, '')] = `data/${dir}/${f}`; } catch {} }
+if (!ids.length) ids = Object.keys(where);
 
 const cache = existsSync(CACHE) ? JSON.parse(readFileSync(CACHE, 'utf8')) : {};
 const urls = new Map(); // url -> [where]
@@ -30,13 +31,13 @@ function collect(pack, media, where) {
   }
 }
 for (const id of ids) {
-  const p = JSON.parse(readFileSync(join(ROOT, 'data/packs', id + '.json'), 'utf8'));
+  const p = JSON.parse(readFileSync(join(ROOT, where[id] || `data/packs/${id}.json`), 'utf8'));
   for (const it of p.items || []) collect(id, it.media, it.id);
   for (const q of p.questions || []) collect(id, q.media, 'q:' + q.id);
 }
 
 async function check(url) {
-  if (url.startsWith('media/')) {
+  if (url.startsWith('media/') || url.startsWith('data/')) {
     return { ok: existsSync(join(ROOT, url)), status: existsSync(join(ROOT, url)) ? 200 : 404, ms: 0 };
   }
   const t0 = Date.now();
@@ -71,7 +72,7 @@ async function worker() {
     const prev = cache[u];
     const fails = r.ok ? 0 : (prev && !prev.ok ? (prev.fails || 1) + 1 : 1);
     cache[u] = { ...r, t: Date.now(), fails, ...(fails >= 2 ? { mirror: true } : {}) };
-    const h = u.startsWith('media/') ? 'local' : new URL(u).host;
+    const h = /^(media|data)\//.test(u) ? 'local' : new URL(u).host;
     (hostT[h] ||= []).push(r.ms);
     if (++done % 100 === 0) process.stderr.write(`  ${done}/${todo.length}\n`);
   }

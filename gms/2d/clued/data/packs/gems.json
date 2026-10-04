@@ -5,6 +5,9 @@
  "icon": "💎",
  "kids": true,
  "version": 1,
+ "imgPrompt": "Which of these is {lname}?",
+ "nameImgPrompt": "Which gem or mineral is this?",
+ "tfImgPrompt": "This is {lname}.",
  "leakExempt": [
   "stone",
   "gem",
@@ -20,17 +23,26 @@
     "Organic",
     "Rock",
     "Metal"
-   ]
+   ],
+   "ask": "What kind of thing is {lname}?",
+   "askReverse": "Which of these is a {lvalue}?",
+   "stmt": "{name} is a {lvalue}."
   },
   "colour": {
    "type": "cat",
-   "label": "Best-known colour"
+   "label": "Best-known colour",
+   "ask": "What colour is {lname} best known for?",
+   "stmt": "{name} is best known in {lvalue}.",
+   "exclusive": false
   },
   "mohs": {
    "type": "num",
    "label": "Mohs hardness",
    "unit": "",
-   "higherLabel": "Harder"
+   "higherLabel": "Harder",
+   "askHigh": "Which of these is the hardest?",
+   "askLow": "Which of these is the softest?",
+   "minRatio": 1.3
   },
   "birthstone": {
    "type": "cat",
@@ -48,7 +60,10 @@
     "October",
     "November",
     "December"
-   ]
+   ],
+   "ask": "{name} is a birthstone for which month?",
+   "askReverse": "Which of these is a birthstone for {value}?",
+   "stmt": "{name} is a birthstone for {value}."
   }
  },
  "items": [
@@ -69,13 +84,14 @@
     "Its Mohs hardness is the top of the scale.",
     "The Cullinan, found in 1905, is the largest gem-quality one ever found.",
     "It is made of pure carbon, like pencil lead.",
+    "It is a gemstone.",
     "It is best known in colourless.",
     "Its Mohs hardness is about 10.",
     "It is a birthstone for April.",
     "It is the hardest natural material.",
     "It is the stone in most engagement rings.",
     "The answer is one word of 7 letters.",
-    "It starts with the letter D."
+    "Its first letter is D."
    ],
    "media": {
     "img": [
@@ -86,14 +102,6 @@
       "credit": "DGPC/ADF Luísa Oliveira",
       "license": "CC0 1.0",
       "page": "https://commons.wikimedia.org/wiki/File:Rough_Diamond.jpg"
-     },
-     {
-      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/3/39/Diamond_%28side_view%29.png/500px-Diamond_%28side_view%29.png",
-      "w": 500,
-      "h": 375,
-      "credit": "Pavel.Somov",
-      "license": "CC BY 4.0",
-      "page": "https://commons.wikimedia.org/wiki/File:Diamond_(side_view).png"
      }
     ]
    },
@@ -117,13 +125,14 @@
     "It is the same mineral as sapphire.",
     "Its colour comes from chromium.",
     "The first laser in 1960 used a crystal of it.",
+    "It is a gemstone.",
     "It is best known in red.",
     "Its Mohs hardness is about 9.",
     "It is a birthstone for July.",
     "Dorothy's slippers in the \"Wizard of Oz\" film are named after it.",
     "It is a red gemstone.",
     "The answer is one word of 4 letters.",
-    "It starts with the letter R."
+    "Its first letter is R."
    ],
    "media": {
     "img": [
@@ -165,13 +174,14 @@
     "Red forms of the same mineral are called something else.",
     "Princess Diana's engagement ring has a big one.",
     "It is used in tough watch glass.",
+    "It is a gemstone.",
     "It is best known in blue.",
     "Its Mohs hardness is about 9.",
     "It is a birthstone for September.",
     "Queensland and Sri Lanka are famous sources.",
     "It is a famous blue gemstone.",
     "The answer is one word of 8 letters.",
-    "It starts with the letter S."
+    "Its first letter is S."
    ],
    "media": {
     "img": [
@@ -213,24 +223,17 @@
     "It is a kind of beryl.",
     "Most have tiny flaws called \"jardin\", meaning garden.",
     "Colombia is famous for the best ones.",
+    "It is a gemstone.",
     "It is best known in green.",
     "Its Mohs hardness is about 8.",
     "It is a birthstone for May.",
     "Cleopatra loved it.",
     "It is a deep green gemstone.",
     "The answer is one word of 7 letters.",
-    "It starts with the letter E."
+    "Its first letter is E."
    ],
    "media": {
     "img": [
-     {
-      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/a/a6/Emerald_cut.png/500px-Emerald_cut.png",
-      "w": 500,
-      "h": 369,
-      "credit": "Jan Arkesteijn",
-      "license": "Public domain",
-      "page": "https://commons.wikimedia.org/wiki/File:Emerald_cut.png"
-     },
      {
       "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/d/df/B%C3%A9ryl_var._%C3%A9meraude_sur_gangue_%28Muzo_Mine_Boyaca_-_Colombie%29_2.jpg/500px-B%C3%A9ryl_var._%C3%A9meraude_sur_gangue_%28Muzo_Mine_Boyaca_-_Colombie%29_2.jpg",
       "w": 500,
@@ -261,13 +264,14 @@
     "Its name means \"not drunk\" in ancient Greek.",
     "Heating it can turn it yellow.",
     "Big geodes lined with it come from Brazil and Uruguay.",
+    "It is a gemstone.",
     "It is best known in purple.",
     "Its Mohs hardness is about 7.",
     "It is a birthstone for February.",
     "It is a kind of quartz.",
     "It is a purple gemstone.",
     "The answer is one word of 8 letters.",
-    "It starts with the letter A."
+    "Its first letter is A."
    ],
    "media": {
     "img": [
@@ -305,12 +309,13 @@
     "It is used as the number 8 on the Mohs scale.",
     "Most blue ones are treated with heat and radiation.",
     "Imperial ones are golden-orange.",
+    "It is a gemstone.",
     "It is best known in blue.",
     "Its Mohs hardness is about 8.",
     "It is a birthstone for November.",
     "Its name has five letters and starts with T.",
     "The answer is one word of 5 letters.",
-    "It starts with the letter T."
+    "Its first letter is T."
    ],
    "media": {
     "img": [
@@ -348,13 +353,14 @@
     "It contains water.",
     "Coober Pedy residents live underground to mine it.",
     "Its flashes of colour are called \"play of colour\".",
+    "It is a gemstone.",
     "It is best known in multicoloured.",
     "Its Mohs hardness is about 6.",
     "It is a birthstone for October.",
     "Australia mines almost all of the world's supply.",
     "It flashes all the colours of the rainbow.",
     "The answer is one word of 4 letters.",
-    "It starts with the letter O."
+    "Its first letter is O."
    ],
    "media": {
     "img": [
@@ -392,13 +398,14 @@
     "Most sold today are farmed.",
     "It dissolves in vinegar.",
     "Layers of nacre build it up.",
+    "It is an organic gem.",
     "It is best known in white.",
     "Its Mohs hardness is about 3.",
     "It is a birthstone for June.",
     "It forms inside an oyster.",
     "It is a shiny white gem from the sea.",
     "The answer is one word of 5 letters.",
-    "It starts with the letter P."
+    "Its first letter is P."
    ],
    "media": {
     "img": [
@@ -409,14 +416,6 @@
       "credit": "MASAYUKI KATO",
       "license": "CC BY-SA 3.0",
       "page": "https://commons.wikimedia.org/wiki/File:Various_pearls.jpg"
-     },
-     {
-      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/0/0f/1665_Girl_with_a_Pearl_Earring.jpg/500px-1665_Girl_with_a_Pearl_Earring.jpg",
-      "w": 500,
-      "h": 592,
-      "credit": "Johannes Vermeer",
-      "license": "Public domain",
-      "page": "https://commons.wikimedia.org/wiki/File:1665_Girl_with_a_Pearl_Earring.jpg"
      }
     ]
    },
@@ -443,12 +442,13 @@
     "Its name covers two different minerals.",
     "It is extremely tough and hard to break.",
     "Ancient Chinese emperors were buried in suits of it.",
+    "It is a gemstone.",
     "It is best known in green.",
     "Its Mohs hardness is about 6.5.",
     "Māori carve it into pendants called pounamu.",
     "It is a green stone prized in China.",
     "The answer is one word of 4 letters.",
-    "It starts with the letter J."
+    "Its first letter is J."
    ],
    "media": {
     "img": [
@@ -489,13 +489,14 @@
     "Tutankhamun's mask is inlaid with it.",
     "It contains copper.",
     "It is prized in Native American jewellery.",
+    "It is a gemstone.",
     "It is best known in blue.",
     "Its Mohs hardness is about 5.5.",
     "It is a birthstone for December.",
     "A colour is named after it.",
     "It is a sky-blue stone.",
     "The answer is one word of 9 letters.",
-    "It starts with the letter T."
+    "Its first letter is T."
    ],
    "media": {
     "img": [
@@ -536,12 +537,13 @@
     "Its crystals are often twelve-sided.",
     "It is used to make sandpaper.",
     "Its name comes from the Latin for pomegranate.",
+    "It is a gemstone.",
     "It is best known in red.",
     "Its Mohs hardness is about 7.",
     "It is a birthstone for January.",
     "It is a deep red gemstone.",
     "The answer is one word of 6 letters.",
-    "It starts with the letter G."
+    "Its first letter is G."
    ],
    "media": {
     "img": [
@@ -583,22 +585,31 @@
     "It is the same mineral as emerald.",
     "Sailors carried it for luck at sea.",
     "Its crystals can be huge.",
+    "It is a gemstone.",
     "It is best known in blue.",
     "Its Mohs hardness is about 7.5.",
     "It is a birthstone for March.",
     "Its name means \"sea water\".",
     "The answer is one word of 10 letters.",
-    "It starts with the letter A."
+    "Its first letter is A."
    ],
    "media": {
     "img": [
      {
-      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/8/81/%D0%A2%D0%B5%D0%BF%D0%BB%D0%BE%D1%85%D0%BE%D0%B4_%D0%90%D0%BA%D0%B2%D0%B0%D0%BC%D0%B0%D1%80%D0%B8%D0%BD.png/500px-%D0%A2%D0%B5%D0%BF%D0%BB%D0%BE%D1%85%D0%BE%D0%B4_%D0%90%D0%BA%D0%B2%D0%B0%D0%BC%D0%B0%D1%80%D0%B8%D0%BD.png",
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/7/7f/Fancy_cut_aquamarine_1.jpg/500px-Fancy_cut_aquamarine_1.jpg",
       "w": 500,
       "h": 333,
-      "credit": "Никита Державин",
+      "credit": "W.carter",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Fancy_cut_aquamarine_1.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/0/07/Dom_Pedro_Aquamarine.jpg/500px-Dom_Pedro_Aquamarine.jpg",
+      "w": 500,
+      "h": 592,
+      "credit": "General Kipicus",
       "license": "CC0 1.0",
-      "page": "https://commons.wikimedia.org/wiki/File:%D0%A2%D0%B5%D0%BF%D0%BB%D0%BE%D1%85%D0%BE%D0%B4_%D0%90%D0%BA%D0%B2%D0%B0%D0%BC%D0%B0%D1%80%D0%B8%D0%BD.png"
+      "page": "https://commons.wikimedia.org/wiki/File:Dom_Pedro_Aquamarine.jpg"
      }
     ]
    },
@@ -621,13 +632,14 @@
     "It has been found in meteorites.",
     "It forms deep in the Earth's mantle.",
     "Hawaii has green beaches made of it.",
+    "It is a gemstone.",
     "It is best known in green.",
     "Its Mohs hardness is about 6.5.",
     "It is a birthstone for August.",
     "It is a kind of olivine.",
     "It is lime green.",
     "The answer is one word of 7 letters.",
-    "It starts with the letter P."
+    "Its first letter is P."
    ],
    "media": {
     "img": [
@@ -669,11 +681,12 @@
     "Much of it is heated amethyst.",
     "It is a kind of quartz.",
     "It is a birthstone for November.",
+    "It is a gemstone.",
     "It is best known in yellow.",
     "Its Mohs hardness is about 7.",
     "It is yellow to orange.",
     "The answer is one word of 7 letters.",
-    "It starts with the letter C."
+    "Its first letter is C."
    ],
    "media": {
     "img": [
@@ -716,12 +729,13 @@
     "It was ground to make ultramarine paint.",
     "It has golden flecks of pyrite.",
     "It was mined in Afghanistan for 6,000 years.",
+    "It is a rock.",
     "It is best known in blue.",
     "Its Mohs hardness is about 5.5.",
     "Tutankhamun's mask contains it.",
     "It is a deep blue rock.",
     "The answer has 2 words (5, 6 letters).",
-    "It starts with the letter L."
+    "Its first letter is L."
    ],
    "media": {
     "img": [
@@ -759,13 +773,34 @@
     "It is a kind of feldspar.",
     "Its glow is called adularescence.",
     "It is a birthstone for June.",
+    "It is a gemstone.",
     "It is best known in white.",
     "Its Mohs hardness is about 6.",
     "It has a soft, floating blue glow.",
     "It is named after something in the night sky.",
     "The answer is one word of 9 letters.",
-    "It starts with the letter M."
+    "Its first letter is M."
    ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/6/6b/MoonstoneGem.jpg/500px-MoonstoneGem.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Meganpru",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:MoonstoneGem.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/8/84/Feldspar-Group-Moonstone-36971.jpg/500px-Feldspar-Group-Moonstone-36971.jpg",
+      "w": 500,
+      "h": 445,
+      "credit": "Robert M. Lavinsky",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Feldspar-Group-Moonstone-36971.jpg"
+     }
+    ]
+   },
    "difficulty": 2
   },
   {
@@ -786,13 +821,14 @@
     "It was discovered in 1967.",
     "Tiffany & Co. named it.",
     "It looks different colours from different angles.",
+    "It is a gemstone.",
     "It is best known in violet-blue.",
     "Its Mohs hardness is about 6.5.",
     "It is a birthstone for December.",
     "It is found only near Mount Kilimanjaro.",
     "It is named after an African country.",
     "The answer is one word of 9 letters.",
-    "It starts with the letter T."
+    "Its first letter is T."
    ],
    "media": {
     "img": [
@@ -821,11 +857,12 @@
     "Its shine is called chatoyancy.",
     "It is a kind of quartz.",
     "Much of it comes from South Africa.",
+    "It is a gemstone.",
     "It is best known in golden brown.",
     "Its Mohs hardness is about 7.",
     "Its bands shine as it moves.",
     "The answer has 2 words (6, 3 letters).",
-    "It starts with the letter T."
+    "Its first letter is T."
    ],
    "media": {
     "img": [
@@ -866,12 +903,13 @@
     "It was ground into green paint and eye make-up.",
     "It is a copper mineral.",
     "A room in the Winter Palace is covered in it.",
+    "It is a mineral.",
     "It is best known in green.",
     "Its Mohs hardness is about 3.75.",
     "It has swirling light and dark bands.",
     "It is bright green.",
     "The answer is one word of 9 letters.",
-    "It starts with the letter M."
+    "Its first letter is M."
    ],
    "media": {
     "img": [
@@ -908,12 +946,13 @@
     "Its edges can be sharper than steel scalpels.",
     "The Aztecs used it for blades.",
     "It forms when lava cools very fast.",
+    "It is a rock.",
     "It is best known in black.",
     "Its Mohs hardness is about 5.5.",
     "It is a natural glass.",
     "It is shiny and black.",
     "The answer is one word of 8 letters.",
-    "It starts with the letter O."
+    "Its first letter is O."
    ],
    "media": {
     "img": [
@@ -955,13 +994,17 @@
    ],
    "blurb": "One of the most common minerals on Earth. Tiny quartz crystals keep time in watches.",
    "clues": [
+    "It is made of silicon and oxygen.",
+    "Some watches use it to keep time.",
+    "It is very common.",
     "It is number 7 on the Mohs scale.",
-    "Sand is mostly made of it.",
+    "It is a mineral.",
     "It is best known in colourless.",
     "Its Mohs hardness is about 7.",
+    "Sand is mostly made of it.",
     "Amethyst and citrine are kinds of it.",
     "The answer is one word of 6 letters.",
-    "It starts with the letter Q."
+    "Its first letter is Q."
    ],
    "media": {
     "img": [
@@ -972,14 +1015,6 @@
       "credit": "Didier Descouens",
       "license": "CC BY-SA 4.0",
       "page": "https://commons.wikimedia.org/wiki/File:Quartz_Br%C3%A9sil.jpg"
-     },
-     {
-      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/14/Quartz%2C_Tibet.jpg/500px-Quartz%2C_Tibet.jpg",
-      "w": 500,
-      "h": 501,
-      "credit": "JJ Harrison (https://www.jjharrison.com.au/)",
-      "license": "CC BY-SA 2.5",
-      "page": "https://commons.wikimedia.org/wiki/File:Quartz,_Tibet.jpg"
      }
     ]
    },
@@ -1002,11 +1037,12 @@
     "It rarely forms clear crystals.",
     "It is often carved into beads.",
     "Its colour can fade in strong sunlight.",
+    "It is a mineral.",
     "It is best known in pink.",
     "Its Mohs hardness is about 7.",
     "It is pale pink.",
     "The answer has 2 words (4, 6 letters).",
-    "It starts with the letter R."
+    "Its first letter is R."
    ],
    "media": {
     "img": [
@@ -1043,12 +1079,13 @@
     "Rubbing it makes static electricity; \"electric\" comes from its Greek name.",
     "It floats in salty water.",
     "It is fossilised tree resin.",
+    "It is an organic gem.",
     "It is best known in orange.",
     "Its Mohs hardness is about 2.25.",
     "Insects can be trapped inside it.",
     "It is golden orange.",
     "The answer is one word of 5 letters.",
-    "It starts with the letter A."
+    "Its first letter is A."
    ],
    "media": {
     "img": [
@@ -1089,11 +1126,16 @@
    ],
    "blurb": "A shiny gold-coloured mineral that fooled miners into thinking they had found gold.",
    "clues": [
+    "Its name comes from the Greek word for fire.",
+    "It is brassy yellow.",
+    "Its crystals are shiny.",
+    "It is a common mineral, not a metal.",
+    "It is a mineral.",
+    "Its Mohs hardness is about 6.25.",
     "It can make sparks when struck.",
     "It often forms perfect cubes.",
-    "Its Mohs hardness is about 6.25.",
     "The answer is one word of 6 letters.",
-    "It starts with the letter P."
+    "Its first letter is P."
    ],
    "media": {
     "img": [
@@ -1104,14 +1146,6 @@
       "credit": "Ivar Leidus",
       "license": "CC BY-SA 4.0",
       "page": "https://commons.wikimedia.org/wiki/File:Pyrite_-_Huanzala_mine,_Huallanca,_Bolognesi,_Ancash,_Peru.jpg"
-     },
-     {
-      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/4/43/Pyrit_01.jpg/500px-Pyrit_01.jpg",
-      "w": 500,
-      "h": 375,
-      "credit": "Uoaei1",
-      "license": "CC BY-SA 4.0",
-      "page": "https://commons.wikimedia.org/wiki/File:Pyrit_01.jpg"
      }
     ]
    },
@@ -1136,11 +1170,12 @@
     "Its chemical symbol is Au.",
     "One gram can be hammered into a sheet about a square metre.",
     "The biggest nugget, the \"Welcome Stranger\", was found in Victoria.",
+    "It is a metal.",
     "Its Mohs hardness is about 2.75.",
     "It never rusts or tarnishes.",
     "Olympic winners get a medal of it.",
     "The answer is one word of 4 letters.",
-    "It starts with the letter G."
+    "Its first letter is G."
    ],
    "media": {
     "img": [
@@ -1151,14 +1186,6 @@
       "credit": "Alchemist-hp (talk) www.pse-mendelejew.de",
       "license": "CC BY-SA 3.0 de",
       "page": "https://commons.wikimedia.org/wiki/File:Gold-crystals.jpg"
-     },
-     {
-      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/5/56/The_Sounds_of_Earth_Record_Cover_-_GPN-2000-001978.jpg/500px-The_Sounds_of_Earth_Record_Cover_-_GPN-2000-001978.jpg",
-      "w": 500,
-      "h": 500,
-      "credit": "NASA/JPL",
-      "license": "Public domain",
-      "page": "https://commons.wikimedia.org/wiki/File:The_Sounds_of_Earth_Record_Cover_-_GPN-2000-001978.jpg"
      }
     ]
    },
@@ -1180,12 +1207,13 @@
     "Its name comes from the Greek for blood.",
     "It leaves a red-brown streak.",
     "It has been found on Mars.",
+    "It is a mineral.",
     "It is best known in silver-grey.",
     "Its Mohs hardness is about 5.75.",
     "It is the main ore of iron.",
     "It looks shiny and metallic grey.",
     "The answer is one word of 8 letters.",
-    "It starts with the letter H."
+    "Its first letter is H."
    ],
    "media": {
     "img": [
@@ -1221,12 +1249,13 @@
    "clues": [
     "It is number 4 on the Mohs scale.",
     "It is used to make steel.",
+    "It is a mineral.",
     "It is best known in purple.",
     "Its Mohs hardness is about 4.",
     "It often forms cubes.",
     "It glows under ultraviolet light.",
     "The answer is one word of 8 letters.",
-    "It starts with the letter F."
+    "Its first letter is F."
    ],
    "media": {
     "img": [
@@ -1263,11 +1292,12 @@
     "It is number 3 on the Mohs scale.",
     "A clear piece makes things behind it look double.",
     "It fizzes in weak acid.",
+    "It is a mineral.",
     "It is best known in white.",
     "Its Mohs hardness is about 3.",
     "Limestone, chalk and marble are made of it.",
     "The answer is one word of 7 letters.",
-    "It starts with the letter C."
+    "Its first letter is C."
    ],
    "media": {
     "img": [
@@ -1308,12 +1338,13 @@
     "It is number 2 on the Mohs scale.",
     "You can scratch it with a fingernail.",
     "It is used to make plaster of Paris.",
+    "It is a mineral.",
     "It is best known in white.",
     "Its Mohs hardness is about 2.",
     "Giant crystals of it grow in a Mexican cave.",
     "It is a soft white mineral.",
     "The answer is one word of 6 letters.",
-    "It starts with the letter G."
+    "Its first letter is G."
    ],
    "media": {
     "img": [
@@ -1324,14 +1355,6 @@
       "credit": "Didier Descouens",
       "license": "CC BY-SA 4.0",
       "page": "https://commons.wikimedia.org/wiki/File:Gypse_Caresse.jpg"
-     },
-     {
-      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/6/66/Gypsum_-_Sieroszowice_mine%2C_Lubin%2C_Lower_Silesia%2C_Poland.jpg/500px-Gypsum_-_Sieroszowice_mine%2C_Lubin%2C_Lower_Silesia%2C_Poland.jpg",
-      "w": 500,
-      "h": 417,
-      "credit": "Ivar Leidus",
-      "license": "CC BY-SA 4.0",
-      "page": "https://commons.wikimedia.org/wiki/File:Gypsum_-_Sieroszowice_mine,_Lubin,_Lower_Silesia,_Poland.jpg"
      }
     ]
    },
@@ -1350,12 +1373,13 @@
     "Soapstone is mostly made of it.",
     "It feels soapy or greasy.",
     "It is ground into baby powder.",
+    "It is a mineral.",
     "It is best known in white.",
     "Its Mohs hardness is about 1.",
     "It is number 1 on the Mohs scale.",
     "It is the softest mineral.",
     "The answer is one word of 4 letters.",
-    "It starts with the letter T."
+    "Its first letter is T."
    ],
    "media": {
     "img": [
@@ -1394,11 +1418,12 @@
    "clues": [
     "It forms cubes.",
     "It dissolves in water.",
+    "It is a mineral.",
     "It is best known in colourless.",
     "Its Mohs hardness is about 2.5.",
     "It is spread on icy roads.",
     "The answer is one word of 6 letters.",
-    "It starts with the letter H."
+    "Its first letter is H."
    ],
    "media": {
     "img": [

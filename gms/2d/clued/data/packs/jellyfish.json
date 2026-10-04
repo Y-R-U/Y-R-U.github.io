@@ -6,6 +6,9 @@
  "kids": true,
  "version": 1,
  "notice": "Not for real-world identification. If stung, get first aid and follow local advice.",
+ "imgPrompt": "Which of these is {aName}?",
+ "nameImgPrompt": "What is this sea creature?",
+ "tfImgPrompt": "This is {aName}.",
  "leakExempt": [
   "jellyfish",
   "jelly"
@@ -19,11 +22,17 @@
     "Mild sting",
     "Painful sting",
     "Potentially deadly"
-   ]
+   ],
+   "ask": "How bad is a sting from the {lname}?",
+   "askReverse": "Which of these has a sting rated \"{lvalue}\"?",
+   "stmt": "The {lname}'s sting is rated \"{lvalue}\"."
   },
   "kind": {
    "type": "cat",
-   "label": "Kind of animal"
+   "label": "Kind of animal",
+   "ask": "What kind of animal is the {lname}?",
+   "askReverse": "Which of these is a {lvalue}?",
+   "stmt": "The {lname} is a kind of {lvalue}."
   }
  },
  "items": [
@@ -54,10 +63,26 @@
     "Its venom can kill a person.",
     "Its bell is shaped like a cube.",
     "The answer has 2 words (3, 9 letters).",
-    "It starts with the letter B."
+    "Its first letter is B."
    ],
    "media": {
     "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/b/bc/Avispa_marina_cropped.png/500px-Avispa_marina_cropped.png",
+      "w": 500,
+      "h": 634,
+      "credit": "Avispa marina.jpg: Guido Gautsch, Toyota, Japan derivative work: Mithril (talk)",
+      "license": "CC BY-SA 2.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Avispa_marina_cropped.png"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/a/ac/Cubozoa_Lebenszyklus.png/500px-Cubozoa_Lebenszyklus.png",
+      "w": 500,
+      "h": 352,
+      "credit": "Shao at Ukrainian Wikipedia/ text Perhelion at German Wikipedia",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Cubozoa_Lebenszyklus.png"
+     },
      {
       "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/157640089/medium.jpeg",
       "w": 500,
@@ -96,7 +121,7 @@
     "It is named after an Aboriginal people from near Cairns.",
     "It is a tiny but very dangerous jellyfish.",
     "The answer has 2 words (9, 9 letters).",
-    "It starts with the letter I."
+    "Its first letter is I."
    ],
    "media": {
     "img": [
@@ -148,10 +173,18 @@
     "It is named after an old sailing warship.",
     "It comes from a country next to Spain.",
     "The answer has 4 words (10, 3, 1, 3 letters).",
-    "It starts with the letter P."
+    "Its first letter is P."
    ],
    "media": {
     "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/c/c3/Portuguese_Man-O-War_%28Physalia_physalis%29.jpg/330px-Portuguese_Man-O-War_%28Physalia_physalis%29.jpg",
+      "w": 330,
+      "h": 452,
+      "credit": "Image courtesy of Islands in the Sea 2002, NOAA/OER.",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Portuguese_Man-O-War_(Physalia_physalis).jpg"
+     },
      {
       "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/544306293/medium.jpg",
       "w": 488,
@@ -167,14 +200,6 @@
       "credit": "Jan Ebr &amp; Ivana Ebrová",
       "license": "CC BY 4.0",
       "page": "https://www.inaturalist.org/photos/183028065"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/31588251/medium.jpeg",
-      "w": 500,
-      "h": 375,
-      "credit": "Георгий Виноградов (Georgy Vinogradov)",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/31588251"
      }
     ]
    },
@@ -207,7 +232,7 @@
     "Thousands wash up on Australian beaches after north-east winds.",
     "It is named after a blue glass container.",
     "The answer is one word of 10 letters.",
-    "It starts with the letter B."
+    "Its first letter is B."
    ],
    "media": {
     "img": [
@@ -266,33 +291,33 @@
     "It is clear and saucer-shaped.",
     "It is named after something in the night sky.",
     "The answer has 2 words (4, 9 letters).",
-    "It starts with the letter M."
+    "Its first letter is M."
    ],
    "media": {
     "img": [
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/2915596/medium.JPG",
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/7/7c/Vandmaend.jpg/500px-Vandmaend.jpg",
       "w": 500,
       "h": 375,
-      "credit": "Floyd A. Reed",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/2915596"
+      "credit": "Wikimedia Commons",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Vandmaend.jpg"
      },
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/17663444/medium.jpeg",
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/4/4e/Moon_Jellyfish_%2814278816210%29.jpg/500px-Moon_Jellyfish_%2814278816210%29.jpg",
       "w": 500,
-      "h": 375,
-      "credit": "mfeaver",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/17663444"
+      "h": 558,
+      "credit": "Paul VanDerWerf from Brunswick, Maine, USA",
+      "license": "CC BY 2.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Moon_Jellyfish_(14278816210).jpg"
      },
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/44516705/medium.jpeg",
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/f/f9/Aurelia_aurita_%28Cnidaria%29_Luc_Viatour.jpg/500px-Aurelia_aurita_%28Cnidaria%29_Luc_Viatour.jpg",
       "w": 500,
-      "h": 375,
-      "credit": "Micha Baum",
-      "license": "CC BY-SA 4.0",
-      "page": "https://www.inaturalist.org/photos/44516705"
+      "h": 333,
+      "credit": "Luc Viatour",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Aurelia_aurita_(Cnidaria)_Luc_Viatour.jpg"
      }
     ]
    },
@@ -321,7 +346,7 @@
     "It is the largest known jellyfish.",
     "Its tentacles look like the hairy neck of a big cat.",
     "The answer has 3 words (5, 4, 9 letters).",
-    "It starts with the letter L."
+    "Its first letter is L."
    ],
    "media": {
     "img": [
@@ -373,7 +398,7 @@
     "Its bell has 16 brown V-shaped marks.",
     "It is named after a tool for finding north.",
     "The answer has 2 words (7, 9 letters).",
-    "It starts with the letter C."
+    "Its first letter is C."
    ],
    "media": {
     "img": [
@@ -428,7 +453,7 @@
     "Its sting is weak.",
     "It is named after a wooden container for wine.",
     "The answer has 2 words (6, 9 letters).",
-    "It starts with the letter B."
+    "Its first letter is B."
    ],
    "media": {
     "img": [
@@ -480,18 +505,10 @@
     "It lies on the sea floor.",
     "It rests the wrong way up.",
     "The answer has 3 words (6, 4, 9 letters).",
-    "It starts with the letter U."
+    "Its first letter is U."
    ],
    "media": {
     "img": [
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/179161047/medium.jpg",
-      "w": 500,
-      "h": 200,
-      "credit": "no rights reserved",
-      "license": "CC0 1.0",
-      "page": "https://www.inaturalist.org/photos/179161047"
-     },
      {
       "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/32969688/medium.jpeg",
       "w": 500,
@@ -507,6 +524,14 @@
       "credit": "Sarah Faulwetter",
       "license": "CC BY 4.0",
       "page": "https://www.inaturalist.org/photos/385582737"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/348456955/medium.jpeg",
+      "w": 375,
+      "h": 500,
+      "credit": "Alex Doyle",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/348456955"
      }
     ]
    },
@@ -532,8 +557,28 @@
     "It can restart its life cycle.",
     "It is said it may never die of old age.",
     "The answer has 2 words (8, 9 letters).",
-    "It starts with the letter I."
+    "Its first letter is I."
    ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/b/b0/Turritopsis_dohrnii_%28cropped%29.jpg",
+      "w": 500,
+      "h": 500,
+      "credit": "Bachware",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Turritopsis_dohrnii_(cropped).jpg"
+     },
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/7/74/Turritopsis_dohrnii.jpg",
+      "w": 500,
+      "h": 320,
+      "credit": "Bachware",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Turritopsis_dohrnii.jpg"
+     }
+    ]
+   },
    "difficulty": 2
   },
   {
@@ -558,7 +603,7 @@
     "It has a yellow dome in the middle.",
     "It looks like a breakfast food.",
     "The answer has 3 words (5, 3, 9 letters).",
-    "It starts with the letter F."
+    "Its first letter is F."
    ],
    "media": {
     "img": [
@@ -608,7 +653,7 @@
     "Swarms of it close Mediterranean beaches.",
     "It is a pinkish-purple colour.",
     "The answer has 2 words (5, 7 letters).",
-    "It starts with the letter M."
+    "Its first letter is M."
    ],
    "media": {
     "img": [
@@ -643,6 +688,7 @@
   {
    "id": "pacific-sea-nettle",
    "name": "Pacific sea nettle",
+   "lname": "Pacific sea nettle",
    "alt": [
     "sea nettle"
    ],
@@ -663,7 +709,7 @@
     "Its bell is golden-brown.",
     "It is named after a stinging plant.",
     "The answer has 3 words (7, 3, 6 letters).",
-    "It starts with the letter P."
+    "Its first letter is P."
    ],
    "media": {
     "img": [
@@ -716,7 +762,7 @@
     "Its sting is mild.",
     "Its name sounds like whale fat.",
     "The answer has 3 words (4, 7, 9 letters).",
-    "It starts with the letter B."
+    "Its first letter is B."
    ],
    "media": {
     "img": [
@@ -773,7 +819,7 @@
     "It is harmless to people.",
     "It is pushed around by moving air.",
     "The answer has 4 words (2, 3, 4, 6 letters).",
-    "It starts with the letter B."
+    "Its first letter is B."
    ],
    "media": {
     "img": [
@@ -828,7 +874,7 @@
     "Its sting is mild.",
     "It is round and small, like a fastener on a shirt.",
     "The answer has 2 words (4, 6 letters).",
-    "It starts with the letter B."
+    "Its first letter is B."
    ],
    "media": {
     "img": [
@@ -880,7 +926,7 @@
     "It lives off the west coast of North America.",
     "It is almost totally see-through, like glass.",
     "The answer has 2 words (7, 5 letters).",
-    "It starts with the letter C."
+    "Its first letter is C."
    ],
    "media": {
     "img": [
@@ -932,7 +978,7 @@
     "Tourists snorkel among them.",
     "They are a yellow colour.",
     "The answer has 2 words (6, 9 letters).",
-    "It starts with the letter G."
+    "Its first letter is G."
    ],
    "media": {
     "img": [
@@ -984,7 +1030,7 @@
     "It is common off Georgia and Florida.",
     "It is named after an old iron ball fired from guns.",
     "The answer has 2 words (10, 9 letters).",
-    "It starts with the letter C."
+    "Its first letter is C."
    ],
    "media": {
     "img": [
@@ -1042,10 +1088,26 @@
     "It is the most venomous fish in the world.",
     "It looks just like a rock.",
     "The answer is one word of 9 letters.",
-    "It starts with the letter S."
+    "Its first letter is S."
    ],
    "media": {
     "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/5/57/Stone_Fish_at_AQWA_SMC2006.jpg/500px-Stone_Fish_at_AQWA_SMC2006.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "SeanMack",
+      "license": "CC BY 2.5",
+      "page": "https://commons.wikimedia.org/wiki/File:Stone_Fish_at_AQWA_SMC2006.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/7/75/Ichthyologie%3B_ou%2C_Histoire_naturelle_des_poissons_%28Plate_183%29_%286918426608%29.jpg/500px-Ichthyologie%3B_ou%2C_Histoire_naturelle_des_poissons_%28Plate_183%29_%286918426608%29.jpg",
+      "w": 500,
+      "h": 294,
+      "credit": "Bloch, Marcus Elieser",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Ichthyologie;_ou,_Histoire_naturelle_des_poissons_(Plate_183)_(6918426608).jpg"
+     },
      {
       "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/127651323/medium.jpeg",
       "w": 500,
@@ -1053,22 +1115,6 @@
       "credit": "Ewout Knoester",
       "license": "CC BY-SA 4.0",
       "page": "https://www.inaturalist.org/photos/127651323"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/199611213/medium.jpeg",
-      "w": 500,
-      "h": 375,
-      "credit": "Ewout Knoester",
-      "license": "CC BY-SA 4.0",
-      "page": "https://www.inaturalist.org/photos/199611213"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/253038608/medium.jpeg",
-      "w": 375,
-      "h": 500,
-      "credit": "Debra Baker",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/253038608"
      }
     ]
    },
@@ -1099,10 +1145,26 @@
     "Its sting is very painful.",
     "It is named after a big cat with a mane.",
     "The answer has 2 words (3, 8 letters).",
-    "It starts with the letter R."
+    "Its first letter is R."
    ],
    "media": {
     "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/b/bf/Pterois_volitans_Manado-e_edit.jpg/500px-Pterois_volitans_Manado-e_edit.jpg",
+      "w": 500,
+      "h": 362,
+      "credit": "Photo by Jens Petersen, Edited by User:Olegiwit (cloned in part of fins) and Fir0002 (r…",
+      "license": "CC BY 2.5",
+      "page": "https://commons.wikimedia.org/wiki/File:Pterois_volitans_Manado-e_edit.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/7/70/Red_Lionfish_Pterois_volitans_Left_Side_2460px.jpg/500px-Red_Lionfish_Pterois_volitans_Left_Side_2460px.jpg",
+      "w": 500,
+      "h": 407,
+      "credit": "Photo by and (C)2007 Derek Ramsey (Ram-Man)",
+      "license": "CC BY-SA 2.5",
+      "page": "https://commons.wikimedia.org/wiki/File:Red_Lionfish_Pterois_volitans_Left_Side_2460px.jpg"
+     },
      {
       "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/70521568/medium.png",
       "w": 500,
@@ -1110,22 +1172,6 @@
       "credit": "Jens Petersen",
       "license": "CC BY 4.0",
       "page": "https://www.inaturalist.org/photos/70521568"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/113880693/medium.jpg",
-      "w": 500,
-      "h": 375,
-      "credit": "no rights reserved",
-      "license": "CC0 1.0",
-      "page": "https://www.inaturalist.org/photos/113880693"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/439718648/medium.jpeg",
-      "w": 500,
-      "h": 377,
-      "credit": "Dan Schofield",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/439718648"
      }
     ]
    },
@@ -1152,10 +1198,18 @@
     "Its venom can kill a person.",
     "It lives in rock pools in Australia and Asia.",
     "The answer has 3 words (4, 6, 7 letters).",
-    "It starts with the letter B."
+    "Its first letter is B."
    ],
    "media": {
     "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/f/f2/Hapalochlaena_lunulata2.JPG/500px-Hapalochlaena_lunulata2.JPG",
+      "w": 500,
+      "h": 628,
+      "credit": "Jens Petersen",
+      "license": "CC BY 2.5",
+      "page": "https://commons.wikimedia.org/wiki/File:Hapalochlaena_lunulata2.JPG"
+     },
      {
       "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/40594012/medium.jpg",
       "w": 500,
@@ -1171,14 +1225,6 @@
       "credit": "Kai Squires",
       "license": "CC BY 4.0",
       "page": "https://www.inaturalist.org/photos/60648752"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/257441934/medium.jpg",
-      "w": 375,
-      "h": 500,
-      "credit": "Nadezhda Bortnikova",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/257441934"
      }
     ]
    },
@@ -1208,7 +1254,7 @@
     "Collectors are stung picking up its shell.",
     "It is named after the study of maps.",
     "The answer has 2 words (9, 4 letters).",
-    "It starts with the letter G."
+    "Its first letter is G."
    ],
    "media": {
     "img": [
@@ -1260,7 +1306,7 @@
     "It is covered in sharp venomous spines.",
     "It is named after something worn by Jesus at the crucifixion.",
     "The answer has 4 words (5, 2, 6, 8 letters).",
-    "It starts with the letter C."
+    "Its first letter is C."
    ],
    "media": {
     "img": [
@@ -1311,7 +1357,7 @@
     "Divers get stung when they brush against it.",
     "Its sting feels like a burn.",
     "The answer has 2 words (4, 5 letters).",
-    "It starts with the letter F."
+    "Its first letter is F."
    ],
    "media": {
     "img": [
@@ -1363,7 +1409,7 @@
     "Its body is covered in bright blue spots.",
     "Its tail has blue stripes on the sides.",
     "The answer has 3 words (11, 10, 3 letters).",
-    "It starts with the letter B."
+    "Its first letter is B."
    ],
    "media": {
     "img": [
@@ -1419,7 +1465,7 @@
     "It is harmless to people.",
     "It is not a true jellyfish.",
     "The answer has 3 words (5, 4, 5 letters).",
-    "It starts with the letter W."
+    "Its first letter is W."
    ],
    "media": {
     "img": [
@@ -1567,6 +1613,48 @@
    ],
    "explain": "GFP from the crystal jelly earned the 2008 Nobel Prize in Chemistry.",
    "difficulty": 3
+  },
+  {
+   "id": "q11",
+   "kind": "tf",
+   "prompt": "Jellyfish are mostly made of water.",
+   "answer": true,
+   "explain": "They are about 95% water.",
+   "difficulty": 1
+  },
+  {
+   "id": "q12",
+   "kind": "mc",
+   "prompt": "What should you do if you find a jellyfish on the beach?",
+   "answer": "Leave it alone",
+   "wrong": [
+    "Pick it up",
+    "Poke it with your foot",
+    "Take it home"
+   ],
+   "explain": "Even washed-up jellyfish can still sting.",
+   "difficulty": 1
+  },
+  {
+   "id": "q13",
+   "kind": "tf",
+   "prompt": "Some jellyfish can glow in the dark.",
+   "answer": true,
+   "explain": "Many jellyfish make their own light.",
+   "difficulty": 1
+  },
+  {
+   "id": "q14",
+   "kind": "mc",
+   "prompt": "What part of a jellyfish stings?",
+   "answer": "Its tentacles",
+   "wrong": [
+    "Its teeth",
+    "Its fins",
+    "Its shell"
+   ],
+   "explain": "Tentacles are covered in tiny stinging cells.",
+   "difficulty": 1
   }
  ],
  "fakes": [

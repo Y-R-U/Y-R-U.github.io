@@ -13,7 +13,7 @@ export function answer(rec, correct, today, weight = 1) {
   return r;
 }
 
-export const effective = (rec, card) => Math.min(rec?.s || 0, card ? BOX_SCORE[Math.min(card.b || 0, BOX_SCORE.length - 1)] : 0);
+export const effective = (rec, card) => Math.max(rec?.s || 0, card ? BOX_SCORE[Math.min(card.b || 0, BOX_SCORE.length - 1)] : 0);
 
 // 0 unseen, 1 seen, 2 learning, 3 mastered
 export function level(rec, card) {

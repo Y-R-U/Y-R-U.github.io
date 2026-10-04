@@ -138,6 +138,17 @@ async function main() {
       }
     }
   }
+  for (const p of packs.filter((x) => !x.items.some((i) => i.lyrics))) {
+    const qs = listen.generate({ rng: mulberry32(7), packs: [p], count: 4, opts: { grow: 'on' }, difficulty: 0 });
+    for (const q of qs) {
+      if (q.stages !== 5 || q.data.stageLens.length !== 5) fail(`${p.id} ${q.id}: grow mode needs stages 5`);
+      if (q.data.stageLens.some((x, i, a) => i && x < a[i - 1])) fail(`${p.id} ${q.id}: stage lengths must grow`);
+    }
+    const off = listen.generate({ rng: mulberry32(7), packs: [p], count: 2, opts: {}, difficulty: 0 });
+    if (off.some((q) => q.stages)) fail(`${p.id}: stages without grow (solo default must be off)`);
+    const online = listen.generate({ rng: mulberry32(7), packs: [p], count: 2, opts: {}, difficulty: 0, spec: { online: true } });
+    if (online.some((q) => !q.stages)) fail(`${p.id}: online rooms should grow by default`);
+  }
   console.log('ok   listen generate');
   console.log(fails ? `\n${fails} FAILED, ${warns} warnings` : `\nall passed (${warns} warnings)`);
   process.exit(fails ? 1 : 0);

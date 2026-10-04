@@ -1,6 +1,6 @@
 // Sampled piano: Salamander Grand Piano V3 (Alexander Holm, CC BY 3.0), every minor third A0..C7, two velocity layers.
 // Plays note JSON: { title, composer, bpm, notes: [[beat, midi, beats, vel], ...], pedal? }
-import { getCtx, buses, reverbIR } from './ctx.js?v=1';
+import { getCtx, buses, reverbIR, begin, end } from './ctx.js?v=1';
 
 const ROOT = new URL('../../audio/piano/', import.meta.url);
 const NAMES = ['C', 'Cs', 'D', 'Ds', 'E', 'F', 'Fs', 'G', 'Gs', 'A', 'As', 'B'];
@@ -120,15 +120,29 @@ export async function play(piece, opts = {}) {
   const io = chain(c, out);
   const t0 = c.currentTime + (opts.lead ?? 0.06);
   const pedal = !!piece.pedal;
-  const voices = [];
+  let voices = [];
+  const todo = [];
   for (const [b, m, d, v = 80] of piece.notes) {
     const ts = b * k;
     if (ts < from - 0.001 || ts >= until) continue;
-    const sm = nearest(m), buf = await buffers.get(sm + layerOf(v));
-    let dur = Math.max(0.08, d * k * (pedal ? 1.15 : 0.96));
-    dur = Math.min(dur, until - ts + 0.4);
-    voices.push(voice(c, io, buf, m, sm, t0 + ts - from, dur, v, pedal ? 0.6 : 0.3));
+    todo.push([ts, m, d, v, await buffers.get(nearest(m) + layerOf(v))]);
   }
+  todo.sort((a, b) => a[0] - b[0]);
+  let next = 0, pumpId = 0;
+  // long pieces are scheduled a few seconds ahead instead of building thousands of nodes up front
+  const pump = (ahead) => {
+    const horizon = c.currentTime - t0 + from + ahead;
+    while (next < todo.length && todo[next][0] < horizon) {
+      const [ts, m, d, v, buf] = todo[next++];
+      let dur = Math.max(0.08, d * k * (pedal ? 1.15 : 0.96));
+      dur = Math.min(dur, until - ts + 0.4);
+      voices.push(voice(c, io, buf, m, nearest(m), t0 + ts - from, dur, v, pedal ? 0.6 : 0.3));
+    }
+    if (voices.length > 400) voices = voices.slice(-200);
+    if (next >= todo.length) clearInterval(pumpId);
+  };
+  if (opts.ctx || todo.length < 300) pump(Infinity);
+  else { pump(8); pumpId = setInterval(() => pump(8), 2000); }
   const len = Math.min(until, duration(piece)) - from;
   if (opts.seconds) {
     const fe = t0 + opts.seconds;
@@ -141,6 +155,7 @@ export async function play(piece, opts = {}) {
     elapsed: () => Math.max(0, c.currentTime - t0),
     stop(fade = 0.12) {
       if (stopped) return; stopped = true;
+      clearInterval(pumpId);
       const n = c.currentTime;
       out.gain.cancelScheduledValues(n); out.gain.setValueAtTime(out.gain.value, n);
       out.gain.linearRampToValueAtTime(0, n + fade);
@@ -148,7 +163,16 @@ export async function play(piece, opts = {}) {
     },
     done: null,
   };
-  h.done = new Promise((res) => setTimeout(res, (len + 0.5) * 1000 + 60));
+  h.done = new Promise((res) => { h._res = res; setTimeout(res, (len + 0.5) * 1000 + 60); });
+  if (!opts.ctx && !opts.bgm) {
+    const tag = 'piano' + Math.random().toString(36).slice(2);
+    begin(tag);
+    let over = false;
+    const fin = () => { if (!over) { over = true; end(tag); } };
+    h.done.then(fin);
+    const st = h.stop;
+    h.stop = (f) => { st(f); fin(); h._res(); };
+  }
   return h;
 }
 

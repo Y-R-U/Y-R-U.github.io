@@ -29,3 +29,10 @@ export function ladderBanked(rungsCleared) {
   for (const i of LADDER_SAFE) if (rungsCleared > i) banked = LADDER_RUNGS[i];
   return banked;
 }
+
+// Progressive questions (CONTRACT "Progressive stages"): 1 at stage 0 down to 0.4 at the last stage. The server uses the same rule.
+export const stageMultiplier = (stage, n) => (n > 1 ? 1 - 0.6 * Math.min(Math.max(0, stage), n - 1) / (n - 1) : 1);
+// Progressive timing: initial = answer time × 1.5 (min 10 s); each advance extends to max(deadline, now + max(5 s, answer/2)); cap 90 s.
+export const progressiveLimit = answerMs => Math.max(10000, Math.round(answerMs * 1.5));
+export const stageExtendMs = answerMs => Math.max(5000, Math.round(answerMs / 2));
+export const PROGRESSIVE_CAP = 90000;

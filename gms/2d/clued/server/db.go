@@ -3,6 +3,7 @@ package main
 import (
 	"database/sql"
 	"log"
+	"strings"
 
 	_ "modernc.org/sqlite"
 )
@@ -76,6 +77,11 @@ CREATE INDEX IF NOT EXISTS idx_scores_board ON challenge_scores(challenge_id, sc
 CREATE INDEX IF NOT EXISTS idx_challenges_touched ON challenges(touched);
 `
 
+// Columns added after the first release, one ALTER each.
+var migrations = []string{
+	`ALTER TABLE challenge_scores ADD COLUMN detail TEXT NOT NULL DEFAULT ''`, // per-question [correct, stage, ms]
+}
+
 func openDB(path string) {
 	var err error
 	db, err = sql.Open("sqlite", path+"?_pragma=busy_timeout(5000)&_pragma=journal_mode(WAL)&_pragma=foreign_keys(1)&_pragma=synchronous(NORMAL)&_txlock=immediate")
@@ -85,6 +91,11 @@ func openDB(path string) {
 	db.SetMaxOpenConns(1)
 	if _, err := db.Exec(schema); err != nil {
 		log.Fatalf("schema: %v", err)
+	}
+	for _, m := range migrations {
+		if _, err := db.Exec(m); err != nil && !strings.Contains(err.Error(), "duplicate column") {
+			log.Fatalf("migrate %q: %v", m, err)
+		}
 	}
 }
 

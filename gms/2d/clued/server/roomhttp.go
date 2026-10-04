@@ -667,3 +667,28 @@ func resetPublicCache() {
 	pubCache.body = nil
 	pubCache.Unlock()
 }
+
+func handleVote(w http.ResponseWriter, r *http.Request) {
+	if !allow(r, "answer") {
+		rateLimited(w)
+		return
+	}
+	var in struct {
+		Key       string `json:"key"`
+		PlayerKey string `json:"playerKey"`
+		Q         int    `json:"q"`
+	}
+	if !readJSON(w, r, smallBody, &in) {
+		return
+	}
+	if in.Key == "" {
+		in.Key = in.PlayerKey
+	}
+	withPlayer(w, r.PathValue("code"), in.Key, func(room *Room, p *Player) {
+		if code := room.vote(p, in.Q); code != "" {
+			writeErr(w, 409, code, strings.ReplaceAll(code, "_", " "))
+			return
+		}
+		writeJSON(w, 200, room.stateFor(p))
+	})
+}

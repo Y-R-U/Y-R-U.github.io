@@ -48,7 +48,7 @@
      "difficulty": 3
     },
     {
-     "text": "Now this is not the end. It is not even the beginning of the end. But it is, perhaps, the end of the beginning.",
+     "text": "It is not even the beginning of the end.",
      "context": "After victory at El Alamein, 1942",
      "source": "https://en.wikiquote.org/wiki/Winston_Churchill",
      "difficulty": 3
@@ -116,7 +116,7 @@
      "difficulty": 2
     },
     {
-     "text": "We choose to go to the Moon in this decade and do the other things, not because they are easy, but because they are hard",
+     "text": "We choose to go to the Moon",
      "context": "A 1962 speech at Rice University",
      "source": "https://en.wikiquote.org/wiki/John_F._Kennedy",
      "difficulty": 2
@@ -147,7 +147,7 @@
      "difficulty": 2
     },
     {
-     "text": "Darkness cannot drive out darkness; only light can do that. Hate cannot drive out hate; only love can do that.",
+     "text": "Darkness cannot drive out darkness; only light can do that.",
      "context": "Strength to Love, 1963",
      "source": "https://en.wikiquote.org/wiki/Martin_Luther_King_Jr.",
      "difficulty": 2
@@ -1262,12 +1262,6 @@
      "context": "The slogan on posters in Nineteen Eighty-Four",
      "source": "https://en.wikiquote.org/wiki/Nineteen_Eighty-Four",
      "difficulty": 1
-    },
-    {
-     "text": "All animals are equal, but some animals are more equal than others.",
-     "context": "The pigs' rewritten rule in Animal Farm",
-     "source": "https://en.wikiquote.org/wiki/Animal_Farm",
-     "difficulty": 2
     }
    ],
    "blurb": "George Orwell: “Big Brother is watching you” (The slogan on posters in Nineteen Eighty-Four).",
@@ -1917,7 +1911,7 @@
   {
    "id": "who-winston-churchill-4",
    "kind": "mc",
-   "prompt": "Who said or wrote: “Now this is not the end. It is not even the beginning of the end. But it is, perhaps, the end of the beginning.”",
+   "prompt": "Who said or wrote: “It is not even the beginning of the end.”",
    "answer": "Winston Churchill",
    "wrong": [
     "Douglas MacArthur",
@@ -2029,7 +2023,7 @@
   {
    "id": "who-john-f-kennedy-2",
    "kind": "mc",
-   "prompt": "Who said or wrote: “We choose to go to the Moon in this decade and do the other things, not because they are easy, but because they are hard”",
+   "prompt": "Who said or wrote: “We choose to go to the Moon”",
    "answer": "John F. Kennedy",
    "wrong": [
     "Barack Obama",
@@ -2077,7 +2071,7 @@
   {
    "id": "who-martin-luther-king-jr-2",
    "kind": "mc",
-   "prompt": "Who said or wrote: “Darkness cannot drive out darkness; only light can do that. Hate cannot drive out hate; only love can do that.”",
+   "prompt": "Who said or wrote: “Darkness cannot drive out darkness; only light can do that.”",
    "answer": "Martin Luther King Jr.",
    "wrong": [
     "Rosa Parks",
@@ -3355,30 +3349,14 @@
    ]
   },
   {
-   "id": "who-george-orwell-1",
-   "kind": "mc",
-   "prompt": "Who said or wrote: “All animals are equal, but some animals are more equal than others.”",
-   "answer": "George Orwell",
-   "wrong": [
-    "Lord Acton",
-    "Oscar Wilde",
-    "Alexander Pope"
-   ],
-   "explain": "George Orwell: The pigs' rewritten rule in Animal Farm.",
-   "difficulty": 2,
-   "refs": [
-    "quotes/george-orwell"
-   ]
-  },
-  {
    "id": "who-charles-dickens-0",
    "kind": "mc",
    "prompt": "Who said or wrote: “Please, sir, I want some more.”",
    "answer": "Charles Dickens",
    "wrong": [
-    "Alfred, Lord Tennyson",
-    "Samuel Taylor Coleridge",
-    "Herman Melville"
+    "Lord Acton",
+    "Oscar Wilde",
+    "Alexander Pope"
    ],
    "explain": "Charles Dickens: Oliver asks for more gruel in Oliver Twist.",
    "difficulty": 1,
@@ -3392,9 +3370,9 @@
    "prompt": "Who said or wrote: “God bless Us, Every One!”",
    "answer": "Charles Dickens",
    "wrong": [
-    "William Shakespeare",
-    "Horace",
-    "Walt Whitman"
+    "Alfred, Lord Tennyson",
+    "Samuel Taylor Coleridge",
+    "Herman Melville"
    ],
    "explain": "Charles Dickens: Tiny Tim in A Christmas Carol.",
    "difficulty": 1,
@@ -3408,9 +3386,9 @@
    "prompt": "Who said or wrote: “Curiouser and curiouser!”",
    "answer": "Lewis Carroll",
    "wrong": [
-    "Walt Whitman",
-    "Robert Burns",
-    "Samuel Johnson"
+    "William Shakespeare",
+    "Horace",
+    "Walt Whitman"
    ],
    "explain": "Lewis Carroll: Alice in Alice's Adventures in Wonderland.",
    "difficulty": 2,
@@ -3424,9 +3402,9 @@
    "prompt": "Who said or wrote: “Off with her head!”",
    "answer": "Lewis Carroll",
    "wrong": [
-    "William Wordsworth",
-    "Oscar Wilde",
-    "Walt Whitman"
+    "Walt Whitman",
+    "Robert Burns",
+    "Samuel Johnson"
    ],
    "explain": "Lewis Carroll: The Queen of Hearts in Alice's Adventures in Wonderland.",
    "difficulty": 1,
@@ -3440,9 +3418,9 @@
    "prompt": "Who said or wrote: “We're all mad here.”",
    "answer": "Lewis Carroll",
    "wrong": [
-    "Walt Whitman",
-    "Samuel Johnson",
-    "Arthur Conan Doyle"
+    "William Wordsworth",
+    "Oscar Wilde",
+    "Walt Whitman"
    ],
    "explain": "Lewis Carroll: The Cheshire Cat in Alice's Adventures in Wonderland.",
    "difficulty": 2,
@@ -3456,8 +3434,8 @@
    "prompt": "Who said or wrote: “It is a truth universally acknowledged, that a single man in possession of a good fortune, must be in want of a wife.”",
    "answer": "Jane Austen",
    "wrong": [
-    "Juvenal",
-    "Herman Melville",
+    "Walt Whitman",
+    "Samuel Johnson",
     "Arthur Conan Doyle"
    ],
    "explain": "Jane Austen: The opening of Pride and Prejudice.",
@@ -3472,9 +3450,9 @@
    "prompt": "Who said or wrote: “Call me Ishmael.”",
    "answer": "Herman Melville",
    "wrong": [
-    "Mark Twain",
-    "George Orwell",
-    "Christopher Marlowe"
+    "Juvenal",
+    "Jane Austen",
+    "Arthur Conan Doyle"
    ],
    "explain": "Herman Melville: The opening of Moby-Dick.",
    "difficulty": 2,
@@ -3488,9 +3466,9 @@
    "prompt": "Who said or wrote: “When you have eliminated the impossible, whatever remains, however improbable, must be the truth”",
    "answer": "Arthur Conan Doyle",
    "wrong": [
-    "Lewis Carroll",
-    "Charles Dickens",
-    "John Donne"
+    "Mark Twain",
+    "George Orwell",
+    "Christopher Marlowe"
    ],
    "explain": "Arthur Conan Doyle: Sherlock Holmes in The Sign of the Four, 1890.",
    "difficulty": 2,
@@ -3504,8 +3482,8 @@
    "prompt": "Who said or wrote: “There is grandeur in this view of life”",
    "answer": "Charles Darwin",
    "wrong": [
-    "Thomas Edison",
-    "Isaac Newton",
+    "Marie Curie",
+    "Hippocrates",
     "Archimedes"
    ],
    "explain": "Charles Darwin: The closing passage of On the Origin of Species, 1859.",
@@ -3520,9 +3498,9 @@
    "prompt": "Who said or wrote: “Annus horribilis”",
    "answer": "Queen Elizabeth II",
    "wrong": [
-    "Patrick Henry",
-    "Franklin D. Roosevelt",
-    "Napoleon"
+    "Napoleon",
+    "Thomas Jefferson",
+    "Franklin D. Roosevelt"
    ],
    "explain": "Queen Elizabeth II: Looking back on a bad year for the royal family, 1992.",
    "difficulty": 3,
@@ -3536,9 +3514,9 @@
    "prompt": "Who said or wrote: “I declare before you all that my whole life whether it be long or short shall be devoted to your service”",
    "answer": "Queen Elizabeth II",
    "wrong": [
-    "Mao Zedong",
-    "Douglas MacArthur",
-    "John F. Kennedy"
+    "Nelson Mandela",
+    "Abraham Lincoln",
+    "Richard Nixon"
    ],
    "explain": "Queen Elizabeth II: Her 21st birthday broadcast, 1947.",
    "difficulty": 3,
@@ -3552,9 +3530,9 @@
    "prompt": "Who said or wrote: “Mr. Watson, come here, I want to see you.”",
    "answer": "Alexander Graham Bell",
    "wrong": [
-    "Carl Sagan",
-    "Isaac Newton",
-    "Charles Darwin"
+    "Albert Einstein",
+    "Thomas Edison",
+    "Marie Curie"
    ],
    "explain": "Alexander Graham Bell: The first words spoken over his telephone, 1876.",
    "difficulty": 2,
@@ -3568,9 +3546,9 @@
    "prompt": "Who said or wrote: “What hath God wrought”",
    "answer": "Samuel Morse",
    "wrong": [
-    "Hippocrates",
-    "Marie Curie",
-    "Isaac Newton"
+    "Isaac Newton",
+    "Albert Einstein",
+    "Alexander Graham Bell"
    ],
    "explain": "Samuel Morse: The first long-distance telegraph message, 1844.",
    "difficulty": 3,
@@ -3584,9 +3562,9 @@
    "prompt": "Who said or wrote: “The only tired I was, was tired of giving in”",
    "answer": "Rosa Parks",
    "wrong": [
-    "Frederick Douglass",
+    "Helen Keller",
     "Susan B. Anthony",
-    "Malala Yousafzai"
+    "Martin Luther King Jr."
    ],
    "explain": "Rosa Parks: Recalling why she refused to give up her bus seat in 1955.",
    "difficulty": 3,
@@ -3600,9 +3578,9 @@
    "prompt": "Who said or wrote: “Failure is impossible.”",
    "answer": "Susan B. Anthony",
    "wrong": [
-    "Frederick Douglass",
-    "Martin Luther King Jr.",
-    "Malala Yousafzai"
+    "Rosa Parks",
+    "Malala Yousafzai",
+    "Helen Keller"
    ],
    "explain": "Susan B. Anthony: Her last public words, 1906.",
    "difficulty": 3,
@@ -3616,9 +3594,9 @@
    "prompt": "Who said or wrote: “Alone we can do so little; together we can do so much.”",
    "answer": "Helen Keller",
    "wrong": [
+    "Martin Luther King Jr.",
     "Susan B. Anthony",
-    "Rosa Parks",
-    "Martin Luther King Jr."
+    "Malala Yousafzai"
    ],
    "explain": "Helen Keller: On working together.",
    "difficulty": 2,
@@ -3633,8 +3611,8 @@
    "answer": "Aristotle",
    "wrong": [
     "Jean-Jacques Rousseau",
-    "Francis Bacon",
-    "Sun Tzu"
+    "Socrates",
+    "Francis Bacon"
    ],
    "explain": "Aristotle: His Politics.",
    "difficulty": 3,
@@ -3648,9 +3626,9 @@
    "prompt": "Who said or wrote: “Seize the day”",
    "answer": "Horace",
    "wrong": [
-    "Mark Twain",
-    "Christopher Marlowe",
-    "Alexander Pope"
+    "Walt Whitman",
+    "Arthur Conan Doyle",
+    "Jane Austen"
    ],
    "explain": "Horace: Carpe diem, from his Odes.",
    "difficulty": 2,
@@ -3664,9 +3642,9 @@
    "prompt": "Who said or wrote: “Man is born free, and everywhere he is in chains.”",
    "answer": "Jean-Jacques Rousseau",
    "wrong": [
-    "Karl Marx",
+    "Francis Bacon",
     "René Descartes",
-    "Friedrich Nietzsche"
+    "Socrates"
    ],
    "explain": "Jean-Jacques Rousseau: The opening of The Social Contract, 1762.",
    "difficulty": 2,
@@ -3680,9 +3658,9 @@
    "prompt": "Who said or wrote: “Look on my works, ye Mighty, and despair!”",
    "answer": "Percy Bysshe Shelley",
    "wrong": [
-    "William Wordsworth",
-    "Horace",
-    "Samuel Taylor Coleridge"
+    "Alexander Pope",
+    "Juvenal",
+    "Lord Acton"
    ],
    "explain": "Percy Bysshe Shelley: The inscription in his poem Ozymandias, 1818.",
    "difficulty": 2,
@@ -3696,9 +3674,9 @@
    "prompt": "Who said or wrote: “I wandered lonely as a cloud”",
    "answer": "William Wordsworth",
    "wrong": [
-    "Alfred, Lord Tennyson",
-    "Charles Dickens",
-    "Emma Lazarus"
+    "Percy Bysshe Shelley",
+    "Horace",
+    "Samuel Taylor Coleridge"
    ],
    "explain": "William Wordsworth: His poem about daffodils, 1807.",
    "difficulty": 2,
@@ -3712,9 +3690,9 @@
    "prompt": "Who said or wrote: “'Tis better to have loved and lost Than never to have loved at all.”",
    "answer": "Alfred, Lord Tennyson",
    "wrong": [
-    "Horace",
-    "Christopher Marlowe",
-    "Robert Burns"
+    "William Wordsworth",
+    "Charles Dickens",
+    "Emma Lazarus"
    ],
    "explain": "Alfred, Lord Tennyson: In Memoriam A.H.H., 1850.",
    "difficulty": 2,
@@ -3728,8 +3706,8 @@
    "prompt": "Who said or wrote: “Water, water, every where, Nor any drop to drink.”",
    "answer": "Samuel Taylor Coleridge",
    "wrong": [
-    "Percy Bysshe Shelley",
-    "Herman Melville",
+    "Horace",
+    "Christopher Marlowe",
     "Robert Burns"
    ],
    "explain": "Samuel Taylor Coleridge: The Rime of the Ancient Mariner, 1798.",
@@ -3744,9 +3722,9 @@
    "prompt": "Who said or wrote: “Two roads diverged in a wood”",
    "answer": "Robert Frost",
    "wrong": [
-    "Samuel Johnson",
-    "Arthur Conan Doyle",
-    "Alexander Pope"
+    "Percy Bysshe Shelley",
+    "Herman Melville",
+    "Robert Burns"
    ],
    "explain": "Robert Frost: The Road Not Taken, 1916.",
    "difficulty": 2,
@@ -3762,7 +3740,7 @@
    "wrong": [
     "Samuel Johnson",
     "Arthur Conan Doyle",
-    "Oscar Wilde"
+    "Alexander Pope"
    ],
    "explain": "Walt Whitman: His elegy for Abraham Lincoln, 1865.",
    "difficulty": 2,
@@ -3776,9 +3754,9 @@
    "prompt": "Who said or wrote: “Quoth the Raven, \"Nevermore.\"”",
    "answer": "Edgar Allan Poe",
    "wrong": [
-    "Rudyard Kipling",
     "Samuel Johnson",
-    "Walt Whitman"
+    "Arthur Conan Doyle",
+    "Oscar Wilde"
    ],
    "explain": "Edgar Allan Poe: His poem The Raven, 1845.",
    "difficulty": 1,
@@ -3792,9 +3770,9 @@
    "prompt": "Who said or wrote: “Better to reign in Hell, than serve in Heaven.”",
    "answer": "John Milton",
    "wrong": [
-    "Horace",
-    "Robert Frost",
-    "Lord Acton"
+    "Rudyard Kipling",
+    "Samuel Johnson",
+    "Walt Whitman"
    ],
    "explain": "John Milton: Satan in Paradise Lost, 1667.",
    "difficulty": 3,
@@ -3808,9 +3786,9 @@
    "prompt": "Who said or wrote: “Was this the face that launch'd a thousand ships”",
    "answer": "Christopher Marlowe",
    "wrong": [
-    "Robert Burns",
-    "Edward Bulwer-Lytton",
-    "Arthur Conan Doyle"
+    "Horace",
+    "Robert Frost",
+    "Lord Acton"
    ],
    "explain": "Christopher Marlowe: Faustus on Helen of Troy in Doctor Faustus.",
    "difficulty": 3,
@@ -3824,9 +3802,9 @@
    "prompt": "Who said or wrote: “If you can keep your head when all about you”",
    "answer": "Rudyard Kipling",
    "wrong": [
-    "Christopher Marlowe",
-    "Samuel Taylor Coleridge",
-    "William Shakespeare"
+    "Robert Burns",
+    "Edward Bulwer-Lytton",
+    "Arthur Conan Doyle"
    ],
    "explain": "Rudyard Kipling: The opening of his poem If—, 1910.",
    "difficulty": 2,
@@ -3840,9 +3818,9 @@
    "prompt": "Who said or wrote: “Extraordinary claims require extraordinary evidence”",
    "answer": "Carl Sagan",
    "wrong": [
-    "Alexander Graham Bell",
     "Archimedes",
-    "Thomas Edison"
+    "Albert Einstein",
+    "Marie Curie"
    ],
    "explain": "Carl Sagan: From Cosmos, 1980.",
    "difficulty": 3,
@@ -3856,9 +3834,9 @@
    "prompt": "Who said or wrote: “Dr. Livingstone, I presume?”",
    "answer": "Henry Morton Stanley",
    "wrong": [
-    "Benjamin Franklin",
-    "Theodore Roosevelt",
-    "John F. Kennedy"
+    "Oscar Wilde",
+    "Rosa Parks",
+    "Arthur Conan Doyle"
    ],
    "explain": "Henry Morton Stanley: On finding the missing explorer in Africa, 1871.",
    "difficulty": 1,
@@ -3872,9 +3850,9 @@
    "prompt": "Who said or wrote: “Political power grows out of the barrel of a gun.”",
    "answer": "Mao Zedong",
    "wrong": [
-    "Winston Churchill",
-    "Mahatma Gandhi",
-    "Franklin D. Roosevelt"
+    "John F. Kennedy",
+    "Elizabeth I",
+    "Abraham Lincoln"
    ],
    "explain": "Mao Zedong: A 1938 speech.",
    "difficulty": 3,
@@ -3888,9 +3866,9 @@
    "prompt": "Who said or wrote: “Yes, we can.”",
    "answer": "Barack Obama",
    "wrong": [
-    "Theodore Roosevelt",
-    "Benjamin Franklin",
-    "Thomas Jefferson"
+    "Thomas Jefferson",
+    "Napoleon",
+    "Queen Elizabeth II"
    ],
    "explain": "Barack Obama: His 2008 campaign slogan and victory-night refrain.",
    "difficulty": 1,

@@ -370,7 +370,7 @@
      }
     ]
    },
-   "difficulty": 2
+   "difficulty": 1
   },
   {
    "id": "matthew-henson",
@@ -481,7 +481,7 @@
      }
     ]
    },
-   "difficulty": 2
+   "difficulty": 1
   },
   {
    "id": "ernest-shackleton",
@@ -1157,7 +1157,7 @@
     "Valentina Tereshkova"
    ],
    "explain": "David Livingstone (1813–1873): A Scottish explorer of Africa.",
-   "difficulty": 2,
+   "difficulty": 1,
    "refs": [
     "explorers/david-livingstone"
    ]
@@ -1253,7 +1253,7 @@
     "Ferdinand Magellan"
    ],
    "explain": "Roald Amundsen (1872–1928): The first person to reach the South Pole.",
-   "difficulty": 2,
+   "difficulty": 1,
    "refs": [
     "explorers/roald-amundsen"
    ]

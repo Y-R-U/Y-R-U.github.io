@@ -122,5 +122,260 @@
    "common-krait": 2,
    "sidewinder": 2
   }
+ },
+ "spiders": {
+  "peacock-spider": [
+   "https://www.inaturalist.org/photos/9559732"
+  ],
+  "australian-golden-orb-weaver": [
+   "https://www.inaturalist.org/photos/632219672"
+  ],
+  "money-spider": [
+   "https://www.inaturalist.org/photos/167460378"
+  ]
+ },
+ "sharks": {
+  "great-white-shark": [
+   "https://www.inaturalist.org/photos/5289261"
+  ],
+  "silky-shark": [
+   "https://www.inaturalist.org/photos/170832075"
+  ],
+  "small-spotted-catshark": [
+   "https://www.inaturalist.org/photos/317560062"
+  ]
+ },
+ "jellyfish": {
+  "upside-down-jellyfish": [
+   "https://www.inaturalist.org/photos/179161047"
+  ]
+ },
+ "bees": {
+  "honey-bee": [
+   "https://www.inaturalist.org/photos/217394043"
+  ],
+  "teddy-bear-bee": [
+   "https://www.inaturalist.org/photos/350608847"
+  ],
+  "red-mason-bee": [
+   "https://www.inaturalist.org/photos/787758"
+  ],
+  "potter-wasp": [
+   "https://www.inaturalist.org/photos/7634909"
+  ]
+ },
+ "insects": {
+  "monarch-butterfly": [
+   "https://www.inaturalist.org/photos/111043173"
+  ],
+  "painted-lady": [
+   "https://www.inaturalist.org/photos/3347095"
+  ],
+  "small-white": [
+   "https://www.inaturalist.org/photos/1179645"
+  ],
+  "ulysses-butterfly": [
+   "https://www.inaturalist.org/photos/7945775"
+  ],
+  "deaths-head-hawkmoth": [
+   "https://www.inaturalist.org/photos/28549593"
+  ],
+  "orchid-mantis": [
+   "https://www.inaturalist.org/photos/53268667"
+  ],
+  "desert-locust": [
+   "https://www.inaturalist.org/photos/147713544"
+  ],
+  "antlion": [
+   "https://www.inaturalist.org/photos/287217788"
+  ]
+ },
+ "birds": {
+  "southern-cassowary": [
+   "https://www.inaturalist.org/photos/32203941"
+  ],
+  "budgerigar": [
+   "https://www.inaturalist.org/photos/159057697"
+  ],
+  "pied-currawong": [
+   "https://www.inaturalist.org/photos/90759569"
+  ],
+  "great-horned-owl": [
+   "https://www.inaturalist.org/photos/79388250"
+  ],
+  "scarlet-macaw": [
+   "https://www.inaturalist.org/photos/53458435"
+  ],
+  "canada-goose": [
+   "https://www.inaturalist.org/photos/247715952"
+  ],
+  "ruby-throated-hummingbird": [
+   "https://www.inaturalist.org/photos/239401590"
+  ],
+  "indian-peafowl": [
+   "https://www.inaturalist.org/photos/407381945"
+  ],
+  "magnificent-frigatebird": [
+   "https://www.inaturalist.org/photos/158806319"
+  ],
+  "common-starling": [
+   "https://www.inaturalist.org/photos/365984069"
+  ],
+  "northern-cardinal": [
+   "https://www.inaturalist.org/photos/452211474"
+  ],
+  "satin-bowerbird": [
+   "https://www.inaturalist.org/photos/350135160"
+  ]
+ },
+ "dogs": {
+  "belgian-malinois": [
+   "https://commons.wikimedia.org/wiki/File:04_-_Belgian_shepherd_dog_varieties_-_Groenendael,Tervuren,_Malinois,_Laekenois.jpg",
+   "https://commons.wikimedia.org/wiki/File:BelgianShepherdMalinois.jpg"
+  ],
+  "italian-greyhound": [
+   "https://commons.wikimedia.org/wiki/File:Charciki_W%C5%82oskie,_doros%C5%82y_i_szczeniak.jpg",
+   "https://commons.wikimedia.org/wiki/File:Italian_Greyhound_(1).jpg"
+  ]
+ },
+ "mammals": {
+  "lion": [
+   "https://www.inaturalist.org/photos/62738921"
+  ],
+  "snow-leopard": [
+   "https://www.inaturalist.org/photos/721834937"
+  ],
+  "plains-zebra": [
+   "https://www.inaturalist.org/photos/261523831"
+  ],
+  "mandrill": [
+   "https://www.inaturalist.org/photos/339428082"
+  ],
+  "african-wild-dog": [
+   "https://www.inaturalist.org/photos/4949165"
+  ],
+  "giant-panda": [
+   "https://www.inaturalist.org/photos/351209016"
+  ],
+  "red-fox": [
+   "https://www.inaturalist.org/photos/289085807"
+  ],
+  "fennec-fox": [
+   "https://www.inaturalist.org/photos/17864088"
+  ],
+  "brown-bear": [
+   "https://www.inaturalist.org/photos/334287109"
+  ],
+  "platypus": [
+   "https://www.inaturalist.org/photos/178746516"
+  ],
+  "quokka": [
+   "https://www.inaturalist.org/photos/458962044"
+  ],
+  "striped-skunk": [
+   "https://www.inaturalist.org/photos/2761953"
+  ]
+ },
+ "sea": {
+  "sperm-whale": [
+   "https://www.inaturalist.org/photos/219667126"
+  ],
+  "common-octopus": [
+   "https://www.inaturalist.org/photos/560872281"
+  ],
+  "ocellaris-clownfish": [
+   "https://www.inaturalist.org/photos/249409772"
+  ],
+  "southern-stingray": [
+   "https://www.inaturalist.org/photos/174694329"
+  ],
+  "guineafowl-puffer": [
+   "https://www.inaturalist.org/photos/462004038"
+  ],
+  "atlantic-bluefin-tuna": [
+   "https://www.inaturalist.org/photos/88446847"
+  ],
+  "great-barracuda": [
+   "https://www.inaturalist.org/photos/460773257"
+  ],
+  "flying-fish": [
+   "https://www.inaturalist.org/photos/568865307"
+  ],
+  "swordfish": [
+   "https://www.inaturalist.org/photos/9119194"
+  ],
+  "leafy-seadragon": [
+   "https://www.inaturalist.org/photos/501684378"
+  ]
+ },
+ "reptiles": {
+  "komodo-dragon": [
+   "https://www.inaturalist.org/photos/370405210"
+  ],
+  "lace-monitor": [
+   "https://www.inaturalist.org/photos/167349723"
+  ],
+  "great-crested-newt": [
+   "https://www.inaturalist.org/photos/304222333"
+  ],
+  "goliath-frog": [
+   "https://www.inaturalist.org/photos/92002"
+  ]
+ },
+ "gems": {
+  "emerald": [
+   "https://commons.wikimedia.org/wiki/File:Emerald_cut.png"
+  ]
+ },
+ "trees": {
+  "mountain-ash": [
+   "https://www.inaturalist.org/photos/31210907"
+  ],
+  "coconut-palm": [
+   "https://commons.wikimedia.org/wiki/File:Revendeuses_de_Noix_de_Coco_03.jpg"
+  ],
+  "olive-tree": [
+   "https://commons.wikimedia.org/wiki/File:Aceitunas_coloradas.jpg"
+  ]
+ },
+ "flowers": {
+  "bird-of-paradise": [
+   "https://www.inaturalist.org/photos/375653805"
+  ],
+  "kangaroo-paw": [
+   "https://commons.wikimedia.org/wiki/File:Kangaroo_paw_260920_gnangarra_15_years-101.jpg"
+  ],
+  "meadow-buttercup": [
+   "https://commons.wikimedia.org/wiki/File:Ranunculus_acris_niittyleinikki.jpg"
+  ],
+  "japanese-camellia": [
+   "https://commons.wikimedia.org/wiki/File:Camellia_japonica_var._decumbens_3.JPG"
+  ],
+  "rose": [
+   "https://commons.wikimedia.org/wiki/File:Rosa_pendulina.jpg"
+  ],
+  "_max": {
+   "bird-of-paradise": 2,
+   "kangaroo-paw": 2
+  }
+ },
+ "body": {
+  "skull": [
+   "https://commons.wikimedia.org/wiki/File:Aardwolf_Skull.JPG"
+  ],
+  "skin": [
+   "https://commons.wikimedia.org/wiki/File:SOX10_immunohistochemistry_of_normal_skin_(original).jpg"
+  ],
+  "spleen": [
+   "https://commons.wikimedia.org/wiki/File:Spleen.jpg"
+  ],
+  "liver": [
+   "https://commons.wikimedia.org/wiki/File:Leber_Schaf.jpg"
+  ]
+ },
+ "space": {
+  "_max": {
+   "ganymede": 1
+  }
  }
 }

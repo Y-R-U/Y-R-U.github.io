@@ -8,7 +8,7 @@ import { createRunner } from '../structures/runner.js?v=1';
 import { challenges, friendly } from './api.js?v=1';
 import { suggestedName, rememberName, tidyName, MAX_NAME } from './ident.js?v=1';
 import { openShare, challengeUrl, shareOrCopy } from './share.js?v=1';
-import { scoreboard, ordinal } from './board.js?v=1';
+import { scoreboard, ordinal, detailOf, comparison } from './board.js?v=1';
 import { ensureStyles, setQuery } from './util.js?v=1';
 import { ensureFormats } from './room.js?v=1';
 import { openSignIn } from './signin.js?v=1';
@@ -41,7 +41,7 @@ export async function createChallenge(out) {
   if (JSON.stringify(questions).length > MAX_SET) { toast('This game is too big to share'); return null; }
   const ms = (r.answers || []).reduce((s, a) => s + (a.ms || 0), 0);
   try {
-    const res = await challenges.create({ name, title: out.title || '', spec, questions, score: Math.round(r.score || 0), correct: r.correct || 0, ms });
+    const res = await challenges.create({ name, title: out.title || '', spec, questions, score: Math.round(r.score || 0), correct: r.correct || 0, ms, detail: detailOf(r.answers) });
     const url = challengeUrl(res.id);
     const kids = !!spec.kids;
     openShare({ url, heading: 'Challenge a friend', title: 'Clued challenge',
@@ -65,6 +65,12 @@ export async function createChallenge(out) {
 // A ready-made button for A's results screen.
 export function challengeButton(out, cls = 'btn grape wide') {
   return h('button', { type: 'button', class: cls, dataset: { act: 'challenge' }, onclick: () => createChallenge(out) }, '⚔️ Challenge a friend');
+}
+
+// You, the creator and the top few, for the per-question comparison.
+function cmpPlayers(scores, meId) {
+  const pick = [scores.find(s => s.id === meId), scores.find(s => s.creator), ...scores.slice(0, 4)].filter(Boolean);
+  return [...new Map(pick.map(s => [s.id, { name: s.name, me: s.id === meId, detail: s.detail }])).values()].slice(0, 5);
 }
 
 defineScreen('challenge', async (el, { id }, cur) => {
@@ -136,7 +142,7 @@ defineScreen('challenge', async (el, { id }, cur) => {
     const ms = (res.answers || []).reduce((s, a) => s + (a.ms || 0), 0);
     let r;
     try {
-      r = await challenges.submit(id, { name, score: Math.round(res.score || 0), correct: res.correct || 0, ms });
+      r = await challenges.submit(id, { name, score: Math.round(res.score || 0), correct: res.correct || 0, ms, detail: detailOf(res.answers) });
     } catch (e) {
       wrap.replaceChildren(h('div.panel.net-hero', {}, h('h2', {}, 'Score not saved'), h('p', {}, friendly(e))),
         h('button.btn.primary.wide', { type: 'button', onclick: () => submit(name, res) }, 'Try again'),
@@ -151,6 +157,7 @@ defineScreen('challenge', async (el, { id }, cur) => {
         h('h2', {}, kids ? `You got ${res.correct} ⭐` : beat ? `You beat ${c.name}!` : `${fmtNum(res.score)} pts`),
         h('p', {}, kids ? `${res.correct} of ${res.total} right. Brilliant playing!` : `${ordinal(r.rank)} of ${r.plays} · ${res.correct}/${res.total} right`)),
       h('div.panel.stack', {}, h('h3', {}, 'Leaderboard'), scoreboard(r.scores, { meId: r.id, kids, top: 10 })),
+      comparison(cmpPlayers(r.scores, r.id), c.questions),
       h('div.net-actions', {},
         h('button.btn.go.wide', { type: 'button', onclick: () => shareOrCopy({ url, title: 'Clued challenge', text: kids ? `I got ${res.correct} stars on this Clued challenge!` : `I scored ${fmtNum(res.score)} on this Clued challenge. Your turn!` }) }, 'Share this challenge'),
         h('button.btn.wide', { type: 'button', onclick: () => intro() }, 'Play again'),

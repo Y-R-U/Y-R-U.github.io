@@ -1,6 +1,6 @@
 // Quotes: speaker | Wikiquote page(s) ;-separated | group | difficulty | quote | context (our words)
 // Every quote must be found on one of the listed Wikiquote pages outside a misattributed/disputed section, or it is dropped.
-// Historical figures, public-domain authors and speeches only. No song lyrics.
+// Historical figures, public-domain authors and speeches only; quotes from works still in copyright stay short (a few words). No song lyrics.
 export const QUOTES = `
 Winston Churchill|Winston Churchill|leader|1|We shall fight on the beaches|From a speech to Parliament in June 1940, after Dunkirk
 Winston Churchill|Winston Churchill|leader|2|I have nothing to offer but blood, toil, tears and sweat.|His first speech as prime minister, May 1940
@@ -11,7 +11,7 @@ Abraham Lincoln|Abraham Lincoln|leader|2|government of the people, by the people
 Abraham Lincoln|Abraham Lincoln|leader|3|A house divided against itself cannot stand.|An 1858 speech on slavery, echoing the Bible
 John F. Kennedy|John F. Kennedy|leader|1|ask not what your country can do for you — ask what you can do for your country|His inaugural address, January 1961
 John F. Kennedy|John F. Kennedy|leader|2|Ich bin ein Berliner.|A 1963 speech in West Berlin
-John F. Kennedy|John F. Kennedy|leader|2|We choose to go to the Moon in this decade and do the other things, not because they are easy, but because they are hard|A 1962 speech at Rice University
+John F. Kennedy|John F. Kennedy|leader|2|We choose to go to the Moon|A 1962 speech at Rice University
 Martin Luther King Jr.|Martin Luther King Jr.|activist|1|I have a dream|His 1963 speech at the March on Washington
 Martin Luther King Jr.|Martin Luther King Jr.|activist|2|Injustice anywhere is a threat to justice everywhere.|Letter from Birmingham Jail, 1963
 Franklin D. Roosevelt|Franklin D. Roosevelt|leader|2|the only thing we have to fear is fear itself|His first inaugural address, 1933
@@ -78,7 +78,6 @@ Yuri Gagarin|Yuri Gagarin|explorer|3|Poyekhali!|"Let's go!": as his rocket lifte
 Robert Burns|Robert Burns;To a Mouse|writer|3|The best laid schemes o' mice and men|His poem To a Mouse, 1785
 Francis Bacon|Francis Bacon|philosopher|3|knowledge itself is power|Meditationes Sacrae, 1597
 George Orwell|Nineteen Eighty-Four;George Orwell|writer|1|Big Brother is watching you|The slogan on posters in Nineteen Eighty-Four
-George Orwell|Animal Farm;George Orwell|writer|2|All animals are equal, but some animals are more equal than others.|The pigs' rewritten rule in Animal Farm
 Charles Dickens|Oliver Twist|writer|1|Please, sir, I want some more.|Oliver asks for more gruel in Oliver Twist
 Lewis Carroll|Alice's Adventures in Wonderland|writer|2|Curiouser and curiouser!|Alice in Alice's Adventures in Wonderland
 Jane Austen|Pride and Prejudice|writer|2|It is a truth universally acknowledged, that a single man in possession of a good fortune, must be in want of a wife.|The opening of Pride and Prejudice
@@ -104,13 +103,13 @@ Lewis Carroll|Alice's Adventures in Wonderland|writer|2|we're all mad here.|The 
 Oscar Wilde|The Picture of Dorian Gray;Oscar Wilde|writer|2|there is only one thing in the world worse than being talked about, and that is not being talked about.|Lord Henry in The Picture of Dorian Gray, 1890
 Oscar Wilde|The Importance of Being Earnest;Oscar Wilde|writer|3|The truth is rarely pure and never simple.|Algernon in The Importance of Being Earnest, 1895
 Benjamin Franklin|Poor Richard's Almanack;Benjamin Franklin|leader|3|Well done is better than well said.|Poor Richard's Almanack, 1737
-Winston Churchill|Winston Churchill|leader|3|Now this is not the end. It is not even the beginning of the end. But it is, perhaps, the end of the beginning.|After victory at El Alamein, 1942
+Winston Churchill|Winston Churchill|leader|3|It is not even the beginning of the end.|After victory at El Alamein, 1942
 Abraham Lincoln|Abraham Lincoln|leader|3|With malice toward none, with charity for all|His second inaugural address, 1865
 Horatio Nelson|Horatio Nelson|leader|2|England expects that every man will do his duty|His signal before the Battle of Trafalgar, 1805
 Albert Einstein|Albert Einstein|scientist|3|Science without religion is lame, religion without science is blind.|A 1941 essay
 Alexander Graham Bell|Alexander Graham Bell|scientist|2|Mr. Watson, come here, I want to see you.|The first words spoken over his telephone, 1876
 Samuel Morse|Samuel F. B. Morse;Samuel Morse|scientist|3|What hath God wrought|The first long-distance telegraph message, 1844
-Martin Luther King Jr.|Martin Luther King Jr.|activist|2|Darkness cannot drive out darkness; only light can do that. Hate cannot drive out hate; only love can do that.|Strength to Love, 1963
+Martin Luther King Jr.|Martin Luther King Jr.|activist|2|Darkness cannot drive out darkness; only light can do that.|Strength to Love, 1963
 Rosa Parks|Rosa Parks|activist|3|the only tired I was, was tired of giving in|Recalling why she refused to give up her bus seat in 1955
 Susan B. Anthony|Susan B. Anthony|activist|3|Failure is impossible.|Her last public words, 1906
 Helen Keller|Helen Keller|activist|2|Alone we can do so little; together we can do so much.|On working together

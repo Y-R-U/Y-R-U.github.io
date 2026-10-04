@@ -5,6 +5,9 @@
  "icon": "🌸",
  "kids": true,
  "version": 1,
+ "imgPrompt": "Which of these is {aName}?",
+ "nameImgPrompt": "Which flower is this?",
+ "tfImgPrompt": "This flower is {aName}.",
  "leakExempt": [
   "flower",
   "flowers"
@@ -12,15 +15,25 @@
  "factsMeta": {
   "colour": {
    "type": "cat",
-   "label": "Usual colour"
+   "label": "Usual colour",
+   "ask": "What colour is the {lname} usually?",
+   "stmt": "The {lname} is usually {lvalue}.",
+   "exclusive": false
   },
   "region": {
    "type": "cat",
-   "label": "Native to"
+   "label": "Native to",
+   "ask": "Where is the {lname} native to?",
+   "askReverse": "Which of these is native to {value}?",
+   "stmt": "The {lname} is native to {value}.",
+   "exclusive": false
   },
   "emblem": {
    "type": "cat",
-   "label": "Floral emblem of"
+   "label": "Floral emblem of",
+   "ask": "The {lname} is the floral emblem of where?",
+   "askReverse": "Which flower is the floral emblem of {value}?",
+   "stmt": "The {lname} is the floral emblem of {value}."
   }
  },
  "items": [
@@ -48,10 +61,26 @@
     "Van Gogh painted it many times.",
     "It is a tall plant with a giant yellow flower.",
     "The answer is one word of 9 letters.",
-    "It starts with the letter S."
+    "Its first letter is S."
    ],
    "media": {
     "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/b/bd/Helianthus_annuus_exposed_2004-05-22.jpg/330px-Helianthus_annuus_exposed_2004-05-22.jpg",
+      "w": 330,
+      "h": 440,
+      "credit": "Jon Sullivan",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Helianthus_annuus_exposed_2004-05-22.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/8/85/Sunflower_field_-_panoramio_%2810%29.jpg/500px-Sunflower_field_-_panoramio_%2810%29.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Björn S.",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Sunflower_field_-_panoramio_(10).jpg"
+     },
      {
       "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/98056702/medium.jpeg",
       "w": 500,
@@ -59,22 +88,6 @@
       "credit": "Michelle W. （鍾偉瑋）",
       "license": "CC BY 4.0",
       "page": "https://www.inaturalist.org/photos/98056702"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/210274706/medium.jpeg",
-      "w": 500,
-      "h": 334,
-      "credit": "Michelle W. （鍾偉瑋）",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/210274706"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/88052561/medium.jpeg",
-      "w": 500,
-      "h": 375,
-      "credit": "Дарья Орлова",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/88052561"
      }
     ]
    },
@@ -104,33 +117,33 @@
     "Its stems have prickles called thorns.",
     "Red ones are a symbol of love.",
     "The answer is one word of 4 letters.",
-    "It starts with the letter R."
+    "Its first letter is R."
    ],
    "media": {
     "img": [
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/50016224/medium.jpg",
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/9/96/Rosa_rugosa_Sakhalin_1.JPG/500px-Rosa_rugosa_Sakhalin_1.JPG",
       "w": 500,
-      "h": 500,
-      "credit": "Юрий Данилевский (Yuriy Danilevsky)",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/50016224"
+      "h": 375,
+      "credit": "Vihljun",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Rosa_rugosa_Sakhalin_1.JPG"
      },
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/239297896/medium.jpg",
-      "w": 500,
-      "h": 335,
-      "credit": "Douglas Goldman",
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/5/59/Bunga_mawar_putih.jpg/330px-Bunga_mawar_putih.jpg",
+      "w": 330,
+      "h": 440,
+      "credit": "Primazega",
       "license": "CC BY-SA 4.0",
-      "page": "https://www.inaturalist.org/photos/239297896"
+      "page": "https://commons.wikimedia.org/wiki/File:Bunga_mawar_putih.jpg"
      },
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/267774353/medium.jpeg",
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/e/e6/Rosa_rubiginosa_1.jpg/500px-Rosa_rubiginosa_1.jpg",
       "w": 500,
-      "h": 331,
-      "credit": "Margarita",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/267774353"
+      "h": 464,
+      "credit": "Stan Shebs",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Rosa_rubiginosa_1.jpg"
      }
     ]
    },
@@ -156,10 +169,26 @@
     "Its flowers are cup-shaped.",
     "The Netherlands is famous for fields of it.",
     "The answer is one word of 5 letters.",
-    "It starts with the letter T."
+    "Its first letter is T."
    ],
    "media": {
     "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/e/ea/Tulipa_suaveolens_floriade_to_Canberra.jpg/330px-Tulipa_suaveolens_floriade_to_Canberra.jpg",
+      "w": 330,
+      "h": 440,
+      "credit": "John O'Neill",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Tulipa_suaveolens_floriade_to_Canberra.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/9/9e/%D7%A6%D7%91%D7%A2%D7%95%D7%A0%D7%99%D7%9D.JPG/500px-%D7%A6%D7%91%D7%A2%D7%95%D7%A0%D7%99%D7%9D.JPG",
+      "w": 500,
+      "h": 343,
+      "credit": "Dina L",
+      "license": "CC0 1.0",
+      "page": "https://commons.wikimedia.org/wiki/File:%D7%A6%D7%91%D7%A2%D7%95%D7%A0%D7%99%D7%9D.JPG"
+     },
      {
       "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/275165315/medium.jpeg",
       "w": 375,
@@ -167,22 +196,6 @@
       "credit": "Igor Balashov",
       "license": "CC BY 4.0",
       "page": "https://www.inaturalist.org/photos/275165315"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/38071897/medium.jpg",
-      "w": 500,
-      "h": 333,
-      "credit": "Rebecca Ray",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/38071897"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/501064051/medium.jpg",
-      "w": 375,
-      "h": 500,
-      "credit": "Георгий Виноградов (Georgy Vinogradov)",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/501064051"
      }
     ]
    },
@@ -212,33 +225,33 @@
     "Children thread them into chains.",
     "It has white petals and a yellow centre.",
     "The answer has 2 words (6, 5 letters).",
-    "It starts with the letter C."
+    "Its first letter is C."
    ],
    "media": {
     "img": [
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/515847774/medium.jpg",
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/5/53/Belis_peremnis_-_panoramio.jpg/500px-Belis_peremnis_-_panoramio.jpg",
       "w": 500,
       "h": 375,
       "credit": "m.dolores paderne sa…",
-      "license": "CC BY-SA 4.0",
-      "page": "https://www.inaturalist.org/photos/515847774"
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Belis_peremnis_-_panoramio.jpg"
      },
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/208767960/medium.jpg",
-      "w": 335,
-      "h": 500,
-      "credit": "Douglas Goldman",
-      "license": "CC BY-SA 4.0",
-      "page": "https://www.inaturalist.org/photos/208767960"
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/d/d5/Bellis_perennis_white_%28aka%29.jpg/500px-Bellis_perennis_white_%28aka%29.jpg",
+      "w": 500,
+      "h": 487,
+      "credit": "André Karwath aka Aka",
+      "license": "CC BY-SA 2.5",
+      "page": "https://commons.wikimedia.org/wiki/File:Bellis_perennis_white_(aka).jpg"
      },
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/498715260/medium.jpeg",
-      "w": 375,
-      "h": 500,
-      "credit": "Gianni Del Bufalo bygdb",
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/b/be/Bellis_perennis_-_Museo_Tazzetti_Herbarium_96-2024.tif/lossy-page1-500px-Bellis_perennis_-_Museo_Tazzetti_Herbarium_96-2024.tif.jpg",
+      "w": 500,
+      "h": 607,
+      "credit": "Epgrande",
       "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/498715260"
+      "page": "https://commons.wikimedia.org/wiki/File:Bellis_perennis_-_Museo_Tazzetti_Herbarium_96-2024.tif"
      }
     ]
    },
@@ -268,33 +281,33 @@
     "Its seed head is called a clock.",
     "It is a yellow lawn weed.",
     "The answer is one word of 9 letters.",
-    "It starts with the letter D."
+    "Its first letter is D."
    ],
    "media": {
     "img": [
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/127729932/medium.jpeg",
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/4/4f/DandelionFlower.jpg/500px-DandelionFlower.jpg",
       "w": 500,
-      "h": 375,
-      "credit": "Jason Grant",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/127729932"
+      "h": 400,
+      "credit": "Greg Hume",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:DandelionFlower.jpg"
      },
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/349813880/medium.jpeg",
-      "w": 500,
-      "h": 334,
-      "credit": "Yung-Lun Lin",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/349813880"
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/e/e5/Taraxacumlaevigatum.jpg/330px-Taraxacumlaevigatum.jpg",
+      "w": 330,
+      "h": 498,
+      "credit": "JW Stockert",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Taraxacumlaevigatum.jpg"
      },
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/346880845/medium.jpg",
-      "w": 375,
-      "h": 500,
-      "credit": "Liz F",
-      "license": "CC0 1.0",
-      "page": "https://www.inaturalist.org/photos/346880845"
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/0/04/Dandelion_%28Taraxacum%29_Clock_-_Tennessee%2C_USA_-_May_31%2C_2014.jpg/500px-Dandelion_%28Taraxacum%29_Clock_-_Tennessee%2C_USA_-_May_31%2C_2014.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "David Ratledge",
+      "license": "CC BY 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Dandelion_(Taraxacum)_Clock_-_Tennessee,_USA_-_May_31,_2014.jpg"
      }
     ]
    },
@@ -303,6 +316,7 @@
   {
    "id": "english-lavender",
    "name": "English lavender",
+   "lname": "English lavender",
    "alt": [
     "lavender"
    ],
@@ -324,10 +338,18 @@
     "It smells sweet and calming.",
     "It has spikes of purple flowers.",
     "The answer has 2 words (7, 8 letters).",
-    "It starts with the letter E."
+    "Its first letter is E."
    ],
    "media": {
     "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/4/40/Lavandula_angustifolia_-_K%C3%B6hler%E2%80%93s_Medizinal-Pflanzen-087.jpg",
+      "w": 500,
+      "h": 682,
+      "credit": "Franz Eugen Köhler, Köhler's Medizinal-Pflanzen",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Lavandula_angustifolia_-_K%C3%B6hler%E2%80%93s_Medizinal-Pflanzen-087.jpg"
+     },
      {
       "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/2697772/medium.jpg",
       "w": 375,
@@ -343,14 +365,6 @@
       "credit": "Andrey Zharkikh",
       "license": "CC BY 4.0",
       "page": "https://www.inaturalist.org/photos/2697773"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/172041726/medium.jpg",
-      "w": 375,
-      "h": 500,
-      "credit": "Naturalista",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/172041726"
      }
     ]
    },
@@ -371,16 +385,34 @@
    },
    "blurb": "The most popular house orchid. Its flowers are said to look like moths in flight.",
    "clues": [
+    "It is a favourite gift plant.",
+    "It comes from tropical Asia.",
     "Its flowers can last for months.",
     "In the wild it grows on trees.",
-    "Its roots grow in the air.",
     "It is usually white.",
     "It is native to Asia.",
+    "Its roots grow in the air.",
     "The answer has 2 words (4, 6 letters).",
-    "It starts with the letter M."
+    "Its first letter is M."
    ],
    "media": {
     "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/1e/Phalaenopsis_philippinensis_NationalOrchidGarden-Singapore.jpg/500px-Phalaenopsis_philippinensis_NationalOrchidGarden-Singapore.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Wikimedia Commons",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Phalaenopsis_philippinensis_NationalOrchidGarden-Singapore.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/c/cf/Phalaenopsis_aphrodite_%27-180501%27_Rchb.f.%2C_Hamburger_Garten-_Blumenzeitung_18_35_%281862%29_%2847706143821%29.jpg/500px-Phalaenopsis_aphrodite_%27-180501%27_Rchb.f.%2C_Hamburger_Garten-_Blumenzeitung_18_35_%281862%29_%2847706143821%29.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "sunoochi from Sapporo, Hokkaido, Japan",
+      "license": "CC BY 2.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Phalaenopsis_aphrodite_%27-180501%27_Rchb.f.,_Hamburger_Garten-_Blumenzeitung_18_35_(1862)_(47706143821).jpg"
+     },
      {
       "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/368194406/medium.jpeg",
       "w": 500,
@@ -388,22 +420,6 @@
       "credit": "Tom Heijnen",
       "license": "CC BY 4.0",
       "page": "https://www.inaturalist.org/photos/368194406"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/385082339/medium.jpeg",
-      "w": 281,
-      "h": 500,
-      "credit": "Nielbert Raner",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/385082339"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/236182938/medium.jpg",
-      "w": 500,
-      "h": 375,
-      "credit": "Forest Botial-Jarvis",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/236182938"
      }
     ]
    },
@@ -437,7 +453,7 @@
     "It is native to Asia.",
     "It is a holy symbol in Hinduism and Buddhism.",
     "The answer has 2 words (6, 5 letters).",
-    "It starts with the letter S."
+    "Its first letter is S."
    ],
    "media": {
     "img": [
@@ -494,7 +510,7 @@
     "Its round leaves are called pads.",
     "Its flowers float on ponds.",
     "The answer has 3 words (5, 5, 4 letters).",
-    "It starts with the letter W."
+    "Its first letter is W."
    ],
    "media": {
     "img": [
@@ -550,10 +566,26 @@
     "It is native to Europe.",
     "It is worn on Remembrance Day.",
     "The answer has 2 words (6, 5 letters).",
-    "It starts with the letter C."
+    "Its first letter is C."
    ],
    "media": {
     "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/c/cb/Papaver_rhoeas_LC0050.jpg/330px-Papaver_rhoeas_LC0050.jpg",
+      "w": 330,
+      "h": 501,
+      "credit": "Jörg Hempel",
+      "license": "CC BY-SA 2.5",
+      "page": "https://commons.wikimedia.org/wiki/File:Papaver_rhoeas_LC0050.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/7/72/Papaver_rhoeas_Lincolnshire_2026.jpg/500px-Papaver_rhoeas_Lincolnshire_2026.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Kieran Roy Powell",
+      "license": "CC BY 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Papaver_rhoeas_Lincolnshire_2026.jpg"
+     },
      {
       "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/114734771/medium.jpeg",
       "w": 500,
@@ -561,22 +593,6 @@
       "credit": "Eleftherios Katsillis",
       "license": "CC BY 4.0",
       "page": "https://www.inaturalist.org/photos/114734771"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/370227932/medium.jpeg",
-      "w": 380,
-      "h": 500,
-      "credit": "Federico Biguzzi",
-      "license": "CC0 1.0",
-      "page": "https://www.inaturalist.org/photos/370227932"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/18496040/medium.jpg",
-      "w": 500,
-      "h": 375,
-      "credit": "Andreas Rockstein",
-      "license": "CC BY-SA 4.0",
-      "page": "https://www.inaturalist.org/photos/18496040"
      }
     ]
    },
@@ -609,33 +625,33 @@
     "It has a trumpet-shaped centre.",
     "It is a yellow spring flower.",
     "The answer has 2 words (4, 8 letters).",
-    "It starts with the letter W."
+    "Its first letter is W."
    ],
    "media": {
     "img": [
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/63617588/medium.jpg",
-      "w": 373,
-      "h": 500,
-      "credit": "Gilles San Martin",
-      "license": "CC BY-SA 4.0",
-      "page": "https://www.inaturalist.org/photos/63617588"
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/f/f2/Narcissus_pseudonarcissus_030405.jpg/330px-Narcissus_pseudonarcissus_030405.jpg",
+      "w": 330,
+      "h": 440,
+      "credit": "Wikimedia Commons",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Narcissus_pseudonarcissus_030405.jpg"
      },
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/623370227/medium.jpg",
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/e/eb/-_Narcissus_pseudonarcissus_03_-.jpg/500px--_Narcissus_pseudonarcissus_03_-.jpg",
       "w": 500,
-      "h": 375,
-      "credit": "jamie-aa",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/623370227"
+      "h": 333,
+      "credit": "User:Nino Barbieri",
+      "license": "CC BY-SA 2.5",
+      "page": "https://commons.wikimedia.org/wiki/File:-_Narcissus_pseudonarcissus_03_-.jpg"
      },
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/61926031/medium.jpg",
-      "w": 375,
-      "h": 500,
-      "credit": "Sam Kieschnick",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/61926031"
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/a/a4/Narcissus_pseudonarcissus_flower_300303.jpg/500px-Narcissus_pseudonarcissus_flower_300303.jpg",
+      "w": 500,
+      "h": 424,
+      "credit": "Wikimedia Commons",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Narcissus_pseudonarcissus_flower_300303.jpg"
      }
     ]
    },
@@ -666,33 +682,33 @@
     "Its flowers droop on one side of the stem.",
     "It has blue bell-shaped flowers.",
     "The answer has 2 words (6, 8 letters).",
-    "It starts with the letter C."
+    "Its first letter is C."
    ],
    "media": {
     "img": [
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/375142586/medium.jpg",
-      "w": 500,
-      "h": 375,
-      "credit": "Sean Crocker",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/375142586"
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/8/82/Jacinthes_des_bois_%28Hyacinthoides_non-scripta%29.jpg/330px-Jacinthes_des_bois_%28Hyacinthoides_non-scripta%29.jpg",
+      "w": 330,
+      "h": 495,
+      "credit": "JackyM59",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Jacinthes_des_bois_(Hyacinthoides_non-scripta).jpg"
      },
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/429730167/medium.jpeg",
-      "w": 375,
-      "h": 500,
-      "credit": "no rights reserved",
-      "license": "CC0 1.0",
-      "page": "https://www.inaturalist.org/photos/429730167"
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/9/92/Hyacinthoides_non-scripta_Sturm39.jpg/330px-Hyacinthoides_non-scripta_Sturm39.jpg",
+      "w": 330,
+      "h": 489,
+      "credit": "Johann Georg Sturm (Painter: Jacob Sturm)",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Hyacinthoides_non-scripta_Sturm39.jpg"
      },
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/368927713/medium.jpg",
-      "w": 333,
-      "h": 500,
-      "credit": "Jonathan Prior",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/368927713"
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/a/a8/Hyacinthoides_non-scripta_%28Common_Bluebell%29.jpg/330px-Hyacinthoides_non-scripta_%28Common_Bluebell%29.jpg",
+      "w": 330,
+      "h": 495,
+      "credit": "MichaelMaggs",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Hyacinthoides_non-scripta_(Common_Bluebell).jpg"
      }
     ]
    },
@@ -722,33 +738,33 @@
     "It flowers in late winter.",
     "It is a small, drooping white flower.",
     "The answer has 2 words (6, 8 letters).",
-    "It starts with the letter C."
+    "Its first letter is C."
    ],
    "media": {
     "img": [
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/194996965/medium.jpg",
-      "w": 500,
-      "h": 375,
-      "credit": "nalagtus",
-      "license": "CC BY-SA 4.0",
-      "page": "https://www.inaturalist.org/photos/194996965"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/455754320/medium.jpeg",
-      "w": 375,
-      "h": 500,
-      "credit": "Grzegorz Grzejszczak",
-      "license": "CC BY-SA 4.0",
-      "page": "https://www.inaturalist.org/photos/455754320"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/484679715/medium.jpeg",
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/a/ab/Snowdrops_in_Lothersdale_Churchyard.jpg/500px-Snowdrops_in_Lothersdale_Churchyard.jpg",
       "w": 500,
       "h": 333,
-      "credit": "Wairambar Rainforest",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/484679715"
+      "credit": "Tim Green",
+      "license": "CC BY 2.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Snowdrops_in_Lothersdale_Churchyard.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/3/3b/Galanthus_nivalis_2005.jpg/330px-Galanthus_nivalis_2005.jpg",
+      "w": 330,
+      "h": 496,
+      "credit": "Darkone",
+      "license": "CC BY-SA 2.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Galanthus_nivalis_2005.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/2/23/Galanthus_nivalis.jpg/500px-Galanthus_nivalis.jpg",
+      "w": 500,
+      "h": 500,
+      "credit": "Wikimedia Commons",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Galanthus_nivalis.jpg"
      }
     ]
    },
@@ -776,10 +792,26 @@
     "It is native to the Mediterranean.",
     "It gives the world's most expensive spice.",
     "The answer has 2 words (7, 6 letters).",
-    "It starts with the letter S."
+    "Its first letter is S."
    ],
    "media": {
     "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/5/5c/Crocus_sativus2.jpg/500px-Crocus_sativus2.jpg",
+      "w": 500,
+      "h": 580,
+      "credit": "KENPEI",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Crocus_sativus2.jpg"
+     },
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/9/96/Saffran_crocus_sativus_moist.jpg",
+      "w": 500,
+      "h": 667,
+      "credit": "HeiWu",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Saffran_crocus_sativus_moist.jpg"
+     },
      {
       "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/28500579/medium.jpg",
       "w": 375,
@@ -787,22 +819,6 @@
       "credit": "Юрий Данилевский (Yuriy Danilevsky)",
       "license": "CC BY 4.0",
       "page": "https://www.inaturalist.org/photos/28500579"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/46803244/medium.jpg",
-      "w": 500,
-      "h": 375,
-      "credit": "Юрий Данилевский (Yuriy Danilevsky)",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/46803244"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/28500558/medium.jpg",
-      "w": 500,
-      "h": 478,
-      "credit": "Юрий Данилевский (Yuriy Danilevsky)",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/28500558"
      }
     ]
    },
@@ -830,13 +846,42 @@
     "It is native to the Mediterranean.",
     "It shares its name with part of the eye.",
     "The answer has 2 words (7, 4 letters).",
-    "It starts with the letter B."
+    "Its first letter is B."
    ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/2/29/Iris_germanica_001.jpg/500px-Iris_germanica_001.jpg",
+      "w": 500,
+      "h": 647,
+      "credit": "Za",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Iris_germanica_001.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/d/db/Iris_versicolor_4.jpg/500px-Iris_versicolor_4.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "No machine-readable author provided. Dlanglois assumed (based on copyright claims).",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Iris_versicolor_4.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/f/f8/Iris_sanguinea_cultivar%2C_Wakehurst_Place%2C_UK_-_Diliff.jpg/500px-Iris_sanguinea_cultivar%2C_Wakehurst_Place%2C_UK_-_Diliff.jpg",
+      "w": 500,
+      "h": 638,
+      "credit": "Diliff",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Iris_sanguinea_cultivar,_Wakehurst_Place,_UK_-_Diliff.jpg"
+     }
+    ]
+   },
    "difficulty": 2
   },
   {
    "id": "chinese-hibiscus",
    "name": "Chinese hibiscus",
+   "lname": "Chinese hibiscus",
    "alt": [
     "hibiscus"
    ],
@@ -858,13 +903,26 @@
     "It is the national flower of Malaysia.",
     "It is a big red tropical flower.",
     "The answer has 2 words (7, 8 letters).",
-    "It starts with the letter C."
+    "Its first letter is C."
    ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/2/21/Hibiscus_Brilliant.jpg/500px-Hibiscus_Brilliant.jpg",
+      "w": 500,
+      "h": 366,
+      "credit": "Andy / Andrew Fogg from near Cambridge, UK",
+      "license": "CC BY 2.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Hibiscus_Brilliant.jpg"
+     }
+    ]
+   },
    "difficulty": 1
   },
   {
    "id": "mexican-marigold",
    "name": "Mexican marigold",
+   "lname": "Mexican marigold",
    "alt": [
     "marigold",
     "African marigold",
@@ -887,7 +945,7 @@
     "It has a strong smell.",
     "It is bright orange.",
     "The answer has 2 words (7, 8 letters).",
-    "It starts with the letter M."
+    "Its first letter is M."
    ],
    "media": {
     "img": [
@@ -940,10 +998,26 @@
     "It is often worn in a buttonhole.",
     "It has frilly pink or red petals.",
     "The answer is one word of 9 letters.",
-    "It starts with the letter C."
+    "Its first letter is C."
    ],
    "media": {
     "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/8/80/Gartennelke_1.jpg/500px-Gartennelke_1.jpg",
+      "w": 500,
+      "h": 648,
+      "credit": "Darkone (talk · contribs)",
+      "license": "CC BY-SA 1.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Gartennelke_1.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/3/3b/W_carnation4051.jpg/500px-W_carnation4051.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "草花写真館",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:W_carnation4051.jpg"
+     },
      {
       "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/52411785/medium.jpeg",
       "w": 500,
@@ -951,22 +1025,6 @@
       "credit": "Jason Grant",
       "license": "CC BY 4.0",
       "page": "https://www.inaturalist.org/photos/52411785"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/66692952/medium.jpg",
-      "w": 500,
-      "h": 375,
-      "credit": "Yves Bas",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/66692952"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/677526389/medium.jpg",
-      "w": 500,
-      "h": 375,
-      "credit": "Louis Aureglia",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/677526389"
      }
     ]
    },
@@ -996,8 +1054,28 @@
     "It flowers in autumn.",
     "It has many layers of petals.",
     "The answer is one word of 13 letters.",
-    "It starts with the letter C."
+    "Its first letter is C."
    ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/a/a1/Chrysanthemum_morifolium_08NOV.jpg/500px-Chrysanthemum_morifolium_08NOV.jpg",
+      "w": 500,
+      "h": 485,
+      "credit": "池田正樹 (talk)masaki ikeda",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Chrysanthemum_morifolium_08NOV.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/5/51/Chrysanthemum_%C3%97_morifolium_Dompierre_1.jpg/500px-Chrysanthemum_%C3%97_morifolium_Dompierre_1.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Jebulon",
+      "license": "CC0 1.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Chrysanthemum_%C3%97_morifolium_Dompierre_1.jpg"
+     }
+    ]
+   },
    "difficulty": 2
   },
   {
@@ -1019,33 +1097,33 @@
     "It is native to North America.",
     "It comes in pompom and spiky shapes.",
     "The answer is one word of 6 letters.",
-    "It starts with the letter D."
+    "Its first letter is D."
    ],
    "media": {
     "img": [
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/183652241/medium.jpg",
-      "w": 375,
-      "h": 500,
-      "credit": "Stefano Menchetti",
-      "license": "CC BY-SA 4.0",
-      "page": "https://www.inaturalist.org/photos/183652241"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/50574176/medium.jpeg",
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/2/28/Syrphe_%C3%A0_ceintures_sur_un_dahlia_en_novembre.jpg/500px-Syrphe_%C3%A0_ceintures_sur_un_dahlia_en_novembre.jpg",
       "w": 500,
-      "h": 375,
-      "credit": "no rights reserved",
-      "license": "CC0 1.0",
-      "page": "https://www.inaturalist.org/photos/50574176"
+      "h": 500,
+      "credit": "JackyM59",
+      "license": "CC BY 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Syrphe_%C3%A0_ceintures_sur_un_dahlia_en_novembre.jpg"
      },
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/457531953/medium.jpeg",
-      "w": 376,
-      "h": 500,
-      "credit": "biogeek",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/457531953"
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/c/c2/Dahlia_coccinea.jpg/330px-Dahlia_coccinea.jpg",
+      "w": 330,
+      "h": 440,
+      "credit": "Prsjl",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Dahlia_coccinea.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/f/fe/0804_Bl%C3%BCtenpflanze_%28Korbbl%C3%BCtler%29.jpg/500px-0804_Bl%C3%BCtenpflanze_%28Korbbl%C3%BCtler%29.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "W. Bulach",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:0804_Bl%C3%BCtenpflanze_(Korbbl%C3%BCtler).jpg"
      }
     ]
    },
@@ -1075,33 +1153,33 @@
     "Its flowers are big and round.",
     "It is named after Paeon, a healer in Greek myth.",
     "The answer has 2 words (6, 5 letters).",
-    "It starts with the letter C."
+    "Its first letter is C."
    ],
    "media": {
     "img": [
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/275394133/medium.jpeg",
-      "w": 375,
-      "h": 500,
-      "credit": "Ljaž",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/275394133"
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/8/88/Paeonia_officinalis_1.jpg/500px-Paeonia_officinalis_1.jpg",
+      "w": 500,
+      "h": 467,
+      "credit": "Franz Xaver",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Paeonia_officinalis_1.jpg"
      },
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/275394117/medium.jpeg",
-      "w": 375,
-      "h": 500,
-      "credit": "Ljaž",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/275394117"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/107571541/medium.jpeg",
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/0/00/PAEONIA_OFFICINALIS_-_MONTSEC_-_IB-200_%28Pe%C3%B2nia_de_muntanya%29.jpg/500px-PAEONIA_OFFICINALIS_-_MONTSEC_-_IB-200_%28Pe%C3%B2nia_de_muntanya%29.jpg",
       "w": 500,
       "h": 375,
-      "credit": "Yves Bas",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/107571541"
+      "credit": "Isidre blanc",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:PAEONIA_OFFICINALIS_-_MONTSEC_-_IB-200_(Pe%C3%B2nia_de_muntanya).jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/8/8e/Paeonia_officinalis_01.JPG/330px-Paeonia_officinalis_01.JPG",
+      "w": 330,
+      "h": 440,
+      "credit": "Meneerke bloem",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Paeonia_officinalis_01.JPG"
      }
     ]
    },
@@ -1130,10 +1208,18 @@
     "Its flowers grow in big round balls.",
     "Its name begins with \"hydra\".",
     "The answer has 2 words (7, 9 letters).",
-    "It starts with the letter B."
+    "Its first letter is B."
    ],
    "media": {
     "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/2/21/%28Natural%29_Hydrangea_macrophylla%2C_Iwafune%2C_Isumi%2C_Chiba%2C_Japan_2.jpg/500px-%28Natural%29_Hydrangea_macrophylla%2C_Iwafune%2C_Isumi%2C_Chiba%2C_Japan_2.jpg",
+      "w": 500,
+      "h": 371,
+      "credit": "belvedere04",
+      "license": "CC BY 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:(Natural)_Hydrangea_macrophylla,_Iwafune,_Isumi,_Chiba,_Japan_2.jpg"
+     },
      {
       "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/31091656/medium.jpg",
       "w": 500,
@@ -1149,14 +1235,6 @@
       "credit": "Claude Kolwelter",
       "license": "CC BY 4.0",
       "page": "https://www.inaturalist.org/photos/439784619"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/556183552/medium.jpg",
-      "w": 500,
-      "h": 375,
-      "credit": "zebedeugalinha",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/556183552"
      }
     ]
    },
@@ -1183,10 +1261,26 @@
     "It has tiny white bells.",
     "Its name includes a lowland between hills.",
     "The answer has 4 words (4, 2, 3, 6 letters).",
-    "It starts with the letter L."
+    "Its first letter is L."
    ],
    "media": {
     "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/f/f9/Convallaria_majalis_inflorescence_-_Keila.jpg/330px-Convallaria_majalis_inflorescence_-_Keila.jpg",
+      "w": 330,
+      "h": 495,
+      "credit": "Ivar Leidus",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Convallaria_majalis_inflorescence_-_Keila.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/7/79/Convallaria_majalis_2016-11-08_4871.jpg/330px-Convallaria_majalis_2016-11-08_4871.jpg",
+      "w": 330,
+      "h": 440,
+      "credit": "Salicyna",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Convallaria_majalis_2016-11-08_4871.jpg"
+     },
      {
       "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/42995958/medium.jpeg",
       "w": 500,
@@ -1194,22 +1288,6 @@
       "credit": "Vladimir",
       "license": "CC0 1.0",
       "page": "https://www.inaturalist.org/photos/42995958"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/201171821/medium.jpeg",
-      "w": 375,
-      "h": 500,
-      "credit": "J V",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/201171821"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/449482464/medium.jpeg",
-      "w": 500,
-      "h": 375,
-      "credit": "Mike B",
-      "license": "CC BY-SA 4.0",
-      "page": "https://www.inaturalist.org/photos/449482464"
      }
     ]
    },
@@ -1239,10 +1317,26 @@
     "Bees climb inside its tube-shaped flowers.",
     "It is named after a wild animal's glove.",
     "The answer is one word of 8 letters.",
-    "It starts with the letter F."
+    "Its first letter is F."
    ],
    "media": {
     "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/0/0e/Fingerhut_-_Fischbacher_Alpen.JPG/330px-Fingerhut_-_Fischbacher_Alpen.JPG",
+      "w": 330,
+      "h": 495,
+      "credit": "C.Stadler/Bwag",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Fingerhut_-_Fischbacher_Alpen.JPG"
+     },
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/7/74/Digitalis_purpurea2.jpg",
+      "w": 500,
+      "h": 667,
+      "credit": "Kurt Stüber [1]",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Digitalis_purpurea2.jpg"
+     },
      {
       "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/464372621/medium.jpg",
       "w": 500,
@@ -1250,22 +1344,6 @@
       "credit": "nbasargin",
       "license": "CC BY 4.0",
       "page": "https://www.inaturalist.org/photos/464372621"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/451204175/medium.jpeg",
-      "w": 375,
-      "h": 500,
-      "credit": "zebedeugalinha",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/451204175"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/456044336/medium.jpg",
-      "w": 315,
-      "h": 500,
-      "credit": "zebedeugalinha",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/456044336"
      }
     ]
    },
@@ -1294,10 +1372,18 @@
     "It is tiny, blue and yellow-centred.",
     "Its name is a plea to remember.",
     "The answer has 4 words (5, 6, 2, 3 letters).",
-    "It starts with the letter W."
+    "Its first letter is W."
    ],
    "media": {
     "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/b/b0/Myosotis_scorpioides_-_Niitv%C3%A4lja_bog.jpg/500px-Myosotis_scorpioides_-_Niitv%C3%A4lja_bog.jpg",
+      "w": 500,
+      "h": 625,
+      "credit": "Ivar Leidus",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Myosotis_scorpioides_-_Niitv%C3%A4lja_bog.jpg"
+     },
      {
       "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/248589470/medium.jpeg",
       "w": 452,
@@ -1313,14 +1399,6 @@
       "credit": "Douglas Goldman",
       "license": "CC BY-SA 4.0",
       "page": "https://www.inaturalist.org/photos/54579998"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/228038917/medium.jpg",
-      "w": 500,
-      "h": 500,
-      "credit": "Larry Jensen",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/228038917"
      }
     ]
    },
@@ -1352,10 +1430,18 @@
     "It is native to Europe.",
     "Its petals seem to show a face.",
     "The answer has 2 words (6, 5 letters).",
-    "It starts with the letter G."
+    "Its first letter is G."
    ],
    "media": {
     "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/b/b8/PansyScan_%28cropped%29.jpg/500px-PansyScan_%28cropped%29.jpg",
+      "w": 500,
+      "h": 648,
+      "credit": "Osnat Ravid Amir",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:PansyScan_(cropped).jpg"
+     },
      {
       "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/232798264/medium.jpeg",
       "w": 500,
@@ -1371,14 +1457,6 @@
       "credit": "Bobby McCabe",
       "license": "CC BY 4.0",
       "page": "https://www.inaturalist.org/photos/68851906"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/187392103/medium.jpeg",
-      "w": 281,
-      "h": 500,
-      "credit": "Troi Perkins",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/187392103"
      }
     ]
    },
@@ -1409,33 +1487,33 @@
     "A colour is named after it.",
     "It is a small, scented purple flower.",
     "The answer has 2 words (5, 6 letters).",
-    "It starts with the letter S."
+    "Its first letter is S."
    ],
    "media": {
     "img": [
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/479236079/medium.jpeg",
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/7/7a/Viola_odorata_fg01.JPG/500px-Viola_odorata_fg01.JPG",
       "w": 500,
       "h": 333,
-      "credit": "Björn Sothmann",
-      "license": "CC BY-SA 4.0",
-      "page": "https://www.inaturalist.org/photos/479236079"
+      "credit": "Fritz Geller-Grimm",
+      "license": "CC BY-SA 2.5",
+      "page": "https://commons.wikimedia.org/wiki/File:Viola_odorata_fg01.JPG"
      },
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/315648038/medium.jpg",
-      "w": 333,
-      "h": 500,
-      "credit": "Tomás Carranza Perales",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/315648038"
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/f/f2/20130407Viola_odorata1.jpg/330px-20130407Viola_odorata1.jpg",
+      "w": 330,
+      "h": 440,
+      "credit": "AnRo0002",
+      "license": "CC0 1.0",
+      "page": "https://commons.wikimedia.org/wiki/File:20130407Viola_odorata1.jpg"
      },
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/118085149/medium.jpg",
+      "src": "https://upload.wikimedia.org/wikipedia/commons/b/b8/Viola_odorata1.jpg",
       "w": 500,
-      "h": 333,
-      "credit": "Abrimaal",
-      "license": "CC BY-SA 4.0",
-      "page": "https://www.inaturalist.org/photos/118085149"
+      "h": 632,
+      "credit": "Carl Axel Magnus Lindman",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Viola_odorata1.jpg"
      }
     ]
    },
@@ -1465,10 +1543,18 @@
     "Its petals are glossy.",
     "Its name includes a dairy spread.",
     "The answer has 2 words (6, 9 letters).",
-    "It starts with the letter M."
+    "Its first letter is M."
    ],
    "media": {
     "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/c/c0/Illustration_Ranunculus_acris0.jpg/330px-Illustration_Ranunculus_acris0.jpg",
+      "w": 330,
+      "h": 518,
+      "credit": "Wikimedia Commons",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Illustration_Ranunculus_acris0.jpg"
+     },
      {
       "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/102792039/medium.jpeg",
       "w": 500,
@@ -1484,14 +1570,6 @@
       "credit": "Douglas Goldman",
       "license": "CC BY-SA 4.0",
       "page": "https://www.inaturalist.org/photos/178823211"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/178823025/medium.jpg",
-      "w": 500,
-      "h": 335,
-      "credit": "Douglas Goldman",
-      "license": "CC BY-SA 4.0",
-      "page": "https://www.inaturalist.org/photos/178823025"
      }
     ]
    },
@@ -1519,33 +1597,25 @@
     "It is native to Africa.",
     "It comes from South Africa.",
     "The answer has 3 words (4, 2, 8 letters).",
-    "It starts with the letter B."
+    "Its first letter is B."
    ],
    "media": {
     "img": [
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/375653805/medium.jpg",
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/8/86/Ave_del_Para%C3%ADso_%28Strelitzia_reginae%29%2C_Jard%C3%ADn_Bot%C3%A1nico_de_M%C3%BAnich%2C_Alemania%2C_2013-05-04%2C_DD_01.jpg/500px-Ave_del_Para%C3%ADso_%28Strelitzia_reginae%29%2C_Jard%C3%ADn_Bot%C3%A1nico_de_M%C3%BAnich%2C_Alemania%2C_2013-05-04%2C_DD_01.jpg",
       "w": 500,
-      "h": 495,
-      "credit": "Henry de Lange",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/375653805"
+      "h": 339,
+      "credit": "Diego Delso",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Ave_del_Para%C3%ADso_(Strelitzia_reginae),_Jard%C3%ADn_Bot%C3%A1nico_de_M%C3%BAnich,_Alemania,_2013-05-04,_DD_01.jpg"
      },
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/486997783/medium.jpeg",
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/8/84/Strelitzia_April_2015-1.jpg/500px-Strelitzia_April_2015-1.jpg",
       "w": 500,
-      "h": 375,
-      "credit": "Lucas Christofides",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/486997783"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/504865117/medium.jpg",
-      "w": 281,
-      "h": 500,
-      "credit": "Rafael Silva",
+      "h": 353,
+      "credit": "Alvesgaspar",
       "license": "CC BY-SA 4.0",
-      "page": "https://www.inaturalist.org/photos/504865117"
+      "page": "https://commons.wikimedia.org/wiki/File:Strelitzia_April_2015-1.jpg"
      }
     ]
    },
@@ -1578,10 +1648,26 @@
     "It comes from the Cape.",
     "It is the national flower of South Africa.",
     "The answer has 2 words (4, 6 letters).",
-    "It starts with the letter K."
+    "Its first letter is K."
    ],
    "media": {
     "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/7/7c/Prot%C3%A9a_royale_%C3%A0_Stellenbosch_%28Afrique_du_Sud%29.jpg/500px-Prot%C3%A9a_royale_%C3%A0_Stellenbosch_%28Afrique_du_Sud%29.jpg",
+      "w": 500,
+      "h": 465,
+      "credit": "© Pierre André",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Prot%C3%A9a_royale_%C3%A0_Stellenbosch_(Afrique_du_Sud).jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/9/96/Peninsula_Sandstone_Fynbos_-_KingProtea_-_Table_Mountain.JPG/330px-Peninsula_Sandstone_Fynbos_-_KingProtea_-_Table_Mountain.JPG",
+      "w": 330,
+      "h": 440,
+      "credit": "S Molteno",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Peninsula_Sandstone_Fynbos_-_KingProtea_-_Table_Mountain.JPG"
+     },
      {
       "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/180107528/medium.jpg",
       "w": 500,
@@ -1589,22 +1675,6 @@
       "credit": "Klaus Wehrlin",
       "license": "CC0 1.0",
       "page": "https://www.inaturalist.org/photos/180107528"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/175739278/medium.jpeg",
-      "w": 500,
-      "h": 333,
-      "credit": "Tony Rebelo",
-      "license": "CC BY-SA 4.0",
-      "page": "https://www.inaturalist.org/photos/175739278"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/15418778/medium.jpg",
-      "w": 500,
-      "h": 333,
-      "credit": "Tony Rebelo",
-      "license": "CC BY-SA 4.0",
-      "page": "https://www.inaturalist.org/photos/15418778"
      }
     ]
    },
@@ -1637,10 +1707,18 @@
     "It is native to Australia.",
     "Its flower head is big and bright red.",
     "The answer is one word of 7 letters.",
-    "It starts with the letter W."
+    "Its first letter is W."
    ],
    "media": {
     "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/c/cb/Telopea_speciosissima_suellen.JPG/500px-Telopea_speciosissima_suellen.JPG",
+      "w": 500,
+      "h": 374,
+      "credit": "Wikimedia Commons",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Telopea_speciosissima_suellen.JPG"
+     },
      {
       "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/15445139/medium.jpg",
       "w": 500,
@@ -1656,14 +1734,6 @@
       "credit": "Wynand Uys",
       "license": "CC BY 4.0",
       "page": "https://www.inaturalist.org/photos/15236398"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/154507901/medium.jpg",
-      "w": 500,
-      "h": 333,
-      "credit": "dhfischer",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/154507901"
      }
     ]
    },
@@ -1693,33 +1763,25 @@
     "It is the emblem of Western Australia.",
     "It is named after a hopping animal's foot.",
     "The answer has 2 words (8, 3 letters).",
-    "It starts with the letter K."
+    "Its first letter is K."
    ],
    "media": {
     "img": [
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/331657320/medium.jpg",
-      "w": 500,
-      "h": 375,
-      "credit": "pimelea",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/331657320"
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/11/Anigozanthos_manglesii_gnangarra-1008.jpg/330px-Anigozanthos_manglesii_gnangarra-1008.jpg",
+      "w": 330,
+      "h": 494,
+      "credit": "Gnangarra",
+      "license": "CC BY 2.5 au",
+      "page": "https://commons.wikimedia.org/wiki/File:Anigozanthos_manglesii_gnangarra-1008.jpg"
      },
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/77268/medium.jpg",
-      "w": 374,
-      "h": 500,
-      "credit": "Ilena",
-      "license": "CC BY-SA 4.0",
-      "page": "https://www.inaturalist.org/photos/77268"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/152627389/medium.jpg",
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/a/ac/Anigozanthos_manglesii%2C_Eaton.JPG/500px-Anigozanthos_manglesii%2C_Eaton.JPG",
       "w": 500,
-      "h": 333,
-      "credit": "dhfischer",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/152627389"
+      "h": 357,
+      "credit": "Public domainPublic domainfalsefalse This work has been released into the public domain…",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Anigozanthos_manglesii,_Eaton.JPG"
      }
     ]
    },
@@ -1728,6 +1790,7 @@
   {
    "id": "sturts-desert-pea",
    "name": "Sturt's desert pea",
+   "lname": "Sturt's desert pea",
    "sci": "Swainsona formosa",
    "group": "pea family",
    "facts": {
@@ -1747,7 +1810,7 @@
     "It is the emblem of South Australia.",
     "It is red with a glossy black centre.",
     "The answer has 3 words (6, 6, 3 letters).",
-    "It starts with the letter S."
+    "Its first letter is S."
    ],
    "media": {
     "img": [
@@ -1795,38 +1858,40 @@
    "blurb": "A gnarled Australian tree with bottlebrush-like flower spikes. Its old cones inspired May Gibbs's \"big bad Banksia men\".",
    "clues": [
     "Family: Proteaceae.",
-    "Fire helps open its seed cones.",
+    "Its spent flowers turn into hard, knobbly cones.",
+    "It grows on the east coast of Australia.",
     "It is usually yellow.",
     "It is native to Australia.",
+    "Fire helps open its seed cones.",
     "Its flowers grow in big cylindrical spikes.",
     "The answer has 3 words (3, 3, 7 letters).",
-    "It starts with the letter O."
+    "Its first letter is O."
    ],
    "media": {
     "img": [
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/244341884/medium.jpg",
-      "w": 333,
-      "h": 500,
-      "credit": "T. Hammer",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/244341884"
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/8/83/Banksia_serrata_Henry_Hd_email.jpg/330px-Banksia_serrata_Henry_Hd_email.jpg",
+      "w": 330,
+      "h": 495,
+      "credit": "Cas Liber",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Banksia_serrata_Henry_Hd_email.jpg"
      },
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/60700686/medium.jpg",
-      "w": 375,
-      "h": 500,
-      "credit": "Guy Taseski",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/60700686"
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/8/82/Banksia_serrata_regrowth_Booti_Booti.jpg/330px-Banksia_serrata_regrowth_Booti_Booti.jpg",
+      "w": 330,
+      "h": 440,
+      "credit": "Casliber",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Banksia_serrata_regrowth_Booti_Booti.jpg"
      },
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/244061068/medium.jpg",
-      "w": 500,
-      "h": 333,
-      "credit": "T. Hammer",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/244061068"
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/f/fb/Proteaceae_-_Banksia_serrata.JPG/330px-Proteaceae_-_Banksia_serrata.JPG",
+      "w": 330,
+      "h": 439,
+      "credit": "Hectonichus",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Proteaceae_-_Banksia_serrata.JPG"
      }
     ]
    },
@@ -1853,10 +1918,26 @@
     "It grows around Sydney.",
     "It is white and fuzzy.",
     "The answer has 2 words (7, 6 letters).",
-    "It starts with the letter F."
+    "Its first letter is F."
    ],
    "media": {
     "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/e/ef/Actinotus_helianthi_%287779093398%29.jpg/500px-Actinotus_helianthi_%287779093398%29.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "David Lochlin from Australia",
+      "license": "CC BY 2.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Actinotus_helianthi_(7779093398).jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/0/0f/Flannel_Flower_Henry_Head2_email.jpg/500px-Flannel_Flower_Henry_Head2_email.jpg",
+      "w": 500,
+      "h": 381,
+      "credit": "Photo: Cas Liber (user:Casliber)",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Flannel_Flower_Henry_Head2_email.jpg"
+     },
      {
       "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/342474424/medium.jpeg",
       "w": 500,
@@ -1864,22 +1945,6 @@
       "credit": "Shelomi Doyle",
       "license": "CC BY 4.0",
       "page": "https://www.inaturalist.org/photos/342474424"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/86703861/medium.jpeg",
-      "w": 375,
-      "h": 500,
-      "credit": "Tim",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/86703861"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/8574803/medium.jpeg",
-      "w": 500,
-      "h": 375,
-      "credit": "John Barkla",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/8574803"
      }
     ]
    },
@@ -1906,10 +1971,18 @@
     "A song in \"The Sound of Music\" is about it.",
     "It is a white, star-shaped mountain flower.",
     "The answer is one word of 9 letters.",
-    "It starts with the letter E."
+    "Its first letter is E."
    ],
    "media": {
     "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/3/38/Alpen_Edelwei%C3%9F%2C_Leontopodium_alpinum_2.JPG/500px-Alpen_Edelwei%C3%9F%2C_Leontopodium_alpinum_2.JPG",
+      "w": 500,
+      "h": 332,
+      "credit": "Böhringer Friedrich",
+      "license": "CC BY-SA 2.5",
+      "page": "https://commons.wikimedia.org/wiki/File:Alpen_Edelwei%C3%9F,_Leontopodium_alpinum_2.JPG"
+     },
      {
       "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/45613211/medium.jpeg",
       "w": 500,
@@ -1925,14 +1998,6 @@
       "credit": "no rights reserved",
       "license": "CC0 1.0",
       "page": "https://www.inaturalist.org/photos/535574862"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/147603169/medium.jpg",
-      "w": 500,
-      "h": 375,
-      "credit": "Karsten Rohweder",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/147603169"
      }
     ]
    },
@@ -1963,7 +2028,7 @@
     "It smells of rotting meat.",
     "It is the biggest single flower in the world.",
     "The answer has 2 words (6, 6 letters).",
-    "It starts with the letter C."
+    "Its first letter is C."
    ],
    "media": {
     "img": [
@@ -2019,33 +2084,33 @@
     "It comes from Sumatra.",
     "It smells of rotting meat.",
     "The answer has 2 words (5, 4 letters).",
-    "It starts with the letter T."
+    "Its first letter is T."
    ],
    "media": {
     "img": [
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/364052744/medium.jpeg",
-      "w": 375,
-      "h": 500,
-      "credit": "Samuel GUIRAUDOU",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/364052744"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/434469097/medium.jpeg",
-      "w": 375,
-      "h": 500,
-      "credit": "eustreptospondylus",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/434469097"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/629644361/medium.jpg",
+      "src": "https://upload.wikimedia.org/wikipedia/commons/c/c0/Titan-arum1web.jpg",
       "w": 500,
-      "h": 375,
-      "credit": "no rights reserved",
-      "license": "CC0 1.0",
-      "page": "https://www.inaturalist.org/photos/629644361"
+      "h": 767,
+      "credit": "Credits: US Botanic Garden.",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Titan-arum1web.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/f/f7/Arum_titan_au_jardin_botanique_de_Nancy%2C_floraison_2025.jpg/330px-Arum_titan_au_jardin_botanique_de_Nancy%2C_floraison_2025.jpg",
+      "w": 330,
+      "h": 496,
+      "credit": "Le Commissaire",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Arum_titan_au_jardin_botanique_de_Nancy,_floraison_2025.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/5/5c/Amorphophallus_titanum_%28corpse_flower%29_-_2.jpg/330px-Amorphophallus_titanum_%28corpse_flower%29_-_2.jpg",
+      "w": 330,
+      "h": 471,
+      "credit": "Sailing moose",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Amorphophallus_titanum_(corpse_flower)_-_2.jpg"
      }
     ]
    },
@@ -2054,6 +2119,7 @@
   {
    "id": "venus-flytrap",
    "name": "Venus flytrap",
+   "lname": "Venus flytrap",
    "sci": "Dionaea muscipula",
    "group": "carnivorous",
    "facts": {
@@ -2072,10 +2138,26 @@
     "It digests insects.",
     "Its leaves snap shut like a mouth.",
     "The answer has 2 words (5, 7 letters).",
-    "It starts with the letter V."
+    "Its first letter is V."
    ],
    "media": {
     "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/0/07/Venus_Flytrap_Dionaea_muscipula_%2826455092815%29.jpg/500px-Venus_Flytrap_Dionaea_muscipula_%2826455092815%29.jpg",
+      "w": 500,
+      "h": 641,
+      "credit": "Len Worthington",
+      "license": "CC BY-SA 2.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Venus_Flytrap_Dionaea_muscipula_(26455092815).jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/3/37/Venus_Flytrap_showing_trigger_hairs.jpg/500px-Venus_Flytrap_showing_trigger_hairs.jpg",
+      "w": 500,
+      "h": 547,
+      "credit": "Noah Elhardt",
+      "license": "CC BY-SA 2.5",
+      "page": "https://commons.wikimedia.org/wiki/File:Venus_Flytrap_showing_trigger_hairs.jpg"
+     },
      {
       "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/108567955/medium.jpg",
       "w": 500,
@@ -2083,22 +2165,6 @@
       "credit": "David Hill",
       "license": "CC BY 4.0",
       "page": "https://www.inaturalist.org/photos/108567955"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/511537671/medium.jpg",
-      "w": 375,
-      "h": 500,
-      "credit": "Michael J. Papay",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/511537671"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/399138295/medium.jpeg",
-      "w": 500,
-      "h": 354,
-      "credit": "Michael J. Papay",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/399138295"
      }
     ]
    },
@@ -2120,15 +2186,32 @@
    "blurb": "A bright, daisy-like flower from South Africa. It is one of the most popular cut flowers in the world.",
    "clues": [
     "Family: Asteraceae.",
+    "Florists sell it in bright colours.",
     "It is one of the top five cut flowers.",
-    "It comes in many bright colours.",
     "It is usually orange.",
     "It is native to Africa.",
+    "It comes in many bright colours.",
     "The answer is one word of 7 letters.",
-    "It starts with the letter G."
+    "Its first letter is G."
    ],
    "media": {
     "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/2/2b/Arya.hebras.novita.saulina.sitohang.2019.jpg/330px-Arya.hebras.novita.saulina.sitohang.2019.jpg",
+      "w": 330,
+      "h": 440,
+      "credit": "Novita Saulina Sitohang",
+      "license": "CC BY 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Arya.hebras.novita.saulina.sitohang.2019.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/3/3b/Unidentified_Gerbera.jpg/500px-Unidentified_Gerbera.jpg",
+      "w": 500,
+      "h": 315,
+      "credit": "Dmitry Makeev",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Unidentified_Gerbera.jpg"
+     },
      {
       "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/15793969/medium.jpg",
       "w": 500,
@@ -2136,22 +2219,6 @@
       "credit": "Wynand Uys",
       "license": "CC BY 4.0",
       "page": "https://www.inaturalist.org/photos/15793969"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/286250647/medium.jpeg",
-      "w": 500,
-      "h": 375,
-      "credit": "katuchka",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/286250647"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/29806988/medium.jpeg",
-      "w": 500,
-      "h": 333,
-      "credit": "no rights reserved",
-      "license": "CC0 1.0",
-      "page": "https://www.inaturalist.org/photos/29806988"
      }
     ]
    },
@@ -2179,7 +2246,7 @@
     "It climbs walls and fences.",
     "It has small, white, sweet-smelling flowers.",
     "The answer has 2 words (6, 7 letters).",
-    "It starts with the letter C."
+    "Its first letter is C."
    ],
    "media": {
     "img": [
@@ -2236,33 +2303,33 @@
     "It has no nectar but smells sweet.",
     "It is a scented tropical flower.",
     "The answer is one word of 10 letters.",
-    "It starts with the letter F."
+    "Its first letter is F."
    ],
    "media": {
     "img": [
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/6277677/medium.jpeg",
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/f/fe/Frangipani_flowers.jpg/500px-Frangipani_flowers.jpg",
       "w": 500,
-      "h": 372,
-      "credit": "Francisco Farriols Sarabia",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/6277677"
+      "h": 335,
+      "credit": "Renesis",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Frangipani_flowers.jpg"
      },
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/160986053/medium.jpeg",
-      "w": 375,
-      "h": 500,
-      "credit": "Cabanillas Lopez Jesus Miguel",
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/1a/Frangipanier.jpg/500px-Frangipanier.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "No machine-readable author provided. Ju911 assumed (based on copyright claims).",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Frangipanier.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/e/ed/Plumeria_rubra-4.JPG/500px-Plumeria_rubra-4.JPG",
+      "w": 500,
+      "h": 375,
+      "credit": "Varun Pabrai",
       "license": "CC BY-SA 4.0",
-      "page": "https://www.inaturalist.org/photos/160986053"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/23286722/medium.jpg",
-      "w": 500,
-      "h": 333,
-      "credit": "Bill Levine",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/23286722"
+      "page": "https://commons.wikimedia.org/wiki/File:Plumeria_rubra-4.JPG"
      }
     ]
    },
@@ -2288,33 +2355,33 @@
     "It has thorns.",
     "It is a bright pink climber.",
     "The answer is one word of 13 letters.",
-    "It starts with the letter B."
+    "Its first letter is B."
    ],
    "media": {
     "img": [
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/279592/medium.jpeg",
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/f/f8/Starr_030418-0058_Bougainvillea_spectabilis.jpg/500px-Starr_030418-0058_Bougainvillea_spectabilis.jpg",
       "w": 500,
       "h": 375,
-      "credit": "user:Lumbar",
+      "credit": "Forest & Kim Starr",
+      "license": "CC BY 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Starr_030418-0058_Bougainvillea_spectabilis.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/8/84/Bugambilia_IIE.jpg/500px-Bugambilia_IIE.jpg",
+      "w": 500,
+      "h": 360,
+      "credit": "Claudio.molina.salinas",
       "license": "CC BY-SA 4.0",
-      "page": "https://www.inaturalist.org/photos/279592"
+      "page": "https://commons.wikimedia.org/wiki/File:Bugambilia_IIE.jpg"
      },
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/348399424/medium.jpeg",
-      "w": 375,
-      "h": 500,
-      "credit": "Simon Scotland",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/348399424"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/719956793/medium.jpg",
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/4/4c/Bougainvillea_closeup.jpg/500px-Bougainvillea_closeup.jpg",
       "w": 500,
-      "h": 375,
-      "credit": "zebedeugalinha",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/719956793"
+      "h": 333,
+      "credit": "Clint Budd",
+      "license": "CC BY 2.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Bougainvillea_closeup.jpg"
      }
     ]
    },
@@ -2323,6 +2390,7 @@
   {
    "id": "japanese-camellia",
    "name": "Japanese camellia",
+   "lname": "Japanese camellia",
    "alt": [
     "camellia"
    ],
@@ -2343,10 +2411,18 @@
     "Its leaves are glossy and dark.",
     "Its flowers look a bit like roses.",
     "The answer has 2 words (8, 8 letters).",
-    "It starts with the letter J."
+    "Its first letter is J."
    ],
    "media": {
     "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/e/e9/Camellia_japonica_NBG.jpg/500px-Camellia_japonica_NBG.jpg",
+      "w": 500,
+      "h": 332,
+      "credit": "PumpkinSky",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Camellia_japonica_NBG.jpg"
+     },
      {
       "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/3190034/medium.JPG",
       "w": 500,
@@ -2362,14 +2438,6 @@
       "credit": "no rights reserved",
       "license": "CC0 1.0",
       "page": "https://www.inaturalist.org/photos/307161003"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/341068173/medium.jpeg",
-      "w": 500,
-      "h": 333,
-      "credit": "Hugo Innes",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/341068173"
      }
     ]
    },
@@ -2398,10 +2466,26 @@
     "Its flowers form a dense spike.",
     "It grows from a bulb in spring.",
     "The answer has 2 words (6, 8 letters).",
-    "It starts with the letter C."
+    "Its first letter is C."
    ],
    "media": {
     "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/6/66/Hyacinth_bloem.jpg/330px-Hyacinth_bloem.jpg",
+      "w": 330,
+      "h": 444,
+      "credit": "Rasbak",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Hyacinth_bloem.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/8/82/Hyacinth_flower.jpg/330px-Hyacinth_flower.jpg",
+      "w": 330,
+      "h": 438,
+      "credit": "Plantman",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Hyacinth_flower.jpg"
+     },
      {
       "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/258425794/medium.jpeg",
       "w": 500,
@@ -2409,22 +2493,6 @@
       "credit": "florawhite",
       "license": "CC BY 4.0",
       "page": "https://www.inaturalist.org/photos/258425794"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/258594216/medium.jpg",
-      "w": 375,
-      "h": 500,
-      "credit": "Laura Mae",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/258594216"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/360459321/medium.jpg",
-      "w": 376,
-      "h": 500,
-      "credit": "no rights reserved",
-      "license": "CC0 1.0",
-      "page": "https://www.inaturalist.org/photos/360459321"
      }
     ]
    },
@@ -2445,39 +2513,41 @@
    },
    "blurb": "An amazing-looking climbing flower with a ring of thread-like filaments. Its relatives produce passion fruit.",
    "clues": [
+    "Its fruit is orange when ripe.",
+    "It is often grown over fences.",
     "Missionaries linked its parts to the story of the crucifixion.",
-    "It climbs using curly tendrils.",
     "It is native to South America.",
+    "It climbs using curly tendrils.",
     "It has a ring of thin filaments.",
     "It comes from South America.",
     "The answer has 2 words (4, 13 letters).",
-    "It starts with the letter B."
+    "Its first letter is B."
    ],
    "media": {
     "img": [
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/59317442/medium.jpeg",
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/3/30/Passiflora_caerulea_%28makro_close-up%29.jpg/500px-Passiflora_caerulea_%28makro_close-up%29.jpg",
+      "w": 500,
+      "h": 355,
+      "credit": "Petar Milošević",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Passiflora_caerulea_(makro_close-up).jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/6/6a/South_Central_Farm_45.jpg/500px-South_Central_Farm_45.jpg",
       "w": 500,
       "h": 375,
-      "credit": "Stephen Thorpe",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/59317442"
+      "credit": "Jonathan McIntosh",
+      "license": "CC BY 2.5",
+      "page": "https://commons.wikimedia.org/wiki/File:South_Central_Farm_45.jpg"
      },
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/169805900/medium.jpeg",
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/1a/Blue_passion_flower_%28Passiflora_caerulea%29.jpg/500px-Blue_passion_flower_%28Passiflora_caerulea%29.jpg",
       "w": 500,
-      "h": 333,
-      "credit": "Victoria Prosdocimo",
+      "h": 375,
+      "credit": "K. Chaikovska (Kate Chkv)",
       "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/169805900"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/484358495/medium.jpeg",
-      "w": 500,
-      "h": 333,
-      "credit": "Andrea Gantzer",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/484358495"
+      "page": "https://commons.wikimedia.org/wiki/File:Blue_passion_flower_(Passiflora_caerulea).jpg"
      }
     ]
    },
@@ -2507,33 +2577,33 @@
     "It is covered in sharp prickles.",
     "It is Scotland's national emblem.",
     "The answer has 2 words (5, 7 letters).",
-    "It starts with the letter S."
+    "Its first letter is S."
    ],
    "media": {
     "img": [
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/106346873/medium.jpg",
-      "w": 375,
-      "h": 500,
-      "credit": "Sandy Wolkenberg",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/106346873"
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/a/a5/Cirsium_vulgare_Harthope.jpg/500px-Cirsium_vulgare_Harthope.jpg",
+      "w": 500,
+      "h": 601,
+      "credit": "Sciadopitys from UK",
+      "license": "CC BY-SA 2.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Cirsium_vulgare_Harthope.jpg"
      },
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/147491/medium.jpg",
-      "w": 500,
-      "h": 331,
-      "credit": "Don Loarie",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/147491"
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/e/e7/Cirsium_vulgare_carriere-fossoy_02_23062008_02.jpg/330px-Cirsium_vulgare_carriere-fossoy_02_23062008_02.jpg",
+      "w": 330,
+      "h": 493,
+      "credit": "Olivier Pichard",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Cirsium_vulgare_carriere-fossoy_02_23062008_02.jpg"
      },
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/296056732/medium.jpeg",
-      "w": 500,
-      "h": 333,
-      "credit": "no rights reserved",
-      "license": "CC0 1.0",
-      "page": "https://www.inaturalist.org/photos/296056732"
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/3/33/Mooie_bloeiwijze_van_een_Speerdistel_%28Cirsium_vulgare%29_03.jpg/330px-Mooie_bloeiwijze_van_een_Speerdistel_%28Cirsium_vulgare%29_03.jpg",
+      "w": 330,
+      "h": 559,
+      "credit": "Dominicus Johannes Bergsma",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Mooie_bloeiwijze_van_een_Speerdistel_(Cirsium_vulgare)_03.jpg"
      }
     ]
    },
@@ -2564,10 +2634,26 @@
     "It covers Scottish moors.",
     "It turns hills purple in late summer.",
     "The answer has 2 words (6, 7 letters).",
-    "It starts with the letter C."
+    "Its first letter is C."
    ],
    "media": {
     "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/9/97/Heather_%28Highlands%29.jpg/500px-Heather_%28Highlands%29.jpg",
+      "w": 500,
+      "h": 467,
+      "credit": "Foxypar4",
+      "license": "CC BY 2.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Heather_(Highlands).jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/3/30/CallunaVulgaris.jpg/500px-CallunaVulgaris.jpg",
+      "w": 500,
+      "h": 427,
+      "credit": "Aqwis (Aqwis)",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:CallunaVulgaris.jpg"
+     },
      {
       "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/4882011/medium.jpg",
       "w": 500,
@@ -2575,22 +2661,6 @@
       "credit": "Andreas Rockstein",
       "license": "CC BY-SA 4.0",
       "page": "https://www.inaturalist.org/photos/4882011"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/465747023/medium.jpg",
-      "w": 500,
-      "h": 331,
-      "credit": "zebedeugalinha",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/465747023"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/604184709/medium.jpg",
-      "w": 500,
-      "h": 375,
-      "credit": "zebedeugalinha",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/604184709"
      }
     ]
    },
@@ -2620,33 +2690,33 @@
     "A shade of blue is named after it.",
     "It is named after a cereal field.",
     "The answer is one word of 10 letters.",
-    "It starts with the letter C."
+    "Its first letter is C."
    ],
    "media": {
     "img": [
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/143259788/medium.jpg",
-      "w": 335,
-      "h": 500,
-      "credit": "Douglas Goldman",
-      "license": "CC BY-SA 4.0",
-      "page": "https://www.inaturalist.org/photos/143259788"
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/e/e3/CentaureaCyanus-bloem-kl.jpg/500px-CentaureaCyanus-bloem-kl.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "TeunSpaans",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:CentaureaCyanus-bloem-kl.jpg"
      },
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/292128300/medium.jpeg",
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/6/6a/Chabry_b%C5%82awatki.jpg/500px-Chabry_b%C5%82awatki.jpg",
       "w": 500,
-      "h": 270,
-      "credit": "Thomas Gyselinck",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/292128300"
+      "h": 333,
+      "credit": "Przykuta",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Chabry_b%C5%82awatki.jpg"
      },
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/143259808/medium.jpg",
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/0/07/Centaurea_cyanus_flower_001.jpg/500px-Centaurea_cyanus_flower_001.jpg",
       "w": 500,
-      "h": 335,
-      "credit": "Douglas Goldman",
-      "license": "CC BY-SA 4.0",
-      "page": "https://www.inaturalist.org/photos/143259808"
+      "h": 375,
+      "credit": "Orikrin1998",
+      "license": "CC BY 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Centaurea_cyanus_flower_001.jpg"
      }
     ]
    },
@@ -2676,10 +2746,26 @@
     "Each flower lasts only one day.",
     "Its flowers open early in the day.",
     "The answer has 3 words (6, 7, 5 letters).",
-    "It starts with the letter C."
+    "Its first letter is C."
    ],
    "media": {
     "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/d/db/BlueMorningGlory.jpg/500px-BlueMorningGlory.jpg",
+      "w": 500,
+      "h": 613,
+      "credit": "Original uploader was PiccoloNamek at en.wikipedia",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:BlueMorningGlory.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/6/61/Ipomoea_purpurea%2C_2021-08-31%2C_Beechview%2C_05.jpg/500px-Ipomoea_purpurea%2C_2021-08-31%2C_Beechview%2C_05.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Cbaile19",
+      "license": "CC0 1.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Ipomoea_purpurea,_2021-08-31,_Beechview,_05.jpg"
+     },
      {
       "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/338150076/medium.jpg",
       "w": 500,
@@ -2687,22 +2773,6 @@
       "credit": "M. Whitson",
       "license": "CC BY 4.0",
       "page": "https://www.inaturalist.org/photos/338150076"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/222679360/medium.jpeg",
-      "w": 500,
-      "h": 333,
-      "credit": "Michelle W. （鍾偉瑋）",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/222679360"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/338150047/medium.jpg",
-      "w": 500,
-      "h": 446,
-      "credit": "M. Whitson",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/338150047"
      }
     ]
    },

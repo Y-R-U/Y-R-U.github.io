@@ -18,6 +18,8 @@ const SHOTS = args.includes('--shots') ? args[args.indexOf('--shots') + 1] : joi
 const POLL = args.includes('--poll');
 mkdirSync(SHOTS, { recursive: true });
 
+const HARD_TIMEOUT = setTimeout(() => { console.log('FATAL: whole run exceeded 8 min'); process.exit(1); }, 8 * 60 * 1000);
+HARD_TIMEOUT.unref();
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 let pass = 0, fail = 0;
 const ok = (c, msg, extra = '') => { if (c) { pass++; console.log(`  ok   ${msg}`); } else { fail++; console.log(`  FAIL ${msg} ${extra}`); } };
@@ -47,7 +49,10 @@ class Page {
   send(method, params = {}) {
     const id = ++this.id;
     this.ws.send(JSON.stringify({ id, method, params }));
-    return new Promise((res, rej) => this.cbs.set(id, { res, rej }));
+    return new Promise((res, rej) => {
+      const t = setTimeout(() => { this.cbs.delete(id); rej(new Error(`${this.name}: CDP ${method} timed out`)); }, 20000);
+      this.cbs.set(id, { res: v => { clearTimeout(t); res(v); }, rej: e => { clearTimeout(t); rej(e); } });
+    });
   }
   size(w, h, dpr = 1, mobile = false) { return this.send('Emulation.setDeviceMetricsOverride', { width: w, height: h, deviceScaleFactor: dpr, mobile }); }
   async eval(expr) {
@@ -74,8 +79,10 @@ class Page {
     await this.send('Input.insertText', { text });
   }
   async shot(file) {
-    const r = await this.send('Page.captureScreenshot', { format: 'png' });
-    writeFileSync(join(SHOTS, file), Buffer.from(r.data, 'base64'));
+    try {
+      const r = await this.send('Page.captureScreenshot', { format: 'png' });
+      writeFileSync(join(SHOTS, file), Buffer.from(r.data, 'base64'));
+    } catch (e) { console.log(`  (screenshot ${file} skipped: ${e.message})`); }
   }
   room() { return this.eval('window.__cluedRoom ? JSON.parse(JSON.stringify(window.__cluedRoom.st)) : null'); }
 }
@@ -189,9 +196,41 @@ async function main() {
   await host.shot('final-host-portrait.png');
   await j2.shot('final-joiner-portrait.png');
 
+  // vote to reveal more: play again with progressive questions (stages: 3)
+  const hostKey = await host.eval(`JSON.parse(sessionStorage.getItem('clued.room.${code}')||'{}').key`);
+  const prog = [0, 1].map(i => ({ format: 'mc', id: `prog${i}`, prompt: `Progressive ${i}?`, stages: 3, answer: 0, options: [{ text: 'Right' }, { text: 'Wrong' }] }));
+  await fetch(`${API}/rooms/${code}/again`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ key: hostKey, questions: prog, spec: {} }) });
+  await host.waitFor(`window.__cluedRoom?.st?.phase === 'lobby'`, 10000, 'again → lobby');
+  await host.click('[data-act=start]');
+  const btn = `document.querySelector('.more-btn:not([hidden])')`;
+  for (const p of pages) await p.waitFor(`${btn} && !${btn}.disabled && ${btn}.textContent.includes('(0/3)')`, 15000, `${p.name} vote button 0/3`);
+  ok(true, 'everyone sees "Show more 👀 (0/3)"');
+  await host.click('.more-btn:not([hidden])');
+  await j1.click('.more-btn:not([hidden])');
+  await j2.waitFor(`${btn}.textContent.includes('(2/3)')`, 8000, 'bob sees 2/3');
+  ok(await host.eval(`${btn}.disabled`), 'a voter cannot vote twice');
+  await j2.shot('vote-2of3.png');
+  await j2.click('.more-btn:not([hidden])');
+  for (const p of pages) await p.waitFor(`window.__cluedRoom.st.stage === 1 && ${btn}.textContent.includes('(0/3)')`, 8000, `${p.name} stage 1`);
+  ok(true, 'unanimous vote advances everyone to stage 1');
+  ok((await host.room()).limitMs > 15000, 'the vote extended the deadline', String((await host.room()).limitMs));
+  await j1.click('.stage .choices .choice');
+  for (const p of [host, j2]) await p.waitFor(`${btn}.textContent.includes('Locked')`, 8000, `${p.name} locked`);
+  ok(true, 'the first answer locks voting for everyone');
+  await host.shot('vote-locked.png');
+  const annSt = await j1.room();
+  ok(annSt.you.stage === 1 && annSt.you.last && annSt.you.last.points > 0, 'answer recorded at stage 1 with stage-reduced points', JSON.stringify(annSt.you.last));
+  for (const p of [host, j2]) await p.click('.stage .choices .choice');
+  await host.waitFor(`window.__cluedRoom.st.phase === 'reveal'`, 8000, 'prog reveal');
+  const rows = (await host.room()).players;
+  const ann = rows.find(r => r.name === 'Ann'), hosty = rows.find(r => r.name === 'Hosty');
+  ok(ann.last.points < 500 && hosty.last.points <= ann.last.points, 'stage multiplier applied by the server', `${ann.last.points} ${hosty.last.points}`);
+  await fetch(`${API}/rooms/${code}/end`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ key: hostKey }) });
+  await host.waitFor(`window.__cluedRoom?.st?.phase === 'final'`, 8000, 'final again');
+
   // host leaves → Ann becomes host
   await host.eval(`window.__cluedCtx.reset('home')`).catch(() => {});
-  await fetch(`${API}/rooms/${code}/leave`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ key: await host.eval(`JSON.parse(sessionStorage.getItem('clued.room.${code}')||'{}').key`) }) });
+  await fetch(`${API}/rooms/${code}/leave`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ key: hostKey }) });
   await j1.waitFor(`window.__cluedRoom?.st?.you?.host === true`, 8000, 'ann becomes host');
   ok(true, 'host leaving hands the room to the next player');
   ok(await j1.eval(`!!document.querySelector('[data-act=again]')`), 'new host gets "Play again"');
@@ -205,6 +244,7 @@ main().catch(async e => {
   for (const p of all) {
     try {
       await p.shot(`fail-${p.name}.png`);
+      console.log(`  [${p.name}] more=${await p.eval(`[...document.querySelectorAll('.more-btn')].map(b => b.outerHTML + ' w=' + b.getBoundingClientRect().width).join(' | ')`)}`);
       console.log(`  [${p.name}] screen=${await p.eval('document.body.dataset.screen')} err=${await p.eval(`[...document.querySelectorAll('.net-err,.error-panel,.toast')].map(x=>x.textContent).join(' | ')`)}`);
       p.events.forEach(x => console.log(`  [${p.name}] ${x}`));
     } catch (err) {}

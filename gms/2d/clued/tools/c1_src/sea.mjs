@@ -1,15 +1,15 @@
 import { INAT, WD, COMMONS, STATUS_META, len } from './_common.mjs';
 
-const MA = 'Mammal', FI = 'Fish', RE = 'Reptile', MO = 'Mollusc', CR = 'Crustacean', EC = 'Echinoderm', CN = 'Cnidarian', AR = 'Arachnid relative';
+const MA = 'Mammal', FI = 'Fish', RE = 'Reptile', MO = 'Mollusc', CR = 'Crustacean', EC = 'Echinoderm', CN = 'Cnidarian', AR = 'Chelicerate';
 const f = (kind, lengthM) => ({ kind, breathesAir: kind === MA || kind === RE, lengthM });
 
 export default {
   id: 'sea', title: 'Sea creatures', theme: 'animals', icon: '🐋', kids: true,
   leakExempt: [],
-  autoTaxo: ['family', 'genus'], status: true, audio: true, wdCheck: { lengthM: 'P2043' },
+  wikiD1: true, autoTaxo: ['family', 'genus'], status: true, audio: true, wdCheck: { lengthM: 'P2043' },
   ranges: { lengthM: [0.02, 35] },
   factsMeta: {
-    kind: { type: 'cat', label: 'Kind of animal', values: [MA, FI, RE, MO, CR, EC, CN], clue: v => `It is a ${v.toLowerCase()}.` },
+    kind: { type: 'cat', label: 'Kind of animal', values: [MA, FI, RE, MO, CR, EC, CN, AR], clue: v => `It is a ${v.toLowerCase()}.` },
     breathesAir: { type: 'bool', label: 'Breathes air', yes: 'Breathes air', no: 'Breathes underwater', clue: v => (v ? 'It must come to the surface to breathe air.' : null) },
     lengthM: len(),
     status: STATUS_META,
@@ -110,7 +110,7 @@ export default {
     { n: 'Weedy seadragon', alt: ['common seadragon'], sci: 'Phyllopteryx taeniolatus', g: 'seahorse', f: f(FI, 0.45), d: 3, look: ['Leafy seadragon'],
       b: 'A colourful seahorse relative of southern Australia with small leafy flaps. It is Victoria\'s marine emblem.',
       c: ['It is Victoria\'s marine emblem.', 'It has red, yellow and purple colours.', 'Males carry eggs on their tails.', 'It has fewer, smaller flaps than its leafy cousin.', 'It is a seahorse relative from southern Australia.'] },
-    { n: 'Guineafowl puffer', alt: ['pufferfish', 'puffer fish', 'blowfish'], sci: 'Arothron meleagris', g: 'pufferfish', f: f(FI, 0.4), d: 1,
+    { n: 'Guineafowl puffer', wikiFirst: true, alt: ['pufferfish', 'puffer fish', 'blowfish'], sci: 'Arothron meleagris', g: 'pufferfish', f: f(FI, 0.4), d: 1,
       b: 'A spotted pufferfish of coral reefs. Like other puffers, it swallows water to blow up like a ball, and it is poisonous to eat.',
       c: ['Its flesh contains a deadly poison.', 'It can be black with white spots or bright yellow.', 'It eats coral tips with its beak-like teeth.', 'It is covered in white spots.', 'It blows itself up like a balloon.'] },
     { n: 'Ocean sunfish', alt: ['mola', 'sunfish'], sci: 'Mola mola', g: 'sunfish', f: f(FI, 1.8), d: 2,
@@ -119,7 +119,7 @@ export default {
     { n: 'Swordfish', sci: 'Xiphias gladius', g: 'billfish', f: f(FI, 3), d: 1,
       b: 'A big, fast fish with a long, flat bill like a sword. It slashes at fish with its bill.',
       c: ['It has a special organ that warms its eyes and brain.', 'Its scientific name includes the word for a Roman sword.', 'Adults have no scales or teeth.', 'It slashes prey with its bill.', 'Its long, flat bill looks like a blade.'] },
-    { n: 'Atlantic bluefin tuna', alt: ['bluefin tuna', 'tuna'], sci: 'Thunnus thynnus', g: 'tuna', f: f(FI, 2.5), d: 2,
+    { n: 'Atlantic bluefin tuna', wikiFirst: true, alt: ['bluefin tuna', 'tuna'], sci: 'Thunnus thynnus', g: 'tuna', f: f(FI, 2.5), d: 2,
       b: 'A huge, fast, warm-bodied fish that crosses the Atlantic. One fish can sell for a fortune at Tokyo fish auctions.',
       c: ['One sold for over US$3 million at a Tokyo auction.', 'It can keep its body warmer than the water.', 'It crosses the Atlantic Ocean.', 'It is used for sushi.', 'It is a large, fast tuna.'] },
     { n: 'Great barracuda', alt: ['barracuda'], sci: 'Sphyraena barracuda', g: 'fish', f: f(FI, 1.5), d: 2,
@@ -164,7 +164,7 @@ export default {
     { n: 'Eastern blue groper', alt: ['blue groper'], sci: 'Achoerodus viridis', g: 'reef fish', f: f(FI, 1), d: 3,
       b: 'A big, friendly blue fish of the New South Wales coast. Females can change into males.',
       c: ['It is the state fish of New South Wales.', 'It starts life female and can become male.', 'Divers find it friendly and curious.', 'Males are bright blue.', 'It is a kind of wrasse.'] },
-    { n: 'Flying fish', alt: ['tropical two-wing flyingfish'], sci: 'Exocoetus volitans', g: 'fish', f: f(FI, 0.25), d: 2,
+    { n: 'Flying fish', wikiFirst: true, alt: ['tropical two-wing flyingfish'], sci: 'Exocoetus volitans', g: 'fish', f: f(FI, 0.25), d: 2,
       b: 'A fish that leaps out of the sea and glides on wing-like fins to escape predators.',
       c: ['It can glide about 50 metres.', 'It beats its tail on the water to take off again.', 'It has huge, wing-like fins.', 'It escapes predators by leaving the water.', 'It glides through the air.'] },
     { n: 'Atlantic cod', alt: ['cod'], sci: 'Gadus morhua', g: 'fish', f: f(FI, 1), d: 2,

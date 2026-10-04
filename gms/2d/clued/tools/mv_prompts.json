@@ -1,5 +1,5 @@
 {
- "style": "painterly gouache illustration in the style of a vintage film poster, bold simplified shapes, visible brush texture, rich limited colour palette, dramatic cinematic lighting, cream paper border, no text, no letters, no words, no numbers, no logos, no signature",
+ "style": "painterly gouache illustration in the style of a vintage film poster, bold simplified shapes, visible brush texture, rich limited colour palette, dramatic cinematic lighting, cream paper border, no text, any signs or labels left blank, no letters, no words, no numbers, no logos, no signature",
  "model": "flux2-klein-9b-mlx-4bit",
  "steps": 4,
  "width": 640,
@@ -251,7 +251,7 @@
    "blurb": "An angel shows a despairing George Bailey what his small town would be like if he had never been born.",
    "scenes": [
     {
-     "p": "a man in a 1940s coat seen from behind running joyfully down the snowy main street of a small American town at Christmas, lit shop windows, a cinema marquee without letters",
+     "p": "a man in a 1940s overcoat and hat seen from behind running joyfully down the snowy main street of a small American town on Christmas Eve, lit shop windows with wreaths, falling snow, an old savings and loan office, no signs",
      "d": 3,
      "cap": "Running through Bedford Falls on Christmas Eve"
     },
@@ -343,7 +343,7 @@
    "scenes": [
     {
      "p": "view from a dark apartment across a Greenwich Village courtyard at night into many lit windows of neighbours, a camera with a long telephoto lens on the sill, a leg in a plaster cast",
-     "d": 2,
+     "d": 3,
      "cap": "Spying on the neighbours across the courtyard"
     },
     {
@@ -367,12 +367,14 @@
     {
      "p": "a colossal dark reptilian monster with jagged dorsal plates rising from Tokyo Bay at night, breathing a glowing blue beam, 1950s city in flames, black and white tones",
      "d": 1,
-     "cap": "The giant monster rises from Tokyo Bay"
+     "cap": "The giant monster rises from Tokyo Bay",
+     "drop": true
     },
     {
      "p": "a small 1950s Japanese fishing boat at night on a calm sea suddenly lit by a blinding white flash on the horizon",
      "d": 3,
-     "cap": "The fishing boat and the flash at sea"
+     "cap": "The fishing boat and the flash at sea",
+     "drop": true
     }
    ]
   },
@@ -386,7 +388,7 @@
    "blurb": "A pampered cocker spaniel falls for a streetwise mutt.",
    "scenes": [
     {
-     "p": "two dogs, a golden cocker spaniel and a scruffy grey mongrel, sharing one long strand of spaghetti from a plate of meatballs at a candlelit table behind an Italian restaurant, accordion player",
+     "p": "two dogs, a golden cocker spaniel and a scruffy grey mongrel, sharing one long strand of spaghetti from a plate of meatballs at a candlelit table in a moonlit back alley behind a restaurant, an accordion player, blank walls without signs",
      "d": 1,
      "cap": "Sharing spaghetti, Bella Notte"
     },
@@ -553,7 +555,7 @@
    "blurb": "Socialite Holly Golightly charms New York and her writer neighbour.",
    "scenes": [
     {
-     "p": "a slender woman seen from behind in a long black evening dress, pearls and an updo, holding a paper coffee cup and pastry, gazing into a jewellery store window on an empty Fifth Avenue at dawn",
+     "p": "a slender woman seen from behind in a long black evening dress, pearls and an updo, holding a paper coffee cup and a pastry, gazing into a jewellery shop window full of necklaces on an empty New York avenue at dawn, plain blank storefronts without signs",
      "d": 2,
      "cap": "Breakfast at the jewellery store window"
     },
@@ -791,7 +793,7 @@
    "blurb": "Charlie Bucket finds a golden ticket and tours the eccentric candy maker's fantastical factory.",
    "scenes": [
     {
-     "p": "a gleaming golden ticket peeking out from a torn chocolate bar wrapper held by a small boy's hands, grey snowy town behind",
+     "p": "a plain shiny golden ticket with no writing peeking out from a torn chocolate bar wrapper held in a small boy's hands, a grey snowy town behind",
      "d": 1,
      "cap": "Finding a golden ticket"
     },
@@ -1166,7 +1168,7 @@
    "blurb": "A cyborg assassin is sent back in time to kill the mother of humanity's future saviour.",
    "scenes": [
     {
-     "p": "a gleaming chrome robot skeleton with glowing red eyes walking through a ruined future city at night, laser fire in the sky",
+     "p": "a wrecked tanker truck burning on a factory road at night, a dark silhouetted figure walking out of the flames with two glowing red eyes",
      "d": 2,
      "cap": "The machine war of the future"
     },
@@ -1211,7 +1213,7 @@
    "blurb": "Teenager Marty McFly is sent back to 1955 in a time-travelling car.",
    "scenes": [
     {
-     "p": "a stainless-steel gull-wing sports car speeding away at night, leaving two blazing trails of fire on the road and a burst of blue lightning",
+     "p": "a boxy angular brushed stainless-steel 1980s sports car with gull-wing doors, seen from behind speeding away down a night road, leaving two parallel blazing trails of fire on the asphalt and a burst of blue electric lightning around it",
      "d": 1,
      "cap": "Hitting 88 mph: twin trails of fire"
     },
@@ -1392,7 +1394,7 @@
    "blurb": "A mermaid princess trades her voice to a sea witch to become human.",
    "scenes": [
     {
-     "p": "a red-haired mermaid with a green tail seen from behind sitting on a rock as waves crash, a castle and a ship on the horizon at sunset",
+     "p": "a red-haired mermaid with a green tail and a purple seashell top seen from behind sitting on a rock as waves crash, a castle and a ship on the horizon at sunset",
      "d": 1,
      "cap": "A mermaid dreams of the world above"
     },
@@ -1800,7 +1802,7 @@
    "blurb": "A bomb on a Los Angeles bus will explode if it drops below 50 mph.",
    "scenes": [
     {
-     "p": "a city bus flying through the air across a gap in an unfinished elevated freeway, Los Angeles",
+     "p": "a city bus with a blank destination panel flying through the air across a gap in an unfinished elevated freeway, Los Angeles, police cars behind",
      "d": 2,
      "cap": "The bus jumps the freeway gap"
     },
@@ -1890,7 +1892,7 @@
    "scenes": [
     {
      "p": "a damaged 1970s Apollo command module and service module venting gas in space, the Moon looming, Earth small in the distance",
-     "d": 2,
+     "d": 3,
      "cap": "Houston, we have a problem"
     },
     {
@@ -1932,7 +1934,7 @@
    "scenes": [
     {
      "p": "a red pickup truck racing along a dirt road toward a huge black tornado over Oklahoma farmland, a cow flying through the air",
-     "d": 1,
+     "d": 2,
      "cap": "Chasing the tornado (with a flying cow)"
     },
     {
@@ -2323,7 +2325,7 @@
    "scenes": [
     {
      "p": "a towering red Japanese bathhouse glowing with lanterns at night across a bridge, steam rising, mysterious spirits",
-     "d": 1,
+     "d": 2,
      "cap": "The spirits' bathhouse"
     },
     {

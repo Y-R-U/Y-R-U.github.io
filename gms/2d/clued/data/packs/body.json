@@ -1,0 +1,1790 @@
+{
+ "id": "body",
+ "title": "Human body",
+ "theme": "science",
+ "icon": "🫀",
+ "kids": true,
+ "version": 1,
+ "imgPrompt": "Which of these shows the {lname}?",
+ "nameImgPrompt": "Which part of the body is this?",
+ "tfImgPrompt": "This is the {lname}.",
+ "leakExempt": [],
+ "factsMeta": {
+  "kind": {
+   "type": "cat",
+   "label": "Kind",
+   "values": [
+    "Organ",
+    "Bone",
+    "Muscle",
+    "Cell",
+    "Tissue"
+   ],
+   "ask": "What kind of body part is the {lname}?",
+   "askReverse": "Which of these is a {lvalue}?",
+   "stmt": "The {lname} is a {lvalue}."
+  },
+  "system": {
+   "type": "cat",
+   "label": "Body system",
+   "ask": "Which body system is the {lname} part of?",
+   "askReverse": "Which of these is part of the {lvalue} system?",
+   "stmt": "The {lname} is part of the {lvalue} system."
+  },
+  "count": {
+   "type": "num",
+   "label": "How many you have",
+   "unit": "",
+   "askHigh": "Which of these do we have the most of?"
+  }
+ },
+ "items": [
+  {
+   "id": "heart",
+   "name": "Heart",
+   "facts": {
+    "kind": "Organ",
+    "system": "Circulatory",
+    "count": 1
+   },
+   "blurb": "A muscle that pumps blood around your body. It beats about 100,000 times a day.",
+   "clues": [
+    "It has four chambers.",
+    "It beats about 100,000 times a day.",
+    "It is about the size of a fist.",
+    "It is an organ.",
+    "It is part of the circulatory system.",
+    "Most people have 1 of these.",
+    "It pumps blood around the body.",
+    "It is the shape drawn on Valentine's cards, more or less.",
+    "The answer is one word of 5 letters.",
+    "Its first letter is H."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/11/Heart_numlabels.svg/500px-Heart_numlabels.svg.png",
+      "w": 500,
+      "h": 535,
+      "credit": "Wapcaplet.",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Heart_numlabels.svg"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "brain",
+   "name": "Brain",
+   "facts": {
+    "kind": "Organ",
+    "system": "Nervous",
+    "count": 1
+   },
+   "blurb": "The control centre of your body. It has about 86 billion nerve cells.",
+   "clues": [
+    "It uses about 20% of the body's energy.",
+    "It contains about 86 billion neurons.",
+    "Its left side mostly controls the right side of the body.",
+    "It is an organ.",
+    "It is part of the nervous system.",
+    "Most people have 1 of these.",
+    "It is protected by the skull.",
+    "You think with it.",
+    "The answer is one word of 5 letters.",
+    "Its first letter is B."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/0/0a/Human_brain_NIH.png",
+      "w": 500,
+      "h": 363,
+      "credit": "National Institutes of Health",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Human_brain_NIH.png"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "lungs",
+   "name": "Lungs",
+   "alt": [
+    "lung"
+   ],
+   "facts": {
+    "kind": "Organ",
+    "system": "Respiratory",
+    "count": 2
+   },
+   "blurb": "Two spongy organs that take in oxygen from the air and get rid of carbon dioxide.",
+   "clues": [
+    "The left one is smaller to make room for the heart.",
+    "They contain hundreds of millions of tiny air sacs called alveoli.",
+    "Smoking damages them.",
+    "It is an organ.",
+    "It is part of the respiratory system.",
+    "Most people have 2 of these.",
+    "They take oxygen from the air.",
+    "You breathe with them.",
+    "The answer is one word of 5 letters.",
+    "Its first letter is L."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/6/61/Thorax_Lung_3d_from_ct_scans.jpg",
+      "w": 500,
+      "h": 500,
+      "credit": "AndreasHeinemann at Zeppelinzentrum Karlsruhe, Germany http://www.rad-zep.de",
+      "license": "CC BY 2.5",
+      "page": "https://commons.wikimedia.org/wiki/File:Thorax_Lung_3d_from_ct_scans.jpg"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "liver",
+   "name": "Liver",
+   "facts": {
+    "kind": "Organ",
+    "system": "Digestive",
+    "count": 1
+   },
+   "blurb": "The biggest organ inside the body. It cleans the blood, stores energy and makes bile. It can regrow if part is removed.",
+   "clues": [
+    "It can regrow after part of it is removed.",
+    "It makes bile to help digest fat.",
+    "It removes poisons from the blood.",
+    "It is an organ.",
+    "It is part of the digestive system.",
+    "Most people have 1 of these.",
+    "It is the largest internal organ.",
+    "It sits under the right ribs.",
+    "The answer is one word of 5 letters.",
+    "Its first letter is L."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/a/a3/Gray1087-liver.png/500px-Gray1087-liver.png",
+      "w": 500,
+      "h": 335,
+      "credit": "Henry Vandyke Carter",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Gray1087-liver.png"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "kidneys",
+   "name": "Kidneys",
+   "alt": [
+    "kidney"
+   ],
+   "facts": {
+    "kind": "Organ",
+    "system": "Urinary",
+    "count": 2
+   },
+   "blurb": "Two bean-shaped organs that filter waste from the blood and make urine.",
+   "clues": [
+    "You can live with just one of them.",
+    "They filter about 180 litres of blood plasma a day.",
+    "They make urine.",
+    "It is an organ.",
+    "It is part of the urinary system.",
+    "Most people have 2 of these.",
+    "They are near your lower back.",
+    "They are shaped like beans.",
+    "The answer is one word of 7 letters.",
+    "Its first letter is K."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/7/76/Gray1122.png/500px-Gray1122.png",
+      "w": 500,
+      "h": 388,
+      "credit": "Henry Vandyke Carter",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Gray1122.png"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "stomach",
+   "name": "Stomach",
+   "facts": {
+    "kind": "Organ",
+    "system": "Digestive",
+    "count": 1
+   },
+   "blurb": "A stretchy bag of muscle that mixes food with acid to start breaking it down.",
+   "clues": [
+    "It makes a new lining every few days so its acid does not digest it.",
+    "Its acid is strong enough to dissolve some metals.",
+    "It growls when it is empty.",
+    "It is an organ.",
+    "It is part of the digestive system.",
+    "Most people have 1 of these.",
+    "It churns food with acid.",
+    "Food goes here after you swallow.",
+    "The answer is one word of 7 letters.",
+    "Its first letter is S."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/6/64/Illu_stomach2.jpg/500px-Illu_stomach2.jpg",
+      "w": 500,
+      "h": 269,
+      "credit": "NIH / National Cancer Institute",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Illu_stomach2.jpg"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "small-intestine",
+   "name": "Small intestine",
+   "alt": [
+    "small bowel"
+   ],
+   "facts": {
+    "kind": "Organ",
+    "system": "Digestive",
+    "count": 1
+   },
+   "lookalikes": [
+    "large-intestine"
+   ],
+   "blurb": "A long, coiled tube where most food is digested and absorbed. It is about 6 metres long.",
+   "clues": [
+    "Its lining is covered in tiny finger-like villi.",
+    "Its first part is called the duodenum.",
+    "Most nutrients are absorbed here.",
+    "It is an organ.",
+    "It is part of the digestive system.",
+    "Most people have 1 of these.",
+    "It is about 6 metres long.",
+    "Its name says it is the narrower part of the gut.",
+    "The answer has 2 words (5, 9 letters).",
+    "Its first letter is S."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/d/d4/Tractus_intestinalis_intestinum_tenue.svg/330px-Tractus_intestinalis_intestinum_tenue.svg.png",
+      "w": 330,
+      "h": 465,
+      "credit": "Olek Remesz (wiki-pl: Orem, commons: Orem)",
+      "license": "CC BY-SA 2.5",
+      "page": "https://commons.wikimedia.org/wiki/File:Tractus_intestinalis_intestinum_tenue.svg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "large-intestine",
+   "name": "Large intestine",
+   "alt": [
+    "colon",
+    "large bowel"
+   ],
+   "facts": {
+    "kind": "Organ",
+    "system": "Digestive",
+    "count": 1
+   },
+   "lookalikes": [
+    "small-intestine"
+   ],
+   "blurb": "The last part of the gut. It soaks up water and is home to trillions of helpful bacteria.",
+   "clues": [
+    "Trillions of bacteria live in it.",
+    "It soaks up water from waste.",
+    "The appendix hangs off it.",
+    "It is an organ.",
+    "It is part of the digestive system.",
+    "Most people have 1 of these.",
+    "It is wider but shorter than the other part of the gut.",
+    "The answer has 2 words (5, 9 letters).",
+    "Its first letter is L."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/6/62/Blausen_0603_LargeIntestine_Anatomy.png/500px-Blausen_0603_LargeIntestine_Anatomy.png",
+      "w": 500,
+      "h": 500,
+      "credit": "BruceBlaus. When using this image in external sources it can be cited as: Blausen.com s…",
+      "license": "CC BY 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Blausen_0603_LargeIntestine_Anatomy.png"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "skin",
+   "name": "Skin",
+   "facts": {
+    "kind": "Organ",
+    "system": "Skin",
+    "count": 1
+   },
+   "blurb": "The biggest organ of the body. It protects us, keeps us at the right temperature and lets us feel touch.",
+   "clues": [
+    "We shed millions of its cells every day.",
+    "Melanin gives it its colour.",
+    "Sweat helps it cool us down.",
+    "It is an organ.",
+    "Most people have 1 of these.",
+    "It is the largest organ of the body.",
+    "It covers the outside of the body.",
+    "The answer is one word of 4 letters.",
+    "Its first letter is S."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/e/ed/Skin_Layers_Unlabeled.jpg/500px-Skin_Layers_Unlabeled.jpg",
+      "w": 500,
+      "h": 500,
+      "credit": "Andrewmeyerson",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Skin_Layers_Unlabeled.jpg"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "pancreas",
+   "name": "Pancreas",
+   "facts": {
+    "kind": "Organ",
+    "system": "Endocrine",
+    "count": 1
+   },
+   "blurb": "An organ behind the stomach that makes digestive juices and insulin, which controls blood sugar.",
+   "clues": [
+    "It lies behind the stomach.",
+    "People with type 1 diabetes have damage to it.",
+    "It makes digestive enzymes.",
+    "It is an organ.",
+    "It is part of the endocrine system.",
+    "Most people have 1 of these.",
+    "It makes insulin.",
+    "It controls blood sugar.",
+    "The answer is one word of 8 letters.",
+    "Its first letter is P."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/0/03/Illu_pancrease.svg/500px-Illu_pancrease.svg.png",
+      "w": 500,
+      "h": 507,
+      "credit": "Cradel",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Illu_pancrease.svg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "spleen",
+   "name": "Spleen",
+   "facts": {
+    "kind": "Organ",
+    "system": "Immune",
+    "count": 1
+   },
+   "blurb": "An organ on the left side that filters old red blood cells and helps fight infection.",
+   "clues": [
+    "People can live without it.",
+    "It recycles old red blood cells.",
+    "It helps fight infections.",
+    "It is an organ.",
+    "It is part of the immune system.",
+    "Most people have 1 of these.",
+    "It sits under the left ribs.",
+    "Its name also means bad temper in old English.",
+    "The answer is one word of 6 letters.",
+    "Its first letter is S."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/9/93/Location_of_the_spleen_in_the_human_body%2C_without_text.jpg/330px-Location_of_the_spleen_in_the_human_body%2C_without_text.jpg",
+      "w": 330,
+      "h": 471,
+      "credit": "Henry Vandyke Carter",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Location_of_the_spleen_in_the_human_body,_without_text.jpg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "bladder",
+   "name": "Bladder",
+   "alt": [
+    "urinary bladder"
+   ],
+   "facts": {
+    "kind": "Organ",
+    "system": "Urinary",
+    "count": 1
+   },
+   "blurb": "A stretchy bag that stores urine until you go to the toilet.",
+   "clues": [
+    "It sits low in the pelvis.",
+    "It can hold about half a litre.",
+    "Its walls stretch as it fills.",
+    "It is an organ.",
+    "Most people have 1 of these.",
+    "It tells you when you need the toilet.",
+    "It stores wee.",
+    "The answer is one word of 7 letters.",
+    "Its first letter is B."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/3/30/Urinary_system.svg/500px-Urinary_system.svg.png",
+      "w": 500,
+      "h": 657,
+      "credit": "Jordi March i Nogué [1]",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Urinary_system.svg"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "appendix",
+   "name": "Appendix",
+   "facts": {
+    "kind": "Organ",
+    "system": "Digestive",
+    "count": 1
+   },
+   "blurb": "A small tube attached to the large intestine. It can get inflamed and may need to be removed.",
+   "clues": [
+    "It may store helpful gut bacteria.",
+    "It is a small pouch about the size of a finger.",
+    "It is attached to the large intestine.",
+    "It is an organ.",
+    "It is part of the digestive system.",
+    "Most people have 1 of these.",
+    "It is often removed when inflamed.",
+    "Its name also means the extra section at the end of a book.",
+    "The answer is one word of 8 letters.",
+    "Its first letter is A."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/a/ad/Gray536.png",
+      "w": 500,
+      "h": 394,
+      "credit": "Henry Vandyke Carter",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Gray536.png"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "gallbladder",
+   "name": "Gallbladder",
+   "facts": {
+    "kind": "Organ",
+    "system": "Digestive",
+    "count": 1
+   },
+   "blurb": "A small pouch under the liver that stores bile to help digest fat.",
+   "clues": [
+    "Stones can form inside it.",
+    "It squeezes bile into the gut after fatty meals.",
+    "It sits under the liver.",
+    "It is an organ.",
+    "It is part of the digestive system.",
+    "Most people have 1 of these.",
+    "People can live without it.",
+    "It stores bile.",
+    "The answer is one word of 11 letters.",
+    "Its first letter is G."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/d/de/2425_Gallbladder.jpg/500px-2425_Gallbladder.jpg",
+      "w": 500,
+      "h": 407,
+      "credit": "OpenStax College",
+      "license": "CC BY 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:2425_Gallbladder.jpg"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "thyroid",
+   "name": "Thyroid",
+   "alt": [
+    "thyroid gland"
+   ],
+   "facts": {
+    "kind": "Organ",
+    "system": "Endocrine",
+    "count": 1
+   },
+   "blurb": "A butterfly-shaped gland in the neck that controls how fast the body uses energy.",
+   "clues": [
+    "It needs iodine to work.",
+    "It controls metabolism.",
+    "A swelling of it is called a goitre.",
+    "It is an organ.",
+    "It is part of the endocrine system.",
+    "Most people have 1 of these.",
+    "It is shaped like a butterfly.",
+    "The answer is one word of 7 letters.",
+    "Its first letter is T."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/b/b8/Thyroid_dummy.jpg",
+      "w": 500,
+      "h": 379,
+      "credit": "CFCF",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Thyroid_dummy.jpg"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "tongue",
+   "name": "Tongue",
+   "facts": {
+    "kind": "Muscle",
+    "system": "Digestive",
+    "count": 1
+   },
+   "blurb": "A muscly organ covered in taste buds. It helps you taste, chew, swallow and talk.",
+   "clues": [
+    "Its print is unique, like a fingerprint.",
+    "It is made of eight muscles.",
+    "It has thousands of taste buds.",
+    "It is a muscle.",
+    "It is part of the digestive system.",
+    "Most people have 1 of these.",
+    "It helps you speak.",
+    "You taste with it.",
+    "The answer is one word of 6 letters.",
+    "Its first letter is T."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/a/a6/Tongue.agr.jpg/500px-Tongue.agr.jpg",
+      "w": 500,
+      "h": 572,
+      "credit": "ArnoldReinhold",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Tongue.agr.jpg"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "eye",
+   "name": "Eye",
+   "alt": [
+    "eyes",
+    "eyeball"
+   ],
+   "facts": {
+    "kind": "Organ",
+    "system": "Senses",
+    "count": 2
+   },
+   "blurb": "The organ of sight. Light passes through the lens and makes an upside-down picture that the brain flips.",
+   "clues": [
+    "The picture it makes is upside down; the brain flips it.",
+    "Its coloured part is the iris.",
+    "It has a blind spot where the nerve leaves.",
+    "It is an organ.",
+    "It is part of the senses system.",
+    "Most people have 2 of these.",
+    "Its black centre is the pupil.",
+    "You see with it.",
+    "The answer is one word of 3 letters.",
+    "Its first letter is E."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/6/65/Eye_iris.jpg/500px-Eye_iris.jpg",
+      "w": 500,
+      "h": 334,
+      "credit": "che (Please credit as \"Petr Novák, Wikipedia\" in case you use this outside Wikimedia pr…",
+      "license": "CC BY-SA 2.5",
+      "page": "https://commons.wikimedia.org/wiki/File:Eye_iris.jpg"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "ear",
+   "name": "Ear",
+   "alt": [
+    "ears"
+   ],
+   "facts": {
+    "kind": "Organ",
+    "system": "Senses",
+    "count": 2
+   },
+   "blurb": "The organ of hearing and balance. Tiny bones inside pass sound vibrations to the inner ear.",
+   "clues": [
+    "It contains the smallest bones in the body.",
+    "Its inner part helps you balance.",
+    "The snail-shaped cochlea is inside it.",
+    "It is an organ.",
+    "It is part of the senses system.",
+    "Most people have 2 of these.",
+    "Its drum vibrates with sound.",
+    "You hear with it.",
+    "The answer is one word of 3 letters.",
+    "Its first letter is E."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/9/9a/Closeup_of_a_human_ear.jpg/330px-Closeup_of_a_human_ear.jpg",
+      "w": 330,
+      "h": 495,
+      "credit": "צולם על ידי he:משתמש:אנדר-ויק",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Closeup_of_a_human_ear.jpg"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "femur",
+   "name": "Femur",
+   "alt": [
+    "thigh bone",
+    "thighbone"
+   ],
+   "facts": {
+    "kind": "Bone",
+    "system": "Skeletal",
+    "count": 2
+   },
+   "lookalikes": [
+    "humerus"
+   ],
+   "blurb": "The thigh bone, the longest and strongest bone in the body.",
+   "clues": [
+    "Its top end forms part of the hip joint.",
+    "Its bottom end forms part of the knee.",
+    "It is very hard to break.",
+    "It is about a quarter of your height.",
+    "It is part of the skeletal system.",
+    "Most people have 2 of these.",
+    "Its ball fits into the hip socket.",
+    "The answer is one word of 5 letters.",
+    "Its first letter is F."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/4/4a/Thigh_bone_-_Femur_1_--_Smart-Servier.png/330px-Thigh_bone_-_Femur_1_--_Smart-Servier.png",
+      "w": 330,
+      "h": 1187,
+      "credit": "Laboratoires Servier",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Thigh_bone_-_Femur_1_--_Smart-Servier.png"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "skull",
+   "name": "Skull",
+   "alt": [
+    "cranium"
+   ],
+   "facts": {
+    "kind": "Bone",
+    "system": "Skeletal",
+    "count": 1
+   },
+   "blurb": "The bones of the head that protect the brain. Its only bone that moves is the lower jaw.",
+   "clues": [
+    "A baby's has soft spots that close as it grows.",
+    "It is made of 22 bones in adults.",
+    "Its only movable bone is the lower jaw.",
+    "It is a bone.",
+    "It is part of the skeletal system.",
+    "Most people have 1 of these.",
+    "It protects the brain.",
+    "It is the bony part of the head.",
+    "The answer is one word of 5 letters.",
+    "Its first letter is S."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/e/e1/Human_skull_front_simplified.PNG",
+      "w": 500,
+      "h": 511,
+      "credit": "User:LadyofHats; translated by User:Matasg DerivativeVersions:MrArifnajafov",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Human_skull_front_simplified.PNG"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "spine",
+   "name": "Spine",
+   "alt": [
+    "backbone",
+    "vertebral column",
+    "spinal column"
+   ],
+   "facts": {
+    "kind": "Bone",
+    "system": "Skeletal",
+    "count": 1
+   },
+   "blurb": "A column of 33 small bones called vertebrae that holds you up and protects the spinal cord.",
+   "clues": [
+    "It lets you bend and twist.",
+    "Discs of cartilage sit between its bones.",
+    "Its lowest part is the tailbone.",
+    "It is a bone.",
+    "It is part of the skeletal system.",
+    "Most people have 1 of these.",
+    "It has natural S-shaped curves.",
+    "It runs down the middle of your back.",
+    "The answer is one word of 5 letters.",
+    "Its first letter is S."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/5/53/Illu_vertebral_column.svg/500px-Illu_vertebral_column.svg.png",
+      "w": 500,
+      "h": 500,
+      "credit": "Original: Arcadian Vector: Pixelsquid🎱",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Illu_vertebral_column.svg"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "rib-cage",
+   "name": "Rib cage",
+   "alt": [
+    "ribs"
+   ],
+   "facts": {
+    "kind": "Bone",
+    "system": "Skeletal",
+    "count": 24
+   },
+   "blurb": "A cage of 24 curved bones that protects the heart and lungs.",
+   "clues": [
+    "Some of its lowest bones are called \"floating\" because they do not reach the front.",
+    "Most people have 12 pairs.",
+    "It moves when you breathe.",
+    "It is a bone.",
+    "It is part of the skeletal system.",
+    "Most people have 24 of these.",
+    "It protects the heart and lungs.",
+    "It is made of curved bones around your chest.",
+    "The answer has 2 words (3, 4 letters).",
+    "Its first letter is R."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/8/88/Gray112.png",
+      "w": 500,
+      "h": 688,
+      "credit": "Henry Vandyke Carter",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Gray112.png"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "stapes",
+   "name": "Stapes",
+   "alt": [
+    "stirrup"
+   ],
+   "facts": {
+    "kind": "Bone",
+    "system": "Senses",
+    "count": 2
+   },
+   "blurb": "The smallest bone in the body, deep in the ear. It is shaped like a stirrup.",
+   "clues": [
+    "It is about 3 mm long.",
+    "It passes sound to the inner ear.",
+    "It is one of three tiny bones in the ear.",
+    "It is a bone.",
+    "It is part of the senses system.",
+    "Most people have 2 of these.",
+    "It is the smallest bone in the body.",
+    "The answer is one word of 6 letters.",
+    "Its first letter is S."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/c/c1/Gray918.png",
+      "w": 500,
+      "h": 283,
+      "credit": "Henry Vandyke Carter",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Gray918.png"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "pelvis",
+   "name": "Pelvis",
+   "alt": [
+    "hip bone",
+    "hips"
+   ],
+   "facts": {
+    "kind": "Bone",
+    "system": "Skeletal",
+    "count": 1
+   },
+   "blurb": "A basin-shaped ring of bones at the base of the spine that connects the legs to the body.",
+   "clues": [
+    "You sit on part of it.",
+    "Its name comes from the Latin for \"basin\".",
+    "It is wider in women to allow childbirth.",
+    "It is part of the skeletal system.",
+    "Most people have 1 of these.",
+    "It connects the spine to the legs.",
+    "The answer is one word of 6 letters.",
+    "Its first letter is P."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/d/df/Sobo_1909_211.png/500px-Sobo_1909_211.png",
+      "w": 500,
+      "h": 401,
+      "credit": "Dr. Johannes Sobotta",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Sobo_1909_211.png"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "clavicle",
+   "name": "Clavicle",
+   "alt": [
+    "collarbone",
+    "collar bone"
+   ],
+   "facts": {
+    "kind": "Bone",
+    "system": "Skeletal",
+    "count": 2
+   },
+   "blurb": "The collarbone, a long thin bone between the shoulder and the breastbone. It is often broken in falls.",
+   "clues": [
+    "It is shaped like a long, flat S.",
+    "It helps hold the arm away from the body.",
+    "Its name comes from the Latin for \"little key\".",
+    "It is part of the skeletal system.",
+    "Most people have 2 of these.",
+    "It joins the shoulder blade to the breastbone.",
+    "You can feel it at the base of your neck.",
+    "The answer is one word of 8 letters.",
+    "Its first letter is C."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/b/b9/Gray200.png/500px-Gray200.png",
+      "w": 500,
+      "h": 157,
+      "credit": "Henry Vandyke Carter",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Gray200.png"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "patella",
+   "name": "Patella",
+   "alt": [
+    "kneecap"
+   ],
+   "facts": {
+    "kind": "Bone",
+    "system": "Skeletal",
+    "count": 2
+   },
+   "blurb": "The kneecap, a small, flat bone that protects the front of the knee joint.",
+   "clues": [
+    "It slides in a groove as you bend your leg.",
+    "It is on the front of your leg.",
+    "Babies' are made of cartilage at first.",
+    "It sits inside a tendon.",
+    "It is a bone.",
+    "It is part of the skeletal system.",
+    "Most people have 2 of these.",
+    "It is a small, round, flat bone.",
+    "The answer is one word of 7 letters.",
+    "Its first letter is P."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/e/ef/Patella_post.jpg/500px-Patella_post.jpg",
+      "w": 500,
+      "h": 500,
+      "credit": "No machine-readable author provided. Palica assumed (based on copyright claims).",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Patella_post.jpg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "humerus",
+   "name": "Humerus",
+   "alt": [
+    "upper arm bone"
+   ],
+   "facts": {
+    "kind": "Bone",
+    "system": "Skeletal",
+    "count": 2
+   },
+   "lookalikes": [
+    "femur"
+   ],
+   "blurb": "The long bone of the upper arm. Knocking a nerve near it gives the tingle of your \"funny bone\".",
+   "clues": [
+    "Its ball fits into the shoulder socket.",
+    "Its name sounds like the word for being amusing.",
+    "Hitting the nerve near its end gives a tingle.",
+    "It is part of the skeletal system.",
+    "Most people have 2 of these.",
+    "It connects the shoulder to the elbow.",
+    "The answer is one word of 7 letters.",
+    "Its first letter is H."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/9/9d/Gray208.png",
+      "w": 500,
+      "h": 1953,
+      "credit": "Henry Vandyke Carter",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Gray208.png"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "diaphragm",
+   "name": "Diaphragm",
+   "facts": {
+    "kind": "Muscle",
+    "system": "Respiratory",
+    "count": 1
+   },
+   "blurb": "A dome-shaped sheet of muscle under the lungs. When it tightens, you breathe in. Hiccups are spasms of it.",
+   "clues": [
+    "It separates the chest from the belly.",
+    "It is shaped like a dome.",
+    "Hiccups are sudden spasms of it.",
+    "It is a muscle.",
+    "It is part of the respiratory system.",
+    "Most people have 1 of these.",
+    "It is the main muscle for breathing.",
+    "It sits just below the lungs.",
+    "The answer is one word of 9 letters.",
+    "Its first letter is D."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/8/8b/Respiratory_system.svg/500px-Respiratory_system.svg.png",
+      "w": 500,
+      "h": 544,
+      "credit": "Theresa knott",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Respiratory_system.svg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "biceps",
+   "name": "Biceps",
+   "alt": [
+    "bicep",
+    "biceps brachii"
+   ],
+   "facts": {
+    "kind": "Muscle",
+    "system": "Muscular",
+    "count": 2
+   },
+   "blurb": "The muscle at the front of the upper arm that bends your elbow. People flex it to show off.",
+   "clues": [
+    "Its name means \"two heads\".",
+    "It works with the triceps as a pair.",
+    "It bends the elbow.",
+    "It is a muscle.",
+    "It is part of the muscular system.",
+    "Most people have 2 of these.",
+    "People flex it to show strength.",
+    "It is on the front of the upper arm.",
+    "The answer is one word of 6 letters.",
+    "Its first letter is B."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/3/36/1120_Muscles_that_Move_the_Forearm_Humerus_Flex_Sin.png/500px-1120_Muscles_that_Move_the_Forearm_Humerus_Flex_Sin.png",
+      "w": 500,
+      "h": 442,
+      "credit": "CFCF",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:1120_Muscles_that_Move_the_Forearm_Humerus_Flex_Sin.png"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "gluteus-maximus",
+   "name": "Gluteus maximus",
+   "alt": [
+    "glutes",
+    "buttock muscle"
+   ],
+   "facts": {
+    "kind": "Muscle",
+    "system": "Muscular",
+    "count": 2
+   },
+   "blurb": "The biggest muscle in the body, in the buttocks. It helps you stand up, climb and run.",
+   "clues": [
+    "It helps you stand up from sitting.",
+    "It straightens the hip when you run.",
+    "It helps you climb stairs.",
+    "Most people have 2 of these.",
+    "It keeps you upright.",
+    "You sit on it.",
+    "The answer has 2 words (7, 7 letters).",
+    "Its first letter is G."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/c/c6/Gluteus_maximus_muscle.PNG",
+      "w": 500,
+      "h": 1359,
+      "credit": "Mikael Häggström. When using this image in external works, it may be cited as: Häggströ…",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Gluteus_maximus_muscle.PNG"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "red-blood-cell",
+   "name": "Red blood cell",
+   "alt": [
+    "erythrocyte",
+    "red blood cells"
+   ],
+   "facts": {
+    "kind": "Cell",
+    "system": "Circulatory"
+   },
+   "lookalikes": [
+    "white-blood-cell"
+   ],
+   "blurb": "Tiny disc-shaped cells that carry oxygen around the body. They are red because of a protein called haemoglobin.",
+   "clues": [
+    "They are shaped like discs dented in the middle.",
+    "They have no nucleus.",
+    "They live for about 120 days.",
+    "It is part of the circulatory system.",
+    "They are made in bone marrow.",
+    "Haemoglobin inside them carries oxygen.",
+    "The answer has 3 words (3, 5, 4 letters).",
+    "Its first letter is R."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/3/37/Red_Blood_Cell.jpg/500px-Red_Blood_Cell.jpg",
+      "w": 500,
+      "h": 250,
+      "credit": "Arek Socha",
+      "license": "CC0 1.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Red_Blood_Cell.jpg"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "white-blood-cell",
+   "name": "White blood cell",
+   "alt": [
+    "leukocyte",
+    "white blood cells"
+   ],
+   "facts": {
+    "kind": "Cell",
+    "system": "Immune"
+   },
+   "lookalikes": [
+    "red-blood-cell"
+   ],
+   "blurb": "Cells in the blood that fight germs and help protect you from infections.",
+   "clues": [
+    "There are far fewer of them than red ones.",
+    "Their numbers rise when you are ill.",
+    "Some kinds make antibodies.",
+    "Some kinds swallow germs whole.",
+    "It is part of the immune system.",
+    "They are made in bone marrow.",
+    "They fight infections.",
+    "The answer has 3 words (5, 5, 4 letters).",
+    "Its first letter is W."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/1f/Blausen_0909_WhiteBloodCells.png/500px-Blausen_0909_WhiteBloodCells.png",
+      "w": 500,
+      "h": 375,
+      "credit": "BruceBlaus. When using this image in external sources it can be cited as: Blausen.com s…",
+      "license": "CC BY 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Blausen_0909_WhiteBloodCells.png"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "neuron",
+   "name": "Neuron",
+   "alt": [
+    "nerve cell",
+    "neurone"
+   ],
+   "facts": {
+    "kind": "Cell",
+    "system": "Nervous"
+   },
+   "blurb": "A nerve cell that sends electrical signals around the body and brain.",
+   "clues": [
+    "It has branches called dendrites.",
+    "Messages jump between them using chemicals.",
+    "Your spinal cord is full of them.",
+    "Signals can travel along some at over 100 metres per second.",
+    "Its long tail is called an axon.",
+    "Gaps between them are called synapses.",
+    "The brain has about 86 billion of them.",
+    "The answer is one word of 6 letters.",
+    "Its first letter is N."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/d/dc/PLoSBiol4.e126.Fig6fNeuron.jpg/500px-PLoSBiol4.e126.Fig6fNeuron.jpg",
+      "w": 500,
+      "h": 437,
+      "credit": "Wei-Chung Allen Lee, Hayden Huang, Guoping Feng, Joshua R. Sanes, Emery N. Brown, Peter…",
+      "license": "CC BY 2.5",
+      "page": "https://commons.wikimedia.org/wiki/File:PLoSBiol4.e126.Fig6fNeuron.jpg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "tooth",
+   "name": "Tooth",
+   "alt": [
+    "teeth"
+   ],
+   "facts": {
+    "kind": "Tissue",
+    "system": "Digestive",
+    "count": 32
+   },
+   "blurb": "Teeth bite and chew food. Adults usually have 32, and their outer enamel is the hardest substance in the body.",
+   "clues": [
+    "Children have 20 of the first set.",
+    "Adults usually have 32.",
+    "Its enamel is the hardest substance in the body.",
+    "It is a tissue.",
+    "It is part of the digestive system.",
+    "Most people have 32 of these.",
+    "Dentists look after them.",
+    "You chew with them.",
+    "The answer is one word of 5 letters.",
+    "Its first letter is T."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/14/Teeth_by_David_Shankbone.jpg/500px-Teeth_by_David_Shankbone.jpg",
+      "w": 500,
+      "h": 258,
+      "credit": "David Shankbone",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Teeth_by_David_Shankbone.jpg"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "achilles-tendon",
+   "name": "Achilles tendon",
+   "alt": [
+    "heel cord"
+   ],
+   "facts": {
+    "kind": "Tissue",
+    "system": "Muscular",
+    "count": 2
+   },
+   "blurb": "The thickest and strongest tendon in the body. It connects the calf muscles to the heel bone.",
+   "clues": [
+    "It runs down the back of the lower leg.",
+    "It is used every time you walk or jump.",
+    "It is named after a Greek hero with one weak spot.",
+    "Sprinters sometimes tear it.",
+    "It is a tissue.",
+    "It is part of the muscular system.",
+    "Most people have 2 of these.",
+    "It lets you stand on tiptoe.",
+    "The answer has 2 words (8, 6 letters).",
+    "Its first letter is A."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/b/bd/Gray438-cropped.png",
+      "w": 500,
+      "h": 604,
+      "credit": "Henry Vandyke Carter",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Gray438-cropped.png"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "trachea",
+   "name": "Trachea",
+   "alt": [
+    "windpipe"
+   ],
+   "facts": {
+    "kind": "Organ",
+    "system": "Respiratory",
+    "count": 1
+   },
+   "blurb": "The windpipe, a tube held open by rings of cartilage that carries air to the lungs.",
+   "clues": [
+    "C-shaped rings of cartilage hold it open.",
+    "It splits into two bronchi.",
+    "A flap called the epiglottis covers it when you swallow.",
+    "It is an organ.",
+    "It is part of the respiratory system.",
+    "Most people have 1 of these.",
+    "It carries air to the lungs.",
+    "The answer is one word of 7 letters.",
+    "Its first letter is T."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/9/9f/Illu_conducting_passages.svg/500px-Illu_conducting_passages.svg.png",
+      "w": 500,
+      "h": 643,
+      "credit": "Lord Akryl, Jmarchn",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Illu_conducting_passages.svg"
+     }
+    ]
+   },
+   "difficulty": 2
+  }
+ ],
+ "questions": [
+  {
+   "id": "q1",
+   "kind": "number",
+   "prompt": "How many bones are in an adult human body?",
+   "answer": 206,
+   "unit": "bones",
+   "tolerance": 0,
+   "explain": "Babies have about 300; many fuse as they grow.",
+   "difficulty": 2
+  },
+  {
+   "id": "q2",
+   "kind": "mc",
+   "prompt": "What is the largest organ of the human body?",
+   "answer": "Skin",
+   "wrong": [
+    "Liver",
+    "Brain",
+    "Lungs"
+   ],
+   "explain": "The liver is the largest internal organ.",
+   "difficulty": 1
+  },
+  {
+   "id": "q3",
+   "kind": "mc",
+   "prompt": "What is the longest bone in the body?",
+   "answer": "Femur",
+   "wrong": [
+    "Humerus",
+    "Tibia",
+    "Spine"
+   ],
+   "explain": "The femur, or thigh bone, is about a quarter of your height.",
+   "difficulty": 1
+  },
+  {
+   "id": "q4",
+   "kind": "mc",
+   "prompt": "What is the smallest bone in the body?",
+   "answer": "Stapes",
+   "wrong": [
+    "Patella",
+    "Incus",
+    "Little toe bone"
+   ],
+   "explain": "The stirrup bone in the middle ear is about 3 mm long.",
+   "difficulty": 2
+  },
+  {
+   "id": "q5",
+   "kind": "mc",
+   "prompt": "What does the heart pump around the body?",
+   "answer": "Blood",
+   "wrong": [
+    "Air",
+    "Food",
+    "Water"
+   ],
+   "explain": "Blood carries oxygen and food to every cell.",
+   "difficulty": 1
+  },
+  {
+   "id": "q6",
+   "kind": "number",
+   "prompt": "How many chambers does the human heart have?",
+   "answer": 4,
+   "unit": "chambers",
+   "tolerance": 0,
+   "explain": "Two atria and two ventricles.",
+   "difficulty": 2
+  },
+  {
+   "id": "q7",
+   "kind": "mc",
+   "prompt": "Which organ do you breathe with?",
+   "answer": "Lungs",
+   "wrong": [
+    "Stomach",
+    "Kidneys",
+    "Liver"
+   ],
+   "explain": "They swap oxygen and carbon dioxide.",
+   "difficulty": 1
+  },
+  {
+   "id": "q8",
+   "kind": "mc",
+   "prompt": "Which gas do we breathe out more of than we breathe in?",
+   "answer": "Carbon dioxide",
+   "wrong": [
+    "Oxygen",
+    "Nitrogen",
+    "Helium"
+   ],
+   "explain": "Our cells make carbon dioxide as waste.",
+   "difficulty": 2
+  },
+  {
+   "id": "q9",
+   "kind": "mc",
+   "prompt": "Which organ makes insulin?",
+   "answer": "Pancreas",
+   "wrong": [
+    "Liver",
+    "Kidney",
+    "Heart"
+   ],
+   "explain": "Insulin controls the level of sugar in the blood.",
+   "difficulty": 2
+  },
+  {
+   "id": "q10",
+   "kind": "mc",
+   "prompt": "What is the hardest substance in the human body?",
+   "answer": "Tooth enamel",
+   "wrong": [
+    "Bone",
+    "Fingernail",
+    "Hair"
+   ],
+   "explain": "Enamel is mostly a hard mineral.",
+   "difficulty": 2
+  },
+  {
+   "id": "q11",
+   "kind": "number",
+   "prompt": "How many teeth does an adult usually have?",
+   "answer": 32,
+   "unit": "teeth",
+   "tolerance": 0,
+   "explain": "Including four wisdom teeth.",
+   "difficulty": 2
+  },
+  {
+   "id": "q12",
+   "kind": "number",
+   "prompt": "How many baby teeth do children have?",
+   "answer": 20,
+   "unit": "teeth",
+   "tolerance": 0,
+   "explain": "They are replaced by 32 adult teeth.",
+   "difficulty": 2
+  },
+  {
+   "id": "q13",
+   "kind": "mc",
+   "prompt": "Which blood cells carry oxygen?",
+   "answer": "Red blood cells",
+   "wrong": [
+    "White blood cells",
+    "Platelets",
+    "Nerve cells"
+   ],
+   "explain": "Haemoglobin in them carries oxygen.",
+   "difficulty": 1
+  },
+  {
+   "id": "q14",
+   "kind": "mc",
+   "prompt": "Which blood cells fight germs?",
+   "answer": "White blood cells",
+   "wrong": [
+    "Red blood cells",
+    "Platelets",
+    "Skin cells"
+   ],
+   "explain": "They are part of the immune system.",
+   "difficulty": 1
+  },
+  {
+   "id": "q15",
+   "kind": "mc",
+   "prompt": "Which tiny pieces in the blood help it clot when you cut yourself?",
+   "answer": "Platelets",
+   "wrong": [
+    "Red blood cells",
+    "Plasma",
+    "Neurons"
+   ],
+   "explain": "They clump together to plug the wound.",
+   "difficulty": 2
+  },
+  {
+   "id": "q16",
+   "kind": "mc",
+   "prompt": "Which is the biggest muscle in the body?",
+   "answer": "Gluteus maximus",
+   "wrong": [
+    "Biceps",
+    "Heart",
+    "Tongue"
+   ],
+   "explain": "It is the main muscle of the buttocks.",
+   "difficulty": 2
+  },
+  {
+   "id": "q17",
+   "kind": "mc",
+   "prompt": "What is the coloured part of the eye called?",
+   "answer": "Iris",
+   "wrong": [
+    "Pupil",
+    "Retina",
+    "Cornea"
+   ],
+   "explain": "The pupil is the black hole in the middle of it.",
+   "difficulty": 2
+  },
+  {
+   "id": "q18",
+   "kind": "mc",
+   "prompt": "Which organ filters blood to make urine?",
+   "answer": "Kidneys",
+   "wrong": [
+    "Liver",
+    "Lungs",
+    "Heart"
+   ],
+   "explain": "Urine is then stored in the bladder.",
+   "difficulty": 2
+  },
+  {
+   "id": "q19",
+   "kind": "mc",
+   "prompt": "What does the skull protect?",
+   "answer": "The brain",
+   "wrong": [
+    "The heart",
+    "The lungs",
+    "The stomach"
+   ],
+   "explain": "The rib cage protects the heart and lungs.",
+   "difficulty": 1
+  },
+  {
+   "id": "q20",
+   "kind": "mc",
+   "prompt": "What is the normal human body temperature, roughly?",
+   "answer": "37 °C",
+   "wrong": [
+    "30 °C",
+    "42 °C",
+    "25 °C"
+   ],
+   "explain": "It varies a little through the day.",
+   "difficulty": 2
+  },
+  {
+   "id": "q21",
+   "kind": "mc",
+   "prompt": "How many senses are traditionally counted?",
+   "answer": "5",
+   "wrong": [
+    "3",
+    "7",
+    "10"
+   ],
+   "explain": "Sight, hearing, smell, taste and touch; scientists count others too, like balance.",
+   "difficulty": 1
+  },
+  {
+   "id": "q22",
+   "kind": "mc",
+   "prompt": "Which part of the body do you smell with?",
+   "answer": "Nose",
+   "wrong": [
+    "Ears",
+    "Tongue",
+    "Fingers"
+   ],
+   "explain": "Smell also helps you taste food.",
+   "difficulty": 1
+  },
+  {
+   "id": "q23",
+   "kind": "tf",
+   "prompt": "You can live with only one kidney.",
+   "answer": true,
+   "explain": "One healthy kidney can do the work of two.",
+   "difficulty": 2
+  },
+  {
+   "id": "q24",
+   "kind": "tf",
+   "prompt": "Babies are born with more bones than adults.",
+   "answer": true,
+   "explain": "About 300 bones fuse into 206.",
+   "difficulty": 2
+  },
+  {
+   "id": "q25",
+   "kind": "tf",
+   "prompt": "Your heart is on the far left of your chest.",
+   "answer": false,
+   "explain": "It sits near the middle, tilted slightly to the left.",
+   "difficulty": 3
+  },
+  {
+   "id": "q26",
+   "kind": "mc",
+   "prompt": "Where in the body are red blood cells made?",
+   "answer": "Bone marrow",
+   "wrong": [
+    "The heart",
+    "The liver",
+    "The lungs"
+   ],
+   "explain": "Marrow inside big bones makes millions every second.",
+   "difficulty": 2
+  },
+  {
+   "id": "q27",
+   "kind": "mc",
+   "prompt": "What are the tiny air sacs in the lungs called?",
+   "answer": "Alveoli",
+   "wrong": [
+    "Villi",
+    "Neurons",
+    "Capillaries"
+   ],
+   "explain": "Oxygen passes into the blood through their thin walls.",
+   "difficulty": 3
+  },
+  {
+   "id": "q28",
+   "kind": "mc",
+   "prompt": "Which organ is the body's main chemical factory and can regrow?",
+   "answer": "Liver",
+   "wrong": [
+    "Heart",
+    "Brain",
+    "Spleen"
+   ],
+   "explain": "It can regrow from as little as a quarter of its tissue.",
+   "difficulty": 2
+  },
+  {
+   "id": "q29",
+   "kind": "mc",
+   "prompt": "What is the name of the tube that carries food from your mouth to your stomach?",
+   "answer": "Oesophagus",
+   "wrong": [
+    "Trachea",
+    "Intestine",
+    "Artery"
+   ],
+   "explain": "The trachea, or windpipe, carries air.",
+   "difficulty": 2
+  },
+  {
+   "id": "q30",
+   "kind": "mc",
+   "prompt": "Which blood vessels carry blood away from the heart?",
+   "answer": "Arteries",
+   "wrong": [
+    "Veins",
+    "Nerves",
+    "Tendons"
+   ],
+   "explain": "Veins carry blood back to the heart.",
+   "difficulty": 2
+  },
+  {
+   "id": "q31",
+   "kind": "mc",
+   "prompt": "What joins muscles to bones?",
+   "answer": "Tendons",
+   "wrong": [
+    "Ligaments",
+    "Nerves",
+    "Veins"
+   ],
+   "explain": "Ligaments join bone to bone.",
+   "difficulty": 3
+  },
+  {
+   "id": "q32",
+   "kind": "order",
+   "prompt": "Put the path of food in order.",
+   "answer": [
+    "Mouth",
+    "Oesophagus",
+    "Stomach",
+    "Small intestine",
+    "Large intestine"
+   ],
+   "orderLabel": "First to last",
+   "explain": "Most nutrients are absorbed in the small intestine.",
+   "difficulty": 2
+  }
+ ],
+ "sources": [
+  {
+   "name": "Wikidata",
+   "url": "https://www.wikidata.org"
+  },
+  {
+   "name": "Wikimedia Commons",
+   "url": "https://commons.wikimedia.org"
+  }
+ ]
+}

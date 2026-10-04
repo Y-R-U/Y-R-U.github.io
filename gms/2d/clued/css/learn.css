@@ -135,13 +135,20 @@ body.kids-on .l-toolbar { background: linear-gradient(#fff4c9 85%, rgba(255,244,
 .l-lvchip { font-size: 13px; padding: 5px 10px; border-radius: 999px; background: #eee9fb; border: 2px solid var(--ink); }
 .l-lvchip.lv2 { background: #fff0c2; } .l-lvchip.lv3 { background: #c7f3e6; }
 .l-item-nav { position: sticky; bottom: 0; display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 12px 0 calc(8px + var(--sab));
-  background: linear-gradient(rgba(255,246,230,0), var(--paper) 35%); margin-top: 4px; }
-body.kids-on .l-item-nav { background: linear-gradient(rgba(255,244,201,0), #fff4c9 35%); }
+  background: var(--paper); box-shadow: 0 -14px 14px -2px var(--paper); margin-top: 4px; }
+body.kids-on .l-item-nav { background: #fff4c9; box-shadow: 0 -14px 14px -2px #fff4c9; }
 @media (orientation: landscape) and (min-width: 700px) {
   .l-item { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); align-items: start; }
   .l-item-media { position: sticky; top: 64px; }
 }
-@media (orientation: landscape) and (max-height: 500px) { .l-slide { aspect-ratio: auto; height: calc(100vh - 150px); } .l-noimg { aspect-ratio: auto; height: calc(100vh - 150px); } }
+@media (orientation: landscape) and (max-height: 500px) {
+  .l-slide, .l-noimg { aspect-ratio: auto; height: calc(100vh - 120px); }
+  .l-item-nav { position: static; box-shadow: none; background: none; padding-top: 4px; }
+  body.kids-on .l-item-nav { box-shadow: none; background: none; }
+  .l-cmp-img { aspect-ratio: 4 / 3; }
+  .l-cmp { max-width: 640px; margin-inline: auto; }
+  .l-today b { font-size: 20px; }
+}
 
 /* flashcards */
 .l-deckhead { display: grid; gap: 14px; }
@@ -165,6 +172,7 @@ body.kids-on .l-item-nav { background: linear-gradient(rgba(255,244,201,0), #fff
 .l-card-ico { font-size: 54px; }
 .l-card-name { font-size: 30px; text-align: center; line-height: 1.1; }
 .l-card .back { border-top: 2px dashed #e4dff2; margin-top: 12px; padding-top: 10px; animation: l-in .2s ease-out both; }
+.l-card .back .l-card-thumb.pic { display: none; }
 .l-card-thumb { display: block; max-width: 160px; max-height: 120px; margin: 6px auto; border-radius: 12px; }
 .l-card-tools { display: flex; justify-content: center; gap: 10px; }
 .l-grades { display: grid; grid-template-columns: repeat(auto-fit, minmax(0, 1fr)); gap: 10px; }
@@ -177,6 +185,9 @@ body.kids-on .l-item-nav { background: linear-gradient(rgba(255,244,201,0), #fff
   .l-rv-top { grid-column: 1 / -1; }
   .l-card { grid-row: span 3; }
   .l-card .l-slide { aspect-ratio: auto; height: 46vh; }
+  .l-card.flipped .front { display: none; }
+  .l-card .back .l-card-thumb.pic { display: block; }
+  .l-card .back { border-top: 0; margin-top: 0; padding-top: 0; }
 }
 
 /* mastery */
@@ -230,6 +241,7 @@ body.kids-on .l-item-nav { background: linear-gradient(rgba(255,244,201,0), #fff
 
 /* explore */
 .l-explore-scr { display: flex; flex-direction: column; }
+.l-explore-scr > * { width: 100%; }
 .l-xwrap { display: grid; gap: 12px; width: 100%; }
 .l-xmap { height: 52vh; min-height: 260px; border: var(--line) solid var(--ink); border-radius: var(--r); overflow: hidden; box-shadow: var(--shadow); }
 .l-xside { min-height: 120px; }
@@ -259,7 +271,7 @@ body.kids-on .l-item-nav { background: linear-gradient(rgba(255,244,201,0), #fff
 .l-kids .l-tile .t-title { font-size: 24px; }
 .l-kids .l-grid { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 14px; }
 .l-kids .l-cell { border-radius: 22px; }
-.l-kids .l-cell .c-name { font-size: 18px; text-align: center; padding: 8px; min-height: 0; -webkit-line-clamp: 1; }
+.l-kids .l-cell .c-name { font-size: 18px; text-align: center; padding: 8px; min-height: 0; display: block; white-space: nowrap; text-overflow: ellipsis; }
 .l-kids .l-item-title h2 { font-size: 38px; }
 .l-kids .l-blurb { font-size: 20px; }
 .l-kids .l-item-nav .btn { min-height: 56px; font-size: 19px; padding: 8px 22px; }

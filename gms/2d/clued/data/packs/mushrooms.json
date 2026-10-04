@@ -6,6 +6,10 @@
  "kids": false,
  "version": 1,
  "notice": "Never use this to forage. Many deadly mushrooms look like edible ones. Not for real-world identification.",
+ "kidsSafe": false,
+ "imgPrompt": "Which of these is {aName}?",
+ "nameImgPrompt": "Which fungus is this?",
+ "tfImgPrompt": "This is {aName}.",
  "leakExempt": [
   "mushroom",
   "mushrooms",
@@ -21,17 +25,25 @@
     "Inedible",
     "Poisonous",
     "Deadly"
-   ]
+   ],
+   "ask": "Which word best describes the {lname}?",
+   "askReverse": "Which of these is classed as \"{lvalue}\"?",
+   "stmt": "The {lname} is classed as \"{lvalue}\"."
   },
   "region": {
    "type": "cat",
-   "label": "Found in"
+   "label": "Found in",
+   "ask": "Where does the {lname} grow?",
+   "stmt": "The {lname} grows in {value}.",
+   "exclusive": false
   },
   "glows": {
    "type": "bool",
    "label": "Glows in the dark",
    "yes": "Glows in the dark",
-   "no": "Does not glow"
+   "no": "Does not glow",
+   "askBool": "Which of these glows in the dark?",
+   "stmt": "The {lname} glows in the dark."
   }
  },
  "items": [
@@ -59,10 +71,18 @@
     "It grows in many parts of the world.",
     "It has a ring on its stem and a cup-like sac at its base.",
     "The answer has 2 words (5, 3 letters).",
-    "It starts with the letter D."
+    "Its first letter is D."
    ],
    "media": {
     "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/9/99/Amanita_phalloides_1.JPG/330px-Amanita_phalloides_1.JPG",
+      "w": 330,
+      "h": 440,
+      "credit": "Archenzo",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Amanita_phalloides_1.JPG"
+     },
      {
       "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/245302130/medium.jpeg",
       "w": 500,
@@ -78,14 +98,6 @@
       "credit": "Sofia Zvolanek",
       "license": "CC BY 4.0",
       "page": "https://www.inaturalist.org/photos/392666373"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/347794788/medium.jpg",
-      "w": 375,
-      "h": 500,
-      "credit": "no rights reserved",
-      "license": "CC0 1.0",
-      "page": "https://www.inaturalist.org/photos/347794788"
      }
     ]
    },
@@ -116,7 +128,7 @@
     "It is pure white.",
     "Its name sounds heavenly but deadly.",
     "The answer has 2 words (10, 5 letters).",
-    "It starts with the letter D."
+    "Its first letter is D."
    ],
    "media": {
     "img": [
@@ -173,33 +185,33 @@
     "It appears in \"Super Mario\" games.",
     "It is red with white spots.",
     "The answer has 2 words (3, 6 letters).",
-    "It starts with the letter F."
+    "Its first letter is F."
    ],
    "media": {
     "img": [
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/448681419/medium.jpg",
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/3/32/Amanita_muscaria_3_vliegenzwammen_op_rij.jpg/500px-Amanita_muscaria_3_vliegenzwammen_op_rij.jpg",
       "w": 500,
       "h": 375,
-      "credit": "Borja Fierro",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/448681419"
+      "credit": "Onderwijsgek",
+      "license": "CC BY-SA 3.0 nl",
+      "page": "https://commons.wikimedia.org/wiki/File:Amanita_muscaria_3_vliegenzwammen_op_rij.jpg"
      },
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/59724451/medium.jpeg",
-      "w": 375,
-      "h": 500,
-      "credit": "Drew T Henderson",
-      "license": "CC BY-SA 4.0",
-      "page": "https://www.inaturalist.org/photos/59724451"
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/c/ce/Amanita_muscaria%2C_Kyiv_Region%2C_Pushcha-Vodytsia_Forestry.jpg/500px-Amanita_muscaria%2C_Kyiv_Region%2C_Pushcha-Vodytsia_Forestry.jpg",
+      "w": 500,
+      "h": 373,
+      "credit": "K. Chaikovska (Kate Chkv)",
+      "license": "CC BY 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Amanita_muscaria,_Kyiv_Region,_Pushcha-Vodytsia_Forestry.jpg"
      },
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/28969484/medium.jpg",
-      "w": 375,
-      "h": 500,
-      "credit": "tlaloc27",
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/7/71/Amanita_muscaria_Aberystwyth_2023.jpg/500px-Amanita_muscaria_Aberystwyth_2023.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Kieran Roy Powell",
       "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/28969484"
+      "page": "https://commons.wikimedia.org/wiki/File:Amanita_muscaria_Aberystwyth_2023.jpg"
      }
     ]
    },
@@ -228,7 +240,7 @@
     "It grows in the northern hemisphere.",
     "It is named after a spotted big cat.",
     "The answer has 2 words (7, 3 letters).",
-    "It starts with the letter P."
+    "Its first letter is P."
    ],
    "media": {
     "img": [
@@ -288,7 +300,7 @@
     "It grows in many parts of the world.",
     "It is a close relative of the supermarket mushroom.",
     "The answer has 2 words (5, 8 letters).",
-    "It starts with the letter F."
+    "Its first letter is F."
    ],
    "media": {
     "img": [
@@ -348,10 +360,18 @@
     "It grows in many parts of the world.",
     "It is sold in every supermarket.",
     "The answer has 2 words (6, 8 letters).",
-    "It starts with the letter B."
+    "Its first letter is B."
    ],
    "media": {
     "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/0/01/ChampignonMushroom.jpg/500px-ChampignonMushroom.jpg",
+      "w": 500,
+      "h": 356,
+      "credit": "chris_73",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:ChampignonMushroom.jpg"
+     },
      {
       "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/32035053/medium.jpg",
       "w": 500,
@@ -367,14 +387,6 @@
       "credit": "Adam J. Searcy",
       "license": "CC BY 4.0",
       "page": "https://www.inaturalist.org/photos/32035082"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/6464471/medium.jpeg",
-      "w": 500,
-      "h": 334,
-      "credit": "Alan Rockefeller",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/6464471"
      }
     ]
    },
@@ -402,7 +414,7 @@
     "It is poisonous.",
     "It grows in many parts of the world.",
     "The answer has 2 words (6, 7 letters).",
-    "It starts with the letter Y."
+    "Its first letter is Y."
    ],
    "media": {
     "img": [
@@ -461,7 +473,7 @@
     "It grows in Europe.",
     "It is shaped like a funnel or trumpet.",
     "The answer has 2 words (6, 11 letters).",
-    "It starts with the letter G."
+    "Its first letter is G."
    ],
    "media": {
     "img": [
@@ -523,7 +535,7 @@
     "It is bright orange.",
     "It is named after a carved Halloween pumpkin.",
     "The answer has 4 words (4, 1, 7, 8 letters).",
-    "It starts with the letter J."
+    "Its first letter is J."
    ],
    "media": {
     "img": [
@@ -581,7 +593,7 @@
     "It glows green at night.",
     "It is named after a spooky spirit.",
     "The answer has 2 words (5, 6 letters).",
-    "It starts with the letter G."
+    "Its first letter is G."
    ],
    "media": {
     "img": [
@@ -637,7 +649,7 @@
     "Its cap is brown like a bread roll.",
     "Its name includes a small coin.",
     "The answer has 2 words (5, 3 letters).",
-    "It starts with the letter P."
+    "Its first letter is P."
    ],
    "media": {
     "img": [
@@ -691,7 +703,7 @@
     "It grows in many parts of the world.",
     "It grows on lawns and roadsides.",
     "The answer has 3 words (6, 3, 3 letters).",
-    "It starts with the letter S."
+    "Its first letter is S."
    ],
    "media": {
     "img": [
@@ -747,10 +759,18 @@
     "It is a big white ball.",
     "Old ones send out smoky clouds when squeezed.",
     "The answer has 2 words (5, 8 letters).",
-    "It starts with the letter G."
+    "Its first letter is G."
    ],
    "media": {
     "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/2/2f/Giant_Puffball.jpg/500px-Giant_Puffball.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "The original uploader was Sulfur at English Wikipedia.",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Giant_Puffball.jpg"
+     },
      {
       "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/77020346/medium.jpeg",
       "w": 500,
@@ -766,14 +786,6 @@
       "credit": "Jacqui Geux",
       "license": "CC BY 4.0",
       "page": "https://www.inaturalist.org/photos/3089906"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/66381049/medium.jpg",
-      "w": 500,
-      "h": 445,
-      "credit": "Adam Wilson",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/66381049"
      }
     ]
    },
@@ -807,7 +819,7 @@
     "Its cap looks like a honeycomb.",
     "It is a prized spring mushroom.",
     "The answer has 2 words (6, 5 letters).",
-    "It starts with the letter C."
+    "Its first letter is C."
    ],
    "media": {
     "img": [
@@ -864,7 +876,7 @@
     "It can kill people who eat it.",
     "It grows in the northern hemisphere.",
     "The answer has 2 words (5, 5 letters).",
-    "It starts with the letter F."
+    "Its first letter is F."
    ],
    "media": {
     "img": [
@@ -917,10 +929,26 @@
     "It is a popular farmed mushroom.",
     "It is shaped like a shellfish.",
     "The answer has 2 words (6, 8 letters).",
-    "It starts with the letter O."
+    "Its first letter is O."
    ],
    "media": {
     "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/9/94/Oyster_mushoom_fells.jpg/500px-Oyster_mushoom_fells.jpg",
+      "w": 500,
+      "h": 342,
+      "credit": "Photograph by Aaron Sherman",
+      "license": "CC BY 2.5",
+      "page": "https://commons.wikimedia.org/wiki/File:Oyster_mushoom_fells.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/7/72/Pleurotus_dryinus_JPG1.jpg/500px-Pleurotus_dryinus_JPG1.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Jean-Pol GRANDMONT",
+      "license": "CC BY 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Pleurotus_dryinus_JPG1.jpg"
+     },
      {
       "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/34047624/medium.jpg",
       "w": 375,
@@ -928,22 +956,6 @@
       "credit": "Katja Schulz",
       "license": "CC BY 4.0",
       "page": "https://www.inaturalist.org/photos/34047624"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/7573196/medium.jpeg",
-      "w": 500,
-      "h": 281,
-      "credit": "no rights reserved",
-      "license": "CC0 1.0",
-      "page": "https://www.inaturalist.org/photos/7573196"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/24549391/medium.jpeg",
-      "w": 500,
-      "h": 375,
-      "credit": "pinonbistro",
-      "license": "CC BY-SA 4.0",
-      "page": "https://www.inaturalist.org/photos/24549391"
      }
     ]
    },
@@ -970,33 +982,33 @@
     "It is used in miso soup and stir-fries.",
     "It is a brown Japanese mushroom.",
     "The answer is one word of 8 letters.",
-    "It starts with the letter S."
+    "Its first letter is S."
    ],
    "media": {
     "img": [
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/63629337/medium.jpg",
-      "w": 375,
-      "h": 500,
-      "credit": "Scott Morris",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/63629337"
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/6/64/Shiitakegrowing.jpg/330px-Shiitakegrowing.jpg",
+      "w": 330,
+      "h": 440,
+      "credit": "frankenstoen from Portland, Oregon",
+      "license": "CC BY 2.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Shiitakegrowing.jpg"
      },
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/263782428/medium.jpeg",
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/6/65/Lentinula_edodes.jpg/500px-Lentinula_edodes.jpg",
       "w": 500,
       "h": 375,
-      "credit": "MUNENORI YAMAKAWA",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/263782428"
+      "credit": "Eric Steinert",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Lentinula_edodes.jpg"
      },
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/197797714/medium.jpg",
-      "w": 281,
-      "h": 500,
-      "credit": "Atsushi Nakajima",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/197797714"
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/7/7b/Funghi_Shiitake.jpg/500px-Funghi_Shiitake.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Albarubescens",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Funghi_Shiitake.jpg"
      }
     ]
    },
@@ -1026,7 +1038,7 @@
     "It is used in hot pot and soup.",
     "Farmed ones are long, thin and white.",
     "The answer is one word of 5 letters.",
-    "It starts with the letter E."
+    "Its first letter is E."
    ],
    "media": {
     "img": [
@@ -1080,7 +1092,7 @@
     "It grows on oak and other trees.",
     "It is said to taste like a farm bird.",
     "The answer has 4 words (7, 2, 3, 5 letters).",
-    "It starts with the letter C."
+    "Its first letter is C."
    ],
    "media": {
     "img": [
@@ -1132,33 +1144,33 @@
     "It grows in many parts of the world.",
     "It has bands of brown, grey and cream.",
     "The answer has 2 words (6, 4 letters).",
-    "It starts with the letter T."
+    "Its first letter is T."
    ],
    "media": {
     "img": [
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/27005174/medium.jpg",
-      "w": 467,
-      "h": 500,
-      "credit": "Ken Kneidel",
-      "license": "CC0 1.0",
-      "page": "https://www.inaturalist.org/photos/27005174"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/160331967/medium.jpg",
-      "w": 500,
-      "h": 400,
-      "credit": "Christine Young",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/160331967"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/171501819/medium.jpeg",
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/5/5d/Stumpfungus.jpg/500px-Stumpfungus.jpg",
       "w": 500,
       "h": 375,
-      "credit": "Rick Farwell",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/171501819"
+      "credit": "Ecornerdropshop at en.wikipedia",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Stumpfungus.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/1b/Velvet_Revolver.jpg/500px-Velvet_Revolver.jpg",
+      "w": 500,
+      "h": 314,
+      "credit": "Steve Jurvetson from Menlo Park, USA",
+      "license": "CC BY 2.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Velvet_Revolver.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/a/a3/Trametes_versicolor_G4_%281%29.JPG/500px-Trametes_versicolor_G4_%281%29.JPG",
+      "w": 500,
+      "h": 375,
+      "credit": "Jerzy Opioła",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Trametes_versicolor_G4_(1).JPG"
      }
     ]
    },
@@ -1188,7 +1200,7 @@
     "It grows in the northern hemisphere.",
     "It is made of long white dangling spines.",
     "The answer has 2 words (5, 4 letters).",
-    "It starts with the letter L."
+    "Its first letter is L."
    ],
    "media": {
     "img": [
@@ -1245,7 +1257,7 @@
     "Its tip is covered in dark green slime.",
     "It smells awful.",
     "The answer has 2 words (6, 9 letters).",
-    "It starts with the letter C."
+    "Its first letter is C."
    ],
    "media": {
     "img": [
@@ -1301,7 +1313,7 @@
     "It is related to puffballs.",
     "Its outer layer splits into a star.",
     "The answer has 2 words (8, 9 letters).",
-    "It starts with the letter C."
+    "Its first letter is C."
    ],
    "media": {
     "img": [
@@ -1354,7 +1366,7 @@
     "It grows in pine forests.",
     "It is rusty orange and very poisonous.",
     "The answer has 2 words (6, 6 letters).",
-    "It starts with the letter D."
+    "Its first letter is D."
    ],
    "media": {
     "img": [
@@ -1407,7 +1419,7 @@
     "It has a ring on its stem.",
     "Its name is linked to a burial.",
     "The answer has 2 words (7, 4 letters).",
-    "It starts with the letter F."
+    "Its first letter is F."
    ],
    "media": {
     "img": [
@@ -1460,7 +1472,7 @@
     "It grows in big clumps.",
     "Its cap is the colour of a sweet bee product.",
     "The answer has 2 words (5, 6 letters).",
-    "It starts with the letter H."
+    "Its first letter is H."
    ],
    "media": {
     "img": [
@@ -1512,7 +1524,7 @@
     "It grows in the northern hemisphere.",
     "It is very common.",
     "The answer has 2 words (7, 4 letters).",
-    "It starts with the letter S."
+    "Its first letter is S."
    ],
    "media": {
     "img": [
@@ -1565,7 +1577,7 @@
     "It is bright violet.",
     "It is named after a purple gemstone.",
     "The answer has 2 words (8, 8 letters).",
-    "It starts with the letter A."
+    "Its first letter is A."
    ],
    "media": {
     "img": [
@@ -1614,7 +1626,7 @@
     "It can puff out clouds of spores.",
     "It grows in the northern hemisphere.",
     "The answer has 3 words (7, 3, 3 letters).",
-    "It starts with the letter S."
+    "Its first letter is S."
    ],
    "media": {
     "img": [
@@ -1670,7 +1682,7 @@
     "It is very tall.",
     "Its cap opens like an umbrella.",
     "The answer has 2 words (7, 8 letters).",
-    "It starts with the letter P."
+    "Its first letter is P."
    ],
    "media": {
     "img": [
@@ -1728,7 +1740,7 @@
     "It is eaten as food, but only when expertly identified.",
     "It grows in Asia.",
     "The answer has 2 words (6, 4 letters).",
-    "It starts with the letter V."
+    "Its first letter is V."
    ],
    "media": {
     "img": [
@@ -1780,7 +1792,7 @@
     "It grows in the northern hemisphere.",
     "It oozes red drops.",
     "The answer has 3 words (8, 5, 6 letters).",
-    "It starts with the letter B."
+    "Its first letter is B."
    ],
    "media": {
     "img": [
@@ -1833,7 +1845,7 @@
     "It is one of very few blue mushrooms.",
     "It is a deep blue colour.",
     "The answer has 3 words (6, 4, 3 letters).",
-    "It starts with the letter I."
+    "Its first letter is I."
    ],
    "media": {
     "img": [
@@ -1891,7 +1903,7 @@
     "It is used in Asian cooking.",
     "It is grown in rice fields.",
     "The answer has 3 words (5, 5, 8 letters).",
-    "It starts with the letter P."
+    "Its first letter is P."
    ],
    "media": {
     "img": [
@@ -2038,6 +2050,35 @@
    "prompt": "Some mushrooms glow in the dark.",
    "answer": true,
    "explain": "Ghost fungus and jack-o'-lantern mushrooms are bioluminescent.",
+   "difficulty": 1
+  },
+  {
+   "id": "q11",
+   "kind": "tf",
+   "prompt": "You should never eat a wild mushroom unless an expert says it is safe.",
+   "answer": true,
+   "explain": "Deadly mushrooms can look like edible ones.",
+   "difficulty": 1
+  },
+  {
+   "id": "q12",
+   "kind": "mc",
+   "prompt": "Where do mushrooms often grow?",
+   "answer": "On damp ground and rotting wood",
+   "wrong": [
+    "On hot sand",
+    "In the sea",
+    "On clouds"
+   ],
+   "explain": "Most fungi like damp, shady places.",
+   "difficulty": 1
+  },
+  {
+   "id": "q13",
+   "kind": "tf",
+   "prompt": "Mushrooms need sunlight to make their food.",
+   "answer": false,
+   "explain": "Unlike plants, fungi feed on dead or living material.",
    "difficulty": 1
   }
  ],

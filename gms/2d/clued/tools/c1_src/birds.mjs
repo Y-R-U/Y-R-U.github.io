@@ -6,7 +6,7 @@ const f = (region, flightless = false) => ({ region, flightless });
 export default {
   id: 'birds', title: 'Birds', theme: 'animals', icon: '🐦', kids: true,
   leakExempt: ['bird'],
-  autoTaxo: ['family', 'genus'], status: true, audio: true,
+  wikiD1: true, autoTaxo: ['family', 'genus'], status: true, audio: true,
   factsMeta: {
     region: { type: 'cat', label: 'Found in', clue: v => `It is found in ${v}.` },
     flightless: { type: 'bool', label: 'Flightless', yes: 'Cannot fly', no: 'Can fly', clue: v => (v ? 'It cannot fly.' : null) },

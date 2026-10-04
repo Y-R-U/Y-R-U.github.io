@@ -51,4 +51,3 @@ landmark fallback image Gateway of India: Gateway of India Port Mumbai 4.jpg
 landmark fallback image Charles Bridge: North view of Charles Bridge from Mánesův most, Prague 20160808 1.jpg
 landmark fallback image Gyeongbokgung: Front view of the Imperial Throne Hall Geunjeongjeon at Gyeongbokgung Palace with blue sky in Seoul.jpg
 landmark fallback image Lotus Temple: Lotus Temple-Panoroma-Visit During WCI 2016- IMG 6471.jpg
-flag licence rejected OMN: OGL-om 1.0

@@ -11,7 +11,7 @@ async function etymology(word) {
   let j;
   try { j = await fetchJSON('https://en.wiktionary.org/w/api.php?action=parse&prop=wikitext&redirects=1&format=json&formatversion=2&page=' + encodeURIComponent(word)); } catch { return ''; }
   const t = j?.parse?.wikitext || '';
-  const en = t.split(/\n==(?!=)/).find(s => s.startsWith('English==')) || '';
+  const en = ('\n' + t).split(/\n==(?!=)/).find(s => s.startsWith('English==')) || '';
   return en.split(/\n(?====)/).filter(s => /^===+\s*Etymology/.test(s)).join('\n');
 }
 const loans = LOANWORDS.trim().split('\n').map(l => { const [word, lang, codes, d, story] = l.split('|'); return { word, lang, codes: codes.split(';'), d: +d, story }; });

@@ -1,0 +1,2607 @@
+{
+ "id": "space",
+ "title": "Space",
+ "theme": "science",
+ "icon": "🪐",
+ "kids": true,
+ "version": 1,
+ "imgPrompt": "Which of these is {lname}?",
+ "nameImgPrompt": "What is this?",
+ "tfImgPrompt": "This is {lname}.",
+ "leakExempt": [],
+ "factsMeta": {
+  "kind": {
+   "type": "cat",
+   "label": "Kind",
+   "values": [
+    "Planet",
+    "Dwarf planet",
+    "Moon",
+    "Star",
+    "Constellation",
+    "Galaxy",
+    "Nebula",
+    "Mission or spacecraft",
+    "Comet",
+    "Black hole"
+   ],
+   "ask": "What is {lname}?",
+   "askReverse": "Which of these is a {lvalue}?",
+   "stmt": "{lname} is a {lvalue}."
+  },
+  "diameterKm": {
+   "type": "num",
+   "label": "Diameter",
+   "unit": "km",
+   "higherLabel": "Bigger",
+   "askHigh": "Which of these is the biggest?",
+   "askLow": "Which of these is the smallest?"
+  },
+  "fromSun": {
+   "type": "num",
+   "label": "Order from the Sun",
+   "unit": "",
+   "askHigh": "Which of these planets is farthest from the Sun?",
+   "askLow": "Which of these planets is closest to the Sun?",
+   "minRatio": 1.1
+  },
+  "year": {
+   "type": "year",
+   "label": "Launched or happened",
+   "askHigh": "Which of these launched most recently?",
+   "askLow": "Which of these launched first?",
+   "minRatio": 1.002
+  },
+  "planetType": {
+   "type": "cat",
+   "label": "Planet type",
+   "values": [
+    "Rocky",
+    "Gas giant",
+    "Ice giant"
+   ],
+   "ask": "What type of planet is {lname}?",
+   "askReverse": "Which of these is a {lvalue} planet?",
+   "stmt": "{lname} is a {lvalue} planet."
+  },
+  "orbits": {
+   "type": "cat",
+   "label": "Orbits",
+   "ask": "What does {lname} orbit?",
+   "askReverse": "Which of these orbits {value}?",
+   "stmt": "{lname} orbits {value}."
+  }
+ },
+ "items": [
+  {
+   "id": "sun",
+   "name": "Sun",
+   "lname": "the Sun",
+   "alt": [
+    "the Sun",
+    "Sol"
+   ],
+   "facts": {
+    "kind": "Star",
+    "diameterKm": 1392700
+   },
+   "blurb": "The star at the centre of our solar system. Its light takes about 8 minutes to reach Earth.",
+   "clues": [
+    "It holds about 99.8% of the mass of the solar system.",
+    "It is about 4.6 billion years old.",
+    "Its light takes about 8 minutes to reach us.",
+    "It is a star.",
+    "It is about 1,392,700 km across.",
+    "It is a yellow dwarf star.",
+    "It is the star at the centre of our solar system.",
+    "The answer is one word of 3 letters.",
+    "Its first letter is S."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/9/9d/Our_Sun_at_a_distance_of_150_Mio._km.jpg/500px-Our_Sun_at_a_distance_of_150_Mio._km.jpg",
+      "w": 500,
+      "h": 433,
+      "credit": "Burkhard Mücke",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Our_Sun_at_a_distance_of_150_Mio._km.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/8/83/The_Sun_in_white_light.jpg/500px-The_Sun_in_white_light.jpg",
+      "w": 500,
+      "h": 500,
+      "credit": "Matúš Motlo",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:The_Sun_in_white_light.jpg"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "mercury",
+   "name": "Mercury",
+   "lname": "Mercury",
+   "facts": {
+    "kind": "Planet",
+    "diameterKm": 4879,
+    "fromSun": 1,
+    "planetType": "Rocky"
+   },
+   "lookalikes": [
+    "moon"
+   ],
+   "blurb": "The smallest planet and the closest to the Sun. A year there is just 88 Earth days.",
+   "clues": [
+    "A day there lasts longer than its year.",
+    "It has almost no atmosphere, so nights fall to about −180 °C.",
+    "Its year is just 88 Earth days.",
+    "It is a planet.",
+    "It is about 4,879 km across.",
+    "It is planet number 1 from the Sun.",
+    "It is a rocky planet.",
+    "It is the smallest planet.",
+    "It is the closest planet to the Sun.",
+    "The answer is one word of 7 letters.",
+    "Its first letter is M."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/3/30/Mercury_in_color_-_Prockter07_centered.jpg/500px-Mercury_in_color_-_Prockter07_centered.jpg",
+      "w": 500,
+      "h": 496,
+      "credit": "NASA/Johns Hopkins University Applied Physics Laboratory/Carnegie Institution of Washin…",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Mercury_in_color_-_Prockter07_centered.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/4/4a/Mercury_in_true_color.jpg/500px-Mercury_in_true_color.jpg",
+      "w": 500,
+      "h": 500,
+      "credit": "NASA/Johns Hopkins University Applied Physics Laboratory/Arizona State University/Carne…",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Mercury_in_true_color.jpg"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "venus",
+   "name": "Venus",
+   "lname": "Venus",
+   "facts": {
+    "kind": "Planet",
+    "diameterKm": 12104,
+    "fromSun": 2,
+    "planetType": "Rocky"
+   },
+   "blurb": "The hottest planet, wrapped in thick clouds of acid. It spins backwards compared with most planets.",
+   "clues": [
+    "It spins in the opposite direction to most planets.",
+    "Its clouds contain sulphuric acid.",
+    "It is the hottest planet, even though Mercury is closer to the Sun.",
+    "It is a planet.",
+    "It is about 12,104 km across.",
+    "It is planet number 2 from the Sun.",
+    "It is a rocky planet.",
+    "It is the brightest planet in our sky.",
+    "It is named after the Roman goddess of love.",
+    "The answer is one word of 5 letters.",
+    "Its first letter is V."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/c/c7/PIA23791-Venus-RealAndEnhancedContrastViews-20200608_%28cropped%29.jpg/500px-PIA23791-Venus-RealAndEnhancedContrastViews-20200608_%28cropped%29.jpg",
+      "w": 500,
+      "h": 500,
+      "credit": "NASA/JPL-Caltech",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:PIA23791-Venus-RealAndEnhancedContrastViews-20200608_(cropped).jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/0/08/Venus_from_Mariner_10.jpg/500px-Venus_from_Mariner_10.jpg",
+      "w": 500,
+      "h": 500,
+      "credit": "NASA/JPL-Caltech",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Venus_from_Mariner_10.jpg"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "earth",
+   "name": "Earth",
+   "lname": "Earth",
+   "alt": [
+    "the Earth"
+   ],
+   "facts": {
+    "kind": "Planet",
+    "diameterKm": 12742,
+    "fromSun": 3,
+    "planetType": "Rocky"
+   },
+   "blurb": "Our home and the only place known to have life. About 71% of its surface is covered in water.",
+   "clues": [
+    "It is the densest planet in the solar system.",
+    "About 71% of its surface is water.",
+    "It has one natural satellite.",
+    "It is a planet.",
+    "It is about 12,742 km across.",
+    "It is planet number 3 from the Sun.",
+    "It is a rocky planet.",
+    "It is the only planet known to have life.",
+    "It is the planet we live on.",
+    "The answer is one word of 5 letters.",
+    "Its first letter is E."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/5/5b/The_Blue_Marble_%285052124705%29.jpg/500px-The_Blue_Marble_%285052124705%29.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "NASA on The Commons",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:The_Blue_Marble_(5052124705).jpg"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "mars",
+   "name": "Mars",
+   "lname": "Mars",
+   "facts": {
+    "kind": "Planet",
+    "diameterKm": 6779,
+    "fromSun": 4,
+    "planetType": "Rocky"
+   },
+   "blurb": "The red planet, coloured by rusty dust. It has the tallest volcano in the solar system, Olympus Mons.",
+   "clues": [
+    "Its moons are Phobos and Deimos.",
+    "Olympus Mons, the tallest volcano in the solar system, is here.",
+    "Rovers like Curiosity and Perseverance explore it.",
+    "It is a planet.",
+    "It is about 6,779 km across.",
+    "It is planet number 4 from the Sun.",
+    "It is a rocky planet.",
+    "It is named after the Roman god of war.",
+    "It is called the red planet.",
+    "The answer is one word of 4 letters.",
+    "Its first letter is M."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/0/0c/Mars_-_August_30_2021_-_Flickr_-_Kevin_M._Gill.png/500px-Mars_-_August_30_2021_-_Flickr_-_Kevin_M._Gill.png",
+      "w": 500,
+      "h": 500,
+      "credit": "Kevin Gill from Los Angeles, CA, United States",
+      "license": "CC BY 2.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Mars_-_August_30_2021_-_Flickr_-_Kevin_M._Gill.png"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "jupiter",
+   "name": "Jupiter",
+   "lname": "Jupiter",
+   "facts": {
+    "kind": "Planet",
+    "diameterKm": 139820,
+    "fromSun": 5,
+    "planetType": "Gas giant"
+   },
+   "blurb": "The biggest planet, a gas giant with a giant storm called the Great Red Spot.",
+   "clues": [
+    "Galileo discovered its four biggest moons in 1610.",
+    "It has the shortest day of any planet, about 10 hours.",
+    "Its Great Red Spot is a storm bigger than Earth.",
+    "It is a planet.",
+    "It is about 139,820 km across.",
+    "It is planet number 5 from the Sun.",
+    "It is a gas giant.",
+    "It is named after the king of the Roman gods.",
+    "It is the biggest planet.",
+    "The answer is one word of 7 letters.",
+    "Its first letter is J."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/e/e2/Jupiter_OPAL_2024.png/500px-Jupiter_OPAL_2024.png",
+      "w": 500,
+      "h": 453,
+      "credit": "NASA/STSCI (S.T.A.R.S)",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Jupiter_OPAL_2024.png"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "saturn",
+   "name": "Saturn",
+   "lname": "Saturn",
+   "facts": {
+    "kind": "Planet",
+    "diameterKm": 116460,
+    "fromSun": 6,
+    "planetType": "Gas giant"
+   },
+   "blurb": "A gas giant famous for its bright rings of ice and rock. It is so light it would float in a big enough bath.",
+   "clues": [
+    "It is less dense than water.",
+    "Its biggest moon, Titan, has a thick atmosphere.",
+    "The Cassini probe studied it for 13 years.",
+    "It is a planet.",
+    "It is about 116,460 km across.",
+    "It is planet number 6 from the Sun.",
+    "It is a gas giant.",
+    "It is the sixth planet from the Sun.",
+    "It has the most famous rings.",
+    "The answer is one word of 6 letters.",
+    "Its first letter is S."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/f/fb/Saturn%2C_Four_Years_On%2C_by_ISS.tif/lossy-page1-500px-Saturn%2C_Four_Years_On%2C_by_ISS.tif.jpg",
+      "w": 500,
+      "h": 242,
+      "credit": "NASA",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Saturn,_Four_Years_On,_by_ISS.tif"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/e/ea/8423_20181_1saturn2016.jpg/500px-8423_20181_1saturn2016.jpg",
+      "w": 500,
+      "h": 254,
+      "credit": "Credit: NASA/JPL-Caltech/SSI",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:8423_20181_1saturn2016.jpg"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "uranus",
+   "name": "Uranus",
+   "lname": "Uranus",
+   "facts": {
+    "kind": "Planet",
+    "diameterKm": 50724,
+    "fromSun": 7,
+    "planetType": "Ice giant"
+   },
+   "blurb": "An ice giant that spins on its side. It was the first planet found with a telescope.",
+   "clues": [
+    "William Herschel discovered it in 1781.",
+    "It was the first planet found with a telescope.",
+    "Most of its moons are named after Shakespeare characters.",
+    "It is a planet.",
+    "It is about 50,724 km across.",
+    "It is planet number 7 from the Sun.",
+    "It is an ice giant.",
+    "It spins on its side.",
+    "It is the seventh planet from the Sun.",
+    "The answer is one word of 6 letters.",
+    "Its first letter is U."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/6/69/Uranus_Voyager2_color_calibrated.png/500px-Uranus_Voyager2_color_calibrated.png",
+      "w": 500,
+      "h": 500,
+      "credit": "Ardenau4",
+      "license": "CC0 1.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Uranus_Voyager2_color_calibrated.png"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "neptune",
+   "name": "Neptune",
+   "lname": "Neptune",
+   "facts": {
+    "kind": "Planet",
+    "diameterKm": 49244,
+    "fromSun": 8,
+    "planetType": "Ice giant"
+   },
+   "blurb": "The farthest planet from the Sun, a deep blue ice giant with the fastest winds in the solar system.",
+   "clues": [
+    "It was found by maths before it was seen, in 1846.",
+    "Only Voyager 2 has visited it.",
+    "It has the fastest winds in the solar system.",
+    "It is a planet.",
+    "It is about 49,244 km across.",
+    "It is planet number 8 from the Sun.",
+    "It is an ice giant.",
+    "It is named after the Roman god of the sea.",
+    "It is the farthest planet from the Sun.",
+    "The answer is one word of 7 letters.",
+    "Its first letter is N."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/b/b9/Neptune_Voyager2_color_calibrated.png/500px-Neptune_Voyager2_color_calibrated.png",
+      "w": 500,
+      "h": 500,
+      "credit": "NASA / Voyager 2 / PDS / OPUS / Ardenau4",
+      "license": "CC0 1.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Neptune_Voyager2_color_calibrated.png"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "pluto",
+   "name": "Pluto",
+   "lname": "Pluto",
+   "facts": {
+    "kind": "Dwarf planet",
+    "diameterKm": 2377,
+    "orbits": "the Sun"
+   },
+   "blurb": "A dwarf planet in the Kuiper Belt. It was called the ninth planet until 2006.",
+   "clues": [
+    "It has a heart-shaped plain of nitrogen ice.",
+    "New Horizons flew past it in 2015.",
+    "It was discovered by Clyde Tombaugh in 1930.",
+    "It is a dwarf planet.",
+    "It is about 2,377 km across.",
+    "It orbits the Sun.",
+    "It was reclassified as a dwarf planet in 2006.",
+    "It used to be called the ninth planet.",
+    "The answer is one word of 5 letters.",
+    "Its first letter is P."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/d/d3/Global_LORRI_mosaic_of_Pluto_in_true_colour.jpg/500px-Global_LORRI_mosaic_of_Pluto_in_true_colour.jpg",
+      "w": 500,
+      "h": 499,
+      "credit": "NASA/JHUAPL/SwRI",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Global_LORRI_mosaic_of_Pluto_in_true_colour.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/e/ef/Pluto_in_True_Color_-_High-Res.jpg/500px-Pluto_in_True_Color_-_High-Res.jpg",
+      "w": 500,
+      "h": 500,
+      "credit": "NASA/Johns Hopkins University Applied Physics Laboratory/Southwest Research Institute/A…",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Pluto_in_True_Color_-_High-Res.jpg"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "ceres",
+   "name": "Ceres",
+   "lname": "Ceres",
+   "facts": {
+    "kind": "Dwarf planet",
+    "diameterKm": 940,
+    "orbits": "the Sun"
+   },
+   "blurb": "The largest object in the asteroid belt and the only dwarf planet in the inner solar system.",
+   "clues": [
+    "It was discovered in 1801.",
+    "The Dawn spacecraft orbited it.",
+    "It has bright salty spots in a crater.",
+    "It is a dwarf planet.",
+    "It is about 940 km across.",
+    "It orbits the Sun.",
+    "It is the largest object in the asteroid belt.",
+    "It is named after the Roman goddess of farming.",
+    "The answer is one word of 5 letters.",
+    "Its first letter is C."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/7/76/Ceres_-_RC3_-_Haulani_Crater_%2822381131691%29_%28cropped%29.jpg/500px-Ceres_-_RC3_-_Haulani_Crater_%2822381131691%29_%28cropped%29.jpg",
+      "w": 500,
+      "h": 491,
+      "credit": "Justin Cowart",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Ceres_-_RC3_-_Haulani_Crater_(22381131691)_(cropped).jpg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "eris",
+   "name": "Eris",
+   "lname": "Eris",
+   "facts": {
+    "kind": "Dwarf planet",
+    "diameterKm": 2326,
+    "orbits": "the Sun"
+   },
+   "blurb": "A distant dwarf planet almost as big as Pluto. Its discovery led to Pluto being reclassified.",
+   "clues": [
+    "It was discovered in 2005.",
+    "It is more massive than Pluto.",
+    "Its discovery led to the definition of a planet.",
+    "It is a dwarf planet.",
+    "It is about 2,326 km across.",
+    "It orbits the Sun.",
+    "It is named after the Greek goddess of strife.",
+    "It is a distant dwarf planet.",
+    "The answer is one word of 4 letters.",
+    "Its first letter is E."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/c/ca/Eris_and_dysnomia.jpg",
+      "w": 500,
+      "h": 500,
+      "credit": "NASA, ESA, and M. Brown (California Institute of Technology)",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Eris_and_dysnomia.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/6/63/Eris_and_moon_Dysnomia_JWST_NIRCam.jpg/500px-Eris_and_moon_Dysnomia_JWST_NIRCam.jpg",
+      "w": 500,
+      "h": 500,
+      "credit": "NASA/ESA/CSA JWST NIRCam; Ana Carolina de Souza Feliciano et al. & Melina Thévenot",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Eris_and_moon_Dysnomia_JWST_NIRCam.jpg"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "moon",
+   "name": "Moon",
+   "lname": "the Moon",
+   "alt": [
+    "the Moon",
+    "Luna"
+   ],
+   "facts": {
+    "kind": "Moon",
+    "diameterKm": 3474,
+    "orbits": "Earth"
+   },
+   "lookalikes": [
+    "mercury"
+   ],
+   "blurb": "Earth's natural satellite. Twelve astronauts walked on it between 1969 and 1972.",
+   "clues": [
+    "It is slowly moving away from Earth by about 4 cm a year.",
+    "The same side always faces Earth.",
+    "Twelve people have walked on it.",
+    "It is about 3,474 km across.",
+    "It orbits Earth.",
+    "Its pull causes the tides.",
+    "It lights up the night sky.",
+    "The answer is one word of 4 letters.",
+    "Its first letter is M."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/e/e1/FullMoon2010.jpg/500px-FullMoon2010.jpg",
+      "w": 500,
+      "h": 475,
+      "credit": "Gregory H. Revera",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:FullMoon2010.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/3/3f/Solar_eclipse_taken_from_Artemis_II_-_April_2026.jpg/500px-Solar_eclipse_taken_from_Artemis_II_-_April_2026.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "NASA",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Solar_eclipse_taken_from_Artemis_II_-_April_2026.jpg"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "io",
+   "name": "Io",
+   "lname": "Io",
+   "facts": {
+    "kind": "Moon",
+    "diameterKm": 3643,
+    "orbits": "Jupiter"
+   },
+   "lookalikes": [
+    "europa"
+   ],
+   "blurb": "A moon of Jupiter and the most volcanic place in the solar system.",
+   "clues": [
+    "Its volcanoes shoot plumes hundreds of kilometres high.",
+    "Its yellow colour comes from sulphur.",
+    "Galileo discovered it in 1610.",
+    "It is a moon.",
+    "It is about 3,643 km across.",
+    "It orbits Jupiter.",
+    "It is the most volcanic body in the solar system.",
+    "It has only two letters in its name.",
+    "The answer is one word of 2 letters.",
+    "Its first letter is I."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/8/8e/Image_of_Io_from_Juno_JunoCam_from_December_2023.png/500px-Image_of_Io_from_Juno_JunoCam_from_December_2023.png",
+      "w": 500,
+      "h": 500,
+      "credit": "NASA / SWRI / MSSS / Jason Perry",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Image_of_Io_from_Juno_JunoCam_from_December_2023.png"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/0/07/Io_highest_resolution_natural_color.png/500px-Io_highest_resolution_natural_color.png",
+      "w": 500,
+      "h": 500,
+      "credit": "NASA",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Io_highest_resolution_natural_color.png"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "europa",
+   "name": "Europa",
+   "lname": "Europa",
+   "facts": {
+    "kind": "Moon",
+    "diameterKm": 3122,
+    "orbits": "Jupiter"
+   },
+   "lookalikes": [
+    "io",
+    "enceladus"
+   ],
+   "blurb": "An icy moon of Jupiter with a salty ocean under its shell. It is one of the best places to look for life.",
+   "clues": [
+    "Its ice is criss-crossed with cracks.",
+    "A salty ocean lies under its ice.",
+    "It is a moon.",
+    "It is about 3,122 km across.",
+    "It orbits Jupiter.",
+    "It is one of Jupiter's four big moons.",
+    "It shares its name with a continent.",
+    "The answer is one word of 6 letters.",
+    "Its first letter is E."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/5/54/Europa-moon.jpg/500px-Europa-moon.jpg",
+      "w": 500,
+      "h": 500,
+      "credit": "NASA/JPL/DLR",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Europa-moon.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/b/b3/Europa_-_Perijove_45_%28cropped%29.png/500px-Europa_-_Perijove_45_%28cropped%29.png",
+      "w": 500,
+      "h": 500,
+      "credit": "NASA/JPL-Caltech/SwRI/MSSS/Kevin M. Gill",
+      "license": "CC BY 2.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Europa_-_Perijove_45_(cropped).png"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "ganymede",
+   "name": "Ganymede",
+   "lname": "Ganymede",
+   "facts": {
+    "kind": "Moon",
+    "diameterKm": 5268,
+    "orbits": "Jupiter"
+   },
+   "lookalikes": [
+    "titan"
+   ],
+   "blurb": "The biggest moon in the solar system, bigger than the planet Mercury. It has its own magnetic field.",
+   "clues": [
+    "It is the only moon with its own magnetic field.",
+    "It is bigger than the planet Mercury.",
+    "It orbits Jupiter.",
+    "It is a moon.",
+    "It is about 5,268 km across.",
+    "It is the largest moon in the solar system.",
+    "It is named after a cup-bearer of the Greek gods.",
+    "The answer is one word of 8 letters.",
+    "Its first letter is G."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://images-assets.nasa.gov/image/PIA24681/PIA24681~thumb.jpg",
+      "credit": "NASA / JPL",
+      "license": "Public domain",
+      "page": "https://images.nasa.gov/details/PIA24681"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "callisto",
+   "name": "Callisto",
+   "lname": "Callisto",
+   "facts": {
+    "kind": "Moon",
+    "diameterKm": 4821,
+    "orbits": "Jupiter"
+   },
+   "blurb": "A dark, heavily cratered moon of Jupiter. Its surface is one of the oldest in the solar system.",
+   "clues": [
+    "It is the most heavily cratered body in the solar system.",
+    "Its surface is about 4 billion years old.",
+    "It is the second-largest moon of Jupiter.",
+    "It is a moon.",
+    "It is about 4,821 km across.",
+    "It orbits Jupiter.",
+    "Galileo discovered it in 1610.",
+    "It is named after a nymph in Greek myth.",
+    "The answer is one word of 8 letters.",
+    "Its first letter is C."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://images-assets.nasa.gov/image/PIA01055/PIA01055~thumb.jpg",
+      "credit": "NASA / JPL",
+      "license": "Public domain",
+      "page": "https://images.nasa.gov/details/PIA01055"
+     },
+     {
+      "src": "https://images-assets.nasa.gov/image/PIA03456/PIA03456~thumb.jpg",
+      "credit": "NASA / JPL",
+      "license": "Public domain",
+      "page": "https://images.nasa.gov/details/PIA03456"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "titan",
+   "name": "Titan",
+   "lname": "Titan",
+   "facts": {
+    "kind": "Moon",
+    "diameterKm": 5150,
+    "orbits": "Saturn"
+   },
+   "lookalikes": [
+    "ganymede"
+   ],
+   "blurb": "Saturn's largest moon, with a thick orange haze and lakes of liquid methane.",
+   "clues": [
+    "The Huygens probe landed there in 2005.",
+    "It has lakes and rain of liquid methane.",
+    "It has a thicker atmosphere than Earth.",
+    "It is a moon.",
+    "It is about 5,150 km across.",
+    "It orbits Saturn.",
+    "It is the largest moon of Saturn.",
+    "Its name means a giant from Greek myth.",
+    "The answer is one word of 5 letters.",
+    "Its first letter is T."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/f/fe/Titan_in_true_color_by_Kevin_M._Gill.jpg/500px-Titan_in_true_color_by_Kevin_M._Gill.jpg",
+      "w": 500,
+      "h": 500,
+      "credit": "NASA/JPL-Caltech/SSI/Kevin M. Gill",
+      "license": "CC BY 2.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Titan_in_true_color_by_Kevin_M._Gill.jpg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "enceladus",
+   "name": "Enceladus",
+   "lname": "Enceladus",
+   "facts": {
+    "kind": "Moon",
+    "diameterKm": 504,
+    "orbits": "Saturn"
+   },
+   "lookalikes": [
+    "europa"
+   ],
+   "blurb": "A small, icy moon of Saturn that shoots jets of water from cracks near its south pole.",
+   "clues": [
+    "Its jets feed one of Saturn's rings.",
+    "It reflects almost all the sunlight that hits it.",
+    "Cassini flew through its plumes.",
+    "It is a moon.",
+    "It is about 504 km across.",
+    "It orbits Saturn.",
+    "It sprays water jets from its south pole.",
+    "It is a small icy moon of Saturn.",
+    "The answer is one word of 9 letters.",
+    "Its first letter is E."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/8/83/PIA17202_-_Approaching_Enceladus.jpg/500px-PIA17202_-_Approaching_Enceladus.jpg",
+      "w": 500,
+      "h": 500,
+      "credit": "National Aeronautics and Space Administration (NASA) / Jet Propulsion Laboratory (JPL)",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:PIA17202_-_Approaching_Enceladus.jpg"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "triton",
+   "name": "Triton",
+   "lname": "Triton",
+   "facts": {
+    "kind": "Moon",
+    "diameterKm": 2707,
+    "orbits": "Neptune"
+   },
+   "blurb": "Neptune's biggest moon. It orbits backwards and has geysers of nitrogen.",
+   "clues": [
+    "It orbits in the opposite direction to Neptune's spin.",
+    "It may be a captured Kuiper Belt object.",
+    "Voyager 2 saw its nitrogen geysers.",
+    "It is a moon.",
+    "It is about 2,707 km across.",
+    "It orbits Neptune.",
+    "It is Neptune's largest moon.",
+    "It is named after a merman god.",
+    "The answer is one word of 6 letters.",
+    "Its first letter is T."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/9/9d/Neptune%E2%80%99s_Moon_Triton_Fosters_Rare_Icy_Union_%28gemini1903a%29_square.jpg/500px-Neptune%E2%80%99s_Moon_Triton_Fosters_Rare_Icy_Union_%28gemini1903a%29_square.jpg",
+      "w": 500,
+      "h": 500,
+      "credit": "NASA/JPL",
+      "license": "CC BY 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Neptune%E2%80%99s_Moon_Triton_Fosters_Rare_Icy_Union_(gemini1903a)_square.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/9/98/Triton-usgs23-with-frame.jpg/500px-Triton-usgs23-with-frame.jpg",
+      "w": 500,
+      "h": 500,
+      "credit": "Michael T. Bland, U.S. Geological Survey (USGS)",
+      "license": "CC BY 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Triton-usgs23-with-frame.jpg"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "phobos",
+   "name": "Phobos",
+   "lname": "Phobos",
+   "facts": {
+    "kind": "Moon",
+    "diameterKm": 22,
+    "orbits": "Mars"
+   },
+   "blurb": "The larger of Mars's two tiny moons. It is slowly spiralling inwards and will break apart one day.",
+   "clues": [
+    "It orbits Mars three times a day.",
+    "It is slowly spiralling towards Mars.",
+    "It is shaped like a potato.",
+    "It is a moon.",
+    "It is about 22 km across.",
+    "It orbits Mars.",
+    "Its name means \"fear\" in Greek.",
+    "It is the bigger of Mars's two moons.",
+    "The answer is one word of 6 letters.",
+    "Its first letter is P."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/5/5c/Phobos_colour_2008.jpg/500px-Phobos_colour_2008.jpg",
+      "w": 500,
+      "h": 471,
+      "credit": "NASA / JPL-Caltech / University of Arizona",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Phobos_colour_2008.jpg"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "charon",
+   "name": "Charon",
+   "lname": "Charon",
+   "facts": {
+    "kind": "Moon",
+    "diameterKm": 1212,
+    "orbits": "Pluto"
+   },
+   "blurb": "Pluto's largest moon, about half Pluto's size. The two are locked face to face.",
+   "clues": [
+    "It and Pluto always show each other the same face.",
+    "It has a reddish polar cap.",
+    "It was discovered in 1978.",
+    "It is a moon.",
+    "It is about 1,212 km across.",
+    "It orbits Pluto.",
+    "It is about half the size of Pluto.",
+    "It is named after the ferryman of the dead.",
+    "The answer is one word of 6 letters.",
+    "Its first letter is C."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/2/2e/Charon_in_True_Color_-_High-Res.jpg/500px-Charon_in_True_Color_-_High-Res.jpg",
+      "w": 500,
+      "h": 500,
+      "credit": "NASA/Johns Hopkins University Applied Physics Laboratory/Southwest Research Institute/A…",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Charon_in_True_Color_-_High-Res.jpg"
+     },
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/7/70/Pluto_system_2006_es.jpg",
+      "w": 500,
+      "h": 471,
+      "credit": "derivative work: Otiñar (talk) Pluto_system_2006.jpg: H. Weaver (JHU/APL), A. Stern (Sw…",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Pluto_system_2006_es.jpg"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "sirius",
+   "name": "Sirius",
+   "lname": "Sirius",
+   "alt": [
+    "Dog Star"
+   ],
+   "facts": {
+    "kind": "Star"
+   },
+   "blurb": "The brightest star in the night sky. It is about 8.6 light years away.",
+   "clues": [
+    "It is in the southern half of the sky.",
+    "Ancient Egyptians linked its rising to the Nile flood.",
+    "It is the brightest point of light at night after the planets.",
+    "It has a tiny white dwarf companion.",
+    "It is about 8.6 light years away.",
+    "It is in the constellation Canis Major.",
+    "The answer is one word of 6 letters.",
+    "Its first letter is S."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/c/c6/Sirius.jpg/500px-Sirius.jpg",
+      "w": 500,
+      "h": 331,
+      "credit": "Mellostorm",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Sirius.jpg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "betelgeuse",
+   "name": "Betelgeuse",
+   "lname": "Betelgeuse",
+   "facts": {
+    "kind": "Star"
+   },
+   "blurb": "A huge red supergiant star in Orion. It will explode as a supernova one day.",
+   "clues": [
+    "It is hundreds of times wider than the Sun.",
+    "It looks orange-red.",
+    "It dimmed strangely in 2019 and 2020.",
+    "It will one day explode as a supernova.",
+    "It is a star.",
+    "It is a red supergiant.",
+    "It marks a shoulder of Orion.",
+    "Its name sounds like a famous ghost film.",
+    "The answer is one word of 10 letters.",
+    "Its first letter is B."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/8/88/Position_Alpha_Ori.png",
+      "w": 500,
+      "h": 638,
+      "credit": "Wikimedia Commons",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Position_Alpha_Ori.png"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/f/f2/Location_of_the_binary_system_of_Betelgeuse_in_constellation_Orion.png/500px-Location_of_the_binary_system_of_Betelgeuse_in_constellation_Orion.png",
+      "w": 500,
+      "h": 541,
+      "credit": "Aaron McKinnon, E. Slawik/NOIRLab/NSF/AURA/M. Zamani",
+      "license": "CC BY 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Location_of_the_binary_system_of_Betelgeuse_in_constellation_Orion.png"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "polaris",
+   "name": "Polaris",
+   "lname": "Polaris",
+   "alt": [
+    "North Star",
+    "Pole Star"
+   ],
+   "facts": {
+    "kind": "Star"
+   },
+   "blurb": "The North Star. It sits almost directly above the North Pole, so it barely moves in the sky.",
+   "clues": [
+    "Its height above the horizon tells you your latitude.",
+    "It is in Ursa Minor.",
+    "It cannot be seen from Australia.",
+    "Sailors used it to find their latitude.",
+    "It is at the end of the Little Dipper's handle.",
+    "It barely moves in the night sky.",
+    "The answer is one word of 7 letters.",
+    "Its first letter is P."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/5/5f/Polaris_alpha_ursae_minoris.jpg/500px-Polaris_alpha_ursae_minoris.jpg",
+      "w": 500,
+      "h": 338,
+      "credit": "NASA/HST",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Polaris_alpha_ursae_minoris.jpg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "proxima-centauri",
+   "name": "Proxima Centauri",
+   "lname": "Proxima Centauri",
+   "facts": {
+    "kind": "Star"
+   },
+   "lookalikes": [
+    "alpha-centauri"
+   ],
+   "blurb": "The closest star to the Sun, about 4.2 light years away. It has at least one planet.",
+   "clues": [
+    "It sometimes gives off big flares.",
+    "It is part of a three-star system.",
+    "It has a planet in its habitable zone.",
+    "It is a small red dwarf.",
+    "It is a star.",
+    "It is too dim to see without a telescope.",
+    "It is about 4.2 light years away.",
+    "It is the closest star to the Sun.",
+    "The answer has 2 words (7, 8 letters).",
+    "Its first letter is P."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/9/95/New_shot_of_Proxima_Centauri%2C_our_nearest_neighbour.jpg/500px-New_shot_of_Proxima_Centauri%2C_our_nearest_neighbour.jpg",
+      "w": 500,
+      "h": 490,
+      "credit": "ESA/Hubble & NASA",
+      "license": "CC BY 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:New_shot_of_Proxima_Centauri,_our_nearest_neighbour.jpg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "alpha-centauri",
+   "name": "Alpha Centauri",
+   "lname": "Alpha Centauri",
+   "alt": [
+    "Rigil Kentaurus"
+   ],
+   "facts": {
+    "kind": "Star"
+   },
+   "lookalikes": [
+    "proxima-centauri"
+   ],
+   "blurb": "The closest star system to us. Its two bright stars look like one point of light to the naked eye.",
+   "clues": [
+    "It is in the southern sky.",
+    "It cannot be seen from most of Europe.",
+    "It is a triple star system.",
+    "It points the way to the Southern Cross.",
+    "It is a star.",
+    "Two of its stars look like one to the naked eye.",
+    "It is the third-brightest star in the night sky.",
+    "It is about 4.4 light years away.",
+    "The answer has 2 words (5, 8 letters).",
+    "Its first letter is A."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/3/31/Best_image_of_Alpha_Centauri_A_and_B.jpg/500px-Best_image_of_Alpha_Centauri_A_and_B.jpg",
+      "w": 500,
+      "h": 327,
+      "credit": "ESA/Hubble & NASA",
+      "license": "CC BY 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Best_image_of_Alpha_Centauri_A_and_B.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/3/31/The_sky_around_Alpha_Centauri_and_Proxima_Centauri_%28eso1629i%29.jpg/500px-The_sky_around_Alpha_Centauri_and_Proxima_Centauri_%28eso1629i%29.jpg",
+      "w": 500,
+      "h": 508,
+      "credit": "Digitized Sky Survey 2. Acknowledgement: Davide De Martin/Mahdi Zamani",
+      "license": "CC BY 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:The_sky_around_Alpha_Centauri_and_Proxima_Centauri_(eso1629i).jpg"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "orion",
+   "name": "Orion",
+   "lname": "Orion",
+   "facts": {
+    "kind": "Constellation"
+   },
+   "blurb": "A bright constellation shaped like a hunter, with three stars in a row for his belt.",
+   "clues": [
+    "It can be seen from both hemispheres.",
+    "It is best seen in December and January evenings.",
+    "Its brightest stars are Rigel and Betelgeuse.",
+    "A famous nebula forms its sword.",
+    "It is a constellation.",
+    "Three stars in a row form its belt.",
+    "Australians see it upside down as \"the Saucepan\".",
+    "It is named after a hunter from Greek myth.",
+    "The answer is one word of 5 letters.",
+    "Its first letter is O."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/f/f5/OrionCC.jpg",
+      "w": 500,
+      "h": 710,
+      "credit": "Till Credner",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:OrionCC.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/f/ff/Orion_IAU.svg/500px-Orion_IAU.svg.png",
+      "w": 500,
+      "h": 620,
+      "credit": "IAU and Sky & Telescope magazine (Roger Sinnott & Rick Fienberg)",
+      "license": "CC BY 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Orion_IAU.svg"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "ursa-major",
+   "name": "Ursa Major",
+   "lname": "Ursa Major",
+   "alt": [
+    "Great Bear",
+    "Big Dipper",
+    "the Plough"
+   ],
+   "facts": {
+    "kind": "Constellation"
+   },
+   "blurb": "A big northern constellation, the Great Bear. Seven of its stars form the Big Dipper, or Plough.",
+   "clues": [
+    "It circles the North Star.",
+    "It is the third-largest constellation.",
+    "Two of its stars point to Polaris.",
+    "Seven of its brightest stars form a saucepan or wagon shape.",
+    "It is a constellation.",
+    "Its name is Latin for a large wild animal.",
+    "Its seven famous stars are sometimes called a farm tool.",
+    "The answer has 2 words (4, 5 letters).",
+    "Its first letter is U."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/8/86/UrsaMajorCC.jpg",
+      "w": 500,
+      "h": 751,
+      "credit": "Till Credner",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:UrsaMajorCC.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/13/Ursa_Major_IAU.svg/500px-Ursa_Major_IAU.svg.png",
+      "w": 500,
+      "h": 434,
+      "credit": "IAU and Sky & Telescope magazine (Roger Sinnott & Rick Fienberg)",
+      "license": "CC BY 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Ursa_Major_IAU.svg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "crux",
+   "name": "Crux",
+   "lname": "Crux",
+   "alt": [
+    "Southern Cross"
+   ],
+   "facts": {
+    "kind": "Constellation"
+   },
+   "blurb": "The smallest constellation, a cross of stars in the southern sky. It is on the flags of Australia and New Zealand.",
+   "clues": [
+    "It is in the Milky Way.",
+    "Its brightest star is Acrux.",
+    "It has four bright stars and one fainter one.",
+    "It is the smallest of the 88 constellations.",
+    "It is a constellation.",
+    "Two pointer stars lead to it.",
+    "It appears on the flags of Australia and New Zealand.",
+    "The answer is one word of 4 letters.",
+    "Its first letter is C."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/d/d5/Constellation_Crux.jpg/500px-Constellation_Crux.jpg",
+      "w": 500,
+      "h": 335,
+      "credit": "Till Credner",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Constellation_Crux.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/c/cf/Crux_IAU.svg/500px-Crux_IAU.svg.png",
+      "w": 500,
+      "h": 474,
+      "credit": "IAU and Sky & Telescope magazine (Roger Sinnott & Rick Fienberg)",
+      "license": "CC BY 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Crux_IAU.svg"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "cassiopeia",
+   "name": "Cassiopeia",
+   "lname": "Cassiopeia",
+   "facts": {
+    "kind": "Constellation"
+   },
+   "blurb": "A northern constellation shaped like a W, named after a vain queen in Greek myth.",
+   "clues": [
+    "It is a northern constellation.",
+    "It sits in the Milky Way.",
+    "It never sets in much of the northern hemisphere.",
+    "It is named after a vain queen.",
+    "It is a constellation.",
+    "Her daughter Andromeda is nearby.",
+    "It is opposite the Big Dipper around the North Star.",
+    "Its stars form a W shape.",
+    "The answer is one word of 10 letters.",
+    "Its first letter is C."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/c/c1/CassiopeiaCC.jpg",
+      "w": 500,
+      "h": 749,
+      "credit": "Till Credner",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:CassiopeiaCC.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/e/e7/Cassiopeia_IAU.svg/500px-Cassiopeia_IAU.svg.png",
+      "w": 500,
+      "h": 473,
+      "credit": "IAU and Sky & Telescope magazine (Roger Sinnott & Rick Fienberg)",
+      "license": "CC BY 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Cassiopeia_IAU.svg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "scorpius",
+   "name": "Scorpius",
+   "lname": "Scorpius",
+   "alt": [
+    "Scorpio"
+   ],
+   "facts": {
+    "kind": "Constellation"
+   },
+   "blurb": "A constellation shaped like a scorpion, with the bright red star Antares at its heart.",
+   "clues": [
+    "It is best seen in winter evenings in Australia.",
+    "It lies near the centre of the Milky Way.",
+    "Its brightest star is Antares, a red supergiant.",
+    "In myth it killed Orion.",
+    "It is a constellation.",
+    "It is a sign of the zodiac.",
+    "Its stars curl like a tail with a sting.",
+    "The answer is one word of 8 letters.",
+    "Its first letter is S."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/4/4e/ScorpiusCC.jpg/500px-ScorpiusCC.jpg",
+      "w": 500,
+      "h": 334,
+      "credit": "Till Credner",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:ScorpiusCC.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/3/38/Scorpius_IAU.svg/500px-Scorpius_IAU.svg.png",
+      "w": 500,
+      "h": 618,
+      "credit": "IAU and Sky & Telescope magazine (Roger Sinnott & Rick Fienberg)",
+      "license": "CC BY 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Scorpius_IAU.svg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "milky-way",
+   "name": "Milky Way",
+   "lname": "the Milky Way",
+   "alt": [
+    "the Milky Way"
+   ],
+   "facts": {
+    "kind": "Galaxy"
+   },
+   "lookalikes": [
+    "andromeda-galaxy"
+   ],
+   "blurb": "Our home galaxy, a spiral of hundreds of billions of stars. On dark nights it looks like a glowing band across the sky.",
+   "clues": [
+    "It is about 100,000 light years across.",
+    "The Sun takes about 230 million years to go round it.",
+    "A supermassive black hole sits at its centre.",
+    "It is a barred spiral galaxy.",
+    "It is a galaxy.",
+    "It contains hundreds of billions of stars.",
+    "It looks like a glowing band across dark skies.",
+    "It is our home galaxy.",
+    "The answer has 2 words (5, 3 letters).",
+    "Its first letter is M."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/4/4f/Artist%E2%80%99s_impression_of_the_Milky_Way.jpg/500px-Artist%E2%80%99s_impression_of_the_Milky_Way.jpg",
+      "w": 500,
+      "h": 500,
+      "credit": "NASA/JPL-Caltech/ESO/R. Hurt",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Artist%E2%80%99s_impression_of_the_Milky_Way.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/4/43/ESO-VLT-Laser-phot-33a-07.jpg/500px-ESO-VLT-Laser-phot-33a-07.jpg",
+      "w": 500,
+      "h": 332,
+      "credit": "ESO/Y. Beletsky",
+      "license": "CC BY 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:ESO-VLT-Laser-phot-33a-07.jpg"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "andromeda-galaxy",
+   "name": "Andromeda Galaxy",
+   "lname": "the Andromeda Galaxy",
+   "alt": [
+    "Andromeda",
+    "M31"
+   ],
+   "facts": {
+    "kind": "Galaxy"
+   },
+   "lookalikes": [
+    "milky-way"
+   ],
+   "blurb": "The nearest big galaxy to the Milky Way, about 2.5 million light years away. The two will merge in billions of years.",
+   "clues": [
+    "It has two small companions called M32 and M110.",
+    "It is bigger than the Milky Way.",
+    "Charles Messier listed it as number 31.",
+    "It is in the northern sky.",
+    "It is heading towards the Milky Way.",
+    "It is about 2.5 million light years away.",
+    "It is the most distant thing most people can see without a telescope.",
+    "It is a huge spiral of about a trillion stars.",
+    "It is named after a princess in Greek myth.",
+    "The answer has 2 words (9, 6 letters).",
+    "Its first letter is A."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/5/57/M31-Andromede-16-09-2023-Hamois.jpg/500px-M31-Andromede-16-09-2023-Hamois.jpg",
+      "w": 500,
+      "h": 331,
+      "credit": "Lviatour",
+      "license": "CC BY-SA 2.5",
+      "page": "https://commons.wikimedia.org/wiki/File:M31-Andromede-16-09-2023-Hamois.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/2/26/Andromeda_Galaxy_Hubble_M31Mosaic_2025_42208x9870.jpg/500px-Andromeda_Galaxy_Hubble_M31Mosaic_2025_42208x9870.jpg",
+      "w": 500,
+      "h": 117,
+      "credit": "NASA, ESA, Benjamin F. Williams (UWashington), Zhuo Chen (UWashington), L. Clifton John…",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Andromeda_Galaxy_Hubble_M31Mosaic_2025_42208x9870.jpg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "orion-nebula",
+   "name": "Orion Nebula",
+   "lname": "the Orion Nebula",
+   "alt": [
+    "M42"
+   ],
+   "facts": {
+    "kind": "Nebula"
+   },
+   "blurb": "A glowing cloud of gas where new stars are being born. It forms the \"sword\" of Orion.",
+   "clues": [
+    "It is about 24 light years across.",
+    "It glows pink and red in photos.",
+    "It is about 1,300 light years away.",
+    "It is a stellar nursery.",
+    "It can be seen without a telescope.",
+    "It forms the sword of a hunter constellation.",
+    "It is named after a hunter.",
+    "The answer has 2 words (5, 6 letters).",
+    "Its first letter is O."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/f/f3/Orion_Nebula_-_Hubble_2006_mosaic_18000.jpg/500px-Orion_Nebula_-_Hubble_2006_mosaic_18000.jpg",
+      "w": 500,
+      "h": 500,
+      "credit": "NASA, ESA, M. Robberto (Space Telescope Science Institute/ESA) and the Hubble Space Tel…",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Orion_Nebula_-_Hubble_2006_mosaic_18000.jpg"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "pillars-of-creation",
+   "name": "Pillars of Creation",
+   "lname": "the Pillars of Creation",
+   "facts": {
+    "kind": "Nebula"
+   },
+   "blurb": "Towering columns of gas and dust in the Eagle Nebula, made famous by a Hubble photo in 1995.",
+   "clues": [
+    "They are about 6,500 light years away.",
+    "Their tallest column is about 4 light years long.",
+    "They are in the Eagle Nebula.",
+    "Hubble photographed them in 1995.",
+    "It is a nebula.",
+    "The James Webb telescope photographed them in 2022.",
+    "New stars are forming inside them.",
+    "They look like tall columns of gas and dust.",
+    "The answer has 3 words (7, 2, 8 letters).",
+    "Its first letter is P."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/2/29/Sternentstehung_im_Adlernebel.jpg/500px-Sternentstehung_im_Adlernebel.jpg",
+      "w": 500,
+      "h": 381,
+      "credit": "Burkhard Mücke",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Sternentstehung_im_Adlernebel.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/b/b2/Eagle_nebula_pillars.jpg/500px-Eagle_nebula_pillars.jpg",
+      "w": 500,
+      "h": 493,
+      "credit": "Credit: NASA, Jeff Hester, and Paul Scowen (Arizona State University)",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Eagle_nebula_pillars.jpg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "halleys-comet",
+   "name": "Halley's Comet",
+   "lname": "Halley's Comet",
+   "alt": [
+    "Halley's comet",
+    "Comet Halley"
+   ],
+   "facts": {
+    "kind": "Comet"
+   },
+   "blurb": "The most famous comet, seen from Earth about every 76 years. It will next return in 2061.",
+   "clues": [
+    "It was seen by a spacecraft fleet in 1986.",
+    "It appears on the Bayeux Tapestry.",
+    "It last came near Earth in 1986.",
+    "It returns about every 76 years.",
+    "It will next be visible in 2061.",
+    "It is named after an English astronomer.",
+    "The answer has 2 words (7, 5 letters).",
+    "Its first letter is H."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/2/2a/Lspn_comet_halley.jpg/500px-Lspn_comet_halley.jpg",
+      "w": 500,
+      "h": 347,
+      "credit": "NASA/W. Liller",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Lspn_comet_halley.jpg"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "sagittarius-a",
+   "name": "Sagittarius A*",
+   "lname": "Sagittarius A*",
+   "alt": [
+    "Sagittarius A star",
+    "Sgr A*"
+   ],
+   "facts": {
+    "kind": "Black hole"
+   },
+   "blurb": "The supermassive black hole at the centre of our galaxy. It is about four million times the mass of the Sun.",
+   "clues": [
+    "It lies about 26,000 light years away.",
+    "Radio telescopes study it.",
+    "Its first image was released in 2022.",
+    "It is a black hole.",
+    "It is about four million times the mass of the Sun.",
+    "It sits at the centre of the Milky Way.",
+    "It is a supermassive black hole.",
+    "The answer has 2 words (11, 1 letters).",
+    "Its first letter is S."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/f/f6/Gcle.jpg/500px-Gcle.jpg",
+      "w": 500,
+      "h": 379,
+      "credit": "Original uploader was Serendipodous at en.wikipedia",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Gcle.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/e/ed/EHT_Sagittarius_A%2A.jpg/330px-EHT_Sagittarius_A%2A.jpg",
+      "w": 330,
+      "h": 469,
+      "credit": "Kazunori Akiyama, Antxon Alberdi, Walter Alef, Juan Carlos Algaba, Richard Anantua, Kei…",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:EHT_Sagittarius_A*.jpg"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "sputnik-1",
+   "name": "Sputnik 1",
+   "lname": "Sputnik 1",
+   "alt": [
+    "Sputnik"
+   ],
+   "facts": {
+    "kind": "Mission or spacecraft",
+    "year": 1957
+   },
+   "blurb": "The first artificial satellite, launched by the Soviet Union in 1957. It beeped radio signals as it orbited.",
+   "clues": [
+    "It was a metal ball with four long antennas.",
+    "Its beeps could be heard by radio amateurs.",
+    "It started the Space Race.",
+    "It is a mission or spacecraft.",
+    "It launched in 1957.",
+    "The Soviet Union launched it in 1957.",
+    "It was the first artificial satellite.",
+    "The answer has 2 words (7, 1 letters).",
+    "Its first letter is S."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/c/c5/Sputnik.jpg/500px-Sputnik.jpg",
+      "w": 500,
+      "h": 376,
+      "credit": "Wikimedia Commons",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Sputnik.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/b/b0/Sputnik_1.jpg/330px-Sputnik_1.jpg",
+      "w": 330,
+      "h": 444,
+      "credit": "U.S. Air Force photo",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Sputnik_1.jpg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "vostok-1",
+   "name": "Vostok 1",
+   "lname": "Vostok 1",
+   "facts": {
+    "kind": "Mission or spacecraft",
+    "year": 1961
+   },
+   "blurb": "The spacecraft that carried Yuri Gagarin, the first person in space, around the Earth in 1961.",
+   "clues": [
+    "Its flight lasted 108 minutes.",
+    "Its pilot ejected and landed by parachute.",
+    "It launched on 12 April 1961.",
+    "It is a mission or spacecraft.",
+    "It launched in 1961.",
+    "It carried Yuri Gagarin.",
+    "It took the first human into space.",
+    "The answer has 2 words (6, 1 letters).",
+    "Its first letter is V."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/c/cc/Gagarin_in_Sweden.jpg",
+      "w": 500,
+      "h": 727,
+      "credit": "Arkiv: Sydsvenskan",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Gagarin_in_Sweden.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/c/c7/Vostokpanel.JPG/500px-Vostokpanel.JPG",
+      "w": 500,
+      "h": 370,
+      "credit": "Tempe",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Vostokpanel.JPG"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "apollo-11",
+   "name": "Apollo 11",
+   "lname": "Apollo 11",
+   "facts": {
+    "kind": "Mission or spacecraft",
+    "year": 1969
+   },
+   "blurb": "The mission that first landed people on the Moon, in July 1969. Neil Armstrong and Buzz Aldrin walked on the surface.",
+   "clues": [
+    "Michael Collins stayed in orbit in the command module.",
+    "Its lunar module was called Eagle.",
+    "It landed in the Sea of Tranquility.",
+    "It is a mission or spacecraft.",
+    "It launched in 1969.",
+    "Neil Armstrong said \"one small step for man\".",
+    "It was the first mission to land people on the Moon.",
+    "The answer has 2 words (6, 2 letters).",
+    "Its first letter is A."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/3/3d/Apollo_11_Crew.jpg/500px-Apollo_11_Crew.jpg",
+      "w": 500,
+      "h": 393,
+      "credit": "NASA",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Apollo_11_Crew.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/16/Apollo_11_Launch_-_GPN-2000-000630.jpg/500px-Apollo_11_Launch_-_GPN-2000-000630.jpg",
+      "w": 500,
+      "h": 625,
+      "credit": "NASA",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Apollo_11_Launch_-_GPN-2000-000630.jpg"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "apollo-13",
+   "name": "Apollo 13",
+   "lname": "Apollo 13",
+   "facts": {
+    "kind": "Mission or spacecraft",
+    "year": 1970
+   },
+   "blurb": "A Moon mission that went wrong when an oxygen tank exploded. The crew got home safely using the lunar module as a lifeboat.",
+   "clues": [
+    "An oxygen tank exploded on the way to the Moon.",
+    "The crew used the lunar module as a lifeboat.",
+    "Its crew said \"Houston, we've had a problem.\"",
+    "It is a mission or spacecraft.",
+    "It launched in 1970.",
+    "A 1995 film with Tom Hanks tells its story.",
+    "It never landed on the Moon.",
+    "The answer has 2 words (6, 2 letters).",
+    "Its first letter is A."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/17/Apollo_13_Prime_Crew.jpg/500px-Apollo_13_Prime_Crew.jpg",
+      "w": 500,
+      "h": 421,
+      "credit": "NASA",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Apollo_13_Prime_Crew.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/5/57/Apollo_13_passing_Moon.jpg/500px-Apollo_13_passing_Moon.jpg",
+      "w": 500,
+      "h": 519,
+      "credit": "James Lovell, John Swigert, Fred Haise",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Apollo_13_passing_Moon.jpg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "voyager-1",
+   "name": "Voyager 1",
+   "lname": "Voyager 1",
+   "facts": {
+    "kind": "Mission or spacecraft",
+    "year": 1977
+   },
+   "lookalikes": [
+    "new-horizons"
+   ],
+   "blurb": "A space probe launched in 1977. It is the farthest human-made object from Earth, now in interstellar space.",
+   "clues": [
+    "It carries a golden record of sounds from Earth.",
+    "It took the \"Pale Blue Dot\" photo of Earth.",
+    "It flew past Jupiter and Saturn.",
+    "It is a mission or spacecraft.",
+    "It launched in 1977.",
+    "It entered interstellar space in 2012.",
+    "It is the farthest human-made object.",
+    "The answer has 2 words (7, 1 letters).",
+    "Its first letter is V."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/2/29/Voyager_spacecraft.jpg/500px-Voyager_spacecraft.jpg",
+      "w": 500,
+      "h": 413,
+      "credit": "NASA/JPL",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Voyager_spacecraft.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/6/60/Voyager_spacecraft_model.png/500px-Voyager_spacecraft_model.png",
+      "w": 500,
+      "h": 363,
+      "credit": "National Aeronautics and Space Administration (NASA)",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Voyager_spacecraft_model.png"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "hubble-space-telescope",
+   "name": "Hubble Space Telescope",
+   "lname": "the Hubble Space Telescope",
+   "alt": [
+    "Hubble"
+   ],
+   "facts": {
+    "kind": "Mission or spacecraft",
+    "year": 1990
+   },
+   "lookalikes": [
+    "james-webb-space-telescope"
+   ],
+   "blurb": "A space telescope launched in 1990. It has taken some of the most famous pictures of the universe.",
+   "clues": [
+    "It launched in 1990.",
+    "Astronauts visited it five times to repair it.",
+    "It sees mainly visible and ultraviolet light.",
+    "Its mirror was faulty at first and fixed by astronauts.",
+    "It helped measure the age of the universe.",
+    "It orbits the Earth.",
+    "The answer has 3 words (6, 5, 9 letters).",
+    "Its first letter is H."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/8/85/Hubble_2009_close-up.jpg/500px-Hubble_2009_close-up.jpg",
+      "w": 500,
+      "h": 332,
+      "credit": "NASA",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Hubble_2009_close-up.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/0/01/1990_s31_IMAX_view_of_HST_release.jpg/500px-1990_s31_IMAX_view_of_HST_release.jpg",
+      "w": 500,
+      "h": 319,
+      "credit": "NASA/IMAX",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:1990_s31_IMAX_view_of_HST_release.jpg"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "james-webb-space-telescope",
+   "name": "James Webb Space Telescope",
+   "lname": "the James Webb Space Telescope",
+   "alt": [
+    "JWST",
+    "Webb"
+   ],
+   "facts": {
+    "kind": "Mission or spacecraft",
+    "year": 2021
+   },
+   "lookalikes": [
+    "hubble-space-telescope"
+   ],
+   "blurb": "The biggest space telescope ever launched, in 2021. It sees in infrared light and has a gold-coated mirror.",
+   "clues": [
+    "Its sunshield is the size of a tennis court.",
+    "It orbits about 1.5 million km from Earth.",
+    "It sees in infrared light.",
+    "It launched in 2021.",
+    "Its mirror is coated in gold.",
+    "It launched on Christmas Day 2021.",
+    "The answer has 4 words (5, 4, 5, 9 letters).",
+    "Its first letter is J."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/6/6a/JWST_spacecraft_model_2.png/500px-JWST_spacecraft_model_2.png",
+      "w": 500,
+      "h": 524,
+      "credit": "NASA",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:JWST_spacecraft_model_2.png"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/2/2a/JWST_spacecraft_model_3.png/500px-JWST_spacecraft_model_3.png",
+      "w": 500,
+      "h": 428,
+      "credit": "NASA",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:JWST_spacecraft_model_3.png"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "international-space-station",
+   "name": "International Space Station",
+   "lname": "the International Space Station",
+   "alt": [
+    "ISS",
+    "space station"
+   ],
+   "facts": {
+    "kind": "Mission or spacecraft",
+    "year": 1998
+   },
+   "blurb": "A space station that has had people living on it since 2000. It circles Earth about every 90 minutes.",
+   "clues": [
+    "It has been lived on non-stop since 2000.",
+    "It travels at about 28,000 km/h.",
+    "It circles Earth about 16 times a day.",
+    "It launched in 1998.",
+    "You can see it from the ground as a moving bright dot.",
+    "Astronauts from many countries live on it.",
+    "The answer has 3 words (13, 5, 7 letters).",
+    "Its first letter is I."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/e/e1/The_station_pictured_from_the_SpaceX_Crew_Dragon_5_%28cropped%29.jpg/500px-The_station_pictured_from_the_SpaceX_Crew_Dragon_5_%28cropped%29.jpg",
+      "w": 500,
+      "h": 288,
+      "credit": "NASA",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:The_station_pictured_from_the_SpaceX_Crew_Dragon_5_(cropped).jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/5/59/The_station_pictured_from_the_SpaceX_Crew_Dragon_5.jpg/500px-The_station_pictured_from_the_SpaceX_Crew_Dragon_5.jpg",
+      "w": 500,
+      "h": 332,
+      "credit": "NASA",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:The_station_pictured_from_the_SpaceX_Crew_Dragon_5.jpg"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "space-shuttle",
+   "name": "Space Shuttle",
+   "lname": "the Space Shuttle",
+   "facts": {
+    "kind": "Mission or spacecraft",
+    "year": 1981
+   },
+   "blurb": "A reusable spaceplane flown by NASA from 1981 to 2011. Five shuttles flew in space.",
+   "clues": [
+    "Its big orange fuel tank was thrown away each flight.",
+    "It was launched by NASA.",
+    "Two were lost, Challenger and Columbia.",
+    "Its last flight was in 2011.",
+    "It launched in 1981.",
+    "It landed like a glider.",
+    "It launched Hubble into orbit.",
+    "The answer has 2 words (5, 7 letters).",
+    "Its first letter is S."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/d/d6/STS120LaunchHiRes-edit1.jpg/330px-STS120LaunchHiRes-edit1.jpg",
+      "w": 330,
+      "h": 517,
+      "credit": "NASA; edited by jjron (tilt corrected)",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:STS120LaunchHiRes-edit1.jpg"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "curiosity",
+   "name": "Curiosity",
+   "lname": "Curiosity",
+   "alt": [
+    "Curiosity rover"
+   ],
+   "facts": {
+    "kind": "Mission or spacecraft",
+    "year": 2011
+   },
+   "lookalikes": [
+    "perseverance"
+   ],
+   "blurb": "A car-sized NASA rover that landed in Gale Crater on Mars in 2012 using a rocket-powered \"sky crane\".",
+   "clues": [
+    "It has a laser to zap rocks.",
+    "It is nuclear powered.",
+    "It landed using a rocket-powered sky crane.",
+    "It is powered by plutonium.",
+    "It is a mission or spacecraft.",
+    "It launched in 2011.",
+    "It landed in Gale Crater in 2012.",
+    "It is about the size of a car.",
+    "The answer is one word of 9 letters.",
+    "Its first letter is C."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/2/25/Curiosity_rover_self_portrait_at_John_Klein_site_%28PIA16764%2C_cropped%29.jpg/500px-Curiosity_rover_self_portrait_at_John_Klein_site_%28PIA16764%2C_cropped%29.jpg",
+      "w": 500,
+      "h": 411,
+      "credit": "NASA/JPL-Caltech/MSSS",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Curiosity_rover_self_portrait_at_John_Klein_site_(PIA16764,_cropped).jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/f/f3/Curiosity_Self-Portrait_at_%27Big_Sky%27_Drilling_Site.jpg/330px-Curiosity_Self-Portrait_at_%27Big_Sky%27_Drilling_Site.jpg",
+      "w": 330,
+      "h": 455,
+      "credit": "NASA",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Curiosity_Self-Portrait_at_%27Big_Sky%27_Drilling_Site.jpg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "perseverance",
+   "name": "Perseverance",
+   "lname": "Perseverance",
+   "alt": [
+    "Perseverance rover",
+    "Percy"
+   ],
+   "facts": {
+    "kind": "Mission or spacecraft",
+    "year": 2020
+   },
+   "lookalikes": [
+    "curiosity"
+   ],
+   "blurb": "A NASA Mars rover that landed in 2021. It carried a small helicopter called Ingenuity.",
+   "clues": [
+    "It has microphones that recorded sounds on Mars.",
+    "It is nuclear powered.",
+    "It collects rock samples to bring back to Earth one day.",
+    "It landed in Jezero Crater.",
+    "It is a mission or spacecraft.",
+    "It launched in 2020.",
+    "It carried a helicopter called Ingenuity.",
+    "It landed on Mars in 2021.",
+    "The answer is one word of 12 letters.",
+    "Its first letter is P."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://images-assets.nasa.gov/image/PIA24542/PIA24542~thumb.jpg",
+      "credit": "NASA / JPL",
+      "license": "Public domain",
+      "page": "https://images.nasa.gov/details/PIA24542"
+     },
+     {
+      "src": "https://images-assets.nasa.gov/image/PIA24669/PIA24669~thumb.jpg",
+      "credit": "NASA / JPL",
+      "license": "Public domain",
+      "page": "https://images.nasa.gov/details/PIA24669"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "cassini-huygens",
+   "name": "Cassini–Huygens",
+   "lname": "Cassini–Huygens",
+   "alt": [
+    "Cassini",
+    "Cassini-Huygens"
+   ],
+   "facts": {
+    "kind": "Mission or spacecraft",
+    "year": 1997
+   },
+   "blurb": "A mission that orbited Saturn for 13 years. It dropped the Huygens probe onto Titan.",
+   "clues": [
+    "It ended by diving into Saturn in 2017.",
+    "Its probe landed on Titan.",
+    "It found water jets on Enceladus.",
+    "It is a mission or spacecraft.",
+    "It launched in 1997.",
+    "It orbited Saturn for 13 years.",
+    "It is named after two astronomers.",
+    "The answer is one word of 14 letters.",
+    "Its first letter is C."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/4/4d/Cassini_spacecraft_model.png/500px-Cassini_spacecraft_model.png",
+      "w": 500,
+      "h": 501,
+      "credit": "NASA",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Cassini_spacecraft_model.png"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/b/b2/Cassini_Saturn_Orbit_Insertion.jpg/500px-Cassini_Saturn_Orbit_Insertion.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "NASA/JPL",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Cassini_Saturn_Orbit_Insertion.jpg"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "new-horizons",
+   "name": "New Horizons",
+   "lname": "New Horizons",
+   "facts": {
+    "kind": "Mission or spacecraft",
+    "year": 2006
+   },
+   "lookalikes": [
+    "voyager-1"
+   ],
+   "blurb": "A NASA probe that flew past Pluto in 2015, giving us the first close-up pictures of it.",
+   "clues": [
+    "It is a NASA spacecraft.",
+    "It was the fastest spacecraft at launch.",
+    "It took nine years to reach its main target.",
+    "It carries some of Clyde Tombaugh's ashes.",
+    "It is a mission or spacecraft.",
+    "It launched in 2006.",
+    "It later flew past Arrokoth in the Kuiper Belt.",
+    "It flew past Pluto in 2015.",
+    "The answer has 2 words (3, 8 letters).",
+    "Its first letter is N."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/4/44/Encounter_01_lg.jpg/500px-Encounter_01_lg.jpg",
+      "w": 500,
+      "h": 400,
+      "credit": "Johns Hopkins University Applied Physics Laboratory/Southwest Research Institute",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Encounter_01_lg.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/e/ee/New_Horizons_spacecraft_model_1.png/500px-New_Horizons_spacecraft_model_1.png",
+      "w": 500,
+      "h": 466,
+      "credit": "National Aeronautics and Space Administration (NASA), Applied Physics Laboratory",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:New_Horizons_spacecraft_model_1.png"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "parker-solar-probe",
+   "name": "Parker Solar Probe",
+   "lname": "the Parker Solar Probe",
+   "facts": {
+    "kind": "Mission or spacecraft",
+    "year": 2018
+   },
+   "blurb": "A NASA probe that flies closer to the Sun than any spacecraft before. It is the fastest human-made object.",
+   "clues": [
+    "It was the first NASA spacecraft named after a living person.",
+    "It is the fastest human-made object.",
+    "It is protected by a heat shield.",
+    "It is a mission or spacecraft.",
+    "It launched in 2018.",
+    "It has \"touched\" the Sun's outer atmosphere.",
+    "It studies the Sun up close.",
+    "The answer has 3 words (6, 5, 5 letters).",
+    "Its first letter is P."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/1c/Parker_Solar_Probe.jpg/500px-Parker_Solar_Probe.jpg",
+      "w": 500,
+      "h": 346,
+      "credit": "NASA/Johns Hopkins APL/Steve Gribben",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Parker_Solar_Probe.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/e/e1/Parker_Solar_Probe_spacecraft_model.png/500px-Parker_Solar_Probe_spacecraft_model.png",
+      "w": 500,
+      "h": 348,
+      "credit": "National Aeronautics and Space Administration (NASA)",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Parker_Solar_Probe_spacecraft_model.png"
+     }
+    ]
+   },
+   "difficulty": 3
+  }
+ ],
+ "questions": [
+  {
+   "id": "q1",
+   "kind": "order",
+   "prompt": "Put these planets in order from the Sun.",
+   "answer": [
+    "Mercury",
+    "Venus",
+    "Earth",
+    "Mars"
+   ],
+   "orderLabel": "Closest first",
+   "explain": "These are the four rocky planets.",
+   "difficulty": 1
+  },
+  {
+   "id": "q2",
+   "kind": "order",
+   "prompt": "Put these planets in order from the Sun.",
+   "answer": [
+    "Jupiter",
+    "Saturn",
+    "Uranus",
+    "Neptune"
+   ],
+   "orderLabel": "Closest first",
+   "explain": "These are the four giant planets.",
+   "difficulty": 2
+  },
+  {
+   "id": "q3",
+   "kind": "number",
+   "prompt": "How many planets are in our solar system?",
+   "answer": 8,
+   "unit": "planets",
+   "tolerance": 0,
+   "explain": "Pluto was reclassified as a dwarf planet in 2006.",
+   "difficulty": 1
+  },
+  {
+   "id": "q4",
+   "kind": "mc",
+   "prompt": "Which is the biggest planet?",
+   "answer": "Jupiter",
+   "wrong": [
+    "Saturn",
+    "Neptune",
+    "Earth"
+   ],
+   "explain": "Over 1,300 Earths could fit inside it.",
+   "difficulty": 1
+  },
+  {
+   "id": "q5",
+   "kind": "mc",
+   "prompt": "Which is the hottest planet?",
+   "answer": "Venus",
+   "wrong": [
+    "Mercury",
+    "Mars",
+    "Jupiter"
+   ],
+   "explain": "Its thick carbon dioxide atmosphere traps heat, so it beats Mercury.",
+   "difficulty": 2
+  },
+  {
+   "id": "q6",
+   "kind": "mc",
+   "prompt": "Which planet is called the red planet?",
+   "answer": "Mars",
+   "wrong": [
+    "Venus",
+    "Jupiter",
+    "Mercury"
+   ],
+   "explain": "Iron oxide dust makes it look red.",
+   "difficulty": 1
+  },
+  {
+   "id": "q7",
+   "kind": "mc",
+   "prompt": "Who was the first person to walk on the Moon?",
+   "answer": "Neil Armstrong",
+   "wrong": [
+    "Buzz Aldrin",
+    "Yuri Gagarin",
+    "John Glenn"
+   ],
+   "explain": "He stepped onto the Moon on 20 July 1969 (21 July UTC).",
+   "difficulty": 1
+  },
+  {
+   "id": "q8",
+   "kind": "mc",
+   "prompt": "Who was the first person in space?",
+   "answer": "Yuri Gagarin",
+   "wrong": [
+    "Neil Armstrong",
+    "Alan Shepard",
+    "Valentina Tereshkova"
+   ],
+   "explain": "He orbited Earth in Vostok 1 on 12 April 1961.",
+   "difficulty": 1
+  },
+  {
+   "id": "q9",
+   "kind": "mc",
+   "prompt": "Who was the first woman in space?",
+   "answer": "Valentina Tereshkova",
+   "wrong": [
+    "Sally Ride",
+    "Mae Jemison",
+    "Eileen Collins"
+   ],
+   "explain": "She flew Vostok 6 in 1963.",
+   "difficulty": 2
+  },
+  {
+   "id": "q10",
+   "kind": "mc",
+   "prompt": "Which planet has the most famous rings?",
+   "answer": "Saturn",
+   "wrong": [
+    "Jupiter",
+    "Mars",
+    "Venus"
+   ],
+   "explain": "All four giant planets have rings, but Saturn's are the brightest.",
+   "difficulty": 1
+  },
+  {
+   "id": "q11",
+   "kind": "mc",
+   "prompt": "What is the name of our galaxy?",
+   "answer": "The Milky Way",
+   "wrong": [
+    "Andromeda",
+    "The Whirlpool",
+    "Orion"
+   ],
+   "explain": "It is a barred spiral galaxy.",
+   "difficulty": 1
+  },
+  {
+   "id": "q12",
+   "kind": "mc",
+   "prompt": "About how long does sunlight take to reach Earth?",
+   "answer": "8 minutes",
+   "wrong": [
+    "8 seconds",
+    "8 hours",
+    "8 days"
+   ],
+   "explain": "Light travels about 150 million km from the Sun.",
+   "difficulty": 2
+  },
+  {
+   "id": "q13",
+   "kind": "tf",
+   "prompt": "Pluto is still called a planet by astronomers.",
+   "answer": false,
+   "explain": "The IAU classed it as a dwarf planet in 2006.",
+   "difficulty": 1
+  },
+  {
+   "id": "q14",
+   "kind": "mc",
+   "prompt": "What causes the tides on Earth?",
+   "answer": "Mainly the Moon's gravity",
+   "wrong": [
+    "The wind",
+    "Earthquakes",
+    "The Earth's magnetic field"
+   ],
+   "explain": "The Sun adds a smaller pull too.",
+   "difficulty": 2
+  },
+  {
+   "id": "q15",
+   "kind": "mc",
+   "prompt": "Which is the closest star to the Sun?",
+   "answer": "Proxima Centauri",
+   "wrong": [
+    "Sirius",
+    "Polaris",
+    "Betelgeuse"
+   ],
+   "explain": "It is about 4.2 light years away.",
+   "difficulty": 2
+  },
+  {
+   "id": "q16",
+   "kind": "mc",
+   "prompt": "Which is the brightest star in the night sky?",
+   "answer": "Sirius",
+   "wrong": [
+    "Polaris",
+    "Betelgeuse",
+    "Vega"
+   ],
+   "explain": "Polaris is not especially bright; it is famous for staying still.",
+   "difficulty": 2
+  },
+  {
+   "id": "q17",
+   "kind": "mc",
+   "prompt": "What is a light year?",
+   "answer": "The distance light travels in a year",
+   "wrong": [
+    "The time it takes to get to the Moon",
+    "A year on a planet with no night",
+    "The weight of a star"
+   ],
+   "explain": "It is about 9.5 trillion km.",
+   "difficulty": 2
+  },
+  {
+   "id": "q18",
+   "kind": "mc",
+   "prompt": "What is at the centre of our solar system?",
+   "answer": "The Sun",
+   "wrong": [
+    "The Earth",
+    "The Moon",
+    "Jupiter"
+   ],
+   "explain": "All the planets orbit the Sun.",
+   "difficulty": 1
+  },
+  {
+   "id": "q19",
+   "kind": "mc",
+   "prompt": "Which planet is the closest to the Sun?",
+   "answer": "Mercury",
+   "wrong": [
+    "Venus",
+    "Earth",
+    "Mars"
+   ],
+   "explain": "Mercury orbits in just 88 days.",
+   "difficulty": 1
+  },
+  {
+   "id": "q20",
+   "kind": "tf",
+   "prompt": "The Sun is a star.",
+   "answer": true,
+   "explain": "It is a fairly ordinary yellow dwarf star.",
+   "difficulty": 1
+  },
+  {
+   "id": "q21",
+   "kind": "mc",
+   "prompt": "What is the name of the very large volcano on Mars?",
+   "answer": "Olympus Mons",
+   "wrong": [
+    "Mount Everest",
+    "Mauna Kea",
+    "Vesuvius"
+   ],
+   "explain": "It is about 22 km high.",
+   "difficulty": 2
+  },
+  {
+   "id": "q22",
+   "kind": "mc",
+   "prompt": "Which spacecraft is the farthest human-made object from Earth?",
+   "answer": "Voyager 1",
+   "wrong": [
+    "Hubble Space Telescope",
+    "New Horizons",
+    "Apollo 11"
+   ],
+   "explain": "It has been travelling since 1977.",
+   "difficulty": 2
+  },
+  {
+   "id": "q23",
+   "kind": "mc",
+   "prompt": "How many people have walked on the Moon?",
+   "answer": "12",
+   "wrong": [
+    "2",
+    "6",
+    "24"
+   ],
+   "explain": "Six Apollo missions landed between 1969 and 1972.",
+   "difficulty": 2
+  }
+ ],
+ "fakes": [
+  "Planet Nibiru",
+  "Vulcanis",
+  "Kepler's Moon of Ganthor",
+  "The Orion Spiral Galaxy",
+  "Apollo 21",
+  "Comet Brightwater"
+ ],
+ "sources": [
+  {
+   "name": "NASA Image and Video Library",
+   "url": "https://images.nasa.gov"
+  },
+  {
+   "name": "Wikidata",
+   "url": "https://www.wikidata.org"
+  },
+  {
+   "name": "Wikimedia Commons",
+   "url": "https://commons.wikimedia.org"
+  }
+ ]
+}

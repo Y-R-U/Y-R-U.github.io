@@ -86,5 +86,7 @@ export function emptyState(icon, title, text, action) {
   return h('div.l-empty', {}, h('div.e-ico', {}, icon), h('h3', {}, title), text ? h('p.muted', {}, text) : null, action || null);
 }
 
+export const put = (el, ...nodes) => el.append(...nodes.filter(Boolean));
+
 // Wide screens get more room than the shell's 560px column.
 export const WIDE = 'learn-wide';

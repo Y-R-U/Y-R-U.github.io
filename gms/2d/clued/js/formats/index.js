@@ -13,6 +13,22 @@ export const MODULES = [
   '../geo/formats/pin-drop.js',
   '../geo/formats/neighbours.js',
   '../geo/formats/flag-map.js',
+  './match.js',
+  './ladder.js',
+  './hilo.js',
+  './order.js',
+  './odd.js',
+  './sort.js',
+  './fake.js',
+  './reveal.js',
+  './silhouette.js',
+  './number.js',
+  './connect.js',
+  './blitz60.js',
+  './type.js',
+  './chain.js',
+  './lookalike.js',
+  './quote.js',
 ];
 
 export async function loadFormats() {

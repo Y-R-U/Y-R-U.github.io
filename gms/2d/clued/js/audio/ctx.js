@@ -98,3 +98,58 @@ export function reverbIR() {
   }
   return ir;
 }
+
+// "something with sound is playing" bus: bgm pauses while busy and ducks while speech is talking.
+// Media elements and speechSynthesis are patched here so other lanes' players are covered without changes.
+const busyTags = new Map(), duckTags = new Map(), busyFns = new Set();
+const emit = () => busyFns.forEach((f) => { try { f(); } catch {} });
+export const onBusy = (fn) => (busyFns.add(fn), () => busyFns.delete(fn));
+export const busy = () => busyTags.size > 0;
+export const ducked = () => duckTags.size > 0;
+export function begin(tag) { busyTags.set(tag, (busyTags.get(tag) || 0) + 1); emit(); }
+export function end(tag) { const n = (busyTags.get(tag) || 0) - 1; n > 0 ? busyTags.set(tag, n) : busyTags.delete(tag); emit(); }
+export function duckBegin(tag) { duckTags.set(tag, 1); emit(); }
+export function duckEnd(tag) { duckTags.delete(tag); emit(); }
+
+let mediaSeq = 0;
+function patchMedia() {
+  const M = globalThis.HTMLMediaElement;
+  if (!M || M.prototype.__cluedPatched) return;
+  M.prototype.__cluedPatched = true;
+  const orig = M.prototype.play;
+  M.prototype.play = function (...args) {
+    if (!this.__cluedBgm && !this.__cluedTag) {
+      const tag = this.__cluedTag = 'media' + (++mediaSeq);
+      begin(tag);
+      const off = () => {
+        if (this.__cluedTag !== tag) return;
+        this.__cluedTag = null;
+        ['pause', 'ended', 'error', 'emptied'].forEach((e) => this.removeEventListener(e, off));
+        end(tag);
+      };
+      ['pause', 'ended', 'error', 'emptied'].forEach((e) => this.addEventListener(e, off));
+      const p = orig.apply(this, args);
+      p?.catch?.(off);
+      return p;
+    }
+    return orig.apply(this, args);
+  };
+}
+
+function patchSpeech() {
+  const s = globalThis.speechSynthesis;
+  if (!s || s.__cluedPatched) return;
+  s.__cluedPatched = true;
+  const speak = s.speak.bind(s), cancel = s.cancel.bind(s);
+  let n = 0;
+  s.speak = (u) => {
+    const tag = 'speech' + (++n);
+    duckBegin(tag);
+    const off = () => duckEnd(tag);
+    u.addEventListener?.('end', off); u.addEventListener?.('error', off);
+    setTimeout(off, 30000);
+    return speak(u);
+  };
+  s.cancel = () => { [...duckTags.keys()].filter((k) => k.startsWith('speech')).forEach(duckEnd); return cancel(); };
+}
+if (globalThis.document) { patchMedia(); patchSpeech(); }

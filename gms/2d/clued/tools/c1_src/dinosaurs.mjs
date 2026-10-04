@@ -7,7 +7,7 @@ const f = (period, mya, diet, dinosaur, lengthM, found, extra = {}) => ({ period
 export default {
   id: 'dinosaurs', title: 'Dinosaurs & prehistoric life', theme: 'animals', icon: '🦖', kids: true,
   leakExempt: ['dinosaur', 'saurus', 'sauru'],
-  media: 'wiki', photos: 3, depicts: 1, lname: 'asis',
+  media: 'wiki', photos: 3, depicts: 0, lname: 'asis',
   ranges: { lengthM: [0.3, 40], mya: [0.004, 400], wingspanM: [0.5, 12] },
   factsMeta: {
     period: { type: 'cat', label: 'Period', values: [DV, CB, PE, TR, JU, CR, PG, NG, QU], clue: v => `It lived in the ${v} period.` },

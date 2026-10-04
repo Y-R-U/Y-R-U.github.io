@@ -5,7 +5,7 @@ import { toast } from '../ui/popup.js?v=1';
 import { sfx } from '../ui/fx.js?v=1';
 import { itemByRef, factRows, kidsOn, refOf } from './data.js?v=1';
 import { getCards, addCards, removeCard, itemLevel } from './model.js?v=1';
-import { notice, soundBtn, sayBtn, say, creditBtn, emptyState, stopAudio } from './ui.js?v=1';
+import { notice, soundBtn, sayBtn, say, creditBtn, emptyState, stopAudio, put } from './ui.js?v=1';
 
 const LV = ['Not seen yet', 'Seen', 'Learning', 'Learned ★'];
 
@@ -61,7 +61,7 @@ export async function itemCard(el, params) {
     notice(pack.notice),
     item.blurb ? h('p.l-blurb', {}, item.blurb) : null,
     rows.length ? h('table.l-facts', {}, h('tbody', {}, ...(kids ? rows.slice(0, 4) : rows).map(r => h('tr', {}, h('th', {}, r.label), h('td', {}, r.text))))) : null,
-    lookRow(pack, item, list),
+    lookRow(pack, item),
     h('div.l-item-acts', {},
       kids ? null : h('span.l-lvchip', { class: 'lv' + lv }, LV[lv]),
       deckBtn,
@@ -71,7 +71,7 @@ export async function itemCard(el, params) {
     h('button.btn.small', { type: 'button', disabled: at <= 0, 'aria-label': 'Previous', onclick: () => nav(-1) }, '‹ Prev'),
     h('span.muted.tiny', {}, `${at + 1} / ${list.length}`),
     h('button.btn.small' + (kids ? '.go' : ''), { type: 'button', disabled: at >= list.length - 1, 'aria-label': 'Next', onclick: () => nav(1) }, 'Next ›')) : null;
-  el.append(h('div.l-item', {}, media, info), navRow);
+  put(el, h('div.l-item', {}, media, info), navRow);
 
   // swipe left/right on the info side to move through the list
   let sx = 0, sy = 0;
@@ -86,7 +86,7 @@ export async function itemCard(el, params) {
   return () => { document.removeEventListener('keydown', onKey); stopAudio(); };
 }
 
-function lookRow(pack, item, list) {
+function lookRow(pack, item) {
   const ids = (item.lookalikes || []).filter(id => pack.items.some(x => x.id === id));
   if (!ids.length) return null;
   const byId = Object.fromEntries(pack.items.map(x => [x.id, x]));

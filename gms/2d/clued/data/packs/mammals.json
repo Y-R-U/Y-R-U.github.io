@@ -5,17 +5,27 @@
  "icon": "🦁",
  "kids": true,
  "version": 1,
+ "imgPrompt": "Which of these is {aName}?",
+ "nameImgPrompt": "Which animal is this?",
+ "tfImgPrompt": "This animal is {aName}.",
  "leakExempt": [],
  "factsMeta": {
   "massKg": {
    "type": "num",
    "label": "Typical adult weight",
    "unit": "kg",
-   "higherLabel": "Heavier"
+   "higherLabel": "Heavier",
+   "askHigh": "Which of these animals is the heaviest?",
+   "askLow": "Which of these animals is the lightest?",
+   "minRatio": 2
   },
   "region": {
    "type": "cat",
-   "label": "Found in"
+   "label": "Found in",
+   "ask": "Where does the {lname} live?",
+   "askReverse": "Which of these animals lives in {value}?",
+   "stmt": "The {lname} lives in {value}.",
+   "exclusive": false
   },
   "diet": {
    "type": "cat",
@@ -25,12 +35,17 @@
     "Herbivore",
     "Omnivore",
     "Insectivore"
-   ]
+   ],
+   "ask": "What does the {lname} eat?",
+   "askReverse": "Which of these animals is a {lvalue}?",
+   "stmt": "The {lname} is a {lvalue}."
   },
   "status": {
    "type": "cat",
    "label": "Conservation status (IUCN)",
-   "hard": true
+   "ask": "What is the IUCN conservation status of the {lname}?",
+   "askReverse": "Which of these is listed as \"{value}\" by the IUCN?",
+   "stmt": "The {lname} is listed as \"{value}\" by the IUCN."
   }
  },
  "items": [
@@ -62,33 +77,33 @@
     "It lives in groups called prides.",
     "The male has a big shaggy mane.",
     "The answer is one word of 4 letters.",
-    "It starts with the letter L."
+    "Its first letter is L."
    ],
    "media": {
     "img": [
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/62738921/medium.jpeg",
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/f/f8/Lion_in_masai_mara.jpg/500px-Lion_in_masai_mara.jpg",
       "w": 500,
       "h": 375,
-      "credit": "datadan",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/62738921"
+      "credit": "Sumit.pamnani at English Wikipedia",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Lion_in_masai_mara.jpg"
      },
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/300761357/medium.jpg",
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/c/c6/Okonjima_Lioness.jpg/500px-Okonjima_Lioness.jpg",
       "w": 500,
-      "h": 333,
-      "credit": "David Knox",
+      "h": 436,
+      "credit": "Falense",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Okonjima_Lioness.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/7/7e/PZ_lion_pride.jpg/500px-PZ_lion_pride.jpg",
+      "w": 500,
+      "h": 331,
+      "credit": "GinaFranchi",
       "license": "CC BY-SA 4.0",
-      "page": "https://www.inaturalist.org/photos/300761357"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/12610319/medium.jpg",
-      "w": 500,
-      "h": 375,
-      "credit": "Luis G. Restrepo",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/12610319"
+      "page": "https://commons.wikimedia.org/wiki/File:PZ_lion_pride.jpg"
      }
     ],
     "audio": [
@@ -130,33 +145,33 @@
     "It is the largest cat in the world.",
     "It is orange with black stripes.",
     "The answer is one word of 5 letters.",
-    "It starts with the letter T."
+    "Its first letter is T."
    ],
    "media": {
     "img": [
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/111317641/medium.jpg",
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/6/66/Adult_male_Royal_Bengal_tiger.jpg/500px-Adult_male_Royal_Bengal_tiger.jpg",
       "w": 500,
-      "h": 323,
-      "credit": "Morten Ross",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/111317641"
+      "h": 375,
+      "credit": "Seemaleena",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Adult_male_Royal_Bengal_tiger.jpg"
      },
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/222405547/medium.jpg",
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/9/97/Bengal_tiger_%28Panthera_tigris_tigris%29_female_3.jpg/500px-Bengal_tiger_%28Panthera_tigris_tigris%29_female_3.jpg",
       "w": 500,
       "h": 333,
-      "credit": "Morten Ross",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/222405547"
+      "credit": "Charles J. Sharp",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Bengal_tiger_(Panthera_tigris_tigris)_female_3.jpg"
      },
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/222514065/medium.jpg",
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/b/b0/Bengal_tiger_%28Panthera_tigris_tigris%29_female_3_crop.jpg/500px-Bengal_tiger_%28Panthera_tigris_tigris%29_female_3_crop.jpg",
       "w": 500,
       "h": 333,
-      "credit": "Morten Ross",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/222514065"
+      "credit": "Charles J. Sharp",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Bengal_tiger_(Panthera_tigris_tigris)_female_3_crop.jpg"
      }
     ]
    },
@@ -191,10 +206,26 @@
     "Its spots are rosettes, like flowers.",
     "It is a spotted big cat that climbs trees.",
     "The answer is one word of 7 letters.",
-    "It starts with the letter L."
+    "Its first letter is L."
    ],
    "media": {
     "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/0/0c/Male_leopard_-_Mara.jpg/500px-Male_leopard_-_Mara.jpg",
+      "w": 500,
+      "h": 281,
+      "credit": "Sumeet Moghe",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Male_leopard_-_Mara.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/7/70/African_leopard_male_%28cropped%29.jpg/500px-African_leopard_male_%28cropped%29.jpg",
+      "w": 500,
+      "h": 499,
+      "credit": "Sumeet Moghe",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:African_leopard_male_(cropped).jpg"
+     },
      {
       "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/90399697/medium.jpg",
       "w": 500,
@@ -202,22 +233,6 @@
       "credit": "Raja bandi",
       "license": "CC BY 4.0",
       "page": "https://www.inaturalist.org/photos/90399697"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/182303394/medium.jpg",
-      "w": 500,
-      "h": 333,
-      "credit": "no rights reserved",
-      "license": "CC0 1.0",
-      "page": "https://www.inaturalist.org/photos/182303394"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/160809135/medium.jpeg",
-      "w": 500,
-      "h": 333,
-      "credit": "no rights reserved",
-      "license": "CC0 1.0",
-      "page": "https://www.inaturalist.org/photos/160809135"
      }
     ]
    },
@@ -251,33 +266,33 @@
     "It is the biggest cat in the Americas.",
     "A British car company is named after it.",
     "The answer is one word of 6 letters.",
-    "It starts with the letter J."
+    "Its first letter is J."
    ],
    "media": {
     "img": [
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/200127875/medium.jpg",
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/b/b2/On%C3%A7a-pintada-PE_Encontro_das_%C3%81guas-Thiagomarcelcampi%28001%29.jpg/500px-On%C3%A7a-pintada-PE_Encontro_das_%C3%81guas-Thiagomarcelcampi%28001%29.jpg",
       "w": 500,
       "h": 333,
-      "credit": "Charles J. Sharp",
+      "credit": "Thiagomarcelcampi",
       "license": "CC BY-SA 4.0",
-      "page": "https://www.inaturalist.org/photos/200127875"
+      "page": "https://commons.wikimedia.org/wiki/File:On%C3%A7a-pintada-PE_Encontro_das_%C3%81guas-Thiagomarcelcampi(001).jpg"
      },
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/352611624/medium.jpg",
-      "w": 500,
-      "h": 333,
-      "credit": "Charles J. Sharp",
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/9/95/Panthera_onca_%2CYaguaret%C3%A9_macho_%2C_27.09.2023_%2C_Bioparque_de_Fundacion_Temaiken_%2C_Escobar_%2C_Buenos_aires_%2C_Argentina.jpg/330px-Panthera_onca_%2CYaguaret%C3%A9_macho_%2C_27.09.2023_%2C_Bioparque_de_Fundacion_Temaiken_%2C_Escobar_%2C_Buenos_aires_%2C_Argentina.jpg",
+      "w": 330,
+      "h": 495,
+      "credit": "Naturaleza en.foco",
       "license": "CC BY-SA 4.0",
-      "page": "https://www.inaturalist.org/photos/352611624"
+      "page": "https://commons.wikimedia.org/wiki/File:Panthera_onca_,Yaguaret%C3%A9_macho_,_27.09.2023_,_Bioparque_de_Fundacion_Temaiken_,_Escobar_,_Buenos_aires_,_Argentina.jpg"
      },
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/53458442/medium.jpg",
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/0/0a/Standing_jaguar.jpg/500px-Standing_jaguar.jpg",
       "w": 500,
-      "h": 375,
-      "credit": "Matt Muir",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/53458442"
+      "h": 345,
+      "credit": "USFWS",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Standing_jaguar.jpg"
      }
     ],
     "audio": [
@@ -320,33 +335,33 @@
     "It has solid black spots.",
     "It is the fastest land animal.",
     "The answer is one word of 7 letters.",
-    "It starts with the letter C."
+    "Its first letter is C."
    ],
    "media": {
     "img": [
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/123082309/medium.jpg",
-      "w": 500,
-      "h": 325,
-      "credit": "Bernard DUPONT",
-      "license": "CC BY-SA 4.0",
-      "page": "https://www.inaturalist.org/photos/123082309"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/58544633/medium.jpg",
-      "w": 500,
-      "h": 336,
-      "credit": "Karim Haddad",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/58544633"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/350833012/medium.jpeg",
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/3/36/Cheetah_%28Acinonyx_jubatus%29_female_2.jpg/500px-Cheetah_%28Acinonyx_jubatus%29_female_2.jpg",
       "w": 500,
       "h": 333,
-      "credit": "موسی مزینانیان Mousa Mazinanian",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/350833012"
+      "credit": "Charles J. Sharp",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Cheetah_(Acinonyx_jubatus)_female_2.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/0/09/TheCheethcat.jpg/330px-TheCheethcat.jpg",
+      "w": 330,
+      "h": 495,
+      "credit": "James Temple",
+      "license": "CC BY 2.0",
+      "page": "https://commons.wikimedia.org/wiki/File:TheCheethcat.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/11/Acinonyx.jubatus-1-ZOO.Olomouc.jpg/500px-Acinonyx.jubatus-1-ZOO.Olomouc.jpg",
+      "w": 500,
+      "h": 373,
+      "credit": "Mistvan",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Acinonyx.jubatus-1-ZOO.Olomouc.jpg"
      }
     ],
     "audio": [
@@ -388,33 +403,42 @@
     "It lives in the Himalayas.",
     "It is a pale grey spotted cat of the mountains.",
     "The answer has 2 words (4, 7 letters).",
-    "It starts with the letter S."
+    "Its first letter is S."
    ],
    "media": {
     "img": [
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/721834937/medium.jpg",
-      "w": 375,
-      "h": 500,
-      "credit": "Graham Whittaker",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/721834937"
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/a/a7/Uncia_uncia.jpg/330px-Uncia_uncia.jpg",
+      "w": 330,
+      "h": 495,
+      "credit": "Bernard Landgraf",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Uncia_uncia.jpg"
      },
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/593179719/medium.jpg",
-      "w": 375,
-      "h": 500,
-      "credit": "Sara Navarro",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/593179719"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/381342970/medium.jpeg",
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/7/71/Uncia_uncia_-_A_tail_and_a_cat_cropped.jpg/500px-Uncia_uncia_-_A_tail_and_a_cat_cropped.jpg",
       "w": 500,
-      "h": 333,
-      "credit": "Jan Ebr &amp; Ivana Ebrová",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/381342970"
+      "h": 520,
+      "credit": "Marit & Toomas Hinnosaar",
+      "license": "CC BY 2.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Uncia_uncia_-_A_tail_and_a_cat_cropped.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/a/a5/Irbis4.JPG/500px-Irbis4.JPG",
+      "w": 500,
+      "h": 375,
+      "credit": "Irbis1983",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Irbis4.JPG"
+     }
+    ],
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/0/01/LL-Q150_%28fra%29-J%C3%A9r%C3%A9my-G%C3%BCnther-Heinz_J%C3%A4hnick-Panthera_uncia.wav/LL-Q150_%28fra%29-J%C3%A9r%C3%A9my-G%C3%BCnther-Heinz_J%C3%A4hnick-Panthera_uncia.wav.mp3",
+      "credit": "Speaker: Jérémy-Günther-Heinz Jähnick Recorder: Jérémy-Günther-Heinz Jähnick",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:LL-Q150_(fra)-J%C3%A9r%C3%A9my-G%C3%BCnther-Heinz_J%C3%A4hnick-Panthera_uncia.wav",
+      "start": 0
      }
     ]
    },
@@ -451,7 +475,7 @@
     "It eats meat.",
     "It is tawny brown with no spots.",
     "The answer is one word of 6 letters.",
-    "It starts with the letter C."
+    "Its first letter is C."
    ],
    "media": {
     "img": [
@@ -486,6 +510,7 @@
   {
    "id": "eurasian-lynx",
    "name": "Eurasian lynx",
+   "lname": "Eurasian lynx",
    "alt": [
     "lynx"
    ],
@@ -510,7 +535,7 @@
     "It has a short tail with a black tip.",
     "It has long black tufts on its ears.",
     "The answer has 2 words (8, 4 letters).",
-    "It starts with the letter E."
+    "Its first letter is E."
    ],
    "media": {
     "img": [
@@ -545,6 +570,7 @@
   {
    "id": "african-bush-elephant",
    "name": "African bush elephant",
+   "lname": "African bush elephant",
    "alt": [
     "African elephant",
     "elephant"
@@ -569,10 +595,26 @@
     "It uses its trunk to drink and smell.",
     "It is the biggest land animal.",
     "The answer has 3 words (7, 4, 8 letters).",
-    "It starts with the letter A."
+    "Its first letter is A."
    ],
    "media": {
     "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/9/94/178_Male_African_bush_elephant_in_Etosha_National_Park_Photo_by_Giles_Laurent.jpg/500px-178_Male_African_bush_elephant_in_Etosha_National_Park_Photo_by_Giles_Laurent.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Giles Laurent",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:178_Male_African_bush_elephant_in_Etosha_National_Park_Photo_by_Giles_Laurent.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/2/2e/African_bush_elephant%2C_Loxodonta_africana_at_Punda_Maria%2C_Kruger_National_Park%2C_South_Africa._Includes_lots_of_baby_elephant._%2820591203310%29.jpg/330px-African_bush_elephant%2C_Loxodonta_africana_at_Punda_Maria%2C_Kruger_National_Park%2C_South_Africa._Includes_lots_of_baby_elephant._%2820591203310%29.jpg",
+      "w": 330,
+      "h": 442,
+      "credit": "Derek Keats from Johannesburg, South Africa",
+      "license": "CC BY 2.0",
+      "page": "https://commons.wikimedia.org/wiki/File:African_bush_elephant,_Loxodonta_africana_at_Punda_Maria,_Kruger_National_Park,_South_Africa._Includes_lots_of_baby_elephant._(20591203310).jpg"
+     },
      {
       "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/93674728/medium.jpg",
       "w": 500,
@@ -580,22 +622,6 @@
       "credit": "dhfischer",
       "license": "CC BY 4.0",
       "page": "https://www.inaturalist.org/photos/93674728"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/110771183/medium.jpg",
-      "w": 500,
-      "h": 375,
-      "credit": "Jean-Paul Boerekamps",
-      "license": "CC0 1.0",
-      "page": "https://www.inaturalist.org/photos/110771183"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/607144400/medium.jpg",
-      "w": 500,
-      "h": 334,
-      "credit": "Tony Rebelo",
-      "license": "CC BY-SA 4.0",
-      "page": "https://www.inaturalist.org/photos/607144400"
      }
     ]
    },
@@ -604,6 +630,7 @@
   {
    "id": "asian-elephant",
    "name": "Asian elephant",
+   "lname": "Asian elephant",
    "sci": "Elephas maximus",
    "group": "elephant",
    "facts": {
@@ -623,33 +650,33 @@
     "It eats plants.",
     "Its ears are smaller and rounder than its African cousin's.",
     "The answer has 2 words (5, 8 letters).",
-    "It starts with the letter A."
+    "Its first letter is A."
    ],
    "media": {
     "img": [
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/219306743/medium.jpg",
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/9/98/Elephas_maximus_%28Bandipur%29.jpg/500px-Elephas_maximus_%28Bandipur%29.jpg",
       "w": 500,
       "h": 333,
-      "credit": "Morten Ross",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/219306743"
+      "credit": "Yathin S Krishnappa",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Elephas_maximus_(Bandipur).jpg"
      },
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/113030589/medium.jpeg",
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/a/a8/Female_elephas_maximus_at_hamburg.JPG/500px-Female_elephas_maximus_at_hamburg.JPG",
       "w": 500,
-      "h": 313,
-      "credit": "Eamon Corbett",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/113030589"
+      "h": 375,
+      "credit": "LadyofHats",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Female_elephas_maximus_at_hamburg.JPG"
      },
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/110290149/medium.jpeg",
-      "w": 375,
-      "h": 500,
-      "credit": "T R Shankar Raman",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/110290149"
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/a/a2/ZOO_Praha%2C_Elephas_maximus%2C_08.jpg/500px-ZOO_Praha%2C_Elephas_maximus%2C_08.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Honza Groh (Jagro)",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:ZOO_Praha,_Elephas_maximus,_08.jpg"
      }
     ],
     "audio": [
@@ -690,10 +717,18 @@
     "It eats leaves from acacia trees.",
     "It is the tallest animal in the world.",
     "The answer is one word of 7 letters.",
-    "It starts with the letter G."
+    "Its first letter is G."
    ],
    "media": {
     "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/6/68/Giraffen.jpg/500px-Giraffen.jpg",
+      "w": 500,
+      "h": 444,
+      "credit": "John Walker",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Giraffen.jpg"
+     },
      {
       "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/219565591/medium.jpg",
       "w": 381,
@@ -709,14 +744,6 @@
       "credit": "B Pulman005",
       "license": "CC BY 4.0",
       "page": "https://www.inaturalist.org/photos/599886814"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/436466325/medium.jpeg",
-      "w": 500,
-      "h": 500,
-      "credit": "Chiara",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/436466325"
      }
     ],
     "audio": [
@@ -758,17 +785,25 @@
     "It is related to horses.",
     "It has black and white stripes.",
     "The answer has 2 words (6, 5 letters).",
-    "It starts with the letter P."
+    "Its first letter is P."
    ],
    "media": {
     "img": [
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/261523831/medium.jpeg",
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/e/eb/GrantsZebra2.jpg/500px-GrantsZebra2.jpg",
       "w": 500,
-      "h": 375,
-      "credit": "Connor Long",
-      "license": "CC BY-SA 4.0",
-      "page": "https://www.inaturalist.org/photos/261523831"
+      "h": 428,
+      "credit": "Ltshears",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:GrantsZebra2.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/4/45/Equus_quagga_burchellii_-_Etosha%2C_2014.jpg/500px-Equus_quagga_burchellii_-_Etosha%2C_2014.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Yathin S Krishnappa",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Equus_quagga_burchellii_-_Etosha,_2014.jpg"
      },
      {
       "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/473246789/medium.jpg",
@@ -777,14 +812,6 @@
       "credit": "Francis",
       "license": "CC BY 4.0",
       "page": "https://www.inaturalist.org/photos/473246789"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/50371107/medium.jpg",
-      "w": 500,
-      "h": 391,
-      "credit": "Seig",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/50371107"
      }
     ]
    },
@@ -816,33 +843,33 @@
     "It is one of Africa's most dangerous animals.",
     "Its name means \"river horse\".",
     "The answer is one word of 12 letters.",
-    "It starts with the letter H."
+    "Its first letter is H."
    ],
    "media": {
     "img": [
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/258049259/medium.jpeg",
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/e/e5/Hippo_%28Hippopotamus_amphibius%29_%2816485955207%29.jpg/500px-Hippo_%28Hippopotamus_amphibius%29_%2816485955207%29.jpg",
       "w": 500,
       "h": 333,
-      "credit": "Tommy Andriollo",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/258049259"
+      "credit": "Bernard DUPONT from FRANCE",
+      "license": "CC BY-SA 2.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Hippo_(Hippopotamus_amphibius)_(16485955207).jpg"
      },
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/50294895/medium.jpeg",
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/f/f2/Portrait_Hippopotamus_in_the_water.jpg/500px-Portrait_Hippopotamus_in_the_water.jpg",
       "w": 500,
-      "h": 375,
-      "credit": "Annika Lindqvist",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/50294895"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/442908905/medium.jpeg",
-      "w": 500,
-      "h": 375,
-      "credit": "Noeleen du Toit",
+      "h": 333,
+      "credit": "Muhammad Mahdi Karim",
       "license": "CC BY-SA 4.0",
-      "page": "https://www.inaturalist.org/photos/442908905"
+      "page": "https://commons.wikimedia.org/wiki/File:Portrait_Hippopotamus_in_the_water.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/18/Zulaihamaryam-Museum_Geologi-Hippotamus_Simplex_%28Kuda_Nil%29.jpg/330px-Zulaihamaryam-Museum_Geologi-Hippotamus_Simplex_%28Kuda_Nil%29.jpg",
+      "w": 330,
+      "h": 440,
+      "credit": "Zulaihamaryam",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Zulaihamaryam-Museum_Geologi-Hippotamus_Simplex_(Kuda_Nil).jpg"
      }
     ]
    },
@@ -877,10 +904,26 @@
     "It eats plants.",
     "It is grey, despite its name.",
     "The answer has 2 words (5, 10 letters).",
-    "It starts with the letter W."
+    "Its first letter is W."
    ],
    "media": {
     "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/e/e1/White_rhinoceros_africa.jpg/500px-White_rhinoceros_africa.jpg",
+      "w": 500,
+      "h": 334,
+      "credit": "Payamfarahani",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:White_rhinoceros_africa.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/2/28/109_Male_White_rhinoceros_walking_in_the_Kalahari_Desert_of_Namibia_Photo_by_Giles_Laurent.jpg/500px-109_Male_White_rhinoceros_walking_in_the_Kalahari_Desert_of_Namibia_Photo_by_Giles_Laurent.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Giles Laurent",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:109_Male_White_rhinoceros_walking_in_the_Kalahari_Desert_of_Namibia_Photo_by_Giles_Laurent.jpg"
+     },
      {
       "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/18821982/medium.jpeg",
       "w": 500,
@@ -888,22 +931,6 @@
       "credit": "Wynand Uys",
       "license": "CC BY 4.0",
       "page": "https://www.inaturalist.org/photos/18821982"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/58595467/medium.jpeg",
-      "w": 500,
-      "h": 332,
-      "credit": "Tom Heijnen",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/58595467"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/58595488/medium.jpeg",
-      "w": 500,
-      "h": 332,
-      "credit": "Tom Heijnen",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/58595488"
      }
     ]
    },
@@ -939,7 +966,7 @@
     "It has two horns.",
     "It is grey, despite its name.",
     "The answer has 2 words (5, 10 letters).",
-    "It starts with the letter B."
+    "Its first letter is B."
    ],
    "media": {
     "img": [
@@ -1001,33 +1028,33 @@
     "Old males have silver hair on their backs.",
     "It is the largest ape.",
     "The answer has 2 words (7, 7 letters).",
-    "It starts with the letter W."
+    "Its first letter is W."
    ],
    "media": {
     "img": [
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/86526064/medium.jpg",
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/4/4c/Gorille.jpg/500px-Gorille.jpg",
       "w": 500,
-      "h": 333,
-      "credit": "Thomas Fuhrmann",
-      "license": "CC BY-SA 4.0",
-      "page": "https://www.inaturalist.org/photos/86526064"
+      "h": 500,
+      "credit": "Macinate",
+      "license": "CC BY 2.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Gorille.jpg"
      },
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/28969301/medium.jpeg",
-      "w": 500,
-      "h": 375,
-      "credit": "Matt Muir",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/28969301"
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/7/70/Gorilla_gorilla_at_the_Bronx_Zoo_007.jpg/330px-Gorilla_gorilla_at_the_Bronx_Zoo_007.jpg",
+      "w": 330,
+      "h": 440,
+      "credit": "Postdlf",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Gorilla_gorilla_at_the_Bronx_Zoo_007.jpg"
      },
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/2996372/medium.JPG",
+      "src": "https://upload.wikimedia.org/wikipedia/commons/c/c7/Stavenn_Gorilla_gorilla_00.jpg",
       "w": 500,
-      "h": 375,
-      "credit": "John P Friel",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/2996372"
+      "h": 667,
+      "credit": "Stavenn",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Stavenn_Gorilla_gorilla_00.jpg"
      }
     ]
    },
@@ -1063,10 +1090,26 @@
     "It lives in groups in African forests.",
     "It is an ape and one of our closest relatives.",
     "The answer is one word of 10 letters.",
-    "It starts with the letter C."
+    "Its first letter is C."
    ],
    "media": {
     "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/8/86/013_Alpha_male_chimpanzee_at_Kibale_forest_National_Park_Photo_by_Giles_Laurent.jpg/500px-013_Alpha_male_chimpanzee_at_Kibale_forest_National_Park_Photo_by_Giles_Laurent.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Giles Laurent",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:013_Alpha_male_chimpanzee_at_Kibale_forest_National_Park_Photo_by_Giles_Laurent.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/4/42/015_Chimpanzee_at_Kibale_forest_National_Park_Photo_by_Giles_Laurent.jpg/330px-015_Chimpanzee_at_Kibale_forest_National_Park_Photo_by_Giles_Laurent.jpg",
+      "w": 330,
+      "h": 495,
+      "credit": "Giles Laurent",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:015_Chimpanzee_at_Kibale_forest_National_Park_Photo_by_Giles_Laurent.jpg"
+     },
      {
       "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/217300479/medium.jpg",
       "w": 500,
@@ -1074,22 +1117,6 @@
       "credit": "Wairambar Rainforest",
       "license": "CC BY 4.0",
       "page": "https://www.inaturalist.org/photos/217300479"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/895774/medium.jpg",
-      "w": 500,
-      "h": 375,
-      "credit": "Carrie Seltzer",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/895774"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/363002091/medium.jpg",
-      "w": 500,
-      "h": 335,
-      "credit": "Stan Rullman",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/363002091"
      }
     ],
     "audio": [
@@ -1130,7 +1157,7 @@
     "It is one of our two closest living relatives.",
     "It looks like a slim chimpanzee.",
     "The answer is one word of 6 letters.",
-    "It starts with the letter B."
+    "Its first letter is B."
    ],
    "media": {
     "img": [
@@ -1165,6 +1192,7 @@
   {
    "id": "bornean-orangutan",
    "name": "Bornean orangutan",
+   "lname": "Bornean orangutan",
    "alt": [
     "orangutan"
    ],
@@ -1192,33 +1220,33 @@
     "Its name means \"person of the forest\" in Malay.",
     "It is a red-orange ape.",
     "The answer has 2 words (7, 9 letters).",
-    "It starts with the letter B."
+    "Its first letter is B."
    ],
    "media": {
     "img": [
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/62662319/medium.jpeg",
+      "src": "https://upload.wikimedia.org/wikipedia/commons/d/d3/OrangutanP1.jpg",
       "w": 500,
-      "h": 375,
-      "credit": "Pirataber",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/62662319"
+      "h": 648,
+      "credit": "Ltshears",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:OrangutanP1.jpg"
      },
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/62662391/medium.jpeg",
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/b/b1/Nanga_with_male_baby.jpg/500px-Nanga_with_male_baby.jpg",
       "w": 500,
-      "h": 375,
-      "credit": "Pirataber",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/62662391"
+      "h": 498,
+      "credit": "user mt7",
+      "license": "CC BY 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Nanga_with_male_baby.jpg"
      },
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/109597147/medium.jpg",
-      "w": 500,
-      "h": 333,
-      "credit": "no rights reserved",
-      "license": "CC0 1.0",
-      "page": "https://www.inaturalist.org/photos/109597147"
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/d/d6/Tanjung_Puting30477.jpg/330px-Tanjung_Puting30477.jpg",
+      "w": 330,
+      "h": 495,
+      "credit": "Nanosanchez",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Tanjung_Puting30477.jpg"
      }
     ]
    },
@@ -1246,33 +1274,33 @@
     "It eats both plants and animals.",
     "It lives only on Madagascar.",
     "The answer has 3 words (4, 6, 5 letters).",
-    "It starts with the letter R."
+    "Its first letter is R."
    ],
    "media": {
     "img": [
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/99684889/medium.jpg",
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/f/f5/Lemur_catta_001.jpg/500px-Lemur_catta_001.jpg",
       "w": 500,
-      "h": 339,
-      "credit": "George Williams",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/99684889"
+      "h": 281,
+      "credit": "Alex Dunkel (Maky)",
+      "license": "CC BY 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Lemur_catta_001.jpg"
      },
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/2068076/medium.jpg",
-      "w": 500,
-      "h": 375,
-      "credit": "Rafael Medina",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/2068076"
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/2/29/Lemur_walking-2.jpg/330px-Lemur_walking-2.jpg",
+      "w": 330,
+      "h": 442,
+      "credit": "derivative work: Visionholder (talk) Lemur_walking.jpg: Twowells",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Lemur_walking-2.jpg"
      },
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/235042823/medium.jpeg",
-      "w": 375,
-      "h": 500,
-      "credit": "no rights reserved",
-      "license": "CC0 1.0",
-      "page": "https://www.inaturalist.org/photos/235042823"
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/0/0b/Ring-tailed_lemur_%28Lemur_catta%29.jpg/330px-Ring-tailed_lemur_%28Lemur_catta%29.jpg",
+      "w": 330,
+      "h": 494,
+      "credit": "Charles J. Sharp",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Ring-tailed_lemur_(Lemur_catta).jpg"
      }
     ],
     "audio": [
@@ -1311,33 +1339,33 @@
     "It has a colourful bottom.",
     "Males have a red nose and blue cheeks.",
     "The answer is one word of 8 letters.",
-    "It starts with the letter M."
+    "Its first letter is M."
    ],
    "media": {
     "img": [
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/339428082/medium.jpeg",
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/7/75/Mandrill_at_san_francisco_zoo.jpg/500px-Mandrill_at_san_francisco_zoo.jpg",
       "w": 500,
-      "h": 333,
-      "credit": "Julien Renoult",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/339428082"
+      "h": 375,
+      "credit": "((brian)) from Sebastopol, CA, USA",
+      "license": "CC BY 2.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Mandrill_at_san_francisco_zoo.jpg"
      },
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/339428130/medium.jpeg",
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/4/44/Mandrill_%284531340530%29.jpg/500px-Mandrill_%284531340530%29.jpg",
       "w": 500,
-      "h": 333,
-      "credit": "Julien Renoult",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/339428130"
+      "h": 433,
+      "credit": "LaggedOnUser",
+      "license": "CC BY-SA 2.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Mandrill_(4531340530).jpg"
      },
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/339428057/medium.jpeg",
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/e/ed/Mandrill_Albert_September_2015_Zoo_Berlin_%282%29.jpg/500px-Mandrill_Albert_September_2015_Zoo_Berlin_%282%29.jpg",
       "w": 500,
-      "h": 333,
-      "credit": "Julien Renoult",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/339428057"
+      "h": 653,
+      "credit": "Katma0601",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Mandrill_Albert_September_2015_Zoo_Berlin_(2).jpg"
      }
     ]
    },
@@ -1367,10 +1395,26 @@
     "It lives in big family groups in burrows.",
     "It stands up on its back legs to keep watch.",
     "The answer is one word of 7 letters.",
-    "It starts with the letter M."
+    "Its first letter is M."
    ],
    "media": {
     "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/c/c4/Meerkat_%28Suricata_suricatta%29.jpg/500px-Meerkat_%28Suricata_suricatta%29.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Hans Hillewaert",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Meerkat_(Suricata_suricatta).jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/9/9a/Meerkat_%28Suricata_suricatta%29_Tswalu.jpg/500px-Meerkat_%28Suricata_suricatta%29_Tswalu.jpg",
+      "w": 500,
+      "h": 412,
+      "credit": "Charles J. Sharp",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Meerkat_(Suricata_suricatta)_Tswalu.jpg"
+     },
      {
       "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/73792684/medium.jpeg",
       "w": 500,
@@ -1378,22 +1422,6 @@
       "credit": "Justin Ponder",
       "license": "CC BY 4.0",
       "page": "https://www.inaturalist.org/photos/73792684"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/65999068/medium.jpg",
-      "w": 500,
-      "h": 359,
-      "credit": "H. Zel",
-      "license": "CC BY-SA 4.0",
-      "page": "https://www.inaturalist.org/photos/65999068"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/73783329/medium.jpeg",
-      "w": 500,
-      "h": 333,
-      "credit": "Justin Ponder",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/73783329"
      }
     ]
    },
@@ -1426,10 +1454,26 @@
     "It eats meat.",
     "Its call sounds like laughing.",
     "The answer has 2 words (7, 5 letters).",
-    "It starts with the letter S."
+    "Its first letter is S."
    ],
    "media": {
     "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/e/ea/Hiena_manchada_%28Crocuta_crocuta%29%2C_parque_nacional_Kruger%2C_Sud%C3%A1frica%2C_2018-07-26%2C_DD_22.jpg/500px-Hiena_manchada_%28Crocuta_crocuta%29%2C_parque_nacional_Kruger%2C_Sud%C3%A1frica%2C_2018-07-26%2C_DD_22.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Diego Delso",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Hiena_manchada_(Crocuta_crocuta),_parque_nacional_Kruger,_Sud%C3%A1frica,_2018-07-26,_DD_22.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/d/dc/Spotted_hyena_%28Crocuta_crocuta%29.jpg/500px-Spotted_hyena_%28Crocuta_crocuta%29.jpg",
+      "w": 500,
+      "h": 268,
+      "credit": "Charles J. Sharp",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Spotted_hyena_(Crocuta_crocuta).jpg"
+     },
      {
       "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/607418898/medium.jpg",
       "w": 500,
@@ -1437,22 +1481,6 @@
       "credit": "Liaka ac",
       "license": "CC BY-SA 4.0",
       "page": "https://www.inaturalist.org/photos/607418898"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/261238778/medium.jpeg",
-      "w": 500,
-      "h": 333,
-      "credit": "Darren Obbard",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/261238778"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/61607813/medium.jpg",
-      "w": 500,
-      "h": 307,
-      "credit": "Diogo Luiz",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/61607813"
      }
     ],
     "audio": [
@@ -1470,6 +1498,7 @@
   {
    "id": "african-wild-dog",
    "name": "African wild dog",
+   "lname": "African wild dog",
    "alt": [
     "painted dog"
    ],
@@ -1491,18 +1520,10 @@
     "It eats meat.",
     "Each one has a unique patchy coat.",
     "The answer has 3 words (7, 4, 3 letters).",
-    "It starts with the letter A."
+    "Its first letter is A."
    ],
    "media": {
     "img": [
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/4949165/medium.jpg",
-      "w": 500,
-      "h": 324,
-      "credit": "Per Arne Slotte",
-      "license": "CC BY-SA 4.0",
-      "page": "https://www.inaturalist.org/photos/4949165"
-     },
      {
       "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/120818440/medium.jpg",
       "w": 500,
@@ -1518,6 +1539,23 @@
       "credit": "Henry de Lange",
       "license": "CC BY 4.0",
       "page": "https://www.inaturalist.org/photos/11624075"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/530342946/medium.jpg",
+      "w": 400,
+      "h": 500,
+      "credit": "Darío De la Fuente",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/530342946"
+     }
+    ],
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/d/d2/Lycaon_pictus_hoo-sound.wav/Lycaon_pictus_hoo-sound.wav.mp3",
+      "credit": "Elsa Sandoval, Stichting Painted Dog Conservation",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Lycaon_pictus_hoo-sound.wav",
+      "start": 0
      }
     ]
    },
@@ -1550,7 +1588,7 @@
     "It is black with a grey-white back.",
     "It raids bees' nests for a sweet food.",
     "The answer has 2 words (5, 6 letters).",
-    "It starts with the letter H."
+    "Its first letter is H."
    ],
    "media": {
     "img": [
@@ -1606,7 +1644,7 @@
     "It eats ants and termites.",
     "It has a long snout and rabbit-like ears.",
     "The answer is one word of 8 letters.",
-    "It starts with the letter A."
+    "Its first letter is A."
    ],
    "media": {
     "img": [
@@ -1664,7 +1702,7 @@
     "Its back legs have zebra-like stripes.",
     "It is the giraffe's closest relative.",
     "The answer is one word of 5 letters.",
-    "It starts with the letter O."
+    "Its first letter is O."
    ],
    "media": {
     "img": [
@@ -1723,33 +1761,33 @@
     "Pumbaa in \"The Lion King\" is one.",
     "It is a wild pig with tusks.",
     "The answer is one word of 7 letters.",
-    "It starts with the letter W."
+    "Its first letter is W."
    ],
    "media": {
     "img": [
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/251735512/medium.jpg",
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/9/99/Phacochoerus_africanus.jpg/500px-Phacochoerus_africanus.jpg",
       "w": 500,
-      "h": 367,
-      "credit": "Bernard DUPONT",
+      "h": 375,
+      "credit": "Hans Hillewaert",
       "license": "CC BY-SA 4.0",
-      "page": "https://www.inaturalist.org/photos/251735512"
+      "page": "https://commons.wikimedia.org/wiki/File:Phacochoerus_africanus.jpg"
      },
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/187832008/medium.jpg",
-      "w": 500,
-      "h": 349,
-      "credit": "Bernard DUPONT",
-      "license": "CC BY-SA 4.0",
-      "page": "https://www.inaturalist.org/photos/187832008"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/420815823/medium.jpeg",
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/1f/Desert_Warthog%2C_Samburu%2C_Kenya_04.jpg/500px-Desert_Warthog%2C_Samburu%2C_Kenya_04.jpg",
       "w": 500,
       "h": 333,
-      "credit": "no rights reserved",
-      "license": "CC0 1.0",
-      "page": "https://www.inaturalist.org/photos/420815823"
+      "credit": "darren_j_obbard",
+      "license": "CC BY 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Desert_Warthog,_Samburu,_Kenya_04.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/4/45/Southern_warthog_%28Phacochoerus_africanus_sundevallii%29_male.jpg/500px-Southern_warthog_%28Phacochoerus_africanus_sundevallii%29_male.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Charles J. Sharp",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Southern_warthog_(Phacochoerus_africanus_sundevallii)_male.jpg"
      }
     ]
    },
@@ -1785,17 +1823,25 @@
     "It lives in the mountains of China.",
     "It is a black-and-white bear.",
     "The answer has 2 words (5, 5 letters).",
-    "It starts with the letter G."
+    "Its first letter is G."
    ],
    "media": {
     "img": [
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/351209016/medium.jpeg",
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/3/3c/Giant_Panda_2004-03-2.jpg/500px-Giant_Panda_2004-03-2.jpg",
       "w": 500,
       "h": 333,
-      "credit": "James Eaton",
-      "license": "CC0 1.0",
-      "page": "https://www.inaturalist.org/photos/351209016"
+      "credit": "Jeff Kubina",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Giant_Panda_2004-03-2.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/0/0f/Grosser_Panda.JPG/500px-Grosser_Panda.JPG",
+      "w": 500,
+      "h": 333,
+      "credit": "J. Patrick Fischer",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Grosser_Panda.JPG"
      },
      {
       "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/351209004/medium.jpeg",
@@ -1804,14 +1850,6 @@
       "credit": "no rights reserved",
       "license": "CC0 1.0",
       "page": "https://www.inaturalist.org/photos/351209004"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/351209026/medium.jpeg",
-      "w": 500,
-      "h": 333,
-      "credit": "no rights reserved",
-      "license": "CC0 1.0",
-      "page": "https://www.inaturalist.org/photos/351209026"
      }
     ]
    },
@@ -1841,10 +1879,26 @@
     "It eats plants.",
     "It lives in Himalayan forests.",
     "The answer has 2 words (3, 5 letters).",
-    "It starts with the letter R."
+    "Its first letter is R."
    ],
    "media": {
     "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/0/0c/RedPanda_SingalilaNationalPark_DFrame.jpg/500px-RedPanda_SingalilaNationalPark_DFrame.jpg",
+      "w": 500,
+      "h": 400,
+      "credit": "Ajit Hota",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:RedPanda_SingalilaNationalPark_DFrame.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/f/fd/Red_Panda%2C_Gentle_Tree-Dweller_of_the_Himalayas.jpg/500px-Red_Panda%2C_Gentle_Tree-Dweller_of_the_Himalayas.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Sunuwargr",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Red_Panda,_Gentle_Tree-Dweller_of_the_Himalayas.jpg"
+     },
      {
       "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/123108651/medium.jpg",
       "w": 500,
@@ -1852,22 +1906,6 @@
       "credit": "S.Brickman",
       "license": "CC BY-SA 4.0",
       "page": "https://www.inaturalist.org/photos/123108651"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/117761880/medium.jpeg",
-      "w": 500,
-      "h": 333,
-      "credit": "zhangshen",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/117761880"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/523439045/medium.jpg",
-      "w": 375,
-      "h": 500,
-      "credit": "no rights reserved",
-      "license": "CC0 1.0",
-      "page": "https://www.inaturalist.org/photos/523439045"
      }
     ]
    },
@@ -1896,7 +1934,7 @@
     "It has a pot belly.",
     "Males have a huge, droopy nose.",
     "The answer has 2 words (9, 6 letters).",
-    "It starts with the letter P."
+    "Its first letter is P."
    ],
    "media": {
     "img": [
@@ -1931,6 +1969,7 @@
   {
    "id": "japanese-macaque",
    "name": "Japanese macaque",
+   "lname": "Japanese macaque",
    "alt": [
     "snow monkey"
    ],
@@ -1953,7 +1992,7 @@
     "It eats both plants and animals.",
     "It has a bright red face.",
     "The answer has 2 words (8, 7 letters).",
-    "It starts with the letter J."
+    "Its first letter is J."
    ],
    "media": {
     "img": [
@@ -1988,6 +2027,7 @@
   {
    "id": "malayan-tapir",
    "name": "Malayan tapir",
+   "lname": "Malayan tapir",
    "sci": "Tapirus indicus",
    "group": "tapir",
    "facts": {
@@ -2005,7 +2045,7 @@
     "It eats plants.",
     "Its body is black with a white middle.",
     "The answer has 2 words (7, 5 letters).",
-    "It starts with the letter M."
+    "Its first letter is M."
    ],
    "media": {
     "img": [
@@ -2061,7 +2101,7 @@
     "It has long shaggy hair.",
     "It is a wild ox of Tibet.",
     "The answer is one word of 3 letters.",
-    "It starts with the letter Y."
+    "Its first letter is Y."
    ],
    "media": {
     "img": [
@@ -2096,6 +2136,7 @@
   {
    "id": "bactrian-camel",
    "name": "Bactrian camel",
+   "lname": "Bactrian camel",
    "sci": "Camelus bactrianus",
    "group": "camel",
    "facts": {
@@ -2117,7 +2158,7 @@
     "Its shaggy coat falls out in summer.",
     "It has two humps.",
     "The answer has 2 words (8, 5 letters).",
-    "It starts with the letter B."
+    "Its first letter is B."
    ],
    "media": {
     "img": [
@@ -2181,10 +2222,18 @@
     "It howls to talk to its pack.",
     "It is a wild dog of northern lands.",
     "The answer has 2 words (4, 4 letters).",
-    "It starts with the letter G."
+    "Its first letter is G."
    ],
    "media": {
     "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/6/68/Eurasian_wolf_2.jpg/500px-Eurasian_wolf_2.jpg",
+      "w": 500,
+      "h": 387,
+      "credit": "User:Mas3cf",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Eurasian_wolf_2.jpg"
+     },
      {
       "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/415517238/medium.jpg",
       "w": 500,
@@ -2200,14 +2249,6 @@
       "credit": "Matt Muir",
       "license": "CC BY 4.0",
       "page": "https://www.inaturalist.org/photos/481187478"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/468217911/medium.jpg",
-      "w": 408,
-      "h": 500,
-      "credit": "gerardbertrand",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/468217911"
      }
     ],
     "audio": [
@@ -2253,17 +2294,25 @@
     "It eats both plants and animals.",
     "It has a bushy, white-tipped tail.",
     "The answer has 2 words (3, 3 letters).",
-    "It starts with the letter R."
+    "Its first letter is R."
    ],
    "media": {
     "img": [
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/289085807/medium.jpg",
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/9/9d/Fox_at_the_British_Wildlife_Centre%2C_Newchapel%2C_Surrey_-_geograph.org.uk_-_2221750.jpg/330px-Fox_at_the_British_Wildlife_Centre%2C_Newchapel%2C_Surrey_-_geograph.org.uk_-_2221750.jpg",
+      "w": 330,
+      "h": 496,
+      "credit": "Peter Trimming",
+      "license": "CC BY-SA 2.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Fox_at_the_British_Wildlife_Centre,_Newchapel,_Surrey_-_geograph.org.uk_-_2221750.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/d/d2/Portrait_of_a_red_fox_in_Rautas_fj%C3%A4llurskog_%28cropped%29.jpg/500px-Portrait_of_a_red_fox_in_Rautas_fj%C3%A4llurskog_%28cropped%29.jpg",
       "w": 500,
-      "h": 400,
-      "credit": "David Willingham",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/289085807"
+      "h": 331,
+      "credit": "ClaudiaTen",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Portrait_of_a_red_fox_in_Rautas_fj%C3%A4llurskog_(cropped).jpg"
      },
      {
       "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/120825265/medium.jpg",
@@ -2272,14 +2321,6 @@
       "credit": "Morten Ross",
       "license": "CC BY 4.0",
       "page": "https://www.inaturalist.org/photos/120825265"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/57391469/medium.jpg",
-      "w": 500,
-      "h": 337,
-      "credit": "Алина Урусова",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/57391469"
      }
     ],
     "audio": [
@@ -2324,33 +2365,33 @@
     "It eats both plants and animals.",
     "It has enormous ears.",
     "The answer has 2 words (6, 3 letters).",
-    "It starts with the letter F."
+    "Its first letter is F."
    ],
    "media": {
     "img": [
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/17864088/medium.jpeg",
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/f/f4/Fennec_Fox_Peek.jpg/500px-Fennec_Fox_Peek.jpg",
       "w": 500,
-      "h": 333,
-      "credit": "Stacey Robert Greenstein",
+      "h": 335,
+      "credit": "Anass ERRIHANI",
       "license": "CC BY-SA 4.0",
-      "page": "https://www.inaturalist.org/photos/17864088"
+      "page": "https://commons.wikimedia.org/wiki/File:Fennec_Fox_Peek.jpg"
      },
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/142063337/medium.jpg",
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/9/96/Fennec_Fox_%40_Africa_Alive%2C_Lowestoft.jpg/500px-Fennec_Fox_%40_Africa_Alive%2C_Lowestoft.jpg",
       "w": 500,
       "h": 375,
-      "credit": "Markus Krieger",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/142063337"
+      "credit": "Tim Parkinson from Sheffield, UK",
+      "license": "CC BY 2.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Fennec_Fox_@_Africa_Alive,_Lowestoft.jpg"
      },
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/471246065/medium.jpg",
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/d/d1/Fennec_Fox_%289163009503%29.jpg/500px-Fennec_Fox_%289163009503%29.jpg",
       "w": 500,
       "h": 333,
-      "credit": "Demian Hiß",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/471246065"
+      "credit": "Daniel Ramirez from Honolulu, USA",
+      "license": "CC BY 2.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Fennec_Fox_(9163009503).jpg"
      }
     ],
     "audio": [
@@ -2392,10 +2433,18 @@
     "It eats meat.",
     "It hunts seals on the sea ice.",
     "The answer has 2 words (5, 4 letters).",
-    "It starts with the letter P."
+    "Its first letter is P."
    ],
    "media": {
     "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/6/66/Polar_Bear_-_Alaska_%28cropped%29.jpg/500px-Polar_Bear_-_Alaska_%28cropped%29.jpg",
+      "w": 500,
+      "h": 502,
+      "credit": "Alan Wilson",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Polar_Bear_-_Alaska_(cropped).jpg"
+     },
      {
       "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/123092729/medium.jpg",
       "w": 500,
@@ -2411,14 +2460,6 @@
       "credit": "Алексей Логинов",
       "license": "CC BY 4.0",
       "page": "https://www.inaturalist.org/photos/109439406"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/111316985/medium.jpg",
-      "w": 500,
-      "h": 325,
-      "credit": "Morten Ross",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/111316985"
      }
     ]
    },
@@ -2454,33 +2495,33 @@
     "It lives in many parts of the world.",
     "It eats both plants and animals.",
     "The answer has 2 words (5, 4 letters).",
-    "It starts with the letter B."
+    "Its first letter is B."
    ],
    "media": {
     "img": [
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/334287109/medium.jpg",
-      "w": 500,
-      "h": 333,
-      "credit": "Nathan Ruser",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/334287109"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/414075864/medium.jpeg",
-      "w": 500,
-      "h": 333,
-      "credit": "Валерия Ковалева",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/414075864"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/9581603/medium.jpeg",
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/5/5d/Kamchatka_Brown_Bear_near_Dvuhyurtochnoe_on_2015-07-23.jpg/500px-Kamchatka_Brown_Bear_near_Dvuhyurtochnoe_on_2015-07-23.jpg",
       "w": 500,
       "h": 375,
-      "credit": "Annika Lindqvist",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/9581603"
+      "credit": "Robert F. Tobler",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Kamchatka_Brown_Bear_near_Dvuhyurtochnoe_on_2015-07-23.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/7/7d/Brown_bear.jpg/500px-Brown_bear.jpg",
+      "w": 500,
+      "h": 399,
+      "credit": "Marshmallow",
+      "license": "CC BY 2.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Brown_bear.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/7/71/2010-kodiak-bear-1.jpg/500px-2010-kodiak-bear-1.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Yathin S Krishnappa",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:2010-kodiak-bear-1.jpg"
      }
     ],
     "audio": [
@@ -2498,6 +2539,7 @@
   {
    "id": "american-black-bear",
    "name": "American black bear",
+   "lname": "American black bear",
    "alt": [
     "black bear"
    ],
@@ -2523,7 +2565,7 @@
     "Typical adult weight: about 120 kg.",
     "It eats both plants and animals.",
     "The answer has 3 words (8, 5, 4 letters).",
-    "It starts with the letter A."
+    "Its first letter is A."
    ],
    "media": {
     "img": [
@@ -2586,33 +2628,33 @@
     "Males grow huge, flat antlers.",
     "It is the biggest deer in the world.",
     "The answer is one word of 5 letters.",
-    "It starts with the letter M."
+    "Its first letter is M."
    ],
    "media": {
     "img": [
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/187783997/medium.jpg",
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/1c/Elk-telemark.jpg/500px-Elk-telemark.jpg",
       "w": 500,
-      "h": 332,
-      "credit": "mikaelsoderberg",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/187783997"
+      "h": 375,
+      "credit": "Badzil",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Elk-telemark.jpg"
      },
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/23946339/medium.jpeg",
-      "w": 375,
-      "h": 500,
-      "credit": "Matt Muir",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/23946339"
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/4/44/A_male_moose_takes_a_rest_in_a_field_during_a_light_rainshower.jpg/500px-A_male_moose_takes_a_rest_in_a_field_during_a_light_rainshower.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Ryan Hagerty",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:A_male_moose_takes_a_rest_in_a_field_during_a_light_rainshower.jpg"
      },
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/458933375/medium.jpg",
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/e/e0/Alaska_moose.jpg/500px-Alaska_moose.jpg",
       "w": 500,
-      "h": 500,
-      "credit": "Dan Vickers",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/458933375"
+      "h": 333,
+      "credit": "Paxson Woelber",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Alaska_moose.jpg"
      }
     ],
     "audio": [
@@ -2657,33 +2699,33 @@
     "It eats plants.",
     "Legend says it pulls Santa's sleigh.",
     "The answer is one word of 8 letters.",
-    "It starts with the letter R."
+    "Its first letter is R."
    ],
    "media": {
     "img": [
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/86057375/medium.jpg",
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/f/fd/Caribou.jpg/500px-Caribou.jpg",
       "w": 500,
-      "h": 375,
-      "credit": "Bering Land Bridge National Preserve",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/86057375"
+      "h": 328,
+      "credit": "Dean Biggins (U.S. Fish and Wildlife Service)",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Caribou.jpg"
      },
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/86057277/medium.jpg",
-      "w": 500,
-      "h": 290,
-      "credit": "Gregory \"Slobirdr\" Smith",
-      "license": "CC BY-SA 4.0",
-      "page": "https://www.inaturalist.org/photos/86057277"
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/e/e0/Rentier_fws_1.jpg/330px-Rentier_fws_1.jpg",
+      "w": 330,
+      "h": 490,
+      "credit": "Jon Nickles",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Rentier_fws_1.jpg"
      },
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/46874350/medium.jpeg",
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/9/96/Reinbukken_p%C3%A5_frisk_gr%C3%B8nt_beite._-_panoramio.jpg/500px-Reinbukken_p%C3%A5_frisk_gr%C3%B8nt_beite._-_panoramio.jpg",
       "w": 500,
-      "h": 333,
-      "credit": "Oskar Liset Pryds Hansen",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/46874350"
+      "h": 338,
+      "credit": "Are G Nilsen",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Reinbukken_p%C3%A5_frisk_gr%C3%B8nt_beite._-_panoramio.jpg"
      }
     ]
    },
@@ -2718,7 +2760,7 @@
     "It eats plants.",
     "Its coat is reddish-brown.",
     "The answer has 2 words (3, 4 letters).",
-    "It starts with the letter R."
+    "Its first letter is R."
    ],
    "media": {
     "img": [
@@ -2762,6 +2804,7 @@
   {
    "id": "european-hedgehog",
    "name": "European hedgehog",
+   "lname": "European hedgehog",
    "alt": [
     "hedgehog"
    ],
@@ -2786,33 +2829,33 @@
     "It rolls into a spiky ball when scared.",
     "It is covered in spines.",
     "The answer has 2 words (8, 8 letters).",
-    "It starts with the letter E."
+    "Its first letter is E."
    ],
    "media": {
     "img": [
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/132296376/medium.jpg",
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/c/cb/Erinaceus_europaeus_%28Linnaeus%2C_1758%29.jpg/500px-Erinaceus_europaeus_%28Linnaeus%2C_1758%29.jpg",
       "w": 500,
       "h": 387,
       "credit": "Michael Gäbler",
-      "license": "CC BY-SA 4.0",
-      "page": "https://www.inaturalist.org/photos/132296376"
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Erinaceus_europaeus_(Linnaeus,_1758).jpg"
      },
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/123442290/medium.jpeg",
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/d/d4/Igel01.jpg/500px-Igel01.jpg",
       "w": 500,
-      "h": 331,
-      "credit": "Codrin Bucur",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/123442290"
+      "h": 345,
+      "credit": "Wikimedia Commons",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Igel01.jpg"
      },
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/11950016/medium.jpg",
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/e/e1/Erinaceus_europaeus_LC0119.jpg/500px-Erinaceus_europaeus_LC0119.jpg",
       "w": 500,
-      "h": 333,
-      "credit": "Frank Sengpiel",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/11950016"
+      "h": 375,
+      "credit": "Jörg Hempel",
+      "license": "CC BY-SA 2.0 de",
+      "page": "https://commons.wikimedia.org/wiki/File:Erinaceus_europaeus_LC0119.jpg"
      }
     ]
    },
@@ -2845,10 +2888,26 @@
     "It has a big bushy tail.",
     "Its fur is reddish.",
     "The answer has 2 words (3, 8 letters).",
-    "It starts with the letter R."
+    "Its first letter is R."
    ],
    "media": {
     "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/1c/Squirrel_posing.jpg/500px-Squirrel_posing.jpg",
+      "w": 500,
+      "h": 418,
+      "credit": "Peter Trimming",
+      "license": "CC BY 2.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Squirrel_posing.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/b/bd/Red_squirrel_%2821808%29.jpg/500px-Red_squirrel_%2821808%29.jpg",
+      "w": 500,
+      "h": 390,
+      "credit": "Rhododendrites",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Red_squirrel_(21808).jpg"
+     },
      {
       "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/462357539/medium.jpg",
       "w": 500,
@@ -2856,22 +2915,6 @@
       "credit": "Rhododendrites",
       "license": "CC BY-SA 4.0",
       "page": "https://www.inaturalist.org/photos/462357539"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/462357532/medium.jpg",
-      "w": 500,
-      "h": 441,
-      "credit": "hedera.baltica",
-      "license": "CC BY-SA 4.0",
-      "page": "https://www.inaturalist.org/photos/462357532"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/178305326/medium.jpg",
-      "w": 500,
-      "h": 333,
-      "credit": "Blondinrikard Fröberg",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/178305326"
      }
     ]
    },
@@ -2880,6 +2923,7 @@
   {
    "id": "european-badger",
    "name": "European badger",
+   "lname": "European badger",
    "alt": [
     "badger"
    ],
@@ -2904,7 +2948,7 @@
     "It comes out at night.",
     "Its face has black and white stripes.",
     "The answer has 2 words (8, 6 letters).",
-    "It starts with the letter E."
+    "Its first letter is E."
    ],
    "media": {
     "img": [
@@ -2948,6 +2992,7 @@
   {
    "id": "eurasian-otter",
    "name": "Eurasian otter",
+   "lname": "Eurasian otter",
    "alt": [
     "otter"
    ],
@@ -2972,7 +3017,7 @@
     "It lives along rivers and catches fish.",
     "It is a sleek, playful swimmer.",
     "The answer has 2 words (8, 5 letters).",
-    "It starts with the letter E."
+    "Its first letter is E."
    ],
    "media": {
     "img": [
@@ -3028,7 +3073,7 @@
     "It lives in cold northern forests.",
     "A Marvel superhero shares its name.",
     "The answer is one word of 9 letters.",
-    "It starts with the letter W."
+    "Its first letter is W."
    ],
    "media": {
     "img": [
@@ -3056,6 +3101,15 @@
       "license": "CC BY 4.0",
       "page": "https://www.inaturalist.org/photos/429001711"
      }
+    ],
+    "audio": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/d/d2/LL-Q2891049_%28btm%29-Ni.nasution02-Gulo_gulo.wav/LL-Q2891049_%28btm%29-Ni.nasution02-Gulo_gulo.wav.mp3",
+      "credit": "Speaker: Ni.nasution02 Recorder: Ni.nasution02",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:LL-Q2891049_(btm)-Ni.nasution02-Gulo_gulo.wav",
+      "start": 0
+     }
     ]
    },
    "difficulty": 2
@@ -3063,6 +3117,7 @@
   {
    "id": "european-rabbit",
    "name": "European rabbit",
+   "lname": "European rabbit",
    "alt": [
     "rabbit",
     "bunny"
@@ -3089,10 +3144,26 @@
     "It eats plants.",
     "It thumps its back feet as a warning.",
     "The answer has 2 words (8, 6 letters).",
-    "It starts with the letter E."
+    "Its first letter is E."
    ],
    "media": {
     "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/5/5b/Oryctolagus_cuniculus_Tasmania_2_%28cropped%29.jpg/330px-Oryctolagus_cuniculus_Tasmania_2_%28cropped%29.jpg",
+      "w": 330,
+      "h": 450,
+      "credit": "JJ Harrison",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Oryctolagus_cuniculus_Tasmania_2_(cropped).jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/5/5f/Oryctolagus_cuniculus_-_euqirneto_-_419737670_%28cropped%29.jpeg/500px-Oryctolagus_cuniculus_-_euqirneto_-_419737670_%28cropped%29.jpeg",
+      "w": 500,
+      "h": 544,
+      "credit": "euqirneto",
+      "license": "CC BY 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Oryctolagus_cuniculus_-_euqirneto_-_419737670_(cropped).jpeg"
+     },
      {
       "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/137362674/medium.jpg",
       "w": 500,
@@ -3100,22 +3171,6 @@
       "credit": "Alexis Lours",
       "license": "CC BY 4.0",
       "page": "https://www.inaturalist.org/photos/137362674"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/529217699/medium.jpg",
-      "w": 500,
-      "h": 333,
-      "credit": "jirau",
-      "license": "CC BY-SA 4.0",
-      "page": "https://www.inaturalist.org/photos/529217699"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/463531772/medium.jpg",
-      "w": 500,
-      "h": 500,
-      "credit": "euqirneto",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/463531772"
      }
     ]
    },
@@ -3124,6 +3179,7 @@
   {
    "id": "european-hare",
    "name": "European hare",
+   "lname": "European hare",
    "alt": [
     "brown hare",
     "hare"
@@ -3152,7 +3208,7 @@
     "In spring it \"boxes\" in fields.",
     "It looks like a big rabbit with long ears.",
     "The answer has 2 words (8, 4 letters).",
-    "It starts with the letter E."
+    "Its first letter is E."
    ],
    "media": {
     "img": [
@@ -3187,6 +3243,7 @@
   {
    "id": "american-bison",
    "name": "American bison",
+   "lname": "American bison",
    "alt": [
     "bison",
     "buffalo"
@@ -3211,10 +3268,26 @@
     "It eats plants.",
     "It has a big shoulder hump.",
     "The answer has 2 words (8, 5 letters).",
-    "It starts with the letter A."
+    "Its first letter is A."
    ],
    "media": {
     "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/8/8d/American_bison_k5680-1.jpg/500px-American_bison_k5680-1.jpg",
+      "w": 500,
+      "h": 326,
+      "credit": "Jack Dykinga",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:American_bison_k5680-1.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/9/98/Bison_calf_%2814952304329%29.jpg/500px-Bison_calf_%2814952304329%29.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Yellowstone National Park from Yellowstone NP, USA",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Bison_calf_(14952304329).jpg"
+     },
      {
       "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/297923496/medium.jpg",
       "w": 500,
@@ -3222,22 +3295,6 @@
       "credit": "Kathlin Simpkins",
       "license": "CC0 1.0",
       "page": "https://www.inaturalist.org/photos/297923496"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/91354425/medium.jpg",
-      "w": 310,
-      "h": 500,
-      "credit": "Catherine C. Galley",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/91354425"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/605263174/medium.jpg",
-      "w": 282,
-      "h": 500,
-      "credit": "Daughter Dad",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/605263174"
      }
     ],
     "audio": [
@@ -3278,10 +3335,26 @@
     "It is bigger than an alpaca.",
     "It lives in the Andes.",
     "The answer is one word of 5 letters.",
-    "It starts with the letter L."
+    "Its first letter is L."
    ],
    "media": {
     "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/2/2e/Lama_glama_Laguna_Colorada_2.jpg/500px-Lama_glama_Laguna_Colorada_2.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "kallerna",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Lama_glama_Laguna_Colorada_2.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/f/f7/Llamas%2C_Vernagt-Stausee%2C_Italy.jpg/500px-Llamas%2C_Vernagt-Stausee%2C_Italy.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Andrija12345678",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Llamas,_Vernagt-Stausee,_Italy.jpg"
+     },
      {
       "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/188007033/medium.jpg",
       "w": 500,
@@ -3289,22 +3362,6 @@
       "credit": "Lucyin",
       "license": "CC BY-SA 4.0",
       "page": "https://www.inaturalist.org/photos/188007033"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/188007041/medium.jpg",
-      "w": 500,
-      "h": 375,
-      "credit": "Richard Masoner",
-      "license": "CC BY-SA 4.0",
-      "page": "https://www.inaturalist.org/photos/188007041"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/11023551/medium.jpg",
-      "w": 500,
-      "h": 375,
-      "credit": "Peter O'Connor aka anemoneprojectors",
-      "license": "CC BY-SA 4.0",
-      "page": "https://www.inaturalist.org/photos/11023551"
      }
     ]
    },
@@ -3336,10 +3393,26 @@
     "It is smaller than a llama.",
     "It is fluffy and lives in the Andes.",
     "The answer is one word of 6 letters.",
-    "It starts with the letter A."
+    "Its first letter is A."
    ],
    "media": {
     "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/f/fe/Alpacas.JPG/500px-Alpacas.JPG",
+      "w": 500,
+      "h": 375,
+      "credit": "Philippe Lavoie",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Alpacas.JPG"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/0/0e/Alpaca_in_Higashiyama_Zoo_-_1.jpg/500px-Alpaca_in_Higashiyama_Zoo_-_1.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "KKPCW",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Alpaca_in_Higashiyama_Zoo_-_1.jpg"
+     },
      {
       "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/112773251/medium.jpg",
       "w": 500,
@@ -3347,22 +3420,6 @@
       "credit": "no rights reserved",
       "license": "CC0 1.0",
       "page": "https://www.inaturalist.org/photos/112773251"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/31073196/medium.jpg",
-      "w": 500,
-      "h": 333,
-      "credit": "Tony Rebelo",
-      "license": "CC BY-SA 4.0",
-      "page": "https://www.inaturalist.org/photos/31073196"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/496805095/medium.jpeg",
-      "w": 500,
-      "h": 375,
-      "credit": "Humber Alberto",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/496805095"
      }
     ]
    },
@@ -3392,33 +3449,33 @@
     "It is very calm and friendly.",
     "It is the biggest rodent in the world.",
     "The answer is one word of 8 letters.",
-    "It starts with the letter C."
+    "Its first letter is C."
    ],
    "media": {
     "img": [
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/39870217/medium.jpg",
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/c/c5/Capybaras_%28Hydrochoerus_hydrachaeris%29_female_and_young_suckling_..._%2848427191032%29.jpg/500px-Capybaras_%28Hydrochoerus_hydrachaeris%29_female_and_young_suckling_..._%2848427191032%29.jpg",
+      "w": 500,
+      "h": 308,
+      "credit": "Bernard DUPONT from FRANCE",
+      "license": "CC BY-SA 2.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Capybaras_(Hydrochoerus_hydrachaeris)_female_and_young_suckling_..._(48427191032).jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/3/32/Capybara_%28Hydrochoerus_hydrochaeris%29_alpha_male.JPG/500px-Capybara_%28Hydrochoerus_hydrochaeris%29_alpha_male.JPG",
       "w": 500,
       "h": 333,
-      "credit": "Bernard DUPONT",
+      "credit": "Charles J. Sharp",
       "license": "CC BY-SA 4.0",
-      "page": "https://www.inaturalist.org/photos/39870217"
+      "page": "https://commons.wikimedia.org/wiki/File:Capybara_(Hydrochoerus_hydrochaeris)_alpha_male.JPG"
      },
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/28266462/medium.jpg",
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/7/71/Capybaracropped.jpg/500px-Capybaracropped.jpg",
       "w": 500,
-      "h": 332,
-      "credit": "Bruce Kirchoff",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/28266462"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/10691626/medium.jpg",
-      "w": 500,
-      "h": 333,
-      "credit": "avocat",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/10691626"
+      "h": 334,
+      "credit": "Giles Laurent",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Capybaracropped.jpg"
      }
     ]
    },
@@ -3451,10 +3508,26 @@
     "Its tongue can be 60 cm long.",
     "It eats thousands of ants and termites a day.",
     "The answer has 2 words (5, 8 letters).",
-    "It starts with the letter G."
+    "Its first letter is G."
    ],
    "media": {
     "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/3/3b/Myresluger2.jpg/500px-Myresluger2.jpg",
+      "w": 500,
+      "h": 338,
+      "credit": "Malene Thyssen",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Myresluger2.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/4/4d/Giant_anteater_at_MAV-USP.jpg/500px-Giant_anteater_at_MAV-USP.jpg",
+      "w": 500,
+      "h": 281,
+      "credit": "Museum of Veterinary Anatomy FMVZ USP / Wagner Souza e Silva",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Giant_anteater_at_MAV-USP.jpg"
+     },
      {
       "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/123119770/medium.jpg",
       "w": 500,
@@ -3462,22 +3535,6 @@
       "credit": "Fernando Flores",
       "license": "CC BY-SA 4.0",
       "page": "https://www.inaturalist.org/photos/123119770"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/12636412/medium.jpg",
-      "w": 500,
-      "h": 333,
-      "credit": "avocat",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/12636412"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/345917023/medium.jpeg",
-      "w": 500,
-      "h": 281,
-      "credit": "djcooker",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/345917023"
      }
     ]
    },
@@ -3511,10 +3568,26 @@
     "It hangs upside down.",
     "It is the slowest mammal.",
     "The answer has 3 words (5, 8, 5 letters).",
-    "It starts with the letter B."
+    "Its first letter is B."
    ],
    "media": {
     "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/18/Bradypus.jpg/330px-Bradypus.jpg",
+      "w": 330,
+      "h": 440,
+      "credit": "Stefan Laube (Tauchgurke)",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Bradypus.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/2/2e/MC_Drei-Finger-Faultier.jpg/500px-MC_Drei-Finger-Faultier.jpg",
+      "w": 500,
+      "h": 334,
+      "credit": "Christian Mehlführer, User:Chmehl",
+      "license": "CC BY 2.5",
+      "page": "https://commons.wikimedia.org/wiki/File:MC_Drei-Finger-Faultier.jpg"
+     },
      {
       "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/60587910/medium.jpg",
       "w": 500,
@@ -3522,22 +3595,6 @@
       "credit": "Aitor",
       "license": "CC BY 4.0",
       "page": "https://www.inaturalist.org/photos/60587910"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/670139199/medium.jpg",
-      "w": 500,
-      "h": 333,
-      "credit": "Joao Quental",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/670139199"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/256853375/medium.jpg",
-      "w": 375,
-      "h": 500,
-      "credit": "Roger A. Morales-Flores",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/256853375"
      }
     ]
    },
@@ -3570,33 +3627,33 @@
     "It is covered in bony armour.",
     "Its name means \"little armoured one\" in Spanish.",
     "The answer has 3 words (4, 6, 9 letters).",
-    "It starts with the letter N."
+    "Its first letter is N."
    ],
    "media": {
     "img": [
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/552761863/medium.jpg",
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/b/b4/Nine-banded_Armadillo.jpg/500px-Nine-banded_Armadillo.jpg",
       "w": 500,
-      "h": 333,
-      "credit": "Bruno Henrique Aranda",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/552761863"
+      "h": 302,
+      "credit": "http://www.birdphotos.com",
+      "license": "CC BY 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Nine-banded_Armadillo.jpg"
      },
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/267511175/medium.jpeg",
-      "w": 500,
-      "h": 375,
-      "credit": "Pedro Silva",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/267511175"
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/4/4c/Armadillo_en_Montemorelos.jpg/330px-Armadillo_en_Montemorelos.jpg",
+      "w": 330,
+      "h": 496,
+      "credit": "Ereenegee",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Armadillo_en_Montemorelos.jpg"
      },
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/129628301/medium.jpeg",
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/a/a7/Dasypus_novemcinctus_en_Zool%C3%B3gico_de_Paraguan%C3%A1.jpg/500px-Dasypus_novemcinctus_en_Zool%C3%B3gico_de_Paraguan%C3%A1.jpg",
       "w": 500,
-      "h": 375,
-      "credit": "Pedro Henrique Maloso Ramos",
+      "h": 442,
+      "credit": "Aramburu Carlos",
       "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/129628301"
+      "page": "https://commons.wikimedia.org/wiki/File:Dasypus_novemcinctus_en_Zool%C3%B3gico_de_Paraguan%C3%A1.jpg"
      }
     ]
    },
@@ -3629,10 +3686,26 @@
     "It builds dams and lodges.",
     "It chews down trees with its teeth.",
     "The answer has 3 words (5, 8, 6 letters).",
-    "It starts with the letter N."
+    "Its first letter is N."
    ],
    "media": {
     "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/18/North_American_Beaver%2C_Humber_River_near_Kleinburg%2C_Ontario_%2839637607974%29.jpg/500px-North_American_Beaver%2C_Humber_River_near_Kleinburg%2C_Ontario_%2839637607974%29.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Vlad Podvorny",
+      "license": "CC BY 2.0",
+      "page": "https://commons.wikimedia.org/wiki/File:North_American_Beaver,_Humber_River_near_Kleinburg,_Ontario_(39637607974).jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/6/6b/American_Beaver.jpg/500px-American_Beaver.jpg",
+      "w": 500,
+      "h": 501,
+      "credit": "Steve from Washington, DC, USA",
+      "license": "CC BY-SA 2.0",
+      "page": "https://commons.wikimedia.org/wiki/File:American_Beaver.jpg"
+     },
      {
       "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/172437951/medium.jpg",
       "w": 500,
@@ -3640,22 +3713,6 @@
       "credit": "Rodney Campbell",
       "license": "CC BY 4.0",
       "page": "https://www.inaturalist.org/photos/172437951"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/214854240/medium.jpg",
-      "w": 500,
-      "h": 486,
-      "credit": "no rights reserved",
-      "license": "CC0 1.0",
-      "page": "https://www.inaturalist.org/photos/214854240"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/92345163/medium.jpg",
-      "w": 375,
-      "h": 500,
-      "credit": "Cody Stricker",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/92345163"
      }
     ]
    },
@@ -3692,10 +3749,26 @@
     "It has a ringed tail.",
     "It has a black mask across its eyes.",
     "The answer has 2 words (6, 7 letters).",
-    "It starts with the letter C."
+    "Its first letter is C."
    ],
    "media": {
     "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/3/3e/Raccoon_in_Central_Park_%2835264%29.jpg/500px-Raccoon_in_Central_Park_%2835264%29.jpg",
+      "w": 500,
+      "h": 392,
+      "credit": "Rhododendrites",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Raccoon_in_Central_Park_(35264).jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/d/d8/Baby_Bandits_%2815086307402%29.jpg/500px-Baby_Bandits_%2815086307402%29.jpg",
+      "w": 500,
+      "h": 356,
+      "credit": "USFWS Mountain-Prairie",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Baby_Bandits_(15086307402).jpg"
+     },
      {
       "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/38408348/medium.jpg",
       "w": 500,
@@ -3703,22 +3776,6 @@
       "credit": "kent ozment",
       "license": "CC0 1.0",
       "page": "https://www.inaturalist.org/photos/38408348"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/244073456/medium.gif",
-      "w": 500,
-      "h": 250,
-      "credit": "no rights reserved",
-      "license": "CC0 1.0",
-      "page": "https://www.inaturalist.org/photos/244073456"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/2679010/medium.jpg",
-      "w": 500,
-      "h": 333,
-      "credit": "Michael D Fox",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/2679010"
      }
     ]
    },
@@ -3751,33 +3808,33 @@
     "It eats both plants and animals.",
     "It sprays a terrible smell.",
     "The answer has 2 words (7, 5 letters).",
-    "It starts with the letter S."
+    "Its first letter is S."
    ],
    "media": {
     "img": [
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/2761953/medium.jpg",
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/0/0c/Striped_Skunk_%28Mephitis_mephitis%29_DSC_0030.jpg/500px-Striped_Skunk_%28Mephitis_mephitis%29_DSC_0030.jpg",
       "w": 500,
-      "h": 383,
-      "credit": "Jesse Rorabaugh",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/2761953"
+      "h": 332,
+      "credit": "Dan & Lin Dzurisin",
+      "license": "CC BY 2.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Striped_Skunk_(Mephitis_mephitis)_DSC_0030.jpg"
      },
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/66330139/medium.jpg",
+      "src": "https://upload.wikimedia.org/wikipedia/commons/6/63/Striped_skunk.jpg",
       "w": 500,
-      "h": 375,
-      "credit": "juniper_likethetree",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/66330139"
+      "h": 728,
+      "credit": "Wikimedia Commons",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Striped_skunk.jpg"
      },
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/2076866/medium.jpg",
-      "w": 497,
-      "h": 500,
-      "credit": "no rights reserved",
-      "license": "CC0 1.0",
-      "page": "https://www.inaturalist.org/photos/2076866"
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/1f/Skunk_about_to_spray.jpg/500px-Skunk_about_to_spray.jpg",
+      "w": 500,
+      "h": 609,
+      "credit": "Wallace Keck",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Skunk_about_to_spray.jpg"
      }
     ]
    },
@@ -3786,6 +3843,7 @@
   {
    "id": "virginia-opossum",
    "name": "Virginia opossum",
+   "lname": "Virginia opossum",
    "alt": [
     "opossum",
     "possum"
@@ -3811,7 +3869,7 @@
     "Its long tail is almost hairless.",
     "It \"plays dead\" when scared.",
     "The answer has 2 words (8, 7 letters).",
-    "It starts with the letter V."
+    "Its first letter is V."
    ],
    "media": {
     "img": [
@@ -3873,7 +3931,7 @@
     "It appears on Australia's coat of arms.",
     "It is the biggest marsupial.",
     "The answer has 2 words (3, 8 letters).",
-    "It starts with the letter R."
+    "Its first letter is R."
    ],
    "media": {
     "img": [
@@ -3931,7 +3989,7 @@
     "It eats plants.",
     "It is the second-largest marsupial.",
     "The answer has 3 words (7, 4, 8 letters).",
-    "It starts with the letter E."
+    "Its first letter is E."
    ],
    "media": {
     "img": [
@@ -3993,33 +4051,33 @@
     "It eats plants.",
     "It is a furry grey tree-dweller from Australia.",
     "The answer is one word of 5 letters.",
-    "It starts with the letter K."
+    "Its first letter is K."
    ],
    "media": {
     "img": [
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/446727684/medium.jpeg",
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/4/49/Koala_climbing_tree.jpg/500px-Koala_climbing_tree.jpg",
       "w": 500,
-      "h": 333,
-      "credit": "jirau",
+      "h": 492,
+      "credit": "Diliff",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Koala_climbing_tree.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/a/ad/Australia_Cairns_Koala.jpg/500px-Australia_Cairns_Koala.jpg",
+      "w": 500,
+      "h": 624,
+      "credit": "Guillaume Blanchard at French Wikipedia",
+      "license": "CC BY-SA 1.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Australia_Cairns_Koala.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/c/ce/Koala_%28Phascolarctos_cinereus%29_%283%29.jpg/330px-Koala_%28Phascolarctos_cinereus%29_%283%29.jpg",
+      "w": 330,
+      "h": 495,
+      "credit": "Gzen92",
       "license": "CC BY-SA 4.0",
-      "page": "https://www.inaturalist.org/photos/446727684"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/334142508/medium.jpg",
-      "w": 500,
-      "h": 481,
-      "credit": "no rights reserved",
-      "license": "CC0 1.0",
-      "page": "https://www.inaturalist.org/photos/334142508"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/363964034/medium.jpg",
-      "w": 500,
-      "h": 333,
-      "credit": "Ged Tranter",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/363964034"
+      "page": "https://commons.wikimedia.org/wiki/File:Koala_(Phascolarctos_cinereus)_(3).jpg"
      }
     ]
    },
@@ -4055,10 +4113,26 @@
     "It is a stocky Australian marsupial.",
     "It does cube-shaped poo.",
     "The answer has 2 words (6, 6 letters).",
-    "It starts with the letter C."
+    "Its first letter is C."
    ],
    "media": {
     "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/18/Vombatus_ursinus_-Maria_Island_National_Park.jpg/500px-Vombatus_ursinus_-Maria_Island_National_Park.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "JJ Harrison (jjharrison89@facebook.com)",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Vombatus_ursinus_-Maria_Island_National_Park.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/8/87/Wombat_at_Lone_Pine.jpg/500px-Wombat_at_Lone_Pine.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "rob & juels",
+      "license": "CC BY-SA 2.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Wombat_at_Lone_Pine.jpg"
+     },
      {
       "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/87611575/medium.jpeg",
       "w": 500,
@@ -4066,22 +4140,6 @@
       "credit": "Nathan Ruser",
       "license": "CC BY 4.0",
       "page": "https://www.inaturalist.org/photos/87611575"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/602132755/medium.jpg",
-      "w": 500,
-      "h": 333,
-      "credit": "Ryan van Huyssteen",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/602132755"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/348925020/medium.jpeg",
-      "w": 376,
-      "h": 500,
-      "credit": "David Thompson",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/348925020"
      }
     ]
    },
@@ -4090,6 +4148,7 @@
   {
    "id": "tasmanian-devil",
    "name": "Tasmanian devil",
+   "lname": "Tasmanian devil",
    "sci": "Sarcophilus harrisii",
    "group": "marsupial",
    "facts": {
@@ -4110,10 +4169,18 @@
     "It is black with a white chest band.",
     "It lives only on an island state of Australia.",
     "The answer has 2 words (9, 5 letters).",
-    "It starts with the letter T."
+    "Its first letter is T."
    ],
    "media": {
     "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/4/43/Sarcophilus_harrisii_taranna.jpg/500px-Sarcophilus_harrisii_taranna.jpg",
+      "w": 500,
+      "h": 326,
+      "credit": "JJ Harrison (https://www.jjharrison.com.au/)",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Sarcophilus_harrisii_taranna.jpg"
+     },
      {
       "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/262038394/medium.jpg",
       "w": 500,
@@ -4129,14 +4196,6 @@
       "credit": "Ramit Singal",
       "license": "CC BY 4.0",
       "page": "https://www.inaturalist.org/photos/662658737"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/114229625/medium.jpg",
-      "w": 375,
-      "h": 500,
-      "credit": "Ramit Singal",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/114229625"
      }
     ]
    },
@@ -4172,17 +4231,17 @@
     "It eats meat.",
     "It is a mammal that lays eggs.",
     "The answer is one word of 8 letters.",
-    "It starts with the letter P."
+    "Its first letter is P."
    ],
    "media": {
     "img": [
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/178746516/medium.jpeg",
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/1a/Duck-billed_platypus_%28Ornithorhynchus_anatinus%29_Scottsdale.jpg/500px-Duck-billed_platypus_%28Ornithorhynchus_anatinus%29_Scottsdale.jpg",
       "w": 500,
-      "h": 334,
-      "credit": "no rights reserved",
-      "license": "CC0 1.0",
-      "page": "https://www.inaturalist.org/photos/178746516"
+      "h": 333,
+      "credit": "Charles J. Sharp",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Duck-billed_platypus_(Ornithorhynchus_anatinus)_Scottsdale.jpg"
      },
      {
       "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/159363965/medium.jpeg",
@@ -4236,7 +4295,7 @@
     "It eats mostly insects.",
     "It lays eggs.",
     "The answer has 3 words (5, 6, 7 letters).",
-    "It starts with the letter S."
+    "Its first letter is S."
    ],
    "media": {
     "img": [
@@ -4292,17 +4351,25 @@
     "It lives on Rottnest Island.",
     "It looks as if it is smiling.",
     "The answer is one word of 6 letters.",
-    "It starts with the letter Q."
+    "Its first letter is Q."
    ],
    "media": {
     "img": [
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/458962044/medium.jpg",
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/a/a0/Rottnest_Quokka_2004_SeanMcClean.jpg/500px-Rottnest_Quokka_2004_SeanMcClean.jpg",
       "w": 500,
-      "h": 461,
-      "credit": "Caleb Catto",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/458962044"
+      "h": 459,
+      "credit": "en:User:SeanMack",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Rottnest_Quokka_2004_SeanMcClean.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/3/3b/Setonix_brachyurus_on_Rottnest_Island_1.jpg/330px-Setonix_brachyurus_on_Rottnest_Island_1.jpg",
+      "w": 330,
+      "h": 457,
+      "credit": "Christophe95",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Setonix_brachyurus_on_Rottnest_Island_1.jpg"
      },
      {
       "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/16496002/medium.jpeg",
@@ -4311,14 +4378,6 @@
       "credit": "Philipp Pavelka",
       "license": "CC BY 4.0",
       "page": "https://www.inaturalist.org/photos/16496002"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/32082082/medium.jpeg",
-      "w": 500,
-      "h": 333,
-      "credit": "Thomas Mesaglio",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/32082082"
      }
     ]
    },
@@ -4347,7 +4406,7 @@
     "It eats both plants and animals.",
     "It has a flap of skin like a cape between its legs.",
     "The answer has 2 words (5, 6 letters).",
-    "It starts with the letter S."
+    "Its first letter is S."
    ],
    "media": {
     "img": [
@@ -4406,7 +4465,7 @@
     "It has white stripes across its back.",
     "Its name starts with a word for having no feeling.",
     "The answer is one word of 6 letters.",
-    "It starts with the letter N."
+    "Its first letter is N."
    ],
    "media": {
     "img": [
@@ -4465,7 +4524,7 @@
     "Chocolate ones are sold at Easter in Australia.",
     "It has long ears like a rabbit.",
     "The answer has 2 words (7, 5 letters).",
-    "It starts with the letter G."
+    "Its first letter is G."
    ],
    "media": {
     "img": [
@@ -4523,33 +4582,33 @@
     "It is usually sandy-ginger.",
     "It is Australia's wild dog.",
     "The answer is one word of 5 letters.",
-    "It starts with the letter D."
+    "Its first letter is D."
    ],
    "media": {
     "img": [
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/87498061/medium.jpg",
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/b/b0/Dingo_Side.JPG/500px-Dingo_Side.JPG",
       "w": 500,
-      "h": 333,
-      "credit": "dhfischer",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/87498061"
+      "h": 391,
+      "credit": "Quartl",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Dingo_Side.JPG"
      },
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/52746014/medium.jpg",
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/c/ca/Nullarbor_Dingo.jpg/500px-Nullarbor_Dingo.jpg",
       "w": 500,
-      "h": 359,
-      "credit": "Graham Winterflood",
+      "h": 332,
+      "credit": "Henry Whitehead",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Nullarbor_Dingo.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/8/85/Dingo_%28Canis_lupus_dingo%29_Kakadu_2.jpg/500px-Dingo_%28Canis_lupus_dingo%29_Kakadu_2.jpg",
+      "w": 500,
+      "h": 441,
+      "credit": "Charles J. Sharp",
       "license": "CC BY-SA 4.0",
-      "page": "https://www.inaturalist.org/photos/52746014"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/4565267/medium.jpg",
-      "w": 500,
-      "h": 359,
-      "credit": "Nathan Odgers",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/4565267"
+      "page": "https://commons.wikimedia.org/wiki/File:Dingo_(Canis_lupus_dingo)_Kakadu_2.jpg"
      }
     ]
    },
@@ -4582,7 +4641,7 @@
     "It lives in Australia.",
     "It eats plants.",
     "The answer has 4 words (4, 6, 6, 3 letters).",
-    "It starts with the letter G."
+    "Its first letter is G."
    ],
    "media": {
     "img": [
@@ -4617,6 +4676,7 @@
   {
    "id": "chinese-pangolin",
    "name": "Chinese pangolin",
+   "lname": "Chinese pangolin",
    "alt": [
     "pangolin"
    ],
@@ -4641,7 +4701,7 @@
     "It rolls into a ball when scared.",
     "It is the only mammal covered in scales.",
     "The answer has 2 words (7, 8 letters).",
-    "It starts with the letter C."
+    "Its first letter is C."
    ],
    "media": {
     "img": [
@@ -4697,7 +4757,7 @@
     "It lives underground in East Africa.",
     "It is wrinkly and nearly hairless.",
     "The answer has 3 words (5, 4, 3 letters).",
-    "It starts with the letter N."
+    "Its first letter is N."
    ],
    "media": {
     "img": [
@@ -4756,7 +4816,7 @@
     "It is a large rodent.",
     "It is covered in long sharp spines.",
     "The answer has 2 words (7, 9 letters).",
-    "It starts with the letter C."
+    "Its first letter is C."
    ],
    "media": {
     "img": [
@@ -4816,10 +4876,26 @@
     "Its hump stores fat.",
     "It has one hump.",
     "The answer is one word of 9 letters.",
-    "It starts with the letter D."
+    "Its first letter is D."
    ],
    "media": {
     "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/9/9e/Camelcalf-feeding.jpg/500px-Camelcalf-feeding.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Garrondo",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Camelcalf-feeding.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/c/c4/Camelus_dromedarius_in_Nuweiba.jpg/500px-Camelus_dromedarius_in_Nuweiba.jpg",
+      "w": 500,
+      "h": 335,
+      "credit": "Florian Prischl",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Camelus_dromedarius_in_Nuweiba.jpg"
+     },
      {
       "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/86281945/medium.jpg",
       "w": 500,
@@ -4827,22 +4903,6 @@
       "credit": "Clément Bardot",
       "license": "CC BY-SA 4.0",
       "page": "https://www.inaturalist.org/photos/86281945"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/77861714/medium.jpeg",
-      "w": 500,
-      "h": 333,
-      "credit": "Richard Fuller",
-      "license": "CC0 1.0",
-      "page": "https://www.inaturalist.org/photos/77861714"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/90920852/medium.jpg",
-      "w": 500,
-      "h": 375,
-      "credit": "Norbert Nagel, Mörfelden-Walldorf, Germany",
-      "license": "CC BY-SA 4.0",
-      "page": "https://www.inaturalist.org/photos/90920852"
      }
     ]
    },

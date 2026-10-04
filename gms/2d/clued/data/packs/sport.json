@@ -2866,7 +2866,7 @@
     "Manchester United",
     "Arsenal"
    ],
-   "explain": "Everton's stadium is less than a mile away.",
+   "explain": "Liverpool have played at Anfield since the club was founded in 1892.",
    "difficulty": 2,
    "tags": [
     "sport"
@@ -2874,9 +2874,9 @@
    "topic": "football"
   },
   {
-   "id": "spt-football-be6c6f",
+   "id": "spt-football-e46c63",
    "kind": "mc",
-   "prompt": "Which club plays home games at the Camp Nou?",
+   "prompt": "The Camp Nou is the home stadium of which club?",
    "answer": "FC Barcelona",
    "wrong": [
     "Real Madrid",
@@ -2982,7 +2982,7 @@
    "answer": 23,
    "unit": "titles",
    "tolerance": 0,
-   "explain": "That's the most of any player in the Open Era.",
+   "explain": "That's the most by any woman in the Open Era.",
    "difficulty": 2,
    "tags": [
     "sport"
@@ -3334,7 +3334,7 @@
     "Troon",
     "Carnoustie"
    ],
-   "explain": "Golf has been played there since the 1400s.",
+   "explain": "Its Old Course is one of the oldest golf courses in the world.",
    "difficulty": 2,
    "tags": [
     "sport"
@@ -3471,6 +3471,207 @@
     "5"
    ],
    "explain": "The Kentucky Derby, the Preakness Stakes and the Belmont Stakes.",
+   "difficulty": 3,
+   "tags": [
+    "sport"
+   ],
+   "topic": "rules"
+  },
+  {
+   "id": "spt-rules-eb7936",
+   "kind": "number",
+   "prompt": "How many players are on each side in beach volleyball?",
+   "answer": 2,
+   "unit": "players",
+   "tolerance": 0,
+   "explain": "Beach volleyball is played in pairs.",
+   "difficulty": 2,
+   "tags": [
+    "sport"
+   ],
+   "topic": "rules"
+  },
+  {
+   "id": "spt-rules-2eb04a",
+   "kind": "mc",
+   "prompt": "In which sport might you score a 'hole in one'?",
+   "answer": "Golf",
+   "wrong": [
+    "Tennis",
+    "Bowling",
+    "Snooker"
+   ],
+   "explain": "A hole in one means getting the ball in the hole with your first shot.",
+   "difficulty": 1,
+   "tags": [
+    "sport"
+   ],
+   "topic": "rules"
+  },
+  {
+   "id": "spt-rules-a2f749",
+   "kind": "number",
+   "prompt": "How many hurdles are there in a 110 m hurdles race?",
+   "answer": 10,
+   "unit": "hurdles",
+   "tolerance": 0,
+   "explain": "Runners clear ten hurdles in the 110 m and 400 m hurdles.",
+   "difficulty": 3,
+   "tags": [
+    "sport"
+   ],
+   "topic": "rules"
+  },
+  {
+   "id": "spt-rules-e0a038",
+   "kind": "number",
+   "prompt": "How long is one lap of a standard outdoor running track?",
+   "answer": 400,
+   "unit": "m",
+   "tolerance": 0,
+   "explain": "Measured around the inside lane.",
+   "difficulty": 1,
+   "tags": [
+    "sport"
+   ],
+   "topic": "rules"
+  },
+  {
+   "id": "spt-rules-ae4fdb",
+   "kind": "mc",
+   "prompt": "In which sport would you see a 'slam dunk'?",
+   "answer": "Basketball",
+   "wrong": [
+    "Volleyball",
+    "Tennis",
+    "Handball"
+   ],
+   "explain": "A player jumps and pushes the ball down through the hoop.",
+   "difficulty": 1,
+   "tags": [
+    "sport"
+   ],
+   "topic": "rules"
+  },
+  {
+   "id": "spt-rules-cda0c1",
+   "kind": "mc",
+   "prompt": "Which sport is played at Lord's in London?",
+   "answer": "Cricket",
+   "wrong": [
+    "Tennis",
+    "Rugby",
+    "Football"
+   ],
+   "explain": "Lord's is known as the 'home of cricket'.",
+   "difficulty": 2,
+   "tags": [
+    "sport"
+   ],
+   "topic": "rules"
+  },
+  {
+   "id": "spt-olympics-03b707",
+   "kind": "mc",
+   "prompt": "How is the Olympic flame lit at Olympia in Greece?",
+   "answer": "With the Sun's rays and a curved mirror",
+   "wrong": [
+    "By a lightning strike",
+    "With a match struck by the IOC president",
+    "From a lamp kept burning since ancient times"
+   ],
+   "explain": "A curved mirror focuses sunlight to light the torch.",
+   "difficulty": 2,
+   "tags": [
+    "sport"
+   ],
+   "topic": "olympics"
+  },
+  {
+   "id": "spt-olympics-e45357",
+   "kind": "mc",
+   "prompt": "How often are the Summer Olympic Games normally held?",
+   "answer": "Every four years",
+   "wrong": [
+    "Every two years",
+    "Every year",
+    "Every five years"
+   ],
+   "explain": "The Winter Games are also every four years, two years apart from the Summer Games.",
+   "difficulty": 1,
+   "tags": [
+    "sport"
+   ],
+   "topic": "olympics"
+  },
+  {
+   "id": "spt-olympics-18f997",
+   "kind": "tf",
+   "prompt": "The Summer and Winter Olympics were held in the same year until 1992.",
+   "answer": true,
+   "explain": "From Lillehammer 1994, the Winter Games moved two years apart from the Summer Games.",
+   "difficulty": 3,
+   "tags": [
+    "sport"
+   ],
+   "topic": "olympics"
+  },
+  {
+   "id": "spt-football-80dc47",
+   "kind": "number",
+   "prompt": "How many penalties does each team take in a football shoot-out before it goes to sudden death?",
+   "answer": 5,
+   "unit": "penalties",
+   "tolerance": 0,
+   "explain": "If it is still level after five each, the teams take one each until one misses.",
+   "difficulty": 2,
+   "tags": [
+    "sport"
+   ],
+   "topic": "football"
+  },
+  {
+   "id": "spt-rules-fe9883",
+   "kind": "number",
+   "prompt": "How many players are on the field for each team in Gaelic football?",
+   "answer": 15,
+   "unit": "players",
+   "tolerance": 0,
+   "explain": "Gaelic football is played 15-a-side, mainly in Ireland.",
+   "difficulty": 3,
+   "tags": [
+    "sport"
+   ],
+   "topic": "rules"
+  },
+  {
+   "id": "spt-rules-de9102",
+   "kind": "mc",
+   "prompt": "Which martial art's name means 'the gentle way'?",
+   "answer": "Judo",
+   "wrong": [
+    "Karate",
+    "Aikido",
+    "Kung fu"
+   ],
+   "explain": "Karate means 'empty hand'.",
+   "difficulty": 3,
+   "tags": [
+    "sport"
+   ],
+   "topic": "rules"
+  },
+  {
+   "id": "spt-rules-e0ec9d",
+   "kind": "mc",
+   "prompt": "How high is a tennis net at the centre?",
+   "answer": "3 feet (0.91 m)",
+   "wrong": [
+    "4 feet (1.22 m)",
+    "2 feet (0.61 m)",
+    "3.5 feet (1.07 m)"
+   ],
+   "explain": "The net is 3 feet high in the middle and 3.5 feet at the posts.",
    "difficulty": 3,
    "tags": [
     "sport"

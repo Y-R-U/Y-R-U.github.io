@@ -17,6 +17,8 @@ const SHOTS = args.includes('--shots') ? args[args.indexOf('--shots') + 1] : joi
 const POLL = args.includes('--poll');
 mkdirSync(SHOTS, { recursive: true });
 
+const HARD_TIMEOUT = setTimeout(() => { console.log('FATAL: whole run exceeded 8 min'); process.exit(1); }, 8 * 60 * 1000);
+HARD_TIMEOUT.unref();
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 let pass = 0, fail = 0;
 const ok = (c, msg, extra = '') => { if (c) { pass++; console.log(`  ok   ${msg}`); } else { fail++; console.log(`  FAIL ${msg} ${extra}`); } };
@@ -46,7 +48,10 @@ class Page {
   send(method, params = {}) {
     const id = ++this.id;
     this.ws.send(JSON.stringify({ id, method, params }));
-    return new Promise((res, rej) => this.cbs.set(id, { res, rej }));
+    return new Promise((res, rej) => {
+      const t = setTimeout(() => { this.cbs.delete(id); rej(new Error(`${this.name}: CDP ${method} timed out`)); }, 20000);
+      this.cbs.set(id, { res: v => { clearTimeout(t); res(v); }, rej: e => { clearTimeout(t); rej(e); } });
+    });
   }
   size(w, h, dpr = 1, mobile = false) { return this.send('Emulation.setDeviceMetricsOverride', { width: w, height: h, deviceScaleFactor: dpr, mobile }); }
   async eval(expr) {
@@ -73,8 +78,10 @@ class Page {
     await this.send('Input.insertText', { text });
   }
   async shot(file) {
-    const r = await this.send('Page.captureScreenshot', { format: 'png' });
-    writeFileSync(join(SHOTS, file), Buffer.from(r.data, 'base64'));
+    try {
+      const r = await this.send('Page.captureScreenshot', { format: 'png' });
+      writeFileSync(join(SHOTS, file), Buffer.from(r.data, 'base64'));
+    } catch (e) { console.log(`  (screenshot ${file} skipped: ${e.message})`); }
   }
   room() { return this.eval('window.__cluedRoom ? JSON.parse(JSON.stringify(window.__cluedRoom.st)) : null'); }
 }

@@ -1,0 +1,2208 @@
+{
+ "id": "words",
+ "title": "Word origins",
+ "theme": "books",
+ "icon": "🔤",
+ "kids": false,
+ "version": 1,
+ "notice": "Origins are checked against Wiktionary etymologies; many words passed through other languages on the way to English.",
+ "factsMeta": {
+  "origin": {
+   "type": "cat",
+   "label": "Comes from",
+   "ask": "The English word “{name}” comes from which language?",
+   "askReverse": "Which of these English words comes from {value}?",
+   "stmt": "The English word “{name}” comes from {value}."
+  },
+  "namedAfter": {
+   "type": "text",
+   "label": "Named after"
+  },
+  "kind": {
+   "type": "cat",
+   "label": "Kind of word",
+   "exclusive": false
+  }
+ },
+ "items": [
+  {
+   "id": "robot",
+   "name": "robot",
+   "group": "loanword",
+   "facts": {
+    "origin": "Czech",
+    "kind": "Borrowed from another language"
+   },
+   "blurb": "“robot” comes from Czech. From robota, \"forced labour\"; first used in Karel Čapek's 1920 play R.U.R..",
+   "difficulty": 2
+  },
+  {
+   "id": "shampoo",
+   "name": "shampoo",
+   "group": "loanword",
+   "facts": {
+    "origin": "Hindi",
+    "kind": "Borrowed from another language"
+   },
+   "blurb": "“shampoo” comes from Hindi. From a word meaning \"to press\" or \"massage\".",
+   "difficulty": 2
+  },
+  {
+   "id": "pyjamas",
+   "name": "pyjamas",
+   "group": "loanword",
+   "facts": {
+    "origin": "Hindi and Urdu",
+    "kind": "Borrowed from another language"
+   },
+   "blurb": "“pyjamas” comes from Hindi and Urdu. From words meaning \"leg garment\".",
+   "difficulty": 2
+  },
+  {
+   "id": "bungalow",
+   "name": "bungalow",
+   "group": "loanword",
+   "facts": {
+    "origin": "Hindi",
+    "kind": "Borrowed from another language"
+   },
+   "blurb": "“bungalow” comes from Hindi. Originally \"a house in the Bengal style\".",
+   "difficulty": 2
+  },
+  {
+   "id": "jungle",
+   "name": "jungle",
+   "group": "loanword",
+   "facts": {
+    "origin": "Hindi",
+    "kind": "Borrowed from another language"
+   },
+   "blurb": "“jungle” comes from Hindi. From a word for wild, uncultivated land.",
+   "difficulty": 2
+  },
+  {
+   "id": "kindergarten",
+   "name": "kindergarten",
+   "group": "loanword",
+   "facts": {
+    "origin": "German",
+    "kind": "Borrowed from another language"
+   },
+   "blurb": "“kindergarten” comes from German. \"Children's garden\".",
+   "difficulty": 1
+  },
+  {
+   "id": "hamburger",
+   "name": "hamburger",
+   "group": "loanword",
+   "facts": {
+    "origin": "German",
+    "kind": "Borrowed from another language"
+   },
+   "blurb": "“hamburger” comes from German. Named after the city of Hamburg.",
+   "difficulty": 1
+  },
+  {
+   "id": "tsunami",
+   "name": "tsunami",
+   "group": "loanword",
+   "facts": {
+    "origin": "Japanese",
+    "kind": "Borrowed from another language"
+   },
+   "blurb": "“tsunami” comes from Japanese. \"Harbour wave\".",
+   "difficulty": 1
+  },
+  {
+   "id": "karaoke",
+   "name": "karaoke",
+   "group": "loanword",
+   "facts": {
+    "origin": "Japanese",
+    "kind": "Borrowed from another language"
+   },
+   "blurb": "“karaoke” comes from Japanese. \"Empty orchestra\".",
+   "difficulty": 2
+  },
+  {
+   "id": "emoji",
+   "name": "emoji",
+   "group": "loanword",
+   "facts": {
+    "origin": "Japanese",
+    "kind": "Borrowed from another language"
+   },
+   "blurb": "“emoji” comes from Japanese. \"Picture\" plus \"character\"; the likeness to \"emotion\" is a coincidence.",
+   "difficulty": 2
+  },
+  {
+   "id": "tycoon",
+   "name": "tycoon",
+   "group": "loanword",
+   "facts": {
+    "origin": "Japanese",
+    "kind": "Borrowed from another language"
+   },
+   "blurb": "“tycoon” comes from Japanese. From a title meaning \"great lord\".",
+   "difficulty": 3
+  },
+  {
+   "id": "kayak",
+   "name": "kayak",
+   "group": "loanword",
+   "facts": {
+    "origin": "Inuit",
+    "kind": "Borrowed from another language"
+   },
+   "blurb": "“kayak” comes from Inuit. An Inuit word for a one-person hunting boat.",
+   "difficulty": 1
+  },
+  {
+   "id": "igloo",
+   "name": "igloo",
+   "group": "loanword",
+   "facts": {
+    "origin": "Inuit",
+    "kind": "Borrowed from another language"
+   },
+   "blurb": "“igloo” comes from Inuit. An Inuit word for \"house\".",
+   "difficulty": 1
+  },
+  {
+   "id": "tomato",
+   "name": "tomato",
+   "group": "loanword",
+   "facts": {
+    "origin": "Nahuatl",
+    "kind": "Borrowed from another language"
+   },
+   "blurb": "“tomato” comes from Nahuatl. From tomatl, via Spanish.",
+   "difficulty": 1
+  },
+  {
+   "id": "chocolate",
+   "name": "chocolate",
+   "group": "loanword",
+   "facts": {
+    "origin": "Nahuatl",
+    "kind": "Borrowed from another language"
+   },
+   "blurb": "“chocolate” comes from Nahuatl. From a Nahuatl word, via Spanish.",
+   "difficulty": 1
+  },
+  {
+   "id": "avocado",
+   "name": "avocado",
+   "group": "loanword",
+   "facts": {
+    "origin": "Nahuatl",
+    "kind": "Borrowed from another language"
+   },
+   "blurb": "“avocado” comes from Nahuatl. From āhuacatl, via Spanish.",
+   "difficulty": 3
+  },
+  {
+   "id": "algebra",
+   "name": "algebra",
+   "group": "loanword",
+   "facts": {
+    "origin": "Arabic",
+    "kind": "Borrowed from another language"
+   },
+   "blurb": "“algebra” comes from Arabic. From al-jabr, \"the reunion of broken parts\".",
+   "difficulty": 2
+  },
+  {
+   "id": "alcohol",
+   "name": "alcohol",
+   "group": "loanword",
+   "facts": {
+    "origin": "Arabic",
+    "kind": "Borrowed from another language"
+   },
+   "blurb": "“alcohol” comes from Arabic. From al-kuḥl, a fine powder used as eyeliner.",
+   "difficulty": 2
+  },
+  {
+   "id": "coffee",
+   "name": "coffee",
+   "group": "loanword",
+   "facts": {
+    "origin": "Arabic",
+    "kind": "Borrowed from another language"
+   },
+   "blurb": "“coffee” comes from Arabic. From qahwa, via Turkish and Italian.",
+   "difficulty": 2
+  },
+  {
+   "id": "magazine",
+   "name": "magazine",
+   "group": "loanword",
+   "facts": {
+    "origin": "Arabic",
+    "kind": "Borrowed from another language"
+   },
+   "blurb": "“magazine” comes from Arabic. From a word for \"storehouses\".",
+   "difficulty": 3
+  },
+  {
+   "id": "zero",
+   "name": "zero",
+   "group": "loanword",
+   "facts": {
+    "origin": "Arabic",
+    "kind": "Borrowed from another language"
+   },
+   "blurb": "“zero” comes from Arabic. From ṣifr, \"empty\", via Italian.",
+   "difficulty": 3
+  },
+  {
+   "id": "giraffe",
+   "name": "giraffe",
+   "group": "loanword",
+   "facts": {
+    "origin": "Arabic",
+    "kind": "Borrowed from another language"
+   },
+   "blurb": "“giraffe” comes from Arabic. From zarāfa, via Italian.",
+   "difficulty": 3
+  },
+  {
+   "id": "admiral",
+   "name": "admiral",
+   "group": "loanword",
+   "facts": {
+    "origin": "Arabic",
+    "kind": "Borrowed from another language"
+   },
+   "blurb": "“admiral” comes from Arabic. From amīr, \"commander\".",
+   "difficulty": 3
+  },
+  {
+   "id": "yoghurt",
+   "name": "yoghurt",
+   "group": "loanword",
+   "facts": {
+    "origin": "Turkish",
+    "kind": "Borrowed from another language"
+   },
+   "blurb": "“yoghurt” comes from Turkish. From a Turkish word for the fermented milk.",
+   "difficulty": 2
+  },
+  {
+   "id": "tulip",
+   "name": "tulip",
+   "group": "loanword",
+   "facts": {
+    "origin": "Turkish",
+    "kind": "Borrowed from another language"
+   },
+   "blurb": "“tulip” comes from Turkish. From a word for \"turban\", which the flower was thought to resemble.",
+   "difficulty": 3
+  },
+  {
+   "id": "bazaar",
+   "name": "bazaar",
+   "group": "loanword",
+   "facts": {
+    "origin": "Persian",
+    "kind": "Borrowed from another language"
+   },
+   "blurb": "“bazaar” comes from Persian. \"Market\".",
+   "difficulty": 2
+  },
+  {
+   "id": "caravan",
+   "name": "caravan",
+   "group": "loanword",
+   "facts": {
+    "origin": "Persian",
+    "kind": "Borrowed from another language"
+   },
+   "blurb": "“caravan” comes from Persian. \"Group of travellers\".",
+   "difficulty": 3
+  },
+  {
+   "id": "umbrella",
+   "name": "umbrella",
+   "group": "loanword",
+   "facts": {
+    "origin": "Italian",
+    "kind": "Borrowed from another language"
+   },
+   "blurb": "“umbrella” comes from Italian. \"Little shade\".",
+   "difficulty": 2
+  },
+  {
+   "id": "piano",
+   "name": "piano",
+   "group": "loanword",
+   "facts": {
+    "origin": "Italian",
+    "kind": "Borrowed from another language"
+   },
+   "blurb": "“piano” comes from Italian. Short for pianoforte, \"soft-loud\".",
+   "difficulty": 1
+  },
+  {
+   "id": "volcano",
+   "name": "volcano",
+   "group": "loanword",
+   "facts": {
+    "origin": "Italian",
+    "kind": "Borrowed from another language"
+   },
+   "blurb": "“volcano” comes from Italian. From Vulcano, an island named after Vulcan, the Roman god of fire.",
+   "difficulty": 2
+  },
+  {
+   "id": "balcony",
+   "name": "balcony",
+   "group": "loanword",
+   "facts": {
+    "origin": "Italian",
+    "kind": "Borrowed from another language"
+   },
+   "blurb": "“balcony” comes from Italian. From balcone.",
+   "difficulty": 3
+  },
+  {
+   "id": "ballot",
+   "name": "ballot",
+   "group": "loanword",
+   "facts": {
+    "origin": "Italian",
+    "kind": "Borrowed from another language"
+   },
+   "blurb": "“ballot” comes from Italian. From ballotta, \"little ball\", once used to vote.",
+   "difficulty": 3
+  },
+  {
+   "id": "croissant",
+   "name": "croissant",
+   "group": "loanword",
+   "facts": {
+    "origin": "French",
+    "kind": "Borrowed from another language"
+   },
+   "blurb": "“croissant” comes from French. \"Crescent\".",
+   "difficulty": 1
+  },
+  {
+   "id": "restaurant",
+   "name": "restaurant",
+   "group": "loanword",
+   "facts": {
+    "origin": "French",
+    "kind": "Borrowed from another language"
+   },
+   "blurb": "“restaurant” comes from French. \"Restoring\", from food that restores your strength.",
+   "difficulty": 2
+  },
+  {
+   "id": "mosquito",
+   "name": "mosquito",
+   "group": "loanword",
+   "facts": {
+    "origin": "Spanish",
+    "kind": "Borrowed from another language"
+   },
+   "blurb": "“mosquito” comes from Spanish. \"Little fly\".",
+   "difficulty": 2
+  },
+  {
+   "id": "alligator",
+   "name": "alligator",
+   "group": "loanword",
+   "facts": {
+    "origin": "Spanish",
+    "kind": "Borrowed from another language"
+   },
+   "blurb": "“alligator” comes from Spanish. From el lagarto, \"the lizard\".",
+   "difficulty": 2
+  },
+  {
+   "id": "hurricane",
+   "name": "hurricane",
+   "group": "loanword",
+   "facts": {
+    "origin": "Taíno",
+    "kind": "Borrowed from another language"
+   },
+   "blurb": "“hurricane” comes from Taíno. From a Caribbean word, via Spanish.",
+   "difficulty": 3
+  },
+  {
+   "id": "barbecue",
+   "name": "barbecue",
+   "group": "loanword",
+   "facts": {
+    "origin": "Taíno",
+    "kind": "Borrowed from another language"
+   },
+   "blurb": "“barbecue” comes from Taíno. From a word for a wooden frame, via Spanish.",
+   "difficulty": 3
+  },
+  {
+   "id": "cookie",
+   "name": "cookie",
+   "group": "loanword",
+   "facts": {
+    "origin": "Dutch",
+    "kind": "Borrowed from another language"
+   },
+   "blurb": "“cookie” comes from Dutch. From koekje, \"little cake\".",
+   "difficulty": 1
+  },
+  {
+   "id": "yacht",
+   "name": "yacht",
+   "group": "loanword",
+   "facts": {
+    "origin": "Dutch",
+    "kind": "Borrowed from another language"
+   },
+   "blurb": "“yacht” comes from Dutch. From jacht, a fast pursuit ship.",
+   "difficulty": 3
+  },
+  {
+   "id": "boss",
+   "name": "boss",
+   "group": "loanword",
+   "facts": {
+    "origin": "Dutch",
+    "kind": "Borrowed from another language"
+   },
+   "blurb": "“boss” comes from Dutch. From baas, \"master\".",
+   "difficulty": 3
+  },
+  {
+   "id": "sauna",
+   "name": "sauna",
+   "group": "loanword",
+   "facts": {
+    "origin": "Finnish",
+    "kind": "Borrowed from another language"
+   },
+   "blurb": "“sauna” comes from Finnish. A Finnish steam bath.",
+   "difficulty": 1
+  },
+  {
+   "id": "ski",
+   "name": "ski",
+   "group": "loanword",
+   "facts": {
+    "origin": "Norwegian",
+    "kind": "Borrowed from another language"
+   },
+   "blurb": "“ski” comes from Norwegian. From an Old Norse word for a split piece of wood.",
+   "difficulty": 1
+  },
+  {
+   "id": "slalom",
+   "name": "slalom",
+   "group": "loanword",
+   "facts": {
+    "origin": "Norwegian",
+    "kind": "Borrowed from another language"
+   },
+   "blurb": "“slalom” comes from Norwegian. \"Sloping track\".",
+   "difficulty": 2
+  },
+  {
+   "id": "berserk",
+   "name": "berserk",
+   "group": "loanword",
+   "facts": {
+    "origin": "Old Norse",
+    "kind": "Borrowed from another language"
+   },
+   "blurb": "“berserk” comes from Old Norse. Probably \"bear shirt\", for fierce warriors.",
+   "difficulty": 3
+  },
+  {
+   "id": "window",
+   "name": "window",
+   "group": "loanword",
+   "facts": {
+    "origin": "Old Norse",
+    "kind": "Borrowed from another language"
+   },
+   "blurb": "“window” comes from Old Norse. \"Wind eye\".",
+   "difficulty": 2
+  },
+  {
+   "id": "kangaroo",
+   "name": "kangaroo",
+   "group": "loanword",
+   "facts": {
+    "origin": "Guugu Yimithirr",
+    "kind": "Borrowed from another language"
+   },
+   "blurb": "“kangaroo” comes from Guugu Yimithirr. From an Aboriginal Australian language in Queensland.",
+   "difficulty": 2
+  },
+  {
+   "id": "koala",
+   "name": "koala",
+   "group": "loanword",
+   "facts": {
+    "origin": "Dharug",
+    "kind": "Borrowed from another language"
+   },
+   "blurb": "“koala” comes from Dharug. From an Aboriginal language of the Sydney area.",
+   "difficulty": 3
+  },
+  {
+   "id": "yoga",
+   "name": "yoga",
+   "group": "loanword",
+   "facts": {
+    "origin": "Sanskrit",
+    "kind": "Borrowed from another language"
+   },
+   "blurb": "“yoga” comes from Sanskrit. \"Union\" or \"yoking\".",
+   "difficulty": 1
+  },
+  {
+   "id": "guru",
+   "name": "guru",
+   "group": "loanword",
+   "facts": {
+    "origin": "Sanskrit",
+    "kind": "Borrowed from another language"
+   },
+   "blurb": "“guru” comes from Sanskrit. \"Venerable\" or \"heavy\".",
+   "difficulty": 2
+  },
+  {
+   "id": "avatar",
+   "name": "avatar",
+   "group": "loanword",
+   "facts": {
+    "origin": "Sanskrit",
+    "kind": "Borrowed from another language"
+   },
+   "blurb": "“avatar” comes from Sanskrit. \"Descent\", of a god to Earth.",
+   "difficulty": 3
+  },
+  {
+   "id": "thug",
+   "name": "thug",
+   "group": "loanword",
+   "facts": {
+    "origin": "Hindi",
+    "kind": "Borrowed from another language"
+   },
+   "blurb": "“thug” comes from Hindi. From ṭhag, \"thief\" or \"swindler\".",
+   "difficulty": 3
+  },
+  {
+   "id": "loot",
+   "name": "loot",
+   "group": "loanword",
+   "facts": {
+    "origin": "Hindi",
+    "kind": "Borrowed from another language"
+   },
+   "blurb": "“loot” comes from Hindi. From lūṭ, \"plunder\".",
+   "difficulty": 3
+  },
+  {
+   "id": "mammoth",
+   "name": "mammoth",
+   "group": "loanword",
+   "facts": {
+    "origin": "Russian",
+    "kind": "Borrowed from another language"
+   },
+   "blurb": "“mammoth” comes from Russian. From an old Russian word for the beast.",
+   "difficulty": 3
+  },
+  {
+   "id": "tea",
+   "name": "tea",
+   "group": "loanword",
+   "facts": {
+    "origin": "Chinese",
+    "kind": "Borrowed from another language"
+   },
+   "blurb": "“tea” comes from Chinese. From the Min Chinese word te.",
+   "difficulty": 2
+  },
+  {
+   "id": "sandwich",
+   "name": "sandwich",
+   "group": "eponym",
+   "facts": {
+    "namedAfter": "The Earl of Sandwich",
+    "kind": "Named after a person"
+   },
+   "blurb": "“sandwich” is named after the Earl of Sandwich. John Montagu, 4th Earl of Sandwich, is said to have eaten beef between bread so he could keep playing cards.",
+   "difficulty": 1
+  },
+  {
+   "id": "cardigan",
+   "name": "cardigan",
+   "group": "eponym",
+   "facts": {
+    "namedAfter": "The Earl of Cardigan",
+    "kind": "Named after a person"
+   },
+   "blurb": "“cardigan” is named after the Earl of Cardigan. The 7th Earl of Cardigan, who led the Charge of the Light Brigade.",
+   "difficulty": 2
+  },
+  {
+   "id": "boycott",
+   "name": "boycott",
+   "group": "eponym",
+   "facts": {
+    "namedAfter": "Charles Boycott",
+    "kind": "Named after a person"
+   },
+   "blurb": "“boycott” is named after Charles Boycott. An Irish land agent shunned by his community in 1880.",
+   "difficulty": 2
+  },
+  {
+   "id": "leotard",
+   "name": "leotard",
+   "group": "eponym",
+   "facts": {
+    "namedAfter": "Jules Léotard",
+    "kind": "Named after a person"
+   },
+   "blurb": "“leotard” is named after Jules Léotard. A French trapeze artist of the 1800s.",
+   "difficulty": 3
+  },
+  {
+   "id": "saxophone",
+   "name": "saxophone",
+   "group": "eponym",
+   "facts": {
+    "namedAfter": "Adolphe Sax",
+    "kind": "Named after a person"
+   },
+   "blurb": "“saxophone” is named after Adolphe Sax. A Belgian instrument maker who patented it in 1846.",
+   "difficulty": 2
+  },
+  {
+   "id": "braille",
+   "name": "braille",
+   "group": "eponym",
+   "facts": {
+    "namedAfter": "Louis Braille",
+    "kind": "Named after a person"
+   },
+   "blurb": "“braille” is named after Louis Braille. A Frenchman, blind from childhood, who invented the raised-dot alphabet.",
+   "difficulty": 1
+  },
+  {
+   "id": "diesel",
+   "name": "diesel",
+   "group": "eponym",
+   "facts": {
+    "namedAfter": "Rudolf Diesel",
+    "kind": "Named after a person"
+   },
+   "blurb": "“diesel” is named after Rudolf Diesel. The German engineer who invented the engine.",
+   "difficulty": 2
+  },
+  {
+   "id": "guillotine",
+   "name": "guillotine",
+   "group": "eponym",
+   "facts": {
+    "namedAfter": "Joseph-Ignace Guillotin",
+    "kind": "Named after a person"
+   },
+   "blurb": "“guillotine” is named after Joseph-Ignace Guillotin. A French doctor who proposed a quicker, more humane method of execution.",
+   "difficulty": 2
+  },
+  {
+   "id": "silhouette",
+   "name": "silhouette",
+   "group": "eponym",
+   "facts": {
+    "namedAfter": "Étienne de Silhouette",
+    "kind": "Named after a person"
+   },
+   "blurb": "“silhouette” is named after Étienne de Silhouette. A penny-pinching French finance minister of 1759.",
+   "difficulty": 3
+  },
+  {
+   "id": "teddy-bear",
+   "name": "teddy bear",
+   "group": "eponym",
+   "facts": {
+    "namedAfter": "Theodore Roosevelt",
+    "kind": "Named after a person"
+   },
+   "blurb": "“teddy bear” is named after Theodore Roosevelt. The US president who, the story goes, refused to shoot a captive bear.",
+   "difficulty": 1
+  },
+  {
+   "id": "nicotine",
+   "name": "nicotine",
+   "group": "eponym",
+   "facts": {
+    "namedAfter": "Jean Nicot",
+    "kind": "Named after a person"
+   },
+   "blurb": "“nicotine” is named after Jean Nicot. A French diplomat who sent tobacco to Paris in 1560.",
+   "difficulty": 3
+  },
+  {
+   "id": "watt",
+   "name": "watt",
+   "group": "eponym",
+   "facts": {
+    "namedAfter": "James Watt",
+    "kind": "Named after a person"
+   },
+   "blurb": "“watt” is named after James Watt. The Scottish inventor who improved the steam engine.",
+   "difficulty": 2
+  },
+  {
+   "id": "pasteurise",
+   "name": "pasteurise",
+   "group": "eponym",
+   "facts": {
+    "namedAfter": "Louis Pasteur",
+    "kind": "Named after a person"
+   },
+   "blurb": "“pasteurise” is named after Louis Pasteur. The French scientist who showed heating could kill germs in drinks.",
+   "difficulty": 2
+  },
+  {
+   "id": "volt",
+   "name": "volt",
+   "group": "eponym",
+   "facts": {
+    "namedAfter": "Alessandro Volta",
+    "kind": "Named after a person"
+   },
+   "blurb": "“volt” is named after Alessandro Volta. The Italian physicist who built the first battery.",
+   "difficulty": 3
+  },
+  {
+   "id": "shrapnel",
+   "name": "shrapnel",
+   "group": "eponym",
+   "facts": {
+    "namedAfter": "Henry Shrapnel",
+    "kind": "Named after a person"
+   },
+   "blurb": "“shrapnel” is named after Henry Shrapnel. A British army officer who invented an exploding shell.",
+   "difficulty": 3
+  }
+ ],
+ "questions": [
+  {
+   "id": "origin-robot",
+   "kind": "mc",
+   "prompt": "The English word “robot” comes from which language?",
+   "answer": "Czech",
+   "wrong": [
+    "German",
+    "Arabic",
+    "Old Norse"
+   ],
+   "explain": "“robot” comes from Czech. From robota, \"forced labour\"; first used in Karel Čapek's 1920 play R.U.R..",
+   "difficulty": 2,
+   "refs": [
+    "words/robot"
+   ]
+  },
+  {
+   "id": "origin-shampoo",
+   "kind": "mc",
+   "prompt": "The English word “shampoo” comes from which language?",
+   "answer": "Hindi",
+   "wrong": [
+    "Guugu Yimithirr",
+    "Nahuatl",
+    "Arabic"
+   ],
+   "explain": "“shampoo” comes from Hindi. From a word meaning \"to press\" or \"massage\".",
+   "difficulty": 2,
+   "refs": [
+    "words/shampoo"
+   ]
+  },
+  {
+   "id": "origin-pyjamas",
+   "kind": "mc",
+   "prompt": "The English word “pyjamas” comes from which language?",
+   "answer": "Hindi and Urdu",
+   "wrong": [
+    "Russian",
+    "Arabic",
+    "Norwegian"
+   ],
+   "explain": "“pyjamas” comes from Hindi and Urdu. From words meaning \"leg garment\".",
+   "difficulty": 2,
+   "refs": [
+    "words/pyjamas"
+   ]
+  },
+  {
+   "id": "origin-bungalow",
+   "kind": "mc",
+   "prompt": "The English word “bungalow” comes from which language?",
+   "answer": "Hindi",
+   "wrong": [
+    "Dharug",
+    "German",
+    "Nahuatl"
+   ],
+   "explain": "“bungalow” comes from Hindi. Originally \"a house in the Bengal style\".",
+   "difficulty": 2,
+   "refs": [
+    "words/bungalow"
+   ]
+  },
+  {
+   "id": "origin-jungle",
+   "kind": "mc",
+   "prompt": "The English word “jungle” comes from which language?",
+   "answer": "Hindi",
+   "wrong": [
+    "Old Norse",
+    "Dharug",
+    "Sanskrit"
+   ],
+   "explain": "“jungle” comes from Hindi. From a word for wild, uncultivated land.",
+   "difficulty": 2,
+   "refs": [
+    "words/jungle"
+   ]
+  },
+  {
+   "id": "origin-kindergarten",
+   "kind": "mc",
+   "prompt": "The English word “kindergarten” comes from which language?",
+   "answer": "German",
+   "wrong": [
+    "Italian",
+    "Guugu Yimithirr",
+    "Turkish"
+   ],
+   "explain": "“kindergarten” comes from German. \"Children's garden\".",
+   "difficulty": 1,
+   "refs": [
+    "words/kindergarten"
+   ]
+  },
+  {
+   "id": "origin-hamburger",
+   "kind": "mc",
+   "prompt": "The English word “hamburger” comes from which language?",
+   "answer": "German",
+   "wrong": [
+    "Japanese",
+    "Taíno",
+    "Italian"
+   ],
+   "explain": "“hamburger” comes from German. Named after the city of Hamburg.",
+   "difficulty": 1,
+   "refs": [
+    "words/hamburger"
+   ]
+  },
+  {
+   "id": "origin-tsunami",
+   "kind": "mc",
+   "prompt": "The English word “tsunami” comes from which language?",
+   "answer": "Japanese",
+   "wrong": [
+    "Arabic",
+    "Sanskrit",
+    "Persian"
+   ],
+   "explain": "“tsunami” comes from Japanese. \"Harbour wave\".",
+   "difficulty": 1,
+   "refs": [
+    "words/tsunami"
+   ]
+  },
+  {
+   "id": "origin-karaoke",
+   "kind": "mc",
+   "prompt": "The English word “karaoke” comes from which language?",
+   "answer": "Japanese",
+   "wrong": [
+    "Old Norse",
+    "Spanish",
+    "Finnish"
+   ],
+   "explain": "“karaoke” comes from Japanese. \"Empty orchestra\".",
+   "difficulty": 2,
+   "refs": [
+    "words/karaoke"
+   ]
+  },
+  {
+   "id": "origin-emoji",
+   "kind": "mc",
+   "prompt": "The English word “emoji” comes from which language?",
+   "answer": "Japanese",
+   "wrong": [
+    "Turkish",
+    "Persian",
+    "Inuit"
+   ],
+   "explain": "“emoji” comes from Japanese. \"Picture\" plus \"character\"; the likeness to \"emotion\" is a coincidence.",
+   "difficulty": 2,
+   "refs": [
+    "words/emoji"
+   ]
+  },
+  {
+   "id": "origin-tycoon",
+   "kind": "mc",
+   "prompt": "The English word “tycoon” comes from which language?",
+   "answer": "Japanese",
+   "wrong": [
+    "Inuit",
+    "Czech",
+    "Finnish"
+   ],
+   "explain": "“tycoon” comes from Japanese. From a title meaning \"great lord\".",
+   "difficulty": 3,
+   "refs": [
+    "words/tycoon"
+   ]
+  },
+  {
+   "id": "origin-kayak",
+   "kind": "mc",
+   "prompt": "The English word “kayak” comes from which language?",
+   "answer": "Inuit",
+   "wrong": [
+    "Dutch",
+    "Russian",
+    "Arabic"
+   ],
+   "explain": "“kayak” comes from Inuit. An Inuit word for a one-person hunting boat.",
+   "difficulty": 1,
+   "refs": [
+    "words/kayak"
+   ]
+  },
+  {
+   "id": "origin-igloo",
+   "kind": "mc",
+   "prompt": "The English word “igloo” comes from which language?",
+   "answer": "Inuit",
+   "wrong": [
+    "Sanskrit",
+    "Taíno",
+    "Chinese"
+   ],
+   "explain": "“igloo” comes from Inuit. An Inuit word for \"house\".",
+   "difficulty": 1,
+   "refs": [
+    "words/igloo"
+   ]
+  },
+  {
+   "id": "origin-tomato",
+   "kind": "mc",
+   "prompt": "The English word “tomato” comes from which language?",
+   "answer": "Nahuatl",
+   "wrong": [
+    "Hindi",
+    "Turkish",
+    "Inuit"
+   ],
+   "explain": "“tomato” comes from Nahuatl. From tomatl, via Spanish.",
+   "difficulty": 1,
+   "refs": [
+    "words/tomato"
+   ]
+  },
+  {
+   "id": "origin-chocolate",
+   "kind": "mc",
+   "prompt": "The English word “chocolate” comes from which language?",
+   "answer": "Nahuatl",
+   "wrong": [
+    "Hindi and Urdu",
+    "Arabic",
+    "German"
+   ],
+   "explain": "“chocolate” comes from Nahuatl. From a Nahuatl word, via Spanish.",
+   "difficulty": 1,
+   "refs": [
+    "words/chocolate"
+   ]
+  },
+  {
+   "id": "origin-avocado",
+   "kind": "mc",
+   "prompt": "The English word “avocado” comes from which language?",
+   "answer": "Nahuatl",
+   "wrong": [
+    "Norwegian",
+    "Old Norse",
+    "Dutch"
+   ],
+   "explain": "“avocado” comes from Nahuatl. From āhuacatl, via Spanish.",
+   "difficulty": 3,
+   "refs": [
+    "words/avocado"
+   ]
+  },
+  {
+   "id": "origin-algebra",
+   "kind": "mc",
+   "prompt": "The English word “algebra” comes from which language?",
+   "answer": "Arabic",
+   "wrong": [
+    "Guugu Yimithirr",
+    "Spanish",
+    "Dharug"
+   ],
+   "explain": "“algebra” comes from Arabic. From al-jabr, \"the reunion of broken parts\".",
+   "difficulty": 2,
+   "refs": [
+    "words/algebra"
+   ]
+  },
+  {
+   "id": "origin-alcohol",
+   "kind": "mc",
+   "prompt": "The English word “alcohol” comes from which language?",
+   "answer": "Arabic",
+   "wrong": [
+    "French",
+    "Finnish",
+    "Italian"
+   ],
+   "explain": "“alcohol” comes from Arabic. From al-kuḥl, a fine powder used as eyeliner.",
+   "difficulty": 2,
+   "refs": [
+    "words/alcohol"
+   ]
+  },
+  {
+   "id": "origin-coffee",
+   "kind": "mc",
+   "prompt": "The English word “coffee” comes from which language?",
+   "answer": "Arabic",
+   "wrong": [
+    "Old Norse",
+    "Dutch",
+    "French"
+   ],
+   "explain": "“coffee” comes from Arabic. From qahwa, via Turkish and Italian.",
+   "difficulty": 2,
+   "refs": [
+    "words/coffee"
+   ]
+  },
+  {
+   "id": "origin-magazine",
+   "kind": "mc",
+   "prompt": "The English word “magazine” comes from which language?",
+   "answer": "Arabic",
+   "wrong": [
+    "Inuit",
+    "Chinese",
+    "Norwegian"
+   ],
+   "explain": "“magazine” comes from Arabic. From a word for \"storehouses\".",
+   "difficulty": 3,
+   "refs": [
+    "words/magazine"
+   ]
+  },
+  {
+   "id": "origin-zero",
+   "kind": "mc",
+   "prompt": "The English word “zero” comes from which language?",
+   "answer": "Arabic",
+   "wrong": [
+    "Dutch",
+    "German",
+    "Inuit"
+   ],
+   "explain": "“zero” comes from Arabic. From ṣifr, \"empty\", via Italian.",
+   "difficulty": 3,
+   "refs": [
+    "words/zero"
+   ]
+  },
+  {
+   "id": "origin-giraffe",
+   "kind": "mc",
+   "prompt": "The English word “giraffe” comes from which language?",
+   "answer": "Arabic",
+   "wrong": [
+    "Persian",
+    "Czech",
+    "French"
+   ],
+   "explain": "“giraffe” comes from Arabic. From zarāfa, via Italian.",
+   "difficulty": 3,
+   "refs": [
+    "words/giraffe"
+   ]
+  },
+  {
+   "id": "origin-admiral",
+   "kind": "mc",
+   "prompt": "The English word “admiral” comes from which language?",
+   "answer": "Arabic",
+   "wrong": [
+    "Chinese",
+    "Spanish",
+    "Dharug"
+   ],
+   "explain": "“admiral” comes from Arabic. From amīr, \"commander\".",
+   "difficulty": 3,
+   "refs": [
+    "words/admiral"
+   ]
+  },
+  {
+   "id": "origin-yoghurt",
+   "kind": "mc",
+   "prompt": "The English word “yoghurt” comes from which language?",
+   "answer": "Turkish",
+   "wrong": [
+    "Dharug",
+    "Chinese",
+    "Italian"
+   ],
+   "explain": "“yoghurt” comes from Turkish. From a Turkish word for the fermented milk.",
+   "difficulty": 2,
+   "refs": [
+    "words/yoghurt"
+   ]
+  },
+  {
+   "id": "origin-tulip",
+   "kind": "mc",
+   "prompt": "The English word “tulip” comes from which language?",
+   "answer": "Turkish",
+   "wrong": [
+    "Chinese",
+    "Sanskrit",
+    "Nahuatl"
+   ],
+   "explain": "“tulip” comes from Turkish. From a word for \"turban\", which the flower was thought to resemble.",
+   "difficulty": 3,
+   "refs": [
+    "words/tulip"
+   ]
+  },
+  {
+   "id": "origin-bazaar",
+   "kind": "mc",
+   "prompt": "The English word “bazaar” comes from which language?",
+   "answer": "Persian",
+   "wrong": [
+    "Spanish",
+    "French",
+    "Italian"
+   ],
+   "explain": "“bazaar” comes from Persian. \"Market\".",
+   "difficulty": 2,
+   "refs": [
+    "words/bazaar"
+   ]
+  },
+  {
+   "id": "origin-caravan",
+   "kind": "mc",
+   "prompt": "The English word “caravan” comes from which language?",
+   "answer": "Persian",
+   "wrong": [
+    "Nahuatl",
+    "Dutch",
+    "French"
+   ],
+   "explain": "“caravan” comes from Persian. \"Group of travellers\".",
+   "difficulty": 3,
+   "refs": [
+    "words/caravan"
+   ]
+  },
+  {
+   "id": "origin-umbrella",
+   "kind": "mc",
+   "prompt": "The English word “umbrella” comes from which language?",
+   "answer": "Italian",
+   "wrong": [
+    "Turkish",
+    "French",
+    "Hindi and Urdu"
+   ],
+   "explain": "“umbrella” comes from Italian. \"Little shade\".",
+   "difficulty": 2,
+   "refs": [
+    "words/umbrella"
+   ]
+  },
+  {
+   "id": "origin-piano",
+   "kind": "mc",
+   "prompt": "The English word “piano” comes from which language?",
+   "answer": "Italian",
+   "wrong": [
+    "Finnish",
+    "Norwegian",
+    "French"
+   ],
+   "explain": "“piano” comes from Italian. Short for pianoforte, \"soft-loud\".",
+   "difficulty": 1,
+   "refs": [
+    "words/piano"
+   ]
+  },
+  {
+   "id": "origin-volcano",
+   "kind": "mc",
+   "prompt": "The English word “volcano” comes from which language?",
+   "answer": "Italian",
+   "wrong": [
+    "Turkish",
+    "Inuit",
+    "Guugu Yimithirr"
+   ],
+   "explain": "“volcano” comes from Italian. From Vulcano, an island named after Vulcan, the Roman god of fire.",
+   "difficulty": 2,
+   "refs": [
+    "words/volcano"
+   ]
+  },
+  {
+   "id": "origin-balcony",
+   "kind": "mc",
+   "prompt": "The English word “balcony” comes from which language?",
+   "answer": "Italian",
+   "wrong": [
+    "Sanskrit",
+    "Inuit",
+    "Spanish"
+   ],
+   "explain": "“balcony” comes from Italian. From balcone.",
+   "difficulty": 3,
+   "refs": [
+    "words/balcony"
+   ]
+  },
+  {
+   "id": "origin-ballot",
+   "kind": "mc",
+   "prompt": "The English word “ballot” comes from which language?",
+   "answer": "Italian",
+   "wrong": [
+    "Spanish",
+    "Taíno",
+    "Old Norse"
+   ],
+   "explain": "“ballot” comes from Italian. From ballotta, \"little ball\", once used to vote.",
+   "difficulty": 3,
+   "refs": [
+    "words/ballot"
+   ]
+  },
+  {
+   "id": "origin-croissant",
+   "kind": "mc",
+   "prompt": "The English word “croissant” comes from which language?",
+   "answer": "French",
+   "wrong": [
+    "Swahili",
+    "Japanese",
+    "Sanskrit"
+   ],
+   "explain": "“croissant” comes from French. \"Crescent\".",
+   "difficulty": 1,
+   "refs": [
+    "words/croissant"
+   ]
+  },
+  {
+   "id": "origin-restaurant",
+   "kind": "mc",
+   "prompt": "The English word “restaurant” comes from which language?",
+   "answer": "French",
+   "wrong": [
+    "Finnish",
+    "German",
+    "Norwegian"
+   ],
+   "explain": "“restaurant” comes from French. \"Restoring\", from food that restores your strength.",
+   "difficulty": 2,
+   "refs": [
+    "words/restaurant"
+   ]
+  },
+  {
+   "id": "origin-mosquito",
+   "kind": "mc",
+   "prompt": "The English word “mosquito” comes from which language?",
+   "answer": "Spanish",
+   "wrong": [
+    "Hindi",
+    "Nahuatl",
+    "Japanese"
+   ],
+   "explain": "“mosquito” comes from Spanish. \"Little fly\".",
+   "difficulty": 2,
+   "refs": [
+    "words/mosquito"
+   ]
+  },
+  {
+   "id": "origin-alligator",
+   "kind": "mc",
+   "prompt": "The English word “alligator” comes from which language?",
+   "answer": "Spanish",
+   "wrong": [
+    "Persian",
+    "Turkish",
+    "Swahili"
+   ],
+   "explain": "“alligator” comes from Spanish. From el lagarto, \"the lizard\".",
+   "difficulty": 2,
+   "refs": [
+    "words/alligator"
+   ]
+  },
+  {
+   "id": "origin-hurricane",
+   "kind": "mc",
+   "prompt": "The English word “hurricane” comes from which language?",
+   "answer": "Taíno",
+   "wrong": [
+    "Arabic",
+    "Persian",
+    "Turkish"
+   ],
+   "explain": "“hurricane” comes from Taíno. From a Caribbean word, via Spanish.",
+   "difficulty": 3,
+   "refs": [
+    "words/hurricane"
+   ]
+  },
+  {
+   "id": "origin-barbecue",
+   "kind": "mc",
+   "prompt": "The English word “barbecue” comes from which language?",
+   "answer": "Taíno",
+   "wrong": [
+    "Sanskrit",
+    "Czech",
+    "German"
+   ],
+   "explain": "“barbecue” comes from Taíno. From a word for a wooden frame, via Spanish.",
+   "difficulty": 3,
+   "refs": [
+    "words/barbecue"
+   ]
+  },
+  {
+   "id": "origin-cookie",
+   "kind": "mc",
+   "prompt": "The English word “cookie” comes from which language?",
+   "answer": "Dutch",
+   "wrong": [
+    "Finnish",
+    "Japanese",
+    "Guugu Yimithirr"
+   ],
+   "explain": "“cookie” comes from Dutch. From koekje, \"little cake\".",
+   "difficulty": 1,
+   "refs": [
+    "words/cookie"
+   ]
+  },
+  {
+   "id": "origin-yacht",
+   "kind": "mc",
+   "prompt": "The English word “yacht” comes from which language?",
+   "answer": "Dutch",
+   "wrong": [
+    "Arabic",
+    "Japanese",
+    "Sanskrit"
+   ],
+   "explain": "“yacht” comes from Dutch. From jacht, a fast pursuit ship.",
+   "difficulty": 3,
+   "refs": [
+    "words/yacht"
+   ]
+  },
+  {
+   "id": "origin-boss",
+   "kind": "mc",
+   "prompt": "The English word “boss” comes from which language?",
+   "answer": "Dutch",
+   "wrong": [
+    "Finnish",
+    "Nahuatl",
+    "Hindi"
+   ],
+   "explain": "“boss” comes from Dutch. From baas, \"master\".",
+   "difficulty": 3,
+   "refs": [
+    "words/boss"
+   ]
+  },
+  {
+   "id": "origin-sauna",
+   "kind": "mc",
+   "prompt": "The English word “sauna” comes from which language?",
+   "answer": "Finnish",
+   "wrong": [
+    "Swahili",
+    "Taíno",
+    "Persian"
+   ],
+   "explain": "“sauna” comes from Finnish. A Finnish steam bath.",
+   "difficulty": 1,
+   "refs": [
+    "words/sauna"
+   ]
+  },
+  {
+   "id": "origin-ski",
+   "kind": "mc",
+   "prompt": "The English word “ski” comes from which language?",
+   "answer": "Norwegian",
+   "wrong": [
+    "Persian",
+    "Taíno",
+    "Guugu Yimithirr"
+   ],
+   "explain": "“ski” comes from Norwegian. From an Old Norse word for a split piece of wood.",
+   "difficulty": 1,
+   "refs": [
+    "words/ski"
+   ]
+  },
+  {
+   "id": "origin-slalom",
+   "kind": "mc",
+   "prompt": "The English word “slalom” comes from which language?",
+   "answer": "Norwegian",
+   "wrong": [
+    "Turkish",
+    "Arabic",
+    "Swahili"
+   ],
+   "explain": "“slalom” comes from Norwegian. \"Sloping track\".",
+   "difficulty": 2,
+   "refs": [
+    "words/slalom"
+   ]
+  },
+  {
+   "id": "origin-berserk",
+   "kind": "mc",
+   "prompt": "The English word “berserk” comes from which language?",
+   "answer": "Old Norse",
+   "wrong": [
+    "Nahuatl",
+    "Hindi",
+    "Sanskrit"
+   ],
+   "explain": "“berserk” comes from Old Norse. Probably \"bear shirt\", for fierce warriors.",
+   "difficulty": 3,
+   "refs": [
+    "words/berserk"
+   ]
+  },
+  {
+   "id": "origin-window",
+   "kind": "mc",
+   "prompt": "The English word “window” comes from which language?",
+   "answer": "Old Norse",
+   "wrong": [
+    "Italian",
+    "Guugu Yimithirr",
+    "Japanese"
+   ],
+   "explain": "“window” comes from Old Norse. \"Wind eye\".",
+   "difficulty": 2,
+   "refs": [
+    "words/window"
+   ]
+  },
+  {
+   "id": "origin-kangaroo",
+   "kind": "mc",
+   "prompt": "The English word “kangaroo” comes from which language?",
+   "answer": "Guugu Yimithirr",
+   "wrong": [
+    "Sanskrit",
+    "Inuit",
+    "Finnish"
+   ],
+   "explain": "“kangaroo” comes from Guugu Yimithirr. From an Aboriginal Australian language in Queensland.",
+   "difficulty": 2,
+   "refs": [
+    "words/kangaroo"
+   ]
+  },
+  {
+   "id": "origin-koala",
+   "kind": "mc",
+   "prompt": "The English word “koala” comes from which language?",
+   "answer": "Dharug",
+   "wrong": [
+    "Norwegian",
+    "Hindi",
+    "Hindi and Urdu"
+   ],
+   "explain": "“koala” comes from Dharug. From an Aboriginal language of the Sydney area.",
+   "difficulty": 3,
+   "refs": [
+    "words/koala"
+   ]
+  },
+  {
+   "id": "origin-yoga",
+   "kind": "mc",
+   "prompt": "The English word “yoga” comes from which language?",
+   "answer": "Sanskrit",
+   "wrong": [
+    "Spanish",
+    "Norwegian",
+    "Italian"
+   ],
+   "explain": "“yoga” comes from Sanskrit. \"Union\" or \"yoking\".",
+   "difficulty": 1,
+   "refs": [
+    "words/yoga"
+   ]
+  },
+  {
+   "id": "origin-guru",
+   "kind": "mc",
+   "prompt": "The English word “guru” comes from which language?",
+   "answer": "Sanskrit",
+   "wrong": [
+    "Dutch",
+    "Swahili",
+    "Old Norse"
+   ],
+   "explain": "“guru” comes from Sanskrit. \"Venerable\" or \"heavy\".",
+   "difficulty": 2,
+   "refs": [
+    "words/guru"
+   ]
+  },
+  {
+   "id": "origin-avatar",
+   "kind": "mc",
+   "prompt": "The English word “avatar” comes from which language?",
+   "answer": "Sanskrit",
+   "wrong": [
+    "Turkish",
+    "German",
+    "Japanese"
+   ],
+   "explain": "“avatar” comes from Sanskrit. \"Descent\", of a god to Earth.",
+   "difficulty": 3,
+   "refs": [
+    "words/avatar"
+   ]
+  },
+  {
+   "id": "origin-thug",
+   "kind": "mc",
+   "prompt": "The English word “thug” comes from which language?",
+   "answer": "Hindi",
+   "wrong": [
+    "Taíno",
+    "Dutch",
+    "Guugu Yimithirr"
+   ],
+   "explain": "“thug” comes from Hindi. From ṭhag, \"thief\" or \"swindler\".",
+   "difficulty": 3,
+   "refs": [
+    "words/thug"
+   ]
+  },
+  {
+   "id": "origin-loot",
+   "kind": "mc",
+   "prompt": "The English word “loot” comes from which language?",
+   "answer": "Hindi",
+   "wrong": [
+    "Norwegian",
+    "Italian",
+    "Spanish"
+   ],
+   "explain": "“loot” comes from Hindi. From lūṭ, \"plunder\".",
+   "difficulty": 3,
+   "refs": [
+    "words/loot"
+   ]
+  },
+  {
+   "id": "origin-mammoth",
+   "kind": "mc",
+   "prompt": "The English word “mammoth” comes from which language?",
+   "answer": "Russian",
+   "wrong": [
+    "Nahuatl",
+    "Chinese",
+    "Inuit"
+   ],
+   "explain": "“mammoth” comes from Russian. From an old Russian word for the beast.",
+   "difficulty": 3,
+   "refs": [
+    "words/mammoth"
+   ]
+  },
+  {
+   "id": "origin-tea",
+   "kind": "mc",
+   "prompt": "The English word “tea” comes from which language?",
+   "answer": "Chinese",
+   "wrong": [
+    "Nahuatl",
+    "Arabic",
+    "Dutch"
+   ],
+   "explain": "“tea” comes from Chinese. From the Min Chinese word te.",
+   "difficulty": 2,
+   "refs": [
+    "words/tea"
+   ]
+  },
+  {
+   "id": "named-sandwich",
+   "kind": "mc",
+   "prompt": "The word “sandwich” is named after whom?",
+   "answer": "The Earl of Sandwich",
+   "wrong": [
+    "The Duke of Wellington",
+    "Lord Cardigan",
+    "Queen Victoria"
+   ],
+   "explain": "“sandwich” is named after the Earl of Sandwich. John Montagu, 4th Earl of Sandwich, is said to have eaten beef between bread so he could keep playing cards.",
+   "difficulty": 1,
+   "refs": [
+    "words/sandwich"
+   ]
+  },
+  {
+   "id": "named-cardigan",
+   "kind": "mc",
+   "prompt": "The word “cardigan” is named after whom?",
+   "answer": "The Earl of Cardigan",
+   "wrong": [
+    "The Earl of Sandwich",
+    "Adolphe Sax",
+    "Lord Byron"
+   ],
+   "explain": "“cardigan” is named after the Earl of Cardigan. The 7th Earl of Cardigan, who led the Charge of the Light Brigade.",
+   "difficulty": 2,
+   "refs": [
+    "words/cardigan"
+   ]
+  },
+  {
+   "id": "named-boycott",
+   "kind": "mc",
+   "prompt": "The word “boycott” is named after whom?",
+   "answer": "Charles Boycott",
+   "wrong": [
+    "Louis Braille",
+    "Rudolf Diesel",
+    "Jules Léotard"
+   ],
+   "explain": "“boycott” is named after Charles Boycott. An Irish land agent shunned by his community in 1880.",
+   "difficulty": 2,
+   "refs": [
+    "words/boycott"
+   ]
+  },
+  {
+   "id": "named-leotard",
+   "kind": "mc",
+   "prompt": "The word “leotard” is named after whom?",
+   "answer": "Jules Léotard",
+   "wrong": [
+    "Charles Boycott",
+    "Joseph Guillotin",
+    "Adolphe Sax"
+   ],
+   "explain": "“leotard” is named after Jules Léotard. A French trapeze artist of the 1800s.",
+   "difficulty": 3,
+   "refs": [
+    "words/leotard"
+   ]
+  },
+  {
+   "id": "named-saxophone",
+   "kind": "mc",
+   "prompt": "The word “saxophone” is named after whom?",
+   "answer": "Adolphe Sax",
+   "wrong": [
+    "Rudolf Diesel",
+    "Anders Celsius",
+    "Jules Léotard"
+   ],
+   "explain": "“saxophone” is named after Adolphe Sax. A Belgian instrument maker who patented it in 1846.",
+   "difficulty": 2,
+   "refs": [
+    "words/saxophone"
+   ]
+  },
+  {
+   "id": "named-braille",
+   "kind": "mc",
+   "prompt": "The word “braille” is named after whom?",
+   "answer": "Louis Braille",
+   "wrong": [
+    "Samuel Morse",
+    "Louis Pasteur",
+    "Charles Boycott"
+   ],
+   "explain": "“braille” is named after Louis Braille. A Frenchman, blind from childhood, who invented the raised-dot alphabet.",
+   "difficulty": 1,
+   "refs": [
+    "words/braille"
+   ]
+  },
+  {
+   "id": "named-diesel",
+   "kind": "mc",
+   "prompt": "The word “diesel” is named after whom?",
+   "answer": "Rudolf Diesel",
+   "wrong": [
+    "Adolphe Sax",
+    "James Watt",
+    "Henry Ford"
+   ],
+   "explain": "“diesel” is named after Rudolf Diesel. The German engineer who invented the engine.",
+   "difficulty": 2,
+   "refs": [
+    "words/diesel"
+   ]
+  },
+  {
+   "id": "named-guillotine",
+   "kind": "mc",
+   "prompt": "The word “guillotine” is named after whom?",
+   "answer": "Joseph-Ignace Guillotin",
+   "wrong": [
+    "Louis Pasteur",
+    "Étienne de Silhouette",
+    "Charles Boycott"
+   ],
+   "explain": "“guillotine” is named after Joseph-Ignace Guillotin. A French doctor who proposed a quicker, more humane method of execution.",
+   "difficulty": 2,
+   "refs": [
+    "words/guillotine"
+   ]
+  },
+  {
+   "id": "named-silhouette",
+   "kind": "mc",
+   "prompt": "The word “silhouette” is named after whom?",
+   "answer": "Étienne de Silhouette",
+   "wrong": [
+    "Joseph-Ignace Guillotin",
+    "Louis Braille",
+    "Jules Léotard"
+   ],
+   "explain": "“silhouette” is named after Étienne de Silhouette. A penny-pinching French finance minister of 1759.",
+   "difficulty": 3,
+   "refs": [
+    "words/silhouette"
+   ]
+  },
+  {
+   "id": "named-teddy-bear",
+   "kind": "mc",
+   "prompt": "The word “teddy bear” is named after whom?",
+   "answer": "Theodore Roosevelt",
+   "wrong": [
+    "Winston Churchill",
+    "Edward VII",
+    "Teddy Sheringham"
+   ],
+   "explain": "“teddy bear” is named after Theodore Roosevelt. The US president who, the story goes, refused to shoot a captive bear.",
+   "difficulty": 1,
+   "refs": [
+    "words/teddy-bear"
+   ]
+  },
+  {
+   "id": "named-nicotine",
+   "kind": "mc",
+   "prompt": "The word “nicotine” is named after whom?",
+   "answer": "Jean Nicot",
+   "wrong": [
+    "Louis Pasteur",
+    "Rudolf Diesel",
+    "Anders Celsius"
+   ],
+   "explain": "“nicotine” is named after Jean Nicot. A French diplomat who sent tobacco to Paris in 1560.",
+   "difficulty": 3,
+   "refs": [
+    "words/nicotine"
+   ]
+  },
+  {
+   "id": "named-watt",
+   "kind": "mc",
+   "prompt": "The word “watt” is named after whom?",
+   "answer": "James Watt",
+   "wrong": [
+    "Alessandro Volta",
+    "André-Marie Ampère",
+    "Isaac Newton"
+   ],
+   "explain": "“watt” is named after James Watt. The Scottish inventor who improved the steam engine.",
+   "difficulty": 2,
+   "refs": [
+    "words/watt"
+   ]
+  },
+  {
+   "id": "named-pasteurise",
+   "kind": "mc",
+   "prompt": "The word “pasteurise” is named after whom?",
+   "answer": "Louis Pasteur",
+   "wrong": [
+    "Marie Curie",
+    "Joseph Lister",
+    "Jean Nicot"
+   ],
+   "explain": "“pasteurise” is named after Louis Pasteur. The French scientist who showed heating could kill germs in drinks.",
+   "difficulty": 2,
+   "refs": [
+    "words/pasteurise"
+   ]
+  },
+  {
+   "id": "named-volt",
+   "kind": "mc",
+   "prompt": "The word “volt” is named after whom?",
+   "answer": "Alessandro Volta",
+   "wrong": [
+    "James Watt",
+    "Michael Faraday",
+    "Galileo Galilei"
+   ],
+   "explain": "“volt” is named after Alessandro Volta. The Italian physicist who built the first battery.",
+   "difficulty": 3,
+   "refs": [
+    "words/volt"
+   ]
+  },
+  {
+   "id": "named-shrapnel",
+   "kind": "mc",
+   "prompt": "The word “shrapnel” is named after whom?",
+   "answer": "Henry Shrapnel",
+   "wrong": [
+    "Rudolf Diesel",
+    "Charles Boycott",
+    "Joseph Guillotin"
+   ],
+   "explain": "“shrapnel” is named after Henry Shrapnel. A British army officer who invented an exploding shell.",
+   "difficulty": 3,
+   "refs": [
+    "words/shrapnel"
+   ]
+  },
+  {
+   "id": "wq-b58e804a",
+   "kind": "tf",
+   "prompt": "The word \"emoji\" comes from the English word \"emotion\".",
+   "difficulty": 2,
+   "answer": false,
+   "explain": "It is Japanese: e (\"picture\") plus moji (\"character\"). The likeness is a coincidence."
+  },
+  {
+   "id": "wq-b40ec0e6",
+   "kind": "tf",
+   "prompt": "\"Posh\" stands for \"Port Out, Starboard Home\".",
+   "difficulty": 2,
+   "answer": false,
+   "explain": "That is a later invented explanation; no evidence supports it."
+  },
+  {
+   "id": "wq-bf2e2af3",
+   "kind": "tf",
+   "prompt": "\"Golf\" stands for \"Gentlemen Only, Ladies Forbidden\".",
+   "difficulty": 1,
+   "answer": false,
+   "explain": "A modern joke. The word goes back to Scots in the 1400s."
+  },
+  {
+   "id": "wq-ab8b0e53",
+   "kind": "tf",
+   "prompt": "\"SOS\" stands for \"Save Our Souls\".",
+   "difficulty": 2,
+   "answer": false,
+   "explain": "SOS was chosen because its Morse code (three dots, three dashes, three dots) is easy to send and recognise."
+  },
+  {
+   "id": "wq-1953dc46",
+   "kind": "tf",
+   "prompt": "\"Goodbye\" is a shortened form of \"God be with you\".",
+   "difficulty": 2,
+   "answer": true,
+   "explain": "The phrase was squeezed down over the 1500s and 1600s."
+  },
+  {
+   "id": "wq-a3574f1a",
+   "kind": "tf",
+   "prompt": "\"Muscle\" comes from a Latin word meaning \"little mouse\".",
+   "difficulty": 2,
+   "answer": true,
+   "explain": "Latin musculus: a flexing muscle was thought to look like a mouse moving under the skin."
+  },
+  {
+   "id": "wq-13aadc13",
+   "kind": "tf",
+   "prompt": "\"Disaster\" literally means \"bad star\".",
+   "difficulty": 2,
+   "answer": true,
+   "explain": "From Italian disastro: an ill-starred event, from the idea that stars rule our fate."
+  },
+  {
+   "id": "wq-9b85639b",
+   "kind": "tf",
+   "prompt": "\"Quarantine\" comes from an Italian phrase for \"forty days\".",
+   "difficulty": 2,
+   "answer": true,
+   "explain": "Ships arriving in Venice during plagues had to wait forty days before landing."
+  },
+  {
+   "id": "wq-92a53061",
+   "kind": "tf",
+   "prompt": "\"Malaria\" comes from Italian words for \"bad air\".",
+   "difficulty": 2,
+   "answer": true,
+   "explain": "People once blamed the disease on foul air from swamps."
+  },
+  {
+   "id": "wq-36ff43a6",
+   "kind": "tf",
+   "prompt": "\"Clue\" comes from \"clew\", a ball of thread.",
+   "difficulty": 3,
+   "answer": true,
+   "explain": "In the Greek myth, Theseus used a ball of thread to find his way out of the Labyrinth."
+  },
+  {
+   "id": "wq-ed374884",
+   "kind": "tf",
+   "prompt": "The word \"robot\" was first used in a play.",
+   "difficulty": 2,
+   "answer": true,
+   "explain": "Karel Čapek's 1920 play R.U.R. introduced it."
+  },
+  {
+   "id": "wq-bde4d1a9",
+   "kind": "tf",
+   "prompt": "John Milton coined the word \"pandemonium\".",
+   "difficulty": 3,
+   "answer": true,
+   "explain": "In Paradise Lost (1667) it is the capital of Hell: \"all the demons\"."
+  },
+  {
+   "id": "wq-c941cc47",
+   "kind": "tf",
+   "prompt": "\"Serendipity\" was coined by the writer Horace Walpole.",
+   "difficulty": 3,
+   "answer": true,
+   "explain": "He made it up in 1754, from a fairy tale called The Three Princes of Serendip."
+  },
+  {
+   "id": "wq-11bbc306",
+   "kind": "tf",
+   "prompt": "Lewis Carroll coined the word \"chortle\".",
+   "difficulty": 2,
+   "answer": true,
+   "explain": "It first appeared in Through the Looking-Glass (1871), blending \"chuckle\" and \"snort\"."
+  },
+  {
+   "id": "wq-ec84551e",
+   "kind": "tf",
+   "prompt": "Thomas More coined the word \"utopia\".",
+   "difficulty": 3,
+   "answer": true,
+   "explain": "His 1516 book Utopia named an ideal island; the Greek means \"no place\"."
+  },
+  {
+   "id": "wq-8022bd99",
+   "kind": "tf",
+   "prompt": "\"Nice\" once meant \"foolish\" or \"ignorant\".",
+   "difficulty": 3,
+   "answer": true,
+   "explain": "It comes from Latin nescius, \"not knowing\", and changed meaning over centuries."
+  },
+  {
+   "id": "wq-269f58b2",
+   "kind": "tf",
+   "prompt": "\"Quiz\" was invented by a Dublin theatre owner who bet he could get a nonsense word into the language overnight.",
+   "difficulty": 2,
+   "answer": false,
+   "explain": "The story is a legend; the word was already in use before the supposed bet."
+  },
+  {
+   "id": "wq-d8078250",
+   "kind": "tf",
+   "prompt": "\"Hippopotamus\" comes from Greek words meaning \"river horse\".",
+   "difficulty": 1,
+   "answer": true,
+   "explain": "Hippos means horse and potamos means river."
+  },
+  {
+   "id": "wq-1b63289f",
+   "kind": "tf",
+   "prompt": "\"Dinosaur\" means \"terrible lizard\".",
+   "difficulty": 1,
+   "answer": true,
+   "explain": "Richard Owen coined it in 1842 from Greek deinos (\"terrible\") and sauros (\"lizard\")."
+  },
+  {
+   "id": "wq-dc1de096",
+   "kind": "tf",
+   "prompt": "\"Astronaut\" means \"star sailor\".",
+   "difficulty": 2,
+   "answer": true,
+   "explain": "From Greek astron (\"star\") and nautes (\"sailor\")."
+  },
+  {
+   "id": "wq-703db910",
+   "kind": "mc",
+   "prompt": "Which day of the week is named after the Norse god of thunder, Thor?",
+   "difficulty": 1,
+   "answer": "Thursday",
+   "wrong": [
+    "Tuesday",
+    "Wednesday",
+    "Saturday"
+   ],
+   "explain": "Thursday is \"Thor's day\"."
+  },
+  {
+   "id": "wq-1e24c57a",
+   "kind": "mc",
+   "prompt": "Which day of the week is named after the god Woden (Odin)?",
+   "difficulty": 2,
+   "answer": "Wednesday",
+   "wrong": [
+    "Tuesday",
+    "Thursday",
+    "Friday"
+   ],
+   "explain": "Wednesday is \"Woden's day\"."
+  },
+  {
+   "id": "wq-94d307d5",
+   "kind": "mc",
+   "prompt": "Which day of the week is named after the Roman god Saturn?",
+   "difficulty": 2,
+   "answer": "Saturday",
+   "wrong": [
+    "Sunday",
+    "Tuesday",
+    "Friday"
+   ],
+   "explain": "Saturday is \"Saturn's day\"."
+  },
+  {
+   "id": "wq-7f1a2a81",
+   "kind": "mc",
+   "prompt": "Which month is named after Janus, the two-faced Roman god of doorways?",
+   "difficulty": 2,
+   "answer": "January",
+   "wrong": [
+    "June",
+    "July",
+    "March"
+   ],
+   "explain": "Janus looks both back to the old year and forward to the new."
+  },
+  {
+   "id": "wq-5e5980c4",
+   "kind": "mc",
+   "prompt": "Which month is named after Julius Caesar?",
+   "difficulty": 2,
+   "answer": "July",
+   "wrong": [
+    "June",
+    "August",
+    "March"
+   ],
+   "explain": "The Romans renamed the month Quintilis in his honour."
+  },
+  {
+   "id": "wq-0ab9f9a6",
+   "kind": "mc",
+   "prompt": "Which month is named after the emperor Augustus?",
+   "difficulty": 2,
+   "answer": "August",
+   "wrong": [
+    "July",
+    "April",
+    "September"
+   ],
+   "explain": "The month Sextilis was renamed in his honour."
+  },
+  {
+   "id": "wq-c3f7c323",
+   "kind": "mc",
+   "prompt": "October comes from the Latin word for which number?",
+   "difficulty": 3,
+   "answer": "Eight",
+   "wrong": [
+    "Ten",
+    "Six",
+    "Twelve"
+   ],
+   "explain": "October was the eighth month of the early Roman calendar, which began in March."
+  },
+  {
+   "id": "wq-066afd8f",
+   "kind": "mc",
+   "prompt": "The word \"panic\" comes from which Greek god?",
+   "difficulty": 2,
+   "answer": "Pan",
+   "wrong": [
+    "Zeus",
+    "Ares",
+    "Hermes"
+   ],
+   "explain": "Pan was believed to cause sudden fear in lonely places."
+  },
+  {
+   "id": "wq-6a7f154d",
+   "kind": "mc",
+   "prompt": "The word \"cereal\" comes from which Roman goddess?",
+   "difficulty": 3,
+   "answer": "Ceres",
+   "wrong": [
+    "Juno",
+    "Venus",
+    "Minerva"
+   ],
+   "explain": "Ceres was the goddess of grain and farming."
+  }
+ ],
+ "sources": [
+  {
+   "name": "Wiktionary (etymologies)",
+   "url": "https://en.wiktionary.org"
+  },
+  {
+   "name": "Online Etymology Dictionary",
+   "url": "https://www.etymonline.com"
+  }
+ ]
+}

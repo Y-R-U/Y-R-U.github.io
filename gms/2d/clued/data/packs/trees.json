@@ -5,6 +5,9 @@
  "icon": "🌳",
  "kids": true,
  "version": 1,
+ "imgPrompt": "Which of these is {aName}?",
+ "nameImgPrompt": "Which tree is this?",
+ "tfImgPrompt": "This is {aName}.",
  "leakExempt": [
   "tree",
   "trees"
@@ -12,31 +15,42 @@
  "factsMeta": {
   "region": {
    "type": "cat",
-   "label": "Native to"
+   "label": "Native to",
+   "ask": "Where is the {lname} native to?",
+   "askReverse": "Which of these trees is native to {value}?",
+   "stmt": "The {lname} is native to {value}.",
+   "exclusive": false
   },
   "evergreen": {
    "type": "bool",
    "label": "Evergreen",
    "yes": "Evergreen",
-   "no": "Loses its leaves"
+   "no": "Loses its leaves",
+   "askBool": "Which of these trees keeps its leaves all year?",
+   "stmt": "The {lname} keeps its leaves all year."
   },
   "conifer": {
    "type": "bool",
    "label": "Conifer",
    "yes": "Conifer",
-   "no": "Not a conifer"
+   "no": "Not a conifer",
+   "askBool": "Which of these trees is a conifer?",
+   "stmt": "The {lname} is a conifer."
   },
   "heightM": {
    "type": "num",
    "label": "Typical mature height",
    "unit": "m",
-   "higherLabel": "Taller"
+   "higherLabel": "Taller",
+   "askHigh": "Which of these trees grows the tallest?",
+   "askLow": "Which of these trees is the smallest?"
   }
  },
  "items": [
   {
    "id": "english-oak",
    "name": "English oak",
+   "lname": "English oak",
    "alt": [
     "oak",
     "pedunculate oak",
@@ -66,33 +80,33 @@
     "It was used to build wooden warships.",
     "Its nuts are called acorns.",
     "The answer has 2 words (7, 3 letters).",
-    "It starts with the letter E."
+    "Its first letter is E."
    ],
    "media": {
     "img": [
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/326660041/medium.jpeg",
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/d/dc/Paprastasis_azuolas.JPG/500px-Paprastasis_azuolas.JPG",
       "w": 500,
-      "h": 500,
-      "credit": "Veronica Jendrick",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/326660041"
+      "h": 375,
+      "credit": "Algirdas at Lithuanian Wikipedia",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Paprastasis_azuolas.JPG"
      },
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/467469040/medium.jpg",
-      "w": 500,
-      "h": 353,
-      "credit": "zebedeugalinha",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/467469040"
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/a/af/Quercus_robur.jpg/330px-Quercus_robur.jpg",
+      "w": 330,
+      "h": 446,
+      "credit": "Wikimedia Commons",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Quercus_robur.jpg"
      },
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/654174819/medium.jpg",
-      "w": 375,
-      "h": 500,
-      "credit": "Wolfgang Jauch",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/654174819"
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/c/c2/K%C3%B6hler%27s_Medizinal-Pflanzen_in_naturgetreuen_Abbildungen_mit_kurz_erl%C3%A4uterndem_Texte_%28Plate_30%29_%286972238968%29.jpg/330px-K%C3%B6hler%27s_Medizinal-Pflanzen_in_naturgetreuen_Abbildungen_mit_kurz_erl%C3%A4uterndem_Texte_%28Plate_30%29_%286972238968%29.jpg",
+      "w": 330,
+      "h": 469,
+      "credit": "Brandt, Wilhelm; Gürke, M.; Köhler, F. E.; Pabst, G.; Schellenberg, G.; Vogtherr, Max.",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:K%C3%B6hler%27s_Medizinal-Pflanzen_in_naturgetreuen_Abbildungen_mit_kurz_erl%C3%A4uterndem_Texte_(Plate_30)_(6972238968).jpg"
      }
     ]
    },
@@ -125,33 +139,33 @@
     "Its leaves are small and triangular.",
     "Its bark is white and papery.",
     "The answer has 2 words (6, 5 letters).",
-    "It starts with the letter S."
+    "Its first letter is S."
    ],
    "media": {
     "img": [
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/175067773/medium.jpg",
-      "w": 500,
-      "h": 335,
-      "credit": "Douglas Goldman",
-      "license": "CC BY-SA 4.0",
-      "page": "https://www.inaturalist.org/photos/175067773"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/4734583/medium.jpeg",
-      "w": 500,
-      "h": 333,
-      "credit": "Fabien Piednoir",
-      "license": "CC BY-SA 4.0",
-      "page": "https://www.inaturalist.org/photos/4734583"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/114260890/medium.jpg",
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/8/8a/Betula_pendula_Finland.jpg/500px-Betula_pendula_Finland.jpg",
       "w": 500,
       "h": 375,
-      "credit": "Oleg Kosterin",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/114260890"
+      "credit": "Percita at Flickr",
+      "license": "CC BY-SA 2.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Betula_pendula_Finland.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/17/Betula_pendula_in_Sedovo_1.jpg/330px-Betula_pendula_in_Sedovo_1.jpg",
+      "w": 330,
+      "h": 440,
+      "credit": "Andrey Butko",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Betula_pendula_in_Sedovo_1.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/7/78/Illustration_Betula_pendula0.jpg/330px-Illustration_Betula_pendula0.jpg",
+      "w": 330,
+      "h": 566,
+      "credit": "Wikimedia Commons",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Illustration_Betula_pendula0.jpg"
      }
     ]
    },
@@ -160,6 +174,7 @@
   {
    "id": "european-beech",
    "name": "European beech",
+   "lname": "European beech",
    "alt": [
     "beech",
     "common beech"
@@ -184,33 +199,33 @@
     "It is often grown as a hedge.",
     "Its name begins like a sandy seaside.",
     "The answer has 2 words (8, 5 letters).",
-    "It starts with the letter E."
+    "Its first letter is E."
    ],
    "media": {
     "img": [
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/394535806/medium.jpeg",
-      "w": 375,
-      "h": 500,
-      "credit": "Rebecca Gimenez Husted",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/394535806"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/408459425/medium.jpeg",
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/5/5b/Grib_skov.jpg/500px-Grib_skov.jpg",
       "w": 500,
-      "h": 333,
-      "credit": "no rights reserved",
-      "license": "CC0 1.0",
-      "page": "https://www.inaturalist.org/photos/408459425"
+      "h": 470,
+      "credit": "Malene Thyssen",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Grib_skov.jpg"
      },
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/349506389/medium.jpeg",
-      "w": 375,
-      "h": 500,
-      "credit": "Erwin Gruber",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/349506389"
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/f/f1/Illustration_Fagus_sylvatica0_clean.jpg/330px-Illustration_Fagus_sylvatica0_clean.jpg",
+      "w": 330,
+      "h": 533,
+      "credit": "User:Kilom691",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Illustration_Fagus_sylvatica0_clean.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/e/e4/Fagus-sylvatica-cansiglio-forest-italy.jpg/330px-Fagus-sylvatica-cansiglio-forest-italy.jpg",
+      "w": 330,
+      "h": 440,
+      "credit": "GooseCanada",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Fagus-sylvatica-cansiglio-forest-italy.jpg"
      }
     ]
    },
@@ -242,33 +257,33 @@
     "It typically grows to about 30 m tall.",
     "Children play a game with its seeds on strings.",
     "The answer has 2 words (5, 8 letters).",
-    "It starts with the letter H."
+    "Its first letter is H."
    ],
    "media": {
     "img": [
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/236277620/medium.jpeg",
-      "w": 375,
-      "h": 500,
-      "credit": "Onondaga Earth Corps",
-      "license": "CC0 1.0",
-      "page": "https://www.inaturalist.org/photos/236277620"
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/f/f7/Horse-chestnut_800.jpg/330px-Horse-chestnut_800.jpg",
+      "w": 330,
+      "h": 454,
+      "credit": "Sannse at English Wikipedia",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Horse-chestnut_800.jpg"
      },
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/1183047/medium.jpg",
-      "w": 310,
-      "h": 500,
-      "credit": "Chestnut District",
-      "license": "CC BY-SA 4.0",
-      "page": "https://www.inaturalist.org/photos/1183047"
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/e/eb/Aesculus_hippocastanum_flori.jpg/330px-Aesculus_hippocastanum_flori.jpg",
+      "w": 330,
+      "h": 459,
+      "credit": "Wikimedia Commons",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Aesculus_hippocastanum_flori.jpg"
      },
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/1183046/medium.jpg",
-      "w": 375,
-      "h": 500,
-      "credit": "Maja Dumat",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/1183046"
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/d/db/Horse-chestnut%2C_Germany_%2816756367248%29.jpg/500px-Horse-chestnut%2C_Germany_%2816756367248%29.jpg",
+      "w": 500,
+      "h": 372,
+      "credit": "Rolf Dietrich Brecher from Germany",
+      "license": "CC BY-SA 2.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Horse-chestnut,_Germany_(16756367248).jpg"
      }
     ]
    },
@@ -304,33 +319,33 @@
     "Its leaf is on the flag of Canada.",
     "Its sap makes a sweet syrup for pancakes.",
     "The answer has 2 words (5, 5 letters).",
-    "It starts with the letter S."
+    "Its first letter is S."
    ],
    "media": {
     "img": [
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/270771956/medium.jpg",
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/2/26/Acer_saccharum.jpg/330px-Acer_saccharum.jpg",
+      "w": 330,
+      "h": 440,
+      "credit": "Bruce Marlin",
+      "license": "CC BY-SA 2.5",
+      "page": "https://commons.wikimedia.org/wiki/File:Acer_saccharum.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/2/22/Acer_saccharum_foliage.jpg/330px-Acer_saccharum_foliage.jpg",
+      "w": 330,
+      "h": 440,
+      "credit": "No machine-readable author provided. MPF assumed (based on copyright claims).",
+      "license": "CC BY 2.5",
+      "page": "https://commons.wikimedia.org/wiki/File:Acer_saccharum_foliage.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/a/a1/Acer_saccharum_1-jgreenlee_%285098070608%29.jpg/500px-Acer_saccharum_1-jgreenlee_%285098070608%29.jpg",
       "w": 500,
-      "h": 414,
-      "credit": "James St. John",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/270771956"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/237322690/medium.jpeg",
-      "w": 375,
-      "h": 500,
-      "credit": "Tom Norton",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/237322690"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/476491608/medium.jpg",
-      "w": 375,
-      "h": 500,
-      "credit": "oksanaetal",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/476491608"
+      "h": 375,
+      "credit": "Superior National Forest",
+      "license": "CC BY 2.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Acer_saccharum_1-jgreenlee_(5098070608).jpg"
      }
     ]
    },
@@ -339,6 +354,7 @@
   {
    "id": "japanese-maple",
    "name": "Japanese maple",
+   "lname": "Japanese maple",
    "sci": "Acer palmatum",
    "group": "broadleaf",
    "facts": {
@@ -362,10 +378,18 @@
     "It typically grows to about 8 m tall.",
     "Its leaves turn bright red in autumn.",
     "The answer has 2 words (8, 5 letters).",
-    "It starts with the letter J."
+    "Its first letter is J."
    ],
    "media": {
     "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/d/d6/Acer_palmatum0.jpg/500px-Acer_palmatum0.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Kurt Stüber [1]",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Acer_palmatum0.jpg"
+     },
      {
       "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/2651499/medium.jpg",
       "w": 500,
@@ -381,14 +405,6 @@
       "credit": "Timur Kalininsky",
       "license": "CC BY 4.0",
       "page": "https://www.inaturalist.org/photos/135870395"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/146544542/medium.jpeg",
-      "w": 500,
-      "h": 281,
-      "credit": "Gavin Slater",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/146544542"
      }
     ]
    },
@@ -420,33 +436,33 @@
     "Its long branches hang down to the ground.",
     "Its name sounds sad, as if it is crying.",
     "The answer has 2 words (7, 6 letters).",
-    "It starts with the letter W."
+    "Its first letter is W."
    ],
    "media": {
     "img": [
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/57094810/medium.jpeg",
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/2/2b/%28MHNT%29_Salix_babylonica_-_Les_Martels%2C_Giroussens_Tarn.jpg/500px-%28MHNT%29_Salix_babylonica_-_Les_Martels%2C_Giroussens_Tarn.jpg",
       "w": 500,
       "h": 333,
-      "credit": "Tony Rebelo",
+      "credit": "Didier Descouens",
       "license": "CC BY-SA 4.0",
-      "page": "https://www.inaturalist.org/photos/57094810"
+      "page": "https://commons.wikimedia.org/wiki/File:(MHNT)_Salix_babylonica_-_Les_Martels,_Giroussens_Tarn.jpg"
      },
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/63337211/medium.jpeg",
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/15/SalixBabylonica.jpg/500px-SalixBabylonica.jpg",
       "w": 500,
-      "h": 333,
-      "credit": "Tony Rebelo",
-      "license": "CC BY-SA 4.0",
-      "page": "https://www.inaturalist.org/photos/63337211"
+      "h": 375,
+      "credit": "Fanghong",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:SalixBabylonica.jpg"
      },
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/272253549/medium.jpeg",
-      "w": 243,
-      "h": 500,
-      "credit": "Rob Cruickshank",
-      "license": "CC BY-SA 4.0",
-      "page": "https://www.inaturalist.org/photos/272253549"
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/4/48/Wheeping_willow_Larousse_Extracted.png/330px-Wheeping_willow_Larousse_Extracted.png",
+      "w": 330,
+      "h": 451,
+      "credit": "Arbres d'ornement-1 - ornamental trees in colour- Public domain book illustration (visu…",
+      "license": "CC0 1.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Wheeping_willow_Larousse_Extracted.png"
      }
     ]
    },
@@ -477,33 +493,33 @@
     "It is a conifer.",
     "It typically grows to about 30 m tall.",
     "The answer has 2 words (5, 4 letters).",
-    "It starts with the letter S."
+    "Its first letter is S."
    ],
    "media": {
     "img": [
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/268451762/medium.jpg",
-      "w": 335,
-      "h": 500,
-      "credit": "Douglas Goldman",
-      "license": "CC BY-SA 4.0",
-      "page": "https://www.inaturalist.org/photos/268451762"
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/5/5f/Pinus_sylvestris_Glenmuick.jpg/500px-Pinus_sylvestris_Glenmuick.jpg",
+      "w": 500,
+      "h": 650,
+      "credit": "Hello, I am Bruce on Flickr",
+      "license": "CC BY-SA 2.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Pinus_sylvestris_Glenmuick.jpg"
      },
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/71529/medium.jpg",
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/2/2d/Arjeplog_V%2C_Sweden_-_panoramio.jpg/330px-Arjeplog_V%2C_Sweden_-_panoramio.jpg",
+      "w": 330,
+      "h": 440,
+      "credit": "mroszewski",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Arjeplog_V,_Sweden_-_panoramio.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/e/e3/M%C3%A4nty.JPG/500px-M%C3%A4nty.JPG",
       "w": 500,
       "h": 375,
-      "credit": "anemoneprojectors (no internet at the moment)",
-      "license": "CC BY-SA 4.0",
-      "page": "https://www.inaturalist.org/photos/71529"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/66534708/medium.jpg",
-      "w": 375,
-      "h": 500,
-      "credit": "Patrick Cox",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/66534708"
+      "credit": "Demokraatti",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:M%C3%A4nty.JPG"
      }
     ]
    },
@@ -512,6 +528,7 @@
   {
    "id": "norway-spruce",
    "name": "Norway spruce",
+   "lname": "Norway spruce",
    "alt": [
     "Christmas tree",
     "spruce"
@@ -539,10 +556,26 @@
     "It typically grows to about 40 m tall.",
     "It is shaped like a cone.",
     "The answer has 2 words (6, 6 letters).",
-    "It starts with the letter N."
+    "Its first letter is N."
    ],
    "media": {
     "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/9/9d/Kuusk_Keila-Paldiski_rdt_%C3%A4%C3%A4res.jpg/330px-Kuusk_Keila-Paldiski_rdt_%C3%A4%C3%A4res.jpg",
+      "w": 330,
+      "h": 495,
+      "credit": "Ivar Leidus",
+      "license": "CC BY-SA 3.0 ee",
+      "page": "https://commons.wikimedia.org/wiki/File:Kuusk_Keila-Paldiski_rdt_%C3%A4%C3%A4res.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/0/00/Picea_abies_IMG_6858.jpg/500px-Picea_abies_IMG_6858.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Sdjurovic",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Picea_abies_IMG_6858.jpg"
+     },
      {
       "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/547109733/medium.jpg",
       "w": 335,
@@ -550,22 +583,6 @@
       "credit": "Douglas Goldman",
       "license": "CC BY-SA 4.0",
       "page": "https://www.inaturalist.org/photos/547109733"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/424612110/medium.jpg",
-      "w": 500,
-      "h": 374,
-      "credit": "Edward Ricemeyer",
-      "license": "CC BY-SA 4.0",
-      "page": "https://www.inaturalist.org/photos/424612110"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/369736539/medium.jpg",
-      "w": 375,
-      "h": 500,
-      "credit": "Katrin Simon",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/369736539"
      }
     ]
    },
@@ -602,33 +619,33 @@
     "It typically grows to about 90 m tall.",
     "It is the tallest tree in the world.",
     "The answer has 2 words (5, 7 letters).",
-    "It starts with the letter C."
+    "Its first letter is C."
    ],
    "media": {
     "img": [
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/24613306/medium.jpg",
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/6/6c/Sequoia_sempervirens_Big_Basin_Redwoods_State_Park_9.jpg/330px-Sequoia_sempervirens_Big_Basin_Redwoods_State_Park_9.jpg",
+      "w": 330,
+      "h": 495,
+      "credit": "Allie_Caulfield from Germany",
+      "license": "CC BY 2.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Sequoia_sempervirens_Big_Basin_Redwoods_State_Park_9.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/7/70/Sequoia_sempervirens_foliage_cones_Mount_Tamalpais_1.jpg/500px-Sequoia_sempervirens_foliage_cones_Mount_Tamalpais_1.jpg",
       "w": 500,
-      "h": 375,
-      "credit": "Miguel Vieira",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/24613306"
+      "h": 332,
+      "credit": "Ilya Katsnelson from Mountain View, USA",
+      "license": "CC BY 2.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Sequoia_sempervirens_foliage_cones_Mount_Tamalpais_1.jpg"
      },
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/29121312/medium.jpeg",
-      "w": 238,
-      "h": 500,
-      "credit": "Annie Chang",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/29121312"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/326787967/medium.jpg",
-      "w": 375,
-      "h": 500,
-      "credit": "no rights reserved",
-      "license": "CC0 1.0",
-      "page": "https://www.inaturalist.org/photos/326787967"
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/0/03/US_199_Redwood_Highway.jpg/330px-US_199_Redwood_Highway.jpg",
+      "w": 330,
+      "h": 494,
+      "credit": "Acroterion",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:US_199_Redwood_Highway.jpg"
      }
     ]
    },
@@ -665,33 +682,33 @@
     "It grows in California's Sierra Nevada.",
     "It is the biggest tree in the world by volume.",
     "The answer has 2 words (5, 7 letters).",
-    "It starts with the letter G."
+    "Its first letter is G."
    ],
    "media": {
     "img": [
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/84769950/medium.jpg",
-      "w": 500,
-      "h": 333,
-      "credit": "Laura Camp",
-      "license": "CC BY-SA 4.0",
-      "page": "https://www.inaturalist.org/photos/84769950"
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/1c/Grizzly_Giant_Mariposa_Grove.jpg/330px-Grizzly_Giant_Mariposa_Grove.jpg",
+      "w": 330,
+      "h": 609,
+      "credit": "Mike Murphy (talk · contribs)",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Grizzly_Giant_Mariposa_Grove.jpg"
      },
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/50434/medium.jpg",
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/d/d5/Amer0003_-_Flickr_-_NOAA_Photo_Library.jpg/330px-Amer0003_-_Flickr_-_NOAA_Photo_Library.jpg",
+      "w": 330,
+      "h": 440,
+      "credit": "NOAA Photo Library",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Amer0003_-_Flickr_-_NOAA_Photo_Library.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/d/db/Sequoiadendron_giganteum_08137.JPG/500px-Sequoiadendron_giganteum_08137.JPG",
       "w": 500,
       "h": 375,
-      "credit": "folini",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/50434"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/103304895/medium.jpg",
-      "w": 341,
-      "h": 500,
-      "credit": "Jeff Lahr",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/103304895"
+      "credit": "Wikimedia Commons",
+      "license": "CC BY 2.5",
+      "page": "https://commons.wikimedia.org/wiki/File:Sequoiadendron_giganteum_08137.JPG"
      }
     ]
    },
@@ -720,33 +737,33 @@
     "It typically grows to about 70 m tall.",
     "It is one of the world's most important timber trees.",
     "The answer has 2 words (7, 3 letters).",
-    "It starts with the letter D."
+    "Its first letter is D."
    ],
    "media": {
     "img": [
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/146021534/medium.jpeg",
-      "w": 500,
-      "h": 375,
-      "credit": "Danny Steaven",
-      "license": "CC BY-SA 4.0",
-      "page": "https://www.inaturalist.org/photos/146021534"
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/d/d4/Pseudotsuga_menziesii_7456.JPG/330px-Pseudotsuga_menziesii_7456.JPG",
+      "w": 330,
+      "h": 495,
+      "credit": "Walter Siegmund (talk)",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Pseudotsuga_menziesii_7456.JPG"
      },
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/159545535/medium.jpeg",
-      "w": 500,
-      "h": 375,
-      "credit": "Ellyne Geurts",
-      "license": "CC0 1.0",
-      "page": "https://www.inaturalist.org/photos/159545535"
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/3/30/DouglasFir_7491t.jpg/330px-DouglasFir_7491t.jpg",
+      "w": 330,
+      "h": 440,
+      "credit": "Walter Siegmund (talk)",
+      "license": "CC BY 2.5",
+      "page": "https://commons.wikimedia.org/wiki/File:DouglasFir_7491t.jpg"
      },
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/34300450/medium.jpeg",
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/b/ba/Pseudotsuga_menziesii_subsp_glauca%2C_Logan_Canyon%2C_Utah_2016-07-09_DSC05161.jpg/500px-Pseudotsuga_menziesii_subsp_glauca%2C_Logan_Canyon%2C_Utah_2016-07-09_DSC05161.jpg",
       "w": 500,
       "h": 375,
-      "credit": "Randal",
-      "license": "CC0 1.0",
-      "page": "https://www.inaturalist.org/photos/34300450"
+      "credit": "Andrey Zharkikh from Salt Lake City, USA",
+      "license": "CC BY 2.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Pseudotsuga_menziesii_subsp_glauca,_Logan_Canyon,_Utah_2016-07-09_DSC05161.jpg"
      }
     ]
    },
@@ -780,10 +797,26 @@
     "It is a \"living fossil\" from dinosaur times.",
     "Its name suggests an animal would find it hard to climb.",
     "The answer has 3 words (6, 6, 4 letters).",
-    "It starts with the letter M."
+    "Its first letter is M."
    ],
    "media": {
     "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/b/bb/Araucaria_en_Parque_Nacional_Conguillio.jpg/330px-Araucaria_en_Parque_Nacional_Conguillio.jpg",
+      "w": 330,
+      "h": 495,
+      "credit": "Vicente Fernández Rioja",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Araucaria_en_Parque_Nacional_Conguillio.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/d/d1/Pehuen.JPG/500px-Pehuen.JPG",
+      "w": 500,
+      "h": 375,
+      "credit": "Leoneldp",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Pehuen.JPG"
+     },
      {
       "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/16303515/medium.jpg",
       "w": 375,
@@ -791,22 +824,6 @@
       "credit": "Francisco E. Fonturbel",
       "license": "CC BY 4.0",
       "page": "https://www.inaturalist.org/photos/16303515"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/59786970/medium.jpg",
-      "w": 500,
-      "h": 375,
-      "credit": "Nelson Atencio",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/59786970"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/117500375/medium.jpeg",
-      "w": 375,
-      "h": 500,
-      "credit": "Nicolas Olejnik",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/117500375"
      }
     ]
    },
@@ -838,10 +855,26 @@
     "Its leaves turn golden yellow in autumn.",
     "Its leaves are shaped like fans.",
     "The answer is one word of 6 letters.",
-    "It starts with the letter G."
+    "Its first letter is G."
    ],
    "media": {
     "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/6/68/Gingko_biloba2.jpg",
+      "w": 500,
+      "h": 667,
+      "credit": "Kurt Stueber (Kurt Stüber)",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Gingko_biloba2.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/e/e0/GINKGOBAUM-2.jpg/330px-GINKGOBAUM-2.jpg",
+      "w": 330,
+      "h": 453,
+      "credit": "EecherplazGinkgo06.jpg: Cayambe derivative work: Ginkgotree (talk)",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:GINKGOBAUM-2.jpg"
+     },
      {
       "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/343545534/medium.jpg",
       "w": 500,
@@ -849,22 +882,6 @@
       "credit": "Douglas Goldman",
       "license": "CC BY-SA 4.0",
       "page": "https://www.inaturalist.org/photos/343545534"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/69936348/medium.jpg",
-      "w": 500,
-      "h": 375,
-      "credit": "Marco Mussita",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/69936348"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/119137630/medium.jpeg",
-      "w": 500,
-      "h": 333,
-      "credit": "Wang.QG",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/119137630"
      }
     ]
    },
@@ -873,6 +890,7 @@
   {
    "id": "african-baobab",
    "name": "African baobab",
+   "lname": "African baobab",
    "alt": [
     "baobab"
    ],
@@ -899,10 +917,18 @@
     "It is called the \"upside-down tree\".",
     "Its trunk is very fat and its branches look like roots.",
     "The answer has 2 words (7, 6 letters).",
-    "It starts with the letter A."
+    "Its first letter is A."
    ],
    "media": {
     "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/0/09/Baobab_and_elephant%2C_Tanzania.jpg/500px-Baobab_and_elephant%2C_Tanzania.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Ferdinand Reus from Arnhem, Holland",
+      "license": "CC BY-SA 2.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Baobab_and_elephant,_Tanzania.jpg"
+     },
      {
       "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/155601064/medium.jpeg",
       "w": 500,
@@ -918,14 +944,6 @@
       "credit": "Robert Taylor",
       "license": "CC BY 4.0",
       "page": "https://www.inaturalist.org/photos/15521975"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/49587711/medium.jpg",
-      "w": 500,
-      "h": 331,
-      "credit": "no rights reserved",
-      "license": "CC0 1.0",
-      "page": "https://www.inaturalist.org/photos/49587711"
      }
     ]
    },
@@ -959,33 +977,33 @@
     "It typically grows to about 12 m tall.",
     "Its trunk is bottle-shaped.",
     "The answer is one word of 4 letters.",
-    "It starts with the letter B."
+    "Its first letter is B."
    ],
    "media": {
     "img": [
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/42496268/medium.jpeg",
-      "w": 500,
-      "h": 333,
-      "credit": "Thibaud Aronson",
-      "license": "CC BY-SA 4.0",
-      "page": "https://www.inaturalist.org/photos/42496268"
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/d/d5/Boab%2C_Timber_Creek%2C_NT_-_Melissa_Jamcotchian.JPG/330px-Boab%2C_Timber_Creek%2C_NT_-_Melissa_Jamcotchian.JPG",
+      "w": 330,
+      "h": 440,
+      "credit": "Whitenoise01 at English Wikipedia",
+      "license": "CC BY 2.5",
+      "page": "https://commons.wikimedia.org/wiki/File:Boab,_Timber_Creek,_NT_-_Melissa_Jamcotchian.JPG"
      },
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/100635287/medium.jpeg",
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/3/3e/00_2018_Giant_Boab_Tree_-_Western_Australia.jpg/500px-00_2018_Giant_Boab_Tree_-_Western_Australia.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "W. Bulach",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:00_2018_Giant_Boab_Tree_-_Western_Australia.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/d/dc/Derby_boab%2C_Western_Australia.jpg/500px-Derby_boab%2C_Western_Australia.jpg",
       "w": 500,
       "h": 375,
-      "credit": "Ben Lewis",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/100635287"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/590128340/medium.jpg",
-      "w": 500,
-      "h": 333,
-      "credit": "Wolfgang Ahlmer",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/590128340"
+      "credit": "Nachoman-au",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Derby_boab,_Western_Australia.jpg"
      }
     ]
    },
@@ -1017,17 +1035,25 @@
     "It typically grows to about 85 m tall.",
     "It is the tallest flowering plant.",
     "The answer has 2 words (8, 3 letters).",
-    "It starts with the letter M."
+    "Its first letter is M."
    ],
    "media": {
     "img": [
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/31210907/medium.jpeg",
+      "src": "https://upload.wikimedia.org/wikipedia/commons/4/47/Tasmania_logging_08_Mighty_tree.jpg",
       "w": 500,
-      "h": 281,
-      "credit": "naturewatchwidow",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/31210907"
+      "h": 737,
+      "credit": "TTaylor",
+      "license": "CC BY 2.5",
+      "page": "https://commons.wikimedia.org/wiki/File:Tasmania_logging_08_Mighty_tree.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/6/6f/MountainAshWithCars.jpg/330px-MountainAshWithCars.jpg",
+      "w": 330,
+      "h": 440,
+      "credit": "Bob Beale",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:MountainAshWithCars.jpg"
      },
      {
       "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/389503546/medium.jpg",
@@ -1036,14 +1062,6 @@
       "credit": "Donald Davesne",
       "license": "CC BY 4.0",
       "page": "https://www.inaturalist.org/photos/389503546"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/47328384/medium.jpeg",
-      "w": 243,
-      "h": 500,
-      "credit": "Yoav Daniel Bar-Ness",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/47328384"
      }
     ]
    },
@@ -1074,7 +1092,7 @@
     "It keeps its leaves all year.",
     "It typically grows to about 30 m tall.",
     "The answer has 3 words (5, 3, 3 letters).",
-    "It starts with the letter R."
+    "Its first letter is R."
    ],
    "media": {
     "img": [
@@ -1109,6 +1127,7 @@
   {
    "id": "tasmanian-blue-gum",
    "name": "Tasmanian blue gum",
+   "lname": "Tasmanian blue gum",
    "alt": [
     "blue gum",
     "eucalyptus"
@@ -1131,10 +1150,18 @@
     "It typically grows to about 45 m tall.",
     "Koalas eat leaves from trees like it.",
     "The answer has 3 words (9, 4, 3 letters).",
-    "It starts with the letter T."
+    "Its first letter is T."
    ],
    "media": {
     "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/7/74/Eucalyptus_globulus_globulus.jpg/330px-Eucalyptus_globulus_globulus.jpg",
+      "w": 330,
+      "h": 440,
+      "credit": "Murray Fagg",
+      "license": "CC BY 3.0 au",
+      "page": "https://commons.wikimedia.org/wiki/File:Eucalyptus_globulus_globulus.jpg"
+     },
      {
       "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/138155692/medium.jpg",
       "w": 500,
@@ -1150,14 +1177,6 @@
       "credit": "whichchick",
       "license": "CC BY 4.0",
       "page": "https://www.inaturalist.org/photos/13601383"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/344581901/medium.jpeg",
-      "w": 500,
-      "h": 223,
-      "credit": "Gabriel Campbell-Martinez",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/344581901"
      }
     ]
    },
@@ -1186,10 +1205,26 @@
     "It typically grows to about 10 m tall.",
     "Its name includes winter weather.",
     "The answer has 2 words (4, 3 letters).",
-    "It starts with the letter S."
+    "Its first letter is S."
    ],
    "media": {
     "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/2/29/Snow_Gum.jpg/500px-Snow_Gum.jpg",
+      "w": 500,
+      "h": 335,
+      "credit": "Toby Hudson",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Snow_Gum.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/c/c9/Eucalyptus_pauciflora_flower.jpg/500px-Eucalyptus_pauciflora_flower.jpg",
+      "w": 500,
+      "h": 434,
+      "credit": "JJ Harrison (https://www.jjharrison.com.au/)",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Eucalyptus_pauciflora_flower.jpg"
+     },
      {
       "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/471275469/medium.jpeg",
       "w": 333,
@@ -1197,22 +1232,6 @@
       "credit": "Gary Williams",
       "license": "CC BY-SA 4.0",
       "page": "https://www.inaturalist.org/photos/471275469"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/400947651/medium.jpeg",
-      "w": 500,
-      "h": 333,
-      "credit": "Wairambar Rainforest",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/400947651"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/368090369/medium.jpg",
-      "w": 376,
-      "h": 500,
-      "credit": "no rights reserved",
-      "license": "CC0 1.0",
-      "page": "https://www.inaturalist.org/photos/368090369"
      }
     ]
    },
@@ -1221,6 +1240,7 @@
   {
    "id": "moreton-bay-fig",
    "name": "Moreton Bay fig",
+   "lname": "Moreton Bay fig",
    "sci": "Ficus macrophylla",
    "group": "fig",
    "facts": {
@@ -1244,10 +1264,18 @@
     "It typically grows to about 40 m tall.",
     "It is planted in parks across Australia.",
     "The answer has 3 words (7, 3, 3 letters).",
-    "It starts with the letter M."
+    "Its first letter is M."
    ],
    "media": {
     "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/4/48/Moretonbayfigfrom1850.JPG/500px-Moretonbayfigfrom1850.JPG",
+      "w": 500,
+      "h": 375,
+      "credit": "User DO'Neil on en.wikipedia",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Moretonbayfigfrom1850.JPG"
+     },
      {
       "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/289755926/medium.jpeg",
       "w": 500,
@@ -1263,14 +1291,6 @@
       "credit": "Greg Tasney",
       "license": "CC BY-SA 4.0",
       "page": "https://www.inaturalist.org/photos/289755989"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/286086529/medium.jpeg",
-      "w": 500,
-      "h": 375,
-      "credit": "no rights reserved",
-      "license": "CC0 1.0",
-      "page": "https://www.inaturalist.org/photos/286086529"
      }
     ]
    },
@@ -1279,6 +1299,7 @@
   {
    "id": "wollemi-pine",
    "name": "Wollemi pine",
+   "lname": "Wollemi pine",
    "sci": "Wollemia nobilis",
    "group": "conifer",
    "facts": {
@@ -1300,10 +1321,26 @@
     "Fewer than 100 grow in the wild.",
     "It is called the \"dinosaur tree\".",
     "The answer has 2 words (7, 4 letters).",
-    "It starts with the letter W."
+    "Its first letter is W."
    ],
    "media": {
     "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/5/56/WollemiaNobilisPineKiefer.jpg",
+      "w": 500,
+      "h": 667,
+      "credit": "Wikimedia Commons",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:WollemiaNobilisPineKiefer.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/7/70/Wakehurst_Place_woodland_Wollemi_pine.jpg/330px-Wakehurst_Place_woodland_Wollemi_pine.jpg",
+      "w": 330,
+      "h": 495,
+      "credit": "AndyScott",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Wakehurst_Place_woodland_Wollemi_pine.jpg"
+     },
      {
       "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/57215581/medium.jpeg",
       "w": 500,
@@ -1311,22 +1348,6 @@
       "credit": "Grzegorz Grzejszczak",
       "license": "CC BY-SA 4.0",
       "page": "https://www.inaturalist.org/photos/57215581"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/30403985/medium.jpeg",
-      "w": 500,
-      "h": 282,
-      "credit": "Andra Waagmeester",
-      "license": "CC0 1.0",
-      "page": "https://www.inaturalist.org/photos/30403985"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/694967707/medium.jpg",
-      "w": 376,
-      "h": 500,
-      "credit": "no rights reserved",
-      "license": "CC0 1.0",
-      "page": "https://www.inaturalist.org/photos/694967707"
      }
     ]
    },
@@ -1355,10 +1376,26 @@
     "Its fallen flowers make purple carpets.",
     "It is covered in purple flowers.",
     "The answer is one word of 9 letters.",
-    "It starts with the letter J."
+    "Its first letter is J."
    ],
    "media": {
     "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/16/Jacaranda_cuspidifolia_flower.jpg/500px-Jacaranda_cuspidifolia_flower.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "João Medeiros",
+      "license": "CC BY 2.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Jacaranda_cuspidifolia_flower.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/8/84/Starr_010419-0078_Jacaranda_mimosifolia.jpg/500px-Starr_010419-0078_Jacaranda_mimosifolia.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Forest & Kim Starr",
+      "license": "CC BY 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Starr_010419-0078_Jacaranda_mimosifolia.jpg"
+     },
      {
       "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/102444/medium.jpg",
       "w": 500,
@@ -1366,22 +1403,6 @@
       "credit": "mauroguanandi",
       "license": "CC BY 4.0",
       "page": "https://www.inaturalist.org/photos/102444"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/125575926/medium.jpeg",
-      "w": 500,
-      "h": 375,
-      "credit": "Gustavo Puente",
-      "license": "CC0 1.0",
-      "page": "https://www.inaturalist.org/photos/125575926"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/57156533/medium.jpeg",
-      "w": 500,
-      "h": 375,
-      "credit": "Alan demian benadia",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/57156533"
      }
     ]
    },
@@ -1416,10 +1437,26 @@
     "Its fruit holds sweet water.",
     "Its fruit is a big hairy nut.",
     "The answer has 2 words (7, 4 letters).",
-    "It starts with the letter C."
+    "Its first letter is C."
    ],
    "media": {
     "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/3/33/Koh_Mak_%28island%29%2C_Thailand%2C_Palm_tree_on_the_beach.jpg/500px-Koh_Mak_%28island%29%2C_Thailand%2C_Palm_tree_on_the_beach.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Vyacheslav Argenberg",
+      "license": "CC BY 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Koh_Mak_(island),_Thailand,_Palm_tree_on_the_beach.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/8/80/Koh_Samui_Lipa_Noi2.jpg/500px-Koh_Samui_Lipa_Noi2.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Manfred Werner",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Koh_Samui_Lipa_Noi2.jpg"
+     },
      {
       "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/234982213/medium.jpg",
       "w": 500,
@@ -1427,22 +1464,6 @@
       "credit": "Douglas Goldman",
       "license": "CC BY-SA 4.0",
       "page": "https://www.inaturalist.org/photos/234982213"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/103610074/medium.jpg",
-      "w": 500,
-      "h": 331,
-      "credit": "David Anderson",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/103610074"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/237428590/medium.jpg",
-      "w": 500,
-      "h": 375,
-      "credit": "Diogo Luiz",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/237428590"
      }
     ]
    },
@@ -1475,10 +1496,26 @@
     "Its sweet fruit grows in big bunches.",
     "Its fruit shares a name with a day on the calendar.",
     "The answer has 2 words (4, 4 letters).",
-    "It starts with the letter D."
+    "Its first letter is D."
    ],
    "media": {
     "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/d/db/Phoenix_dactylifera_-_EJ_Burns_-_606494286.jpeg/330px-Phoenix_dactylifera_-_EJ_Burns_-_606494286.jpeg",
+      "w": 330,
+      "h": 440,
+      "credit": "EJ Burns",
+      "license": "CC BY 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Phoenix_dactylifera_-_EJ_Burns_-_606494286.jpeg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/4/45/Dates005.jpg/500px-Dates005.jpg",
+      "w": 500,
+      "h": 335,
+      "credit": "Nepenthes",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Dates005.jpg"
+     },
      {
       "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/160414571/medium.jpg",
       "w": 500,
@@ -1486,22 +1523,6 @@
       "credit": "Ashley Basil",
       "license": "CC BY 4.0",
       "page": "https://www.inaturalist.org/photos/160414571"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/7603161/medium.jpg",
-      "w": 500,
-      "h": 375,
-      "credit": "Jon Mortin",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/7603161"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/412786024/medium.jpeg",
-      "w": 500,
-      "h": 375,
-      "credit": "Nachman bones",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/412786024"
      }
     ]
    },
@@ -1537,10 +1558,26 @@
     "It spreads out like a forest from one tree.",
     "It is a kind of fig.",
     "The answer is one word of 6 letters.",
-    "It starts with the letter B."
+    "Its first letter is B."
    ],
    "media": {
     "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/5/58/Gomero_de_la_India%2C_Parque_Mitre%2C_Corrientes.jpg/500px-Gomero_de_la_India%2C_Parque_Mitre%2C_Corrientes.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Dario Alpern",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Gomero_de_la_India,_Parque_Mitre,_Corrientes.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/0/0d/Big_Banyan_Tree_at_Bangalore.jpg/500px-Big_Banyan_Tree_at_Bangalore.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Kiran Gopi",
+      "license": "CC BY-SA 2.5 in",
+      "page": "https://commons.wikimedia.org/wiki/File:Big_Banyan_Tree_at_Bangalore.jpg"
+     },
      {
       "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/7695/medium.jpg",
       "w": 500,
@@ -1548,22 +1585,6 @@
       "credit": "jess n",
       "license": "CC BY-SA 4.0",
       "page": "https://www.inaturalist.org/photos/7695"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/192133322/medium.jpg",
-      "w": 500,
-      "h": 281,
-      "credit": "Yoav Daniel Bar-Ness",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/192133322"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/192795211/medium.jpg",
-      "w": 500,
-      "h": 375,
-      "credit": "Yoav Daniel Bar-Ness",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/192795211"
      }
     ]
    },
@@ -1596,10 +1617,26 @@
     "Its fruit is pressed for oil.",
     "It grows around the Mediterranean.",
     "The answer has 2 words (5, 4 letters).",
-    "It starts with the letter O."
+    "Its first letter is O."
    ],
    "media": {
     "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/10/Olea_europaea_Preveli_01.JPG/500px-Olea_europaea_Preveli_01.JPG",
+      "w": 500,
+      "h": 333,
+      "credit": "Uoaei1",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Olea_europaea_Preveli_01.JPG"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/c/c2/Olea_europaea%2C_Murviel-l%C3%A8s-B%C3%A9ziers.jpg/500px-Olea_europaea%2C_Murviel-l%C3%A8s-B%C3%A9ziers.jpg",
+      "w": 500,
+      "h": 313,
+      "credit": "Christian Ferrer",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Olea_europaea,_Murviel-l%C3%A8s-B%C3%A9ziers.jpg"
+     },
      {
       "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/95624108/medium.jpeg",
       "w": 375,
@@ -1607,22 +1644,6 @@
       "credit": "viridian",
       "license": "CC0 1.0",
       "page": "https://www.inaturalist.org/photos/95624108"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/712174255/medium.jpg",
-      "w": 500,
-      "h": 375,
-      "credit": "zebedeugalinha",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/712174255"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/602303597/medium.jpg",
-      "w": 500,
-      "h": 260,
-      "credit": "zebedeugalinha",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/602303597"
      }
     ]
    },
@@ -1631,6 +1652,7 @@
   {
    "id": "japanese-cherry",
    "name": "Japanese cherry",
+   "lname": "Japanese cherry",
    "alt": [
     "cherry blossom",
     "sakura"
@@ -1652,10 +1674,18 @@
     "It loses its leaves each year.",
     "It typically grows to about 10 m tall.",
     "The answer has 2 words (8, 6 letters).",
-    "It starts with the letter J."
+    "Its first letter is J."
    ],
    "media": {
     "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/10/Cerisier_du_Japon_Prunus_serrulata.jpg/500px-Cerisier_du_Japon_Prunus_serrulata.jpg",
+      "w": 500,
+      "h": 342,
+      "credit": "Myrabella",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Cerisier_du_Japon_Prunus_serrulata.jpg"
+     },
      {
       "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/30084777/medium.jpeg",
       "w": 500,
@@ -1671,14 +1701,6 @@
       "credit": "Jenny Christianson",
       "license": "CC0 1.0",
       "page": "https://www.inaturalist.org/photos/33925758"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/366717203/medium.jpeg",
-      "w": 500,
-      "h": 375,
-      "credit": "W Rao",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/366717203"
      }
     ]
    },
@@ -1711,33 +1733,33 @@
     "Its blossom is pink and white.",
     "It grows a crunchy red or green fruit.",
     "The answer has 2 words (5, 4 letters).",
-    "It starts with the letter A."
+    "Its first letter is A."
    ],
    "media": {
     "img": [
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/399127934/medium.jpg",
-      "w": 375,
-      "h": 500,
-      "credit": "Kieran Hanrahan",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/399127934"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/491893168/medium.jpg",
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/f/f4/Honeycrisp.jpg/500px-Honeycrisp.jpg",
       "w": 500,
       "h": 500,
-      "credit": "Alexander Dubynin",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/491893168"
+      "credit": "Jonathunder",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Honeycrisp.jpg"
      },
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/55570314/medium.jpeg",
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/9/9e/Apfel_mit_Schnitt_Golden_Delicious_%28fcm%29.jpg/500px-Apfel_mit_Schnitt_Golden_Delicious_%28fcm%29.jpg",
       "w": 500,
-      "h": 333,
-      "credit": "no rights reserved",
-      "license": "CC0 1.0",
-      "page": "https://www.inaturalist.org/photos/55570314"
+      "h": 382,
+      "credit": "Photograph: Frank C. Müller, Frankfurt am Main",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Apfel_mit_Schnitt_Golden_Delicious_(fcm).jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/d/d5/Assorted_Red_and_Green_Apples_2120px.jpg/330px-Assorted_Red_and_Green_Apples_2120px.jpg",
+      "w": 330,
+      "h": 438,
+      "credit": "Original photo by and (c)2007 NaJina McEnany. Photo prepared by User:Ram-Man. Used by p…",
+      "license": "CC BY-SA 2.5",
+      "page": "https://commons.wikimedia.org/wiki/File:Assorted_Red_and_Green_Apples_2120px.jpg"
      }
     ]
    },
@@ -1769,10 +1791,18 @@
     "It typically grows to about 6 m tall.",
     "It is Australia's floral emblem.",
     "The answer has 2 words (6, 6 letters).",
-    "It starts with the letter G."
+    "Its first letter is G."
    ],
    "media": {
     "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/9/9b/Acacia_pycnantha_Golden_Wattle.jpg/500px-Acacia_pycnantha_Golden_Wattle.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Melburnian",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Acacia_pycnantha_Golden_Wattle.jpg"
+     },
      {
       "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/111113985/medium.jpeg",
       "w": 500,
@@ -1788,14 +1818,6 @@
       "credit": "Tony Rebelo",
       "license": "CC BY-SA 4.0",
       "page": "https://www.inaturalist.org/photos/131659410"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/538889167/medium.jpg",
-      "w": 281,
-      "h": 500,
-      "credit": "Rosalie Lawrence",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/538889167"
      }
     ]
    },
@@ -1804,6 +1826,7 @@
   {
    "id": "norfolk-island-pine",
    "name": "Norfolk Island pine",
+   "lname": "Norfolk Island pine",
    "sci": "Araucaria heterophylla",
    "group": "conifer",
    "facts": {
@@ -1828,10 +1851,26 @@
     "It typically grows to about 50 m tall.",
     "It lines many Australian beaches.",
     "The answer has 3 words (7, 6, 4 letters).",
-    "It starts with the letter N."
+    "Its first letter is N."
    ],
    "media": {
     "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/3/38/Araucaria_heterophylla_Norfolk_Island_0.jpg/330px-Araucaria_heterophylla_Norfolk_Island_0.jpg",
+      "w": 330,
+      "h": 495,
+      "credit": "bertknot from scarborough, australia",
+      "license": "CC BY-SA 2.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Araucaria_heterophylla_Norfolk_Island_0.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/10/Norfolk-Island-Pines.jpg/500px-Norfolk-Island-Pines.jpg",
+      "w": 500,
+      "h": 331,
+      "credit": "thinboyfatter",
+      "license": "CC BY 2.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Norfolk-Island-Pines.jpg"
+     },
      {
       "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/250438081/medium.jpg",
       "w": 500,
@@ -1839,22 +1878,6 @@
       "credit": "bertknot",
       "license": "CC BY-SA 4.0",
       "page": "https://www.inaturalist.org/photos/250438081"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/373978451/medium.jpg",
-      "w": 375,
-      "h": 500,
-      "credit": "Donna Belder",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/373978451"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/266147351/medium.jpeg",
-      "w": 375,
-      "h": 500,
-      "credit": "Leon Perrie",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/266147351"
      }
     ]
    },
@@ -1885,10 +1908,26 @@
     "It typically grows to about 40 m tall.",
     "Its trunk has no branches until high up.",
     "The answer is one word of 5 letters.",
-    "It starts with the letter K."
+    "Its first letter is K."
    ],
    "media": {
     "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/e/ef/Kauri_Te_Matua_Ngahere.jpg/330px-Kauri_Te_Matua_Ngahere.jpg",
+      "w": 330,
+      "h": 825,
+      "credit": "No machine-readable author provided. Mr. Tickle assumed (based on copyright claims).",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Kauri_Te_Matua_Ngahere.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/0/0a/Agathis_robusta2.JPG/330px-Agathis_robusta2.JPG",
+      "w": 330,
+      "h": 440,
+      "credit": "Wikimedia Commons",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Agathis_robusta2.JPG"
+     },
      {
       "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/62568619/medium.jpeg",
       "w": 500,
@@ -1896,22 +1935,6 @@
       "credit": "Jacqui Geux",
       "license": "CC BY 4.0",
       "page": "https://www.inaturalist.org/photos/62568619"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/62497940/medium.jpeg",
-      "w": 500,
-      "h": 333,
-      "credit": "Jacqui Geux",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/62497940"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/3153402/medium.jpg",
-      "w": 500,
-      "h": 375,
-      "credit": "J Brew",
-      "license": "CC BY-SA 4.0",
-      "page": "https://www.inaturalist.org/photos/3153402"
      }
     ]
    },
@@ -1943,10 +1966,18 @@
     "Its leaves are feather-like.",
     "It has bunches of bright red berries.",
     "The answer is one word of 5 letters.",
-    "It starts with the letter R."
+    "Its first letter is R."
    ],
    "media": {
     "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/d/d7/Rowanberries_in_late_August_2004_in_Helsinki.jpg/500px-Rowanberries_in_late_August_2004_in_Helsinki.jpg",
+      "w": 500,
+      "h": 371,
+      "credit": "Taken by me, Jonik, on August 25, 2004.",
+      "license": "CC BY-SA 2.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Rowanberries_in_late_August_2004_in_Helsinki.jpg"
+     },
      {
       "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/10450/medium.jpg",
       "w": 500,
@@ -1962,14 +1993,6 @@
       "credit": "per",
       "license": "CC BY 4.0",
       "page": "https://www.inaturalist.org/photos/10451"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/10453/medium.jpg",
-      "w": 500,
-      "h": 333,
-      "credit": "Miika Silfverberg",
-      "license": "CC BY-SA 4.0",
-      "page": "https://www.inaturalist.org/photos/10453"
      }
     ]
    },
@@ -1978,6 +2001,7 @@
   {
    "id": "english-yew",
    "name": "English yew",
+   "lname": "English yew",
    "alt": [
     "yew",
     "common yew"
@@ -2003,10 +2027,26 @@
     "It is often found in churchyards.",
     "Some are thought to be thousands of years old.",
     "The answer has 2 words (7, 3 letters).",
-    "It starts with the letter E."
+    "Its first letter is E."
    ],
    "media": {
     "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/7/7e/Taxus_baccata_tree.jpg/330px-Taxus_baccata_tree.jpg",
+      "w": 330,
+      "h": 440,
+      "credit": "Sitomon",
+      "license": "CC BY-SA 2.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Taxus_baccata_tree.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/3/31/Taxus_baccata_MHNT.jpg/500px-Taxus_baccata_MHNT.jpg",
+      "w": 500,
+      "h": 436,
+      "credit": "Didier Descouens",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Taxus_baccata_MHNT.jpg"
+     },
      {
       "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/79446798/medium.jpg",
       "w": 500,
@@ -2014,22 +2054,6 @@
       "credit": "Douglas Goldman",
       "license": "CC BY-SA 4.0",
       "page": "https://www.inaturalist.org/photos/79446798"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/69373138/medium.jpeg",
-      "w": 500,
-      "h": 375,
-      "credit": "Florin Feneru",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/69373138"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/1203032/medium.",
-      "w": 500,
-      "h": 333,
-      "credit": "Colin Meurk",
-      "license": "CC BY-SA 4.0",
-      "page": "https://www.inaturalist.org/photos/1203032"
      }
     ]
    },
@@ -2062,10 +2086,26 @@
     "It is a Christmas decoration.",
     "It has spiky leaves and red berries.",
     "The answer is one word of 5 letters.",
-    "It starts with the letter H."
+    "Its first letter is H."
    ],
    "media": {
     "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/2/28/Ilex_paraguariensis_-_K%C3%B6hler%E2%80%93s_Medizinal-Pflanzen-074.jpg",
+      "w": 500,
+      "h": 723,
+      "credit": "Franz Eugen Köhler, Köhler's Medizinal-Pflanzen",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Ilex_paraguariensis_-_K%C3%B6hler%E2%80%93s_Medizinal-Pflanzen-074.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/9/96/Ilex-aquifolium_%28Europaeische_Stechpalme-1%29.jpg/500px-Ilex-aquifolium_%28Europaeische_Stechpalme-1%29.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Jürgen Howaldt",
+      "license": "CC BY-SA 2.0 de",
+      "page": "https://commons.wikimedia.org/wiki/File:Ilex-aquifolium_(Europaeische_Stechpalme-1).jpg"
+     },
      {
       "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/70264116/medium.jpg",
       "w": 375,
@@ -2073,22 +2113,6 @@
       "credit": "no rights reserved",
       "license": "CC0 1.0",
       "page": "https://www.inaturalist.org/photos/70264116"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/448317645/medium.jpeg",
-      "w": 500,
-      "h": 375,
-      "credit": "zebedeugalinha",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/448317645"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/602751275/medium.jpg",
-      "w": 500,
-      "h": 375,
-      "credit": "Kieran Roy Powell",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/602751275"
      }
     ]
    },
@@ -2097,6 +2121,7 @@
   {
    "id": "london-plane",
    "name": "London plane",
+   "lname": "London plane",
    "alt": [
     "plane tree"
    ],
@@ -2121,33 +2146,33 @@
     "It copes well with city pollution.",
     "It lines the streets of the UK capital.",
     "The answer has 2 words (6, 5 letters).",
-    "It starts with the letter L."
+    "Its first letter is L."
    ],
    "media": {
     "img": [
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/734521948/medium.jpg",
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/e/e0/PlatanusAcerifoliaTrunk.jpg/330px-PlatanusAcerifoliaTrunk.jpg",
+      "w": 330,
+      "h": 440,
+      "credit": "Taken by Fanghong",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:PlatanusAcerifoliaTrunk.jpg"
+     },
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/8/81/London_Plane_Larousse_Extracted.png",
       "w": 500,
-      "h": 375,
-      "credit": "zebedeugalinha",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/734521948"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/111448285/medium.jpg",
-      "w": 375,
-      "h": 500,
-      "credit": "no rights reserved",
+      "h": 625,
+      "credit": "Arbres d'ornement-2 - ornamental trees in colour - Public domain book illustration (vis…",
       "license": "CC0 1.0",
-      "page": "https://www.inaturalist.org/photos/111448285"
+      "page": "https://commons.wikimedia.org/wiki/File:London_Plane_Larousse_Extracted.png"
      },
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/679234298/medium.jpg",
-      "w": 333,
-      "h": 500,
-      "credit": "James Heal",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/679234298"
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/2/23/Berkeley_Square_-_geograph.org.uk_-_911963.jpg/500px-Berkeley_Square_-_geograph.org.uk_-_911963.jpg",
+      "w": 500,
+      "h": 334,
+      "credit": "Richard Croft",
+      "license": "CC BY-SA 2.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Berkeley_Square_-_geograph.org.uk_-_911963.jpg"
      }
     ]
    },
@@ -2180,33 +2205,33 @@
     "Its cones sit upright like barrels.",
     "It appears on the flag of a Middle Eastern country.",
     "The answer has 3 words (5, 2, 7 letters).",
-    "It starts with the letter C."
+    "Its first letter is C."
    ],
    "media": {
     "img": [
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/179936964/medium.jpeg",
-      "w": 375,
-      "h": 500,
-      "credit": "Zeke Marshall",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/179936964"
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/b/bf/C%C3%A8dre_du_Liban_Barouk_2005.jpg/500px-C%C3%A8dre_du_Liban_Barouk_2005.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Olivier BEZES",
+      "license": "CC BY 2.5",
+      "page": "https://commons.wikimedia.org/wiki/File:C%C3%A8dre_du_Liban_Barouk_2005.jpg"
      },
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/212970981/medium.jpeg",
-      "w": 376,
-      "h": 500,
-      "credit": "Michael, Antoni and Nihat Hinczewski",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/212970981"
+      "src": "https://upload.wikimedia.org/wikipedia/commons/2/25/Libanonzeder.jpg",
+      "w": 500,
+      "h": 666,
+      "credit": "Wikimedia Commons",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Libanonzeder.jpg"
      },
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/44324764/medium.jpg",
-      "w": 375,
-      "h": 500,
-      "credit": "James Hardcastle",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/44324764"
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/b/ba/Lebanese_Cedar_Larousse_Extracted.png/500px-Lebanese_Cedar_Larousse_Extracted.png",
+      "w": 500,
+      "h": 413,
+      "credit": "Arbres d'ornement-1 - ornamental trees in colour- Public domain book illustration (visu…",
+      "license": "CC0 1.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Lebanese_Cedar_Larousse_Extracted.png"
      }
     ]
    },
@@ -2239,10 +2264,26 @@
     "Its trunk is twisted and weathered.",
     "It is one of the oldest living things on Earth.",
     "The answer has 4 words (5, 5, 11, 4 letters).",
-    "It starts with the letter G."
+    "Its first letter is G."
    ],
    "media": {
     "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/5/58/Big_bristlecone_pine_Pinus_longaeva.jpg/500px-Big_bristlecone_pine_Pinus_longaeva.jpg",
+      "w": 500,
+      "h": 623,
+      "credit": "Dcrjsr",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Big_bristlecone_pine_Pinus_longaeva.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/b/be/Prometheus_Wheeler.jpg/500px-Prometheus_Wheeler.jpg",
+      "w": 500,
+      "h": 335,
+      "credit": "James R Bouldin (talk · contribs)",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Prometheus_Wheeler.jpg"
+     },
      {
       "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/51385754/medium.jpg",
       "w": 500,
@@ -2250,22 +2291,6 @@
       "credit": "Jim Morefield",
       "license": "CC BY 4.0",
       "page": "https://www.inaturalist.org/photos/51385754"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/441396173/medium.jpeg",
-      "w": 357,
-      "h": 500,
-      "credit": "Roberto Daniel Avila",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/441396173"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/441396217/medium.jpeg",
-      "w": 333,
-      "h": 500,
-      "credit": "Roberto Daniel Avila",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/441396217"
      }
     ]
    },
@@ -2296,7 +2321,7 @@
     "It typically grows to about 10 m tall.",
     "It is named after a mythical beast's red resin.",
     "The answer has 3 words (7, 5, 4 letters).",
-    "It starts with the letter D."
+    "Its first letter is D."
    ],
    "media": {
     "img": [
@@ -2331,6 +2356,7 @@
   {
    "id": "joshua-tree",
    "name": "Joshua tree",
+   "lname": "Joshua tree",
    "sci": "Yucca brevifolia",
    "group": "yucca",
    "facts": {
@@ -2352,10 +2378,26 @@
     "It is a kind of yucca.",
     "It is named after a figure from the Bible.",
     "The answer has 2 words (6, 4 letters).",
-    "It starts with the letter J."
+    "Its first letter is J."
    ],
    "media": {
     "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/2/21/Joshua_Tree_NP_-_Joshua_Tree_2.jpg/330px-Joshua_Tree_NP_-_Joshua_Tree_2.jpg",
+      "w": 330,
+      "h": 511,
+      "credit": "Jarek Tuszyński",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Joshua_Tree_NP_-_Joshua_Tree_2.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/4/49/Joshua_Tree_01.jpg/330px-Joshua_Tree_01.jpg",
+      "w": 330,
+      "h": 455,
+      "credit": "Bernard Gagnon",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Joshua_Tree_01.jpg"
+     },
      {
       "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/18708210/medium.jpeg",
       "w": 375,
@@ -2363,22 +2405,6 @@
       "credit": "Rod",
       "license": "CC0 1.0",
       "page": "https://www.inaturalist.org/photos/18708210"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/862/medium.jpg",
-      "w": 374,
-      "h": 500,
-      "credit": "Larry Page",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/862"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/475121830/medium.jpg",
-      "w": 500,
-      "h": 333,
-      "credit": "Roberto Daniel Avila",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/475121830"
      }
     ]
    },
@@ -2410,33 +2436,33 @@
     "It typically grows to about 20 m tall.",
     "Its bark is used to seal wine bottles.",
     "The answer has 2 words (4, 3 letters).",
-    "It starts with the letter C."
+    "Its first letter is C."
    ],
    "media": {
     "img": [
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/159050222/medium.jpeg",
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/7/70/Quercus_suber_JPG1.jpg/500px-Quercus_suber_JPG1.jpg",
       "w": 500,
-      "h": 375,
-      "credit": "Duarte Frade",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/159050222"
+      "h": 333,
+      "credit": "Jean-Pol GRANDMONT",
+      "license": "CC BY 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Quercus_suber_JPG1.jpg"
      },
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/383856062/medium.jpeg",
-      "w": 500,
-      "h": 375,
-      "credit": "Duarte Frade",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/383856062"
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/16/Surera_de_Tossa.jpg/330px-Surera_de_Tossa.jpg",
+      "w": 330,
+      "h": 440,
+      "credit": "No machine-readable author provided. David.gaya assumed (based on copyright claims).",
+      "license": "CC BY-SA 2.5",
+      "page": "https://commons.wikimedia.org/wiki/File:Surera_de_Tossa.jpg"
      },
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/23574718/medium.jpeg",
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/c/c9/Cork_oak_%2828864190188%29.jpg/500px-Cork_oak_%2828864190188%29.jpg",
       "w": 500,
-      "h": 375,
-      "credit": "Crap Fou",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/23574718"
+      "h": 333,
+      "credit": "Kent Wang from London, United Kingdom",
+      "license": "CC BY-SA 2.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Cork_oak_(28864190188).jpg"
      }
     ]
    },
@@ -2465,33 +2491,33 @@
     "It typically grows to about 25 m tall.",
     "Its white flowers are huge and scented.",
     "The answer has 2 words (8, 8 letters).",
-    "It starts with the letter S."
+    "Its first letter is S."
    ],
    "media": {
     "img": [
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/557171383/medium.jpg",
-      "w": 335,
-      "h": 500,
-      "credit": "Douglas Goldman",
-      "license": "CC BY-SA 4.0",
-      "page": "https://www.inaturalist.org/photos/557171383"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/70227915/medium.jpg",
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/7/78/Magnolia_flower_Duke_campus.jpg/500px-Magnolia_flower_Duke_campus.jpg",
       "w": 500,
-      "h": 375,
-      "credit": "Pmsyyz",
-      "license": "CC BY-SA 4.0",
-      "page": "https://www.inaturalist.org/photos/70227915"
+      "h": 313,
+      "credit": "DavetheMage",
+      "license": "CC BY 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Magnolia_flower_Duke_campus.jpg"
      },
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/82254016/medium.jpg",
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/6/67/Magnolia_grandiflora3.jpg/500px-Magnolia_grandiflora3.jpg",
       "w": 500,
       "h": 375,
       "credit": "Kurt Stueber",
-      "license": "CC BY-SA 4.0",
-      "page": "https://www.inaturalist.org/photos/82254016"
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Magnolia_grandiflora3.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/d/dc/Magn%C3%B2lia_a_Verbania.JPG/500px-Magn%C3%B2lia_a_Verbania.JPG",
+      "w": 500,
+      "h": 331,
+      "credit": "Josep Renalias Lohen11",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Magn%C3%B2lia_a_Verbania.JPG"
      }
     ]
    },
@@ -2523,10 +2549,18 @@
     "Workers cut its bark to collect sap.",
     "Its sap makes tyres and balloons.",
     "The answer has 2 words (6, 4 letters).",
-    "It starts with the letter R."
+    "Its first letter is R."
    ],
    "media": {
     "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/1/1d/Hevea_brasiliensis_-_K%C3%B6hler%E2%80%93s_Medizinal-Pflanzen-071.jpg",
+      "w": 500,
+      "h": 693,
+      "credit": "Franz Eugen Köhler, Köhler's Medizinal-Pflanzen",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Hevea_brasiliensis_-_K%C3%B6hler%E2%80%93s_Medizinal-Pflanzen-071.jpg"
+     },
      {
       "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/60706943/medium.jpeg",
       "w": 375,
@@ -2542,14 +2576,6 @@
       "credit": "Ong Jyh Seng",
       "license": "CC BY-SA 4.0",
       "page": "https://www.inaturalist.org/photos/48142234"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/146559031/medium.jpeg",
-      "w": 375,
-      "h": 500,
-      "credit": "Ong Jyh Seng",
-      "license": "CC BY-SA 4.0",
-      "page": "https://www.inaturalist.org/photos/146559031"
      }
     ]
    },

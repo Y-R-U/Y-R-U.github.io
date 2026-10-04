@@ -1,0 +1,2170 @@
+{
+ "id": "inventions",
+ "title": "Inventions",
+ "theme": "science",
+ "icon": "💡",
+ "kids": true,
+ "version": 1,
+ "imgPrompt": "Which of these is {lname}?",
+ "nameImgPrompt": "Which invention is this?",
+ "tfImgPrompt": "This is {lname}.",
+ "leakExempt": [],
+ "factsMeta": {
+  "year": {
+   "type": "year",
+   "label": "Year",
+   "higherLabel": "Later",
+   "askHigh": "Which of these is the newest invention?",
+   "askLow": "Which of these is the oldest invention?",
+   "minRatio": 1.01
+  },
+  "inventor": {
+   "type": "text",
+   "label": "Inventor",
+   "ask": "Who is credited with {lname}?",
+   "askReverse": "Which invention is credited to {value}?",
+   "stmt": "The {lname} is credited to {value}."
+  },
+  "country": {
+   "type": "cat",
+   "label": "Country",
+   "ask": "Where was {lname} invented?",
+   "askReverse": "Which of these was invented in {value}?",
+   "stmt": "The {lname} was invented in {value}."
+  }
+ },
+ "items": [
+  {
+   "id": "paper",
+   "name": "Paper",
+   "facts": {
+    "year": 105,
+    "inventor": "Cai Lun",
+    "country": "China"
+   },
+   "blurb": "Paper made from plant fibres was improved and recorded by Cai Lun, a Chinese court official, around 105 AD.",
+   "clues": [
+    "Its maker was a court official of the Han dynasty.",
+    "Early versions used tree bark, hemp and old fishing nets.",
+    "The idea reached Europe over a thousand years later.",
+    "It dates from 105.",
+    "It is credited to Cai Lun.",
+    "It was invented in China.",
+    "Books and newspapers are printed on it.",
+    "You write on it with a pen.",
+    "The answer is one word of 5 letters.",
+    "Its first letter is P."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/2/2a/Scattered_white_paper_%28Unsplash%29.jpg/330px-Scattered_white_paper_%28Unsplash%29.jpg",
+      "w": 330,
+      "h": 474,
+      "credit": "Brandi Redd brandi1",
+      "license": "CC0 1.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Scattered_white_paper_(Unsplash).jpg"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "printing-press",
+   "name": "Printing press",
+   "lname": "the printing press",
+   "alt": [
+    "movable-type printing press"
+   ],
+   "facts": {
+    "year": 1440,
+    "inventor": "Johannes Gutenberg",
+    "country": "Germany"
+   },
+   "blurb": "Johannes Gutenberg's press with movable metal type made books much cheaper and spread ideas across Europe.",
+   "clues": [
+    "Its most famous early product was a Bible.",
+    "It was developed in Mainz.",
+    "It dates from 1440.",
+    "It is credited to Johannes Gutenberg.",
+    "It was invented in Germany.",
+    "It made books cheap and common.",
+    "The answer has 2 words (8, 5 letters).",
+    "Its first letter is P."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/1b/The_Caxton_Celebration_-_William_Caxton_showing_specimens_of_his_printing_to_King_Edward_IV_and_his_Queen.jpg/500px-The_Caxton_Celebration_-_William_Caxton_showing_specimens_of_his_printing_to_King_Edward_IV_and_his_Queen.jpg",
+      "w": 500,
+      "h": 301,
+      "credit": "William Small",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:The_Caxton_Celebration_-_William_Caxton_showing_specimens_of_his_printing_to_King_Edward_IV_and_his_Queen.jpg"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "telescope",
+   "name": "Telescope",
+   "lname": "the telescope",
+   "facts": {
+    "year": 1608,
+    "inventor": "Hans Lipperhey",
+    "country": "Netherlands"
+   },
+   "blurb": "The first known telescope patent was filed by the Dutch spectacle-maker Hans Lipperhey in 1608. Galileo soon used one to study the sky.",
+   "clues": [
+    "A Dutch spectacle-maker applied for the first patent.",
+    "Galileo used one to find moons around Jupiter.",
+    "Isaac Newton built a version using a mirror.",
+    "It dates from 1608.",
+    "It is credited to Hans Lipperhey.",
+    "It was invented in Netherlands.",
+    "Hubble is a famous space version.",
+    "It makes faraway things look closer.",
+    "The answer is one word of 9 letters.",
+    "Its first letter is T."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/a/a9/Lunette_mg_2368.jpg/500px-Lunette_mg_2368.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Rama",
+      "license": "CC BY-SA 2.0 fr",
+      "page": "https://commons.wikimedia.org/wiki/File:Lunette_mg_2368.jpg"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "barometer",
+   "name": "Barometer",
+   "lname": "the barometer",
+   "facts": {
+    "year": 1643,
+    "inventor": "Evangelista Torricelli",
+    "country": "Italy"
+   },
+   "blurb": "Evangelista Torricelli made the first mercury barometer in 1643. It measures air pressure and helps forecast weather.",
+   "clues": [
+    "Its inventor was a student of Galileo.",
+    "Early ones used a tube of mercury.",
+    "Falling readings can mean a storm is coming.",
+    "It dates from 1643.",
+    "It is credited to Evangelista Torricelli.",
+    "It was invented in Italy.",
+    "It measures air pressure.",
+    "It helps forecast the weather.",
+    "The answer is one word of 9 letters.",
+    "Its first letter is B."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/9/9e/Dosen-barometer.jpg",
+      "w": 500,
+      "h": 483,
+      "credit": "Wikimedia Commons",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Dosen-barometer.jpg"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "pendulum-clock",
+   "name": "Pendulum clock",
+   "lname": "the pendulum clock",
+   "facts": {
+    "year": 1656,
+    "inventor": "Christiaan Huygens",
+    "country": "Netherlands"
+   },
+   "blurb": "Christiaan Huygens built the first pendulum clock in 1656. It was far more accurate than any clock before.",
+   "clues": [
+    "Galileo had studied how its key part swings.",
+    "It dates from 1656.",
+    "It is credited to Christiaan Huygens.",
+    "It was invented in Netherlands.",
+    "It ticks as a weight swings back and forth.",
+    "It keeps time with a swinging weight.",
+    "The answer has 2 words (8, 5 letters).",
+    "Its first letter is P."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/6/66/Pendule_electrique_l_maitrier_05117.jpg",
+      "w": 500,
+      "h": 904,
+      "credit": "Heurtelions",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Pendule_electrique_l_maitrier_05117.jpg"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "mercury-thermometer",
+   "name": "Mercury thermometer",
+   "lname": "the mercury thermometer",
+   "facts": {
+    "year": 1714,
+    "inventor": "Daniel Gabriel Fahrenheit",
+    "country": "Netherlands"
+   },
+   "blurb": "Daniel Fahrenheit made the first mercury thermometer in 1714 and later created a temperature scale.",
+   "clues": [
+    "Its inventor also created a temperature scale used in the USA.",
+    "It uses a liquid metal in a thin glass tube.",
+    "Doctors once used it to take temperatures.",
+    "It dates from 1714.",
+    "It is credited to Daniel Gabriel Fahrenheit.",
+    "It was invented in Netherlands.",
+    "It has been replaced by digital versions.",
+    "It measures temperature.",
+    "The answer has 2 words (7, 11 letters).",
+    "Its first letter is M."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/9/93/Clinical_thermometer_38.7.JPG/500px-Clinical_thermometer_38.7.JPG",
+      "w": 500,
+      "h": 310,
+      "credit": "Menchi",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Clinical_thermometer_38.7.JPG"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "lightning-rod",
+   "name": "Lightning rod",
+   "lname": "the lightning rod",
+   "alt": [
+    "lightning conductor"
+   ],
+   "facts": {
+    "year": 1752,
+    "inventor": "Benjamin Franklin",
+    "country": "United States"
+   },
+   "blurb": "Benjamin Franklin invented the lightning rod around 1752 to protect buildings from lightning strikes.",
+   "clues": [
+    "Its inventor is famous for a kite experiment.",
+    "Its inventor is on the US $100 note.",
+    "It dates from 1752.",
+    "It is credited to Benjamin Franklin.",
+    "It was invented in United States.",
+    "It carries electricity safely into the ground.",
+    "It protects buildings during storms.",
+    "The answer has 2 words (9, 3 letters).",
+    "Its first letter is L."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/0/09/CN_Tower_struck_by_lightning-Edit%28Taxi%29.jpg/330px-CN_Tower_struck_by_lightning-Edit%28Taxi%29.jpg",
+      "w": 330,
+      "h": 477,
+      "credit": "Raul Heinrich",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:CN_Tower_struck_by_lightning-Edit(Taxi).jpg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "watt-steam-engine",
+   "name": "Watt steam engine",
+   "lname": "the Watt steam engine",
+   "alt": [
+    "steam engine"
+   ],
+   "facts": {
+    "year": 1769,
+    "inventor": "James Watt",
+    "country": "United Kingdom"
+   },
+   "blurb": "James Watt's 1769 improvement to the steam engine made it far more efficient and powered the Industrial Revolution.",
+   "clues": [
+    "Its inventor added a separate condenser.",
+    "A unit of power is named after its inventor.",
+    "It powered factories and mills.",
+    "It dates from 1769.",
+    "It was invented in United Kingdom.",
+    "It drove the Industrial Revolution.",
+    "It runs on boiling water.",
+    "The answer has 3 words (4, 5, 6 letters).",
+    "Its first letter is W."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/9/9e/Maquina_vapor_Watt_ETSIIM.jpg/500px-Maquina_vapor_Watt_ETSIIM.jpg",
+      "w": 500,
+      "h": 371,
+      "credit": "Nicolás Pérez",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Maquina_vapor_Watt_ETSIIM.jpg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "hot-air-balloon",
+   "name": "Hot air balloon",
+   "lname": "the hot air balloon",
+   "facts": {
+    "year": 1783,
+    "inventor": "Montgolfier brothers",
+    "country": "France"
+   },
+   "blurb": "The Montgolfier brothers flew the first hot air balloon with people aboard in Paris in 1783.",
+   "clues": [
+    "Its first passengers were a sheep, a duck and a rooster.",
+    "Its inventors were brothers who made paper.",
+    "The first human flight was over Paris.",
+    "It dates from 1783.",
+    "It is credited to Montgolfier brothers.",
+    "It was invented in France.",
+    "It carries people in a basket.",
+    "The answer has 3 words (3, 3, 7 letters).",
+    "Its first letter is H."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/e/ed/17._Th%C3%BCringer_Montgolfiade_-_35.jpg/500px-17._Th%C3%BCringer_Montgolfiade_-_35.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "This photograph was taken with a Panasonic Lumix DMC-FX100 by Jed",
+      "license": "CC BY-SA 3.0 de",
+      "page": "https://commons.wikimedia.org/wiki/File:17._Th%C3%BCringer_Montgolfiade_-_35.jpg"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "smallpox-vaccine",
+   "name": "Smallpox vaccine",
+   "lname": "the smallpox vaccine",
+   "alt": [
+    "vaccine",
+    "vaccination"
+   ],
+   "facts": {
+    "year": 1796,
+    "inventor": "Edward Jenner",
+    "country": "United Kingdom"
+   },
+   "blurb": "In 1796 Edward Jenner showed that cowpox could protect people from smallpox. It was the world's first vaccine.",
+   "clues": [
+    "It was first tested on a boy named James Phipps.",
+    "It used material from cowpox blisters.",
+    "Its name comes from the Latin for cow.",
+    "It dates from 1796.",
+    "It is credited to Edward Jenner.",
+    "It was invented in United Kingdom.",
+    "The answer has 2 words (8, 7 letters).",
+    "Its first letter is S."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/9/95/Smallpox_vaccine.jpg/500px-Smallpox_vaccine.jpg",
+      "w": 500,
+      "h": 331,
+      "credit": "Photo Credit: James Gathany Content Providers(s): CDC",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Smallpox_vaccine.jpg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "electric-battery",
+   "name": "Electric battery",
+   "lname": "the electric battery",
+   "alt": [
+    "battery",
+    "voltaic pile"
+   ],
+   "facts": {
+    "year": 1800,
+    "inventor": "Alessandro Volta",
+    "country": "Italy"
+   },
+   "blurb": "Alessandro Volta stacked metal discs and salty cardboard to make the first battery in 1800.",
+   "clues": [
+    "It has a positive and a negative end.",
+    "Many sizes are named with letters like AA.",
+    "It dates from 1800.",
+    "It was invented in Italy.",
+    "It stores chemical energy.",
+    "Phones and torches use it.",
+    "It gives power to things with no plug.",
+    "The answer has 2 words (8, 7 letters).",
+    "Its first letter is E."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/3/3b/Batteries.jpg",
+      "w": 500,
+      "h": 357,
+      "credit": "en:User:Brianiac",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Batteries.jpg"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "steam-locomotive",
+   "name": "Steam locomotive",
+   "lname": "the steam locomotive",
+   "facts": {
+    "year": 1804,
+    "inventor": "Richard Trevithick",
+    "country": "United Kingdom"
+   },
+   "blurb": "Richard Trevithick built the first working steam locomotive in Wales in 1804.",
+   "clues": [
+    "Its first run was at an ironworks in Wales.",
+    "George Stephenson's \"Rocket\" made it famous.",
+    "It dates from 1804.",
+    "It is credited to Richard Trevithick.",
+    "It was invented in United Kingdom.",
+    "It pulls trains.",
+    "It puffs smoke as it chugs along rails.",
+    "The answer has 2 words (5, 10 letters).",
+    "Its first letter is S."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/3/3a/3511_-_Hartswater_240481.jpg/500px-3511_-_Hartswater_240481.jpg",
+      "w": 500,
+      "h": 325,
+      "credit": "User:Malcolm Best",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:3511_-_Hartswater_240481.jpg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "stethoscope",
+   "name": "Stethoscope",
+   "lname": "the stethoscope",
+   "facts": {
+    "year": 1816,
+    "inventor": "René Laennec",
+    "country": "France"
+   },
+   "blurb": "René Laennec invented the stethoscope in 1816, starting with a rolled-up tube of paper.",
+   "clues": [
+    "The first one was a rolled-up tube of paper.",
+    "Its inventor was a French doctor.",
+    "It lets you hear the lungs and heart.",
+    "It dates from 1816.",
+    "It is credited to René Laennec.",
+    "It was invented in France.",
+    "Doctors wear it around their neck.",
+    "Doctors listen to your heartbeat with it.",
+    "The answer is one word of 11 letters.",
+    "Its first letter is S."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/9/9e/2023_Stetoskop.jpg/500px-2023_Stetoskop.jpg",
+      "w": 500,
+      "h": 342,
+      "credit": "Jacek Halicki",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:2023_Stetoskop.jpg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "draisine",
+   "name": "Draisine",
+   "lname": "the draisine",
+   "alt": [
+    "running machine",
+    "dandy horse"
+   ],
+   "facts": {
+    "year": 1817,
+    "inventor": "Karl Drais",
+    "country": "Germany"
+   },
+   "blurb": "Karl Drais's 1817 \"running machine\" had two wheels but no pedals. It was the ancestor of the bicycle.",
+   "clues": [
+    "Riders pushed it along with their feet.",
+    "It had no pedals.",
+    "It was invented in Mannheim.",
+    "It dates from 1817.",
+    "It was invented in Germany.",
+    "It was the ancestor of the bicycle.",
+    "The answer is one word of 8 letters.",
+    "Its first letter is D."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/4/45/Draisine-templin.jpg/500px-Draisine-templin.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "User Oktaeder on de.Wikipedia",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Draisine-templin.jpg"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "daguerreotype",
+   "name": "Daguerreotype",
+   "lname": "the daguerreotype",
+   "facts": {
+    "year": 1839,
+    "inventor": "Louis Daguerre",
+    "country": "France"
+   },
+   "blurb": "The daguerreotype, announced in 1839, was the first popular form of photography.",
+   "clues": [
+    "Its pictures were on silver-coated copper plates.",
+    "Sitters had to stay still for a long time.",
+    "It was announced to the world in 1839.",
+    "It dates from 1839.",
+    "It is credited to Louis Daguerre.",
+    "It was invented in France.",
+    "It was an early kind of photograph.",
+    "It is named after its French inventor.",
+    "The answer is one word of 13 letters.",
+    "Its first letter is D."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/4/4b/C%C3%A1mara_para_obtener_vistas_al_daguerrotipo%2C_original_del_a%C3%B1o_1839%2C_conservada_en_Barcelona%2C_Espa%C3%B1a%2C_Spain.jpg/500px-C%C3%A1mara_para_obtener_vistas_al_daguerrotipo%2C_original_del_a%C3%B1o_1839%2C_conservada_en_Barcelona%2C_Espa%C3%B1a%2C_Spain.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "CARLOS TEIXIDOR CADENAS",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:C%C3%A1mara_para_obtener_vistas_al_daguerrotipo,_original_del_a%C3%B1o_1839,_conservada_en_Barcelona,_Espa%C3%B1a,_Spain.jpg"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "safety-pin",
+   "name": "Safety pin",
+   "lname": "the safety pin",
+   "facts": {
+    "year": 1849,
+    "inventor": "Walter Hunt",
+    "country": "United States"
+   },
+   "blurb": "Walter Hunt invented the safety pin in 1849 by twisting a piece of wire, then sold the rights for $400.",
+   "clues": [
+    "Its inventor sold the rights for $400.",
+    "It was made from a single twisted wire.",
+    "It has a clasp that covers the point.",
+    "It dates from 1849.",
+    "It is credited to Walter Hunt.",
+    "It was invented in United States.",
+    "It holds nappies and clothes together.",
+    "The answer has 2 words (6, 3 letters).",
+    "Its first letter is S."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/4/4d/Safety_Pin.jpg/500px-Safety_Pin.jpg",
+      "w": 500,
+      "h": 366,
+      "credit": "Haragayato",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Safety_Pin.jpg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "elevator-safety-brake",
+   "name": "Elevator safety brake",
+   "lname": "the elevator safety brake",
+   "alt": [
+    "safety elevator",
+    "safety lift"
+   ],
+   "facts": {
+    "year": 1852,
+    "inventor": "Elisha Otis",
+    "country": "United States"
+   },
+   "blurb": "Elisha Otis invented a safety brake that stops a lift from falling if the cable breaks. It made skyscrapers possible.",
+   "clues": [
+    "It was first shown at a New York fair.",
+    "It grips the guide rails.",
+    "Its inventor showed it off by cutting the rope while standing on the platform.",
+    "It dates from 1852.",
+    "It is credited to Elisha Otis.",
+    "It was invented in United States.",
+    "It made skyscrapers practical.",
+    "The answer has 3 words (8, 6, 5 letters).",
+    "Its first letter is E."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/1b/Elisha_OTIS_1854.jpg/500px-Elisha_OTIS_1854.jpg",
+      "w": 500,
+      "h": 493,
+      "credit": "Unknown authorUnknown author",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Elisha_OTIS_1854.jpg"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "dynamite",
+   "name": "Dynamite",
+   "facts": {
+    "year": 1867,
+    "inventor": "Alfred Nobel",
+    "country": "Sweden"
+   },
+   "blurb": "Alfred Nobel invented dynamite in 1867. He later used his fortune to create the Nobel Prizes.",
+   "clues": [
+    "Its inventor's brother died in an explosion.",
+    "It made nitroglycerine safer to handle.",
+    "Its inventor's fortune funds famous prizes.",
+    "It dates from 1867.",
+    "It is credited to Alfred Nobel.",
+    "It was invented in Sweden.",
+    "It is used in mining and demolition.",
+    "It is an explosive in sticks.",
+    "The answer is one word of 8 letters.",
+    "Its first letter is D."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/c/cb/Caisse_dynamite_nobel_paulilles_expo.JPG/500px-Caisse_dynamite_nobel_paulilles_expo.JPG",
+      "w": 500,
+      "h": 375,
+      "credit": "Olecrab",
+      "license": "CC BY 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Caisse_dynamite_nobel_paulilles_expo.JPG"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "typewriter",
+   "name": "Typewriter",
+   "lname": "the typewriter",
+   "alt": [
+    "QWERTY typewriter"
+   ],
+   "facts": {
+    "year": 1868,
+    "inventor": "Christopher Latham Sholes",
+    "country": "United States"
+   },
+   "blurb": "Christopher Latham Sholes patented the first practical typewriter in 1868. Its QWERTY layout is still used today.",
+   "clues": [
+    "Mark Twain was an early user.",
+    "Its keys hit an inked ribbon.",
+    "It dates from 1868.",
+    "It is credited to Christopher Latham Sholes.",
+    "It was invented in United States.",
+    "It makes a clacking sound.",
+    "It types letters onto paper.",
+    "The answer is one word of 10 letters.",
+    "Its first letter is T."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/8/88/Olivetti_Lettera_22_by_LjL.jpeg/500px-Olivetti_Lettera_22_by_LjL.jpeg",
+      "w": 500,
+      "h": 418,
+      "credit": "Wikimedia Commons",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Olivetti_Lettera_22_by_LjL.jpeg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "telephone",
+   "name": "Telephone",
+   "lname": "the telephone",
+   "facts": {
+    "year": 1876,
+    "inventor": "Alexander Graham Bell",
+    "country": "United States"
+   },
+   "blurb": "Alexander Graham Bell patented the telephone in 1876. His first call was to his assistant, Mr Watson.",
+   "clues": [
+    "Its first words were \"Mr Watson, come here\".",
+    "Its inventor was born in Scotland.",
+    "Its patent was granted in 1876.",
+    "It dates from 1876.",
+    "It is credited to Alexander Graham Bell.",
+    "It was invented in United States.",
+    "It sends voices along wires.",
+    "You make calls on it.",
+    "The answer is one word of 9 letters.",
+    "Its first letter is T."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/a/a6/Telefon_BW_2012-02-18_13-44-32.JPG/500px-Telefon_BW_2012-02-18_13-44-32.JPG",
+      "w": 500,
+      "h": 394,
+      "credit": "Berthold Werner",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Telefon_BW_2012-02-18_13-44-32.JPG"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "phonograph",
+   "name": "Phonograph",
+   "lname": "the phonograph",
+   "facts": {
+    "year": 1877,
+    "inventor": "Thomas Edison",
+    "country": "United States"
+   },
+   "blurb": "Thomas Edison invented the phonograph in 1877, the first machine that could record and play back sound.",
+   "clues": [
+    "The first words it recorded were \"Mary had a little lamb\".",
+    "It recorded on tinfoil wrapped round a cylinder.",
+    "Its inventor is called the \"Wizard of Menlo Park\".",
+    "It dates from 1877.",
+    "It is credited to Thomas Edison.",
+    "It was invented in United States.",
+    "It led to the record player.",
+    "It records and plays back sound.",
+    "The answer is one word of 10 letters.",
+    "Its first letter is P."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/c/c5/Edison_and_phonograph_edit2.jpg/500px-Edison_and_phonograph_edit2.jpg",
+      "w": 500,
+      "h": 630,
+      "credit": "Levin C. Handy (per http://hdl.loc.gov/loc.pnp/cwpbh.04326)",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Edison_and_phonograph_edit2.jpg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "incandescent-light-bulb",
+   "name": "Incandescent light bulb",
+   "lname": "the incandescent light bulb",
+   "alt": [
+    "light bulb",
+    "lightbulb"
+   ],
+   "facts": {
+    "year": 1879,
+    "inventor": "Thomas Edison",
+    "country": "United States"
+   },
+   "blurb": "In 1879 Thomas Edison made a long-lasting light bulb with a carbon filament. Joseph Swan made a similar bulb in England.",
+   "clues": [
+    "Joseph Swan made one in England at the same time.",
+    "Its early filament was carbonised bamboo or thread.",
+    "It wastes most of its energy as heat.",
+    "It dates from 1879.",
+    "It is credited to Thomas Edison.",
+    "It was invented in United States.",
+    "Cartoons show one above a head for a bright idea.",
+    "The answer has 3 words (12, 5, 4 letters).",
+    "Its first letter is I."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/3/3a/Gluehlampe_01_KMJ.jpg/330px-Gluehlampe_01_KMJ.jpg",
+      "w": 330,
+      "h": 548,
+      "credit": "KMJ",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Gluehlampe_01_KMJ.jpg"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "benz-patent-motorwagen",
+   "name": "Benz Patent-Motorwagen",
+   "lname": "the Benz Patent-Motorwagen",
+   "alt": [
+    "motor car",
+    "car",
+    "automobile"
+   ],
+   "facts": {
+    "year": 1885,
+    "inventor": "Karl Benz",
+    "country": "Germany"
+   },
+   "blurb": "Karl Benz built the first true petrol-powered car in 1885. His wife Bertha took it on the first long road trip.",
+   "clues": [
+    "It reached about 16 km/h.",
+    "Its engine sat at the back.",
+    "It was built in Mannheim.",
+    "It had three wheels.",
+    "It dates from 1885.",
+    "It was invented in Germany.",
+    "It had a petrol engine.",
+    "The answer has 3 words (4, 6, 10 letters).",
+    "Its first letter is B."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/b/b8/Patent-Motorwagen_Nr.1_Benz_2.jpg/500px-Patent-Motorwagen_Nr.1_Benz_2.jpg",
+      "w": 500,
+      "h": 337,
+      "credit": "DaimlerChrysler AG",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Patent-Motorwagen_Nr.1_Benz_2.jpg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "electric-drill",
+   "name": "Electric drill",
+   "lname": "the electric drill",
+   "facts": {
+    "year": 1889,
+    "inventor": "Arthur James Arnot",
+    "country": "Australia"
+   },
+   "blurb": "Australian electrical engineer Arthur James Arnot patented the electric drill in Melbourne in 1889.",
+   "clues": [
+    "Its inventor worked in Melbourne.",
+    "Its patent was granted in 1889.",
+    "It dates from 1889.",
+    "It is credited to Arthur James Arnot.",
+    "It was invented in Australia.",
+    "It spins a bit to make holes.",
+    "It is a power tool for making holes.",
+    "The answer has 2 words (8, 5 letters).",
+    "Its first letter is E."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/e/e0/Drill_inside.jpg/500px-Drill_inside.jpg",
+      "w": 500,
+      "h": 373,
+      "credit": "FDominec",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Drill_inside.jpg"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "diesel-engine",
+   "name": "Diesel engine",
+   "lname": "the diesel engine",
+   "facts": {
+    "year": 1893,
+    "inventor": "Rudolf Diesel",
+    "country": "Germany"
+   },
+   "blurb": "Rudolf Diesel developed an engine in the 1890s that ignites fuel by squeezing air until it is hot.",
+   "clues": [
+    "It has no spark plugs.",
+    "It squeezes air until it is hot enough to ignite fuel.",
+    "Its inventor vanished from a ship in 1913.",
+    "It dates from 1893.",
+    "It was invented in Germany.",
+    "Trucks and ships use it.",
+    "It is named after its German inventor.",
+    "The answer has 2 words (6, 6 letters).",
+    "Its first letter is D."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/0/0b/MAN_TGX_V8_engine.JPG/500px-MAN_TGX_V8_engine.JPG",
+      "w": 500,
+      "h": 476,
+      "credit": "High Contrast",
+      "license": "CC BY 3.0 de",
+      "page": "https://commons.wikimedia.org/wiki/File:MAN_TGX_V8_engine.JPG"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "cinematographe",
+   "name": "Cinématographe",
+   "lname": "the Cinématographe",
+   "alt": [
+    "cinematograph",
+    "cinema"
+   ],
+   "facts": {
+    "year": 1895,
+    "inventor": "Lumière brothers",
+    "country": "France"
+   },
+   "blurb": "The Lumière brothers' camera and projector showed the first public films to a paying audience in Paris in 1895.",
+   "clues": [
+    "An early film showed a train arriving at a station.",
+    "It was camera, printer and projector in one.",
+    "Its first paid show was in Paris in 1895.",
+    "It dates from 1895.",
+    "It is credited to Lumière brothers.",
+    "It was invented in France.",
+    "It was made by two French brothers.",
+    "It showed moving pictures.",
+    "The answer is one word of 14 letters.",
+    "Its first letter is C."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/6/63/Cinematographe_Lumiere.jpg/500px-Cinematographe_Lumiere.jpg",
+      "w": 500,
+      "h": 367,
+      "credit": "Marcellin Auzolle",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Cinematographe_Lumiere.jpg"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "radio",
+   "name": "Radio",
+   "alt": [
+    "wireless telegraphy"
+   ],
+   "facts": {
+    "year": 1895,
+    "inventor": "Guglielmo Marconi",
+    "country": "Italy"
+   },
+   "blurb": "Guglielmo Marconi sent radio signals in 1895 and across the Atlantic in 1901.",
+   "clues": [
+    "Its inventor shared the 1909 Nobel Prize in Physics.",
+    "It sent a signal across the Atlantic in 1901.",
+    "It uses invisible waves.",
+    "It dates from 1895.",
+    "It is credited to Guglielmo Marconi.",
+    "It was invented in Italy.",
+    "You can listen to music and news on it.",
+    "It plays sound from far away without wires.",
+    "The answer is one word of 5 letters.",
+    "Its first letter is R."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/5/54/Biblis_RFE_RL_01.jpg/500px-Biblis_RFE_RL_01.jpg",
+      "w": 500,
+      "h": 285,
+      "credit": "Kuebi",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Biblis_RFE_RL_01.jpg"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "air-conditioning",
+   "name": "Air conditioning",
+   "facts": {
+    "year": 1902,
+    "inventor": "Willis Carrier",
+    "country": "United States"
+   },
+   "blurb": "Willis Carrier invented modern air conditioning in 1902 to control humidity at a printing plant.",
+   "clues": [
+    "It was first built for a printing company.",
+    "Its first job was to control humidity.",
+    "It made hot cities more liveable.",
+    "It dates from 1902.",
+    "It is credited to Willis Carrier.",
+    "It was invented in United States.",
+    "It cools rooms.",
+    "The answer has 2 words (3, 12 letters).",
+    "Its first letter is A."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/3/36/TECO_MA-750B_in_Nangang_20110217.jpg/500px-TECO_MA-750B_in_Nangang_20110217.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Solomon203",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:TECO_MA-750B_in_Nangang_20110217.jpg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "airplane",
+   "name": "Airplane",
+   "lname": "the airplane",
+   "alt": [
+    "aeroplane",
+    "Wright Flyer",
+    "plane"
+   ],
+   "facts": {
+    "year": 1903,
+    "inventor": "Wright brothers",
+    "country": "United States"
+   },
+   "blurb": "The Wright brothers made the first powered, controlled aeroplane flight at Kitty Hawk in 1903.",
+   "clues": [
+    "The first flight lasted 12 seconds.",
+    "Its inventors ran a bicycle shop.",
+    "The first flight was at Kitty Hawk, North Carolina.",
+    "It dates from 1903.",
+    "It was invented in United States.",
+    "Orville and Wilbur made it.",
+    "It flies people through the sky.",
+    "The answer is one word of 8 letters.",
+    "Its first letter is A."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/6/65/Airliners_28.07.2009_10-01-28.JPG/500px-Airliners_28.07.2009_10-01-28.JPG",
+      "w": 500,
+      "h": 332,
+      "credit": "Hansueli Krapf",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Airliners_28.07.2009_10-01-28.JPG"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "zipper",
+   "name": "Zipper",
+   "lname": "the zipper",
+   "alt": [
+    "zip",
+    "zip fastener"
+   ],
+   "facts": {
+    "year": 1913,
+    "inventor": "Gideon Sundback",
+    "country": "United States"
+   },
+   "blurb": "Gideon Sundback, a Swedish-born engineer in the USA, designed the modern zip in 1913.",
+   "clues": [
+    "Its inventor was born in Sweden.",
+    "It is used on jeans and jackets.",
+    "It dates from 1913.",
+    "It is credited to Gideon Sundback.",
+    "It was invented in United States.",
+    "Its teeth lock together.",
+    "You pull it up and down to close a jacket.",
+    "The answer is one word of 6 letters.",
+    "Its first letter is Z."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/a/a5/Coil_plastic_and_metal_zippers.jpg/500px-Coil_plastic_and_metal_zippers.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Woodbine9",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Coil_plastic_and_metal_zippers.jpg"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "crossword",
+   "name": "Crossword",
+   "lname": "the crossword",
+   "alt": [
+    "crossword puzzle"
+   ],
+   "facts": {
+    "year": 1913,
+    "inventor": "Arthur Wynne",
+    "country": "United States"
+   },
+   "blurb": "Arthur Wynne published the first crossword puzzle in a New York newspaper in 1913.",
+   "clues": [
+    "Its first version was diamond-shaped.",
+    "Its inventor was born in Liverpool.",
+    "It first appeared in the New York World.",
+    "It dates from 1913.",
+    "It is credited to Arthur Wynne.",
+    "It was invented in United States.",
+    "Newspapers print one every day.",
+    "The answer is one word of 9 letters.",
+    "Its first letter is C."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/8/86/American_crossword.png/500px-American_crossword.png",
+      "w": 500,
+      "h": 408,
+      "credit": "User:MeekMark",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:American_crossword.png"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "television",
+   "name": "Television",
+   "alt": [
+    "TV"
+   ],
+   "facts": {
+    "year": 1926,
+    "inventor": "John Logie Baird",
+    "country": "United Kingdom"
+   },
+   "blurb": "John Logie Baird gave the first public demonstration of television in London in 1926.",
+   "clues": [
+    "Its first public demonstration was in a London attic room.",
+    "Its inventor was Scottish.",
+    "Early versions used a spinning disc.",
+    "It dates from 1926.",
+    "It is credited to John Logie Baird.",
+    "It was invented in United Kingdom.",
+    "You watch shows on it.",
+    "It is often called the telly.",
+    "The answer is one word of 10 letters.",
+    "Its first letter is T."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/e/e2/LG_smart_TV.jpg/500px-LG_smart_TV.jpg",
+      "w": 500,
+      "h": 344,
+      "credit": "LG전자",
+      "license": "CC BY 2.0",
+      "page": "https://commons.wikimedia.org/wiki/File:LG_smart_TV.jpg"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "jet-engine",
+   "name": "Jet engine",
+   "lname": "the jet engine",
+   "facts": {
+    "year": 1930,
+    "inventor": "Frank Whittle",
+    "country": "United Kingdom"
+   },
+   "blurb": "Frank Whittle patented the jet engine in 1930. Hans von Ohain in Germany built one separately.",
+   "clues": [
+    "Its inventor was an RAF officer.",
+    "It was patented in 1930.",
+    "It dates from 1930.",
+    "It is credited to Frank Whittle.",
+    "It was invented in United Kingdom.",
+    "It sucks in air and blasts it out the back.",
+    "It powers big passenger planes.",
+    "The answer has 2 words (3, 6 letters).",
+    "Its first letter is J."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/6/69/F100_F-15_engine.JPG/500px-F100_F-15_engine.JPG",
+      "w": 500,
+      "h": 304,
+      "credit": "Shelley Gill",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:F100_F-15_engine.JPG"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "nylon",
+   "name": "Nylon",
+   "facts": {
+    "year": 1935,
+    "inventor": "Wallace Carothers",
+    "country": "United States"
+   },
+   "blurb": "Wallace Carothers made nylon at DuPont in 1935. It was first used for toothbrush bristles and stockings.",
+   "clues": [
+    "It was first used in toothbrush bristles.",
+    "Stockings made of it caused shopping riots.",
+    "It was made at the DuPont company.",
+    "It dates from 1935.",
+    "It is credited to Wallace Carothers.",
+    "It was invented in United States.",
+    "It is a strong plastic fibre.",
+    "Its name has five letters.",
+    "The answer is one word of 5 letters.",
+    "Its first letter is N."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/4/4d/Nylon6_and_Nylon_66.png/500px-Nylon6_and_Nylon_66.png",
+      "w": 500,
+      "h": 358,
+      "credit": "Michael Ströck (mstroeck) at en.wikipedia",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Nylon6_and_Nylon_66.png"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "ballpoint-pen",
+   "name": "Ballpoint pen",
+   "lname": "the ballpoint pen",
+   "alt": [
+    "biro"
+   ],
+   "facts": {
+    "year": 1938,
+    "inventor": "László Bíró",
+    "country": "Hungary"
+   },
+   "blurb": "Hungarian journalist László Bíró patented the ballpoint pen in 1938. In many countries it is still called a biro.",
+   "clues": [
+    "Its inventor was a Hungarian journalist.",
+    "It was inspired by quick-drying newspaper ink.",
+    "A tiny rolling ball spreads the ink.",
+    "It dates from 1938.",
+    "It was invented in Hungary.",
+    "In Britain it is often called by its inventor's name.",
+    "You write with it.",
+    "The answer has 2 words (9, 3 letters).",
+    "Its first letter is B."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/e/e1/03-BICcristal2008-03-26.jpg/500px-03-BICcristal2008-03-26.jpg",
+      "w": 500,
+      "h": 335,
+      "credit": "Trounce",
+      "license": "CC BY 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:03-BICcristal2008-03-26.jpg"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "helicopter",
+   "name": "Helicopter",
+   "lname": "the helicopter",
+   "alt": [
+    "Sikorsky VS-300"
+   ],
+   "facts": {
+    "year": 1939,
+    "inventor": "Igor Sikorsky",
+    "country": "United States"
+   },
+   "blurb": "Igor Sikorsky flew the first practical single-rotor helicopter, the VS-300, in 1939.",
+   "clues": [
+    "Leonardo da Vinci drew an \"aerial screw\" like it.",
+    "Its inventor was born in Kyiv.",
+    "It has a small rotor on its tail.",
+    "It dates from 1939.",
+    "It was invented in United States.",
+    "It can hover and fly backwards.",
+    "It flies with spinning blades on top.",
+    "The answer is one word of 10 letters.",
+    "Its first letter is H."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/7/78/LAPD_Bell_206_Jetranger.jpg/500px-LAPD_Bell_206_Jetranger.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Mfield - Matthew Field, http://www.photography.mattfield.com",
+      "license": "CC BY 2.5",
+      "page": "https://commons.wikimedia.org/wiki/File:LAPD_Bell_206_Jetranger.jpg"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "microwave-oven",
+   "name": "Microwave oven",
+   "lname": "the microwave oven",
+   "alt": [
+    "microwave"
+   ],
+   "facts": {
+    "year": 1945,
+    "inventor": "Percy Spencer",
+    "country": "United States"
+   },
+   "blurb": "Percy Spencer noticed a chocolate bar melting in his pocket near radar equipment in 1945 and invented the microwave oven.",
+   "clues": [
+    "A melting chocolate bar inspired it.",
+    "Its inventor worked on radar.",
+    "The first ones were taller than a person.",
+    "It dates from 1945.",
+    "It is credited to Percy Spencer.",
+    "It was invented in United States.",
+    "It heats food in minutes.",
+    "It reheats leftovers with invisible waves.",
+    "The answer has 2 words (9, 4 letters).",
+    "Its first letter is M."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/0/08/Panasonic_NN-SD69LS_20220410.jpg/500px-Panasonic_NN-SD69LS_20220410.jpg",
+      "w": 500,
+      "h": 500,
+      "credit": "Mrbeastmodeallday",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Panasonic_NN-SD69LS_20220410.jpg"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "hills-hoist",
+   "name": "Hills Hoist",
+   "lname": "the Hills Hoist",
+   "alt": [
+    "rotary clothesline"
+   ],
+   "facts": {
+    "year": 1945,
+    "inventor": "Lance Hill",
+    "country": "Australia"
+   },
+   "blurb": "Lance Hill of Adelaide started making his winding rotary clothesline in 1945. It became an Australian backyard icon.",
+   "clues": [
+    "It appeared in the Sydney 2000 Olympics opening ceremony.",
+    "You wind it up and down with a handle.",
+    "It was made in Adelaide.",
+    "It dates from 1945.",
+    "It was invented in Australia.",
+    "It is an Australian backyard icon.",
+    "The answer has 2 words (5, 5 letters).",
+    "Its first letter is H."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/f/f7/W%C3%A4schespinne_April_2012.JPG/500px-W%C3%A4schespinne_April_2012.JPG",
+      "w": 500,
+      "h": 375,
+      "credit": "4028mdk09",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:W%C3%A4schespinne_April_2012.JPG"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "transistor",
+   "name": "Transistor",
+   "lname": "the transistor",
+   "facts": {
+    "year": 1947,
+    "inventor": "Bardeen, Brattain and Shockley",
+    "country": "United States"
+   },
+   "blurb": "The transistor was invented at Bell Labs in 1947. Billions now fit on a single computer chip.",
+   "clues": [
+    "It was invented at Bell Labs.",
+    "Its three inventors won the 1956 Nobel Prize.",
+    "It replaced bulky vacuum tubes.",
+    "It dates from 1947.",
+    "It is credited to Bardeen, Brattain and Shockley.",
+    "It was invented in United States.",
+    "Billions fit on one chip.",
+    "It switches and boosts electric signals.",
+    "The answer is one word of 10 letters.",
+    "Its first letter is T."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/5/5a/Transistors.agr.jpg/500px-Transistors.agr.jpg",
+      "w": 500,
+      "h": 419,
+      "credit": "ArnoldReinhold",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Transistors.agr.jpg"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "velcro",
+   "name": "Velcro",
+   "lname": "Velcro",
+   "alt": [
+    "hook-and-loop fastener"
+   ],
+   "facts": {
+    "year": 1955,
+    "inventor": "George de Mestral",
+    "country": "Switzerland"
+   },
+   "blurb": "Swiss engineer George de Mestral invented Velcro after looking at burrs stuck to his dog's fur.",
+   "clues": [
+    "Burrs stuck to a dog's fur inspired it.",
+    "Astronauts use it to stop things floating away.",
+    "It dates from 1955.",
+    "It is credited to George de Mestral.",
+    "It was invented in Switzerland.",
+    "It rips apart with a tearing sound.",
+    "The answer is one word of 6 letters.",
+    "Its first letter is V."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/2/2c/Velcro_photomicrograph.jpg/500px-Velcro_photomicrograph.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Trazyanderson",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Velcro_photomicrograph.jpg"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "flight-recorder",
+   "name": "Flight recorder",
+   "lname": "the flight recorder",
+   "alt": [
+    "black box"
+   ],
+   "facts": {
+    "year": 1958,
+    "inventor": "David Warren",
+    "country": "Australia"
+   },
+   "blurb": "Australian scientist David Warren built the first flight data and voice recorder in 1958. It helps explain plane crashes.",
+   "clues": [
+    "Its Australian inventor's father died in a plane crash.",
+    "It is painted bright orange.",
+    "It dates from 1958.",
+    "It is credited to David Warren.",
+    "It was invented in Australia.",
+    "Investigators search for it after a crash.",
+    "The answer has 2 words (6, 8 letters).",
+    "Its first letter is F."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/6/6a/Fdr_sidefront.jpg/500px-Fdr_sidefront.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "NTSB",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Fdr_sidefront.jpg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "lego-brick",
+   "name": "Lego brick",
+   "lname": "the Lego brick",
+   "alt": [
+    "Lego"
+   ],
+   "facts": {
+    "year": 1958,
+    "inventor": "Godtfred Kirk Christiansen",
+    "country": "Denmark"
+   },
+   "blurb": "The modern Lego brick, with tubes inside for a firm grip, was patented in Denmark in 1958.",
+   "clues": [
+    "Its name comes from Danish words meaning \"play well\".",
+    "It dates from 1958.",
+    "It is credited to Godtfred Kirk Christiansen.",
+    "It was invented in Denmark.",
+    "It is a plastic building toy.",
+    "It hurts to step on one.",
+    "The answer has 2 words (4, 5 letters).",
+    "Its first letter is L."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/19/Lego_bricks.jpg/500px-Lego_bricks.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Benjamin D. Esham (bdesham)",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Lego_bricks.jpg"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "three-point-seat-belt",
+   "name": "Three-point seat belt",
+   "lname": "the three-point seat belt",
+   "alt": [
+    "seat belt",
+    "seatbelt"
+   ],
+   "facts": {
+    "year": 1959,
+    "inventor": "Nils Bohlin",
+    "country": "Sweden"
+   },
+   "blurb": "Nils Bohlin designed the three-point seat belt for Volvo in 1959. Volvo let other carmakers use it for free.",
+   "clues": [
+    "Volvo let other car makers use it free.",
+    "It is thought to have saved over a million lives.",
+    "It crosses the lap and the chest.",
+    "It dates from 1959.",
+    "It is credited to Nils Bohlin.",
+    "It was invented in Sweden.",
+    "It is the law to wear one.",
+    "You buckle it in a car.",
+    "The answer has 4 words (5, 5, 4, 4 letters).",
+    "Its first letter is T."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/4/40/Female_driver_buckling_seatbelt.jpg/330px-Female_driver_buckling_seatbelt.jpg",
+      "w": 330,
+      "h": 495,
+      "credit": "State Farm",
+      "license": "CC BY 2.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Female_driver_buckling_seatbelt.jpg"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "laser",
+   "name": "Laser",
+   "lname": "the laser",
+   "facts": {
+    "year": 1960,
+    "inventor": "Theodore Maiman",
+    "country": "United States"
+   },
+   "blurb": "Theodore Maiman built the first working laser in 1960 using a ruby crystal.",
+   "clues": [
+    "The first one used a ruby crystal.",
+    "Its name is short for \"light amplification by stimulated emission of radiation\".",
+    "It reads barcodes at checkouts.",
+    "It dates from 1960.",
+    "It is credited to Theodore Maiman.",
+    "It was invented in United States.",
+    "It makes a very narrow beam.",
+    "It is a beam of focused light.",
+    "The answer is one word of 5 letters.",
+    "Its first letter is L."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/2/23/Lasers.JPG/500px-Lasers.JPG",
+      "w": 500,
+      "h": 375,
+      "credit": "彭嘉傑",
+      "license": "CC BY 2.5",
+      "page": "https://commons.wikimedia.org/wiki/File:Lasers.JPG"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "kevlar",
+   "name": "Kevlar",
+   "lname": "Kevlar",
+   "facts": {
+    "year": 1965,
+    "inventor": "Stephanie Kwolek",
+    "country": "United States"
+   },
+   "blurb": "Chemist Stephanie Kwolek invented Kevlar in 1965. It is five times stronger than steel for its weight.",
+   "clues": [
+    "It is five times stronger than steel by weight.",
+    "It was invented by a woman chemist at DuPont.",
+    "It is used in racing tyres.",
+    "It dates from 1965.",
+    "It is credited to Stephanie Kwolek.",
+    "It was invented in United States.",
+    "It is used in bulletproof vests.",
+    "Its name starts with a K.",
+    "The answer is one word of 6 letters.",
+    "Its first letter is K."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/d/da/Kevlar_gloves.jpg/500px-Kevlar_gloves.jpg",
+      "w": 500,
+      "h": 391,
+      "credit": "Cjp24",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Kevlar_gloves.jpg"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "mobile-phone",
+   "name": "Mobile phone",
+   "lname": "the mobile phone",
+   "alt": [
+    "cell phone",
+    "cellphone"
+   ],
+   "facts": {
+    "year": 1973,
+    "inventor": "Martin Cooper",
+    "country": "United States"
+   },
+   "blurb": "Martin Cooper of Motorola made the first handheld mobile phone call in New York in 1973.",
+   "clues": [
+    "Its first call was made to a rival company.",
+    "The first one weighed about 1 kg.",
+    "The first call was made in New York in 1973.",
+    "It dates from 1973.",
+    "It is credited to Martin Cooper.",
+    "It was invented in United States.",
+    "It was made by Motorola.",
+    "You carry it in your pocket.",
+    "The answer has 2 words (6, 5 letters).",
+    "Its first letter is M."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/c/c7/Mobile_phone_PHS_Japan_1997-2003.jpg/500px-Mobile_phone_PHS_Japan_1997-2003.jpg",
+      "w": 500,
+      "h": 348,
+      "credit": "Marus",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Mobile_phone_PHS_Japan_1997-2003.jpg"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "rubiks-cube",
+   "name": "Rubik's Cube",
+   "lname": "the Rubik's Cube",
+   "alt": [
+    "Rubiks cube",
+    "magic cube"
+   ],
+   "facts": {
+    "year": 1974,
+    "inventor": "Ernő Rubik",
+    "country": "Hungary"
+   },
+   "blurb": "Hungarian professor Ernő Rubik invented his famous puzzle cube in 1974.",
+   "clues": [
+    "It has over 43 quintillion possible positions.",
+    "Its inventor was a Hungarian architecture professor.",
+    "Speed solvers finish it in a few seconds.",
+    "It dates from 1974.",
+    "It was invented in Hungary.",
+    "Each face has nine coloured squares.",
+    "The answer has 2 words (6, 4 letters).",
+    "Its first letter is R."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/6/61/Rubiks_cube_solved.jpg/500px-Rubiks_cube_solved.jpg",
+      "w": 500,
+      "h": 500,
+      "credit": "Mike Gonzalez (TheCoffee)",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Rubiks_cube_solved.jpg"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "cochlear-implant",
+   "name": "Cochlear implant",
+   "lname": "the cochlear implant",
+   "alt": [
+    "bionic ear"
+   ],
+   "facts": {
+    "year": 1978,
+    "inventor": "Graeme Clark",
+    "country": "Australia"
+   },
+   "blurb": "Australian surgeon Graeme Clark implanted his multi-channel \"bionic ear\" in 1978. It helps deaf people hear.",
+   "clues": [
+    "Its inventor's father was deaf.",
+    "It sends electrical signals to the hearing nerve.",
+    "It dates from 1978.",
+    "It is credited to Graeme Clark.",
+    "It was invented in Australia.",
+    "It helps deaf people hear.",
+    "The answer has 2 words (8, 7 letters).",
+    "Its first letter is C."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/3/35/Cochlear_implant_user_%28cropped%29.jpg",
+      "w": 500,
+      "h": 574,
+      "credit": "Hear hear!",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Cochlear_implant_user_(cropped).jpg"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "post-it-note",
+   "name": "Post-it note",
+   "lname": "the Post-it note",
+   "alt": [
+    "sticky note",
+    "Post-it"
+   ],
+   "facts": {
+    "year": 1980,
+    "inventor": "Spencer Silver and Art Fry",
+    "country": "United States"
+   },
+   "blurb": "Post-it notes went on sale in 1980. They use a weak glue that 3M scientist Spencer Silver made by accident.",
+   "clues": [
+    "Its glue was a failed attempt at a strong adhesive.",
+    "Art Fry wanted bookmarks that would not fall out of his hymn book.",
+    "The classic colour is canary yellow.",
+    "It dates from 1980.",
+    "It is credited to Spencer Silver and Art Fry.",
+    "It was invented in United States.",
+    "It was made by 3M.",
+    "The answer has 3 words (4, 2, 4 letters).",
+    "Its first letter is P."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/d/d9/Post-it.jpg/500px-Post-it.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "The original uploader was Consequencefree at English Wikipedia.",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Post-it.jpg"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "polymer-banknote",
+   "name": "Polymer banknote",
+   "lname": "the polymer banknote",
+   "alt": [
+    "plastic banknote"
+   ],
+   "facts": {
+    "year": 1988,
+    "inventor": "Reserve Bank of Australia and CSIRO",
+    "country": "Australia"
+   },
+   "blurb": "Australia issued the world's first polymer banknote in 1988. It lasts longer and is hard to fake.",
+   "clues": [
+    "Its first design celebrated a bicentenary.",
+    "It was developed with CSIRO.",
+    "It has a clear window that is hard to forge.",
+    "It dates from 1988.",
+    "It is credited to Reserve Bank of Australia and CSIRO.",
+    "It was invented in Australia.",
+    "It survives a trip through the washing machine.",
+    "The answer has 2 words (7, 8 letters).",
+    "Its first letter is P."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/18/Australian_banknotes_in_wallet.jpg/500px-Australian_banknotes_in_wallet.jpg",
+      "w": 500,
+      "h": 377,
+      "credit": "Martin Kingsley from Melbourne, Australia",
+      "license": "CC BY 2.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Australian_banknotes_in_wallet.jpg"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "world-wide-web",
+   "name": "World Wide Web",
+   "lname": "the World Wide Web",
+   "alt": [
+    "the web",
+    "WWW"
+   ],
+   "facts": {
+    "year": 1989,
+    "inventor": "Tim Berners-Lee",
+    "country": "Switzerland"
+   },
+   "blurb": "Tim Berners-Lee invented the World Wide Web at CERN in Switzerland in 1989.",
+   "clues": [
+    "Its inventor was knighted in 2004.",
+    "It was invented at CERN.",
+    "Its pages are linked by hyperlinks.",
+    "It dates from 1989.",
+    "It is credited to Tim Berners-Lee.",
+    "It was invented in Switzerland.",
+    "You browse it on the internet.",
+    "The answer has 3 words (5, 4, 3 letters).",
+    "Its first letter is W."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/3/3e/Alcal%C3%A1_de_Henares_%28RPS_08-04-2017%29_Calle_WWW%2C_indicador.png/500px-Alcal%C3%A1_de_Henares_%28RPS_08-04-2017%29_Calle_WWW%2C_indicador.png",
+      "w": 500,
+      "h": 169,
+      "credit": "Raimundo Pastor",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Alcal%C3%A1_de_Henares_(RPS_08-04-2017)_Calle_WWW,_indicador.png"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "iphone",
+   "name": "iPhone",
+   "lname": "the iPhone",
+   "facts": {
+    "year": 2007,
+    "inventor": "Apple",
+    "country": "United States"
+   },
+   "blurb": "Apple's iPhone, launched by Steve Jobs in 2007, made touchscreen smartphones mainstream.",
+   "clues": [
+    "Steve Jobs called it three devices in one.",
+    "It launched in 2007.",
+    "It brought the App Store a year later.",
+    "It dates from 2007.",
+    "It is credited to Apple.",
+    "It was invented in United States.",
+    "It has a touchscreen.",
+    "It is a smartphone made by Apple.",
+    "The answer is one word of 6 letters.",
+    "Its first letter is I."
+   ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/1e/IPhone_models.jpg/500px-IPhone_models.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Ka Kit Pang",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:IPhone_models.jpg"
+     }
+    ]
+   },
+   "difficulty": 1
+  }
+ ],
+ "questions": [
+  {
+   "id": "q1",
+   "kind": "mc",
+   "prompt": "Who is credited with inventing the telephone in 1876?",
+   "answer": "Alexander Graham Bell",
+   "wrong": [
+    "Thomas Edison",
+    "Guglielmo Marconi",
+    "Nikola Tesla"
+   ],
+   "explain": "Bell's patent was granted in March 1876.",
+   "difficulty": 1
+  },
+  {
+   "id": "q2",
+   "kind": "mc",
+   "prompt": "Who made the first powered aeroplane flight in 1903?",
+   "answer": "The Wright brothers",
+   "wrong": [
+    "The Montgolfier brothers",
+    "The Lumière brothers",
+    "Charles Lindbergh"
+   ],
+   "explain": "Orville flew 12 seconds at Kitty Hawk.",
+   "difficulty": 1
+  },
+  {
+   "id": "q3",
+   "kind": "mc",
+   "prompt": "Who invented the World Wide Web?",
+   "answer": "Tim Berners-Lee",
+   "wrong": [
+    "Bill Gates",
+    "Steve Jobs",
+    "Alan Turing"
+   ],
+   "explain": "He proposed it at CERN in 1989.",
+   "difficulty": 1
+  },
+  {
+   "id": "q4",
+   "kind": "mc",
+   "prompt": "Which inventor's fortune created the Nobel Prizes?",
+   "answer": "Alfred Nobel",
+   "wrong": [
+    "Thomas Edison",
+    "James Watt",
+    "Karl Benz"
+   ],
+   "explain": "He invented dynamite.",
+   "difficulty": 1
+  },
+  {
+   "id": "q5",
+   "kind": "mc",
+   "prompt": "Which Australian invention records data to help investigate plane crashes?",
+   "answer": "The black box flight recorder",
+   "wrong": [
+    "The jet engine",
+    "Radar",
+    "The seat belt"
+   ],
+   "explain": "David Warren built the first in 1958.",
+   "difficulty": 2
+  },
+  {
+   "id": "q6",
+   "kind": "mc",
+   "prompt": "What inspired the invention of Velcro?",
+   "answer": "Burrs stuck to a dog's fur",
+   "wrong": [
+    "A bird's feather",
+    "A spider's web",
+    "Gecko feet"
+   ],
+   "explain": "George de Mestral studied the burrs under a microscope.",
+   "difficulty": 2
+  },
+  {
+   "id": "q7",
+   "kind": "mc",
+   "prompt": "What melted in Percy Spencer's pocket and led to the microwave oven?",
+   "answer": "A chocolate bar",
+   "wrong": [
+    "An ice cube",
+    "A candle",
+    "A crayon"
+   ],
+   "explain": "He was working near a radar magnetron.",
+   "difficulty": 2
+  },
+  {
+   "id": "q8",
+   "kind": "order",
+   "prompt": "Put these inventions in order, oldest first.",
+   "answer": [
+    "Printing press",
+    "Telephone",
+    "Television",
+    "World Wide Web"
+   ],
+   "orderLabel": "Oldest first",
+   "explain": "About 1440, 1876, 1926 and 1989.",
+   "difficulty": 2
+  },
+  {
+   "id": "q9",
+   "kind": "order",
+   "prompt": "Put these inventions in order, oldest first.",
+   "answer": [
+    "Paper",
+    "Telescope",
+    "Light bulb",
+    "Mobile phone"
+   ],
+   "orderLabel": "Oldest first",
+   "explain": "About 105, 1608, 1879 and 1973.",
+   "difficulty": 2
+  },
+  {
+   "id": "q10",
+   "kind": "mc",
+   "prompt": "Which unit of power is named after the inventor of an improved steam engine?",
+   "answer": "Watt",
+   "wrong": [
+    "Volt",
+    "Joule",
+    "Newton"
+   ],
+   "explain": "James Watt improved the steam engine in 1769.",
+   "difficulty": 2
+  },
+  {
+   "id": "q11",
+   "kind": "mc",
+   "prompt": "Which inventor is famous for flying a kite in a thunderstorm?",
+   "answer": "Benjamin Franklin",
+   "wrong": [
+    "Thomas Edison",
+    "Isaac Newton",
+    "Galileo Galilei"
+   ],
+   "explain": "He went on to invent the lightning rod.",
+   "difficulty": 1
+  },
+  {
+   "id": "q12",
+   "kind": "mc",
+   "prompt": "Which country did the Lego brick come from?",
+   "answer": "Denmark",
+   "wrong": [
+    "Sweden",
+    "Germany",
+    "Japan"
+   ],
+   "explain": "Lego comes from the Danish \"leg godt\", meaning play well.",
+   "difficulty": 1
+  },
+  {
+   "id": "q13",
+   "kind": "mc",
+   "prompt": "Who invented the ballpoint pen in 1938?",
+   "answer": "László Bíró",
+   "wrong": [
+    "Thomas Edison",
+    "Ernő Rubik",
+    "Karl Benz"
+   ],
+   "explain": "Many people still call a ballpoint a biro.",
+   "difficulty": 2
+  },
+  {
+   "id": "q14",
+   "kind": "mc",
+   "prompt": "Which country issued the world's first plastic (polymer) banknote?",
+   "answer": "Australia",
+   "wrong": [
+    "Canada",
+    "United Kingdom",
+    "Japan"
+   ],
+   "explain": "A commemorative $10 note was issued in 1988.",
+   "difficulty": 2
+  }
+ ],
+ "fakes": [
+  "Steam-powered umbrella (1822)",
+  "Electric spoon (1911)",
+  "Pneumatic hat (1874)",
+  "Clockwork toothbrush (1797)"
+ ],
+ "sources": [
+  {
+   "name": "Wikidata",
+   "url": "https://www.wikidata.org"
+  },
+  {
+   "name": "Wikimedia Commons",
+   "url": "https://commons.wikimedia.org"
+  }
+ ]
+}

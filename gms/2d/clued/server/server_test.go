@@ -13,6 +13,7 @@ import (
 	"encoding/json"
 	"encoding/pem"
 	"fmt"
+	"math"
 	"math/big"
 	"net/http"
 	"net/http/httptest"
@@ -588,7 +589,8 @@ func TestChallenges(t *testing.T) {
 	if call(t, "POST", "/challenges/"+id+"/scores", map[string]any{"name": "Cheat", "score": 100, "correct": 6}).code != 400 {
 		t.Fatal("correct > total")
 	}
-	s := call(t, "POST", "/challenges/"+id+"/scores", map[string]any{"name": "Beater", "score": 1800, "correct": 5, "ms": 20000})
+	s := call(t, "POST", "/challenges/"+id+"/scores", map[string]any{"name": "Beater", "score": 1800, "correct": 5, "ms": 20000,
+		"detail": [][]int{{1, 0, 900}, {1, 2, 4000}, {0, 9, 1}, {1, 0, 50}, {1, 1, 77}}})
 	if s.code != 200 || num(s.body["rank"]) != 1 || num(s.body["plays"]) != 2 {
 		t.Fatalf("score: %v", s.body)
 	}
@@ -599,6 +601,12 @@ func TestChallenges(t *testing.T) {
 	board := call(t, "GET", "/challenges/"+id+"/scores", nil).body["scores"].([]any)
 	if len(board) != 3 || board[0].(map[string]any)["name"] != "Beater" || board[1].(map[string]any)["creator"] != true {
 		t.Fatalf("board: %v", board)
+	}
+	if d := board[0].(map[string]any)["detail"].([]any); len(d) != 5 || num(d[1].([]any)[1]) != 2 {
+		t.Fatalf("per-question detail stored: %v", board[0])
+	}
+	if cleanDetail(json.RawMessage(`[[1,0,1],[1,0,1]]`), 1) != "" || cleanDetail(json.RawMessage(`[[1,0]]`), 3) != "" {
+		t.Fatal("detail longer than the set or malformed is dropped")
 	}
 	if call(t, "GET", "/challenges/nope", nil).code != 404 {
 		t.Fatal("bad id")
@@ -993,4 +1001,126 @@ func TestAdminAuth(t *testing.T) {
 	if joins == 0 {
 		t.Fatal("stats recorded room creations")
 	}
+}
+
+func progQ(i, stages int) map[string]any {
+	q := mcQ(i)
+	q["format"], q["stages"] = "reveal", stages
+	delete(q, "timeLimit")
+	return q
+}
+
+func TestVoteToReveal(t *testing.T) {
+	resetLimits()
+	clearRooms()
+	r := call(t, "POST", "/rooms", map[string]any{"hostName": "H", "answerSec": 10, "gapSec": 0,
+		"questions": []any{progQ(0, 4), progQ(1, 3), mcQ(2)}})
+	code, hk := r.body["code"].(string), r.body["hostKey"].(string)
+	k1, _ := join(t, code, "A")
+	k2, _ := join(t, code, "B")
+	vote := func(k string, q int) resp {
+		return call(t, "POST", "/rooms/"+code+"/vote", map[string]any{"playerKey": k, "q": q})
+	}
+	st := call(t, "POST", "/rooms/"+code+"/start", map[string]any{"key": hk}).body
+	if num(st["stages"]) != 4 || num(st["limitMs"]) != 15000 {
+		t.Fatalf("progressive initial deadline = answer × 1.5: %v %v", st["stages"], st["limitMs"])
+	}
+	if vote(k1, 0).code != 409 {
+		t.Fatal("no voting during the lead-in")
+	}
+	advance(leadInMs * time.Millisecond)
+	start := num(state(t, code, hk)["qDeadline"]) - 15000
+	// unanimous advance
+	vote(k1, 0)
+	st = vote(k2, 0).body
+	if num(st["stage"]) != 0 || num(st["votes"]) != 2 || num(st["needed"]) != 3 {
+		t.Fatalf("2/3 votes: %v %v %v", st["stage"], st["votes"], st["needed"])
+	}
+	advance(12 * time.Second)
+	st = vote(hk, 0).body
+	if num(st["stage"]) != 1 || num(st["votes"]) != 0 {
+		t.Fatalf("unanimous → stage 1: %v", st["stage"])
+	}
+	// extension: max(15 s, 12 s + max(5 s, 10/2 s)) = 17 s from start
+	if d := num(st["qDeadline"]) - start; d != 17000 || num(st["limitMs"]) != 17000 {
+		t.Fatalf("extended deadline %d", d)
+	}
+	// a disconnected player doesn't block: B goes silent
+	advance(onlineMs*time.Millisecond + time.Second)
+	state(t, code, hk)
+	state(t, code, k1)
+	vote(hk, 0)
+	st = vote(k1, 0).body
+	if num(st["stage"]) != 2 || num(st["needed"]) != 2 {
+		t.Fatalf("offline player excluded: stage %v needed %v", st["stage"], st["needed"])
+	}
+	// cap: 90 s from the start
+	if d := num(st["qDeadline"]) - start; d > 90000 {
+		t.Fatalf("deadline beyond the cap: %d", d)
+	}
+	// the multiplier: answering at stage 2 of 4 = 1 - 0.6*2/3 = 0.6
+	a := call(t, "POST", "/rooms/"+code+"/answer", map[string]any{"key": k1, "q": 0, "given": "Right", "correct": true, "ms": 999999})
+	ms, lim := num(a.body["ms"]), 15000
+	want := int(math.Round(float64(basePoints("reveal", true, nil, ms, lim, true)) * 0.6))
+	if num(a.body["points"]) != want {
+		t.Fatalf("stage multiplier: got %v want %d", a.body["points"], want)
+	}
+	// lock on first answer
+	st = state(t, code, hk)
+	if st["locked"] != true || vote(hk, 0).code != 409 {
+		t.Fatal("the first answer locks voting")
+	}
+	if num(st["you"].(map[string]any)["stage"]) != 0 {
+		t.Fatal("host hasn't answered")
+	}
+	call(t, "POST", "/rooms/"+code+"/next", map[string]any{"key": hk})
+	st = call(t, "POST", "/rooms/"+code+"/next", map[string]any{"key": hk}).body
+	if st["locked"] == true || num(st["stage"]) != 0 {
+		t.Fatal("next question resets stage and lock")
+	}
+}
+
+func TestStageExtensionCap(t *testing.T) {
+	resetLimits()
+	clearRooms()
+	r := call(t, "POST", "/rooms", map[string]any{"hostName": "Solo", "answerSec": 30, "questions": []any{progQ(0, 10)}})
+	code, hk := r.body["code"].(string), r.body["hostKey"].(string)
+	st := call(t, "POST", "/rooms/"+code+"/start", map[string]any{"key": hk}).body
+	if num(st["limitMs"]) != 45000 {
+		t.Fatalf("30 s × 1.5: %v", st["limitMs"])
+	}
+	qs := num(st["qStart"])
+	advance(leadInMs * time.Millisecond)
+	for i := 0; i < 8; i++ {
+		advance(14 * time.Second)
+		state(t, code, hk)
+		st = call(t, "POST", "/rooms/"+code+"/vote", map[string]any{"key": hk, "q": 0}).body
+	}
+	if num(st["stage"]) < 5 {
+		t.Fatalf("solo votes advance: %v", st["stage"])
+	}
+	if d := num(st["qDeadline"]) - qs; d != 90000 {
+		t.Fatalf("capped at 90 s, got %d", d)
+	}
+	r2 := call(t, "POST", "/rooms", map[string]any{"hostName": "Short", "answerSec": 3, "questions": []any{progQ(0, 3)}})
+	st = call(t, "POST", "/rooms/"+r2.body["code"].(string)+"/start", map[string]any{"key": r2.body["hostKey"]}).body
+	if num(st["limitMs"]) != 10000 {
+		t.Fatalf("min 10 s: %v", st["limitMs"])
+	}
+	clearRooms()
+}
+
+func TestKidsStagesAutoAdvance(t *testing.T) {
+	resetLimits()
+	clearRooms()
+	r := call(t, "POST", "/rooms", map[string]any{"hostName": "Mum", "spec": map[string]any{"kids": true}, "questions": []any{progQ(0, 3)}})
+	code, hk := r.body["code"].(string), r.body["hostKey"].(string)
+	call(t, "POST", "/rooms/"+code+"/start", map[string]any{"key": hk})
+	advance(leadInMs*time.Millisecond + kidsStageMs*time.Millisecond + 10*time.Millisecond)
+	state(t, code, hk)
+	tickRooms()
+	if num(state(t, code, hk)["stage"]) != 1 {
+		t.Fatal("kids stages auto-advance")
+	}
+	clearRooms()
 }

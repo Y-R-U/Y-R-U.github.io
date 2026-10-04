@@ -4,15 +4,15 @@ import { defineScreen, reset, header, current } from '../ui/app.js?v=1';
 import { confirmPop, toast } from '../ui/popup.js?v=1';
 import { sfx, confetti } from '../ui/fx.js?v=1';
 import { createRunner } from '../structures/runner.js?v=1';
-import { prepare } from '../structures/session.js?v=1';
-import { basePoints, streakMultiplier } from '../core/scoring.js?v=1';
+import { prepare, prepareFormats } from '../structures/session.js?v=1';
+import { basePoints, streakMultiplier, stageMultiplier } from '../core/scoring.js?v=1';
 import { urlsOf, preflight } from '../core/media.js?v=1';
 import { randomSeed } from '../core/rng.js?v=1';
 import { listFormats } from '../formats/registry.js?v=1';
 import { loadFormats } from '../formats/index.js?v=1';
 import { friendly } from './api.js?v=1';
 import { getTransport } from './transport.js?v=1';
-import { sharePanel, joinUrl } from './share.js?v=1';
+import { sharePanel, joinUrl, p2pUrl } from './share.js?v=1';
 import { scoreboard, podium, ordinal, timingPanel } from './board.js?v=1';
 import { ensureStyles, dropSeat, setQuery, gapLabel, TRUST_HINT, mmss } from './util.js?v=1';
 
@@ -28,7 +28,7 @@ defineScreen('room', async (el, { code, key, st: initial, via = 'server' }, cur)
   const T = getTransport(via);
   const serverNow = T.now;
   ensureStyles();
-  setQuery('join', code);
+  setQuery(via === 'p2p' ? 'p2p' : 'join', code);
   await ensureFormats();
   const ctx = { st: null, game: -1, run: null, view: '', waiters: [], qcache: new Map(), live: null, asking: null, wasHost: null, timers: new Set(), ended: false };
   const every = (fn, ms) => { const id = setInterval(fn, ms); ctx.timers.add(id); return id; };
@@ -64,6 +64,7 @@ defineScreen('room', async (el, { code, key, st: initial, via = 'server' }, cur)
     if (st.phase === 'lobby') { stopRunner(); showLobby(st); return; }
     if (st.phase === 'final') { stopRunner(); showFinal(st); return; }
     if (ctx.run) {
+      syncStages(st);
       updateLive(st);
       if (st.phase === 'reveal' && ctx.asking === st.q) { ctx.asking = null; ctx.run.timeUp(); }
     } else if (st.phase === 'question' && st.you.joinedQ <= st.q) {
@@ -97,7 +98,7 @@ defineScreen('room', async (el, { code, key, st: initial, via = 'server' }, cur)
   /* -------------------------------------------------------------- lobby */
   function showLobby(st) {
     if (setView('lobby') || !lobbyRefs) {
-      const url = joinUrl(code);
+      const url = via === 'p2p' ? p2pUrl(code) : joinUrl(code);
       const players = h('div.net-players');
       const count = h('div.net-count');
       const actions = h('div.net-actions.net-sticky');
@@ -109,14 +110,14 @@ defineScreen('room', async (el, { code, key, st: initial, via = 'server' }, cur)
           h('div.net-lobby-grid', {},
             h('div.panel', {}, sharePanel({ url, code, title: 'Join my Clued game', text: `Join my Clued game! Code ${code}`, big: true }),
               h('p.net-note', { style: { margin: '10px 0 0' } }, 'Scan the code or open the link, type a name, and you’re in.'),
-              h('p.net-note', { style: { margin: '6px 0 0' } }, TRUST_HINT)),
+              h('p.net-note', { style: { margin: '6px 0 0' } }, TRUST_HINT), T.lobbyNote ? T.lobbyNote(code, st) : null),
             h('div.stack', {}, h('div.panel.stack', {}, count, players), settings, actions))));
       lobbyRefs = { players, count, actions, settings, badges };
     }
     const r = lobbyRefs;
     r.badges.replaceChildren(...[
       h('span.net-badge', {}, `${st.total} question${st.total === 1 ? '' : 's'}`),
-      h('span.net-badge.diff', {}, st.public ? '🌍 Public' : '🔒 Private'),
+      h('span.net-badge.diff', {}, st.p2p ? '📡 Device room' : st.public ? '🌍 Public' : '🔒 Private'),
       st.kids ? h('span.net-badge.kids', {}, '🧸 Kids game') : null,
       !st.kids && st.difficulty ? h('span.net-badge.diff', {}, DIFF[st.difficulty] || '') : null].filter(Boolean));
     r.count.textContent = `${st.players.length} player${st.players.length === 1 ? '' : 's'}`;
@@ -185,11 +186,13 @@ defineScreen('room', async (el, { code, key, st: initial, via = 'server' }, cur)
       before: (i, q) => beforeQ(base + i, q, run),
       onQuestion: i => {
         ctx.asking = base + i;
+        syncStages(ctx.st);
         const s = ctx.st;
         if (s.q !== base + i || s.phase !== 'question' || s.you.last) setTimeout(() => { if (ctx.asking === base + i) { ctx.asking = null; run.timeUp(); } }, 60);
       },
       scoreFn: () => basePoints({ timed: !ctx.st.kids, remaining: Math.max(0, ctx.st.qDeadline - serverNow()), limit: ctx.st.limitMs || 20000 }),
       onAnswer: rec => sendAnswer(base + rec.i, rec, run),
+      requestMore: i => T.vote(code, key, base + i).then(s => sub.push(s)).catch(e => { if (e.status !== 409) toast(friendly(e)); }),
       revealExtra: rec => liveBox(base + rec.i),
       waitNext: i => waitFor(s => s.game !== game || s.phase === 'final' || s.phase === 'lobby' || (s.phase !== 'lobby' && s.q > base + i)),
       waitLabel: ' ',
@@ -213,6 +216,7 @@ defineScreen('room', async (el, { code, key, st: initial, via = 'server' }, cur)
     }
     for (const k of Object.keys(q)) delete q[k];
     Object.assign(q, data ? data.question : { format: 'mc', prompt: 'This question didn’t load.', options: [{ text: 'Skip' }], answer: 0 });
+    if (data) await prepareFormats([q]);
     if (ctx.st.q === a && ctx.st.phase === 'question') await countdown(a, run);
   }
 
@@ -234,6 +238,15 @@ defineScreen('room', async (el, { code, key, st: initial, via = 'server' }, cur)
     });
   }
 
+  // Progressive questions: mirror the server's stage, votes and lock into the runner.
+  function syncStages(st) {
+    const run = ctx.run;
+    if (!run || st.phase !== 'question' || !st.stages || ctx.asking !== st.q) return;
+    if (st.stage > run.stage) run.setStage(st.stage, st.qDeadline, st.limitMs);
+    run.setVotes(st.votes, st.needed, st.you.voted);
+    if (st.locked) run.lockStages();
+  }
+
   function getQuestion(i) {
     if (!ctx.qcache.has(i)) ctx.qcache.set(i, T.question(code, key, i));
     return ctx.qcache.get(i);
@@ -241,13 +254,14 @@ defineScreen('room', async (el, { code, key, st: initial, via = 'server' }, cur)
 
   function prefetch(i) {
     if (!ctx.st || i >= ctx.st.total || ctx.qcache.has(i)) return;
-    getQuestion(i).then(d => preflight(urlsOf([d.question]))).catch(() => ctx.qcache.delete(i));
+    getQuestion(i).then(async d => { await prepareFormats([d.question]); return preflight(urlsOf([d.question])); }).catch(() => ctx.qcache.delete(i));
   }
 
   async function sendAnswer(a, rec, run) {
     if (ctx.asking === a) ctx.asking = null;
     if (rec.timeout || rec.skipped) { updateLive(ctx.st); return; }
-    const base = rec.correct ? rec.points / streakMultiplier(rec.streak) : rec.points;
+    const sm = rec.stages ? stageMultiplier(rec.stage, rec.stages) : 1; // the server applies its own stage
+    const base = (rec.correct ? rec.points / streakMultiplier(rec.streak) : rec.points) / sm;
     const body = { q: a, given: rec.given, correct: rec.correct, points: Math.round(base || 0), ms: Math.max(0, Math.round(serverNow() - ctx.st.qStart)) };
     for (let tries = 0; tries < 3; tries++) {
       try {
@@ -362,6 +376,7 @@ defineScreen('room', async (el, { code, key, st: initial, via = 'server' }, cur)
     }
     const actions = h('div.net-actions');
     if (st.you.host) actions.append(h('button.btn.go.big.wide', { type: 'button', dataset: { act: 'again' }, onclick: e => playAgain(st, e.currentTarget) }, 'Play again'));
+    else if (st.closed) actions.append(h('div.net-wait', {}, st.hostLost ? 'Lost the host’s device: these are the last scores.' : 'The host closed the room.'));
     else actions.append(h('div.net-wait', {}, `${hostName(st)} can start another round`, h('span.dots')));
     actions.append(h('button.btn.wide', { type: 'button', onclick: leave }, 'Leave room'));
     parts.push(actions);
@@ -388,7 +403,7 @@ defineScreen('room', async (el, { code, key, st: initial, via = 'server' }, cur)
   async function confirmLeave() {
     if (ctx.ended) return true;
     const host = ctx.st?.you?.host && ctx.st.players.length > 1;
-    if (!(await confirmPop('Leave this room?', host ? 'Someone else will become the host.' : 'You can rejoin with the link while the room is open.', 'Leave', 'Stay', true))) return false;
+    if (!(await confirmPop('Leave this room?', host ? (ctx.st.p2p ? 'This device is hosting: the game ends for everyone.' : 'Someone else will become the host.') : 'You can rejoin with the link while the room is open.', 'Leave', 'Stay', true))) return false;
     ctx.ended = true;
     try { await T.leave(code, key); } catch (e) {}
     dropSeat(code);

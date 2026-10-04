@@ -12,7 +12,7 @@ import { createRunner } from '../structures/runner.js?v=1';
 import { prepare } from '../structures/session.js?v=1';
 import { suggestedName, rememberName, tidyName, MAX_NAME } from './ident.js?v=1';
 import { openShare, shareOrCopy } from './share.js?v=1';
-import { ordinal } from './board.js?v=1';
+import { ordinal, detailOf, comparison } from './board.js?v=1';
 import { ensureStyles } from './util.js?v=1';
 import { ensureFormats } from './room.js?v=1';
 
@@ -49,7 +49,9 @@ function linkFor(code) {
 }
 
 function cleanEntry(e) {
-  return { n: tidyName(e?.n) || 'Player', s: Math.max(0, Math.round(+e?.s || 0)), r: Math.max(0, Math.round(+e?.r || 0)) };
+  const out = { n: tidyName(e?.n) || 'Player', s: Math.max(0, Math.round(+e?.s || 0)), r: Math.max(0, Math.round(+e?.r || 0)) };
+  if (Array.isArray(e?.d) && e.d.length <= 200) out.d = e.d.map(x => (Array.isArray(x) ? [x[0] ? 1 : 0, Math.max(0, +x[1] || 0), Math.max(0, +x[2] || 0)] : [0, 0, 0]));
+  return out;
 }
 
 // out = results params { spec, title, choice, result: { score, correct, questions } }
@@ -59,7 +61,7 @@ export async function createLinkChallenge(out, name, chain = []) {
   const payload = {
     v: 1, b: BUILD, t: String(out.title || '').slice(0, 60), s: spec, f: setFingerprint(r.questions || []),
     tm: out.choice?.timer ?? spec.timer ?? (spec.kids ? false : getSettings().timer),
-    c: [...chain, { n: name, s: Math.round(r.score || 0), r: r.correct || 0 }].slice(-MAX_CHAIN),
+    c: [...chain, { n: name, s: Math.round(r.score || 0), r: r.correct || 0, d: detailOf(r.answers) }].slice(-MAX_CHAIN),
   };
   return linkFor(await encodePayload(payload));
 }
@@ -156,7 +158,7 @@ defineScreen('linkchallenge', async (el, { code }, cur) => {
       run = null;
       if (cur !== current()) return;
       if (res.aborted) { intro(); return; }
-      const chain = [...p.c, { n: name, s: Math.round(res.score || 0), r: res.correct || 0 }];
+      const chain = [...p.c, { n: name, s: Math.round(res.score || 0), r: res.correct || 0, d: detailOf(res.answers) }];
       const shown = chain.slice(-MAX_CHAIN), meIdx = shown.length - 1;
       const reply = await createLinkChallenge({ spec: p.s, title: p.t, choice: { timer: p.tm }, result: { ...res, questions } }, name, p.c);
       const rank = [...shown].sort((a, b) => (kids ? b.r - a.r : b.s - a.s)).findIndex(e => e === shown[meIdx]) + 1;
@@ -168,6 +170,7 @@ defineScreen('linkchallenge', async (el, { code }, cur) => {
           h('h2', {}, kids ? `You got ${res.correct} ⭐` : `${fmtNum(res.score)} pts`),
           h('p', {}, `${ordinal(rank)} of ${shown.length} · ${res.correct}/${res.total} right`)),
         chainBoard(shown, meIdx),
+        comparison(shown.map((e, i) => ({ name: e.n, me: i === meIdx, detail: e.d })), questions),
         h('div.net-actions', {},
           h('button.btn.go.big.wide', { type: 'button', dataset: { act: 'reply' }, onclick: () => shareOrCopy({ url: reply, title: 'Clued challenge', text: kids ? `I got ${res.correct} stars. Your turn!` : `I scored ${fmtNum(res.score)}. Your turn!` }) }, 'Send your score back'),
           h('button.btn.wide', { type: 'button', onclick: () => openShare({ url: reply, heading: 'Pass it on', text: 'Can you beat us?' }) }, 'Show QR code'),

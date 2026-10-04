@@ -53,23 +53,25 @@ export const summarize = pack => ({
   caps: computeCaps(pack),
 });
 
-async function devIndex() {
-  let ids = [];
+async function listDir(dir) {
   try {
-    const r = await fetch(dataUrl('data/packs/'), { cache: 'no-cache' });
-    if (r.ok) {
-      const html = await r.text();
-      ids = [...html.matchAll(/href="([^"/]+)\.json"/g)].map(m => decodeURIComponent(m[1]));
-    }
-  } catch (e) { /* no listing */ }
-  if (!ids.length) ids = DEV_PACKS;
+    const r = await fetch(dataUrl(`data/${dir}/`), { cache: 'no-cache' });
+    if (!r.ok) return [];
+    const html = await r.text();
+    return [...html.matchAll(/href="([^"/]+)\.json"/g)].map(m => `${dir}/${decodeURIComponent(m[1])}.json`);
+  } catch (e) { return []; }
+}
+
+async function devIndex() {
+  let paths = [...await listDir('packs'), ...await listDir('music')];
+  if (!paths.length) paths = DEV_PACKS.map(id => `packs/${id}.json`);
   const packs = {};
-  await Promise.all(ids.map(async id => {
+  await Promise.all(paths.map(async path => {
     try {
-      const p = await getJSON(dataUrl(`data/packs/${id}.json?v=${BUILD}`));
+      const p = await getJSON(dataUrl(`data/${path}?v=${BUILD}`));
       if (!p || !p.id) return;
       G.packs.set(p.id, p);
-      packs[p.id] = summarize(p);
+      packs[p.id] = { ...summarize(p), path };
     } catch (e) { /* missing pack */ }
   }));
   return buildIndexShape(packs, 'dev');
@@ -107,7 +109,7 @@ export const allPackIds = () => Object.keys(G.index?.packs || {});
 export function loadPack(id) {
   if (G.packs.has(id)) return Promise.resolve(G.packs.get(id));
   if (G.loading.has(id)) return G.loading.get(id);
-  const p = getJSON(dataUrl(`data/packs/${id}.json?v=${BUILD}&b=${G.index?.build || ''}`)).then(pack => {
+  const p = getJSON(dataUrl(`data/${G.index?.packs?.[id]?.path || `packs/${id}.json`}?v=${BUILD}&b=${G.index?.build || ''}`)).then(pack => {
     G.packs.set(id, pack);
     G.loading.delete(id);
     return pack;

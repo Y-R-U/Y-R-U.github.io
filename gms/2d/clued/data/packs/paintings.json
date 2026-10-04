@@ -95,7 +95,7 @@
      }
     ]
    },
-   "difficulty": 2
+   "difficulty": 1
   },
   {
    "id": "the-starry-night",
@@ -233,7 +233,7 @@
      }
     ]
    },
-   "difficulty": 2
+   "difficulty": 1
   },
   {
    "id": "the-night-watch",
@@ -268,7 +268,7 @@
      }
     ]
    },
-   "difficulty": 2
+   "difficulty": 1
   },
   {
    "id": "the-kiss",
@@ -548,7 +548,7 @@
      }
     ]
    },
-   "difficulty": 2
+   "difficulty": 1
   },
   {
    "id": "the-arnolfini-portrait",
@@ -967,7 +967,7 @@
      }
     ]
    },
-   "difficulty": 2
+   "difficulty": 1
   },
   {
    "id": "self-portrait-with-bandaged-ear",
@@ -1000,7 +1000,7 @@
      }
     ]
    },
-   "difficulty": 2
+   "difficulty": 1
   },
   {
    "id": "the-hunters-in-the-snow",
@@ -2072,7 +2072,7 @@
     "Raphael"
    ],
    "explain": "The Last Supper by Leonardo da Vinci. It shows Jesus at a meal with his twelve apostles.",
-   "difficulty": 2,
+   "difficulty": 1,
    "media": {
     "img": [
      {
@@ -2100,7 +2100,7 @@
     "The Creation of Adam"
    ],
    "explain": "The Last Supper by Leonardo da Vinci. It shows Jesus at a meal with his twelve apostles.",
-   "difficulty": 2,
+   "difficulty": 1,
    "media": {
     "img": [
      {
@@ -2296,7 +2296,7 @@
     "J. M. W. Turner"
    ],
    "explain": "The Birth of Venus (1485) by Sandro Botticelli. A goddess stands on a giant scallop shell.",
-   "difficulty": 2,
+   "difficulty": 1,
    "media": {
     "img": [
      {
@@ -2324,7 +2324,7 @@
     "The Blue Boy"
    ],
    "explain": "The Birth of Venus (1485) by Sandro Botticelli. A goddess stands on a giant scallop shell.",
-   "difficulty": 2,
+   "difficulty": 1,
    "media": {
     "img": [
      {
@@ -2352,7 +2352,7 @@
     "John Constable"
    ],
    "explain": "The Night Watch (1642) by Rembrandt. It is a huge group portrait full of light and shadow.",
-   "difficulty": 2,
+   "difficulty": 1,
    "media": {
     "img": [
      {
@@ -2380,7 +2380,7 @@
     "The Blue Boy"
    ],
    "explain": "The Night Watch (1642) by Rembrandt. It is a huge group portrait full of light and shadow.",
-   "difficulty": 2,
+   "difficulty": 1,
    "media": {
     "img": [
      {
@@ -2800,7 +2800,7 @@
     "Michelangelo"
    ],
    "explain": "American Gothic (1930) by Grant Wood. A stern farmer with a pitchfork stands beside a woman.",
-   "difficulty": 2,
+   "difficulty": 1,
    "media": {
     "img": [
      {
@@ -2828,7 +2828,7 @@
     "Liberty Leading the People"
    ],
    "explain": "American Gothic (1930) by Grant Wood. A stern farmer with a pitchfork stands beside a woman.",
-   "difficulty": 2,
+   "difficulty": 1,
    "media": {
     "img": [
      {
@@ -3472,7 +3472,7 @@
     "Caravaggio"
    ],
    "explain": "Café Terrace at Night (1888) by Vincent van Gogh. People sit outside a café under the stars.",
-   "difficulty": 2,
+   "difficulty": 1,
    "media": {
     "img": [
      {
@@ -3500,7 +3500,7 @@
     "American Gothic"
    ],
    "explain": "Café Terrace at Night (1888) by Vincent van Gogh. People sit outside a café under the stars.",
-   "difficulty": 2,
+   "difficulty": 1,
    "media": {
     "img": [
      {
@@ -3528,7 +3528,7 @@
     "Jean-François Millet"
    ],
    "explain": "Self-Portrait with Bandaged Ear (1889) by Vincent van Gogh. The painter shows himself with a bandage over his ear.",
-   "difficulty": 2,
+   "difficulty": 1,
    "media": {
     "img": [
      {
@@ -3556,7 +3556,7 @@
     "Tiger in a Tropical Storm (Surprised!)"
    ],
    "explain": "Self-Portrait with Bandaged Ear (1889) by Vincent van Gogh. The painter shows himself with a bandage over his ear.",
-   "difficulty": 2,
+   "difficulty": 1,
    "media": {
     "img": [
      {

@@ -2,6 +2,7 @@
 import { go } from '../ui/app.js?v=1';
 import './room.js?v=1';
 import './join.js?v=1';
+import './p2p.js?v=1';   // lane P2P: registers the device-hosted transport
 import { createChallenge as create, challengeButton } from './challenge.js?v=1';
 import { cleanCode } from './util.js?v=1';
 import { openLinkChallenge as openLink, linkChallengeShare, createLinkChallenge } from './linkchallenge.js?v=1';
@@ -27,6 +28,8 @@ export const openJoin = code => go('join', { code: cleanCode(code) });
 export const joinRoom = openJoin;
 export const openChallenge = id => go('challenge', { id: String(id || '').toLowerCase().trim() });
 export const openOnline = () => go('online');
+// ?p2p=CODE: a device-hosted room (lane P2P).
+export const openP2P = code => go('join', { code: cleanCode(code), via: 'p2p' });
 // Host a prepared spec (e.g. a pub quiz built elsewhere): goes to the host screen for a name, then builds + creates.
 export const hostRoom = (spec, { title = '' } = {}) => go('host', { spec, title });
 
@@ -49,5 +52,6 @@ export function routeFromUrl() {
   const q = new URLSearchParams(location.search);
   if (q.get('join')) { openJoin(q.get('join')); return true; }
   if (q.get('c')) { openChallenge(q.get('c')); return true; }
+  if (q.get('p2p')) { openP2P(q.get('p2p')); return true; }
   return false;
 }

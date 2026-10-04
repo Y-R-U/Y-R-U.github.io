@@ -37,7 +37,7 @@ for (const [mode, vp] of [['portrait', [384, 854]], ['landscape', [854, 384]], [
   ok(st.p > 0.1, `${mode}: clip playing (progress ${st.p.toFixed(2)}, "${st.s}", "${st.prompt}", ${st.n} answers)`);
   await c.screenshot(`${OUT}/${mode}-q.png`, vp[0], vp[1]);
   await c.evaluate(`document.querySelectorAll('.choice')[0].click(); true`);
-  await sleep(1200);
+  for (let i = 0; i < 16 && !(await c.evaluate("!!document.querySelector('.reveal.show .au-rv')")); i++) await sleep(250);
   const rv = await c.evaluate(`({ rv: !!document.querySelector('.reveal.show .au-rv'), apple: !!document.querySelector('.reveal.show .au-apple'), pts: document.querySelector('.reveal.show .pts')?.textContent || '' })`);
   ok(rv.rv, `${mode}: reveal card has the AU block (apple badge ${rv.apple}, ${rv.pts})`);
   await c.screenshot(`${OUT}/${mode}-reveal.png`, vp[0], vp[1]);

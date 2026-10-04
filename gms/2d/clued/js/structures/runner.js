@@ -2,7 +2,7 @@
 // Every structure uses it, and lane S drives it for online rooms and challenge links. API in docs/notes/A.md.
 import { getFormat } from '../formats/registry.js?v=1';
 import { createTimer } from '../core/timer.js?v=1';
-import { basePoints, withStreak } from '../core/scoring.js?v=1';
+import { basePoints, withStreak, stageMultiplier, progressiveLimit, stageExtendMs, PROGRESSIVE_CAP } from '../core/scoring.js?v=1';
 import { creditsOf, urlsOf, preflight } from '../core/media.js?v=1';
 import { getSettings } from '../core/store.js?v=1';
 import { h, esc, onKey, countUp, fmtNum } from '../ui/kit.js?v=1';
@@ -15,7 +15,19 @@ const KIND_WRONG = ['Good try!', 'Nearly!', 'Nice guess!', 'Ooh, close!'];
 const RIGHT = ['Correct!', 'Nailed it!', 'Spot on!', 'Yes!', 'Right!'];
 const WRONG = ['Not quite', 'Nope', 'Unlucky', 'Wrong'];
 
+// Styles for the shared Show-more button and the ring's "+5s" (lane S; kept here so the runner stays self-contained).
+function stageStyles() {
+  if (document.getElementById('runner-stage-css')) return;
+  const st = document.createElement('style');
+  st.id = 'runner-stage-css';
+  st.textContent = '.more-btn{margin-left:auto;min-height:38px}.more-btn[hidden]{display:none}.more-btn.locked{background:#e9e4f5}' +
+    '.ring{position:relative}.ring-plus{position:absolute;left:50%;top:-6px;transform:translateX(-50%);font-weight:900;font-size:13px;color:var(--good,#1fbf6a);' +
+    'animation:ringplus 1.2s ease-out forwards;pointer-events:none;white-space:nowrap}@keyframes ringplus{from{opacity:1;transform:translate(-50%,0)}to{opacity:0;transform:translate(-50%,-18px)}}';
+  document.head.append(st);
+}
+
 export function createRunner(host, cfg = {}) {
+  stageStyles();
   const settings = getSettings();
   const kidsAll = !!cfg.kids;
   let kids = kidsAll;   // per question: party mixes kids and grown-up players
@@ -26,6 +38,8 @@ export function createRunner(host, cfg = {}) {
   const limitFor = q => cfg.timeLimit || (typeof cfg.timer === 'number' && cfg.timer > 0 ? cfg.timer * 1000 : 0) || q.timeLimit || (settings.timerSec || 10) * 1000;
   const nowFn = cfg.now || Date.now;   // online: a server-synced clock
   let fullLimit = 0;
+  // Progressive stages (lane S): current question's stage, vote display and lock. See docs/notes/S.md.
+  const sg = { n: 0, stage: 0, locked: false, votes: 0, needed: 0, voted: false, subs: new Set(), kidsTimer: null, answerMs: 0, startAt: 0, deadline: 0 };
   const lifelines = new Set(cfg.lifelines || []);
   const state = {
     i: -1, score: 0, streak: 0, bestStreak: 0, correct: 0, answered: 0,
@@ -57,6 +71,7 @@ export function createRunner(host, cfg = {}) {
   const streakEl = h('span.streak');
   const livesEl = h('span.lives');
   const clockEl = h('span.clock');
+  const moreBtn = h('button.btn.small.sun.more-btn', { type: 'button', hidden: true, dataset: { act: 'more' }, onclick: () => requestMore() });
   const speakBtn = canSpeak() ? h('button.icon-btn.speak', { type: 'button', 'aria-label': 'Read aloud', onclick: () => readAloud() }, '🔊') : null;
   const lifeBox = h('span.lifelines');
   const used = new Set();
@@ -65,7 +80,7 @@ export function createRunner(host, cfg = {}) {
     lifeBox.append(h('button.lifeline', { type: 'button', dataset: { id }, 'aria-label': label, onclick: () => useLifeline(id) }, h('span', {}, icon), h('small', {}, label)));
   }
   hud.append(h('div.hud-row1', {}, cfg.quit === false ? h('span.bar-gap') : quitBtn, prog, h('div.hud-right', {}, speakBtn || '', ring, scoreEl)));
-  row2.append(playerChip, streakEl, livesEl, clockEl, lifeBox);
+  row2.append(playerChip, streakEl, livesEl, clockEl, lifeBox, moreBtn);
   hud.append(row2);
 
   const offKeys = onKey(e => {
@@ -88,7 +103,7 @@ export function createRunner(host, cfg = {}) {
     streakEl.classList.toggle('hot', st >= 3);
     livesEl.innerHTML = state.lives != null ? Array.from({ length: state.maxLives }, (_, k) => `<i class="${k < state.lives ? '' : 'lost'}">♥</i>`).join('') : '';
     lifeBox.querySelectorAll('.lifeline').forEach(b => { b.disabled = used.has(b.dataset.id); });
-    row2.hidden = !(players.length > 1 || st >= 2 || state.lives != null || cfg.deadline || lifelines.size);
+    row2.hidden = !(players.length > 1 || st >= 2 || state.lives != null || cfg.deadline || lifelines.size || sg.n);
   }
   function drawTimer(r) {
     const k = fullLimit ? Math.max(0, Math.min(1, r / fullLimit)) : 0;
@@ -122,6 +137,11 @@ export function createRunner(host, cfg = {}) {
     preload: urls => preflight(urls),
     speak: text => speak(text, { kids }),
     answer(res) { if (answerResolve) { const r = answerResolve; answerResolve = null; r(res || {}); } },
+    get stage() { return sg.stage; },
+    get stages() { return sg.n; },
+    get stageLocked() { return sg.locked; },
+    onStage(cb) { sg.subs.add(cb); return () => sg.subs.delete(cb); },
+    requestMore() { requestMore(); },
     reveal(html) { extraReveal.push(html); },
   };
   let extraReveal = [];
@@ -146,6 +166,8 @@ export function createRunner(host, cfg = {}) {
   }
 
   function ask(q) {
+    // Formats' timers/loops/audio must not leak into the next question (lane AU request).
+    if (ctrl) { try { ctrl.destroy && ctrl.destroy(); } catch (e) {} ctrl = null; }
     return new Promise(resolve => {
       reveal.classList.remove('show', 'good', 'bad');
       reveal.innerHTML = '';
@@ -167,6 +189,8 @@ export function createRunner(host, cfg = {}) {
       const ext = cfg.deadlineFor ? cfg.deadlineFor(state.i, q) : 0;
       let limit = (cfg.limitFor && cfg.limitFor(state.i, q)) || limitFor(q);
       const useTimer = !!ext || (timedFor(kids) && !cfg.deadline);
+      resetStages(q, limit);
+      if (sg.n && !ext && !cfg.limitFor) limit = progressiveLimit(limit);
       answerResolve = res => {
         const remaining = timer.remaining();
         timer.stop();
@@ -185,6 +209,7 @@ export function createRunner(host, cfg = {}) {
         resolve(record(q, { correct: false, given: null, detail: 'skip' }, { remaining: 0, limit, ms: performance.now() - t0, skipped: true }));
       };
       try {
+        ctrl = null;
         ctrl = fmt.render(stage, q, api) || {};
       } catch (e) {
         console.error('[clued] render failed', q.format, e);
@@ -195,6 +220,7 @@ export function createRunner(host, cfg = {}) {
       ring.hidden = !useTimer;
       ring.querySelector('.rf').style.strokeDasharray = String(RING_LEN);
       fullLimit = limit;
+      drawMore();
       if (ext) timer.start(Math.max(0, ext - nowFn()));
       else if (useTimer && !fmt.manualTimer) timer.start(limit);
       if (kids || settings.readAloud) setTimeout(readAloud, 250);
@@ -203,6 +229,71 @@ export function createRunner(host, cfg = {}) {
   }
   let onTimeoutFn = null, skipFn = null;
   function onTimeout() { onTimeoutFn && onTimeoutFn(); }
+
+  /* Progressive stages: the runner owns the stage, the shared Show-more button and the multiplier.
+     Solo: requestMore advances at once (kids: auto every 4 s). Online: cfg.requestMore(i, q, stage) sends a vote and
+     the room calls run.setStage / setVotes / lockStages from server state. */
+  function resetStages(q, answerMs) {
+    clearInterval(sg.kidsTimer);
+    Object.assign(sg, { n: q.stages >= 2 ? q.stages : 0, stage: 0, locked: false, votes: 0, needed: 0, voted: false, kidsTimer: null,
+      answerMs, startAt: performance.now() });
+    sg.subs = new Set();
+    api.moreButton = !!sg.n; // formats (listen) hide their own Show-more when the runner draws the shared one
+    if (sg.n && kids && !cfg.requestMore) sg.kidsTimer = setInterval(() => { if (answerResolve && !sg.locked && sg.stage < sg.n - 1) setStage(sg.stage + 1); }, cfg.kidsStageMs || 4000);
+    drawMore();
+  }
+  function drawMore() {
+    moreBtn.hidden = !sg.n;
+    if (sg.n) row2.hidden = false;
+    if (!sg.n) return;
+    const last = sg.stage >= sg.n - 1;
+    const online = !!cfg.requestMore;
+    moreBtn.disabled = sg.locked || last || !answerResolve || (online && sg.voted);
+    moreBtn.classList.toggle('locked', sg.locked);
+    moreBtn.textContent = sg.locked ? 'Locked 🔒' : last ? 'All shown' : online && sg.needed ? `Show more 👀 (${sg.votes}/${sg.needed})` : 'Show more 👀';
+  }
+  function requestMore() {
+    if (!sg.n || sg.locked || sg.stage >= sg.n - 1 || !answerResolve) return;
+    if (cfg.requestMore) {
+      if (sg.voted) return;
+      sg.voted = true; sg.votes++;
+      drawMore();
+      try { cfg.requestMore(state.i, questions[state.i], sg.stage); } catch (e) { console.error(e); }
+    } else setStage(sg.stage + 1);
+  }
+  function flourish(ms) {
+    if (ms < 500) return;
+    const f = h('span.ring-plus', {}, `+${Math.round(ms / 1000)}s`);
+    ring.append(f);
+    setTimeout(() => f.remove(), 1200);
+  }
+  // deadline/limitMs: online, the server's new deadline (absolute, room clock) and full ring length.
+  function setStage(next, deadline, limitMs) {
+    if (!sg.n || next <= sg.stage) return;
+    sg.stage = Math.min(sg.n - 1, next);
+    sg.votes = 0; sg.voted = false;
+    if (answerResolve && timer.running) {
+      const before = timer.remaining();
+      if (deadline) {
+        if (limitMs) fullLimit = limitMs;
+        timer.start(Math.max(0, deadline - nowFn()));
+      } else {
+        const elapsed = performance.now() - sg.startAt;
+        const want = Math.min(Math.max(before, stageExtendMs(sg.answerMs)), PROGRESSIVE_CAP - elapsed);
+        if (want > before) { fullLimit = elapsed + want; timer.start(want); }
+      }
+      flourish(timer.remaining() - before);
+    }
+    sfx('reveal');
+    drawMore();
+    for (const cb of [...sg.subs]) { try { cb(sg.stage); } catch (e) { console.error(e); } }
+  }
+  function lockStages() {
+    if (!sg.n || sg.locked) return;
+    sg.locked = true;
+    clearInterval(sg.kidsTimer);
+    drawMore();
+  }
 
   function record(q, res, t) {
     const pi = playerOf(state.i);
@@ -215,10 +306,13 @@ export function createRunner(host, cfg = {}) {
         : cfg.scoreFn ? cfg.scoreFn(res, q, state) : basePoints({ timed: t.timedNow, remaining: t.remaining, limit: t.limit });
       points = (cfg.noStreak ? base : withStreak(base, streak)) * (cfg.multiplier ? cfg.multiplier(state.i, q, state) : 1);
     } else if (res.partial && res.points) points = res.points;
+    if (sg.n) points = Math.round(points * stageMultiplier(sg.stage, sg.n));
     const rec = {
       i: state.i, qid: q.id, format: q.format, round: q.round, correct, points, given: res.given ?? null,
       detail: res.detail, ms: Math.round(t.ms), streak, player: pi, timeout: !!t.timeout, skipped: !!t.skipped,
+      ...(sg.n ? { stage: sg.stage, stages: sg.n } : {}),
     };
+    lockStages();
     if (!t.skipped) state.answered++;
     if (correct) {
       state.correct++; p.correct++; state.stars++;
@@ -339,7 +433,7 @@ export function createRunner(host, cfg = {}) {
     finished = true;
     state.done = true;
     state.aborted = reason === 'quit' || reason === 'stop';
-    timer.stop(); clock?.stop(); stopSpeaking(); offKeys();
+    timer.stop(); clock?.stop(); stopSpeaking(); offKeys(); clearInterval(sg.kidsTimer);
     try { ctrl?.destroy && ctrl.destroy(); } catch (e) {}
     if (answerResolve) { const r = answerResolve; answerResolve = null; r({ correct: false, detail: reason }); }
     advance();
@@ -366,6 +460,11 @@ export function createRunner(host, cfg = {}) {
       ring.hidden = false;
       timer.start(Math.max(0, absMs - nowFn()));
     },
+    // Progressive stages, driven by the room (lane S): see docs/notes/S.md.
+    setStage: (stage, deadline, limitMs) => setStage(stage, deadline, limitMs),
+    setVotes(votes, needed, voted) { if (!sg.n) return; sg.votes = votes; sg.needed = needed; sg.voted = !!voted; drawMore(); },
+    lockStages: () => lockStages(),
+    get stage() { return sg.stage; },
     // Online: the server says time is up. Locks input and records a timeout if still unanswered.
     timeUp: () => onTimeout(),
     // "Next question in 3…2…1". `to` is seconds, or an absolute ms time (server clock). Resolves when it ends.

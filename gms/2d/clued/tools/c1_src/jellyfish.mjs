@@ -7,7 +7,7 @@ export default {
   id: 'jellyfish', title: 'Jellyfish & stingers', theme: 'animals', icon: '🪼', kids: true,
   notice: NOT_ID + ' If stung, get first aid and follow local advice.',
   leakExempt: ['jellyfish', 'jelly'],
-  autoTaxo: ['class', 'family'],
+  wikiD1: true, autoTaxo: ['class', 'family'],
   factsMeta: {
     danger: { type: 'cat', label: 'Sting', values: [H, M, P, X], clue: v => ({ [H]: 'It is harmless to people.', [M]: 'Its sting is mild.', [P]: 'Its sting is very painful.', [X]: 'Its venom can kill a person.' }[v]) },
     kind: { type: 'cat', label: 'Kind of animal', clue: v => `It is a kind of ${v.toLowerCase()}.`, noClue: true },
@@ -45,7 +45,7 @@ export default {
     { n: 'Upside-down jellyfish', sci: 'Cassiopea', g: 'true jellyfish', f: f(M, 'Jellyfish'), d: 2,
       b: 'A jellyfish that lies on the sea floor with its arms pointing up, so algae living in it get sunlight.',
       c: ['Algae living inside it make food from sunlight.', 'It releases stinging mucus into the water.', 'It lives in shallow lagoons and mangroves.', 'It lies on the sea floor.', 'It rests the wrong way up.'] },
-    { n: 'Immortal jellyfish', sci: 'Turritopsis dohrnii', g: 'hydrozoan', f: f(H, 'Hydrozoan'), d: 2,
+    { n: 'Immortal jellyfish', files: ['Turritopsis dohrnii (cropped).jpg', 'Turritopsis dohrnii.jpg'], sci: 'Turritopsis dohrnii', g: 'hydrozoan', f: f(H, 'Hydrozoan'), d: 2,
       b: 'A tiny jellyfish that can turn back into its baby form when stressed or old, again and again.',
       c: ['It is only about 4.5 mm across.', 'Its stomach shows bright red through its body.', 'It can turn back into a polyp.', 'It can restart its life cycle.', 'It is said it may never die of old age.'] },
     { n: 'Fried egg jellyfish', alt: ['Mediterranean jellyfish'], sci: 'Cotylorhiza tuberculata', g: 'true jellyfish', f: f(H, 'Jellyfish'), d: 2,

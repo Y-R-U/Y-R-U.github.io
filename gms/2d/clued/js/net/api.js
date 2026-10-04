@@ -103,6 +103,7 @@ export const rooms = {
   question: (code, key, i) => req('GET', `/rooms/${code}/q/${i}?k=${encodeURIComponent(key)}`),
   answer: (code, key, a) => req('POST', `/rooms/${code}/answer`, { key, ...a }),
   leave: (code, key) => req('POST', `/rooms/${code}/leave`, { key }),
+  vote: (code, key, q) => req('POST', `/rooms/${code}/vote`, { key, q }),
   host: (code, key, action, extra = {}) => req('POST', `/rooms/${code}/${action}`, { key, ...extra }, { timeout: action === 'again' ? 20000 : 12000 }),
 };
 

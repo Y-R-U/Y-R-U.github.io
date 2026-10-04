@@ -7,7 +7,7 @@ const f = (venomous, lengthM, region, danger) => ({ venomous, lengthM, region, d
 export default {
   id: 'snakes', title: 'Snakes', theme: 'animals', icon: '🐍', kids: true, notice: NOT_ID,
   leakExempt: ['snake', 'snakes'],
-  autoTaxo: ['family', 'genus'], status: true, wdCheck: { lengthM: 'P2043' },
+  wikiD1: true, autoTaxo: ['family', 'genus'], status: true, wdCheck: { lengthM: 'P2043' },
   ranges: { lengthM: [0.2, 9] },
   factsMeta: { venomous: VENOM_META, danger: DANGER_META, lengthM: len(), region: REGION_META, status: STATUS_META },
   imgPrompt: "Which of these is {aName}?",

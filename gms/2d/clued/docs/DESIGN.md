@@ -170,3 +170,24 @@ Anything that doesn't need our server has no caps:
   channels (signalling via the free PeerJS cloud broker or similar, vendored client). Same lobby/runner/timers UI,
   ~8 players max, the room ends if the host leaves. Offered on Pages, and on br8t automatically when the server is at a
   cap or protection level 3 ("host from your device instead").
+
+## Vote to reveal more (Aaron, 2026-10-05)
+Progressive questions (`reveal`, `ladder` clues, `listen` clip length, `silhouette`, movie-moment zoom/blur) have
+**stages** 0…N-1, starting at the least revealed.
+- **Online/P2P rooms:** every player gets a "Show more 👀 (2/5 voted)" button. When **all connected players who
+  haven't answered** have voted, everyone advances one stage at once (server/host-authoritative). As soon as **anyone
+  submits a guess, voting locks** for everyone and the stage freezes. Points depend on the stage when you
+  answered (earlier = more). Progressive questions get **more time**: the initial deadline = answer time × 1.5 (min 10 s), and **each successful vote extends the deadline** by max(5 s, ½ × answer time), measured from the moment the stage advances (never shortening it). Total cap 90 s.
+- **Solo/party:** the "Show more" button advances immediately (the same points rule).
+- **Kids:** stages auto-advance every few seconds and voting is optional.
+
+## Background music + full screen (Aaron, 2026-10-05)
+Soft PD classical background music (default on, quiet), with a 🎵/🔇 toggle on the home header and a Settings row.
+It auto-pauses whenever anything with sound plays (listen questions, item audio, Learn sound/piano/anthems), ducks
+under read-aloud, and resumes afterwards. A ⛶ full-screen toggle sits on the home header and in Settings (hidden where the
+Fullscreen API is missing, e.g. iPhone Safari). UI: js/ui/toggles.js (manager); engine: js/audio/bgm.js (AU).
+
+## Async progressive scoring (Aaron, 2026-10-05)
+In async modes (link challenges, server challenges, solo) "Show more" works freely. The winner of each question
+is whoever answered **correctly with the least revealed** (lowest stage); ties are broken by time. Show the stage used next to each
+player's result in the challenge comparison ("got it at clue 2 / 3 s of music").

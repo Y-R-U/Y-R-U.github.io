@@ -111,3 +111,20 @@ the spec, so media swaps and pack updates can't desync players.
 ## Storage keys (localStorage, synced via cloud.js where marked *)
 `clued.settings`*, `clued.stats`*, `clued.mastery`*, `clued.cards`* (flashcards), `clued.last` (last picks), `clued.name`.
 cloud game id: `clued`.
+
+## Progressive stages (vote to reveal)
+A progressive question sets `stages: N` (≥ 2). Formats read `api.stage` (current, starts 0) and subscribe with
+`api.onStage(cb(stage))` to re-render the reveal; they never advance the stage themselves. They call `api.requestMore()` from their
+"Show more" UI (or let the runner draw the shared vote button; the runner owns the button + vote count display).
+`api.answer({ … })` records `stage` automatically. Points multiplier = `1 - 0.6 * stage/(N-1)` (applied by scoring,
+server and client alike). Runner: solo → requestMore advances immediately; online → sends `vote` via the transport
+and advances on the `stage` event; any `answered` event from anyone → `locked` (button disabled).
+Server/P2P: `POST /rooms/{code}/vote {playerKey, q}` → broadcasts `{type:'vote', q, votes, needed}`; when votes ≥ needed
+(connected, not yet answered players) → `{type:'stage', q, stage, deadline}` (deadline extended per DESIGN: initial = time×1.5 min 10 s; +max(5 s, time/2) from the advance; cap 90 s); the first answer → `{type:'lock', q}`.
+
+## Additive fields in use (documented after the fact, from C1/C2/AU)
+Pack: `kidsSafe` (false = never in kids mode), `path` (index only: "packs/x.json" | "music/x.json").
+Item: `lname` (lower-case name for mid-sentence use), `quotes[]`, `quote`, `firstLine`, `summary`, `leakExempt` (clue leak check
+skip). factsMeta entries: wording templates `ask`, `askReverse`, `askBool`, `askHigh`, `askLow`, `stmt`, `minRatio`, `values`,
+`exclusive:false`; fact type `text`. Item prompts `imgPrompt`, `nameImgPrompt`, `tfImgPrompt`. Facts `flagDisputed`, `kids`.
+Index caps: `qkinds`, `itemImg`, `itemAudio`, `easy`, `kidsItems`.

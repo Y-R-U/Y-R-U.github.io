@@ -41,18 +41,19 @@ func plausibleScore(score, correct, total int) bool {
 }
 
 type scoreRow struct {
-	ID      int64  `json:"id"`
-	Name    string `json:"name"`
-	Score   int    `json:"score"`
-	Correct int    `json:"correct"`
-	Ms      int    `json:"ms"`
-	Creator bool   `json:"creator,omitempty"`
-	Signed  bool   `json:"signed,omitempty"`
-	At      int64  `json:"at"`
+	ID      int64           `json:"id"`
+	Detail  json.RawMessage `json:"detail,omitempty"`
+	Name    string          `json:"name"`
+	Score   int             `json:"score"`
+	Correct int             `json:"correct"`
+	Ms      int             `json:"ms"`
+	Creator bool            `json:"creator,omitempty"`
+	Signed  bool            `json:"signed,omitempty"`
+	At      int64           `json:"at"`
 }
 
 func board(id string, limit int) []scoreRow {
-	rows, err := db.Query(`SELECT id, name, score, correct, ms, creator, uid != '', created FROM challenge_scores
+	rows, err := db.Query(`SELECT id, name, score, correct, ms, creator, uid != '', created, detail FROM challenge_scores
 		WHERE challenge_id = ? ORDER BY score DESC, ms ASC, id ASC LIMIT ?`, id, limit)
 	if err != nil {
 		return nil
@@ -61,7 +62,11 @@ func board(id string, limit int) []scoreRow {
 	out := []scoreRow{}
 	for rows.Next() {
 		var s scoreRow
-		if rows.Scan(&s.ID, &s.Name, &s.Score, &s.Correct, &s.Ms, &s.Creator, &s.Signed, &s.At) == nil {
+		var det string
+		if rows.Scan(&s.ID, &s.Name, &s.Score, &s.Correct, &s.Ms, &s.Creator, &s.Signed, &s.At, &det) == nil {
+			if det != "" {
+				s.Detail = json.RawMessage(det)
+			}
 			out = append(out, s)
 		}
 	}
@@ -69,10 +74,28 @@ func board(id string, limit int) []scoreRow {
 }
 
 type scoreIn struct {
-	Name    string `json:"name"`
-	Score   int    `json:"score"`
-	Correct int    `json:"correct"`
-	Ms      int    `json:"ms"`
+	Name    string          `json:"name"`
+	Score   int             `json:"score"`
+	Correct int             `json:"correct"`
+	Ms      int             `json:"ms"`
+	Detail  json.RawMessage `json:"detail"`
+}
+
+// cleanDetail keeps per-question results as [[correct 0/1, stage, ms], …], at most one per question.
+// Async progressive scoring compares them: correct with the lowest stage wins, ties by time.
+func cleanDetail(raw json.RawMessage, total int) string {
+	var d [][]int
+	if len(raw) == 0 || len(raw) > 8192 || json.Unmarshal(raw, &d) != nil || len(d) > total {
+		return ""
+	}
+	for i, row := range d {
+		if len(row) != 3 {
+			return ""
+		}
+		d[i] = []int{min(max(row[0], 0), 1), min(max(row[1], 0), 50), min(max(row[2], 0), 600000)}
+	}
+	b, _ := json.Marshal(d)
+	return string(b)
 }
 
 func handleCreateChallenge(w http.ResponseWriter, r *http.Request) {
@@ -82,9 +105,10 @@ func handleCreateChallenge(w http.ResponseWriter, r *http.Request) {
 	}
 	var in struct {
 		roomIn
-		Score   int `json:"score"`
-		Correct int `json:"correct"`
-		Ms      int `json:"ms"`
+		Score   int             `json:"score"`
+		Correct int             `json:"correct"`
+		Ms      int             `json:"ms"`
+		Detail  json.RawMessage `json:"detail"`
 	}
 	if !readJSON(w, r, bigBody, &in) || !validQuestions(w, &in.roomIn) {
 		return
@@ -124,8 +148,8 @@ func handleCreateChallenge(w http.ResponseWriter, r *http.Request) {
 	_, err = tx.Exec(`INSERT INTO challenges(id, name, uid, title, spec, questions, total, score, plays, created, touched)
 		VALUES(?,?,?,?,?,?,?,?,1,?,?)`, cid, name, uid, in.Title, string(in.Spec), qs, total, in.Score, now, now)
 	if err == nil {
-		_, err = tx.Exec(`INSERT INTO challenge_scores(challenge_id, name, uid, score, correct, ms, creator, created)
-			VALUES(?,?,?,?,?,?,1,?)`, cid, name, uid, in.Score, in.Correct, max(0, in.Ms), now)
+		_, err = tx.Exec(`INSERT INTO challenge_scores(challenge_id, name, uid, score, correct, ms, creator, created, detail)
+			VALUES(?,?,?,?,?,?,1,?,?)`, cid, name, uid, in.Score, in.Correct, max(0, in.Ms), now, cleanDetail(in.Detail, total))
 	}
 	if err != nil || tx.Commit() != nil {
 		writeErr(w, 500, "db", "database error")
@@ -201,8 +225,8 @@ func handlePostScore(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	now := nowMs()
-	res, err := db.Exec(`INSERT INTO challenge_scores(challenge_id, name, uid, score, correct, ms, created) VALUES(?,?,?,?,?,?,?)`,
-		id, name, uid, in.Score, in.Correct, max(0, in.Ms), now)
+	res, err := db.Exec(`INSERT INTO challenge_scores(challenge_id, name, uid, score, correct, ms, created, detail) VALUES(?,?,?,?,?,?,?,?)`,
+		id, name, uid, in.Score, in.Correct, max(0, in.Ms), now, cleanDetail(in.Detail, total))
 	if err != nil {
 		writeErr(w, 500, "db", "database error")
 		return

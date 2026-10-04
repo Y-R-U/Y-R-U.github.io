@@ -209,7 +209,7 @@ export function parseQuestions(text, prefix) {
     const q = { id: '', kind, prompt: p[2], difficulty };
     if (kind === 'mc') Object.assign(q, { answer: p[3], wrong: p[4].split(';').map(s => s.trim()), explain: p[5] });
     else if (kind === 'tf') Object.assign(q, { answer: p[3] === 'true', explain: p[4] });
-    else if (kind === 'num') Object.assign(q, { answer: +p[3], unit: p[4], tolerance: +p[5], explain: p[6] });
+    else if (kind === 'num') Object.assign(q, { kind: 'number', answer: +p[3], unit: p[4], tolerance: +p[5], explain: p[6] });
     else if (kind === 'order') Object.assign(q, { answer: p[3].split(';').map(s => s.trim()), orderLabel: p[4], explain: p[5] });
     else throw new Error('bad question line: ' + line);
     if (p.some(s => s === undefined) || !q.explain) throw new Error('incomplete question line: ' + line);

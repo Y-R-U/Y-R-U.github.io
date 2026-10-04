@@ -113,7 +113,7 @@ export async function review(el) {
     const audio = e.item.media?.audio?.[0];
     const backF = h('div.l-face.back', { hidden: true },
       h('h2.l-card-name', {}, e.item.name), e.item.sci && !kids ? h('div.l-sci', {}, e.item.sci) : null,
-      !pic && img ? h('img.l-card-thumb', { src: img.src, alt: '', referrerpolicy: 'no-referrer' }) : null,
+      img ? h('img.l-card-thumb', { src: img.src, alt: '', referrerpolicy: 'no-referrer', class: pic ? 'pic' : '' }) : null,
       e.item.blurb ? h('p.l-blurb', {}, e.item.blurb) : null,
       kids ? null : h('table.l-facts.sm', {}, h('tbody', {}, ...factRows(e.pack, e.item).slice(0, 4).map(r => h('tr', {}, h('th', {}, r.label), h('td', {}, r.text))))),
       e.pack.notice && !kids ? notice(e.pack.notice) : null);

@@ -5,6 +5,9 @@
  "icon": "🐸",
  "kids": true,
  "version": 1,
+ "imgPrompt": "Which of these is {aName}?",
+ "nameImgPrompt": "Which animal is this?",
+ "tfImgPrompt": "This is {aName}.",
  "leakExempt": [],
  "factsMeta": {
   "cls": {
@@ -13,28 +16,42 @@
    "values": [
     "Reptile",
     "Amphibian"
-   ]
+   ],
+   "ask": "Is the {lname} a reptile or an amphibian?",
+   "askReverse": "Which of these is an {lvalue}?",
+   "stmt": "The {lname} is an {lvalue}."
   },
   "region": {
    "type": "cat",
-   "label": "Found in"
+   "label": "Found in",
+   "ask": "Where does the {lname} live?",
+   "askReverse": "Which of these lives in {value}?",
+   "stmt": "The {lname} lives in {value}.",
+   "exclusive": false
   },
   "lengthM": {
    "type": "num",
    "label": "Typical adult length",
    "unit": "m",
-   "higherLabel": "Longer"
+   "higherLabel": "Longer",
+   "askHigh": "Which of these grows the longest?",
+   "askLow": "Which of these is the smallest?",
+   "minRatio": 2
   },
   "venomous": {
    "type": "bool",
    "label": "Venomous or poisonous",
    "yes": "Venomous or poisonous",
-   "no": "Harmless"
+   "no": "Harmless",
+   "askBool": "Which of these is venomous or poisonous?",
+   "stmt": "The {lname} is venomous or poisonous."
   },
   "status": {
    "type": "cat",
    "label": "Conservation status (IUCN)",
-   "hard": true
+   "ask": "What is the IUCN conservation status of the {lname}?",
+   "askReverse": "Which of these is listed as \"{value}\" by the IUCN?",
+   "stmt": "The {lname} is listed as \"{value}\" by the IUCN."
   }
  },
  "items": [
@@ -71,10 +88,26 @@
     "It is common in northern Australian rivers.",
     "It is the biggest living reptile.",
     "The answer has 2 words (9, 9 letters).",
-    "It starts with the letter S."
+    "Its first letter is S."
    ],
    "media": {
     "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/7/78/Laurie%27s_crocodile_in_the_garden.jpg/500px-Laurie%27s_crocodile_in_the_garden.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Laubarr",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Laurie%27s_crocodile_in_the_garden.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/4/43/SaltwaterCrocodile%28%27Maximo%27%29.jpg/500px-SaltwaterCrocodile%28%27Maximo%27%29.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Obtained from Molly Ebersold of the St. Augustine Alligator Farm",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:SaltwaterCrocodile(%27Maximo%27).jpg"
+     },
      {
       "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/188080748/medium.jpg",
       "w": 500,
@@ -82,22 +115,6 @@
       "credit": "Bernard DUPONT",
       "license": "CC BY-SA 4.0",
       "page": "https://www.inaturalist.org/photos/188080748"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/28434316/medium.jpg",
-      "w": 500,
-      "h": 333,
-      "credit": "Julien Renoult",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/28434316"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/51609320/medium.jpeg",
-      "w": 500,
-      "h": 243,
-      "credit": "Dragonette",
-      "license": "CC BY-SA 4.0",
-      "page": "https://www.inaturalist.org/photos/51609320"
      }
     ]
    },
@@ -106,6 +123,7 @@
   {
    "id": "nile-crocodile",
    "name": "Nile crocodile",
+   "lname": "Nile crocodile",
    "sci": "Crocodylus niloticus",
    "group": "crocodilian",
    "facts": {
@@ -128,7 +146,7 @@
     "Typical adult length: about 4.5 m.",
     "It is named after the world's longest river.",
     "The answer has 2 words (4, 9 letters).",
-    "It starts with the letter N."
+    "Its first letter is N."
    ],
    "media": {
     "img": [
@@ -163,6 +181,7 @@
   {
    "id": "american-alligator",
    "name": "American alligator",
+   "lname": "American alligator",
    "alt": [
     "alligator",
     "gator"
@@ -190,10 +209,26 @@
     "Its snout is wide and U-shaped.",
     "It is found in the swamps of the USA.",
     "The answer has 2 words (8, 9 letters).",
-    "It starts with the letter A."
+    "Its first letter is A."
    ],
    "media": {
     "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/0/03/American_Alligator.jpg/330px-American_Alligator.jpg",
+      "w": 330,
+      "h": 440,
+      "credit": "User:Postdlf",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:American_Alligator.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/a/a5/American_Alligator.JPG/500px-American_Alligator.JPG",
+      "w": 500,
+      "h": 333,
+      "credit": "Skeetdeloach at English Wikipedia",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:American_Alligator.JPG"
+     },
      {
       "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/32333837/medium.jpeg",
       "w": 500,
@@ -201,22 +236,6 @@
       "credit": "Vijay Barve",
       "license": "CC0 1.0",
       "page": "https://www.inaturalist.org/photos/32333837"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/113342133/medium.jpeg",
-      "w": 500,
-      "h": 375,
-      "credit": "Kristen Diesburg",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/113342133"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/113744549/medium.jpg",
-      "w": 500,
-      "h": 333,
-      "credit": "no rights reserved",
-      "license": "CC0 1.0",
-      "page": "https://www.inaturalist.org/photos/113744549"
      }
     ],
     "audio": [
@@ -261,7 +280,7 @@
     "It lives in rivers of India and Nepal.",
     "Its snout is very long and thin.",
     "The answer is one word of 7 letters.",
-    "It starts with the letter G."
+    "Its first letter is G."
    ],
    "media": {
     "img": [
@@ -296,6 +315,7 @@
   {
    "id": "komodo-dragon",
    "name": "Komodo dragon",
+   "lname": "Komodo dragon",
    "sci": "Varanus komodoensis",
    "group": "monitor",
    "facts": {
@@ -321,33 +341,33 @@
     "It lives on a few Indonesian islands.",
     "It is the biggest lizard in the world.",
     "The answer has 2 words (6, 6 letters).",
-    "It starts with the letter K."
+    "Its first letter is K."
    ],
    "media": {
     "img": [
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/370405210/medium.jpg",
-      "w": 500,
-      "h": 364,
-      "credit": "Unknown author",
-      "license": "CC BY-SA 4.0",
-      "page": "https://www.inaturalist.org/photos/370405210"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/370405218/medium.jpeg",
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/8/81/Komodo_dragon_Varanus_komodoensis_Ragunan_Zoo_2.JPG/500px-Komodo_dragon_Varanus_komodoensis_Ragunan_Zoo_2.JPG",
       "w": 500,
       "h": 375,
       "credit": "Midori",
-      "license": "CC BY-SA 4.0",
-      "page": "https://www.inaturalist.org/photos/370405218"
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Komodo_dragon_Varanus_komodoensis_Ragunan_Zoo_2.JPG"
      },
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/414069493/medium.jpeg",
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/a/a9/Varan_komodsk%C3%BD_3.jpg/500px-Varan_komodsk%C3%BD_3.jpg",
       "w": 500,
-      "h": 263,
-      "credit": "no rights reserved",
-      "license": "CC0 1.0",
-      "page": "https://www.inaturalist.org/photos/414069493"
+      "h": 375,
+      "credit": "Dezidor",
+      "license": "CC BY 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Varan_komodsk%C3%BD_3.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/f/f5/202306_Varanus_komodoensis.jpg/500px-202306_Varanus_komodoensis.jpg",
+      "w": 500,
+      "h": 357,
+      "credit": "James Jolokia (james1203)",
+      "license": "CC BY 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:202306_Varanus_komodoensis.jpg"
      }
     ]
    },
@@ -385,18 +405,10 @@
     "Typical adult length: about 1.7 m.",
     "It is the second-largest lizard in Australia.",
     "The answer has 2 words (4, 7 letters).",
-    "It starts with the letter L."
+    "Its first letter is L."
    ],
    "media": {
     "img": [
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/167349723/medium.jpeg",
-      "w": 460,
-      "h": 500,
-      "credit": "Tim",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/167349723"
-     },
      {
       "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/342810956/medium.jpg",
       "w": 375,
@@ -412,6 +424,14 @@
       "credit": "Petra Holland",
       "license": "CC BY 4.0",
       "page": "https://www.inaturalist.org/photos/624648858"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/250729309/medium.jpeg",
+      "w": 303,
+      "h": 500,
+      "credit": "George Baker",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/250729309"
      }
     ]
    },
@@ -446,7 +466,7 @@
     "It is the largest lizard in Australia.",
     "It is a desert goanna.",
     "The answer is one word of 8 letters.",
-    "It starts with the letter P."
+    "Its first letter is P."
    ],
    "media": {
     "img": [
@@ -507,33 +527,33 @@
     "Typical adult length: about 1.5 m.",
     "It has spines down its back.",
     "The answer has 2 words (5, 6 letters).",
-    "It starts with the letter G."
+    "Its first letter is G."
    ],
    "media": {
     "img": [
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/12255959/medium.jpg",
-      "w": 375,
-      "h": 500,
-      "credit": "Judy Gallagher",
-      "license": "CC BY-SA 4.0",
-      "page": "https://www.inaturalist.org/photos/12255959"
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/7/7f/Iguana_V.jpg/500px-Iguana_V.jpg",
+      "w": 500,
+      "h": 332,
+      "credit": "Rjcastillo",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Iguana_V.jpg"
      },
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/382760285/medium.jpg",
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/3/31/Iguana_iguana_Florida_2006.JPG/500px-Iguana_iguana_Florida_2006.JPG",
+      "w": 500,
+      "h": 375,
+      "credit": "keNzi",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Iguana_iguana_Florida_2006.JPG"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/7/72/Curacao_Iguana_iguana_2021_3.jpg/500px-Curacao_Iguana_iguana_2021_3.jpg",
       "w": 500,
       "h": 333,
-      "credit": "Thomaz de Carvalho Callado",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/382760285"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/19063248/medium.jpeg",
-      "w": 500,
-      "h": 462,
-      "credit": "Richard Stovall",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/19063248"
+      "credit": "Aatu Dorochenko",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Curacao_Iguana_iguana_2021_3.jpg"
      }
     ]
    },
@@ -567,7 +587,7 @@
     "It dives for seaweed.",
     "It is the only lizard that feeds in the sea.",
     "The answer has 2 words (6, 6 letters).",
-    "It starts with the letter M."
+    "Its first letter is M."
    ],
    "media": {
     "img": [
@@ -628,33 +648,33 @@
     "Typical adult length: about 85 cm.",
     "It lives in northern Australia.",
     "The answer has 3 words (5, 6, 6 letters).",
-    "It starts with the letter F."
+    "Its first letter is F."
    ],
    "media": {
     "img": [
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/292292243/medium.jpeg",
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/d/dc/Chlamydosaurus_kingii.jpg/500px-Chlamydosaurus_kingii.jpg",
       "w": 500,
-      "h": 375,
-      "credit": "no rights reserved",
-      "license": "CC0 1.0",
-      "page": "https://www.inaturalist.org/photos/292292243"
+      "h": 327,
+      "credit": "Miklos Schiberna",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Chlamydosaurus_kingii.jpg"
      },
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/543439339/medium.jpg",
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/4/4d/Frill-necked_Lizard_%28Chlamydosaurus_kingii%29_%288692607976%29.jpg/500px-Frill-necked_Lizard_%28Chlamydosaurus_kingii%29_%288692607976%29.jpg",
       "w": 500,
       "h": 333,
-      "credit": "Romain Boisseau",
-      "license": "CC BY-SA 4.0",
-      "page": "https://www.inaturalist.org/photos/543439339"
+      "credit": "Matt from Melbourne, Australia",
+      "license": "CC BY 2.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Frill-necked_Lizard_(Chlamydosaurus_kingii)_(8692607976).jpg"
      },
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/85963801/medium.jpg",
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/7/75/%281%29Frill_neck_lizard.jpg/500px-%281%29Frill_neck_lizard.jpg",
       "w": 500,
-      "h": 380,
-      "credit": "Tony Eales",
+      "h": 544,
+      "credit": "Sardaka",
       "license": "CC BY-SA 4.0",
-      "page": "https://www.inaturalist.org/photos/85963801"
+      "page": "https://commons.wikimedia.org/wiki/File:(1)Frill_neck_lizard.jpg"
      }
     ]
    },
@@ -689,10 +709,26 @@
     "It lives in Australian deserts.",
     "It is covered in sharp spikes.",
     "The answer has 2 words (6, 5 letters).",
-    "It starts with the letter T."
+    "Its first letter is T."
    ],
    "media": {
     "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/5/5f/Thornydevil02.jpg/500px-Thornydevil02.jpg",
+      "w": 500,
+      "h": 384,
+      "credit": "User:Bäras",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Thornydevil02.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/7/72/Thornydevil.jpg/500px-Thornydevil.jpg",
+      "w": 500,
+      "h": 297,
+      "credit": "Bäras (talk · contribs)",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Thornydevil.jpg"
+     },
      {
       "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/48698/medium.jpg",
       "w": 500,
@@ -700,22 +736,6 @@
       "credit": "Steve Shattuck",
       "license": "CC BY 4.0",
       "page": "https://www.inaturalist.org/photos/48698"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/150790361/medium.jpg",
-      "w": 500,
-      "h": 333,
-      "credit": "dhfischer",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/150790361"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/108311312/medium.jpg",
-      "w": 500,
-      "h": 333,
-      "credit": "Connor Margetts",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/108311312"
      }
     ]
    },
@@ -750,10 +770,26 @@
     "It lives in Australia.",
     "Typical adult length: about 50 cm.",
     "The answer has 4 words (7, 4, 7, 6 letters).",
-    "It starts with the letter E."
+    "Its first letter is E."
    ],
    "media": {
     "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/11/Eastern_Blue_Tongue_%28Tiliqua_scincoides_scincoides%29_%288397072985%29.jpg/500px-Eastern_Blue_Tongue_%28Tiliqua_scincoides_scincoides%29_%288397072985%29.jpg",
+      "w": 500,
+      "h": 336,
+      "credit": "Matt from Melbourne, Australia",
+      "license": "CC BY 2.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Eastern_Blue_Tongue_(Tiliqua_scincoides_scincoides)_(8397072985).jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/6/64/Eastern_blue_tongued_lizard.jpg/500px-Eastern_blue_tongued_lizard.jpg",
+      "w": 500,
+      "h": 285,
+      "credit": "No machine-readable author provided. Malcolm Morley~commonswiki assumed (based on copyr…",
+      "license": "CC BY 2.5",
+      "page": "https://commons.wikimedia.org/wiki/File:Eastern_blue_tongued_lizard.jpg"
+     },
      {
       "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/33787887/medium.jpeg",
       "w": 467,
@@ -761,22 +797,6 @@
       "credit": "Thomas Mesaglio",
       "license": "CC BY 4.0",
       "page": "https://www.inaturalist.org/photos/33787887"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/336836540/medium.jpeg",
-      "w": 233,
-      "h": 500,
-      "credit": "no rights reserved",
-      "license": "CC0 1.0",
-      "page": "https://www.inaturalist.org/photos/336836540"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/389707734/medium.jpg",
-      "w": 500,
-      "h": 500,
-      "credit": "Sockrosma",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/389707734"
      }
     ]
    },
@@ -811,33 +831,33 @@
     "Typical adult length: about 50 cm.",
     "It lives in inland Australia.",
     "The answer has 3 words (7, 7, 6 letters).",
-    "It starts with the letter C."
+    "Its first letter is C."
    ],
    "media": {
     "img": [
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/74009398/medium.jpeg",
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/b/b6/Australian_Bearded_Dragon.jpg/500px-Australian_Bearded_Dragon.jpg",
       "w": 500,
-      "h": 332,
-      "credit": "Chris Lindorff",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/74009398"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/450652528/medium.jpg",
-      "w": 500,
-      "h": 334,
-      "credit": "Will Brown",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/450652528"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/450652520/medium.jpg",
-      "w": 500,
-      "h": 385,
-      "credit": "Frank C. Müller",
+      "h": 383,
+      "credit": "Toni Segers",
       "license": "CC BY-SA 4.0",
-      "page": "https://www.inaturalist.org/photos/450652520"
+      "page": "https://commons.wikimedia.org/wiki/File:Australian_Bearded_Dragon.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/e/ec/Pogona_vitticeps_close-up_2009_G3.jpg/500px-Pogona_vitticeps_close-up_2009_G3.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "George Chernilevsky",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Pogona_vitticeps_close-up_2009_G3.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/f/fb/Nordrhein-Westfalen%2C_Wuppertal%2C_Wikicon_2019_NIK_9554.jpg/500px-Nordrhein-Westfalen%2C_Wuppertal%2C_Wikicon_2019_NIK_9554.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "--Nightflyer (talk) 20:19, 7 October 2019 (UTC)",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Nordrhein-Westfalen,_Wuppertal,_Wikicon_2019_NIK_9554.jpg"
      }
     ]
    },
@@ -846,6 +866,7 @@
   {
    "id": "gila-monster",
    "name": "Gila monster",
+   "lname": "Gila monster",
    "sci": "Heloderma suspectum",
    "group": "beaded lizard",
    "facts": {
@@ -868,7 +889,7 @@
     "Its skin is beaded black and pink.",
     "It is named after a river in Arizona.",
     "The answer has 2 words (4, 7 letters).",
-    "It starts with the letter G."
+    "Its first letter is G."
    ],
    "media": {
     "img": [
@@ -931,10 +952,18 @@
     "It grips branches with its tail.",
     "It changes colour.",
     "The answer has 2 words (7, 9 letters).",
-    "It starts with the letter P."
+    "Its first letter is P."
    ],
    "media": {
     "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/2/2d/Panther_chameleon_%28Furcifer_pardalis%29_male_Nosy_Be.jpg/500px-Panther_chameleon_%28Furcifer_pardalis%29_male_Nosy_Be.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Charles J. Sharp",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Panther_chameleon_(Furcifer_pardalis)_male_Nosy_Be.jpg"
+     },
      {
       "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/19887/medium.jpg",
       "w": 500,
@@ -950,14 +979,6 @@
       "credit": "Marius Burger",
       "license": "CC0 1.0",
       "page": "https://www.inaturalist.org/photos/188585705"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/162222600/medium.jpg",
-      "w": 500,
-      "h": 375,
-      "credit": "no rights reserved",
-      "license": "CC0 1.0",
-      "page": "https://www.inaturalist.org/photos/162222600"
      }
     ]
    },
@@ -991,7 +1012,7 @@
     "Typical adult length: about 45 cm.",
     "It has a tall helmet on its head.",
     "The answer has 2 words (6, 9 letters).",
-    "It starts with the letter V."
+    "Its first letter is V."
    ],
    "media": {
     "img": [
@@ -1051,7 +1072,7 @@
     "It is a popular pet.",
     "It has spots like a big cat.",
     "The answer has 2 words (7, 5 letters).",
-    "It starts with the letter L."
+    "Its first letter is L."
    ],
    "media": {
     "img": [
@@ -1111,7 +1132,7 @@
     "It is blue-grey with orange spots.",
     "Its name comes from its loud call.",
     "The answer has 2 words (5, 5 letters).",
-    "It starts with the letter T."
+    "Its first letter is T."
    ],
    "media": {
     "img": [
@@ -1155,6 +1176,7 @@
   {
    "id": "galapagos-tortoise",
    "name": "Galápagos tortoise",
+   "lname": "Galápagos tortoise",
    "alt": [
     "giant tortoise",
     "Galapagos giant tortoise"
@@ -1183,10 +1205,26 @@
     "Typical adult length: about 1.5 m.",
     "It can go a year without food or water.",
     "The answer has 2 words (9, 8 letters).",
-    "It starts with the letter G."
+    "Its first letter is G."
    ],
    "media": {
     "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/f/f3/Galapagos_Geochelone_nigra_porteri.jpg/500px-Galapagos_Geochelone_nigra_porteri.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "The original uploader was Pandanus at German Wikipedia.",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Galapagos_Geochelone_nigra_porteri.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/4/42/Galapagos_giant_tortoise_Geochelone_elephantopus.jpg/500px-Galapagos_giant_tortoise_Geochelone_elephantopus.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Mfield, Matthew Field, http://www.photography.mattfield.com",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Galapagos_giant_tortoise_Geochelone_elephantopus.jpg"
+     },
      {
       "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/37748207/medium.jpg",
       "w": 500,
@@ -1194,22 +1232,6 @@
       "credit": "John G. Phillips",
       "license": "CC BY 4.0",
       "page": "https://www.inaturalist.org/photos/37748207"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/355933997/medium.jpeg",
-      "w": 500,
-      "h": 333,
-      "credit": "Bill Levine",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/355933997"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/31286170/medium.jpg",
-      "w": 500,
-      "h": 333,
-      "credit": "Carrie Seltzer",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/31286170"
      }
     ]
    },
@@ -1237,7 +1259,7 @@
     "Typical adult length: about 70 cm.",
     "It has a spiky shell and a hooked beak.",
     "The answer has 3 words (9, 8, 6 letters).",
-    "It starts with the letter A."
+    "Its first letter is A."
    ],
    "media": {
     "img": [
@@ -1294,7 +1316,7 @@
     "It looks like a lizard but is not one.",
     "It lives only in New Zealand.",
     "The answer is one word of 7 letters.",
-    "It starts with the letter T."
+    "Its first letter is T."
    ],
    "media": {
     "img": [
@@ -1351,33 +1373,33 @@
     "It has feathery gills on its head.",
     "It seems to smile.",
     "The answer is one word of 7 letters.",
-    "It starts with the letter A."
+    "Its first letter is A."
    ],
    "media": {
     "img": [
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/91821276/medium.jpg",
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/2/24/Axolotl_Wild_Type.jpg/500px-Axolotl_Wild_Type.jpg",
       "w": 500,
-      "h": 343,
-      "credit": "Stan Shebs",
+      "h": 139,
+      "credit": "Mariblubb",
       "license": "CC BY-SA 4.0",
-      "page": "https://www.inaturalist.org/photos/91821276"
+      "page": "https://commons.wikimedia.org/wiki/File:Axolotl_Wild_Type.jpg"
      },
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/272115050/medium.jpeg",
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/7/77/6_maja_06_r._ZOO_204.jpg/500px-6_maja_06_r._ZOO_204.jpg",
       "w": 500,
-      "h": 282,
-      "credit": "Cedricguppy",
-      "license": "CC BY-SA 4.0",
-      "page": "https://www.inaturalist.org/photos/272115050"
+      "h": 375,
+      "credit": "Monika Korzeniec",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:6_maja_06_r._ZOO_204.jpg"
      },
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/186572555/medium.jpg",
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/2/20/Ambystoma_mexicanum_Natural_History_Museum_University_of_Pisa_%28cropped%29.jpg/500px-Ambystoma_mexicanum_Natural_History_Museum_University_of_Pisa_%28cropped%29.jpg",
       "w": 500,
       "h": 333,
-      "credit": "Ruben Undheim",
+      "credit": "Mattia Nocciola",
       "license": "CC BY-SA 4.0",
-      "page": "https://www.inaturalist.org/photos/186572555"
+      "page": "https://commons.wikimedia.org/wiki/File:Ambystoma_mexicanum_Natural_History_Museum_University_of_Pisa_(cropped).jpg"
      }
     ]
    },
@@ -1410,10 +1432,18 @@
     "Typical adult length: about 5 cm.",
     "It lives in the rainforests of Colombia.",
     "The answer has 3 words (6, 6, 4 letters).",
-    "It starts with the letter G."
+    "Its first letter is G."
    ],
    "media": {
     "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/6/6e/Schrecklicherpfeilgiftfrosch-01.jpg/500px-Schrecklicherpfeilgiftfrosch-01.jpg",
+      "w": 500,
+      "h": 382,
+      "credit": "Wilfried Berns",
+      "license": "CC BY-SA 2.0 de",
+      "page": "https://commons.wikimedia.org/wiki/File:Schrecklicherpfeilgiftfrosch-01.jpg"
+     },
      {
       "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/95423919/medium.jpg",
       "w": 500,
@@ -1429,14 +1459,6 @@
       "credit": "http://www.tierlexikon.ch/",
       "license": "CC BY-SA 4.0",
       "page": "https://www.inaturalist.org/photos/86411320"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/95423918/medium.jpg",
-      "w": 500,
-      "h": 375,
-      "credit": "孫鋒 林",
-      "license": "CC BY-SA 4.0",
-      "page": "https://www.inaturalist.org/photos/95423918"
      }
     ]
    },
@@ -1473,7 +1495,7 @@
     "It is red with blue legs.",
     "It is named after a red fruit.",
     "The answer has 3 words (10, 6, 4 letters).",
-    "It starts with the letter S."
+    "Its first letter is S."
    ],
    "media": {
     "img": [
@@ -1539,7 +1561,7 @@
     "Typical adult length: about 6 cm.",
     "It lives in Central American rainforests.",
     "The answer has 4 words (3, 4, 4, 4 letters).",
-    "It starts with the letter R."
+    "Its first letter is R."
    ],
    "media": {
     "img": [
@@ -1602,7 +1624,7 @@
     "It is a major pest in Australia.",
     "It is named after a sugar crop.",
     "The answer has 2 words (4, 4 letters).",
-    "It starts with the letter C."
+    "Its first letter is C."
    ],
    "media": {
     "img": [
@@ -1637,6 +1659,7 @@
   {
    "id": "australian-green-tree-frog",
    "name": "Australian green tree frog",
+   "lname": "Australian green tree frog",
    "alt": [
     "green tree frog",
     "White's tree frog",
@@ -1657,7 +1680,8 @@
    "blurb": "A plump, friendly green frog of Australia that often lives in bathrooms, water tanks and drainpipes.",
    "clues": [
     "Its IUCN conservation status is \"Least concern\".",
-    "Genus: Ranoidea.",
+    "Family: Pelodryadidae.",
+    "Genus: Pelodryas.",
     "Its skin makes a substance studied for medicine.",
     "It often lives in toilets and drainpipes.",
     "It has big sticky toe pads.",
@@ -1665,8 +1689,36 @@
     "Typical adult length: about 10 cm.",
     "It is plump and smiles.",
     "The answer has 4 words (10, 5, 4, 4 letters).",
-    "It starts with the letter A."
+    "Its first letter is A."
    ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/8/8b/Australia_green_tree_frog_%28Litoria_caerulea%29_crop.jpg/500px-Australia_green_tree_frog_%28Litoria_caerulea%29_crop.jpg",
+      "w": 500,
+      "h": 329,
+      "credit": "LiquidGhoul",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Australia_green_tree_frog_(Litoria_caerulea)_crop.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/6/68/Green_Tree_Frog_%28Litoria_caerulea%29_%288692503598%29.jpg/500px-Green_Tree_Frog_%28Litoria_caerulea%29_%288692503598%29.jpg",
+      "w": 500,
+      "h": 332,
+      "credit": "Matt from Melbourne, Australia",
+      "license": "CC BY 2.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Green_Tree_Frog_(Litoria_caerulea)_(8692503598).jpg"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/343261212/medium.jpg",
+      "w": 500,
+      "h": 500,
+      "credit": "Sockrosma",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/343261212"
+     }
+    ]
+   },
    "difficulty": 1
   },
   {
@@ -1697,13 +1749,26 @@
     "It lives in the Snowy Mountains.",
     "It is striped yellow and black.",
     "The answer has 3 words (8, 10, 4 letters).",
-    "It starts with the letter S."
+    "Its first letter is S."
    ],
+   "media": {
+    "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/9/9b/CorroboreeFrog.jpg/500px-CorroboreeFrog.jpg",
+      "w": 500,
+      "h": 387,
+      "credit": "No machine-readable author provided. Andrew c assumed (based on copyright claims).",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:CorroboreeFrog.jpg"
+     }
+    ]
+   },
    "difficulty": 3
   },
   {
    "id": "american-bullfrog",
    "name": "American bullfrog",
+   "lname": "American bullfrog",
    "alt": [
     "bullfrog"
    ],
@@ -1731,7 +1796,7 @@
     "Typical adult length: about 15 cm.",
     "Its call sounds like a cow mooing.",
     "The answer has 2 words (8, 8 letters).",
-    "It starts with the letter A."
+    "Its first letter is A."
    ],
    "media": {
     "img": [
@@ -1796,33 +1861,33 @@
     "Typical adult length: about 8 cm.",
     "It hops with long back legs.",
     "The answer has 2 words (6, 4 letters).",
-    "It starts with the letter C."
+    "Its first letter is C."
    ],
    "media": {
     "img": [
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/171173/medium.jpg",
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/3/39/European_Common_Frog_Rana_temporaria.jpg/500px-European_Common_Frog_Rana_temporaria.jpg",
       "w": 500,
-      "h": 443,
-      "credit": "Jörg Hempel",
+      "h": 313,
+      "credit": "Richard Bartz, Munich aka Makro Freak Image:MFB.jpg",
+      "license": "CC BY-SA 2.5",
+      "page": "https://commons.wikimedia.org/wiki/File:European_Common_Frog_Rana_temporaria.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/16/Common_frog.jpg/500px-Common_frog.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Wikimedia Commons",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Common_frog.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/2/27/Rana_temporaria_at_Muhalnitsa%2C_Botevgrad_%2801.03.2019%29_01.jpg/500px-Rana_temporaria_at_Muhalnitsa%2C_Botevgrad_%2801.03.2019%29_01.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Dimitǎr Boevski",
       "license": "CC BY-SA 4.0",
-      "page": "https://www.inaturalist.org/photos/171173"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/54599133/medium.jpg",
-      "w": 500,
-      "h": 371,
-      "credit": "H. Krisp",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/54599133"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/359250602/medium.jpg",
-      "w": 500,
-      "h": 333,
-      "credit": "Dr. Sven Gippner",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/359250602"
+      "page": "https://commons.wikimedia.org/wiki/File:Rana_temporaria_at_Muhalnitsa,_Botevgrad_(01.03.2019)_01.jpg"
      }
     ],
     "audio": [
@@ -1870,33 +1935,33 @@
     "It is poisonous or venomous.",
     "Its skin is dry and warty.",
     "The answer has 2 words (6, 4 letters).",
-    "It starts with the letter C."
+    "Its first letter is C."
    ],
    "media": {
     "img": [
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/42142219/medium.jpg",
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/16/Bufo_bufo_2_%282005_07_11%29.jpg/500px-Bufo_bufo_2_%282005_07_11%29.jpg",
       "w": 500,
       "h": 375,
-      "credit": "John Witton",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/42142219"
+      "credit": "Taka",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Bufo_bufo_2_(2005_07_11).jpg"
      },
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/235371826/medium.jpg",
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/f/f7/Bufo_bufo_couple_during_migration%282005%29.jpg/500px-Bufo_bufo_couple_during_migration%282005%29.jpg",
       "w": 500,
       "h": 375,
-      "credit": "no rights reserved",
-      "license": "CC0 1.0",
-      "page": "https://www.inaturalist.org/photos/235371826"
+      "credit": "Janekpfeifer at de.wikipedia",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Bufo_bufo_couple_during_migration(2005).jpg"
      },
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/81587062/medium.jpg",
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/9/9c/K%C3%A4rnkonn_K%C3%B5rvemaal._2015._aasta_mai..jpg/500px-K%C3%A4rnkonn_K%C3%B5rvemaal._2015._aasta_mai..jpg",
       "w": 500,
-      "h": 281,
-      "credit": "no rights reserved",
-      "license": "CC0 1.0",
-      "page": "https://www.inaturalist.org/photos/81587062"
+      "h": 333,
+      "credit": "Sillerkiil",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:K%C3%A4rnkonn_K%C3%B5rvemaal._2015._aasta_mai..jpg"
      }
     ],
     "audio": [
@@ -1939,7 +2004,7 @@
     "You can see its heart beating.",
     "Its belly skin is see-through.",
     "The answer has 2 words (5, 4 letters).",
-    "It starts with the letter G."
+    "Its first letter is G."
    ],
    "media": {
     "img": [
@@ -1974,6 +2039,7 @@
   {
    "id": "goliath-frog",
    "name": "Goliath frog",
+   "lname": "Goliath frog",
    "sci": "Conraua goliath",
    "group": "frog",
    "facts": {
@@ -1994,17 +2060,25 @@
     "Typical adult length: about 30 cm.",
     "It can weigh over 3 kg.",
     "The answer has 2 words (7, 4 letters).",
-    "It starts with the letter G."
+    "Its first letter is G."
    ],
    "media": {
     "img": [
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/92002/medium.JPG",
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/d/d7/Goliath_Frog.jpg/500px-Goliath_Frog.jpg",
       "w": 500,
-      "h": 376,
-      "credit": "116916927065934112165",
+      "h": 333,
+      "credit": "Ryan Somma",
+      "license": "CC BY-SA 2.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Goliath_Frog.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/6/60/Conraua_goliath_photo_from_iNaturalist_539752953.jpg/500px-Conraua_goliath_photo_from_iNaturalist_539752953.jpg",
+      "w": 500,
+      "h": 339,
+      "credit": "jeanlouisamiet",
       "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/92002"
+      "page": "https://commons.wikimedia.org/wiki/File:Conraua_goliath_photo_from_iNaturalist_539752953.jpg"
      },
      {
       "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/360001369/medium.jpeg",
@@ -2013,14 +2087,6 @@
       "credit": "Ryan van Huyssteen",
       "license": "CC BY 4.0",
       "page": "https://www.inaturalist.org/photos/360001369"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/539752953/medium.jpg",
-      "w": 500,
-      "h": 339,
-      "credit": "jeanlouisamiet",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/539752953"
      }
     ]
    },
@@ -2053,7 +2119,7 @@
     "It lives in damp European forests.",
     "It is black with yellow spots.",
     "The answer has 2 words (4, 10 letters).",
-    "It starts with the letter F."
+    "Its first letter is F."
    ],
    "media": {
     "img": [
@@ -2113,17 +2179,17 @@
     "Typical adult length: about 15 cm.",
     "It has warty dark skin.",
     "The answer has 3 words (5, 7, 4 letters).",
-    "It starts with the letter G."
+    "Its first letter is G."
    ],
    "media": {
     "img": [
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/304222333/medium.jpeg",
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/e/e0/Kammmolchmaennchen.jpg/500px-Kammmolchmaennchen.jpg",
       "w": 500,
-      "h": 333,
-      "credit": "Roy Lowry",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/304222333"
+      "h": 320,
+      "credit": "Rainer Theuer.",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Kammmolchmaennchen.jpg"
      },
      {
       "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/188697048/medium.jpeg",
@@ -2173,7 +2239,7 @@
     "Its mouth is almost as wide as its body.",
     "It is named after a video game character.",
     "The answer has 2 words (6, 4 letters).",
-    "It starts with the letter P."
+    "Its first letter is P."
    ],
    "media": {
     "img": [

@@ -7,7 +7,7 @@ const f = (danger, region, web) => ({ danger, region, ...(web == null ? {} : { w
 export default {
   id: 'spiders', title: 'Spiders', theme: 'animals', icon: '🕷️', kids: true, notice: NOT_ID,
   leakExempt: ['spider', 'spiders'],
-  autoTaxo: ['family', 'genus'],
+  wikiD1: true, autoTaxo: ['family', 'genus'],
   factsMeta: {
     danger: { ...DANGER_META, clue: v => ({ Harmless: 'Its bite is harmless to people.', 'Mildly venomous': 'Its bite can hurt but is rarely serious.', Dangerous: 'Its bite can make a person very ill.', 'Potentially deadly': 'Its bite can kill a person without treatment.' }[v]) },
     region: REGION_META,

@@ -5,7 +5,7 @@ export const KEYS = {
 export const SYNCED = [KEYS.settings, KEYS.stats, KEYS.mastery, KEYS.cards];
 
 export const DEFAULT_SETTINGS = {
-  sound: true, music: 0.5, haptics: true, timerSec: 10, reducedMotion: false, kids: false, readAloud: false,
+  sound: true, music: 0.5, haptics: true, timerSec: 10, reducedMotion: false, kids: false, readAloud: false, bgm: true,
 };
 export const DEFAULT_STATS = {
   games: 0, answered: 0, correct: 0, bestStreak: 0, best: {}, daily: { last: '', results: {} },

@@ -522,8 +522,6 @@
     "decade": "1990s",
     "topOfYear": true
    },
-   "quote": "It's amazing, Molly. The love inside, you take it with you.",
-   "quoteSource": "https://en.wikiquote.org/wiki/Ghost_(1990_film)",
    "emoji": "👻💑🏺🔮",
    "blurb": "Ghost (1990), directed by Jerry Zucker. Patrick Swayze and Demi Moore star. Worldwide gross about $506 million.",
    "clues": [
@@ -848,7 +846,7 @@
     "decadeRank": 5,
     "kids": true
    },
-   "quote": "It does not do to dwell on dreams and forget to live.",
+   "quote": "It does not do to dwell on dreams",
    "quoteSource": "https://en.wikiquote.org/wiki/Harry_Potter_and_the_Philosopher's_Stone",
    "emoji": "⚡🧙‍♂️🦉🏰🧹",
    "blurb": "Harry Potter and the Philosopher's Stone (2001), directed by Chris Columbus. Harry goes to Hogwarts for the first time. Worldwide gross about $1.01 billion.",
@@ -906,8 +904,6 @@
     "topOfYear": true,
     "decadeRank": 2
    },
-   "quote": "I can't carry it for you, but I can carry you!",
-   "quoteSource": "https://en.wikiquote.org/wiki/The_Lord_of_the_Rings%3A_The_Return_of_the_King",
    "emoji": "💍🌋👑🦅⚔️",
    "blurb": "The Lord of the Rings: The Return of the King (2003), directed by Peter Jackson. The One Ring is finally thrown into Mount Doom. Worldwide gross about $1.15 billion.",
    "clues": [
@@ -1797,7 +1793,7 @@
     "topOfYear": false,
     "decadeRank": 6
    },
-   "quote": "Life was like a box of chocolates. You never know what you're gonna get.",
+   "quote": "Life was like a box of chocolates.",
    "quoteSource": "https://en.wikiquote.org/wiki/Forrest_Gump",
    "emoji": "🏃‍♂️🍫🪶🏓🦐",
    "blurb": "Forrest Gump (1994), directed by Robert Zemeckis. Tom Hanks plays a kind man from Alabama. Worldwide gross about $677 million.",
@@ -4069,30 +4065,14 @@
    ]
   },
   {
-   "id": "quote-ghost",
-   "kind": "mc",
-   "prompt": "Which film has the line: \"It's amazing, Molly. The love inside, you take it with you.\"",
-   "answer": "Ghost",
-   "wrong": [
-    "Titanic",
-    "The Lost World: Jurassic Park",
-    "Terminator 2: Judgment Day"
-   ],
-   "explain": "From Ghost (1990).",
-   "difficulty": 3,
-   "refs": [
-    "movies/ghost"
-   ]
-  },
-  {
    "id": "emoji-ghost",
    "kind": "mc",
    "prompt": "Which film is this? 👻💑🏺🔮",
    "answer": "Ghost",
    "wrong": [
-    "The Dark Knight",
-    "Batman",
-    "Avatar: Fire and Ash"
+    "Pirates of the Caribbean: At World's End",
+    "Avatar: Fire and Ash",
+    "Men in Black"
    ],
    "explain": "Ghost (1990), directed by Jerry Zucker. Patrick Swayze and Demi Moore star. Worldwide gross about $506 million.",
    "difficulty": 3,
@@ -4106,9 +4086,9 @@
    "prompt": "In which year was Terminator 2: Judgment Day released?",
    "answer": "1991",
    "wrong": [
-    "1993",
-    "1994",
-    "1988"
+    "1988",
+    "1992",
+    "1990"
    ],
    "explain": "Terminator 2: Judgment Day (1991), directed by James Cameron. Arnold Schwarzenegger plays a reprogrammed Terminator. Worldwide gross about $526 million.",
    "difficulty": 3,
@@ -4122,9 +4102,9 @@
    "prompt": "Who directed Terminator 2: Judgment Day (1991)?",
    "answer": "James Cameron",
    "wrong": [
-    "M. Night Shyamalan",
-    "Robert Zemeckis",
-    "Greta Gerwig"
+    "John Woo",
+    "Mike Newell",
+    "Roger Allers and Rob Minkoff"
    ],
    "explain": "Terminator 2: Judgment Day (1991), directed by James Cameron. Arnold Schwarzenegger plays a reprogrammed Terminator. Worldwide gross about $526 million.",
    "difficulty": 3,
@@ -4138,9 +4118,9 @@
    "prompt": "Which film has the line: \"Hasta la vista, baby.\"",
    "answer": "Terminator 2: Judgment Day",
    "wrong": [
-    "Men in Black",
-    "Armageddon",
-    "Titanic"
+    "The Lost World: Jurassic Park",
+    "Star Wars: Episode I – The Phantom Menace",
+    "Jurassic Park"
    ],
    "explain": "From Terminator 2: Judgment Day (1991).",
    "difficulty": 2,
@@ -4154,9 +4134,9 @@
    "prompt": "Which film is this? 🤖🏍️👦🔥🕶️",
    "answer": "Terminator 2: Judgment Day",
    "wrong": [
-    "The Lion King (2019)",
-    "Harry Potter and the Deathly Hallows – Part 2",
-    "Raiders of the Lost Ark"
+    "Avengers: Age of Ultron",
+    "Enter the Dragon",
+    "Star Wars: The Last Jedi"
    ],
    "explain": "Terminator 2: Judgment Day (1991), directed by James Cameron. Arnold Schwarzenegger plays a reprogrammed Terminator. Worldwide gross about $526 million.",
    "difficulty": 2,
@@ -4170,9 +4150,9 @@
    "prompt": "In which year was Aladdin released?",
    "answer": "1992",
    "wrong": [
-    "1990",
     "1994",
-    "1991"
+    "1989",
+    "1993"
    ],
    "explain": "Aladdin (1992), directed by John Musker and Ron Clements. A street boy finds a magic lamp. Worldwide gross about $504 million.",
    "difficulty": 2,
@@ -4186,9 +4166,9 @@
    "prompt": "Who directed Aladdin (1992)?",
    "answer": "John Musker and Ron Clements",
    "wrong": [
-    "Roland Emmerich",
-    "David Yates",
-    "Richard Marquand"
+    "Richard Marquand",
+    "Andrew Adamson and Kelly Asbury and Conrad Vernon",
+    "Aaron Horvath and Michael Jelenic"
    ],
    "explain": "Aladdin (1992), directed by John Musker and Ron Clements. A street boy finds a magic lamp. Worldwide gross about $504 million.",
    "difficulty": 2,
@@ -4202,9 +4182,9 @@
    "prompt": "Which film has the line: \"Phenomenal cosmic powers! Itty-bitty living space.\"",
    "answer": "Aladdin",
    "wrong": [
-    "Independence Day",
-    "The Sixth Sense",
-    "Jurassic Park"
+    "Ghost",
+    "The Lost World: Jurassic Park",
+    "Titanic"
    ],
    "explain": "From Aladdin (1992).",
    "difficulty": 1,
@@ -4218,9 +4198,9 @@
    "prompt": "Which film is this? 🧞‍♂️🪔🐒🕌🧙‍♂️",
    "answer": "Aladdin",
    "wrong": [
-    "Harry Potter and the Philosopher's Stone",
-    "E.T. the Extra-Terrestrial",
-    "Grease"
+    "Rocky",
+    "Terminator 2: Judgment Day",
+    "Star Wars"
    ],
    "explain": "Aladdin (1992), directed by John Musker and Ron Clements. A street boy finds a magic lamp. Worldwide gross about $504 million.",
    "difficulty": 1,
@@ -4234,9 +4214,9 @@
    "prompt": "In which year was Jurassic Park released?",
    "answer": "1993",
    "wrong": [
-    "1991",
-    "1992",
-    "1996"
+    "1995",
+    "1990",
+    "1992"
    ],
    "explain": "Jurassic Park (1993), directed by Steven Spielberg. Dinosaurs are brought back to life on an island theme park. Worldwide gross about $1.04 billion.",
    "difficulty": 2,
@@ -4250,9 +4230,9 @@
    "prompt": "Who directed Jurassic Park (1993)?",
    "answer": "Steven Spielberg",
    "wrong": [
-    "Tony Scott",
-    "Robert Benton",
-    "Lee Unkrich"
+    "Roland Emmerich",
+    "John Lasseter",
+    "M. Night Shyamalan"
    ],
    "explain": "Jurassic Park (1993), directed by Steven Spielberg. Dinosaurs are brought back to life on an island theme park. Worldwide gross about $1.04 billion.",
    "difficulty": 2,
@@ -4266,9 +4246,9 @@
    "prompt": "Which film has the line: \"Life, uh, finds a way.\"",
    "answer": "Jurassic Park",
    "wrong": [
+    "Star Wars: Episode I – The Phantom Menace",
     "The Lion King",
-    "The Lost World: Jurassic Park",
-    "Armageddon"
+    "Titanic"
    ],
    "explain": "From Jurassic Park (1993).",
    "difficulty": 1,
@@ -4282,9 +4262,9 @@
    "prompt": "Which film is this? 🦖🦕🏝️🧬🚙",
    "answer": "Jurassic Park",
    "wrong": [
-    "The Super Mario Bros. Movie",
-    "The Lord of the Rings: The Two Towers",
-    "Grease"
+    "Forrest Gump",
+    "Toy Story 3",
+    "Top Gun: Maverick"
    ],
    "explain": "Jurassic Park (1993), directed by Steven Spielberg. Dinosaurs are brought back to life on an island theme park. Worldwide gross about $1.04 billion.",
    "difficulty": 1,
@@ -4314,9 +4294,9 @@
    "prompt": "Who directed The Lion King (1994)?",
    "answer": "Roger Allers and Rob Minkoff",
    "wrong": [
-    "John Lasseter",
-    "John G. Avildsen",
-    "Robert Clouse"
+    "John Musker and Ron Clements",
+    "Joss Whedon",
+    "Ryan Coogler"
    ],
    "explain": "The Lion King (1994), directed by Roger Allers and Rob Minkoff. Simba must become king of the Pride Lands. Worldwide gross about $971 million.",
    "difficulty": 2,
@@ -4330,9 +4310,9 @@
    "prompt": "Which film has the line: \"Remember who you are.\"",
    "answer": "The Lion King",
    "wrong": [
-    "Men in Black",
-    "Armageddon",
-    "Independence Day"
+    "The Lost World: Jurassic Park",
+    "Terminator 2: Judgment Day",
+    "Armageddon"
    ],
    "explain": "From The Lion King (1994).",
    "difficulty": 1,
@@ -4346,9 +4326,9 @@
    "prompt": "Which film is this? 🦁👑🐗🦍🌅",
    "answer": "The Lion King",
    "wrong": [
-    "Grease",
-    "Toy Story",
-    "Frozen"
+    "Harry Potter and the Deathly Hallows – Part 2",
+    "Avengers: Endgame",
+    "The Avengers"
    ],
    "explain": "The Lion King (1994), directed by Roger Allers and Rob Minkoff. Simba must become king of the Pride Lands. Worldwide gross about $971 million.",
    "difficulty": 1,
@@ -4362,9 +4342,9 @@
    "prompt": "In which year was Toy Story released?",
    "answer": "1995",
    "wrong": [
-    "1994",
-    "1997",
-    "1992"
+    "1998",
+    "1992",
+    "1993"
    ],
    "explain": "Toy Story (1995), directed by John Lasseter. Woody and Buzz Lightyear are its heroes. Worldwide gross about $385 million.",
    "difficulty": 2,
@@ -4379,8 +4359,8 @@
    "answer": "John Lasseter",
    "wrong": [
     "Jared Bush and Byron Howard",
-    "Barry Sonnenfeld",
-    "Tim Burton"
+    "Anthony Russo and Joe Russo",
+    "M. Night Shyamalan"
    ],
    "explain": "Toy Story (1995), directed by John Lasseter. Woody and Buzz Lightyear are its heroes. Worldwide gross about $385 million.",
    "difficulty": 2,
@@ -4395,8 +4375,8 @@
    "answer": "Toy Story",
    "wrong": [
     "Men in Black",
-    "Independence Day",
-    "Aladdin"
+    "Armageddon",
+    "The Sixth Sense"
    ],
    "explain": "From Toy Story (1995).",
    "difficulty": 1,
@@ -4410,9 +4390,9 @@
    "prompt": "Which film is this? 🤠🚀🧸👦",
    "answer": "Toy Story",
    "wrong": [
-    "The Super Mario Bros. Movie",
-    "The Lord of the Rings: The Return of the King",
-    "The Empire Strikes Back"
+    "Grease",
+    "Ne Zha 2",
+    "The Lion King"
    ],
    "explain": "Toy Story (1995), directed by John Lasseter. Woody and Buzz Lightyear are its heroes. Worldwide gross about $385 million.",
    "difficulty": 1,
@@ -4426,9 +4406,9 @@
    "prompt": "In which year was Independence Day released?",
    "answer": "1996",
    "wrong": [
-    "1997",
-    "1993",
-    "1998"
+    "1995",
+    "1994",
+    "1997"
    ],
    "explain": "Independence Day (1996), directed by Roland Emmerich. Will Smith fights an alien invasion on the 4th of July. Worldwide gross about $817 million.",
    "difficulty": 3,
@@ -4442,9 +4422,9 @@
    "prompt": "Who directed Independence Day (1996)?",
    "answer": "Roland Emmerich",
    "wrong": [
-    "J. J. Abrams",
-    "Christopher Nolan",
-    "Francis Ford Coppola"
+    "Jerry Zucker",
+    "Robert Clouse",
+    "Colin Trevorrow"
    ],
    "explain": "Independence Day (1996), directed by Roland Emmerich. Will Smith fights an alien invasion on the 4th of July. Worldwide gross about $817 million.",
    "difficulty": 3,
@@ -4458,9 +4438,9 @@
    "prompt": "Which film has the line: \"Welcome to Earth!\"",
    "answer": "Independence Day",
    "wrong": [
-    "The Lion King",
-    "The Sixth Sense",
-    "Men in Black"
+    "Jurassic Park",
+    "Men in Black",
+    "The Sixth Sense"
    ],
    "explain": "From Independence Day (1996).",
    "difficulty": 2,
@@ -4474,9 +4454,9 @@
    "prompt": "Which film is this? 👽🛸🇺🇸💥🎆",
    "answer": "Independence Day",
    "wrong": [
-    "Demon Slayer: Kimetsu no Yaiba – The Movie: Mugen Train",
-    "Frozen",
-    "Indiana Jones and the Last Crusade"
+    "Ghost",
+    "Avatar: Fire and Ash",
+    "Furious 7"
    ],
    "explain": "Independence Day (1996), directed by Roland Emmerich. Will Smith fights an alien invasion on the 4th of July. Worldwide gross about $817 million.",
    "difficulty": 2,
@@ -4491,8 +4471,8 @@
    "answer": "1997",
    "wrong": [
     "2000",
-    "1994",
-    "1996"
+    "1998",
+    "1999"
    ],
    "explain": "Titanic (1997), directed by James Cameron. It is about a ship that sank in 1912. Worldwide gross about $2.26 billion.",
    "difficulty": 2,
@@ -4506,7 +4486,7 @@
    "prompt": "Who directed Titanic (1997)?",
    "answer": "James Cameron",
    "wrong": [
-    "Barry Levinson",
+    "Roland Emmerich",
     "Colin Trevorrow",
     "Mike Newell"
    ],
@@ -4522,9 +4502,9 @@
    "prompt": "Which film has the line: \"I'm the king of the world!\"",
    "answer": "Titanic",
    "wrong": [
-    "Men in Black",
-    "Toy Story",
-    "Ghost"
+    "The Lost World: Jurassic Park",
+    "Terminator 2: Judgment Day",
+    "Men in Black"
    ],
    "explain": "From Titanic (1997).",
    "difficulty": 1,
@@ -4538,9 +4518,9 @@
    "prompt": "Which film is this? 🚢🧊💑🎨💎",
    "answer": "Titanic",
    "wrong": [
-    "Batman",
-    "Ne Zha 2",
-    "The Lion King"
+    "Top Gun: Maverick",
+    "Harry Potter and the Goblet of Fire",
+    "Batman"
    ],
    "explain": "Titanic (1997), directed by James Cameron. It is about a ship that sank in 1912. Worldwide gross about $2.26 billion.",
    "difficulty": 1,
@@ -4554,9 +4534,9 @@
    "prompt": "In which year was Armageddon released?",
    "answer": "1998",
    "wrong": [
-    "2000",
+    "2001",
     "1999",
-    "1996"
+    "1997"
    ],
    "explain": "Armageddon (1998), directed by Michael Bay. Bruce Willis leads a crew to blow up an asteroid. Worldwide gross about $554 million.",
    "difficulty": 3,
@@ -4570,9 +4550,9 @@
    "prompt": "Who directed Armageddon (1998)?",
    "answer": "Michael Bay",
    "wrong": [
-    "Hal Needham",
-    "Roland Emmerich",
-    "John Lasseter"
+    "J. J. Abrams",
+    "Colin Trevorrow",
+    "Joss Whedon"
    ],
    "explain": "Armageddon (1998), directed by Michael Bay. Bruce Willis leads a crew to blow up an asteroid. Worldwide gross about $554 million.",
    "difficulty": 3,
@@ -4586,9 +4566,9 @@
    "prompt": "Which film is this? ☄️👷‍♂️🚀💥🌍",
    "answer": "Armageddon",
    "wrong": [
-    "Avatar: The Way of Water",
-    "Forrest Gump",
-    "Avatar: Fire and Ash"
+    "Demon Slayer: Kimetsu no Yaiba – The Movie: Mugen Train",
+    "Enter the Dragon",
+    "Smokey and the Bandit"
    ],
    "explain": "Armageddon (1998), directed by Michael Bay. Bruce Willis leads a crew to blow up an asteroid. Worldwide gross about $554 million.",
    "difficulty": 3,
@@ -4602,8 +4582,8 @@
    "prompt": "In which year was Star Wars: Episode I – The Phantom Menace released?",
    "answer": "1999",
    "wrong": [
-    "1997",
-    "1996",
+    "2002",
+    "2001",
     "2000"
    ],
    "explain": "Star Wars: Episode I – The Phantom Menace (1999), directed by George Lucas. It is the first of the Star Wars prequels. Worldwide gross about $1.05 billion.",
@@ -4618,9 +4598,9 @@
    "prompt": "Who directed Star Wars: Episode I – The Phantom Menace (1999)?",
    "answer": "George Lucas",
    "wrong": [
-    "Anthony Russo and Joe Russo",
-    "John Woo",
-    "Lee Unkrich"
+    "J. J. Abrams",
+    "Barry Sonnenfeld",
+    "Shawn Levy"
    ],
    "explain": "Star Wars: Episode I – The Phantom Menace (1999), directed by George Lucas. It is the first of the Star Wars prequels. Worldwide gross about $1.05 billion.",
    "difficulty": 3,
@@ -4634,9 +4614,9 @@
    "prompt": "Which film is this? 👦🏎️⚔️🐸👑",
    "answer": "Star Wars: Episode I – The Phantom Menace",
    "wrong": [
-    "Enter the Dragon",
-    "Star Wars",
-    "Star Wars: The Force Awakens"
+    "Rocky",
+    "Frozen II",
+    "Animal House"
    ],
    "explain": "Star Wars: Episode I – The Phantom Menace (1999), directed by George Lucas. It is the first of the Star Wars prequels. Worldwide gross about $1.05 billion.",
    "difficulty": 2,
@@ -4650,9 +4630,9 @@
    "prompt": "In which year was Mission: Impossible 2 released?",
    "answer": "2000",
    "wrong": [
-    "2002",
-    "1999",
-    "1997"
+    "2001",
+    "1998",
+    "2003"
    ],
    "explain": "Mission: Impossible 2 (2000), directed by John Woo. Tom Cruise returns as agent Ethan Hunt. Worldwide gross about $546 million.",
    "difficulty": 3,
@@ -4666,9 +4646,9 @@
    "prompt": "Who directed Mission: Impossible 2 (2000)?",
    "answer": "John Woo",
    "wrong": [
-    "Randal Kleiser",
-    "J. J. Abrams",
-    "George Lucas"
+    "John Musker and Ron Clements",
+    "Christopher Nolan",
+    "Joseph Kosinski"
    ],
    "explain": "Mission: Impossible 2 (2000), directed by John Woo. Tom Cruise returns as agent Ethan Hunt. Worldwide gross about $546 million.",
    "difficulty": 3,
@@ -4682,9 +4662,9 @@
    "prompt": "Which film is this? 🕵️‍♂️🦠🏍️🧗‍♂️",
    "answer": "Mission: Impossible 2",
    "wrong": [
-    "Close Encounters of the Third Kind",
-    "Return of the Jedi",
-    "Star Wars: The Last Jedi"
+    "Raiders of the Lost Ark",
+    "Moonraker",
+    "Indiana Jones and the Last Crusade"
    ],
    "explain": "Mission: Impossible 2 (2000), directed by John Woo. Tom Cruise returns as agent Ethan Hunt. Worldwide gross about $546 million.",
    "difficulty": 3,
@@ -4698,9 +4678,9 @@
    "prompt": "In which year was Harry Potter and the Philosopher's Stone released?",
    "answer": "2001",
    "wrong": [
-    "2000",
-    "2003",
-    "1999"
+    "2004",
+    "2002",
+    "2000"
    ],
    "explain": "Harry Potter and the Philosopher's Stone (2001), directed by Chris Columbus. Harry goes to Hogwarts for the first time. Worldwide gross about $1.01 billion.",
    "difficulty": 2,
@@ -4714,9 +4694,9 @@
    "prompt": "Who directed Harry Potter and the Philosopher's Stone (2001)?",
    "answer": "Chris Columbus",
    "wrong": [
-    "Richard Marquand",
-    "Hal Needham",
-    "Lewis Gilbert"
+    "J. J. Abrams",
+    "Ivan Reitman",
+    "Steven Spielberg"
    ],
    "explain": "Harry Potter and the Philosopher's Stone (2001), directed by Chris Columbus. Harry goes to Hogwarts for the first time. Worldwide gross about $1.01 billion.",
    "difficulty": 2,
@@ -4727,12 +4707,12 @@
   {
    "id": "quote-harry-potter-and-the-philosopher-s-stone",
    "kind": "mc",
-   "prompt": "Which film has the line: \"It does not do to dwell on dreams and forget to live.\"",
+   "prompt": "Which film has the line: \"It does not do to dwell on dreams\"",
    "answer": "Harry Potter and the Philosopher's Stone",
    "wrong": [
-    "Mission: Impossible 2",
-    "The Lord of the Rings: The Two Towers",
-    "Shrek 2"
+    "Harry Potter and the Order of the Phoenix",
+    "Pirates of the Caribbean: Dead Man's Chest",
+    "Avatar"
    ],
    "explain": "From Harry Potter and the Philosopher's Stone (2001).",
    "difficulty": 1,
@@ -4746,9 +4726,9 @@
    "prompt": "Which film is this? ⚡🧙‍♂️🦉🏰🧹",
    "answer": "Harry Potter and the Philosopher's Stone",
    "wrong": [
-    "Jurassic World",
-    "Harry Potter and the Deathly Hallows – Part 2",
-    "Top Gun"
+    "Shrek 2",
+    "Rocky",
+    "Harry Potter and the Deathly Hallows – Part 2"
    ],
    "explain": "Harry Potter and the Philosopher's Stone (2001), directed by Chris Columbus. Harry goes to Hogwarts for the first time. Worldwide gross about $1.01 billion.",
    "difficulty": 1,
@@ -4762,9 +4742,9 @@
    "prompt": "In which year was The Lord of the Rings: The Two Towers released?",
    "answer": "2002",
    "wrong": [
-    "2004",
-    "2005",
-    "1999"
+    "2001",
+    "2000",
+    "2005"
    ],
    "explain": "The Lord of the Rings: The Two Towers (2002), directed by Peter Jackson. It is the second part of a fantasy trilogy about a ring. Worldwide gross about $949 million.",
    "difficulty": 3,
@@ -4778,9 +4758,9 @@
    "prompt": "Who directed The Lord of the Rings: The Two Towers (2002)?",
    "answer": "Peter Jackson",
    "wrong": [
-    "John Landis",
-    "Roland Emmerich",
-    "Robert Clouse"
+    "Chris Buck and Jennifer Lee",
+    "Ivan Reitman",
+    "Lee Unkrich"
    ],
    "explain": "The Lord of the Rings: The Two Towers (2002), directed by Peter Jackson. It is the second part of a fantasy trilogy about a ring. Worldwide gross about $949 million.",
    "difficulty": 3,
@@ -4794,9 +4774,9 @@
    "prompt": "Which film is this? 🧙‍♂️🌳🏰⚔️💍",
    "answer": "The Lord of the Rings: The Two Towers",
    "wrong": [
-    "Shrek 2",
-    "Ghost",
-    "Deadpool & Wolverine"
+    "Furious 7",
+    "The Dark Knight",
+    "Frozen"
    ],
    "explain": "The Lord of the Rings: The Two Towers (2002), directed by Peter Jackson. It is the second part of a fantasy trilogy about a ring. Worldwide gross about $949 million.",
    "difficulty": 2,
@@ -4810,9 +4790,9 @@
    "prompt": "In which year was The Lord of the Rings: The Return of the King released?",
    "answer": "2003",
    "wrong": [
+    "2005",
     "2000",
-    "2002",
-    "2004"
+    "2006"
    ],
    "explain": "The Lord of the Rings: The Return of the King (2003), directed by Peter Jackson. The One Ring is finally thrown into Mount Doom. Worldwide gross about $1.15 billion.",
    "difficulty": 3,
@@ -4826,28 +4806,12 @@
    "prompt": "Who directed The Lord of the Rings: The Return of the King (2003)?",
    "answer": "Peter Jackson",
    "wrong": [
-    "John Musker and Ron Clements",
-    "Joseph Kosinski",
-    "Colin Trevorrow"
+    "Roger Allers and Rob Minkoff",
+    "Jon Favreau",
+    "Barry Levinson"
    ],
    "explain": "The Lord of the Rings: The Return of the King (2003), directed by Peter Jackson. The One Ring is finally thrown into Mount Doom. Worldwide gross about $1.15 billion.",
    "difficulty": 3,
-   "refs": [
-    "movies/the-lord-of-the-rings-the-return-of-the-king"
-   ]
-  },
-  {
-   "id": "quote-the-lord-of-the-rings-the-return-of-the-king",
-   "kind": "mc",
-   "prompt": "Which film has the line: \"I can't carry it for you, but I can carry you!\"",
-   "answer": "The Lord of the Rings: The Return of the King",
-   "wrong": [
-    "Harry Potter and the Order of the Phoenix",
-    "Harry Potter and the Philosopher's Stone",
-    "Mission: Impossible 2"
-   ],
-   "explain": "From The Lord of the Rings: The Return of the King (2003).",
-   "difficulty": 2,
    "refs": [
     "movies/the-lord-of-the-rings-the-return-of-the-king"
    ]
@@ -4858,9 +4822,9 @@
    "prompt": "Which film is this? 💍🌋👑🦅⚔️",
    "answer": "The Lord of the Rings: The Return of the King",
    "wrong": [
-    "Rocky",
-    "The Super Mario Bros. Movie",
-    "Avatar: The Way of Water"
+    "Transformers: Age of Extinction",
+    "Smokey and the Bandit",
+    "Avatar: Fire and Ash"
    ],
    "explain": "The Lord of the Rings: The Return of the King (2003), directed by Peter Jackson. The One Ring is finally thrown into Mount Doom. Worldwide gross about $1.15 billion.",
    "difficulty": 2,
@@ -4875,7 +4839,7 @@
    "answer": "2004",
    "wrong": [
     "2002",
-    "2007",
+    "2005",
     "2006"
    ],
    "explain": "Shrek 2 (2004), directed by Andrew Adamson and Kelly Asbury and Conrad Vernon. An ogre and Princess Fiona go to meet her parents. Worldwide gross about $933 million.",
@@ -4890,9 +4854,9 @@
    "prompt": "Who directed Shrek 2 (2004)?",
    "answer": "Andrew Adamson and Kelly Asbury and Conrad Vernon",
    "wrong": [
-    "M. Night Shyamalan",
-    "Peter Jackson",
-    "Haruo Sotozaki"
+    "Steven Spielberg",
+    "John Musker and Ron Clements",
+    "Barry Levinson"
    ],
    "explain": "Shrek 2 (2004), directed by Andrew Adamson and Kelly Asbury and Conrad Vernon. An ogre and Princess Fiona go to meet her parents. Worldwide gross about $933 million.",
    "difficulty": 2,
@@ -4906,9 +4870,9 @@
    "prompt": "Which film has the line: \"Are we there yet?\"",
    "answer": "Shrek 2",
    "wrong": [
-    "Avatar",
-    "Mission: Impossible 2",
-    "The Lord of the Rings: The Two Towers"
+    "The Dark Knight",
+    "The Lord of the Rings: The Two Towers",
+    "Harry Potter and the Order of the Phoenix"
    ],
    "explain": "From Shrek 2 (2004).",
    "difficulty": 1,
@@ -4922,9 +4886,9 @@
    "prompt": "Which film is this? 👹👸🐴🐱🏰",
    "answer": "Shrek 2",
    "wrong": [
-    "Frozen II",
-    "Avatar",
-    "Captain America: Civil War"
+    "Avengers: Infinity War",
+    "E.T. the Extra-Terrestrial",
+    "The Lord of the Rings: The Two Towers"
    ],
    "explain": "Shrek 2 (2004), directed by Andrew Adamson and Kelly Asbury and Conrad Vernon. An ogre and Princess Fiona go to meet her parents. Worldwide gross about $933 million.",
    "difficulty": 1,
@@ -4939,8 +4903,8 @@
    "answer": "2005",
    "wrong": [
     "2008",
-    "2003",
-    "2006"
+    "2002",
+    "2003"
    ],
    "explain": "Harry Potter and the Goblet of Fire (2005), directed by Mike Newell. It is the fourth film about the boy wizard. Worldwide gross about $896 million.",
    "difficulty": 3,
@@ -4954,9 +4918,9 @@
    "prompt": "Who directed Harry Potter and the Goblet of Fire (2005)?",
    "answer": "Mike Newell",
    "wrong": [
-    "Shawn Levy",
-    "Anthony Russo and Joe Russo",
-    "James Wan"
+    "Adrian Lyne",
+    "Francis Ford Coppola",
+    "James Cameron"
    ],
    "explain": "Harry Potter and the Goblet of Fire (2005), directed by Mike Newell. It is the fourth film about the boy wizard. Worldwide gross about $896 million.",
    "difficulty": 3,
@@ -4970,9 +4934,9 @@
    "prompt": "Which film has the line: \"Dark and difficult times lie ahead.\"",
    "answer": "Harry Potter and the Goblet of Fire",
    "wrong": [
-    "Harry Potter and the Half-Blood Prince",
-    "Harry Potter and the Order of the Phoenix",
-    "Shrek 2"
+    "Pirates of the Caribbean: Dead Man's Chest",
+    "Pirates of the Caribbean: At World's End",
+    "Harry Potter and the Philosopher's Stone"
    ],
    "explain": "From Harry Potter and the Goblet of Fire (2005).",
    "difficulty": 2,
@@ -4986,9 +4950,9 @@
    "prompt": "Which film is this? 🔥🏆🐉🧙‍♂️🌊",
    "answer": "Harry Potter and the Goblet of Fire",
    "wrong": [
-    "Harry Potter and the Philosopher's Stone",
-    "Smokey and the Bandit",
-    "The Lost World: Jurassic Park"
+    "Toy Story 3",
+    "Raiders of the Lost Ark",
+    "Rain Man"
    ],
    "explain": "Harry Potter and the Goblet of Fire (2005), directed by Mike Newell. It is the fourth film about the boy wizard. Worldwide gross about $896 million.",
    "difficulty": 2,
@@ -5002,9 +4966,9 @@
    "prompt": "In which year was Pirates of the Caribbean: Dead Man's Chest released?",
    "answer": "2006",
    "wrong": [
-    "2005",
-    "2009",
-    "2008"
+    "2003",
+    "2008",
+    "2009"
    ],
    "explain": "Pirates of the Caribbean: Dead Man's Chest (2006), directed by Gore Verbinski. Captain Jack Sparrow owes a debt to Davy Jones. Worldwide gross about $1.07 billion.",
    "difficulty": 3,
@@ -5018,9 +4982,9 @@
    "prompt": "Who directed Pirates of the Caribbean: Dead Man's Chest (2006)?",
    "answer": "Gore Verbinski",
    "wrong": [
-    "Adrian Lyne",
-    "Steven Spielberg",
-    "Tony Scott"
+    "Ryan Coogler",
+    "Francis Ford Coppola",
+    "John Lasseter"
    ],
    "explain": "Pirates of the Caribbean: Dead Man's Chest (2006), directed by Gore Verbinski. Captain Jack Sparrow owes a debt to Davy Jones. Worldwide gross about $1.07 billion.",
    "difficulty": 3,
@@ -5035,8 +4999,8 @@
    "answer": "Pirates of the Caribbean: Dead Man's Chest",
    "wrong": [
     "Ghost",
-    "Inside Out 2",
-    "Star Wars"
+    "Raiders of the Lost Ark",
+    "The Godfather"
    ],
    "explain": "Pirates of the Caribbean: Dead Man's Chest (2006), directed by Gore Verbinski. Captain Jack Sparrow owes a debt to Davy Jones. Worldwide gross about $1.07 billion.",
    "difficulty": 2,
@@ -5051,8 +5015,8 @@
    "answer": "2007",
    "wrong": [
     "2005",
-    "2009",
-    "2004"
+    "2010",
+    "2006"
    ],
    "explain": "Pirates of the Caribbean: At World's End (2007), directed by Gore Verbinski. It is the third film about Captain Jack Sparrow. Worldwide gross about $961 million.",
    "difficulty": 3,
@@ -5066,9 +5030,9 @@
    "prompt": "Who directed Pirates of the Caribbean: At World's End (2007)?",
    "answer": "Gore Verbinski",
    "wrong": [
-    "Randal Kleiser",
+    "Ivan Reitman",
     "Jon Watts",
-    "Jiaozi"
+    "Francis Ford Coppola"
    ],
    "explain": "Pirates of the Caribbean: At World's End (2007), directed by Gore Verbinski. It is the third film about Captain Jack Sparrow. Worldwide gross about $961 million.",
    "difficulty": 3,
@@ -5082,9 +5046,9 @@
    "prompt": "Which film is this? 🏴‍☠️🌍⚓🦀🌀",
    "answer": "Pirates of the Caribbean: At World's End",
    "wrong": [
-    "Captain America: Civil War",
-    "Harry Potter and the Goblet of Fire",
-    "The Lost World: Jurassic Park"
+    "Pirates of the Caribbean: Dead Man's Chest",
+    "Batman",
+    "Independence Day"
    ],
    "explain": "Pirates of the Caribbean: At World's End (2007), directed by Gore Verbinski. It is the third film about Captain Jack Sparrow. Worldwide gross about $961 million.",
    "difficulty": 3,
@@ -5098,8 +5062,8 @@
    "prompt": "In which year was The Dark Knight released?",
    "answer": "2008",
    "wrong": [
-    "2007",
     "2009",
+    "2007",
     "2011"
    ],
    "explain": "The Dark Knight (2008), directed by Christopher Nolan. Christian Bale plays Batman. Worldwide gross about $1.01 billion.",
@@ -5114,9 +5078,9 @@
    "prompt": "Who directed The Dark Knight (2008)?",
    "answer": "Christopher Nolan",
    "wrong": [
-    "Joseph Kosinski",
-    "Shawn Levy",
-    "Joss Whedon"
+    "Rian Johnson",
+    "Aaron Horvath and Michael Jelenic",
+    "Jiaozi"
    ],
    "explain": "The Dark Knight (2008), directed by Christopher Nolan. Christian Bale plays Batman. Worldwide gross about $1.01 billion.",
    "difficulty": 3,
@@ -5130,9 +5094,9 @@
    "prompt": "Which film has the line: \"Why so serious?\"",
    "answer": "The Dark Knight",
    "wrong": [
-    "Harry Potter and the Half-Blood Prince",
-    "Harry Potter and the Philosopher's Stone",
-    "Shrek 2"
+    "Shrek 2",
+    "Harry Potter and the Goblet of Fire",
+    "Harry Potter and the Order of the Phoenix"
    ],
    "explain": "From The Dark Knight (2008).",
    "difficulty": 2,
@@ -5146,9 +5110,9 @@
    "prompt": "Which film is this? 🦇🃏🔥🏙️🚓",
    "answer": "The Dark Knight",
    "wrong": [
-    "Terminator 2: Judgment Day",
     "The Lion King",
-    "Harry Potter and the Half-Blood Prince"
+    "Raiders of the Lost Ark",
+    "Mission: Impossible 2"
    ],
    "explain": "The Dark Knight (2008), directed by Christopher Nolan. Christian Bale plays Batman. Worldwide gross about $1.01 billion.",
    "difficulty": 2,
@@ -5163,8 +5127,8 @@
    "answer": "2009",
    "wrong": [
     "2007",
-    "2012",
-    "2006"
+    "2008",
+    "2012"
    ],
    "explain": "Avatar (2009), directed by James Cameron. It is set on the moon Pandora. Worldwide gross about $2.92 billion.",
    "difficulty": 2,
@@ -5178,9 +5142,9 @@
    "prompt": "Who directed Avatar (2009)?",
    "answer": "James Cameron",
    "wrong": [
-    "Chris Buck and Jennifer Lee",
-    "Jon Favreau",
-    "Jennifer Lee and Chris Buck"
+    "Colin Trevorrow",
+    "Steven Spielberg",
+    "Robert Clouse"
    ],
    "explain": "Avatar (2009), directed by James Cameron. It is set on the moon Pandora. Worldwide gross about $2.92 billion.",
    "difficulty": 2,
@@ -5194,9 +5158,9 @@
    "prompt": "Which film has the line: \"I see you.\"",
    "answer": "Avatar",
    "wrong": [
-    "Mission: Impossible 2",
-    "Pirates of the Caribbean: Dead Man's Chest",
-    "The Lord of the Rings: The Two Towers"
+    "The Lord of the Rings: The Two Towers",
+    "The Dark Knight",
+    "Harry Potter and the Philosopher's Stone"
    ],
    "explain": "From Avatar (2009).",
    "difficulty": 1,
@@ -5210,9 +5174,9 @@
    "prompt": "Which film is this? 🌳💙👽🐉🪐",
    "answer": "Avatar",
    "wrong": [
-    "Avengers: Age of Ultron",
-    "Aladdin",
-    "Batman"
+    "Shrek 2",
+    "Superman",
+    "Return of the Jedi"
    ],
    "explain": "Avatar (2009), directed by James Cameron. It is set on the moon Pandora. Worldwide gross about $2.92 billion.",
    "difficulty": 1,
@@ -5226,9 +5190,9 @@
    "prompt": "In which year was Toy Story 3 released?",
    "answer": "2010",
    "wrong": [
+    "2009",
     "2013",
-    "2008",
-    "2012"
+    "2011"
    ],
    "explain": "Toy Story 3 (2010), directed by Lee Unkrich. Woody, Buzz and friends face being thrown away. Worldwide gross about $1.07 billion.",
    "difficulty": 2,
@@ -5242,9 +5206,9 @@
    "prompt": "Who directed Toy Story 3 (2010)?",
    "answer": "Lee Unkrich",
    "wrong": [
-    "John G. Avildsen",
-    "Tony Scott",
-    "Barry Levinson"
+    "Jennifer Lee and Chris Buck",
+    "Jared Bush and Byron Howard",
+    "John Lasseter"
    ],
    "explain": "Toy Story 3 (2010), directed by Lee Unkrich. Woody, Buzz and friends face being thrown away. Worldwide gross about $1.07 billion.",
    "difficulty": 2,
@@ -5258,9 +5222,9 @@
    "prompt": "Which film has the line: \"So long, partner.\"",
    "answer": "Toy Story 3",
    "wrong": [
-    "Jurassic World",
-    "The Lion King (2019)",
-    "Furious 7"
+    "Avengers: Age of Ultron",
+    "Harry Potter and the Deathly Hallows – Part 2",
+    "Jurassic World"
    ],
    "explain": "From Toy Story 3 (2010).",
    "difficulty": 1,
@@ -5274,9 +5238,9 @@
    "prompt": "Which film is this? 🧸🏫🔥👋🤠",
    "answer": "Toy Story 3",
    "wrong": [
-    "Inside Out 2",
-    "The Lion King",
-    "The Super Mario Bros. Movie"
+    "Star Wars: Episode I – The Phantom Menace",
+    "Ne Zha 2",
+    "Jurassic Park"
    ],
    "explain": "Toy Story 3 (2010), directed by Lee Unkrich. Woody, Buzz and friends face being thrown away. Worldwide gross about $1.07 billion.",
    "difficulty": 1,
@@ -5290,9 +5254,9 @@
    "prompt": "In which year was Harry Potter and the Deathly Hallows – Part 2 released?",
    "answer": "2011",
    "wrong": [
-    "2013",
-    "2008",
-    "2010"
+    "2010",
+    "2014",
+    "2009"
    ],
    "explain": "Harry Potter and the Deathly Hallows – Part 2 (2011), directed by David Yates. It is the final film in the boy wizard series. Worldwide gross about $1.34 billion.",
    "difficulty": 3,
@@ -5306,9 +5270,9 @@
    "prompt": "Who directed Harry Potter and the Deathly Hallows – Part 2 (2011)?",
    "answer": "David Yates",
    "wrong": [
-    "George Lucas",
-    "John Musker and Ron Clements",
-    "Michael Bay"
+    "Francis Ford Coppola",
+    "John Lasseter",
+    "Mike Newell"
    ],
    "explain": "Harry Potter and the Deathly Hallows – Part 2 (2011), directed by David Yates. It is the final film in the boy wizard series. Worldwide gross about $1.34 billion.",
    "difficulty": 3,
@@ -5322,9 +5286,9 @@
    "prompt": "Which film is this? ⚡🏰⚔️🐍💀",
    "answer": "Harry Potter and the Deathly Hallows – Part 2",
    "wrong": [
-    "The Avengers",
-    "Ghostbusters",
-    "The Lord of the Rings: The Return of the King"
+    "Harry Potter and the Half-Blood Prince",
+    "Pirates of the Caribbean: Dead Man's Chest",
+    "Spider-Man: No Way Home"
    ],
    "explain": "Harry Potter and the Deathly Hallows – Part 2 (2011), directed by David Yates. It is the final film in the boy wizard series. Worldwide gross about $1.34 billion.",
    "difficulty": 2,
@@ -5338,9 +5302,9 @@
    "prompt": "In which year was The Avengers released?",
    "answer": "2012",
    "wrong": [
-    "2010",
-    "2013",
-    "2014"
+    "2015",
+    "2014",
+    "2010"
    ],
    "explain": "The Avengers (2012), directed by Joss Whedon. Iron Man, Captain America, Thor and Hulk team up. Worldwide gross about $1.52 billion.",
    "difficulty": 2,
@@ -5354,9 +5318,9 @@
    "prompt": "Who directed The Avengers (2012)?",
    "answer": "Joss Whedon",
    "wrong": [
+    "Jennifer Lee and Chris Buck",
     "Ivan Reitman",
-    "Steven Spielberg",
-    "James Wan"
+    "Peter Jackson"
    ],
    "explain": "The Avengers (2012), directed by Joss Whedon. Iron Man, Captain America, Thor and Hulk team up. Worldwide gross about $1.52 billion.",
    "difficulty": 2,
@@ -5370,9 +5334,9 @@
    "prompt": "Which film has the line: \"Puny god.\"",
    "answer": "The Avengers",
    "wrong": [
-    "The Lion King (2019)",
-    "Captain America: Civil War",
-    "Avengers: Infinity War"
+    "Black Panther",
+    "Frozen II",
+    "Avengers: Age of Ultron"
    ],
    "explain": "From The Avengers (2012).",
    "difficulty": 1,
@@ -5386,9 +5350,9 @@
    "prompt": "Which film is this? 🦸‍♂️🛡️🔨👽🏙️",
    "answer": "The Avengers",
    "wrong": [
-    "Toy Story",
-    "Barbie",
-    "Spider-Man: No Way Home"
+    "The Lion King (2019)",
+    "Indiana Jones and the Last Crusade",
+    "Harry Potter and the Deathly Hallows – Part 2"
    ],
    "explain": "The Avengers (2012), directed by Joss Whedon. Iron Man, Captain America, Thor and Hulk team up. Worldwide gross about $1.52 billion.",
    "difficulty": 1,
@@ -5402,9 +5366,9 @@
    "prompt": "In which year was Frozen released?",
    "answer": "2013",
    "wrong": [
-    "2016",
     "2010",
-    "2011"
+    "2014",
+    "2016"
    ],
    "explain": "Frozen (2013), directed by Chris Buck and Jennifer Lee. Elsa and Anna are sisters in the kingdom of Arendelle. Worldwide gross about $1.29 billion.",
    "difficulty": 2,
@@ -5418,9 +5382,9 @@
    "prompt": "Who directed Frozen (2013)?",
    "answer": "Chris Buck and Jennifer Lee",
    "wrong": [
-    "Tim Burton",
-    "Steven Spielberg",
-    "Tony Scott"
+    "Jennifer Lee and Chris Buck",
+    "David Yates",
+    "Lewis Gilbert"
    ],
    "explain": "Frozen (2013), directed by Chris Buck and Jennifer Lee. Elsa and Anna are sisters in the kingdom of Arendelle. Worldwide gross about $1.29 billion.",
    "difficulty": 2,
@@ -5434,8 +5398,8 @@
    "prompt": "Which film has the line: \"Some people are worth melting for.\"",
    "answer": "Frozen",
    "wrong": [
-    "Black Panther",
-    "Avengers: Age of Ultron",
+    "The Avengers",
+    "Transformers: Age of Extinction",
     "The Lion King (2019)"
    ],
    "explain": "From Frozen (2013).",
@@ -5450,9 +5414,9 @@
    "prompt": "Which film is this? ❄️👭⛄🏰👑",
    "answer": "Frozen",
    "wrong": [
-    "Jaws",
-    "The Lord of the Rings: The Two Towers",
-    "Zootopia 2"
+    "The Dark Knight",
+    "Furious 7",
+    "Star Wars: Episode I – The Phantom Menace"
    ],
    "explain": "Frozen (2013), directed by Chris Buck and Jennifer Lee. Elsa and Anna are sisters in the kingdom of Arendelle. Worldwide gross about $1.29 billion.",
    "difficulty": 1,
@@ -5466,9 +5430,9 @@
    "prompt": "In which year was Transformers: Age of Extinction released?",
    "answer": "2014",
    "wrong": [
+    "2013",
     "2017",
-    "2016",
-    "2013"
+    "2015"
    ],
    "explain": "Transformers: Age of Extinction (2014), directed by Michael Bay. Optimus Prime leads the Autobots. Worldwide gross about $1.10 billion.",
    "difficulty": 3,
@@ -5482,9 +5446,9 @@
    "prompt": "Who directed Transformers: Age of Extinction (2014)?",
    "answer": "Michael Bay",
    "wrong": [
-    "Anthony Russo and Joe Russo",
-    "Barry Sonnenfeld",
-    "David Yates"
+    "Richard Donner",
+    "Jennifer Lee and Chris Buck",
+    "James Wan"
    ],
    "explain": "Transformers: Age of Extinction (2014), directed by Michael Bay. Optimus Prime leads the Autobots. Worldwide gross about $1.10 billion.",
    "difficulty": 3,
@@ -5498,9 +5462,9 @@
    "prompt": "Which film is this? 🤖🚗🦖🔧",
    "answer": "Transformers: Age of Extinction",
    "wrong": [
-    "Batman",
-    "Top Gun: Maverick",
-    "Harry Potter and the Order of the Phoenix"
+    "The Godfather",
+    "Men in Black",
+    "Captain America: Civil War"
    ],
    "explain": "Transformers: Age of Extinction (2014), directed by Michael Bay. Optimus Prime leads the Autobots. Worldwide gross about $1.10 billion.",
    "difficulty": 3,
@@ -5514,9 +5478,9 @@
    "prompt": "In which year was Star Wars: The Force Awakens released?",
    "answer": "2015",
    "wrong": [
+    "2012",
     "2017",
-    "2013",
-    "2018"
+    "2014"
    ],
    "explain": "Star Wars: The Force Awakens (2015), directed by J. J. Abrams. It is the seventh main Star Wars film. Worldwide gross about $2.07 billion.",
    "difficulty": 2,
@@ -5530,9 +5494,9 @@
    "prompt": "Who directed Star Wars: The Force Awakens (2015)?",
    "answer": "J. J. Abrams",
    "wrong": [
-    "Adrian Lyne",
-    "Christopher Nolan",
-    "James Cameron"
+    "Roland Emmerich",
+    "Anthony Russo and Joe Russo",
+    "Colin Trevorrow"
    ],
    "explain": "Star Wars: The Force Awakens (2015), directed by J. J. Abrams. It is the seventh main Star Wars film. Worldwide gross about $2.07 billion.",
    "difficulty": 2,
@@ -5546,9 +5510,9 @@
    "prompt": "Which film has the line: \"Chewie, we're home.\"",
    "answer": "Star Wars: The Force Awakens",
    "wrong": [
+    "Captain America: Civil War",
     "The Lion King (2019)",
-    "Avengers: Endgame",
-    "Frozen"
+    "Avengers: Infinity War"
    ],
    "explain": "From Star Wars: The Force Awakens (2015).",
    "difficulty": 1,
@@ -5562,9 +5526,9 @@
    "prompt": "Which film is this? 🌌🤖⚽🪐⚔️",
    "answer": "Star Wars: The Force Awakens",
    "wrong": [
-    "Back to the Future",
-    "Return of the Jedi",
-    "Aladdin"
+    "Harry Potter and the Order of the Phoenix",
+    "Star Wars: The Last Jedi",
+    "Avatar"
    ],
    "explain": "Star Wars: The Force Awakens (2015), directed by J. J. Abrams. It is the seventh main Star Wars film. Worldwide gross about $2.07 billion.",
    "difficulty": 1,
@@ -5578,9 +5542,9 @@
    "prompt": "In which year was Captain America: Civil War released?",
    "answer": "2016",
    "wrong": [
-    "2015",
-    "2014",
-    "2018"
+    "2019",
+    "2013",
+    "2015"
    ],
    "explain": "Captain America: Civil War (2016), directed by Anthony Russo and Joe Russo. Captain America and Iron Man turn against each other. Worldwide gross about $1.15 billion.",
    "difficulty": 3,
@@ -5594,9 +5558,9 @@
    "prompt": "Who directed Captain America: Civil War (2016)?",
    "answer": "Anthony Russo and Joe Russo",
    "wrong": [
-    "Kelsey Mann",
-    "J. J. Abrams",
-    "John G. Avildsen"
+    "Steven Spielberg",
+    "David Yates",
+    "Jared Bush and Byron Howard"
    ],
    "explain": "Captain America: Civil War (2016), directed by Anthony Russo and Joe Russo. Captain America and Iron Man turn against each other. Worldwide gross about $1.15 billion.",
    "difficulty": 3,
@@ -5610,9 +5574,9 @@
    "prompt": "Which film is this? 🛡️🆚🤖🕷️",
    "answer": "Captain America: Civil War",
    "wrong": [
-    "Star Wars",
-    "Avengers: Endgame",
-    "Zootopia 2"
+    "Ne Zha 2",
+    "Moonraker",
+    "Avatar: The Way of Water"
    ],
    "explain": "Captain America: Civil War (2016), directed by Anthony Russo and Joe Russo. Captain America and Iron Man turn against each other. Worldwide gross about $1.15 billion.",
    "difficulty": 2,
@@ -5626,9 +5590,9 @@
    "prompt": "In which year was Star Wars: The Last Jedi released?",
    "answer": "2017",
    "wrong": [
-    "2019",
     "2015",
-    "2020"
+    "2019",
+    "2016"
    ],
    "explain": "Star Wars: The Last Jedi (2017), directed by Rian Johnson. It is the eighth main Star Wars film. Worldwide gross about $1.33 billion.",
    "difficulty": 3,
@@ -5642,9 +5606,9 @@
    "prompt": "Who directed Star Wars: The Last Jedi (2017)?",
    "answer": "Rian Johnson",
    "wrong": [
-    "Kelsey Mann",
-    "Robert Benton",
-    "Gore Verbinski"
+    "Colin Trevorrow",
+    "Robert Clouse",
+    "Barry Levinson"
    ],
    "explain": "Star Wars: The Last Jedi (2017), directed by Rian Johnson. It is the eighth main Star Wars film. Worldwide gross about $1.33 billion.",
    "difficulty": 3,
@@ -5658,8 +5622,8 @@
    "prompt": "Which film has the line: \"This is not going to go the way you think.\"",
    "answer": "Star Wars: The Last Jedi",
    "wrong": [
-    "Transformers: Age of Extinction",
-    "Frozen",
+    "Furious 7",
+    "Avengers: Infinity War",
     "The Lion King (2019)"
    ],
    "explain": "From Star Wars: The Last Jedi (2017).",
@@ -5674,8 +5638,8 @@
    "prompt": "Which film is this? ⚔️🏝️🐧👴🔥",
    "answer": "Star Wars: The Last Jedi",
    "wrong": [
-    "Close Encounters of the Third Kind",
-    "Aladdin",
+    "Independence Day",
+    "Batman",
     "Superman"
    ],
    "explain": "Star Wars: The Last Jedi (2017), directed by Rian Johnson. It is the eighth main Star Wars film. Worldwide gross about $1.33 billion.",
@@ -5690,9 +5654,9 @@
    "prompt": "In which year was Avengers: Infinity War released?",
    "answer": "2018",
    "wrong": [
-    "2015",
-    "2017",
-    "2019"
+    "2019",
+    "2016",
+    "2021"
    ],
    "explain": "Avengers: Infinity War (2018), directed by Anthony Russo and Joe Russo. Nearly every Marvel hero teams up against Thanos. Worldwide gross about $2.05 billion.",
    "difficulty": 2,
@@ -5706,9 +5670,9 @@
    "prompt": "Who directed Avengers: Infinity War (2018)?",
    "answer": "Anthony Russo and Joe Russo",
    "wrong": [
-    "John Landis",
-    "John Lasseter",
-    "Richard Marquand"
+    "Colin Trevorrow",
+    "Jared Bush and Byron Howard",
+    "Lee Unkrich"
    ],
    "explain": "Avengers: Infinity War (2018), directed by Anthony Russo and Joe Russo. Nearly every Marvel hero teams up against Thanos. Worldwide gross about $2.05 billion.",
    "difficulty": 2,
@@ -5722,9 +5686,9 @@
    "prompt": "Which film is this? 🟣🧤💎💎🫰",
    "answer": "Avengers: Infinity War",
    "wrong": [
-    "E.T. the Extra-Terrestrial",
-    "The Lion King",
-    "Harry Potter and the Goblet of Fire"
+    "Spider-Man: No Way Home",
+    "Barbie",
+    "Independence Day"
    ],
    "explain": "Avengers: Infinity War (2018), directed by Anthony Russo and Joe Russo. Nearly every Marvel hero teams up against Thanos. Worldwide gross about $2.05 billion.",
    "difficulty": 1,
@@ -5738,9 +5702,9 @@
    "prompt": "In which year was Avengers: Endgame released?",
    "answer": "2019",
    "wrong": [
+    "2021",
     "2017",
-    "2022",
-    "2018"
+    "2016"
    ],
    "explain": "Avengers: Endgame (2019), directed by Anthony Russo and Joe Russo. The surviving Avengers try to undo Thanos's snap. Worldwide gross about $2.92 billion.",
    "difficulty": 2,
@@ -5754,9 +5718,9 @@
    "prompt": "Who directed Avengers: Endgame (2019)?",
    "answer": "Anthony Russo and Joe Russo",
    "wrong": [
-    "Haruo Sotozaki",
-    "Tony Scott",
-    "Michael Bay"
+    "Adrian Lyne",
+    "John Lasseter",
+    "John Woo"
    ],
    "explain": "Avengers: Endgame (2019), directed by Anthony Russo and Joe Russo. The surviving Avengers try to undo Thanos's snap. Worldwide gross about $2.92 billion.",
    "difficulty": 2,
@@ -5770,9 +5734,9 @@
    "prompt": "Which film has the line: \"I love you 3000.\"",
    "answer": "Avengers: Endgame",
    "wrong": [
-    "Frozen",
-    "Harry Potter and the Deathly Hallows – Part 2",
-    "Avengers: Age of Ultron"
+    "Toy Story 3",
+    "Transformers: Age of Extinction",
+    "Jurassic World"
    ],
    "explain": "From Avengers: Endgame (2019).",
    "difficulty": 1,
@@ -5786,9 +5750,9 @@
    "prompt": "Which film is this? ⏳🦸‍♀️🧤🫰🛡️",
    "answer": "Avengers: Endgame",
    "wrong": [
-    "Grease",
-    "Batman",
-    "The Empire Strikes Back"
+    "Rocky",
+    "Superman",
+    "Jurassic Park"
    ],
    "explain": "Avengers: Endgame (2019), directed by Anthony Russo and Joe Russo. The surviving Avengers try to undo Thanos's snap. Worldwide gross about $2.92 billion.",
    "difficulty": 1,
@@ -5802,9 +5766,9 @@
    "prompt": "In which year was Demon Slayer: Kimetsu no Yaiba – The Movie: Mugen Train released?",
    "answer": "2020",
    "wrong": [
-    "2018",
-    "2022",
-    "2019"
+    "2019",
+    "2017",
+    "2023"
    ],
    "explain": "Demon Slayer: Kimetsu no Yaiba – The Movie: Mugen Train (2020), directed by Haruo Sotozaki. Tanjiro and the Flame Hashira face Enmu. Worldwide gross about $515 million.",
    "difficulty": 3,
@@ -5818,9 +5782,9 @@
    "prompt": "Who directed Demon Slayer: Kimetsu no Yaiba – The Movie: Mugen Train (2020)?",
    "answer": "Haruo Sotozaki",
    "wrong": [
-    "James Wan",
-    "Roger Allers and Rob Minkoff",
-    "Richard Donner"
+    "Anthony Russo and Joe Russo",
+    "John Musker and Ron Clements",
+    "Adrian Lyne"
    ],
    "explain": "Demon Slayer: Kimetsu no Yaiba – The Movie: Mugen Train (2020), directed by Haruo Sotozaki. Tanjiro and the Flame Hashira face Enmu. Worldwide gross about $515 million.",
    "difficulty": 3,
@@ -5834,9 +5798,9 @@
    "prompt": "Which film is this? 🚂👹🗡️🔥🌙",
    "answer": "Demon Slayer: Kimetsu no Yaiba – The Movie: Mugen Train",
    "wrong": [
-    "Kramer vs. Kramer",
-    "Star Wars: Episode I – The Phantom Menace",
-    "Terminator 2: Judgment Day"
+    "Terminator 2: Judgment Day",
+    "The Sixth Sense",
+    "Fatal Attraction"
    ],
    "explain": "Demon Slayer: Kimetsu no Yaiba – The Movie: Mugen Train (2020), directed by Haruo Sotozaki. Tanjiro and the Flame Hashira face Enmu. Worldwide gross about $515 million.",
    "difficulty": 3,
@@ -5851,8 +5815,8 @@
    "answer": "2021",
    "wrong": [
     "2023",
-    "2022",
-    "2024"
+    "2019",
+    "2020"
    ],
    "explain": "Spider-Man: No Way Home (2021), directed by Jon Watts. Tom Holland's Peter Parker faces the multiverse. Worldwide gross about $1.92 billion.",
    "difficulty": 2,
@@ -5866,9 +5830,9 @@
    "prompt": "Who directed Spider-Man: No Way Home (2021)?",
    "answer": "Jon Watts",
    "wrong": [
-    "Joss Whedon",
-    "Haruo Sotozaki",
-    "Joseph Kosinski"
+    "Barry Sonnenfeld",
+    "M. Night Shyamalan",
+    "Roland Emmerich"
    ],
    "explain": "Spider-Man: No Way Home (2021), directed by Jon Watts. Tom Holland's Peter Parker faces the multiverse. Worldwide gross about $1.92 billion.",
    "difficulty": 2,
@@ -5882,9 +5846,9 @@
    "prompt": "Which film is this? 🕷️🪄🕸️🌀",
    "answer": "Spider-Man: No Way Home",
    "wrong": [
-    "Avengers: Age of Ultron",
-    "The Lion King",
-    "Harry Potter and the Deathly Hallows – Part 2"
+    "The Avengers",
+    "Titanic",
+    "The Empire Strikes Back"
    ],
    "explain": "Spider-Man: No Way Home (2021), directed by Jon Watts. Tom Holland's Peter Parker faces the multiverse. Worldwide gross about $1.92 billion.",
    "difficulty": 1,
@@ -5898,9 +5862,9 @@
    "prompt": "In which year was Avatar: The Way of Water released?",
    "answer": "2022",
    "wrong": [
-    "2024",
+    "2023",
     "2021",
-    "2020"
+    "2024"
    ],
    "explain": "Avatar: The Way of Water (2022), directed by James Cameron. It is the second film set on Pandora. Worldwide gross about $2.33 billion.",
    "difficulty": 3,
@@ -5914,9 +5878,9 @@
    "prompt": "Who directed Avatar: The Way of Water (2022)?",
    "answer": "James Cameron",
    "wrong": [
-    "Peter Jackson",
-    "Ryan Coogler",
-    "John Landis"
+    "Aaron Horvath and Michael Jelenic",
+    "Lee Unkrich",
+    "M. Night Shyamalan"
    ],
    "explain": "Avatar: The Way of Water (2022), directed by James Cameron. It is the second film set on Pandora. Worldwide gross about $2.33 billion.",
    "difficulty": 3,
@@ -5930,9 +5894,9 @@
    "prompt": "Which film is this? 🌊🐋💙👨‍👩‍👧‍👦🏝️",
    "answer": "Avatar: The Way of Water",
    "wrong": [
-    "Grease",
-    "Kramer vs. Kramer",
-    "Top Gun"
+    "Men in Black",
+    "Star Wars: The Last Jedi",
+    "Harry Potter and the Deathly Hallows – Part 2"
    ],
    "explain": "Avatar: The Way of Water (2022), directed by James Cameron. It is the second film set on Pandora. Worldwide gross about $2.33 billion.",
    "difficulty": 2,
@@ -5946,9 +5910,9 @@
    "prompt": "In which year was Barbie released?",
    "answer": "2023",
    "wrong": [
-    "2020",
     "2025",
-    "2024"
+    "2021",
+    "2020"
    ],
    "explain": "Barbie (2023), directed by Greta Gerwig. Margot Robbie plays a famous fashion doll. Worldwide gross about $1.45 billion.",
    "difficulty": 2,
@@ -5962,9 +5926,9 @@
    "prompt": "Who directed Barbie (2023)?",
    "answer": "Greta Gerwig",
    "wrong": [
-    "George Lucas",
-    "J. J. Abrams",
-    "Tony Scott"
+    "Hal Needham",
+    "Barry Levinson",
+    "Joss Whedon"
    ],
    "explain": "Barbie (2023), directed by Greta Gerwig. Margot Robbie plays a famous fashion doll. Worldwide gross about $1.45 billion.",
    "difficulty": 2,
@@ -5978,9 +5942,9 @@
    "prompt": "Which film is this? 💗👠🏖️🌎🎸",
    "answer": "Barbie",
    "wrong": [
-    "Aladdin",
-    "Star Wars: Episode I – The Phantom Menace",
-    "Avengers: Endgame"
+    "Raiders of the Lost Ark",
+    "Independence Day",
+    "Men in Black"
    ],
    "explain": "Barbie (2023), directed by Greta Gerwig. Margot Robbie plays a famous fashion doll. Worldwide gross about $1.45 billion.",
    "difficulty": 1,
@@ -5994,9 +5958,9 @@
    "prompt": "In which year was Inside Out 2 released?",
    "answer": "2024",
    "wrong": [
+    "2025",
     "2023",
-    "2022",
-    "2025"
+    "2022"
    ],
    "explain": "Inside Out 2 (2024), directed by Kelsey Mann. Joy and her friends meet new emotions as Riley turns 13. Worldwide gross about $1.70 billion.",
    "difficulty": 2,
@@ -6010,9 +5974,9 @@
    "prompt": "Who directed Inside Out 2 (2024)?",
    "answer": "Kelsey Mann",
    "wrong": [
-    "Jennifer Lee and Chris Buck",
-    "Lewis Gilbert",
-    "Jared Bush and Byron Howard"
+    "Joss Whedon",
+    "Adrian Lyne",
+    "James Cameron"
    ],
    "explain": "Inside Out 2 (2024), directed by Kelsey Mann. Joy and her friends meet new emotions as Riley turns 13. Worldwide gross about $1.70 billion.",
    "difficulty": 2,
@@ -6026,9 +5990,9 @@
    "prompt": "Which film is this? 😊😢😠😰🧠",
    "answer": "Inside Out 2",
    "wrong": [
-    "Batman",
-    "The Lion King (2019)",
-    "Star Wars: The Last Jedi"
+    "Harry Potter and the Philosopher's Stone",
+    "Star Wars: Episode I – The Phantom Menace",
+    "Forrest Gump"
    ],
    "explain": "Inside Out 2 (2024), directed by Kelsey Mann. Joy and her friends meet new emotions as Riley turns 13. Worldwide gross about $1.70 billion.",
    "difficulty": 1,
@@ -6042,9 +6006,9 @@
    "prompt": "In which year was Ne Zha 2 released?",
    "answer": "2025",
    "wrong": [
+    "2023",
     "2022",
-    "2024",
-    "2023"
+    "2024"
    ],
    "explain": "Ne Zha 2 (2025), directed by Jiaozi. Its hero is a mischievous boy deity with fire powers. Worldwide gross about $2.27 billion.",
    "difficulty": 3,
@@ -6058,9 +6022,9 @@
    "prompt": "Who directed Ne Zha 2 (2025)?",
    "answer": "Jiaozi",
    "wrong": [
-    "Richard Marquand",
-    "Barry Sonnenfeld",
-    "Francis Ford Coppola"
+    "Tim Burton",
+    "Ryan Coogler",
+    "Michael Bay"
    ],
    "explain": "Ne Zha 2 (2025), directed by Jiaozi. Its hero is a mischievous boy deity with fire powers. Worldwide gross about $2.27 billion.",
    "difficulty": 3,
@@ -6074,9 +6038,9 @@
    "prompt": "Which film is this? 🔥👦🐉🪷🇨🇳",
    "answer": "Ne Zha 2",
    "wrong": [
-    "Independence Day",
-    "Enter the Dragon",
-    "The Sixth Sense"
+    "Toy Story 3",
+    "Men in Black",
+    "Jurassic Park"
    ],
    "explain": "Ne Zha 2 (2025), directed by Jiaozi. Its hero is a mischievous boy deity with fire powers. Worldwide gross about $2.27 billion.",
    "difficulty": 2,
@@ -6090,9 +6054,9 @@
    "prompt": "In which year was Superman released?",
    "answer": "1978",
    "wrong": [
-    "1976",
-    "1980",
-    "1981"
+    "1979",
+    "1975",
+    "1976"
    ],
    "explain": "Superman (1978), directed by Richard Donner. Christopher Reeve plays the Man of Steel.",
    "difficulty": 3,
@@ -6106,9 +6070,9 @@
    "prompt": "Who directed Superman (1978)?",
    "answer": "Richard Donner",
    "wrong": [
-    "Tony Scott",
-    "Christopher Nolan",
-    "Jon Watts"
+    "Ivan Reitman",
+    "J. J. Abrams",
+    "James Cameron"
    ],
    "explain": "Superman (1978), directed by Richard Donner. Christopher Reeve plays the Man of Steel.",
    "difficulty": 3,
@@ -6122,9 +6086,9 @@
    "prompt": "Which film has the line: \"You've got me? Who's got you?\"",
    "answer": "Superman",
    "wrong": [
-    "Kramer vs. Kramer",
-    "Grease",
-    "Enter the Dragon"
+    "Jaws",
+    "Moonraker",
+    "Smokey and the Bandit"
    ],
    "explain": "From Superman (1978).",
    "difficulty": 2,
@@ -6138,9 +6102,9 @@
    "prompt": "Which film is this? 🦸‍♂️🌍👓📰🚁",
    "answer": "Superman",
    "wrong": [
-    "Grease",
-    "Frozen",
-    "The Empire Strikes Back"
+    "Back to the Future",
+    "Avengers: Infinity War",
+    "The Dark Knight"
    ],
    "explain": "Superman (1978), directed by Richard Donner. Christopher Reeve plays the Man of Steel.",
    "difficulty": 2,
@@ -6155,8 +6119,8 @@
    "answer": "1972",
    "wrong": [
     "1975",
-    "1969",
-    "1973"
+    "1974",
+    "1970"
    ],
    "explain": "The Godfather (1972), directed by Francis Ford Coppola. It follows the Corleone mafia family.",
    "difficulty": 3,
@@ -6170,9 +6134,9 @@
    "prompt": "Who directed The Godfather (1972)?",
    "answer": "Francis Ford Coppola",
    "wrong": [
-    "Chris Columbus",
-    "Irvin Kershner",
-    "M. Night Shyamalan"
+    "George Lucas",
+    "James Wan",
+    "John Landis"
    ],
    "explain": "The Godfather (1972), directed by Francis Ford Coppola. It follows the Corleone mafia family.",
    "difficulty": 3,
@@ -6186,9 +6150,9 @@
    "prompt": "Which film has the line: \"I'm gonna make him an offer he can't refuse.\"",
    "answer": "The Godfather",
    "wrong": [
-    "Grease",
+    "Kramer vs. Kramer",
     "Star Wars",
-    "Animal House"
+    "Smokey and the Bandit"
    ],
    "explain": "From The Godfather (1972).",
    "difficulty": 2,
@@ -6202,9 +6166,9 @@
    "prompt": "Which film is this? 🌹🍊🐴🔫👨‍👦",
    "answer": "The Godfather",
    "wrong": [
-    "Ghost",
-    "Harry Potter and the Half-Blood Prince",
-    "Moonraker"
+    "Men in Black",
+    "Pirates of the Caribbean: At World's End",
+    "The Empire Strikes Back"
    ],
    "explain": "The Godfather (1972), directed by Francis Ford Coppola. It follows the Corleone mafia family.",
    "difficulty": 2,
@@ -6218,9 +6182,9 @@
    "prompt": "In which year was Smokey and the Bandit released?",
    "answer": "1977",
    "wrong": [
-    "1980",
-    "1978",
-    "1976"
+    "1976",
+    "1979",
+    "1978"
    ],
    "explain": "Smokey and the Bandit (1977), directed by Hal Needham. Burt Reynolds plays the Bandit.",
    "difficulty": 3,
@@ -6234,9 +6198,9 @@
    "prompt": "Who directed Smokey and the Bandit (1977)?",
    "answer": "Hal Needham",
    "wrong": [
-    "John G. Avildsen",
-    "Jon Favreau",
-    "George Lucas"
+    "M. Night Shyamalan",
+    "John Landis",
+    "Anthony Russo and Joe Russo"
    ],
    "explain": "Smokey and the Bandit (1977), directed by Hal Needham. Burt Reynolds plays the Bandit.",
    "difficulty": 3,
@@ -6250,9 +6214,9 @@
    "prompt": "Which film is this? 🚚🍺🚓🐶",
    "answer": "Smokey and the Bandit",
    "wrong": [
-    "Mission: Impossible 2",
-    "Black Panther",
-    "Independence Day"
+    "Ghost",
+    "Captain America: Civil War",
+    "Batman"
    ],
    "explain": "Smokey and the Bandit (1977), directed by Hal Needham. Burt Reynolds plays the Bandit.",
    "difficulty": 3,
@@ -6266,9 +6230,9 @@
    "prompt": "In which year was Animal House released?",
    "answer": "1978",
    "wrong": [
-    "1976",
-    "1979",
-    "1981"
+    "1981",
+    "1980",
+    "1975"
    ],
    "explain": "Animal House (1978), directed by John Landis. It is a comedy about the Delta house.",
    "difficulty": 3,
@@ -6282,9 +6246,9 @@
    "prompt": "Who directed Animal House (1978)?",
    "answer": "John Landis",
    "wrong": [
-    "Adrian Lyne",
-    "David Yates",
-    "Hal Needham"
+    "Joseph Kosinski",
+    "Joss Whedon",
+    "John Woo"
    ],
    "explain": "Animal House (1978), directed by John Landis. It is a comedy about the Delta house.",
    "difficulty": 3,
@@ -6298,9 +6262,9 @@
    "prompt": "Which film has the line: \"Toga! Toga!\"",
    "answer": "Animal House",
    "wrong": [
-    "Enter the Dragon",
-    "The Godfather",
-    "Close Encounters of the Third Kind"
+    "Kramer vs. Kramer",
+    "Rocky",
+    "Moonraker"
    ],
    "explain": "From Animal House (1978).",
    "difficulty": 3,
@@ -6314,9 +6278,9 @@
    "prompt": "Which film is this? 🎓🍻🏛️🎉",
    "answer": "Animal House",
    "wrong": [
-    "The Lord of the Rings: The Return of the King",
-    "Rain Man",
-    "Captain America: Civil War"
+    "Grease",
+    "Terminator 2: Judgment Day",
+    "The Lord of the Rings: The Two Towers"
    ],
    "explain": "Animal House (1978), directed by John Landis. It is a comedy about the Delta house.",
    "difficulty": 3,
@@ -6331,8 +6295,8 @@
    "answer": "1977",
    "wrong": [
     "1980",
-    "1978",
-    "1979"
+    "1974",
+    "1975"
    ],
    "explain": "Close Encounters of the Third Kind (1977), directed by Steven Spielberg. It is about first contact with aliens.",
    "difficulty": 3,
@@ -6346,9 +6310,9 @@
    "prompt": "Who directed Close Encounters of the Third Kind (1977)?",
    "answer": "Steven Spielberg",
    "wrong": [
-    "John Lasseter",
-    "Jennifer Lee and Chris Buck",
-    "Roger Allers and Rob Minkoff"
+    "M. Night Shyamalan",
+    "Colin Trevorrow",
+    "Ryan Coogler"
    ],
    "explain": "Close Encounters of the Third Kind (1977), directed by Steven Spielberg. It is about first contact with aliens.",
    "difficulty": 3,
@@ -6362,9 +6326,9 @@
    "prompt": "Which film has the line: \"This means something. This is important.\"",
    "answer": "Close Encounters of the Third Kind",
    "wrong": [
-    "Grease",
+    "Superman",
     "The Godfather",
-    "Rocky"
+    "Grease"
    ],
    "explain": "From Close Encounters of the Third Kind (1977).",
    "difficulty": 3,
@@ -6378,9 +6342,9 @@
    "prompt": "Which film is this? 🛸⛰️🎹👽",
    "answer": "Close Encounters of the Third Kind",
    "wrong": [
-    "Black Panther",
-    "Raiders of the Lost Ark",
-    "The Lord of the Rings: The Return of the King"
+    "Top Gun: Maverick",
+    "Ne Zha 2",
+    "Fatal Attraction"
    ],
    "explain": "Close Encounters of the Third Kind (1977), directed by Steven Spielberg. It is about first contact with aliens.",
    "difficulty": 3,
@@ -6394,8 +6358,8 @@
    "prompt": "In which year was Kramer vs. Kramer released?",
    "answer": "1979",
    "wrong": [
-    "1978",
-    "1981",
+    "1982",
+    "1976",
     "1977"
    ],
    "explain": "Kramer vs. Kramer (1979), directed by Robert Benton. A divorced couple fight for custody of their son.",
@@ -6410,9 +6374,9 @@
    "prompt": "Who directed Kramer vs. Kramer (1979)?",
    "answer": "Robert Benton",
    "wrong": [
-    "Jon Watts",
-    "Haruo Sotozaki",
-    "Roland Emmerich"
+    "Jennifer Lee and Chris Buck",
+    "Robert Zemeckis",
+    "Haruo Sotozaki"
    ],
    "explain": "Kramer vs. Kramer (1979), directed by Robert Benton. A divorced couple fight for custody of their son.",
    "difficulty": 3,
@@ -6426,9 +6390,9 @@
    "prompt": "Which film is this? 👨‍👦🍳⚖️💔",
    "answer": "Kramer vs. Kramer",
    "wrong": [
-    "The Lord of the Rings: The Return of the King",
-    "Rain Man",
-    "Pirates of the Caribbean: Dead Man's Chest"
+    "Enter the Dragon",
+    "Pirates of the Caribbean: At World's End",
+    "Grease"
    ],
    "explain": "Kramer vs. Kramer (1979), directed by Robert Benton. A divorced couple fight for custody of their son.",
    "difficulty": 3,
@@ -6442,9 +6406,9 @@
    "prompt": "In which year was Enter the Dragon released?",
    "answer": "1973",
    "wrong": [
-    "1976",
     "1972",
-    "1974"
+    "1970",
+    "1976"
    ],
    "explain": "Enter the Dragon (1973), directed by Robert Clouse. Bruce Lee stars as a Shaolin martial artist.",
    "difficulty": 3,
@@ -6458,9 +6422,9 @@
    "prompt": "Who directed Enter the Dragon (1973)?",
    "answer": "Robert Clouse",
    "wrong": [
-    "Haruo Sotozaki",
+    "Lewis Gilbert",
     "Hal Needham",
-    "Adrian Lyne"
+    "Francis Ford Coppola"
    ],
    "explain": "Enter the Dragon (1973), directed by Robert Clouse. Bruce Lee stars as a Shaolin martial artist.",
    "difficulty": 3,
@@ -6474,9 +6438,9 @@
    "prompt": "Which film has the line: \"Don't think. Feel.\"",
    "answer": "Enter the Dragon",
    "wrong": [
-    "Kramer vs. Kramer",
-    "Close Encounters of the Third Kind",
-    "Smokey and the Bandit"
+    "Moonraker",
+    "Grease",
+    "Close Encounters of the Third Kind"
    ],
    "explain": "From Enter the Dragon (1973).",
    "difficulty": 3,
@@ -6490,9 +6454,9 @@
    "prompt": "Which film is this? 🥋🏝️🪞🐉",
    "answer": "Enter the Dragon",
    "wrong": [
-    "Moonraker",
-    "Harry Potter and the Half-Blood Prince",
-    "Captain America: Civil War"
+    "Animal House",
+    "Men in Black",
+    "Harry Potter and the Half-Blood Prince"
    ],
    "explain": "Enter the Dragon (1973), directed by Robert Clouse. Bruce Lee stars as a Shaolin martial artist.",
    "difficulty": 3,
@@ -6506,9 +6470,9 @@
    "prompt": "In which year was Batman released?",
    "answer": "1989",
    "wrong": [
-    "1986",
+    "1990",
     "1987",
-    "1988"
+    "1986"
    ],
    "explain": "Batman (1989), directed by Tim Burton. A masked vigilante protects Gotham City. Worldwide gross about $411 million.",
    "difficulty": 3,
@@ -6522,9 +6486,9 @@
    "prompt": "Who directed Batman (1989)?",
    "answer": "Tim Burton",
    "wrong": [
-    "Ryan Coogler",
-    "Adrian Lyne",
-    "Hal Needham"
+    "Greta Gerwig",
+    "Gore Verbinski",
+    "Lewis Gilbert"
    ],
    "explain": "Batman (1989), directed by Tim Burton. A masked vigilante protects Gotham City. Worldwide gross about $411 million.",
    "difficulty": 3,
@@ -6538,9 +6502,9 @@
    "prompt": "Which film is this? 🦇🃏🎨🏙️",
    "answer": "Batman",
    "wrong": [
-    "Star Wars: The Last Jedi",
-    "Demon Slayer: Kimetsu no Yaiba – The Movie: Mugen Train",
-    "Back to the Future"
+    "E.T. the Extra-Terrestrial",
+    "Deadpool & Wolverine",
+    "Moonraker"
    ],
    "explain": "Batman (1989), directed by Tim Burton. A masked vigilante protects Gotham City. Worldwide gross about $411 million.",
    "difficulty": 2,
@@ -6554,9 +6518,9 @@
    "prompt": "In which year was Indiana Jones and the Temple of Doom released?",
    "answer": "1984",
    "wrong": [
-    "1985",
-    "1982",
-    "1986"
+    "1983",
+    "1981",
+    "1987"
    ],
    "explain": "Indiana Jones and the Temple of Doom (1984), directed by Steven Spielberg. It is the second film about the archaeologist with a whip. Worldwide gross about $333 million.",
    "difficulty": 3,
@@ -6570,9 +6534,9 @@
    "prompt": "Who directed Indiana Jones and the Temple of Doom (1984)?",
    "answer": "Steven Spielberg",
    "wrong": [
-    "Jiaozi",
-    "Aaron Horvath and Michael Jelenic",
-    "Peter Jackson"
+    "Anthony Russo and Joe Russo",
+    "Lewis Gilbert",
+    "David Yates"
    ],
    "explain": "Indiana Jones and the Temple of Doom (1984), directed by Steven Spielberg. It is the second film about the archaeologist with a whip. Worldwide gross about $333 million.",
    "difficulty": 3,
@@ -6586,9 +6550,9 @@
    "prompt": "Which film has the line: \"Fortune and glory, kid.\"",
    "answer": "Indiana Jones and the Temple of Doom",
    "wrong": [
-    "Batman",
-    "The Empire Strikes Back",
-    "Back to the Future"
+    "Back to the Future",
+    "Rain Man",
+    "Return of the Jedi"
    ],
    "explain": "From Indiana Jones and the Temple of Doom (1984).",
    "difficulty": 3,
@@ -6602,8 +6566,8 @@
    "prompt": "Which film is this? 🤠💎🐍⛏️🔥",
    "answer": "Indiana Jones and the Temple of Doom",
    "wrong": [
-    "Avatar: The Way of Water",
-    "Raiders of the Lost Ark",
+    "Rocky",
+    "Harry Potter and the Half-Blood Prince",
     "Pirates of the Caribbean: At World's End"
    ],
    "explain": "Indiana Jones and the Temple of Doom (1984), directed by Steven Spielberg. It is the second film about the archaeologist with a whip. Worldwide gross about $333 million.",
@@ -6618,9 +6582,9 @@
    "prompt": "In which year was Forrest Gump released?",
    "answer": "1994",
    "wrong": [
-    "1991",
+    "1995",
     "1996",
-    "1992"
+    "1991"
    ],
    "explain": "Forrest Gump (1994), directed by Robert Zemeckis. Tom Hanks plays a kind man from Alabama. Worldwide gross about $677 million.",
    "difficulty": 3,
@@ -6634,9 +6598,9 @@
    "prompt": "Who directed Forrest Gump (1994)?",
    "answer": "Robert Zemeckis",
    "wrong": [
-    "Chris Columbus",
-    "Tim Burton",
-    "James Cameron"
+    "Rian Johnson",
+    "Anthony Russo and Joe Russo",
+    "John Lasseter"
    ],
    "explain": "Forrest Gump (1994), directed by Robert Zemeckis. Tom Hanks plays a kind man from Alabama. Worldwide gross about $677 million.",
    "difficulty": 3,
@@ -6647,12 +6611,12 @@
   {
    "id": "quote-forrest-gump",
    "kind": "mc",
-   "prompt": "Which film has the line: \"Life was like a box of chocolates. You never know what you're gonna get.\"",
+   "prompt": "Which film has the line: \"Life was like a box of chocolates.\"",
    "answer": "Forrest Gump",
    "wrong": [
-    "Terminator 2: Judgment Day",
-    "Aladdin",
-    "The Lost World: Jurassic Park"
+    "Titanic",
+    "Men in Black",
+    "Ghost"
    ],
    "explain": "From Forrest Gump (1994).",
    "difficulty": 2,
@@ -6666,9 +6630,9 @@
    "prompt": "Which film is this? 🏃‍♂️🍫🪶🏓🦐",
    "answer": "Forrest Gump",
    "wrong": [
-    "Avatar: Fire and Ash",
-    "The Avengers",
-    "The Empire Strikes Back"
+    "Ghostbusters",
+    "Ne Zha 2",
+    "Star Wars: The Force Awakens"
    ],
    "explain": "Forrest Gump (1994), directed by Robert Zemeckis. Tom Hanks plays a kind man from Alabama. Worldwide gross about $677 million.",
    "difficulty": 2,
@@ -6682,9 +6646,9 @@
    "prompt": "In which year was The Sixth Sense released?",
    "answer": "1999",
    "wrong": [
-    "2001",
+    "1997",
     "1996",
-    "2000"
+    "2001"
    ],
    "explain": "The Sixth Sense (1999), directed by M. Night Shyamalan. Bruce Willis stars with Haley Joel Osment. Worldwide gross about $673 million.",
    "difficulty": 3,
@@ -6698,9 +6662,9 @@
    "prompt": "Who directed The Sixth Sense (1999)?",
    "answer": "M. Night Shyamalan",
    "wrong": [
-    "Robert Zemeckis",
-    "Tim Burton",
-    "Lee Unkrich"
+    "Randal Kleiser",
+    "George Lucas",
+    "Kelsey Mann"
    ],
    "explain": "The Sixth Sense (1999), directed by M. Night Shyamalan. Bruce Willis stars with Haley Joel Osment. Worldwide gross about $673 million.",
    "difficulty": 3,
@@ -6714,9 +6678,9 @@
    "prompt": "Which film has the line: \"I see dead people.\"",
    "answer": "The Sixth Sense",
    "wrong": [
-    "Forrest Gump",
-    "Aladdin",
-    "Men in Black"
+    "Toy Story",
+    "Jurassic Park",
+    "Titanic"
    ],
    "explain": "From The Sixth Sense (1999).",
    "difficulty": 3,
@@ -6730,9 +6694,9 @@
    "prompt": "Which film is this? 👦👻🩺❄️",
    "answer": "The Sixth Sense",
    "wrong": [
-    "Raiders of the Lost Ark",
-    "Independence Day",
-    "Rocky"
+    "Top Gun: Maverick",
+    "Rain Man",
+    "The Lord of the Rings: The Two Towers"
    ],
    "explain": "The Sixth Sense (1999), directed by M. Night Shyamalan. Bruce Willis stars with Haley Joel Osment. Worldwide gross about $673 million.",
    "difficulty": 3,
@@ -6747,8 +6711,8 @@
    "answer": "1997",
    "wrong": [
     "1998",
-    "1995",
-    "1999"
+    "1999",
+    "1994"
    ],
    "explain": "The Lost World: Jurassic Park (1997), directed by Steven Spielberg. It is the sequel to a 1993 dinosaur film. Worldwide gross about $619 million.",
    "difficulty": 3,
@@ -6762,9 +6726,9 @@
    "prompt": "Who directed The Lost World: Jurassic Park (1997)?",
    "answer": "Steven Spielberg",
    "wrong": [
-    "Christopher Nolan",
-    "Andrew Adamson and Kelly Asbury and Conrad Vernon",
-    "Tim Burton"
+    "Irvin Kershner",
+    "M. Night Shyamalan",
+    "Joseph Kosinski"
    ],
    "explain": "The Lost World: Jurassic Park (1997), directed by Steven Spielberg. It is the sequel to a 1993 dinosaur film. Worldwide gross about $619 million.",
    "difficulty": 3,
@@ -6778,9 +6742,9 @@
    "prompt": "Which film is this? 🦖🏝️🚐🏙️",
    "answer": "The Lost World: Jurassic Park",
    "wrong": [
-    "Close Encounters of the Third Kind",
-    "Rocky",
-    "Top Gun: Maverick"
+    "Star Wars: Episode I – The Phantom Menace",
+    "Top Gun: Maverick",
+    "Harry Potter and the Goblet of Fire"
    ],
    "explain": "The Lost World: Jurassic Park (1997), directed by Steven Spielberg. It is the sequel to a 1993 dinosaur film. Worldwide gross about $619 million.",
    "difficulty": 3,
@@ -6794,7 +6758,7 @@
    "prompt": "In which year was Men in Black released?",
    "answer": "1997",
    "wrong": [
-    "1994",
+    "1995",
     "2000",
     "1998"
    ],
@@ -6810,9 +6774,9 @@
    "prompt": "Who directed Men in Black (1997)?",
    "answer": "Barry Sonnenfeld",
    "wrong": [
-    "Christopher Nolan",
-    "Ryan Coogler",
-    "J. J. Abrams"
+    "Roland Emmerich",
+    "Randal Kleiser",
+    "Adrian Lyne"
    ],
    "explain": "Men in Black (1997), directed by Barry Sonnenfeld. Will Smith and Tommy Lee Jones wear black suits. Worldwide gross about $589 million.",
    "difficulty": 3,
@@ -6826,9 +6790,9 @@
    "prompt": "Which film is this? 🕶️👽🔫🗽",
    "answer": "Men in Black",
    "wrong": [
-    "The Dark Knight",
-    "Barbie",
-    "Harry Potter and the Philosopher's Stone"
+    "Harry Potter and the Order of the Phoenix",
+    "Avatar: The Way of Water",
+    "Indiana Jones and the Last Crusade"
    ],
    "explain": "Men in Black (1997), directed by Barry Sonnenfeld. Will Smith and Tommy Lee Jones wear black suits. Worldwide gross about $589 million.",
    "difficulty": 2,
@@ -6843,8 +6807,8 @@
    "answer": "2007",
    "wrong": [
     "2009",
-    "2004",
-    "2005"
+    "2010",
+    "2004"
    ],
    "explain": "Harry Potter and the Order of the Phoenix (2007), directed by David Yates. It is the fifth film about the boy wizard. Worldwide gross about $942 million.",
    "difficulty": 3,
@@ -6858,9 +6822,9 @@
    "prompt": "Who directed Harry Potter and the Order of the Phoenix (2007)?",
    "answer": "David Yates",
    "wrong": [
-    "Jared Bush and Byron Howard",
-    "Kelsey Mann",
-    "Barry Levinson"
+    "Francis Ford Coppola",
+    "Tony Scott",
+    "Robert Zemeckis"
    ],
    "explain": "Harry Potter and the Order of the Phoenix (2007), directed by David Yates. It is the fifth film about the boy wizard. Worldwide gross about $942 million.",
    "difficulty": 3,
@@ -6874,9 +6838,9 @@
    "prompt": "Which film is this? ⚡🦅🏫📜🧙‍♀️",
    "answer": "Harry Potter and the Order of the Phoenix",
    "wrong": [
-    "E.T. the Extra-Terrestrial",
-    "Star Wars: The Last Jedi",
-    "Avatar: The Way of Water"
+    "Jurassic World",
+    "Toy Story 3",
+    "Zootopia 2"
    ],
    "explain": "Harry Potter and the Order of the Phoenix (2007), directed by David Yates. It is the fifth film about the boy wizard. Worldwide gross about $942 million.",
    "difficulty": 2,
@@ -6890,9 +6854,9 @@
    "prompt": "In which year was Harry Potter and the Half-Blood Prince released?",
    "answer": "2009",
    "wrong": [
-    "2011",
+    "2012",
     "2008",
-    "2007"
+    "2011"
    ],
    "explain": "Harry Potter and the Half-Blood Prince (2009), directed by David Yates. It is the sixth film about the boy wizard. Worldwide gross about $934 million.",
    "difficulty": 3,
@@ -6906,9 +6870,9 @@
    "prompt": "Who directed Harry Potter and the Half-Blood Prince (2009)?",
    "answer": "David Yates",
    "wrong": [
-    "John Landis",
-    "Aaron Horvath and Michael Jelenic",
-    "M. Night Shyamalan"
+    "George Lucas",
+    "Lewis Gilbert",
+    "Richard Marquand"
    ],
    "explain": "Harry Potter and the Half-Blood Prince (2009), directed by David Yates. It is the sixth film about the boy wizard. Worldwide gross about $934 million.",
    "difficulty": 3,
@@ -6922,9 +6886,9 @@
    "prompt": "Which film is this? ⚡📕🧪🏰",
    "answer": "Harry Potter and the Half-Blood Prince",
    "wrong": [
-    "Furious 7",
-    "Independence Day",
-    "Pirates of the Caribbean: Dead Man's Chest"
+    "Ne Zha 2",
+    "Avatar",
+    "Avengers: Infinity War"
    ],
    "explain": "Harry Potter and the Half-Blood Prince (2009), directed by David Yates. It is the sixth film about the boy wizard. Worldwide gross about $934 million.",
    "difficulty": 2,
@@ -6938,9 +6902,9 @@
    "prompt": "In which year was Jurassic World released?",
    "answer": "2015",
    "wrong": [
-    "2014",
-    "2012",
-    "2017"
+    "2017",
+    "2016",
+    "2012"
    ],
    "explain": "Jurassic World (2015), directed by Colin Trevorrow. It is set 22 years after the first park film. Worldwide gross about $1.67 billion.",
    "difficulty": 3,
@@ -6954,9 +6918,9 @@
    "prompt": "Who directed Jurassic World (2015)?",
    "answer": "Colin Trevorrow",
    "wrong": [
-    "Barry Sonnenfeld",
-    "John Lasseter",
-    "Anthony Russo and Joe Russo"
+    "Ivan Reitman",
+    "Barry Levinson",
+    "Chris Columbus"
    ],
    "explain": "Jurassic World (2015), directed by Colin Trevorrow. It is set 22 years after the first park film. Worldwide gross about $1.67 billion.",
    "difficulty": 3,
@@ -6970,9 +6934,9 @@
    "prompt": "Which film is this? 🦖🏝️🏍️🦕",
    "answer": "Jurassic World",
    "wrong": [
-    "E.T. the Extra-Terrestrial",
-    "Avatar: Fire and Ash",
-    "Frozen"
+    "Enter the Dragon",
+    "Inside Out 2",
+    "The Super Mario Bros. Movie"
    ],
    "explain": "Jurassic World (2015), directed by Colin Trevorrow. It is set 22 years after the first park film. Worldwide gross about $1.67 billion.",
    "difficulty": 2,
@@ -6986,9 +6950,9 @@
    "prompt": "In which year was The Lion King (2019) released?",
    "answer": "2019",
    "wrong": [
-    "2020",
-    "2018",
-    "2016"
+    "2021",
+    "2017",
+    "2020"
    ],
    "explain": "The Lion King (2019) (2019), directed by Jon Favreau. It is a remake of a 1994 animated film about a lion cub. Worldwide gross about $1.66 billion.",
    "difficulty": 2,
@@ -7002,9 +6966,9 @@
    "prompt": "Who directed The Lion King (2019) (2019)?",
    "answer": "Jon Favreau",
    "wrong": [
-    "Gore Verbinski",
-    "David Yates",
-    "John Lasseter"
+    "Michael Bay",
+    "Greta Gerwig",
+    "Joss Whedon"
    ],
    "explain": "The Lion King (2019) (2019), directed by Jon Favreau. It is a remake of a 1994 animated film about a lion cub. Worldwide gross about $1.66 billion.",
    "difficulty": 2,
@@ -7018,9 +6982,9 @@
    "prompt": "Which film is this? 🦁👑🐗🌅💻",
    "answer": "The Lion King (2019)",
    "wrong": [
-    "Avengers: Infinity War",
-    "Raiders of the Lost Ark",
-    "Harry Potter and the Deathly Hallows – Part 2"
+    "Rocky",
+    "Harry Potter and the Goblet of Fire",
+    "Grease"
    ],
    "explain": "The Lion King (2019) (2019), directed by Jon Favreau. It is a remake of a 1994 animated film about a lion cub. Worldwide gross about $1.66 billion.",
    "difficulty": 1,
@@ -7034,8 +6998,8 @@
    "prompt": "In which year was Furious 7 released?",
    "answer": "2015",
    "wrong": [
-    "2016",
-    "2013",
+    "2014",
+    "2018",
     "2017"
    ],
    "explain": "Furious 7 (2015), directed by James Wan. Dom Toretto's crew are hunted by a vengeful assassin. Worldwide gross about $1.52 billion.",
@@ -7050,9 +7014,9 @@
    "prompt": "Who directed Furious 7 (2015)?",
    "answer": "James Wan",
    "wrong": [
-    "Aaron Horvath and Michael Jelenic",
-    "Mike Newell",
-    "Ivan Reitman"
+    "Andrew Adamson and Kelly Asbury and Conrad Vernon",
+    "Kelsey Mann",
+    "J. J. Abrams"
    ],
    "explain": "Furious 7 (2015), directed by James Wan. Dom Toretto's crew are hunted by a vengeful assassin. Worldwide gross about $1.52 billion.",
    "difficulty": 3,
@@ -7066,8 +7030,8 @@
    "prompt": "Which film has the line: \"I don't have friends. I got family.\"",
    "answer": "Furious 7",
    "wrong": [
-    "Avengers: Endgame",
-    "Captain America: Civil War",
+    "The Avengers",
+    "Toy Story 3",
     "Frozen II"
    ],
    "explain": "From Furious 7 (2015).",
@@ -7082,9 +7046,9 @@
    "prompt": "Which film is this? 🚗🪂🏙️🏎️",
    "answer": "Furious 7",
    "wrong": [
-    "The Lion King (2019)",
-    "Zootopia 2",
-    "Grease"
+    "Pirates of the Caribbean: Dead Man's Chest",
+    "Jurassic World",
+    "The Avengers"
    ],
    "explain": "Furious 7 (2015), directed by James Wan. Dom Toretto's crew are hunted by a vengeful assassin. Worldwide gross about $1.52 billion.",
    "difficulty": 2,
@@ -7098,7 +7062,7 @@
    "prompt": "In which year was Frozen II released?",
    "answer": "2019",
    "wrong": [
-    "2018",
+    "2022",
     "2016",
     "2020"
    ],
@@ -7114,9 +7078,9 @@
    "prompt": "Who directed Frozen II (2019)?",
    "answer": "Jennifer Lee and Chris Buck",
    "wrong": [
-    "Jared Bush and Byron Howard",
-    "Barry Sonnenfeld",
-    "Anthony Russo and Joe Russo"
+    "Roger Allers and Rob Minkoff",
+    "Ivan Reitman",
+    "Roland Emmerich"
    ],
    "explain": "Frozen II (2019), directed by Jennifer Lee and Chris Buck. Elsa, Anna, Olaf and Kristoff journey north. Worldwide gross about $1.45 billion.",
    "difficulty": 2,
@@ -7130,9 +7094,9 @@
    "prompt": "Which film has the line: \"Some things never change.\"",
    "answer": "Frozen II",
    "wrong": [
-    "The Avengers",
-    "Avengers: Endgame",
-    "Jurassic World"
+    "The Lion King (2019)",
+    "Toy Story 3",
+    "Transformers: Age of Extinction"
    ],
    "explain": "From Frozen II (2019).",
    "difficulty": 1,
@@ -7146,9 +7110,9 @@
    "prompt": "Which film is this? ❄️🍂🌊🐴👭",
    "answer": "Frozen II",
    "wrong": [
-    "Spider-Man: No Way Home",
-    "Shrek 2",
-    "Star Wars: The Last Jedi"
+    "Ghostbusters",
+    "Barbie",
+    "Avengers: Age of Ultron"
    ],
    "explain": "Frozen II (2019), directed by Jennifer Lee and Chris Buck. Elsa, Anna, Olaf and Kristoff journey north. Worldwide gross about $1.45 billion.",
    "difficulty": 1,
@@ -7163,8 +7127,8 @@
    "answer": "2015",
    "wrong": [
     "2018",
-    "2013",
-    "2014"
+    "2016",
+    "2012"
    ],
    "explain": "Avengers: Age of Ultron (2015), directed by Joss Whedon. The Avengers fight the robot Ultron. Worldwide gross about $1.41 billion.",
    "difficulty": 3,
@@ -7178,9 +7142,9 @@
    "prompt": "Who directed Avengers: Age of Ultron (2015)?",
    "answer": "Joss Whedon",
    "wrong": [
-    "Andrew Adamson and Kelly Asbury and Conrad Vernon",
-    "Richard Marquand",
-    "George Lucas"
+    "George Lucas",
+    "Chris Buck and Jennifer Lee",
+    "John Musker and Ron Clements"
    ],
    "explain": "Avengers: Age of Ultron (2015), directed by Joss Whedon. The Avengers fight the robot Ultron. Worldwide gross about $1.41 billion.",
    "difficulty": 3,
@@ -7194,9 +7158,9 @@
    "prompt": "Which film is this? 🤖🦸‍♂️🏙️🌋",
    "answer": "Avengers: Age of Ultron",
    "wrong": [
-    "Men in Black",
-    "Ne Zha 2",
-    "Jaws"
+    "Harry Potter and the Order of the Phoenix",
+    "Mission: Impossible 2",
+    "Top Gun"
    ],
    "explain": "Avengers: Age of Ultron (2015), directed by Joss Whedon. The Avengers fight the robot Ultron. Worldwide gross about $1.41 billion.",
    "difficulty": 2,
@@ -7210,9 +7174,9 @@
    "prompt": "In which year was Black Panther released?",
    "answer": "2018",
    "wrong": [
-    "2015",
+    "2021",
     "2019",
-    "2021"
+    "2020"
    ],
    "explain": "Black Panther (2018), directed by Ryan Coogler. T'Challa rules the hidden African nation of Wakanda. Worldwide gross about $1.35 billion.",
    "difficulty": 3,
@@ -7226,9 +7190,9 @@
    "prompt": "Who directed Black Panther (2018)?",
    "answer": "Ryan Coogler",
    "wrong": [
-    "Joss Whedon",
-    "Lewis Gilbert",
-    "Rian Johnson"
+    "Haruo Sotozaki",
+    "John Landis",
+    "Richard Donner"
    ],
    "explain": "Black Panther (2018), directed by Ryan Coogler. T'Challa rules the hidden African nation of Wakanda. Worldwide gross about $1.35 billion.",
    "difficulty": 3,
@@ -7242,9 +7206,9 @@
    "prompt": "Which film has the line: \"Wakanda forever!\"",
    "answer": "Black Panther",
    "wrong": [
-    "Avengers: Endgame",
-    "Harry Potter and the Deathly Hallows – Part 2",
-    "Furious 7"
+    "Avengers: Infinity War",
+    "Star Wars: The Last Jedi",
+    "Toy Story 3"
    ],
    "explain": "From Black Panther (2018).",
    "difficulty": 2,
@@ -7258,9 +7222,9 @@
    "prompt": "Which film is this? 🐆👑💎🌍",
    "answer": "Black Panther",
    "wrong": [
-    "Top Gun: Maverick",
-    "Avatar: Fire and Ash",
-    "The Lion King (2019)"
+    "Rain Man",
+    "Batman",
+    "Spider-Man: No Way Home"
    ],
    "explain": "Black Panther (2018), directed by Ryan Coogler. T'Challa rules the hidden African nation of Wakanda. Worldwide gross about $1.35 billion.",
    "difficulty": 2,
@@ -7275,8 +7239,8 @@
    "answer": "2025",
    "wrong": [
     "2023",
-    "2022",
-    "2024"
+    "2024",
+    "2022"
    ],
    "explain": "Zootopia 2 (2025), directed by Jared Bush and Byron Howard. Judy Hopps and Nick Wilde take on a new case. Worldwide gross about $1.87 billion.",
    "difficulty": 2,
@@ -7290,9 +7254,9 @@
    "prompt": "Who directed Zootopia 2 (2025)?",
    "answer": "Jared Bush and Byron Howard",
    "wrong": [
-    "Robert Zemeckis",
-    "Randal Kleiser",
-    "Jiaozi"
+    "Roland Emmerich",
+    "Peter Jackson",
+    "Aaron Horvath and Michael Jelenic"
    ],
    "explain": "Zootopia 2 (2025), directed by Jared Bush and Byron Howard. Judy Hopps and Nick Wilde take on a new case. Worldwide gross about $1.87 billion.",
    "difficulty": 2,
@@ -7306,9 +7270,9 @@
    "prompt": "Which film is this? 🐰🦊🐍🚓🏙️",
    "answer": "Zootopia 2",
    "wrong": [
-    "Avengers: Endgame",
-    "Avatar",
-    "Shrek 2"
+    "Avengers: Infinity War",
+    "The Lion King",
+    "Toy Story 3"
    ],
    "explain": "Zootopia 2 (2025), directed by Jared Bush and Byron Howard. Judy Hopps and Nick Wilde take on a new case. Worldwide gross about $1.87 billion.",
    "difficulty": 1,
@@ -7322,8 +7286,8 @@
    "prompt": "In which year was Top Gun: Maverick released?",
    "answer": "2022",
    "wrong": [
-    "2021",
-    "2023",
+    "2024",
+    "2025",
     "2019"
    ],
    "explain": "Top Gun: Maverick (2022), directed by Joseph Kosinski. Tom Cruise returns as Pete Mitchell more than 30 years later. Worldwide gross about $1.50 billion.",
@@ -7338,9 +7302,9 @@
    "prompt": "Who directed Top Gun: Maverick (2022)?",
    "answer": "Joseph Kosinski",
    "wrong": [
-    "Greta Gerwig",
-    "Kelsey Mann",
-    "Haruo Sotozaki"
+    "Hal Needham",
+    "Barry Levinson",
+    "Aaron Horvath and Michael Jelenic"
    ],
    "explain": "Top Gun: Maverick (2022), directed by Joseph Kosinski. Tom Cruise returns as Pete Mitchell more than 30 years later. Worldwide gross about $1.50 billion.",
    "difficulty": 3,
@@ -7354,9 +7318,9 @@
    "prompt": "Which film has the line: \"It's not the plane, it's the pilot.\"",
    "answer": "Top Gun: Maverick",
    "wrong": [
-    "Inside Out 2",
+    "Avatar: The Way of Water",
     "Deadpool & Wolverine",
-    "Avatar: The Way of Water"
+    "Barbie"
    ],
    "explain": "From Top Gun: Maverick (2022).",
    "difficulty": 2,
@@ -7370,9 +7334,9 @@
    "prompt": "Which film is this? ✈️😎🏈🎯",
    "answer": "Top Gun: Maverick",
    "wrong": [
-    "The Empire Strikes Back",
-    "Spider-Man: No Way Home",
-    "Return of the Jedi"
+    "Avatar",
+    "Star Wars: Episode I – The Phantom Menace",
+    "Shrek 2"
    ],
    "explain": "Top Gun: Maverick (2022), directed by Joseph Kosinski. Tom Cruise returns as Pete Mitchell more than 30 years later. Worldwide gross about $1.50 billion.",
    "difficulty": 2,
@@ -7402,9 +7366,9 @@
    "prompt": "Who directed Avatar: Fire and Ash (2025)?",
    "answer": "James Cameron",
    "wrong": [
-    "Joseph Kosinski",
+    "Jared Bush and Byron Howard",
     "Lewis Gilbert",
-    "Francis Ford Coppola"
+    "Gore Verbinski"
    ],
    "explain": "Avatar: Fire and Ash (2025), directed by James Cameron. It is a sequel to The Way of Water. Worldwide gross about $1.49 billion.",
    "difficulty": 3,
@@ -7418,9 +7382,9 @@
    "prompt": "Which film is this? 🔥💙🌋🌊🐉",
    "answer": "Avatar: Fire and Ash",
    "wrong": [
-    "Ne Zha 2",
-    "Black Panther",
-    "Batman"
+    "Harry Potter and the Half-Blood Prince",
+    "Smokey and the Bandit",
+    "Mission: Impossible 2"
    ],
    "explain": "Avatar: Fire and Ash (2025), directed by James Cameron. It is a sequel to The Way of Water. Worldwide gross about $1.49 billion.",
    "difficulty": 3,
@@ -7434,9 +7398,9 @@
    "prompt": "In which year was The Super Mario Bros. Movie released?",
    "answer": "2023",
    "wrong": [
+    "2024",
     "2020",
-    "2022",
-    "2025"
+    "2021"
    ],
    "explain": "The Super Mario Bros. Movie (2023), directed by Aaron Horvath and Michael Jelenic. Mario and Luigi fall into a world of mushrooms and Bowser. Worldwide gross about $1.36 billion.",
    "difficulty": 2,
@@ -7450,9 +7414,9 @@
    "prompt": "Who directed The Super Mario Bros. Movie (2023)?",
    "answer": "Aaron Horvath and Michael Jelenic",
    "wrong": [
-    "Haruo Sotozaki",
-    "John Woo",
-    "Joseph Kosinski"
+    "David Yates",
+    "John Lasseter",
+    "Hal Needham"
    ],
    "explain": "The Super Mario Bros. Movie (2023), directed by Aaron Horvath and Michael Jelenic. Mario and Luigi fall into a world of mushrooms and Bowser. Worldwide gross about $1.36 billion.",
    "difficulty": 2,
@@ -7466,9 +7430,9 @@
    "prompt": "Which film is this? 🍄🧱🐢👑🏎️",
    "answer": "The Super Mario Bros. Movie",
    "wrong": [
-    "Spider-Man: No Way Home",
-    "Avatar",
-    "Avengers: Age of Ultron"
+    "Furious 7",
+    "Frozen II",
+    "Zootopia 2"
    ],
    "explain": "The Super Mario Bros. Movie (2023), directed by Aaron Horvath and Michael Jelenic. Mario and Luigi fall into a world of mushrooms and Bowser. Worldwide gross about $1.36 billion.",
    "difficulty": 1,
@@ -7482,9 +7446,9 @@
    "prompt": "In which year was Deadpool & Wolverine released?",
    "answer": "2024",
    "wrong": [
-    "2023",
     "2025",
-    "2022"
+    "2021",
+    "2023"
    ],
    "explain": "Deadpool & Wolverine (2024), directed by Shawn Levy. A wisecracking mercenary teams up with Wolverine. Worldwide gross about $1.34 billion.",
    "difficulty": 3,
@@ -7498,9 +7462,9 @@
    "prompt": "Who directed Deadpool & Wolverine (2024)?",
    "answer": "Shawn Levy",
    "wrong": [
-    "John Landis",
-    "Peter Jackson",
-    "J. J. Abrams"
+    "Rian Johnson",
+    "James Wan",
+    "Barry Levinson"
    ],
    "explain": "Deadpool & Wolverine (2024), directed by Shawn Levy. A wisecracking mercenary teams up with Wolverine. Worldwide gross about $1.34 billion.",
    "difficulty": 3,
@@ -7515,8 +7479,8 @@
    "answer": "Deadpool & Wolverine",
    "wrong": [
     "Star Wars: Episode I – The Phantom Menace",
-    "Raiders of the Lost Ark",
-    "Pirates of the Caribbean: Dead Man's Chest"
+    "Black Panther",
+    "Harry Potter and the Deathly Hallows – Part 2"
    ],
    "explain": "Deadpool & Wolverine (2024), directed by Shawn Levy. A wisecracking mercenary teams up with Wolverine. Worldwide gross about $1.34 billion.",
    "difficulty": 3,

@@ -6,6 +6,9 @@
  "kids": true,
  "version": 1,
  "notice": "Not for real-world identification.",
+ "imgPrompt": "Which of these is {aName}?",
+ "nameImgPrompt": "Which snake is this?",
+ "tfImgPrompt": "This snake is {aName}.",
  "leakExempt": [
   "snake",
   "snakes"
@@ -15,7 +18,9 @@
    "type": "bool",
    "label": "Venomous",
    "yes": "Venomous",
-   "no": "Not venomous"
+   "no": "Not venomous",
+   "askBool": "Which of these snakes is venomous?",
+   "stmt": "The {lname} is venomous."
   },
   "danger": {
    "type": "cat",
@@ -25,22 +30,33 @@
     "Mildly venomous",
     "Dangerous",
     "Potentially deadly"
-   ]
+   ],
+   "ask": "How dangerous is the {lname} to people?",
+   "askReverse": "Which of these snakes is rated \"{lvalue}\" to people?",
+   "stmt": "The {lname} is rated \"{lvalue}\" to people."
   },
   "lengthM": {
    "type": "num",
    "label": "Typical length",
    "unit": "m",
-   "higherLabel": "Longer"
+   "higherLabel": "Longer",
+   "askHigh": "Which of these snakes is usually the longest?",
+   "askLow": "Which of these snakes is usually the shortest?"
   },
   "region": {
    "type": "cat",
-   "label": "Found in"
+   "label": "Found in",
+   "ask": "Where does the {lname} live?",
+   "askReverse": "Which of these snakes lives in {value}?",
+   "stmt": "The {lname} lives in {value}.",
+   "exclusive": false
   },
   "status": {
    "type": "cat",
    "label": "Conservation status (IUCN)",
-   "hard": true
+   "ask": "What is the IUCN conservation status of the {lname}?",
+   "askReverse": "Which of these is listed as \"{value}\" by the IUCN?",
+   "stmt": "The {lname} is listed as \"{value}\" by the IUCN."
   }
  },
  "items": [
@@ -77,7 +93,7 @@
     "One bite holds enough venom to kill many adult humans.",
     "It is said to have the most toxic venom of any land snake.",
     "The answer has 2 words (6, 6 letters).",
-    "It starts with the letter I."
+    "Its first letter is I."
    ],
    "media": {
     "img": [
@@ -138,7 +154,7 @@
     "It is the longest venomous snake in Australia.",
     "Its inland cousin has the most toxic venom of any land snake.",
     "The answer has 2 words (7, 6 letters).",
-    "It starts with the letter C."
+    "Its first letter is C."
    ],
    "media": {
     "img": [
@@ -200,25 +216,25 @@
     "Its venom has the second most toxic rating of any land snake.",
     "It causes the most snakebite deaths in Australia.",
     "The answer has 3 words (7, 5, 5 letters).",
-    "It starts with the letter E."
+    "Its first letter is E."
    ],
    "media": {
     "img": [
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/86409111/medium.jpg",
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/e/e6/Pseudonaja_textilis_-_Werrington_Sydney_2023._g.jpg/500px-Pseudonaja_textilis_-_Werrington_Sydney_2023._g.jpg",
       "w": 500,
       "h": 375,
-      "credit": "Matt",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/86409111"
+      "credit": "Xyxyzyz",
+      "license": "CC0 1.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Pseudonaja_textilis_-_Werrington_Sydney_2023._g.jpg"
      },
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/94107713/medium.jpeg",
-      "w": 500,
-      "h": 366,
-      "credit": "Rod Lowther",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/94107713"
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/d/de/Eastern_Brown_Snake_-_Kempsey_NSW.jpg/330px-Eastern_Brown_Snake_-_Kempsey_NSW.jpg",
+      "w": 330,
+      "h": 496,
+      "credit": "Poyt448 Peter Woodard",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Eastern_Brown_Snake_-_Kempsey_NSW.jpg"
      }
     ]
    },
@@ -252,7 +268,7 @@
     "It belongs to the brown snake group.",
     "It is a highly venomous snake of Western Australia.",
     "The answer is one word of 6 letters.",
-    "It starts with the letter D."
+    "Its first letter is D."
    ],
    "media": {
     "img": [
@@ -304,10 +320,18 @@
     "It likes swamps and wetlands of southern Australia.",
     "Many are banded yellow and dark, like a big cat.",
     "The answer has 2 words (5, 5 letters).",
-    "It starts with the letter T."
+    "Its first letter is T."
    ],
    "media": {
     "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/e/e5/Notechis_scutatus_260523890.jpg/500px-Notechis_scutatus_260523890.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Max Tibby",
+      "license": "CC0 1.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Notechis_scutatus_260523890.jpg"
+     },
      {
       "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/127663785/medium.jpeg",
       "w": 500,
@@ -315,14 +339,6 @@
       "credit": "Bruce Deagle",
       "license": "CC BY 4.0",
       "page": "https://www.inaturalist.org/photos/127663785"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/55158068/medium.jpeg",
-      "w": 342,
-      "h": 500,
-      "credit": "Peter Crowcroft",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/55158068"
      }
     ]
    },
@@ -356,7 +372,7 @@
     "It can be dangerous to people.",
     "Cane toads have caused declines in some populations.",
     "The answer has 4 words (3, 7, 5, 5 letters).",
-    "It starts with the letter R."
+    "Its first letter is R."
    ],
    "media": {
     "img": [
@@ -420,7 +436,7 @@
     "Its bite or sting can kill a person.",
     "It eats other snakes, even venomous ones.",
     "The answer has 2 words (5, 5 letters).",
-    "It starts with the letter M."
+    "Its first letter is M."
    ],
    "media": {
     "img": [
@@ -477,7 +493,7 @@
     "It lies buried in leaf litter waiting for prey.",
     "Its name sounds like it should be a viper.",
     "The answer has 3 words (6, 5, 5 letters).",
-    "It starts with the letter C."
+    "Its first letter is C."
    ],
    "media": {
     "img": [
@@ -537,7 +553,7 @@
     "It shares a name with an unrelated North American pit viper.",
     "Its head is often coppery brown.",
     "The answer has 2 words (8, 10 letters).",
-    "It starts with the letter L."
+    "Its first letter is L."
    ],
    "media": {
     "img": [
@@ -597,7 +613,7 @@
     "It can be dangerous to people.",
     "Its common name describes its bumpy skin.",
     "The answer has 3 words (5, 6, 5 letters).",
-    "It starts with the letter R."
+    "Its first letter is R."
    ],
    "media": {
     "img": [
@@ -657,7 +673,7 @@
     "Its bite is only mildly venomous to people.",
     "Its name repeats a word, joined by a hyphen.",
     "The answer has 2 words (5, 5 letters).",
-    "It starts with the letter B."
+    "Its first letter is B."
    ],
    "media": {
     "img": [
@@ -717,10 +733,26 @@
     "Its blotched pattern looks like a woven rug.",
     "It is a common non-venomous constrictor in Australia.",
     "The answer has 2 words (6, 6 letters).",
-    "It starts with the letter C."
+    "Its first letter is C."
    ],
    "media": {
     "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/f/f5/Morelia_spilota_variegata_2.jpg/500px-Morelia_spilota_variegata_2.jpg",
+      "w": 500,
+      "h": 368,
+      "credit": "User:Haplochromis",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Morelia_spilota_variegata_2.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/0/0b/Australian-Carpet-Python.jpg/500px-Australian-Carpet-Python.jpg",
+      "w": 500,
+      "h": 540,
+      "credit": "Amos T Fairchild",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Australian-Carpet-Python.jpg"
+     },
      {
       "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/435009120/medium.jpeg",
       "w": 477,
@@ -728,22 +760,6 @@
       "credit": "Ruth Palsson",
       "license": "CC BY-SA 4.0",
       "page": "https://www.inaturalist.org/photos/435009120"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/158055900/medium.jpg",
-      "w": 500,
-      "h": 333,
-      "credit": "dhfischer",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/158055900"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/735720848/medium.jpg",
-      "w": 500,
-      "h": 375,
-      "credit": "Scott W. Gavins",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/735720848"
      }
     ]
    },
@@ -774,7 +790,7 @@
     "Its black scales carry cream spots in rosette-like clusters.",
     "It is named after a shape found on playing cards.",
     "The answer has 2 words (7, 6 letters).",
-    "It starts with the letter D."
+    "Its first letter is D."
    ],
    "media": {
     "img": [
@@ -832,7 +848,7 @@
     "It is harmless to people.",
     "It lives in rainforest in far north Queensland.",
     "The answer has 2 words (5, 6 letters).",
-    "It starts with the letter S."
+    "Its first letter is S."
    ],
    "media": {
     "img": [
@@ -889,7 +905,7 @@
     "It has no bold pattern at all.",
     "It is named after the colour of a fruit used for oil.",
     "The answer has 2 words (5, 6 letters).",
-    "It starts with the letter O."
+    "Its first letter is O."
    ],
    "media": {
     "img": [
@@ -947,7 +963,7 @@
     "It is harmless to people.",
     "Its body is banded in cream and brown.",
     "The answer has 3 words (5, 6, 6 letters).",
-    "It starts with the letter B."
+    "Its first letter is B."
    ],
    "media": {
     "img": [
@@ -1010,7 +1026,7 @@
     "It is harmless to people.",
     "Its name is four letters, from an Aboriginal language.",
     "The answer is one word of 4 letters.",
-    "It starts with the letter W."
+    "Its first letter is W."
    ],
    "media": {
     "img": [
@@ -1029,6 +1045,7 @@
   {
    "id": "childrens-python",
    "name": "Children's python",
+   "lname": "Children's python",
    "sci": "Antaresia childreni",
    "group": "python",
    "facts": {
@@ -1054,7 +1071,7 @@
     "It is a popular beginner's pet in Australia.",
     "Its name sounds as if it is meant for kids.",
     "The answer has 2 words (9, 6 letters).",
-    "It starts with the letter C."
+    "Its first letter is C."
    ],
    "media": {
     "img": [
@@ -1113,7 +1130,7 @@
     "It is harmless to people.",
     "Its pale body is covered in dark blotches.",
     "The answer has 2 words (7, 6 letters).",
-    "It starts with the letter S."
+    "Its first letter is S."
    ],
    "media": {
     "img": [
@@ -1172,10 +1189,18 @@
     "It is harmless to people.",
     "It looks almost identical to a South American boa.",
     "The answer has 3 words (5, 4, 6 letters).",
-    "It starts with the letter G."
+    "Its first letter is G."
    ],
    "media": {
     "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/4/44/M._viridis.jpg/500px-M._viridis.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "TarnishedPath",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:M._viridis.jpg"
+     },
      {
       "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/56450745/medium.jpg",
       "w": 500,
@@ -1191,14 +1216,6 @@
       "credit": "Bryce Watts-Parker",
       "license": "CC BY 4.0",
       "page": "https://www.inaturalist.org/photos/435259669"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/725194064/medium.jpg",
-      "w": 500,
-      "h": 375,
-      "credit": "no rights reserved",
-      "license": "CC0 1.0",
-      "page": "https://www.inaturalist.org/photos/725194064"
      }
     ]
    },
@@ -1232,7 +1249,7 @@
     "It is found in Australia.",
     "It is harmless to people.",
     "The answer has 3 words (6, 4, 5 letters).",
-    "It starts with the letter C."
+    "Its first letter is C."
    ],
    "media": {
     "img": [
@@ -1289,7 +1306,7 @@
     "Its bite is only mildly venomous to people.",
     "It wiped out most of Guam's forest birds.",
     "The answer has 3 words (5, 4, 5 letters).",
-    "It starts with the letter B."
+    "Its first letter is B."
    ],
    "media": {
     "img": [
@@ -1352,7 +1369,7 @@
     "It is often confused with the venomous rough-scaled snake.",
     "Its scales have ridges, a little like the bottom of a boat.",
     "The answer is one word of 8 letters.",
-    "It starts with the letter K."
+    "Its first letter is K."
    ],
    "media": {
     "img": [
@@ -1412,7 +1429,7 @@
     "It has a paddle-shaped tail.",
     "It lives in shallow tropical coastal waters.",
     "The answer has 3 words (6, 3, 5 letters).",
-    "It starts with the letter B."
+    "Its first letter is B."
    ],
    "media": {
     "img": [
@@ -1470,7 +1487,7 @@
     "Typical length: about 80 cm.",
     "It can be dangerous to people.",
     "The answer has 4 words (6, 7, 3, 5 letters).",
-    "It starts with the letter Y."
+    "Its first letter is Y."
    ],
    "media": {
     "img": [
@@ -1526,7 +1543,7 @@
     "Typical length: about 1.5 m.",
     "It can be dangerous to people.",
     "The answer has 3 words (5, 3, 5 letters).",
-    "It starts with the letter O."
+    "Its first letter is O."
    ],
    "media": {
     "img": [
@@ -1589,10 +1606,26 @@
     "It eats mostly other snakes.",
     "It is the longest venomous snake in the world.",
     "The answer has 2 words (4, 5 letters).",
-    "It starts with the letter K."
+    "Its first letter is K."
    ],
    "media": {
     "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/0/05/Ophiophagus_hannah_381373252.jpg/500px-Ophiophagus_hannah_381373252.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Max Tibby",
+      "license": "CC0 1.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Ophiophagus_hannah_381373252.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/4/4d/12_-_The_Mystical_King_Cobra_and_Coffee_Forests.jpg/500px-12_-_The_Mystical_King_Cobra_and_Coffee_Forests.jpg",
+      "w": 500,
+      "h": 374,
+      "credit": "Michael Allen Smith from Seattle, USA",
+      "license": "CC BY-SA 2.0",
+      "page": "https://commons.wikimedia.org/wiki/File:12_-_The_Mystical_King_Cobra_and_Coffee_Forests.jpg"
+     },
      {
       "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/157899882/medium.jpg",
       "w": 400,
@@ -1600,22 +1633,6 @@
       "credit": "Lawrence Hylton",
       "license": "CC BY 4.0",
       "page": "https://www.inaturalist.org/photos/157899882"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/241177516/medium.jpeg",
-      "w": 375,
-      "h": 500,
-      "credit": "Lawrence Hylton",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/241177516"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/122692917/medium.jpg",
-      "w": 375,
-      "h": 500,
-      "credit": "Lawrence Hylton",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/122692917"
      }
     ]
    },
@@ -1624,6 +1641,7 @@
   {
    "id": "indian-cobra",
    "name": "Indian cobra",
+   "lname": "Indian cobra",
    "alt": [
     "spectacled cobra"
    ],
@@ -1653,10 +1671,26 @@
     "The back of its hood has a mark like a pair of glasses.",
     "It is a hooded snake from South Asia.",
     "The answer has 2 words (6, 5 letters).",
-    "It starts with the letter I."
+    "Its first letter is I."
    ],
    "media": {
     "img": [
+     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/7/7a/Cobra_hood.jpg",
+      "w": 500,
+      "h": 830,
+      "credit": "Saleem Hameed",
+      "license": "CC BY 2.5",
+      "page": "https://commons.wikimedia.org/wiki/File:Cobra_hood.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/8/84/Indian_Cobra%2C_crop.jpg/500px-Indian_Cobra%2C_crop.jpg",
+      "w": 500,
+      "h": 491,
+      "credit": "Pavan Kumar N",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Indian_Cobra,_crop.jpg"
+     },
      {
       "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/89762452/medium.jpg",
       "w": 400,
@@ -1664,22 +1698,6 @@
       "credit": "Chayant Gonsalves",
       "license": "CC BY 4.0",
       "page": "https://www.inaturalist.org/photos/89762452"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/169465348/medium.jpeg",
-      "w": 500,
-      "h": 333,
-      "credit": "Aravinth",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/169465348"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/107288826/medium.jpeg",
-      "w": 375,
-      "h": 500,
-      "credit": "Chayant Gonsalves",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/107288826"
      }
     ]
    },
@@ -1713,7 +1731,7 @@
     "The mark on its hood is a single ring.",
     "Its name refers to a one-lens eyeglass.",
     "The answer has 2 words (8, 5 letters).",
-    "It starts with the letter M."
+    "Its first letter is M."
    ],
    "media": {
     "img": [
@@ -1773,7 +1791,7 @@
     "It is glossy black with thin white crossbands.",
     "Its name is a short word starting with K.",
     "The answer has 2 words (6, 5 letters).",
-    "It starts with the letter C."
+    "Its first letter is C."
    ],
    "media": {
     "img": [
@@ -1826,7 +1844,7 @@
     "Its bite or sting can kill a person.",
     "It eats other snakes.",
     "The answer has 2 words (6, 5 letters).",
-    "It starts with the letter B."
+    "Its first letter is B."
    ],
    "media": {
     "img": [
@@ -1861,6 +1879,7 @@
   {
    "id": "russells-viper",
    "name": "Russell's viper",
+   "lname": "Russell's viper",
    "sci": "Daboia russelii",
    "group": "viper",
    "facts": {
@@ -1885,7 +1904,7 @@
     "Its bite or sting can kill a person.",
     "Its back has three rows of dark spots like chain links.",
     "The answer has 2 words (8, 5 letters).",
-    "It starts with the letter R."
+    "Its first letter is R."
    ],
    "media": {
     "img": [
@@ -1932,7 +1951,7 @@
     "Its bite or sting can kill a person.",
     "Its name describes a toothed cutting tool.",
     "The answer has 3 words (3, 6, 5 letters).",
-    "It starts with the letter S."
+    "Its first letter is S."
    ],
    "media": {
     "img": [
@@ -1967,6 +1986,7 @@
   {
    "id": "malayan-pit-viper",
    "name": "Malayan pit viper",
+   "lname": "Malayan pit viper",
    "sci": "Calloselasma rhodostoma",
    "group": "viper",
    "facts": {
@@ -1989,7 +2009,7 @@
     "Its back has dark triangles along each side.",
     "It is named after a South-East Asian peninsula.",
     "The answer has 3 words (7, 3, 5 letters).",
-    "It starts with the letter M."
+    "Its first letter is M."
    ],
    "media": {
     "img": [
@@ -2024,6 +2044,7 @@
   {
    "id": "waglers-pit-viper",
    "name": "Wagler's pit viper",
+   "lname": "Wagler's pit viper",
    "alt": [
     "temple viper"
    ],
@@ -2048,7 +2069,7 @@
     "It can be dangerous to people.",
     "It is named after a German naturalist.",
     "The answer has 3 words (7, 3, 5 letters).",
-    "It starts with the letter W."
+    "Its first letter is W."
    ],
    "media": {
     "img": [
@@ -2109,10 +2130,26 @@
     "Its pattern is a complex net-like mesh.",
     "It is the longest snake in the world.",
     "The answer has 2 words (11, 6 letters).",
-    "It starts with the letter R."
+    "Its first letter is R."
    ],
    "media": {
     "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/b/b4/Python_reticulatus_%D1%81%D0%B5%D1%82%D1%87%D0%B0%D1%82%D1%8B%D0%B9_%D0%BF%D0%B8%D1%82%D0%BE%D0%BD-2.jpg/500px-Python_reticulatus_%D1%81%D0%B5%D1%82%D1%87%D0%B0%D1%82%D1%8B%D0%B9_%D0%BF%D0%B8%D1%82%D0%BE%D0%BD-2.jpg",
+      "w": 500,
+      "h": 341,
+      "credit": "This photography was created by Mariluna. Other photos see here.",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Python_reticulatus_%D1%81%D0%B5%D1%82%D1%87%D0%B0%D1%82%D1%8B%D0%B9_%D0%BF%D0%B8%D1%82%D0%BE%D0%BD-2.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/f/fa/Python_reticulatus_kop.jpg/500px-Python_reticulatus_kop.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Goalsurfer",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Python_reticulatus_kop.jpg"
+     },
      {
       "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/11395341/medium.jpg",
       "w": 500,
@@ -2120,22 +2157,6 @@
       "credit": "Rushen",
       "license": "CC BY-SA 4.0",
       "page": "https://www.inaturalist.org/photos/11395341"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/11395340/medium.jpg",
-      "w": 500,
-      "h": 346,
-      "credit": "Steve Wilson - over 9 million views Thanks !!",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/11395340"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/11395416/medium.jpg",
-      "w": 500,
-      "h": 375,
-      "credit": "Kyle Zimmerman",
-      "license": "CC BY-SA 4.0",
-      "page": "https://www.inaturalist.org/photos/11395416"
      }
     ]
    },
@@ -2144,6 +2165,7 @@
   {
    "id": "burmese-python",
    "name": "Burmese python",
+   "lname": "Burmese python",
    "sci": "Python bivittatus",
    "group": "python",
    "facts": {
@@ -2170,10 +2192,26 @@
     "It is one of the five largest snakes in the world.",
     "It is named after a country now called Myanmar.",
     "The answer has 2 words (7, 6 letters).",
-    "It starts with the letter B."
+    "Its first letter is B."
    ],
    "media": {
     "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/d/d0/Burmese_Python_%2813%29%2C_NPSPhoto%2C_R._Cammauf_%289101584016%29.jpg/500px-Burmese_Python_%2813%29%2C_NPSPhoto%2C_R._Cammauf_%289101584016%29.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Everglades NPS from Homestead, Florida, United States",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Burmese_Python_(13),_NPSPhoto,_R._Cammauf_(9101584016).jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/10/Brooding_female_Python_molurus_bivittatus.jpg/500px-Brooding_female_Python_molurus_bivittatus.jpg",
+      "w": 500,
+      "h": 383,
+      "credit": "Tigerpython",
+      "license": "CC BY 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Brooding_female_Python_molurus_bivittatus.jpg"
+     },
      {
       "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/194433891/medium.jpg",
       "w": 500,
@@ -2181,22 +2219,6 @@
       "credit": "Adam Cushen",
       "license": "CC BY 4.0",
       "page": "https://www.inaturalist.org/photos/194433891"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/146402018/medium.jpg",
-      "w": 500,
-      "h": 334,
-      "credit": "Lawrence Hylton",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/146402018"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/427368510/medium.jpeg",
-      "w": 281,
-      "h": 500,
-      "credit": "no rights reserved",
-      "license": "CC0 1.0",
-      "page": "https://www.inaturalist.org/photos/427368510"
      }
     ]
    },
@@ -2230,7 +2252,7 @@
     "Its bite is only mildly venomous to people.",
     "Its name refers to heaven.",
     "The answer has 3 words (8, 4, 5 letters).",
-    "It starts with the letter P."
+    "Its first letter is P."
    ],
    "media": {
     "img": [
@@ -2290,7 +2312,7 @@
     "Its bite is only mildly venomous to people.",
     "It is named after coastal swamp forests.",
     "The answer has 2 words (8, 5 letters).",
-    "It starts with the letter M."
+    "Its first letter is M."
    ],
    "media": {
     "img": [
@@ -2350,10 +2372,26 @@
     "Its bite or sting can kill a person.",
     "Its body is actually grey or olive-brown.",
     "The answer has 2 words (5, 5 letters).",
-    "It starts with the letter B."
+    "Its first letter is B."
    ],
    "media": {
     "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/7/70/Dendroaspis_polylepis_by_Bill_Love.jpg/330px-Dendroaspis_polylepis_by_Bill_Love.jpg",
+      "w": 330,
+      "h": 465,
+      "credit": "Bill Love/Blue Chameleon Ventures",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Dendroaspis_polylepis_by_Bill_Love.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/7/76/Dendroaspis_polylepis_%2814%29.jpg/500px-Dendroaspis_polylepis_%2814%29.jpg",
+      "w": 500,
+      "h": 344,
+      "credit": "TimVickers",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Dendroaspis_polylepis_(14).jpg"
+     },
      {
       "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/15583520/medium.jpg",
       "w": 500,
@@ -2361,22 +2399,6 @@
       "credit": "Wynand Uys",
       "license": "CC BY 4.0",
       "page": "https://www.inaturalist.org/photos/15583520"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/189495916/medium.jpg",
-      "w": 500,
-      "h": 375,
-      "credit": "no rights reserved",
-      "license": "CC0 1.0",
-      "page": "https://www.inaturalist.org/photos/189495916"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/337131802/medium.jpg",
-      "w": 375,
-      "h": 500,
-      "credit": "Sunčana Bradley",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/337131802"
      }
     ]
    },
@@ -2410,7 +2432,7 @@
     "It is found in Africa.",
     "Its bite or sting can kill a person.",
     "The answer has 3 words (7, 5, 5 letters).",
-    "It starts with the letter E."
+    "Its first letter is E."
    ],
    "media": {
     "img": [
@@ -2470,7 +2492,7 @@
     "It inflates its body and hisses loudly when threatened.",
     "Its name describes blowing up with air.",
     "The answer has 2 words (4, 5 letters).",
-    "It starts with the letter P."
+    "Its first letter is P."
    ],
    "media": {
     "img": [
@@ -2505,6 +2527,7 @@
   {
    "id": "gaboon-viper",
    "name": "Gaboon viper",
+   "lname": "Gaboon viper",
    "sci": "Bitis gabonica",
    "group": "viper",
    "facts": {
@@ -2531,7 +2554,7 @@
     "It has the longest fangs of any snake.",
     "It is named after a country on Africa's west coast.",
     "The answer has 2 words (6, 5 letters).",
-    "It starts with the letter G."
+    "Its first letter is G."
    ],
    "media": {
     "img": [
@@ -2591,7 +2614,7 @@
     "It has two or three pairs of horn-like scales on its nose.",
     "It is named after a horned African mammal.",
     "The answer has 2 words (10, 5 letters).",
-    "It starts with the letter R."
+    "Its first letter is R."
    ],
    "media": {
     "img": [
@@ -2651,7 +2674,7 @@
     "It is one of the few dangerous rear-fanged snakes.",
     "Its name is Afrikaans for \"tree snake\".",
     "The answer is one word of 9 letters.",
-    "It starts with the letter B."
+    "Its first letter is B."
    ],
    "media": {
     "img": [
@@ -2686,6 +2709,7 @@
   {
    "id": "cape-cobra",
    "name": "Cape cobra",
+   "lname": "Cape cobra",
    "sci": "Naja nivea",
    "group": "elapid",
    "facts": {
@@ -2708,7 +2732,7 @@
     "It is found in Africa.",
     "Its bite or sting can kill a person.",
     "The answer has 2 words (4, 5 letters).",
-    "It starts with the letter C."
+    "Its first letter is C."
    ],
    "media": {
     "img": [
@@ -2743,6 +2767,7 @@
   {
    "id": "egyptian-cobra",
    "name": "Egyptian cobra",
+   "lname": "Egyptian cobra",
    "sci": "Naja haje",
    "group": "elapid",
    "facts": {
@@ -2765,7 +2790,7 @@
     "It spreads a broad hood when threatened.",
     "It is named after a country on the Nile.",
     "The answer has 2 words (8, 5 letters).",
-    "It starts with the letter E."
+    "Its first letter is E."
    ],
    "media": {
     "img": [
@@ -2800,6 +2825,7 @@
   {
    "id": "mozambique-spitting-cobra",
    "name": "Mozambique spitting cobra",
+   "lname": "Mozambique spitting cobra",
    "sci": "Naja mossambica",
    "group": "elapid",
    "facts": {
@@ -2822,7 +2848,7 @@
     "It is a hooded snake of south-eastern Africa.",
     "It is named after an African country on the Indian Ocean.",
     "The answer has 3 words (10, 8, 5 letters).",
-    "It starts with the letter M."
+    "Its first letter is M."
    ],
    "media": {
     "img": [
@@ -2886,7 +2912,7 @@
     "It is sand-coloured.",
     "It has a spike-like scale above each eye.",
     "The answer has 2 words (6, 5 letters).",
-    "It starts with the letter H."
+    "Its first letter is H."
    ],
    "media": {
     "img": [
@@ -2921,6 +2947,7 @@
   {
    "id": "african-rock-python",
    "name": "African rock python",
+   "lname": "African rock python",
    "sci": "Python sebae",
    "group": "python",
    "facts": {
@@ -2944,7 +2971,7 @@
     "It has an arrow-shaped mark on top of its head.",
     "Its name includes a word for stone.",
     "The answer has 3 words (7, 4, 6 letters).",
-    "It starts with the letter A."
+    "Its first letter is A."
    ],
    "media": {
     "img": [
@@ -3003,7 +3030,7 @@
     "It is harmless to people.",
     "When scared it curls into a tight sphere.",
     "The answer has 2 words (4, 6 letters).",
-    "It starts with the letter B."
+    "Its first letter is B."
    ],
    "media": {
     "img": [
@@ -3055,10 +3082,26 @@
     "It has diamond-shaped markings along its back.",
     "It shakes a buzzing tail as a warning.",
     "The answer has 3 words (7, 11, 11 letters).",
-    "It starts with the letter W."
+    "Its first letter is W."
    ],
    "media": {
     "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/d/d7/Crotalus_atrox_USFWS.jpg/500px-Crotalus_atrox_USFWS.jpg",
+      "w": 500,
+      "h": 340,
+      "credit": "Gary Stolz (original)",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Crotalus_atrox_USFWS.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/e/ec/%28Westliche_Diamantklapperschlange%29_Crotalus_atrox.jpg/500px-%28Westliche_Diamantklapperschlange%29_Crotalus_atrox.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Holger Krisp",
+      "license": "CC BY 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:(Westliche_Diamantklapperschlange)_Crotalus_atrox.jpg"
+     },
      {
       "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/2785199/medium.JPG",
       "w": 500,
@@ -3066,22 +3109,6 @@
       "credit": "Sam Kieschnick",
       "license": "CC BY 4.0",
       "page": "https://www.inaturalist.org/photos/2785199"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/667140/medium.JPG",
-      "w": 500,
-      "h": 379,
-      "credit": "Juan Cruzado Cortés",
-      "license": "CC BY-SA 4.0",
-      "page": "https://www.inaturalist.org/photos/667140"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/1904884/medium.jpg",
-      "w": 500,
-      "h": 307,
-      "credit": "Mike Lewinski",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/1904884"
      }
     ]
    },
@@ -3115,7 +3142,7 @@
     "Its back has bold diamonds edged in cream.",
     "It warns with a buzzing tail.",
     "The answer has 3 words (7, 11, 11 letters).",
-    "It starts with the letter E."
+    "Its first letter is E."
    ],
    "media": {
     "img": [
@@ -3172,7 +3199,7 @@
     "It has dark zig-zag crossbands.",
     "It lives in eastern US woodlands and shakes its tail.",
     "The answer has 2 words (6, 11 letters).",
-    "It starts with the letter T."
+    "Its first letter is T."
    ],
    "media": {
     "img": [
@@ -3235,7 +3262,7 @@
     "It can be dangerous to people.",
     "It moves across sand by throwing its body sideways.",
     "The answer is one word of 10 letters.",
-    "It starts with the letter S."
+    "Its first letter is S."
    ],
    "media": {
     "img": [
@@ -3288,7 +3315,7 @@
     "Its bites are very rarely fatal.",
     "Its head is the colour of a reddish metal.",
     "The answer is one word of 10 letters.",
-    "It starts with the letter C."
+    "Its first letter is C."
    ],
    "media": {
     "img": [
@@ -3350,7 +3377,7 @@
     "It can be dangerous to people.",
     "When threatened it opens its mouth to show the white inside.",
     "The answer is one word of 11 letters.",
-    "It starts with the letter C."
+    "Its first letter is C."
    ],
    "media": {
     "img": [
@@ -3411,10 +3438,18 @@
     "The rhyme \"red touches yellow\" helps tell it from mimics in the USA.",
     "It is ringed in red, yellow and black and shares its name with a reef animal.",
     "The answer has 3 words (7, 5, 5 letters).",
-    "It starts with the letter E."
+    "Its first letter is E."
    ],
    "media": {
     "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/3/3c/Coral_009.jpg/500px-Coral_009.jpg",
+      "w": 500,
+      "h": 445,
+      "credit": "Norman.benton",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Coral_009.jpg"
+     },
      {
       "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/286627672/medium.jpg",
       "w": 500,
@@ -3430,14 +3465,6 @@
       "credit": "Court Harding",
       "license": "CC BY 4.0",
       "page": "https://www.inaturalist.org/photos/129443227"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/198238314/medium.jpg",
-      "w": 500,
-      "h": 333,
-      "credit": "Siddarth Machado",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/198238314"
      }
     ]
    },
@@ -3472,7 +3499,7 @@
     "It is harmless to people.",
     "Its name is a dairy drink.",
     "The answer has 2 words (4, 5 letters).",
-    "It starts with the letter M."
+    "Its first letter is M."
    ],
    "media": {
     "img": [
@@ -3533,7 +3560,7 @@
     "It is harmless to people.",
     "It is named after a bright shade of red.",
     "The answer has 2 words (7, 9 letters).",
-    "It starts with the letter S."
+    "Its first letter is S."
    ],
    "media": {
     "img": [
@@ -3568,6 +3595,7 @@
   {
    "id": "california-kingsnake",
    "name": "California kingsnake",
+   "lname": "California kingsnake",
    "sci": "Lampropeltis californiae",
    "group": "colubrid",
    "facts": {
@@ -3590,7 +3618,7 @@
     "It is a popular pet.",
     "It is named after a US state.",
     "The answer has 2 words (10, 9 letters).",
-    "It starts with the letter C."
+    "Its first letter is C."
    ],
    "media": {
     "img": [
@@ -3650,10 +3678,26 @@
     "It is harmless to people.",
     "Its name is a cereal crop.",
     "The answer has 2 words (4, 5 letters).",
-    "It starts with the letter C."
+    "Its first letter is C."
    ],
    "media": {
     "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/8/8e/Kornnatter_%28Pantherophis_guttatus%29%2C_Seitenansicht.jpg/500px-Kornnatter_%28Pantherophis_guttatus%29%2C_Seitenansicht.jpg",
+      "w": 500,
+      "h": 325,
+      "credit": "Peter Paplanus",
+      "license": "CC BY 2.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Kornnatter_(Pantherophis_guttatus),_Seitenansicht.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/e/ef/CornSnake.jpg/500px-CornSnake.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Ethan Porcaro",
+      "license": "CC0 1.0",
+      "page": "https://commons.wikimedia.org/wiki/File:CornSnake.jpg"
+     },
      {
       "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/64866146/medium.jpeg",
       "w": 500,
@@ -3661,22 +3705,6 @@
       "credit": "evangrimes",
       "license": "CC BY 4.0",
       "page": "https://www.inaturalist.org/photos/64866146"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/347156071/medium.jpg",
-      "w": 500,
-      "h": 333,
-      "credit": "Jeremiah Degenhardt",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/347156071"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/497415790/medium.jpeg",
-      "w": 500,
-      "h": 375,
-      "credit": "Russell Prince-Wright",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/497415790"
      }
     ]
    },
@@ -3707,10 +3735,18 @@
     "It usually has three pale stripes along its body.",
     "Its name sounds like a gardener's snake.",
     "The answer has 3 words (6, 6, 5 letters).",
-    "It starts with the letter C."
+    "Its first letter is C."
    ],
    "media": {
     "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/f/f7/Thamnophis_sirtalis_sirtalis_Wooster.jpg/500px-Thamnophis_sirtalis_sirtalis_Wooster.jpg",
+      "w": 500,
+      "h": 417,
+      "credit": "Wilson44691",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Thamnophis_sirtalis_sirtalis_Wooster.jpg"
+     },
      {
       "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/172567155/medium.jpeg",
       "w": 500,
@@ -3726,14 +3762,6 @@
       "credit": "kclarksdnhmorg",
       "license": "CC BY 4.0",
       "page": "https://www.inaturalist.org/photos/1520773"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/99085291/medium.jpg",
-      "w": 500,
-      "h": 281,
-      "credit": "Dan MacNeal",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/99085291"
      }
     ]
    },
@@ -3770,7 +3798,7 @@
     "It hunts rodents in their burrows.",
     "It is named after a burrowing rodent.",
     "The answer has 2 words (6, 5 letters).",
-    "It starts with the letter G."
+    "Its first letter is G."
    ],
    "media": {
     "img": [
@@ -3823,7 +3851,7 @@
     "It is often found near streams and farms.",
     "Its French name means \"iron of the spear\".",
     "The answer has 3 words (3, 2, 5 letters).",
-    "It starts with the letter F."
+    "Its first letter is F."
    ],
    "media": {
     "img": [
@@ -3872,7 +3900,7 @@
     "It lives in the Amazon rainforest.",
     "It is the longest viper in the Americas.",
     "The answer is one word of 10 letters.",
-    "It starts with the letter B."
+    "Its first letter is B."
    ],
    "media": {
     "img": [
@@ -3929,7 +3957,7 @@
     "It can be dangerous to people.",
     "It has spiky scales above its eyes.",
     "The answer has 2 words (7, 5 letters).",
-    "It starts with the letter E."
+    "Its first letter is E."
    ],
    "media": {
     "img": [
@@ -3988,7 +4016,7 @@
     "Typical length: about 1.2 m.",
     "Its bite or sting can kill a person.",
     "The answer has 3 words (5, 8, 11 letters).",
-    "It starts with the letter S."
+    "Its first letter is S."
    ],
    "media": {
     "img": [
@@ -4048,33 +4076,33 @@
     "It is the heaviest snake in the world.",
     "It is an olive-coloured giant of the Amazon.",
     "The answer has 2 words (5, 8 letters).",
-    "It starts with the letter G."
+    "Its first letter is G."
    ],
    "media": {
     "img": [
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/265377542/medium.jpg",
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/f/f6/Eunectes_murinus_8zz.jpg/500px-Eunectes_murinus_8zz.jpg",
       "w": 500,
-      "h": 333,
-      "credit": "Conrado Pável de Oliveira",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/265377542"
+      "h": 373,
+      "credit": "Photo by David J. Stang",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Eunectes_murinus_8zz.jpg"
      },
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/160176914/medium.jpeg",
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/c/cc/Eunectes_murinus_%281%29.jpg/500px-Eunectes_murinus_%281%29.jpg",
       "w": 500,
-      "h": 333,
-      "credit": "Fábio Olmos",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/160176914"
+      "h": 329,
+      "credit": "TimVickers",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Eunectes_murinus_(1).jpg"
      },
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/277170833/medium.jpeg",
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/b/b4/Sucuri_verde.jpg/500px-Sucuri_verde.jpg",
       "w": 500,
-      "h": 274,
-      "credit": "Paul Prior",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/277170833"
+      "h": 375,
+      "credit": "MKAMPIS",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Sucuri_verde.jpg"
      }
     ]
    },
@@ -4109,33 +4137,33 @@
     "It kills prey by squeezing.",
     "It is a large South American snake that shares its name with a feather scarf.",
     "The answer has 2 words (3, 11 letters).",
-    "It starts with the letter B."
+    "Its first letter is B."
    ],
    "media": {
     "img": [
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/334994710/medium.jpeg",
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/9/90/Boa_constrictor%2C_Va%C5%88kovka%2C_Brno_%282%29.jpg/500px-Boa_constrictor%2C_Va%C5%88kovka%2C_Brno_%282%29.jpg",
       "w": 500,
-      "h": 397,
-      "credit": "Gustavo Sandres",
+      "h": 375,
+      "credit": "I would appreciate being notified if you use my work outside Wikimedia. Do not copy thi…",
       "license": "CC BY-SA 4.0",
-      "page": "https://www.inaturalist.org/photos/334994710"
+      "page": "https://commons.wikimedia.org/wiki/File:Boa_constrictor,_Va%C5%88kovka,_Brno_(2).jpg"
      },
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/334994725/medium.jpeg",
-      "w": 375,
-      "h": 500,
-      "credit": "Gustavo Sandres",
-      "license": "CC BY-SA 4.0",
-      "page": "https://www.inaturalist.org/photos/334994725"
+      "src": "https://upload.wikimedia.org/wikipedia/commons/a/a6/Boa_leofleck.jpg",
+      "w": 500,
+      "h": 316,
+      "credit": "Leofleck at English Wikipedia",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Boa_leofleck.jpg"
      },
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/334994715/medium.jpeg",
-      "w": 411,
-      "h": 500,
-      "credit": "Gustavo Sandres",
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/e/e9/Boa_constrictor_Natural_History_Museum_University_of_Pisa_B_2124.jpg/500px-Boa_constrictor_Natural_History_Museum_University_of_Pisa_B_2124.jpg",
+      "w": 500,
+      "h": 82,
+      "credit": "Stefano Puzzuoli",
       "license": "CC BY-SA 4.0",
-      "page": "https://www.inaturalist.org/photos/334994715"
+      "page": "https://commons.wikimedia.org/wiki/File:Boa_constrictor_Natural_History_Museum_University_of_Pisa_B_2124.jpg"
      }
     ]
    },
@@ -4169,7 +4197,7 @@
     "It looks almost exactly like a python from New Guinea.",
     "It is named after a green gemstone.",
     "The answer has 3 words (7, 4, 3 letters).",
-    "It starts with the letter E."
+    "Its first letter is E."
    ],
    "media": {
     "img": [
@@ -4232,33 +4260,33 @@
     "It has a dark zig-zag stripe down its back.",
     "Its name begins with the word for \"ordinary\".",
     "The answer has 3 words (6, 8, 5 letters).",
-    "It starts with the letter C."
+    "Its first letter is C."
    ],
    "media": {
     "img": [
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/2732539/medium.jpg",
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/d/d5/Vipera_berus_%28Marek_Szczepanek%29.jpg/500px-Vipera_berus_%28Marek_Szczepanek%29.jpg",
       "w": 500,
-      "h": 305,
-      "credit": "Alexander A. Fomichev",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/2732539"
+      "h": 335,
+      "credit": "Wikimedia Commons",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Vipera_berus_(Marek_Szczepanek).jpg"
      },
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/676395824/medium.jpg",
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/d/dc/Benny_Trapp_Vipera_berus.jpg/500px-Benny_Trapp_Vipera_berus.jpg",
       "w": 500,
-      "h": 375,
-      "credit": "Михаил Языков",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/676395824"
+      "h": 333,
+      "credit": "Benny Trapp",
+      "license": "CC BY 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Benny_Trapp_Vipera_berus.jpg"
      },
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/623236066/medium.jpg",
-      "w": 233,
-      "h": 500,
-      "credit": "no rights reserved",
-      "license": "CC0 1.0",
-      "page": "https://www.inaturalist.org/photos/623236066"
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/a/a7/Common_European_viper_%28Vipera_berus%29_female_Pieniny.jpg/500px-Common_European_viper_%28Vipera_berus%29_female_Pieniny.jpg",
+      "w": 500,
+      "h": 250,
+      "credit": "Charles J. Sharp",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Common_European_viper_(Vipera_berus)_female_Pieniny.jpg"
      }
     ]
    },
@@ -4291,7 +4319,7 @@
     "It can be dangerous to people.",
     "It has a zig-zag stripe down its back.",
     "The answer has 3 words (4, 6, 5 letters).",
-    "It starts with the letter N."
+    "Its first letter is N."
    ],
    "media": {
     "img": [
@@ -4350,7 +4378,7 @@
     "It can be dangerous to people.",
     "Its name shares a word with the snake linked to Cleopatra.",
     "The answer has 2 words (3, 5 letters).",
-    "It starts with the letter A."
+    "Its first letter is A."
    ],
    "media": {
     "img": [
@@ -4410,10 +4438,26 @@
     "It has a yellow or cream collar behind its head.",
     "Its name is a lawn plant.",
     "The answer has 2 words (5, 5 letters).",
-    "It starts with the letter G."
+    "Its first letter is G."
    ],
    "media": {
     "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/f/f6/2017.07.17.-17-Tiefer_See_oder_Grubensee-Storkow_%28Mark%29--Ringelnatter.jpg/500px-2017.07.17.-17-Tiefer_See_oder_Grubensee-Storkow_%28Mark%29--Ringelnatter.jpg",
+      "w": 500,
+      "h": 354,
+      "credit": "Andreas Eichler",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:2017.07.17.-17-Tiefer_See_oder_Grubensee-Storkow_(Mark)--Ringelnatter.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/0/0c/Grass_snake_%28Natrix_natrix%29_Pieniny.jpg/500px-Grass_snake_%28Natrix_natrix%29_Pieniny.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Charles J. Sharp",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Grass_snake_(Natrix_natrix)_Pieniny.jpg"
+     },
      {
       "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/124845228/medium.jpeg",
       "w": 500,
@@ -4421,22 +4465,6 @@
       "credit": "Micha Baum",
       "license": "CC BY-SA 4.0",
       "page": "https://www.inaturalist.org/photos/124845228"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/39452028/medium.jpeg",
-      "w": 500,
-      "h": 335,
-      "credit": "franciscodocampo",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/39452028"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/319158753/medium.jpg",
-      "w": 500,
-      "h": 333,
-      "credit": "Sylvain Montagner",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/319158753"
      }
     ]
    },
@@ -4470,7 +4498,7 @@
     "It is one of only three native snakes in Britain.",
     "Its scales have no ridges, so it feels sleek.",
     "The answer has 2 words (6, 5 letters).",
-    "It starts with the letter S."
+    "Its first letter is S."
    ],
    "media": {
     "img": [
@@ -4527,7 +4555,7 @@
     "It is linked with the rod of the Greek god of medicine.",
     "It is named after a god of healing.",
     "The answer has 2 words (11, 5 letters).",
-    "It starts with the letter A."
+    "Its first letter is A."
    ],
    "media": {
     "img": [
@@ -4588,7 +4616,7 @@
     "Typical length: about 1 m.",
     "It can be dangerous to people.",
     "The answer has 3 words (6, 3, 5 letters).",
-    "It starts with the letter B."
+    "Its first letter is B."
    ],
    "media": {
     "img": [

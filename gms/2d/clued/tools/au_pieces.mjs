@@ -49,6 +49,48 @@ export const MUTOPIA = [
   { id: 'liszt-consolation-3', title: 'Consolation No. 3', alt: ['Consolation'], composer: 'Franz Liszt', year: 1850, mutopia: 1647, secs: 35, d: 3 },
 ];
 
+// background music: gentle pieces, kept up to ~150 s, written to data/music/bgm/ with an index.json playlist
+export const BGM = [
+  { id: 'gymnopedie-1', title: 'Gymnopédie No. 1', composer: 'Erik Satie', mutopia: 37 },
+  { id: 'gymnopedie-2', title: 'Gymnopédie No. 2', composer: 'Erik Satie', mutopia: 38 },
+  { id: 'gymnopedie-3', title: 'Gymnopédie No. 3', composer: 'Erik Satie', mutopia: 39 },
+  { id: 'gnossienne-1', title: 'Gnossienne No. 1', composer: 'Erik Satie', mutopia: 2035 },
+  { id: 'gnossienne-3', title: 'Gnossienne No. 3', composer: 'Erik Satie', mutopia: 2131 },
+  { id: 'clair-de-lune', title: 'Clair de lune', composer: 'Claude Debussy', mutopia: 1778 },
+  { id: 'prelude-in-c', title: 'Prelude in C major, BWV 846', composer: 'Johann Sebastian Bach', mutopia: 5 },
+  { id: 'traumerei', title: 'Träumerei (Kinderszenen)', composer: 'Robert Schumann', mutopia: 504 },
+  { id: 'von-fremden-landern', title: 'Of Foreign Lands and Peoples (Kinderszenen)', composer: 'Robert Schumann', mutopia: 354 },
+  { id: 'nocturne-op9-2', title: 'Nocturne Op. 9 No. 2', composer: 'Frédéric Chopin', mutopia: 1590 },
+  { id: 'nocturne-e-minor', title: 'Nocturne in E minor, Op. 72 No. 1', composer: 'Frédéric Chopin', mutopia: 509 },
+  { id: 'prelude-op28-4', title: 'Prelude Op. 28 No. 4', composer: 'Frédéric Chopin', mutopia: 468 },
+  { id: 'prelude-op28-15', title: 'Prelude Op. 28 No. 15 "Raindrop"', composer: 'Frédéric Chopin', mutopia: 471 },
+  { id: 'consolation-3', title: 'Consolation No. 3', composer: 'Franz Liszt', mutopia: 1647 },
+  { id: 'consolation-1', title: 'Consolation No. 1', composer: 'Franz Liszt', mutopia: 1654 },
+  { id: 'field-nocturne-5', title: 'Nocturne No. 5', composer: 'John Field', mutopia: 2137 },
+  { id: 'gondellied', title: 'Venetian Boat Song, Op. 30 No. 6', composer: 'Felix Mendelssohn', mutopia: 1741 },
+  { id: 'morning-prayer', title: 'Morning Prayer, Op. 39 No. 1', composer: 'Pyotr Ilyich Tchaikovsky', mutopia: 2032 },
+  { id: 'old-french-song', title: 'Old French Song, Op. 39 No. 16', composer: 'Pyotr Ilyich Tchaikovsky', mutopia: 2080 },
+  { id: 'albumblatt', title: 'Albumblatt, Op. 12 No. 3', composer: 'Edvard Grieg', mutopia: 2194 },
+];
+
+async function buildBgm() {
+  const dir = path.join(ROOT, 'data/music/bgm');
+  fs.mkdirSync(dir, { recursive: true });
+  const list = [];
+  for (const m of BGM) {
+    try {
+      const piece = await buildMutopia({ ...m, id: 'bgm-' + m.id, secs: 150, d: 1 });
+      // soften: cap velocities so nothing jumps out of the background
+      piece.notes = piece.notes.map(([b, n, d, v]) => [b, n, d, Math.min(v, 72)]);
+      piece.id = m.id;
+      fs.writeFileSync(path.join(dir, m.id + '.json'), JSON.stringify(piece));
+      list.push({ id: m.id, title: m.title, composer: m.composer, src: `data/music/bgm/${m.id}.json`, license: piece.source.license, page: piece.source.page, credit: `${m.composer}; MIDI from the Mutopia Project${piece.source.by ? ', maintained by ' + piece.source.by : ''}` });
+      console.log(`bgm ${m.id} ${Math.round(durationOf(piece))}s ${piece.source.license}`);
+    } catch (e) { console.log(`bgm FAIL ${m.id}: ${e.message}`); }
+  }
+  fs.writeFileSync(path.join(dir, 'index.json'), JSON.stringify({ pieces: list, piano: 'Salamander Grand Piano V3 by Alexander Holm (CC BY 3.0)' }, null, 1));
+}
+
 async function download(url, file) {
   if (fs.existsSync(file)) return;
   const r = await fetch(url);
@@ -174,4 +216,4 @@ async function main() {
   console.log(`classical ${classical.length}, melodies ${melodies.length}, nursery ${nursery.length}`);
 }
 
-if (process.argv[1] === fileURLToPath(import.meta.url)) main();
+if (process.argv[1] === fileURLToPath(import.meta.url)) (process.argv[2] === 'bgm' ? buildBgm() : main());

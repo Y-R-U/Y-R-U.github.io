@@ -1,6 +1,6 @@
-import { register, poolItems, pickPack, byDifficulty, imageOf, hasImg, factText, placeAnswer, collect, pick, sample } from './registry.js?v=1';
+import { register, poolItems, pickPack, byDifficulty, imageOf, factText, placeAnswer, collect, pick, sample } from './registry.js?v=1';
 import { layout, choiceGrid } from '../ui/kit.js?v=1';
-import { uniqueByName, norm } from './fkit.js?v=1';
+import { uniqueByName, norm, hasImg } from './fkit.js?v=1';
 
 const vals = v => [].concat(v).map(String);
 
@@ -25,6 +25,17 @@ function sources(pack, n, difficulty) {
   const dupFact = Object.keys(pack.factsMeta || {}).some(k => items.every(it => !it.group || vals(it.facts?.[k] ?? '').includes(it.group)));
   if (pack.groupLabel && !dupFact && Object.keys(groups).length >= 2 && Object.values(groups).some(c => c >= n - 1)) out.push(['group', '']);
   return out;
+}
+
+// With multi-valued facts another option could also be "the odd one"; such sets are dropped.
+function onlyOneOdd(list, v) {
+  let n = 0;
+  list.forEach((c, j) => {
+    const rest = list.filter((_, k) => k !== j);
+    const shared = v(rest[0]).filter(x => rest.every(r => v(r).includes(x)));
+    if (shared.length && shared.every(x => !v(c).includes(x))) n++;
+  });
+  return n === 1;
 }
 
 function make(rng, pack, [type, key], n, difficulty, kids) {
@@ -55,6 +66,7 @@ function make(rng, pack, [type, key], n, difficulty, kids) {
     sameText = V; oddText = vals(val(odd)).join(', ');
   }
   if (same.length < n - 1 || same.some(c => norm(c.item.name) === norm(odd.item.name))) return null;
+  if (!onlyOneOdd([odd, ...same], c => (type === 'bool' ? [String(val(c))] : vals(val(c))))) return null;
   const { options, answer } = placeAnswer(rng, odd, same);
   const pics = options.every(c => hasImg(c.item)) && (kids || rng() < 0.45);
   return {
@@ -77,7 +89,8 @@ export default register({
   ],
   supports(info) {
     const c = info.caps || {};
-    if (Object.values(c.facts || {}).some(t => t === 'cat' || t === 'bool') && info.items >= 4) return true;
+    const multi = new Set(c.multi || []);
+    if (Object.entries(c.facts || {}).some(([k, t]) => t === 'bool' || (t === 'cat' && !multi.has(k))) && info.items >= 4) return true;
     return 'Needs items with category or yes/no facts';
   },
   generate({ rng, packs, count, opts = {}, difficulty = 0, kids = false, avoid }) {

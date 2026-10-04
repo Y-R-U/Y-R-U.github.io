@@ -78,12 +78,20 @@
    "media": {
     "img": [
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/217394043/medium.jpeg",
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/8/8e/Bees-wings.web.jpg/500px-Bees-wings.web.jpg",
       "w": 500,
-      "h": 375,
-      "credit": "no rights reserved",
-      "license": "CC0 1.0",
-      "page": "https://www.inaturalist.org/photos/217394043"
+      "h": 417,
+      "credit": "Wikimedia Commons",
+      "license": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Bees-wings.web.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/11/The_Lone_Pollinator.jpg/500px-The_Lone_Pollinator.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Tanner Smida",
+      "license": "CC BY 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:The_Lone_Pollinator.jpg"
      },
      {
       "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/67970909/medium.jpeg",
@@ -92,14 +100,6 @@
       "credit": "Albertus Horn",
       "license": "CC BY 4.0",
       "page": "https://www.inaturalist.org/photos/67970909"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/485263880/medium.jpg",
-      "w": 375,
-      "h": 500,
-      "credit": "Kieran Hanrahan",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/485263880"
      }
     ]
    },
@@ -138,28 +138,28 @@
    "media": {
     "img": [
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/733614806/medium.jpg",
-      "w": 500,
-      "h": 500,
-      "credit": "Alan Flisch",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/733614806"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/60648454/medium.jpeg",
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/4/4a/Bumblebee_October_2007-3a.jpg/500px-Bumblebee_October_2007-3a.jpg",
       "w": 500,
       "h": 375,
-      "credit": "no rights reserved",
-      "license": "CC0 1.0",
-      "page": "https://www.inaturalist.org/photos/60648454"
+      "credit": "Alvesgaspar",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Bumblebee_October_2007-3a.jpg"
      },
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/716505768/medium.jpg",
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/e/e4/Bombus_terrestris_-_Tilia_cordata_-_Keila-crop.jpg/330px-Bombus_terrestris_-_Tilia_cordata_-_Keila-crop.jpg",
+      "w": 330,
+      "h": 440,
+      "credit": "Ivar Leidus",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Bombus_terrestris_-_Tilia_cordata_-_Keila-crop.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/f/f6/Bombus_terrestris.jpg/500px-Bombus_terrestris.jpg",
       "w": 500,
-      "h": 356,
-      "credit": "William Harland",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/716505768"
+      "h": 350,
+      "credit": "Marco Almbauer",
+      "license": "CC0 1.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Bombus_terrestris.jpg"
      }
     ]
    },
@@ -416,14 +416,6 @@
    "media": {
     "img": [
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/787758/medium.jpg",
-      "w": 500,
-      "h": 357,
-      "credit": "tpjunier",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/787758"
-     },
-     {
       "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/787760/medium.jpg",
       "w": 500,
       "h": 333,
@@ -438,6 +430,14 @@
       "credit": "Rupert Lees",
       "license": "CC BY 4.0",
       "page": "https://www.inaturalist.org/photos/489895113"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/194947367/medium.jpeg",
+      "w": 500,
+      "h": 333,
+      "credit": "no rights reserved",
+      "license": "CC0 1.0",
+      "page": "https://www.inaturalist.org/photos/194947367"
      }
     ]
    },
@@ -523,14 +523,6 @@
    "media": {
     "img": [
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/350608847/medium.jpg",
-      "w": 381,
-      "h": 500,
-      "credit": "Suzanne Muzic",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/350608847"
-     },
-     {
       "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/587945700/medium.jpg",
       "w": 500,
       "h": 375,
@@ -545,6 +537,14 @@
       "credit": "James K. Douch",
       "license": "CC BY-SA 4.0",
       "page": "https://www.inaturalist.org/photos/352667923"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/625310956/medium.jpg",
+      "w": 500,
+      "h": 313,
+      "credit": "Austen Armstrong",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/625310956"
      }
     ]
    },
@@ -696,28 +696,28 @@
    "media": {
     "img": [
      {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/9/9b/Flying_Vespula_vulgaris.jpg/500px-Flying_Vespula_vulgaris.jpg",
+      "w": 500,
+      "h": 444,
+      "credit": "soebe",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Flying_Vespula_vulgaris.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/6/66/Vespula_vulgaris-m.jpg/500px-Vespula_vulgaris-m.jpg",
+      "w": 500,
+      "h": 371,
+      "credit": "Magne Flåten",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Vespula_vulgaris-m.jpg"
+     },
+     {
       "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/21937595/medium.jpeg",
       "w": 500,
       "h": 375,
       "credit": "Tom",
       "license": "CC BY 4.0",
       "page": "https://www.inaturalist.org/photos/21937595"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/1183581/medium.jpg",
-      "w": 500,
-      "h": 375,
-      "credit": "Jon Sullivan",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/1183581"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/225583/medium.jpg",
-      "w": 500,
-      "h": 444,
-      "credit": "anonymous",
-      "license": "CC BY-SA 4.0",
-      "page": "https://www.inaturalist.org/photos/225583"
      }
     ]
    },
@@ -817,28 +817,28 @@
    "media": {
     "img": [
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/24810290/medium.jpg",
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/f/fd/Hornet-vespa.jpg/500px-Hornet-vespa.jpg",
       "w": 500,
-      "h": 416,
-      "credit": "katunchik",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/24810290"
+      "h": 338,
+      "credit": "PiccoloNamek",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Hornet-vespa.jpg"
      },
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/416257156/medium.jpeg",
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/f/f8/Vespa_crabro_80708.jpg/500px-Vespa_crabro_80708.jpg",
       "w": 500,
-      "h": 375,
-      "credit": "Brian R Wilson",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/416257156"
+      "h": 357,
+      "credit": "Accipiter (R. Altenkamp, Berlin)",
+      "license": "CC BY 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Vespa_crabro_80708.jpg"
      },
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/47451092/medium.jpeg",
-      "w": 412,
-      "h": 500,
-      "credit": "no rights reserved",
-      "license": "CC0 1.0",
-      "page": "https://www.inaturalist.org/photos/47451092"
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/b/b1/VespaCrabroCollezione.jpg/330px-VespaCrabroCollezione.jpg",
+      "w": 330,
+      "h": 661,
+      "credit": "Filippo Turetta",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:VespaCrabroCollezione.jpg"
      }
     ]
    },
@@ -879,28 +879,28 @@
    "media": {
     "img": [
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/326699273/medium.jpg",
-      "w": 500,
-      "h": 385,
-      "credit": "Yasunori Koide",
-      "license": "CC BY-SA 4.0",
-      "page": "https://www.inaturalist.org/photos/326699273"
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/3/3e/Vespa_mandarinia_japonica2.jpg/330px-Vespa_mandarinia_japonica2.jpg",
+      "w": 330,
+      "h": 440,
+      "credit": "KENPEI",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Vespa_mandarinia_japonica2.jpg"
      },
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/28685539/medium.jpeg",
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/a/a8/Picture_Vespa.jpg/500px-Picture_Vespa.jpg",
       "w": 500,
-      "h": 333,
-      "credit": "Alpsdake",
-      "license": "CC BY-SA 4.0",
-      "page": "https://www.inaturalist.org/photos/28685539"
+      "h": 375,
+      "credit": "Hornetboy1970 at English Wikipedia",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Picture_Vespa.jpg"
      },
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/104822583/medium.jpg",
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/f/f5/Vespa_mandarinia.jpg/500px-Vespa_mandarinia.jpg",
       "w": 500,
-      "h": 333,
-      "credit": "WATANABE Hitoshi 渡辺仁",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/104822583"
+      "h": 418,
+      "credit": "Gary Alpert",
+      "license": "CC BY 2.5",
+      "page": "https://commons.wikimedia.org/wiki/File:Vespa_mandarinia.jpg"
      }
     ]
    },
@@ -1162,14 +1162,6 @@
    "media": {
     "img": [
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/7634909/medium.jpg",
-      "w": 500,
-      "h": 398,
-      "credit": "christine123",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/7634909"
-     },
-     {
       "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/55089421/medium.jpeg",
       "w": 335,
       "h": 500,
@@ -1184,6 +1176,14 @@
       "credit": "psweet",
       "license": "CC BY-SA 4.0",
       "page": "https://www.inaturalist.org/photos/152735859"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/23316526/medium.jpg",
+      "w": 375,
+      "h": 500,
+      "credit": "Zihao Wang",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/23316526"
      }
     ]
    },
@@ -1497,28 +1497,28 @@
    "media": {
     "img": [
      {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/15/Hoverfly_December_2007-8.jpg/500px-Hoverfly_December_2007-8.jpg",
+      "w": 500,
+      "h": 381,
+      "credit": "Alvesgaspar",
+      "license": "CC BY-SA 3.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Hoverfly_December_2007-8.jpg"
+     },
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/4/40/Marmalade_hoverfly_%28Episyrphus_balteatus%29_male_Wengen_2.jpg/500px-Marmalade_hoverfly_%28Episyrphus_balteatus%29_male_Wengen_2.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Charles J. Sharp",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Marmalade_hoverfly_(Episyrphus_balteatus)_male_Wengen_2.jpg"
+     },
+     {
       "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/99038941/medium.jpeg",
       "w": 500,
       "h": 375,
       "credit": "Michael Knapp",
       "license": "CC BY 4.0",
       "page": "https://www.inaturalist.org/photos/99038941"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/18548439/medium.jpeg",
-      "w": 454,
-      "h": 500,
-      "credit": "carnifex",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/18548439"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/201262356/medium.jpg",
-      "w": 500,
-      "h": 400,
-      "credit": "Alexis Tinker-Tsavalas",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/201262356"
      }
     ]
    },
@@ -1694,6 +1694,53 @@
     "The guards"
    ],
    "explain": "One queen can lay over a thousand eggs a day.",
+   "difficulty": 1
+  },
+  {
+   "id": "q11",
+   "kind": "mc",
+   "prompt": "What do bees collect from flowers?",
+   "answer": "Nectar and pollen",
+   "wrong": [
+    "Leaves and twigs",
+    "Water and mud",
+    "Seeds and stones"
+   ],
+   "explain": "Nectar becomes honey; pollen feeds the young.",
+   "difficulty": 1
+  },
+  {
+   "id": "q12",
+   "kind": "mc",
+   "prompt": "Where do honey bees live?",
+   "answer": "In a hive",
+   "wrong": [
+    "In a web",
+    "In a burrow",
+    "In a shell"
+   ],
+   "explain": "A hive can hold tens of thousands of bees.",
+   "difficulty": 1
+  },
+  {
+   "id": "q13",
+   "kind": "tf",
+   "prompt": "Bees help plants make seeds by carrying pollen from flower to flower.",
+   "answer": true,
+   "explain": "This is called pollination.",
+   "difficulty": 1
+  },
+  {
+   "id": "q14",
+   "kind": "mc",
+   "prompt": "What colours are most wasps?",
+   "answer": "Yellow and black",
+   "wrong": [
+    "Red and blue",
+    "Green and white",
+    "Pink and purple"
+   ],
+   "explain": "The bright colours warn that they can sting.",
    "difficulty": 1
   }
  ],

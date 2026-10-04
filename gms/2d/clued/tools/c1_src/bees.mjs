@@ -5,7 +5,7 @@ const f = (kind, stings, social) => ({ kind, stings, social });
 export default {
   id: 'bees', title: 'Wasps, bees & hornets', theme: 'animals', icon: '🐝', kids: true, notice: NOT_ID,
   leakExempt: [],
-  autoTaxo: ['family', 'genus'],
+  wikiD1: true, autoTaxo: ['family', 'genus'],
   factsMeta: {
     kind: { type: 'cat', label: 'Kind', values: ['Bee', 'Wasp', 'Hornet', 'Fly'], noClue: true },
     stings: { type: 'bool', label: 'Can sting', yes: 'Can sting', no: 'Cannot sting', clue: v => (v ? 'Females can sting.' : 'It cannot sting.') },

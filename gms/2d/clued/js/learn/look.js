@@ -3,7 +3,7 @@ import { h } from '../ui/kit.js?v=1';
 import { header, go } from '../ui/app.js?v=1';
 import { sfx } from '../ui/fx.js?v=1';
 import { themeTree, getPack, itemsFor, thumb, factRows, kidsOn } from './data.js?v=1';
-import { notice, emptyState, creditBtn, sayBtn } from './ui.js?v=1';
+import { notice, emptyState, creditBtn, sayBtn, put } from './ui.js?v=1';
 import { pick } from '../core/rng.js?v=1';
 
 export function pairsOf(pack, items = pack.items) {
@@ -57,7 +57,7 @@ export async function lookScreen(el, params) {
 
 async function pairList(el, pid, kids) {
   const pack = await getPack(pid);
-  el.append(header(`${pack.icon || ''} ${pack.title}`.trim()), notice(pack.notice));
+  put(el, header(`${pack.icon || ''} ${pack.title}`.trim()), notice(pack.notice));
   const items = itemsFor(pack, false);
   const byId = Object.fromEntries(items.map(x => [x.id, x]));
   const pairs = pairsOf(pack, items);
@@ -73,7 +73,7 @@ async function compare(el, { pack: pid, a: aid, b: bid }, kids) {
   const by = id => pack.items.find(x => x.id === id);
   const a = by(aid), b = by(bid);
   if (!a || !b) { el.append(header('Lookalikes'), emptyState('❓', 'Pair not found', '')); return; }
-  el.append(header(kids ? 'Spot the difference' : 'Compare'), notice(pack.notice));
+  put(el, header(kids ? 'Spot the difference' : 'Compare'), notice(pack.notice));
   const col = it => {
     const t = thumb(it);
     const cr = [...(it.media?.img || [])];
@@ -94,7 +94,7 @@ async function compare(el, { pack: pid, a: aid, b: bid }, kids) {
   if (say) diffEl.firstChild.append(' ', say);
 
   const others = [...new Set([...(a.lookalikes || []), ...pack.items.filter(x => x.lookalikes?.includes(a.id)).map(x => x.id)])].filter(id => id !== b.id && by(id));
-  el.append(h('div.l-cmp', {}, col(a), h('div.l-vs', {}, 'vs'), col(b)), diffEl,
+  put(el, h('div.l-cmp', {}, col(a), h('div.l-vs', {}, 'vs'), col(b)), diffEl,
     others.length ? h('div.l-looks', {}, h('div.l-flabel', {}, `${a.name} is also confused with`),
       h('div.chips', {}, ...others.map(id => h('button.chip', { type: 'button', onclick: () => go('l-look', { pack: pid, a: aid, b: id }, { replace: true }) }, by(id).name)))) : null,
     quiz(pack, a, b));
