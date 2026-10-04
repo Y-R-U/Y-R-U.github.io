@@ -1,13 +1,13 @@
 import * as THREE from 'three';
-import { createCast } from './cast.js?v=20261004f';
-import { createProps, PV } from './props.js?v=20261004f';
-import { createParticles } from './particles.js?v=20261004f';
-import { CHARS, townsfolk } from './looks.js?v=20261004f';
-import { hatIndex, dressScale } from './cast.js?v=20261004f';
-import { createScenes } from './scenes.js?v=20261004f';
-import { createHalos, createGhosts } from './overlay.js?v=20261004f';
-import { FRONTS } from '../../data/plots.js?v=20261004f';
-import { updateSoftTint } from '../fx.js?v=20261004f';
+import { createCast } from './cast.js?v=20261004g';
+import { createProps, PV } from './props.js?v=20261004g';
+import { createParticles } from './particles.js?v=20261004g';
+import { CHARS, townsfolk } from './looks.js?v=20261004g';
+import { hatIndex, dressScale } from './cast.js?v=20261004g';
+import { createScenes } from './scenes.js?v=20261004g';
+import { createHalos, createGhosts } from './overlay.js?v=20261004g';
+import { FRONTS } from '../../data/plots.js?v=20261004g';
+import { updateSoftTint } from '../fx.js?v=20261004g';
 
 // The spectacle director (DESIGN W9/W10): ONE slot for the big moment (a special or a story beat), a hard actor budget
 // (≤ 6 animated + ≤ 24 crowd extras + ≤ 256 particles), a pre-allocated actor pool, blob shadows, hero picking in the

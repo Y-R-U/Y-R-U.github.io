@@ -1,8 +1,8 @@
 // Town life that belongs to no plot: lamp halos at night, pecking birds, circling buzzards, townsfolk on the boardwalks.
 import * as THREE from 'three';
-import * as S from './shape.js?v=20261004f';
-import { createCrowd, CLIP } from './crowd.js?v=20261004f';
-import * as WK from './western.js?v=20261004f';
+import * as S from './shape.js?v=20261004g';
+import { createCrowd, CLIP } from './crowd.js?v=20261004g';
+import * as WK from './western.js?v=20261004g';
 
 const _m = new THREE.Matrix4(), _q = new THREE.Quaternion(), _e = new THREE.Euler(), _p = new THREE.Vector3(), _s = new THREE.Vector3();
 

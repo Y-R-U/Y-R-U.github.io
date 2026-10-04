@@ -3,9 +3,9 @@
 // bathwater (murky, sold to the saloon as "house beer"). Gag: every few seconds a bather leaps up and the duck flies.
 // L1 two tubs → L25 a third tub behind a rose privacy screen → L100 a water tower piping hot water to the deck.
 import * as THREE from 'three';
-import { softPuffs } from '../fx.js?v=20261004f';
-import { COLORS, EXTRA_HATS, cardCam, falseFront, porch, win, barrel, lantern, blade, signBoard, hats, hatted, particles, tufts, rock, tone, vignette } from './western.js?v=20261004f';
-import { createConstruction, finishPlot } from './construction.js?v=20261004f';
+import { softPuffs } from '../fx.js?v=20261004g';
+import { COLORS, EXTRA_HATS, cardCam, falseFront, porch, win, barrel, lantern, blade, signBoard, hats, hatted, particles, tufts, rock, tone, vignette } from './western.js?v=20261004g';
+import { createConstruction, finishPlot } from './construction.js?v=20261004g';
 
 const BX = -3.0, FZ = 0.4, W = 6.0, D = 5.0, H = 3.2, FH = 5.0;
 const TUBS = [[1.4, 1.2], [3.6, 0.6], [5.0, 2.4]];

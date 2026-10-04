@@ -1,5 +1,5 @@
-import { el, btn, setText } from './dom.js?v=20261004f';
-import { fmtCash } from '../state/format.js?v=20261004f';
+import { el, btn, setText } from './dom.js?v=20261004g';
+import { fmtCash } from '../state/format.js?v=20261004g';
 
 // W8/W9 specials. The state spawns a special in wind-up (`special:wind`): we ring the bell, show a chip, and call
 // `special:begin` once the hero (or, for a brawl, the Saloon card) has been on screen for WIND_MS. Never begun, it
@@ -240,7 +240,9 @@ export function createSpecials(hero, ctx, { heroVisible, cardFor, toHero, specta
     const r = game.act('duel:result', payload);
     if (ms === 'early') { setTimeout(() => audio.sfx.tuba(), 300); ctx.barks.wordless('stranger', { force: true }); }
     ctx.bus.emit('ui:duel', { phase: 'result', id: g.ev.id, ...payload, tier: r.reward?.tier });
-    finish({ ...(r.reward || {}), ms: ms === 'early' || ms == null ? null : ms, early: ms === 'early' }, true);
+    g.ui.draw.classList.remove('on');
+    const res = { ...(r.reward || {}), ms: ms === 'early' || ms == null ? null : ms, early: ms === 'early' };
+    setTimeout(() => { if (cur === g) finish(res, true); }, 450);
   }
 
   // Follow Spectacle's duel timeline: paces → standoff/ECU (eyes) → draw.

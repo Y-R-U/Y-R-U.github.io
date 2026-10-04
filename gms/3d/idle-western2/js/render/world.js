@@ -1,14 +1,14 @@
 import * as THREE from 'three';
-import { createCardRig, createHeroDirector } from './cameras.js?v=20261004f';
-import { createLighting, lerpLight } from './kit/lighting.js?v=20261004f';
-import { createField, buildTerrain, terrainMesh } from './kit/terrain.js?v=20261004f';
-import { buildTown } from './kit/town.js?v=20261004f';
-import { createAmbient } from './kit/ambient.js?v=20261004f';
-import { LIGHTS, DAY_KEYS } from '../data/palette.js?v=20261004f';
-import { gameClock, CYCLE_SEC } from '../data/clock.js?v=20261004f';
-import * as PL from '../data/plots.js?v=20261004f';
+import { createCardRig, createHeroDirector } from './cameras.js?v=20261004g';
+import { createLighting, lerpLight } from './kit/lighting.js?v=20261004g';
+import { createField, buildTerrain, terrainMesh } from './kit/terrain.js?v=20261004g';
+import { buildTown } from './kit/town.js?v=20261004g';
+import { createAmbient } from './kit/ambient.js?v=20261004g';
+import { LIGHTS, DAY_KEYS } from '../data/palette.js?v=20261004g';
+import { gameClock, CYCLE_SEC } from '../data/clock.js?v=20261004g';
+import * as PL from '../data/plots.js?v=20261004g';
 
-import { PLOT_BUILDERS, FALLBACK_PLOT } from './plots/index.js?v=20261004f';
+import { PLOT_BUILDERS, FALLBACK_PLOT } from './plots/index.js?v=20261004g';
 
 export { PLOT_BUILDERS };
 const HUB = PL.HUB;

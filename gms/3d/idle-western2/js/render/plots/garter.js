@@ -4,8 +4,8 @@
 // upstairs window and drops into the hay cart while his wife, rolling pin raised, storms in at the front door.
 // L1 parlour → L25 a gazebo of pink lanterns + a second boa'd balcony → L100 an onion-dome cupola with a heart weather vane.
 import * as THREE from 'three';
-import { COLORS, EXTRA_HATS, cardCam, falseFront, porch, win, lantern, blade, signBoard, hats, hatted, particles, tufts, cart, tone, tilt, hatGeo, smooth01, vignette, CROWD_K } from './western.js?v=20261004f';
-import { createConstruction, finishPlot } from './construction.js?v=20261004f';
+import { COLORS, EXTRA_HATS, cardCam, falseFront, porch, win, lantern, blade, signBoard, hats, hatted, particles, tufts, cart, tone, tilt, hatGeo, smooth01, vignette, CROWD_K } from './western.js?v=20261004g';
+import { createConstruction, finishPlot } from './construction.js?v=20261004g';
 
 const BX = -1.6, FZ = 0.6, W = 8.6, D = 6.0, H1 = 3.3, H2 = 6.4, FH = 7.6;
 const DOOR = [BX - 1.4, FZ];

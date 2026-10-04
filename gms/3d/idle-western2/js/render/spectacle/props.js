@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { propMaterial } from '../eventart.js?v=20261004f';
+import { propMaterial } from '../eventart.js?v=20261004g';
 
 // Every spectacle prop shape in ONE instanced mesh (the eventart trick: each instance picks its variant, the vertex
 // shader collapses the rest). Facing +z, origin on the ground unless noted. Flap parts (wings) swing in the shader.

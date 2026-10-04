@@ -1,6 +1,6 @@
 import * as THREE from 'three';
-import * as S from './shape.js?v=20261004f';
-import { WORLD_LIGHT_HEAD, WORLD_LIGHT_FRAG, WORLD_POS_VERT } from './materials.js?v=20261004f';
+import * as S from './shape.js?v=20261004g';
+import { WORLD_LIGHT_HEAD, WORLD_LIGHT_FRAG, WORLD_POS_VERT } from './materials.js?v=20261004g';
 
 // Caricature chibi townsfolk (Look A): one merged rig, one InstancedMesh per crowd, limbs posed in the vertex shader.
 // Head ≈ 40% of height, big nose, thick brows, moustaches, hats and accessories are all inside the rig and picked per

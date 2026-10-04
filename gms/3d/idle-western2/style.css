@@ -255,6 +255,7 @@ button:focus-visible, select:focus-visible, input:focus-visible, .line-card:focu
 .duel-pace.tick { animation: tickp .25s ease-out; }
 @keyframes tickp { from { transform: translate(-50%, -50%) scale(1.5); opacity: .4; } }
 .duel-draw { position: absolute; left: 50%; top: 46%; transform: translate(-50%, -50%) scale(.3); opacity: 0; font: 400 72px/1 var(--display); color: #fff; text-shadow: 0 4px 0 var(--red), 0 0 30px rgba(255, 120, 40, .9); pointer-events: none; z-index: 3; }
+.duel-draw { transition: opacity .3s; }
 .duel-draw.on { opacity: 1; transform: translate(-50%, -50%) scale(1); }
 .duel-on .mini-result { z-index: 4; }
 

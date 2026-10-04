@@ -1,7 +1,7 @@
 import * as THREE from 'three';
-import { pomfreyHat } from './looks.js?v=20261004f';
-import { POMFREY_HATS } from '../../data/hats.js?v=20261004f';
-import { PCOL } from './particles.js?v=20261004f';
+import { pomfreyHat } from './looks.js?v=20261004g';
+import { POMFREY_HATS } from '../../data/hats.js?v=20261004g';
+import { PCOL } from './particles.js?v=20261004g';
 
 // R4 hero vignettes, composed like refs/a_clay_hero.jpg: the Stranger seen from behind in the foreground (lower left of
 // centre), one or two characters playing a readable gag in the mid-ground, and open dirt around them (`clear` zones:

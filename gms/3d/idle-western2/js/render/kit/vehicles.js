@@ -1,5 +1,5 @@
 // Soft toy vehicles. Front = +x, origin on the ground at the centre.
-import * as S from './shape.js?v=20261004f';
+import * as S from './shape.js?v=20261004g';
 
 const at = (x, z, ry, y = 0, parent = null) => {
   const m = S.matrix({ pos: [x, y, z], ry });
