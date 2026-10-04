@@ -72,3 +72,10 @@ Aaron's words, condensed (inspiration, not a spec — improve on it):
 - 2026-10-04 Round 6 complete + pushed (BUILD 20261004g). Manager fix: duel result card waits 450 ms for DRAW! to fade.
 - 2026-10-04 Aaron feedback on live build: (1) card Lv·$/s badge should also show bottom-left when the card top is scrolled off but buttons visible; (2) a shoot-out view was blocked by a wagon; (3) slow laptop jerky → adaptive quality. Launched U (badge mirror + Graphics Auto/High/Med/Low setting, 9361), S (spectacle occluder hiding + test, 9351), M (startup detection + desktop governor + quality API + test-quality, 9301).
 - 2026-10-04 Adaptive quality committed (not pushed yet): test-scroll phone p95 14 ms in 3/4 loaded runs — A/B vs previous commit on a quiet machine before pushing.
+- 2026-10-04 Badge mirror, strongbox tap-skip, Graphics setting, occluder hiding (duel wagon), adaptive quality (calibrated so capable devices stay High; A/B showed no perf regression) — all pushed, BUILD 20261004h. REGISTERED in projects.js (a79fb9d6) with screenshot assets/screenshots/idle-western2.jpg.
+## RESUME BACKLOG (after 2026-10-04)
+1. Aaron's phone feedback is the judge (blind critic plateau ~4.25 vs AI concept refs; IL2 precedent).
+2. Open art items: building corner covering ~10% in shine ambient duel; tagged props pop (no fade); build-card crew large; ACE piano riffs unheard (optional tap pool); manifest still says "Colonel" (not shown).
+3. world.setCrowdDensity(f) hook requested by M (governor's last rung) — lane A.
+4. v1.1: Railroad End block (Elixir, Mine, Depot), Feud, After Dark, Christmas season; Ghost Town cut-off rule 20 Oct is moot (overlay shipped).
+5. Typical-profile player doesn't reach "Fake Your Death recommended" in 75 min (only active ~62 min) — revisit pacing.
