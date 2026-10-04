@@ -3,7 +3,7 @@
 // layer and is rebuilt whenever the set of visible pieces changes (tier ups, construction), never per frame.
 import * as THREE from 'three';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
-import { CROWD_LAYER } from './crowd.js?v=20261004e';
+import { CROWD_LAYER } from './crowd.js?v=20261004f';
 
 export function createPlotBatch() {
   const root = new THREE.Group();

@@ -1,5 +1,5 @@
-import { el, btn } from './dom.js?v=20261004e';
-import { section, buyRow, empty } from './kit.js?v=20261004e';
+import { el, btn } from './dom.js?v=20261004f';
+import { section, buyRow, empty } from './kit.js?v=20261004f';
 
 // Manager sheet: portrait, trait, Lv 1–5 (cash + 🦷), item slots, the saddlebag (equip, merge 3 → 1, auto-equip).
 export function fillManager(body, ctx, managerId) {

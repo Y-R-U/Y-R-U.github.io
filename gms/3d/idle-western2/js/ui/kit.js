@@ -1,5 +1,5 @@
-import { el, btn, setText } from './dom.js?v=20261004e';
-import { fmtCash } from '../state/format.js?v=20261004e';
+import { el, btn, setText } from './dom.js?v=20261004f';
+import { fmtCash } from '../state/format.js?v=20261004f';
 
 export function section(body, title) {
   const s = el('section', 'sec');

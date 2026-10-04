@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { HERO_VIEW, ROAD_Z, STREET_W } from '../data/plots.js?v=20261004e';
+import { HERO_VIEW, ROAD_Z, STREET_W } from '../data/plots.js?v=20261004f';
 const FACADE_Z = ROAD_Z - STREET_W / 2 - 5;
 
 const D2R = Math.PI / 180;

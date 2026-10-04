@@ -1,4 +1,4 @@
-import { el as mk } from './dom.js?v=20261004e';
+import { el as mk } from './dom.js?v=20261004f';
 
 const HOLD_MS = 300, SLOP = 8, YAW_PER_W = 2.3, PITCH_PER_H = 1.4;
 

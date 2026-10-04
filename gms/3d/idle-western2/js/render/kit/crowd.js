@@ -1,6 +1,6 @@
 import * as THREE from 'three';
-import * as S from './shape.js?v=20261004e';
-import { WORLD_LIGHT_HEAD, WORLD_LIGHT_FRAG, WORLD_POS_VERT } from './materials.js?v=20261004e';
+import * as S from './shape.js?v=20261004f';
+import { WORLD_LIGHT_HEAD, WORLD_LIGHT_FRAG, WORLD_POS_VERT } from './materials.js?v=20261004f';
 
 // Caricature chibi townsfolk (Look A): one merged rig, one InstancedMesh per crowd, limbs posed in the vertex shader.
 // Head ≈ 40% of height, big nose, thick brows, moustaches, hats and accessories are all inside the rig and picked per
@@ -174,7 +174,7 @@ export function hatForTier(def) {
   if (id === 'derby') return { type: HAT.derby, scale: 1, color: HAT_COLORS.brown };
   if (id === 'bowler') return { type: HAT.bowler, scale: 1, color: HAT_COLORS.black };
   if (id === 'stetson') return { type: HAT.stetson, scale: 1, color: HAT_COLORS.tan };
-  return { type: HAT.ten, scale: Math.max(1, (def.scale || 1.6) / 1.6), color: HAT_COLORS.cream };
+  return { type: HAT.ten, scale: Math.max(1, (def.scale || 1.6) / 1.6), color: HAT_COLORS.dark };
 }
 // Pomfrey's tier (POMFREY_HATS row) → a top hat that shrinks to a thimble.
 export function hatForPomfrey(def) {

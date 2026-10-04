@@ -1,4 +1,4 @@
-import { el } from './dom.js?v=20261004e';
+import { el } from './dom.js?v=20261004f';
 
 // W5 bark layer. The state gates sentence barks (one per 30–45 s, priority triggers always) and emits `bark {char, trig}`;
 // this picks the line (once-ever, 10 min no-repeat, Sunday School), plays it and shows ONE bubble, positioned by

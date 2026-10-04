@@ -1,5 +1,5 @@
-import { el, btn, setText, show } from './dom.js?v=20261004e';
-import { fmtCash, fmtRate } from '../state/format.js?v=20261004e';
+import { el, btn, setText, show } from './dom.js?v=20261004f';
+import { fmtCash, fmtRate } from '../state/format.js?v=20261004f';
 
 const HOLD_DELAY = 380, HOLD_START = 170, HOLD_MIN = 45;
 export const STAGE_LABEL = { survey: '📐 Survey', frame: '🪵 Frame', walls: '🧱 Walls', front: '🏚️ False front', sign: '🪧 Sign' };

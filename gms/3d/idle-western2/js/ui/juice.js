@@ -1,5 +1,5 @@
-import { el, reducedMotion } from './dom.js?v=20261004e';
-import { fmtCash } from '../state/format.js?v=20261004e';
+import { el, reducedMotion } from './dom.js?v=20261004f';
+import { fmtCash } from '../state/format.js?v=20261004f';
 
 export function createJuice({ root, target, audio }) {
   const layer = el('div', 'fx-layer');

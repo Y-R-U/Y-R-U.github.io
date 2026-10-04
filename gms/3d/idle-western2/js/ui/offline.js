@@ -1,5 +1,5 @@
-import { el, btn } from './dom.js?v=20261004e';
-import { fmtCash, fmtTime } from '../state/format.js?v=20261004e';
+import { el, btn } from './dom.js?v=20261004f';
+import { fmtCash, fmtTime } from '../state/format.js?v=20261004f';
 
 export function createOffline(root, ctx) {
   const card = el('div', 'away');

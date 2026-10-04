@@ -1,8 +1,8 @@
-import { EJECT_LOOK, OPPONENTS, townsfolk, hatFor, pomfreyHat } from './looks.js?v=20261004e';
-import { CLIP as RIG, CHARACTERS } from '../kit/crowd.js?v=20261004e';
-import { PCOL } from './particles.js?v=20261004e';
-import { HATS, POMFREY_HATS } from '../../data/hats.js?v=20261004e';
-import { createVignettes } from './vignettes.js?v=20261004e';
+import { EJECT_LOOK, OPPONENTS, townsfolk, hatFor, pomfreyHat } from './looks.js?v=20261004f';
+import { CLIP as RIG, CHARACTERS } from '../kit/crowd.js?v=20261004f';
+import { PCOL } from './particles.js?v=20261004f';
+import { HATS, POMFREY_HATS } from '../../data/hats.js?v=20261004f';
+import { createVignettes } from './vignettes.js?v=20261004f';
 
 // Every spectacle as a small state machine: { prio, slot, line, begin, update(dt) → false when done, pick, on, end }.
 // prio: 3 special · 2 beat/fling · 1 ambient duel · 0 gag. Actors come from ctx.actor() and may be null (budget):

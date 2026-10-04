@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { CHARACTERS, HAT, HAT_COLORS, HAT_SEAT, CROWD_K, CLIP, hatGeometry } from '../kit/crowd.js?v=20261004e';
+import { CHARACTERS, HAT, HAT_COLORS, HAT_SEAT, CROWD_K, CLIP, hatGeometry } from '../kit/crowd.js?v=20261004f';
 
 // Spectacle cast on lane A's caricature rig (kit/crowd.js): one InstancedMesh + one blob draw for every hero actor,
 // hats/moustaches/accessories inside the rig. Instance index = pool index, so a look is uploaded once per actor and

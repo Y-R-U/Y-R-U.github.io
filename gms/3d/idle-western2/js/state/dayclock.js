@@ -1,6 +1,6 @@
 // W18 game clock for the economy: lane A's pure clock (data/clock.js) on game seconds, plus the Witching Hour.
 // The renderer reads the same gameClock(game.simTime), or injects its own with game.setDayClock(fn).
-import { gameClock, CYCLE_SEC } from '../data/clock.js?v=20261004e';
+import { gameClock, CYCLE_SEC } from '../data/clock.js?v=20261004f';
 
 export function dayAt(sec, D) {
   const c = gameClock(sec);

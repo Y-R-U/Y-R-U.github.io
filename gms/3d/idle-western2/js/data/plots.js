@@ -1,7 +1,7 @@
 // Dribble Creek (DESIGN W1/W3): ONE main street along +x. The 9 business lots sit on the NORTH side (z ≈ 0, facing +z
 // toward the street) in three blocks split by alleys; Pomfrey's 7 frontages and the Town Hall face them from the SOUTH
 // side (facing −z); the church closes the far end of the street and Boot Hill rises behind it. See docs/ART.md.
-import { LINES } from './lines.js?v=20261004e';
+import { LINES } from './lines.js?v=20261004f';
 
 export const PLOT_D = 9;
 export const ROAD_Z = 9;

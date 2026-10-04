@@ -4,7 +4,7 @@
 // walls rise with t. No geometry is made after boot: timbers and planks are one InstancedMesh, the swinging front and
 // the sign are two prebuilt meshes, the crew is one crowd. Also plays the Lv25/Lv100 "extension" crew bustle.
 import * as THREE from 'three';
-import { tone, wheel, crate, particles, placed, headY, tilt, rand, smooth01, fgProp, COLORS, CROWD_K } from './western.js?v=20261004e';
+import { tone, wheel, crate, particles, placed, headY, tilt, rand, smooth01, fgProp, COLORS, CROWD_K } from './western.js?v=20261004f';
 
 const easeBack = (x) => { const t = Math.max(0, Math.min(1, x)); const c = 1.9; return 1 + (c + 1) * Math.pow(t - 1, 3) + c * Math.pow(t - 1, 2); };
 const _m = new THREE.Matrix4(), _q = new THREE.Quaternion(), _e = new THREE.Euler(), _p = new THREE.Vector3(), _s = new THREE.Vector3(), _c = new THREE.Color();

@@ -1,4 +1,4 @@
-import { el } from './dom.js?v=20261004e';
+import { el } from './dom.js?v=20261004f';
 
 // Hero toasts live in the band between the hero's central 50% box and the label/qty row (right-aligned, clear of
 // the 🎹); with the hero away they move to the root, just under the HUD. At most 2, fewer if the band is short.
