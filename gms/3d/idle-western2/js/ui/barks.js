@@ -1,4 +1,4 @@
-import { el } from './dom.js?v=20261004g';
+import { el } from './dom.js?v=20261004h';
 
 // W5 bark layer. The state picks speakers and emits `bark {char, trig, prio}`; this layer owns the one global sentence
 // budget (PT2#4): ambient sentences (state idle/event barks, Spectacle's gags) one per 30–45 s and one per character

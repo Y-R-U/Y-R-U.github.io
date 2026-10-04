@@ -1,8 +1,8 @@
 // Reusable dressing built through a builder: townhouses, street furniture, greenery, paving.
 // Every function takes (b, x, z, opts) in the builder's space; opts.ry rotates, opts.y lifts, opts.parent nests.
 import * as THREE from 'three';
-import * as S from './shape.js?v=20261004g';
-import { resolveSlot, ROOF } from './build.js?v=20261004g';
+import * as S from './shape.js?v=20261004h';
+import { resolveSlot, ROOF } from './build.js?v=20261004h';
 
 const at = (x, y, z, ry = 0, parent = null) => {
   const m = S.matrix({ pos: [x, y, z], ry });

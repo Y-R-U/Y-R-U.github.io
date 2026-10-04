@@ -145,11 +145,11 @@ export function qualityAt(level) {
 //        known, the GPU time scaled by the next rung's cost still under 80% of the target.
 //        The hold is 12 s, doubled for every time that rung already failed (max 16×), so a rung that can't hold is
 //        retried at 24 s, 48 s, … and the ladder never oscillates.
-// Down needs ≥ 2 s of samples (1.5 s when severe), up a full window. Nothing is sampled for 3.5 s after boot, 4.5 s after
+// Down needs a full window that stays over for 1.5 s (severe: 1.5 s of samples), up a full window. Nothing is sampled for 3.5 s after boot, 2.5 s after
 // the boot bench, 2.5 s after a visibility return (host resets), 1 s after a step down.
-export function createGovernor({ windowMs = 3000, graceMs = 2500, bootGraceMs = 3500, downSpanMs = 2000, upHoldMs = 12000, evalMs = 250 } = {}) {
+export function createGovernor({ windowMs = 3000, graceMs = 2500, bootGraceMs = 3500, upHoldMs = 12000, evalMs = 250 } = {}) {
   const N = 512, dts = new Float32Array(N), works = new Float32Array(N), gpus = new Float32Array(N), ts = new Float64Array(N);
-  let n = 0, head = 0, graceUntil = -1, evalAt = 0, goodSince = null, lastDown = -Infinity, trial = null, target = 1000 / 60;
+  let n = 0, head = 0, overSince = null, graceUntil = -1, evalAt = 0, goodSince = null, lastDown = -Infinity, trial = null, target = 1000 / 60;
   const fails = new Map(), tmp = new Float32Array(N);
   const out = { meanDt: 0, p95: 0, slow: 0, meanWork: 0, gpu: -1, jitter: 0, downs: 0, ups: 0, trials: 0, capped: false, target, reason: '', hold: 0 };
   const quantile = (src, k, p) => { for (let i = 0; i < k; i++) tmp[i] = src[(head + i) % N]; const a = tmp.subarray(0, k).sort(); return a[Math.min(k - 1, Math.floor(k * p))]; };
@@ -162,7 +162,7 @@ export function createGovernor({ windowMs = 3000, graceMs = 2500, bootGraceMs = 
   const g = {
     stats: out,
     fails,
-    reset(now, grace = graceMs) { n = head = 0; goodSince = null; graceUntil = now + grace; },
+    reset(now, grace = graceMs) { n = head = 0; goodSince = overSince = null; graceUntil = now + grace; },
     sample(dt, work, gpu, now, level, min, max) {
       if (graceUntil < 0) graceUntil = now + bootGraceMs;
       if (now < graceUntil || dt <= 0) return 0;
@@ -187,7 +187,7 @@ export function createGovernor({ windowMs = 3000, graceMs = 2500, bootGraceMs = 
       for (let k = 0; k < n; k++) { const d = dts[(head + k) % N] - mean; v += d * d; }
       Object.assign(out, { meanDt: mean, meanWork: meanW, gpu: meanG, jitter: Math.sqrt(v / n), slow: slow / n, p95: quantile(dts, n, 0.95), target });
       const severe = meanC > target * 2.5 && span > 1500 && n >= 4;
-      if (span < downSpanMs && !severe) return 0;
+      if (span < (severe ? 1500 : windowMs * 0.9)) return 0;
       if (trial) {
         const t = trial;
         trial = null;
@@ -199,7 +199,10 @@ export function createGovernor({ windowMs = 3000, graceMs = 2500, bootGraceMs = 
         }
       }
       const over = meanC > target * 1.25 || slow / n > 0.05;
-      if (over && level < max) {
+      // A non-severe overload must persist for 1.5 s of evaluations (a full window after one bad burst), so one burst
+      // of hitches (boot work, a card first shown, a big spectacle cut) never costs a rung on a capable device.
+      if (over) overSince ??= now; else overSince = null;
+      if (over && level < max && (severe || now - overSince >= 1500)) {
         const light = meanW < target * 0.4;
         if (meanG >= 0 && light && meanG < target * 0.45) { out.reason = 'slow but not GPU/CPU-bound: hold'; goodSince = null; return 0; }
         let step;
@@ -230,11 +233,13 @@ export function createGovernor({ windowMs = 3000, graceMs = 2500, bootGraceMs = 
   return g;
 }
 
-// Boot micro-benchmark → start level: sync-timed hero renders (CPU submit + GPU) at the current level, projected down the
-// ladder by cost until one fits the budget (desktop 60 fps hero + cards: 14 ms; phone 30 fps idle hero + solo frames: 16 ms). It only ever lowers the start;
-// the 14 ms bar is deliberately loose (an M5 under load reads 6–9 ms), the governor does the fine tuning..
+// Boot micro-benchmark → start level. Only a clearly slow device moves: the fastest fenced hero render (CPU submit + GPU,
+// warm-up discarded) must exceed 28 ms (desktop; phone 30), i.e. the hero alone can't hold ~30 fps. Then it is projected
+// down the ladder by cost until it fits 16 ms; anything milder is left to the governor, which measures real frames.
+// Measured (fastest render): M5 headless @1 ≈ 6–9 ms, @2 ≈ 20 ms, the slow-laptop stand-in 37–60 ms.
 export function levelForBench(ms, level, max) {
-  const budget = device.mobile ? 16 : 14;
+  if (ms <= (device.mobile ? 30 : 28)) return level;
+  const budget = 16;
   let to = level;
   while (to < max && ms * LADDER[to].cost / LADDER[level].cost > budget) to++;
   return to;

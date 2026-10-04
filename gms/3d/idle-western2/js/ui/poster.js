@@ -1,5 +1,5 @@
-import { el } from './dom.js?v=20261004g';
-import { fmtCash, fmtNum } from '../state/format.js?v=20261004g';
+import { el } from './dom.js?v=20261004h';
+import { fmtCash, fmtNum } from '../state/format.js?v=20261004h';
 
 // W16 Wanted Poster postcard: your hat, moustache, bounty and joke stats, drawn on a 2D canvas and saved as a PNG.
 const W = 1200, H = 1650;

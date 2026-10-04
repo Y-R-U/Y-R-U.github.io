@@ -4,7 +4,7 @@
 // top of (0.01 m in front of) a thin wood slab for thickness. ry = 0 faces +z.
 // Styles: you · pomfrey · civic · none · forsale · reserved · poster · brass · chalk
 import * as THREE from 'three';
-import { WORLD_LIGHT_HEAD, WORLD_LIGHT_FRAG, WORLD_POS_VERT, RIM_FRAG } from './materials.js?v=20261004g';
+import { WORLD_LIGHT_HEAD, WORLD_LIGHT_FRAG, WORLD_POS_VERT, RIM_FRAG } from './materials.js?v=20261004h';
 
 const AW = 2048, AH = 1024, ROW = 64;
 const FONT = "Georgia, 'Times New Roman', 'Noto Serif', serif";

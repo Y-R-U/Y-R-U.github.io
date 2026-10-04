@@ -1,5 +1,5 @@
-import { el, btn, setText } from './dom.js?v=20261004g';
-import { fmtCash } from '../state/format.js?v=20261004g';
+import { el, btn, setText } from './dom.js?v=20261004h';
+import { fmtCash } from '../state/format.js?v=20261004h';
 
 // W8/W9 specials. The state spawns a special in wind-up (`special:wind`): we ring the bell, show a chip, and call
 // `special:begin` once the hero (or, for a brawl, the Saloon card) has been on screen for WIND_MS. Never begun, it

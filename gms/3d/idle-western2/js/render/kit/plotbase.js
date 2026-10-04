@@ -1,10 +1,10 @@
 // The plot framework every business diorama is built on. See docs/ART.md for the contract.
 import * as THREE from 'three';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
-import { createBuilder, contactMesh } from './build.js?v=20261004g';
-import { createCrowd, CLIP, OUTFITS } from './crowd.js?v=20261004g';
-import { createPile } from './piles.js?v=20261004g';
-import * as props from './props.js?v=20261004g';
+import { createBuilder, contactMesh } from './build.js?v=20261004h';
+import { createCrowd, CLIP, OUTFITS } from './crowd.js?v=20261004h';
+import { createPile } from './piles.js?v=20261004h';
+import * as props from './props.js?v=20261004h';
 
 export const PLOT_W = 24, PLOT_D = 9;
 

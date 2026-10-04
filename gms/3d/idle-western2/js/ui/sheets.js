@@ -1,4 +1,4 @@
-import { el, btn } from './dom.js?v=20261004g';
+import { el, btn } from './dom.js?v=20261004h';
 
 export function createSheets(root, { onChange } = {}) {
   const scrim = el('div', 'sheet-scrim');

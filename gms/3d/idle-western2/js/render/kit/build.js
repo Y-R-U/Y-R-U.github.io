@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import * as S from './shape.js?v=20261004g';
+import * as S from './shape.js?v=20261004h';
 
 const _m = new THREE.Matrix4(), _q = new THREE.Quaternion(), _e = new THREE.Euler(), _v = new THREE.Vector3(),
   _s = new THREE.Vector3(), _n3 = new THREE.Matrix3(), _c = new THREE.Color();

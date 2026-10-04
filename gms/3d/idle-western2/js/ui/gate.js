@@ -1,5 +1,5 @@
-import { el, btn, setText, show } from './dom.js?v=20261004g';
-import { fmtCash } from '../state/format.js?v=20261004g';
+import { el, btn, setText, show } from './dom.js?v=20261004h';
+import { fmtCash } from '../state/format.js?v=20261004h';
 
 // The next district's permit, bought right here under the list. Hidden while there is no next district.
 export function createGate(ctx) {

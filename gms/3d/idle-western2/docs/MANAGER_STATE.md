@@ -69,3 +69,6 @@ Aaron's words, condensed (inspiration, not a spec — improve on it):
 - 2026-10-04 Round 5 complete, pushed BUILD 20261004f (hero draws ~100, all green; lifecycle actor-sum check relaxed for hero near-cut). Blind critic r5 + playtest 2 (9391) running.
 - 2026-10-04 Blind critic r5 ~4.25 (plateau). Concrete blockers in critic/r5/REPORT.md (opaque dust balls, blob ejectee, orange skin, translucent night char, huge fg cactus, hex tiling, red rocks). Waiting on playtest 2 before round 6.
 - 2026-10-04 Playtest 2 done (PLAYTEST_2.md). Round 6 (ROUND6.md) launched: A/P/S/U/E. Rulings R6a ambient ejections from minute 1, R6b drop 'Colonel', R6c ghosts gated.
+- 2026-10-04 Round 6 complete + pushed (BUILD 20261004g). Manager fix: duel result card waits 450 ms for DRAW! to fade.
+- 2026-10-04 Aaron feedback on live build: (1) card Lv·$/s badge should also show bottom-left when the card top is scrolled off but buttons visible; (2) a shoot-out view was blocked by a wagon; (3) slow laptop jerky → adaptive quality. Launched U (badge mirror + Graphics Auto/High/Med/Low setting, 9361), S (spectacle occluder hiding + test, 9351), M (startup detection + desktop governor + quality API + test-quality, 9301).
+- 2026-10-04 Adaptive quality committed (not pushed yet): test-scroll phone p95 14 ms in 3/4 loaded runs — A/B vs previous commit on a quiet machine before pushing.

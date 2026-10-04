@@ -3,9 +3,9 @@
 // Won at poker (W13): while unowned the lot shows Pomfrey's version (purple + gold boards); buying re-skins it.
 // L1 saloon → L25 card-room annex + more lanterns → L100 hotel storey, gold sign and a rooftop water tank.
 import * as THREE from 'three';
-import { softPuffs } from '../fx.js?v=20261004g';
-import { COLORS, EXTRA_HATS, cardCam, falseFront, porch, win, barrel, crate, lantern, blade, signBoard, horse, hatted, particles, tufts, tone, cart, bale, tilt, vignette } from './western.js?v=20261004g';
-import { createConstruction, finishPlot } from './construction.js?v=20261004g';
+import { softPuffs } from '../fx.js?v=20261004h';
+import { COLORS, EXTRA_HATS, cardCam, falseFront, porch, win, barrel, crate, lantern, blade, signBoard, horse, hatted, particles, tufts, tone, cart, bale, tilt, vignette } from './western.js?v=20261004h';
+import { createConstruction, finishPlot } from './construction.js?v=20261004h';
 
 const BX = -1.2, FZ = 0.7, W = 11, D = 6.4, H1 = 3.9, H2 = 6.8, FH = 7.9;
 const DOOR = [BX + 0.6, FZ];

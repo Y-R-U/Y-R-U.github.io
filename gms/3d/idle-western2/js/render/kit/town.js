@@ -4,8 +4,8 @@
 // Output: merged chunks split by x (and a north/street/south band) so frustum + shadow passes cull them, one painted
 // sign batch, the windmill rotor (spins), the Boot Hill graves (instanced, grows at prestige) and a lamp list.
 import * as THREE from 'three';
-import { contactMesh } from './build.js?v=20261004g';
-import * as W from './western.js?v=20261004g';
+import { contactMesh } from './build.js?v=20261004h';
+import * as W from './western.js?v=20261004h';
 
 const HAT_TOP = (b) => {
   b.cyl('dark', 0, 0, 0, 0.62, 0.08, 0, { sides: 14, taper: 1 });

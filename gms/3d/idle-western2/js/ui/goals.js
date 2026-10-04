@@ -1,7 +1,7 @@
-import { el, btn, bar } from './dom.js?v=20261004g';
-import { fmtNum } from '../state/format.js?v=20261004g';
-import { section, empty } from './kit.js?v=20261004g';
-import { BOX_INFO } from './boxes.js?v=20261004g';
+import { el, btn, bar } from './dom.js?v=20261004h';
+import { fmtNum } from '../state/format.js?v=20261004h';
+import { section, empty } from './kit.js?v=20261004h';
+import { BOX_INFO } from './boxes.js?v=20261004h';
 
 export function rewardText(r) {
   if (!r) return '';

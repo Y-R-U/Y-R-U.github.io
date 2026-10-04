@@ -1,18 +1,18 @@
-import { createMaterials } from './materials.js?v=20261004g';
-import { createBuilder } from './build.js?v=20261004g';
-import { createCrowd, crowdMaterial, createCrowdPool, CROWD_LAYER, EXPR, rigVertexCount, CLIP, OUTFITS, PANTS, HAT, HAT_TYPES, HAT_SEAT, HAT_COLORS, ACC, STACHE, CHARACTERS, hatGeometry, hatForTier, hatForPomfrey } from './crowd.js?v=20261004g';
-import { createGhosts } from './ghost.js?v=20261004g';
-import { createPile, stockUnit } from './piles.js?v=20261004g';
-import { GEO } from './geo.js?v=20261004g';
-import { basePlot, createPlot, FIT } from './plotbase.js?v=20261004g';
-import * as vehicles from './vehicles.js?v=20261004g';
-import * as props from './props.js?v=20261004g';
-import * as shape from './shape.js?v=20261004g';
-import { makeRng, noise2 } from './rng.js?v=20261004g';
-import * as western from './western.js?v=20261004g';
-import { createSigns } from './signs.js?v=20261004g';
-import { SURF } from './build.js?v=20261004g';
-import { createPlotBatch } from './plotbatch.js?v=20261004g';
+import { createMaterials } from './materials.js?v=20261004h';
+import { createBuilder } from './build.js?v=20261004h';
+import { createCrowd, crowdMaterial, createCrowdPool, CROWD_LAYER, EXPR, rigVertexCount, CLIP, OUTFITS, PANTS, HAT, HAT_TYPES, HAT_SEAT, HAT_COLORS, ACC, STACHE, CHARACTERS, hatGeometry, hatForTier, hatForPomfrey } from './crowd.js?v=20261004h';
+import { createGhosts } from './ghost.js?v=20261004h';
+import { createPile, stockUnit } from './piles.js?v=20261004h';
+import { GEO } from './geo.js?v=20261004h';
+import { basePlot, createPlot, FIT } from './plotbase.js?v=20261004h';
+import * as vehicles from './vehicles.js?v=20261004h';
+import * as props from './props.js?v=20261004h';
+import * as shape from './shape.js?v=20261004h';
+import { makeRng, noise2 } from './rng.js?v=20261004h';
+import * as western from './western.js?v=20261004h';
+import { createSigns } from './signs.js?v=20261004h';
+import { SURF } from './build.js?v=20261004h';
+import { createPlotBatch } from './plotbatch.js?v=20261004h';
 
 export function createKit() {
   const materials = createMaterials();

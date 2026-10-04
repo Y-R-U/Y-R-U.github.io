@@ -1,7 +1,7 @@
 // Adaptive quality (ENGINE.md "Adaptive quality"). Headless Metal, desktop 1440×900, demo town.
 //  normal      — no load: auto must stay on High (no steps) and ignore a 3 s freeze (hidden-tab) gap.
 //  slow laptop — CPU 6× + ?gpuload=900 (a fill-bound GPU stand-in: per-pixel shader cost after every view render):
-//                governor alone from High (?bench=0), then boot bench + governor. Frame dt p95 over 10–25 s ≤ 34 ms
+//                governor alone from High (?bench=0), then boot bench + governor on a heavier stand-in (1600). Frame dt p95 over 10–25 s ≤ 34 ms
 //                (two vsyncs) and in every 5 s window from 10 s, level dropped, no up/down reversals, no up-step late.
 //  falsify     — same load with ?gov=0: the p95 gate must FAIL, or the gate proves nothing.
 //  api         — host.quality.set/current/on; classifyGpu table (node side).
@@ -10,7 +10,7 @@ import { launch, stop, openPage, GAME, VIEWPORTS, sleep } from './cdp.mjs';
 import { classifyGpu } from '../js/render/quality.js';
 
 const ONLY = (process.argv.find((a) => a.startsWith('--only=')) || '').slice(7).split(',').filter(Boolean);
-const LOAD = process.env.GPULOAD || '900', RUN = 25000;
+const LOAD = process.env.GPULOAD || '900', HEAVY = process.env.GPULOAD_HEAVY || '1600', RUN = 25000;
 const fails = [];
 const check = (ok, msg) => { console.log((ok ? '  ok   ' : '  FAIL ') + msg); if (!ok) fails.push(msg); return ok; };
 const pct = (a, p) => { const s = [...a].sort((x, y) => x - y); return s[Math.min(s.length - 1, Math.floor(s.length * p))] || 0; };
@@ -115,7 +115,9 @@ try {
   };
   if (want('gov')) slow(await run(port, { name: 'slow laptop, governor only', query: `?nosave=1&demo=1&gpuload=${LOAD}&bench=0`, cpu: 6 }), 'governor');
   if (want('bench')) {
-    const r = await run(port, { name: 'slow laptop, boot bench + governor', query: `?nosave=1&demo=1&gpuload=${LOAD}`, cpu: 6 });
+    // The bench only moves a clearly slow device (fastest hero render > 28 ms): the 900 stand-in reads ~18–26 ms and is
+    // left to the governor, so this profile uses a heavier stand-in.
+    const r = await run(port, { name: 'very slow laptop, boot bench + governor', query: `?nosave=1&demo=1&gpuload=${HEAVY}`, cpu: 6 });
     check(r.bench && r.bench.to > 0, `bench picked level ${r.bench?.to} from ${r.bench?.ms} ms`);
     slow(r, 'bench');
   }

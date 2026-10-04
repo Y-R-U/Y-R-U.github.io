@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { white, softDustMesh } from '../fx.js?v=20261004g';
+import { white, softDustMesh } from '../fx.js?v=20261004h';
 
 // Budgeted particles: soft alpha dust/smoke/splash billboards (C#1: they spread and fade, never opaque balls) and
 // glowing cartoon stars/flashes/shards.

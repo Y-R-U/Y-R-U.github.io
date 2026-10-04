@@ -1,8 +1,8 @@
 import * as THREE from 'three';
-import { createBlitPresenter } from './presenter-blit.js?v=20261004g';
-import { createOverlayPresenter } from './presenter-overlay.js?v=20261004g';
-import { LADDER, PRESET_LEVEL, startLevel, qualityAt, createGovernor, levelForBench, device } from './quality.js?v=20261004g';
-import { createPost, POST_DEFAULTS } from './post.js?v=20261004g';
+import { createBlitPresenter } from './presenter-blit.js?v=20261004h';
+import { createOverlayPresenter } from './presenter-overlay.js?v=20261004h';
+import { LADDER, PRESET_LEVEL, startLevel, qualityAt, createGovernor, levelForBench, device } from './quality.js?v=20261004h';
+import { createPost, POST_DEFAULTS } from './post.js?v=20261004h';
 
 const LIVE_CAP = 10, LOSS_WAIT = 1000, MAX_RECREATE = 3, FRAME_BUDGET = 5;
 const _v3 = new THREE.Vector3(), _ndc = new THREE.Vector2(), _ray = new THREE.Raycaster(), _c = new THREE.Vector3(),
@@ -525,7 +525,7 @@ export function createRenderHost({ lifecycle, flags, bus }) {
 
   // Boot micro-benchmark (auto mode, once): 2.5 s after the first present (shaders warm), 8 hero renders are timed with
   // a sync before and after (1×1 readPixels: waits for the GPU), so each sample is CPU submit + GPU for one hero frame.
-  // The 2nd-fastest of the last 5 picks the start rung (quality.levelForBench). The governor waits for it to finish.
+  // The fastest of the last 5 picks the start rung (quality.levelForBench). The governor waits for it to finish.
   const syncPx = new Uint8Array(4);
   function gpuSync() {
     try { renderer.setRenderTarget(null); const gl = renderer.getContext(); gl.readPixels(0, 0, 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, syncPx); } catch {}
@@ -541,12 +541,12 @@ export function createRenderHost({ lifecycle, flags, bus }) {
     if (bench.ms.length < 8) return;
     // Minus the round trip of an empty sync, so the number is the frame, not the readback.
     const so = bench.sync.slice().sort((a, b) => a - b)[bench.sync.length >> 1] || 0;
-    // 2nd-fastest of the last 5: late warm-up and load on the machine only ever add time, so the low end is the device.
-    const s = bench.ms.slice(3).sort((a, b) => a - b), med = Math.max(0, s[1] - so);
+    // Fastest of the last 5: late warm-up and load on the machine only ever add time, so the low end is the device.
+    const s = bench.ms.slice(3).sort((a, b) => a - b), med = Math.max(0, s[0] - so);
     const to = levelForBench(med, level, Math.min(LADDER.length - 1, 7));
     bench.done = true;
     dbg.bench = { ms: Math.round(med * 100) / 100, sync: Math.round(so * 100) / 100, samples: bench.ms.map((x) => Math.round(x * 10) / 10), from: level, to, at: Math.round(now) };
-    governor.reset(performance.now(), 4500);
+    governor.reset(performance.now(), 2500);
     if (to > level) setLevel(to, `bench ${med.toFixed(1)} ms`);
     else notifyQuality();
   }

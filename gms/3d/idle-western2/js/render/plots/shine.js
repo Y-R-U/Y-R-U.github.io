@@ -1,8 +1,8 @@
 // 🥾 Spit & Shine: Lil' Nubbin's shoeshine throne in front of a mustard shack with a giant wooden boot on the roof.
 // Gag (W4): Nubbin spits on the boot, buffs, and the boot flashes a star glint. Stock: a tip jar with a coin heap.
 // L1 throne + shack → L25 second throne, striped awning, blade sign → L100 "Boot Emporium" with a golden boot.
-import { COLORS, EXTRA_HATS, cardCam, falseFront, porch, crate, blade, signBoard, hats, hatted, particles, tufts, rock, cactus, barrel, lantern, tone, vignette } from './western.js?v=20261004g';
-import { createConstruction, finishPlot } from './construction.js?v=20261004g';
+import { COLORS, EXTRA_HATS, cardCam, falseFront, porch, crate, blade, signBoard, hats, hatted, particles, tufts, rock, cactus, barrel, lantern, tone, vignette } from './western.js?v=20261004h';
+import { createConstruction, finishPlot } from './construction.js?v=20261004h';
 
 const BX = -2.9, FZ = 0.3, W = 5.6, D = 4.6, H = 3.0, FH = 4.6;
 const THRONE = [1.9, 1.8];

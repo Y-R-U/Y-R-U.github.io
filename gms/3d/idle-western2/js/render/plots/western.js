@@ -2,7 +2,7 @@
 // street (road starts at z ≈ 3.5), y up. Building fronts sit near z ≈ 0.9 with a raised porch out to z ≈ 3.3.
 // Every helper writes into a builder (b), so a plot stays one merged static mesh per tier.
 import * as THREE from 'three';
-import { CROWD_K } from '../kit/crowd.js?v=20261004g';
+import { CROWD_K } from '../kit/crowd.js?v=20261004h';
 export { CROWD_K };
 
 // Look A palette (docs/ART_DIRECTION.md §3). Plots pass these as `colors`, so they don't depend on the town palette.

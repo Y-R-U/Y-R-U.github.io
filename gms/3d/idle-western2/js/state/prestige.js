@@ -1,5 +1,5 @@
 // "Fake Your Death" (W2): Bounty maths (IL2 legacy points), graves with seeded epitaphs, the next disguise.
-import { mulberry32, hashStr } from './events.js?v=20261004g';
+import { mulberry32, hashStr } from './events.js?v=20261004h';
 
 export function bountyTotal(allTime, B) {
   if (!(allTime > 0)) return 0;

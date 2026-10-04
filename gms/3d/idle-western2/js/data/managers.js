@@ -1,7 +1,7 @@
 // One manager per business, defined on the business row (data/lines.js BUSINESSES[].manager), plus seasonal ones.
 // Trait kinds handled by state/game.js derive(): speed sigma shelf offline cost events autopile harvest star
 // teeth (every Nth sale drops 🦷) duel (duel rewards ×(1+v)) quiet (+v while no event runs) night (+v during game night, W18).
-import { LINES, BUSINESSES } from './lines.js?v=20261004g';
+import { LINES, BUSINESSES } from './lines.js?v=20261004h';
 
 export const MANAGERS = [
   ...BUSINESSES.filter((b) => b.manager).map((b) => {

@@ -1,6 +1,6 @@
-import { el, btn } from './dom.js?v=20261004g';
-import { BUILD } from '../core/version.js?v=20261004g';
-import { section, toggle, seg, slider } from './kit.js?v=20261004g';
+import { el, btn } from './dom.js?v=20261004h';
+import { BUILD } from '../core/version.js?v=20261004h';
+import { section, toggle, seg, slider } from './kit.js?v=20261004h';
 
 const KEY = 'iw2.save', BAK = 'iw2.save.bak';
 let pending;

@@ -1,4 +1,4 @@
-import { el, btn } from './dom.js?v=20261004g';
+import { el, btn } from './dom.js?v=20261004h';
 
 // Strongbox opening: the box rattles three times, the lid pops, the loot fans out by rarity.
 // Any tap during the rattle skips to the reveal; only the button closes, and only 400 ms after the reveal settles.
