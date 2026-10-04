@@ -488,24 +488,98 @@ let tagged = null, scanIn = 0;
 // R4: the staged vignette's open dirt (spectacle.clear = [[x, z, r], ...]) — no townsfolk or shipments inside it.
 let zones = [];
 const inZone = (x, z) => { for (const q of zones) { const dx = x - q[0], dz = z - q[1]; if (dx * dx + dz * dz < q[2] * q[2]) return true; } return false; };
-export function heroNearCut(camera, x, y, z) {
+// Spectacle occluders: while the hero frames spectacle actors (`spectacle.focal`: a borrowed shot's cast, else the live
+// vignette / ambient duel), every non-cast thing that enters the view cone from the lens to one of them in front of it is
+// dropped for the render: pooled townsfolk and shipments (per frame), and meshes tagged `userData.occluder` or
+// `heroNear` (sticky until the focal scene changes, so nothing flickers). A mesh is kept when it holds a `keep` point
+// (a fling landing) or a focal actor whose feet are off the ground inside it (the drunk in the jail wagon).
+let foc = null, focKey = null;
+const sticky = new Set(), _bx = new THREE.Box3(), _c0 = new THREE.Vector3();
+function coneSphere(C, x, y, z, r) {
+  for (let i = 0; i < foc.n; i++) {
+    const f = foc.f[i], vx = f[0] - C.x, vy = f[1] - C.y, vz = f[2] - C.z, L2 = vx * vx + vy * vy + vz * vz;
+    const u = ((x - C.x) * vx + (y - C.y) * vy + (z - C.z) * vz) / L2;
+    if (u <= 0 || u >= 1) continue;
+    const dx = C.x + vx * u - x, dy = C.y + vy * u - y, dz = C.z + vz * u - z, rr = r + f[3] * u + 0.1;
+    if (dx * dx + dy * dy + dz * dz < rr * rr) return true;
+  }
+  return false;
+}
+// Segment camera → actor against the box grown by the actor's radius (slab test); blocks if it enters before the actor.
+const _d3 = [0, 0, 0], _o3 = [0, 0, 0], _lo = [0, 0, 0], _hi = [0, 0, 0];
+function coneBox(C, b) {
+  const d = _d3, o = _o3, lo = _lo, hi = _hi;
+  for (let i = 0; i < foc.n; i++) {
+    const f = foc.f[i], e = f[3];
+    d[0] = f[0] - C.x; d[1] = f[1] - C.y; d[2] = f[2] - C.z; o[0] = C.x; o[1] = C.y; o[2] = C.z;
+    lo[0] = b.min.x - e; lo[1] = b.min.y - e; lo[2] = b.min.z - e; hi[0] = b.max.x + e; hi[1] = b.max.y + e; hi[2] = b.max.z + e;
+    let t0 = 0, t1 = 1;
+    for (let k = 0; k < 3 && t0 <= t1; k++) {
+      if (Math.abs(d[k]) < 1e-9) { if (o[k] < lo[k] || o[k] > hi[k]) t1 = -1; continue; }
+      let a = (lo[k] - o[k]) / d[k], c = (hi[k] - o[k]) / d[k];
+      if (a > c) { const tmp = a; a = c; c = tmp; }
+      t0 = Math.max(t0, a); t1 = Math.min(t1, c);
+    }
+    if (t0 <= t1 && t0 < 1 - e / Math.sqrt(d[0] * d[0] + d[1] * d[1] + d[2] * d[2])) return true;
+  }
+  return false;
+}
+function holds(b) {
+  for (const k of foc.keep) if (b.distanceToPoint(_c0.set(k[0], k[1], k[2])) < 0.6) return true;
+  for (let i = 0; i < foc.n; i++) { const f = foc.f[i]; if (f[4] > 0.2 && f[0] > b.min.x && f[0] < b.max.x && f[2] > b.min.z && f[2] < b.max.z) return true; }
+  return false;
+}
+// Thin, spread-out meshes (bulb strings) are tested against their triangles: a 5 × 3 grid over ONE actor's body every
+// RAY_EVERY hero frames, round-robin over the focal actors (a hit is sticky for the rest of the scene).
+const _rc = new THREE.Raycaster(), _rt = new THREE.Vector3(), _rs = new THREE.Vector3(), _hits = [], RAY_EVERY = 8;
+let rayTick = 0;
+function rayHits(C, o) {
+  {
+    const f = foc.f[(rayTick / RAY_EVERY | 0) % foc.n], dx = f[0] - C.x, dz = f[2] - C.z, n = Math.hypot(dx, dz) || 1;
+    _rs.set(-dz / n, 0, dx / n).multiplyScalar(f[3] * 0.45);
+    for (let k = 0; k < 5; k++) for (let l = -1; l <= 1; l++) {
+      _rt.set(f[0] + _rs.x * l, f[4] + 0.3 + (f[1] + f[3] - f[4] - 0.3) * k / 4, f[2] + _rs.z * l);
+      const d = _rt.distanceTo(C);
+      _rc.set(C, _rt.sub(C).normalize()); _rc.near = 0; _rc.far = d - 0.4;
+      _hits.length = 0;
+      o.raycast(_rc, _hits);
+      if (_hits.length) return true;
+    }
+  }
+  return false;
+}
+export function heroOccludes(camera, x, y, z, r) { return !!(foc && foc.n && coneSphere(camera.position, x, y, z, r)); }
+export function heroNearCut(camera, x, y, z, r = 0) {
   if (Math.hypot(camera.position.x - x, camera.position.z - z) < NEAR) return true;
   if (zones.length && inZone(x, z)) return true;
+  if (r && foc && foc.n && coneSphere(camera.position, x, y + r * 0.5, z, r)) return true;
   _vp.multiplyMatrices(camera.projectionMatrix, camera.matrixWorldInverse);
   return _v.set(x, y, z).applyMatrix4(_vp).y < (zones.length ? FOOT_VIG : FOOT_Y);
 }
 function hide(o) { if (o.visible) { o.visible = false; hidden.push(o); } }
 export function heroTidy(world, camera, game) {
-  if (camera !== world.heroRig?.camera) { zones = []; return; }
+  if (camera !== world.heroRig?.camera) { zones = []; foc = null; return; }
   zones = world.spectacle?.clear || [];
   const hub = world.plots.get('hub');
   if (hub && game?.state?.bootstrap?.done && !world.spectacle?.scenes?.includes('opening')) hide(hub.group);
-  if (!tagged || --scanIn <= 0) { tagged = []; scanIn = 240; world.scene.traverse((o) => { if (o.userData?.heroNear) tagged.push(o); }); }
+  if (!tagged || --scanIn <= 0) { tagged = []; scanIn = 240; world.scene.traverse((o) => { if (o.userData?.heroNear || o.userData?.occluder) tagged.push(o); }); }
+  foc = world.spectacle?.focal || null;
+  if (!foc?.n || foc.key !== focKey) { sticky.clear(); focKey = foc?.n ? foc.key : null; rayTick = 0; } else rayTick++;
   for (const o of tagged) {
     if (!o.geometry) continue;
-    if (!o.geometry.boundingSphere) o.geometry.computeBoundingSphere();
-    _sph.copy(o.geometry.boundingSphere).applyMatrix4(o.matrixWorld);
-    if (Math.hypot(camera.position.x - _sph.center.x, camera.position.z - _sph.center.z) - _sph.radius < NEAR_PROP) hide(o);
+    if (sticky.has(o)) { hide(o); continue; }
+    if (o.userData.heroNear) {
+      if (!o.geometry.boundingSphere) o.geometry.computeBoundingSphere();
+      _sph.copy(o.geometry.boundingSphere).applyMatrix4(o.matrixWorld);
+      if (Math.hypot(camera.position.x - _sph.center.x, camera.position.z - _sph.center.z) - _sph.radius < NEAR_PROP) { hide(o); continue; }
+    }
+    if (!focKey || !o.visible) continue;
+    if (!o.geometry.boundingBox) o.geometry.computeBoundingBox();
+    _bx.copy(o.geometry.boundingBox).applyMatrix4(o.matrixWorld);
+    let p = o.parent;
+    while (p && p.visible) p = p.parent;
+    if (p) continue;
+    if (coneBox(camera.position, _bx) && !holds(_bx) && (o.userData.occluder !== 'ray' || (rayTick % RAY_EVERY === 0 && rayHits(camera.position, o)))) { sticky.add(o); hide(o); }
   }
   const pool = world.pool;
   const n = pool?.mesh.visible ? pool.mesh.count : 0;
@@ -519,7 +593,7 @@ export function heroTidy(world, camera, game) {
     const sx = Math.hypot(im[o], im[o + 1], im[o + 2]), sy = Math.hypot(im[o + 4], im[o + 5], im[o + 6]), sz = Math.hypot(im[o + 8], im[o + 9], im[o + 10]);
     if (sy < 1e-6) continue;
     const dx = cx - tx, dz = cz - tz, hd = Math.hypot(dx, dz);
-    if (hd < NEAR || (zones.length && inZone(tx, tz)) || _v.set(tx, ty, tz).applyMatrix4(_vp).y < footY) {
+    if (hd < NEAR || (zones.length && inZone(tx, tz)) || _v.set(tx, ty, tz).applyMatrix4(_vp).y < footY || (focKey && coneSphere(camera.position, tx, ty + 1.1, tz, 0.9))) {
       for (let k = 0; k < 16; k++) im[o + k] = bm[o + k] = 0;
       cut++;
       continue;

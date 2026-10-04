@@ -161,6 +161,8 @@ export function createScenes(ctx) {
       if (!over()) for (const b of bodies) { heldPos(bodies.indexOf(b), _f); b.x = _f[0]; b.y = _f[1]; b.z = _f[2]; popHat(b, 0.3, 1.5, 0.4); }
       parts.puff([doors[0], 0.3, doors[2] + 0.4], 5, { line: 'saloon' });
       world.plots.get('saloon')?.kickDoors?.();
+      // The landings stay on screen even when they stand between the lens and Mabel (heroTidy's occluder cut).
+      sc.keep = Object.keys(TARGET_ANCHOR).map((id) => targetPos(id)).filter(Boolean);
       if (((!sc.cosmetic || args.frenzy) && args.id !== 'amb') || args.ambient) if (ctx.heroVisible) ctx.takeShot(sc, flingShot);
       if (args.thrown) sc.on('fling', args.thrown);
     };
@@ -372,6 +374,10 @@ export function createScenes(ctx) {
       opp = ctx.actor(sc, { char: oppId, x: cx + 0.4, z, h: PI / 2 });
       if (!you || !opp) return;
       place(you, -0.4); place(opp, 0.4); you.h = -PI / 2 + ro; opp.h = PI / 2 + ro;
+      // The duel lane is open dirt: no townsfolk or shipments walk through it (heroTidy/heroNearCut).
+      sc.lane = true;
+      sc.clear = [];
+      for (let k = -2; k <= 2; k++) sc.clear.push(staged ? [cx, cz + k * 1.8, 2.6] : [cx + k * (pace + 2) / 2, z, 3.2]);
       // PT2#7: a Hundred-Gallon brim seen from behind fills the lens; the duel Stranger wears it capped and tipped forward
       // like the vignettes' foreground Stranger (the shot-off hat still flies at full size).
       if (!amb) { you.hat.scale = Math.min(you.hat.scale, 0.62); you.hat.tilt = 0.34; you.hat.brim = 0.84; }

@@ -246,3 +246,21 @@ pale cream (ref: dark) — a hat-colour call for A/U.
   the doors, varied landings without repeats, `bark {char:'mabel', trig:'eject'}`. Verified on a fresh save: 45 s, 98 s.
 Evidence: `docs/shots/spectacle/r6/` (dust_*, card_saloon_*, duel_*, fling_*, cut_*, amb_eject_*), harness in `r6/harness/`
 (`node run.mjs duel.json` etc.; `m.js` measures hat fraction and actor px).
+
+## Round 7 (2026-10-04): occluders — "my view was blocked by a wagon"
+Repro (`docs/shots/spectacle/occl/harness/sweep.mjs`, every pin + `@town`, day + night, real duel / ambient staged duel /
+vignette duel, ray-sampled body occlusion via `tools/occl.mjs`): 12/130 day and 14/126 night samples had a duellist > 15%
+covered — the saloon's paddy wagon (merged into its static, in the street at the saloon/dentist line, 24–33% in every
+real-duel phase), shipment covered wagons/couriers in the lane (up to 24%), the town's parked covered wagon (57%,
+ambient duel), pooled porch townsfolk (up to 100%, ambient duel had no clear zone) and the saloon's hitched horse, and
+night bulb strings (up to 100% in a vignette).
+Fix (general): `spectacle.focal` (director) = body spheres of the shot owner's cast, else live vignettes / ambient duels,
+plus scene `keep` points; `heroTidy`/`heroNearCut` drop every non-cast thing entering the camera→actor cone before the
+actor (pool instances + shipments per frame; `userData.occluder`/`heroNear` meshes sticky per scene, so nothing flickers).
+Duels publish lane `clear` zones (`sc.lane`), so townsfolk and shipments stay out of the duel lane. Splits: town parked
+wagons, saloon street props + paddy wagon (CONTRACT). Kept on purpose: fling landing targets (`sc.keep`), a mesh holding a
+raised focal actor (the drunk in the jail wagon). Limits: hides (pops) rather than fades; merged plot statics/porches are
+not candidates (a building corner may still cover ~10%); a vignette start can pop a tagged prop in the tour shot.
+After: 0/130 day, 0/130 night > 15%. Gate: test-spectacle arms O1 (must pass) / O2 `?nooccl=1` (must fail: saloon paddy
+wagon 33%, porch crowd 100%). Evidence: `occl/before|after/` (15_* = day, nooccl vs fix), `cmp_*.jpg`, `sheet_other.jpg`
+(fling/brawl/coach/robbery with the cut on), logs `log_15/22.txt`.

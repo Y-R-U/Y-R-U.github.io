@@ -43,6 +43,11 @@ export function createSpectacle({ world, kit, host, game, bus, fx, street }) {
   let drawPending = null, shotOwner = null, uiHero = true;
   const caps = new Set(['ghost']);
   const clear = [];
+  // Occluder focus (cameras.heroTidy): the actors the hero frame is about, as [x, y, z, r, feetY] body spheres, plus
+  // `keep` points (set pieces the scene needs on screen, e.g. the fling landings). `key` = the owning scene (sticky hides).
+  const FOCAL_N = 12;
+  const focal = { n: 0, f: Array.from({ length: FOCAL_N }, () => [0, 0, 0, 0, 0]), keep: [], key: null, off: q.has('nooccl') };
+  const _fc = [0, 0, 0];
 
   const count = (extra) => { let n = 0; for (const a of pool) if (a.used && a.extra === extra) n++; return n; };
 
@@ -387,7 +392,8 @@ export function createSpectacle({ world, kit, host, game, bus, fx, street }) {
     }
     S.always?.(dt);
     clear.length = 0;
-    for (const sc of scenes) if (sc.clear) for (const q of sc.clear) clear.push(q);
+    for (const sc of scenes) if (sc.clear && !(sc.lane && focal.off)) for (const q of sc.clear) clear.push(q);
+    gatherFocal();
     if (frame % 20 === 1) updateSoftTint(world.rig?.palette);
     parts.update(dt);
     fxLive = fx?.live ? fx.live() : 0;
@@ -398,6 +404,24 @@ export function createSpectacle({ world, kit, host, game, bus, fx, street }) {
     if (np > stats.maxParticles) stats.maxParticles = np;
     stats.frames++;
     bubbles.frame = -1;
+  }
+
+  // The shot owner's cast, else the live hero vignettes and ambient duels (they play in the tour camera).
+  function gatherFocal() {
+    focal.n = 0; focal.keep.length = 0; focal.key = null;
+    if (focal.off) return;
+    const own = shotOwner && scenes.includes(shotOwner) ? shotOwner : null;
+    for (const sc of scenes) {
+      if (own ? sc !== own : !(sc.vig || sc.kind === 'duel')) continue;
+      focal.key ||= sc;
+      if (sc.keep) for (const k of sc.keep) focal.keep.push(k);
+      for (const a of sc.actors) {
+        if (a.hidden || a.bodyless || a.extra || focal.n >= FOCAL_N) continue;
+        cast.centre(a, _fc);
+        const f = focal.f[focal.n++], s = (a.s || 1) * (a.bodyS || 1);
+        f[0] = _fc[0]; f[1] = _fc[1]; f[2] = _fc[2]; f[3] = Math.max(0.7 * s, cast.hatRadius(a) * 0.8); f[4] = a.y;
+      }
+    }
   }
 
   // ---- render: fill instance buffers once per (frame, camera filter)
@@ -570,6 +594,7 @@ export function createSpectacle({ world, kit, host, game, bus, fx, street }) {
     caps,
     // R4: open-dirt zones [[x, z, r]] around the staged vignette; cameras.heroTidy keeps townsfolk and shipments out.
     clear,
+    focal,
     // M's "hot" flag: the hero runs at 60 fps while a slot scene, an ejection, a duel or a borrowed camera is live.
     get hot() { return !!shotOwner || scenes.some((s) => s.slot || s.kind === 'eject' || s.kind === 'duel'); },
     get beatsQueued() { return beats.map((b) => b.kind); },

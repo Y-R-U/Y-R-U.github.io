@@ -88,9 +88,13 @@ export function buildTown(kit, data, field, pal) {
     const hot = FR.find((f) => f.id === 'p_hotel'), op = FR.find((f) => f.id === 'p_opera');
     if (hot && op) W.bunting(B(hot.x + 8, SZ), [hot.x - 4, 6.4, SZ - 2.3], [op.x + 4, 6.4, SZ - 2.3], { sag: 0.6 });
   }
-  // parked wagons along the south street edge (the duel lane down the middle stays clear)
+  // parked wagons along the south street edge (the duel lane down the middle stays clear). Each is its own mesh tagged
+  // `occluder` so a spectacle shot can drop one that stands between the lens and the cast (cameras.heroTidy).
+  const wagons = [];
   for (const [x, kind, ry, extra] of [[15, 'covered', Math.PI / 2 - 0.06, {}], [46.5, 'hay', -Math.PI / 2 + 0.1, {}], [99, 'flat', Math.PI / 2 + 0.04, { load: true }], [lastS + 9, 'flat', 0.5, { broken: true }]]) {
-    W.wagon(B(x, roadS), x, x > lastS ? SZ + 4 : roadS - 1.4, { kind, ry, ...extra });
+    const wb = kit.builder(pal, { seed: 500 + wagons.length * 7 }), z = x > lastS ? SZ + 4 : roadS - 1.4;
+    W.wagon(wb, x, z, { kind, ry, ...extra });
+    wagons.push({ wb, k: cellKey(x, z), name: 'town:wagon:' + kind + ':' + wagons.length });
   }
   // pebbles, horse apples and tufts scattered over the dirt (ground mesh, no extra draws)
   for (let i = 0; i < 520; i++) {
@@ -218,11 +222,13 @@ export function buildTown(kit, data, field, pal) {
   // userData.cell = { x0, x1, band } lets world.prepare cull by x-range/band for cards and drop far shadow casters.
   const tag = (m, k) => { const [ix, bd] = k.split(':'); m.userData.cell = { x0: X0 + +ix * CELL, x1: X0 + (+ix + 1) * CELL, band: bd }; return m; };
   const chunks = [...cells.entries()].map(([k, b]) => { const m = b.finish(); m.name = 'town:' + k; return tag(m, k); });
+  for (const w of wagons) { const m = w.wb.finish(); m.name = w.name; m.userData.occluder = true; chunks.push(tag(m, w.k)); }
   const farMesh = far.finish({ cast: false });
   const bulbMesh = bulbs.finish({ cast: false });
   bulbMesh.name = 'town:bulbs';
+  bulbMesh.userData.occluder = 'ray';
   farMesh.name = 'town:far';
-  const rows = [...cells.values()].flatMap((b) => b.contacts);
+  const rows = [...cells.values(), ...wagons.map((w) => w.wb)].flatMap((b) => b.contacts);
   for (const b of cells.values()) lamps.push(...b.lamps);
   const out = [...chunks, farMesh, bulbMesh];
   if (rows.length) out.push(contactMesh(kit.materials, rows));

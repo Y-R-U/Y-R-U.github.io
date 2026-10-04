@@ -438,7 +438,7 @@ export function createActors(world, kit, data) {
         r.on = false;
         if (line && r.lineId !== line) continue;
         if (r.s <= 0.001) continue;
-        if (hero && r.kind !== 'boat' && r.kind !== 'drone' && heroNearCut(hero, r.x, r.y, r.z)) continue;
+        if (hero && r.kind !== 'boat' && r.kind !== 'drone' && heroNearCut(hero, r.x, r.y, r.z, OCC_R[r.kind] || 0)) continue;
         r.on = true;
         const sc = r.s;
         if (r.kind === 'walker') {
@@ -525,6 +525,8 @@ export function createActors(world, kit, data) {
 }
 
 let wired = null;
+// Spectacle occluder radii (cameras.heroNearCut): covered wagon + mule, rider, walker.
+const OCC_R = { van: 2.6, courier: 1.6, walker: 0.6 };
 const STREET_FALLBACK = (world) => world.street || { x0: -24, x1: 300, z: 7.5, width: 8 };
 // One call wires render core to the game: courier picking, director inputs, fx triggers. Idempotent.
 export function wireRenderCore({ game, host, world, shipments, actors, fx, bus }) {

@@ -18,20 +18,28 @@ const PZ1 = 3.9, BALZ = FZ + 1.75, OPEN_W = 3.3, OPEN_H = 2.75;
 export default function buildPlot(kit, { line, palette, rng }) {
   const P = kit.plot({ id: 'saloon', line, palette, rng, seed: 41, colors: { ...COLORS, bottle: { c: '#7a3a1e', r: 0.2 }, felt: '#3f7a52', pom: '#6b3f8f', pomGold: COLORS.gold, inGlow: { c: '#ff9a3c', r: 0.5, g: 0.8 }, inDeep: { c: '#d8692a', r: 0.6, g: 0.55 }, glassS: { c: '#ff8f30', r: 0.25, g: 0.6 }, spill: { c: '#f2b06a', r: 0.7, g: 0.28 }, inBar: { c: '#7a3a22', r: 0.7 }, inLamp: { c: '#ffe3a6', r: 0.2, g: 1.2 }, mirror: { c: '#ffd890', r: 0.1, g: 1.0 }, inSil: { c: '#4a2620', r: 0.9 } } });
   const { b, t1, t2, lot } = P;
-  vignette(b, -7.0, 5.7);
 
   saloon(b, true);
   saloon(lot, false);
   // street dressing (owned): hitching rail with a horse, trough, cacti
   // the town lane puts a trough at (−5.2, 4.4) and a hitching rail at (4.5, 4.5) in front of the saloon: horses use them
-  horse(b, 2.9, 6.4, { ry: Math.PI * 0.9, c: '#f1ece2', dark: '#6a6a72', blanket: '#5E8F8C' });
-  horse(b, 4.6, 5.25, { ry: Math.PI * 0.94, c: '#9a5a35', blanket: '#D9A441' });
+  // Street-front props stand in the street, so each group is its own mesh tagged `occluder` (S: a spectacle shot drops
+  // the one between the lens and the cast, cameras.heroTidy) — the hitched horses + barrels, and the paddy wagon.
+  const street = P.dynamic((d) => {
+    vignette(d, -7.0, 5.7);
+    horse(d, 2.9, 6.4, { ry: Math.PI * 0.9, c: '#f1ece2', dark: '#6a6a72', blanket: '#5E8F8C' });
+    horse(d, 4.6, 5.25, { ry: Math.PI * 0.94, c: '#9a5a35', blanket: '#D9A441' });
+    b.contacts.push(...d.contacts); b.lamps.push(...d.lamps);
+  });
   tufts(b, [[-7.4, 3.2], [7.4, 3.0], [-7.6, -3.5], [-5.6, 5.6], [1.2, 5.4], [5.2, 6.4]]);
   // the sheriff's paddy wagon parked out front (fling 'down' lands in it)
-  cart(b, WAGON[0], WAGON[1], { ry: 0.2, c: 'soot', side: 'iron' });
-  for (let i = 0; i < 5; i++) b.cyl('iron', WAGON[0] - 0.9 + i * 0.45, 0.85, WAGON[1], 0.03, 1.2, 0, { sides: 4, taper: 1 });
-  b.slab('soot', WAGON[0], 2.05, WAGON[1], 2.5, 0.12, 1.4, { round: 0.04 });
-  b.slab('#c9a43a', WAGON[0], 1.4, WAGON[1] + 0.68, 0.5, 0.3, 0.02, { round: 0.1, taper: 0, noAo: true });
+  const wagon = P.dynamic((d) => {
+    cart(d, WAGON[0], WAGON[1], { ry: 0.2, c: 'soot', side: 'iron' });
+    for (let i = 0; i < 5; i++) d.cyl('iron', WAGON[0] - 0.9 + i * 0.45, 0.85, WAGON[1], 0.03, 1.2, 0, { sides: 4, taper: 1 });
+    d.slab('soot', WAGON[0], 2.05, WAGON[1], 2.5, 0.12, 1.4, { round: 0.04 });
+    d.slab('#c9a43a', WAGON[0], 1.4, WAGON[1] + 0.68, 0.5, 0.3, 0.02, { round: 0.1, taper: 0, noAo: true });
+  });
+  for (const [m, n] of [[street, 'saloon:street'], [wagon, 'saloon:wagon']]) { m.name = n; m.userData.occluder = true; }
   tufts(lot, [[-7.4, 3.2], [7.4, 3.0]]);
 
   // L25: card-room annex on the right with its own little false front and lanterns
