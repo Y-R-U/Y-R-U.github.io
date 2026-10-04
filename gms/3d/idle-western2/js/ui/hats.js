@@ -4,6 +4,7 @@ import { el, btn, setText, show } from './dom.js?v=20261004f';
 // the promotion toast, and the upturned mud hat of the opening (W15) that you tap to bank coins.
 export function createHats(hero, ctx) {
   const { model } = ctx;
+  let promo = null;
   const ribbon = btn('hero-chip ribbon', '', (e) => { e.stopPropagation(); explain(); }, 'Hat war');
   const you = el('span', 'rb-side you');
   const youHat = el('i', 'rb-hat', '🤠');
@@ -55,6 +56,8 @@ export function createHats(hero, ctx) {
       pomHat.style.setProperty('--s', Math.max(0.68, Math.min(1.6, 0.55 + (h.pomfreyHat?.scale || 1) * 0.22)).toFixed(2));
       ribbon.classList.toggle('winning', h.pomfrey <= 0);
     },
+    // Hero-px rect of the promotion card while it is up, so speech bubbles steer under it (PT2#10).
+    promoRect() { return promo && promo.el.isConnected && !promo.el.classList.contains('out') ? promo.rect : null; },
     promo({ hat, pomfreyHat, pomfrey }) {
       const t = el('div', 'hat-promo');
       const big = el('div', 'hp-hat', '🤠');
@@ -62,6 +65,8 @@ export function createHats(hero, ctx) {
       txt.append(el('small', '', 'New hat!'), el('b', '', hat?.name || 'Bigger hat'), el('span', 'hp-pom', pomfrey <= 0 ? 'Pomfrey is wearing a THIMBLE' : `Pomfrey shrinks to a ${pomfreyHat?.name || 'smaller hat'}`));
       t.append(big, txt);
       hero.appendChild(t);
+      const r = t.getBoundingClientRect(), h = hero.getBoundingClientRect();
+      promo = { el: t, rect: { l: r.left - h.left, r: r.right - h.left, t: r.top - h.top, b: r.bottom - h.top } };
       ctx.audio.stinger('st_hat');
       setTimeout(() => t.classList.add('out'), 2800);
       setTimeout(() => t.remove(), 3300);

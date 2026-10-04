@@ -60,6 +60,147 @@ try {
   check(await p.until('ui.audio.running', 3000), 'the next tap resumes the context');
   await p.close();
 
+  // ---------- PT2#1 + PT2#5: the opening ring is on screen, "And STAY out!" waits for the first touch ----------
+  console.log('PT2#1/#5 opening ring + opening bark (fresh)');
+  p = await open('?nosave=1');
+  await sleep(2500);
+  const ring = await p.eval(`(() => { const z = document.querySelector('.hero-tapzone'), hv = document.querySelector('.hero').getBoundingClientRect(), hud = document.querySelector('.hud').getBoundingClientRect();
+    const r = z.getBoundingClientRect(), c = document.querySelector('.hero-tapzone .coach'), cr = c && c.getBoundingClientRect(), a = __iw2ui.debug.spectacle.bubbleAnchor('mud');
+    return { pulse: z.classList.contains('coach-pulse'), cx: r.left + r.width / 2, cy: r.top + r.height / 2, w: r.width, hero: [hv.left, hv.top, hv.right, hv.bottom], hud: hud.bottom,
+      anchor: a && a.visible ? [hv.left + a.x, hv.top + a.y] : null, coach: cr ? [cr.left, cr.top, cr.right, cr.bottom, c.textContent] : null,
+      before: getComputedStyle(z, '::before').animationName }; })()`);
+  check(ring.pulse && ring.before === 'tapring', `mud ring pulses on its ::before (${ring.before})`);
+  check(ring.cx > ring.hero[0] + 20 && ring.cx < ring.hero[2] - 20 && ring.cy > ring.hud + 20 && ring.cy < ring.hero[3] - 20, `mud ring centre is inside the hero, below the HUD (${ring.cx | 0}, ${ring.cy | 0})`);
+  if (ring.anchor) check(Math.hypot(ring.cx - ring.anchor[0], ring.cy - ring.anchor[1]) < 6, `ring sits on Spectacle's mud anchor (${ring.anchor.map((v) => v | 0)})`);
+  check(!!ring.coach && ring.coach[0] >= 0 && ring.coach[2] <= ring.hero[2] && ring.coach[1] >= ring.hud && /mud/i.test(ring.coach[4]), `"Tap the mud" text is on screen ${JSON.stringify(ring.coach)}`);
+  const pre = await p.S(`({ bubble: !!ui.barks.showing, pend: ui.barks.debug.pend.map((q) => q.char + '/' + q.trig) })`);
+  check(!pre.bubble && pre.pend.some((q) => /\/opening$/.test(q)), `before any touch the opening bark is queued, not dropped (${pre.pend.join(',') || 'none'})`);
+  await p.tap(ring.cx, ring.cy);
+  check(await p.until('st.stats.bootTaps >= 1', 2000), 'a real tap on the ring pays a mud coin');
+  const said = await p.until(`ui.barks.debug.log.some((l) => l.trig === 'opening')`, 6000, 100);
+  const op = await p.S(`(() => { const l = ui.barks.debug.log.find((x) => x.trig === 'opening'); return l ? l.char + ': ' + l.id : null; })()`);
+  check(said, `the opening bark plays on the first touch (${op})`);
+  if (pre.pend.some((q) => q.startsWith('mabel/'))) check(/^mabel/.test(op || ''), 'it is Mabel\'s "And STAY out!" (Spectacle\'s staged opening wins)');
+  check(await p.until(`!!ui.barks.showing && document.querySelector('.bubble').hidden === false`, 5000, 100), 'its bubble shows with the voice');
+  check(p.exceptions.length === 0, 'no exceptions');
+  await p.close();
+
+  // ---------- PT2#4: W5 bark budget ----------
+  console.log('PT2#4 bark budget (demo, virtual clock)');
+  p = await open('?nosave=1&demo=1');
+  await p.eval('scrollTo(0, 0)');
+  await sleep(1500);
+  const hb = await p.rect('.hero-view');
+  await p.tap(hb.x - 80, hb.y + 140);
+  check(await p.until('ui.barks.ready && ui.audio.running', 6000), 'barks indexed after the first touch');
+  await p.until('!ui.barks.showing', 8000);
+  const budget = await p.S(`(() => {
+    const B = ui.barks, who = ['pickles', 'pomfrey', 'nubbin', 'fingers', 'mabel', 'wendell'];
+    B.debug.log.length = 0;
+    for (let i = 0; i < 240; i++) {
+      B.debug.skew(2500);
+      const c = who[i % who.length];
+      if (i % 2) B.say(c, 'idle'); else __iw2.bus.emit('bark', { char: c, trig: 'idle', src: 'spectacle' });
+      if (i % 5 === 0) B.say(who[(i + 1) % who.length], 'eject');
+      B.hide();
+    }
+    const L = B.debug.log.filter((l) => l.kind === 'ambient');
+    let minGap = Infinity, minChar = Infinity, repeat = null;
+    for (let i = 1; i < L.length; i++) minGap = Math.min(minGap, L[i].t - L[i - 1].t);
+    const by = {};
+    for (const l of L) { if (by[l.char] != null) minChar = Math.min(minChar, l.t - by[l.char]); by[l.char] = l.t; }
+    const seen = {};
+    for (const l of B.debug.log) { if (seen[l.id] != null && l.t - seen[l.id] < 600e3) repeat = l.id; seen[l.id] = l.t; }
+    return { n: L.length, span: (240 * 2.5) | 0, minGap: minGap / 1000, minChar: minChar / 1000, repeat };
+  })()`);
+  check(budget.n >= 8 && budget.n <= 20, `${budget.n} ambient sentences in ${budget.span} s of virtual time (W5: one per 30–45 s)`);
+  check(budget.minGap >= 30, `ambient sentences ≥ 30 s apart (min ${budget.minGap.toFixed(1)} s)`);
+  check(budget.minChar >= 90, `one character ≤ 1 ambient sentence per 90 s (min ${budget.minChar.toFixed(1)} s)`);
+  check(!budget.repeat, `no line repeats inside 10 min (${budget.repeat || 'none'})`);
+  const charSpots = await p.eval(`(() => { const hv = document.querySelector('.hero-view').getBoundingClientRect(); const out = []; for (let y = hv.top + 60; y < hv.bottom - 40; y += 14) for (let x = hv.left + 20; x < hv.right - 20; x += 14) { const h = __iw2ui.debug.spectacle.pickHero(x, y); if (h.kind === 'char' && h.char && h.char !== 'stranger') { out.push([x, y, h.char]); if (out.length > 2) return out; } } return out; })()`);
+  if (charSpots.length) {
+    const [cx, cy, ch] = charSpots[0];
+    await p.S('(ui.barks.debug.skew(60e3), ui.barks.hide(), ui.barks.debug.log.length = 0, 0)');
+    await p.tap(cx, cy);
+    await sleep(300);
+    const n1 = await p.S('ui.barks.debug.log.length');
+    await p.S('(ui.barks.hide(), 0)');
+    await p.tap(cx, cy);
+    await sleep(300);
+    const n2 = await p.S('ui.barks.debug.log.length');
+    check(n1 <= 1 && n2 === n1, `tapping ${ch} twice: one sentence at most, the second tap inside the 20 s cooldown is wordless (${n1} → ${n2})`);
+  } else console.log('  (skip char tap: no character under the hero right now)');
+  check(p.exceptions.length === 0, 'no exceptions');
+  await p.close();
+
+  // ---------- PT2#2: ⤒ Watch closes a sheet / Town and the special begins ----------
+  console.log('PT2#2 Watch from a sheet and from Town (demo)');
+  p = await open('?nosave=1&demo=1');
+  await p.eval('scrollTo(0, 0)');
+  await sleep(2500);
+  const FORCE = (kind) => `(() => { for (let i = 0; i < 60; i++) { const cur = g.special(); if (cur && cur.kind === '${kind}') return cur.id; if (cur) g.act('claimEvent', { eventId: cur.id }); st.events.nextSpecial = g.simTime; g.tick(0.05); } return null; })()`;
+  for (const [tab, open1, closed] of [['goals', `document.querySelector('.sheet.open')`, `!document.querySelector('.sheet.open')`], ['town', `__iw2ui.debug.town.active`, `!__iw2ui.debug.town.active`]]) {
+    await p.until('!ui.specials.active && !ui.captions.active', 15000);
+    await p.tapEl(`.tab[data-tab="${tab}"]`);
+    await sleep(700);
+    check(await p.eval(`!!(${open1})`), `${tab} open`);
+    const id = await p.S(FORCE('duel'));
+    await sleep(400);
+    const chip = await p.rect('.sp-chip:not(.fade)');
+    check(!!id && !!chip && await p.eval(`/Watch/.test(document.querySelector('.sp-chip').textContent)`), `duel wind-up shows "⤒ Watch" over ${tab} (${id} ${JSON.stringify(chip)} ${await p.eval(`document.querySelector('.sp-chip').className + ' ' + document.querySelector('.sp-chip').textContent`)})`);
+    if (chip) await p.tap(chip.x, chip.y);
+    const begun = await p.until(`!!ui.specials.active`, 8000, 150);
+    check(begun && await p.eval(`!!(${closed}) && __iw2ui.heroVisible()`), `tap Watch: ${tab} closes, hero visible, the duel begins (${await p.S('ui.specials.active')})`);
+    await p.S(`(ui.specials.debug.finish(0), 0)`);
+    await p.until('!ui.specials.active', 15000);
+    await p.S(`(() => { const cur = g.special(); if (cur) g.act('claimEvent', { eventId: cur.id }); return 0; })()`);
+    await p.until('!g.special() && !ui.specials.active', 15000);
+    await sleep(800);
+  }
+  check(p.exceptions.length === 0, 'no exceptions');
+  await p.close();
+
+  // ---------- PT2#3: the Saloon Row Deed is signposted ----------
+  console.log('PT2#3 Deed signpost (fresh → 3 Lower Street businesses)');
+  p = await open('?nosave=1&debug=1');
+  await sleep(1500);
+  const hv3 = await p.rect('.hero-view');
+  await p.tap(hv3.x, hv3.y + 120);
+  await p.S(`(() => { g.act('cheat', { cash: 1e5 }); g.act('hat'); for (const id of ['shine', 'tubs', 'livery']) { g.act('buy', { lineId: id }); for (let i = 0; i < 80 && st.build[id]; i++) g.tick(0.5); } return 0; })()`);
+  const cost = await p.S(`g.nextGoal().cost`);
+  await p.S(`(st.cash = ${cost} * 0.9, 0)`);
+  await p.eval('scrollTo(0, 0)');
+  await p.until('!ui.captions.active && __iw2ui.heroVisible()', 15000);
+  const blocked = await p.until(`g.nextGoal().hint === 'blocked' && !document.querySelector('.deed-chip').hidden`, 5000);
+  const bt = await p.eval(`document.querySelector('.deed-chip').textContent`);
+  check(blocked && /Demands \d\/3/.test(bt), `Deed blocked: hero chip names the Demands owed (${bt})`);
+  await p.until(`!document.querySelector('.hat-promo')`, 6000);
+  await sleep(600);
+  const dc = await p.eval(`(() => { const r = document.querySelector('.deed-chip').getBoundingClientRect(), x = r.left + r.width / 2, y = r.top + r.height / 2, e = document.elementFromPoint(x, y); return { x, y, hit: e && e.className }; })()`);
+  await p.tap(dc.x, dc.y);
+  check(await p.until(`ui.sheets.top === 'goals'`, 2000), `tapping it opens Demands (${dc.hit})`);
+  await sleep(600);
+  await p.tapEl('.sheet-close');
+  await sleep(500);
+  check(await p.S('!ui.sheets.isOpen'), `✕ closes Demands (${await p.S('ui.sheets.top')})`);
+  await p.S(`(st.lines.shine.lv = Math.max(st.lines.shine.lv, 30), st.stats.pileTaps = Math.max(st.stats.pileTaps, 12), st.cash = ${cost} * 1.05, 0)`);
+  const ready = await p.until(`g.nextGoal().hint === 'buy' && /Open/.test(document.querySelector('.deed-chip').textContent) && !document.querySelector('.deed-chip').hidden`, 6000);
+  check(ready, `Deed affordable: "${await p.eval(`document.querySelector('.deed-chip').textContent`)}" on the hero`);
+  await p.until(`!document.querySelector('.hat-promo')`, 6000);
+  await sleep(400);
+  const dc2 = await p.eval(`(() => { const r = document.querySelector('.deed-chip').getBoundingClientRect(), x = r.left + r.width / 2, y = r.top + r.height / 2, e = document.elementFromPoint(x, y); return { x, y, hit: e && e.className }; })()`);
+  await p.tap(dc2.x, dc2.y);
+  await sleep(1200);
+  if (dc2.hit !== 'hero-chip deed-chip ready') console.log('  (chip tap hit ' + dc2.hit + ')');
+  const gv = await p.eval(`(() => { const r = document.querySelector('.gate-main').getBoundingClientRect(); return r.top >= 0 && r.bottom <= innerHeight; })()`);
+  check(gv, 'tapping it brings the gate on screen');
+  check(await p.until(`(ui.coach.current || '').startsWith('deed:')`, 4000), `coach sits on the gate (${await p.S('ui.coach.current')})`);
+  await p.tapEl('.gate-main');
+  check(await p.until(`st.districts.includes('saloonrow')`, 3000), 'tapping the gate opens Saloon Row');
+  check(await p.until(`document.querySelector('.deed-chip').hidden || !/Saloon Row/.test(document.querySelector('.deed-chip').textContent)`, 3000), 'the Saloon Row chip goes once it is yours');
+  check(p.exceptions.length === 0, 'no exceptions');
+  await p.close();
+
   // ---------- PT#1: hint queue ----------
   console.log('PT#1 hint queue (fresh)');
   p = await open('?nosave=1');
@@ -165,6 +306,8 @@ try {
   const sample = () => p.eval(`(() => { const h = document.querySelector('.hero').getBoundingClientRect(); const c = { l: h.left + h.width * .25, r: h.left + h.width * .75, t: h.top + h.height * .25, b: h.top + h.height * .75 };
     const ts = [...document.querySelectorAll('.toast, .hero > .stamp')].filter((t) => !t.classList.contains('out')).map((t) => { const r = t.getBoundingClientRect(); return { text: t.textContent, inHero: !!t.closest('.hero'), hit: r.width > 0 && r.right > c.l && r.left < c.r && r.bottom > c.t && r.top < c.b }; });
     return { n: document.querySelectorAll('.toast:not(.out)').length, hits: ts.filter((t) => t.hit).map((t) => t.text), texts: ts.map((t) => t.text), inHero: ts.every((t) => t.inHero) }; })()`);
+  await sleep(2500);
+  await p.until(`ui.quietQ.length === 0 && !document.querySelector('.toast:not(.out)')`, 20000);
   const got = await p.S(`(() => { const ids = Object.keys(st.achievements).filter((k) => st.achievements[k]).slice(0, 3); ids.forEach((k) => delete st.achievements[k]); const ls = Object.keys(st.links || {}).filter((k) => st.links[k]).slice(0, 2); ls.forEach((k) => delete st.links[k]); return { a: ids.length, l: ls.length }; })()`);
   for (let i = 0; i < 6; i++) await p.S(`(__iw2ui.toast('🧪 Toast ${i}'), 0)`);
   let maxN = 0, hits = [], seen = new Set(), allIn = true;
@@ -177,7 +320,7 @@ try {
   check(maxN <= 2, `toasts stack at most 2 (max ${maxN})`);
   check(allIn, 'with the hero up, toasts sit inside the hero');
   const achT = [...seen].filter((t) => /achievement|\+1%/.test(t));
-  if (got.a > 1) check(achT.length === 1 && /\d+ achievements/.test(achT[0]), `${got.a} achievements at once → one toast (${achT.join(' | ') || 'none'})`);
+  if (got.a > 1) check(achT.filter((t) => /\d+ achievements/.test(t)).length === 1 && achT.some((t) => t.includes(`${got.a} achievements`)), `${got.a} achievements at once → one toast (${achT.join(' | ') || 'none'})`);
   if (got.l > 1) check([...seen].filter((t) => /gag link/.test(t)).length === 1, `${got.l} gag links at once → one toast`);
   const long = [...seen].filter((t) => !/🧪/.test(t) && t.split(/\s+/).filter((w) => /[A-Za-z]/.test(w)).length > 4);
   check(!long.length, `achievement / link toasts ≤ 4 words (${long.join(' | ') || 'ok'})`);

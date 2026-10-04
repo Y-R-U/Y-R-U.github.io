@@ -113,7 +113,13 @@ export function createFling(hero, heroView, ctx, { canShow, spectacle }) {
     const parts = [j.t];
     if (out.cash > 0) parts.push('+' + fmtCash(out.cash));
     if (out.teeth) parts.push('+🦷' + out.teeth);
-    ctx.juice.float(hero, W / 2, H * 0.42, 0, { label: parts.join(' · '), cls: 'gold joke' });
+    // The state barks the payoff line right after this event: float once it is placed, clear of its bubble (PT2#10).
+    queueMicrotask(() => {
+      let y = H * 0.42;
+      const r = ctx.barks.rect;
+      if (r && r.l < W / 2 + 130 && r.r > W / 2 - 130 && r.t < y + 24 && r.b > y - 24) y = r.b + 30 < H * 0.8 ? r.b + 30 : Math.max(70, r.t - 30);
+      ctx.juice.float(hero, W / 2, y, 0, { label: parts.join(' · '), cls: 'gold joke' });
+    });
     ctx.buzz(18);
   });
 

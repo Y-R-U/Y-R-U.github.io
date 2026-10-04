@@ -33,7 +33,7 @@ export const SCRIPTS = {
     ['…and yours goes up. Again.', 1400],
   ],
   deed: [
-    ['📜 A Deed showdown with Colonel Pomfrey', 1500],
+    ['📜 A Deed showdown with Pomfrey', 1500],
     ['His sign comes down. Splendidly.', 1500],
   ],
   fakeDeath: [

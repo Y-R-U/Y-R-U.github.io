@@ -42,7 +42,7 @@ export function createSpecials(hero, ctx, { heroVisible, cardFor, toHero, specta
     if (pending?.ev.id === event.id) {
       pending = null;
       chip.classList.add('fade');
-      setTimeout(() => { chip.hidden = true; chip.classList.remove('fade'); }, 600);
+      setTimeout(() => { if (!pending) { chip.hidden = true; chip.classList.remove('fade'); } }, 600);
       if (expired) ctx.toast(`${event.emoji} The ${event.name.toLowerCase()} wandered off`, { ms: 1800, cls: 'soft' });
     }
     if (cur?.ev.id === event.id && !cur.done) finish(reward, true);
@@ -59,6 +59,7 @@ export function createSpecials(hero, ctx, { heroVisible, cardFor, toHero, specta
     chip.dataset.k = key;
     chip.replaceChildren(el('span', 'sp-bell', '🔔'), el('b', '', `${e.emoji} ${e.name}!`), el('small', '', vis ? 'Get ready…' : '⤒ Watch'));
     chip.hidden = false;
+    chip.classList.remove('fade');
     chip.classList.toggle('away', !vis);
   }
 

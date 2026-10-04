@@ -98,7 +98,8 @@ try {
   await tapAt(page, h.x, h.y - 60);
   await sleep(400);
 
-  // piano (W11)
+  // piano (W11); a held drunk (fling-on) hides the 🎹, so wait for Mabel to let go first
+  for (let i = 0; i < 40 && await page.eval(`document.querySelector('.hero').classList.contains('fling-on')`); i++) await sleep(150);
   const p0 = await page.eval(S('st.stats.pianoTaps'));
   if (await rectOf(page, '.hero-btn.piano')) await tapEl(page, '.hero-btn.piano'); else await page.eval(S('ui.playPiano()'));
   await sleep(200);
@@ -121,6 +122,7 @@ try {
   await page.eval(S(`(st.saloon.held = null, st.saloon.next = g.simTime, g.tick(0.05), 0)`));
   await sleep(250);
   const pf0 = await page.eval(S('st.stats.flingPomfrey'));
+  for (let i = 0; i < 20 && !(await rectOf(page, '.fling-t.up')); i++) await sleep(100);
   await tapEl(page, '.fling-t.up');
   await sleep(200);
   check(await page.eval(S('st.stats.flingPomfrey')) === pf0 + 1, 'tapping the 🪟 chip throws him through Pomfrey’s window');

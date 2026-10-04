@@ -38,7 +38,7 @@ export function createUI({ game, host, bus }) {
   const visibleCards = new Set();
   const doc = document.documentElement;
   let root, look, sheets, toasts, juice, hud, coach, reveal, events, town, offline, tabs, hats, barks, captions, fling, specials, ghosts, boxes;
-  let welcome, heroWrap, heroView, tapzone, qtyBar, qtyBtns, list, gate, pinChip, focusChip, tipChip, gfxChip, pianoBtn, posterChip;
+  let welcome, heroWrap, heroView, tapzone, qtyBar, qtyBtns, list, gate, pinChip, focusChip, tipChip, gfxChip, pianoBtn, posterChip, deedChip;
   let lastFrame = 0, combo = 0, lastTapAt = 0, desktop = false, heroOn = true, ceremony = false;
   let qty = model.setting('qty', 1);
   const audio = createAudio({ settings: () => game.state.settings });
@@ -342,7 +342,8 @@ export function createUI({ game, host, bus }) {
     R.crew = reveal.check('crew', () => model.owned().some((l) => st.lines[l.id].mgr) || (st.items || []).length > 0 || model.boxCount() > 0);
     R.goals = reveal.check('goals', () => model.ownedCount() >= 2 || model.contracts().some((c) => c.done && c.visible));
     R.boothill = reveal.check('boothill', () => model.districtOpen('bankblock') || model.graves().length > 0);
-    R.season = started && !!model.season() && (R.season || st.deeds.length > 1 || model.graves().length > 0 || (game.simTime || 0) >= 600);
+    // R6c: one rule with the state's ghost spawn gate (second Deed, a grave, or 10 min played; sticky).
+    R.season = !!model.season() && (R.season || (game.ghostsOpen ? game.ghostsOpen() : started && (st.deeds.length > 1 || model.graves().length > 0 || (game.simTime || 0) >= 600)));
   }
 
   function cardCtx() {
@@ -507,6 +508,40 @@ export function createUI({ game, host, bus }) {
     c?.saveHint(save ? `💰 Save for it · ${fmtEta(g.eta)}` : null);
     setGlow('best', g?.bestBuy?.affordable ? glyphOf(g.bestBuy) : null);
     setGlow('near', g?.save?.kind === 'upgrade' ? glyphOf(g.save) : null);
+    deedHint(g?.kind === 'deed' ? g : null);
+  }
+
+  // PT2#3: the next Deed gets a signpost. A hero chip (ready / ETA / progress, or the Demands still owed) that jumps
+  // to the gate or opens Demands, and a coach on the gate itself once it can be opened.
+  let deedGoal = null;
+  function deedNeed(g) {
+    const d = data.districts.find((x) => x.id === g.districtId);
+    const prev = data.districts[data.districts.indexOf(d) - 1];
+    const done = prev ? model.contracts().filter((c) => c.district === prev.id && c.done).length : 0;
+    return { done: Math.min(done, d?.needContracts || 0), need: d?.needContracts || 0 };
+  }
+  function deedHint(g) {
+    deedGoal = g;
+    let text = null, mode = 'gate', ready = false;
+    if (g && model.started()) {
+      const name = g.name.replace(/ Deed$/, '');
+      if (g.hint === 'buy') { text = `📜 Open ${name} ⤓`; ready = true; }
+      else if (g.hint === 'blocked') {
+        if (/demand/i.test(g.blocked || '') && g.p01 >= 0.3) { const n = deedNeed(g); text = `📋 Demands ${n.done}/${n.need}`; mode = 'goals'; }
+      } else if (g.hint === 'save' && g.eta > 0) text = `📜 ${name} · ${fmtEta(g.eta)}`;
+      else if (g.p01 >= 0.25) text = `📜 ${name} ${Math.floor(g.p01 * 100)}%`;
+    }
+    deedChip.dataset.mode = mode;
+    deedChip.classList.toggle('ready', ready);
+    if (text) setText(deedChip, text);
+    if (!!text === deedChip.hidden) { show(deedChip, !!text); if (text) restartAnim(deedChip, 'pop'); }
+    const main = gate.root.querySelector('.gate-main');
+    if (ready && !gate.root.hidden) coach.show('deed:' + g.id, main, '📜 Open it!', { ms: Infinity, prio: 2, when: () => deedGoal?.id === g.id && deedGoal.hint === 'buy' && !gate.root.hidden });
+  }
+  function onDeedChip(e) {
+    e.stopPropagation();
+    if (deedChip.dataset.mode === 'goals') { openTab('goals'); return; }
+    gate.root.scrollIntoView({ block: 'center', behavior: smooth() });
   }
 
   // Promo cards and story captions wait until the hero is actually on screen (PT B5/B6); S's beats announce
@@ -539,6 +574,13 @@ export function createUI({ game, host, bus }) {
     if (a && a.visible) { tapzone.style.transform = `translate(${a.x | 0}px, ${a.y | 0}px)`; tapzone.classList.add('anchored'); }
     else if (tapzone.classList.contains('anchored')) { tapzone.classList.remove('anchored'); tapzone.style.transform = ''; }
   }
+  function chipRect(n) {
+    if (n.hidden) return null;
+    const r = n.getBoundingClientRect();
+    if (!r.width) return null;
+    const h = heroWrap.getBoundingClientRect();
+    return { l: r.left - h.left, r: r.right - h.left, t: r.top - h.top, b: r.bottom - h.top };
+  }
   function heroJob(now) {
     const hv = heroVisible();
     if (hv !== heroWas) {
@@ -549,6 +591,7 @@ export function createUI({ game, host, bus }) {
     root.classList.toggle('special-on', !!specials.active);
     root.classList.toggle('hero-off', !hv);
     toasts.place(hv);
+    if (hv) toasts.steer(() => [barks.rect, chipRect(deedChip), chipRect(posterChip), chipRect(pinChip)]);
     flushBeats();
   }
 
@@ -631,6 +674,13 @@ export function createUI({ game, host, bus }) {
 
   const smooth = () => (doc.classList.contains('calm') ? 'auto' : 'smooth');
   function toTop() { scrollTo({ top: 0, behavior: smooth() }); }
+  // PT2#2: "⤒ Watch" must actually make the hero visible, so close any sheet or Town first.
+  function goHero() {
+    if (sheets.isOpen) sheets.close();
+    if (town.active) town.close();
+    if (tabs.current !== 'lines') tabs.set('lines');
+    toTop();
+  }
   function toBottom() { scrollTo({ top: doc.scrollHeight, behavior: smooth() }); }
 
   // P#8: no scrollY/innerHeight reads. heroOn and nearEnd come from IntersectionObservers.
@@ -779,7 +829,7 @@ export function createUI({ game, host, bus }) {
     game.on('deed', ({ reopen }) => { if (!reopen) queueBeat('deed', () => captions.script('deed')); });
     bus.on('spectacle:beat', (b) => { if (b?.phase === 'start') flushBeats(b.kind); });
     game.on('bark', ({ char, trig, prio }) => barks.say(char, trig, prio));
-    bus.on('bark', (b) => { if (b?.src === 'spectacle') barks.say(b.char, b.trig, false, { gated: true }); });
+    bus.on('bark', (b) => { if (b?.src === 'spectacle') barks.say(b.char, b.trig, !!b.prio, { gated: true, staged: !!b.prio }); });
     game.on('box', ({ kind, n, source }) => {
       if (source === 'cheat') return;
       toasts.toast(`${BOX_INFO[kind]?.e || '📦'} ${BOX_INFO[kind]?.n || 'Strongbox'}${n > 1 ? ' ×' + n : ''}!`, { cls: 'gold' });
@@ -831,6 +881,8 @@ export function createUI({ game, host, bus }) {
       pianoBtn.hidden = true;
       posterChip = btn('hero-chip poster-chip', '🖼️ Your new Wanted Poster', async (e) => { e.stopPropagation(); show(posterChip, false); await takePoster(ctx); }, 'Save Wanted Poster');
       posterChip.hidden = true;
+      deedChip = btn('hero-chip deed-chip', '', onDeedChip, 'Next Deed');
+      deedChip.hidden = true;
       qtyBar = el('div', 'qty');
       qtyBar.hidden = true;
       qtyBtns = [1, 10, 'max'].map((v) => {
@@ -840,7 +892,7 @@ export function createUI({ game, host, bus }) {
         return b;
       });
       qtyBar.append(...qtyBtns);
-      heroWrap.append(heroView, tapzone, pinChip, focusChip, tipChip, gfxChip, pianoBtn, posterChip, qtyBar);
+      heroWrap.append(heroView, tapzone, pinChip, focusChip, tipChip, gfxChip, pianoBtn, posterChip, deedChip, qtyBar);
       hud.root.querySelector('.hud-money').addEventListener('click', (e) => { if (!e.target.closest('button')) toTop(); });
 
       const side = el('div', 'side');
@@ -858,12 +910,12 @@ export function createUI({ game, host, bus }) {
       coach = createCoach({ reveal });
       tabs = createTabs(root, { onTab: openTab, model, onJump: (k) => { if (k === 'up') toTop(); else if (k === 'down') toBottom(); else { const vals = [1, 10, 'max']; setQty(vals[(vals.indexOf(qty) + 1) % 3]); } } });
       hats = createHats(heroWrap, ctx);
-      barks = createBarks({ game, audio, hero: heroWrap, anchorOf: (c) => spectacle.bubbleAnchor(c), geo, sunday: () => model.sunday(), busy: () => !!specials?.active && specials.active !== 'brawl' });
+      barks = createBarks({ game, audio, hero: heroWrap, anchorOf: (c) => spectacle.bubbleAnchor(c), geo, sunday: () => model.sunday(), busy: () => !!specials?.active && specials.active !== 'brawl', avoid: () => hats.promoRect() });
       captions = createCaptions(heroWrap, { sfx: audio.sfx });
       town = createTown(heroWrap, ctx, { onClose: () => { root.classList.remove('town'); tabs.set('lines'); syncJump(); }, onOpen: () => { root.classList.add('town'); scrollTo({ top: 0 }); syncJump(); } });
-      events = createEvents(heroWrap, ctx, { heroOn: () => heroOn || desktop, toHero: (id) => { toTop(); rig().cut(id); } });
+      events = createEvents(heroWrap, ctx, { heroOn: () => heroOn || desktop, toHero: (id) => { goHero(); rig().cut(id); } });
       specials = createSpecials(heroWrap, ctx, {
-        heroVisible, spectacle, toHero: toTop,
+        heroVisible, spectacle, toHero: goHero,
         cardFor: (id) => { const c = cards.get(id); return c && c.mode === 'full' && visibleCards.has(c) ? c.card : null; },
       });
       fling = createFling(heroWrap, heroView, ctx, { spectacle, canShow: () => heroVisible() && !specials.active && !captions.active });

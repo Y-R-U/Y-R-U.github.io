@@ -1,15 +1,25 @@
 import { el } from './dom.js?v=20261004f';
 
-// W5 bark layer. The state gates sentence barks (one per 30–45 s, priority triggers always) and emits `bark {char, trig}`;
-// this picks the line (once-ever, 10 min no-repeat, Sunday School), plays it and shows ONE bubble, positioned by
-// transform only from Spectacle's anchors. Wordless clips (grunts, hics) are a separate, frequent, bubble-free layer.
-const NO_REPEAT_MS = 10 * 60e3, TAP_COOLDOWN = 20e3, WORDLESS_GAP = 3000, ANCHOR_HZ = 33, SENTENCE_GAP = 30e3;
+// W5 bark layer. The state picks speakers and emits `bark {char, trig, prio}`; this layer owns the one global sentence
+// budget (PT2#4): ambient sentences (state idle/event barks, Spectacle's gags) one per 30–45 s and one per character
+// per 90 s, player-caused fling payoffs ≥ 12 s apart, taps ≥ 10 s apart, priority beats always. No line repeats
+// within 10 min (silence/wordless instead), unplayed lines first. Wordless clips fill the gaps, bubble-free.
+// Priority barks wait until the manifest is indexed and audio runs (PT2#5: the opening "And STAY out!").
+const NO_REPEAT_MS = 10 * 60e3, TAP_COOLDOWN = 20e3, WORDLESS_GAP = 3000, ANCHOR_HZ = 33;
+const GAP_MIN = 30e3, GAP_MAX = 45e3, CHAR_GAP = 90e3, REACT_GAP = 12e3, TAP_GAP = 10e3, PEND_TTL = 60e3;
+const REACT = new Set(['fling', 'fling_trough', 'fling_dentist', 'fling_jail', 'fling_pomfrey']);
+const PLAYED_KEY = 'iw2.barks.played';
 const NAMES = { mabel: 'Mabel', pickles: 'Pickles', pomfrey: 'Pomfrey', wendell: 'Wendell', mortimer: 'Mortimer', lulu: 'Lulu', pete: 'Pete', nubbin: 'Nubbin', hortense: 'Hortense', thrupp: 'Thrupp', bart: 'Bart', fingers: 'Fingers', mulligan: 'Mick', stranger: 'You', hank: 'Hank' };
 
-export function createBarks({ game, audio, hero, anchorOf, geo, sunday, busy = () => false }) {
-  let chars = null;
-  const said = new Map(), tapAt = new Map();
-  let wordAt = 0, lastWord = '', showing = null, queued = null, anchorAt = 0, sentenceAt = -1e9;
+export function createBarks({ game, audio, hero, anchorOf, geo, sunday, busy = () => false, avoid = () => null }) {
+  let chars = null, skew = 0;
+  const clock = () => performance.now() + skew;
+  const said = new Map(), tapAt = new Map(), charAt = new Map(), log = [];
+  let wordAt = -1e9, lastWord = '', showing = null, queued = null, anchorAt = 0, sentenceAt = -1e9, gapNext = GAP_MIN, unlockAt = 0;
+  let pend = [], rect = null, holding = false;
+  const played = new Set();
+  try { for (const id of JSON.parse(localStorage.getItem(PLAYED_KEY) || '[]')) played.add(id); } catch {}
+  audio.onUnlock?.(() => { unlockAt = clock(); });
 
   const bubble = el('div', 'bubble');
   const box = el('div', 'bubble-box');
@@ -33,27 +43,32 @@ export function createBarks({ game, audio, hero, anchorOf, geo, sunday, busy = (
   if (audio.manifestDone) index(audio.manifest, audio.script);
 
   const onceDone = (id) => !!game.state.barks?.once?.[id];
+  const rnd = (a) => a[Math.floor(Math.random() * a.length)];
 
-  function pickLine(char, trig) {
+  // strict: nothing fresh → null (silence). Priority beats fall back to the least recently said line.
+  function pickLine(char, trig, strict) {
     const c = chars?.[char];
     if (!c) return null;
-    const now = performance.now();
-    let pool = c.lines.filter((l) => (l.trig || []).includes(trig) && !(l.once && onceDone(l.id)) && !(l.rude && sunday()));
-    if (!pool.length) return null;
+    const now = clock();
+    const of = (t) => c.lines.filter((l) => (l.trig || []).includes(t) && !(l.once && onceDone(l.id)) && !(l.rude && sunday()));
+    const pool = of(trig);
     const firsts = pool.filter((l) => l.once);
-    if (firsts.length) return firsts[Math.floor(Math.random() * firsts.length)];
-    const fresh = pool.filter((l) => now - (said.get(l.id) || -Infinity) > NO_REPEAT_MS);
-    pool = fresh.length ? fresh : pool.sort((a, b) => (said.get(a.id) || 0) - (said.get(b.id) || 0)).slice(0, 2);
-    return pool[Math.floor(Math.random() * pool.length)];
+    if (firsts.length) return rnd(firsts);
+    const fresh = (p) => p.filter((l) => now - (said.get(l.id) ?? -Infinity) > NO_REPEAT_MS);
+    let f = fresh(pool);
+    if (!f.length && trig === 'idle') f = fresh(of('tap'));
+    if (!f.length) return strict || !pool.length ? null : pool.sort((a, b) => (said.get(a.id) || 0) - (said.get(b.id) || 0))[0];
+    const unplayed = f.filter((l) => !played.has(l.id));
+    return rnd(unplayed.length ? unplayed : f);
   }
 
   function wordless(char, { force = false } = {}) {
-    const now = performance.now();
+    const now = clock();
     if (!force && now - wordAt < WORDLESS_GAP) return false;
     const c = chars?.[char];
     const list = (c?.wordless || []).filter((w) => w.file && w.id !== lastWord);
     if (!list.length) return false;
-    const w = list[Math.floor(Math.random() * list.length)];
+    const w = rnd(list);
     wordAt = now;
     lastWord = w.id;
     audio.voice(w.file, { delayMax: 400 });
@@ -68,6 +83,8 @@ export function createBarks({ game, audio, hero, anchorOf, geo, sunday, busy = (
     box.classList.remove('in');
     void box.offsetWidth;
     box.classList.add('in');
+    showing.w = box.offsetWidth;
+    showing.h = box.offsetHeight;
     anchorAt = 0;
     place(true);
   }
@@ -75,31 +92,72 @@ export function createBarks({ game, audio, hero, anchorOf, geo, sunday, busy = (
 
   function hide() {
     showing = null;
+    rect = null;
     bubble.hidden = true;
     if (queued) { const q = queued; queued = null; say(q.char, q.trig, q.prio); }
   }
 
-  // gated: barks from outside the state (Spectacle's gags) keep the W5 one-sentence-per-30-s budget here.
-  async function say(char, trig, prio = false, { gated = false } = {}) {
-    if (!chars) return false;
-    if (gated && performance.now() - sentenceAt < SENTENCE_GAP) return wordless(char);
-    if (showing) {
-      if (prio) queued = { char, trig, prio };
+  const ready = () => !!chars && (audio.running || (unlockAt > 0 && clock() - unlockAt > 1500));
+  const kindOf = (trig, prio, tap) => (tap ? 'tap' : prio ? 'prio' : REACT.has(trig) ? 'react' : 'ambient');
+
+  // gated (Spectacle's gags) is kept for callers; every non-priority sentence goes through the same budget now.
+  // staged: Spectacle's own opening (Mabel at the doors) replaces the state's randomly picked opening speaker.
+  async function say(char, trig, prio = false, { gated = false, tap = false, staged = false, late = false } = {}) {
+    const now = clock();
+    if (!ready()) {
+      if (prio && !tap) {
+        const i = pend.findIndex((p) => p.trig === trig);
+        if (i >= 0) { if (staged) pend[i] = { char, trig, at: now }; }
+        else if (pend.length < 3) pend.push({ char, trig, at: now });
+      }
       return false;
     }
-    if (busy() && !prio) return false;
-    const line = pickLine(char, trig);
-    if (!line) return false;
-    said.set(line.id, performance.now());
-    sentenceAt = performance.now();
+    if (showing || holding) {
+      if (prio && !tap) queued = { char, trig, prio };
+      return false;
+    }
+    const kind = kindOf(trig, prio, tap);
+    if (busy() && kind !== 'prio') return false;
+    const since = now - sentenceAt;
+    if (kind === 'ambient' && (since < gapNext || now - (charAt.get(char) ?? -Infinity) < CHAR_GAP)) return wordless(char) && false;
+    if (kind === 'react' && since < REACT_GAP) return wordless(char) && false;
+    if (kind === 'tap' && since < TAP_GAP) return false;
+    const line = pickLine(char, trig, kind !== 'prio');
+    if (!line) { if (kind !== 'tap') wordless(char); return false; }
+    said.set(line.id, now);
+    sentenceAt = now;
+    gapNext = GAP_MIN + Math.random() * (GAP_MAX - GAP_MIN);
+    charAt.set(char, now);
+    log.push({ t: now, char, trig, id: line.id, kind });
+    if (log.length > 200) log.shift();
+    if (!played.has(line.id)) {
+      played.add(line.id);
+      try { localStorage.setItem(PLAYED_KEY, JSON.stringify([...played])); } catch {}
+    }
     if (line.once) game.act('barkOnce', { id: line.id });
     const words = line.text.split(/\s+/).length;
     const ms = Math.max(1800, Math.min(5200, (line.dur ? line.dur * 1000 : 0) + 900, 900 + words * 360));
-    show(char, line, Math.max(ms, (line.dur || 0) * 1000 + 600));
+    const T = Math.max(ms, (line.dur || 0) * 1000 + 600);
+    // A queued beat right after the unlock waits (≤ 4 s) for its clip to decode so voice and bubble land together.
+    if (late && line.file) {
+      holding = true;
+      Promise.race([audio.voice(line.file, { delayMax: 4000 }), new Promise((r) => setTimeout(r, 4200))]).finally(() => { holding = false; show(char, line, T); });
+      return true;
+    }
+    show(char, line, T);
     if (line.file) audio.voice(line.file);
     return true;
   }
 
+  function flushPending() {
+    if (!pend.length || showing || holding || !ready()) return;
+    const now = clock();
+    pend = pend.filter((p) => now - p.at < PEND_TTL);
+    const p = pend.shift();
+    if (p) say(p.char, p.trig, true, { late: true });
+  }
+
+  // Clamped by the bubble's measured size so it never clips the viewport edge (PT2#10) or sits under the ribbon.
   function place(force) {
     if (!showing) return;
     const now = performance.now();
@@ -107,12 +165,22 @@ export function createBarks({ game, audio, hero, anchorOf, geo, sunday, busy = (
     anchorAt = now;
     const a = anchorOf(showing.char);
     const W = geo.viewW || 400, H = geo.heroH || 400;
-    let x = W / 2, y = 78, pinned = true;
+    const bw = Math.min(showing.w || 140, W - 16), bh = showing.h || 50;
+    let x = W / 2, y = 62, pinned = true;
     if (a && a.visible) { x = a.x; y = a.y; pinned = false; }
-    x = Math.max(70, Math.min(W - 70, x));
-    y = Math.max(62, Math.min(H - 20, y));
+    x = Math.max(8 + bw / 2, Math.min(W - 8 - bw / 2, x));
+    if (pinned) y = Math.max(56, Math.min(H - 64 - bh, y));
+    else y = Math.max(56 + bh + 14, Math.min(H - 8, y));
+    // Steer under a card that owns the top of the hero (the hat promotion), never behind it.
+    const o = avoid();
+    if (o) {
+      const top = pinned ? y : y - 14 - bh;
+      if (x - bw / 2 < o.r + 6 && x + bw / 2 > o.l - 6 && top < o.b + 6 && top + bh > o.t - 6) y = pinned ? o.b + 10 : o.b + 10 + bh + 14;
+    }
     bubble.classList.toggle('pinned', pinned);
     bubble.style.transform = `translate3d(${x | 0}px, ${y | 0}px, 0)`;
+    const top = pinned ? y : y - 14 - bh;
+    rect = { l: x - bw / 2, r: x + bw / 2, t: top, b: top + bh };
   }
 
   return {
@@ -120,22 +188,24 @@ export function createBarks({ game, audio, hero, anchorOf, geo, sunday, busy = (
     wordless,
     // Player tapped a character (W7 #5): a sentence if off cooldown and no bubble is up, else a grunt. Pays nothing.
     tap(char) {
-      const now = performance.now();
-      if (now - (tapAt.get(char) || -Infinity) >= TAP_COOLDOWN && !showing) {
+      const now = clock();
+      if (now - (tapAt.get(char) ?? -Infinity) >= TAP_COOLDOWN && !showing) {
         tapAt.set(char, now);
-        say(char, 'tap', true).then((ok) => { if (!ok) wordless(char, { force: true }); });
+        say(char, 'tap', true, { tap: true }).then((ok) => { if (!ok) wordless(char, { force: true }); });
         return true;
       }
       return wordless(char, { force: true });
     },
     frame() {
-      if (!showing) return;
+      if (!showing) { flushPending(); return; }
       if (performance.now() > showing.until) { hide(); return; }
       place(false);
     },
     get showing() { return showing; },
     get ready() { return !!chars; },
+    // Hero-px rect of the visible bubble box (null when none), for toasts and floats to steer around.
+    get rect() { return showing ? rect : null; },
     hide,
-    debug: { said, tapAt, get chars() { return chars; } },
+    debug: { said, tapAt, charAt, log, get pend() { return pend; }, get chars() { return chars; }, skew(ms) { skew += ms; }, get clock() { return clock(); } },
   };
 }
