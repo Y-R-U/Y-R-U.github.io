@@ -250,6 +250,9 @@ const PROJECTS = [
     desc: "3D idle transport tycoon with Babylon.js graphics. Build routes, upgrade vehicles, and grow your business empire.",
     date: "2026-03-11", creator: "Claude" },
 
+  { name: "Idle Western 2",     path: "/gms/3d/idle-western2/",   screenshot: "idle-western2",   type: "game",
+    desc: "Big Hat Energy: thrown out of the saloon face-first, you build half of Dribble Creek. Watch the Mulligan Brothers raise every business on screen, fling drunks into troughs and Pomfrey's window, win Leone-style 10-pace duels, tap Fingers' piano, and grow a hat to rival Pomfrey's. Voiced townsfolk, western soundtrack, Ghost Town season, M15 cheek.",
+    date: "2026-10-04", creator: "Claude" },
   { name: "Idle Life 2",        path: "/gms/3d/idle-life2/",      screenshot: "idle-life2",      type: "game",
     desc: "Live one life, then hand the town to your child. A warm 3D toy-diorama town where every business is a live scene: tap cans to buy a lemonade stand, grow through Old Town, Suburbs, Harbour and Downtown, move house, meet a partner, raise kids who work your shops, and retire to pass it all on. Each generation leaves landmarks behind. Managers with gear, 3D random events, two mini-games and a live Hollow's Eve season.",
     date: "2026-10-04", creator: "Claude" },
