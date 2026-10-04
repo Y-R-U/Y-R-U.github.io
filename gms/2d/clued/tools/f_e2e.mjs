@@ -46,12 +46,11 @@ const PLAY = {
   },
   async reveal(Q, good) { if (await count(MORE)) { await b.click(MORE); await sleep(400); } await PLAY.choice(Q, good); },
   async match(Q, good) {
-    for (let i = 0; i < Q.answer.length; i++) {
-      const decoy = Q.data.right.findIndex((_, j) => !Q.answer.includes(j));
-      const j = good || i ? Q.answer[i] : decoy >= 0 ? decoy : Q.answer[1];
-      await b.click('.mt-t[data-side=l]', { index: i }); await b.click(`.mt-t[data-side=r][data-i="${j}"]`);
-    }
-    if (!good && Q.data.multi === false && (await b.eval('document.querySelector(".mt-foot .btn").disabled'))) { await b.click('.mt-t[data-side=l]', { index: 0 }); await b.click(`.mt-t[data-side=r][data-i="${Q.answer[0]}"]`); await b.click('.mt-t[data-side=l]', { index: 1 }); await b.click(`.mt-t[data-side=r][data-i="${Q.answer[0]}"]`); }
+    // wrong round: swap the first two answers
+    const want = Q.answer.slice();
+    if (!good) [want[0], want[1]] = [want[1], want[0]];
+    for (let i = 0; i < want.length; i++) { await b.click('.mt-t[data-side=l]', { index: i }); await b.click(`.mt-t[data-side=r][data-i="${want[i]}"]`); }
+    await sleep(450);
     if (await vis('.mt-foot .btn:not(:disabled)')) await b.click('.mt-foot .btn');
   },
   async order(Q, good) {

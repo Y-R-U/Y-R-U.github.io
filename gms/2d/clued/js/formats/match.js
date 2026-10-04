@@ -28,7 +28,7 @@ const CSS = `
 .play.kids .mt-t img{height:96px}
 @media (orientation:landscape) and (max-height:520px){
  .mt{flex-direction:row;gap:14px}.mt-head{flex:0 0 26%;display:flex;flex-direction:column;justify-content:center;gap:10px}
- .mt-cols{flex:1}.mt-t{min-height:42px;font-size:14px;padding:4px 8px}.mt-t img{height:50px}.mt-col{gap:6px}
+ .mt-cols{flex:1}.mt-t{min-height:34px;font-size:13px;padding:2px 8px}.mt-t img{height:46px}.mt-col{gap:4px}.mt-t .key{width:20px;height:20px;font-size:11px}.mt-col h3{font-size:12px}
  .mt-cols.pics .mt-col.l{display:grid;grid-template-columns:1fr 1fr;gap:6px}.mt-cols.pics .mt-col.l h3{grid-column:1/-1}
 }
 @media (min-width:900px) and (min-height:560px){.mt-cols{gap:12px 28px}.mt-t{min-height:60px;font-size:18px}.mt-t img{height:100px}}
@@ -88,7 +88,8 @@ function make(rng, pack, src, n, decoys, difficulty) {
   if (new Set(truth.map(norm)).size !== truth.length) return null;
   const others = [...new Map(all.map(val).filter(v => v != null && !truth.some(t => norm(t) === norm(v))).map(v => [norm(v), v])).values()];
   const extra = decoys ? shuffle(rng, others).slice(0, multi ? 1 : 2) : [];
-  const right = type === 'year' ? [...truth, ...extra].sort() : shuffle(rng, [...truth, ...extra]);
+  const num = t => { const m = String(t).match(/^(\d+)( BC)?$/); return m ? (m[2] ? -m[1] : +m[1]) : 0; };
+  const right = type === 'year' ? [...truth, ...extra].sort((a, b) => num(a) - num(b)) : shuffle(rng, [...truth, ...extra]);
   const label = String(meta.label || key).toLowerCase();
   return {
     format: 'match', id: `match:${key}:${chosen.map(c => c.ref).sort().join(',')}`,
@@ -102,7 +103,7 @@ function make(rng, pack, src, n, decoys, difficulty) {
 const PAIRS = [4, 5, 6];
 
 export default register({
-  id: 'match', title: 'Matching board', icon: '🔗', blurb: 'Pair them all up', tags: ['slow'], kids: true,
+  id: 'match', title: 'Matching board', icon: '🔗', blurb: 'Pair them all up', tags: ['slow', 'kids'], kids: true,
   options: [
     { key: 'pairs', label: 'Pairs', type: 'choice', values: PAIRS, default: 5, kidsValues: [4], kidsDefault: 4 },
     { key: 'decoys', label: 'Decoy answers', type: 'bool', default: true, kidsHide: true },

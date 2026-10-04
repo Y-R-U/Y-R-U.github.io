@@ -22,7 +22,7 @@ const CSS = `
 @media (orientation:landscape) and (max-height:520px){
  .bz{display:grid;grid-template-columns:minmax(260px,38%) 1fr;grid-template-rows:auto auto auto 1fr;column-gap:14px}
  .bz-top{grid-column:1}.bz .type-box,.bz-msg,.bz-start{grid-column:1}.bz-grid{grid-column:2;grid-row:1/5}
- .bz-clock{width:52px;height:52px;font-size:21px}.bz-clock span{width:38px;height:38px}
+ .bz-top .q-prompt{font-size:16px}.bz-count{font-size:18px}.bz-clock{width:52px;height:52px;font-size:21px}.bz-clock span{width:38px;height:38px}
 }
 `;
 
@@ -152,7 +152,8 @@ export default register({
       T.forEach((t, i) => { if (!found.has(i)) { slots[i].textContent = t.name; slots[i].classList.add('miss'); if (!showGrid) grid.append(slots[i]); } });
       const k = found.size, ok = k >= d.goal;
       api.reveal(`You named <b>${k}</b> of ${total}${ok ? '' : ` (goal ${d.goal})`}.`);
-      answer(ok ? { correct: true, points: 100 + k * 25, given: k } : { correct: false, partial: k > 0, points: k * 15, given: k, detail: `${k}/${total}` });
+      answer(ok ? { correct: true, points: Math.min(500, 300 + Math.round(200 * (k - d.goal) / Math.max(1, Math.min(total, d.goal * 2) - d.goal))), given: k }
+        : { correct: false, partial: k > 0, points: Math.round(250 * k / d.goal), given: k, detail: `${k}/${total}` });
     }
     const onKey = e => { if (!t0 && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); e.stopPropagation(); begin(); } };
     document.addEventListener('keydown', onKey, true);

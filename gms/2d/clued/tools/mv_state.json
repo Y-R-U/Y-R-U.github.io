@@ -87,9 +87,9 @@
   "at": "2026-10-04T15:43:28.212Z"
  },
  "dumbo-2": {
-  "seed": 80713,
+  "seed": 88632,
   "model": "flux2-klein-9b-mlx-4bit",
-  "at": "2026-10-04T15:45:30.623Z",
+  "at": "2026-10-04T19:11:23.476Z",
   "attempt": 1
  },
  "bambi-1": {
@@ -706,5 +706,105 @@
   "seed": 11267,
   "model": "flux2-klein-9b-mlx-4bit",
   "at": "2026-10-04T18:51:26.666Z"
+ },
+ "la-la-land-1": {
+  "seed": 76582,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-04T18:52:57.006Z"
+ },
+ "moana-1": {
+  "seed": 34139,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-04T18:54:12.273Z"
+ },
+ "zootopia-1": {
+  "seed": 89154,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-04T18:55:45.409Z"
+ },
+ "coco-1": {
+  "seed": 28711,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-04T18:57:10.943Z"
+ },
+ "dunkirk-1": {
+  "seed": 14353,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-04T18:58:38.936Z"
+ },
+ "dune-1": {
+  "seed": 13889,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-04T19:00:04.601Z"
+ },
+ "encanto-1": {
+  "seed": 38983,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-04T19:01:22.338Z"
+ },
+ "luca-1": {
+  "seed": 2056,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-04T19:02:47.740Z"
+ },
+ "turning-red-1": {
+  "seed": 63570,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-04T19:04:13.242Z"
+ },
+ "everything-everywhere-all-at-once-1": {
+  "seed": 51061,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-04T19:05:46.680Z"
+ },
+ "oppenheimer-1": {
+  "seed": 59589,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-04T19:07:07.184Z"
+ },
+ "the-wild-robot-1": {
+  "seed": 88436,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-04T19:08:37.853Z"
+ },
+ "wicked-1": {
+  "seed": 17012,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-04T19:10:00.703Z"
+ },
+ "bambi-2": {
+  "seed": 28817,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-04T19:12:53.796Z"
+ },
+ "casablanca-2": {
+  "seed": 25359,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-04T19:14:14.202Z"
+ },
+ "citizen-kane-2": {
+  "seed": 15212,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-04T19:15:42.045Z"
+ },
+ "its-a-wonderful-life-2": {
+  "seed": 68154,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-04T19:17:12.347Z"
+ },
+ "cinderella-2": {
+  "seed": 38685,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-04T19:18:32.673Z"
+ },
+ "singin-in-the-rain-2": {
+  "seed": 86821,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-04T19:19:57.911Z"
+ },
+ "peter-pan-2": {
+  "seed": 4488,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-04T19:21:08.120Z"
  }
 }

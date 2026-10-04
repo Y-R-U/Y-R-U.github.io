@@ -4,6 +4,7 @@ import { injectCSS, baseCSS, stages, stretchTimer, once, hasImg } from './fkit.j
 
 const CSS = `
 .rx-pic{position:relative;flex:1 1 0;min-height:170px;border:var(--line) solid var(--ink);border-radius:var(--r);overflow:hidden;background:#1f1a4d;box-shadow:var(--shadow)}
+.rx-pic::before{content:'';position:absolute;inset:-20px;background:var(--fill) center/cover;filter:blur(22px) saturate(1.2);opacity:.55}
 .rx-pic canvas,.rx-pic img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;display:block}
 .rx-pic canvas{image-rendering:pixelated}
 .rx-pic img.zoom{transition:transform .6s cubic-bezier(.3,1,.4,1),filter .4s}
@@ -23,7 +24,7 @@ const CSS = `
 `;
 
 const STAGES = 6;
-const PIX = [64, 40, 24, 14, 8, 4];      // cells across the image, per stage (then full)
+const PIX = [12, 18, 26, 38, 56, 90];    // cells across the image, per stage (then full)
 const ZOOM = [7, 4.6, 3, 2, 1.45, 1.12];
 const TILES = [2, 4, 6, 9, 12, 14];
 
@@ -62,7 +63,7 @@ function loadImg(src) {
 }
 
 export default register({
-  id: 'reveal', title: 'Picture reveal', icon: '🖼️', blurb: 'Guess before it’s clear', tags: [], kids: true,
+  id: 'reveal', title: 'Picture reveal', icon: '🖼️', blurb: 'Guess before it’s clear', tags: ['kids'], kids: true,
   options: [
     { key: 'mode', label: 'Reveal', type: 'choice', values: ['mix', 'pixel', 'zoom', 'tiles'], labels: ['Mix', 'Pixels', 'Zoom', 'Tiles'], default: 'mix' },
     { key: 'answers', label: 'Answers', type: 'choice', values: [3, 4], default: 4, kidsValues: [3], kidsDefault: 3 },
@@ -83,6 +84,7 @@ export default register({
     const d = q.data;
     const answer = once(api);
     const pic = h('div.rx-pic');
+    pic.style.setProperty('--fill', `url("${d.img.src.replace(/"/g, '%22')}")`);
     const meter = h('div.rx-meter', {}, ...Array.from({ length: q.stages || STAGES }, () => h('i')));
     const body = h('div.q-body', {}, h('h2.q-prompt', {}, q.prompt));
     const answersEl = h('div.q-answers');
@@ -150,6 +152,8 @@ export default register({
     if (!st.native) stretchTimer(api, el, 2);
     const onResize = () => paint(cur);
     addEventListener('resize', onResize);
+    const ro = typeof ResizeObserver !== 'undefined' ? new ResizeObserver(() => paint(cur)) : null;
+    ro && ro.observe(pic);
     const grid = choiceGrid(answersEl, q.options, {
       onPick(i) {
         grid.lock(); grid.mark(q.answer, i); st.lock(); done();
@@ -158,7 +162,7 @@ export default register({
     });
     function done() { finished = true; pic.classList.add('done'); ready.then(() => paint(cur)); paint(cur); }
     return {
-      destroy() { grid.destroy(); st.destroy(); removeEventListener('resize', onResize); },
+      destroy() { grid.destroy(); st.destroy(); removeEventListener('resize', onResize); ro && ro.disconnect(); },
       timeout() { grid.lock(); grid.mark(q.answer, -1); st.lock(); done(); },
       eliminate(k = 2) { grid.eliminate(q.answer, k, api.rng || Math.random); },
       choose(x) { grid.pick(x === 'correct' ? q.answer : x === 'wrong' ? (q.answer + 1) % q.options.length : +x); },

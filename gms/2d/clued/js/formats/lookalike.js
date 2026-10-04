@@ -69,7 +69,7 @@ function diffHtml(q) {
 const ANSWERS = [2, 3];
 
 export default register({
-  id: 'lookalike', title: 'Lookalikes', icon: '👯', blurb: 'Which one is the real deal?', tags: ['choice'], kids: true,
+  id: 'lookalike', title: 'Lookalikes', icon: '👯', blurb: 'Which one is the real deal?', tags: ['kids'], kids: true,
   options: [{ key: 'answers', label: 'Pictures', type: 'choice', values: ANSWERS, default: 3, kidsValues: [2], kidsDefault: 2 }],
   supports(info) {
     const c = info.caps || {};

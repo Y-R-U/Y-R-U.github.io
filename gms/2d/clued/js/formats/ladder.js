@@ -81,7 +81,7 @@ function make(rng, pack, opts, difficulty, kids) {
 }
 
 export default register({
-  id: 'ladder', title: 'Clue ladder', icon: '🪜', blurb: 'Fewer clues, more points', tags: ['slow'], kids: true,
+  id: 'ladder', title: 'Clue ladder', icon: '🪜', blurb: 'Fewer clues, more points', tags: ['slow', 'kids'], kids: true,
   options: [
     { key: 'clues', label: 'Clues', type: 'choice', values: [5, 10, 20], default: 10, kidsHide: true },
     { key: 'answer', label: 'Answer by', type: 'choice', values: ['pick', 'type'], labels: ['Picking', 'Typing'], default: 'pick', kidsHide: true },

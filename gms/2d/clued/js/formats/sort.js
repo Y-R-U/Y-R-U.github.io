@@ -87,8 +87,8 @@ function make(rng, pack, [type, key], cards, bins, difficulty, kids) {
     const per = Math.floor(cards / bins);
     chosen.forEach((v, b) => deck.push(...sample(rng, has.filter(c => c.item.facts[key] === v), b < cards % bins ? per + 1 : per).map(c => ({ c, bin: b }))));
     if (deck.length < cards - 1) return null;
-    binNames = chosen;
-    prompt = `Sort by ${String(meta.label || key).toLowerCase()}`;
+    binNames = chosen.map(v => v.charAt(0).toUpperCase() + v.slice(1));
+    prompt = `${meta.label || key}: ${binNames.slice(0, -1).join(', ')} or ${binNames.at(-1)}?`;
   }
   deck = shuffle(rng, deck);
   const pics = type !== 'fake' && deck.every(x => hasImg(x.c.item)) && (kids || rng() < 0.6);
@@ -103,7 +103,7 @@ function make(rng, pack, [type, key], cards, bins, difficulty, kids) {
 const CARDS = [6, 8, 10];
 
 export default register({
-  id: 'sort', title: 'Sort into bins', icon: '🗂️', blurb: 'Swipe each one into the right bin', tags: ['slow'], kids: true,
+  id: 'sort', title: 'Sort into bins', icon: '🗂️', blurb: 'Swipe each one into the right bin', tags: ['slow', 'kids'], kids: true,
   options: [
     { key: 'cards', label: 'Cards', type: 'choice', values: CARDS, default: 8, kidsValues: [6], kidsDefault: 6 },
     { key: 'bins', label: 'Bins', type: 'choice', values: [2, 3], default: 2, kidsHide: true },

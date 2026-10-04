@@ -125,7 +125,7 @@ function sortCheck(q, { itemOf, byId, norm, ok }, tag) {
     const it = pack.items.find(x => x.name === c.text);
     if (type === 'fake') ok(q.answer[i] === (it ? 0 : 1) && (it || pack.fakes.includes(c.text)), `sort :: real/fake bin (${tag}) ${q.id} ${c.text}`);
     else if (type === 'bool') ok(it && it.facts[key] === (q.answer[i] === 0), `sort :: bool bin (${tag}) ${q.id} ${c.text}`);
-    else ok(it && String(it.facts[key]) === d.bins[q.answer[i]], `sort :: cat bin (${tag}) ${q.id} ${c.text}`);
+    else ok(it && String(it.facts[key]).toLowerCase() === d.bins[q.answer[i]].toLowerCase(), `sort :: cat bin (${tag}) ${q.id} ${c.text}`);
   });
 }
 

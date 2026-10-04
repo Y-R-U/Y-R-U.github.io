@@ -66,7 +66,7 @@ function make(rng, pack, key, difficulty, kids) {
 }
 
 export default register({
-  id: 'hilo', title: 'Higher or lower', icon: '📈', blurb: 'Is the next one higher or lower?', tags: ['choice'], kids: true,
+  id: 'hilo', title: 'Higher or lower', icon: '📈', blurb: 'Is the next one higher or lower?', tags: ['choice', 'kids'], kids: true,
   options: [],
   supports(info) {
     return Object.values(info.caps?.facts || {}).some(t => t === 'num' || t === 'year') ? true : 'Needs number or year facts';

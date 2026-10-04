@@ -9,7 +9,7 @@ function sources(pack, n, difficulty) {
   const items = pack.items || [];
   const out = [];
   for (const [key, m] of Object.entries(pack.factsMeta || {})) {
-    if (m.hard && difficulty !== 3) continue;
+    if ((m.hard || /conservation|iucn/i.test(m.label || '')) && difficulty !== 3) continue;
     const has = items.filter(it => it.facts && it.facts[key] != null);
     if (m.type === 'cat' && m.exclusive !== false) {
       const counts = {};
@@ -83,7 +83,7 @@ function make(rng, pack, [type, key], n, difficulty, kids) {
 const ANSWERS = [3, 4, 5];
 
 export default register({
-  id: 'odd', title: 'Odd one out', icon: '🧩', blurb: 'Spot the one that doesn’t belong', tags: ['choice'], kids: true,
+  id: 'odd', title: 'Odd one out', icon: '🧩', blurb: 'Spot the one that doesn’t belong', tags: ['choice', 'kids'], kids: true,
   options: [
     { key: 'answers', label: 'Answers', type: 'choice', values: ANSWERS, default: 4, kidsValues: [3], kidsDefault: 3 },
   ],

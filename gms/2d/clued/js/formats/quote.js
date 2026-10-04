@@ -39,7 +39,6 @@ function promptFor(pack, kind) {
   if (pack.quotePrompt) return pack.quotePrompt;
   if (kind === 'first') return 'Which book opens with this line?';
   if (pack.theme === 'screen') return 'Which film is this line from?';
-  if (pack.theme === 'books') return 'Which book is this from?';
   return 'Who said it?';
 }
 
@@ -109,7 +108,7 @@ function fromQuestion(rng, pack, n, difficulty) {
 const ANSWERS = [3, 4];
 
 export default register({
-  id: 'quote', title: 'Who said it?', icon: '💬', blurb: 'Famous lines: which film, book or person?', tags: ['choice'], kids: true,
+  id: 'quote', title: 'Who said it?', icon: '💬', blurb: 'Famous lines: which film, book or person?', tags: ['choice', 'kids'], kids: true,
   options: [{ key: 'answers', label: 'Answers', type: 'choice', values: ANSWERS, default: 4, kidsValues: [3], kidsDefault: 3 }],
   supports(info) {
     const c = info.caps || {};

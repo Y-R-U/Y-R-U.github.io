@@ -25,8 +25,8 @@ const CSS = `
 .or-foot .btn{min-width:160px}
 .play.kids .or-it{min-height:70px;font-size:20px}.play.kids .or-it img{width:76px;height:58px}
 @media (orientation:landscape) and (max-height:520px){
- .or{flex-direction:row;gap:16px}.or-head{flex:0 0 30%;display:flex;flex-direction:column;justify-content:center;gap:12px}
- .or-wrap{flex:1}.or-it{min-height:40px;font-size:15px;padding:3px 8px 3px 4px}.or-it img{height:32px;width:44px}.or-list{gap:5px}.or-it .pos{width:26px;height:26px;font-size:15px}
+ .or{flex-direction:row;gap:16px}.or-head{flex:0 0 calc(46% - 24px);display:flex;flex-direction:column;justify-content:center;gap:12px}
+ .or-wrap{flex:1}.or-it{min-height:40px;font-size:15px;padding:3px 8px 3px 4px}.or-it img{height:32px;width:44px}.or-list{gap:5px}.or-it .pos{width:26px;height:26px;font-size:15px}.or-it .mv{flex-direction:row;gap:4px}.or-it .mv button{height:28px;width:32px}.or-cap{font-size:11px}.or-wrap{gap:3px}.or-foot .btn{min-height:42px}
 }
 @media (min-width:900px) and (min-height:560px){.or-it{min-height:64px;font-size:19px}}
 `;

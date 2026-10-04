@@ -7,6 +7,7 @@ export const norm = normalize;
 
 export function injectCSS(id, text) {
   if (typeof document === 'undefined' || document.getElementById(id)) return;
+  if (id !== 'f-base-css') baseCSS();   // base first, so per-format rules win the cascade
   const s = document.createElement('style');
   s.id = id;
   s.textContent = text;
@@ -21,7 +22,7 @@ const BASE_CSS = `
 .f-pop{animation:f-pop .45s cubic-bezier(.2,1.8,.4,1)}
 @keyframes f-pop{40%{transform:scale(1.08)}}
 .f-shake{animation:shake .4s}
-.f-stage{flex:1;display:flex;flex-direction:column;justify-content:center;gap:12px;width:100%;max-width:640px;margin:0 auto;min-height:0}
+.f-stage{flex:1;display:flex;flex-direction:column;justify-content:safe center;gap:12px;width:100%;max-width:640px;margin:0 auto;min-height:0}
 .f-stage .q-prompt{font-size:clamp(20px,5.6vw,28px)}
 .play.kids .f-stage .q-prompt{font-size:clamp(24px,6.8vw,34px)}
 .f-more{align-self:center}
@@ -30,7 +31,7 @@ const BASE_CSS = `
 @media (min-width:900px) and (min-height:560px){.f-stage{max-width:820px}.f-stage .q-prompt{font-size:30px}}
 @media (orientation:landscape) and (max-height:520px){.f-stage{max-width:none}.f-stage .q-prompt{font-size:clamp(17px,3.2vw,24px)}}
 `;
-export const baseCSS = () => injectCSS('f-base-css', BASE_CSS);
+export function baseCSS() { injectCSS('f-base-css', BASE_CSS); }
 
 // The player's answer time suits a one-tap question; slow formats stretch it (never in online rooms, which sync deadlines).
 export function stretchTimer(api, el, factor) {

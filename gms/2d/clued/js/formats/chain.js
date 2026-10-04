@@ -6,7 +6,7 @@ import { FILMS } from './chain_data.js?v=1';
 const CSS = `
 .ch{gap:10px}
 .ch-row{display:flex;align-items:flex-start;justify-content:center;gap:2px;flex-wrap:nowrap}
-.ch-actor{flex:1 1 0;min-width:0;max-width:110px;overflow-wrap:anywhere;display:flex;flex-direction:column;align-items:center;gap:4px;text-align:center;font-weight:900;font-size:13px;line-height:1.1;animation:ch-in .35s cubic-bezier(.2,1.4,.4,1) both}
+.ch-actor{flex:1 1 0;min-width:0;max-width:110px;display:flex;flex-direction:column;align-items:center;gap:4px;text-align:center;font-weight:900;font-size:12px;line-height:1.1;animation:ch-in .35s cubic-bezier(.2,1.4,.4,1) both}
 .ch-actor .ph{width:min(64px,15vw);height:min(64px,15vw);border-radius:50%;border:var(--line) solid var(--ink);background:#eee center/cover;overflow:hidden;box-shadow:var(--shadow-sm);display:grid;place-items:center;font-family:var(--font-display);font-size:26px}
 .ch-actor .ph img{width:100%;height:100%;object-fit:cover}
 .ch-link{flex:0 1 44px;min-width:24px;margin-top:20px;display:flex;flex-direction:column;align-items:center;gap:2px}

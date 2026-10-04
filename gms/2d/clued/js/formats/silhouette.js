@@ -4,7 +4,7 @@ import { injectCSS, baseCSS, stages, stretchTimer, once, numOf } from './fkit.js
 
 const CSS = `
 .sl-box{position:relative;flex:1 1 0;min-height:180px;border:var(--line) solid var(--ink);border-radius:var(--r);background:radial-gradient(circle at 50% 40%,#fffdf6,#f1ead7);box-shadow:var(--shadow);overflow:hidden;display:grid;place-items:center}
-.sl-box svg{width:94%;height:94%;overflow:visible}
+.sl-box svg{position:absolute;inset:3%;width:94%;height:94%;overflow:visible}
 .sl-main{fill:var(--ink);stroke:var(--ink);stroke-width:.4;stroke-linejoin:round;transition:fill .5s}
 .sl-ctx{fill:none;stroke:rgba(31,26,77,.35);stroke-width:.35;stroke-dasharray:1.2 .8;opacity:0;transition:opacity .5s}
 .sl-box.ctx .sl-ctx{opacity:1}
@@ -54,7 +54,7 @@ function loadGeo() {
 }
 
 export default register({
-  id: 'silhouette', title: 'Silhouettes', icon: '🗺️', blurb: 'Name the country from its outline', tags: ['map'], kids: true,
+  id: 'silhouette', title: 'Silhouettes', icon: '🗺️', blurb: 'Name the country from its outline', tags: ['map', 'kids'], kids: true,
   options: [{ key: 'answers', label: 'Answers', type: 'choice', values: [3, 4], default: 4, kidsValues: [3], kidsDefault: 3 }],
   supports(info) {
     const f = info.caps?.facts || {};

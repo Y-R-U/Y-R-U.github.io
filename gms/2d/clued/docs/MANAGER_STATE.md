@@ -76,3 +76,5 @@ in games/js/games.js ONLY if that file is no longer dirty from another session, 
 - 2026-10-05 C1 follow-up DONE: 115 lookalike differences notes (both directions, tested), lion photo replaced.
 - 2026-10-05 P2P DONE: PeerJS cloud signalling, ?p2p=CODE, 96/96 logic, 39/39 3-browser e2e on real broker, 20/20 joins (median 3.3 s); no TURN → symmetric NAT / client-isolated wifi fail with clear message. AARON CHECK: two real phones same wifi + one on 4G.
 - 2026-10-05 AU follow-up DONE: anthems iso3 (173), tested.
+- 2026-10-05 Lane F DONE: 16 formats (match, ladder, hilo, order, odd, sort, fake, reveal, silhouette, number, connect, blitz60, type, chain, lookalike, quote), f_test 1.69M checks, e2e 3 viewports. P2 complete except MV.
+- 2026-10-05 P3 launched: lane I (integration: all requests + QA BACKLOG + whole-app click-through, CDP 9420, owns shell + build_index) and lane QF (fact-check 300 generated + 150 hand-written questions, media linkcheck + contact sheets, bees face photo; data only).
