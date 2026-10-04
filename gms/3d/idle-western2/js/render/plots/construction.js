@@ -4,13 +4,13 @@
 // walls rise with t. No geometry is made after boot: timbers and planks are one InstancedMesh, the swinging front and
 // the sign are two prebuilt meshes, the crew is one crowd. Also plays the Lv25/Lv100 "extension" crew bustle.
 import * as THREE from 'three';
-import { tone, wheel, crate, particles, placed, headY, tilt, rand, smooth01, cardCam, fgProp, COLORS, CROWD_K } from './western.js?v=20261004e';
+import { tone, wheel, crate, particles, placed, headY, tilt, rand, smooth01, fgProp, COLORS, CROWD_K } from './western.js?v=20261004e';
 
 const easeBack = (x) => { const t = Math.max(0, Math.min(1, x)); const c = 1.9; return 1 + (c + 1) * Math.pow(t - 1, 3) + c * Math.pow(t - 1, 2); };
 const _m = new THREE.Matrix4(), _q = new THREE.Quaternion(), _e = new THREE.Euler(), _p = new THREE.Vector3(), _s = new THREE.Vector3(), _c = new THREE.Color();
 const NSTAGE = 5, UP = new THREE.Vector3(0, 1, 0);
 const FACE = -0.45; // heading that faces the card cameras (they stand south-west of the lot)
-const CREW_SCALE = 1.08, CREW_K = 1.0;
+const CREW_SCALE = 0.96, CREW_K = 1.0;
 
 // site: { x, fz, w, d, h, fh, parapet, ext: {x, z, w, h} (Lv25/100 bustle spot), yard: [x, z] (lumber pile + mule cart) }
 export function createConstruction(kit, P, site) {
@@ -31,25 +31,29 @@ export function createConstruction(kit, P, site) {
   const g = kit.builder(P.pal, { seed: 71 });
   g.slab('dirtM', S.x, -0.02, zf - S.d / 2 + 0.6, S.w + 2.6, 0.05, S.d + 3.0, { round: 0.04, taper: 0, noAo: true });
   for (let i = 0; i < 9; i++) g.slab(i % 2 ? 'rut' : 'dirtL', S.x + (rnd() - 0.5) * S.w, 0.0, zf + 1.8 - rnd() * (S.d + 1.5), 0.6 + rnd() * 1.2, 0.04, 0.4 + rnd() * 0.6, { round: 0.02, taper: 0, ry: rnd() * 3, noAo: true });
-  const tx = S.x - 0.9, tz = zf + 2.5;
+  const tx = x0 + 1.0, tz = zf + 1.95;
   for (let i = 0; i < 3; i++) { const a = i * 2.09 + 0.3; g.cyl('raw2', tx + Math.cos(a) * 0.3, 0, tz + Math.sin(a) * 0.3, 0.06, 1.3, 0, { sides: 5, taper: 0.8, rz: Math.cos(a) * 0.22, rx: -Math.sin(a) * 0.22 }); }
   g.slab('brass', tx, 1.22, tz, 0.5, 0.26, 0.26, { round: 0.06, ry: 2.4 });
   g.cyl('brass', tx - 0.2, 1.35, tz - 0.18, 0.08, 0.42, 0, { sides: 7, taper: 1, rx: Math.PI / 2, ry: 2.4 });
-  const LUM = [x0 + 0.2, zf + 3.4];
+  const LUM = [x0 - 0.1, zf + 2.35];
   for (let r = 0; r < 4; r++) for (let k = 0; k < 4 - (r >> 1); k++) g.slab(tone(COLORS.raw, 0.9 + ((r * 3 + k) % 4) * 0.05), LUM[0] + (k - 1.5 + (r >> 1) * 0.5) * 0.44 + (r % 2) * 0.06, 0.02 + r * 0.24, LUM[1], 0.42, 0.22, 2.6, { round: 0.04, taper: 0, ry: Math.PI / 2 + 0.25 + (r % 2 ? 0.04 : -0.03) });
   for (const k of [-1, 1]) g.slab('raw2', LUM[0], 0, LUM[1] + k * 0.9, 1.9, 0.08, 0.2, { round: 0.02, taper: 0, ry: 0.25 });
   g.contact(LUM[0], LUM[1], 2.4, 3.0, { ry: 0.25 });
   // toolbox with a hammer and a saw, two nail kegs, offcuts
-  const TB = [S.x + 0.9, zf + 1.95];
+  const TB = [x1 - 0.35, zf + 1.95];
   g.slab('raw', TB[0], 0, TB[1], 0.9, 0.4, 0.45, { round: 0.05, ry: 0.3 });
   g.slab('raw2', TB[0], 0.4, TB[1], 0.08, 0.32, 0.08, { round: 0.02, taper: 0, ry: 0.3, rz: 0 });
   g.slab('raw2', TB[0], 0.68, TB[1], 0.8, 0.07, 0.07, { round: 0.02, taper: 0, ry: 0.3 });
   g.slab('iron', TB[0] + 0.15, 0.4, TB[1] + 0.05, 0.5, 0.06, 0.2, { round: 0.02, taper: 0, ry: 1.2 });
   g.cyl('raw', TB[0] - 0.25, 0.42, TB[1] + 0.1, 0.04, 0.45, 0, { sides: 5, taper: 1, rz: 1.2, ry: 0.3 });
-  for (const [dx, dz] of [[1.2, -0.25], [1.65, 0.05]]) { g.cyl('plank', TB[0] + dx, 0, TB[1] + dz, 0.24, 0.5, 0, { sides: 9, taper: 0.9 }); g.cyl('iron', TB[0] + dx, 0.47, TB[1] + dz, 0.22, 0.06, 0, { sides: 9, taper: 1, noAo: true }); }
-  for (let i = 0; i < 4; i++) g.slab(tone(COLORS.raw, 0.9 + (i % 3) * 0.06), x0 + 1.6 + i * 0.6, 0.02, zf + 3.6 + (i % 2) * 0.4, 0.55 + (i % 3) * 0.2, 0.1, 0.2, { round: 0.02, taper: 0, ry: i * 1.3 });
+  for (let i = 0; i < 6; i++) g.slab(tone(COLORS.raw, 0.9 + (i % 3) * 0.06), x0 + 1.4 + i * 0.75, 0.02, zf + 2.4 + (i % 3) * 0.5, 0.55 + (i % 3) * 0.2, 0.1, 0.2, { round: 0.02, taper: 0, ry: i * 1.3 });
+  // kegs right of the deck (by the mule), a crate of shingles and a bucket of nails front-left, stones in the foreground
+  for (const [dx, dz] of [[0.45, 1.75], [1.05, 2.05], [0.6, 2.45]]) { g.cyl('plank', x1 + dx, 0, zf + dz, 0.3, 0.62, 0, { sides: 10, taper: 0.9 }); for (const h of [0.08, 0.5]) g.cyl('iron', x1 + dx, h, zf + dz, 0.31, 0.05, 0, { sides: 10, taper: 1, noAo: true }); }
+  crate(g, x0 + 0.35, 0, zf + 1.7, 0.85, 0.4);
+  g.cyl('iron', x0 + 1.5, 0, zf + 2.6, 0.2, 0.3, 0, { sides: 9, taper: 1.1 });
+  for (let i = 0; i < 5; i++) g.ball('rockN', S.x + (rnd() - 0.4) * S.w * 1.2, 0, zf + 3.6 + rnd() * 1.6, 0.18 + rnd() * 0.2, { sy: 0.55, detail: 0 });
   // sawhorse with a plank half sawn (B works here: the bonk victim)
-  const SAW = [S.x + S.w * 0.22, zf + 2.9];
+  const SAW = [S.x + 0.95, zf + 2.25];
   for (const k of [-1, 1]) for (const j of [-1, 1]) g.slab('raw2', SAW[0] + k * 0.6, 0, SAW[1] + j * 0.2, 0.13, 0.8, 0.13, { round: 0.03, taper: 0, rz: k * 0.14, rx: j * 0.2 });
   g.slab('raw', SAW[0], 0.74, SAW[1], 1.5, 0.16, 0.24, { round: 0.03, taper: 0 });
   g.slab(tone(COLORS.raw, 1.06), SAW[0] + 0.3, 0.9, SAW[1], 2.0, 0.12, 0.38, { round: 0.03, taper: 0, rz: -0.04 });
@@ -133,6 +137,7 @@ export function createConstruction(kit, P, site) {
   const CARRY = items.length; T(-1, 0, 0, 0, 0, 2.6, 0.18, 0.36, 0, 0, 0, tone(COLORS.raw, 1.05));
   const ROPES = items.length; for (let i = 0; i < 3; i++) T(-1, 0, 0, 0, 0, 0.03, 1, 0.03, 0, 0, 0, COLORS.rope);
   const PLAN = items.length; T(-1, 0, 0, 0, 0, 0.78, 0.56, 0.02, 0, 0, 0, '#f1ead2');
+  const SAWB = items.length; T(-1, 0, 0, 0, 0, 0.03, 0.2, 0.62, 0, 0, 0, '#b9bec2'); T(-1, 0, 0, 0, 0, 0.09, 0.17, 0.16, 0, 0, 0, COLORS.raw2);
   const ub = kit.builder(P.pal);
   ub.slab('#ffffff', 0, 0, 0, 1, 1, 1, { round: 0.02, taper: 0 });
   const timbers = new THREE.InstancedMesh(ub.geometry({ ao: 0.12, aoH: 0.4 }), kit.materials.uber, items.length);
@@ -195,7 +200,8 @@ export function createConstruction(kit, P, site) {
 
   // ---- crew: 3 identical Mulligans + the manager who runs out at the sign; hammers; bonk stars; dust
   const crew = P.crowd({ count: 4, seed: 5, scale: CREW_SCALE });
-  for (let i = 0; i < 3; i++) crew.dress(i, 'mulligan' + (i + 1));
+  // the tall grump (mulligan3) hammers up top, the shocked one (2) saws and gets bonked, the stocky one (1) carries
+  for (let i = 0; i < 3; i++) crew.dress(i, 'mulligan' + [3, 2, 1][i]);
   crew.look(3, { top: '#3f8f8a', bot: '#5a4632', skin: 2, hair: 0, style: 1, acc: ['vest'], stache: 'handlebar', hat: 'bowler', hatScale: 0.85, hatColor: 'dark' }).body(3, 1.2, 0.95, 1.0);
   const hb = kit.builder(P.pal);
   hb.cyl('raw', 0, -0.05, 0, 0.025, 0.4, 0, { sides: 5, taper: 1, rx: Math.PI / 2 });
@@ -227,7 +233,7 @@ export function createConstruction(kit, P, site) {
     out[0] = a.x + (lx * ch + lz * sh) * a.k; out[1] = a.y + ly * a.k; out[2] = a.z + (-lx * sh + lz * ch) * a.k; out[3] = ang;
     return out;
   };
-  ag.forEach((a, k) => { a.ph = k * 1.7; a.k = CREW_SCALE * CROWD_K * [1.1, 1.0, 1.25, 1.0][k]; });
+  ag.forEach((a, k) => { a.ph = k * 1.7; a.k = CREW_SCALE * CROWD_K * [1.25, 1.0, 1.1, 1.0][k]; });
 
   let shownStage = -1, popT = 1, lastT = null, lastP = 0, bustle = 0, bonk = 0, bonkCd = 4, hurryKick = 0, thumped = false, dove = false, levelled = false, cheer = 0, prevVt = null;
   const hand = [0, 0, 0, 0];
@@ -350,25 +356,27 @@ export function createConstruction(kit, P, site) {
     const [A, B, C, M] = ag;
     const fast = hurryKick > 0 ? 2.2 : 1;
     hurryKick = Math.max(0, hurryKick - dt);
-    for (const a of [A, B, C]) { a.y = 0; a.clip = 3; a.sp = 3.6 * fast; a.tilt = null; a.hide = false; }
+    for (const a of [A, B, C]) { a.y = 0; a.clip = 3; a.sp = 3.6 * fast; a.tilt = null; a.hide = false; a.saw = false; }
     M.hide = true;
     let carry = false;
     // R4 staging: every Mulligan has a job and a prop, spread across the frame. A hammers up high, B works the sawhorse
     // (and catches the plank), C carries planks from the lumber stack, the foreman (M) reads the blueprint front-right.
     const cyc = (per) => { const u = (time % per) / per; return u; };
+    // B saws a plank on the sawhorse from behind it, facing the camera (the saw is a timbers instance)
+    function sawyer() { B.x = SAW[0] + 0.05; B.z = SAW[1] - 0.62; B.y = DECK; B.h = -0.15; B.clip = 3; B.saw = true; }
     if (st === 0) {
       if (sp < 0.4) { const ci = Math.floor(sp * 10) % 4, [cx, cz] = corners[ci]; if (go(A, cx + 0.5, cz + 0.6, dt, 3)) { A.h = Math.atan2(-0.5, -0.6); A.clip = 3; } else A.clip = 1; }
       else { A.x = x0 + S.w * 0.3; A.z = zf + 0.5; A.y = DECK; A.h = FACE; A.clip = 3; }
       if (sp < 0.55) { B.x = tx + 0.2; B.z = tz + 0.6; B.h = 2.4 + Math.PI; B.clip = 0; }
-      else { B.x = SAW[0] - 1.0; B.z = SAW[1] + 0.25; B.h = Math.PI / 2 + 0.25; B.clip = 3; }
+      else sawyer();
     } else if (st === 1 || st === 2 || st === 4) {
       // A: on the deck, then up the ladder and on the top plate hammering against the sky
       if (st === 4) { A.x = S.x - SW / 2 + 0.2; A.z = zf - 0.35; A.y = S.h + pl + 0.2; A.h = 0.3; A.clip = sp > 0.6 && sp < 0.78 ? 4 : 0; }
       else if (st === 1 && sp < 0.3) { A.x = x0 + S.w * 0.55; A.z = zf + 0.5; A.y = DECK; A.h = FACE; }
       else if (st === 1 && sp < 0.4) { const k = (sp - 0.3) / 0.1; A.x = lx; A.z = lz - 0.3 - k * 0.9; A.y = DECK + k * (S.h + pl - DECK); A.h = Math.PI; A.clip = 1; }
-      else { A.x = x0 + S.w * 0.36; A.z = zf; A.y = S.h + pl + (st === 2 ? 0.2 : 0); A.h = FACE; }
+      else { A.x = x0 + S.w * 0.42; A.z = zf - 1.1; A.y = S.h + pl + (st === 2 ? 0.2 : 0); A.h = FACE; }
       // B at the sawhorse
-      B.x = SAW[0] - 1.0; B.z = SAW[1] + 0.25; B.h = Math.PI / 2 + 0.25; B.clip = 3;
+      sawyer();
       if (st === 4) { B.x = S.x + 0.3; B.z = zf + 1.9; B.h = Math.PI; B.clip = sp < 0.6 ? 2 : 0; }
       if (st !== 4) carrier();
       else { C.x = S.x - 1.6; C.z = zf + 2.8; C.h = Math.PI * 0.95; C.clip = sp > 0.75 ? 4 : 0; }
@@ -376,7 +384,7 @@ export function createConstruction(kit, P, site) {
     if (st === 0) carrier();
     function carrier() {
       bonkCd -= dt;
-      const u = cyc(7), ya = [LUM[0] + 0.9, LUM[1] - 0.2], tb2 = [B.x - 0.6, B.z - 0.9];
+      const u = cyc(7), ya = [LUM[0] + 1.0, LUM[1] - 0.3], tb2 = [SAW[0] - 1.25, SAW[1] - 0.1];
       const f = u < 0.45 ? u / 0.45 : u < 0.55 ? 1 : 1 - (u - 0.55) / 0.45;
       C.x = ya[0] + (tb2[0] - ya[0]) * smooth01(f); C.z = ya[1] + (tb2[1] - ya[1]) * smooth01(f);
       C.h = Math.atan2(tb2[0] - ya[0], tb2[1] - ya[1]) + (u > 0.5 ? Math.PI : 0);
@@ -392,11 +400,11 @@ export function createConstruction(kit, P, site) {
       C.x = S.x + 0.3 + dive * (S.w / 2 + 1.0); C.z = zf + 1.6 + dive * 0.8; C.h = Math.PI * 0.9 + dive * 1.2; C.clip = sp > 0.7 && sp < 0.85 ? 1 : 0;
       if (sp > 0.84) { C.clip = 5; if (!dove) { dove = true; bonk = 2.4; } }
     }
-    if (st < 4) { M.hide = false; M.x = x1 + 0.2; M.z = zf + 3.3; M.y = 0; M.h = FACE + 0.25; M.clip = 2; M.sp = 1; }
+    if (st < 4) { M.hide = false; M.x = x1 - 0.1; M.z = zf + 2.6; M.y = 0; M.h = FACE + 0.25; M.clip = 2; M.sp = 1; }
     if (st === 4 && sp > 0.8) { M.hide = false; const u = smooth01((sp - 0.8) / 0.12); M.x = S.x; M.z = zf + 0.4 + u * 2.0; M.h = 0; M.y = 0.3 * (1 - u); M.clip = u < 1 ? 1 : 4; M.sp = 4; }
     // bonked brother sits seeing stars (B normally; C after the near-flattening)
     const victim = st === 3 ? C : B;
-    if (bonk > 0) { bonk -= dt; if (st !== 3) { victim.clip = 5; victim.y = 0; } }
+    if (bonk > 0) { bonk -= dt; if (st !== 3) { victim.clip = 5; victim.y = 0; if (victim.saw) { victim.saw = false; victim.y = 0; victim.z = SAW[1] + 0.75; victim.x = SAW[0] - 0.5; victim.h = -0.3; } } }
     stars.visible = bonk > 0;
     if (bonk > 0) {
       const hy = victim.y + headY(CREW_SCALE, CREW_K, 0.9, 1.22) + 0.25;
@@ -407,6 +415,10 @@ export function createConstruction(kit, P, site) {
     // the foreman's plan, held open in front of his chest
     if (!M.hide && st < 4) { const ch = Math.cos(M.h), sh = Math.sin(M.h); placeRaw(PLAN, M.x + sh * 0.5 * M.k, M.y + 0.98 * M.k, M.z + ch * 0.5 * M.k, 0.78, 0.56, 0.02, -0.5, M.h, 0); }
     else timbers.setMatrixAt(PLAN, _m.makeScale(0, 0, 0));
+    // B's saw rides the plank on the sawhorse: stroking while he works, left lying there when he is bonked
+    { const k = B.saw ? Math.sin(time * 7.5) * 0.17 : 0.1, sx = SAW[0] + 0.1, sz = SAW[1] - 0.02 + k;
+      placeRaw(SAWB, sx, 0.97, sz, 0.03, 0.2, 0.62, B.saw ? 0.12 : 0, 0, B.saw ? 0 : Math.PI / 2);
+      placeRaw(SAWB + 1, sx, B.saw ? 1.0 : 0.9, sz - (B.saw ? 0.36 : 0), 0.09, 0.17, 0.16); }
     // carried plank
     if (carry && st !== 4) {
       const ch = Math.cos(C.h), sh = Math.sin(C.h);
@@ -442,7 +454,7 @@ export function createConstruction(kit, P, site) {
       if (a.hide) { crew.hide(a.i); if (a.i < 3) hammers.setMatrixAt(a.i, _m.makeScale(0, 0, 0)); continue; }
       crew.set(a.i, a.x, a.y + 0.02, a.z, a.h, a.clip, a.ph, a.sp);
       if (a.i < 3) {
-        if (a.clip === 3) {
+        if (a.clip === 3 && !a.saw) {
           handAt(a, time, hand);
           _e.set(hand[3], a.h, 0, 'YXZ');
           hammers.setMatrixAt(a.i, _m.compose(_p.set(hand[0], hand[1], hand[2]), _q.setFromEuler(_e), _s.setScalar(1.3)));
@@ -481,7 +493,18 @@ function cartAndMule(b, x, z) {
 // Wraps P.done: runs the construction kit first, keeps the lot hidden while the Mulligans build on it, adds a 'site' tap
 // target (hurry) only while building, and exposes anchors. spec.acquired = true keeps the lot (Pomfrey's version of the
 // building) on screen through an acquisition cutscene.
-export const BC = { dx: 0.1, y: 1.8, dz: 1.4, yaw: 22, elev: 18, k: 1.8, min: 17, fov: 42, sky: 8 };
+// R5 (critic r4 fix 6, refs/a_clay_build.jpg): a low, wide camera (height hk × D) with a shallow pitch so the horizon sits
+// about a third down the card, the site centred and filling its width, yard and crew spread across the lower half. D is
+// capped so the camera stays in the street, in front of Pomfrey's side (SOUTH_Z ≈ 13 plot-local).
+export const BC = { dx: -0.2, dz: 1.6, yaw: 14, pitch: 8, k: 1.2, pad: 3.0, min: 9.2, max: 10.8, hk: 0.34, fov: 46 };
+export function buildCam(S) {
+  const R = Math.PI / 180, a = BC.yaw * R, p = BC.pitch * R, D = Math.min(BC.max, Math.max(BC.min, (S.w + BC.pad) * BC.k)), h = D * BC.hk;
+  const lx = S.x + BC.dx, lz = S.fz + BC.dz;
+  const pos = [lx - Math.sin(a) * D, h, lz + Math.cos(a) * D];
+  const at = [pos[0] + Math.sin(a) * Math.cos(p) * D, h - Math.sin(p) * D, pos[2] - Math.cos(a) * Math.cos(p) * D];
+  // the card rig stands the camera 1.15 × this distance from `look` (see cardCam)
+  return { pos: pos.map((v, i) => at[i] + (v - at[i]) / 1.15), look: at, fov: BC.fov, facade: true };
+}
 export function finishPlot(P, C, spec) {
   const before = new Set(P.group.children);
   const user = spec.update;
@@ -490,8 +513,10 @@ export function finishPlot(P, C, spec) {
   // R4: one build framing for every buildable plot, authored from the site: the braced frame fills the upper middle,
   // the yard (lumber left, sawhorse + foreman right, mule cart behind right) and the spaced crew sit under it.
   if (spec.camera?.build) {
-    const S = C.site, span = S.w + 4.2;
-    spec.camera.build = cardCam([S.x + BC.dx, BC.y, S.fz + BC.dz], BC.yaw, BC.elev, Math.max(BC.min, span * BC.k), BC.fov, BC.sky);
+    const cam = spec.camera, open = cam.fov;
+    cam.build = buildCam(C.site);
+    // the card rig reads the lens from plot.camera.fov even when it frames camera.build, so hand it the build lens while building
+    Object.defineProperty(cam, 'fov', { get: () => (C.root.visible ? cam.build.fov : open), configurable: true, enumerable: true });
   }
   out = P.done({
     ...spec,
@@ -524,7 +549,27 @@ export function finishPlot(P, C, spec) {
 // framing). Each is one mesh drawn only by this plot's own card camera in its own state: onBeforeRender runs before
 // three builds the model-view matrix, so other cameras (hero, neighbours' cards) get a zero-scale matrix. +1 draw, card only.
 const _z = new THREE.Matrix4().makeScale(0, 0, 0);
-const FG_BUILD = [{ kind: 'saguaro', sx: -0.92, dist: 8, up: 2.8 }, { kind: 'post', sx: 0.97, dist: 7, up: 1.4 }];
+const FG_BUILD = [{ kind: 'saguaro', sx: -1.02, dist: 4.4, up: 1.5, s: 0.85 }, { kind: 'post', sx: 1.02, dist: 4.2, up: 0.9 }];
+
+// The build card's background (ref: a water tower and a shed on the far side of the lot), drawn in the card-only fg mesh.
+function backdrop(b, S) {
+  const zb = S.fz - S.d, tx = S.x - S.w * 0.3 - 1.6, tz = zb - 9;
+  for (const [dx, dz] of [[-1, -1], [1, -1], [-1, 1], [1, 1]]) b.cyl('raw2', tx + dx * 1.05, 0, tz + dz * 1.05, 0.13, 5.4, 0, { sides: 6, taper: 0.85 });
+  for (const y of [1.6, 3.4]) for (const k of [-1, 1]) { b.slab('raw', tx, y, tz + k * 1.0, 2.2, 0.1, 0.1, { round: 0.02, taper: 0, rz: k * 0.65 }); b.slab('raw', tx + k * 1.0, y, tz, 0.1, 0.1, 2.2, { round: 0.02, taper: 0, rx: k * 0.65 }); }
+  b.slab('plank3', tx, 5.3, tz, 3.0, 0.16, 3.0, { round: 0.03, taper: 0 });
+  b.cyl('plank', tx, 5.4, tz, 1.45, 2.2, 0, { sides: 14, taper: 0.97 });
+  for (const h of [0.35, 1.1, 1.85]) b.cyl('iron', tx, 5.4 + h, tz, 1.47, 0.09, 0, { sides: 14, taper: 1, noAo: true });
+  b.cone('plank2', tx, 7.55, tz, 1.65, 0.95, 0, { sides: 14, curve: 1 });
+  b.cyl('raw2', tx + 0.9, 3.5, tz + 0.9, 0.08, 1.9, 0, { sides: 5, taper: 1, rz: 0.15 });
+  // a tin-roofed shed and a windmill-less pump beside it
+  const hx = S.x + S.w / 2 + 1.2, hz = zb - 7.5;
+  b.slab('raw', hx, 0, hz, 3.4, 2.4, 2.6, { round: 0.05 });
+  b.roof('tin', hx, 2.4, hz, 3.8, 1.0, 3.0, 0, { over: 0.2 });
+  b.slab('plank3', hx - 0.4, 0, hz + 1.31, 0.9, 1.8, 0.05, { round: 0.02, taper: 0 });
+  b.contact(hx, hz, 3.8, 3.0);
+  b.contact(tx, tz, 3.0, 3.0);
+  for (let i = 0; i < 5; i++) b.cone(i % 2 ? 'hay2' : 'hay', tx + 2 + i * 0.7, 0, tz + 1.5 + (i % 2), 0.2, 0.6, 0, { sides: 4 });
+}
 function framers(P, C, spec) {
   const cam = spec.camera;
   if (!cam?.facade) return;
@@ -532,6 +577,7 @@ function framers(P, C, spec) {
     if (!c || !list?.length) return;
     const b = C.kit.builder(P.pal, { seed: 77 });
     for (const f of list) fgProp(b, c, f);
+    if (build) backdrop(b, C.site);
     const m = b.finish({ cast: false });
     m.name = 'fg';
     m.frustumCulled = false;

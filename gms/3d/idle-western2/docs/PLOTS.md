@@ -276,3 +276,42 @@ Owner: lane P. The files are `js/render/plots/*`. Each business has one file. Th
   - `p_build_stages_r4.jpg`;
   - `p_saloon_ejection_r4.jpg`.
 - **Open issue:** lane S's hero saloon vignette (`vignettes.js`, a 1.7× Mabel plus a thrown drunk with a white puff) also renders in the saloon card. It sits in front of the doors and doubles P's card ejection. S should skip its actors for `camera.userData.iw2Line === 'saloon'`, or ask P to drop the card gag.
+
+## Round 5 (2026-10-04)
+
+### Build card (construction.js, critic r4 fix 6)
+- **Camera:** `buildCam(site)` replaces the cardCam build framing. It is low and wide: yaw 14, pitch 8, fov 46, height 0.34 × D, and D = clamp((w + 3) × 1.2, 9.2, 10.8). The horizon sits about a third of the way down, and the site is centred and fills the width.
+  - D is capped so the camera stays in the street (plot-local z < ~12.5). Behind that line, Pomfrey's side signs (`town:signs`, which are never culled) and awnings block the view.
+  - The card rig reads its lens from `plot.camera.fov`, so `finishPlot` turns that into a getter that returns the build fov while the site is up. **Cameras.js owner:** `load()` should use `auth.fov`. Then the getter can go.
+- **Backdrop (card only, inside the build `fg` mesh, 0 draws):** a water tower behind the lot to the left and a tin-roofed shed behind it to the right.
+- **Yard, pulled in toward the deck so the crew isn't giant in the foreground:**
+  - the lumber stack is front-left;
+  - the theodolite and a crate of shingles sit by the left deck corner;
+  - the sawhorse is centre-right;
+  - the toolbox and three kegs are by the mule on the right;
+  - foreground stones.
+- **Crew:** `CREW_SCALE` is 0.96. The roles are swapped so the tall grump (mulligan3) hammers on the top joists.
+  - B (mulligan2) stands on the deck edge behind the sawhorse, facing the camera, and saws. The saw is a `timbers` instance: it strokes while he works and is left on the plank when he is bonked.
+  - When B is bonked, he sits in front of the sawhorse under stars.
+  - C carries planks from the lumber stack to the sawhorse.
+  - The foreman reads the blueprint front-right.
+- `FG_BUILD` is now a smaller ribbed cactus at the left corner plus a post at the right.
+
+### Saloon card ejection (fix 4)
+- The thrown cowboy is drawn at 1.45× (`place` `s`) with a smaller hat (0.62). He lands on the card's centre line (`LAND = [DOOR − 1.1, 0, PZ1 + 1.9]`).
+- His flight is a low arc that stays under the porch roof and then drops, with hang time in the middle.
+- **Squash/stretch** is done by post-multiplying the instance matrix (`squash()`): he stretches through the flight, then pancakes on landing with a damped wobble.
+- **Dust:** the puff pool is 40. There is a 6-puff spray at the doors and a 30-puff ring burst on landing.
+
+### Foreground and porches (fix 8)
+- `ribbed(b, x, y, z, r, h)` (western.js) is a dark core with ellipsoid ribs, a domed crown and spine dots.
+- The fgProp `saguaro` is now a ribbed trunk with two sphere-swept elbow arms. They are raised into the visible part of the frame.
+- `porch()` now adds `clutter()` clusters beside each post, or at the porch ends when there is no awning. Each cluster is one of 8 knee-high items: bucket, sacks, crate + bottles, spittoon, broom, firewood, jug + basin, stool.
+  - The clusters keep clear of the step.
+  - Opt out with `clutter: false`, or pass `clutterSkip: [x…]` to keep a spot clear.
+  - They are static, so they cost 0 draws.
+
+### Checks (CDP 9341, real game)
+- test-boot PASS, test-cards PASS, test-scroll PASS (163 max draws, p95 3.8 ms). Plot draws are unchanged: everything new is static, an instance, or in an existing pool.
+- Shots in `docs/art/shots/r5/` (gitignored): `p_build_vs_ref_r5.jpg` (r4 → r5 → ref), `p_build_stages_r5.jpg`, `p_saloon_vs_ref_r5.jpg`, `p_cards_open_a_r5.jpg`, `p_cards_open_b_r5.jpg`.
+- **Open:** the open-state cards (other than the saloon) still show a lot of sky and sand above the roofs. That is the next framing pass.

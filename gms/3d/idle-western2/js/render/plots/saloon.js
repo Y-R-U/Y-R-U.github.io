@@ -75,9 +75,10 @@ export default function buildPlot(kit, { line, palette, rng }) {
 
   // Card gag (R3): Mabel throws a cowboy through the bat-wings every EJ s; he tumbles into the street in a dust puff,
   // lies flat, sits up dizzy and staggers off. Card-only (out.inCard), so it never doubles lane S's hero ejection.
-  const puff = particles(kit, P, (n) => { n.ball('dirtL', 0, 0, 0, 1, { detail: 1, smooth: true }); }, 18);
-  const EJ = 8.5, LAND = [DOOR[0] - 0.4, 0, PZ1 + 2.5];
-  let ej = 0, landed = false;
+  const puff = particles(kit, P, (n) => { n.ball('dirtL', 0, 0, 0, 1, { detail: 1, smooth: true }); }, 40);
+  const EJ = 8.5, LAND = [DOOR[0] - 1.1, 0, PZ1 + 1.9];
+  let ej = 0, landed = false, launched = false;
+  const _mm = new THREE.Matrix4(), _sq = new THREE.Matrix4();
 
   // Stock: crates of rotgut on the porch's right end (the brightest warm thing in frame).
   const rot = kit.builder(P.pal);
@@ -97,7 +98,7 @@ export default function buildPlot(kit, { line, palette, rng }) {
   folk.look(7, { top: '#5E8F8C', bot: '#4a3a32', skin: 3, hair: 0, style: 1 }).body(7, 1.18, 1.0, 1.0);
   folk.dress(8, 'mabel');
   folk.dress(9, 'lulu').body(9, 1.24, 0.95, 0.92).look(9, { hatScale: 0.8 });
-  folk.look(11, { top: '#c4473a', bot: '#4a5878', skin: 1, hair: 2, style: 3, stache: 'walrus', hat: 'stetson', hatScale: 0.8, hatColor: 'tan', acc: ['vest'] }).body(11, 1.2, 0.95, 1.0);
+  folk.look(11, { top: '#c4473a', bot: '#4a5878', skin: 1, hair: 2, style: 3, stache: 'walrus', hat: 'stetson', hatScale: 0.62, hatColor: 'tan', acc: ['vest'] }).body(11, 1.2, 0.95, 1.0);
   folk.look(10, { top: '#D9A441', bot: '#4a5878', skin: 3, hair: 1, style: 2, stache: 'walrus', hat: 'stetson', hatScale: 0.9, hatColor: 'brown' }).body(10, 1.2, 0.95, 1.05);
 
   let playK = 0, frenzy = 0, nextNote = 0;
@@ -159,25 +160,40 @@ export default function buildPlot(kit, { line, palette, rng }) {
       folk.set(10, BX + 3.8, BALC_Y, FZ + 1.05, -0.25, 6, 1.1, 1.0);
     },
   });
+  // R5 (critic fix 4): the thrown cowboy is 1.45× and lands on the card's centre line, hangs at the top of a high arc,
+  // stretches in flight, pancakes on landing (squash/stretch on the instance matrix) in a big dust burst.
   function eject(u) {
-    const C = P.CLIP;
+    const C = P.CLIP, ES = 1.45;
     if (u < 0.3) { folk.hide(11); landed = false; return; }
-    if (u < 0.4) { doorKick = 0.6; doorSwing = 1; }
-    if (u < 1.4) {
-      const f = (u - 0.3) / 1.1, x = DOOR[0] + (LAND[0] - DOOR[0]) * f, z = FZ + 0.2 + (LAND[2] - FZ - 0.2) * f;
-      folk.place(11, { x, y: 0.4 * (1 - f) + 1.5 * Math.sin(Math.PI * f), z, heading: 0.2, pitch: -f * 5.6, roll: Math.sin(f * 9) * 0.25, clip: C.flail, speed: 2.2 });
+    if (u < 0.4) { doorKick = 0.6; doorSwing = 1; if (!launched) { launched = true; for (let i = 0; i < 6; i++) puff.emit(DOOR[0] + (i - 2.5) * 0.3, 0.6 + (i % 3) * 0.3, FZ + 0.6, (i - 2.5) * 0.4, 0.4, 1.2, 0.8, 0.22, 0); } }
+    if (u < 1.75) {
+      const t = (u - 0.3) / 1.45, f = t + 0.1 * Math.sin(t * Math.PI * 2);
+      const x = DOOR[0] + (LAND[0] - DOOR[0]) * f, z = FZ + 0.2 + (LAND[2] - FZ - 0.2) * f;
+      folk.place(11, { x, y: 0.6 * (1 - f) + 1.25 * Math.sin(Math.PI * f * f), z, heading: 0.35, pitch: -f * 5.9, roll: Math.sin(f * 9) * 0.25, clip: C.flail, speed: 2.6, s: ES });
+      const k = Math.abs(Math.cos(Math.PI * f)) * 0.2;
+      squash(11, 1 - k * 0.45, 1 + k, 1 - k * 0.45);
       return;
     }
     if (!landed) {
-      landed = true;
-      for (let i = 0; i < 18; i++) { const a = i * 0.35 + Math.sin(i * 7) * 0.3, v = 1.1 + (i % 3) * 0.5; puff.emit(LAND[0] + Math.cos(a) * 0.6, 0.15, LAND[2] + Math.sin(a) * 0.45, Math.cos(a) * v, 0.35 + (i % 4) * 0.2, Math.sin(a) * v * 0.6, 1.0 + (i % 3) * 0.3, 0.13 + (i % 4) * 0.045, 0.5); }
+      landed = true; launched = false;
+      for (let i = 0; i < 30; i++) { const a = (i / 30) * Math.PI * 2 + Math.sin(i * 7) * 0.2, v = 1.6 + (i % 4) * 0.55; puff.emit(LAND[0] + Math.cos(a) * 0.8, 0.2, LAND[2] + Math.sin(a) * 0.6, Math.cos(a) * v, 0.45 + (i % 5) * 0.28, Math.sin(a) * v * 0.6, 1.1 + (i % 3) * 0.35, 0.22 + (i % 4) * 0.08, 0.5); }
       doorSwing = 1;
     }
-    if (u < 3.6) { const k = Math.min(1, (u - 1.4) / 0.25), slide = 0.6 * Math.min(1, (u - 1.4) / 0.4); folk.place(11, { x: LAND[0], y: 0.08 * Math.abs(Math.sin(k * Math.PI)), z: LAND[2] + slide, heading: 0.2, pitch: -Math.PI / 2, clip: C.sprawl }); return; }
-    if (u < 4.6) { folk.set(11, LAND[0], 0, LAND[2] + 0.5, 0.3, C.dizzy, 0, 1.4); return; }
-    const w = Math.min(1, (u - 4.6) / 3.2);
+    if (u < 3.8) {
+      const w = u - 1.75, slide = 0.7 * Math.min(1, w / 0.4), bump = 0.12 * Math.abs(Math.sin(Math.min(1, w / 0.3) * Math.PI));
+      folk.place(11, { x: LAND[0], y: bump, z: LAND[2] + slide, heading: 0.35, pitch: -Math.PI / 2, clip: C.sprawl, s: ES });
+      const q = Math.exp(-w * 7) * Math.cos(w * 26);
+      squash(11, 1 + q * 0.3, 1 + q * 0.2, 1 - q * 0.5);
+      return;
+    }
+    if (u < 4.8) { folk.place(11, { x: LAND[0], y: 0, z: LAND[2] + 0.7, heading: 0.4, clip: C.dizzy, speed: 1.4, s: ES }); return; }
+    const w = Math.min(1, (u - 4.8) / 3.2);
     if (w >= 1) { folk.hide(11); return; }
-    folk.set(11, LAND[0] + w * 7.5, 0, LAND[2] + 0.5 + Math.sin(w * 14) * 0.25, Math.PI / 2 + Math.sin(w * 14) * 0.35, C.stagger, 0, 1.2);
+    folk.place(11, { x: LAND[0] + w * 7.5, y: 0, z: LAND[2] + 0.7 + Math.sin(w * 14) * 0.25, heading: Math.PI / 2 + Math.sin(w * 14) * 0.35, clip: C.stagger, speed: 1.2, s: ES });
+  }
+  function squash(i, sx, sy, sz) {
+    folk.mesh.getMatrixAt(i, _mm);
+    folk.mesh.setMatrixAt(i, _mm.multiply(_sq.makeScale(sx, sy, sz)));
   }
   out.piano = api.play;
   out.kickDoors = () => { doorKick = 0.8; doorSwing = 1; };
