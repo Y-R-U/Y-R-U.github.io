@@ -258,7 +258,7 @@ body.kids-on {
 .play.kids .q-prompt { font-size: clamp(26px, 7.4vw, 36px); }
 .play.kids .choice { min-height: 80px; font-size: 22px; border-radius: 22px; }
 .play.kids .choices.images .choice img { aspect-ratio: 1; border-radius: 16px; }
-.play.kids .choices.images .choice .label { display: block; font-size: 18px; }
+.play.kids .choices.images.locked .choice .label, .play.kids .choices.images.revealed .choice .label { display: block; font-size: 18px; }
 .play.kids .choices.n3:not(.images) { grid-template-columns: 1fr; }
 .play.kids .q-media { border-radius: 28px; }
 .play.kids .rv-title { font-size: 30px; }
