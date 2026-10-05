@@ -78,3 +78,13 @@ in games/js/games.js ONLY if that file is no longer dirty from another session, 
 - 2026-10-05 AU follow-up DONE: anthems iso3 (173), tested.
 - 2026-10-05 Lane F DONE: 16 formats (match, ladder, hilo, order, odd, sort, fake, reveal, silhouette, number, connect, blitz60, type, chain, lookalike, quote), f_test 1.69M checks, e2e 3 viewports. P2 complete except MV.
 - 2026-10-05 P3 launched: lane I (integration: all requests + QA BACKLOG + whole-app click-through, CDP 9420, owns shell + build_index) and lane QF (fact-check 300 generated + 150 hand-written questions, media linkcheck + contact sheets, bees face photo; data only).
+- 2026-10-05 QF DONE (generated-question error 3.3% → 0.7%; hand-written 0/230; 141 photos rejected incl. the bees face; linkcheck 4,158 OK). I DONE (all fixes, caps.formats truthful availability, all suites green).
+- 2026-10-05 SHIPPED: registered in projects.js + assets/screenshots/clued.jpg, pushed (BUILD 202610050144), live at yru.br8t.com/gms/2d/clued/ (Pages custom domain!) and games.br8t.com/gms/2d/clued/ (manual rsync excluding unreviewed media). Fixed API base (hostname === games.br8t.com) + CLUED_ORIGINS in box env incl. http(s)://yru.br8t.com. Landscape layout needs ≥640px (540px overflowed). MV stopped by manager to save weekly quota.
+
+## NEXT (week of 2026-10-06)
+1. Hub card in games/js/games.js — that file was dirty from another session; check `git status games/` first or ask Aaron.
+2. QF "For lane I" generator rules (docs/notes/QF.md): BC years "-323", IUCN questions in kids mode, `type` asking for bin values, lname mid-sentence in hilo/number, "the" before {value} countries, highest/lower wording for sizes/time, match lower-casing labels, sort "or" wording, pack.noun singular/plural, nested-value guard in connect/odd.
+3. I's open issues (docs/notes/I.md): portrait map empty ocean bands, landscape reveal card over bottom continent buttons, desktop continent buttons to panel edge, slow Wikimedia emptying picture rounds; I's "For QF": "Unknown authorUnknown author" credits (~37), snow-leopard tail photo, anthems "Insular Oceania" continent, Tiny Tim quote attribution.
+4. MV stretch: media/song-pictures + media/book-moments (113 images) generated but UNREVIEWED, no pack files, gitignored + excluded from rsync. Resume MV to review/finish or delete.
+5. Aaron real-device checks: P2P rooms (two phones same wifi, then one on 4G), audio on Android (piano, Apple clips, bgm), server room via share link.
+6. Static deploy = rsync command above (server/deploy.sh STATIC=1 would also ship unreviewed media; fix its excludes).
