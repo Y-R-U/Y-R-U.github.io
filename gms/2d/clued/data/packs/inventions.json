@@ -23,14 +23,14 @@
    "label": "Inventor",
    "ask": "Who is credited with {lname}?",
    "askReverse": "Which invention is credited to {value}?",
-   "stmt": "The {lname} is credited to {value}."
+   "stmt": "{lname} is credited to {value}."
   },
   "country": {
    "type": "cat",
    "label": "Country",
    "ask": "Where was {lname} invented?",
    "askReverse": "Which of these was invented in {value}?",
-   "stmt": "The {lname} was invented in {value}."
+   "stmt": "{lname} was invented in {value}."
   }
  },
  "items": [
@@ -122,7 +122,7 @@
     "Isaac Newton built a version using a mirror.",
     "It dates from 1608.",
     "It is credited to Hans Lipperhey.",
-    "It was invented in Netherlands.",
+    "It was invented in the Netherlands.",
     "Hubble is a famous space version.",
     "It makes faraway things look closer.",
     "The answer is one word of 9 letters.",
@@ -192,7 +192,7 @@
     "Galileo had studied how its key part swings.",
     "It dates from 1656.",
     "It is credited to Christiaan Huygens.",
-    "It was invented in Netherlands.",
+    "It was invented in the Netherlands.",
     "It ticks as a weight swings back and forth.",
     "It keeps time with a swinging weight.",
     "The answer has 2 words (8, 5 letters).",
@@ -228,7 +228,7 @@
     "Doctors once used it to take temperatures.",
     "It dates from 1714.",
     "It is credited to Daniel Gabriel Fahrenheit.",
-    "It was invented in Netherlands.",
+    "It was invented in the Netherlands.",
     "It has been replaced by digital versions.",
     "It measures temperature.",
     "The answer has 2 words (7, 11 letters).",
@@ -266,7 +266,7 @@
     "Its inventor is on the US $100 note.",
     "It dates from 1752.",
     "It is credited to Benjamin Franklin.",
-    "It was invented in United States.",
+    "It was invented in the United States.",
     "It carries electricity safely into the ground.",
     "It protects buildings during storms.",
     "The answer has 2 words (9, 3 letters).",
@@ -304,7 +304,7 @@
     "A unit of power is named after its inventor.",
     "It powered factories and mills.",
     "It dates from 1769.",
-    "It was invented in United Kingdom.",
+    "It was invented in the United Kingdom.",
     "It drove the Industrial Revolution.",
     "It runs on boiling water.",
     "The answer has 3 words (4, 5, 6 letters).",
@@ -379,7 +379,7 @@
     "Its name comes from the Latin for cow.",
     "It dates from 1796.",
     "It is credited to Edward Jenner.",
-    "It was invented in United Kingdom.",
+    "It was invented in the United Kingdom.",
     "The answer has 2 words (8, 7 letters).",
     "Its first letter is S."
    ],
@@ -451,7 +451,7 @@
     "George Stephenson's \"Rocket\" made it famous.",
     "It dates from 1804.",
     "It is credited to Richard Trevithick.",
-    "It was invented in United Kingdom.",
+    "It was invented in the United Kingdom.",
     "It pulls trains.",
     "It puffs smoke as it chugs along rails.",
     "The answer has 2 words (5, 10 letters).",
@@ -597,7 +597,7 @@
     "It has a clasp that covers the point.",
     "It dates from 1849.",
     "It is credited to Walter Hunt.",
-    "It was invented in United States.",
+    "It was invented in the United States.",
     "It holds nappies and clothes together.",
     "The answer has 2 words (6, 3 letters).",
     "Its first letter is S."
@@ -636,7 +636,7 @@
     "Its inventor showed it off by cutting the rope while standing on the platform.",
     "It dates from 1852.",
     "It is credited to Elisha Otis.",
-    "It was invented in United States.",
+    "It was invented in the United States.",
     "It made skyscrapers practical.",
     "The answer has 3 words (8, 6, 5 letters).",
     "Its first letter is E."
@@ -708,7 +708,7 @@
     "Its keys hit an inked ribbon.",
     "It dates from 1868.",
     "It is credited to Christopher Latham Sholes.",
-    "It was invented in United States.",
+    "It was invented in the United States.",
     "It makes a clacking sound.",
     "It types letters onto paper.",
     "The answer is one word of 10 letters.",
@@ -744,7 +744,7 @@
     "Its patent was granted in 1876.",
     "It dates from 1876.",
     "It is credited to Alexander Graham Bell.",
-    "It was invented in United States.",
+    "It was invented in the United States.",
     "It sends voices along wires.",
     "You make calls on it.",
     "The answer is one word of 9 letters.",
@@ -780,7 +780,7 @@
     "Its inventor is called the \"Wizard of Menlo Park\".",
     "It dates from 1877.",
     "It is credited to Thomas Edison.",
-    "It was invented in United States.",
+    "It was invented in the United States.",
     "It led to the record player.",
     "It records and plays back sound.",
     "The answer is one word of 10 letters.",
@@ -810,8 +810,7 @@
    ],
    "facts": {
     "year": 1879,
-    "inventor": "Thomas Edison",
-    "country": "United States"
+    "inventor": "Thomas Edison"
    },
    "blurb": "In 1879 Thomas Edison made a long-lasting light bulb with a carbon filament. Joseph Swan made a similar bulb in England.",
    "clues": [
@@ -820,7 +819,6 @@
     "It wastes most of its energy as heat.",
     "It dates from 1879.",
     "It is credited to Thomas Edison.",
-    "It was invented in United States.",
     "Cartoons show one above a head for a bright idea.",
     "The answer has 3 words (12, 5, 4 letters).",
     "Its first letter is I."
@@ -975,18 +973,6 @@
     "The answer is one word of 14 letters.",
     "Its first letter is C."
    ],
-   "media": {
-    "img": [
-     {
-      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/6/63/Cinematographe_Lumiere.jpg/500px-Cinematographe_Lumiere.jpg",
-      "w": 500,
-      "h": 367,
-      "credit": "Marcellin Auzolle",
-      "license": "Public domain",
-      "page": "https://commons.wikimedia.org/wiki/File:Cinematographe_Lumiere.jpg"
-     }
-    ]
-   },
    "difficulty": 3
   },
   {
@@ -1042,7 +1028,7 @@
     "It made hot cities more liveable.",
     "It dates from 1902.",
     "It is credited to Willis Carrier.",
-    "It was invented in United States.",
+    "It was invented in the United States.",
     "It cools rooms.",
     "The answer has 2 words (3, 12 letters).",
     "Its first letter is A."
@@ -1081,7 +1067,7 @@
     "Its inventors ran a bicycle shop.",
     "The first flight was at Kitty Hawk, North Carolina.",
     "It dates from 1903.",
-    "It was invented in United States.",
+    "It was invented in the United States.",
     "Orville and Wilbur made it.",
     "It flies people through the sky.",
     "The answer is one word of 8 letters.",
@@ -1120,7 +1106,7 @@
     "It is used on jeans and jackets.",
     "It dates from 1913.",
     "It is credited to Gideon Sundback.",
-    "It was invented in United States.",
+    "It was invented in the United States.",
     "Its teeth lock together.",
     "You pull it up and down to close a jacket.",
     "The answer is one word of 6 letters.",
@@ -1159,7 +1145,7 @@
     "It first appeared in the New York World.",
     "It dates from 1913.",
     "It is credited to Arthur Wynne.",
-    "It was invented in United States.",
+    "It was invented in the United States.",
     "Newspapers print one every day.",
     "The answer is one word of 9 letters.",
     "Its first letter is C."
@@ -1196,7 +1182,7 @@
     "Early versions used a spinning disc.",
     "It dates from 1926.",
     "It is credited to John Logie Baird.",
-    "It was invented in United Kingdom.",
+    "It was invented in the United Kingdom.",
     "You watch shows on it.",
     "It is often called the telly.",
     "The answer is one word of 10 letters.",
@@ -1222,8 +1208,7 @@
    "lname": "the jet engine",
    "facts": {
     "year": 1930,
-    "inventor": "Frank Whittle",
-    "country": "United Kingdom"
+    "inventor": "Frank Whittle"
    },
    "blurb": "Frank Whittle patented the jet engine in 1930. Hans von Ohain in Germany built one separately.",
    "clues": [
@@ -1231,7 +1216,6 @@
     "It was patented in 1930.",
     "It dates from 1930.",
     "It is credited to Frank Whittle.",
-    "It was invented in United Kingdom.",
     "It sucks in air and blasts it out the back.",
     "It powers big passenger planes.",
     "The answer has 2 words (3, 6 letters).",
@@ -1266,24 +1250,12 @@
     "It was made at the DuPont company.",
     "It dates from 1935.",
     "It is credited to Wallace Carothers.",
-    "It was invented in United States.",
+    "It was invented in the United States.",
     "It is a strong plastic fibre.",
     "Its name has five letters.",
     "The answer is one word of 5 letters.",
     "Its first letter is N."
    ],
-   "media": {
-    "img": [
-     {
-      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/4/4d/Nylon6_and_Nylon_66.png/500px-Nylon6_and_Nylon_66.png",
-      "w": 500,
-      "h": 358,
-      "credit": "Michael Ströck (mstroeck) at en.wikipedia",
-      "license": "CC BY-SA 3.0",
-      "page": "https://commons.wikimedia.org/wiki/File:Nylon6_and_Nylon_66.png"
-     }
-    ]
-   },
    "difficulty": 2
   },
   {
@@ -1333,8 +1305,7 @@
    ],
    "facts": {
     "year": 1939,
-    "inventor": "Igor Sikorsky",
-    "country": "United States"
+    "inventor": "Igor Sikorsky"
    },
    "blurb": "Igor Sikorsky flew the first practical single-rotor helicopter, the VS-300, in 1939.",
    "clues": [
@@ -1342,7 +1313,6 @@
     "Its inventor was born in Kyiv.",
     "It has a small rotor on its tail.",
     "It dates from 1939.",
-    "It was invented in United States.",
     "It can hover and fly backwards.",
     "It flies with spinning blades on top.",
     "The answer is one word of 10 letters.",
@@ -1381,7 +1351,7 @@
     "The first ones were taller than a person.",
     "It dates from 1945.",
     "It is credited to Percy Spencer.",
-    "It was invented in United States.",
+    "It was invented in the United States.",
     "It heats food in minutes.",
     "It reheats leftovers with invisible waves.",
     "The answer has 2 words (9, 4 letters).",
@@ -1454,7 +1424,7 @@
     "It replaced bulky vacuum tubes.",
     "It dates from 1947.",
     "It is credited to Bardeen, Brattain and Shockley.",
-    "It was invented in United States.",
+    "It was invented in the United States.",
     "Billions fit on one chip.",
     "It switches and boosts electric signals.",
     "The answer is one word of 10 letters.",
@@ -1534,18 +1504,6 @@
     "The answer has 2 words (6, 8 letters).",
     "Its first letter is F."
    ],
-   "media": {
-    "img": [
-     {
-      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/6/6a/Fdr_sidefront.jpg/500px-Fdr_sidefront.jpg",
-      "w": 500,
-      "h": 375,
-      "credit": "NTSB",
-      "license": "Public domain",
-      "page": "https://commons.wikimedia.org/wiki/File:Fdr_sidefront.jpg"
-     }
-    ]
-   },
    "difficulty": 2
   },
   {
@@ -1641,7 +1599,7 @@
     "It reads barcodes at checkouts.",
     "It dates from 1960.",
     "It is credited to Theodore Maiman.",
-    "It was invented in United States.",
+    "It was invented in the United States.",
     "It makes a very narrow beam.",
     "It is a beam of focused light.",
     "The answer is one word of 5 letters.",
@@ -1677,7 +1635,7 @@
     "It is used in racing tyres.",
     "It dates from 1965.",
     "It is credited to Stephanie Kwolek.",
-    "It was invented in United States.",
+    "It was invented in the United States.",
     "It is used in bulletproof vests.",
     "Its name starts with a K.",
     "The answer is one word of 6 letters.",
@@ -1717,7 +1675,7 @@
     "The first call was made in New York in 1973.",
     "It dates from 1973.",
     "It is credited to Martin Cooper.",
-    "It was invented in United States.",
+    "It was invented in the United States.",
     "It was made by Motorola.",
     "You carry it in your pocket.",
     "The answer has 2 words (6, 5 letters).",
@@ -1832,7 +1790,7 @@
     "The classic colour is canary yellow.",
     "It dates from 1980.",
     "It is credited to Spencer Silver and Art Fry.",
-    "It was invented in United States.",
+    "It was invented in the United States.",
     "It was made by 3M.",
     "The answer has 3 words (4, 2, 4 letters).",
     "Its first letter is P."
@@ -1914,19 +1872,7 @@
     "The answer has 3 words (5, 4, 3 letters).",
     "Its first letter is W."
    ],
-   "media": {
-    "img": [
-     {
-      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/3/3e/Alcal%C3%A1_de_Henares_%28RPS_08-04-2017%29_Calle_WWW%2C_indicador.png/500px-Alcal%C3%A1_de_Henares_%28RPS_08-04-2017%29_Calle_WWW%2C_indicador.png",
-      "w": 500,
-      "h": 169,
-      "credit": "Raimundo Pastor",
-      "license": "CC BY-SA 4.0",
-      "page": "https://commons.wikimedia.org/wiki/File:Alcal%C3%A1_de_Henares_(RPS_08-04-2017)_Calle_WWW,_indicador.png"
-     }
-    ]
-   },
-   "difficulty": 1
+   "difficulty": 2
   },
   {
    "id": "iphone",
@@ -1944,7 +1890,7 @@
     "It brought the App Store a year later.",
     "It dates from 2007.",
     "It is credited to Apple.",
-    "It was invented in United States.",
+    "It was invented in the United States.",
     "It has a touchscreen.",
     "It is a smartphone made by Apple.",
     "The answer is one word of 6 letters.",
@@ -1953,12 +1899,12 @@
    "media": {
     "img": [
      {
-      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/1e/IPhone_models.jpg/500px-IPhone_models.jpg",
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/c/c7/IPhone_First_Generation_%28cropped%29.jpg/500px-IPhone_First_Generation_%28cropped%29.jpg",
       "w": 500,
-      "h": 375,
-      "credit": "Ka Kit Pang",
-      "license": "CC BY-SA 4.0",
-      "page": "https://commons.wikimedia.org/wiki/File:IPhone_models.jpg"
+      "h": 333,
+      "credit": "Carl Berkeley from Riverside California",
+      "license": "CC BY-SA 2.0",
+      "page": "https://commons.wikimedia.org/wiki/File:IPhone_First_Generation_(cropped).jpg"
      }
     ]
    },
@@ -2152,10 +2098,10 @@
   }
  ],
  "fakes": [
-  "Steam-powered umbrella (1822)",
-  "Electric spoon (1911)",
-  "Pneumatic hat (1874)",
-  "Clockwork toothbrush (1797)"
+  "Steam-powered umbrella",
+  "Pneumatic hat",
+  "Magnetic raincoat",
+  "Spring-loaded teacup"
  ],
  "sources": [
   {

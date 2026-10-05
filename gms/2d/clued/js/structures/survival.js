@@ -1,5 +1,5 @@
-import { playSpec } from './session.js?v=1';
-import { specFor, fmtTitle } from './common.js?v=1';
+import { playSpec } from './session.js?v=202610050139';
+import { specFor, fmtTitle } from './common.js?v=202610050139';
 
 const survival = {
   id: 'survival', title: 'Survival', icon: '❤️', blurb: 'Keep going until you lose three lives.', count: false,
@@ -10,5 +10,6 @@ const survival = {
       cfg: () => ({ lives: 3, timer: c.timer, label: i => `Question ${i + 1}` }),
     });
   },
+  replay: { cfg: () => ({ lives: 3, label: i => `Question ${i + 1}` }) },
 };
 export default survival;

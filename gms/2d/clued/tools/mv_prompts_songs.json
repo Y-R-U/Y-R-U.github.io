@@ -48,7 +48,7 @@
    "scenes": [
     {
      "p": "a lonely Spanish mission-style hotel lit up on a dark desert highway at dusk, palm trees, a shimmering light in the distance",
-     "d": 2,
+     "d": 3,
      "cap": "A hotel on a dark desert highway"
     }
    ]
@@ -399,7 +399,7 @@
    "blurb": "Famous for the line about paving paradise to put up a parking lot.",
    "scenes": [
     {
-     "p": "a big yellow taxi driving past a paradise of trees beside a newly paved parking lot",
+     "p": "a big yellow taxi cab with a blank roof light driving past a freshly paved grey parking lot where a lush green paradise of trees and flowers has been bulldozed, a pink hotel and a swinging hot spot in the background",
      "d": 2,
      "cap": "They paved paradise"
     }
@@ -559,7 +559,7 @@
    "blurb": "Became the Billboard Hot 100's top song of all time in 2021.",
    "scenes": [
     {
-     "p": "a red sports car racing through a city at night, blinding white headlights and neon",
+     "p": "a red sports car racing down a dark city street at night with blinding white headlight beams flaring toward the viewer, glowing abstract neon shapes and coloured light strips on the buildings, no lettering",
      "d": 2,
      "cap": "Blinded by the lights"
     }

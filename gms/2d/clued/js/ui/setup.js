@@ -1,13 +1,13 @@
 // Format grid + per-game setup (themes, count, options, difficulty, timer).
-import { h } from './kit.js?v=1';
-import { defineScreen, go, header } from './app.js?v=1';
-import { listFormats, getFormat, defaultOpts } from '../formats/registry.js?v=1';
-import { getIndex } from '../core/packs.js?v=1';
-import { supportedPackIds } from '../core/spec.js?v=1';
-import { getSettings, getLast, setLast, ANSWER_TIMES } from '../core/store.js?v=1';
-import { themePicker } from './picker.js?v=1';
-import { STRUCTURES } from '../structures/index.js?v=1';
-import { sfx } from './fx.js?v=1';
+import { h } from './kit.js?v=202610050139';
+import { defineScreen, go, header } from './app.js?v=202610050139';
+import { listFormats, getFormat, defaultOpts } from '../formats/registry.js?v=202610050139';
+import { getIndex } from '../core/packs.js?v=202610050139';
+import { supportedPackIds, formatAvailable } from '../core/spec.js?v=202610050139';
+import { getSettings, getLast, setLast, ANSWER_TIMES } from '../core/store.js?v=202610050139';
+import { themePicker } from './picker.js?v=202610050139';
+import { STRUCTURES } from '../structures/index.js?v=202610050139';
+import { sfx } from './fx.js?v=202610050139';
 
 export const DIFFS = [[0, 'Mixed'], [1, 'Easy'], [2, 'Medium'], [3, 'Hard']];
 
@@ -23,7 +23,7 @@ defineScreen('formats', (el, { structure = 'quick', onPick = null, title = null 
   el.append(header(title || (structure === 'quick' ? 'Pick a format' : st.title)));
   if (structure !== 'quick' && st.blurb) el.append(h('p.muted.center', { style: { marginTop: '0', marginBottom: '12px' } }, st.blurb));
   const fmts = formatsFor(structure)
-    .map(f => ({ f, n: supportedPackIds(f, index, { kids }).length }))
+    .map(f => ({ f, n: formatAvailable(f, index, { kids }) ? Math.max(1, supportedPackIds(f, index, { kids }).length) : 0 }))
     .sort((a, b) => (b.n > 0) - (a.n > 0) || (kids ? (b.f.kids ? 1 : 0) - (a.f.kids ? 1 : 0) : 0));
   const grid = h('div.tiles');
   for (const { f, n } of fmts) {
@@ -65,7 +65,9 @@ export function optionsPanel(host, fmt, { structure = 'quick', last = null, show
     difficulty: last?.difficulty ?? 0,
     timer: typeof last?.timer === 'number' ? last.timer : kids ? 0 : s.timerSec,
   };
-  const picker = themePicker(host, { fmt, selected: v.packs, kids, onChange: p => { v.packs = p; } });
+  const picker = fmt.packless
+    ? (host.append(h('div.panel.picker', {}, h('div.theme-sum', {}, h('span.ts-ico', {}, '🗺️'), h('span.ts-txt', {}, h('b', {}, 'Built-in world map'), h('small', {}, 'Natural Earth borders, no theme to pick'))))), { value: () => 'all' })
+    : themePicker(host, { fmt, selected: v.packs, kids, onChange: p => { v.packs = p; } });
   const panel = h('div.panel', { style: { marginTop: '14px' } });
   if (showCount) {
     const custom = h('input.field.custom-n', { type: 'number', min: 3, max: 50, value: v.count, inputmode: 'numeric', 'aria-label': 'Custom count', hidden: [5, 10, 20].includes(v.count) });

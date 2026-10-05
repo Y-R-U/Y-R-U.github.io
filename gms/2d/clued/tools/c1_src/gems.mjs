@@ -5,6 +5,7 @@ const f = (kind, colour, mohs, birthstone) => ({ kind, colour, ...(mohs != null 
 
 export default {
   id: 'gems', title: 'Gemstones & minerals', theme: 'nature', icon: '💎', kids: true,
+  noun: 'gem or mineral', fakePrompt: 'Which of these gems and minerals is made up?',
   leakExempt: ['stone', 'gem', 'gemstone'],
   media: 'wiki', photos: 2, depicts: 0,
   wdCheckNum: { mohs: 'P1088' }, wdCheckTol: { mohs: 0.75 },
@@ -18,7 +19,7 @@ export default {
   imgPrompt: "Which of these is {lname}?",
   nameImgPrompt: "Which gem or mineral is this?",
   tfImgPrompt: "This is {lname}.",
-  tpl: {"kind": {"ask": "What kind of thing is {lname}?", "askReverse": "Which of these is a {lvalue}?", "stmt": "{name} is a {lvalue}."}, "colour": {"ask": "What colour is {lname} best known for?", "stmt": "{name} is best known in {lvalue}.", "exclusive": false}, "mohs": {"askHigh": "Which of these is the hardest?", "askLow": "Which of these is the softest?", "minRatio": 1.3}, "birthstone": {"ask": "{name} is a birthstone for which month?", "askReverse": "Which of these is a birthstone for {value}?", "stmt": "{name} is a birthstone for {value}."}},
+  tpl: {"kind": {"ask": "What kind of thing is {lname}?", "askReverse": "Which of these is a {lvalue}?", "stmt": "{name} is a {lvalue}.", "exclusive": false}, "colour": {"ask": "What colour is {lname} best known for?", "stmt": "{name} is best known in {lvalue}.", "exclusive": false}, "mohs": {"askHigh": "Which of these is the hardest?", "askLow": "Which of these is the softest?", "minRatio": 1.3}, "birthstone": {"ask": "{name} is a birthstone for which month?", "askReverse": "Which of these is a birthstone for {value}?", "stmt": "{name} is a birthstone for {value}."}},
   sources: [WD, COMMONS],
   items: [
     { n: 'Diamond', f: f(G, 'Colourless', 10, 'April'), d: 1, look: ['Quartz'],

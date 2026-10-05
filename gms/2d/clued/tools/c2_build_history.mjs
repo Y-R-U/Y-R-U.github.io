@@ -60,7 +60,7 @@ const seen = new Set();
 writePack({
   id: 'history', title: 'History', theme: 'history', icon: '🏛️', kids: false, version: 1,
   factsMeta: {
-    year: { type: 'year', label: 'Year', higherLabel: 'Later', askHigh: 'Which of these happened most recently?', askLow: 'Which of these happened first?' },
+    year: { type: 'year', label: 'Year', higherLabel: 'Later', askNumber: 'In what year did this happen: {name}?', askHigh: 'Which of these happened most recently?', askLow: 'Which of these happened first?' },
     century: { type: 'cat', label: 'Century', ask: 'In which century did this happen: {name}?', stmt: 'This happened in the {value}: {name}.' },
     era: { type: 'cat', label: 'Era', exclusive: false },
   },

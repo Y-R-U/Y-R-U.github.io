@@ -6,12 +6,13 @@ const f = (kind, system, extra = {}) => ({ kind, system, ...extra });
 
 export default {
   id: 'body', title: 'Human body', theme: 'science', icon: '🫀', kids: true,
+  noun: 'body part',
   leakExempt: [],
   media: 'wiki', photos: 1, depicts: 0,
   factsMeta: {
     kind: { type: 'cat', label: 'Kind', values: [OR, BO, MU, CE, TI], clue: v => `It is ${/^[AEIOU]/.test(v) ? 'an' : 'a'} ${v.toLowerCase()}.` },
     system: { type: 'cat', label: 'Body system', clue: v => `It is part of the ${v.toLowerCase()} system.` },
-    count: { type: 'num', label: 'How many you have', unit: '', clue: v => `Most people have ${v} of these.` },
+    count: { type: 'num', label: 'How many you have', unit: '', askNumber: '{name}: how many does a person usually have?', clue: v => `Most people have ${v} of these.` },
   },
   imgPrompt: "Which of these shows the {lname}?",
   nameImgPrompt: "Which part of the body is this?",
@@ -82,7 +83,7 @@ export default {
     { n: 'Spine', alt: ['backbone', 'vertebral column', 'spinal column'], wp: 'Vertebral column', f: f(BO, SKE, { count: 1 }), d: 1, allowSvg: true,
       b: 'A column of 33 small bones called vertebrae that holds you up and protects the spinal cord.',
       c: ['It lets you bend and twist.', 'Discs of cartilage sit between its bones.', 'It is made of 33 vertebrae.', 'Its lowest part is the tailbone.', 'It protects the spinal cord.', 'It has natural S-shaped curves.', 'It runs down the middle of your back.'] },
-    { n: 'Rib cage', alt: ['ribs'], wp: 'Rib cage', f: f(BO, SKE, { count: 24 }), d: 1, allowSvg: true,
+    { n: 'Rib cage', alt: ['ribs'], wp: 'Rib cage', f: f(BO, SKE, { count: 1 }) /* one cage of 24 ribs */, d: 1, allowSvg: true,
       b: 'A cage of 24 curved bones that protects the heart and lungs.',
       c: ['Some of its lowest bones are called "floating" because they do not reach the front.', 'Most people have 12 pairs.', 'It moves when you breathe.', 'It protects the heart and lungs.', 'It is made of curved bones around your chest.'] },
     { n: 'Stapes', alt: ['stirrup'], wp: 'Stapes', f: f(BO, SEN, { count: 2 }), d: 3, allowSvg: true,

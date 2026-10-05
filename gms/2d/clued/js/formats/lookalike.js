@@ -1,11 +1,11 @@
-import { register, poolItems, pickPack, byDifficulty, imageOf, fill, placeAnswer, collect, pick, shuffle } from './registry.js?v=1';
-import { layout, choiceGrid } from '../ui/kit.js?v=1';
-import { norm, fmtFact, escHtml, injectCSS, hasImg } from './fkit.js?v=1';
+import { register, poolItems, pickPack, byDifficulty, imageOf, fill, placeAnswer, collect, pick, shuffle } from './registry.js?v=202610050139';
+import { layout, choiceGrid } from '../ui/kit.js?v=202610050139';
+import { norm, fmtFact, escHtml, injectCSS, hasImg } from './fkit.js?v=202610050139';
 
 const CSS = `
-.lk-diff{border-collapse:collapse;width:100%;font-size:14px;margin-top:2px}
-.lk-diff th,.lk-diff td{border-top:2px solid rgba(31,26,77,.12);padding:4px 6px;text-align:left;vertical-align:top}
-.lk-diff th{color:var(--ink-2);font-weight:800;white-space:nowrap}
+.lk-diff{border-collapse:collapse;width:100%;table-layout:fixed;font-size:14px;margin-top:2px}
+.lk-diff th,.lk-diff td{border-top:2px solid rgba(31,26,77,.12);padding:4px 6px;text-align:left;vertical-align:top;overflow-wrap:break-word;hyphens:auto}
+.lk-diff th{color:var(--ink-2);font-weight:800}
 .lk-diff td.me{color:var(--good);font-weight:900}
 .lk-notes{margin:2px 0 0;padding-left:18px;font-size:14px;color:var(--ink-2)}
 `;

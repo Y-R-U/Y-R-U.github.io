@@ -1,7 +1,7 @@
 // Theme picker: "All" by default, or a Theme -> packs tree with multi-select. Unsupported packs are greyed with a reason.
-import { h } from './kit.js?v=1';
-import { getIndex } from '../core/packs.js?v=1';
-import { supportsPack } from '../formats/registry.js?v=1';
+import { h } from './kit.js?v=202610050139';
+import { getIndex } from '../core/packs.js?v=202610050139';
+import { supportsPack } from '../formats/registry.js?v=202610050139';
 
 export function themePicker(host, { fmt, selected = 'all', kids = false, onChange = () => {} } = {}) {
   const index = getIndex();
@@ -10,7 +10,7 @@ export function themePicker(host, { fmt, selected = 'all', kids = false, onChang
     const info = index.packs[id];
     if (!info) return 'Missing';
     if (kids && info.kidsSafe === false) return 'Not in kids mode';
-    return fmt ? supportsPack(fmt, info) : true;
+    return fmt ? supportsPack(fmt, info, { kids }) : true;
   };
   const okIds = Object.keys(index.packs).filter(id => why(id) === true);
   if (sel !== 'all') { sel = new Set([...sel].filter(id => okIds.includes(id))); if (!sel.size) sel = 'all'; }
@@ -29,7 +29,8 @@ export function themePicker(host, { fmt, selected = 'all', kids = false, onChang
   function drawSummary() {
     if (sel === 'all') {
       sumIco.textContent = '🌈';
-      sumTxt.innerHTML = `<b>All themes</b><small>${okIds.length} pack${okIds.length === 1 ? '' : 's'} can play this</small>`;
+      const n = okIds.filter(id => !index.packs[id].virtual).length;
+      sumTxt.innerHTML = `<b>All themes</b><small>${n} pack${n === 1 ? '' : 's'} can play this</small>`;
     } else {
       const names = [...sel].map(id => index.packs[id]?.title).filter(Boolean);
       sumIco.textContent = index.packs[[...sel][0]]?.icon || '🎯';

@@ -1,8 +1,8 @@
-import { register, collect, pick } from '../../formats/registry.js?v=1';
+import { register, collect, pick } from '../../formats/registry.js?v=202610050139';
 import {
   geo, countryIds, regionMembers, REGIONS, STATE_VIEWS, createMap, frame, message, revealCard, isKids, cname, byLevel,
   stateDifficulty, REGION_CHOICES, REGION_LABELS, STATE_CHOICES, STATE_LABELS, refFor, supportsGeo, theName,
-} from './common.js?v=1';
+} from './common.js?v=202610050139';
 
 const EASY_STATES = ['USA', 'CAN', 'AUS', 'BRA', 'IND', 'GBR', 'DEU', 'ITA', 'ESP', 'FRA', 'MEX', 'CHN', 'JPN'];
 
@@ -27,7 +27,7 @@ export default register({
     { key: 'region', label: 'Map', type: 'choice', values: [...REGION_CHOICES, 'states'], labels: [...REGION_LABELS, 'States & provinces'], default: 'world' },
     { key: 'country', label: 'States of', type: 'choice', values: STATE_CHOICES, labels: STATE_LABELS, default: 'any' },
   ],
-  supports: supportsGeo,
+  supports: supportsGeo, packless: true,
   generate({ rng, packs = [], count, opts = {}, difficulty = 0, avoid }) {
     const kids = !!opts.kids;
     const level = kids ? 1 : difficulty || 0;

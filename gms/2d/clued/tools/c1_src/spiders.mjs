@@ -117,7 +117,7 @@ export default {
     { n: 'Darwin\'s bark spider', sci: 'Caerostris darwini', g: 'orb-weaver', f: f(H, AF, true), d: 3,
       b: 'A spider from Madagascar that spins the biggest webs known, right across rivers. Its silk is the toughest known.',
       c: ['It was described in 2010.', 'Its silk is tougher than Kevlar.', 'Its webs can stretch right across rivers.', 'It lives in Madagascar.', 'It is named after a famous naturalist.'] },
-    { n: 'Net-casting spider', alt: ['ogre-faced spider'], sci: 'Deinopis', g: 'net-caster', f: f(H, WW, false), d: 3,
+    { n: 'Net-casting spider', alt: ['ogre-faced spider'], sci: 'Deinopis', g: 'net-caster', f: f(H, WW, true), d: 3,
       b: 'A stick-thin spider that holds a small stretchy net in its front legs and throws it over passing insects.',
       c: ['It has two enormous eyes for seeing at night.', 'Its face looks a bit like a monster\'s.', 'It hangs upside down and waits.', 'It holds a stretchy web between its front legs.', 'It throws its web over prey.'] },
     { n: 'Goldenrod crab spider', sci: 'Misumena vatia', g: 'crab', f: f(H, WW, false), d: 2,

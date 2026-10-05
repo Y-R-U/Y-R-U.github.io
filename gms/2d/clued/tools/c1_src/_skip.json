@@ -128,27 +128,140 @@
    "https://www.inaturalist.org/photos/9559732"
   ],
   "australian-golden-orb-weaver": [
-   "https://www.inaturalist.org/photos/632219672"
+   "https://www.inaturalist.org/photos/632219672",
+   "https://www.inaturalist.org/photos/488190687",
+   "https://www.inaturalist.org/photos/466303500"
   ],
   "money-spider": [
-   "https://www.inaturalist.org/photos/167460378"
-  ]
+   "https://www.inaturalist.org/photos/167460378",
+   "https://commons.wikimedia.org/wiki/File:Drapetisca_alteranda.JPG"
+  ],
+  "sydney-funnel-web-spider": [
+   "https://commons.wikimedia.org/wiki/File:Atrax_Robustus.jpg"
+  ],
+  "huntsman-spider": [
+   "https://www.inaturalist.org/photos/5655389"
+  ],
+  "six-eyed-sand-spider": [
+   "https://www.inaturalist.org/photos/285086997"
+  ],
+  "yellow-garden-spider": [
+   "https://www.inaturalist.org/photos/208881445"
+  ],
+  "brown-recluse": [
+   "https://www.inaturalist.org/photos/92437087"
+  ],
+  "indian-ornamental-tarantula": [
+   "https://www.inaturalist.org/photos/127402301"
+  ],
+  "_max": {
+   "sydney-funnel-web-spider": 2,
+   "huntsman-spider": 2,
+   "australian-golden-orb-weaver": 1,
+   "six-eyed-sand-spider": 2,
+   "yellow-garden-spider": 2,
+   "brown-recluse": 2,
+   "indian-ornamental-tarantula": 2,
+   "money-spider": 2
+  }
  },
  "sharks": {
   "great-white-shark": [
    "https://www.inaturalist.org/photos/5289261"
   ],
   "silky-shark": [
-   "https://www.inaturalist.org/photos/170832075"
+   "https://www.inaturalist.org/photos/170832075",
+   "https://www.inaturalist.org/photos/17635551",
+   "https://www.inaturalist.org/photos/58234987"
   ],
   "small-spotted-catshark": [
-   "https://www.inaturalist.org/photos/317560062"
+   "https://www.inaturalist.org/photos/317560062",
+   "https://www.inaturalist.org/photos/264501030",
+   "https://www.inaturalist.org/photos/353512776"
+  ],
+  "thresher-shark": [
+   "https://www.inaturalist.org/photos/1181941",
+   "https://www.inaturalist.org/photos/242255842"
+  ],
+  "bonnethead": [
+   "https://www.inaturalist.org/photos/342735870"
+  ],
+  "_max": {
+   "cookiecutter-shark": 0,
+   "thresher-shark": 2,
+   "whitetip-reef-shark": 2,
+   "zebra-shark": 2,
+   "small-spotted-catshark": 2,
+   "bluntnose-sixgill-shark": 2,
+   "port-jackson-shark": 2,
+   "silky-shark": 1
+  },
+  "whitetip-reef-shark": [
+   "https://www.inaturalist.org/photos/5709037"
+  ],
+  "grey-reef-shark": [
+   "https://www.inaturalist.org/photos/343618923"
+  ],
+  "zebra-shark": [
+   "https://www.inaturalist.org/photos/60848973",
+   "https://www.inaturalist.org/photos/577251304",
+   "https://www.inaturalist.org/photos/175540733"
+  ],
+  "port-jackson-shark": [
+   "https://www.inaturalist.org/photos/90570698",
+   "https://www.inaturalist.org/photos/533158552"
+  ],
+  "spotted-wobbegong": [
+   "https://www.inaturalist.org/photos/101185477"
+  ],
+  "lemon-shark": [
+   "https://www.inaturalist.org/photos/62048233"
+  ],
+  "sand-tiger-shark": [
+   "https://www.inaturalist.org/photos/112889377"
+  ],
+  "blue-shark": [
+   "https://www.inaturalist.org/photos/660564942"
+  ],
+  "bluntnose-sixgill-shark": [
+   "https://www.inaturalist.org/photos/30421020"
   ]
  },
  "jellyfish": {
   "upside-down-jellyfish": [
-   "https://www.inaturalist.org/photos/179161047"
-  ]
+   "https://www.inaturalist.org/photos/179161047",
+   "https://www.inaturalist.org/photos/385582737",
+   "https://www.inaturalist.org/photos/348456955"
+  ],
+  "box-jellyfish": [
+   "https://commons.wikimedia.org/wiki/File:Cubozoa_Lebenszyklus.png"
+  ],
+  "blue-button": [
+   "https://www.inaturalist.org/photos/152108659",
+   "https://www.inaturalist.org/photos/254278213"
+  ],
+  "stonefish": [
+   "https://commons.wikimedia.org/wiki/File:Ichthyologie;_ou,_Histoire_naturelle_des_poissons_(Plate_183)_(6918426608).jpg"
+  ],
+  "crown-of-thorns-starfish": [
+   "https://www.inaturalist.org/photos/190286887"
+  ],
+  "geography-cone": [
+   "https://www.inaturalist.org/photos/2851851"
+  ],
+  "fire-coral": [
+   "https://www.inaturalist.org/photos/261236596",
+   "https://www.inaturalist.org/photos/612947569"
+  ],
+  "_max": {
+   "box-jellyfish": 2,
+   "upside-down-jellyfish": 1,
+   "blue-button": 1,
+   "stonefish": 2,
+   "crown-of-thorns-starfish": 2,
+   "geography-cone": 2,
+   "fire-coral": 1
+  }
  },
  "bees": {
   "honey-bee": [
@@ -161,7 +274,20 @@
    "https://www.inaturalist.org/photos/787758"
   ],
   "potter-wasp": [
-   "https://www.inaturalist.org/photos/7634909"
+   "https://www.inaturalist.org/photos/7634909",
+   "https://www.inaturalist.org/photos/55089421"
+  ],
+  "giant-ichneumon-wasp": [
+   "https://www.inaturalist.org/photos/137922066"
+  ],
+  "black-and-yellow-mud-dauber": [
+   "https://www.inaturalist.org/photos/150152422"
+  ],
+  "european-hornet": [
+   "https://commons.wikimedia.org/wiki/File:VespaCrabroCollezione.jpg"
+  ],
+  "blue-banded-bee": [
+   "https://www.inaturalist.org/photos/489551264"
   ]
  },
  "insects": {
@@ -169,26 +295,64 @@
    "https://www.inaturalist.org/photos/111043173"
   ],
   "painted-lady": [
-   "https://www.inaturalist.org/photos/3347095"
+   "https://www.inaturalist.org/photos/3347095",
+   "https://www.inaturalist.org/photos/40181266"
   ],
   "small-white": [
-   "https://www.inaturalist.org/photos/1179645"
+   "https://www.inaturalist.org/photos/1179645",
+   "https://www.inaturalist.org/photos/435816667"
   ],
   "ulysses-butterfly": [
-   "https://www.inaturalist.org/photos/7945775"
+   "https://www.inaturalist.org/photos/7945775",
+   "https://www.inaturalist.org/photos/111699379"
   ],
   "deaths-head-hawkmoth": [
    "https://www.inaturalist.org/photos/28549593"
   ],
   "orchid-mantis": [
-   "https://www.inaturalist.org/photos/53268667"
+   "https://www.inaturalist.org/photos/53268667",
+   "https://www.inaturalist.org/photos/356484614"
   ],
   "desert-locust": [
-   "https://www.inaturalist.org/photos/147713544"
+   "https://www.inaturalist.org/photos/147713544",
+   "https://www.inaturalist.org/photos/575342058"
   ],
   "antlion": [
    "https://www.inaturalist.org/photos/287217788"
-  ]
+  ],
+  "acorn-weevil": [
+   "https://www.inaturalist.org/photos/160041513"
+  ],
+  "seven-spot-ladybird": [
+   "https://commons.wikimedia.org/wiki/File:7-Spotted-Ladybug-Coccinella-septempunctata-sq1.jpg"
+  ],
+  "red-admiral": [
+   "https://www.inaturalist.org/photos/376647594",
+   "https://www.inaturalist.org/photos/35221177"
+  ],
+  "giant-weta": [
+   "https://www.inaturalist.org/photos/71543446"
+  ],
+  "common-pond-skater": [
+   "https://www.inaturalist.org/photos/488312051"
+  ],
+  "spiny-leaf-insect": [
+   "https://www.inaturalist.org/photos/243494428"
+  ],
+  "emperor-dragonfly": [
+   "https://commons.wikimedia.org/wiki/File:Emperor_dragonfly_(Anax_imperator)_female.JPG"
+  ],
+  "_max": {
+   "seven-spot-ladybird": 2,
+   "painted-lady": 2,
+   "red-admiral": 1,
+   "small-white": 2,
+   "ulysses-butterfly": 2,
+   "giant-weta": 2,
+   "common-pond-skater": 2,
+   "spiny-leaf-insect": 2,
+   "emperor-dragonfly": 2
+  }
  },
  "birds": {
   "southern-cassowary": [
@@ -201,7 +365,9 @@
    "https://www.inaturalist.org/photos/90759569"
   ],
   "great-horned-owl": [
-   "https://www.inaturalist.org/photos/79388250"
+   "https://www.inaturalist.org/photos/79388250",
+   "https://www.inaturalist.org/photos/408807127",
+   "https://www.inaturalist.org/photos/427724222"
   ],
   "scarlet-macaw": [
    "https://www.inaturalist.org/photos/53458435"
@@ -225,8 +391,74 @@
    "https://www.inaturalist.org/photos/452211474"
   ],
   "satin-bowerbird": [
-   "https://www.inaturalist.org/photos/350135160"
-  ]
+   "https://www.inaturalist.org/photos/350135160",
+   "https://www.inaturalist.org/photos/245467722"
+  ],
+  "little-penguin": [
+   "https://www.inaturalist.org/photos/72265398"
+  ],
+  "australian-white-ibis": [
+   "https://commons.wikimedia.org/wiki/File:%27Bin_chicken%27_(Threskiornis_molucca)_in_Belmore_Park,_Sydney.jpg"
+  ],
+  "willie-wagtail": [
+   "https://www.inaturalist.org/photos/50151417"
+  ],
+  "superb-lyrebird": [
+   "https://www.inaturalist.org/photos/350107803",
+   "https://www.inaturalist.org/photos/453861820"
+  ],
+  "kakapo": [
+   "https://www.inaturalist.org/photos/386289202"
+  ],
+  "golden-eagle": [
+   "https://www.inaturalist.org/photos/112188157"
+  ],
+  "toco-toucan": [
+   "https://www.inaturalist.org/photos/145999537"
+  ],
+  "african-grey-parrot": [
+   "https://www.inaturalist.org/photos/42638096"
+  ],
+  "bee-hummingbird": [
+   "https://www.inaturalist.org/photos/144891172"
+  ],
+  "resplendent-quetzal": [
+   "https://www.inaturalist.org/photos/175739925"
+  ],
+  "american-robin": [
+   "https://www.inaturalist.org/photos/370528121"
+  ],
+  "grey-heron": [
+   "https://www.inaturalist.org/photos/197362536",
+   "https://www.inaturalist.org/photos/710435847"
+  ],
+  "blue-footed-booby": [
+   "https://www.inaturalist.org/photos/474042571"
+  ],
+  "great-hornbill": [
+   "https://www.inaturalist.org/photos/182063723"
+  ],
+  "golden-pheasant": [
+   "https://www.inaturalist.org/photos/382009145"
+  ],
+  "_max": {
+   "little-penguin": 2,
+   "australian-white-ibis": 2,
+   "willie-wagtail": 2,
+   "superb-lyrebird": 1,
+   "kakapo": 2,
+   "golden-eagle": 2,
+   "great-horned-owl": 1,
+   "toco-toucan": 2,
+   "african-grey-parrot": 2,
+   "bee-hummingbird": 2,
+   "resplendent-quetzal": 2,
+   "american-robin": 2,
+   "grey-heron": 1,
+   "blue-footed-booby": 2,
+   "great-hornbill": 2,
+   "golden-pheasant": 2
+  }
  },
  "dogs": {
   "belgian-malinois": [
@@ -252,13 +484,15 @@
    "https://www.inaturalist.org/photos/339428082"
   ],
   "african-wild-dog": [
-   "https://www.inaturalist.org/photos/4949165"
+   "https://www.inaturalist.org/photos/4949165",
+   "https://www.inaturalist.org/photos/11624075"
   ],
   "giant-panda": [
    "https://www.inaturalist.org/photos/351209016"
   ],
   "red-fox": [
-   "https://www.inaturalist.org/photos/289085807"
+   "https://www.inaturalist.org/photos/289085807",
+   "https://www.inaturalist.org/photos/120825265"
   ],
   "fennec-fox": [
    "https://www.inaturalist.org/photos/17864088"
@@ -267,7 +501,8 @@
    "https://www.inaturalist.org/photos/334287109"
   ],
   "platypus": [
-   "https://www.inaturalist.org/photos/178746516"
+   "https://www.inaturalist.org/photos/178746516",
+   "https://www.inaturalist.org/photos/159363965"
   ],
   "quokka": [
    "https://www.inaturalist.org/photos/458962044"
@@ -276,12 +511,94 @@
    "https://www.inaturalist.org/photos/2761953"
   ],
   "_max": {
-   "lion": 3
-  }
+   "lion": 3,
+   "tiger": 2,
+   "hippopotamus": 2,
+   "bonobo": 2,
+   "african-wild-dog": 2,
+   "aardvark": 2,
+   "yak": 2,
+   "grey-wolf": 2,
+   "red-fox": 2,
+   "red-deer": 2,
+   "european-badger": 2,
+   "wolverine": 2,
+   "giant-anteater": 2,
+   "virginia-opossum": 2,
+   "platypus": 2,
+   "sugar-glider": 2,
+   "numbat": 1,
+   "greater-bilby": 1,
+   "grey-headed-flying-fox": 2,
+   "naked-mole-rat": 2,
+   "crested-porcupine": 2,
+   "red-squirrel": 2,
+   "american-black-bear": 2
+  },
+  "tiger": [
+   "https://commons.wikimedia.org/wiki/File:Bengal_tiger_(Panthera_tigris_tigris)_female_3_crop.jpg"
+  ],
+  "hippopotamus": [
+   "https://commons.wikimedia.org/wiki/File:Zulaihamaryam-Museum_Geologi-Hippotamus_Simplex_(Kuda_Nil).jpg"
+  ],
+  "bonobo": [
+   "https://www.inaturalist.org/photos/1443311"
+  ],
+  "aardvark": [
+   "https://www.inaturalist.org/photos/370107127"
+  ],
+  "yak": [
+   "https://www.inaturalist.org/photos/590674140"
+  ],
+  "grey-wolf": [
+   "https://www.inaturalist.org/photos/481187478"
+  ],
+  "red-deer": [
+   "https://www.inaturalist.org/photos/170312227"
+  ],
+  "european-badger": [
+   "https://www.inaturalist.org/photos/55269535"
+  ],
+  "wolverine": [
+   "https://www.inaturalist.org/photos/323241133"
+  ],
+  "giant-anteater": [
+   "https://commons.wikimedia.org/wiki/File:Giant_anteater_at_MAV-USP.jpg"
+  ],
+  "virginia-opossum": [
+   "https://www.inaturalist.org/photos/173131417"
+  ],
+  "sugar-glider": [
+   "https://www.inaturalist.org/photos/254186060"
+  ],
+  "numbat": [
+   "https://www.inaturalist.org/photos/106705794",
+   "https://www.inaturalist.org/photos/102731459"
+  ],
+  "greater-bilby": [
+   "https://www.inaturalist.org/photos/570952724",
+   "https://www.inaturalist.org/photos/570953671"
+  ],
+  "grey-headed-flying-fox": [
+   "https://www.inaturalist.org/photos/335884275"
+  ],
+  "naked-mole-rat": [
+   "https://www.inaturalist.org/photos/736311673"
+  ],
+  "crested-porcupine": [
+   "https://www.inaturalist.org/photos/17360571"
+  ],
+  "red-squirrel": [
+   "https://www.inaturalist.org/photos/462357539"
+  ],
+  "american-black-bear": [
+   "https://www.inaturalist.org/photos/184578489"
+  ]
  },
  "sea": {
   "sperm-whale": [
-   "https://www.inaturalist.org/photos/219667126"
+   "https://www.inaturalist.org/photos/219667126",
+   "https://www.inaturalist.org/photos/59925420"
   ],
   "common-octopus": [
    "https://www.inaturalist.org/photos/560872281"
@@ -290,16 +607,20 @@
    "https://www.inaturalist.org/photos/249409772"
   ],
   "southern-stingray": [
-   "https://www.inaturalist.org/photos/174694329"
+   "https://www.inaturalist.org/photos/174694329",
+   "https://www.inaturalist.org/photos/221375130",
+   "https://www.inaturalist.org/photos/369395491"
   ],
   "guineafowl-puffer": [
    "https://www.inaturalist.org/photos/462004038"
   ],
   "atlantic-bluefin-tuna": [
-   "https://www.inaturalist.org/photos/88446847"
+   "https://www.inaturalist.org/photos/88446847",
+   "https://www.inaturalist.org/photos/107933283"
   ],
   "great-barracuda": [
-   "https://www.inaturalist.org/photos/460773257"
+   "https://www.inaturalist.org/photos/460773257",
+   "https://www.inaturalist.org/photos/151110522"
   ],
   "flying-fish": [
    "https://www.inaturalist.org/photos/568865307"
@@ -308,8 +629,58 @@
    "https://www.inaturalist.org/photos/9119194"
   ],
   "leafy-seadragon": [
-   "https://www.inaturalist.org/photos/501684378"
-  ]
+   "https://www.inaturalist.org/photos/501684378",
+   "https://www.inaturalist.org/photos/509618902"
+  ],
+  "orca": [
+   "https://commons.wikimedia.org/wiki/File:Killer_Whale_Types.jpg"
+  ],
+  "beluga": [
+   "https://www.inaturalist.org/photos/566892172"
+  ],
+  "leatherback-sea-turtle": [
+   "https://www.inaturalist.org/photos/250159220"
+  ],
+  "giant-pacific-octopus": [
+   "https://www.inaturalist.org/photos/161194229"
+  ],
+  "moorish-idol": [
+   "https://www.inaturalist.org/photos/603847724"
+  ],
+  "ocean-sunfish": [
+   "https://www.inaturalist.org/photos/21315691"
+  ],
+  "purple-sea-urchin": [
+   "https://www.inaturalist.org/photos/575337762"
+  ],
+  "atlantic-horseshoe-crab": [
+   "https://www.inaturalist.org/photos/281735049",
+   "https://www.inaturalist.org/photos/315678445"
+  ],
+  "common-hermit-crab": [
+   "https://www.inaturalist.org/photos/713327422"
+  ],
+  "red-king-crab": [
+   "https://www.inaturalist.org/photos/42426482",
+   "https://www.inaturalist.org/photos/42426413"
+  ],
+  "_max": {
+   "orca": 2,
+   "sperm-whale": 2,
+   "beluga": 2,
+   "leatherback-sea-turtle": 2,
+   "giant-pacific-octopus": 2,
+   "southern-stingray": 1,
+   "leafy-seadragon": 2,
+   "moorish-idol": 2,
+   "ocean-sunfish": 2,
+   "atlantic-bluefin-tuna": 2,
+   "great-barracuda": 2,
+   "purple-sea-urchin": 2,
+   "atlantic-horseshoe-crab": 1,
+   "common-hermit-crab": 2,
+   "red-king-crab": 1
+  }
  },
  "reptiles": {
   "komodo-dragon": [
@@ -319,15 +690,41 @@
    "https://www.inaturalist.org/photos/167349723"
   ],
   "great-crested-newt": [
-   "https://www.inaturalist.org/photos/304222333"
+   "https://www.inaturalist.org/photos/304222333",
+   "https://www.inaturalist.org/photos/188697048",
+   "https://www.inaturalist.org/photos/368505629"
   ],
   "goliath-frog": [
-   "https://www.inaturalist.org/photos/92002"
-  ]
+   "https://www.inaturalist.org/photos/92002",
+   "https://www.inaturalist.org/photos/360001369"
+  ],
+  "veiled-chameleon": [
+   "https://www.inaturalist.org/photos/604352228"
+  ],
+  "perentie": [
+   "https://www.inaturalist.org/photos/126756246"
+  ],
+  "american-bullfrog": [
+   "https://www.inaturalist.org/photos/38503110"
+  ],
+  "glass-frog": [
+   "https://www.inaturalist.org/photos/399304213"
+  ],
+  "_max": {
+   "veiled-chameleon": 2,
+   "perentie": 2,
+   "american-bullfrog": 2,
+   "glass-frog": 2,
+   "goliath-frog": 2,
+   "great-crested-newt": 1
+  }
  },
  "gems": {
   "emerald": [
    "https://commons.wikimedia.org/wiki/File:Emerald_cut.png"
+  ],
+  "sapphire": [
+   "https://commons.wikimedia.org/wiki/File:Sapphire01.jpg"
   ]
  },
  "trees": {
@@ -360,7 +757,10 @@
   "_max": {
    "bird-of-paradise": 2,
    "kangaroo-paw": 2
-  }
+  },
+  "common-peony": [
+   "https://commons.wikimedia.org/wiki/File:Paeonia_officinalis_1.jpg"
+  ]
  },
  "body": {
   "skull": [
@@ -378,7 +778,80 @@
  },
  "space": {
   "_max": {
-   "ganymede": 1
+   "ganymede": 1,
+   "orion": 1,
+   "ursa-major": 0,
+   "crux": 1,
+   "cassiopeia": 0,
+   "scorpius": 0,
+   "polaris": 0,
+   "betelgeuse": 0,
+   "vostok-1": 1
+  },
+  "vostok-1": [
+   "https://commons.wikimedia.org/wiki/File:Gagarin_in_Sweden.jpg"
+  ]
+ },
+ "dinosaurs": {
+  "minmi": [
+   "https://commons.wikimedia.org/wiki/File:Minmi_left_foot.jpg"
+  ],
+  "_max": {
+   "meganeura": 0,
+   "leaellynasaura": 1
+  }
+ },
+ "dishes": {
+  "vegemite": [
+   "https://commons.wikimedia.org/wiki/File:Vegemite_brand_logo.png"
+  ]
+ },
+ "elements": {
+  "_max": {
+   "neon": 0,
+   "argon": 0,
+   "krypton": 0,
+   "xenon": 0,
+   "bromine": 0,
+   "francium": 0,
+   "polonium": 0,
+   "moscovium": 0,
+   "radon": 0,
+   "fermium": 0
+  }
+ },
+ "mushrooms": {
+  "sulphur-tuft": [
+   "https://www.inaturalist.org/photos/109907882",
+   "https://www.inaturalist.org/photos/226164232",
+   "https://www.inaturalist.org/photos/138722737",
+   "https://www.inaturalist.org/photos/595482721"
+  ],
+  "yellow-stainer": [
+   "https://www.inaturalist.org/photos/144785717"
+  ],
+  "golden-chanterelle": [
+   "https://www.inaturalist.org/photos/78254813"
+  ],
+  "bleeding-tooth-fungus": [
+   "https://www.inaturalist.org/photos/178347211"
+  ],
+  "common-stinkhorn": [
+   "https://www.inaturalist.org/photos/62455743",
+   "https://www.inaturalist.org/photos/75780233"
+  ],
+  "lions-mane": [
+   "https://www.inaturalist.org/photos/5885301",
+   "https://www.inaturalist.org/photos/5641100"
+  ]
+ },
+ "inventions": {
+  "_max": {
+   "cinematographe": 0,
+   "nylon": 0,
+   "iphone": 1,
+   "world-wide-web": 0,
+   "flight-recorder": 0
   }
  }
 }

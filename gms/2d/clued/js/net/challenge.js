@@ -1,18 +1,19 @@
 // Challenge links: "beat my score on this exact set". Create from a results screen, play via ?c=ID.
-import { h, fmtNum } from '../ui/kit.js?v=1';
-import { defineScreen, header, current, reset } from '../ui/app.js?v=1';
-import { popup, toast } from '../ui/popup.js?v=1';
-import { sfx, confetti } from '../ui/fx.js?v=1';
-import { getSettings } from '../core/store.js?v=1';
-import { createRunner } from '../structures/runner.js?v=1';
-import { challenges, friendly } from './api.js?v=1';
-import { suggestedName, rememberName, tidyName, MAX_NAME } from './ident.js?v=1';
-import { openShare, challengeUrl, shareOrCopy } from './share.js?v=1';
-import { scoreboard, ordinal, detailOf, comparison } from './board.js?v=1';
-import { ensureStyles, setQuery } from './util.js?v=1';
-import { ensureFormats } from './room.js?v=1';
-import { openSignIn } from './signin.js?v=1';
-import { linkChallengeShare } from './linkchallenge.js?v=1';
+import { h, fmtNum } from '../ui/kit.js?v=202610050139';
+import { defineScreen, header, current, reset } from '../ui/app.js?v=202610050139';
+import { popup, toast } from '../ui/popup.js?v=202610050139';
+import { sfx, confetti } from '../ui/fx.js?v=202610050139';
+import { getSettings } from '../core/store.js?v=202610050139';
+import { createRunner } from '../structures/runner.js?v=202610050139';
+import { replayCfg, replayScore } from '../structures/index.js?v=202610050139';
+import { challenges, friendly } from './api.js?v=202610050139';
+import { suggestedName, rememberName, tidyName, MAX_NAME } from './ident.js?v=202610050139';
+import { openShare, challengeUrl, shareOrCopy } from './share.js?v=202610050139';
+import { scoreboard, ordinal, detailOf, comparison } from './board.js?v=202610050139';
+import { ensureStyles, setQuery } from './util.js?v=202610050139';
+import { ensureFormats } from './room.js?v=202610050139';
+import { openSignIn } from './signin.js?v=202610050139';
+import { linkChallengeShare } from './linkchallenge.js?v=202610050139';
 
 const MAX_SET = 500 * 1024;
 
@@ -120,12 +121,15 @@ defineScreen('challenge', async (el, { id }, cur) => {
   function play(name) {
     el.innerHTML = '';
     el.classList.add('playing');
+    const qs = JSON.parse(JSON.stringify(c.questions));
     run = createRunner(el, {
-      questions: JSON.parse(JSON.stringify(c.questions)), kids, mode: 'challenge',
+      questions: qs, kids, mode: 'challenge',
       difficulty: c.spec?.rounds?.[0]?.difficulty || 0,
       ...(c.spec && typeof c.spec.timer === 'boolean' ? { timer: c.spec.timer } : {}),
+      ...replayCfg(c.spec, qs),
     });
     run.done.then(res => {
+      res.score = replayScore(c.spec, res);
       const r = run;
       run = null;
       if (cur !== current() || r === null) return;

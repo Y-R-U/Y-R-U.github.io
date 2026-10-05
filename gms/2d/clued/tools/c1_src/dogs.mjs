@@ -1,7 +1,7 @@
-import { WD, COMMONS } from './_common.mjs';
+import { WD, COMMONS, theC } from './_common.mjs';
 
 const UK = 'United Kingdom', DE = 'Germany', FR = 'France', CN = 'China', JP = 'Japan', AU = 'Australia', US = 'United States', IE = 'Ireland', RU = 'Russia', CH = 'Switzerland', HU = 'Hungary', IT = 'Italy', BE = 'Belgium', CA = 'Canada', MX = 'Mexico', TB = 'Tibet', MT = 'Malta', AF = 'Afghanistan', CU = 'Cuba', ZW = 'Zimbabwe', PT = 'Portugal', HR = 'Croatia', CG = 'Democratic Republic of the Congo';
-const sizeOf = kg => (kg < 5 ? 'Toy' : kg < 12 ? 'Small' : kg < 25 ? 'Medium' : kg < 45 ? 'Large' : 'Giant');
+const sizeOf = kg => (kg < 5 ? 'Toy' : kg < 12 ? 'Small' : kg < 25 ? 'Medium' : kg < 50 ? 'Large' : 'Giant');
 const f = (origin, type, massKg) => ({ origin, type, ...(massKg ? { massKg, size: sizeOf(massKg) } : {}) });
 
 export default {
@@ -11,7 +11,7 @@ export default {
   wdCheckLabel: { origin: 'P495' }, wdP31: ['Q39367'],
   ranges: { massKg: [1, 100] },
   factsMeta: {
-    origin: { type: 'cat', label: 'Country of origin', clue: v => `The breed comes from ${v}.` },
+    origin: { type: 'cat', label: 'Country of origin', clue: v => `The breed comes from ${[].concat(v).map(theC).join(' or ')}.` },
     type: { type: 'cat', label: 'Breed type', values: ['Gundog', 'Herding', 'Hound', 'Terrier', 'Toy', 'Working', 'Companion', 'Spitz'], clue: v => `It is a ${v.toLowerCase()} breed.` },
     massKg: { type: 'num', label: 'Typical adult weight', unit: 'kg', higherLabel: 'Heavier', clue: v => `A typical adult weighs about ${v} kg.` },
     size: { type: 'cat', label: 'Size', values: ['Toy', 'Small', 'Medium', 'Large', 'Giant'], noClue: true },
@@ -37,7 +37,7 @@ export default {
     { n: 'Bulldog', wp: 'Bulldog', alt: ['British Bulldog', 'English Bulldog'], f: f(UK, 'Companion', 23), d: 1, look: ['French Bulldog'],
       b: 'A stocky, wrinkly dog with a pushed-in face. It is a national symbol of Britain.',
       c: ['It was originally bred for a cruel sport with bulls.', 'It is a mascot of many sports teams.', 'It has a loose, wrinkly face and an underbite.', 'It is linked with Winston Churchill.', 'It is a national symbol of Britain.'] },
-    { n: 'Poodle', wp: 'Poodle', alt: ['Standard Poodle'], f: f(FR, 'Companion', 25), d: 1,
+    { n: 'Poodle', wp: 'Poodle', alt: ['Standard Poodle'], f: f([FR, DE], 'Companion', 25), d: 1,
       b: 'A clever dog with curly fur that hardly sheds. It comes in standard, miniature and toy sizes.',
       c: ['It was first bred as a water dog in Germany.', 'Its fancy haircut was designed to help it swim.', 'It is one of the most intelligent breeds.', 'It comes in standard, miniature and toy sizes.', 'It has tight, curly fur.'] },
     { n: 'Beagle', f: f(UK, 'Hound', 10), d: 1, look: ['Basset Hound'],
@@ -70,7 +70,7 @@ export default {
     { n: 'Pug', f: f(CN, 'Toy', 7), d: 1, look: ['French Bulldog', 'Pekingese'],
       b: 'A small, wrinkly dog with a flat face and curly tail. It was a favourite of Chinese emperors.',
       c: ['It was a favourite of Chinese emperors.', 'Dutch royalty made it popular in Europe.', 'It has a tightly curled tail.', 'Its face is flat and wrinkly.', 'Its name is just three letters.'] },
-    { n: 'Shih Tzu', f: f(CN, 'Toy', 6), d: 1, look: ['Lhasa Apso', 'Pekingese'],
+    { n: 'Shih Tzu', f: f([CN, TB], 'Toy', 6), d: 1, look: ['Lhasa Apso', 'Pekingese'],
       b: 'A small, long-haired lap dog bred for Chinese royalty. Its name means "lion dog".',
       c: ['It was bred for Chinese royalty.', 'It is related to the Lhasa Apso from Tibet.', 'Its hair is often tied up in a topknot.', 'It has a long, flowing coat.', 'Its name means "lion" in Chinese.'] },
     { n: 'Border Collie', alt: ['Collie'], f: f(UK, 'Herding', 17), d: 1, look: ['Australian Shepherd', 'Rough Collie', 'Shetland Sheepdog'],
@@ -151,7 +151,7 @@ export default {
     { n: 'Basset Hound', alt: ['Basset'], f: f(FR, 'Hound', 27), d: 1, look: ['Beagle', 'Bloodhound', 'Dachshund'],
       b: 'A short-legged hound with long droopy ears and a great nose. It was bred to follow rabbits by scent.',
       c: ['Its name comes from a French word meaning "low".', 'Its long ears sweep scents up to its nose.', 'It has droopy eyes.', 'It has very short legs and very long ears.', 'It is a sad-looking scent hound.'] },
-    { n: 'Bloodhound', f: f(BE, 'Hound', 45), d: 1, look: ['Basset Hound'],
+    { n: 'Bloodhound', f: f([BE, FR, UK], 'Hound', 45), d: 1, look: ['Basset Hound'],
       b: 'A big, wrinkly hound with the best sense of smell of any dog. It can follow a trail days old.',
       c: ['Its tracking evidence has been accepted in court.', 'It was bred by monks in Belgium.', 'It can follow a scent trail days old.', 'It has loose, wrinkly skin and long ears.', 'It has the best nose of any dog.'] },
     { n: 'Irish Wolfhound', f: f(IE, 'Hound', 60), d: 2, look: ['Great Dane', 'Scottish Deerhound'],

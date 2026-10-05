@@ -9,6 +9,8 @@
  "imgPrompt": "Which of these is {aName}?",
  "nameImgPrompt": "Which insect is this?",
  "tfImgPrompt": "This is {aName}.",
+ "noun": "insect",
+ "fakePrompt": "Which of these wasps, bees and hornets is made up?",
  "leakExempt": [],
  "factsMeta": {
   "kind": {
@@ -492,20 +494,20 @@
       "page": "https://www.inaturalist.org/photos/29046892"
      },
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/489551264/medium.jpeg",
-      "w": 281,
-      "h": 500,
-      "credit": "no rights reserved",
-      "license": "CC0 1.0",
-      "page": "https://www.inaturalist.org/photos/489551264"
-     },
-     {
       "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/248955613/medium.jpeg",
       "w": 500,
       "h": 333,
       "credit": "Greg Tasney",
       "license": "CC BY-SA 4.0",
       "page": "https://www.inaturalist.org/photos/248955613"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/608116119/medium.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Greg Tasney",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/608116119"
      }
     ]
    },
@@ -863,12 +865,12 @@
       "page": "https://commons.wikimedia.org/wiki/File:Vespa_crabro_80708.jpg"
      },
      {
-      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/b/b1/VespaCrabroCollezione.jpg/330px-VespaCrabroCollezione.jpg",
-      "w": 330,
-      "h": 661,
-      "credit": "Filippo Turetta",
-      "license": "CC BY-SA 4.0",
-      "page": "https://commons.wikimedia.org/wiki/File:VespaCrabroCollezione.jpg"
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/24810290/medium.jpg",
+      "w": 500,
+      "h": 416,
+      "credit": "katunchik",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/24810290"
      }
     ]
    },
@@ -1166,12 +1168,12 @@
       "page": "https://www.inaturalist.org/photos/312926499"
      },
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/150152422/medium.jpeg",
-      "w": 375,
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/510505658/medium.jpg",
+      "w": 500,
       "h": 500,
-      "credit": "DDutrey",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/150152422"
+      "credit": "no rights reserved",
+      "license": "CC0 1.0",
+      "page": "https://www.inaturalist.org/photos/510505658"
      }
     ]
    },
@@ -1203,14 +1205,6 @@
    "media": {
     "img": [
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/55089421/medium.jpeg",
-      "w": 335,
-      "h": 500,
-      "credit": "Douglas Goldman",
-      "license": "CC BY-SA 4.0",
-      "page": "https://www.inaturalist.org/photos/55089421"
-     },
-     {
       "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/152735859/medium.jpg",
       "w": 500,
       "h": 334,
@@ -1225,6 +1219,14 @@
       "credit": "Zihao Wang",
       "license": "CC BY 4.0",
       "page": "https://www.inaturalist.org/photos/23316526"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/233988746/medium.jpg",
+      "w": 500,
+      "h": 409,
+      "credit": "Sam Kieschnick",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/233988746"
      }
     ]
    },
@@ -1492,12 +1494,12 @@
       "page": "https://www.inaturalist.org/photos/3942468"
      },
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/137922066/medium.jpg",
-      "w": 375,
-      "h": 500,
-      "credit": "anguspritchard",
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/3966395/medium.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Ken-ichi Ueda",
       "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/137922066"
+      "page": "https://www.inaturalist.org/photos/3966395"
      }
     ]
    },

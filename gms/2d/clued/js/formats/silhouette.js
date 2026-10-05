@@ -1,6 +1,6 @@
-import { register, poolItems, pickPack, byDifficulty, distractors, placeAnswer, collect, pick } from './registry.js?v=1';
-import { h, choiceGrid } from '../ui/kit.js?v=1';
-import { injectCSS, baseCSS, stages, stretchTimer, once, numOf } from './fkit.js?v=1';
+import { register, poolItems, pickPack, byDifficulty, distractors, placeAnswer, collect, pick } from './registry.js?v=202610050139';
+import { h, choiceGrid } from '../ui/kit.js?v=202610050139';
+import { injectCSS, baseCSS, stages, once, numOf } from './fkit.js?v=202610050139';
 
 const CSS = `
 .sl-box{position:relative;flex:1 1 0;min-height:180px;border:var(--line) solid var(--ink);border-radius:var(--r);background:radial-gradient(circle at 50% 40%,#fffdf6,#f1ead7);box-shadow:var(--shadow);overflow:hidden;display:grid;place-items:center}
@@ -48,8 +48,8 @@ function make(rng, pack, n, difficulty, kids) {
 
 let geoP = null;
 function loadGeo() {
-  return (geoP ||= Promise.all([import('../geo/data.js?v=1'), import('./f_shape.js?v=1')])
-    .then(async ([data, shape]) => { const [topo, G] = await Promise.all([data.loadWorld(), data.loadIndex()]); return { topo, G, shape }; })
+  return (geoP ||= Promise.all([import('../geo/data.js?v=202610050139'), import('../geo/shape.js?v=202610050139')])
+    .then(async ([data, shape]) => { const G = await data.loadIndex(); return { G, shape }; })
     .catch(e => { geoP = null; throw e; }));
 }
 
@@ -76,16 +76,17 @@ export default register({
     const answersEl = h('div.q-answers');
     el.append(h('div.q.has-media.sl-q', {}, box, h('div.q-body', {}, h('h2.q-prompt', {}, q.prompt), answersEl)));
     let cur = 0, drawn = false;
-    loadGeo().then(({ topo, G, shape }) => {
+    loadGeo().then(async ({ G, shape }) => {
       if (!box.isConnected) return;
-      const s = shape.countryShape(topo, d.iso, { neighbours: G.countries?.[d.iso]?.nb || [] });
+      const s = await shape.countryShape(d.iso, { neighbours: G.countries?.[d.iso]?.nb || [] });
+      if (!box.isConnected) return;
       box.querySelector('.sl-load')?.remove();
       if (!s) { box.append(h('span.sl-load', {}, 'Map unavailable')); return; }
       box.insertAdjacentHTML('afterbegin', `<svg viewBox="0 0 100 100" aria-label="Country outline"><g class="sl-g"><path class="sl-ctx" d="${s.context}"/><path class="sl-main" d="${s.main}" fill-rule="evenodd"/></g></svg>`);
       if (!d.continent && G.countries?.[d.iso]) tag.textContent = `In ${CONTINENTS[G.countries[d.iso].c] || ''}`;
       drawn = true;
       paint(cur);
-    }).catch(() => { box.querySelector('.sl-load').textContent = 'Map unavailable'; });
+    }).catch(() => { const l = box.querySelector('.sl-load'); if (l) l.textContent = 'Map unavailable'; });
     box.append(tag);
     function paint(s) {
       cur = s;
@@ -94,7 +95,6 @@ export default register({
     }
     const st = stages(api, q, el, s => { if (s > cur) api.sfx('reveal'); paint(s); }, { label: 'Clue 👀' });
     if (st.button) box.append(st.button);
-    if (!st.native) stretchTimer(api, el, 1.6);
     const grid = choiceGrid(answersEl, q.options, {
       onPick(i) {
         grid.lock(); grid.mark(q.answer, i); st.lock(); box.classList.add('done', 'ctx');

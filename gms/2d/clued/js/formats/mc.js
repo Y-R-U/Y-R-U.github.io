@@ -1,8 +1,8 @@
 import {
   register, poolItems, packQuestions, pickPack, distractors, byDifficulty, imageOf, hasImg, fill, factText,
   spreadApart, placeAnswer, collect, pick, shuffle, sample,
-} from './registry.js?v=1';
-import { layout, choiceGrid } from '../ui/kit.js?v=1';
+} from './registry.js?v=202610050139';
+import { layout, choiceGrid } from '../ui/kit.js?v=202610050139';
 
 const PROMPTS = { nameImg: 'Which of these is {aName}?', imgName: 'What is this?' };
 
@@ -11,7 +11,7 @@ function sources(pack, n, src) {
   const items = pack.items || [];
   const out = [];
   const want = s => src === 'mix' || src === s;
-  if (want('questions') && (pack.questions || []).some(q => (q.kind || 'mc') === 'mc' && (q.wrong || []).length >= n - 1)) out.push(['q', 3]);
+  if (want('questions') && (pack.questions || []).some(q => (q.kind || 'mc') === 'mc' && (q.wrong || []).length >= Math.min(n - 1, 2))) out.push(['q', 3]);
   const imgs = items.filter(hasImg).length;
   if (want('pictures') && imgs >= n) out.push(['imgName', 2], ['nameImg', 1.5]);
   if (want('facts')) {
@@ -31,10 +31,13 @@ function sources(pack, n, src) {
 }
 
 function fromQuestion(rng, pack, n, difficulty) {
-  const qs = byDifficulty((pack.questions || []).filter(q => (q.kind || 'mc') === 'mc' && (q.wrong || []).length >= n - 1), difficulty, 1);
+  // kids-bank questions carry only 2 wrong answers: a 4-answer game falls back to 3 rather than finding nothing
+  const mcs = (pack.questions || []).filter(q => (q.kind || 'mc') === 'mc');
+  const full = mcs.filter(q => (q.wrong || []).length >= n - 1);
+  const qs = byDifficulty(full.length ? full : mcs.filter(q => (q.wrong || []).length >= 2), difficulty, 1);
   if (!qs.length) return null;
   const q = pick(rng, qs);
-  const { options, answer } = placeAnswer(rng, q.answer, sample(rng, q.wrong, n - 1));
+  const { options, answer } = placeAnswer(rng, q.answer, sample(rng, q.wrong, Math.min(n - 1, q.wrong.length)));
   return {
     format: 'mc', id: `mc:${pack.id}/q:${q.id}`, prompt: q.prompt, media: q.media && Object.keys(q.media).length ? q.media : undefined,
     options: options.map(t => ({ text: String(t) })), answer, answerText: String(q.answer),
@@ -141,7 +144,7 @@ export default register({
   id: 'mc', title: 'Multiple choice', icon: '🔤', blurb: 'Pick the right answer', tags: ['choice', 'quick'], kids: true,
   options: [
     { key: 'answers', label: 'Answers', type: 'choice', values: ANSWERS, default: 4, kidsValues: [2, 3], kidsDefault: 3 },
-    { key: 'source', label: 'Questions', type: 'choice', values: ['mix', 'pictures', 'facts', 'questions'], labels: ['Mix', 'Pictures', 'Facts', 'Trivia'], default: 'mix', kidsDefault: 'pictures' },
+    { key: 'source', label: 'Question type', type: 'choice', values: ['mix', 'pictures', 'facts', 'questions'], labels: ['Mix', 'Pictures', 'Facts', 'Trivia'], default: 'mix', kidsDefault: 'pictures' },
   ],
   supports(info) {
     const c = info.caps || {};

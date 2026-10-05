@@ -40,7 +40,7 @@ for (const it of items) {
 }
 const mis = parseQuestions(MISQUOTES, 'mis');
 writePack({
-  id: 'quotes', title: 'Famous quotes', theme: 'books', icon: '💬', kids: false, version: 1,
+  id: 'quotes', title: 'Famous quotes', theme: 'books', icon: '💬', kids: false, version: 1, quotePrompt: 'Who said or wrote it?',
   notice: 'Every quote is checked against Wikiquote. Famous misquotes appear as true-or-false questions.',
   factsMeta: { field: { type: 'cat', label: 'Known for', exclusive: false } },
   items, questions: [...questions, ...mis],

@@ -37,7 +37,7 @@ for (const it of items) {
 writePack({
   id: 'tv', title: 'TV shows', theme: 'screen', icon: '📺', kids: false, version: 1,
   factsMeta: {
-    year: { type: 'year', label: 'First shown', higherLabel: 'Newer', askHigh: 'Which of these shows started most recently?', askLow: 'Which of these shows started first?' },
+    year: { type: 'year', label: 'First shown', matchPrompt: 'Match each show to the year it was first shown', askNumber: 'In what year was {name} first shown?', higherLabel: 'Newer', askHigh: 'Which of these shows started most recently?', askLow: 'Which of these shows started first?' },
     country: { type: 'cat', label: 'Country of origin', ask: 'Which country does {name} come from?', stmt: 'Country of origin of {name}: {value}.' },
     decade: { type: 'cat', label: 'Decade', ask: 'In which decade did {name} start?', stmt: '{name} started in the {value}.' },
     kids: { type: 'bool', label: "Children's show", yes: "Children's show", no: 'Not a children’s show', askBool: "Which of these is a children's show?", stmt: "{name} is a children's show." },

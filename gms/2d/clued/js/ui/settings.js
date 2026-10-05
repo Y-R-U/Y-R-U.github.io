@@ -1,13 +1,13 @@
-import { h, esc } from './kit.js?v=1';
-import { setBgm, canFullscreen, toggleFullscreen } from './toggles.js?v=1';
-import { defineScreen, header, back } from './app.js?v=1';
-import { getSettings, setSettings, ANSWER_TIMES } from '../core/store.js?v=1';
-import { getIndex, loadPacks, loadedPacks, allPackIds } from '../core/packs.js?v=1';
-import { applyAudioSettings, sfx } from './fx.js?v=1';
-import { applyKids } from './home.js?v=1';
-import { loadLearn } from './net.js?v=1';
-import { BUILD } from '../build.js?v=1';
-import { canSpeak, speak } from './speech.js?v=1';
+import { h, esc } from './kit.js?v=202610050139';
+import { setBgm, canFullscreen, toggleFullscreen } from './toggles.js?v=202610050139';
+import { defineScreen, header, back } from './app.js?v=202610050139';
+import { getSettings, setSettings, ANSWER_TIMES } from '../core/store.js?v=202610050139';
+import { getIndex, loadPacks, loadedPacks, allPackIds } from '../core/packs.js?v=202610050139';
+import { applyAudioSettings, sfx } from './fx.js?v=202610050139';
+import { applyKids } from './home.js?v=202610050139';
+import { loadLearn } from './net.js?v=202610050139';
+import { BUILD } from '../build.js?v=202610050139';
+import { canSpeak, speak } from './speech.js?v=202610050139';
 
 function toggleRow(label, help, key, after) {
   const s = getSettings();
@@ -45,17 +45,27 @@ defineScreen('settings', el => {
     canFullscreen() ? h('div.opt-row', {}, h('span.lbl', {}, 'Full screen'), h('button.btn.small', { type: 'button', onclick: () => toggleFullscreen() }, 'Toggle')) : null,
     toggleRow('Kids mode', 'Easy picture questions, no timer, stickers', 'kids', applyAll),
   ));
-  el.append(h('p.muted.tiny.center', { style: { marginTop: '18px' } }, `Clued build ${BUILD} · ${Object.keys(getIndex()?.packs || {}).length} packs`));
+  el.append(h('p.muted.tiny.center', { style: { marginTop: '18px' } }, `Clued build ${BUILD} · ${Object.values(getIndex()?.packs || {}).filter(p => !p.virtual).length} packs`));
 });
 
 defineScreen('credits', async el => {
   el.append(header('Credits'));
   const body = h('div');
-  el.append(h('p.muted', {}, 'Every picture and sound in Clued is free to use under the licence shown. Thank you to all the photographers, musicians and archives.'), body);
+  const link = (t, u) => `<a href="${u}" target="_blank" rel="noopener">${t}</a>`;
+  const fixed = h('div.panel.credits-pack', {}, h('h3', {}, 'Maps, music and services'), h('ul', { html: [
+    `<b>Map data</b>: Made with ${link('Natural Earth', 'https://www.naturalearthdata.com')} (public domain). Flags from Wikimedia Commons (credit per flag below the map questions).`,
+    `<b>Song previews</b>: provided courtesy of ${link('Apple Music', 'https://music.apple.com')}; streamed from Apple, never stored. Apple Music is a trademark of Apple Inc.`,
+    `<b>Piano</b>: ${link('Salamander Grand Piano', 'https://archive.org/details/SalamanderGrandPianoV3')} by Alexander Holm (CC BY 3.0). Sheet music from the ${link('Mutopia Project', 'https://www.mutopiaproject.org')} (licence per piece) and public-domain sources.`,
+    `<b>Anthems and band recordings</b>: US Navy, Marine, Army and Air Force bands (US government, public domain) and other Wikimedia Commons files.`,
+    `<b>Device-hosted rooms</b>: ${link('PeerJS', 'https://peerjs.com')} (MIT licence) and its free signalling server.`,
+    `<b>Facts</b>: ${link('Wikidata', 'https://www.wikidata.org')} (CC0), ${link('iNaturalist', 'https://www.inaturalist.org')}, Wikipedia and Wikiquote, checked by hand.`,
+  ].map(x => `<li>${x}</li>`).join('') }));
+  el.append(h('p.muted', {}, 'Every picture and sound in Clued is free to use under the licence shown. Thank you to all the photographers, musicians and archives.'), fixed, body);
   const draw = () => {
     body.innerHTML = '';
     const idx = getIndex();
-    for (const p of loadedPacks().sort((a, b) => String(a.title).localeCompare(b.title))) {
+    const real = () => allPackIds().filter(id => !idx?.packs?.[id]?.virtual);
+    for (const p of loadedPacks().filter(p => !idx?.packs?.[p.id]?.virtual).sort((a, b) => String(a.title).localeCompare(b.title))) {
       const rows = [];
       for (const it of p.items || []) for (const m of [...(it.media?.img || []), ...(it.media?.audio || [])]) rows.push([it.name, m]);
       for (const q of p.questions || []) for (const m of [...(q.media?.img || []), ...(q.media?.audio || [])]) rows.push([q.prompt.slice(0, 40) + (q.prompt.length > 40 ? '…' : ''), m]);
@@ -64,10 +74,9 @@ defineScreen('credits', async el => {
       if (p.sources?.length) sec.append(h('p.tiny.muted', { html: 'Data: ' + p.sources.map(s => `<a href="${esc(s.url)}" target="_blank" rel="noopener">${esc(s.name)}</a>`).join(', ') }));
       body.append(sec);
     }
-    const missing = allPackIds().length - loadedPacks().filter(p => idx?.packs?.[p.id]).length;
-    if (missing > 0) body.append(h('button.btn.wide', { type: 'button', onclick: async e => { e.target.disabled = true; e.target.textContent = 'Loading…'; await loadPacks(allPackIds()); draw(); } }, `Show credits for all ${allPackIds().length} packs`));
+    const missing = real().length - loadedPacks().filter(p => idx?.packs?.[p.id] && !idx.packs[p.id].virtual).length;
+    if (missing > 0) body.append(h('button.btn.wide', { type: 'button', onclick: async e => { e.target.disabled = true; e.target.textContent = 'Loading…'; await loadPacks(real()); draw(); } }, `Show credits for all ${real().length} packs`));
     body.append(h('div.panel.credits-pack', {}, h('h3', {}, 'Fonts and code'), h('p.tiny', { html: 'Lilita One and Nunito (SIL Open Font License) via Google Fonts. Account layer: br8t games.' })));
-    import(`../audio/piano.js?v=${BUILD}`).then(m => { if (m.CREDIT) body.append(h('div.panel.credits-pack', {}, h('h3', {}, 'Piano'), h('p.tiny', {}, typeof m.CREDIT === 'string' ? m.CREDIT : `${m.CREDIT.name || m.CREDIT.credit || ''} · ${m.CREDIT.license || ''}`))); }).catch(() => {});
   };
   if (!loadedPacks().length && allPackIds().length <= 12) { await loadPacks(allPackIds()); }
   draw();

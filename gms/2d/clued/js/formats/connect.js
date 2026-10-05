@@ -1,7 +1,7 @@
-import { register, poolItems, byDifficulty, factText, collect, pick, shuffle, sample } from './registry.js?v=1';
-import { h } from '../ui/kit.js?v=1';
-import { norm, injectCSS, baseCSS, stretchTimer, once } from './fkit.js?v=1';
-import { toast } from '../ui/popup.js?v=1';
+import { register, poolItems, byDifficulty, factText, collect, pick, shuffle, sample } from './registry.js?v=202610050139';
+import { h } from '../ui/kit.js?v=202610050139';
+import { norm, injectCSS, baseCSS, once } from './fkit.js?v=202610050139';
+import { toast } from '../ui/popup.js?v=202610050139';
 
 const CSS = `
 .cn{gap:10px}
@@ -84,7 +84,7 @@ function make(rng, pack, G, S, difficulty) {
 }
 
 export default register({
-  id: 'connect', title: 'Connections', icon: '🧶', blurb: 'Sort 16 into 4 hidden groups', tags: ['slow', 'nodaily'],
+  id: 'connect', title: 'Connections', icon: '🧶', blurb: 'Sort 16 into 4 hidden groups', tags: ['slow', 'nodaily'], timeScale: 6,
   options: [],
   supports(info) {
     const c = info.caps || {};
@@ -130,7 +130,6 @@ export default register({
     const clear = h('button.btn', { type: 'button', onclick: () => { sel.clear(); paint(); } }, 'Clear');
     el.append(h('div.f-stage.cn', {}, h('h2.q-prompt', {}, q.prompt), h('div.cn-side', {}, livesEl, h('div.cn-foot', {}, shuffleBtn, clear, submit)),
       h('div.cn-board', {}, solvedEl, grid)));
-    stretchTimer(api, el, 6);
     function paint() {
       tiles.forEach((b, i) => b.classList.toggle('sel', sel.has(i)));
       submit.disabled = sel.size !== S || done;

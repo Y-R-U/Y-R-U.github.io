@@ -223,14 +223,6 @@
       "page": "https://commons.wikimedia.org/wiki/File:Killerwhales_jumping.jpg"
      },
      {
-      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/8/84/Killer_Whale_Types.jpg/330px-Killer_Whale_Types.jpg",
-      "w": 330,
-      "h": 457,
-      "credit": "Albino.orca",
-      "license": "CC BY-SA 3.0",
-      "page": "https://commons.wikimedia.org/wiki/File:Killer_Whale_Types.jpg"
-     },
-     {
       "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/0/0e/Anim1133_-_Flickr_-_NOAA_Photo_Library.jpg/500px-Anim1133_-_Flickr_-_NOAA_Photo_Library.jpg",
       "w": 500,
       "h": 336,
@@ -288,14 +280,6 @@
       "credit": "harum.koh",
       "license": "CC BY-SA 4.0",
       "page": "https://www.inaturalist.org/photos/7690110"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/59925420/medium.jpg",
-      "w": 500,
-      "h": 297,
-      "credit": "Anja J.",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/59925420"
      }
     ]
    },
@@ -416,14 +400,6 @@
       "credit": "Lucy Keith-Diagne",
       "license": "CC BY 4.0",
       "page": "https://www.inaturalist.org/photos/177555065"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/566892172/medium.jpg",
-      "w": 500,
-      "h": 375,
-      "credit": "Matt Muir",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/566892172"
      }
     ],
     "audio": [
@@ -1026,14 +1002,6 @@
       "credit": "Pam Kleinsasser",
       "license": "CC BY 4.0",
       "page": "https://www.inaturalist.org/photos/23833432"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/250159220/medium.jpeg",
-      "w": 375,
-      "h": 500,
-      "credit": "Jake McCumber",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/250159220"
      }
     ],
     "audio": [
@@ -1216,14 +1184,6 @@
       "credit": "Matt Muir",
       "license": "CC BY 4.0",
       "page": "https://www.inaturalist.org/photos/78439903"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/161194229/medium.jpg",
-      "w": 500,
-      "h": 375,
-      "credit": "Justin Flint",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/161194229"
      }
     ]
    },
@@ -1563,14 +1523,6 @@
       "page": "https://www.inaturalist.org/photos/223662857"
      },
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/603847724/medium.jpg",
-      "w": 500,
-      "h": 399,
-      "credit": "Cricket Raspet",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/603847724"
-     },
-     {
       "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/249154834/medium.jpeg",
       "w": 500,
       "h": 312,
@@ -1677,22 +1629,6 @@
       "credit": "Isaac Chacón",
       "license": "CC BY 4.0",
       "page": "https://www.inaturalist.org/photos/221379071"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/221375130/medium.jpeg",
-      "w": 281,
-      "h": 500,
-      "credit": "Isaac Chacón",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/221375130"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/369395491/medium.jpeg",
-      "w": 500,
-      "h": 375,
-      "credit": "Alex Doyle",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/369395491"
      }
     ]
    },
@@ -1806,14 +1742,6 @@
       "credit": "Jennie Pistevos",
       "license": "CC BY 4.0",
       "page": "https://www.inaturalist.org/photos/148776236"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/509618902/medium.jpg",
-      "w": 500,
-      "h": 280,
-      "credit": "leonie_rennie",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/509618902"
      },
      {
       "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/368390714/medium.jpeg",
@@ -1989,14 +1917,6 @@
       "page": "https://www.inaturalist.org/photos/114458708"
      },
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/21315691/medium.jpg",
-      "w": 500,
-      "h": 500,
-      "credit": "Brook",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/21315691"
-     },
-     {
       "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/404980939/medium.jpeg",
       "w": 500,
       "h": 375,
@@ -2104,14 +2024,6 @@
       "page": "https://commons.wikimedia.org/wiki/File:Bluefin-big.jpg"
      },
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/107933283/medium.jpg",
-      "w": 500,
-      "h": 379,
-      "credit": "Michel Frisch",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/107933283"
-     },
-     {
       "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/318106996/medium.jpeg",
       "w": 500,
       "h": 286,
@@ -2161,14 +2073,6 @@
       "credit": "Pauline Walsh Jacobson",
       "license": "CC BY 4.0",
       "page": "https://www.inaturalist.org/photos/249214732"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/151110522/medium.jpeg",
-      "w": 500,
-      "h": 359,
-      "credit": "Ashwin Srinivasan",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/151110522"
      },
      {
       "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/72347699/medium.jpeg",
@@ -2454,14 +2358,6 @@
       "credit": "Roberto Daniel Avila",
       "license": "CC BY 4.0",
       "page": "https://www.inaturalist.org/photos/473308958"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/575337762/medium.jpg",
-      "w": 500,
-      "h": 375,
-      "credit": "Garth Harwood",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/575337762"
      }
     ]
    },
@@ -2562,22 +2458,6 @@
       "credit": "Meghan Cassidy",
       "license": "CC BY-SA 4.0",
       "page": "https://www.inaturalist.org/photos/1104162"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/281735049/medium.jpeg",
-      "w": 324,
-      "h": 500,
-      "credit": "Elizabeth Green",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/281735049"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/315678445/medium.jpg",
-      "w": 500,
-      "h": 333,
-      "credit": "Martin Kaehrle",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/315678445"
      }
     ]
    },
@@ -2687,14 +2567,6 @@
       "credit": "Donald Davesne",
       "license": "CC BY 4.0",
       "page": "https://www.inaturalist.org/photos/285264344"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/713327422/medium.jpg",
-      "w": 408,
-      "h": 500,
-      "credit": "Adam Kaya",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/713327422"
      }
     ]
    },
@@ -2765,8 +2637,7 @@
    "group": "crab",
    "facts": {
     "kind": "Crustacean",
-    "breathesAir": false,
-    "lengthM": 1.8
+    "breathesAir": false
    },
    "blurb": "A huge crab of cold northern seas, with legs spanning up to 1.8 metres. It is caught for food in the Bering Sea.",
    "clues": [
@@ -2776,7 +2647,6 @@
     "Its legs can span 1.8 metres.",
     "The TV show \"Deadliest Catch\" features its fishery.",
     "It is a crustacean.",
-    "Typical length: about 1.8 m.",
     "It lives in cold northern seas.",
     "The answer has 3 words (3, 4, 4 letters).",
     "Its first letter is R."
@@ -2790,22 +2660,6 @@
       "credit": "Dag Endresen",
       "license": "CC0 1.0",
       "page": "https://www.inaturalist.org/photos/88776171"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/42426482/medium.jpg",
-      "w": 375,
-      "h": 500,
-      "credit": "James M. Maley",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/42426482"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/42426413/medium.jpg",
-      "w": 375,
-      "h": 500,
-      "credit": "James M. Maley",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/42426413"
      }
     ]
    },

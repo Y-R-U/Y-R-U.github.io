@@ -164,14 +164,6 @@
       "credit": "Charles J. Sharp",
       "license": "CC BY-SA 4.0",
       "page": "https://commons.wikimedia.org/wiki/File:Bengal_tiger_(Panthera_tigris_tigris)_female_3.jpg"
-     },
-     {
-      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/b/b0/Bengal_tiger_%28Panthera_tigris_tigris%29_female_3_crop.jpg/500px-Bengal_tiger_%28Panthera_tigris_tigris%29_female_3_crop.jpg",
-      "w": 500,
-      "h": 333,
-      "credit": "Charles J. Sharp",
-      "license": "CC BY-SA 4.0",
-      "page": "https://commons.wikimedia.org/wiki/File:Bengal_tiger_(Panthera_tigris_tigris)_female_3_crop.jpg"
      }
     ]
    },
@@ -862,14 +854,6 @@
       "credit": "Muhammad Mahdi Karim",
       "license": "CC BY-SA 4.0",
       "page": "https://commons.wikimedia.org/wiki/File:Portrait_Hippopotamus_in_the_water.jpg"
-     },
-     {
-      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/18/Zulaihamaryam-Museum_Geologi-Hippotamus_Simplex_%28Kuda_Nil%29.jpg/330px-Zulaihamaryam-Museum_Geologi-Hippotamus_Simplex_%28Kuda_Nil%29.jpg",
-      "w": 330,
-      "h": 440,
-      "credit": "Zulaihamaryam",
-      "license": "CC BY-SA 4.0",
-      "page": "https://commons.wikimedia.org/wiki/File:Zulaihamaryam-Museum_Geologi-Hippotamus_Simplex_(Kuda_Nil).jpg"
      }
     ]
    },
@@ -1176,14 +1160,6 @@
       "credit": "Pierre Fidenci",
       "license": "CC BY-SA 4.0",
       "page": "https://www.inaturalist.org/photos/97076291"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/1443311/medium.JPG",
-      "w": 500,
-      "h": 375,
-      "credit": "116916927065934112165",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/1443311"
      }
     ]
    },
@@ -1533,14 +1509,6 @@
       "page": "https://www.inaturalist.org/photos/120818440"
      },
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/11624075/medium.jpg",
-      "w": 500,
-      "h": 375,
-      "credit": "Henry de Lange",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/11624075"
-     },
-     {
       "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/530342946/medium.jpg",
       "w": 400,
       "h": 500,
@@ -1663,14 +1631,6 @@
       "credit": "Dave Brown",
       "license": "CC0 1.0",
       "page": "https://www.inaturalist.org/photos/78448701"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/370107127/medium.jpeg",
-      "w": 500,
-      "h": 332,
-      "credit": "Klaus Rassinger",
-      "license": "CC BY-SA 4.0",
-      "page": "https://www.inaturalist.org/photos/370107127"
      }
     ]
    },
@@ -2120,14 +2080,6 @@
       "credit": "Subhadra Devi",
       "license": "CC BY 4.0",
       "page": "https://www.inaturalist.org/photos/47604060"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/590674140/medium.jpg",
-      "w": 500,
-      "h": 375,
-      "credit": "Sara Navarro",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/590674140"
      }
     ]
    },
@@ -2241,14 +2193,6 @@
       "credit": "Matt Muir",
       "license": "CC BY 4.0",
       "page": "https://www.inaturalist.org/photos/415517238"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/481187478/medium.gif",
-      "w": 500,
-      "h": 281,
-      "credit": "Matt Muir",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/481187478"
      }
     ],
     "audio": [
@@ -2313,14 +2257,6 @@
       "credit": "ClaudiaTen",
       "license": "CC BY-SA 4.0",
       "page": "https://commons.wikimedia.org/wiki/File:Portrait_of_a_red_fox_in_Rautas_fj%C3%A4llurskog_(cropped).jpg"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/120825265/medium.jpg",
-      "w": 500,
-      "h": 333,
-      "credit": "Morten Ross",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/120825265"
      }
     ],
     "audio": [
@@ -2570,14 +2506,6 @@
    "media": {
     "img": [
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/184578489/medium.jpg",
-      "w": 500,
-      "h": 407,
-      "credit": "Jay Pruett",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/184578489"
-     },
-     {
       "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/573514665/medium.jpg",
       "w": 500,
       "h": 375,
@@ -2779,14 +2707,6 @@
       "credit": "Mourad Harzallah",
       "license": "CC BY 4.0",
       "page": "https://www.inaturalist.org/photos/177947667"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/170312227/medium.jpeg",
-      "w": 500,
-      "h": 375,
-      "credit": "Nicolas Olejnik",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/170312227"
      }
     ],
     "audio": [
@@ -2907,14 +2827,6 @@
       "credit": "Rhododendrites",
       "license": "CC BY-SA 4.0",
       "page": "https://commons.wikimedia.org/wiki/File:Red_squirrel_(21808).jpg"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/462357539/medium.jpg",
-      "w": 500,
-      "h": 375,
-      "credit": "Rhododendrites",
-      "license": "CC BY-SA 4.0",
-      "page": "https://www.inaturalist.org/photos/462357539"
      }
     ]
    },
@@ -2959,14 +2871,6 @@
       "credit": "caroline legg",
       "license": "CC BY 4.0",
       "page": "https://www.inaturalist.org/photos/172054371"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/55269535/medium.jpg",
-      "w": 500,
-      "h": 333,
-      "credit": "Tina Ellegaard Poulsen",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/55269535"
      },
      {
       "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/187833913/medium.jpg",
@@ -3084,14 +2988,6 @@
       "credit": "Susanne Nilsson",
       "license": "CC BY-SA 4.0",
       "page": "https://www.inaturalist.org/photos/94772809"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/323241133/medium.jpeg",
-      "w": 500,
-      "h": 375,
-      "credit": "Wairambar Rainforest",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/323241133"
      },
      {
       "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/429001711/medium.jpg",
@@ -3521,14 +3417,6 @@
       "page": "https://commons.wikimedia.org/wiki/File:Myresluger2.jpg"
      },
      {
-      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/4/4d/Giant_anteater_at_MAV-USP.jpg/500px-Giant_anteater_at_MAV-USP.jpg",
-      "w": 500,
-      "h": 281,
-      "credit": "Museum of Veterinary Anatomy FMVZ USP / Wagner Souza e Silva",
-      "license": "CC BY-SA 4.0",
-      "page": "https://commons.wikimedia.org/wiki/File:Giant_anteater_at_MAV-USP.jpg"
-     },
-     {
       "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/123119770/medium.jpg",
       "w": 500,
       "h": 333,
@@ -3880,14 +3768,6 @@
       "credit": "Shirley Zundell",
       "license": "CC BY 4.0",
       "page": "https://www.inaturalist.org/photos/64550531"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/173131417/medium.jpeg",
-      "w": 375,
-      "h": 500,
-      "credit": "no rights reserved",
-      "license": "CC0 1.0",
-      "page": "https://www.inaturalist.org/photos/173131417"
      },
      {
       "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/2443002/medium.jpg",
@@ -4244,14 +4124,6 @@
       "page": "https://commons.wikimedia.org/wiki/File:Duck-billed_platypus_(Ornithorhynchus_anatinus)_Scottsdale.jpg"
      },
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/159363965/medium.jpeg",
-      "w": 500,
-      "h": 445,
-      "credit": "Tim",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/159363965"
-     },
-     {
       "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/28248055/medium.jpg",
       "w": 500,
       "h": 241,
@@ -4425,14 +4297,6 @@
       "credit": "Jan Ebr &amp; Ivana Ebrová",
       "license": "CC BY 4.0",
       "page": "https://www.inaturalist.org/photos/679974138"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/254186060/medium.jpeg",
-      "w": 500,
-      "h": 375,
-      "credit": "no rights reserved",
-      "license": "CC0 1.0",
-      "page": "https://www.inaturalist.org/photos/254186060"
      }
     ]
    },
@@ -4476,22 +4340,6 @@
       "credit": "Kym Nicolson",
       "license": "CC BY 4.0",
       "page": "https://www.inaturalist.org/photos/259629687"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/106705794/medium.jpeg",
-      "w": 333,
-      "h": 500,
-      "credit": "T. Hammer",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/106705794"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/102731459/medium.jpg",
-      "w": 500,
-      "h": 375,
-      "credit": "Ann Bentley",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/102731459"
      }
     ]
    },
@@ -4535,22 +4383,6 @@
       "credit": "Bernard DUPONT",
       "license": "CC BY-SA 4.0",
       "page": "https://www.inaturalist.org/photos/104083571"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/570952724/medium.jpg",
-      "w": 375,
-      "h": 500,
-      "credit": "Julia Palmer",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/570952724"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/570953671/medium.jpg",
-      "w": 500,
-      "h": 373,
-      "credit": "Julia Palmer",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/570953671"
      }
     ]
    },
@@ -4652,14 +4484,6 @@
       "credit": "Lawrence Hylton",
       "license": "CC BY 4.0",
       "page": "https://www.inaturalist.org/photos/597168533"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/335884275/medium.jpg",
-      "w": 500,
-      "h": 375,
-      "credit": "Carl Ramirez",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/335884275"
      },
      {
       "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/343049121/medium.jpg",
@@ -4776,14 +4600,6 @@
       "credit": "Jan Ebr &amp; Ivana Ebrová",
       "license": "CC BY 4.0",
       "page": "https://www.inaturalist.org/photos/176037362"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/736311673/medium.jpg",
-      "w": 418,
-      "h": 500,
-      "credit": "olliesaunders",
-      "license": "CC BY-SA 4.0",
-      "page": "https://www.inaturalist.org/photos/736311673"
      }
     ]
    },
@@ -4835,14 +4651,6 @@
       "credit": "Julien Lepage",
       "license": "CC BY 4.0",
       "page": "https://www.inaturalist.org/photos/51202052"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/17360571/medium.jpg",
-      "w": 375,
-      "h": 500,
-      "credit": "tlaloc27",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/17360571"
      }
     ]
    },

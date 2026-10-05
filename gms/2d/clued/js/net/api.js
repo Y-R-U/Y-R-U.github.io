@@ -1,5 +1,5 @@
 // Clued server client: base URL, JSON requests, server clock, live room subscription (SSE → long-poll fallback).
-import { idToken } from './ident.js?v=1';
+import { idToken } from './ident.js?v=202610050139';
 
 const DEFAULT_API = location.origin.includes('br8t.com') ? '/gms/2d/clued/api' : 'https://games.br8t.com/gms/2d/clued/api';
 

@@ -1,21 +1,21 @@
 // Online hub, join-by-name screen and host setup. Joining needs only a name.
-import { h } from '../ui/kit.js?v=1';
-import { defineScreen, go, header, current } from '../ui/app.js?v=1';
-import { toast } from '../ui/popup.js?v=1';
-import { sfx } from '../ui/fx.js?v=1';
-import { getFormat } from '../formats/registry.js?v=1';
-import { getSettings, getLast } from '../core/store.js?v=1';
-import { optionsPanel } from '../ui/setup.js?v=1';
-import { specFor, fmtTitle } from '../structures/common.js?v=1';
-import { prepare } from '../structures/session.js?v=1';
-import { rooms, friendly } from './api.js?v=1';
-import { suggestedName, rememberName, tidyName, MAX_NAME } from './ident.js?v=1';
-import { ensureStyles, saveSeat, loadSeat, dropSeat, cleanCode, validCode, setQuery, TRUST_HINT, START_CHOICES, startLabel, mmss } from './util.js?v=1';
-import { timingPanel, choiceChips } from './board.js?v=1';
-import { packInfo } from '../core/packs.js?v=1';
-import { getTransport, canHostFromDevice, fallback, hasTransport } from './transport.js?v=1';
-import { signInPrompt, isSignedIn, pausedText, busyText } from './signin.js?v=1';
-import { ensureFormats } from './room.js?v=1';
+import { h } from '../ui/kit.js?v=202610050139';
+import { defineScreen, go, header, current } from '../ui/app.js?v=202610050139';
+import { toast } from '../ui/popup.js?v=202610050139';
+import { sfx } from '../ui/fx.js?v=202610050139';
+import { getFormat } from '../formats/registry.js?v=202610050139';
+import { getSettings, getLast } from '../core/store.js?v=202610050139';
+import { optionsPanel } from '../ui/setup.js?v=202610050139';
+import { specFor, fmtTitle } from '../structures/common.js?v=202610050139';
+import { prepare } from '../structures/session.js?v=202610050139';
+import { rooms, friendly } from './api.js?v=202610050139';
+import { suggestedName, rememberName, tidyName, MAX_NAME } from './ident.js?v=202610050139';
+import { ensureStyles, saveSeat, loadSeat, dropSeat, cleanCode, validCode, setQuery, TRUST_HINT, START_CHOICES, startLabel, mmss } from './util.js?v=202610050139';
+import { timingPanel, choiceChips } from './board.js?v=202610050139';
+import { packInfo } from '../core/packs.js?v=202610050139';
+import { getTransport, canHostFromDevice, fallback, hasTransport } from './transport.js?v=202610050139';
+import { signInPrompt, isSignedIn, pausedText, busyText } from './signin.js?v=202610050139';
+import { ensureFormats } from './room.js?v=202610050139';
 
 const MAX_SET = 500 * 1024;
 

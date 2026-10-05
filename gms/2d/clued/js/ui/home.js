@@ -1,17 +1,18 @@
-import { h } from './kit.js?v=1';
-import { defineScreen, go } from './app.js?v=1';
-import { getSettings, setSettings, getStats, dailyDone } from '../core/store.js?v=1';
-import { kidsProgress } from './stickers.js?v=1';
-import { sfx } from './fx.js?v=1';
-import { loadNet } from './net.js?v=1';
-import { toolButtons } from './toggles.js?v=1';
+import { h } from './kit.js?v=202610050139';
+import { defineScreen, go } from './app.js?v=202610050139';
+import { getSettings, setSettings, getStats, dailyDone, todayUTC } from '../core/store.js?v=202610050139';
+import { kidsProgress } from './stickers.js?v=202610050139';
+import { sfx } from './fx.js?v=202610050139';
+import { loadNet } from './net.js?v=202610050139';
+import { toolButtons } from './toggles.js?v=202610050139';
 
 export const logo = (sm = false) => h('div.logo', { class: sm ? 'sm' : '', 'aria-label': 'Clued' },
   h('span.lens', {}, '?'), ...'lued'.split('').map(c => h('span.l', {}, c)));
 
-function calBadge(d = new Date()) {
+// the daily rolls over at midnight UTC, so the badge shows the UTC date too
+function calBadge(d = new Date(`${todayUTC()}T12:00:00Z`)) {
   return h('span.d-badge.cal', { 'aria-hidden': 'true' },
-    h('b', {}, d.toLocaleString('en', { month: 'short' }).toUpperCase()), h('i', {}, String(d.getDate())));
+    h('b', {}, d.toLocaleString('en', { month: 'short', timeZone: 'UTC' }).toUpperCase()), h('i', {}, String(d.getUTCDate())));
 }
 
 export function applyKids(on) {

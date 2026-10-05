@@ -1,7 +1,7 @@
 // GameSpec -> questions. A spec fully describes a game; same spec + same packs = same questions.
-import { rngFrom, sample, randomSeed } from './rng.js?v=1';
-import { loadIndex, loadPacks } from './packs.js?v=1';
-import { getFormat, supportsPack, defaultOpts } from '../formats/registry.js?v=1';
+import { rngFrom, sample, randomSeed } from './rng.js?v=202610050139';
+import { loadIndex, loadPacks } from './packs.js?v=202610050139';
+import { getFormat, supportsPack, defaultOpts } from '../formats/registry.js?v=202610050139';
 
 export const MAX_ALL_PACKS = 8;
 
@@ -11,10 +11,13 @@ export function makeSpec(structure, rounds, seed = randomSeed(), extra = {}) {
 
 // Kids mode: kids packs first; other packs only if not marked kidsSafe:false (their items get filtered to difficulty 1).
 export function supportedPackIds(fmt, index, { kids = false } = {}) {
-  const ids = Object.keys(index.packs).filter(id => supportsPack(fmt, index.packs[id]) === true);
+  const ids = Object.keys(index.packs).filter(id => supportsPack(fmt, index.packs[id], { kids }) === true);
   if (!kids) return ids;
   return ids.filter(id => index.packs[id].kidsSafe !== false);
 }
+
+// Map formats bring their own geo data (packless); the geography packs only add flags, landmarks and mastery refs.
+export const formatAvailable = (fmt, index, opts) => !!fmt?.packless || supportedPackIds(fmt, index, opts).length > 0;
 
 export const kidsOk = (x, pack) => x.facts?.kids === true || x.kids === true || (x.difficulty || 2) <= 1 || (pack.kids && !(x.difficulty > 1));
 
@@ -24,8 +27,12 @@ export function kidsView(pack) {
 }
 
 export function resolvePackIds(fmt, packs, index, rng, opts = {}) {
-  const ok = supportedPackIds(fmt, index, opts);
+  let ok = supportedPackIds(fmt, index, opts);
+  if (fmt.packless) return ok.filter(id => index.packs[id].theme === 'geography' && !index.packs[id].virtual);
   if (packs === 'all' || !Array.isArray(packs) || !packs.length) {
+    // virtual packs (general~science) are slices of `general`: never double-count them in "All"
+    const real = ok.filter(id => !index.packs[id].virtual);
+    if (real.length) ok = real;
     if (ok.length <= MAX_ALL_PACKS) return ok;
     if (!opts.kids) return sample(rng, ok.sort(), MAX_ALL_PACKS);
     const kp = ok.filter(id => index.packs[id].kids || index.packs[id].theme === 'kids').sort();
@@ -50,7 +57,7 @@ export async function buildQuestions(spec, { sparesRatio = 0.4, avoid = new Set(
     const ids = resolvePackIds(fmt, r.packs, index, rng, { kids });
     let packs = await loadPacks(ids);
     if (kids) packs = packs.map(kidsView).filter(p => p.items.length + p.questions.length > 0);
-    if (!packs.length) throw new Error(`No packs can play ${fmt.title}`);
+    if (!packs.length && !fmt.packless) throw new Error(`No packs can play ${fmt.title}`);
     const want = r.count + Math.ceil(r.count * sparesRatio) + 1;
     let list = [];
     try {

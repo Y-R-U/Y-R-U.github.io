@@ -1,6 +1,6 @@
-import { register, poolItems, pickPack, byDifficulty, imageOf, collect, pick } from './registry.js?v=1';
-import { h, mediaBox } from '../ui/kit.js?v=1';
-import { numericKeys, numOf, rangeOf, injectCSS, baseCSS, stretchTimer, once, hasImg } from './fkit.js?v=1';
+import { register, poolItems, pickPack, byDifficulty, imageOf, collect, pick } from './registry.js?v=202610050139';
+import { h, mediaBox } from '../ui/kit.js?v=202610050139';
+import { numericKeys, numOf, rangeOf, injectCSS, baseCSS, once, hasImg } from './fkit.js?v=202610050139';
 
 const CSS = `
 .nb{gap:12px}
@@ -123,7 +123,7 @@ function fromQuestion(rng, pack, difficulty) {
 }
 
 export default register({
-  id: 'number', title: 'Closest guess', icon: '🎯', blurb: 'How big? What year? Get close', tags: [],
+  id: 'number', title: 'Closest guess', icon: '🎯', blurb: 'How big? What year? Get close', tags: [], timeScale: 2,
   options: [],
   supports(info) {
     const c = info.caps || {};
@@ -166,7 +166,6 @@ export default register({
     const media = q.media ? h('div.nb-media', {}, mediaBox(q.media)) : null;
     el.append(h('div.f-stage.nb', {}, h('h2.q-prompt', {}, q.prompt), media,
       h('div.nb-right', {}, read, slider, h('div.nb-ends', {}, h('span', {}, pretty(d.min, d.unit === 'USD' ? 'USD' : '', d.year)), h('span', {}, pretty(d.max, d.unit === 'USD' ? 'USD' : '', d.year))), pad, go)));
-    stretchTimer(api, el, 2);
     function draw() {
       read.firstChild.textContent = typed ? (d.unit === 'USD' ? '$' : '') + typed.replace('-', '−') : d.year ? pretty(value, '', true) : pretty(value, d.unit === 'USD' ? 'USD' : '');
     }

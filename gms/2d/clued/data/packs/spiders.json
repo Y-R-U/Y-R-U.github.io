@@ -101,14 +101,6 @@
       "page": "https://commons.wikimedia.org/wiki/File:Atrax_robustus.jpg"
      },
      {
-      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/f/f0/Atrax_Robustus.jpg/330px-Atrax_Robustus.jpg",
-      "w": 330,
-      "h": 440,
-      "credit": "Sputniktilt",
-      "license": "CC BY-SA 3.0",
-      "page": "https://commons.wikimedia.org/wiki/File:Atrax_Robustus.jpg"
-     },
-     {
       "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/54337827/medium.jpeg",
       "w": 500,
       "h": 375,
@@ -290,14 +282,6 @@
       "credit": "Matt Muir",
       "license": "CC BY 4.0",
       "page": "https://www.inaturalist.org/photos/7497532"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/5655389/medium.jpeg",
-      "w": 500,
-      "h": 376,
-      "credit": "Matt Muir",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/5655389"
      }
     ]
    },
@@ -340,22 +324,6 @@
    ],
    "media": {
     "img": [
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/488190687/medium.jpg",
-      "w": 500,
-      "h": 333,
-      "credit": "no rights reserved",
-      "license": "CC0 1.0",
-      "page": "https://www.inaturalist.org/photos/488190687"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/466303500/medium.jpeg",
-      "w": 500,
-      "h": 333,
-      "credit": "jirau",
-      "license": "CC BY-SA 4.0",
-      "page": "https://www.inaturalist.org/photos/466303500"
-     },
      {
       "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/318418734/medium.jpeg",
       "w": 378,
@@ -1076,14 +1044,6 @@
       "credit": "mayfly1963",
       "license": "CC BY 4.0",
       "page": "https://www.inaturalist.org/photos/414487"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/92437087/medium.jpg",
-      "w": 375,
-      "h": 500,
-      "credit": "Meghan Cassidy",
-      "license": "CC BY-SA 4.0",
-      "page": "https://www.inaturalist.org/photos/92437087"
      }
     ]
    },
@@ -1189,14 +1149,6 @@
       "credit": "Ansie Dippenaar-Schoeman",
       "license": "CC BY 4.0",
       "page": "https://www.inaturalist.org/photos/550744529"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/285086997/medium.jpeg",
-      "w": 375,
-      "h": 500,
-      "credit": "no rights reserved",
-      "license": "CC0 1.0",
-      "page": "https://www.inaturalist.org/photos/285086997"
      }
     ]
    },
@@ -1608,14 +1560,6 @@
    "media": {
     "img": [
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/208881445/medium.jpg",
-      "w": 500,
-      "h": 500,
-      "credit": "M. Whitson",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/208881445"
-     },
-     {
       "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/555702674/medium.jpg",
       "w": 375,
       "h": 500,
@@ -1999,7 +1943,7 @@
    "facts": {
     "danger": "Harmless",
     "region": "many parts of the world",
-    "web": false
+    "web": true
    },
    "blurb": "A stick-thin spider that holds a small stretchy net in its front legs and throws it over passing insects.",
    "clues": [
@@ -2008,7 +1952,7 @@
     "It hangs upside down and waits.",
     "Its bite is harmless to people.",
     "It is found in many parts of the world.",
-    "It hunts without a catching web.",
+    "It catches prey in a web.",
     "It holds a stretchy web between its front legs.",
     "It throws its web over prey.",
     "The answer has 3 words (3, 7, 6 letters).",
@@ -2441,14 +2385,6 @@
       "page": "https://www.inaturalist.org/photos/76551"
      },
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/127402301/medium.jpeg",
-      "w": 500,
-      "h": 375,
-      "credit": "Hopeland",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/127402301"
-     },
-     {
       "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/60142353/medium.jpeg",
       "w": 457,
       "h": 500,
@@ -2610,14 +2546,6 @@
    ],
    "media": {
     "img": [
-     {
-      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/0/0c/Drapetisca_alteranda.JPG/500px-Drapetisca_alteranda.JPG",
-      "w": 500,
-      "h": 452,
-      "credit": "Bruce Marlin",
-      "license": "CC BY 3.0",
-      "page": "https://commons.wikimedia.org/wiki/File:Drapetisca_alteranda.JPG"
-     },
      {
       "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/b/b7/Linyphia.spec.6856.jpg/500px-Linyphia.spec.6856.jpg",
       "w": 500,

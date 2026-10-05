@@ -251,7 +251,7 @@
    "blurb": "An angel shows a despairing George Bailey what his small town would be like if he had never been born.",
    "scenes": [
     {
-     "p": "a man in a 1940s overcoat and hat seen from behind running joyfully down the snowy main street of a small American town on Christmas Eve, lit shop windows with wreaths, falling snow, an old savings and loan office, no signs",
+     "p": "a man in a 1940s overcoat and hat seen from behind running joyfully down the snowy main street of a small American town on Christmas Eve, shop windows with wreaths and warm light, falling snow, blank shopfronts",
      "d": 3,
      "cap": "Running through Bedford Falls on Christmas Eve"
     },
@@ -305,9 +305,10 @@
      "cap": "Dancing and singing in the rain"
     },
     {
-     "p": "three dancers in raincoats with umbrellas silhouetted in a heavy downpour on a glistening city street at night",
+     "p": "three dancers in raincoats with umbrellas silhouetted in a heavy downpour on a glistening city street at night, glowing shop windows without signs",
      "d": 3,
-     "cap": "Good mornin', even in a downpour"
+     "cap": "Good mornin', even in a downpour",
+     "drop": true
     }
    ]
   },
@@ -459,7 +460,7 @@
      "cap": "Chased by the crop-duster"
     },
     {
-     "p": "a man in a grey suit waiting alone by a dusty empty highway crossroads in flat Midwest farmland, a bus driving away",
+     "p": "a man in a grey suit waiting alone by a dusty empty highway crossroads in flat Midwest farmland, a plain unmarked bus driving away",
      "d": 3,
      "cap": "Waiting at the lonely crossroads"
     }
@@ -625,7 +626,8 @@
     {
      "p": "a narrow wooden escape tunnel lit by lamps, a little rail trolley on tracks, men crawling, sand spilling",
      "d": 3,
-     "cap": "Digging the tunnel"
+     "cap": "Digging the tunnel",
+     "drop": true
     }
    ]
   },
@@ -651,7 +653,8 @@
     {
      "p": "two children and a nanny flying a red kite in a London park, kites in the sky",
      "d": 3,
-     "cap": "Let's go fly a kite"
+     "cap": "Let's go fly a kite",
+     "drop": true
     }
    ]
   },
@@ -677,7 +680,8 @@
     {
      "p": "a gazebo of glass panes in a garden at night, rain on the glass",
      "d": 3,
-     "cap": "Sixteen going on seventeen in the gazebo"
+     "cap": "Sixteen going on seventeen in the gazebo",
+     "drop": true
     }
    ]
   },
@@ -698,7 +702,7 @@
      "cap": "Bare necessities on the river"
     },
     {
-     "p": "a large python with swirling hypnotic eyes coiled around a tree branch above a sleeping boy in the jungle at night",
+     "p": "a long python snake coiled around a tree branch with big swirling hypnotic rainbow-ringed eyes, its tail dangling, a sleeping jungle boy below in the moonlit Indian jungle",
      "d": 2,
      "cap": "Trust in me: the hypnotic python"
     },
@@ -734,7 +738,8 @@
     {
      "p": "a huge spinning wheel-shaped space station orbiting Earth, a small shuttle approaching, starfield",
      "d": 3,
-     "cap": "The space station waltz"
+     "cap": "The space station waltz",
+     "drop": true
     }
    ]
   },
@@ -833,7 +838,8 @@
     {
      "p": "a sunlit Sicilian village square with an orange tree, an old stone church and a 1940s car",
      "d": 3,
-     "cap": "Sicily, the old country"
+     "cap": "Sicily, the old country",
+     "drop": true
     }
    ]
   },
@@ -903,7 +909,7 @@
      "cap": "The twin suns of the desert planet"
     },
     {
-     "p": "a gigantic grey spherical battle station with a large concave dish, looming over a small planet in space, tiny fighter craft",
+     "p": "a gigantic grey moon-sized spherical space battle station with one large circular concave dish crater in its upper half and a trench around its equator, looming over a small planet, tiny fighter craft",
      "d": 1,
      "cap": "That's no moon"
     },
@@ -915,7 +921,7 @@
    ]
   },
   {
-   "id": "close-encounters",
+   "id": "close-encounters-of-the-third-kind",
    "name": "Close Encounters of the Third Kind",
    "alt": [
     "Close Encounters"
@@ -996,7 +1002,8 @@
     {
      "p": "a vast industrial mining spaceship towing a refinery through deep space",
      "d": 3,
-     "cap": "The towing ship Nostromo"
+     "cap": "The towing ship Nostromo",
+     "drop": true
     }
    ]
   },
@@ -1079,7 +1086,7 @@
    ]
   },
   {
-   "id": "et",
+   "id": "e-t-the-extra-terrestrial",
    "name": "E.T. the Extra-Terrestrial",
    "alt": [
     "E.T.",
@@ -1267,7 +1274,7 @@
      "cap": "Danger zone at sunset"
     },
     {
-     "p": "a pilot in a leather bomber jacket and aviator sunglasses seen from behind riding a sports motorcycle alongside a runway as a jet takes off",
+     "p": "a pilot in a brown leather bomber jacket and aviator sunglasses seen from behind riding a sports motorcycle alongside a runway as a grey fighter jet takes off",
      "d": 2,
      "cap": "Racing a jet on the motorbike"
     }
@@ -1290,7 +1297,8 @@
     {
      "p": "a 1960s summer holiday resort in the Catskills with a lake, cabins and a dance hall at dusk",
      "d": 3,
-     "cap": "Summer at Kellerman's resort"
+     "cap": "Summer at Kellerman's resort",
+     "drop": true
     }
    ]
   },
@@ -1355,7 +1363,7 @@
      "cap": "Playing the giant floor piano"
     },
     {
-     "p": "an old fortune-teller arcade machine with a mechanical mystic in a glass booth at a night carnival",
+     "p": "an old fortune-teller arcade machine with a mechanical turbaned mystic figure in a glass booth at a night carnival, no sign, no lettering",
      "d": 3,
      "cap": "Making a wish on the fortune machine"
     }
@@ -1788,7 +1796,8 @@
     {
      "p": "a sunny Mexican beach with a man sanding an old wooden boat, turquoise sea",
      "d": 3,
-     "cap": "Zihuatanejo"
+     "cap": "Zihuatanejo",
+     "drop": true
     }
    ]
   },
@@ -1809,7 +1818,8 @@
     {
      "p": "a speeding city bus weaving through Los Angeles traffic with police cars chasing",
      "d": 3,
-     "cap": "Pop quiz, hotshot: don't slow down"
+     "cap": "Pop quiz, hotshot: don't slow down",
+     "drop": true
     }
    ]
   },
@@ -1835,7 +1845,8 @@
     {
      "p": "a claw crane arcade machine full of three-eyed green alien toys looking up at the claw",
      "d": 2,
-     "cap": "The claw at Pizza Planet"
+     "cap": "The claw at Pizza Planet",
+     "drop": true
     }
    ]
   },
@@ -1854,7 +1865,7 @@
      "cap": "The board game unleashes a stampede"
     },
     {
-     "p": "monkeys wrecking a kitchen and driving a police car, vines bursting through the floor",
+     "p": "mischievous monkeys wrecking a family kitchen, flinging pots and pans, thick green jungle vines bursting through the floorboards and wrapping the fridge",
      "d": 2,
      "cap": "Jungle chaos in town"
     }
@@ -1966,7 +1977,8 @@
     {
      "p": "a stern headmistress figure seen from behind swinging a girl by her pigtails in a schoolyard",
      "d": 3,
-     "cap": "The hammer throw"
+     "cap": "The hammer throw",
+     "drop": true
     }
    ]
   },
@@ -1986,13 +1998,14 @@
     },
     {
      "p": "a couple seen from behind at the very bow of a great ship, the woman with arms outstretched like flying, golden sunset over the ocean",
-     "d": 1,
+     "d": 2,
      "cap": "I'm flying! at the ship's bow"
     },
     {
      "p": "a sparkling blue heart-shaped diamond necklace on a velvet cloth beside a charcoal sketchbook",
      "d": 2,
-     "cap": "The Heart of the Ocean"
+     "cap": "The Heart of the Ocean",
+     "drop": true
     }
    ]
   },
@@ -2039,7 +2052,8 @@
     {
      "p": "a tiny red dragon and a cricket in a cage riding on a horse, Chinese mountain landscape",
      "d": 2,
-     "cap": "A small red dragon guardian"
+     "cap": "A small red dragon guardian",
+     "drop": true
     }
    ]
   },
@@ -2233,7 +2247,7 @@
    ]
   },
   {
-   "id": "harry-potter-1",
+   "id": "harry-potter-and-the-philosopher-s-stone",
    "name": "Harry Potter and the Philosopher's Stone",
    "alt": [
     "Harry Potter and the Sorcerer's Stone",
@@ -2383,7 +2397,8 @@
     {
      "p": "a fish tank in a dentist's office overlooking Sydney Harbour",
      "d": 3,
-     "cap": "The dentist's fish tank in Sydney"
+     "cap": "The dentist's fish tank in Sydney",
+     "drop": true
     }
    ]
   },
@@ -2433,7 +2448,8 @@
     {
      "p": "a tall man in an elf costume walking through a snowy New York street at Christmas past yellow taxis",
      "d": 2,
-     "cap": "An elf in New York"
+     "cap": "An elf in New York",
+     "drop": true
     }
    ]
   },
@@ -2491,14 +2507,16 @@
    "blurb": "A hotshot race car gets stranded in a forgotten Route 66 town.",
    "scenes": [
     {
-     "p": "a shiny red stock racing car with yellow lightning-bolt stripes parked on a desert highway beside a sleepy old roadside town with neon motel shapes and red rock mesas, no road signs, no lettering",
+     "p": "a shiny red stock racing car with yellow lightning-bolt stripes alone on an empty two-lane desert highway winding between towering red rock mesas and buttes, a lonely old neon-lit diner shape far away, clear sky",
      "d": 1,
-     "cap": "Stranded on Route 66"
+     "cap": "Stranded on Route 66",
+     "drop": true
     },
     {
      "p": "tractors tipping over in a field at night",
      "d": 3,
-     "cap": "Tractor tipping"
+     "cap": "Tractor tipping",
+     "drop": true
     }
    ]
   },
@@ -2660,7 +2678,8 @@
     {
      "p": "a golden retriever wearing a collar device, a squirrel in the jungle",
      "d": 3,
-     "cap": "Squirrel!"
+     "cap": "Squirrel!",
+     "drop": true
     }
    ]
   },
@@ -2769,7 +2788,7 @@
     },
     {
      "p": "a lifeboat drifting through glowing jellyfish as a huge whale leaps",
-     "d": 2,
+     "d": 3,
      "cap": "The glowing ocean night"
     }
    ]
@@ -2887,7 +2906,8 @@
     {
      "p": "a dusty cornfield farmhouse with a bookshelf, dust patterns on the floor",
      "d": 3,
-     "cap": "The dust and the bookshelf"
+     "cap": "The dust and the bookshelf",
+     "drop": true
     }
    ]
   },
@@ -2908,7 +2928,8 @@
     {
      "p": "a small brown bear in a blue duffle coat and a red bush hat sitting on an old suitcase on a London railway station platform, steam and iron arches, a jar of marmalade",
      "d": 1,
-     "cap": "A bear from darkest Peru arrives in London"
+     "cap": "A bear from darkest Peru arrives in London",
+     "drop": true
     }
    ]
   },
@@ -3129,14 +3150,15 @@
    "blurb": "A young noble on the desert planet Arrakis becomes caught up in a war.",
    "scenes": [
     {
-     "p": "a colossal sandworm rising from desert sand dunes, its gaping circular mouth, a tiny figure",
+     "p": "a colossal segmented sandworm bursting up out of golden desert dunes, its enormous round mouth ringed with crystal teeth open to the sky, a tiny robed figure on the sand below, spice haze",
      "d": 1,
      "cap": "The giant sandworm of Arrakis"
     },
     {
      "p": "dragonfly-winged aircraft flying over a vast desert",
      "d": 2,
-     "cap": "Ornithopters over the dunes"
+     "cap": "Ornithopters over the dunes",
+     "drop": true
     }
    ]
   },
@@ -3150,7 +3172,7 @@
    "blurb": "In a magical Colombian house, the only family member without a gift tries to save the magic.",
    "scenes": [
     {
-     "p": "a colourful magical house with yellow butterflies in the Colombian mountains, a glowing candle in the window",
+     "p": "a magical colourful Colombian hacienda house nestled in green mountains, its roof tiles and shutters moving by themselves like waves, a glowing magic candle in an arched window, swarms of yellow butterflies, a girl in round green glasses and an embroidered skirt in front",
      "d": 1,
      "cap": "The magical house"
     },
@@ -3172,13 +3194,14 @@
    "scenes": [
     {
      "p": "two boys riding a rickety homemade scooter down a hill into the Italian Riviera sea, town of colourful houses",
-     "d": 1,
+     "d": 2,
      "cap": "Silenzio, Bruno!"
     },
     {
-     "p": "a sea monster boy with scales peeking out of the water at a Vespa poster",
+     "p": "a boy with green fish scales on his cheeks and arms peeking out of the sea at sunset, gazing at a plain unbranded vintage motor scooter parked on a jetty, Italian Riviera village behind",
      "d": 2,
-     "cap": "A sea monster who dreams of a Vespa"
+     "cap": "A sea monster who dreams of a Vespa",
+     "drop": true
     }
    ]
   },
@@ -3214,7 +3237,7 @@
    "scenes": [
     {
      "p": "a giant swirling black everything bagel and googly eyes",
-     "d": 2,
+     "d": 3,
      "cap": "The everything bagel and googly eyes"
     },
     {
@@ -3285,7 +3308,8 @@
     {
      "p": "a pink bubble floating over a fairytale university",
      "d": 3,
-     "cap": "Arriving at Shiz"
+     "cap": "Arriving at Shiz",
+     "drop": true
     }
    ]
   }

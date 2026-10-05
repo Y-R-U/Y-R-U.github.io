@@ -1,14 +1,14 @@
 // Daily: the same 10 questions for everyone (UTC date seed). Kids, map and music dailies have their own seeds.
-import { playSpec } from './session.js?v=1';
-import { makeSpec } from '../core/spec.js?v=1';
-import { listFormats, getFormat } from '../formats/registry.js?v=1';
-import { todayUTC, dailyDone, recordDaily, getStats, getSettings } from '../core/store.js?v=1';
-import { defineScreen, go, header } from '../ui/app.js?v=1';
-import { h, fmtNum } from '../ui/kit.js?v=1';
-import { shareText } from '../ui/share.js?v=1';
+import { playSpec } from './session.js?v=202610050139';
+import { makeSpec } from '../core/spec.js?v=202610050139';
+import { listFormats, getFormat } from '../formats/registry.js?v=202610050139';
+import { todayUTC, dailyDone, recordDaily, getStats, getSettings } from '../core/store.js?v=202610050139';
+import { defineScreen, go, header } from '../ui/app.js?v=202610050139';
+import { h, fmtNum } from '../ui/kit.js?v=202610050139';
+import { shareText } from '../ui/share.js?v=202610050139';
 
 const KINDS = {
-  main: { title: 'Daily challenge', icon: '📅', blurb: 'Ten questions from everything.' },
+  main: { title: 'Daily challenge', icon: '🔎', blurb: 'Ten questions from everything.' },
   kids: { title: 'Kids Daily', icon: '🧸', blurb: 'Ten easy picture questions.' },
   map: { title: 'Daily map', icon: '🗺️', blurb: 'Ten map questions.', tag: 'map' },
   music: { title: 'Daily music', icon: '🎵', blurb: 'Ten music questions.', tag: 'music' },
@@ -79,4 +79,4 @@ defineScreen('daily', el => {
   el.append(list);
 }, { pester: true });
 
-export default { id: 'daily', title: 'Daily', icon: '📅', start: ({ kind = 'main' } = {}) => startDaily(kind), formatTitle: id => getFormat(id)?.title };
+export default { id: 'daily', title: 'Daily', icon: '🔎', start: ({ kind = 'main' } = {}) => startDaily(kind), formatTitle: id => getFormat(id)?.title };

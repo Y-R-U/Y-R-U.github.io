@@ -32,6 +32,7 @@
    "type": "num",
    "label": "Countries using it",
    "higherLabel": "More countries",
+   "askNumber": "How many countries use the {name}?",
    "askHigh": "Which of these currencies is used by the most countries?"
   },
   "continent": {
@@ -41,7 +42,8 @@
   },
   "code": {
    "type": "text",
-   "label": "ISO code"
+   "label": "ISO code",
+   "matchPrompt": "Match each currency to its ISO code"
   },
   "symbol": {
    "type": "text",
@@ -285,7 +287,7 @@
     "symbol": "$",
     "continent": "North America"
    },
-   "blurb": "The Bahamian dollar (BSD) is used in Bahamas.",
+   "blurb": "The Bahamian dollar (BSD) is used in the Bahamas.",
    "clues": [
     "Its symbol is $.",
     "About 403,000 people live in the countries that use it.",
@@ -565,7 +567,7 @@
     "countries": 6,
     "continent": "Africa"
    },
-   "blurb": "The Central African CFA franc (XAF) is used in Cameroon, Central African Republic, Chad, Republic of the Congo, Equatorial Guinea and Gabon.",
+   "blurb": "The Central African CFA franc (XAF) is used in Cameroon, the Central African Republic, Chad, the Republic of the Congo, Equatorial Guinea and Gabon.",
    "difficulty": 2
   },
   {
@@ -688,7 +690,7 @@
     "countries": 1,
     "continent": "Africa"
    },
-   "blurb": "The Comorian franc (KMF) is used in Comoros.",
+   "blurb": "The Comorian franc (KMF) is used in the Comoros.",
    "difficulty": 2
   },
   {
@@ -703,13 +705,13 @@
     "countries": 1,
     "continent": "Africa"
    },
-   "blurb": "The Congolese franc (CDF) is used in Democratic Republic of the Congo.",
+   "blurb": "The Congolese franc (CDF) is used in the Democratic Republic of the Congo.",
    "clues": [
     "About 113 million people live in the countries that use it.",
     "You could spend it in Kinshasa.",
     "It is used in 1 UN member or observer state.",
     "It is used in Africa.",
-    "It is the currency of Democratic Republic of the Congo."
+    "It is the currency of the Democratic Republic of the Congo."
    ],
    "difficulty": 2
   },
@@ -834,7 +836,7 @@
     "symbol": "$",
     "continent": "North America"
    },
-   "blurb": "The Dominican peso (DOP) is used in Dominican Republic.",
+   "blurb": "The Dominican peso (DOP) is used in the Dominican Republic.",
    "clues": [
     "Its symbol is $.",
     "About 11.5 million people live in the countries that use it.",
@@ -857,14 +859,14 @@
     "symbol": "$",
     "continent": "South America"
    },
-   "blurb": "The United States dollar (USD) is used in Ecuador, El Salvador, Marshall Islands, Micronesia, Palau and Panama and others.",
+   "blurb": "The United States dollar (USD) is used in Ecuador, El Salvador, the Marshall Islands, Micronesia, Palau and Panama and others.",
    "clues": [
     "Its symbol is $.",
     "About 390 million people live in the countries that use it.",
     "You could spend it in Quito and San Salvador.",
     "It is used in 9 UN member or observer states.",
     "It is used in South America, North America, Oceania, Asia and Africa.",
-    "Countries using it include Ecuador, El Salvador and Marshall Islands."
+    "Countries using it include Ecuador, El Salvador and the Marshall Islands."
    ],
    "difficulty": 1
   },
@@ -978,7 +980,7 @@
     "countries": 1,
     "continent": "Africa"
    },
-   "blurb": "The Gambian dalasi (GMD) is used in Gambia.",
+   "blurb": "The Gambian dalasi (GMD) is used in the Gambia.",
    "difficulty": 2
   },
   {
@@ -1579,7 +1581,7 @@
     "countries": 1,
     "continent": "Asia"
    },
-   "blurb": "The Maldivian rufiyaa (MVR) is used in Maldives.",
+   "blurb": "The Maldivian rufiyaa (MVR) is used in the Maldives.",
    "difficulty": 2
   },
   {
@@ -1997,7 +1999,7 @@
     "symbol": "₱",
     "continent": "Asia"
    },
-   "blurb": "The Philippine peso (PHP) is used in Philippines.",
+   "blurb": "The Philippine peso (PHP) is used in the Philippines.",
    "clues": [
     "Its symbol is ₱.",
     "About 117 million people live in the countries that use it.",
@@ -2171,7 +2173,7 @@
     "countries": 1,
     "continent": "Africa"
    },
-   "blurb": "The Seychellois rupee (SCR) is used in Seychelles.",
+   "blurb": "The Seychellois rupee (SCR) is used in the Seychelles.",
    "difficulty": 2
   },
   {
@@ -2218,7 +2220,7 @@
     "symbol": "$",
     "continent": "Oceania"
    },
-   "blurb": "The Solomon Islands dollar (SBD) is used in Solomon Islands.",
+   "blurb": "The Solomon Islands dollar (SBD) is used in the Solomon Islands.",
    "clues": [
     "Its symbol is $.",
     "About 839,000 people live in the countries that use it.",
@@ -2566,13 +2568,13 @@
     "countries": 1,
     "continent": "Asia"
    },
-   "blurb": "The UAE dirham (AED) is used in United Arab Emirates.",
+   "blurb": "The UAE dirham (AED) is used in the United Arab Emirates.",
    "clues": [
     "About 11.5 million people live in the countries that use it.",
     "You could spend it in Abu Dhabi.",
     "It is used in 1 UN member or observer state.",
     "It is used in Asia.",
-    "It is the currency of United Arab Emirates."
+    "It is the currency of the United Arab Emirates."
    ],
    "difficulty": 2
   },
@@ -2589,14 +2591,14 @@
     "symbol": "£",
     "continent": "Europe"
    },
-   "blurb": "The Pound sterling (GBP) is used in United Kingdom.",
+   "blurb": "The Pound sterling (GBP) is used in the United Kingdom.",
    "clues": [
     "Its symbol is £.",
     "About 69.5 million people live in the countries that use it.",
     "You could spend it in London.",
     "It is used in 1 UN member or observer state.",
     "It is used in Europe.",
-    "It is the currency of United Kingdom."
+    "It is the currency of the United Kingdom."
    ],
    "difficulty": 1
   },
@@ -5451,5 +5453,6 @@
    "name": "ISO 4217 via Wikidata",
    "url": "https://www.wikidata.org/wiki/Property:P498"
   }
- ]
+ ],
+ "noun": "currency"
 }

@@ -8,6 +8,8 @@
  "imgPrompt": "Which of these is {aName}?",
  "nameImgPrompt": "Which animal is this?",
  "tfImgPrompt": "This is {aName}.",
+ "noun": "frog or reptile",
+ "fakePrompt": "Which of these frogs and reptiles is made up?",
  "leakExempt": [],
  "factsMeta": {
   "cls": {
@@ -386,7 +388,7 @@
     "cls": "Reptile",
     "region": "Australia",
     "lengthM": 1.7,
-    "venomous": false,
+    "venomous": true,
     "status": "Least concern"
    },
    "lookalikes": [
@@ -403,6 +405,7 @@
     "It is a reptile.",
     "It lives in Australia.",
     "Typical adult length: about 1.7 m.",
+    "It is poisonous or venomous.",
     "It is the second-largest lizard in Australia.",
     "The answer has 2 words (4, 7 letters).",
     "Its first letter is L."
@@ -446,7 +449,6 @@
     "cls": "Reptile",
     "region": "Australia",
     "lengthM": 2,
-    "venomous": false,
     "status": "Least concern"
    },
    "lookalikes": [
@@ -485,14 +487,6 @@
       "credit": "Peter Crowcroft",
       "license": "CC BY 4.0",
       "page": "https://www.inaturalist.org/photos/219611915"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/126756246/medium.jpeg",
-      "w": 500,
-      "h": 375,
-      "credit": "no rights reserved",
-      "license": "CC0 1.0",
-      "page": "https://www.inaturalist.org/photos/126756246"
      }
     ]
    },
@@ -1031,14 +1025,6 @@
       "credit": "Daily Anole",
       "license": "CC BY 4.0",
       "page": "https://www.inaturalist.org/photos/253549365"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/604352228/medium.jpg",
-      "w": 500,
-      "h": 358,
-      "credit": "no rights reserved",
-      "license": "CC0 1.0",
-      "page": "https://www.inaturalist.org/photos/604352228"
      }
     ]
    },
@@ -1815,14 +1801,6 @@
       "credit": "Nell Cant",
       "license": "CC BY 4.0",
       "page": "https://www.inaturalist.org/photos/161936314"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/38503110/medium.jpg",
-      "w": 500,
-      "h": 333,
-      "credit": "Adam Cushen",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/38503110"
      }
     ]
    },
@@ -2017,14 +1995,6 @@
       "page": "https://www.inaturalist.org/photos/60123702"
      },
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/399304213/medium.jpg",
-      "w": 375,
-      "h": 500,
-      "credit": "Nick Tobler (Cowturtle)",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/399304213"
-     },
-     {
       "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/399304615/medium.jpg",
       "w": 500,
       "h": 375,
@@ -2079,14 +2049,6 @@
       "credit": "jeanlouisamiet",
       "license": "CC BY 4.0",
       "page": "https://commons.wikimedia.org/wiki/File:Conraua_goliath_photo_from_iNaturalist_539752953.jpg"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/360001369/medium.jpeg",
-      "w": 500,
-      "h": 375,
-      "credit": "Ryan van Huyssteen",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/360001369"
      }
     ]
    },
@@ -2160,7 +2122,6 @@
     "cls": "Amphibian",
     "region": "Europe",
     "lengthM": 0.15,
-    "venomous": false,
     "status": "Least concern"
    },
    "lookalikes": [
@@ -2190,22 +2151,6 @@
       "credit": "Rainer Theuer.",
       "license": "Public domain",
       "page": "https://commons.wikimedia.org/wiki/File:Kammmolchmaennchen.jpg"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/188697048/medium.jpeg",
-      "w": 281,
-      "h": 500,
-      "credit": "Aurelijus Narbutas",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/188697048"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/368505629/medium.jpg",
-      "w": 500,
-      "h": 334,
-      "credit": "Joeb",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/368505629"
      }
     ]
    },

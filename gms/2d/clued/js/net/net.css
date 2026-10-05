@@ -107,7 +107,7 @@
 .net-step .medal { font-size: 34px; }
 @keyframes net-rise { from { transform: scaleY(0); } }
 
-@media (orientation: landscape) and (max-height: 500px) {
+@media (orientation: landscape) and (max-height: 500px) and (min-width: 640px) {
   .net-share { grid-template-columns: 104px 1fr; }
   .net-code { font-size: 32px; }
   .net-count3 .n { font-size: 84px; }

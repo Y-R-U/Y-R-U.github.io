@@ -1,7 +1,7 @@
 // Lane F shared helpers: CSS injection, timer stretch, fact maths, pointer drag. Used by F's formats only.
-import { normalize } from '../core/fuzzy.js?v=1';
-import { factText, shuffle } from './registry.js?v=1';
-import { basePoints } from '../core/scoring.js?v=1';
+import { normalize } from '../core/fuzzy.js?v=202610050139';
+import { factText, shuffle } from './registry.js?v=202610050139';
+import { basePoints } from '../core/scoring.js?v=202610050139';
 
 export const norm = normalize;
 
@@ -33,24 +33,11 @@ const BASE_CSS = `
 `;
 export function baseCSS() { injectCSS('f-base-css', BASE_CSS); }
 
-// The player's answer time suits a one-tap question; slow formats stretch it (never in online rooms, which sync deadlines).
-export function stretchTimer(api, el, factor) {
-  setTimeout(() => {
-    if (api.mode === 'online' || !el.isConnected) return;
-    const ring = el.closest('.play')?.querySelector('.ring');
-    if (!ring || ring.hidden) return;
-    const lim = api.timer.limit;
-    if (lim > 0 && api.timer.remaining() > 0) api.timer.start(Math.round(lim * factor));
-  }, 0);
-}
+// Slow formats declare `timeScale` on the format object; the runner stretches the answer time (never online).
 
-// Formats with their own clock (blitz60) hide the shared ring.
-export function ownClock(api, el) {
-  setTimeout(() => {
-    try { api.timer.stop(); } catch (e) {}
-    const ring = el.closest('.play')?.querySelector('.ring');
-    if (ring) ring.hidden = true;
-  }, 0);
+// Formats with their own clock (blitz60, manualTimer) never start the shared timer; the runner keeps its ring hidden.
+export function ownClock(api) {
+  try { api.timer.stop(); } catch (e) {}
 }
 
 // Call api.answer once at most.

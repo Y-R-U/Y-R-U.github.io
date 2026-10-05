@@ -5,6 +5,7 @@
  "icon": "💬",
  "kids": false,
  "version": 1,
+ "quotePrompt": "Who said or wrote it?",
  "notice": "Every quote is checked against Wikiquote. Famous misquotes appear as true-or-false questions.",
  "factsMeta": {
   "field": {
@@ -4110,5 +4111,6 @@
    "name": "Quote Investigator (misattributions)",
    "url": "https://quoteinvestigator.com"
   }
- ]
+ ],
+ "noun": "person"
 }

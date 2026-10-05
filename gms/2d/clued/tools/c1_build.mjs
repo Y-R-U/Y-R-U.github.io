@@ -233,7 +233,7 @@ async function buildPack(id) {
     if (it.skipFiles) for (const s of it.skipFiles) { const i = img.findIndex(x => x.page?.includes(encodeURIComponent(s.replace(/ /g, '_'))) || x.src.includes(s)); if (i >= 0) img.splice(i, 1); }
     const media = {};
     const cap = SKIP[id]?._max?.[iid] ?? photosWanted;
-    if (img.length) media.img = img.slice(0, cap).map(({ src, w, h, credit, license, page }) => mir({ src, w, h, credit, license, page }));
+    if (img.length && cap > 0) media.img = img.slice(0, cap).map(({ src, w, h, credit, license, page }) => mir({ src, w, h, credit, license, page }));
     else if (!S.noImages) warn.push(`${iid}: no images`);
     if (S.audio) {
       // Wikidata sometimes links a generic soundscape; keep only files whose title names this species
@@ -262,7 +262,7 @@ async function buildPack(id) {
     id: S.id, title: S.title, theme: S.theme, icon: S.icon, kids: !!S.kids, version: S.version || 1,
     ...(S.notice ? { notice: S.notice } : {}),
     ...(S.kidsSafe === false ? { kidsSafe: false } : {}),
-    ...Object.fromEntries(['imgPrompt', 'nameImgPrompt', 'tfImgPrompt'].filter(k => S[k]).map(k => [k, S[k]])),
+    ...Object.fromEntries(['imgPrompt', 'nameImgPrompt', 'tfImgPrompt', 'noun', 'fakePrompt'].filter(k => S[k]).map(k => [k, S[k]])),
     ...(S.leakExempt ? { leakExempt: S.leakExempt } : {}),
     factsMeta: Object.fromEntries(Object.entries(S.factsMeta || {}).map(([k, m]) => [k, { ...m, ...(S.tpl?.[k] || {}) }]).map(([k, m]) => [k, Object.fromEntries(Object.entries(m).filter(([kk, v]) => typeof v !== 'function' && !['noClue', 'yesClue', 'noClue2', 'hard'].includes(kk)))])),
     items,

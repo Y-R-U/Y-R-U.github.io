@@ -1,6 +1,6 @@
-import { register, poolItems, pickPack, byDifficulty, imageOf, factText, collect, pick, shuffle, sample } from './registry.js?v=1';
-import { h, imgEl } from '../ui/kit.js?v=1';
-import { norm, uniqueByName, injectCSS, baseCSS, stretchTimer, once, drag, hasImg } from './fkit.js?v=1';
+import { register, poolItems, pickPack, byDifficulty, imageOf, factText, collect, pick, shuffle, sample } from './registry.js?v=202610050139';
+import { h, imgEl } from '../ui/kit.js?v=202610050139';
+import { norm, uniqueByName, injectCSS, baseCSS, once, drag, hasImg } from './fkit.js?v=202610050139';
 
 const CSS = `
 .so{gap:10px}
@@ -103,7 +103,7 @@ function make(rng, pack, [type, key], cards, bins, difficulty, kids) {
 const CARDS = [6, 8, 10];
 
 export default register({
-  id: 'sort', title: 'Sort into bins', icon: '🗂️', blurb: 'Swipe each one into the right bin', tags: ['slow', 'kids'], kids: true,
+  id: 'sort', title: 'Sort into bins', icon: '🗂️', blurb: 'Swipe each one into the right bin', tags: ['slow', 'kids'], kids: true, timeScale: q => 1 + q.data.cards.length * 0.35,
   options: [
     { key: 'cards', label: 'Cards', type: 'choice', values: CARDS, default: 8, kidsValues: [6], kidsDefault: 6 },
     { key: 'bins', label: 'Bins', type: 'choice', values: [2, 3], default: 2, kidsHide: true },
@@ -138,7 +138,6 @@ export default register({
     const hint = h('div.so-hint', {}, d.bins.length === 2 ? 'Swipe left or right, or tap a bin' : 'Drag to a bin, or tap one');
     el.append(h('div.f-stage.so', {}, h('h2.q-prompt', {}, q.prompt), h('div.so-top', {}, counter, dots), deck,
       h('div.so-bins', { style: `--n:${d.bins.length}` }, ...bins), hint));
-    stretchTimer(api, el, 1 + N * 0.35);
     const cardEls = d.cards.map((c, i) => {
       const e = h('div.so-card', { class: c.img ? '' : 'text' }, c.img ? imgEl(c.img, { alt: c.text }) : null, h('span', {}, c.text));
       e.style.zIndex = String(N - i);

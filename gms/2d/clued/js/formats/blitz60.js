@@ -1,7 +1,7 @@
-import { register, poolItems, pickPack, collect, pick, factText } from './registry.js?v=1';
-import { h, typeBox } from '../ui/kit.js?v=1';
-import { fuzzyMatch, distance, answersFor } from '../core/fuzzy.js?v=1';
-import { norm, injectCSS, baseCSS, ownClock, once } from './fkit.js?v=1';
+import { register, poolItems, pickPack, collect, pick, factText } from './registry.js?v=202610050139';
+import { h, typeBox } from '../ui/kit.js?v=202610050139';
+import { fuzzyMatch, distance, answersFor } from '../core/fuzzy.js?v=202610050139';
+import { norm, injectCSS, baseCSS, ownClock, once } from './fkit.js?v=202610050139';
 
 const CSS = `
 .bz{gap:10px}
@@ -67,7 +67,7 @@ function make(rng, pack, difficulty) {
 }
 
 export default register({
-  id: 'blitz60', title: 'Name them all', icon: '⏱️', blurb: 'As many as you can in 60 seconds', tags: ['slow', 'nodaily'], manualTimer: true,
+  id: 'blitz60', title: 'Name them all', icon: '⏱️', blurb: 'As many as you can in 60 seconds', tags: ['slow', 'nodaily'], manualTimer: true, minPerPack: 2,
   options: [],
   supports(info) {
     return info.items >= 6 ? true : 'Needs at least 6 items';

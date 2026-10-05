@@ -13,15 +13,15 @@
    "type": "year",
    "label": "Born",
    "higherLabel": "Born later",
-   "askHigh": "Who of these was born most recently?",
-   "askLow": "Who of these was born first?"
+   "askHigh": "Which of these people was born most recently?",
+   "askLow": "Which of these people was born first?"
   },
   "died": {
    "type": "year",
    "label": "Died",
    "higherLabel": "Died later",
-   "askHigh": "Who of these died most recently?",
-   "askLow": "Who of these died first?"
+   "askHigh": "Which of these people died most recently?",
+   "askLow": "Which of these people died first?"
   },
   "nationality": {
    "type": "cat",
@@ -6524,5 +6524,6 @@
    "name": "Wikimedia Commons (portraits, licence-checked)",
    "url": "https://commons.wikimedia.org"
   }
- ]
+ ],
+ "noun": "famous person"
 }

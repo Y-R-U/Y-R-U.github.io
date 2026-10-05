@@ -79,7 +79,9 @@ body.kids-on .kids-toggle { border-style: solid; border-color: var(--ink); backg
 .opt-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 10px 0; border-bottom: 2px dashed rgba(31, 26, 77, .15); }
 .opt-row:last-child { border-bottom: 0; }
 .opt-row .lbl small { display: block; font-size: 13px; color: var(--ink-2); font-weight: 700; }
-.start-bar { position: sticky; bottom: 0; padding: 14px 0 calc(8px + var(--sab)); background: linear-gradient(transparent, var(--paper) 30%); margin-top: 8px; }
+.start-bar { position: sticky; bottom: 0; padding: 14px 0 calc(14px + var(--sab)); background: linear-gradient(transparent, var(--paper) 30%); margin-top: 8px; }
+/* sticky sits above the screen's bottom padding, so content showed through under the bar: the bar brings its own */
+.screen:has(> .start-bar) { padding-bottom: 0; }
 .custom-n { width: 84px; min-height: 40px; padding: 4px 10px; font-size: 16px; }
 
 /* theme picker */
@@ -190,7 +192,7 @@ body.kids-on .kids-toggle { border-style: solid; border-color: var(--ink); backg
   .screen > * { max-width: 720px; }
   .scr-home > *, .scr-setup > *, .scr-settings > *, .scr-results > * { max-width: 600px; }
 }
-@media (orientation: landscape) and (max-height: 500px) {
+@media (orientation: landscape) and (max-height: 500px) and (min-width: 640px) {
   .tiles { grid-template-columns: repeat(4, 1fr); }
   .screen > * { max-width: 820px; }
   .home-grid { display: grid; grid-template-columns: 1fr 1.3fr; gap: 16px; align-items: start; }

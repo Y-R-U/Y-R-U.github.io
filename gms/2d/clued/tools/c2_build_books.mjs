@@ -57,7 +57,7 @@ const items = rows.filter(r => ents[q[r.title]]).map(r => {
     blurb: `${r.name} (${r.year}) by ${r.author}. ${SUMMARIES[r.name]}`,
     summary: SUMMARIES[r.name], clues, difficulty: r.d,
   };
-  if (r.first) Object.assign(it, { firstLine: r.first, firstLineSource: r.firstSource, ...(tr ? { translator: tr } : {}) });
+  if (r.first) Object.assign(it, { firstLine: r.first.replace(/[;:,]$/, '…'), firstLineSource: r.firstSource, ...(tr ? { translator: tr } : {}) });
   return it;
 });
 function centuryOf(y) { const c = Math.floor((y - 1) / 100) + 1; return `${c}${c % 10 === 1 && c !== 11 ? 'st' : c % 10 === 2 && c !== 12 ? 'nd' : c % 10 === 3 && c !== 13 ? 'rd' : 'th'} century`; }
@@ -96,7 +96,7 @@ writePack({
     year: { type: 'year', label: 'First published', higherLabel: 'Newer', askHigh: 'Which of these books was published most recently?', askLow: 'Which of these books was published first?' },
     genre: { type: 'cat', label: 'Genre', exclusive: false },
     century: { type: 'cat', label: 'Century', ask: 'In which century was {name} first published?', stmt: '{name} was first published in the {value}.' },
-    kids: { type: 'bool', label: "Children's book", yes: "Children's book", no: 'Not a children’s book', askBool: "Which of these is a children's book?" },
+    kids: { type: 'bool', label: "Children's book", yes: "Children's book", no: 'Not a children’s book', askBool: "Which of these is a children's book?", stmt: "{name} is a children's book." },
   },
   items, questions: qs,
   fakes: ['The Lantern of Wexmoor', 'A Map of Quiet Rivers', 'The Brass Orchard', 'Mrs Pemberton’s Umbrella', 'The Ninth Lighthouse', 'Children of the Salt Road', 'The Clockwork Duchess', 'Winter at Hollowmere'],

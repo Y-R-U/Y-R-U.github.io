@@ -1,6 +1,6 @@
-import { register, poolItems, pickPack, byDifficulty, imageOf, collect, pick, shuffle } from './registry.js?v=1';
-import { h, imgEl } from '../ui/kit.js?v=1';
-import { numericKeys, numOf, spreadSet, rangeOf, fmtFact, uniqueByName, injectCSS, baseCSS, stretchTimer, once, drag, hasImg } from './fkit.js?v=1';
+import { register, poolItems, pickPack, byDifficulty, imageOf, collect, pick, shuffle } from './registry.js?v=202610050139';
+import { h, imgEl } from '../ui/kit.js?v=202610050139';
+import { numericKeys, numOf, spreadSet, rangeOf, fmtFact, uniqueByName, injectCSS, baseCSS, once, drag, hasImg } from './fkit.js?v=202610050139';
 
 const CSS = `
 .or-wrap{display:flex;flex-direction:column;gap:6px}
@@ -9,7 +9,7 @@ const CSS = `
 .or-it{position:relative;display:flex;align-items:center;gap:10px;min-height:58px;padding:6px 8px 6px 6px;background:#fff;border:var(--line) solid var(--ink);border-radius:14px;box-shadow:var(--shadow-sm);font-weight:900;font-size:17px;line-height:1.15;touch-action:none;user-select:none;cursor:grab;animation:ch-in .35s cubic-bezier(.2,1.4,.4,1) both;animation-delay:calc(var(--i)*40ms)}
 .or-it .pos{flex:none;width:30px;height:30px;border-radius:9px;background:var(--grape);color:#fff;display:grid;place-items:center;font-family:var(--font-display);font-weight:400;font-size:17px;border:2px solid var(--ink)}
 .or-it img{flex:none;width:58px;height:44px;object-fit:cover;border-radius:8px;border:2px solid var(--ink);background:#eee}
-.or-it .nm{flex:1;min-width:0;overflow-wrap:anywhere}
+.or-it .nm{flex:1;min-width:4.5em;overflow-wrap:break-word;hyphens:auto}
 .or-it .val{flex:none;font-family:var(--font-display);font-weight:400;font-size:17px;color:var(--grape);display:none}
 .or-it .mv{flex:none;display:flex;flex-direction:column;gap:2px}
 .or-it .mv button{width:34px;height:24px;border:2px solid var(--ink);border-radius:7px;background:#f1edff;font-size:12px;line-height:1;padding:0}
@@ -79,7 +79,7 @@ function fromQuestion(rng, pack, difficulty) {
 const COUNTS = [4, 5, 6];
 
 export default register({
-  id: 'order', title: 'Put in order', icon: '↕️', blurb: 'Drag them into the right order', tags: ['slow'],
+  id: 'order', title: 'Put in order', icon: '↕️', blurb: 'Drag them into the right order', tags: ['slow'], timeScale: q => 1 + q.data.items.length * 0.5,
   options: [{ key: 'items', label: 'Items', type: 'choice', values: COUNTS, default: 4, kidsValues: [4], kidsDefault: 4 }],
   supports(info) {
     const c = info.caps || {};
@@ -124,7 +124,6 @@ export default register({
     const check = h('button.btn.go', { type: 'button', onclick: () => grade() }, 'Check order');
     el.append(h('div.f-stage.or', {}, h('div.or-head', {}, h('h2.q-prompt', {}, q.prompt)),
       h('div.or-wrap', {}, h('div.or-cap', {}, '▲ ' + d.caps[0]), list, d.caps[1] ? h('div.or-cap', {}, '▼ ' + d.caps[1]) : null, h('div.or-foot', {}, check))));
-    stretchTimer(api, el, 1 + n * 0.5);
 
     function layoutList(animate = true) {
       const before = new Map(cards.map(c => [c, c.getBoundingClientRect().top]));

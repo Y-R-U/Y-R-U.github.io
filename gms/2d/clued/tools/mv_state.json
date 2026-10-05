@@ -66,9 +66,9 @@
   "at": "2026-10-04T15:31:07.069Z"
  },
  "pinocchio-3": {
-  "seed": 56581,
+  "seed": 64500,
   "model": "flux2-klein-9b-mlx-4bit",
-  "at": "2026-10-04T15:35:26.541Z",
+  "at": "2026-10-04T22:27:28.440Z",
   "attempt": 1
  },
  "fantasia-1": {
@@ -108,10 +108,10 @@
   "at": "2026-10-04T15:57:48.949Z"
  },
  "its-a-wonderful-life-1": {
-  "seed": 30535,
+  "seed": 46373,
   "model": "flux2-klein-9b-mlx-4bit",
-  "at": "2026-10-04T15:59:42.701Z",
-  "attempt": 1
+  "at": "2026-10-04T23:08:50.763Z",
+  "attempt": 2
  },
  "cinderella-1": {
   "seed": 15828,
@@ -140,9 +140,9 @@
   "dropped": true
  },
  "lady-and-the-tramp-1": {
-  "seed": 10996,
+  "seed": 18915,
   "model": "flux2-klein-9b-mlx-4bit",
-  "at": "2026-10-04T16:12:53.417Z",
+  "at": "2026-10-04T20:35:12.372Z",
   "attempt": 1
  },
  "the-ten-commandments-1": {
@@ -176,9 +176,9 @@
   "at": "2026-10-04T16:23:32.693Z"
  },
  "breakfast-at-tiffanys-1": {
-  "seed": 87193,
+  "seed": 95112,
   "model": "flux2-klein-9b-mlx-4bit",
-  "at": "2026-10-04T16:25:00.785Z",
+  "at": "2026-10-04T20:36:22.545Z",
   "attempt": 1
  },
  "lawrence-of-arabia-1": {
@@ -227,9 +227,9 @@
   "at": "2026-10-04T16:37:49.352Z"
  },
  "willy-wonka-1": {
-  "seed": 46095,
+  "seed": 54014,
   "model": "flux2-klein-9b-mlx-4bit",
-  "at": "2026-10-04T16:39:09.794Z",
+  "at": "2026-10-04T20:37:37.753Z",
   "attempt": 1
  },
  "the-godfather-1": {
@@ -251,11 +251,6 @@
   "seed": 54797,
   "model": "flux2-klein-9b-mlx-4bit",
   "at": "2026-10-04T16:44:37.054Z"
- },
- "close-encounters-1": {
-  "seed": 49430,
-  "model": "flux2-klein-9b-mlx-4bit",
-  "at": "2026-10-04T16:45:59.792Z"
  },
  "saturday-night-fever-1": {
   "seed": 19588,
@@ -287,11 +282,6 @@
   "model": "flux2-klein-9b-mlx-4bit",
   "at": "2026-10-04T16:54:16.593Z"
  },
- "et-1": {
-  "seed": 43590,
-  "model": "flux2-klein-9b-mlx-4bit",
-  "at": "2026-10-04T16:55:41.925Z"
- },
  "ghostbusters-1": {
   "seed": 88056,
   "model": "flux2-klein-9b-mlx-4bit",
@@ -303,9 +293,9 @@
   "at": "2026-10-04T16:58:32.452Z"
  },
  "the-terminator-1": {
-  "seed": 28488,
+  "seed": 36407,
   "model": "flux2-klein-9b-mlx-4bit",
-  "at": "2026-10-04T16:59:52.693Z",
+  "at": "2026-10-04T20:38:50.471Z",
   "attempt": 1
  },
  "the-neverending-story-1": {
@@ -314,9 +304,9 @@
   "at": "2026-10-04T17:01:12.950Z"
  },
  "back-to-the-future-1": {
-  "seed": 34316,
+  "seed": 42235,
   "model": "flux2-klein-9b-mlx-4bit",
-  "at": "2026-10-04T17:02:30.705Z",
+  "at": "2026-10-04T20:40:08.190Z",
   "attempt": 1
  },
  "the-goonies-1": {
@@ -355,9 +345,9 @@
   "at": "2026-10-04T17:12:07.446Z"
  },
  "the-little-mermaid-1": {
-  "seed": 59063,
+  "seed": 66982,
   "model": "flux2-klein-9b-mlx-4bit",
-  "at": "2026-10-04T17:13:32.704Z",
+  "at": "2026-10-04T20:41:20.877Z",
   "attempt": 1
  },
  "field-of-dreams-1": {
@@ -441,9 +431,9 @@
   "at": "2026-10-04T17:32:25.820Z"
  },
  "speed-1": {
-  "seed": 72514,
+  "seed": 80433,
   "model": "flux2-klein-9b-mlx-4bit",
-  "at": "2026-10-04T17:33:28.464Z",
+  "at": "2026-10-04T20:42:31.071Z",
   "attempt": 1
  },
  "toy-story-1": {
@@ -536,11 +526,6 @@
   "model": "flux2-klein-9b-mlx-4bit",
   "at": "2026-10-04T17:53:16.374Z"
  },
- "harry-potter-1-1": {
-  "seed": 83002,
-  "model": "flux2-klein-9b-mlx-4bit",
-  "at": "2026-10-04T17:54:26.534Z"
- },
  "lotr-fellowship-1": {
   "seed": 63310,
   "model": "flux2-klein-9b-mlx-4bit",
@@ -587,13 +572,17 @@
   "at": "2026-10-04T18:05:20.756Z"
  },
  "godzilla-2": {
-  "dropped": true
+  "dropped": true,
+  "seed": 71396,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-04T19:23:33.652Z"
  },
  "cars-1": {
-  "seed": 29120,
+  "seed": 44958,
   "model": "flux2-klein-9b-mlx-4bit",
-  "at": "2026-10-04T18:07:47.273Z",
-  "attempt": 1
+  "at": "2026-10-04T23:10:03.460Z",
+  "attempt": 2,
+  "dropped": true
  },
  "happy-feet-1": {
   "seed": 63714,
@@ -636,9 +625,9 @@
   "at": "2026-10-04T18:23:59.791Z"
  },
  "inception-1": {
-  "seed": 27126,
+  "seed": 35045,
   "model": "flux2-klein-9b-mlx-4bit",
-  "at": "2026-10-04T18:26:06.088Z",
+  "at": "2026-10-04T20:44:53.942Z",
   "attempt": 1
  },
  "tangled-1": {
@@ -682,9 +671,9 @@
   "at": "2026-10-04T18:43:15.968Z"
  },
  "paddington-1": {
-  "seed": 14677,
+  "seed": 22596,
   "model": "flux2-klein-9b-mlx-4bit",
-  "at": "2026-10-04T18:45:21.206Z",
+  "at": "2026-10-04T20:46:06.645Z",
   "attempt": 1
  },
  "the-grand-budapest-hotel-1": {
@@ -733,14 +722,16 @@
   "at": "2026-10-04T18:58:38.936Z"
  },
  "dune-1": {
-  "seed": 13889,
+  "seed": 21808,
   "model": "flux2-klein-9b-mlx-4bit",
-  "at": "2026-10-04T19:00:04.601Z"
+  "at": "2026-10-04T20:47:14.330Z",
+  "attempt": 1
  },
  "encanto-1": {
-  "seed": 38983,
+  "seed": 46902,
   "model": "flux2-klein-9b-mlx-4bit",
-  "at": "2026-10-04T19:01:22.338Z"
+  "at": "2026-10-04T20:48:24.512Z",
+  "attempt": 1
  },
  "luca-1": {
   "seed": 2056,
@@ -798,13 +789,1432 @@
   "at": "2026-10-04T19:18:32.673Z"
  },
  "singin-in-the-rain-2": {
-  "seed": 86821,
+  "seed": 94740,
   "model": "flux2-klein-9b-mlx-4bit",
-  "at": "2026-10-04T19:19:57.911Z"
+  "at": "2026-10-04T20:49:34.696Z",
+  "attempt": 1,
+  "dropped": true
  },
  "peter-pan-2": {
   "seed": 4488,
   "model": "flux2-klein-9b-mlx-4bit",
   "at": "2026-10-04T19:21:08.120Z"
+ },
+ "rear-window-2": {
+  "seed": 88905,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-04T19:22:15.949Z"
+ },
+ "lady-and-the-tramp-2": {
+  "seed": 33853,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-04T19:24:48.831Z"
+ },
+ "the-ten-commandments-2": {
+  "seed": 52152,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-04T19:26:04.032Z"
+ },
+ "20000-leagues-under-the-sea-2": {
+  "seed": 63962,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-04T19:27:24.227Z"
+ },
+ "north-by-northwest-2": {
+  "seed": 83411,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-04T20:50:47.423Z",
+  "attempt": 1
+ },
+ "ben-hur-2": {
+  "seed": 20051,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-04T19:30:09.683Z"
+ },
+ "sleeping-beauty-2": {
+  "seed": 51444,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-04T19:31:24.957Z"
+ },
+ "101-dalmatians-2": {
+  "seed": 17925,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-04T19:32:50.166Z"
+ },
+ "breakfast-at-tiffanys-2": {
+  "seed": 64336,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-04T19:34:02.863Z"
+ },
+ "lawrence-of-arabia-2": {
+  "seed": 56208,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-04T19:35:15.561Z"
+ },
+ "the-birds-2": {
+  "seed": 3578,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-04T19:36:30.817Z"
+ },
+ "the-great-escape-2": {
+  "seed": 43911,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-04T19:37:51.042Z",
+  "dropped": true
+ },
+ "mary-poppins-2": {
+  "seed": 48919,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-04T19:39:18.975Z"
+ },
+ "the-sound-of-music-2": {
+  "seed": 68933,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-04T19:40:50.274Z"
+ },
+ "the-jungle-book-2": {
+  "seed": 47514,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-04T20:51:55.076Z",
+  "attempt": 1
+ },
+ "2001-a-space-odyssey-2": {
+  "seed": 86885,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-04T19:43:33.370Z"
+ },
+ "planet-of-the-apes-2": {
+  "seed": 85378,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-04T19:44:56.127Z"
+ },
+ "chitty-chitty-bang-bang-2": {
+  "seed": 62683,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-04T19:46:24.277Z"
+ },
+ "willy-wonka-2": {
+  "seed": 83714,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-04T19:47:57.139Z"
+ },
+ "the-godfather-2": {
+  "seed": 11062,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-04T19:49:19.899Z"
+ },
+ "jaws-2": {
+  "seed": 87489,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-04T19:50:37.677Z"
+ },
+ "rocky-2": {
+  "seed": 20116,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-04T19:52:10.476Z"
+ },
+ "star-wars-2": {
+  "seed": 39859,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-04T20:53:07.758Z",
+  "attempt": 1
+ },
+ "saturday-night-fever-2": {
+  "seed": 42445,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-04T19:56:13.811Z"
+ },
+ "grease-2": {
+  "seed": 55881,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-04T19:57:34.096Z"
+ },
+ "alien-2": {
+  "seed": 38003,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-04T19:58:52.173Z",
+  "dropped": true
+ },
+ "apocalypse-now-2": {
+  "seed": 79052,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-04T20:00:12.405Z"
+ },
+ "the-shining-2": {
+  "seed": 73954,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-04T20:01:37.657Z"
+ },
+ "raiders-of-the-lost-ark-2": {
+  "seed": 41656,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-04T20:02:55.380Z"
+ },
+ "ghostbusters-2": {
+  "seed": 20913,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-04T20:05:50.907Z"
+ },
+ "the-karate-kid-2": {
+  "seed": 55143,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-04T20:07:16.127Z"
+ },
+ "the-terminator-2": {
+  "seed": 51345,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-04T20:08:41.570Z"
+ },
+ "the-neverending-story-2": {
+  "seed": 13343,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-04T20:10:11.843Z"
+ },
+ "back-to-the-future-2": {
+  "seed": 57173,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-04T20:11:32.093Z"
+ },
+ "the-goonies-2": {
+  "seed": 1884,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-04T20:12:54.811Z"
+ },
+ "top-gun-2": {
+  "seed": 30315,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-04T20:54:17.944Z",
+  "attempt": 1
+ },
+ "dirty-dancing-2": {
+  "seed": 58913,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-04T20:15:45.308Z",
+  "dropped": true
+ },
+ "the-princess-bride-2": {
+  "seed": 47046,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-04T20:17:18.465Z"
+ },
+ "ferris-buellers-day-off-2": {
+  "seed": 771,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-04T20:18:54.179Z"
+ },
+ "big-2": {
+  "seed": 64601,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-04T20:55:30.604Z",
+  "attempt": 1
+ },
+ "die-hard-2": {
+  "seed": 38474,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-04T20:21:29.807Z"
+ },
+ "the-little-mermaid-2": {
+  "seed": 6682,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-04T20:22:55.094Z"
+ },
+ "field-of-dreams-2": {
+  "seed": 9313,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-04T20:24:30.757Z"
+ },
+ "dead-poets-society-2": {
+  "seed": 45279,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-04T20:26:01.246Z"
+ },
+ "honey-i-shrunk-the-kids-2": {
+  "seed": 22555,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-04T20:27:26.568Z"
+ },
+ "kikis-delivery-service-2": {
+  "seed": 70480,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-04T20:28:49.312Z"
+ },
+ "home-alone-2": {
+  "seed": 13502,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-04T20:56:45.778Z",
+  "attempt": 1
+ },
+ "the-sound-of-music-3": {
+  "dropped": true
+ },
+ "the-godfather-3": {
+  "dropped": true
+ },
+ "the-shawshank-redemption-3": {
+  "dropped": true
+ },
+ "mulan-3": {
+  "dropped": true
+ },
+ "finding-nemo-3": {
+  "dropped": true
+ },
+ "up-3": {
+  "dropped": true
+ },
+ "interstellar-3": {
+  "dropped": true
+ },
+ "matilda-3": {
+  "dropped": true
+ },
+ "mary-poppins-3": {
+  "dropped": true
+ },
+ "ghost-2": {
+  "seed": 87103,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-04T20:31:27.294Z"
+ },
+ "edward-scissorhands-2": {
+  "seed": 13154,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-04T20:57:50.935Z"
+ },
+ "beauty-and-the-beast-2": {
+  "seed": 27134,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-04T20:58:58.982Z"
+ },
+ "aladdin-2": {
+  "seed": 31279,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-04T21:00:11.656Z"
+ },
+ "jurassic-park-2": {
+  "seed": 33905,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-04T21:01:16.841Z"
+ },
+ "mrs-doubtfire-2": {
+  "seed": 60559,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-04T21:02:24.507Z"
+ },
+ "groundhog-day-2": {
+  "seed": 66104,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-04T21:03:34.645Z"
+ },
+ "free-willy-2": {
+  "seed": 63074,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-04T21:04:49.976Z"
+ },
+ "the-lion-king-2": {
+  "seed": 45460,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-04T21:06:00.167Z"
+ },
+ "forrest-gump-2": {
+  "seed": 2399,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-04T21:07:15.324Z"
+ },
+ "the-shawshank-redemption-2": {
+  "seed": 61782,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-04T21:08:22.982Z"
+ },
+ "speed-2": {
+  "seed": 34895,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-04T21:09:33.194Z",
+  "dropped": true
+ },
+ "toy-story-2": {
+  "seed": 67776,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-04T21:10:38.352Z"
+ },
+ "jumanji-2": {
+  "seed": 26337,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-04T23:11:08.679Z",
+  "attempt": 1
+ },
+ "babe-2": {
+  "seed": 24246,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-04T21:13:06.254Z"
+ },
+ "apollo-13-2": {
+  "seed": 41798,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-04T21:14:11.448Z"
+ },
+ "independence-day-2": {
+  "seed": 20091,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-04T21:15:19.105Z"
+ },
+ "twister-2": {
+  "seed": 31636,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-04T21:16:26.785Z"
+ },
+ "matilda-2": {
+  "seed": 37044,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-04T21:17:34.463Z"
+ },
+ "titanic-2": {
+  "seed": 61050,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-04T21:18:47.242Z"
+ },
+ "men-in-black-2": {
+  "seed": 11912,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-04T21:20:02.524Z"
+ },
+ "mulan-2": {
+  "seed": 54853,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-04T21:21:15.239Z"
+ },
+ "armageddon-2": {
+  "seed": 28806,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-04T21:22:25.405Z"
+ },
+ "the-matrix-2": {
+  "seed": 71993,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-04T21:23:33.087Z"
+ },
+ "the-iron-giant-2": {
+  "seed": 63214,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-04T21:24:40.833Z"
+ },
+ "stuart-little-2": {
+  "seed": 15922,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-04T21:25:51.013Z"
+ },
+ "gladiator-2": {
+  "seed": 62413,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-04T21:27:06.222Z"
+ },
+ "cast-away-2": {
+  "seed": 75620,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-04T21:28:16.400Z"
+ },
+ "chicken-run-2": {
+  "seed": 48411,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-04T21:29:26.599Z"
+ },
+ "shrek-2": {
+  "seed": 21623,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-04T21:30:39.264Z"
+ },
+ "lotr-fellowship-2": {
+  "seed": 25691,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-04T21:33:04.614Z"
+ },
+ "monsters-inc-2": {
+  "seed": 75096,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-04T21:34:17.397Z"
+ },
+ "spirited-away-2": {
+  "seed": 57409,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-04T21:35:30.131Z"
+ },
+ "ice-age-2": {
+  "seed": 6801,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-04T21:36:40.304Z"
+ },
+ "finding-nemo-2": {
+  "seed": 58719,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-04T21:37:50.499Z"
+ },
+ "pirates-of-the-caribbean-2": {
+  "seed": 23994,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-04T21:39:00.682Z"
+ },
+ "elf-2": {
+  "seed": 25625,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-04T21:40:15.881Z",
+  "dropped": true
+ },
+ "the-polar-express-2": {
+  "seed": 69671,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-04T21:41:33.595Z"
+ },
+ "madagascar-2": {
+  "seed": 43998,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-04T21:42:43.758Z"
+ },
+ "cars-2": {
+  "seed": 51977,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-04T21:43:51.440Z",
+  "dropped": true
+ },
+ "happy-feet-2": {
+  "seed": 26095,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-04T21:45:04.102Z"
+ },
+ "night-at-the-museum-2": {
+  "seed": 40713,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-04T21:46:14.326Z"
+ },
+ "ratatouille-2": {
+  "seed": 30932,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-04T21:47:24.473Z"
+ },
+ "wall-e-2": {
+  "seed": 17460,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-04T21:48:29.608Z"
+ },
+ "kung-fu-panda-2": {
+  "seed": 24786,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-04T21:49:39.785Z"
+ },
+ "mamma-mia-2": {
+  "seed": 75791,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-04T21:50:52.512Z"
+ },
+ "up-2": {
+  "seed": 77663,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-04T21:52:05.175Z"
+ },
+ "avatar-2": {
+  "seed": 7707,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-04T21:53:15.350Z"
+ },
+ "inception-2": {
+  "seed": 79507,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-04T21:54:30.524Z"
+ },
+ "tangled-2": {
+  "seed": 15581,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-04T21:55:43.240Z"
+ },
+ "how-to-train-your-dragon-2": {
+  "seed": 64341,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-04T21:56:58.478Z"
+ },
+ "life-of-pi-2": {
+  "seed": 57050,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-04T21:58:08.653Z"
+ },
+ "brave-2": {
+  "seed": 31890,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-04T21:59:18.865Z"
+ },
+ "the-hunger-games-2": {
+  "seed": 89301,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-04T22:00:31.545Z"
+ },
+ "frozen-2": {
+  "seed": 58968,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-04T22:01:44.202Z"
+ },
+ "gravity-2": {
+  "seed": 56734,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-04T22:02:59.401Z"
+ },
+ "interstellar-2": {
+  "seed": 3177,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-04T22:04:07.179Z"
+ },
+ "paddington-2": {
+  "seed": 81820,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-04T22:05:22.403Z",
+  "dropped": true
+ },
+ "the-grand-budapest-hotel-2": {
+  "seed": 48284,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-04T22:06:37.591Z"
+ },
+ "mad-max-fury-road-2": {
+  "seed": 29033,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-04T22:07:50.260Z"
+ },
+ "inside-out-2": {
+  "seed": 87403,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-04T22:09:02.949Z"
+ },
+ "the-martian-2": {
+  "seed": 48886,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-04T22:10:18.132Z"
+ },
+ "la-la-land-2": {
+  "seed": 38963,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-04T22:11:33.340Z"
+ },
+ "moana-2": {
+  "seed": 71758,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-04T22:12:41.037Z"
+ },
+ "zootopia-2": {
+  "seed": 51535,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-04T22:13:48.700Z"
+ },
+ "coco-2": {
+  "seed": 66330,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-04T22:15:06.372Z"
+ },
+ "dunkirk-2": {
+  "seed": 81496,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-04T22:16:19.055Z"
+ },
+ "dune-2": {
+  "seed": 81032,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-04T22:17:31.915Z",
+  "dropped": true
+ },
+ "encanto-2": {
+  "seed": 76602,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-04T22:18:47.116Z"
+ },
+ "luca-2": {
+  "seed": 32832,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-04T23:12:21.495Z",
+  "attempt": 1,
+  "dropped": true
+ },
+ "turning-red-2": {
+  "seed": 25951,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-04T22:21:14.976Z"
+ },
+ "everything-everywhere-all-at-once-2": {
+  "seed": 28204,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-04T22:22:22.627Z"
+ },
+ "oppenheimer-2": {
+  "seed": 36732,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-04T22:23:40.314Z"
+ },
+ "the-wild-robot-2": {
+  "seed": 21293,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-04T22:25:00.509Z"
+ },
+ "wicked-2": {
+  "seed": 39869,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-04T22:26:13.197Z",
+  "dropped": true
+ },
+ "cinderella-3": {
+  "seed": 1066,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-04T22:28:41.174Z"
+ },
+ "sleeping-beauty-3": {
+  "seed": 89063,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-04T22:29:51.341Z"
+ },
+ "101-dalmatians-3": {
+  "seed": 70306,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-04T22:31:04.003Z"
+ },
+ "the-jungle-book-3": {
+  "seed": 1976,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-04T22:32:14.215Z"
+ },
+ "2001-a-space-odyssey-3": {
+  "seed": 49266,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-04T22:33:26.918Z",
+  "dropped": true
+ },
+ "willy-wonka-3": {
+  "seed": 31333,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-04T22:34:42.146Z"
+ },
+ "jaws-3": {
+  "seed": 49870,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-04T22:35:54.856Z"
+ },
+ "star-wars-3": {
+  "seed": 69559,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-04T22:37:07.493Z"
+ },
+ "the-shining-3": {
+  "seed": 21573,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-04T22:38:10.136Z"
+ },
+ "raiders-of-the-lost-ark-3": {
+  "seed": 79275,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-04T22:39:22.814Z"
+ },
+ "ghostbusters-3": {
+  "seed": 73294,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-04T22:41:48.212Z"
+ },
+ "back-to-the-future-3": {
+  "seed": 19554,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-04T22:42:58.390Z"
+ },
+ "the-little-mermaid-3": {
+  "seed": 44301,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-04T22:44:16.085Z"
+ },
+ "home-alone-3": {
+  "seed": 57964,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-04T22:45:31.350Z"
+ },
+ "beauty-and-the-beast-3": {
+  "seed": 64753,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-04T22:46:49.078Z"
+ },
+ "aladdin-3": {
+  "seed": 83660,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-04T22:48:04.284Z"
+ },
+ "jurassic-park-3": {
+  "seed": 86286,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-04T22:49:16.952Z"
+ },
+ "the-lion-king-3": {
+  "seed": 83079,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-04T22:50:24.998Z"
+ },
+ "forrest-gump-3": {
+  "seed": 54780,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-04T22:51:32.672Z"
+ },
+ "toy-story-3": {
+  "seed": 15395,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-04T22:52:50.465Z",
+  "dropped": true
+ },
+ "titanic-3": {
+  "seed": 8669,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-04T22:54:03.141Z",
+  "dropped": true
+ },
+ "the-matrix-3": {
+  "seed": 34374,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-04T22:55:15.813Z"
+ },
+ "cast-away-3": {
+  "seed": 23239,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-04T22:56:33.519Z"
+ },
+ "shrek-3": {
+  "seed": 74004,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-04T22:57:48.746Z"
+ },
+ "lotr-fellowship-3": {
+  "seed": 78072,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-04T23:00:11.614Z"
+ },
+ "spirited-away-3": {
+  "seed": 19790,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-04T23:01:24.276Z"
+ },
+ "pirates-of-the-caribbean-3": {
+  "seed": 61613,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-04T23:02:39.652Z"
+ },
+ "ratatouille-3": {
+  "seed": 68551,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-04T23:03:54.801Z"
+ },
+ "inception-3": {
+  "seed": 41888,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-04T23:05:09.997Z"
+ },
+ "frozen-3": {
+  "seed": 6587,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-04T23:06:22.678Z"
+ },
+ "moana-3": {
+  "seed": 19377,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-04T23:07:37.902Z"
+ },
+ "close-encounters-of-the-third-kind-1": {
+  "seed": 49430,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-04T16:45:59.792Z"
+ },
+ "close-encounters-of-the-third-kind-2": {
+  "seed": 11811,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-04T19:54:50.965Z"
+ },
+ "e-t-the-extra-terrestrial-1": {
+  "seed": 43590,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-04T16:55:41.925Z"
+ },
+ "e-t-the-extra-terrestrial-2": {
+  "seed": 5971,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-04T20:04:23.088Z"
+ },
+ "e-t-the-extra-terrestrial-3": {
+  "seed": 58352,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-04T22:40:38.014Z"
+ },
+ "harry-potter-and-the-philosopher-s-stone-1": {
+  "seed": 83002,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-04T17:54:26.534Z"
+ },
+ "harry-potter-and-the-philosopher-s-stone-2": {
+  "seed": 45383,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-04T21:31:49.433Z"
+ },
+ "harry-potter-and-the-philosopher-s-stone-3": {
+  "seed": 7764,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-04T22:58:56.433Z"
+ },
+ "yellow-submarine-1": {
+  "seed": 61958,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-04T23:13:58.205Z"
+ },
+ "purple-rain-1": {
+  "seed": 59094,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-04T23:15:18.455Z"
+ },
+ "hotel-california-1": {
+  "seed": 80764,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-04T23:16:28.659Z"
+ },
+ "smoke-on-the-water-1": {
+  "seed": 5510,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-04T23:17:38.879Z"
+ },
+ "stairway-to-heaven-1": {
+  "seed": 31305,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-04T23:18:51.558Z"
+ },
+ "strawberry-fields-forever-1": {
+  "seed": 38522,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-04T23:20:04.245Z"
+ },
+ "here-comes-the-sun-1": {
+  "seed": 85068,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-04T23:21:19.472Z"
+ },
+ "octopuss-garden-1": {
+  "seed": 40321,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-04T23:22:32.156Z"
+ },
+ "blue-suede-shoes-1": {
+  "seed": 20347,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-04T23:23:42.340Z"
+ },
+ "jailhouse-rock-1": {
+  "seed": 56845,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-04T23:24:52.529Z"
+ },
+ "rocket-man-1": {
+  "seed": 59590,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-04T23:26:10.411Z"
+ },
+ "crocodile-rock-1": {
+  "seed": 71537,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-04T23:27:23.142Z"
+ },
+ "another-brick-in-the-wall-1": {
+  "seed": 73155,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-04T23:28:35.863Z"
+ },
+ "riders-on-the-storm-1": {
+  "seed": 28034,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-04T23:29:46.015Z"
+ },
+ "paint-it-black-1": {
+  "seed": 24391,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-04T23:31:01.194Z"
+ },
+ "umbrella-1": {
+  "seed": 1435,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-04T23:32:13.968Z"
+ },
+ "firework-1": {
+  "seed": 68846,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-04T23:33:31.648Z"
+ },
+ "roar-1": {
+  "seed": 27619,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-04T23:34:46.869Z"
+ },
+ "mr-blue-sky-1": {
+  "seed": 89039,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-04T23:36:02.065Z"
+ },
+ "waterloo-1": {
+  "seed": 34604,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-04T23:37:19.764Z"
+ },
+ "dancing-queen-1": {
+  "seed": 43650,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-04T23:38:32.441Z"
+ },
+ "bridge-over-troubled-water-1": {
+  "seed": 86937,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-04T23:39:47.626Z"
+ },
+ "black-hole-sun-1": {
+  "seed": 37000,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-04T23:41:02.817Z"
+ },
+ "ring-of-fire-1": {
+  "seed": 84504,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-04T23:42:15.531Z"
+ },
+ "big-yellow-taxi-1": {
+  "seed": 71748,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-05T00:14:27.866Z",
+  "attempt": 1
+ },
+ "starman-1": {
+  "seed": 11649,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-04T23:44:45.900Z"
+ },
+ "space-oddity-1": {
+  "seed": 64297,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-04T23:45:56.106Z"
+ },
+ "hungry-like-the-wolf-1": {
+  "seed": 63199,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-04T23:47:13.910Z"
+ },
+ "eye-of-the-tiger-1": {
+  "seed": 53914,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-04T23:48:24.119Z"
+ },
+ "wrecking-ball-1": {
+  "seed": 1749,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-04T23:49:34.294Z"
+ },
+ "island-in-the-sun-1": {
+  "seed": 81143,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-04T23:50:51.962Z"
+ },
+ "bad-moon-rising-1": {
+  "seed": 76925,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-04T23:52:04.636Z"
+ },
+ "sunflower-1": {
+  "seed": 87852,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-04T23:53:22.344Z"
+ },
+ "counting-stars-1": {
+  "seed": 31542,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-04T23:54:35.477Z"
+ },
+ "blinding-lights-1": {
+  "seed": 46531,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-05T00:19:26.079Z",
+  "attempt": 1
+ },
+ "levitating-1": {
+  "seed": 56526,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-04T23:57:11.185Z"
+ },
+ "rhinestone-cowboy-1": {
+  "seed": 65638,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-04T23:58:21.386Z"
+ },
+ "purple-haze-1": {
+  "seed": 55798,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-04T23:59:31.563Z"
+ },
+ "white-christmas-1": {
+  "seed": 87109,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-05T00:00:49.241Z"
+ },
+ "message-in-a-bottle-1": {
+  "seed": 42087,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-05T00:01:56.910Z"
+ },
+ "walking-on-the-moon-1": {
+  "seed": 21948,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-05T00:03:12.090Z"
+ },
+ "diamonds-1": {
+  "seed": 39158,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-05T00:04:27.354Z"
+ },
+ "wonderwall-1": {
+  "seed": 3220,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-05T00:05:42.549Z"
+ },
+ "candle-in-the-wind-1": {
+  "seed": 70129,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-05T00:06:57.761Z"
+ },
+ "lucy-in-the-sky-with-diamonds-1": {
+  "seed": 86773,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-05T00:08:10.440Z"
+ },
+ "moby-dick-1": {
+  "seed": 62948,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-05T00:09:25.846Z"
+ },
+ "treasure-island-1": {
+  "seed": 2692,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-05T00:10:43.575Z"
+ },
+ "alice-in-wonderland-1": {
+  "seed": 69852,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-05T00:12:01.254Z"
+ },
+ "robinson-crusoe-1": {
+  "seed": 39179,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-05T00:13:16.441Z"
+ },
+ "frankenstein-1": {
+  "seed": 15763,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-05T00:15:44.299Z"
+ },
+ "dracula-1": {
+  "seed": 66459,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-05T00:16:56.996Z"
+ },
+ "the-hobbit-1": {
+  "seed": 17857,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-05T00:18:12.204Z"
+ },
+ "around-the-world-in-eighty-days-1": {
+  "seed": 37100,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-05T00:20:45.026Z"
+ },
+ "pride-and-prejudice-1": {
+  "seed": 55193,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-05T00:22:02.946Z"
+ },
+ "jane-eyre-1": {
+  "seed": 59217,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-05T00:23:15.655Z"
+ },
+ "wuthering-heights-1": {
+  "seed": 55769,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-05T00:24:35.877Z"
+ },
+ "great-expectations-1": {
+  "seed": 49808,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-05T00:25:53.583Z"
+ },
+ "a-christmas-carol-1": {
+  "seed": 6667,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-05T00:27:08.780Z"
+ },
+ "oliver-twist-1": {
+  "seed": 74994,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-05T00:28:26.481Z"
+ },
+ "charlottes-web-1": {
+  "seed": 49749,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-05T00:29:44.173Z"
+ },
+ "the-lion-the-witch-and-the-wardrobe-1": {
+  "seed": 26360,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-05T00:31:04.372Z"
+ },
+ "the-very-hungry-caterpillar-1": {
+  "seed": 49155,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-05T00:32:22.061Z"
+ },
+ "james-and-the-giant-peach-1": {
+  "seed": 38707,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-05T00:33:29.735Z"
+ },
+ "the-bfg-1": {
+  "seed": 40282,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-05T00:34:44.930Z",
+  "attempt": 1
+ },
+ "fantastic-mr-fox-1": {
+  "seed": 67236,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-05T00:36:02.648Z"
+ },
+ "the-secret-garden-1": {
+  "seed": 14725,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-05T00:37:17.854Z"
+ },
+ "black-beauty-1": {
+  "seed": 79153,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-05T00:38:35.581Z",
+  "attempt": 1
+ },
+ "the-wind-in-the-willows-1": {
+  "seed": 26753,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-05T00:39:55.788Z"
+ },
+ "gullivers-travels-1": {
+  "seed": 72128,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-05T00:41:16.081Z"
+ },
+ "don-quixote-1": {
+  "seed": 31786,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-05T00:42:28.773Z"
+ },
+ "the-old-man-and-the-sea-1": {
+  "seed": 64955,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-05T00:43:41.502Z"
+ },
+ "lord-of-the-flies-1": {
+  "seed": 65300,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-05T00:44:59.258Z"
+ },
+ "the-great-gatsby-1": {
+  "seed": 12153,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-05T00:46:14.466Z"
+ },
+ "to-kill-a-mockingbird-1": {
+  "seed": 72711,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-05T00:47:32.184Z"
+ },
+ "nineteen-eighty-four-1": {
+  "seed": 77259,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-05T00:48:52.454Z"
+ },
+ "animal-farm-1": {
+  "seed": 75134,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-05T00:50:17.804Z"
+ },
+ "fahrenheit-451-1": {
+  "seed": 77110,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-05T00:51:38.033Z"
+ },
+ "the-war-of-the-worlds-1": {
+  "seed": 53763,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-05T00:52:58.225Z"
+ },
+ "the-time-machine-1": {
+  "seed": 31016,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-05T00:54:13.395Z"
+ },
+ "little-women-1": {
+  "seed": 83140,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-05T00:55:36.193Z"
+ },
+ "heidi-1": {
+  "seed": 76448,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-05T00:56:51.430Z"
+ },
+ "the-little-prince-1": {
+  "seed": 18377,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-05T00:58:09.124Z"
+ },
+ "peter-rabbit-1": {
+  "seed": 41070,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-05T00:59:26.843Z"
+ },
+ "the-hound-of-the-baskervilles-1": {
+  "seed": 25691,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-05T01:00:44.551Z"
+ },
+ "journey-to-the-centre-of-the-earth-1": {
+  "seed": 78914,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-05T01:02:02.269Z"
+ },
+ "the-call-of-the-wild-1": {
+  "seed": 47922,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-05T01:03:22.481Z"
+ },
+ "les-miserables-1": {
+  "seed": 26385,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-05T01:04:42.747Z"
+ },
+ "the-hunchback-of-notre-dame-1": {
+  "seed": 66915,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-05T01:05:57.980Z"
+ },
+ "the-count-of-monte-cristo-1": {
+  "seed": 34957,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-05T01:07:13.153Z"
+ },
+ "the-three-musketeers-1": {
+  "seed": 19962,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-05T01:08:25.855Z"
+ },
+ "anne-of-green-gables-1": {
+  "seed": 49752,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-05T01:09:43.704Z"
+ },
+ "hitchhikers-guide-1": {
+  "seed": 56690,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-05T01:11:03.899Z"
+ },
+ "watership-down-1": {
+  "seed": 56843,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-05T01:12:21.597Z"
+ },
+ "moby-dick-2": {
+  "seed": 85805,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-05T01:13:39.292Z"
+ },
+ "treasure-island-2": {
+  "seed": 25549,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-05T01:14:52.029Z"
+ },
+ "alice-in-wonderland-2": {
+  "seed": 2709,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-05T01:16:07.275Z"
+ },
+ "robinson-crusoe-2": {
+  "seed": 76798,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-05T01:17:27.481Z"
+ },
+ "frankenstein-2": {
+  "seed": 53382,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-05T01:18:43.045Z"
+ },
+ "dracula-2": {
+  "seed": 14078,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-05T01:20:03.249Z"
+ },
+ "the-hobbit-2": {
+  "seed": 85000,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-05T01:21:18.456Z"
+ },
+ "around-the-world-in-eighty-days-2": {
+  "seed": 59957,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-05T01:22:41.292Z"
+ },
+ "pride-and-prejudice-2": {
+  "seed": 32336,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-05T01:24:01.477Z"
+ },
+ "jane-eyre-2": {
+  "seed": 36360,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-05T01:25:19.184Z"
+ },
+ "wuthering-heights-2": {
+  "seed": 32912,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-05T01:26:34.410Z"
+ },
+ "great-expectations-2": {
+  "seed": 72665,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-05T01:27:52.127Z"
+ },
+ "a-christmas-carol-2": {
+  "seed": 44286,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-05T01:29:04.817Z"
+ },
+ "oliver-twist-2": {
+  "seed": 37375,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-05T01:30:22.531Z"
+ },
+ "charlottes-web-2": {
+  "seed": 26892,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-05T01:32:05.633Z"
+ },
+ "the-lion-the-witch-and-the-wardrobe-2": {
+  "seed": 49217,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-05T01:33:33.855Z"
+ },
+ "the-very-hungry-caterpillar-2": {
+  "seed": 86774,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-05T01:34:51.624Z"
+ },
+ "james-and-the-giant-peach-2": {
+  "seed": 76326,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-05T01:36:21.828Z"
+ },
+ "the-bfg-2": {
+  "seed": 2663,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-05T01:37:42.168Z"
  }
 }

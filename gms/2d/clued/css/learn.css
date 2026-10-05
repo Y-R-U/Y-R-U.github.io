@@ -143,7 +143,7 @@ body.kids-on .l-item-nav { background: #fff4c9; box-shadow: 0 -14px 14px -2px #f
   .l-item { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); align-items: start; }
   .l-item-media { position: sticky; top: 64px; }
 }
-@media (orientation: landscape) and (max-height: 500px) {
+@media (orientation: landscape) and (max-height: 500px) and (min-width: 640px) {
   .l-slide, .l-noimg { aspect-ratio: auto; height: calc(100vh - 120px); }
   .l-item-nav { position: static; box-shadow: none; background: none; padding-top: 4px; }
   body.kids-on .l-item-nav { box-shadow: none; background: none; }
@@ -182,7 +182,7 @@ body.kids-on .l-item-nav { background: #fff4c9; box-shadow: 0 -14px 14px -2px #f
 .l-grades .btn small { font-size: 12px; opacity: .85; font-weight: 800; }
 .l-done { text-align: center; padding: 20px 0; }
 .l-done h2 { font-size: 30px; }
-@media (orientation: landscape) and (max-height: 500px) {
+@media (orientation: landscape) and (max-height: 500px) and (min-width: 640px) {
   .screen.learn-wide > .l-review { max-width: 760px; }
   .l-review { display: grid; grid-template-columns: 1.1fr 1fr; align-items: start; }
   .l-rv-top { grid-column: 1 / -1; }
@@ -201,7 +201,7 @@ body.kids-on .l-item-nav { background: #fff4c9; box-shadow: 0 -14px 14px -2px #f
 .l-legend .lm0 { background: #f6efdc; } .l-legend .lm1 { background: #e3dcf7; } .l-legend .lm2 { background: #ffd977; } .l-legend .lm3 { background: #3fc58f; }
 .gm .is-lm1 { fill: #e3dcf7 !important; } .gm .is-lm2 { fill: #ffd977 !important; } .gm .is-lm3 { fill: #3fc58f !important; stroke: #1c7a52 !important; }
 .l-mapwrap .tiny { text-align: center; margin: 6px 0 2px; }
-@media (orientation: landscape) and (max-height: 500px) { .l-mmap { height: 62vh; } }
+@media (orientation: landscape) and (max-height: 500px) and (min-width: 640px) { .l-mmap { height: 62vh; } }
 
 /* lookalikes */
 .l-pairs { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 10px; }
@@ -224,7 +224,7 @@ body.kids-on .l-item-nav { background: #fff4c9; box-shadow: 0 -14px 14px -2px #f
 .l-quiz-btns { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 .l-quiz-btns .btn { font-size: 16px; padding: 8px 10px; }
 
-@media (orientation: landscape) and (max-height: 500px) { .l-cmp-img { aspect-ratio: 4 / 3; } .l-vs { margin-top: 0; } }
+@media (orientation: landscape) and (max-height: 500px) and (min-width: 640px) { .l-cmp-img { aspect-ratio: 4 / 3; } .l-vs { margin-top: 0; } }
 
 /* sound lab */
 .l-groups { flex-wrap: nowrap; overflow-x: auto; padding: 2px 2px 8px; scrollbar-width: none; }

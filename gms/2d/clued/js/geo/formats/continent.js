@@ -1,6 +1,6 @@
-import { register, collect, pick, shuffle } from '../../formats/registry.js?v=1';
-import { geo, countryIds, createMap, frame, message, revealCard, isKids, cname, theName, byLevel, refFor, supportsGeo, CONTINENTS, loadFlags } from './common.js?v=1';
-import { CONTINENT_FILL } from '../style.js?v=1';
+import { register, collect, pick, shuffle } from '../../formats/registry.js?v=202610050139';
+import { geo, countryIds, createMap, frame, message, revealCard, isKids, cname, theName, byLevel, refFor, supportsGeo, CONTINENTS, loadFlags } from './common.js?v=202610050139';
+import { CONTINENT_FILL } from '../style.js?v=202610050139';
 
 const CODES = ['AF', 'AS', 'EU', 'NA', 'SA', 'OC'];
 const GLOBE = { AF: '🌍', EU: '🌍', AS: '🌏', OC: '🌏', NA: '🌎', SA: '🌎' };
@@ -11,7 +11,7 @@ export default register({
     { key: 'answers', label: 'Buttons', type: 'choice', values: [3, 6], default: 6 },
     { key: 'map', label: 'Show map', type: 'choice', values: ['yes', 'no'], labels: ['Yes', 'No (harder)'], default: 'yes' },
   ],
-  supports: supportsGeo,
+  supports: supportsGeo, packless: true,
   generate({ rng, packs = [], count, opts = {}, difficulty = 0, avoid }) {
     const kids = !!opts.kids, level = kids ? 1 : difficulty || 0;
     const n = kids ? 3 : +opts.answers === 3 ? 3 : 6;
@@ -32,7 +32,8 @@ export default register({
     const ui = frame(el, { prompt: q.prompt });
     let done = false, map = null;
     if (q.data.map) {
-      map = createMap(ui.mapEl, { region: 'world', target: 'none', interactive: false, dotFor: [q.data.iso], bigTargets: true, padding: 6 });
+      // portraitZoom off: tall maps otherwise start zoomed on the Atlantic and the country can be off-screen (lane I)
+      map = createMap(ui.mapEl, { region: 'world', target: 'none', interactive: false, dotFor: [q.data.iso], bigTargets: true, padding: 6, portraitZoom: false });
       map.ready.then(() => { map.setState(q.data.iso, 'target pulse'); });
     } else ui.mapEl.parentNode.style.display = 'none';
     const grid = document.createElement('div');

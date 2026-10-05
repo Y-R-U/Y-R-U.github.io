@@ -8,11 +8,14 @@
  "imgPrompt": "Which of these is {lname}?",
  "nameImgPrompt": "Which dish is this?",
  "tfImgPrompt": "This dish is {lname}.",
+ "noun": "dish",
+ "fakePrompt": "Which of these dishes is made up?",
  "leakExempt": [],
  "factsMeta": {
   "country": {
    "type": "cat",
-   "label": "Comes from",
+   "label": "Country",
+   "matchPrompt": "Match each dish to the country it comes from",
    "ask": "Which country does {lname} come from?",
    "askReverse": "Which of these dishes comes from {value}?",
    "stmt": "{name} comes from {value}."
@@ -803,7 +806,7 @@
     "It was not rationed in World War II.",
     "Cod and haddock are popular choices.",
     "It is often eaten with mushy peas.",
-    "It comes from United Kingdom.",
+    "It comes from the United Kingdom.",
     "It is usually a main meal.",
     "It is sprinkled with salt and vinegar.",
     "The answer has 3 words (4, 3, 5 letters).",
@@ -848,7 +851,7 @@
     "It often comes with a cup of tea.",
     "Hotels and cafés serve it in the morning.",
     "It often includes black pudding.",
-    "It comes from United Kingdom.",
+    "It comes from the United Kingdom.",
     "It includes baked beans.",
     "It has eggs, bacon and sausages.",
     "The answer has 3 words (4, 7, 9 letters).",
@@ -892,7 +895,7 @@
     "Made with beef, it has a different name.",
     "It is made with minced lamb.",
     "It is topped with mashed potato.",
-    "It comes from United Kingdom.",
+    "It comes from the United Kingdom.",
     "It is usually a main meal.",
     "It is baked in the oven.",
     "It is named after someone who looks after sheep.",
@@ -933,7 +936,7 @@
     "It is traditionally cooked in a sheep's stomach.",
     "It is eaten on Burns Night.",
     "Robert Burns wrote a poem to it.",
-    "It comes from United Kingdom.",
+    "It comes from the United Kingdom.",
     "It is usually a main meal.",
     "It is served with \"neeps and tatties\".",
     "It is the national dish of Scotland.",
@@ -2359,7 +2362,7 @@
     "It is named after a city in Germany.",
     "It became famous in the USA.",
     "It is often eaten with fries.",
-    "It comes from United States.",
+    "It comes from the United States.",
     "It is usually a main meal.",
     "It has a patty of minced beef.",
     "It is served in a bun.",
@@ -2403,7 +2406,7 @@
     "Coney Island is famous for them.",
     "A famous eating contest is held every 4 July.",
     "It is topped with mustard and ketchup.",
-    "It comes from United States.",
+    "It comes from the United States.",
     "It is usually a snack or street food.",
     "It is a sausage in a long bun.",
     "Its name sounds like a warm pet.",
@@ -2758,14 +2761,6 @@
       "credit": "Tristanb",
       "license": "CC BY-SA 3.0",
       "page": "https://commons.wikimedia.org/wiki/File:Vegemiteontoast_large.jpg"
-     },
-     {
-      "src": "https://upload.wikimedia.org/wikipedia/commons/8/84/Vegemite_brand_logo.png",
-      "w": 500,
-      "h": 303,
-      "credit": "Unknown authorUnknown author",
-      "license": "Public domain",
-      "page": "https://commons.wikimedia.org/wiki/File:Vegemite_brand_logo.png"
      }
     ]
    },
@@ -2952,10 +2947,10 @@
   }
  ],
  "fakes": [
-  "Glazed moonfish pie (Norway)",
-  "Sunberry dumplings (Peru)",
-  "Cloud noodles (Chile)",
-  "Velvet goat stew (Iceland)"
+  "Glazed moonfish pie",
+  "Sunberry dumplings",
+  "Copperleaf pudding",
+  "Velvet goat stew"
  ],
  "sources": [
   {

@@ -1,5 +1,5 @@
-import { h, onKey } from '../ui/kit.js?v=1';
-import { sfx } from '../ui/fx.js?v=1';
+import { h, onKey } from '../ui/kit.js?v=202610050139';
+import { sfx } from '../ui/fx.js?v=202610050139';
 
 // Full-screen "pass the phone" / round card. Resolves when tapped.
 export function handoff(host, { kicker = 'Pass to', name = '', sub = '', icon = '', button = "I'm ready", cls = '' } = {}) {

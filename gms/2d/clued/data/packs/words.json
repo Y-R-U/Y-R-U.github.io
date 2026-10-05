@@ -9,14 +9,16 @@
  "factsMeta": {
   "origin": {
    "type": "cat",
-   "label": "Comes from",
+   "label": "Language of origin",
+   "matchPrompt": "Match each word to the language it comes from",
    "ask": "The English word “{name}” comes from which language?",
    "askReverse": "Which of these English words comes from {value}?",
    "stmt": "The English word “{name}” comes from {value}."
   },
   "namedAfter": {
    "type": "text",
-   "label": "Named after"
+   "label": "Named after",
+   "matchPrompt": "Match each word to the person it is named after"
   },
   "kind": {
    "type": "cat",
@@ -33,7 +35,7 @@
     "origin": "Czech",
     "kind": "Borrowed from another language"
    },
-   "blurb": "“robot” comes from Czech. From robota, \"forced labour\"; first used in Karel Čapek's 1920 play R.U.R..",
+   "blurb": "“robot” comes from Czech. From robota, \"forced labour\"; first used in Karel Čapek's 1920 play R.U.R.",
    "difficulty": 2
   },
   {
@@ -807,7 +809,7 @@
     "Arabic",
     "Old Norse"
    ],
-   "explain": "“robot” comes from Czech. From robota, \"forced labour\"; first used in Karel Čapek's 1920 play R.U.R..",
+   "explain": "“robot” comes from Czech. From robota, \"forced labour\"; first used in Karel Čapek's 1920 play R.U.R.",
    "difficulty": 2,
    "refs": [
     "words/robot"
@@ -2204,5 +2206,6 @@
    "name": "Online Etymology Dictionary",
    "url": "https://www.etymonline.com"
   }
- ]
+ ],
+ "noun": "word"
 }

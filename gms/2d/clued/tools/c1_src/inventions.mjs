@@ -1,7 +1,7 @@
-import { WD, COMMONS } from './_common.mjs';
+import { WD, COMMONS, theC } from './_common.mjs';
 
 const UK = 'United Kingdom', US = 'United States', FR = 'France', DE = 'Germany', IT = 'Italy', NL = 'Netherlands', AU = 'Australia', SE = 'Sweden', CH = 'Switzerland', CN = 'China', HU = 'Hungary', DK = 'Denmark', JP = 'Japan';
-const f = (year, inventor, country) => ({ year, inventor, country });
+const f = (year, inventor, country) => ({ year, inventor, ...(country ? { country } : {}) });
 
 export default {
   id: 'inventions', title: 'Inventions', theme: 'science', icon: '💡', kids: true,
@@ -11,12 +11,12 @@ export default {
   factsMeta: {
     year: { type: 'year', label: 'Year', higherLabel: 'Later', clue: v => `It dates from ${v}.` },
     inventor: { type: 'text', label: 'Inventor', clue: v => `It is credited to ${v}.` },
-    country: { type: 'cat', label: 'Country', clue: v => `It was invented in ${v}.` },
+    country: { type: 'cat', label: 'Country', clue: v => `It was invented in ${theC(v)}.` },
   },
   imgPrompt: "Which of these is {lname}?",
   nameImgPrompt: "Which invention is this?",
   tfImgPrompt: "This is {lname}.",
-  tpl: {"year": {"askHigh": "Which of these is the newest invention?", "askLow": "Which of these is the oldest invention?", "minRatio": 1.01}, "inventor": {"ask": "Who is credited with {lname}?", "askReverse": "Which invention is credited to {value}?", "stmt": "The {lname} is credited to {value}."}, "country": {"ask": "Where was {lname} invented?", "askReverse": "Which of these was invented in {value}?", "stmt": "The {lname} was invented in {value}."}},
+  tpl: {"year": {"askHigh": "Which of these is the newest invention?", "askLow": "Which of these is the oldest invention?", "minRatio": 1.01}, "inventor": {"ask": "Who is credited with {lname}?", "askReverse": "Which invention is credited to {value}?", "stmt": "{lname} is credited to {value}."}, "country": {"ask": "Where was {lname} invented?", "askReverse": "Which of these was invented in {value}?", "stmt": "{lname} was invented in {value}."}},
   sources: [WD, COMMONS],
   items: [
     { n: 'Paper', ln: 'paper', f: f(105, 'Cai Lun', CN), d: 1,
@@ -82,7 +82,7 @@ export default {
     { n: 'Phonograph', f: f(1877, 'Thomas Edison', US), d: 2,
       b: 'Thomas Edison invented the phonograph in 1877, the first machine that could record and play back sound.',
       c: ['The first words it recorded were "Mary had a little lamb".', 'It recorded on tinfoil wrapped round a cylinder.', 'Its inventor is called the "Wizard of Menlo Park".', 'It led to the record player.', 'It records and plays back sound.'] },
-    { n: 'Incandescent light bulb', alt: ['light bulb', 'lightbulb'], f: f(1879, 'Thomas Edison', US), d: 1,
+    { n: 'Incandescent light bulb', alt: ['light bulb', 'lightbulb'], f: f(1879, 'Thomas Edison') /* no country: Joseph Swan's British bulb */, d: 1,
       b: 'In 1879 Thomas Edison made a long-lasting light bulb with a carbon filament. Joseph Swan made a similar bulb in England.',
       c: ['Joseph Swan made one in England at the same time.', 'Its early filament was carbonised bamboo or thread.', 'It wastes most of its energy as heat.', 'Cartoons show one above a head for a bright idea.', 'It lights up a room.'] },
     { n: 'Benz Patent-Motorwagen', ln: 'the Benz Patent-Motorwagen', alt: ['motor car', 'car', 'automobile'], f: f(1885, 'Karl Benz', DE), d: 2,
@@ -115,7 +115,7 @@ export default {
     { n: 'Television', ln: 'television', alt: ['TV'], f: f(1926, 'John Logie Baird', UK), d: 1,
       b: 'John Logie Baird gave the first public demonstration of television in London in 1926.',
       c: ['Its first public demonstration was in a London attic room.', 'Its inventor was Scottish.', 'Early versions used a spinning disc.', 'You watch shows on it.', 'It is often called the telly.'] },
-    { n: 'Jet engine', f: f(1930, 'Frank Whittle', UK), d: 2,
+    { n: 'Jet engine', f: f(1930, 'Frank Whittle') /* no country: von Ohain's German jet flew first */, d: 2,
       b: 'Frank Whittle patented the jet engine in 1930. Hans von Ohain in Germany built one separately.',
       c: ['A German engineer, Hans von Ohain, developed one separately.', 'Its inventor was an RAF officer.', 'It was patented in 1930.', 'It sucks in air and blasts it out the back.', 'It powers big passenger planes.'] },
     { n: 'Nylon', ln: 'nylon', f: f(1935, 'Wallace Carothers', US), d: 2,
@@ -124,7 +124,7 @@ export default {
     { n: 'Ballpoint pen', alt: ['biro'], f: f(1938, 'László Bíró', HU), d: 1,
       b: 'Hungarian journalist László Bíró patented the ballpoint pen in 1938. In many countries it is still called a biro.',
       c: ['Its inventor was a Hungarian journalist.', 'It was inspired by quick-drying newspaper ink.', 'A tiny rolling ball spreads the ink.', 'In Britain it is often called by its inventor\'s name.', 'You write with it.'] },
-    { n: 'Helicopter', alt: ['Sikorsky VS-300'], f: f(1939, 'Igor Sikorsky', US), d: 1,
+    { n: 'Helicopter', alt: ['Sikorsky VS-300'], f: f(1939, 'Igor Sikorsky') /* no country: Germany's Fw 61 flew in 1936 */, d: 1,
       b: 'Igor Sikorsky flew the first practical single-rotor helicopter, the VS-300, in 1939.',
       c: ['Leonardo da Vinci drew an "aerial screw" like it.', 'Its inventor was born in Kyiv.', 'It has a small rotor on its tail.', 'It can hover and fly backwards.', 'It flies with spinning blades on top.'] },
     { n: 'Microwave oven', alt: ['microwave'], f: f(1945, 'Percy Spencer', US), d: 1,
@@ -169,14 +169,14 @@ export default {
     { n: 'Polymer banknote', alt: ['plastic banknote'], f: f(1988, 'Reserve Bank of Australia and CSIRO', AU), d: 3,
       b: 'Australia issued the world\'s first polymer banknote in 1988. It lasts longer and is hard to fake.',
       c: ['Its first design celebrated a bicentenary.', 'It was developed with CSIRO.', 'It has a clear window that is hard to forge.', 'It survives a trip through the washing machine.', 'It is money made of plastic.'] },
-    { n: 'World Wide Web', ln: 'the World Wide Web', alt: ['the web', 'WWW'], f: f(1989, 'Tim Berners-Lee', CH), d: 1,
+    { n: 'World Wide Web', ln: 'the World Wide Web', alt: ['the web', 'WWW'], f: f(1989, 'Tim Berners-Lee', CH), d: 2 /* no picture that doesn't print 'WWW' */,
       b: 'Tim Berners-Lee invented the World Wide Web at CERN in Switzerland in 1989.',
       c: ['Its inventor was knighted in 2004.', 'It was invented at CERN.', 'Its pages are linked by hyperlinks.', 'Its addresses often start with "www".', 'You browse it on the internet.'] },
-    { n: 'iPhone', ln: 'the iPhone', f: f(2007, 'Apple', US), d: 1,
+    { n: 'iPhone', ln: 'the iPhone', files: ['IPhone First Generation (cropped).jpg'] /* no printed name */, f: f(2007, 'Apple', US), d: 1,
       b: 'Apple\'s iPhone, launched by Steve Jobs in 2007, made touchscreen smartphones mainstream.',
       c: ['Steve Jobs called it three devices in one.', 'It launched in 2007.', 'It brought the App Store a year later.', 'It has a touchscreen.', 'It is a smartphone made by Apple.'] },
   ],
-  fakes: ['Steam-powered umbrella (1822)', 'Electric spoon (1911)', 'Pneumatic hat (1874)', 'Clockwork toothbrush (1797)'],
+  fakes: ['Steam-powered umbrella', 'Pneumatic hat', 'Magnetic raincoat', 'Spring-loaded teacup'],
   questions: [
     { kind: 'mc', prompt: 'Who is credited with inventing the telephone in 1876?', answer: 'Alexander Graham Bell', wrong: ['Thomas Edison', 'Guglielmo Marconi', 'Nikola Tesla'], explain: 'Bell\'s patent was granted in March 1876.', difficulty: 1 },
     { kind: 'mc', prompt: 'Who made the first powered aeroplane flight in 1903?', answer: 'The Wright brothers', wrong: ['The Montgolfier brothers', 'The Lumière brothers', 'Charles Lindbergh'], explain: 'Orville flew 12 seconds at Kitty Hawk.', difficulty: 1 },

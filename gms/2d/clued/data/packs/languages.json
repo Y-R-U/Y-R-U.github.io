@@ -29,6 +29,7 @@
    "type": "num",
    "label": "Countries where it is a main language",
    "higherLabel": "More countries",
+   "askNumber": "In how many countries is {name} a main language?",
    "askHigh": "Which of these is a main language in the most countries?"
   }
  },

@@ -9,6 +9,8 @@
   "year": {
    "type": "year",
    "label": "First shown",
+   "matchPrompt": "Match each show to the year it was first shown",
+   "askNumber": "In what year was {name} first shown?",
    "higherLabel": "Newer",
    "askHigh": "Which of these shows started most recently?",
    "askLow": "Which of these shows started first?"
@@ -367,18 +369,18 @@
    "id": "top-gear",
    "name": "Top Gear",
    "alt": [],
-   "group": "2000s",
+   "group": "1970s",
    "facts": {
-    "year": 2002,
+    "year": 1977,
     "country": "United Kingdom",
-    "decade": "2000s"
+    "decade": "1970s"
    },
-   "blurb": "Top Gear (first shown 2002, United Kingdom). A BBC programme about cars and road trips.",
+   "blurb": "Top Gear (first shown 1977, United Kingdom). A BBC programme about cars and road trips.",
    "clues": [
     "Celebrities race round a test track in a reasonably priced car.",
     "Its anonymous racing driver is called the Stig.",
     "Its best-known presenters were Clarkson, Hammond and May.",
-    "It first aired in 2002.",
+    "It first aired in 1977.",
     "It was made in the United Kingdom.",
     "A BBC programme about cars and road trips."
    ],
@@ -1690,7 +1692,7 @@
     "The Office (US)",
     "EastEnders"
    ],
-   "explain": "Top Gear (first shown 2002, United Kingdom). A BBC programme about cars and road trips.",
+   "explain": "Top Gear (first shown 1977, United Kingdom). A BBC programme about cars and road trips.",
    "difficulty": 2,
    "refs": [
     "tv/top-gear"
@@ -1700,13 +1702,13 @@
    "id": "year-top-gear",
    "kind": "mc",
    "prompt": "In which year was Top Gear first shown?",
-   "answer": "2002",
+   "answer": "1977",
    "wrong": [
-    "2006",
-    "2000",
-    "1998"
+    "1981",
+    "1975",
+    "1973"
    ],
-   "explain": "Top Gear (first shown 2002, United Kingdom). A BBC programme about cars and road trips.",
+   "explain": "Top Gear (first shown 1977, United Kingdom). A BBC programme about cars and road trips.",
    "difficulty": 3,
    "refs": [
     "tv/top-gear"
@@ -3651,5 +3653,6 @@
    "name": "Wikipedia articles for each show",
    "url": "https://en.wikipedia.org"
   }
- ]
+ ],
+ "noun": "TV show"
 }

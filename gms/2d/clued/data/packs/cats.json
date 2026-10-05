@@ -102,7 +102,7 @@
    "clues": [
     "It often enjoys playing with water.",
     "It has tufts of fur on the tips of its ears.",
-    "The breed comes from United States.",
+    "The breed comes from the United States.",
     "Its fur is long.",
     "It is one of the largest pet cat breeds.",
     "Its name includes a word for a racoon.",
@@ -207,7 +207,7 @@
     "It was first bred in California in the 1960s.",
     "It often follows its owner around like a dog.",
     "It has blue eyes and darker points.",
-    "The breed comes from United States.",
+    "The breed comes from the United States.",
     "Its fur is long.",
     "It goes limp when you pick it up.",
     "It is named after a floppy toy.",
@@ -261,7 +261,7 @@
     "It may be the model for the Cheshire Cat.",
     "Its ancestors may have arrived with the Romans.",
     "It has copper or orange eyes.",
-    "The breed comes from United Kingdom.",
+    "The breed comes from the United Kingdom.",
     "Its fur is short.",
     "The best-known colour is blue-grey.",
     "The answer has 2 words (7, 9 letters).",
@@ -306,7 +306,7 @@
     "It was bred from the wild Asian leopard cat.",
     "Its coat can shimmer with a \"glitter\" effect.",
     "It loves to climb and play in water.",
-    "The breed comes from United States.",
+    "The breed comes from the United States.",
     "Its fur is short.",
     "It has spots or marbled patterns like a wild cat.",
     "It shares its name with a tiger from India.",
@@ -393,7 +393,10 @@
     "Aby"
    ],
    "facts": {
-    "origin": "Ethiopia",
+    "origin": [
+     "Ethiopia",
+     "United Kingdom"
+    ],
     "coat": "Short"
    },
    "lookalikes": [
@@ -405,7 +408,7 @@
     "Each hair has several bands of colour.",
     "It looks like cats in ancient Egyptian art.",
     "It is very active and curious.",
-    "The breed comes from Ethiopia.",
+    "The breed comes from Ethiopia or the United Kingdom.",
     "Its fur is short.",
     "It has large ears and almond eyes.",
     "It is named after an old name for Ethiopia.",
@@ -455,7 +458,7 @@
     "All of them descend from a farm cat named Susie.",
     "The gene that causes its look can harm joints.",
     "It often sits up like an otter.",
-    "The breed comes from United Kingdom.",
+    "The breed comes from the United Kingdom.",
     "Its fur is short.",
     "It comes from Scotland.",
     "The answer has 2 words (8, 4 letters).",
@@ -584,7 +587,10 @@
    "name": "Birman",
    "lname": "Birman",
    "facts": {
-    "origin": "Myanmar",
+    "origin": [
+     "Myanmar",
+     "France"
+    ],
     "coat": "Long"
    },
    "lookalikes": [
@@ -594,7 +600,7 @@
    "clues": [
     "A legend links it to a temple in Burma.",
     "It has blue eyes and darker points.",
-    "The breed comes from Myanmar.",
+    "The breed comes from Myanmar or France.",
     "Its fur is long.",
     "Its four paws are pure white like gloves.",
     "Its name comes from an old name for Myanmar.",
@@ -692,7 +698,7 @@
     "It was found in Buckfastleigh in 1960.",
     "It is nicknamed the \"poodle cat\".",
     "It has huge ears and big eyes.",
-    "The breed comes from United Kingdom.",
+    "The breed comes from the United Kingdom.",
     "Its fur is curly or wavy.",
     "Its short coat is wavy.",
     "It comes from an English county in the south-west.",
@@ -732,7 +738,7 @@
     "The first one was a kitten named Kallibunker.",
     "Its coat has no outer guard hairs.",
     "It has a slim body and arched back like a greyhound.",
-    "The breed comes from United Kingdom.",
+    "The breed comes from the United Kingdom.",
     "Its fur is curly or wavy.",
     "Its coat is tightly curled.",
     "It comes from the county at the tip of south-west England.",
@@ -769,7 +775,7 @@
     "Oriental"
    ],
    "facts": {
-    "origin": "Thailand",
+    "origin": "United States",
     "coat": "Short"
    },
    "lookalikes": [
@@ -783,7 +789,7 @@
     "It comes in hundreds of colours and patterns.",
     "It is very talkative.",
     "It has very large ears.",
-    "The breed comes from Thailand.",
+    "The breed comes from the United States.",
     "Its fur is short.",
     "It is a close relative of the Siamese.",
     "It has short fur.",
@@ -839,7 +845,7 @@
    "clues": [
     "It is easier to groom than a Persian.",
     "It has a flat face and round eyes.",
-    "The breed comes from United States.",
+    "The breed comes from the United States.",
     "Its fur is short.",
     "It looks like a short-coated Persian.",
     "Garfield is often said to look like one.",
@@ -892,7 +898,7 @@
     "Its ancestors hunted mice on settlers' ships.",
     "The silver tabby is its best-known colour.",
     "It is sturdy and easy-going.",
-    "The breed comes from United States.",
+    "The breed comes from the United States.",
     "Its fur is short.",
     "It has short, thick fur.",
     "It comes from the USA.",
@@ -977,7 +983,10 @@
     "swimming cat"
    ],
    "facts": {
-    "origin": "Turkey",
+    "origin": [
+     "Turkey",
+     "United Kingdom"
+    ],
     "coat": "Medium"
    },
    "lookalikes": [
@@ -1127,7 +1136,7 @@
     "It was bred from a pet cat and a wild serval.",
     "It can jump about 2.5 metres high.",
     "It is one of the tallest cat breeds.",
-    "The breed comes from United States.",
+    "The breed comes from the United States.",
     "Its fur is short.",
     "It has big ears and spots.",
     "It is named after the African grasslands.",
@@ -1263,7 +1272,7 @@
    "clues": [
     "It has blue eyes and dark points.",
     "It has a long, fluffy coat.",
-    "The breed comes from United States.",
+    "The breed comes from the United States.",
     "Its fur is long.",
     "It is named after a rabbit with similar markings and a mountain range.",
     "It needs daily grooming.",
@@ -1399,7 +1408,7 @@
     "It was bred in Kentucky in the 1950s.",
     "It was bred to look like a mini panther.",
     "It has copper or golden eyes.",
-    "The breed comes from United States.",
+    "The breed comes from the United States.",
     "Its fur is short.",
     "Its coat is glossy and jet black.",
     "It is named after an Indian city now called Mumbai.",
@@ -1448,7 +1457,7 @@
     "It has no wild ancestry at all.",
     "It came from a Siamese and Abyssinian cross.",
     "It is spotted like a wild cat.",
-    "The breed comes from United States.",
+    "The breed comes from the United States.",
     "Its fur is short.",
     "It is very sociable.",
     "It is named after the ocelot.",
@@ -1493,7 +1502,7 @@
     "Some cat groups refuse to recognise it.",
     "It was found in Louisiana in 1983.",
     "It is sometimes called the \"sausage cat\".",
-    "The breed comes from United States.",
+    "The breed comes from the United States.",
     "Its fur is short.",
     "Its legs are very short.",
     "It is named after characters in \"The Wizard of Oz\".",
@@ -1627,7 +1636,7 @@
     "It is a long-haired version of the Abyssinian.",
     "It is nicknamed the \"fox cat\".",
     "It has a big bushy tail.",
-    "The breed comes from United States.",
+    "The breed comes from the United States.",
     "Its fur is long.",
     "Each hair has bands of colour.",
     "It is named after a country next to Ethiopia.",
@@ -1723,7 +1732,7 @@
     "The first one was born on an Oregon farm in 1982.",
     "Kittens may be born bald.",
     "Its coat feels springy.",
-    "The breed comes from United States.",
+    "The breed comes from the United States.",
     "Its fur is curly or wavy.",
     "Its fur is curly.",
     "It is named after a curly hairstyle.",
@@ -1764,7 +1773,7 @@
     "The first one was found in Montana in 1987.",
     "It comes in long and short coats.",
     "Its whiskers are curly too.",
-    "The breed comes from United States.",
+    "The breed comes from the United States.",
     "Its fur is curly or wavy.",
     "Its coat is thick and curly.",
     "It is sometimes called \"the cat in sheep's clothing\".",
@@ -1803,7 +1812,7 @@
   {
    "id": "q2",
    "kind": "mc",
-   "prompt": "Which cat breed is born without a tail?",
+   "prompt": "Which cat breed is famous for often having no tail?",
    "answer": "Manx",
    "wrong": [
     "Siamese",

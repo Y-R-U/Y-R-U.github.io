@@ -8,6 +8,7 @@
  "imgPrompt": "Which of these shows the {lname}?",
  "nameImgPrompt": "Which part of the body is this?",
  "tfImgPrompt": "This is the {lname}.",
+ "noun": "body part",
  "leakExempt": [],
  "factsMeta": {
   "kind": {
@@ -35,6 +36,7 @@
    "type": "num",
    "label": "How many you have",
    "unit": "",
+   "askNumber": "{name}: how many does a person usually have?",
    "askHigh": "Which of these do we have the most of?"
   }
  },
@@ -834,7 +836,7 @@
    "facts": {
     "kind": "Bone",
     "system": "Skeletal",
-    "count": 24
+    "count": 1
    },
    "blurb": "A cage of 24 curved bones that protects the heart and lungs.",
    "clues": [
@@ -843,7 +845,7 @@
     "It moves when you breathe.",
     "It is a bone.",
     "It is part of the skeletal system.",
-    "Most people have 24 of these.",
+    "Most people have 1 of these.",
     "It protects the heart and lungs.",
     "It is made of curved bones around your chest.",
     "The answer has 2 words (3, 4 letters).",

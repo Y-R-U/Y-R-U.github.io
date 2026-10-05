@@ -8,6 +8,8 @@
  "imgPrompt": "Which of these is {lname}?",
  "nameImgPrompt": "Which prehistoric animal is this?",
  "tfImgPrompt": "This is {lname}.",
+ "noun": "prehistoric animal",
+ "fakePrompt": "Which of these prehistoric animals is made up?",
  "leakExempt": [
   "dinosaur",
   "saurus",
@@ -34,8 +36,9 @@
   },
   "mya": {
    "type": "num",
-   "label": "Lived about (million years ago)",
+   "label": "How long ago it lived",
    "unit": "million years ago",
+   "askNumber": "About how many million years ago did {name} live?",
    "higherLabel": "Older",
    "askHigh": "Which of these lived longest ago?",
    "askLow": "Which of these lived most recently?",
@@ -1975,22 +1978,6 @@
       "credit": "Danny Cicchetti",
       "license": "CC BY-SA 3.0",
       "page": "https://commons.wikimedia.org/wiki/File:Leaellynasaura_transparent.png"
-     },
-     {
-      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/2/28/Leaellynasaura-amicagraphica-dinosaur-skull-p-185990-1330079-large.jpg/500px-Leaellynasaura-amicagraphica-dinosaur-skull-p-185990-1330079-large.jpg",
-      "w": 500,
-      "h": 333,
-      "credit": "Museums Victoria",
-      "license": "CC BY 4.0",
-      "page": "https://commons.wikimedia.org/wiki/File:Leaellynasaura-amicagraphica-dinosaur-skull-p-185990-1330079-large.jpg"
-     },
-     {
-      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/f/f9/Leaellynasaura-amicagraphica-dinosaur-skull-holotype-p-185991-1330043-large.jpg/500px-Leaellynasaura-amicagraphica-dinosaur-skull-holotype-p-185991-1330043-large.jpg",
-      "w": 500,
-      "h": 375,
-      "credit": "Photographer: Benjamin Healley Source: Museums Victoria",
-      "license": "CC BY 4.0",
-      "page": "https://commons.wikimedia.org/wiki/File:Leaellynasaura-amicagraphica-dinosaur-skull-holotype-p-185991-1330043-large.jpg"
      }
     ]
    },
@@ -2026,18 +2013,6 @@
     "The answer is one word of 5 letters.",
     "Its first letter is M."
    ],
-   "media": {
-    "img": [
-     {
-      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/f/f3/Minmi_left_foot.jpg/500px-Minmi_left_foot.jpg",
-      "w": 500,
-      "h": 344,
-      "credit": "Stephen F. Poropat, Phil R. Bell, Lachlan J. Hart, Steven W. Salisbury, & Benjamin P. Kear",
-      "license": "CC BY-SA 4.0",
-      "page": "https://commons.wikimedia.org/wiki/File:Minmi_left_foot.jpg"
-     }
-    ]
-   },
    "difficulty": 3
   },
   {
@@ -2881,26 +2856,6 @@
     "The answer is one word of 9 letters.",
     "Its first letter is M."
    ],
-   "media": {
-    "img": [
-     {
-      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/c/c6/Meganeura_monyi_type.jpg/500px-Meganeura_monyi_type.jpg",
-      "w": 500,
-      "h": 214,
-      "credit": "Ghedo",
-      "license": "CC BY-SA 4.0",
-      "page": "https://commons.wikimedia.org/wiki/File:Meganeura_monyi_type.jpg"
-     },
-     {
-      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/b/bf/Meganeura_monyi_MNHN_R51142_1.jpg/500px-Meganeura_monyi_MNHN_R51142_1.jpg",
-      "w": 500,
-      "h": 333,
-      "credit": "Gaëlle Doitteau & Sandra DAILLIE",
-      "license": "CC BY 4.0",
-      "page": "https://commons.wikimedia.org/wiki/File:Meganeura_monyi_MNHN_R51142_1.jpg"
-     }
-    ]
-   },
    "difficulty": 3
   },
   {

@@ -7,13 +7,13 @@ const c = await connect(9405);
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 let fails = 0;
 const ok = (cond, m) => { console.log((cond ? 'PASS ' : 'FAIL ') + m); if (!cond) fails++; };
-const st = () => c.evaluate(`import('./js/audio/bgm.js?v=1').then(m => m.state())`);
+const st = () => c.evaluate(`import('./js/audio/bgm.js?v=' + (window.__clued?.BUILD || window.__cluedCtx?.BUILD || 1)).then(m => m.state())`);
 async function until(fn, ms = 8000) { const t0 = Date.now(); let s; while (Date.now() - t0 < ms) { s = await st(); if (fn(s)) return s; await sleep(250); } return s; }
 
 await c.goto('http://localhost:8888/gms/2d/clued/?test', 'window.__cluedReady === true');
 await c.evaluate(`localStorage.setItem('clued.settings', JSON.stringify({ sound: true, bgm: true })); true`);
 await c.goto('http://localhost:8888/gms/2d/clued/?test', 'window.__cluedReady === true');
-await c.evaluate(`(async () => { const P = globalThis.__cluedPacks; const { summarize } = await import('./js/core/packs.js?v=1');
+await c.evaluate(`(async () => { const P = globalThis.__cluedPacks; const { summarize } = await import('./js/core/packs.js?v=' + (window.__clued?.BUILD || window.__cluedCtx?.BUILD || 1));
   const p = await (await fetch('data/music/hits-1990s.json')).json(); P.packs.set(p.id, p); P.index.packs[p.id] = { ...summarize(p), id: p.id }; return true; })()`);
 let s = await st();
 ok(!s.playing, 'silent before any gesture');
@@ -38,18 +38,18 @@ await c.evaluate(`window.__a.pause(); true`);
 s = await until((x) => x.playing, 8000);
 ok(s.playing, 'resumed after it paused');
 
-await c.evaluate(`(async () => { const m = await import('./js/audio/bgm.js?v=1'); m.duck(true, 'test'); return true; })()`);
+await c.evaluate(`(async () => { const m = await import('./js/audio/bgm.js?v=' + (window.__clued?.BUILD || window.__cluedCtx?.BUILD || 1)); m.duck(true, 'test'); return true; })()`);
 await sleep(700);
 s = await st();
 ok(s.gain < 0.1, `duck() drops the level (gain ${s.gain})`);
-await c.evaluate(`import('./js/audio/bgm.js?v=1').then(m => (m.duck(false, 'test'), true))`);
+await c.evaluate(`import('./js/audio/bgm.js?v=' + (window.__clued?.BUILD || window.__cluedCtx?.BUILD || 1)).then(m => (m.duck(false, 'test'), true))`);
 await c.evaluate(`(() => { speechSynthesis.speak(new SpeechSynthesisUtterance('Which country is this anthem from?')); return true; })()`);
 await sleep(150);
 s = await st();
 ok(s.ducked, `speech ducks the music (ducked ${s.ducked})`);
 await c.evaluate(`speechSynthesis.cancel(); true`);
 
-await c.evaluate(`import('./js/ui/toggles.js?v=1').then(m => m.setBgm(false)).then(() => true)`);
+await c.evaluate(`import('./js/ui/toggles.js?v=' + (window.__clued?.BUILD || window.__cluedCtx?.BUILD || 1)).then(m => m.setBgm(false)).then(() => true)`);
 s = await until((x) => !x.playing, 4000);
 ok(!s.playing && !s.wanted, 'turning it off stops it');
 console.log(c.logs.filter((l) => /EXC/.test(l)).slice(0, 5).join('\n'));

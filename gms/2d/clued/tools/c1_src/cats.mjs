@@ -1,4 +1,4 @@
-import { WD, COMMONS } from './_common.mjs';
+import { WD, COMMONS, theC } from './_common.mjs';
 
 const UK = 'United Kingdom', US = 'United States', TH = 'Thailand', RU = 'Russia', FR = 'France', TR = 'Turkey', JP = 'Japan', CA = 'Canada', EG = 'Egypt', NO = 'Norway', MM = 'Myanmar', AU = 'Australia', ET = 'Ethiopia', SG = 'Singapore', IR = 'Iran';
 const f = (origin, coat) => ({ origin, coat });
@@ -9,7 +9,7 @@ export default {
   media: 'wiki', photos: 3, depicts: 0, lname: 'asis',
   wdCheckLabel: { origin: 'P495' }, wdP31: ['Q43577'],
   factsMeta: {
-    origin: { type: 'cat', label: 'Country of origin', clue: v => `The breed comes from ${v}.` },
+    origin: { type: 'cat', label: 'Country of origin', clue: v => `The breed comes from ${[].concat(v).map(theC).join(' or ')}.` },
     coat: { type: 'cat', label: 'Coat', values: ['Long', 'Medium', 'Short', 'Curly', 'Hairless'], clue: v => (v === 'Hairless' ? 'It has almost no fur.' : v === 'Curly' ? 'Its fur is curly or wavy.' : `Its fur is ${v.toLowerCase()}.`) },
   },
   imgPrompt: "Which of these is {aName}?",
@@ -39,7 +39,7 @@ export default {
     { n: 'Sphynx', wp: 'Sphynx cat', alt: ['Sphynx cat', 'Sphinx'], f: f(CA, 'Hairless'), d: 1, look: ['Devon Rex', 'Cornish Rex'],
       b: 'A cat with almost no fur and wrinkly skin. It feels warm and soft, like a peach.',
       c: ['It was first bred in Canada in the 1960s.', 'It feels warm, like a peach.', 'It needs regular baths.', 'It has big ears and wrinkly skin.', 'It has almost no fur.'] },
-    { n: 'Abyssinian', wp: 'Abyssinian cat', alt: ['Abyssinian cat', 'Aby'], f: f(ET, 'Short'), d: 2, look: ['Somali', 'Singapura'],
+    { n: 'Abyssinian', wp: 'Abyssinian cat', alt: ['Abyssinian cat', 'Aby'], f: f([ET, UK], 'Short'), d: 2, look: ['Somali', 'Singapura'],
       b: 'A slim, active cat with a ticked coat where each hair has bands of colour.',
       c: ['Each hair has several bands of colour.', 'It looks like cats in ancient Egyptian art.', 'It is very active and curious.', 'It has large ears and almond eyes.', 'It is named after an old name for Ethiopia.'] },
     { n: 'Scottish Fold', f: f(UK, 'Short'), d: 1,
@@ -51,7 +51,7 @@ export default {
     { n: 'Norwegian Forest Cat', alt: ['Wegie'], f: f(NO, 'Long'), d: 2, look: ['Maine Coon', 'Siberian'],
       b: 'A big, fluffy cat from Scandinavia with a waterproof coat. Legends say it pulled the goddess Freya\'s chariot.',
       c: ['Norse legends say it pulled the goddess Freya\'s chariot.', 'It can climb down trees head-first.', 'Its thick coat is waterproof.', 'It has a bushy tail and tufted ears.', 'It comes from Norway.'] },
-    { n: 'Birman', f: f(MM, 'Long'), d: 2, look: ['Ragdoll'],
+    { n: 'Birman', f: f([MM, FR], 'Long'), d: 2, look: ['Ragdoll'],
       b: 'A silky long-haired cat with blue eyes and pure white "gloves" on all four paws.',
       c: ['A legend links it to a temple in Burma.', 'It has blue eyes and darker points.', 'In France it is called the "Sacré de Birmanie".', 'Its four paws are pure white like gloves.', 'Its name comes from an old name for Myanmar.'] },
     { n: 'Burmese', wp: 'Burmese cat', alt: ['Burmese cat'], f: f(MM, 'Short'), d: 2, look: ['Bombay', 'Tonkinese'],
@@ -63,7 +63,7 @@ export default {
     { n: 'Cornish Rex', f: f(UK, 'Curly'), d: 3, look: ['Devon Rex'],
       b: 'A slim cat with a short, tightly curled coat that feels like velvet. It can run very fast.',
       c: ['The first one was a kitten named Kallibunker.', 'Its coat has no outer guard hairs.', 'It has a slim body and arched back like a greyhound.', 'Its coat is tightly curled.', 'It comes from the county at the tip of south-west England.'] },
-    { n: 'Oriental Shorthair', alt: ['Oriental'], f: f(TH, 'Short'), d: 3, look: ['Siamese'],
+    { n: 'Oriental Shorthair', alt: ['Oriental'], f: f(US, 'Short'), d: 3, look: ['Siamese'],
       b: 'A slim, long-legged cat with huge ears, closely related to the Siamese, but in hundreds of colours.',
       c: ['It comes in hundreds of colours and patterns.', 'It is very talkative.', 'It has very large ears.', 'It is a close relative of the Siamese.', 'It has short fur.'] },
     { n: 'Exotic Shorthair', alt: ['Exotic'], f: f(US, 'Short'), d: 3, look: ['Persian', 'British Shorthair'],
@@ -75,7 +75,7 @@ export default {
     { n: 'Turkish Angora', alt: ['Angora'], f: f(TR, 'Long'), d: 2, look: ['Turkish Van'],
       b: 'An elegant, silky-coated cat from Turkey, often pure white. Ankara Zoo has a breeding programme for it.',
       c: ['Ankara Zoo has bred it for decades.', 'White ones may be deaf, especially with blue eyes.', 'It often has eyes of two different colours.', 'Its coat is silky and is often pure white.', 'It comes from Turkey\'s capital region.', 'It is slim and graceful.', 'It is one of the oldest natural breeds.'] },
-    { n: 'Turkish Van', alt: ['swimming cat'], f: f(TR, 'Medium'), d: 3, look: ['Turkish Angora'],
+    { n: 'Turkish Van', alt: ['swimming cat'], f: f([TR, UK], 'Medium'), d: 3, look: ['Turkish Angora'],
       b: 'A white cat with coloured patches on its head and tail, nicknamed "the swimming cat" because it likes water.',
       c: ['It is nicknamed "the swimming cat".', 'It has a water-resistant coat.', 'Its colour is only on its head and tail.', 'It is mostly white.', 'It is named after a big lake in Turkey.', 'Its coloured tail is often ringed.', 'It comes from the mountains of eastern Anatolia.', 'It is a large, muscular cat.'] },
     { n: 'Manx', wp: 'Manx cat', alt: ['Manx cat'], f: f('Isle of Man', 'Short'), d: 2, look: ['Japanese Bobtail'],
@@ -133,7 +133,7 @@ export default {
   fakes: ['Alpine Snow Mau', 'Nordic Velvet Rex', 'Highland Curlpaw', 'Tasmanian Mist', 'Celtic Bluefold', 'Andean Shorthair', 'Moroccan Tufted Cat'],
   questions: [
     { kind: 'mc', prompt: 'Which cat breed has almost no fur?', answer: 'Sphynx', wrong: ['Persian', 'Maine Coon', 'Ragdoll'], explain: 'Sphynx cats have only fine down.', difficulty: 1 },
-    { kind: 'mc', prompt: 'Which cat breed is born without a tail?', answer: 'Manx', wrong: ['Siamese', 'Persian', 'Bengal'], explain: 'It comes from the Isle of Man.', difficulty: 1 },
+    { kind: 'mc', prompt: 'Which cat breed is famous for often having no tail?', answer: 'Manx', wrong: ['Siamese', 'Persian', 'Bengal'], explain: 'It comes from the Isle of Man.', difficulty: 1 },
     { kind: 'mc', prompt: 'Which cat breed goes floppy when picked up?', answer: 'Ragdoll', wrong: ['Siamese', 'Abyssinian', 'Bengal'], explain: 'The name comes from this floppy habit.', difficulty: 1 },
     { kind: 'mc', prompt: 'Which breed was bred from wild Asian leopard cats?', answer: 'Bengal', wrong: ['Ocicat', 'Egyptian Mau', 'Abyssinian'], explain: 'Bengals were crossed with leopard cats in the USA.', difficulty: 2 },
     { kind: 'mc', prompt: 'Siamese cats come from which country, once called Siam?', answer: 'Thailand', wrong: ['Japan', 'India', 'China'], explain: 'Siam was renamed Thailand in 1939.', difficulty: 2 },

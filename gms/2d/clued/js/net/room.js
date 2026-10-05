@@ -1,20 +1,20 @@
 // Live room screen: lobby → synced questions (driven through A's runner) → scoreboards → podium.
-import { h, fmtNum } from '../ui/kit.js?v=1';
-import { defineScreen, reset, header, current } from '../ui/app.js?v=1';
-import { confirmPop, toast } from '../ui/popup.js?v=1';
-import { sfx, confetti } from '../ui/fx.js?v=1';
-import { createRunner } from '../structures/runner.js?v=1';
-import { prepare, prepareFormats } from '../structures/session.js?v=1';
-import { basePoints, streakMultiplier, stageMultiplier } from '../core/scoring.js?v=1';
-import { urlsOf, preflight } from '../core/media.js?v=1';
-import { randomSeed } from '../core/rng.js?v=1';
-import { listFormats } from '../formats/registry.js?v=1';
-import { loadFormats } from '../formats/index.js?v=1';
-import { friendly } from './api.js?v=1';
-import { getTransport } from './transport.js?v=1';
-import { sharePanel, joinUrl, p2pUrl } from './share.js?v=1';
-import { scoreboard, podium, ordinal, timingPanel } from './board.js?v=1';
-import { ensureStyles, dropSeat, setQuery, gapLabel, TRUST_HINT, mmss } from './util.js?v=1';
+import { h, fmtNum } from '../ui/kit.js?v=202610050139';
+import { defineScreen, reset, header, current } from '../ui/app.js?v=202610050139';
+import { confirmPop, toast } from '../ui/popup.js?v=202610050139';
+import { sfx, confetti } from '../ui/fx.js?v=202610050139';
+import { createRunner } from '../structures/runner.js?v=202610050139';
+import { prepare, prepareFormats } from '../structures/session.js?v=202610050139';
+import { basePoints, streakMultiplier, stageMultiplier } from '../core/scoring.js?v=202610050139';
+import { urlsOf, preflight } from '../core/media.js?v=202610050139';
+import { randomSeed } from '../core/rng.js?v=202610050139';
+import { listFormats } from '../formats/registry.js?v=202610050139';
+import { loadFormats } from '../formats/index.js?v=202610050139';
+import { friendly } from './api.js?v=202610050139';
+import { getTransport } from './transport.js?v=202610050139';
+import { sharePanel, joinUrl, p2pUrl } from './share.js?v=202610050139';
+import { scoreboard, podium, ordinal, timingPanel } from './board.js?v=202610050139';
+import { ensureStyles, dropSeat, setQuery, gapLabel, TRUST_HINT, mmss } from './util.js?v=202610050139';
 
 const DIFF = ['Mixed', 'Easy', 'Medium', 'Hard'];
 let formatsP = null;

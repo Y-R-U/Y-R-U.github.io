@@ -107,7 +107,7 @@ async function main() {
   const q = `noauth=1&api=${encodeURIComponent(API)}${POLL ? '&netpoll=1' : ''}`;
   await host.go(`${SITE}?${q}`);
   await host.waitFor('window.__cluedReady', 20000, 'boot');
-  await host.eval(`import('./js/net/index.js?v=1').then(() => window.__cluedCtx.go('online'))`);
+  await host.eval(`import('./js/net/index.js?v=' + (window.__clued?.BUILD || window.__cluedCtx?.BUILD || 1)).then(() => window.__cluedCtx.go('online'))`);
   await host.click('[data-act=host]');
   await host.click('.tile[data-format=mc]');
   await host.type('[data-field=name]', 'Hosty');

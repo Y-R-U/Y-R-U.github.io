@@ -1,13 +1,13 @@
-import { register, poolItems, pickPack, byDifficulty, imageOf, collect, pick, shuffle } from './registry.js?v=1';
-import { h, imgEl } from '../ui/kit.js?v=1';
-import { norm, injectCSS, baseCSS, stretchTimer, once, fmtFact, uniqueByName, hasImg } from './fkit.js?v=1';
+import { register, poolItems, pickPack, byDifficulty, imageOf, collect, pick, shuffle } from './registry.js?v=202610050139';
+import { h, imgEl } from '../ui/kit.js?v=202610050139';
+import { norm, injectCSS, baseCSS, once, fmtFact, uniqueByName, hasImg } from './fkit.js?v=202610050139';
 
 const CSS = `
 .mt-cols{display:grid;grid-template-columns:1fr 1fr;gap:10px 12px;align-items:start}
 .mt-col{display:flex;flex-direction:column;gap:8px}
 .mt-col h3{font-size:14px;font-family:var(--font);font-weight:900;color:var(--ink-2);text-align:center;margin:0}
 .mt-t{--c:#fff;position:relative;display:flex;align-items:center;gap:8px;min-height:54px;padding:6px 10px;border:var(--line) solid var(--ink);border-radius:14px;background:#fff;box-shadow:var(--shadow-sm);font-weight:900;font-size:16px;line-height:1.15;text-align:left;transition:transform .1s,background .2s,box-shadow .1s;animation:ch-in .35s cubic-bezier(.2,1.4,.4,1) both;animation-delay:calc(var(--i)*35ms);touch-action:manipulation}
-.mt-t .lbl{flex:1;min-width:0;overflow-wrap:anywhere}
+.mt-t .lbl{flex:1;min-width:0;overflow-wrap:break-word;hyphens:auto}
 .mt-t img{width:100%;height:76px;object-fit:cover;border-radius:9px;border:2px solid var(--ink);background:#eee;display:block}
 .mt-t.pic{flex-direction:column;align-items:stretch;padding:5px}
 .mt-t.pic .lbl{display:none}
@@ -103,7 +103,7 @@ function make(rng, pack, src, n, decoys, difficulty) {
 const PAIRS = [4, 5, 6];
 
 export default register({
-  id: 'match', title: 'Matching board', icon: '🔗', blurb: 'Pair them all up', tags: ['slow', 'kids'], kids: true,
+  id: 'match', title: 'Matching board', icon: '🔗', blurb: 'Pair them all up', tags: ['slow', 'kids'], kids: true, timeScale: q => 1 + q.data.left.length * 0.6,
   options: [
     { key: 'pairs', label: 'Pairs', type: 'choice', values: PAIRS, default: 5, kidsValues: [4], kidsDefault: 4 },
     { key: 'decoys', label: 'Decoy answers', type: 'bool', default: true, kidsHide: true },
@@ -155,7 +155,6 @@ export default register({
       h('div.mt-cols', { class: d.pics ? 'pics' : '' },
         h('div.mt-col.l', {}, h('h3', {}, d.heads?.[0] || ''), ...L), h('div.mt-col.r', {}, h('h3', {}, d.heads?.[1] || ''), ...R)),
       h('div.mt-foot', {}, check)));
-    stretchTimer(api, el, 1 + n * 0.6);
 
     function draw() {
       L.forEach((t, i) => {

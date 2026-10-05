@@ -90,7 +90,7 @@ for (const [name, sport, nation, d, blurb] of ATHLETES) {
 }
 
 write('sport', {
-  id: 'sport', title: 'Sport', theme: 'sport', icon: '⚽', kids: false, version: 1,
+  id: 'sport', title: 'Sport', theme: 'sport', icon: '⚽', kids: false, version: 1, noun: 'sports star or event',
   factsMeta: {
     host: { type: 'cat', label: 'Host city', ask: 'Which city hosted the {name}?', stmt: 'The {name} were held in {value}.' },
     winner: { type: 'cat', label: 'Winner', ask: 'Who won the {name}?', stmt: 'The {name} was won by {value}.' },

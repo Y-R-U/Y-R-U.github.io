@@ -1,5 +1,5 @@
-import { register, collect, pick } from '../../formats/registry.js?v=1';
-import { geo, countryIds, isPlayable, REGIONS, createMap, frame, message, button, isKids, cname, theName, byLevel, refFor, supportsGeo, bboxUnion, plural } from './common.js?v=1';
+import { register, collect, pick } from '../../formats/registry.js?v=202610050139';
+import { geo, countryIds, isPlayable, REGIONS, createMap, frame, message, button, isKids, cname, theName, byLevel, refFor, supportsGeo, bboxUnion, plural } from './common.js?v=202610050139';
 
 // Borders that surprise people, explained on the reveal.
 const NOTES = {
@@ -25,7 +25,7 @@ function viewFor(iso) {
 export default register({
   id: 'neighbours', title: 'Neighbours', icon: '🤝', blurb: 'Tap every country that borders it', tags: ['map'],
   options: [{ key: 'mistakes', label: 'Wrong taps allowed', type: 'choice', values: [1, 3, 5], default: 3 }],
-  supports: supportsGeo,
+  supports: supportsGeo, packless: true,
   generate({ rng, packs = [], count, opts = {}, difficulty = 0, avoid }) {
     const kids = !!opts.kids, level = kids ? 1 : difficulty || 0;
     const max = level === 1 ? 6 : level === 2 ? 9 : 15;

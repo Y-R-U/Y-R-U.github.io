@@ -6,12 +6,13 @@ const f = (period, mya, diet, dinosaur, lengthM, found, extra = {}) => ({ period
 
 export default {
   id: 'dinosaurs', title: 'Dinosaurs & prehistoric life', theme: 'animals', icon: '🦖', kids: true,
+  noun: 'prehistoric animal', fakePrompt: 'Which of these prehistoric animals is made up?',
   leakExempt: ['dinosaur', 'saurus', 'sauru'],
   media: 'wiki', photos: 3, depicts: 0, lname: 'asis',
   ranges: { lengthM: [0.3, 40], mya: [0.004, 400], wingspanM: [0.5, 12] },
   factsMeta: {
     period: { type: 'cat', label: 'Period', values: [DV, CB, PE, TR, JU, CR, PG, NG, QU], clue: v => `It lived in the ${v} period.` },
-    mya: { type: 'num', label: 'Lived about (million years ago)', unit: 'million years ago', higherLabel: 'Older', clue: v => (v < 1 ? 'It lived within the last million years.' : `It lived about ${v} million years ago.`) },
+    mya: { type: 'num', label: 'How long ago it lived', unit: 'million years ago', askNumber: 'About how many million years ago did {name} live?', higherLabel: 'Older', clue: v => (v < 1 ? 'It lived within the last million years.' : `It lived about ${v} million years ago.`) },
     diet: { type: 'cat', label: 'Diet', values: [C, H, O, P], clue: v => `It was a ${v.toLowerCase()}.` },
     dinosaur: { type: 'bool', label: 'A dinosaur', yes: 'Dinosaur', no: 'Not a dinosaur', clue: v => (v ? null : 'It was not a dinosaur.') },
     lengthM: { type: 'num', label: 'Length', unit: 'm', higherLabel: 'Longer', clue: v => `It grew to about ${v} m long.` },

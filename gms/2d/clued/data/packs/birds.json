@@ -862,22 +862,6 @@
       "credit": "Tim",
       "license": "CC BY 4.0",
       "page": "https://www.inaturalist.org/photos/69898951"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/350107803/medium.png",
-      "w": 500,
-      "h": 350,
-      "credit": "Sockrosma",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/350107803"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/453861820/medium.jpeg",
-      "w": 375,
-      "h": 500,
-      "credit": "Zara",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/453861820"
      }
     ],
     "audio": [
@@ -976,14 +960,6 @@
    "media": {
     "img": [
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/245467722/medium.jpeg",
-      "w": 281,
-      "h": 500,
-      "credit": "Sofia Zvolanek",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/245467722"
-     },
-     {
       "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/411315483/medium.jpeg",
       "w": 375,
       "h": 500,
@@ -998,6 +974,14 @@
       "credit": "pimelea",
       "license": "CC BY 4.0",
       "page": "https://www.inaturalist.org/photos/333081926"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/111948592/medium.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Paul Whitington",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/111948592"
      }
     ],
     "audio": [
@@ -1168,14 +1152,6 @@
       "page": "https://commons.wikimedia.org/wiki/File:Threskiornis_molucca_-_Perth.jpg"
      },
      {
-      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/3/39/%27Bin_chicken%27_%28Threskiornis_molucca%29_in_Belmore_Park%2C_Sydney.jpg/330px-%27Bin_chicken%27_%28Threskiornis_molucca%29_in_Belmore_Park%2C_Sydney.jpg",
-      "w": 330,
-      "h": 440,
-      "credit": "Aliceinthealice",
-      "license": "CC0 1.0",
-      "page": "https://commons.wikimedia.org/wiki/File:%27Bin_chicken%27_(Threskiornis_molucca)_in_Belmore_Park,_Sydney.jpg"
-     },
-     {
       "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/2/20/Australian_ibis_%28Threskiornis_molucca%29_Sydney.jpg/500px-Australian_ibis_%28Threskiornis_molucca%29_Sydney.jpg",
       "w": 500,
       "h": 333,
@@ -1293,14 +1269,6 @@
       "credit": "anonymous",
       "license": "CC BY-SA 4.0",
       "page": "https://www.inaturalist.org/photos/50151416"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/50151417/medium.jpg",
-      "w": 500,
-      "h": 375,
-      "credit": "Summerdrought",
-      "license": "CC BY-SA 4.0",
-      "page": "https://www.inaturalist.org/photos/50151417"
      }
     ]
    },
@@ -1581,14 +1549,6 @@
       "credit": "Spencer McIntyre",
       "license": "CC BY 4.0",
       "page": "https://www.inaturalist.org/photos/63612085"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/72265398/medium.jpeg",
-      "w": 500,
-      "h": 375,
-      "credit": "Jacqui Geux",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/72265398"
      }
     ],
     "audio": [
@@ -1778,14 +1738,6 @@
       "credit": "Oscar Dove",
       "license": "CC BY 4.0",
       "page": "https://www.inaturalist.org/photos/412477110"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/386289202/medium.jpg",
-      "w": 500,
-      "h": 336,
-      "credit": "no rights reserved",
-      "license": "CC0 1.0",
-      "page": "https://www.inaturalist.org/photos/386289202"
      }
     ]
    },
@@ -2080,14 +2032,6 @@
       "credit": "Morten Ross",
       "license": "CC BY 4.0",
       "page": "https://www.inaturalist.org/photos/120823804"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/112188157/medium.jpg",
-      "w": 500,
-      "h": 333,
-      "credit": "Richard Littauer",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/112188157"
      },
      {
       "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/222207380/medium.jpeg",
@@ -2555,22 +2499,6 @@
       "credit": "no rights reserved",
       "license": "CC0 1.0",
       "page": "https://www.inaturalist.org/photos/264835127"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/408807127/medium.jpg",
-      "w": 380,
-      "h": 500,
-      "credit": "Michael Warner",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/408807127"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/427724222/medium.jpg",
-      "w": 344,
-      "h": 500,
-      "credit": "Michael Warner",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/427724222"
      }
     ],
     "audio": [
@@ -2746,14 +2674,6 @@
       "page": "https://www.inaturalist.org/photos/319398053"
      },
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/42638096/medium.jpg",
-      "w": 500,
-      "h": 444,
-      "credit": "Sandra Keller",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/42638096"
-     },
-     {
       "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/432659299/medium.jpeg",
       "w": 500,
       "h": 488,
@@ -2818,14 +2738,6 @@
       "credit": "Diogo Luiz",
       "license": "CC BY 4.0",
       "page": "https://www.inaturalist.org/photos/95469825"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/145999537/medium.jpeg",
-      "w": 500,
-      "h": 375,
-      "credit": "Daniel Cavallari",
-      "license": "CC BY-SA 4.0",
-      "page": "https://www.inaturalist.org/photos/145999537"
      }
     ],
     "audio": [
@@ -2884,14 +2796,6 @@
       "credit": "avocat",
       "license": "CC BY 4.0",
       "page": "https://www.inaturalist.org/photos/187011774"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/144891172/medium.jpeg",
-      "w": 500,
-      "h": 375,
-      "credit": "amantedarmanin",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/144891172"
      }
     ]
    },
@@ -3009,14 +2913,6 @@
       "credit": "Morten Ross",
       "license": "CC BY 4.0",
       "page": "https://www.inaturalist.org/photos/111321224"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/175739925/medium.jpg",
-      "w": 500,
-      "h": 375,
-      "credit": "Paul Hoekman",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/175739925"
      }
     ],
     "audio": [
@@ -3705,14 +3601,6 @@
       "credit": "Judy Gallagher",
       "license": "CC BY 4.0",
       "page": "https://www.inaturalist.org/photos/111891993"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/370528121/medium.jpg",
-      "w": 500,
-      "h": 500,
-      "credit": "Mila Turov",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/370528121"
      }
     ],
     "audio": [
@@ -4425,14 +4313,6 @@
       "credit": "William Stephens",
       "license": "CC BY 4.0",
       "page": "https://www.inaturalist.org/photos/64237933"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/474042571/medium.jpeg",
-      "w": 500,
-      "h": 281,
-      "credit": "no rights reserved",
-      "license": "CC0 1.0",
-      "page": "https://www.inaturalist.org/photos/474042571"
      }
     ]
    },
@@ -4527,22 +4407,6 @@
       "credit": "Frank Sengpiel",
       "license": "CC BY 4.0",
       "page": "https://www.inaturalist.org/photos/73516715"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/197362536/medium.jpg",
-      "w": 375,
-      "h": 500,
-      "credit": "pmcabinet",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/197362536"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/710435847/medium.jpg",
-      "w": 407,
-      "h": 500,
-      "credit": "no rights reserved",
-      "license": "CC0 1.0",
-      "page": "https://www.inaturalist.org/photos/710435847"
      }
     ],
     "audio": [
@@ -4841,14 +4705,6 @@
       "credit": "dhfischer",
       "license": "CC BY 4.0",
       "page": "https://www.inaturalist.org/photos/477439197"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/182063723/medium.jpeg",
-      "w": 500,
-      "h": 500,
-      "credit": "Aparna Krishnan",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/182063723"
      },
      {
       "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/173064735/medium.jpeg",
@@ -5155,14 +5011,6 @@
       "credit": "Alice Shanks",
       "license": "CC BY 4.0",
       "page": "https://www.inaturalist.org/photos/186367047"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/382009145/medium.jpg",
-      "w": 500,
-      "h": 333,
-      "credit": "Wang.QG",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/382009145"
      }
     ]
    },

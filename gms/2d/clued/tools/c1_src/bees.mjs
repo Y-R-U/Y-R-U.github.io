@@ -4,6 +4,7 @@ const f = (kind, stings, social) => ({ kind, stings, social });
 
 export default {
   id: 'bees', title: 'Wasps, bees & hornets', theme: 'animals', icon: '🐝', kids: true, notice: NOT_ID,
+  noun: 'insect', fakePrompt: 'Which of these wasps, bees and hornets is made up?',
   leakExempt: [],
   wikiD1: true, autoTaxo: ['family', 'genus'],
   factsMeta: {

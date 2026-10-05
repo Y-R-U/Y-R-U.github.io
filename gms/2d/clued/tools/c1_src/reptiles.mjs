@@ -2,10 +2,12 @@ import { INAT, WD, COMMONS, STATUS_META, len } from './_common.mjs';
 
 const AU = 'Australia', AF = 'Africa', AS = 'Asia', EU = 'Europe', NA = 'North America', SA = 'South America', AM = 'the Americas', NZ = 'New Zealand', GA = 'the Galápagos Islands';
 const RE = 'Reptile', AMP = 'Amphibian';
-const f = (cls, region, lengthM, venomous = false) => ({ cls, region, lengthM, venomous });
+// venomous: null = left out (venom glands or skin toxins too weak or disputed to call either way)
+const f = (cls, region, lengthM, venomous = false) => ({ cls, region, lengthM, ...(venomous == null ? {} : { venomous }) });
 
 export default {
   id: 'reptiles', title: 'Frogs & reptiles', theme: 'animals', icon: '🐸', kids: true,
+  noun: 'frog or reptile', fakePrompt: 'Which of these frogs and reptiles is made up?',
   leakExempt: [],
   wikiD1: true, autoTaxo: ['family', 'genus'], status: true, audio: true, wdCheck: { lengthM: 'P2043' },
   ranges: { lengthM: [0.01, 7] },
@@ -37,10 +39,10 @@ export default {
     { n: 'Komodo dragon', sci: 'Varanus komodoensis', g: 'monitor', f: f(RE, AS, 2.6, true), d: 1, look: ['Lace monitor', 'Perentie'],
       b: 'The biggest lizard in the world, from a few Indonesian islands. It has a venomous bite.',
       c: ['Females can lay eggs without a male.', 'It can eat 80% of its body weight in one meal.', 'Its bite contains venom.', 'It lives on a few Indonesian islands.', 'It is the biggest lizard in the world.'] },
-    { n: 'Lace monitor', alt: ['goanna', 'tree goanna'], sci: 'Varanus varius', g: 'monitor', f: f(RE, AU, 1.7), d: 2, look: ['Perentie', 'Komodo dragon'],
+    { n: 'Lace monitor', alt: ['goanna', 'tree goanna'], sci: 'Varanus varius', g: 'monitor', f: f(RE, AU, 1.7, true), d: 2, look: ['Perentie', 'Komodo dragon'],
       b: 'A big goanna of eastern Australia that climbs trees and raids picnic grounds and bird nests.',
       c: ['It lays its eggs inside termite mounds.', 'It raids picnic grounds for food.', 'It climbs trees easily.', 'It is the second-largest lizard in Australia.', 'It is a kind of goanna.'] },
-    { n: 'Perentie', sci: 'Varanus giganteus', g: 'monitor', f: f(RE, AU, 2), d: 2, look: ['Lace monitor', 'Komodo dragon'],
+    { n: 'Perentie', sci: 'Varanus giganteus', g: 'monitor', f: f(RE, AU, 2, null), d: 2, look: ['Lace monitor', 'Komodo dragon'],
       b: 'Australia\'s biggest lizard, a goanna of the desert. It stands up on its back legs to look around.',
       c: ['Its species name means "gigantic".', 'It stands on its back legs to look around.', 'It lives in the red centre of Australia.', 'It is the largest lizard in Australia.', 'It is a desert goanna.'] },
     { n: 'Green iguana', alt: ['iguana'], sci: 'Iguana iguana', g: 'iguana', f: f(RE, AM, 1.5), d: 1, look: ['Marine iguana'],
@@ -124,7 +126,7 @@ export default {
     { n: 'Fire salamander', sci: 'Salamandra salamandra', g: 'salamander', f: f(AMP, EU, 0.2, true), d: 2, look: ['Great crested newt'],
       b: 'A black-and-yellow salamander of European forests. Its skin oozes poison.',
       c: ['People once thought it could walk through fire.', 'It gives birth to larvae in streams.', 'Its skin oozes toxins.', 'It lives in damp European forests.', 'It is black with yellow spots.'] },
-    { n: 'Great crested newt', wikiFirst: true, sci: 'Triturus cristatus', g: 'newt', f: f(AMP, EU, 0.15), d: 3, look: ['Fire salamander'],
+    { n: 'Great crested newt', wikiFirst: true, sci: 'Triturus cristatus', g: 'newt', f: f(AMP, EU, 0.15, null), d: 3, look: ['Fire salamander'],
       b: 'A big dark newt of Europe. In spring, males grow a jagged crest along their backs.',
       c: ['It is protected by law in Britain.', 'Its belly is orange with black spots.', 'Females fold each egg into a leaf.', 'It has warty dark skin.', 'Males grow a jagged crest in spring.'] },
     { n: 'Pacman frog', alt: ['Argentine horned frog', 'horned frog'], sci: 'Ceratophrys ornata', g: 'frog', f: f(AMP, SA, 0.12), d: 2,

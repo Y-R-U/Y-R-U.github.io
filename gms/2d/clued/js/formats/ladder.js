@@ -1,7 +1,7 @@
-import { register, poolItems, pickPack, byDifficulty, distractors, imageOf, placeAnswer, collect, pick } from './registry.js?v=1';
-import { h, choiceGrid, typeBox } from '../ui/kit.js?v=1';
-import { fuzzyMatch, answersFor } from '../core/fuzzy.js?v=1';
-import { norm, injectCSS, baseCSS, stages, stretchTimer, once, hasImg } from './fkit.js?v=1';
+import { register, poolItems, pickPack, byDifficulty, distractors, imageOf, placeAnswer, collect, pick } from './registry.js?v=202610050139';
+import { h, choiceGrid, typeBox } from '../ui/kit.js?v=202610050139';
+import { fuzzyMatch, answersFor } from '../core/fuzzy.js?v=202610050139';
+import { norm, injectCSS, baseCSS, stages, once, hasImg } from './fkit.js?v=202610050139';
 
 const CSS = `
 .ld{gap:10px}
@@ -81,7 +81,7 @@ function make(rng, pack, opts, difficulty, kids) {
 }
 
 export default register({
-  id: 'ladder', title: 'Clue ladder', icon: '🪜', blurb: 'Fewer clues, more points', tags: ['slow', 'kids'], kids: true,
+  id: 'ladder', title: 'Clue ladder', icon: '🪜', blurb: 'Fewer clues, more points', tags: ['slow', 'kids'], kids: true, timeScale: q => Math.min(2, 1 + q.data.clues.length / 10),
   options: [
     { key: 'clues', label: 'Clues', type: 'choice', values: [5, 10, 20], default: 10, kidsHide: true },
     { key: 'answer', label: 'Answer by', type: 'choice', values: ['pick', 'type'], labels: ['Picking', 'Typing'], default: 'pick', kidsHide: true },
@@ -116,7 +116,6 @@ export default register({
       if (s > 0) api.sfx('reveal');
     };
     st = stages(api, q, el, draw);
-    if (!st.native) stretchTimer(api, el, Math.min(4, 1 + N / 4));
     if (st.button) left.append(st.button);
     const showAll = () => items.forEach(li => li.classList.remove('hidden'));
     let grid = null, box = null, tries = 0;

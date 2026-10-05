@@ -153,7 +153,7 @@ async function main() {
 
   // --- serverless link challenge
   const url = await a.eval(`(async () => {
-    const net = await import('./js/net/index.js?v=1');
+    const net = await import('./js/net/index.js?v=' + (window.__clued?.BUILD || window.__cluedCtx?.BUILD || 1));
     const c = window.__cluedCtx;
     const spec = c.makeSpec('quick', [{ format: 'mc', count: 4 }], 'lc-seed');
     const { questions } = await c.buildQuestions(spec);
@@ -163,7 +163,7 @@ async function main() {
   ok(url.length < 1500, `link is short enough to share (${url.length} chars)`);
   await b.go(url.replace('/clued/#', `/clued/?noauth=1#`));
   await b.waitFor('window.__cluedReady', 20000, 'boot');
-  await b.eval(`import('./js/net/index.js?v=1').then(m => m.routeFromUrl())`);
+  await b.eval(`import('./js/net/index.js?v=' + (window.__clued?.BUILD || window.__cluedCtx?.BUILD || 1)).then(m => m.routeFromUrl())`);
   await b.waitFor(`document.querySelector('#net-lname')`, 15000, 'link intro');
   ok(await b.eval(`document.body.textContent.includes('Linky challenges you')`), 'link intro names the sender');
   await b.type('#net-lname', 'Replier');

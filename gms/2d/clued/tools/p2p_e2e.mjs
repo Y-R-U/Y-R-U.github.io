@@ -98,7 +98,7 @@ async function main() {
 
   await host.go(`${SITE}?${extra}`);
   await host.waitFor('window.__cluedReady', 20000, 'boot');
-  await host.eval(`import('./js/net/index.js?v=1').then(() => window.__cluedCtx.go('online'))`);
+  await host.eval(`import('./js/net/index.js?v=' + (window.__clued?.BUILD || window.__cluedCtx?.BUILD || 1)).then(() => window.__cluedCtx.go('online'))`);
   await host.waitFor(`document.querySelector('[data-act=host-device]')`, 8000, 'device host button');
   ok(true, 'Online hub offers "Host from this device"');
   await host.shot('hub-portrait.png');

@@ -6,6 +6,7 @@ const f = (edibility, region, extra = {}) => ({ ...(edibility ? { edibility } : 
 
 export default {
   id: 'mushrooms', title: 'Mushrooms & fungi', theme: 'nature', icon: '🍄', kids: false, kidsSafe: false,
+  noun: 'mushroom or fungus', fakePrompt: 'Which of these mushrooms and fungi is made up?',
   notice: 'Never use this to forage. Many deadly mushrooms look like edible ones. Not for real-world identification.',
   leakExempt: ['mushroom', 'mushrooms', 'fungus', 'fungi'],
   wikiD1: true, autoTaxo: ['family', 'genus'],

@@ -154,7 +154,19 @@ export function gatePack(pack) {
   return pack;
 }
 
+// singular nouns for type's "Name the …" prompt where the pack title doesn't singularise
+const PACK_NOUNS = { countries: 'country', currencies: 'currency', history: 'historical event', leaders: 'leader', people: 'famous person', quotes: 'person', tv: 'TV show', words: 'word' };
+
+// "Mamma Mia!." / "D.C.." -> one closing mark
+const tidy = t => (typeof t === 'string' ? t.replace(/([!?])\.(?=\s|$)/g, '$1').replace(/([A-Z])\.\.(?=\s|$)/g, '$1.') : t);
+function tidyPack(pack) {
+  for (const it of pack.items || []) { it.blurb = tidy(it.blurb); if (it.clues) it.clues = it.clues.map(tidy); }
+  for (const q of pack.questions || []) { q.prompt = tidy(q.prompt); if (q.explain) q.explain = tidy(q.explain); }
+}
+
 export function writePack(pack) {
+  if (!pack.noun && PACK_NOUNS[pack.id]) pack.noun = PACK_NOUNS[pack.id];
+  tidyPack(pack);
   const before = gateLog.length;
   gatePack(pack);
   const gl = gateLog.slice(before);

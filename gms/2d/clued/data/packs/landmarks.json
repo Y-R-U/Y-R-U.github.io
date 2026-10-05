@@ -2398,18 +2398,7 @@
     "It is in the United Arab Emirates.",
     "It is the largest mosque in the United Arab Emirates."
    ],
-   "media": {
-    "img": [
-     {
-      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/01/Sheikh_Zayed_Mosque_Silhouette.jpg/500px-Sheikh_Zayed_Mosque_Silhouette.jpg",
-      "w": 500,
-      "h": 281,
-      "credit": "PotatoWitch",
-      "license": "CC BY-SA 4.0",
-      "page": "https://commons.wikimedia.org/wiki/File:Sheikh_Zayed_Mosque_Silhouette.jpg"
-     }
-    ]
-   },
+   "media": {},
    "difficulty": 3
   },
   {
@@ -4017,7 +4006,7 @@
     "kind": "building",
     "built": 1800
    },
-   "blurb": "White House, United States. It is the home and office of the US president in Washington, D.C.. Its address is 1600 Pennsylvania Avenue.",
+   "blurb": "White House, United States. It is the home and office of the US president in Washington, D.C. Its address is 1600 Pennsylvania Avenue.",
    "clues": [
     "It was set on fire by British troops in 1814.",
     "John Adams was the first president to live there.",
@@ -4107,18 +4096,7 @@
     "It is in Morocco.",
     "It is in Casablanca."
    ],
-   "media": {
-    "img": [
-     {
-      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8a/Sunshine_on_mosque_Hassan_II_in_Casablanca%2C_Morocco_-_Flickr_-_Milamber%27s_portfolio.jpg/500px-Sunshine_on_mosque_Hassan_II_in_Casablanca%2C_Morocco_-_Flickr_-_Milamber%27s_portfolio.jpg",
-      "w": 500,
-      "h": 332,
-      "credit": "Milamber's portfolio",
-      "license": "CC BY 2.0",
-      "page": "https://commons.wikimedia.org/wiki/File:Sunshine_on_mosque_Hassan_II_in_Casablanca,_Morocco_-_Flickr_-_Milamber%27s_portfolio.jpg"
-     }
-    ]
-   },
+   "media": {},
    "difficulty": 3
   },
   {
@@ -5763,7 +5741,7 @@
     "Ireland",
     "Thailand"
    ],
-   "explain": "White House, United States. It is the home and office of the US president in Washington, D.C.. Its address is 1600 Pennsylvania Avenue.",
+   "explain": "White House, United States. It is the home and office of the US president in Washington, D.C. Its address is 1600 Pennsylvania Avenue.",
    "difficulty": 1,
    "refs": [
     "landmarks/white-house"

@@ -77,7 +77,8 @@ const items = rows.map(r => {
   const [name, altName] = IUPAC[r.Name] || [r.Name];
   const { period, group } = position(z);
   const hand = H[z];
-  const state = /^(Gas|Solid|Liquid)$/.test(r.StandardState) ? r.StandardState : null;
+  // state only where a bulk sample has been seen (no astatine/francium, nothing past einsteinium); the rest are predictions
+  const state = /^(Gas|Solid|Liquid)$/.test(r.StandardState) && z <= 99 && z !== 85 && z !== 87 ? r.StandardState : null;
   const year = /^\d{4}$/.test(r.YearDiscovered) ? +r.YearDiscovered : null;
   const facts = {
     atomicNumber: z, symbol: r.Symbol, block: r.GroupBlock, period,

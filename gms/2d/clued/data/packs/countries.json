@@ -8351,7 +8351,7 @@
     "About 342 million people lived there in 2025.",
     "It is home to the Statue of Liberty.",
     "Main language: English.",
-    "Its capital is Washington, D.C.."
+    "Its capital is Washington, D.C."
    ],
    "media": {
     "img": [
@@ -11862,5 +11862,6 @@
    "name": "UN M49 regions",
    "url": "https://unstats.un.org/unsd/methodology/m49/"
   }
- ]
+ ],
+ "noun": "country"
 }

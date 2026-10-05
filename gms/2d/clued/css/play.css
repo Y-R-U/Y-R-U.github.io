@@ -177,8 +177,20 @@ body[data-screen=play] { --br8t-account-space: 0px; }
   .q.no-media ~ .reveal { width: calc(42% - 20px); }
   .play.revealed .q.no-media .q-prompt { visibility: hidden; }
   .q.no-media ~ .reveal .rv-q { display: block; }
-  .play.revealed .q.has-media .q-media { flex: 1 1 46%; }
+  /* the card sits under the picture: shrink the picture above it so the subject stays whole (runner sets --rv-h) */
+  .play.revealed .q.has-media .q-media { flex: 1 1 46%; margin-bottom: calc(var(--rv-h, 0px) + 10px); min-height: 70px; transition: margin-bottom .3s; }
+  .q.has-media ~ .reveal .rv-card { max-height: calc(100vh - 190px); }
   .rv-card { max-height: calc(100vh - 110px); overflow: auto; padding: 10px 12px; gap: 6px; }
+  /* boards keep their left column for the prompt; widen it under the card so the card never hides the board */
+  .play.revealed .mt-head { flex-basis: calc(46% - 14px); visibility: hidden; }
+  .play.revealed .mt-foot { display: none; }
+  .play.revealed .cn { grid-template-columns: calc(46% - 14px) 1fr; }
+  .play.revealed .cn > .q-prompt, .play.revealed .cn-side { visibility: hidden; }
+  .play.revealed .hl-left { flex-basis: 50%; }
+  .play.revealed .q.no-media .qt-card { visibility: hidden; }
+  /* map rounds: the card goes over the side panel, never over the map */
+  .stage:has(> .gmq) > .reveal { left: auto; right: var(--gutter); width: calc(38% - 14px); }
+  .play.revealed .gmq-side { justify-content: flex-start; padding-bottom: calc(var(--rv-h, 0px) + 14px); }
   .rv-title { font-size: 22px; }
 }
 /* desktop */
@@ -193,6 +205,11 @@ body[data-screen=play] { --br8t-account-space: 0px; }
   .choice { min-height: 72px; font-size: 20px; }
   .stage { padding-top: 24px; }
   .reveal { max-width: 720px; }
+  /* picture answers: keep the grid and the card on one screen */
+  .choices.images .choice img { max-height: 22vh; }
+  .stage { position: relative; }
+  .stage:has(> .gmq) > .reveal { position: absolute; left: auto; right: var(--gutter); bottom: 24px; width: 320px; margin: 0; z-index: 5; }
+  .play.revealed .gmq-side { justify-content: flex-start; padding-bottom: calc(var(--rv-h, 0px) + 24px); }
 }
 
 /* duel */

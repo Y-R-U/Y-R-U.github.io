@@ -8,7 +8,7 @@ import { fileURLToPath } from 'node:url';
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const old = readFileSync(join(ROOT, 'js/build.js'), 'utf8').match(/BUILD = '([^']+)'/)[1];
 const next = process.argv[2] || new Date().toISOString().slice(0, 16).replace(/[-:T]/g, '');
-const files = [join(ROOT, 'index.html')];
+const files = [join(ROOT, 'index.html'), join(ROOT, 'admin.html')];
 (function walk(d) {
   for (const f of readdirSync(d)) {
     const p = join(d, f);

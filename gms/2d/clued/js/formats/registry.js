@@ -1,5 +1,5 @@
 // Format registry + helpers shared by every format. See docs/notes/A.md "Format author guide".
-import { pick, shuffle, sample, weightedPick } from '../core/rng.js?v=1';
+import { pick, shuffle, sample, weightedPick } from '../core/rng.js?v=202610050139';
 
 const R = globalThis.__cluedFormats || (globalThis.__cluedFormats = { map: new Map(), listeners: new Set() });
 
@@ -18,12 +18,17 @@ export const getFormat = id => R.map.get(id) || null;
 export const listFormats = () => [...R.map.values()];
 export const onRegister = fn => (R.listeners.add(fn), () => R.listeners.delete(fn));
 
-export function supportsPack(fmt, info) {
+export const NOT_ENOUGH = 'Not enough for this game yet';
+
+// supports() reads index caps; caps.formats (tools/build_index.mjs) then says how many questions generate() really made.
+export function supportsPack(fmt, info, { kids = false } = {}) {
   if (!fmt || !info) return 'Not available';
-  try {
-    const r = fmt.supports(info);
-    return r === true ? true : (typeof r === 'string' && r ? r : 'Not enough data for this format');
-  } catch (e) { return 'Not enough data for this format'; }
+  let r;
+  try { r = fmt.supports(info); } catch (e) { r = false; }
+  if (r !== true) return typeof r === 'string' && r ? r : 'Not enough data for this format';
+  const counts = kids ? info.caps?.formatsKids : info.caps?.formats;
+  if (fmt.packless || !counts || !(fmt.id in counts)) return true;
+  return counts[fmt.id] >= (fmt.minPerPack || 5) ? true : NOT_ENOUGH;
 }
 
 export function defaultOpts(fmt) {

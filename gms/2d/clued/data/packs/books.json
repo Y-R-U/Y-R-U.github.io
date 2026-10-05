@@ -39,7 +39,8 @@
    "label": "Children's book",
    "yes": "Children's book",
    "no": "Not a children’s book",
-   "askBool": "Which of these is a children's book?"
+   "askBool": "Which of these is a children's book?",
+   "stmt": "{name} is a children's book."
   }
  },
  "items": [
@@ -125,7 +126,7 @@
     "A girl follows a White Rabbit down a rabbit hole."
    ],
    "difficulty": 1,
-   "firstLine": "Alice was beginning to get very tired of sitting by her sister on the bank, and of having nothing to do:",
+   "firstLine": "Alice was beginning to get very tired of sitting by her sister on the bank, and of having nothing to do…",
    "firstLineSource": "https://www.gutenberg.org/ebooks/11"
   },
   {
@@ -180,7 +181,7 @@
     "A vampire count travels from Transylvania to England."
    ],
    "difficulty": 1,
-   "firstLine": "Left Munich at 8:35 P. M., on 1st May, arriving at Vienna early next morning;",
+   "firstLine": "Left Munich at 8:35 P. M., on 1st May, arriving at Vienna early next morning…",
    "firstLineSource": "https://www.gutenberg.org/ebooks/345"
   },
   {
@@ -207,7 +208,7 @@
     "It ends with Sydney Carton going to the guillotine."
    ],
    "difficulty": 2,
-   "firstLine": "It was the best of times, it was the worst of times,",
+   "firstLine": "It was the best of times, it was the worst of times…",
    "firstLineSource": "https://www.gutenberg.org/ebooks/98"
   },
   {
@@ -394,7 +395,7 @@
     "A handsome young man trades his soul for eternal youth."
    ],
    "difficulty": 2,
-   "firstLine": "The studio was filled with the rich odour of roses,",
+   "firstLine": "The studio was filled with the rich odour of roses…",
    "firstLineSource": "https://www.gutenberg.org/ebooks/174"
   },
   {
@@ -537,7 +538,7 @@
     "A boy named Mowgli is raised by wolves."
    ],
    "difficulty": 1,
-   "firstLine": "It was seven o'clock of a very warm evening in the Seeonee hills when Father Wolf woke up from his day's rest,",
+   "firstLine": "It was seven o'clock of a very warm evening in the Seeonee hills when Father Wolf woke up from his day's rest…",
    "firstLineSource": "https://www.gutenberg.org/ebooks/236"
   },
   {
@@ -615,7 +616,7 @@
     "A shipwrecked sailor survives alone on an island."
    ],
    "difficulty": 2,
-   "firstLine": "I was born in the year 1632, in the city of York, of a good family, though not of that country,",
+   "firstLine": "I was born in the year 1632, in the city of York, of a good family, though not of that country…",
    "firstLineSource": "https://www.gutenberg.org/ebooks/521"
   },
   {
@@ -669,7 +670,7 @@
     "An old knight attacks windmills thinking they are giants."
    ],
    "difficulty": 2,
-   "firstLine": "In a village of La Mancha, the name of which I have no desire to call to mind,",
+   "firstLine": "In a village of La Mancha, the name of which I have no desire to call to mind…",
    "firstLineSource": "https://www.gutenberg.org/ebooks/996",
    "translator": "John Ormsby"
   },
@@ -838,7 +839,7 @@
     "A wealthy young woman meddles in others' love lives."
    ],
    "difficulty": 2,
-   "firstLine": "Emma Woodhouse, handsome, clever, and rich, with a comfortable home and happy disposition, seemed to unite some of the best blessings of existence;",
+   "firstLine": "Emma Woodhouse, handsome, clever, and rich, with a comfortable home and happy disposition, seemed to unite some of the best blessings of existence…",
    "firstLineSource": "https://www.gutenberg.org/ebooks/158"
   },
   {
@@ -865,7 +866,7 @@
     "An orphan in a workhouse asks for more."
    ],
    "difficulty": 1,
-   "firstLine": "Among other public buildings in a certain town, which for many reasons it will be prudent to refrain from mentioning,",
+   "firstLine": "Among other public buildings in a certain town, which for many reasons it will be prudent to refrain from mentioning…",
    "firstLineSource": "https://www.gutenberg.org/ebooks/730"
   },
   {
@@ -1055,7 +1056,7 @@
     "A talkative orphan girl is adopted by a brother and sister."
    ],
    "difficulty": 1,
-   "firstLine": "Mrs. Rachel Lynde lived just where the Avonlea main road dipped down into a little hollow,",
+   "firstLine": "Mrs. Rachel Lynde lived just where the Avonlea main road dipped down into a little hollow…",
    "firstLineSource": "https://www.gutenberg.org/ebooks/45"
   },
   {
@@ -1111,7 +1112,7 @@
     "A dog becomes a sled dog in the Yukon."
    ],
    "difficulty": 2,
-   "firstLine": "Buck did not read the newspapers, or he would have known that trouble was brewing,",
+   "firstLine": "Buck did not read the newspapers, or he would have known that trouble was brewing…",
    "firstLineSource": "https://www.gutenberg.org/ebooks/215"
   },
   {
@@ -1139,7 +1140,7 @@
     "An Englishman makes a bet to circle the globe."
    ],
    "difficulty": 1,
-   "firstLine": "Mr. Phileas Fogg lived, in 1872, at No. 7, Saville Row, Burlington Gardens,",
+   "firstLine": "Mr. Phileas Fogg lived, in 1872, at No. 7, Saville Row, Burlington Gardens…",
    "firstLineSource": "https://www.gutenberg.org/ebooks/103"
   },
   {
@@ -1201,7 +1202,7 @@
     "A doctor drinks a potion that turns him into a monster."
    ],
    "difficulty": 2,
-   "firstLine": "Mr. Utterson the lawyer was a man of a rugged countenance that was never lighted by a smile;",
+   "firstLine": "Mr. Utterson the lawyer was a man of a rugged countenance that was never lighted by a smile…",
    "firstLineSource": "https://www.gutenberg.org/ebooks/43"
   },
   {
@@ -1258,7 +1259,7 @@
     "Young David Balfour is seized and put on a ship."
    ],
    "difficulty": 3,
-   "firstLine": "I will begin the story of my adventures with a certain morning early in the month of June, the year of grace 1751,",
+   "firstLine": "I will begin the story of my adventures with a certain morning early in the month of June, the year of grace 1751…",
    "firstLineSource": "https://www.gutenberg.org/ebooks/421"
   },
   {

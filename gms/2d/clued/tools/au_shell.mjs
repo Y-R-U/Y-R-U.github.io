@@ -16,7 +16,7 @@ async function boot(kids = false) {
   await c.evaluate(`localStorage.setItem('clued.settings', JSON.stringify({ sound: true, kids: ${kids} })); true`);
   await c.goto(URL, 'window.__cluedReady === true');
   await c.evaluate(`(async () => {
-    const P = globalThis.__cluedPacks; const { summarize } = await import('./js/core/packs.js?v=1');
+    const P = globalThis.__cluedPacks; const { summarize } = await import('./js/core/packs.js?v=' + (window.__clued?.BUILD || window.__cluedCtx?.BUILD || 1));
     for (const id of ['hits-1980s','hits-2010s','classical-piano','nursery-rhymes','anthems','kids-film-tv','screen-themes','music-artists']) {
       const p = await (await fetch('data/music/' + id + '.json')).json();
       P.packs.set(id, p); P.index.packs[id] = { ...summarize(p), id };

@@ -66,14 +66,6 @@
       "page": "https://commons.wikimedia.org/wiki/File:BIEDRONA.JPG"
      },
      {
-      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/0/08/7-Spotted-Ladybug-Coccinella-septempunctata-sq1.jpg/500px-7-Spotted-Ladybug-Coccinella-septempunctata-sq1.jpg",
-      "w": 500,
-      "h": 500,
-      "credit": "Photographer: Dominik Stodulski Graphic Processing: User:MathKnight",
-      "license": "CC BY-SA 3.0",
-      "page": "https://commons.wikimedia.org/wiki/File:7-Spotted-Ladybug-Coccinella-septempunctata-sq1.jpg"
-     },
-     {
       "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/220339613/medium.jpg",
       "w": 500,
       "h": 333,
@@ -192,14 +184,6 @@
       "credit": "Shirley Zundell",
       "license": "CC BY 4.0",
       "page": "https://www.inaturalist.org/photos/54031036"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/40181266/medium.jpg",
-      "w": 500,
-      "h": 357,
-      "credit": "Jennifer Kepler",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/40181266"
      }
     ]
    },
@@ -293,22 +277,6 @@
       "credit": "Gilles San Martin",
       "license": "CC BY-SA 4.0",
       "page": "https://www.inaturalist.org/photos/53928483"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/376647594/medium.jpeg",
-      "w": 463,
-      "h": 500,
-      "credit": "Shirley Zundell",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/376647594"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/35221177/medium.jpeg",
-      "w": 500,
-      "h": 335,
-      "credit": "Gilles San Martin",
-      "license": "CC BY-SA 4.0",
-      "page": "https://www.inaturalist.org/photos/35221177"
      }
     ]
    },
@@ -355,14 +323,6 @@
       "credit": "Fyodor Pudovikov",
       "license": "CC BY 4.0",
       "page": "https://www.inaturalist.org/photos/186022464"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/435816667/medium.jpeg",
-      "w": 375,
-      "h": 500,
-      "credit": "Radu Teodoreanu",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/435816667"
      }
     ]
    },
@@ -535,14 +495,6 @@
       "credit": "Jane C Frost",
       "license": "CC BY 4.0",
       "page": "https://www.inaturalist.org/photos/383236105"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/111699379/medium.jpg",
-      "w": 280,
-      "h": 500,
-      "credit": "Tony Eales",
-      "license": "CC BY-SA 4.0",
-      "page": "https://www.inaturalist.org/photos/111699379"
      }
     ]
    },
@@ -1318,12 +1270,12 @@
       "page": "https://www.inaturalist.org/photos/295768805"
      },
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/160041513/medium.jpeg",
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/602768384/medium.jpg",
       "w": 500,
-      "h": 326,
-      "credit": "no rights reserved",
-      "license": "CC0 1.0",
-      "page": "https://www.inaturalist.org/photos/160041513"
+      "h": 451,
+      "credit": "Lucas Benaiche",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/602768384"
      }
     ]
    },
@@ -1421,14 +1373,6 @@
    "media": {
     "img": [
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/356484614/medium.jpg",
-      "w": 500,
-      "h": 357,
-      "credit": "no rights reserved",
-      "license": "CC0 1.0",
-      "page": "https://www.inaturalist.org/photos/356484614"
-     },
-     {
       "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/168345099/medium.jpeg",
       "w": 500,
       "h": 329,
@@ -1443,6 +1387,14 @@
       "credit": "Cheongweei Gan",
       "license": "CC BY 4.0",
       "page": "https://www.inaturalist.org/photos/154549867"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/64969704/medium.jpg",
+      "w": 500,
+      "h": 331,
+      "credit": "Pavel Kirillov",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/64969704"
      }
     ]
    },
@@ -1488,14 +1440,6 @@
       "credit": "Sam Fraser-Smith",
       "license": "CC BY 4.0",
       "page": "https://www.inaturalist.org/photos/154784"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/243494428/medium.jpeg",
-      "w": 375,
-      "h": 500,
-      "credit": "Matt B",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/243494428"
      },
      {
       "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/450888255/medium.jpeg",
@@ -1610,14 +1554,6 @@
       "page": "https://commons.wikimedia.org/wiki/File:Anax_imperator_qtl2.jpg"
      },
      {
-      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/5/5e/Emperor_dragonfly_%28Anax_imperator%29_female.JPG/500px-Emperor_dragonfly_%28Anax_imperator%29_female.JPG",
-      "w": 500,
-      "h": 333,
-      "credit": "Charles J. Sharp",
-      "license": "CC BY-SA 4.0",
-      "page": "https://commons.wikimedia.org/wiki/File:Emperor_dragonfly_(Anax_imperator)_female.JPG"
-     },
-     {
       "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/f/f9/Anax_imperator_qtl1.jpg/500px-Anax_imperator_qtl1.jpg",
       "w": 500,
       "h": 356,
@@ -1718,14 +1654,6 @@
    "media": {
     "img": [
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/575342058/medium.jpg",
-      "w": 500,
-      "h": 375,
-      "credit": "no rights reserved",
-      "license": "CC0 1.0",
-      "page": "https://www.inaturalist.org/photos/575342058"
-     },
-     {
       "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/77195713/medium.jpeg",
       "w": 500,
       "h": 375,
@@ -1740,6 +1668,14 @@
       "credit": "Bernard DUPONT",
       "license": "CC BY 4.0",
       "page": "https://www.inaturalist.org/photos/575914453"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/465734985/medium.png",
+      "w": 500,
+      "h": 438,
+      "credit": "nberhe",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/465734985"
      }
     ]
    },
@@ -2438,14 +2374,6 @@
       "page": "https://www.inaturalist.org/photos/47645"
      },
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/71543446/medium.jpg",
-      "w": 354,
-      "h": 500,
-      "credit": "Auckland War Memorial Museum",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/71543446"
-     },
-     {
       "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/180871061/medium.jpg",
       "w": 500,
       "h": 333,
@@ -2498,14 +2426,6 @@
       "credit": "no rights reserved",
       "license": "CC0 1.0",
       "page": "https://www.inaturalist.org/photos/642470984"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/488312051/medium.jpg",
-      "w": 500,
-      "h": 375,
-      "credit": "no rights reserved",
-      "license": "CC0 1.0",
-      "page": "https://www.inaturalist.org/photos/488312051"
      }
     ]
    },
@@ -2675,7 +2595,7 @@
   {
    "id": "antlion",
    "name": "Antlion",
-   "sci": "Myrmeleontidae",
+   "sci": "Myrmeleon",
    "group": "lacewing",
    "facts": {
     "order": "Lacewings & antlions",
@@ -2696,28 +2616,28 @@
    "media": {
     "img": [
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/11079517/medium.jpg",
-      "w": 459,
-      "h": 500,
-      "credit": "Kostas Zontanos",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/11079517"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/158193040/medium.jpeg",
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/183889416/medium.jpg",
       "w": 500,
-      "h": 282,
-      "credit": "Julien Tchilinguirian",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/158193040"
+      "h": 332,
+      "credit": "Douglas Goldman",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/183889416"
      },
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/10800614/medium.jpeg",
-      "w": 455,
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/241115462/medium.jpg",
+      "w": 375,
       "h": 500,
-      "credit": "Kostas Zontanos",
+      "credit": "Jared Shorma",
       "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/10800614"
+      "page": "https://www.inaturalist.org/photos/241115462"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/615762331/medium.jpg",
+      "w": 500,
+      "h": 333,
+      "credit": "Suvarna Parbhoo Mohan",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/615762331"
      }
     ]
    },

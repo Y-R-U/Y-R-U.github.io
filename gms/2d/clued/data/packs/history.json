@@ -10,6 +10,7 @@
    "type": "year",
    "label": "Year",
    "higherLabel": "Later",
+   "askNumber": "In what year did this happen: {name}?",
    "askHigh": "Which of these happened most recently?",
    "askLow": "Which of these happened first?"
   },
@@ -5276,5 +5277,6 @@
    "name": "Wikipedia articles for each event",
    "url": "https://en.wikipedia.org"
   }
- ]
+ ],
+ "noun": "historical event"
 }

@@ -499,18 +499,6 @@
     "The answer is one word of 4 letters.",
     "Its first letter is N."
    ],
-   "media": {
-    "img": [
-     {
-      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/8/88/NeTube.jpg/500px-NeTube.jpg",
-      "w": 500,
-      "h": 500,
-      "credit": "User:Pslawinski",
-      "license": "CC BY-SA 2.5",
-      "page": "https://commons.wikimedia.org/wiki/File:NeTube.jpg"
-     }
-    ]
-   },
    "difficulty": 1
   },
   {
@@ -857,18 +845,6 @@
     "The answer is one word of 5 letters.",
     "Its first letter is A."
    ],
-   "media": {
-    "img": [
-     {
-      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/2/2f/ArTube.jpg/500px-ArTube.jpg",
-      "w": 500,
-      "h": 500,
-      "credit": "User:Pslawinski",
-      "license": "CC BY-SA 2.5",
-      "page": "https://commons.wikimedia.org/wiki/File:ArTube.jpg"
-     }
-    ]
-   },
    "difficulty": 2
   },
   {
@@ -1525,18 +1501,6 @@
     "The answer is one word of 7 letters.",
     "Its first letter is B."
    ],
-   "media": {
-    "img": [
-     {
-      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/3/35/Bromine_vial_in_acrylic_cube.jpg/500px-Bromine_vial_in_acrylic_cube.jpg",
-      "w": 500,
-      "h": 495,
-      "credit": "Alchemist-hp (pse-mendelejew.de)",
-      "license": "CC BY-SA 3.0 de",
-      "page": "https://commons.wikimedia.org/wiki/File:Bromine_vial_in_acrylic_cube.jpg"
-     }
-    ]
-   },
    "difficulty": 3
   },
   {
@@ -1569,18 +1533,6 @@
     "The answer is one word of 7 letters.",
     "Its first letter is K."
    ],
-   "media": {
-    "img": [
-     {
-      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/e/e7/KrTube.jpg/500px-KrTube.jpg",
-      "w": 500,
-      "h": 500,
-      "credit": "User:Pslawinski",
-      "license": "CC BY-SA 2.5",
-      "page": "https://commons.wikimedia.org/wiki/File:KrTube.jpg"
-     }
-    ]
-   },
    "difficulty": 2
   },
   {
@@ -2263,18 +2215,6 @@
     "The answer is one word of 5 letters.",
     "Its first letter is X."
    ],
-   "media": {
-    "img": [
-     {
-      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/5/59/XeTube.jpg/500px-XeTube.jpg",
-      "w": 500,
-      "h": 500,
-      "credit": "User:Pslawinski",
-      "license": "CC BY-SA 2.5",
-      "page": "https://commons.wikimedia.org/wiki/File:XeTube.jpg"
-     }
-    ]
-   },
    "difficulty": 3
   },
   {
@@ -3462,18 +3402,6 @@
     "The answer is one word of 8 letters.",
     "Its first letter is P."
    ],
-   "media": {
-    "img": [
-     {
-      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/8/86/2019-11-22_Spark_plugs_and_static_eliminators_with_radioactive_polonium_at_museum_display.jpg/500px-2019-11-22_Spark_plugs_and_static_eliminators_with_radioactive_polonium_at_museum_display.jpg",
-      "w": 500,
-      "h": 478,
-      "credit": "Maksym Kozlenko",
-      "license": "CC BY-SA 4.0",
-      "page": "https://commons.wikimedia.org/wiki/File:2019-11-22_Spark_plugs_and_static_eliminators_with_radioactive_polonium_at_museum_display.jpg"
-     }
-    ]
-   },
    "difficulty": 3
   },
   {
@@ -3486,20 +3414,18 @@
     "block": "Halogen",
     "period": 6,
     "group": 17,
-    "state": "Solid",
     "year": 1940,
     "atomicMass": 210,
     "meltingC": 302,
     "density": 7
    },
-   "blurb": "Astatine (At) is element number 85, a halogen that is a solid at room temperature. It was discovered in 1940.",
+   "blurb": "Astatine (At) is element number 85, a halogen. It was discovered in 1940.",
    "clues": [
     "Its atomic mass is about 210.",
     "It melts at about 302 °C.",
     "It is in period 6, group 17 of the periodic table.",
     "It is a halogen.",
     "It was discovered in 1940.",
-    "At room temperature it is a solid.",
     "Its atomic number is 85.",
     "Its chemical symbol is At.",
     "The answer is one word of 8 letters.",
@@ -3549,18 +3475,6 @@
     "The answer is one word of 5 letters.",
     "Its first letter is R."
    ],
-   "media": {
-    "img": [
-     {
-      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/b/b4/Radon_water_apparatus_P1120815.JPG/330px-Radon_water_apparatus_P1120815.JPG",
-      "w": 330,
-      "h": 440,
-      "credit": "David.Monniaux",
-      "license": "CC BY-SA 3.0",
-      "page": "https://commons.wikimedia.org/wiki/File:Radon_water_apparatus_P1120815.JPG"
-     }
-    ]
-   },
    "difficulty": 3
   },
   {
@@ -3573,36 +3487,22 @@
     "block": "Alkali metal",
     "period": 7,
     "group": 1,
-    "state": "Solid",
     "year": 1939,
     "atomicMass": 223,
     "meltingC": 27
    },
-   "blurb": "Francium (Fr) is element number 87, an alkali metal that is a solid at room temperature. It was discovered in 1939.",
+   "blurb": "Francium (Fr) is element number 87, an alkali metal. It was discovered in 1939.",
    "clues": [
     "Its atomic mass is about 223.",
     "It melts at about 27 °C.",
     "It is in period 7, group 1 of the periodic table.",
     "It is an alkali metal.",
     "It was discovered in 1939.",
-    "At room temperature it is a solid.",
     "Its atomic number is 87.",
     "Its chemical symbol is Fr.",
     "The answer is one word of 8 letters.",
     "Its first letter is F."
    ],
-   "media": {
-    "img": [
-     {
-      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/2/2d/Francium_%28Element_-_87%29_1.jpg/500px-Francium_%28Element_-_87%29_1.jpg",
-      "w": 500,
-      "h": 454,
-      "credit": "James St. John",
-      "license": "CC BY 2.0",
-      "page": "https://commons.wikimedia.org/wiki/File:Francium_(Element_-_87)_1.jpg"
-     }
-    ]
-   },
    "difficulty": 3
   },
   {
@@ -4090,34 +3990,20 @@
     "symbol": "Fm",
     "block": "Actinide",
     "period": 7,
-    "state": "Solid",
     "year": 1952,
     "atomicMass": 257.1
    },
-   "blurb": "Fermium (Fm) is element number 100, an actinide that is a solid at room temperature. It was discovered in 1952.",
+   "blurb": "Fermium (Fm) is element number 100, an actinide. It was discovered in 1952.",
    "clues": [
     "Its atomic mass is about 257.1.",
     "It is in period 7 of the periodic table.",
     "It is an actinide.",
     "It was discovered in 1952.",
-    "At room temperature it is a solid.",
     "Its atomic number is 100.",
     "Its chemical symbol is Fm.",
     "The answer is one word of 7 letters.",
     "Its first letter is F."
    ],
-   "media": {
-    "img": [
-     {
-      "src": "https://upload.wikimedia.org/wikipedia/commons/9/9e/Fermium-Ytterbium_Alloy.jpg",
-      "w": 500,
-      "h": 463,
-      "credit": "Ben E. Lewis.",
-      "license": "Public domain",
-      "page": "https://commons.wikimedia.org/wiki/File:Fermium-Ytterbium_Alloy.jpg"
-     }
-    ]
-   },
    "difficulty": 3
   },
   {
@@ -4129,7 +4015,6 @@
     "symbol": "Md",
     "block": "Actinide",
     "period": 7,
-    "state": "Solid",
     "year": 1955,
     "atomicMass": 258.1
    },
@@ -4158,17 +4043,15 @@
     "symbol": "No",
     "block": "Actinide",
     "period": 7,
-    "state": "Solid",
     "year": 1957,
     "atomicMass": 259.1
    },
-   "blurb": "Nobelium (No) is element number 102, an actinide that is a solid at room temperature. It was discovered in 1957.",
+   "blurb": "Nobelium (No) is element number 102, an actinide. It was discovered in 1957.",
    "clues": [
     "Its atomic mass is about 259.1.",
     "It is in period 7 of the periodic table.",
     "It is an actinide.",
     "It was discovered in 1957.",
-    "At room temperature it is a solid.",
     "Its atomic number is 102.",
     "Its chemical symbol is No.",
     "The answer is one word of 8 letters.",
@@ -4185,17 +4068,15 @@
     "symbol": "Lr",
     "block": "Actinide",
     "period": 7,
-    "state": "Solid",
     "year": 1961,
     "atomicMass": 266.1
    },
-   "blurb": "Lawrencium (Lr) is element number 103, an actinide that is a solid at room temperature. It was discovered in 1961.",
+   "blurb": "Lawrencium (Lr) is element number 103, an actinide. It was discovered in 1961.",
    "clues": [
     "Its atomic mass is about 266.1.",
     "It is in period 7 of the periodic table.",
     "It is an actinide.",
     "It was discovered in 1961.",
-    "At room temperature it is a solid.",
     "Its atomic number is 103.",
     "Its chemical symbol is Lr.",
     "The answer is one word of 10 letters.",
@@ -4213,17 +4094,15 @@
     "block": "Transition metal",
     "period": 7,
     "group": 4,
-    "state": "Solid",
     "year": 1964,
     "atomicMass": 267.1
    },
-   "blurb": "Rutherfordium (Rf) is element number 104, a transition metal that is a solid at room temperature. It was discovered in 1964.",
+   "blurb": "Rutherfordium (Rf) is element number 104, a transition metal. It was discovered in 1964.",
    "clues": [
     "Its atomic mass is about 267.1.",
     "It is in period 7, group 4 of the periodic table.",
     "It is a transition metal.",
     "It was discovered in 1964.",
-    "At room temperature it is a solid.",
     "Its atomic number is 104.",
     "Its chemical symbol is Rf.",
     "The answer is one word of 13 letters.",
@@ -4241,17 +4120,15 @@
     "block": "Transition metal",
     "period": 7,
     "group": 5,
-    "state": "Solid",
     "year": 1967,
     "atomicMass": 268.1
    },
-   "blurb": "Dubnium (Db) is element number 105, a transition metal that is a solid at room temperature. It was discovered in 1967.",
+   "blurb": "Dubnium (Db) is element number 105, a transition metal. It was discovered in 1967.",
    "clues": [
     "Its atomic mass is about 268.1.",
     "It is in period 7, group 5 of the periodic table.",
     "It is a transition metal.",
     "It was discovered in 1967.",
-    "At room temperature it is a solid.",
     "Its atomic number is 105.",
     "Its chemical symbol is Db.",
     "The answer is one word of 7 letters.",
@@ -4269,17 +4146,15 @@
     "block": "Transition metal",
     "period": 7,
     "group": 6,
-    "state": "Solid",
     "year": 1974,
     "atomicMass": 269.1
    },
-   "blurb": "Seaborgium (Sg) is element number 106, a transition metal that is a solid at room temperature. It was discovered in 1974.",
+   "blurb": "Seaborgium (Sg) is element number 106, a transition metal. It was discovered in 1974.",
    "clues": [
     "Its atomic mass is about 269.1.",
     "It is in period 7, group 6 of the periodic table.",
     "It is a transition metal.",
     "It was discovered in 1974.",
-    "At room temperature it is a solid.",
     "Its atomic number is 106.",
     "Its chemical symbol is Sg.",
     "The answer is one word of 10 letters.",
@@ -4297,17 +4172,15 @@
     "block": "Transition metal",
     "period": 7,
     "group": 7,
-    "state": "Solid",
     "year": 1976,
     "atomicMass": 270.1
    },
-   "blurb": "Bohrium (Bh) is element number 107, a transition metal that is a solid at room temperature. It was discovered in 1976.",
+   "blurb": "Bohrium (Bh) is element number 107, a transition metal. It was discovered in 1976.",
    "clues": [
     "Its atomic mass is about 270.1.",
     "It is in period 7, group 7 of the periodic table.",
     "It is a transition metal.",
     "It was discovered in 1976.",
-    "At room temperature it is a solid.",
     "Its atomic number is 107.",
     "Its chemical symbol is Bh.",
     "The answer is one word of 7 letters.",
@@ -4325,17 +4198,15 @@
     "block": "Transition metal",
     "period": 7,
     "group": 8,
-    "state": "Solid",
     "year": 1984,
     "atomicMass": 269.1
    },
-   "blurb": "Hassium (Hs) is element number 108, a transition metal that is a solid at room temperature. It was discovered in 1984.",
+   "blurb": "Hassium (Hs) is element number 108, a transition metal. It was discovered in 1984.",
    "clues": [
     "Its atomic mass is about 269.1.",
     "It is in period 7, group 8 of the periodic table.",
     "It is a transition metal.",
     "It was discovered in 1984.",
-    "At room temperature it is a solid.",
     "Its atomic number is 108.",
     "Its chemical symbol is Hs.",
     "The answer is one word of 7 letters.",
@@ -4353,17 +4224,15 @@
     "block": "Transition metal",
     "period": 7,
     "group": 9,
-    "state": "Solid",
     "year": 1982,
     "atomicMass": 277.2
    },
-   "blurb": "Meitnerium (Mt) is element number 109, a transition metal that is a solid at room temperature. It was discovered in 1982.",
+   "blurb": "Meitnerium (Mt) is element number 109, a transition metal. It was discovered in 1982.",
    "clues": [
     "Its atomic mass is about 277.2.",
     "It is in period 7, group 9 of the periodic table.",
     "It is a transition metal.",
     "It was discovered in 1982.",
-    "At room temperature it is a solid.",
     "Its atomic number is 109.",
     "Its chemical symbol is Mt.",
     "The answer is one word of 10 letters.",
@@ -4525,18 +4394,6 @@
     "The answer is one word of 9 letters.",
     "Its first letter is M."
    ],
-   "media": {
-    "img": [
-     {
-      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/c/ce/U.S._Department_of_Energy_-_Science_-_529_005_001_%289735158765%29.jpg/500px-U.S._Department_of_Energy_-_Science_-_529_005_001_%289735158765%29.jpg",
-      "w": 500,
-      "h": 375,
-      "credit": "U.S. Department of Energy from United States",
-      "license": "Public domain",
-      "page": "https://commons.wikimedia.org/wiki/File:U.S._Department_of_Energy_-_Science_-_529_005_001_(9735158765).jpg"
-     }
-    ]
-   },
    "difficulty": 3
   },
   {

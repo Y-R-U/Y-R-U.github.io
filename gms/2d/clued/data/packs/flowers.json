@@ -1158,14 +1158,6 @@
    "media": {
     "img": [
      {
-      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/8/88/Paeonia_officinalis_1.jpg/500px-Paeonia_officinalis_1.jpg",
-      "w": 500,
-      "h": 467,
-      "credit": "Franz Xaver",
-      "license": "CC BY-SA 3.0",
-      "page": "https://commons.wikimedia.org/wiki/File:Paeonia_officinalis_1.jpg"
-     },
-     {
       "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/0/00/PAEONIA_OFFICINALIS_-_MONTSEC_-_IB-200_%28Pe%C3%B2nia_de_muntanya%29.jpg/500px-PAEONIA_OFFICINALIS_-_MONTSEC_-_IB-200_%28Pe%C3%B2nia_de_muntanya%29.jpg",
       "w": 500,
       "h": 375,
@@ -1180,6 +1172,14 @@
       "credit": "Meneerke bloem",
       "license": "CC BY-SA 3.0",
       "page": "https://commons.wikimedia.org/wiki/File:Paeonia_officinalis_01.JPG"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/275394133/medium.jpeg",
+      "w": 375,
+      "h": 500,
+      "credit": "Ljaž",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/275394133"
      }
     ]
    },
@@ -2010,10 +2010,10 @@
    "difficulty": 2
   },
   {
-   "id": "corpse-flower",
-   "name": "Corpse flower",
+   "id": "rafflesia",
+   "name": "Rafflesia",
    "alt": [
-    "rafflesia",
+    "corpse lily",
     "stinking corpse lily"
    ],
    "sci": "Rafflesia arnoldii",
@@ -2033,11 +2033,19 @@
     "It is native to Asia.",
     "It smells of rotting meat.",
     "It is the biggest single flower in the world.",
-    "The answer has 2 words (6, 6 letters).",
-    "Its first letter is C."
+    "The answer is one word of 9 letters.",
+    "Its first letter is R."
    ],
    "media": {
     "img": [
+     {
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/3/33/Rafflesia_arnoldii_Bengkulu_01.jpg/330px-Rafflesia_arnoldii_Bengkulu_01.jpg",
+      "w": 330,
+      "h": 495,
+      "credit": "SofianRafflesia",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:Rafflesia_arnoldii_Bengkulu_01.jpg"
+     },
      {
       "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/101228662/medium.jpg",
       "w": 500,
@@ -2053,14 +2061,6 @@
       "credit": "no rights reserved",
       "license": "CC0 1.0",
       "page": "https://www.inaturalist.org/photos/630962743"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/364062201/medium.jpeg",
-      "w": 375,
-      "h": 500,
-      "credit": "Samuel GUIRAUDOU",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/364062201"
      }
     ]
    },
@@ -2076,7 +2076,7 @@
     "region": "Asia"
    },
    "lookalikes": [
-    "corpse-flower"
+    "rafflesia"
    ],
    "blurb": "A giant plant from Sumatra with the biggest unbranched flower spike in the world. It smells of rotting meat when it blooms.",
    "clues": [

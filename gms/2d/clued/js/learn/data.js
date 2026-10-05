@@ -1,8 +1,8 @@
 // Pack access for Learn: game packs via the shell loader, music packs (data/music/) via our own small cache.
-import { getIndex, loadPack, THEMES, dataUrl } from '../core/packs.js?v=1';
-import { factText } from '../formats/registry.js?v=1';
-import { getSettings } from '../core/store.js?v=1';
-import { BUILD } from '../build.js?v=1';
+import { getIndex, loadPack, THEMES, dataUrl } from '../core/packs.js?v=202610050139';
+import { factText } from '../formats/registry.js?v=202610050139';
+import { getSettings } from '../core/store.js?v=202610050139';
+import { BUILD } from '../build.js?v=202610050139';
 
 export const MUSIC_PACKS = ['anthems', 'instruments', 'classical-piano', 'classical-recordings', 'nursery-rhymes', 'pd-melodies',
   'kids-film-tv', 'screen-themes', 'music-artists', 'one-hit-wonders', 'hits-1960s', 'hits-1970s', 'hits-1980s', 'hits-1990s',
@@ -25,7 +25,8 @@ export const kidsOn = () => !!getSettings().kids;
 export function packList() {
   const idx = getIndex();
   const ids = Object.keys(idx?.packs || {});
-  const real = ids.filter(id => !id.startsWith('_'));
+  // lane I: virtual general~<theme> slices and question-only packs have no items to learn
+  const real = ids.filter(id => !id.startsWith('_') && !idx.packs[id].virtual && idx.packs[id].items > 0);
   return (real.length ? real : ids).map(id => ({ id, ...idx.packs[id] }));
 }
 

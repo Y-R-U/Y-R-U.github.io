@@ -227,7 +227,7 @@
      {
       "src": "media/moments/pinocchio-1.webp",
       "w": 640,
-      "h": 427,
+      "h": 432,
       "credit": "Clued (AI-generated illustration)",
       "license": "CC0",
       "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
@@ -243,6 +243,5242 @@
       "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
       "difficulty": 2,
       "caption": "Escaping the giant whale"
+     },
+     {
+      "src": "media/moments/pinocchio-3.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 3,
+      "caption": "When you wish upon a star"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "fantasia",
+   "name": "Fantasia",
+   "alt": [],
+   "facts": {
+    "year": 1940,
+    "decade": "1940s",
+    "kids": true
+   },
+   "blurb": "Disney's concert film sets animation to classical music, including The Sorcerer's Apprentice.",
+   "media": {
+    "img": [
+     {
+      "src": "media/moments/fantasia-1.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 1,
+      "caption": "The Sorcerer's Apprentice and the marching brooms"
+     },
+     {
+      "src": "media/moments/fantasia-2.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 3,
+      "caption": "Dance of the Hours"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "dumbo",
+   "name": "Dumbo",
+   "alt": [],
+   "facts": {
+    "year": 1941,
+    "decade": "1940s",
+    "director": "Ben Sharpsteen",
+    "kids": true
+   },
+   "blurb": "A baby circus elephant mocked for his enormous ears discovers he can fly.",
+   "media": {
+    "img": [
+     {
+      "src": "media/moments/dumbo-1.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 1,
+      "caption": "The little elephant who could fly"
+     },
+     {
+      "src": "media/moments/dumbo-2.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 3,
+      "caption": "The circus train rolls into town"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "bambi",
+   "name": "Bambi",
+   "alt": [],
+   "facts": {
+    "year": 1942,
+    "decade": "1940s",
+    "director": "David Hand",
+    "kids": true
+   },
+   "blurb": "A young deer grows up in the forest with his friends, a rabbit and a skunk.",
+   "media": {
+    "img": [
+     {
+      "src": "media/moments/bambi-1.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 1,
+      "caption": "Learning to skate on the frozen pond"
+     },
+     {
+      "src": "media/moments/bambi-2.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 2,
+      "caption": "Three friends in the forest"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "casablanca",
+   "name": "Casablanca",
+   "alt": [],
+   "facts": {
+    "year": 1942,
+    "decade": "1940s",
+    "director": "Michael Curtiz",
+    "kids": false
+   },
+   "blurb": "In wartime Morocco, nightclub owner Rick must choose between love and helping his old flame escape the Nazis.",
+   "media": {
+    "img": [
+     {
+      "src": "media/moments/casablanca-1.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 2,
+      "caption": "The foggy goodbye on the runway"
+     },
+     {
+      "src": "media/moments/casablanca-2.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 3,
+      "caption": "Rick's Café, where they play it again"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "citizen-kane",
+   "name": "Citizen Kane",
+   "alt": [],
+   "facts": {
+    "year": 1941,
+    "decade": "1940s",
+    "director": "Orson Welles",
+    "kids": false
+   },
+   "blurb": "A reporter tries to decode the dying word of newspaper tycoon Charles Foster Kane.",
+   "media": {
+    "img": [
+     {
+      "src": "media/moments/citizen-kane-1.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 3,
+      "caption": "The sled thrown into the furnace"
+     },
+     {
+      "src": "media/moments/citizen-kane-2.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 3,
+      "caption": "The dropped snow globe"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "its-a-wonderful-life",
+   "name": "It's a Wonderful Life",
+   "alt": [
+    "Its a Wonderful Life"
+   ],
+   "facts": {
+    "year": 1946,
+    "decade": "1940s",
+    "director": "Frank Capra",
+    "kids": false
+   },
+   "blurb": "An angel shows a despairing George Bailey what his small town would be like if he had never been born.",
+   "media": {
+    "img": [
+     {
+      "src": "media/moments/its-a-wonderful-life-1.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 3,
+      "caption": "Running through Bedford Falls on Christmas Eve"
+     },
+     {
+      "src": "media/moments/its-a-wonderful-life-2.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 3,
+      "caption": "The bridge where an angel earns his wings"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "cinderella",
+   "name": "Cinderella",
+   "alt": [],
+   "facts": {
+    "year": 1950,
+    "decade": "1950s",
+    "director": "Clyde Geronimi, Wilfred Jackson, Hamilton Luske",
+    "kids": true
+   },
+   "blurb": "With help from her fairy godmother, a mistreated young woman goes to the royal ball and loses a glass slipper.",
+   "media": {
+    "img": [
+     {
+      "src": "media/moments/cinderella-1.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 1,
+      "caption": "The glass slipper left behind at midnight"
+     },
+     {
+      "src": "media/moments/cinderella-2.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 1,
+      "caption": "Bibbidi-bobbidi-boo: a pumpkin becomes a coach"
+     },
+     {
+      "src": "media/moments/cinderella-3.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 2,
+      "caption": "Mice sewing a dress for the ball"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "singin-in-the-rain",
+   "name": "Singin' in the Rain",
+   "alt": [
+    "Singing in the Rain"
+   ],
+   "facts": {
+    "year": 1952,
+    "decade": "1950s",
+    "director": "Gene Kelly, Stanley Donen",
+    "kids": false
+   },
+   "blurb": "A silent-movie star falls in love as Hollywood switches to talking pictures.",
+   "media": {
+    "img": [
+     {
+      "src": "media/moments/singin-in-the-rain-1.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 2,
+      "caption": "Dancing and singing in the rain"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "peter-pan",
+   "name": "Peter Pan",
+   "alt": [],
+   "facts": {
+    "year": 1953,
+    "decade": "1950s",
+    "director": "Clyde Geronimi, Wilfred Jackson, Hamilton Luske",
+    "kids": true
+   },
+   "blurb": "Three London children fly to Neverland with the boy who never grows up.",
+   "media": {
+    "img": [
+     {
+      "src": "media/moments/peter-pan-1.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 1,
+      "caption": "Second star to the right: flying over London"
+     },
+     {
+      "src": "media/moments/peter-pan-2.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 2,
+      "caption": "Skull Rock and the ticking crocodile"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "rear-window",
+   "name": "Rear Window",
+   "alt": [],
+   "facts": {
+    "year": 1954,
+    "decade": "1950s",
+    "director": "Alfred Hitchcock",
+    "kids": false
+   },
+   "blurb": "A photographer stuck in a wheelchair spies on his neighbours and suspects one of murder.",
+   "media": {
+    "img": [
+     {
+      "src": "media/moments/rear-window-1.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 3,
+      "caption": "Spying on the neighbours across the courtyard"
+     },
+     {
+      "src": "media/moments/rear-window-2.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 3,
+      "caption": "The photographer at the window"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "lady-and-the-tramp",
+   "name": "Lady and the Tramp",
+   "alt": [],
+   "facts": {
+    "year": 1955,
+    "decade": "1950s",
+    "director": "Clyde Geronimi, Wilfred Jackson, Hamilton Luske",
+    "kids": true
+   },
+   "blurb": "A pampered cocker spaniel falls for a streetwise mutt.",
+   "media": {
+    "img": [
+     {
+      "src": "media/moments/lady-and-the-tramp-1.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 1,
+      "caption": "Sharing spaghetti, Bella Notte"
+     },
+     {
+      "src": "media/moments/lady-and-the-tramp-2.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 3,
+      "caption": "A Christmas puppy in a hatbox"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "the-ten-commandments",
+   "name": "The Ten Commandments",
+   "alt": [],
+   "facts": {
+    "year": 1956,
+    "decade": "1950s",
+    "director": "Cecil B. DeMille",
+    "kids": false
+   },
+   "blurb": "Moses leads the Hebrews out of slavery in Egypt.",
+   "media": {
+    "img": [
+     {
+      "src": "media/moments/the-ten-commandments-1.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 1,
+      "caption": "The parting of the Red Sea"
+     },
+     {
+      "src": "media/moments/the-ten-commandments-2.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 2,
+      "caption": "Tablets on the mountain"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "20000-leagues-under-the-sea",
+   "name": "20,000 Leagues Under the Sea",
+   "alt": [
+    "20000 Leagues Under the Sea",
+    "Twenty Thousand Leagues Under the Sea"
+   ],
+   "facts": {
+    "year": 1954,
+    "decade": "1950s",
+    "director": "Richard Fleischer",
+    "kids": false
+   },
+   "blurb": "Captain Nemo's submarine Nautilus terrorises the seas in Disney's Jules Verne adventure.",
+   "media": {
+    "img": [
+     {
+      "src": "media/moments/20000-leagues-under-the-sea-1.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 2,
+      "caption": "The Nautilus fights a giant squid"
+     },
+     {
+      "src": "media/moments/20000-leagues-under-the-sea-2.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 3,
+      "caption": "A walk on the sea floor"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "north-by-northwest",
+   "name": "North by Northwest",
+   "alt": [],
+   "facts": {
+    "year": 1959,
+    "decade": "1950s",
+    "director": "Alfred Hitchcock",
+    "kids": false
+   },
+   "blurb": "An advertising man mistaken for a spy is chased across America.",
+   "media": {
+    "img": [
+     {
+      "src": "media/moments/north-by-northwest-1.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 2,
+      "caption": "Chased by the crop-duster"
+     },
+     {
+      "src": "media/moments/north-by-northwest-2.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 3,
+      "caption": "Waiting at the lonely crossroads"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "ben-hur",
+   "name": "Ben-Hur",
+   "alt": [
+    "Ben Hur"
+   ],
+   "facts": {
+    "year": 1959,
+    "decade": "1950s",
+    "director": "William Wyler",
+    "kids": false
+   },
+   "blurb": "A Jewish prince betrayed by his Roman friend seeks revenge, culminating in a famous chariot race.",
+   "media": {
+    "img": [
+     {
+      "src": "media/moments/ben-hur-1.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 1,
+      "caption": "The great chariot race"
+     },
+     {
+      "src": "media/moments/ben-hur-2.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 3,
+      "caption": "Chained to the oars of a galley"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "sleeping-beauty",
+   "name": "Sleeping Beauty",
+   "alt": [],
+   "facts": {
+    "year": 1959,
+    "decade": "1950s",
+    "director": "Clyde Geronimi",
+    "kids": true
+   },
+   "blurb": "Cursed by an evil fairy, Princess Aurora pricks her finger on a spinning wheel and falls into an enchanted sleep.",
+   "media": {
+    "img": [
+     {
+      "src": "media/moments/sleeping-beauty-1.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 1,
+      "caption": "The cursed spinning wheel"
+     },
+     {
+      "src": "media/moments/sleeping-beauty-2.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 2,
+      "caption": "The prince battles the dragon through the thorns"
+     },
+     {
+      "src": "media/moments/sleeping-beauty-3.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 3,
+      "caption": "Three good fairies baking a cake"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "101-dalmatians",
+   "name": "One Hundred and One Dalmatians",
+   "alt": [
+    "101 Dalmatians",
+    "Dalmatians"
+   ],
+   "facts": {
+    "year": 1961,
+    "decade": "1960s",
+    "director": "Clyde Geronimi, Hamilton Luske, Wolfgang Reitherman",
+    "kids": true
+   },
+   "blurb": "Pongo and Perdita rescue their puppies from a villain who wants a spotted fur coat.",
+   "media": {
+    "img": [
+     {
+      "src": "media/moments/101-dalmatians-1.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 1,
+      "caption": "A living room full of dalmatian puppies"
+     },
+     {
+      "src": "media/moments/101-dalmatians-2.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 2,
+      "caption": "The great escape through the snow"
+     },
+     {
+      "src": "media/moments/101-dalmatians-3.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 3,
+      "caption": "The villain's car on the chase"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "breakfast-at-tiffanys",
+   "name": "Breakfast at Tiffany's",
+   "alt": [
+    "Breakfast at Tiffanys"
+   ],
+   "facts": {
+    "year": 1961,
+    "decade": "1960s",
+    "director": "Blake Edwards",
+    "kids": false
+   },
+   "blurb": "Socialite Holly Golightly charms New York and her writer neighbour.",
+   "media": {
+    "img": [
+     {
+      "src": "media/moments/breakfast-at-tiffanys-1.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 2,
+      "caption": "Breakfast at the jewellery store window"
+     },
+     {
+      "src": "media/moments/breakfast-at-tiffanys-2.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 3,
+      "caption": "Cat, the nameless cat, in the rain"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "lawrence-of-arabia",
+   "name": "Lawrence of Arabia",
+   "alt": [],
+   "facts": {
+    "year": 1962,
+    "decade": "1960s",
+    "director": "David Lean",
+    "kids": false
+   },
+   "blurb": "A British officer unites Arab tribes against the Ottoman Empire in World War I.",
+   "media": {
+    "img": [
+     {
+      "src": "media/moments/lawrence-of-arabia-1.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 2,
+      "caption": "A rider appears out of the desert mirage"
+     },
+     {
+      "src": "media/moments/lawrence-of-arabia-2.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 3,
+      "caption": "Standing on the captured train"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "the-birds",
+   "name": "The Birds",
+   "alt": [],
+   "facts": {
+    "year": 1963,
+    "decade": "1960s",
+    "director": "Alfred Hitchcock",
+    "kids": false
+   },
+   "blurb": "A California seaside town is inexplicably attacked by flocks of birds.",
+   "media": {
+    "img": [
+     {
+      "src": "media/moments/the-birds-1.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 2,
+      "caption": "Crows gathering on the playground"
+     },
+     {
+      "src": "media/moments/the-birds-2.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 3,
+      "caption": "The birds attack Bodega Bay"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "the-great-escape",
+   "name": "The Great Escape",
+   "alt": [],
+   "facts": {
+    "year": 1963,
+    "decade": "1960s",
+    "director": "John Sturges",
+    "kids": false
+   },
+   "blurb": "Allied prisoners of war plan a mass breakout from a German camp.",
+   "media": {
+    "img": [
+     {
+      "src": "media/moments/the-great-escape-1.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 2,
+      "caption": "The motorcycle jump at the border fence"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "mary-poppins",
+   "name": "Mary Poppins",
+   "alt": [],
+   "facts": {
+    "year": 1964,
+    "decade": "1960s",
+    "director": "Robert Stevenson",
+    "kids": true
+   },
+   "blurb": "A magical nanny brings fun and order to the Banks family in Edwardian London.",
+   "media": {
+    "img": [
+     {
+      "src": "media/moments/mary-poppins-1.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 1,
+      "caption": "The nanny who arrives by umbrella"
+     },
+     {
+      "src": "media/moments/mary-poppins-2.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 2,
+      "caption": "Step in time on the rooftops"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "the-sound-of-music",
+   "name": "The Sound of Music",
+   "alt": [],
+   "facts": {
+    "year": 1965,
+    "decade": "1960s",
+    "director": "Robert Wise",
+    "kids": true
+   },
+   "blurb": "A governess brings music to the seven von Trapp children in Austria as the Nazis rise to power.",
+   "media": {
+    "img": [
+     {
+      "src": "media/moments/the-sound-of-music-1.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 1,
+      "caption": "The hills are alive"
+     },
+     {
+      "src": "media/moments/the-sound-of-music-2.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 2,
+      "caption": "Seven children in curtain play clothes"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "the-jungle-book",
+   "name": "The Jungle Book",
+   "alt": [
+    "Jungle Book"
+   ],
+   "facts": {
+    "year": 1967,
+    "decade": "1960s",
+    "director": "Wolfgang Reitherman",
+    "kids": true
+   },
+   "blurb": "Raised by wolves, the boy Mowgli is guided through the Indian jungle by a panther and a carefree bear.",
+   "media": {
+    "img": [
+     {
+      "src": "media/moments/the-jungle-book-1.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 1,
+      "caption": "Bare necessities on the river"
+     },
+     {
+      "src": "media/moments/the-jungle-book-2.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 2,
+      "caption": "Trust in me: the hypnotic python"
+     },
+     {
+      "src": "media/moments/the-jungle-book-3.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 3,
+      "caption": "The monkey king's ruined temple"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "2001-a-space-odyssey",
+   "name": "2001: A Space Odyssey",
+   "alt": [
+    "2001 A Space Odyssey",
+    "2001"
+   ],
+   "facts": {
+    "year": 1968,
+    "decade": "1960s",
+    "director": "Stanley Kubrick",
+    "kids": false
+   },
+   "blurb": "A mysterious black monolith guides human evolution, from apes to a voyage to Jupiter.",
+   "media": {
+    "img": [
+     {
+      "src": "media/moments/2001-a-space-odyssey-1.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 2,
+      "caption": "The unblinking red eye of the ship's computer"
+     },
+     {
+      "src": "media/moments/2001-a-space-odyssey-2.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 2,
+      "caption": "The monolith at the dawn of man"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "planet-of-the-apes",
+   "name": "Planet of the Apes",
+   "alt": [],
+   "facts": {
+    "year": 1968,
+    "decade": "1960s",
+    "director": "Franklin J. Schaffner",
+    "kids": false
+   },
+   "blurb": "An astronaut lands on a planet ruled by intelligent apes and makes a shocking discovery.",
+   "media": {
+    "img": [
+     {
+      "src": "media/moments/planet-of-the-apes-1.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 1,
+      "caption": "The ruined statue on the beach: it was Earth all along"
+     },
+     {
+      "src": "media/moments/planet-of-the-apes-2.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 2,
+      "caption": "Ape soldiers on horseback"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "chitty-chitty-bang-bang",
+   "name": "Chitty Chitty Bang Bang",
+   "alt": [],
+   "facts": {
+    "year": 1968,
+    "decade": "1960s",
+    "director": "Ken Hughes",
+    "kids": true
+   },
+   "blurb": "An inventor restores a race car that can fly and float, taking his family to a land where children are banned.",
+   "media": {
+    "img": [
+     {
+      "src": "media/moments/chitty-chitty-bang-bang-1.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 1,
+      "caption": "The magical flying car"
+     },
+     {
+      "src": "media/moments/chitty-chitty-bang-bang-2.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 3,
+      "caption": "Vulgaria, where children are banned"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "willy-wonka",
+   "name": "Willy Wonka & the Chocolate Factory",
+   "alt": [
+    "Willy Wonka and the Chocolate Factory",
+    "Willy Wonka"
+   ],
+   "facts": {
+    "year": 1971,
+    "decade": "1970s",
+    "director": "Mel Stuart",
+    "kids": true
+   },
+   "blurb": "Charlie Bucket finds a golden ticket and tours the eccentric candy maker's fantastical factory.",
+   "media": {
+    "img": [
+     {
+      "src": "media/moments/willy-wonka-1.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 1,
+      "caption": "Finding a golden ticket"
+     },
+     {
+      "src": "media/moments/willy-wonka-2.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 1,
+      "caption": "The chocolate river room"
+     },
+     {
+      "src": "media/moments/willy-wonka-3.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 2,
+      "caption": "The girl who turned into a blueberry"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "the-godfather",
+   "name": "The Godfather",
+   "alt": [
+    "Godfather"
+   ],
+   "facts": {
+    "year": 1972,
+    "decade": "1970s",
+    "director": "Francis Ford Coppola",
+    "kids": false
+   },
+   "blurb": "The aging head of a Mafia family hands control of his empire to his reluctant youngest son.",
+   "media": {
+    "img": [
+     {
+      "src": "media/moments/the-godfather-1.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 2,
+      "caption": "Hearing requests on his daughter's wedding day"
+     },
+     {
+      "src": "media/moments/the-godfather-2.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 3,
+      "caption": "The puppet master's strings"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "jaws",
+   "name": "Jaws",
+   "alt": [],
+   "facts": {
+    "year": 1975,
+    "decade": "1970s",
+    "director": "Steven Spielberg",
+    "kids": false
+   },
+   "blurb": "A great white shark terrorises the beach town of Amity Island.",
+   "media": {
+    "img": [
+     {
+      "src": "media/moments/jaws-1.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 1,
+      "caption": "The great white rises beneath a swimmer"
+     },
+     {
+      "src": "media/moments/jaws-2.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 2,
+      "caption": "You're gonna need a bigger boat"
+     },
+     {
+      "src": "media/moments/jaws-3.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 3,
+      "caption": "Panic on the Amity beach"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "rocky",
+   "name": "Rocky",
+   "alt": [],
+   "facts": {
+    "year": 1976,
+    "decade": "1970s",
+    "director": "John G. Avildsen",
+    "kids": false
+   },
+   "blurb": "Small-time Philadelphia boxer Rocky Balboa gets a shot at the heavyweight title.",
+   "media": {
+    "img": [
+     {
+      "src": "media/moments/rocky-1.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 2,
+      "caption": "Triumph at the top of the museum steps"
+     },
+     {
+      "src": "media/moments/rocky-2.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 3,
+      "caption": "Training on frozen beef"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "star-wars",
+   "name": "Star Wars",
+   "alt": [
+    "Star Wars: A New Hope",
+    "A New Hope",
+    "Star Wars Episode IV"
+   ],
+   "facts": {
+    "year": 1977,
+    "decade": "1970s",
+    "director": "George Lucas",
+    "kids": false
+   },
+   "blurb": "Farm boy Luke Skywalker joins a rebellion to defeat the Empire's Death Star.",
+   "media": {
+    "img": [
+     {
+      "src": "media/moments/star-wars-1.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 1,
+      "caption": "The twin suns of the desert planet"
+     },
+     {
+      "src": "media/moments/star-wars-2.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 1,
+      "caption": "That's no moon"
+     },
+     {
+      "src": "media/moments/star-wars-3.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 3,
+      "caption": "A wretched hive at the cantina"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "close-encounters-of-the-third-kind",
+   "name": "Close Encounters of the Third Kind",
+   "alt": [
+    "Close Encounters"
+   ],
+   "facts": {
+    "year": 1977,
+    "decade": "1970s",
+    "director": "Steven Spielberg",
+    "kids": false
+   },
+   "blurb": "Ordinary people are drawn to a Wyoming mountain where a UFO makes contact.",
+   "media": {
+    "img": [
+     {
+      "src": "media/moments/close-encounters-of-the-third-kind-1.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 2,
+      "caption": "The mothership at Devils Tower"
+     },
+     {
+      "src": "media/moments/close-encounters-of-the-third-kind-2.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 3,
+      "caption": "The mashed-potato mountain"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "saturday-night-fever",
+   "name": "Saturday Night Fever",
+   "alt": [],
+   "facts": {
+    "year": 1977,
+    "decade": "1970s",
+    "director": "John Badham",
+    "kids": false
+   },
+   "blurb": "A Brooklyn paint-store clerk lives for the weekends at the disco.",
+   "media": {
+    "img": [
+     {
+      "src": "media/moments/saturday-night-fever-1.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 2,
+      "caption": "Night fever on the light-up dance floor"
+     },
+     {
+      "src": "media/moments/saturday-night-fever-2.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 3,
+      "caption": "The Verrazzano bridge at night"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "grease",
+   "name": "Grease",
+   "alt": [],
+   "facts": {
+    "year": 1978,
+    "decade": "1970s",
+    "director": "Randal Kleiser",
+    "kids": false
+   },
+   "blurb": "Greaser Danny and good girl Sandy fall for each other at Rydell High in the 1950s.",
+   "media": {
+    "img": [
+     {
+      "src": "media/moments/grease-1.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 2,
+      "caption": "Greased Lightnin' races in the drain"
+     },
+     {
+      "src": "media/moments/grease-2.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 2,
+      "caption": "You're the one that I want, at the carnival"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "alien",
+   "name": "Alien",
+   "alt": [],
+   "facts": {
+    "year": 1979,
+    "decade": "1970s",
+    "director": "Ridley Scott",
+    "kids": false
+   },
+   "blurb": "The crew of the spaceship Nostromo is hunted by a deadly creature.",
+   "media": {
+    "img": [
+     {
+      "src": "media/moments/alien-1.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 2,
+      "caption": "The chamber of eggs"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "apocalypse-now",
+   "name": "Apocalypse Now",
+   "alt": [],
+   "facts": {
+    "year": 1979,
+    "decade": "1970s",
+    "director": "Francis Ford Coppola",
+    "kids": false
+   },
+   "blurb": "A US Army captain travels upriver in Vietnam to find a rogue colonel.",
+   "media": {
+    "img": [
+     {
+      "src": "media/moments/apocalypse-now-1.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 2,
+      "caption": "Helicopters over the jungle at sunset"
+     },
+     {
+      "src": "media/moments/apocalypse-now-2.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 3,
+      "caption": "Upriver into the heart of darkness"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "the-shining",
+   "name": "The Shining",
+   "alt": [
+    "Shining"
+   ],
+   "facts": {
+    "year": 1980,
+    "decade": "1980s",
+    "director": "Stanley Kubrick",
+    "kids": false
+   },
+   "blurb": "A writer caretaking a snowbound hotel for the winter descends into madness.",
+   "media": {
+    "img": [
+     {
+      "src": "media/moments/the-shining-1.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 2,
+      "caption": "The tricycle in the hotel corridor"
+     },
+     {
+      "src": "media/moments/the-shining-2.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 2,
+      "caption": "The snowy hedge maze"
+     },
+     {
+      "src": "media/moments/the-shining-3.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 3,
+      "caption": "All work and no play"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "raiders-of-the-lost-ark",
+   "name": "Raiders of the Lost Ark",
+   "alt": [
+    "Indiana Jones and the Raiders of the Lost Ark",
+    "Indiana Jones"
+   ],
+   "facts": {
+    "year": 1981,
+    "decade": "1980s",
+    "director": "Steven Spielberg",
+    "kids": false
+   },
+   "blurb": "Archaeologist Indiana Jones races the Nazis to find the Ark of the Covenant.",
+   "media": {
+    "img": [
+     {
+      "src": "media/moments/raiders-of-the-lost-ark-1.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 1,
+      "caption": "Outrunning the giant boulder"
+     },
+     {
+      "src": "media/moments/raiders-of-the-lost-ark-2.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 2,
+      "caption": "Swapping the golden idol"
+     },
+     {
+      "src": "media/moments/raiders-of-the-lost-ark-3.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 3,
+      "caption": "Snakes. Why'd it have to be snakes?"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "e-t-the-extra-terrestrial",
+   "name": "E.T. the Extra-Terrestrial",
+   "alt": [
+    "E.T.",
+    "ET"
+   ],
+   "facts": {
+    "year": 1982,
+    "decade": "1980s",
+    "director": "Steven Spielberg",
+    "kids": true
+   },
+   "blurb": "A boy befriends a stranded alien and helps him get home.",
+   "media": {
+    "img": [
+     {
+      "src": "media/moments/e-t-the-extra-terrestrial-1.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 1,
+      "caption": "Flying across the moon on a bicycle"
+     },
+     {
+      "src": "media/moments/e-t-the-extra-terrestrial-2.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 2,
+      "caption": "A trail of sweets to lure a visitor"
+     },
+     {
+      "src": "media/moments/e-t-the-extra-terrestrial-3.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 3,
+      "caption": "Phoning home"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "ghostbusters",
+   "name": "Ghostbusters",
+   "alt": [],
+   "facts": {
+    "year": 1984,
+    "decade": "1980s",
+    "director": "Ivan Reitman",
+    "kids": false
+   },
+   "blurb": "Three parapsychologists start a ghost-catching business in New York City.",
+   "media": {
+    "img": [
+     {
+      "src": "media/moments/ghostbusters-1.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 2,
+      "caption": "Busting a ghost in the hotel ballroom"
+     },
+     {
+      "src": "media/moments/ghostbusters-2.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 2,
+      "caption": "The ghost-catching car outside the firehouse"
+     },
+     {
+      "src": "media/moments/ghostbusters-3.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 2,
+      "caption": "The giant marshmallow man"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "the-karate-kid",
+   "name": "The Karate Kid",
+   "alt": [
+    "Karate Kid"
+   ],
+   "facts": {
+    "year": 1984,
+    "decade": "1980s",
+    "director": "John G. Avildsen",
+    "kids": false
+   },
+   "blurb": "A bullied teenager learns karate from a wise handyman.",
+   "media": {
+    "img": [
+     {
+      "src": "media/moments/the-karate-kid-1.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 2,
+      "caption": "The crane kick"
+     },
+     {
+      "src": "media/moments/the-karate-kid-2.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 2,
+      "caption": "Wax on, wax off"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "the-terminator",
+   "name": "The Terminator",
+   "alt": [
+    "Terminator"
+   ],
+   "facts": {
+    "year": 1984,
+    "decade": "1980s",
+    "director": "James Cameron",
+    "kids": false
+   },
+   "blurb": "A cyborg assassin is sent back in time to kill the mother of humanity's future saviour.",
+   "media": {
+    "img": [
+     {
+      "src": "media/moments/the-terminator-1.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 2,
+      "caption": "The machine war of the future"
+     },
+     {
+      "src": "media/moments/the-terminator-2.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 3,
+      "caption": "Arriving from the future in a ball of lightning"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "the-neverending-story",
+   "name": "The NeverEnding Story",
+   "alt": [
+    "Neverending Story",
+    "The Never Ending Story"
+   ],
+   "facts": {
+    "year": 1984,
+    "decade": "1980s",
+    "director": "Wolfgang Petersen",
+    "kids": true
+   },
+   "blurb": "A boy reading a magical book is drawn into the land of Fantasia.",
+   "media": {
+    "img": [
+     {
+      "src": "media/moments/the-neverending-story-1.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 1,
+      "caption": "Riding the luckdragon"
+     },
+     {
+      "src": "media/moments/the-neverending-story-2.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 3,
+      "caption": "Reading in the school attic"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "back-to-the-future",
+   "name": "Back to the Future",
+   "alt": [],
+   "facts": {
+    "year": 1985,
+    "decade": "1980s",
+    "director": "Robert Zemeckis",
+    "kids": true
+   },
+   "blurb": "Teenager Marty McFly is sent back to 1955 in a time-travelling car.",
+   "media": {
+    "img": [
+     {
+      "src": "media/moments/back-to-the-future-1.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 1,
+      "caption": "Hitting 88 mph: twin trails of fire"
+     },
+     {
+      "src": "media/moments/back-to-the-future-2.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 2,
+      "caption": "Lightning strikes the clock tower"
+     },
+     {
+      "src": "media/moments/back-to-the-future-3.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 3,
+      "caption": "Skateboarding through 1955"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "the-goonies",
+   "name": "The Goonies",
+   "alt": [
+    "Goonies"
+   ],
+   "facts": {
+    "year": 1985,
+    "decade": "1980s",
+    "director": "Richard Donner",
+    "kids": true
+   },
+   "blurb": "A group of kids follow a treasure map to a pirate ship hidden under their town.",
+   "media": {
+    "img": [
+     {
+      "src": "media/moments/the-goonies-1.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 1,
+      "caption": "The pirate ship in the cave"
+     },
+     {
+      "src": "media/moments/the-goonies-2.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 2,
+      "caption": "Finding the treasure map"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "top-gun",
+   "name": "Top Gun",
+   "alt": [],
+   "facts": {
+    "year": 1986,
+    "decade": "1980s",
+    "director": "Tony Scott",
+    "kids": false
+   },
+   "blurb": "A hotshot naval aviator trains at the elite fighter weapons school.",
+   "media": {
+    "img": [
+     {
+      "src": "media/moments/top-gun-1.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 2,
+      "caption": "Danger zone at sunset"
+     },
+     {
+      "src": "media/moments/top-gun-2.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 2,
+      "caption": "Racing a jet on the motorbike"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "dirty-dancing",
+   "name": "Dirty Dancing",
+   "alt": [],
+   "facts": {
+    "year": 1987,
+    "decade": "1980s",
+    "director": "Emile Ardolino",
+    "kids": false
+   },
+   "blurb": "A teenager falls for her dance instructor at a 1960s summer resort.",
+   "media": {
+    "img": [
+     {
+      "src": "media/moments/dirty-dancing-1.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 2,
+      "caption": "Practising the lift in the lake"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "the-princess-bride",
+   "name": "The Princess Bride",
+   "alt": [
+    "Princess Bride"
+   ],
+   "facts": {
+    "year": 1987,
+    "decade": "1980s",
+    "director": "Rob Reiner",
+    "kids": false
+   },
+   "blurb": "A farmhand turned pirate rescues his true love from an evil prince.",
+   "media": {
+    "img": [
+     {
+      "src": "media/moments/the-princess-bride-1.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 2,
+      "caption": "The duel atop the Cliffs of Insanity"
+     },
+     {
+      "src": "media/moments/the-princess-bride-2.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 3,
+      "caption": "The Fire Swamp"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "ferris-buellers-day-off",
+   "name": "Ferris Bueller's Day Off",
+   "alt": [
+    "Ferris Buellers Day Off"
+   ],
+   "facts": {
+    "year": 1986,
+    "decade": "1980s",
+    "director": "John Hughes",
+    "kids": false
+   },
+   "blurb": "A high-schooler skips school for a day of adventure in Chicago.",
+   "media": {
+    "img": [
+     {
+      "src": "media/moments/ferris-buellers-day-off-1.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 3,
+      "caption": "The red Ferrari goes through the window"
+     },
+     {
+      "src": "media/moments/ferris-buellers-day-off-2.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 3,
+      "caption": "Twist and shout on the parade float"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "big",
+   "name": "Big",
+   "alt": [],
+   "facts": {
+    "year": 1988,
+    "decade": "1980s",
+    "director": "Penny Marshall",
+    "kids": false
+   },
+   "blurb": "A boy wishes to be big and wakes up as a grown man.",
+   "media": {
+    "img": [
+     {
+      "src": "media/moments/big-1.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 2,
+      "caption": "Playing the giant floor piano"
+     },
+     {
+      "src": "media/moments/big-2.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 3,
+      "caption": "Making a wish on the fortune machine"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "die-hard",
+   "name": "Die Hard",
+   "alt": [],
+   "facts": {
+    "year": 1988,
+    "decade": "1980s",
+    "director": "John McTiernan",
+    "kids": false
+   },
+   "blurb": "A New York cop takes on terrorists who seize a Los Angeles skyscraper on Christmas Eve.",
+   "media": {
+    "img": [
+     {
+      "src": "media/moments/die-hard-1.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 2,
+      "caption": "Christmas Eve at Nakatomi Plaza"
+     },
+     {
+      "src": "media/moments/die-hard-2.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 2,
+      "caption": "The rooftop leap with the fire hose"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "the-little-mermaid",
+   "name": "The Little Mermaid",
+   "alt": [
+    "Little Mermaid"
+   ],
+   "facts": {
+    "year": 1989,
+    "decade": "1980s",
+    "director": "Ron Clements, John Musker",
+    "kids": true
+   },
+   "blurb": "A mermaid princess trades her voice to a sea witch to become human.",
+   "media": {
+    "img": [
+     {
+      "src": "media/moments/the-little-mermaid-1.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 1,
+      "caption": "A mermaid dreams of the world above"
+     },
+     {
+      "src": "media/moments/the-little-mermaid-2.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 2,
+      "caption": "The grotto of human treasures"
+     },
+     {
+      "src": "media/moments/the-little-mermaid-3.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 2,
+      "caption": "Under the sea"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "field-of-dreams",
+   "name": "Field of Dreams",
+   "alt": [],
+   "facts": {
+    "year": 1989,
+    "decade": "1980s",
+    "director": "Phil Alden Robinson",
+    "kids": false
+   },
+   "blurb": "An Iowa farmer builds a baseball field in his cornfield after hearing a voice.",
+   "media": {
+    "img": [
+     {
+      "src": "media/moments/field-of-dreams-1.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 2,
+      "caption": "If you build it, they will come"
+     },
+     {
+      "src": "media/moments/field-of-dreams-2.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 3,
+      "caption": "A ballpark on the farm"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "dead-poets-society",
+   "name": "Dead Poets Society",
+   "alt": [],
+   "facts": {
+    "year": 1989,
+    "decade": "1980s",
+    "director": "Peter Weir",
+    "kids": false
+   },
+   "blurb": "An inspiring English teacher urges students at a strict boarding school to seize the day.",
+   "media": {
+    "img": [
+     {
+      "src": "media/moments/dead-poets-society-1.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 2,
+      "caption": "O Captain! My Captain! on the desks"
+     },
+     {
+      "src": "media/moments/dead-poets-society-2.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 3,
+      "caption": "A secret poetry club in a cave"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "honey-i-shrunk-the-kids",
+   "name": "Honey, I Shrunk the Kids",
+   "alt": [
+    "Honey I Shrunk the Kids"
+   ],
+   "facts": {
+    "year": 1989,
+    "decade": "1980s",
+    "director": "Joe Johnston",
+    "kids": true
+   },
+   "blurb": "An inventor accidentally shrinks the children, who must cross the back garden to get home.",
+   "media": {
+    "img": [
+     {
+      "src": "media/moments/honey-i-shrunk-the-kids-1.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 1,
+      "caption": "Riding an ant through the jungle of the lawn"
+     },
+     {
+      "src": "media/moments/honey-i-shrunk-the-kids-2.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 2,
+      "caption": "Nearly eaten with the cereal"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "kikis-delivery-service",
+   "name": "Kiki's Delivery Service",
+   "alt": [
+    "Kikis Delivery Service"
+   ],
+   "facts": {
+    "year": 1989,
+    "decade": "1980s",
+    "director": "Hayao Miyazaki",
+    "kids": true
+   },
+   "blurb": "A young witch moves to a seaside town and starts a flying delivery business.",
+   "media": {
+    "img": [
+     {
+      "src": "media/moments/kikis-delivery-service-1.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 1,
+      "caption": "A young witch flying over a seaside town"
+     },
+     {
+      "src": "media/moments/kikis-delivery-service-2.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 3,
+      "caption": "The bakery she lives above"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "home-alone",
+   "name": "Home Alone",
+   "alt": [],
+   "facts": {
+    "year": 1990,
+    "decade": "1990s",
+    "director": "Chris Columbus",
+    "kids": true
+   },
+   "blurb": "An eight-year-old left behind at Christmas defends his house from two burglars.",
+   "media": {
+    "img": [
+     {
+      "src": "media/moments/home-alone-1.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 1,
+      "caption": "Booby traps for the Wet Bandits"
+     },
+     {
+      "src": "media/moments/home-alone-2.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 2,
+      "caption": "Left home alone at Christmas"
+     },
+     {
+      "src": "media/moments/home-alone-3.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 3,
+      "caption": "The family racing for the plane to Paris"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "ghost",
+   "name": "Ghost",
+   "alt": [],
+   "facts": {
+    "year": 1990,
+    "decade": "1990s",
+    "director": "Jerry Zucker",
+    "kids": false
+   },
+   "blurb": "A murdered man's spirit stays behind to protect his girlfriend with help from a psychic.",
+   "media": {
+    "img": [
+     {
+      "src": "media/moments/ghost-1.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 2,
+      "caption": "The pottery wheel"
+     },
+     {
+      "src": "media/moments/ghost-2.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 3,
+      "caption": "Watching over her from the other side"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "edward-scissorhands",
+   "name": "Edward Scissorhands",
+   "alt": [],
+   "facts": {
+    "year": 1990,
+    "decade": "1990s",
+    "director": "Tim Burton",
+    "kids": false
+   },
+   "blurb": "An artificial man with scissors for hands is taken in by a pastel suburban town.",
+   "media": {
+    "img": [
+     {
+      "src": "media/moments/edward-scissorhands-1.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 2,
+      "caption": "Topiary art in pastel suburbia"
+     },
+     {
+      "src": "media/moments/edward-scissorhands-2.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 2,
+      "caption": "Ice-carving snow"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "beauty-and-the-beast",
+   "name": "Beauty and the Beast",
+   "alt": [],
+   "facts": {
+    "year": 1991,
+    "decade": "1990s",
+    "director": "Gary Trousdale, Kirk Wise",
+    "kids": true
+   },
+   "blurb": "A bookish young woman is held captive in the castle of a cursed prince.",
+   "media": {
+    "img": [
+     {
+      "src": "media/moments/beauty-and-the-beast-1.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 1,
+      "caption": "The enchanted rose"
+     },
+     {
+      "src": "media/moments/beauty-and-the-beast-2.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 1,
+      "caption": "Tale as old as time"
+     },
+     {
+      "src": "media/moments/beauty-and-the-beast-3.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 2,
+      "caption": "Be our guest: the enchanted household"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "aladdin",
+   "name": "Aladdin",
+   "alt": [],
+   "facts": {
+    "year": 1992,
+    "decade": "1990s",
+    "director": "Ron Clements, John Musker",
+    "kids": true
+   },
+   "blurb": "A street urchin finds a magic lamp containing a wish-granting genie.",
+   "media": {
+    "img": [
+     {
+      "src": "media/moments/aladdin-1.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 1,
+      "caption": "A whole new world on a magic carpet"
+     },
+     {
+      "src": "media/moments/aladdin-2.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 1,
+      "caption": "The magic lamp in the Cave of Wonders"
+     },
+     {
+      "src": "media/moments/aladdin-3.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 2,
+      "caption": "The Cave of Wonders"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "jurassic-park",
+   "name": "Jurassic Park",
+   "alt": [],
+   "facts": {
+    "year": 1993,
+    "decade": "1990s",
+    "director": "Steven Spielberg",
+    "kids": false
+   },
+   "blurb": "Cloned dinosaurs escape at a theme park on a remote island.",
+   "media": {
+    "img": [
+     {
+      "src": "media/moments/jurassic-park-1.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 1,
+      "caption": "The T. rex breaks out"
+     },
+     {
+      "src": "media/moments/jurassic-park-2.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 2,
+      "caption": "The rippling glass of water"
+     },
+     {
+      "src": "media/moments/jurassic-park-3.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 2,
+      "caption": "Dinosaur DNA in amber"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "mrs-doubtfire",
+   "name": "Mrs. Doubtfire",
+   "alt": [
+    "Mrs Doubtfire"
+   ],
+   "facts": {
+    "year": 1993,
+    "decade": "1990s",
+    "director": "Chris Columbus",
+    "kids": false
+   },
+   "blurb": "A divorced dad disguises himself as an elderly British nanny to see his children.",
+   "media": {
+    "img": [
+     {
+      "src": "media/moments/mrs-doubtfire-2.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 2,
+      "caption": "Dancing with the vacuum cleaner"
+     },
+     {
+      "src": "media/moments/mrs-doubtfire-1.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 3,
+      "caption": "A face full of cream"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "groundhog-day",
+   "name": "Groundhog Day",
+   "alt": [],
+   "facts": {
+    "year": 1993,
+    "decade": "1990s",
+    "director": "Harold Ramis",
+    "kids": false
+   },
+   "blurb": "A cynical weatherman relives the same day over and over.",
+   "media": {
+    "img": [
+     {
+      "src": "media/moments/groundhog-day-1.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 2,
+      "caption": "The groundhog sees his shadow"
+     },
+     {
+      "src": "media/moments/groundhog-day-2.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 3,
+      "caption": "The same morning, again"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "free-willy",
+   "name": "Free Willy",
+   "alt": [],
+   "facts": {
+    "year": 1993,
+    "decade": "1990s",
+    "director": "Simon Wincer",
+    "kids": true
+   },
+   "blurb": "A boy helps a captive orca escape to the ocean.",
+   "media": {
+    "img": [
+     {
+      "src": "media/moments/free-willy-1.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 1,
+      "caption": "The leap to freedom"
+     },
+     {
+      "src": "media/moments/free-willy-2.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 2,
+      "caption": "A boy befriends a captive orca"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "the-lion-king",
+   "name": "The Lion King",
+   "alt": [
+    "Lion King"
+   ],
+   "facts": {
+    "year": 1994,
+    "decade": "1990s",
+    "director": "Roger Allers, Rob Minkoff",
+    "kids": true
+   },
+   "blurb": "A lion cub flees his kingdom after his father's death and returns to reclaim it.",
+   "media": {
+    "img": [
+     {
+      "src": "media/moments/the-lion-king-1.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 1,
+      "caption": "The circle of life at Pride Rock"
+     },
+     {
+      "src": "media/moments/the-lion-king-2.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 2,
+      "caption": "The wildebeest stampede"
+     },
+     {
+      "src": "media/moments/the-lion-king-3.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 2,
+      "caption": "Hakuna matata"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "forrest-gump",
+   "name": "Forrest Gump",
+   "alt": [],
+   "facts": {
+    "year": 1994,
+    "decade": "1990s",
+    "director": "Robert Zemeckis",
+    "kids": false
+   },
+   "blurb": "A kind-hearted Alabama man drifts through decades of American history.",
+   "media": {
+    "img": [
+     {
+      "src": "media/moments/forrest-gump-1.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 2,
+      "caption": "Life is like a box of chocolates"
+     },
+     {
+      "src": "media/moments/forrest-gump-2.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 2,
+      "caption": "Running across America"
+     },
+     {
+      "src": "media/moments/forrest-gump-3.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 3,
+      "caption": "The shrimp boat that survived the hurricane"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "the-shawshank-redemption",
+   "name": "The Shawshank Redemption",
+   "alt": [
+    "Shawshank Redemption",
+    "Shawshank"
+   ],
+   "facts": {
+    "year": 1994,
+    "decade": "1990s",
+    "director": "Frank Darabont",
+    "kids": false
+   },
+   "blurb": "A banker wrongly jailed for murder befriends a fellow inmate and plans his escape.",
+   "media": {
+    "img": [
+     {
+      "src": "media/moments/the-shawshank-redemption-1.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 2,
+      "caption": "Free, in the rain"
+     },
+     {
+      "src": "media/moments/the-shawshank-redemption-2.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 3,
+      "caption": "The tunnel behind the poster"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "speed",
+   "name": "Speed",
+   "alt": [],
+   "facts": {
+    "year": 1994,
+    "decade": "1990s",
+    "director": "Jan de Bont",
+    "kids": false
+   },
+   "blurb": "A bomb on a Los Angeles bus will explode if it drops below 50 mph.",
+   "media": {
+    "img": [
+     {
+      "src": "media/moments/speed-1.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 2,
+      "caption": "The bus jumps the freeway gap"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "toy-story",
+   "name": "Toy Story",
+   "alt": [],
+   "facts": {
+    "year": 1995,
+    "decade": "1990s",
+    "director": "John Lasseter",
+    "kids": true
+   },
+   "blurb": "A cowboy doll is jealous when a new space-ranger action figure becomes his owner's favourite.",
+   "media": {
+    "img": [
+     {
+      "src": "media/moments/toy-story-1.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 1,
+      "caption": "The toys come alive when nobody's looking"
+     },
+     {
+      "src": "media/moments/toy-story-2.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 2,
+      "caption": "Falling with style"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "jumanji",
+   "name": "Jumanji",
+   "alt": [],
+   "facts": {
+    "year": 1995,
+    "decade": "1990s",
+    "director": "Joe Johnston",
+    "kids": true
+   },
+   "blurb": "A magical board game unleashes jungle dangers on a small town.",
+   "media": {
+    "img": [
+     {
+      "src": "media/moments/jumanji-1.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 1,
+      "caption": "The board game unleashes a stampede"
+     },
+     {
+      "src": "media/moments/jumanji-2.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 2,
+      "caption": "Jungle chaos in town"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "babe",
+   "name": "Babe",
+   "alt": [],
+   "facts": {
+    "year": 1995,
+    "decade": "1990s",
+    "director": "Chris Noonan",
+    "kids": true
+   },
+   "blurb": "A piglet raised by sheepdogs learns to herd sheep.",
+   "media": {
+    "img": [
+     {
+      "src": "media/moments/babe-1.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 1,
+      "caption": "The sheep-pig wins the trial"
+     },
+     {
+      "src": "media/moments/babe-2.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 2,
+      "caption": "Adopted by the sheepdog"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "apollo-13",
+   "name": "Apollo 13",
+   "alt": [],
+   "facts": {
+    "year": 1995,
+    "decade": "1990s",
+    "director": "Ron Howard",
+    "kids": false
+   },
+   "blurb": "Three astronauts struggle home after an explosion cripples their Moon mission.",
+   "media": {
+    "img": [
+     {
+      "src": "media/moments/apollo-13-1.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 3,
+      "caption": "Houston, we have a problem"
+     },
+     {
+      "src": "media/moments/apollo-13-2.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 3,
+      "caption": "Fitting a square filter into a round hole"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "independence-day",
+   "name": "Independence Day",
+   "alt": [],
+   "facts": {
+    "year": 1996,
+    "decade": "1990s",
+    "director": "Roland Emmerich",
+    "kids": false
+   },
+   "blurb": "Humanity fights back against a massive alien invasion on the Fourth of July.",
+   "media": {
+    "img": [
+     {
+      "src": "media/moments/independence-day-1.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 1,
+      "caption": "The alien ship over the White House"
+     },
+     {
+      "src": "media/moments/independence-day-2.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 2,
+      "caption": "Shadows over the city"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "twister",
+   "name": "Twister",
+   "alt": [],
+   "facts": {
+    "year": 1996,
+    "decade": "1990s",
+    "director": "Jan de Bont",
+    "kids": false
+   },
+   "blurb": "Storm chasers race to put sensors into the heart of a tornado.",
+   "media": {
+    "img": [
+     {
+      "src": "media/moments/twister-1.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 2,
+      "caption": "Chasing the tornado (with a flying cow)"
+     },
+     {
+      "src": "media/moments/twister-2.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 3,
+      "caption": "Dorothy's sensors fly into the twister"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "matilda",
+   "name": "Matilda",
+   "alt": [],
+   "facts": {
+    "year": 1996,
+    "decade": "1990s",
+    "director": "Danny DeVito",
+    "kids": true
+   },
+   "blurb": "A brilliant girl with telekinetic powers stands up to her awful parents and headmistress.",
+   "media": {
+    "img": [
+     {
+      "src": "media/moments/matilda-1.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 1,
+      "caption": "A girl whose books float"
+     },
+     {
+      "src": "media/moments/matilda-2.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 2,
+      "caption": "The giant chocolate cake"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "titanic",
+   "name": "Titanic",
+   "alt": [],
+   "facts": {
+    "year": 1997,
+    "decade": "1990s",
+    "director": "James Cameron",
+    "kids": false
+   },
+   "blurb": "A love story aboard the doomed ocean liner on its maiden voyage in 1912.",
+   "media": {
+    "img": [
+     {
+      "src": "media/moments/titanic-1.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 1,
+      "caption": "The ship that 'could not sink' meets an iceberg"
+     },
+     {
+      "src": "media/moments/titanic-2.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 2,
+      "caption": "I'm flying! at the ship's bow"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "men-in-black",
+   "name": "Men in Black",
+   "alt": [],
+   "facts": {
+    "year": 1997,
+    "decade": "1990s",
+    "director": "Barry Sonnenfeld",
+    "kids": false
+   },
+   "blurb": "Two secret agents police alien immigrants living on Earth.",
+   "media": {
+    "img": [
+     {
+      "src": "media/moments/men-in-black-1.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 2,
+      "caption": "Look into the neuralyzer"
+     },
+     {
+      "src": "media/moments/men-in-black-2.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 3,
+      "caption": "Alien immigration at headquarters"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "mulan",
+   "name": "Mulan",
+   "alt": [],
+   "facts": {
+    "year": 1998,
+    "decade": "1990s",
+    "director": "Tony Bancroft, Barry Cook",
+    "kids": true
+   },
+   "blurb": "A young woman disguises herself as a man to take her father's place in the Chinese army.",
+   "media": {
+    "img": [
+     {
+      "src": "media/moments/mulan-1.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 1,
+      "caption": "Taking her father's place"
+     },
+     {
+      "src": "media/moments/mulan-2.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 2,
+      "caption": "The avalanche in the mountain pass"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "armageddon",
+   "name": "Armageddon",
+   "alt": [],
+   "facts": {
+    "year": 1998,
+    "decade": "1990s",
+    "director": "Michael Bay",
+    "kids": false
+   },
+   "blurb": "Oil drillers are sent to blow up an asteroid heading for Earth.",
+   "media": {
+    "img": [
+     {
+      "src": "media/moments/armageddon-1.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 2,
+      "caption": "Drillers to the asteroid"
+     },
+     {
+      "src": "media/moments/armageddon-2.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 3,
+      "caption": "The walk to the launch pad"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "the-matrix",
+   "name": "The Matrix",
+   "alt": [
+    "Matrix"
+   ],
+   "facts": {
+    "year": 1999,
+    "decade": "1990s",
+    "director": "The Wachowskis",
+    "kids": false
+   },
+   "blurb": "A hacker learns the world is a simulation and joins a rebellion against the machines.",
+   "media": {
+    "img": [
+     {
+      "src": "media/moments/the-matrix-1.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 1,
+      "caption": "Dodging bullets in slow motion"
+     },
+     {
+      "src": "media/moments/the-matrix-2.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 1,
+      "caption": "Red pill or blue pill?"
+     },
+     {
+      "src": "media/moments/the-matrix-3.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 2,
+      "caption": "The human battery fields"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "the-iron-giant",
+   "name": "The Iron Giant",
+   "alt": [
+    "Iron Giant"
+   ],
+   "facts": {
+    "year": 1999,
+    "decade": "1990s",
+    "director": "Brad Bird",
+    "kids": true
+   },
+   "blurb": "A boy in 1950s Maine befriends a giant robot from outer space.",
+   "media": {
+    "img": [
+     {
+      "src": "media/moments/the-iron-giant-1.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 1,
+      "caption": "A boy and his giant robot"
+     },
+     {
+      "src": "media/moments/the-iron-giant-2.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 3,
+      "caption": "Superman: the robot's sacrifice"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "stuart-little",
+   "name": "Stuart Little",
+   "alt": [],
+   "facts": {
+    "year": 1999,
+    "decade": "1990s",
+    "director": "Rob Minkoff",
+    "kids": true
+   },
+   "blurb": "A New York family adopts a mouse, who wins over everyone except the cat.",
+   "media": {
+    "img": [
+     {
+      "src": "media/moments/stuart-little-1.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 1,
+      "caption": "The mouse who sailed in the boat race"
+     },
+     {
+      "src": "media/moments/stuart-little-2.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 2,
+      "caption": "A mouse in a toy roadster"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "gladiator",
+   "name": "Gladiator",
+   "alt": [],
+   "facts": {
+    "year": 2000,
+    "decade": "2000s",
+    "director": "Ridley Scott",
+    "kids": false
+   },
+   "blurb": "A betrayed Roman general becomes a gladiator and seeks revenge on the emperor.",
+   "media": {
+    "img": [
+     {
+      "src": "media/moments/gladiator-1.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 1,
+      "caption": "Are you not entertained?"
+     },
+     {
+      "src": "media/moments/gladiator-2.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 2,
+      "caption": "A hand through the wheat field"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "cast-away",
+   "name": "Cast Away",
+   "alt": [
+    "Castaway"
+   ],
+   "facts": {
+    "year": 2000,
+    "decade": "2000s",
+    "director": "Robert Zemeckis",
+    "kids": false
+   },
+   "blurb": "A courier stranded on a deserted island survives alone for four years.",
+   "media": {
+    "img": [
+     {
+      "src": "media/moments/cast-away-1.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 1,
+      "caption": "A volleyball for a friend"
+     },
+     {
+      "src": "media/moments/cast-away-2.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 2,
+      "caption": "Adrift on the raft"
+     },
+     {
+      "src": "media/moments/cast-away-3.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 3,
+      "caption": "The parcel he never opened"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "chicken-run",
+   "name": "Chicken Run",
+   "alt": [],
+   "facts": {
+    "year": 2000,
+    "decade": "2000s",
+    "director": "Peter Lord, Nick Park",
+    "kids": true
+   },
+   "blurb": "Chickens on a Yorkshire farm plan a daring escape.",
+   "media": {
+    "img": [
+     {
+      "src": "media/moments/chicken-run-1.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 1,
+      "caption": "The great chicken escape by plane"
+     },
+     {
+      "src": "media/moments/chicken-run-2.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 2,
+      "caption": "The farm that looks like a prison camp"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "shrek",
+   "name": "Shrek",
+   "alt": [],
+   "facts": {
+    "year": 2001,
+    "decade": "2000s",
+    "director": "Andrew Adamson, Vicky Jenson",
+    "kids": true
+   },
+   "blurb": "A grumpy ogre and a talking donkey set out to rescue a princess.",
+   "media": {
+    "img": [
+     {
+      "src": "media/moments/shrek-1.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 1,
+      "caption": "Crossing the bridge to the dragon's castle"
+     },
+     {
+      "src": "media/moments/shrek-2.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 2,
+      "caption": "A swamp invaded by fairy-tale creatures"
+     },
+     {
+      "src": "media/moments/shrek-3.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 2,
+      "caption": "Not my gumdrop buttons!"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "harry-potter-and-the-philosopher-s-stone",
+   "name": "Harry Potter and the Philosopher's Stone",
+   "alt": [
+    "Harry Potter and the Sorcerer's Stone",
+    "Harry Potter"
+   ],
+   "facts": {
+    "year": 2001,
+    "decade": "2000s",
+    "director": "Chris Columbus",
+    "kids": true
+   },
+   "blurb": "An orphan discovers he is a wizard and goes to Hogwarts.",
+   "media": {
+    "img": [
+     {
+      "src": "media/moments/harry-potter-and-the-philosopher-s-stone-1.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 1,
+      "caption": "The letters that wouldn't stop coming"
+     },
+     {
+      "src": "media/moments/harry-potter-and-the-philosopher-s-stone-2.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 1,
+      "caption": "The floating candles of the Great Hall"
+     },
+     {
+      "src": "media/moments/harry-potter-and-the-philosopher-s-stone-3.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 2,
+      "caption": "Through the wall to Platform 9¾"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "lotr-fellowship",
+   "name": "The Lord of the Rings: The Fellowship of the Ring",
+   "alt": [
+    "The Fellowship of the Ring",
+    "Lord of the Rings",
+    "The Lord of the Rings"
+   ],
+   "facts": {
+    "year": 2001,
+    "decade": "2000s",
+    "director": "Peter Jackson",
+    "kids": false
+   },
+   "blurb": "A hobbit begins the quest to destroy the One Ring.",
+   "media": {
+    "img": [
+     {
+      "src": "media/moments/lotr-fellowship-1.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 1,
+      "caption": "One ring to rule them all"
+     },
+     {
+      "src": "media/moments/lotr-fellowship-2.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 2,
+      "caption": "A hobbit hole in the Shire"
+     },
+     {
+      "src": "media/moments/lotr-fellowship-3.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 2,
+      "caption": "You shall not pass"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "monsters-inc",
+   "name": "Monsters, Inc.",
+   "alt": [
+    "Monsters Inc"
+   ],
+   "facts": {
+    "year": 2001,
+    "decade": "2000s",
+    "director": "Pete Docter",
+    "kids": true
+   },
+   "blurb": "Monsters who scare children for power discover a little girl in their world.",
+   "media": {
+    "img": [
+     {
+      "src": "media/moments/monsters-inc-1.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 1,
+      "caption": "The door vault"
+     },
+     {
+      "src": "media/moments/monsters-inc-2.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 3,
+      "caption": "The scare floor"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "spirited-away",
+   "name": "Spirited Away",
+   "alt": [],
+   "facts": {
+    "year": 2001,
+    "decade": "2000s",
+    "director": "Hayao Miyazaki",
+    "kids": true
+   },
+   "blurb": "A girl trapped in a spirit world works in a bathhouse to save her parents.",
+   "media": {
+    "img": [
+     {
+      "src": "media/moments/spirited-away-1.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 2,
+      "caption": "The spirits' bathhouse"
+     },
+     {
+      "src": "media/moments/spirited-away-2.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 2,
+      "caption": "The train across the sea"
+     },
+     {
+      "src": "media/moments/spirited-away-3.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 2,
+      "caption": "Her parents turned into pigs"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "ice-age",
+   "name": "Ice Age",
+   "alt": [],
+   "facts": {
+    "year": 2002,
+    "decade": "2000s",
+    "director": "Chris Wedge",
+    "kids": true
+   },
+   "blurb": "A mammoth, a sloth and a sabre-toothed tiger return a human baby to his tribe.",
+   "media": {
+    "img": [
+     {
+      "src": "media/moments/ice-age-1.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 1,
+      "caption": "An unlikely herd crossing the ice"
+     },
+     {
+      "src": "media/moments/ice-age-2.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 1,
+      "caption": "The squirrel and the acorn"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "finding-nemo",
+   "name": "Finding Nemo",
+   "alt": [],
+   "facts": {
+    "year": 2003,
+    "decade": "2000s",
+    "director": "Andrew Stanton",
+    "kids": true
+   },
+   "blurb": "A clownfish crosses the ocean to find his son, captured by a diver.",
+   "media": {
+    "img": [
+     {
+      "src": "media/moments/finding-nemo-1.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 1,
+      "caption": "A clownfish and a blue tang"
+     },
+     {
+      "src": "media/moments/finding-nemo-2.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 2,
+      "caption": "Riding the East Australian Current"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "pirates-of-the-caribbean",
+   "name": "Pirates of the Caribbean: The Curse of the Black Pearl",
+   "alt": [
+    "Pirates of the Caribbean",
+    "The Curse of the Black Pearl"
+   ],
+   "facts": {
+    "year": 2003,
+    "decade": "2000s",
+    "director": "Gore Verbinski",
+    "kids": false
+   },
+   "blurb": "A blacksmith teams up with an eccentric pirate captain to rescue the governor's daughter from cursed pirates.",
+   "media": {
+    "img": [
+     {
+      "src": "media/moments/pirates-of-the-caribbean-1.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 2,
+      "caption": "Cursed pirates in the moonlight"
+     },
+     {
+      "src": "media/moments/pirates-of-the-caribbean-2.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 2,
+      "caption": "Arriving on a sinking boat"
+     },
+     {
+      "src": "media/moments/pirates-of-the-caribbean-3.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 3,
+      "caption": "The cursed Aztec gold"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "elf",
+   "name": "Elf",
+   "alt": [],
+   "facts": {
+    "year": 2003,
+    "decade": "2000s",
+    "director": "Jon Favreau",
+    "kids": true
+   },
+   "blurb": "A human raised by Santa's elves travels to New York to find his real father.",
+   "media": {
+    "img": [
+     {
+      "src": "media/moments/elf-1.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 1,
+      "caption": "A very tall elf at the North Pole"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "the-polar-express",
+   "name": "The Polar Express",
+   "alt": [
+    "Polar Express"
+   ],
+   "facts": {
+    "year": 2004,
+    "decade": "2000s",
+    "director": "Robert Zemeckis",
+    "kids": true
+   },
+   "blurb": "A boy boards a magical train to the North Pole on Christmas Eve.",
+   "media": {
+    "img": [
+     {
+      "src": "media/moments/the-polar-express-1.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 1,
+      "caption": "All aboard the train to the North Pole"
+     },
+     {
+      "src": "media/moments/the-polar-express-2.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 3,
+      "caption": "The first gift of Christmas"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "madagascar",
+   "name": "Madagascar",
+   "alt": [],
+   "facts": {
+    "year": 2005,
+    "decade": "2000s",
+    "director": "Eric Darnell, Tom McGrath",
+    "kids": true
+   },
+   "blurb": "Four pampered zoo animals end up stranded on Madagascar.",
+   "media": {
+    "img": [
+     {
+      "src": "media/moments/madagascar-1.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 1,
+      "caption": "Zoo animals stranded on the beach"
+     },
+     {
+      "src": "media/moments/madagascar-2.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 2,
+      "caption": "The penguins take over the ship"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "happy-feet",
+   "name": "Happy Feet",
+   "alt": [],
+   "facts": {
+    "year": 2006,
+    "decade": "2000s",
+    "director": "George Miller",
+    "kids": true
+   },
+   "blurb": "An emperor penguin who can't sing finds his heart song in tap dancing.",
+   "media": {
+    "img": [
+     {
+      "src": "media/moments/happy-feet-1.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 1,
+      "caption": "The tap-dancing penguin"
+     },
+     {
+      "src": "media/moments/happy-feet-2.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 3,
+      "caption": "Tobogganing across the ice"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "night-at-the-museum",
+   "name": "Night at the Museum",
+   "alt": [],
+   "facts": {
+    "year": 2006,
+    "decade": "2000s",
+    "director": "Shawn Levy",
+    "kids": true
+   },
+   "blurb": "A night guard discovers the museum exhibits come to life after dark.",
+   "media": {
+    "img": [
+     {
+      "src": "media/moments/night-at-the-museum-1.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 1,
+      "caption": "The T. rex skeleton wants to play fetch"
+     },
+     {
+      "src": "media/moments/night-at-the-museum-2.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 2,
+      "caption": "Miniature dioramas come to life"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "ratatouille",
+   "name": "Ratatouille",
+   "alt": [],
+   "facts": {
+    "year": 2007,
+    "decade": "2000s",
+    "director": "Brad Bird",
+    "kids": true
+   },
+   "blurb": "A rat who dreams of being a chef teams up with a kitchen boy in Paris.",
+   "media": {
+    "img": [
+     {
+      "src": "media/moments/ratatouille-1.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 1,
+      "caption": "A rat who loves to cook"
+     },
+     {
+      "src": "media/moments/ratatouille-2.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 2,
+      "caption": "A rat's view of Paris"
+     },
+     {
+      "src": "media/moments/ratatouille-3.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 2,
+      "caption": "The dish that won the critic"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "wall-e",
+   "name": "WALL-E",
+   "alt": [
+    "Wall-E",
+    "WALLE"
+   ],
+   "facts": {
+    "year": 2008,
+    "decade": "2000s",
+    "director": "Andrew Stanton",
+    "kids": true
+   },
+   "blurb": "A lonely trash-compacting robot on an abandoned Earth falls in love.",
+   "media": {
+    "img": [
+     {
+      "src": "media/moments/wall-e-1.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 1,
+      "caption": "Cleaning up an abandoned Earth"
+     },
+     {
+      "src": "media/moments/wall-e-2.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 2,
+      "caption": "Dancing in space"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "kung-fu-panda",
+   "name": "Kung Fu Panda",
+   "alt": [],
+   "facts": {
+    "year": 2008,
+    "decade": "2000s",
+    "director": "John Stevenson, Mark Osborne",
+    "kids": true
+   },
+   "blurb": "A clumsy noodle-loving panda is chosen as the Dragon Warrior.",
+   "media": {
+    "img": [
+     {
+      "src": "media/moments/kung-fu-panda-1.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 1,
+      "caption": "The panda who became a kung fu master"
+     },
+     {
+      "src": "media/moments/kung-fu-panda-2.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 3,
+      "caption": "The sacred peach tree"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "mamma-mia",
+   "name": "Mamma Mia!",
+   "alt": [
+    "Mamma Mia"
+   ],
+   "facts": {
+    "year": 2008,
+    "decade": "2000s",
+    "director": "Phyllida Lloyd",
+    "kids": false
+   },
+   "blurb": "A bride-to-be invites three possible fathers to her wedding on a Greek island, set to ABBA songs.",
+   "media": {
+    "img": [
+     {
+      "src": "media/moments/mamma-mia-1.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 3,
+      "caption": "A wedding on a Greek island"
+     },
+     {
+      "src": "media/moments/mamma-mia-2.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 3,
+      "caption": "Dancing queens"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "up",
+   "name": "Up",
+   "alt": [],
+   "facts": {
+    "year": 2009,
+    "decade": "2000s",
+    "director": "Pete Docter",
+    "kids": true
+   },
+   "blurb": "An old widower ties balloons to his house to fly to South America.",
+   "media": {
+    "img": [
+     {
+      "src": "media/moments/up-1.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 1,
+      "caption": "A house carried away by balloons"
+     },
+     {
+      "src": "media/moments/up-2.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 2,
+      "caption": "Paradise Falls"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "avatar",
+   "name": "Avatar",
+   "alt": [],
+   "facts": {
+    "year": 2009,
+    "decade": "2000s",
+    "director": "James Cameron",
+    "kids": false
+   },
+   "blurb": "A marine on the moon Pandora joins the blue-skinned Na'vi.",
+   "media": {
+    "img": [
+     {
+      "src": "media/moments/avatar-1.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 1,
+      "caption": "The floating mountains of Pandora"
+     },
+     {
+      "src": "media/moments/avatar-2.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 2,
+      "caption": "The glowing forest at night"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "inception",
+   "name": "Inception",
+   "alt": [],
+   "facts": {
+    "year": 2010,
+    "decade": "2010s",
+    "director": "Christopher Nolan",
+    "kids": false
+   },
+   "blurb": "A thief enters people's dreams to plant an idea.",
+   "media": {
+    "img": [
+     {
+      "src": "media/moments/inception-1.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 1,
+      "caption": "The city folding over in a dream"
+     },
+     {
+      "src": "media/moments/inception-2.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 2,
+      "caption": "Is it still spinning?"
+     },
+     {
+      "src": "media/moments/inception-3.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 2,
+      "caption": "The rotating hallway fight"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "tangled",
+   "name": "Tangled",
+   "alt": [],
+   "facts": {
+    "year": 2010,
+    "decade": "2010s",
+    "director": "Nathan Greno, Byron Howard",
+    "kids": true
+   },
+   "blurb": "A princess with magical long hair leaves her tower to see the floating lanterns.",
+   "media": {
+    "img": [
+     {
+      "src": "media/moments/tangled-1.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 1,
+      "caption": "I see the light: the floating lanterns"
+     },
+     {
+      "src": "media/moments/tangled-2.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 2,
+      "caption": "Let down your hair"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "how-to-train-your-dragon",
+   "name": "How to Train Your Dragon",
+   "alt": [],
+   "facts": {
+    "year": 2010,
+    "decade": "2010s",
+    "director": "Dean DeBlois, Chris Sanders",
+    "kids": true
+   },
+   "blurb": "A young Viking befriends an injured dragon.",
+   "media": {
+    "img": [
+     {
+      "src": "media/moments/how-to-train-your-dragon-1.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 1,
+      "caption": "A viking boy rides his dragon"
+     },
+     {
+      "src": "media/moments/how-to-train-your-dragon-2.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 2,
+      "caption": "Dragon raid on Berk"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "life-of-pi",
+   "name": "Life of Pi",
+   "alt": [],
+   "facts": {
+    "year": 2012,
+    "decade": "2010s",
+    "director": "Ang Lee",
+    "kids": false
+   },
+   "blurb": "A boy survives a shipwreck in a lifeboat with a Bengal tiger.",
+   "media": {
+    "img": [
+     {
+      "src": "media/moments/life-of-pi-1.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 1,
+      "caption": "Adrift with a tiger"
+     },
+     {
+      "src": "media/moments/life-of-pi-2.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 3,
+      "caption": "The glowing ocean night"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "brave",
+   "name": "Brave",
+   "alt": [],
+   "facts": {
+    "year": 2012,
+    "decade": "2010s",
+    "director": "Mark Andrews, Brenda Chapman",
+    "kids": true
+   },
+   "blurb": "A Scottish princess defies tradition and her mother turns into a bear.",
+   "media": {
+    "img": [
+     {
+      "src": "media/moments/brave-1.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 1,
+      "caption": "The red-haired archer of the highlands"
+     },
+     {
+      "src": "media/moments/brave-2.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 2,
+      "caption": "Follow the wisps"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "the-hunger-games",
+   "name": "The Hunger Games",
+   "alt": [
+    "Hunger Games"
+   ],
+   "facts": {
+    "year": 2012,
+    "decade": "2010s",
+    "director": "Gary Ross",
+    "kids": false
+   },
+   "blurb": "A girl volunteers to take her sister's place in a televised fight to the death.",
+   "media": {
+    "img": [
+     {
+      "src": "media/moments/the-hunger-games-1.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 2,
+      "caption": "The girl on fire in the arena"
+     },
+     {
+      "src": "media/moments/the-hunger-games-2.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 3,
+      "caption": "The Cornucopia"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "frozen",
+   "name": "Frozen",
+   "alt": [],
+   "facts": {
+    "year": 2013,
+    "decade": "2010s",
+    "director": "Chris Buck, Jennifer Lee",
+    "kids": true
+   },
+   "blurb": "A queen with ice powers flees her kingdom and her sister follows to bring her home.",
+   "media": {
+    "img": [
+     {
+      "src": "media/moments/frozen-1.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 1,
+      "caption": "Let it go: building the ice palace"
+     },
+     {
+      "src": "media/moments/frozen-2.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 1,
+      "caption": "A snowman who loves summer"
+     },
+     {
+      "src": "media/moments/frozen-3.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 2,
+      "caption": "An eternal winter on the fjord"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "gravity",
+   "name": "Gravity",
+   "alt": [],
+   "facts": {
+    "year": 2013,
+    "decade": "2010s",
+    "director": "Alfonso Cuarón",
+    "kids": false
+   },
+   "blurb": "An astronaut is stranded in orbit after debris destroys her shuttle.",
+   "media": {
+    "img": [
+     {
+      "src": "media/moments/gravity-1.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 2,
+      "caption": "Lost in orbit"
+     },
+     {
+      "src": "media/moments/gravity-2.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 3,
+      "caption": "Back on solid ground"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "interstellar",
+   "name": "Interstellar",
+   "alt": [],
+   "facts": {
+    "year": 2014,
+    "decade": "2010s",
+    "director": "Christopher Nolan",
+    "kids": false
+   },
+   "blurb": "Astronauts travel through a wormhole to find a new home for humanity.",
+   "media": {
+    "img": [
+     {
+      "src": "media/moments/interstellar-1.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 2,
+      "caption": "The black hole Gargantua"
+     },
+     {
+      "src": "media/moments/interstellar-2.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 2,
+      "caption": "The planet of giant waves"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "paddington",
+   "name": "Paddington",
+   "alt": [],
+   "facts": {
+    "year": 2014,
+    "decade": "2010s",
+    "director": "Paul King",
+    "kids": true
+   },
+   "blurb": "A polite bear from Peru arrives in London looking for a home.",
+   "media": {
+    "img": [
+     {
+      "src": "media/moments/paddington-1.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 2,
+      "caption": "A bear's luggage at the station"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "the-grand-budapest-hotel",
+   "name": "The Grand Budapest Hotel",
+   "alt": [
+    "Grand Budapest Hotel"
+   ],
+   "facts": {
+    "year": 2014,
+    "decade": "2010s",
+    "director": "Wes Anderson",
+    "kids": false
+   },
+   "blurb": "A concierge and his lobby boy are caught up in a stolen-painting caper.",
+   "media": {
+    "img": [
+     {
+      "src": "media/moments/the-grand-budapest-hotel-1.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 2,
+      "caption": "The pink hotel"
+     },
+     {
+      "src": "media/moments/the-grand-budapest-hotel-2.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 3,
+      "caption": "Mendl's pastries"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "mad-max-fury-road",
+   "name": "Mad Max: Fury Road",
+   "alt": [
+    "Fury Road",
+    "Mad Max"
+   ],
+   "facts": {
+    "year": 2015,
+    "decade": "2010s",
+    "director": "George Miller",
+    "kids": false
+   },
+   "blurb": "In a desert wasteland, a rebel warrior and a drifter flee a tyrant in a war rig.",
+   "media": {
+    "img": [
+     {
+      "src": "media/moments/mad-max-fury-road-1.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 1,
+      "caption": "The flame-throwing guitar war party"
+     },
+     {
+      "src": "media/moments/mad-max-fury-road-2.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 2,
+      "caption": "Into the sandstorm"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "inside-out",
+   "name": "Inside Out",
+   "alt": [],
+   "facts": {
+    "year": 2015,
+    "decade": "2010s",
+    "director": "Pete Docter",
+    "kids": true
+   },
+   "blurb": "Five emotions guide a girl's mind as her family moves.",
+   "media": {
+    "img": [
+     {
+      "src": "media/moments/inside-out-1.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 1,
+      "caption": "Headquarters and the memory orbs"
+     },
+     {
+      "src": "media/moments/inside-out-2.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 2,
+      "caption": "The personality islands"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "the-martian",
+   "name": "The Martian",
+   "alt": [
+    "Martian"
+   ],
+   "facts": {
+    "year": 2015,
+    "decade": "2010s",
+    "director": "Ridley Scott",
+    "kids": false
+   },
+   "blurb": "An astronaut stranded on Mars grows potatoes to survive.",
+   "media": {
+    "img": [
+     {
+      "src": "media/moments/the-martian-1.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 1,
+      "caption": "Growing potatoes on Mars"
+     },
+     {
+      "src": "media/moments/the-martian-2.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 2,
+      "caption": "Driving across Mars"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "la-la-land",
+   "name": "La La Land",
+   "alt": [],
+   "facts": {
+    "year": 2016,
+    "decade": "2010s",
+    "director": "Damien Chazelle",
+    "kids": false
+   },
+   "blurb": "A jazz pianist and an aspiring actress fall in love in Los Angeles.",
+   "media": {
+    "img": [
+     {
+      "src": "media/moments/la-la-land-1.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 2,
+      "caption": "Dancing above the city at twilight"
+     },
+     {
+      "src": "media/moments/la-la-land-2.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 2,
+      "caption": "Another day of sun on the freeway"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "moana",
+   "name": "Moana",
+   "alt": [
+    "Vaiana"
+   ],
+   "facts": {
+    "year": 2016,
+    "decade": "2010s",
+    "director": "Ron Clements, John Musker",
+    "kids": true
+   },
+   "blurb": "A Polynesian chief's daughter sails across the ocean to restore the heart of Te Fiti.",
+   "media": {
+    "img": [
+     {
+      "src": "media/moments/moana-1.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 1,
+      "caption": "Sailing beyond the reef"
+     },
+     {
+      "src": "media/moments/moana-2.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 2,
+      "caption": "The heart of Te Fiti"
+     },
+     {
+      "src": "media/moments/moana-3.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 2,
+      "caption": "The demigod and his fishhook"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "zootopia",
+   "name": "Zootopia",
+   "alt": [
+    "Zootropolis"
+   ],
+   "facts": {
+    "year": 2016,
+    "decade": "2010s",
+    "director": "Byron Howard, Rich Moore",
+    "kids": true
+   },
+   "blurb": "A rabbit police officer and a con-artist fox crack a conspiracy in a city of animals.",
+   "media": {
+    "img": [
+     {
+      "src": "media/moments/zootopia-1.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 1,
+      "caption": "A rabbit cop and a fox"
+     },
+     {
+      "src": "media/moments/zootopia-2.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 2,
+      "caption": "The sloth at the DMV"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "coco",
+   "name": "Coco",
+   "alt": [],
+   "facts": {
+    "year": 2017,
+    "decade": "2010s",
+    "director": "Lee Unkrich",
+    "kids": true
+   },
+   "blurb": "A boy who dreams of music enters the Land of the Dead.",
+   "media": {
+    "img": [
+     {
+      "src": "media/moments/coco-1.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 1,
+      "caption": "The marigold bridge to the Land of the Dead"
+     },
+     {
+      "src": "media/moments/coco-2.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 2,
+      "caption": "The ofrenda and the guitar"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "dunkirk",
+   "name": "Dunkirk",
+   "alt": [],
+   "facts": {
+    "year": 2017,
+    "decade": "2010s",
+    "director": "Christopher Nolan",
+    "kids": false
+   },
+   "blurb": "Allied soldiers are evacuated from the beaches of Dunkirk.",
+   "media": {
+    "img": [
+     {
+      "src": "media/moments/dunkirk-1.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 2,
+      "caption": "Waiting on the beach"
+     },
+     {
+      "src": "media/moments/dunkirk-2.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 3,
+      "caption": "The Spitfire's last glide"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "dune",
+   "name": "Dune",
+   "alt": [
+    "Dune: Part One"
+   ],
+   "facts": {
+    "year": 2021,
+    "decade": "2020s",
+    "director": "Denis Villeneuve",
+    "kids": false
+   },
+   "blurb": "A young noble on the desert planet Arrakis becomes caught up in a war.",
+   "media": {
+    "img": [
+     {
+      "src": "media/moments/dune-1.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 1,
+      "caption": "The giant sandworm of Arrakis"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "encanto",
+   "name": "Encanto",
+   "alt": [],
+   "facts": {
+    "year": 2021,
+    "decade": "2020s",
+    "director": "Jared Bush, Byron Howard, Charise Castro Smith",
+    "kids": true
+   },
+   "blurb": "In a magical Colombian house, the only family member without a gift tries to save the magic.",
+   "media": {
+    "img": [
+     {
+      "src": "media/moments/encanto-1.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 1,
+      "caption": "The magical house"
+     },
+     {
+      "src": "media/moments/encanto-2.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 2,
+      "caption": "The girl without a gift"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "luca",
+   "name": "Luca",
+   "alt": [],
+   "facts": {
+    "year": 2021,
+    "decade": "2020s",
+    "director": "Enrico Casarosa",
+    "kids": true
+   },
+   "blurb": "A young sea monster spends a summer on the Italian Riviera.",
+   "media": {
+    "img": [
+     {
+      "src": "media/moments/luca-1.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 2,
+      "caption": "Silenzio, Bruno!"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "turning-red",
+   "name": "Turning Red",
+   "alt": [],
+   "facts": {
+    "year": 2022,
+    "decade": "2020s",
+    "director": "Domee Shi",
+    "kids": true
+   },
+   "blurb": "A girl turns into a giant red panda when she gets too excited.",
+   "media": {
+    "img": [
+     {
+      "src": "media/moments/turning-red-1.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 1,
+      "caption": "A giant red panda in Toronto"
+     },
+     {
+      "src": "media/moments/turning-red-2.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 2,
+      "caption": "The boyband concert"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "everything-everywhere-all-at-once",
+   "name": "Everything Everywhere All at Once",
+   "alt": [],
+   "facts": {
+    "year": 2022,
+    "decade": "2020s",
+    "director": "Daniel Kwan, Daniel Scheinert",
+    "kids": false
+   },
+   "blurb": "A laundromat owner discovers she can access parallel universes.",
+   "media": {
+    "img": [
+     {
+      "src": "media/moments/everything-everywhere-all-at-once-1.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 3,
+      "caption": "The everything bagel and googly eyes"
+     },
+     {
+      "src": "media/moments/everything-everywhere-all-at-once-2.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 3,
+      "caption": "The universe where they're rocks"
+     }
+    ]
+   },
+   "difficulty": 3
+  },
+  {
+   "id": "oppenheimer",
+   "name": "Oppenheimer",
+   "alt": [],
+   "facts": {
+    "year": 2023,
+    "decade": "2020s",
+    "director": "Christopher Nolan",
+    "kids": false
+   },
+   "blurb": "The story of the physicist who led the Manhattan Project.",
+   "media": {
+    "img": [
+     {
+      "src": "media/moments/oppenheimer-1.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 2,
+      "caption": "The Trinity test"
+     },
+     {
+      "src": "media/moments/oppenheimer-2.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 3,
+      "caption": "The man in the hat"
+     }
+    ]
+   },
+   "difficulty": 2
+  },
+  {
+   "id": "the-wild-robot",
+   "name": "The Wild Robot",
+   "alt": [
+    "Wild Robot"
+   ],
+   "facts": {
+    "year": 2024,
+    "decade": "2020s",
+    "director": "Chris Sanders",
+    "kids": true
+   },
+   "blurb": "A robot shipwrecked on a wild island raises an orphaned gosling.",
+   "media": {
+    "img": [
+     {
+      "src": "media/moments/the-wild-robot-1.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 1,
+      "caption": "A robot mother and her gosling"
+     },
+     {
+      "src": "media/moments/the-wild-robot-2.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 3,
+      "caption": "The migration"
+     }
+    ]
+   },
+   "difficulty": 1
+  },
+  {
+   "id": "wicked",
+   "name": "Wicked",
+   "alt": [],
+   "facts": {
+    "year": 2024,
+    "decade": "2020s",
+    "director": "Jon M. Chu",
+    "kids": true
+   },
+   "blurb": "The untold story of the witches of Oz.",
+   "media": {
+    "img": [
+     {
+      "src": "media/moments/wicked-1.webp",
+      "w": 640,
+      "h": 432,
+      "credit": "Clued (AI-generated illustration)",
+      "license": "CC0",
+      "page": "https://y-r-u.github.io/gms/2d/clued/docs/notes/MV.md",
+      "difficulty": 1,
+      "caption": "Defying gravity over the Emerald City"
      }
     ]
    },

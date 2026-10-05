@@ -129,3 +129,11 @@ skip). factsMeta entries: wording templates `ask`, `askReverse`, `askBool`, `ask
 `exclusive:false`; fact type `text`. Item prompts `imgPrompt`, `nameImgPrompt`, `tfImgPrompt`. Facts `flagDisputed`, `kids`.
 Index caps: `qkinds`, `itemImg`, `itemAudio`, `easy`, `kidsItems`.
 Question `refs`: `refs[0]` is the question's subject item; any further refs are the wrong-answer options' items (Learn mastery relies on this).
+
+## Additive fields from lane I (integration)
+Format: `timeScale` (number or `q => number`, stretches the player's answer time outside online rooms), `packless: true`
+(map formats: no theme picker, always selectable), `minPerPack` (default 5: pairs that generate fewer are greyed).
+Runner api: `api.timed`. Index caps: `formats` / `formatsEasy` / `formatsKids` (`{ formatId: questions generate() made }`,
+written by tools/build_index.mjs), `multi`, `catBins`. Index packs: `virtual: { of, tag }` for `general~<theme>` slices.
+Structures: optional `replay: { cfg(spec, questions), score(res, spec) }` for challenge replays. Geo: `js/geo/shape.js`
+`countryShape(iso3, opts)`.

@@ -141,6 +141,8 @@ for (const r of lmRows) {
   }
 }
 const LM_FILE = {};
+// lead photos that don't show the landmark (sunset silhouettes); no free replacement found yet, so no picture
+const LM_NO_IMG = ['Sheikh Zayed Grand Mosque', 'Hassan II Mosque'];
 for (const r of lmRows) if (LM_FILE[r.name]) lmImgFiles[r.title] = LM_FILE[r.name];
 const lmImgs = await commonsImages(Object.values(lmImgFiles), { maxDim: 640 });
 const LM_SEARCH = { 'Gateway of India': ['Gateway of India Port Mumbai', 'port mumbai'], 'Charles Bridge': ['Charles Bridge Prague', 'bridge'], Gyeongbokgung: ['Gyeongbokgung Geunjeongjeon', 'gyeongbok'], 'Lotus Temple': ['Lotus Temple Delhi', 'lotus'], 'Blue Mosque': ['Sultan Ahmed Mosque Istanbul', 'mosque'] };
@@ -370,6 +372,7 @@ for (const r of usable) for (const c of r.currencies) (curUsers[c] ??= []).push(
 const curItems = Object.entries(curUsers).map(([code, users]) => {
   const [name, symbol] = CURRENCIES[code] || [code];
   const countries = users.map(u => u.name);
+  const theCountries = countries.map(theName);
   const pop = users.reduce((a, u) => a + u.population, 0);
   const caps = users.filter(u => !CAPITAL_NOTES[u.iso3]?.skip).map(u => u.capital);
   const clues = [
@@ -378,10 +381,10 @@ const curItems = Object.entries(curUsers).map(([code, users]) => {
     caps.length && `You could spend it in ${listAnd(caps.slice(0, 2))}.`,
     `It is used in ${countries.length} UN member or observer state${countries.length > 1 ? 's' : ''}.`,
     `It is used in ${listAnd([...new Set(users.map(u => CONT[u.cont]))])}.`,
-    countries.length > 1 ? `Countries using it include ${listAnd(countries.slice(0, 3))}.` : `It is the currency of ${countries[0]}.`,
+    countries.length > 1 ? `Countries using it include ${listAnd(theCountries.slice(0, 3))}.` : `It is the currency of ${theCountries[0]}.`,
   ].filter(c => c && !leaks(c, [name]));
   return { id: slug(name), name, alt: [code], group: CONT[users[0].cont], facts: { code, countries: countries.length, symbol: symbol || undefined, continent: CONT[users[0].cont] },
-    blurb: `The ${name} (${code}) is used in ${listAnd(countries.slice(0, 6))}${countries.length > 6 ? ' and others' : ''}.`, clues, difficulty: users.some(u => FAMOUS.includes(u.iso3)) ? 1 : 2 };
+    blurb: `The ${name} (${code}) is used in ${listAnd(theCountries.slice(0, 6))}${countries.length > 6 ? ' and others' : ''}.`, clues, difficulty: users.some(u => FAMOUS.includes(u.iso3)) ? 1 : 2 };
 });
 function currencyQuestions() {
   const r = rng('currencies');
@@ -409,7 +412,7 @@ function currencyQuestions() {
 }
 writePack({
   id: 'currencies', title: 'Currencies', theme: 'geography', icon: '💱', kids: false, version: 1,
-  leakExempt: GEO_EXEMPT, factsMeta: { countries: { type: 'num', label: 'Countries using it', higherLabel: 'More countries', askHigh: 'Which of these currencies is used by the most countries?' }, continent: { type: 'cat', label: 'Main region', exclusive: false }, code: { type: 'text', label: 'ISO code' }, symbol: { type: 'text', label: 'Symbol' } },
+  leakExempt: GEO_EXEMPT, factsMeta: { countries: { type: 'num', label: 'Countries using it', higherLabel: 'More countries', askNumber: 'How many countries use the {name}?', askHigh: 'Which of these currencies is used by the most countries?' }, continent: { type: 'cat', label: 'Main region', exclusive: false }, code: { type: 'text', label: 'ISO code', matchPrompt: 'Match each currency to its ISO code' }, symbol: { type: 'text', label: 'Symbol' } },
   items: curItems, questions: currencyQuestions(), sources: [{ name: 'ISO 4217 via Wikidata', url: 'https://www.wikidata.org/wiki/Property:P498' }],
 });
 
@@ -461,7 +464,7 @@ function languageQuestions() {
 writePack({
   id: 'languages', title: 'Languages', theme: 'geography', icon: '🗣️', kids: false, version: 1,
   notice: '"Main languages" are the official or most widely used languages of each country, simplified.',
-  factsMeta: { family: { type: 'cat', label: 'Language family', ask: 'Which language family does {name} belong to?', stmt: '{name} belongs to the {value} family.' }, branch: { type: 'cat', label: 'Branch', ask: 'Which branch of its family does {name} belong to?', stmt: '{name} belongs to the {value} branch of its language family.' }, script: { type: 'cat', label: 'Script', ask: 'Which script is {name} normally written in?', stmt: '{name} is normally written in the {value} script.' }, countries: { type: 'num', label: 'Countries where it is a main language', higherLabel: 'More countries', askHigh: 'Which of these is a main language in the most countries?' } },
+  factsMeta: { family: { type: 'cat', label: 'Language family', ask: 'Which language family does {name} belong to?', stmt: '{name} belongs to the {value} family.' }, branch: { type: 'cat', label: 'Branch', ask: 'Which branch of its family does {name} belong to?', stmt: '{name} belongs to the {value} branch of its language family.' }, script: { type: 'cat', label: 'Script', ask: 'Which script is {name} normally written in?', stmt: '{name} is normally written in the {value} script.' }, countries: { type: 'num', label: 'Countries where it is a main language', higherLabel: 'More countries', askNumber: 'In how many countries is {name} a main language?', askHigh: 'Which of these is a main language in the most countries?' } },
   items: langItems, questions: languageQuestions(), sources: geoSources,
 });
 
@@ -481,7 +484,7 @@ const lmItems = lmRows.filter(r => r.qid && r.geo).map(r => {
     facts: { country: country.name, continent: CONT[country.cont], kind: r.kind, built: r.year || undefined },
     blurb: r.clues[r.clues.length - 1].replace(/^(It is|They are|It stands|It sits|It lies|It towers|It looks|It crosses|It spans|It rises|It overlooks|It guards|It faces|It snakes)/, m => m) + '.',
     clues: clues.map(c => /[.!?]$/.test(c) ? c : c + '.').filter(c => !leaks(c, names, LM_STOP)),
-    media: { img: img(im) },
+    media: LM_NO_IMG.includes(r.name) ? {} : { img: img(im) },
     difficulty: LM_HARD.includes(r.name) ? 3 : ['Eiffel Tower', 'Statue of Liberty', 'Great Wall of China', 'Taj Mahal', 'Colosseum', 'Great Pyramid of Giza', 'Sydney Opera House', 'Big Ben', 'Leaning Tower of Pisa', 'Christ the Redeemer', 'Mount Fuji', 'Golden Gate Bridge', 'Stonehenge', 'Burj Khalifa', 'Machu Picchu', 'Grand Canyon', 'Empire State Building', 'Mount Rushmore', 'White House', 'Tower Bridge', 'Great Sphinx of Giza'].includes(r.name) ? 1 : 2,
   };
 });

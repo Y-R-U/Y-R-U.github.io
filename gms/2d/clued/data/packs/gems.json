@@ -8,6 +8,8 @@
  "imgPrompt": "Which of these is {lname}?",
  "nameImgPrompt": "Which gem or mineral is this?",
  "tfImgPrompt": "This is {lname}.",
+ "noun": "gem or mineral",
+ "fakePrompt": "Which of these gems and minerals is made up?",
  "leakExempt": [
   "stone",
   "gem",
@@ -26,7 +28,8 @@
    ],
    "ask": "What kind of thing is {lname}?",
    "askReverse": "Which of these is a {lvalue}?",
-   "stmt": "{name} is a {lvalue}."
+   "stmt": "{name} is a {lvalue}.",
+   "exclusive": false
   },
   "colour": {
    "type": "cat",
@@ -185,14 +188,6 @@
    ],
    "media": {
     "img": [
-     {
-      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/f/fc/Sapphire01.jpg/500px-Sapphire01.jpg",
-      "w": 500,
-      "h": 403,
-      "credit": "Azuncha",
-      "license": "CC BY-SA 3.0",
-      "page": "https://commons.wikimedia.org/wiki/File:Sapphire01.jpg"
-     },
      {
       "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/8/87/Logan_Sapphire_10956420_cropped.png/330px-Logan_Sapphire_10956420_cropped.png",
       "w": 330,

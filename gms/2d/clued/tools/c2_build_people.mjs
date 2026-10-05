@@ -100,8 +100,8 @@ function questions(items, kind) {
 }
 
 const common = {
-  born: { type: 'year', label: 'Born', higherLabel: 'Born later', askHigh: 'Who of these was born most recently?', askLow: 'Who of these was born first?' },
-  died: { type: 'year', label: 'Died', higherLabel: 'Died later', askHigh: 'Who of these died most recently?', askLow: 'Who of these died first?' },
+  born: { type: 'year', label: 'Born', higherLabel: 'Born later', askHigh: 'Which of these people was born most recently?', askLow: 'Which of these people was born first?' },
+  died: { type: 'year', label: 'Died', higherLabel: 'Died later', askHigh: 'Which of these people died most recently?', askLow: 'Which of these people died first?' },
   nationality: { type: 'cat', label: 'Nationality', exclusive: false, ask: 'What nationality is {name}?', stmt: '{name}’s nationality: {value}.' },
   era: { type: 'cat', label: 'Born in', ask: 'When was {name} born?', stmt: '{name} was born in the {value}.' },
 };

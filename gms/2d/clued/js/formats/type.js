@@ -1,7 +1,7 @@
-import { register, poolItems, pickPack, byDifficulty, imageOf, fill, collect, pick } from './registry.js?v=1';
-import { h, layout, typeBox } from '../ui/kit.js?v=1';
-import { fuzzyMatch, answersFor } from '../core/fuzzy.js?v=1';
-import { norm, injectCSS, stretchTimer, once, hasImg } from './fkit.js?v=1';
+import { register, poolItems, pickPack, byDifficulty, imageOf, fill, collect, pick } from './registry.js?v=202610050139';
+import { h, layout, typeBox } from '../ui/kit.js?v=202610050139';
+import { fuzzyMatch, answersFor } from '../core/fuzzy.js?v=202610050139';
+import { norm, injectCSS, once, hasImg } from './fkit.js?v=202610050139';
 
 const CSS = `
 .ty-pat{display:flex;flex-wrap:wrap;justify-content:center;gap:4px 14px;font-family:var(--font-display);font-size:22px;letter-spacing:4px;color:var(--ink-2)}
@@ -70,7 +70,7 @@ function make(rng, pack, kind, difficulty) {
 const pattern = s => String(s).split(/\s+/).map(w => w.replace(/[A-Za-zÀ-ÿ0-9]/g, '_'));
 
 export default register({
-  id: 'type', title: 'Type the answer', icon: '⌨️', blurb: 'No options. Typos forgiven.', tags: [],
+  id: 'type', title: 'Type the answer', icon: '⌨️', blurb: 'No options. Typos forgiven.', tags: [], timeScale: 1.8,
   options: [{ key: 'hint', label: 'Letter hints', type: 'choice', values: ['auto', 'off'], labels: ['By difficulty', 'Off'], default: 'auto' }],
   supports(info) {
     const c = info.caps || {};
@@ -117,7 +117,6 @@ export default register({
     });
     const giveUp = h('button.btn.ghost.small', { type: 'button', onclick: () => { box.lock(); giveUp.disabled = true; answer({ correct: false, given: null, detail: 'gave up' }); } }, 'I don’t know');
     answersEl.append(msg, h('div.ty-row', {}, giveUp));
-    stretchTimer(api, el, 1.8);
     return {
       destroy() {},
       timeout() { box.lock(); giveUp.disabled = true; },

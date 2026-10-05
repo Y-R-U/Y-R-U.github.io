@@ -8,6 +8,8 @@
  "imgPrompt": "Which of these is {lname}?",
  "nameImgPrompt": "What is this?",
  "tfImgPrompt": "This is {lname}.",
+ "noun": "space object",
+ "fakePrompt": "Which of these space names is made up?",
  "leakExempt": [],
  "factsMeta": {
   "kind": {
@@ -41,13 +43,15 @@
    "type": "num",
    "label": "Order from the Sun",
    "unit": "",
+   "askNumber": "Counting out from the Sun, which planet number is {name}?",
+   "matchPrompt": "Match each planet to its place from the Sun",
    "askHigh": "Which of these planets is farthest from the Sun?",
    "askLow": "Which of these planets is closest to the Sun?",
    "minRatio": 1.1
   },
   "year": {
    "type": "year",
-   "label": "Launched or happened",
+   "label": "Launched",
    "askHigh": "Which of these launched most recently?",
    "askLow": "Which of these launched first?",
    "minRatio": 1.002
@@ -1054,26 +1058,6 @@
     "The answer is one word of 10 letters.",
     "Its first letter is B."
    ],
-   "media": {
-    "img": [
-     {
-      "src": "https://upload.wikimedia.org/wikipedia/commons/8/88/Position_Alpha_Ori.png",
-      "w": 500,
-      "h": 638,
-      "credit": "Wikimedia Commons",
-      "license": "Public domain",
-      "page": "https://commons.wikimedia.org/wiki/File:Position_Alpha_Ori.png"
-     },
-     {
-      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/f/f2/Location_of_the_binary_system_of_Betelgeuse_in_constellation_Orion.png/500px-Location_of_the_binary_system_of_Betelgeuse_in_constellation_Orion.png",
-      "w": 500,
-      "h": 541,
-      "credit": "Aaron McKinnon, E. Slawik/NOIRLab/NSF/AURA/M. Zamani",
-      "license": "CC BY 4.0",
-      "page": "https://commons.wikimedia.org/wiki/File:Location_of_the_binary_system_of_Betelgeuse_in_constellation_Orion.png"
-     }
-    ]
-   },
    "difficulty": 2
   },
   {
@@ -1098,18 +1082,6 @@
     "The answer is one word of 7 letters.",
     "Its first letter is P."
    ],
-   "media": {
-    "img": [
-     {
-      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/5/5f/Polaris_alpha_ursae_minoris.jpg/500px-Polaris_alpha_ursae_minoris.jpg",
-      "w": 500,
-      "h": 338,
-      "credit": "NASA/HST",
-      "license": "Public domain",
-      "page": "https://commons.wikimedia.org/wiki/File:Polaris_alpha_ursae_minoris.jpg"
-     }
-    ]
-   },
    "difficulty": 2
   },
   {
@@ -1226,20 +1198,12 @@
    "media": {
     "img": [
      {
-      "src": "https://upload.wikimedia.org/wikipedia/commons/f/f5/OrionCC.jpg",
-      "w": 500,
-      "h": 710,
-      "credit": "Till Credner",
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/4/47/Orion_Head_to_Toe.jpg/330px-Orion_Head_to_Toe.jpg",
+      "w": 330,
+      "h": 509,
+      "credit": "Rogelio Bernal Andreo",
       "license": "CC BY-SA 3.0",
-      "page": "https://commons.wikimedia.org/wiki/File:OrionCC.jpg"
-     },
-     {
-      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/f/ff/Orion_IAU.svg/500px-Orion_IAU.svg.png",
-      "w": 500,
-      "h": 620,
-      "credit": "IAU and Sky & Telescope magazine (Roger Sinnott & Rick Fienberg)",
-      "license": "CC BY 3.0",
-      "page": "https://commons.wikimedia.org/wiki/File:Orion_IAU.svg"
+      "page": "https://commons.wikimedia.org/wiki/File:Orion_Head_to_Toe.jpg"
      }
     ]
    },
@@ -1269,26 +1233,6 @@
     "The answer has 2 words (4, 5 letters).",
     "Its first letter is U."
    ],
-   "media": {
-    "img": [
-     {
-      "src": "https://upload.wikimedia.org/wikipedia/commons/8/86/UrsaMajorCC.jpg",
-      "w": 500,
-      "h": 751,
-      "credit": "Till Credner",
-      "license": "CC BY-SA 3.0",
-      "page": "https://commons.wikimedia.org/wiki/File:UrsaMajorCC.jpg"
-     },
-     {
-      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/13/Ursa_Major_IAU.svg/500px-Ursa_Major_IAU.svg.png",
-      "w": 500,
-      "h": 434,
-      "credit": "IAU and Sky & Telescope magazine (Roger Sinnott & Rick Fienberg)",
-      "license": "CC BY 3.0",
-      "page": "https://commons.wikimedia.org/wiki/File:Ursa_Major_IAU.svg"
-     }
-    ]
-   },
    "difficulty": 2
   },
   {
@@ -1316,20 +1260,12 @@
    "media": {
     "img": [
      {
-      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/d/d5/Constellation_Crux.jpg/500px-Constellation_Crux.jpg",
+      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/e/ea/The_Crux_from_Southeastern_Queensland.jpg/500px-The_Crux_from_Southeastern_Queensland.jpg",
       "w": 500,
-      "h": 335,
-      "credit": "Till Credner",
-      "license": "CC BY-SA 3.0",
-      "page": "https://commons.wikimedia.org/wiki/File:Constellation_Crux.jpg"
-     },
-     {
-      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/c/cf/Crux_IAU.svg/500px-Crux_IAU.svg.png",
-      "w": 500,
-      "h": 474,
-      "credit": "IAU and Sky & Telescope magazine (Roger Sinnott & Rick Fienberg)",
-      "license": "CC BY 3.0",
-      "page": "https://commons.wikimedia.org/wiki/File:Crux_IAU.svg"
+      "h": 333,
+      "credit": "Yulanlu97",
+      "license": "CC BY-SA 4.0",
+      "page": "https://commons.wikimedia.org/wiki/File:The_Crux_from_Southeastern_Queensland.jpg"
      }
     ]
    },
@@ -1355,26 +1291,6 @@
     "The answer is one word of 10 letters.",
     "Its first letter is C."
    ],
-   "media": {
-    "img": [
-     {
-      "src": "https://upload.wikimedia.org/wikipedia/commons/c/c1/CassiopeiaCC.jpg",
-      "w": 500,
-      "h": 749,
-      "credit": "Till Credner",
-      "license": "CC BY-SA 3.0",
-      "page": "https://commons.wikimedia.org/wiki/File:CassiopeiaCC.jpg"
-     },
-     {
-      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/e/e7/Cassiopeia_IAU.svg/500px-Cassiopeia_IAU.svg.png",
-      "w": 500,
-      "h": 473,
-      "credit": "IAU and Sky & Telescope magazine (Roger Sinnott & Rick Fienberg)",
-      "license": "CC BY 3.0",
-      "page": "https://commons.wikimedia.org/wiki/File:Cassiopeia_IAU.svg"
-     }
-    ]
-   },
    "difficulty": 2
   },
   {
@@ -1399,26 +1315,6 @@
     "The answer is one word of 8 letters.",
     "Its first letter is S."
    ],
-   "media": {
-    "img": [
-     {
-      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/4/4e/ScorpiusCC.jpg/500px-ScorpiusCC.jpg",
-      "w": 500,
-      "h": 334,
-      "credit": "Till Credner",
-      "license": "CC BY-SA 3.0",
-      "page": "https://commons.wikimedia.org/wiki/File:ScorpiusCC.jpg"
-     },
-     {
-      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/3/38/Scorpius_IAU.svg/500px-Scorpius_IAU.svg.png",
-      "w": 500,
-      "h": 618,
-      "credit": "IAU and Sky & Telescope magazine (Roger Sinnott & Rick Fienberg)",
-      "license": "CC BY 3.0",
-      "page": "https://commons.wikimedia.org/wiki/File:Scorpius_IAU.svg"
-     }
-    ]
-   },
    "difficulty": 2
   },
   {
@@ -1751,14 +1647,6 @@
    ],
    "media": {
     "img": [
-     {
-      "src": "https://upload.wikimedia.org/wikipedia/commons/c/cc/Gagarin_in_Sweden.jpg",
-      "w": 500,
-      "h": 727,
-      "credit": "Arkiv: Sydsvenskan",
-      "license": "Public domain",
-      "page": "https://commons.wikimedia.org/wiki/File:Gagarin_in_Sweden.jpg"
-     },
      {
       "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/c/c7/Vostokpanel.JPG/500px-Vostokpanel.JPG",
       "w": 500,

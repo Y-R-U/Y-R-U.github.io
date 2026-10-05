@@ -18,7 +18,8 @@ const vis = sel => `(() => { const e = document.querySelector(${JSON.stringify(s
 async function fresh(settings = {}) {
   await b.goto(URL);
   await b.waitFor('window.__cluedReady');
-  await b.eval(`localStorage.clear(); localStorage.setItem('clued.settings', JSON.stringify(${JSON.stringify(settings)})); true`);
+  // timer Off: the default 10 s answer time can expire before the driver clicks with real packs (flake)
+  await b.eval(`localStorage.clear(); localStorage.setItem('clued.settings', JSON.stringify(${JSON.stringify({ timerSec: 0, bgm: false, ...settings })})); true`);
   await b.goto(URL);
   await b.waitFor('window.__cluedReady');
   await b.sleep(300);
@@ -26,7 +27,7 @@ async function fresh(settings = {}) {
 
 // Answers until the play screen ends. pick(i) -> choice index. Handles handoffs and round cards.
 async function playThrough({ max = 60, pick = i => i % 3, shotAt = -1, name = 'x', screenName = 'play' } = {}) {
-  let answered = 0;
+  let answered = 0, idle = 0;
   for (let guard = 0; guard < max * 4 && (await screen()) === screenName; guard++) {
     if (await b.eval(vis('[data-act=ready]'))) { if (answered === 0) await b.shot(`${OUT}/${MODE}-${name}-handoff.png`); await b.click('[data-act=ready]'); continue; }
     if (await b.eval(vis('.reveal.show .next'))) { await b.click('.reveal.show .next'); await b.sleep(250); continue; }
@@ -39,6 +40,8 @@ async function playThrough({ max = 60, pick = i => i % 3, shotAt = -1, name = 'x
       if (answered - 1 === shotAt) await b.shot(`${OUT}/${MODE}-${name}-reveal.png`);
       continue;
     }
+    // non-choice formats (maps, boards) in mixed structures: answer through the test hook
+    if (++idle > 10 && await b.eval('!!window.__cluedRun && !document.querySelector(".reveal.show")')) { await b.eval('window.__clued.answer("correct"); true'); answered++; idle = 0; await b.sleep(400); continue; }
     await b.sleep(200);
   }
   return answered;
@@ -125,7 +128,8 @@ const scenarios = {
     await b.click('.lifeline[data-id=fifty]');
     await b.sleep(200);
     const gone = await b.eval('document.querySelectorAll(".choice.gone").length');
-    if (gone !== 2) throw new Error('50:50 removed ' + gone);
+    const nOpts = await b.eval('document.querySelectorAll(".choice").length');
+    if (gone !== Math.max(1, nOpts - 2)) throw new Error(`50:50 removed ${gone} of ${nOpts}`);   // 3-answer questions lose one
     await b.click('.lifeline[data-id=hint]');
     await b.shot(`${OUT}/${MODE}-ladder-q.png`);
     await b.eval('window.__clued.answer("correct")'); await b.waitFor(vis('.reveal.show .next')); await b.sleep(300); await b.click('.reveal.show .next');
@@ -198,7 +202,8 @@ const scenarios = {
       await b.waitFor(vis('.duel-half.p2 .choices:not(.locked) .choice'), 8000).catch(() => {});
       if ((await screen()) !== 'duel') break;
       const ans = await b.eval('window.__cluedDuel.answer');
-      if (i % 2) { await b.click('.duel-half.p1 .choice', { index: (ans + 1) % 4 }); await b.sleep(200); }
+      const n = await b.eval('document.querySelectorAll(".duel-half.p1 .choice").length');
+      if (i % 2) { await b.click('.duel-half.p1 .choice', { index: (ans + 1) % n }); await b.sleep(200); }
       await b.click(`.duel-half.p${i % 3 ? 2 : 1} .choice`, { index: ans });
       await b.sleep(300);
       if (i === 0) await b.shot(`${OUT}/${MODE}-duel-answer.png`);

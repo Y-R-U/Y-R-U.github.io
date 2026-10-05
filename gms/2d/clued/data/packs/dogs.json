@@ -84,7 +84,7 @@
     "Its ancestors came from Newfoundland in Canada.",
     "It has a thick \"otter\" tail.",
     "It is one of the most common guide dogs for blind people.",
-    "The breed comes from United Kingdom.",
+    "The breed comes from the United Kingdom.",
     "It is a gundog breed.",
     "A typical adult weighs about 32 kg.",
     "It comes in black, yellow and chocolate.",
@@ -136,7 +136,7 @@
     "It was first bred in the Scottish Highlands by Lord Tweedmouth.",
     "It carries things gently in its \"soft mouth\".",
     "It is a popular therapy and guide dog.",
-    "The breed comes from United Kingdom.",
+    "The breed comes from the United Kingdom.",
     "It is a gundog breed.",
     "A typical adult weighs about 30 kg.",
     "It has a long, feathery coat.",
@@ -281,7 +281,7 @@
    "clues": [
     "It is a mascot of many sports teams.",
     "It has a loose, wrinkly face and an underbite.",
-    "The breed comes from United Kingdom.",
+    "The breed comes from the United Kingdom.",
     "It is a companion breed.",
     "A typical adult weighs about 23 kg.",
     "It is linked with Winston Churchill.",
@@ -310,7 +310,10 @@
     "Standard Poodle"
    ],
    "facts": {
-    "origin": "France",
+    "origin": [
+     "France",
+     "Germany"
+    ],
     "type": "Companion",
     "massKg": 25,
     "size": "Large"
@@ -320,7 +323,7 @@
     "It was first bred as a water dog in Germany.",
     "Its fancy haircut was designed to help it swim.",
     "It is one of the most intelligent breeds.",
-    "The breed comes from France.",
+    "The breed comes from France or Germany.",
     "It is a companion breed.",
     "A typical adult weighs about 25 kg.",
     "It has tight, curly fur.",
@@ -375,7 +378,7 @@
     "Snoopy from \"Peanuts\" is one.",
     "It sniffs bags for food at airports.",
     "It was bred to hunt hares in packs.",
-    "The breed comes from United Kingdom.",
+    "The breed comes from the United Kingdom.",
     "It is a hound breed.",
     "A typical adult weighs about 10 kg.",
     "It has floppy ears and a white-tipped tail.",
@@ -416,7 +419,7 @@
     "origin": "Germany",
     "type": "Working",
     "massKg": 45,
-    "size": "Giant"
+    "size": "Large"
    },
    "lookalikes": [
     "dobermann"
@@ -532,7 +535,7 @@
     "It was bred to catch rats in clothing mills.",
     "Its long coat is steel-blue and tan.",
     "It is often carried in handbags.",
-    "The breed comes from United Kingdom.",
+    "The breed comes from the United Kingdom.",
     "It is a toy breed.",
     "A typical adult weighs about 3 kg.",
     "It is named after an English county.",
@@ -682,7 +685,7 @@
     "It herded cattle by nipping at their heels.",
     "Queen Elizabeth II owned more than 30.",
     "It has big pointed ears and a fox-like face.",
-    "The breed comes from United Kingdom.",
+    "The breed comes from the United Kingdom.",
     "It is a herding breed.",
     "A typical adult weighs about 12 kg.",
     "It has very short legs and a long body.",
@@ -858,7 +861,10 @@
    "name": "Shih Tzu",
    "lname": "Shih Tzu",
    "facts": {
-    "origin": "China",
+    "origin": [
+     "China",
+     "Tibet"
+    ],
     "type": "Toy",
     "massKg": 6,
     "size": "Small"
@@ -872,7 +878,7 @@
     "It was bred for Chinese royalty.",
     "It is related to the Lhasa Apso from Tibet.",
     "Its hair is often tied up in a topknot.",
-    "The breed comes from China.",
+    "The breed comes from China or Tibet.",
     "It is a toy breed.",
     "A typical adult weighs about 6 kg.",
     "It has a long, flowing coat.",
@@ -925,7 +931,7 @@
     "One named Chaser learned the names of over 1,000 toys.",
     "It controls sheep with an intense stare.",
     "It is often called the cleverest breed.",
-    "The breed comes from United Kingdom.",
+    "The breed comes from the United Kingdom.",
     "It is a herding breed.",
     "A typical adult weighs about 17 kg.",
     "It is usually black and white.",
@@ -976,7 +982,7 @@
     "It was developed on ranches in the western USA.",
     "Many have one blue eye and one brown eye.",
     "It is often blue merle coloured.",
-    "The breed comes from United States.",
+    "The breed comes from the United States.",
     "It is a herding breed.",
     "A typical adult weighs about 23 kg.",
     "It was popular in rodeos.",
@@ -1163,7 +1169,7 @@
     "origin": "Switzerland",
     "type": "Working",
     "massKg": 45,
-    "size": "Giant"
+    "size": "Large"
    },
    "lookalikes": [
     "saint-bernard"
@@ -1224,7 +1230,7 @@
    "clues": [
     "It barks a lot.",
     "It looks like a small Rough Collie.",
-    "The breed comes from United Kingdom.",
+    "The breed comes from the United Kingdom.",
     "It is a herding breed.",
     "A typical adult weighs about 9 kg.",
     "It has a thick mane-like coat.",
@@ -1272,7 +1278,7 @@
     "It is nicknamed \"the American gentleman\".",
     "It looks like it is wearing a tuxedo.",
     "It has a flat face and upright ears.",
-    "The breed comes from United States.",
+    "The breed comes from the United States.",
     "It is a companion breed.",
     "A typical adult weighs about 8 kg.",
     "It is the state dog of Massachusetts.",
@@ -1426,7 +1432,7 @@
     "It was bred to flush woodcock for hunters.",
     "Its tail never seems to stop wagging.",
     "It has long, silky ears.",
-    "The breed comes from United Kingdom.",
+    "The breed comes from the United Kingdom.",
     "It is a gundog breed.",
     "A typical adult weighs about 14 kg.",
     "Lady in \"Lady and the Tramp\" is the American kind.",
@@ -1629,7 +1635,7 @@
     "It is named after a vicar who loved fox hunting.",
     "It can jump many times its own height.",
     "It is mostly white with tan or black patches.",
-    "The breed comes from United Kingdom.",
+    "The breed comes from the United Kingdom.",
     "A typical adult weighs about 6 kg.",
     "It is full of energy.",
     "The answer has 3 words (4, 7, 7 letters).",
@@ -1671,7 +1677,7 @@
     "It was once nicknamed the \"nanny dog\".",
     "It is very popular in Britain and Australia.",
     "It has a broad head and a wide grin.",
-    "The breed comes from United Kingdom.",
+    "The breed comes from the United Kingdom.",
     "A typical adult weighs about 15 kg.",
     "It is short, stocky and muscular.",
     "It is named after an English county in the Midlands.",
@@ -1718,7 +1724,7 @@
     "Spuds MacKenzie, a famous beer mascot, was one.",
     "Target stores use one as a mascot.",
     "It has small, triangular eyes.",
-    "The breed comes from United Kingdom.",
+    "The breed comes from the United Kingdom.",
     "A typical adult weighs about 27 kg.",
     "Its head is shaped like an egg.",
     "Its name includes a male cow.",
@@ -1769,7 +1775,7 @@
     "It appears on Cesar dog food.",
     "It has a rough double coat.",
     "It comes from Scotland.",
-    "The breed comes from United Kingdom.",
+    "The breed comes from the United Kingdom.",
     "A typical adult weighs about 8 kg.",
     "It was bred to hunt foxes and badgers among rocks.",
     "Its face is often trimmed into a round shape.",
@@ -1812,7 +1818,7 @@
     "It is a playing piece in Monopoly.",
     "US President Franklin Roosevelt owned one called Fala.",
     "It has a beard and bushy eyebrows.",
-    "The breed comes from United Kingdom.",
+    "The breed comes from the United Kingdom.",
     "A typical adult weighs about 9 kg.",
     "It is usually black.",
     "The answer has 2 words (8, 7 letters).",
@@ -1857,7 +1863,7 @@
    "clues": [
     "It carried messages in World War I.",
     "It has a black saddle and tan legs.",
-    "The breed comes from United Kingdom.",
+    "The breed comes from the United Kingdom.",
     "A typical adult weighs about 25 kg.",
     "It is named after a valley in Yorkshire.",
     "Its coat is wiry and dense.",
@@ -1914,7 +1920,7 @@
     "It was called \"the poor man's racehorse\".",
     "It is one of the fastest-accelerating dogs.",
     "It loves to curl up on the sofa.",
-    "The breed comes from United Kingdom.",
+    "The breed comes from the United Kingdom.",
     "It is a hound breed.",
     "A typical adult weighs about 13 kg.",
     "It looks like a small greyhound.",
@@ -1964,7 +1970,7 @@
     "It can run at about 70 km/h.",
     "Retired racers are often adopted as pets.",
     "It has a deep chest and a very thin waist.",
-    "The breed comes from United Kingdom.",
+    "The breed comes from the United Kingdom.",
     "It is a hound breed.",
     "A typical adult weighs about 30 kg.",
     "It is raced on oval tracks chasing a lure.",
@@ -2204,10 +2210,14 @@
    "name": "Bloodhound",
    "lname": "Bloodhound",
    "facts": {
-    "origin": "Belgium",
+    "origin": [
+     "Belgium",
+     "France",
+     "United Kingdom"
+    ],
     "type": "Hound",
     "massKg": 45,
-    "size": "Giant"
+    "size": "Large"
    },
    "lookalikes": [
     "basset-hound"
@@ -2217,7 +2227,7 @@
     "Its tracking evidence has been accepted in court.",
     "It was bred by monks in Belgium.",
     "It can follow a scent trail days old.",
-    "The breed comes from Belgium.",
+    "The breed comes from Belgium or France or the United Kingdom.",
     "It is a hound breed.",
     "A typical adult weighs about 45 kg.",
     "It has loose, wrinkly skin and long ears.",
@@ -2428,7 +2438,7 @@
     "It is named after an Inuit people.",
     "It is bigger and stronger than a husky.",
     "It was bred for heavy hauling, not speed.",
-    "The breed comes from United States.",
+    "The breed comes from the United States.",
     "It is a working breed.",
     "A typical adult weighs about 38 kg.",
     "It has a plumed tail curled over its back.",
@@ -2872,7 +2882,7 @@
     "Zorba was once the heaviest dog on record.",
     "Romans wrote about British war dogs like it.",
     "It has a black mask on its face.",
-    "The breed comes from United Kingdom.",
+    "The breed comes from the United Kingdom.",
     "It is a working breed.",
     "A typical adult weighs about 80 kg.",
     "It is calm and gentle.",
@@ -2928,7 +2938,7 @@
     "It was nicknamed \"the gamekeeper's night dog\".",
     "It pinned poachers without biting.",
     "It is a cross of two large breeds.",
-    "The breed comes from United Kingdom.",
+    "The breed comes from the United Kingdom.",
     "It is a working breed.",
     "A typical adult weighs about 50 kg.",
     "It has a black mask.",
@@ -3117,7 +3127,7 @@
    "clues": [
     "It is often used as a sniffer dog.",
     "It has long, feathery ears.",
-    "The breed comes from United Kingdom.",
+    "The breed comes from the United Kingdom.",
     "It is a gundog breed.",
     "A typical adult weighs about 22 kg.",
     "It is usually liver and white.",
@@ -3206,7 +3216,7 @@
    "clues": [
     "It was used to drive cattle to market.",
     "It has a rolling, bear-like walk.",
-    "The breed comes from United Kingdom.",
+    "The breed comes from the United Kingdom.",
     "It is a herding breed.",
     "A typical adult weighs about 35 kg.",
     "Its shaggy hair often hides its eyes.",
@@ -3266,7 +3276,7 @@
     "Queen Victoria made it popular.",
     "It has a long, narrow face.",
     "It has a long, thick mane.",
-    "The breed comes from United Kingdom.",
+    "The breed comes from the United Kingdom.",
     "It is a herding breed.",
     "A typical adult weighs about 25 kg.",
     "It comes from Scotland.",
@@ -3547,7 +3557,7 @@
     "It cleans itself like a cat.",
     "Its tail curls tightly.",
     "It has a wrinkled forehead.",
-    "The breed comes from Democratic Republic of the Congo.",
+    "The breed comes from the Democratic Republic of the Congo.",
     "It is a hound breed.",
     "A typical adult weighs about 10 kg.",
     "It yodels instead of barking.",
@@ -3968,7 +3978,7 @@
     "origin": "Italy",
     "type": "Working",
     "massKg": 45,
-    "size": "Giant"
+    "size": "Large"
    },
    "lookalikes": [
     "english-mastiff",
@@ -4063,7 +4073,7 @@
     "It was bred by miners to catch rats.",
     "It can run fast like a whippet.",
     "It has a pear-shaped head with a topknot.",
-    "The breed comes from United Kingdom.",
+    "The breed comes from the United Kingdom.",
     "A typical adult weighs about 9 kg.",
     "It looks like a little lamb.",
     "It is named after a town in Northumberland.",
@@ -4110,7 +4120,7 @@
     "It has longer legs than its close cousin.",
     "It was bred to keep up with horses and hounds.",
     "It is mostly white.",
-    "The breed comes from United Kingdom.",
+    "The breed comes from the United Kingdom.",
     "A typical adult weighs about 7 kg.",
     "It is named after a vicar.",
     "The answer has 3 words (6, 7, 7 letters).",
@@ -4158,7 +4168,7 @@
    "clues": [
     "It looks like a rough-coated greyhound.",
     "It has a wiry grey coat.",
-    "The breed comes from United Kingdom.",
+    "The breed comes from the United Kingdom.",
     "It is a hound breed.",
     "A typical adult weighs about 40 kg.",
     "It hunted red deer.",

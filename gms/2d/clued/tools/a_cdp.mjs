@@ -1,5 +1,6 @@
 // Minimal raw-CDP driver for lane A tests. import { open } from './a_cdp.mjs'
-export async function open({ port = 9401, url, width = 384, height = 854, dpr = 2, mobile = true } = {}) {
+export async function open({ port: portArg = 9401, url, width = 384, height = 854, dpr = 2, mobile = true } = {}) {
+  const port = +process.env.CDP_PORT || portArg;   // CDP_PORT lets the integration lane drive any lane's e2e
   const list = await (await fetch(`http://127.0.0.1:${port}/json/list`)).json();
   let page = list.find(t => t.type === 'page');
   if (!page) page = await (await fetch(`http://127.0.0.1:${port}/json/new?about:blank`, { method: 'PUT' })).json();

@@ -104,7 +104,7 @@ async function main() {
   await fetch(API + '/rooms', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ hostName: 'Pubby', title: 'Snakes & spiders', public: true, startIn: 120, questions: q, spec: { kids: true, rounds: [{ format: 'mc', packs: ['snakes', 'spiders'] }] } }) });
   await a.go(`${SITE}?noauth=1&api=${encodeURIComponent(API)}`);
   await a.waitFor('window.__cluedReady', 20000, 'boot');
-  await a.eval(`import('./js/net/index.js?v=1').then(m => m.openOnline())`);
+  await a.eval(`import('./js/net/index.js?v=' + (window.__clued?.BUILD || window.__cluedCtx?.BUILD || 1)).then(m => m.openOnline())`);
   await a.waitFor(`document.querySelector('.net-pub')`, 10000, 'public card');
   ok(await a.eval(`document.querySelector('.net-pub').textContent.includes('Pubby') && /Starts in 1:5/.test(document.querySelector('.net-pub').textContent)`), 'public card with host and countdown');
   await a.shot('online-hub.png');

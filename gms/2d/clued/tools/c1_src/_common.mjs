@@ -14,3 +14,6 @@ export const REGION_META = { type: 'cat', label: 'Found in', clue: v => (v === '
 export const len = (label = 'Typical length') => ({ type: 'num', label, unit: 'm', higherLabel: 'Longer', clue: v => `${label}: about ${v < 1 ? Math.round(v * 100) + ' cm' : v + ' m'}.` });
 export const lenCm = (label = 'Typical length') => ({ type: 'num', label, unit: 'cm', higherLabel: 'Longer', clue: v => `${label}: about ${v} cm.` });
 export const mass = (label = 'Typical adult weight') => ({ type: 'num', label, unit: 'kg', higherLabel: 'Heavier', clue: v => `${label}: about ${v >= 1000 ? (v / 1000).toLocaleString('en-GB') + ' tonnes' : v < 1 ? Math.round(v * 1000) + ' g' : v + ' kg'}.` });
+
+// country names that take 'the' mid-sentence
+export const theC = v => (/^(United |Netherlands$|Czech Republic$|Philippines$|Bahamas$|Gambia$|Maldives$|Dominican Republic$|Central African|Democratic Republic)/.test(v) ? 'the ' + v : v);

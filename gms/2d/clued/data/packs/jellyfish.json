@@ -9,6 +9,8 @@
  "imgPrompt": "Which of these is {aName}?",
  "nameImgPrompt": "What is this sea creature?",
  "tfImgPrompt": "This is {aName}.",
+ "noun": "sea stinger",
+ "fakePrompt": "Which of these sea stingers is made up?",
  "leakExempt": [
   "jellyfish",
   "jelly"
@@ -78,14 +80,6 @@
       "credit": "Avispa marina.jpg: Guido Gautsch, Toyota, Japan derivative work: Mithril (talk)",
       "license": "CC BY-SA 2.0",
       "page": "https://commons.wikimedia.org/wiki/File:Avispa_marina_cropped.png"
-     },
-     {
-      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/a/ac/Cubozoa_Lebenszyklus.png/500px-Cubozoa_Lebenszyklus.png",
-      "w": 500,
-      "h": 352,
-      "credit": "Shao at Ukrainian Wikipedia/ text Perhelion at German Wikipedia",
-      "license": "Public domain",
-      "page": "https://commons.wikimedia.org/wiki/File:Cubozoa_Lebenszyklus.png"
      },
      {
       "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/157640089/medium.jpeg",
@@ -290,7 +284,7 @@
    "group": "true jellyfish",
    "facts": {
     "danger": "Mild sting",
-    "kind": "Jellyfish"
+    "kind": "True jellyfish"
    },
    "lookalikes": [
     "box-jellyfish"
@@ -352,7 +346,7 @@
    "group": "true jellyfish",
    "facts": {
     "danger": "Painful sting",
-    "kind": "Jellyfish"
+    "kind": "True jellyfish"
    },
    "blurb": "The largest known jellyfish. Its mass of hundreds of tentacles can trail for many metres.",
    "clues": [
@@ -404,7 +398,7 @@
    "group": "true jellyfish",
    "facts": {
     "danger": "Painful sting",
-    "kind": "Jellyfish"
+    "kind": "True jellyfish"
    },
    "blurb": "A European jellyfish with brown V-shaped markings that look like the points of a compass.",
    "clues": [
@@ -459,7 +453,7 @@
    "group": "true jellyfish",
    "facts": {
     "danger": "Mild sting",
-    "kind": "Jellyfish"
+    "kind": "True jellyfish"
    },
    "blurb": "A huge, heavy European jellyfish with frilly arms instead of long tentacles. It can be as big as a person.",
    "clues": [
@@ -511,7 +505,7 @@
    "group": "true jellyfish",
    "facts": {
     "danger": "Mild sting",
-    "kind": "Jellyfish"
+    "kind": "True jellyfish"
    },
    "blurb": "A jellyfish that lies on the sea floor with its arms pointing up, so algae living in it get sunlight.",
    "clues": [
@@ -535,22 +529,6 @@
       "credit": "Louis Imbeau",
       "license": "CC BY 4.0",
       "page": "https://www.inaturalist.org/photos/32969688"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/385582737/medium.jpeg",
-      "w": 500,
-      "h": 281,
-      "credit": "Sarah Faulwetter",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/385582737"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/348456955/medium.jpeg",
-      "w": 375,
-      "h": 500,
-      "credit": "Alex Doyle",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/348456955"
      }
     ]
    },
@@ -610,7 +588,7 @@
    "group": "true jellyfish",
    "facts": {
     "danger": "Harmless",
-    "kind": "Jellyfish"
+    "kind": "True jellyfish"
    },
    "blurb": "A Mediterranean jellyfish with a raised yellow-orange dome in the middle of its pale bell.",
    "clues": [
@@ -661,7 +639,7 @@
    "group": "true jellyfish",
    "facts": {
     "danger": "Painful sting",
-    "kind": "Jellyfish"
+    "kind": "True jellyfish"
    },
    "blurb": "A pinkish-purple jellyfish that glows at night. Huge swarms close beaches in the Mediterranean.",
    "clues": [
@@ -715,7 +693,7 @@
    "group": "true jellyfish",
    "facts": {
     "danger": "Painful sting",
-    "kind": "Jellyfish"
+    "kind": "True jellyfish"
    },
    "blurb": "A golden-brown jellyfish with long maroon arms, common off the west coast of North America and in big aquariums.",
    "clues": [
@@ -770,7 +748,7 @@
    "group": "true jellyfish",
    "facts": {
     "danger": "Mild sting",
-    "kind": "Jellyfish"
+    "kind": "True jellyfish"
    },
    "blurb": "A round, rubbery jellyfish of eastern Australia that can be blue, brown or white. Its sting is mild.",
    "clues": [
@@ -912,22 +890,6 @@
       "credit": "Emily Roberts",
       "license": "CC BY 4.0",
       "page": "https://www.inaturalist.org/photos/206228902"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/152108659/medium.jpg",
-      "w": 375,
-      "h": 500,
-      "credit": "Emme Carroll",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/152108659"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/254278213/medium.jpeg",
-      "w": 375,
-      "h": 500,
-      "credit": "Brandon Corder",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/254278213"
      }
     ]
    },
@@ -992,7 +954,7 @@
    "group": "true jellyfish",
    "facts": {
     "danger": "Harmless",
-    "kind": "Jellyfish"
+    "kind": "True jellyfish"
    },
    "blurb": "Millions of these jellyfish live in Jellyfish Lake in Palau, following the sun across the lake each day.",
    "clues": [
@@ -1044,7 +1006,7 @@
    "group": "true jellyfish",
    "facts": {
     "danger": "Mild sting",
-    "kind": "Jellyfish"
+    "kind": "True jellyfish"
    },
    "blurb": "A firm, round jellyfish common off the south-eastern USA. It is caught and dried for food in Asia.",
    "clues": [
@@ -1129,14 +1091,6 @@
       "credit": "SeanMack",
       "license": "CC BY 2.5",
       "page": "https://commons.wikimedia.org/wiki/File:Stone_Fish_at_AQWA_SMC2006.jpg"
-     },
-     {
-      "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/7/75/Ichthyologie%3B_ou%2C_Histoire_naturelle_des_poissons_%28Plate_183%29_%286918426608%29.jpg/500px-Ichthyologie%3B_ou%2C_Histoire_naturelle_des_poissons_%28Plate_183%29_%286918426608%29.jpg",
-      "w": 500,
-      "h": 294,
-      "credit": "Bloch, Marcus Elieser",
-      "license": "Public domain",
-      "page": "https://commons.wikimedia.org/wiki/File:Ichthyologie;_ou,_Histoire_naturelle_des_poissons_(Plate_183)_(6918426608).jpg"
      },
      {
       "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/127651323/medium.jpeg",
@@ -1312,14 +1266,6 @@
       "credit": "Walliang C.",
       "license": "CC BY 4.0",
       "page": "https://www.inaturalist.org/photos/116455008"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/2851851/medium.jpg",
-      "w": 500,
-      "h": 400,
-      "credit": "Almed2",
-      "license": "CC BY-SA 4.0",
-      "page": "https://www.inaturalist.org/photos/2851851"
      }
     ]
    },
@@ -1356,14 +1302,6 @@
       "credit": "Nathan",
       "license": "CC BY 4.0",
       "page": "https://www.inaturalist.org/photos/525906136"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/190286887/medium.jpeg",
-      "w": 500,
-      "h": 375,
-      "credit": "luluchouette",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/190286887"
      },
      {
       "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/591493819/medium.jpg",
@@ -1407,22 +1345,6 @@
       "credit": "Pauline Walsh Jacobson",
       "license": "CC BY 4.0",
       "page": "https://www.inaturalist.org/photos/520923201"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/261236596/medium.jpg",
-      "w": 500,
-      "h": 282,
-      "credit": "Robin White",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/261236596"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/612947569/medium.jpg",
-      "w": 500,
-      "h": 375,
-      "credit": "Turner Brockman",
-      "license": "CC BY-SA 4.0",
-      "page": "https://www.inaturalist.org/photos/612947569"
      }
     ]
    },

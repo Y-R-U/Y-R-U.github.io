@@ -68,8 +68,11 @@ const hostT = {};
 async function worker() {
   while (queue.length) {
     const u = queue.shift();
-    const r = await check(u);
+    let r = await check(u);
+    // 429 = the host is rate-limiting us, not a dead file: back off, and never count it towards "mirror"
+    for (let k = 0; r.status === 429 && k < 4; k++) { await new Promise(res => setTimeout(res, 3000 * 2 ** k)); r = await check(u); }
     const prev = cache[u];
+    if (r.status === 429) { cache[u] = { ...(prev || {}), ok: prev?.ok ?? false, throttled: true, status: prev?.status ?? 429, t: prev?.t ?? 0 }; if (++done % 100 === 0) process.stderr.write(`  ${done}/${todo.length}\n`); continue; }
     const fails = r.ok ? 0 : (prev && !prev.ok ? (prev.fails || 1) + 1 : 1);
     cache[u] = { ...r, t: Date.now(), fails, ...(fails >= 2 ? { mirror: true } : {}) };
     const h = /^(media|data)\//.test(u) ? 'local' : new URL(u).host;

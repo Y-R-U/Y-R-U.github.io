@@ -1,14 +1,14 @@
 // The question runner: plays a list of questions with HUD, timer, reveal and scoring.
 // Every structure uses it, and lane S drives it for online rooms and challenge links. API in docs/notes/A.md.
-import { getFormat } from '../formats/registry.js?v=1';
-import { createTimer } from '../core/timer.js?v=1';
-import { basePoints, withStreak, stageMultiplier, progressiveLimit, stageExtendMs, PROGRESSIVE_CAP } from '../core/scoring.js?v=1';
-import { creditsOf, urlsOf, preflight } from '../core/media.js?v=1';
-import { getSettings } from '../core/store.js?v=1';
-import { h, esc, onKey, countUp, fmtNum } from '../ui/kit.js?v=1';
-import { popup, confirmPop } from '../ui/popup.js?v=1';
-import { sfx, haptic, reducedMotion } from '../ui/fx.js?v=1';
-import { speak, stopSpeaking, questionSpeech, canSpeak } from '../ui/speech.js?v=1';
+import { getFormat } from '../formats/registry.js?v=202610050139';
+import { createTimer } from '../core/timer.js?v=202610050139';
+import { basePoints, withStreak, stageMultiplier, progressiveLimit, stageExtendMs, PROGRESSIVE_CAP } from '../core/scoring.js?v=202610050139';
+import { creditsOf, urlsOf, preflight } from '../core/media.js?v=202610050139';
+import { getSettings } from '../core/store.js?v=202610050139';
+import { h, esc, onKey, countUp, fmtNum } from '../ui/kit.js?v=202610050139';
+import { popup, confirmPop } from '../ui/popup.js?v=202610050139';
+import { sfx, haptic, reducedMotion } from '../ui/fx.js?v=202610050139';
+import { speak, stopSpeaking, questionSpeech, canSpeak } from '../ui/speech.js?v=202610050139';
 
 const KIND_RIGHT = ['Brilliant!', 'You got it!', 'Super!', 'Yes!', 'Amazing!'];
 const KIND_WRONG = ['Good try!', 'Nearly!', 'Nice guess!', 'Ooh, close!'];
@@ -127,7 +127,7 @@ export function createRunner(host, cfg = {}) {
 
   const api = {
     get opts() { return questions[state.i]?.opts || cfg.opts || {}; },
-    mode: cfg.mode || 'solo', kids: kidsAll, difficulty: cfg.difficulty || 0,
+    mode: cfg.mode || 'solo', kids: kidsAll, difficulty: cfg.difficulty || 0, timed: false,
     rng: Math.random,
     timer: {
       start: ms => { fullLimit = ms; ring.hidden = false; timer.start(ms); }, remaining: () => timer.remaining(), stop: () => timer.stop(),
@@ -189,8 +189,15 @@ export function createRunner(host, cfg = {}) {
       const ext = cfg.deadlineFor ? cfg.deadlineFor(state.i, q) : 0;
       let limit = (cfg.limitFor && cfg.limitFor(state.i, q)) || limitFor(q);
       const useTimer = !!ext || (timedFor(kids) && !cfg.deadline);
+      // Slow formats (boards, typing) declare timeScale so the player's one-tap answer time stretches; online rooms sync deadlines instead.
+      if (!ext && !cfg.limitFor && api.mode !== 'online' && fmt.timeScale) {
+        let k = 1;
+        try { k = typeof fmt.timeScale === 'function' ? fmt.timeScale(q) : fmt.timeScale; } catch (e) {}
+        if (k > 1 && isFinite(k)) limit = Math.round(limit * k);
+      }
       resetStages(q, limit);
       if (sg.n && !ext && !cfg.limitFor) limit = progressiveLimit(limit);
+      api.timed = useTimer;
       answerResolve = res => {
         const remaining = timer.remaining();
         timer.stop();
@@ -217,7 +224,7 @@ export function createRunner(host, cfg = {}) {
         setTimeout(() => skipFn(), 900);
         return;
       }
-      ring.hidden = !useTimer;
+      ring.hidden = !useTimer || !!fmt.manualTimer;   // manual-timer formats show it when they call api.timer.start
       ring.querySelector('.rf').style.strokeDasharray = String(RING_LEN);
       fullLimit = limit;
       drawMore();
@@ -364,7 +371,11 @@ export function createRunner(host, cfg = {}) {
     reveal.append(card);
     stage.append(reveal);
     root.classList.add('revealed');
-    requestAnimationFrame(() => { reveal.classList.add('show'); stage.scrollTo({ top: stage.scrollHeight, behavior: reducedMotion() ? 'auto' : 'smooth' }); });
+    requestAnimationFrame(() => {
+      stage.style.setProperty('--rv-h', `${card.offsetHeight}px`);
+      reveal.classList.add('show');
+      stage.scrollTo({ top: stage.scrollHeight, behavior: reducedMotion() ? 'auto' : 'smooth' });
+    });
     if (kids && good) speak(title, { kids }); else if (kids) speak(`${title} The answer is ${answerLine(q)}`, { kids });
     return Promise.resolve();
   }

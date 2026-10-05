@@ -1,7 +1,7 @@
 import { INAT, WD, COMMONS, STATUS_META, len } from './_common.mjs';
 
 const MA = 'Mammal', FI = 'Fish', RE = 'Reptile', MO = 'Mollusc', CR = 'Crustacean', EC = 'Echinoderm', CN = 'Cnidarian', AR = 'Chelicerate';
-const f = (kind, lengthM) => ({ kind, breathesAir: kind === MA || kind === RE, lengthM });
+const f = (kind, lengthM) => ({ kind, breathesAir: kind === MA || kind === RE, ...(lengthM != null ? { lengthM } : {}) });
 
 export default {
   id: 'sea', title: 'Sea creatures', theme: 'animals', icon: '🐋', kids: true,
@@ -155,7 +155,7 @@ export default {
     { n: 'Peacock mantis shrimp', alt: ['mantis shrimp'], sci: 'Odontodactylus scyllarus', g: 'mantis shrimp', f: f(CR, 0.15), d: 2,
       b: 'A colourful reef crustacean with one of the fastest punches in nature. Its club can crack aquarium glass.',
       c: ['Its eyes have up to 16 kinds of colour sensors.', 'Its punch can crack aquarium glass.', 'Its punch speeds up as fast as a bullet fired from a gun.', 'It is brightly coloured like a peacock.', 'It is a crustacean, not a mantis.'] },
-    { n: 'Red king crab', alt: ['king crab'], sci: 'Paralithodes camtschaticus', g: 'crab', f: f(CR, 1.8), d: 2,
+    { n: 'Red king crab', alt: ['king crab'], sci: 'Paralithodes camtschaticus', g: 'crab', f: f(CR) /* 1.8 m is its leg span, not a length */, d: 2,
       b: 'A huge crab of cold northern seas, with legs spanning up to 1.8 metres. It is caught for food in the Bering Sea.',
       c: ['It was introduced to the Barents Sea by Soviet scientists.', 'Its legs can span 1.8 metres.', 'The TV show "Deadliest Catch" features its fishery.', 'It lives in cold northern seas.', 'It is a big red crab with a royal name.'] },
     { n: 'Spanish dancer', sci: 'Hexabranchus sanguineus', g: 'sea slug', f: f(MO, 0.4), d: 3,

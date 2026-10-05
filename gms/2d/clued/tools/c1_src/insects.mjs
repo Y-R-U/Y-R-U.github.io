@@ -163,7 +163,7 @@ export default {
     { n: 'Silverfish', sci: 'Lepisma saccharinum', g: 'silverfish', f: f(ZY), d: 2,
       b: 'A wingless, silvery insect that wriggles like a fish. It eats starch in paper, glue and food.',
       c: ['It can live for years.', 'It eats paper, glue and book bindings.', 'It has no wings.', 'It wriggles like a fish when it runs.', 'It is covered in shiny grey scales.'] },
-    { n: 'Antlion', sci: 'Myrmeleontidae', g: 'lacewing', f: f(NE), d: 3,
+    { n: 'Antlion', sci: 'Myrmeleon', /* family photos are mostly owlflies */ g: 'lacewing', f: f(NE), d: 3,
       b: 'Its larva digs a cone-shaped pit in sand and waits at the bottom for ants to fall in. Adults look like damselflies.',
       c: ['Its larva is also called a doodlebug.', 'Adults look like damselflies.', 'Its larva flicks sand at prey trying to climb out.', 'Its larva digs a pit trap in sand.', 'It is named after an insect and a big cat.'] },
     { n: 'Green lacewing', alt: ['lacewing'], sci: 'Chrysoperla carnea', g: 'lacewing', f: f(NE), d: 2,

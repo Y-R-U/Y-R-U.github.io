@@ -8,3 +8,5 @@ tools/*.cache.json
 server/clued
 *.db
 .DS_Store
+media/song-pictures/
+media/book-moments/

@@ -127,6 +127,27 @@ if (dev) {
   ok(hard.every(i => i.difficulty === 3), 'byDifficulty hard');
 }
 
+// lane I: generated caps make supports() truthful, kids-bank fallback, virtual packs, packless, challenge replay scoring
+{
+  const mcF = registry.getFormat('mc');
+  const info = { theme: 'animals', items: 20, questions: 0, caps: { img: 20, facts: {}, formats: { mc: 3 }, formatsKids: { mc: 12 } } };
+  ok(registry.supportsPack(mcF, info) === registry.NOT_ENOUGH, 'supportsPack greys a pack whose generate() made < 5');
+  ok(registry.supportsPack(mcF, info, { kids: true }) === true, 'supportsPack uses formatsKids in kids mode');
+  ok(registry.supportsPack(mcF, { ...info, caps: { ...info.caps, formats: { mc: 20 } } }) === true, 'supportsPack passes with enough');
+  ok(registry.supportsPack({ ...mcF, packless: true }, info) === true, 'packless formats skip the count');
+  const kidsPack = { id: 'kb', title: 'K', theme: 'kids', kids: true, items: [], questions: Array.from({ length: 8 }, (_, i) => ({ id: 'q' + i, kind: 'mc', prompt: 'Q' + i, answer: 'A' + i, wrong: ['B' + i, 'C' + i], difficulty: 1 })) };
+  const k4 = mcF.generate({ rng: rng.rngFrom('kb'), packs: [kidsPack], count: 5, opts: { answers: 4, source: 'questions' }, difficulty: 0 });
+  ok(k4.length === 5 && k4.every(q => q.options.length === 3 && q.options[q.answer].text === q.answerText), 'mc with 4 answers falls back to 3 on 2-wrong questions');
+  const idx = { packs: { general: { theme: 'general', items: 0, questions: 10, caps: { qkinds: { mc: 10 } } }, 'general~science': { theme: 'science', virtual: { of: 'general', tag: 'science' }, items: 0, questions: 5, caps: { qkinds: { mc: 5 } } }, snakes: { theme: 'animals', items: 20, questions: 0, caps: { img: 20, facts: {} } } } };
+  const all = spec.resolvePackIds(mcF, 'all', idx, rng.rngFrom('v'));
+  ok(all.includes('general') && !all.includes('general~science'), '"All" never double-counts virtual packs');
+  ok(spec.resolvePackIds(mcF, ['general~science'], idx, rng.rngFrom('v')).join() === 'general~science', 'a virtual pack can be picked on its own');
+  const { ladderResult } = await imp('js/structures/ladder.js');
+  const ans = n => Array.from({ length: n }, () => ({ correct: true }));
+  ok(ladderResult({ correct: 7, answers: [...ans(7), { correct: false }] }, false).score === scoring.ladderBanked(7), 'ladder replay banks on a fall');
+  ok(ladderResult({ correct: 15, answers: ans(15) }, false).score === scoring.LADDER_RUNGS[14], 'ladder replay top score');
+}
+
 // template filling
 ok(registry.fill('Which of these is {aName}?', { name: 'Axolotl' }) === 'Which of these is an axolotl?', 'fill aName');
 ok(registry.fill('The {lname} is {aValue}.', { name: 'Tiger', value: 'Mammal' }) === 'The tiger is a mammal.', 'fill lvalue');

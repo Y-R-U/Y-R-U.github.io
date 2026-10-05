@@ -10,6 +10,8 @@
  "imgPrompt": "Which of these is {aName}?",
  "nameImgPrompt": "Which fungus is this?",
  "tfImgPrompt": "This is {aName}.",
+ "noun": "mushroom or fungus",
+ "fakePrompt": "Which of these mushrooms and fungi is made up?",
  "leakExempt": [
   "mushroom",
   "mushrooms",
@@ -446,14 +448,6 @@
    "media": {
     "img": [
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/144785717/medium.jpg",
-      "w": 500,
-      "h": 375,
-      "credit": "Anisha Kumra",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/144785717"
-     },
-     {
       "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/533951090/medium.jpg",
       "w": 375,
       "h": 500,
@@ -468,6 +462,14 @@
       "credit": "Виктория Билоус",
       "license": "CC BY 4.0",
       "page": "https://www.inaturalist.org/photos/89747424"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/357108589/medium.jpg",
+      "w": 375,
+      "h": 500,
+      "credit": "reagan peschke",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/357108589"
      }
     ]
    },
@@ -508,14 +510,6 @@
    "media": {
     "img": [
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/78254813/medium.jpg",
-      "w": 333,
-      "h": 500,
-      "credit": "Björn S...",
-      "license": "CC BY-SA 4.0",
-      "page": "https://www.inaturalist.org/photos/78254813"
-     },
-     {
       "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/430849322/medium.jpeg",
       "w": 376,
       "h": 500,
@@ -530,6 +524,14 @@
       "credit": "Ewa Olchanowska",
       "license": "CC BY 4.0",
       "page": "https://www.inaturalist.org/photos/242562705"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/168227261/medium.jpeg",
+      "w": 500,
+      "h": 375,
+      "credit": "Thor-Rune Hansen",
+      "license": "CC BY-SA 4.0",
+      "page": "https://www.inaturalist.org/photos/168227261"
      }
     ]
    },
@@ -1248,14 +1250,6 @@
    "media": {
     "img": [
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/5885301/medium.jpg",
-      "w": 500,
-      "h": 375,
-      "credit": "Katja Schulz",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/5885301"
-     },
-     {
       "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/348556109/medium.jpg",
       "w": 375,
       "h": 500,
@@ -1270,6 +1264,14 @@
       "credit": "Katya",
       "license": "CC BY 4.0",
       "page": "https://www.inaturalist.org/photos/5466254"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/13419525/medium.jpg",
+      "w": 500,
+      "h": 500,
+      "credit": "Katja Schulz",
+      "license": "CC BY 4.0",
+      "page": "https://www.inaturalist.org/photos/13419525"
      }
     ]
    },
@@ -1308,28 +1310,28 @@
    "media": {
     "img": [
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/62455743/medium.jpg",
-      "w": 500,
-      "h": 334,
-      "credit": "Dr. Hans-Günter Wagner",
-      "license": "CC BY-SA 4.0",
-      "page": "https://www.inaturalist.org/photos/62455743"
-     },
-     {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/75780233/medium.jpg",
-      "w": 500,
-      "h": 333,
-      "credit": "Björn S...",
-      "license": "CC BY-SA 4.0",
-      "page": "https://www.inaturalist.org/photos/75780233"
-     },
-     {
       "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/159628472/medium.jpg",
       "w": 375,
       "h": 500,
       "credit": "K Bar",
       "license": "CC BY 4.0",
       "page": "https://www.inaturalist.org/photos/159628472"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/143706140/medium.jpeg",
+      "w": 375,
+      "h": 500,
+      "credit": "no rights reserved",
+      "license": "CC0 1.0",
+      "page": "https://www.inaturalist.org/photos/143706140"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/141686674/medium.jpeg",
+      "w": 375,
+      "h": 500,
+      "credit": "no rights reserved",
+      "license": "CC0 1.0",
+      "page": "https://www.inaturalist.org/photos/141686674"
      }
     ]
    },
@@ -1575,14 +1577,6 @@
    "media": {
     "img": [
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/109907882/medium.jpeg",
-      "w": 375,
-      "h": 500,
-      "credit": "Alan Rockefeller",
-      "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/109907882"
-     },
-     {
       "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/147869406/medium.jpeg",
       "w": 500,
       "h": 375,
@@ -1591,12 +1585,20 @@
       "page": "https://www.inaturalist.org/photos/147869406"
      },
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/226164232/medium.jpeg",
-      "w": 281,
-      "h": 500,
-      "credit": "Alan Rockefeller",
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/175543384/medium.jpg",
+      "w": 500,
+      "h": 375,
+      "credit": "Michel Langeveld",
       "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/226164232"
+      "page": "https://www.inaturalist.org/photos/175543384"
+     },
+     {
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/197729494/medium.jpeg",
+      "w": 500,
+      "h": 375,
+      "credit": "no rights reserved",
+      "license": "CC0 1.0",
+      "page": "https://www.inaturalist.org/photos/197729494"
      }
     ]
    },
@@ -1862,12 +1864,12 @@
       "page": "https://www.inaturalist.org/photos/367736191"
      },
      {
-      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/178347211/medium.jpeg",
-      "w": 500,
-      "h": 374,
-      "credit": "Alan Rockefeller",
+      "src": "https://inaturalist-open-data.s3.amazonaws.com/photos/52086866/medium.jpeg",
+      "w": 375,
+      "h": 500,
+      "credit": "Sharon Squazzo",
       "license": "CC BY 4.0",
-      "page": "https://www.inaturalist.org/photos/178347211"
+      "page": "https://www.inaturalist.org/photos/52086866"
      }
     ]
    },

@@ -1,7 +1,7 @@
-import { register, imageOf, collect, pick, shuffle } from './registry.js?v=1';
-import { h, imgEl } from '../ui/kit.js?v=1';
-import { injectCSS, baseCSS, stretchTimer, once, hasImg } from './fkit.js?v=1';
-import { FILMS } from './chain_data.js?v=1';
+import { register, imageOf, collect, pick, shuffle } from './registry.js?v=202610050139';
+import { h, imgEl } from '../ui/kit.js?v=202610050139';
+import { injectCSS, baseCSS, once, hasImg } from './fkit.js?v=202610050139';
+import { FILMS } from './chain_data.js?v=202610050139';
 
 const CSS = `
 .ch{gap:10px}
@@ -71,7 +71,7 @@ function make(rng, actorsPack, links, n) {
 }
 
 export default register({
-  id: 'chain', title: 'Link chain', icon: '⛓️', blurb: 'Actor → film → actor', tags: ['slow'],
+  id: 'chain', title: 'Link chain', icon: '⛓️', blurb: 'Actor → film → actor', tags: ['slow'], timeScale: q => 1 + q.data.links.length * 0.8,
   options: [
     { key: 'links', label: 'Links', type: 'choice', values: [2, 3, 4], default: 3 },
     { key: 'answers', label: 'Films per link', type: 'choice', values: [3, 4], default: 3 },
@@ -103,7 +103,6 @@ export default register({
     const ask = h('div.ch-ask');
     const pickEl = h('div.ch-pick.q-answers');
     el.append(h('div.f-stage.ch', {}, h('h2.q-prompt', {}, q.prompt), row, ask, pickEl));
-    stretchTimer(api, el, 1 + N * 0.8);
     let buttons = [];
     function step() {
       linkEls.forEach((l, i) => l.classList.toggle('cur', i === k && !done));

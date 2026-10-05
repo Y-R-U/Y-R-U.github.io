@@ -49,8 +49,8 @@ writePack({
   id: 'words', title: 'Word origins', theme: 'books', icon: '🔤', kids: false, version: 1,
   notice: 'Origins are checked against Wiktionary etymologies; many words passed through other languages on the way to English.',
   factsMeta: {
-    origin: { type: 'cat', label: 'Comes from', ask: 'The English word “{name}” comes from which language?', askReverse: 'Which of these English words comes from {value}?', stmt: 'The English word “{name}” comes from {value}.' },
-    namedAfter: { type: 'text', label: 'Named after' },
+    origin: { type: 'cat', label: 'Language of origin', matchPrompt: 'Match each word to the language it comes from', ask: 'The English word “{name}” comes from which language?', askReverse: 'Which of these English words comes from {value}?', stmt: 'The English word “{name}” comes from {value}.' },
+    namedAfter: { type: 'text', label: 'Named after', matchPrompt: 'Match each word to the person it is named after' },
     kind: { type: 'cat', label: 'Kind of word', exclusive: false },
   },
   items, questions: [...questions, ...parseQuestions(WORD_QS, 'wq')],

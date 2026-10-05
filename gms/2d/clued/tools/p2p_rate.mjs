@@ -22,7 +22,7 @@ async function page(port) {
   const boot = async () => {
     await send('Page.navigate', { url: SITE });
     for (let i = 0; i < 100 && !(await ev('!!window.__cluedReady').catch(() => false)); i++) await sleep(200);
-    await ev(`import('./js/net/index.js?v=1')`);
+    await ev(`import('./js/net/index.js?v=' + (window.__clued?.BUILD || window.__cluedCtx?.BUILD || 1))`);
   };
   return { ev, boot };
 }

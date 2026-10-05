@@ -1,15 +1,16 @@
-import { WD, COMMONS } from './_common.mjs';
+import { WD, COMMONS, theC } from './_common.mjs';
 
 const MA = 'Main', SN = 'Snack', DE = 'Dessert', SO = 'Soup', SI = 'Side', BR = 'Breakfast', BA = 'Bread or pastry';
 const f = (country, course) => ({ ...(country ? { country } : {}), course });
 
 export default {
   id: 'dishes', title: 'World dishes', theme: 'food', icon: '🍜', kids: true,
+  noun: 'dish', fakePrompt: 'Which of these dishes is made up?',
   leakExempt: [],
   media: 'wiki', photos: 2, depicts: 0,
   wdCheckLabel: { country: 'P495' },
   factsMeta: {
-    country: { type: 'cat', label: 'Comes from', clue: v => `It comes from ${v}.` },
+    country: { type: 'cat', label: 'Country', matchPrompt: 'Match each dish to the country it comes from', clue: v => `It comes from ${theC(v)}.` },
     course: { type: 'cat', label: 'Kind of dish', values: [MA, SN, DE, SO, SI, BR, BA], clue: v => ({ [MA]: 'It is usually a main meal.', [SN]: 'It is usually a snack or street food.', [DE]: 'It is a dessert or sweet treat.', [SO]: 'It is a soup.', [SI]: 'It is usually a side dish or dip.', [BR]: 'It is a breakfast dish.', [BA]: 'It is a kind of bread or pastry.' }[v]) },
   },
   imgPrompt: 'Which of these is {lname}?', nameImgPrompt: 'Which dish is this?', tfImgPrompt: 'This dish is {lname}.',
@@ -218,7 +219,7 @@ export default {
       b: 'A dark, salty Australian spread made from leftover brewer\'s yeast, first sold in 1923.',
       c: ['It was first made in Melbourne in 1923.', 'It is made from brewer\'s yeast extract.', 'It is rich in B vitamins.', 'It is spread thinly on toast.', 'It is a dark, salty Australian spread.'] },
   ],
-  fakes: ['Glazed moonfish pie (Norway)', 'Sunberry dumplings (Peru)', 'Cloud noodles (Chile)', 'Velvet goat stew (Iceland)'],
+  fakes: ['Glazed moonfish pie', 'Sunberry dumplings', 'Copperleaf pudding', 'Velvet goat stew'],
   questions: [
     { kind: 'mc', prompt: 'Which country is sushi from?', answer: 'Japan', wrong: ['China', 'Thailand', 'Korea'], explain: 'Sushi grew from a Japanese way of preserving fish.', difficulty: 1 },
     { kind: 'mc', prompt: 'Which country is pizza from?', answer: 'Italy', wrong: ['France', 'Greece', 'United States'], explain: 'Modern pizza comes from Naples.', difficulty: 1 },

@@ -250,6 +250,9 @@ const PROJECTS = [
     desc: "3D idle transport tycoon with Babylon.js graphics. Build routes, upgrade vehicles, and grow your business empire.",
     date: "2026-03-11", creator: "Claude" },
 
+  { name: "Clued",              path: "/gms/2d/clued/",           screenshot: "clued",           type: "game",
+    desc: "Trivia and learning: 26 game types (picture reveal, clue ladders, maps, music clips, connections, Movie Moments…) across 70 packs from snakes to box office. Pub quiz, daily, kids mode, Learn tab with field guides and flashcards, and online rooms by share link.",
+    date: "2026-10-05", creator: "Claude" },
   { name: "Idle Western 2",     path: "/gms/3d/idle-western2/",   screenshot: "idle-western2",   type: "game",
     desc: "Big Hat Energy: thrown out of the saloon face-first, you build half of Dribble Creek. Watch the Mulligan Brothers raise every business on screen, fling drunks into troughs and Pomfrey's window, win Leone-style 10-pace duels, tap Fingers' piano, and grow a hat to rival Pomfrey's. Voiced townsfolk, western soundtrack, Ghost Town season, M15 cheek.",
     date: "2026-10-04", creator: "Claude" },
