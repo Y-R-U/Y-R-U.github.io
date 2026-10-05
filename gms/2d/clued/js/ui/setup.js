@@ -1,13 +1,15 @@
 // Format grid + per-game setup (themes, count, options, difficulty, timer).
-import { h } from './kit.js?v=202610050144';
-import { defineScreen, go, header } from './app.js?v=202610050144';
-import { listFormats, getFormat, defaultOpts } from '../formats/registry.js?v=202610050144';
-import { getIndex } from '../core/packs.js?v=202610050144';
-import { supportedPackIds, formatAvailable } from '../core/spec.js?v=202610050144';
-import { getSettings, getLast, setLast, ANSWER_TIMES } from '../core/store.js?v=202610050144';
-import { themePicker } from './picker.js?v=202610050144';
-import { STRUCTURES } from '../structures/index.js?v=202610050144';
-import { sfx } from './fx.js?v=202610050144';
+import { h } from './kit.js?v=202610051408';
+import { defineScreen, go, header } from './app.js?v=202610051408';
+import { listFormats, getFormat, defaultOpts } from '../formats/registry.js?v=202610051408';
+import { getIndex } from '../core/packs.js?v=202610051408';
+import { supportedPackIds, formatAvailable } from '../core/spec.js?v=202610051408';
+import { getSettings, getLast, setLast, ANSWER_TIMES } from '../core/store.js?v=202610051408';
+import { themePicker } from './picker.js?v=202610051408';
+import { STRUCTURES } from '../structures/index.js?v=202610051408';
+import { sfx } from './fx.js?v=202610051408';
+import { favControls } from './favs.js?v=202610051408';
+import { favKey } from './favmodel.js?v=202610051408';
 
 export const DIFFS = [[0, 'Mixed'], [1, 'Easy'], [2, 'Medium'], [3, 'Hard']];
 
@@ -55,60 +57,92 @@ function switchEl(checked, onChange, label) {
   return h('span.switch', {}, inp, h('i'));
 }
 
-// Builds the option panel for one format. Returns getter for the chosen settings.
-export function optionsPanel(host, fmt, { structure = 'quick', last = null, showCount = true, showTimer = true, showDifficulty = true, kids = false } = {}) {
+// Builds the option panel for one format, with favourite picks (quick picks above, ♥ save control below).
+export function optionsPanel(host, fmt, { structure = 'quick', last = null, showCount = true, showTimer = true, showDifficulty = true, kids = false, favs = true } = {}) {
   const s = getSettings();
-  const v = {
-    packs: last?.packs || 'all',
-    count: last?.count || 10,
-    opts: { ...defaultOpts(fmt), ...(last?.opts || {}) },
-    difficulty: last?.difficulty ?? 0,
-    timer: typeof last?.timer === 'number' ? last.timer : kids ? 0 : s.timerSec,
-  };
-  const picker = fmt.packless
-    ? (host.append(h('div.panel.picker', {}, h('div.theme-sum', {}, h('span.ts-ico', {}, '🗺️'), h('span.ts-txt', {}, h('b', {}, 'Built-in world map'), h('small', {}, 'Natural Earth borders, no theme to pick'))))), { value: () => 'all' })
-    : themePicker(host, { fmt, selected: v.packs, kids, onChange: p => { v.packs = p; } });
-  const panel = h('div.panel', { style: { marginTop: '14px' } });
-  if (showCount) {
-    const custom = h('input.field.custom-n', { type: 'number', min: 3, max: 50, value: v.count, inputmode: 'numeric', 'aria-label': 'Custom count', hidden: [5, 10, 20].includes(v.count) });
-    custom.addEventListener('input', () => { v.count = Math.max(3, Math.min(50, +custom.value || 10)); });
-    const row = chipRow([5, 10, 20, 'custom'], ['5', '10', '20', 'Custom'], [5, 10, 20].includes(v.count) ? v.count : 'custom', x => {
-      custom.hidden = x !== 'custom';
-      if (x === 'custom') { custom.focus(); v.count = +custom.value || 15; } else v.count = x;
-    });
-    row.append(custom);
-    panel.append(h('div.opt', {}, h('div.opt-label', {}, 'Questions'), row));
-  }
-  for (const o of fmt.options || []) {
-    if (kids && o.kidsHide) continue;
-    if (o.type === 'bool') {
-      panel.append(h('div.opt-row', {}, h('span.lbl', {}, o.label, o.help ? h('small', {}, o.help) : null), switchEl(v.opts[o.key], x => { v.opts[o.key] = x; }, o.label)));
-    } else if (o.values) {
-      let values = o.values, labels = o.labels;
-      if (kids && o.kidsValues) { const keep = values.map((x, i) => [x, labels?.[i]]).filter(([x]) => o.kidsValues.includes(x)); values = keep.map(k => k[0]); labels = labels ? keep.map(k => k[1]) : null; }
-      if (kids && o.kidsDefault != null && !last?.opts) v.opts[o.key] = o.kidsDefault;
-      if (!values.includes(v.opts[o.key])) v.opts[o.key] = kids && o.kidsDefault != null ? o.kidsDefault : values.includes(o.default) ? o.default : values[0];
-      panel.append(h('div.opt', {}, h('div.opt-label', {}, o.label), chipRow(values, labels, v.opts[o.key], x => { v.opts[o.key] = x; })));
+  const index = getIndex();
+  let v, picker;
+  const wrap = h('div.opt-wrap');
+  let fav = null;
+  const changed = () => fav && fav.refresh();
+
+  function build(last) {
+    wrap.replaceChildren();
+    v = {
+      packs: last?.packs || 'all',
+      count: last?.count || 10,
+      opts: { ...defaultOpts(fmt), ...(last?.opts || {}) },
+      difficulty: last?.difficulty ?? 0,
+      timer: typeof last?.timer === 'number' ? last.timer : kids ? 0 : s.timerSec,
+    };
+    picker = fmt.packless
+      ? (wrap.append(h('div.panel.picker', {}, h('div.theme-sum', {}, h('span.ts-ico', {}, '🗺️'), h('span.ts-txt', {}, h('b', {}, 'Built-in world map'), h('small', {}, 'Natural Earth borders, no theme to pick'))))), { value: () => 'all' })
+      : themePicker(wrap, { fmt, selected: v.packs, kids, onChange: p => { v.packs = p; changed(); } });
+    const panel = h('div.panel', { style: { marginTop: '14px' } });
+    if (showCount) {
+      const custom = h('input.field.custom-n', { type: 'number', min: 3, max: 50, value: v.count, inputmode: 'numeric', 'aria-label': 'Custom count', hidden: [5, 10, 20].includes(v.count) });
+      custom.addEventListener('input', () => { v.count = Math.max(3, Math.min(50, +custom.value || 10)); changed(); });
+      const row = chipRow([5, 10, 20, 'custom'], ['5', '10', '20', 'Custom'], [5, 10, 20].includes(v.count) ? v.count : 'custom', x => {
+        custom.hidden = x !== 'custom';
+        if (x === 'custom') { custom.focus(); v.count = +custom.value || 15; } else v.count = x;
+        changed();
+      });
+      row.append(custom);
+      panel.append(h('div.opt', {}, h('div.opt-label', {}, 'Questions'), row));
     }
-  }
-  if (showDifficulty && !kids) {
-    panel.append(h('div.opt', {}, h('div.opt-label', {}, 'Difficulty'), chipRow(DIFFS.map(d => d[0]), DIFFS.map(d => d[1]), v.difficulty, x => {
-      v.difficulty = x;
-      const ans = (fmt.options || []).find(o => o.key === 'answers');
-      if (ans && x === 1 && ans.values.includes(3) && v.opts.answers > 3) {
-        v.opts.answers = 3;
-        panel.querySelectorAll('.opt').forEach(o => { if (o.firstChild.textContent === ans.label) o.querySelectorAll('.chip').forEach(c => c.classList.toggle('on', c.dataset.v === '3')); });
+    for (const o of fmt.options || []) {
+      if (kids && o.kidsHide) continue;
+      if (o.type === 'bool') {
+        panel.append(h('div.opt-row', {}, h('span.lbl', {}, o.label, o.help ? h('small', {}, o.help) : null), switchEl(v.opts[o.key], x => { v.opts[o.key] = x; changed(); }, o.label)));
+      } else if (o.values) {
+        let values = o.values, labels = o.labels;
+        if (kids && o.kidsValues) { const keep = values.map((x, i) => [x, labels?.[i]]).filter(([x]) => o.kidsValues.includes(x)); values = keep.map(k => k[0]); labels = labels ? keep.map(k => k[1]) : null; }
+        if (kids && o.kidsDefault != null && !(last?.opts && o.key in last.opts)) v.opts[o.key] = o.kidsDefault;
+        if (!values.includes(v.opts[o.key])) v.opts[o.key] = kids && o.kidsDefault != null ? o.kidsDefault : values.includes(o.default) ? o.default : values[0];
+        panel.append(h('div.opt', { dataset: { opt: o.key } }, h('div.opt-label', {}, o.label), chipRow(values, labels, v.opts[o.key], x => { v.opts[o.key] = x; changed(); })));
       }
-    })));
+    }
+    if (showDifficulty && !kids) {
+      panel.append(h('div.opt', { dataset: { opt: 'difficulty' } }, h('div.opt-label', {}, 'Difficulty'), chipRow(DIFFS.map(d => d[0]), DIFFS.map(d => d[1]), v.difficulty, x => {
+        v.difficulty = x;
+        const ans = (fmt.options || []).find(o => o.key === 'answers');
+        if (ans && x === 1 && ans.values.includes(3) && v.opts.answers > 3) {
+          v.opts.answers = 3;
+          panel.querySelectorAll('.opt').forEach(o => { if (o.firstChild.textContent === ans.label) o.querySelectorAll('.chip').forEach(c => c.classList.toggle('on', c.dataset.v === '3')); });
+        }
+        changed();
+      })));
+    }
+    if (showTimer) {
+      const times = kids ? [0, 20, 30] : ANSWER_TIMES;
+      if (!times.includes(v.timer)) v.timer = kids ? 0 : 10;
+      panel.append(h('div.opt', { dataset: { opt: 'timer' } }, h('div.opt-label', {}, 'Answer time', h('small.muted.tiny', {}, kids ? 'A gentle timer, if you like' : 'Faster answers score more')),
+        chipRow(times, times.map(t => (t ? `${t}s` : 'Off')), v.timer, x => { v.timer = x; changed(); })));
+    }
+    if (kids) panel.append(h('p.muted.tiny', { style: { margin: '8px 0 0' } }, '🧸 Kids mode: easy questions, big pictures, no timer, read aloud.'));
+    if (panel.childNodes.length) wrap.append(panel);
   }
-  if (showTimer) {
-    const times = kids ? [0, 20, 30] : ANSWER_TIMES;
-    if (!times.includes(v.timer)) v.timer = kids ? 0 : 10;
-    panel.append(h('div.opt', {}, h('div.opt-label', {}, 'Answer time', h('small.muted.tiny', {}, kids ? 'A gentle timer, if you like' : 'Faster answers score more')),
-      chipRow(times, times.map(t => (t ? `${t}s` : 'Off')), v.timer, x => { v.timer = x; })));
-  }
-  if (kids) panel.append(h('p.muted.tiny', { style: { margin: '8px 0 0' } }, '🧸 Kids mode: easy questions, big pictures, no timer, read aloud.'));
-  if (panel.childNodes.length) host.append(panel);
+
+  // Only the fields this screen shows: a fav saved from the pub quiz builder (no timer) leaves the timer alone elsewhere.
+  const snap = () => {
+    const o = { packs: picker.value(), opts: { ...v.opts } };
+    if (showCount) o.count = v.count;
+    if (showDifficulty && !kids) o.difficulty = v.difficulty;
+    if (showTimer) o.timer = v.timer;
+    return o;
+  };
+  build(last);
+  if (favs) {
+    fav = favControls({
+      key: favKey(fmt, kids), fmt, kids, index, snap, timerDefault: kids ? 0 : s.timerSec,
+      apply: c => {
+        const cur = { packs: picker.value(), count: v.count, opts: { ...v.opts }, difficulty: v.difficulty, timer: v.timer };
+        build({ ...cur, ...c, opts: { ...cur.opts, ...c.opts } });
+        wrap.classList.remove('fav-applied'); void wrap.offsetWidth; wrap.classList.add('fav-applied');
+      },
+    });
+    host.append(fav.quick, wrap, fav.save);
+  } else host.append(wrap);
   return {
     value: () => ({ format: fmt.id, packs: picker.value(), count: v.count, opts: { ...v.opts }, difficulty: kids ? 1 : v.difficulty, timer: v.timer, kids }),
     save: () => setLast(kids ? `${fmt.id}:kids` : fmt.id, { packs: picker.value(), count: v.count, opts: v.opts, difficulty: v.difficulty, timer: v.timer }),

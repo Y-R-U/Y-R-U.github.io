@@ -130,7 +130,7 @@ await playFormat('fmt=pin-drop&seed=t13', async (q, d) => {
   const b = await p.eval(`(() => { const b = [...document.querySelectorAll('.gmq-btn')].find(x => /pin/i.test(x.textContent)).getBoundingClientRect(); return [b.left + b.width / 2, b.top + b.height / 2]; })()`);
   await tapAt(b, d);
 }, 'pin-drop', ALL_VP);
-await playFormat('fmt=neighbours&seed=t14', async (q, d) => {
+await playFormat('fmt=neighbours&ask=map&seed=t14', async (q, d) => {
   await p.sleep(600);
   for (const id of q.answer) await tapFeature(id, { desktop: d });
 }, 'neighbours', ALL_VP);

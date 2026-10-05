@@ -88,3 +88,6 @@ in games/js/games.js ONLY if that file is no longer dirty from another session, 
 4. MV stretch: media/song-pictures + media/book-moments (113 images) generated but UNREVIEWED, no pack files, gitignored + excluded from rsync. Resume MV to review/finish or delete.
 5. Aaron real-device checks: P2P rooms (two phones same wifi, then one on 4G), audio on Android (piano, Apple clips, bgm), server room via share link.
 6. Static deploy = rsync command above (server/deploy.sh STATIC=1 would also ship unreviewed media; fix its excludes).
+- 2026-10-06 Aaron feedback round 1: (4) kids picture labels leaked answers → fixed + shipped (css only). Agents: FAV (♥ + 5 slots per format, quick-pick, synced clued.favs; CDP 9430) and GEO2 (continent-for-city tiers dot/line/name; neighbours → multi-select + 'how many' mc, visual only for kids with big targets; answer-leak audit all formats; CDP 9431).
+- 2026-10-06 FAV DONE (♥ + 5 slots per format in optionsPanel → setup/pubquiz/host; kids slots separate; synced clued.favs; fav_test 46/0, fav_e2e 25/25). Ship together with GEO2 + BUILD bump (mixed-module risk if shipped unbumped).
+- 2026-10-06 GEO2 DONE (continent tiers dot/line/name + cities pool; neighbours pick/how-many/kids-tap with fairness rules; leak audit fixed Duel + kids listen covers + read-aloud; kids flag now reaches map formats). Shipped with FAV.

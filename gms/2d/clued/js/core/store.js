@@ -1,8 +1,8 @@
 export const KEYS = {
   settings: 'clued.settings', stats: 'clued.stats', mastery: 'clued.mastery',
-  cards: 'clued.cards', last: 'clued.last', name: 'clued.name',
+  cards: 'clued.cards', last: 'clued.last', name: 'clued.name', favs: 'clued.favs',
 };
-export const SYNCED = [KEYS.settings, KEYS.stats, KEYS.mastery, KEYS.cards];
+export const SYNCED = [KEYS.settings, KEYS.stats, KEYS.mastery, KEYS.cards, KEYS.favs];
 
 export const DEFAULT_SETTINGS = {
   sound: true, music: 0.5, haptics: true, timerSec: 10, reducedMotion: false, kids: false, readAloud: false, bgm: true,
@@ -92,3 +92,32 @@ export function setLast(formatId, value) {
 
 export const getName = () => read(KEYS.name) || '';
 export const setName = n => write(KEYS.name, String(n).slice(0, 24));
+
+// Favourite picks: clued.favs = { v: 1, slots: { '<formatId>' | '<formatId>:kids': [fav|null × 5] } }.
+export const FAV_SLOTS = 5;
+const isFav = f => !!f && typeof f === 'object' && !Array.isArray(f) && (f.packs === 'all' || Array.isArray(f.packs));
+function favRoot() {
+  const r = read(KEYS.favs);
+  return r && typeof r === 'object' && r.slots && typeof r.slots === 'object' && !Array.isArray(r.slots) ? r : { v: 1, slots: {} };
+}
+export function getFavs(key) {
+  const a = favRoot().slots[key];
+  return Array.from({ length: FAV_SLOTS }, (_, i) => (Array.isArray(a) && isFav(a[i]) ? a[i] : null));
+}
+function putFavs(key, list) {
+  const r = favRoot();
+  if (list.some(Boolean)) r.slots[key] = list; else delete r.slots[key];
+  write(KEYS.favs, r);
+  return list;
+}
+export function setFav(key, slot, fav) {
+  if (!(slot >= 0 && slot < FAV_SLOTS) || !isFav(fav)) return getFavs(key);
+  const list = getFavs(key);
+  list[slot] = { ...fav, at: Date.now() };
+  return putFavs(key, list);
+}
+export function clearFav(key, slot) {
+  const list = getFavs(key);
+  if (slot >= 0 && slot < FAV_SLOTS) list[slot] = null;
+  return putFavs(key, list);
+}

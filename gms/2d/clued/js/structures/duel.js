@@ -1,10 +1,10 @@
 // Duel: two players, one device. Portrait = top half flipped; landscape = left vs right. First right answer scores.
-import { specFor, fmtTitle } from './common.js?v=202610050144';
-import { prepare } from './session.js?v=202610050144';
-import { defineScreen, go, back } from '../ui/app.js?v=202610050144';
-import { h, choiceGrid, mediaBox, onKey } from '../ui/kit.js?v=202610050144';
-import { confirmPop } from '../ui/popup.js?v=202610050144';
-import { sfx, haptic } from '../ui/fx.js?v=202610050144';
+import { specFor, fmtTitle } from './common.js?v=202610051408';
+import { prepare } from './session.js?v=202610051408';
+import { defineScreen, go, back } from '../ui/app.js?v=202610051408';
+import { h, choiceGrid, mediaBox, onKey } from '../ui/kit.js?v=202610051408';
+import { confirmPop } from '../ui/popup.js?v=202610051408';
+import { sfx, haptic } from '../ui/fx.js?v=202610051408';
 
 const asChoice = q => {
   if (q.format === 'tf') return { ...q, options: [{ text: 'True' }, { text: 'False' }], answer: q.answer ? 0 : 1 };
@@ -61,7 +61,7 @@ defineScreen('duel', async (el, { spec, choice, names = ['Red', 'Teal'] }) => {
             halves.forEach(x => x.classList.remove('locked')); grids.forEach(x => { x.lock(); x.mark(q.answer, -1); });
             timer = setTimeout(next, 1500);
           } else {
-            locked[p] = true; halves[p].classList.add('locked'); g.mark(-1, i); flash(p, 'Locked out'); sfx('wrong'); haptic('wrong');
+            locked[p] = true; halves[p].classList.add('locked'); g.buttons[i].classList.add('wrong');   // not mark(): it reveals picture names to the other player flash(p, 'Locked out'); sfx('wrong'); haptic('wrong');
             if (locked[0] && locked[1]) { over = true; halves.forEach(x => x.classList.remove('locked')); grids.forEach(x => { x.lock(); x.mark(q.answer, -1); }); timer = setTimeout(next, 1700); }
           }
         },

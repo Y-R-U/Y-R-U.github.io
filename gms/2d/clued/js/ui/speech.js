@@ -31,7 +31,7 @@ export function stopSpeaking() { try { synth && synth.cancel(); } catch (e) {} }
 export function questionSpeech(q) {
   let s = q.prompt || '';
   if (q.format === 'tf') s += '. True, or false?';
-  else if (Array.isArray(q.options) && q.data?.layout !== 'images' && q.options.every(o => o && (o.text || typeof o === 'string'))) {
+  else if (Array.isArray(q.options) && q.data?.layout !== 'images' && q.options.every(o => o && !o.img && (o.text || typeof o === 'string'))) {
     s += '. ' + q.options.map((o, i) => `${i + 1}: ${o.text || o}`).join('. ');
   }
   return s;

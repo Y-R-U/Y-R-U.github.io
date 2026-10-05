@@ -109,7 +109,9 @@ the spec, so media swaps and pack updates can't desync players.
 - CORS allows `https://y-r-u.github.io`, `http://localhost:8888`. Rate-limited, size-capped, rooms expire after 6 h.
 
 ## Storage keys (localStorage, synced via cloud.js where marked *)
-`clued.settings`*, `clued.stats`*, `clued.mastery`*, `clued.cards`* (flashcards), `clued.last` (last picks), `clued.name`.
+`clued.settings`*, `clued.stats`*, `clued.mastery`*, `clued.cards`* (flashcards), `clued.favs`* (favourite picks:
+`{ v:1, slots: { '<formatId>' | '<formatId>:kids': [5 × { packs, count?, opts, difficulty?, timer?, at } | null] } }`, see
+docs/notes/FAV.md), `clued.last` (last picks), `clued.name`.
 cloud game id: `clued`.
 
 ## Progressive stages (vote to reveal)

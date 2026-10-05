@@ -1,17 +1,17 @@
 // Pub quiz: 4–8 rounds of different formats/themes, one double-points joker per player, builder or "surprise me".
-import { playSpec } from './session.js?v=202610050144';
-import { makeSpec, supportedPackIds } from '../core/spec.js?v=202610050144';
-import { handoff } from './handoff.js?v=202610050144';
-import { playersEditor } from './party.js?v=202610050144';
-import { defineScreen, go, back, header } from '../ui/app.js?v=202610050144';
-import { h, esc, fmtNum } from '../ui/kit.js?v=202610050144';
-import { popup, toast } from '../ui/popup.js?v=202610050144';
-import { listFormats, getFormat, defaultOpts } from '../formats/registry.js?v=202610050144';
-import { getIndex } from '../core/packs.js?v=202610050144';
-import { getSettings, read, write } from '../core/store.js?v=202610050144';
-import { optionsPanel } from '../ui/setup.js?v=202610050144';
-import { rngFrom, pick, shuffle, randomSeed } from '../core/rng.js?v=202610050144';
-import { sfx } from '../ui/fx.js?v=202610050144';
+import { playSpec } from './session.js?v=202610051408';
+import { makeSpec, supportedPackIds } from '../core/spec.js?v=202610051408';
+import { handoff } from './handoff.js?v=202610051408';
+import { playersEditor } from './party.js?v=202610051408';
+import { defineScreen, go, back, header } from '../ui/app.js?v=202610051408';
+import { h, esc, fmtNum } from '../ui/kit.js?v=202610051408';
+import { popup, toast } from '../ui/popup.js?v=202610051408';
+import { listFormats, getFormat, defaultOpts } from '../formats/registry.js?v=202610051408';
+import { getIndex } from '../core/packs.js?v=202610051408';
+import { getSettings, read, write } from '../core/store.js?v=202610051408';
+import { optionsPanel } from '../ui/setup.js?v=202610051408';
+import { rngFrom, pick, shuffle, randomSeed } from '../core/rng.js?v=202610051408';
+import { sfx } from '../ui/fx.js?v=202610051408';
 
 const KEY = 'clued.pubquiz';
 const MAX_ROUNDS = 8;
@@ -144,7 +144,7 @@ defineScreen('pqround', (el, { idx = -1, format }) => {
   const cur = idx >= 0 ? s.rounds[idx] : null;
   el.append(header(idx >= 0 ? `Round ${idx + 1}` : 'New round'));
   if (!fmt) { el.append(h('p.panel', {}, 'Format missing')); return; }
-  const titleIn = h('input.field', { type: 'text', value: cur?.title || '', placeholder: `Round name (optional): ${fmt.title}`, maxlength: 40 });
+  const titleIn = h('input.field', { type: 'text', value: cur?.title || '', placeholder: `Round name (optional): ${fmt.title}`, maxlength: 40, style: { display: 'block' } });
   el.append(h('div.setup-head', {}, h('span.fh-ico', {}, fmt.icon), h('div', {}, h('h2', {}, fmt.title), h('p', {}, fmt.blurb || ''))), titleIn);
   const body = h('div', { style: { marginTop: '12px' } });
   el.append(body);

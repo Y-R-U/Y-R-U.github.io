@@ -1,6 +1,6 @@
-import { register, collect, pick } from '../../formats/registry.js?v=202610050144';
-import { loadMarine } from '../data.js?v=202610050144';
-import { REGIONS, createMap, frame, message, isKids, REGION_CHOICES, REGION_LABELS, supportsGeo } from './common.js?v=202610050144';
+import { register, collect, pick } from '../../formats/registry.js?v=202610051408';
+import { loadMarine } from '../data.js?v=202610051408';
+import { REGIONS, createMap, frame, message, isKids, REGION_CHOICES, REGION_LABELS, supportsGeo } from './common.js?v=202610051408';
 
 const { info: M } = await loadMarine();
 
@@ -28,8 +28,8 @@ export default register({
   id: 'water-click', title: 'Oceans and seas', icon: '🌊', blurb: 'Tap the ocean, sea, gulf or bay', tags: ['map', 'kids'],
   options: [{ key: 'region', label: 'Map', type: 'choice', values: REGION_CHOICES.filter(r => !['caribbean', 'mideast'].includes(r)), labels: REGION_LABELS.filter((l, i) => !['caribbean', 'mideast'].includes(REGION_CHOICES[i])), default: 'world' }],
   supports: supportsGeo, packless: true,
-  generate({ rng, count, opts = {}, difficulty = 0, avoid }) {
-    const kids = !!opts.kids, level = kids ? 1 : difficulty || 0;
+  generate({ rng, count, opts = {}, difficulty = 0, avoid, kids: kidsArg }) {
+    const kids = !!(opts.kids || kidsArg), level = kids ? 1 : difficulty || 0;
     const region = level === 1 ? 'world' : REGIONS[opts.region] ? opts.region : 'world';
     let pool = targets(level, region);
     if (pool.length < 4) pool = targets(level || 2, 'world');

@@ -1,7 +1,7 @@
-import { register, collect, pick } from '../../formats/registry.js?v=202610050144';
-import { loadCities, geo as G } from '../data.js?v=202610050144';
-import { haversineKm } from '../proj.js?v=202610050144';
-import { geo, countryIds, regionMembers, REGIONS, createMap, frame, message, button, isKids, cname, REGION_CHOICES, REGION_LABELS, supportsGeo, fmtKm } from './common.js?v=202610050144';
+import { register, collect, pick } from '../../formats/registry.js?v=202610051408';
+import { loadCities, geo as G } from '../data.js?v=202610051408';
+import { haversineKm } from '../proj.js?v=202610051408';
+import { geo, countryIds, regionMembers, REGIONS, createMap, frame, message, button, isKids, cname, REGION_CHOICES, REGION_LABELS, supportsGeo, fmtKm } from './common.js?v=202610051408';
 
 await loadCities();
 
@@ -27,8 +27,8 @@ export default register({
     { key: 'region', label: 'Map', type: 'choice', values: REGION_CHOICES, labels: REGION_LABELS, default: 'world' },
   ],
   supports: supportsGeo, packless: true,
-  generate({ rng, packs = [], count, opts = {}, difficulty = 0, avoid }) {
-    const kids = !!opts.kids, level = kids ? 1 : difficulty || 0;
+  generate({ rng, packs = [], count, opts = {}, difficulty = 0, avoid, kids: kidsArg }) {
+    const kids = !!(opts.kids || kidsArg), level = kids ? 1 : difficulty || 0;
     const region = REGIONS[opts.region] ? opts.region : 'world';
     const members = new Set(region === 'world' ? countryIds() : regionMembers(region));
     const f = REGIONS[region].frame;

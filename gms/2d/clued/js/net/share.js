@@ -1,8 +1,8 @@
 // Share links: navigator.share, clipboard fallback, and a QR code people in the room can scan.
-import { h } from '../ui/kit.js?v=202610050144';
-import { popup, toast } from '../ui/popup.js?v=202610050144';
-import { qrSvg } from '../vendor/qr.js?v=202610050144';
-import { API_OVERRIDE } from './api.js?v=202610050144';
+import { h } from '../ui/kit.js?v=202610051408';
+import { popup, toast } from '../ui/popup.js?v=202610051408';
+import { qrSvg } from '../vendor/qr.js?v=202610051408';
+import { API_OVERRIDE } from './api.js?v=202610051408';
 
 function link(param, value) {
   const u = new URL(location.pathname, location.origin);

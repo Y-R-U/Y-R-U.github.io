@@ -1,10 +1,10 @@
 // CLUED map component. SVG, projected once; pan/zoom via a CSS transform during gestures, committed on release.
 // API documented in docs/notes/M.md.
-import { makeProjection, projectedBox, greatCircle } from './proj.js?v=202610050144';
-import { features as topoFeatures } from './topo.js?v=202610050144';
-import { loadIndex, loadWorld, loadRegionFile, loadStatesFile, loadMarine, geo, isPlayable, regionMembers } from './data.js?v=202610050144';
-import { regionFor } from './regions.js?v=202610050144';
-import { injectStyle, POLITICAL, CONTINENT_FILL } from './style.js?v=202610050144';
+import { makeProjection, projectedBox, greatCircle } from './proj.js?v=202610051408';
+import { features as topoFeatures } from './topo.js?v=202610051408';
+import { loadIndex, loadWorld, loadRegionFile, loadStatesFile, loadMarine, geo, isPlayable, regionMembers } from './data.js?v=202610051408';
+import { regionFor } from './regions.js?v=202610051408';
+import { injectStyle, POLITICAL, CONTINENT_FILL } from './style.js?v=202610051408';
 
 const NS = 'http://www.w3.org/2000/svg';
 const U = 1000;
@@ -493,6 +493,12 @@ export function createMap(el, opts = {}) {
     addLine(a, b, { cls = '' } = {}) {
       const pts = greatCircle(a, b).map(([lon, lat]) => pointU(lon, lat));
       const p = svgEl('path', { class: 'gm-line ' + cls, d: 'M' + pts.map(p => p.map(v => v.toFixed(2)).join(' ')).join('L') });
+      L.lines.append(p);
+      return p;
+    },
+    // a polyline through [lon,lat] points as given (parallels, meridians)
+    addPath(lonlats, { cls = '' } = {}) {
+      const p = svgEl('path', { class: 'gm-line ' + cls, d: 'M' + lonlats.map(([lon, lat]) => pointU(lon, lat).map(v => v.toFixed(2)).join(' ')).join('L') });
       L.lines.append(p);
       return p;
     },

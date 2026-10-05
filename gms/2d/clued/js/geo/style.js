@@ -33,6 +33,8 @@ background:radial-gradient(ellipse at 50% 40%,var(--gm-ocean2),var(--gm-ocean) 7
 .gm-lbl{font:700 13px/1 system-ui,-apple-system,"Segoe UI",sans-serif;fill:#2b2418;stroke:#fffaf0;stroke-width:3.5px;paint-order:stroke;stroke-linejoin:round;text-anchor:middle;dominant-baseline:middle;pointer-events:none}
 .gm-lbl.sea{fill:#1f5671;font-style:italic;font-weight:600}
 .gm-line{fill:none;stroke:#2b2418;stroke-width:2px;stroke-dasharray:6 5;vector-effect:non-scaling-stroke}
+.gm-line.clue{stroke:#3b2a8f;stroke-width:2.2px;stroke-dasharray:8 5;opacity:.62}
+.gm.faded .gm-svg{opacity:.55}
 .gm-mk{cursor:pointer}
 .gm-mk .mk-dot{fill:#fff;stroke:#2b2418;stroke-width:2.5px}
 .gm-mk.ok .mk-dot{fill:var(--gm-ok)}.gm-mk.bad .mk-dot{fill:var(--gm-bad)}.gm-mk.sel .mk-dot{fill:var(--gm-sel)}

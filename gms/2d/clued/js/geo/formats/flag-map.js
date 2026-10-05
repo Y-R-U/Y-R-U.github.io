@@ -1,5 +1,5 @@
-import { register, collect, pick } from '../../formats/registry.js?v=202610050144';
-import { countryIds, regionMembers, REGIONS, createMap, frame, message, revealCard, isKids, cname, theName, byLevel, refFor, supportsGeo, REGION_CHOICES, REGION_LABELS, loadFlags } from './common.js?v=202610050144';
+import { register, collect, pick } from '../../formats/registry.js?v=202610051408';
+import { countryIds, regionMembers, REGIONS, createMap, frame, message, revealCard, isKids, cname, theName, byLevel, refFor, supportsGeo, REGION_CHOICES, REGION_LABELS, loadFlags } from './common.js?v=202610051408';
 
 const FLAGS = await loadFlags();
 
@@ -23,8 +23,8 @@ export default register({
   id: 'flag-map', title: 'Flag on the map', icon: '🏳️', blurb: 'See a flag, tap its country', tags: ['map', 'kids'],
   options: [{ key: 'region', label: 'Map', type: 'choice', values: REGION_CHOICES, labels: REGION_LABELS, default: 'world' }],
   supports: supportsGeo, packless: true,
-  generate({ rng, packs = [], count, opts = {}, difficulty = 0, avoid }) {
-    const kids = !!opts.kids, level = kids ? 1 : difficulty || 0;
+  generate({ rng, packs = [], count, opts = {}, difficulty = 0, avoid, kids: kidsArg }) {
+    const kids = !!(opts.kids || kidsArg), level = kids ? 1 : difficulty || 0;
     const region = REGIONS[opts.region] ? opts.region : 'world';
     const members = (region === 'world' ? countryIds() : regionMembers(region)).filter(iso => flagFor(packs, iso));
     const pool = byLevel(members, level, undefined, 8);
