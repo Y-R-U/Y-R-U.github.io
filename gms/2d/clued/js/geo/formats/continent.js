@@ -1,6 +1,6 @@
-import { register, collect, pick, shuffle } from '../../formats/registry.js?v=202610050139';
-import { geo, countryIds, createMap, frame, message, revealCard, isKids, cname, theName, byLevel, refFor, supportsGeo, CONTINENTS, loadFlags } from './common.js?v=202610050139';
-import { CONTINENT_FILL } from '../style.js?v=202610050139';
+import { register, collect, pick, shuffle } from '../../formats/registry.js?v=202610050144';
+import { geo, countryIds, createMap, frame, message, revealCard, isKids, cname, theName, byLevel, refFor, supportsGeo, CONTINENTS, loadFlags } from './common.js?v=202610050144';
+import { CONTINENT_FILL } from '../style.js?v=202610050144';
 
 const CODES = ['AF', 'AS', 'EU', 'NA', 'SA', 'OC'];
 const GLOBE = { AF: '🌍', EU: '🌍', AS: '🌏', OC: '🌏', NA: '🌎', SA: '🌎' };

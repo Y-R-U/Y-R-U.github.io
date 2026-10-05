@@ -2,13 +2,13 @@
 // Also "finish the line" for public-domain songs (items with `lyrics`).
 import {
   register, poolItems, distractors, byDifficulty, placeAnswer, collect, pick, shuffle, hasAudio, imageOf, hasImg, pickPack,
-} from '../formats/registry.js?v=202610050139';
-import { h, choiceGrid, esc } from '../ui/kit.js?v=202610050139';
-import { basePoints } from '../core/scoring.js?v=202610050139';
-import * as clip from './clip.js?v=202610050139';
-import { revealHTML, BADGE_CSS, art as artUrl, previewUrl } from './apple.js?v=202610050139';
-import { getCtx, unlock, begin, end } from './ctx.js?v=202610050139';
-import { LISTEN_CSS } from './listen_css.js?v=202610050139';
+} from '../formats/registry.js?v=202610050144';
+import { h, choiceGrid, esc } from '../ui/kit.js?v=202610050144';
+import { basePoints } from '../core/scoring.js?v=202610050144';
+import * as clip from './clip.js?v=202610050144';
+import { revealHTML, BADGE_CSS, art as artUrl, previewUrl } from './apple.js?v=202610050144';
+import { getCtx, unlock, begin, end } from './ctx.js?v=202610050144';
+import { LISTEN_CSS } from './listen_css.js?v=202610050144';
 
 const CLIPS = [1, 2, 3, 5, 10, 15, 30];
 const CLIP_MUL = { 1: 2, 2: 1.7, 3: 1.5, 5: 1.25, 10: 1, 15: 0.85, 30: 0.7 };

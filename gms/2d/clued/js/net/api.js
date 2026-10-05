@@ -1,7 +1,7 @@
 // Clued server client: base URL, JSON requests, server clock, live room subscription (SSE → long-poll fallback).
-import { idToken } from './ident.js?v=202610050139';
+import { idToken } from './ident.js?v=202610050144';
 
-const DEFAULT_API = location.origin.includes('br8t.com') ? '/gms/2d/clued/api' : 'https://games.br8t.com/gms/2d/clued/api';
+const DEFAULT_API = location.hostname === 'games.br8t.com' ? '/gms/2d/clued/api' : 'https://games.br8t.com/gms/2d/clued/api';
 
 // ?api=http://127.0.0.1:PORT/gms/2d/clued/api points a local page at a local server (testing only).
 // The shell strips the query on boot, so also read the original navigation URL.

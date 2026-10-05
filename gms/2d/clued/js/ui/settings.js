@@ -1,13 +1,13 @@
-import { h, esc } from './kit.js?v=202610050139';
-import { setBgm, canFullscreen, toggleFullscreen } from './toggles.js?v=202610050139';
-import { defineScreen, header, back } from './app.js?v=202610050139';
-import { getSettings, setSettings, ANSWER_TIMES } from '../core/store.js?v=202610050139';
-import { getIndex, loadPacks, loadedPacks, allPackIds } from '../core/packs.js?v=202610050139';
-import { applyAudioSettings, sfx } from './fx.js?v=202610050139';
-import { applyKids } from './home.js?v=202610050139';
-import { loadLearn } from './net.js?v=202610050139';
-import { BUILD } from '../build.js?v=202610050139';
-import { canSpeak, speak } from './speech.js?v=202610050139';
+import { h, esc } from './kit.js?v=202610050144';
+import { setBgm, canFullscreen, toggleFullscreen } from './toggles.js?v=202610050144';
+import { defineScreen, header, back } from './app.js?v=202610050144';
+import { getSettings, setSettings, ANSWER_TIMES } from '../core/store.js?v=202610050144';
+import { getIndex, loadPacks, loadedPacks, allPackIds } from '../core/packs.js?v=202610050144';
+import { applyAudioSettings, sfx } from './fx.js?v=202610050144';
+import { applyKids } from './home.js?v=202610050144';
+import { loadLearn } from './net.js?v=202610050144';
+import { BUILD } from '../build.js?v=202610050144';
+import { canSpeak, speak } from './speech.js?v=202610050144';
 
 function toggleRow(label, help, key, after) {
   const s = getSettings();

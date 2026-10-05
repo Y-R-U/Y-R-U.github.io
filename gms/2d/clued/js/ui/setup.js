@@ -1,13 +1,13 @@
 // Format grid + per-game setup (themes, count, options, difficulty, timer).
-import { h } from './kit.js?v=202610050139';
-import { defineScreen, go, header } from './app.js?v=202610050139';
-import { listFormats, getFormat, defaultOpts } from '../formats/registry.js?v=202610050139';
-import { getIndex } from '../core/packs.js?v=202610050139';
-import { supportedPackIds, formatAvailable } from '../core/spec.js?v=202610050139';
-import { getSettings, getLast, setLast, ANSWER_TIMES } from '../core/store.js?v=202610050139';
-import { themePicker } from './picker.js?v=202610050139';
-import { STRUCTURES } from '../structures/index.js?v=202610050139';
-import { sfx } from './fx.js?v=202610050139';
+import { h } from './kit.js?v=202610050144';
+import { defineScreen, go, header } from './app.js?v=202610050144';
+import { listFormats, getFormat, defaultOpts } from '../formats/registry.js?v=202610050144';
+import { getIndex } from '../core/packs.js?v=202610050144';
+import { supportedPackIds, formatAvailable } from '../core/spec.js?v=202610050144';
+import { getSettings, getLast, setLast, ANSWER_TIMES } from '../core/store.js?v=202610050144';
+import { themePicker } from './picker.js?v=202610050144';
+import { STRUCTURES } from '../structures/index.js?v=202610050144';
+import { sfx } from './fx.js?v=202610050144';
 
 export const DIFFS = [[0, 'Mixed'], [1, 'Easy'], [2, 'Medium'], [3, 'Hard']];
 

@@ -1,5 +1,5 @@
-import { register, collect, pick } from '../../formats/registry.js?v=202610050139';
-import { countryIds, regionMembers, REGIONS, createMap, frame, message, revealCard, isKids, cname, theName, byLevel, refFor, supportsGeo, REGION_CHOICES, REGION_LABELS, loadFlags } from './common.js?v=202610050139';
+import { register, collect, pick } from '../../formats/registry.js?v=202610050144';
+import { countryIds, regionMembers, REGIONS, createMap, frame, message, revealCard, isKids, cname, theName, byLevel, refFor, supportsGeo, REGION_CHOICES, REGION_LABELS, loadFlags } from './common.js?v=202610050144';
 
 const FLAGS = await loadFlags();
 

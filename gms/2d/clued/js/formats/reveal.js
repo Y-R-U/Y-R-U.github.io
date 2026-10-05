@@ -1,6 +1,6 @@
-import { register, poolItems, pickPack, byDifficulty, distractors, imageOf, fill, placeAnswer, collect, pick, shuffle } from './registry.js?v=202610050139';
-import { h, choiceGrid } from '../ui/kit.js?v=202610050139';
-import { injectCSS, baseCSS, stages, once, hasImg } from './fkit.js?v=202610050139';
+import { register, poolItems, pickPack, byDifficulty, distractors, imageOf, fill, placeAnswer, collect, pick, shuffle } from './registry.js?v=202610050144';
+import { h, choiceGrid } from '../ui/kit.js?v=202610050144';
+import { injectCSS, baseCSS, stages, once, hasImg } from './fkit.js?v=202610050144';
 
 const CSS = `
 .rx-pic{position:relative;flex:1 1 0;min-height:170px;border:var(--line) solid var(--ink);border-radius:var(--r);overflow:hidden;background:#1f1a4d;box-shadow:var(--shadow)}

@@ -1,5 +1,5 @@
-import { register, collect, pick } from '../../formats/registry.js?v=202610050139';
-import { geo, countryIds, isPlayable, REGIONS, createMap, frame, message, button, isKids, cname, theName, byLevel, refFor, supportsGeo, bboxUnion, plural } from './common.js?v=202610050139';
+import { register, collect, pick } from '../../formats/registry.js?v=202610050144';
+import { geo, countryIds, isPlayable, REGIONS, createMap, frame, message, button, isKids, cname, theName, byLevel, refFor, supportsGeo, bboxUnion, plural } from './common.js?v=202610050144';
 
 // Borders that surprise people, explained on the reveal.
 const NOTES = {

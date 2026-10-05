@@ -1,7 +1,7 @@
-import { register, poolItems, byDifficulty, factText, collect, pick, shuffle, sample } from './registry.js?v=202610050139';
-import { h } from '../ui/kit.js?v=202610050139';
-import { norm, injectCSS, baseCSS, once } from './fkit.js?v=202610050139';
-import { toast } from '../ui/popup.js?v=202610050139';
+import { register, poolItems, byDifficulty, factText, collect, pick, shuffle, sample } from './registry.js?v=202610050144';
+import { h } from '../ui/kit.js?v=202610050144';
+import { norm, injectCSS, baseCSS, once } from './fkit.js?v=202610050144';
+import { toast } from '../ui/popup.js?v=202610050144';
 
 const CSS = `
 .cn{gap:10px}
