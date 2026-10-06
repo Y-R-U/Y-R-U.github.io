@@ -1,5 +1,5 @@
-import { THREE, makeProp, Builder, roundedBox, gloss, ease, worldPos } from './util.js';
-import { buildLasagnaPanFilling, tickFood, foodMats } from '../food.js';
+import { THREE, makeProp, Builder, roundedBox, gloss, ease, worldPos, palette } from './util.js';
+import { buildLasagnaPanFilling, tickFood } from '../food.js';
 
 const W = 0.32, D = 0.22, H = 0.065, WALL = 0.014;
 const PAN_SCALE = 1.2;
@@ -7,30 +7,28 @@ const PAN_SCALE = 1.2;
 export function createPan(ctx) {
   const p = makeProp('pan', ctx);
   const q = ctx.quality || 'high';
-  const outer = gloss(0xd0552c, { roughness: 0.3, clearcoat: 0.9 });
-  const inner = gloss(0xf7ead2, { roughness: 0.25, clearcoat: 0.8 });
+  const PAL = palette();
   const holder = new THREE.Group(); holder.scale.setScalar(PAN_SCALE); p.root.add(holder);
   const b = new Builder();
-  b.add(roundedBox(W, 0.016, D, 0.007, 2), outer, { pos: [0, 0.008, 0] });
-  b.add(roundedBox(W, H, WALL, 0.006, 2), outer, { pos: [0, H / 2, D / 2 - WALL / 2] });
-  b.add(roundedBox(W, H, WALL, 0.006, 2), outer, { pos: [0, H / 2, -D / 2 + WALL / 2] });
-  b.add(roundedBox(WALL, H, D, 0.006, 2), outer, { pos: [W / 2 - WALL / 2, H / 2, 0] });
-  b.add(roundedBox(WALL, H, D, 0.006, 2), outer, { pos: [-W / 2 + WALL / 2, H / 2, 0] });
+  b.add(roundedBox(W, 0.016, D, 0.007, 2), PAL.gloss, { pos: [0, 0.008, 0] }, 0xd0552c);
+  b.add(roundedBox(W, H, WALL, 0.006, 2), PAL.gloss, { pos: [0, H / 2, D / 2 - WALL / 2] }, 0xd0552c);
+  b.add(roundedBox(W, H, WALL, 0.006, 2), PAL.gloss, { pos: [0, H / 2, -D / 2 + WALL / 2] }, 0xd0552c);
+  b.add(roundedBox(WALL, H, D, 0.006, 2), PAL.gloss, { pos: [W / 2 - WALL / 2, H / 2, 0] }, 0xd0552c);
+  b.add(roundedBox(WALL, H, D, 0.006, 2), PAL.gloss, { pos: [-W / 2 + WALL / 2, H / 2, 0] }, 0xd0552c);
   // rim lip + handles
-  b.add(roundedBox(W + 0.008, 0.008, WALL + 0.008, 0.004, 2), inner, { pos: [0, H, D / 2 - WALL / 2] });
-  b.add(roundedBox(W + 0.008, 0.008, WALL + 0.008, 0.004, 2), inner, { pos: [0, H, -D / 2 + WALL / 2] });
-  b.add(roundedBox(WALL + 0.008, 0.008, D, 0.004, 2), inner, { pos: [W / 2 - WALL / 2, H, 0] });
-  b.add(roundedBox(WALL + 0.008, 0.008, D, 0.004, 2), inner, { pos: [-W / 2 + WALL / 2, H, 0] });
-  for (const s of [-1, 1]) b.add(roundedBox(0.035, 0.012, 0.11, 0.006, 2), outer, { pos: [s * (W / 2 + 0.016), H - 0.008, 0] });
-  b.add(new THREE.BoxGeometry(W - WALL * 2, 0.002, D - WALL * 2), inner, { pos: [0, 0.017, 0] });
+  b.add(roundedBox(W + 0.008, 0.008, WALL + 0.008, 0.004, 2), PAL.gloss, { pos: [0, H, D / 2 - WALL / 2] }, 0xf7ead2);
+  b.add(roundedBox(W + 0.008, 0.008, WALL + 0.008, 0.004, 2), PAL.gloss, { pos: [0, H, -D / 2 + WALL / 2] }, 0xf7ead2);
+  b.add(roundedBox(WALL + 0.008, 0.008, D, 0.004, 2), PAL.gloss, { pos: [W / 2 - WALL / 2, H, 0] }, 0xf7ead2);
+  b.add(roundedBox(WALL + 0.008, 0.008, D, 0.004, 2), PAL.gloss, { pos: [-W / 2 + WALL / 2, H, 0] }, 0xf7ead2);
+  for (const s of [-1, 1]) b.add(roundedBox(0.035, 0.012, 0.11, 0.006, 2), PAL.gloss, { pos: [s * (W / 2 + 0.016), H - 0.008, 0] }, 0xd0552c);
+  b.add(new THREE.BoxGeometry(W - WALL * 2, 0.002, D - WALL * 2), PAL.gloss, { pos: [0, 0.017, 0] }, 0xf7ead2);
   // baked-on cheese spilling over the rim
-  const melt = foodMats().melt;
   for (const [x, z, L] of [[-0.09, 1, 0.022], [0.03, 1, 0.012], [0.105, 1, 0.028], [-0.03, -1, 0.018], [0.08, -1, 0.01]]) {
     const zi = z * (D / 2 - WALL), zo = z * (D / 2 + 0.006);
     const c = new THREE.CatmullRomCurve3([new THREE.Vector3(x, H - 0.006, zi), new THREE.Vector3(x, H + 0.007, z * (D / 2 - WALL / 2)),
       new THREE.Vector3(x, H - 0.004, zo), new THREE.Vector3(x, H - 0.006 - L, zo)]);
-    b.add(new THREE.TubeGeometry(c, 12, 0.0065, 8), melt);
-    b.add(new THREE.SphereGeometry(0.0075, 8, 6), melt, { pos: [x, H - 0.006 - L, zo] });
+    b.add(new THREE.TubeGeometry(c, 12, 0.0065, 8), PAL.gloss, null, 0xf2b844);
+    b.add(new THREE.SphereGeometry(0.0075, 8, 6), PAL.gloss, { pos: [x, H - 0.006 - L, zo] }, 0xf2b844);
   }
   const dish = b.build('panDish', { cast: false });
   holder.add(dish);

@@ -164,6 +164,10 @@ export async function createWorld({ renderer, quality = 'high', withProps = true
       if (propsMod?.resetProps) propsMod.resetProps(props); else for (const p of props.values()) p.reset?.();
     },
     update(dt, camera, focus) {
+      // the street needs a longer far plane than the interior camera's 90 m (horizon ring sits at 145 m)
+      if (camera && camera.far !== (exteriorOn ? 320 : (camera.userData.farIn ??= camera.far))) {
+        camera.far = exteriorOn ? 320 : camera.userData.farIn; camera.updateProjectionMatrix();
+      }
       if (propsMod?.updateProps) propsMod.updateProps(props, dt); else for (const p of props.values()) p.update?.(dt);
       const c = camera?.position;
       props.get('vine')?.cull?.(c);

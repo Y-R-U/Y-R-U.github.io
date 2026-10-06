@@ -146,7 +146,7 @@ export function scatter(b, bulb, lots) {
     return !lots.some(([lx, lz]) => Math.hypot(x - lx, z - lz) < 8.5);
   };
   let placed = 0;
-  for (let i = 0; i < 400 && placed < 70; i++) {
+  for (let i = 0; i < 700 && placed < 110; i++) {
     const a = rnd() * Math.PI * 2, r = 13 + rnd() * 32;
     const x = bulb.x + Math.cos(a) * r, z = bulb.z + 6 + Math.sin(a) * r;
     if (!clear(x, z)) continue;

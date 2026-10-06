@@ -1,4 +1,4 @@
-import { THREE, makeProp, Builder, lathe, gloss, ease, Particles, worldPos, rng } from './util.js';
+import { THREE, makeProp, Builder, lathe, gloss, ease, Particles, worldPos, rng, palette } from './util.js';
 import { buildSteakDinner, buildLasagnaPlate, buildMeatloafPlate, setFoodEaten, tickFood, foodMats } from '../food.js';
 
 export const FOOD_SCALE = 1.4; // a touch over real size so the food reads from Garfield's camera
@@ -6,13 +6,12 @@ export const FOOD_SCALE = 1.4; // a touch over real size so the food reads from 
 const builders = { steak: buildSteakDinner, lasagna: buildLasagnaPlate, meatloaf: buildMeatloafPlate };
 
 export function plateMesh() {
-  const china = gloss(0xfffaf0, { roughness: 0.18, clearcoat: 1, clearcoatRoughness: 0.08 });
-  const band = gloss(0x3d7cc9, { roughness: 0.25, clearcoat: 1 });
+  const pal = palette().gloss;
   const b = new Builder();
   const prof = [[0, 0.004], [0.06, 0.004], [0.075, 0.0], [0.085, 0.004], [0.088, 0.011], [0.1, 0.014], [0.13, 0.02], [0.136, 0.023], [0.137, 0.019],
     [0.128, 0.015], [0.098, 0.011], [0.088, 0.008], [0.08, 0.006], [0.07, 0.009], [0.06, 0.012], [0, 0.012]];
-  b.add(lathe(prof, 48), china);
-  b.add(lathe([[0.1295, 0.0203], [0.1225, 0.0185]], 48), band, { pos: [0, 0.0008, 0] });
+  b.add(lathe(prof, 48), pal, null, 0xfffaf0);
+  b.add(lathe([[0.1295, 0.0203], [0.1225, 0.0185]], 48), pal, { pos: [0, 0.0008, 0] }, 0x3d7cc9);
   const m = b.build('plate', { cast: false });
   return m;
 }

@@ -33,7 +33,13 @@ export function createChair(ctx) {
   b.add(new THREE.CylinderGeometry(0.01, 0.01, SW - 0.06, 8), wood, { pos: [0, 0.14, LEG_Z], rot: [0, 0, Math.PI / 2] });
   b.add(new THREE.CylinderGeometry(0.01, 0.01, SD - 0.06, 8), wood, { pos: [LEG_X, 0.16, 0], rot: [Math.PI / 2, 0, 0] });
   b.add(new THREE.CylinderGeometry(0.01, 0.01, SD - 0.06, 8), wood, { pos: [-LEG_X, 0.16, 0], rot: [Math.PI / 2, 0, 0] });
-  body.add(b.build('chairBody'));
+  // intact lower back legs ride in the merged body (drawRange-trimmed when one breaks): 2 fewer draw calls at rest
+  const legStart = b.marks().get(wood);
+  for (const sx of [-1, 1]) b.add(leg(BREAK_Y), wood, { pos: [sx * LEG_X, 0, -LEG_Z] });
+  const bodyMesh = b.build('chairBody');
+  body.add(bodyMesh);
+  const woodMesh = bodyMesh.children.find(m => m.userData.mat === wood);
+  const legsMerged = on => { woodMesh.geometry.setDrawRange(0, on ? Infinity : legStart); for (const L of lowers) L.m.visible = !on; };
 
   // lower back legs: [0] = left (-X), [1] = right (+X); matches legPos() / legPosR()
   const jag = new THREE.ConeGeometry(0.02, 0.03, 6);
@@ -47,6 +53,7 @@ export function createChair(ctx) {
     body.add(up); m.add(dn);
     return { m, home, up, dn, sx, vel: new THREE.Vector3(), spin: new THREE.Vector3(), flying: false };
   });
+  legsMerged(true);
 
   // Jon socket: seat surface centre
   const seat = new THREE.Object3D(); seat.name = 'chairSeat'; seat.position.set(0, SEAT, 0.0); body.add(seat);
@@ -89,6 +96,7 @@ export function createChair(ctx) {
     const L = lowers[i ? 1 : 0];
     p.sfx('crash', { rate: 1.6, vol: 0.8 });
     L.up.visible = L.dn.visible = true;
+    legsMerged(false);
     const at = new THREE.Vector3(L.sx * LEG_X, BREAK_Y, -LEG_Z);
     body.localToWorld(at);
     for (let k = 0; k < 16; k++) {
@@ -142,6 +150,7 @@ export function createChair(ctx) {
     p.anim.clear(); splinters.clear();
     pivot.position.set(0, 0, -LEG_Z); pivot.rotation.set(0, 0, 0);
     for (const L of lowers) { L.flying = false; L.m.position.copy(L.home); L.m.rotation.set(0, 0, 0); L.up.visible = L.dn.visible = false; }
+    legsMerged(true);
     resetState(); syncColliders(p);
   };
   p.legPos = (out = new THREE.Vector3()) => { out.set(-LEG_X, BREAK_Y * 0.6, -LEG_Z); return body.localToWorld(out); };

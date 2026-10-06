@@ -381,8 +381,8 @@ export function buildLasagnaPlate(quality = 'high') {
   const b = lasagnaBlock(0.1, 0.072, 0.052, quality, 5);
   // basil leaves
   const leaf = () => { const s = new THREE.SphereGeometry(0.012, 10, 6); s.scale(1, 0.16, 0.55); return s; };
-  b.add(leaf(), m.basil, { pos: [0.012, 0.0585, 0.004], rot: [0.1, 0.7, 0.15] });
-  b.add(leaf(), m.basil, { pos: [-0.002, 0.0595, -0.004], rot: [-0.1, -0.5, -0.1] });
+  b.add(leaf(), m.layer, { pos: [0.012, 0.0585, 0.004], rot: [0.1, 0.7, 0.15] }, 0x3f8f2a);
+  b.add(leaf(), m.layer, { pos: [-0.002, 0.0595, -0.004], rot: [-0.1, -0.5, -0.1] }, 0x3f8f2a);
   const slice = b.build('slice'); slice.position.set(0.005, PLATE_Y + 0.001, 0); slice.rotation.y = -0.25;
   item(g, slice, 4);
   // sauce pool

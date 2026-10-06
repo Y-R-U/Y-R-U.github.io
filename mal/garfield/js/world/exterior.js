@@ -287,9 +287,9 @@ function makeHorizon() {
   }
   const tex = new THREE.CanvasTexture(c);
   tex.colorSpace = THREE.SRGBColorSpace; tex.wrapS = THREE.RepeatWrapping; tex.repeat.x = 3;
-  const m = new THREE.Mesh(new THREE.CylinderGeometry(135, 135, 30, 64, 1, true),
+  const m = new THREE.Mesh(new THREE.CylinderGeometry(150, 150, 30, 64, 1, true),
     new THREE.MeshBasicMaterial({ map: tex, side: THREE.BackSide, transparent: true, fog: false, depthWrite: false }));
-  m.position.set(4.6, GROUND_Y + 15 - 30 * 0.45, -10);
+  m.position.set(4.6, GROUND_Y + 15 - 30 * 0.6, -10);
   m.name = 'horizon';
   m.renderOrder = -6;
   return m;

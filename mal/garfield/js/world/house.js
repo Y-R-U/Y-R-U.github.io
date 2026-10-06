@@ -527,7 +527,7 @@ export function buildHouse({ quality = 'high' } = {}) {
     b.box('metal', 0.5, ctrTop + 0.12, z0 + 0.15, 0.7, ctrTop + 0.14, z0 + 0.19, 0x2a2a2a, { r: 0.008 });
   }
   // upper cabinets (kept clear of the microwave → fridge climb)
-  for (const [x0, x1] of [[0, 1.65], [3.15, 4.4]]) {
+  for (const [x0, x1] of [[0, 1.65], [3.15, 3.98]]) {
     b.box('wood', x0, 1.5, D - 0.34, x1, 2.2, D, C.cabinet, { r: 0.012 });
     const n = Math.round((x1 - x0) / 0.42);
     for (let i = 0; i < n; i++) {
@@ -574,7 +574,7 @@ export function buildHouse({ quality = 'high' } = {}) {
     const dome = [[0.0, 0.26], [0.04, 0.255], [0.13, 0.22], [0.2, 0.15], [0.24, 0.06], [0.255, 0], [0.25, -0.005]].map(([r, h]) => [r * k, h * k]);
     b.cyl('metal', null, x, (y + CEIL1) / 2 + 0.15, z, 0.006, 0.006, CEIL1 - y - 0.3, 0x333333, { radial: 4 });
     b.cyl('metal', null, x, y + 0.36, z, 0.035, 0.05, 0.1, 0xe8b54a, { radial: 12, cast: false });
-    b.lathe('shadeGlow', null, x, y, z, dome, 0xffffff, { radial: 28, cast: false, receive: false });
+    b.lathe('glowShade', null, x, y, z, dome, 0xf6e2b0, { radial: 28, cast: false, receive: false });
     b.lathe('glowShade', null, x, y + 0.01, z, [[0.24 * k, 0], [0.0, 0.0]], 0xffffff, { radial: 28, cast: false });
     b.sphere('glowWarm', null, x, y + 0.05, z, 0.075, 0xffffff, { cast: false });
     b.cyl('metal', null, x, CEIL1 - 0.01, z, 0.07, 0.07, 0.02, 0xe8b54a, { radial: 16 });

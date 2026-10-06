@@ -2,6 +2,8 @@ import * as THREE from '../../vendor/three/three.module.js';
 import { mergeGeometries } from '../../vendor/three/addons/utils/BufferGeometryUtils.js';
 import { material } from './materials.js';
 
+// near-identical looks folded together to save draw calls
+const ALIAS = { ceramic: 'gloss', shadeGlow: 'glowShade', metal: 'gloss', wood: 'woodGloss' };
 const _v = new THREE.Vector3(), _n = new THREE.Vector3(), _c = new THREE.Color();
 
 // Rounded box: segments concentrated in the corner radius, vertices pushed onto the rounded hull.
@@ -39,6 +41,7 @@ export class Builder {
 
   // Bakes matrix, world-space UVs (metres) and vertex colour (tint × AO) into a geometry and buckets it.
   geom(matKey, g, matrix, color = 0xffffff, opts = {}) {
+    matKey = ALIAS[matKey] || matKey;
     g = g.index ? g : g;
     if (matrix) g.applyMatrix4(matrix);
     for (const k of Object.keys(g.attributes)) if (!['position', 'normal', 'uv'].includes(k)) g.deleteAttribute(k);
@@ -157,6 +160,17 @@ export class Builder {
   }
 
   build(name = 'static') {
+    // one mesh per layer+material: a cast/no-cast split costs a main-pass draw call, merging only adds shadow tris
+    const merged = new Map();
+    for (const [key, list] of this.buckets) {
+      const [layer, matKey, cast, recv] = key.split('|');
+      const k2 = `${layer}|${matKey}|${recv}`;
+      if (!merged.has(k2)) merged.set(k2, { cast: '0', list: [] });
+      const e = merged.get(k2);
+      if (cast === '1') e.cast = '1';
+      e.list.push(...list);
+    }
+    this.buckets = new Map([...merged].map(([k2, e]) => { const [l, m, r] = k2.split('|'); return [`${l}|${m}|${e.cast}|${r}`, e.list]; }));
     const root = new THREE.Group();
     root.name = name;
     const layers = {};
