@@ -12,7 +12,7 @@ ROOT = Path(__file__).resolve().parents[2]
 mf = json.load(open(ROOT / "audio/vo/manifest.json"))
 QC = ROOT / "tools/media/scratch/qc.json"
 qc = json.load(open(QC)) if QC.exists() else {}
-keys = sys.argv[1:] or [k for k in mf if (ROOT / f"audio/vo/{k}.mp3").exists()]
+keys = [a for a in sys.argv[1:] if not a.startswith("--")] or [k for k in mf if (ROOT / f"audio/vo/{k}.mp3").exists()]
 
 from mlx_audio.stt.utils import load_model
 from transformers import WhisperProcessor
@@ -25,20 +25,29 @@ def words(t):
     t = t.lower().replace("’", "'")
     return [NUM.get(w, w) for w in re.findall(r"[a-z0-9']+", t)]
 
+INTERJ = re.compile(r"^(a+h+|w?h?o+a+h?|m+[mhp]*|h?m+f?|p?h?ew|w?h?ew|ow+|ugh|uh+|oo+f|bl?e+ch|ha+|hu+h)$")
+def same(a, b):
+    return a == b or (len(b) > 3 and a[:4] == b[:4]) or (INTERJ.match(a) and INTERJ.match(b))
+
 def score(target, asr):
     tw = words(target); aw = words(asr)[: len(tw) + 4]
     if not tw: return 1.0
     j = hit = 0
     for w in tw:
         for k in range(j, min(len(aw), j + 4)):
-            if aw[k] == w or (len(w) > 3 and aw[k][:4] == w[:4]):
+            if same(aw[k], w):
                 hit += 1; j = k + 1; break
     return hit / len(tw)
 
+if "--rescore" in sys.argv:
+    for k, v in qc.items():
+        if k in mf: v["score"] = round(score(mf[k]["text"], v["asr"]), 2)
+    json.dump(qc, open(QC, "w"), indent=1)
+    keys = []
 for k in keys:
     p = str(ROOT / f"audio/vo/{k}.mp3")
     if not os.path.exists(p): continue
-    if k in qc and qc[k].get("gen_text") == mf[k].get("gen_text") and qc[k].get("mtime") == os.path.getmtime(p) and not sys.argv[1:]:
+    if k in qc and qc[k].get("gen_text") == mf[k].get("gen_text") and qc[k].get("mtime") == os.path.getmtime(p) and not [a for a in sys.argv[1:] if not a.startswith("--")]:
         continue
     asr = model.generate(p, language="en").text.strip()
     x, sr = load(p); f = f0(x, sr)

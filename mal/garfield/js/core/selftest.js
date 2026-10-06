@@ -5,6 +5,9 @@ const CASES = [
   ['table holding forward', [3.9, 0, 7.5, 0], [{ t: 0.2, y: 1 }, { t: 0.5, y: 1, jump: 1 }, { t: 0.1 }], /table:top/],
   ['chair then table', [4.4, 0, 7.2, 0], [{ t: 0.1, y: 1 }, { t: 0.4, y: 0.6, jump: 1 }, { t: 0.4 }, { t: 0.35, y: 1, jump: 1 }, { t: 0.5 }], /table:top/],
   ['counter from bench side', [4.4, 0, 9.95, 0], [{ t: 0.4, y: 1, jump: 1 }, { t: 0.5 }], /counter/],
+  ['table rim from under', [3.9, 0, 8.25, 0], [{ t: 0.05, y: 1 }, { t: 0.5, y: 1, jump: 1 }, { t: 0.5 }], /table:top|bench/],
+  ['bench from under table', [4.4, 0, 9.15, 0], [{ t: 0.1, y: 0.6 }, { t: 0.5, y: 0.6, jump: 1 }, { t: 0.5 }], /bench|table:top/],
+  ['counter to microwave', [4.1, 0.92, 10.75, PI / 2], [{ t: 0.2, y: 1 }, { t: 0.5, y: 1, jump: 1 }, { t: 0.5 }], /microwave/],
   ['microwave to fridge', [4.95, 1.27, 10.72, PI / 2], [{ t: 0.45, y: 1, jump: 1 }, { t: 0.5 }], /fridge/],
   ['fridge holding forward', [4.95, 1.27, 10.72, PI / 2], [{ t: 0.6, y: 1, jump: 1 }, { t: 0.1 }], /fridge/],
   ['windowsill', [3.0, 0, 1.4, PI], [{ t: 0.3, y: 1 }, { t: 0.5, y: 1, jump: 1 }, { t: 0.4 }], /windowsill/],
@@ -15,14 +18,18 @@ const CASES = [
 ];
 
 export function selfTest(g) {
-  const c = g.sys.controller, saved = { pos: c.pos.clone(), rot: g.sys.garfield.root.rotation.y, yaw: g.sys.camera.yaw };
+  const c = g.sys.controller, saved = { pos: c.pos.clone(), rot: g.sys.garfield.root.rotation.y, yaw: g.sys.camera.yaw, belly: c.belly, locked: c.locked };
   const rows = [];
+  // Belly changes speed and height (it grows with every level won), so pin it: the routes are timed.
+  c.setBelly(0.3); c.locked = false;
   for (const [name, [x, y, z, r], steps, want] of CASES) {
+    c.knockT = 0; c.bufferT = 0; c.coyoteT = 0; c.landT = 0; c.jumping = false; c.jumpedT = 0; c.airT = 0;
     g.teleport(x, y, z, r);
     g.sys.camera.yaw = r + PI;
     const end = g.sim(steps).pop();
     rows.push(`${want.test(end) ? 'PASS' : 'FAIL'} ${name}: ${end}`);
   }
+  c.setBelly(saved.belly); c.locked = saved.locked;
   c.teleport(saved.pos, saved.rot);
   g.sys.camera.yaw = saved.yaw;
   return { pass: rows.filter((r) => r.startsWith('PASS')).length, total: rows.length, rows };

@@ -130,7 +130,7 @@ export default defineLevel({
 
 function onFridge(L) {
   const c = L.ctx.controller, ft = fridgeTopPos(L.ctx);
-  return c.pos.y > ft.y - 0.15 && Math.hypot(c.pos.x - ft.x, c.pos.z - ft.z) < 0.9;
+  return c.grounded && c.pos.y > ft.y - 0.15 && Math.hypot(c.pos.x - ft.x, c.pos.z - ft.z) < 0.9;
 }
 
 function startSwing(L) {
@@ -144,7 +144,7 @@ function startSwing(L) {
   if (vine) { vine.autoSwing = false; vine.grab?.(); }
   try { ctx.garfield.play?.('hang', { fade: 0.12 }); ctx.garfield.setExpression?.('happy'); } catch {}
   L.say('g_l05_grab', { force: true });
-  ctx.ui?.toast?.('Press Space when you are over the pan!');
+  ctx.ui?.toast?.(ctx.ui?.isTouch ? 'Tap any button when you are over the pan!' : 'Press Space when you are over the pan!');
   ctx.events.emit('swing', { on: true });
   // side-on view of the whole arc so the kid can see the pan coming
   try {
@@ -198,7 +198,7 @@ function updateSwing(L, dt) {
   L.flags.wasOver = over && !L.flags.caught;
   if (over) L.flags.overAt = L.t;
   const nearlyOver = over || L.t - (L.flags.overAt ?? -9) < 0.3;   // forgiving: a slightly late press still counts
-  ctx.ui?.hud?.set?.({ interactLabel: !L.flags.caught && over ? 'SPACE!' : null });
+  ctx.ui?.hud?.set?.({ interactLabel: !L.flags.caught && over ? (ctx.ui?.isTouch ? 'GRAB!' : 'SPACE!') : null });
   // count passes (each time the swing turns around)
   const side = Math.sign(Math.sin(phase)) || 1;
   if (side !== L.flags.lastSide) { L.flags.lastSide = side; L.flags.passes++; }

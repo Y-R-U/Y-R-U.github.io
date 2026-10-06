@@ -29,6 +29,7 @@ export function createMarker(ctx) {
     visible: true,
     set(fn, opts = {}) { getPos = fn; h = opts.height ?? 0.55; },
     get active() { return !!getPos; },
+    goal: (out = new THREE.Vector3()) => (getPos ? getPos(out) : null),
     update(dt) {
       t += dt;
       if (!getPos || !m.visible) { sprite.visible = false; return; }

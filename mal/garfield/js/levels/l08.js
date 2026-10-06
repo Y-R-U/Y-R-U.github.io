@@ -37,7 +37,8 @@ export default defineLevel({
       // nearest point of the bed to Garfield, at claw height
       const b = prop(ctx, 'jonBed'), p = bedPos(ctx), g = ctx.controller.pos;
       const half = b?.size ? V(b.size.w / 2, 0, b.size.d / 2) : V(0.75, 0, 1.0);
-      return V(THREE.MathUtils.clamp(g.x, p.x - half.x, p.x + half.x), g.y + 0.26, THREE.MathUtils.clamp(g.z, p.z - half.z, p.z + half.z));
+      return V(THREE.MathUtils.clamp(g.x, p.x - half.x, p.x + half.x), THREE.MathUtils.clamp(g.y + 0.26, p.y, p.y + 0.8),   // (clamped: not from the living room below)
+         THREE.MathUtils.clamp(g.z, p.z - half.z, p.z + half.z));
     }, () => scratchBed(L), { radius: 0.3, heightTol: 0.8, enabled: () => !L.flags.called });
     ctx.interact.register({
       id: 'bedroomDoor', radius: 1.1, heightTol: 0.6, markerHeight: 1.0,

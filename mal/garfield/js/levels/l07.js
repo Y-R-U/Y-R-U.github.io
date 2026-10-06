@@ -51,14 +51,19 @@ function openWindow(L) {
     t.say('j_cold_1', { force: true });
     try { ctx.jon.setExpression?.('shock'); } catch {}
     await t.play('stunned_shake', 1.2, { fallback: 'idle' });
-    await t.play('stand_up', 0.8, { fallback: 'idle' });
+    await ai.standUp(t);
     t.say('j_cold_2', { force: true });
     await t.walkTo(stand, { arrive: 0.25 });
     await t.face(sillP);
     if (L.flags.sill.isOn()) {
       t.say('j_shoo', { force: true });
-      const away = new THREE.Vector3().subVectors(stand, sillP).setY(0).normalize();
-      ctx.controller.knockback(away, 2.2);
+      // straight off the front of the sill, away from the window (intoRoom runs along the sill here)
+      const wp = apos(ctx, 'window') || sillP;
+      const away = new THREE.Vector3().subVectors(ctx.controller.pos, wp).setY(0);
+      away.x *= 0.3;
+      if (away.lengthSq() < 1e-4) away.set(0, 0, 1);
+      away.normalize();
+      ctx.controller.knockback(away, 3.4);
       await t.wait(0.6);
     }
     await t.play('close_window', 1.4, { fallback: 'idle' });

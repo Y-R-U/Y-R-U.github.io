@@ -3,10 +3,10 @@ import { SFX, LEVEL } from './sfx.js';
 
 const BASE = new URL('../../audio/', import.meta.url).href;
 const MUSIC = {
-  menu: { file: 'music/menu.mp3', loop: true, gain: 0.9 },
-  sneak: { file: 'music/sneak.mp3', loop: true, gain: 0.8 },
-  chase: { file: 'music/chase.mp3', loop: true, gain: 0.85 },
-  cutscene: { file: 'music/cutscene.mp3', loop: true, gain: 0.75 },
+  menu: { file: 'music/menu.mp3', len: 82.2424, loop: true, gain: 0.9 },
+  sneak: { file: 'music/sneak.mp3', len: 82.2424, loop: true, gain: 0.8 },
+  chase: { file: 'music/chase.mp3', len: 69.5, loop: true, gain: 0.85 },
+  cutscene: { file: 'music/cutscene.mp3', len: 61.0, loop: true, gain: 0.75 },
   victory: { file: 'music/victory.mp3', loop: false, gain: 1 },
   fanfare: { file: 'music/fanfare.mp3', loop: false, gain: 1 },
   title: { file: 'music/title_song.mp3', loop: true, gain: 0.85 },

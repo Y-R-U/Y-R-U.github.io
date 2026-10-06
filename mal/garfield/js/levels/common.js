@@ -177,13 +177,16 @@ function makeRuntime(ctx, spec) {
 
   // ---------------- hints ----------------
   function updateHints(dt) {
-    if (ctx.director?.active || ai.state === 'chase' || ai.state === 'glare' || L.eating || L.won) return;
+    if (ctx.director?.active || ctx.controller.locked || ai.state === 'chase' || ai.state === 'glare' || L.eating || L.won) return;
     L.hintT += dt;
     const hints = spec.hints || [];
     if (!hints.length) return;
     const wait = L.hintI === 0 ? HINT_AFTER : HINT_AFTER + 5;
     if (L.hintT > wait) {
       L.hintT = 0;
+      // never hint at a step that's already done (hint N roughly matches objective N)
+      const done = L.objDone.filter(Boolean).length;
+      L.hintI = Math.max(L.hintI, Math.min(done, hints.length - 1));
       const k = hints[Math.min(L.hintI, hints.length - 1)];
       L.hintI++;
       barks.say(k, { force: true });
@@ -199,6 +202,34 @@ function makeRuntime(ctx, spec) {
     if (nearT > 0) return;
     nearT = 0.5;
     if (flat(ctx.controller.pos, L.foodPos()) < 1.4) barks.near(spec.food);
+  }
+
+  // Jon's body is solid to the cat (standing, walking or lying on the floor); seated upright, the chair handles it
+  // (and L9 needs the cat under the chair).
+  const hA = V(), hB = V(), seg = V(), cp = V();
+  function separateFromJon() {
+    const c = ctx.controller, jon = ctx.jon;
+    if (ctx.director?.active || c.locked || L.eating || L.won || ai.state === 'catch') return;
+    const head = jon.sockets?.head, hips = jon.sockets?.hips;
+    if (!head || !hips || jon.root.visible === false) return;
+    head.getWorldPosition(hA); hips.getWorldPosition(hB);
+    if (ai.seated() && hA.y - hB.y > 0.35) return;
+    if (c.pos.y > Math.max(hA.y, hB.y) - 0.05 || c.pos.y + 0.44 < Math.min(hA.y, hB.y) - 0.9) return;
+    // head → hips, carried on past the hips for the legs when he's lying down
+    seg.subVectors(hB, hA).setY(0);
+    const len = seg.length();
+    const lying = hA.y - hB.y < 0.35;
+    const ext = lying ? len + 0.55 : len;
+    if (len > 1e-3) seg.multiplyScalar(1 / len);
+    const px = c.pos.x - hA.x, pz = c.pos.z - hA.z;
+    const k = len > 1e-3 ? Math.max(0, Math.min(ext, px * seg.x + pz * seg.z)) : 0;
+    cp.set(hA.x + seg.x * k, 0, hA.z + seg.z * k);
+    const R = (lying ? 0.26 : 0.2) + (c.radius || 0.22);
+    let dx = c.pos.x - cp.x, dz = c.pos.z - cp.z, d = Math.hypot(dx, dz);
+    if (d >= R) return;
+    if (d < 1e-3) { dx = -seg.z || 1; dz = seg.x; d = Math.hypot(dx, dz); }
+    const push = R - d, nx = c.pos.x + (dx / d) * push, nz = c.pos.z + (dz / d) * push;
+    if (!c._blocked?.(nx, nz, c.pos.y)) { c.pos.x = nx; c.pos.z = nz; }
   }
 
   L.start = () => {
@@ -218,6 +249,7 @@ function makeRuntime(ctx, spec) {
     updateHints(dt);
     updateNear(dt);
     spec.update?.(L, dt);
+    separateFromJon();
     marker.visible = L.showMarker !== false && !L.won && !ctx.director?.active;
     marker.update(dt);
     // interact.register copies the def (a getter label is read once), so keep the live label in sync ourselves

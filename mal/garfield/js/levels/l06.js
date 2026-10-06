@@ -96,10 +96,10 @@ async function fling(L) {
   // Jon: shock, stands, "five-second rule!" and shuffles round to the plate — slowly, on purpose.
   ai.run('rescue', async (t) => {
     try { ctx.jon.setExpression?.('shock'); } catch {}
-    await t.play('cover_face', 1.2, { fallback: 'idle' });
-    await t.play('stand_up', 0.8, { fallback: 'idle' });
+    await ai.standUp(t);   // out of the chair first (walking while parented to the seat moves him in chair space)
+    await t.play('cover_face', 1.3, { fallback: 'idle' });
     t.say('j_fling_2', { force: true });
-    await t.walkTo(platePos(ctx), { speed: 1.0, arrive: 0.55 });
+    await t.walkTo(platePos(ctx), { speed: 0.85, arrive: 0.55 });   // slow on purpose: a fair race for small hands
     if (L.eating || L.won) return;
     await t.play('give_bowl', 1.0, { fallback: 'idle' });
     if (L.eating || L.won) return;

@@ -61,6 +61,7 @@ function breakChair(L, leg = 0) {
     t.say('j_chair_crack', { force: true });
     try { ctx.jon.setExpression?.('shock'); } catch {}
     await t.wait(0.9);
+    dodgeFall(L);
     L.flags.down = true;
     L.progress();
     ctx.events.emit('jonDown');
@@ -94,4 +95,23 @@ function breakChair(L, leg = 0) {
     L.flags.down = false; L.flags.breaking = false;
     ai.goSit();
   }, { interruptible: false });
+}
+
+// Jon topples backwards over the chair's back legs: if the cat is standing in that patch, he leaps aside.
+function dodgeFall(L) {
+  const { ctx } = L, c = ctx.controller;
+  if (c.pos.y > 0.4) return;
+  const [a, b] = legPositions(ctx);
+  const mid = a.clone().lerp(b, 0.5).setY(0);
+  const seat = prop(ctx, 'chair')?.seat;
+  const sc = seat ? seat.getWorldPosition(V()).setY(0) : (anchor(ctx, 'jonChair')?.pos.clone().setY(0) || mid.clone().add(V(0, 0, 0.2)));
+  const back = V().subVectors(mid, sc).setY(0);
+  if (back.lengthSq() < 1e-4) return;
+  back.normalize();
+  const side = V(-back.z, 0, back.x);
+  const rel = V(c.pos.x - mid.x, 0, c.pos.z - mid.z);
+  const along = rel.dot(back), lat = rel.dot(side);
+  if (along < -0.3 || along > 1.9 || Math.abs(lat) > 0.65) return;
+  const dir = side.clone().multiplyScalar(lat >= 0 ? 1 : -1).addScaledVector(back, 0.15);
+  c.hop(dir, (0.85 - Math.abs(lat)) * 3 + 1.2);
 }

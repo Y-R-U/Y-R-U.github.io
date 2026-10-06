@@ -21,7 +21,7 @@ export default defineLevel({
       // the hem hangs to the floor and spans the window: test at Garfield's height, nearest point along the curtain
       const p = curtainPos(ctx).clone();
       const g = ctx.controller.pos;
-      p.y = g.y + 0.26;
+      p.y = Math.min(g.y + 0.26, 1.7);   // ground floor only (the bedroom is right above)
       const span = 0.9;
       const along = new THREE.Vector3(0, 0, 1);
       const a = ctx.world.anchors?.get('curtains');

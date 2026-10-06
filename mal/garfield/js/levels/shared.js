@@ -59,10 +59,12 @@ export function vaseLevel(L, { objIndex, onBroken, spareLine, homeStates = ['sit
     onBroken?.(frag);
   }
   // re-arm: Jon is back home with the vase broken and the food not eaten → spare vase
-  let homeT = 0;
+  let homeT = 0, awayOnce = false;
   const off = ctx.every(0.25, () => {
-    if (!L.flags.vaseBroken || L.won || L.eating || L.flags.noRearm) { homeT = 0; return; }
-    if (homeStates.includes(L.ai.state)) homeT += 0.25; else homeT = 0;
+    if (!L.flags.vaseBroken || L.won || L.eating || L.flags.noRearm) { homeT = 0; awayOnce = false; return; }
+    // only once he has actually come to look and gone back (not while the vase is still falling)
+    if (!homeStates.includes(L.ai.state)) awayOnce = true;
+    if (awayOnce && homeStates.includes(L.ai.state)) homeT += 0.25; else homeT = 0;
     if (homeT > 1.5) {
       homeT = 0;
       L.say(spareLine, { force: true });

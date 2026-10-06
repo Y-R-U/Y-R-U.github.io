@@ -254,13 +254,13 @@ export function createJonAI(ctx) {
       if (away.length() > 0.01) away.setLength(standOff); dest.add(away);
       await t.walkTo(dest, { speed });
       await t.face(p);
-      if (arriveLine) t.say(arriveLine);
+      if (arriveLine) t.say(arriveLine, { force: true });
       onArrive?.();
       let left = dur, i = 0;
       while (left > 0) {
         const c = i % 2 ? 'scratch_head' : 'investigate';
         await t.play(c, Math.min(left, 3), { fallback: 'idle' });
-        if (lookLines[i]) t.say(lookLines[i]);
+        if (lookLines[i]) t.say(lookLines[i], { force: true });
         left -= 3; i++;
       }
       setState('returning');
@@ -309,7 +309,7 @@ export function createJonAI(ctx) {
     ctx.audio?.sfx?.('yowl', { vol: 0.5 });
     makeTask(async (t) => {
       // standing clips only: get out of the chair first (seated clips are sit/sit_eat/stand_up/stunned/fall_back)
-      t.say(zone === 'leg' ? 'j_leg' : zone === 'butt' ? 'j_butt' : 'j_face');
+      t.say(zone === 'leg' ? 'j_leg' : zone === 'butt' ? 'j_butt' : 'j_face', { force: true });
       if (seated) { expr('pain'); await ai.standUp(t); }
       if (zone === 'leg') {
         expr('pain');
@@ -484,7 +484,7 @@ export function createJonAI(ctx) {
     cancelTask(); setState('stunned'); expr('dizzy');
     makeTask(async (t) => {
       t.loop('stunned_shake', { fallback: 'idle' });
-      t.say('j_stunned');
+      t.say('j_stunned', { force: true });
       await t.wait(dur);
       expr('happy'); setState('sitEat'); ai.sitNow();
     }, { name: 'stunned', interruptible: false });
@@ -495,7 +495,7 @@ export function createJonAI(ctx) {
       for (let i = 0; ; i++) {
         t.loop('pound_door', { fallback: 'talk_angry' });
         world.props?.get?.('bedroomDoor')?.rattle?.();
-        if (i % 2 === 0) t.say('j_trapped');
+        if (i % 2 === 0) t.say('j_trapped', { force: i === 0, interrupt: true });
         await t.wait(4 + Math.random() * 2);
       }
     }, { name: 'trapped', interruptible: false });

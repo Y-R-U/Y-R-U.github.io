@@ -72,7 +72,19 @@ export default defineLevel({
       onInteract: () => openFridge(L),
     });
   },
-  start(L) { L.flags.ensurePan(); },
+  start(L) {
+    L.flags.ensurePan();
+    // he paws the pan out of the fridge onto the floor and eats it there (not off a shelf at head height)
+    L.ctx.events.on('eatStart', () => {
+      const pan = prop(L.ctx, 'pan'), g = L.ctx.garfield.root;
+      if (!pan?.root) return;
+      L.ctx.world.scene.attach(pan.root);
+      const fwd = V(Math.sin(g.rotation.y), 0, Math.cos(g.rotation.y));
+      pan.root.position.copy(g.position).addScaledVector(fwd, 0.36).setY(0.005);
+      pan.root.rotation.set(0, g.rotation.y, 0);
+      L.ctx.audio?.sfx?.('land', { vol: 0.4 });
+    });
+  },
   update(L) {
     const { ctx, ai, flags } = L;
     if (flags.fridgeOpen && ai.state === 'faceplant') L.target((o) => o.copy(panInFridge(ctx)), { height: 0.3 });

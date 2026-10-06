@@ -54,6 +54,14 @@ export function createController({ actor, world, events, camera }) {
       setAnim('knockback', { once: true, fade: 0.06 });
       events?.emit('knockback', { dir: d, strength });
     },
+    // A little comic leap out of harm's way (Jon toppling onto him): no knockback clip, input off briefly.
+    hop(dir, speed = 2.6) {
+      const d = new THREE.Vector3(dir.x, 0, dir.z).normalize();
+      vel.x = d.x * speed; vel.z = d.z * speed; vel.y = 4.2;
+      c.grounded = false; c.knockT = 0.4; c.peakY = pos.y; c.takeoffY = pos.y;
+      actor.root.rotation.y = Math.atan2(d.x, d.z);
+      setAnim('jump_up', { once: true, fade: 0.06 });
+    },
     setBelly(t) { c.belly = THREE.MathUtils.clamp(t, 0, 1); actor.setBelly?.(c.belly); c.radius = (actor.radius || 0.22); },
     update,
   };
@@ -140,8 +148,21 @@ export function createController({ actor, world, events, camera }) {
       }
     }
     // Push flush against the face we hit.
-    if (axis === 'x') pos.x = d > 0 ? Math.min(pos.x, b.min.x - r - 1e-4) : Math.max(pos.x, b.max.x + r + 1e-4);
-    else pos.z = d > 0 ? Math.min(pos.z, b.min.z - r - 1e-4) : Math.max(pos.z, b.max.z + r + 1e-4);
+    // (already overlapping it, e.g. mid-jump through a rim: just stop, never snap back across the box)
+    const face = axis === 'x' ? (d > 0 ? b.min.x - r - 1e-4 : b.max.x + r + 1e-4) : (d > 0 ? b.min.z - r - 1e-4 : b.max.z + r + 1e-4);
+    const cur = axis === 'x' ? pos.x : pos.z;
+    if (d > 0 ? cur <= face : cur >= face) {
+      const nf = d > 0 ? Math.min(face, cur + d) : Math.max(face, cur + d);
+      if (axis === 'x') { if (!blocked(nf, pos.z, pos.y, r)) pos.x = nf; } else if (!blocked(pos.x, nf, pos.y, r)) pos.z = nf;
+    }
+    // Clipped a corner (door jambs): slip sideways round it instead of stopping dead.
+    const lo = axis === 'x' ? pos.z + r - b.min.z : pos.x + r - b.min.x;
+    const hi = axis === 'x' ? b.max.z - (pos.z - r) : b.max.x - (pos.x - r);
+    const slip = lo < hi ? -lo : hi;
+    if (Math.abs(slip) < 0.1) {
+      const s = Math.sign(slip) * Math.min(Math.abs(slip) + 1e-3, Math.abs(d) * 0.9);
+      if (axis === 'x') { if (!blocked(pos.x, pos.z + s, pos.y, r)) pos.z += s; } else if (!blocked(pos.x + s, pos.z, pos.y, r)) pos.x += s;
+    }
     if (axis === 'x') vel.x = 0; else vel.z = 0;
   }
 
@@ -162,10 +183,20 @@ export function createController({ actor, world, events, camera }) {
       pos.y = ny; c.grounded = false;
     } else {
       const h = H();
-      for (const b of cols()) {
+      let escapes = 0;
+      for (let i = 0, cs = cols(); i < cs.length; i++) {
+        const b = cs[i];
         if (b.enabled === false || b.oneWay) continue;
         if (b.min.y < prev + h - 0.02 || b.min.y > ny + h) continue;
         if (!overlapsXZ(b, pos.x, pos.z, r * 0.8)) continue;
+        // Only the rim caught his head (jumping beside a table edge): slip out past it instead of bonking.
+        // A thin top (table, bench) he ran in under mid-jump: slide back out from under the rim.
+        const thin = b.max.y - b.min.y <= 0.12;
+        // (centre at or just past the rim: rise through it; depenetrate() then mantles him onto the top)
+        const tol = thin ? 0.08 + Math.min(0.14, Math.hypot(vel.x, vel.z) * 0.05) : 0;
+        if (thin && !(pos.x > b.min.x + tol && pos.x < b.max.x - tol && pos.z > b.min.z + tol && pos.z < b.max.z - tol)) continue;
+        const rim = thin && Math.hypot(vel.x, vel.z) > 0.3;
+        if (escapes < 2 && edgeEscape(b, r * 0.8, rim ? 0.42 : 0.24, rim)) { escapes++; i = -1; continue; }
         pos.y = b.min.y - h; vel.y = Math.min(0, vel.y) - 0.5;
         c.lastBonk = b.id;
         events?.emit('bonk', { surfaceId: b.id, collider: b });
@@ -173,6 +204,23 @@ export function createController({ actor, world, events, camera }) {
       }
       pos.y = ny; c.grounded = false;
     }
+  }
+
+  // maxPush: how far he may be slid sideways; inside: allow it even when his centre is under the box.
+  function edgeEscape(b, rr, maxPush, inside) {
+    const inX = pos.x > b.min.x + 0.06 && pos.x < b.max.x - 0.06, inZ = pos.z > b.min.z + 0.06 && pos.z < b.max.z - 0.06;
+    if (inX && inZ && !inside) return false;
+    const opts = [];
+    if (!inZ || inX) opts.push([0, b.min.z - rr - 1e-3 - pos.z], [0, b.max.z + rr + 1e-3 - pos.z]);
+    if (!inX || inZ) opts.push([b.min.x - rr - 1e-3 - pos.x, 0], [b.max.x + rr + 1e-3 - pos.x, 0]);
+    opts.sort((a, b2) => Math.abs(a[0] + a[1]) - Math.abs(b2[0] + b2[1]));
+    for (const [dx, dz] of opts) {
+      if (Math.abs(dx + dz) > maxPush) break;
+      if (blocked(pos.x + dx, pos.z + dz, pos.y, c.radius)) continue;
+      pos.x += dx; pos.z += dz;
+      return true;
+    }
+    return false;
   }
 
   function land(hit) {

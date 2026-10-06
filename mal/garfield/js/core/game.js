@@ -191,7 +191,12 @@ export function createGame(sys) {
     // (bestShot keeps the camera out of walls/ceiling, e.g. when he eats on top of the fridge)
     const look = new THREE.Vector3(gp.x, gp.y + 0.3, gp.z);
     const pose = ctx ? bestShot(ctx, look, { dist: 1.4, h: 0.25, prefer: ry, min: 0.8 }) : null;
-    camera.shot(pose || { pos: new THREE.Vector3(gp.x + Math.sin(ry) * 1.3, gp.y + 0.55, gp.z + Math.cos(ry) * 1.3), look }, { dur: 0.9 });
+    // turn him to face the lens (in front of the fridge the best spot is beside him)
+    if (pose) garfield.root.rotation.y = Math.atan2(pose.pos.x - gp.x, pose.pos.z - gp.z);
+    const end = pose || { pos: new THREE.Vector3(gp.x + Math.sin(ry) * 1.3, gp.y + 0.55, gp.z + Math.cos(ry) * 1.3), look };
+    // cut straight to his face and push in (a dolly from the follow cam swept through/behind him)
+    camera.cut({ pos: look.clone().lerp(end.pos, 1.15), look: end.look || look, fov: 50 });
+    camera.shot({ ...end, fov: 50 }, { dur: 1.4, ease: 'out' });
     await Promise.race([Promise.resolve(garfield.play?.('celebrate', { once: true })), new Promise((r) => setTimeout(r, 2200))]);
     if (token !== levelToken) return;
     const nextUnlocked = n < 10;
