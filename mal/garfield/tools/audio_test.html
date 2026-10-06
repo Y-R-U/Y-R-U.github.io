@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Hungry Heist · Audio test</title>
+<style>
+  :root { --bg:#fdf3e1; --card:#fffaf0; --ink:#4a2c17; --or:#f08a1c; --or2:#d96f0a; --mute:#9b7b62; }
+  * { box-sizing: border-box; }
+  body { margin:0; font:15px/1.4 system-ui, sans-serif; background:var(--bg); color:var(--ink); padding:16px; }
+  h1 { margin:0 0 4px; font-size:22px; } h2 { font-size:16px; margin:18px 0 8px; }
+  .row { display:flex; flex-wrap:wrap; gap:6px; align-items:center; }
+  button { font:inherit; border:2px solid var(--or2); background:var(--or); color:#fff; border-radius:999px; padding:6px 12px; cursor:pointer; }
+  button.alt { background:var(--card); color:var(--ink); }
+  button:active { transform: translateY(1px); }
+  label { display:inline-flex; gap:6px; align-items:center; margin-right:12px; }
+  #lines { max-height:55vh; overflow:auto; background:var(--card); border-radius:12px; padding:6px; border:2px solid #ecd5b5; }
+  .ln { display:flex; gap:8px; padding:4px 6px; border-bottom:1px solid #f1e2cc; cursor:pointer; align-items:baseline; }
+  .ln:hover { background:#fde6c8; } .k { font-family:ui-monospace,monospace; font-size:12px; color:var(--mute); min-width:150px; }
+  .who-jon .k { color:#2f6db0; } .d { margin-left:auto; color:var(--mute); font-size:12px; } .miss { opacity:.45; }
+  input[type=search] { font:inherit; padding:6px 10px; border-radius:999px; border:2px solid #ecd5b5; min-width:220px; }
+  #status { color:var(--mute); font-size:13px; }
+</style>
+</head>
+<body>
+<h1>Hungry Heist · Audio test</h1>
+<div id="status">click anything to unlock audio</div>
+
+<h2>Volumes</h2>
+<div class="row">
+  <label>music <input type="range" id="vm" min="0" max="1" step="0.01" value="0.35"></label>
+  <label>sfx <input type="range" id="vs" min="0" max="1" step="0.01" value="0.8"></label>
+  <label>voice <input type="range" id="vv" min="0" max="1" step="0.01" value="1"></label>
+  <label><input type="checkbox" id="mon" checked> music on</label>
+  <label><input type="checkbox" id="cn"> custom names (_nn takes)</label>
+</div>
+
+<h2>Music</h2>
+<div class="row" id="music"></div>
+
+<h2>SFX</h2>
+<div class="row" id="sfx"></div>
+<div class="row" style="margin-top:6px"><label>rate <input type="range" id="rate" min="0.5" max="2" step="0.05" value="1"></label></div>
+
+<h2>Voice lines <span id="count"></span></h2>
+<div class="row" style="margin-bottom:6px">
+  <input type="search" id="q" placeholder="filter key or text">
+  <button class="alt" id="rand">random bark from filter</button>
+  <button class="alt" id="stop">stop VO</button>
+</div>
+<div id="lines"></div>
+
+<script type="module">
+import { audio } from '../js/audio/audio.js';
+const $ = (id) => document.getElementById(id);
+addEventListener('pointerdown', () => audio.unlock(), { capture: true });
+addEventListener('keydown', () => audio.unlock(), { capture: true });
+setInterval(() => { $('status').textContent = JSON.stringify(audio.state); }, 500);
+
+for (const n of [...audio.musicNames, null]) {
+  const b = document.createElement('button'); b.textContent = n || 'stop';
+  if (!n) b.className = 'alt';
+  b.onclick = () => audio.music(n); $('music').append(b);
+}
+for (const n of audio.sfxNames) {
+  const b = document.createElement('button'); b.textContent = n; b.className = 'alt';
+  b.onclick = () => audio.sfx(n, { rate: +$('rate').value }); $('sfx').append(b);
+}
+const vols = () => audio.setVolumes({ music: +$('vm').value, sfx: +$('vs').value, voice: +$('vv').value });
+for (const id of ['vm', 'vs', 'vv']) $(id).oninput = vols;
+$('mon').onchange = () => audio.setMusicOn($('mon').checked);
+$('cn').onchange = () => audio.setCustomNames($('cn').checked);
+$('stop').onclick = () => audio.stopVo();
+
+await audio.ready;
+const keys = Object.keys(audio.voLines);
+function render() {
+  const q = $('q').value.toLowerCase();
+  const shown = keys.filter((k) => !q || k.includes(q) || audio.voLines[k].text.toLowerCase().includes(q));
+  $('count').textContent = `(${shown.length}/${keys.length})`;
+  $('lines').innerHTML = '';
+  for (const k of shown) {
+    const l = audio.voLines[k];
+    const d = document.createElement('div');
+    d.className = `ln who-${l.who}` + (l.dur ? '' : ' miss');
+    d.innerHTML = `<span class="k">${k}</span><span>${l.text}</span><span class="d">${l.dur ? l.dur + 's' : 'no audio'}</span>`;
+    d.onclick = () => audio.vo(k);
+    $('lines').append(d);
+  }
+  return shown;
+}
+$('q').oninput = render;
+render();
+$('rand').onclick = () => { const s = render().filter((k) => !k.endsWith('_nn')); if (s.length) audio.vo(s[Math.floor(Math.random() * s.length)]); };
+</script>
+</body>
+</html>

@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Hungry Heist — test launcher</title>
+<style>
+  body { font: 15px system-ui, sans-serif; background: #2b1608; color: #fff4dc; margin: 0; padding: 20px; }
+  h1 { font-size: 20px; margin: 0 0 12px; }
+  label { margin-right: 14px; white-space: nowrap; }
+  .row { margin: 10px 0; }
+  a.lv { display: inline-block; margin: 4px; padding: 8px 14px; background: #e8891c; color: #fff; border-radius: 10px; text-decoration: none; font-weight: 600; }
+  a.lv.alt { background: #6b3510; }
+  code { color: #ffd36a; }
+</style>
+</head>
+<body>
+<h1>Garfield: Hungry Heist — test launcher</h1>
+<div class="row">
+  <label><input type="checkbox" id="dev" checked> dev overlay</label>
+  <label><input type="checkbox" id="skip"> skip cutscenes</label>
+  <label><input type="checkbox" id="touch"> force touch</label>
+  <label>quality <select id="q"><option value="">auto</option><option>high</option><option>med</option><option>low</option></select></label>
+  <label>stubs <input id="stub" placeholder="world,jon,all" size="14"></label>
+</div>
+<div class="row" id="links"></div>
+<p>Inside the game: <code>__game.goLevel(n)</code>, <code>__game.win()</code>, <code>__game.teleport(x,y,z)</code>,
+<code>__game.skipCutscene()</code>, <code>__game.info</code>. Contract docs: <code>js/core/README.md</code>.</p>
+<script>
+  const links = document.getElementById('links');
+  function url(extra) {
+    const p = new URLSearchParams(extra);
+    if (dev.checked) p.set('dev', '1');
+    if (skip.checked) p.set('skip', '1');
+    if (touch.checked) p.set('touch', '1');
+    if (q.value) p.set('q', q.value);
+    if (stub.value.trim()) p.set('stub', stub.value.trim());
+    return '../index.html?' + p.toString();
+  }
+  function render() {
+    links.innerHTML = '';
+    const add = (label, extra, alt) => { const a = document.createElement('a'); a.className = 'lv' + (alt ? ' alt' : ''); a.textContent = label; a.href = url(extra); links.appendChild(a); };
+    add('Normal start', {}, true);
+    add('Menu (no intro)', { nointro: '1' }, true);
+    for (let n = 1; n <= 10; n++) add('Level ' + n, { level: n });
+  }
+  for (const el of document.querySelectorAll('input,select')) el.addEventListener('input', render);
+  render();
+</script>
+</body>
+</html>

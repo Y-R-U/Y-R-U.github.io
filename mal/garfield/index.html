@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#e8891c">
+<meta name="screen-orientation" content="landscape">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="robots" content="noindex">
+<title>Garfield: Hungry Heist</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="css/ui.css">
+<style>
+  :root { --orange:#e8891c; --cream:#fff4dc; --brown:#4a2a12; }
+  html, body { margin:0; height:100%; overflow:hidden; background:#2b1608; overscroll-behavior:none;
+    touch-action:none; -webkit-user-select:none; user-select:none; -webkit-touch-callout:none;
+    -webkit-tap-highlight-color:transparent; }
+  body { font-family: Fredoka, "Trebuchet MS", "Arial Rounded MT Bold", system-ui, sans-serif; color:var(--brown); }
+  #gl { position:fixed; inset:0; width:100%; height:100%; display:block; outline:none; }
+  #ui-root { position:fixed; inset:0; pointer-events:none; z-index:10; }
+  #boot { position:fixed; inset:0; z-index:100; display:flex; flex-direction:column; align-items:center;
+    justify-content:center; gap:18px; background:radial-gradient(ellipse at 50% 40%, #f6a23a 0%, #d8751a 55%, #8d4310 100%);
+    transition:opacity .6s ease; }
+  #boot.gone { opacity:0; pointer-events:none; }
+  #boot h1 { margin:0; font-size:clamp(30px,6vw,64px); color:var(--cream); letter-spacing:.5px; text-align:center;
+    text-shadow:0 4px 0 #6b3510, 0 8px 24px rgba(0,0,0,.35); line-height:1.05; }
+  #boot h1 small { display:block; font-size:.42em; letter-spacing:3px; opacity:.9; margin-top:6px; }
+  #boot .bar { width:min(60vw,420px); height:22px; border-radius:14px; background:rgba(74,42,18,.45);
+    box-shadow:inset 0 2px 6px rgba(0,0,0,.35); overflow:hidden; border:3px solid var(--cream); }
+  #boot .fill { height:100%; width:0%; background:linear-gradient(#ffe7a8,#ffc456); border-radius:10px;
+    transition:width .25s ease; }
+  #boot .lbl { color:var(--cream); font-size:16px; min-height:20px; opacity:.9; }
+  #boot .paw { width:54px; height:54px; animation:bob 1s ease-in-out infinite; }
+  @keyframes bob { 50% { transform:translateY(-8px) rotate(-8deg); } }
+  #boot .disc { position:absolute; bottom:10px; left:0; right:0; text-align:center; font-size:12px;
+    color:rgba(255,244,220,.75); }
+  .bootcard { display:none; background:var(--cream); border-radius:22px; padding:22px 28px; text-align:center;
+    box-shadow:0 10px 0 #b5641c, 0 20px 40px rgba(0,0,0,.35); max-width:min(80vw,440px); }
+  .bootcard h2 { margin:0 0 8px; font-size:24px; }
+  .bootcard p { margin:0 0 16px; font-size:16px; line-height:1.35; }
+  .bootcard button, #rotate button { font:inherit; font-size:20px; font-weight:600; color:var(--cream);
+    background:var(--orange); border:0; border-radius:16px; padding:10px 28px; box-shadow:0 5px 0 #9a4f0f; cursor:pointer; }
+  #boot.failed .bootcard { display:block; }
+  #boot.failed .bar, #boot.failed .lbl, #boot.failed .paw { display:none; }
+  #rotate { display:none; position:fixed; inset:0; z-index:200; background:#d8751a; color:var(--cream);
+    align-items:center; justify-content:center; flex-direction:column; gap:12px; font-size:22px; text-align:center; padding:20px; }
+  @media (orientation:portrait) and (pointer:coarse) { #rotate { display:flex; } }
+</style>
+</head>
+<body>
+<canvas id="gl" tabindex="0"></canvas>
+<div id="ui-root"></div>
+<div id="boot">
+  <svg class="paw" viewBox="0 0 64 64" aria-hidden="true"><g fill="#fff4dc"><ellipse cx="32" cy="42" rx="15" ry="12"/><circle cx="15" cy="26" r="6.5"/><circle cx="26" cy="17" r="6.5"/><circle cx="38" cy="17" r="6.5"/><circle cx="49" cy="26" r="6.5"/></g></svg>
+  <h1>Garfield<small>HUNGRY HEIST</small></h1>
+  <div class="bar"><div class="fill" id="boot-fill"></div></div>
+  <div class="lbl" id="boot-lbl">Warming up the lasagna…</div>
+  <div class="bootcard" id="boot-card">
+    <h2>Hmm, that took too long</h2>
+    <p id="boot-msg">The game didn't finish loading. A reload usually fixes it.</p>
+    <button type="button" id="boot-reload">Reload</button>
+  </div>
+  <div class="disc">Fan-made, non-commercial. Garfield &copy; Paws, Inc. &mdash; not affiliated.</div>
+</div>
+<div id="rotate"><div style="font-size:54px">&#x21bb;</div>Turn your device sideways to play!</div>
+<script>
+// Classic (non-module) watchdog: a failed or stalled module graph would otherwise hang silently.
+(function () {
+  var boot = document.getElementById('boot'), fill = document.getElementById('boot-fill'),
+      lbl = document.getElementById('boot-lbl'), msg = document.getElementById('boot-msg');
+  var done = false, lastProgress = Date.now();
+  function fail(text) {
+    if (done) return;
+    if (text) msg.textContent = text;
+    boot.classList.add('failed');
+  }
+  window.__boot = {
+    progress: function (p, label) {
+      lastProgress = Date.now();
+      fill.style.width = Math.round(Math.max(0, Math.min(1, p)) * 100) + '%';
+      if (label) lbl.textContent = label;
+    },
+    ready: function () {
+      done = true; fill.style.width = '100%';
+      boot.classList.add('gone');
+      setTimeout(function () { boot.style.display = 'none'; }, 700);
+    },
+    fail: fail,
+    errors: []
+  };
+  window.addEventListener('error', function (e) {
+    window.__boot.errors.push(String(e.message || e));
+    if (!done && e.filename && /\.js/.test(e.filename)) fail('Something went wrong while loading (' + (e.message || 'script error') + '). A reload usually fixes it.');
+  });
+  window.addEventListener('unhandledrejection', function (e) {
+    window.__boot.errors.push(String(e.reason && e.reason.message || e.reason));
+  });
+  var t0 = Date.now();
+  var iv = setInterval(function () {
+    if (done) return clearInterval(iv);
+    // 30 s with no progress at all, or 75 s total, means something is stuck.
+    if (Date.now() - lastProgress > 30000 || Date.now() - t0 > 75000) { clearInterval(iv); fail(); }
+  }, 1000);
+  document.getElementById('boot-reload').onclick = function () {
+    var u = new URL(location.href); u.searchParams.set('r', Date.now().toString(36)); location.replace(u.toString());
+  };
+})();
+</script>
+<script type="module" src="js/main.js"></script>
+</body>
+</html>

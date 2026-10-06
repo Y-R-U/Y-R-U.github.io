@@ -1,0 +1,206 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Jon Turntable</title>
+<style>
+  :root { --bg:#2b211b; --panel:#3a2c22ee; --ink:#fff3e0; --acc:#f39a2b; }
+  html,body { margin:0; height:100%; background:var(--bg); color:var(--ink); font:13px/1.3 system-ui, sans-serif; overflow:hidden; }
+  canvas { display:block; }
+  #ui { position:fixed; left:8px; top:8px; bottom:8px; width:250px; overflow:auto; background:var(--panel); border-radius:10px; padding:8px; }
+  #ui.hide { display:none; }
+  h3 { margin:8px 0 4px; font-size:12px; text-transform:uppercase; letter-spacing:.06em; color:#ffcf8a; }
+  button { background:#5a4130; color:var(--ink); border:0; border-radius:6px; padding:4px 7px; margin:2px; cursor:pointer; font:inherit; }
+  button.on { background:var(--acc); color:#2b1a0c; }
+  label { display:block; margin:4px 0; }
+  input[type=range] { width:100%; }
+  #info { position:fixed; right:8px; top:8px; background:var(--panel); padding:6px 9px; border-radius:8px; font:12px monospace; white-space:pre; }
+</style>
+</head>
+<body>
+<div id="ui">
+  <h3>Clips</h3><div id="clips"></div>
+  <h3>Locomotion</h3>
+  <label>speed <span id="spv">0</span> m/s<input id="sp" type="range" min="0" max="4" step="0.05" value="0"></label>
+  <h3>Expression</h3><div id="exprs"></div>
+  <h3>Hold prop (handR)</h3><div id="props"></div>
+  <h3>View</h3>
+  <label><input type="checkbox" id="spin"> turntable</label>
+  <label><input type="checkbox" id="zones"> hit-zone visualiser (click floor/Jon)</label>
+  <label><input type="checkbox" id="lookcam"> look at camera</label>
+  <label><input type="checkbox" id="chair" checked> stand-in chair</label>
+  <label>quality <select id="q"><option>high</option><option>medium</option><option>low</option></select></label>
+  <label>speed x<input id="ts" type="range" min="0" max="2" step="0.05" value="1"></label>
+</div>
+<div id="info"></div>
+<script type="module">
+import * as THREE from '../vendor/three/three.module.js';
+import { RoomEnvironment } from '../vendor/three/addons/environments/RoomEnvironment.js';
+import { createJon, CHAIR_FALL } from '../js/actors/jon.js';
+
+const Q = new URLSearchParams(location.search);
+const renderer = new THREE.WebGLRenderer({ antialias: true, preserveDrawingBuffer: true });
+renderer.setPixelRatio(Math.min(2, devicePixelRatio));
+renderer.setSize(innerWidth, innerHeight);
+renderer.shadowMap.enabled = true; renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+renderer.toneMapping = THREE.ACESFilmicToneMapping; renderer.toneMappingExposure = 1.05;
+document.body.appendChild(renderer.domElement);
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0x4a3a2e);
+const pmrem = new THREE.PMREMGenerator(renderer);
+scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
+scene.environmentIntensity = 0.45;
+const cam = new THREE.PerspectiveCamera(35, innerWidth / innerHeight, 0.05, 50);
+scene.add(new THREE.HemisphereLight(0xfff0dc, 0x6a4a35, 0.9));
+const key = new THREE.DirectionalLight(0xffe2bf, 2.4); key.position.set(2.5, 4, 3); key.castShadow = true;
+key.shadow.mapSize.set(2048, 2048); key.shadow.camera.left = key.shadow.camera.bottom = -2; key.shadow.camera.right = key.shadow.camera.top = 2;
+key.shadow.bias = -0.0004; key.shadow.normalBias = 0.02; scene.add(key);
+const rim = new THREE.DirectionalLight(0xbfd8ff, 1.0); rim.position.set(-3, 2.5, -3); scene.add(rim);
+const floor = new THREE.Mesh(new THREE.CircleGeometry(4, 48), new THREE.MeshStandardMaterial({ color: 0xc89a6a, roughness: 0.8 }));
+floor.rotation.x = -Math.PI / 2; floor.receiveShadow = true; scene.add(floor);
+
+// stand-in chair: pivot at the back feet, seat object at the seat surface centre (props convention)
+const chair = new THREE.Group(); scene.add(chair);
+const chairBody = new THREE.Group(); chairBody.position.z = 0.21; chair.position.z = -0.21; chair.add(chairBody);
+const seatObj = new THREE.Object3D(); seatObj.position.set(0, 0.46, 0); chairBody.add(seatObj);
+{
+  const wood = new THREE.MeshStandardMaterial({ color: 0x9b6a3f, roughness: 0.6 });
+  const seat = new THREE.Mesh(new THREE.BoxGeometry(0.44, 0.04, 0.42), wood); seat.position.set(0, 0.44, 0); chairBody.add(seat);
+  const back = new THREE.Mesh(new THREE.BoxGeometry(0.44, 0.5, 0.04), wood); back.position.set(0, 0.71, -0.2); chairBody.add(back);
+  for (const [x, z] of [[-0.19, 0.18], [0.19, 0.18], [-0.19, -0.19], [0.19, -0.19]]) {
+    const l = new THREE.Mesh(new THREE.BoxGeometry(0.035, 0.44, 0.035), wood); l.position.set(x, 0.22, z); chairBody.add(l);
+  }
+  chair.traverse(m => { if (m.isMesh) { m.castShadow = m.receiveShadow = true; } });
+}
+chair.visible = false;
+
+let jon = await createJon({ quality: Q.get('q') || 'high' });
+scene.add(jon.root);
+window.__jon = jon;
+
+const $ = (id) => document.getElementById(id);
+const info = $('info');
+let current = 'idle';
+function buildUI() {
+  $('clips').innerHTML = '';
+  for (const n of jon.anims) {
+    const b = document.createElement('button'); b.textContent = n; b.dataset.n = n;
+    b.onclick = () => playClip(n); $('clips').appendChild(b);
+  }
+}
+function mark() { document.querySelectorAll('#clips button').forEach(b => b.classList.toggle('on', b.dataset.n === current)); }
+const SEATED = new Set(['sit', 'sit_eat', 'stand_up', 'fall_back_chair', 'stunned_shake', 'sit_down']);
+function playClip(n) {
+  current = n; mark();
+  const seated = SEATED.has(n);
+  chair.visible = $('chair').checked && seated;
+  chair.rotation.x = 0;
+  if (seated) {
+    if (jon.root.parent !== seatObj) { seatObj.add(jon.root); jon.root.position.set(0, 0, 0); jon.root.rotation.set(0, 0, 0); }
+  } else if (jon.root.parent !== scene) { scene.add(jon.root); jon.root.position.set(0, 0, 0); jon.root.rotation.set(0, 0, 0); }
+  jon.play(n, { once: false }).then(r => { info.dataset.last = n + ':' + r; if (n === 'stand_up' && r === 'done') jon.leaveSeat(scene); });
+}
+buildUI(); mark();
+for (const e of ['neutral', 'happy', 'angry', 'pain', 'shock', 'dizzy', 'sad', 'talk']) {
+  const b = document.createElement('button'); b.textContent = e; b.onclick = () => jon.setExpression(e); $('exprs').appendChild(b);
+}
+for (const p of ['none', 'newspaper', 'rolled', 'fork', 'spoon', 'plate', 'pan', 'bowl']) {
+  const b = document.createElement('button'); b.textContent = p; b.onclick = () => jon.holdProp(p === 'none' ? null : p); $('props').appendChild(b);
+}
+$('sp').oninput = (e) => { $('spv').textContent = e.target.value; jon.setMove(+e.target.value); if (current !== 'idle') { jon.play('idle'); current = 'idle'; mark(); } };
+$('q').value = Q.get('q') || 'high';
+$('q').onchange = async (e) => { jon.dispose(); jon = await createJon({ quality: e.target.value }); scene.add(jon.root); window.__jon = jon; buildUI(); };
+
+// hit-zone visualiser
+const zoneCol = { face: 0xff4040, butt: 0xffd040, leg: 0x40d0ff, body: 0x80ff80 };
+const dots = new THREE.Group(); scene.add(dots);
+function zoneGrid() {
+  dots.clear();
+  if (!$('zones').checked) return;
+  const g = new THREE.SphereGeometry(0.012, 6, 4);
+  const mats = Object.fromEntries(Object.entries(zoneCol).map(([k, c]) => [k, new THREE.MeshBasicMaterial({ color: c })]));
+  for (let y = 0.05; y < 1.9; y += 0.06) for (let x = -0.4; x <= 0.4; x += 0.08) for (const z of [-0.35, 0.35]) {
+    const p = new THREE.Vector3(x, y, z);
+    const zz = jon.hitTest(p, 0.12); if (!zz) continue;
+    const m = new THREE.Mesh(g, mats[zz]); m.position.copy(p); dots.add(m);
+  }
+}
+$('zones').onchange = zoneGrid;
+const ray = new THREE.Raycaster();
+renderer.domElement.addEventListener('dblclick', (ev) => {
+  ray.setFromCamera(new THREE.Vector2(ev.clientX / innerWidth * 2 - 1, -ev.clientY / innerHeight * 2 + 1), cam);
+  const h = ray.intersectObjects([jon.root, floor], true)[0];
+  if (h) info.dataset.zone = jon.hitZone(h.point) + ' @' + h.point.toArray().map(v => v.toFixed(2)).join(',');
+});
+
+// camera orbit
+let yaw = +(Q.get('yaw') ?? 20) * Math.PI / 180, pitch = +(Q.get('pitch') ?? 8) * Math.PI / 180, dist = +(Q.get('dist') ?? 4.2);
+let tgtY = +(Q.get('ty') ?? 0.95);
+let drag = null;
+renderer.domElement.addEventListener('pointerdown', e => drag = { x: e.clientX, y: e.clientY });
+addEventListener('pointerup', () => drag = null);
+addEventListener('pointermove', e => { if (!drag) return; yaw -= (e.clientX - drag.x) * 0.01; pitch = Math.max(-0.4, Math.min(1.3, pitch + (e.clientY - drag.y) * 0.01)); drag = { x: e.clientX, y: e.clientY }; });
+addEventListener('wheel', e => { dist = Math.max(0.5, Math.min(10, dist * (1 + e.deltaY * 0.001))); });
+addEventListener('keydown', e => { if (e.key === 'h') $('ui').classList.toggle('hide'); });
+if (Q.has('hideui')) $('ui').classList.add('hide');
+function placeCam() {
+  cam.position.set(Math.sin(yaw) * Math.cos(pitch) * dist, tgtY + Math.sin(pitch) * dist, Math.cos(yaw) * Math.cos(pitch) * dist);
+  cam.lookAt(0, tgtY, 0);
+}
+addEventListener('resize', () => { renderer.setSize(innerWidth, innerHeight); cam.aspect = innerWidth / innerHeight; cam.updateProjectionMatrix(); });
+
+// deterministic stepping for screenshots: __step(sec)
+let paused = Q.has('paused');
+const ts = () => +$('ts').value;
+function chairSync() {
+  chair.rotation.x = current === 'fall_back_chair' ? -CHAIR_FALL.angle(window.__clipT) * Math.PI / 180 : 0;
+}
+window.__clipT = 0;
+jon.on?.('impact', () => {});
+window.__step = (sec, dt = 1 / 60) => { for (let s = 0; s < sec; s += dt) { jon.update(dt); window.__clipT += dt; } chairSync(); };
+window.__play = (n, o) => { window.__clipT = 0; playClip(n); };
+let last = performance.now();
+function frame(now) {
+  const dt = Math.min(0.05, (now - last) / 1000) * ts(); last = now;
+  if (!paused) { jon.update(dt); window.__clipT += dt; chairSync(); }
+  if ($('spin').checked) yaw += dt * 0.5;
+  if ($('lookcam').checked) jon.lookAt(cam.position); else if (!window.__lookSet) jon.lookAt(null);
+  placeCam();
+  renderer.render(scene, cam);
+  info.textContent = `${current}  tris ${jon.tris | 0}  calls ${renderer.info.render.calls}\n${info.dataset.zone || 'dblclick: hit zone'}\n${info.dataset.last || ''}`;
+  requestAnimationFrame(frame);
+}
+if (Q.get('clip')) playClip(Q.get('clip'));
+if (Q.get('expr')) jon.setExpression(Q.get('expr'));
+if (Q.get('prop')) jon.holdProp(Q.get('prop'));
+if (Q.get('speed')) jon.setMove(+Q.get('speed'));
+if (Q.get('t')) window.__step(+Q.get('t'));
+requestAnimationFrame(frame);
+// contact sheet: __sheet('clip', [times], {yaw, dist, ty}) -> renders a grid over the page
+window.__sheet = (name, times, o = {}) => {
+  paused = true;
+  const cols = o.cols || Math.min(times.length, 4), rows = Math.ceil(times.length / cols);
+  const W = innerWidth, H = innerHeight, cw = Math.floor(W / cols), ch = Math.floor(H / rows);
+  const out = document.createElement('canvas'); out.width = W; out.height = H;
+  out.style.cssText = 'position:fixed;inset:0;z-index:5'; const g = out.getContext('2d');
+  g.fillStyle = '#222'; g.fillRect(0, 0, W, H);
+  renderer.setSize(cw, ch); cam.aspect = cw / ch; cam.updateProjectionMatrix();
+  if (o.yaw !== undefined) yaw = o.yaw * Math.PI / 180; if (o.dist) dist = o.dist; if (o.ty !== undefined) tgtY = o.ty; if (o.pitch !== undefined) pitch = o.pitch * Math.PI / 180;
+  if (o.expr) jon.setExpression(o.expr);
+  if (name) { window.__clipT = 0; playClip(name); }
+  let tPrev = 0;
+  times.forEach((t, i) => {
+    if (o.exprs) jon.setExpression(o.exprs[i]);
+    window.__step(t - tPrev); tPrev = t;
+    placeCam(); renderer.render(scene, cam);
+    g.drawImage(renderer.domElement, (i % cols) * cw, Math.floor(i / cols) * ch, cw, ch);
+    g.fillStyle = '#fff'; g.font = '14px monospace'; g.fillText((name || '') + (o.exprs ? o.exprs[i] : '') + ' t=' + t.toFixed(2), (i % cols) * cw + 6, Math.floor(i / cols) * ch + 16);
+  });
+  document.body.appendChild(out);
+  return 'ok';
+};
+window.__ready = true;
+</script>
+</body>
+</html>

@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>House viewer</title>
+<style>
+  html,body{margin:0;height:100%;background:#222;overflow:hidden;font:13px system-ui,sans-serif;color:#fff}
+  canvas{display:block;width:100%;height:100%}
+  #ui{position:fixed;left:8px;top:8px;background:rgba(30,20,10,.75);padding:8px;border-radius:10px;max-width:260px;max-height:calc(100% - 16px);overflow:auto}
+  #ui button{margin:2px;padding:3px 6px;border:0;border-radius:6px;background:#e8891c;color:#fff;cursor:pointer;font:inherit}
+  #ui label{display:block;margin:3px 0}
+  #info{position:fixed;right:8px;top:8px;background:rgba(30,20,10,.75);padding:6px 10px;border-radius:10px;white-space:pre}
+  body.shot #ui, body.shot #info{display:none}
+</style>
+</head>
+<body>
+<canvas id="c"></canvas>
+<div id="ui">
+  <div id="views"></div>
+  <label><input type="checkbox" id="ext"> exterior</label>
+  <label><input type="checkbox" id="cols"> colliders</label>
+  <label><input type="checkbox" id="navd"> nav nodes</label>
+  <label>quality <select id="q"><option>high</option><option>medium</option><option>low</option></select></label>
+  <div>WASD/QE fly, drag look, shift fast</div>
+</div>
+<div id="info"></div>
+<script type="module">
+import * as THREE from '../vendor/three/three.module.js';
+import { createWorld } from '../js/world/world.js';
+
+const params = new URLSearchParams(location.search);
+const quality = params.get('q') || 'high';
+document.getElementById('q').value = quality;
+if (params.get('shot')) document.body.classList.add('shot');
+const canvas = document.getElementById('c');
+const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
+renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+renderer.outputColorSpace = THREE.SRGBColorSpace;
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.shadowMap.enabled = quality !== 'low';
+renderer.shadowMap.type = quality === 'high' ? THREE.PCFSoftShadowMap : THREE.PCFShadowMap;
+const camera = new THREE.PerspectiveCamera(55, 1, 0.05, 600);
+const t0 = performance.now();
+const world = await createWorld({ renderer, quality, withProps: params.get('props') !== '0' });
+const buildMs = performance.now() - t0;
+const scene = world.scene;
+scene.add(camera);
+
+function resize() { const w = innerWidth, h = innerHeight; renderer.setSize(w, h, false); camera.aspect = w / h; camera.updateProjectionMatrix(); }
+addEventListener('resize', resize); resize();
+
+let yaw = 0, pitch = 0;
+function setView(pos, look, fov) {
+  camera.position.copy(pos);
+  const d = new THREE.Vector3().subVectors(look, pos).normalize();
+  yaw = Math.atan2(-d.x, -d.z); pitch = Math.asin(d.y);
+  if (fov) { camera.fov = fov; camera.updateProjectionMatrix(); }
+}
+const V = (x, y, z) => new THREE.Vector3(x, y, z);
+const views = {
+  kitchen: [V(8.4, 1.7, 6.2), V(3.5, 0.6, 9.8), 60],
+  kitchenCat: [V(6.6, 0.55, 7.0), V(4.4, 0.6, 9.5), 65],
+  living: [V(8.0, 1.8, 4.8), V(1.5, 0.6, 1.0), 60],
+  livingCat: [V(6.0, 0.6, 4.3), V(2.5, 0.6, 1.0), 65],
+  stairs: [V(5.8, 1.6, 0.6), V(8.6, 2.0, 4.0), 60],
+  bedroom: [V(5.8, UFY(2.0), 6.3), V(1.0, UFY(0.4), 2.0), 60],
+  landing: [V(8.8, UFY(1.6), 6.5), V(7.0, UFY(0.6), 2.0), 60],
+  climb: [V(3.0, 1.4, 7.6), V(5.2, 1.3, 10.6), 60],
+  sill: [V(5.2, 1.3, 2.4), V(3.0, 0.9, 0.2), 60],
+  outsideFront: [V(4.6, 3.5, -22), V(4.6, 3.5, 0), 50],
+  bedroomCat: [V(5.0, UFY(0.6), 5.4), V(1.5, UFY(0.5), 2.5), 65],
+  landingCat: [V(8.6, UFY(0.6), 6.4), V(6.3, UFY(0.7), 5.7), 65],
+  stairsCat: [V(7.0, 0.6, 0.4), V(8.6, 1.6, 4.0), 65],
+  underTable: [V(5.6, 0.35, 8.3), V(3.6, 0.3, 9.2), 70],
+  topdownGF: [V(4.6, 22, 5.5001), V(4.6, 0, 5.5), 40],
+};
+function UFY(y) { return 3.0 + y; }
+for (const [k, a] of world.anchors) if (k.startsWith('cam_')) views[k] = [a.pos, a.look, a.fov];
+const vdiv = document.getElementById('views');
+for (const k of Object.keys(views)) {
+  const b = document.createElement('button'); b.textContent = k;
+  b.onclick = () => { if (k.startsWith('cam_culdesac') || k.startsWith('cam_house') || k === 'outsideFront' || k === 'cam_porch') { world.exterior.show(true); extBox.checked = true; } setView(...views[k]); };
+  vdiv.appendChild(b);
+}
+const extBox = document.getElementById('ext');
+extBox.onchange = () => world.exterior.show(extBox.checked);
+document.getElementById('q').onchange = (e) => { params.set('q', e.target.value); location.search = params; };
+
+let colGroup = null;
+document.getElementById('cols').onchange = (e) => {
+  if (colGroup) { scene.remove(colGroup); colGroup = null; }
+  if (!e.target.checked) return;
+  colGroup = new THREE.Group();
+  for (const c of world.colliders) {
+    const s = new THREE.Vector3().subVectors(c.max, c.min), m = new THREE.Vector3().addVectors(c.max, c.min).multiplyScalar(0.5);
+    const box = new THREE.LineSegments(new THREE.EdgesGeometry(new THREE.BoxGeometry(s.x, s.y, s.z)), new THREE.LineBasicMaterial({ color: c.kind === 'surface' ? 0x00ffff : c.wall ? 0x888888 : 0xff4444 }));
+    box.position.copy(m); colGroup.add(box);
+  }
+  scene.add(colGroup);
+};
+let navGroup = null;
+document.getElementById('navd').onchange = (e) => {
+  if (navGroup) { scene.remove(navGroup); navGroup = null; }
+  if (!e.target.checked) return;
+  const pts = world.nav.debugPoints().filter(p => !p.blocked);
+  const g = new THREE.BufferGeometry().setFromPoints(pts.map(p => new THREE.Vector3(p.x, p.y + 0.03, p.z)));
+  navGroup = new THREE.Points(g, new THREE.PointsMaterial({ color: 0x00ff66, size: 0.05 }));
+  scene.add(navGroup);
+};
+
+const keys = {};
+addEventListener('keydown', e => keys[e.code] = true);
+addEventListener('keyup', e => keys[e.code] = false);
+let drag = null;
+canvas.addEventListener('pointerdown', e => drag = [e.clientX, e.clientY]);
+addEventListener('pointerup', () => drag = null);
+addEventListener('pointermove', e => {
+  if (!drag) return;
+  yaw -= (e.clientX - drag[0]) * 0.004; pitch -= (e.clientY - drag[1]) * 0.004;
+  pitch = Math.max(-1.5, Math.min(1.5, pitch)); drag = [e.clientX, e.clientY];
+});
+
+setView(...views[params.get('view') || 'kitchen']);
+if (params.get('ext') === '1') { world.exterior.show(true); extBox.checked = true; }
+
+const info = document.getElementById('info');
+let last = performance.now(), fpsAcc = 0, fpsN = 0, fps = 0;
+const clock = new THREE.Clock();
+renderer.info.autoReset = false;
+function frame() {
+  const dt = Math.min(clock.getDelta(), 0.05);
+  const sp = (keys.ShiftLeft ? 8 : 2.5) * dt;
+  const fwd = new THREE.Vector3(-Math.sin(yaw), 0, -Math.cos(yaw)), right = new THREE.Vector3(-fwd.z, 0, fwd.x);
+  if (keys.KeyW) camera.position.addScaledVector(fwd, sp);
+  if (keys.KeyS) camera.position.addScaledVector(fwd, -sp);
+  if (keys.KeyD) camera.position.addScaledVector(right, sp);
+  if (keys.KeyA) camera.position.addScaledVector(right, -sp);
+  if (keys.KeyE) camera.position.y += sp;
+  if (keys.KeyQ) camera.position.y -= sp;
+  camera.rotation.set(pitch, yaw, 0, 'YXZ');
+  world.update(dt, camera);
+  renderer.info.reset();
+  renderer.render(scene, camera);
+  const now = performance.now(); fpsAcc += now - last; fpsN++; last = now;
+  if (fpsAcc > 500) { fps = 1000 * fpsN / fpsAcc; fpsAcc = 0; fpsN = 0; }
+  info.textContent = `fps ${fps.toFixed(0)}  calls ${renderer.info.render.calls}  tris ${(renderer.info.render.triangles / 1000).toFixed(0)}k\nbuild ${buildMs.toFixed(0)}ms  pos ${camera.position.toArray().map(v => v.toFixed(2)).join(',')}`;
+  requestAnimationFrame(frame);
+}
+frame();
+window.__house = { world, camera, renderer, setView, views, get fps() { return fps; }, buildMs, THREE };
+window.__ready = true;
+</script>
+</body>
+</html>

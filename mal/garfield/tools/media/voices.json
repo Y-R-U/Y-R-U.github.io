@@ -1,0 +1,110 @@
+{
+ "garfield": {
+  "id": "9611963dfd0b48d48ec21f9e72ff258b",
+  "name": "Hungry Heist · Garfield",
+  "notes": "Designed for Garfield: Hungry Heist (yru mal/garfield). Original voice, no actor imitation.",
+  "settings": {
+   "mode": "clone",
+   "speaker": "Ryan",
+   "language": "English",
+   "instruct": "",
+   "reference_id": "8e708c54f0d546c0a3e86d44821f3236",
+   "ref_text": "Diet biscuits. The saddest two words in any language. I'll get up in five minutes. Or fifty. Mmm, lasagna.",
+   "temperature": 0.9,
+   "top_p": 1.0,
+   "top_k": 50,
+   "repetition_penalty": 1.05,
+   "speed": 1,
+   "seed": 7
+  },
+  "preview": "9dbc90c8041b49738a93d81c994a6187",
+  "created": 1791302446.225903,
+  "source_recipe": {
+   "mode": "design",
+   "speaker": "Ryan",
+   "language": "English",
+   "instruct": "A deep, mellow, laid-back American male voice, low and velvety with a lazy drawl. Bored, sarcastic, deadpan delivery, smug and cheeky but friendly, like a sleepy comedian muttering to himself.",
+   "reference_id": null,
+   "ref_text": "",
+   "temperature": 0.9,
+   "top_p": 1.0,
+   "top_k": 50,
+   "repetition_penalty": 1.05,
+   "speed": 1.0,
+   "seed": 7,
+   "text": "Diet biscuits. The saddest two words in any language. I'll get up in five minutes. Or fifty. Mmm, lasagna."
+  }
+ },
+ "jon": {
+  "id": "04254ade71d1424c9e89e05626956bde",
+  "name": "Hungry Heist · Jon (v2 male)",
+  "notes": "Garfield: Hungry Heist Jon v2 — adult male redesign (Aaron: v1 sounded like a girl). Original voice.",
+  "settings": {
+   "mode": "clone",
+   "speaker": "Ryan",
+   "language": "English",
+   "instruct": "",
+   "reference_id": "946340ae22e64ba88fe14d021cab331e",
+   "ref_text": "Here you go, buddy. Crunchy cat biscuits, your favourite. And for me, steak and mash! Oh boy, I've been looking forward to this all day.",
+   "temperature": 0.9,
+   "top_p": 1.0,
+   "top_k": 50,
+   "repetition_penalty": 1.05,
+   "speed": 1,
+   "seed": 21
+  },
+  "preview": "707cc84d11f644c4944670f733decfcd",
+  "created": 1791303832.2208588,
+  "source_recipe": {
+   "mode": "design",
+   "speaker": "Ryan",
+   "language": "English",
+   "instruct": "Adult male in his mid-thirties, deep-ish male baritone voice, low and warm. Friendly, cheerful, a little nerdy and awkward. Relaxed conversational American accent. Clearly a grown man.",
+   "reference_id": null,
+   "ref_text": "",
+   "temperature": 0.9,
+   "top_p": 1.0,
+   "top_k": 50,
+   "repetition_penalty": 1.05,
+   "speed": 1.0,
+   "seed": 21,
+   "text": "Here you go, buddy. Crunchy cat biscuits, your favourite. And for me, steak and mash! Oh boy, I've been looking forward to this all day."
+  }
+ },
+ "jon_v1_rejected": {
+  "id": "a5bbe2edfb1346c589f6d61a16c162f3",
+  "name": "Hungry Heist · Jon",
+  "notes": "Designed for Garfield: Hungry Heist (yru mal/garfield). Original voice, no actor imitation.",
+  "settings": {
+   "mode": "clone",
+   "speaker": "Ryan",
+   "language": "English",
+   "instruct": "",
+   "reference_id": "97d87ea65adc472593e9e0e9f8a98774",
+   "ref_text": "Here you go, buddy! Crunchy cat biscuits, your favourite! And for me, steak and mash! Hey! Ow, ow, ow! My leg!",
+   "temperature": 0.9,
+   "top_p": 1.0,
+   "top_k": 50,
+   "repetition_penalty": 1.05,
+   "speed": 1,
+   "seed": 7
+  },
+  "preview": "178dde33903547af8476eab37c0436dd",
+  "created": 1791302446.234079,
+  "source_recipe": {
+   "mode": "design",
+   "speaker": "Ryan",
+   "language": "English",
+   "instruct": "A friendly, gangly, awkward American guy around thirty-five. Bright, slightly nasal tenor voice, enthusiastic and earnest, talks quickly, gets flustered and squeaky when upset.",
+   "reference_id": null,
+   "ref_text": "",
+   "temperature": 0.9,
+   "top_p": 1.0,
+   "top_k": 50,
+   "repetition_penalty": 1.05,
+   "speed": 1.0,
+   "seed": 7,
+   "text": "Here you go, buddy! Crunchy cat biscuits, your favourite! And for me, steak and mash! Hey! Ow, ow, ow! My leg!"
+  }
+ }
+}

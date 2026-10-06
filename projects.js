@@ -511,6 +511,10 @@ const PROJECTS = [
 
   // ── HIDDEN: PolyPerfect asset tools (commercial pack — art ships obfuscated;
   //    shown only via the secret reveal on the Projects page) ──
+  { name: "Garfield: Hungry Heist", path: "/mal/garfield/", screenshot: "garfield", type: "game", hidden: true,
+    desc: "Personal, non-commercial fan game designed by a young Garfield fan. Third-person 3D: steal Jon's steak, lasagna and meatloaf across ten levels of Chapter One: Food, using scratches, vases, curtains, a vine swing, a trapped Jon and a very fat belly. Voiced thought bubbles, cheeky barks, cutscenes. Unlisted; also at br8t.com/mal/garfield/.",
+    date: "2026-10-07", creator: "Opus 5.5" },
+
   { name: "Asset Gallery",      path: "/app/3d/gallery/", screenshot: "gallery", type: "app", hidden: true,
     desc: "Browsable, searchable, taggable index of all 3,156 PolyPerfect Low Poly Ultimate Pack models, rendered live in Three.js with a shared palette atlas. Filter by category/world/tag and orbit any model. The art ships as one obfuscated pack, never as raw files.",
     date: "2026-06-17", creator: "Opus 4.8" },

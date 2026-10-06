@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+<title>UI Kit — Garfield: Hungry Heist</title>
+<link rel="stylesheet" href="../css/ui.css">
+<style>
+  html, body { margin: 0; height: 100%; overflow: hidden; background: #2a1a10; }
+  #fake { position: fixed; inset: 0; width: 100%; height: 100%; display: block; }
+  #kit { position: fixed; z-index: 1000; left: 50%; bottom: 0; transform: translateX(-50%); max-width: 98vw; font: 12px system-ui, sans-serif;
+    background: rgba(20, 12, 6, .88); color: #fff; border-radius: 10px 10px 0 0; padding: 6px 8px; display: flex; flex-wrap: wrap; gap: 4px; justify-content: center; }
+  #kit.hide { display: none; }
+  #kit button { font: 12px system-ui; padding: 4px 7px; border-radius: 6px; border: 0; background: #ffb347; color: #3b2314; cursor: pointer; }
+  #kit b { align-self: center; color: #ffb347; margin: 0 2px 0 6px; }
+  #log { position: fixed; z-index: 1000; right: 6px; top: 90px; width: 230px; max-height: 50vh; overflow: auto; font: 11px ui-monospace, monospace; color: #cfe; background: rgba(0, 0, 0, .55); padding: 4px 6px; border-radius: 6px; pointer-events: none; white-space: pre-wrap; }
+  #log:empty { display: none; }
+  #marker { position: fixed; z-index: 5; width: 14px; height: 14px; margin: -7px 0 0 -7px; border-radius: 50%; background: #39f; box-shadow: 0 0 0 3px #fff; pointer-events: none; display: none; }
+  #marker.g { background: #f7931e; }
+</style>
+</head>
+<body>
+<canvas id="fake"></canvas>
+<div id="ui-root"></div>
+<div id="marker"></div>
+<div id="kit"></div>
+<div id="log"></div>
+<script type="module">
+import { ui } from '../js/ui/ui.js';
+const P = new URLSearchParams(location.search);
+ui.mount(document.getElementById('ui-root'));
+window.ui = ui;
+
+// fake "game" backdrop: warm room with floor + table so overlays read like they will in-game
+const cv = document.getElementById('fake'), g = cv.getContext('2d');
+function paint() {
+  const W = cv.width = innerWidth, H = cv.height = innerHeight;
+  let gr = g.createLinearGradient(0, 0, 0, H); gr.addColorStop(0, '#c98a55'); gr.addColorStop(.58, '#e9b277'); gr.addColorStop(.58, '#8a5a33'); gr.addColorStop(1, '#5a3418');
+  g.fillStyle = gr; g.fillRect(0, 0, W, H);
+  g.fillStyle = 'rgba(255,240,200,.25)'; for (let x = 0; x < W; x += 60) g.fillRect(x, 0, 24, H * .58);
+  g.fillStyle = '#b3d4ef'; g.fillRect(W * .62, H * .14, W * .22, H * .26); g.fillStyle = '#c0392b'; g.fillRect(W * .6, H * .1, W * .05, H * .36); g.fillRect(W * .81, H * .1, W * .05, H * .36);
+  g.fillStyle = '#6b3e1f'; g.fillRect(W * .25, H * .52, W * .36, H * .05); g.fillRect(W * .27, H * .57, W * .02, H * .2); g.fillRect(W * .57, H * .57, W * .02, H * .2);
+  g.fillStyle = '#fff'; g.beginPath(); g.ellipse(W * .43, H * .515, 50, 12, 0, 0, 7); g.fill();
+  g.fillStyle = '#3f78c9'; g.fillRect(W * .66, H * .3, W * .05, H * .3); g.fillStyle = '#f2c79c'; g.beginPath(); g.arc(W * .685, H * .26, H * .045, 0, 7); g.fill();
+  g.fillStyle = '#f7931e'; g.beginPath(); g.ellipse(W * .36, H * .8, 60, 34, 0, 0, 7); g.fill(); g.beginPath(); g.arc(W * .32, H * .73, 26, 0, 7); g.fill();
+}
+paint(); addEventListener('resize', paint);
+const jonHead = () => ({ x: innerWidth * .685, y: innerHeight * .2 });
+const garfHead = () => ({ x: innerWidth * .32, y: innerHeight * .68 });
+
+const logEl = document.getElementById('log');
+const log = (s) => { logEl.textContent = (s + '\n' + logEl.textContent).slice(0, 1500); };
+for (const e of ['jump', 'jumpUp', 'scratch', 'interact', 'pause', 'resume', 'restart', 'exit', 'skip', 'chapter', 'level', 'back', 'tap', 'replayIntro', 'resetProgress', 'fullscreenchange', 'sfx'])
+  ui.on(e, (a) => log(e + (a !== undefined ? ' ' + JSON.stringify(a) : '')));
+ui.on('settings', (s) => log('settings ' + JSON.stringify(s)));
+setInterval(() => { const m = ui.controls.move, l = ui.controls.consumeLook(); if (m.x || m.y || l.dx || l.dy) log(`move ${m.x.toFixed(2)},${m.y.toFixed(2)} look ${l.dx.toFixed(0)},${l.dy.toFixed(0)}`); }, 250);
+
+const OBJ = [{ text: "Scratch {jon}'s face", done: true }, { text: "Eat {jon}'s steak", done: false }];
+let belly = .3;
+const levels = (done, just) => Array.from({ length: 10 }, (_, i) => ({ n: i + 1, done: i < done, locked: i > done, justUnlocked: just && i === done }));
+
+const S = {
+  title1: () => { ui.fade(false, 0); ui.menu.show({ chapters: [{ id: 1, title: 'Chapter One', subtitle: 'Food', justUnlocked: true }] }); },
+  title: () => ui.menu.show({ chapters: [{ id: 1, title: 'Chapter One', subtitle: 'Food' }] }),
+  chapter1: () => ui.chapter.show({ levels: levels(0, true), onPick: (n) => log('pick ' + n) }),
+  chapter: () => ui.chapter.show({ levels: levels(4, false), onPick: (n) => log('pick ' + n) }),
+  chapterNew: () => ui.chapter.show({ levels: levels(6, true) }),
+  chapterAll: () => ui.chapter.show({ levels: levels(10, false) }),
+  hud: () => { ui.screen('hud'); ui.hud.set({ objectives: OBJ, belly, interactLabel: null, chaseTimer: null }); },
+  hudFull: () => { S.hud(); ui.hud.set({ interactLabel: 'Eat!', chaseTimer: 7 }); ui.tutorial.show({ id: 'jump', text: 'Press Jump to hop up onto the table!', icon: 'jump', keys: ['Space'], touch: 'jump' }); },
+  objDone: () => ui.hud.set({ objectives: OBJ.map((o) => ({ ...o, done: true })) }),
+  belly: () => { belly = Math.min(1, belly + .15); ui.hud.set({ belly }); },
+  bellyLow: () => { belly = .1; ui.hud.set({ belly }); },
+  interact: () => ui.hud.set({ interactLabel: ui.hud.state.interactLabel ? null : ['Eat!', 'Open', 'Grab'][Math.random() * 3 | 0] }),
+  chase: () => { let t = 10; ui.hud.set({ chaseTimer: t }); const iv = setInterval(() => { t -= .1; ui.hud.set({ chaseTimer: t > 0 ? t : null }); if (t <= 0) clearInterval(iv); }, 100); },
+  tutMove: () => ui.tutorial.show({ id: 'move', text: 'Walk around with W A S D!', icon: 'paw', keys: ['W', 'A', 'S', 'D'], touch: 'joystick' }),
+  tutScratch: () => ui.tutorial.show({ id: 'scratch', text: "Scratch {jon}'s face to make him drop his guard!", icon: 'claw', keys: ['J'], touch: 'scratch' }),
+  tutHide: () => ui.tutorial.hide(),
+  jon: () => { marker('j'); ui.say({ who: 'jon', text: 'Garfield! Get off the table! That is MY dinner!', anchor: jonHead }); },
+  garf: () => { marker('g'); ui.say({ who: 'garfield', thought: true, text: 'Biscuits again? I can smell steak. Steak is calling my name.', anchor: garfHead }); },
+  subs: () => ui.say({ who: 'jon', text: "Hmm, where did that cat go? He's up to something.", dur: 4 }),
+  subsG: () => ui.say({ who: 'garfield', thought: true, text: 'Diet? I thought you said "dinner".', dur: 4 }),
+  cutscene: () => { ui.letterbox(true); ui.say({ who: 'jon', text: "Here's your dinner, Garfield. Enjoy!", anchor: jonHead, dur: 4 }); },
+  cutsceneOff: () => ui.letterbox(false),
+  fade: async () => { await ui.fade(true, .5); await new Promise((r) => setTimeout(r, 300)); ui.fade(false, .5); },
+  toast: () => ui.toast(['Level 2 unlocked!', 'Yum! Belly got bigger', 'Settings saved'][Math.random() * 3 | 0]),
+  pause: () => ui.pause.open(),
+  settings: () => ui.settings.open(),
+  popup: () => ui.confirm('Go back to the menu?', { title: 'Leaving?' }).then((v) => log('confirm ' + v)),
+  complete: () => ui.complete.show({ level: 3, food: 'lasagna', nextUnlocked: true }).then((v) => log('complete ' + v)),
+  completeM: () => ui.complete.show({ level: 4, food: 'meatloaf', nextUnlocked: true }).then((v) => log('complete ' + v)),
+  chapterDone: () => ui.chapterComplete.show({}).then((v) => log('chapterComplete ' + v)),
+  none: () => ui.screen('none'),
+};
+function marker(w) { const m = document.getElementById('marker'); const p = w === 'g' ? garfHead() : jonHead(); m.style.display = 'block'; m.className = w === 'g' ? 'g' : ''; m.style.left = p.x + 'px'; m.style.top = p.y + 'px'; }
+
+const kit = document.getElementById('kit');
+const groups = { Menus: ['title1', 'title', 'chapter1', 'chapter', 'chapterNew', 'chapterAll'], HUD: ['hud', 'hudFull', 'objDone', 'belly', 'bellyLow', 'interact', 'chase', 'tutMove', 'tutScratch', 'tutHide'],
+  Talk: ['jon', 'garf', 'subs', 'subsG', 'cutscene', 'cutsceneOff', 'fade', 'toast'], Panels: ['pause', 'settings', 'popup', 'complete', 'completeM', 'chapterDone', 'none'] };
+for (const [gname, keys] of Object.entries(groups)) {
+  kit.append(Object.assign(document.createElement('b'), { textContent: gname }));
+  for (const k of keys) { const b = document.createElement('button'); b.textContent = k; b.onclick = () => S[k](); kit.append(b); }
+}
+const hideBtn = document.createElement('button'); hideBtn.textContent = 'hide kit'; hideBtn.onclick = () => kit.classList.add('hide'); kit.append(hideBtn);
+addEventListener('keydown', (e) => { if (e.key === '`') kit.classList.toggle('hide'); if (e.key === 'Escape' && !ui.modals.count && ui.current === 'hud') ui.pause.open(); });
+if (P.get('kit') === '0') kit.classList.add('hide');
+for (const k of (P.get('state') || 'title1').split(',')) S[k]?.();
+window.S = S;
+</script>
+</body>
+</html>
