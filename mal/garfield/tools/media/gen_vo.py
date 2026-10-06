@@ -82,14 +82,17 @@ def main():
         if not only and dst.exists() and e.get("gen_text") == v["text"] and e.get("voice") == voice["id"]:
             continue
         wav = SCR / f"{k}.wav"
-        jid, s = tts.gen(voice["settings"], tts_text(v["text"]), str(wav))
+        st = dict(voice["settings"])
+        if os.environ.get("SEED"):
+            st["seed"] = int(os.environ["SEED"])
+        jid, s = tts.gen(st, tts_text(v["text"]), str(wav))
         subprocess.run(["ffmpeg", "-y", "-loglevel", "error", "-i", str(wav), "-af",
                         "silenceremove=start_periods=1:start_threshold=-45dB:start_silence=0.04,areverse,"
                         "silenceremove=start_periods=1:start_threshold=-45dB:start_silence=0.08,areverse,"
                         "loudnorm=I=-16:TP=-1.5:LRA=11", "-ac", "1", "-ar", "24000", "-b:a", "64k", str(dst)], check=True)
         dur = float(subprocess.run(["ffprobe", "-v", "error", "-show_entries", "format=duration", "-of", "csv=p=0", str(dst)],
                                    capture_output=True, text=True).stdout.strip())
-        e.update(dur=round(dur, 2), gen_text=v["text"], job=jid, voice=voice["id"])
+        e.update(dur=round(dur, 2), gen_text=v["text"], job=jid, voice=voice["id"], seed=st["seed"])
         save_mf(mf)
         print(k, round(dur, 2), flush=True)
     docs(lines, mf)

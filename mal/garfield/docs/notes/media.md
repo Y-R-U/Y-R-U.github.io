@@ -1,24 +1,24 @@
 # media — notes
 
 ## DONE
-- Step 1 refs complete (refs/README.md). All lanes messaged.
-- VO script: levels' js/game/lines.js (parsed live) + EXTRAS/NN_FIXES in tools/media/vo_lines.py (~387 lines).
-  `python3 tools/media/gen_vo.py docs` rebuilds audio/vo/manifest.json + docs/VO_LINES.md.
-- Voices (Qwen Voice Studio clone profiles; tools/media/voices.json):
-  Garfield = "Hungry Heist · Garfield" 9611963d… (F0≈100 Hz). Jon = "Hungry Heist · Jon (v2 male)" 04254ade… (F0≈110–160 Hz)
-  — v1 Jon (F0≈250) rejected by Aaron ("sounds like a girl"), kept as jon_v1_rejected.
-- Music (ACE-Step turbo, 6 steps) → audio/music: menu 82 s loop, sneak 82 s loop, chase 69.5 s loop, cutscene 61 s loop,
-  victory 9.5 s, fanfare 14.5 s (6.9 MB). Loops = crossfaded head into tail (gen_music.py loop); audio.js MUSIC[].len
-  drives loopStart/loopEnd so Safari's MP3 padding doesn't gap. Raw takes in tools/media/scratch/music.
-- js/audio/audio.js + sfx.js + tools/audio_test.html; headless-tested (music switching, VO playback, SFX render).
-- tools/media/qc_vo.py ASR QC (whisper-small.en mlx).
+- refs: 15 images + refs/README.md (garfield ×5, jon ×2, kitchen, living_room, bedroom, culdesac_exterior, 3 foods).
+  Candidates moved to tools/media/scratch/ref_cands (gitignored).
+- VO: 387/387 lines in audio/vo/*.mp3 (64 kbps mono, loudnorm −16 LUFS, trimmed; 8.9 MB, 16.9 min total).
+  Source = levels' js/game/lines.js + tools/media/vo_lines.py EXTRAS/NN_FIXES. manifest + docs/VO_LINES.md generated
+  (`python3 tools/media/gen_vo.py docs`). Every line ASR-checked (tools/media/qc_vo.py → scratch/qc.json); 4 bad takes
+  re-rolled with SEED=101. The 10 remaining "LOW" scores are false positives (interjections/homophones: Blech→black,
+  Whoa spellings, steak→stake).
+- Voices (Qwen Voice Studio clones; tools/media/voices.json): Garfield "Hungry Heist · Garfield" (F0≈100 Hz);
+  Jon "Hungry Heist · Jon (v2 male)" (F0≈110–160 Hz). v1 Jon rejected by Aaron.
+- Music (audio/music, 9.1 MB): menu/sneak/chase/cutscene seamless loops (ACE-Step), victory 9.5 s, fanfare 14.5 s,
+  title_song 88 s (YuE2, original lyrics in tools/media/song/title_song.json; whisper confirms clearly sung lyrics).
+- js/audio/audio.js + sfx.js (37 procedural SFX) + tools/audio_test.html. Headless-tested.
 
-## IN PROGRESS
-- VO batch (Jon all regenerated with v2) — resumable: `cd tools/media && python3 gen_vo.py`. ~8 s/line.
+## NEXT (if more time)
+- Human listen-pass on music + a few VO lines (all QC so far is objective: ASR, F0, loudness — nobody has listened).
+- Richer recorded-style SFX (meow/purr are synthesised formants; they work but are the weakest).
 
-## NEXT
-- qc_vo.py → regen LOW lines. Message manager when VO done.
-- Optional YuE2 title song: tools/media/song/title_song.json (original lyrics). Unload ACE first (done).
-
-## REQUESTS
-- none
+## Regenerating
+- VO: `cd tools/media && python3 gen_vo.py` (only new/changed lines); `SEED=n python3 gen_vo.py key…` to re-roll.
+- QC: `HF_HUB_OFFLINE=1 ~/cc/airon/qwen-tts/.venv/bin/python qc_vo.py`.
+- Music: `~/cc/airon/audio/yue2/.venv/bin/python gen_music.py gen <name>` then `loop`/`oneshot`; update MUSIC[].len in audio.js.

@@ -9,7 +9,7 @@ const MUSIC = {
   cutscene: { file: 'music/cutscene.mp3', len: 61.0, loop: true, gain: 0.75 },
   victory: { file: 'music/victory.mp3', loop: false, gain: 1 },
   fanfare: { file: 'music/fanfare.mp3', loop: false, gain: 1 },
-  title: { file: 'music/title_song.mp3', loop: true, gain: 0.85 },
+  title: { file: 'music/title_song.mp3', loop: true, gain: 0.85 },  // YuE2 sung song, original lyrics (tools/media/song)
 };
 
 let ctx = null, master, musicBus, sfxBus, voiceBus, duck, thoughtFx;

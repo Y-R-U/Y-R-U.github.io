@@ -14,56 +14,56 @@ Total lines: 387
 ### j_intro  (3)
 | key | who | text | dur | src |
 |---|---|---|---|---|
-| `j_intro_1` | jon | Ahh. A quiet evening, a perfect steak, and absolutely no interruptions. | 5.89 | levels |
+| `j_intro_1` | jon | Ahh. A quiet evening, a perfect steak, and absolutely no interruptions. | 4.67 | levels |
 | `j_intro_2` | jon | GARFIELD! | 0.8 | levels |
-| `j_intro_2_nn` | jon | HEY! MY STEAK! | 1.32 | levels |
+| `j_intro_2_nn` | jon | HEY! MY STEAK! | 1.4 | levels |
 
 ### g_intro  (5)
 | key | who | text | dur | src |
 |---|---|---|---|---|
 | `g_intro_1` | garfield | Interruptions are my specialty. | 1.75 | levels |
-| `g_intro_2` | garfield | Ah, the cul-de-sac. Quiet. Peaceful. Home to the world's most magnificent cat. | — | media |
-| `g_intro_3` | garfield | That's me. You're welcome. | — | media |
-| `g_intro_4` | garfield | Somewhere in there, dinner is happening without me. Unacceptable. | — | media |
-| `g_intro_5` | garfield | Worth it. | — | media |
+| `g_intro_2` | garfield | Ah, the cul-de-sac. Quiet. Peaceful. Home to the world's most magnificent cat. | 7.05 | media |
+| `g_intro_3` | garfield | That's me. You're welcome. | 1.81 | media |
+| `g_intro_4` | garfield | Somewhere in there, dinner is happening without me. Unacceptable. | 3.59 | media |
+| `g_intro_5` | garfield | Worth it. | 0.69 | media |
 
 ### j_open_bowl  (5)
 | key | who | text | dur | src |
 |---|---|---|---|---|
-| `j_open_bowl_1` | jon | Here you go, buddy! Crunchy cat biscuits, your favourite! | 3.37 | levels |
-| `j_open_bowl_2` | jon | Dinner is served! One bowl of healthy, nutritious biscuits! | 3.42 | levels |
-| `j_open_bowl_3` | jon | Biscuits for you, and something special for me! | 2.48 | levels |
-| `j_open_bowl_4` | jon | Biscuits are served! Crunchy, nutritious, and only a little bit like cardboard. | — | media |
-| `j_open_bowl_5` | jon | The vet says these are very good for you, buddy. Very, very good. | — | media |
+| `j_open_bowl_1` | jon | Here you go, buddy! Crunchy cat biscuits, your favourite! | 2.46 | levels |
+| `j_open_bowl_2` | jon | Dinner is served! One bowl of healthy, nutritious biscuits! | 3.3 | levels |
+| `j_open_bowl_3` | jon | Biscuits for you, and something special for me! | 2.5 | levels |
+| `j_open_bowl_4` | jon | Biscuits are served! Crunchy, nutritious, and only a little bit like cardboard. | 4.36 | media |
+| `j_open_bowl_5` | jon | The vet says these are very good for you, buddy. Very, very good. | 4.45 | media |
 
 ### j_open_steak  (2)
 | key | who | text | dur | src |
 |---|---|---|---|---|
-| `j_open_steak` | jon | And for me: steak, peas and mashed potatoes! | 3.14 | levels |
-| `j_open_steak_2` | jon | Steak night! With peas! And a mountain of mash! Best night of the week. | — | media |
+| `j_open_steak` | jon | And for me: steak, peas and mashed potatoes! | 2.56 | levels |
+| `j_open_steak_2` | jon | Steak night! With peas! And a mountain of mash! Best night of the week. | 4.13 | media |
 
 ### j_open_lasagna  (2)
 | key | who | text | dur | src |
 |---|---|---|---|---|
-| `j_open_lasagna` | jon | And for me: a big slice of lasagna, fresh from the pan! | 3.73 | levels |
-| `j_open_lasagna_2` | jon | Lasagna! Just one scoop for me. Okay, maybe two. | — | media |
+| `j_open_lasagna` | jon | And for me: a big slice of lasagna, fresh from the pan! | 3.64 | levels |
+| `j_open_lasagna_2` | jon | Lasagna! Just one scoop for me. Okay, maybe two. | 3.65 | media |
 
 ### j_open_meatloaf  (2)
 | key | who | text | dur | src |
 |---|---|---|---|---|
-| `j_open_meatloaf` | jon | And for me: meatloaf. Plain, simple, honest meatloaf. | 3.99 | levels |
-| `j_open_meatloaf_2` | jon | Ah, my famous meatloaf. Nobody makes a loaf of meat quite like me. | — | media |
+| `j_open_meatloaf` | jon | And for me: meatloaf. Plain, simple, honest meatloaf. | 3.33 | levels |
+| `j_open_meatloaf_2` | jon | Ah, my famous meatloaf. Nobody makes a loaf of meat quite like me. | 3.84 | media |
 
 ### g_open_spit  (7)
 | key | who | text | dur | src |
 |---|---|---|---|---|
-| `g_open_spit_1` | garfield | Blech. Crunchy disappointment. | 2.18 | levels |
+| `g_open_spit_1` | garfield | Blech. Crunchy disappointment. | 2.39 | levels |
 | `g_open_spit_2` | garfield | These taste like a cardboard box had a sad day. | 2.98 | levels |
 | `g_open_spit_3` | garfield | Healthy. Ugh. My least favourite flavour. | 3.39 | levels |
 | `g_open_spit_4` | garfield | Nope. My tongue has filed a complaint. | 2.42 | levels |
-| `g_open_spit_5` | garfield | Bleh! That tastes like a sock that gave up on life. | — | media |
-| `g_open_spit_6` | garfield | That's not food. That's gravel with a marketing team. | — | media |
-| `g_open_spit_7` | garfield | Ptoo! I can taste the disappointment. | — | media |
+| `g_open_spit_5` | garfield | Bleh! That tastes like a sock that gave up on life. | 3.54 | media |
+| `g_open_spit_6` | garfield | That's not food. That's gravel with a marketing team. | 3.29 | media |
+| `g_open_spit_7` | garfield | Ptoo! I can taste the disappointment. | 2.71 | media |
 
 ### g_open_plan_steak  (1)
 | key | who | text | dur | src |
@@ -83,8 +83,8 @@ Total lines: 387
 ### j_l10  (2)
 | key | who | text | dur | src |
 |---|---|---|---|---|
-| `j_l10_1` | jon | You won't let me eat my food; I won't let you eat my food. Fine, I just won't eat. | 5.27 | levels |
-| `j_l10_2` | jon | There. Safe and sound. Nobody's eating tonight. | 3.65 | levels |
+| `j_l10_1` | jon | You won't let me eat my food; I won't let you eat my food. Fine, I just won't eat. | 4.94 | levels |
+| `j_l10_2` | jon | There. Safe and sound. Nobody's eating tonight. | 2.59 | levels |
 
 ### g_l10  (1)
 | key | who | text | dur | src |
@@ -94,21 +94,21 @@ Total lines: 387
 ### j_l10_sulk  (4)
 | key | who | text | dur | src |
 |---|---|---|---|---|
-| `j_l10_sulk_1` | jon | I'm fine. Totally fine. Not hungry at all. | 2.76 | levels |
-| `j_l10_sulk_2` | jon | My tummy is rumbling. I'm ignoring it. | 2.48 | levels |
-| `j_l10_sulk_3` | jon | This is a very nice chair. I love sitting here. Not eating. | 3.87 | levels |
-| `j_l10_sulk_4` | jon | Lalala. Not thinking about lasagna. Not thinking about it at all. | — | media |
+| `j_l10_sulk_1` | jon | I'm fine. Totally fine. Not hungry at all. | 2.68 | levels |
+| `j_l10_sulk_2` | jon | My tummy is rumbling. I'm ignoring it. | 2.43 | levels |
+| `j_l10_sulk_3` | jon | This is a very nice chair. I love sitting here. Not eating. | 3.49 | levels |
+| `j_l10_sulk_4` | jon | Lalala. Not thinking about lasagna. Not thinking about it at all. | 4.64 | media |
 
 ### j_catch  (7)
 | key | who | text | dur | src |
 |---|---|---|---|---|
-| `j_catch_1` | jon | Gotcha! | 0.47 | levels |
-| `j_catch_2` | jon | Bad kitty! | 1.02 | levels |
-| `j_catch_3` | jon | Not my dinner, mister! | 1.48 | levels |
-| `j_catch_4` | jon | Back to your biscuits! | 1.12 | levels |
-| `j_catch_5` | jon | Newspaper of justice! | 1.61 | levels |
-| `j_catch_6` | jon | Ha! Caught you! | — | media |
-| `j_catch_7` | jon | No scratching! Got it? | — | media |
+| `j_catch_1` | jon | Gotcha! | 0.63 | levels |
+| `j_catch_2` | jon | Bad kitty! | 0.83 | levels |
+| `j_catch_3` | jon | Not my dinner, mister! | 1.15 | levels |
+| `j_catch_4` | jon | Back to your biscuits! | 1.11 | levels |
+| `j_catch_5` | jon | Newspaper of justice! | 1.59 | levels |
+| `j_catch_6` | jon | Ha! Caught you! | 1.26 | media |
+| `j_catch_7` | jon | No scratching! Got it? | 1.38 | media |
 
 ### g_caught  (8)
 | key | who | text | dur | src |
@@ -118,165 +118,165 @@ Total lines: 387
 | `g_caught_3` | garfield | I'm flat. Still hungry, though. | 2.15 | levels |
 | `g_caught_4` | garfield | I'll allow it. This time. | 1.36 | levels |
 | `g_caught_5` | garfield | That was the sports section. Rude. | 2.58 | levels |
-| `g_caught_6` | garfield | Flattened by the evening news. Classic. | — | media |
-| `g_caught_7` | garfield | I'll be fine. I'm well padded. | — | media |
-| `g_caught_8` | garfield | Round one to the human. The war continues. | — | media |
+| `g_caught_6` | garfield | Flattened by the evening news. Classic. | 2.61 | media |
+| `g_caught_7` | garfield | I'll be fine. I'm well padded. | 2.23 | media |
+| `g_caught_8` | garfield | Round one to the human. The war continues. | 3.31 | media |
 
 ### j_leg  (5)
 | key | who | text | dur | src |
 |---|---|---|---|---|
 | `j_leg_1` | jon | Ow ow ow! My leg! | 2.27 | levels |
-| `j_leg_2` | jon | Yeowch! That was my good leg! | 2.3 | levels |
-| `j_leg_3` | jon | Hop… hop… OUCH! | 2.08 | levels |
-| `j_leg_4` | jon | Ooh! Ah! Ee! Not the shin! | — | media |
-| `j_leg_5` | jon | Ow-ow-ow! Why is it always the leg? | — | media |
+| `j_leg_2` | jon | Yeowch! That was my good leg! | 2.13 | levels |
+| `j_leg_3` | jon | Hop… hop… OUCH! | 1.99 | levels |
+| `j_leg_4` | jon | Ooh! Ah! Ee! Not the shin! | 3.05 | media |
+| `j_leg_5` | jon | Ow-ow-ow! Why is it always the leg? | 2.81 | media |
 
 ### j_face  (5)
 | key | who | text | dur | src |
 |---|---|---|---|---|
-| `j_face_1` | jon | Aah! My face! | 1.4 | levels |
-| `j_face_2` | jon | Not the face! Anything but the face! | 2.56 | levels |
-| `j_face_3` | jon | I can't see! …Okay, I can see. | 2.55 | levels |
-| `j_face_4` | jon | Agh! Everything is cat! | — | media |
-| `j_face_5` | jon | Not the nose! I need that for smelling dinner! | — | media |
+| `j_face_1` | jon | Aah! My face! | 1.24 | levels |
+| `j_face_2` | jon | Not the face! Anything but the face! | 2.62 | levels |
+| `j_face_3` | jon | I can't see! …Okay, I can see. | 1.98 | levels |
+| `j_face_4` | jon | Agh! Everything is cat! | 1.3 | media |
+| `j_face_5` | jon | Not the nose! I need that for smelling dinner! | 2.91 | media |
 
 ### j_paper  (4)
 | key | who | text | dur | src |
 |---|---|---|---|---|
-| `j_paper_1` | jon | Newspaper time! | 1.12 | levels |
-| `j_paper_2` | jon | Special delivery! | 1.25 | levels |
-| `j_paper_3` | jon | Incoming! | 0.87 | levels |
-| `j_paper_4` | jon | Read all about it! | — | media |
+| `j_paper_1` | jon | Newspaper time! | 1.15 | levels |
+| `j_paper_2` | jon | Special delivery! | 1.14 | levels |
+| `j_paper_3` | jon | Incoming! | 0.85 | levels |
+| `j_paper_4` | jon | Read all about it! | 1.0 | media |
 
 ### j_paper_fetch  (2)
 | key | who | text | dur | src |
 |---|---|---|---|---|
-| `j_paper_fetch_1` | jon | Now where did my paper go… | 1.77 | levels |
-| `j_paper_fetch_2` | jon | I hadn't even read the comics yet. | 1.89 | levels |
+| `j_paper_fetch_1` | jon | Now where did my paper go… | 1.62 | levels |
+| `j_paper_fetch_2` | jon | I hadn't even read the comics yet. | 1.55 | levels |
 
 ### j_butt  (4)
 | key | who | text | dur | src |
 |---|---|---|---|---|
-| `j_butt_1` | jon | Yow! My behind! | 1.57 | levels |
-| `j_butt_2` | jon | Hey! That's private property! | 1.8 | levels |
-| `j_butt_3` | jon | Not the pants! These are my good pants! | 2.79 | levels |
-| `j_butt_4` | jon | Hey! That's my sitting area! | — | media |
+| `j_butt_1` | jon | Yow! My behind! | 1.83 | levels |
+| `j_butt_2` | jon | Hey! That's private property! | 1.44 | levels |
+| `j_butt_3` | jon | Not the pants! These are my good pants! | 2.78 | levels |
+| `j_butt_4` | jon | Hey! That's my sitting area! | 1.7 | media |
 
 ### j_chase  (13)
 | key | who | text | dur | src |
 |---|---|---|---|---|
-| `j_chase_1` | jon | Come back here! | 0.86 | levels |
-| `j_chase_2` | jon | You can't outrun me! …Can you? | 1.92 | levels |
+| `j_chase_1` | jon | Come back here! | 0.96 | levels |
+| `j_chase_2` | jon | You can't outrun me! …Can you? | 1.67 | levels |
 | `j_chase_3` | jon | Slow down, you fuzzball! | 1.43 | levels |
-| `j_chase_4` | jon | I just want to talk! With a newspaper! | 1.84 | levels |
-| `j_chase_5` | jon | Garfield, stop! | 1.47 | levels |
-| `j_chase_6` | jon | I'm faster than I look! …Wheeze. | 2.48 | levels |
-| `j_chase_5_nn` | jon | Kitty, stop! | — | levels |
-| `j_chase_7` | jon | That's it! You're in big trouble, mister! | — | media |
-| `j_chase_8` | jon | How is something so round so fast? | — | media |
-| `j_chase_9` | jon | Stop! Stop in the name of dinner! | — | media |
-| `j_chase_10` | jon | Huff... puff... I should really exercise more. | — | media |
-| `j_chase_11` | jon | Whoa! Watch the lamp! Watch the lamp! | — | media |
-| `j_chase_12` | jon | Get back here, you furry orange menace! | — | media |
+| `j_chase_4` | jon | I just want to talk! With a newspaper! | 2.46 | levels |
+| `j_chase_5` | jon | Garfield, stop! | 1.05 | levels |
+| `j_chase_6` | jon | I'm faster than I look! …Wheeze. | 2.66 | levels |
+| `j_chase_5_nn` | jon | Kitty, stop! | 0.73 | levels |
+| `j_chase_7` | jon | That's it! You're in big trouble, mister! | 2.17 | media |
+| `j_chase_8` | jon | How is something so round so fast? | 2.19 | media |
+| `j_chase_9` | jon | Stop! Stop in the name of dinner! | 2.15 | media |
+| `j_chase_10` | jon | Huff... puff... I should really exercise more. | 2.85 | media |
+| `j_chase_11` | jon | Whoa! Watch the lamp! Watch the lamp! | 2.84 | media |
+| `j_chase_12` | jon | Get back here, you furry orange menace! | 1.96 | media |
 
 ### j_glare  (5)
 | key | who | text | dur | src |
 |---|---|---|---|---|
-| `j_glare_1` | jon | Get down from there! | 1.08 | levels |
-| `j_glare_2` | jon | I can wait. …I can't wait. | 2.11 | levels |
-| `j_glare_3` | jon | No fair! I can't jump that high! | 2.07 | levels |
-| `j_glare_4` | jon | I'm watching you. | — | media |
-| `j_glare_5` | jon | You have to come down sometime. | — | media |
+| `j_glare_1` | jon | Get down from there! | 1.03 | levels |
+| `j_glare_2` | jon | I can wait. …I can't wait. | 2.13 | levels |
+| `j_glare_3` | jon | No fair! I can't jump that high! | 1.66 | levels |
+| `j_glare_4` | jon | I'm watching you. | 0.9 | media |
+| `j_glare_5` | jon | You have to come down sometime. | 1.66 | media |
 
 ### j_giveup  (6)
 | key | who | text | dur | src |
 |---|---|---|---|---|
-| `j_giveup_1` | jon | Fine. Stay up there. | 1.5 | levels |
-| `j_giveup_2` | jon | I'll get you next time. | 1.08 | levels |
-| `j_giveup_3` | jon | I'm too tired for this. | 1.51 | levels |
-| `j_giveup_4` | jon | Phew. Cardio. | 1.1 | levels |
-| `j_giveup_5` | jon | I'm not climbing on the furniture. I have dignity. | — | media |
-| `j_giveup_6` | jon | Huff... you win this round. This round! | — | media |
+| `j_giveup_1` | jon | Fine. Stay up there. | 1.15 | levels |
+| `j_giveup_2` | jon | I'll get you next time. | 1.01 | levels |
+| `j_giveup_3` | jon | I'm too tired for this. | 1.4 | levels |
+| `j_giveup_4` | jon | Phew. Cardio. | 1.41 | levels |
+| `j_giveup_5` | jon | I'm not climbing on the furniture. I have dignity. | 2.91 | media |
+| `j_giveup_6` | jon | Huff... you win this round. This round! | 2.79 | media |
 
 ### j_offtable  (4)
 | key | who | text | dur | src |
 |---|---|---|---|---|
-| `j_offtable_1` | jon | Garfield! Off the table! | 1.67 | levels |
-| `j_offtable_2` | jon | Paws off my plate! | 1.39 | levels |
-| `j_offtable_3` | jon | Shoo! This is people food! | 2.03 | levels |
-| `j_offtable_1_nn` | jon | Hey! Off the table! | — | levels |
+| `j_offtable_1` | jon | Garfield! Off the table! | 1.48 | levels |
+| `j_offtable_2` | jon | Paws off my plate! | 1.23 | levels |
+| `j_offtable_3` | jon | Shoo! This is people food! | 1.78 | levels |
+| `j_offtable_1_nn` | jon | Hey! Off the table! | 1.15 | levels |
 
 ### j_back  (3)
 | key | who | text | dur | src |
 |---|---|---|---|---|
-| `j_back_1` | jon | Now, where was I? Oh right. Dinner. | 3.11 | levels |
-| `j_back_2` | jon | Peace and quiet at last. | 1.4 | levels |
-| `j_back_3` | jon | Honestly. Every single night. | — | media |
+| `j_back_1` | jon | Now, where was I? Oh right. Dinner. | 2.54 | levels |
+| `j_back_2` | jon | Peace and quiet at last. | 1.83 | levels |
+| `j_back_3` | jon | Honestly. Every single night. | 2.17 | media |
 
 ### j_lost  (6)
 | key | who | text | dur | src |
 |---|---|---|---|---|
-| `j_lost_1` | jon | My dinner! Again! | 1.41 | levels |
-| `j_lost_2` | jon | Why does this always happen to me? | 1.72 | levels |
-| `j_lost_3` | jon | I guess it's cereal for dinner. Again. | 2.08 | levels |
-| `j_lost_4` | jon | My plate is empty. Again. Why is my plate always empty? | — | media |
-| `j_lost_5` | jon | Garfield! You ate my dinner! | — | media |
-| `j_lost_5_nn` | jon | Hey! Somebody ate my dinner! | — | media |
+| `j_lost_1` | jon | My dinner! Again! | 0.92 | levels |
+| `j_lost_2` | jon | Why does this always happen to me? | 1.69 | levels |
+| `j_lost_3` | jon | I guess it's cereal for dinner. Again. | 2.33 | levels |
+| `j_lost_4` | jon | My plate is empty. Again. Why is my plate always empty? | 3.72 | media |
+| `j_lost_5` | jon | Garfield! You ate my dinner! | 1.54 | media |
+| `j_lost_5_nn` | jon | Hey! Somebody ate my dinner! | 1.45 | media |
 
 ### j_huh  (3)
 | key | who | text | dur | src |
 |---|---|---|---|---|
-| `j_huh_1` | jon | Hmm? | — | levels |
-| `j_huh_2` | jon | What was that noise? | — | levels |
-| `j_huh_3` | jon | Hello? Who's there? | — | levels |
+| `j_huh_1` | jon | Hmm? | 0.29 | levels |
+| `j_huh_2` | jon | What was that noise? | 1.16 | levels |
+| `j_huh_3` | jon | Hello? Who's there? | 0.98 | levels |
 
 ### j_eat  (8)
 | key | who | text | dur | src |
 |---|---|---|---|---|
-| `j_eat_1` | jon | Mmm, delicious. | — | levels |
-| `j_eat_2` | jon | Best. Dinner. Ever. | — | levels |
-| `j_eat_3` | jon | Nom nom nom. | — | levels |
-| `j_eat_4` | jon | Now THIS is living. | — | levels |
-| `j_eat_5` | jon | I should cook this more often. | — | levels |
-| `j_eat_6` | jon | Don't even think about it, buddy. | — | levels |
-| `j_eat_7` | jon | Mmm, compliments to the chef. That's me! | — | media |
-| `j_eat_8` | jon | Chew, chew, chew... wonderful. | — | media |
+| `j_eat_1` | jon | Mmm, delicious. | 1.28 | levels |
+| `j_eat_2` | jon | Best. Dinner. Ever. | 1.81 | levels |
+| `j_eat_3` | jon | Nom nom nom. | 1.17 | levels |
+| `j_eat_4` | jon | Now THIS is living. | 1.08 | levels |
+| `j_eat_5` | jon | I should cook this more often. | 1.46 | levels |
+| `j_eat_6` | jon | Don't even think about it, buddy. | 1.43 | levels |
+| `j_eat_7` | jon | Mmm, compliments to the chef. That's me! | 3.47 | media |
+| `j_eat_8` | jon | Chew, chew, chew... wonderful. | 1.97 | media |
 
 ### j_wander  (22)
 | key | who | text | dur | src |
 |---|---|---|---|---|
-| `j_wander_1` | jon | La la la, dinner time soon! | — | levels |
+| `j_wander_1` | jon | La la la, dinner time soon! | 2.41 | levels |
 | `j_wander_2` | jon | Where did I put my glasses? …Oh, they're on my face. | 3.44 | levels |
-| `j_wander_3` | jon | Should I vacuum? …Nah. | — | levels |
-| `j_wander_4` | jon | What a lovely evening. | — | levels |
-| `j_wander_5` | jon | Note to self: hide the lasagna better. | — | levels |
-| `j_wander_6` | jon | I wonder if the TV has anything good on. | — | levels |
-| `j_wander_7` | jon | Who left cat hair on the sofa? …Oh. Right. | — | levels |
-| `j_wander_8` | jon | Hmm hmm hmm, la la la... | — | media |
-| `j_wander_9` | jon | Dum de dum, dee dum... | — | media |
-| `j_wander_10` | jon | I wonder if I should take up the tuba again. | — | media |
-| `j_wander_11` | jon | Did I leave the oven on? No. Probably. No. | — | media |
-| `j_wander_12` | jon | Maybe I'll organise my sock drawer tonight. Wild night! | — | media |
-| `j_wander_13` | jon | Ooh, I could alphabetise the spice rack! | — | media |
-| `j_wander_14` | jon | Doo doo doo... walking, walking, walking... | — | media |
-| `j_wander_15` | jon | Why do I feel like I'm being watched? | — | media |
-| `j_wander_16` | jon | That cat is up to something. I can feel it. | — | media |
-| `j_wander_17` | jon | I should call my mum. After dinner. Definitely after dinner. | — | media |
-| `j_wander_18` | jon | Mmm, I can smell dinner from here. | — | media |
-| `j_wander_19` | jon | La la la, nobody's going to steal my dinner tonight... | — | media |
-| `j_wander_20` | jon | I wonder what the dog next door is doing. | — | media |
-| `j_wander_21` | jon | Diet biscuits. Healthy cat. Happy me. That's the plan. | — | media |
-| `j_wander_22` | jon | These floorboards really need polishing. | — | media |
+| `j_wander_3` | jon | Should I vacuum? …Nah. | 1.66 | levels |
+| `j_wander_4` | jon | What a lovely evening. | 1.13 | levels |
+| `j_wander_5` | jon | Note to self: hide the lasagna better. | 2.57 | levels |
+| `j_wander_6` | jon | I wonder if the TV has anything good on. | 2.01 | levels |
+| `j_wander_7` | jon | Who left cat hair on the sofa? …Oh. Right. | 3.03 | levels |
+| `j_wander_8` | jon | Hmm hmm hmm, la la la... | 2.29 | media |
+| `j_wander_9` | jon | Dum de dum, dee dum... | 1.8 | media |
+| `j_wander_10` | jon | I wonder if I should take up the tuba again. | 2.12 | media |
+| `j_wander_11` | jon | Did I leave the oven on? No. Probably. No. | 2.94 | media |
+| `j_wander_12` | jon | Maybe I'll organise my sock drawer tonight. Wild night! | 3.26 | media |
+| `j_wander_13` | jon | Ooh, I could alphabetise the spice rack! | 2.86 | media |
+| `j_wander_14` | jon | Doo doo doo... walking, walking, walking... | 3.18 | media |
+| `j_wander_15` | jon | Why do I feel like I'm being watched? | 1.92 | media |
+| `j_wander_16` | jon | That cat is up to something. I can feel it. | 2.34 | media |
+| `j_wander_17` | jon | I should call my mum. After dinner. Definitely after dinner. | 3.52 | media |
+| `j_wander_18` | jon | Mmm, I can smell dinner from here. | 2.15 | media |
+| `j_wander_19` | jon | La la la, nobody's going to steal my dinner tonight... | 2.54 | media |
+| `j_wander_20` | jon | I wonder what the dog next door is doing. | 1.98 | media |
+| `j_wander_21` | jon | Diet biscuits. Healthy cat. Happy me. That's the plan. | 3.18 | media |
+| `j_wander_22` | jon | These floorboards really need polishing. | 2.25 | media |
 
 ### j_dinner_time  (1)
 | key | who | text | dur | src |
 |---|---|---|---|---|
-| `j_dinner_time` | jon | Dinner time! Finally! | — | levels |
+| `j_dinner_time` | jon | Dinner time! Finally! | 1.46 | levels |
 
 ### j_chair_crack  (1)
 | key | who | text | dur | src |
 |---|---|---|---|---|
-| `j_chair_crack` | jon | Huh? What's that crunchy noise? | — | levels |
+| `j_chair_crack` | jon | Huh? What's that crunchy noise? | 2.29 | levels |
 
 ### j_chair_fall  (1)
 | key | who | text | dur | src |
@@ -286,562 +286,562 @@ Total lines: 387
 ### j_chair_floor  (2)
 | key | who | text | dur | src |
 |---|---|---|---|---|
-| `j_chair_floor` | jon | Ow. Hello, floor. | — | levels |
-| `j_chair_floor_2` | jon | Chair's broken. Back's sore. Pride is definitely broken. | — | media |
+| `j_chair_floor` | jon | Ow. Hello, floor. | 1.54 | levels |
+| `j_chair_floor_2` | jon | Chair's broken. Back's sore. Pride is definitely broken. | 3.21 | media |
 
 ### j_vase_hear  (1)
 | key | who | text | dur | src |
 |---|---|---|---|---|
-| `j_vase_hear` | jon | What was THAT?! | — | levels |
+| `j_vase_hear` | jon | What was THAT?! | 0.75 | levels |
 
 ### j_vase_see  (3)
 | key | who | text | dur | src |
 |---|---|---|---|---|
-| `j_vase_see` | jon | My good vase! In a million pieces! | — | levels |
-| `j_vase_see2` | jon | Not my OTHER good vase! | — | levels |
-| `j_vase_see3` | jon | My vase! Who did this? ...Don't answer that. | — | media |
+| `j_vase_see` | jon | My good vase! In a million pieces! | 2.22 | levels |
+| `j_vase_see2` | jon | Not my OTHER good vase! | 1.31 | levels |
+| `j_vase_see3` | jon | My vase! Who did this? ...Don't answer that. | 2.78 | media |
 
 ### j_vase_sweep  (1)
 | key | who | text | dur | src |
 |---|---|---|---|---|
-| `j_vase_sweep` | jon | Where did I put that broom… | — | levels |
+| `j_vase_sweep` | jon | Where did I put that broom… | 1.48 | levels |
 
 ### j_vase_spare  (2)
 | key | who | text | dur | src |
 |---|---|---|---|---|
-| `j_vase_spare` | jon | Good thing I keep a spare vase. | — | levels |
-| `j_vase_spare2` | jon | Second spare vase. I buy them in bulk. | — | levels |
+| `j_vase_spare` | jon | Good thing I keep a spare vase. | 1.77 | levels |
+| `j_vase_spare2` | jon | Second spare vase. I buy them in bulk. | 2.8 | levels |
 
 ### j_curtain_hear  (1)
 | key | who | text | dur | src |
 |---|---|---|---|---|
-| `j_curtain_hear` | jon | Is something ripping? | — | levels |
+| `j_curtain_hear` | jon | Is something ripping? | 1.36 | levels |
 
 ### j_curtain_see  (2)
 | key | who | text | dur | src |
 |---|---|---|---|---|
-| `j_curtain_see` | jon | My CURTAINS! They were on sale! | — | levels |
-| `j_curtain_see2` | jon | They're shredded! These were nearly new! | — | media |
+| `j_curtain_see` | jon | My CURTAINS! They were on sale! | 2.26 | levels |
+| `j_curtain_see2` | jon | They're shredded! These were nearly new! | 2.64 | media |
 
 ### j_curtain_fix  (1)
 | key | who | text | dur | src |
 |---|---|---|---|---|
-| `j_curtain_fix` | jon | Maybe if I hold this bit up… nope. | — | levels |
+| `j_curtain_fix` | jon | Maybe if I hold this bit up… nope. | 2.01 | levels |
 
 ### j_pan_gone  (1)
 | key | who | text | dur | src |
 |---|---|---|---|---|
-| `j_pan_gone` | jon | Wait… where's my pan? | — | levels |
+| `j_pan_gone` | jon | Wait… where's my pan? | 1.14 | levels |
 
 ### j_fling  (2)
 | key | who | text | dur | src |
 |---|---|---|---|---|
-| `j_fling_1` | jon | HEY! My dinner! | — | levels |
-| `j_fling_2` | jon | Five-second rule! Five-second rule! | — | levels |
+| `j_fling_1` | jon | HEY! My dinner! | 0.86 | levels |
+| `j_fling_2` | jon | Five-second rule! Five-second rule! | 2.09 | levels |
 
 ### j_fling_save  (1)
 | key | who | text | dur | src |
 |---|---|---|---|---|
-| `j_fling_save` | jon | Saved it! Ha! | — | levels |
+| `j_fling_save` | jon | Saved it! Ha! | 1.07 | levels |
 
 ### j_cold  (4)
 | key | who | text | dur | src |
 |---|---|---|---|---|
-| `j_cold_1` | jon | Brrr! Why is it suddenly freezing?! | — | levels |
-| `j_cold_2` | jon | Who opened the window? | — | levels |
-| `j_cold_3` | jon | Much better. Brrr. | — | levels |
-| `j_cold_4` | jon | It's freezing! I'd better shut that window. | — | media |
+| `j_cold_1` | jon | Brrr! Why is it suddenly freezing?! | 2.41 | levels |
+| `j_cold_2` | jon | Who opened the window? | 1.43 | levels |
+| `j_cold_3` | jon | Much better. Brrr. | 1.01 | levels |
+| `j_cold_4` | jon | It's freezing! I'd better shut that window. | 2.29 | media |
 
 ### j_shoo  (1)
 | key | who | text | dur | src |
 |---|---|---|---|---|
-| `j_shoo` | jon | Shoo, off the sill! | — | levels |
+| `j_shoo` | jon | Shoo, off the sill! | 1.45 | levels |
 
 ### j_bed_hear  (1)
 | key | who | text | dur | src |
 |---|---|---|---|---|
-| `j_bed_hear` | jon | What's going on up there? | — | levels |
+| `j_bed_hear` | jon | What's going on up there? | 1.17 | levels |
 
 ### j_bed_see  (2)
 | key | who | text | dur | src |
 |---|---|---|---|---|
-| `j_bed_see` | jon | My BED! My comfy, cosy bed! | — | levels |
-| `j_bed_see2` | jon | My quilt! It's more holes than quilt! | — | media |
+| `j_bed_see` | jon | My BED! My comfy, cosy bed! | 2.05 | levels |
+| `j_bed_see2` | jon | My quilt! It's more holes than quilt! | 1.95 | media |
 
 ### j_trapped  (6)
 | key | who | text | dur | src |
 |---|---|---|---|---|
-| `j_trapped_1` | jon | Hey! The door's stuck! | — | levels |
-| `j_trapped_2` | jon | Garfield, open this door! | — | levels |
-| `j_trapped_3` | jon | Hello? Anybody? …Anybody with thumbs? | — | levels |
-| `j_trapped_2_nn` | jon | Kitty, open this door! | — | levels |
-| `j_trapped_4` | jon | Locked in my own bedroom. This is a new low. | — | media |
-| `j_trapped_5` | jon | I hope nobody's eating my dinner out there! | — | media |
+| `j_trapped_1` | jon | Hey! The door's stuck! | 1.13 | levels |
+| `j_trapped_2` | jon | Garfield, open this door! | 2.16 | levels |
+| `j_trapped_3` | jon | Hello? Anybody? …Anybody with thumbs? | 2.48 | levels |
+| `j_trapped_2_nn` | jon | Kitty, open this door! | 1.13 | levels |
+| `j_trapped_4` | jon | Locked in my own bedroom. This is a new low. | 2.55 | media |
+| `j_trapped_5` | jon | I hope nobody's eating my dinner out there! | 2.05 | media |
 
 ### j_letout  (1)
 | key | who | text | dur | src |
 |---|---|---|---|---|
-| `j_letout` | jon | Out you go, mister. | — | levels |
+| `j_letout` | jon | Out you go, mister. | 1.24 | levels |
 
 ### j_bump  (3)
 | key | who | text | dur | src |
 |---|---|---|---|---|
-| `j_bump_1` | jon | Earthquake?! | — | levels |
-| `j_bump_2` | jon | Did the table just… hop? | — | levels |
-| `j_bump_3` | jon | I'm sure it's nothing. | — | levels |
+| `j_bump_1` | jon | Earthquake?! | 0.8 | levels |
+| `j_bump_2` | jon | Did the table just… hop? | 1.48 | levels |
+| `j_bump_3` | jon | I'm sure it's nothing. | 1.11 | levels |
 
 ### j_stunned  (3)
 | key | who | text | dur | src |
 |---|---|---|---|---|
-| `j_stunned` | jon | Wobble… wobble… is the room spinning? | — | levels |
-| `j_stunned_2` | jon | Who turned the house into a bouncy castle? | — | media |
-| `j_stunned_3` | jon | Ooh... I see little lasagnas spinning round my head. | — | media |
+| `j_stunned` | jon | Wobble… wobble… is the room spinning? | 2.46 | levels |
+| `j_stunned_2` | jon | Who turned the house into a bouncy castle? | 2.08 | media |
+| `j_stunned_3` | jon | Ooh... I see little lasagnas spinning round my head. | 2.96 | media |
 
 ### j_slip  (1)
 | key | who | text | dur | src |
 |---|---|---|---|---|
-| `j_slip` | jon | Whoa—whoa—WHOAAA! | — | levels |
+| `j_slip` | jon | Whoa—whoa—WHOAAA! | 1.73 | levels |
 
 ### j_faceplant  (2)
 | key | who | text | dur | src |
 |---|---|---|---|---|
-| `j_faceplant` | jon | Mmmph. | 0.6 | levels |
-| `j_faceplant_2` | jon | I'm just gonna lie here for a while. | — | media |
+| `j_faceplant` | jon | Mmmph. | 0.59 | levels |
+| `j_faceplant_2` | jon | I'm just gonna lie here for a while. | 1.67 | media |
 
 ### j_fridge_hey  (1)
 | key | who | text | dur | src |
 |---|---|---|---|---|
-| `j_fridge_hey` | jon | Hey! I can SEE you! | — | levels |
+| `j_fridge_hey` | jon | Hey! I can SEE you! | 1.19 | levels |
 
 ### g_idle  (49)
 | key | who | text | dur | src |
 |---|---|---|---|---|
 | `g_idle_01` | garfield | I'm not lazy. I'm in energy-saving mode. | 3.1 | levels |
-| `g_idle_02` | garfield | If I sit still long enough, maybe dinner comes to me. | — | levels |
-| `g_idle_03` | garfield | Is it nap time? It feels like nap time. | — | levels |
-| `g_idle_04` | garfield | I could do something. Or… not. | — | levels |
-| `g_idle_05` | garfield | My tummy is talking. It says 'more'. | — | levels |
-| `g_idle_06` | garfield | I need a snack, to give me strength to find a snack. | — | levels |
-| `g_idle_07` | garfield | A diet is just a sad word for 'less food'. | — | levels |
-| `g_idle_08` | garfield | Exercise? I thought you said extra pies. | — | levels |
-| `g_idle_09` | garfield | I'll get up in five minutes. Or fifty. | — | levels |
-| `g_idle_10` | garfield | Time is just the gap between meals. | — | levels |
-| `g_idle_11` | garfield | I'm not fat. I'm fluffy with ambition. | — | levels |
-| `g_idle_12` | garfield | This floor is comfy. I live here now. | — | levels |
-| `g_idle_13` | garfield | Somebody should do something. Not me, though. | — | levels |
-| `g_idle_14` | garfield | Waiting is hungry work. | — | levels |
-| `g_idle_15` | garfield | Yawn. Being this adorable is exhausting. | — | levels |
-| `g_idle_16` | garfield | Jon's dinner won't eat itself. That's my job. | — | levels |
-| `g_idle_17` | garfield | A cat's gotta do what a cat's gotta eat. | — | levels |
-| `g_idle_18` | garfield | Hello? Food? Where are you hiding? | — | levels |
-| `g_idle_19` | garfield | I could chase my tail. But then I'd have to catch it. | — | levels |
-| `g_idle_20` | garfield | Cat biscuits. The saddest two words. | — | levels |
-| `g_idle_21` | garfield | Is it Monday? It feels like a Monday. | — | levels |
-| `g_idle_22` | garfield | Hmm. Thinking about lasagna. As usual. | — | levels |
-| `g_idle_23` | garfield | Is it dinner time? It always feels like dinner time. | — | media |
-| `g_idle_24` | garfield | I could take a nap. Or I could take a nap. Tough choice. | — | media |
-| `g_idle_25` | garfield | Mondays. Even the word sounds like a hairball. | — | media |
-| `g_idle_26` | garfield | I'm not fat. I'm just extra huggable. | — | media |
-| `g_idle_27` | garfield | Exercise. Never heard of it. Sounds made up. | — | media |
-| `g_idle_28` | garfield | I love lasagna more than I love sleeping. And I really love sleeping. | — | media |
-| `g_idle_29` | garfield | Hello? Player? I'm not getting any thinner standing here. | — | media |
-| `g_idle_30` | garfield | My belly is rumbling. It's singing a song called 'feed me'. | — | media |
-| `g_idle_31` | garfield | Some cats chase mice. I chase snacks. Slowly. | — | media |
-| `g_idle_32` | garfield | I'd go for a walk, but my legs are on a break. | — | media |
-| `g_idle_33` | garfield | Nap first, plan later. That's my motto. Well, one of them. | — | media |
-| `g_idle_34` | garfield | A balanced diet is a lasagna in each paw. | — | media |
-| `g_idle_35` | garfield | If Mondays were food, they'd be diet biscuits. | — | media |
-| `g_idle_36` | garfield | I see food, I eat it. It's a very simple system. | — | media |
-| `g_idle_37` | garfield | Is this floor heated? It should be heated. I'll file a complaint. | — | media |
-| `g_idle_38` | garfield | I'm just resting my eyes. With my eyes open. | — | media |
-| `g_idle_39` | garfield | Somewhere out there is a lasagna with my name on it. | — | media |
-| `g_idle_40` | garfield | I'm not ignoring you. I'm conserving charm. | — | media |
-| `g_idle_41` | garfield | Hmm. Is that a crumb? No. Just a dust bunny. Tragic. | — | media |
-| `g_idle_42` | garfield | Stretching counts as exercise. I just did a stretch. Workout over. | — | media |
-| `g_idle_43` | garfield | Some call it a weight problem. I call it more of me to love. | — | media |
-| `g_idle_44` | garfield | Thinking about food is my hobby. Eating it is my career. | — | media |
-| `g_idle_45` | garfield | Cats have nine lives. I plan to spend all nine on the sofa. | — | media |
-| `g_idle_46` | garfield | Tick tock. The food isn't going to steal itself. | — | media |
-| `g_idle_47` | garfield | Do I hear a can opener? No. Just my imagination. Again. | — | media |
-| `g_idle_48` | garfield | If you need me, I'll be here. Being adorable. | — | media |
-| `g_idle_16_nn` | garfield | His dinner won't eat itself. That's my job. | — | media |
+| `g_idle_02` | garfield | If I sit still long enough, maybe dinner comes to me. | 3.58 | levels |
+| `g_idle_03` | garfield | Is it nap time? It feels like nap time. | 2.98 | levels |
+| `g_idle_04` | garfield | I could do something. Or… not. | 3.38 | levels |
+| `g_idle_05` | garfield | My tummy is talking. It says 'more'. | 2.59 | levels |
+| `g_idle_06` | garfield | I need a snack, to give me strength to find a snack. | 3.73 | levels |
+| `g_idle_07` | garfield | A diet is just a sad word for 'less food'. | 2.9 | levels |
+| `g_idle_08` | garfield | Exercise? I thought you said extra pies. | 3.33 | levels |
+| `g_idle_09` | garfield | I'll get up in five minutes. Or fifty. | 2.39 | levels |
+| `g_idle_10` | garfield | Time is just the gap between meals. | 2.14 | levels |
+| `g_idle_11` | garfield | I'm not fat. I'm fluffy with ambition. | 2.74 | levels |
+| `g_idle_12` | garfield | This floor is comfy. I live here now. | 2.97 | levels |
+| `g_idle_13` | garfield | Somebody should do something. Not me, though. | 3.09 | levels |
+| `g_idle_14` | garfield | Waiting is hungry work. | 1.51 | levels |
+| `g_idle_15` | garfield | Yawn. Being this adorable is exhausting. | 3.59 | levels |
+| `g_idle_16` | garfield | Jon's dinner won't eat itself. That's my job. | 2.92 | levels |
+| `g_idle_17` | garfield | A cat's gotta do what a cat's gotta eat. | 2.41 | levels |
+| `g_idle_18` | garfield | Hello? Food? Where are you hiding? | 2.46 | levels |
+| `g_idle_19` | garfield | I could chase my tail. But then I'd have to catch it. | 2.81 | levels |
+| `g_idle_20` | garfield | Cat biscuits. The saddest two words. | 3.06 | levels |
+| `g_idle_21` | garfield | Is it Monday? It feels like a Monday. | 2.4 | levels |
+| `g_idle_22` | garfield | Hmm. Thinking about lasagna. As usual. | 3.16 | levels |
+| `g_idle_23` | garfield | Is it dinner time? It always feels like dinner time. | 3.54 | media |
+| `g_idle_24` | garfield | I could take a nap. Or I could take a nap. Tough choice. | 4.82 | media |
+| `g_idle_25` | garfield | Mondays. Even the word sounds like a hairball. | 3.34 | media |
+| `g_idle_26` | garfield | I'm not fat. I'm just extra huggable. | 2.86 | media |
+| `g_idle_27` | garfield | Exercise. Never heard of it. Sounds made up. | 3.89 | media |
+| `g_idle_28` | garfield | I love lasagna more than I love sleeping. And I really love sleeping. | 4.74 | media |
+| `g_idle_29` | garfield | Hello? Player? I'm not getting any thinner standing here. | 3.73 | media |
+| `g_idle_30` | garfield | My belly is rumbling. It's singing a song called 'feed me'. | 3.9 | media |
+| `g_idle_31` | garfield | Some cats chase mice. I chase snacks. Slowly. | 3.99 | media |
+| `g_idle_32` | garfield | I'd go for a walk, but my legs are on a break. | 2.66 | media |
+| `g_idle_33` | garfield | Nap first, plan later. That's my motto. Well, one of them. | 4.74 | media |
+| `g_idle_34` | garfield | A balanced diet is a lasagna in each paw. | 3.1 | media |
+| `g_idle_35` | garfield | If Mondays were food, they'd be diet biscuits. | 3.29 | media |
+| `g_idle_36` | garfield | I see food, I eat it. It's a very simple system. | 3.9 | media |
+| `g_idle_37` | garfield | Is this floor heated? It should be heated. I'll file a complaint. | 4.05 | media |
+| `g_idle_38` | garfield | I'm just resting my eyes. With my eyes open. | 2.97 | media |
+| `g_idle_39` | garfield | Somewhere out there is a lasagna with my name on it. | 3.07 | media |
+| `g_idle_40` | garfield | I'm not ignoring you. I'm conserving charm. | 3.44 | media |
+| `g_idle_41` | garfield | Hmm. Is that a crumb? No. Just a dust bunny. Tragic. | 5.51 | media |
+| `g_idle_42` | garfield | Stretching counts as exercise. I just did a stretch. Workout over. | 4.3 | media |
+| `g_idle_43` | garfield | Some call it a weight problem. I call it more of me to love. | 3.83 | media |
+| `g_idle_44` | garfield | Thinking about food is my hobby. Eating it is my career. | 4.19 | media |
+| `g_idle_45` | garfield | Cats have nine lives. I plan to spend all nine on the sofa. | 4.62 | media |
+| `g_idle_46` | garfield | Tick tock. The food isn't going to steal itself. | 3.19 | media |
+| `g_idle_47` | garfield | Do I hear a can opener? No. Just my imagination. Again. | 4.98 | media |
+| `g_idle_48` | garfield | If you need me, I'll be here. Being adorable. | 2.82 | media |
+| `g_idle_16_nn` | garfield | His dinner won't eat itself. That's my job. | 2.97 | media |
 
 ### g_near_steak  (1)
 | key | who | text | dur | src |
 |---|---|---|---|---|
-| `g_near_steak` | garfield | Steak? Don't mind if I do. | — | levels |
+| `g_near_steak` | garfield | Steak? Don't mind if I do. | 2.21 | levels |
 
 ### g_near_lasagna  (1)
 | key | who | text | dur | src |
 |---|---|---|---|---|
-| `g_near_lasagna` | garfield | Lasagna. Hello, gorgeous. | — | levels |
+| `g_near_lasagna` | garfield | Lasagna. Hello, gorgeous. | 2.33 | levels |
 
 ### g_near_meatloaf  (1)
 | key | who | text | dur | src |
 |---|---|---|---|---|
-| `g_near_meatloaf` | garfield | Meatloaf. Plain. Boring. MINE. | — | levels |
+| `g_near_meatloaf` | garfield | Meatloaf. Plain. Boring. MINE. | 4.02 | levels |
 
 ### g_near  (6)
 | key | who | text | dur | src |
 |---|---|---|---|---|
-| `g_near_1` | garfield | So close I can taste it. Because I'm about to. | — | levels |
-| `g_near_2` | garfield | Come to papa. | — | levels |
-| `g_near_3` | garfield | There it is. The love of my life. On a plate. | — | media |
-| `g_near_4` | garfield | Steady. Steady. Don't drool on the table. | — | media |
-| `g_near_5` | garfield | Hello, dinner. Did you miss me? | — | media |
-| `g_near_6` | garfield | Mmm. Smells like victory. And gravy. | — | media |
+| `g_near_1` | garfield | So close I can taste it. Because I'm about to. | 3.31 | levels |
+| `g_near_2` | garfield | Come to papa. | 0.94 | levels |
+| `g_near_3` | garfield | There it is. The love of my life. On a plate. | 3.39 | media |
+| `g_near_4` | garfield | Steady. Steady. Don't drool on the table. | 2.8 | media |
+| `g_near_5` | garfield | Hello, dinner. Did you miss me? | 2.25 | media |
+| `g_near_6` | garfield | Mmm. Smells like victory. And gravy. | 3.04 | media |
 
 ### g_guarded  (3)
 | key | who | text | dur | src |
 |---|---|---|---|---|
-| `g_guarded_1` | garfield | He's watching. I need a distraction. | — | levels |
-| `g_guarded_2` | garfield | Not while he's looking. Too risky. | — | levels |
-| `g_guarded_3` | garfield | First, a little chaos. Then dinner. | — | levels |
+| `g_guarded_1` | garfield | He's watching. I need a distraction. | 2.68 | levels |
+| `g_guarded_2` | garfield | Not while he's looking. Too risky. | 2.44 | levels |
+| `g_guarded_3` | garfield | First, a little chaos. Then dinner. | 2.98 | levels |
 
 ### g_jumpfail  (6)
 | key | who | text | dur | src |
 |---|---|---|---|---|
-| `g_jumpfail_1` | garfield | Gravity. My oldest enemy. | — | levels |
-| `g_jumpfail_2` | garfield | That was a warm-up. | — | levels |
-| `g_jumpfail_3` | garfield | I meant to do that. | — | levels |
-| `g_jumpfail_4` | garfield | Too much cat, not enough jump. | — | levels |
-| `g_jumpfail_5` | garfield | Nobody saw that. Nobody saw that. | — | media |
-| `g_jumpfail_6` | garfield | Maybe I need a run-up. Or a ladder. Or a butler. | — | media |
+| `g_jumpfail_1` | garfield | Gravity. My oldest enemy. | 2.2 | levels |
+| `g_jumpfail_2` | garfield | That was a warm-up. | 1.13 | levels |
+| `g_jumpfail_3` | garfield | I meant to do that. | 1.01 | levels |
+| `g_jumpfail_4` | garfield | Too much cat, not enough jump. | 2.18 | levels |
+| `g_jumpfail_5` | garfield | Nobody saw that. Nobody saw that. | 2.91 | media |
+| `g_jumpfail_6` | garfield | Maybe I need a run-up. Or a ladder. Or a butler. | 3.85 | media |
 
 ### g_scratch_hit  (7)
 | key | who | text | dur | src |
 |---|---|---|---|---|
-| `g_scratch_hit_1` | garfield | Sorry. Not sorry. | — | levels |
-| `g_scratch_hit_2` | garfield | Claws: one. Jon: zero. | — | levels |
-| `g_scratch_hit_3` | garfield | That's for the cat biscuits. | — | levels |
-| `g_scratch_hit_4` | garfield | Oops. My paw slipped. On purpose. | — | levels |
-| `g_scratch_hit_5` | garfield | Ooh, he's hopping. Like a very sad kangaroo. | — | media |
-| `g_scratch_hit_6` | garfield | Claws: sharp. Aim: perfect. Guilt: none. | — | media |
-| `g_scratch_hit_2_nn` | garfield | Claws: one. Human: zero. | — | media |
+| `g_scratch_hit_1` | garfield | Sorry. Not sorry. | 1.76 | levels |
+| `g_scratch_hit_2` | garfield | Claws: one. Jon: zero. | 2.28 | levels |
+| `g_scratch_hit_3` | garfield | That's for the cat biscuits. | 1.45 | levels |
+| `g_scratch_hit_4` | garfield | Oops. My paw slipped. On purpose. | 2.52 | levels |
+| `g_scratch_hit_5` | garfield | Ooh, he's hopping. Like a very sad kangaroo. | 4.05 | media |
+| `g_scratch_hit_6` | garfield | Claws: sharp. Aim: perfect. Guilt: none. | 3.66 | media |
+| `g_scratch_hit_2_nn` | garfield | Claws: one. Human: zero. | 2.47 | media |
 
 ### g_scratch_miss  (4)
 | key | who | text | dur | src |
 |---|---|---|---|---|
-| `g_scratch_miss_1` | garfield | Swing and a miss. | — | levels |
-| `g_scratch_miss_2` | garfield | Just stretching. | — | levels |
-| `g_scratch_miss_3` | garfield | Practising. Obviously. | — | levels |
-| `g_scratch_miss_4` | garfield | Swish. That was a warning shot. | — | media |
+| `g_scratch_miss_1` | garfield | Swing and a miss. | 1.78 | levels |
+| `g_scratch_miss_2` | garfield | Just stretching. | 1.09 | levels |
+| `g_scratch_miss_3` | garfield | Practising. Obviously. | 2.05 | levels |
+| `g_scratch_miss_4` | garfield | Swish. That was a warning shot. | 2.29 | media |
 
 ### g_chased  (11)
 | key | who | text | dur | src |
 |---|---|---|---|---|
-| `g_chased_1` | garfield | Run away! Slowly! | — | levels |
-| `g_chased_2` | garfield | Cats don't run. We relocate. Quickly. | — | levels |
-| `g_chased_3` | garfield | I regret nothing! Except the running. | — | levels |
-| `g_chased_4` | garfield | He'll never catch me. Probably. | — | levels |
-| `g_chased_5` | garfield | Legs! Do your thing! | — | levels |
-| `g_chased_6` | garfield | Up high! Jon can't jump! | — | levels |
-| `g_chased_7` | garfield | This is the most exercise I've done all year. | — | media |
-| `g_chased_8` | garfield | Run now, nap later. Run now, nap later. | — | media |
-| `g_chased_9` | garfield | Why does he always take things so personally? | — | media |
-| `g_chased_10` | garfield | Wheee! I mean... help! | — | media |
-| `g_chased_6_nn` | garfield | Up high! He can't jump! | — | media |
+| `g_chased_1` | garfield | Run away! Slowly! | 1.61 | levels |
+| `g_chased_2` | garfield | Cats don't run. We relocate. Quickly. | 2.75 | levels |
+| `g_chased_3` | garfield | I regret nothing! Except the running. | 2.62 | levels |
+| `g_chased_4` | garfield | He'll never catch me. Probably. | 1.65 | levels |
+| `g_chased_5` | garfield | Legs! Do your thing! | 1.88 | levels |
+| `g_chased_6` | garfield | Up high! Jon can't jump! | 2.53 | levels |
+| `g_chased_7` | garfield | This is the most exercise I've done all year. | 2.82 | media |
+| `g_chased_8` | garfield | Run now, nap later. Run now, nap later. | 4.33 | media |
+| `g_chased_9` | garfield | Why does he always take things so personally? | 2.37 | media |
+| `g_chased_10` | garfield | Wheee! I mean... help! | 1.76 | media |
+| `g_chased_6_nn` | garfield | Up high! He can't jump! | 1.68 | media |
 
 ### g_escape  (7)
 | key | who | text | dur | src |
 |---|---|---|---|---|
-| `g_escape_1` | garfield | Ha. Jons can't jump. | — | levels |
-| `g_escape_2` | garfield | Up here, I'm untouchable. | — | levels |
-| `g_escape_3` | garfield | Enjoy the view, Jon. | — | levels |
-| `g_escape_4` | garfield | Safe. The high ground always wins. | — | media |
-| `g_escape_5` | garfield | Phew. Now I need a nap. And a snack. And another nap. | — | media |
-| `g_escape_3_nn` | garfield | Enjoy the view, pal. | — | media |
-| `g_escape_1_nn` | garfield | Ha. Humans can't jump. | — | media |
+| `g_escape_1` | garfield | Ha. Jons can't jump. | 2.05 | levels |
+| `g_escape_2` | garfield | Up here, I'm untouchable. | 1.52 | levels |
+| `g_escape_3` | garfield | Enjoy the view, Jon. | 1.16 | levels |
+| `g_escape_4` | garfield | Safe. The high ground always wins. | 2.66 | media |
+| `g_escape_5` | garfield | Phew. Now I need a nap. And a snack. And another nap. | 5.08 | media |
+| `g_escape_3_nn` | garfield | Enjoy the view, pal. | 1.38 | media |
+| `g_escape_1_nn` | garfield | Ha. Humans can't jump. | 2.23 | media |
 
 ### g_gaveup  (4)
 | key | who | text | dur | src |
 |---|---|---|---|---|
-| `g_gaveup_1` | garfield | And the cat wins again. | — | levels |
-| `g_gaveup_2` | garfield | Too easy. | — | levels |
-| `g_gaveup_3` | garfield | Better luck next time, pal. | — | levels |
-| `g_gaveup_4` | garfield | He'll forget about this in five minutes. He forgets where his keys are. | — | media |
+| `g_gaveup_1` | garfield | And the cat wins again. | 1.68 | levels |
+| `g_gaveup_2` | garfield | Too easy. | 0.73 | levels |
+| `g_gaveup_3` | garfield | Better luck next time, pal. | 1.8 | levels |
+| `g_gaveup_4` | garfield | He'll forget about this in five minutes. He forgets where his keys are. | 3.7 | media |
 
 ### g_paper_hit  (4)
 | key | who | text | dur | src |
 |---|---|---|---|---|
-| `g_paper_hit_1` | garfield | Ow. Read all about it. | — | levels |
-| `g_paper_hit_2` | garfield | That was a strongly worded newspaper. | — | levels |
-| `g_paper_hit_3` | garfield | Hit by the comics section. Ironic. | — | levels |
-| `g_paper_hit_4` | garfield | Bonk. Headline news: cat hit by headline news. | — | media |
+| `g_paper_hit_1` | garfield | Ow. Read all about it. | 1.71 | levels |
+| `g_paper_hit_2` | garfield | That was a strongly worded newspaper. | 2.15 | levels |
+| `g_paper_hit_3` | garfield | Hit by the comics section. Ironic. | 2.17 | levels |
+| `g_paper_hit_4` | garfield | Bonk. Headline news: cat hit by headline news. | 4.21 | media |
 
 ### g_paper_dodge  (2)
 | key | who | text | dur | src |
 |---|---|---|---|---|
-| `g_paper_dodge_1` | garfield | Missed me! | — | levels |
-| `g_paper_dodge_2` | garfield | Too slow, paperboy. | — | levels |
+| `g_paper_dodge_1` | garfield | Missed me! | 0.65 | levels |
+| `g_paper_dodge_2` | garfield | Too slow, paperboy. | 1.67 | levels |
 
 ### g_win  (11)
 | key | who | text | dur | src |
 |---|---|---|---|---|
-| `g_win_1` | garfield | Mmm. Worth every second. | — | levels |
-| `g_win_2` | garfield | Delicious. Are there seconds? | — | levels |
-| `g_win_3` | garfield | Victory tastes like gravy. | — | levels |
-| `g_win_4` | garfield | Belly: fuller. Life: better. | — | levels |
-| `g_win_5` | garfield | Burp. Pardon me. | — | levels |
-| `g_win_6` | garfield | Now THAT is what I call a heist. | — | levels |
-| `g_win_7` | garfield | Another flawless heist. I'd take a bow, but bending is effort. | — | media |
-| `g_win_8` | garfield | Delicious. Ten out of ten. Would steal again. | — | media |
-| `g_win_9` | garfield | And that's how it's done. Now, if you'll excuse me, I have a nap scheduled. | — | media |
-| `g_win_10` | garfield | I'm not saying I'm a genius. But I'm not not saying it. | — | media |
-| `g_win_11` | garfield | That was a team effort. And by team, I mean me. | — | media |
+| `g_win_1` | garfield | Mmm. Worth every second. | 1.93 | levels |
+| `g_win_2` | garfield | Delicious. Are there seconds? | 2.18 | levels |
+| `g_win_3` | garfield | Victory tastes like gravy. | 1.88 | levels |
+| `g_win_4` | garfield | Belly: fuller. Life: better. | 2.84 | levels |
+| `g_win_5` | garfield | Burp. Pardon me. | 1.57 | levels |
+| `g_win_6` | garfield | Now THAT is what I call a heist. | 1.97 | levels |
+| `g_win_7` | garfield | Another flawless heist. I'd take a bow, but bending is effort. | 3.76 | media |
+| `g_win_8` | garfield | Delicious. Ten out of ten. Would steal again. | 2.9 | media |
+| `g_win_9` | garfield | And that's how it's done. Now, if you'll excuse me, I have a nap scheduled. | 4.56 | media |
+| `g_win_10` | garfield | I'm not saying I'm a genius. But I'm not not saying it. | 3.65 | media |
+| `g_win_11` | garfield | That was a team effort. And by team, I mean me. | 3.45 | media |
 
 ### g_tut  (4)
 | key | who | text | dur | src |
 |---|---|---|---|---|
-| `g_tut_1` | garfield | Okay. Sneaking lesson. It's like napping, but with walking. | — | levels |
-| `g_tut_2` | garfield | Jon's wandering around. Let's practise on him. | — | levels |
-| `g_tut_3` | garfield | He's sitting down to eat. Showtime. | — | levels |
-| `g_tut_2_nn` | garfield | My human's wandering around. Let's practise on him. | — | media |
+| `g_tut_1` | garfield | Okay. Sneaking lesson. It's like napping, but with walking. | 4.17 | levels |
+| `g_tut_2` | garfield | Jon's wandering around. Let's practise on him. | 3.31 | levels |
+| `g_tut_3` | garfield | He's sitting down to eat. Showtime. | 2.26 | levels |
+| `g_tut_2_nn` | garfield | My human's wandering around. Let's practise on him. | 2.86 | media |
 
 ### g_l02_frontleg  (2)
 | key | who | text | dur | src |
 |---|---|---|---|---|
-| `g_l02_frontleg` | garfield | Wrong leg. The back ones hold up the Jon. | — | levels |
-| `g_l02_frontleg_nn` | garfield | Wrong leg. The back ones hold up the human. | — | media |
+| `g_l02_frontleg` | garfield | Wrong leg. The back ones hold up the Jon. | 3.57 | levels |
+| `g_l02_frontleg_nn` | garfield | Wrong leg. The back ones hold up the human. | 3.15 | media |
 
 ### g_l05_miss  (1)
 | key | who | text | dur | src |
 |---|---|---|---|---|
-| `g_l05_miss` | garfield | Too early. Or too late. Timing is hard. | — | levels |
+| `g_l05_miss` | garfield | Too early. Or too late. Timing is hard. | 3.56 | levels |
 
 ### g_l09_early  (1)
 | key | who | text | dur | src |
 |---|---|---|---|---|
-| `g_l09_early` | garfield | Not loose enough yet. More belly power needed. | — | levels |
+| `g_l09_early` | garfield | Not loose enough yet. More belly power needed. | 3.04 | levels |
 
 ### g_l05_grab  (1)
 | key | who | text | dur | src |
 |---|---|---|---|---|
-| `g_l05_grab` | garfield | Me Tarzan. You lasagna. | — | levels |
+| `g_l05_grab` | garfield | Me Tarzan. You lasagna. | 2.52 | levels |
 
 ### l01_hint  (4)
 | key | who | text | dur | src |
 |---|---|---|---|---|
-| `l01_hint_1` | garfield | Jon's face is up high. I need to be up high too. | — | levels |
-| `l01_hint_2` | garfield | If I jump on the table next to him, I can reach his face. | — | levels |
-| `l01_hint_3` | garfield | Table. Scratch face. Eat. Simple. | — | levels |
-| `l01_hint_1_nn` | garfield | His face is up high. I need to be up high too. | — | media |
+| `l01_hint_1` | garfield | Jon's face is up high. I need to be up high too. | 3.47 | levels |
+| `l01_hint_2` | garfield | If I jump on the table next to him, I can reach his face. | 3.16 | levels |
+| `l01_hint_3` | garfield | Table. Scratch face. Eat. Simple. | 3.37 | levels |
+| `l01_hint_1_nn` | garfield | His face is up high. I need to be up high too. | 3.14 | media |
 
 ### l02_hint  (5)
 | key | who | text | dur | src |
 |---|---|---|---|---|
-| `l02_hint_1` | garfield | That chair looks wobbly… | — | levels |
-| `l02_hint_2` | garfield | If a back leg of Jon's chair broke… timber! | — | levels |
-| `l02_hint_3` | garfield | Scratch the BACK leg of Jon's chair. | — | levels |
-| `l02_hint_2_nn` | garfield | If a back leg of his chair broke... timber! | — | media |
-| `l02_hint_3_nn` | garfield | Scratch the BACK leg of his chair. | — | media |
+| `l02_hint_1` | garfield | That chair looks wobbly… | 1.41 | levels |
+| `l02_hint_2` | garfield | If a back leg of Jon's chair broke… timber! | 3.13 | levels |
+| `l02_hint_3` | garfield | Scratch the BACK leg of Jon's chair. | 2.56 | levels |
+| `l02_hint_2_nn` | garfield | If a back leg of his chair broke... timber! | 2.35 | media |
+| `l02_hint_3_nn` | garfield | Scratch the BACK leg of his chair. | 2.04 | media |
 
 ### l03_hint  (4)
 | key | who | text | dur | src |
 |---|---|---|---|---|
-| `l03_hint_1` | garfield | That vase on the windowsill looks… breakable. | — | levels |
-| `l03_hint_2` | garfield | Jump on the windowsill and give that vase a little nudge. | — | levels |
-| `l03_hint_3` | garfield | Scratch the vase off the sill, then run for the food while Jon looks. | — | levels |
-| `l03_hint_3_nn` | garfield | Scratch the vase off the sill, then run for the food while he looks. | — | media |
+| `l03_hint_1` | garfield | That vase on the windowsill looks… breakable. | 2.56 | levels |
+| `l03_hint_2` | garfield | Jump on the windowsill and give that vase a little nudge. | 3.07 | levels |
+| `l03_hint_3` | garfield | Scratch the vase off the sill, then run for the food while Jon looks. | 4.26 | levels |
+| `l03_hint_3_nn` | garfield | Scratch the vase off the sill, then run for the food while he looks. | 3.95 | media |
 
 ### l04_hint  (4)
 | key | who | text | dur | src |
 |---|---|---|---|---|
-| `l04_hint_1` | garfield | Those curtains look very scratchable. | — | levels |
-| `l04_hint_2` | garfield | If I really shred those curtains, Jon will have to come and look. | — | levels |
-| `l04_hint_3` | garfield | Scratch the curtains a few times. Then eat while he's busy. | — | levels |
-| `l04_hint_2_nn` | garfield | If I really shred those curtains, he'll have to come and look. | — | media |
+| `l04_hint_1` | garfield | Those curtains look very scratchable. | 2.15 | levels |
+| `l04_hint_2` | garfield | If I really shred those curtains, Jon will have to come and look. | 3.22 | levels |
+| `l04_hint_3` | garfield | Scratch the curtains a few times. Then eat while he's busy. | 3.44 | levels |
+| `l04_hint_2_nn` | garfield | If I really shred those curtains, he'll have to come and look. | 3.5 | media |
 
 ### l05_hint  (3)
 | key | who | text | dur | src |
 |---|---|---|---|---|
-| `l05_hint_1` | garfield | The fridge top looks like a good view. How do I get up there? | — | levels |
-| `l05_hint_2` | garfield | Chair, counter, bread bin, fridge. Step by step. | — | levels |
-| `l05_hint_3` | garfield | Grab the vine on the fridge, swing over the table and press Space over the pan! | — | levels |
+| `l05_hint_1` | garfield | The fridge top looks like a good view. How do I get up there? | 3.32 | levels |
+| `l05_hint_2` | garfield | Chair, counter, bread bin, fridge. Step by step. | 4.92 | levels |
+| `l05_hint_3` | garfield | Grab the vine on the fridge, swing over the table and press Space over the pan! | 4.72 | levels |
 
 ### l06_hint  (3)
 | key | who | text | dur | src |
 |---|---|---|---|---|
-| `l06_hint_1` | garfield | He's guarding that plate like a dragon. | — | levels |
-| `l06_hint_2` | garfield | What if the food… fell off the table? | — | levels |
-| `l06_hint_3` | garfield | Jump on the table and scratch the plate! Then eat it off the floor. | — | levels |
+| `l06_hint_1` | garfield | He's guarding that plate like a dragon. | 2.22 | levels |
+| `l06_hint_2` | garfield | What if the food… fell off the table? | 2.65 | levels |
+| `l06_hint_3` | garfield | Jump on the table and scratch the plate! Then eat it off the floor. | 3.57 | levels |
 
 ### l07_hint  (4)
 | key | who | text | dur | src |
 |---|---|---|---|---|
-| `l07_hint_1` | garfield | It's a bit stuffy in here. Some fresh air would be nice. | — | levels |
-| `l07_hint_2` | garfield | If I open that window, Jon will have to close it. | — | levels |
-| `l07_hint_3` | garfield | Jump on the windowsill, press Space to open the window, then go eat. | — | levels |
-| `l07_hint_2_nn` | garfield | If I open that window, he'll have to close it. | — | media |
+| `l07_hint_1` | garfield | It's a bit stuffy in here. Some fresh air would be nice. | 3.35 | levels |
+| `l07_hint_2` | garfield | If I open that window, Jon will have to close it. | 2.57 | levels |
+| `l07_hint_3` | garfield | Jump on the windowsill, press Space to open the window, then go eat. | 4.69 | levels |
+| `l07_hint_2_nn` | garfield | If I open that window, he'll have to close it. | 2.16 | media |
 
 ### l08_hint  (5)
 | key | who | text | dur | src |
 |---|---|---|---|---|
-| `l08_hint_1` | garfield | Jon loves his bed. Almost as much as I love his dinner. | — | levels |
-| `l08_hint_2` | garfield | If I scratch up his bed, he'll come running upstairs… | — | levels |
-| `l08_hint_3` | garfield | Shred the bed, wait for Jon to go in, then close the door on him! | — | levels |
-| `l08_hint_1_nn` | garfield | He loves his bed. Almost as much as I love his dinner. | — | media |
-| `l08_hint_3_nn` | garfield | Shred the bed, wait for him to go in, then close the door on him! | — | media |
+| `l08_hint_1` | garfield | Jon loves his bed. Almost as much as I love his dinner. | 3.09 | levels |
+| `l08_hint_2` | garfield | If I scratch up his bed, he'll come running upstairs… | 2.87 | levels |
+| `l08_hint_3` | garfield | Shred the bed, wait for Jon to go in, then close the door on him! | 4.52 | levels |
+| `l08_hint_1_nn` | garfield | He loves his bed. Almost as much as I love his dinner. | 3.45 | media |
+| `l08_hint_3_nn` | garfield | Shred the bed, wait for him to go in, then close the door on him! | 4.29 | media |
 
 ### l09_hint  (4)
 | key | who | text | dur | src |
 |---|---|---|---|---|
-| `l09_hint_1` | garfield | This table is wobbly. And I am… substantial. | — | levels |
-| `l09_hint_2` | garfield | If I jump under the table enough, things will start shaking. | — | levels |
-| `l09_hint_3` | garfield | Bump the table 3 times from below, then walk under Jon's chair! | — | levels |
-| `l09_hint_3_nn` | garfield | Bump the table three times from below, then walk under his chair! | — | media |
+| `l09_hint_1` | garfield | This table is wobbly. And I am… substantial. | 4.34 | levels |
+| `l09_hint_2` | garfield | If I jump under the table enough, things will start shaking. | 2.83 | levels |
+| `l09_hint_3` | garfield | Bump the table 3 times from below, then walk under Jon's chair! | 4.36 | levels |
+| `l09_hint_3_nn` | garfield | Bump the table three times from below, then walk under his chair! | 3.41 | media |
 
 ### l10_hint  (6)
 | key | who | text | dur | src |
 |---|---|---|---|---|
-| `l10_hint_1` | garfield | That vase is back. Jon never learns. | — | levels |
-| `l10_hint_2` | garfield | If Jon's busy by the broken vase… a little scratch might trip him up. | — | levels |
-| `l10_hint_3` | garfield | Knock the vase off, scratch Jon next to the pieces, then raid the fridge! | — | levels |
-| `l10_hint_1_nn` | garfield | That vase is back. He never learns. | — | media |
-| `l10_hint_2_nn` | garfield | If he's busy by the broken vase... a little scratch might trip him up. | — | media |
-| `l10_hint_3_nn` | garfield | Knock the vase off, scratch him next to the pieces, then raid the fridge! | — | media |
+| `l10_hint_1` | garfield | That vase is back. Jon never learns. | 2.98 | levels |
+| `l10_hint_2` | garfield | If Jon's busy by the broken vase… a little scratch might trip him up. | 4.85 | levels |
+| `l10_hint_3` | garfield | Knock the vase off, scratch Jon next to the pieces, then raid the fridge! | 4.9 | levels |
+| `l10_hint_1_nn` | garfield | That vase is back. He never learns. | 2.8 | media |
+| `l10_hint_2_nn` | garfield | If he's busy by the broken vase... a little scratch might trip him up. | 4.26 | media |
+| `l10_hint_3_nn` | garfield | Knock the vase off, scratch him next to the pieces, then raid the fridge! | 3.95 | media |
 
 ### g_l09_ready  (1)
 | key | who | text | dur | src |
 |---|---|---|---|---|
-| `g_l09_ready` | garfield | Table: loosened. Now for the chair. | — | levels |
+| `g_l09_ready` | garfield | Table: loosened. Now for the chair. | 2.5 | levels |
 
 ### g_open_plan  (1)
 | key | who | text | dur | src |
 |---|---|---|---|---|
-| `g_open_plan_1` | garfield | Change of plan. I'm having whatever he's having. | — | media |
+| `g_open_plan_1` | garfield | Change of plan. I'm having whatever he's having. | 2.97 | media |
 
 ### g_l10_fridge  (1)
 | key | who | text | dur | src |
 |---|---|---|---|---|
-| `g_l10_fridge` | garfield | A fridge is just a lunchbox with a door. And I have paws. | — | media |
+| `g_l10_fridge` | garfield | A fridge is just a lunchbox with a door. And I have paws. | 3.8 | media |
 
 ### g_l10_open  (1)
 | key | who | text | dur | src |
 |---|---|---|---|---|
-| `g_l10_open` | garfield | Hello, beautiful. Did you miss me? | — | media |
+| `g_l10_open` | garfield | Hello, beautiful. Did you miss me? | 1.65 | media |
 
 ### g_l10_end  (1)
 | key | who | text | dur | src |
 |---|---|---|---|---|
-| `g_l10_end` | garfield | Chapter complete. Belly complete. Nap... beginning. | — | media |
+| `g_l10_end` | garfield | Chapter complete. Belly complete. Nap... beginning. | 3.58 | media |
 
 ### j_chair_bounce  (1)
 | key | who | text | dur | src |
 |---|---|---|---|---|
-| `j_chair_bounce` | jon | Whoa! The chair! It's alive! | — | media |
+| `j_chair_bounce` | jon | Whoa! The chair! It's alive! | 1.98 | media |
 
 ### g_tut_move  (1)
 | key | who | text | dur | src |
 |---|---|---|---|---|
-| `g_tut_move` | garfield | Walk around. Slowly. Majestically. Use the keys, or the stick in the corner. | — | media |
+| `g_tut_move` | garfield | Walk around. Slowly. Majestically. Use the keys, or the stick in the corner. | 5.48 | media |
 
 ### g_tut_camera  (1)
 | key | who | text | dur | src |
 |---|---|---|---|---|
-| `g_tut_camera` | garfield | Drag to look around. Admire the house. It's mine, really. The human just pays for it. | — | media |
+| `g_tut_camera` | garfield | Drag to look around. Admire the house. It's mine, really. The human just pays for it. | 6.35 | media |
 
 ### g_tut_jump  (1)
 | key | who | text | dur | src |
 |---|---|---|---|---|
-| `g_tut_jump` | garfield | Jump! Yes, I can jump. I simply choose not to, most days. | — | media |
+| `g_tut_jump` | garfield | Jump! Yes, I can jump. I simply choose not to, most days. | 5.1 | media |
 
 ### g_tut_jump_up  (1)
 | key | who | text | dur | src |
 |---|---|---|---|---|
-| `g_tut_jump_up` | garfield | Hop up onto things. The higher I am, the further I am from trouble. | — | media |
+| `g_tut_jump_up` | garfield | Hop up onto things. The higher I am, the further I am from trouble. | 4.54 | media |
 
 ### g_tut_scratch  (1)
 | key | who | text | dur | src |
 |---|---|---|---|---|
-| `g_tut_scratch` | garfield | Claws out. Give it a swipe. Scratching is a cat's way of saying hello. | — | media |
+| `g_tut_scratch` | garfield | Claws out. Give it a swipe. Scratching is a cat's way of saying hello. | 4.35 | media |
 
 ### g_tut_wait  (1)
 | key | who | text | dur | src |
 |---|---|---|---|---|
-| `g_tut_wait` | garfield | He'll sit down to eat soon. Patience. Ugh, I hate patience. | — | media |
+| `g_tut_wait` | garfield | He'll sit down to eat soon. Patience. Ugh, I hate patience. | 4.95 | media |
 
 ### g_tut_interact  (1)
 | key | who | text | dur | src |
 |---|---|---|---|---|
-| `g_tut_interact` | garfield | Standing on the food? Press the button to eat it. That's the best button. | — | media |
+| `g_tut_interact` | garfield | Standing on the food? Press the button to eat it. That's the best button. | 4.49 | media |
 
 ### g_tut_chase  (1)
 | key | who | text | dur | src |
 |---|---|---|---|---|
-| `g_tut_chase` | garfield | If he chases me, I climb up high. He can't jump. He can barely walk. | — | media |
+| `g_tut_chase` | garfield | If he chases me, I climb up high. He can't jump. He can barely walk. | 5.5 | media |
 
 ### g_tut_newspaper  (1)
 | key | who | text | dur | src |
 |---|---|---|---|---|
-| `g_tut_newspaper` | garfield | Watch out for flying newspapers. His aim is terrible, but even he gets lucky. | — | media |
+| `g_tut_newspaper` | garfield | Watch out for flying newspapers. His aim is terrible, but even he gets lucky. | 5.47 | media |
 
 ### g_tut_done  (1)
 | key | who | text | dur | src |
 |---|---|---|---|---|
-| `g_tut_done` | garfield | Lesson over. You're a natural. Almost as natural as me. | — | media |
+| `g_tut_done` | garfield | Lesson over. You're a natural. Almost as natural as me. | 4.94 | media |
 
 ### g_eat  (3)
 | key | who | text | dur | src |
 |---|---|---|---|---|
-| `g_eat_1` | garfield | Nom nom nom nom! | — | media |
-| `g_eat_2` | garfield | Mmm-hmm! Oh yes. Oh, that's the stuff. | — | media |
-| `g_eat_3` | garfield | Gulp! Gone. Like it was never there. | — | media |
+| `g_eat_1` | garfield | Nom nom nom nom! | 1.75 | media |
+| `g_eat_2` | garfield | Mmm-hmm! Oh yes. Oh, that's the stuff. | 3.47 | media |
+| `g_eat_3` | garfield | Gulp! Gone. Like it was never there. | 2.8 | media |
 
 ### g_eat_lasagna  (1)
 | key | who | text | dur | src |
 |---|---|---|---|---|
-| `g_eat_lasagna` | garfield | Lasagna! My one true love! | — | media |
+| `g_eat_lasagna` | garfield | Lasagna! My one true love! | 3.18 | media |
 
 ### g_win_lasagna  (1)
 | key | who | text | dur | src |
 |---|---|---|---|---|
-| `g_win_lasagna` | garfield | Layers of pasta, layers of cheese, layers of happiness. | — | media |
+| `g_win_lasagna` | garfield | Layers of pasta, layers of cheese, layers of happiness. | 3.82 | media |
 
 ### g_win_steak  (1)
 | key | who | text | dur | src |
 |---|---|---|---|---|
-| `g_win_steak` | garfield | Steak, mash and peas. I even ate the peas. Don't tell anyone. | — | media |
+| `g_win_steak` | garfield | Steak, mash and peas. I even ate the peas. Don't tell anyone. | 4.87 | media |
 
 ### g_win_meatloaf  (1)
 | key | who | text | dur | src |
 |---|---|---|---|---|
-| `g_win_meatloaf` | garfield | Meatloaf. It's a loaf. Made of meat. Genius. | — | media |
+| `g_win_meatloaf` | garfield | Meatloaf. It's a loaf. Made of meat. Genius. | 4.78 | media |
 
 ### g_jon_down  (3)
 | key | who | text | dur | src |
 |---|---|---|---|---|
-| `g_jon_down_1` | garfield | Look at him, all stunned. Perfect time for a snack. | — | media |
-| `g_jon_down_2` | garfield | He's busy. Dinner, here I come. | — | media |
-| `g_jon_down_3` | garfield | While he's distracted, dinner is undefended. | — | media |
+| `g_jon_down_1` | garfield | Look at him, all stunned. Perfect time for a snack. | 3.51 | media |
+| `g_jon_down_2` | garfield | He's busy. Dinner, here I come. | 2.25 | media |
+| `g_jon_down_3` | garfield | While he's distracted, dinner is undefended. | 3.08 | media |
 
 ### g_belly  (1)
 | key | who | text | dur | src |
 |---|---|---|---|---|
-| `g_belly_1` | garfield | My belly's getting bigger. My plan is working. | — | media |
+| `g_belly_1` | garfield | My belly's getting bigger. My plan is working. | 3.09 | media |
 
 ### g_vase  (1)
 | key | who | text | dur | src |
 |---|---|---|---|---|
-| `g_vase_1` | garfield | Oops. Gravity did that. I just helped. | — | media |
+| `g_vase_1` | garfield | Oops. Gravity did that. I just helped. | 2.59 | media |
 
 ### g_curtain  (1)
 | key | who | text | dur | src |
 |---|---|---|---|---|
-| `g_curtain_1` | garfield | Rrrrip. Ah, the sweet sound of interior decorating. | — | media |
+| `g_curtain_1` | garfield | Rrrrip. Ah, the sweet sound of interior decorating. | 3.95 | media |
 
 ### g_window  (1)
 | key | who | text | dur | src |
 |---|---|---|---|---|
-| `g_window_1` | garfield | Brrr. Cold air in. Human out. Hopefully. | — | media |
+| `g_window_1` | garfield | Brrr. Cold air in. Human out. Hopefully. | 3.78 | media |
 
 ### g_door  (2)
 | key | who | text | dur | src |
 |---|---|---|---|---|
-| `g_door_1` | garfield | And... close. Enjoy your room, Jon. | — | media |
-| `g_door_1_nn` | garfield | And... close. Enjoy your room. | — | media |
+| `g_door_1` | garfield | And... close. Enjoy your room, Jon. | 3.51 | media |
+| `g_door_1_nn` | garfield | And... close. Enjoy your room. | 3.6 | media |
 
 ### g_fridge_top  (1)
 | key | who | text | dur | src |
 |---|---|---|---|---|
-| `g_fridge_top` | garfield | Up here, I'm the king of the kitchen. | — | media |
+| `g_fridge_top` | garfield | Up here, I'm the king of the kitchen. | 2.02 | media |

@@ -19,13 +19,14 @@ export function createGame(sys) {
       }
     },
   };
-  let levelEvents = null, scoped = [], winning = false, levelToken = 0;
+  let levelEvents = null, scoped = [], winning = false, levelToken = 0, titleSung = false;
 
   // ---------- menus ----------
   async function menu() {
     teardownLevel();
     game.state = 'menu';
-    audio.music?.('menu', { fade: 1 });
+    audio.music?.(titleSung ? 'menu' : 'title', { fade: 1 });
+    titleSung = true;
     showActors(false);
     game.menuOrbit();
     const first = !save.data.chapterUnlockSeen;
