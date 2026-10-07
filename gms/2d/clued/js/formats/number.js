@@ -1,6 +1,6 @@
-import { register, poolItems, pickPack, byDifficulty, imageOf, collect, pick, midName, capFirst, lcLabel } from './registry.js?v=202610071327';
-import { h, mediaBox } from '../ui/kit.js?v=202610071327';
-import { numericKeys, numOf, rangeOf, injectCSS, baseCSS, once, hasImg } from './fkit.js?v=202610071327';
+import { register, poolItems, pickPack, byDifficulty, imageOf, collect, pick, midName, capFirst, lcLabel } from './registry.js?v=202610071336';
+import { h, mediaBox } from '../ui/kit.js?v=202610071336';
+import { numericKeys, numOf, rangeOf, injectCSS, baseCSS, once, hasImg } from './fkit.js?v=202610071336';
 
 const CSS = `
 .nb{gap:12px}

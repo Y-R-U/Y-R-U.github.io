@@ -1,5 +1,5 @@
-import { register, poolItems, pickPack, byDifficulty, imageOf, hasImg, fill, collect, distractors, pick, factAllowed, nested } from './registry.js?v=202610071327';
-import { layout, choiceGrid } from '../ui/kit.js?v=202610071327';
+import { register, poolItems, pickPack, byDifficulty, imageOf, hasImg, fill, collect, distractors, pick, factAllowed, nested, nameArgs } from './registry.js?v=202610071336';
+import { layout, choiceGrid } from '../ui/kit.js?v=202610071336';
 
 function sources(pack, gate) {
   const out = [];
@@ -37,7 +37,7 @@ function make(rng, pack, kind, difficulty) {
     }
     const tpl = t.item.tfImgPrompt || pack.tfImgPrompt || 'This is {aName}.';
     return {
-      format: 'tf', id: `tf:img:${t.ref}:${shown.item.id}`, prompt: fill(tpl, { name: t.item.name, lname: t.item.lname }),
+      format: 'tf', id: `tf:img:${t.ref}:${shown.item.id}`, prompt: fill(tpl, nameArgs(t.item, pack)),
       media: { img: [imageOf(shown.item, rng)] }, answer: truth,
       answerText: truth ? 'True' : `False: this is ${shown.item.name}`, explain: shown.item.blurb, refs: [t.ref, shown.ref],
     };

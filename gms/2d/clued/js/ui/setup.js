@@ -1,15 +1,15 @@
 // Format grid + per-game setup (themes, count, options, difficulty, timer).
-import { h } from './kit.js?v=202610071327';
-import { defineScreen, go, header } from './app.js?v=202610071327';
-import { listFormats, getFormat, defaultOpts } from '../formats/registry.js?v=202610071327';
-import { getIndex } from '../core/packs.js?v=202610071327';
-import { supportedPackIds, formatAvailable } from '../core/spec.js?v=202610071327';
-import { getSettings, getLast, setLast, ANSWER_TIMES } from '../core/store.js?v=202610071327';
-import { themePicker } from './picker.js?v=202610071327';
-import { STRUCTURES } from '../structures/index.js?v=202610071327';
-import { sfx } from './fx.js?v=202610071327';
-import { favControls } from './favs.js?v=202610071327';
-import { favKey } from './favmodel.js?v=202610071327';
+import { h } from './kit.js?v=202610071336';
+import { defineScreen, go, header } from './app.js?v=202610071336';
+import { listFormats, getFormat, defaultOpts } from '../formats/registry.js?v=202610071336';
+import { getIndex } from '../core/packs.js?v=202610071336';
+import { supportedPackIds, formatAvailable } from '../core/spec.js?v=202610071336';
+import { getSettings, getLast, setLast, ANSWER_TIMES } from '../core/store.js?v=202610071336';
+import { themePicker } from './picker.js?v=202610071336';
+import { STRUCTURES } from '../structures/index.js?v=202610071336';
+import { sfx } from './fx.js?v=202610071336';
+import { favControls } from './favs.js?v=202610071336';
+import { favKey } from './favmodel.js?v=202610071336';
 
 export const DIFFS = [[0, 'Mixed'], [1, 'Easy'], [2, 'Medium'], [3, 'Hard']];
 

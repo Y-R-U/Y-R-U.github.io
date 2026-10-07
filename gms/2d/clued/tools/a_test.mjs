@@ -184,6 +184,9 @@ ok(registry.fill('The {lname} is {aValue}.', { name: 'Tiger', value: 'Mammal' })
   ok(registry.lcLabel('Conservation status (IUCN)') === 'conservation status (IUCN)', 'labels keep acronyms');
   ok(registry.midName({ name: 'Southern stingray' }, { id: 'sea', theme: 'animals' }) === 'the southern stingray', 'animal names mid-sentence');
   ok(registry.midName({ name: 'United Kingdom', lname: 'United Kingdom' }, { theme: 'geography' }) === 'the United Kingdom', 'country names mid-sentence');
+  ok(registry.fill('It is {aValue}.', { value: 'Duck, goose or swan' }) === 'It is a duck, goose or swan.', 'lower-cases a value with a comma');
+  ok(registry.fill('Which one is {aName}?', { name: 'Sashimi' }) === 'Which one is sashimi?' && registry.fill('Which one is {aName}?', { name: 'Croissant' }) === 'Which one is a croissant?', 'mass nouns take no article');
+  ok(registry.fill('Which is {aName}?', { name: 'Rice', mass: true }) === 'Which is rice?' && registry.fill('Which is {aName}?', { name: 'Gold', mass: false }) === 'Which is a gold?', 'item mass flag overrides the list');
   ok(registry.nested('Jellyfish', 'Box jellyfish') && !registry.nested('Asia', 'Eurasia'), 'nested values');
   ok(!registry.factAllowed({ label: 'Conservation status (IUCN)' }, { kids: true }) && registry.factAllowed({ label: 'Conservation status (IUCN)' }, { difficulty: 3 }), 'IUCN only at Hard, never kids');
 }

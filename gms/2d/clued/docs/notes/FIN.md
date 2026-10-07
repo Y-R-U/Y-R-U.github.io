@@ -92,3 +92,19 @@ fav's packs replace the theme. Round cards show a small ♥. Real-click check: l
   builders should use `theC()` (tools/c1_src/_common.mjs) for these.
 - Optional: `factsMeta.typeable` on any cat fact that should (or shouldn't) be typed, and `pack.nounPlural` where the
   title makes an odd plural in "Which of these … is made up?".
+
+## 5. Follow-up from the content lane (docs/notes/GAPS.md "Requests")
+- **connect seed flakiness** (`js/formats/connect.js`): facts with a single usable value (hits' decade/artist) are
+  never chosen; a fact goes solo only with ≥ G values, else it's mixed with another. A shape is only given up after 4
+  rounds of misses (was: after one round of 6 tries). build_index now records connect 20 for hits-1970s/1980s.
+- **listen reads audio questions** (`js/audio/listen.js`): hand-written mc questions with `media.audio` (kids-nature's
+  8 animal sounds) become listen questions (answer + `wrong`, ≤3 options in kids). kids-nature listen 0 → 8. Real-click
+  kids round played and revealed in portrait.
+- **Mass nouns** (`registry.js`): `{aName}` drops the article for a built-in list (sushi, sashimi, gazpacho, paella,
+  risotto, hummus, kimchi…, gold, silver, jade, quartz…) and for items/packs with `mass: true` or `article: ''`
+  (`mass: false` forces "a"; `article: 'some'` is used as given). `nameArgs(item, pack)` passes these in lookalike, mc and tf.
+- **fill() lower-casing** now handles a first word with trailing punctuation: "a duck, goose or swan".
+- Tests: a_test 467/0 (+3: comma value, mass list, item flag), f_test +connect seed-stability on every pack (caps seed + 3
+  others), +listen audio questions, +synthetic mass-noun probe across lookalike/mc/tf. All four falsified (connect fix
+  reverted: bees/books/hits-1960s/hits-1980s unstable; listen path off; mass off: 26/5/26 "a sashimi"-style prompts;
+  comma fix off). Index rebuilt (71 packs, 0 errors); all node suites green (f_test 2,377,245/0).

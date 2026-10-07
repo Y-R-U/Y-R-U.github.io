@@ -1,21 +1,21 @@
 // Serverless link challenges: the URL hash carries the GameSpec (with its seed), BUILD and a chain of
 // up to 8 { name, score }. The receiver regenerates the identical set locally, plays it, and gets a
 // reply link with their score appended. No server, no caps; works on Pages.
-import { h, fmtNum } from '../ui/kit.js?v=202610071327';
-import { defineScreen, header, current, reset } from '../ui/app.js?v=202610071327';
-import { toast } from '../ui/popup.js?v=202610071327';
-import { sfx, confetti } from '../ui/fx.js?v=202610071327';
-import { BUILD } from '../build.js?v=202610071327';
-import { getSettings } from '../core/store.js?v=202610071327';
-import { hashString } from '../core/rng.js?v=202610071327';
-import { createRunner } from '../structures/runner.js?v=202610071327';
-import { replayCfg, replayScore } from '../structures/index.js?v=202610071327';
-import { prepare } from '../structures/session.js?v=202610071327';
-import { suggestedName, rememberName, tidyName, MAX_NAME } from './ident.js?v=202610071327';
-import { openShare, shareOrCopy } from './share.js?v=202610071327';
-import { ordinal, detailOf, comparison } from './board.js?v=202610071327';
-import { ensureStyles } from './util.js?v=202610071327';
-import { ensureFormats } from './room.js?v=202610071327';
+import { h, fmtNum } from '../ui/kit.js?v=202610071336';
+import { defineScreen, header, current, reset } from '../ui/app.js?v=202610071336';
+import { toast } from '../ui/popup.js?v=202610071336';
+import { sfx, confetti } from '../ui/fx.js?v=202610071336';
+import { BUILD } from '../build.js?v=202610071336';
+import { getSettings } from '../core/store.js?v=202610071336';
+import { hashString } from '../core/rng.js?v=202610071336';
+import { createRunner } from '../structures/runner.js?v=202610071336';
+import { replayCfg, replayScore } from '../structures/index.js?v=202610071336';
+import { prepare } from '../structures/session.js?v=202610071336';
+import { suggestedName, rememberName, tidyName, MAX_NAME } from './ident.js?v=202610071336';
+import { openShare, shareOrCopy } from './share.js?v=202610071336';
+import { ordinal, detailOf, comparison } from './board.js?v=202610071336';
+import { ensureStyles } from './util.js?v=202610071336';
+import { ensureFormats } from './room.js?v=202610071336';
 
 const MAX_CHAIN = 8;
 const b64u = bytes => btoa(String.fromCharCode(...bytes)).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');

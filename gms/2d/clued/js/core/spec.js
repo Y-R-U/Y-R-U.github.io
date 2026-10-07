@@ -1,7 +1,7 @@
 // GameSpec -> questions. A spec fully describes a game; same spec + same packs = same questions.
-import { rngFrom, sample, randomSeed } from './rng.js?v=202610071327';
-import { loadIndex, loadPacks } from './packs.js?v=202610071327';
-import { getFormat, supportsPack, defaultOpts } from '../formats/registry.js?v=202610071327';
+import { rngFrom, sample, randomSeed } from './rng.js?v=202610071336';
+import { loadIndex, loadPacks } from './packs.js?v=202610071336';
+import { getFormat, supportsPack, defaultOpts } from '../formats/registry.js?v=202610071336';
 
 export const MAX_ALL_PACKS = 8;
 

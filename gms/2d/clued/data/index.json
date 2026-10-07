@@ -1,5 +1,5 @@
 {
- "build": "202610071327",
+ "build": "202610071331",
  "themes": [
   {
    "id": "animals",
@@ -414,7 +414,7 @@
      "fake": 20,
      "reveal": 20,
      "number": 17,
-     "connect": 0,
+     "connect": 20,
      "blitz60": 5,
      "type": 20,
      "lookalike": 19
@@ -946,7 +946,7 @@
      "reveal": 20,
      "silhouette": 20,
      "number": 20,
-     "connect": 0,
+     "connect": 20,
      "blitz60": 10,
      "type": 20
     },
@@ -1125,7 +1125,7 @@
      "fake": 20,
      "reveal": 14,
      "number": 20,
-     "connect": 0,
+     "connect": 20,
      "blitz60": 5,
      "type": 20,
      "lookalike": 7
@@ -1370,7 +1370,7 @@
      "fake": 20,
      "reveal": 14,
      "number": 20,
-     "connect": 0,
+     "connect": 20,
      "blitz60": 14,
      "type": 20
     },
@@ -2404,7 +2404,7 @@
      "fake": 20,
      "reveal": 16,
      "number": 15,
-     "connect": 0,
+     "connect": 20,
      "blitz60": 2,
      "type": 20,
      "lookalike": 1
@@ -2602,19 +2602,19 @@
     "formats": {
      "mc": 20,
      "tf": 8,
-     "listen": 0,
+     "listen": 8,
      "type": 20
     },
     "formatsEasy": {
      "mc": 20,
      "tf": 8,
-     "listen": 0,
+     "listen": 8,
      "type": 20
     },
     "formatsKids": {
      "mc": 0,
      "tf": 8,
-     "listen": 0,
+     "listen": 8,
      "type": 20
     }
    }
@@ -4656,7 +4656,7 @@
      "odd": 20,
      "sort": 20,
      "number": 20,
-     "connect": 0,
+     "connect": 20,
      "blitz60": 4
     },
     "formatsEasy": {
@@ -4731,7 +4731,7 @@
      "odd": 20,
      "sort": 20,
      "number": 20,
-     "connect": 0,
+     "connect": 20,
      "blitz60": 5
     },
     "formatsEasy": {
@@ -5258,7 +5258,7 @@
      "match": 0,
      "odd": 20,
      "sort": 20,
-     "connect": 0,
+     "connect": 20,
      "blitz60": 4
     }
    }

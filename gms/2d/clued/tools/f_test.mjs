@@ -106,6 +106,10 @@ function wordingCheck(fid, q, tag) {
   if (fid === 'sort' && (q.data?.bins || []).some(b => /\bor\b/i.test(b))) ok(q.prompt.includes(' / '), `${fid} :: bins containing "or" (${tag}) ${q.id}: ${q.prompt}`);
   if (fid === 'type' && /^type:[a-zA-Z]+:/.test(q.id) && !/^type:(img|clue):/.test(q.id)) ok(!BIN_ANS.test(q.answerText), `${fid} :: no bin labels as typed answers (${tag}) ${q.id}: ${q.answerText}`);
   if (fid === 'fake' && pack?.noun && !pack.nounPlural && !pack.fakePrompt) ok(!q.prompt.includes(`these ${pack.noun.toLowerCase()} is`), `${fid} :: plural noun (${tag}) ${q.id}`);
+  if (q.refs?.[0] && /\{aName\}|^Which one is|^Which of these is|^This is/.test(q.prompt)) {
+    const it = itemOf(q.refs[0]);
+    if (it && (it.mass || pack?.mass || /^(sushi|sashimi|ramen|tempura|risotto|paella|gazpacho|goulash|hummus|kimchi|guacamole|gelato|tiramisu|gold|silver|copper|jade|amber|quartz)$/i.test(it.name))) ok(!new RegExp(`\\b(a|an) ${(it.lname || it.name).replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\b`, 'i').test(q.prompt), `${fid} :: no article on mass nouns (${tag}) ${q.id}: ${q.prompt}`);
+  }
   if (fid === 'connect') {
     const ls = (q.data?.groups || []).map(g => g.label);
     ok(!ls.some((a, i) => ls.some((b, j) => j > i && a.split(': ')[0] === b.split(': ')[0] && registry.nested(a.split(': ')[1], b.split(': ')[1]))), `${fid} :: no nested group values (${tag}) ${q.id}: ${ls.join(' | ')}`);
@@ -188,6 +192,44 @@ for (const f of loaded) {
   console.log(`${f.id.padEnd(11)} ${String(packsOk).padStart(2)} packs  ${String(total).padStart(5)} questions`);
 }
 
+// connect must not give up on a pack whose seed happens to hit a one-value fact first (build_index's caps seed)
+for (const p of packs.concat(readdirSync(join(ROOT, 'data/music')).filter(f => f.endsWith('.json')).map(f => JSON.parse(readFileSync(join(ROOT, 'data/music', f), 'utf8'))))) {
+  const f = registry.getFormat('connect');
+  if (!f || (ONLY.length && !ONLY.includes('connect')) || registry.supportsPack(f, { ...infoOf(p), caps: { ...infoOf(p).caps, formats: undefined } }) !== true) continue;
+  const n = seed => (f.generate({ rng: rngFrom(seed), packs: [p], count: 20, opts: {}, difficulty: 0, avoid: new Set() }) || []).length;
+  const counts = ['caps:' + p.id + ':connect:0:false', 'x1', 'x2', 'x3'].map(n);
+  ok(Math.max(...counts) < 5 || Math.min(...counts) >= 5, `connect :: seed-stable on ${p.id} (${counts.join('/')})`);
+}
+// mass nouns: no "a sashimi" from the built-in prompts (synthetic pack, so pack-level prompt overrides can't hide it)
+{
+  const img = i => ({ src: `https://example.org/${i}.jpg`, w: 4, h: 3, credit: 'x', license: 'CC0', page: 'https://example.org' });
+  const names = ['Sashimi', 'Sushi', 'Gazpacho', 'Paella', 'Croissant', 'Rice pudding'];
+  const items = names.map((name, i) => ({ id: 'm' + i, name, media: { img: [img(i)] }, lookalikes: names.map((_, j) => 'm' + j).filter(x => x !== 'm' + i), ...(name === 'Rice pudding' ? { mass: true } : {}) }));
+  const probe = { id: 'massprobe', title: 'Dishes', theme: 'food', items, questions: [] };
+  for (const id of ['lookalike', 'mc', 'tf']) {
+    await imp(`js/formats/${id === 'lookalike' ? 'lookalike' : id}.js`);
+    const qs = registry.getFormat(id).generate({ rng: rngFrom('mass:' + id), packs: [probe], count: 30, opts: id === 'mc' ? { source: 'pictures', answers: 3 } : {}, difficulty: 0, avoid: new Set() }) || [];
+    const bad = qs.filter(q => /\b(a|an) (sashimi|sushi|gazpacho|paella|rice pudding)\b/i.test(q.prompt));
+    ok(qs.length > 0 && !bad.length, `${id} :: no article on mass nouns: ${bad.map(q => q.prompt).join(' | ')}`);
+    const art = qs.filter(q => /\bcroissant\b/i.test(q.prompt) && /\{aName\}|Which one is|Which of these is|This is/.test(q.prompt));
+    ok(art.every(q => /\ba croissant\b/i.test(q.prompt)), `${id} :: count nouns keep "a"`);
+  }
+}
+
+// listen reads hand-written questions that carry audio (kids-nature's animal sounds)
+{
+  await imp('js/audio/listen.js');
+  const f = registry.getFormat('listen');
+  for (const p of packs.filter(p => (p.questions || []).filter(q => q.media?.audio?.length).length >= 5)) {
+    const qs = f.generate({ rng: rngFrom('lq:' + p.id), packs: [kidsView(p)], count: 10, opts: {}, difficulty: 1, kids: true, avoid: new Set() }) || [];
+    ok(qs.length >= 5, `listen :: audio questions playable (${p.id}) got ${qs.length}`);
+    for (const q of qs.filter(q => q.id.includes('/q:'))) {
+      const src = p.questions.find(x => q.id.endsWith('/q:' + x.id));
+      ok(src && q.options[q.answer].text === String(src.answer) && q.media.audio[0].src === src.media.audio[0].src && q.options.length <= 3, `listen :: audio question answer + clip (${p.id}) ${q.id}`);
+    }
+  }
+}
+
 // A's mc/tf: wording rules only (normal, hard and kids), not in F_FORMATS.
 if (!ONLY.length || ONLY.some(x => x === 'mc' || x === 'tf')) for (const id of ['mc', 'tf']) {
   await imp(`js/formats/${id}.js`);
@@ -198,7 +240,7 @@ if (!ONLY.length || ONLY.some(x => x === 'mc' || x === 'tf')) for (const id of [
     for (const [d, kids] of [[0, false], [3, false], [1, true]]) {
       const src = kids ? kidsView(p) : p;
       if (kids && src.items.length + src.questions.length === 0) continue;
-      for (const q of gen(f, [src], `f:${id}:${p.id}:${d}:${kids}`, { difficulty: d, kids, count: 60, opts: id === 'mc' ? { source: 'facts' } : {} })) {
+      for (const q of gen(f, [src], `f:${id}:${p.id}:${d}:${kids}`, { difficulty: d, kids, count: 60, opts: id === 'mc' ? { source: d === 3 ? 'pictures' : 'facts' } : {} })) {
         q.pack = q.pack || p.id; n++;
         wordingCheck(id, q, `${p.id}${kids ? ' kids' : ` d${d}`}`);
       }

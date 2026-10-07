@@ -1,8 +1,8 @@
 import {
   register, poolItems, packQuestions, pickPack, distractors, byDifficulty, imageOf, hasImg, fill, factText,
-  spreadApart, placeAnswer, collect, pick, shuffle, sample, factAllowed, nested, lcLabel,
-} from './registry.js?v=202610071327';
-import { layout, choiceGrid } from '../ui/kit.js?v=202610071327';
+  spreadApart, placeAnswer, collect, pick, shuffle, sample, factAllowed, nested, lcLabel, nameArgs,
+} from './registry.js?v=202610071336';
+import { layout, choiceGrid } from '../ui/kit.js?v=202610071336';
 
 const PROMPTS = { nameImg: 'Which of these is {aName}?', imgName: 'What is this?' };
 
@@ -62,7 +62,7 @@ function fromItems(rng, pack, kind, n, difficulty) {
     const asImages = type === 'nameImg';
     const tpl = asImages ? (t.item.imgPrompt || pack.imgPrompt || PROMPTS.nameImg) : (t.item.nameImgPrompt || pack.nameImgPrompt || PROMPTS.imgName);
     return {
-      format: 'mc', id: `mc:${type}:${t.ref}`, prompt: fill(tpl, { name: t.item.name, lname: t.item.lname }),
+      format: 'mc', id: `mc:${type}:${t.ref}`, prompt: fill(tpl, nameArgs(t.item, pack)),
       media: asImages ? undefined : { img: [imageOf(t.item, rng)] },
       options: options.map(c => (asImages ? { text: c.item.name, img: imageOf(c.item, rng) } : { text: c.item.name })),
       answer, answerText: t.item.name, explain: t.item.blurb, refs: [t.ref, ...wrong.map(c => c.ref)],

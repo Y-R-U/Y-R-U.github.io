@@ -2,13 +2,13 @@
 // Also "finish the line" for public-domain songs (items with `lyrics`).
 import {
   register, poolItems, distractors, byDifficulty, placeAnswer, collect, pick, shuffle, hasAudio, imageOf, hasImg, pickPack,
-} from '../formats/registry.js?v=202610071327';
-import { h, choiceGrid, esc } from '../ui/kit.js?v=202610071327';
-import { basePoints } from '../core/scoring.js?v=202610071327';
-import * as clip from './clip.js?v=202610071327';
-import { revealHTML, BADGE_CSS, art as artUrl, previewUrl } from './apple.js?v=202610071327';
-import { getCtx, unlock, begin, end } from './ctx.js?v=202610071327';
-import { LISTEN_CSS } from './listen_css.js?v=202610071327';
+} from '../formats/registry.js?v=202610071336';
+import { h, choiceGrid, esc } from '../ui/kit.js?v=202610071336';
+import { basePoints } from '../core/scoring.js?v=202610071336';
+import * as clip from './clip.js?v=202610071336';
+import { revealHTML, BADGE_CSS, art as artUrl, previewUrl } from './apple.js?v=202610071336';
+import { getCtx, unlock, begin, end } from './ctx.js?v=202610071336';
+import { LISTEN_CSS } from './listen_css.js?v=202610071336';
 
 const CLIPS = [1, 2, 3, 5, 10, 15, 30];
 const CLIP_MUL = { 1: 2, 2: 1.7, 3: 1.5, 5: 1.25, 10: 1, 15: 0.85, 30: 0.7 };
@@ -100,8 +100,12 @@ function generate({ rng, packs, count, opts = {}, difficulty = 0, kids = false, 
   const n = kids ? Math.min(3, +opts.answers || 3) : (+opts.answers || 4);
   const art = kids ? 'blur' : (ART_MUL[opts.art] ? opts.art : 'off');   // kids: covers often print the title, so they sharpen as the clip plays
   const usable = packs.filter((p) => (p.items || []).filter(hasAudio).length >= n);
-  if (!usable.length) return [];
+  // hand-written mc questions that carry a sound ("Listen! Which animal makes this sound?")
+  const qPool = packs.flatMap((p) => (p.questions || []).filter((q) => (q.kind || 'mc') === 'mc' && q.media?.audio?.some((a) => a.src) && (q.wrong || []).length >= 2).map((q) => ({ p, q })));
+  if (!usable.length && !qPool.length) return [];
+  const itemN = usable.reduce((s, p) => s + (p.items || []).filter(hasAudio).length, 0);
   return collect(count, () => {
+    if (qPool.length && (!usable.length || rng() < qPool.length / (qPool.length + itemN))) return fromQuestion(rng, pick(rng, qPool), n, opts, difficulty, kids);
     const p = pickPack(rng, usable);
     const pool = poolItems([p], (it) => hasAudio(it) && (!kids || p.kids || (it.difficulty || 2) === 1));
     if (pool.length < n) return null;
@@ -147,6 +151,19 @@ function generate({ rng, packs, count, opts = {}, difficulty = 0, kids = false, 
       data: { ...base.data, layout: pics ? 'images' : 'text' },
     };
   }, avoid);
+}
+
+function fromQuestion(rng, { p, q }, n, opts, difficulty, kids) {
+  const a = { ...q.media.audio.find((x) => x.src) };
+  let len = clipLen(opts, difficulty, kids);
+  if (a.dur && a.dur < len) len = a.dur;
+  const { options, answer } = placeAnswer(rng, String(q.answer), shuffle(rng, q.wrong.map(String)).slice(0, n - 1));
+  return {
+    format: 'listen', id: `listen:${p.id}/q:${q.id}`, prompt: q.prompt, refs: [`${p.id}/q:${q.id}`], explain: q.explain, pack: p.id,
+    media: { audio: [a] }, timeLimit: Math.round((len + 15) * 1000),
+    options: options.map((text) => ({ text })), answer, answerText: String(q.answer),
+    data: { a, start: a.start || 0, len, art: 'off', kind: 'name', replays: kids ? -1 : REPLAYS, meta: { title: String(q.answer), artist: '', year: '' }, kids: !!kids, layout: 'text' },
+  };
 }
 
 let cssDone = false;

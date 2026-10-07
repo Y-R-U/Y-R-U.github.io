@@ -1,5 +1,5 @@
 // Format registry + helpers shared by every format. See docs/notes/A.md "Format author guide".
-import { pick, shuffle, sample, weightedPick } from '../core/rng.js?v=202610071327';
+import { pick, shuffle, sample, weightedPick } from '../core/rng.js?v=202610071336';
 
 const R = globalThis.__cluedFormats || (globalThis.__cluedFormats = { map: new Map(), listeners: new Set() });
 
@@ -53,7 +53,7 @@ export const theName = v => (THE_RE.test(String(v ?? '').trim()) ? `the ${String
 const lc = s => {
   const t = String(s ?? '');
   const [w, w2] = t.split(/\s+/);
-  if (!/^[A-Z][a-z'’-]*$/.test(w || '') || (w2 && /^[A-Z]/.test(w2))) return t;
+  if (!/^[A-Z][a-z'’-]*[,;:.)]?$/.test(w || '') || (w2 && /^[A-Z]/.test(w2))) return t;
   return t.charAt(0).toLowerCase() + t.slice(1);
 };
 export const lcLabel = lc;
@@ -70,10 +70,18 @@ export const capFirst = s => String(s).charAt(0).toUpperCase() + String(s).slice
 
 // {name} {lname} (item.lname overrides the lower-cased name) {aName} {value} {lvalue} {aValue} {theValue} {label} {llabel} {unit}
 // A country that needs "the" gets it wherever {value}/{name}/{lname} is used, unless the template already says "the".
+// Mass nouns take no article ("Which one is sashimi?"). Items/packs can say so with `mass: true` or `article: 'some'|''`.
+const MASS = /^(sushi|sashimi|ramen|tempura|lasagne|risotto|spaghetti( .+)?|tiramisu|gelato|paella|gazpacho|churros|ratatouille|bouillabaisse|fish and chips|haggis|goulash|pierogi|borscht|moussaka|gyros|hummus|falafel|injera|biryani|butter chicken|pad thai|tom yum|thai green curry|phở|nasi goreng|satay|rendang|peking duck|jiaozi|kung pao chicken|kimchi|bibimbap|tacos|guacamole|poutine|feijoada|ceviche|asado|fairy bread|vegemite|gold|silver|copper|iron|lead|tin|platinum|mercury|water|sand|salt|amber|jade|marble|granite|coal|chalk|clay|quartz|obsidian|pumice|graphite|sulfur|sulphur)$/i;
+export const isMass = (name, x = {}) => x.mass === true || x.article === '' || (x.mass !== false && x.article == null && MASS.test(String(name || '').trim()));
+// {aName} for an item: pass fill(tpl, { …, ...nameArgs(item, pack) }).
+export const nameArgs = (item, pack) => ({ name: item.name, lname: item.lname, mass: item.mass ?? pack?.mass, article: item.article ?? pack?.article });
+
 export function fill(tpl, v = {}) {
   const name = v.name ?? '', value = v.value ?? '';
+  const ln = v.lname || lc(name);
+  const art = isMass(name, v) ? (v.article || '') : v.article || article(ln);
   const map = {
-    name, lname: v.lname || lc(name), aName: `${article(v.lname || name)} ${v.lname || lc(name)}`,
+    name, lname: ln, aName: art ? `${art} ${ln}` : ln,
     value, lvalue: lc(value), aValue: `${article(value)} ${lc(value)}`, theValue: theName(value),
     label: v.label ?? '', llabel: lc(v.label ?? ''), unit: v.unit ?? '',
   };

@@ -1,7 +1,7 @@
-import { register, poolItems, byDifficulty, factText, collect, pick, shuffle, sample, factAllowed, nested } from './registry.js?v=202610071327';
-import { h } from '../ui/kit.js?v=202610071327';
-import { norm, injectCSS, baseCSS, once } from './fkit.js?v=202610071327';
-import { toast } from '../ui/popup.js?v=202610071327';
+import { register, poolItems, byDifficulty, factText, collect, pick, shuffle, sample, factAllowed, nested } from './registry.js?v=202610071336';
+import { h } from '../ui/kit.js?v=202610071336';
+import { norm, injectCSS, baseCSS, once } from './fkit.js?v=202610071336';
+import { toast } from '../ui/popup.js?v=202610071336';
 
 const CSS = `
 .cn{gap:10px}
@@ -50,11 +50,14 @@ const test = (p, it) => { const v = it.facts?.[p.key]; return v == null || Array
 
 function make(rng, pack, G, S, difficulty, kids) {
   const preds = predicates(pack, difficulty, kids);
-  const attrs = [...new Set(preds.map(p => p.attr))];
-  if (!attrs.length) return null;
+  const per = a => preds.filter(p => p.attr === a).length;
+  // a fact with one usable value (every hit is the 1980s) can never split tiles; one with < G values can't fill alone
+  const attrs = [...new Set(preds.map(p => p.attr))].filter(a => per(a) >= 2);
+  const solo = attrs.filter(a => per(a) >= G);
+  if (!attrs.length || (!solo.length && attrs.length < 2)) return null;
   let chosen;
-  if (difficulty === 1 || attrs.length === 1 || rng() < 0.5) {
-    const a = pick(rng, attrs);
+  if (attrs.length === 1 || (solo.length && (difficulty === 1 || rng() < 0.5))) {
+    const a = pick(rng, solo);
     chosen = sample(rng, preds.filter(p => p.attr === a), G);
   } else {
     const [a, b] = sample(rng, attrs, 2);
@@ -103,9 +106,9 @@ export default register({
       const p = pick(rng, usable);
       for (const [G, S] of shapes) {
         const k = `${p.id}:${G}x${S}`;
-        if (fits.get(k) === false || (p.items || []).length < G * S) continue;
-        for (let t = 0; t < 6; t++) { const q = make(rng, p, G, S, difficulty, kids); if (q) { fits.set(k, true); return q; } }
-        if (!fits.has(k)) fits.set(k, false);
+        if ((fits.get(k) || 0) >= 4 || (p.items || []).length < G * S) continue;
+        for (let t = 0; t < 8; t++) { const q = make(rng, p, G, S, difficulty, kids); if (q) { fits.set(k, -1e9); return q; } }
+        fits.set(k, (fits.get(k) || 0) + 1);   // a shape is only given up after several rounds of misses
       }
       return null;
     }, avoid, count * 6);

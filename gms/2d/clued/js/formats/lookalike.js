@@ -1,6 +1,6 @@
-import { register, poolItems, pickPack, byDifficulty, imageOf, fill, placeAnswer, collect, pick, shuffle, factAllowed } from './registry.js?v=202610071327';
-import { layout, choiceGrid } from '../ui/kit.js?v=202610071327';
-import { norm, fmtFact, escHtml, injectCSS, hasImg } from './fkit.js?v=202610071327';
+import { register, poolItems, pickPack, byDifficulty, imageOf, fill, placeAnswer, collect, pick, shuffle, factAllowed, nameArgs } from './registry.js?v=202610071336';
+import { layout, choiceGrid } from '../ui/kit.js?v=202610071336';
+import { norm, fmtFact, escHtml, injectCSS, hasImg } from './fkit.js?v=202610071336';
 
 const CSS = `
 .lk-diff{border-collapse:collapse;width:100%;table-layout:fixed;font-size:14px;margin-top:2px}
@@ -44,7 +44,7 @@ function make(rng, pack, n, difficulty, kids) {
   const rows = diffTable(pack, ordered, kids);
   return {
     format: 'lookalike', id: `look:${t.ref}:${wrong.map(c => c.item.id).sort().join(',')}`,
-    prompt: fill(pack.lookPrompt || 'Which one is {aName}?', { name: t.item.name, lname: t.item.lname }),
+    prompt: fill(pack.lookPrompt || 'Which one is {aName}?', nameArgs(t.item, pack)),
     options: ordered.map(c => ({ text: c.item.name, img: imageOf(c.item, rng) })),
     answer, answerText: t.item.name, explain: t.item.blurb,
     refs: [t.ref, ...wrong.map(c => c.ref)], pack: pack.id,
