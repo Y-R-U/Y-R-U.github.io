@@ -1,10 +1,10 @@
-import { NOT_ID, INAT, WD, DANGER_META, REGION_META } from './_common.mjs';
+import { NOT_ID, INAT, WD, DANGER_META, REGION_META, addFacts } from './_common.mjs';
 
 const AU = 'Australia', AS = 'Asia', AF = 'Africa', AM = 'the Americas', EU = 'Europe', WW = 'many parts of the world';
 const H = 'Harmless', M = 'Mildly venomous', D = 'Dangerous', X = 'Potentially deadly';
 const f = (danger, region, web) => ({ danger, region, ...(web == null ? {} : { web }) });
 
-export default {
+const PACK = {
   id: 'spiders', title: 'Spiders', theme: 'animals', icon: '🕷️', kids: true, notice: NOT_ID,
   leakExempt: ['spider', 'spiders'],
   wikiD1: true, autoTaxo: ['family', 'genus'],
@@ -13,12 +13,13 @@ export default {
     region: REGION_META,
     web: { type: 'bool', label: 'Catches prey in a web', yes: 'Web builder', no: 'Hunts without a web', clue: v => (v ? 'It catches prey in a web.' : 'It hunts without a catching web.') },
     legSpanCm: { type: 'num', label: 'Leg span', unit: 'cm', higherLabel: 'Bigger', clue: v => `Its leg span can reach about ${v} cm.` },
+    bodyMm: { type: 'num', label: 'Body length (adult female)', unit: 'mm', higherLabel: 'Bigger', noClue: true },
   },
   ranges: { legSpanCm: [0.3, 32] },
   imgPrompt: "Which of these is {aName}?",
   nameImgPrompt: "Which spider is this?",
   tfImgPrompt: "This spider is {aName}.",
-  tpl: {"danger": {"ask": "How dangerous is a bite from the {lname}?", "askReverse": "Which of these spiders is rated \"{lvalue}\" to people?", "stmt": "A bite from the {lname} is rated \"{lvalue}\"."}, "region": {"ask": "Where does the {lname} live?", "askReverse": "Which of these spiders lives in {value}?", "stmt": "The {lname} lives in {value}.", "exclusive": false}, "web": {"askBool": "Which of these spiders catches its prey in a web?", "stmt": "The {lname} catches its prey in a web."}, "legSpanCm": {"askHigh": "Which of these spiders has the biggest leg span?", "askLow": "Which of these spiders has the smallest leg span?"}},
+  tpl: {"bodyMm": {"askHigh": "Which of these spiders has the biggest body?", "askLow": "Which of these spiders has the smallest body?", "askNumber": "How long is {name}'s body (adult female, not counting legs), in millimetres?"}, "danger": {"ask": "How dangerous is a bite from the {lname}?", "askReverse": "Which of these spiders is rated \"{lvalue}\" to people?", "stmt": "A bite from the {lname} is rated \"{lvalue}\"."}, "region": {"ask": "Where does the {lname} live?", "askReverse": "Which of these spiders lives in {value}?", "stmt": "The {lname} lives in {value}.", "exclusive": false}, "web": {"askBool": "Which of these spiders catches its prey in a web?", "stmt": "The {lname} catches its prey in a web."}, "legSpanCm": {"askHigh": "Which of these spiders has the biggest leg span?", "askLow": "Which of these spiders has the smallest leg span?"}},
   sources: [INAT, WD],
   items: [
     { n: 'Sydney funnel-web spider', alt: ['funnel-web', 'Sydney funnel-web'], sci: 'Atrax robustus', g: 'funnel-web', f: f(X, AU, false), d: 1, look: ['Trapdoor spider', 'Mouse spider'],
@@ -165,3 +166,16 @@ export default {
     { kind: 'mc', prompt: 'Spiders belong to which group of animals?', answer: 'Arachnids', wrong: ['Insects', 'Crustaceans', 'Reptiles'], explain: 'Arachnids include spiders, scorpions, ticks and mites.', difficulty: 2 },
   ],
 };
+
+// Adult female body length (legs not included), midpoint of the range in each species' Wikipedia description.
+// Family/genus items (huntsman, wolf, trapdoor, jumping, tarantula…) and species with no stated size are left out.
+addFacts(PACK.items, 'bodyMm', {
+  'Redback spider': 10, 'White-tailed spider': 15, 'Australian golden orb-weaver': 35, 'Peacock spider': 5,
+  "St Andrew's cross spider": 13, 'Black house spider': 15, 'Christmas spider': 10, 'Black widow': 10, 'Brown recluse': 10,
+  'Six-eyed sand spider': 10, 'Goliath birdeater': 100, 'Mexican red-knee tarantula': 53, 'European garden spider': 13,
+  'Wasp spider': 17, 'Yellow garden spider': 24, 'Zebra jumping spider': 7, 'Bold jumping spider': 12, 'Regal jumping spider': 15,
+  'Diving bell spider': 10, 'Raft spider': 15, "Darwin's bark spider": 20, 'Goldenrod crab spider': 8, 'Hobo spider': 10,
+  'Woodlouse spider': 13,
+});
+
+export default PACK;

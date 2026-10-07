@@ -1,7 +1,7 @@
-import { register, poolItems, byDifficulty, factText, collect, pick, shuffle, sample } from './registry.js?v=202610071242';
-import { h } from '../ui/kit.js?v=202610071242';
-import { norm, injectCSS, baseCSS, once } from './fkit.js?v=202610071242';
-import { toast } from '../ui/popup.js?v=202610071242';
+import { register, poolItems, byDifficulty, factText, collect, pick, shuffle, sample, factAllowed, nested } from './registry.js?v=202610071324';
+import { h } from '../ui/kit.js?v=202610071324';
+import { norm, injectCSS, baseCSS, once } from './fkit.js?v=202610071324';
+import { toast } from '../ui/popup.js?v=202610071324';
 
 const CSS = `
 .cn{gap:10px}
@@ -30,11 +30,11 @@ const CSS = `
 @media (min-width:900px) and (min-height:560px){.cn-t{min-height:78px;font-size:17px}.cn{max-width:720px}}
 `;
 
-function predicates(pack, difficulty) {
+function predicates(pack, difficulty, kids) {
   const items = pack.items || [];
   const out = [];
   for (const [key, m] of Object.entries(pack.factsMeta || {})) {
-    if (m.hard && difficulty !== 3) continue;
+    if ((m.hard && difficulty !== 3) || !factAllowed(m, { kids, difficulty })) continue;
     if (m.type === 'cat' && m.exclusive !== false) {
       const counts = {};
       for (const it of items) { const v = it.facts?.[key]; if (v != null && !Array.isArray(v)) counts[v] = (counts[v] || 0) + 1; }
@@ -48,8 +48,8 @@ function predicates(pack, difficulty) {
 // true / false / null (unknown: the item lacks that fact, so it can't be placed fairly)
 const test = (p, it) => { const v = it.facts?.[p.key]; return v == null || Array.isArray(v) ? null : String(v) === String(p.value); };
 
-function make(rng, pack, G, S, difficulty) {
-  const preds = predicates(pack, difficulty);
+function make(rng, pack, G, S, difficulty, kids) {
+  const preds = predicates(pack, difficulty, kids);
   const attrs = [...new Set(preds.map(p => p.attr))];
   if (!attrs.length) return null;
   let chosen;
@@ -62,6 +62,7 @@ function make(rng, pack, G, S, difficulty) {
     chosen = [...sample(rng, preds.filter(p => p.attr === a), k), ...sample(rng, preds.filter(p => p.attr === b), G - k)];
   }
   if (chosen.length < G || new Set(chosen.map(p => p.label)).size < G) return null;
+  if (chosen.some((p, i) => chosen.some((o, j) => j > i && p.attr === o.attr && nested(p.value, o.value)))) return null;
   const pool = byDifficulty(poolItems([pack]), difficulty, G * S * 2, c => c.item.difficulty || 2);
   const used = new Set();
   const groups = [];
@@ -95,7 +96,7 @@ export default register({
   generate({ rng, packs, count, difficulty = 0, kids = false, avoid }) {
     // 16 into 4 is the target; a pack whose facts can't fill that cleanly drops to 12 (3×4), then 9 (3×3)
     const shapes = kids ? [[3, 3]] : [[4, 4], [3, 4], [3, 3]];
-    const usable = packs.filter(p => (p.items || []).length >= 9 && predicates(p, difficulty).length >= 3);
+    const usable = packs.filter(p => (p.items || []).length >= 9 && predicates(p, difficulty, kids).length >= 3);
     if (!usable.length) return [];
     const fits = new Map();
     return collect(count, () => {
@@ -103,7 +104,7 @@ export default register({
       for (const [G, S] of shapes) {
         const k = `${p.id}:${G}x${S}`;
         if (fits.get(k) === false || (p.items || []).length < G * S) continue;
-        for (let t = 0; t < 6; t++) { const q = make(rng, p, G, S, difficulty); if (q) { fits.set(k, true); return q; } }
+        for (let t = 0; t < 6; t++) { const q = make(rng, p, G, S, difficulty, kids); if (q) { fits.set(k, true); return q; } }
         if (!fits.has(k)) fits.set(k, false);
       }
       return null;

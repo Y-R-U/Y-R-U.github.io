@@ -1,6 +1,6 @@
-import { register, poolItems, pickPack, byDifficulty, imageOf, factText, collect, pick, shuffle, sample } from './registry.js?v=202610071242';
-import { h, imgEl } from '../ui/kit.js?v=202610071242';
-import { norm, uniqueByName, injectCSS, baseCSS, once, drag, hasImg } from './fkit.js?v=202610071242';
+import { register, poolItems, pickPack, byDifficulty, imageOf, factText, collect, pick, shuffle, sample, factAllowed, lcLabel } from './registry.js?v=202610071324';
+import { h, imgEl } from '../ui/kit.js?v=202610071324';
+import { norm, uniqueByName, injectCSS, baseCSS, once, drag, hasImg } from './fkit.js?v=202610071324';
 
 const CSS = `
 .so{gap:10px}
@@ -37,11 +37,11 @@ const CSS = `
 @media (min-width:900px) and (min-height:560px){.so-deck{min-height:300px}.so-card{width:320px}}
 `;
 
-function sources(pack, bins) {
+function sources(pack, bins, gate) {
   const items = pack.items || [];
   const out = [];
   for (const [key, m] of Object.entries(pack.factsMeta || {})) {
-    if (m.hard) continue;
+    if (m.hard || !factAllowed(m, gate)) continue;
     const has = items.filter(it => it.facts?.[key] != null);
     if (m.type === 'bool' && has.filter(it => it.facts[key] === true).length >= 2 && has.filter(it => it.facts[key] === false).length >= 2) out.push(['bool', key]);
     if (m.type === 'cat' && m.exclusive !== false) {
@@ -53,6 +53,9 @@ function sources(pack, bins) {
   if ((pack.fakes || []).length >= 3 && items.length >= 4) out.push(['fake', '']);
   return out;
 }
+
+// "A or B?", but "A / B / C" when a bin name has its own "or" ("1900s or later")
+const binList = b => (b.some(x => /\bor\b/i.test(x)) ? b.join(' / ') : `${b.slice(0, -1).join(', ')} or ${b.at(-1)}?`);
 
 function make(rng, pack, [type, key], cards, bins, difficulty, kids) {
   const pool = uniqueByName(byDifficulty(poolItems([pack]), difficulty, cards + 2, c => c.item.difficulty || 2));
@@ -72,7 +75,7 @@ function make(rng, pack, [type, key], cards, bins, difficulty, kids) {
     if (yes.length < 2 || no.length < cards - ny) return null;
     deck = [...sample(rng, yes, ny).map(c => ({ c, bin: 0 })), ...sample(rng, no, cards - ny).map(c => ({ c, bin: 1 }))];
     binNames = [factText(meta, true), factText(meta, false)];
-    prompt = `Sort them: ${binNames[0].toLowerCase()} or ${binNames[1].toLowerCase()}?`;
+    prompt = `Sort them: ${binList(binNames.map(lcLabel))}`;
   } else {
     const meta = pack.factsMeta[key];
     const has = pool.filter(c => c.item.facts?.[key] != null && !Array.isArray(c.item.facts[key]));
@@ -88,7 +91,7 @@ function make(rng, pack, [type, key], cards, bins, difficulty, kids) {
     chosen.forEach((v, b) => deck.push(...sample(rng, has.filter(c => c.item.facts[key] === v), b < cards % bins ? per + 1 : per).map(c => ({ c, bin: b }))));
     if (deck.length < cards - 1) return null;
     binNames = chosen.map(v => v.charAt(0).toUpperCase() + v.slice(1));
-    prompt = `${meta.label || key}: ${binNames.slice(0, -1).join(', ')} or ${binNames.at(-1)}?`;
+    prompt = `${meta.label || key}: ${binList(binNames)}`;
   }
   deck = shuffle(rng, deck);
   const pics = type !== 'fake' && deck.every(x => hasImg(x.c.item)) && (kids || rng() < 0.6);
@@ -117,7 +120,7 @@ export default register({
   generate({ rng, packs, count, opts = {}, difficulty = 0, kids = false, avoid }) {
     const cards = kids ? 6 : CARDS.includes(+opts.cards) ? +opts.cards : 8;
     const bins = kids ? 2 : +opts.bins === 3 ? 3 : 2;
-    const usable = packs.map(p => ({ p, s: sources(p, bins).filter(s => !(kids && s[0] === 'fake')) })).filter(x => x.s.length && (x.p.items || []).length >= cards);
+    const usable = packs.map(p => ({ p, s: sources(p, bins, { kids, difficulty }).filter(s => !(kids && s[0] === 'fake')) })).filter(x => x.s.length && (x.p.items || []).length >= cards);
     if (!usable.length) return [];
     return collect(count, () => {
       const { p, s } = pickPack(rng, usable, x => Math.sqrt((x.p.items || []).length + 1));

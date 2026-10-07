@@ -142,6 +142,10 @@ async function resolveSong(want, year) {
   return b;
 }
 
+// act of the credited lead artist (tools/au_lists/acts.json); songs{} can override one "Artist — Title" (null = leave out)
+const ACTS = JSON.parse(fs.readFileSync(path.join(LISTS, 'acts.json'), 'utf8'));
+const actOf = (artist, title) => { const k = `${artist} — ${title}`; return k in ACTS.songs ? ACTS.songs[k] : ACTS.artists[artist]; };
+
 async function buildSongs(head, rows, report) {
   const items = [], dropped = [], offby = [];
   for (const [y, artist, title, optStr] of rows) {
@@ -161,7 +165,7 @@ async function buildSongs(head, rows, report) {
       id, name: theme ? o.film : title, alt: o.alt ? o.alt.split('/') : undefined,
       group: theme ? (o.type || 'film') : decade(year),
       facts: theme ? { composer: o.composer || artist, year, decade: decade(year), track: title, type: o.type || 'film' }
-        : { artist, year, decade: decade(year) },
+        : { artist, year, decade: decade(year), ...(actOf(artist, title) ? { act: actOf(artist, title) } : {}) },
       blurb: o.blurb || (theme ? `"${title}" from ${o.film} (${year}), by ${o.composer || artist}.` : `"${title}" by ${artist}, released in ${year}.`),
       media: { audio: [audioObj(b.t, artist)] },
       difficulty: +(o.d || head.difficulty || 2),
@@ -202,6 +206,7 @@ const FACTS_SONGS = {
   artist: { type: 'cat', label: 'Artist' },
   year: { type: 'year', label: 'Released', higherLabel: 'Newer' },
   decade: { type: 'cat', label: 'Decade' },
+  act: { type: 'cat', label: 'Act', values: ['Male solo artist', 'Female solo artist', 'Group or duo', 'Duet or team-up'], ask: 'Who recorded {name}: a solo singer, a group or a team-up?', askReverse: 'Which of these hits is by {aValue}?', stmt: '{name} is by {aValue}.' },
 };
 const FACTS_THEMES = {
   composer: { type: 'cat', label: 'Composer / artist' },

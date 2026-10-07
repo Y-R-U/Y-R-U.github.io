@@ -1,11 +1,11 @@
 // Shared game flow: build questions from a spec, preflight media, run them, go to results.
-import { buildQuestions } from '../core/spec.js?v=202610071242';
-import { getFormat } from '../formats/registry.js?v=202610071242';
-import { urlsOf, preflight, swapFailed } from '../core/media.js?v=202610071242';
-import { createRunner } from './runner.js?v=202610071242';
-import { defineScreen, go, back, current } from '../ui/app.js?v=202610071242';
-import { h } from '../ui/kit.js?v=202610071242';
-import { toast } from '../ui/popup.js?v=202610071242';
+import { buildQuestions } from '../core/spec.js?v=202610071324';
+import { getFormat } from '../formats/registry.js?v=202610071324';
+import { urlsOf, preflight, swapFailed, questionFailed } from '../core/media.js?v=202610071324';
+import { createRunner } from './runner.js?v=202610071324';
+import { defineScreen, go, back, current } from '../ui/app.js?v=202610071324';
+import { h } from '../ui/kit.js?v=202610071324';
+import { toast } from '../ui/popup.js?v=202610071324';
 
 const TIPS = [
   'Keys 1–6 pick an answer, Enter moves on.',
@@ -26,7 +26,9 @@ export async function prepareFormats(questions) {
 }
 
 // Renders a progress screen into el. Returns { questions, spares, dropped }.
-export async function prepare(spec, el, { sparesRatio = 0.4 } = {}) {
+// Slow or rate-limited picture hosts must not empty a round: failed questions are swapped for spares that loaded
+// (same round), and a round left under 60% gets a slower second try before anything is dropped.
+export async function prepare(spec, el, { sparesRatio = 0.8 } = {}) {
   el.innerHTML = '';
   const bar = h('div.pf-bar', {}, h('i'));
   const txt = h('div.muted', {}, 'Picking questions…');
@@ -36,22 +38,39 @@ export async function prepare(spec, el, { sparesRatio = 0.4 } = {}) {
   await prepareFormats(questions);
   const urls = urlsOf(questions);
   let result = { questions, spares, dropped: 0 };
+  const show = label => (d, t) => {
+    bar.firstChild.style.width = `${Math.round(100 * d / Math.max(1, t))}%`;
+    txt.textContent = `${label} ${d}/${t}`;
+  };
   if (urls.length) {
     txt.textContent = `Loading pictures and sounds… 0/${urls.length}`;
-    const { failed } = await preflight(urls, (d, t) => {
-      bar.firstChild.style.width = `${Math.round(100 * d / Math.max(1, t))}%`;
-      txt.textContent = `Loading pictures and sounds… ${d}/${t}`;
-    });
+    const { failed } = await preflight(urls, show('Loading pictures and sounds…'));
     if (failed.size) {
-      const spareUrls = urlsOf(spares);
-      const sf = spareUrls.length ? (await preflight(spareUrls.slice(0, 60))).failed : new Set();
-      const all = new Set([...failed, ...sf, ...spareUrls.slice(60)]);
-      result = { ...swapFailed(questions, spares, all), spares };
       console.warn('[clued] media failed', [...failed]);
+      const need = questions.filter(q => questionFailed(q, failed)).length;
+      const cand = spares.filter(s => !questionFailed(s, failed)).slice(0, need * 3 + 6);
+      const spareUrls = urlsOf(cand);
+      const sf = spareUrls.length ? (await preflight(spareUrls, show(`Swapping ${need} that didn't load…`))).failed : new Set();
+      let bad = new Set([...failed, ...sf]);
+      let r = swapFailed(questions, cand, bad);
+      if (thinRounds(spec, r.questions).length) {
+        // second chance: the slow ones again, fewer at a time and with a long timeout
+        const retry = [...failed].filter(u => questions.some(q => questionFailed(q, new Set([u]))));
+        const again = await preflight(retry, show('Slow connection, still loading…'), { concurrency: 3, timeoutMs: 20000 });
+        bad = new Set([...bad].filter(u => !again.ok.has(u)));
+        r = swapFailed(questions, cand, bad);
+      }
+      const used = new Set(r.questions.map(q => q.id));
+      result = { ...r, spares: spares.filter(s => !used.has(s.id) && !questionFailed(s, bad)) };
     }
   }
   bar.firstChild.style.width = '100%';
   return result;
+}
+
+// Rounds holding fewer than 60% of the questions they asked for.
+export function thinRounds(spec, questions) {
+  return (spec.rounds || []).map((r, i) => i).filter(i => questions.filter(q => q.round === i).length < 0.6 * (spec.rounds[i].count || 1));
 }
 
 // params: { spec, questions?, structure, title, cfg(questions, spares) -> runner cfg, onDone(result, ctx) }

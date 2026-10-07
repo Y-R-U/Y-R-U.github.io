@@ -19,6 +19,19 @@
   "decade": {
    "type": "cat",
    "label": "Decade"
+  },
+  "act": {
+   "type": "cat",
+   "label": "Act",
+   "values": [
+    "Male solo artist",
+    "Female solo artist",
+    "Group or duo",
+    "Duet or team-up"
+   ],
+   "ask": "Who recorded {name}: a solo singer, a group or a team-up?",
+   "askReverse": "Which of these hits is by {aValue}?",
+   "stmt": "{name} is by {aValue}."
   }
  },
  "items": [
@@ -29,7 +42,8 @@
    "facts": {
     "artist": "Faith Hill",
     "year": 1999,
-    "decade": "1990s"
+    "decade": "1990s",
+    "act": "Female solo artist"
    },
    "blurb": "\"Breathe\" by Faith Hill, released in 1999.",
    "media": {
@@ -87,7 +101,8 @@
    "facts": {
     "artist": "Destiny's Child",
     "year": 2000,
-    "decade": "2000s"
+    "decade": "2000s",
+    "act": "Group or duo"
    },
    "blurb": "\"Say My Name\" by Destiny's Child, released in 2000.",
    "media": {
@@ -116,7 +131,8 @@
    "facts": {
     "artist": "Britney Spears",
     "year": 2000,
-    "decade": "2000s"
+    "decade": "2000s",
+    "act": "Female solo artist"
    },
    "blurb": "\"Oops!...I Did It Again\" by Britney Spears, released in 2000.",
    "media": {
@@ -145,7 +161,8 @@
    "facts": {
     "artist": "*NSYNC",
     "year": 2000,
-    "decade": "2000s"
+    "decade": "2000s",
+    "act": "Group or duo"
    },
    "blurb": "\"Bye Bye Bye\" by *NSYNC, released in 2000.",
    "media": {
@@ -174,7 +191,8 @@
    "facts": {
     "artist": "Madonna",
     "year": 2000,
-    "decade": "2000s"
+    "decade": "2000s",
+    "act": "Female solo artist"
    },
    "blurb": "\"Music\" by Madonna, released in 2000.",
    "media": {
@@ -203,7 +221,8 @@
    "facts": {
     "artist": "Bon Jovi",
     "year": 2000,
-    "decade": "2000s"
+    "decade": "2000s",
+    "act": "Group or duo"
    },
    "blurb": "\"It's My Life\" by Bon Jovi, released in 2000.",
    "media": {
@@ -232,7 +251,8 @@
    "facts": {
     "artist": "Baha Men",
     "year": 2000,
-    "decade": "2000s"
+    "decade": "2000s",
+    "act": "Group or duo"
    },
    "blurb": "\"Who Let the Dogs Out\" by Baha Men, released in 2000.",
    "media": {
@@ -261,7 +281,8 @@
    "facts": {
     "artist": "Lifehouse",
     "year": 2000,
-    "decade": "2000s"
+    "decade": "2000s",
+    "act": "Group or duo"
    },
    "blurb": "\"Hanging by a Moment\" by Lifehouse, released in 2000.",
    "media": {
@@ -290,7 +311,8 @@
    "facts": {
     "artist": "Alicia Keys",
     "year": 2001,
-    "decade": "2000s"
+    "decade": "2000s",
+    "act": "Female solo artist"
    },
    "blurb": "\"Fallin'\" by Alicia Keys, released in 2001.",
    "media": {
@@ -319,7 +341,8 @@
    "facts": {
     "artist": "Christina Aguilera, Lil' Kim, Mýa & P!nk",
     "year": 2001,
-    "decade": "2000s"
+    "decade": "2000s",
+    "act": "Duet or team-up"
    },
    "blurb": "\"Lady Marmalade\" by Christina Aguilera, Lil' Kim, Mýa & P!nk, released in 2001.",
    "media": {
@@ -348,7 +371,8 @@
    "facts": {
     "artist": "Destiny's Child",
     "year": 2000,
-    "decade": "2000s"
+    "decade": "2000s",
+    "act": "Group or duo"
    },
    "blurb": "\"Independent Women, Pt. 1\" by Destiny's Child, released in 2000.",
    "media": {
@@ -377,7 +401,8 @@
    "facts": {
     "artist": "Kylie Minogue",
     "year": 2001,
-    "decade": "2000s"
+    "decade": "2000s",
+    "act": "Female solo artist"
    },
    "blurb": "\"Can't Get You Out of My Head\" by Kylie Minogue, released in 2001.",
    "media": {
@@ -406,7 +431,8 @@
    "facts": {
     "artist": "Nickelback",
     "year": 2001,
-    "decade": "2000s"
+    "decade": "2000s",
+    "act": "Group or duo"
    },
    "blurb": "\"How You Remind Me\" by Nickelback, released in 2001.",
    "media": {
@@ -435,7 +461,8 @@
    "facts": {
     "artist": "Nelly",
     "year": 2002,
-    "decade": "2000s"
+    "decade": "2000s",
+    "act": "Male solo artist"
    },
    "blurb": "\"Hot in Herre\" by Nelly, released in 2002.",
    "media": {
@@ -464,7 +491,8 @@
    "facts": {
     "artist": "Nelly & Kelly Rowland",
     "year": 2002,
-    "decade": "2000s"
+    "decade": "2000s",
+    "act": "Duet or team-up"
    },
    "blurb": "\"Dilemma\" by Nelly & Kelly Rowland, released in 2002.",
    "media": {
@@ -493,7 +521,8 @@
    "facts": {
     "artist": "Vanessa Carlton",
     "year": 2002,
-    "decade": "2000s"
+    "decade": "2000s",
+    "act": "Female solo artist"
    },
    "blurb": "\"A Thousand Miles\" by Vanessa Carlton, released in 2002.",
    "media": {
@@ -522,7 +551,8 @@
    "facts": {
     "artist": "Avril Lavigne",
     "year": 2002,
-    "decade": "2000s"
+    "decade": "2000s",
+    "act": "Female solo artist"
    },
    "blurb": "\"Complicated\" by Avril Lavigne, released in 2002.",
    "media": {
@@ -551,7 +581,8 @@
    "facts": {
     "artist": "Eminem",
     "year": 2002,
-    "decade": "2000s"
+    "decade": "2000s",
+    "act": "Male solo artist"
    },
    "blurb": "\"Lose Yourself\" by Eminem, released in 2002.",
    "media": {
@@ -580,7 +611,8 @@
    "facts": {
     "artist": "Eminem",
     "year": 2002,
-    "decade": "2000s"
+    "decade": "2000s",
+    "act": "Male solo artist"
    },
    "blurb": "\"Without Me\" by Eminem, released in 2002.",
    "media": {
@@ -609,7 +641,8 @@
    "facts": {
     "artist": "50 Cent",
     "year": 2003,
-    "decade": "2000s"
+    "decade": "2000s",
+    "act": "Male solo artist"
    },
    "blurb": "\"In da Club\" by 50 Cent, released in 2003.",
    "media": {
@@ -638,7 +671,8 @@
    "facts": {
     "artist": "Beyoncé",
     "year": 2003,
-    "decade": "2000s"
+    "decade": "2000s",
+    "act": "Female solo artist"
    },
    "blurb": "\"Crazy in Love\" by Beyoncé, released in 2003.",
    "media": {
@@ -667,7 +701,8 @@
    "facts": {
     "artist": "Outkast",
     "year": 2003,
-    "decade": "2000s"
+    "decade": "2000s",
+    "act": "Group or duo"
    },
    "blurb": "\"Hey Ya!\" by Outkast, released in 2003.",
    "media": {
@@ -696,7 +731,8 @@
    "facts": {
     "artist": "The Black Eyed Peas",
     "year": 2003,
-    "decade": "2000s"
+    "decade": "2000s",
+    "act": "Group or duo"
    },
    "blurb": "\"Where Is the Love?\" by The Black Eyed Peas, released in 2003.",
    "media": {
@@ -725,7 +761,8 @@
    "facts": {
     "artist": "Evanescence",
     "year": 2003,
-    "decade": "2000s"
+    "decade": "2000s",
+    "act": "Group or duo"
    },
    "blurb": "\"Bring Me to Life\" by Evanescence, released in 2003.",
    "media": {
@@ -754,7 +791,8 @@
    "facts": {
     "artist": "Sean Paul",
     "year": 2002,
-    "decade": "2000s"
+    "decade": "2000s",
+    "act": "Male solo artist"
    },
    "blurb": "\"Get Busy\" by Sean Paul, released in 2002.",
    "media": {
@@ -783,7 +821,8 @@
    "facts": {
     "artist": "Coldplay",
     "year": 2002,
-    "decade": "2000s"
+    "decade": "2000s",
+    "act": "Group or duo"
    },
    "blurb": "\"Clocks\" by Coldplay, released in 2002.",
    "media": {
@@ -812,7 +851,8 @@
    "facts": {
     "artist": "Usher",
     "year": 2004,
-    "decade": "2000s"
+    "decade": "2000s",
+    "act": "Male solo artist"
    },
    "blurb": "\"Yeah!\" by Usher, released in 2004.",
    "media": {
@@ -841,7 +881,8 @@
    "facts": {
     "artist": "Usher",
     "year": 2004,
-    "decade": "2000s"
+    "decade": "2000s",
+    "act": "Male solo artist"
    },
    "blurb": "\"Burn\" by Usher, released in 2004.",
    "media": {
@@ -870,7 +911,8 @@
    "facts": {
     "artist": "Alicia Keys",
     "year": 2003,
-    "decade": "2000s"
+    "decade": "2000s",
+    "act": "Female solo artist"
    },
    "blurb": "\"If I Ain't Got You\" by Alicia Keys, released in 2003.",
    "media": {
@@ -899,7 +941,8 @@
    "facts": {
     "artist": "Britney Spears",
     "year": 2003,
-    "decade": "2000s"
+    "decade": "2000s",
+    "act": "Female solo artist"
    },
    "blurb": "\"Toxic\" by Britney Spears, released in 2003.",
    "media": {
@@ -928,7 +971,8 @@
    "facts": {
     "artist": "Kelly Clarkson",
     "year": 2004,
-    "decade": "2000s"
+    "decade": "2000s",
+    "act": "Female solo artist"
    },
    "blurb": "\"Since U Been Gone\" by Kelly Clarkson, released in 2004.",
    "media": {
@@ -957,7 +1001,8 @@
    "facts": {
     "artist": "Mariah Carey",
     "year": 2005,
-    "decade": "2000s"
+    "decade": "2000s",
+    "act": "Female solo artist"
    },
    "blurb": "\"We Belong Together\" by Mariah Carey, released in 2005.",
    "media": {
@@ -986,7 +1031,8 @@
    "facts": {
     "artist": "Gwen Stefani",
     "year": 2004,
-    "decade": "2000s"
+    "decade": "2000s",
+    "act": "Female solo artist"
    },
    "blurb": "\"Hollaback Girl\" by Gwen Stefani, released in 2004.",
    "media": {
@@ -1015,7 +1061,8 @@
    "facts": {
     "artist": "Kanye West",
     "year": 2005,
-    "decade": "2000s"
+    "decade": "2000s",
+    "act": "Male solo artist"
    },
    "blurb": "\"Gold Digger\" by Kanye West, released in 2005.",
    "media": {
@@ -1044,7 +1091,8 @@
    "facts": {
     "artist": "Gorillaz",
     "year": 2005,
-    "decade": "2000s"
+    "decade": "2000s",
+    "act": "Group or duo"
    },
    "blurb": "\"Feel Good Inc.\" by Gorillaz, released in 2005.",
    "media": {
@@ -1073,7 +1121,8 @@
    "facts": {
     "artist": "Daniel Powter",
     "year": 2005,
-    "decade": "2000s"
+    "decade": "2000s",
+    "act": "Male solo artist"
    },
    "blurb": "\"Bad Day\" by Daniel Powter, released in 2005.",
    "media": {
@@ -1102,7 +1151,8 @@
    "facts": {
     "artist": "James Blunt",
     "year": 2004,
-    "decade": "2000s"
+    "decade": "2000s",
+    "act": "Male solo artist"
    },
    "blurb": "\"You're Beautiful\" by James Blunt, released in 2004.",
    "media": {
@@ -1131,7 +1181,8 @@
    "facts": {
     "artist": "Shakira",
     "year": 2006,
-    "decade": "2000s"
+    "decade": "2000s",
+    "act": "Female solo artist"
    },
    "blurb": "\"Hips Don't Lie\" by Shakira, released in 2006.",
    "media": {
@@ -1160,7 +1211,8 @@
    "facts": {
     "artist": "Gnarls Barkley",
     "year": 2006,
-    "decade": "2000s"
+    "decade": "2000s",
+    "act": "Group or duo"
    },
    "blurb": "\"Crazy\" by Gnarls Barkley, released in 2006.",
    "media": {
@@ -1189,7 +1241,8 @@
    "facts": {
     "artist": "Justin Timberlake",
     "year": 2006,
-    "decade": "2000s"
+    "decade": "2000s",
+    "act": "Male solo artist"
    },
    "blurb": "\"SexyBack\" by Justin Timberlake, released in 2006.",
    "media": {
@@ -1218,7 +1271,8 @@
    "facts": {
     "artist": "Nelly Furtado",
     "year": 2006,
-    "decade": "2000s"
+    "decade": "2000s",
+    "act": "Female solo artist"
    },
    "blurb": "\"Promiscuous\" by Nelly Furtado, released in 2006.",
    "media": {
@@ -1247,7 +1301,8 @@
    "facts": {
     "artist": "Snow Patrol",
     "year": 2006,
-    "decade": "2000s"
+    "decade": "2000s",
+    "act": "Group or duo"
    },
    "blurb": "\"Chasing Cars\" by Snow Patrol, released in 2006.",
    "media": {
@@ -1276,7 +1331,8 @@
    "facts": {
     "artist": "Beyoncé",
     "year": 2006,
-    "decade": "2000s"
+    "decade": "2000s",
+    "act": "Female solo artist"
    },
    "blurb": "\"Irreplaceable\" by Beyoncé, released in 2006.",
    "media": {
@@ -1305,7 +1361,8 @@
    "facts": {
     "artist": "Rihanna",
     "year": 2007,
-    "decade": "2000s"
+    "decade": "2000s",
+    "act": "Female solo artist"
    },
    "blurb": "\"Umbrella\" by Rihanna, released in 2007.",
    "media": {
@@ -1334,7 +1391,8 @@
    "facts": {
     "artist": "Avril Lavigne",
     "year": 2007,
-    "decade": "2000s"
+    "decade": "2000s",
+    "act": "Female solo artist"
    },
    "blurb": "\"Girlfriend\" by Avril Lavigne, released in 2007.",
    "media": {
@@ -1363,7 +1421,8 @@
    "facts": {
     "artist": "Kanye West",
     "year": 2007,
-    "decade": "2000s"
+    "decade": "2000s",
+    "act": "Male solo artist"
    },
    "blurb": "\"Stronger\" by Kanye West, released in 2007.",
    "media": {
@@ -1421,7 +1480,8 @@
    "facts": {
     "artist": "Leona Lewis",
     "year": 2007,
-    "decade": "2000s"
+    "decade": "2000s",
+    "act": "Female solo artist"
    },
    "blurb": "\"Bleeding Love\" by Leona Lewis, released in 2007.",
    "media": {
@@ -1450,7 +1510,8 @@
    "facts": {
     "artist": "Flo Rida",
     "year": 2007,
-    "decade": "2000s"
+    "decade": "2000s",
+    "act": "Male solo artist"
    },
    "blurb": "\"Low\" by Flo Rida, released in 2007.",
    "media": {
@@ -1479,7 +1540,8 @@
    "facts": {
     "artist": "Katy Perry",
     "year": 2008,
-    "decade": "2000s"
+    "decade": "2000s",
+    "act": "Female solo artist"
    },
    "blurb": "\"I Kissed a Girl\" by Katy Perry, released in 2008.",
    "media": {
@@ -1508,7 +1570,8 @@
    "facts": {
     "artist": "Coldplay",
     "year": 2008,
-    "decade": "2000s"
+    "decade": "2000s",
+    "act": "Group or duo"
    },
    "blurb": "\"Viva la Vida\" by Coldplay, released in 2008.",
    "media": {
@@ -1540,7 +1603,8 @@
    "facts": {
     "artist": "Beyoncé",
     "year": 2008,
-    "decade": "2000s"
+    "decade": "2000s",
+    "act": "Female solo artist"
    },
    "blurb": "\"Single Ladies (Put a Ring on It)\" by Beyoncé, released in 2008.",
    "media": {
@@ -1569,7 +1633,8 @@
    "facts": {
     "artist": "Taylor Swift",
     "year": 2008,
-    "decade": "2000s"
+    "decade": "2000s",
+    "act": "Female solo artist"
    },
    "blurb": "\"Love Story\" by Taylor Swift, released in 2008.",
    "media": {
@@ -1598,7 +1663,8 @@
    "facts": {
     "artist": "Lady Gaga",
     "year": 2008,
-    "decade": "2000s"
+    "decade": "2000s",
+    "act": "Female solo artist"
    },
    "blurb": "\"Poker Face\" by Lady Gaga, released in 2008.",
    "media": {
@@ -1627,7 +1693,8 @@
    "facts": {
     "artist": "Lady Gaga",
     "year": 2008,
-    "decade": "2000s"
+    "decade": "2000s",
+    "act": "Female solo artist"
    },
    "blurb": "\"Just Dance\" by Lady Gaga, released in 2008.",
    "media": {
@@ -1656,7 +1723,8 @@
    "facts": {
     "artist": "The Black Eyed Peas",
     "year": 2009,
-    "decade": "2000s"
+    "decade": "2000s",
+    "act": "Group or duo"
    },
    "blurb": "\"I Gotta Feeling\" by The Black Eyed Peas, released in 2009.",
    "media": {
@@ -1685,7 +1753,8 @@
    "facts": {
     "artist": "The Black Eyed Peas",
     "year": 2009,
-    "decade": "2000s"
+    "decade": "2000s",
+    "act": "Group or duo"
    },
    "blurb": "\"Boom Boom Pow\" by The Black Eyed Peas, released in 2009.",
    "media": {
@@ -1743,7 +1812,8 @@
    "facts": {
     "artist": "Jay-Z & Alicia Keys",
     "year": 2009,
-    "decade": "2000s"
+    "decade": "2000s",
+    "act": "Duet or team-up"
    },
    "blurb": "\"Empire State of Mind\" by Jay-Z & Alicia Keys, released in 2009.",
    "media": {
@@ -1772,7 +1842,8 @@
    "facts": {
     "artist": "Kings of Leon",
     "year": 2008,
-    "decade": "2000s"
+    "decade": "2000s",
+    "act": "Group or duo"
    },
    "blurb": "\"Use Somebody\" by Kings of Leon, released in 2008.",
    "media": {
@@ -1810,5 +1881,5 @@
    "url": "https://performance-partners.apple.com/search-api"
   }
  ],
- "built": "2026-10-04"
+ "built": "2026-10-07"
 }

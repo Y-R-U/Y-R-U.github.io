@@ -5446,6 +5446,326 @@
    ],
    "explain": "The ruble sign was adopted in 2013.",
    "difficulty": 3
+  },
+  {
+   "id": "curtf-china",
+   "kind": "tf",
+   "prompt": "The currency of China is the renminbi (yuan).",
+   "answer": true,
+   "explain": "China uses the Renminbi (yuan) (CNY).",
+   "difficulty": 1
+  },
+  {
+   "id": "curtf-vanuatu",
+   "kind": "tf",
+   "prompt": "The currency of Vanuatu is the paʻanga.",
+   "answer": false,
+   "explain": "Vanuatu uses the Vanuatu vatu (VUV).",
+   "difficulty": 3
+  },
+  {
+   "id": "curtf-north-macedonia",
+   "kind": "tf",
+   "prompt": "The currency of North Macedonia is the denar.",
+   "answer": true,
+   "explain": "North Macedonia uses the Macedonian denar (MKD).",
+   "difficulty": 3
+  },
+  {
+   "id": "curtf-gambia",
+   "kind": "tf",
+   "prompt": "The currency of the Gambia is the nakfa.",
+   "answer": false,
+   "explain": "The Gambia uses the Gambian dalasi (GMD).",
+   "difficulty": 3
+  },
+  {
+   "id": "curtf-honduras",
+   "kind": "tf",
+   "prompt": "The currency of Honduras is the lempira.",
+   "answer": true,
+   "explain": "Honduras uses the Honduran lempira (HNL).",
+   "difficulty": 2
+  },
+  {
+   "id": "curtf-peru",
+   "kind": "tf",
+   "prompt": "The currency of Peru is the bolívar.",
+   "answer": false,
+   "explain": "Peru uses the Peruvian sol (PEN).",
+   "difficulty": 1
+  },
+  {
+   "id": "curtf-sao-tome-and-principe",
+   "kind": "tf",
+   "prompt": "The currency of São Tomé and Príncipe is the dobra.",
+   "answer": true,
+   "explain": "São Tomé and Príncipe uses the São Tomé and Príncipe dobra (STN).",
+   "difficulty": 3
+  },
+  {
+   "id": "curtf-ukraine",
+   "kind": "tf",
+   "prompt": "The currency of Ukraine is the denar.",
+   "answer": false,
+   "explain": "Ukraine uses the Ukrainian hryvnia (UAH).",
+   "difficulty": 2
+  },
+  {
+   "id": "curtf-eswatini",
+   "kind": "tf",
+   "prompt": "The currency of Eswatini is the lilangeni.",
+   "answer": true,
+   "explain": "Eswatini uses the Swazi lilangeni (SZL).",
+   "difficulty": 3
+  },
+  {
+   "id": "curtf-bolivia",
+   "kind": "tf",
+   "prompt": "The currency of Bolivia is the guaraní.",
+   "answer": false,
+   "explain": "Bolivia uses the Bolivian boliviano (BOB).",
+   "difficulty": 2
+  },
+  {
+   "id": "curtf-thailand",
+   "kind": "tf",
+   "prompt": "The currency of Thailand is the baht.",
+   "answer": true,
+   "explain": "Thailand uses the Thai baht (THB).",
+   "difficulty": 1
+  },
+  {
+   "id": "curtf-sweden",
+   "kind": "tf",
+   "prompt": "The currency of Sweden is the pound sterling.",
+   "answer": false,
+   "explain": "Sweden uses the Swedish krona (SEK).",
+   "difficulty": 1
+  },
+  {
+   "id": "curtf-papua-new-guinea",
+   "kind": "tf",
+   "prompt": "The currency of Papua New Guinea is the kina.",
+   "answer": true,
+   "explain": "Papua New Guinea uses the Papua New Guinean kina (PGK).",
+   "difficulty": 2
+  },
+  {
+   "id": "curtf-czechia",
+   "kind": "tf",
+   "prompt": "The currency of Czechia is the forint.",
+   "answer": false,
+   "explain": "Czechia uses the Czech koruna (CZK).",
+   "difficulty": 2
+  },
+  {
+   "id": "curtf-nicaragua",
+   "kind": "tf",
+   "prompt": "The currency of Nicaragua is the córdoba.",
+   "answer": true,
+   "explain": "Nicaragua uses the Nicaraguan córdoba (NIO).",
+   "difficulty": 2
+  },
+  {
+   "id": "curtf-cambodia",
+   "kind": "tf",
+   "prompt": "The currency of Cambodia is the dram.",
+   "answer": false,
+   "explain": "Cambodia uses the Cambodian riel (KHR).",
+   "difficulty": 2
+  },
+  {
+   "id": "curtf-malaysia",
+   "kind": "tf",
+   "prompt": "The currency of Malaysia is the ringgit.",
+   "answer": true,
+   "explain": "Malaysia uses the Malaysian ringgit (MYR).",
+   "difficulty": 2
+  },
+  {
+   "id": "curtf-botswana",
+   "kind": "tf",
+   "prompt": "The currency of Botswana is the escudo.",
+   "answer": false,
+   "explain": "Botswana uses the Botswana pula (BWP).",
+   "difficulty": 3
+  },
+  {
+   "id": "curtf-kazakhstan",
+   "kind": "tf",
+   "prompt": "The currency of Kazakhstan is the tenge.",
+   "answer": true,
+   "explain": "Kazakhstan uses the Kazakhstani tenge (KZT).",
+   "difficulty": 2
+  },
+  {
+   "id": "curtf-georgia",
+   "kind": "tf",
+   "prompt": "The currency of Georgia is the riel.",
+   "answer": false,
+   "explain": "Georgia uses the Georgian lari (GEL).",
+   "difficulty": 2
+  },
+  {
+   "id": "curtf-albania",
+   "kind": "tf",
+   "prompt": "The currency of Albania is the lek.",
+   "answer": true,
+   "explain": "Albania uses the Albanian lek (ALL).",
+   "difficulty": 3
+  },
+  {
+   "id": "curtf-sierra-leone",
+   "kind": "tf",
+   "prompt": "The currency of Sierra Leone is the birr.",
+   "answer": false,
+   "explain": "Sierra Leone uses the Sierra Leonean leone (SLE).",
+   "difficulty": 2
+  },
+  {
+   "id": "curtf-myanmar",
+   "kind": "tf",
+   "prompt": "The currency of Myanmar is the kyat.",
+   "answer": true,
+   "explain": "Myanmar uses the Myanmar kyat (MMK).",
+   "difficulty": 2
+  },
+  {
+   "id": "curtf-japan",
+   "kind": "tf",
+   "prompt": "The currency of Japan is the afghani.",
+   "answer": false,
+   "explain": "Japan uses the Japanese yen (JPY).",
+   "difficulty": 1
+  },
+  {
+   "id": "curtf-haiti",
+   "kind": "tf",
+   "prompt": "The currency of Haiti is the gourde.",
+   "answer": true,
+   "explain": "Haiti uses the Haitian gourde (HTG).",
+   "difficulty": 2
+  },
+  {
+   "id": "curtf-armenia",
+   "kind": "tf",
+   "prompt": "The currency of Armenia is the taka.",
+   "answer": false,
+   "explain": "Armenia uses the Armenian dram (AMD).",
+   "difficulty": 2
+  },
+  {
+   "id": "curtf-poland",
+   "kind": "tf",
+   "prompt": "The currency of Poland is the złoty.",
+   "answer": true,
+   "explain": "Poland uses the Polish złoty (PLN).",
+   "difficulty": 1
+  },
+  {
+   "id": "curtf-hungary",
+   "kind": "tf",
+   "prompt": "The currency of Hungary is the denar.",
+   "answer": false,
+   "explain": "Hungary uses the Hungarian forint (HUF).",
+   "difficulty": 2
+  },
+  {
+   "id": "curtf-united-kingdom",
+   "kind": "tf",
+   "prompt": "The currency of the United Kingdom is the pound sterling.",
+   "answer": true,
+   "explain": "The United Kingdom uses the Pound sterling (GBP).",
+   "difficulty": 1
+  },
+  {
+   "id": "curtf-guatemala",
+   "kind": "tf",
+   "prompt": "The currency of Guatemala is the balboa.",
+   "answer": false,
+   "explain": "Guatemala uses the Guatemalan quetzal (GTQ).",
+   "difficulty": 2
+  },
+  {
+   "id": "curtf-turkey",
+   "kind": "tf",
+   "prompt": "The currency of Turkey is the lira.",
+   "answer": true,
+   "explain": "Turkey uses the Turkish lira (TRY).",
+   "difficulty": 1
+  },
+  {
+   "id": "curtf-vietnam",
+   "kind": "tf",
+   "prompt": "The currency of Vietnam is the kyat.",
+   "answer": false,
+   "explain": "Vietnam uses the Vietnamese đồng (VND).",
+   "difficulty": 2
+  },
+  {
+   "id": "curtf-paraguay",
+   "kind": "tf",
+   "prompt": "The currency of Paraguay is the guaraní.",
+   "answer": true,
+   "explain": "Paraguay uses the Paraguayan guaraní (PYG).",
+   "difficulty": 2
+  },
+  {
+   "id": "curtf-eritrea",
+   "kind": "tf",
+   "prompt": "The currency of Eritrea is the ouguiya.",
+   "answer": false,
+   "explain": "Eritrea uses the Eritrean nakfa (ERN).",
+   "difficulty": 2
+  },
+  {
+   "id": "curtf-samoa",
+   "kind": "tf",
+   "prompt": "The currency of Samoa is the tālā.",
+   "answer": true,
+   "explain": "Samoa uses the Samoan tālā (WST).",
+   "difficulty": 3
+  },
+  {
+   "id": "curtf-costa-rica",
+   "kind": "tf",
+   "prompt": "The currency of Costa Rica is the lempira.",
+   "answer": false,
+   "explain": "Costa Rica uses the Costa Rican colón (CRC).",
+   "difficulty": 2
+  },
+  {
+   "id": "curtf-cape-verde",
+   "kind": "tf",
+   "prompt": "The currency of Cape Verde is the escudo.",
+   "answer": true,
+   "explain": "Cape Verde uses the Cape Verdean escudo (CVE).",
+   "difficulty": 3
+  },
+  {
+   "id": "curtf-indonesia",
+   "kind": "tf",
+   "prompt": "The currency of Indonesia is the ringgit.",
+   "answer": false,
+   "explain": "Indonesia uses the Indonesian rupiah (IDR).",
+   "difficulty": 2
+  },
+  {
+   "id": "curtf-nigeria",
+   "kind": "tf",
+   "prompt": "The currency of Nigeria is the naira.",
+   "answer": true,
+   "explain": "Nigeria uses the Nigerian naira (NGN).",
+   "difficulty": 1
+  },
+  {
+   "id": "curtf-madagascar",
+   "kind": "tf",
+   "prompt": "The currency of Madagascar is the lilangeni.",
+   "answer": false,
+   "explain": "Madagascar uses the Malagasy ariary (MGA).",
+   "difficulty": 2
   }
  ],
  "sources": [

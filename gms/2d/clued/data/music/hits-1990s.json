@@ -19,6 +19,19 @@
   "decade": {
    "type": "cat",
    "label": "Decade"
+  },
+  "act": {
+   "type": "cat",
+   "label": "Act",
+   "values": [
+    "Male solo artist",
+    "Female solo artist",
+    "Group or duo",
+    "Duet or team-up"
+   ],
+   "ask": "Who recorded {name}: a solo singer, a group or a team-up?",
+   "askReverse": "Which of these hits is by {aValue}?",
+   "stmt": "{name} is by {aValue}."
   }
  },
  "items": [
@@ -29,7 +42,8 @@
    "facts": {
     "artist": "Wilson Phillips",
     "year": 1990,
-    "decade": "1990s"
+    "decade": "1990s",
+    "act": "Group or duo"
    },
    "blurb": "\"Hold On\" by Wilson Phillips, released in 1990.",
    "media": {
@@ -58,7 +72,8 @@
    "facts": {
     "artist": "Sinéad O'Connor",
     "year": 1990,
-    "decade": "1990s"
+    "decade": "1990s",
+    "act": "Female solo artist"
    },
    "blurb": "\"Nothing Compares 2 U\" by Sinéad O'Connor, released in 1990.",
    "media": {
@@ -87,7 +102,8 @@
    "facts": {
     "artist": "Madonna",
     "year": 1990,
-    "decade": "1990s"
+    "decade": "1990s",
+    "act": "Female solo artist"
    },
    "blurb": "\"Vogue\" by Madonna, released in 1990.",
    "media": {
@@ -116,7 +132,8 @@
    "facts": {
     "artist": "Mariah Carey",
     "year": 1990,
-    "decade": "1990s"
+    "decade": "1990s",
+    "act": "Female solo artist"
    },
    "blurb": "\"Vision of Love\" by Mariah Carey, released in 1990.",
    "media": {
@@ -145,7 +162,8 @@
    "facts": {
     "artist": "MC Hammer",
     "year": 1990,
-    "decade": "1990s"
+    "decade": "1990s",
+    "act": "Male solo artist"
    },
    "blurb": "\"U Can't Touch This\" by MC Hammer, released in 1990.",
    "media": {
@@ -174,7 +192,8 @@
    "facts": {
     "artist": "Vanilla Ice",
     "year": 1990,
-    "decade": "1990s"
+    "decade": "1990s",
+    "act": "Male solo artist"
    },
    "blurb": "\"Ice Ice Baby\" by Vanilla Ice, released in 1990.",
    "media": {
@@ -203,7 +222,8 @@
    "facts": {
     "artist": "Deee-Lite",
     "year": 1990,
-    "decade": "1990s"
+    "decade": "1990s",
+    "act": "Group or duo"
    },
    "blurb": "\"Groove Is in the Heart\" by Deee-Lite, released in 1990.",
    "media": {
@@ -232,7 +252,8 @@
    "facts": {
     "artist": "Bryan Adams",
     "year": 1991,
-    "decade": "1990s"
+    "decade": "1990s",
+    "act": "Male solo artist"
    },
    "blurb": "\"(Everything I Do) I Do It for You\" by Bryan Adams, released in 1991.",
    "media": {
@@ -261,7 +282,8 @@
    "facts": {
     "artist": "Nirvana",
     "year": 1991,
-    "decade": "1990s"
+    "decade": "1990s",
+    "act": "Group or duo"
    },
    "blurb": "\"Smells Like Teen Spirit\" by Nirvana, released in 1991.",
    "media": {
@@ -290,7 +312,8 @@
    "facts": {
     "artist": "R.E.M.",
     "year": 1991,
-    "decade": "1990s"
+    "decade": "1990s",
+    "act": "Group or duo"
    },
    "blurb": "\"Losing My Religion\" by R.E.M., released in 1991.",
    "media": {
@@ -319,7 +342,8 @@
    "facts": {
     "artist": "Michael Jackson",
     "year": 1991,
-    "decade": "1990s"
+    "decade": "1990s",
+    "act": "Male solo artist"
    },
    "blurb": "\"Black or White\" by Michael Jackson, released in 1991.",
    "media": {
@@ -348,7 +372,8 @@
    "facts": {
     "artist": "C+C Music Factory",
     "year": 1990,
-    "decade": "1990s"
+    "decade": "1990s",
+    "act": "Group or duo"
    },
    "blurb": "\"Gonna Make You Sweat (Everybody Dance Now)\" by C+C Music Factory, released in 1990.",
    "media": {
@@ -377,7 +402,8 @@
    "facts": {
     "artist": "Boyz II Men",
     "year": 1992,
-    "decade": "1990s"
+    "decade": "1990s",
+    "act": "Group or duo"
    },
    "blurb": "\"End of the Road\" by Boyz II Men, released in 1992.",
    "media": {
@@ -406,7 +432,8 @@
    "facts": {
     "artist": "Sir Mix-a-Lot",
     "year": 1992,
-    "decade": "1990s"
+    "decade": "1990s",
+    "act": "Male solo artist"
    },
    "blurb": "\"Baby Got Back\" by Sir Mix-a-Lot, released in 1992.",
    "media": {
@@ -435,7 +462,8 @@
    "facts": {
     "artist": "Kris Kross",
     "year": 1992,
-    "decade": "1990s"
+    "decade": "1990s",
+    "act": "Group or duo"
    },
    "blurb": "\"Jump\" by Kris Kross, released in 1992.",
    "media": {
@@ -464,7 +492,8 @@
    "facts": {
     "artist": "Whitney Houston",
     "year": 1992,
-    "decade": "1990s"
+    "decade": "1990s",
+    "act": "Female solo artist"
    },
    "blurb": "\"I Will Always Love You\" by Whitney Houston, released in 1992.",
    "media": {
@@ -493,7 +522,8 @@
    "facts": {
     "artist": "Billy Ray Cyrus",
     "year": 1992,
-    "decade": "1990s"
+    "decade": "1990s",
+    "act": "Male solo artist"
    },
    "blurb": "\"Achy Breaky Heart\" by Billy Ray Cyrus, released in 1992.",
    "media": {
@@ -522,7 +552,8 @@
    "facts": {
     "artist": "Red Hot Chili Peppers",
     "year": 1991,
-    "decade": "1990s"
+    "decade": "1990s",
+    "act": "Group or duo"
    },
    "blurb": "\"Under the Bridge\" by Red Hot Chili Peppers, released in 1991.",
    "media": {
@@ -551,7 +582,8 @@
    "facts": {
     "artist": "Haddaway",
     "year": 1993,
-    "decade": "1990s"
+    "decade": "1990s",
+    "act": "Male solo artist"
    },
    "blurb": "\"What Is Love\" by Haddaway, released in 1993.",
    "media": {
@@ -580,7 +612,8 @@
    "facts": {
     "artist": "UB40",
     "year": 1993,
-    "decade": "1990s"
+    "decade": "1990s",
+    "act": "Group or duo"
    },
    "blurb": "\"(I Can't Help) Falling in Love with You\" by UB40, released in 1993.",
    "media": {
@@ -609,7 +642,8 @@
    "facts": {
     "artist": "Meat Loaf",
     "year": 1993,
-    "decade": "1990s"
+    "decade": "1990s",
+    "act": "Male solo artist"
    },
    "blurb": "\"I'd Do Anything for Love (But I Won't Do That)\" by Meat Loaf, released in 1993.",
    "media": {
@@ -638,7 +672,8 @@
    "facts": {
     "artist": "Tag Team",
     "year": 1993,
-    "decade": "1990s"
+    "decade": "1990s",
+    "act": "Group or duo"
    },
    "blurb": "\"Whoomp! (There It Is)\" by Tag Team, released in 1993.",
    "media": {
@@ -667,7 +702,8 @@
    "facts": {
     "artist": "Ace of Base",
     "year": 1993,
-    "decade": "1990s"
+    "decade": "1990s",
+    "act": "Group or duo"
    },
    "blurb": "\"The Sign\" by Ace of Base, released in 1993.",
    "media": {
@@ -696,7 +732,8 @@
    "facts": {
     "artist": "All-4-One",
     "year": 1994,
-    "decade": "1990s"
+    "decade": "1990s",
+    "act": "Group or duo"
    },
    "blurb": "\"I Swear\" by All-4-One, released in 1994.",
    "media": {
@@ -725,7 +762,8 @@
    "facts": {
     "artist": "Boyz II Men",
     "year": 1994,
-    "decade": "1990s"
+    "decade": "1990s",
+    "act": "Group or duo"
    },
    "blurb": "\"I'll Make Love to You\" by Boyz II Men, released in 1994.",
    "media": {
@@ -754,7 +792,8 @@
    "facts": {
     "artist": "Wet Wet Wet",
     "year": 1994,
-    "decade": "1990s"
+    "decade": "1990s",
+    "act": "Group or duo"
    },
    "blurb": "\"Love Is All Around\" by Wet Wet Wet, released in 1994.",
    "media": {
@@ -783,7 +822,8 @@
    "facts": {
     "artist": "Lisa Loeb",
     "year": 1994,
-    "decade": "1990s"
+    "decade": "1990s",
+    "act": "Female solo artist"
    },
    "blurb": "\"Stay (I Missed You)\" by Lisa Loeb, released in 1994.",
    "media": {
@@ -812,7 +852,8 @@
    "facts": {
     "artist": "Coolio",
     "year": 1995,
-    "decade": "1990s"
+    "decade": "1990s",
+    "act": "Male solo artist"
    },
    "blurb": "\"Gangsta's Paradise\" by Coolio, released in 1995.",
    "media": {
@@ -841,7 +882,8 @@
    "facts": {
     "artist": "TLC",
     "year": 1995,
-    "decade": "1990s"
+    "decade": "1990s",
+    "act": "Group or duo"
    },
    "blurb": "\"Waterfalls\" by TLC, released in 1995.",
    "media": {
@@ -870,7 +912,8 @@
    "facts": {
     "artist": "Seal",
     "year": 1994,
-    "decade": "1990s"
+    "decade": "1990s",
+    "act": "Male solo artist"
    },
    "blurb": "\"Kiss from a Rose\" by Seal, released in 1994.",
    "media": {
@@ -899,7 +942,8 @@
    "facts": {
     "artist": "Mariah Carey & Boyz II Men",
     "year": 1995,
-    "decade": "1990s"
+    "decade": "1990s",
+    "act": "Duet or team-up"
    },
    "blurb": "\"One Sweet Day\" by Mariah Carey & Boyz II Men, released in 1995.",
    "media": {
@@ -928,7 +972,8 @@
    "facts": {
     "artist": "Oasis",
     "year": 1995,
-    "decade": "1990s"
+    "decade": "1990s",
+    "act": "Group or duo"
    },
    "blurb": "\"Wonderwall\" by Oasis, released in 1995.",
    "media": {
@@ -957,7 +1002,8 @@
    "facts": {
     "artist": "Alanis Morissette",
     "year": 1995,
-    "decade": "1990s"
+    "decade": "1990s",
+    "act": "Female solo artist"
    },
    "blurb": "\"Ironic\" by Alanis Morissette, released in 1995.",
    "media": {
@@ -986,7 +1032,8 @@
    "facts": {
     "artist": "Celine Dion",
     "year": 1996,
-    "decade": "1990s"
+    "decade": "1990s",
+    "act": "Female solo artist"
    },
    "blurb": "\"Because You Loved Me\" by Celine Dion, released in 1996.",
    "media": {
@@ -1015,7 +1062,8 @@
    "facts": {
     "artist": "Fugees",
     "year": 1996,
-    "decade": "1990s"
+    "decade": "1990s",
+    "act": "Group or duo"
    },
    "blurb": "\"Killing Me Softly with His Song\" by Fugees, released in 1996.",
    "media": {
@@ -1044,7 +1092,8 @@
    "facts": {
     "artist": "Spice Girls",
     "year": 1996,
-    "decade": "1990s"
+    "decade": "1990s",
+    "act": "Group or duo"
    },
    "blurb": "\"Wannabe\" by Spice Girls, released in 1996.",
    "media": {
@@ -1073,7 +1122,8 @@
    "facts": {
     "artist": "Blackstreet",
     "year": 1996,
-    "decade": "1990s"
+    "decade": "1990s",
+    "act": "Group or duo"
    },
    "blurb": "\"No Diggity\" by Blackstreet, released in 1996.",
    "media": {
@@ -1102,7 +1152,8 @@
    "facts": {
     "artist": "Toni Braxton",
     "year": 1996,
-    "decade": "1990s"
+    "decade": "1990s",
+    "act": "Female solo artist"
    },
    "blurb": "\"Un-Break My Heart\" by Toni Braxton, released in 1996.",
    "media": {
@@ -1160,7 +1211,8 @@
    "facts": {
     "artist": "Hanson",
     "year": 1997,
-    "decade": "1990s"
+    "decade": "1990s",
+    "act": "Group or duo"
    },
    "blurb": "\"MMMBop\" by Hanson, released in 1997.",
    "media": {
@@ -1189,7 +1241,8 @@
    "facts": {
     "artist": "Aqua",
     "year": 1997,
-    "decade": "1990s"
+    "decade": "1990s",
+    "act": "Group or duo"
    },
    "blurb": "\"Barbie Girl\" by Aqua, released in 1997.",
    "media": {
@@ -1218,7 +1271,8 @@
    "facts": {
     "artist": "The Verve",
     "year": 1997,
-    "decade": "1990s"
+    "decade": "1990s",
+    "act": "Group or duo"
    },
    "blurb": "\"Bitter Sweet Symphony\" by The Verve, released in 1997.",
    "media": {
@@ -1247,7 +1301,8 @@
    "facts": {
     "artist": "Chumbawamba",
     "year": 1997,
-    "decade": "1990s"
+    "decade": "1990s",
+    "act": "Group or duo"
    },
    "blurb": "\"Tubthumping\" by Chumbawamba, released in 1997.",
    "media": {
@@ -1276,7 +1331,8 @@
    "facts": {
     "artist": "Celine Dion",
     "year": 1997,
-    "decade": "1990s"
+    "decade": "1990s",
+    "act": "Female solo artist"
    },
    "blurb": "\"My Heart Will Go On\" by Celine Dion, released in 1997.",
    "media": {
@@ -1305,7 +1361,8 @@
    "facts": {
     "artist": "Savage Garden",
     "year": 1997,
-    "decade": "1990s"
+    "decade": "1990s",
+    "act": "Group or duo"
    },
    "blurb": "\"Truly Madly Deeply\" by Savage Garden, released in 1997.",
    "media": {
@@ -1334,7 +1391,8 @@
    "facts": {
     "artist": "Cher",
     "year": 1998,
-    "decade": "1990s"
+    "decade": "1990s",
+    "act": "Female solo artist"
    },
    "blurb": "\"Believe\" by Cher, released in 1998.",
    "media": {
@@ -1366,7 +1424,8 @@
    "facts": {
     "artist": "Britney Spears",
     "year": 1998,
-    "decade": "1990s"
+    "decade": "1990s",
+    "act": "Female solo artist"
    },
    "blurb": "\"...Baby One More Time\" by Britney Spears, released in 1998.",
    "media": {
@@ -1395,7 +1454,8 @@
    "facts": {
     "artist": "Goo Goo Dolls",
     "year": 1998,
-    "decade": "1990s"
+    "decade": "1990s",
+    "act": "Group or duo"
    },
    "blurb": "\"Iris\" by Goo Goo Dolls, released in 1998.",
    "media": {
@@ -1424,7 +1484,8 @@
    "facts": {
     "artist": "TLC",
     "year": 1999,
-    "decade": "1990s"
+    "decade": "1990s",
+    "act": "Group or duo"
    },
    "blurb": "\"No Scrubs\" by TLC, released in 1999.",
    "media": {
@@ -1482,7 +1543,8 @@
    "facts": {
     "artist": "Ricky Martin",
     "year": 1999,
-    "decade": "1990s"
+    "decade": "1990s",
+    "act": "Male solo artist"
    },
    "blurb": "\"Livin' la Vida Loca\" by Ricky Martin, released in 1999.",
    "media": {
@@ -1511,7 +1573,8 @@
    "facts": {
     "artist": "Christina Aguilera",
     "year": 1999,
-    "decade": "1990s"
+    "decade": "1990s",
+    "act": "Female solo artist"
    },
    "blurb": "\"Genie in a Bottle\" by Christina Aguilera, released in 1999.",
    "media": {
@@ -1540,7 +1603,8 @@
    "facts": {
     "artist": "Backstreet Boys",
     "year": 1999,
-    "decade": "1990s"
+    "decade": "1990s",
+    "act": "Group or duo"
    },
    "blurb": "\"I Want It That Way\" by Backstreet Boys, released in 1999.",
    "media": {
@@ -1569,7 +1633,8 @@
    "facts": {
     "artist": "Smash Mouth",
     "year": 1999,
-    "decade": "1990s"
+    "decade": "1990s",
+    "act": "Group or duo"
    },
    "blurb": "\"All Star\" by Smash Mouth, released in 1999.",
    "media": {
@@ -1598,7 +1663,8 @@
    "facts": {
     "artist": "Lou Bega",
     "year": 1999,
-    "decade": "1990s"
+    "decade": "1990s",
+    "act": "Male solo artist"
    },
    "blurb": "\"Mambo No. 5 (A Little Bit Of...)\" by Lou Bega, released in 1999.",
    "media": {
@@ -1627,7 +1693,8 @@
    "facts": {
     "artist": "Eiffel 65",
     "year": 1999,
-    "decade": "1990s"
+    "decade": "1990s",
+    "act": "Group or duo"
    },
    "blurb": "\"Blue (Da Ba Dee)\" by Eiffel 65, released in 1999.",
    "media": {
@@ -1665,5 +1732,5 @@
    "url": "https://performance-partners.apple.com/search-api"
   }
  ],
- "built": "2026-10-04"
+ "built": "2026-10-07"
 }

@@ -1,6 +1,6 @@
-import { register, poolItems, pickPack, byDifficulty, imageOf, collect, pick, shuffle } from './registry.js?v=202610071242';
-import { h, imgEl } from '../ui/kit.js?v=202610071242';
-import { norm, injectCSS, baseCSS, once, fmtFact, uniqueByName, hasImg } from './fkit.js?v=202610071242';
+import { register, poolItems, pickPack, byDifficulty, imageOf, collect, pick, shuffle, factAllowed, lcLabel } from './registry.js?v=202610071324';
+import { h, imgEl } from '../ui/kit.js?v=202610071324';
+import { norm, injectCSS, baseCSS, once, fmtFact, uniqueByName, hasImg } from './fkit.js?v=202610071324';
 
 const CSS = `
 .mt-cols{display:grid;grid-template-columns:1fr 1fr;gap:10px 12px;align-items:start}
@@ -37,11 +37,11 @@ const CSS = `
 const COLORS = ['#ffd5d5', '#c9f2e6', '#ffe7a6', '#ddd4ff', '#cfe8ff', '#ffd6ef'];
 const DOTS = ['#ff5d5d', '#22c3a0', '#ffc23c', '#7b61ff', '#3da5ff', '#ff7ac6'];
 
-function factSources(pack) {
+function factSources(pack, gate) {
   const items = pack.items || [];
   const out = [];
   for (const [key, m] of Object.entries(pack.factsMeta || {})) {
-    if (m.hard) continue;
+    if (m.hard || !factAllowed(m, gate)) continue;
     const has = items.filter(it => it.facts?.[key] != null && !Array.isArray(it.facts[key]));
     if (has.length < 6) continue;
     if (m.type === 'cat' && m.exclusive !== false) out.push([key, 'cat']);
@@ -90,7 +90,7 @@ function make(rng, pack, src, n, decoys, difficulty) {
   const extra = decoys ? shuffle(rng, others).slice(0, multi ? 1 : 2) : [];
   const num = t => { const m = String(t).match(/^(\d+)( BC)?$/); return m ? (m[2] ? -m[1] : +m[1]) : 0; };
   const right = type === 'year' ? [...truth, ...extra].sort((a, b) => num(a) - num(b)) : shuffle(rng, [...truth, ...extra]);
-  const label = String(meta.label || key).toLowerCase();
+  const label = lcLabel(meta.label || key);
   return {
     format: 'match', id: `match:${key}:${chosen.map(c => c.ref).sort().join(',')}`,
     prompt: meta.matchPrompt || `Match each one to its ${label}`,
@@ -119,7 +119,7 @@ export default register({
     const n = kids ? 4 : PAIRS.includes(+opts.pairs) ? +opts.pairs : 5;
     const decoys = !kids && opts.decoys !== false;
     const usable = packs.map(p => {
-      const s = factSources(p).map(x => [x, 1]);
+      const s = factSources(p, { kids, difficulty }).map(x => [x, 1]);
       if ((p.items || []).filter(hasImg).length >= n) s.push(['img', kids ? 6 : 2]);
       return { p, s: kids ? s.filter(x => x[0] === 'img') : s };
     }).filter(x => x.s.length);

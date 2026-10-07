@@ -1,7 +1,7 @@
-import { register, poolItems, pickPack, byDifficulty, imageOf, fill, collect, pick } from './registry.js?v=202610071242';
-import { h, layout, typeBox } from '../ui/kit.js?v=202610071242';
-import { fuzzyMatch, answersFor } from '../core/fuzzy.js?v=202610071242';
-import { norm, injectCSS, once, hasImg } from './fkit.js?v=202610071242';
+import { register, poolItems, pickPack, byDifficulty, imageOf, fill, collect, pick, factAllowed } from './registry.js?v=202610071324';
+import { h, layout, typeBox } from '../ui/kit.js?v=202610071324';
+import { fuzzyMatch, answersFor } from '../core/fuzzy.js?v=202610071324';
+import { norm, injectCSS, once, hasImg } from './fkit.js?v=202610071324';
 
 const CSS = `
 .ty-pat{display:flex;flex-wrap:wrap;justify-content:center;gap:4px 14px;font-family:var(--font-display);font-size:22px;letter-spacing:4px;color:var(--ink-2)}
@@ -17,13 +17,43 @@ const CSS = `
 const SHORT = s => { const t = String(s ?? '').trim(); return t.length >= 2 && t.length <= 26 && t.split(/\s+/).length <= 4 && norm(t).length >= 2; };
 const CONTEXT = /\b(these|following|which of|not|except|true|false)\b/i;
 
-function sources(pack) {
+// Facts whose values are bins or scales ("Middle Ages", "1900s or later", "Potentially deadly", "Large") can't be typed:
+// nobody would guess the exact label. factsMeta.typeable overrides.
+const BIN_KEY = /^(era|century|danger|size|edibility|status|coat|habitat|field|type|age)$/i;
+const BIN_VAL = /\d0?s\b|\bor (later|earlier|older)\b|\bto\b|\bcentury\b|ancient|middle ages|deadly|dangerous|harmless|venomous|provoked|\bsting\b|concern|threatened|endangered|vulnerable|deficient/i;
+export function typeableFact(key, m, items) {
+  if (m.typeable != null) return !!m.typeable;
+  if (BIN_KEY.test(key) || /conservation|iucn/i.test(m.label || '')) return false;
+  const vals = [...new Set(items.map(it => it.facts?.[key]).filter(v => typeof v === 'string'))];
+  if (vals.length < 3) return false;
+  return /decade/i.test(key) || !vals.some(v => BIN_VAL.test(v));
+}
+
+// Common other names for typed answers ("Great Britain" for the United Kingdom).
+const ALIASES = {
+  'United Kingdom': ['UK', 'Great Britain', 'Britain', 'GB'], 'United States': ['USA', 'US', 'America', 'United States of America'],
+  'Netherlands': ['Holland'], 'Czech Republic': ['Czechia'], 'South Korea': ['Korea'], 'Myanmar': ['Burma'],
+  'United Arab Emirates': ['UAE'], 'Democratic Republic of the Congo': ['DR Congo', 'DRC'], 'Eswatini': ['Swaziland'],
+  'Türkiye': ['Turkey'], 'Turkey': ['Türkiye'], 'Ivory Coast': ["Côte d'Ivoire"], "Côte d'Ivoire": ['Ivory Coast'],
+};
+export function withAliases(list) {
+  const out = [];
+  for (const a of list) {
+    out.push(a);
+    for (const x of ALIASES[a] || []) out.push(x);
+    const dec = /^(1\d|20)(\d0)s$/.exec(a);
+    if (dec) out.push(`${dec[2]}s`);
+  }
+  return [...new Set(out)];
+}
+
+function sources(pack, gate) {
   const items = pack.items || [];
   const out = [];
   if (items.filter(it => hasImg(it) && SHORT(it.name)).length >= 4) out.push(['img', 3]);
   if (items.filter(it => (it.clues || []).length >= 3 && SHORT(it.name)).length >= 4) out.push(['clue', 2]);
   for (const [key, m] of Object.entries(pack.factsMeta || {})) {
-    if (!m.ask || (m.type !== 'cat' && m.type !== 'text') || m.exclusive === false) continue;
+    if (!m.ask || (m.type !== 'cat' && m.type !== 'text') || m.exclusive === false || !factAllowed(m, gate) || !typeableFact(key, m, items)) continue;
     if (items.filter(it => typeof it.facts?.[key] === 'string' && SHORT(it.facts[key])).length >= 4) out.push([`fact:${key}`, 1.5]);
   }
   if ((pack.questions || []).some(q => (q.kind || 'mc') === 'mc' && SHORT(q.answer) && !CONTEXT.test(q.prompt))) out.push(['q', 1.5]);
@@ -41,7 +71,7 @@ function make(rng, pack, kind, difficulty) {
     const q = pick(rng, qs);
     return { ...base, id: `type:${pack.id}/q:${q.id}`, prompt: q.prompt, media: q.media && Object.keys(q.media).length ? q.media : undefined,
       answer: String(q.answer), answerText: String(q.answer), explain: q.explain, refs: [`${pack.id}/q:${q.id}`],
-      data: { accept: [String(q.answer), ...(q.alt || [])], level: difficulty } };
+      data: { accept: withAliases([String(q.answer), ...(q.alt || [])]), level: difficulty } };
   }
   if (kind.startsWith('fact:')) {
     const key = kind.slice(5), meta = pack.factsMeta[key];
@@ -50,7 +80,7 @@ function make(rng, pack, kind, difficulty) {
     if (!t) return null;
     const v = t.item.facts[key];
     return { ...base, id: `type:${key}:${t.ref}`, prompt: fill(meta.ask, { name: t.item.name, lname: t.item.lname, label: meta.label }),
-      answer: v, answerText: v, explain: t.item.blurb, refs: [t.ref], data: { accept: [v], level: difficulty } };
+      answer: v, answerText: v, explain: t.item.blurb, refs: [t.ref], data: { accept: withAliases([v, ...(meta.alt?.[v] || [])]), level: difficulty } };
   }
   const pool = byDifficulty(all.filter(c => SHORT(c.item.name) && (kind === 'img' ? hasImg(c.item) : (c.item.clues || []).length >= 3)), difficulty, 4, c => c.item.difficulty || 2);
   const t = pick(rng, pool);
@@ -77,8 +107,8 @@ export default register({
     if ((c.img || 0) >= 4 || (c.clues || 0) >= 4 || (c.qkinds?.mc ?? info.questions ?? 0) > 0) return true;
     return 'Needs pictures, clues or trivia questions';
   },
-  generate({ rng, packs, count, opts = {}, difficulty = 0, avoid }) {
-    const usable = packs.map(p => ({ p, s: sources(p) })).filter(x => x.s.length);
+  generate({ rng, packs, count, opts = {}, difficulty = 0, kids = false, avoid }) {
+    const usable = packs.map(p => ({ p, s: sources(p, { kids, difficulty }) })).filter(x => x.s.length);
     if (!usable.length) return [];
     return collect(count, () => {
       const { p, s } = pickPack(rng, usable, x => Math.sqrt((x.p.items || []).length + (x.p.questions || []).length + 1));

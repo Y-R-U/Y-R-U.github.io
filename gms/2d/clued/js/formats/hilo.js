@@ -1,6 +1,6 @@
-import { register, poolItems, pickPack, byDifficulty, imageOf, collect, pick } from './registry.js?v=202610071242';
-import { h, choiceGrid, imgEl, countUp } from '../ui/kit.js?v=202610071242';
-import { numericKeys, numOf, apart, rangeOf, fmtFact, norm, injectCSS, baseCSS, hasImg } from './fkit.js?v=202610071242';
+import { register, poolItems, pickPack, byDifficulty, imageOf, collect, pick, midName, capFirst, comparison, lcLabel } from './registry.js?v=202610071324';
+import { h, choiceGrid, imgEl, countUp } from '../ui/kit.js?v=202610071324';
+import { numericKeys, numOf, apart, rangeOf, fmtFact, norm, injectCSS, baseCSS, hasImg } from './fkit.js?v=202610071324';
 
 const CSS = `
 .hl-cards{display:grid;grid-template-columns:1fr auto 1fr;gap:8px;align-items:stretch}
@@ -30,8 +30,8 @@ const PASSIVE = /^(released|born|built|founded|discovered|first published|publis
 function yearQuestion(meta, b) {
   const l = String(meta.label || '').trim();
   if (/^died$/i.test(l)) return `Did ${b} die earlier or later?`;
-  if (PASSIVE.test(l)) return `Was ${b} ${l.toLowerCase()} earlier or later?`;
-  return `${b}: earlier or later?`;
+  if (PASSIVE.test(l)) return `Was ${b} ${lcLabel(l)} earlier or later?`;
+  return `${capFirst(b)}: earlier or later?`;
 }
 
 function make(rng, pack, key, difficulty, kids) {
@@ -45,12 +45,16 @@ function make(rng, pack, key, difficulty, kids) {
   const b = pick(rng, bs);
   const vb = numOf(b.item, key);
   const year = meta.type === 'year';
-  const options = year ? [{ text: 'Earlier', icon: '◀' }, { text: 'Later', icon: '▶' }] : [{ text: 'Higher', icon: '▲' }, { text: 'Lower', icon: '▼' }];
+  const cmp = year ? null : comparison(meta);
+  const options = year ? [{ text: 'Earlier', icon: '◀' }, { text: 'Later', icon: '▶' }]
+    : [{ text: cmp?.hi || 'Higher', icon: '▲' }, { text: cmp?.lo || 'Lower', icon: '▼' }];
   const answer = year ? (vb < va ? 0 : 1) : (vb > va ? 0 : 1);
   const label = meta.label || key;
+  const an = capFirst(midName(a.item, pack)), bn = midName(b.item, pack);
+  const ask = year ? yearQuestion(meta, bn) : cmp ? cmp.ask(bn) : `Is ${bn} higher or lower?`;
   const prompt = year
-    ? `${a.item.name}: ${String(label).toLowerCase()} ${fmtFact(meta, va)}. ${yearQuestion(meta, b.item.name)}`
-    : `${label}: ${a.item.name} is ${fmtFact(meta, va)}. Is ${b.item.name} higher or lower?`;
+    ? `${a.item.name}: ${lcLabel(label)} ${fmtFact(meta, va)}. ${ask}`
+    : cmp?.stmt ? `${cmp.stmt(an, fmtFact(meta, va))} ${ask}` : `${label}: ${an} is ${fmtFact(meta, va)}. ${ask}`;
   const pics = hasImg(a.item) && hasImg(b.item);
   return {
     format: 'hilo', id: `hilo:${key}:${a.ref}:${b.ref}`, prompt, options, answer,
@@ -58,7 +62,7 @@ function make(rng, pack, key, difficulty, kids) {
     explain: `${b.item.name}: ${fmtFact(meta, vb)} · ${a.item.name}: ${fmtFact(meta, va)}`,
     refs: [a.ref, b.ref], pack: pack.id,
     data: {
-      label, year,
+      label, year, ask: capFirst(ask),
       a: { name: a.item.name, value: fmtFact(meta, va), img: pics ? imageOf(a.item, rng) : undefined },
       b: { name: b.item.name, value: fmtFact(meta, vb), num: vb, img: pics ? imageOf(b.item, rng) : undefined },
     },
@@ -87,7 +91,7 @@ export default register({
       h('div.hl-name', {}, x.name), h('div.hl-val', { class: cls === 'b' ? 'q' : '' }, cls === 'b' ? '?' : x.value));
     const A = card(d.a, 'a'), B = card(d.b, 'b');
     const left = h('div.hl-left', {}, h('div.hl-label', {}, d.label), h('div.hl-cards', {}, A, h('div.hl-vs', {}, 'vs'), B));
-    const prompt = h('h2.q-prompt', {}, d.year ? `Was ${d.b.name} earlier or later?` : `Is ${d.b.name} higher or lower?`);
+    const prompt = h('h2.q-prompt', {}, d.ask || (d.year ? `Was ${d.b.name} earlier or later?` : `Is ${d.b.name} higher or lower?`));
     const answers = h('div.q-answers');
     const right = h('div.hl-right', {}, prompt, answers);
     el.append(h('div.f-stage.hl', {}, left, right));

@@ -1,5 +1,5 @@
 // Format registry + helpers shared by every format. See docs/notes/A.md "Format author guide".
-import { pick, shuffle, sample, weightedPick } from '../core/rng.js?v=202610071242';
+import { pick, shuffle, sample, weightedPick } from '../core/rng.js?v=202610071324';
 
 const R = globalThis.__cluedFormats || (globalThis.__cluedFormats = { map: new Map(), listeners: new Set() });
 
@@ -45,21 +45,76 @@ export const hasImg = it => !!it?.media?.img?.length;
 export const hasAudio = it => !!it?.media?.audio?.length;
 export const itemDifficulty = x => x?.difficulty || 2;
 
-// {name} {lname} (item.lname overrides the lower-cased name) {aName} {value} {lvalue} {aValue} {label} {llabel} {unit}
+// Country names that take "the" mid-sentence ("comes from the United States").
+const THE_RE = /^(United States|United Kingdom|United Arab Emirates|Netherlands|Czech Republic|Philippines|Bahamas|Gambia|Maldives|Dominican Republic|Central African Republic|Democratic Republic of the Congo|Republic of the Congo|Solomon Islands|Marshall Islands|Comoros|Vatican City|Isle of Man)$/;
+export const theName = v => (THE_RE.test(String(v ?? '').trim()) ? `the ${String(v).trim()}` : String(v ?? ''));
+// Lower-case the first letter only for an ordinary first word: "Southern stingray" → "southern stingray", but
+// "United States", "Maine Coon" and "IUCN" keep their capitals.
+const lc = s => {
+  const t = String(s ?? '');
+  const [w, w2] = t.split(/\s+/);
+  if (!/^[A-Z][a-z'’-]*$/.test(w || '') || (w2 && /^[A-Z]/.test(w2))) return t;
+  return t.charAt(0).toLowerCase() + t.slice(1);
+};
+export const lcLabel = lc;
+
+// An item's name for the middle of a sentence: item.lname, else the lower-cased name; animals and plants get "the"
+// ("the southern stingray"), countries that need it get "the" too.
+const THE_PACKS = /^(animals|nature)$/;
+export function midName(item, pack) {
+  const n = item.lname || (pack && /^(animals|nature|science|food)$/.test(pack.theme || '') ? lc(item.name) : String(item.name || ''));
+  if (THE_RE.test(n)) return `the ${n}`;
+  return pack && THE_PACKS.test(pack.theme || '') && pack.id !== 'gems' && !/^the /i.test(n) ? `the ${n}` : n;
+}
+export const capFirst = s => String(s).charAt(0).toUpperCase() + String(s).slice(1);
+
+// {name} {lname} (item.lname overrides the lower-cased name) {aName} {value} {lvalue} {aValue} {theValue} {label} {llabel} {unit}
+// A country that needs "the" gets it wherever {value}/{name}/{lname} is used, unless the template already says "the".
 export function fill(tpl, v = {}) {
   const name = v.name ?? '', value = v.value ?? '';
-  const lc = s => String(s).charAt(0).toLowerCase() + String(s).slice(1);
   const map = {
     name, lname: v.lname || lc(name), aName: `${article(v.lname || name)} ${v.lname || lc(name)}`,
-    value, lvalue: lc(value), aValue: `${article(value)} ${lc(value)}`,
+    value, lvalue: lc(value), aValue: `${article(value)} ${lc(value)}`, theValue: theName(value),
     label: v.label ?? '', llabel: lc(v.label ?? ''), unit: v.unit ?? '',
   };
-  const out = String(tpl).replace(/\{(\w+)\}/g, (m, k) => (k in map ? map[k] : m));
+  const out = String(tpl).replace(/\{(\w+)\}/g, (m, k, at, all) => {
+    if (!(k in map)) return m;
+    const x = String(map[k]);
+    if (['value', 'lvalue', 'name', 'lname'].includes(k) && THE_RE.test(x) && !/\bthe\s*$/i.test(all.slice(0, at))) return `the ${x}`;
+    return x;
+  });
   return out.charAt(0).toUpperCase() + out.slice(1);
+}
+
+// Conservation status (IUCN) is grown-up, hard trivia: never in kids mode, only at Hard.
+export const isIucn = m => /conservation|iucn/i.test(`${m?.label || ''} ${m?.ask || ''}`);
+export const factAllowed = (m, { kids = false, difficulty = 0 } = {}) => !(isIucn(m) && (kids || difficulty !== 3));
+
+// "Jellyfish" sits inside "Box jellyfish": such values can't share a connect/odd question fairly.
+export function nested(a, b) {
+  const x = String(a ?? '').toLowerCase().trim(), y = String(b ?? '').toLowerCase().trim();
+  if (!x || !y || x === y) return false;
+  const inside = (s, t) => ` ${t.replace(/[^a-z0-9]+/g, ' ')} `.includes(` ${s.replace(/[^a-z0-9]+/g, ' ').trim()} `);
+  return inside(x, y) || inside(y, x);
+}
+
+// Wording for comparing a number fact, from factsMeta.higherLabel: { hi, lo, sup, ask(b) } or null (use higher/lower).
+const OPP = { bigger: 'smaller', longer: 'shorter', heavier: 'lighter', taller: 'shorter', wider: 'narrower', harder: 'softer', denser: 'less dense' };
+const SUP = { bigger: 'biggest', longer: 'longest', heavier: 'heaviest', taller: 'tallest', wider: 'widest', harder: 'hardest', denser: 'densest' };
+export function comparison(meta) {
+  if (!meta || meta.type !== 'num') return null;
+  if (/\bago\b/i.test(meta.unit || '')) {
+    const lived = /lived/i.test(meta.label || '');
+    return { hi: 'Longer ago', lo: 'More recently', sup: 'longest ago', ask: b => (lived ? `Did ${b} live longer ago or more recently?` : `Was ${b} longer ago or more recently?`), stmt: (a, v) => (lived ? `${a} lived ${v}.` : `${a}: ${v}.`) };
+  }
+  const w = String(meta.higherLabel || '').trim().toLowerCase();
+  if (!OPP[w]) return null;
+  return { hi: capFirst(w), lo: capFirst(OPP[w]), sup: SUP[w], ask: b => `Is ${b} ${w} or ${OPP[w]}?` };
 }
 
 export function factText(meta, value) {
   if (value == null) return '';
+  if (meta?.type === 'year' && isFinite(Number(value))) return Number(value) < 0 ? `${-Number(value)} BC` : String(value);
   if (meta?.type === 'bool') return value ? (meta.yes || 'Yes') : (meta.no || 'No');
   if (meta?.type === 'num') {
     const n = Number(value);

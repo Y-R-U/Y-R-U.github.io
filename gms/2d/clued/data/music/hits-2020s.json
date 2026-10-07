@@ -19,6 +19,19 @@
   "decade": {
    "type": "cat",
    "label": "Decade"
+  },
+  "act": {
+   "type": "cat",
+   "label": "Act",
+   "values": [
+    "Male solo artist",
+    "Female solo artist",
+    "Group or duo",
+    "Duet or team-up"
+   ],
+   "ask": "Who recorded {name}: a solo singer, a group or a team-up?",
+   "askReverse": "Which of these hits is by {aValue}?",
+   "stmt": "{name} is by {aValue}."
   }
  },
  "items": [
@@ -29,7 +42,8 @@
    "facts": {
     "artist": "Dua Lipa",
     "year": 2019,
-    "decade": "2010s"
+    "decade": "2010s",
+    "act": "Female solo artist"
    },
    "blurb": "\"Don't Start Now\" by Dua Lipa, released in 2019.",
    "media": {
@@ -58,7 +72,8 @@
    "facts": {
     "artist": "Post Malone",
     "year": 2019,
-    "decade": "2010s"
+    "decade": "2010s",
+    "act": "Male solo artist"
    },
    "blurb": "\"Circles\" by Post Malone, released in 2019.",
    "media": {
@@ -87,7 +102,8 @@
    "facts": {
     "artist": "Harry Styles",
     "year": 2019,
-    "decade": "2010s"
+    "decade": "2010s",
+    "act": "Male solo artist"
    },
    "blurb": "\"Watermelon Sugar\" by Harry Styles, released in 2019.",
    "media": {
@@ -116,7 +132,8 @@
    "facts": {
     "artist": "Harry Styles",
     "year": 2019,
-    "decade": "2010s"
+    "decade": "2010s",
+    "act": "Male solo artist"
    },
    "blurb": "\"Adore You\" by Harry Styles, released in 2019.",
    "media": {
@@ -145,7 +162,8 @@
    "facts": {
     "artist": "BTS",
     "year": 2020,
-    "decade": "2020s"
+    "decade": "2020s",
+    "act": "Group or duo"
    },
    "blurb": "\"Dynamite\" by BTS, released in 2020.",
    "media": {
@@ -174,7 +192,8 @@
    "facts": {
     "artist": "Dua Lipa",
     "year": 2020,
-    "decade": "2020s"
+    "decade": "2020s",
+    "act": "Female solo artist"
    },
    "blurb": "\"Levitating\" by Dua Lipa, released in 2020.",
    "media": {
@@ -203,7 +222,8 @@
    "facts": {
     "artist": "The Weeknd",
     "year": 2020,
-    "decade": "2020s"
+    "decade": "2020s",
+    "act": "Male solo artist"
    },
    "blurb": "\"Save Your Tears\" by The Weeknd, released in 2020.",
    "media": {
@@ -232,7 +252,8 @@
    "facts": {
     "artist": "24kGoldn",
     "year": 2020,
-    "decade": "2020s"
+    "decade": "2020s",
+    "act": "Male solo artist"
    },
    "blurb": "\"Mood\" by 24kGoldn, released in 2020.",
    "media": {
@@ -261,7 +282,8 @@
    "facts": {
     "artist": "Jawsh 685 & Jason Derulo",
     "year": 2020,
-    "decade": "2020s"
+    "decade": "2020s",
+    "act": "Duet or team-up"
    },
    "blurb": "\"Savage Love (Laxed - Siren Beat)\" by Jawsh 685 & Jason Derulo, released in 2020.",
    "media": {
@@ -290,7 +312,8 @@
    "facts": {
     "artist": "Glass Animals",
     "year": 2020,
-    "decade": "2020s"
+    "decade": "2020s",
+    "act": "Group or duo"
    },
    "blurb": "\"Heat Waves\" by Glass Animals, released in 2020.",
    "media": {
@@ -322,7 +345,8 @@
    "facts": {
     "artist": "Olivia Rodrigo",
     "year": 2021,
-    "decade": "2020s"
+    "decade": "2020s",
+    "act": "Female solo artist"
    },
    "blurb": "\"drivers license\" by Olivia Rodrigo, released in 2021.",
    "media": {
@@ -354,7 +378,8 @@
    "facts": {
     "artist": "Olivia Rodrigo",
     "year": 2021,
-    "decade": "2020s"
+    "decade": "2020s",
+    "act": "Female solo artist"
    },
    "blurb": "\"good 4 u\" by Olivia Rodrigo, released in 2021.",
    "media": {
@@ -383,7 +408,8 @@
    "facts": {
     "artist": "The Kid LAROI & Justin Bieber",
     "year": 2021,
-    "decade": "2020s"
+    "decade": "2020s",
+    "act": "Duet or team-up"
    },
    "blurb": "\"STAY\" by The Kid LAROI & Justin Bieber, released in 2021.",
    "media": {
@@ -412,7 +438,8 @@
    "facts": {
     "artist": "Lil Nas X",
     "year": 2021,
-    "decade": "2020s"
+    "decade": "2020s",
+    "act": "Male solo artist"
    },
    "blurb": "\"MONTERO (Call Me By Your Name)\" by Lil Nas X, released in 2021.",
    "media": {
@@ -441,7 +468,8 @@
    "facts": {
     "artist": "Justin Bieber",
     "year": 2021,
-    "decade": "2020s"
+    "decade": "2020s",
+    "act": "Male solo artist"
    },
    "blurb": "\"Peaches\" by Justin Bieber, released in 2021.",
    "media": {
@@ -470,7 +498,8 @@
    "facts": {
     "artist": "Doja Cat",
     "year": 2021,
-    "decade": "2020s"
+    "decade": "2020s",
+    "act": "Female solo artist"
    },
    "blurb": "\"Kiss Me More\" by Doja Cat, released in 2021.",
    "media": {
@@ -499,7 +528,8 @@
    "facts": {
     "artist": "Silk Sonic",
     "year": 2021,
-    "decade": "2020s"
+    "decade": "2020s",
+    "act": "Group or duo"
    },
    "blurb": "\"Leave the Door Open\" by Silk Sonic, released in 2021.",
    "media": {
@@ -528,7 +558,8 @@
    "facts": {
     "artist": "Adele",
     "year": 2021,
-    "decade": "2020s"
+    "decade": "2020s",
+    "act": "Female solo artist"
    },
    "blurb": "\"Easy on Me\" by Adele, released in 2021.",
    "media": {
@@ -557,7 +588,8 @@
    "facts": {
     "artist": "Ed Sheeran",
     "year": 2021,
-    "decade": "2020s"
+    "decade": "2020s",
+    "act": "Male solo artist"
    },
    "blurb": "\"Bad Habits\" by Ed Sheeran, released in 2021.",
    "media": {
@@ -586,7 +618,8 @@
    "facts": {
     "artist": "Ed Sheeran",
     "year": 2021,
-    "decade": "2020s"
+    "decade": "2020s",
+    "act": "Male solo artist"
    },
    "blurb": "\"Shivers\" by Ed Sheeran, released in 2021.",
    "media": {
@@ -615,7 +648,8 @@
    "facts": {
     "artist": "Harry Styles",
     "year": 2022,
-    "decade": "2020s"
+    "decade": "2020s",
+    "act": "Male solo artist"
    },
    "blurb": "\"As It Was\" by Harry Styles, released in 2022.",
    "media": {
@@ -644,7 +678,8 @@
    "facts": {
     "artist": "Jack Harlow",
     "year": 2022,
-    "decade": "2020s"
+    "decade": "2020s",
+    "act": "Male solo artist"
    },
    "blurb": "\"First Class\" by Jack Harlow, released in 2022.",
    "media": {
@@ -673,7 +708,8 @@
    "facts": {
     "artist": "Taylor Swift",
     "year": 2022,
-    "decade": "2020s"
+    "decade": "2020s",
+    "act": "Female solo artist"
    },
    "blurb": "\"Anti-Hero\" by Taylor Swift, released in 2022.",
    "media": {
@@ -702,7 +738,8 @@
    "facts": {
     "artist": "Lizzo",
     "year": 2022,
-    "decade": "2020s"
+    "decade": "2020s",
+    "act": "Female solo artist"
    },
    "blurb": "\"About Damn Time\" by Lizzo, released in 2022.",
    "media": {
@@ -731,7 +768,8 @@
    "facts": {
     "artist": "SZA",
     "year": 2022,
-    "decade": "2020s"
+    "decade": "2020s",
+    "act": "Female solo artist"
    },
    "blurb": "\"Kill Bill\" by SZA, released in 2022.",
    "media": {
@@ -760,7 +798,8 @@
    "facts": {
     "artist": "Rema & Selena Gomez",
     "year": 2022,
-    "decade": "2020s"
+    "decade": "2020s",
+    "act": "Duet or team-up"
    },
    "blurb": "\"Calm Down\" by Rema & Selena Gomez, released in 2022.",
    "media": {
@@ -789,7 +828,8 @@
    "facts": {
     "artist": "Sam Smith & Kim Petras",
     "year": 2022,
-    "decade": "2020s"
+    "decade": "2020s",
+    "act": "Duet or team-up"
    },
    "blurb": "\"Unholy\" by Sam Smith & Kim Petras, released in 2022.",
    "media": {
@@ -818,7 +858,8 @@
    "facts": {
     "artist": "Metro Boomin, The Weeknd & 21 Savage",
     "year": 2022,
-    "decade": "2020s"
+    "decade": "2020s",
+    "act": "Duet or team-up"
    },
    "blurb": "\"Creepin'\" by Metro Boomin, The Weeknd & 21 Savage, released in 2022.",
    "media": {
@@ -876,7 +917,8 @@
    "facts": {
     "artist": "Morgan Wallen",
     "year": 2023,
-    "decade": "2020s"
+    "decade": "2020s",
+    "act": "Male solo artist"
    },
    "blurb": "\"Last Night\" by Morgan Wallen, released in 2023.",
    "media": {
@@ -905,7 +947,8 @@
    "facts": {
     "artist": "Olivia Rodrigo",
     "year": 2023,
-    "decade": "2020s"
+    "decade": "2020s",
+    "act": "Female solo artist"
    },
    "blurb": "\"vampire\" by Olivia Rodrigo, released in 2023.",
    "media": {
@@ -934,7 +977,8 @@
    "facts": {
     "artist": "Teddy Swims",
     "year": 2023,
-    "decade": "2020s"
+    "decade": "2020s",
+    "act": "Male solo artist"
    },
    "blurb": "\"Lose Control\" by Teddy Swims, released in 2023.",
    "media": {
@@ -963,7 +1007,8 @@
    "facts": {
     "artist": "Jack Harlow",
     "year": 2023,
-    "decade": "2020s"
+    "decade": "2020s",
+    "act": "Male solo artist"
    },
    "blurb": "\"Lovin On Me\" by Jack Harlow, released in 2023.",
    "media": {
@@ -992,7 +1037,8 @@
    "facts": {
     "artist": "Shaboozey",
     "year": 2024,
-    "decade": "2020s"
+    "decade": "2020s",
+    "act": "Male solo artist"
    },
    "blurb": "\"A Bar Song (Tipsy)\" by Shaboozey, released in 2024.",
    "media": {
@@ -1021,7 +1067,8 @@
    "facts": {
     "artist": "Benson Boone",
     "year": 2024,
-    "decade": "2020s"
+    "decade": "2020s",
+    "act": "Male solo artist"
    },
    "blurb": "\"Beautiful Things\" by Benson Boone, released in 2024.",
    "media": {
@@ -1050,7 +1097,8 @@
    "facts": {
     "artist": "Post Malone & Morgan Wallen",
     "year": 2024,
-    "decade": "2020s"
+    "decade": "2020s",
+    "act": "Duet or team-up"
    },
    "blurb": "\"I Had Some Help\" by Post Malone & Morgan Wallen, released in 2024.",
    "media": {
@@ -1079,7 +1127,8 @@
    "facts": {
     "artist": "Sabrina Carpenter",
     "year": 2024,
-    "decade": "2020s"
+    "decade": "2020s",
+    "act": "Female solo artist"
    },
    "blurb": "\"Espresso\" by Sabrina Carpenter, released in 2024.",
    "media": {
@@ -1108,7 +1157,8 @@
    "facts": {
     "artist": "Sabrina Carpenter",
     "year": 2024,
-    "decade": "2020s"
+    "decade": "2020s",
+    "act": "Female solo artist"
    },
    "blurb": "\"Please Please Please\" by Sabrina Carpenter, released in 2024.",
    "media": {
@@ -1137,7 +1187,8 @@
    "facts": {
     "artist": "Kendrick Lamar",
     "year": 2024,
-    "decade": "2020s"
+    "decade": "2020s",
+    "act": "Male solo artist"
    },
    "blurb": "\"Not Like Us\" by Kendrick Lamar, released in 2024.",
    "media": {
@@ -1166,7 +1217,8 @@
    "facts": {
     "artist": "Hozier",
     "year": 2024,
-    "decade": "2020s"
+    "decade": "2020s",
+    "act": "Male solo artist"
    },
    "blurb": "\"Too Sweet\" by Hozier, released in 2024.",
    "media": {
@@ -1195,7 +1247,8 @@
    "facts": {
     "artist": "Billie Eilish",
     "year": 2024,
-    "decade": "2020s"
+    "decade": "2020s",
+    "act": "Female solo artist"
    },
    "blurb": "\"BIRDS OF A FEATHER\" by Billie Eilish, released in 2024.",
    "media": {
@@ -1224,7 +1277,8 @@
    "facts": {
     "artist": "Beyoncé",
     "year": 2024,
-    "decade": "2020s"
+    "decade": "2020s",
+    "act": "Female solo artist"
    },
    "blurb": "\"TEXAS HOLD 'EM\" by Beyoncé, released in 2024.",
    "media": {
@@ -1253,7 +1307,8 @@
    "facts": {
     "artist": "Lady Gaga & Bruno Mars",
     "year": 2024,
-    "decade": "2020s"
+    "decade": "2020s",
+    "act": "Duet or team-up"
    },
    "blurb": "\"Die With A Smile\" by Lady Gaga & Bruno Mars, released in 2024.",
    "media": {
@@ -1282,7 +1337,8 @@
    "facts": {
     "artist": "ROSÉ & Bruno Mars",
     "year": 2024,
-    "decade": "2020s"
+    "decade": "2020s",
+    "act": "Duet or team-up"
    },
    "blurb": "\"APT.\" by ROSÉ & Bruno Mars, released in 2024.",
    "media": {
@@ -1311,7 +1367,8 @@
    "facts": {
     "artist": "Chappell Roan",
     "year": 2024,
-    "decade": "2020s"
+    "decade": "2020s",
+    "act": "Female solo artist"
    },
    "blurb": "\"Good Luck, Babe!\" by Chappell Roan, released in 2024.",
    "media": {
@@ -1340,7 +1397,8 @@
    "facts": {
     "artist": "Alex Warren",
     "year": 2025,
-    "decade": "2020s"
+    "decade": "2020s",
+    "act": "Male solo artist"
    },
    "blurb": "\"Ordinary\" by Alex Warren, released in 2025.",
    "media": {
@@ -1369,7 +1427,8 @@
    "facts": {
     "artist": "Lady Gaga",
     "year": 2025,
-    "decade": "2020s"
+    "decade": "2020s",
+    "act": "Female solo artist"
    },
    "blurb": "\"Abracadabra\" by Lady Gaga, released in 2025.",
    "media": {
@@ -1398,7 +1457,8 @@
    "facts": {
     "artist": "Sabrina Carpenter",
     "year": 2025,
-    "decade": "2020s"
+    "decade": "2020s",
+    "act": "Female solo artist"
    },
    "blurb": "\"Manchild\" by Sabrina Carpenter, released in 2025.",
    "media": {
@@ -1436,5 +1496,5 @@
    "url": "https://performance-partners.apple.com/search-api"
   }
  ],
- "built": "2026-10-04"
+ "built": "2026-10-07"
 }

@@ -9351,6 +9351,852 @@
     "science"
    ],
    "topic": "science"
+  },
+  {
+   "id": "gen-his-d0820a",
+   "kind": "tf",
+   "prompt": "Cleopatra lived closer in time to the first Moon landing than to the building of the Great Pyramid of Giza.",
+   "answer": true,
+   "explain": "The Great Pyramid dates from about 2560 BC; Cleopatra died in 30 BC, about 2,000 years before 1969.",
+   "difficulty": 3,
+   "tags": [
+    "history"
+   ],
+   "topic": "history"
+  },
+  {
+   "id": "gen-his-28ef28",
+   "kind": "tf",
+   "prompt": "The Hundred Years' War lasted exactly 100 years.",
+   "answer": false,
+   "explain": "It ran from 1337 to 1453, about 116 years, with long truces.",
+   "difficulty": 2,
+   "tags": [
+    "history"
+   ],
+   "topic": "history"
+  },
+  {
+   "id": "gen-his-4c0616",
+   "kind": "tf",
+   "prompt": "Oxford University was already teaching students before the Aztec city of Tenochtitlan was founded.",
+   "answer": true,
+   "explain": "Teaching at Oxford began in about 1096; Tenochtitlan was founded in 1325.",
+   "difficulty": 3,
+   "tags": [
+    "history"
+   ],
+   "topic": "history"
+  },
+  {
+   "id": "gen-his-25dde3",
+   "kind": "tf",
+   "prompt": "The Great Wall of China was built during a single dynasty.",
+   "answer": false,
+   "explain": "Walls were built and rebuilt over about 2,000 years; most of what stands today is from the Ming dynasty.",
+   "difficulty": 2,
+   "tags": [
+    "history"
+   ],
+   "topic": "history"
+  },
+  {
+   "id": "gen-his-bd7745",
+   "kind": "tf",
+   "prompt": "The Berlin Wall stood for more than 40 years.",
+   "answer": false,
+   "explain": "It stood from 1961 until 1989, about 28 years.",
+   "difficulty": 1,
+   "tags": [
+    "history"
+   ],
+   "topic": "history"
+  },
+  {
+   "id": "gen-his-4b4871",
+   "kind": "order",
+   "prompt": "Put these 15th- and 16th-century events in order, earliest first.",
+   "answer": [
+    "Fall of Constantinople",
+    "Columbus reaches the Americas",
+    "Luther's 95 Theses",
+    "Spanish Armada"
+   ],
+   "orderLabel": "Earliest first",
+   "explain": "1453, 1492, 1517 and 1588.",
+   "difficulty": 3,
+   "tags": [
+    "history"
+   ],
+   "topic": "history"
+  },
+  {
+   "id": "gen-his-bcba29",
+   "kind": "order",
+   "prompt": "Put these US presidents in order, earliest first.",
+   "answer": [
+    "George Washington",
+    "Abraham Lincoln",
+    "Franklin D. Roosevelt",
+    "John F. Kennedy"
+   ],
+   "orderLabel": "Earliest first",
+   "explain": "Washington took office in 1789, Lincoln in 1861, Roosevelt in 1933 and Kennedy in 1961.",
+   "difficulty": 1,
+   "tags": [
+    "history"
+   ],
+   "topic": "history"
+  },
+  {
+   "id": "gen-his-40a9e9",
+   "kind": "order",
+   "prompt": "Put these English monarchs in order, earliest first.",
+   "answer": [
+    "Henry VIII",
+    "Elizabeth I",
+    "Queen Victoria",
+    "Elizabeth II"
+   ],
+   "orderLabel": "Earliest first",
+   "explain": "Their reigns began in 1509, 1558, 1837 and 1952.",
+   "difficulty": 2,
+   "tags": [
+    "history"
+   ],
+   "topic": "history"
+  },
+  {
+   "id": "gen-geo-e26c1d",
+   "kind": "number",
+   "prompt": "About how long is the River Nile, in kilometres?",
+   "answer": 6650,
+   "unit": "km",
+   "tolerance": 300,
+   "explain": "It is usually given as about 6,650 km, from its sources to the Mediterranean.",
+   "difficulty": 2,
+   "tags": [
+    "geography"
+   ],
+   "topic": "geography"
+  },
+  {
+   "id": "gen-geo-e424be",
+   "kind": "number",
+   "prompt": "How many countries are members of the United Nations?",
+   "answer": 193,
+   "unit": "countries",
+   "tolerance": 0,
+   "explain": "South Sudan became the 193rd member in 2011.",
+   "difficulty": 2,
+   "tags": [
+    "geography"
+   ],
+   "topic": "geography"
+  },
+  {
+   "id": "gen-geo-54bd8c",
+   "kind": "number",
+   "prompt": "About how deep is the Challenger Deep, the deepest known point of the ocean, in metres?",
+   "answer": 10935,
+   "unit": "m",
+   "tolerance": 150,
+   "explain": "Recent surveys put it at about 10,935 m, in the Mariana Trench.",
+   "difficulty": 3,
+   "tags": [
+    "geography"
+   ],
+   "topic": "geography"
+  },
+  {
+   "id": "gen-geo-8c1a67",
+   "kind": "number",
+   "prompt": "In which year did the Panama Canal open?",
+   "answer": 1914,
+   "unit": "",
+   "tolerance": 2,
+   "explain": "It opened on 15 August 1914.",
+   "difficulty": 2,
+   "tags": [
+    "geography"
+   ],
+   "topic": "geography"
+  },
+  {
+   "id": "gen-geo-142430",
+   "kind": "number",
+   "prompt": "How many countries share a land border with Germany?",
+   "answer": 9,
+   "unit": "countries",
+   "tolerance": 0,
+   "explain": "Denmark, Poland, Czechia, Austria, Switzerland, France, Luxembourg, Belgium and the Netherlands.",
+   "difficulty": 3,
+   "tags": [
+    "geography"
+   ],
+   "topic": "geography"
+  },
+  {
+   "id": "gen-geo-6f994f",
+   "kind": "order",
+   "prompt": "Put these rivers in order of length, longest first.",
+   "answer": [
+    "Nile",
+    "Danube",
+    "Rhine",
+    "Thames"
+   ],
+   "orderLabel": "Longest first",
+   "explain": "About 6,650 km, 2,850 km, 1,230 km and 346 km.",
+   "difficulty": 1,
+   "tags": [
+    "geography"
+   ],
+   "topic": "geography"
+  },
+  {
+   "id": "gen-geo-6c8451",
+   "kind": "order",
+   "prompt": "Put these oceans in order of size, largest first.",
+   "answer": [
+    "Pacific Ocean",
+    "Atlantic Ocean",
+    "Indian Ocean",
+    "Arctic Ocean"
+   ],
+   "orderLabel": "Largest first",
+   "explain": "The Pacific is bigger than all the land on Earth put together; the Arctic is the smallest ocean.",
+   "difficulty": 1,
+   "tags": [
+    "geography"
+   ],
+   "topic": "geography"
+  },
+  {
+   "id": "gen-geo-b8b714",
+   "kind": "order",
+   "prompt": "Put these capital cities in order from north to south.",
+   "answer": [
+    "Oslo",
+    "Paris",
+    "Rome",
+    "Cairo"
+   ],
+   "orderLabel": "Furthest north first",
+   "explain": "Oslo is at about 60° N, Paris 49° N, Rome 42° N and Cairo 30° N.",
+   "difficulty": 2,
+   "tags": [
+    "geography"
+   ],
+   "topic": "geography"
+  },
+  {
+   "id": "gen-art-0574e2",
+   "kind": "tf",
+   "prompt": "Vincent van Gogh sold hundreds of paintings during his lifetime.",
+   "answer": false,
+   "explain": "He sold very few and was little known until after his death in 1890.",
+   "difficulty": 2,
+   "tags": [
+    "art"
+   ],
+   "topic": "arts"
+  },
+  {
+   "id": "gen-art-afce39",
+   "kind": "tf",
+   "prompt": "The ancient Greek statue the Venus de Milo still has both of its arms.",
+   "answer": false,
+   "explain": "Its arms were already missing when it was found on the island of Milos in 1820.",
+   "difficulty": 1,
+   "tags": [
+    "art"
+   ],
+   "topic": "arts"
+  },
+  {
+   "id": "gen-art-58cd2a",
+   "kind": "tf",
+   "prompt": "Michelangelo's statue of David is carved from marble.",
+   "answer": true,
+   "explain": "He carved it from a single block of Carrara marble between 1501 and 1504.",
+   "difficulty": 1,
+   "tags": [
+    "art"
+   ],
+   "topic": "arts"
+  },
+  {
+   "id": "gen-art-a5edc2",
+   "kind": "tf",
+   "prompt": "The Mona Lisa was once stolen from the Louvre.",
+   "answer": true,
+   "explain": "Vincenzo Peruggia took it in 1911; it was found in Florence in 1913.",
+   "difficulty": 2,
+   "tags": [
+    "art"
+   ],
+   "topic": "arts"
+  },
+  {
+   "id": "gen-art-6f6671",
+   "kind": "tf",
+   "prompt": "'The Scream' was painted by Edvard Munch.",
+   "answer": true,
+   "explain": "The Norwegian artist made several versions of it, the first in 1893.",
+   "difficulty": 1,
+   "tags": [
+    "art"
+   ],
+   "topic": "arts"
+  },
+  {
+   "id": "gen-art-5d6a9c",
+   "kind": "tf",
+   "prompt": "Andy Warhol is famous for pictures of Campbell's soup cans.",
+   "answer": true,
+   "explain": "His 32 Campbell's Soup Cans (1962) helped launch Pop Art.",
+   "difficulty": 1,
+   "tags": [
+    "art"
+   ],
+   "topic": "arts"
+  },
+  {
+   "id": "gen-art-91f694",
+   "kind": "tf",
+   "prompt": "Salvador Dalí was born in Mexico.",
+   "answer": false,
+   "explain": "Dalí was born in Figueres, in Catalonia, Spain, in 1904.",
+   "difficulty": 2,
+   "tags": [
+    "art"
+   ],
+   "topic": "arts"
+  },
+  {
+   "id": "gen-mus-045379",
+   "kind": "tf",
+   "prompt": "Elvis Presley was born in Memphis, Tennessee.",
+   "answer": false,
+   "explain": "He was born in Tupelo, Mississippi, in 1935; his family moved to Memphis when he was 13.",
+   "difficulty": 3,
+   "tags": [
+    "music"
+   ],
+   "topic": "music"
+  },
+  {
+   "id": "gen-mus-34f55b",
+   "kind": "tf",
+   "prompt": "Johann Sebastian Bach and George Frideric Handel were born in the same year.",
+   "answer": true,
+   "explain": "Both were born in Germany in 1685, about 130 km apart.",
+   "difficulty": 3,
+   "tags": [
+    "music"
+   ],
+   "topic": "music"
+  },
+  {
+   "id": "gen-mus-fd193c",
+   "kind": "tf",
+   "prompt": "A cello is bigger than a violin.",
+   "answer": true,
+   "explain": "The cello is played sitting down, held between the knees.",
+   "difficulty": 1,
+   "tags": [
+    "music"
+   ],
+   "topic": "music"
+  },
+  {
+   "id": "gen-mus-66c76a",
+   "kind": "tf",
+   "prompt": "Mick Jagger is the lead singer of the Rolling Stones.",
+   "answer": true,
+   "explain": "Jagger has fronted the band since it formed in London in 1962.",
+   "difficulty": 1,
+   "tags": [
+    "music"
+   ],
+   "topic": "music"
+  },
+  {
+   "id": "gen-mus-d30f31",
+   "kind": "tf",
+   "prompt": "The pop group ABBA came from Norway.",
+   "answer": false,
+   "explain": "ABBA were Swedish; they won Eurovision for Sweden with 'Waterloo' in 1974.",
+   "difficulty": 1,
+   "tags": [
+    "music"
+   ],
+   "topic": "music"
+  },
+  {
+   "id": "gen-mus-199e7a",
+   "kind": "tf",
+   "prompt": "The tuba belongs to the woodwind family.",
+   "answer": false,
+   "explain": "The tuba is the largest and lowest member of the brass family.",
+   "difficulty": 1,
+   "tags": [
+    "music"
+   ],
+   "topic": "music"
+  },
+  {
+   "id": "gen-mus-e882e8",
+   "kind": "number",
+   "prompt": "How many symphonies did Beethoven complete?",
+   "answer": 9,
+   "unit": "symphonies",
+   "tolerance": 0,
+   "explain": "His Ninth, with the 'Ode to Joy', was first performed in 1824.",
+   "difficulty": 2,
+   "tags": [
+    "music"
+   ],
+   "topic": "music"
+  },
+  {
+   "id": "gen-mus-dbdf59",
+   "kind": "number",
+   "prompt": "In which year did the Beatles release their first single, 'Love Me Do'?",
+   "answer": 1962,
+   "unit": "",
+   "tolerance": 1,
+   "explain": "'Love Me Do' came out in the UK in October 1962.",
+   "difficulty": 2,
+   "tags": [
+    "music"
+   ],
+   "topic": "music"
+  },
+  {
+   "id": "gen-mus-535bd8",
+   "kind": "number",
+   "prompt": "How many valves does a standard trumpet have?",
+   "answer": 3,
+   "unit": "valves",
+   "tolerance": 0,
+   "explain": "Pressing the three valves in different combinations changes the note.",
+   "difficulty": 2,
+   "tags": [
+    "music"
+   ],
+   "topic": "music"
+  },
+  {
+   "id": "gen-mus-9fbce2",
+   "kind": "order",
+   "prompt": "Put these string instruments in order of size, largest first.",
+   "answer": [
+    "Double bass",
+    "Cello",
+    "Viola",
+    "Violin"
+   ],
+   "orderLabel": "Largest first",
+   "explain": "The bigger the instrument, the lower it plays.",
+   "difficulty": 1,
+   "tags": [
+    "music"
+   ],
+   "topic": "music"
+  },
+  {
+   "id": "gen-mus-4fc542",
+   "kind": "order",
+   "prompt": "Put these singing voices in order from highest to lowest.",
+   "answer": [
+    "Soprano",
+    "Alto",
+    "Tenor",
+    "Bass"
+   ],
+   "orderLabel": "Highest first",
+   "explain": "Soprano and alto are the higher voices, tenor and bass the lower ones.",
+   "difficulty": 2,
+   "tags": [
+    "music"
+   ],
+   "topic": "music"
+  },
+  {
+   "id": "gen-mus-bc2d05",
+   "kind": "order",
+   "prompt": "Put these composers in order of birth, oldest first.",
+   "answer": [
+    "Antonio Vivaldi",
+    "Joseph Haydn",
+    "Frédéric Chopin",
+    "Claude Debussy"
+   ],
+   "orderLabel": "Born earliest first",
+   "explain": "1678, 1732, 1810 and 1862.",
+   "difficulty": 3,
+   "tags": [
+    "music"
+   ],
+   "topic": "music"
+  },
+  {
+   "id": "gen-mus-4f3eef",
+   "kind": "order",
+   "prompt": "Put these ways of playing music in order of invention, earliest first.",
+   "answer": [
+    "Vinyl LP",
+    "Compact cassette",
+    "Compact disc",
+    "iPod"
+   ],
+   "orderLabel": "Earliest first",
+   "explain": "1948, 1963, 1982 and 2001.",
+   "difficulty": 2,
+   "tags": [
+    "music"
+   ],
+   "topic": "music"
+  },
+  {
+   "id": "gen-lit-ce24e0",
+   "kind": "tf",
+   "prompt": "In Mary Shelley's novel, Frankenstein is the name of the monster.",
+   "answer": false,
+   "explain": "Victor Frankenstein is the scientist; his creature is never given a name.",
+   "difficulty": 2,
+   "tags": [
+    "books"
+   ],
+   "topic": "literature"
+  },
+  {
+   "id": "gen-lit-8c49f7",
+   "kind": "tf",
+   "prompt": "Charles Dickens wrote 'Pride and Prejudice'.",
+   "answer": false,
+   "explain": "Jane Austen wrote it; it was published in 1813.",
+   "difficulty": 1,
+   "tags": [
+    "books"
+   ],
+   "topic": "literature"
+  },
+  {
+   "id": "gen-lit-3924da",
+   "kind": "tf",
+   "prompt": "Sherlock Holmes lives at 221B Baker Street.",
+   "answer": true,
+   "explain": "He shares the London flat with Dr Watson.",
+   "difficulty": 1,
+   "tags": [
+    "books"
+   ],
+   "topic": "literature"
+  },
+  {
+   "id": "gen-lit-191c5c",
+   "kind": "tf",
+   "prompt": "'Robinson Crusoe' was written by Daniel Defoe.",
+   "answer": true,
+   "explain": "It was published in 1719.",
+   "difficulty": 2,
+   "tags": [
+    "books"
+   ],
+   "topic": "literature"
+  },
+  {
+   "id": "gen-pop-132fc2",
+   "kind": "tf",
+   "prompt": "The 1997 film 'Titanic' won the Oscar for Best Picture.",
+   "answer": true,
+   "explain": "It was one of its 11 Academy Awards.",
+   "difficulty": 1,
+   "tags": [
+    "screen"
+   ],
+   "topic": "pop culture"
+  },
+  {
+   "id": "gen-pop-1f640c",
+   "kind": "tf",
+   "prompt": "'Toy Story' (1995) was the first feature film made entirely with computer animation.",
+   "answer": true,
+   "explain": "Pixar made it; it was released in November 1995.",
+   "difficulty": 2,
+   "tags": [
+    "screen"
+   ],
+   "topic": "pop culture"
+  },
+  {
+   "id": "gen-pop-b48234",
+   "kind": "tf",
+   "prompt": "In the 1939 film 'The Wizard of Oz', Dorothy's magic slippers are silver.",
+   "answer": false,
+   "explain": "They are ruby in the film; they were silver in L. Frank Baum's book.",
+   "difficulty": 2,
+   "tags": [
+    "screen"
+   ],
+   "topic": "pop culture"
+  },
+  {
+   "id": "gen-pop-507be1",
+   "kind": "tf",
+   "prompt": "Pac-Man was created in Japan.",
+   "answer": true,
+   "explain": "Namco released it in Japan in 1980.",
+   "difficulty": 2,
+   "tags": [
+    "screen"
+   ],
+   "topic": "pop culture"
+  },
+  {
+   "id": "gen-pop-81bee8",
+   "kind": "tf",
+   "prompt": "Walt Disney was the first voice of Mickey Mouse.",
+   "answer": true,
+   "explain": "He voiced Mickey from 1928 until 1947.",
+   "difficulty": 2,
+   "tags": [
+    "screen"
+   ],
+   "topic": "pop culture"
+  },
+  {
+   "id": "gen-pop-e2da02",
+   "kind": "tf",
+   "prompt": "Batman first appeared in a comic book in 1939.",
+   "answer": true,
+   "explain": "He debuted in Detective Comics #27 in 1939.",
+   "difficulty": 3,
+   "tags": [
+    "screen"
+   ],
+   "topic": "pop culture"
+  },
+  {
+   "id": "gen-pop-f77034",
+   "kind": "tf",
+   "prompt": "In 'Finding Nemo', Nemo is a goldfish.",
+   "answer": false,
+   "explain": "Nemo is a clownfish.",
+   "difficulty": 1,
+   "tags": [
+    "screen"
+   ],
+   "topic": "pop culture"
+  },
+  {
+   "id": "gen-pop-f61c36",
+   "kind": "number",
+   "prompt": "In which year was the first Star Wars film released?",
+   "answer": 1977,
+   "unit": "",
+   "tolerance": 1,
+   "explain": "It opened in US cinemas on 25 May 1977.",
+   "difficulty": 1,
+   "tags": [
+    "screen"
+   ],
+   "topic": "pop culture"
+  },
+  {
+   "id": "gen-pop-8c22dd",
+   "kind": "number",
+   "prompt": "In which year was the first Harry Potter film released?",
+   "answer": 2001,
+   "unit": "",
+   "tolerance": 1,
+   "explain": "'Harry Potter and the Philosopher's Stone' came out in November 2001.",
+   "difficulty": 2,
+   "tags": [
+    "screen"
+   ],
+   "topic": "pop culture"
+  },
+  {
+   "id": "gen-pop-f2a25f",
+   "kind": "number",
+   "prompt": "In which year was the film 'Jurassic Park' released?",
+   "answer": 1993,
+   "unit": "",
+   "tolerance": 1,
+   "explain": "Steven Spielberg's film came out in June 1993.",
+   "difficulty": 2,
+   "tags": [
+    "screen"
+   ],
+   "topic": "pop culture"
+  },
+  {
+   "id": "gen-ani-3f6943",
+   "kind": "number",
+   "prompt": "About how many months is an African elephant pregnant for?",
+   "answer": 22,
+   "unit": "months",
+   "tolerance": 1,
+   "explain": "About 22 months, the longest pregnancy of any land animal.",
+   "difficulty": 2,
+   "tags": [
+    "animals"
+   ],
+   "topic": "animals"
+  },
+  {
+   "id": "gen-ani-84b861",
+   "kind": "number",
+   "prompt": "How many chambers does a cow's stomach have?",
+   "answer": 4,
+   "unit": "chambers",
+   "tolerance": 0,
+   "explain": "The rumen, reticulum, omasum and abomasum.",
+   "difficulty": 2,
+   "tags": [
+    "animals"
+   ],
+   "topic": "animals"
+  },
+  {
+   "id": "gen-ani-4d7388",
+   "kind": "number",
+   "prompt": "How many eyes does a honey bee have?",
+   "answer": 5,
+   "unit": "eyes",
+   "tolerance": 0,
+   "explain": "Two large compound eyes and three small simple eyes on top of its head.",
+   "difficulty": 3,
+   "tags": [
+    "animals"
+   ],
+   "topic": "animals"
+  },
+  {
+   "id": "gen-ani-4ecd99",
+   "kind": "number",
+   "prompt": "How many teeth does an adult dog usually have?",
+   "answer": 42,
+   "unit": "teeth",
+   "tolerance": 0,
+   "explain": "Adult dogs have 42 teeth; puppies have 28 milk teeth.",
+   "difficulty": 3,
+   "tags": [
+    "animals"
+   ],
+   "topic": "animals"
+  },
+  {
+   "id": "gen-ani-0dc16d",
+   "kind": "order",
+   "prompt": "Put these animals in order of weight, heaviest first.",
+   "answer": [
+    "Blue whale",
+    "African elephant",
+    "Hippopotamus",
+    "Polar bear"
+   ],
+   "orderLabel": "Heaviest first",
+   "explain": "Blue whales can top 100 tonnes; elephants weigh about 6 tonnes, hippos about 1.5 and polar bears under 1.",
+   "difficulty": 1,
+   "tags": [
+    "animals"
+   ],
+   "topic": "animals"
+  },
+  {
+   "id": "gen-ani-314c5d",
+   "kind": "order",
+   "prompt": "Put these eggs in order of size, largest first.",
+   "answer": [
+    "Ostrich egg",
+    "Chicken egg",
+    "Quail egg",
+    "Hummingbird egg"
+   ],
+   "orderLabel": "Largest first",
+   "explain": "An ostrich egg weighs about 1.4 kg; a hummingbird egg is smaller than a jelly bean.",
+   "difficulty": 1,
+   "tags": [
+    "animals"
+   ],
+   "topic": "animals"
+  },
+  {
+   "id": "gen-ani-8b2081",
+   "kind": "order",
+   "prompt": "Put these animals in order of how many legs they have, most first.",
+   "answer": [
+    "Spider",
+    "Ant",
+    "Chicken",
+    "Snake"
+   ],
+   "orderLabel": "Most legs first",
+   "explain": "8, 6, 2 and 0.",
+   "difficulty": 1,
+   "tags": [
+    "animals"
+   ],
+   "topic": "animals"
+  },
+  {
+   "id": "gen-ani-4d0631",
+   "kind": "order",
+   "prompt": "Put these animals in order of top speed, fastest first.",
+   "answer": [
+    "Peregrine falcon",
+    "Cheetah",
+    "Horse",
+    "Human"
+   ],
+   "orderLabel": "Fastest first",
+   "explain": "A diving peregrine can pass 300 km/h; cheetahs reach about 100 km/h, racehorses about 70 and the fastest humans about 44.",
+   "difficulty": 2,
+   "tags": [
+    "animals"
+   ],
+   "topic": "animals"
+  },
+  {
+   "id": "gen-ani-2e3ff8",
+   "kind": "order",
+   "prompt": "Put these animals in order of how long their pregnancy lasts, longest first.",
+   "answer": [
+    "African elephant",
+    "Human",
+    "Dog",
+    "Hamster"
+   ],
+   "orderLabel": "Longest first",
+   "explain": "About 22 months, 9 months, 2 months and under 3 weeks.",
+   "difficulty": 2,
+   "tags": [
+    "animals"
+   ],
+   "topic": "animals"
+  },
+  {
+   "id": "gen-ani-01582c",
+   "kind": "order",
+   "prompt": "Put these animals in order of how long they can live, longest first.",
+   "answer": [
+    "Greenland shark",
+    "Human",
+    "Dog",
+    "Mouse"
+   ],
+   "orderLabel": "Longest-lived first",
+   "explain": "Greenland sharks may live for centuries; dogs live about 10–13 years and mice 1–2.",
+   "difficulty": 2,
+   "tags": [
+    "animals"
+   ],
+   "topic": "animals"
   }
  ],
  "sources": [

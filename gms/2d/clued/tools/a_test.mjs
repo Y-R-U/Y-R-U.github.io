@@ -152,5 +152,41 @@ if (dev) {
 ok(registry.fill('Which of these is {aName}?', { name: 'Axolotl' }) === 'Which of these is an axolotl?', 'fill aName');
 ok(registry.fill('The {lname} is {aValue}.', { name: 'Tiger', value: 'Mammal' }) === 'The tiger is a mammal.', 'fill lvalue');
 
+// lane FIN: picker hides packs a format can't use; preflight swaps; generator wording helpers
+{
+  const idx = JSON.parse(readFileSync(join(ROOT, 'data/index.json'), 'utf8'));
+  const { hiddenPacks } = await imp('js/ui/picker.js');
+  const fake = { id: 'fakefmt', supports: info => (info.caps?.fakes ? true : 'Needs a list of made-up names') };
+  const why = id => (idx.packs[id] ? registry.supportsPack(fake, idx.packs[id]) : 'Missing');
+  const hid = hiddenPacks(idx, why, false);
+  const listed = hid.flatMap(g => g.packs.map(p => p.id));
+  ok(hid.length && hid.every(g => g.reason && g.packs.length), 'hidden packs are grouped by reason');
+  ok(listed.every(id => why(id) !== true) && new Set(listed).size === listed.length, 'only unusable packs are listed, once each');
+  const usable = Object.keys(idx.packs).filter(id => why(id) === true);
+  ok(usable.every(id => !listed.includes(id)), 'usable packs never listed as hidden');
+  const unsafe = Object.keys(idx.packs).filter(id => idx.packs[id].kidsSafe === false);
+  const kidsWhy = id => (idx.packs[id]?.kidsSafe === false ? 'Not in kids mode' : why(id));
+  ok(!hiddenPacks(idx, kidsWhy, true).some(g => g.packs.some(p => unsafe.includes(p.id))), 'kids mode never lists grown-up packs');
+  ok(String(hiddenPacks(idx, id => (id === 'mammals' ? registry.NOT_ENOUGH : true), true)[0]?.reason || '').includes('easy'), 'kids wording for "not enough"');
+
+  const media = await imp('js/core/media.js');
+  const q = (id, round, src, format = 'mc') => ({ id, round, format, media: src ? { img: [{ src }] } : undefined });
+  const r = media.swapFailed([q('a', 0, 'bad1'), q('b', 0, 'ok1')], [q('s1', 1, 'ok2'), q('s2', 0, 'ok3', 'tf')], new Set(['bad1']));
+  ok(r.questions.map(x => x.id).join() === 's2,b' && r.dropped === 0, 'swapFailed fills from the same round, any format');
+  const { thinRounds } = await imp('js/structures/session.js');
+  const sp = { rounds: [{ count: 10 }, { count: 5 }] };
+  const qs = [...Array(6)].map((_, i) => ({ round: 0, id: 'x' + i })).concat([{ round: 1, id: 'y' }]);
+  ok(thinRounds(sp, qs).join() === '1', 'a round under 60% is thin, 60% is not');
+
+  ok(registry.factText({ type: 'year' }, -323) === '323 BC', 'BC years in factText');
+  ok(registry.fill('The Persian breed comes from {value}.', { value: 'United States' }) === 'The Persian breed comes from the United States.', '"the" before country {value}');
+  ok(registry.fill('Is it in the {value}?', { value: 'Netherlands' }) === 'Is it in the Netherlands?', 'no double "the"');
+  ok(registry.lcLabel('Conservation status (IUCN)') === 'conservation status (IUCN)', 'labels keep acronyms');
+  ok(registry.midName({ name: 'Southern stingray' }, { id: 'sea', theme: 'animals' }) === 'the southern stingray', 'animal names mid-sentence');
+  ok(registry.midName({ name: 'United Kingdom', lname: 'United Kingdom' }, { theme: 'geography' }) === 'the United Kingdom', 'country names mid-sentence');
+  ok(registry.nested('Jellyfish', 'Box jellyfish') && !registry.nested('Asia', 'Eurasia'), 'nested values');
+  ok(!registry.factAllowed({ label: 'Conservation status (IUCN)' }, { kids: true }) && registry.factAllowed({ label: 'Conservation status (IUCN)' }, { difficulty: 3 }), 'IUCN only at Hard, never kids');
+}
+
 console.log(`a_test: ${passes} passed, ${fails} failed`);
 process.exit(fails ? 1 : 0);

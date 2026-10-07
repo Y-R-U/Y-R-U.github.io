@@ -1,10 +1,10 @@
-import { h } from './kit.js?v=202610071242';
-import { defineScreen, go } from './app.js?v=202610071242';
-import { getSettings, setSettings, getStats, dailyDone, todayUTC } from '../core/store.js?v=202610071242';
-import { kidsProgress } from './stickers.js?v=202610071242';
-import { sfx } from './fx.js?v=202610071242';
-import { loadNet } from './net.js?v=202610071242';
-import { toolButtons } from './toggles.js?v=202610071242';
+import { h } from './kit.js?v=202610071324';
+import { defineScreen, go } from './app.js?v=202610071324';
+import { getSettings, setSettings, getStats, dailyDone, todayUTC } from '../core/store.js?v=202610071324';
+import { kidsProgress } from './stickers.js?v=202610071324';
+import { sfx } from './fx.js?v=202610071324';
+import { loadNet } from './net.js?v=202610071324';
+import { toolButtons } from './toggles.js?v=202610071324';
 
 export const logo = (sm = false) => h('div.logo', { class: sm ? 'sm' : '', 'aria-label': 'Clued' },
   h('span.lens', {}, '?'), ...'lued'.split('').map(c => h('span.l', {}, c)));

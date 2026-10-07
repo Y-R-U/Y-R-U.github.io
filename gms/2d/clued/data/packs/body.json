@@ -32,6 +32,15 @@
    "askReverse": "Which of these is part of the {lvalue} system?",
    "stmt": "The {lname} is part of the {lvalue} system."
   },
+  "massG": {
+   "type": "num",
+   "label": "Typical adult weight",
+   "unit": "g",
+   "higherLabel": "Heavier",
+   "askHigh": "Which of these weighs the most in an adult?",
+   "askLow": "Which of these weighs the least in an adult?",
+   "askNumber": "What is the typical weight of an adult's {name}, in grams?"
+  },
   "count": {
    "type": "num",
    "label": "How many you have",
@@ -47,7 +56,8 @@
    "facts": {
     "kind": "Organ",
     "system": "Circulatory",
-    "count": 1
+    "count": 1,
+    "massG": 300
    },
    "blurb": "A muscle that pumps blood around your body. It beats about 100,000 times a day.",
    "clues": [
@@ -82,7 +92,8 @@
    "facts": {
     "kind": "Organ",
     "system": "Nervous",
-    "count": 1
+    "count": 1,
+    "massG": 1300
    },
    "blurb": "The control centre of your body. It has about 86 billion nerve cells.",
    "clues": [
@@ -120,7 +131,8 @@
    "facts": {
     "kind": "Organ",
     "system": "Respiratory",
-    "count": 2
+    "count": 2,
+    "massG": 1300
    },
    "blurb": "Two spongy organs that take in oxygen from the air and get rid of carbon dioxide.",
    "clues": [
@@ -155,7 +167,8 @@
    "facts": {
     "kind": "Organ",
     "system": "Digestive",
-    "count": 1
+    "count": 1,
+    "massG": 1500
    },
    "blurb": "The biggest organ inside the body. It cleans the blood, stores energy and makes bile. It can regrow if part is removed.",
    "clues": [
@@ -351,7 +364,8 @@
    "facts": {
     "kind": "Organ",
     "system": "Skin",
-    "count": 1
+    "count": 1,
+    "massG": 3300
    },
    "blurb": "The biggest organ of the body. It protects us, keeps us at the right temperature and lets us feel touch.",
    "clues": [
@@ -420,7 +434,8 @@
    "facts": {
     "kind": "Organ",
     "system": "Immune",
-    "count": 1
+    "count": 1,
+    "massG": 130
    },
    "blurb": "An organ on the left side that filters old red blood cells and helps fight infection.",
    "clues": [
@@ -565,7 +580,8 @@
    "facts": {
     "kind": "Organ",
     "system": "Endocrine",
-    "count": 1
+    "count": 1,
+    "massG": 25
    },
    "blurb": "A butterfly-shaped gland in the neck that controls how fast the body uses energy.",
    "clues": [

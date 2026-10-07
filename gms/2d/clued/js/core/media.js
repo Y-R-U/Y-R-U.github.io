@@ -64,11 +64,12 @@ function loadAudio(url, ms) {
   });
 }
 
-export function preloadOne(url, ms = 9000) {
+export function preloadOne(url, ms = 12000) {
   if (cache.has(url)) return cache.get(url);
   const p = (AUDIO_RE.test(url) ? loadAudio(url, ms) : loadImage(url, ms)).then(async ok => {
     if (ok) return true;
-    // one retry with a cache-buster: Wikimedia thumbs occasionally 429 on first hit
+    // one retry with a cache-buster after a short back-off: Wikimedia thumbs 429 when hit in bursts
+    await new Promise(r => setTimeout(r, 800 + Math.random() * 1200));
     const retry = url + (url.includes('?') ? '&' : '?') + 'r=1';
     return AUDIO_RE.test(url) ? loadAudio(retry, ms) : loadImage(retry, ms);
   });
@@ -78,7 +79,7 @@ export function preloadOne(url, ms = 9000) {
 }
 
 // onProgress(done, total). Resolves { ok:Set, failed:Set }.
-export async function preflight(urls, onProgress, { concurrency = 6, timeoutMs = 9000 } = {}) {
+export async function preflight(urls, onProgress, { concurrency = 6, timeoutMs = 12000 } = {}) {
   const list = [...new Set(urls)].filter(Boolean);
   const ok = new Set(), failed = new Set();
   let done = 0, i = 0;
@@ -105,7 +106,8 @@ export function swapFailed(questions, spares, failed) {
   const out = [];
   for (const q of questions) {
     if (!questionFailed(q, failed)) { out.push(q); continue; }
-    const k = pool.findIndex(s => !used.has(s.id) && (s.format === q.format) && (s.round === q.round));
+    let k = pool.findIndex(s => !used.has(s.id) && s.format === q.format && s.round === q.round);
+    if (k < 0) k = pool.findIndex(s => !used.has(s.id) && s.round === q.round);
     if (k >= 0) { const s = pool.splice(k, 1)[0]; used.add(s.id); out.push(s); } else dropped++;
   }
   return { questions: out, dropped };

@@ -14,6 +14,16 @@
   "breed"
  ],
  "factsMeta": {
+  "massKg": {
+   "type": "num",
+   "label": "Typical adult weight",
+   "unit": "kg",
+   "higherLabel": "Heavier",
+   "askHigh": "Which of these breeds is usually the heaviest?",
+   "askLow": "Which of these breeds is usually the lightest?",
+   "askNumber": "About how much does an adult {name} cat weigh, in kilograms?",
+   "minRatio": 1.5
+  },
   "origin": {
    "type": "cat",
    "label": "Country of origin",
@@ -92,7 +102,8 @@
    "lname": "Maine Coon",
    "facts": {
     "origin": "United States",
-    "coat": "Long"
+    "coat": "Long",
+    "massKg": 7.5
    },
    "lookalikes": [
     "norwegian-forest-cat",
@@ -197,7 +208,8 @@
    "lname": "Ragdoll",
    "facts": {
     "origin": "United States",
-    "coat": "Long"
+    "coat": "Long",
+    "massKg": 6.5
    },
    "lookalikes": [
     "birman"
@@ -250,7 +262,8 @@
    "lname": "British Shorthair",
    "facts": {
     "origin": "United Kingdom",
-    "coat": "Short"
+    "coat": "Short",
+    "massKg": 5
    },
    "lookalikes": [
     "russian-blue",
@@ -397,7 +410,8 @@
      "Ethiopia",
      "United Kingdom"
     ],
-    "coat": "Short"
+    "coat": "Short",
+    "massKg": 4.5
    },
    "lookalikes": [
     "somali",
@@ -451,7 +465,8 @@
    "lname": "Scottish Fold",
    "facts": {
     "origin": "United Kingdom",
-    "coat": "Short"
+    "coat": "Short",
+    "massKg": 4.2
    },
    "blurb": "A cat whose ears fold forward and down, giving it an owl-like face. The fold comes from a gene that can cause joint problems.",
    "clues": [
@@ -492,7 +507,8 @@
    "lname": "Russian Blue",
    "facts": {
     "origin": "Russia",
-    "coat": "Short"
+    "coat": "Short",
+    "massKg": 5
    },
    "lookalikes": [
     "british-shorthair",
@@ -542,7 +558,8 @@
    ],
    "facts": {
     "origin": "Norway",
-    "coat": "Long"
+    "coat": "Long",
+    "massKg": 6
    },
    "lookalikes": [
     "maine-coon",
@@ -638,7 +655,8 @@
    ],
    "facts": {
     "origin": "Myanmar",
-    "coat": "Short"
+    "coat": "Short",
+    "massKg": 5
    },
    "lookalikes": [
     "bombay",
@@ -776,7 +794,8 @@
    ],
    "facts": {
     "origin": "United States",
-    "coat": "Short"
+    "coat": "Short",
+    "massKg": 3.8
    },
    "lookalikes": [
     "siamese"
@@ -987,7 +1006,8 @@
      "Turkey",
      "United Kingdom"
     ],
-    "coat": "Medium"
+    "coat": "Medium",
+    "massKg": 5.5
    },
    "lookalikes": [
     "turkish-angora"
@@ -1035,7 +1055,8 @@
    ],
    "facts": {
     "origin": "Isle of Man",
-    "coat": "Short"
+    "coat": "Short",
+    "massKg": 4.5
    },
    "lookalikes": [
     "japanese-bobtail"
@@ -1167,7 +1188,8 @@
    ],
    "facts": {
     "origin": "Russia",
-    "coat": "Long"
+    "coat": "Long",
+    "massKg": 6.5
    },
    "lookalikes": [
     "maine-coon",
@@ -1221,7 +1243,8 @@
    "lname": "Japanese Bobtail",
    "facts": {
     "origin": "Japan",
-    "coat": "Short"
+    "coat": "Short",
+    "massKg": 3.3
    },
    "lookalikes": [
     "manx"
@@ -1398,7 +1421,8 @@
    ],
    "facts": {
     "origin": "United States",
-    "coat": "Short"
+    "coat": "Short",
+    "massKg": 3.5
    },
    "lookalikes": [
     "burmese"
@@ -1443,7 +1467,8 @@
    "lname": "Ocicat",
    "facts": {
     "origin": "United States",
-    "coat": "Short"
+    "coat": "Short",
+    "massKg": 4.5
    },
    "lookalikes": [
     "bengal",
@@ -1495,7 +1520,8 @@
    ],
    "facts": {
     "origin": "United States",
-    "coat": "Short"
+    "coat": "Short",
+    "massKg": 3
    },
    "blurb": "A cat with very short legs caused by a natural gene. Some groups refuse to recognise it because of health worries.",
    "clues": [
@@ -1674,7 +1700,8 @@
    ],
    "facts": {
     "origin": "Singapore",
-    "coat": "Short"
+    "coat": "Short",
+    "massKg": 2.2
    },
    "lookalikes": [
     "abyssinian"

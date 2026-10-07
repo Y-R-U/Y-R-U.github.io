@@ -8,6 +8,7 @@ import { createHash } from 'node:crypto';
 import { TOPICS } from './c2c_src/lib.mjs';
 import GA from './c2c_src/general_a.mjs';
 import GB from './c2c_src/general_b.mjs';
+import GC from './c2c_src/general_c.mjs';
 import KIDS from './c2c_src/kids.mjs';
 import { SUMMER, WINTER, WORLD_CUP, ATHLETES, QUESTIONS as SPORT_Q } from './c2c_src/sport.mjs';
 
@@ -44,7 +45,7 @@ function write(id, pack) {
   console.log(`${id}: ${qs} questions${its ? `, ${its} items` : ''}`);
 }
 
-const general = [...GA, ...GB].map(q => toQuestion('gen', q));
+const general = [...GA, ...GB, ...GC].map(q => toQuestion('gen', q));
 write('general', {
   id: 'general', title: 'General knowledge', theme: 'general', icon: '💡', kids: false, version: 1,
   questions: general,

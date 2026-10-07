@@ -117,7 +117,14 @@ export default {
     'cornish-rex|devon-rex': 'The Devon Rex has huge low-set ears, an elf-like face and a looser wavy coat; the Cornish Rex has a tight marcel-wave coat and a slim, arched, greyhound-like body.',
     'laperm|selkirk-rex': 'The Selkirk Rex is big and cobby with a thick plush curly coat; the LaPerm is lighter-built with a looser, springy coat.',
   },
-  dishes: { 'sashimi|sushi': 'Sushi always includes vinegared rice; sashimi is sliced raw fish served without rice.' },
+  dishes: {
+    'sashimi|sushi': 'Sushi always includes vinegared rice; sashimi is sliced raw fish served without rice.',
+    'pho|ramen': 'Phở is Vietnamese, with flat rice noodles in a clear broth topped with fresh herbs and lime; ramen is Japanese, with springy wheat noodles in a richer broth.',
+    'lasagne|moussaka': 'Lasagne is layered with sheets of pasta; moussaka is layered with aubergine (and often potato) instead of pasta.',
+    'borscht|gazpacho': 'Borscht gets its deep red from beetroot and is usually served hot; gazpacho is a cold, raw tomato soup.',
+    'bratwurst|hot-dog': 'A bratwurst is a coarser German sausage, usually of pork and usually grilled; a hot dog is a smooth frankfurter-style sausage served in a soft split bun.',
+    'jiaozi|pierogi': 'Jiaozi are Chinese, with thin wheat wrappers often filled with pork and cabbage; pierogi are Polish, with thicker dough and fillings such as potato and cheese.',
+  },
   flowers: { 'garden-pansy|sweet-violet': 'The pansy has large flowers with a dark "face"; the sweet violet has small purple flowers and a sweet scent.' },
   insects: {
     'monarch-butterfly|painted-lady': 'The monarch is orange with thick black veins; the painted lady is orange-brown with black and white spots near the wingtips.',

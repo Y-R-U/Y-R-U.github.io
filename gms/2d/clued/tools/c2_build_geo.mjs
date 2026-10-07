@@ -408,6 +408,24 @@ function currencyQuestions() {
   qs.push({ id: 'cur-yen-sym', kind: 'mc', prompt: 'Which currency uses the symbol ¥ along with the Chinese renminbi?', answer: 'Japanese yen', wrong: ['South Korean won', 'Thai baht', 'Indian rupee'], explain: 'Both the yen and the yuan are written with ¥.', difficulty: 2 });
   qs.push({ id: 'cur-rupee-sym', kind: 'mc', prompt: 'Which currency has the symbol ₹?', answer: 'Indian rupee', wrong: ['Russian ruble', 'Indonesian rupiah', 'Pakistani rupee'], explain: 'India adopted the ₹ sign in 2010.', difficulty: 2 });
   qs.push({ id: 'cur-ruble-sym', kind: 'mc', prompt: 'Which currency has the symbol ₽?', answer: 'Russian ruble', wrong: ['Philippine peso', 'Polish złoty', 'Peruvian sol'], explain: 'The ruble sign was adopted in 2013.', difficulty: 3 });
+  // true/false "The currency of X is the <unit>." Only units whose word is unique (birr, pula, yen; not dollar, franc,
+  // dinar…) and countries with a currency of their own; false ones name a same-region unit X doesn't use. The bare
+  // unit is used because full names ("Ethiopian birr") give the answer away.
+  const unit = n => n.replace(/\s*\(.*\)/, '').split(' ').pop();
+  const unitText = n => ({ 'Renminbi (yuan)': 'renminbi (yuan)', 'Pound sterling': 'pound sterling' }[n] || unit(n));
+  const unitCount = {};
+  for (const c of curItems) unitCount[unit(c.name).toLowerCase()] = (unitCount[unit(c.name).toLowerCase()] || 0) + 1;
+  const distinct = n => unitCount[unit(n).toLowerCase()] === 1;
+  const rt = rng('currencies-tf');
+  const singles = usable.filter(u => u.currencies.length === 1 && u.iso3 !== 'PSE' && curUsers[u.currencies[0]].length === 1 && distinct(curName(u.currencies[0])));
+  sample(rt, singles, 40).forEach((u, i) => {
+    const own = u.currencies[0], ci = countryItems.find(c => c.iso3 === u.iso3);
+    const other = sample(rt, curItems.filter(c => !u.currencies.includes(c.facts.code) && c.group === CONT[u.cont] && distinct(c.name)), 1)[0];
+    const truth = i % 2 === 0 || !other;
+    const who = theName(u.name);
+    qs.push({ id: `curtf-${slug(u.name)}`, kind: 'tf', prompt: `The currency of ${who} is the ${unitText(truth ? curName(own) : other.name)}.`, answer: truth,
+      explain: `${who.charAt(0).toUpperCase() + who.slice(1)} uses the ${curName(own)} (${own}).`, difficulty: ci.difficulty });
+  });
   return qs;
 }
 writePack({

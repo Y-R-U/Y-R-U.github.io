@@ -1,10 +1,10 @@
-import { WD, COMMONS } from './_common.mjs';
+import { WD, COMMONS, addFacts } from './_common.mjs';
 
 const OR = 'Organ', BO = 'Bone', MU = 'Muscle', CE = 'Cell', TI = 'Tissue';
 const DIG = 'Digestive', CIR = 'Circulatory', RES = 'Respiratory', NER = 'Nervous', SKE = 'Skeletal', URI = 'Urinary', IMM = 'Immune', END = 'Endocrine', MUS = 'Muscular', SEN = 'Senses', INT = 'Skin';
 const f = (kind, system, extra = {}) => ({ kind, system, ...extra });
 
-export default {
+const PACK = {
   id: 'body', title: 'Human body', theme: 'science', icon: '🫀', kids: true,
   noun: 'body part',
   leakExempt: [],
@@ -12,12 +12,13 @@ export default {
   factsMeta: {
     kind: { type: 'cat', label: 'Kind', values: [OR, BO, MU, CE, TI], clue: v => `It is ${/^[AEIOU]/.test(v) ? 'an' : 'a'} ${v.toLowerCase()}.` },
     system: { type: 'cat', label: 'Body system', clue: v => `It is part of the ${v.toLowerCase()} system.` },
+    massG: { type: 'num', label: 'Typical adult weight', unit: 'g', higherLabel: 'Heavier', noClue: true },
     count: { type: 'num', label: 'How many you have', unit: '', askNumber: '{name}: how many does a person usually have?', clue: v => `Most people have ${v} of these.` },
   },
   imgPrompt: "Which of these shows the {lname}?",
   nameImgPrompt: "Which part of the body is this?",
   tfImgPrompt: "This is the {lname}.",
-  tpl: {"kind": {"ask": "What kind of body part is the {lname}?", "askReverse": "Which of these is a {lvalue}?", "stmt": "The {lname} is a {lvalue}."}, "system": {"ask": "Which body system is the {lname} part of?", "askReverse": "Which of these is part of the {lvalue} system?", "stmt": "The {lname} is part of the {lvalue} system."}, "count": {"askHigh": "Which of these do we have the most of?"}},
+  tpl: {"massG": {"askHigh": "Which of these weighs the most in an adult?", "askLow": "Which of these weighs the least in an adult?", "askNumber": "What is the typical weight of an adult's {name}, in grams?"}, "kind": {"ask": "What kind of body part is the {lname}?", "askReverse": "Which of these is a {lvalue}?", "stmt": "The {lname} is a {lvalue}."}, "system": {"ask": "Which body system is the {lname} part of?", "askReverse": "Which of these is part of the {lvalue} system?", "stmt": "The {lname} is part of the {lvalue} system."}, "count": {"askHigh": "Which of these do we have the most of?"}},
   sources: [WD, COMMONS],
   items: [
     { n: 'Heart', wp: 'Heart', f: f(OR, CIR, { count: 1 }), d: 1, allowSvg: true,
@@ -164,3 +165,8 @@ export default {
     { kind: 'order', prompt: 'Put the path of food in order.', answer: ['Mouth', 'Oesophagus', 'Stomach', 'Small intestine', 'Large intestine'], orderLabel: 'First to last', explain: 'Most nutrients are absorbed in the small intestine.', difficulty: 2 },
   ],
 };
+
+// Typical adult organ weights from Wikipedia (Lungs = both together; skin = ICRP tissue mass, no fat layer).
+addFacts(PACK.items, 'massG', { Skin: 3300, Liver: 1500, Brain: 1300, Lungs: 1300, Heart: 300, Spleen: 130, Thyroid: 25 });
+
+export default PACK;

@@ -8,6 +8,7 @@
  "imgPrompt": "Which of these is {lname}?",
  "nameImgPrompt": "Which element is this?",
  "tfImgPrompt": "This is {lname}.",
+ "fakePrompt": "Which of these chemical elements is made up?",
  "leakExempt": [],
  "factsMeta": {
   "atomicNumber": {
@@ -4691,6 +4692,16 @@
    "explain": "Tungsten melts at about 3,400 °C.",
    "difficulty": 3
   }
+ ],
+ "fakes": [
+  "Vibranium",
+  "Adamantium",
+  "Unobtainium",
+  "Draconium",
+  "Zephyrium",
+  "Glacium",
+  "Lunarium",
+  "Pandemonium"
  ],
  "sources": [
   {

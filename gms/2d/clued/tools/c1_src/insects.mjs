@@ -1,22 +1,24 @@
-import { INAT, WD } from './_common.mjs';
+import { INAT, WD, addFacts } from './_common.mjs';
 
 const BE = 'Beetles', LE = 'Butterflies & moths', FL = 'Flies', HY = 'Ants, bees & wasps', OR = 'Grasshoppers & crickets', MA = 'Mantises',
   OD = 'Dragonflies & damselflies', HE = 'True bugs', PH = 'Stick & leaf insects', BL = 'Cockroaches & termites', DE = 'Earwigs', NE = 'Lacewings & antlions', ZY = 'Silverfish';
 const FULL = new Set([BE, LE, FL, HY, NE]);
 const f = order => ({ order, complete: FULL.has(order) });
 
-export default {
+const PACK = {
   id: 'insects', title: 'Insects', theme: 'animals', icon: '🐞', kids: true,
   leakExempt: ['insect', 'insects'],
   wikiD1: true, autoTaxo: ['family', 'genus'],
   factsMeta: {
     order: { type: 'cat', label: 'Insect group', noClue: true },
     complete: { type: 'bool', label: 'Has a pupa stage', yes: 'Egg, larva, pupa, adult', no: 'Egg, nymph, adult', clue: v => (v ? 'It goes through a pupa stage as it grows.' : 'Its young look like small adults; there is no pupa stage.') },
+    lengthMm: { type: 'num', label: 'Typical body length', unit: 'mm', higherLabel: 'Longer', noClue: true },
+    wingspanMm: { type: 'num', label: 'Wingspan', unit: 'mm', higherLabel: 'Wider', noClue: true },
   },
   imgPrompt: "Which of these is {aName}?",
   nameImgPrompt: "Which insect is this?",
   tfImgPrompt: "This is {aName}.",
-  tpl: {"order": {"ask": "Which insect group does the {lname} belong to?", "askReverse": "Which of these belongs to the group \"{value}\"?", "stmt": "The {lname} belongs to the group \"{value}\"."}, "complete": {"askBool": "Which of these insects goes through a pupa stage?", "stmt": "The {lname} goes through a pupa stage as it grows."}},
+  tpl: {"order": {"ask": "Which insect group does the {lname} belong to?", "askReverse": "Which of these belongs to the group \"{value}\"?", "stmt": "The {lname} belongs to the group \"{value}\"."}, "lengthMm": {"askHigh": "Which of these insects is the longest?", "askLow": "Which of these insects is the smallest?", "askNumber": "About how long is {name}, in millimetres?"}, "wingspanMm": {"askHigh": "Which of these has the widest wingspan?", "askLow": "Which of these has the smallest wingspan?", "askNumber": "About how wide is the wingspan of {name}, in millimetres?"}, "complete": {"askBool": "Which of these insects goes through a pupa stage?", "stmt": "The {lname} goes through a pupa stage as it grows."}},
   sources: [INAT, WD],
   items: [
     { n: 'Seven-spot ladybird', alt: ['ladybird', 'ladybug', 'seven-spotted lady beetle'], sci: 'Coccinella septempunctata', g: 'beetle', f: f(BE), d: 1,
@@ -192,3 +194,20 @@ export default {
     { kind: 'mc', prompt: 'How long do periodical cicadas of the eastern USA live underground, at most?', answer: '17 years', wrong: ['1 year', '5 years', '50 years'], explain: 'Some broods emerge every 13 years, others every 17.', difficulty: 3 },
   ],
 };
+
+// Typical adult sizes from each species' Wikipedia description (midpoint of the stated range). Species with big
+// size differences between sexes or castes (Hercules beetle, leaf insects, leafcutter ants) or no stated size are left out.
+addFacts(PACK.items, 'lengthMm', {
+  'Seven-spot ladybird': 7, 'Goliath beetle': 80, 'Sacred scarab': 30, 'Common eastern firefly': 14, 'Christmas beetle': 25,
+  'Colorado potato beetle': 10, 'European mantis': 65, 'Emperor dragonfly': 78, 'Banded demoiselle': 45, 'Desert locust': 60,
+  'House cricket': 18, 'Green grocer cicada': 40, 'Periodical cicada': 28, 'Bullet ant': 25, 'Red imported fire ant': 4,
+  'American cockroach': 40, 'Magnetic termite': 5, Housefly: 6.5, 'Yellow fever mosquito': 5, 'Common earwig': 13,
+  'Common pond skater': 9, 'Pea aphid': 3.5, Silverfish: 8.5,
+});
+addFacts(PACK.items, 'wingspanMm', {
+  'Monarch butterfly': 95, 'Peacock butterfly': 68, 'Red admiral': 55, 'Small white': 40, 'Blue morpho': 120,
+  'Old World swallowtail': 75, 'Ulysses butterfly': 120, 'Atlas moth': 270, 'Luna moth': 114, "Death's-head hawkmoth": 100,
+  'Hummingbird hawk-moth': 42, 'Bogong moth': 45, 'Domestic silk moth': 40, 'Emperor dragonfly': 104,
+});
+
+export default PACK;

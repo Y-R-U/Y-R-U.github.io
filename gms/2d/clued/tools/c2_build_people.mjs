@@ -73,12 +73,13 @@ function toItem(r, kind) {
   const hand = r.clues.map(c => c + '.');
   const clues = [...hand.slice(0, -1), ...auto, hand[hand.length - 1]].filter(c => !leaks(c, names));
   if (clues.length < 5) note(`few clues ${kind}/${r.name}: ${clues.length}`);
-  const facts = { born: r.born ?? undefined, died: r.died ?? undefined, nationality: r.nat, era: era(r.born) };
+  // actors are nearly all born after 1900, so their era is the decade of birth
+  const facts = { born: r.born ?? undefined, died: r.died ?? undefined, nationality: r.nat, era: kind === 'actors' && r.born != null ? `${Math.floor(r.born / 10) * 10}s` : era(r.born) };
   if (kind === 'artists') facts.movement = r.field; else if (kind !== 'actors') facts.field = FIELD_LABEL[r.field] || r.field;
   if (kind === 'actors' && r.verifiedFilms.length) facts.films = r.verifiedFilms.join(', ');
   const life = r.born != null ? ` (${yr(r.born)}${r.died != null ? '–' + yr(r.died) : ''})` : '';
   return {
-    id: slug(r.name), name: r.name, alt: r.alt, group: kind === 'artists' ? r.field : kind === 'actors' ? era(r.born) : FIELD_LABEL[r.field] || r.field,
+    id: slug(r.name), name: r.name, alt: r.alt, group: kind === 'artists' ? r.field : kind === 'actors' ? facts.era : FIELD_LABEL[r.field] || r.field,
     facts, blurb: `${r.name}${life}: ${r.clues[r.clues.length - 1].replace(/^(He|She|They) (was|is) /, '').replace(/^(He|She) /, '')}.`.replace(/: ([a-z])/, (m, c) => ': ' + c.toUpperCase()),
     clues, media: { img: r.img }, difficulty: r.d,
   };

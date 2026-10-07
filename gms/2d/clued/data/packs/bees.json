@@ -41,6 +41,15 @@
    "no": "Lives alone",
    "askBool": "Which of these lives in a colony with a queen?",
    "stmt": "The {lname} lives in a colony with a queen."
+  },
+  "lengthMm": {
+   "type": "num",
+   "label": "Typical length (worker or female)",
+   "unit": "mm",
+   "higherLabel": "Bigger",
+   "askHigh": "Which of these is the biggest?",
+   "askLow": "Which of these is the smallest?",
+   "askNumber": "About how long is {name} (a worker or female), in millimetres?"
   }
  },
  "items": [
@@ -123,7 +132,8 @@
    "facts": {
     "kind": "Bee",
     "stings": true,
-    "social": true
+    "social": true,
+    "lengthMm": 14
    },
    "lookalikes": [
     "red-tailed-bumblebee",
@@ -243,7 +253,8 @@
    "facts": {
     "kind": "Bee",
     "stings": true,
-    "social": true
+    "social": true,
+    "lengthMm": 12
    },
    "lookalikes": [
     "buff-tailed-bumblebee"
@@ -415,7 +426,8 @@
    "facts": {
     "kind": "Bee",
     "stings": true,
-    "social": false
+    "social": false,
+    "lengthMm": 11
    },
    "blurb": "A gingery solitary bee that nests in holes and seals each cell with mud. It loves bee hotels.",
    "clues": [
@@ -468,7 +480,8 @@
    "facts": {
     "kind": "Bee",
     "stings": true,
-    "social": false
+    "social": false,
+    "lengthMm": 11
    },
    "blurb": "An Australian bee with shiny blue stripes. It shakes pollen out of flowers by buzzing.",
    "clues": [
@@ -579,7 +592,8 @@
    "facts": {
     "kind": "Bee",
     "stings": false,
-    "social": true
+    "social": true,
+    "lengthMm": 4
    },
    "blurb": "A tiny black Australian bee that cannot sting. Its hives make a small amount of tangy honey.",
    "clues": [
@@ -688,7 +702,8 @@
    "facts": {
     "kind": "Wasp",
     "stings": true,
-    "social": true
+    "social": true,
+    "lengthMm": 15
    },
    "lookalikes": [
     "honey-bee",
@@ -759,7 +774,8 @@
    "facts": {
     "kind": "Wasp",
     "stings": true,
-    "social": true
+    "social": true,
+    "lengthMm": 13
    },
    "lookalikes": [
     "common-wasp"
@@ -821,7 +837,8 @@
    "facts": {
     "kind": "Hornet",
     "stings": true,
-    "social": true
+    "social": true,
+    "lengthMm": 25
    },
    "lookalikes": [
     "common-wasp",
@@ -889,7 +906,8 @@
    "facts": {
     "kind": "Hornet",
     "stings": true,
-    "social": true
+    "social": true,
+    "lengthMm": 40
    },
    "lookalikes": [
     "european-hornet",
@@ -954,7 +972,8 @@
    "facts": {
     "kind": "Hornet",
     "stings": true,
-    "social": true
+    "social": true,
+    "lengthMm": 20
    },
    "lookalikes": [
     "european-hornet",
@@ -1015,7 +1034,8 @@
    "facts": {
     "kind": "Wasp",
     "stings": true,
-    "social": true
+    "social": true,
+    "lengthMm": 19
    },
    "blurb": "A black-and-white wasp of North America that builds big grey paper nests in trees. It is really a yellowjacket, not a true hornet.",
    "clues": [
@@ -1133,7 +1153,8 @@
    "facts": {
     "kind": "Wasp",
     "stings": true,
-    "social": false
+    "social": false,
+    "lengthMm": 26
    },
    "blurb": "A thin-waisted solitary wasp that builds nests of mud and stocks them with paralysed spiders.",
    "clues": [
@@ -1353,7 +1374,8 @@
    "facts": {
     "kind": "Wasp",
     "stings": true,
-    "social": false
+    "social": false,
+    "lengthMm": 19
    },
    "blurb": "A fuzzy red-and-black wingless insect that looks like an ant but is really a wasp. Its sting is very painful.",
    "clues": [
@@ -1408,7 +1430,8 @@
    "facts": {
     "kind": "Wasp",
     "stings": true,
-    "social": false
+    "social": false,
+    "lengthMm": 22
    },
    "blurb": "A shiny green wasp that stings a cockroach in the brain, then leads it to its burrow like a dog on a lead.",
    "clues": [
@@ -1517,7 +1540,8 @@
    "facts": {
     "kind": "Fly",
     "stings": false,
-    "social": false
+    "social": false,
+    "lengthMm": 10.5
    },
    "lookalikes": [
     "common-wasp",
@@ -1583,7 +1607,8 @@
    "facts": {
     "kind": "Fly",
     "stings": false,
-    "social": false
+    "social": false,
+    "lengthMm": 9
    },
    "lookalikes": [
     "buff-tailed-bumblebee"

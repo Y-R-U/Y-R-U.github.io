@@ -250,6 +250,13 @@ const CLASSICAL = [
   { file: 'File:Bach; Chaconne d-moll Heifetz.flac', title: 'Chaconne in D minor (Partita No. 2)', alt: ['Chaconne'], composer: 'Johann Sebastian Bach', year: 1720, d: 3, maxStart: 40 },
 ];
 
+// textbook period of each composer; Debussy (impressionist) has none
+const ERA = {
+  'Johann Sebastian Bach': 'Baroque', 'George Frideric Handel': 'Baroque', 'Antonio Vivaldi': 'Baroque', 'Johann Pachelbel': 'Baroque',
+  'Wolfgang Amadeus Mozart': 'Classical', 'Edvard Grieg': 'Romantic', 'Johann Strauss II': 'Romantic', 'Pyotr Ilyich Tchaikovsky': 'Romantic',
+  'Antonín Dvořák': 'Romantic', 'Georges Bizet': 'Romantic', 'Edward Elgar': 'Romantic',
+};
+
 async function classical() {
   const info = await audioInfo(CLASSICAL.map((c) => c.file));
   const items = [], dropped = [];
@@ -259,7 +266,7 @@ async function classical() {
     if (!(await headOk(a.src))) { dropped.push(`${c.title}: not reachable`); continue; }
     items.push({
       id: slug(c.title).slice(0, 50), name: c.title, alt: c.alt, group: c.composer,
-      facts: { composer: c.composer, year: c.year },
+      facts: { composer: c.composer, year: c.year, ...(ERA[c.composer] ? { era: ERA[c.composer] } : {}) },
       blurb: `${c.title} by ${c.composer} (${c.yearNote ? c.yearNote + ' ' : ''}${c.year}). Recording: ${a.credit}.`,
       media: { audio: [audioObj(a, { minStart: c.minStart ?? 2, maxStart: c.maxStart })] },
       difficulty: c.d,
@@ -267,7 +274,8 @@ async function classical() {
   }
   write({
     id: 'classical-recordings', title: 'Classical recordings', theme: 'music', icon: '🎻', kids: false, version: 1,
-    factsMeta: { composer: { type: 'cat', label: 'Composer' }, year: { type: 'year', label: 'Written', higherLabel: 'Later' } },
+    factsMeta: { composer: { type: 'cat', label: 'Composer' }, year: { type: 'year', label: 'Written', higherLabel: 'Later' },
+      era: { type: 'cat', label: 'Period', values: ['Baroque', 'Classical', 'Romantic'], ask: 'Which period of music is {name} from?', askReverse: 'Which of these is from the {value} period?', stmt: '{name} is from the {value} period.' } },
     items, questions: [],
     sources: [{ name: 'Wikimedia Commons (Musopen, US military bands, PDP-CH and CC BY recordings; licence per file)', url: 'https://commons.wikimedia.org' }],
   }, dropped);

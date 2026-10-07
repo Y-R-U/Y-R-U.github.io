@@ -50,6 +50,15 @@
    "higherLabel": "Bigger",
    "askHigh": "Which of these spiders has the biggest leg span?",
    "askLow": "Which of these spiders has the smallest leg span?"
+  },
+  "bodyMm": {
+   "type": "num",
+   "label": "Body length (adult female)",
+   "unit": "mm",
+   "higherLabel": "Bigger",
+   "askHigh": "Which of these spiders has the biggest body?",
+   "askLow": "Which of these spiders has the smallest body?",
+   "askNumber": "How long is {name}'s body (adult female, not counting legs), in millimetres?"
   }
  },
  "items": [
@@ -123,7 +132,8 @@
    "facts": {
     "danger": "Dangerous",
     "region": "Australia",
-    "web": true
+    "web": true,
+    "bodyMm": 10
    },
    "lookalikes": [
     "black-widow",
@@ -187,7 +197,8 @@
    "facts": {
     "danger": "Mildly venomous",
     "region": "Australia",
-    "web": false
+    "web": false,
+    "bodyMm": 15
    },
    "blurb": "A slim, dark Australian spider that hunts other spiders at night. Its bite is painful but it does not cause flesh to rot.",
    "clues": [
@@ -300,7 +311,8 @@
    "facts": {
     "danger": "Harmless",
     "region": "Australia",
-    "web": true
+    "web": true,
+    "bodyMm": 35
    },
    "lookalikes": [
     "european-garden-spider"
@@ -528,7 +540,8 @@
    "facts": {
     "danger": "Harmless",
     "region": "Australia",
-    "web": false
+    "web": false,
+    "bodyMm": 5
    },
    "blurb": "A tiny Australian jumping spider. The male raises a brightly coloured flap and dances to win a mate.",
    "differences": {
@@ -587,7 +600,8 @@
    "facts": {
     "danger": "Harmless",
     "region": "Australia",
-    "web": true
+    "web": true,
+    "bodyMm": 13
    },
    "lookalikes": [
     "wasp-spider"
@@ -647,7 +661,8 @@
    "facts": {
     "danger": "Mildly venomous",
     "region": "Australia",
-    "web": true
+    "web": true,
+    "bodyMm": 15
    },
    "lookalikes": [
     "redback-spider"
@@ -770,7 +785,8 @@
    "facts": {
     "danger": "Harmless",
     "region": "Australia",
-    "web": true
+    "web": true,
+    "bodyMm": 10
    },
    "blurb": "A small spiny orb-weaver that appears in Australian gardens in early summer, often in big groups.",
    "clues": [
@@ -882,7 +898,8 @@
    "facts": {
     "danger": "Dangerous",
     "region": "the Americas",
-    "web": true
+    "web": true,
+    "bodyMm": 10
    },
    "lookalikes": [
     "redback-spider",
@@ -1011,7 +1028,8 @@
    "facts": {
     "danger": "Dangerous",
     "region": "the Americas",
-    "web": false
+    "web": false,
+    "bodyMm": 10
    },
    "blurb": "A shy brown spider of the central USA with a violin-shaped mark. Rarely, its bite causes a slow-healing wound.",
    "clues": [
@@ -1116,7 +1134,8 @@
    "facts": {
     "danger": "Dangerous",
     "region": "Africa",
-    "web": false
+    "web": false,
+    "bodyMm": 10
    },
    "blurb": "A flat spider of southern African deserts that buries itself in sand to ambush prey. It can live a year without food.",
    "clues": [
@@ -1164,7 +1183,8 @@
     "danger": "Mildly venomous",
     "region": "the Americas",
     "web": false,
-    "legSpanCm": 28
+    "legSpanCm": 28,
+    "bodyMm": 100
    },
    "lookalikes": [
     "mexican-red-knee-tarantula"
@@ -1228,7 +1248,8 @@
     "danger": "Harmless",
     "region": "the Americas",
     "web": false,
-    "legSpanCm": 15
+    "legSpanCm": 15,
+    "bodyMm": 53
    },
    "lookalikes": [
     "goliath-birdeater",
@@ -1413,7 +1434,8 @@
    "facts": {
     "danger": "Harmless",
     "region": "Europe",
-    "web": true
+    "web": true,
+    "bodyMm": 13
    },
    "lookalikes": [
     "australian-golden-orb-weaver"
@@ -1471,7 +1493,8 @@
    "facts": {
     "danger": "Harmless",
     "region": "Europe",
-    "web": true
+    "web": true,
+    "bodyMm": 17
    },
    "lookalikes": [
     "yellow-garden-spider",
@@ -1537,7 +1560,8 @@
    "facts": {
     "danger": "Harmless",
     "region": "the Americas",
-    "web": true
+    "web": true,
+    "bodyMm": 24
    },
    "lookalikes": [
     "wasp-spider"
@@ -1587,7 +1611,8 @@
    "facts": {
     "danger": "Harmless",
     "region": "many parts of the world",
-    "web": false
+    "web": false,
+    "bodyMm": 7
    },
    "lookalikes": [
     "bold-jumping-spider"
@@ -1649,7 +1674,8 @@
    "facts": {
     "danger": "Harmless",
     "region": "the Americas",
-    "web": false
+    "web": false,
+    "bodyMm": 12
    },
    "lookalikes": [
     "zebra-jumping-spider",
@@ -1712,7 +1738,8 @@
    "facts": {
     "danger": "Harmless",
     "region": "the Americas",
-    "web": false
+    "web": false,
+    "bodyMm": 15
    },
    "lookalikes": [
     "bold-jumping-spider"
@@ -1775,7 +1802,8 @@
    "facts": {
     "danger": "Harmless",
     "region": "Europe",
-    "web": false
+    "web": false,
+    "bodyMm": 10
    },
    "blurb": "The only spider that lives almost its whole life underwater. It breathes from a silk bubble of air it fills itself.",
    "clues": [
@@ -1829,7 +1857,8 @@
    "facts": {
     "danger": "Harmless",
     "region": "Europe",
-    "web": false
+    "web": false,
+    "bodyMm": 15
    },
    "blurb": "A large European spider that sits at the edge of ponds and runs across the water to catch insects and tiny fish.",
    "clues": [
@@ -1885,7 +1914,8 @@
    "facts": {
     "danger": "Harmless",
     "region": "Africa",
-    "web": true
+    "web": true,
+    "bodyMm": 20
    },
    "blurb": "A spider from Madagascar that spins the biggest webs known, right across rivers. Its silk is the toughest known.",
    "clues": [
@@ -1996,7 +2026,8 @@
    "facts": {
     "danger": "Harmless",
     "region": "many parts of the world",
-    "web": false
+    "web": false,
+    "bodyMm": 8
    },
    "blurb": "A crab spider that waits on flowers to grab bees and butterflies. It can slowly change between white and yellow.",
    "clues": [
@@ -2233,7 +2264,8 @@
    "facts": {
     "danger": "Harmless",
     "region": "Europe",
-    "web": true
+    "web": true,
+    "bodyMm": 10
    },
    "lookalikes": [
     "giant-house-spider"
@@ -2294,7 +2326,8 @@
    "facts": {
     "danger": "Harmless",
     "region": "many parts of the world",
-    "web": false
+    "web": false,
+    "bodyMm": 13
    },
    "blurb": "A reddish spider with huge jaws that hunts woodlice, which most other spiders avoid.",
    "clues": [

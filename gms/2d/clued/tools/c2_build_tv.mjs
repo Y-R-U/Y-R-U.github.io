@@ -1,8 +1,8 @@
 // Builds the tv pack: famous long-running shows (start year cross-checked with Wikidata) + hand-written questions.
 import { writeFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { ROOT, wpQids, wdEntities, claims, wdYear, writePack, slug, rng, sample, parseQuestions } from './c2_lib.mjs';
-import { SHOWS, TV_QS } from './c2_src/tv.mjs';
+import { ROOT, wpQids, wdEntities, claims, wdYear, writePack, slug, rng, sample, parseQuestions, fetchJSON, wikiquoteCheck, leaks } from './c2_lib.mjs';
+import { SHOWS, TV_QS, TV_QUOTES } from './c2_src/tv.mjs';
 
 const report = [];
 const note = s => report.push(s);
@@ -26,6 +26,27 @@ const items = rows.filter(r => !r.drop).map(r => {
     difficulty: r.d,
   };
 });
+// Catchphrases: Wikiquote search for the exact line, then wikiquoteCheck on the hits that are the show's own pages
+// (TV pages are often split by season: "Friends (season 1)", "The Simpsons/Season 4").
+const wqBase = t => t.replace(/\s*\((US|UK)\)$/, '');
+const WQ_PAGES = { 'Star Trek': ['Star Trek: The Original Series'], 'The Office (US)': ['The Office (American TV series)'] };
+for (const it of items) {
+  const line = TV_QUOTES[it.name];
+  if (!line) continue;
+  if (line.split(/\s+/).length > 10) { note(`tv quote too long ${it.name}`); continue; }
+  if (leaks(line, [it.name, ...(it.alt || [])])) { note(`tv quote leaks the title ${it.name}: ${line}`); continue; }
+  let hits = [];
+  try {
+    const j = await fetchJSON('https://en.wikiquote.org/w/api.php?action=query&list=search&format=json&srlimit=20&srsearch=' + encodeURIComponent(`"${line.replace(/[!?.]$/, '')}"`));
+    hits = (j.query?.search || []).map(h => h.title);
+  } catch (e) { note(`wikiquote search failed ${it.name}: ${e.message}`); }
+  const base = wqBase(rows.find(r => r.name === it.name)?.title || it.name).toLowerCase();
+  // the show's own pages only: "<base>", "<base> (season 3)", "<base>/Season 3", "<base> (TV series)"; never films or spin-offs
+  const ownPage = t => { const l = t.toLowerCase(); return (WQ_PAGES[it.name] || []).includes(t) || l === base || (l.startsWith(base) && /^( \((season|series) \d+\)|\/season \d+| \(([a-z]+ )?tv series\))$/.test(l.slice(base.length))); };
+  const own = hits.filter(ownPage);
+  const res = own.length ? await wikiquoteCheck(own, line) : { ok: false };
+  if (res.ok) { it.quote = line; it.quoteSource = res.url; } else note(`tv quote NOT verified ${it.name}: ${line} (search hits: ${hits.slice(0, 5).join(' / ') || 'none'})`);
+}
 const rr = rng('tv');
 const questions = [];
 for (const it of items) {
@@ -35,7 +56,7 @@ for (const it of items) {
   questions.push({ id: `year-${it.id}`, kind: 'mc', prompt: `In which year was ${it.name} first shown?`, answer: String(it.facts.year), wrong: wy, explain: it.blurb, difficulty: 3, refs: [`tv/${it.id}`] });
 }
 writePack({
-  id: 'tv', title: 'TV shows', theme: 'screen', icon: '📺', kids: false, version: 1,
+  id: 'tv', title: 'TV shows', theme: 'screen', icon: '📺', kids: false, version: 1, quotePrompt: 'Which TV show is this line from?',
   factsMeta: {
     year: { type: 'year', label: 'First shown', matchPrompt: 'Match each show to the year it was first shown', askNumber: 'In what year was {name} first shown?', higherLabel: 'Newer', askHigh: 'Which of these shows started most recently?', askLow: 'Which of these shows started first?' },
     country: { type: 'cat', label: 'Country of origin', ask: 'Which country does {name} come from?', stmt: 'Country of origin of {name}: {value}.' },
@@ -43,7 +64,7 @@ writePack({
     kids: { type: 'bool', label: "Children's show", yes: "Children's show", no: 'Not a children’s show', askBool: "Which of these is a children's show?", stmt: "{name} is a children's show." },
   },
   items, questions: [...questions, ...parseQuestions(TV_QS, 'tvq')],
-  sources: [{ name: 'Wikidata (start dates)', url: 'https://www.wikidata.org' }, { name: 'Wikipedia articles for each show', url: 'https://en.wikipedia.org' }],
+  sources: [{ name: 'Wikidata (start dates)', url: 'https://www.wikidata.org' }, { name: 'Wikipedia articles for each show', url: 'https://en.wikipedia.org' }, { name: 'Wikiquote (catchphrases)', url: 'https://en.wikiquote.org' }],
 });
 writeFileSync(join(ROOT, 'tools/c2_reports/tv.txt'), report.join('\n') + '\n');
 console.log(report.join('\n'));

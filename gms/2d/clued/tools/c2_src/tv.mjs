@@ -119,3 +119,39 @@ tf|3|Doctor Who's first episode aired the day after President Kennedy was assass
 tf|3|Coronation Street began in 1960.|true|Its first episode aired on 9 December 1960.
 mc|2|In The Office (US, 2005), what is the paper company called?|Dunder Mifflin|Wernham Hogg;Sabre;Staples|The British original was set at Wernham Hogg.
 `;
+
+// Catchphrases for the quote format: display name -> line. c2_build_tv keeps a line only if it is found on one of the
+// show's own Wikiquote pages (outside Misattributed/Disputed/About sections); 10 words or fewer, as for films.
+export const TV_QUOTES = {
+  'Doctor Who': 'Exterminate!',
+  'The Simpsons': "D'oh!",
+  'Friends': "How you doin'?",
+  'Star Trek': 'Live long and prosper.',
+  'Seinfeld': 'No soup for you!',
+  'Fawlty Towers': "Don't mention the war!",
+  'Only Fools and Horses': 'Lovely jubbly!',
+  'The X-Files': 'The truth is out there.',
+  'Game of Thrones': 'Winter is coming.',
+  'Breaking Bad': 'I am the one who knocks!',
+  'The Big Bang Theory': 'Bazinga!',
+  "Dad's Army": "Don't panic!",
+  'Blackadder': 'I have a cunning plan.',
+  "Monty Python's Flying Circus": 'And now for something completely different.',
+  'Teletubbies': 'Eh-oh!',
+  'The Flintstones': 'Yabba dabba doo!',
+  'The Mandalorian': 'This is the way.',
+  'Who Wants to Be a Millionaire?': 'Is that your final answer?',
+  'The Office (US)': "That's what she said!",
+  'Frasier': "I'm listening.",
+  'Lost': 'We have to go back!',
+  'Twin Peaks': 'Damn fine cup of coffee.',
+  'Downton Abbey': 'What is a weekend?',
+  'Top Gear': 'How hard can it be?',
+  'SpongeBob SquarePants': "I'm ready!",
+  'Pokémon': 'I choose you!',
+  'Blue Peter': "Here's one I made earlier.",
+  'Ted Lasso': 'Football is life!',
+  'Strictly Come Dancing': 'Keep dancing!',
+  'Scooby-Doo, Where Are You!': 'Zoinks!',
+  'Sesame Street': 'Me want cookie!',
+};

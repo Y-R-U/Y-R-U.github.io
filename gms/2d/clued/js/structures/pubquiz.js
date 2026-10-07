@@ -1,17 +1,18 @@
 // Pub quiz: 4–8 rounds of different formats/themes, one double-points joker per player, builder or "surprise me".
-import { playSpec } from './session.js?v=202610071242';
-import { makeSpec, supportedPackIds } from '../core/spec.js?v=202610071242';
-import { handoff } from './handoff.js?v=202610071242';
-import { playersEditor } from './party.js?v=202610071242';
-import { defineScreen, go, back, header } from '../ui/app.js?v=202610071242';
-import { h, esc, fmtNum } from '../ui/kit.js?v=202610071242';
-import { popup, toast } from '../ui/popup.js?v=202610071242';
-import { listFormats, getFormat, defaultOpts } from '../formats/registry.js?v=202610071242';
-import { getIndex } from '../core/packs.js?v=202610071242';
-import { getSettings, read, write } from '../core/store.js?v=202610071242';
-import { optionsPanel } from '../ui/setup.js?v=202610071242';
-import { rngFrom, pick, shuffle, randomSeed } from '../core/rng.js?v=202610071242';
-import { sfx } from '../ui/fx.js?v=202610071242';
+import { playSpec } from './session.js?v=202610071324';
+import { makeSpec, supportedPackIds } from '../core/spec.js?v=202610071324';
+import { handoff } from './handoff.js?v=202610071324';
+import { playersEditor } from './party.js?v=202610071324';
+import { defineScreen, go, back, header } from '../ui/app.js?v=202610071324';
+import { h, esc, fmtNum } from '../ui/kit.js?v=202610071324';
+import { popup, toast } from '../ui/popup.js?v=202610071324';
+import { listFormats, getFormat, defaultOpts } from '../formats/registry.js?v=202610071324';
+import { getIndex } from '../core/packs.js?v=202610071324';
+import { getSettings, read, write, getFavs } from '../core/store.js?v=202610071324';
+import { cleanFav, favKey } from '../ui/favmodel.js?v=202610071324';
+import { optionsPanel } from '../ui/setup.js?v=202610071324';
+import { rngFrom, pick, shuffle, randomSeed } from '../core/rng.js?v=202610071324';
+import { sfx } from '../ui/fx.js?v=202610071324';
 
 const KEY = 'clued.pubquiz';
 const MAX_ROUNDS = 8;
@@ -33,7 +34,32 @@ const packsLabel = packs => {
 const roundTitle = r => r.title || `${getFormat(r.format)?.title || r.format}`;
 const usable = (kids) => listFormats().filter(f => !f.hidden && supportedPackIds(f, getIndex(), { kids }).length);
 
+// The first round of each format uses one of the player's saved favourites for it, if any (packs, options, difficulty).
+// A round's own preset options (Picture round = pictures) win, and the final keeps its difficulty.
+function withFavs(rounds, rng, kids, idx) {
+  const done = new Set();
+  return rounds.map(r => {
+    const fmt = getFormat(r.format);
+    if (!fmt || done.has(r.format) || r.title === 'The final') return r;
+    done.add(r.format);
+    const saved = getFavs(favKey(fmt, kids)).filter(Boolean);
+    if (!saved.length) return r;
+    const c = cleanFav(pick(rng, saved), fmt, idx, { kids });
+    if (!c) return r;
+    const out = { ...r, opts: { ...r.opts, ...c.opts, ...(r.preset || {}) }, fav: true };
+    if (!fmt.packless && Array.isArray(c.packs)) out.packs = c.packs;
+    if (!kids && c.difficulty != null) out.difficulty = c.difficulty;
+    if (Array.isArray(out.packs) && out.packs === c.packs && /: /.test(r.title || '')) out.title = fmt.title; // "Science: Odd one out" no longer fits the fav's packs
+    return out;
+  });
+}
+
 export function surprise(seed = randomSeed(), kids = false) {
+  const rounds = surpriseBase(seed, kids);
+  return withFavs(rounds, rngFrom(`pubfav:${seed}`), kids, getIndex()).map(({ preset, ...r }) => r);
+}
+
+function surpriseBase(seed, kids) {
   const rng = rngFrom(`pub:${seed}`);
   const idx = getIndex();
   const fmts = usable(kids);
@@ -46,7 +72,7 @@ export function surprise(seed = randomSeed(), kids = false) {
     const kf = shuffle(rng, fmts.filter(f => f.kids && !['mc', 'tf'].includes(f.id)));
     for (const f of kf.slice(0, 2)) rounds.push({ format: f.id, title: f.title });
     while (rounds.length < 4 && has('mc')) rounds.push({ format: 'mc', opts: { answers: 3 }, title: rounds.length === 3 ? 'The final' : 'Mixed bag' });
-    return rounds.slice(0, 4).map(r => ({ packs: 'all', count: 5, difficulty: 1, ...r, opts: { ...defaultOpts(getFormat(r.format)), ...(r.opts || {}) } }));
+    return rounds.slice(0, 4).map(r => ({ packs: 'all', count: 5, difficulty: 1, ...r, preset: r.opts, opts: { ...defaultOpts(getFormat(r.format)), ...(r.opts || {}) } }));
   }
   if (has('mc')) rounds.push({ format: 'mc', opts: { source: 'pictures' }, title: 'Picture round' });
   const music = tagged('music')[0]; if (music) rounds.push({ format: music.id, title: 'Music round' });
@@ -64,7 +90,7 @@ export function surprise(seed = randomSeed(), kids = false) {
     rounds.push({ format: 'mc', packs: t ? t.packs : 'all', title: t ? `${t.title}` : 'General knowledge' });
   }
   if (has('mc')) rounds.push({ format: 'mc', difficulty: 3, count: 5, title: 'The final' });
-  return rounds.map(r => ({ packs: 'all', count: 6, difficulty: 0, ...r, opts: { ...defaultOpts(getFormat(r.format)), ...(r.opts || {}) } }));
+  return rounds.map(r => ({ packs: 'all', count: 6, difficulty: 0, ...r, preset: r.opts, opts: { ...defaultOpts(getFormat(r.format)), ...(r.opts || {}) } }));
 }
 
 async function pickFormat(kids) {
@@ -114,7 +140,7 @@ defineScreen('pubquiz', el => {
       const f = getFormat(r.format);
       list.append(h('div.round-card', { dataset: { round: String(i) } },
         h('span.r-ico', {}, f?.icon || '❓'),
-        h('div', {}, h('div.r-t', {}, `${i + 1}. ${roundTitle(r)}`), h('div.r-s', {}, `${r.count} questions · ${packsLabel(r.packs)}${f ? '' : ' · format missing'}`), h('div.jokers', { dataset: { r: String(i) } })),
+        h('div', {}, h('div.r-t', {}, `${i + 1}. ${roundTitle(r)}`, r.fav ? h('span.r-fav', { title: 'From your favourites' }, ' ♥') : null), h('div.r-s', {}, `${r.count} questions · ${packsLabel(r.packs)}${f ? '' : ' · format missing'}`), h('div.jokers', { dataset: { r: String(i) } })),
         h('div.row', { style: { gap: '6px' } },
           h('button.icon-btn', { type: 'button', 'aria-label': 'Edit round', onclick: () => go('pqround', { idx: i, format: r.format }) }, '✎'),
           h('button.icon-btn', { type: 'button', 'aria-label': 'Remove round', onclick: () => { s.rounds.splice(i, 1); s.jokers = {}; save(); draw(); } }, '✕'))));

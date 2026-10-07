@@ -1,7 +1,7 @@
-import { register, poolItems, pickPack, byDifficulty, distractors, imageOf, placeAnswer, collect, pick } from './registry.js?v=202610071242';
-import { h, choiceGrid, typeBox } from '../ui/kit.js?v=202610071242';
-import { fuzzyMatch, answersFor } from '../core/fuzzy.js?v=202610071242';
-import { norm, injectCSS, baseCSS, stages, once, hasImg } from './fkit.js?v=202610071242';
+import { register, poolItems, pickPack, byDifficulty, distractors, imageOf, placeAnswer, collect, pick, isIucn } from './registry.js?v=202610071324';
+import { h, choiceGrid, typeBox } from '../ui/kit.js?v=202610071324';
+import { fuzzyMatch, answersFor } from '../core/fuzzy.js?v=202610071324';
+import { norm, injectCSS, baseCSS, stages, once, hasImg } from './fkit.js?v=202610071324';
 
 const CSS = `
 .ld{gap:10px}
@@ -57,7 +57,7 @@ function make(rng, pack, opts, difficulty, kids) {
   const pool = byDifficulty(all.filter(c => usableClues(c.item).length >= 5), difficulty, 4, c => c.item.difficulty || 2);
   if (!pool.length) return null;
   const t = pick(rng, pool);
-  const clues = spread(usableClues(t.item), want);
+  const clues = spread(usableClues(t.item).filter(c => !kids || !isIucn({ label: c })), want);
   if (clues.length < 5) return null;
   const q = {
     format: 'ladder', id: `ladder:${t.ref}`, prompt: typed ? 'Name it from the clues' : 'Which one is it?',

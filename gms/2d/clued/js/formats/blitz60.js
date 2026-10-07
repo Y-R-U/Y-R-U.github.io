@@ -1,7 +1,7 @@
-import { register, poolItems, pickPack, collect, pick, factText } from './registry.js?v=202610071242';
-import { h, typeBox } from '../ui/kit.js?v=202610071242';
-import { fuzzyMatch, distance, answersFor } from '../core/fuzzy.js?v=202610071242';
-import { norm, injectCSS, baseCSS, ownClock, once } from './fkit.js?v=202610071242';
+import { register, poolItems, pickPack, collect, pick, factText, isIucn, lcLabel } from './registry.js?v=202610071324';
+import { h, typeBox } from '../ui/kit.js?v=202610071324';
+import { fuzzyMatch, distance, answersFor } from '../core/fuzzy.js?v=202610071324';
+import { norm, injectCSS, baseCSS, ownClock, once } from './fkit.js?v=202610071324';
 
 const CSS = `
 .bz{gap:10px}
@@ -36,11 +36,11 @@ function categories(pack) {
   const title = pack.title || pack.id;
   if (items.length >= 6) out.push({ label: title, test: () => true, key: '*' });
   for (const [key, m] of Object.entries(pack.factsMeta || {})) {
-    if (m.hard) continue;
+    if (m.hard || isIucn(m)) continue;
     if (m.type === 'cat') {
       const counts = {};
       for (const it of items) for (const v of [].concat(it.facts?.[key] ?? [])) counts[v] = (counts[v] || 0) + 1;
-      for (const [v, c] of Object.entries(counts)) if (c >= 6 && c < items.length) out.push({ label: `${title} (${String(m.label || key).toLowerCase()}: ${v})`, key: `${key}=${v}`, test: it => [].concat(it.facts?.[key] ?? []).map(String).includes(v) });
+      for (const [v, c] of Object.entries(counts)) if (c >= 6 && c < items.length) out.push({ label: `${title} (${lcLabel(m.label || key)}: ${v})`, key: `${key}=${v}`, test: it => [].concat(it.facts?.[key] ?? []).map(String).includes(v) });
     } else if (m.type === 'bool') {
       const c = items.filter(it => it.facts?.[key] === true).length;
       if (c >= 6 && c < items.length) out.push({ label: `${title}: ${factText(m, true).toLowerCase()}`, key: `${key}=true`, test: it => it.facts?.[key] === true });

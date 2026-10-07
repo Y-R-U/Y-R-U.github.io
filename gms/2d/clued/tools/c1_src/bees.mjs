@@ -1,8 +1,8 @@
-import { NOT_ID, INAT, WD } from './_common.mjs';
+import { NOT_ID, INAT, WD, addFacts } from './_common.mjs';
 
 const f = (kind, stings, social) => ({ kind, stings, social });
 
-export default {
+const PACK = {
   id: 'bees', title: 'Wasps, bees & hornets', theme: 'animals', icon: '🐝', kids: true, notice: NOT_ID,
   noun: 'insect', fakePrompt: 'Which of these wasps, bees and hornets is made up?',
   leakExempt: [],
@@ -11,11 +11,12 @@ export default {
     kind: { type: 'cat', label: 'Kind', values: ['Bee', 'Wasp', 'Hornet', 'Fly'], noClue: true },
     stings: { type: 'bool', label: 'Can sting', yes: 'Can sting', no: 'Cannot sting', clue: v => (v ? 'Females can sting.' : 'It cannot sting.') },
     social: { type: 'bool', label: 'Lives in colonies', yes: 'Lives in a colony', no: 'Lives alone', clue: v => (v ? 'It lives in a colony with a queen.' : 'It lives alone, not in a colony.') },
+    lengthMm: { type: 'num', label: 'Typical length (worker or female)', unit: 'mm', higherLabel: 'Bigger', noClue: true },
   },
   imgPrompt: "Which of these is {aName}?",
   nameImgPrompt: "Which insect is this?",
   tfImgPrompt: "This is {aName}.",
-  tpl: {"kind": {"ask": "Is the {lname} a bee, a wasp, a hornet or a fly?", "askReverse": "Which of these is a {lvalue}?", "stmt": "The {lname} is a {lvalue}."}, "stings": {"askBool": "Which of these can sting?", "stmt": "The {lname} can sting."}, "social": {"askBool": "Which of these lives in a colony with a queen?", "stmt": "The {lname} lives in a colony with a queen."}},
+  tpl: {"lengthMm": {"askHigh": "Which of these is the biggest?", "askLow": "Which of these is the smallest?", "askNumber": "About how long is {name} (a worker or female), in millimetres?"}, "kind": {"ask": "Is the {lname} a bee, a wasp, a hornet or a fly?", "askReverse": "Which of these is a {lvalue}?", "stmt": "The {lname} is a {lvalue}."}, "stings": {"askBool": "Which of these can sting?", "stmt": "The {lname} can sting."}, "social": {"askBool": "Which of these lives in a colony with a queen?", "stmt": "The {lname} lives in a colony with a queen."}},
   sources: [INAT, WD],
   items: [
     { n: 'Honey bee', alt: ['western honey bee', 'European honey bee', 'honeybee'], sci: 'Apis mellifera', g: 'bee', f: f('Bee', true, true), d: 1, look: ['Common wasp', 'Marmalade hoverfly'],
@@ -118,3 +119,14 @@ export default {
     { kind: 'mc', prompt: 'What colours are most wasps?', answer: 'Yellow and black', wrong: ['Red and blue', 'Green and white', 'Pink and purple'], explain: 'The bright colours warn that they can sting.', difficulty: 1 },
   ],
 };
+
+// Body length of a worker (social species) or female, midpoint of the range in each species' Wikipedia description.
+// Left out where no species size is given (honey bee, genus-level items, tarantula hawk "up to").
+addFacts(PACK.items, 'lengthMm', {
+  'Buff-tailed bumblebee': 14, 'Common carder bee': 12, 'Red mason bee': 11, 'Blue-banded bee': 11, 'Sugarbag bee': 4,
+  'Common wasp': 15, 'German wasp': 13, 'European hornet': 25, 'Asian giant hornet': 40, 'Asian hornet': 20,
+  'Bald-faced hornet': 19, 'Black and yellow mud dauber': 26, 'Velvet ant': 19, 'Emerald cockroach wasp': 22,
+  'Marmalade hoverfly': 10.5, 'Dark-edged bee-fly': 9,
+});
+
+export default PACK;

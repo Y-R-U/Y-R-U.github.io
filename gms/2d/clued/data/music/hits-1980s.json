@@ -19,6 +19,19 @@
   "decade": {
    "type": "cat",
    "label": "Decade"
+  },
+  "act": {
+   "type": "cat",
+   "label": "Act",
+   "values": [
+    "Male solo artist",
+    "Female solo artist",
+    "Group or duo",
+    "Duet or team-up"
+   ],
+   "ask": "Who recorded {name}: a solo singer, a group or a team-up?",
+   "askReverse": "Which of these hits is by {aValue}?",
+   "stmt": "{name} is by {aValue}."
   }
  },
  "items": [
@@ -29,7 +42,8 @@
    "facts": {
     "artist": "Blondie",
     "year": 1980,
-    "decade": "1980s"
+    "decade": "1980s",
+    "act": "Group or duo"
    },
    "blurb": "\"Call Me\" by Blondie, released in 1980.",
    "media": {
@@ -58,7 +72,8 @@
    "facts": {
     "artist": "Queen",
     "year": 1980,
-    "decade": "1980s"
+    "decade": "1980s",
+    "act": "Group or duo"
    },
    "blurb": "\"Another One Bites the Dust\" by Queen, released in 1980.",
    "media": {
@@ -87,7 +102,8 @@
    "facts": {
     "artist": "Queen",
     "year": 1979,
-    "decade": "1970s"
+    "decade": "1970s",
+    "act": "Group or duo"
    },
    "blurb": "\"Crazy Little Thing Called Love\" by Queen, released in 1979.",
    "media": {
@@ -116,7 +132,8 @@
    "facts": {
     "artist": "Olivia Newton-John",
     "year": 1980,
-    "decade": "1980s"
+    "decade": "1980s",
+    "act": "Female solo artist"
    },
    "blurb": "\"Magic\" by Olivia Newton-John, released in 1980.",
    "media": {
@@ -145,7 +162,8 @@
    "facts": {
     "artist": "Michael Jackson",
     "year": 1979,
-    "decade": "1970s"
+    "decade": "1970s",
+    "act": "Male solo artist"
    },
    "blurb": "\"Rock with You\" by Michael Jackson, released in 1979.",
    "media": {
@@ -174,7 +192,8 @@
    "facts": {
     "artist": "Lipps Inc.",
     "year": 1980,
-    "decade": "1980s"
+    "decade": "1980s",
+    "act": "Group or duo"
    },
    "blurb": "\"Funkytown\" by Lipps Inc., released in 1980.",
    "media": {
@@ -203,7 +222,8 @@
    "facts": {
     "artist": "AC/DC",
     "year": 1980,
-    "decade": "1980s"
+    "decade": "1980s",
+    "act": "Group or duo"
    },
    "blurb": "\"Back in Black\" by AC/DC, released in 1980.",
    "media": {
@@ -232,7 +252,8 @@
    "facts": {
     "artist": "Kim Carnes",
     "year": 1981,
-    "decade": "1980s"
+    "decade": "1980s",
+    "act": "Female solo artist"
    },
    "blurb": "\"Bette Davis Eyes\" by Kim Carnes, released in 1981.",
    "media": {
@@ -261,7 +282,8 @@
    "facts": {
     "artist": "Diana Ross & Lionel Richie",
     "year": 1981,
-    "decade": "1980s"
+    "decade": "1980s",
+    "act": "Duet or team-up"
    },
    "blurb": "\"Endless Love\" by Diana Ross & Lionel Richie, released in 1981.",
    "media": {
@@ -290,7 +312,8 @@
    "facts": {
     "artist": "Kenny Rogers",
     "year": 1980,
-    "decade": "1980s"
+    "decade": "1980s",
+    "act": "Male solo artist"
    },
    "blurb": "\"Lady\" by Kenny Rogers, released in 1980.",
    "media": {
@@ -319,7 +342,8 @@
    "facts": {
     "artist": "Rick Springfield",
     "year": 1981,
-    "decade": "1980s"
+    "decade": "1980s",
+    "act": "Male solo artist"
    },
    "blurb": "\"Jessie's Girl\" by Rick Springfield, released in 1981.",
    "media": {
@@ -348,7 +372,8 @@
    "facts": {
     "artist": "Kool & The Gang",
     "year": 1980,
-    "decade": "1980s"
+    "decade": "1980s",
+    "act": "Group or duo"
    },
    "blurb": "\"Celebration\" by Kool & The Gang, released in 1980.",
    "media": {
@@ -380,7 +405,8 @@
    "facts": {
     "artist": "Dolly Parton",
     "year": 1980,
-    "decade": "1980s"
+    "decade": "1980s",
+    "act": "Female solo artist"
    },
    "blurb": "\"9 to 5\" by Dolly Parton, released in 1980.",
    "media": {
@@ -409,7 +435,8 @@
    "facts": {
     "artist": "Journey",
     "year": 1981,
-    "decade": "1980s"
+    "decade": "1980s",
+    "act": "Group or duo"
    },
    "blurb": "\"Don't Stop Believin'\" by Journey, released in 1981.",
    "media": {
@@ -438,7 +465,8 @@
    "facts": {
     "artist": "Soft Cell",
     "year": 1981,
-    "decade": "1980s"
+    "decade": "1980s",
+    "act": "Group or duo"
    },
    "blurb": "\"Tainted Love\" by Soft Cell, released in 1981.",
    "media": {
@@ -467,7 +495,8 @@
    "facts": {
     "artist": "The Human League",
     "year": 1981,
-    "decade": "1980s"
+    "decade": "1980s",
+    "act": "Group or duo"
    },
    "blurb": "\"Don't You Want Me\" by The Human League, released in 1981.",
    "media": {
@@ -496,7 +525,8 @@
    "facts": {
     "artist": "Olivia Newton-John",
     "year": 1981,
-    "decade": "1980s"
+    "decade": "1980s",
+    "act": "Female solo artist"
    },
    "blurb": "\"Physical\" by Olivia Newton-John, released in 1981.",
    "media": {
@@ -525,7 +555,8 @@
    "facts": {
     "artist": "Survivor",
     "year": 1982,
-    "decade": "1980s"
+    "decade": "1980s",
+    "act": "Group or duo"
    },
    "blurb": "\"Eye of the Tiger\" by Survivor, released in 1982.",
    "media": {
@@ -583,7 +614,8 @@
    "facts": {
     "artist": "Paul McCartney & Stevie Wonder",
     "year": 1982,
-    "decade": "1980s"
+    "decade": "1980s",
+    "act": "Duet or team-up"
    },
    "blurb": "\"Ebony and Ivory\" by Paul McCartney & Stevie Wonder, released in 1982.",
    "media": {
@@ -612,7 +644,8 @@
    "facts": {
     "artist": "John Cougar",
     "year": 1982,
-    "decade": "1980s"
+    "decade": "1980s",
+    "act": "Male solo artist"
    },
    "blurb": "\"Jack & Diane\" by John Cougar, released in 1982.",
    "media": {
@@ -641,7 +674,8 @@
    "facts": {
     "artist": "Dexys Midnight Runners",
     "year": 1982,
-    "decade": "1980s"
+    "decade": "1980s",
+    "act": "Group or duo"
    },
    "blurb": "\"Come On Eileen\" by Dexys Midnight Runners, released in 1982.",
    "media": {
@@ -670,7 +704,8 @@
    "facts": {
     "artist": "Toto",
     "year": 1982,
-    "decade": "1980s"
+    "decade": "1980s",
+    "act": "Group or duo"
    },
    "blurb": "\"Africa\" by Toto, released in 1982.",
    "media": {
@@ -699,7 +734,8 @@
    "facts": {
     "artist": "The Police",
     "year": 1983,
-    "decade": "1980s"
+    "decade": "1980s",
+    "act": "Group or duo"
    },
    "blurb": "\"Every Breath You Take\" by The Police, released in 1983.",
    "media": {
@@ -728,7 +764,8 @@
    "facts": {
     "artist": "Michael Jackson",
     "year": 1982,
-    "decade": "1980s"
+    "decade": "1980s",
+    "act": "Male solo artist"
    },
    "blurb": "\"Billie Jean\" by Michael Jackson, released in 1982.",
    "media": {
@@ -757,7 +794,8 @@
    "facts": {
     "artist": "Irene Cara",
     "year": 1983,
-    "decade": "1980s"
+    "decade": "1980s",
+    "act": "Female solo artist"
    },
    "blurb": "\"Flashdance... What a Feeling\" by Irene Cara, released in 1983.",
    "media": {
@@ -786,7 +824,8 @@
    "facts": {
     "artist": "Michael Jackson",
     "year": 1982,
-    "decade": "1980s"
+    "decade": "1980s",
+    "act": "Male solo artist"
    },
    "blurb": "\"Beat It\" by Michael Jackson, released in 1982.",
    "media": {
@@ -815,7 +854,8 @@
    "facts": {
     "artist": "Bonnie Tyler",
     "year": 1983,
-    "decade": "1980s"
+    "decade": "1980s",
+    "act": "Female solo artist"
    },
    "blurb": "\"Total Eclipse of the Heart\" by Bonnie Tyler, released in 1983.",
    "media": {
@@ -844,7 +884,8 @@
    "facts": {
     "artist": "Eurythmics",
     "year": 1983,
-    "decade": "1980s"
+    "decade": "1980s",
+    "act": "Group or duo"
    },
    "blurb": "\"Sweet Dreams (Are Made of This)\" by Eurythmics, released in 1983.",
    "media": {
@@ -873,7 +914,8 @@
    "facts": {
     "artist": "Culture Club",
     "year": 1983,
-    "decade": "1980s"
+    "decade": "1980s",
+    "act": "Group or duo"
    },
    "blurb": "\"Karma Chameleon\" by Culture Club, released in 1983.",
    "media": {
@@ -902,7 +944,8 @@
    "facts": {
     "artist": "Cyndi Lauper",
     "year": 1983,
-    "decade": "1980s"
+    "decade": "1980s",
+    "act": "Female solo artist"
    },
    "blurb": "\"Girls Just Want to Have Fun\" by Cyndi Lauper, released in 1983.",
    "media": {
@@ -931,7 +974,8 @@
    "facts": {
     "artist": "Prince",
     "year": 1984,
-    "decade": "1980s"
+    "decade": "1980s",
+    "act": "Male solo artist"
    },
    "blurb": "\"When Doves Cry\" by Prince, released in 1984.",
    "media": {
@@ -960,7 +1004,8 @@
    "facts": {
     "artist": "Tina Turner",
     "year": 1984,
-    "decade": "1980s"
+    "decade": "1980s",
+    "act": "Female solo artist"
    },
    "blurb": "\"What's Love Got to Do with It\" by Tina Turner, released in 1984.",
    "media": {
@@ -989,7 +1034,8 @@
    "facts": {
     "artist": "Van Halen",
     "year": 1983,
-    "decade": "1980s"
+    "decade": "1980s",
+    "act": "Group or duo"
    },
    "blurb": "\"Jump\" by Van Halen, released in 1983.",
    "media": {
@@ -1018,7 +1064,8 @@
    "facts": {
     "artist": "Kenny Loggins",
     "year": 1984,
-    "decade": "1980s"
+    "decade": "1980s",
+    "act": "Male solo artist"
    },
    "blurb": "\"Footloose\" by Kenny Loggins, released in 1984.",
    "media": {
@@ -1047,7 +1094,8 @@
    "facts": {
     "artist": "Ray Parker Jr.",
     "year": 1984,
-    "decade": "1980s"
+    "decade": "1980s",
+    "act": "Male solo artist"
    },
    "blurb": "\"Ghostbusters\" by Ray Parker Jr., released in 1984.",
    "media": {
@@ -1076,7 +1124,8 @@
    "facts": {
     "artist": "Madonna",
     "year": 1984,
-    "decade": "1980s"
+    "decade": "1980s",
+    "act": "Female solo artist"
    },
    "blurb": "\"Like a Virgin\" by Madonna, released in 1984.",
    "media": {
@@ -1105,7 +1154,8 @@
    "facts": {
     "artist": "Wham!",
     "year": 1984,
-    "decade": "1980s"
+    "decade": "1980s",
+    "act": "Group or duo"
    },
    "blurb": "\"Wake Me Up Before You Go-Go\" by Wham!, released in 1984.",
    "media": {
@@ -1134,7 +1184,8 @@
    "facts": {
     "artist": "George Michael",
     "year": 1984,
-    "decade": "1980s"
+    "decade": "1980s",
+    "act": "Male solo artist"
    },
    "blurb": "\"Careless Whisper\" by George Michael, released in 1984.",
    "media": {
@@ -1163,7 +1214,8 @@
    "facts": {
     "artist": "Foreigner",
     "year": 1984,
-    "decade": "1980s"
+    "decade": "1980s",
+    "act": "Group or duo"
    },
    "blurb": "\"I Want to Know What Love Is\" by Foreigner, released in 1984.",
    "media": {
@@ -1250,7 +1302,8 @@
    "facts": {
     "artist": "Tears for Fears",
     "year": 1985,
-    "decade": "1980s"
+    "decade": "1980s",
+    "act": "Group or duo"
    },
    "blurb": "\"Everybody Wants to Rule the World\" by Tears for Fears, released in 1985.",
    "media": {
@@ -1279,7 +1332,8 @@
    "facts": {
     "artist": "Dire Straits",
     "year": 1985,
-    "decade": "1980s"
+    "decade": "1980s",
+    "act": "Group or duo"
    },
    "blurb": "\"Money for Nothing\" by Dire Straits, released in 1985.",
    "media": {
@@ -1337,7 +1391,8 @@
    "facts": {
     "artist": "Bon Jovi",
     "year": 1986,
-    "decade": "1980s"
+    "decade": "1980s",
+    "act": "Group or duo"
    },
    "blurb": "\"Livin' on a Prayer\" by Bon Jovi, released in 1986.",
    "media": {
@@ -1395,7 +1450,8 @@
    "facts": {
     "artist": "The Bangles",
     "year": 1986,
-    "decade": "1980s"
+    "decade": "1980s",
+    "act": "Group or duo"
    },
    "blurb": "\"Walk Like an Egyptian\" by The Bangles, released in 1986.",
    "media": {
@@ -1424,7 +1480,8 @@
    "facts": {
     "artist": "Madonna",
     "year": 1986,
-    "decade": "1980s"
+    "decade": "1980s",
+    "act": "Female solo artist"
    },
    "blurb": "\"Papa Don't Preach\" by Madonna, released in 1986.",
    "media": {
@@ -1453,7 +1510,8 @@
    "facts": {
     "artist": "U2",
     "year": 1987,
-    "decade": "1980s"
+    "decade": "1980s",
+    "act": "Group or duo"
    },
    "blurb": "\"With or Without You\" by U2, released in 1987.",
    "media": {
@@ -1485,7 +1543,8 @@
    "facts": {
     "artist": "Whitney Houston",
     "year": 1987,
-    "decade": "1980s"
+    "decade": "1980s",
+    "act": "Female solo artist"
    },
    "blurb": "\"I Wanna Dance with Somebody (Who Loves Me)\" by Whitney Houston, released in 1987.",
    "media": {
@@ -1514,7 +1573,8 @@
    "facts": {
     "artist": "Rick Astley",
     "year": 1987,
-    "decade": "1980s"
+    "decade": "1980s",
+    "act": "Male solo artist"
    },
    "blurb": "\"Never Gonna Give You Up\" by Rick Astley, released in 1987.",
    "media": {
@@ -1543,7 +1603,8 @@
    "facts": {
     "artist": "George Michael",
     "year": 1987,
-    "decade": "1980s"
+    "decade": "1980s",
+    "act": "Male solo artist"
    },
    "blurb": "\"Faith\" by George Michael, released in 1987.",
    "media": {
@@ -1572,7 +1633,8 @@
    "facts": {
     "artist": "Guns N' Roses",
     "year": 1987,
-    "decade": "1980s"
+    "decade": "1980s",
+    "act": "Group or duo"
    },
    "blurb": "\"Sweet Child o' Mine\" by Guns N' Roses, released in 1987.",
    "media": {
@@ -1601,7 +1663,8 @@
    "facts": {
     "artist": "INXS",
     "year": 1987,
-    "decade": "1980s"
+    "decade": "1980s",
+    "act": "Group or duo"
    },
    "blurb": "\"Need You Tonight\" by INXS, released in 1987.",
    "media": {
@@ -1630,7 +1693,8 @@
    "facts": {
     "artist": "Bobby McFerrin",
     "year": 1988,
-    "decade": "1980s"
+    "decade": "1980s",
+    "act": "Male solo artist"
    },
    "blurb": "\"Don't Worry, Be Happy\" by Bobby McFerrin, released in 1988.",
    "media": {
@@ -1659,7 +1723,8 @@
    "facts": {
     "artist": "Michael Jackson",
     "year": 1987,
-    "decade": "1980s"
+    "decade": "1980s",
+    "act": "Male solo artist"
    },
    "blurb": "\"Man in the Mirror\" by Michael Jackson, released in 1987.",
    "media": {
@@ -1688,7 +1753,8 @@
    "facts": {
     "artist": "Paula Abdul",
     "year": 1988,
-    "decade": "1980s"
+    "decade": "1980s",
+    "act": "Female solo artist"
    },
    "blurb": "\"Straight Up\" by Paula Abdul, released in 1988.",
    "media": {
@@ -1717,7 +1783,8 @@
    "facts": {
     "artist": "Madonna",
     "year": 1989,
-    "decade": "1980s"
+    "decade": "1980s",
+    "act": "Female solo artist"
    },
    "blurb": "\"Like a Prayer\" by Madonna, released in 1989.",
    "media": {
@@ -1746,7 +1813,8 @@
    "facts": {
     "artist": "Phil Collins",
     "year": 1989,
-    "decade": "1980s"
+    "decade": "1980s",
+    "act": "Male solo artist"
    },
    "blurb": "\"Another Day in Paradise\" by Phil Collins, released in 1989.",
    "media": {
@@ -1775,7 +1843,8 @@
    "facts": {
     "artist": "Bette Midler",
     "year": 1988,
-    "decade": "1980s"
+    "decade": "1980s",
+    "act": "Female solo artist"
    },
    "blurb": "\"Wind Beneath My Wings\" by Bette Midler, released in 1988.",
    "media": {
@@ -1804,7 +1873,8 @@
    "facts": {
     "artist": "Black Box",
     "year": 1989,
-    "decade": "1980s"
+    "decade": "1980s",
+    "act": "Group or duo"
    },
    "blurb": "\"Ride on Time\" by Black Box, released in 1989.",
    "media": {
@@ -1842,5 +1912,5 @@
    "url": "https://performance-partners.apple.com/search-api"
   }
  ],
- "built": "2026-10-04"
+ "built": "2026-10-07"
 }

@@ -1,9 +1,9 @@
-import { INAT, WD } from './_common.mjs';
+import { INAT, WD, addFacts } from './_common.mjs';
 
 const EU = 'Europe', AS = 'Asia', AU = 'Australia', AF = 'Africa', NA = 'North America', SA = 'South America', AM = 'the Americas', MED = 'the Mediterranean', ME = 'the Middle East';
 const f = (colour, region, emblem) => ({ colour, region, ...(emblem ? { emblem } : {}) });
 
-export default {
+const PACK = {
   id: 'flowers', title: 'Flowers', theme: 'nature', icon: '🌸', kids: true,
   leakExempt: ['flower', 'flowers'],
   wikiD1: true, wikiAll: true, autoTaxo: ['family', 'genus'],
@@ -11,11 +11,24 @@ export default {
     colour: { type: 'cat', label: 'Usual colour', clue: v => `It is usually ${v.toLowerCase()}.` },
     region: { type: 'cat', label: 'Native to', clue: v => `It is native to ${v}.` },
     emblem: { type: 'cat', label: 'Floral emblem of', clue: v => `It is the floral emblem of ${v}.` },
+    family: { type: 'cat', label: 'Plant family', noClue: true },
   },
+  // plant family from the iNat lineage (APG IV)
+  taxoFacts: { family: {
+    Asteraceae: 'Daisy family', Rosaceae: 'Rose family', Liliaceae: 'Lily family', Lamiaceae: 'Mint family', Orchidaceae: 'Orchid family',
+    Nelumbonaceae: 'Lotus family', Nymphaeaceae: 'Water lily family', Papaveraceae: 'Poppy family', Amaryllidaceae: 'Amaryllis family',
+    Asparagaceae: 'Asparagus family', Iridaceae: 'Iris family', Malvaceae: 'Mallow family', Caryophyllaceae: 'Carnation family',
+    Paeoniaceae: 'Peony family', Hydrangeaceae: 'Hydrangea family', Plantaginaceae: 'Plantain family', Boraginaceae: 'Borage family',
+    Violaceae: 'Violet family', Ranunculaceae: 'Buttercup family', Strelitziaceae: 'Bird-of-paradise family', Proteaceae: 'Protea family',
+    Haemodoraceae: 'Bloodwort family', Fabaceae: 'Pea family', Apiaceae: 'Carrot family', Rafflesiaceae: 'Rafflesia family',
+    Araceae: 'Arum family', Droseraceae: 'Sundew family', Oleaceae: 'Olive family', Apocynaceae: 'Dogbane family',
+    Nyctaginaceae: "Four o'clock family", Theaceae: 'Tea family', Passifloraceae: 'Passionflower family', Ericaceae: 'Heath family',
+    Convolvulaceae: 'Bindweed family',
+  } },
   imgPrompt: "Which of these is {aName}?",
   nameImgPrompt: "Which flower is this?",
   tfImgPrompt: "This flower is {aName}.",
-  tpl: {"colour": {"ask": "What colour is the {lname} usually?", "stmt": "The {lname} is usually {lvalue}.", "exclusive": false}, "region": {"ask": "Where is the {lname} native to?", "askReverse": "Which of these is native to {value}?", "stmt": "The {lname} is native to {value}.", "exclusive": false}, "emblem": {"ask": "The {lname} is the floral emblem of where?", "askReverse": "Which flower is the floral emblem of {value}?", "stmt": "The {lname} is the floral emblem of {value}."}},
+  tpl: {"colour": {"ask": "What colour is the {lname} usually?", "stmt": "The {lname} is usually {lvalue}.", "exclusive": false}, "region": {"ask": "Where is the {lname} native to?", "askReverse": "Which of these is native to {value}?", "stmt": "The {lname} is native to {value}.", "exclusive": false}, "family": {"ask": "Which plant family does the {lname} belong to?", "askReverse": "Which of these flowers is in the {lvalue}?", "stmt": "The {lname} belongs to the {lvalue}."}, "emblem": {"ask": "The {lname} is the floral emblem of where?", "askReverse": "Which flower is the floral emblem of {value}?", "stmt": "The {lname} is the floral emblem of {value}."}},
   sources: [INAT, WD],
   items: [
     { n: 'Sunflower', alt: ['common sunflower'], sci: 'Helianthus annuus', g: 'daisy family', f: f('Yellow', NA), d: 1,
@@ -183,3 +196,8 @@ export default {
     { kind: 'mc', prompt: 'Which flower turns into a fluffy "clock" of seeds?', answer: 'Dandelion', wrong: ['Daisy', 'Buttercup', 'Rose'], explain: 'Each seed floats away on a little parachute.', difficulty: 1 },
   ],
 };
+
+// hybrids/cultivars with no iNat species: family by genus (Iris, Hibiscus, Chrysanthemum)
+addFacts(PACK.items, 'family', { 'Bearded iris': 'Iris family', 'Chinese hibiscus': 'Mallow family', Chrysanthemum: 'Daisy family' });
+
+export default PACK;

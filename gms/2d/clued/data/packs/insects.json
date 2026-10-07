@@ -27,6 +27,24 @@
    "no": "Egg, nymph, adult",
    "askBool": "Which of these insects goes through a pupa stage?",
    "stmt": "The {lname} goes through a pupa stage as it grows."
+  },
+  "lengthMm": {
+   "type": "num",
+   "label": "Typical body length",
+   "unit": "mm",
+   "higherLabel": "Longer",
+   "askHigh": "Which of these insects is the longest?",
+   "askLow": "Which of these insects is the smallest?",
+   "askNumber": "About how long is {name}, in millimetres?"
+  },
+  "wingspanMm": {
+   "type": "num",
+   "label": "Wingspan",
+   "unit": "mm",
+   "higherLabel": "Wider",
+   "askHigh": "Which of these has the widest wingspan?",
+   "askLow": "Which of these has the smallest wingspan?",
+   "askNumber": "About how wide is the wingspan of {name}, in millimetres?"
   }
  },
  "items": [
@@ -42,7 +60,8 @@
    "group": "beetle",
    "facts": {
     "order": "Beetles",
-    "complete": true
+    "complete": true,
+    "lengthMm": 7
    },
    "blurb": "A red beetle with seven black spots. Gardeners love it because it eats aphids.",
    "clues": [
@@ -87,7 +106,8 @@
    "group": "butterfly",
    "facts": {
     "order": "Butterflies & moths",
-    "complete": true
+    "complete": true,
+    "wingspanMm": 95
    },
    "lookalikes": [
     "painted-lady"
@@ -196,7 +216,8 @@
    "group": "butterfly",
    "facts": {
     "order": "Butterflies & moths",
-    "complete": true
+    "complete": true,
+    "wingspanMm": 68
    },
    "blurb": "A red butterfly with big eye-spots on its wings. It flashes them to scare off birds.",
    "clues": [
@@ -248,7 +269,8 @@
    "group": "butterfly",
    "facts": {
     "order": "Butterflies & moths",
-    "complete": true
+    "complete": true,
+    "wingspanMm": 55
    },
    "lookalikes": [
     "painted-lady"
@@ -293,7 +315,8 @@
    "group": "butterfly",
    "facts": {
     "order": "Butterflies & moths",
-    "complete": true
+    "complete": true,
+    "wingspanMm": 40
    },
    "blurb": "A common white butterfly whose green caterpillars munch cabbages. It has spread around the world.",
    "clues": [
@@ -335,7 +358,8 @@
    "group": "butterfly",
    "facts": {
     "order": "Butterflies & moths",
-    "complete": true
+    "complete": true,
+    "wingspanMm": 120
    },
    "blurb": "A big butterfly from South American rainforests with shining blue wings. The blue comes from tiny scales that reflect light, not from colour.",
    "differences": {
@@ -394,7 +418,8 @@
    "group": "butterfly",
    "facts": {
     "order": "Butterflies & moths",
-    "complete": true
+    "complete": true,
+    "wingspanMm": 75
    },
    "lookalikes": [
     "ulysses-butterfly"
@@ -456,7 +481,8 @@
    "group": "butterfly",
    "facts": {
     "order": "Butterflies & moths",
-    "complete": true
+    "complete": true,
+    "wingspanMm": 120
    },
    "lookalikes": [
     "blue-morpho",
@@ -508,7 +534,8 @@
    "group": "moth",
    "facts": {
     "order": "Butterflies & moths",
-    "complete": true
+    "complete": true,
+    "wingspanMm": 270
    },
    "blurb": "One of the biggest moths in the world, from Asian forests. The tips of its wings look like snake heads.",
    "clues": [
@@ -559,7 +586,8 @@
    "group": "moth",
    "facts": {
     "order": "Butterflies & moths",
-    "complete": true
+    "complete": true,
+    "wingspanMm": 114
    },
    "blurb": "A pale green North American moth with long trailing tails on its back wings. Adults live only about a week.",
    "clues": [
@@ -611,7 +639,8 @@
    "group": "moth",
    "facts": {
     "order": "Butterflies & moths",
-    "complete": true
+    "complete": true,
+    "wingspanMm": 100
    },
    "blurb": "A big moth with a skull-like pattern on its back. It squeaks loudly and raids beehives for honey.",
    "clues": [
@@ -663,7 +692,8 @@
    "group": "moth",
    "facts": {
     "order": "Butterflies & moths",
-    "complete": true
+    "complete": true,
+    "wingspanMm": 42
    },
    "blurb": "A day-flying moth that hovers in front of flowers and sips nectar with a long tongue, just like a tiny bird.",
    "clues": [
@@ -715,7 +745,8 @@
    "group": "moth",
    "facts": {
     "order": "Butterflies & moths",
-    "complete": true
+    "complete": true,
+    "wingspanMm": 45
    },
    "blurb": "A brown Australian moth that flies to cool mountain caves for summer. Aboriginal people feasted on them there.",
    "clues": [
@@ -769,7 +800,8 @@
    "group": "moth",
    "facts": {
     "order": "Butterflies & moths",
-    "complete": true
+    "complete": true,
+    "wingspanMm": 40
    },
    "blurb": "A moth bred by people for 5,000 years. Its caterpillar spins a cocoon of the thread we use to make silk.",
    "clues": [
@@ -920,7 +952,8 @@
    "group": "beetle",
    "facts": {
     "order": "Beetles",
-    "complete": true
+    "complete": true,
+    "lengthMm": 80
    },
    "blurb": "One of the heaviest insects in the world, from African rainforests. Its larvae can weigh up to 100 grams.",
    "clues": [
@@ -975,7 +1008,8 @@
    "group": "beetle",
    "facts": {
     "order": "Beetles",
-    "complete": true
+    "complete": true,
+    "lengthMm": 30
    },
    "blurb": "A dung beetle that rolls balls of dung. Ancient Egyptians linked it with the sun god.",
    "clues": [
@@ -1029,7 +1063,8 @@
    "group": "beetle",
    "facts": {
     "order": "Beetles",
-    "complete": true
+    "complete": true,
+    "lengthMm": 14
    },
    "blurb": "A beetle whose tail glows in the dark. Males flash their lights to talk to females on summer nights.",
    "clues": [
@@ -1082,7 +1117,8 @@
    "group": "beetle",
    "facts": {
     "order": "Beetles",
-    "complete": true
+    "complete": true,
+    "lengthMm": 25
    },
    "blurb": "Shiny golden-brown beetles that swarm around Australian gum trees in early summer.",
    "clues": [
@@ -1185,7 +1221,8 @@
    "group": "beetle",
    "facts": {
     "order": "Beetles",
-    "complete": true
+    "complete": true,
+    "lengthMm": 10
    },
    "blurb": "A striped beetle that is a serious pest of potato crops. It has resisted many insecticides.",
    "clues": [
@@ -1293,7 +1330,8 @@
    "group": "mantis",
    "facts": {
     "order": "Mantises",
-    "complete": false
+    "complete": false,
+    "lengthMm": 65
    },
    "lookalikes": [
     "orchid-mantis"
@@ -1523,7 +1561,9 @@
    "group": "dragonfly",
    "facts": {
     "order": "Dragonflies & damselflies",
-    "complete": false
+    "complete": false,
+    "lengthMm": 78,
+    "wingspanMm": 104
    },
    "lookalikes": [
     "banded-demoiselle"
@@ -1575,7 +1615,8 @@
    "group": "damselfly",
    "facts": {
     "order": "Dragonflies & damselflies",
-    "complete": false
+    "complete": false,
+    "lengthMm": 45
    },
    "lookalikes": [
     "emperor-dragonfly"
@@ -1636,7 +1677,8 @@
    "group": "grasshopper",
    "facts": {
     "order": "Grasshoppers & crickets",
-    "complete": false
+    "complete": false,
+    "lengthMm": 60
    },
    "blurb": "A grasshopper that can form enormous swarms. A swarm can eat as much food in a day as millions of people.",
    "clues": [
@@ -1691,7 +1733,8 @@
    "group": "cricket",
    "facts": {
     "order": "Grasshoppers & crickets",
-    "complete": false
+    "complete": false,
+    "lengthMm": 18
    },
    "blurb": "A cricket that chirps by rubbing its wings. It is farmed as food for pets and people.",
    "clues": [
@@ -1747,7 +1790,8 @@
    "group": "cicada",
    "facts": {
     "order": "True bugs",
-    "complete": false
+    "complete": false,
+    "lengthMm": 40
    },
    "blurb": "A big green Australian cicada. Males sing so loudly in summer they are among the loudest insects in the world.",
    "differences": {
@@ -1800,7 +1844,8 @@
    "group": "cicada",
    "facts": {
     "order": "True bugs",
-    "complete": false
+    "complete": false,
+    "lengthMm": 28
    },
    "lookalikes": [
     "green-grocer-cicada"
@@ -1857,7 +1902,8 @@
    "group": "ant",
    "facts": {
     "order": "Ants, bees & wasps",
-    "complete": true
+    "complete": true,
+    "lengthMm": 25
    },
    "blurb": "A large rainforest ant with the most painful sting of any insect, said to feel like being shot.",
    "clues": [
@@ -2018,7 +2064,8 @@
    "group": "ant",
    "facts": {
     "order": "Ants, bees & wasps",
-    "complete": true
+    "complete": true,
+    "lengthMm": 4
    },
    "blurb": "A South American ant with a burning sting. It has invaded the USA, Australia and Asia.",
    "clues": [
@@ -2074,7 +2121,8 @@
    "group": "cockroach",
    "facts": {
     "order": "Cockroaches & termites",
-    "complete": false
+    "complete": false,
+    "lengthMm": 40
    },
    "blurb": "A big reddish-brown cockroach that lives in drains and buildings around the world. It can run very fast.",
    "clues": [
@@ -2129,7 +2177,8 @@
    "group": "termite",
    "facts": {
     "order": "Cockroaches & termites",
-    "complete": false
+    "complete": false,
+    "lengthMm": 5
    },
    "blurb": "A termite of northern Australia that builds tall, flat mounds lined up north to south, which keeps them from overheating.",
    "clues": [
@@ -2184,7 +2233,8 @@
    "group": "fly",
    "facts": {
     "order": "Flies",
-    "complete": true
+    "complete": true,
+    "lengthMm": 6.5
    },
    "blurb": "The common fly found in homes all over the world. It tastes with its feet and spits on food before eating it.",
    "clues": [
@@ -2238,7 +2288,8 @@
    "group": "fly",
    "facts": {
     "order": "Flies",
-    "complete": true
+    "complete": true,
+    "lengthMm": 5
    },
    "blurb": "A small black-and-white striped mosquito that spreads dengue, Zika and yellow fever. Only females bite.",
    "clues": [
@@ -2293,7 +2344,8 @@
    "group": "earwig",
    "facts": {
     "order": "Earwigs",
-    "complete": false
+    "complete": false,
+    "lengthMm": 13
    },
    "blurb": "A brown insect with pincers on its tail. Despite the myth, it does not crawl into people's ears.",
    "clues": [
@@ -2396,7 +2448,8 @@
    "group": "bug",
    "facts": {
     "order": "True bugs",
-    "complete": false
+    "complete": false,
+    "lengthMm": 9
    },
    "blurb": "A long-legged bug that skates across the surface of ponds without sinking, using surface tension.",
    "clues": [
@@ -2496,7 +2549,8 @@
    "group": "bug",
    "facts": {
     "order": "True bugs",
-    "complete": false
+    "complete": false,
+    "lengthMm": 3.5
    },
    "blurb": "A tiny green bug that sucks sap from plants. Females can give birth without mating.",
    "clues": [
@@ -2547,7 +2601,8 @@
    "group": "silverfish",
    "facts": {
     "order": "Silverfish",
-    "complete": false
+    "complete": false,
+    "lengthMm": 8.5
    },
    "blurb": "A wingless, silvery insect that wriggles like a fish. It eats starch in paper, glue and food.",
    "clues": [

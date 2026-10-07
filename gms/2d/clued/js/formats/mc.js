@@ -1,13 +1,13 @@
 import {
   register, poolItems, packQuestions, pickPack, distractors, byDifficulty, imageOf, hasImg, fill, factText,
-  spreadApart, placeAnswer, collect, pick, shuffle, sample,
-} from './registry.js?v=202610071242';
-import { layout, choiceGrid } from '../ui/kit.js?v=202610071242';
+  spreadApart, placeAnswer, collect, pick, shuffle, sample, factAllowed, nested, lcLabel,
+} from './registry.js?v=202610071324';
+import { layout, choiceGrid } from '../ui/kit.js?v=202610071324';
 
 const PROMPTS = { nameImg: 'Which of these is {aName}?', imgName: 'What is this?' };
 
 // Which question sources a pack can feed, given loaded pack data.
-function sources(pack, n, src) {
+function sources(pack, n, src, gate = {}) {
   const items = pack.items || [];
   const out = [];
   const want = s => src === 'mix' || src === s;
@@ -16,6 +16,7 @@ function sources(pack, n, src) {
   if (want('pictures') && imgs >= n) out.push(['imgName', 2], ['nameImg', 1.5]);
   if (want('facts')) {
     for (const [key, m] of Object.entries(pack.factsMeta || {})) {
+      if (!factAllowed(m, gate)) continue;
       const has = items.filter(it => it.facts && it.facts[key] != null);
       if (m.type === 'cat' && m.exclusive !== false && new Set(has.map(it => String(it.facts[key]))).size >= n) {
         out.push([`cat:${key}`, 1.5]);
@@ -75,7 +76,7 @@ function fromItems(rng, pack, kind, n, difficulty) {
     const vals = [].concat(fv(t.item)).map(String);
     const value = pick(rng, vals);
     if (type === 'cat') {
-      const others = shuffle(rng, [...new Set(pool.flatMap(c => [].concat(fv(c.item)).map(String)))].filter(v => !vals.includes(v)));
+      const others = shuffle(rng, [...new Set(pool.flatMap(c => [].concat(fv(c.item)).map(String)))].filter(v => !vals.includes(v) && !vals.some(x => nested(x, v))));
       if (others.length < n - 1) return null;
       const { options, answer } = placeAnswer(rng, value, others.slice(0, n - 1));
       return {
@@ -117,7 +118,7 @@ function fromItems(rng, pack, kind, n, difficulty) {
     const low = rng() < 0.35 && meta.askLow;
     const sorted = set.slice().sort((a, b) => fv(b.item) - fv(a.item));
     const t = low ? sorted[sorted.length - 1] : sorted[0];
-    const label = String(meta.label || key).toLowerCase();
+    const label = lcLabel(meta.label || key);
     const prompt = low ? fill(meta.askLow, { label: meta.label }) : fill(meta.askHigh || `Which has the highest ${label}?`, { label: meta.label });
     const order = shuffle(rng, set);
     return {
@@ -156,7 +157,7 @@ export default register({
     let n = ANSWERS.includes(+opts.answers) ? +opts.answers : 4;
     if (kids) n = Math.min(n, 3);
     const src = opts.source || 'mix';
-    const usable = packs.map(p => ({ p, s: sources(p, n, src).map(([k, w]) => [k, kids && /img|Img/.test(k) ? w * 3 : w]) }))
+    const usable = packs.map(p => ({ p, s: sources(p, n, src, { kids, difficulty }).map(([k, w]) => [k, kids && /img|Img/.test(k) ? w * 3 : w]) }))
       .filter(x => x.s.length);
     if (!usable.length) return [];
     return collect(count, () => {

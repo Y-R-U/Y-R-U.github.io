@@ -14,6 +14,18 @@
    "type": "year",
    "label": "Written",
    "higherLabel": "Later"
+  },
+  "era": {
+   "type": "cat",
+   "label": "Period",
+   "values": [
+    "Baroque",
+    "Classical",
+    "Romantic"
+   ],
+   "ask": "Which period of music is {name} from?",
+   "askReverse": "Which of these is from the {value} period?",
+   "stmt": "{name} is from the {value} period."
   }
  },
  "items": [
@@ -27,7 +39,8 @@
    "group": "Edvard Grieg",
    "facts": {
     "composer": "Edvard Grieg",
-    "year": 1875
+    "year": 1875,
+    "era": "Romantic"
    },
    "blurb": "Morning Mood (Peer Gynt) by Edvard Grieg (1875). Recording: Edvard Grieg.",
    "media": {
@@ -51,7 +64,8 @@
    "group": "Edvard Grieg",
    "facts": {
     "composer": "Edvard Grieg",
-    "year": 1875
+    "year": 1875,
+    "era": "Romantic"
    },
    "blurb": "In the Hall of the Mountain King by Edvard Grieg (1875). Recording: Edvard Grieg.",
    "media": {
@@ -78,7 +92,8 @@
    "group": "Edvard Grieg",
    "facts": {
     "composer": "Edvard Grieg",
-    "year": 1875
+    "year": 1875,
+    "era": "Romantic"
    },
    "blurb": "Anitra's Dance (Peer Gynt) by Edvard Grieg (1875). Recording: Edvard Grieg.",
    "media": {
@@ -106,7 +121,8 @@
    "group": "Johann Strauss II",
    "facts": {
     "composer": "Johann Strauss II",
-    "year": 1866
+    "year": 1866,
+    "era": "Romantic"
    },
    "blurb": "The Blue Danube by Johann Strauss II (1866). Recording: United States Marine Band.",
    "media": {
@@ -134,7 +150,8 @@
    "group": "Edward Elgar",
    "facts": {
     "composer": "Edward Elgar",
-    "year": 1901
+    "year": 1901,
+    "era": "Romantic"
    },
    "blurb": "Pomp and Circumstance March No. 1 by Edward Elgar (1901). Recording: United States Marine Band.",
    "media": {
@@ -185,7 +202,8 @@
    "group": "Johann Pachelbel",
    "facts": {
     "composer": "Johann Pachelbel",
-    "year": 1690
+    "year": 1690,
+    "era": "Baroque"
    },
    "blurb": "Canon in D by Johann Pachelbel (1690). Recording: Composition: Johann Pachelbel; Arrangement: Frank Hudson; Performance: United States Air Force Band, Strolling Strings; Recording: United States Air Force.",
    "media": {
@@ -213,7 +231,8 @@
    "group": "Wolfgang Amadeus Mozart",
    "facts": {
     "composer": "Wolfgang Amadeus Mozart",
-    "year": 1791
+    "year": 1791,
+    "era": "Classical"
    },
    "blurb": "Requiem: Lacrimosa by Wolfgang Amadeus Mozart (1791). Recording: Wolfgang Amadeus Mozart.",
    "media": {
@@ -242,7 +261,8 @@
    "group": "George Frideric Handel",
    "facts": {
     "composer": "George Frideric Handel",
-    "year": 1741
+    "year": 1741,
+    "era": "Baroque"
    },
    "blurb": "Hallelujah Chorus (Messiah) by George Frideric Handel (1741). Recording: Unknown (see source page).",
    "media": {
@@ -266,7 +286,8 @@
    "group": "Pyotr Ilyich Tchaikovsky",
    "facts": {
     "composer": "Pyotr Ilyich Tchaikovsky",
-    "year": 1876
+    "year": 1876,
+    "era": "Romantic"
    },
    "blurb": "Swan Lake by Pyotr Ilyich Tchaikovsky (1876). Recording: Pyotr Ilyich Tchaikovsky; Antal Dorati; London Philharmonic Orchestra.",
    "media": {
@@ -295,7 +316,8 @@
    "group": "Pyotr Ilyich Tchaikovsky",
    "facts": {
     "composer": "Pyotr Ilyich Tchaikovsky",
-    "year": 1892
+    "year": 1892,
+    "era": "Romantic"
    },
    "blurb": "Russian Dance (The Nutcracker) by Pyotr Ilyich Tchaikovsky (1892). Recording: Music by Pyotr Ilyich Tchaikovsky in 1892; Conducted by Philip Milman and funded by Ludwig Ahgren and Jschlatt..",
    "media": {
@@ -322,7 +344,8 @@
    "group": "Pyotr Ilyich Tchaikovsky",
    "facts": {
     "composer": "Pyotr Ilyich Tchaikovsky",
-    "year": 1892
+    "year": 1892,
+    "era": "Romantic"
    },
    "blurb": "Waltz of the Flowers (The Nutcracker) by Pyotr Ilyich Tchaikovsky (1892). Recording: Unknown (see source page).",
    "media": {
@@ -349,7 +372,8 @@
    "group": "Johann Sebastian Bach",
    "facts": {
     "composer": "Johann Sebastian Bach",
-    "year": 1721
+    "year": 1721,
+    "era": "Baroque"
    },
    "blurb": "Brandenburg Concerto No. 4 by Johann Sebastian Bach (1721). Recording: Original Composition: Bach ; Brandenburg Concerto No. 4 in G, Movement I (Allegro), BWV 1049; Arrangment and performance: Kevin MacLeod.",
    "media": {
@@ -377,7 +401,8 @@
    "group": "Antonio Vivaldi",
    "facts": {
     "composer": "Antonio Vivaldi",
-    "year": 1725
+    "year": 1725,
+    "era": "Baroque"
    },
    "blurb": "Autumn (The Four Seasons) by Antonio Vivaldi (1725). Recording: The Modena Chamber Orchestra.",
    "media": {
@@ -405,7 +430,8 @@
    "group": "Antonín Dvořák",
    "facts": {
     "composer": "Antonín Dvořák",
-    "year": 1893
+    "year": 1893,
+    "era": "Romantic"
    },
    "blurb": "Symphony No. 9 \"From the New World\": Largo by Antonín Dvořák (1893). Recording: Unknown (see source page).",
    "media": {
@@ -433,7 +459,8 @@
    "group": "Johann Sebastian Bach",
    "facts": {
     "composer": "Johann Sebastian Bach",
-    "year": 1720
+    "year": 1720,
+    "era": "Baroque"
    },
    "blurb": "Cello Suite No. 1: Prelude by Johann Sebastian Bach (c. 1720). Recording: Kevin MacLeod.",
    "media": {
@@ -461,7 +488,8 @@
    "group": "Georges Bizet",
    "facts": {
     "composer": "Georges Bizet",
-    "year": 1875
+    "year": 1875,
+    "era": "Romantic"
    },
    "blurb": "Habanera (Carmen) by Georges Bizet (1875). Recording: Aria composed by : Georges Bizet; Singer: Jenny Lee Mitchell. ; Kevin MacLeod.",
    "media": {
@@ -488,7 +516,8 @@
    "group": "Johann Sebastian Bach",
    "facts": {
     "composer": "Johann Sebastian Bach",
-    "year": 1720
+    "year": 1720,
+    "era": "Baroque"
    },
    "blurb": "Chaconne in D minor (Partita No. 2) by Johann Sebastian Bach (1720). Recording: Jascha Heifetz.",
    "media": {
@@ -514,5 +543,5 @@
    "url": "https://commons.wikimedia.org"
   }
  ],
- "built": "2026-10-04"
+ "built": "2026-10-07"
 }

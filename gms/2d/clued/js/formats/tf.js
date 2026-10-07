@@ -1,12 +1,13 @@
-import { register, poolItems, pickPack, byDifficulty, imageOf, hasImg, fill, collect, distractors, pick } from './registry.js?v=202610071242';
-import { layout, choiceGrid } from '../ui/kit.js?v=202610071242';
+import { register, poolItems, pickPack, byDifficulty, imageOf, hasImg, fill, collect, distractors, pick, factAllowed, nested } from './registry.js?v=202610071324';
+import { layout, choiceGrid } from '../ui/kit.js?v=202610071324';
 
-function sources(pack) {
+function sources(pack, gate) {
   const out = [];
   const items = pack.items || [];
   if ((pack.questions || []).some(q => q.kind === 'tf')) out.push(['q', 3]);
   if (items.filter(hasImg).length >= 3) out.push(['img', 1.5]);
   for (const [key, m] of Object.entries(pack.factsMeta || {})) {
+    if (!factAllowed(m, gate)) continue;
     const has = items.filter(it => it.facts && it.facts[key] != null);
     if (m.type === 'bool' && has.length >= 2 && (m.stmt || m.yes)) out.push([`bool:${key}`, 1]);
     if (m.type === 'cat' && m.exclusive !== false && new Set(has.map(it => String(it.facts[key]))).size >= 2) out.push([`cat:${key}`, 1.2]);
@@ -57,7 +58,7 @@ function make(rng, pack, kind, difficulty) {
   const truth = rng() < 0.5;
   let value = pick(rng, vals);
   if (!truth) {
-    const others = [...new Set(pool.flatMap(c => [].concat(c.item.facts[key]).map(String)))].filter(x => !vals.includes(x));
+    const others = [...new Set(pool.flatMap(c => [].concat(c.item.facts[key]).map(String)))].filter(x => !vals.includes(x) && !vals.some(y => nested(x, y)));
     if (!others.length) return null;
     value = pick(rng, others);
   }
@@ -77,8 +78,8 @@ export default register({
     if (Object.values(c.facts || {}).some(t => t === 'bool' || t === 'cat')) return true;
     return 'Needs true/false questions, pictures or category facts';
   },
-  generate({ rng, packs, count, opts = {}, difficulty = 0, avoid }) {
-    const usable = packs.map(p => ({ p, s: sources(p) })).filter(x => x.s.length);
+  generate({ rng, packs, count, opts = {}, difficulty = 0, kids = false, avoid }) {
+    const usable = packs.map(p => ({ p, s: sources(p, { kids, difficulty }) })).filter(x => x.s.length);
     if (!usable.length) return [];
     return collect(count, () => {
       const { p, s } = pickPack(rng, usable, x => Math.sqrt((x.p.items || []).length + (x.p.questions || []).length + 1));

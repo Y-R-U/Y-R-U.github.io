@@ -19,6 +19,19 @@
   "decade": {
    "type": "cat",
    "label": "Decade"
+  },
+  "act": {
+   "type": "cat",
+   "label": "Act",
+   "values": [
+    "Male solo artist",
+    "Female solo artist",
+    "Group or duo",
+    "Duet or team-up"
+   ],
+   "ask": "Who recorded {name}: a solo singer, a group or a team-up?",
+   "askReverse": "Which of these hits is by {aValue}?",
+   "stmt": "{name} is by {aValue}."
   }
  },
  "items": [
@@ -29,7 +42,8 @@
    "facts": {
     "artist": "Kesha",
     "year": 2009,
-    "decade": "2000s"
+    "decade": "2000s",
+    "act": "Female solo artist"
    },
    "blurb": "\"TiK ToK\" by Kesha, released in 2009.",
    "media": {
@@ -58,7 +72,8 @@
    "facts": {
     "artist": "Train",
     "year": 2009,
-    "decade": "2000s"
+    "decade": "2000s",
+    "act": "Group or duo"
    },
    "blurb": "\"Hey, Soul Sister\" by Train, released in 2009.",
    "media": {
@@ -87,7 +102,8 @@
    "facts": {
     "artist": "Katy Perry",
     "year": 2010,
-    "decade": "2010s"
+    "decade": "2010s",
+    "act": "Female solo artist"
    },
    "blurb": "\"California Gurls\" by Katy Perry, released in 2010.",
    "media": {
@@ -145,7 +161,8 @@
    "facts": {
     "artist": "Bruno Mars",
     "year": 2010,
-    "decade": "2010s"
+    "decade": "2010s",
+    "act": "Male solo artist"
    },
    "blurb": "\"Just the Way You Are\" by Bruno Mars, released in 2010.",
    "media": {
@@ -174,7 +191,8 @@
    "facts": {
     "artist": "Bruno Mars",
     "year": 2010,
-    "decade": "2010s"
+    "decade": "2010s",
+    "act": "Male solo artist"
    },
    "blurb": "\"Grenade\" by Bruno Mars, released in 2010.",
    "media": {
@@ -203,7 +221,8 @@
    "facts": {
     "artist": "Katy Perry",
     "year": 2010,
-    "decade": "2010s"
+    "decade": "2010s",
+    "act": "Female solo artist"
    },
    "blurb": "\"Firework\" by Katy Perry, released in 2010.",
    "media": {
@@ -232,7 +251,8 @@
    "facts": {
     "artist": "Adele",
     "year": 2010,
-    "decade": "2010s"
+    "decade": "2010s",
+    "act": "Female solo artist"
    },
    "blurb": "\"Rolling in the Deep\" by Adele, released in 2010.",
    "media": {
@@ -261,7 +281,8 @@
    "facts": {
     "artist": "Adele",
     "year": 2011,
-    "decade": "2010s"
+    "decade": "2010s",
+    "act": "Female solo artist"
    },
    "blurb": "\"Someone Like You\" by Adele, released in 2011.",
    "media": {
@@ -290,7 +311,8 @@
    "facts": {
     "artist": "LMFAO",
     "year": 2011,
-    "decade": "2010s"
+    "decade": "2010s",
+    "act": "Group or duo"
    },
    "blurb": "\"Party Rock Anthem\" by LMFAO, released in 2011.",
    "media": {
@@ -319,7 +341,8 @@
    "facts": {
     "artist": "Maroon 5",
     "year": 2011,
-    "decade": "2010s"
+    "decade": "2010s",
+    "act": "Group or duo"
    },
    "blurb": "\"Moves Like Jagger\" by Maroon 5, released in 2011.",
    "media": {
@@ -406,7 +429,8 @@
    "facts": {
     "artist": "Carly Rae Jepsen",
     "year": 2011,
-    "decade": "2010s"
+    "decade": "2010s",
+    "act": "Female solo artist"
    },
    "blurb": "\"Call Me Maybe\" by Carly Rae Jepsen, released in 2011.",
    "media": {
@@ -435,7 +459,8 @@
    "facts": {
     "artist": "fun.",
     "year": 2011,
-    "decade": "2010s"
+    "decade": "2010s",
+    "act": "Group or duo"
    },
    "blurb": "\"We Are Young\" by fun., released in 2011.",
    "media": {
@@ -464,7 +489,8 @@
    "facts": {
     "artist": "Rihanna",
     "year": 2011,
-    "decade": "2010s"
+    "decade": "2010s",
+    "act": "Female solo artist"
    },
    "blurb": "\"We Found Love\" by Rihanna, released in 2011.",
    "media": {
@@ -493,7 +519,8 @@
    "facts": {
     "artist": "Maroon 5",
     "year": 2012,
-    "decade": "2010s"
+    "decade": "2010s",
+    "act": "Group or duo"
    },
    "blurb": "\"Payphone\" by Maroon 5, released in 2012.",
    "media": {
@@ -522,7 +549,8 @@
    "facts": {
     "artist": "PSY",
     "year": 2012,
-    "decade": "2010s"
+    "decade": "2010s",
+    "act": "Male solo artist"
    },
    "blurb": "\"Gangnam Style\" by PSY, released in 2012.",
    "media": {
@@ -551,7 +579,8 @@
    "facts": {
     "artist": "Macklemore & Ryan Lewis",
     "year": 2012,
-    "decade": "2010s"
+    "decade": "2010s",
+    "act": "Group or duo"
    },
    "blurb": "\"Thrift Shop\" by Macklemore & Ryan Lewis, released in 2012.",
    "media": {
@@ -580,7 +609,8 @@
    "facts": {
     "artist": "Imagine Dragons",
     "year": 2012,
-    "decade": "2010s"
+    "decade": "2010s",
+    "act": "Group or duo"
    },
    "blurb": "\"Radioactive\" by Imagine Dragons, released in 2012.",
    "media": {
@@ -609,7 +639,8 @@
    "facts": {
     "artist": "Robin Thicke",
     "year": 2013,
-    "decade": "2010s"
+    "decade": "2010s",
+    "act": "Male solo artist"
    },
    "blurb": "\"Blurred Lines\" by Robin Thicke, released in 2013.",
    "media": {
@@ -638,7 +669,8 @@
    "facts": {
     "artist": "Daft Punk",
     "year": 2013,
-    "decade": "2010s"
+    "decade": "2010s",
+    "act": "Group or duo"
    },
    "blurb": "\"Get Lucky\" by Daft Punk, released in 2013.",
    "media": {
@@ -667,7 +699,8 @@
    "facts": {
     "artist": "Lorde",
     "year": 2013,
-    "decade": "2010s"
+    "decade": "2010s",
+    "act": "Female solo artist"
    },
    "blurb": "\"Royals\" by Lorde, released in 2013.",
    "media": {
@@ -725,7 +758,8 @@
    "facts": {
     "artist": "Katy Perry",
     "year": 2013,
-    "decade": "2010s"
+    "decade": "2010s",
+    "act": "Female solo artist"
    },
    "blurb": "\"Roar\" by Katy Perry, released in 2013.",
    "media": {
@@ -754,7 +788,8 @@
    "facts": {
     "artist": "Pharrell Williams",
     "year": 2013,
-    "decade": "2010s"
+    "decade": "2010s",
+    "act": "Male solo artist"
    },
    "blurb": "\"Happy\" by Pharrell Williams, released in 2013.",
    "media": {
@@ -783,7 +818,8 @@
    "facts": {
     "artist": "John Legend",
     "year": 2013,
-    "decade": "2010s"
+    "decade": "2010s",
+    "act": "Male solo artist"
    },
    "blurb": "\"All of Me\" by John Legend, released in 2013.",
    "media": {
@@ -812,7 +848,8 @@
    "facts": {
     "artist": "Idina Menzel",
     "year": 2013,
-    "decade": "2010s"
+    "decade": "2010s",
+    "act": "Female solo artist"
    },
    "blurb": "\"Let It Go\" by Idina Menzel, released in 2013.",
    "media": {
@@ -870,7 +907,8 @@
    "facts": {
     "artist": "Taylor Swift",
     "year": 2014,
-    "decade": "2010s"
+    "decade": "2010s",
+    "act": "Female solo artist"
    },
    "blurb": "\"Shake It Off\" by Taylor Swift, released in 2014.",
    "media": {
@@ -899,7 +937,8 @@
    "facts": {
     "artist": "Mark Ronson",
     "year": 2014,
-    "decade": "2010s"
+    "decade": "2010s",
+    "act": "Male solo artist"
    },
    "blurb": "\"Uptown Funk\" by Mark Ronson, released in 2014.",
    "media": {
@@ -928,7 +967,8 @@
    "facts": {
     "artist": "Ed Sheeran",
     "year": 2014,
-    "decade": "2010s"
+    "decade": "2010s",
+    "act": "Male solo artist"
    },
    "blurb": "\"Thinking Out Loud\" by Ed Sheeran, released in 2014.",
    "media": {
@@ -957,7 +997,8 @@
    "facts": {
     "artist": "Wiz Khalifa",
     "year": 2015,
-    "decade": "2010s"
+    "decade": "2010s",
+    "act": "Male solo artist"
    },
    "blurb": "\"See You Again\" by Wiz Khalifa, released in 2015.",
    "media": {
@@ -986,7 +1027,8 @@
    "facts": {
     "artist": "Adele",
     "year": 2015,
-    "decade": "2010s"
+    "decade": "2010s",
+    "act": "Female solo artist"
    },
    "blurb": "\"Hello\" by Adele, released in 2015.",
    "media": {
@@ -1015,7 +1057,8 @@
    "facts": {
     "artist": "Walk the Moon",
     "year": 2014,
-    "decade": "2010s"
+    "decade": "2010s",
+    "act": "Group or duo"
    },
    "blurb": "\"Shut Up and Dance\" by Walk the Moon, released in 2014.",
    "media": {
@@ -1044,7 +1087,8 @@
    "facts": {
     "artist": "Justin Bieber",
     "year": 2015,
-    "decade": "2010s"
+    "decade": "2010s",
+    "act": "Male solo artist"
    },
    "blurb": "\"Love Yourself\" by Justin Bieber, released in 2015.",
    "media": {
@@ -1073,7 +1117,8 @@
    "facts": {
     "artist": "Justin Bieber",
     "year": 2015,
-    "decade": "2010s"
+    "decade": "2010s",
+    "act": "Male solo artist"
    },
    "blurb": "\"Sorry\" by Justin Bieber, released in 2015.",
    "media": {
@@ -1102,7 +1147,8 @@
    "facts": {
     "artist": "Drake",
     "year": 2016,
-    "decade": "2010s"
+    "decade": "2010s",
+    "act": "Male solo artist"
    },
    "blurb": "\"One Dance\" by Drake, released in 2016.",
    "media": {
@@ -1131,7 +1177,8 @@
    "facts": {
     "artist": "Rihanna",
     "year": 2016,
-    "decade": "2010s"
+    "decade": "2010s",
+    "act": "Female solo artist"
    },
    "blurb": "\"Work\" by Rihanna, released in 2016.",
    "media": {
@@ -1160,7 +1207,8 @@
    "facts": {
     "artist": "Justin Timberlake",
     "year": 2016,
-    "decade": "2010s"
+    "decade": "2010s",
+    "act": "Male solo artist"
    },
    "blurb": "\"CAN'T STOP THE FEELING!\" by Justin Timberlake, released in 2016.",
    "media": {
@@ -1218,7 +1266,8 @@
    "facts": {
     "artist": "Sia",
     "year": 2016,
-    "decade": "2010s"
+    "decade": "2010s",
+    "act": "Female solo artist"
    },
    "blurb": "\"Cheap Thrills\" by Sia, released in 2016.",
    "media": {
@@ -1247,7 +1296,8 @@
    "facts": {
     "artist": "Ed Sheeran",
     "year": 2017,
-    "decade": "2010s"
+    "decade": "2010s",
+    "act": "Male solo artist"
    },
    "blurb": "\"Shape of You\" by Ed Sheeran, released in 2017.",
    "media": {
@@ -1276,7 +1326,8 @@
    "facts": {
     "artist": "Luis Fonsi & Daddy Yankee",
     "year": 2017,
-    "decade": "2010s"
+    "decade": "2010s",
+    "act": "Duet or team-up"
    },
    "blurb": "\"Despacito\" by Luis Fonsi & Daddy Yankee, released in 2017.",
    "media": {
@@ -1305,7 +1356,8 @@
    "facts": {
     "artist": "Kendrick Lamar",
     "year": 2017,
-    "decade": "2010s"
+    "decade": "2010s",
+    "act": "Male solo artist"
    },
    "blurb": "\"HUMBLE.\" by Kendrick Lamar, released in 2017.",
    "media": {
@@ -1334,7 +1386,8 @@
    "facts": {
     "artist": "Imagine Dragons",
     "year": 2017,
-    "decade": "2010s"
+    "decade": "2010s",
+    "act": "Group or duo"
    },
    "blurb": "\"Believer\" by Imagine Dragons, released in 2017.",
    "media": {
@@ -1363,7 +1416,8 @@
    "facts": {
     "artist": "Ed Sheeran",
     "year": 2017,
-    "decade": "2010s"
+    "decade": "2010s",
+    "act": "Male solo artist"
    },
    "blurb": "\"Perfect\" by Ed Sheeran, released in 2017.",
    "media": {
@@ -1392,7 +1446,8 @@
    "facts": {
     "artist": "Camila Cabello",
     "year": 2017,
-    "decade": "2010s"
+    "decade": "2010s",
+    "act": "Female solo artist"
    },
    "blurb": "\"Havana\" by Camila Cabello, released in 2017.",
    "media": {
@@ -1421,7 +1476,8 @@
    "facts": {
     "artist": "Drake",
     "year": 2018,
-    "decade": "2010s"
+    "decade": "2010s",
+    "act": "Male solo artist"
    },
    "blurb": "\"God's Plan\" by Drake, released in 2018.",
    "media": {
@@ -1450,7 +1506,8 @@
    "facts": {
     "artist": "Lady Gaga & Bradley Cooper",
     "year": 2018,
-    "decade": "2010s"
+    "decade": "2010s",
+    "act": "Duet or team-up"
    },
    "blurb": "\"Shallow\" by Lady Gaga & Bradley Cooper, released in 2018.",
    "media": {
@@ -1479,7 +1536,8 @@
    "facts": {
     "artist": "Post Malone & Swae Lee",
     "year": 2018,
-    "decade": "2010s"
+    "decade": "2010s",
+    "act": "Duet or team-up"
    },
    "blurb": "\"Sunflower (Spider-Man: Into the Spider-Verse)\" by Post Malone & Swae Lee, released in 2018.",
    "media": {
@@ -1508,7 +1566,8 @@
    "facts": {
     "artist": "Lil Nas X",
     "year": 2018,
-    "decade": "2010s"
+    "decade": "2010s",
+    "act": "Male solo artist"
    },
    "blurb": "\"Old Town Road\" by Lil Nas X, released in 2018.",
    "media": {
@@ -1540,7 +1599,8 @@
    "facts": {
     "artist": "Billie Eilish",
     "year": 2019,
-    "decade": "2010s"
+    "decade": "2010s",
+    "act": "Female solo artist"
    },
    "blurb": "\"bad guy\" by Billie Eilish, released in 2019.",
    "media": {
@@ -1569,7 +1629,8 @@
    "facts": {
     "artist": "Shawn Mendes & Camila Cabello",
     "year": 2019,
-    "decade": "2010s"
+    "decade": "2010s",
+    "act": "Duet or team-up"
    },
    "blurb": "\"Señorita\" by Shawn Mendes & Camila Cabello, released in 2019.",
    "media": {
@@ -1598,7 +1659,8 @@
    "facts": {
     "artist": "Lewis Capaldi",
     "year": 2018,
-    "decade": "2010s"
+    "decade": "2010s",
+    "act": "Male solo artist"
    },
    "blurb": "\"Someone You Loved\" by Lewis Capaldi, released in 2018.",
    "media": {
@@ -1627,7 +1689,8 @@
    "facts": {
     "artist": "The Weeknd",
     "year": 2019,
-    "decade": "2010s"
+    "decade": "2010s",
+    "act": "Male solo artist"
    },
    "blurb": "\"Blinding Lights\" by The Weeknd, released in 2019.",
    "media": {
@@ -1665,5 +1728,5 @@
    "url": "https://performance-partners.apple.com/search-api"
   }
  ],
- "built": "2026-10-04"
+ "built": "2026-10-07"
 }

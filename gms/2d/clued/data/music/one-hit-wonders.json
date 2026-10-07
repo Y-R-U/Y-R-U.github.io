@@ -19,6 +19,19 @@
   "decade": {
    "type": "cat",
    "label": "Decade"
+  },
+  "act": {
+   "type": "cat",
+   "label": "Act",
+   "values": [
+    "Male solo artist",
+    "Female solo artist",
+    "Group or duo",
+    "Duet or team-up"
+   ],
+   "ask": "Who recorded {name}: a solo singer, a group or a team-up?",
+   "askReverse": "Which of these hits is by {aValue}?",
+   "stmt": "{name} is by {aValue}."
   }
  },
  "items": [
@@ -29,7 +42,8 @@
    "facts": {
     "artist": "Norman Greenbaum",
     "year": 1969,
-    "decade": "1960s"
+    "decade": "1960s",
+    "act": "Male solo artist"
    },
    "blurb": "\"Spirit in the Sky\" by Norman Greenbaum, released in 1969.",
    "media": {
@@ -58,7 +72,8 @@
    "facts": {
     "artist": "Zager & Evans",
     "year": 1969,
-    "decade": "1960s"
+    "decade": "1960s",
+    "act": "Group or duo"
    },
    "blurb": "\"In the Year 2525\" by Zager & Evans, released in 1969.",
    "media": {
@@ -87,7 +102,8 @@
    "facts": {
     "artist": "Hot Butter",
     "year": 1972,
-    "decade": "1970s"
+    "decade": "1970s",
+    "act": "Group or duo"
    },
    "blurb": "\"Popcorn\" by Hot Butter, released in 1972.",
    "media": {
@@ -116,7 +132,8 @@
    "facts": {
     "artist": "Looking Glass",
     "year": 1972,
-    "decade": "1970s"
+    "decade": "1970s",
+    "act": "Group or duo"
    },
    "blurb": "\"Brandy (You're a Fine Girl)\" by Looking Glass, released in 1972.",
    "media": {
@@ -145,7 +162,8 @@
    "facts": {
     "artist": "Carl Douglas",
     "year": 1974,
-    "decade": "1970s"
+    "decade": "1970s",
+    "act": "Male solo artist"
    },
    "blurb": "\"Kung Fu Fighting\" by Carl Douglas, released in 1974.",
    "media": {
@@ -174,7 +192,8 @@
    "facts": {
     "artist": "Wild Cherry",
     "year": 1976,
-    "decade": "1970s"
+    "decade": "1970s",
+    "act": "Group or duo"
    },
    "blurb": "\"Play That Funky Music\" by Wild Cherry, released in 1976.",
    "media": {
@@ -203,7 +222,8 @@
    "facts": {
     "artist": "The Buggles",
     "year": 1979,
-    "decade": "1970s"
+    "decade": "1970s",
+    "act": "Group or duo"
    },
    "blurb": "\"Video Killed the Radio Star\" by The Buggles, released in 1979.",
    "media": {
@@ -232,7 +252,8 @@
    "facts": {
     "artist": "The Sugarhill Gang",
     "year": 1979,
-    "decade": "1970s"
+    "decade": "1970s",
+    "act": "Group or duo"
    },
    "blurb": "\"Rapper's Delight\" by The Sugarhill Gang, released in 1979.",
    "media": {
@@ -290,7 +311,8 @@
    "facts": {
     "artist": "The Vapors",
     "year": 1980,
-    "decade": "1980s"
+    "decade": "1980s",
+    "act": "Group or duo"
    },
    "blurb": "\"Turning Japanese\" by The Vapors, released in 1980.",
    "media": {
@@ -319,7 +341,8 @@
    "facts": {
     "artist": "Lipps Inc.",
     "year": 1979,
-    "decade": "1970s"
+    "decade": "1970s",
+    "act": "Group or duo"
    },
    "blurb": "\"Funkytown\" by Lipps Inc., released in 1979.",
    "media": {
@@ -348,7 +371,8 @@
    "facts": {
     "artist": "Toni Basil",
     "year": 1981,
-    "decade": "1980s"
+    "decade": "1980s",
+    "act": "Female solo artist"
    },
    "blurb": "\"Mickey\" by Toni Basil, released in 1981.",
    "media": {
@@ -377,7 +401,8 @@
    "facts": {
     "artist": "Men Without Hats",
     "year": 1982,
-    "decade": "1980s"
+    "decade": "1980s",
+    "act": "Group or duo"
    },
    "blurb": "\"The Safety Dance\" by Men Without Hats, released in 1982.",
    "media": {
@@ -435,7 +460,8 @@
    "facts": {
     "artist": "Dexys Midnight Runners",
     "year": 1982,
-    "decade": "1980s"
+    "decade": "1980s",
+    "act": "Group or duo"
    },
    "blurb": "\"Come On Eileen\" by Dexys Midnight Runners, released in 1982.",
    "media": {
@@ -464,7 +490,8 @@
    "facts": {
     "artist": "Bobby McFerrin",
     "year": 1988,
-    "decade": "1980s"
+    "decade": "1980s",
+    "act": "Male solo artist"
    },
    "blurb": "\"Don't Worry, Be Happy\" by Bobby McFerrin, released in 1988.",
    "media": {
@@ -493,7 +520,8 @@
    "facts": {
     "artist": "Deee-Lite",
     "year": 1990,
-    "decade": "1990s"
+    "decade": "1990s",
+    "act": "Group or duo"
    },
    "blurb": "\"Groove Is in the Heart\" by Deee-Lite, released in 1990.",
    "media": {
@@ -522,7 +550,8 @@
    "facts": {
     "artist": "Right Said Fred",
     "year": 1991,
-    "decade": "1990s"
+    "decade": "1990s",
+    "act": "Group or duo"
    },
    "blurb": "\"I'm Too Sexy\" by Right Said Fred, released in 1991.",
    "media": {
@@ -580,7 +609,8 @@
    "facts": {
     "artist": "Chumbawamba",
     "year": 1997,
-    "decade": "1990s"
+    "decade": "1990s",
+    "act": "Group or duo"
    },
    "blurb": "\"Tubthumping\" by Chumbawamba, released in 1997.",
    "media": {
@@ -609,7 +639,8 @@
    "facts": {
     "artist": "Len",
     "year": 1999,
-    "decade": "1990s"
+    "decade": "1990s",
+    "act": "Group or duo"
    },
    "blurb": "\"Steal My Sunshine\" by Len, released in 1999.",
    "media": {
@@ -638,7 +669,8 @@
    "facts": {
     "artist": "Lou Bega",
     "year": 1999,
-    "decade": "1990s"
+    "decade": "1990s",
+    "act": "Male solo artist"
    },
    "blurb": "\"Mambo No. 5 (A Little Bit Of...)\" by Lou Bega, released in 1999.",
    "media": {
@@ -667,7 +699,8 @@
    "facts": {
     "artist": "Eiffel 65",
     "year": 1999,
-    "decade": "1990s"
+    "decade": "1990s",
+    "act": "Group or duo"
    },
    "blurb": "\"Blue (Da Ba Dee)\" by Eiffel 65, released in 1999.",
    "media": {
@@ -696,7 +729,8 @@
    "facts": {
     "artist": "Baha Men",
     "year": 2000,
-    "decade": "2000s"
+    "decade": "2000s",
+    "act": "Group or duo"
    },
    "blurb": "\"Who Let the Dogs Out\" by Baha Men, released in 2000.",
    "media": {
@@ -725,7 +759,8 @@
    "facts": {
     "artist": "Las Ketchup",
     "year": 2002,
-    "decade": "2000s"
+    "decade": "2000s",
+    "act": "Group or duo"
    },
    "blurb": "\"The Ketchup Song (Aserejé)\" by Las Ketchup, released in 2002.",
    "media": {
@@ -754,7 +789,8 @@
    "facts": {
     "artist": "Fountains of Wayne",
     "year": 2003,
-    "decade": "2000s"
+    "decade": "2000s",
+    "act": "Group or duo"
    },
    "blurb": "\"Stacy's Mom\" by Fountains of Wayne, released in 2003.",
    "media": {
@@ -783,7 +819,8 @@
    "facts": {
     "artist": "Daniel Powter",
     "year": 2005,
-    "decade": "2000s"
+    "decade": "2000s",
+    "act": "Male solo artist"
    },
    "blurb": "\"Bad Day\" by Daniel Powter, released in 2005.",
    "media": {
@@ -812,7 +849,8 @@
    "facts": {
     "artist": "Gnarls Barkley",
     "year": 2006,
-    "decade": "2000s"
+    "decade": "2000s",
+    "act": "Group or duo"
    },
    "blurb": "\"Crazy\" by Gnarls Barkley, released in 2006.",
    "media": {
@@ -870,7 +908,8 @@
    "facts": {
     "artist": "PSY",
     "year": 2012,
-    "decade": "2010s"
+    "decade": "2010s",
+    "act": "Male solo artist"
    },
    "blurb": "\"Gangnam Style\" by PSY, released in 2012.",
    "media": {
@@ -899,7 +938,8 @@
    "facts": {
     "artist": "Baauer",
     "year": 2012,
-    "decade": "2010s"
+    "decade": "2010s",
+    "act": "Male solo artist"
    },
    "blurb": "\"Harlem Shake\" by Baauer, released in 2012.",
    "media": {
@@ -928,7 +968,8 @@
    "facts": {
     "artist": "MAGIC!",
     "year": 2013,
-    "decade": "2010s"
+    "decade": "2010s",
+    "act": "Group or duo"
    },
    "blurb": "\"Rude\" by MAGIC!, released in 2013.",
    "media": {
@@ -957,7 +998,8 @@
    "facts": {
     "artist": "OMI",
     "year": 2014,
-    "decade": "2010s"
+    "decade": "2010s",
+    "act": "Male solo artist"
    },
    "blurb": "\"Cheerleader (Felix Jaehn Remix)\" by OMI, released in 2014.",
    "media": {
@@ -986,7 +1028,8 @@
    "facts": {
     "artist": "Ylvis",
     "year": 2013,
-    "decade": "2010s"
+    "decade": "2010s",
+    "act": "Group or duo"
    },
    "blurb": "\"The Fox (What Does the Fox Say?)\" by Ylvis, released in 2013.",
    "media": {
@@ -1020,5 +1063,5 @@
    "url": "https://performance-partners.apple.com/search-api"
   }
  ],
- "built": "2026-10-04"
+ "built": "2026-10-07"
 }

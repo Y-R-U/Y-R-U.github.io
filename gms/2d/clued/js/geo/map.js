@@ -1,10 +1,10 @@
 // CLUED map component. SVG, projected once; pan/zoom via a CSS transform during gestures, committed on release.
 // API documented in docs/notes/M.md.
-import { makeProjection, projectedBox, greatCircle } from './proj.js?v=202610071242';
-import { features as topoFeatures } from './topo.js?v=202610071242';
-import { loadIndex, loadWorld, loadRegionFile, loadStatesFile, loadMarine, geo, isPlayable, regionMembers } from './data.js?v=202610071242';
-import { regionFor } from './regions.js?v=202610071242';
-import { injectStyle, POLITICAL, CONTINENT_FILL } from './style.js?v=202610071242';
+import { makeProjection, projectedBox, greatCircle } from './proj.js?v=202610071324';
+import { features as topoFeatures } from './topo.js?v=202610071324';
+import { loadIndex, loadWorld, loadRegionFile, loadStatesFile, loadMarine, geo, isPlayable, regionMembers } from './data.js?v=202610071324';
+import { regionFor } from './regions.js?v=202610071324';
+import { injectStyle, POLITICAL, CONTINENT_FILL } from './style.js?v=202610071324';
 
 const NS = 'http://www.w3.org/2000/svg';
 const U = 1000;
@@ -32,7 +32,7 @@ export function createMap(el, opts = {}) {
   const ui = document.createElement('div'); ui.className = 'gm-ui';
   const toastEl = document.createElement('div'); toastEl.className = 'gm-toast';
 
-  let W = 0, H = 0, T = { k: 1, x: 0, y: 0 }, live = null, fitK = 1, home = null, frameU = null;
+  let W = 0, H = 0, T = { k: 1, x: 0, y: 0 }, live = null, fitK = 1, home = null, frameU = null, refit = false;
   let locked = false, destroyed = false, anim = 0;
   const feats = new Map();          // id -> { id, el, dot, lp:[x,y], box:[x0,y0,x1,y1], playable, layer, props }
   const marks = new Map();
@@ -254,12 +254,17 @@ export function createMap(el, opts = {}) {
   function goHome(animate) {
     let t = fitBox(frameU);
     fitK = t.k;
-    // Tall containers: a wide frame would be a thin strip, so start zoomed in on its centre (pan for the rest).
-    const fh = (frameU[3] - frameU[1]) * t.k;
-    if (H > W * 1.15 && o.portraitZoom !== false) {
-      const s = Math.min(region.proj === 'equalEarth' ? 1.7 : 1, (H * 0.92) / fh);
-      if (s > 1.05) { const cx = (W / 2 - t.x) / t.k, cy = (H / 2 - t.y) / t.k; t = { k: t.k * s, x: W / 2 - cx * t.k * s, y: H / 2 - cy * t.k * s }; }
-    }
+    // Portrait screens: a wide frame would be a thin strip, so start zoomed in on its centre (pan for the rest).
+    // gm-fit tells the layout how tall the box needs to be at this width, so it can drop the empty ocean bands;
+    // it depends only on the width, so shrinking the box never feeds back into it.
+    const P = pad(), bw = frameU[2] - frameU[0], bh = frameU[3] - frameU[1];
+    const fhW = bh * (W - P.l - P.r) / (bw || 1), fh = bh * t.k;
+    const want = o.portraitZoom !== false && innerHeight > innerWidth * 1.15 ? (region.proj === 'equalEarth' ? 1.7 : 1) : 1;
+    const z = Math.min(want, (H * 0.92) / fh);
+    if (z > 1.05) { const cx = (W / 2 - t.x) / t.k, cy = (H / 2 - t.y) / t.k; t = { k: t.k * z, x: W / 2 - cx * t.k * z, y: H / 2 - cy * t.k * z }; }
+    el.dispatchEvent(new CustomEvent('gm-fit', { bubbles: true, detail: { h: fhW * want + P.t + P.b } }));
+    // the layout may have resized the box just now: fit again at once, before any fly-to starts from a stale size
+    if (!refit && measure()) { refit = true; try { return goHome(animate); } finally { refit = false; } }
     home = t;
     animate ? animateTo(t) : commit(t);
   }

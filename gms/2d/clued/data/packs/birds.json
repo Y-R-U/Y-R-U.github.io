@@ -34,6 +34,34 @@
    "ask": "What is the IUCN conservation status of the {lname}?",
    "askReverse": "Which of these is listed as \"{value}\" by the IUCN?",
    "stmt": "The {lname} is listed as \"{value}\" by the IUCN."
+  },
+  "kind": {
+   "type": "cat",
+   "label": "Kind of bird",
+   "values": [
+    "Perching bird",
+    "Parrot",
+    "Bird of prey",
+    "Duck, goose or swan",
+    "Pheasant or fowl",
+    "Ratite",
+    "Penguin",
+    "Hummingbird",
+    "Kingfisher"
+   ],
+   "ask": "What kind of bird is the {lname}?",
+   "askReverse": "Which of these birds is {aValue}?",
+   "stmt": "The {lname} is {aValue}."
+  },
+  "massKg": {
+   "type": "num",
+   "label": "Typical adult weight",
+   "unit": "kg",
+   "higherLabel": "Heavier",
+   "askHigh": "Which of these birds is the heaviest?",
+   "askLow": "Which of these birds is the lightest?",
+   "askNumber": "About how much does {name} weigh, in kilograms?",
+   "minRatio": 2
   }
  },
  "items": [
@@ -45,6 +73,8 @@
    "facts": {
     "region": "Australia",
     "flightless": true,
+    "massKg": 35,
+    "kind": "Ratite",
     "status": "Least concern"
    },
    "lookalikes": [
@@ -119,6 +149,8 @@
    "facts": {
     "region": "Australia",
     "flightless": true,
+    "massKg": 45,
+    "kind": "Ratite",
     "status": "Least concern"
    },
    "lookalikes": [
@@ -184,6 +216,8 @@
    "facts": {
     "region": "Australia",
     "flightless": false,
+    "massKg": 0.35,
+    "kind": "Kingfisher",
     "status": "Least concern"
    },
    "lookalikes": [
@@ -249,6 +283,7 @@
    "facts": {
     "region": "Australia",
     "flightless": false,
+    "kind": "Parrot",
     "status": "Least concern"
    },
    "lookalikes": [
@@ -312,6 +347,8 @@
    "facts": {
     "region": "Australia",
     "flightless": false,
+    "massKg": 0.31,
+    "kind": "Parrot",
     "status": "Least concern"
    },
    "lookalikes": [
@@ -378,6 +415,8 @@
    "facts": {
     "region": "Australia",
     "flightless": false,
+    "massKg": 0.12,
+    "kind": "Parrot",
     "status": "Least concern"
    },
    "lookalikes": [
@@ -437,6 +476,7 @@
    "facts": {
     "region": "Australia",
     "flightless": false,
+    "kind": "Parrot",
     "status": "Least concern"
    },
    "lookalikes": [
@@ -501,6 +541,8 @@
    "facts": {
     "region": "Australia",
     "flightless": false,
+    "massKg": 0.035,
+    "kind": "Parrot",
     "status": "Least concern"
    },
    "lookalikes": [
@@ -570,6 +612,7 @@
    "facts": {
     "region": "Australia",
     "flightless": false,
+    "kind": "Parrot",
     "status": "Least concern"
    },
    "lookalikes": [
@@ -639,6 +682,8 @@
    "facts": {
     "region": "Australia",
     "flightless": false,
+    "massKg": 0.29,
+    "kind": "Perching bird",
     "status": "Least concern"
    },
    "lookalikes": [
@@ -708,6 +753,8 @@
    "facts": {
     "region": "Australia",
     "flightless": false,
+    "massKg": 0.3,
+    "kind": "Perching bird",
     "status": "Least concern"
    },
    "lookalikes": [
@@ -781,6 +828,8 @@
    "facts": {
     "region": "Australia",
     "flightless": false,
+    "massKg": 0.01,
+    "kind": "Perching bird",
     "status": "Least concern"
    },
    "blurb": "A tiny Australian bird with a cocked tail. Breeding males are bright blue and black.",
@@ -837,6 +886,8 @@
    "facts": {
     "region": "Australia",
     "flightless": false,
+    "massKg": 1,
+    "kind": "Perching bird",
     "status": "Least concern"
    },
    "blurb": "An Australian bird famous for copying sounds, from other birds to chainsaws and camera shutters.",
@@ -884,6 +935,7 @@
    "facts": {
     "region": "Australia",
     "flightless": false,
+    "massKg": 0.35,
     "status": "Least concern"
    },
    "lookalikes": [
@@ -941,6 +993,7 @@
    "facts": {
     "region": "Australia",
     "flightless": false,
+    "kind": "Perching bird",
     "status": "Least concern"
    },
    "blurb": "The male builds a stick bower and decorates it with blue objects, like bottle tops and pegs, to win a mate.",
@@ -1005,6 +1058,7 @@
    "facts": {
     "region": "Australia",
     "flightless": false,
+    "massKg": 6,
     "status": "Least concern"
    },
    "blurb": "A big white-and-black waterbird with the longest bill of any bird. Its throat pouch holds fish.",
@@ -1058,6 +1112,8 @@
    "facts": {
     "region": "Australia",
     "flightless": false,
+    "massKg": 6,
+    "kind": "Duck, goose or swan",
     "status": "Least concern"
    },
    "lookalikes": [
@@ -1128,6 +1184,7 @@
    "facts": {
     "region": "Australia",
     "flightless": false,
+    "massKg": 1.8,
     "status": "Least concern"
    },
    "blurb": "A white bird with a bald black head and a long curved bill. In cities it raids rubbish bins, earning the nickname \"bin chicken\".",
@@ -1183,6 +1240,8 @@
    "facts": {
     "region": "Australia",
     "flightless": false,
+    "massKg": 3.5,
+    "kind": "Bird of prey",
     "status": "Least concern"
    },
    "blurb": "Australia's largest bird of prey, with a diamond-shaped tail. It can take prey as big as young kangaroos.",
@@ -1236,6 +1295,8 @@
    "facts": {
     "region": "Australia",
     "flightless": false,
+    "massKg": 0.02,
+    "kind": "Perching bird",
     "status": "Least concern"
    },
    "blurb": "A small black-and-white Australian bird that wags its tail from side to side. It bravely chases off much bigger birds.",
@@ -1282,6 +1343,8 @@
    "facts": {
     "region": "Australia",
     "flightless": false,
+    "massKg": 0.075,
+    "kind": "Perching bird",
     "status": "Least concern"
    },
    "blurb": "A grey honeyeater with a yellow patch behind its eye. Gangs of them chase other small birds out of gardens.",
@@ -1349,6 +1412,7 @@
    "facts": {
     "region": "Australia",
     "flightless": false,
+    "massKg": 0.3,
     "status": "Least concern"
    },
    "blurb": "A loud, brave bird with yellow face wattles. It dive-bombs people who get close to its nest on footy ovals.",
@@ -1401,7 +1465,8 @@
    "group": "crane",
    "facts": {
     "region": "Australia",
-    "flightless": false
+    "flightless": false,
+    "massKg": 5.5
    },
    "blurb": "A tall grey crane with a red head. Pairs perform graceful leaping dances.",
    "clues": [
@@ -1458,6 +1523,7 @@
    "facts": {
     "region": "Australia",
     "flightless": false,
+    "kind": "Perching bird",
     "status": "Least concern"
    },
    "blurb": "A tiny, brilliantly coloured finch of northern Australia with a purple chest and yellow belly.",
@@ -1514,6 +1580,8 @@
    "facts": {
     "region": "Australia",
     "flightless": true,
+    "massKg": 1.5,
+    "kind": "Penguin",
     "status": "Least concern"
    },
    "lookalikes": [
@@ -1574,6 +1642,8 @@
    "facts": {
     "region": "New Zealand",
     "flightless": true,
+    "massKg": 2.5,
+    "kind": "Ratite",
     "status": "Vulnerable"
    },
    "blurb": "A small flightless bird from New Zealand with hair-like feathers. It has nostrils at the tip of its long beak to sniff out worms.",
@@ -1636,7 +1706,9 @@
    "group": "parrot",
    "facts": {
     "region": "New Zealand",
-    "flightless": false
+    "flightless": false,
+    "massKg": 0.9,
+    "kind": "Parrot"
    },
    "lookalikes": [
     "kakapo"
@@ -1704,7 +1776,9 @@
    "group": "parrot",
    "facts": {
     "region": "New Zealand",
-    "flightless": true
+    "flightless": true,
+    "massKg": 2,
+    "kind": "Parrot"
    },
    "lookalikes": [
     "kea"
@@ -1754,6 +1828,8 @@
    "facts": {
     "region": "Africa",
     "flightless": true,
+    "massKg": 100,
+    "kind": "Ratite",
     "status": "Least concern"
    },
    "lookalikes": [
@@ -1813,6 +1889,8 @@
    "facts": {
     "region": "Antarctica",
     "flightless": true,
+    "massKg": 30,
+    "kind": "Penguin",
     "status": "Near threatened"
    },
    "lookalikes": [
@@ -1874,6 +1952,7 @@
    "facts": {
     "region": "Europe",
     "flightless": false,
+    "massKg": 0.45,
     "status": "Vulnerable"
    },
    "blurb": "A small black-and-white seabird with a colourful beak. It can carry many small fish in its beak at once.",
@@ -1937,6 +2016,8 @@
    "facts": {
     "region": "North America",
     "flightless": false,
+    "massKg": 4.5,
+    "kind": "Bird of prey",
     "status": "Least concern"
    },
    "lookalikes": [
@@ -2003,6 +2084,8 @@
    "facts": {
     "region": "many parts of the world",
     "flightless": false,
+    "massKg": 4.5,
+    "kind": "Bird of prey",
     "status": "Least concern"
    },
    "lookalikes": [
@@ -2065,6 +2148,8 @@
    "facts": {
     "region": "many parts of the world",
     "flightless": false,
+    "massKg": 0.8,
+    "kind": "Bird of prey",
     "status": "Least concern"
    },
    "blurb": "The fastest animal on Earth. It dives on other birds at over 300 km/h.",
@@ -2120,6 +2205,8 @@
    "facts": {
     "region": "many parts of the world",
     "flightless": false,
+    "massKg": 1.5,
+    "kind": "Bird of prey",
     "status": "Least concern"
    },
    "blurb": "A bird of prey that eats almost only fish. It plunges feet-first into the water to catch them.",
@@ -2182,6 +2269,8 @@
    "facts": {
     "region": "South America",
     "flightless": false,
+    "massKg": 12,
+    "kind": "Bird of prey",
     "status": "Vulnerable"
    },
    "blurb": "A huge vulture of the Andes mountains with one of the largest wingspans of any bird. It can glide for hours without flapping.",
@@ -2247,7 +2336,9 @@
    "group": "raptor",
    "facts": {
     "region": "Africa",
-    "flightless": false
+    "flightless": false,
+    "massKg": 4,
+    "kind": "Bird of prey"
    },
    "blurb": "A long-legged African bird of prey that kills snakes by stamping on them.",
    "clues": [
@@ -2300,6 +2391,8 @@
    "facts": {
     "region": "South America",
     "flightless": false,
+    "massKg": 7,
+    "kind": "Bird of prey",
     "status": "Vulnerable"
    },
    "blurb": "A huge rainforest eagle of Central and South America. Its talons are as big as a bear's claws, and it catches sloths and monkeys.",
@@ -2353,6 +2446,7 @@
    "facts": {
     "region": "many parts of the world",
     "flightless": false,
+    "kind": "Bird of prey",
     "status": "Least concern"
    },
    "lookalikes": [
@@ -2420,6 +2514,8 @@
    "facts": {
     "region": "many parts of the world",
     "flightless": false,
+    "massKg": 2,
+    "kind": "Bird of prey",
     "status": "Vulnerable"
    },
    "lookalikes": [
@@ -2475,6 +2571,8 @@
    "facts": {
     "region": "the Americas",
     "flightless": false,
+    "massKg": 1.4,
+    "kind": "Bird of prey",
     "status": "Least concern"
    },
    "blurb": "A big, fierce owl of the Americas with feathery ear tufts. It even hunts skunks.",
@@ -2524,6 +2622,7 @@
    "facts": {
     "region": "many parts of the world",
     "flightless": false,
+    "massKg": 3,
     "status": "Least concern"
    },
    "blurb": "A tall pink bird that feeds with its head upside down. Its pink colour comes from the food it eats.",
@@ -2587,6 +2686,8 @@
    "facts": {
     "region": "the Americas",
     "flightless": false,
+    "massKg": 1,
+    "kind": "Parrot",
     "status": "Least concern"
    },
    "lookalikes": [
@@ -2647,7 +2748,9 @@
    "group": "parrot",
    "facts": {
     "region": "Africa",
-    "flightless": false
+    "flightless": false,
+    "massKg": 0.45,
+    "kind": "Parrot"
    },
    "lookalikes": [
     "scarlet-macaw"
@@ -2705,6 +2808,7 @@
    "facts": {
     "region": "South America",
     "flightless": false,
+    "massKg": 0.54,
     "status": "Least concern"
    },
    "blurb": "A black bird with a huge orange beak, from South America. Its beak is light because it is hollow inside.",
@@ -2760,6 +2864,8 @@
    "facts": {
     "region": "the Americas",
     "flightless": false,
+    "massKg": 0.002,
+    "kind": "Hummingbird",
     "status": "Near threatened"
    },
    "lookalikes": [
@@ -2812,6 +2918,8 @@
    "facts": {
     "region": "North America",
     "flightless": false,
+    "massKg": 0.0035,
+    "kind": "Hummingbird",
     "status": "Least concern"
    },
    "lookalikes": [
@@ -2880,6 +2988,7 @@
    "facts": {
     "region": "the Americas",
     "flightless": false,
+    "massKg": 0.21,
     "status": "Near threatened"
    },
    "blurb": "A shining green bird of Central American cloud forests. Males have tail streamers longer than their bodies.",
@@ -2941,6 +3050,8 @@
    "facts": {
     "region": "Asia",
     "flightless": false,
+    "massKg": 4,
+    "kind": "Pheasant or fowl",
     "status": "Least concern"
    },
    "blurb": "The male, called a peacock, shows off a huge fan of tail feathers covered in eye-spots.",
@@ -3003,6 +3114,7 @@
    "facts": {
     "region": "Asia",
     "flightless": false,
+    "kind": "Duck, goose or swan",
     "status": "Least concern"
    },
    "lookalikes": [
@@ -3062,6 +3174,8 @@
    "facts": {
     "region": "many parts of the world",
     "flightless": false,
+    "massKg": 1.1,
+    "kind": "Duck, goose or swan",
     "status": "Least concern"
    },
    "lookalikes": [
@@ -3126,6 +3240,8 @@
    "facts": {
     "region": "Europe",
     "flightless": false,
+    "massKg": 10.5,
+    "kind": "Duck, goose or swan",
     "status": "Least concern"
    },
    "lookalikes": [
@@ -3192,6 +3308,8 @@
    "facts": {
     "region": "North America",
     "flightless": false,
+    "massKg": 4.5,
+    "kind": "Duck, goose or swan",
     "status": "Least concern"
    },
    "blurb": "A big brown goose with a black neck and white chin strap. Flocks fly in V shapes.",
@@ -3258,6 +3376,8 @@
    "facts": {
     "region": "North America",
     "flightless": false,
+    "massKg": 6,
+    "kind": "Pheasant or fowl",
     "status": "Least concern"
    },
    "blurb": "A big North American bird. Males puff up and fan their tails. Farm turkeys come from it.",
@@ -3324,6 +3444,8 @@
    "facts": {
     "region": "Asia",
     "flightless": false,
+    "massKg": 1,
+    "kind": "Pheasant or fowl",
     "status": "Least concern"
    },
    "blurb": "A wild bird of Asian forests and the ancestor of the chicken. There are more chickens than any other bird.",
@@ -3382,6 +3504,7 @@
    "facts": {
     "region": "many parts of the world",
     "flightless": false,
+    "massKg": 0.3,
     "status": "Least concern"
    },
    "blurb": "The wild ancestor of the city pigeon. Pigeons can find their way home from hundreds of kilometres away.",
@@ -3447,6 +3570,7 @@
    "facts": {
     "region": "North America",
     "flightless": false,
+    "massKg": 0.35,
     "status": "Least concern"
    },
    "blurb": "A fast desert cuckoo of the south-western USA and Mexico. It can run at about 30 km/h and kills rattlesnakes.",
@@ -3505,6 +3629,8 @@
    "facts": {
     "region": "North America",
     "flightless": false,
+    "massKg": 0.045,
+    "kind": "Perching bird",
     "status": "Least concern"
    },
    "blurb": "A bright red songbird with a crest and a black face, common in gardens in the eastern USA.",
@@ -3566,6 +3692,8 @@
    "facts": {
     "region": "North America",
     "flightless": false,
+    "massKg": 0.077,
+    "kind": "Perching bird",
     "status": "Least concern"
    },
    "lookalikes": [
@@ -3628,6 +3756,8 @@
    "facts": {
     "region": "Europe",
     "flightless": false,
+    "massKg": 0.018,
+    "kind": "Perching bird",
     "status": "Least concern"
    },
    "lookalikes": [
@@ -3693,6 +3823,8 @@
    "facts": {
     "region": "North America",
     "flightless": false,
+    "massKg": 0.085,
+    "kind": "Perching bird",
     "status": "Least concern"
    },
    "blurb": "A loud, clever blue-and-white bird with a crest. It buries acorns and helps oak forests spread.",
@@ -3758,6 +3890,8 @@
    "facts": {
     "region": "many parts of the world",
     "flightless": false,
+    "massKg": 0.03,
+    "kind": "Perching bird",
     "status": "Least concern"
    },
    "blurb": "A small brown bird that lives close to people almost everywhere. Its numbers have dropped in many cities.",
@@ -3824,6 +3958,8 @@
    "facts": {
     "region": "many parts of the world",
     "flightless": false,
+    "massKg": 0.08,
+    "kind": "Perching bird",
     "status": "Least concern"
    },
    "blurb": "A speckled songbird whose huge flocks make swirling shapes in the sky called murmurations.",
@@ -3890,6 +4026,8 @@
    "facts": {
     "region": "many parts of the world",
     "flightless": false,
+    "massKg": 0.019,
+    "kind": "Perching bird",
     "status": "Least concern"
    },
    "blurb": "A fast-flying bird with a long forked tail. It flies from Europe to Africa each winter.",
@@ -3956,6 +4094,8 @@
    "facts": {
     "region": "Europe",
     "flightless": false,
+    "massKg": 0.04,
+    "kind": "Kingfisher",
     "status": "Least concern"
    },
    "lookalikes": [
@@ -4026,6 +4166,8 @@
    "facts": {
     "region": "Europe",
     "flightless": false,
+    "massKg": 0.011,
+    "kind": "Perching bird",
     "status": "Least concern"
    },
    "blurb": "A tiny blue-and-yellow garden bird. It used to peck through foil milk bottle tops to drink the cream.",
@@ -4092,6 +4234,8 @@
    "facts": {
     "region": "Europe",
     "flightless": false,
+    "massKg": 0.22,
+    "kind": "Perching bird",
     "status": "Least concern"
    },
    "lookalikes": [
@@ -4161,6 +4305,8 @@
    "facts": {
     "region": "many parts of the world",
     "flightless": false,
+    "massKg": 1.2,
+    "kind": "Perching bird",
     "status": "Least concern"
    },
    "blurb": "The biggest songbird in the world, all glossy black. Ravens are very clever and can solve puzzles.",
@@ -4227,6 +4373,7 @@
    "facts": {
     "region": "Antarctica",
     "flightless": false,
+    "massKg": 9,
     "status": "Vulnerable"
    },
    "blurb": "The bird with the longest wings in the world, up to about 3.5 metres. It glides over the Southern Ocean for hours without flapping.",
@@ -4281,6 +4428,7 @@
    "facts": {
     "region": "the Americas",
     "flightless": false,
+    "massKg": 1.5,
     "status": "Least concern"
    },
    "blurb": "A seabird with bright blue feet. Males show off their feet in a high-stepping dance.",
@@ -4329,6 +4477,7 @@
    "facts": {
     "region": "the Americas",
     "flightless": false,
+    "massKg": 1.35,
     "status": "Least concern"
    },
    "blurb": "A seabird with long pointed wings. Males blow up a huge red throat pouch like a balloon.",
@@ -4383,6 +4532,7 @@
    "facts": {
     "region": "many parts of the world",
     "flightless": false,
+    "massKg": 1.5,
     "status": "Least concern"
    },
    "blurb": "A tall grey wading bird that stands still in shallow water, then stabs fish with its sharp beak.",
@@ -4429,6 +4579,7 @@
    "facts": {
     "region": "Europe",
     "flightless": false,
+    "massKg": 3.4,
     "status": "Least concern"
    },
    "blurb": "A big white bird with black wings and a red beak. In stories it delivers babies.",
@@ -4494,6 +4645,7 @@
    "facts": {
     "region": "Africa",
     "flightless": false,
+    "massKg": 5.5,
     "status": "Vulnerable"
    },
    "blurb": "A huge, grey, prehistoric-looking bird from African swamps with an enormous beak. It catches lungfish and even baby crocodiles.",
@@ -4551,6 +4703,7 @@
    "facts": {
     "region": "Europe",
     "flightless": false,
+    "massKg": 0.085,
     "status": "Least concern"
    },
    "blurb": "A black-and-white woodpecker with red patches. It drums on trees so fast you can hear it across a wood.",
@@ -4617,6 +4770,7 @@
    "facts": {
     "region": "Europe",
     "flightless": false,
+    "massKg": 0.12,
     "status": "Least concern"
    },
    "blurb": "A grey bird that lays its eggs in other birds' nests. Its chick pushes out the other eggs.",
@@ -4680,6 +4834,7 @@
    "facts": {
     "region": "Asia",
     "flightless": false,
+    "massKg": 3,
     "status": "Vulnerable"
    },
    "blurb": "A huge Asian bird with a giant yellow beak and a helmet on top. The female seals herself inside a tree hole to nest.",
@@ -4735,6 +4890,7 @@
    "facts": {
     "region": "Africa",
     "flightless": false,
+    "massKg": 0.1,
     "status": "Least concern"
    },
    "blurb": "A brilliantly coloured bird of the African savanna. It tumbles and rolls in the air during courtship.",
@@ -4797,6 +4953,7 @@
    "facts": {
     "region": "Asia",
     "flightless": false,
+    "kind": "Perching bird",
     "status": "Least concern"
    },
    "blurb": "A bird of New Guinea forests. Males show off huge golden plumes in group displays.",
@@ -4850,6 +5007,7 @@
    "facts": {
     "region": "many parts of the world",
     "flightless": false,
+    "massKg": 0.1,
     "status": "Least concern"
    },
    "blurb": "A small seabird with the longest migration of any animal, flying from the Arctic to the Antarctic and back every year.",
@@ -4916,6 +5074,7 @@
    "facts": {
     "region": "Europe",
     "flightless": false,
+    "kind": "Perching bird",
     "status": "Least concern"
    },
    "blurb": "A plain brown songbird famous for its beautiful song, often sung at night.",
@@ -4978,6 +5137,7 @@
    "facts": {
     "region": "Asia",
     "flightless": false,
+    "kind": "Pheasant or fowl",
     "status": "Least concern"
    },
    "blurb": "A dazzling pheasant from the mountains of China, with a golden crest and red body.",

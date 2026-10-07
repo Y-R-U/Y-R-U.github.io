@@ -1,6 +1,6 @@
-import { register, poolItems, pickPack, byDifficulty, imageOf, fill, placeAnswer, collect, pick, shuffle } from './registry.js?v=202610071242';
-import { layout, choiceGrid } from '../ui/kit.js?v=202610071242';
-import { norm, fmtFact, escHtml, injectCSS, hasImg } from './fkit.js?v=202610071242';
+import { register, poolItems, pickPack, byDifficulty, imageOf, fill, placeAnswer, collect, pick, shuffle, factAllowed } from './registry.js?v=202610071324';
+import { layout, choiceGrid } from '../ui/kit.js?v=202610071324';
+import { norm, fmtFact, escHtml, injectCSS, hasImg } from './fkit.js?v=202610071324';
 
 const CSS = `
 .lk-diff{border-collapse:collapse;width:100%;table-layout:fixed;font-size:14px;margin-top:2px}
@@ -15,9 +15,10 @@ function lookalikesOf(c, byId) {
 }
 
 // Facts that tell the target apart from its lookalikes, as a small table for the reveal.
-function diffTable(pack, list) {
+function diffTable(pack, list, kids) {
   const rows = [];
   for (const [key, m] of Object.entries(pack.factsMeta || {})) {
+    if (kids && !factAllowed(m, { kids })) continue;
     if (!['bool', 'cat', 'num', 'year'].includes(m.type)) continue;
     const vs = list.map(c => c.item.facts?.[key]);
     if (vs.some(v => v == null)) continue;
@@ -29,7 +30,7 @@ function diffTable(pack, list) {
   return rows;
 }
 
-function make(rng, pack, n, difficulty) {
+function make(rng, pack, n, difficulty, kids) {
   const all = poolItems([pack]).filter(c => hasImg(c.item));
   const byId = new Map(all.map(c => [c.item.id, c]));
   const targets = byDifficulty(all.filter(c => lookalikesOf(c, byId).length), difficulty, 3, c => c.item.difficulty || 2);
@@ -40,7 +41,7 @@ function make(rng, pack, n, difficulty) {
   const wrong = others.filter(c => !seen.has(norm(c.item.name)) && seen.add(norm(c.item.name))).slice(0, n - 1);
   const { options, answer } = placeAnswer(rng, t, wrong);
   const ordered = options;
-  const rows = diffTable(pack, ordered);
+  const rows = diffTable(pack, ordered, kids);
   return {
     format: 'lookalike', id: `look:${t.ref}:${wrong.map(c => c.item.id).sort().join(',')}`,
     prompt: fill(pack.lookPrompt || 'Which one is {aName}?', { name: t.item.name, lname: t.item.lname }),
@@ -80,7 +81,7 @@ export default register({
     const usable = packs.filter(p => (p.items || []).some(it => it.lookalikes?.length && hasImg(it)));
     if (!usable.length) return [];
     return collect(count, () => {
-      const q = make(rng, pickPack(rng, usable), n, difficulty);
+      const q = make(rng, pickPack(rng, usable), n, difficulty, kids);
       return q && q.options.length >= 2 ? q : null;
     }, avoid);
   },

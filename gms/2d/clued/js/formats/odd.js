@@ -1,15 +1,15 @@
-import { register, poolItems, pickPack, byDifficulty, imageOf, factText, placeAnswer, collect, pick, sample } from './registry.js?v=202610071242';
-import { layout, choiceGrid } from '../ui/kit.js?v=202610071242';
-import { uniqueByName, norm, hasImg } from './fkit.js?v=202610071242';
+import { register, poolItems, pickPack, byDifficulty, imageOf, factText, placeAnswer, collect, pick, sample, factAllowed, nested, lcLabel } from './registry.js?v=202610071324';
+import { layout, choiceGrid } from '../ui/kit.js?v=202610071324';
+import { uniqueByName, norm, hasImg } from './fkit.js?v=202610071324';
 
 const vals = v => [].concat(v).map(String);
 
 // Every way a pack can split its items into "same" and "odd". n = total options.
-function sources(pack, n, difficulty) {
+function sources(pack, n, difficulty, kids) {
   const items = pack.items || [];
   const out = [];
   for (const [key, m] of Object.entries(pack.factsMeta || {})) {
-    if ((m.hard || /conservation|iucn/i.test(m.label || '')) && difficulty !== 3) continue;
+    if ((m.hard && difficulty !== 3) || !factAllowed(m, { kids, difficulty })) continue;
     const has = items.filter(it => it.facts && it.facts[key] != null);
     if (m.type === 'cat' && m.exclusive !== false) {
       const counts = {};
@@ -50,7 +50,7 @@ function make(rng, pack, [type, key], n, difficulty, kids) {
     if (A.length < n - 1 || !B.length) return null;
     same = sample(rng, uniqueByName(A), n - 1);
     odd = pick(rng, B);
-    label = String(meta.label || key).toLowerCase();
+    label = lcLabel(meta.label || key);
     sameText = factText(meta, !flip); oddText = factText(meta, flip);
   } else {
     const counts = {};
@@ -58,11 +58,11 @@ function make(rng, pack, [type, key], n, difficulty, kids) {
     const big = Object.keys(counts).filter(v => counts[v] >= n - 1).sort();
     if (!big.length) return null;
     const V = pick(rng, big);
-    const A = pool.filter(c => vals(val(c)).includes(V)), B = pool.filter(c => !vals(val(c)).includes(V));
+    const A = pool.filter(c => vals(val(c)).includes(V)), B = pool.filter(c => !vals(val(c)).includes(V) && !vals(val(c)).some(x => nested(x, V)));
     if (!B.length) return null;
     same = sample(rng, uniqueByName(A), n - 1);
     odd = pick(rng, B);
-    label = type === 'group' ? pack.groupLabel : String(meta.label || key).toLowerCase();
+    label = type === 'group' ? pack.groupLabel : lcLabel(meta.label || key);
     sameText = V; oddText = vals(val(odd)).join(', ');
   }
   if (same.length < n - 1 || same.some(c => norm(c.item.name) === norm(odd.item.name))) return null;
@@ -96,7 +96,7 @@ export default register({
   generate({ rng, packs, count, opts = {}, difficulty = 0, kids = false, avoid }) {
     let n = ANSWERS.includes(+opts.answers) ? +opts.answers : 4;
     if (kids) n = 3;
-    const usable = packs.map(p => ({ p, s: sources(p, n, difficulty) })).filter(x => x.s.length);
+    const usable = packs.map(p => ({ p, s: sources(p, n, difficulty, kids) })).filter(x => x.s.length);
     if (!usable.length) return [];
     return collect(count, () => {
       const { p, s } = pickPack(rng, usable, x => Math.sqrt((x.p.items || []).length + 1));

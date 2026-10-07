@@ -1,7 +1,7 @@
 // Lane F shared helpers: CSS injection, timer stretch, fact maths, pointer drag. Used by F's formats only.
-import { normalize } from '../core/fuzzy.js?v=202610071242';
-import { factText, shuffle } from './registry.js?v=202610071242';
-import { basePoints } from '../core/scoring.js?v=202610071242';
+import { normalize } from '../core/fuzzy.js?v=202610071324';
+import { factText, shuffle, lcLabel } from './registry.js?v=202610071324';
+import { basePoints } from '../core/scoring.js?v=202610071324';
 
 export const norm = normalize;
 
@@ -48,7 +48,8 @@ export function once(api) {
   return f;
 }
 
-export const packNoun = pack => String(pack.noun || pack.title || 'items').toLowerCase();
+// Plural, for "Which of these … is made up?" (pack.noun is singular: type's "Name the …").
+export const packNoun = pack => lcLabel(pack.nounPlural || pack.title || 'items');
 
 export function fmtFact(meta, v) {
   if (meta?.type === 'year') return v < 0 ? `${-v} BC` : String(v);

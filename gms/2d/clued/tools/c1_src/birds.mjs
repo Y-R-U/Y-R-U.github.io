@@ -1,9 +1,10 @@
-import { INAT, WD, COMMONS, STATUS_META } from './_common.mjs';
+import { INAT, WD, COMMONS, STATUS_META, addFacts } from './_common.mjs';
 
 const AU = 'Australia', NZ = 'New Zealand', EU = 'Europe', AF = 'Africa', AS = 'Asia', AM = 'the Americas', NA = 'North America', SA = 'South America', AN = 'Antarctica', WW = 'many parts of the world';
+const KINDS = ['Perching bird', 'Parrot', 'Bird of prey', 'Duck, goose or swan', 'Pheasant or fowl', 'Ratite', 'Penguin', 'Hummingbird', 'Kingfisher'];
 const f = (region, flightless = false) => ({ region, flightless });
 
-export default {
+const PACK = {
   id: 'birds', title: 'Birds', theme: 'animals', icon: '🐦', kids: true,
   leakExempt: ['bird'],
   wikiD1: true, autoTaxo: ['family', 'genus'], status: true, audio: true,
@@ -11,11 +12,21 @@ export default {
     region: { type: 'cat', label: 'Found in', clue: v => `It is found in ${v}.` },
     flightless: { type: 'bool', label: 'Flightless', yes: 'Cannot fly', no: 'Can fly', clue: v => (v ? 'It cannot fly.' : null) },
     status: STATUS_META,
+    kind: { type: 'cat', label: 'Kind of bird', values: KINDS, noClue: true },
+    massKg: { type: 'num', label: 'Typical adult weight', unit: 'kg', higherLabel: 'Heavier', noClue: true },
   },
+  // kind comes from the iNat order (owls count as birds of prey); birds outside these groups have no kind
+  taxoFacts: { kind: {
+    Passeriformes: 'Perching bird', Psittaciformes: 'Parrot', Accipitriformes: 'Bird of prey', Falconiformes: 'Bird of prey',
+    Cathartiformes: 'Bird of prey', Strigiformes: 'Bird of prey', Anatidae: 'Duck, goose or swan', Galliformes: 'Pheasant or fowl',
+    Struthioniformes: 'Ratite', Casuariiformes: 'Ratite', Apterygiformes: 'Ratite', Sphenisciformes: 'Penguin',
+    Trochilidae: 'Hummingbird', Alcedinidae: 'Kingfisher',
+  } },
+  wdCheck: { massKg: 'P2067' },
   imgPrompt: "Which of these is {aName}?",
   nameImgPrompt: "Which bird is this?",
   tfImgPrompt: "This bird is {aName}.",
-  tpl: {"region": {"ask": "Where does the {lname} live?", "askReverse": "Which of these birds lives in {value}?", "stmt": "The {lname} lives in {value}.", "exclusive": false}, "flightless": {"askBool": "Which of these birds cannot fly?", "stmt": "The {lname} cannot fly."}, "status": {"ask": "What is the IUCN conservation status of the {lname}?", "askReverse": "Which of these is listed as \"{value}\" by the IUCN?", "stmt": "The {lname} is listed as \"{value}\" by the IUCN."}},
+  tpl: {"region": {"ask": "Where does the {lname} live?", "askReverse": "Which of these birds lives in {value}?", "stmt": "The {lname} lives in {value}.", "exclusive": false}, "flightless": {"askBool": "Which of these birds cannot fly?", "stmt": "The {lname} cannot fly."}, "kind": {"ask": "What kind of bird is the {lname}?", "askReverse": "Which of these birds is {aValue}?", "stmt": "The {lname} is {aValue}."}, "massKg": {"askHigh": "Which of these birds is the heaviest?", "askLow": "Which of these birds is the lightest?", "askNumber": "About how much does {name} weigh, in kilograms?", "minRatio": 2}, "status": {"ask": "What is the IUCN conservation status of the {lname}?", "askReverse": "Which of these is listed as \"{value}\" by the IUCN?", "stmt": "The {lname} is listed as \"{value}\" by the IUCN."}},
   sources: [INAT, WD, COMMONS],
   items: [
     // ---- Australia & New Zealand ----
@@ -286,3 +297,23 @@ export default {
     { kind: 'tf', prompt: 'Birds are the only animals alive today with feathers.', answer: true, explain: 'Some dinosaurs had feathers too, and birds are living dinosaurs.', difficulty: 2 },
   ],
 };
+
+// Typical adult weight (both sexes), from each species' Wikipedia description; birds without a clear figure are left out.
+addFacts(PACK.items, 'massKg', {
+  Emu: 35, 'Southern cassowary': 45, 'Laughing kookaburra': 0.35, Galah: 0.31, 'Rainbow lorikeet': 0.12, Budgerigar: 0.035,
+  'Australian magpie': 0.29, 'Pied currawong': 0.3, 'Superb fairywren': 0.01, 'Superb lyrebird': 1, 'Tawny frogmouth': 0.35,
+  'Australian pelican': 6, 'Black swan': 6, 'Australian white ibis': 1.8, 'Wedge-tailed eagle': 3.5, 'Willie wagtail': 0.02,
+  'Noisy miner': 0.075, 'Masked lapwing': 0.3, Brolga: 5.5, 'Little penguin': 1.5, 'North Island brown kiwi': 2.5, Kea: 0.9,
+  'Kākāpō': 2, Ostrich: 100, 'Emperor penguin': 30, 'Atlantic puffin': 0.45, 'Bald eagle': 4.5, 'Golden eagle': 4.5,
+  'Peregrine falcon': 0.8, Osprey: 1.5, 'Andean condor': 12, 'Secretary bird': 4, 'Harpy eagle': 7, 'Snowy owl': 2,
+  'Great horned owl': 1.4, 'Greater flamingo': 3, 'Scarlet macaw': 1, 'African grey parrot': 0.45, 'Toco toucan': 0.54,
+  'Bee hummingbird': 0.002, 'Ruby-throated hummingbird': 0.0035, 'Resplendent quetzal': 0.21, 'Indian peafowl': 4, Mallard: 1.1,
+  'Mute swan': 10.5, 'Canada goose': 4.5, 'Wild turkey': 6, 'Red junglefowl': 1, 'Rock dove': 0.3, 'Greater roadrunner': 0.35,
+  'Northern cardinal': 0.045, 'American robin': 0.077, 'European robin': 0.018, 'Blue jay': 0.085, 'House sparrow': 0.03,
+  'Common starling': 0.08, 'Barn swallow': 0.019, 'Common kingfisher': 0.04, 'Eurasian blue tit': 0.011, 'Eurasian magpie': 0.22,
+  'Common raven': 1.2, 'Wandering albatross': 9, 'Blue-footed booby': 1.5, 'Magnificent frigatebird': 1.35, 'Grey heron': 1.5,
+  'White stork': 3.4, Shoebill: 5.5, 'Great spotted woodpecker': 0.085, 'Common cuckoo': 0.12, 'Great hornbill': 3,
+  'Lilac-breasted roller': 0.1, 'Arctic tern': 0.1,
+});
+
+export default PACK;

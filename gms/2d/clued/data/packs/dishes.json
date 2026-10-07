@@ -140,7 +140,13 @@
     "country": "Japan",
     "course": "Soup"
    },
+   "lookalikes": [
+    "pho"
+   ],
    "blurb": "Wheat noodles in a rich broth, topped with things like pork, egg and spring onion. It came to Japan from China.",
+   "differences": {
+    "pho": "Phở is Vietnamese, with flat rice noodles in a clear broth topped with fresh herbs and lime; ramen is Japanese, with springy wheat noodles in a richer broth."
+   },
    "clues": [
     "Instant noodles were invented in Japan in 1958.",
     "Its broth can be flavoured with soy, miso or pork bones.",
@@ -269,7 +275,13 @@
     "country": "Italy",
     "course": "Main"
    },
+   "lookalikes": [
+    "moussaka"
+   ],
    "blurb": "Layers of flat pasta sheets with meat sauce, white sauce and cheese, baked in the oven.",
+   "differences": {
+    "moussaka": "Lasagne is layered with sheets of pasta; moussaka is layered with aubergine (and often potato) instead of pasta."
+   },
    "clues": [
     "Garfield the cat loves it.",
     "It is baked in a deep dish.",
@@ -512,7 +524,13 @@
     "country": "Spain",
     "course": "Soup"
    },
+   "lookalikes": [
+    "borscht"
+   ],
    "blurb": "A cold soup of blended raw tomatoes, peppers, cucumber, garlic and olive oil, from Andalusia.",
+   "differences": {
+    "borscht": "Borscht gets its deep red from beetroot and is usually served hot; gazpacho is a cold, raw tomato soup."
+   },
    "clues": [
     "It comes from Andalusia.",
     "It is blended from raw vegetables.",
@@ -972,7 +990,13 @@
     "country": "Germany",
     "course": "Main"
    },
+   "lookalikes": [
+    "hot-dog"
+   ],
    "blurb": "A German sausage, usually pork, grilled or fried and often eaten in a bread roll with mustard.",
+   "differences": {
+    "hot-dog": "A bratwurst is a coarser German sausage, usually of pork and usually grilled; a hot dog is a smooth frankfurter-style sausage served in a soft split bun."
+   },
    "clues": [
     "Nuremberg is famous for small ones.",
     "It is often eaten with sauerkraut.",
@@ -1176,7 +1200,13 @@
     "country": "Poland",
     "course": "Main"
    },
+   "lookalikes": [
+    "jiaozi"
+   ],
    "blurb": "Polish dumplings filled with potato and cheese, meat, cabbage or fruit, then boiled or fried.",
+   "differences": {
+    "jiaozi": "Jiaozi are Chinese, with thin wheat wrappers often filled with pork and cabbage; pierogi are Polish, with thicker dough and fillings such as potato and cheese."
+   },
    "clues": [
     "Popular fillings include potato and cheese.",
     "They can be sweet or savoury.",
@@ -1220,7 +1250,13 @@
     "country": "Ukraine",
     "course": "Soup"
    },
+   "lookalikes": [
+    "gazpacho"
+   ],
    "blurb": "A sour soup coloured deep red by beetroot. UNESCO lists Ukrainian borscht cooking as cultural heritage.",
+   "differences": {
+    "gazpacho": "Borscht gets its deep red from beetroot and is usually served hot; gazpacho is a cold, raw tomato soup."
+   },
    "clues": [
     "It is often served with sour cream.",
     "It can be eaten hot or cold.",
@@ -1260,7 +1296,13 @@
     "country": "Greece",
     "course": "Main"
    },
+   "lookalikes": [
+    "lasagne"
+   ],
    "blurb": "A baked Greek dish of layered aubergine and minced meat topped with creamy white sauce.",
+   "differences": {
+    "lasagne": "Lasagne is layered with sheets of pasta; moussaka is layered with aubergine (and often potato) instead of pasta."
+   },
    "clues": [
     "Its modern form was shaped by chef Nikolaos Tselementes.",
     "It has a thick béchamel topping.",
@@ -1848,7 +1890,13 @@
     "country": "Vietnam",
     "course": "Soup"
    },
+   "lookalikes": [
+    "ramen"
+   ],
    "blurb": "A Vietnamese noodle soup of rice noodles in fragrant broth with beef or chicken and fresh herbs.",
+   "differences": {
+    "ramen": "Phở is Vietnamese, with flat rice noodles in a clear broth topped with fresh herbs and lime; ramen is Japanese, with springy wheat noodles in a richer broth."
+   },
    "clues": [
     "It developed near Hanoi in the early 1900s.",
     "Its broth is spiced with star anise.",
@@ -2102,7 +2150,13 @@
     "country": "China",
     "course": "Main"
    },
+   "lookalikes": [
+    "pierogi"
+   ],
    "blurb": "Chinese dumplings filled with meat and vegetables. Families make them together for Chinese New Year.",
+   "differences": {
+    "pierogi": "Jiaozi are Chinese, with thin wheat wrappers often filled with pork and cabbage; pierogi are Polish, with thicker dough and fillings such as potato and cheese."
+   },
    "clues": [
     "Their name sounds like an old word for changing to a new year.",
     "They are often dipped in vinegar and soy sauce.",
@@ -2401,7 +2455,13 @@
     "country": "United States",
     "course": "Snack"
    },
+   "lookalikes": [
+    "bratwurst"
+   ],
    "blurb": "A cooked sausage in a long bun, often topped with mustard and ketchup.",
+   "differences": {
+    "bratwurst": "A bratwurst is a coarser German sausage, usually of pork and usually grilled; a hot dog is a smooth frankfurter-style sausage served in a soft split bun."
+   },
    "clues": [
     "Coney Island is famous for them.",
     "A famous eating contest is held every 4 July.",

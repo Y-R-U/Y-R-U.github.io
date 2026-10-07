@@ -203,3 +203,9 @@ body.kids-on .kids-toggle { border-style: solid; border-color: var(--ink); backg
 .daily-card .d-badge.cal { display: flex; flex-direction: column; overflow: hidden; background: var(--card); place-items: stretch; }
 .daily-card .d-badge.cal b { background: var(--coral, #f25c54); color: #fff; font: 900 13px/1 var(--font-body, sans-serif); letter-spacing: .08em; padding: 5px 0 4px; text-align: center; }
 .daily-card .d-badge.cal i { flex: 1; display: grid; place-items: center; font: 400 30px/1 var(--font-display, sans-serif); font-style: normal; color: var(--ink); }
+.hid { margin-top: 2px; text-align: center; }
+.hid-more { border: 0; background: none; color: var(--ink-2); font: inherit; font-size: 13px; font-weight: 700; padding: 10px 8px; min-height: 40px; cursor: pointer; }
+.hid-caret { margin-left: 6px; font-size: 11px; }
+.hid-list { text-align: left; padding: 0 6px 6px; display: flex; flex-direction: column; gap: 8px; }
+.hid-g { margin: 0; font-size: 12.5px; line-height: 1.45; color: var(--ink-2); }
+.hid-g b { display: block; color: var(--ink-2); font-size: 12px; }

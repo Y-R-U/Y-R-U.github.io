@@ -21,7 +21,7 @@
    ],
    "ask": "Is the {lname} a reptile or an amphibian?",
    "askReverse": "Which of these is an {lvalue}?",
-   "stmt": "The {lname} is an {lvalue}."
+   "stmt": "The {lname} is {aValue}."
   },
   "region": {
    "type": "cat",
@@ -54,6 +54,22 @@
    "ask": "What is the IUCN conservation status of the {lname}?",
    "askReverse": "Which of these is listed as \"{value}\" by the IUCN?",
    "stmt": "The {lname} is listed as \"{value}\" by the IUCN."
+  },
+  "kind": {
+   "type": "cat",
+   "label": "Kind",
+   "values": [
+    "Lizard",
+    "Frog or toad",
+    "Crocodilian",
+    "Salamander or newt",
+    "Turtle or tortoise",
+    "Tuatara",
+    "Snake"
+   ],
+   "ask": "What kind of animal is the {lname}?",
+   "askReverse": "Which of these is {aValue}?",
+   "stmt": "The {lname} is {aValue}."
   }
  },
  "items": [
@@ -71,6 +87,7 @@
     "region": "Australia",
     "lengthM": 5,
     "venomous": false,
+    "kind": "Crocodilian",
     "status": "Least concern"
    },
    "lookalikes": [
@@ -133,6 +150,7 @@
     "region": "Africa",
     "lengthM": 4.5,
     "venomous": false,
+    "kind": "Crocodilian",
     "status": "Least concern"
    },
    "lookalikes": [
@@ -195,6 +213,7 @@
     "region": "North America",
     "lengthM": 3.5,
     "venomous": false,
+    "kind": "Crocodilian",
     "status": "Least concern"
    },
    "lookalikes": [
@@ -265,6 +284,7 @@
     "region": "Asia",
     "lengthM": 4.5,
     "venomous": false,
+    "kind": "Crocodilian",
     "status": "Critically endangered"
    },
    "lookalikes": [
@@ -324,7 +344,8 @@
     "cls": "Reptile",
     "region": "Asia",
     "lengthM": 2.6,
-    "venomous": true
+    "venomous": true,
+    "kind": "Lizard"
    },
    "lookalikes": [
     "lace-monitor",
@@ -389,6 +410,7 @@
     "region": "Australia",
     "lengthM": 1.7,
     "venomous": true,
+    "kind": "Lizard",
     "status": "Least concern"
    },
    "lookalikes": [
@@ -449,6 +471,7 @@
     "cls": "Reptile",
     "region": "Australia",
     "lengthM": 2,
+    "kind": "Lizard",
     "status": "Least concern"
    },
    "lookalikes": [
@@ -505,6 +528,7 @@
     "region": "the Americas",
     "lengthM": 1.5,
     "venomous": false,
+    "kind": "Lizard",
     "status": "Least concern"
    },
    "lookalikes": [
@@ -563,6 +587,7 @@
     "region": "the Galápagos Islands",
     "lengthM": 1,
     "venomous": false,
+    "kind": "Lizard",
     "status": "Vulnerable"
    },
    "lookalikes": [
@@ -627,6 +652,7 @@
     "region": "Australia",
     "lengthM": 0.85,
     "venomous": false,
+    "kind": "Lizard",
     "status": "Least concern"
    },
    "blurb": "An Australian lizard that opens a huge frill around its neck to scare enemies, then runs away on its back legs.",
@@ -688,6 +714,7 @@
     "region": "Australia",
     "lengthM": 0.2,
     "venomous": false,
+    "kind": "Lizard",
     "status": "Least concern"
    },
    "blurb": "A spiky desert lizard of Australia. It drinks by soaking up water through grooves in its skin.",
@@ -750,6 +777,7 @@
     "region": "Australia",
     "lengthM": 0.5,
     "venomous": false,
+    "kind": "Lizard",
     "status": "Least concern"
    },
    "blurb": "A big, slow Australian skink that sticks out its bright blue tongue to scare enemies. It eats snails in gardens.",
@@ -810,6 +838,7 @@
     "region": "Australia",
     "lengthM": 0.5,
     "venomous": false,
+    "kind": "Lizard",
     "status": "Least concern"
    },
    "blurb": "A spiky Australian lizard that puffs out a dark \"beard\" when scared. It is a very popular pet.",
@@ -868,6 +897,7 @@
     "region": "North America",
     "lengthM": 0.5,
     "venomous": true,
+    "kind": "Lizard",
     "status": "Near threatened"
    },
    "blurb": "A venomous lizard of the south-western USA and Mexico with beaded pink-and-black skin. Its venom led to a diabetes drug.",
@@ -928,6 +958,7 @@
     "region": "Africa",
     "lengthM": 0.4,
     "venomous": false,
+    "kind": "Lizard",
     "status": "Least concern"
    },
    "lookalikes": [
@@ -988,6 +1019,7 @@
     "region": "Asia",
     "lengthM": 0.45,
     "venomous": false,
+    "kind": "Lizard",
     "status": "Least concern"
    },
    "lookalikes": [
@@ -1040,6 +1072,7 @@
     "region": "Asia",
     "lengthM": 0.2,
     "venomous": false,
+    "kind": "Lizard",
     "status": "Least concern"
    },
    "lookalikes": [
@@ -1100,6 +1133,7 @@
     "region": "Asia",
     "lengthM": 0.3,
     "venomous": false,
+    "kind": "Lizard",
     "status": "Least concern"
    },
    "lookalikes": [
@@ -1174,6 +1208,7 @@
     "region": "the Galápagos Islands",
     "lengthM": 1.5,
     "venomous": false,
+    "kind": "Turtle or tortoise",
     "status": "Extinct"
    },
    "lookalikes": [
@@ -1232,7 +1267,8 @@
     "cls": "Reptile",
     "region": "North America",
     "lengthM": 0.7,
-    "venomous": false
+    "venomous": false,
+    "kind": "Turtle or tortoise"
    },
    "blurb": "A huge freshwater turtle of the USA. It lures fish with a worm-like pink tongue.",
    "clues": [
@@ -1287,6 +1323,7 @@
     "region": "New Zealand",
     "lengthM": 0.6,
     "venomous": false,
+    "kind": "Tuatara",
     "status": "Least concern"
    },
    "blurb": "A lizard-like reptile from New Zealand. It is the last survivor of a group that lived with the dinosaurs.",
@@ -1344,6 +1381,7 @@
     "region": "North America",
     "lengthM": 0.25,
     "venomous": false,
+    "kind": "Salamander or newt",
     "status": "Critically endangered"
    },
    "blurb": "A Mexican salamander that keeps its feathery gills and stays in the water all its life. It can regrow lost legs.",
@@ -1404,7 +1442,8 @@
     "cls": "Amphibian",
     "region": "South America",
     "lengthM": 0.05,
-    "venomous": true
+    "venomous": true,
+    "kind": "Frog or toad"
    },
    "lookalikes": [
     "strawberry-poison-frog"
@@ -1463,6 +1502,7 @@
     "region": "the Americas",
     "lengthM": 0.02,
     "venomous": true,
+    "kind": "Frog or toad",
     "status": "Least concern"
    },
    "lookalikes": [
@@ -1532,6 +1572,7 @@
     "region": "the Americas",
     "lengthM": 0.06,
     "venomous": false,
+    "kind": "Frog or toad",
     "status": "Least concern"
    },
    "blurb": "A bright green tree frog with huge red eyes. It flashes its eyes to startle predators.",
@@ -1592,6 +1633,7 @@
     "region": "South America",
     "lengthM": 0.15,
     "venomous": true,
+    "kind": "Frog or toad",
     "status": "Least concern"
    },
    "lookalikes": [
@@ -1658,6 +1700,7 @@
     "region": "Australia",
     "lengthM": 0.1,
     "venomous": false,
+    "kind": "Frog or toad",
     "status": "Least concern"
    },
    "lookalikes": [
@@ -1720,6 +1763,7 @@
     "region": "Australia",
     "lengthM": 0.03,
     "venomous": true,
+    "kind": "Frog or toad",
     "status": "Critically endangered"
    },
    "blurb": "A tiny, critically endangered frog of the Snowy Mountains with bright yellow and black stripes.",
@@ -1765,6 +1809,7 @@
     "region": "North America",
     "lengthM": 0.15,
     "venomous": false,
+    "kind": "Frog or toad",
     "status": "Least concern"
    },
    "lookalikes": [
@@ -1821,6 +1866,7 @@
     "region": "Europe",
     "lengthM": 0.08,
     "venomous": false,
+    "kind": "Frog or toad",
     "status": "Least concern"
    },
    "lookalikes": [
@@ -1894,6 +1940,7 @@
     "region": "Europe",
     "lengthM": 0.1,
     "venomous": true,
+    "kind": "Frog or toad",
     "status": "Least concern"
    },
    "lookalikes": [
@@ -1967,6 +2014,7 @@
     "region": "the Americas",
     "lengthM": 0.025,
     "venomous": false,
+    "kind": "Frog or toad",
     "status": "Least concern"
    },
    "blurb": "A tiny frog with see-through skin on its belly. You can see its heart beating.",
@@ -2016,7 +2064,8 @@
     "cls": "Amphibian",
     "region": "Africa",
     "lengthM": 0.3,
-    "venomous": false
+    "venomous": false,
+    "kind": "Frog or toad"
    },
    "blurb": "The biggest frog in the world, from West Africa. It can weigh over 3 kg.",
    "clues": [
@@ -2064,6 +2113,7 @@
     "region": "Europe",
     "lengthM": 0.2,
     "venomous": true,
+    "kind": "Salamander or newt",
     "status": "Vulnerable"
    },
    "lookalikes": [
@@ -2122,6 +2172,7 @@
     "cls": "Amphibian",
     "region": "Europe",
     "lengthM": 0.15,
+    "kind": "Salamander or newt",
     "status": "Least concern"
    },
    "lookalikes": [
@@ -2170,6 +2221,7 @@
     "region": "South America",
     "lengthM": 0.12,
     "venomous": false,
+    "kind": "Frog or toad",
     "status": "Vulnerable"
    },
    "blurb": "A round frog with a huge mouth from South America. It will try to eat almost anything that moves past it.",

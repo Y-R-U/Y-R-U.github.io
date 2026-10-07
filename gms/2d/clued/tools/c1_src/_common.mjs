@@ -17,3 +17,12 @@ export const mass = (label = 'Typical adult weight') => ({ type: 'num', label, u
 
 // country names that take 'the' mid-sentence
 export const theC = v => (/^(United |Netherlands$|Czech Republic$|Philippines$|Bahamas$|Gambia$|Maldives$|Dominican Republic$|Central African|Democratic Republic)/.test(v) ? 'the ' + v : v);
+
+// Merge one fact into items by name: addFacts(items, 'massKg', { Emu: 35, … }). Unknown names throw.
+export function addFacts(items, key, byName) {
+  const seen = new Set();
+  for (const it of items) if (Object.prototype.hasOwnProperty.call(byName, it.n)) { it.f = { ...(it.f || {}), [key]: byName[it.n] }; seen.add(it.n); }
+  const miss = Object.keys(byName).filter(n => !seen.has(n));
+  if (miss.length) throw new Error(`addFacts ${key}: unknown items ${miss.join(', ')}`);
+  return items;
+}

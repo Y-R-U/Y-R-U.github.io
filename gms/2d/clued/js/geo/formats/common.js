@@ -1,7 +1,7 @@
 // Shared bits for the map formats: geo index (loaded before any format generates), layout, views, flags.
-import { loadIndex, geo, countryIds, regionMembers, isPlayable } from '../data.js?v=202610071242';
-import { REGIONS, STATE_VIEWS, CONTINENTS } from '../regions.js?v=202610071242';
-import { createMap } from '../map.js?v=202610071242';
+import { loadIndex, geo, countryIds, regionMembers, isPlayable } from '../data.js?v=202610071324';
+import { REGIONS, STATE_VIEWS, CONTINENTS } from '../regions.js?v=202610071324';
+import { createMap } from '../map.js?v=202610071324';
 
 await loadIndex();   // ~75 KB; generate() is synchronous and needs it
 
@@ -66,7 +66,7 @@ export function stateDifficulty(iso) {
 }
 
 const CSS = `
-.gmq{position:absolute;inset:0;display:flex;flex-direction:column;gap:8px;min-height:0}
+.gmq{position:absolute;inset:0;display:flex;flex-direction:column;justify-content:center;gap:8px;min-height:0}
 .gmq-side{display:contents}
 .gmq-top{order:0}.gmq-mapwrap{order:1}.gmq-foot{order:2}
 .gmq-top{flex:0 0 auto;display:flex;align-items:center;gap:10px;justify-content:center;padding:2px 4px 0}
@@ -95,7 +95,8 @@ const CSS = `
 .kids .gmq-top .q-prompt,.kids-on .gmq-top .q-prompt{font-size:1.45em}
 @media (orientation:landscape) and (max-height:520px){
  .gmq{flex-direction:row;gap:10px}
- .gmq-side{order:2;flex:0 0 38%;display:flex;flex-direction:column;justify-content:center;gap:10px;min-width:0;overflow:auto}
+ .gmq-side{order:2;flex:0 0 38%;display:flex;flex-direction:column;justify-content:center;gap:10px;min-width:0;overflow:auto;padding:4px max(10px,env(safe-area-inset-right)) 4px 4px}
+ .play.revealed .gmq-big button:not(.ok):not(.bad){display:none}
  .gmq-mapwrap{order:1;min-height:0}
  .gmq-top{flex-direction:column}
  .gmq-big{grid-template-columns:1fr 1fr;gap:6px}
@@ -105,7 +106,7 @@ const CSS = `
 }
 @media (orientation:landscape) and (min-height:521px) and (min-width:900px){
  .gmq{flex-direction:row;gap:16px}
- .gmq-side{order:2;flex:0 0 340px;display:flex;flex-direction:column;justify-content:center;gap:14px}
+ .gmq-side{order:2;flex:0 0 340px;display:flex;flex-direction:column;justify-content:center;gap:14px;padding-right:16px}
  .gmq-mapwrap{order:1}
  .gmq-top{flex-direction:column}
 }
@@ -126,6 +127,11 @@ export function frame(el, { prompt, flag = null }) {
   if (flag) { const img = document.createElement('img'); img.className = 'gmq-flag'; img.src = flag.src; img.alt = 'Flag'; img.referrerPolicy = 'no-referrer'; top.append(img); }
   top.append(promptEl);
   wrap.append(mapEl);
+  // portrait: shrink the map box to the map (min 300 px, which kids tap targets are sized for) instead of ocean bands
+  wrap.addEventListener('gm-fit', e => {
+    const tall = matchMedia('(orientation: portrait)').matches;
+    wrap.style.maxHeight = tall ? `${Math.max(300, Math.ceil(e.detail.h))}px` : '';
+  });
   side.append(top, foot);
   root.append(side, wrap);
   el.append(root);

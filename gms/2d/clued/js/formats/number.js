@@ -1,6 +1,6 @@
-import { register, poolItems, pickPack, byDifficulty, imageOf, collect, pick } from './registry.js?v=202610071242';
-import { h, mediaBox } from '../ui/kit.js?v=202610071242';
-import { numericKeys, numOf, rangeOf, injectCSS, baseCSS, once, hasImg } from './fkit.js?v=202610071242';
+import { register, poolItems, pickPack, byDifficulty, imageOf, collect, pick, midName, capFirst, lcLabel } from './registry.js?v=202610071324';
+import { h, mediaBox } from '../ui/kit.js?v=202610071324';
+import { numericKeys, numOf, rangeOf, injectCSS, baseCSS, once, hasImg } from './fkit.js?v=202610071324';
 
 const CSS = `
 .nb{gap:12px}
@@ -32,16 +32,17 @@ const CSS = `
 `;
 
 const PASSIVE = /^(released|born|built|founded|discovered|first published|published|painted|completed|opened|written|launched|formed|invented)$/i;
-function askFor(meta, name) {
-  const l = String(meta.label || '').trim();
-  if (meta.askNumber) return meta.askNumber.replace(/\{name\}/g, name);
+function askFor(meta, item, pack) {
+  const l = String(meta.label || '').trim(), ll = lcLabel(l);
+  const name = midName(item, pack);
+  if (meta.askNumber) return capFirst(meta.askNumber.replace(/\{name\}/g, name));
   if (meta.type === 'year') {
     if (/^died$/i.test(l)) return `In what year did ${name} die?`;
-    if (PASSIVE.test(l)) return `In what year was ${name} ${l.toLowerCase()}?`;
-    return `${name}: ${l.toLowerCase()} (year)?`;
+    if (PASSIVE.test(l)) return `In what year was ${name} ${ll}?`;
+    return `${capFirst(name)}: ${ll} (year)?`;
   }
-  if (/\b(using|by|in|of|per)\b/i.test(l)) return `${name}: ${l.toLowerCase()}?`;
-  return `What is the ${l.toLowerCase()} of ${name}?`;
+  if (/\b(using|by|in|of|per)\b/i.test(l)) return `${capFirst(name)}: ${ll}?`;
+  return `What is the ${ll} of ${name}?`;
 }
 
 const BIG = [[1e12, 'trillion'], [1e9, 'billion'], [1e6, 'million']];
@@ -101,7 +102,7 @@ function make(rng, pack, key, difficulty) {
   const sc = scaleFor(meta, range, v);
   const unit = meta.type === 'year' ? '' : meta.unit || '';
   return {
-    format: 'number', id: `number:${key}:${t.ref}`, prompt: askFor(meta, t.item.name),
+    format: 'number', id: `number:${key}:${t.ref}`, prompt: askFor(meta, t.item, pack),
     media: meta.showImg && hasImg(t.item) ? { img: [imageOf(t.item, rng)] } : undefined,
     answer: v, answerText: pretty(v, unit, sc.year), explain: t.item.blurb, refs: [t.ref], pack: pack.id,
     data: { ...sc, unit, level: difficulty, label: meta.label || key },

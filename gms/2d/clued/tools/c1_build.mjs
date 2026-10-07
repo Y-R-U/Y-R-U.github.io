@@ -145,6 +145,18 @@ async function buildPack(id) {
       if (!taxon) warn.push(`${iid}: iNat taxon not found for "${it.inat || it.sci}"`);
       else ranks = inatRanks(taxon);
     }
+    // taxoFacts: { key: { '<iNat taxon name>': value } } derives a cat fact from the item's iNat lineage (most specific
+    // match wins). A hand value must agree; `f: { key: null }` opts an item out.
+    for (const [k, map] of Object.entries(S.taxoFacts || {})) {
+      const lineage = taxon ? [taxon.name, ...(taxon.ancestors || []).map(a => a.name).reverse()] : [];
+      const hit = lineage.find(n => map[n] != null);
+      if (it.f && k in it.f) {
+        if (it.f[k] === null) delete facts[k];
+        else if (hit && map[hit] !== it.f[k]) throw new Error(`${id}/${iid}: ${k}="${it.f[k]}" but iNat lineage says "${map[hit]}" (${hit})`);
+        continue;
+      }
+      if (hit) facts[k] = map[hit];
+    }
     const w = wd[it.sci];
     if (S.status && w && !('status' in facts)) {
       const st = [...w.status].map(q => STATUS[q]).filter(Boolean);

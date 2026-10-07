@@ -1,5 +1,5 @@
 {
- "build": "202610051408",
+ "build": "202610071324",
  "themes": [
   {
    "id": "animals",
@@ -217,7 +217,7 @@
      "era": "cat",
      "films": "text"
     },
-    "groups": 2,
+    "groups": 10,
     "lookalikes": 0,
     "fakes": 0,
     "quotes": 0,
@@ -230,7 +230,7 @@
      "nationality"
     ],
     "catBins": {
-     "era": 1
+     "era": 8
     },
     "formats": {
      "mc": 20,
@@ -240,11 +240,11 @@
      "hilo": 20,
      "order": 20,
      "odd": 20,
-     "sort": 0,
+     "sort": 20,
      "reveal": 20,
      "number": 20,
-     "connect": 0,
-     "blitz60": 4,
+     "connect": 20,
+     "blitz60": 11,
      "type": 20,
      "chain": 20
     },
@@ -255,12 +255,12 @@
      "ladder": 20,
      "hilo": 20,
      "order": 0,
-     "odd": 0,
-     "sort": 0,
+     "odd": 20,
+     "sort": 16,
      "reveal": 20,
      "number": 20,
-     "connect": 0,
-     "blitz60": 4,
+     "connect": 20,
+     "blitz60": 11,
      "type": 20,
      "chain": 20
     },
@@ -271,8 +271,8 @@
      "ladder": 20,
      "hilo": 20,
      "order": 20,
-     "odd": 0,
-     "sort": 0,
+     "odd": 20,
+     "sort": 20,
      "reveal": 20,
      "number": 20,
      "connect": 0,
@@ -384,7 +384,8 @@
     "facts": {
      "kind": "cat",
      "stings": "bool",
-     "social": "bool"
+     "social": "bool",
+     "lengthMm": "num"
     },
     "groups": 4,
     "lookalikes": 12,
@@ -406,11 +407,13 @@
      "tf": 20,
      "match": 20,
      "ladder": 20,
+     "hilo": 20,
+     "order": 20,
      "odd": 20,
      "sort": 20,
      "fake": 20,
      "reveal": 20,
-     "number": 1,
+     "number": 17,
      "connect": 0,
      "blitz60": 5,
      "type": 20,
@@ -421,11 +424,13 @@
      "tf": 20,
      "match": 20,
      "ladder": 6,
+     "hilo": 20,
+     "order": 0,
      "odd": 19,
      "sort": 20,
      "fake": 20,
      "reveal": 6,
-     "number": 1,
+     "number": 6,
      "connect": 0,
      "blitz60": 5,
      "type": 20,
@@ -436,11 +441,13 @@
      "tf": 20,
      "match": 15,
      "ladder": 6,
+     "hilo": 6,
+     "order": 0,
      "odd": 20,
      "sort": 0,
      "fake": 20,
      "reveal": 6,
-     "number": 1,
+     "number": 6,
      "connect": 0,
      "blitz60": 1,
      "type": 20,
@@ -465,7 +472,9 @@
     "facts": {
      "region": "cat",
      "flightless": "bool",
-     "status": "cat"
+     "status": "cat",
+     "kind": "cat",
+     "massKg": "num"
     },
     "groups": 23,
     "lookalikes": 33,
@@ -481,7 +490,8 @@
      "region"
     ],
     "catBins": {
-     "status": 2
+     "status": 2,
+     "kind": 6
     },
     "formats": {
      "mc": 20,
@@ -489,12 +499,15 @@
      "listen": 20,
      "match": 20,
      "ladder": 20,
+     "hilo": 20,
+     "order": 20,
      "odd": 20,
      "sort": 20,
      "fake": 20,
      "reveal": 20,
-     "connect": 0,
-     "blitz60": 10,
+     "number": 20,
+     "connect": 20,
+     "blitz60": 11,
      "type": 20,
      "lookalike": 20
     },
@@ -504,12 +517,15 @@
      "listen": 20,
      "match": 20,
      "ladder": 20,
+     "hilo": 20,
+     "order": 20,
      "odd": 20,
      "sort": 20,
      "fake": 20,
      "reveal": 20,
-     "connect": 0,
-     "blitz60": 10,
+     "number": 20,
+     "connect": 20,
+     "blitz60": 11,
      "type": 20,
      "lookalike": 20
     },
@@ -519,12 +535,15 @@
      "listen": 20,
      "match": 20,
      "ladder": 20,
+     "hilo": 20,
+     "order": 20,
      "odd": 20,
      "sort": 20,
      "fake": 20,
      "reveal": 20,
-     "connect": 0,
-     "blitz60": 6,
+     "number": 20,
+     "connect": 20,
+     "blitz60": 7,
      "type": 20,
      "lookalike": 20
     }
@@ -547,6 +566,7 @@
     "facts": {
      "kind": "cat",
      "system": "cat",
+     "massG": "num",
      "count": "num"
     },
     "groups": 0,
@@ -572,7 +592,7 @@
      "match": 20,
      "ladder": 20,
      "hilo": 20,
-     "order": 1,
+     "order": 14,
      "odd": 20,
      "sort": 20,
      "reveal": 20,
@@ -604,11 +624,11 @@
      "match": 20,
      "ladder": 18,
      "hilo": 20,
-     "order": 0,
+     "order": 2,
      "odd": 20,
      "sort": 20,
      "reveal": 18,
-     "number": 16,
+     "number": 20,
      "connect": 0,
      "blitz60": 2,
      "type": 20,
@@ -783,6 +803,7 @@
     "itemAudio": 0,
     "clues": 37,
     "facts": {
+     "massKg": "num",
      "origin": "cat",
      "coat": "cat"
     },
@@ -806,10 +827,13 @@
      "tf": 20,
      "match": 20,
      "ladder": 20,
+     "hilo": 20,
+     "order": 0,
      "odd": 20,
      "sort": 20,
      "fake": 20,
      "reveal": 20,
+     "number": 17,
      "connect": 20,
      "blitz60": 5,
      "type": 20,
@@ -820,10 +844,13 @@
      "tf": 20,
      "match": 20,
      "ladder": 8,
+     "hilo": 2,
+     "order": 0,
      "odd": 20,
      "sort": 20,
      "fake": 20,
      "reveal": 8,
+     "number": 4,
      "connect": 20,
      "blitz60": 5,
      "type": 20,
@@ -834,10 +861,13 @@
      "tf": 20,
      "match": 20,
      "ladder": 8,
+     "hilo": 0,
+     "order": 0,
      "odd": 20,
      "sort": 5,
      "fake": 20,
      "reveal": 8,
+     "number": 4,
      "connect": 0,
      "blitz60": 1,
      "type": 20,
@@ -946,7 +976,7 @@
    "icon": "💱",
    "kids": false,
    "items": 142,
-   "questions": 210,
+   "questions": 250,
    "caps": {
     "img": 0,
     "audio": 0,
@@ -966,9 +996,9 @@
     "qkinds": {
      "mc": 205,
      "number": 1,
-     "tf": 4
+     "tf": 44
     },
-    "easy": 72,
+    "easy": 81,
     "kidsItems": 0,
     "multi": [
      "continent"
@@ -976,7 +1006,7 @@
     "catBins": {},
     "formats": {
      "mc": 20,
-     "tf": 4,
+     "tf": 20,
      "match": 20,
      "ladder": 20,
      "hilo": 20,
@@ -987,7 +1017,7 @@
     },
     "formatsEasy": {
      "mc": 20,
-     "tf": 2,
+     "tf": 11,
      "match": 20,
      "ladder": 20,
      "hilo": 20,
@@ -998,7 +1028,7 @@
     },
     "formatsKids": {
      "mc": 0,
-     "tf": 2,
+     "tf": 11,
      "match": 0,
      "ladder": 20,
      "hilo": 20,
@@ -1121,7 +1151,7 @@
      "course": "cat"
     },
     "groups": 0,
-    "lookalikes": 4,
+    "lookalikes": 14,
     "fakes": 4,
     "quotes": 0,
     "qkinds": {
@@ -1148,7 +1178,7 @@
      "connect": 20,
      "blitz60": 6,
      "type": 20,
-     "lookalike": 4
+     "lookalike": 14
     },
     "formatsEasy": {
      "mc": 20,
@@ -1162,7 +1192,7 @@
      "connect": 20,
      "blitz60": 6,
      "type": 20,
-     "lookalike": 4
+     "lookalike": 7
     },
     "formatsKids": {
      "mc": 20,
@@ -1176,7 +1206,7 @@
      "connect": 0,
      "blitz60": 3,
      "type": 20,
-     "lookalike": 0
+     "lookalike": 2
     }
    }
   },
@@ -1298,7 +1328,7 @@
     },
     "groups": 10,
     "lookalikes": 0,
-    "fakes": 0,
+    "fakes": 8,
     "quotes": 0,
     "qkinds": {
      "mc": 15,
@@ -1321,6 +1351,7 @@
      "order": 20,
      "odd": 20,
      "sort": 20,
+     "fake": 20,
      "reveal": 20,
      "number": 20,
      "connect": 20,
@@ -1336,6 +1367,7 @@
      "order": 20,
      "odd": 20,
      "sort": 20,
+     "fake": 20,
      "reveal": 14,
      "number": 20,
      "connect": 0,
@@ -1351,6 +1383,7 @@
      "order": 20,
      "odd": 20,
      "sort": 20,
+     "fake": 20,
      "reveal": 14,
      "number": 20,
      "connect": 0,
@@ -1527,7 +1560,8 @@
     "facts": {
      "colour": "cat",
      "region": "cat",
-     "emblem": "cat"
+     "emblem": "cat",
+     "family": "cat"
     },
     "groups": 34,
     "lookalikes": 8,
@@ -1543,18 +1577,20 @@
      "colour",
      "region"
     ],
-    "catBins": {},
+    "catBins": {
+     "family": 1
+    },
     "formats": {
      "mc": 20,
      "tf": 20,
      "match": 20,
      "ladder": 20,
-     "odd": 0,
+     "odd": 20,
      "sort": 20,
      "fake": 20,
      "reveal": 20,
      "connect": 0,
-     "blitz60": 9,
+     "blitz60": 10,
      "type": 20,
      "lookalike": 8
     },
@@ -1563,12 +1599,12 @@
      "tf": 20,
      "match": 20,
      "ladder": 20,
-     "odd": 0,
+     "odd": 20,
      "sort": 20,
      "fake": 20,
      "reveal": 20,
      "connect": 0,
-     "blitz60": 9,
+     "blitz60": 10,
      "type": 20,
      "lookalike": 3
     },
@@ -1577,8 +1613,8 @@
      "tf": 20,
      "match": 20,
      "ladder": 20,
-     "odd": 0,
-     "sort": 0,
+     "odd": 20,
+     "sort": 4,
      "fake": 20,
      "reveal": 20,
      "connect": 0,
@@ -1619,10 +1655,11 @@
     "easy": 19,
     "kidsItems": 13,
     "multi": [
-     "kind",
-     "colour"
+     "kind"
     ],
-    "catBins": {},
+    "catBins": {
+     "colour": 2
+    },
     "formats": {
      "mc": 20,
      "tf": 20,
@@ -1630,13 +1667,13 @@
      "ladder": 20,
      "hilo": 20,
      "order": 20,
-     "odd": 0,
+     "odd": 20,
      "sort": 20,
      "fake": 20,
      "reveal": 20,
      "number": 20,
      "connect": 0,
-     "blitz60": 3,
+     "blitz60": 4,
      "type": 20,
      "lookalike": 18
     },
@@ -1647,13 +1684,13 @@
      "ladder": 13,
      "hilo": 20,
      "order": 1,
-     "odd": 0,
+     "odd": 9,
      "sort": 20,
      "fake": 20,
      "reveal": 13,
      "number": 13,
      "connect": 0,
-     "blitz60": 3,
+     "blitz60": 4,
      "type": 20,
      "lookalike": 10
     },
@@ -1664,8 +1701,8 @@
      "ladder": 13,
      "hilo": 20,
      "order": 0,
-     "odd": 0,
-     "sort": 0,
+     "odd": 20,
+     "sort": 2,
      "fake": 20,
      "reveal": 13,
      "number": 13,
@@ -1683,7 +1720,7 @@
    "icon": "💡",
    "kids": false,
    "items": 0,
-   "questions": 587,
+   "questions": 647,
    "caps": {
     "img": 0,
     "audio": 0,
@@ -1697,32 +1734,32 @@
     "quotes": 0,
     "qkinds": {
      "mc": 404,
-     "number": 96,
-     "tf": 72,
-     "order": 15
+     "number": 111,
+     "tf": 101,
+     "order": 31
     },
-    "easy": 204,
+    "easy": 225,
     "kidsItems": 0,
     "multi": [],
     "catBins": {},
     "formats": {
      "mc": 20,
      "tf": 20,
-     "order": 15,
+     "order": 20,
      "number": 20,
      "type": 20
     },
     "formatsEasy": {
      "mc": 20,
      "tf": 20,
-     "order": 1,
+     "order": 8,
      "number": 20,
      "type": 20
     },
     "formatsKids": {
      "mc": 0,
      "tf": 20,
-     "order": 1,
+     "order": 8,
      "number": 20,
      "type": 20
     }
@@ -1791,7 +1828,7 @@
    "icon": "💡",
    "kids": false,
    "items": 0,
-   "questions": 58,
+   "questions": 66,
    "virtual": {
     "of": "general",
     "tag": "geography"
@@ -1809,32 +1846,32 @@
     "quotes": 0,
     "qkinds": {
      "mc": 46,
-     "number": 2,
+     "number": 7,
      "tf": 7,
-     "order": 3
+     "order": 6
     },
-    "easy": 17,
+    "easy": 19,
     "kidsItems": 0,
     "multi": [],
     "catBins": {},
     "formats": {
      "mc": 20,
      "tf": 7,
-     "order": 3,
-     "number": 2,
+     "order": 6,
+     "number": 7,
      "type": 20
     },
     "formatsEasy": {
      "mc": 14,
      "tf": 2,
-     "order": 3,
+     "order": 2,
      "number": 1,
      "type": 14
     },
     "formatsKids": {
      "mc": 0,
      "tf": 2,
-     "order": 0,
+     "order": 2,
      "number": 1,
      "type": 14
     }
@@ -1847,7 +1884,7 @@
    "icon": "💡",
    "kids": false,
    "items": 0,
-   "questions": 70,
+   "questions": 78,
    "virtual": {
     "of": "general",
     "tag": "history"
@@ -1866,31 +1903,31 @@
     "qkinds": {
      "number": 19,
      "mc": 44,
-     "tf": 4,
-     "order": 3
+     "tf": 9,
+     "order": 6
     },
-    "easy": 29,
+    "easy": 31,
     "kidsItems": 0,
     "multi": [],
     "catBins": {},
     "formats": {
      "mc": 20,
-     "tf": 4,
-     "order": 3,
+     "tf": 9,
+     "order": 6,
      "number": 19,
      "type": 20
     },
     "formatsEasy": {
      "mc": 19,
-     "tf": 2,
-     "order": 1,
+     "tf": 3,
+     "order": 2,
      "number": 7,
      "type": 17
     },
     "formatsKids": {
      "mc": 0,
-     "tf": 2,
-     "order": 1,
+     "tf": 3,
+     "order": 2,
      "number": 7,
      "type": 17
     }
@@ -1903,7 +1940,7 @@
    "icon": "💡",
    "kids": false,
    "items": 0,
-   "questions": 24,
+   "questions": 31,
    "virtual": {
     "of": "general",
     "tag": "art"
@@ -1921,25 +1958,25 @@
     "quotes": 0,
     "qkinds": {
      "mc": 23,
-     "tf": 1
+     "tf": 8
     },
-    "easy": 6,
+    "easy": 10,
     "kidsItems": 0,
     "multi": [],
     "catBins": {},
     "formats": {
      "mc": 20,
-     "tf": 1,
+     "tf": 8,
      "type": 20
     },
     "formatsEasy": {
      "mc": 5,
-     "tf": 1,
+     "tf": 5,
      "type": 5
     },
     "formatsKids": {
      "mc": 0,
-     "tf": 1,
+     "tf": 5,
      "type": 5
     }
    }
@@ -1951,7 +1988,7 @@
    "icon": "💡",
    "kids": false,
    "items": 0,
-   "questions": 22,
+   "questions": 35,
    "virtual": {
     "of": "general",
     "tag": "music"
@@ -1969,32 +2006,32 @@
     "quotes": 0,
     "qkinds": {
      "mc": 16,
-     "number": 4,
-     "tf": 1,
-     "order": 1
+     "number": 7,
+     "tf": 7,
+     "order": 5
     },
-    "easy": 9,
+    "easy": 14,
     "kidsItems": 0,
     "multi": [],
     "catBins": {},
     "formats": {
      "mc": 16,
-     "tf": 1,
-     "order": 1,
-     "number": 4,
+     "tf": 7,
+     "order": 5,
+     "number": 7,
      "type": 16
     },
     "formatsEasy": {
      "mc": 7,
-     "tf": 1,
+     "tf": 4,
      "order": 1,
      "number": 2,
      "type": 7
     },
     "formatsKids": {
      "mc": 0,
-     "tf": 0,
-     "order": 0,
+     "tf": 4,
+     "order": 1,
      "number": 2,
      "type": 7
     }
@@ -2007,7 +2044,7 @@
    "icon": "💡",
    "kids": false,
    "items": 0,
-   "questions": 70,
+   "questions": 74,
    "virtual": {
     "of": "general",
     "tag": "books"
@@ -2026,27 +2063,27 @@
     "qkinds": {
      "mc": 60,
      "number": 6,
-     "tf": 4
+     "tf": 8
     },
-    "easy": 23,
+    "easy": 25,
     "kidsItems": 0,
     "multi": [],
     "catBins": {},
     "formats": {
      "mc": 20,
-     "tf": 4,
+     "tf": 8,
      "number": 6,
      "type": 20
     },
     "formatsEasy": {
      "mc": 20,
-     "tf": 1,
+     "tf": 3,
      "number": 1,
      "type": 20
     },
     "formatsKids": {
      "mc": 0,
-     "tf": 1,
+     "tf": 3,
      "number": 1,
      "type": 20
     }
@@ -2059,7 +2096,7 @@
    "icon": "💡",
    "kids": false,
    "items": 0,
-   "questions": 33,
+   "questions": 43,
    "virtual": {
     "of": "general",
     "tag": "animals"
@@ -2077,28 +2114,32 @@
     "quotes": 0,
     "qkinds": {
      "mc": 20,
-     "number": 1,
-     "tf": 12
+     "number": 5,
+     "tf": 12,
+     "order": 6
     },
-    "easy": 14,
+    "easy": 17,
     "kidsItems": 0,
     "multi": [],
     "catBins": {},
     "formats": {
      "mc": 20,
      "tf": 12,
-     "number": 1,
+     "order": 6,
+     "number": 5,
      "type": 18
     },
     "formatsEasy": {
      "mc": 9,
      "tf": 5,
-     "number": 1,
+     "order": 3,
+     "number": 3,
      "type": 7
     },
     "formatsKids": {
      "mc": 0,
      "tf": 5,
+     "order": 3,
      "number": 0,
      "type": 7
     }
@@ -2159,7 +2200,7 @@
    "icon": "💡",
    "kids": false,
    "items": 0,
-   "questions": 40,
+   "questions": 50,
    "virtual": {
     "of": "general",
     "tag": "screen"
@@ -2177,29 +2218,29 @@
     "quotes": 0,
     "qkinds": {
      "mc": 35,
-     "number": 4,
-     "tf": 1
+     "number": 7,
+     "tf": 8
     },
-    "easy": 23,
+    "easy": 26,
     "kidsItems": 0,
     "multi": [],
     "catBins": {},
     "formats": {
      "mc": 20,
-     "tf": 1,
-     "number": 4,
+     "tf": 8,
+     "number": 7,
      "type": 20
     },
     "formatsEasy": {
      "mc": 20,
-     "tf": 1,
-     "number": 3,
+     "tf": 2,
+     "number": 4,
      "type": 19
     },
     "formatsKids": {
      "mc": 0,
-     "tf": 0,
-     "number": 3,
+     "tf": 2,
+     "number": 4,
      "type": 19
     }
    }
@@ -2297,7 +2338,9 @@
     "clues": 50,
     "facts": {
      "order": "cat",
-     "complete": "bool"
+     "complete": "bool",
+     "lengthMm": "num",
+     "wingspanMm": "num"
     },
     "groups": 18,
     "lookalikes": 13,
@@ -2320,12 +2363,13 @@
      "tf": 20,
      "match": 20,
      "ladder": 20,
-     "order": 1,
+     "hilo": 20,
+     "order": 20,
      "odd": 20,
      "sort": 20,
      "fake": 20,
      "reveal": 20,
-     "number": 2,
+     "number": 20,
      "connect": 20,
      "blitz60": 4,
      "type": 20,
@@ -2336,12 +2380,13 @@
      "tf": 20,
      "match": 20,
      "ladder": 16,
+     "hilo": 20,
      "order": 1,
      "odd": 20,
      "sort": 20,
      "fake": 20,
      "reveal": 16,
-     "number": 1,
+     "number": 15,
      "connect": 20,
      "blitz60": 4,
      "type": 20,
@@ -2352,12 +2397,13 @@
      "tf": 20,
      "match": 20,
      "ladder": 16,
-     "order": 1,
+     "hilo": 20,
+     "order": 9,
      "odd": 20,
      "sort": 20,
      "fake": 20,
      "reveal": 16,
-     "number": 1,
+     "number": 15,
      "connect": 0,
      "blitz60": 2,
      "type": 20,
@@ -2915,7 +2961,7 @@
      "reveal": 20,
      "number": 20,
      "connect": 20,
-     "blitz60": 13,
+     "blitz60": 10,
      "type": 20,
      "lookalike": 20
     },
@@ -2933,7 +2979,7 @@
      "reveal": 20,
      "number": 20,
      "connect": 20,
-     "blitz60": 13,
+     "blitz60": 10,
      "type": 20,
      "lookalike": 20
     },
@@ -2951,7 +2997,7 @@
      "reveal": 20,
      "number": 20,
      "connect": 20,
-     "blitz60": 11,
+     "blitz60": 8,
      "type": 20,
      "lookalike": 20
     }
@@ -3182,7 +3228,7 @@
      "reveal": 7,
      "connect": 0,
      "blitz60": 5,
-     "type": 20,
+     "type": 18,
      "lookalike": 5
     },
     "formatsKids": {
@@ -3218,6 +3264,7 @@
     "facts": {
      "artist": "cat",
      "year": "year",
+     "century": "cat",
      "museum": "text"
     },
     "groups": 40,
@@ -3231,7 +3278,8 @@
     "kidsItems": 0,
     "multi": [],
     "catBins": {
-     "artist": 1
+     "artist": 1,
+     "century": 5
     },
     "formats": {
      "mc": 20,
@@ -3241,11 +3289,11 @@
      "hilo": 20,
      "order": 20,
      "odd": 20,
-     "sort": 8,
+     "sort": 20,
      "reveal": 20,
      "number": 20,
-     "connect": 0,
-     "blitz60": 2,
+     "connect": 20,
+     "blitz60": 4,
      "type": 20
     },
     "formatsEasy": {
@@ -3255,12 +3303,12 @@
      "ladder": 15,
      "hilo": 20,
      "order": 20,
-     "odd": 12,
-     "sort": 0,
+     "odd": 20,
+     "sort": 10,
      "reveal": 15,
      "number": 14,
-     "connect": 0,
-     "blitz60": 2,
+     "connect": 20,
+     "blitz60": 4,
      "type": 20
     },
     "formatsKids": {
@@ -3271,7 +3319,7 @@
      "hilo": 20,
      "order": 20,
      "odd": 20,
-     "sort": 1,
+     "sort": 20,
      "reveal": 15,
      "number": 14,
      "connect": 0,
@@ -3438,7 +3486,8 @@
      "region": "cat",
      "lengthM": "num",
      "venomous": "bool",
-     "status": "cat"
+     "status": "cat",
+     "kind": "cat"
     },
     "groups": 15,
     "lookalikes": 23,
@@ -3456,7 +3505,8 @@
     ],
     "catBins": {
      "cls": 2,
-     "status": 1
+     "status": 1,
+     "kind": 3
     },
     "formats": {
      "mc": 20,
@@ -3471,8 +3521,8 @@
      "fake": 20,
      "reveal": 20,
      "number": 20,
-     "connect": 0,
-     "blitz60": 6,
+     "connect": 20,
+     "blitz60": 7,
      "type": 20,
      "lookalike": 20
     },
@@ -3489,8 +3539,8 @@
      "fake": 20,
      "reveal": 17,
      "number": 17,
-     "connect": 0,
-     "blitz60": 6,
+     "connect": 20,
+     "blitz60": 7,
      "type": 20,
      "lookalike": 13
     },
@@ -3508,7 +3558,7 @@
      "reveal": 17,
      "number": 17,
      "connect": 0,
-     "blitz60": 5,
+     "blitz60": 6,
      "type": 20,
      "lookalike": 7
     }
@@ -3563,7 +3613,7 @@
      "reveal": 20,
      "number": 20,
      "connect": 20,
-     "blitz60": 7,
+     "blitz60": 5,
      "type": 20,
      "lookalike": 20
     },
@@ -3580,7 +3630,7 @@
      "reveal": 20,
      "number": 20,
      "connect": 20,
-     "blitz60": 7,
+     "blitz60": 5,
      "type": 20,
      "lookalike": 13
     },
@@ -3597,7 +3647,7 @@
      "reveal": 20,
      "number": 20,
      "connect": 0,
-     "blitz60": 5,
+     "blitz60": 4,
      "type": 20,
      "lookalike": 10
     }
@@ -3652,7 +3702,7 @@
      "reveal": 20,
      "number": 20,
      "connect": 20,
-     "blitz60": 8,
+     "blitz60": 6,
      "type": 20,
      "lookalike": 14
     },
@@ -3669,8 +3719,8 @@
      "reveal": 7,
      "number": 7,
      "connect": 20,
-     "blitz60": 8,
-     "type": 20,
+     "blitz60": 6,
+     "type": 19,
      "lookalike": 6
     },
     "formatsKids": {
@@ -3687,7 +3737,7 @@
      "number": 7,
      "connect": 0,
      "blitz60": 1,
-     "type": 20,
+     "type": 19,
      "lookalike": 2
     }
    }
@@ -3744,7 +3794,7 @@
      "reveal": 20,
      "number": 20,
      "connect": 20,
-     "blitz60": 11,
+     "blitz60": 10,
      "type": 20,
      "lookalike": 20
     },
@@ -3761,7 +3811,7 @@
      "reveal": 17,
      "number": 17,
      "connect": 20,
-     "blitz60": 11,
+     "blitz60": 10,
      "type": 20,
      "lookalike": 15
     },
@@ -3778,7 +3828,7 @@
      "reveal": 17,
      "number": 17,
      "connect": 20,
-     "blitz60": 6,
+     "blitz60": 5,
      "type": 20,
      "lookalike": 8
     }
@@ -3896,7 +3946,8 @@
      "danger": "cat",
      "region": "cat",
      "web": "bool",
-     "legSpanCm": "num"
+     "legSpanCm": "num",
+     "bodyMm": "num"
     },
     "groups": 18,
     "lookalikes": 26,
@@ -3920,13 +3971,13 @@
      "tf": 20,
      "match": 20,
      "ladder": 20,
-     "hilo": 8,
-     "order": 0,
+     "hilo": 20,
+     "order": 20,
      "odd": 20,
      "sort": 20,
      "fake": 20,
      "reveal": 20,
-     "number": 6,
+     "number": 20,
      "connect": 20,
      "blitz60": 8,
      "type": 20,
@@ -3937,13 +3988,13 @@
      "tf": 20,
      "match": 20,
      "ladder": 15,
-     "hilo": 0,
-     "order": 0,
+     "hilo": 20,
+     "order": 1,
      "odd": 20,
      "sort": 20,
      "fake": 20,
      "reveal": 15,
-     "number": 6,
+     "number": 14,
      "connect": 20,
      "blitz60": 8,
      "type": 20,
@@ -3954,13 +4005,13 @@
      "tf": 20,
      "match": 20,
      "ladder": 15,
-     "hilo": 0,
-     "order": 0,
+     "hilo": 20,
+     "order": 8,
      "odd": 20,
      "sort": 20,
      "fake": 20,
      "reveal": 15,
-     "number": 1,
+     "number": 9,
      "connect": 0,
      "blitz60": 4,
      "type": 20,
@@ -3975,7 +4026,7 @@
    "icon": "⚽",
    "kids": false,
    "items": 120,
-   "questions": 150,
+   "questions": 155,
    "caps": {
     "img": 0,
     "audio": 0,
@@ -3997,10 +4048,10 @@
     "qkinds": {
      "number": 56,
      "mc": 84,
-     "order": 2,
+     "order": 7,
      "tf": 8
     },
-    "easy": 59,
+    "easy": 60,
     "kidsItems": 0,
     "multi": [],
     "catBins": {
@@ -4013,7 +4064,7 @@
      "mc": 20,
      "tf": 20,
      "match": 20,
-     "order": 2,
+     "order": 7,
      "odd": 20,
      "sort": 19,
      "number": 20,
@@ -4025,7 +4076,7 @@
      "mc": 20,
      "tf": 20,
      "match": 20,
-     "order": 2,
+     "order": 1,
      "odd": 20,
      "sort": 1,
      "number": 12,
@@ -4037,7 +4088,7 @@
      "mc": 0,
      "tf": 20,
      "match": 0,
-     "order": 0,
+     "order": 1,
      "odd": 20,
      "sort": 20,
      "number": 12,
@@ -4154,7 +4205,7 @@
     "groups": 8,
     "lookalikes": 0,
     "fakes": 0,
-    "quotes": 0,
+    "quotes": 17,
     "qkinds": {
      "mc": 157,
      "tf": 9,
@@ -4179,7 +4230,8 @@
      "number": 20,
      "connect": 20,
      "blitz60": 9,
-     "type": 20
+     "type": 20,
+     "quote": 17
     },
     "formatsEasy": {
      "mc": 20,
@@ -4193,7 +4245,8 @@
      "number": 18,
      "connect": 20,
      "blitz60": 9,
-     "type": 20
+     "type": 20,
+     "quote": 5
     },
     "formatsKids": {
      "mc": 0,
@@ -4207,7 +4260,8 @@
      "number": 18,
      "connect": 20,
      "blitz60": 4,
-     "type": 20
+     "type": 20,
+     "quote": 5
     }
    }
   },
@@ -4428,7 +4482,8 @@
     "clues": 0,
     "facts": {
      "composer": "cat",
-     "year": "year"
+     "year": "year",
+     "era": "cat"
     },
     "groups": 12,
     "lookalikes": 0,
@@ -4438,7 +4493,9 @@
     "easy": 5,
     "kidsItems": 0,
     "multi": [],
-    "catBins": {},
+    "catBins": {
+     "era": 2
+    },
     "formats": {
      "mc": 18,
      "tf": 20,
@@ -4447,10 +4504,10 @@
      "hilo": 20,
      "order": 20,
      "odd": 20,
-     "sort": 0,
+     "sort": 20,
      "number": 18,
      "connect": 0,
-     "blitz60": 1
+     "blitz60": 2
     },
     "formatsEasy": {
      "mc": 5,
@@ -4459,11 +4516,11 @@
      "match": 20,
      "hilo": 20,
      "order": 20,
-     "odd": 11,
-     "sort": 0,
+     "odd": 20,
+     "sort": 20,
      "number": 5,
      "connect": 0,
-     "blitz60": 1
+     "blitz60": 2
     },
     "formatsKids": {
      "mc": 0,
@@ -4472,7 +4529,7 @@
      "match": 0,
      "hilo": 14,
      "order": 3,
-     "odd": 3,
+     "odd": 12,
      "sort": 0,
      "number": 5,
      "connect": 0,
@@ -4498,7 +4555,8 @@
     "facts": {
      "artist": "cat",
      "year": "year",
-     "decade": "cat"
+     "decade": "cat",
+     "act": "cat"
     },
     "groups": 2,
     "lookalikes": 0,
@@ -4510,7 +4568,8 @@
     "multi": [],
     "catBins": {
      "artist": 1,
-     "decade": 1
+     "decade": 1,
+     "act": 3
     },
     "formats": {
      "mc": 20,
@@ -4520,10 +4579,10 @@
      "hilo": 20,
      "order": 0,
      "odd": 20,
-     "sort": 9,
+     "sort": 20,
      "number": 20,
-     "connect": 0,
-     "blitz60": 2
+     "connect": 20,
+     "blitz60": 4
     },
     "formatsEasy": {
      "mc": 18,
@@ -4532,11 +4591,11 @@
      "match": 20,
      "hilo": 0,
      "order": 0,
-     "odd": 15,
-     "sort": 0,
+     "odd": 20,
+     "sort": 20,
      "number": 18,
-     "connect": 0,
-     "blitz60": 2
+     "connect": 20,
+     "blitz60": 4
     },
     "formatsKids": {
      "mc": 0,
@@ -4546,10 +4605,10 @@
      "hilo": 0,
      "order": 0,
      "odd": 20,
-     "sort": 0,
+     "sort": 20,
      "number": 18,
      "connect": 0,
-     "blitz60": 1
+     "blitz60": 3
     }
    }
   },
@@ -4571,7 +4630,8 @@
     "facts": {
      "artist": "cat",
      "year": "year",
-     "decade": "cat"
+     "decade": "cat",
+     "act": "cat"
     },
     "groups": 1,
     "lookalikes": 0,
@@ -4583,7 +4643,8 @@
     "multi": [],
     "catBins": {
      "artist": 1,
-     "decade": 1
+     "decade": 1,
+     "act": 3
     },
     "formats": {
      "mc": 20,
@@ -4593,23 +4654,23 @@
      "hilo": 20,
      "order": 0,
      "odd": 20,
-     "sort": 0,
+     "sort": 20,
      "number": 20,
      "connect": 0,
-     "blitz60": 1
+     "blitz60": 4
     },
     "formatsEasy": {
-     "mc": 18,
+     "mc": 20,
      "tf": 20,
      "listen": 20,
      "match": 20,
      "hilo": 0,
      "order": 0,
-     "odd": 0,
-     "sort": 0,
+     "odd": 20,
+     "sort": 20,
      "number": 18,
-     "connect": 0,
-     "blitz60": 1
+     "connect": 20,
+     "blitz60": 4
     },
     "formatsKids": {
      "mc": 0,
@@ -4619,10 +4680,10 @@
      "hilo": 0,
      "order": 0,
      "odd": 20,
-     "sort": 0,
+     "sort": 20,
      "number": 18,
      "connect": 0,
-     "blitz60": 1
+     "blitz60": 2
     }
    }
   },
@@ -4644,7 +4705,8 @@
     "facts": {
      "artist": "cat",
      "year": "year",
-     "decade": "cat"
+     "decade": "cat",
+     "act": "cat"
     },
     "groups": 2,
     "lookalikes": 0,
@@ -4656,7 +4718,8 @@
     "multi": [],
     "catBins": {
      "artist": 1,
-     "decade": 1
+     "decade": 1,
+     "act": 3
     },
     "formats": {
      "mc": 20,
@@ -4666,23 +4729,23 @@
      "hilo": 20,
      "order": 0,
      "odd": 20,
-     "sort": 1,
+     "sort": 20,
      "number": 20,
      "connect": 0,
-     "blitz60": 2
+     "blitz60": 5
     },
     "formatsEasy": {
-     "mc": 16,
+     "mc": 20,
      "tf": 20,
      "listen": 20,
      "match": 20,
      "hilo": 0,
      "order": 0,
-     "odd": 0,
-     "sort": 0,
+     "odd": 20,
+     "sort": 20,
      "number": 16,
-     "connect": 0,
-     "blitz60": 2
+     "connect": 20,
+     "blitz60": 5
     },
     "formatsKids": {
      "mc": 0,
@@ -4691,11 +4754,11 @@
      "match": 0,
      "hilo": 0,
      "order": 0,
-     "odd": 0,
-     "sort": 0,
+     "odd": 20,
+     "sort": 20,
      "number": 16,
-     "connect": 0,
-     "blitz60": 1
+     "connect": 20,
+     "blitz60": 2
     }
    }
   },
@@ -4717,7 +4780,8 @@
     "facts": {
      "artist": "cat",
      "year": "year",
-     "decade": "cat"
+     "decade": "cat",
+     "act": "cat"
     },
     "groups": 1,
     "lookalikes": 0,
@@ -4728,7 +4792,8 @@
     "kidsItems": 0,
     "multi": [],
     "catBins": {
-     "decade": 1
+     "decade": 1,
+     "act": 3
     },
     "formats": {
      "mc": 20,
@@ -4737,24 +4802,24 @@
      "match": 20,
      "hilo": 20,
      "order": 0,
-     "odd": 0,
-     "sort": 0,
+     "odd": 20,
+     "sort": 20,
      "number": 20,
-     "connect": 0,
-     "blitz60": 1
+     "connect": 20,
+     "blitz60": 4
     },
     "formatsEasy": {
-     "mc": 15,
+     "mc": 20,
      "tf": 20,
      "listen": 20,
      "match": 20,
      "hilo": 0,
      "order": 0,
-     "odd": 0,
-     "sort": 0,
+     "odd": 20,
+     "sort": 20,
      "number": 15,
-     "connect": 0,
-     "blitz60": 1
+     "connect": 20,
+     "blitz60": 4
     },
     "formatsKids": {
      "mc": 0,
@@ -4763,11 +4828,11 @@
      "match": 0,
      "hilo": 0,
      "order": 0,
-     "odd": 0,
-     "sort": 0,
+     "odd": 20,
+     "sort": 20,
      "number": 15,
-     "connect": 0,
-     "blitz60": 1
+     "connect": 20,
+     "blitz60": 2
     }
    }
   },
@@ -4789,7 +4854,8 @@
     "facts": {
      "artist": "cat",
      "year": "year",
-     "decade": "cat"
+     "decade": "cat",
+     "act": "cat"
     },
     "groups": 2,
     "lookalikes": 0,
@@ -4800,7 +4866,8 @@
     "kidsItems": 0,
     "multi": [],
     "catBins": {
-     "decade": 1
+     "decade": 1,
+     "act": 3
     },
     "formats": {
      "mc": 20,
@@ -4810,23 +4877,23 @@
      "hilo": 20,
      "order": 0,
      "odd": 20,
-     "sort": 0,
+     "sort": 20,
      "number": 20,
-     "connect": 0,
-     "blitz60": 2
+     "connect": 20,
+     "blitz60": 5
     },
     "formatsEasy": {
-     "mc": 18,
+     "mc": 20,
      "tf": 20,
      "listen": 20,
      "match": 20,
      "hilo": 0,
      "order": 0,
-     "odd": 0,
-     "sort": 0,
+     "odd": 20,
+     "sort": 20,
      "number": 18,
-     "connect": 0,
-     "blitz60": 2
+     "connect": 20,
+     "blitz60": 5
     },
     "formatsKids": {
      "mc": 0,
@@ -4835,11 +4902,11 @@
      "match": 0,
      "hilo": 0,
      "order": 0,
-     "odd": 16,
-     "sort": 0,
+     "odd": 20,
+     "sort": 20,
      "number": 18,
-     "connect": 0,
-     "blitz60": 1
+     "connect": 20,
+     "blitz60": 3
     }
    }
   },
@@ -4861,7 +4928,8 @@
     "facts": {
      "artist": "cat",
      "year": "year",
-     "decade": "cat"
+     "decade": "cat",
+     "act": "cat"
     },
     "groups": 2,
     "lookalikes": 0,
@@ -4872,7 +4940,8 @@
     "kidsItems": 0,
     "multi": [],
     "catBins": {
-     "decade": 1
+     "decade": 1,
+     "act": 4
     },
     "formats": {
      "mc": 20,
@@ -4882,23 +4951,23 @@
      "hilo": 20,
      "order": 0,
      "odd": 20,
-     "sort": 0,
+     "sort": 20,
      "number": 20,
-     "connect": 0,
-     "blitz60": 2
+     "connect": 20,
+     "blitz60": 5
     },
     "formatsEasy": {
-     "mc": 17,
+     "mc": 20,
      "tf": 20,
      "listen": 20,
      "match": 20,
      "hilo": 0,
      "order": 0,
-     "odd": 14,
-     "sort": 0,
+     "odd": 20,
+     "sort": 20,
      "number": 17,
-     "connect": 0,
-     "blitz60": 2
+     "connect": 20,
+     "blitz60": 5
     },
     "formatsKids": {
      "mc": 0,
@@ -4908,10 +4977,10 @@
      "hilo": 0,
      "order": 0,
      "odd": 20,
-     "sort": 0,
+     "sort": 20,
      "number": 17,
      "connect": 0,
-     "blitz60": 1
+     "blitz60": 3
     }
    }
   },
@@ -4933,7 +5002,8 @@
     "facts": {
      "artist": "cat",
      "year": "year",
-     "decade": "cat"
+     "decade": "cat",
+     "act": "cat"
     },
     "groups": 2,
     "lookalikes": 0,
@@ -4944,7 +5014,8 @@
     "kidsItems": 0,
     "multi": [],
     "catBins": {
-     "decade": 2
+     "decade": 2,
+     "act": 3
     },
     "formats": {
      "mc": 20,
@@ -4956,21 +5027,21 @@
      "odd": 20,
      "sort": 20,
      "number": 20,
-     "connect": 0,
-     "blitz60": 2
+     "connect": 20,
+     "blitz60": 5
     },
     "formatsEasy": {
-     "mc": 18,
+     "mc": 20,
      "tf": 20,
      "listen": 20,
      "match": 20,
      "hilo": 0,
      "order": 0,
      "odd": 20,
-     "sort": 0,
+     "sort": 20,
      "number": 18,
-     "connect": 0,
-     "blitz60": 2
+     "connect": 20,
+     "blitz60": 5
     },
     "formatsKids": {
      "mc": 0,
@@ -4982,8 +5053,8 @@
      "odd": 20,
      "sort": 20,
      "number": 18,
-     "connect": 0,
-     "blitz60": 2
+     "connect": 20,
+     "blitz60": 3
     }
    }
   },
@@ -5248,7 +5319,8 @@
     "facts": {
      "artist": "cat",
      "year": "year",
-     "decade": "cat"
+     "decade": "cat",
+     "act": "cat"
     },
     "groups": 6,
     "lookalikes": 0,
@@ -5259,7 +5331,8 @@
     "kidsItems": 0,
     "multi": [],
     "catBins": {
-     "decade": 5
+     "decade": 5,
+     "act": 2
     },
     "formats": {
      "mc": 20,
@@ -5272,7 +5345,7 @@
      "sort": 20,
      "number": 20,
      "connect": 20,
-     "blitz60": 4
+     "blitz60": 6
     },
     "formatsEasy": {
      "mc": 16,
@@ -5281,11 +5354,11 @@
      "match": 20,
      "hilo": 10,
      "order": 0,
-     "odd": 5,
+     "odd": 20,
      "sort": 20,
      "number": 8,
      "connect": 20,
-     "blitz60": 4
+     "blitz60": 6
     },
     "formatsKids": {
      "mc": 0,
@@ -5295,7 +5368,7 @@
      "hilo": 10,
      "order": 0,
      "odd": 20,
-     "sort": 1,
+     "sort": 5,
      "number": 8,
      "connect": 0,
      "blitz60": 1

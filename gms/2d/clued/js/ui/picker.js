@@ -1,7 +1,25 @@
-// Theme picker: "All" by default, or a Theme -> packs tree with multi-select. Unsupported packs are greyed with a reason.
-import { h } from './kit.js?v=202610071242';
-import { getIndex } from '../core/packs.js?v=202610071242';
-import { supportsPack } from '../formats/registry.js?v=202610071242';
+// Theme picker: "All" by default, or a Theme -> packs tree with multi-select. Packs that can't play this format are
+// hidden (and themes left empty); one quiet line at the bottom lists them, grouped by reason, for the curious.
+import { h } from './kit.js?v=202610071324';
+import { getIndex } from '../core/packs.js?v=202610071324';
+import { supportsPack, NOT_ENOUGH } from '../formats/registry.js?v=202610071324';
+
+const shortWhy = (w, kids) => (w === NOT_ENOUGH ? (kids ? 'Not enough easy questions for this game yet' : 'Too few questions for this game yet') : w);
+
+// [{ reason, packs: [{ id, title, icon }…] }] for packs this format can't use (kids mode leaves out grown-up packs entirely).
+export function hiddenPacks(index, why, kids) {
+  const groups = new Map();
+  for (const t of index.themes) for (const id of t.packs) {
+    const info = index.packs[id];
+    if (!info || (kids && info.kidsSafe === false)) continue;
+    const w = why(id);
+    if (w === true) continue;
+    const r = shortWhy(w, kids);
+    if (!groups.has(r)) groups.set(r, []);
+    if (!groups.get(r).some(p => p.id === id)) groups.get(r).push({ id, title: info.title, icon: info.icon });
+  }
+  return [...groups].map(([reason, packs]) => ({ reason, packs })).sort((a, b) => b.packs.length - a.packs.length);
+}
 
 export function themePicker(host, { fmt, selected = 'all', kids = false, onChange = () => {} } = {}) {
   const index = getIndex();
@@ -14,6 +32,8 @@ export function themePicker(host, { fmt, selected = 'all', kids = false, onChang
   };
   const okIds = Object.keys(index.packs).filter(id => why(id) === true);
   if (sel !== 'all') { sel = new Set([...sel].filter(id => okIds.includes(id))); if (!sel.size) sel = 'all'; }
+  const hidden = fmt ? hiddenPacks(index, why, kids) : [];
+  let hidOpen = false;
 
   const sumIco = h('span.ts-ico', {}, '🌈');
   const sumTxt = h('span.ts-txt');
@@ -52,11 +72,10 @@ export function themePicker(host, { fmt, selected = 'all', kids = false, onChang
     allTick.addEventListener('change', () => set(allTick.checked ? 'all' : new Set()));
     tree.append(h('label.tree-all', {}, allTick, h('span', {}, '🌈 All themes'), h('small.muted', { style: { marginLeft: 'auto' } }, 'mixes everything')));
     for (const t of index.themes) {
-      const ids = t.packs.filter(id => index.packs[id]);
-      if (!ids.length) continue;
-      const usable = ids.filter(id => why(id) === true);
+      const usable = t.packs.filter(id => index.packs[id] && why(id) === true);
+      if (!usable.length) continue;
       const on = sel === 'all' ? [] : usable.filter(id => sel.has(id));
-      const tt = h('input.tick', { type: 'checkbox', 'aria-label': t.title, disabled: !usable.length });
+      const tt = h('input.tick', { type: 'checkbox', 'aria-label': t.title });
       tt.checked = on.length > 0 && on.length === usable.length;
       if (on.length && on.length < usable.length) tt.classList.add('part');
       tt.addEventListener('change', () => {
@@ -66,27 +85,37 @@ export function themePicker(host, { fmt, selected = 'all', kids = false, onChang
       });
       const exp = h('button.th-exp', { type: 'button', 'aria-label': `Show ${t.title} packs` }, '›');
       const box = h('div.th', { class: open.has(t.id) ? 'open' : '', dataset: { theme: t.id } },
-        h('div.th-row', {}, tt, h('span.th-ico', {}, t.icon || '•'), h('span.th-name', {}, t.title),
-          h('span.th-count', {}, usable.length < ids.length ? `${usable.length}/${ids.length}` : `${ids.length}`), exp));
+        h('div.th-row', {}, tt, h('span.th-ico', {}, t.icon || '•'), h('span.th-name', {}, t.title), h('span.th-count', {}, `${usable.length}`), exp));
       exp.addEventListener('click', () => box.classList.toggle('open'));
       box.querySelector('.th-name').addEventListener('click', () => box.classList.toggle('open'));
       const list = h('div.th-packs');
-      for (const id of ids) {
+      for (const id of usable) {
         const info = index.packs[id];
-        const w = why(id);
-        const pt = h('input.tick', { type: 'checkbox', disabled: w !== true, 'aria-label': info.title });
-        pt.checked = w === true && sel !== 'all' && sel.has(id);
+        const pt = h('input.tick', { type: 'checkbox', 'aria-label': info.title });
+        pt.checked = sel !== 'all' && sel.has(id);
         pt.addEventListener('change', () => {
           const s = sel === 'all' ? new Set() : new Set(sel);
           pt.checked ? s.add(id) : s.delete(id);
           set(s);
         });
-        list.append(h('label.pk', { class: w === true ? '' : 'off' }, pt, h('span', {}, info.icon || '•'),
-          h('span.pk-name', {}, info.title, w === true ? null : h('span.pk-why', {}, w))));
+        list.append(h('label.pk', {}, pt, h('span', {}, info.icon || '•'), h('span.pk-name', {}, info.title)));
       }
       box.append(list);
       tree.append(box);
     }
+    if (hidden.length) tree.append(hiddenNote());
+  }
+  function hiddenNote() {
+    const n = hidden.reduce((a, g) => a + g.packs.length, 0);
+    const more = h('div.hid-list', { hidden: !hidOpen },
+      ...hidden.map(g => h('p.hid-g', {}, h('b', {}, g.reason), g.packs.map(p => p.title).join(', '))));
+    const btn = h('button.hid-more', { type: 'button', 'aria-expanded': String(hidOpen) },
+      `${n} more topic${n === 1 ? '' : 's'} ${n === 1 ? "doesn't" : "don't"} suit this game`, h('span.hid-caret', {}, hidOpen ? '▴' : '▾'));
+    btn.addEventListener('click', () => {
+      hidOpen = !hidOpen; more.hidden = !hidOpen;
+      btn.setAttribute('aria-expanded', String(hidOpen)); btn.lastChild.textContent = hidOpen ? '▴' : '▾';
+    });
+    return h('div.hid', {}, btn, more);
   }
   drawSummary();
   return { value, el: panel, usableCount: okIds.length };

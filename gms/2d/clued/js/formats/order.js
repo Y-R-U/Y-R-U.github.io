@@ -1,6 +1,6 @@
-import { register, poolItems, pickPack, byDifficulty, imageOf, collect, pick, shuffle } from './registry.js?v=202610071242';
-import { h, imgEl } from '../ui/kit.js?v=202610071242';
-import { numericKeys, numOf, spreadSet, rangeOf, fmtFact, uniqueByName, injectCSS, baseCSS, once, drag, hasImg } from './fkit.js?v=202610071242';
+import { register, poolItems, pickPack, byDifficulty, imageOf, collect, pick, shuffle, comparison, lcLabel, capFirst } from './registry.js?v=202610071324';
+import { h, imgEl } from '../ui/kit.js?v=202610071324';
+import { numericKeys, numOf, spreadSet, rangeOf, fmtFact, uniqueByName, injectCSS, baseCSS, once, drag, hasImg } from './fkit.js?v=202610071324';
 
 const CSS = `
 .or-wrap{display:flex;flex-direction:column;gap:6px}
@@ -31,6 +31,8 @@ const CSS = `
 @media (min-width:900px) and (min-height:560px){.or-it{min-height:64px;font-size:19px}}
 `;
 
+const SUP_LO = { Smaller: 'smallest', Shorter: 'shortest', Lighter: 'lightest', Narrower: 'narrowest', Softer: 'softest', 'Less dense': 'least dense', 'More recently': 'most recent' };
+
 function make(rng, pack, key, n, difficulty) {
   const meta = pack.factsMeta[key];
   const pool = uniqueByName(byDifficulty(poolItems([pack]).filter(c => numOf(c.item, key) != null), difficulty, n + 2, c => c.item.difficulty || 2));
@@ -43,15 +45,16 @@ function make(rng, pack, key, n, difficulty) {
   if (shown.every((c, i) => c === sorted[i])) shown = sorted.slice().reverse();
   const pics = shown.every(c => hasImg(c.item));
   const label = meta.label || key;
+  const cmp = year ? null : comparison(meta);
   return {
     format: 'order', id: `order:${key}:${set.map(c => c.ref).sort().join(',')}`,
-    prompt: year ? `Put these in order: ${String(label).toLowerCase()}, earliest first` : `Put these in order: ${String(label).toLowerCase()}, highest first`,
+    prompt: `Put these in order: ${lcLabel(label)}, ${year ? 'earliest' : cmp?.sup || 'highest'} first`,
     answer: sorted.map(c => shown.indexOf(c)), answerText: sorted.map(c => c.item.name).join(' → '),
     explain: sorted.map(c => `${c.item.name}: ${fmtFact(meta, numOf(c.item, key))}`).join(' · '),
     refs: set.map(c => c.ref), pack: pack.id,
     data: {
       items: shown.map(c => ({ text: c.item.name, img: pics ? imageOf(c.item, rng) : undefined, value: fmtFact(meta, numOf(c.item, key)) })),
-      caps: year ? ['Earliest', 'Latest'] : ['Highest', 'Lowest'],
+      caps: year ? ['Earliest', 'Latest'] : cmp ? [capFirst(cmp.sup), capFirst(SUP_LO[cmp.lo] || 'last')] : ['Highest', 'Lowest'],
     },
   };
 }

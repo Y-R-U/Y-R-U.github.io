@@ -17,11 +17,14 @@ export default {
     lengthM: len('Typical adult length'),
     venomous: { type: 'bool', label: 'Venomous or poisonous', yes: 'Venomous or poisonous', no: 'Harmless', clue: v => (v ? 'It is poisonous or venomous.' : null) },
     status: STATUS_META,
+    kind: { type: 'cat', label: 'Kind', values: ['Lizard', 'Frog or toad', 'Crocodilian', 'Salamander or newt', 'Turtle or tortoise', 'Tuatara', 'Snake'], noClue: true },
   },
+  // kind comes from the iNat order (lizards: suborder Sauria)
+  taxoFacts: { kind: { Sauria: 'Lizard', Serpentes: 'Snake', Anura: 'Frog or toad', Crocodylia: 'Crocodilian', Caudata: 'Salamander or newt', Testudines: 'Turtle or tortoise', Rhynchocephalia: 'Tuatara' } },
   imgPrompt: "Which of these is {aName}?",
   nameImgPrompt: "Which animal is this?",
   tfImgPrompt: "This is {aName}.",
-  tpl: {"cls": {"ask": "Is the {lname} a reptile or an amphibian?", "askReverse": "Which of these is an {lvalue}?", "stmt": "The {lname} is an {lvalue}."}, "region": {"ask": "Where does the {lname} live?", "askReverse": "Which of these lives in {value}?", "stmt": "The {lname} lives in {value}.", "exclusive": false}, "lengthM": {"askHigh": "Which of these grows the longest?", "askLow": "Which of these is the smallest?", "minRatio": 2}, "venomous": {"askBool": "Which of these is venomous or poisonous?", "stmt": "The {lname} is venomous or poisonous."}, "status": {"ask": "What is the IUCN conservation status of the {lname}?", "askReverse": "Which of these is listed as \"{value}\" by the IUCN?", "stmt": "The {lname} is listed as \"{value}\" by the IUCN."}},
+  tpl: {"cls": {"ask": "Is the {lname} a reptile or an amphibian?", "askReverse": "Which of these is an {lvalue}?", "stmt": "The {lname} is {aValue}."}, "kind": {"ask": "What kind of animal is the {lname}?", "askReverse": "Which of these is {aValue}?", "stmt": "The {lname} is {aValue}."}, "region": {"ask": "Where does the {lname} live?", "askReverse": "Which of these lives in {value}?", "stmt": "The {lname} lives in {value}.", "exclusive": false}, "lengthM": {"askHigh": "Which of these grows the longest?", "askLow": "Which of these is the smallest?", "minRatio": 2}, "venomous": {"askBool": "Which of these is venomous or poisonous?", "stmt": "The {lname} is venomous or poisonous."}, "status": {"ask": "What is the IUCN conservation status of the {lname}?", "askReverse": "Which of these is listed as \"{value}\" by the IUCN?", "stmt": "The {lname} is listed as \"{value}\" by the IUCN."}},
   sources: [INAT, WD, COMMONS],
   items: [
     { n: 'Saltwater crocodile', alt: ['saltie', 'estuarine crocodile'], sci: 'Crocodylus porosus', g: 'crocodilian', f: f(RE, AU, 5), d: 1, look: ['Nile crocodile', 'American alligator', 'Gharial'],

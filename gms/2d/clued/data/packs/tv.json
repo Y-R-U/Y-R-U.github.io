@@ -5,6 +5,7 @@
  "icon": "📺",
  "kids": false,
  "version": 1,
+ "quotePrompt": "Which TV show is this line from?",
  "factsMeta": {
   "year": {
    "type": "year",
@@ -80,7 +81,9 @@
     "It was made in the United States.",
     "A yellow cartoon family: Homer, Marge, Bart, Lisa and Maggie."
    ],
-   "difficulty": 1
+   "difficulty": 1,
+   "quote": "D'oh!",
+   "quoteSource": "https://en.wikiquote.org/wiki/The_Simpsons%2FSeason_1"
   },
   {
    "id": "friends",
@@ -101,7 +104,9 @@
     "It was made in the United States.",
     "Six pals in their twenties share flats, jokes and love lives in Manhattan."
    ],
-   "difficulty": 1
+   "difficulty": 1,
+   "quote": "How you doin'?",
+   "quoteSource": "https://en.wikiquote.org/wiki/Friends_(season_5)"
   },
   {
    "id": "star-trek",
@@ -124,7 +129,9 @@
     "It was made in the United States.",
     "Captain Kirk and Mr Spock explore strange new worlds."
    ],
-   "difficulty": 2
+   "difficulty": 2,
+   "quote": "Live long and prosper.",
+   "quoteSource": "https://en.wikiquote.org/wiki/Star_Trek%3A_The_Original_Series"
   },
   {
    "id": "sesame-street",
@@ -234,7 +241,9 @@
     "It was made in the United States.",
     "Noble families battle to rule the Seven Kingdoms of Westeros."
    ],
-   "difficulty": 2
+   "difficulty": 2,
+   "quote": "Winter is coming.",
+   "quoteSource": "https://en.wikiquote.org/wiki/Game_of_Thrones%2FSeason_1"
   },
   {
    "id": "breaking-bad",
@@ -255,7 +264,9 @@
     "It was made in the United States.",
     "A chemistry teacher turns to crime after a cancer diagnosis."
    ],
-   "difficulty": 2
+   "difficulty": 2,
+   "quote": "I am the one who knocks!",
+   "quoteSource": "https://en.wikiquote.org/wiki/Breaking_Bad_(season_4)"
   },
   {
    "id": "the-office-us",
@@ -278,7 +289,9 @@
     "It was made in the United States.",
     "A mockumentary about workers at the Dunder Mifflin paper company."
    ],
-   "difficulty": 2
+   "difficulty": 2,
+   "quote": "That's what she said!",
+   "quoteSource": "https://en.wikiquote.org/wiki/The_Office_(American_TV_series)"
   },
   {
    "id": "seinfeld",
@@ -299,7 +312,9 @@
     "It was made in the United States.",
     "A New York comedian and his friends obsess over small things."
    ],
-   "difficulty": 2
+   "difficulty": 2,
+   "quote": "No soup for you!",
+   "quoteSource": "https://en.wikiquote.org/wiki/Seinfeld_(season_7)"
   },
   {
    "id": "fawlty-towers",
@@ -320,7 +335,9 @@
     "It was made in the United Kingdom.",
     "John Cleese plays a rude hotel owner in Torquay."
    ],
-   "difficulty": 2
+   "difficulty": 2,
+   "quote": "Don't mention the war!",
+   "quoteSource": "https://en.wikiquote.org/wiki/Fawlty_Towers"
   },
   {
    "id": "only-fools-and-horses",
@@ -341,7 +358,9 @@
     "It was made in the United Kingdom.",
     "Del Boy is a market trader in Peckham who dreams of being a millionaire."
    ],
-   "difficulty": 2
+   "difficulty": 2,
+   "quote": "Lovely jubbly!",
+   "quoteSource": "https://en.wikiquote.org/wiki/Only_Fools_and_Horses"
   },
   {
    "id": "blue-peter",
@@ -405,7 +424,9 @@
     "It was made in the United States.",
     "Two FBI agents investigate the paranormal."
    ],
-   "difficulty": 2
+   "difficulty": 2,
+   "quote": "The truth is out there.",
+   "quoteSource": "https://en.wikiquote.org/wiki/The_X-Files"
   },
   {
    "id": "mr-bean",
@@ -499,7 +520,9 @@
     "It was made in the United States.",
     "A yellow, square sea creature lives in a pineapple under the sea."
    ],
-   "difficulty": 1
+   "difficulty": 1,
+   "quote": "I'm ready!",
+   "quoteSource": "https://en.wikiquote.org/wiki/SpongeBob_SquarePants"
   },
   {
    "id": "stranger-things",
@@ -562,7 +585,9 @@
     "It was made in the United Kingdom.",
     "A drama about an aristocratic family and their servants in the early 1900s."
    ],
-   "difficulty": 2
+   "difficulty": 2,
+   "quote": "What is a weekend?",
+   "quoteSource": "https://en.wikiquote.org/wiki/Downton_Abbey"
   },
   {
    "id": "sherlock",
@@ -646,7 +671,9 @@
     "It was made in the United States.",
     "An FBI agent investigates a murder in a strange small town."
    ],
-   "difficulty": 3
+   "difficulty": 3,
+   "quote": "Damn fine cup of coffee.",
+   "quoteSource": "https://en.wikiquote.org/wiki/Twin_Peaks"
   },
   {
    "id": "m-a-s-h",
@@ -821,7 +848,9 @@
     "It was made in the United States.",
     "Nerdy scientists in Pasadena befriend their neighbour."
    ],
-   "difficulty": 1
+   "difficulty": 1,
+   "quote": "Bazinga!",
+   "quoteSource": "https://en.wikiquote.org/wiki/The_Big_Bang_Theory_(season_5)"
   },
   {
    "id": "strictly-come-dancing",
@@ -934,7 +963,9 @@
     "It was made in the United Kingdom.",
     "A surreal BBC sketch comedy by six writer-performers."
    ],
-   "difficulty": 2
+   "difficulty": 2,
+   "quote": "And now for something completely different.",
+   "quoteSource": "https://en.wikiquote.org/wiki/Monty_Python's_Flying_Circus"
   },
   {
    "id": "teletubbies",
@@ -980,7 +1011,9 @@
     "It was made in the United States.",
     "A talking Great Dane and four teenagers solve mysteries."
    ],
-   "difficulty": 1
+   "difficulty": 1,
+   "quote": "Zoinks!",
+   "quoteSource": "https://en.wikiquote.org/wiki/Scooby-Doo%2C_Where_Are_You!_(season_2)"
   },
   {
    "id": "the-flintstones",
@@ -1002,7 +1035,9 @@
     "It was made in the United States.",
     "A Stone Age family with dinosaur pets and gadgets."
    ],
-   "difficulty": 2
+   "difficulty": 2,
+   "quote": "Yabba dabba doo!",
+   "quoteSource": "https://en.wikiquote.org/wiki/The_Flintstones"
   },
   {
    "id": "the-mandalorian",
@@ -3652,6 +3687,10 @@
   {
    "name": "Wikipedia articles for each show",
    "url": "https://en.wikipedia.org"
+  },
+  {
+   "name": "Wikiquote (catchphrases)",
+   "url": "https://en.wikiquote.org"
   }
  ],
  "noun": "TV show"

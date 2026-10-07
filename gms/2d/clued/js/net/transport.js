@@ -18,7 +18,7 @@
 // { stage, stages, votes, needed, locked, qDeadline, limitMs } and you.voted / you.stage. A 'stage' event = stage went up
 // (with the extended qDeadline); 'lock' = locked became true. P2P hosts should emit the same fields.
 // Room state shape is the server's (docs/notes/S.md "Room state"). Errors are ApiError-like: { status, code, message }.
-import { rooms, subscribe, serverNow, syncClock } from './api.js?v=202610071242';
+import { rooms, subscribe, serverNow, syncClock } from './api.js?v=202610071324';
 
 export const serverTransport = {
   id: 'server',

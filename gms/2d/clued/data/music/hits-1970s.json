@@ -19,6 +19,19 @@
   "decade": {
    "type": "cat",
    "label": "Decade"
+  },
+  "act": {
+   "type": "cat",
+   "label": "Act",
+   "values": [
+    "Male solo artist",
+    "Female solo artist",
+    "Group or duo",
+    "Duet or team-up"
+   ],
+   "ask": "Who recorded {name}: a solo singer, a group or a team-up?",
+   "askReverse": "Which of these hits is by {aValue}?",
+   "stmt": "{name} is by {aValue}."
   }
  },
  "items": [
@@ -29,7 +42,8 @@
    "facts": {
     "artist": "Simon & Garfunkel",
     "year": 1970,
-    "decade": "1970s"
+    "decade": "1970s",
+    "act": "Group or duo"
    },
    "blurb": "\"Bridge Over Troubled Water\" by Simon & Garfunkel, released in 1970.",
    "media": {
@@ -61,7 +75,8 @@
    "facts": {
     "artist": "Carpenters",
     "year": 1970,
-    "decade": "1970s"
+    "decade": "1970s",
+    "act": "Group or duo"
    },
    "blurb": "\"(They Long to Be) Close to You\" by Carpenters, released in 1970.",
    "media": {
@@ -90,7 +105,8 @@
    "facts": {
     "artist": "The Guess Who",
     "year": 1970,
-    "decade": "1970s"
+    "decade": "1970s",
+    "act": "Group or duo"
    },
    "blurb": "\"American Woman\" by The Guess Who, released in 1970.",
    "media": {
@@ -119,7 +135,8 @@
    "facts": {
     "artist": "Edwin Starr",
     "year": 1970,
-    "decade": "1970s"
+    "decade": "1970s",
+    "act": "Male solo artist"
    },
    "blurb": "\"War\" by Edwin Starr, released in 1970.",
    "media": {
@@ -148,7 +165,8 @@
    "facts": {
     "artist": "The Jackson 5",
     "year": 1970,
-    "decade": "1970s"
+    "decade": "1970s",
+    "act": "Group or duo"
    },
    "blurb": "\"ABC\" by The Jackson 5, released in 1970.",
    "media": {
@@ -177,7 +195,8 @@
    "facts": {
     "artist": "The Beatles",
     "year": 1970,
-    "decade": "1970s"
+    "decade": "1970s",
+    "act": "Group or duo"
    },
    "blurb": "\"Let It Be\" by The Beatles, released in 1970.",
    "media": {
@@ -206,7 +225,8 @@
    "facts": {
     "artist": "Three Dog Night",
     "year": 1971,
-    "decade": "1970s"
+    "decade": "1970s",
+    "act": "Group or duo"
    },
    "blurb": "\"Joy to the World\" by Three Dog Night, released in 1971.",
    "media": {
@@ -235,7 +255,8 @@
    "facts": {
     "artist": "Rod Stewart",
     "year": 1971,
-    "decade": "1970s"
+    "decade": "1970s",
+    "act": "Male solo artist"
    },
    "blurb": "\"Maggie May\" by Rod Stewart, released in 1971.",
    "media": {
@@ -264,7 +285,8 @@
    "facts": {
     "artist": "Carole King",
     "year": 1971,
-    "decade": "1970s"
+    "decade": "1970s",
+    "act": "Female solo artist"
    },
    "blurb": "\"It's Too Late\" by Carole King, released in 1971.",
    "media": {
@@ -293,7 +315,8 @@
    "facts": {
     "artist": "Bee Gees",
     "year": 1971,
-    "decade": "1970s"
+    "decade": "1970s",
+    "act": "Group or duo"
    },
    "blurb": "\"How Can You Mend a Broken Heart\" by Bee Gees, released in 1971.",
    "media": {
@@ -322,7 +345,8 @@
    "facts": {
     "artist": "The Rolling Stones",
     "year": 1971,
-    "decade": "1970s"
+    "decade": "1970s",
+    "act": "Group or duo"
    },
    "blurb": "\"Brown Sugar\" by The Rolling Stones, released in 1971.",
    "media": {
@@ -351,7 +375,8 @@
    "facts": {
     "artist": "John Lennon",
     "year": 1971,
-    "decade": "1970s"
+    "decade": "1970s",
+    "act": "Male solo artist"
    },
    "blurb": "\"Imagine\" by John Lennon, released in 1971.",
    "media": {
@@ -380,7 +405,8 @@
    "facts": {
     "artist": "Don McLean",
     "year": 1971,
-    "decade": "1970s"
+    "decade": "1970s",
+    "act": "Male solo artist"
    },
    "blurb": "\"American Pie\" by Don McLean, released in 1971.",
    "media": {
@@ -409,7 +435,8 @@
    "facts": {
     "artist": "Gilbert O'Sullivan",
     "year": 1972,
-    "decade": "1970s"
+    "decade": "1970s",
+    "act": "Male solo artist"
    },
    "blurb": "\"Alone Again (Naturally)\" by Gilbert O'Sullivan, released in 1972.",
    "media": {
@@ -438,7 +465,8 @@
    "facts": {
     "artist": "Bill Withers",
     "year": 1972,
-    "decade": "1970s"
+    "decade": "1970s",
+    "act": "Male solo artist"
    },
    "blurb": "\"Lean on Me\" by Bill Withers, released in 1972.",
    "media": {
@@ -467,7 +495,8 @@
    "facts": {
     "artist": "Al Green",
     "year": 1971,
-    "decade": "1970s"
+    "decade": "1970s",
+    "act": "Male solo artist"
    },
    "blurb": "\"Let's Stay Together\" by Al Green, released in 1971.",
    "media": {
@@ -496,7 +525,8 @@
    "facts": {
     "artist": "Nilsson",
     "year": 1971,
-    "decade": "1970s"
+    "decade": "1970s",
+    "act": "Male solo artist"
    },
    "blurb": "\"Without You\" by Nilsson, released in 1971.",
    "media": {
@@ -525,7 +555,8 @@
    "facts": {
     "artist": "Elton John",
     "year": 1972,
-    "decade": "1970s"
+    "decade": "1970s",
+    "act": "Male solo artist"
    },
    "blurb": "\"Crocodile Rock\" by Elton John, released in 1972.",
    "media": {
@@ -554,7 +585,8 @@
    "facts": {
     "artist": "Carly Simon",
     "year": 1972,
-    "decade": "1970s"
+    "decade": "1970s",
+    "act": "Female solo artist"
    },
    "blurb": "\"You're So Vain\" by Carly Simon, released in 1972.",
    "media": {
@@ -583,7 +615,8 @@
    "facts": {
     "artist": "Tony Orlando & Dawn",
     "year": 1973,
-    "decade": "1970s"
+    "decade": "1970s",
+    "act": "Group or duo"
    },
    "blurb": "\"Tie a Yellow Ribbon Round the Ole Oak Tree\" by Tony Orlando & Dawn, released in 1973.",
    "media": {
@@ -612,7 +645,8 @@
    "facts": {
     "artist": "Roberta Flack",
     "year": 1973,
-    "decade": "1970s"
+    "decade": "1970s",
+    "act": "Female solo artist"
    },
    "blurb": "\"Killing Me Softly with His Song\" by Roberta Flack, released in 1973.",
    "media": {
@@ -641,7 +675,8 @@
    "facts": {
     "artist": "Marvin Gaye",
     "year": 1973,
-    "decade": "1970s"
+    "decade": "1970s",
+    "act": "Male solo artist"
    },
    "blurb": "\"Let's Get It On\" by Marvin Gaye, released in 1973.",
    "media": {
@@ -670,7 +705,8 @@
    "facts": {
     "artist": "Jim Croce",
     "year": 1973,
-    "decade": "1970s"
+    "decade": "1970s",
+    "act": "Male solo artist"
    },
    "blurb": "\"Bad, Bad Leroy Brown\" by Jim Croce, released in 1973.",
    "media": {
@@ -699,7 +735,8 @@
    "facts": {
     "artist": "ABBA",
     "year": 1974,
-    "decade": "1970s"
+    "decade": "1970s",
+    "act": "Group or duo"
    },
    "blurb": "\"Waterloo\" by ABBA, released in 1974.",
    "media": {
@@ -728,7 +765,8 @@
    "facts": {
     "artist": "Carl Douglas",
     "year": 1974,
-    "decade": "1970s"
+    "decade": "1970s",
+    "act": "Male solo artist"
    },
    "blurb": "\"Kung Fu Fighting\" by Carl Douglas, released in 1974.",
    "media": {
@@ -757,7 +795,8 @@
    "facts": {
     "artist": "Redbone",
     "year": 1973,
-    "decade": "1970s"
+    "decade": "1970s",
+    "act": "Group or duo"
    },
    "blurb": "\"Come and Get Your Love\" by Redbone, released in 1973.",
    "media": {
@@ -786,7 +825,8 @@
    "facts": {
     "artist": "Barbra Streisand",
     "year": 1973,
-    "decade": "1970s"
+    "decade": "1970s",
+    "act": "Female solo artist"
    },
    "blurb": "\"The Way We Were\" by Barbra Streisand, released in 1973.",
    "media": {
@@ -815,7 +855,8 @@
    "facts": {
     "artist": "Captain & Tennille",
     "year": 1975,
-    "decade": "1970s"
+    "decade": "1970s",
+    "act": "Group or duo"
    },
    "blurb": "\"Love Will Keep Us Together\" by Captain & Tennille, released in 1975.",
    "media": {
@@ -844,7 +885,8 @@
    "facts": {
     "artist": "Glen Campbell",
     "year": 1975,
-    "decade": "1970s"
+    "decade": "1970s",
+    "act": "Male solo artist"
    },
    "blurb": "\"Rhinestone Cowboy\" by Glen Campbell, released in 1975.",
    "media": {
@@ -873,7 +915,8 @@
    "facts": {
     "artist": "Bee Gees",
     "year": 1975,
-    "decade": "1970s"
+    "decade": "1970s",
+    "act": "Group or duo"
    },
    "blurb": "\"Jive Talkin'\" by Bee Gees, released in 1975.",
    "media": {
@@ -902,7 +945,8 @@
    "facts": {
     "artist": "David Bowie",
     "year": 1975,
-    "decade": "1970s"
+    "decade": "1970s",
+    "act": "Male solo artist"
    },
    "blurb": "\"Fame\" by David Bowie, released in 1975.",
    "media": {
@@ -931,7 +975,8 @@
    "facts": {
     "artist": "Eagles",
     "year": 1975,
-    "decade": "1970s"
+    "decade": "1970s",
+    "act": "Group or duo"
    },
    "blurb": "\"One of These Nights\" by Eagles, released in 1975.",
    "media": {
@@ -960,7 +1005,8 @@
    "facts": {
     "artist": "Labelle",
     "year": 1974,
-    "decade": "1970s"
+    "decade": "1970s",
+    "act": "Group or duo"
    },
    "blurb": "\"Lady Marmalade\" by Labelle, released in 1974.",
    "media": {
@@ -989,7 +1035,8 @@
    "facts": {
     "artist": "Queen",
     "year": 1975,
-    "decade": "1970s"
+    "decade": "1970s",
+    "act": "Group or duo"
    },
    "blurb": "\"Bohemian Rhapsody\" by Queen, released in 1975.",
    "media": {
@@ -1018,7 +1065,8 @@
    "facts": {
     "artist": "Wings",
     "year": 1976,
-    "decade": "1970s"
+    "decade": "1970s",
+    "act": "Group or duo"
    },
    "blurb": "\"Silly Love Songs\" by Wings, released in 1976.",
    "media": {
@@ -1047,7 +1095,8 @@
    "facts": {
     "artist": "Elton John & Kiki Dee",
     "year": 1976,
-    "decade": "1970s"
+    "decade": "1970s",
+    "act": "Duet or team-up"
    },
    "blurb": "\"Don't Go Breaking My Heart\" by Elton John & Kiki Dee, released in 1976.",
    "media": {
@@ -1076,7 +1125,8 @@
    "facts": {
     "artist": "Wild Cherry",
     "year": 1976,
-    "decade": "1970s"
+    "decade": "1970s",
+    "act": "Group or duo"
    },
    "blurb": "\"Play That Funky Music\" by Wild Cherry, released in 1976.",
    "media": {
@@ -1105,7 +1155,8 @@
    "facts": {
     "artist": "ABBA",
     "year": 1976,
-    "decade": "1970s"
+    "decade": "1970s",
+    "act": "Group or duo"
    },
    "blurb": "\"Dancing Queen\" by ABBA, released in 1976.",
    "media": {
@@ -1134,7 +1185,8 @@
    "facts": {
     "artist": "Stevie Wonder",
     "year": 1976,
-    "decade": "1970s"
+    "decade": "1970s",
+    "act": "Male solo artist"
    },
    "blurb": "\"Sir Duke\" by Stevie Wonder, released in 1976.",
    "media": {
@@ -1163,7 +1215,8 @@
    "facts": {
     "artist": "Eagles",
     "year": 1976,
-    "decade": "1970s"
+    "decade": "1970s",
+    "act": "Group or duo"
    },
    "blurb": "\"Hotel California\" by Eagles, released in 1976.",
    "media": {
@@ -1192,7 +1245,8 @@
    "facts": {
     "artist": "Rod Stewart",
     "year": 1976,
-    "decade": "1970s"
+    "decade": "1970s",
+    "act": "Male solo artist"
    },
    "blurb": "\"Tonight's the Night (Gonna Be Alright)\" by Rod Stewart, released in 1976.",
    "media": {
@@ -1221,7 +1275,8 @@
    "facts": {
     "artist": "Andy Gibb",
     "year": 1977,
-    "decade": "1970s"
+    "decade": "1970s",
+    "act": "Male solo artist"
    },
    "blurb": "\"I Just Want to Be Your Everything\" by Andy Gibb, released in 1977.",
    "media": {
@@ -1250,7 +1305,8 @@
    "facts": {
     "artist": "The Emotions",
     "year": 1977,
-    "decade": "1970s"
+    "decade": "1970s",
+    "act": "Group or duo"
    },
    "blurb": "\"Best of My Love\" by The Emotions, released in 1977.",
    "media": {
@@ -1279,7 +1335,8 @@
    "facts": {
     "artist": "Fleetwood Mac",
     "year": 1977,
-    "decade": "1970s"
+    "decade": "1970s",
+    "act": "Group or duo"
    },
    "blurb": "\"Go Your Own Way\" by Fleetwood Mac, released in 1977.",
    "media": {
@@ -1308,7 +1365,8 @@
    "facts": {
     "artist": "Bee Gees",
     "year": 1977,
-    "decade": "1970s"
+    "decade": "1970s",
+    "act": "Group or duo"
    },
    "blurb": "\"Stayin' Alive\" by Bee Gees, released in 1977.",
    "media": {
@@ -1337,7 +1395,8 @@
    "facts": {
     "artist": "Andy Gibb",
     "year": 1978,
-    "decade": "1970s"
+    "decade": "1970s",
+    "act": "Male solo artist"
    },
    "blurb": "\"Shadow Dancing\" by Andy Gibb, released in 1978.",
    "media": {
@@ -1366,7 +1425,8 @@
    "facts": {
     "artist": "Bee Gees",
     "year": 1977,
-    "decade": "1970s"
+    "decade": "1970s",
+    "act": "Group or duo"
    },
    "blurb": "\"Night Fever\" by Bee Gees, released in 1977.",
    "media": {
@@ -1395,7 +1455,8 @@
    "facts": {
     "artist": "Chic",
     "year": 1978,
-    "decade": "1970s"
+    "decade": "1970s",
+    "act": "Group or duo"
    },
    "blurb": "\"Le Freak\" by Chic, released in 1978.",
    "media": {
@@ -1424,7 +1485,8 @@
    "facts": {
     "artist": "John Travolta & Olivia Newton-John",
     "year": 1978,
-    "decade": "1970s"
+    "decade": "1970s",
+    "act": "Duet or team-up"
    },
    "blurb": "\"You're the One That I Want\" by John Travolta & Olivia Newton-John, released in 1978.",
    "media": {
@@ -1453,7 +1515,8 @@
    "facts": {
     "artist": "Frankie Valli",
     "year": 1978,
-    "decade": "1970s"
+    "decade": "1970s",
+    "act": "Male solo artist"
    },
    "blurb": "\"Grease\" by Frankie Valli, released in 1978.",
    "media": {
@@ -1482,7 +1545,8 @@
    "facts": {
     "artist": "Gloria Gaynor",
     "year": 1978,
-    "decade": "1970s"
+    "decade": "1970s",
+    "act": "Female solo artist"
    },
    "blurb": "\"I Will Survive\" by Gloria Gaynor, released in 1978.",
    "media": {
@@ -1514,7 +1578,8 @@
    "facts": {
     "artist": "Village People",
     "year": 1978,
-    "decade": "1970s"
+    "decade": "1970s",
+    "act": "Group or duo"
    },
    "blurb": "\"Y.M.C.A.\" by Village People, released in 1978.",
    "media": {
@@ -1543,7 +1608,8 @@
    "facts": {
     "artist": "The Knack",
     "year": 1979,
-    "decade": "1970s"
+    "decade": "1970s",
+    "act": "Group or duo"
    },
    "blurb": "\"My Sharona\" by The Knack, released in 1979.",
    "media": {
@@ -1572,7 +1638,8 @@
    "facts": {
     "artist": "Donna Summer",
     "year": 1979,
-    "decade": "1970s"
+    "decade": "1970s",
+    "act": "Female solo artist"
    },
    "blurb": "\"Hot Stuff\" by Donna Summer, released in 1979.",
    "media": {
@@ -1601,7 +1668,8 @@
    "facts": {
     "artist": "Anita Ward",
     "year": 1979,
-    "decade": "1970s"
+    "decade": "1970s",
+    "act": "Female solo artist"
    },
    "blurb": "\"Ring My Bell\" by Anita Ward, released in 1979.",
    "media": {
@@ -1630,7 +1698,8 @@
    "facts": {
     "artist": "Blondie",
     "year": 1978,
-    "decade": "1970s"
+    "decade": "1970s",
+    "act": "Group or duo"
    },
    "blurb": "\"Heart of Glass\" by Blondie, released in 1978.",
    "media": {
@@ -1659,7 +1728,8 @@
    "facts": {
     "artist": "Michael Jackson",
     "year": 1979,
-    "decade": "1970s"
+    "decade": "1970s",
+    "act": "Male solo artist"
    },
    "blurb": "\"Don't Stop 'Til You Get Enough\" by Michael Jackson, released in 1979.",
    "media": {
@@ -1688,7 +1758,8 @@
    "facts": {
     "artist": "Pink Floyd",
     "year": 1979,
-    "decade": "1970s"
+    "decade": "1970s",
+    "act": "Group or duo"
    },
    "blurb": "\"Another Brick in the Wall, Pt. 2\" by Pink Floyd, released in 1979.",
    "media": {
@@ -1726,5 +1797,5 @@
    "url": "https://performance-partners.apple.com/search-api"
   }
  ],
- "built": "2026-10-04"
+ "built": "2026-10-07"
 }

@@ -2554,6 +2554,96 @@
    "topic": "olympics"
   },
   {
+   "id": "spt-olympics-f756ba",
+   "kind": "order",
+   "prompt": "In what order did these cities host the Summer Olympics? Earliest first.",
+   "answer": [
+    "Amsterdam",
+    "Mexico City",
+    "Moscow",
+    "Beijing"
+   ],
+   "orderLabel": "Hosted first",
+   "explain": "Amsterdam 1928, Mexico City 1968, Moscow 1980, Beijing 2008.",
+   "difficulty": 2,
+   "tags": [
+    "sport"
+   ],
+   "topic": "olympics"
+  },
+  {
+   "id": "spt-football-abf861",
+   "kind": "order",
+   "prompt": "Put these men's World Cup host countries in order, earliest first.",
+   "answer": [
+    "Uruguay",
+    "England",
+    "Spain",
+    "South Africa"
+   ],
+   "orderLabel": "Hosted first",
+   "explain": "Uruguay 1930, England 1966, Spain 1982, South Africa 2010.",
+   "difficulty": 2,
+   "tags": [
+    "sport"
+   ],
+   "topic": "football"
+  },
+  {
+   "id": "spt-football-cc7b5e",
+   "kind": "order",
+   "prompt": "Put these countries in order of their first men's World Cup win, earliest first.",
+   "answer": [
+    "Italy",
+    "Brazil",
+    "Argentina",
+    "France"
+   ],
+   "orderLabel": "First win earliest",
+   "explain": "Italy 1934, Brazil 1958, Argentina 1978, France 1998.",
+   "difficulty": 3,
+   "tags": [
+    "sport"
+   ],
+   "topic": "football"
+  },
+  {
+   "id": "spt-rules-b33b52",
+   "kind": "order",
+   "prompt": "Put tennis's four Grand Slam tournaments in calendar order, earliest in the year first.",
+   "answer": [
+    "Australian Open",
+    "French Open",
+    "Wimbledon",
+    "US Open"
+   ],
+   "orderLabel": "Earliest in the year first",
+   "explain": "January in Melbourne, May–June in Paris, June–July in London, August–September in New York.",
+   "difficulty": 1,
+   "tags": [
+    "sport"
+   ],
+   "topic": "rules"
+  },
+  {
+   "id": "spt-rules-741797",
+   "kind": "order",
+   "prompt": "Put these balls in order of size, largest first.",
+   "answer": [
+    "Basketball",
+    "Football (soccer ball)",
+    "Tennis ball",
+    "Golf ball"
+   ],
+   "orderLabel": "Largest first",
+   "explain": "A basketball is about 75 cm round, a size-5 football about 69 cm, a tennis ball about 6.7 cm across and a golf ball 4.3 cm.",
+   "difficulty": 2,
+   "tags": [
+    "sport"
+   ],
+   "topic": "rules"
+  },
+  {
    "id": "spt-olympics-95f13e",
    "kind": "number",
    "prompt": "How many gold medals did Michael Phelps win at the Olympics?",

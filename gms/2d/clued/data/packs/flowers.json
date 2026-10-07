@@ -34,6 +34,13 @@
    "ask": "The {lname} is the floral emblem of where?",
    "askReverse": "Which flower is the floral emblem of {value}?",
    "stmt": "The {lname} is the floral emblem of {value}."
+  },
+  "family": {
+   "type": "cat",
+   "label": "Plant family",
+   "ask": "Which plant family does the {lname} belong to?",
+   "askReverse": "Which of these flowers is in the {lvalue}?",
+   "stmt": "The {lname} belongs to the {lvalue}."
   }
  },
  "items": [
@@ -47,7 +54,8 @@
    "group": "daisy family",
    "facts": {
     "colour": "Yellow",
-    "region": "North America"
+    "region": "North America",
+    "family": "Daisy family"
    },
    "blurb": "A tall plant with a huge yellow flower head. Young sunflowers turn to follow the sun.",
    "clues": [
@@ -104,7 +112,8 @@
    "facts": {
     "colour": "Red",
     "region": "Asia",
-    "emblem": "England"
+    "emblem": "England",
+    "family": "Rose family"
    },
    "blurb": "A flower with soft, scented petals and thorny stems. Red roses are a symbol of love.",
    "clues": [
@@ -156,7 +165,8 @@
    "group": "lily family",
    "facts": {
     "colour": "Red",
-    "region": "Asia"
+    "region": "Asia",
+    "family": "Lily family"
    },
    "blurb": "A cup-shaped spring flower that grows from a bulb. Tulips are a symbol of the Netherlands.",
    "clues": [
@@ -212,7 +222,8 @@
    "group": "daisy family",
    "facts": {
     "colour": "White",
-    "region": "Europe"
+    "region": "Europe",
+    "family": "Daisy family"
    },
    "blurb": "A small flower with white petals and a yellow centre that grows in lawns. Children make daisy chains from it.",
    "clues": [
@@ -267,7 +278,8 @@
    "group": "daisy family",
    "facts": {
     "colour": "Yellow",
-    "region": "Europe"
+    "region": "Europe",
+    "family": "Daisy family"
    },
    "blurb": "A yellow flower that turns into a fluffy \"clock\" of seeds. Children blow the seeds away.",
    "clues": [
@@ -324,7 +336,8 @@
    "group": "mint family",
    "facts": {
     "colour": "Purple",
-    "region": "the Mediterranean"
+    "region": "the Mediterranean",
+    "family": "Mint family"
    },
    "blurb": "A purple, sweet-smelling herb. Its flowers are used in soaps, oils and bags to scent drawers.",
    "clues": [
@@ -381,7 +394,8 @@
    "group": "orchid",
    "facts": {
     "colour": "White",
-    "region": "Asia"
+    "region": "Asia",
+    "family": "Orchid family"
    },
    "blurb": "The most popular house orchid. Its flowers are said to look like moths in flight.",
    "clues": [
@@ -437,7 +451,8 @@
    "facts": {
     "colour": "Pink",
     "region": "Asia",
-    "emblem": "India"
+    "emblem": "India",
+    "family": "Lotus family"
    },
    "lookalikes": [
     "white-water-lily"
@@ -496,7 +511,8 @@
    "group": "water lily",
    "facts": {
     "colour": "White",
-    "region": "Europe"
+    "region": "Europe",
+    "family": "Water lily family"
    },
    "lookalikes": [
     "sacred-lotus"
@@ -555,7 +571,8 @@
    "group": "poppy",
    "facts": {
     "colour": "Red",
-    "region": "Europe"
+    "region": "Europe",
+    "family": "Poppy family"
    },
    "blurb": "A bright red wildflower that grew on the battlefields of World War I. It is worn to remember soldiers who died.",
    "clues": [
@@ -610,7 +627,8 @@
    "facts": {
     "colour": "Yellow",
     "region": "Europe",
-    "emblem": "Wales"
+    "emblem": "Wales",
+    "family": "Amaryllis family"
    },
    "blurb": "A yellow spring flower with a trumpet in the middle. It is a symbol of Wales.",
    "clues": [
@@ -668,7 +686,8 @@
    "group": "asparagus family",
    "facts": {
     "colour": "Blue",
-    "region": "Europe"
+    "region": "Europe",
+    "family": "Asparagus family"
    },
    "blurb": "A woodland flower with drooping blue bells. Half the world's bluebells grow in Britain.",
    "clues": [
@@ -724,7 +743,8 @@
    "group": "amaryllis family",
    "facts": {
     "colour": "White",
-    "region": "Europe"
+    "region": "Europe",
+    "family": "Amaryllis family"
    },
    "blurb": "A small white flower that droops like a drop of snow. It is one of the first flowers of the year.",
    "clues": [
@@ -780,7 +800,8 @@
    "group": "iris family",
    "facts": {
     "colour": "Purple",
-    "region": "the Mediterranean"
+    "region": "the Mediterranean",
+    "family": "Iris family"
    },
    "blurb": "A purple crocus whose red threads are dried to make saffron, the world's most expensive spice.",
    "clues": [
@@ -835,7 +856,8 @@
    "group": "iris family",
    "facts": {
     "colour": "Purple",
-    "region": "the Mediterranean"
+    "region": "the Mediterranean",
+    "family": "Iris family"
    },
    "blurb": "A tall garden flower with three upright and three drooping petals. It inspired the French fleur-de-lis.",
    "clues": [
@@ -890,7 +912,8 @@
    "facts": {
     "colour": "Red",
     "region": "Asia",
-    "emblem": "Malaysia"
+    "emblem": "Malaysia",
+    "family": "Mallow family"
    },
    "blurb": "A big, trumpet-shaped tropical flower that lasts only a day or so. It is the national flower of Malaysia.",
    "clues": [
@@ -932,7 +955,8 @@
    "group": "daisy family",
    "facts": {
     "colour": "Orange",
-    "region": "North America"
+    "region": "North America",
+    "family": "Daisy family"
    },
    "blurb": "A bright orange flower used to decorate altars and graves for Mexico's Day of the Dead.",
    "clues": [
@@ -984,7 +1008,8 @@
    "group": "pink family",
    "facts": {
     "colour": "Pink",
-    "region": "the Mediterranean"
+    "region": "the Mediterranean",
+    "family": "Carnation family"
    },
    "blurb": "A frilly-petalled flower often worn in buttonholes. It is a popular flower for Mother's Day.",
    "clues": [
@@ -1041,7 +1066,8 @@
    "facts": {
     "colour": "Yellow",
     "region": "Asia",
-    "emblem": "Japan"
+    "emblem": "Japan",
+    "family": "Daisy family"
    },
    "blurb": "A flower with many layers of petals. It is the symbol of the Japanese emperor.",
    "clues": [
@@ -1085,7 +1111,8 @@
    "group": "daisy family",
    "facts": {
     "colour": "Red",
-    "region": "North America"
+    "region": "North America",
+    "family": "Daisy family"
    },
    "blurb": "A showy garden flower from Mexico that comes in many shapes, from pompoms to spiky \"cactus\" types.",
    "clues": [
@@ -1139,7 +1166,8 @@
    "group": "peony",
    "facts": {
     "colour": "Pink",
-    "region": "Europe"
+    "region": "Europe",
+    "family": "Peony family"
    },
    "blurb": "A big, round, frilly flower that blooms in late spring. In China it is called the \"king of flowers\".",
    "clues": [
@@ -1196,7 +1224,8 @@
    "group": "hydrangea",
    "facts": {
     "colour": "Blue",
-    "region": "Asia"
+    "region": "Asia",
+    "family": "Hydrangea family"
    },
    "blurb": "A shrub with big balls of flowers. In acid soil the flowers are blue; in chalky soil they are pink.",
    "clues": [
@@ -1247,7 +1276,8 @@
    "group": "asparagus family",
    "facts": {
     "colour": "White",
-    "region": "Europe"
+    "region": "Europe",
+    "family": "Asparagus family"
    },
    "blurb": "A woodland plant with tiny white bell-shaped flowers and a sweet scent. All parts are poisonous.",
    "clues": [
@@ -1303,7 +1333,8 @@
    "group": "plantain family",
    "facts": {
     "colour": "Purple",
-    "region": "Europe"
+    "region": "Europe",
+    "family": "Plantain family"
    },
    "blurb": "A tall spike of purple, bell-shaped flowers. It is very poisonous, but it gave us an important heart medicine.",
    "clues": [
@@ -1359,7 +1390,8 @@
    "group": "borage family",
    "facts": {
     "colour": "Blue",
-    "region": "Europe"
+    "region": "Europe",
+    "family": "Borage family"
    },
    "blurb": "A tiny sky-blue flower with a yellow centre. It is a symbol of remembrance.",
    "clues": [
@@ -1414,7 +1446,8 @@
    "group": "violet family",
    "facts": {
     "colour": "Purple",
-    "region": "Europe"
+    "region": "Europe",
+    "family": "Violet family"
    },
    "lookalikes": [
     "sweet-violet"
@@ -1475,7 +1508,8 @@
    "group": "violet family",
    "facts": {
     "colour": "Purple",
-    "region": "Europe"
+    "region": "Europe",
+    "family": "Violet family"
    },
    "lookalikes": [
     "garden-pansy"
@@ -1535,7 +1569,8 @@
    "group": "buttercup family",
    "facts": {
     "colour": "Yellow",
-    "region": "Europe"
+    "region": "Europe",
+    "family": "Buttercup family"
    },
    "blurb": "A shiny yellow meadow flower. Children hold it under a chin to see if it glows yellow.",
    "clues": [
@@ -1592,7 +1627,8 @@
    "group": "strelitzia",
    "facts": {
     "colour": "Orange",
-    "region": "Africa"
+    "region": "Africa",
+    "family": "Bird-of-paradise family"
    },
    "blurb": "A South African flower that looks like a colourful bird's head. Sunbirds pollinate it.",
    "clues": [
@@ -1638,7 +1674,8 @@
    "facts": {
     "colour": "Pink",
     "region": "Africa",
-    "emblem": "South Africa"
+    "emblem": "South Africa",
+    "family": "Protea family"
    },
    "lookalikes": [
     "waratah"
@@ -1697,7 +1734,8 @@
    "facts": {
     "colour": "Red",
     "region": "Australia",
-    "emblem": "New South Wales"
+    "emblem": "New South Wales",
+    "family": "Protea family"
    },
    "lookalikes": [
     "king-protea"
@@ -1756,7 +1794,8 @@
    "facts": {
     "colour": "Red and green",
     "region": "Australia",
-    "emblem": "Western Australia"
+    "emblem": "Western Australia",
+    "family": "Bloodwort family"
    },
    "blurb": "A furry Australian flower shaped like an animal's paw. It is the floral emblem of Western Australia.",
    "clues": [
@@ -1802,7 +1841,8 @@
    "facts": {
     "colour": "Red",
     "region": "Australia",
-    "emblem": "South Australia"
+    "emblem": "South Australia",
+    "family": "Pea family"
    },
    "blurb": "A desert flower with bright red petals and a shiny black \"eye\". It is the floral emblem of South Australia.",
    "clues": [
@@ -1859,7 +1899,8 @@
    "group": "protea",
    "facts": {
     "colour": "Yellow",
-    "region": "Australia"
+    "region": "Australia",
+    "family": "Protea family"
    },
    "blurb": "A gnarled Australian tree with bottlebrush-like flower spikes. Its old cones inspired May Gibbs's \"big bad Banksia men\".",
    "clues": [
@@ -1910,7 +1951,8 @@
    "group": "carrot family",
    "facts": {
     "colour": "White",
-    "region": "Australia"
+    "region": "Australia",
+    "family": "Carrot family"
    },
    "blurb": "A soft, white, daisy-like flower of the Sydney region that feels like flannel cloth.",
    "clues": [
@@ -1963,7 +2005,8 @@
    "group": "daisy family",
    "facts": {
     "colour": "White",
-    "region": "Europe"
+    "region": "Europe",
+    "family": "Daisy family"
    },
    "blurb": "A white, woolly star-shaped flower of the high Alps. A famous song from \"The Sound of Music\" is named after it.",
    "clues": [
@@ -2020,7 +2063,8 @@
    "group": "rafflesia",
    "facts": {
     "colour": "Red",
-    "region": "Asia"
+    "region": "Asia",
+    "family": "Rafflesia family"
    },
    "lookalikes": [
     "titan-arum"
@@ -2073,7 +2117,8 @@
    "group": "arum family",
    "facts": {
     "colour": "Purple",
-    "region": "Asia"
+    "region": "Asia",
+    "family": "Arum family"
    },
    "lookalikes": [
     "rafflesia"
@@ -2130,7 +2175,8 @@
    "group": "carnivorous",
    "facts": {
     "colour": "White",
-    "region": "North America"
+    "region": "North America",
+    "family": "Sundew family"
    },
    "blurb": "A meat-eating plant whose leaves snap shut on insects. It is found wild only in the Carolinas, USA.",
    "clues": [
@@ -2187,7 +2233,8 @@
    "group": "daisy family",
    "facts": {
     "colour": "Orange",
-    "region": "Africa"
+    "region": "Africa",
+    "family": "Daisy family"
    },
    "blurb": "A bright, daisy-like flower from South Africa. It is one of the most popular cut flowers in the world.",
    "clues": [
@@ -2240,7 +2287,8 @@
    "group": "olive family",
    "facts": {
     "colour": "White",
-    "region": "Asia"
+    "region": "Asia",
+    "family": "Olive family"
    },
    "blurb": "A climbing plant with small white star-shaped flowers and a strong sweet scent, used in tea and perfume.",
    "clues": [
@@ -2295,7 +2343,8 @@
    "facts": {
     "colour": "White",
     "region": "the Americas",
-    "emblem": "Laos"
+    "emblem": "Laos",
+    "family": "Dogbane family"
    },
    "blurb": "A tropical tree with waxy, scented flowers used in Hawaiian leis. It is the national flower of Laos.",
    "clues": [
@@ -2348,7 +2397,8 @@
    "group": "four o'clock family",
    "facts": {
     "colour": "Pink",
-    "region": "South America"
+    "region": "South America",
+    "family": "Four o'clock family"
    },
    "blurb": "A thorny climbing plant covered in bright papery \"petals\" that are really leaves called bracts.",
    "clues": [
@@ -2404,7 +2454,8 @@
    "group": "tea family",
    "facts": {
     "colour": "Pink",
-    "region": "Asia"
+    "region": "Asia",
+    "family": "Tea family"
    },
    "blurb": "A shrub with glossy leaves and rose-like flowers that bloom in winter. The tea plant is a close relative.",
    "clues": [
@@ -2459,7 +2510,8 @@
    "group": "asparagus family",
    "facts": {
     "colour": "Blue",
-    "region": "the Middle East"
+    "region": "the Middle East",
+    "family": "Asparagus family"
    },
    "blurb": "A spring bulb with a dense spike of very sweet-smelling flowers, often grown indoors in winter.",
    "clues": [
@@ -2515,7 +2567,8 @@
    "group": "passionflower",
    "facts": {
     "colour": "Blue",
-    "region": "South America"
+    "region": "South America",
+    "family": "Passionflower family"
    },
    "blurb": "An amazing-looking climbing flower with a ring of thread-like filaments. Its relatives produce passion fruit.",
    "clues": [
@@ -2569,7 +2622,8 @@
    "group": "daisy family",
    "facts": {
     "colour": "Purple",
-    "region": "Europe"
+    "region": "Europe",
+    "family": "Daisy family"
    },
    "blurb": "A spiky plant with purple flower heads. The thistle is the national emblem of Scotland.",
    "clues": [
@@ -2626,7 +2680,8 @@
    "group": "heath family",
    "facts": {
     "colour": "Purple",
-    "region": "Europe"
+    "region": "Europe",
+    "family": "Heath family"
    },
    "blurb": "A low, tough shrub that turns moors purple in late summer. White heather is said to be lucky.",
    "clues": [
@@ -2682,7 +2737,8 @@
    "group": "daisy family",
    "facts": {
     "colour": "Blue",
-    "region": "Europe"
+    "region": "Europe",
+    "family": "Daisy family"
    },
    "blurb": "A bright blue wildflower that once grew in cornfields. A wreath of them was found in Tutankhamun's tomb.",
    "clues": [
@@ -2738,7 +2794,8 @@
    "group": "bindweed family",
    "facts": {
     "colour": "Purple",
-    "region": "the Americas"
+    "region": "the Americas",
+    "family": "Bindweed family"
    },
    "blurb": "A climbing vine with trumpet-shaped flowers that open in the morning and fade by afternoon.",
    "clues": [

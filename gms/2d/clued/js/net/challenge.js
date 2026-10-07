@@ -1,19 +1,19 @@
 // Challenge links: "beat my score on this exact set". Create from a results screen, play via ?c=ID.
-import { h, fmtNum } from '../ui/kit.js?v=202610071242';
-import { defineScreen, header, current, reset } from '../ui/app.js?v=202610071242';
-import { popup, toast } from '../ui/popup.js?v=202610071242';
-import { sfx, confetti } from '../ui/fx.js?v=202610071242';
-import { getSettings } from '../core/store.js?v=202610071242';
-import { createRunner } from '../structures/runner.js?v=202610071242';
-import { replayCfg, replayScore } from '../structures/index.js?v=202610071242';
-import { challenges, friendly } from './api.js?v=202610071242';
-import { suggestedName, rememberName, tidyName, MAX_NAME } from './ident.js?v=202610071242';
-import { openShare, challengeUrl, shareOrCopy } from './share.js?v=202610071242';
-import { scoreboard, ordinal, detailOf, comparison } from './board.js?v=202610071242';
-import { ensureStyles, setQuery } from './util.js?v=202610071242';
-import { ensureFormats } from './room.js?v=202610071242';
-import { openSignIn } from './signin.js?v=202610071242';
-import { linkChallengeShare } from './linkchallenge.js?v=202610071242';
+import { h, fmtNum } from '../ui/kit.js?v=202610071324';
+import { defineScreen, header, current, reset } from '../ui/app.js?v=202610071324';
+import { popup, toast } from '../ui/popup.js?v=202610071324';
+import { sfx, confetti } from '../ui/fx.js?v=202610071324';
+import { getSettings } from '../core/store.js?v=202610071324';
+import { createRunner } from '../structures/runner.js?v=202610071324';
+import { replayCfg, replayScore } from '../structures/index.js?v=202610071324';
+import { challenges, friendly } from './api.js?v=202610071324';
+import { suggestedName, rememberName, tidyName, MAX_NAME } from './ident.js?v=202610071324';
+import { openShare, challengeUrl, shareOrCopy } from './share.js?v=202610071324';
+import { scoreboard, ordinal, detailOf, comparison } from './board.js?v=202610071324';
+import { ensureStyles, setQuery } from './util.js?v=202610071324';
+import { ensureFormats } from './room.js?v=202610071324';
+import { openSignIn } from './signin.js?v=202610071324';
+import { linkChallengeShare } from './linkchallenge.js?v=202610071324';
 
 const MAX_SET = 500 * 1024;
 

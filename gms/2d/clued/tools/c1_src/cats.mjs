@@ -1,21 +1,22 @@
-import { WD, COMMONS, theC } from './_common.mjs';
+import { WD, COMMONS, theC, addFacts } from './_common.mjs';
 
 const UK = 'United Kingdom', US = 'United States', TH = 'Thailand', RU = 'Russia', FR = 'France', TR = 'Turkey', JP = 'Japan', CA = 'Canada', EG = 'Egypt', NO = 'Norway', MM = 'Myanmar', AU = 'Australia', ET = 'Ethiopia', SG = 'Singapore', IR = 'Iran';
 const f = (origin, coat) => ({ origin, coat });
 
-export default {
+const PACK = {
   id: 'cats', title: 'Cat breeds', theme: 'animals', icon: '🐈', kids: true,
   leakExempt: ['cat', 'cats', 'breed'],
   media: 'wiki', photos: 3, depicts: 0, lname: 'asis',
   wdCheckLabel: { origin: 'P495' }, wdP31: ['Q43577'],
   factsMeta: {
+    massKg: { type: 'num', label: 'Typical adult weight', unit: 'kg', higherLabel: 'Heavier', noClue: true },
     origin: { type: 'cat', label: 'Country of origin', clue: v => `The breed comes from ${[].concat(v).map(theC).join(' or ')}.` },
     coat: { type: 'cat', label: 'Coat', values: ['Long', 'Medium', 'Short', 'Curly', 'Hairless'], clue: v => (v === 'Hairless' ? 'It has almost no fur.' : v === 'Curly' ? 'Its fur is curly or wavy.' : `Its fur is ${v.toLowerCase()}.`) },
   },
   imgPrompt: "Which of these is {aName}?",
   nameImgPrompt: "Which cat breed is this?",
   tfImgPrompt: "This cat is {aName}.",
-  tpl: {"origin": {"ask": "Where does the {name} breed come from?", "askReverse": "Which of these breeds comes from {value}?", "stmt": "The {name} breed comes from {value}."}, "coat": {"ask": "What kind of coat does the {name} have?", "askReverse": "Which of these breeds has a {lvalue} coat?", "stmt": "The {name} has a {lvalue} coat."}},
+  tpl: {"massKg": {"askHigh": "Which of these breeds is usually the heaviest?", "askLow": "Which of these breeds is usually the lightest?", "askNumber": "About how much does an adult {name} cat weigh, in kilograms?", "minRatio": 1.5}, "origin": {"ask": "Where does the {name} breed come from?", "askReverse": "Which of these breeds comes from {value}?", "stmt": "The {name} breed comes from {value}."}, "coat": {"ask": "What kind of coat does the {name} have?", "askReverse": "Which of these breeds has a {lvalue} coat?", "stmt": "The {name} has a {lvalue} coat."}},
   sources: [WD, COMMONS],
   items: [
     { n: 'Persian', wp: 'Persian cat', alt: ['Persian cat'], f: f(IR, 'Long'), d: 1, look: ['Himalayan', 'Exotic Shorthair'],
@@ -147,3 +148,13 @@ export default {
     { kind: 'mc', prompt: 'Which cat breed is very fluffy with a flat face?', answer: 'Persian', wrong: ['Sphynx', 'Siamese', 'Bengal'], explain: 'Persians need brushing every day.', difficulty: 1 },
   ],
 };
+
+// Typical adult weight (average of the sexes) from each breed's Wikipedia description; breeds with no figure, or whose
+// size depends on generation (Savannah), are left out.
+addFacts(PACK.items, 'massKg', {
+  'Maine Coon': 7.5, Ragdoll: 6.5, 'British Shorthair': 5, Abyssinian: 4.5, 'Scottish Fold': 4.2, 'Russian Blue': 5,
+  'Norwegian Forest Cat': 6, Burmese: 5, 'Oriental Shorthair': 3.8, 'Turkish Van': 5.5, Manx: 4.5, Siberian: 6.5,
+  'Japanese Bobtail': 3.3, Bombay: 3.5, Ocicat: 4.5, Munchkin: 3, Singapura: 2.2,
+});
+
+export default PACK;

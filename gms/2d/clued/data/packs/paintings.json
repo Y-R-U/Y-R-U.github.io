@@ -23,6 +23,13 @@
    "askHigh": "Which of these was painted most recently?",
    "askLow": "Which of these is the oldest painting?"
   },
+  "century": {
+   "type": "cat",
+   "label": "Painted in the",
+   "ask": "In which century was {name} painted?",
+   "askReverse": "Which of these was painted in the {value}?",
+   "stmt": "{name} was painted in the {value}."
+  },
   "museum": {
    "type": "text",
    "label": "Where it is"
@@ -40,6 +47,7 @@
    "facts": {
     "artist": "Leonardo da Vinci",
     "year": 1503,
+    "century": "1500s",
     "museum": "Louvre, Paris"
    },
    "blurb": "Mona Lisa (1503) by Leonardo da Vinci. It is famous for a mysterious smile.",
@@ -107,6 +115,7 @@
    "facts": {
     "artist": "Vincent van Gogh",
     "year": 1889,
+    "century": "1800s",
     "museum": "Museum of Modern Art, New York"
    },
    "blurb": "The Starry Night (1889) by Vincent van Gogh. Swirling stars fill a deep blue night sky above a village.",
@@ -142,6 +151,7 @@
    "facts": {
     "artist": "Edvard Munch",
     "year": 1893,
+    "century": "1800s",
     "museum": "National Museum, Oslo"
    },
    "blurb": "The Scream (1893) by Edvard Munch. It shows a figure screaming in terror.",
@@ -175,6 +185,7 @@
    "facts": {
     "artist": "Johannes Vermeer",
     "year": 1665,
+    "century": "1600s",
     "museum": "Mauritshuis, The Hague"
    },
    "blurb": "Girl with a Pearl Earring (1665) by Johannes Vermeer. A girl looks over her shoulder wearing a large pearl.",
@@ -209,6 +220,7 @@
    "facts": {
     "artist": "Sandro Botticelli",
     "year": 1485,
+    "century": "1400s",
     "museum": "Uffizi, Florence"
    },
    "blurb": "The Birth of Venus (1485) by Sandro Botticelli. A goddess stands on a giant scallop shell.",
@@ -245,6 +257,7 @@
    "facts": {
     "artist": "Rembrandt",
     "year": 1642,
+    "century": "1600s",
     "museum": "Rijksmuseum, Amsterdam"
    },
    "blurb": "The Night Watch (1642) by Rembrandt. It is a huge group portrait full of light and shadow.",
@@ -280,6 +293,7 @@
    "facts": {
     "artist": "Gustav Klimt",
     "year": 1908,
+    "century": "1900s",
     "museum": "Belvedere, Vienna"
    },
    "blurb": "The Kiss (1908) by Gustav Klimt. A couple embrace wrapped in golden robes.",
@@ -316,6 +330,7 @@
    "facts": {
     "artist": "Katsushika Hokusai",
     "year": 1831,
+    "century": "1800s",
     "museum": "Woodblock print (many copies)"
    },
    "blurb": "The Great Wave off Kanagawa (1831) by Katsushika Hokusai. A giant claw-like wave towers over three boats.",
@@ -351,6 +366,7 @@
    "facts": {
     "artist": "Claude Monet",
     "year": 1872,
+    "century": "1800s",
     "museum": "Musée Marmottan Monet, Paris"
    },
    "blurb": "Impression, Sunrise (1872) by Claude Monet. A small orange sun glows over a misty harbour.",
@@ -387,6 +403,7 @@
    "facts": {
     "artist": "Michelangelo",
     "year": 1512,
+    "century": "1500s",
     "museum": "Sistine Chapel, Vatican City"
    },
    "blurb": "The Creation of Adam (1512) by Michelangelo. Two fingers almost touch as God gives life to the first man.",
@@ -423,6 +440,7 @@
    "facts": {
     "artist": "Diego Velázquez",
     "year": 1656,
+    "century": "1600s",
     "museum": "Museo del Prado, Madrid"
    },
    "blurb": "Las Meninas (1656) by Diego Velázquez. It shows the young Spanish princess Margarita with her attendants.",
@@ -492,6 +510,7 @@
    "facts": {
     "artist": "Georges Seurat",
     "year": 1886,
+    "century": "1800s",
     "museum": "Art Institute of Chicago"
    },
    "blurb": "A Sunday Afternoon on the Island of La Grande Jatte (1886) by Georges Seurat. Parisians relax by the river on a sunny day.",
@@ -526,6 +545,7 @@
    "facts": {
     "artist": "Grant Wood",
     "year": 1930,
+    "century": "1900s",
     "museum": "Art Institute of Chicago"
    },
    "blurb": "American Gothic (1930) by Grant Wood. A stern farmer with a pitchfork stands beside a woman.",
@@ -560,6 +580,7 @@
    "facts": {
     "artist": "Jan van Eyck",
     "year": 1434,
+    "century": "1400s",
     "museum": "National Gallery, London"
    },
    "blurb": "The Arnolfini Portrait (1434) by Jan van Eyck. A wealthy merchant and his wife stand in a room in Bruges.",
@@ -596,6 +617,7 @@
    "facts": {
     "artist": "John Constable",
     "year": 1821,
+    "century": "1800s",
     "museum": "National Gallery, London"
    },
    "blurb": "The Hay Wain (1821) by John Constable. A horse-drawn farm cart stands in a shallow river.",
@@ -632,6 +654,7 @@
    "facts": {
     "artist": "J. M. W. Turner",
     "year": 1839,
+    "century": "1800s",
     "museum": "National Gallery, London"
    },
    "blurb": "The Fighting Temeraire (1839) by J. M. W. Turner. A small steam tug tows an old sailing warship to be broken up.",
@@ -666,6 +689,7 @@
    "facts": {
     "artist": "Eugène Delacroix",
     "year": 1830,
+    "century": "1800s",
     "museum": "Louvre, Paris"
    },
    "blurb": "Liberty Leading the People (1830) by Eugène Delacroix. She raises the French tricolour flag.",
@@ -701,6 +725,7 @@
    "facts": {
     "artist": "Francisco Goya",
     "year": 1814,
+    "century": "1800s",
     "museum": "Museo del Prado, Madrid"
    },
    "blurb": "The Third of May 1808 (1814) by Francisco Goya. It shows a firing squad executing Spanish civilians.",
@@ -737,6 +762,7 @@
    "facts": {
     "artist": "Caspar David Friedrich",
     "year": 1818,
+    "century": "1800s",
     "museum": "Hamburger Kunsthalle"
    },
    "blurb": "Wanderer above the Sea of Fog (1818) by Caspar David Friedrich. A man stands on a rock gazing over a landscape covered in mist.",
@@ -772,6 +798,7 @@
    "facts": {
     "artist": "Théodore Géricault",
     "year": 1819,
+    "century": "1800s",
     "museum": "Louvre, Paris"
    },
    "blurb": "The Raft of the Medusa (1819) by Théodore Géricault. Shipwreck survivors cling to a crowded raft.",
@@ -807,6 +834,7 @@
    "facts": {
     "artist": "Raphael",
     "year": 1511,
+    "century": "1500s",
     "museum": "Apostolic Palace, Vatican City"
    },
    "blurb": "The School of Athens (1511) by Raphael. It shows the great thinkers of ancient Greece together.",
@@ -843,6 +871,7 @@
    "facts": {
     "artist": "Johannes Vermeer",
     "year": 1658,
+    "century": "1600s",
     "museum": "Rijksmuseum, Amsterdam"
    },
    "blurb": "The Milkmaid (1658) by Johannes Vermeer. A kitchen maid carefully pours milk from a jug.",
@@ -878,6 +907,7 @@
    "facts": {
     "artist": "Pierre-Auguste Renoir",
     "year": 1876,
+    "century": "1800s",
     "museum": "Musée d'Orsay, Paris"
    },
    "blurb": "Dance at Le Moulin de la Galette (1876) by Pierre-Auguste Renoir. People dance and chat at an open-air café.",
@@ -911,6 +941,7 @@
    "facts": {
     "artist": "Pierre-Auguste Renoir",
     "year": 1881,
+    "century": "1800s",
     "museum": "Phillips Collection, Washington, D.C."
    },
    "blurb": "Luncheon of the Boating Party (1881) by Pierre-Auguste Renoir. Friends share lunch on a balcony by the river.",
@@ -945,6 +976,7 @@
    "facts": {
     "artist": "Vincent van Gogh",
     "year": 1888,
+    "century": "1800s",
     "museum": "Kröller-Müller Museum, Otterlo"
    },
    "blurb": "Café Terrace at Night (1888) by Vincent van Gogh. People sit outside a café under the stars.",
@@ -977,6 +1009,7 @@
    "facts": {
     "artist": "Vincent van Gogh",
     "year": 1889,
+    "century": "1800s",
     "museum": "Courtauld Gallery, London"
    },
    "blurb": "Self-Portrait with Bandaged Ear (1889) by Vincent van Gogh. The painter shows himself with a bandage over his ear.",
@@ -1012,6 +1045,7 @@
    "facts": {
     "artist": "Pieter Bruegel the Elder",
     "year": 1565,
+    "century": "1500s",
     "museum": "Kunsthistorisches Museum, Vienna"
    },
    "blurb": "The Hunters in the Snow (1565) by Pieter Bruegel the Elder. It is a winter landscape covered in snow.",
@@ -1046,6 +1080,7 @@
    "facts": {
     "artist": "Pieter Bruegel the Elder",
     "year": 1563,
+    "century": "1500s",
     "museum": "Kunsthistorisches Museum, Vienna"
    },
    "blurb": "The Tower of Babel (1563) by Pieter Bruegel the Elder. A gigantic unfinished tower rises into the clouds.",
@@ -1081,6 +1116,7 @@
    "facts": {
     "artist": "Hans Holbein the Younger",
     "year": 1533,
+    "century": "1500s",
     "museum": "National Gallery, London"
    },
    "blurb": "The Ambassadors (1533) by Hans Holbein the Younger. Two richly dressed French diplomats stand side by side.",
@@ -1117,6 +1153,7 @@
    "facts": {
     "artist": "Sandro Botticelli",
     "year": 1480,
+    "century": "1400s",
     "museum": "Uffizi, Florence"
    },
    "blurb": "Primavera (1480) by Sandro Botticelli. Its title means Spring.",
@@ -1186,6 +1223,7 @@
    "facts": {
     "artist": "James McNeill Whistler",
     "year": 1871,
+    "century": "1800s",
     "museum": "Musée d'Orsay, Paris"
    },
    "blurb": "Whistler's Mother (1871) by James McNeill Whistler. It shows the painter's mother.",
@@ -1220,6 +1258,7 @@
    "facts": {
     "artist": "Jean-François Millet",
     "year": 1857,
+    "century": "1800s",
     "museum": "Musée d'Orsay, Paris"
    },
    "blurb": "The Gleaners (1857) by Jean-François Millet. Three peasant women stoop to pick up leftover grain.",
@@ -1254,6 +1293,7 @@
    "facts": {
     "artist": "Édouard Manet",
     "year": 1882,
+    "century": "1800s",
     "museum": "Courtauld Gallery, London"
    },
    "blurb": "A Bar at the Folies-Bergère (1882) by Édouard Manet. A barmaid stands behind a marble counter in a Paris nightclub.",
@@ -1288,6 +1328,7 @@
    "facts": {
     "artist": "Paul Gauguin",
     "year": 1898,
+    "century": "1800s",
     "museum": "Museum of Fine Arts, Boston"
    },
    "blurb": "Where Do We Come From? What Are We? Where Are We Going? (1898) by Paul Gauguin. It is a large frieze of figures under a three-question title.",
@@ -1324,6 +1365,7 @@
    "facts": {
     "artist": "Henri Rousseau",
     "year": 1897,
+    "century": "1800s",
     "museum": "Museum of Modern Art, New York"
    },
    "blurb": "The Sleeping Gypsy (1897) by Henri Rousseau. A lion sniffs at a sleeping woman.",
@@ -1359,6 +1401,7 @@
    "facts": {
     "artist": "Henri Rousseau",
     "year": 1891,
+    "century": "1800s",
     "museum": "National Gallery, London"
    },
    "blurb": "Tiger in a Tropical Storm (Surprised!) (1891) by Henri Rousseau. A tiger crouches in a jungle during a storm.",
@@ -1394,6 +1437,7 @@
    "facts": {
     "artist": "John William Waterhouse",
     "year": 1888,
+    "century": "1800s",
     "museum": "Tate Britain, London"
    },
    "blurb": "The Lady of Shalott (1888) by John William Waterhouse. A woman with long red hair sits in a boat drifting down a river.",
@@ -1428,6 +1472,7 @@
    "facts": {
     "artist": "John Everett Millais",
     "year": 1852,
+    "century": "1800s",
     "museum": "Tate Britain, London"
    },
    "blurb": "Ophelia (1852) by John Everett Millais. A young woman floats singing in a stream.",
@@ -1464,6 +1509,7 @@
    "facts": {
     "artist": "Thomas Gainsborough",
     "year": 1770,
+    "century": "1700s",
     "museum": "Huntington Library, San Marino, California"
    },
    "blurb": "The Blue Boy (1770) by Thomas Gainsborough. A boy stands in a shimmering blue satin suit.",
@@ -1497,6 +1543,7 @@
    "facts": {
     "artist": "Thomas Gainsborough",
     "year": 1750,
+    "century": "1700s",
     "museum": "National Gallery, London"
    },
    "blurb": "Mr and Mrs Andrews (1750) by Thomas Gainsborough. A young married couple pose under an oak tree.",
@@ -1533,6 +1580,7 @@
    "facts": {
     "artist": "Jean-Honoré Fragonard",
     "year": 1767,
+    "century": "1700s",
     "museum": "Wallace Collection, London"
    },
    "blurb": "The Swing (1767) by Jean-Honoré Fragonard. A young woman in a frothy pink dress flies through the air on a swing.",
@@ -1565,6 +1613,7 @@
    "facts": {
     "artist": "Emanuel Leutze",
     "year": 1851,
+    "century": "1800s",
     "museum": "Metropolitan Museum of Art, New York"
    },
    "blurb": "Washington Crossing the Delaware (1851) by Emanuel Leutze. A general stands boldly in a rowing boat among ice.",
@@ -1601,6 +1650,7 @@
    "facts": {
     "artist": "Frans Hals",
     "year": 1624,
+    "century": "1600s",
     "museum": "Wallace Collection, London"
    },
    "blurb": "The Laughing Cavalier (1624) by Frans Hals. A man with a wide hat and curled moustache smiles at us.",
@@ -1636,6 +1686,7 @@
    "facts": {
     "artist": "Rembrandt",
     "year": 1632,
+    "century": "1600s",
     "museum": "Mauritshuis, The Hague"
    },
    "blurb": "The Anatomy Lesson of Dr. Nicolaes Tulp (1632) by Rembrandt. Surgeons gather to watch a dissection.",
@@ -1672,6 +1723,7 @@
    "facts": {
     "artist": "Claude Monet",
     "year": 1875,
+    "century": "1800s",
     "museum": "National Gallery of Art, Washington, D.C."
    },
    "blurb": "Woman with a Parasol (1875) by Claude Monet. A woman holds a parasol against a bright sky.",
@@ -1700,6 +1752,7 @@
    "facts": {
     "artist": "Gustav Klimt",
     "year": 1907,
+    "century": "1900s",
     "museum": "Neue Galerie, New York"
    },
    "blurb": "Portrait of Adele Bloch-Bauer I (1907) by Gustav Klimt. A Viennese society woman sits surrounded by swirls of gold.",
@@ -1734,6 +1787,7 @@
    "facts": {
     "artist": "Leonardo da Vinci",
     "year": 1490,
+    "century": "1400s",
     "museum": "Czartoryski Museum, Kraków"
    },
    "blurb": "Lady with an Ermine (1490) by Leonardo da Vinci. A young woman holds a white stoat-like animal.",
@@ -1766,6 +1820,7 @@
    "facts": {
     "artist": "Pieter Bruegel the Elder",
     "year": 1565,
+    "century": "1500s",
     "museum": "Metropolitan Museum of Art, New York"
    },
    "blurb": "The Harvesters (1565) by Pieter Bruegel the Elder. Peasants cut and gather golden wheat in summer.",
@@ -1802,6 +1857,7 @@
    "facts": {
     "artist": "Vincent van Gogh",
     "year": 1889,
+    "century": "1800s",
     "museum": "J. Paul Getty Museum, Los Angeles"
    },
    "blurb": "Irises (1889) by Vincent van Gogh. It shows a bed of purple-blue flowers.",
@@ -1838,6 +1894,7 @@
    "facts": {
     "artist": "Vincent van Gogh",
     "year": 1885,
+    "century": "1800s",
     "museum": "Van Gogh Museum, Amsterdam"
    },
    "blurb": "The Potato Eaters (1885) by Vincent van Gogh. A peasant family shares a simple meal.",
@@ -1874,6 +1931,7 @@
    "facts": {
     "artist": "Jacques-Louis David",
     "year": 1793,
+    "century": "1700s",
     "museum": "Royal Museums of Fine Arts of Belgium, Brussels"
    },
    "blurb": "The Death of Marat (1793) by Jacques-Louis David. It is a famous image of the French Revolution.",
@@ -1908,6 +1966,7 @@
    "facts": {
     "artist": "Frederic Leighton",
     "year": 1895,
+    "century": "1800s",
     "museum": "Museo de Arte de Ponce, Puerto Rico"
    },
    "blurb": "Flaming June (1895) by Frederic Leighton. A woman sleeps curled up in a sheer orange dress.",
@@ -1944,6 +2003,7 @@
    "facts": {
     "artist": "Albrecht Dürer",
     "year": 1502,
+    "century": "1500s",
     "museum": "Albertina, Vienna"
    },
    "blurb": "Young Hare (1502) by Albrecht Dürer. It is a famous painting of a young hare.",
@@ -1979,6 +2039,7 @@
    "facts": {
     "artist": "Vincent van Gogh",
     "year": 1888,
+    "century": "1800s",
     "museum": "Yale University Art Gallery"
    },
    "blurb": "The Night Café (1888) by Vincent van Gogh. It shows a billiard table in an all-night café.",

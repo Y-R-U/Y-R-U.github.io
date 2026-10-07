@@ -35,8 +35,7 @@
    "type": "cat",
    "label": "Best-known colour",
    "ask": "What colour is {lname} best known for?",
-   "stmt": "{name} is best known in {lvalue}.",
-   "exclusive": false
+   "stmt": "{name} is best known for being {lvalue}."
   },
   "mohs": {
    "type": "num",
@@ -75,7 +74,7 @@
    "name": "Diamond",
    "facts": {
     "kind": "Gemstone",
-    "colour": "Colourless",
+    "colour": "Colourless or white",
     "mohs": 10,
     "birthstone": "April"
    },
@@ -88,7 +87,7 @@
     "The Cullinan, found in 1905, is the largest gem-quality one ever found.",
     "It is made of pure carbon, like pencil lead.",
     "It is a gemstone.",
-    "It is best known in colourless.",
+    "It is usually colourless or white.",
     "Its Mohs hardness is about 10.",
     "It is a birthstone for April.",
     "It is the hardest natural material.",
@@ -295,7 +294,6 @@
    "name": "Topaz",
    "facts": {
     "kind": "Gemstone",
-    "colour": "Blue",
     "mohs": 8,
     "birthstone": "November"
    },
@@ -305,7 +303,6 @@
     "Most blue ones are treated with heat and radiation.",
     "Imperial ones are golden-orange.",
     "It is a gemstone.",
-    "It is best known in blue.",
     "Its Mohs hardness is about 8.",
     "It is a birthstone for November.",
     "Its name has five letters and starts with T.",
@@ -384,7 +381,7 @@
    "name": "Pearl",
    "facts": {
     "kind": "Organic",
-    "colour": "White",
+    "colour": "Colourless or white",
     "mohs": 3,
     "birthstone": "June"
    },
@@ -394,7 +391,7 @@
     "It dissolves in vinegar.",
     "Layers of nacre build it up.",
     "It is an organic gem.",
-    "It is best known in white.",
+    "It is usually colourless or white.",
     "Its Mohs hardness is about 3.",
     "It is a birthstone for June.",
     "It forms inside an oyster.",
@@ -472,7 +469,6 @@
    "name": "Turquoise",
    "facts": {
     "kind": "Gemstone",
-    "colour": "Blue",
     "mohs": 5.5,
     "birthstone": "December"
    },
@@ -485,7 +481,6 @@
     "It contains copper.",
     "It is prized in Native American jewellery.",
     "It is a gemstone.",
-    "It is best known in blue.",
     "Its Mohs hardness is about 5.5.",
     "It is a birthstone for December.",
     "A colour is named after it.",
@@ -759,7 +754,7 @@
    "name": "Moonstone",
    "facts": {
     "kind": "Gemstone",
-    "colour": "White",
+    "colour": "Colourless or white",
     "mohs": 6,
     "birthstone": "June"
    },
@@ -769,7 +764,7 @@
     "Its glow is called adularescence.",
     "It is a birthstone for June.",
     "It is a gemstone.",
-    "It is best known in white.",
+    "It is usually colourless or white.",
     "Its Mohs hardness is about 6.",
     "It has a soft, floating blue glow.",
     "It is named after something in the night sky.",
@@ -803,7 +798,6 @@
    "name": "Tanzanite",
    "facts": {
     "kind": "Gemstone",
-    "colour": "Violet-blue",
     "mohs": 6.5,
     "birthstone": "December"
    },
@@ -817,7 +811,6 @@
     "Tiffany & Co. named it.",
     "It looks different colours from different angles.",
     "It is a gemstone.",
-    "It is best known in violet-blue.",
     "Its Mohs hardness is about 6.5.",
     "It is a birthstone for December.",
     "It is found only near Mount Kilimanjaro.",
@@ -980,7 +973,7 @@
    ],
    "facts": {
     "kind": "Mineral",
-    "colour": "Colourless",
+    "colour": "Colourless or white",
     "mohs": 7
    },
    "lookalikes": [
@@ -994,7 +987,7 @@
     "It is very common.",
     "It is number 7 on the Mohs scale.",
     "It is a mineral.",
-    "It is best known in colourless.",
+    "It is usually colourless or white.",
     "Its Mohs hardness is about 7.",
     "Sand is mostly made of it.",
     "Amethyst and citrine are kinds of it.",
@@ -1237,7 +1230,6 @@
    "name": "Fluorite",
    "facts": {
     "kind": "Mineral",
-    "colour": "Purple",
     "mohs": 4
    },
    "blurb": "A colourful mineral that often glows under ultraviolet light. The word \"fluorescent\" comes from it.",
@@ -1245,7 +1237,6 @@
     "It is number 4 on the Mohs scale.",
     "It is used to make steel.",
     "It is a mineral.",
-    "It is best known in purple.",
     "Its Mohs hardness is about 4.",
     "It often forms cubes.",
     "It glows under ultraviolet light.",
@@ -1279,7 +1270,7 @@
    "name": "Calcite",
    "facts": {
     "kind": "Mineral",
-    "colour": "White",
+    "colour": "Colourless or white",
     "mohs": 3
    },
    "blurb": "A common mineral that makes up limestone, marble and chalk. A clear crystal of it makes you see double.",
@@ -1288,7 +1279,7 @@
     "A clear piece makes things behind it look double.",
     "It fizzes in weak acid.",
     "It is a mineral.",
-    "It is best known in white.",
+    "It is usually colourless or white.",
     "Its Mohs hardness is about 3.",
     "Limestone, chalk and marble are made of it.",
     "The answer is one word of 7 letters.",
@@ -1325,7 +1316,7 @@
    ],
    "facts": {
     "kind": "Mineral",
-    "colour": "White",
+    "colour": "Colourless or white",
     "mohs": 2
    },
    "blurb": "A soft mineral used to make plaster and plasterboard. A Mexican cave holds gypsum crystals 11 metres long.",
@@ -1334,7 +1325,7 @@
     "You can scratch it with a fingernail.",
     "It is used to make plaster of Paris.",
     "It is a mineral.",
-    "It is best known in white.",
+    "It is usually colourless or white.",
     "Its Mohs hardness is about 2.",
     "Giant crystals of it grow in a Mexican cave.",
     "It is a soft white mineral.",
@@ -1360,7 +1351,7 @@
    "name": "Talc",
    "facts": {
     "kind": "Mineral",
-    "colour": "White",
+    "colour": "Colourless or white",
     "mohs": 1
    },
    "blurb": "The softest mineral, at the bottom of the Mohs scale. It feels soapy and is ground into talcum powder.",
@@ -1369,7 +1360,7 @@
     "It feels soapy or greasy.",
     "It is ground into baby powder.",
     "It is a mineral.",
-    "It is best known in white.",
+    "It is usually colourless or white.",
     "Its Mohs hardness is about 1.",
     "It is number 1 on the Mohs scale.",
     "It is the softest mineral.",
@@ -1406,7 +1397,7 @@
    ],
    "facts": {
     "kind": "Mineral",
-    "colour": "Colourless",
+    "colour": "Colourless or white",
     "mohs": 2.5
    },
    "blurb": "The mineral form of table salt. Its crystals form perfect cubes.",
@@ -1414,7 +1405,7 @@
     "It forms cubes.",
     "It dissolves in water.",
     "It is a mineral.",
-    "It is best known in colourless.",
+    "It is usually colourless or white.",
     "Its Mohs hardness is about 2.5.",
     "It is spread on icy roads.",
     "The answer is one word of 6 letters.",

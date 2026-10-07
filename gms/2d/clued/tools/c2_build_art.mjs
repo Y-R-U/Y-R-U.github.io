@@ -44,7 +44,7 @@ for (const r of rows) {
   if (clues.length < 5) note(`few clues ${r.name}: ${clues.length}`);
   items.push({
     id: slug(r.name), name: r.name, alt: r.alt, group: r.artist,
-    facts: { artist: r.artist, year: r.year || undefined, museum: r.museum },
+    facts: { artist: r.artist, year: r.year || undefined, century: r.year ? `${Math.floor(r.year / 100) * 100}s` : undefined, museum: r.museum },
     blurb: `${r.name}${r.year ? ` (${r.year})` : ''} by ${r.artist}. ${r.clues[r.clues.length - 1]}.`,
     clues, media: { img: [m] }, difficulty: r.d,
   });
@@ -59,7 +59,7 @@ for (const it of items) {
 writePack({
   id: 'paintings', title: 'Famous paintings', theme: 'art', icon: '🖼️', kids: false, version: 1,
   imgPrompt: 'Which of these is {name}?', nameImgPrompt: 'What is this painting called?', tfImgPrompt: 'This painting is {name}.',
-  factsMeta: { artist: { type: 'cat', label: 'Artist', ask: 'Who painted {name}?', askReverse: 'Which of these was painted by {value}?', stmt: '{name} was painted by {value}.' }, year: { type: 'year', label: 'Painted', higherLabel: 'Later', askHigh: 'Which of these was painted most recently?', askLow: 'Which of these is the oldest painting?' }, museum: { type: 'text', label: 'Where it is' } },
+  factsMeta: { artist: { type: 'cat', label: 'Artist', ask: 'Who painted {name}?', askReverse: 'Which of these was painted by {value}?', stmt: '{name} was painted by {value}.' }, year: { type: 'year', label: 'Painted', higherLabel: 'Later', askHigh: 'Which of these was painted most recently?', askLow: 'Which of these is the oldest painting?' }, century: { type: 'cat', label: 'Painted in the', ask: 'In which century was {name} painted?', askReverse: 'Which of these was painted in the {value}?', stmt: '{name} was painted in the {value}.' }, museum: { type: 'text', label: 'Where it is' } },
   items, questions,
   sources: [{ name: 'Wikimedia Commons (public-domain reproductions)', url: 'https://commons.wikimedia.org' }, { name: 'Wikidata (creator, date, collection)', url: 'https://www.wikidata.org' }],
 });
