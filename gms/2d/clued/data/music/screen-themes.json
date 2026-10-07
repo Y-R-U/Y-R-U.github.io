@@ -10,24 +10,42 @@
  "factsMeta": {
   "composer": {
    "type": "cat",
-   "label": "Composer / artist"
+   "label": "Composer / artist",
+   "noun": "composer or performer",
+   "ask": "Who wrote or performed the music from {name}?",
+   "askReverse": "Which of these has music by {value}?",
+   "stmt": "The music from {name} is by {value}."
   },
   "year": {
    "type": "year",
    "label": "Film or show year",
-   "higherLabel": "Newer"
+   "noun": "year",
+   "higherLabel": "Newer",
+   "askHigh": "Which of these came out most recently?",
+   "askLow": "Which of these came out first?",
+   "askNumber": "In what year did {name} come out?"
   },
   "decade": {
    "type": "cat",
-   "label": "Decade"
+   "label": "Decade",
+   "ask": "In which decade did {name} come out?",
+   "askReverse": "Which of these came out in the {value}?",
+   "stmt": "{name} came out in the {value}."
   },
   "track": {
    "type": "text",
-   "label": "Track"
+   "label": "Track",
+   "noun": "theme or song"
   },
   "type": {
    "type": "cat",
-   "label": "Film or TV"
+   "label": "Film or TV",
+   "ask": false,
+   "stmt": false,
+   "display": {
+    "film": "Film",
+    "tv": "TV"
+   }
   }
  },
  "items": [
@@ -1416,5 +1434,5 @@
    "url": "https://performance-partners.apple.com/search-api"
   }
  ],
- "built": "2026-10-04"
+ "built": "2026-10-07"
 }

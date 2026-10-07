@@ -1,6 +1,6 @@
-import { register, poolItems, pickPack, byDifficulty, imageOf, factText, collect, pick, shuffle, sample, factAllowed, lcLabel } from './registry.js?v=202610071336';
-import { h, imgEl } from '../ui/kit.js?v=202610071336';
-import { norm, uniqueByName, injectCSS, baseCSS, once, drag, hasImg } from './fkit.js?v=202610071336';
+import { register, poolItems, pickPack, byDifficulty, imageOf, factText, collect, pick, shuffle, sample, factAllowed, lcLabel, factHeading, valueText } from './registry.js?v=202610071438';
+import { h, imgEl } from '../ui/kit.js?v=202610071438';
+import { norm, uniqueByName, injectCSS, baseCSS, once, drag, hasImg } from './fkit.js?v=202610071438';
 
 const CSS = `
 .so{gap:10px}
@@ -90,8 +90,8 @@ function make(rng, pack, [type, key], cards, bins, difficulty, kids) {
     const per = Math.floor(cards / bins);
     chosen.forEach((v, b) => deck.push(...sample(rng, has.filter(c => c.item.facts[key] === v), b < cards % bins ? per + 1 : per).map(c => ({ c, bin: b }))));
     if (deck.length < cards - 1) return null;
-    binNames = chosen.map(v => v.charAt(0).toUpperCase() + v.slice(1));
-    prompt = `${meta.label || key}: ${binList(binNames)}`;
+    binNames = chosen.map(v => { const t = String(valueText(meta, v)); return t.charAt(0).toUpperCase() + t.slice(1); });
+    prompt = `${factHeading(meta, key) || 'Sort them'}: ${binList(binNames)}`;
   }
   deck = shuffle(rng, deck);
   const pics = type !== 'fake' && deck.every(x => hasImg(x.c.item)) && (kids || rng() < 0.6);
@@ -106,7 +106,7 @@ function make(rng, pack, [type, key], cards, bins, difficulty, kids) {
 const CARDS = [6, 8, 10];
 
 export default register({
-  id: 'sort', title: 'Sort into bins', icon: '🗂️', blurb: 'Swipe each one into the right bin', tags: ['slow', 'kids'], kids: true, timeScale: q => 1 + q.data.cards.length * 0.35,
+  id: 'sort', revealInline: true, title: 'Sort into bins', icon: '🗂️', blurb: 'Swipe each one into the right bin', tags: ['slow', 'kids'], kids: true, timeScale: q => 1 + q.data.cards.length * 0.35,
   options: [
     { key: 'cards', label: 'Cards', type: 'choice', values: CARDS, default: 8, kidsValues: [6], kidsDefault: 6 },
     { key: 'bins', label: 'Bins', type: 'choice', values: [2, 3], default: 2, kidsHide: true },

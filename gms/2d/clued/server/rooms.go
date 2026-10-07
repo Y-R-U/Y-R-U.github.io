@@ -20,6 +20,9 @@ const (
 	abandonedMs    = 10 * 60 * 1000 // an empty public lobby is dropped so the cap can't be squatted
 	kidsStageMs    = 4000           // kids rooms: progressive stages auto-advance
 	kidsAnswer     = 20000          // kids rooms default to a gentle timer and flat 100 per correct
+	roundIntroMs   = 5000           // extra lead-in on the first question of each round (the round card)
+	maxTScale      = 6
+	maxScaledMs    = 180000
 )
 
 type Answer struct {
@@ -80,6 +83,7 @@ type Room struct {
 	NoLate    bool              `json:"noLate,omitempty"`
 	EmptyAt   int64             `json:"emptyAt,omitempty"` // when the last player went offline
 	meta      []qMeta
+	rounds    roundInfo
 	subs      map[*sub]struct{}
 	dirty     bool
 	dead      bool
@@ -118,26 +122,58 @@ func newRoom(spec json.RawMessage, title string, qs []json.RawMessage) *Room {
 	}
 }
 
+// roundInfo groups the question list into rounds by question.round (consecutive runs).
+type roundInfo struct {
+	of    []int // question → round ordinal
+	sizes []int
+	spec  []int // round ordinal → spec round index
+}
+
+func (ri roundInfo) multi() bool { return len(ri.sizes) > 1 }
+
+// first reports whether question i opens a round (and the game has several).
+func (ri roundInfo) first(i int) bool {
+	return ri.multi() && i >= 0 && i < len(ri.of) && (i == 0 || ri.of[i] != ri.of[i-1])
+}
+
+func groupRounds(meta []qMeta) roundInfo {
+	ri := roundInfo{of: make([]int, len(meta))}
+	for i, m := range meta {
+		if i == 0 || m.Round != meta[i-1].Round {
+			ri.sizes = append(ri.sizes, 0)
+			ri.spec = append(ri.spec, m.Round)
+		}
+		ri.of[i] = len(ri.sizes) - 1
+		ri.sizes[len(ri.sizes)-1]++
+	}
+	return ri
+}
+
 func (r *Room) buildMeta() {
 	r.Kids, r.Diff = specInfo(r.Spec)
 	r.meta = make([]qMeta, len(r.Questions))
 	for i, q := range r.Questions {
 		r.meta[i] = parseMeta(q)
-		r.meta[i].LimitMs = r.limitFor(r.meta[i].Format)
+		r.meta[i].LimitMs = r.limitFor(r.meta[i])
 		if n := r.meta[i].Stages; n >= 2 {
 			r.meta[i].LimitMs = max(r.meta[i].LimitMs, progressiveInitial, r.AnswerMs*3/2)
 		}
 	}
+	r.rounds = groupRounds(r.meta)
 }
 
-// The host's answer time applies to every question; long formats (connections,
-// blitz…) never get less than their own minimum, or they'd be unplayable.
-func (r *Room) limitFor(format string) int {
+// The host's answer time applies to every question, stretched by the format's
+// timeScale (typing, boards); long formats (connections, blitz…) never get less
+// than their own minimum, or they'd be unplayable.
+func (r *Room) limitFor(m qMeta) int {
 	ms := r.AnswerMs
 	if ms <= 0 {
 		ms = defaultAnswer
 	}
-	if long, ok := longFormats[format]; ok && long > ms {
+	if m.TScale > 1 {
+		ms = max(ms, min(int(math.Round(float64(ms)*m.TScale)), maxScaledMs))
+	}
+	if long, ok := longFormats[m.Format]; ok && long > ms {
 		ms = long
 	}
 	return ms
@@ -262,6 +298,9 @@ func (r *Room) addPlayer(name, uid string) (*Player, string) {
 	switch r.Phase {
 	case "question", "reveal":
 		joinQ = r.Q + 1
+		if r.Phase == "question" && now < r.QStart {
+			joinQ = r.Q // still counting down (or on the round card): play this one
+		}
 	case "final":
 		joinQ = len(r.Questions)
 	}
@@ -323,6 +362,9 @@ func (r *Room) advance() {
 	r.Phase = "question"
 	r.Stage, r.Votes, r.Locked = 0, nil, false
 	r.QStart = now + leadInMs
+	if r.rounds.first(r.Q) {
+		r.QStart += roundIntroMs
+	}
 	r.StageAt = r.QStart
 	r.QDeadline = r.QStart + int64(r.meta[r.Q].LimitMs)
 	r.RevealAt = 0
@@ -643,6 +685,7 @@ type pubPlayer struct {
 	Late     bool     `json:"late,omitempty"`
 	Signed   bool     `json:"signed,omitempty"`
 	Last     *pubLast `json:"last,omitempty"`
+	Rounds   []int    `json:"rs,omitempty"` // points per round (multi-round games)
 }
 
 type pubYou struct {
@@ -690,6 +733,11 @@ type pubState struct {
 	VoteCount int             `json:"votes"`
 	Needed    int             `json:"needed"`
 	Locked    bool            `json:"locked"`
+	// multi-round games only: the current question's round ordinal, questions per round,
+	// and each round's index in spec.rounds (a round can be dropped when its media failed)
+	Round      int   `json:"round,omitempty"`
+	RoundSizes []int `json:"roundSizes,omitempty"`
+	RoundSpec  []int `json:"roundSpec,omitempty"`
 }
 
 // stateFor must be called with r.mu held.
@@ -699,6 +747,13 @@ func (r *Room) stateFor(viewer *Player) pubState {
 		Auto: r.Auto, AnswerSec: r.AnswerMs / 1000, Title: r.Title, Kids: r.Kids, Diff: r.Diff, Public: r.Public, StartAt: r.StartAt, LateJoin: !r.NoLate, HostID: r.HostID, Expired: r.dead, Spec: r.Spec}
 	if r.Auto {
 		s.GapSec = r.RevealMs / 1000
+	}
+	multi := r.rounds.multi()
+	if multi {
+		s.RoundSizes, s.RoundSpec = r.rounds.sizes, r.rounds.spec
+		if r.Q >= 0 && r.Q < len(r.rounds.of) {
+			s.Round = r.rounds.of[r.Q]
+		}
 	}
 	if r.Phase == "question" || r.Phase == "reveal" {
 		s.QStart, s.QDeadline, s.LimitMs = r.QStart, r.QDeadline, r.meta[r.Q].LimitMs
@@ -724,6 +779,14 @@ func (r *Room) stateFor(viewer *Player) pubState {
 	for _, p := range act {
 		pp := pubPlayer{ID: p.ID, Name: p.Name, Score: p.Score, Correct: p.Correct, Streak: p.Streak, Best: p.BestStreak,
 			Online: p.online(now), Host: p.ID == r.HostID, Late: r.Q >= 0 && p.JoinedQ > r.Q, Signed: p.UID != ""}
+		if multi {
+			pp.Rounds = make([]int, len(r.rounds.sizes))
+			for qi, a := range p.Answers {
+				if qi >= 0 && qi < len(r.rounds.of) {
+					pp.Rounds[r.rounds.of[qi]] += a.Points
+				}
+			}
+		}
 		if r.Q >= 0 {
 			if a := p.Answers[r.Q]; a != nil {
 				pp.Answered = true

@@ -1,5 +1,5 @@
 // Scoreboards and podium for rooms and challenges. All text goes in via textContent (h() kids).
-import { h, fmtNum } from '../ui/kit.js?v=202610071336';
+import { h, fmtNum } from '../ui/kit.js?v=202610071438';
 
 export const ordinal = n => {
   const s = ['th', 'st', 'nd', 'rd'], v = n % 100;
@@ -10,7 +10,8 @@ const MEDAL = ['🥇', '🥈', '🥉'];
 
 // rows: [{ id, name, score, correct, last?, signed? }] sorted best first.
 // Kids rooms show the top 3 plus your own row, stars instead of points, no rank for anyone else.
-export function scoreboard(rows, { meId = null, kids = false, top = 5, deltas = false } = {}) {
+// round: show each row's points for that round (rows[].rs, multi-round rooms) instead of the last question's.
+export function scoreboard(rows, { meId = null, kids = false, top = 5, deltas = false, round = null } = {}) {
   const list = h('ol.net-board');
   const meIdx = rows.findIndex(r => r.id === meId);
   const limit = kids ? 3 : top;
@@ -19,16 +20,32 @@ export function scoreboard(rows, { meId = null, kids = false, top = 5, deltas = 
     if (gap) list.append(h('li.net-row.gap', {}, '⋯'));
     const me = r.id === meId;
     const rank = kids ? (i < 3 ? MEDAL[i] : '⭐') : i < 3 ? MEDAL[i] : String(i + 1);
-    const delta = deltas && r.last ? r.last.points : null;
+    const rp = round != null && Array.isArray(r.rs) ? r.rs[round] || 0 : null;
+    const delta = rp != null ? rp : deltas && r.last ? r.last.points : null;
+    const dl = delta ? `+${fmtNum(delta)}` : '+0';
     list.append(h('li.net-row', { class: me ? 'me' : '', style: { '--i': i } },
       h('span.rk', {}, rank),
       h('span.nm', {}, r.name + (me ? ' (you)' : '')),
-      kids ? h('span.dl', {}, '') : delta != null ? h('span.dl', { class: delta ? '' : 'zero' }, delta ? `+${fmtNum(delta)}` : '+0') : h('span.dl'),
+      kids ? h('span.dl', {}, '') : delta != null ? h('span.dl', { class: delta ? '' : 'zero', title: rp != null ? `Round ${round + 1}` : null }, rp != null ? `R${round + 1} ${dl}` : dl) : h('span.dl'),
       h('span.pt', {}, kids ? h('span.stars', {}, `${r.correct || 0} ⭐`) : fmtNum(r.score))));
   };
   shown.forEach((r, i) => addRow(r, i));
   if (meIdx >= limit) addRow(rows[meIdx], meIdx, true);
   return list;
+}
+
+// Multi-round final: points per round. rounds: [{ n, icon, title }]; rows sorted best first, with rs[].
+export function roundsTable(rows, rounds, { meId = null } = {}) {
+  const head = h('tr', {}, h('th', {}, ''), ...rounds.map(r => h('th', { title: r.title }, h('span.ri', {}, r.icon), `R${r.n}`)), h('th', {}, 'Total'));
+  const best = rounds.map((_, k) => Math.max(...rows.map(x => x.rs?.[k] || 0)));
+  const body = rows.map(p => {
+    return h('tr', { class: p.id === meId ? 'me' : '' }, h('th', {}, p.name),
+      ...rounds.map((_, k) => { const v = p.rs?.[k] || 0; return h('td', { class: v && v === best[k] ? 'top' : '' }, fmtNum(v)); }),
+      h('td.tot', {}, fmtNum(p.score)));
+  });
+  return h('div.panel.net-rtable', {}, h('div.opt-label', {}, 'Round by round'),
+    h('div.net-rtable-scroll', {}, h('table', {}, h('thead', {}, head), h('tbody', {}, ...body))),
+    h('p.tiny.muted', { style: { margin: '6px 0 0' } }, rounds.map(r => `R${r.n} ${r.title}`).join(' · ')));
 }
 
 export function podium(rows, { kids = false } = {}) {

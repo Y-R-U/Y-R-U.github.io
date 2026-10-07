@@ -1,7 +1,7 @@
-import { register, imageOf, collect, pick, shuffle } from './registry.js?v=202610071336';
-import { h, imgEl } from '../ui/kit.js?v=202610071336';
-import { injectCSS, baseCSS, once, hasImg } from './fkit.js?v=202610071336';
-import { FILMS } from './chain_data.js?v=202610071336';
+import { register, imageOf, collect, pick, shuffle } from './registry.js?v=202610071438';
+import { h, imgEl } from '../ui/kit.js?v=202610071438';
+import { injectCSS, baseCSS, once, hasImg } from './fkit.js?v=202610071438';
+import { FILMS } from './chain_data.js?v=202610071438';
 
 const CSS = `
 .ch{gap:10px}
@@ -71,7 +71,7 @@ function make(rng, actorsPack, links, n) {
 }
 
 export default register({
-  id: 'chain', title: 'Link chain', icon: '⛓️', blurb: 'Actor → film → actor', tags: ['slow'], timeScale: q => 1 + q.data.links.length * 0.8,
+  id: 'chain', revealInline: true, title: 'Link chain', icon: '⛓️', blurb: 'Actor → film → actor', tags: ['slow'], timeScale: q => 1 + q.data.links.length * 0.8,
   options: [
     { key: 'links', label: 'Links', type: 'choice', values: [2, 3, 4], default: 3 },
     { key: 'answers', label: 'Films per link', type: 'choice', values: [3, 4], default: 3 },

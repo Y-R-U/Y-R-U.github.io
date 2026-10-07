@@ -269,7 +269,7 @@ function buildCities(meta, statesByIso) {
       const hit = Object.keys(meta).find(id => { const b = meta[id].bb; return lon >= b[0] - 0.1 && lon <= b[2] + 0.1 && lat >= b[1] - 0.1 && lat <= b[3] + 0.1 && inPolys(lon, lat, polysById[id] || []); });
       if (hit) iso = hit; else if (!meta[iso]) continue;
     }
-    const c = { n: p.NAME, lon, lat, pop: p.POP_MAX, r: p.SCALERANK };
+    const c = { n: p.NAME.replace(/\s+/g, ' '), lon, lat, pop: p.POP_MAX, r: p.SCALERANK };
     if (p.ADM0CAP === 1) c.cap = 1;
     const list = (countryCities[iso] ||= []);
     if (list.length >= 25) continue;
@@ -287,7 +287,7 @@ function buildCities(meta, statesByIso) {
       if (!st) continue;
       const list = (stateCities[st.id] ||= []);
       if (list.length >= 12 || list.some(o => o.n === p.NAME || hav([o.lon, o.lat], [lon, lat]) < 5)) continue;
-      const c = { n: p.NAME, lon, lat, pop: p.POP_MAX, r: p.SCALERANK };
+      const c = { n: p.NAME.replace(/\s+/g, ' '), lon, lat, pop: p.POP_MAX, r: p.SCALERANK };
       if (p.ADM0CAP === 1) c.cap = 1;
       list.push(c);
     }

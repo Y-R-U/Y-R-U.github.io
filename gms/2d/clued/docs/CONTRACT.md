@@ -130,6 +130,10 @@ Item: `lname` (lower-case name for mid-sentence use), `quotes[]`, `quote`, `firs
 skip). factsMeta entries: wording templates `ask`, `askReverse`, `askBool`, `askHigh`, `askLow`, `stmt`, `minRatio`, `values`,
 `exclusive:false`; fact type `text`. Item prompts `imgPrompt`, `nameImgPrompt`, `tfImgPrompt`. Facts `flagDisputed`, `kids`.
 Index caps: `qkinds`, `itemImg`, `itemAudio`, `easy`, `kidsItems`.
+From lane POLISH: factsMeta `noun` (the fact as a noun for prose: "home country"), `display` (stored value → text),
+and `false` for any wording template (`ask: false` = never ask it). With no template, registry.js `catAsk`/`catStmt`/
+`boolAsk`/`boolStmt`/`numAsk` pick wording from the label or return null (the question is not made). Format flags
+`revealInline` (compact result line under a tall board) and `answerOnBoard` (no "Answer:" line; the board shows it).
 Question `refs`: `refs[0]` is the question's subject item; any further refs are the wrong-answer options' items (Learn mastery relies on this).
 
 ## Additive fields from lane I (integration)

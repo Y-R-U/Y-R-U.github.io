@@ -42,7 +42,7 @@ const mis = parseQuestions(MISQUOTES, 'mis');
 writePack({
   id: 'quotes', title: 'Famous quotes', theme: 'books', icon: '💬', kids: false, version: 1, quotePrompt: 'Who said or wrote it?',
   notice: 'Every quote is checked against Wikiquote. Famous misquotes appear as true-or-false questions.',
-  factsMeta: { field: { type: 'cat', label: 'Known for', exclusive: false } },
+  factsMeta: { field: { type: 'cat', label: 'Known for', noun: 'speaker', exclusive: false } },
   items, questions: [...questions, ...mis],
   sources: [{ name: 'Wikiquote', url: 'https://en.wikiquote.org' }, { name: 'Quote Investigator (misattributions)', url: 'https://quoteinvestigator.com' }],
 });

@@ -9,11 +9,18 @@
  "factsMeta": {
   "origin": {
    "type": "cat",
-   "label": "From"
+   "label": "From",
+   "noun": "home country",
+   "ask": "Where is {name} from?",
+   "askReverse": "Which of these acts is from {value}?",
+   "stmt": "{name} is from {value}."
   },
   "decade": {
    "type": "cat",
-   "label": "Breakthrough decade"
+   "label": "Breakthrough decade",
+   "ask": "In which decade did {name} break through?",
+   "askReverse": "Which of these acts broke through in the {value}?",
+   "stmt": "{name} broke through in the {value}."
   },
   "songs": {
    "type": "text",
@@ -4116,5 +4123,5 @@
    "url": "https://performance-partners.apple.com/search-api"
   }
  ],
- "built": "2026-10-04"
+ "built": "2026-10-07"
 }

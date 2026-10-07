@@ -16,6 +16,7 @@
    "higherLabel": "Later",
    "askHigh": "Which of these is the newest invention?",
    "askLow": "Which of these is the oldest invention?",
+   "askNumber": "In what year was {name} invented?",
    "minRatio": 1.01
   },
   "inventor": {

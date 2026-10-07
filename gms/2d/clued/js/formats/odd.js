@@ -1,6 +1,6 @@
-import { register, poolItems, pickPack, byDifficulty, imageOf, factText, placeAnswer, collect, pick, sample, factAllowed, nested, lcLabel } from './registry.js?v=202610071336';
-import { layout, choiceGrid } from '../ui/kit.js?v=202610071336';
-import { uniqueByName, norm, hasImg } from './fkit.js?v=202610071336';
+import { register, poolItems, pickPack, byDifficulty, imageOf, factText, placeAnswer, collect, pick, sample, factAllowed, nested, factPhrase } from './registry.js?v=202610071438';
+import { layout, choiceGrid } from '../ui/kit.js?v=202610071438';
+import { uniqueByName, norm, hasImg } from './fkit.js?v=202610071438';
 
 const vals = v => [].concat(v).map(String);
 
@@ -50,7 +50,7 @@ function make(rng, pack, [type, key], n, difficulty, kids) {
     if (A.length < n - 1 || !B.length) return null;
     same = sample(rng, uniqueByName(A), n - 1);
     odd = pick(rng, B);
-    label = lcLabel(meta.label || key);
+    label = factPhrase(meta, key);
     sameText = factText(meta, !flip); oddText = factText(meta, flip);
   } else {
     const counts = {};
@@ -62,7 +62,7 @@ function make(rng, pack, [type, key], n, difficulty, kids) {
     if (!B.length) return null;
     same = sample(rng, uniqueByName(A), n - 1);
     odd = pick(rng, B);
-    label = type === 'group' ? pack.groupLabel : lcLabel(meta.label || key);
+    label = type === 'group' ? pack.groupLabel : factPhrase(meta, key);
     sameText = V; oddText = vals(val(odd)).join(', ');
   }
   if (same.length < n - 1 || same.some(c => norm(c.item.name) === norm(odd.item.name))) return null;

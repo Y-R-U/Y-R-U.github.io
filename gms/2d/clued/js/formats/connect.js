@@ -1,7 +1,7 @@
-import { register, poolItems, byDifficulty, factText, collect, pick, shuffle, sample, factAllowed, nested } from './registry.js?v=202610071336';
-import { h } from '../ui/kit.js?v=202610071336';
-import { norm, injectCSS, baseCSS, once } from './fkit.js?v=202610071336';
-import { toast } from '../ui/popup.js?v=202610071336';
+import { register, poolItems, byDifficulty, factText, collect, pick, shuffle, sample, factAllowed, nested } from './registry.js?v=202610071438';
+import { h } from '../ui/kit.js?v=202610071438';
+import { norm, injectCSS, baseCSS, once } from './fkit.js?v=202610071438';
+import { toast } from '../ui/popup.js?v=202610071438';
 
 const CSS = `
 .cn{gap:10px}
@@ -88,7 +88,7 @@ function make(rng, pack, G, S, difficulty, kids) {
 }
 
 export default register({
-  id: 'connect', title: 'Connections', icon: '🧶', blurb: 'Sort 16 into 4 hidden groups', tags: ['slow', 'nodaily'], timeScale: 6,
+  id: 'connect', revealInline: true, answerOnBoard: true, title: 'Connections', icon: '🧶', blurb: 'Sort 16 into 4 hidden groups', tags: ['slow', 'nodaily'], timeScale: 6,
   options: [],
   supports(info) {
     const c = info.caps || {};

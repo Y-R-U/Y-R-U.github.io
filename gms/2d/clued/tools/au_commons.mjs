@@ -168,7 +168,7 @@ async function anthems() {
   write({
     id: 'anthems', title: 'National anthems', theme: 'music', icon: '🎺', kids: false, version: 1,
     listenPrompt: "Which country's national anthem is this?",
-    factsMeta: { iso3: { type: 'text', label: 'ISO code' }, anthem: { type: 'text', label: 'Anthem' }, continent: { type: 'cat', label: 'Continent' } },
+    factsMeta: { iso3: { type: 'text', label: 'ISO code' }, anthem: { type: 'text', label: 'Anthem' }, continent: { type: 'cat', label: 'Continent', ask: 'Which continent is {name} in?', askReverse: 'Which of these countries is in {value}?', stmt: '{name} is in {value}.' } },
     items, questions: [],
     sources: [{ name: 'Wikidata (country → anthem → audio)', url: 'https://www.wikidata.org' }, { name: 'Wikimedia Commons; most recordings by the United States Navy Band (US government work, public domain)', url: 'https://commons.wikimedia.org/wiki/Category:Audio_files_of_national_anthems_performed_by_the_United_States_Navy_Band' }],
   }, dropped);
@@ -177,7 +177,7 @@ async function anthems() {
 // ---------- instruments ----------
 const INSTRUMENTS = {
   Q6607: { d: 1 }, Q5994: { d: 1 }, Q8355: { d: 1 }, Q11404: { d: 1, name: 'Drum' }, Q11405: { d: 1 }, Q79838: { d: 1 }, Q8343: { d: 2 }, Q8371: { d: 1 },
-  Q51290: { d: 1 }, Q81982: { d: 2 }, Q80284: { d: 3 }, Q8350: { d: 2 }, Q8377: { d: 2 }, Q78987: { d: 1 }, Q131168: { d: 2 }, Q8347: { d: 1, name: 'Bagpipes' },
+  Q51290: { d: 1 }, Q81982: { d: 2 }, Q80284: { d: 3 }, Q8350: { d: 2 }, Q8377: { d: 2 }, Q78987: { d: 1 }, Q131168: { d: 2 }, Q8347: { d: 1, name: 'Bagpipes', plural: true },
   Q185003: { d: 3 }, Q159998: { d: 3 }, Q61285: { d: 2 }, Q258896: { d: 2 }, Q193666: { d: 2 }, Q190172: { d: 2 }, Q208320: { d: 2 }, Q191000: { d: 3 },
   Q83266: { d: 2 }, Q187851: { d: 2 }, Q187780: { d: 3 }, Q76239: { d: 3 }, Q202027: { d: 3 }, Q289037: { d: 3 }, Q737917: { d: 3 }, Q6685124: { d: 3 },
   Q320341: { d: 3 }, Q215032: { d: 3 }, Q752638: { d: 3 }, Q244976: { d: 3 }, Q105891: { d: 3 }, Q593050: { d: 3 }, Q1628293: { d: 2 }, Q512191: { d: 3 },
@@ -213,7 +213,10 @@ async function instruments() {
     const name = INSTRUMENTS[e.q].name || e.name.charAt(0).toUpperCase() + e.name.slice(1);
     items.push({
       id: slug(name), name, group: FAMILY[e.q] || 'other',
-      facts: { family: FAMILY[e.q] || 'other' },
+      ...(/^(Hammond|Jew)/.test(name) ? { lname: name } : {}),
+      ...(INSTRUMENTS[e.q].plural ? { imgPrompt: 'Which of these shows {lname}?', tfImgPrompt: 'These are {lname}.' } : {}),
+      // "other" is not an instrument family, so those few get no family fact
+      facts: FAMILY[e.q] && FAMILY[e.q] !== 'other' ? { family: FAMILY[e.q] } : {},
       blurb: `The sound of the ${name.toLowerCase()}.`,
       media: { audio: auds.slice(0, 2).map((a) => audioObj(a)), ...(img ? { img: [img] } : {}) },
       difficulty: INSTRUMENTS[e.q].d,
@@ -222,7 +225,7 @@ async function instruments() {
   write({
     id: 'instruments', title: 'Musical instruments', theme: 'music', icon: '🎻', kids: false, version: 1,
     listenPrompt: 'Which instrument is this?',
-    factsMeta: { family: { type: 'cat', label: 'Family' } },
+    factsMeta: { family: { type: 'cat', label: 'Family', noun: 'instrument family', ask: 'Which family of instruments does the {lname} belong to?', askReverse: 'Which of these belongs to the {value} family?', stmt: 'The {lname} belongs to the {value} family.' } },
     items, questions: [],
     sources: [{ name: 'Wikidata (instrument → audio, image)', url: 'https://www.wikidata.org' }, { name: 'Wikimedia Commons', url: 'https://commons.wikimedia.org' }],
   }, dropped);
@@ -274,7 +277,8 @@ async function classical() {
   }
   write({
     id: 'classical-recordings', title: 'Classical recordings', theme: 'music', icon: '🎻', kids: false, version: 1,
-    factsMeta: { composer: { type: 'cat', label: 'Composer' }, year: { type: 'year', label: 'Written', higherLabel: 'Later' },
+    factsMeta: { composer: { type: 'cat', label: 'Composer', ask: 'Who composed {name}?', askReverse: 'Which of these pieces is by {value}?', stmt: '{name} was composed by {value}.' },
+      year: { type: 'year', label: 'Written', higherLabel: 'Later', askHigh: 'Which of these pieces was written most recently?', askLow: 'Which of these pieces was written first?', askNumber: 'In what year was {name} written?' },
       era: { type: 'cat', label: 'Period', values: ['Baroque', 'Classical', 'Romantic'], ask: 'Which period of music is {name} from?', askReverse: 'Which of these is from the {value} period?', stmt: '{name} is from the {value} period.' } },
     items, questions: [],
     sources: [{ name: 'Wikimedia Commons (Musopen, US military bands, PDP-CH and CC BY recordings; licence per file)', url: 'https://commons.wikimedia.org' }],

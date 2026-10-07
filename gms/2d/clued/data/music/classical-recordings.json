@@ -8,12 +8,18 @@
  "factsMeta": {
   "composer": {
    "type": "cat",
-   "label": "Composer"
+   "label": "Composer",
+   "ask": "Who composed {name}?",
+   "askReverse": "Which of these pieces is by {value}?",
+   "stmt": "{name} was composed by {value}."
   },
   "year": {
    "type": "year",
    "label": "Written",
-   "higherLabel": "Later"
+   "higherLabel": "Later",
+   "askHigh": "Which of these pieces was written most recently?",
+   "askLow": "Which of these pieces was written first?",
+   "askNumber": "In what year was {name} written?"
   },
   "era": {
    "type": "cat",

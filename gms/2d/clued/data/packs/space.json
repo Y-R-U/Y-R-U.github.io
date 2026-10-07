@@ -27,7 +27,7 @@
     "Comet",
     "Black hole"
    ],
-   "ask": "What is {lname}?",
+   "ask": "What kind of object is {lname}?",
    "askReverse": "Which of these is {aValue}?",
    "stmt": "{lname} is {aValue}."
   },

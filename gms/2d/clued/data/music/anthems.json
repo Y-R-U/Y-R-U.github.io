@@ -17,7 +17,10 @@
   },
   "continent": {
    "type": "cat",
-   "label": "Continent"
+   "label": "Continent",
+   "ask": "Which continent is {name} in?",
+   "askReverse": "Which of these countries is in {value}?",
+   "stmt": "{name} is in {value}."
   }
  },
  "items": [
@@ -4353,5 +4356,5 @@
    "url": "https://commons.wikimedia.org/wiki/Category:Audio_files_of_national_anthems_performed_by_the_United_States_Navy_Band"
   }
  ],
- "built": "2026-10-04"
+ "built": "2026-10-07"
 }

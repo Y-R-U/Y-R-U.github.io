@@ -9,21 +9,33 @@
  "factsMeta": {
   "year": {
    "type": "year",
-   "label": "Released"
+   "label": "Released",
+   "askHigh": "Which of these films came out most recently?",
+   "askLow": "Which of these films came out first?",
+   "askNumber": "In what year did {name} come out?"
   },
   "decade": {
    "type": "cat",
-   "label": "Decade"
+   "label": "Decade",
+   "ask": "In which decade did {name} come out?",
+   "askReverse": "Which of these films came out in the {value}?",
+   "stmt": "{name} came out in the {value}."
   },
   "director": {
    "type": "cat",
-   "label": "Directed by"
+   "label": "Directed by",
+   "noun": "director",
+   "ask": "Who directed {name}?",
+   "askReverse": "Which of these films was directed by {value}?",
+   "stmt": "{name} was directed by {value}."
   },
   "kids": {
    "type": "bool",
    "label": "Family film",
    "yes": "Family film",
-   "no": "Not a family film"
+   "no": "Not a family film",
+   "askBool": "Which of these is a family film?",
+   "stmt": "{name} is a family film."
   }
  },
  "kids": false,

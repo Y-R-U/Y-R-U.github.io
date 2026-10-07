@@ -1,9 +1,9 @@
 // Favourite picks UI: one-tap quick picks (filled slots) and the ♥ + 1–5 save control. Logic in favmodel.js.
-import { h } from './kit.js?v=202610071336';
-import { sfx, haptic } from './fx.js?v=202610071336';
-import { toast } from './popup.js?v=202610071336';
-import { getFavs, setFav, clearFav, FAV_SLOTS } from '../core/store.js?v=202610071336';
-import { cleanFav, sameFav, favLabel } from './favmodel.js?v=202610071336';
+import { h } from './kit.js?v=202610071438';
+import { sfx, haptic } from './fx.js?v=202610071438';
+import { toast } from './popup.js?v=202610071438';
+import { getFavs, setFav, clearFav, FAV_SLOTS } from '../core/store.js?v=202610071438';
+import { cleanFav, sameFav, favLabel } from './favmodel.js?v=202610071438';
 
 const CSS = `
 .fav-quick { display: flex; align-items: flex-start; gap: 10px; margin: 10px 0 14px; padding: 10px 12px; background: #ffe1e1; border: var(--line) solid var(--ink); border-radius: var(--r); box-shadow: var(--shadow-sm); }

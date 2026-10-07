@@ -1,25 +1,17 @@
 // Online hub, join-by-name screen and host setup. Joining needs only a name.
-import { h } from '../ui/kit.js?v=202610071336';
-import { defineScreen, go, header, current } from '../ui/app.js?v=202610071336';
-import { toast } from '../ui/popup.js?v=202610071336';
-import { sfx } from '../ui/fx.js?v=202610071336';
-import { getFormat } from '../formats/registry.js?v=202610071336';
-import { getSettings, getLast } from '../core/store.js?v=202610071336';
-import { optionsPanel } from '../ui/setup.js?v=202610071336';
-import { specFor, fmtTitle } from '../structures/common.js?v=202610071336';
-import { prepare } from '../structures/session.js?v=202610071336';
-import { rooms, friendly } from './api.js?v=202610071336';
-import { suggestedName, rememberName, tidyName, MAX_NAME } from './ident.js?v=202610071336';
-import { ensureStyles, saveSeat, loadSeat, dropSeat, cleanCode, validCode, setQuery, TRUST_HINT, START_CHOICES, startLabel, mmss } from './util.js?v=202610071336';
-import { timingPanel, choiceChips } from './board.js?v=202610071336';
-import { packInfo } from '../core/packs.js?v=202610071336';
-import { getTransport, canHostFromDevice, fallback, hasTransport } from './transport.js?v=202610071336';
-import { signInPrompt, isSignedIn, pausedText, busyText } from './signin.js?v=202610071336';
-import { ensureFormats } from './room.js?v=202610071336';
+import { h } from '../ui/kit.js?v=202610071438';
+import { defineScreen, go, header, current } from '../ui/app.js?v=202610071438';
+import { sfx } from '../ui/fx.js?v=202610071438';
+import { getFormat } from '../formats/registry.js?v=202610071438';
+import { rooms, friendly } from './api.js?v=202610071438';
+import { suggestedName, rememberName, tidyName, MAX_NAME } from './ident.js?v=202610071438';
+import { ensureStyles, saveSeat, loadSeat, dropSeat, cleanCode, validCode, setQuery, mmss } from './util.js?v=202610071438';
+import { packInfo } from '../core/packs.js?v=202610071438';
+import { getTransport, hasTransport } from './transport.js?v=202610071438';
+import { signInPrompt, busyText } from './signin.js?v=202610071438';
 
-const MAX_SET = 500 * 1024;
 
-function nameField(value = '') {
+export function nameField(value = '') {
   const input = h('input.field', { type: 'text', maxlength: String(MAX_NAME), autocomplete: 'nickname', autocapitalize: 'words', spellcheck: 'false', enterkeyhint: 'go', placeholder: 'Your name', 'aria-label': 'Your name', dataset: { field: 'name' } });
   input.value = value;
   suggestedName().then(n => { if (!input.value && n && document.activeElement !== input) input.value = n; });
@@ -69,9 +61,9 @@ defineScreen('online', (el, params, cur) => {
   el.append(header('Play online'),
     h('div.net-wrap', {},
       h('div.net-hero', {}, h('div', { style: { fontSize: '48px' } }, '🌐'), h('h2', {}, 'Play with friends'), h('p', {}, 'Host a game and share the link. Friends type a name and they’re in. No sign-in needed.')),
-      h('div.panel.stack', {}, h('h3', {}, 'Host a game'), h('p.muted', { style: { margin: 0 } }, 'Pick a format and themes, then share the link or QR code.'),
-        h('button.btn.go.big.wide', { type: 'button', dataset: { act: 'host' }, onclick: () => go('formats', { structure: 'quick', title: 'Host: pick a format', onPick: f => go('host', { format: f.id }) }) }, 'Host a game'),
-        hasTransport('p2p') ? h('button.btn.wide', { type: 'button', dataset: { act: 'host-device' }, onclick: () => go('formats', { structure: 'quick', title: 'Host from this device', onPick: f => go('host', { format: f.id, via: 'p2p' }) }) }, '📡 Host from this device (no server)') : null,
+      h('div.panel.stack', {}, h('h3', {}, 'Host a game'), h('p.muted', { style: { margin: 0 } }, 'Add rounds, pick themes (or a ♥ favourite) for each, then share the link or QR code.'),
+        h('button.btn.go.big.wide', { type: 'button', dataset: { act: 'host' }, onclick: () => go('host') }, 'Host a game'),
+        hasTransport('p2p') ? h('button.btn.wide', { type: 'button', dataset: { act: 'host-device' }, onclick: () => go('host', { via: 'p2p' }) }, '📡 Host from this device (no server)') : null,
         hasTransport('p2p') ? h('p.net-note', { style: { margin: 0 } }, 'Device rooms need no server: your phone or laptop runs the game for up to 8 players.') : null),
       h('div.panel', {}, joinForm),
       h('div.stack', {}, h('h3.sec-title', {}, 'Public games'), pubList),
@@ -142,7 +134,7 @@ defineScreen('join', async (el, { code: raw = '', fresh = false, via = 'server' 
   body.replaceChildren(
     h('div.net-hero', {}, h('div', { style: { fontSize: '48px' } }, '🔎'),
       h('h2', {}, info.host ? `Join ${info.host}’s game` : 'Join the game'),
-      h('p', {}, info.title ? `${info.title} · ` : '', phase),
+      h('p', {}, info.title ? `${info.title} · ` : '', info.rounds > 1 ? `${info.rounds} rounds · ` : '', phase),
       h('div.net-badges', {}, h('span.net-badge', {}, `Room ${code}`))),
     h('div.panel', {}, form),
     h('p.net-note', {}, 'No sign-in needed. Your name is shown to the other players.'));
@@ -187,108 +179,4 @@ defineScreen('join', async (el, { code: raw = '', fresh = false, via = 'server' 
     });
     return f;
   }
-});
-
-/* --------------------------------------------------------------- host */
-// params: { format } (from the format grid) or { spec, title } (from another screen, e.g. a pub quiz builder).
-// via: 'p2p' hosts from this device (lane P2P): no public listing, no server status.
-defineScreen('host', async (el, { format, spec: given, title: givenTitle, via = 'server' }, cur) => {
-  ensureStyles();
-  await ensureFormats();
-  const kids = !!getSettings().kids;
-  const fmt = format ? getFormat(format) : null;
-  const device = via === 'p2p' && hasTransport('p2p');
-  el.append(header(device ? 'Host from this device' : 'Host a game'));
-  const body = h('div.net-wrap');
-  el.append(body);
-  const name = nameField();
-  const err = h('p.net-err', { role: 'alert' });
-  body.append(h('div.panel.net-form', {}, h('label', {}, 'Your name'), name));
-  let panel = null;
-  if (fmt) {
-    body.append(h('div.setup-head', {}, h('span.fh-ico', {}, fmt.icon), h('div', {}, h('h2', {}, fmt.title), h('p', {}, fmt.blurb || ''))));
-    const opts = h('div');
-    body.append(opts);
-    panel = optionsPanel(opts, fmt, { structure: 'quick', kids, last: getLast(fmt.id), showTimer: false });
-  } else if (given) {
-    body.append(h('div.panel', {}, h('h3', {}, givenTitle || 'Your game'), h('p.muted', {}, `${(given.rounds || []).length} round${(given.rounds || []).length === 1 ? '' : 's'}`)));
-  } else {
-    body.append(h('p.panel', {}, 'Pick a format first.'));
-    return;
-  }
-  const timing = { answerSec: kids ? 20 : 10, gapSec: 5 };
-  body.append(timingPanel({ ...timing, onChange: v => Object.assign(timing, v) }));
-  const vis = { public: false, startIn: 120 };
-  const startRow = h('div', { hidden: true, dataset: { opt: 'start' } }, h('div.opt-label', {}, 'Start'),
-    choiceChips(START_CHOICES, START_CHOICES.map(startLabel), vis.startIn, x => { vis.startIn = x; }));
-  if (!device) body.append(h('div.panel.stack.net-timing', {},
-    h('div', { dataset: { opt: 'vis' } }, h('div.opt-label', {}, 'Who can join'),
-      choiceChips([false, true], ['🔒 Private: link or code', '🌍 Public: listed online'], false, x => { vis.public = x; startRow.hidden = !x; })),
-    startRow));
-  const btn = h('button.btn.go.big.wide', { type: 'button', dataset: { act: 'create' } }, 'Create room');
-  const status = h('div');
-  body.append(err, btn, status, h('p.net-note', {}, TRUST_HINT));
-  const T = getTransport(device ? 'p2p' : 'server');
-  const statusNote = h('div');
-  body.insertBefore(statusNote, body.firstChild.nextSibling);
-  if (device) statusNote.append(h('p.net-note', {}, '📡 No server: this device runs the room for up to 8 players. Keep this tab open and on screen while you play.'));
-  else rooms.status().then(s => {
-    if (s.level >= 3) statusNote.append(h('p.net-note', {}, pausedText));
-    else if (s.level >= 1) isSignedIn().then(ok => { if (!ok) statusNote.append(h('p.net-note', {}, '🔐 Hosting needs a free br8t sign-in right now; you’ll be asked when you create the room.')); });
-  }).catch(() => {});
-
-  // Creates the room, handling every refusal inline: sign-in, public slots full, busy/paused (+ device fallback).
-  async function createWith(opts) {
-    try {
-      const res = await T.create(opts);
-      saveSeat(res.code, { key: res.playerKey, id: res.playerId, via: T.id });
-      rememberName(opts.hostName);
-      go('room', { code: res.code, key: res.playerKey, st: res.room, via: T.id }, { replace: true, skipGuard: true });
-    } catch (e) {
-      if (cur !== current()) return;
-      if (e.code === 'signin_required') {
-        if (await signInPrompt(status, 'host')) return createWith(opts);
-        return;
-      }
-      const box = h('div.panel.stack', {}, h('b', {}, e.code === 'public_full' ? 'Public games are full' : e.code === 'paused' ? 'Paused' : 'Busy'),
-        h('p.muted', { style: { margin: 0 } }, e.code === 'public_full' ? 'All public game slots are busy right now. Make it a private game and share the link instead?'
-          : e.code === 'paused' ? pausedText : e.code === 'busy' ? busyText : friendly(e)));
-      if (e.code === 'public_full') box.append(h('button.btn.go.wide', { type: 'button', dataset: { act: 'private' }, onclick: () => { box.remove(); createWith({ ...opts, public: false }); } }, 'Create a private game'));
-      if ((e.code === 'busy' || e.code === 'paused') && canHostFromDevice()) {
-        box.append(h('button.btn.sun.wide', { type: 'button', dataset: { act: 'device' }, onclick: () => fallback.host(opts) }, 'Host from your device instead'));
-      }
-      status.replaceChildren(box);
-      btn.disabled = false;
-    }
-  }
-
-  btn.addEventListener('click', async () => {
-    const n = tidyName(name.value);
-    if (!n) { err.textContent = 'Type your name first.'; name.focus(); return; }
-    err.textContent = '';
-    btn.disabled = true;
-    let spec = given ? { ...given, rounds: (given.rounds || []).map(r => ({ ...r, opts: { ...(r.opts || {}), online: true } })) } : given, title = givenTitle;
-    if (panel) {
-      panel.save();
-      const c = panel.value();
-      spec = specFor('online', c);
-      if (kids) spec.rounds.forEach(r => { r.opts = { ...r.opts, kids: true }; r.difficulty = 1; });
-      spec.rounds.forEach(r => { r.opts = { ...r.opts, online: true }; }); // formats may tune for rooms (lane AU)
-      title = fmtTitle(c.format);
-    }
-    try {
-      const r = await prepare(spec, status);
-      if (cur !== current()) return;
-      if (!r.questions.length) throw new Error('Not enough questions for those themes. Try more themes.');
-      let questions = r.questions;
-      while (questions.length > 1 && JSON.stringify(questions).length > MAX_SET) questions = questions.slice(0, -1);
-      if (questions.length < r.questions.length) toast(`Trimmed to ${questions.length} questions to fit`);
-      status.replaceChildren();
-      await createWith({ hostName: n, spec, title, questions, ...timing, ...vis });
-    } catch (e) {
-      status.replaceChildren();
-      err.textContent = friendly(e);
-      btn.disabled = false;
-    }
-  });
 });

@@ -107,7 +107,9 @@ try {
   await b.click('[data-mode=online]');
   await b.waitFor(`!!document.querySelector('[data-act=host]')`);
   await b.click('[data-act=host]');
-  await b.click('[data-format=listen]');
+  await b.click('[data-act=add-round]');
+  ok(await b.waitFor(`document.querySelectorAll('.pop .rp-fav[data-fav-format=listen]').length === 1`), 'host add-round picker lists the listen fav');
+  await b.click('.pop .tile[data-format=listen]');
   await b.waitFor(`!!document.querySelector('[data-fav=quick] .fq')`);
   await b.click('.fq[data-slot="1"]');
   ok((await onChip('clip')) === '10', 'host setup quick pick applied');

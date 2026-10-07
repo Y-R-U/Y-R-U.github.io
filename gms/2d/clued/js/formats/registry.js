@@ -1,5 +1,5 @@
 // Format registry + helpers shared by every format. See docs/notes/A.md "Format author guide".
-import { pick, shuffle, sample, weightedPick } from '../core/rng.js?v=202610071336';
+import { pick, shuffle, sample, weightedPick } from '../core/rng.js?v=202610071438';
 
 const R = globalThis.__cluedFormats || (globalThis.__cluedFormats = { map: new Map(), listeners: new Set() });
 
@@ -46,14 +46,15 @@ export const hasAudio = it => !!it?.media?.audio?.length;
 export const itemDifficulty = x => x?.difficulty || 2;
 
 // Country names that take "the" mid-sentence ("comes from the United States").
-const THE_RE = /^(United States|United Kingdom|United Arab Emirates|Netherlands|Czech Republic|Philippines|Bahamas|Gambia|Maldives|Dominican Republic|Central African Republic|Democratic Republic of the Congo|Republic of the Congo|Solomon Islands|Marshall Islands|Comoros|Vatican City|Isle of Man)$/;
+const THE_RE = /^(United States|United Kingdom|United Arab Emirates|Netherlands|Czech Republic|Philippines|Bahamas|Gambia|Maldives|Dominican Republic|Central African Republic|Democratic Republic of the Congo|Republic of the Congo|Solomon Islands|Marshall Islands|Comoros|Vatican City|Isle of Man|UK|US|USA|UAE|DRC)$/;
 export const theName = v => (THE_RE.test(String(v ?? '').trim()) ? `the ${String(v).trim()}` : String(v ?? ''));
 // Lower-case the first letter only for an ordinary first word: "Southern stingray" → "southern stingray", but
 // "United States", "Maine Coon" and "IUCN" keep their capitals.
+const PROPER = /^(Mohs|Celsius|Fahrenheit|Kelvin|Richter|Scoville|Beaufort|English|French|Latin|Greek|Arabic|Spanish|German|Italian|Japanese|Chinese|Christmas|Baroque|Romantic|Classical|Europe|Africa|Asia|Oceania|Earth|Sun|Moon)[,;:.)]?$/;
 const lc = s => {
   const t = String(s ?? '');
   const [w, w2] = t.split(/\s+/);
-  if (!/^[A-Z][a-z'’-]*[,;:.)]?$/.test(w || '') || (w2 && /^[A-Z]/.test(w2))) return t;
+  if (!/^[A-Z][a-z'’-]*[,;:.)]?$/.test(w || '') || (w2 && /^[A-Z]/.test(w2)) || PROPER.test(w)) return t;
   return t.charAt(0).toLowerCase() + t.slice(1);
 };
 export const lcLabel = lc;
@@ -91,7 +92,9 @@ export function fill(tpl, v = {}) {
     if (['value', 'lvalue', 'name', 'lname'].includes(k) && THE_RE.test(x) && !/\bthe\s*$/i.test(all.slice(0, at))) return `the ${x}`;
     return x;
   });
-  return out.charAt(0).toUpperCase() + out.slice(1);
+  // titles that end in punctuation: "Where Is the Love??" → "?", "Ray Parker Jr.." → "Jr."
+  const tidy = out.replace(/\?\?/g, '?').replace(/([?!])\./g, '$1').replace(/([^.])\.\.(?!\.)/g, '$1.');
+  return /^[a-z][A-Z]/.test(tidy) ? tidy : tidy.charAt(0).toUpperCase() + tidy.slice(1);   // iPhone, eBay
 }
 
 // Conservation status (IUCN) is grown-up, hard trivia: never in kids mode, only at Hard.
@@ -120,6 +123,105 @@ export function comparison(meta) {
   return { hi: capFirst(w), lo: capFirst(OPP[w]), sup: SUP[w], ask: b => `Is ${b} ${w} or ${OPP[w]}?` };
 }
 
+// Wording for a fact the pack gave no template for. Labels are often not nouns ("From", "Released", "Directed by"), so
+// "What is the {label} of {name}?" is only used when the label reads as a noun; otherwise a phrasing is picked from the
+// label, and when none fits the result is null and the caller must not make that question. `ask: false` (or stmt…)
+// in factsMeta switches a wording off on purpose.
+const VERBISH = /^(from|born|died|released|written|painted|drawn|discovered|launched|completed|built|founded|opened|formed|invented|published|first |directed|composed|recorded|known|found|native|lives|living|drives|made|named|catches|breathes|glows|can|has|have|is|are|was|a|an|the|where|when|who|how|what|which|fossils|floral|birthstone|used|spoken|eaten|grows|flies|hunts|countries where|best-known)\b|\b(of|in|to|by|for|from|on|at|with|the)$/i;
+const NOUNS = {
+  from: 'home country', born: 'birth year', died: 'year of death', 'born in': 'birth decade', 'directed by': 'director',
+  'found in': 'region', 'native to': 'native region', 'lives in': 'habitat', 'drives on': 'driving side',
+  'painted in the': 'century', 'fossils found in': 'fossil region', 'birthstone for': 'birthstone month', 'where it is': 'location',
+  'best-known colour': 'best-known colour', 'film or tv': null, 'composer / artist': 'composer or artist',
+  'floral emblem of': 'the place it is the emblem of', 'named after': 'the person it is named after', 'known for': null,
+};
+export const plainLabel = meta => String(meta?.label || '').replace(/\s*\([^)]*\)/g, '').trim();
+const labelKey = meta => String(meta?.label || '').trim().toLowerCase();
+export function factNoun(meta) {
+  if (meta?.noun) return meta.noun;
+  const l = labelKey(meta);
+  if (!l) return null;
+  if (l in NOUNS) return NOUNS[l];
+  const pl = lc(plainLabel(meta));
+  if (meta.type === 'year') return VERBISH.test(l) ? 'year' : pl;
+  if (meta.type === 'bool' || VERBISH.test(l) || /\?|:/.test(l)) return null;
+  return pl;
+}
+// For prose ("Match each one to its …", "Odd one out: think …"): the noun, else the label without its parentheses.
+export const factPhrase = (meta, key) => factNoun(meta) || lc(plainLabel(meta) || key);
+// A heading ("Century: 1500s or 1600s?"): the label, or its noun when the label trails off ("Painted in the").
+// null when the label trails off and has no noun ("Known for"): leave the heading out.
+export function factHeading(meta, key) {
+  const l = plainLabel(meta) || key, n = factNoun(meta);
+  if (!/\b(of|in|to|by|for|from|on|at|the)$/i.test(l)) return l;
+  return n && !/^the /.test(n) ? capFirst(n) : null;
+}
+// How a cat value reads on screen: factsMeta.display maps stored values ("tv") to text ("TV").
+export const valueText = (meta, v) => (meta?.display && v in meta.display ? meta.display[v] : v);
+// "when they were released" / "when they died" for year facts whose label is a participle, else null.
+export function whenPhrase(meta) {
+  const l = labelKey(meta);
+  if (l === 'died') return 'when they died';
+  return PART.test(l) ? `when they were ${l}` : null;
+}
+const WHO = { composer: 'Who composed {name}?', 'composer / artist': null, artist: 'Who recorded {name}?', author: 'Who wrote {name}?', 'directed by': 'Who directed {name}?', director: 'Who directed {name}?', inventor: 'Who invented {name}?', 'painted by': 'Who painted {name}?' };
+const BY = { composer: '{name} was composed by {value}.', artist: '{name} is by {value}.', author: '{name} was written by {value}.', 'directed by': '{name} was directed by {value}.', director: '{name} was directed by {value}.', inventor: '{name} was invented by {value}.' };
+export function catAsk(meta) {
+  if (!meta || meta.ask === false) return null;
+  if (meta.ask) return meta.ask;
+  const l = labelKey(meta), noun = factNoun(meta) || '';
+  if (l in WHO) return WHO[l];
+  if (/^(from|country of origin|origin)$/.test(l)) return 'Where is {name} from?';
+  if (/^nationality$/.test(l)) return 'What nationality is {name}?';
+  if (/decade/.test(`${l} ${noun}`)) return 'Which decade is {name} from?';
+  if (/century/.test(`${l} ${noun}`)) return 'Which century is {name} from?';
+  if (/^continent$/.test(l)) return 'Which continent is {name} in?';
+  if (/^(found in|native to|lives in)$/.test(l)) return 'Where is {name} found?';
+  const kind = /^(?:kind|type|sort) of (.+)$/.exec(noun);
+  if (kind) return `What kind of ${kind[1]} is {name}?`;
+  if (WEAK.test(noun)) return 'Which of these describes {name}?';
+  return noun && !NO_OF.test(noun) ? `What is the ${noun} of {name}?` : null;
+}
+// nouns too vague for "What is the … of X?" ("the kind of Io", "the act of Grease")
+const WEAK = /^(kind|type|sort|category|class|group|family|[\w-]+ type)$/;
+const NO_OF = /^(the |act$|track$|name$)/;
+export function catStmt(meta) {
+  if (!meta || meta.stmt === false) return null;
+  if (meta.stmt) return meta.stmt;
+  const l = labelKey(meta), noun = factNoun(meta) || '';
+  if (l in BY) return BY[l];
+  if (/^(from|country of origin|origin)$/.test(l)) return '{name} is from {value}.';
+  if (/decade|century/.test(`${l} ${noun}`)) return '{name} is from the {value}.';
+  if (/^continent$/.test(l)) return '{name} is in {value}.';
+  if (/^(?:kind|type|sort) of /.test(noun) || WEAK.test(noun)) return '{name}: {lvalue}.';
+  return noun && !NO_OF.test(noun) ? `{name}: the ${noun} is {value}.` : null;
+}
+const ADJ = s => /^[a-z][a-z -]*$/i.test(s) && !VERBISH.test(s.toLowerCase()) && s.split(' ').length <= 3;
+export function boolAsk(meta) {
+  if (!meta || meta.askBool === false) return null;
+  if (meta.askBool) return meta.askBool;
+  return meta.yes && ADJ(meta.yes) ? `Which of these is ${lc(meta.yes)}?` : null;
+}
+export function boolStmt(meta) {
+  if (!meta || meta.stmt === false) return null;
+  if (meta.stmt) return meta.stmt;
+  return meta.yes && ADJ(meta.yes) ? `{name} is ${lc(meta.yes)}.` : null;
+}
+const PART = /^(released|born|died|written|painted|discovered|launched|completed|built|founded|opened|formed|invented|published|first published|first shown|composed|recorded)$/;
+export function numAsk(meta, low = false) {
+  if (!meta) return null;
+  const t = low ? meta.askLow : meta.askHigh;
+  if (t === false) return null;
+  if (t) return t;
+  if (low) return null;
+  const l = labelKey(meta);
+  if (meta.type === 'year') return PART.test(l) ? (l === 'died' ? 'Who died most recently?' : `Which was ${l} most recently?`) : 'Which of these is the most recent?';
+  const cmp = comparison(meta);
+  if (cmp) return `Which is the ${cmp.sup}?`;
+  const noun = factNoun(meta);
+  return noun && !/^(rank|period|group)\b/i.test(noun) ? `Which has the highest ${noun}?` : null;
+}
+
 export function factText(meta, value) {
   if (value == null) return '';
   if (meta?.type === 'year' && isFinite(Number(value))) return Number(value) < 0 ? `${-Number(value)} BC` : String(value);
@@ -129,7 +231,7 @@ export function factText(meta, value) {
     const s = Math.abs(n) >= 1000 ? n.toLocaleString('en-GB') : String(+n.toPrecision(4));
     return meta.unit ? `${s} ${meta.unit}` : s;
   }
-  return Array.isArray(value) ? value.join(', ') : String(value);
+  return Array.isArray(value) ? value.map(v => valueText(meta, v)).join(', ') : String(valueText(meta, value));
 }
 
 // 0 = mixed, 1 easy, 2 medium, 3 hard. Widens the band when too few match.

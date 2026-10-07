@@ -1,6 +1,6 @@
 // Device-hosted room logic: a port of server/rooms.go + scoring.go so the host's tab can be the room
 // server. Pure (no DOM, no network), so tools/p2p_test.mjs runs it in node. State shape = the server's.
-import { stageMultiplier, withStreak, progressiveLimit, stageExtendMs, PROGRESSIVE_CAP } from '../core/scoring.js?v=202610071336';
+import { stageMultiplier, withStreak, progressiveLimit, stageExtendMs, PROGRESSIVE_CAP } from '../core/scoring.js?v=202610071438';
 export { stageMultiplier, withStreak };
 
 export const MAX_PLAYERS = 8;
@@ -9,6 +9,8 @@ export const GRACE_MS = 500;
 export const ONLINE_MS = 6000;           // a dropped data channel counts as online this long (refresh/rejoin)
 const DEFAULT_ANSWER = 10000, DEFAULT_GAP = 5000, KIDS_ANSWER = 20000, MAX_BASE = 500;
 export const KIDS_STAGE_MS = 4000;
+export const ROUND_INTRO_MS = 5000;     // extra lead-in on each round's first question (the round card)
+const MAX_TSCALE = 6, MAX_SCALED_MS = 180000;
 const CODE_ALPHABET = 'ABCDEFGHJKMNPQRSTUVWXYZ23456789';
 const ANSWER_CHOICES = [3, 5, 10, 15, 20, 30], GAP_CHOICES = [3, 5, 10];
 
@@ -42,6 +44,19 @@ export function verifyCorrect(q, given, claimed) {
   if (typeof a === 'number' && typeof g === 'number') return a === g;
   return !!claimed;
 }
+
+// Rounds = consecutive runs of question.round. of: question → ordinal, sizes, spec: ordinal → spec round index.
+export function groupRounds(questions) {
+  const ri = { of: [], sizes: [], spec: [] };
+  (questions || []).forEach((q, i) => {
+    const r = Math.max(0, Math.floor(Number(q?.round) || 0));
+    if (i === 0 || r !== ri.spec[ri.spec.length - 1]) { ri.sizes.push(0); ri.spec.push(r); }
+    ri.of.push(ri.sizes.length - 1);
+    ri.sizes[ri.sizes.length - 1]++;
+  });
+  return ri;
+}
+export const roundStart = (ri, i) => ri.sizes.length > 1 && i >= 0 && i < ri.of.length && (i === 0 || ri.of[i] !== ri.of[i - 1]);
 
 export function specInfo(spec) {
   let kids = !!spec?.kids, diff = spec?.difficulty || 0;
@@ -84,10 +99,13 @@ export class P2PRoom {
     this.spec = spec || {}; this.title = tidy(title).slice(0, 60) || ''; this.questions = questions || [];
     const { kids, diff } = specInfo(this.spec);
     this.kids = kids; this.diff = diff;
+    this.rounds = groupRounds(this.questions);
   }
 
   limitFor(q) {
     let ms = this.answerMs > 0 ? this.answerMs : DEFAULT_ANSWER;
+    const ts = Number(q?.tscale);
+    if (ts > 1) ms = Math.max(ms, Math.min(Math.round(ms * Math.min(ts, MAX_TSCALE)), MAX_SCALED_MS));
     const long = LONG[q?.format];
     if (long && long > ms) ms = long;
     return stagesOf(q) ? Math.max(ms, progressiveLimit(this.answerMs)) : ms;
@@ -116,7 +134,8 @@ export class P2PRoom {
     const act = this.active();
     if (act.length >= this.maxPlayers) return err('room_full');
     const name = dedupe(name0, n => act.some(p => p.name.toLowerCase() === n.toLowerCase()));
-    const joinedQ = this.phase === 'question' || this.phase === 'reveal' ? this.q + 1 : this.phase === 'final' ? this.questions.length : 0;
+    const counting = this.phase === 'question' && this.now() < this.qStart; // lead-in / round card: play this one
+    const joinedQ = counting ? this.q : this.phase === 'question' || this.phase === 'reveal' ? this.q + 1 : this.phase === 'final' ? this.questions.length : 0;
     const p = { id: rnd(CODE_ALPHABET, 6, this.rand), name, key: newKey(this.rand), score: 0, correct: 0, streak: 0, best: 0,
       joinedQ, order: this.nextOrder++, answers: {}, gone: false, kicked: false, seen: this.now(), conns: 0, local };
     this.players.push(p);
@@ -145,7 +164,7 @@ export class P2PRoom {
     if (this.q + 1 >= this.questions.length) return this.finish();
     this.q++;
     this.phase = 'question';
-    this.qStart = now + LEAD_IN_MS;
+    this.qStart = now + LEAD_IN_MS + (roundStart(this.rounds, this.q) ? ROUND_INTRO_MS : 0);
     this.stageAt = this.qStart;
     this.qDeadline = this.qStart + this.limitFor(this.questions[this.q]);
     this.revealAt = 0;
@@ -312,7 +331,7 @@ export class P2PRoom {
 
   peek() {
     return { code: this.code, phase: this.phase, players: this.active().length, host: this.player(this.hostId)?.name || '',
-      title: this.title, total: this.questions.length, q: this.q, max: this.maxPlayers, closed: this.closed };
+      title: this.title, total: this.questions.length, q: this.q, rounds: Math.max(1, this.rounds.sizes.length), max: this.maxPlayers, closed: this.closed };
   }
 
   stateFor(viewer) {
@@ -328,6 +347,11 @@ export class P2PRoom {
     if (this.phase === 'reveal' && this.auto) s.revealAt = this.revealAt;
     if (n) Object.assign(s, { stages: n, stage: this.stage, locked: this.locked, ...this.voteNeed(now) });
     if (this.closed) s.closed = true;
+    const multi = this.rounds.sizes.length > 1;
+    if (multi) {
+      Object.assign(s, { roundSizes: this.rounds.sizes, roundSpec: this.rounds.spec });
+      if (this.q >= 0 && this.q < this.rounds.of.length && this.rounds.of[this.q]) s.round = this.rounds.of[this.q];
+    }
     const showLast = this.phase === 'reveal' || this.phase === 'final';
     let act = this.active();
     if (showLast) act = act.slice().sort((a, b) => b.score - a.score || a.order - b.order);
@@ -337,6 +361,10 @@ export class P2PRoom {
         online: this.isOnline(p, now), host: p.id === this.hostId, answered: !!a };
       if (this.q >= 0 && p.joinedQ > this.q) row.late = true;
       if (a) { s.answered++; if (showLast) row.last = { correct: a.correct, points: a.points, ms: a.ms }; }
+      if (multi) {
+        row.rs = this.rounds.sizes.map(() => 0);
+        for (const [qi, x] of Object.entries(p.answers)) { const r = this.rounds.of[+qi]; if (r != null) row.rs[r] += x.points; }
+      }
       s.players.push(row);
     }
     if (viewer) {

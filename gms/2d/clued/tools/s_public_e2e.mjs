@@ -106,11 +106,12 @@ async function main() {
   await a.waitFor('window.__cluedReady', 20000, 'boot');
   await a.eval(`import('./js/net/index.js?v=' + (window.__clued?.BUILD || window.__cluedCtx?.BUILD || 1)).then(m => m.openOnline())`);
   await a.waitFor(`document.querySelector('.net-pub')`, 10000, 'public card');
-  ok(await a.eval(`document.querySelector('.net-pub').textContent.includes('Pubby') && /Starts in 1:5/.test(document.querySelector('.net-pub').textContent)`), 'public card with host and countdown');
+  ok(await a.eval(`document.querySelector('.net-pub').textContent.includes('Pubby') && /Starts in (2:00|1:5)/.test(document.querySelector('.net-pub').textContent)`), 'public card with host and countdown', await a.eval(`document.querySelector('.net-pub').textContent`));
   await a.shot('online-hub.png');
   // public cap hit → inline "create private" offer
+  await a.eval(`localStorage.removeItem('clued.online'); true`);
   await a.click('[data-act=host]');
-  await a.click('.tile[data-format=mc]');
+  await a.waitFor(`document.querySelector('.round-card[data-round="0"]')`, 10000, 'host round list');
   await a.type('[data-field=name]', 'Second');
   await a.click('[data-opt=vis] .chip[data-v="true"]');
   await a.click('[data-act=create]');

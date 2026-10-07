@@ -1,5 +1,5 @@
-import { register, poolItems, pickPack, byDifficulty, imageOf, hasImg, fill, collect, distractors, pick, factAllowed, nested, nameArgs } from './registry.js?v=202610071336';
-import { layout, choiceGrid } from '../ui/kit.js?v=202610071336';
+import { register, poolItems, pickPack, byDifficulty, imageOf, hasImg, fill, collect, distractors, pick, factAllowed, nested, nameArgs, catStmt, boolStmt } from './registry.js?v=202610071438';
+import { layout, choiceGrid } from '../ui/kit.js?v=202610071438';
 
 function sources(pack, gate) {
   const out = [];
@@ -9,8 +9,8 @@ function sources(pack, gate) {
   for (const [key, m] of Object.entries(pack.factsMeta || {})) {
     if (!factAllowed(m, gate)) continue;
     const has = items.filter(it => it.facts && it.facts[key] != null);
-    if (m.type === 'bool' && has.length >= 2 && (m.stmt || m.yes)) out.push([`bool:${key}`, 1]);
-    if (m.type === 'cat' && m.exclusive !== false && new Set(has.map(it => String(it.facts[key]))).size >= 2) out.push([`cat:${key}`, 1.2]);
+    if (m.type === 'bool' && has.length >= 2 && boolStmt(m)) out.push([`bool:${key}`, 1]);
+    if (m.type === 'cat' && m.exclusive !== false && catStmt(m) && new Set(has.map(it => String(it.facts[key]))).size >= 2) out.push([`cat:${key}`, 1.2]);
   }
   return out;
 }
@@ -48,7 +48,7 @@ function make(rng, pack, kind, difficulty) {
   const t = pick(rng, byDifficulty(pool, difficulty, 2, c => c.item.difficulty || 2));
   const v = t.item.facts[key];
   if (type === 'bool') {
-    const stmt = meta.stmt || `{name}: ${String(meta.yes).toLowerCase()}.`;
+    const stmt = boolStmt(meta);
     return {
       format: 'tf', id: `tf:bool:${key}:${t.ref}`, prompt: fill(stmt, { name: t.item.name, lname: t.item.lname, label: meta.label }),
       answer: v === true, answerText: v ? 'True' : 'False', explain: t.item.blurb, refs: [t.ref],
@@ -62,7 +62,7 @@ function make(rng, pack, kind, difficulty) {
     if (!others.length) return null;
     value = pick(rng, others);
   }
-  const stmt = meta.stmt || `{name}: {llabel} is {value}.`;
+  const stmt = catStmt(meta);
   return {
     format: 'tf', id: `tf:cat:${key}:${t.ref}:${value}`, prompt: fill(stmt, { name: t.item.name, lname: t.item.lname, label: meta.label, value }),
     answer: truth, answerText: truth ? 'True' : `False: ${vals.join(', ')}`, explain: t.item.blurb, refs: [t.ref],

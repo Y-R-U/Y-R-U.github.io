@@ -1,12 +1,13 @@
 // Lane S entry points. Importing this module registers the screens: online, join, host, room, challenge, linkchallenge.
-import { go } from '../ui/app.js?v=202610071336';
-import './room.js?v=202610071336';
-import './join.js?v=202610071336';
-import './p2p.js?v=202610071336';   // lane P2P: registers the device-hosted transport
-import { createChallenge as create, challengeButton } from './challenge.js?v=202610071336';
-import { cleanCode } from './util.js?v=202610071336';
-import { openLinkChallenge as openLink, linkChallengeShare, createLinkChallenge } from './linkchallenge.js?v=202610071336';
-export { registerTransport, getTransport, fallback } from './transport.js?v=202610071336';
+import { go } from '../ui/app.js?v=202610071438';
+import './room.js?v=202610071438';
+import './join.js?v=202610071438';
+import './host.js?v=202610071438';   // host setup: round list + room settings
+import './p2p.js?v=202610071438';   // lane P2P: registers the device-hosted transport
+import { createChallenge as create, challengeButton } from './challenge.js?v=202610071438';
+import { cleanCode } from './util.js?v=202610071438';
+import { openLinkChallenge as openLink, linkChallengeShare, createLinkChallenge } from './linkchallenge.js?v=202610071438';
+export { registerTransport, getTransport, fallback } from './transport.js?v=202610071438';
 export { createLinkChallenge };
 
 export { challengeButton };
@@ -20,7 +21,7 @@ export function createChallenge(a, b) {
   }
   return create(a);
 }
-export { API } from './api.js?v=202610071336';
+export { API } from './api.js?v=202610071438';
 
 // Boot routing: ?join=CODE and ?c=ID.
 // A's boot route calls joinRoom(code, ctx) / openChallenge(id, ctx).
@@ -30,7 +31,7 @@ export const openChallenge = id => go('challenge', { id: String(id || '').toLowe
 export const openOnline = () => go('online');
 // ?p2p=CODE: a device-hosted room (lane P2P).
 export const openP2P = code => go('join', { code: cleanCode(code), via: 'p2p' });
-// Host a prepared spec (e.g. a pub quiz built elsewhere): goes to the host screen for a name, then builds + creates.
+// Host a prepared spec (e.g. a pub quiz built elsewhere): its rounds become the host screen's editable round list.
 export const hostRoom = (spec, { title = '' } = {}) => go('host', { spec, title });
 
 // Returns true when the URL asked for a net screen and it was opened.
@@ -40,7 +41,7 @@ export const openLinkChallenge = hash => openLink(hash || location.hash, go);
 // Results screen: "send a link challenge" (no server). Same payload shape as createChallenge(ctx, {...}).
 export async function linkChallenge(a, b) {
   const x = b || a;
-  const { suggestedName } = await import('./ident.js?v=202610071336');
+  const { suggestedName } = await import('./ident.js?v=202610071438');
   const name = (await suggestedName()) || 'Player';
   const answers = x.answers || x.result?.answers || [];
   const out = x.result ? x : { spec: x.spec, title: x.title, choice: x.choice, result: { questions: x.questions, score: x.score, answers, correct: x.correct ?? answers.filter(r => r.correct).length } };

@@ -9,16 +9,25 @@
  "factsMeta": {
   "artist": {
    "type": "cat",
-   "label": "Artist"
+   "label": "Artist",
+   "ask": "Who recorded {name}?",
+   "askReverse": "Which of these songs is by {value}?",
+   "stmt": "{name} is by {value}."
   },
   "year": {
    "type": "year",
    "label": "Released",
-   "higherLabel": "Newer"
+   "higherLabel": "Newer",
+   "askHigh": "Which of these songs came out most recently?",
+   "askLow": "Which of these songs came out first?",
+   "askNumber": "In what year did {name} come out?"
   },
   "decade": {
    "type": "cat",
-   "label": "Decade"
+   "label": "Decade",
+   "ask": "In which decade did {name} come out?",
+   "askReverse": "Which of these songs came out in the {value}?",
+   "stmt": "{name} came out in the {value}."
   },
   "act": {
    "type": "cat",

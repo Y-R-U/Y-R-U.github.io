@@ -1,14 +1,14 @@
 // The question runner: plays a list of questions with HUD, timer, reveal and scoring.
 // Every structure uses it, and lane S drives it for online rooms and challenge links. API in docs/notes/A.md.
-import { getFormat } from '../formats/registry.js?v=202610071336';
-import { createTimer } from '../core/timer.js?v=202610071336';
-import { basePoints, withStreak, stageMultiplier, progressiveLimit, stageExtendMs, PROGRESSIVE_CAP } from '../core/scoring.js?v=202610071336';
-import { creditsOf, urlsOf, preflight } from '../core/media.js?v=202610071336';
-import { getSettings } from '../core/store.js?v=202610071336';
-import { h, esc, onKey, countUp, fmtNum } from '../ui/kit.js?v=202610071336';
-import { popup, confirmPop } from '../ui/popup.js?v=202610071336';
-import { sfx, haptic, reducedMotion } from '../ui/fx.js?v=202610071336';
-import { speak, stopSpeaking, questionSpeech, canSpeak } from '../ui/speech.js?v=202610071336';
+import { getFormat } from '../formats/registry.js?v=202610071438';
+import { createTimer } from '../core/timer.js?v=202610071438';
+import { basePoints, withStreak, stageMultiplier, progressiveLimit, stageExtendMs, PROGRESSIVE_CAP } from '../core/scoring.js?v=202610071438';
+import { creditsOf, urlsOf, preflight } from '../core/media.js?v=202610071438';
+import { getSettings } from '../core/store.js?v=202610071438';
+import { h, esc, onKey, countUp, fmtNum } from '../ui/kit.js?v=202610071438';
+import { popup, confirmPop } from '../ui/popup.js?v=202610071438';
+import { sfx, haptic, reducedMotion } from '../ui/fx.js?v=202610071438';
+import { speak, stopSpeaking, questionSpeech, canSpeak } from '../ui/speech.js?v=202610071438';
 
 const KIND_RIGHT = ['Brilliant!', 'You got it!', 'Super!', 'Yes!', 'Amazing!'];
 const KIND_WRONG = ['Good try!', 'Nearly!', 'Nice guess!', 'Ooh, close!'];
@@ -171,7 +171,7 @@ export function createRunner(host, cfg = {}) {
     return new Promise(resolve => {
       reveal.classList.remove('show', 'good', 'bad');
       reveal.innerHTML = '';
-      root.classList.remove('revealed');
+      root.classList.remove('revealed', 'rv-inline');
       extraReveal = [];
       ring._ticked = false;
       drawHud();
@@ -181,6 +181,7 @@ export function createRunner(host, cfg = {}) {
       api.difficulty = q.kids ? 1 : (cfg.difficulty || 0);
       root.classList.toggle('kids', kids);
       stage.innerHTML = '';
+      stage.scrollTop = 0;
       stage.classList.remove('in');
       void stage.offsetWidth;
       stage.classList.add('in');
@@ -352,13 +353,18 @@ export function createRunner(host, cfg = {}) {
     const good = rec.correct;
     const title = rec.skipped ? 'Skipped' : rec.timeout ? (kids ? 'Out of time!' : "Time's up") : good ? pick(kids ? KIND_RIGHT : RIGHT) : pick(kids ? KIND_WRONG : WRONG);
     const pts = good ? (kids ? '<span class="star-pop">⭐</span>' : `<span class="pts">+${fmtNum(rec.points)}</span>`) : '';
-    const ans = good ? '' : `<div class="rv-answer">${kids ? 'The answer is' : 'Answer:'} <b>${esc(answerLine(q))}</b></div>`;
+    // Tall boards (format flag revealInline) get a one-line result under the board with Next beside it; answerOnBoard
+    // formats already mark the right answer on the board, so the long "Answer:" line is left out.
+    const fmt = getFormat(q.format) || {};
+    const inline = !!fmt.revealInline;
+    const ans = good || (fmt.answerOnBoard && !rec.skipped && !rec.timeout) ? '' : `<div class="rv-answer">${kids ? 'The answer is' : 'Answer:'} <b>${esc(answerLine(q))}</b></div>`;
     const credits = creditsOf(q);
     reveal.innerHTML = '';
-    reveal.className = `reveal ${good ? 'good' : 'bad'}`;
+    reveal.className = `reveal ${good ? 'good' : 'bad'}${inline ? ' inline' : ''}`;
+    const head = h('div.rv-head', { html: `<span class="rv-mark">${good ? '✓' : rec.skipped ? '⤼' : kids ? '♥' : '✗'}</span><span class="rv-title">${esc(title)}</span>${pts}` });
     const card = h('div.rv-card', {},
       h('div.rv-q', {}, q.prompt || ''),
-      h('div.rv-head', { html: `<span class="rv-mark">${good ? '✓' : rec.skipped ? '⤼' : kids ? '♥' : '✗'}</span><span class="rv-title">${esc(title)}</span>${pts}` }),
+      head,
       ans ? h('div', { html: ans }) : null,
       q.explain ? h('p.rv-explain', {}, q.explain) : null,
       ...extraReveal.map(x => (typeof x === 'string' ? h('div.rv-extra', { html: x }) : x)),
@@ -367,14 +373,17 @@ export function createRunner(host, cfg = {}) {
     if (credits.length) row.append(h('button.icon-btn.info', { type: 'button', 'aria-label': 'Media credits', onclick: () => showCredits(credits) }, 'ⓘ'));
     if (!cfg.waitNext) row.append(h('button.btn.primary.next', { type: 'button', onclick: () => advance() }, last ? 'Finish' : 'Next ›'));
     else row.append(h('span.rv-wait', {}, cfg.waitLabel || 'Waiting for the host…'));
-    card.append(row);
+    if (inline) head.append(row); else card.append(row);
     reveal.append(card);
     stage.append(reveal);
     root.classList.add('revealed');
+    root.classList.toggle('rv-inline', inline);
     requestAnimationFrame(() => {
       stage.style.setProperty('--rv-h', `${card.offsetHeight}px`);
       reveal.classList.add('show');
-      stage.scrollTo({ top: stage.scrollHeight, behavior: reducedMotion() ? 'auto' : 'smooth' });
+      // only as far as needed to bring the card (and Next) into view, so as much of the board as possible stays on screen
+      const over = card.getBoundingClientRect().bottom + 24 - stage.getBoundingClientRect().bottom;
+      if (over > 0) stage.scrollTo({ top: stage.scrollTop + over, behavior: reducedMotion() ? 'auto' : 'smooth' });
     });
     if (kids && good) speak(title, { kids }); else if (kids) speak(`${title} The answer is ${answerLine(q)}`, { kids });
     return Promise.resolve();

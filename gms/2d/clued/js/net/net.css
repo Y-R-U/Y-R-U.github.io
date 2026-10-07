@@ -139,3 +139,33 @@
 .net-cmp-chip.win { background: var(--sun); }
 .net-cmp-chip.win::before { content: '🏅 '; }
 .net-cmp-chip.miss { opacity: .6; }
+/* multi-round rooms */
+.net-rlist { list-style: none; padding: 0; margin: 12px auto 0; max-width: 440px; display: flex; flex-direction: column; gap: 6px; text-align: left; counter-reset: rl; }
+.net-rlist:empty { display: none; }
+.net-rlist li { display: grid; grid-template-columns: 26px 30px minmax(0, 1fr); grid-template-areas: 'k i t' 'k i s'; column-gap: 6px; align-items: center; padding: 6px 10px; background: #fff; border: 2px solid var(--ink); border-radius: 12px; counter-increment: rl; }
+.net-rlist li::before { content: counter(rl); grid-area: k; font-family: var(--font-display); font-size: 18px; text-align: center; color: var(--grape); }
+.net-rlist .ri { grid-area: i; font-size: 22px; text-align: center; }
+.net-rlist b { grid-area: t; overflow-wrap: anywhere; }
+.net-rlist small { grid-area: s; color: var(--ink-2); font-size: 12.5px; overflow-wrap: anywhere; }
+.net-round { padding: 8px 0; }
+.net-round .nr-in { width: min(100%, 460px); display: flex; flex-direction: column; align-items: center; gap: 6px; }
+.net-round .nr-kick { font-weight: 900; color: var(--grape); text-transform: uppercase; letter-spacing: .6px; font-size: 15px; }
+.net-round .nr-ico { font-size: 72px; line-height: 1.1; animation: pop-in .6s cubic-bezier(.2, 1.6, .4, 1) both; }
+.net-round .nr-name { font-size: 32px; line-height: 1.1; margin: 0; overflow-wrap: anywhere; }
+.net-round .nr-sub { margin: 0 0 6px; font-size: 16px; }
+.net-round .net-board { width: 100%; text-align: left; }
+.net-round .nr-go { display: flex; align-items: center; gap: 10px; margin-top: 4px; font-weight: 900; color: var(--ink-2); }
+.net-round .nr-go .n { font-size: 54px; text-shadow: 0 4px 0 var(--ink); }
+.net-round-end { display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 10px 12px; background: var(--sun); border: var(--line) solid var(--ink); border-radius: var(--r); box-shadow: var(--shadow-sm); text-align: center; }
+.net-round-end b { font-family: var(--font-display); font-weight: 400; font-size: 22px; }
+.net-round-end span { font-weight: 800; font-size: 14px; }
+.net-rtable-scroll { overflow-x: auto; }
+.net-rtable table { width: 100%; border-collapse: collapse; font-size: 14px; }
+.net-rtable th, .net-rtable td { padding: 6px 6px; border-bottom: 2px solid var(--paper-2, #eee); text-align: right; white-space: nowrap; }
+.net-rtable thead th { font-size: 12.5px; color: var(--ink-2); }
+.net-rtable thead .ri { margin-right: 2px; }
+.net-rtable tbody th { text-align: left; max-width: 120px; overflow: hidden; text-overflow: ellipsis; }
+.net-rtable td.top { color: var(--good); font-weight: 900; }
+.net-rtable td.tot { font-family: var(--font-display); font-size: 16px; }
+.net-rtable tr.me { background: #e6e0ff; }
+@media (max-height: 700px) { .net-round .nr-ico { font-size: 48px; } .net-round .nr-name { font-size: 26px; } }

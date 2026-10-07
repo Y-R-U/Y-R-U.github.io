@@ -1,6 +1,6 @@
-import { register, poolItems, pickPack, byDifficulty, imageOf, collect, pick, shuffle, comparison, lcLabel, capFirst } from './registry.js?v=202610071336';
-import { h, imgEl } from '../ui/kit.js?v=202610071336';
-import { numericKeys, numOf, spreadSet, rangeOf, fmtFact, uniqueByName, injectCSS, baseCSS, once, drag, hasImg } from './fkit.js?v=202610071336';
+import { register, poolItems, pickPack, byDifficulty, imageOf, collect, pick, shuffle, comparison, capFirst, factPhrase, whenPhrase } from './registry.js?v=202610071438';
+import { h, imgEl } from '../ui/kit.js?v=202610071438';
+import { numericKeys, numOf, spreadSet, rangeOf, fmtFact, uniqueByName, injectCSS, baseCSS, once, drag, hasImg } from './fkit.js?v=202610071438';
 
 const CSS = `
 .or-wrap{display:flex;flex-direction:column;gap:6px}
@@ -27,6 +27,7 @@ const CSS = `
 @media (orientation:landscape) and (max-height:520px){
  .or{flex-direction:row;gap:16px}.or-head{flex:0 0 calc(46% - 24px);display:flex;flex-direction:column;justify-content:center;gap:12px}
  .or-wrap{flex:1}.or-it{min-height:40px;font-size:15px;padding:3px 8px 3px 4px}.or-it img{height:32px;width:44px}.or-list{gap:5px}.or-it .pos{width:26px;height:26px;font-size:15px}.or-it .mv{flex-direction:row;gap:4px}.or-it .mv button{height:28px;width:32px}.or-cap{font-size:11px}.or-wrap{gap:3px}.or-foot .btn{min-height:42px}
+ .play.revealed .or-head{padding-bottom:calc(var(--rv-h,0px) + 14px)}
 }
 @media (min-width:900px) and (min-height:560px){.or-it{min-height:64px;font-size:19px}}
 `;
@@ -44,11 +45,11 @@ function make(rng, pack, key, n, difficulty) {
   for (let k = 0; k < 4 && shown.every((c, i) => c === sorted[i]); k++) shown = shuffle(rng, set);
   if (shown.every((c, i) => c === sorted[i])) shown = sorted.slice().reverse();
   const pics = shown.every(c => hasImg(c.item));
-  const label = meta.label || key;
   const cmp = year ? null : comparison(meta);
+  const when = year && whenPhrase(meta);
   return {
     format: 'order', id: `order:${key}:${set.map(c => c.ref).sort().join(',')}`,
-    prompt: `Put these in order: ${lcLabel(label)}, ${year ? 'earliest' : cmp?.sup || 'highest'} first`,
+    prompt: year ? `Put these in order${when ? ` of ${when}` : ''}, earliest first` : `Put these in order: ${factPhrase(meta, key)}, ${cmp?.sup || 'highest'} first`,
     answer: sorted.map(c => shown.indexOf(c)), answerText: sorted.map(c => c.item.name).join(' → '),
     explain: sorted.map(c => `${c.item.name}: ${fmtFact(meta, numOf(c.item, key))}`).join(' · '),
     refs: set.map(c => c.ref), pack: pack.id,
@@ -82,7 +83,7 @@ function fromQuestion(rng, pack, difficulty) {
 const COUNTS = [4, 5, 6];
 
 export default register({
-  id: 'order', title: 'Put in order', icon: '↕️', blurb: 'Drag them into the right order', tags: ['slow'], timeScale: q => 1 + q.data.items.length * 0.5,
+  id: 'order', revealInline: true, answerOnBoard: true, title: 'Put in order', icon: '↕️', blurb: 'Drag them into the right order', tags: ['slow'], timeScale: q => 1 + q.data.items.length * 0.5,
   options: [{ key: 'items', label: 'Items', type: 'choice', values: COUNTS, default: 4, kidsValues: [4], kidsDefault: 4 }],
   supports(info) {
     const c = info.caps || {};

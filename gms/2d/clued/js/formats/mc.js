@@ -1,8 +1,8 @@
 import {
   register, poolItems, packQuestions, pickPack, distractors, byDifficulty, imageOf, hasImg, fill, factText,
-  spreadApart, placeAnswer, collect, pick, shuffle, sample, factAllowed, nested, lcLabel, nameArgs,
-} from './registry.js?v=202610071336';
-import { layout, choiceGrid } from '../ui/kit.js?v=202610071336';
+  spreadApart, placeAnswer, collect, pick, shuffle, sample, factAllowed, nested, nameArgs, catAsk, boolAsk, numAsk,
+} from './registry.js?v=202610071438';
+import { layout, choiceGrid } from '../ui/kit.js?v=202610071438';
 
 const PROMPTS = { nameImg: 'Which of these is {aName}?', imgName: 'What is this?' };
 
@@ -19,11 +19,11 @@ function sources(pack, n, src, gate = {}) {
       if (!factAllowed(m, gate)) continue;
       const has = items.filter(it => it.facts && it.facts[key] != null);
       if (m.type === 'cat' && m.exclusive !== false && new Set(has.map(it => String(it.facts[key]))).size >= n) {
-        out.push([`cat:${key}`, 1.5]);
+        if (catAsk(m)) out.push([`cat:${key}`, 1.5]);
         if (m.askReverse) out.push([`rev:${key}`, 1]);
-      } else if (m.type === 'bool' && has.some(it => it.facts[key] === true) && has.filter(it => it.facts[key] === false).length >= n - 1) {
+      } else if (m.type === 'bool' && boolAsk(m) && has.some(it => it.facts[key] === true) && has.filter(it => it.facts[key] === false).length >= n - 1) {
         out.push([`bool:${key}`, 1]);
-      } else if ((m.type === 'num' || m.type === 'year') && has.length >= n) {
+      } else if ((m.type === 'num' || m.type === 'year') && numAsk(m) && has.length >= n) {
         out.push([`num:${key}`, 0.8]);
       }
     }
@@ -80,7 +80,7 @@ function fromItems(rng, pack, kind, n, difficulty) {
       if (others.length < n - 1) return null;
       const { options, answer } = placeAnswer(rng, value, others.slice(0, n - 1));
       return {
-        format: 'mc', id: `mc:cat:${key}:${t.ref}`, prompt: fill(meta.ask || `What is the {llabel} of {name}?`, { name: t.item.name, lname: t.item.lname, label: meta.label, value }),
+        format: 'mc', id: `mc:cat:${key}:${t.ref}`, prompt: fill(catAsk(meta), { name: t.item.name, lname: t.item.lname, label: meta.label, value }),
         media: hasImg(t.item) && meta.showImg ? { img: [imageOf(t.item, rng)] } : undefined,
         options: options.map(text => ({ text })), answer, answerText: value,
         explain: t.item.blurb, refs: [t.ref], hint: `It starts with “${value.charAt(0)}”`,
@@ -105,7 +105,7 @@ function fromItems(rng, pack, kind, n, difficulty) {
     const pics = options.every(c => hasImg(c.item)) && rng() < 0.5;
     return {
       format: 'mc', id: `mc:bool:${key}:${t.ref}:${wrong.map(c => c.item.id).sort().join(',')}`,
-      prompt: fill(meta.askBool || `Which of these is ${String(meta.yes || meta.label).toLowerCase()}?`, { label: meta.label }),
+      prompt: fill(boolAsk(meta), { label: meta.label }),
       options: options.map(c => (pics ? { text: c.item.name, img: imageOf(c.item, rng) } : { text: c.item.name })),
       answer, answerText: t.item.name, explain: t.item.blurb, refs: [t.ref, ...wrong.map(c => c.ref)],
       data: { layout: pics ? 'images' : 'text' }, hint: hintFor(t.item, pack),
@@ -115,11 +115,10 @@ function fromItems(rng, pack, kind, n, difficulty) {
   if (type === 'num') {
     const set = spreadApart(pool, c => fv(c.item), n, meta.minRatio || 1.5, rng);
     if (!set) return null;
-    const low = rng() < 0.35 && meta.askLow;
+    const low = rng() < 0.35 && !!numAsk(meta, true);
     const sorted = set.slice().sort((a, b) => fv(b.item) - fv(a.item));
     const t = low ? sorted[sorted.length - 1] : sorted[0];
-    const label = lcLabel(meta.label || key);
-    const prompt = low ? fill(meta.askLow, { label: meta.label }) : fill(meta.askHigh || `Which has the highest ${label}?`, { label: meta.label });
+    const prompt = fill(numAsk(meta, low), { label: meta.label });
     const order = shuffle(rng, set);
     return {
       format: 'mc', id: `mc:num:${key}:${low ? 'lo' : 'hi'}:${order.map(c => c.item.id).sort().join(',')}`,

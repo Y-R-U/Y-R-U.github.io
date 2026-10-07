@@ -10,15 +10,15 @@
    "type": "year",
    "label": "Year",
    "higherLabel": "Later",
-   "askNumber": "In what year did this happen: {name}?",
+   "askNumber": "{name}. In what year did this happen?",
    "askHigh": "Which of these happened most recently?",
    "askLow": "Which of these happened first?"
   },
   "century": {
    "type": "cat",
    "label": "Century",
-   "ask": "In which century did this happen: {name}?",
-   "stmt": "This happened in the {value}: {name}."
+   "ask": "{name}. In which century did this happen?",
+   "stmt": "{name}. This happened in the {value}."
   },
   "era": {
    "type": "cat",

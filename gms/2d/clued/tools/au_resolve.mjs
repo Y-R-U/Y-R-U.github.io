@@ -203,21 +203,23 @@ async function buildArtists(head, rows, report) {
 }
 
 const FACTS_SONGS = {
-  artist: { type: 'cat', label: 'Artist' },
-  year: { type: 'year', label: 'Released', higherLabel: 'Newer' },
-  decade: { type: 'cat', label: 'Decade' },
+  artist: { type: 'cat', label: 'Artist', ask: 'Who recorded {name}?', askReverse: 'Which of these songs is by {value}?', stmt: '{name} is by {value}.' },
+  year: { type: 'year', label: 'Released', higherLabel: 'Newer', askHigh: 'Which of these songs came out most recently?', askLow: 'Which of these songs came out first?', askNumber: 'In what year did {name} come out?' },
+  decade: { type: 'cat', label: 'Decade', ask: 'In which decade did {name} come out?', askReverse: 'Which of these songs came out in the {value}?', stmt: '{name} came out in the {value}.' },
   act: { type: 'cat', label: 'Act', values: ['Male solo artist', 'Female solo artist', 'Group or duo', 'Duet or team-up'], ask: 'Who recorded {name}: a solo singer, a group or a team-up?', askReverse: 'Which of these hits is by {aValue}?', stmt: '{name} is by {aValue}.' },
 };
 const FACTS_THEMES = {
-  composer: { type: 'cat', label: 'Composer / artist' },
-  year: { type: 'year', label: 'Film or show year', higherLabel: 'Newer' },
-  decade: { type: 'cat', label: 'Decade' },
-  track: { type: 'text', label: 'Track' },
-  type: { type: 'cat', label: 'Film or TV' },
+  // composer holds the writer for scores and the performer for songs, so the wording covers both
+  composer: { type: 'cat', label: 'Composer / artist', noun: 'composer or performer', ask: 'Who wrote or performed the music from {name}?', askReverse: 'Which of these has music by {value}?', stmt: 'The music from {name} is by {value}.' },
+  year: { type: 'year', label: 'Film or show year', noun: 'year', higherLabel: 'Newer', askHigh: 'Which of these came out most recently?', askLow: 'Which of these came out first?', askNumber: 'In what year did {name} come out?' },
+  decade: { type: 'cat', label: 'Decade', ask: 'In which decade did {name} come out?', askReverse: 'Which of these came out in the {value}?', stmt: '{name} came out in the {value}.' },
+  track: { type: 'text', label: 'Track', noun: 'theme or song' },
+  // values stay 'film' / 'tv' (listen.js reads them); no question is worded from them
+  type: { type: 'cat', label: 'Film or TV', ask: false, stmt: false, display: { film: 'Film', tv: 'TV' } },
 };
 const FACTS_ARTISTS = {
-  origin: { type: 'cat', label: 'From' },
-  decade: { type: 'cat', label: 'Breakthrough decade' },
+  origin: { type: 'cat', label: 'From', noun: 'home country', ask: 'Where is {name} from?', askReverse: 'Which of these acts is from {value}?', stmt: '{name} is from {value}.' },
+  decade: { type: 'cat', label: 'Breakthrough decade', ask: 'In which decade did {name} break through?', askReverse: 'Which of these acts broke through in the {value}?', stmt: '{name} broke through in the {value}.' },
   songs: { type: 'text', label: 'Known for' },
 };
 

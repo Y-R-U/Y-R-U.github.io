@@ -1,6 +1,6 @@
-import { register, poolItems, pickPack, byDifficulty, imageOf, collect, pick, midName, capFirst, comparison, lcLabel } from './registry.js?v=202610071336';
-import { h, choiceGrid, imgEl, countUp } from '../ui/kit.js?v=202610071336';
-import { numericKeys, numOf, apart, rangeOf, fmtFact, norm, injectCSS, baseCSS, hasImg } from './fkit.js?v=202610071336';
+import { register, poolItems, pickPack, byDifficulty, imageOf, collect, pick, midName, capFirst, comparison, lcLabel, plainLabel } from './registry.js?v=202610071438';
+import { h, choiceGrid, imgEl, countUp } from '../ui/kit.js?v=202610071438';
+import { numericKeys, numOf, apart, rangeOf, fmtFact, norm, injectCSS, baseCSS, hasImg } from './fkit.js?v=202610071438';
 
 const CSS = `
 .hl-cards{display:grid;grid-template-columns:1fr auto 1fr;gap:8px;align-items:stretch}
@@ -49,11 +49,12 @@ function make(rng, pack, key, difficulty, kids) {
   const options = year ? [{ text: 'Earlier', icon: '◀' }, { text: 'Later', icon: '▶' }]
     : [{ text: cmp?.hi || 'Higher', icon: '▲' }, { text: cmp?.lo || 'Lower', icon: '▼' }];
   const answer = year ? (vb < va ? 0 : 1) : (vb > va ? 0 : 1);
-  const label = meta.label || key;
+  const label = plainLabel(meta) || key;
+  const yl = lcLabel(label);
   const an = capFirst(midName(a.item, pack)), bn = midName(b.item, pack);
   const ask = year ? yearQuestion(meta, bn) : cmp ? cmp.ask(bn) : `Is ${bn} higher or lower?`;
   const prompt = year
-    ? `${a.item.name}: ${lcLabel(label)} ${fmtFact(meta, va)}. ${ask}`
+    ? `${a.item.name}: ${PASSIVE.test(yl) || yl === 'died' ? `${yl} ` : ''}${fmtFact(meta, va)}. ${ask}`
     : cmp?.stmt ? `${cmp.stmt(an, fmtFact(meta, va))} ${ask}` : `${label}: ${an} is ${fmtFact(meta, va)}. ${ask}`;
   const pics = hasImg(a.item) && hasImg(b.item);
   return {

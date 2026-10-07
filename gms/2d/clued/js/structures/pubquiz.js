@@ -1,18 +1,18 @@
 // Pub quiz: 4–8 rounds of different formats/themes, one double-points joker per player, builder or "surprise me".
-import { playSpec } from './session.js?v=202610071336';
-import { makeSpec, supportedPackIds } from '../core/spec.js?v=202610071336';
-import { handoff } from './handoff.js?v=202610071336';
-import { playersEditor } from './party.js?v=202610071336';
-import { defineScreen, go, back, header } from '../ui/app.js?v=202610071336';
-import { h, esc, fmtNum } from '../ui/kit.js?v=202610071336';
-import { popup, toast } from '../ui/popup.js?v=202610071336';
-import { listFormats, getFormat, defaultOpts } from '../formats/registry.js?v=202610071336';
-import { getIndex } from '../core/packs.js?v=202610071336';
-import { getSettings, read, write, getFavs } from '../core/store.js?v=202610071336';
-import { cleanFav, favKey } from '../ui/favmodel.js?v=202610071336';
-import { optionsPanel } from '../ui/setup.js?v=202610071336';
-import { rngFrom, pick, shuffle, randomSeed } from '../core/rng.js?v=202610071336';
-import { sfx } from '../ui/fx.js?v=202610071336';
+import { playSpec } from './session.js?v=202610071438';
+import { makeSpec, supportedPackIds } from '../core/spec.js?v=202610071438';
+import { handoff } from './handoff.js?v=202610071438';
+import { playersEditor } from './party.js?v=202610071438';
+import { defineScreen, go, header } from '../ui/app.js?v=202610071438';
+import { h, esc, fmtNum } from '../ui/kit.js?v=202610071438';
+import { toast } from '../ui/popup.js?v=202610071438';
+import { getFormat, defaultOpts } from '../formats/registry.js?v=202610071438';
+import { getIndex } from '../core/packs.js?v=202610071438';
+import { getSettings, read, write, getFavs } from '../core/store.js?v=202610071438';
+import { cleanFav, favKey } from '../ui/favmodel.js?v=202610071438';
+import { roundTitle, usable, roundCard, moveItem, registerRoundList, addRound } from './rounds.js?v=202610071438';
+import { rngFrom, pick, shuffle, randomSeed } from '../core/rng.js?v=202610071438';
+import { sfx } from '../ui/fx.js?v=202610071438';
 
 const KEY = 'clued.pubquiz';
 const MAX_ROUNDS = 8;
@@ -24,15 +24,7 @@ function state() {
   return S;
 }
 const save = () => write(KEY, { rounds: S.rounds, players: S.players });
-
-const packsLabel = packs => {
-  if (packs === 'all' || !packs?.length) return 'All themes';
-  const idx = getIndex();
-  const names = packs.map(id => idx.packs[id]?.title).filter(Boolean);
-  return names.length > 2 ? `${names.slice(0, 2).join(', ')} +${names.length - 2}` : names.join(', ');
-};
-const roundTitle = r => r.title || `${getFormat(r.format)?.title || r.format}`;
-const usable = (kids) => listFormats().filter(f => !f.hidden && supportedPackIds(f, getIndex(), { kids }).length);
+registerRoundList('pub', { get: () => state().rounds, save: () => { state(); save(); }, count: 6 });
 
 // The first round of each format uses one of the player's saved favourites for it, if any (packs, options, difficulty).
 // A round's own preset options (Picture round = pictures) win, and the final keeps its difficulty.
@@ -93,20 +85,6 @@ function surpriseBase(seed, kids) {
   return rounds.map(r => ({ packs: 'all', count: 6, difficulty: 0, ...r, preset: r.opts, opts: { ...defaultOpts(getFormat(r.format)), ...(r.opts || {}) } }));
 }
 
-async function pickFormat(kids) {
-  const grid = h('div.tiles');
-  const fmts = usable(kids);
-  return popup({
-    title: 'Pick a format for this round',
-    body: (() => {
-      for (const f of fmts) grid.append(h('button.tile', { type: 'button', dataset: { format: f.id }, onclick: () => grid.closest('.pop')._close(f.id) },
-        h('span.t-ico', {}, f.icon), h('span.t-title', {}, f.title)));
-      return grid;
-    })(),
-    actions: [{ label: 'Cancel', value: null }],
-  });
-}
-
 defineScreen('pubquiz', el => {
   const s = state();
   const kids = !!getSettings().kids;
@@ -137,16 +115,15 @@ defineScreen('pubquiz', el => {
   function draw() {
     list.innerHTML = '';
     s.rounds.forEach((r, i) => {
-      const f = getFormat(r.format);
-      list.append(h('div.round-card', { dataset: { round: String(i) } },
-        h('span.r-ico', {}, f?.icon || '❓'),
-        h('div', {}, h('div.r-t', {}, `${i + 1}. ${roundTitle(r)}`, r.fav ? h('span.r-fav', { title: 'From your favourites' }, ' ♥') : null), h('div.r-s', {}, `${r.count} questions · ${packsLabel(r.packs)}${f ? '' : ' · format missing'}`), h('div.jokers', { dataset: { r: String(i) } })),
-        h('div.row', { style: { gap: '6px' } },
-          h('button.icon-btn', { type: 'button', 'aria-label': 'Edit round', onclick: () => go('pqround', { idx: i, format: r.format }) }, '✎'),
-          h('button.icon-btn', { type: 'button', 'aria-label': 'Remove round', onclick: () => { s.rounds.splice(i, 1); s.jokers = {}; save(); draw(); } }, '✕'))));
+      list.append(roundCard(r, {
+        i, n: s.rounds.length, extra: h('div.jokers', { dataset: { r: String(i) } }),
+        onEdit: () => go('pqround', { idx: i, format: r.format, list: 'pub' }),
+        onRemove: () => { s.rounds.splice(i, 1); s.jokers = {}; save(); draw(); },
+        onMove: dir => { if (moveItem(s.rounds, i, dir)) { s.jokers = {}; save(); draw(); } },
+      }));
     });
     if (s.rounds.length < MAX_ROUNDS) {
-      list.append(h('button.btn.wide', { type: 'button', dataset: { act: 'add-round' }, onclick: async () => { const id = await pickFormat(kids); if (id) go('pqround', { idx: -1, format: id }); } }, '+ Add round'));
+      list.append(h('button.btn.wide.add-round', { type: 'button', dataset: { act: 'add-round' }, onclick: async () => { if (await addRound('pub', kids)) draw(); } }, '＋ Add round'));
     }
     if (!s.rounds.length) list.prepend(h('p.muted.center', {}, 'No rounds yet. Tap Surprise me for an instant quiz.'));
     drawJokers();
@@ -162,29 +139,6 @@ defineScreen('pubquiz', el => {
     },
   }, 'Start the quiz')));
 }, { pester: true });
-
-defineScreen('pqround', (el, { idx = -1, format }) => {
-  const s = state();
-  const fmt = getFormat(format);
-  const kids = !!getSettings().kids;
-  const cur = idx >= 0 ? s.rounds[idx] : null;
-  el.append(header(idx >= 0 ? `Round ${idx + 1}` : 'New round'));
-  if (!fmt) { el.append(h('p.panel', {}, 'Format missing')); return; }
-  const titleIn = h('input.field', { type: 'text', value: cur?.title || '', placeholder: `Round name (optional): ${fmt.title}`, maxlength: 40, style: { display: 'block' } });
-  el.append(h('div.setup-head', {}, h('span.fh-ico', {}, fmt.icon), h('div', {}, h('h2', {}, fmt.title), h('p', {}, fmt.blurb || ''))), titleIn);
-  const body = h('div', { style: { marginTop: '12px' } });
-  el.append(body);
-  const panel = optionsPanel(body, fmt, { kids, showTimer: false, last: cur ? { packs: cur.packs, count: cur.count, opts: cur.opts, difficulty: cur.difficulty } : { count: 6 } });
-  el.append(h('div.start-bar', {}, h('button.btn.go.big.wide', {
-    type: 'button', dataset: { act: 'save-round' }, onclick: () => {
-      const v = panel.value();
-      const r = { format: fmt.id, packs: v.packs, count: v.count, opts: v.opts, difficulty: v.difficulty, title: titleIn.value.trim() || undefined };
-      if (idx >= 0) s.rounds[idx] = r; else s.rounds.push(r);
-      save();
-      back();
-    },
-  }, idx >= 0 ? 'Save round' : 'Add round')));
-});
 
 function startQuiz(rounds, players, jokers, kids) {
   const n = players.length;

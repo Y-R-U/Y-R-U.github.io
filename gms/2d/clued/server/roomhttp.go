@@ -168,7 +168,7 @@ func handlePeek(w http.ResponseWriter, r *http.Request) {
 		host = h.Name
 	}
 	writeJSON(w, 200, map[string]any{"code": room.Code, "phase": room.Phase, "players": len(room.active()),
-		"host": host, "title": room.Title, "total": len(room.Questions), "q": room.Q})
+		"host": host, "title": room.Title, "total": len(room.Questions), "q": room.Q, "rounds": max(1, len(room.rounds.sizes))})
 }
 
 func handleJoin(w http.ResponseWriter, r *http.Request) {

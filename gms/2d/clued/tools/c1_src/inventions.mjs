@@ -16,7 +16,7 @@ export default {
   imgPrompt: "Which of these is {lname}?",
   nameImgPrompt: "Which invention is this?",
   tfImgPrompt: "This is {lname}.",
-  tpl: {"year": {"askHigh": "Which of these is the newest invention?", "askLow": "Which of these is the oldest invention?", "minRatio": 1.01}, "inventor": {"ask": "Who is credited with {lname}?", "askReverse": "Which invention is credited to {value}?", "stmt": "{lname} is credited to {value}."}, "country": {"ask": "Where was {lname} invented?", "askReverse": "Which of these was invented in {value}?", "stmt": "{lname} was invented in {value}."}},
+  tpl: {"year": {"askHigh": "Which of these is the newest invention?", "askLow": "Which of these is the oldest invention?", "askNumber": "In what year was {name} invented?", "minRatio": 1.01}, "inventor": {"ask": "Who is credited with {lname}?", "askReverse": "Which invention is credited to {value}?", "stmt": "{lname} is credited to {value}."}, "country": {"ask": "Where was {lname} invented?", "askReverse": "Which of these was invented in {value}?", "stmt": "{lname} was invented in {value}."}},
   sources: [WD, COMMONS],
   items: [
     { n: 'Paper', ln: 'paper', f: f(105, 'Cai Lun', CN), d: 1,

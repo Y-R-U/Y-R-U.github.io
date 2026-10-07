@@ -30,7 +30,9 @@ type qMeta struct {
 	Format  string
 	Answer  json.RawMessage
 	LimitMs int
-	Stages  int // progressive question: stages 0…Stages-1 (0/1 = not progressive)
+	Stages  int     // progressive question: stages 0…Stages-1 (0/1 = not progressive)
+	Round   int     // spec round index (question.round)
+	TScale  float64 // the format's answer-time stretch, resolved by the client (question.tscale)
 }
 
 func parseMeta(raw json.RawMessage) qMeta {
@@ -39,9 +41,14 @@ func parseMeta(raw json.RawMessage) qMeta {
 		Answer    json.RawMessage `json:"answer"`
 		TimeLimit float64         `json:"timeLimit"`
 		Stages    int             `json:"stages"`
+		Round     int             `json:"round"`
+		TScale    float64         `json:"tscale"`
 	}
 	json.Unmarshal(raw, &q)
-	m := qMeta{Format: q.Format, Answer: q.Answer, Stages: max(0, min(q.Stages, 50))}
+	m := qMeta{Format: q.Format, Answer: q.Answer, Stages: max(0, min(q.Stages, 50)), Round: max(0, q.Round), TScale: 1}
+	if q.TScale > 1 {
+		m.TScale = min(q.TScale, maxTScale)
+	}
 	// timeLimit may be seconds (small numbers) or ms.
 	switch {
 	case q.TimeLimit <= 0:

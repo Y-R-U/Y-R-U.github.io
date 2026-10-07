@@ -1,5 +1,5 @@
 {
- "build": "202610071331",
+ "build": "202610071430",
  "themes": [
   {
    "id": "animals",
@@ -4374,7 +4374,7 @@
      "blitz60": 7
     },
     "formatsEasy": {
-     "mc": 14,
+     "mc": 20,
      "tf": 20,
      "listen": 15,
      "match": 20,
@@ -4439,7 +4439,7 @@
      "blitz60": 1
     },
     "formatsEasy": {
-     "mc": 15,
+     "mc": 20,
      "tf": 20,
      "listen": 20,
      "match": 20,
@@ -4497,7 +4497,7 @@
      "era": 2
     },
     "formats": {
-     "mc": 18,
+     "mc": 20,
      "tf": 20,
      "listen": 20,
      "match": 20,
@@ -4510,7 +4510,7 @@
      "blitz60": 2
     },
     "formatsEasy": {
-     "mc": 5,
+     "mc": 10,
      "tf": 20,
      "listen": 10,
      "match": 20,
@@ -4585,7 +4585,7 @@
      "blitz60": 4
     },
     "formatsEasy": {
-     "mc": 18,
+     "mc": 20,
      "tf": 20,
      "listen": 20,
      "match": 20,
@@ -5108,7 +5108,7 @@
      "reveal": 10,
      "connect": 20,
      "blitz60": 5,
-     "type": 10
+     "type": 20
     },
     "formatsKids": {
      "mc": 20,
@@ -5120,7 +5120,7 @@
      "reveal": 10,
      "connect": 0,
      "blitz60": 1,
-     "type": 10
+     "type": 20
     }
    }
   },
@@ -5348,7 +5348,7 @@
      "blitz60": 6
     },
     "formatsEasy": {
-     "mc": 16,
+     "mc": 20,
      "tf": 20,
      "listen": 20,
      "match": 20,
@@ -5407,7 +5407,7 @@
      "origin": 1
     },
     "formats": {
-     "mc": 16,
+     "mc": 12,
      "tf": 20,
      "listen": 20,
      "match": 20,
@@ -5420,8 +5420,8 @@
      "blitz60": 1
     },
     "formatsEasy": {
-     "mc": 11,
-     "tf": 20,
+     "mc": 12,
+     "tf": 12,
      "listen": 20,
      "match": 20,
      "hilo": 20,
@@ -5434,7 +5434,7 @@
     },
     "formatsKids": {
      "mc": 0,
-     "tf": 14,
+     "tf": 4,
      "listen": 19,
      "match": 0,
      "hilo": 0,
@@ -5496,7 +5496,7 @@
      "blitz60": 8
     },
     "formatsEasy": {
-     "mc": 18,
+     "mc": 20,
      "tf": 20,
      "listen": 18,
      "match": 20,

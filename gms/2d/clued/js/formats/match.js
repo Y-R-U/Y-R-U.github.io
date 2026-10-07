@@ -1,6 +1,6 @@
-import { register, poolItems, pickPack, byDifficulty, imageOf, collect, pick, shuffle, factAllowed, lcLabel } from './registry.js?v=202610071336';
-import { h, imgEl } from '../ui/kit.js?v=202610071336';
-import { norm, injectCSS, baseCSS, once, fmtFact, uniqueByName, hasImg } from './fkit.js?v=202610071336';
+import { register, poolItems, pickPack, byDifficulty, imageOf, collect, pick, shuffle, factAllowed, factPhrase } from './registry.js?v=202610071438';
+import { h, imgEl } from '../ui/kit.js?v=202610071438';
+import { norm, injectCSS, baseCSS, once, fmtFact, uniqueByName, hasImg } from './fkit.js?v=202610071438';
 
 const CSS = `
 .mt-cols{display:grid;grid-template-columns:1fr 1fr;gap:10px 12px;align-items:start}
@@ -20,6 +20,7 @@ const CSS = `
 .mt-t.ok{box-shadow:0 0 0 3px var(--good),var(--shadow-sm)}
 .mt-t.bad{box-shadow:0 0 0 3px var(--bad),var(--shadow-sm);animation:shake .45s}
 .mt-t .fix{display:block;font-size:12px;color:var(--good);font-weight:900}
+.mt-t:not(.pic):has(.fix){flex-wrap:wrap;row-gap:2px}.mt-t:not(.pic) .fix{flex-basis:100%;padding-left:32px}
 .mt-t.pic .fix{position:absolute;left:6px;right:6px;bottom:6px;background:#fff;border-radius:6px;padding:1px 4px;border:2px solid var(--ink)}
 .mt-foot{display:flex;justify-content:center;gap:10px;align-items:center}
 .mt-foot .btn{min-width:150px}
@@ -90,10 +91,10 @@ function make(rng, pack, src, n, decoys, difficulty) {
   const extra = decoys ? shuffle(rng, others).slice(0, multi ? 1 : 2) : [];
   const num = t => { const m = String(t).match(/^(\d+)( BC)?$/); return m ? (m[2] ? -m[1] : +m[1]) : 0; };
   const right = type === 'year' ? [...truth, ...extra].sort((a, b) => num(a) - num(b)) : shuffle(rng, [...truth, ...extra]);
-  const label = lcLabel(meta.label || key);
+  const label = factPhrase(meta, key);
   return {
     format: 'match', id: `match:${key}:${chosen.map(c => c.ref).sort().join(',')}`,
-    prompt: meta.matchPrompt || `Match each one to its ${label}`,
+    prompt: meta.matchPrompt || `Match each one to ${/^the /.test(label) ? '' : 'its '}${label}`,
     answer: chosen.map(c => right.indexOf(val(c))), answerText: chosen.map(c => `${c.item.name}: ${val(c)}`).join(' · '),
     refs: chosen.map(c => c.ref), pack: pack.id,
     data: { left: chosen.map(c => ({ text: c.item.name })), right: right.map(text => ({ text })), multi, pics: false, heads: [pack.title, meta.label || key] },
@@ -103,7 +104,7 @@ function make(rng, pack, src, n, decoys, difficulty) {
 const PAIRS = [4, 5, 6];
 
 export default register({
-  id: 'match', title: 'Matching board', icon: '🔗', blurb: 'Pair them all up', tags: ['slow', 'kids'], kids: true, timeScale: q => 1 + q.data.left.length * 0.6,
+  id: 'match', revealInline: true, answerOnBoard: true, title: 'Matching board', icon: '🔗', blurb: 'Pair them all up', tags: ['slow', 'kids'], kids: true, timeScale: q => 1 + q.data.left.length * 0.6,
   options: [
     { key: 'pairs', label: 'Pairs', type: 'choice', values: PAIRS, default: 5, kidsValues: [4], kidsDefault: 4 },
     { key: 'decoys', label: 'Decoy answers', type: 'bool', default: true, kidsHide: true },

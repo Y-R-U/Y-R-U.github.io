@@ -1124,3 +1124,117 @@ func TestKidsStagesAutoAdvance(t *testing.T) {
 	}
 	clearRooms()
 }
+
+func roundQ(i, round int) map[string]any {
+	q := mcQ(i)
+	q["round"] = round
+	return q
+}
+
+// Multi-round rooms: round sizes/ordinals in state, a round-card lead-in on each round's
+// first question, late join during that card, per-round scores, timeScale-stretched limits.
+func TestMultiRound(t *testing.T) {
+	resetLimits()
+	clearRooms()
+	// spec round 1 was dropped (media), so ordinals 0,1,2 map to spec rounds 0,2,3
+	qs := []any{roundQ(0, 0), roundQ(1, 0), roundQ(2, 2), roundQ(3, 2), roundQ(4, 3)}
+	r := call(t, "POST", "/rooms", map[string]any{"hostName": "H", "answerSec": 10, "gapSec": 0, "questions": qs})
+	code, hk := r.body["code"].(string), r.body["hostKey"].(string)
+	k1, _ := join(t, code, "A")
+	peek := call(t, "GET", "/rooms/"+code, nil).body
+	if num(peek["rounds"]) != 3 {
+		t.Fatalf("peek rounds: %v", peek)
+	}
+	st := call(t, "POST", "/rooms/"+code+"/start", map[string]any{"key": hk}).body
+	if fmt.Sprint(st["roundSizes"]) != "[2 2 1]" || fmt.Sprint(st["roundSpec"]) != "[0 2 3]" || num(st["round"]) != 0 {
+		t.Fatalf("round fields: %v %v %v", st["roundSizes"], st["roundSpec"], st["round"])
+	}
+	if lead := num(st["qStart"]) - num(st["now"]); lead != leadInMs+roundIntroMs {
+		t.Fatalf("first question of a round gets the round card: lead %d", lead)
+	}
+	ans := func(key string, q int, ms float64) {
+		t.Helper()
+		if c := call(t, "POST", "/rooms/"+code+"/answer", map[string]any{"key": key, "q": q, "given": "Right", "correct": true, "ms": ms}); c.code != 200 {
+			t.Fatalf("answer q%d: %v", q, c.body)
+		}
+	}
+	next := func() map[string]any {
+		return call(t, "POST", "/rooms/"+code+"/next", map[string]any{"key": hk}).body
+	}
+	advance((leadInMs + roundIntroMs) * time.Millisecond)
+	ans(hk, 0, 0)
+	ans(k1, 0, 0)
+	st = next()
+	if num(st["q"]) != 1 || num(st["qStart"])-num(st["now"]) != leadInMs {
+		t.Fatalf("mid-round question has the normal lead-in: %v", num(st["qStart"])-num(st["now"]))
+	}
+	advance(leadInMs * time.Millisecond)
+	ans(hk, 1, 0)
+	ans(k1, 1, 0)
+	st = next()
+	if num(st["round"]) != 1 || num(st["qStart"])-num(st["now"]) != leadInMs+roundIntroMs {
+		t.Fatalf("round 2 card: round %v lead %v", st["round"], num(st["qStart"])-num(st["now"]))
+	}
+	// joining while the round card shows plays this question; after it opens, the next one
+	k2, j2 := join(t, code, "Late")
+	if num(j2.body["room"].(map[string]any)["you"].(map[string]any)["joinedQ"]) != 2 {
+		t.Fatalf("join during the round card: %v", j2.body["room"].(map[string]any)["you"])
+	}
+	advance((leadInMs + roundIntroMs) * time.Millisecond)
+	_, j3 := join(t, code, "Later")
+	if num(j3.body["room"].(map[string]any)["you"].(map[string]any)["joinedQ"]) != 3 {
+		t.Fatal("join after the question opened starts at the next one")
+	}
+	ans(hk, 2, 0)
+	ans(k1, 2, 0)
+	ans(k2, 2, 0)
+	st = state(t, code, hk)
+	var a map[string]any
+	for _, p := range players(st) {
+		if p["name"] == "A" {
+			a = p
+		}
+	}
+	// A: q0 500, q1 500 +10% streak = 550, q2 500 +20% = 600
+	if fmt.Sprint(a["rs"]) != "[1050 600 0]" || num(a["score"]) != 1650 {
+		t.Fatalf("per-round scores: %v score %v", a["rs"], a["score"])
+	}
+
+	// single-round rooms carry no round fields and keep the plain lead-in
+	code2, hk2 := createRoom(t, "Solo", 2)
+	st = call(t, "POST", "/rooms/"+code2+"/start", map[string]any{"key": hk2}).body
+	if st["roundSizes"] != nil || num(st["qStart"])-num(st["now"]) != leadInMs || players(st)[0]["rs"] != nil {
+		t.Fatalf("single round: %v %v", st["roundSizes"], num(st["qStart"])-num(st["now"]))
+	}
+}
+
+func TestTimeScaleLimits(t *testing.T) {
+	resetLimits()
+	clearRooms()
+	q := func(format string, ts float64) map[string]any {
+		m := mcQ(0)
+		m["format"], m["tscale"] = format, ts
+		delete(m, "timeLimit")
+		return m
+	}
+	room := newRoom(nil, "", nil)
+	room.AnswerMs = 10000
+	for _, c := range []struct {
+		f    string
+		ts   float64
+		want int
+	}{{"number", 2, 20000}, {"mc", 0, 10000}, {"mc", 0.5, 10000}, {"number", 100, 60000}, {"connect", 6, 120000}, {"type", 1.8, 30000}} {
+		raw, _ := json.Marshal(q(c.f, c.ts))
+		if got := room.limitFor(parseMeta(raw)); got != c.want {
+			t.Fatalf("%s × %v: %d want %d", c.f, c.ts, got, c.want)
+		}
+	}
+	room.AnswerMs = 30000
+	raw, _ := json.Marshal(q("connect", 6))
+	if got := room.limitFor(parseMeta(raw)); got != maxScaledMs {
+		t.Fatalf("scaled limit cap: %d", got)
+	}
+	roomsMu.Lock()
+	delete(rooms, room.Code)
+	roomsMu.Unlock()
+}

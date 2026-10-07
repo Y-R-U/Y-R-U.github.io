@@ -1,11 +1,11 @@
 // Shared game flow: build questions from a spec, preflight media, run them, go to results.
-import { buildQuestions } from '../core/spec.js?v=202610071336';
-import { getFormat } from '../formats/registry.js?v=202610071336';
-import { urlsOf, preflight, swapFailed, questionFailed } from '../core/media.js?v=202610071336';
-import { createRunner } from './runner.js?v=202610071336';
-import { defineScreen, go, back, current } from '../ui/app.js?v=202610071336';
-import { h } from '../ui/kit.js?v=202610071336';
-import { toast } from '../ui/popup.js?v=202610071336';
+import { buildQuestions } from '../core/spec.js?v=202610071438';
+import { getFormat } from '../formats/registry.js?v=202610071438';
+import { urlsOf, preflight, swapFailed, questionFailed } from '../core/media.js?v=202610071438';
+import { createRunner } from './runner.js?v=202610071438';
+import { defineScreen, go, back, current } from '../ui/app.js?v=202610071438';
+import { h } from '../ui/kit.js?v=202610071438';
+import { toast } from '../ui/popup.js?v=202610071438';
 
 const TIPS = [
   'Keys 1–6 pick an answer, Enter moves on.',

@@ -11,6 +11,7 @@
   "field": {
    "type": "cat",
    "label": "Known for",
+   "noun": "speaker",
    "exclusive": false
   }
  },

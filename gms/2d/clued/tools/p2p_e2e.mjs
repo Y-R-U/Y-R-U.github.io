@@ -102,8 +102,9 @@ async function main() {
   await host.waitFor(`document.querySelector('[data-act=host-device]')`, 8000, 'device host button');
   ok(true, 'Online hub offers "Host from this device"');
   await host.shot('hub-portrait.png');
+  await host.eval(`localStorage.removeItem('clued.online'); true`);
   await host.click('[data-act=host-device]');
-  await host.click('.tile[data-format=mc]');
+  await host.waitFor(`document.querySelector('.round-card[data-round="0"]')`, 10000, 'host round list');
   await host.type('[data-field=name]', 'Hosty');
   ok(await host.eval(`!document.querySelector('[data-opt=vis]') && document.body.textContent.includes('this device runs the room')`), 'device host screen: no public option, device note');
   await host.click('[data-opt=answer] .chip[data-v="15"]');

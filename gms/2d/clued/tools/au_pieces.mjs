@@ -166,8 +166,8 @@ function pack(id, title, icon, items, extra = {}) {
   return {
     id, title, theme: 'music', icon, kids: false, version: 1,
     factsMeta: {
-      composer: { type: 'cat', label: 'Composer' },
-      year: { type: 'year', label: 'Written', higherLabel: 'Later' },
+      composer: { type: 'cat', label: 'Composer', ask: 'Who composed {name}?', askReverse: 'Which of these pieces is by {value}?', stmt: '{name} was composed by {value}.' },
+      year: { type: 'year', label: 'Written', higherLabel: 'Later', askHigh: 'Which of these was written most recently?', askLow: 'Which of these was written first?', askNumber: 'In what year was {name} written?' },
       ...(extra.factsMeta || {}),
     },
     items, questions: [],
@@ -206,7 +206,8 @@ async function main() {
   }));
   W(pack('pd-melodies', 'Old songs & carols', '🎼', melodies, {
     notice: 'Public-domain melodies played on a sampled piano.',
-    factsMeta: { origin: { type: 'cat', label: 'Kind of song' } },
+    // Joy to the World and Silent Night are carols and hymns at once: a question would have two right answers
+    factsMeta: { origin: { type: 'cat', label: 'Kind of song', ask: false, stmt: false } },
     sources: [{ name: 'Clued transcriptions of public-domain melodies (published before 1931 or traditional)' }],
   }));
   W({ ...pack('nursery-rhymes', 'Nursery rhymes', '🧸', nursery, {

@@ -148,6 +148,25 @@ body[data-screen=play] { --br8t-account-space: 0px; }
 .rv-row .next { min-width: 140px; }
 .rv-row .info { width: 40px; height: 40px; margin-right: auto; font-size: 20px; }
 .rv-wait { color: var(--ink-2); font-size: 14px; margin-left: auto; }
+/* tall boards (format.revealInline): a compact result line straight under the board, Next on the same line. The board
+   keeps its full height (it used to shrink and slide under the card) and the stage scrolls instead. */
+.play.revealed.rv-inline .stage > .f-stage { flex: 0 0 auto; }
+.play.revealed .mt-foot, .play.revealed .or-foot, .play.revealed .cn-foot { display: none; }
+.reveal.inline { margin-top: 10px; }
+.reveal.inline .rv-card { padding: 10px 12px; gap: 6px; border-radius: 18px; }
+.reveal.inline .rv-head { flex-wrap: wrap; gap: 8px 10px; }
+.reveal.inline .rv-mark { width: 34px; height: 34px; font-size: 18px; }
+.reveal.inline .rv-title { font-size: 22px; flex: 1 1 auto; }
+.reveal.inline .rv-head .pts { font-size: 22px; }
+.reveal.inline .rv-head .rv-row { margin: 0 0 0 auto; }
+.reveal.inline .rv-row .next { min-width: 112px; min-height: 48px; }
+.reveal.inline .rv-row .info { width: 36px; height: 36px; margin-right: 0; }
+.reveal.inline .rv-answer { font-size: 16px; }
+.reveal.inline .rv-explain, .reveal.inline .rv-extra { font-size: 14px; }
+/* portrait map rounds: the card sits under the answer buttons and the map frame shrinks to make room, instead of the
+   card landing on top of the map */
+.stage:has(> .gmq) > .reveal { position: absolute; left: var(--gutter); right: var(--gutter); width: auto; bottom: calc(8px + var(--sab)); margin: 0; z-index: 5; }
+.play.revealed .stage > .gmq { bottom: calc(var(--rv-h, 0px) + 12px); }
 
 /* landscape phone: media left, answers right */
 @media (orientation: landscape) and (max-height: 520px) {
@@ -192,6 +211,8 @@ body[data-screen=play] { --br8t-account-space: 0px; }
   .stage:has(> .gmq) > .reveal { left: auto; right: var(--gutter); width: calc(38% - 14px); }
   .play.revealed .gmq-side { justify-content: flex-start; padding-bottom: calc(var(--rv-h, 0px) + 14px); }
   .rv-title { font-size: 22px; }
+  .play.revealed.rv-inline .stage > .f-stage { flex: 1; }
+  .play.revealed .stage > .gmq { bottom: 0; }
 }
 /* desktop */
 @media (min-width: 900px) and (min-height: 560px) {
@@ -210,6 +231,7 @@ body[data-screen=play] { --br8t-account-space: 0px; }
   .stage { position: relative; }
   .stage:has(> .gmq) > .reveal { position: absolute; left: auto; right: var(--gutter); bottom: 24px; width: 320px; margin: 0; z-index: 5; }
   .play.revealed .gmq-side { justify-content: flex-start; padding-bottom: calc(var(--rv-h, 0px) + 24px); }
+  .play.revealed .stage > .gmq { bottom: 0; }
 }
 
 /* duel */

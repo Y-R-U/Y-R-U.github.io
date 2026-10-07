@@ -1,5 +1,5 @@
 // Lane P2P: device-hosted room logic (js/net/p2p_room.js) against the server's rules. node tools/p2p_test.mjs
-import { P2PRoom, MAX_PLAYERS, GRACE_MS, LEAD_IN_MS, ONLINE_MS, basePoints, withStreak, stageMultiplier, verifyCorrect } from '../js/net/p2p_room.js';
+import { P2PRoom, ROUND_INTRO_MS, MAX_PLAYERS, GRACE_MS, LEAD_IN_MS, ONLINE_MS, basePoints, withStreak, stageMultiplier, verifyCorrect } from '../js/net/p2p_room.js';
 import * as S from '../js/core/scoring.js';
 
 let pass = 0, fail = 0;
@@ -106,6 +106,8 @@ ok(verifyCorrect({ format: 'type', answer: 'x' }, 'y', true) === true, 'other fo
   eq(r.hostAction(a, 'next').error, 'not_host', 'only the host advances');
   r.hostAction(host, 'next');
   eq(r.q, 1, 'host taps Next');
+  eq(r.addPlayer('Early').player.joinedQ, 1, 'joining during the countdown plays this question');
+  openQ(r);
   const late = join(r, 'Late');
   eq(late.joinedQ, 2, 'late joiner plays from the next question');
   ok(r.stateFor(late).players.find(p => p.id === late.id).late, 'late flag');
@@ -216,6 +218,45 @@ ok(verifyCorrect({ format: 'type', answer: 'x' }, 'y', true) === true, 'other fo
   ok(a2 && a2.score === a.score && r2.q === 0 && r2.phase === 'question' && r2.hostId === host.id, 'restore keeps seats, scores and phase');
   eq(r2.answer(a2, { q: 0, given: 0 }).error, 'already_answered', 'restore keeps answers');
   ok(r2.ver === r.ver, 'restore keeps the version (clients ignore older states)');
+}
+
+/* multi-round: same shape as server TestMultiRound (round card lead-in, late join on the card, per-round scores) */
+{
+  T = 7_000_000;
+  const rq = (i, round) => ({ ...mc(i), round });
+  const { r, host } = room({ questions: [rq(0, 0), rq(1, 0), rq(2, 2), rq(3, 2), rq(4, 3)], gapSec: 0 });
+  const a = join(r, 'A');
+  eq(r.peek().rounds, 3, 'peek counts rounds');
+  r.hostAction(host, 'start');
+  let st = r.stateFor(host);
+  eq([st.roundSizes, st.roundSpec, st.round], [[2, 2, 1], [0, 2, 3], undefined], 'round sizes, spec map, round 0');
+  eq(r.qStart - T, LEAD_IN_MS + ROUND_INTRO_MS, 'first question of a round shows the round card');
+  openQ(r); r.answer(host, { q: 0, given: 0 }); r.answer(a, { q: 0, given: 0 });
+  r.hostAction(host, 'next');
+  eq(r.qStart - T, LEAD_IN_MS, 'mid-round lead-in unchanged');
+  openQ(r); r.answer(host, { q: 1, given: 0 }); r.answer(a, { q: 1, given: 0 });
+  r.hostAction(host, 'next');
+  eq([r.stateFor(host).round, r.qStart - T], [1, LEAD_IN_MS + ROUND_INTRO_MS], 'round 2 card');
+  const late = join(r, 'Late');
+  eq(late.joinedQ, 2, 'joining on the round card plays this question');
+  openQ(r);
+  eq(join(r, 'Later').joinedQ, 3, 'joining after it opens starts at the next one');
+  for (const p of [host, a, late]) r.answer(p, { q: 2, given: 0 });
+  const row = r.stateFor(host).players.find(p => p.name === 'A');
+  eq([row.rs, row.score], [[1050, 600, 0], 1650], 'per-round scores');
+  const solo = room();
+  solo.r.hostAction(solo.host, 'start');
+  ok(solo.r.stateFor(solo.host).roundSizes === undefined && solo.r.qStart - T === LEAD_IN_MS && !('rs' in solo.r.stateFor(solo.host).players[0]), 'single round: no round fields');
+  const restored = P2PRoom.restore(JSON.parse(JSON.stringify(r.snapshot())), { now });
+  eq(restored.stateFor(restored.byKey(a.key)).roundSizes, [2, 2, 1], 'restore keeps rounds');
+}
+{
+  const r = new P2PRoom({ questions: [], answerSec: 10, now, rand });
+  for (const [f, ts, want] of [['number', 2, 20000], ['mc', undefined, 10000], ['mc', 0.5, 10000], ['number', 100, 60000], ['connect', 6, 120000], ['type', 1.8, 30000]]) {
+    eq(r.limitFor({ format: f, tscale: ts }), want, `limit ${f} × ${ts}`);
+  }
+  r.setTiming(30);
+  eq(r.limitFor({ format: 'connect', tscale: 6 }), 180000, 'scaled limit cap');
 }
 
 console.log(`${pass} passed, ${fail} failed`);
