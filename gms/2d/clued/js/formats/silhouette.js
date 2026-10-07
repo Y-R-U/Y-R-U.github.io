@@ -1,6 +1,6 @@
-import { register, poolItems, pickPack, byDifficulty, distractors, placeAnswer, collect, pick } from './registry.js?v=202610071324';
-import { h, choiceGrid } from '../ui/kit.js?v=202610071324';
-import { injectCSS, baseCSS, stages, once, numOf } from './fkit.js?v=202610071324';
+import { register, poolItems, pickPack, byDifficulty, distractors, placeAnswer, collect, pick } from './registry.js?v=202610071327';
+import { h, choiceGrid } from '../ui/kit.js?v=202610071327';
+import { injectCSS, baseCSS, stages, once, numOf } from './fkit.js?v=202610071327';
 
 const CSS = `
 .sl-box{position:relative;flex:1 1 0;min-height:180px;border:var(--line) solid var(--ink);border-radius:var(--r);background:radial-gradient(circle at 50% 40%,#fffdf6,#f1ead7);box-shadow:var(--shadow);overflow:hidden;display:grid;place-items:center}
@@ -48,7 +48,7 @@ function make(rng, pack, n, difficulty, kids) {
 
 let geoP = null;
 function loadGeo() {
-  return (geoP ||= Promise.all([import('../geo/data.js?v=202610071324'), import('../geo/shape.js?v=202610071324')])
+  return (geoP ||= Promise.all([import('../geo/data.js?v=202610071327'), import('../geo/shape.js?v=202610071327')])
     .then(async ([data, shape]) => { const G = await data.loadIndex(); return { G, shape }; })
     .catch(e => { geoP = null; throw e; }));
 }

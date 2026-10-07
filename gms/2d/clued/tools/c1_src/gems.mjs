@@ -20,7 +20,7 @@ export default {
   imgPrompt: "Which of these is {lname}?",
   nameImgPrompt: "Which gem or mineral is this?",
   tfImgPrompt: "This is {lname}.",
-  tpl: {"kind": {"ask": "What kind of thing is {lname}?", "askReverse": "Which of these is a {lvalue}?", "stmt": "{name} is a {lvalue}.", "exclusive": false}, "colour": {"ask": "What colour is {lname} best known for?", "stmt": "{name} is best known for being {lvalue}."}, "mohs": {"askHigh": "Which of these is the hardest?", "askLow": "Which of these is the softest?", "minRatio": 1.3}, "birthstone": {"ask": "{name} is a birthstone for which month?", "askReverse": "Which of these is a birthstone for {value}?", "stmt": "{name} is a birthstone for {value}."}},
+  tpl: {"kind": {"ask": "What kind of thing is {lname}?", "askReverse": "Which of these is {aValue}?", "stmt": "{name} is {aValue}.", "exclusive": false}, "colour": {"ask": "What colour is {lname} best known for?", "stmt": "{name} is best known for being {lvalue}."}, "mohs": {"askHigh": "Which of these is the hardest?", "askLow": "Which of these is the softest?", "minRatio": 1.3}, "birthstone": {"ask": "{name} is a birthstone for which month?", "askReverse": "Which of these is a birthstone for {value}?", "stmt": "{name} is a birthstone for {value}."}},
   sources: [WD, COMMONS],
   items: [
     { n: 'Diamond', f: f(G, 'Colourless or white', 10, 'April'), d: 1, look: ['Quartz'],

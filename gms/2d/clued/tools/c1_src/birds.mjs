@@ -1,7 +1,7 @@
 import { INAT, WD, COMMONS, STATUS_META, addFacts } from './_common.mjs';
 
 const AU = 'Australia', NZ = 'New Zealand', EU = 'Europe', AF = 'Africa', AS = 'Asia', AM = 'the Americas', NA = 'North America', SA = 'South America', AN = 'Antarctica', WW = 'many parts of the world';
-const KINDS = ['Perching bird', 'Parrot', 'Bird of prey', 'Duck, goose or swan', 'Pheasant or fowl', 'Ratite', 'Penguin', 'Hummingbird', 'Kingfisher'];
+const KINDS = ['Perching bird', 'Parrot', 'Bird of prey', 'Waterfowl', 'Pheasant or fowl', 'Ratite', 'Penguin', 'Hummingbird', 'Kingfisher'];
 const f = (region, flightless = false) => ({ region, flightless });
 
 const PACK = {
@@ -18,7 +18,7 @@ const PACK = {
   // kind comes from the iNat order (owls count as birds of prey); birds outside these groups have no kind
   taxoFacts: { kind: {
     Passeriformes: 'Perching bird', Psittaciformes: 'Parrot', Accipitriformes: 'Bird of prey', Falconiformes: 'Bird of prey',
-    Cathartiformes: 'Bird of prey', Strigiformes: 'Bird of prey', Anatidae: 'Duck, goose or swan', Galliformes: 'Pheasant or fowl',
+    Cathartiformes: 'Bird of prey', Strigiformes: 'Bird of prey', Anatidae: 'Waterfowl', Galliformes: 'Pheasant or fowl',
     Struthioniformes: 'Ratite', Casuariiformes: 'Ratite', Apterygiformes: 'Ratite', Sphenisciformes: 'Penguin',
     Trochilidae: 'Hummingbird', Alcedinidae: 'Kingfisher',
   } },

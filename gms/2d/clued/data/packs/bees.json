@@ -23,8 +23,8 @@
     "Fly"
    ],
    "ask": "Is the {lname} a bee, a wasp, a hornet or a fly?",
-   "askReverse": "Which of these is a {lvalue}?",
-   "stmt": "The {lname} is a {lvalue}."
+   "askReverse": "Which of these is {aValue}?",
+   "stmt": "The {lname} is {aValue}."
   },
   "stings": {
    "type": "bool",

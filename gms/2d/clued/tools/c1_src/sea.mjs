@@ -17,7 +17,7 @@ export default {
   imgPrompt: "Which of these is {aName}?",
   nameImgPrompt: "Which sea creature is this?",
   tfImgPrompt: "This is {aName}.",
-  tpl: {"kind": {"ask": "What kind of animal is the {lname}?", "askReverse": "Which of these is a {lvalue}?", "stmt": "The {lname} is a {lvalue}."}, "breathesAir": {"askBool": "Which of these sea creatures breathes air?", "stmt": "The {lname} has to come to the surface to breathe air."}, "lengthM": {"askHigh": "Which of these grows the longest?", "askLow": "Which of these is the smallest?", "minRatio": 2}, "status": {"ask": "What is the IUCN conservation status of the {lname}?", "askReverse": "Which of these is listed as \"{value}\" by the IUCN?", "stmt": "The {lname} is listed as \"{value}\" by the IUCN."}},
+  tpl: {"kind": {"ask": "What kind of animal is the {lname}?", "askReverse": "Which of these is {aValue}?", "stmt": "The {lname} is {aValue}."}, "breathesAir": {"askBool": "Which of these sea creatures breathes air?", "stmt": "The {lname} has to come to the surface to breathe air."}, "lengthM": {"askHigh": "Which of these grows the longest?", "askLow": "Which of these is the smallest?", "minRatio": 2}, "status": {"ask": "What is the IUCN conservation status of the {lname}?", "askReverse": "Which of these is listed as \"{value}\" by the IUCN?", "stmt": "The {lname} is listed as \"{value}\" by the IUCN."}},
   sources: [INAT, WD, COMMONS],
   items: [
     { n: 'Blue whale', sci: 'Balaenoptera musculus', g: 'whale', f: f(MA, 25), d: 1, look: ['Humpback whale', 'Sperm whale'],

@@ -18,7 +18,7 @@ const PACK = {
   imgPrompt: "Which of these shows the {lname}?",
   nameImgPrompt: "Which part of the body is this?",
   tfImgPrompt: "This is the {lname}.",
-  tpl: {"massG": {"askHigh": "Which of these weighs the most in an adult?", "askLow": "Which of these weighs the least in an adult?", "askNumber": "What is the typical weight of an adult's {name}, in grams?"}, "kind": {"ask": "What kind of body part is the {lname}?", "askReverse": "Which of these is a {lvalue}?", "stmt": "The {lname} is a {lvalue}."}, "system": {"ask": "Which body system is the {lname} part of?", "askReverse": "Which of these is part of the {lvalue} system?", "stmt": "The {lname} is part of the {lvalue} system."}, "count": {"askHigh": "Which of these do we have the most of?"}},
+  tpl: {"massG": {"askHigh": "Which of these weighs the most in an adult?", "askLow": "Which of these weighs the least in an adult?", "askNumber": "What is the typical weight of an adult's {name}, in grams?"}, "kind": {"ask": "What kind of body part is the {lname}?", "askReverse": "Which of these is {aValue}?", "stmt": "The {lname} is {aValue}."}, "system": {"ask": "Which body system is the {lname} part of?", "askReverse": "Which of these is part of the {lvalue} system?", "stmt": "The {lname} is part of the {lvalue} system."}, "count": {"askHigh": "Which of these do we have the most of?"}},
   sources: [WD, COMMONS],
   items: [
     { n: 'Heart', wp: 'Heart', f: f(OR, CIR, { count: 1 }), d: 1, allowSvg: true,

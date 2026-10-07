@@ -33,7 +33,7 @@
    "type": "cat",
    "label": "Kind of animal",
    "ask": "What kind of animal is the {lname}?",
-   "askReverse": "Which of these is a {lvalue}?",
+   "askReverse": "Which of these is {aValue}?",
    "stmt": "The {lname} is a kind of {lvalue}."
   }
  },

@@ -158,6 +158,7 @@ for (const r of lmRows) {
 const fmtPop = n => n >= 1e9 ? `${(n / 1e9).toFixed(2).replace(/0$/, '')} billion` : n >= 1e6 ? `${(n / 1e6).toFixed(n >= 1e8 ? 0 : 1).replace(/\.0$/, '')} million` : n >= 1e4 ? `${Math.round(n / 1000).toLocaleString('en-US')},000` : `${Math.round(n / 10) * 10}`;
 const sig = (n, d = 3) => { if (n < 1) return +n.toPrecision(2); const p = Math.pow(10, Math.max(0, Math.floor(Math.log10(n)) - d + 1)); return Math.round(n / p) * p; };
 const theName = n => /^(United|Netherlands|Philippines|Bahamas|Gambia|Republic|Central African|Dominican|Marshall|Solomon|Maldives|Seychelles|Comoros|Democratic)/.test(n) ? 'the ' + n : n;
+const TheName = n => { const t = theName(n); return t.charAt(0).toUpperCase() + t.slice(1); };
 const listAnd = a => a.length <= 1 ? a.join('') : a.slice(0, -1).join(', ') + ' and ' + a[a.length - 1];
 const curName = c => CURRENCIES[c]?.[0] || c;
 const theCur = c => (/^(Euro|Pound sterling|Renminbi)/.test(curName(c)) ? 'the ' : 'the ') + curName(c);
@@ -240,7 +241,7 @@ function countryQuestions() {
     if (it.transcontinental) continue;
     if (it.difficulty < 3 || r() < 0.4) {
       const wrong = sample(r, Object.values(CONT).filter(c => c !== it.group), 3);
-      qs.push({ id: `cont-${it.id}`, kind: 'mc', prompt: `Which continent is ${it.lname} in?`, answer: it.group, wrong, explain: `${it.name} is in ${it.group}.`, difficulty: it.difficulty, refs: [`countries/${it.id}`] });
+      qs.push({ id: `cont-${it.id}`, kind: 'mc', prompt: `Which continent is ${it.lname} in?`, answer: it.group, wrong, explain: `${TheName(it.name)} is in ${it.group}.`, difficulty: it.difficulty, refs: [`countries/${it.id}`] });
     }
   }
   // biggest/smallest by population and area within a continent, from four
@@ -261,12 +262,12 @@ function countryQuestions() {
   const ll = countryItems.filter(i => i.facts.landlocked && i.difficulty <= 2);
   for (const it of sample(r, ll, 12)) {
     const wrong = sample(r, countryItems.filter(i => !i.facts.landlocked && i.group === it.group && i.difficulty <= 2), 3).map(i => i.name);
-    if (wrong.length === 3) qs.push({ id: `ll-${it.id}`, kind: 'mc', prompt: 'Which of these countries has no coastline?', answer: it.name, wrong, explain: `${it.name} is landlocked.`, difficulty: 2 });
+    if (wrong.length === 3) qs.push({ id: `ll-${it.id}`, kind: 'mc', prompt: 'Which of these countries has no coastline?', answer: it.name, wrong, explain: `${TheName(it.name)} is landlocked.`, difficulty: 2 });
   }
   const left = countryItems.filter(i => i.facts.drivingSide === 'left');
   for (const it of sample(r, left.filter(i => i.difficulty <= 2), 10)) {
     const wrong = sample(r, countryItems.filter(i => i.facts.drivingSide === 'right' && i.difficulty <= 2), 3).map(i => i.name);
-    qs.push({ id: `drive-${it.id}`, kind: 'mc', prompt: 'In which of these countries do people drive on the left?', answer: it.name, wrong, explain: `${it.name} drives on the left.`, difficulty: 2 });
+    qs.push({ id: `drive-${it.id}`, kind: 'mc', prompt: 'In which of these countries do people drive on the left?', answer: it.name, wrong, explain: `${TheName(it.name)} drives on the left.`, difficulty: 2 });
   }
   return qs;
 }
@@ -394,10 +395,10 @@ function currencyQuestions() {
     const code = u.currencies[0];
     const ci = countryItems.find(i => i.iso3 === u.iso3);
     const wrong = sample(r, curItems.filter(c => c.facts.code !== code), 3).map(c => c.name);
-    qs.push({ id: `cur-${slug(u.name)}`, kind: 'mc', prompt: `What is the currency of ${u.name}?`, answer: curName(code), wrong, explain: `${u.name} uses the ${curName(code)} (${code}).`, difficulty: ci.difficulty });
+    qs.push({ id: `cur-${slug(u.name)}`, kind: 'mc', prompt: `What is the currency of ${theName(u.name)}?`, answer: curName(code), wrong, explain: `${TheName(u.name)} uses the ${curName(code)} (${code}).`, difficulty: ci.difficulty });
     if (curUsers[code].length === 1 && !leaks(curName(code), [u.name, ...u.alt])) {
       const wrongC = sample(r, usable.filter(x => x !== u && x.cont === u.cont), 3).map(x => x.name);
-      qs.push({ id: `curr-${slug(u.name)}`, kind: 'mc', prompt: `Which country uses the ${curName(code)}?`, answer: u.name, wrong: wrongC, explain: `The ${curName(code)} is the currency of ${u.name}.`, difficulty: Math.min(3, ci.difficulty + 1) });
+      qs.push({ id: `curr-${slug(u.name)}`, kind: 'mc', prompt: `Which country uses the ${curName(code)}?`, answer: u.name, wrong: wrongC, explain: `The ${curName(code)} is the currency of ${theName(u.name)}.`, difficulty: Math.min(3, ci.difficulty + 1) });
     }
   }
   qs.push({ id: 'cur-eurozone-2026', kind: 'number', prompt: 'In 2026, how many European Union countries use the euro?', answer: 21, unit: 'countries', tolerance: 2, explain: 'Bulgaria became the 21st when it adopted the euro on 1 January 2026.', difficulty: 3 });
@@ -466,7 +467,7 @@ function languageQuestions() {
     const pool = all.filter(l => !u.languages.includes(l) && !sameContLangs.has(l) && langUsers[l].length >= 1);
     const answer = u.languages[0];
     if (u.iso3 === 'USA' || u.iso3 === 'GBR') continue;
-    qs.push({ id: `lang-${slug(u.name)}`, kind: 'mc', prompt: `Which of these is a main language of ${u.name}?`, answer, wrong: sample(r, pool, 3), explain: `Main language${u.languages.length > 1 ? 's' : ''} of ${u.name}: ${listAnd(u.languages)}.`, difficulty: ci.difficulty });
+    qs.push({ id: `lang-${slug(u.name)}`, kind: 'mc', prompt: `Which of these is a main language of ${theName(u.name)}?`, answer, wrong: sample(r, pool, 3), explain: `Main language${u.languages.length > 1 ? 's' : ''} of ${theName(u.name)}: ${listAnd(u.languages)}.`, difficulty: ci.difficulty });
   }
   for (const l of langItems) {
     const users = langUsers[l.name] || [];

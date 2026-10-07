@@ -1,9 +1,9 @@
 // Single-country outline as SVG paths (official API for other lanes; used by F's silhouette format).
 //   await countryShape('FRA', { neighbours: ['ESP', …], zoomOut: 1 })  → { main, context, frac, aspect } | null
 //   shapeFromTopo(topo, 'FRA', opts)                                     → same, synchronous, given world.json
-import { features } from './topo.js?v=202610071324';
-import { laea } from './proj.js?v=202610071324';
-import { loadWorld } from './data.js?v=202610071324';
+import { features } from './topo.js?v=202610071327';
+import { laea } from './proj.js?v=202610071327';
+import { loadWorld } from './data.js?v=202610071327';
 
 let feats = null;
 const featMap = topo => (feats ||= new Map(features(topo, 'countries').map(f => [f.id, f])));

@@ -28,8 +28,8 @@
     "Black hole"
    ],
    "ask": "What is {lname}?",
-   "askReverse": "Which of these is a {lvalue}?",
-   "stmt": "{lname} is a {lvalue}."
+   "askReverse": "Which of these is {aValue}?",
+   "stmt": "{lname} is {aValue}."
   },
   "diameterKm": {
    "type": "num",
@@ -65,8 +65,8 @@
     "Ice giant"
    ],
    "ask": "What type of planet is {lname}?",
-   "askReverse": "Which of these is a {lvalue} planet?",
-   "stmt": "{lname} is a {lvalue} planet."
+   "askReverse": "Which of these is {aValue} planet?",
+   "stmt": "{lname} is {aValue} planet."
   },
   "orbits": {
    "type": "cat",

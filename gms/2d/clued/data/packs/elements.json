@@ -55,8 +55,8 @@
     "Gas"
    ],
    "ask": "Is {lname} a solid, liquid or gas at room temperature?",
-   "askReverse": "Which of these is a {lvalue} at room temperature?",
-   "stmt": "{name} is a {lvalue} at room temperature."
+   "askReverse": "Which of these is {aValue} at room temperature?",
+   "stmt": "{name} is {aValue} at room temperature."
   },
   "year": {
    "type": "year",

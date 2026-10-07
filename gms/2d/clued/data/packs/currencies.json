@@ -2899,14 +2899,14 @@
   {
    "id": "cur-bahamas",
    "kind": "mc",
-   "prompt": "What is the currency of Bahamas?",
+   "prompt": "What is the currency of the Bahamas?",
    "answer": "Bahamian dollar",
    "wrong": [
     "Jamaican dollar",
     "Solomon Islands dollar",
     "Japanese yen"
    ],
-   "explain": "Bahamas uses the Bahamian dollar (BSD).",
+   "explain": "The Bahamas uses the Bahamian dollar (BSD).",
    "difficulty": 3
   },
   {
@@ -3172,14 +3172,14 @@
   {
    "id": "cur-central-african-republic",
    "kind": "mc",
-   "prompt": "What is the currency of Central African Republic?",
+   "prompt": "What is the currency of the Central African Republic?",
    "answer": "Central African CFA franc",
    "wrong": [
     "Bosnia and Herzegovina convertible mark",
     "Colombian peso",
     "Malawian kwacha"
    ],
-   "explain": "Central African Republic uses the Central African CFA franc (XAF).",
+   "explain": "The Central African Republic uses the Central African CFA franc (XAF).",
    "difficulty": 2
   },
   {
@@ -3250,40 +3250,40 @@
   {
    "id": "cur-comoros",
    "kind": "mc",
-   "prompt": "What is the currency of Comoros?",
+   "prompt": "What is the currency of the Comoros?",
    "answer": "Comorian franc",
    "wrong": [
     "Jordanian dinar",
     "Swiss franc",
     "Bangladeshi taka"
    ],
-   "explain": "Comoros uses the Comorian franc (KMF).",
+   "explain": "The Comoros uses the Comorian franc (KMF).",
    "difficulty": 3
   },
   {
    "id": "cur-democratic-republic-of-the-congo",
    "kind": "mc",
-   "prompt": "What is the currency of Democratic Republic of the Congo?",
+   "prompt": "What is the currency of the Democratic Republic of the Congo?",
    "answer": "Congolese franc",
    "wrong": [
     "Iranian rial",
     "Bhutanese ngultrum",
     "Turkish lira"
    ],
-   "explain": "Democratic Republic of the Congo uses the Congolese franc (CDF).",
+   "explain": "The Democratic Republic of the Congo uses the Congolese franc (CDF).",
    "difficulty": 2
   },
   {
    "id": "cur-republic-of-the-congo",
    "kind": "mc",
-   "prompt": "What is the currency of Republic of the Congo?",
+   "prompt": "What is the currency of the Republic of the Congo?",
    "answer": "Central African CFA franc",
    "wrong": [
     "Ethiopian birr",
     "Zambian kwacha",
     "Costa Rican colón"
    ],
-   "explain": "Republic of the Congo uses the Central African CFA franc (XAF).",
+   "explain": "The Republic of the Congo uses the Central African CFA franc (XAF).",
    "difficulty": 2
   },
   {
@@ -3419,14 +3419,14 @@
   {
    "id": "cur-dominican-republic",
    "kind": "mc",
-   "prompt": "What is the currency of Dominican Republic?",
+   "prompt": "What is the currency of the Dominican Republic?",
    "answer": "Dominican peso",
    "wrong": [
     "Congolese franc",
     "Samoan tālā",
     "Somali shilling"
    ],
-   "explain": "Dominican Republic uses the Dominican peso (DOP).",
+   "explain": "The Dominican Republic uses the Dominican peso (DOP).",
    "difficulty": 2
   },
   {
@@ -3601,14 +3601,14 @@
   {
    "id": "cur-gambia",
    "kind": "mc",
-   "prompt": "What is the currency of Gambia?",
+   "prompt": "What is the currency of the Gambia?",
    "answer": "Gambian dalasi",
    "wrong": [
     "Armenian dram",
     "Philippine peso",
     "Myanmar kyat"
    ],
-   "explain": "Gambia uses the Gambian dalasi (GMD).",
+   "explain": "The Gambia uses the Gambian dalasi (GMD).",
    "difficulty": 3
   },
   {
@@ -4160,14 +4160,14 @@
   {
    "id": "cur-maldives",
    "kind": "mc",
-   "prompt": "What is the currency of Maldives?",
+   "prompt": "What is the currency of the Maldives?",
    "answer": "Maldivian rufiyaa",
    "wrong": [
     "Malagasy ariary",
     "Panamanian balboa",
     "Cambodian riel"
    ],
-   "explain": "Maldives uses the Maldivian rufiyaa (MVR).",
+   "explain": "The Maldives uses the Maldivian rufiyaa (MVR).",
    "difficulty": 3
   },
   {
@@ -4199,14 +4199,14 @@
   {
    "id": "cur-marshall-islands",
    "kind": "mc",
-   "prompt": "What is the currency of Marshall Islands?",
+   "prompt": "What is the currency of the Marshall Islands?",
    "answer": "United States dollar",
    "wrong": [
     "Australian dollar",
     "Algerian dinar",
     "Moroccan dirham"
    ],
-   "explain": "Marshall Islands uses the United States dollar (USD).",
+   "explain": "The Marshall Islands uses the United States dollar (USD).",
    "difficulty": 3
   },
   {
@@ -4381,14 +4381,14 @@
   {
    "id": "cur-netherlands",
    "kind": "mc",
-   "prompt": "What is the currency of Netherlands?",
+   "prompt": "What is the currency of the Netherlands?",
    "answer": "Euro",
    "wrong": [
     "Nigerian naira",
     "Argentine peso",
     "Turkmenistan manat"
    ],
-   "explain": "Netherlands uses the Euro (EUR).",
+   "explain": "The Netherlands uses the Euro (EUR).",
    "difficulty": 1
   },
   {
@@ -4576,14 +4576,14 @@
   {
    "id": "cur-philippines",
    "kind": "mc",
-   "prompt": "What is the currency of Philippines?",
+   "prompt": "What is the currency of the Philippines?",
    "answer": "Philippine peso",
    "wrong": [
     "Maldivian rufiyaa",
     "Bolivian boliviano",
     "Azerbaijani manat"
    ],
-   "explain": "Philippines uses the Philippine peso (PHP).",
+   "explain": "The Philippines uses the Philippine peso (PHP).",
    "difficulty": 2
   },
   {
@@ -4797,14 +4797,14 @@
   {
    "id": "cur-seychelles",
    "kind": "mc",
-   "prompt": "What is the currency of Seychelles?",
+   "prompt": "What is the currency of the Seychelles?",
    "answer": "Seychellois rupee",
    "wrong": [
     "Chilean peso",
     "Egyptian pound",
     "Swiss franc"
    ],
-   "explain": "Seychelles uses the Seychellois rupee (SCR).",
+   "explain": "The Seychelles uses the Seychellois rupee (SCR).",
    "difficulty": 3
   },
   {
@@ -4862,14 +4862,14 @@
   {
    "id": "cur-solomon-islands",
    "kind": "mc",
-   "prompt": "What is the currency of Solomon Islands?",
+   "prompt": "What is the currency of the Solomon Islands?",
    "answer": "Solomon Islands dollar",
    "wrong": [
     "United States dollar",
     "East Caribbean dollar",
     "Namibian dollar"
    ],
-   "explain": "Solomon Islands uses the Solomon Islands dollar (SBD).",
+   "explain": "The Solomon Islands uses the Solomon Islands dollar (SBD).",
    "difficulty": 3
   },
   {
@@ -5213,27 +5213,27 @@
   {
    "id": "cur-united-arab-emirates",
    "kind": "mc",
-   "prompt": "What is the currency of United Arab Emirates?",
+   "prompt": "What is the currency of the United Arab Emirates?",
    "answer": "UAE dirham",
    "wrong": [
     "East Caribbean dollar",
     "Somali shilling",
     "Georgian lari"
    ],
-   "explain": "United Arab Emirates uses the UAE dirham (AED).",
+   "explain": "The United Arab Emirates uses the UAE dirham (AED).",
    "difficulty": 2
   },
   {
    "id": "cur-united-kingdom",
    "kind": "mc",
-   "prompt": "What is the currency of United Kingdom?",
+   "prompt": "What is the currency of the United Kingdom?",
    "answer": "Pound sterling",
    "wrong": [
     "Sri Lankan rupee",
     "Nigerian naira",
     "Australian dollar"
    ],
-   "explain": "United Kingdom uses the Pound sterling (GBP).",
+   "explain": "The United Kingdom uses the Pound sterling (GBP).",
    "difficulty": 1
   },
   {
@@ -5246,20 +5246,20 @@
     "Andorra",
     "Iceland"
    ],
-   "explain": "The Pound sterling is the currency of United Kingdom.",
+   "explain": "The Pound sterling is the currency of the United Kingdom.",
    "difficulty": 2
   },
   {
    "id": "cur-united-states",
    "kind": "mc",
-   "prompt": "What is the currency of United States?",
+   "prompt": "What is the currency of the United States?",
    "answer": "United States dollar",
    "wrong": [
     "Kyrgyz som",
     "Bhutanese ngultrum",
     "Cape Verdean escudo"
    ],
-   "explain": "United States uses the United States dollar (USD).",
+   "explain": "The United States uses the United States dollar (USD).",
    "difficulty": 1
   },
   {

@@ -16,7 +16,7 @@ export default {
   imgPrompt: 'Which of these is {lname}?', nameImgPrompt: 'Which dish is this?', tfImgPrompt: 'This dish is {lname}.',
   tpl: {
     country: { ask: 'Which country does {lname} come from?', askReverse: 'Which of these dishes comes from {value}?', stmt: '{name} comes from {value}.' },
-    course: { ask: 'What kind of dish is {lname}?', askReverse: 'Which of these is usually eaten as a {lvalue}?', stmt: '{name} is usually eaten as a {lvalue}.', exclusive: false },
+    course: { ask: 'What kind of dish is {lname}?', askReverse: 'Which of these is usually eaten as {aValue}?', stmt: '{name} is usually eaten as {aValue}.', exclusive: false },
   },
   sources: [WD, COMMONS],
   items: [

@@ -42,7 +42,7 @@
     "Perching bird",
     "Parrot",
     "Bird of prey",
-    "Duck, goose or swan",
+    "Waterfowl",
     "Pheasant or fowl",
     "Ratite",
     "Penguin",
@@ -1113,7 +1113,7 @@
     "region": "Australia",
     "flightless": false,
     "massKg": 6,
-    "kind": "Duck, goose or swan",
+    "kind": "Waterfowl",
     "status": "Least concern"
    },
    "lookalikes": [
@@ -3114,7 +3114,7 @@
    "facts": {
     "region": "Asia",
     "flightless": false,
-    "kind": "Duck, goose or swan",
+    "kind": "Waterfowl",
     "status": "Least concern"
    },
    "lookalikes": [
@@ -3175,7 +3175,7 @@
     "region": "many parts of the world",
     "flightless": false,
     "massKg": 1.1,
-    "kind": "Duck, goose or swan",
+    "kind": "Waterfowl",
     "status": "Least concern"
    },
    "lookalikes": [
@@ -3241,7 +3241,7 @@
     "region": "Europe",
     "flightless": false,
     "massKg": 10.5,
-    "kind": "Duck, goose or swan",
+    "kind": "Waterfowl",
     "status": "Least concern"
    },
    "lookalikes": [
@@ -3309,7 +3309,7 @@
     "region": "North America",
     "flightless": false,
     "massKg": 4.5,
-    "kind": "Duck, goose or swan",
+    "kind": "Waterfowl",
     "status": "Least concern"
    },
    "blurb": "A big brown goose with a black neck and white chin strap. Flocks fly in V shapes.",

@@ -19,7 +19,7 @@ export default {
   imgPrompt: "Which of these is {aName}?",
   nameImgPrompt: "Which dog breed is this?",
   tfImgPrompt: "This dog is {aName}.",
-  tpl: {"origin": {"ask": "Which country does the {name} come from?", "askReverse": "Which of these breeds comes from {value}?", "stmt": "The {name} comes from {value}."}, "type": {"ask": "What type of breed is the {name}?", "askReverse": "Which of these is a {lvalue} breed?", "stmt": "The {name} is a {lvalue} breed."}, "massKg": {"askHigh": "Which of these breeds is usually the heaviest?", "askLow": "Which of these breeds is usually the lightest?"}, "size": {"ask": "What size is the {name}?", "askReverse": "Which of these breeds is {lvalue}-sized?", "stmt": "The {name} is a {lvalue}-sized breed."}},
+  tpl: {"origin": {"ask": "Which country does the {name} come from?", "askReverse": "Which of these breeds comes from {value}?", "stmt": "The {name} comes from {value}."}, "type": {"ask": "What type of breed is the {name}?", "askReverse": "Which of these is {aValue} breed?", "stmt": "The {name} is {aValue} breed."}, "massKg": {"askHigh": "Which of these breeds is usually the heaviest?", "askLow": "Which of these breeds is usually the lightest?"}, "size": {"ask": "What size is the {name}?", "askReverse": "Which of these breeds is {lvalue}-sized?", "stmt": "The {name} is {aValue}-sized breed."}},
   sources: [WD, COMMONS],
   items: [
     { n: 'Labrador Retriever', alt: ['Labrador', 'Lab'], f: f(UK, 'Gundog', 32), d: 1, look: ['Golden Retriever'],

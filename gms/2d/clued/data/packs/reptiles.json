@@ -20,7 +20,7 @@
     "Amphibian"
    ],
    "ask": "Is the {lname} a reptile or an amphibian?",
-   "askReverse": "Which of these is an {lvalue}?",
+   "askReverse": "Which of these is {aValue}?",
    "stmt": "The {lname} is {aValue}."
   },
   "region": {

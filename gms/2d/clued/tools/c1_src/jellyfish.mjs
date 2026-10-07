@@ -16,7 +16,7 @@ export default {
   imgPrompt: "Which of these is {aName}?",
   nameImgPrompt: "What is this sea creature?",
   tfImgPrompt: "This is {aName}.",
-  tpl: {"danger": {"ask": "How bad is a sting from the {lname}?", "askReverse": "Which of these has a sting rated \"{lvalue}\"?", "stmt": "The {lname}'s sting is rated \"{lvalue}\"."}, "kind": {"ask": "What kind of animal is the {lname}?", "askReverse": "Which of these is a {lvalue}?", "stmt": "The {lname} is a kind of {lvalue}."}},
+  tpl: {"danger": {"ask": "How bad is a sting from the {lname}?", "askReverse": "Which of these has a sting rated \"{lvalue}\"?", "stmt": "The {lname}'s sting is rated \"{lvalue}\"."}, "kind": {"ask": "What kind of animal is the {lname}?", "askReverse": "Which of these is {aValue}?", "stmt": "The {lname} is a kind of {lvalue}."}},
   sources: [INAT, WD],
   items: [
     { n: 'Box jellyfish', alt: ['sea wasp', 'Australian box jellyfish'], sci: 'Chironex fleckeri', g: 'box jellyfish', f: f(X, 'Box jellyfish'), d: 1, look: ['Moon jellyfish', 'Irukandji jellyfish'],

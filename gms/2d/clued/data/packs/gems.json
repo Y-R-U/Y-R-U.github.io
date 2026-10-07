@@ -27,8 +27,8 @@
     "Metal"
    ],
    "ask": "What kind of thing is {lname}?",
-   "askReverse": "Which of these is a {lvalue}?",
-   "stmt": "{name} is a {lvalue}.",
+   "askReverse": "Which of these is {aValue}?",
+   "stmt": "{name} is {aValue}.",
    "exclusive": false
   },
   "colour": {

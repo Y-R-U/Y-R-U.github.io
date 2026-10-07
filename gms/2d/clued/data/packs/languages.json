@@ -1524,14 +1524,14 @@
   {
    "id": "lang-bahamas",
    "kind": "mc",
-   "prompt": "Which of these is a main language of Bahamas?",
+   "prompt": "Which of these is a main language of the Bahamas?",
    "answer": "English",
    "wrong": [
     "Czech",
     "Finnish",
     "Tongan"
    ],
-   "explain": "Main language of Bahamas: English.",
+   "explain": "Main language of the Bahamas: English.",
    "difficulty": 3
   },
   {
@@ -1797,14 +1797,14 @@
   {
    "id": "lang-central-african-republic",
    "kind": "mc",
-   "prompt": "Which of these is a main language of Central African Republic?",
+   "prompt": "Which of these is a main language of the Central African Republic?",
    "answer": "French",
    "wrong": [
     "Lithuanian",
     "Georgian",
     "Persian"
    ],
-   "explain": "Main languages of Central African Republic: French and Sango.",
+   "explain": "Main languages of the Central African Republic: French and Sango.",
    "difficulty": 2
   },
   {
@@ -1862,40 +1862,40 @@
   {
    "id": "lang-comoros",
    "kind": "mc",
-   "prompt": "Which of these is a main language of Comoros?",
+   "prompt": "Which of these is a main language of the Comoros?",
    "answer": "Comorian",
    "wrong": [
     "Belarusian",
     "Croatian",
     "Marshallese"
    ],
-   "explain": "Main languages of Comoros: Comorian, Arabic and French.",
+   "explain": "Main languages of the Comoros: Comorian, Arabic and French.",
    "difficulty": 3
   },
   {
    "id": "lang-democratic-republic-of-the-congo",
    "kind": "mc",
-   "prompt": "Which of these is a main language of Democratic Republic of the Congo?",
+   "prompt": "Which of these is a main language of the Democratic Republic of the Congo?",
    "answer": "French",
    "wrong": [
     "Gilbertese",
     "Belarusian",
     "Thai"
    ],
-   "explain": "Main language of Democratic Republic of the Congo: French.",
+   "explain": "Main language of the Democratic Republic of the Congo: French.",
    "difficulty": 2
   },
   {
    "id": "lang-republic-of-the-congo",
    "kind": "mc",
-   "prompt": "Which of these is a main language of Republic of the Congo?",
+   "prompt": "Which of these is a main language of the Republic of the Congo?",
    "answer": "French",
    "wrong": [
     "Pashto",
     "Urdu",
     "Georgian"
    ],
-   "explain": "Main language of Republic of the Congo: French.",
+   "explain": "Main language of the Republic of the Congo: French.",
    "difficulty": 2
   },
   {
@@ -2018,14 +2018,14 @@
   {
    "id": "lang-dominican-republic",
    "kind": "mc",
-   "prompt": "Which of these is a main language of Dominican Republic?",
+   "prompt": "Which of these is a main language of the Dominican Republic?",
    "answer": "Spanish",
    "wrong": [
     "Kyrgyz",
     "Kazakh",
     "Mauritian Creole"
    ],
-   "explain": "Main language of Dominican Republic: Spanish.",
+   "explain": "Main language of the Dominican Republic: Spanish.",
    "difficulty": 2
   },
   {
@@ -2187,14 +2187,14 @@
   {
    "id": "lang-gambia",
    "kind": "mc",
-   "prompt": "Which of these is a main language of Gambia?",
+   "prompt": "Which of these is a main language of the Gambia?",
    "answer": "English",
    "wrong": [
     "Lao",
     "Czech",
     "Filipino"
    ],
-   "explain": "Main language of Gambia: English.",
+   "explain": "Main language of the Gambia: English.",
    "difficulty": 3
   },
   {
@@ -2720,14 +2720,14 @@
   {
    "id": "lang-maldives",
    "kind": "mc",
-   "prompt": "Which of these is a main language of Maldives?",
+   "prompt": "Which of these is a main language of the Maldives?",
    "answer": "Dhivehi",
    "wrong": [
     "Setswana",
     "Xhosa",
     "Sesotho"
    ],
-   "explain": "Main language of Maldives: Dhivehi.",
+   "explain": "Main language of the Maldives: Dhivehi.",
    "difficulty": 3
   },
   {
@@ -2759,14 +2759,14 @@
   {
    "id": "lang-marshall-islands",
    "kind": "mc",
-   "prompt": "Which of these is a main language of Marshall Islands?",
+   "prompt": "Which of these is a main language of the Marshall Islands?",
    "answer": "Marshallese",
    "wrong": [
     "Nepali",
     "Mauritian Creole",
     "Kyrgyz"
    ],
-   "explain": "Main languages of Marshall Islands: Marshallese and English.",
+   "explain": "Main languages of the Marshall Islands: Marshallese and English.",
    "difficulty": 3
   },
   {
@@ -2954,14 +2954,14 @@
   {
    "id": "lang-netherlands",
    "kind": "mc",
-   "prompt": "Which of these is a main language of Netherlands?",
+   "prompt": "Which of these is a main language of the Netherlands?",
    "answer": "Dutch",
    "wrong": [
     "Mongolian",
     "Quechua",
     "Tongan"
    ],
-   "explain": "Main language of Netherlands: Dutch.",
+   "explain": "Main language of the Netherlands: Dutch.",
    "difficulty": 1
   },
   {
@@ -3162,14 +3162,14 @@
   {
    "id": "lang-philippines",
    "kind": "mc",
-   "prompt": "Which of these is a main language of Philippines?",
+   "prompt": "Which of these is a main language of the Philippines?",
    "answer": "Filipino",
    "wrong": [
     "Polish",
     "Wolof",
     "Tongan"
    ],
-   "explain": "Main languages of Philippines: Filipino and English.",
+   "explain": "Main languages of the Philippines: Filipino and English.",
    "difficulty": 2
   },
   {
@@ -3370,14 +3370,14 @@
   {
    "id": "lang-seychelles",
    "kind": "mc",
-   "prompt": "Which of these is a main language of Seychelles?",
+   "prompt": "Which of these is a main language of the Seychelles?",
    "answer": "Seychellois Creole",
    "wrong": [
     "Armenian",
     "Fiji Hindi",
     "Kurdish"
    ],
-   "explain": "Main languages of Seychelles: Seychellois Creole, English and French.",
+   "explain": "Main languages of the Seychelles: Seychellois Creole, English and French.",
    "difficulty": 3
   },
   {
@@ -3435,14 +3435,14 @@
   {
    "id": "lang-solomon-islands",
    "kind": "mc",
-   "prompt": "Which of these is a main language of Solomon Islands?",
+   "prompt": "Which of these is a main language of the Solomon Islands?",
    "answer": "English",
    "wrong": [
     "Guaraní",
     "Tajik",
     "Seychellois Creole"
    ],
-   "explain": "Main language of Solomon Islands: English.",
+   "explain": "Main language of the Solomon Islands: English.",
    "difficulty": 3
   },
   {
@@ -3760,14 +3760,14 @@
   {
    "id": "lang-united-arab-emirates",
    "kind": "mc",
-   "prompt": "Which of these is a main language of United Arab Emirates?",
+   "prompt": "Which of these is a main language of the United Arab Emirates?",
    "answer": "Arabic",
    "wrong": [
     "Hausa",
     "Swahili",
     "Estonian"
    ],
-   "explain": "Main language of United Arab Emirates: Arabic.",
+   "explain": "Main language of the United Arab Emirates: Arabic.",
    "difficulty": 2
   },
   {

@@ -35,8 +35,8 @@
     "Spitz"
    ],
    "ask": "What type of breed is the {name}?",
-   "askReverse": "Which of these is a {lvalue} breed?",
-   "stmt": "The {name} is a {lvalue} breed."
+   "askReverse": "Which of these is {aValue} breed?",
+   "stmt": "The {name} is {aValue} breed."
   },
   "massKg": {
    "type": "num",
@@ -58,7 +58,7 @@
    ],
    "ask": "What size is the {name}?",
    "askReverse": "Which of these breeds is {lvalue}-sized?",
-   "stmt": "The {name} is a {lvalue}-sized breed."
+   "stmt": "The {name} is {aValue}-sized breed."
   }
  },
  "items": [

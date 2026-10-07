@@ -18,7 +18,7 @@ export default {
   imgPrompt: "Which of these is {aName}?",
   nameImgPrompt: "Which animal is this?",
   tfImgPrompt: "This animal is {aName}.",
-  tpl: {"massKg": {"askHigh": "Which of these animals is the heaviest?", "askLow": "Which of these animals is the lightest?", "minRatio": 2}, "region": {"ask": "Where does the {lname} live?", "askReverse": "Which of these animals lives in {value}?", "stmt": "The {lname} lives in {value}.", "exclusive": false}, "diet": {"ask": "What does the {lname} eat?", "askReverse": "Which of these animals is a {lvalue}?", "stmt": "The {lname} is a {lvalue}."}, "status": {"ask": "What is the IUCN conservation status of the {lname}?", "askReverse": "Which of these is listed as \"{value}\" by the IUCN?", "stmt": "The {lname} is listed as \"{value}\" by the IUCN."}},
+  tpl: {"massKg": {"askHigh": "Which of these animals is the heaviest?", "askLow": "Which of these animals is the lightest?", "minRatio": 2}, "region": {"ask": "Where does the {lname} live?", "askReverse": "Which of these animals lives in {value}?", "stmt": "The {lname} lives in {value}.", "exclusive": false}, "diet": {"ask": "What does the {lname} eat?", "askReverse": "Which of these animals is {aValue}?", "stmt": "The {lname} is {aValue}."}, "status": {"ask": "What is the IUCN conservation status of the {lname}?", "askReverse": "Which of these is listed as \"{value}\" by the IUCN?", "stmt": "The {lname} is listed as \"{value}\" by the IUCN."}},
   sources: [INAT, WD, COMMONS],
   items: [
     // ---- big cats ----

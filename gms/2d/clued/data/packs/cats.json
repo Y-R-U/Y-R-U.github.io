@@ -42,8 +42,8 @@
     "Hairless"
    ],
    "ask": "What kind of coat does the {name} have?",
-   "askReverse": "Which of these breeds has a {lvalue} coat?",
-   "stmt": "The {name} has a {lvalue} coat."
+   "askReverse": "Which of these breeds has {aValue} coat?",
+   "stmt": "The {name} has {aValue} coat."
   }
  },
  "items": [

@@ -37,8 +37,8 @@
     "Insectivore"
    ],
    "ask": "What does the {lname} eat?",
-   "askReverse": "Which of these animals is a {lvalue}?",
-   "stmt": "The {lname} is a {lvalue}."
+   "askReverse": "Which of these animals is {aValue}?",
+   "stmt": "The {lname} is {aValue}."
   },
   "status": {
    "type": "cat",

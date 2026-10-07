@@ -16,7 +16,7 @@ const PACK = {
   imgPrompt: "Which of these is {aName}?",
   nameImgPrompt: "Which insect is this?",
   tfImgPrompt: "This is {aName}.",
-  tpl: {"lengthMm": {"askHigh": "Which of these is the biggest?", "askLow": "Which of these is the smallest?", "askNumber": "About how long is {name} (a worker or female), in millimetres?"}, "kind": {"ask": "Is the {lname} a bee, a wasp, a hornet or a fly?", "askReverse": "Which of these is a {lvalue}?", "stmt": "The {lname} is a {lvalue}."}, "stings": {"askBool": "Which of these can sting?", "stmt": "The {lname} can sting."}, "social": {"askBool": "Which of these lives in a colony with a queen?", "stmt": "The {lname} lives in a colony with a queen."}},
+  tpl: {"lengthMm": {"askHigh": "Which of these is the biggest?", "askLow": "Which of these is the smallest?", "askNumber": "About how long is {name} (a worker or female), in millimetres?"}, "kind": {"ask": "Is the {lname} a bee, a wasp, a hornet or a fly?", "askReverse": "Which of these is {aValue}?", "stmt": "The {lname} is {aValue}."}, "stings": {"askBool": "Which of these can sting?", "stmt": "The {lname} can sting."}, "social": {"askBool": "Which of these lives in a colony with a queen?", "stmt": "The {lname} lives in a colony with a queen."}},
   sources: [INAT, WD],
   items: [
     { n: 'Honey bee', alt: ['western honey bee', 'European honey bee', 'honeybee'], sci: 'Apis mellifera', g: 'bee', f: f('Bee', true, true), d: 1, look: ['Common wasp', 'Marmalade hoverfly'],

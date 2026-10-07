@@ -33,8 +33,8 @@
     "Bread or pastry"
    ],
    "ask": "What kind of dish is {lname}?",
-   "askReverse": "Which of these is usually eaten as a {lvalue}?",
-   "stmt": "{name} is usually eaten as a {lvalue}.",
+   "askReverse": "Which of these is usually eaten as {aValue}?",
+   "stmt": "{name} is usually eaten as {aValue}.",
    "exclusive": false
   }
  },

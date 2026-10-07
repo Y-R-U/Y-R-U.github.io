@@ -16,7 +16,7 @@ const PACK = {
   imgPrompt: "Which of these is {aName}?",
   nameImgPrompt: "Which cat breed is this?",
   tfImgPrompt: "This cat is {aName}.",
-  tpl: {"massKg": {"askHigh": "Which of these breeds is usually the heaviest?", "askLow": "Which of these breeds is usually the lightest?", "askNumber": "About how much does an adult {name} cat weigh, in kilograms?", "minRatio": 1.5}, "origin": {"ask": "Where does the {name} breed come from?", "askReverse": "Which of these breeds comes from {value}?", "stmt": "The {name} breed comes from {value}."}, "coat": {"ask": "What kind of coat does the {name} have?", "askReverse": "Which of these breeds has a {lvalue} coat?", "stmt": "The {name} has a {lvalue} coat."}},
+  tpl: {"massKg": {"askHigh": "Which of these breeds is usually the heaviest?", "askLow": "Which of these breeds is usually the lightest?", "askNumber": "About how much does an adult {name} cat weigh, in kilograms?", "minRatio": 1.5}, "origin": {"ask": "Where does the {name} breed come from?", "askReverse": "Which of these breeds comes from {value}?", "stmt": "The {name} breed comes from {value}."}, "coat": {"ask": "What kind of coat does the {name} have?", "askReverse": "Which of these breeds has {aValue} coat?", "stmt": "The {name} has {aValue} coat."}},
   sources: [WD, COMMONS],
   items: [
     { n: 'Persian', wp: 'Persian cat', alt: ['Persian cat'], f: f(IR, 'Long'), d: 1, look: ['Himalayan', 'Exotic Shorthair'],

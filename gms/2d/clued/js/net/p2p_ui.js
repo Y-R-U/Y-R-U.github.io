@@ -1,6 +1,6 @@
 // Small UI bits for device-hosted rooms (S's screens render everything else).
-import { h } from '../ui/kit.js?v=202610071324';
-import { toast } from '../ui/popup.js?v=202610071324';
+import { h } from '../ui/kit.js?v=202610071327';
+import { toast } from '../ui/popup.js?v=202610071327';
 
 let styled = false;
 function style() {

@@ -9098,7 +9098,7 @@
     "South America",
     "North America"
    ],
-   "explain": "Central African Republic is in Africa.",
+   "explain": "The Central African Republic is in Africa.",
    "difficulty": 2,
    "refs": [
     "countries/central-african-republic"
@@ -9178,7 +9178,7 @@
     "Asia",
     "South America"
    ],
-   "explain": "Comoros is in Africa.",
+   "explain": "The Comoros is in Africa.",
    "difficulty": 3,
    "refs": [
     "countries/comoros"
@@ -9194,7 +9194,7 @@
     "North America",
     "Europe"
    ],
-   "explain": "Democratic Republic of the Congo is in Africa.",
+   "explain": "The Democratic Republic of the Congo is in Africa.",
    "difficulty": 2,
    "refs": [
     "countries/democratic-republic-of-the-congo"
@@ -9210,7 +9210,7 @@
     "Asia",
     "Europe"
    ],
-   "explain": "Republic of the Congo is in Africa.",
+   "explain": "The Republic of the Congo is in Africa.",
    "difficulty": 2,
    "refs": [
     "countries/republic-of-the-congo"
@@ -9322,7 +9322,7 @@
     "Europe",
     "South America"
    ],
-   "explain": "Dominican Republic is in North America.",
+   "explain": "The Dominican Republic is in North America.",
    "difficulty": 2,
    "refs": [
     "countries/dominican-republic"
@@ -9450,7 +9450,7 @@
     "North America",
     "South America"
    ],
-   "explain": "Gambia is in Africa.",
+   "explain": "The Gambia is in Africa.",
    "difficulty": 3,
    "refs": [
     "countries/gambia"
@@ -9930,7 +9930,7 @@
     "Africa",
     "Oceania"
    ],
-   "explain": "Maldives is in Asia.",
+   "explain": "The Maldives is in Asia.",
    "difficulty": 3,
    "refs": [
     "countries/maldives"
@@ -10138,7 +10138,7 @@
     "North America",
     "South America"
    ],
-   "explain": "Netherlands is in Europe.",
+   "explain": "The Netherlands is in Europe.",
    "difficulty": 1,
    "refs": [
     "countries/netherlands"
@@ -10346,7 +10346,7 @@
     "North America",
     "South America"
    ],
-   "explain": "Philippines is in Asia.",
+   "explain": "The Philippines is in Asia.",
    "difficulty": 2,
    "refs": [
     "countries/philippines"
@@ -10522,7 +10522,7 @@
     "Asia",
     "Europe"
    ],
-   "explain": "Seychelles is in Africa.",
+   "explain": "The Seychelles is in Africa.",
    "difficulty": 3,
    "refs": [
     "countries/seychelles"
@@ -10890,7 +10890,7 @@
     "Europe",
     "North America"
    ],
-   "explain": "United Arab Emirates is in Asia.",
+   "explain": "The United Arab Emirates is in Asia.",
    "difficulty": 2,
    "refs": [
     "countries/united-arab-emirates"
@@ -10906,7 +10906,7 @@
     "South America",
     "Africa"
    ],
-   "explain": "United Kingdom is in Europe.",
+   "explain": "The United Kingdom is in Europe.",
    "difficulty": 1,
    "refs": [
     "countries/united-kingdom"
@@ -10922,7 +10922,7 @@
     "Europe",
     "Africa"
    ],
-   "explain": "United States is in North America.",
+   "explain": "The United States is in North America.",
    "difficulty": 1,
    "refs": [
     "countries/united-states"
@@ -11638,7 +11638,7 @@
     "Cameroon",
     "Eritrea"
    ],
-   "explain": "Central African Republic is landlocked.",
+   "explain": "The Central African Republic is landlocked.",
    "difficulty": 2
   },
   {

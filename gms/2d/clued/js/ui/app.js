@@ -1,6 +1,6 @@
 // Screen manager: one screen at a time, a back stack, and the hardware/browser back button.
-import { h } from './kit.js?v=202610071324';
-import { closeAll } from './popup.js?v=202610071324';
+import { h } from './kit.js?v=202610071327';
+import { closeAll } from './popup.js?v=202610071327';
 
 const defs = {};
 const stack = [];

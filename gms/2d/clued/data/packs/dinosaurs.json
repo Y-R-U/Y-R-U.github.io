@@ -54,8 +54,8 @@
     "Fish-eater"
    ],
    "ask": "What did {lname} eat?",
-   "askReverse": "Which of these was a {lvalue}?",
-   "stmt": "{lname} was a {lvalue}."
+   "askReverse": "Which of these was {aValue}?",
+   "stmt": "{lname} was {aValue}."
   },
   "dinosaur": {
    "type": "bool",
