@@ -38,7 +38,7 @@ export const DEFAULT = () => ({
   ink: 0,
   perks: {},
   moves: { power: { owned: true, power: 0, cd: 0 }, d_shank: { owned: true, power: 0, cd: 0 } },
-  settings: { music: true, sfx: true, shake: true, haptics: true, hand: 'right' },
+  settings: { music: true, sfx: true, shake: true, haptics: true, hand: 'right', gore: true },
   seen: {},
   musicRecent: [],
   musicOff: {},              // fight tracks the player has switched off

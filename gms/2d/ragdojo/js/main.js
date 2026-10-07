@@ -17,9 +17,9 @@ import * as haptic from './haptic.js';
 import { buildShop } from './shop.js';
 import { MUSIC, TRACK_NAME, poolFor, roleTrack, unlockedFightTracks, pickFightTrack, RECENT_KEEP } from './music.js';
 
-import { DEV, DEMO, ACCOUNTS, HOME } from './edition.js?v=20261007-worlds';
+import { DEV, DEMO, ACCOUNTS, HOME } from './edition.js?v=20261007-flair';
 import { Purchases } from './purchases.js';
-import { createFamilyAccess } from './family-access.js?v=20261007-worlds';
+import { createFamilyAccess } from './family-access.js?v=20261007-flair';
 import { track, visitor, source, analyticsChoice, analyticsEnabled } from './analytics.js';
 const qs = new URLSearchParams(location.search);
 let purchases = null, account = null, pendingCloud = null;
@@ -471,9 +471,11 @@ function render() {
   for (const p of m.projectiles) p.draw(ctx);
   for (const h of m.hazards) h.drawFront && h.drawFront(ctx);
   m.fx.draw(ctx);
+  m.flair.draw(ctx);
   if (mode === 'fight') drawNameTags(ctx, m);
 
   ctx.restore();
+  m.flair.drawScreen(ctx, vw, vh);
 
   if (mode === 'fight') drawHUD(ctx, vw, vh, m, S, input);
   ctx.restore();
@@ -706,6 +708,8 @@ function openSettings() {
     T('Screen shake', S.settings.shake, 'shake') +
     // A dead toggle is worse than no toggle: desktop and iOS Safari cannot vibrate at all.
     (haptic.supported ? T('Vibration', S.settings.haptics, 'haptics') : '') +
+    // Only once GOD is open, where winning tears the losers apart. No spoilers before then.
+    (S.simulantWon ? T('Blood & gore (GOD world)', S.settings.gore !== false, 'gore') : '') +
     `<div class="toggle"><span>Stick side</span><button class="buy" data-fn="hand">${S.settings.hand === 'right' ? 'LEFT STICK' : 'RIGHT STICK'}</button></div>` +
     `<div class="toggle"><span>Share anonymous play statistics</span><button class="buy" id="analyticsToggle">${analyticsEnabled() ? 'ON' : 'OFF'}</button></div>` +
     `<p class="fine">Optional: starts, fight progress and upgrade conversion. No email or save contents. <a href="privacy.html" target="_blank" rel="noopener">Privacy</a></p>` +

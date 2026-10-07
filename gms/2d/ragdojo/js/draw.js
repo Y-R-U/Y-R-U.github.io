@@ -11,6 +11,22 @@ function limb(ctx, r, a, b, c, o) {
   stroke(ctx, [[r.x[a], r.y[a]], [r.x[b], r.y[b]], [r.x[c], r.y[c]]], o);
 }
 
+const BLOOD = '#b3141c';
+/** A limb torn off at the root: its upper bone is drawn on, carried straight out past the joint. */
+function loose(ctx, r, b, c, len, o) {
+  let dx = r.x[b] - r.x[c], dy = r.y[b] - r.y[c];
+  const d = Math.hypot(dx, dy) || 1;
+  const root = [r.x[b] + dx / d * len, r.y[b] + dy / d * len];
+  stroke(ctx, [root, [r.x[b], r.y[b]], [r.x[c], r.y[c]]], o);
+  splat(ctx, root[0], root[1], 4.5, 77, BLOOD, 0.8);
+}
+/** Arm or leg: attached, or flying about on its own. */
+function anyLimb(ctx, f, root, b, c, len, o) {
+  const cut = f.severed && f.severed.has(b);
+  if (cut) loose(ctx, f.rag, b, c, len, o);
+  else limb(ctx, f.rag, root, b, c, o);
+}
+
 /** Smear trail behind a fast-moving hand or foot. */
 function smear(ctx, r, i, col, seed) {
   const vx = r.x[i] - r.px[i], vy = r.y[i] - r.py[i];
@@ -163,18 +179,18 @@ export function drawFighter(ctx, f, t = 0) {
   const farO = { w: w * 0.86, passes: 2, wob: 1.0, seed, col, a: FAR };
   const nearO = { w, passes: 2, wob: 1.0, seed: seed + 333, col, a: 1 };
   const thin = (o, k = 0.7) => ({ ...o, w: o.w * k, passes: 1 });
-  limb(ctx, r, P.NECK, P.ELBOW_L, P.HAND_L, farO);
+  anyLimb(ctx, f, P.NECK, P.ELBOW_L, P.HAND_L, BONE.upperArm * sc, farO);
   hand(ctx, r, P.HAND_L, sc, thin(farO));
-  limb(ctx, r, P.PELVIS, P.KNEE_L, P.FOOT_L, { ...farO, seed: seed + 111 });
+  anyLimb(ctx, f, P.PELVIS, P.KNEE_L, P.FOOT_L, BONE.thigh * sc, { ...farO, seed: seed + 111 });
   foot(ctx, r, P.KNEE_L, P.FOOT_L, f.facing, sc, thin({ ...farO, seed: seed + 112 }, 0.85));
 
   stroke(ctx, [[r.x[P.PELVIS], r.y[P.PELVIS]], [r.x[P.NECK], r.y[P.NECK]]],
     { w: w * 1.12, passes: 2, wob: 0.9, seed: seed + 222, col, a: 1 });
 
-  limb(ctx, r, P.PELVIS, P.KNEE_R, P.FOOT_R, nearO);
+  anyLimb(ctx, f, P.PELVIS, P.KNEE_R, P.FOOT_R, BONE.thigh * sc, nearO);
   foot(ctx, r, P.KNEE_R, P.FOOT_R, f.facing, sc, thin({ ...nearO, seed: seed + 334 }, 0.85));
   smear(ctx, r, P.FOOT_R, col, seed + 400);
-  limb(ctx, r, P.NECK, P.ELBOW_R, P.HAND_R, { ...nearO, seed: seed + 444 });
+  anyLimb(ctx, f, P.NECK, P.ELBOW_R, P.HAND_R, BONE.upperArm * sc, { ...nearO, seed: seed + 444 });
   hand(ctx, r, P.HAND_R, sc, thin({ ...nearO, seed: seed + 445 }));
   smear(ctx, r, P.HAND_R, col, seed + 500);
   if (f.armed && !f.dead) {
@@ -183,6 +199,15 @@ export function drawFighter(ctx, f, t = 0) {
   }
 
   circle(ctx, r.x[P.HEAD], r.y[P.HEAD], BONE.headR * sc, { w: w * 0.95, passes: 2, wob: 0.9, seed: seed + 555, col, a: 1 });
+  if (f.severed && f.severed.size) {
+    // Stumps: wet red ink where something used to be attached.
+    if (f.severed.has(P.HEAD)) {
+      splat(ctx, r.x[P.NECK], r.y[P.NECK], 7 * sc, f.seed + 1, BLOOD, 0.85);
+      splat(ctx, r.x[P.HEAD], r.y[P.HEAD] + BONE.headR * sc * 0.8, 5 * sc, f.seed + 2, BLOOD, 0.8);
+    }
+    if (f.severed.has(P.ELBOW_L) || f.severed.has(P.ELBOW_R)) splat(ctx, r.x[P.NECK], r.y[P.NECK] + 4, 5.5 * sc, f.seed + 3, BLOOD, 0.8);
+    if (f.severed.has(P.KNEE_L) || f.severed.has(P.KNEE_R)) splat(ctx, r.x[P.PELVIS], r.y[P.PELVIS], 6 * sc, f.seed + 4, BLOOD, 0.8);
+  }
 
   // Damage reads as the drawing being scribbled over.
   const dmg = 1 - f.hp / f.maxHp;

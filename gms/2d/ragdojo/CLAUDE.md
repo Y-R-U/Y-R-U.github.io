@@ -106,6 +106,15 @@ Past DARK the hub's DARK toggle becomes a WORLDS list (`openWorlds`). `WORLDS` a
 `BULLY_WIN_FLAG` in config.js are the ladder; every later world reuses the eight move
 `kind`s under new names, and borrows a soundtrack (`MUSIC_OF` in music.js).
 
+**The later worlds are louder** (`js/flair.js`, purely visual — sim balance is untouched).
+CYBORG specials spark, ring and arc; GOD's throw lightning from the hands to the page edge,
+strike impacts from the sky and run the slam along the whole floor, with screen flashes.
+Colours are picked BEFORE the page filter: on a night page a dark `multiply` stroke is what
+glows. Victory rewards: a CYBORG win finished with a special (`match.finisher`, projectiles
+carry `special: true`) fires eye lasers; any GOD/DEMON win tears the losers apart
+(`Match.tearApart` -> `Ragdoll.sever`, `f.severed` in draw.js) unless `settings.gore` is off.
+Only the visuals scale with `flair.mul` — hitstop does not, or every special would freeze.
+
 **Skill caps follow the worlds you have opened, not the page you stand on.** `perkMax(p, save,
 premium)` adds DARK's five levels once `darkUnlocked`, then one more per world after it, in
 every world. `PERK_CAP` stops STIFF JOINTS and INK SKIN where `derive()`'s floors make further

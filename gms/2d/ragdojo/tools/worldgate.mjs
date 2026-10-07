@@ -127,6 +127,30 @@ try {
   await c.frames(4);
   ok('and the page goes to hell with it', await c.eval(cls('demon')) && await c.eval(cls('night')));
 
+  // ── victory rewards ───────────────────────────────────────────────────────
+  const finish = async (patch, def) => {
+    await boot(patch);
+    await c.eval(`document.getElementById('btnFight').click()`);
+    await c.frames(30);
+    await c.eval(`(()=>{const m=window.__ragdojo.match; m.enemies.forEach(e=>{e.invuln=0; m.land(m.player, e, ${def}, [e.x-20, e.y-60]);});})()`);
+    await c.frames(40);
+    return JSON.parse(await c.eval(`(()=>{const m=window.__ragdojo.match; return JSON.stringify({ lasers: !!m.flair.lasers,
+      torn: m.enemies.map(e => e.severed ? e.severed.size : 0),
+      finite: m.enemies.every(e => [...e.rag.x, ...e.rag.y].every(Number.isFinite)) });})()`));
+  };
+  const SPECIAL = '{dmg:99999, kb:900, stagger:1, p:1.4, id:"x"}', PUNCH = '{dmg:99999, kb:600, stagger:1, p:0.8}';
+  const W = { everWon: true, darkUnlocked: true, thugWon: true, simulantWon: true, completed: true, level: 15 };
+  let v = await finish({ ...W, theme: 'god' }, PUNCH);
+  ok('winning in GOD tears the loser apart', v.torn[0] >= 3 && v.finite, JSON.stringify(v));
+  v = await finish({ ...W, theme: 'god', settings: { gore: false } }, PUNCH);
+  ok('unless blood & gore is switched off', v.torn[0] === 0, JSON.stringify(v));
+  v = await finish({ ...W, theme: 'light' }, SPECIAL);
+  ok('the dojo stays clean', v.torn[0] === 0 && !v.lasers, JSON.stringify(v));
+  v = await finish({ ...W, theme: 'cyborg' }, SPECIAL);
+  ok('a CYBORG special finish fires the eye lasers', v.lasers && v.torn[0] === 0, JSON.stringify(v));
+  v = await finish({ ...W, theme: 'cyborg' }, PUNCH);
+  ok('a punch finish does not', !v.lasers, JSON.stringify(v));
+
   // ── WHITE BELT after a THUG win ───────────────────────────────────────────
   const perks = { hp: 9, atk: 7, ink: 2 };
   await boot({ everWon: true, completed: true, darkUnlocked: true, thugWon: true, ink: 4321, perks,

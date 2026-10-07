@@ -92,6 +92,17 @@ export class Ragdoll {
     }
   }
 
+  /**
+   * Cut a set of points free of the body: every link and joint range with exactly one end
+   * inside `pts` goes. The piece keeps its own internal links, so a severed arm stays an arm.
+   */
+  sever(pts) {
+    const inside = (i) => pts.includes(i);
+    const keep = (c) => inside(c.a) === inside(c.b);
+    this.links = this.links.filter(keep);
+    this.ranges = this.ranges.filter(keep);
+  }
+
   impulse(i, ix, iy) {
     this.px[i] -= ix * this.inv[i];
     this.py[i] -= iy * this.inv[i];

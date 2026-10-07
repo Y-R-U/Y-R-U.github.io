@@ -5,6 +5,7 @@ import { Fighter, STRIKES } from './fighter.js';
 import { Brain, movesForTier } from './ai.js';
 import { Projectile } from './projectile.js';
 import { FX } from './fx.js';
+import { Flair } from './flair.js';
 import { repel, P, NPTS } from './ragdoll.js';
 import { HAZARD_CLASS } from './hazards.js';
 import {
@@ -43,6 +44,7 @@ export class Match {
       pit: null, pitFloor: GROUND_Y + 250,
     };
     this.fx = new FX(SHEET_W, SHEET_H);
+    this.flair = new Flair(this.save.theme, this.save.theme === 'god' && this.bully);
     this.projectiles = [];
     this.hazards = [];
     this.time = 0;
@@ -224,8 +226,9 @@ export class Match {
         }
       }
       if (first) {
-        this.fx.burst(attacker.x, GROUND_Y - 10, 46);
-        this.fx.shakeBy(16);
+        this.flair.slam(attacker.x);
+        this.fx.burst(attacker.x, GROUND_Y - 10, 46 * this.flair.mul);
+        this.fx.shakeBy(16 * this.flair.mul);
         this.fx.spawn(attacker.x, GROUND_Y, 0, -220, 'dust', 12, { spread: 220, size: 7 });
         this.fx.mark(attacker.x, GROUND_Y - 4, 16, (Math.random() * 1e6) | 0, '#20242c', 0.4);
         sfx.boom();
@@ -276,6 +279,7 @@ export class Match {
       from, kb: def.kb, stagger: def.stagger, launch: def.launch,
     });
     if (dealt <= 0) return;
+    if (target.dead && attacker === this.player) this.finisher = !!(def.id || def.special);
 
     attacker.landedHit();
     // A carry-forward charge stops on impact. Without this the dash's own momentum ploughs
@@ -290,7 +294,10 @@ export class Match {
     }
     if (stats && stats.drain) attacker.heal(dealt * stats.drain);
 
+    // In the later worlds a special's hit lands louder; ordinary punches stay as they were.
     const power = def.p || 0.5;
+    const loud = power * (def.id ? this.flair.mul : 1);
+    if (def.id) this.flair.impact(from[0], from[1]);
     // Only the player's own phone gets buzzed, and only for hits they are part of —
     // a gauntlet's enemies clobbering each other would otherwise rattle continuously.
     if (!this.demo) {
@@ -298,11 +305,11 @@ export class Match {
       if (target === this.player) (wentDown ? haptic.down() : haptic.took(power));
       else if (attacker === this.player) haptic.hit(power);
     }
-    this.fx.burst(from[0], from[1], 20 + power * 26);
-    this.fx.shakeBy(4 + power * 9);
+    this.fx.burst(from[0], from[1], 20 + loud * 26);
+    this.fx.shakeBy(4 + loud * 9);
     this.fx.stop(0.018 + power * 0.05);
-    this.fx.spawn(from[0], from[1], 0, 0, 'ink', 3 + (power * 4) | 0, { spread: 130 * power, size: 3.4, col: '#20242c' });
-    this.fx.spawn(from[0], from[1], 0, -40, 'scrap', 2 + (power * 3) | 0, { spread: 150 * power, size: 5 });
+    this.fx.spawn(from[0], from[1], 0, 0, 'ink', 3 + (loud * 4) | 0, { spread: 130 * loud, size: 3.4, col: '#20242c' });
+    this.fx.spawn(from[0], from[1], 0, -40, 'scrap', 2 + (loud * 3) | 0, { spread: 150 * loud, size: 5 });
     if (power > 0.9) this.fx.spawn(from[0], from[1], 0, 0, 'star', 3, { spread: 90, size: 9, col: '#20242c' });
     sfx[def.sfx === 'boom' ? 'boom' : def.sfx === 'heavy' ? 'heavy' : 'hit'](power);
 
@@ -321,8 +328,37 @@ export class Match {
     if (target.mode === 'down' || target.dead) target.launchFrom = target.rag.centre()[0];
   }
 
+  /** Pop the head and tear off most of the limbs, flinging each piece with a spurt of red ink. */
+  tearApart(f) {
+    if (f.severed) return;
+    f.severed = new Set();
+    f.gush = [];
+    const r = f.rag;
+    const [cx, cy] = r.centre();
+    const limbs = [[P.ELBOW_L, P.HAND_L, P.NECK], [P.ELBOW_R, P.HAND_R, P.NECK],
+      [P.KNEE_L, P.FOOT_L, P.PELVIS], [P.KNEE_R, P.FOOT_R, P.PELVIS]]
+      .sort(() => Math.random() - 0.5);
+    const pieces = [[P.HEAD, null, P.NECK], ...limbs.slice(0, 2 + ((Math.random() * 3) | 0))];
+    for (const [a, b, stump] of pieces) {
+      const pts = b === null ? [a] : [a, b];
+      r.sever(pts);
+      f.severed.add(a);
+      let dx = r.x[a] - cx, dy = r.y[a] - cy - 40;
+      const d = Math.hypot(dx, dy) || 1;
+      const pow = (a === P.HEAD ? 15 : 11) * (0.8 + Math.random() * 0.5);
+      for (const i of pts) r.impulse(i, dx / d * pow + (Math.random() * 2 - 1) * 3, dy / d * pow - 7);
+      if (b !== null) { r.px[b] += (Math.random() * 2 - 1) * 9; }   // spin the piece
+      f.gush.push({ pt: stump, t: 1.8, rate: 70 }, { pt: a, t: 0.9, rate: 35 });
+      this.fx.spawn(r.x[stump], r.y[stump], 0, -260, 'ink', 14, { spread: 260, size: 4.2, col: '#b3141c' });
+    }
+    this.fx.mark(cx, GROUND_Y - 4, 26, (Math.random() * 1e6) | 0, '#b3141c', 0.55);
+    this.flair.impact(r.x[P.NECK], r.y[P.NECK]);
+    this.fx.shakeBy(18);
+  }
+
   explode(p) {
     const R = 190;
+    this.flair.impact(p.x, p.y);
     this.fx.burst(p.x, p.y, 70, '#7a4048');
     this.fx.shakeBy(26);
     this.fx.stop(0.07);
@@ -334,7 +370,7 @@ export class Match {
       const d = Math.hypot(t.x - p.x, t.y - p.y);
       if (d > R) continue;
       const f = 1 - d / R;
-      this.land(p.owner, t, { dmg: p.dmg * f, kb: p.kb * (0.6 + f), stagger: 1, p: 1.4, sfx: 'boom' }, [p.x, p.y]);
+      this.land(p.owner, t, { dmg: p.dmg * f, kb: p.kb * (0.6 + f), stagger: 1, p: 1.4, sfx: 'boom', special: true }, [p.x, p.y]);
     }
   }
 
@@ -342,6 +378,7 @@ export class Match {
   update(dt, input) {
     if (this.fx.hitstop > 0) {
       this.fx.update(dt, GROUND_Y);
+      this.flair.update(dt);
       return;
     }
     let scale = 1;
@@ -380,6 +417,24 @@ export class Match {
     }
 
     for (const f of this.all) f.update(d, this.world, this.resolveHit);
+    for (const f of this.enemies) {
+      if (!f.gush) continue;
+      for (const g of f.gush) {
+        if (g.t <= 0) continue;
+        g.t -= d;
+        if (Math.random() < d * g.rate * Math.min(1, g.t)) {
+          this.fx.spawn(f.rag.x[g.pt], f.rag.y[g.pt], (Math.random() * 2 - 1) * 60, -320 - Math.random() * 200,
+            'ink', 1, { spread: 70, size: 3.6, col: '#b3141c', life: 1.4 });
+        }
+      }
+    }
+    this.flair.update(d);
+    if (this.flair.on) {
+      for (const f of this.all) {
+        const A = f.attack;
+        if (A && A.def.id && !A.flair) { A.flair = true; this.flair.cast(f, ...f.strikePoint(A.def)); }
+      }
+    }
 
     this.faceOpponents();
     this.separate();
@@ -397,6 +452,7 @@ export class Match {
     for (let i = this.projectiles.length - 1; i >= 0; i--) {
       const p = this.projectiles[i];
       p.update(d, this.world);
+      this.flair.trail(p, d);
       let hit = false;
       // A bomb is a bag of flour, not a dart: it goes off near you, not only on contact.
       // At 26 it sailed a clear head's width over a fighter 150u away and hit nothing.
@@ -409,7 +465,7 @@ export class Match {
         if (hit) {
           if (p.type === 'bomb') { this.explode(p); }
           else {
-            this.land(p.owner, t, { dmg: p.dmg, kb: p.kb, stagger: 0.7, p: 0.7, sfx: 'hit' }, [p.x, p.y]);
+            this.land(p.owner, t, { dmg: p.dmg, kb: p.kb, stagger: 0.7, p: 0.7, sfx: 'hit', special: true }, [p.x, p.y]);
             t.stunT = Math.max(t.stunT, 0.45);
             this.fx.text(t.x, t.y - 150, 'STUN', { col: '#c8683f', size: 22 });
           }
@@ -418,6 +474,7 @@ export class Match {
         }
       }
       if (p.dead) {
+        if (p.type !== 'bomb') this.flair.pop(p);
         if (p.type === 'bomb' && !hit) this.explode(p);
         this.projectiles.splice(i, 1);
       }
@@ -572,6 +629,15 @@ export class Match {
       this.koAt = this.time;
       sfx.ko();
       if (!this.demo) haptic.win();
+      if (!this.demo && this.flair.level === 1 && this.finisher) {
+        this.flair.eyeLasers(this.player, this.enemies);
+        this.say('TERMINATED', 2.2);
+      }
+      // The last world's reward: whoever you beat comes apart.
+      if (!this.demo && this.flair.level === 2 && (this.save.settings || {}).gore !== false) {
+        for (const e of this.enemies) this.tearApart(e);
+        this.say(this.flair.demon ? 'SHREDDED!' : 'SMITTEN!', 2.4);
+      }
       const [kx] = this.enemies[this.enemies.length - 1].rag.centre();
       this.fx.text(kx, GROUND_Y - 190, 'K.O.', { col: '#c0392b', size: 64, life: 2.2, vy: -30 });
       this.fx.shakeBy(20);
