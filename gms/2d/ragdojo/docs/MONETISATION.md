@@ -8,6 +8,18 @@ payments or spending has been performed.** Price and currency remain undecided.
 Aaron approved: **require purchase for DARK, including existing players**.
 Keep earned DARK progress; do not grandfather editable save flags into ownership.
 
+On 4 October 2026 Aaron additionally authorized family play when accessing the
+game through a literal `192.*` IPv4 address. The upgrade popup offers “Skip
+payment — I’m a family member”. Acceptance is remembered in a separate,
+origin-local browser preference and rechecked against the current hostname;
+it grants no account purchase and is never put in game/cloud saves. Normal
+LIGHT completion and BULLY victory prerequisites remain. Public hosts and the
+itch edition exclude this exception. Local source and home release artifacts
+include it; no deployment or live-payment changes are part of this update.
+
+Regression commands: `node --test tools/family-access.test.mjs tools/services.test.mjs`,
+`npm run build`, `node tools/familygate.mjs`, `node tools/releasegate.mjs`.
+
 | Free on games.br8t.com and itch.io | One permanent DARK upgrade on games.br8t.com |
 | --- | --- |
 | All 45 LIGHT fights / nine bandana ranks | Existing 45-fight DARK campaign |

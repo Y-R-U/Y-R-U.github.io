@@ -24,7 +24,7 @@ for (const edition of ['home', 'itch']) {
   });
   let html = await readFile(join(root, 'index.html'), 'utf8');
   html = html.replace(/<link[^>]+https:\/\/fonts\.[^>]+>\n/g, '')
-    .replace('<link rel="stylesheet" href="css/style.css">', '<link rel="stylesheet" href="assets/fonts/fonts.css">\n<link rel="stylesheet" href="css/style.css">');
+    .replace(/<link rel="stylesheet" href="css\/style\.css(?:\?[^"<>]*)?">/, '<link rel="stylesheet" href="assets/fonts/fonts.css">\n$&');
   if (edition === 'itch') html = html.replace('RAGDOJO</title>', 'RAGDOJO — Free LIGHT Campaign</title>');
   await writeFile(join(out, 'index.html'), html);
   const css = await transform(await readFile(join(root, 'css/style.css'), 'utf8'), { loader: 'css', minify: true });

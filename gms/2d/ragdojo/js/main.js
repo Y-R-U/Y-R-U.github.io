@@ -17,12 +17,16 @@ import * as haptic from './haptic.js';
 import { buildShop } from './shop.js';
 import { MUSIC, TRACK_NAME, poolFor, roleTrack, unlockedFightTracks, pickFightTrack, RECENT_KEEP } from './music.js';
 
-import { DEV, DEMO, ACCOUNTS, HOME } from './edition.js';
+import { DEV, DEMO, ACCOUNTS, HOME } from './edition.js?v=20261007-worlds';
 import { Purchases } from './purchases.js';
+import { createFamilyAccess } from './family-access.js?v=20261007-worlds';
 import { track, visitor, source, analyticsChoice, analyticsEnabled } from './analytics.js';
 const qs = new URLSearchParams(location.search);
 let purchases = null, account = null, pendingCloud = null;
-const hasPremium = () => DEV || (!DEMO && purchases?.owned === true);
+let familyStorage;
+try { familyStorage = localStorage; } catch {}
+const familyAccess = createFamilyAccess(location.hostname, familyStorage, !DEMO);
+const hasPremium = () => DEV || familyAccess.active || (!DEMO && purchases?.owned === true);
 
 const cvs = document.getElementById('game');
 const ctx = cvs.getContext('2d', { alpha: false });
@@ -908,10 +912,16 @@ async function restorePurchase() {
 function openUpgrade() {
   track('upgrade_view', S);
   overlay('premium');
-  $('premiumHome').classList.toggle('hidden', !DEMO && ACCOUNTS);
+  $('premiumHome').classList.toggle('hidden', familyAccess.available || (!DEMO && ACCOUNTS));
+  $('btnFamilySkip').classList.toggle('hidden', !familyAccess.available);
+  $('btnFamilySkip').disabled = familyAccess.active;
+  $('btnFamilySkip').textContent = familyAccess.active ? 'FAMILY ACCESS ENABLED' : 'Skip payment — I’m a family member';
   $('btnRestore').classList.toggle('hidden', DEMO || !ACCOUNTS);
   $('btnCheckout').classList.toggle('hidden', DEMO || !ACCOUNTS);
   purchaseStatus(DEMO ? 'Play LIGHT here. Accounts and the DARK upgrade live on games.br8t.com.' : 'Test checkout only. Sign in using the account button before buying or restoring.');
+  if (familyAccess.available) purchaseStatus(familyAccess.active
+    ? 'Family access enabled on this network. Complete LIGHT and win a BULLY run to enter DARK.'
+    : 'Playing on a 192.* address? Family members can skip payment here. Complete LIGHT and win a BULLY run to enter DARK.');
   $('btnCheckout').disabled = true;
   if (DEMO || !ACCOUNTS) return;
   void fetch('/api/ragdojo/offer', { cache: 'no-store' }).then(async res => {
@@ -926,6 +936,16 @@ function openUpgrade() {
 }
 $('btnUpgrade').onclick = () => { click(); openUpgrade(); };
 $('btnPremiumClose').onclick = () => { click(); overlay(null); };
+$('btnFamilySkip').onclick = () => {
+  if (!familyAccess.grant()) return;
+  click(); refreshHub();
+  if (darkOpen() && S.theme === 'light') { overlay(null); setTheme('dark'); }
+  else {
+    $('btnFamilySkip').disabled = true;
+    $('btnFamilySkip').textContent = 'FAMILY ACCESS ENABLED';
+    purchaseStatus('Family access enabled on this network. Complete LIGHT and win a BULLY run to enter DARK.');
+  }
+};
 $('premiumHome').href = HOME + '?from=itch';
 $('btnRestore').onclick = restorePurchase;
 $('btnCheckout').onclick = async () => {
@@ -954,7 +974,7 @@ if (ACCOUNTS && !DEV) {
       },
     });
     purchases = new Purchases(account.auth, fetch, owned => {
-      if (!owned && (S.theme !== 'light' || S.carryDark)) { parkDark(); toMenu(); }
+      if (!hasPremium() && (S.theme !== 'light' || S.carryDark)) { parkDark(); toMenu(); }
       refreshHub();
     });
     account.auth.onChange(() => { void restorePurchase(); });
