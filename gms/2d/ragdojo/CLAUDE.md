@@ -310,7 +310,7 @@ the two sets use different ids (`power` vs `d_shank`) in the same `save.moves`.
   which direction "faded" means.
 - **A gesture hint is the stroke you draw, and nothing else.** The glyphs used to carry
   arrowheads so up could be told from down; a playtester read the slash and concluded they
-  was meant to draw an arrow, which is exactly what the picture said. Direction now comes from
+  were meant to draw an arrow, which is exactly what the picture said. Direction now comes from
   `glyphStart` — a dot where the finger goes down, drawn by both the move strip and the shop —
   and from the shop's stroke animating itself out of that dot. Do not put anything in
   `GLYPH_PATH` that is not part of the swipe.
