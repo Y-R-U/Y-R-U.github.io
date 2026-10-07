@@ -39,10 +39,47 @@ export const RANK_SETS = {
     { key: 'boss',      name: 'The Boss',  col: '#23262d', edge: '#000000', dojo: 'The Last Page, After Dark' },
   ],
 };
-export const THEMES = ['light', 'dark'];
+RANK_SETS.cyborg = [
+  { key: 'scrap',     name: 'Scrap',       col: '#9aa0ad', edge: '#20242c', dojo: 'The Junk Heap' },
+  { key: 'proto',     name: 'Prototype',   col: '#f2cd2e', edge: '#8a6a08', dojo: 'The Assembly Line' },
+  { key: 'drone',     name: 'Drone',       col: '#ef8a2b', edge: '#8a4708', dojo: 'The Server Farm' },
+  { key: 'sentinel',  name: 'Sentinel',    col: '#49a95a', edge: '#1c5626', dojo: 'The Cooling Tower' },
+  { key: 'android',   name: 'Android',     col: '#3d7fd6', edge: '#153f75', dojo: 'Neon Undercity' },
+  { key: 'synth',     name: 'Synth',       col: '#8c50c6', edge: '#42206a', dojo: 'The Clean Room' },
+  { key: 'chrome',    name: 'Chrome',      col: '#8a5a33', edge: '#402616', dojo: 'The Chrome Spire' },
+  { key: 'overclock', name: 'Overclock',   col: '#d5352f', edge: '#6d120f', dojo: 'The Mainframe' },
+  { key: 'core',      name: 'Singularity', col: '#23262d', edge: '#000000', dojo: 'The Core' },
+];
+RANK_SETS.god = [
+  { key: 'mortal',    name: 'Mortal',      col: '#fdfdfa', edge: '#20242c', dojo: "The Clouds' Edge" },
+  { key: 'acolyte',   name: 'Acolyte',     col: '#f2cd2e', edge: '#8a6a08', dojo: 'The Pearly Gate' },
+  { key: 'cherub',    name: 'Cherub',      col: '#ef8a2b', edge: '#8a4708', dojo: 'Halo Heights' },
+  { key: 'angel',     name: 'Angel',       col: '#49a95a', edge: '#1c5626', dojo: 'The Choir Loft' },
+  { key: 'archangel', name: 'Archangel',   col: '#3d7fd6', edge: '#153f75', dojo: 'The Golden Stair' },
+  { key: 'seraph',    name: 'Seraph',      col: '#8c50c6', edge: '#42206a', dojo: 'Seventh Heaven' },
+  { key: 'dominion',  name: 'Dominion',    col: '#8a5a33', edge: '#402616', dojo: 'The Firmament' },
+  { key: 'throne',    name: 'Throne',      col: '#d5352f', edge: '#6d120f', dojo: 'The Throne Room' },
+  { key: 'almighty',  name: 'Almighty',    col: '#23262d', edge: '#000000', dojo: 'The First Page' },
+];
+
+/**
+ * Four worlds on one ladder. Each world's replay run (`bully`) is what opens the next one:
+ * BULLY opens DARK, THUG opens CYBORG, SIMULANT opens GOD. `night` worlds invert the page,
+ * which is what decides the disabled-control opacity in style.css.
+ */
+export const WORLDS = [
+  { id: 'light',  name: 'LIGHT',  icon: '☀', bully: 'BULLY',    flag: 'everWon',     night: false },
+  { id: 'dark',   name: 'DARK',   icon: '☾', bully: 'THUG',     flag: 'darkUnlocked', night: true },
+  { id: 'cyborg', name: 'CYBORG', icon: '⚙', bully: 'SIMULANT', flag: 'thugWon',     night: true },
+  { id: 'god',    name: 'GOD',    icon: '✦', bully: 'DEMON',    flag: 'simulantWon', night: false },
+];
+export const THEMES = WORLDS.map((w) => w.id);
+export const worldOf = (theme) => WORLDS.find((w) => w.id === theme) || WORLDS[0];
+/** The save flag a world's replay run sets when you win it. */
+export const BULLY_WIN_FLAG = { light: 'darkUnlocked', dark: 'thugWon', cyborg: 'simulantWon', god: 'demonWon' };
 export const ranksFor = (theme) => RANK_SETS[theme] || RANK_SETS.light;
 /** What a rank is worn as. "White bandana" in the dojo, "Runner colours" on the street. */
-export const RANK_WORD = { light: 'bandana', dark: 'colours' };
+export const RANK_WORD = { light: 'bandana', dark: 'colours', cyborg: 'chassis', god: 'wings' };
 export const RANKS = RANK_SETS.light;
 
 export const FIGHTS_PER_RANK = 5;
@@ -71,6 +108,28 @@ const GRUNT_SETS = {
     ['Red Nails', 'Ledger', 'Scarlet', 'The Auditor', 'Vermin'],
     ['Soot', 'Blot', 'Hush', 'The Quiet One', 'Midnight'],
   ],
+  cyborg: [
+    ['Rustbucket', 'Sprocket', 'Tin Can', 'Washer', 'Loose Bolt'],
+    ['Beta', 'Patch', 'Firmware', 'Test Unit', 'Prongs'],
+    ['Buzz', 'Rotor', 'Quadcopter', 'Hover', 'Ping'],
+    ['Watchdog', 'Lockout', 'Firewall', 'Turret', 'Tripwire'],
+    ['Neon', 'Glitch', 'Hex', 'Pixel', 'Cache'],
+    ['Silica', 'Lab Coat', 'Sterile', 'Clone Six', 'Iris Scan'],
+    ['Polish', 'Mirror', 'Gleam', 'Alloy', 'Plating'],
+    ['Redline', 'Heatsink', 'Turbo', 'Throttle', 'Meltdown'],
+    ['Null', 'Void', 'Zero Day', 'Root', 'Kernel'],
+  ],
+  god: [
+    ['Pilgrim', 'Shepherd', 'Monk', 'Nun', 'Choirboy'],
+    ['Candle', 'Censer', 'Psalm', 'Vesper', 'Matins'],
+    ['Pudge', 'Dimples', 'Harp', 'Cupid', 'Rosy'],
+    ['Gabriel Jr', 'Feather', 'Trumpet', 'Lyre', 'Hymn'],
+    ['Lightning', 'Thunder', 'Halo', 'Glory', 'Valour'],
+    ['Six Wings', 'Blaze', 'Ember', 'Incense', 'Ardent'],
+    ['Sceptre', 'Orb', 'Crown', 'Mantle', 'Edict'],
+    ['Wheel', 'Many Eyes', 'Ophan', 'Spiral', 'Gyre'],
+    ['Alpha', 'Omega', 'Genesis', 'Revelation', 'Amen'],
+  ],
 };
 
 const CHAMPION_SETS = {
@@ -81,6 +140,14 @@ const CHAMPION_SETS = {
   dark: [
     'SPLIT LIP', 'OLD MERCY', 'THE FENCE', 'CRATE', 'MISTER COLD',
     'SILK', 'DOCKS DELANEY', 'RED HANDS', 'THE PENMAN',
+  ],
+  cyborg: [
+    'SCRAPHEAP', 'UNIT ZERO', 'THE SWARM', 'WARDEN-9', 'NEON NINA',
+    'DR. STERILE', 'CHROMEJAW', 'OVERCLOCK', 'THE SINGULARITY',
+  ],
+  god: [
+    'BROTHER BASIL', 'SAINT WICK', 'CHERUB CHUCK', 'GABRIELLA', 'MICHAEL THE LOUD',
+    'SERAPHINA', 'THE DOMINION', 'THE WHEEL', 'THE AUTHOR',
   ],
 };
 
@@ -168,7 +235,7 @@ function buildLevels(theme) {
   return out;
 }
 
-export const LEVEL_SETS = { light: buildLevels('light'), dark: buildLevels('dark') };
+export const LEVEL_SETS = Object.fromEntries(THEMES.map((t) => [t, buildLevels(t)]));
 export const levelsFor = (theme) => LEVEL_SETS[theme] || LEVEL_SETS.light;
 export const LEVELS = LEVEL_SETS.light;
 
@@ -297,21 +364,143 @@ export const MOVE_SETS = {
       dmg: 30, dmgStep: 11, cd: 7.5, cdStep: 0.7, kb: 900,
     },
   ],
+  cyborg: [
+    {
+      id: 'c_piston', kind: 'power', name: 'PISTON PUNCH', gesture: 'slash', glyph: '/',
+      hint: 'Draw a slash, low to high',
+      desc: 'A hydraulic arm, fully extended. The hiss is the last thing they hear.',
+      owned: true, cost: 0, tier: 0,
+      dmg: 15, dmgStep: 6.5, cd: 2.6, cdStep: 0.26, kb: 620,
+    },
+    {
+      id: 'c_emp', kind: 'toss', name: 'EMP GRENADE', gesture: 'archUp', glyph: '∩',
+      hint: 'Draw the top half of an O',
+      desc: 'Lob a pulse charge. Arcs, bounces, scrambles them on contact.',
+      cost: 140, tier: 0,
+      dmg: 11, dmgStep: 5, cd: 3.2, cdStep: 0.3, kb: 300,
+    },
+    {
+      id: 'c_rocket', kind: 'rise', name: 'ROCKET UPPERCUT', gesture: 'up', glyph: '↑',
+      hint: 'Draw a line straight up',
+      desc: 'A thruster in the elbow. Lifts them clean off the page.',
+      cost: 260, tier: 1,
+      dmg: 13, dmgStep: 5.5, cd: 3.6, cdStep: 0.34, kb: 480,
+    },
+    {
+      id: 'c_laser', kind: 'knives', name: 'TWIN LASERS', gesture: 'right', glyph: '→',
+      hint: 'Draw a line straight forward',
+      desc: 'Two bolts from the eyes, flat and fast. Recharges on its own.',
+      cost: 380, tier: 2,
+      dmg: 14, dmgStep: 6, cd: 4.0, cdStep: 0.4, kb: 540,
+    },
+    {
+      id: 'c_gyro', kind: 'flipF', name: 'GYRO KICK', gesture: 'circleCW', glyph: '↻',
+      hint: 'Draw a circle clockwise',
+      desc: 'Spin up the hip servos and somersault through them heel-first.',
+      cost: 520, tier: 3,
+      dmg: 19, dmgStep: 7.5, cd: 5.0, cdStep: 0.46, kb: 760,
+    },
+    {
+      id: 'c_quake', kind: 'slam', name: 'SEISMIC SLAM', gesture: 'down', glyph: '↓',
+      hint: 'Draw a line straight down',
+      desc: 'Hammer the page with a steel fist. From the air you drop straight onto them.',
+      cost: 660, tier: 4,
+      dmg: 22, dmgStep: 8, cd: 5.6, cdStep: 0.5, kb: 700,
+    },
+    {
+      id: 'c_thrust', kind: 'flipB', name: 'REVERSE THRUST', gesture: 'circleCCW', glyph: '↺',
+      hint: 'Draw a circle anticlockwise',
+      desc: 'Fire the back jets and flip away, kicking on the way up. Your way out.',
+      cost: 800, tier: 5,
+      dmg: 16, dmgStep: 6.5, cd: 4.4, cdStep: 0.42, kb: 620,
+    },
+    {
+      id: 'c_rail', kind: 'gun', name: 'RAILGUN', gesture: 'vee', glyph: 'V',
+      hint: 'Draw a V',
+      desc: 'One magnetic slug, the length of the page. Charges the air on its way.',
+      cost: 1100, tier: 6,
+      dmg: 30, dmgStep: 11, cd: 7.5, cdStep: 0.7, kb: 900,
+    },
+  ],
+  god: [
+    {
+      id: 'g_hammer', kind: 'power', name: 'DIVINE HAMMER', gesture: 'slash', glyph: '/',
+      hint: 'Draw a slash, low to high',
+      desc: 'An overhand blow with the weight of heaven behind it.',
+      owned: true, cost: 0, tier: 0,
+      dmg: 15, dmgStep: 6.5, cd: 2.6, cdStep: 0.26, kb: 620,
+    },
+    {
+      id: 'g_halo', kind: 'toss', name: 'HALO TOSS', gesture: 'archUp', glyph: '∩',
+      hint: 'Draw the top half of an O',
+      desc: 'Throw your halo. It arcs, bounces, and leaves them dazzled.',
+      cost: 140, tier: 0,
+      dmg: 11, dmgStep: 5, cd: 3.2, cdStep: 0.3, kb: 300,
+    },
+    {
+      id: 'g_ascend', kind: 'rise', name: 'ASCENSION', gesture: 'up', glyph: '↑',
+      hint: 'Draw a line straight up',
+      desc: 'Lift them towards the light. They do not stay up there.',
+      cost: 260, tier: 1,
+      dmg: 13, dmgStep: 5.5, cd: 3.6, cdStep: 0.34, kb: 480,
+    },
+    {
+      id: 'g_bolts', kind: 'knives', name: 'LIGHTNING BOLTS', gesture: 'right', glyph: '→',
+      hint: 'Draw a line straight forward',
+      desc: 'Two bolts thrown flat across the page. There are always more where those came from.',
+      cost: 380, tier: 2,
+      dmg: 14, dmgStep: 6, cd: 4.0, cdStep: 0.4, kb: 540,
+    },
+    {
+      id: 'g_wheel', kind: 'flipF', name: 'FIRE WHEEL', gesture: 'circleCW', glyph: '↻',
+      hint: 'Draw a circle clockwise',
+      desc: 'Roll forward as a wheel of fire. Everyone in the way goes over.',
+      cost: 520, tier: 3,
+      dmg: 19, dmgStep: 7.5, cd: 5.0, cdStep: 0.46, kb: 760,
+    },
+    {
+      id: 'g_judge', kind: 'slam', name: 'JUDGEMENT', gesture: 'down', glyph: '↓',
+      hint: 'Draw a line straight down',
+      desc: 'Strike the earth and everyone near it is judged. From the air you come down on them.',
+      cost: 660, tier: 4,
+      dmg: 22, dmgStep: 8, cd: 5.6, cdStep: 0.5, kb: 700,
+    },
+    {
+      id: 'g_wings', kind: 'flipB', name: 'WINGBEAT', gesture: 'circleCCW', glyph: '↺',
+      hint: 'Draw a circle anticlockwise',
+      desc: 'One beat of the wings carries you backwards over trouble, heels first.',
+      cost: 800, tier: 5,
+      dmg: 16, dmgStep: 6.5, cd: 4.4, cdStep: 0.42, kb: 620,
+    },
+    {
+      id: 'g_wrath', kind: 'gun', name: 'WRATH', gesture: 'vee', glyph: 'V',
+      hint: 'Draw a V',
+      desc: 'A beam straight down the page. Nothing about it is forgiving.',
+      cost: 1100, tier: 6,
+      dmg: 30, dmgStep: 11, cd: 7.5, cdStep: 0.7, kb: 900,
+    },
+  ],
 };
 export const movesFor = (theme) => MOVE_SETS[theme] || MOVE_SETS.light;
 /**
  * Which set you are actually holding. Normally the theme's own, but a THUG who has won a
  * thug run can carry the dark moves back into the light world — that is what `carryDark` is.
  */
-export const activeMoves = (save) =>
-  (save && (save.theme === 'dark' || save.carryDark)) ? MOVE_SETS.dark : MOVE_SETS.light;
+export const activeMoves = (save) => {
+  if (!save) return MOVE_SETS.light;
+  if (save.theme === 'light' || !MOVE_SETS[save.theme]) return save.carryDark ? MOVE_SETS.dark : MOVE_SETS.light;
+  return MOVE_SETS[save.theme];
+};
 export const MOVES = MOVE_SETS.light;
-const ALL_MOVES = [...MOVE_SETS.light, ...MOVE_SETS.dark];
+const ALL_MOVES = Object.values(MOVE_SETS).flat();
 
 /** The standard tap attack, renamed per theme. Same three-hit chain either way. */
-export const STRIKE_WORD = { light: 'PUNCH', dark: 'STAB' };
+export const STRIKE_WORD = { light: 'PUNCH', dark: 'STAB', cyborg: 'ZAP', god: 'SMITE' };
 
 export const MOVE_MAX_LV = 7;
+/** The worlds past DARK each add one more level to every track that still has room to grow. */
+export const WORLD_BONUS_FLAGS = ['thugWon', 'simulantWon'];
+const worldBonus = (save) => WORLD_BONUS_FLAGS.filter((f) => save && save[f]).length;
 
 /**
  * The last two levels of anything are a long-haul goal rather than a purchase: they cost
@@ -325,6 +514,18 @@ const deepMul = (lv, max) => {
   return lv < soft ? 1 : Math.pow(2, 2 + (lv - soft));
 };
 const curveLv = (lv, max) => Math.min(lv, max - DEEP_LEVELS - 1);
+
+/** Floor on any special's cooldown — a level that would only push past it buys nothing. */
+export const MIN_CD = 0.7;
+/**
+ * Levels available on one move's power or cooldown track. `premium` false means no world
+ * past LIGHT is open to this player, so nothing past the base cap is either.
+ */
+export function moveMaxLv(save, m, track, premium = true) {
+  const max = MOVE_MAX_LV + (premium ? worldBonus(save) : 0);
+  if (track !== 'cd' || !m) return max;
+  return Math.min(max, Math.ceil((m.cd - MIN_CD) / m.cdStep - 1e-9));
+}
 
 /** Upgrade cost curves. Specials get separate power and cooldown tracks. */
 export const moveBuyCost = (m) => m.cost;
@@ -355,14 +556,31 @@ export const PERKS = [
   { id: 'wind',  name: 'SECOND WIND',     max: 6, base: 190, growth: 1.6,
     desc: 'Start each fight with bonus health that regenerates between rounds.',
     fmt: (l) => `+${l * 8}% heal` },
+  // Compounding, so every level is worth the same 12% of whatever the last one paid.
+  { id: 'ink',   name: 'INK WELL',        max: 5, base: 260, growth: 1.7, needs: 'everWon',
+    needsText: 'finish the dojo to unlock',
+    desc: 'Every fight pays out more ink. Each level multiplies it by another 12%.',
+    fmt: (l) => `×${inkMul(l).toFixed(2)} ink` },
 ];
+export const inkMul = (lv) => Math.pow(1.12, lv || 0);
 
 /**
- * The dark streets ask more of you and charge for it: five further levels on every skill,
- * each one doubling the multiplier again (16x, 32x, 64x, 128x, 256x the old top price).
+ * Opening DARK adds five further levels to every skill, each one doubling the multiplier
+ * again (16x, 32x, 64x, 128x, 256x the old top price), and each world after it one more.
+ * They are yours in every world once earned, not only while you stand in the dark.
+ *
+ * `cap` is where a skill stops doing anything: STIFF JOINTS and INK SKIN run into the floors
+ * in derive(), so levels past that would be ink for nothing.
  */
 export const DARK_PERK_LEVELS = 5;
-export const perkMax = (p, theme) => p.max + (theme === 'dark' ? DARK_PERK_LEVELS : 0);
+const PERK_CAP = { stiff: 6, armor: 12 };
+export function perkMax(p, save, premium = true) {
+  // Old callers passed a theme string; keep that meaning (dark = the five extra levels).
+  if (typeof save === 'string') save = { darkUnlocked: save === 'dark' };
+  const extra = premium && save && save.darkUnlocked ? DARK_PERK_LEVELS + worldBonus(save) : 0;
+  return Math.min(PERK_CAP[p.id] ?? Infinity, p.max + extra);
+}
+export const perkLocked = (p, save) => !!(p.needs && !(save && save[p.needs]));
 export const perkCost = (p, lv) =>
   Math.round(p.base * Math.pow(p.growth, curveLv(lv, p.max)) * deepMul(lv, p.max));
 
@@ -384,6 +602,7 @@ export function derive(save) {
     getUp: Math.max(0.22, 1 - L('stiff') * 0.14),
     drain: L('drain') * 0.04,
     heal: L('wind') * 0.08,
+    inkMul: inkMul(L('ink')),
   };
 }
 
@@ -397,7 +616,7 @@ export function moveStats(save, id) {
     ...m,
     power: s.power || 0, cdLv: s.cd || 0,
     damage: (m.dmg + (s.power || 0) * m.dmgStep) * d.atkMul,
-    cooldown: Math.max(0.7, m.cd - (s.cd || 0) * m.cdStep),
+    cooldown: Math.max(MIN_CD, m.cd - (s.cd || 0) * m.cdStep),
     knockback: m.kb * (1 + (s.power || 0) * 0.11),
   };
 }

@@ -66,6 +66,8 @@ node tools/progressgate.mjs   # what a new game keeps, and what it makes you ear
 node tools/keygate.mjs        # desktop keys: punch, 1-8 specials, both movement layouts
 node tools/panelgate.mjs      # every panel's X is in the corner, and taps outside dismiss
 node tools/darkgate.mjs       # the DARK campaign and its whole unlock chain
+node tools/worldgate.mjs      # CYBORG/GOD, world-scaled skill caps, INK WELL, WHITE BELT restart
+node tools/slamgate.mjs       # a slam cast in the air lands before its shockwave fires
 node tools/flipknees.mjs --check  # no pose may bend a knee backwards
 node tools/glyphgate.mjs      # the gesture hints, measured in PIXELS at the sizes drawn
 node tools/sim.mjs            # whole campaign in node, with its economy. Balance lives here.
@@ -92,9 +94,23 @@ win the dojo            -> DARK appears on the hub, locked
 win a BULLY run         -> save.darkUnlocked, DARK opens
 DARK                    -> a separate run, separate records, dark moves, +5 skill levels
 win the dark campaign   -> the record book offers THUG instead of BULLY
-win the THUG run        -> save.thugWon; "stay a THUG?" can now be answered YES
+win the THUG run        -> save.thugWon; "stay a THUG?" can now be answered YES; CYBORG opens
 YES                     -> the dojo, in daylight, still carrying the knife (save.carryDark)
+WHITE BELT (victory)    -> after any won replay run past LIGHT: the light run restarts at
+                           fight 1, keeping perks, moves, ink and every open world
+win a SIMULANT run      -> save.simulantWon (CYBORG's replay run); GOD opens
+GOD's replay run        -> DEMON, and the page goes to hell with it (#app.demon)
 ```
+
+Past DARK the hub's DARK toggle becomes a WORLDS list (`openWorlds`). `WORLDS` and
+`BULLY_WIN_FLAG` in config.js are the ladder; every later world reuses the eight move
+`kind`s under new names, and borrows a soundtrack (`MUSIC_OF` in music.js).
+
+**Skill caps follow the worlds you have opened, not the page you stand on.** `perkMax(p, save,
+premium)` adds DARK's five levels once `darkUnlocked`, then one more per world after it, in
+every world. `PERK_CAP` stops STIFF JOINTS and INK SKIN where `derive()`'s floors make further
+levels dead; `moveMaxLv` does the same for a cooldown already at `MIN_CD`. INK WELL (`needs:
+'everWon'`) compounds ×1.12 per level on every fight's payout.
 
 The ACTIVE run lives at the top level of the save so every consumer reads `save.level` and
 `save.bully` unchanged; the other theme's copy waits in `save.stash` and `setTheme` swaps

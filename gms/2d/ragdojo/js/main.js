@@ -3,6 +3,7 @@
 import {
   SHEET_W, SHEET_H, GROUND_Y, TOTAL_LEVELS,
   playerRankAt, moveStats, derive, levelsFor, ranksFor, activeMoves, RANK_WORD,
+  WORLDS, worldOf, BULLY_WIN_FLAG, MOVE_SETS,
 } from './config.js';
 import { drawDesk, sheetShadow } from './paper.js';
 import { buildArena } from './arena.js';
@@ -34,7 +35,7 @@ let S = load();
 const LEVELS = () => levelsFor(S.theme);
 const RANKS = () => ranksFor(S.theme);
 const MOVES = () => activeMoves(S);
-if (DEV && qs.get('unlock')) { for (const m of [...activeMoves({ theme: 'light' }), ...activeMoves({ theme: 'dark' })]) S.moves[m.id] = { owned: true, power: 2, cd: 2 }; }
+if (DEV && qs.get('unlock')) { for (const m of Object.values(MOVE_SETS).flat()) S.moves[m.id] = { owned: true, power: 2, cd: 2 }; }
 let match = null;
 let sheet = null;
 let sheetLevel = -1;
@@ -88,13 +89,13 @@ const input = new Input(cvs, {
 });
 
 // ── screens ──────────────────────────────────────────────────────────────
-const SCREENS = ['boot', 'hub', 'shop', 'results', 'victory', 'settings', 'help', 'thug', 'premium'];
+const SCREENS = ['boot', 'hub', 'shop', 'results', 'victory', 'settings', 'help', 'thug', 'premium', 'worlds'];
 function show(name) {
   for (const s of SCREENS) $(s).classList.toggle('show', s === name);
   $('pauseBtn').classList.toggle('hidden', name !== null || !match || match.demo);
 }
 function overlay(name) {   // a panel on top of the hub
-  for (const s of ['shop', 'settings', 'help', 'results', 'victory', 'thug', 'premium']) $(s).classList.toggle('show', s === name);
+  for (const s of ['shop', 'settings', 'help', 'results', 'victory', 'thug', 'premium', 'worlds']) $(s).classList.toggle('show', s === name);
   $('pauseBtn').classList.toggle('hidden', !!name || mode !== 'fight');
 }
 
@@ -120,31 +121,46 @@ function setMode(m) {
  * with you.
  */
 function applyTheme() {
-  document.getElementById('app').classList.toggle('dark', S.theme === 'dark');
+  const app = document.getElementById('app');
+  for (const w of WORLDS) if (w.id !== 'light') app.classList.toggle(w.id, S.theme === w.id);
+  // GOD's replay run is the DEMON run, and the page goes to hell with it.
+  const demon = S.theme === 'god' && !!S.bully;
+  app.classList.toggle('demon', demon);
+  app.classList.toggle('night', worldOf(S.theme).night || demon);
   document.body.classList.toggle('dark', S.theme === 'dark');
 }
 
+/** Each world past LIGHT is opened by winning the previous world's replay run. */
+const worldEarned = (id) => id === 'light' || !!S[worldOf(id).flag];
+const worldOpen = (id) => id === 'light' || (worldEarned(id) && hasPremium());
 /** True once you have won a bully run in the light — that is what opens the door. */
-const darkOpen = () => !!S.darkUnlocked && hasPremium();
+const darkOpen = () => worldOpen('dark');
+/** Past DARK the single toggle becomes a list of worlds. */
+const manyWorlds = () => !!S.thugWon;
 /**
  * In the dark, the bully run is called being a THUG — and it stays called that in the
  * daylight if you walked back out still carrying the knives. The word follows the moves you
  * are holding, not the colour of the page.
  */
-const bullyWord = () => (S.theme === 'dark' || S.carryDark ? 'THUG' : 'BULLY');
+const bullyWord = () => (S.theme === 'light' && S.carryDark ? 'THUG' : worldOf(S.theme).bully);
+/** Who the first fight of a replay run is against, for the line under the button. */
+const FIRST_FOES = { light: 'white belts', dark: 'nobodies', cyborg: 'scrap', god: 'mortals' };
+/** What winning a world's campaign makes you. */
+const CHAMP_TITLE = { light: 'CHAMPION', dark: 'THE BOSS', cyborg: 'SINGULARITY', god: 'ALMIGHTY' };
 /** A thug run has been started but never finished — the state that gates the prompt. */
 const thugInPlay = () => !!(S.stash.dark ? S.stash.dark.bully : false) || (S.theme === 'dark' && S.bully);
 
-function setTheme(to, { keepMoves = null } = {}) {
-  if (to === 'dark' && !darkOpen()) { openUpgrade(); return; }
+function setTheme(to, { keepMoves = null, fresh = false } = {}) {
+  if (to !== 'light' && !worldOpen(to)) { if (!hasPremium()) openUpgrade(); return; }
   if (keepMoves && !hasPremium()) keepMoves = false;
-  if (to === S.theme) return;
+  if (to === S.theme && !fresh) return;
   S.stash[S.theme] = Object.fromEntries(RUN_KEYS.map((k) => [k, S[k]]));
-  const next = S.stash[to] || RUN();
+  // `fresh` starts the world's campaign again from fight 1. Its records are all-time and stay.
+  const next = fresh ? { ...RUN(), records: (S.stash[to] || RUN()).records } : (S.stash[to] || RUN());
   for (const k of RUN_KEYS) S[k] = next[k];
   S.theme = to;
   if (keepMoves !== null) S.carryDark = keepMoves;
-  else if (to === 'dark') S.carryDark = false;
+  else if (to !== 'light') S.carryDark = false;
   applyTheme();
   sheetLevel = -1;                    // the sheet is baked per level; force a rebuild
   persist(S);
@@ -172,7 +188,7 @@ function startDemo() {
 }
 
 function startFight(levelIdx, bully = false) {
-  if ((S.theme === 'dark' || S.carryDark) && !hasPremium()) { parkDark(); refreshHub(); openUpgrade(); return; }
+  if ((S.theme !== 'light' || S.carryDark) && !hasPremium()) { parkDark(); refreshHub(); openUpgrade(); return; }
   if (pendingCloud) { applyCloud(); toMenu(); return; }
   // Never trust the index: an out-of-range one throws inside the click handler, which looks
   // exactly like a button that does nothing.
@@ -216,7 +232,10 @@ function finishFight(result, m) {
   const won = result === 'win';
   const rankGap = L.tier - playerRankAt(L.idx);
   const bonus = won ? Math.round(m.level.reward * Math.max(0, rankGap) * 0.5) : 0;
-  const earned = won ? Math.round(m.level.reward + m.score * 0.12 + bonus) : Math.round(m.score * 0.05);
+  const inkMul = derive(S).inkMul;
+  const base = won ? m.level.reward + m.score * 0.12 + bonus : m.score * 0.05;
+  const earned = Math.round(base * inkMul);
+  const inkWell = earned - Math.round(base);
 
   S.ink += earned;
   S.totalInk += earned;
@@ -240,9 +259,9 @@ function finishFight(result, m) {
     if (wasFinal) {
       if (m.bully) {
         S.records.bullyRuns++;
-        // Winning a bully run is the key to the next world: the dojo's opens DARK, and the
-        // dark streets' (a THUG run) is what lets you carry a knife back into the light.
-        if (S.theme === 'light') S.darkUnlocked = true; else S.thugWon = true;
+        // Winning a bully run is the key to the next world: BULLY opens DARK, THUG opens
+        // CYBORG (and lets you carry a knife back into the light), SIMULANT opens GOD.
+        S[BULLY_WIN_FLAG[S.theme] || 'darkUnlocked'] = true;
       } else {
         S.completed = true;
         S.records.championships++;
@@ -252,7 +271,7 @@ function finishFight(result, m) {
   }
   persist(S);
   const gained = unlockedFightTracks(reachedLevel(null), S.theme).slice(tracksBefore).map((t) => TRACK_NAME[t.id] || t.id);
-  pendingResult = { result, m, earned, bonus, rankGap, wasFinal, bully: m.bully, gained };
+  pendingResult = { result, m, earned, bonus, rankGap, wasFinal, bully: m.bully, gained, inkWell, inkMul };
 
   // A bully run has a finish line too. Without this you beat the Ink Master a second time
   // and got a plain results card, then the hub handed you the same final fight for ever.
@@ -274,6 +293,7 @@ function showResults(R) {
     acc ? row('FLAWLESS', '+500') : '',
     R.bonus > 0 ? row(`Punching up (+${R.rankGap} rank)`, `+${R.bonus}`) : '',
     row('Score', Math.round(m.score)),
+    R.inkWell > 0 ? row(`Ink Well (×${R.inkMul.toFixed(2)})`, `+${R.inkWell}`) : '',
     `<div class="r big"><span>INK EARNED</span><b>+${R.earned}</b></div>`,
     R.gained && R.gained.length
       ? `<div class="r unlock"><span>♪ NEW MUSIC</span><b>${R.gained.join(' · ')}</b></div>` : '',
@@ -303,7 +323,7 @@ function showVictory(bully, justWon = true) {
   $('victory').querySelector('h2').textContent =
     !justWon ? (S.theme === 'dark' ? 'THE BOOK' : 'RECORD BOOK')
       : wasBully ? `${bullyWord()} CHAMPION`
-      : S.theme === 'dark' ? 'THE BOSS' : 'CHAMPION';
+      : CHAMP_TITLE[S.theme] || 'CHAMPION';
   $('vicBody').innerHTML = [
     `<div class="vichead">THIS RUN</div>`,
     row('Fights won', S.wins),
@@ -327,14 +347,21 @@ function showVictory(bully, justWon = true) {
   const BW = bullyWord();
   $('btnBully').textContent = wasBully ? `${BW} AGAIN` : `${BW} MODE`;
   resetAgainBtn();
+  resetBeltBtn();
+  // Won this world's replay run: you may walk back into the dojo as a white belt with every
+  // skill you have bought. Kept on the record book, not just the victory, so it stays reachable.
+  const canBelt = S.theme !== 'light' && !!S[BULLY_WIN_FLAG[S.theme]];
+  $('btnWhiteBelt').classList.toggle('hidden', !canBelt);
   // Every button gets a line. "Bully Mode" and "Keep Playing" sat side by side with only one
   // of them explained, and the difference between "start the campaign again as a black belt"
   // and "close this and carry on" is not something a label can carry on its own.
   const at = `fight ${hubLevel() + 1} of ${TOTAL_LEVELS}`;
   $('vicFine').innerHTML = [
     canBully ? `<b>${BW[0] + BW.slice(1).toLowerCase()} ${wasBully ? 'Again' : 'Mode'}</b>` +
-      ` — back to fight 1 against ${S.theme === 'dark' ? 'nobodies' : 'white belts'},` +
+      ` — back to fight 1 against ${FIRST_FOES[S.theme] || 'white belts'},` +
       ' keeping every upgrade and all your ink.' : '',
+    canBelt ? '<b>White Belt</b> — back to the dojo in daylight, fight 1, as a white belt.' +
+      ' Every skill, move and drop of ink comes with you.' : '',
     `<b>Keep Playing</b> — close this and carry on where you are (${at}).`,
     '<b>New Game</b> — wipe this run. Only the all-time records above are kept.',
   ].filter(Boolean).map((t) => `<span>${t}</span>`).join('');
@@ -364,7 +391,7 @@ function refreshHub() {
   const R = RANKS();
   const pr = R[bullyMode ? R.length - 1 : playerRankAt(idx)];
   const er = R[L.tier];
-  $('hubTitle').textContent = L.kind === 'final' ? 'THE INK MASTER'
+  $('hubTitle').textContent = L.kind === 'final' ? L.enemies[0].name
     : L.kind === 'champion' ? `${er.name.toUpperCase()} CHAMPION` : L.dojo;
   $('hubSub').textContent = `${L.title}  ·  fight ${idx + 1} of ${TOTAL_LEVELS}`;
   const gap = L.tier - (bullyMode ? R.length - 1 : playerRankAt(idx));
@@ -388,6 +415,15 @@ function refreshHub() {
   // won a bully run — you can see what you are working towards.
   const dk = $('btnDark');
   dk.classList.toggle('hidden', !S.everWon);
+  if (manyWorlds()) {
+    // Four worlds do not fit a toggle: the button names where you are and opens the list.
+    const w = worldOf(S.theme);
+    dk.classList.remove('locked');
+    dk.classList.toggle('on', S.theme !== 'light');
+    dk.textContent = `${w.icon} ${w.name}`;
+    dk.title = 'Choose a world';
+    return;
+  }
   dk.classList.toggle('locked', !darkOpen());
   dk.classList.toggle('on', S.theme === 'dark');
   dk.textContent = darkOpen() ? (S.theme === 'dark' ? '☀ LIGHT' : '☾ DARK') : '🔒 DARK';
@@ -477,6 +513,7 @@ $('btnFight').onclick = () => {
 $('btnTrophy').onclick = () => { click(); showVictory(S.bully, false); };
 $('btnDark').onclick = () => {
   click();
+  if (manyWorlds()) { openWorlds(); return; }
   if (!hasPremium()) { openUpgrade(); return; }
   if (!darkOpen()) {
     // Locked, and it says why rather than doing nothing.
@@ -508,6 +545,33 @@ function openThug() {
     : 'win as THUG to enable';
   overlay('thug');
 }
+/** Where each world sits on the ladder, and what it still wants from you if it is shut. */
+function openWorlds() {
+  const prev = (id) => WORLDS[WORLDS.findIndex((w) => w.id === id) - 1];
+  $('worldRows').innerHTML = WORLDS.map((w) => {
+    const here = S.theme === w.id;
+    const open = worldOpen(w.id);
+    const why = here ? 'you are here'
+      : open ? (S.stash[w.id] ? `fight ${Math.min(TOTAL_LEVELS, (S.stash[w.id].level | 0) + 1)}` : 'fight 1')
+      : !worldEarned(w.id) ? `win a ${prev(w.id).bully} run`
+      : 'needs the DARK upgrade';
+    return `<button class="btn world${here ? ' on' : ''}${open ? '' : ' locked'}" data-world="${w.id}"` +
+      `${open && !here ? '' : ' disabled'}><span>${open ? w.icon : '🔒'} ${w.name}</span><small>${why}</small></button>`;
+  }).join('');
+  $('worldRows').querySelectorAll('[data-world]').forEach((b) => {
+    b.onclick = () => {
+      click();
+      const to = b.dataset.world;
+      // Leaving the dark mid-THUG still gets asked whether to keep the knife.
+      if (to === 'light' && S.theme === 'dark' && thugInPlay()) { openThug(); return; }
+      overlay(null);
+      setTheme(to, { keepMoves: to === 'light' ? false : null });
+    };
+  });
+  overlay('worlds');
+}
+$('btnWorldsClose').onclick = () => { click(); overlay(null); };
+
 $('btnThugYes').onclick = () => { if (S.thugWon) { click(); overlay(null); setTheme('light', { keepMoves: true }); } };
 $('btnThugNo').onclick = () => { click(); overlay(null); setTheme('light', { keepMoves: false }); };
 $('btnThugClose').onclick = () => { click(); overlay(null); };
@@ -553,6 +617,26 @@ $('btnAgain').onclick = () => {
   S = { ...DEFAULT(), ...keep, newGamePlus: (S.newGamePlus || 0) + 1 };
   persist(S); overlay(null); setMode('hub'); refreshHub();
 };
+let armBelt = 0;
+$('btnWhiteBelt').onclick = () => {
+  click();
+  if (Date.now() > armBelt) {
+    armBelt = Date.now() + 6000;
+    $('btnWhiteBelt').textContent = 'SURE? RESTARTS THE DOJO';
+    $('btnWhiteBelt').classList.add('danger');
+    setTimeout(() => { if (Date.now() > armBelt - 200) resetBeltBtn(); }, 6000);
+    return;
+  }
+  resetBeltBtn();
+  overlay(null);
+  // The light run starts over; perks, moves, ink and every world you have opened stay.
+  setTheme('light', { keepMoves: false, fresh: true });
+};
+function resetBeltBtn() {
+  armBelt = 0;
+  $('btnWhiteBelt').textContent = 'WHITE BELT';
+  $('btnWhiteBelt').classList.remove('danger');
+}
 function resetAgainBtn() {
   armAgain = 0;
   $('btnAgain').textContent = 'NEW GAME';
@@ -563,6 +647,7 @@ $('btnBully').onclick = () => {
   // Bully mode KEEPS your progress, it does not hand you a maxed save. Maxing everything
   // ended the game twice over: nothing left to buy, and nothing left to earn ink for.
   S.bully = true; S.bullyLevel = 0;
+  applyTheme();
   persist(S); overlay(null); setMode('hub'); refreshHub();
 };
 const leaveVictory = () => { click(); overlay(null); setMode('hub'); refreshHub(); };
@@ -577,7 +662,7 @@ $('btnResClose').onclick = () => { click(); overlay(null); toMenu(); };
  * panel you were reading. The results card is deliberately absent: after a fight your thumb
  * is already moving, and a stray tap there should not skip past the report.
  */
-const DISMISS = { shop: 'btnShopClose', settings: 'btnSetClose', help: 'btnHelpClose', victory: 'btnVicClose' };
+const DISMISS = { shop: 'btnShopClose', settings: 'btnSetClose', help: 'btnHelpClose', victory: 'btnVicClose', worlds: 'btnWorldsClose' };
 for (const id in DISMISS) {
   const el = $(id);
   let downOnBackdrop = false;
@@ -604,7 +689,7 @@ $('btnWipe').onclick = () => {
 };
 
 function openShop() {
-  buildShop($('shopList'), $('shopInk'), S, () => { persist(S); refreshHub(); });
+  buildShop($('shopList'), $('shopInk'), S, () => { persist(S); refreshHub(); }, hasPremium());
   overlay('shop');
 }
 function openSettings() {
@@ -791,8 +876,8 @@ if (DEV) window.__input = input;
 // Paid access never deletes earned progress. Park the dark run intact while signed out,
 // refunded or offline; restoring ownership lets the player resume it from the DARK button.
 function parkDark() {
-  if (S.theme === 'dark') {
-    S.stash.dark = Object.fromEntries(RUN_KEYS.map(k => [k, S[k]]));
+  if (S.theme !== 'light') {
+    S.stash[S.theme] = Object.fromEntries(RUN_KEYS.map(k => [k, S[k]]));
     const light = S.stash.light || RUN();
     for (const k of RUN_KEYS) S[k] = light[k];
     S.theme = 'light';
@@ -861,7 +946,7 @@ if (ACCOUNTS && !DEV) {
       conflict: value => {
         $('cloudChoice').classList.toggle('hidden', !value);
         if (value) {
-          const describe = data => `${data?.save?.theme === 'dark' ? 'DARK' : 'LIGHT'}, fight ${(data?.save?.level || 0) + 1}, ${data?.save?.wins || 0} wins`;
+          const describe = data => `${worldOf(data?.save?.theme).name}, fight ${(data?.save?.level || 0) + 1}, ${data?.save?.wins || 0} wins`;
           $('cloudSummary').textContent = `This device: ${describe(value.local)}. Cloud: ${describe(value.remote)}.`;
           $('btnCloudRetry').textContent = 'CHOOSE CLOUD SAVE';
           if (mode !== 'fight') openSettings();
@@ -869,7 +954,7 @@ if (ACCOUNTS && !DEV) {
       },
     });
     purchases = new Purchases(account.auth, fetch, owned => {
-      if (!owned && (S.theme === 'dark' || S.carryDark)) { parkDark(); toMenu(); }
+      if (!owned && (S.theme !== 'light' || S.carryDark)) { parkDark(); toMenu(); }
       refreshHub();
     });
     account.auth.onChange(() => { void restorePurchase(); });

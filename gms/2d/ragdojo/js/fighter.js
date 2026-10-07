@@ -171,7 +171,11 @@ export class Fighter {
     if (!D) return false;
     D.id = m.id;
     D.kind = m.kind || m.id;
+    const airborne = !this.onGround;
     this.beginAttack(m.id, D);
+    // A slam started in the air drives you down onto whoever is underneath, wound up, and
+    // the shockwave goes off where you land rather than in mid-air over their head.
+    if (D.kind === 'slam' && airborne) { this.attack.dive = true; this.vx *= 0.35; }
     if (D.hopV) { this.vy = -D.hopV; this.onGround = false; }
     if (D.dashV) this.vx = D.dashV * this.facing * (m.id === 'flipB' ? 1 : 1);
     return true;
@@ -319,6 +323,10 @@ export class Fighter {
     if (this.attack) {
       const A = this.attack;
       A.t += dt;
+      if (A.dive) {
+        if (this.onGround) A.dive = false;
+        else { A.t = Math.min(A.t, 0.12); this.vy = Math.max(this.vy, 1700); this.vx *= Math.pow(0.05, dt); }
+      }
       const s = sample(A.def.anim, A.t, A.def.spin ? A.def.spin * Math.min(1, A.t / 0.5) * Math.PI * 2 : 0);
       const anim = { guard: 1 }[A.def.anim] ? null : A.def.anim;
       this.animT = A.t;

@@ -62,7 +62,7 @@
         <button class="icon close" id="btnPremiumClose" aria-label="Close upgrade">✕</button>
         <h2>AFTER DARK</h2>
         <div class="rows">
-          <p>One permanent upgrade: 45 DARK fights, eight dark moves, deeper skill training, ten after-dark tracks and THUG replay.</p>
+          <p>One permanent upgrade: 45 DARK fights, eight dark moves, deeper skill training, ten after-dark tracks and THUG replay — and beyond it, the CYBORG and GOD worlds.</p>
           <p>Complete LIGHT and win a BULLY run to enter. LIGHT’s 45 fights and BULLY replay stay free.</p>
           <p>Already played DARK? Your earned progress is kept. Purchase is now required to access it.</p>
           <p id="purchaseStatus" role="status"></p>
@@ -110,6 +110,7 @@
         <div id="vicBody" class="rows"></div>
         <div class="vicbtns">
           <button id="btnBully" class="btn bully">BULLY MODE</button>
+          <button id="btnWhiteBelt" class="btn hidden">WHITE BELT</button>
           <button id="btnVicMenu" class="btn">KEEP PLAYING</button>
           <button id="btnAgain" class="btn">NEW GAME</button>
         </div>
@@ -146,6 +147,16 @@
           <button id="btnThugNo" class="btn">NO</button>
         </div>
         <p class="fine" id="thugFine"></p>
+      </div>
+    </div>
+
+    <!-- the world ladder, once there are more than two -->
+    <div id="worlds" class="screen panel-screen">
+      <div class="sheet narrow">
+        <button class="icon close" id="btnWorldsClose" aria-label="Close worlds">✕</button>
+        <h2>WORLDS</h2>
+        <div class="rows" id="worldRows"></div>
+        <p class="fine">Ink, skills and moves go with you. Each world keeps its own run and records.</p>
       </div>
     </div>
 

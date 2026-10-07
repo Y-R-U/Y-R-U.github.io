@@ -30,7 +30,7 @@ globalThis.requestAnimationFrame = (fn) => setTimeout(() => fn(Date.now()), 0);
 const { Match } = await import('../js/match.js');
 const {
   LEVELS, TOTAL_LEVELS, MOVES, PERKS, moveBuyCost, movePowerCost, moveCdCost,
-  perkCost, MOVE_MAX_LV, playerRankAt, RANKS,
+  perkCost, perkLocked, MOVE_MAX_LV, playerRankAt, RANKS,
 } = await import('../js/config.js');
 const { DEFAULT } = await import('../js/save.js');
 
@@ -75,6 +75,7 @@ function spend(save) {
     }
     for (const p of PERKS) {
       const lv = save.perks[p.id] || 0;
+      if (perkLocked(p, save)) continue;
       if (lv < p.max) opts.push({ c: perkCost(p, lv), f: () => { save.perks[p.id] = lv + 1; } });
     }
     const afford = opts.filter((o) => o.c <= save.ink).sort((a, b) => a.c - b.c);

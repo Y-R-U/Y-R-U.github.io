@@ -1,4 +1,4 @@
-import { TOTAL_LEVELS } from './config.js';
+import { TOTAL_LEVELS, THEMES } from './config.js';
 
 export const KEY = 'ragdojo.save.v2';
 const listeners = new Set();
@@ -33,6 +33,8 @@ export const DEFAULT = () => ({
   darkUnlocked: false,       // won a LIGHT bully run — this is what opens DARK
   thugWon: false,            // won a DARK bully (THUG) run
   carryDark: false,          // said yes to "stay a THUG": dark moves in the light world
+  simulantWon: false,        // won a CYBORG bully (SIMULANT) run — opens GOD
+  demonWon: false,           // won a GOD bully (DEMON) run
   ink: 0,
   perks: {},
   moves: { power: { owned: true, power: 0, cd: 0 }, d_shank: { owned: true, power: 0, cd: 0 } },
@@ -62,10 +64,10 @@ export function load() {
     s.moves = { ...DEFAULT().moves, ...(s.moves || {}) };
     // A save from before the light/dark split has already won if it says it is completed.
     if (s.completed) s.everWon = true;
-    if (s.theme !== 'dark') s.theme = 'light';
+    if (!THEMES.includes(s.theme)) s.theme = 'light';
     Object.assign(s, healRun(s));
     s.stash = s.stash && typeof s.stash === 'object' ? s.stash : {};
-    for (const t of ['light', 'dark']) {
+    for (const t of THEMES) {
       if (t !== s.theme && s.stash[t]) s.stash[t] = healRun(s.stash[t]);
     }
     return s;

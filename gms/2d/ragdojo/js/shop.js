@@ -2,7 +2,7 @@
 // input at the moment you buy it.
 
 import {
-  PERKS, MOVE_MAX_LV, moveBuyCost, movePowerCost, moveCdCost, perkCost, perkMax,
+  PERKS, moveMaxLv, moveBuyCost, movePowerCost, moveCdCost, perkCost, perkMax, perkLocked,
   moveStats, playerRankAt, ranksFor, activeMoves, RANK_WORD,
 } from './config.js';
 import { glyphPoints, glyphStart } from './gestures.js';
@@ -63,7 +63,7 @@ export function stopShopTicker() {
   tickHandle = null;
 }
 
-export function buildShop(listEl, inkEl, S, onChange) {
+export function buildShop(listEl, inkEl, S, onChange, premium = true) {
   let tab = 'moves';
   const tabs = document.querySelectorAll('#shop .tab');
   // Reopening the shop resets `tab` to moves, so the buttons have to be reset too —
@@ -143,23 +143,25 @@ export function buildShop(listEl, inkEl, S, onChange) {
               ` · COOLDOWN <b>${cur.cooldown.toFixed(1)}s</b>` +
               ` · KNOCKBACK <b>${Math.round(cur.knockback)}</b></div>`);
           }
-          const mk = (label, lv, cost, apply) => {
+          const mk = (label, lv, max, cost, apply) => {
             const wrap = document.createElement('span');
             wrap.className = 'crow';
             const b = document.createElement('button');
             b.className = 'buy';
-            if (lv >= MOVE_MAX_LV) { b.textContent = `${label} MAX`; b.disabled = true; }
+            if (lv >= max) { b.textContent = `${label} MAX`; b.disabled = true; }
             else {
               b.textContent = `${label} · ${cost}`;
               b.disabled = S.ink < cost;
               b.onclick = () => buy(cost, apply);
             }
             wrap.appendChild(b);
-            wrap.insertAdjacentHTML('beforeend', dots(lv, MOVE_MAX_LV));
+            wrap.insertAdjacentHTML('beforeend', dots(lv, max));
             return wrap;
           };
-          row.appendChild(mk('POWER', st.power, movePowerCost(m, st.power), () => { S.moves[m.id].power++; }));
-          row.appendChild(mk('COOLDOWN', st.cd, moveCdCost(m, st.cd), () => { S.moves[m.id].cd++; }));
+          row.appendChild(mk('POWER', st.power, moveMaxLv(S, m, 'power', premium),
+            movePowerCost(m, st.power), () => { S.moves[m.id].power++; }));
+          row.appendChild(mk('COOLDOWN', st.cd, moveMaxLv(S, m, 'cd', premium),
+            moveCdCost(m, st.cd), () => { S.moves[m.id].cd++; }));
         }
         body.appendChild(row);
         card.appendChild(body);
@@ -169,10 +171,11 @@ export function buildShop(listEl, inkEl, S, onChange) {
       PERKS.forEach((p) => {
         const lv = S.perks[p.id] || 0;
         const cost = perkCost(p, lv);
-        const max = perkMax(p, S.theme);
+        const max = perkMax(p, S, premium);
         const maxed = lv >= max;
+        const locked = perkLocked(p, S);
         const card = document.createElement('div');
-        card.className = 'card';
+        card.className = 'card' + (locked ? ' locked' : '');
         const body = document.createElement('div');
         body.className = 'cbody';
         body.innerHTML =
@@ -183,14 +186,15 @@ export function buildShop(listEl, inkEl, S, onChange) {
         row.className = 'crow';
         const b = document.createElement('button');
         b.className = 'buy';
-        if (maxed) { b.textContent = `MAX · ${p.fmt(lv)}`; b.disabled = true; }
+        if (locked) { b.textContent = `UPGRADE · ${cost}`; b.disabled = true; }
+        else if (maxed) { b.textContent = `MAX · ${p.fmt(lv)}`; b.disabled = true; }
         else {
           b.textContent = `UPGRADE · ${cost}`;
           b.disabled = S.ink < cost;
           b.onclick = () => buy(cost, () => { S.perks[p.id] = lv + 1; });
         }
         row.appendChild(b);
-        row.insertAdjacentHTML('beforeend', dots(lv, max));
+        row.insertAdjacentHTML('beforeend', locked ? `<span class="lv">${p.needsText}</span>` : dots(lv, max));
         body.appendChild(row);
         card.appendChild(body);
         listEl.appendChild(card);

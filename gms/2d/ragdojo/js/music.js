@@ -34,7 +34,10 @@ export const ROLE = {
   light: { menu: 'menu', boss: 'boss', final: 'final', victory: 'victory' },
   dark:  { menu: 'dmenu', boss: 'dboss', final: 'dfinal', victory: 'dvictory' },
 };
-export const roleTrack = (theme, role) => (ROLE[theme] || ROLE.light)[role];
+/** The later worlds borrow a soundtrack: CYBORG is a night page, GOD a daylit one. */
+const MUSIC_OF = { cyborg: 'dark', god: 'light' };
+const musicTheme = (theme) => MUSIC_OF[theme] || theme;
+export const roleTrack = (theme, role) => (ROLE[musicTheme(theme)] || ROLE.light)[role];
 
 export const TRACK_NAME = {
   menu: 'Sharpened Pencils',
@@ -94,7 +97,7 @@ export const FIGHT_POOLS = {
     { id: 'dfight6', unlockAt: 15 },
   ],
 };
-export const poolFor = (theme) => FIGHT_POOLS[theme] || FIGHT_POOLS.light;
+export const poolFor = (theme) => FIGHT_POOLS[musicTheme(theme)] || FIGHT_POOLS.light;
 export const FIGHT_POOL = FIGHT_POOLS.light;
 
 export const UNLOCK_GATES = { light: [10, 20, 30], dark: [15] };
