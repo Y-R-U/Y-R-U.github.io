@@ -1,7 +1,7 @@
-import { register, collect, pick, shuffle } from '../../formats/registry.js?v=202610051408';
-import { geo, countryIds, isPlayable, REGIONS, createMap, frame, message, button, isKids, cname, theName, byLevel, refFor, supportsGeo, bboxUnion, plural } from './common.js?v=202610051408';
-import { makeProjection, projectedBox, haversineKm } from '../proj.js?v=202610051408';
-import { regionFor } from '../regions.js?v=202610051408';
+import { register, collect, pick, shuffle } from '../../formats/registry.js?v=202610071242';
+import { geo, countryIds, isPlayable, REGIONS, createMap, frame, message, button, isKids, cname, theName, byLevel, refFor, supportsGeo, bboxUnion, plural } from './common.js?v=202610071242';
+import { makeProjection, projectedBox, haversineKm } from '../proj.js?v=202610071242';
+import { regionFor } from '../regions.js?v=202610071242';
 
 // Borders that surprise people, explained on the reveal.
 const NOTES = {

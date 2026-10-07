@@ -8,6 +8,8 @@ export function getCtx() {
   if (ctx) return ctx;
   const AC = globalThis.AudioContext || globalThis.webkitAudioContext;
   if (!AC) return null;
+  // iOS mutes Web Audio under the ringer's silent switch unless the session is "playback" (Safari 16.4+).
+  try { if (navigator.audioSession) navigator.audioSession.type = 'playback'; } catch {}
   ctx = new AC({ latencyHint: 'interactive' });
   comp = ctx.createDynamicsCompressor();
   comp.threshold.value = -10; comp.knee.value = 8; comp.ratio.value = 4;
@@ -61,10 +63,26 @@ export function unlock() {
     const b = c.createBuffer(1, 1, 22050), s = c.createBufferSource();
     s.buffer = b; s.connect(c.destination); s.start(0);
   } catch {}
+  if (!navigator.audioSession) silentKeepAlive();
   return c.resume().then(() => {
     if (!unlocked) { unlocked = true; unlockCbs.splice(0).forEach((f) => { try { f(); } catch {} }); }
     return true;
   }).catch(() => false);
+}
+
+// Older iOS: a looping silent <audio> started in a gesture moves the session to playback so Web Audio ignores
+// the silent switch. Flagged __cluedBgm so the media patch doesn't treat it as "something is playing".
+let keepAlive = null;
+function silentKeepAlive() {
+  if (keepAlive || !/iP(hone|ad|od)|Macintosh.*Mobile/.test(navigator.userAgent || '')) return;
+  const n = 2000, buf = new ArrayBuffer(44 + n * 2), v = new DataView(buf);
+  const str = (o, t) => [...t].forEach((ch, i) => v.setUint8(o + i, ch.charCodeAt(0)));
+  str(0, 'RIFF'); v.setUint32(4, 36 + n * 2, true); str(8, 'WAVEfmt '); v.setUint32(16, 16, true);
+  v.setUint16(20, 1, true); v.setUint16(22, 1, true); v.setUint32(24, 8000, true); v.setUint32(28, 16000, true);
+  v.setUint16(32, 2, true); v.setUint16(34, 16, true); str(36, 'data'); v.setUint32(40, n * 2, true);
+  keepAlive = new Audio(URL.createObjectURL(new Blob([buf], { type: 'audio/wav' })));
+  keepAlive.__cluedBgm = true; keepAlive.loop = true; keepAlive.setAttribute('playsinline', '');
+  keepAlive.play()?.catch?.(() => { keepAlive = null; });
 }
 
 // call once at boot; resumes on the first real gesture (and again after iOS interruptions)

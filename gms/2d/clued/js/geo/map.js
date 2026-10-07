@@ -1,10 +1,10 @@
 // CLUED map component. SVG, projected once; pan/zoom via a CSS transform during gestures, committed on release.
 // API documented in docs/notes/M.md.
-import { makeProjection, projectedBox, greatCircle } from './proj.js?v=202610051408';
-import { features as topoFeatures } from './topo.js?v=202610051408';
-import { loadIndex, loadWorld, loadRegionFile, loadStatesFile, loadMarine, geo, isPlayable, regionMembers } from './data.js?v=202610051408';
-import { regionFor } from './regions.js?v=202610051408';
-import { injectStyle, POLITICAL, CONTINENT_FILL } from './style.js?v=202610051408';
+import { makeProjection, projectedBox, greatCircle } from './proj.js?v=202610071242';
+import { features as topoFeatures } from './topo.js?v=202610071242';
+import { loadIndex, loadWorld, loadRegionFile, loadStatesFile, loadMarine, geo, isPlayable, regionMembers } from './data.js?v=202610071242';
+import { regionFor } from './regions.js?v=202610071242';
+import { injectStyle, POLITICAL, CONTINENT_FILL } from './style.js?v=202610071242';
 
 const NS = 'http://www.w3.org/2000/svg';
 const U = 1000;

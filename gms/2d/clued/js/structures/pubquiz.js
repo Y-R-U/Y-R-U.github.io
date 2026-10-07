@@ -1,17 +1,17 @@
 // Pub quiz: 4–8 rounds of different formats/themes, one double-points joker per player, builder or "surprise me".
-import { playSpec } from './session.js?v=202610051408';
-import { makeSpec, supportedPackIds } from '../core/spec.js?v=202610051408';
-import { handoff } from './handoff.js?v=202610051408';
-import { playersEditor } from './party.js?v=202610051408';
-import { defineScreen, go, back, header } from '../ui/app.js?v=202610051408';
-import { h, esc, fmtNum } from '../ui/kit.js?v=202610051408';
-import { popup, toast } from '../ui/popup.js?v=202610051408';
-import { listFormats, getFormat, defaultOpts } from '../formats/registry.js?v=202610051408';
-import { getIndex } from '../core/packs.js?v=202610051408';
-import { getSettings, read, write } from '../core/store.js?v=202610051408';
-import { optionsPanel } from '../ui/setup.js?v=202610051408';
-import { rngFrom, pick, shuffle, randomSeed } from '../core/rng.js?v=202610051408';
-import { sfx } from '../ui/fx.js?v=202610051408';
+import { playSpec } from './session.js?v=202610071242';
+import { makeSpec, supportedPackIds } from '../core/spec.js?v=202610071242';
+import { handoff } from './handoff.js?v=202610071242';
+import { playersEditor } from './party.js?v=202610071242';
+import { defineScreen, go, back, header } from '../ui/app.js?v=202610071242';
+import { h, esc, fmtNum } from '../ui/kit.js?v=202610071242';
+import { popup, toast } from '../ui/popup.js?v=202610071242';
+import { listFormats, getFormat, defaultOpts } from '../formats/registry.js?v=202610071242';
+import { getIndex } from '../core/packs.js?v=202610071242';
+import { getSettings, read, write } from '../core/store.js?v=202610071242';
+import { optionsPanel } from '../ui/setup.js?v=202610071242';
+import { rngFrom, pick, shuffle, randomSeed } from '../core/rng.js?v=202610071242';
+import { sfx } from '../ui/fx.js?v=202610071242';
 
 const KEY = 'clued.pubquiz';
 const MAX_ROUNDS = 8;

@@ -1,15 +1,15 @@
 // Flashcards: deck picker and the Leitner review session.
-import { h } from '../ui/kit.js?v=202610051408';
-import { header, go, back } from '../ui/app.js?v=202610051408';
-import { popup } from '../ui/popup.js?v=202610051408';
-import { sfx, haptic, confetti } from '../ui/fx.js?v=202610051408';
-import { addStars } from '../ui/stickers.js?v=202610051408';
-import { getIndex } from '../core/packs.js?v=202610051408';
-import { themeTree, getPack, itemsFor, refOf, thumb, factRows, kidsOn } from './data.js?v=202610051408';
-import { getCards, updateCards, gradeCard, today } from './model.js?v=202610051408';
-import { buildQueue, dueSummary, INTERVALS, MAX_BOX } from './srs.js?v=202610051408';
-import { carousel } from './item.js?v=202610051408';
-import { say, sayBtn, emptyState, notice, stopAudio, soundBtn, put } from './ui.js?v=202610051408';
+import { h } from '../ui/kit.js?v=202610071242';
+import { header, go, back } from '../ui/app.js?v=202610071242';
+import { popup } from '../ui/popup.js?v=202610071242';
+import { sfx, haptic, confetti } from '../ui/fx.js?v=202610071242';
+import { addStars } from '../ui/stickers.js?v=202610071242';
+import { getIndex } from '../core/packs.js?v=202610071242';
+import { themeTree, getPack, itemsFor, refOf, thumb, factRows, kidsOn } from './data.js?v=202610071242';
+import { getCards, updateCards, gradeCard, today } from './model.js?v=202610071242';
+import { buildQueue, dueSummary, INTERVALS, MAX_BOX } from './srs.js?v=202610071242';
+import { carousel } from './item.js?v=202610071242';
+import { say, sayBtn, emptyState, notice, stopAudio, soundBtn, put } from './ui.js?v=202610071242';
 
 const KIDS_STAR_CAP = 10;
 

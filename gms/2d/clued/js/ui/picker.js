@@ -1,7 +1,7 @@
 // Theme picker: "All" by default, or a Theme -> packs tree with multi-select. Unsupported packs are greyed with a reason.
-import { h } from './kit.js?v=202610051408';
-import { getIndex } from '../core/packs.js?v=202610051408';
-import { supportsPack } from '../formats/registry.js?v=202610051408';
+import { h } from './kit.js?v=202610071242';
+import { getIndex } from '../core/packs.js?v=202610071242';
+import { supportsPack } from '../formats/registry.js?v=202610071242';
 
 export function themePicker(host, { fmt, selected = 'all', kids = false, onChange = () => {} } = {}) {
   const index = getIndex();

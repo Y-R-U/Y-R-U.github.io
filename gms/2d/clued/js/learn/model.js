@@ -1,7 +1,7 @@
 // Learn state in localStorage (synced keys clued.cards and clued.mastery, see CONTRACT.md).
-import { read, write, KEYS } from '../core/store.js?v=202610051408';
-import * as srs from './srs.js?v=202610051408';
-import * as M from './mastery.js?v=202610051408';
+import { read, write, KEYS } from '../core/store.js?v=202610071242';
+import * as srs from './srs.js?v=202610071242';
+import * as M from './mastery.js?v=202610071242';
 
 export const today = () => srs.dayNumber();
 

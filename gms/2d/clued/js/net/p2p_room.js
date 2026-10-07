@@ -1,6 +1,6 @@
 // Device-hosted room logic: a port of server/rooms.go + scoring.go so the host's tab can be the room
 // server. Pure (no DOM, no network), so tools/p2p_test.mjs runs it in node. State shape = the server's.
-import { stageMultiplier, withStreak, progressiveLimit, stageExtendMs, PROGRESSIVE_CAP } from '../core/scoring.js?v=202610051408';
+import { stageMultiplier, withStreak, progressiveLimit, stageExtendMs, PROGRESSIVE_CAP } from '../core/scoring.js?v=202610071242';
 export { stageMultiplier, withStreak };
 
 export const MAX_PLAYERS = 8;

@@ -1,11 +1,11 @@
 // Device-hosted rooms: the host's tab runs P2PRoom and serves players over WebRTC data channels.
 // Signalling goes through the free PeerJS cloud broker (0.peerjs.com); no server of ours is involved.
 // Implements the transport interface in transport.js, so room.js / join.js work unchanged. docs/notes/P2P.md.
-import { P2PRoom, newCode, MAX_PLAYERS } from './p2p_room.js?v=202610051408';
-import { registerTransport, fallback } from './transport.js?v=202610051408';
-import { bootParam } from './api.js?v=202610051408';
-import { saveSeat } from './util.js?v=202610051408';
-import { lobbyNote, hostBackWarning } from './p2p_ui.js?v=202610051408';
+import { P2PRoom, newCode, MAX_PLAYERS } from './p2p_room.js?v=202610071242';
+import { registerTransport, fallback } from './transport.js?v=202610071242';
+import { bootParam } from './api.js?v=202610071242';
+import { saveSeat } from './util.js?v=202610071242';
+import { lobbyNote, hostBackWarning } from './p2p_ui.js?v=202610071242';
 
 export const PEER_PREFIX = 'clued-p2p-';
 const ICE = [{ urls: 'stun:stun.l.google.com:19302' }, { urls: 'stun:stun1.l.google.com:19302' }];
@@ -30,7 +30,7 @@ const fromRes = e => new P2PError(e?.error || 'error', MSG[e?.error] || e?.messa
   e?.error === 'bad_key' ? 403 : e?.error === 'kicked' ? 410 : e?.error === 'room_not_found' || e?.error === 'not_yet' ? 404 : CONFLICT.has(e?.error) ? 409 : 400);
 
 let PeerP = null;
-const loadPeer = () => PeerP || (PeerP = import('../vendor/peerjs.js?v=202610051408').then(m => m.Peer));
+const loadPeer = () => PeerP || (PeerP = import('../vendor/peerjs.js?v=202610071242').then(m => m.Peer));
 
 // ?peerhost=host:port[:path] points at a self-run PeerJS server (testing / future self-hosting).
 function peerOptions() {
@@ -433,8 +433,8 @@ stats.transport = p2pTransport;   // test hook (tools/p2p_e2e.mjs)
 
 // Server refused (busy / paused): host the same prepared game from this device.
 fallback.host = async opts => {
-  const { go } = await import('../ui/app.js?v=202610051408');
-  const { toast } = await import('../ui/popup.js?v=202610051408');
+  const { go } = await import('../ui/app.js?v=202610071242');
+  const { toast } = await import('../ui/popup.js?v=202610071242');
   try {
     const res = await p2pTransport.create(opts);
     saveSeat(res.code, { key: res.playerKey, id: res.playerId, via: 'p2p' });
