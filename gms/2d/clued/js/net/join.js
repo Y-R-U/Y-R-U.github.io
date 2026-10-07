@@ -1,14 +1,14 @@
 // Online hub, join-by-name screen and host setup. Joining needs only a name.
-import { h } from '../ui/kit.js?v=202610071438';
-import { defineScreen, go, header, current } from '../ui/app.js?v=202610071438';
-import { sfx } from '../ui/fx.js?v=202610071438';
-import { getFormat } from '../formats/registry.js?v=202610071438';
-import { rooms, friendly } from './api.js?v=202610071438';
-import { suggestedName, rememberName, tidyName, MAX_NAME } from './ident.js?v=202610071438';
-import { ensureStyles, saveSeat, loadSeat, dropSeat, cleanCode, validCode, setQuery, mmss } from './util.js?v=202610071438';
-import { packInfo } from '../core/packs.js?v=202610071438';
-import { getTransport, hasTransport } from './transport.js?v=202610071438';
-import { signInPrompt, busyText } from './signin.js?v=202610071438';
+import { h } from '../ui/kit.js?v=202610071629';
+import { defineScreen, go, header, current } from '../ui/app.js?v=202610071629';
+import { sfx } from '../ui/fx.js?v=202610071629';
+import { getFormat } from '../formats/registry.js?v=202610071629';
+import { rooms, friendly } from './api.js?v=202610071629';
+import { suggestedName, rememberName, tidyName, MAX_NAME } from './ident.js?v=202610071629';
+import { ensureStyles, saveSeat, loadSeat, dropSeat, cleanCode, validCode, setQuery, mmss } from './util.js?v=202610071629';
+import { packInfo } from '../core/packs.js?v=202610071629';
+import { getTransport, hasTransport } from './transport.js?v=202610071629';
+import { signInPrompt, busyText } from './signin.js?v=202610071629';
 
 
 export function nameField(value = '') {
@@ -51,6 +51,8 @@ defineScreen('online', (el, params, cur) => {
   const code = codeField();
   const err = h('p.net-err', { role: 'alert' });
   const pubList = h('div.net-pubs', {}, h('div.net-wait', {}, 'Looking for public games', h('span.dots')));
+  const pubSec = h('div.stack', {}, h('h3.sec-title', {}, 'Public games'), pubList);
+  const live = h('button.net-livechip', { type: 'button', hidden: true, onclick: () => pubSec.scrollIntoView({ behavior: 'smooth', block: 'start' }) });
   const joinForm = h('form.net-form', {}, h('label', {}, 'Join with a code'), code, err, h('button.btn.primary.wide', { type: 'submit' }, 'Join'));
   joinForm.addEventListener('submit', e => {
     e.preventDefault();
@@ -60,13 +62,13 @@ defineScreen('online', (el, params, cur) => {
   });
   el.append(header('Play online'),
     h('div.net-wrap', {},
-      h('div.net-hero', {}, h('div', { style: { fontSize: '48px' } }, '🌐'), h('h2', {}, 'Play with friends'), h('p', {}, 'Host a game and share the link. Friends type a name and they’re in. No sign-in needed.')),
+      h('div.net-hero', {}, live, h('div', { style: { fontSize: '48px' } }, '🌐'), h('h2', {}, 'Play with friends'), h('p', {}, 'Host a game and share the link. Friends type a name and they’re in. No sign-in needed.')),
       h('div.panel.stack', {}, h('h3', {}, 'Host a game'), h('p.muted', { style: { margin: 0 } }, 'Add rounds, pick themes (or a ♥ favourite) for each, then share the link or QR code.'),
         h('button.btn.go.big.wide', { type: 'button', dataset: { act: 'host' }, onclick: () => go('host') }, 'Host a game'),
         hasTransport('p2p') ? h('button.btn.wide', { type: 'button', dataset: { act: 'host-device' }, onclick: () => go('host', { via: 'p2p' }) }, '📡 Host from this device (no server)') : null,
         hasTransport('p2p') ? h('p.net-note', { style: { margin: 0 } }, 'Device rooms need no server: your phone or laptop runs the game for up to 8 players.') : null),
       h('div.panel', {}, joinForm),
-      h('div.stack', {}, h('h3.sec-title', {}, 'Public games'), pubList),
+      pubSec,
       h('p.net-note', {}, 'Challenge links: finish any game and tap “Challenge a friend” to share the same questions.')));
   let cards = [], stop = false, timer = null;
   async function load() {
@@ -76,6 +78,8 @@ defineScreen('online', (el, params, cur) => {
       if (stop || cur !== current()) return;
       const offset = d.now - Date.now();
       cards = d.rooms.map(r => publicCard(r, offset));
+      live.hidden = !cards.length;
+      live.textContent = `🟢 ${cards.length} public game${cards.length === 1 ? '' : 's'} open`;
       pubList.replaceChildren(...(cards.length ? cards.map(c => c.el) : [h('p.net-note', {}, 'No public games right now. Host one and pick “Public”.')]));
     } catch (e) {
       pubList.replaceChildren(h('p.net-note', {}, friendly(e)));

@@ -1,16 +1,16 @@
 // Learn tab entry (lane L). The shell calls openLearn(el, ctx) to render the 'learn' screen.
-import { h } from '../ui/kit.js?v=202610071438';
-import { defineScreen, header, go } from '../ui/app.js?v=202610071438';
-import { sfx } from '../ui/fx.js?v=202610071438';
-import { install, ensureCss } from './hook.js?v=202610071438';
-import { badgeCount, getCards } from './model.js?v=202610071438';
-import { getIndex } from '../core/packs.js?v=202610071438';
-import { kidsOn } from './data.js?v=202610071438';
-import { kidsProgress } from '../ui/stickers.js?v=202610071438';
-import { WIDE } from './ui.js?v=202610071438';
-import { BUILD } from '../build.js?v=202610071438';
+import { h } from '../ui/kit.js?v=202610071629';
+import { defineScreen, header, go } from '../ui/app.js?v=202610071629';
+import { sfx } from '../ui/fx.js?v=202610071629';
+import { install, ensureCss } from './hook.js?v=202610071629';
+import { badgeCount, getCards } from './model.js?v=202610071629';
+import { getIndex } from '../core/packs.js?v=202610071629';
+import { kidsOn } from './data.js?v=202610071629';
+import { kidsProgress } from '../ui/stickers.js?v=202610071629';
+import { WIDE } from './ui.js?v=202610071629';
+import { BUILD } from '../build.js?v=202610071629';
 
-export { install, feed } from './hook.js?v=202610071438';
+export { install, feed } from './hook.js?v=202610071629';
 
 const lazy = file => () => import(`./${file}.js?v=${BUILD}`);
 const SCREENS = {
@@ -50,11 +50,11 @@ export function openLearn(el, ctx) {
   el.append(header('Learn'));
   const due = badgeCount(getIndex());
   const decks = getCards().decks.length;
-  const today = h('button.l-today', { type: 'button', dataset: { act: 'review' }, onclick: () => { sfx('button'); go(due > 0 ? 'l-review' : 'l-cards'); } },
+  const today = h('button.l-today', { type: 'button', dataset: { act: 'review' }, onclick: () => { sfx('button'); go('l-cards'); } },
     h('span.lt-ico', {}, due > 0 ? '🔥' : '✅'),
     h('span.lt-txt', {},
       h('b', {}, due > 0 ? (kids ? `${due} cards to play` : `${due} to review today`) : decks ? 'All caught up!' : (kids ? 'Make a flashcard deck' : 'Start a flashcard deck')),
-      h('small', {}, due > 0 ? 'Missed answers from games land here too' : decks ? 'New cards arrive tomorrow' : 'Pick packs, learn a few a day')),
+      h('small', {}, due > 0 ? 'Pick which packs to study' : decks ? 'New cards arrive tomorrow' : 'Pick packs, learn a few a day')),
     h('span.lt-go', {}, due > 0 ? '▶' : '›'));
   const tiles = h('div.l-tiles', {}, ...TOOLS.filter(t => !kids || t[4]).map(([id, ico, title, blurb, kIco, kTitle]) =>
     h('button.l-tile', { type: 'button', dataset: { go: id }, onclick: () => { sfx('button'); go(id); } },

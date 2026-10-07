@@ -216,7 +216,7 @@ const scenarios = {
     await b.click('[aria-label=Settings]');
     await b.shot(`${OUT}/${MODE}-settings.png`);
     await b.click('.back');
-    await b.click('.home-foot .btn', { index: 1 });
+    await b.click('.home-foot .btn', { index: 2 });   // Settings · Stats · Credits (Stats added by lane STATS)
     await b.waitFor('document.querySelector(".credits-pack")');
     await b.shot(`${OUT}/${MODE}-credits.png`);
     await b.click('.back');

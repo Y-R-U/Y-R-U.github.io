@@ -1,10 +1,12 @@
-import { h } from './kit.js?v=202610071438';
-import { defineScreen, go } from './app.js?v=202610071438';
-import { getSettings, setSettings, getStats, dailyDone, todayUTC } from '../core/store.js?v=202610071438';
-import { kidsProgress } from './stickers.js?v=202610071438';
-import { sfx } from './fx.js?v=202610071438';
-import { loadNet } from './net.js?v=202610071438';
-import { toolButtons } from './toggles.js?v=202610071438';
+import { h } from './kit.js?v=202610071629';
+import { defineScreen, go } from './app.js?v=202610071629';
+import { getSettings, setSettings, dailyDone, todayUTC } from '../core/store.js?v=202610071629';
+import { kidsProgress } from './stickers.js?v=202610071629';
+import { sfx } from './fx.js?v=202610071629';
+import { loadNet } from './net.js?v=202610071629';
+import { toolButtons } from './toggles.js?v=202610071629';
+import { statsLine } from './statsline.js?v=202610071629';
+import { BUILD } from '../build.js?v=202610071629';
 
 export const logo = (sm = false) => h('div.logo', { class: sm ? 'sm' : '', 'aria-label': 'Clued' },
   h('span.lens', {}, '?'), ...'lued'.split('').map(c => h('span.l', {}, c)));
@@ -22,7 +24,7 @@ export function applyKids(on) {
 const MODES = [
   ['pubquiz', '🍻', 'Pub quiz', 'Rounds, jokers, glory'],
   ['party', '🎉', 'Party', 'Pass the phone, 2–8'],
-  ['online', '🌐', 'Online', 'Play friends by link'],
+  ['online', '🌐', 'Online', 'Start a room or join by link'],
   ['learn', '📖', 'Learn', 'Field guides & flashcards'],
   ['survival', '❤️', 'Survival', 'Three lives'],
   ['blitz', '⚡', 'Blitz', '60 seconds, go!'],
@@ -35,7 +37,6 @@ defineScreen('home', el => {
   const s = getSettings();
   const kids = !!s.kids;
   applyKids(kids);
-  const st = getStats();
   const kidSwitch = h('input', { type: 'checkbox', 'aria-label': 'Kids mode' });
   kidSwitch.checked = kids;
   kidSwitch.addEventListener('change', () => { setSettings({ kids: kidSwitch.checked }); sfx('button'); go('home', {}, { replace: true }); });
@@ -49,6 +50,10 @@ defineScreen('home', el => {
   const tiles = h('div.tiles', {}, ...modes.map(([id, ico, title, blurb]) =>
     h('button.tile', { type: 'button', dataset: { mode: id }, onclick: () => openMode(id) },
       h('span.t-ico', {}, ico), h('span.t-title', {}, title), h('span.t-blurb', {}, blurb))));
+  import(`../net/api.js?v=${BUILD}`).then(m => m.rooms.listPublic()).then(d => {
+    const n = d?.rooms?.length, t = tiles.querySelector('[data-mode="online"]');
+    if (n && t) t.append(h('span.t-live', { title: `${n} public game${n === 1 ? '' : 's'} open` }, `🟢 ${n} live`));
+  }).catch(() => {});
 
   let extra = null;
   if (kids) {
@@ -73,9 +78,10 @@ defineScreen('home', el => {
           h('span.wobble', {}, '▶'), ' Play'))),
       h('div', {}, tiles)),
     extra,
-    st.games ? h('div.stats-line', { html: `${st.games} games · ${st.correct}/${st.answered} right · best streak ${st.bestStreak}` }) : null,
+    statsLine(kids),
     h('div.home-foot', {},
       h('button.btn.ghost.small', { type: 'button', onclick: () => go('settings') }, 'Settings'),
+      h('button.btn.ghost.small', { type: 'button', dataset: { act: 'stats-foot' }, onclick: () => go('stats') }, 'Stats'),
       h('button.btn.ghost.small', { type: 'button', onclick: () => go('credits') }, 'Credits')),
   ].filter(Boolean));
 }, { pester: true });

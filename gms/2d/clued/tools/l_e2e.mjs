@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 // Lane L end-to-end: real clicks through every Learn screen. Needs `~/.claude/bin/cdp start --port 9404` and :8888.
-// Usage: node tools/l_e2e.mjs [outDir] [portrait|landscape|desktop] [scenario,...]
+// Usage: [CDP_PORT=9404] node tools/l_e2e.mjs [outDir] [portrait|landscape|desktop] [scenario,...]
 import { open } from './a_cdp.mjs';
 
 const OUT = process.argv[2] || '/tmp';
@@ -8,7 +8,7 @@ const MODE = process.argv[3] || 'portrait';
 const ONLY = (process.argv[4] || '').split(',').filter(Boolean);
 const VP = { portrait: [384, 854, true], landscape: [854, 384, true], desktop: [1280, 800, false] }[MODE];
 const URL = 'http://localhost:8888/gms/2d/clued/?test';
-const b = await open({ port: 9404, width: VP[0], height: VP[1], mobile: VP[2], dpr: VP[2] ? 2 : 1 });
+const b = await open({ port: +(process.env.CDP_PORT || 9404), width: VP[0], height: VP[1], mobile: VP[2], dpr: VP[2] ? 2 : 1 });
 let fails = 0;
 if (process.env.DEBUG) for (const k of ['click', 'eval', 'goto', 'shot']) { const f = b[k]; b[k] = (...a) => { console.log('·', k, String(a[0]).slice(0, 90)); return f(...a); }; }
 const keepAlive = setInterval(() => {}, 1000);
@@ -143,34 +143,153 @@ const scenarios = {
   },
 
   async cards() {
-    await fresh();
+    // Aaron's report: due cards from other packs (a song, a game miss) must not leak into a Snakes session
+    const day = await b.eval(`Math.floor((Date.now() - new Date().getTimezoneOffset() * 60000) / 86400000)`).catch(() => 0);
+    await fresh({}, { 'clued.cards': { cards: { 'hits-1970s/alone-again-naturally-gilbert-osullivan': { b: 1, due: 0, n: 1, l: 0, a: 0 }, 'flowers/sunflower': { b: 0, due: 0, n: 0, l: 0, a: 0, g: 1 } }, decks: ['flowers'] } });
     await openLearn();
-    await b.click('[data-go=l-cards]');
+    await b.click('[data-act=review]');
     await until(vis('.l-dp'));
-    await b.click('.l-dp[data-pack=dogs]');
-    await b.sleep(400);
+    expect(await b.eval(`document.querySelector('.l-dp[data-pack=flowers]').classList.contains('on')`), 'previous pick restored');
+    await b.click('.l-dp[data-pack=flowers]');
+    await b.click('.l-dp[data-pack=snakes]');
+    await b.sleep(300);
+    const lbl = await b.eval(`document.querySelector('[data-act=start]').textContent`);
+    expect(/Study Snakes$/.test(lbl), 'start button names the pack: ' + lbl);
+    expect(/Review all due \(2\)/.test(await b.eval(`document.querySelector('[data-act=all]').textContent`)), 'review-all is separate and counts every pack');
+    expect(/10 new/.test(await b.eval(`document.querySelector('.l-dp[data-pack=snakes] .dp-n').textContent`)), 'per-pack new count');
+    expect(await b.eval(`getComputedStyle(document.querySelector('[data-study=mc]')).backgroundColor !== 'rgba(0, 0, 0, 0)' && document.querySelector('[data-study=mc]').classList.contains('on')`), 'multiple choice is the default');
+    await b.eval(`document.querySelector('.screen:not(.leaving)').scrollTo(0, 0); window.scrollTo(0, 0); true`);
+    await b.sleep(200);
     await shot('deck');
-    await until(vis('[data-act=start]'));
     await b.click('[data-act=start]');
     await until('document.body.dataset.screen === "l-review"');
-    await until(vis('[data-act=flip]'), 15000);
+    await until(vis('.l-answer .choice'), 15000);
     await imgsSettled();
-    await shot('card-front');
+    await shot('card-mc');
+    const refs = [];
+    const frontCheck = async () => {
+      const r = await b.eval(`(() => { const c = document.querySelector('.l-card'); const name = c.querySelector('.back .l-card-name').textContent; const f = c.querySelector('.front').innerText;
+        return { ref: c.dataset.ref, kind: c.dataset.kind, leak: name.length >= 4 && f.toLowerCase().includes(name.toLowerCase()), n: document.querySelectorAll('.l-answer .choice').length }; })()`);
+      refs.push(r.ref);
+      expect(!r.leak, 'front shows the answer: ' + r.ref);
+      return r;
+    };
+    // multiple choice: pick the right answer on card 1, a wrong one on card 2
+    let r = await frontCheck();
+    expect(r.n === 4, '4 options: ' + r.n);
+    const rightIdx = () => b.eval(`(() => { const name = document.querySelector('.l-card .back .l-card-name').textContent; return [...document.querySelectorAll('.l-answer .choice')].findIndex(x => x.querySelector('.label').textContent === name); })()`);
+    let ri = await rightIdx();
+    await b.click('.l-answer .choice', { index: ri });
+    await until(vis('[data-act=next]'));
+    expect(await b.eval(`!document.querySelector('.l-card .back').hidden && !!document.querySelector('.choice.right')`), 'answer highlighted + back shown');
+    await shot('card-mc-right');
+    const ref1 = r.ref;
+    await b.click('[data-act=next]');
+    await b.sleep(250);
+    r = await frontCheck();
+    ri = await rightIdx();
+    await b.click('.l-answer .choice', { index: (ri + 1) % 4 });
+    await until(vis('[data-act=next]'));
+    expect(await b.eval(`!!document.querySelector('.choice.wrong') && !!document.querySelector('.choice.right')`), 'wrong pick marked, right one shown');
+    await shot('card-mc-wrong');
+    let c = await b.eval(`JSON.parse(localStorage.getItem('clued.cards')).cards`);
+    expect(c[ref1]?.b === 1 && c[ref1].due === day + 1, 'right first try = Good: ' + JSON.stringify(c[ref1]));
+    expect(c[r.ref]?.b === 0 && c[r.ref].due === day, 'wrong = Again: ' + JSON.stringify(c[r.ref]));
+    await b.click('[data-act=next]');
+    await b.sleep(250);
+    // "Just show me the answer" → self-grade
+    r = await frontCheck();
+    await b.click('[data-act=show]');
+    await until(vis('.l-grades'));
+    expect(await n('.l-grades:not([hidden]) .btn') === 4, 'show answer offers 4 grades');
+    await b.click('[data-grade=easy]');
+    await b.sleep(250);
+    c = await b.eval(`JSON.parse(localStorage.getItem('clued.cards')).cards`);
+    expect(c[r.ref]?.b === 2, 'easy from MC show-answer: ' + JSON.stringify(c[r.ref]));
+    // switch to flip mode mid-session (remembered)
+    await b.click('.l-rv-top [data-study=flip]');
+    await until(vis('[data-act=flip]'));
+    r = await frontCheck();
+    await imgsSettled();
+    await shot('card-flip-front');
     await b.click('[data-act=flip]');
     await until(vis('.l-grades'));
-    await shot('card-back');
-    await b.click('[data-grade=good]');
-    await b.sleep(300);
-    await b.click('[data-act=flip]');
-    await b.click('[data-grade=again]');
-    await b.sleep(300);
-    const c = await b.eval(`JSON.parse(localStorage.getItem('clued.cards'))`);
-    const vals = Object.values(c.cards);
-    expect(vals.length === 2 && vals.some(v => v.b === 1 && v.due > 0) && vals.some(v => v.b === 0), 'graded two cards: ' + JSON.stringify(c.cards));
-    // finish the session with keyboard
-    for (let i = 0; i < 30 && await b.eval(vis('[data-act=flip]')); i++) { await b.key(' '); await b.sleep(80); await b.key('2'); await b.sleep(120); }
+    expect(await n('.l-grades .btn') === 4, 'flip: Again/Hard/Good/Easy');
+    await shot('card-flip-back');
+    await b.click('[data-grade=hard]');
+    await b.sleep(250);
+    c = await b.eval(`JSON.parse(localStorage.getItem('clued.cards'))`);
+    expect(c.study === 'flip' && c.cards[r.ref]?.b === 1, 'hard grade + mode remembered: ' + JSON.stringify(c.cards[r.ref]));
+    // finish with the keyboard (flip: space then 3 = Good)
+    for (let i = 0; i < 40 && await b.eval(vis('[data-act=flip]')); i++) { await frontCheck(); await b.key(' '); await b.sleep(80); await b.key('3'); await b.sleep(150); }
     await until(vis('.l-done'));
+    const bad = refs.filter(x => !x.startsWith('snakes/'));
+    expect(!bad.length, 'only snake cards: ' + bad.join(','));
+    log('snake session', refs.length, 'cards');
     await shot('cards-done');
+  },
+
+  async music() {
+    await fresh({}, { 'clued.cards': { cards: {}, decks: ['hits-1970s'], study: 'mc' } });
+    await openLearn();
+    await b.click('[data-go=l-cards]');
+    await until(vis('[data-act=start]'));
+    await b.click('[data-act=start]');
+    await until(vis('.l-answer .choice'), 15000);
+    const r = await b.eval(`(() => { const c = document.querySelector('.l-card'); const name = c.querySelector('.back .l-card-name').textContent;
+      return { ref: c.dataset.ref, kind: c.dataset.kind, play: !!c.querySelector('.front .l-bigplay .l-sound'), front: c.querySelector('.front').innerText, name }; })()`);
+    expect(r.ref.startsWith('hits-1970s/') && r.kind === 'audio' && r.play, 'song card has a play button: ' + JSON.stringify(r));
+    expect(!r.front.toLowerCase().includes(r.name.toLowerCase()), 'song front hides the title: ' + r.front);
+    await b.sleep(1500);
+    const playing = await b.eval(`(() => { const s = document.querySelector('.l-bigplay .l-sound'); return s.classList.contains('playing') || s.classList.contains('loading'); })()`);
+    log('song auto-play started:', playing);
+    await shot('music-mc');
+    await b.click('.l-hint').catch(() => {});
+    await b.sleep(150);
+    const hint = await b.eval(`document.querySelector('.l-hinttext')?.textContent || ''`);
+    expect(/hit by/.test(hint) && !hint.toLowerCase().includes(r.name.toLowerCase()), 'hint without the title: ' + hint);
+    await b.click('.l-answer .choice');
+    await until(vis('[data-act=next]'));
+    await shot('music-mc-back');
+    await b.click('[data-act=next]');
+    await b.sleep(200);
+    expect(await b.eval(`!document.querySelector('.l-sound.playing') || document.querySelector('.l-card').dataset.kind === 'audio'`), 'audio stops between cards');
+  },
+
+  async reviewall() {
+    const due = { b: 1, due: 0, n: 1, l: 0, a: 0 };
+    await fresh({}, { 'clued.cards': { cards: { 'hits-1970s/alone-again-naturally-gilbert-osullivan': due, 'flowers/sunflower': { ...due, g: 1 }, 'capitals/kabul': due, 'snakes/inland-taipan': due }, decks: ['snakes'] } });
+    await openLearn();
+    await b.click('[data-go=l-cards]');
+    await until(vis('[data-act=all]'));
+    expect(/Review all due \(4\)/.test(await b.eval(`document.querySelector('[data-act=all]').textContent`)), 'review all count');
+    expect(/missed in games/.test(await b.eval(`document.querySelector('.l-allsub').textContent`)), 'review-all says it mixes game misses');
+    expect(/1 due/.test(await b.eval(`document.querySelector('[data-act=start]').textContent + document.querySelector('.l-startsub').textContent`)), 'study counts only snakes due');
+    await b.click('[data-act=all]');
+    await until(vis('.l-answer .choice'), 15000);
+    expect(await b.eval(`!!document.querySelector('.l-rv-note')`), 'mix note shown');
+    const seen = new Set();
+    for (let i = 0; i < 10 && await b.eval(vis('.l-answer .choice')); i++) {
+      const r = await b.eval(`(() => { const c = document.querySelector('.l-card'); const name = c.querySelector('.back .l-card-name').textContent; return { ref: c.dataset.ref, leak: c.querySelector('.front').innerText.toLowerCase().includes(name.toLowerCase()) }; })()`);
+      expect(!r.leak, 'leak on ' + r.ref);
+      seen.add(r.ref.split('/')[0]);
+      if (i === 2) { await imgsSettled(); await shot('reviewall-text'); }
+      await b.click('[data-act=show]'); await until(vis('.l-grades')); await b.click('[data-grade=good]'); await b.sleep(200);
+    }
+    expect(seen.size === 4, 'review all mixed every pack: ' + [...seen]);
+    await until(vis('.l-done'));
+  },
+
+  async guidecards() {
+    await fresh();
+    await openLearn();
+    await b.click('[data-go=l-guide]');
+    await until(vis('.l-pk[data-pack=snakes]'));
+    await b.click('.l-pk[data-pack=snakes]');
+    await until(vis('[data-act=flash]'), 15000);
+    await b.click('[data-act=flash]');
+    await until(vis('.l-answer .choice'), 15000);
+    expect((await b.eval(`document.querySelector('.l-card').dataset.ref`)).startsWith('snakes/'), 'field guide opens that pack');
   },
 
   async feed() {
@@ -295,15 +414,37 @@ const scenarios = {
     await until('document.body.dataset.screen === "learn"');
     await b.click('[data-go=l-cards]');
     await until(vis('.l-dp'));
+    expect(!(await b.eval(`!!document.querySelector('.l-dp[data-pack=capitals]')`)), 'kids picker hides text-only packs');
     await b.click('.l-dp[data-pack=mammals]');
+    await b.eval(`document.querySelector('.screen:not(.leaving)').scrollTo(0, 0); window.scrollTo(0, 0); true`);
     await b.sleep(300);
+    await shot('kids-deck');
     await b.click('[data-act=start]');
-    await until(vis('[data-act=flip]'), 15000);
-    await b.click('[data-act=flip]');
+    await until(vis('.l-answer .choice'), 15000);
+    expect(await n('.l-answer .choice') === 3, 'kids get 3 options');
+    expect(await b.eval(`document.querySelector('.l-card').dataset.kind === 'img'`), 'kids card is a picture');
     await imgsSettled();
     await shot('kids-card');
+    await b.click('.l-answer .choice');
+    await until(vis('[data-act=next]'));
+    await shot('kids-card-back');
+    await b.click('[data-study=flip]');
+    await b.click('[data-act=next]');
+    await until(vis('[data-act=flip]'));
+    await b.click('[data-act=flip]');
+    expect(await n('.l-grades .btn') === 2, 'kids flip has 2 buttons');
     await b.click('[data-grade=good]');
     await b.sleep(200);
+    // kids sound pack
+    await b.click('.back'); await b.sleep(300);
+    await until(vis('.l-dp[data-pack=nursery-rhymes]'));
+    await b.click('.l-dp[data-pack=mammals]');
+    await b.click('.l-dp[data-pack=nursery-rhymes]');
+    await b.click('[data-study=mc]');
+    await b.click('[data-act=start]');
+    await until(vis('.l-answer .choice'), 15000);
+    expect(await b.eval(`document.querySelector('.l-card').dataset.kind === 'audio' && !!document.querySelector('.l-bigplay .l-sound')`), 'kids sound card');
+    await shot('kids-sound');
   },
 };
 

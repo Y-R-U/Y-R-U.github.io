@@ -147,16 +147,17 @@ async function main() {
     }
   }
   for (const p of packs.filter((x) => !x.items.some((i) => i.lyrics))) {
-    const qs = listen.generate({ rng: mulberry32(7), packs: [p], count: 4, opts: { grow: 'on' }, difficulty: 0 });
-    for (const q of qs) {
-      if (q.stages !== 5 || q.data.stageLens.length !== 5) fail(`${p.id} ${q.id}: grow mode needs stages 5`);
-      if (q.data.stageLens.some((x, i, a) => i && x < a[i - 1])) fail(`${p.id} ${q.id}: stage lengths must grow`);
+    // Grow was removed (TIMING.md): old favourites/rooms carrying grow are ignored; every clip is the chosen length.
+    for (const opts of [{ grow: 'on' }, { grow: 'auto', online: true }, {}, { clip: 5 }]) {
+      for (const spec of [undefined, { online: true }]) {
+        const qs = listen.generate({ rng: mulberry32(7), packs: [p], count: 3, opts, difficulty: 0, spec });
+        if (qs.some((q) => q.stages || q.data.stageLens)) fail(`${p.id}: listen must never be progressive (${JSON.stringify(opts)})`);
+        const want = opts.clip || 5;
+        if (qs.some((q) => q.data.len !== want && !(q.data.a.dur && q.data.a.dur < want))) fail(`${p.id}: clip must be the chosen ${want} s (${qs.map((q) => q.data.len)})`);
+      }
     }
-    const off = listen.generate({ rng: mulberry32(7), packs: [p], count: 2, opts: {}, difficulty: 0 });
-    if (off.some((q) => q.stages)) fail(`${p.id}: stages without grow (solo default must be off)`);
-    const online = listen.generate({ rng: mulberry32(7), packs: [p], count: 2, opts: {}, difficulty: 0, spec: { online: true } });
-    if (online.some((q) => !q.stages)) fail(`${p.id}: online rooms should grow by default`);
   }
+  if (listen.options.some((o) => o.key === 'grow')) fail('the Grow option must be gone from setup');
   console.log('ok   listen generate');
   console.log(fails ? `\n${fails} FAILED, ${warns} warnings` : `\nall passed (${warns} warnings)`);
   process.exit(fails ? 1 : 0);

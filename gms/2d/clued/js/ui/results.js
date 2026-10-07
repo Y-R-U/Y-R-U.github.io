@@ -1,10 +1,12 @@
-import { h, fmtNum, countUp } from './kit.js?v=202610071438';
-import { defineScreen, go, reset } from './app.js?v=202610071438';
-import { recordGame, getSettings } from '../core/store.js?v=202610071438';
-import { confetti, sfx, haptic, reducedMotion } from './fx.js?v=202610071438';
-import { addStars, kidsProgress } from './stickers.js?v=202610071438';
-import { shareText } from './share.js?v=202610071438';
-import { loadNet } from './net.js?v=202610071438';
+import { h, fmtNum, countUp } from './kit.js?v=202610071629';
+import { defineScreen, go, reset } from './app.js?v=202610071629';
+import { getSettings } from '../core/store.js?v=202610071629';
+import { recordGame, summarize, playSecs, MODE_INFO } from '../core/stats.js?v=202610071629';
+import { getFormat } from '../formats/registry.js?v=202610071629';
+import { confetti, sfx, haptic, reducedMotion } from './fx.js?v=202610071629';
+import { addStars, kidsProgress } from './stickers.js?v=202610071629';
+import { shareText } from './share.js?v=202610071629';
+import { loadNet } from './net.js?v=202610071629';
 
 let matchDone = () => {};
 export const setMatchCompleted = fn => { matchDone = fn; };
@@ -33,8 +35,11 @@ defineScreen('results', (el, params) => {
   let newStickers = [];
   if (!params._recorded) {
     params._recorded = true;
+    if (!r.aborted) recordGame(summarize(MODE_INFO[structure] ? structure : 'quick', r, {
+      spec, kids, secs: playSecs(), daily: daily?.kind, day: daily?.day, replay: daily && !daily.first,
+      fmtTheme: f => (getFormat(f)?.packless ? 'geography' : null),
+    }));
     if (!r.aborted && !r.duel) {
-      recordGame({ structure, score: r.score, answers: r.answers || [] });
       if (kids && r.stars) newStickers = addStars(r.stars);
       try { matchDone(); } catch (e) {}
     }

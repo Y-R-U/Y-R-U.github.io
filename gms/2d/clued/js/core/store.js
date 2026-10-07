@@ -5,7 +5,7 @@ export const KEYS = {
 export const SYNCED = [KEYS.settings, KEYS.stats, KEYS.mastery, KEYS.cards, KEYS.favs];
 
 export const DEFAULT_SETTINGS = {
-  sound: true, music: 0.5, haptics: true, timerSec: 10, reducedMotion: false, kids: false, readAloud: false, bgm: true,
+  sound: true, music: 0.5, haptics: true, timerSec: 10, streakPts: true, reducedMotion: false, kids: false, readAloud: false, bgm: true,
 };
 export const DEFAULT_STATS = {
   games: 0, answered: 0, correct: 0, bestStreak: 0, best: {}, daily: { last: '', results: {} },
@@ -53,18 +53,7 @@ export function updateStats(fn) {
   return s;
 }
 
-export function recordGame({ structure, score, answers = [] }) {
-  return updateStats(s => {
-    s.games++;
-    s.answered += answers.length;
-    let run = 0;
-    for (const a of answers) {
-      if (a.correct) { s.correct++; run++; s.bestStreak = Math.max(s.bestStreak, run); } else run = 0;
-    }
-    if (structure && score > (s.best[structure] || 0)) s.best[structure] = score;
-  });
-}
-
+// Finished games are recorded by js/core/stats.js (recordGame), which also keeps these totals.
 export const todayUTC = () => new Date().toISOString().slice(0, 10);
 
 export function dailyDone(day = todayUTC(), kind = 'main') {

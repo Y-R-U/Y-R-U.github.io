@@ -98,7 +98,16 @@ async function main() {
   await host.click('[data-act=add-round]');
   await host.click('.pop:not(.out) .rp-fav[data-fav-format=tf]');
   await host.waitFor(`document.querySelectorAll('.round-card').length === 2`, 8000, '2 rounds');
-  ok(await host.eval(`document.querySelector('.rounds-sum').textContent === '2 rounds · 8 questions'`), 'device host: 2 rounds · 8 questions');
+  // a ♥ round takes the online round default (10), not the favourite's own count (manager rule 2026-10-08)
+  ok(await host.eval(`document.querySelectorAll('.round-card')[1].textContent.includes('10 questions')`), 'fav round uses the default 10 questions');
+  await sleep(500);
+  await host.click('.round-card[data-round="1"] [data-act=round-edit]');
+  await host.waitFor(`document.body.dataset.screen === 'pqround'`, 8000, 'editor 2');
+  await host.click('.opt .chip[data-v="5"]');
+  await host.click('[data-act=save-round]');
+  await host.waitFor(`document.body.dataset.screen === 'host' && document.querySelector('.rounds-sum')?.textContent === '2 rounds · 10 questions'`, 8000, 'round 2 edited to 5').catch(() => {});
+  await sleep(500);
+  ok(await host.eval(`document.querySelector('.rounds-sum').textContent === '2 rounds · 10 questions'`), 'device host: 2 rounds · 10 questions', await host.eval(`document.querySelector('.rounds-sum')?.textContent`));
   await host.type('[data-field=name]', 'Hosty');
   await host.click('[data-opt=answer] .chip[data-v="30"]');
   await host.click('[data-opt=gap] .chip[data-v="3"]');
@@ -116,7 +125,7 @@ async function main() {
   await host.waitFor(`window.__cluedRoom.st.players.length === 2`, 15000, '2 players');
   await host.click('[data-act=start]');
   const st0 = await host.room();
-  ok(JSON.stringify(st0.roundSizes) === '[5,3]', 'rounds of 5 and 3', JSON.stringify(st0.roundSizes));
+  ok(JSON.stringify(st0.roundSizes) === '[5,5]', 'rounds of 5 and 5', JSON.stringify(st0.roundSizes));
   const cards = {};
   let refreshed = false, lastQ = -1;
   for (let guard = 0; guard < 400; guard++) {
@@ -135,7 +144,7 @@ async function main() {
           await p.send('Page.reload', { ignoreCache: true });
           await p.waitFor(`window.__cluedRoom?.st?.q === 6`, 40000, 'rejoin');
           const label = await p.waitFor(`document.querySelector('.prog-txt')?.textContent`, 20000, 'label').catch(() => '');
-          ok(label === 'Round 2 · 2/3', 'joiner back after a refresh mid-round-2, HUD Round 2 · 2/3', label);
+          ok(label === 'Round 2 · 2/5', 'joiner back after a refresh mid-round-2, HUD Round 2 · 2/5', label);
         }
         await p.waitFor(`document.querySelector('.stage .choices .choice:not([disabled])')`, 25000, `${p.name} q${st.q}`);
         await p.click('.stage .choices .choice');

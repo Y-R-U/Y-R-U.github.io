@@ -23,6 +23,10 @@ const (
 	roundIntroMs   = 5000           // extra lead-in on the first question of each round (the round card)
 	maxTScale      = 6
 	maxScaledMs    = 180000
+	readyCapMs     = 5000 // longest the opening waits for clients still loading the question's media
+	readyGoMs      = 800  // once the last client is ready: a short "go" so every countdown ends together
+	holdDecideMs   = 700  // the hold is decided this long before the planned opening, so clients learn of it in time
+	maxTransitMs   = 1500 // a client's ms may undercut the server's receive time by at most this (network transit)
 )
 
 type Answer struct {
@@ -31,6 +35,11 @@ type Answer struct {
 	Points  int             `json:"p"`
 	Ms      int             `json:"ms"`
 	Stage   int             `json:"st,omitempty"`
+	Speed   int             `json:"sp,omitempty"` // base points (speed, or the format's own) before stage and streak
+	Bonus   int             `json:"bo,omitempty"` // streak bonus points included in Points
+	ClipMul float64         `json:"cm,omitempty"` // listen: clip-length and artwork multipliers, replays counted
+	ArtMul  float64         `json:"am,omitempty"`
+	Replays int             `json:"rp,omitempty"`
 }
 
 type Player struct {
@@ -48,6 +57,8 @@ type Player struct {
 	Gone       bool            `json:"gone,omitempty"`
 	Kicked     bool            `json:"kicked,omitempty"`
 	LastSeen   int64           `json:"seen"`
+	Ready      int             `json:"ready,omitempty"`    // highest question index + 1 this client has loaded
+	ReadyCap   bool            `json:"readyCap,omitempty"` // the client reports readiness, so openings may wait for it
 	conns      int
 }
 
@@ -81,7 +92,10 @@ type Room struct {
 	Public    bool              `json:"public,omitempty"`
 	StartAt   int64             `json:"startAt,omitempty"` // public auto-start, 0 = host starts
 	NoLate    bool              `json:"noLate,omitempty"`
-	EmptyAt   int64             `json:"emptyAt,omitempty"` // when the last player went offline
+	EmptyAt   int64             `json:"emptyAt,omitempty"`  // when the last player went offline
+	LeadAt    int64             `json:"leadAt,omitempty"`   // the planned opening (qStart before any ready hold)
+	Hold      bool              `json:"hold,omitempty"`     // opening held while clients load media
+	NoStreak  bool              `json:"noStreak,omitempty"` // the streak counter shows but adds no points
 	meta      []qMeta
 	rounds    roundInfo
 	subs      map[*sub]struct{}
@@ -366,9 +380,59 @@ func (r *Room) advance() {
 		r.QStart += roundIntroMs
 	}
 	r.StageAt = r.QStart
+	r.LeadAt, r.Hold = r.QStart, false
 	r.QDeadline = r.QStart + int64(r.meta[r.Q].LimitMs)
 	r.RevealAt = 0
 	r.changed()
+}
+
+// notReady counts online players who will play this question, report readiness, and haven't loaded it yet.
+func (r *Room) notReady(now int64) int {
+	n := 0
+	for _, p := range r.Players {
+		if p.ReadyCap && p.JoinedQ <= r.Q && p.online(now) && p.Ready < r.Q+1 {
+			n++
+		}
+	}
+	return n
+}
+
+func (r *Room) openAt(t int64) {
+	r.QStart, r.StageAt = t, t
+	r.QDeadline = t + int64(r.meta[r.Q].LimitMs)
+}
+
+// checkHold: media must not eat the answer window. When the planned opening arrives and a client is still loading,
+// the opening waits (up to readyCapMs); it opens readyGoMs after the last one is ready, or at the cap.
+func (r *Room) checkHold(now int64) {
+	if r.Phase != "question" {
+		return
+	}
+	if !r.Hold {
+		if r.QStart == r.LeadAt && now >= r.QStart-holdDecideMs && r.notReady(now) > 0 {
+			r.Hold = true
+			r.openAt(r.LeadAt + readyCapMs)
+			r.changed()
+		}
+		return
+	}
+	if now >= r.QStart {
+		r.Hold = false
+		r.changed()
+	} else if r.notReady(now) == 0 {
+		r.Hold = false
+		r.openAt(max(r.LeadAt, min(r.QStart, now+readyGoMs)))
+		r.changed()
+	}
+}
+
+func (r *Room) ready(p *Player, q int) {
+	p.ReadyCap = true
+	p.LastSeen = nowMs()
+	if q >= 0 && q < len(r.Questions) && q+1 > p.Ready {
+		p.Ready = q + 1
+	}
+	r.checkHold(nowMs())
 }
 
 func (r *Room) reveal() {
@@ -408,6 +472,7 @@ type answerIn struct {
 	Correct bool            `json:"correct"`
 	Points  *float64        `json:"points"`
 	Ms      *float64        `json:"ms"`
+	Replays *int            `json:"replays"` // listen: replays used (client-reported, clamped to the question's allowance)
 }
 
 func (r *Room) answer(p *Player, in answerIn) (*Answer, string) {
@@ -425,14 +490,7 @@ func (r *Room) answer(p *Player, in answerIn) (*Answer, string) {
 		return nil, "too_late"
 	}
 	m := r.meta[r.Q]
-	serverMs := int(now - r.QStart)
-	ms := serverMs
-	// Trust the client's clock-corrected ms unless it claims more than the
-	// network could have shaved off.
-	if in.Ms != nil && *in.Ms >= 0 && int(*in.Ms) <= serverMs+300 {
-		ms = int(*in.Ms)
-	}
-	ms = max(0, min(ms, m.LimitMs))
+	ms := answerMs(int(now-r.QStart), in.Ms, m.LimitMs)
 	if len(in.Given) > 2048 {
 		in.Given = nil
 	}
@@ -446,12 +504,20 @@ func (r *Room) answer(p *Player, in answerIn) (*Answer, string) {
 		p.Streak = 0
 	}
 	stage := r.Stage
-	base = int(math.Round(float64(base) * stageMultiplier(stage, m.Stages)))
-	pts := withStreak(base, p.Streak)
-	if !correct {
-		pts = base
+	speed := base
+	var clipMul, artMul float64
+	reps := 0
+	if m.Format == "listen" && m.Stages < 2 && correct && !r.Kids {
+		clipMul, artMul, reps = listenFactors(m, in.Replays)
+		base = int(math.Round(float64(base) * clipMul * artMul * math.Pow(replayMul, float64(reps))))
 	}
-	a := &Answer{Given: in.Given, Correct: correct, Points: pts, Ms: ms, Stage: stage}
+	base = int(math.Round(float64(base) * stageMultiplier(stage, m.Stages)))
+	pts := base
+	if correct && !r.NoStreak {
+		pts = withStreak(base, p.Streak)
+	}
+	a := &Answer{Given: in.Given, Correct: correct, Points: pts, Ms: ms, Stage: stage, Speed: speed, Bonus: pts - base,
+		ClipMul: clipMul, ArtMul: artMul, Replays: reps}
 	if m.Stages >= 2 {
 		r.Locked = true // the first guess freezes the stage for everyone
 	}
@@ -501,6 +567,7 @@ func (r *Room) again(spec json.RawMessage, title string, qs []json.RawMessage) {
 			continue
 		}
 		p.Score, p.Correct, p.Streak, p.BestStreak, p.JoinedQ = 0, 0, 0, 0, 0
+		p.Ready = 0
 		p.Answers = map[int]*Answer{}
 		keep = append(keep, p)
 	}
@@ -508,6 +575,7 @@ func (r *Room) again(spec json.RawMessage, title string, qs []json.RawMessage) {
 	r.Spec, r.Title, r.Questions = spec, title, qs
 	r.buildMeta()
 	r.Phase, r.Q, r.QStart, r.QDeadline, r.RevealAt = "lobby", -1, 0, 0, 0
+	r.LeadAt, r.Hold = 0, false
 	r.Game++
 	r.changed()
 }
@@ -543,6 +611,7 @@ func (r *Room) tick(now int64) bool {
 	}
 	switch r.Phase {
 	case "question":
+		r.checkHold(now)
 		if n := r.meta[r.Q].Stages; n >= 2 && !r.Locked && r.Stage < n-1 && now >= r.QStart {
 			if r.Kids && now-r.StageAt >= kidsStageMs {
 				r.setStage(r.Stage + 1)
@@ -670,6 +739,33 @@ type pubLast struct {
 	Correct bool `json:"correct"`
 	Points  int  `json:"points"`
 	Ms      int  `json:"ms"`
+	Speed   int  `json:"speed,omitempty"` // base points before the stage multiplier and streak bonus
+	Bonus   int  `json:"bonus,omitempty"` // streak bonus points
+	Stage   int  `json:"stage,omitempty"`
+	Stages  int  `json:"stages,omitempty"`
+	Streak  int  `json:"streak,omitempty"` // streak after this answer
+	// listen: the clip-length/artwork multipliers and replays applied (absent elsewhere)
+	ClipMul float64 `json:"clipMul,omitempty"`
+	ArtMul  float64 `json:"artMul,omitempty"`
+	Clip    float64 `json:"clip,omitempty"`
+	Replays int     `json:"replays,omitempty"`
+}
+
+func (r *Room) lastOf(a *Answer, p *Player) *pubLast {
+	l := &pubLast{Correct: a.Correct, Points: a.Points, Ms: a.Ms, Speed: a.Speed, Bonus: a.Bonus, Stage: a.Stage}
+	if r.Q >= 0 && r.Q < len(r.meta) && r.meta[r.Q].Stages >= 2 {
+		l.Stages = r.meta[r.Q].Stages
+	}
+	if a.Correct {
+		l.Streak = p.Streak
+	}
+	if a.ClipMul > 0 {
+		l.ClipMul, l.ArtMul, l.Replays = a.ClipMul, a.ArtMul, a.Replays
+		if r.Q >= 0 && r.Q < len(r.meta) {
+			l.Clip = r.meta[r.Q].ClipLen
+		}
+	}
+	return l
 }
 
 type pubPlayer struct {
@@ -686,6 +782,7 @@ type pubPlayer struct {
 	Signed   bool     `json:"signed,omitempty"`
 	Last     *pubLast `json:"last,omitempty"`
 	Rounds   []int    `json:"rs,omitempty"` // points per round (multi-round games)
+	RBonus   []int    `json:"rb,omitempty"` // streak bonus points per round
 }
 
 type pubYou struct {
@@ -738,12 +835,15 @@ type pubState struct {
 	Round      int   `json:"round,omitempty"`
 	RoundSizes []int `json:"roundSizes,omitempty"`
 	RoundSpec  []int `json:"roundSpec,omitempty"`
+	// streakBonus: the streak adds points (off = the counter is just for show); hold: the opening waits for media
+	StreakBonus bool `json:"streakBonus"`
+	Hold        bool `json:"hold,omitempty"`
 }
 
 // stateFor must be called with r.mu held.
 func (r *Room) stateFor(viewer *Player) pubState {
 	now := nowMs()
-	s := pubState{Code: r.Code, Ver: r.Ver, Now: now, Phase: r.Phase, Q: r.Q, Total: len(r.Questions), Game: r.Game,
+	s := pubState{Code: r.Code, Ver: r.Ver, Now: now, Phase: r.Phase, Q: r.Q, Total: len(r.Questions), Game: r.Game, StreakBonus: !r.NoStreak,
 		Auto: r.Auto, AnswerSec: r.AnswerMs / 1000, Title: r.Title, Kids: r.Kids, Diff: r.Diff, Public: r.Public, StartAt: r.StartAt, LateJoin: !r.NoLate, HostID: r.HostID, Expired: r.dead, Spec: r.Spec}
 	if r.Auto {
 		s.GapSec = r.RevealMs / 1000
@@ -757,6 +857,7 @@ func (r *Room) stateFor(viewer *Player) pubState {
 	}
 	if r.Phase == "question" || r.Phase == "reveal" {
 		s.QStart, s.QDeadline, s.LimitMs = r.QStart, r.QDeadline, r.meta[r.Q].LimitMs
+		s.Hold = r.Phase == "question" && r.Hold
 		if n := r.meta[r.Q].Stages; n >= 2 {
 			s.Stage, s.Stages, s.Locked = r.Stage, n, r.Locked
 			s.LimitMs = int(r.QDeadline - r.QStart) // the ring re-targets after extensions
@@ -781,9 +882,11 @@ func (r *Room) stateFor(viewer *Player) pubState {
 			Online: p.online(now), Host: p.ID == r.HostID, Late: r.Q >= 0 && p.JoinedQ > r.Q, Signed: p.UID != ""}
 		if multi {
 			pp.Rounds = make([]int, len(r.rounds.sizes))
+			pp.RBonus = make([]int, len(r.rounds.sizes))
 			for qi, a := range p.Answers {
 				if qi >= 0 && qi < len(r.rounds.of) {
 					pp.Rounds[r.rounds.of[qi]] += a.Points
+					pp.RBonus[r.rounds.of[qi]] += a.Bonus
 				}
 			}
 		}
@@ -792,7 +895,7 @@ func (r *Room) stateFor(viewer *Player) pubState {
 				pp.Answered = true
 				s.Answered++
 				if showLast {
-					pp.Last = &pubLast{a.Correct, a.Points, a.Ms}
+					pp.Last = r.lastOf(a, p)
 				}
 			}
 		}
@@ -803,7 +906,7 @@ func (r *Room) stateFor(viewer *Player) pubState {
 			Kicked: viewer.Kicked, Gone: viewer.Gone}
 		if r.Q >= 0 {
 			if a := viewer.Answers[r.Q]; a != nil {
-				y.Last = &pubLast{a.Correct, a.Points, a.Ms}
+				y.Last = r.lastOf(a, viewer)
 				y.Stage = a.Stage
 			}
 		}

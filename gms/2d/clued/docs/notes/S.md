@@ -66,7 +66,7 @@ players: [{ id, name, score, correct, streak, best, online, host, answered, late
 joinedQ, kicked, last?, rank }, expired? }`. Players are score-sorted in reveal/final; `last` (this question's result) is
 only shown in reveal/final.
 
-**Timing/scoring (server-authoritative):** start/next → `qStart = now + 3 s` lead-in, `qDeadline = qStart + answer time`
+**Timing/scoring (server-authoritative; 2026-10-08 changes — Next bound to `q`, media-ready hold, ms clamp, breakdown, listen factors, streak setting — in TIMING.md):** start/next → `qStart = now + 3 s` lead-in, `qDeadline = qStart + answer time`
 (host choice for every question; long formats like connect/blitz60/ladder keep their minimum). Answers accepted until
 **deadline + 500 ms** (server clock); client ms used if ≤ server-measured ms + 300, else server ms; clamped to [0, limit].
 Ends early when every online, non-late player answered. Reveal → auto-next after the gap (or host taps Next). Scoring per

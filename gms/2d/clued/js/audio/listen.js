@@ -2,13 +2,13 @@
 // Also "finish the line" for public-domain songs (items with `lyrics`).
 import {
   register, poolItems, distractors, byDifficulty, placeAnswer, collect, pick, shuffle, hasAudio, imageOf, hasImg, pickPack,
-} from '../formats/registry.js?v=202610071438';
-import { h, choiceGrid, esc } from '../ui/kit.js?v=202610071438';
-import { basePoints } from '../core/scoring.js?v=202610071438';
-import * as clip from './clip.js?v=202610071438';
-import { revealHTML, BADGE_CSS, art as artUrl, previewUrl } from './apple.js?v=202610071438';
-import { getCtx, unlock, begin, end } from './ctx.js?v=202610071438';
-import { LISTEN_CSS } from './listen_css.js?v=202610071438';
+} from '../formats/registry.js?v=202610071629';
+import { h, choiceGrid, esc } from '../ui/kit.js?v=202610071629';
+import { basePoints } from '../core/scoring.js?v=202610071629';
+import * as clip from './clip.js?v=202610071629';
+import { revealHTML, BADGE_CSS, art as artUrl, previewUrl } from './apple.js?v=202610071629';
+import { getCtx, unlock, begin, end } from './ctx.js?v=202610071629';
+import { LISTEN_CSS } from './listen_css.js?v=202610071629';
 
 const CLIPS = [1, 2, 3, 5, 10, 15, 30];
 const CLIP_MUL = { 1: 2, 2: 1.7, 3: 1.5, 5: 1.25, 10: 1, 15: 0.85, 30: 0.7 };
@@ -93,9 +93,9 @@ function clipLen(opts, difficulty, kids) {
   return len;
 }
 
-function generate({ rng, packs, count, opts = {}, difficulty = 0, kids = false, avoid, spec }) {
-  // 'auto' grows the clip in online rooms only (the host generates, so the choice ships with the questions)
-  const grow = opts.grow === 'on' || (opts.grow !== 'off' && (opts.online || spec?.online || spec?.mode === 'online' || spec?.room));
+function generate({ rng, packs, count, opts = {}, difficulty = 0, kids = false, avoid }) {
+  // "Grow the clip" was removed (Aaron 2026-10-08: slow and confusing; replay is how you hear more). Old favourites
+  // and rooms may still carry opts.grow: it is ignored, every clip plays exactly the chosen length.
   const want = opts.ask || 'auto';
   const n = kids ? Math.min(3, +opts.answers || 3) : (+opts.answers || 4);
   const art = kids ? 'blur' : (ART_MUL[opts.art] ? opts.art : 'off');   // kids: covers often print the title, so they sharpen as the clip plays
@@ -120,8 +120,6 @@ function generate({ rng, packs, count, opts = {}, difficulty = 0, kids = false, 
     const a = { ...a0 };
     if (clip.isPiano(a)) a.lazy = true;
     let len = clipLen(opts, difficulty, kids);
-    let stages = 0;
-    if (grow && kind !== 'lyrics') { len = STAGE_LENS[STAGE_LENS.length - 1]; stages = STAGE_LENS.length; }
     if (a.dur && a.dur < len && !a.apple) len = a.dur;
     const start = clip.isPiano(a) ? 0 : clip.pickStart(a, len, rng(), a.dur || 30);
     const f = t.item.facts || {};
@@ -134,7 +132,6 @@ function generate({ rng, packs, count, opts = {}, difficulty = 0, kids = false, 
       timeLimit: Math.round((len + (kind === 'lyrics' ? 20 : 15)) * 1000),
       data: { a, start, len, art: a.apple ? art : 'off', kind, replays: kids ? -1 : REPLAYS, meta, kids: !!kids },
     };
-    if (stages) { base.stages = stages; base.data.stageLens = STAGE_LENS.map((x) => Math.min(x, len)); base.timeLimit = Math.round((len + 20) * 1000); }
     if (a.apple?.art) base.data.artImg = { src: artUrl(a.apple.art, 300), credit: 'Artwork: Apple Music', license: 'Apple Music artwork', page: a.apple.url, kind: 'img' };
     if (kind === 'lyrics') {
       const lq = lyricQuestion(rng, t, pool, n);
@@ -314,7 +311,7 @@ function render(el, q, api) {
     if (lyrics) return base;
     if (staged) return api.onStage ? undefined : Math.round(base * (1 - 0.6 * stage / (q.stages - 1)));
     const used = Math.max(0, played - 1);
-    return Math.round(base * CLIP_MUL[d.len] * (ART_MUL[d.art] || 1) * Math.pow(REPLAY_MUL, d.replays < 0 ? 0 : used)) || base;
+    return Math.round(base * (CLIP_MUL[d.len] ?? 1) * (ART_MUL[d.art] || 1) * Math.pow(REPLAY_MUL, d.replays < 0 ? 0 : used)) || base;
   }
 
   function revealNode() {
@@ -345,7 +342,7 @@ function render(el, q, api) {
     setStatus('');
     api.reveal(revealNode());
     const pts = points(correct);
-    api.answer({ correct, given, ...(pts != null ? { points: pts } : {}), detail: { played, len: playLen(), art: d.art, stage } });
+    api.answer({ correct, given, ...(pts != null ? { points: pts } : {}), replays: Math.max(0, played - 1), detail: { played, len: playLen(), art: d.art, stage } });
     if (lyrics) start(false);
   }
 
@@ -369,13 +366,19 @@ export async function prepare(questions) {
   return questions;
 }
 
+// optional hook for rooms: fetch + decode the clip during the lead-in (render's clip.load then resolves at once)
+export function preload(q) {
+  const d = q?.data;
+  if (!d?.a) return Promise.resolve();
+  return clip.load(d.a, { start: d.start, len: d.len });
+}
+
 export default register({
   id: 'listen', title: 'Listen', icon: '🎧', blurb: 'Name it from a short clip',
   tags: ['choice', 'music'],
   kids: true,
   options: [
-    { key: 'grow', label: 'Grow the clip', type: 'choice', values: ['auto', 'on', 'off'], labels: ['Online only', 'On', 'Off'], default: 'auto', kidsHide: true, help: '1 → 2 → 4 → 8 → 15 s; ask for more, score less' },
-    { key: 'clip', label: 'Clip length', type: 'choice', values: CLIPS, labels: CLIPS.map((s) => `${s}s`), default: 5, kidsValues: [5, 10, 15], kidsDefault: 10, help: 'Shorter clips score more' },
+    { key: 'clip', label: 'Clip length', type: 'choice', values: CLIPS, labels: CLIPS.map((s) => `${s}s`), default: 5, kidsValues: [5, 10, 15], kidsDefault: 10, help: 'Plays exactly this long; replay to hear it again. Shorter clips score more' },
     { key: 'art', label: 'Album artwork', type: 'choice', values: ['off', 'blur', 'on'], labels: ['Off', 'Blurred', 'On'], default: 'off', kidsHide: true, help: 'Off scores most' },
     { key: 'ask', label: 'Ask for', type: 'choice', values: ['auto', 'title', 'artist', 'decade', 'composer', 'lyrics'], labels: ['Mix', 'Title', 'Artist', 'Decade', 'Composer', 'Next line'], default: 'auto', kidsHide: true },
     { key: 'answers', label: 'Answers', type: 'choice', values: [2, 3, 4, 6], default: 4, kidsValues: [2, 3], kidsDefault: 3 },
@@ -385,6 +388,7 @@ export default register({
     return (c.audio || 0) >= 4 ? true : 'Needs sound clips';
   },
   prepare,
+  preload,
   generate,
   render,
 });

@@ -32,5 +32,19 @@ const fitB = fitSet(set, { maxBytes: JSON.stringify(set).length - 200 });
 ok2(JSON.stringify(fitB).length <= JSON.stringify(set).length - 200 && fitB.filter(q => q.round === 2).length === 2, 'fitSet respects the byte cap');
 function ok2(c, msg) { eq(!!c, true, msg); }
 
+// TIMING.md: the reveal's points breakdown and scoreboard notes
+const { pointsBreakdown, rowNote } = await import('../js/net/board.js');
+eq(pointsBreakdown({ correct: true, points: 515, ms: 5895, speed: 343, bonus: 172, streak: 7 }), '343 speed (5.9 s) · +172 streak (7 in a row)', 'breakdown: speed + streak (the 4XG4W Q15 case)');
+eq(pointsBreakdown({ correct: true, points: 515, ms: 5895, speed: 343, bonus: 172, streak: 7 }, { streakBonus: false }), '343 speed (5.9 s)', 'no streak part when streaks are just for show');
+eq(pointsBreakdown({ correct: true, points: 446, ms: 2000, speed: 420, clipMul: 1.25, artMul: 1, clip: 5, replays: 1 }), '420 speed (2.0 s) · ×1.25 5 s clip · −15% 1 replay', 'listen: clip factor and replays');
+eq(pointsBreakdown({ correct: true, points: 357, ms: 3000, speed: 420, stage: 1, stages: 5 }), '420 speed (3.0 s) · ×0.85 at step 2/5', 'progressive step multiplier');
+eq([pointsBreakdown({ correct: false, points: 0, ms: 4000 }), pointsBreakdown({ correct: true, points: 400, ms: 1000 })], ['', ''], 'nothing for a wrong answer or an old server');
+eq([rowNote({ correct: true, ms: 4114, bonus: 39 }), rowNote({ correct: true, ms: 4114, bonus: 39 }, { streakBonus: false }), rowNote({ correct: false, ms: 1 }), rowNote(null)], ['4.1 s · +39 streak', '4.1 s', '✗', ''], 'scoreboard row notes');
+const { answerMs, listenFactors } = await import('../js/net/p2p_room.js');
+eq([answerMs(4000, 3950, 15000), answerMs(4000, 950, 15000), answerMs(4000, 4400, 15000), answerMs(4000, undefined, 15000), answerMs(20000, 19000, 15000)], [3950, 2500, 4000, 4000, 15000], 'answerMs: client time within [receive − 1.5 s, receive + 0.3 s], clamped to the limit');
+eq(listenFactors({ data: { len: 5, art: 'blur', replays: 2 } }, 7), { clipMul: 1.25, artMul: 0.85, reps: 2, clip: 5 }, 'listenFactors clamps replays to the allowance');
+const listen = (await import('../js/audio/listen.js')).default;
+eq(listen.options.map(o => o.key).includes('grow'), false, 'listen has no Grow option');
+
 console.log(bad ? `${bad} FAILED` : 'ALL PASS');
 process.exit(bad ? 1 : 0);

@@ -143,3 +143,9 @@ Runner api: `api.timed`. Index caps: `formats` / `formatsEasy` / `formatsKids` (
 written by tools/build_index.mjs), `multi`, `catBins`. Index packs: `virtual: { of, tag }` for `general~<theme>` slices.
 Structures: optional `replay: { cfg(spec, questions), score(res, spec) }` for challenge replays. Geo: `js/geo/shape.js`
 `countryShape(iso3, opts)`.
+
+## Additive fields from lane STATS
+`clued.stats` keeps its old totals and adds `v, m, f, th, pk, kt, sd, dd, h` (detailed per-mode/format/theme/pack rows,
+study sessions, daily calendar, last 200 games); layout in docs/notes/STATS.md. Every mode end calls
+`js/core/stats.js` (`recordGame(summarize(...))`, `trackRoom` from room.js, `recordStudy` from flashcards).
+`clued.statsTip` (not synced) rotates the home highlight.

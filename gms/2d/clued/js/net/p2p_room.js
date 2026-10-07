@@ -1,6 +1,6 @@
 // Device-hosted room logic: a port of server/rooms.go + scoring.go so the host's tab can be the room
 // server. Pure (no DOM, no network), so tools/p2p_test.mjs runs it in node. State shape = the server's.
-import { stageMultiplier, withStreak, progressiveLimit, stageExtendMs, PROGRESSIVE_CAP } from '../core/scoring.js?v=202610071438';
+import { stageMultiplier, withStreak, progressiveLimit, stageExtendMs, PROGRESSIVE_CAP } from '../core/scoring.js?v=202610071629';
 export { stageMultiplier, withStreak };
 
 export const MAX_PLAYERS = 8;
@@ -10,6 +10,27 @@ export const ONLINE_MS = 6000;           // a dropped data channel counts as onl
 const DEFAULT_ANSWER = 10000, DEFAULT_GAP = 5000, KIDS_ANSWER = 20000, MAX_BASE = 500;
 export const KIDS_STAGE_MS = 4000;
 export const ROUND_INTRO_MS = 5000;     // extra lead-in on each round's first question (the round card)
+export const READY_CAP_MS = 5000;       // longest an opening waits for clients still loading media (server readyCapMs)
+export const READY_GO_MS = 800;         // after the last client is ready: a short "go"
+export const HOLD_DECIDE_MS = 700;      // decided this long before the planned opening, so clients hear in time
+export const MAX_TRANSIT_MS = 1500;     // client ms may undercut the receive time by at most this
+
+// listen point factors (scoring.go listenFactors): clip length and artwork set by the host, ×0.85 per replay.
+export const LISTEN_CLIP_MUL = { 1: 2, 2: 1.7, 3: 1.5, 5: 1.25, 10: 1, 15: 0.85, 30: 0.7 };
+export const LISTEN_ART_MUL = { off: 1, blur: 0.85, on: 0.65 };
+export function listenFactors(q, replays) {
+  const d = q?.data || {};
+  const max = typeof d.replays === 'number' ? d.replays : 2;
+  const reps = max >= 0 && typeof replays === 'number' && Number.isFinite(replays) ? Math.max(0, Math.min(Math.floor(replays), max)) : 0;
+  return { clipMul: LISTEN_CLIP_MUL[d.len] ?? 1, artMul: LISTEN_ART_MUL[d.art] ?? 1, reps, clip: d.len };
+}
+
+// Speed time against the room's question start (scoring.go answerMs): client ms when plausible, clamped.
+export function answerMs(serverMs, client, limit) {
+  let ms = serverMs;
+  if (typeof client === 'number' && Number.isFinite(client) && client >= 0) ms = client > serverMs + 300 ? serverMs : Math.max(serverMs - MAX_TRANSIT_MS, Math.round(client));
+  return Math.max(0, Math.min(ms, limit));
+}
 const MAX_TSCALE = 6, MAX_SCALED_MS = 180000;
 const CODE_ALPHABET = 'ABCDEFGHJKMNPQRSTUVWXYZ23456789';
 const ANSWER_CHOICES = [3, 5, 10, 15, 20, 30], GAP_CHOICES = [3, 5, 10];
@@ -78,10 +99,22 @@ function dedupe(name, taken) {
   }
 }
 
+// The reveal's points breakdown (server pubLast): speed points, stage, streak bonus.
+function lastOf(a, n) {
+  const l = { correct: a.correct, points: a.points, ms: a.ms };
+  if (a.speed) l.speed = a.speed;
+  if (a.bonus) l.bonus = a.bonus;
+  if (a.stage) l.stage = a.stage;
+  if (n) l.stages = n;
+  if (a.streak) l.streak = a.streak;
+  if (a.clipMul) Object.assign(l, { clipMul: a.clipMul, artMul: a.artMul, clip: a.clip, ...(a.replays ? { replays: a.replays } : {}) });
+  return l;
+}
+
 const err = (code, message) => ({ error: code, message: message || code.replace(/_/g, ' ') });
 
 export class P2PRoom {
-  constructor({ code, spec = {}, title = '', questions = [], answerSec, gapSec, lateJoin = true, maxPlayers = MAX_PLAYERS, now = Date.now, rand = Math.random, onChange = null } = {}) {
+  constructor({ code, spec = {}, title = '', questions = [], answerSec, gapSec, lateJoin = true, streak, maxPlayers = MAX_PLAYERS, now = Date.now, rand = Math.random, onChange = null } = {}) {
     this.now = now; this.rand = rand; this.onChange = onChange;
     this.code = code || newCode(rand);
     this.maxPlayers = maxPlayers;
@@ -90,7 +123,10 @@ export class P2PRoom {
     this.auto = true; this.revealMs = DEFAULT_GAP; this.answerMs = DEFAULT_ANSWER;
     this.ver = 0; this.game = 0; this.noLate = !lateJoin; this.closed = false;
     this.stage = 0; this.stageAt = 0; this.votes = new Set(); this.locked = false;
+    this.leadAt = 0; this.hold = false;
     this.load(spec, title, questions);
+    const sv = streak ?? spec?.streak;
+    this.noStreak = sv === false || sv === 'off';
     if (this.kids) this.answerMs = KIDS_ANSWER;
     this.setTiming(answerSec, gapSec);
   }
@@ -166,9 +202,29 @@ export class P2PRoom {
     this.phase = 'question';
     this.qStart = now + LEAD_IN_MS + (roundStart(this.rounds, this.q) ? ROUND_INTRO_MS : 0);
     this.stageAt = this.qStart;
+    this.leadAt = this.qStart; this.hold = false;
     this.qDeadline = this.qStart + this.limitFor(this.questions[this.q]);
     this.revealAt = 0;
     this.changed();
+  }
+
+  // Media-ready hold (rooms.go checkHold): the opening waits ≤ READY_CAP_MS for clients that report readiness.
+  notReady(now = this.now()) { return this.eligible(now).filter(p => p.readyCap && (p.ready || 0) < this.q + 1).length; }
+  openAt(t) { this.qStart = this.stageAt = t; this.qDeadline = t + this.limitFor(this.questions[this.q]); }
+  checkHold(now = this.now()) {
+    if (this.phase !== 'question') return;
+    if (!this.hold) {
+      if (this.qStart === this.leadAt && now >= this.qStart - HOLD_DECIDE_MS && this.notReady(now) > 0) {
+        this.hold = true; this.openAt(this.leadAt + READY_CAP_MS); this.changed();
+      }
+    } else if (now >= this.qStart) { this.hold = false; this.changed(); }
+    else if (this.notReady(now) === 0) { this.hold = false; this.openAt(Math.max(this.leadAt, Math.min(this.qStart, now + READY_GO_MS))); this.changed(); }
+  }
+  ready(p, q) {
+    p.readyCap = true; p.seen = this.now();
+    if (Number.isInteger(q) && q >= 0 && q < this.questions.length && q + 1 > (p.ready || 0)) p.ready = q + 1;
+    this.checkHold();
+    return {};
   }
 
   reveal() {
@@ -239,18 +295,22 @@ export class P2PRoom {
     if (now < this.qStart - 500) return err('not_open');
     if (now > this.qDeadline + GRACE_MS) return err('too_late');
     const q = this.questions[this.q], limit = this.limitFor(q);
-    const serverMs = now - this.qStart;
-    let ms = serverMs;
-    if (typeof a.ms === 'number' && a.ms >= 0 && a.ms <= serverMs + 300) ms = Math.round(a.ms);
-    ms = Math.max(0, Math.min(ms, limit));
+    const ms = answerMs(now - this.qStart, a.ms, limit);
     const correct = verifyCorrect(q, a.given, a.correct);
     const n = stagesOf(q);
     const stage = n ? this.stage : 0;
-    const base = basePoints(q?.format, correct, typeof a.points === 'number' ? a.points : undefined, ms, limit, !this.kids, stageMultiplier(stage, n));
+    const speed = basePoints(q?.format, correct, typeof a.points === 'number' ? a.points : undefined, ms, limit, !this.kids);
+    let raw = speed, lf = null;
+    if (q?.format === 'listen' && !n && correct && !this.kids) {
+      lf = listenFactors(q, a.replays);
+      raw = Math.round(speed * lf.clipMul * lf.artMul * Math.pow(0.85, lf.reps));
+    }
+    const base = Math.round(raw * stageMultiplier(stage, n));
     if (correct) { p.streak++; p.correct++; p.best = Math.max(p.best, p.streak); } else p.streak = 0;
-    const pts = correct ? withStreak(base, p.streak) : base;
+    const pts = correct && !this.noStreak ? withStreak(base, p.streak) : base;
     const given = JSON.stringify(a.given ?? null).length > 2048 ? null : a.given;
-    const rec = { given, correct, points: pts, ms, stage };
+    const rec = { given, correct, points: pts, ms, stage, speed, bonus: pts - base, streak: correct ? p.streak : 0,
+      ...(lf ? { clipMul: lf.clipMul, artMul: lf.artMul, replays: lf.reps, clip: lf.clip } : {}) };
     p.answers[this.q] = rec;
     p.score += pts;
     p.seen = now;
@@ -269,11 +329,15 @@ export class P2PRoom {
     if (p.id !== this.hostId || p.gone) return err('not_host');
     switch (action) {
       case 'start': return this.start();
-      case 'next':
-        if (this.phase === 'lobby' || this.phase === 'reveal') this.advance();
-        else if (this.phase === 'question') this.reveal();
+      case 'next': {
+        // bound to the question on the host's screen: a stale tap never ends the next question (see TIMING.md)
+        const q = Number.isInteger(extra.q) ? extra.q : null;
+        if (this.phase === 'lobby') this.advance();
+        else if (this.phase === 'reveal') { if (q == null || q === this.q) this.advance(); }
+        else if (this.phase === 'question') { if (q === this.q && this.now() >= this.qStart) this.reveal(); }
         else return err('finished');
         return {};
+      }
       case 'end': this.finish(); return {};
       case 'kick': {
         const t = this.player(extra.playerId);
@@ -287,14 +351,15 @@ export class P2PRoom {
         if (typeof extra.auto === 'boolean') this.auto = extra.auto;
         this.setTiming(extra.answerSec, extra.gapSec);
         if (typeof extra.lateJoin === 'boolean') this.noLate = !extra.lateJoin;
+        if (typeof extra.streak === 'boolean') this.noStreak = !extra.streak;
         this.changed();
         return {};
       case 'again': {
         if (!Array.isArray(extra.questions) || !extra.questions.length) return err('bad_questions');
         this.players = this.players.filter(x => !x.gone);
-        for (const x of this.players) Object.assign(x, { score: 0, correct: 0, streak: 0, best: 0, joinedQ: 0, answers: {} });
+        for (const x of this.players) Object.assign(x, { score: 0, correct: 0, streak: 0, best: 0, joinedQ: 0, answers: {}, ready: 0 });
         this.load(extra.spec, extra.title, extra.questions);
-        Object.assign(this, { phase: 'lobby', q: -1, qStart: 0, qDeadline: 0, revealAt: 0, stage: 0, votes: new Set(), locked: false });
+        Object.assign(this, { phase: 'lobby', q: -1, qStart: 0, qDeadline: 0, revealAt: 0, stage: 0, votes: new Set(), locked: false, leadAt: 0, hold: false });
         this.game++;
         this.changed();
         return {};
@@ -314,6 +379,7 @@ export class P2PRoom {
   tick(now = this.now()) {
     if (this.closed) return;
     if (this.phase === 'question') {
+      this.checkHold(now);
       const n = stagesOf(this.questions[this.q]);
       if (n && !this.locked && this.stage < n - 1 && now >= this.qStart) {
         if (this.kids && now - this.stageAt >= KIDS_STAGE_MS) this.setStage(this.stage + 1, now);
@@ -342,8 +408,9 @@ export class P2PRoom {
     const s = { code: this.code, ver: this.ver, now, phase: this.phase, q: this.q, total: this.questions.length, game: this.game,
       auto: this.auto, answerSec: this.answerMs / 1000, gapSec: this.auto ? this.revealMs / 1000 : 0, title: this.title,
       kids: this.kids, difficulty: this.diff, public: false, lateJoin: !this.noLate, spec: this.spec, hostId: this.hostId,
-      answered: 0, players: [], p2p: true };
+      answered: 0, players: [], p2p: true, streakBonus: !this.noStreak };
     if (inQ) Object.assign(s, { qStart: this.qStart, qDeadline: this.qDeadline, limitMs: this.curLimit() });
+    if (this.phase === 'question' && this.hold) s.hold = true;
     if (this.phase === 'reveal' && this.auto) s.revealAt = this.revealAt;
     if (n) Object.assign(s, { stages: n, stage: this.stage, locked: this.locked, ...this.voteNeed(now) });
     if (this.closed) s.closed = true;
@@ -360,10 +427,11 @@ export class P2PRoom {
       const row = { id: p.id, name: p.name, score: p.score, correct: p.correct, streak: p.streak, best: p.best,
         online: this.isOnline(p, now), host: p.id === this.hostId, answered: !!a };
       if (this.q >= 0 && p.joinedQ > this.q) row.late = true;
-      if (a) { s.answered++; if (showLast) row.last = { correct: a.correct, points: a.points, ms: a.ms }; }
+      if (a) { s.answered++; if (showLast) row.last = lastOf(a, n); }
       if (multi) {
         row.rs = this.rounds.sizes.map(() => 0);
-        for (const [qi, x] of Object.entries(p.answers)) { const r = this.rounds.of[+qi]; if (r != null) row.rs[r] += x.points; }
+        row.rb = this.rounds.sizes.map(() => 0);
+        for (const [qi, x] of Object.entries(p.answers)) { const r = this.rounds.of[+qi]; if (r != null) { row.rs[r] += x.points; row.rb[r] += x.bonus || 0; } }
       }
       s.players.push(row);
     }
@@ -374,16 +442,16 @@ export class P2PRoom {
       if (this.votes.has(viewer.id)) s.you.voted = true;
       if (viewer.kicked) s.you.kicked = true;
       if (viewer.gone) s.you.gone = true;
-      if (a) { s.you.last = { correct: a.correct, points: a.points, ms: a.ms }; if (a.stage) s.you.stage = a.stage; }
+      if (a) { s.you.last = lastOf(a, n); if (a.stage) s.you.stage = a.stage; }
     }
     return s;
   }
 
   // Host refresh: the room survives in sessionStorage and resumes under the same peer id.
   snapshot() {
-    const { code, players, hostId, nextOrder, phase, q, qStart, qDeadline, revealAt, stageAt, auto, revealMs, answerMs, ver, game, noLate, stage, locked, spec, title, questions } = this;
+    const { code, players, hostId, nextOrder, phase, q, qStart, qDeadline, revealAt, stageAt, auto, revealMs, answerMs, ver, game, noLate, stage, locked, spec, title, questions, leadAt, hold, noStreak } = this;
     return { code, players: players.map(p => ({ ...p, conns: 0 })), hostId, nextOrder, phase, q, qStart, qDeadline, revealAt, stageAt, auto, revealMs,
-      answerMs, ver, game, noLate, stage, locked, votes: [...this.votes], spec, title, questions };
+      answerMs, ver, game, noLate, stage, locked, votes: [...this.votes], spec, title, questions, leadAt, hold, noStreak };
   }
 
   static restore(snap, opts = {}) {

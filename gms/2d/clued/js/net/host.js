@@ -1,23 +1,24 @@
 // Host setup (server rooms and device rooms): a list of rounds (＋ Add round → ♥ favourite or format → themes),
 // 10 questions each by default, plus the room-wide settings (answer time, gap, private/public, auto-start).
-import { h } from '../ui/kit.js?v=202610071438';
-import { defineScreen, go, header, current } from '../ui/app.js?v=202610071438';
-import { toast } from '../ui/popup.js?v=202610071438';
-import { getFormat, defaultOpts } from '../formats/registry.js?v=202610071438';
-import { getSettings, getLast, read, write } from '../core/store.js?v=202610071438';
-import { makeSpec } from '../core/spec.js?v=202610071438';
-import { randomSeed } from '../core/rng.js?v=202610071438';
-import { prepare } from '../structures/session.js?v=202610071438';
-import { roundCard, moveItem, registerRoundList, addRound, roundTitle, usable } from '../structures/rounds.js?v=202610071438';
-import { rooms, friendly } from './api.js?v=202610071438';
-import { rememberName, tidyName } from './ident.js?v=202610071438';
-import { ensureStyles, saveSeat, TRUST_HINT, START_CHOICES, startLabel } from './util.js?v=202610071438';
-import { timingPanel, choiceChips } from './board.js?v=202610071438';
-import { getTransport, canHostFromDevice, fallback, hasTransport } from './transport.js?v=202610071438';
-import { signInPrompt, isSignedIn, pausedText, busyText } from './signin.js?v=202610071438';
-import { ensureFormats } from './room.js?v=202610071438';
-import { nameField } from './join.js?v=202610071438';
-import { annotateTimes, fitSet, MAX_QUESTIONS } from './roundset.js?v=202610071438';
+import { h } from '../ui/kit.js?v=202610071629';
+import { defineScreen, go, header, current } from '../ui/app.js?v=202610071629';
+import { toast } from '../ui/popup.js?v=202610071629';
+import { getFormat, defaultOpts } from '../formats/registry.js?v=202610071629';
+import { getSettings, getLast, read, write } from '../core/store.js?v=202610071629';
+import { makeSpec } from '../core/spec.js?v=202610071629';
+import { randomSeed } from '../core/rng.js?v=202610071629';
+import { prepare } from '../structures/session.js?v=202610071629';
+import { roundCard, moveItem, registerRoundList, addRound, roundTitle, usable } from '../structures/rounds.js?v=202610071629';
+import { rooms, friendly } from './api.js?v=202610071629';
+import { rememberName, tidyName } from './ident.js?v=202610071629';
+import { ensureStyles, saveSeat, TRUST_HINT, START_CHOICES, startLabel } from './util.js?v=202610071629';
+import { timingPanel, choiceChips } from './board.js?v=202610071629';
+import { streakOption } from '../ui/streakopt.js?v=202610071629';
+import { getTransport, canHostFromDevice, fallback, hasTransport } from './transport.js?v=202610071629';
+import { signInPrompt, isSignedIn, pausedText, busyText } from './signin.js?v=202610071629';
+import { ensureFormats } from './room.js?v=202610071629';
+import { nameField } from './join.js?v=202610071629';
+import { annotateTimes, fitSet, MAX_QUESTIONS } from './roundset.js?v=202610071629';
 
 const KEY = 'clued.online';   // { rounds, kidsRounds }: the last hosted round list, per mode
 const MAX_ROUNDS = 8;
@@ -30,7 +31,9 @@ function hostState() {
   const saved = read(KEY) || {};
   const list = saved[kids ? 'kidsRounds' : 'rounds'];
   HS = { kids, rounds: Array.isArray(list) ? list.filter(r => r && typeof r.format === 'string') : [], name: '',
-    timing: { answerSec: kids ? 20 : 10, gapSec: 5 }, vis: { public: false, startIn: 120 } };
+    // New rooms default to streaks "just for show": the quicker correct answer always scores more (TIMING.md);
+    // the host's last choice is remembered.
+    timing: { answerSec: kids ? 20 : 10, gapSec: 5, streak: saved.streak === true }, vis: { public: false, startIn: 120 } };
   return HS;
 }
 function saveHost() {
@@ -99,7 +102,9 @@ defineScreen('host', async (el, params, cur) => {
   }
   draw();
 
-  body.append(h('h3.sec-title', {}, 'Room settings'), timingPanel({ ...S.timing, onChange: v => Object.assign(S.timing, v) }));
+  const tp = timingPanel({ ...S.timing, onChange: v => Object.assign(S.timing, { answerSec: v.answerSec, gapSec: v.gapSec }) });
+  if (!kids) tp.append(streakOption(S.timing.streak, v => { S.timing.streak = v; const saved = read(KEY) || {}; saved.streak = v; write(KEY, saved); }));
+  body.append(h('h3.sec-title', {}, 'Room settings'), tp);
   const startRow = h('div', { hidden: !S.vis.public, dataset: { opt: 'start' } }, h('div.opt-label', {}, 'Start'),
     choiceChips(START_CHOICES, START_CHOICES.map(startLabel), S.vis.startIn, x => { S.vis.startIn = x; }));
   if (!device) body.append(h('div.panel.stack.net-timing', {},
@@ -153,6 +158,7 @@ defineScreen('host', async (el, params, cur) => {
       format: r.format, packs: r.packs, count: r.count || COUNT, difficulty: kids ? 1 : (r.difficulty || 0),
       opts: { ...(r.opts || {}), online: true, ...(kids ? { kids: true } : {}) }, ...(r.title ? { title: r.title } : {}),
     })), randomSeed(), { kids });
+    spec.streak = S.timing.streak ? 'on' : 'off';
     const title = S.title || roomTitle(rounds);
     try {
       const r = await prepare(spec, status);

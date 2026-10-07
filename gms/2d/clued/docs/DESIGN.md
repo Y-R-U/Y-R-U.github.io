@@ -172,7 +172,7 @@ Anything that doesn't need our server has no caps:
   cap or protection level 3 ("host from your device instead").
 
 ## Vote to reveal more (Aaron, 2026-10-05)
-Progressive questions (`reveal`, `ladder` clues, `listen` clip length, `silhouette`, movie-moment zoom/blur) have
+Progressive questions (`reveal`, `ladder` clues, `silhouette`, movie-moment zoom/blur; NOT `listen` since 2026-10-08) have
 **stages** 0…N-1, starting at the least revealed.
 - **Online/P2P rooms:** every player gets a "Show more 👀 (2/5 voted)" button. When **all connected players who
   haven't answered** have voted, everyone advances one stage at once (server/host-authoritative). As soon as **anyone
@@ -191,3 +191,8 @@ Fullscreen API is missing, e.g. iPhone Safari). UI: js/ui/toggles.js (manager); 
 In async modes (link challenges, server challenges, solo) "Show more" works freely. The winner of each question
 is whoever answered **correctly with the least revealed** (lowest stage); ties are broken by time. Show the stage used next to each
 player's result in the challenge comparison ("got it at clue 2 / 3 s of music").
+
+## Rulings 2026-10-08 (Aaron, after family playtests)
+- Music `listen`: NO "grow the clip". It plays exactly the chosen clip length; replay is how you hear more (shown as "−N replays" in the points breakdown). Vote-to-reveal stays for reveal, ladder and silhouette.
+- Streak bonus is a setting: "Adds points" (+10%/streak, cap +50%) or "Just for show", with an ⓘ explaining it. It's room-level in online play.
+- Every reveal shows a points breakdown (speed, streak, replays, stage).

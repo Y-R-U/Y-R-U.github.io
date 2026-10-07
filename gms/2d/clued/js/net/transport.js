@@ -12,13 +12,15 @@
 //   host(code, key, action, extra) -> state      actions: start next end kick host settings again
 //   leave(code, key)
 //   vote(code, key, q) -> state       vote to reveal more on a progressive question (409 locked/last_stage are harmless)
+//   ready(code, key, q) -> state      question q and its media are loaded (q = -1: announces the client reports readiness);
+//                                      the opening waits ≤ 5 s for reporting clients (state.hold) — see docs/notes/TIMING.md
 //   now() -> ms on the room's clock;  syncClock(samples?) -> Promise
 // }
 // Vote to reveal more travels inside room state (no separate messages): for a progressive question the state carries
 // { stage, stages, votes, needed, locked, qDeadline, limitMs } and you.voted / you.stage. A 'stage' event = stage went up
 // (with the extended qDeadline); 'lock' = locked became true. P2P hosts should emit the same fields.
 // Room state shape is the server's (docs/notes/S.md "Room state"). Errors are ApiError-like: { status, code, message }.
-import { rooms, subscribe, serverNow, syncClock } from './api.js?v=202610071438';
+import { rooms, subscribe, serverNow, syncClock } from './api.js?v=202610071629';
 
 export const serverTransport = {
   id: 'server',
@@ -31,6 +33,7 @@ export const serverTransport = {
   host: (code, key, action, extra) => rooms.host(code, key, action, extra),
   leave: (code, key) => rooms.leave(code, key),
   vote: (code, key, q) => rooms.vote(code, key, q),
+  ready: (code, key, q) => rooms.ready(code, key, q),
   now: () => serverNow(),
   syncClock: n => syncClock(n),
 };

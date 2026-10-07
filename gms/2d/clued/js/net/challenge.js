@@ -1,19 +1,20 @@
 // Challenge links: "beat my score on this exact set". Create from a results screen, play via ?c=ID.
-import { h, fmtNum } from '../ui/kit.js?v=202610071438';
-import { defineScreen, header, current, reset } from '../ui/app.js?v=202610071438';
-import { popup, toast } from '../ui/popup.js?v=202610071438';
-import { sfx, confetti } from '../ui/fx.js?v=202610071438';
-import { getSettings } from '../core/store.js?v=202610071438';
-import { createRunner } from '../structures/runner.js?v=202610071438';
-import { replayCfg, replayScore } from '../structures/index.js?v=202610071438';
-import { challenges, friendly } from './api.js?v=202610071438';
-import { suggestedName, rememberName, tidyName, MAX_NAME } from './ident.js?v=202610071438';
-import { openShare, challengeUrl, shareOrCopy } from './share.js?v=202610071438';
-import { scoreboard, ordinal, detailOf, comparison } from './board.js?v=202610071438';
-import { ensureStyles, setQuery } from './util.js?v=202610071438';
-import { ensureFormats } from './room.js?v=202610071438';
-import { openSignIn } from './signin.js?v=202610071438';
-import { linkChallengeShare } from './linkchallenge.js?v=202610071438';
+import { h, fmtNum } from '../ui/kit.js?v=202610071629';
+import { defineScreen, header, current, reset } from '../ui/app.js?v=202610071629';
+import { popup, toast } from '../ui/popup.js?v=202610071629';
+import { sfx, confetti } from '../ui/fx.js?v=202610071629';
+import { getSettings } from '../core/store.js?v=202610071629';
+import { createRunner } from '../structures/runner.js?v=202610071629';
+import { replayCfg, replayScore } from '../structures/index.js?v=202610071629';
+import { challenges, friendly } from './api.js?v=202610071629';
+import { suggestedName, rememberName, tidyName, MAX_NAME } from './ident.js?v=202610071629';
+import { openShare, challengeUrl, shareOrCopy } from './share.js?v=202610071629';
+import { scoreboard, ordinal, detailOf, comparison } from './board.js?v=202610071629';
+import { ensureStyles, setQuery } from './util.js?v=202610071629';
+import { ensureFormats } from './room.js?v=202610071629';
+import { openSignIn } from './signin.js?v=202610071629';
+import { linkChallengeShare } from './linkchallenge.js?v=202610071629';
+import { recordGame, summarize, playSecs } from '../core/stats.js?v=202610071629';
 
 const MAX_SET = 500 * 1024;
 
@@ -134,6 +135,7 @@ defineScreen('challenge', async (el, { id }, cur) => {
       run = null;
       if (cur !== current() || r === null) return;
       if (res.aborted) { intro(); return; }
+      recordGame(summarize('challenge', res, { spec: c.spec, kids, secs: playSecs() }));
       submit(name, res);
     });
   }

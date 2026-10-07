@@ -1,5 +1,5 @@
 // Scoreboards and podium for rooms and challenges. All text goes in via textContent (h() kids).
-import { h, fmtNum } from '../ui/kit.js?v=202610071438';
+import { h, fmtNum } from '../ui/kit.js?v=202610071629';
 
 export const ordinal = n => {
   const s = ['th', 'st', 'nd', 'rd'], v = n % 100;
@@ -8,10 +8,32 @@ export const ordinal = n => {
 
 const MEDAL = ['🥇', '🥈', '🥉'];
 
+const secs = ms => `${(Math.max(0, ms || 0) / 1000).toFixed(1)} s`;
+
+// Why an answer scored what it did (server `last`): "343 speed (5.9 s) · ×1.25 5 s clip · −15% 1 replay · +172 streak (7 in a row)".
+// The streak part only appears when the room's streak bonus adds points. Returns '' for a wrong answer or an old server.
+export function pointsBreakdown(last, { streakBonus = true } = {}) {
+  if (!last || !last.correct || !last.speed) return '';
+  const parts = [`${fmtNum(last.speed)} speed (${secs(last.ms)})`];
+  if (last.clipMul && last.clipMul !== 1) parts.push(`×${last.clipMul} ${last.clip ? `${last.clip} s ` : ''}clip`);
+  if (last.artMul && last.artMul !== 1) parts.push(`×${last.artMul} artwork`);
+  if (last.replays) parts.push(`−${Math.round((1 - 0.85 ** last.replays) * 100)}% ${last.replays} replay${last.replays === 1 ? '' : 's'}`);
+  if (last.stages > 1 && last.stage) parts.push(`×${(1 - 0.6 * Math.min(last.stage, last.stages - 1) / (last.stages - 1)).toFixed(2).replace(/0$/, '')} at step ${last.stage + 1}/${last.stages}`);
+  if (streakBonus && last.bonus > 0) parts.push(`+${fmtNum(last.bonus)} streak${last.streak > 1 ? ` (${last.streak} in a row)` : ''}`);
+  return parts.join(' · ');
+}
+
+// Short per-row note on a scoreboard: answer time, plus the streak bonus when it added points.
+export function rowNote(last, { streakBonus = true } = {}) {
+  if (!last) return '';
+  if (!last.correct) return '✗';
+  return [secs(last.ms), streakBonus && last.bonus > 0 ? `+${fmtNum(last.bonus)} streak` : ''].filter(Boolean).join(' · ');
+}
+
 // rows: [{ id, name, score, correct, last?, signed? }] sorted best first.
 // Kids rooms show the top 3 plus your own row, stars instead of points, no rank for anyone else.
 // round: show each row's points for that round (rows[].rs, multi-round rooms) instead of the last question's.
-export function scoreboard(rows, { meId = null, kids = false, top = 5, deltas = false, round = null } = {}) {
+export function scoreboard(rows, { meId = null, kids = false, top = 5, deltas = false, round = null, streakBonus = true } = {}) {
   const list = h('ol.net-board');
   const meIdx = rows.findIndex(r => r.id === meId);
   const limit = kids ? 3 : top;
@@ -23,9 +45,11 @@ export function scoreboard(rows, { meId = null, kids = false, top = 5, deltas = 
     const rp = round != null && Array.isArray(r.rs) ? r.rs[round] || 0 : null;
     const delta = rp != null ? rp : deltas && r.last ? r.last.points : null;
     const dl = delta ? `+${fmtNum(delta)}` : '+0';
+    const rb = rp != null && Array.isArray(r.rb) ? r.rb[round] || 0 : 0;
+    const note = kids ? '' : rp != null ? (streakBonus && rb ? `incl. +${fmtNum(rb)} streak` : '') : deltas ? rowNote(r.last, { streakBonus }) : '';
     list.append(h('li.net-row', { class: me ? 'me' : '', style: { '--i': i } },
       h('span.rk', {}, rank),
-      h('span.nm', {}, r.name + (me ? ' (you)' : '')),
+      h('span.nm', {}, r.name + (me ? ' (you)' : ''), note ? h('small.net-note-row', {}, note) : null),
       kids ? h('span.dl', {}, '') : delta != null ? h('span.dl', { class: delta ? '' : 'zero', title: rp != null ? `Round ${round + 1}` : null }, rp != null ? `R${round + 1} ${dl}` : dl) : h('span.dl'),
       h('span.pt', {}, kids ? h('span.stars', {}, `${r.correct || 0} ⭐`) : fmtNum(r.score))));
   };

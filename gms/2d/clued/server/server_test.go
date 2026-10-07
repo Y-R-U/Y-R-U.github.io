@@ -373,7 +373,8 @@ func TestRoomFlow(t *testing.T) {
 		t.Fatal("answer after reveal refused")
 	}
 	call(t, "POST", "/rooms/"+code+"/next", map[string]any{"key": hk})
-	call(t, "POST", "/rooms/"+code+"/next", map[string]any{"key": hk}) // skip q2 to reveal
+	advance(leadInMs * time.Millisecond)
+	call(t, "POST", "/rooms/"+code+"/next", map[string]any{"key": hk, "q": 2}) // skip q2 to reveal (explicit q)
 	st = call(t, "POST", "/rooms/"+code+"/next", map[string]any{"key": hk}).body
 	if st["phase"] != "final" {
 		t.Fatalf("final: %v", st["phase"])
@@ -1073,7 +1074,7 @@ func TestVoteToReveal(t *testing.T) {
 	if num(st["you"].(map[string]any)["stage"]) != 0 {
 		t.Fatal("host hasn't answered")
 	}
-	call(t, "POST", "/rooms/"+code+"/next", map[string]any{"key": hk})
+	call(t, "POST", "/rooms/"+code+"/next", map[string]any{"key": hk, "q": 0})
 	st = call(t, "POST", "/rooms/"+code+"/next", map[string]any{"key": hk}).body
 	if st["locked"] == true || num(st["stage"]) != 0 {
 		t.Fatal("next question resets stage and lock")

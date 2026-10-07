@@ -3,6 +3,12 @@
 // mid-round-2, per-round scores on the podium, a vote-to-reveal round, host handover, and screenshots.
 //   node tools/s_room_e2e.mjs [--keep] [--shots DIR] [--poll]
 // Needs the :8888 site server and ~/.claude/bin/cdp. Ports: 9451 (host), 9452, 9453.
+//
+//   node tools/s_room_e2e.mjs --timing [--site URL] [--server DIR]       (docs/notes/TIMING.md; ports 9461–9463)
+// A 2-round Apple-music listen game: one player's audio-ssl.itunes.apple.com requests are held 3 s each, the host
+// presses "Round 2 ›" early and a stale Next tap follows; asserts no auto-answer, equal speed points for two
+// simultaneous taps, the clip starting with the question on both devices and playing its full 5 s.
+// --site/--server point at another copy (e.g. the pre-fix code) to prove the checks fail there.
 import { spawn, execFileSync } from 'node:child_process';
 import { mkdtempSync, writeFileSync, mkdirSync, rmSync } from 'node:fs';
 import { tmpdir, homedir } from 'node:os';
@@ -11,8 +17,11 @@ import { fileURLToPath } from 'node:url';
 import net from 'node:net';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
-const SERVER = join(HERE, '..', 'server');
-const SITE = 'http://localhost:8888/gms/2d/clued/';
+const argv0 = process.argv.slice(2);
+const argOf = k => (argv0.includes(k) ? argv0[argv0.indexOf(k) + 1] : null);
+const SERVER = argOf('--server') || join(HERE, '..', 'server');
+const SITE = argOf('--site') || 'http://localhost:8888/gms/2d/clued/';
+const TIMING = argv0.includes('--timing');
 const CDP = join(homedir(), '.claude/bin/cdp');
 const args = process.argv.slice(2);
 const SHOTS = args.includes('--shots') ? args[args.indexOf('--shots') + 1] : join(tmpdir(), 'clued-s-shots');
@@ -30,7 +39,8 @@ function freePort() {
 }
 
 class Page {
-  constructor(name, port) { this.name = name; this.port = port; this.id = 0; this.cbs = new Map(); this.events = []; }
+  constructor(name, port) { this.name = name; this.port = port; this.id = 0; this.cbs = new Map(); this.events = []; this.handlers = new Map(); }
+  onEvent(method, fn) { this.handlers.set(method, fn); }
   async open() {
     const list = await (await fetch(`http://127.0.0.1:${this.port}/json`)).json();
     const t = list.find(x => x.type === 'page');
@@ -41,6 +51,7 @@ class Page {
       if (d.id && this.cbs.has(d.id)) { const { res, rej } = this.cbs.get(d.id); this.cbs.delete(d.id); d.error ? rej(new Error(d.error.message)) : res(d.result); }
       else if (d.method === 'Runtime.exceptionThrown') this.events.push('EXC ' + (d.params.exceptionDetails.exception?.description || d.params.exceptionDetails.text));
       else if (d.method === 'Runtime.consoleAPICalled' && d.params.type === 'error') this.events.push('ERR ' + d.params.args.map(a => a.value ?? a.description).join(' '));
+      else if (d.method && this.handlers.has(d.method)) this.handlers.get(d.method)(d.params);
     };
     await this.send('Network.setCacheDisabled', { cacheDisabled: true });
     await this.send('Runtime.enable');
@@ -88,14 +99,14 @@ class Page {
   room() { return this.eval('window.__cluedRoom ? JSON.parse(JSON.stringify(window.__cluedRoom.st)) : null'); }
 }
 
-const PORTS = [9451, 9452, 9453];
+const PORTS = TIMING ? [9461, 9462, 9463] : [9451, 9452, 9453];
 let srv, dataDir, all = [];
 async function main() {
   const port = await freePort();
   dataDir = mkdtempSync(join(tmpdir(), 'clued-e2e-'));
   const bin = join(dataDir, 'clued');
   execFileSync('go', ['build', '-o', bin, '.'], { cwd: SERVER, env: { ...process.env, CGO_ENABLED: '0' } });
-  srv = spawn(bin, [], { env: { ...process.env, CLUED_ADDR: `127.0.0.1:${port}`, CLUED_DATA: join(dataDir, 'data') }, stdio: 'ignore' });
+  srv = spawn(bin, [], { env: { ...process.env, CLUED_ADDR: `127.0.0.1:${port}`, CLUED_DATA: join(dataDir, 'data'), CLUED_ORIGINS: `http://localhost:8888,${new URL(SITE).origin}` }, stdio: 'ignore' });
   const API = `http://127.0.0.1:${port}/gms/2d/clued/api`;
   for (let i = 0; i < 50; i++) { try { if ((await fetch(API + '/health')).ok) break; } catch (e) {} await sleep(100); }
   console.log(`server ${API}`);
@@ -128,7 +139,15 @@ async function main() {
   await host.shot('add-round-portrait.png');
   await host.click('.pop:not(.out) .rp-fav[data-fav-format=tf]');
   await host.waitFor(`document.querySelectorAll('.round-card').length === 2`, 8000, 'fav round added');
-  ok(await host.eval(`(() => { const c = document.querySelectorAll('.round-card')[1]; return c.textContent.includes('True or false') && c.textContent.includes('♥') && c.textContent.includes('4 questions'); })()`), 'round 2 added straight from a favourite (♥, its 4 questions)');
+  ok(await host.eval(`(() => { const c = document.querySelectorAll('.round-card')[1]; return c.textContent.includes('True or false') && c.textContent.includes('♥') && c.textContent.includes('10 questions'); })()`), 'round 2 added straight from a favourite (♥, the default 10 questions)');
+  // keep the game short: edit the fav round down to 5
+  await sleep(500);
+  await host.click('.round-card[data-round="1"] [data-act=round-edit]');
+  await host.waitFor(`document.body.dataset.screen === 'pqround'`, 8000, 'round 2 editor');
+  await host.click('.opt .chip[data-v="5"]');
+  await host.click('[data-act=save-round]');
+  await host.waitFor(`document.body.dataset.screen === 'host' && document.querySelectorAll('.round-card')[1]?.textContent.includes('5 questions')`, 8000, 'round 2 → 5');
+  await sleep(500);
   // round 3: format → editor → 5 questions
   await host.click('[data-act=add-round]');
   await host.click('.pop:not(.out) .tile[data-format=mc]');
@@ -141,7 +160,7 @@ async function main() {
   await host.click('.round-card[data-round="2"] [data-act=round-up]');
   ok(await host.eval(`document.querySelectorAll('.round-card')[1].textContent.includes('Multiple choice')`), 'move up reorders the rounds');
   await host.click('.round-card[data-round="1"] [data-act=round-down]');
-  ok(await host.eval(`document.querySelector('.rounds-sum').textContent === '3 rounds · 14 questions'`), 'summary: 3 rounds · 14 questions', await host.eval(`document.querySelector('.rounds-sum').textContent`));
+  ok(await host.eval(`document.querySelector('.rounds-sum').textContent === '3 rounds · 15 questions'`), 'summary: 3 rounds · 15 questions', await host.eval(`document.querySelector('.rounds-sum').textContent`));
   await host.eval(`scrollTo(0, 0); document.querySelector('.screen').scrollTop = 0; true`);
   await host.shot('host-rounds-portrait.png');
   await host.size(1280, 800, 1, false); await sleep(300); await host.shot('host-rounds-desktop.png');
@@ -181,7 +200,7 @@ async function main() {
   const total = (await host.room()).total;
   const sizes = (await host.room()).roundSizes;
   console.log(`  …playing ${total} questions in rounds of ${sizes}`);
-  ok(JSON.stringify(sizes) === '[5,4,5]', 'server sees rounds of 5, 4 and 5', JSON.stringify(sizes));
+  ok(JSON.stringify(sizes) === '[5,5,5]', 'server sees rounds of 5, 5 and 5', JSON.stringify(sizes));
   const starts = sizes.map((_, k) => sizes.slice(0, k).reduce((a, b) => a + b, 0));
   const REFRESH_Q = starts[1] + 1;
   const pages = [host, j1, j2];
@@ -212,7 +231,7 @@ async function main() {
           const me = await p.room();
           ok(me.you.name === 'Bob', 'same seat after refresh', me.you.name);
           const label = await p.waitFor(`document.querySelector('.prog-txt')?.textContent`, 15000, 'label after refresh').catch(() => '');
-          ok(label === 'Round 2 · 2/4', 'after the refresh the HUD says Round 2 · 2/4', label);
+          ok(label === 'Round 2 · 2/5', 'after the refresh the HUD says Round 2 · 2/5', label);
         }
         if (p === j1 && st.q === total - 1) continue; // Ann sits out the last question: her timer must run out
         if (!sawCountdown) sawCountdown = await p.eval(`!!document.querySelector('.net-count3')`);
@@ -306,7 +325,139 @@ async function main() {
   ok(pages.every(p => !p.events.some(e => e.startsWith('EXC'))), 'no uncaught exceptions');
 }
 
-main().catch(async e => {
+/* ------------------------------------------------------------------ --timing (docs/notes/TIMING.md) */
+const MEDIA_DELAY = 4500;
+// Records every AudioBufferSourceNode start (clip.js plays listen clips this way) and when it ended.
+const CLIP_HOOK = `(() => {
+  window.__clipLog = [];
+  const S = AudioBufferSourceNode.prototype.start;
+  AudioBufferSourceNode.prototype.start = function (when = 0, offset = 0, dur) {
+    const st = window.__cluedRoom && window.__cluedRoom.st;
+    const rec = { at: Date.now(), t0: this.context.currentTime, when, offset, dur, buf: this.buffer && this.buffer.duration, q: st && st.q, qStart: st && st.qStart };
+    window.__clipLog.push(rec);
+    this.addEventListener('ended', () => { rec.t1 = this.context.currentTime; });
+    return S.call(this, when, offset, dur);
+  };
+  window.__timeUps = []; window.__holds = [];
+  setInterval(() => { const st = window.__cluedRoom && window.__cluedRoom.st; if (st && st.hold && !window.__holds.includes(st.q)) window.__holds.push(st.q); }, 50);
+  new MutationObserver(() => {
+    const r = document.querySelector('.reveal.show .rv-title');
+    const st = window.__cluedRoom && window.__cluedRoom.st;
+    if (r && /Time.s up/.test(r.textContent) && st && !window.__timeUps.includes(st.q)) window.__timeUps.push(st.q);
+  }).observe(document, { subtree: true, childList: true });
+})()`;
+
+async function timingMain() {
+  const port = await freePort();
+  dataDir = mkdtempSync(join(tmpdir(), 'clued-e2e-'));
+  const bin = join(dataDir, 'clued');
+  execFileSync('go', ['build', '-o', bin, '.'], { cwd: SERVER, env: { ...process.env, CGO_ENABLED: '0' } });
+  srv = spawn(bin, [], { env: { ...process.env, CLUED_ADDR: `127.0.0.1:${port}`, CLUED_DATA: join(dataDir, 'data'), CLUED_ORIGINS: `http://localhost:8888,${new URL(SITE).origin}` }, stdio: 'ignore' });
+  const API = `http://127.0.0.1:${port}/gms/2d/clued/api`;
+  for (let i = 0; i < 50; i++) { try { if ((await fetch(API + '/health')).ok) break; } catch (e) {} await sleep(100); }
+  console.log(`server ${API} · site ${SITE}`);
+  for (const p of PORTS) { try { execFileSync(CDP, ['stop', String(p)], { stdio: 'ignore' }); } catch (e) {} }  // a reused browser keeps the last run's page
+  for (const p of PORTS) execFileSync(CDP, ['start', '--port', String(p), '--idle', '180', '--', '--use-angle=metal', '--autoplay-policy=no-user-gesture-required'], { stdio: 'ignore' });
+  const [host, slow, fast] = [new Page('host', PORTS[0]), new Page('slow', PORTS[1]), new Page('fast', PORTS[2])];
+  all = [host, slow, fast];
+  for (const p of all) { await p.open(); await p.send('Page.addScriptToEvaluateOnNewDocument', { source: CLIP_HOOK }); }
+  // the slow device: every Apple preview request (HEAD check and the clip itself) waits MEDIA_DELAY
+  let held = 0;
+  await slow.send('Fetch.enable', { patterns: [{ urlPattern: '*audio-ssl.itunes.apple.com*', requestStage: 'Request' }] });
+  slow.onEvent('Fetch.requestPaused', ev => { held++; setTimeout(() => slow.send('Fetch.continueRequest', { requestId: ev.requestId }).catch(() => {}), MEDIA_DELAY); });
+
+  const q = `noauth=1&api=${encodeURIComponent(API)}`;
+  await host.go(`${SITE}?${q}`);
+  await host.waitFor(`location.href.startsWith(${JSON.stringify(SITE)}) && window.__cluedReady`, 20000, 'boot');
+  const round = { format: 'listen', packs: ['hits-1980s', 'hits-1990s'], count: 2, opts: { clip: 5, art: 'off', ask: 'title', answers: 4 }, difficulty: 0 };
+  await host.eval(`(() => { localStorage.setItem('clued.online', JSON.stringify({ rounds: [${JSON.stringify(round)}, ${JSON.stringify({ ...round, packs: ['hits-2000s'] })}] })); localStorage.setItem('clued.settings', JSON.stringify({ bgm: false })); return true; })()`);
+  await host.eval(`import('./js/net/index.js?v=' + (window.__clued?.BUILD || window.__cluedCtx?.BUILD || 1)).then(() => window.__cluedCtx.go('online'))`);
+  await host.click('[data-act=host]');
+  await host.waitFor(`document.querySelectorAll('.round-card').length === 2`, 10000, 'two listen rounds');
+  await host.type('[data-field=name]', 'Hosty');
+  await host.click('[data-act=create]');
+  await host.waitFor(`document.querySelector('.net-code')?.textContent`, 60000, 'lobby code');
+  const code = await host.eval(`document.querySelector('.net-code').textContent`);
+  const link = await host.eval(`document.querySelector('.net-link').textContent`);
+  const hostKey = await host.eval(`JSON.parse(sessionStorage.getItem('clued.room.${code}')||'{}').key`);
+  for (const [p, name] of [[slow, 'Slow'], [fast, 'Fast']]) {
+    await p.go('http://' + link + '&noauth=1');
+    await p.waitFor(`document.querySelector('[data-field=name]')`, 20000, 'join form');
+    await p.type('[data-field=name]', name);
+    await p.click('[data-act=join]');
+    await p.waitFor(`window.__cluedRoom?.st?.phase === 'lobby'`, 15000, 'lobby');
+  }
+  await host.waitFor(`window.__cluedRoom.st.players.length === 3`, 8000, '3 players');
+  const st0 = await host.room();
+  ok(JSON.stringify(st0.roundSizes) === '[2,2]', 'two listen rounds of 2', JSON.stringify(st0.roundSizes));
+  ok(st0.streakBonus === false, 'new online rooms: streaks just for show by default', String(st0.streakBonus));
+  await host.click('[data-act=start]');
+  const total = st0.total;
+  const answerIdx = async i => (await (await fetch(`${API}/rooms/${code}/q/${i}?k=${hostKey}`)).json()).question.answer;
+  const speedPairs = [], starts = {}, holds = new Set();
+  let staleOk = null, whyText = '';
+  for (let i = 0; i < total; i++) {
+    await host.waitFor(`window.__cluedRoom?.st?.q >= ${i} || window.__cluedRoom?.st?.phase === 'final'`, 30000, `q${i}`);
+    const cur = await host.room();
+    if (cur.q > i || cur.phase === 'final') { ok(false, `q${i} was never playable (ended by a stale Next)`, `now ${cur.phase} q${cur.q}`); continue; }
+    const right = await answerIdx(i);
+    const sel = `.stage .choices .choice:not([disabled])`;
+    for (const p of [host, slow, fast]) await p.waitFor(`(() => { const s = window.__cluedRoom?.st; if (s?.hold) window.__sawHold = true; return document.querySelector(${JSON.stringify(sel)}) || document.querySelector('.reveal.show'); })()`, 40000, `${p.name} q${i} choices`);
+    const qs = (await host.room()).qStart;
+    // let the clip play out on question 0 to measure its length; otherwise answer ~2 s in
+    const wait = (i === 0 ? 6000 : 2000) - (Date.now() - qs);
+    if (wait > 0) await sleep(wait);
+    const click = `(() => { const b = document.querySelectorAll('.stage .choices .choice')[${right}]; if (!b || b.disabled) return false; b.click(); return true; })()`;
+    const [a, b] = await Promise.all([slow.eval(click), fast.eval(click)]);
+    ok(a && b, `q${i}: both players could answer (no auto-answer)`, `${a} ${b}`);
+    await host.eval(click);
+    await host.waitFor(`window.__cluedRoom.st.phase === 'reveal' && window.__cluedRoom.st.q === ${i}`, 20000, `q${i} reveal`);
+    const st = await host.room();
+    const P = n => st.players.find(x => x.name === n)?.last || {};
+    speedPairs.push([i, P('Slow'), P('Fast')]);
+    if (i === 0) whyText = await fast.waitFor(`document.querySelector('.net-why')?.textContent`, 5000, 'breakdown').catch(() => '');
+    if (i === 0) { await fast.eval(`document.querySelector('.net-why')?.scrollIntoView({ block: 'center' }); true`); await sleep(1500); await fast.shot('timing-reveal.png'); }
+    ok(st.answered === 3, `q${i}: all three answers recorded`, `${st.phase} q${st.q} answered ${st.answered}`);
+    for (const p of [slow, fast]) {
+      const log = (await p.eval('JSON.stringify(window.__clipLog || [])')).length ? JSON.parse(await p.eval('JSON.stringify(window.__clipLog || [])')) : [];
+      const rec = log.filter(r => r.q === i && r.dur > 4.9 && r.dur < 5.2)[0];
+      (starts[p.name === 'slow' ? 'Slow' : 'Fast'] ||= []).push(rec ? rec.at - rec.qStart : null);
+      if (i === 0 && p === slow) {
+        const played = rec && rec.t1 ? rec.t1 - Math.max(rec.t0, rec.when) : 0;
+        ok(rec && rec.buf >= 5 && played >= 4.9, 'the full 5 s clip played (buffer ≥ 5 s, start→ended ≥ 4.9 s)', rec ? `buf ${rec.buf?.toFixed(2)} played ${played.toFixed(2)} offset ${rec.offset}` : 'no clip');
+      }
+    }
+    const R = st.roundSizes;
+    if (i === R[0] - 1) {
+      // end of round 1: the host taps "Round 2 ›" during the gap, then a stale tap lands after the server moved on
+      ok(await host.waitFor(`document.querySelector('[data-act=next]')?.textContent.includes('Round 2')`, 5000, 'Round 2 button'), 'host sees "Round 2 ›"');
+      await host.click('[data-act=next]');
+      await host.waitFor(`window.__cluedRoom.st.q === ${i + 1} && window.__cluedRoom.st.phase === 'question'`, 8000, 'round 2 opened early');
+      for (const body of [{ key: hostKey, q: i }, { key: hostKey }]) {
+        await fetch(`${API}/rooms/${code}/next`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+      }
+      const after = await (await fetch(`${API}/rooms/${code}/state?k=${hostKey}`)).json();
+      staleOk = after.phase === 'question' && after.q === i + 1;
+      ok(staleOk, 'stale "Next" taps after "Round 2 ›" don\'t end round 2\'s first question', `${after.phase} q${after.q}`);
+    }
+  }
+  for (const p of [host, slow, fast]) await p.waitFor(`window.__cluedRoom?.st?.phase === 'final'`, 20000, 'final');
+  const timeUps = await Promise.all([host, slow, fast].map(p => p.eval('JSON.stringify(window.__timeUps || [])')));
+  ok(timeUps.every(t => t === '[]'), 'nobody saw "Time\'s up" at the start of a question', timeUps.join(' '));
+  ok(held > 0, `the slow device's Apple requests were held (${held})`);
+  console.log(`  holds on questions: ${await slow.eval('JSON.stringify(window.__holds)')} · clip start after qStart (ms): slow ${JSON.stringify(starts.Slow)} fast ${JSON.stringify(starts.Fast)}`);
+  ok(starts.Slow?.length === total && starts.Slow.every(x => x != null && x < 1500), 'slow device: the clip starts within 1.5 s of the question opening', JSON.stringify(starts.Slow));
+  ok(starts.Fast?.length === total && starts.Fast.every(x => x != null && x < 1500), 'fast device: the clip starts within 1.5 s of the question opening', JSON.stringify(starts.Fast));
+  for (const [i, s1, f1] of speedPairs) {
+    ok(s1.correct && f1.correct && Math.abs((s1.speed ?? s1.points) - (f1.speed ?? f1.points)) <= 6 && Math.abs(s1.ms - f1.ms) <= 150,
+      `q${i}: simultaneous taps score the same speed points`, `slow ${s1.speed ?? s1.points} (${s1.ms} ms) fast ${f1.speed ?? f1.points} (${f1.ms} ms)`);
+  }
+  ok(/speed/.test(whyText) && /clip/.test(whyText), 'reveal shows the points breakdown', whyText);
+  await fast.shot('timing-final.png');
+  for (const p of all) for (const e of p.events) console.log(`  [${p.name}] ${e}`);
+}
+
+(TIMING ? timingMain() : main()).catch(async e => {
   fail++; console.error('FATAL', e.message);
   for (const p of all) {
     try {

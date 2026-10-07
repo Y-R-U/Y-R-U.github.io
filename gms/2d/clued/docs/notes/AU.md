@@ -15,7 +15,7 @@
 | `js/audio/dev.html` | Audio lab: SFX buttons (kids skin toggle), piano piece player + tappable keyboard, random clips per pack with the Apple reveal, and the real `listen` format with a mock api. `http://localhost:8888/gms/2d/clued/js/audio/dev.html` |
 
 ### `listen` format
-- Options (A's setup UI shows them; remembered per player via A's `setLast`): **Grow the clip** Online only / On / Off;
+- Options (A's setup UI shows them; remembered per player via A's `setLast`): **Grow the clip was removed 2026-10-08** (see TIMING.md: online it played 1 s first; replay is how you hear more; `opts.grow` is ignored);
   **Clip length** 1/2/3/5/10/15/30 s (default 5; kids 5/10/15, default 10); **Album artwork** Off / Blurred (sharpens as the clip plays) / On;
   **Ask for** Mix / Title / Artist / Decade / Composer / Next line; **Answers** 2/3/4/6 (kids 2/3).
 - Everything that matters online is stored in the question: `data.{ a, start, len, art, kind, replays, stageLens, meta, artImg }`, `stages`. Host settings therefore win in rooms.
@@ -23,7 +23,7 @@
   piano + classical → title / composer; anthems → country (`pack.listenPrompt`); animals → "Which animal makes this sound?" / "Which bird is this?";
   instruments → instrument. "Finish the line" only from items with `lyrics`, which exist only on public-domain piano songs (the test enforces it); lines that repeat inside a song are never used as prompts.
 - Points (solo/party): `base × clip (1 s ×2 … 30 s ×0.7) × artwork (off 1, blurred 0.85, on 0.65) × 0.85 per replay`. 2 replays (kids unlimited).
-- **Progressive stages:** with Grow on, `stages: 5`, clip 1 → 2 → 4 → 8 → 15 s; blurred artwork sharpens by stage. Reads `api.stage`, re-plays on `api.onStage(cb)`, never advances itself. Until the runner draws the shared vote button (it should set `api.moreButton = true`), listen shows its own "Longer clip 👀" button calling `api.requestMore()` (or advancing locally when there is no runner support). In staged mode it omits `points`, so the runner's stage multiplier applies.
+- **Progressive stages (legacy, no longer generated):** with Grow on, `stages: 5`, clip 1 → 2 → 4 → 8 → 15 s; blurred artwork sharpens by stage. Reads `api.stage`, re-plays on `api.onStage(cb)`, never advances itself. Until the runner draws the shared vote button (it should set `api.moreButton = true`), listen shows its own "Longer clip 👀" button calling `api.requestMore()` (or advancing locally when there is no runner support). In staged mode it omits `points`, so the runner's stage multiplier applies.
 - Kids (`kids` from generate / `api.kids`): ≤ 3 answers, picture answers whenever every option has an image (animals), never lookalike distractors, artwork on, unlimited replays, longer clips. Easy difficulty doubles clips under 5 s.
 - Reveal (via `api.reveal`): artwork + title + artist/year + "Listen on Apple Music" + "Keep listening" (streams the full preview / piece).
 - Optional hook `prepare(questions)` (also on the format object) HEAD-checks Apple previews and re-resolves stale ones before preflight.

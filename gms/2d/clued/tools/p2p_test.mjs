@@ -259,5 +259,54 @@ ok(verifyCorrect({ format: 'type', answer: 'x' }, 'y', true) === true, 'other fo
   eq(r.limitFor({ format: 'connect', tscale: 6 }), 180000, 'scaled limit cap');
 }
 
+/* TIMING.md: stale next, ready hold, speed clamp, breakdown, streak setting, listen factors (mirrors server/timing_test.go) */
+{
+  const lq = (i, extra = {}) => ({ format: 'listen', id: `l${i}`, prompt: 'Name it', options: [{ text: 'a' }, { text: 'b' }], answer: 0, timeLimit: 20000, data: { len: 5, art: 'off', replays: 2 }, ...extra });
+  const { r, host } = room({ questions: [lq(0), lq(1), lq(2)] });
+  const p = join(r, 'P');
+  r.hostAction(host, 'start');
+  openQ(r);
+  r.answer(host, { q: 0, correct: true, ms: 2000 }); r.answer(p, { q: 0, correct: true, ms: 2000 });
+  T = r.revealAt; r.tick();
+  eq([r.phase, r.q], ['question', 1], 'gap timer opens q1');
+  T += 100;
+  r.hostAction(host, 'next', { q: 0 }); r.hostAction(host, 'next', {});
+  eq([r.phase, r.q], ['question', 1], 'a stale or q-less next never ends the new question in its lead-in');
+  openQ(r);
+  r.hostAction(host, 'next', { q: 1 });
+  eq(r.phase, 'reveal', 'an explicit next naming the open question skips it');
+  r.hostAction(host, 'next', { q: 1 });
+  eq([r.phase, r.q], ['question', 2], 'next from the reveal advances');
+  // ready hold
+  r.ready(host, -1); r.ready(p, -1); r.ready(host, 2);
+  const lead = r.qStart;
+  T = lead; r.tick();
+  ok(r.hold && r.qStart === lead + 5000 && r.stateFor(host).hold === true, 'opening held while a client loads its media');
+  ok(!!r.answer(host, { q: 2, correct: true, ms: 0 }).error, 'no answers while held');
+  T = lead + 2000; r.ready(p, 2);
+  ok(!r.hold && r.qStart === T + 800 && r.qDeadline - r.qStart === r.limitFor(r.questions[2]), 'last ready → opens 800 ms later with the full window');
+  T = r.qStart + 2000;
+  // same real moment, one client's clock 3 s behind: clamped to 1.5 s before the receive time; replays ×0.85
+  const x = r.answer(host, { q: 2, correct: true, ms: 2000, replays: 1 }).answer, y = r.answer(p, { q: 2, correct: true, ms: -1 + 1, replays: 0 }).answer;
+  eq(y.ms, 500, 'a client ms undercutting the receive time by > 1.5 s is clamped');
+  eq(x.speed, 420, 'speed points from the server-measured time');
+  eq(x.points, Math.round(420 * 1.25 * 0.85), 'listen: ×1.25 for a 5 s clip, ×0.85 per replay (streak reset by the skipped q1)');
+  const lastH = r.stateFor(host).you.last;
+  ok(lastH.clipMul === 1.25 && lastH.replays === 1 && lastH.speed === 420 && !lastH.bonus && lastH.clip === 5, 'the reveal carries the breakdown', JSON.stringify(lastH));
+}
+{
+  const { r, host } = room({ streak: false });
+  const p = join(r, 'P');
+  eq(r.stateFor(host).streakBonus, false, 'streak "just for show" in state');
+  r.hostAction(host, 'start');
+  for (let q = 0; q < 2; q++) { openQ(r); r.answer(host, { q, correct: true, given: 0, ms: 1000 }); r.answer(p, { q, correct: true, given: 0, ms: 1000 }); T = r.revealAt; r.tick(); }
+  openQ(r); T += 3000;
+  const a = r.answer(host, { q: 2, correct: true, given: 0, ms: 3000 }).answer;
+  ok(a.points === 380 && a.bonus === 0 && host.streak === 3, 'streak off: no bonus points, the counter still counts', JSON.stringify(a));
+  r.hostAction(host, 'settings', { streak: true });
+  eq(r.stateFor(host).streakBonus, true, 'settings turns it on');
+  eq(new P2PRoom({ questions: [mc(0)], spec: { streak: 'off' }, now, rand }).stateFor(null).streakBonus, false, 'spec.streak off');
+}
+
 console.log(`${pass} passed, ${fail} failed`);
 process.exit(fail ? 1 : 0);

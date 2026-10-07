@@ -46,6 +46,23 @@ eq(S.dueSummary(cards, deck, T, S.NEW_PER_DAY - 1).fresh, 1, 'new allowance shri
 eq(S.dueSummary(cards, deck, T, S.NEW_PER_DAY + 5).fresh, 0, 'never negative fresh');
 eq(S.buildQueue(cards, deck, T, 2), ['q/x', 'p/a', 'p/b', 'p/d', 'p/e'], 'queue: oldest due first, then new in deck order');
 eq(S.buildQueue(cards, deck, T, 9, 2), ['q/x', 'p/a'], 'queue respects limit');
+// hard keeps the box, repeats its interval; from a new card it still graduates to box 1
+const hd = S.review({ b: 3, due: T, n: 2, l: 0, g: 1 }, 'hard', T);
+eq([hd.b, hd.due, 'g' in hd], [3, T + S.INTERVALS[3], false], 'hard keeps box 3 and its interval');
+eq([S.review(S.newCard(T), 'hard', T).b, S.review(S.newCard(T), 'hard', T).due], [1, T + 1], 'hard on a new card → box 1');
+// study queue: only the selected packs, due first, then new round-robin under each pack's daily cap
+const sc = { 'snakes/a': { b: 1, due: T - 1 }, 'songs/x': { b: 0, due: T - 3 }, 'snakes/b': { b: 2, due: T + 4 }, 'flowers/f': { b: 1, due: T } };
+const byPack = { snakes: ['snakes/a', 'snakes/b', 'snakes/c', 'snakes/d', 'snakes/e'], birds: ['birds/1', 'birds/2'] };
+eq(S.studyQueue(sc, { snakes: byPack.snakes }, T, { packs: ['snakes'] }), ['snakes/a', 'snakes/c', 'snakes/d', 'snakes/e'], 'study: only snakes, due then new');
+eq(S.studyQueue(sc, byPack, T, { packs: ['snakes', 'birds'] }), ['snakes/a', 'snakes/c', 'birds/1', 'snakes/d', 'birds/2', 'snakes/e'], 'study: new cards alternate packs');
+eq(S.studyQueue(sc, byPack, T, { packs: ['snakes'], newBy: { snakes: S.NEW_PER_DAY - 1 } }), ['snakes/a', 'snakes/c'], 'study: per-pack new cap');
+eq(S.studyQueue(sc, byPack, T, { packs: ['birds'], newBy: { snakes: S.NEW_PER_DAY } }), ['birds/1', 'birds/2'], 'study: another pack\'s cap does not apply');
+eq(S.studyQueue(sc, {}, T, { packs: null, fresh: false }), ['songs/x', 'snakes/a', 'flowers/f'], 'review all: every due card, oldest first');
+eq(S.studyQueue(sc, byPack, T, { packs: ['snakes'], limit: 2 }), ['snakes/a', 'snakes/c'], 'study respects limit');
+const cq = S.cramQueue({ 'p/a': { b: 3, r: 5 }, 'p/b': { b: 1, r: 9 }, 'p/c': { b: 1, r: 2 } }, ['p/a', 'p/b', 'p/c', 'p/d'], 3, () => 0.5);
+eq(cq, ['p/d', 'p/c', 'p/b'], 'cram: unseen first, then low boxes, oldest review first');
+const pc = S.packCounts(sc, { snakes: 5, birds: 2, flowers: 1 }, T, { snakes: S.NEW_PER_DAY - 1 });
+eq([pc.snakes, pc.birds, pc.flowers, pc.songs], [{ due: 1, fresh: 1 }, { due: 0, fresh: 2 }, { due: 1, fresh: 0 }, { due: 1, fresh: 0 }], 'per-pack due/new counts');
 // day numbers are local days
 ok(S.dayNumber(Date.UTC(2026, 9, 5, 12)) + 1 === S.dayNumber(Date.UTC(2026, 9, 6, 12)), 'dayNumber increments per day');
 // prune keeps low boxes

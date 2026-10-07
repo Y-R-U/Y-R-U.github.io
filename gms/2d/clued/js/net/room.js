@@ -1,23 +1,25 @@
 // Live room screen: lobby → synced questions (driven through A's runner) → scoreboards → podium.
-import { h, fmtNum } from '../ui/kit.js?v=202610071438';
-import { defineScreen, reset, header, current } from '../ui/app.js?v=202610071438';
-import { confirmPop, toast } from '../ui/popup.js?v=202610071438';
-import { sfx, confetti } from '../ui/fx.js?v=202610071438';
-import { createRunner } from '../structures/runner.js?v=202610071438';
-import { prepare, prepareFormats } from '../structures/session.js?v=202610071438';
-import { basePoints, streakMultiplier, stageMultiplier } from '../core/scoring.js?v=202610071438';
-import { urlsOf, preflight } from '../core/media.js?v=202610071438';
-import { randomSeed } from '../core/rng.js?v=202610071438';
-import { listFormats } from '../formats/registry.js?v=202610071438';
-import { loadFormats } from '../formats/index.js?v=202610071438';
-import { friendly } from './api.js?v=202610071438';
-import { getTransport } from './transport.js?v=202610071438';
-import { sharePanel, joinUrl, p2pUrl } from './share.js?v=202610071438';
-import { scoreboard, podium, ordinal, timingPanel, roundsTable } from './board.js?v=202610071438';
-import { roundAt, specRound, annotateTimes, fitSet } from './roundset.js?v=202610071438';
-import { roundTitle, roundThemes } from '../structures/rounds.js?v=202610071438';
-import { getFormat } from '../formats/registry.js?v=202610071438';
-import { ensureStyles, dropSeat, setQuery, gapLabel, TRUST_HINT, mmss } from './util.js?v=202610071438';
+import { h, fmtNum } from '../ui/kit.js?v=202610071629';
+import { defineScreen, reset, header, current } from '../ui/app.js?v=202610071629';
+import { confirmPop, toast } from '../ui/popup.js?v=202610071629';
+import { sfx, confetti } from '../ui/fx.js?v=202610071629';
+import { createRunner } from '../structures/runner.js?v=202610071629';
+import { prepare, prepareFormats } from '../structures/session.js?v=202610071629';
+import { basePoints, streakMultiplier, stageMultiplier } from '../core/scoring.js?v=202610071629';
+import { urlsOf, preflight } from '../core/media.js?v=202610071629';
+import { randomSeed } from '../core/rng.js?v=202610071629';
+import { listFormats } from '../formats/registry.js?v=202610071629';
+import { loadFormats } from '../formats/index.js?v=202610071629';
+import { friendly } from './api.js?v=202610071629';
+import { getTransport } from './transport.js?v=202610071629';
+import { sharePanel, joinUrl, p2pUrl } from './share.js?v=202610071629';
+import { scoreboard, podium, ordinal, timingPanel, roundsTable, pointsBreakdown } from './board.js?v=202610071629';
+import { streakOption } from '../ui/streakopt.js?v=202610071629';
+import { roundAt, specRound, annotateTimes, fitSet } from './roundset.js?v=202610071629';
+import { roundTitle, roundThemes } from '../structures/rounds.js?v=202610071629';
+import { getFormat } from '../formats/registry.js?v=202610071629';
+import { ensureStyles, dropSeat, setQuery, gapLabel, TRUST_HINT, mmss } from './util.js?v=202610071629';
+import { trackRoom } from '../core/stats.js?v=202610071629';
 
 const DIFF = ['Mixed', 'Easy', 'Medium', 'Hard'];
 let formatsP = null;
@@ -69,6 +71,7 @@ defineScreen('room', async (el, { code, key, st: initial, via = 'server' }, cur)
   function onState(st) {
     if (cur !== current()) return;
     ctx.st = st;
+    trackRoom(st, code, via);
     window.__cluedRoom = { code, st, view: ctx.view, link: sub?.mode };
     if (ctx.wasHost === false && st.you.host) { toast('You’re the host now'); sfx('join'); }
     ctx.wasHost = st.you.host;
@@ -78,6 +81,8 @@ defineScreen('room', async (el, { code, key, st: initial, via = 'server' }, cur)
     if (st.phase === 'final') { stopRunner(); showFinal(st); return; }
     if (ctx.run) {
       syncStages(st);
+      // the opening moved (media hold) after this question rendered: keep the ring on the server's deadline
+      if (st.phase === 'question' && ctx.asking === st.q && !st.stages && ctx.deadline !== st.qDeadline) { ctx.deadline = st.qDeadline; ctx.run.setDeadline(st.qDeadline, st.limitMs); }
       updateLive(st);
       if (st.phase === 'reveal' && ctx.asking === st.q) { ctx.asking = null; ctx.run.timeUp(); }
     } else if (st.phase === 'question' && st.you.joinedQ <= st.q) {
@@ -107,6 +112,8 @@ defineScreen('room', async (el, { code, key, st: initial, via = 'server' }, cur)
   let lobbyRefs = null, finalShown = -1;
   const sub = T.subscribe(code, key, { onState, onEnd, onLink: up => { linkDot.hidden = up; } });
   if (initial) sub.push(initial);
+  // Tell the room this client reports when each question's media is loaded, so openings can wait for it (TIMING.md).
+  try { T.ready?.(code, key, -1)?.catch(() => {}); } catch (e) {}
 
   /* -------------------------------------------------------------- lobby */
   function showLobby(st) {
@@ -147,15 +154,19 @@ defineScreen('room', async (el, { code, key, st: initial, via = 'server' }, cur)
       p.host ? h('span.crown', { title: 'Host' }, '👑') : null,
       h('span.nm', {}, p.name),
       st.you.host && p.id !== st.you.id ? h('button.kick', { type: 'button', 'aria-label': `Remove ${p.name}`, onclick: () => kick(p) }, '×') : null)));
-    const timingKey = `${st.you.host}|${st.answerSec}|${st.gapSec}`;
+    const streakOn = st.streakBonus !== false;
+    const timingKey = `${st.you.host}|${st.answerSec}|${st.gapSec}|${streakOn}`;
     if (r.timingKey !== timingKey) {
       r.timingKey = timingKey;
       r.settings.replaceChildren();
       if (st.you.host) {
-        r.settings.append(timingPanel({ answerSec: st.answerSec, gapSec: st.gapSec,
-          onChange: (v, which) => T.host(code, key, 'settings', { [which]: v[which] }).then(s => sub.push(s)).catch(e => toast(friendly(e))) }));
+        const panel = timingPanel({ answerSec: st.answerSec, gapSec: st.gapSec,
+          onChange: (v, which) => T.host(code, key, 'settings', { [which]: v[which] }).then(s => sub.push(s)).catch(e => toast(friendly(e))) });
+        if (!st.kids) panel.append(streakOption(streakOn, v => T.host(code, key, 'settings', { streak: v }).then(s => sub.push(s)).catch(e => toast(friendly(e)))));
+        r.settings.append(panel);
       } else {
-        r.settings.append(h('div.net-badges', {}, h('span.net-badge.diff', {}, `⏱ ${st.answerSec} s to answer`), h('span.net-badge.diff', {}, `Next: ${gapLabel(st.gapSec)}`)));
+        r.settings.append(h('div.net-badges', {}, h('span.net-badge.diff', {}, `⏱ ${st.answerSec} s to answer`), h('span.net-badge.diff', {}, `Next: ${gapLabel(st.gapSec)}`),
+          st.kids ? null : h('span.net-badge.diff', { dataset: { badge: 'streak' } }, streakOn ? '🔥 Streaks add points' : '🔥 Streaks just for show')));
       }
     }
     r.actions.replaceChildren();
@@ -201,6 +212,7 @@ defineScreen('room', async (el, { code, key, st: initial, via = 'server' }, cur)
     const qs = Array.from({ length: total - base }, (_, i) => ({ format: '_pending', id: `pending:${base + i}` }));
     const run = createRunner(el, {
       questions: qs, kids: st.kids, difficulty: st.difficulty, mode: 'online', timer: true, total: total - base,
+      noStreak: st.streakBonus === false,
       now: serverNow,
       deadlineFor: i => (ctx.st.q === base + i && ctx.st.phase === 'question' ? ctx.st.qDeadline : 0),
       limitFor: () => ctx.st.limitMs || 10000,
@@ -228,6 +240,9 @@ defineScreen('room', async (el, { code, key, st: initial, via = 'server' }, cur)
   async function beforeQ(a, q, run) {
     const st = await waitFor(s => s.phase !== 'lobby' && s.q >= a);
     if (ctx.run !== run) return;
+    // Replace the previous reveal (and its Next button) at once: a stale tap on it used to end this question
+    // during its lead-in, so everyone got "Time's up" at the start (TIMING.md). Load while counting down.
+    const counting = ctx.st.q === a && ctx.st.phase === 'question' ? countdown(a, run) : null;
     let data = null;
     for (let tries = 0; !data && tries < 6 && ctx.run === run; tries++) {
       try { data = await getQuestion(a); } catch (e) {
@@ -238,8 +253,19 @@ defineScreen('room', async (el, { code, key, st: initial, via = 'server' }, cur)
     }
     for (const k of Object.keys(q)) delete q[k];
     Object.assign(q, data ? data.question : { format: 'mc', prompt: 'This question didn’t load.', options: [{ text: 'Skip' }], answer: 0 });
-    if (data) await prepareFormats([q]);
-    if (ctx.st.q === a && ctx.st.phase === 'question') await countdown(a, run);
+    // formats that preload their own media (listen) refresh stale URLs while loading: skip their extra HEAD round trip
+    if (data && !getFormat(q.format)?.preload) await prepareFormats([q]);
+    if (data && ctx.run === run) {
+      preloadMedia(q).then(() => { if (ctx.run === run && T.ready) T.ready(code, key, a).then(s => s && sub.push(s)).catch(() => {}); });
+    }
+    if (counting) await counting;
+  }
+
+  // Fetch + decode the question's media during the lead-in, so it plays the moment the question opens.
+  function preloadMedia(q) {
+    const fmt = getFormat(q.format);
+    const job = fmt?.preload ? Promise.resolve().then(() => fmt.preload(q)) : preflight(urlsOf([q]));
+    return Promise.race([job.catch(() => {}), sleep(12000)]);
   }
 
   function countdown(a, run) {
@@ -250,13 +276,16 @@ defineScreen('room', async (el, { code, key, st: initial, via = 'server' }, cur)
       const ptxt = el.querySelector('.prog-txt');
       if (R && ptxt) ptxt.textContent = `Round ${R.ord + 1} · ${R.pos + 1}/${R.size}`;
       const box = R?.first ? roundCard(ctx.st, R, n) : h('div.net-count3', {}, h('div', {}, n, h('p', {}, `Question ${a + 1} of ${ctx.st.total}`)));
+      const wait = h('p.net-hold', { hidden: true }, 'Waiting for everyone’s question to load…');
+      (box.querySelector('.nr-in') || box.firstChild || box).append(wait);
       if (stage) { stage.innerHTML = ''; stage.append(box); }
       let last = null;
       const tick = () => {
         const left = ctx.st.qStart - serverNow();
-        if (left <= 0 || ctx.run !== run || ctx.st.q !== a) { clearInterval(id); ctx.timers.delete(id); box.remove(); res(); return; }
-        const s = Math.ceil(left / 1000);
-        if (s !== last) { last = s; n.textContent = String(s); sfx('tick'); }
+        if ((left <= 0 && !ctx.st.hold) || ctx.run !== run || ctx.st.q !== a || ctx.st.phase !== 'question') { clearInterval(id); ctx.timers.delete(id); box.remove(); res(); return; }
+        wait.hidden = !ctx.st.hold;
+        const s = ctx.st.hold ? '…' : Math.max(1, Math.ceil(left / 1000));
+        if (s !== last) { last = s; n.textContent = String(s); if (!ctx.st.hold) sfx('tick'); }
       };
       const id = every(tick, 80);
       tick();
@@ -298,8 +327,10 @@ defineScreen('room', async (el, { code, key, st: initial, via = 'server' }, cur)
     if (ctx.asking === a) ctx.asking = null;
     if (rec.timeout || rec.skipped) { updateLive(ctx.st); return; }
     const sm = rec.stages ? stageMultiplier(rec.stage, rec.stages) : 1; // the server applies its own stage
-    const base = (rec.correct ? rec.points / streakMultiplier(rec.streak) : rec.points) / sm;
+    const base = (rec.correct && ctx.st.streakBonus !== false ? rec.points / streakMultiplier(rec.streak) : rec.points) / sm;
+    // ms against the server's question start (not this device's render), so equal taps score equally
     const body = { q: a, given: rec.given, correct: rec.correct, points: Math.round(base || 0), ms: Math.max(0, Math.round(serverNow() - ctx.st.qStart)) };
+    if (rec.detail && typeof rec.detail.played === 'number') body.replays = Math.max(0, rec.detail.played - 1);
     for (let tries = 0; tries < 3; tries++) {
       try {
         const r = await T.answer(code, key, body);
@@ -331,6 +362,9 @@ defineScreen('room', async (el, { code, key, st: initial, via = 'server' }, cur)
       return;
     }
     L.box.replaceChildren(...revealParts(st));
+    // the runner's card shows a local estimate; the server's points (and the breakdown below) are the real ones
+    const pts = el.querySelector('.rv-head .pts');
+    if (pts && st.you.last) pts.textContent = `+${fmtNum(st.you.last.points)}`;
   }
 
   // Server-side result, scoreboard and host controls, shared by the runner reveal and the between view.
@@ -339,11 +373,16 @@ defineScreen('room', async (el, { code, key, st: initial, via = 'server' }, cur)
     const R = roundAt(st, st.q);
     const endOfRound = R?.last && st.phase === 'reveal';
     const out = [];
-    if (st.you.last && !st.kids) out.push(h('div.net-wait', {}, `+${fmtNum(st.you.last.points)} pts · ${ordinal(st.you.rank)} of ${st.players.length}`));
+    const streakBonus = st.streakBonus !== false;
+    if (st.you.last && !st.kids) {
+      out.push(h('div.net-wait', {}, `+${fmtNum(st.you.last.points)} pts · ${ordinal(st.you.rank)} of ${st.players.length}`));
+      const why = pointsBreakdown(st.you.last, { streakBonus });
+      if (why) out.push(h('div.net-why', { dataset: { why: '1' } }, why));
+    }
     else if (st.kids && me) out.push(h('div.net-wait', {}, `You have ${me.correct} ⭐`));
     if (endOfRound) out.push(h('div.net-round-end', { dataset: { roundEnd: String(R.ord) } }, h('b', {}, `End of round ${R.ord + 1} of ${R.n}`),
       R.ord + 1 < R.n ? h('span', {}, `Next: ${roundInfo(st, R.ord + 1).title}`) : h('span', {}, 'Final results next')));
-    out.push(scoreboard(st.players, { meId: st.you.id, kids: st.kids, deltas: true, top: 5, round: endOfRound ? R.ord : null }));
+    out.push(scoreboard(st.players, { meId: st.you.id, kids: st.kids, deltas: true, top: 5, round: endOfRound ? R.ord : null, streakBonus }));
     out.push(nextControls(st));
     return out;
   }
@@ -370,7 +409,7 @@ defineScreen('room', async (el, { code, key, st: initial, via = 'server' }, cur)
     } else if (!st.you.host) auto.textContent = `Waiting for ${hostName(st)}…`;
     if (st.you.host) {
       wrap.append(h('div.net-next', {},
-        h('button.btn.go', { type: 'button', dataset: { act: 'next' }, onclick: e => hostAct('next', e.currentTarget) }, last ? 'Final results' : nextRound ? `Round ${nextRound} ›` : 'Next question ›')));
+        h('button.btn.go', { type: 'button', dataset: { act: 'next' }, onclick: e => hostAct('next', e.currentTarget, { q: st.q }) }, last ? 'Final results' : nextRound ? `Round ${nextRound} ›` : 'Next question ›')));
     }
     return wrap;
   }

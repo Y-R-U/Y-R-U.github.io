@@ -33,6 +33,31 @@ type qMeta struct {
 	Stages  int     // progressive question: stages 0…Stages-1 (0/1 = not progressive)
 	Round   int     // spec round index (question.round)
 	TScale  float64 // the format's answer-time stretch, resolved by the client (question.tscale)
+	// listen: host-chosen clip length (s), artwork mode and replays allowed (-1 = unlimited), from question.data
+	ClipLen    float64
+	Art        string
+	MaxReplays int
+}
+
+// listen point factors (js/audio/listen.js): shorter clips and artwork off score more; each replay ×0.85.
+var listenClipMul = map[float64]float64{1: 2, 2: 1.7, 3: 1.5, 5: 1.25, 10: 1, 15: 0.85, 30: 0.7}
+var listenArtMul = map[string]float64{"off": 1, "blur": 0.85, "on": 0.65}
+
+const replayMul = 0.85
+
+// listenFactors: clip × artwork multipliers and the replays that count (clamped to what the question allows).
+func listenFactors(m qMeta, replays *int) (clipMul, artMul float64, reps int) {
+	clipMul, artMul = 1, 1
+	if v, ok := listenClipMul[m.ClipLen]; ok {
+		clipMul = v
+	}
+	if v, ok := listenArtMul[m.Art]; ok {
+		artMul = v
+	}
+	if replays != nil && m.MaxReplays >= 0 {
+		reps = max(0, min(*replays, m.MaxReplays))
+	}
+	return
 }
 
 func parseMeta(raw json.RawMessage) qMeta {
@@ -43,9 +68,18 @@ func parseMeta(raw json.RawMessage) qMeta {
 		Stages    int             `json:"stages"`
 		Round     int             `json:"round"`
 		TScale    float64         `json:"tscale"`
+		Data      struct {
+			Len     float64 `json:"len"`
+			Art     string  `json:"art"`
+			Replays *int    `json:"replays"`
+		} `json:"data"`
 	}
 	json.Unmarshal(raw, &q)
-	m := qMeta{Format: q.Format, Answer: q.Answer, Stages: max(0, min(q.Stages, 50)), Round: max(0, q.Round), TScale: 1}
+	m := qMeta{Format: q.Format, Answer: q.Answer, Stages: max(0, min(q.Stages, 50)), Round: max(0, q.Round), TScale: 1,
+		ClipLen: q.Data.Len, Art: q.Data.Art, MaxReplays: 2}
+	if q.Data.Replays != nil {
+		m.MaxReplays = *q.Data.Replays
+	}
 	if q.TScale > 1 {
 		m.TScale = min(q.TScale, maxTScale)
 	}
@@ -139,3 +173,18 @@ const (
 	stageExtendMin     = 5000
 	progressiveCap     = 90000
 )
+
+// answerMs is the answer time used for speed points, measured against the server's question start. The client's
+// clock-corrected ms (taken at the tap) is used when it is plausible: never more than 300 ms past the server's receive
+// time, and never more than maxTransitMs before it (a client whose clock estimate runs behind can't buy speed).
+// Two players who tap at the same real moment therefore score the same, whatever their media or network did.
+func answerMs(serverMs int, client *float64, limitMs int) int {
+	ms := serverMs
+	if client != nil && *client >= 0 && !math.IsNaN(*client) {
+		ms = max(serverMs-maxTransitMs, min(int(*client), serverMs+300))
+		if int(*client) > serverMs+300 {
+			ms = serverMs
+		}
+	}
+	return max(0, min(ms, limitMs))
+}

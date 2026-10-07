@@ -1,13 +1,14 @@
-import { h, esc } from './kit.js?v=202610071438';
-import { setBgm, canFullscreen, toggleFullscreen } from './toggles.js?v=202610071438';
-import { defineScreen, header, back } from './app.js?v=202610071438';
-import { getSettings, setSettings, ANSWER_TIMES } from '../core/store.js?v=202610071438';
-import { getIndex, loadPacks, loadedPacks, allPackIds } from '../core/packs.js?v=202610071438';
-import { applyAudioSettings, sfx } from './fx.js?v=202610071438';
-import { applyKids } from './home.js?v=202610071438';
-import { loadLearn } from './net.js?v=202610071438';
-import { BUILD } from '../build.js?v=202610071438';
-import { canSpeak, speak } from './speech.js?v=202610071438';
+import { h, esc } from './kit.js?v=202610071629';
+import { setBgm, canFullscreen, toggleFullscreen } from './toggles.js?v=202610071629';
+import { defineScreen, header, back, go } from './app.js?v=202610071629';
+import { getSettings, setSettings, ANSWER_TIMES } from '../core/store.js?v=202610071629';
+import { getIndex, loadPacks, loadedPacks, allPackIds } from '../core/packs.js?v=202610071629';
+import { applyAudioSettings, sfx } from './fx.js?v=202610071629';
+import { applyKids } from './home.js?v=202610071629';
+import { loadLearn } from './net.js?v=202610071629';
+import { BUILD } from '../build.js?v=202610071629';
+import { canSpeak, speak } from './speech.js?v=202610071629';
+import { streakOption } from './streakopt.js?v=202610071629';
 
 function toggleRow(label, help, key, after) {
   const s = getSettings();
@@ -40,11 +41,14 @@ defineScreen('settings', el => {
     h('div.opt-row', {}, h('span.lbl', {}, 'Music volume'), h('div', { style: { width: '50%' } }, vol)),
     toggleRow('Haptics', 'Buzz on right and wrong answers', 'haptics'),
     h('div.opt', {}, h('div.opt-label', {}, 'Default answer time'), secs),
+    streakOption(s.streakPts !== false, v => setSettings({ streakPts: v })),
     toggleRow('Reduced motion', 'Fewer animations, no confetti', 'reducedMotion', applyAll),
     canSpeak() ? toggleRow('Read questions aloud', 'Always on in kids mode', 'readAloud', n => n.readAloud && speak('Questions will be read aloud.')) : null,
     canFullscreen() ? h('div.opt-row', {}, h('span.lbl', {}, 'Full screen'), h('button.btn.small', { type: 'button', onclick: () => toggleFullscreen() }, 'Toggle')) : null,
     toggleRow('Kids mode', 'Easy picture questions, no timer, stickers', 'kids', applyAll),
   ));
+  el.append(h('div.panel.set-list', { style: { marginTop: '14px' } }, h('div.opt-row', {}, h('span.lbl', {}, 'Your stats', h('small', {}, 'Games, accuracy, streaks, topics and history')),
+    h('button.btn.small', { type: 'button', dataset: { act: 'stats' }, onclick: () => go('stats') }, '📊 Open'))));
   el.append(h('p.muted.tiny.center', { style: { marginTop: '18px' } }, `Clued build ${BUILD} · ${Object.values(getIndex()?.packs || {}).filter(p => !p.virtual).length} packs`));
 });
 

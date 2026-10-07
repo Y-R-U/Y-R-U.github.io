@@ -1,15 +1,18 @@
 // Learn state in localStorage (synced keys clued.cards and clued.mastery, see CONTRACT.md).
-import { read, write, KEYS } from '../core/store.js?v=202610071438';
-import * as srs from './srs.js?v=202610071438';
-import * as M from './mastery.js?v=202610071438';
+import { read, write, KEYS, getSettings } from '../core/store.js?v=202610071629';
+import * as srs from './srs.js?v=202610071629';
+import * as M from './mastery.js?v=202610071629';
 
 export const today = () => srs.dayNumber();
 
 export function getCards() {
   const d = read(KEYS.cards) || {};
   const t = today();
-  const out = { v: 1, cards: d.cards || {}, decks: d.decks || [], mode: d.mode || 'auto', newDay: d.newDay || 0, newSeen: d.newSeen || 0, starDay: d.starDay || 0, stars: d.stars || 0 };
-  if (out.newDay !== t) { out.newDay = t; out.newSeen = 0; }
+  // study: 'mc' | 'flip'; newBy: new cards introduced today per pack; feed: add missed game questions as cards
+  const out = { ...d, v: 1, cards: d.cards || {}, decks: d.decks || [], study: d.study === 'flip' ? 'flip' : 'mc', feed: d.feed !== false,
+    newDay: d.newDay || 0, newSeen: d.newSeen || 0, newBy: d.newBy || {}, starDay: d.starDay || 0, stars: d.stars || 0 };
+  delete out.mode;
+  if (out.newDay !== t) { out.newDay = t; out.newSeen = 0; out.newBy = {}; }
   if (out.starDay !== t) { out.starDay = t; out.stars = 0; }
   return out;
 }
@@ -27,7 +30,7 @@ export function gradeCard(ref, grade) {
   let card;
   updateCards(d => {
     const old = d.cards[ref];
-    if (!old) d.newSeen++;
+    if (!old) { d.newSeen++; const p = srs.packOf(ref); d.newBy[p] = (d.newBy[p] || 0) + 1; }
     card = d.cards[ref] = srs.review(old || srs.newCard(t), grade, t);
   });
   // A flashcard counts toward mastery at half the weight of a game answer.
@@ -47,7 +50,7 @@ export function recordGame(result) {
   const t = today();
   let missed = [];
   updateMastery(m => { const r = M.applyGame(m.items, result, t); m.items = r.items; missed = r.missed; });
-  if (missed.length) addCards([...new Set(missed)], true);
+  if (missed.length && getCards().feed) addCards([...new Set(missed)], true);
   return missed;
 }
 
@@ -71,18 +74,22 @@ export function summary(deckRefs = []) {
   return srs.dueSummary(d.cards, deckRefs, today(), d.newSeen);
 }
 
-// Quick badge count without loading packs: due cards plus today's remaining new allowance if decks exist.
-export function badgeCount(index) {
-  const d = getCards();
-  const t = today();
-  let due = 0;
-  const per = {};
-  for (const [r, c] of Object.entries(d.cards)) {
-    if (c.due <= t) due++;
-    const p = r.slice(0, r.indexOf('/'));
-    per[p] = (per[p] || 0) + 1;
-  }
-  let unseen = 0;
-  for (const p of d.decks) unseen += Math.max(0, (index?.packs?.[p]?.items || 0) - (per[p] || 0));
-  return due + Math.max(0, Math.min(unseen, srs.NEW_PER_DAY - d.newSeen));
+// Item totals per pack from the index (kids count only kid items), for counts without loading packs.
+export function indexTotals(index, ids, kids = false) {
+  const out = {};
+  for (const p of ids) { const e = index?.packs?.[p]; if (e) out[p] = kids ? (e.caps?.kidsItems ?? e.items ?? 0) : e.items || 0; }
+  return out;
 }
+export function deckCounts(index, ids, kids = false, d = getCards()) {
+  return srs.packCounts(d.cards, indexTotals(index, ids, kids), today(), d.newBy);
+}
+
+// Quick badge count without loading packs: every due card plus today's new allowance in the selected packs.
+export function badgeCount(index, kids = !!getSettings().kids) {
+  const d = getCards();
+  const c = deckCounts(index, d.decks, kids, d);
+  let n = 0;
+  for (const [p, x] of Object.entries(c)) n += x.due + (d.decks.includes(p) ? x.fresh : 0);
+  return n;
+}
+export const dueCount = (d = getCards()) => Object.values(d.cards).filter(c => c.due <= today()).length;

@@ -23,6 +23,19 @@ type roomIn struct {
 	Public    *bool             `json:"public"`
 	StartIn   *int              `json:"startIn"` // public auto-start seconds: 60/120/300, 0 = host starts
 	LateJoin  *bool             `json:"lateJoin"`
+	Streak    *bool             `json:"streak"` // streak bonus adds points (false = just for show)
+}
+
+// streakFromSpec reads spec.streak ("off"/false = just for show) when the body doesn't say.
+func streakFromSpec(spec json.RawMessage) *bool {
+	var s struct {
+		Streak any `json:"streak"`
+	}
+	if json.Unmarshal(spec, &s) != nil || s.Streak == nil {
+		return nil
+	}
+	on := s.Streak != false && s.Streak != "off"
+	return &on
 }
 
 func validQuestions(w http.ResponseWriter, in *roomIn) bool {
@@ -149,6 +162,12 @@ func handleCreateRoom(w http.ResponseWriter, r *http.Request) {
 	}
 	if in.LateJoin != nil {
 		room.NoLate = !*in.LateJoin
+	}
+	if in.Streak == nil {
+		in.Streak = streakFromSpec(in.Spec)
+	}
+	if in.Streak != nil {
+		room.NoStreak = !*in.Streak
 	}
 	p, _ := room.addPlayer(name, uid)
 	writeJSON(w, 200, map[string]any{"code": room.Code, "hostKey": p.Key, "playerKey": p.Key, "playerId": p.ID,
@@ -478,6 +497,7 @@ func handleHostAction(w http.ResponseWriter, r *http.Request) {
 		HostKey  string `json:"hostKey"`
 		PlayerID string `json:"playerId"`
 		RevealMs int    `json:"revealMs"`
+		Q        *int   `json:"q"` // next: the question the host is looking at (stale taps are ignored)
 	}
 	if !readJSON(w, r, limit, &in) {
 		return
@@ -498,11 +518,21 @@ func handleHostAction(w http.ResponseWriter, r *http.Request) {
 			}
 			room.start()
 		case "next":
+			// A "next" is bound to the question on the host's screen. A tap that lands after the gap timer
+			// already opened the next question (or a double tap) used to reveal that new question during its
+			// lead-in, so everyone got "Time's up" at the start. Now it's a no-op; only an explicit q equal to
+			// the open question ends it early (old clients send no q, so they can never end one).
 			switch room.Phase {
-			case "lobby", "reveal":
+			case "lobby":
 				room.advance()
+			case "reveal":
+				if in.Q == nil || *in.Q == room.Q {
+					room.advance()
+				}
 			case "question":
-				room.reveal()
+				if in.Q != nil && *in.Q == room.Q && nowMs() >= room.QStart {
+					room.reveal()
+				}
 			default:
 				writeErr(w, 409, "finished", "the game is over")
 				return
@@ -551,6 +581,9 @@ func handleHostAction(w http.ResponseWriter, r *http.Request) {
 			room.setStart(in.StartIn)
 			if in.LateJoin != nil {
 				room.NoLate = !*in.LateJoin
+			}
+			if in.Streak != nil {
+				room.NoStreak = !*in.Streak
 			}
 			room.changed()
 		case "again":
@@ -666,6 +699,25 @@ func resetPublicCache() {
 	pubCache.Lock()
 	pubCache.body = nil
 	pubCache.Unlock()
+}
+
+// handleReady: the client has the question and its media loaded (see Room.checkHold).
+func handleReady(w http.ResponseWriter, r *http.Request) {
+	if !allow(r, "answer") {
+		rateLimited(w)
+		return
+	}
+	var in struct {
+		Key string `json:"key"`
+		Q   int    `json:"q"`
+	}
+	if !readJSON(w, r, smallBody, &in) {
+		return
+	}
+	withPlayer(w, r.PathValue("code"), in.Key, func(room *Room, p *Player) {
+		room.ready(p, in.Q)
+		writeJSON(w, 200, room.stateFor(p))
+	})
 }
 
 func handleVote(w http.ResponseWriter, r *http.Request) {

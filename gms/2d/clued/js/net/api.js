@@ -1,5 +1,5 @@
 // Clued server client: base URL, JSON requests, server clock, live room subscription (SSE → long-poll fallback).
-import { idToken } from './ident.js?v=202610071438';
+import { idToken } from './ident.js?v=202610071629';
 
 const DEFAULT_API = location.hostname === 'games.br8t.com' ? '/gms/2d/clued/api' : 'https://games.br8t.com/gms/2d/clued/api';
 
@@ -104,6 +104,7 @@ export const rooms = {
   answer: (code, key, a) => req('POST', `/rooms/${code}/answer`, { key, ...a }),
   leave: (code, key) => req('POST', `/rooms/${code}/leave`, { key }),
   vote: (code, key, q) => req('POST', `/rooms/${code}/vote`, { key, q }),
+  ready: (code, key, q) => req('POST', `/rooms/${code}/ready`, { key, q }),
   host: (code, key, action, extra = {}) => req('POST', `/rooms/${code}/${action}`, { key, ...extra }, { timeout: action === 'again' ? 20000 : 12000 }),
 };
 
