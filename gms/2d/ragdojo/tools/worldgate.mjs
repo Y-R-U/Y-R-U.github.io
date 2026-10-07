@@ -79,8 +79,9 @@ try {
   const rows = JSON.parse(await c.eval(`JSON.stringify([...document.querySelectorAll('#worldRows [data-world]')].map(b => ({ w: b.dataset.world, d: b.disabled, t: b.textContent })))`));
   const row = (w) => rows.find((r) => r.w === w);
   ok('four worlds are listed', rows.length === 4);
-  ok('CYBORG is open', !row('cyborg').d, row('cyborg').t);
-  ok('GOD says what it wants', row('god').d && /SIMULANT/.test(row('god').t), row('god').t);
+  ok('CYBER is open', !row('cyborg').d && /CYBER/.test(row('cyborg').t), row('cyborg').t);
+  ok('and names both its modes', /cyborg · simulant/.test(row('cyborg').t));
+  ok('DEITIES says what it wants', row('god').d && /DEITIES/.test(row('god').t) && /win a SIMULANT/.test(row('god').t), row('god').t);
   const powerMax = await shopDots('moves', 'POWER HIT');
   ok('CYBORG adds a level to move tracks', powerMax.dots === 8, `${powerMax.dots}`);
   const hpCyb = await shopDots('perks', 'PAPER THICKNESS');
@@ -91,6 +92,8 @@ try {
   ok('CYBORG switches world', await c.eval(S('s.theme')) === 'cyborg');
   ok('with its own page', await c.eval(cls('cyborg')) && await c.eval(cls('night')) && !(await c.eval(cls('dark'))));
   ok('its own ranks', /SCRAP/.test(await c.eval(txt('hubRank'))));
+  ok('the hub names the mode', /CYBORG MODE/.test(await c.eval(`document.getElementById('hubStats').innerHTML`)));
+  ok('and the button names the world', /CYBER/.test(await c.eval(txt('btnDark'))));
   const cybMoves = JSON.parse(await c.eval(`(async()=>{
     const cfg = await import('/js/config.js');
     return JSON.stringify(cfg.activeMoves(window.__ragdojo.save).map(m => m.name)); })()`));

@@ -102,6 +102,8 @@ win a SIMULANT run      -> save.simulantWon (CYBORG's replay run); GOD opens
 GOD's replay run        -> DEMON, and the page goes to hell with it (#app.demon)
 ```
 
+World display names: LIGHT (light/bully), DARK (dark/thug), CYBER (cyborg/simulant), DEITIES
+(god/demon). The save ids stay `cyborg` and `god` — only `WORLDS[].name` is shown.
 Past DARK the hub's DARK toggle becomes a WORLDS list (`openWorlds`). `WORLDS` and
 `BULLY_WIN_FLAG` in config.js are the ladder; every later world reuses the eight move
 `kind`s under new names, and borrows a soundtrack (`MUSIC_OF` in music.js).

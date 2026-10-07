@@ -17,9 +17,9 @@ import * as haptic from './haptic.js';
 import { buildShop } from './shop.js';
 import { MUSIC, TRACK_NAME, poolFor, roleTrack, unlockedFightTracks, pickFightTrack, RECENT_KEEP } from './music.js';
 
-import { DEV, DEMO, ACCOUNTS, HOME } from './edition.js?v=20261007-flair';
+import { DEV, DEMO, ACCOUNTS, HOME } from './edition.js?v=20261008-names';
 import { Purchases } from './purchases.js';
-import { createFamilyAccess } from './family-access.js?v=20261007-flair';
+import { createFamilyAccess } from './family-access.js?v=20261008-names';
 import { track, visitor, source, analyticsChoice, analyticsEnabled } from './analytics.js';
 const qs = new URLSearchParams(location.search);
 let purchases = null, account = null, pendingCloud = null;
@@ -264,7 +264,7 @@ function finishFight(result, m) {
       if (m.bully) {
         S.records.bullyRuns++;
         // Winning a bully run is the key to the next world: BULLY opens DARK, THUG opens
-        // CYBORG (and lets you carry a knife back into the light), SIMULANT opens GOD.
+        // CYBER (and lets you carry a knife back into the light), SIMULANT opens DEITIES.
         S[BULLY_WIN_FLAG[S.theme] || 'darkUnlocked'] = true;
       } else {
         S.completed = true;
@@ -409,7 +409,9 @@ function refreshHub() {
   $('inkPill').textContent = S.ink;
   $('hubStats').innerHTML =
     `won ${S.wins} · lost ${S.losses}<br>score ${Math.round(S.score)}` +
-    (bullyMode ? `<br><b style="color:#e8b93a">${bullyWord()} MODE</b>` : '');
+    (bullyMode ? `<br><b style="color:#e8b93a">${bullyWord()} MODE</b>`
+      // The later worlds hold two modes each, so say which one this is.
+      : S.theme === 'cyborg' || S.theme === 'god' ? `<br><b>${worldOf(S.theme).mode} MODE</b>` : '');
   $('btnFight').textContent = bullyMode ? bullyWord() : L.kind === 'final' ? 'FINAL FIGHT' : 'FIGHT';
   $('btnMusic').classList.toggle('off', !S.settings.music);
   // Once you have finished a run, the options that only appeared on the victory screen have
@@ -562,7 +564,8 @@ function openWorlds() {
       : !worldEarned(w.id) ? `win a ${prev(w.id).bully} run`
       : 'needs the DARK upgrade';
     return `<button class="btn world${here ? ' on' : ''}${open ? '' : ' locked'}" data-world="${w.id}"` +
-      `${open && !here ? '' : ' disabled'}><span>${open ? w.icon : '🔒'} ${w.name}</span><small>${why}</small></button>`;
+      `${open && !here ? '' : ' disabled'}><span>${open ? w.icon : '🔒'} ${w.name}` +
+      `<small class="modes">${w.mode.toLowerCase()} · ${w.bully.toLowerCase()}</small></span><small>${why}</small></button>`;
   }).join('');
   $('worldRows').querySelectorAll('[data-world]').forEach((b) => {
     b.onclick = () => {
@@ -709,7 +712,7 @@ function openSettings() {
     // A dead toggle is worse than no toggle: desktop and iOS Safari cannot vibrate at all.
     (haptic.supported ? T('Vibration', S.settings.haptics, 'haptics') : '') +
     // Only once GOD is open, where winning tears the losers apart. No spoilers before then.
-    (S.simulantWon ? T('Blood & gore (GOD world)', S.settings.gore !== false, 'gore') : '') +
+    (S.simulantWon ? T('Blood & gore (DEITIES)', S.settings.gore !== false, 'gore') : '') +
     `<div class="toggle"><span>Stick side</span><button class="buy" data-fn="hand">${S.settings.hand === 'right' ? 'LEFT STICK' : 'RIGHT STICK'}</button></div>` +
     `<div class="toggle"><span>Share anonymous play statistics</span><button class="buy" id="analyticsToggle">${analyticsEnabled() ? 'ON' : 'OFF'}</button></div>` +
     `<p class="fine">Optional: starts, fight progress and upgrade conversion. No email or save contents. <a href="privacy.html" target="_blank" rel="noopener">Privacy</a></p>` +

@@ -63,15 +63,16 @@ RANK_SETS.god = [
 ];
 
 /**
- * Four worlds on one ladder. Each world's replay run (`bully`) is what opens the next one:
- * BULLY opens DARK, THUG opens CYBORG, SIMULANT opens GOD. `night` worlds invert the page,
+ * Four worlds on one ladder, each a pair: its campaign (`mode`) and its replay run (`bully`),
+ * which is what opens the next world. BULLY opens DARK, THUG opens CYBER, SIMULANT opens
+ * DEITIES. `id` is what the save stores and never changes; `name` is only what is shown. `night` worlds invert the page,
  * which is what decides the disabled-control opacity in style.css.
  */
 export const WORLDS = [
-  { id: 'light',  name: 'LIGHT',  icon: '☀', bully: 'BULLY',    flag: 'everWon',     night: false },
-  { id: 'dark',   name: 'DARK',   icon: '☾', bully: 'THUG',     flag: 'darkUnlocked', night: true },
-  { id: 'cyborg', name: 'CYBORG', icon: '⚙', bully: 'SIMULANT', flag: 'thugWon',     night: true },
-  { id: 'god',    name: 'GOD',    icon: '✦', bully: 'DEMON',    flag: 'simulantWon', night: false },
+  { id: 'light',  name: 'LIGHT',   mode: 'LIGHT',  icon: '☀', bully: 'BULLY',    flag: 'everWon',      night: false },
+  { id: 'dark',   name: 'DARK',    mode: 'DARK',   icon: '☾', bully: 'THUG',     flag: 'darkUnlocked', night: true },
+  { id: 'cyborg', name: 'CYBER',   mode: 'CYBORG', icon: '⚙', bully: 'SIMULANT', flag: 'thugWon',      night: true },
+  { id: 'god',    name: 'DEITIES', mode: 'GOD',    icon: '✦', bully: 'DEMON',    flag: 'simulantWon',  night: false },
 ];
 export const THEMES = WORLDS.map((w) => w.id);
 export const worldOf = (theme) => WORLDS.find((w) => w.id === theme) || WORLDS[0];
