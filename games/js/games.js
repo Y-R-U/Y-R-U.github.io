@@ -14,6 +14,11 @@
 
 export const GAMES = [
   {
+    id: "clued", name: "Clued", tag: "Trivia for curious minds",
+    path: "/gms/2d/clued/", shot: "clued", accent: "#7b61ff",
+    blurb: "26 quiz games across 70 topics: picture reveals, maps, music clips, Movie Moments and more. Pub quiz, daily challenge, kids mode, a Learn tab, and online rooms friends join by link.",
+  },
+  {
     id: "silt", name: "SILT", tag: "Sand, lit not drawn",
     path: "/gms/2d/silt/", shot: "silt", accent: "#e0a24a",
     blurb: "Drop sand, watch it flow, span the board with one colour and it dissolves into drifting light. Six modes, five biomes, ninety-six chemistry puzzles.",

@@ -209,3 +209,4 @@ body.kids-on .kids-toggle { border-style: solid; border-color: var(--ink); backg
 .hid-list { text-align: left; padding: 0 6px 6px; display: flex; flex-direction: column; gap: 8px; }
 .hid-g { margin: 0; font-size: 12.5px; line-height: 1.45; color: var(--ink-2); }
 .hid-g b { display: block; color: var(--ink-2); font-size: 12px; }
+.home-move { display: block; margin: 0 0 12px; padding: 8px 14px; border: 2px dashed var(--grape); border-radius: var(--r-sm); color: var(--grape); font-weight: 800; font-size: 14px; text-decoration: none; text-align: center; background: var(--card); }

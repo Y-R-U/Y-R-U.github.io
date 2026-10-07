@@ -1,6 +1,7 @@
 // Serverless link challenges: the URL hash carries the GameSpec (with its seed), BUILD and a chain of
 // up to 8 { name, score }. The receiver regenerates the identical set locally, plays it, and gets a
 // reply link with their score appended. No server, no caps; works on Pages.
+import { playUrl } from './share.js?v=202610071336';
 import { h, fmtNum } from '../ui/kit.js?v=202610071336';
 import { defineScreen, header, current, reset } from '../ui/app.js?v=202610071336';
 import { toast } from '../ui/popup.js?v=202610071336';
@@ -45,8 +46,7 @@ const setHash = s => { try { history.replaceState(history.state, '', location.pa
 export const setFingerprint = qs => hashString(qs.map(q => q.id).join('|')).toString(36);
 
 function linkFor(code) {
-  const u = new URL(location.pathname, location.origin);
-  return `${u.href}#lc=${code}`;
+  return `${playUrl().href}#lc=${code}`;
 }
 
 function cleanEntry(e) {

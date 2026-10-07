@@ -4,8 +4,12 @@ import { popup, toast } from '../ui/popup.js?v=202610071336';
 import { qrSvg } from '../vendor/qr.js?v=202610071336';
 import { API_OVERRIDE } from './api.js?v=202610071336';
 
+// Shared links always open the games.br8t.com copy: sign-in and the room server work there. Local dev keeps its own host.
+const LOCAL = /^(localhost|127\.|192\.168\.)/.test(location.hostname);
+export const playUrl = () => (LOCAL ? new URL(location.pathname, location.origin) : new URL('https://games.br8t.com/gms/2d/clued/'));
+
 function link(param, value) {
-  const u = new URL(location.pathname, location.origin);
+  const u = playUrl();
   u.searchParams.set(param, value);
   if (API_OVERRIDE) u.searchParams.set('api', API_OVERRIDE);
   return u.href;

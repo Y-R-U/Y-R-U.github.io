@@ -62,6 +62,8 @@ defineScreen('home', el => {
     h('div.home-top', {}, logo(), h('div.tools', {}, ...toolButtons(),
       h('button.icon-btn', { type: 'button', 'aria-label': 'Settings', onclick: () => go('settings') }, '⚙️'))),
     h('p.tagline', {}, kids ? 'Big pictures, no rush, stickers to win!' : 'Trivia for curious minds.'),
+    /^(games\.br8t\.com|localhost|127\.|192\.168\.)/.test(location.hostname) ? null
+      : h('a.home-move', { href: 'https://games.br8t.com/gms/2d/clued/' }, 'Sign-in and online play work best on games.br8t.com →'),
     h('label.kids-toggle', {}, h('span.k-ico', {}, '🧸'),
       h('span.k-txt', {}, 'Kids mode', h('small', {}, kids ? 'On: easy picture questions, read aloud' : 'Easy picture questions, read aloud, no timer')),
       h('span.switch', {}, kidSwitch, h('i'))),
