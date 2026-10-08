@@ -81,6 +81,10 @@ token `snakenet-turn-usage-read`: Account Analytics Read only, IP-locked to
 the br8t box) in the env file. `/gms/pwa/snake/net/health` shows usage and
 whether TURN is on. A $5 billing budget alert emails Aaron as a second line.
 
+Other apps on the box (Aaron's son's Serpent.io) get TURN credentials from a
+loopback-only `http://127.0.0.1:8014/ice` endpoint, under the same cap. Their
+guide is `SHARED_TURN.md`, copied to `/srv/apps/snakenet/SHARED_TURN.md`.
+
 ## Tests
 
 - `cd server && go test ./...` — rooms, codes never listed, region grouping,

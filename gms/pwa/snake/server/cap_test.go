@@ -75,3 +75,20 @@ func TestNoCapNoTurn(t *testing.T) {
 		t.Fatalf("a TURN key without a working cap must not be used")
 	}
 }
+
+func TestInternalIceEndpoint(t *testing.T) {
+	c := newTurnCap("acct", "tok", 800)
+	c.readAt = time.Now()
+	tr := &turn{keyID: "k", token: "t", cap: c, cached: []byte(`[{"urls":["turn:x"],"username":"u","credential":"p"}]`), until: time.Now().Add(time.Hour)}
+	rec := httptest.NewRecorder()
+	internalRoutes(tr).ServeHTTP(rec, httptest.NewRequest("GET", "/ice", nil))
+	if !strings.Contains(rec.Body.String(), `"turn":true`) || !strings.Contains(rec.Body.String(), "turn:x") {
+		t.Fatalf("internal /ice should hand out TURN while the cap allows: %s", rec.Body.String())
+	}
+	c.tripped = true
+	rec = httptest.NewRecorder()
+	internalRoutes(tr).ServeHTTP(rec, httptest.NewRequest("GET", "/ice", nil))
+	if strings.Contains(rec.Body.String(), "turn:x") || !strings.Contains(rec.Body.String(), `"turn":false`) {
+		t.Fatalf("over the cap, other apps get STUN only too: %s", rec.Body.String())
+	}
+}

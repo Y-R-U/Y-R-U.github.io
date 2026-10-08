@@ -14,6 +14,8 @@
 //	CF_ACCOUNT_ID      Cloudflare account, for the TURN spending cap
 //	CF_ANALYTICS_TOKEN read-only Account Analytics token (secret: box only)
 //	SNAKENET_TURN_CAP_GB  monthly TURN egress cap in GB (default 800; free tier is 1,000)
+//	SNAKENET_INTERNAL_ADDR  loopback-only listener for other apps on this box
+//	                        (default 127.0.0.1:8014; see ../SHARED_TURN.md)
 //
 // TURN is only ever handed out while the cap can be read and is not reached.
 package main
@@ -66,8 +68,32 @@ func main() {
 		Handler:           h.routes(prefix, origins),
 		ReadHeaderTimeout: 5 * time.Second,
 	}
+	// Other apps on this box (Serpent.io) get TURN credentials here, so the
+	// Cloudflare key lives in one place and the spending cap covers everyone.
+	// Never proxied by Caddy: loopback only.
+	internal := env("SNAKENET_INTERNAL_ADDR", "127.0.0.1:8014")
+	go func() {
+		isrv := &http.Server{Addr: internal, Handler: internalRoutes(t), ReadHeaderTimeout: 5 * time.Second}
+		log.Printf("internal ice endpoint on %s", internal)
+		log.Print(isrv.ListenAndServe())
+	}()
+
 	log.Printf("snakenet on %s%s (turn key: %v, cap: %v at %.0f GB)", addr, prefix, t.configured(), t.cap.configured(), capGB)
 	log.Fatal(srv.ListenAndServe())
+}
+
+func internalRoutes(t *turn) http.Handler {
+	mux := http.NewServeMux()
+	mux.HandleFunc("/ice", func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		w.Header().Set("Cache-Control", "no-store")
+		json.NewEncoder(w).Encode(map[string]any{
+			"iceServers":     t.iceServers(),
+			"turn":           t.usable(),
+			"refreshSeconds": int(time.Hour.Seconds()),
+		})
+	})
+	return mux
 }
 
 func (h *hub) routes(prefix string, origins []string) http.Handler {

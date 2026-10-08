@@ -62,6 +62,10 @@ if ! healthy; then
 fi
 echo "   healthy"
 
+echo ">> shared-TURN notes for other apps on the box → /srv/apps/$APP/SHARED_TURN.md"
+rsync -az --chmod=F644 "$GAME_DIR/SHARED_TURN.md" "$HOST:/srv/apps/$APP/SHARED_TURN.md"
+ssh "$HOST" "chmod 755 /srv/apps/$APP"
+
 echo ">> Caddy route"
 rsync -az "$SERVER_DIR/caddy_route.py" "$HOST:/tmp/snakenet_route.py"
 ssh "$HOST" "out=\$(sudo python3 /tmp/snakenet_route.py) && echo \"   \$out\" && \
