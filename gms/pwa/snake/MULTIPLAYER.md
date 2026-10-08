@@ -68,7 +68,18 @@ on the box and restart `snakenet`. **Never commit them.**
 **Live since 2026-10-09** (Cloudflare app `snake-eee`, Aaron's account, card on
 file, usage-billed past 1,000 GB). Because TURN credentials work for whoever
 holds them, the server only sends them in `room` messages once a room has two
-or more players, and they live 2 hours (refreshed hourly, shared).
+or more players, and they live 4 hours (refreshed every 2, shared).
+
+**Automatic spending cap (`server/cap.go`).** Cloudflare has no hard spending
+limit, so every hour the server reads month-to-date TURN egress (the billed
+figure) from Cloudflare's GraphQL analytics (`callsTurnUsageAdaptiveGroups`)
+and stops handing out TURN once it passes `SNAKENET_TURN_CAP_GB` (default
+800 of the free 1,000). It **fails closed**: no TURN without a working cap, and
+none if usage hasn't been readable for 6 hours. Players then fall back to the
+US relay. Needs `CF_ACCOUNT_ID` + `CF_ANALYTICS_TOKEN` (Cloudflare account
+token `snakenet-turn-usage-read`: Account Analytics Read only, IP-locked to
+the br8t box) in the env file. `/gms/pwa/snake/net/health` shows usage and
+whether TURN is on. A $5 billing budget alert emails Aaron as a second line.
 
 ## Tests
 

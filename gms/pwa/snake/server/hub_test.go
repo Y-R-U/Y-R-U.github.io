@@ -259,7 +259,9 @@ func toLower(s string) string {
 
 func TestTurnOnlyOnceSomeoneElseIsInTheRoom(t *testing.T) {
 	r := newRig()
-	r.h.turn = &turn{keyID: "k", token: "t", cached: json.RawMessage(`[{"urls":["turn:x"]}]`), until: time.Now().Add(time.Hour)}
+	c := newTurnCap("acct", "tok", 800)
+	c.readAt = time.Now()
+	r.h.turn = &turn{keyID: "k", token: "t", cap: c, cached: json.RawMessage(`[{"urls":["turn:x"]}]`), until: time.Now().Add(time.Hour)}
 	a := r.client("A", "Australia/Sydney")
 	r.msg(a, map[string]any{"t": "quick"})
 	if m := last(a, "room"); m == nil || m["ice"] != nil {

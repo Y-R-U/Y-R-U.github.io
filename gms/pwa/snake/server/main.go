@@ -11,6 +11,11 @@
 //	SNAKENET_ORIGINS   extra allowed WS origins, comma separated host patterns
 //	CF_TURN_KEY_ID     optional Cloudflare TURN key id
 //	CF_TURN_KEY_TOKEN  optional Cloudflare TURN key API token (secret: box only)
+//	CF_ACCOUNT_ID      Cloudflare account, for the TURN spending cap
+//	CF_ANALYTICS_TOKEN read-only Account Analytics token (secret: box only)
+//	SNAKENET_TURN_CAP_GB  monthly TURN egress cap in GB (default 800; free tier is 1,000)
+//
+// TURN is only ever handed out while the cap can be read and is not reached.
 package main
 
 import (
@@ -18,6 +23,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"strconv"
 	"strings"
 	"time"
 )
@@ -43,7 +49,16 @@ func main() {
 		origins = append(origins, strings.Split(extra, ",")...)
 	}
 
-	h := newHub(newTurn(os.Getenv("CF_TURN_KEY_ID"), os.Getenv("CF_TURN_KEY_TOKEN")))
+	capGB, err := strconv.ParseFloat(env("SNAKENET_TURN_CAP_GB", "800"), 64)
+	if err != nil || capGB <= 0 {
+		log.Fatalf("bad SNAKENET_TURN_CAP_GB")
+	}
+	t := newTurn(os.Getenv("CF_TURN_KEY_ID"), os.Getenv("CF_TURN_KEY_TOKEN"))
+	t.cap = newTurnCap(os.Getenv("CF_ACCOUNT_ID"), os.Getenv("CF_ANALYTICS_TOKEN"), capGB)
+	if t.cap.configured() {
+		go t.cap.run()
+	}
+	h := newHub(t)
 	go h.run()
 
 	srv := &http.Server{
@@ -51,7 +66,7 @@ func main() {
 		Handler:           h.routes(prefix, origins),
 		ReadHeaderTimeout: 5 * time.Second,
 	}
-	log.Printf("snakenet on %s%s (turn: %v)", addr, prefix, h.turn.configured())
+	log.Printf("snakenet on %s%s (turn key: %v, cap: %v at %.0f GB)", addr, prefix, t.configured(), t.cap.configured(), capGB)
 	log.Fatal(srv.ListenAndServe())
 }
 
@@ -59,7 +74,7 @@ func (h *hub) routes(prefix string, origins []string) http.Handler {
 	mux := http.NewServeMux()
 	mux.HandleFunc(prefix+"/health", func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
-		w.Write([]byte(`{"ok":true}`))
+		json.NewEncoder(w).Encode(map[string]any{"ok": true, "turn": h.turn.cap.status()})
 	})
 	mux.HandleFunc(prefix+"/stats", func(w http.ResponseWriter, r *http.Request) {
 		cors(w, r)

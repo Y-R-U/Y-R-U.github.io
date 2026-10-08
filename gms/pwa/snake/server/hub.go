@@ -544,7 +544,7 @@ func (h *hub) serveWS(w http.ResponseWriter, r *http.Request, origins []string) 
 	defer cancel()
 	go writer(ctx, conn, c.send, cancel)
 
-	welcome, _ := json.Marshal(map[string]any{"t": "welcome", "id": c.id, "ice": stunOnly, "turn": h.turn.configured()})
+	welcome, _ := json.Marshal(map[string]any{"t": "welcome", "id": c.id, "ice": stunOnly, "turn": h.turn.usable()})
 	// Straight to the socket: the hub has not been told about anything yet.
 	wctx, wcancel := context.WithTimeout(ctx, 5*time.Second)
 	err = conn.Write(wctx, websocket.MessageText, welcome)

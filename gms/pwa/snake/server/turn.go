@@ -21,12 +21,13 @@ var stunOnly = json.RawMessage(`[{"urls":["stun:stun.cloudflare.com:3478","stun:
 // credentials work for anyone holding them, so they only ever go to players
 // who are in a room with somebody else (see hub.broadcastMembers).
 const (
-	turnTTL     = 2 * time.Hour
-	turnRefresh = 1 * time.Hour
+	turnTTL     = 4 * time.Hour
+	turnRefresh = 2 * time.Hour
 )
 
 type turn struct {
 	keyID, token string
+	cap          *turnCap
 	api          string
 	http         *http.Client
 
@@ -46,11 +47,14 @@ func newTurn(keyID, token string) *turn {
 
 func (t *turn) configured() bool { return t.keyID != "" && t.token != "" }
 
+// usable: configured, and the spending cap says yes.
+func (t *turn) usable() bool { return t.configured() && t.cap.allowed() }
+
 // iceServers returns the RTCIceServer list for a new client. Credentials are
 // shared for a few hours rather than minted per connection: there is nothing
 // to revoke per player, and it keeps Cloudflare API calls to a trickle.
 func (t *turn) iceServers() json.RawMessage {
-	if !t.configured() {
+	if !t.usable() {
 		return stunOnly
 	}
 	t.mu.Lock()
