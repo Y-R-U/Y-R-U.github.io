@@ -1,5 +1,5 @@
 // Lazy bridges to lane S (js/net/) and lane L (js/learn/). Missing modules degrade to "coming soon".
-import { BUILD } from '../build.js?v=202610071629';
+import { BUILD } from '../build.js?v=202610081134';
 
 let netP = null, learnP = null;
 export const loadNet = () => netP || (netP = import(`../net/index.js?v=${BUILD}`).catch(e => { console.info('[clued] net not available', e?.message); return null; }));

@@ -1,16 +1,16 @@
 // Format grid + per-game setup (themes, count, options, difficulty, timer).
-import { h } from './kit.js?v=202610071629';
-import { defineScreen, go, header } from './app.js?v=202610071629';
-import { listFormats, getFormat, defaultOpts } from '../formats/registry.js?v=202610071629';
-import { getIndex } from '../core/packs.js?v=202610071629';
-import { supportedPackIds, formatAvailable } from '../core/spec.js?v=202610071629';
-import { getSettings, setSettings, getLast, setLast, ANSWER_TIMES } from '../core/store.js?v=202610071629';
-import { streakOption } from './streakopt.js?v=202610071629';
-import { themePicker } from './picker.js?v=202610071629';
-import { STRUCTURES } from '../structures/index.js?v=202610071629';
-import { sfx } from './fx.js?v=202610071629';
-import { favControls } from './favs.js?v=202610071629';
-import { favKey } from './favmodel.js?v=202610071629';
+import { h } from './kit.js?v=202610081134';
+import { defineScreen, go, header } from './app.js?v=202610081134';
+import { listFormats, getFormat, defaultOpts } from '../formats/registry.js?v=202610081134';
+import { getIndex } from '../core/packs.js?v=202610081134';
+import { supportedPackIds, formatAvailable } from '../core/spec.js?v=202610081134';
+import { getSettings, setSettings, getLast, setLast, ANSWER_TIMES } from '../core/store.js?v=202610081134';
+import { streakOption } from './streakopt.js?v=202610081134';
+import { themePicker } from './picker.js?v=202610081134';
+import { STRUCTURES } from '../structures/index.js?v=202610081134';
+import { sfx } from './fx.js?v=202610081134';
+import { favControls } from './favs.js?v=202610081134';
+import { favKey } from './favmodel.js?v=202610081134';
 
 export const DIFFS = [[0, 'Mixed'], [1, 'Easy'], [2, 'Medium'], [3, 'Hard']];
 

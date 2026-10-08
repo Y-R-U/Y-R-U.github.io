@@ -1,20 +1,20 @@
 // Challenge links: "beat my score on this exact set". Create from a results screen, play via ?c=ID.
-import { h, fmtNum } from '../ui/kit.js?v=202610071629';
-import { defineScreen, header, current, reset } from '../ui/app.js?v=202610071629';
-import { popup, toast } from '../ui/popup.js?v=202610071629';
-import { sfx, confetti } from '../ui/fx.js?v=202610071629';
-import { getSettings } from '../core/store.js?v=202610071629';
-import { createRunner } from '../structures/runner.js?v=202610071629';
-import { replayCfg, replayScore } from '../structures/index.js?v=202610071629';
-import { challenges, friendly } from './api.js?v=202610071629';
-import { suggestedName, rememberName, tidyName, MAX_NAME } from './ident.js?v=202610071629';
-import { openShare, challengeUrl, shareOrCopy } from './share.js?v=202610071629';
-import { scoreboard, ordinal, detailOf, comparison } from './board.js?v=202610071629';
-import { ensureStyles, setQuery } from './util.js?v=202610071629';
-import { ensureFormats } from './room.js?v=202610071629';
-import { openSignIn } from './signin.js?v=202610071629';
-import { linkChallengeShare } from './linkchallenge.js?v=202610071629';
-import { recordGame, summarize, playSecs } from '../core/stats.js?v=202610071629';
+import { h, fmtNum } from '../ui/kit.js?v=202610081134';
+import { defineScreen, header, current, reset } from '../ui/app.js?v=202610081134';
+import { popup, toast } from '../ui/popup.js?v=202610081134';
+import { sfx, confetti } from '../ui/fx.js?v=202610081134';
+import { getSettings } from '../core/store.js?v=202610081134';
+import { createRunner } from '../structures/runner.js?v=202610081134';
+import { replayCfg, replayScore } from '../structures/index.js?v=202610081134';
+import { challenges, friendly } from './api.js?v=202610081134';
+import { suggestedName, rememberName, tidyName, MAX_NAME } from './ident.js?v=202610081134';
+import { openShare, challengeUrl, shareOrCopy } from './share.js?v=202610081134';
+import { scoreboard, ordinal, detailOf, comparison } from './board.js?v=202610081134';
+import { ensureStyles, setQuery } from './util.js?v=202610081134';
+import { ensureFormats } from './room.js?v=202610081134';
+import { openSignIn } from './signin.js?v=202610081134';
+import { linkChallengeShare } from './linkchallenge.js?v=202610081134';
+import { recordGame, summarize, playSecs } from '../core/stats.js?v=202610081134';
 
 const MAX_SET = 500 * 1024;
 

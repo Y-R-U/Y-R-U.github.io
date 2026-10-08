@@ -90,11 +90,23 @@ let installed = false;
 export function installUnlock(target = globalThis.document) {
   if (installed || !target) return;
   installed = true;
-  const h = () => { unlock(); if (ctx && ctx.state === 'running') ['pointerdown', 'touchend', 'keydown'].forEach((e) => target.removeEventListener(e, h, true)); };
-  ['pointerdown', 'touchend', 'keydown'].forEach((e) => target.addEventListener(e, h, true));
-  target.addEventListener('visibilitychange', () => {
-    if (target.visibilityState === 'visible' && ctx && ctx.state !== 'running' && unlocked) ctx.resume().catch(() => {});
-  });
+  // iOS suspends ('interrupted') audio when the app is backgrounded and only lets it resume inside a gesture,
+  // so these stay installed for the page's lifetime: every tap re-wakes a sleeping context.
+  const wake = () => {
+    if (!ctx) return unlock();
+    try { if (navigator.audioSession) navigator.audioSession.type = 'playback'; } catch {}
+    if (keepAlive && keepAlive.paused) keepAlive.play()?.catch?.(() => {});
+    if (ctx.state !== 'running') unlock();
+  };
+  ['pointerdown', 'touchend', 'keydown'].forEach((e) => target.addEventListener(e, wake, true));
+  const back = () => {
+    if (target.visibilityState !== 'visible' || !ctx || !unlocked) return;
+    try { if (navigator.audioSession) navigator.audioSession.type = 'playback'; } catch {}
+    if (ctx.state !== 'running') ctx.resume().catch(() => {});
+  };
+  target.addEventListener('visibilitychange', back);
+  globalThis.addEventListener?.('pageshow', back);
+  globalThis.addEventListener?.('focus', back);
 }
 if (globalThis.document) installUnlock();
 

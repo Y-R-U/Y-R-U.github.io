@@ -1,10 +1,10 @@
 // Lookalike studies: pairs from `lookalikes`, side by side, with the key differences.
-import { h } from '../ui/kit.js?v=202610071629';
-import { header, go } from '../ui/app.js?v=202610071629';
-import { sfx } from '../ui/fx.js?v=202610071629';
-import { themeTree, getPack, itemsFor, thumb, factRows, kidsOn } from './data.js?v=202610071629';
-import { notice, emptyState, creditBtn, sayBtn, put } from './ui.js?v=202610071629';
-import { pick } from '../core/rng.js?v=202610071629';
+import { h } from '../ui/kit.js?v=202610081134';
+import { header, go } from '../ui/app.js?v=202610081134';
+import { sfx } from '../ui/fx.js?v=202610081134';
+import { themeTree, getPack, itemsFor, thumb, factRows, kidsOn } from './data.js?v=202610081134';
+import { notice, emptyState, creditBtn, sayBtn, put } from './ui.js?v=202610081134';
+import { pick } from '../core/rng.js?v=202610081134';
 
 export function pairsOf(pack, items = pack.items) {
   const ids = new Set(items.map(x => x.id));

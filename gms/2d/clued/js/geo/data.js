@@ -1,5 +1,5 @@
 // Geo data loaders (cached). Everything lives under data/geo/ (built by tools/m_build.mjs).
-import { REGIONS } from './regions.js?v=202610071629';
+import { REGIONS } from './regions.js?v=202610081134';
 
 const base = new URL('../../data/geo/', import.meta.url);
 const cache = new Map();

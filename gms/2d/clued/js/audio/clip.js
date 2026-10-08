@@ -1,8 +1,8 @@
 // Clip player: fetch + decode a sound once, keep only the slice a question needs, play it with an analyser.
 // Works for Apple previews, Commons/self-hosted files and piano note JSON (audio object {type:'piano', src}).
-import { getCtx, buses, begin, end } from './ctx.js?v=202610071629';
-import { previewUrl } from './apple.js?v=202610071629';
-import * as piano from './piano.js?v=202610071629';
+import { getCtx, buses, begin, end } from './ctx.js?v=202610081134';
+import { previewUrl } from './apple.js?v=202610081134';
+import * as piano from './piano.js?v=202610081134';
 
 const GAME_ROOT = new URL('../../', import.meta.url);
 export const resolve = (src) => new URL(src, GAME_ROOT).href;
