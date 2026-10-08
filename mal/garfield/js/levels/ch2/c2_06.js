@@ -126,7 +126,7 @@ function fire(L) {
     const dir = V(1, 0, 0);
     ctx.jon.root.position.copy(mid.clone().addScaledVector(dir, 0.45)); ctx.lyman.root.position.copy(mid.clone().addScaledVector(dir, -0.45));
     ctx.jon.root.rotation.y = -Math.PI / 2; ctx.lyman.root.rotation.y = Math.PI / 2;
-    d.cut(L.shot(mid.clone().setY(1.0), { dist: 3.0, h: 0.3 }));
+    d.cut(L.shot(mid.clone().setY(0.8), { dist: 3.0, h: 0.9 }));
     ctx.jon.play?.('brawl_slap', { once: true });
     ctx.audio?.sfx?.('whack');
     await d.wait(0.8);

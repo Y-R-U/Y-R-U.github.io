@@ -7,6 +7,8 @@ const MUSIC = {
   sneak: { file: 'music/sneak.mp3', len: 82.2424, loop: true, gain: 0.8 },
   chase: { file: 'music/chase.mp3', len: 69.5, loop: true, gain: 0.85 },
   cutscene: { file: 'music/cutscene.mp3', len: 61.0, loop: true, gain: 0.75 },
+  arena: { file: 'music/arena.mp3', len: 69.96, loop: true, gain: 0.8 },      // Ch2 arena battle (ACE-Step)
+  sneak2: { file: 'music/sneak2.mp3', len: 76.8, loop: true, gain: 0.75 },    // optional Ch2 sneak variant
   victory: { file: 'music/victory.mp3', loop: false, gain: 1 },
   fanfare: { file: 'music/fanfare.mp3', loop: false, gain: 1 },
   title: { file: 'music/title_song.mp3', loop: true, gain: 0.85 },  // YuE2 sung song, original lyrics (tools/media/song)
@@ -136,9 +138,11 @@ function spatial(pos) {
   return { gain, pan: Math.max(-0.8, Math.min(0.8, right * 0.8)) };
 }
 
-function sampleUrls(name) {
+function sampleUrls(name, withLoop) {
   const smp = SAMPLES[name];
-  return smp ? smp.files.map((f) => BASE + 'sfx/' + f + '.mp3') : [];
+  if (!smp) return [];
+  const f = smp.files.map((n) => BASE + 'sfx/' + n + '.mp3');
+  return withLoop && smp.loop ? [...f, BASE + 'sfx/' + smp.loop + '.mp3'] : f;
 }
 function loadSample(name) {
   const urls = sampleUrls(name);
@@ -232,7 +236,7 @@ export const audio = {
     if (!ensure()) return stop;
     const smp = SAMPLES[name];
     (async () => {
-      const buf = smp ? await loadSample(name) : null;
+      const buf = smp ? await (smp.loop ? load(BASE + 'sfx/' + smp.loop + '.mp3') : loadSample(name)) : null;
       if (stopped) return;
       if (!buf) {
         const tick = () => { if (stopped) return; audio.sfx(name, { vol: v, rate, pos }); timer = setTimeout(tick, 1600 / rate); };
@@ -243,11 +247,12 @@ export const audio = {
       out.gain.linearRampToValueAtTime(v * gain * (smp.gain || 1), ctx.currentTime + 0.15);
       out.connect(sfxBus);
       src = ctx.createBufferSource(); src.buffer = buf; src.loop = true; src.playbackRate.value = rate;
+      if (smp.len && buf.duration - smp.len > 0.005) { src.loopStart = Math.min(0.026, buf.duration - smp.len); src.loopEnd = src.loopStart + smp.len; }
       src.connect(out); src.start();
     })();
     return stop;
   },
-  preloadSfx(names = Object.keys(SAMPLES)) { if (ensure()) for (const n of names) loadSample(n); },
+  preloadSfx(names = Object.keys(SAMPLES)) { if (ensure()) for (const n of names) for (const u of sampleUrls(n, true)) load(u); },
 
   async vo(key) {
     if (customNames && voLines[key + '_nn']) key = key + '_nn';

@@ -99,14 +99,36 @@ export function createHumanAI(ctx, opts = {}) {
   };
 
   // ---------- navigation ----------
-  let path = null, pathI = 0, moveSpeed = 0, goal = null, repathT = 0;
+  // A shut door's blocker (prop collider '<door>:blocker') between a and b on this storey, if any.
+  function doorBetween(a, b, pad = 0.24) {
+    for (const c of world.colliders || []) {
+      if (c.enabled === false || !/:blocker$/.test(c.id || '') || c.max.y < a.y + 0.3 || c.min.y > a.y + 1.5) continue;
+      const x0 = c.min.x - pad, x1 = c.max.x + pad, z0 = c.min.z - pad, z1 = c.max.z + pad;
+      const dx = b.x - a.x, dz = b.z - a.z;
+      let t0 = 0, t1 = 1, ok = true;
+      for (const [o, d, lo, hi] of [[a.x, dx, x0, x1], [a.z, dz, z0, z1]]) {
+        if (Math.abs(d) < 1e-9) { if (o < lo || o > hi) { ok = false; break; } continue; }
+        let u = (lo - o) / d, v = (hi - o) / d;
+        if (u > v) [u, v] = [v, u];
+        t0 = Math.max(t0, u); t1 = Math.min(t1, v);
+        if (t0 > t1) { ok = false; break; }
+      }
+      // starting inside the padded box (standing in the doorway) doesn't count
+      if (ok && !(a.x > x0 && a.x < x1 && a.z > z0 && a.z < z1)) return c;
+    }
+    return null;
+  }
+  ai.doorBetween = doorBetween;
+  let path = null, pathI = 0, moveSpeed = 0, goal = null, repathT = 0, doorT = 0;
   function setGoal(p, speed) {
     goal = p.clone(); moveSpeed = speed;
     let pts = null;
     try { pts = world.nav?.path?.(root.position.clone(), goal.clone()); } catch (e) { pts = null; }
     ai.noPath = !(pts && pts.length);
-    // unreachable (e.g. behind a shut door): never take the straight line through it across floors
-    path = !ai.noPath ? pts.map((q) => q.clone()) : (Math.abs(goal.y - root.position.y) > 1 ? [] : [goal.clone()]);
+    // unreachable (e.g. behind a shut door): never take the straight line through it — across floors, or
+    // through a shut door on this floor (they used to walk straight through the cupboard/bedroom doors)
+    path = !ai.noPath ? pts.map((q) => q.clone())
+      : (Math.abs(goal.y - root.position.y) > 1 || doorBetween(root.position, goal) ? [] : [goal.clone()]);
     // drop a first node behind us
     if (path.length > 1 && flat(path[0], root.position) < 0.3) path.shift();
     pathI = 0;
@@ -121,6 +143,17 @@ export function createHumanAI(ctx, opts = {}) {
     }
     if (!tgt) { if (path.length && goal) root.position.y = goal.y ?? root.position.y; stopMove(); return true; }
     const dx = tgt.x - root.position.x, dz = tgt.z - root.position.z, d = Math.hypot(dx, dz);
+    // a door shut in front of us mid-walk: re-plan (round it, or stop if it's the only way)
+    if ((doorT -= dt) <= 0) {
+      doorT = 0.15;
+      const ahead = root.position.clone().add(V(dx / d * Math.min(d, 0.45), 0, dz / d * Math.min(d, 0.45)));
+      if (doorBetween(root.position, ahead)) {
+        const g = goal; setGoal(g, moveSpeed);
+        const nt = path[pathI];
+        if (!nt || (path.length === 1 && ai.noPath) || doorBetween(root.position, nt)) { stopMove(); return true; }
+        return false;
+      }
+    }
     const want = Math.atan2(dx, dz);
     const turn = wrap(want - root.rotation.y);
     root.rotation.y += turn * Math.min(1, dt * 9);
@@ -396,7 +429,7 @@ export function createHumanAI(ctx, opts = {}) {
   function endChase(gaveUp) {
     events?.emit?.('chase', { on: false, who });
     ctx.ui?.hud?.set?.({ chaseTimer: null });
-    ctx.audio?.music?.('sneak', { fade: 1.2 });
+    ctx.audio?.music?.(ctx.music || 'sneak', { fade: 1.2 });
     stopMove();
     if (gaveUp) { say('j_giveup'); ctx.barks?.say('g_gaveup', { delay: 1.5, chance: 0.7 }); }
     setState('returning');
@@ -609,7 +642,7 @@ export function createHumans(ctx, { lyman = null } = {}) {
     out.lyman = ly; out.list.push(ly);
     const hips = new THREE.Vector3();
     ctx.scratch.register({
-      id: 'lyman', radius: 0.42, heightTol: 1.4,
+      id: 'lyman', radius: 0.42, heightTol: 1.4, noAssist: true,   // a human: only a real aimed swipe counts (like Jon)
       getPos: (o) => {
         lyman.root.getWorldPosition(hips);
         const y0 = hips.y;
@@ -619,8 +652,10 @@ export function createHumans(ctx, { lyman = null } = {}) {
       onHit: (info) => { ly.onScratch({ ...(info || {}), hit: 'lyman' }); ctx.events?.emit?.('humanHit', { who: 'lyman' }); },
     });
   }
+  // close to the lens they fade like furniture (core/fade.js); Ch2 only, untagged again on dispose
+  for (const a of out.list) a.actor.root.userData.fadeActor = true;
   out.update = (dt) => { for (const a of out.list) a.update(dt); };
-  out.dispose = () => { for (const a of out.list) a.dispose(); };
+  out.dispose = () => { for (const a of out.list) { a.dispose(); a.actor.root.userData.fadeActor = false; } };
   out.any = (fn) => out.list.some(fn);
   out.all = (fn) => out.list.every(fn);
   out.chasing = () => out.list.some((a) => a.state === 'chase' || a.state === 'glare');

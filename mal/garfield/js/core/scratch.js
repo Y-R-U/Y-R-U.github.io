@@ -4,7 +4,7 @@ import * as THREE from '../../vendor/three/three.module.js';
 export function createScratch({ garfield, events, audio }) {
   const targets = new Map();
   const jonW = new THREE.Vector3(), fwd = new THREE.Vector3(), claw = new THREE.Vector3(), tp = new THREE.Vector3(), tmp = new THREE.Vector3();
-  const REACH = 0.58, CONE = Math.cos(THREE.MathUtils.degToRad(70));
+  const REACH = 0.58, CONE = Math.cos(THREE.MathUtils.degToRad(70)), ASSIST = -1.01;   // any direction: a kid tapping Scratch right next to the dog expects it to land
   let cooldown = 0, jon = null;
 
   const api = {
@@ -71,6 +71,25 @@ export function createScratch({ garfield, events, audio }) {
         if (d + (info?.hit === 'jon' ? 0.15 : 0) < bestD) {
           bestD = d;
           info = { hit: 'prop', propId: t.id, zone: null, point: pos.clone(), target: t };
+        }
+      }
+      // kid assist: a registered target right beside (or behind) him still gets the swipe, and he spins to it
+      if (!info) {
+        let best = null, bd = Infinity;
+        for (const t of targets.values()) {
+          let ok = false;
+          try { ok = t.enabled(); } catch {}
+          if (!ok || t.noAssist) continue;
+          const pos = t.getPos ? t.getPos(new THREE.Vector3()) : t.pos;
+          if (!pos || Math.abs(pos.y - claw.y) > t.heightTol + 0.25) continue;
+          tmp.copy(pos).sub(root.position); tmp.y = 0;
+          const d = tmp.length();
+          if (d > REACH + t.radius - 0.08 || (d > 0.12 && tmp.normalize().dot(fwd) < ASSIST)) continue;
+          if (d < bd) { bd = d; best = { t, pos }; }
+        }
+        if (best) {
+          root.rotation.y = Math.atan2(best.pos.x - root.position.x, best.pos.z - root.position.z);
+          info = { hit: 'prop', propId: best.t.id, zone: null, point: best.pos.clone(), target: best.t };
         }
       }
       info = info || { hit: null, zone: null, propId: null, point: claw.clone() };

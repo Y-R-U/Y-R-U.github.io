@@ -29,7 +29,7 @@ export default defineLevel2({
           L.flags['ate_' + id] = true;
           const n = ++L.flags.ate;
           L.setObjText(2, `Eat both dinners (${n}/2)`);
-          if (n >= 2) { L.obj(2); L.say('c2_g_l1_plate', { force: true, delay: 0.4 }); } else L.say('c2_g_l1_plate', { force: true });
+          if (n >= 2) { L.obj(2); L.say(['g_win_2', 'g_win_5', 'g_win_4'][Math.floor(Math.random() * 3)], { force: true, delay: 0.4 }); } else L.say('c2_g_l1_plate', { force: true });
         } });
     }
     L.eatSpot({ id: 'odieBowl', pos: () => apos(ctx, 'odieBowl', V(7.6, 0, 6.5)), prop: () => prop(ctx, 'odieBowl'), radius: 0.45,
@@ -45,23 +45,27 @@ export default defineLevel2({
     const bowlProp = prop(ctx, 'catBowl'), oBowlProp = prop(ctx, 'odieBowl');
     if (bowlProp?.root) bowlProp.root.visible = false;
     if (oBowlProp?.root) oBowlProp.root.visible = false;
-    d.place(garfield, bowl.clone().add(V(0.5, 0, 0.2)), -Math.PI / 2);
+    // the bowls sit 0.65 m apart against the counter: cat and dog wait in front of their own bowls, Jon serves from
+    // the left and Lyman from the right (they used to stand on each other's bowls)
+    d.place(garfield, bowl.clone().add(V(-0.05, 0, -0.45)), 0);
     garfield.play?.('sit');
-    d.place(odie, oBowl.clone().add(V(0.6, 0, 0.3)), -Math.PI / 2);
+    d.place(odie, oBowl.clone().add(V(0.15, 0, -0.55)), 0);
     odie.play?.('sit_pant');
     d.place(jon, apos(ctx, 'jonSpawn', V(4, 0, 8)));
-    d.place(ly, apos(ctx, 'jonSpawn', V(4, 0, 8)).add(V(-0.7, 0, 0.3)));
+    d.place(ly, apos(ctx, 'jonSpawn', V(4, 0, 8)).add(V(0.7, 0, -0.3)));
     jon.holdProp?.('bowl'); ly.holdProp?.('bowl');
-    d.cut(L.shot(bowl.clone().lerp(oBowl, 0.5).setY(0.7), { dist: 3.4, h: 0.9 }));
+    d.cut(L.shot(bowl.clone().lerp(oBowl, 0.5).setY(0.7), { dist: 3.4, h: 0.9, prefer: Math.PI }));
     jon.play?.('walk'); ly.play?.('walk');
-    await d.parallel(d.walk(jon, bowl.clone().add(V(-0.55, 0, 0)), { faceEnd: false }), d.walk(ly, oBowl.clone().add(V(-0.55, 0, 0)), { faceEnd: false }));
+    await d.parallel(d.walk(jon, bowl.clone().add(V(-0.6, 0, -0.2)), { faceEnd: false }), d.walk(ly, oBowl.clone().add(V(0.62, 0, -0.2)), { faceEnd: false }));
     d.face(jon, bowl); d.face(ly, oBowl);
     await d.parallel(d.play(jon, 'give_bowl', { once: true, max: 1.6 }), d.say('jon', 'j_open_bowl_1', { text: T('j_open_bowl_1') }));
     jon.holdProp?.(null); if (bowlProp?.root) bowlProp.root.visible = true;
     await d.parallel(d.play(ly, 'give_bowl', { once: true, max: 1.6 }), d.say('lyman', 'c2_l_l1_bowl', { text: T('c2_l_l1_bowl') }));
     ly.holdProp?.(null); if (oBowlProp?.root) oBowlProp.root.visible = true;
     L.odieAI.place(odieSpot(ctx)); L.odieAI.face(oBowl); odie.play?.('eat');
-    d.cut(L.shot(garfield.root.position.clone().setY(0.35), { dist: 1.4, h: 0.15, prefer: garfield.root.rotation.y }));
+    // he turns from the bowl to the room for his line, so the lens can see his face (the counter is behind the bowl)
+    garfield.root.rotation.y = -2.5;
+    d.cut(L.shot(garfield.root.position.clone().setY(0.35), { dist: 1.4, h: 0.15, prefer: -2.5 }));
     try { garfield.setExpression?.('sleepy'); } catch {}
     await d.say('garfield', 'c2_g_l1_hungry', { text: T('c2_g_l1_hungry') });
     // both sit to eat

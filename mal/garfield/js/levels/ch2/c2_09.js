@@ -94,11 +94,13 @@ function walkBy(L) {
       const spot = besideTable(L);
       await t.walkTo(spot, { arrive: 0.2 });
       await t.face(ctx.controller.pos);
-      jon.state = 'byTable';
       try { ctx.jon.setExpression?.('happy'); } catch {}
       t.loop('sing_morning', { fallback: 'talk' });
       t.say('c2_j_l9_morning', { force: true });
-      await t.wait(5);
+      // the Poke! prompt comes up once he's into his song (a poke on arrival cut him off before he sang)
+      await t.wait(1.3);
+      jon.state = 'byTable';
+      await t.wait(4.5);
       jon.state = 'walkBy';
       if (!L.flags.sitting) { L.flags.walkBy = false; jon.goHome(); return; }
       await t.walkTo(apos(ctx, 'livingCentre', V(5.9, 0, 2.6)), { arrive: 0.4 });

@@ -14,9 +14,11 @@ function part(geo, color, m) {
 const M = (x, y, z, sx = 1, sy = 1, sz = 1, rx = 0, ry = 0, rz = 0) =>
   new THREE.Matrix4().compose(new THREE.Vector3(x, y, z), new THREE.Quaternion().setFromEuler(new THREE.Euler(rx, ry, rz)), new THREE.Vector3(sx, sy, sz));
 
+const SIZE = 1.75;
 function mouseGeometry() {
-  const grey = 0x9a9590, pink = 0xf0a0a8, dark = 0x151010;
+  const grey = 0xd8d2ca, pink = 0xff9cab, dark = 0x151010, shade = 0x2a1a10;
   const parts = [
+    part(new THREE.CircleGeometry(1, 14), shade, M(0, 0.002, -0.01, 0.04, 0.055, 1, -Math.PI / 2)),     // soft contact shadow
     part(new THREE.SphereGeometry(1, 12, 8), grey, M(0, 0.022, -0.005, 0.024, 0.02, 0.036)),            // body
     part(new THREE.SphereGeometry(1, 10, 8), grey, M(0, 0.028, 0.035, 0.016, 0.015, 0.02, -0.2)),        // head
     part(new THREE.ConeGeometry(0.01, 0.022, 8), grey, M(0, 0.026, 0.058, 1, 1, 1, Math.PI / 2)),        // snout
@@ -37,7 +39,8 @@ function mouseGeometry() {
 
 export function createMice({ count = 6, color = null } = {}) {
   const geo = mouseGeometry();
-  const mat = new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 0.75 });
+  // comic-sized and pale with a little self-light so they read on warm wooden floors at gameplay distance
+  const mat = new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 0.6, emissive: 0x2a2622 });
   if (color) mat.color.set(color);
   const mesh = new THREE.InstancedMesh(geo, mat, count);
   mesh.castShadow = true; mesh.frustumCulled = false; mesh.name = 'mice';
@@ -66,7 +69,7 @@ export function createMice({ count = 6, color = null } = {}) {
       return new Promise((r) => { m.done = r; });
     },
     // all mice dart about randomly inside {min, max} (Vector3s; y = floor height)
-    wander(a) { area = a; mice.forEach((m) => { const p = randomTarget(); startPath(m, [p, randomTarget()], 'wander'); }); },
+    wander(a) { area = a; mice.forEach((m) => { const p = m.active && m.pos.y > -1 ? m.pos.clone() : randomTarget(); startPath(m, [p, randomTarget()], 'wander'); }); },
     show(v) { root.visible = !!v; },
     stop() { mice.forEach((m) => { m.active = false; m.pos.y = -10; }); },
     update(dt) {
@@ -95,7 +98,7 @@ export function createMice({ count = 6, color = null } = {}) {
         }
         const run = m.active ? 1 : 0;
         _q.setFromAxisAngle(_up, m.yaw + 0.15 * run * Math.sin(m.t * 30));
-        _s.set(1, 1 + 0.12 * run * Math.sin(m.t * 40), 1);
+        _s.set(SIZE, SIZE * (1 + 0.12 * run * Math.sin(m.t * 40)), SIZE);
         _v.copy(m.pos); _v.y += 0.008 * run * Math.abs(Math.sin(m.t * 40));
         _m.compose(_v, _q, _s);
         mesh.setMatrixAt(m.i, _m);

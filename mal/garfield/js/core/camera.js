@@ -53,6 +53,22 @@ export function createCamera(R) {
     update,
   };
 
+  let hintSpots = null;
+  function yawHint(p) {
+    if (!hintSpots) {
+      const d = world?.anchors?.get('dresser');
+      hintSpots = d ? [{ x: d.pos.x, y: d.pos.y, z: d.pos.z, rot: d.rotY ?? Math.PI, w: (d.w || 1) / 2 + 0.35, depth: 1.05 }] : [];
+    }
+    for (const h of hintSpots) {
+      if (p.y < h.y - 0.2 || p.y > h.y + 1.0) continue;
+      // local frame: +f = out of the dresser front
+      const fx = Math.sin(h.rot), fz = Math.cos(h.rot), dx = p.x - h.x, dz = p.z - h.z;
+      const f = dx * fx + dz * fz, side = Math.abs(dx * fz - dz * fx);
+      if (f > -0.1 && f < h.depth && side < h.w) return { yaw: h.rot, pitch: 0.5 };
+    }
+    return null;
+  }
+
   // Pick the yaw nearest `base` that leaves the camera the most room (used after cutscenes / spawns).
   function roomyYaw(base) {
     if (!target) return base;
@@ -232,7 +248,13 @@ export function createCamera(R) {
       if (pivot.distanceToSquared(pivotGoal) > 9) pivot.copy(pivotGoal);
     }
     if (cam.mode === 'follow' || cam.mode === 'blend') {
-      if (info.moving && cam.time - cam.lastLook > 1.1 && target) {
+      // furniture you use from the front (Jon's dresser drawers): swing round to look at its face, or the follow
+      // cam ends up behind the dresser's flank looking through it
+      const hint = target && cam.time - cam.lastLook > 1.1 ? yawHint(target.position) : null;
+      if (hint) {
+        cam.yaw = wrap(cam.yaw + wrap(hint.yaw - cam.yaw) * damp(2.6, dt));
+        cam.pitch += (hint.pitch - cam.pitch) * damp(2, dt);
+      } else if (info.moving && cam.time - cam.lastLook > 1.1 && target) {
         const behind = wrap(target.rotation.y + Math.PI), diff = wrap(behind - cam.yaw);
         if (Math.abs(diff) < 2.3) cam.yaw = wrap(cam.yaw + diff * damp(1.5 * Math.min(1, info.speed / 2.5), dt));
         cam.pitch += (0.36 - cam.pitch) * damp(0.6, dt);

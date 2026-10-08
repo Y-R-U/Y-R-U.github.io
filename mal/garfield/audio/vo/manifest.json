@@ -1003,21 +1003,25 @@
   "who": "jon",
   "text": "Goooood moooorrrning Garfield!",
   "file": "audio/vo/c2_j_l9_morning.mp3",
-  "dur": 1.67,
+  "dur": 3.66,
   "gen_text": "Goooood moooorrrning Garfield!",
-  "job": "dc0a4f39ab2f4ba9bd44f3da5a67b15b",
+  "job": "hand-picked (sung stretch)",
   "voice": "04254ade71d1424c9e89e05626956bde",
-  "seed": 21
+  "seed": 21,
+  "speed": 0.7,
+  "tts_text": "Gooooood moooooorrrrning, Gaaarfield!"
  },
  "c2_j_l9_morning_nn": {
   "who": "jon",
   "text": "Goooood moooorrrning kitty!",
   "file": "audio/vo/c2_j_l9_morning_nn.mp3",
-  "dur": 1.6,
+  "dur": 2.84,
   "gen_text": "Goooood moooorrrning kitty!",
-  "job": "5672759782a5411cb1f6ad68492dfd48",
+  "job": "hand-picked (sung stretch)",
   "voice": "04254ade71d1424c9e89e05626956bde",
-  "seed": 21
+  "seed": 5,
+  "speed": 0.7,
+  "tts_text": "Gooooood moooooorrrrning, kiiitty!"
  },
  "c2_j_l9_nasty": {
   "who": "jon",
@@ -2703,11 +2707,11 @@
   "who": "jon",
   "text": "Telly time! Lyman, budge up.",
   "file": "audio/vo/fp2_j_tv_1.mp3",
-  "dur": 2.07,
+  "dur": 2.24,
   "gen_text": "Telly time! Lyman, budge up.",
-  "job": "ac8b17f51aeb4d06b18fa5b41ed673b2",
+  "job": "e96fbadca05b4468869accb262288bcd",
   "voice": "04254ade71d1424c9e89e05626956bde",
-  "seed": 21
+  "seed": 202
  },
  "fp2_j_wander_1": {
   "who": "jon",
@@ -3022,11 +3026,11 @@
   "who": "garfield",
   "text": "A dog in my house. What's next, a goldfish with opinions?",
   "file": "audio/vo/g_c2_idle_1.mp3",
-  "dur": 4.53,
+  "dur": 5.01,
   "gen_text": "A dog in my house. What's next, a goldfish with opinions?",
-  "job": "0d160f3f6d32456e836879b7daa3f9e5",
+  "job": "0930e384b47f4b81afaad904d68e7b0f",
   "voice": "9611963dfd0b48d48ec21f9e72ff258b",
-  "seed": 7
+  "seed": 202
  },
  "g_c2_idle_2": {
   "who": "garfield",
@@ -7469,85 +7473,99 @@
  "o_bark_1": {
   "who": "odie",
   "text": "Woof!",
-  "file": "audio/sfx/bark_1.mp3",
-  "sfx": "bark"
+  "file": "audio/sfx/bark_2.mp3",
+  "sfx": "bark",
+  "dur": 0.29
  },
  "o_bark_2": {
   "who": "odie",
   "text": "Arf! Arf!",
-  "file": "audio/sfx/bark_2.mp3",
-  "sfx": "bark"
+  "file": "audio/sfx/bark_1.mp3",
+  "sfx": "bark",
+  "dur": 0.73
  },
  "o_bark_happy": {
   "who": "odie",
   "text": "Arf arf arf!",
   "file": "audio/sfx/yap_1.mp3",
-  "sfx": "yap"
+  "sfx": "yap",
+  "dur": 1.27
  },
  "o_growl_play": {
   "who": "odie",
   "text": "Grrr-arf!",
   "file": "audio/sfx/bark_3.mp3",
-  "sfx": "bark"
+  "sfx": "bark",
+  "dur": 0.68
  },
  "o_pant": {
   "who": "odie",
   "text": "Hah-hah-hah-hah…",
-  "file": "audio/sfx/pant_loop.mp3",
-  "sfx": "pant"
+  "file": "audio/sfx/pant_1.mp3",
+  "sfx": "pant",
+  "dur": 1.75
  },
  "o_shake_off": {
   "who": "odie",
   "text": "Brrrrrr!",
   "file": "audio/sfx/pant_1.mp3",
-  "sfx": "pant"
+  "sfx": "pant",
+  "dur": 1.75
  },
  "o_sniff": {
   "who": "odie",
   "text": "Sniff sniff.",
   "file": "audio/sfx/sniff_1.mp3",
-  "sfx": "sniff"
+  "sfx": "sniff",
+  "dur": 1.08
  },
  "o_whimper": {
   "who": "odie",
   "text": "Hmm-mm-mm…",
   "file": "audio/sfx/whimper_1.mp3",
-  "sfx": "whimper"
+  "sfx": "whimper",
+  "dur": 1.12
  },
  "o_whine": {
   "who": "odie",
   "text": "Hnnnn…",
   "file": "audio/sfx/whine_1.mp3",
-  "sfx": "whine"
+  "sfx": "whine",
+  "dur": 1.6
  },
  "o_whine_muffled": {
   "who": "odie",
   "text": "Mmf! Mmf!",
   "file": "audio/sfx/whine_2.mp3",
-  "sfx": "whine"
+  "sfx": "whine",
+  "dur": 0.94
  },
  "o_yip_1": {
   "who": "odie",
   "text": "Yip!",
   "file": "audio/sfx/yip_1.mp3",
-  "sfx": "yip"
+  "sfx": "yip",
+  "dur": 0.24
  },
  "o_yip_2": {
   "who": "odie",
   "text": "Yip yip!",
   "file": "audio/sfx/yip_2.mp3",
-  "sfx": "yip"
+  "sfx": "yip",
+  "dur": 0.55
  },
  "o_yip_3": {
   "who": "odie",
   "text": "Yipe!",
   "file": "audio/sfx/yip_3.mp3",
-  "sfx": "yip"
+  "sfx": "yip",
+  "dur": 0.3
  },
  "o_yip_long": {
   "who": "odie",
   "text": "Yiiiiiiiip!",
   "file": "audio/sfx/yip_long.mp3",
-  "sfx": "yip"
+  "sfx": "yip",
+  "dur": 1.07
  }
 }

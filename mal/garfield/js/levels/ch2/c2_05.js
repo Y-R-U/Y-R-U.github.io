@@ -140,14 +140,16 @@ export default defineLevel2({
 function miceChaos(L) {
   const { ctx, jon, ly } = L;
   L.cut(async (d) => {
-    try { L.mice.show?.(true); L.mice.wander?.({ min: V(0.6, 0, 0.6), max: V(8.0, 0, 10.4) }); } catch {}
+    // the pack starts bunched in the shot so the kid sees them; they spread through the house after the cut
+    const lc = apos(ctx, 'livingCentre', V(5.9, 0, 2.6)).setY(0);
+    try { L.mice.show?.(true); L.mice.wander?.({ min: lc.clone().add(V(-1.6, 0, -1.1)), max: lc.clone().add(V(1.2, 0, 1.1)) }); } catch {}
     ctx.audio?.sfx?.('squeak');
-    d.cut(L.shot(apos(ctx, 'livingCentre', V(5.9, 0, 2.6)).setY(0.8), { dist: 3.4, h: 1.2 }));
+    d.cut(L.shot(lc.clone().setY(0.35), { dist: 2.8, h: 0.75 }));
     startChasing(L);
     await d.say('jon', 'c2_j_l5_mice', { text: T('c2_j_l5_mice') });
     await d.say('lyman', 'c2_l_l5_mice', { text: T('c2_l_l5_mice') });
     await d.wait(2.5);
-  });
+  }).then(() => { try { if (!L.dead) L.mice.wander?.({ min: V(0.6, 0, 0.6), max: V(8.0, 0, 10.4) }); } catch {} });
   L.flags.chaos = true;
   void jon; void ly;
 }

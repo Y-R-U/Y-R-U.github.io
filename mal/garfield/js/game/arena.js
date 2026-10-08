@@ -7,8 +7,8 @@ const flat = (a, b) => Math.hypot(a.x - b.x, a.z - b.z);
 const wrap = (a) => Math.atan2(Math.sin(a), Math.cos(a));
 
 export const DIFFICULTY = {
-  veryEasy: { speed: 1.5, every: [4, 6], tele: 1.1, lunge: 2.0, trip: 0.45, dumb: 0.3, label: 'Very Easy' },
-  easy: { speed: 2.0, every: [3, 4.5], tele: 0.85, lunge: 2.3, trip: 0.25, dumb: 0.15, label: 'Easy' },
+  veryEasy: { speed: 1.5, every: [4, 6], tele: 1.1, lunge: 2.0, trip: 0.45, dumb: 0.3, combo: 4, label: 'Very Easy' },
+  easy: { speed: 2.0, every: [3, 4.5], tele: 0.85, lunge: 2.3, trip: 0.25, dumb: 0.15, combo: 3, label: 'Easy' },
 };
 export const ARENA = { to: 20, hitR: 0.55, lungeDur: 0.38, gInvuln: 1.2, oInvuln: 0.9 };
 
@@ -40,7 +40,7 @@ export function createArena(L, { difficulty = 'easy', to = ARENA.to, onPoint } =
     odie.root.visible = true;
     try { ctx.world.props?.get?.('bedroomDoor')?.close?.(); } catch {}
     odieAI.onScratch = () => scorePlayer();
-    odieAI.scratchable = () => !ar.over && ar.oInv <= 0;
+    odieAI.scratchable = () => !ar.over && ar.oInv <= 0 && ar.state !== 'tele' && ar.state !== 'lunge';
     hud();
     ctx.audio?.music?.((ctx.audio?.musicNames || []).includes('arena') ? 'arena' : 'chase', { fade: 0.6 });
     L.say('ar_g_start', { force: true, delay: 0.6 });
@@ -73,6 +73,8 @@ export function createArena(L, { difficulty = 'easy', to = ARENA.to, onPoint } =
     if (away.lengthSq() < 1e-4) away.set(1, 0, 0);
     ar.kb = { dir: away.normalize(), t: 0 };
     ar.state = 'hit'; ar.st = 0;
+    // a run of swipes in a row makes him snap back with a lunge (otherwise mashing stun-locks him and he never fights)
+    ar.streak = (ar.streak || 0) + 1;
     clip('hit', { once: true, fallback: 'dizzy' });
   }
 
@@ -106,7 +108,7 @@ export function createArena(L, { difficulty = 'easy', to = ARENA.to, onPoint } =
       case 'tele': {
         faceG(10);
         if (ar.st > D.tele) {
-          ar.state = 'lunge'; ar.st = 0;
+          ar.state = 'lunge'; ar.st = 0; ar.streak = 0;
           ar.lungeDir.set(g.x - o.position.x, 0, g.z - o.position.z).normalize();
           clip('tackle', { once: true, fallback: 'run' });
           ar.hitThis = false;
@@ -135,7 +137,10 @@ export function createArena(L, { difficulty = 'easy', to = ARENA.to, onPoint } =
       case 'recover': if (ar.st > 0.8) { ar.state = 'approach'; ar.st = 0; ar.cool = D.every[0] + Math.random() * (D.every[1] - D.every[0]); } break;
       case 'hit': {
         if (ar.kb && ar.kb.t < 0.35) { ar.kb.t += dt; move(ar.kb.dir, 3.2 * (1 - ar.kb.t / 0.35)); }
-        if (ar.st > 0.7) { ar.state = 'recover'; ar.st = 0; ar.cool = Math.max(ar.cool, 1.0); }
+        if (ar.st > 0.7) {
+          if (ar.streak >= (D.combo || 99)) { ar.streak = 0; ar.state = 'tele'; ar.st = 0; odie.setMove?.(0); clip('bark'); ctx.audio?.sfx?.('bark', { vol: 0.6 }); }
+          else { ar.state = 'recover'; ar.st = 0; ar.cool = Math.max(ar.cool, 1.0); }
+        }
         break;
       }
     }

@@ -385,13 +385,14 @@ export function createTvBox(ctx) {
 export function createCarpet(ctx) {
   const p = makeProp('carpet', ctx);
   const L = 1.7, Wd = 0.9;
-  const tex = canvasTex('carpetRug', 256, 512, (g, w, h) => {
-    g.fillStyle = '#7a2e2a'; g.fillRect(0, 0, w, h);
-    g.fillStyle = '#d9a440'; g.fillRect(14, 14, w - 28, h - 28);
-    g.fillStyle = '#2f5a6a'; g.fillRect(26, 26, w - 52, h - 52);
-    g.strokeStyle = '#e8d4a8'; g.lineWidth = 6;
-    for (let i = 0; i < 4; i++) { const cy = 90 + i * 110; g.beginPath(); g.moveTo(w / 2, cy - 44); g.lineTo(w / 2 + 60, cy); g.lineTo(w / 2, cy + 44); g.lineTo(w / 2 - 60, cy); g.closePath(); g.stroke(); g.fillStyle = '#b8463a'; g.beginPath(); g.arc(w / 2, cy, 14, 0, 7); g.fill(); }
-    g.fillStyle = '#e8d4a8'; for (let y = 4; y < h; y += 9) { g.fillRect(0, y, 10, 4); g.fillRect(w - 10, y, 10, 4); }
+  // cool teal + cream so it reads against the big red living-room rug it lies on
+  const tex = canvasTex('carpetRug2', 256, 512, (g, w, h) => {
+    g.fillStyle = '#1f3f4c'; g.fillRect(0, 0, w, h);
+    g.fillStyle = '#efe0b8'; g.fillRect(14, 14, w - 28, h - 28);
+    g.fillStyle = '#3e8a8c'; g.fillRect(26, 26, w - 52, h - 52);
+    g.strokeStyle = '#efe0b8'; g.lineWidth = 6;
+    for (let i = 0; i < 4; i++) { const cy = 90 + i * 110; g.beginPath(); g.moveTo(w / 2, cy - 44); g.lineTo(w / 2 + 60, cy); g.lineTo(w / 2, cy + 44); g.lineTo(w / 2 - 60, cy); g.closePath(); g.stroke(); g.fillStyle = '#f2b13a'; g.beginPath(); g.arc(w / 2, cy, 14, 0, 7); g.fill(); }
+    g.fillStyle = '#efe0b8'; for (let y = 4; y < h; y += 9) { g.fillRect(0, y, 10, 4); g.fillRect(w - 10, y, 10, 4); }
     const r = rng(12); for (let i = 0; i < 900; i++) { g.fillStyle = r() < 0.5 ? 'rgba(0,0,0,0.07)' : 'rgba(255,255,255,0.05)'; g.fillRect(r() * w, r() * h, 2, 2); }
   });
   const rugMat = new THREE.MeshStandardMaterial({ map: tex, roughness: 0.95, polygonOffset: true, polygonOffsetFactor: -1 });
@@ -401,6 +402,10 @@ export function createCarpet(ctx) {
   const rug = new THREE.Mesh(g, rugMat); rug.receiveShadow = true;
   const orig = g.attributes.position.array.slice();
   p.root.add(rug);
+  // a dark soft edge under it: a little thickness/contact shadow so it sits ON the big rug, not printed into it
+  const edge = new THREE.Mesh(new THREE.PlaneGeometry(L + 0.05, Wd + 0.05).rotateX(-Math.PI / 2).translate(0, 0.004, 0),
+    new THREE.MeshBasicMaterial({ color: 0x1a0f08, transparent: true, opacity: 0.45, depthWrite: false, polygonOffset: true, polygonOffsetFactor: -1 }));
+  rug.add(edge);
   homeOf(p);
   p.load = null; // prop riding on the carpet (index.js sets it to the old TV)
   p.state.pulled = false;
@@ -544,18 +549,39 @@ export function createMouseHoles(ctx) {
 
 // ---------- shedding: fur pile + progressive hair coverage on bed/sofa/armchair/table ----------
 function furTex() {
-  return canvasTex('furAlpha', 256, 256, (g, w, h) => {
+  return canvasTex('furAlpha2', 256, 256, (g, w, h) => {
     g.fillStyle = '#000'; g.fillRect(0, 0, w, h);
     const r = rng(17);
-    // each strand gets a random grey level: alphaTest threshold reveals strands progressively
-    for (let i = 0; i < 2600; i++) {
-      const x = r() * w, y = r() * h, a = r() * Math.PI, l = 5 + r() * 9, v = Math.floor(30 + r() * 225);
-      g.strokeStyle = `rgb(${v},${v},${v})`; g.lineWidth = 1 + r() * 1.5;
-      g.beginPath(); g.moveTo(x, y); g.quadraticCurveTo(x + Math.cos(a) * l * 0.5 + 2, y + Math.sin(a) * l * 0.5 - 2, x + Math.cos(a) * l, y + Math.sin(a) * l); g.stroke();
+    // soft fluffy tufts: a dense core with wispy strands radiating out. Each tuft gets one random grey level, so the
+    // alphaTest threshold reveals whole tufts progressively (it used to be lone strands → read as orange speckles)
+    for (let i = 0; i < 150; i++) {
+      const x = r() * w, y = r() * h, rad = 9 + r() * 12, v = Math.floor(40 + r() * 215), col = `rgb(${v},${v},${v})`;
+      for (const [ox, oy] of [[0, 0], [w, 0], [-w, 0], [0, h], [0, -h]]) {
+        const cx = x + ox, cy = y + oy;
+        if (cx < -30 || cx > w + 30 || cy < -30 || cy > h + 30) continue;
+        g.fillStyle = col; g.beginPath(); g.ellipse(cx, cy, rad * 0.5, rad * 0.38, r() * 3, 0, 7); g.fill();
+        g.strokeStyle = col; g.lineCap = 'round';
+        for (let k = 0; k < 30; k++) {
+          const a = r() * Math.PI * 2, l = rad * (0.55 + r() * 0.75), bend = (r() - 0.5) * 0.8;
+          g.lineWidth = 0.8 + r() * 1.6;
+          g.beginPath(); g.moveTo(cx + Math.cos(a) * rad * 0.2, cy + Math.sin(a) * rad * 0.2);
+          g.quadraticCurveTo(cx + Math.cos(a + bend) * l * 0.6, cy + Math.sin(a + bend) * l * 0.6, cx + Math.cos(a + bend * 1.6) * l, cy + Math.sin(a + bend * 1.6) * l);
+          g.stroke();
+        }
+      }
     }
   }, { srgb: false, repeat: [2, 2] });
 }
-const furColor = () => canvasTex('furCol', 64, 64, (g, w, h) => { const r = rng(5); for (let i = 0; i < 400; i++) { g.fillStyle = ['#f08a1c', '#e57a10', '#f6a64a', '#d9690c'][(r() * 4) | 0]; g.fillRect(r() * w, r() * h, 3, 3); } }, { repeat: [2, 2] });
+// warm orange with soft lighter/darker drifts (no hard pixel squares)
+const furColor = () => canvasTex('furCol2', 128, 128, (g, w, h) => {
+  g.fillStyle = '#ee8a24'; g.fillRect(0, 0, w, h);
+  const r = rng(5);
+  for (let i = 0; i < 70; i++) {
+    const x = r() * w, y = r() * h, rad = 6 + r() * 16, c = ['#f7a64a', '#e0740f', '#fbc27e', '#d9690c'][(r() * 4) | 0];
+    const gr = g.createRadialGradient(x, y, 0, x, y, rad); gr.addColorStop(0, c); gr.addColorStop(1, 'rgba(238,138,36,0)');
+    g.fillStyle = gr; g.fillRect(x - rad, y - rad, rad * 2, rad * 2);
+  }
+}, { repeat: [2, 2] });
 
 export function createShed(ctx) {
   const p = makeProp('shedDecals', ctx);
@@ -596,19 +622,30 @@ export function createShed(ctx) {
 
 export function createFurPile(ctx) {
   const p = makeProp('furPile', ctx);
-  // a fluffy heap: lumpy sphere cap with spiky tufts, Garfield-orange
-  const g = new THREE.SphereGeometry(0.22, 24, 12, 0, Math.PI * 2, 0, Math.PI / 2);
-  const pos = g.attributes.position, r = rng(8);
-  for (let i = 0; i < pos.count; i++) {
-    const x = pos.getX(i), y = pos.getY(i), z = pos.getZ(i), k = 1 + 0.18 * Math.sin(x * 40 + z * 31) * Math.cos(z * 37) + (y > 0.02 ? (r() - 0.3) * 0.12 : 0);
-    pos.setXYZ(i, x * k, y * 0.55 * k, z * k);
-  }
-  g.computeVertexNormals();
-  const furM = new THREE.MeshStandardMaterial({ color: 0xf29a3a, roughness: 1 });
-  const heap = new THREE.Mesh(g, furM); heap.castShadow = true; p.root.add(heap);
-  const tuft = new THREE.ConeGeometry(0.02, 0.09, 5);
-  const tufts = new THREE.InstancedMesh(tuft, new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 1 }), 70);
-  { const m4 = new THREE.Matrix4(), q = new THREE.Quaternion(); for (let i = 0; i < 70; i++) { const a = r() * 6.28, el = r() * 1.2; tufts.setColorAt(i, new THREE.Color([0xf6a64a, 0xf08a1c, 0xfbd9a8, 0xe57a10][i % 4])); const d = new THREE.Vector3(Math.cos(a) * Math.cos(el), Math.sin(el) * 0.55 + 0.1, Math.sin(a) * Math.cos(el)).normalize(); q.setFromUnitVectors(new THREE.Vector3(0, 1, 0), d); m4.compose(d.clone().multiplyScalar(0.2).multiply(new THREE.Vector3(1, 0.55, 1)), q, new THREE.Vector3(1, 1, 1).multiplyScalar(0.7 + r() * 0.6)); tufts.setMatrixAt(i, m4); } }
+  // a fluffy heap: a mound of soft overlapping clumps with a velvety sheen, plus a few wisps on top
+  const r = rng(8);
+  const clumps = [];
+  const blob = (x, z, rx, ry, rz, y = 0) => {
+    const g = new THREE.SphereGeometry(1, 18, 12);
+    const pos = g.attributes.position;
+    for (let i = 0; i < pos.count; i++) {
+      const vx = pos.getX(i), vy = pos.getY(i), vz = pos.getZ(i), k = 1 + 0.06 * Math.sin(vx * 9 + vz * 7 + x * 30) * Math.cos(vy * 8 + z * 20);
+      pos.setXYZ(i, vx * rx * k + x, Math.max(-0.2, vy) * ry * k + y, vz * rz * k + z);
+    }
+    clumps.push(g);
+  };
+  blob(0, 0, 0.2, 0.11, 0.18);
+  for (let i = 0; i < 7; i++) { const a = i / 7 * 6.28 + r() * 0.5, d = 0.1 + r() * 0.06; blob(Math.cos(a) * d, Math.sin(a) * d, 0.09 + r() * 0.04, 0.07 + r() * 0.03, 0.09 + r() * 0.04); }
+  for (let i = 0; i < 3; i++) { const a = r() * 6.28, d = r() * 0.06; blob(Math.cos(a) * d, Math.sin(a) * d, 0.08, 0.06, 0.08, 0.06 + r() * 0.03); }
+  // normals per clump (smooth), then merge
+  clumps.forEach((g) => g.computeVertexNormals());
+  const hg = mergeGeometries(clumps);
+  const furM = new THREE.MeshPhysicalMaterial({ color: 0xffffff, roughness: 1, sheen: 1, sheenColor: new THREE.Color(0xffd7a0), sheenRoughness: 0.5, map: furColor() });
+  const heap = new THREE.Mesh(hg, furM); heap.castShadow = true; p.root.add(heap);
+  // a few soft wisps curling off the top (short, fur-coloured)
+  const tuft = new THREE.ConeGeometry(0.01, 0.035, 6).translate(0, 0.012, 0);
+  const tufts = new THREE.InstancedMesh(tuft, new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 1 }), 14);
+  { const m4 = new THREE.Matrix4(), q = new THREE.Quaternion(); for (let i = 0; i < 14; i++) { const a = r() * 6.28, el = 0.5 + r() * 0.9; tufts.setColorAt(i, new THREE.Color([0xf6a64a, 0xf2983a, 0xfbc78a, 0xec8a2a][i % 4])); const d = new THREE.Vector3(Math.cos(a) * Math.cos(el), Math.sin(el), Math.sin(a) * Math.cos(el)).normalize(); q.setFromUnitVectors(new THREE.Vector3(0, 1, 0), d); m4.compose(new THREE.Vector3(Math.cos(a) * 0.12 * Math.cos(el), 0.06 + 0.07 * Math.sin(el), Math.sin(a) * 0.12 * Math.cos(el)), q, new THREE.Vector3(1, 0.8 + r() * 0.6, 1)); tufts.setMatrixAt(i, m4); } }
   p.root.add(tufts);
   const puffs = new Particles(ctx.scene, { count: 30, geo: new THREE.SphereGeometry(0.02, 6, 4), material: new THREE.MeshStandardMaterial({ color: 0xf6a64a, roughness: 1 }), gravity: -0.6, drag: 2, floorY: ctx.floorY ?? 0 });
   p.onUpdate(dt => puffs.update(dt));

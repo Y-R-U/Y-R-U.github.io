@@ -160,7 +160,8 @@ export function createController({ actor, world, events, camera }) {
     const hi = axis === 'x' ? b.max.z - (pos.z - r) : b.max.x - (pos.x - r);
     const slip = lo < hi ? -lo : hi;
     if (Math.abs(slip) < 0.1) {
-      const s = Math.sign(slip) * Math.min(Math.abs(slip) + 1e-3, Math.abs(d) * 0.9);
+      // (a graze exactly on the edge gives slip 0: still nudge, or he sticks on the jamb corner forever)
+      const s = (lo < hi ? -1 : 1) * Math.min(Math.abs(slip) + 2e-3, Math.abs(d) * 0.9);
       if (axis === 'x') { if (!blocked(pos.x, pos.z + s, pos.y, r)) pos.z += s; } else if (!blocked(pos.x + s, pos.z, pos.y, r)) pos.x += s;
     }
     if (axis === 'x') vel.x = 0; else vel.z = 0;

@@ -7,7 +7,7 @@ const T = (k) => LINES[k]?.text;
 
 export default defineLevel2({
   id: 'c2:7', title: 'Arena Unlocked', music: 'arena',
-  objectives: ['Arena: first to 20 points'],
+  objectives: [],
   hints: [],
   setup(L) {
     const { ctx } = L;
@@ -15,6 +15,7 @@ export default defineLevel2({
     L.showMarker = false;
     L.ar = createArena(L, { difficulty: 'veryEasy', onPoint: (who, ar) => tutorialStep(L, who, ar) });
     L.ar.start();
+    ctx.ui?.hud?.set?.({ freePlay: 'Arena · Tutorial' });
   },
   async intro(L, d) {
     const { ctx } = L;
@@ -42,11 +43,8 @@ export default defineLevel2({
   },
   update(L, dt) {
     L.ar.update(dt);
-    const a = L.ar;
-    const txt = `Arena: first to 20 points (${a.g}–${a.o})`;
-    if (txt !== L.flags.txt) { L.flags.txt = txt; L.setObjText(0, txt); }
   },
-  teardown(L) { L.ar?.dispose(); },
+  teardown(L) { L.ar?.dispose(); L.ctx.ui?.hud?.set?.({ freePlay: null }); },
 });
 
 function tutorialStep(L, who) {

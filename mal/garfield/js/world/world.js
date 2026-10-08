@@ -157,6 +157,7 @@ export async function createWorld({ renderer, quality = 'high', withProps = true
 
   const world = {
     scene, colliders, anchors, nav, props, lighting, exterior, camBlockers, groundAt,
+    lamps: house.lamps,
     get navPet() { return getNavPet(); },
     // Ch2 dining set (chair2/plate2), Odie's bowl, carpet + mouse holes: on for chapter >= 2
     setChapter(n) { props.setChapter?.(n); },

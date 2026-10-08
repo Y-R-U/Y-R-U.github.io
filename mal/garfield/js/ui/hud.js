@@ -87,6 +87,7 @@ export function createHud(ui) {
     if ('arenaScore' in p) {
       const a = state.arenaScore;
       scoreBox.style.display = a ? '' : 'none';
+      el.classList.toggle('arena-on', !!a);
       if (a) {
         nameG.textContent = ui.names.get('garfield');
         for (const [el, v] of [[scoreG, a.g], [scoreO, a.o]]) {

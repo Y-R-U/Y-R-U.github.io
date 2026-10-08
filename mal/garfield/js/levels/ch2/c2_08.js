@@ -1,6 +1,7 @@
 import { defineLevel2, V, flat, prop, A, apos, hideHuman } from './common2.js';
 import { hidePlates, showPlates } from './c2_02.js';
 import { LINES } from '../../game/lines.js';
+import { standSpot } from '../../game/shots.js';
 
 // C2 L8 "Shedding Week": shed on Jon's bed, the sofa, the armchair, then the table → his whole coat comes off.
 const T = (k) => LINES[k]?.text;
@@ -78,7 +79,8 @@ async function shed(L, i) {
   L.flags.shedding = false;
   L.obj(i);
   L.say('c2_g_l8_shed_' + (i + 1), { force: true });
-  L.later(4 + Math.random() * 3, () => L.say('c2_j_l8_hair_' + (i + 1), { force: true }));
+  // hair_1 is the sofa line, hair_2 the bed line
+  L.later(4 + Math.random() * 3, () => L.say('c2_j_l8_hair_' + [2, 1, 3][i], { force: true }));
 }
 
 function bald(L) {
@@ -99,18 +101,19 @@ function bald(L) {
     d.sfx('poof');
     L.obj(3);
     await d.wait(1.0);
-    // Jon comes and looks
+    // Jon comes and looks (from a clear floor spot; frame the pair first so he walks into the shot)
     jon.setOff(); jon.leave();
-    const stand = g.clone().setY(0).add(V(0, 0, -1.1));
-    d.place(ctx.jon, stand.clone().add(V(-1.2, 0, -0.6)));
+    const stand = standSpot(ctx, g, { r: 1.0, prefer: Math.PI });
+    const from = standSpot(ctx, stand, { r: 1.4, prefer: Math.atan2(stand.x - g.x, stand.z - g.z) });
+    d.place(ctx.jon, from);
+    d.cut(L.shot(g.clone().lerp(stand, 0.5).setY(0.9), { dist: 2.6, h: 0.5, avoid: [stand, from], prefer: Math.atan2(stand.x - g.x, stand.z - g.z) + Math.PI / 2 }));
     ctx.jon.play?.('walk');
     await d.walk(ctx.jon, stand, { faceEnd: false });
     await d.face(ctx.jon, g);
-    d.cut(L.shot(g.clone().lerp(stand, 0.5).setY(1.0), { dist: 2.4, h: 0.3 }));
     try { ctx.jon.setExpression?.('sad'); } catch {}
     ctx.jon.play?.('sigh');
     await d.say('jon', 'c2_j_l8_bald', { text: T('c2_j_l8_bald') });
-    d.cut(L.shot(g.clone().setY(g.y + 0.35), { dist: 1.3, h: 0.2, prefer: Math.atan2(stand.x - g.x, stand.z - g.z) }));
+    d.cut(L.shot(g.clone().setY(g.y + 0.35), { dist: 1.3, h: 0.2, prefer: Math.atan2(stand.x - g.x, stand.z - g.z) + 0.6, avoid: [stand] }));
     await d.say('garfield', 'c2_g_l8_bald', { text: T('c2_g_l8_bald') });
   }).then(() => L.win(0.2));
 }

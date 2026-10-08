@@ -1,0 +1,45 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>Audio self-test</title>
+<pre id="o">running…</pre>
+<script type="module">
+// Headless check of js/audio: every name the game calls exists, every sample/music/VO file decodes, sfxLoop starts+stops.
+import { audio } from '../../js/audio/audio.js';
+import { SAMPLES } from '../../js/audio/sfx.js';
+const r = { fail: [] };
+const need = ['doorbell', 'knock', 'yip', 'bark', 'yap', 'pant', 'whine', 'whimper', 'sniff', 'squeak', 'whistle', 'tvthud',
+  'carpet', 'splash', 'thwip', 'brawl', 'aww', 'poof', 'drawer'];
+r.missingSfx = need.filter((n) => !audio.sfxNames.includes(n));
+audio.unlock();
+await audio.ready;
+await new Promise((res) => setTimeout(res, 300));
+r.ctx = audio.ctx.state;
+const BASE = new URL('../../audio/', import.meta.url).href;
+const dec = async (u) => { try { const ab = await (await fetch(u)).arrayBuffer(); return (await audio.ctx.decodeAudioData(ab)).duration; } catch (e) { return -1; } };
+r.samples = {};
+for (const [n, s] of Object.entries(SAMPLES)) for (const f of [...s.files, ...(s.loop ? [s.loop] : [])]) {
+  const d = await dec(BASE + 'sfx/' + f + '.mp3'); r.samples[f] = +d.toFixed(2); if (d <= 0) r.fail.push('sample ' + f);
+}
+r.music = {};
+for (const m of ['arena', 'sneak2']) { const d = await dec(BASE + 'music/' + m + '.mp3'); r.music[m] = +d.toFixed(2); if (d <= 0) r.fail.push('music ' + m); }
+for (const n of need) audio.sfx(n);
+await new Promise((res) => setTimeout(res, 1500));
+for (const n of need) audio.sfx(n);   // second call: samples now decoded → sample path
+const stop = audio.sfxLoop('pant');
+r.loopFn = typeof stop;
+await new Promise((res) => setTimeout(res, 800));
+stop();
+const o = await audio.vo('o_yip_2'); r.odieVo = { silent: !!o.silent, dur: +o.dur.toFixed(2) };
+const l = await audio.vo('c2_l_story_odie'); r.lymanVo = { silent: !!l.silent, dur: +l.dur.toFixed(2) };
+audio.setCustomNames(true);
+const nn = await audio.vo('l_idle_8'); r.nnSwap = nn.key;
+audio.setCustomNames(false);
+const keys = Object.keys(audio.voLines);
+r.voKeys = keys.length;
+let bad = 0;
+for (const k of keys) { const f = audio.voLines[k].file; const h = await fetch(new URL('../../' + f, import.meta.url), { method: 'HEAD' }); if (!h.ok) { bad++; r.fail.push('vo ' + k); } }
+r.voMissingFiles = bad;
+audio.music('arena'); await new Promise((res) => setTimeout(res, 2500)); r.musicNow = audio.state.music;
+window.__res = r;
+document.getElementById('o').textContent = JSON.stringify(r, null, 1);
+</script>

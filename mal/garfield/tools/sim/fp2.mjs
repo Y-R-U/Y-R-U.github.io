@@ -172,6 +172,11 @@ T.lymanTrap60 = async () => {
   const inRoom = await until(`S.L().ly.state === 'fpRoom' && S.L().ly.pos().y > 2.9 && S.L().ly.pos().z > 7.6`, 45000);
   ok("Lyman goes to his room", inRoom, JSON.stringify((await E('JSON.stringify(S.snap().hs[1])'))));
   if (!inRoom) return null;
+  // don't shut Odie in with him for the whole minute (the Odie checks that follow would fail at random)
+  if (await E(`S.odie().y > 2.5 && S.odie().z > 6.95`)) {
+    await E(`S.api().odieGo('bowl')`);
+    await until(`!(S.odie().y > 2.5 && S.odie().z > 6.6)`, 20000);
+  }
   await E(`S.tp(S.A('lymanDoorOut').pos.clone(), S.A('lymanDoor').pos)`);
   await until(`S.cur() === 'fp_lymanDoor'`, 3000);
   await pressE();
@@ -370,7 +375,7 @@ T.soup = async () => {
   if (cur === 'fp_splash') await pressE(); else await E(`S.ctx().interact.items.get('fp_splash').enabled() && S.ctx().interact.items.get('fp_splash').onInteract()`);
   const splash = await until(`S.fp().log.some((e) => e.kind === 'splash')`, 3000);
   await sleep(1200); await shot('12_soup_splash', `S.A('tableTop').pos.clone().setY(1.0)`);
-  ok("splash Jon's chicken soup", seated && splash, `cur=${cur}`);
+  ok("splash Jon's chicken soup", seated && splash, `cur=${cur} ` + await E(`JSON.stringify({ jon: S.L().jon.state, task: S.L().jon.taskName, p: S.L().jon.pos().toArray().map(v => +v.toFixed(2)), act: [...S.fp().active.keys()], claims: S.fp().claims })`));
   const end = await until(`!S.fp().active.has('soup')`, 30000);
   ok('…he wipes off and the soup event ends', end);
 };
@@ -393,13 +398,16 @@ T.disco = async () => {
 };
 T.goodmorning = async () => {
   await settle();
+  // Jon has to be free to walk by (a leftover event can hold him, and from upstairs the walk alone is ~20 s)
+  for (const id of ['tvtime', 'dinner', 'soup', 'brawl', 'mice', 'disco']) await E(`S.api().end('${id}')`);
+  await E(`S.api().act('jon', 'wander')`);
   await E(`S.api().start('goodmorning')`);
   await E(`(() => { const tb = S.A('tableTop').pos; S.tp(S.V(tb.x + 0.35, tb.y + 0.01, tb.z)); })()`);
   await sleep(500);
   await until(`S.cur() === 'fp_sit'`, 3000);
   await pressE();
   const sat = await until(`S.L().flags.gmSit`, 2000);
-  const by = await until(`S.L().flags.gmPhase === 'byTable'`, 30000);
+  const by = await until(`S.L().flags.gmPhase === 'byTable'`, 50000);
   await sleep(600); await shot('15_good_morning', `S.A('tableTop').pos.clone().setY(1.1)`);
   await until(`S.cur() === 'fp_poke'`, 3000);
   const cur = await E('S.cur()');
@@ -408,7 +416,7 @@ T.goodmorning = async () => {
   const glarePh = await until(`S.L().flags.gmPhase === 'glare'`, 20000);
   await c.keyDown('KeyE'); await sleep(2200); await shot('16_glare', `S.ctx().controller.pos.clone().setY(1.1)`); await c.keyUp('KeyE');
   const glared = await until(`S.fp().log.some((e) => e.kind === 'glare')`, 3000);
-  ok('bad mood: sit on the table, Jon sings good morning, poke, hold to glare', sat && by && poked && glarePh && glared, `cur=${cur}`);
+  ok('bad mood: sit on the table, Jon sings good morning, poke, hold to glare', sat && by && poked && glarePh && glared, `cur=${cur} sat=${sat} by=${by} poked=${poked} glare=${glarePh}/${glared} ` + await E(`JSON.stringify({ jon: S.L().jon.state, task: S.L().jon.taskName, p: S.L().jon.pos().toArray().map(v => +v.toFixed(2)), gm: S.L().flags.gmPhase, act: [...S.fp().active.keys()] })`));
   const end = await until(`!S.fp().active.has('goodmorning') && !S.ctx().controller.locked`, 15000);
   ok('…and the controls come back', end, (await E(`JSON.stringify(S.fp().log.filter((e) => e.kind === 'hug'))`)));
 };

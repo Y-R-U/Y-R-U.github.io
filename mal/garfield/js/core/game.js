@@ -262,7 +262,8 @@ export function createGame(sys) {
     // Ch2 can have its own tracks (arena, sneak2) once media lands them; anything missing falls back to 'sneak'
     const names = audio.musicNames || [];
     const want = level.music || (info.ch === 2 ? 'sneak2' : 'sneak');
-    audio.music?.(names.includes(want) ? want : 'sneak', { fade: 1.2 });
+    ctx.music = names.includes(want) ? want : 'sneak';   // what a chase hands back to (humanAI)
+    audio.music?.(ctx.music, { fade: 1.2 });
     game.state = 'play';
     sys.timings.toPlay = Math.round(performance.now() - t0);
     events.emit('levelStart', { n, key: info.key });
@@ -343,13 +344,13 @@ export function createGame(sys) {
       await Promise.race([Promise.resolve(garfield.play?.('celebrate', { once: true })), new Promise((r) => setTimeout(r, 2200))]);
     }
     if (token !== levelToken) return;
-    const food = level.food || 'steak';
+    const food = level.eats ? (level.food || 'steak') : 'none';
     if (n === 10 && ui.chapterComplete) {
       const first = await ui.complete.show({ level: n, food, nextUnlocked: false, title: level.title });
       if (token !== levelToken) return;
       if (first === 'replay') return startLevel('c2:10');
       audio.music?.('fanfare', { fade: 0.3 });
-      const choice = await ui.chapterComplete.show({ chapter: 'Chapter Two', subtitle: 'Odie and Lyman' });
+      const choice = await ui.chapterComplete.show({ chapter: 'Chapter Two', subtitle: 'Odie and Lyman', foods: false, cheer: `${names.garfield || 'Garfield'} out-smarted Odie AND Lyman. Every single time.` });
       if (token !== levelToken) return;
       if (choice === 'replay') return startLevel('c2:10');
       return menu();

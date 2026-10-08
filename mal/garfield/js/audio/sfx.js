@@ -441,7 +441,16 @@ export const SFX = {
 
 // Recorded-style samples (audio/sfx/<file>.mp3). audio.sfx(name) picks a random variant and falls back to SFX[name]
 // until the buffer has loaded. `loop: true` entries are what audio.sfxLoop(name) expects.
-export const SAMPLES = {};
+export const SAMPLES = {
+  bark: { files: ['bark_1', 'bark_2', 'bark_3'], jitter: 0.04 },
+  yip: { files: ['yip_1', 'yip_2', 'yip_3'], jitter: 0.05 },
+  yap: { files: ['yap_1', 'yap_2'], jitter: 0.04 },
+  pant: { files: ['pant_1'], loop: 'pant_loop', len: 3.45, gain: 0.8 },
+  whine: { files: ['whine_1', 'whine_2'], jitter: 0.03 },
+  whimper: { files: ['whimper_1', 'whimper_2'], jitter: 0.03 },
+  sniff: { files: ['sniff_1', 'sniff_2'], jitter: 0.06, gain: 0.8 },
+  aww: { files: ['aww_1'] },
+};
 
 // Loudness trims so every effect lands at a similar perceived level (measured offline peaks/RMS).
 export const LEVEL = {

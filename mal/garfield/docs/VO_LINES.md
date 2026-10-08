@@ -1308,8 +1308,8 @@ Total lines: 799
 ### c2_j_l9_morning  (2)
 | key | who | text | dur | src |
 |---|---|---|---|---|
-| `c2_j_l9_morning` | jon | Goooood moooorrrning Garfield! | 1.67 | levels |
-| `c2_j_l9_morning_nn` | jon | Goooood moooorrrning kitty! | 1.6 | levels |
+| `c2_j_l9_morning` | jon | Goooood moooorrrning Garfield! | 3.66 | levels |
+| `c2_j_l9_morning_nn` | jon | Goooood moooorrrning kitty! | 2.84 | levels |
 
 ### c2_j_l9_ow  (1)
 | key | who | text | dur | src |
@@ -1443,7 +1443,7 @@ Total lines: 799
 ### g_c2_idle  (7)
 | key | who | text | dur | src |
 |---|---|---|---|---|
-| `g_c2_idle_1` | garfield | A dog in my house. What's next, a goldfish with opinions? | 4.53 | levels |
+| `g_c2_idle_1` | garfield | A dog in my house. What's next, a goldfish with opinions? | 5.01 | levels |
 | `g_c2_idle_2` | garfield | Peace and quiet. Remember those? I miss those. | 3.56 | levels |
 | `g_c2_idle_3` | garfield | Somebody should get rid of the dog. Somebody orange. | 3.7 | levels |
 | `g_c2_idle_4` | garfield | I'm not jealous of the dog. I'm superior to the dog. Different thing. | 4.4 | levels |
@@ -1855,7 +1855,7 @@ Total lines: 799
 ### fp2_j_tv  (1)
 | key | who | text | dur | src |
 |---|---|---|---|---|
-| `fp2_j_tv_1` | jon | Telly time! Lyman, budge up. | 2.07 | levels |
+| `fp2_j_tv_1` | jon | Telly time! Lyman, budge up. | 2.24 | levels |
 
 ### fp2_l_wander  (2)
 | key | who | text | dur | src |
@@ -1922,60 +1922,60 @@ Total lines: 799
 ### o_yip  (3)
 | key | who | text | dur | src |
 |---|---|---|---|---|
-| `o_yip_1` | odie | Yip! | — | levels |
-| `o_yip_2` | odie | Yip yip! | — | levels |
-| `o_yip_3` | odie | Yipe! | — | levels |
+| `o_yip_1` | odie | Yip! | 0.24 | levels |
+| `o_yip_2` | odie | Yip yip! | 0.55 | levels |
+| `o_yip_3` | odie | Yipe! | 0.3 | levels |
 
 ### o_yip_long  (1)
 | key | who | text | dur | src |
 |---|---|---|---|---|
-| `o_yip_long` | odie | Yiiiiiiiip! | — | levels |
+| `o_yip_long` | odie | Yiiiiiiiip! | 1.07 | levels |
 
 ### o_bark  (2)
 | key | who | text | dur | src |
 |---|---|---|---|---|
-| `o_bark_1` | odie | Woof! | — | levels |
-| `o_bark_2` | odie | Arf! Arf! | — | levels |
+| `o_bark_1` | odie | Woof! | 0.29 | levels |
+| `o_bark_2` | odie | Arf! Arf! | 0.73 | levels |
 
 ### o_bark_happy  (1)
 | key | who | text | dur | src |
 |---|---|---|---|---|
-| `o_bark_happy` | odie | Arf arf arf! | — | levels |
+| `o_bark_happy` | odie | Arf arf arf! | 1.27 | levels |
 
 ### o_pant  (1)
 | key | who | text | dur | src |
 |---|---|---|---|---|
-| `o_pant` | odie | Hah-hah-hah-hah… | — | levels |
+| `o_pant` | odie | Hah-hah-hah-hah… | 1.75 | levels |
 
 ### o_whine  (1)
 | key | who | text | dur | src |
 |---|---|---|---|---|
-| `o_whine` | odie | Hnnnn… | — | levels |
+| `o_whine` | odie | Hnnnn… | 1.6 | levels |
 
 ### o_whimper  (1)
 | key | who | text | dur | src |
 |---|---|---|---|---|
-| `o_whimper` | odie | Hmm-mm-mm… | — | levels |
+| `o_whimper` | odie | Hmm-mm-mm… | 1.12 | levels |
 
 ### o_whine_muffled  (1)
 | key | who | text | dur | src |
 |---|---|---|---|---|
-| `o_whine_muffled` | odie | Mmf! Mmf! | — | levels |
+| `o_whine_muffled` | odie | Mmf! Mmf! | 0.94 | levels |
 
 ### o_growl_play  (1)
 | key | who | text | dur | src |
 |---|---|---|---|---|
-| `o_growl_play` | odie | Grrr-arf! | — | levels |
+| `o_growl_play` | odie | Grrr-arf! | 0.68 | levels |
 
 ### o_shake_off  (1)
 | key | who | text | dur | src |
 |---|---|---|---|---|
-| `o_shake_off` | odie | Brrrrrr! | — | levels |
+| `o_shake_off` | odie | Brrrrrr! | 1.75 | levels |
 
 ### o_sniff  (1)
 | key | who | text | dur | src |
 |---|---|---|---|---|
-| `o_sniff` | odie | Sniff sniff. | — | levels |
+| `o_sniff` | odie | Sniff sniff. | 1.08 | levels |
 
 ### g_open_plan  (1)
 | key | who | text | dur | src |

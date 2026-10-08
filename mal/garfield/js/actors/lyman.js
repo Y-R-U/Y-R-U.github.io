@@ -14,7 +14,8 @@ const NORMAL_COLORS = {
   vest: 0xc99a2e, vestDark: 0xa97c1e,
   pants: 0x3f5238, pantsDark: 0x2f3e2a, belt: 0x2a1c14,
   shoe: 0x6a3a1e, sole: 0x2a160a,
-  hair: 0x2b201a, hairDark: 0x16100c, brow: 0x1a120e, lash: 0x1a120e, stache: 0x1e1612, iris: 0x3a2618,
+  // cool blue-black: the warm evening key turned the old warm near-black into brown
+  hair: 0x1b1d26, hairDark: 0x0d0e14, brow: 0x121319, lash: 0x121319, stache: 0x15161d, iris: 0x3a2618,
 };
 const DISCO_COLORS = {
   ...NORMAL_COLORS,

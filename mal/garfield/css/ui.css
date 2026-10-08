@@ -324,6 +324,9 @@ html.ui-cutscene .scr-hud * { pointer-events: none !important; }
 .tut-card::before { content: 'Tip'; position: absolute; left: calc(-8 * var(--px)); top: calc(-16 * var(--px)); padding: calc(2 * var(--px)) calc(12 * var(--px));
   font-size: calc(17 * var(--px)); color: #fff; background: var(--orange); border: calc(3 * var(--px)) solid var(--brown-d); border-radius: 999px; transform: rotate(-6deg); }
 .tut-card.show { display: flex; animation: tutIn .5s cubic-bezier(.2, 1.6, .4, 1); }
+/* arena: the scoreboard owns the top centre, so tips drop below it */
+.scr-hud.arena-on .tut-card { left: 50%; transform: translateX(-50%); top: calc(110 * var(--px) + var(--safe-t)); max-width: min(calc(720 * var(--px)), 80vw); }
+.scr-hud.arena-on .tut-card.show { animation: none; }
 @keyframes tutIn { from { transform: translateY(calc(-60 * var(--px))) scale(.6); opacity: 0; } }
 .tut-ico { flex: none; width: calc(64 * var(--px)); height: calc(64 * var(--px)); }
 .tut-ico.none { display: none; }
@@ -425,6 +428,8 @@ html.ui-touch .touch-ui { display: block; }
 .subs { position: absolute; z-index: 3; left: 50%; bottom: calc(64 * var(--px) + var(--safe-b)); transform: translateX(-50%); width: min(calc(900 * var(--px)), 80vw);
   display: flex; flex-direction: column; align-items: center; gap: calc(6 * var(--px)); pointer-events: none; }
 html.ui-cutscene .subs { bottom: calc(13vh + 10px); }
+html:not(.ui-cutscene):not(.ui-touch):has(.key-prompt.show) .subs { bottom: calc(172 * var(--px) + var(--safe-b)); }
+html.ui-touch:not(.ui-cutscene):has(.key-prompt.hint.show) .subs { bottom: calc(212 * var(--px) + var(--safe-b)); }
 .sub-line { display: none; padding: calc(6 * var(--px)) calc(18 * var(--px)); font-size: max(16px, calc(26 * var(--px))); font-weight: 500; line-height: 1.25; text-align: center;
   color: #fff8ea; background: rgba(40, 22, 10, .78); border-radius: calc(14 * var(--px)); }
 .sub-line.show { display: block; animation: fadeUp .25s ease; }

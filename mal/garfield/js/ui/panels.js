@@ -176,12 +176,15 @@ export function createSettings(ui) {
 }
 
 const LEVEL_CHEERS = ['Yum!', 'Delicious!', 'Burp!', 'Scrumptious!', 'Nom nom nom!', 'Belly full!'];
+const MISCHIEF_CHEERS = ['Mischief managed!', 'Sneaky!', 'Too easy!', 'Purrfect!', 'Nailed it!', 'Genius!', 'Ha!', 'Smooth!', 'Cat 1, Dog 0!', 'Legendary!'];
 export function showComplete(ui, { level = 1, food = 'steak', nextUnlocked = true, title } = {}) {
   return new Promise((res) => {
     let m, stopConf;
     const done = (v) => { stopConf?.(); ui.modals.close(m); res(v); };
-    const cheer = LEVEL_CHEERS[(level - 1) % LEVEL_CHEERS.length];
-    const foodEl = h('div.win-food', { html: I.food(food) });
+    // Ch2 mischief levels have no food: a smug cat instead of a plate
+    const mischief = food === 'none';
+    const cheer = (mischief ? MISCHIEF_CHEERS : LEVEL_CHEERS)[(level - 1) % (mischief ? MISCHIEF_CHEERS : LEVEL_CHEERS).length];
+    const foodEl = h('div.win-food' + (mischief ? '.win-cat' : ''), { html: mischief ? I.peekCat() : I.food(food) });
     const card = h('div.panel.win-panel', {},
       h('div.win-ribbon', {}, h('span', {}, title || `Level ${level}`)),
       h('h2.win-title', {}, ...'Level Complete!'.split('').map((c, i) => h('span', { style: { animationDelay: (300 + i * 45) + 'ms' } }, c === ' ' ? ' ' : c))),
@@ -201,15 +204,16 @@ export function showComplete(ui, { level = 1, food = 'steak', nextUnlocked = tru
   });
 }
 
-export function showChapterComplete(ui, { chapter = 'Chapter One', subtitle = 'Food' } = {}) {
+export function showChapterComplete(ui, { chapter = 'Chapter One', subtitle = 'Food', cheer, foods = true } = {}) {
   return new Promise((res) => {
     let m, stopConf;
     const done = (v) => { stopConf?.(); ui.modals.close(m); res(v); };
     const card = h('div.panel.win-panel.chapter-win', {},
       h('div.win-ribbon.gold', {}, h('span', {}, 'Chapter Complete!')),
       h('h2.win-title.small', {}, `${chapter}: ${subtitle}`),
-      h('div.win-foods', {}, h('div', { html: I.steak() }), h('div.mid', { html: I.lasagna() }), h('div', { html: I.meatloaf() })),
-      h('p.win-cheer', {}, `${ui.names.get('garfield')} ate ALL the food. Every last bite.`),
+      foods ? h('div.win-foods', {}, h('div', { html: I.steak() }), h('div.mid', { html: I.lasagna() }), h('div', { html: I.meatloaf() }))
+        : h('div.win-food.win-cat', { html: I.peekCat() }),
+      h('p.win-cheer', {}, cheer || `${ui.names.get('garfield')} ate ALL the food. Every last bite.`),
       h('p.win-sub', {}, 'More chapters coming soon!'),
       h('div.win-btns', {},
         btn('Menu', 'primary', () => { ui.emit('sfx', 'click'); done('menu'); }, I.home()),

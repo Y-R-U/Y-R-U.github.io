@@ -110,7 +110,11 @@ async function makeRuntime(ctx, spec) {
   };
   L.dsay = (d, who, key, o = {}) => d.say(who, barks.pick?.(key) && !LINES[key] && !ctx.audio?.voLines?.[key] ? barks.pick(key) : key,
     { text: o.text, thought: who === 'garfield', ...o });
-  L.shot = (look, o = {}) => bestShot(ctx, look, { dist: 2.6, h: 0.7, ...o });
+  // cutscene framing; keeps the lens out of anyone standing nearby (it used to end up inside Jon's trousers)
+  L.shot = (look, o = {}) => {
+    const people = [ctx.jon, lyman, L.del, odie].filter((a) => a?.root?.visible).map((a) => a.root.getWorldPosition(V()));
+    return bestShot(ctx, look, { dist: 2.6, h: 0.7, ...o, avoid: [...people, ...(o.avoid || [])] });
+  };
   L.onTable = () => { const c = ctx.controller, b = tableBox(ctx); return !c.locked && c.grounded !== false && inBoxXZ(c.pos, b, 0.05) && Math.abs(c.pos.y - b.topY) < 0.25; };
   L.tableTopY = () => tableBox(ctx).topY;
 

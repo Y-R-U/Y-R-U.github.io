@@ -15,8 +15,8 @@ VOICES = json.load(open(ROOT / "tools/media/voices.json")) if (ROOT / "tools/med
 
 
 # Odie keys → the dog clip in audio/sfx/ that best fits the subtitle (default: <sfx>_1).
-ODIE_CLIP = {"o_yip_2": "yip_2", "o_yip_3": "yip_3", "o_yip_long": "yip_long", "o_bark_2": "bark_2", "o_growl_play": "bark_3",
-             "o_whine_muffled": "whine_2", "o_shake_off": "pant_1", "o_pant": "pant_loop"}
+ODIE_CLIP = {"o_yip_2": "yip_2", "o_yip_3": "yip_3", "o_yip_long": "yip_long", "o_bark_1": "bark_2", "o_bark_2": "bark_1",
+             "o_bark_happy": "yap_1", "o_growl_play": "bark_3", "o_whine_muffled": "whine_2", "o_shake_off": "pant_1"}
 
 
 def tts_text(t):
@@ -74,6 +74,9 @@ def main():
         e.update(who=v["who"], text=v["text"], file=f"audio/vo/{k}.mp3")
         if v.get("sfx"):
             e.update(file=f"audio/sfx/{ODIE_CLIP.get(k, v['sfx'] + '_1')}.mp3", sfx=v["sfx"])
+            if (ROOT / e["file"]).exists():
+                e["dur"] = round(float(subprocess.run(["ffprobe", "-v", "error", "-show_entries", "format=duration", "-of", "csv=p=0",
+                                                       str(ROOT / e["file"])], capture_output=True, text=True).stdout.strip()), 2)
     if args[:1] == ["docs"]:
         save_mf(mf); docs(lines, mf); print("docs written", len(lines)); return
     who = None

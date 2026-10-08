@@ -1,0 +1,21 @@
+<!doctype html><meta charset="utf-8"><title>SFX dump</title>
+<script type="module">
+// ?n=bark,yip → window.__wav = {name: base64 16-bit mono WAV} of each procedural SFX rendered offline.
+import { SFX, LEVEL } from '../../js/audio/sfx.js';
+const sr = 22050, out = {};
+for (const n of new URLSearchParams(location.search).get('n').split(',')) {
+  const ctx = new OfflineAudioContext(1, sr * 3, sr);
+  const g = ctx.createGain(); g.gain.value = LEVEL[n] || 1; g.connect(ctx.destination);
+  SFX[n](ctx, g, 0.05, 1);
+  const d = (await ctx.startRendering()).getChannelData(0);
+  const b = new DataView(new ArrayBuffer(44 + d.length * 2)), s = (o, t) => [...t].forEach((c, i) => b.setUint8(o + i, c.charCodeAt(0)));
+  s(0, 'RIFF'); b.setUint32(4, 36 + d.length * 2, true); s(8, 'WAVEfmt '); b.setUint32(16, 16, true); b.setUint16(20, 1, true);
+  b.setUint16(22, 1, true); b.setUint32(24, sr, true); b.setUint32(28, sr * 2, true); b.setUint16(32, 2, true); b.setUint16(34, 16, true);
+  s(36, 'data'); b.setUint32(40, d.length * 2, true);
+  d.forEach((v, i) => b.setInt16(44 + i * 2, Math.max(-1, Math.min(1, v)) * 32767, true));
+  const u8 = new Uint8Array(b.buffer); let bin = '';
+  for (let i = 0; i < u8.length; i += 8192) bin += String.fromCharCode(...u8.subarray(i, i + 8192));
+  out[n] = btoa(bin);
+}
+window.__wav = out;
+</script>

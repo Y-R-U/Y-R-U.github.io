@@ -23,13 +23,16 @@ export function makeHalos(list, { opacity = 0.85, fog = true } = {}) {
     map: haloTexture(), transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, fog, toneMapped: false, opacity,
   }), list.length);
   mesh.material.onBeforeCompile = (s) => {
-    s.vertexShader = s.vertexShader.replace('#include <project_vertex>', `
+    // fades out as the lens gets close (a halo right by the camera whited out cutscene shots)
+    s.vertexShader = 'varying float vHaloFade;\n' + s.vertexShader.replace('#include <project_vertex>', `
       vec4 mvPosition = modelViewMatrix * instanceMatrix * vec4(0.0, 0.0, 0.0, 1.0);
+      vHaloFade = smoothstep(0.8, 2.6, -mvPosition.z);
       float sc = length(instanceMatrix[0].xyz);
       vec3 toCam = normalize(-mvPosition.xyz);
       mvPosition.xyz += toCam * min(sc * 0.5, -mvPosition.z * 0.5);
       mvPosition.xy += position.xy * sc;
       gl_Position = projectionMatrix * mvPosition;`);
+    s.fragmentShader = 'varying float vHaloFade;\n' + s.fragmentShader.replace('#include <map_fragment>', '#include <map_fragment>\n diffuseColor.a *= vHaloFade;');
   };
   const m = new THREE.Matrix4();
   list.forEach(([x, y, z, s], i) => { m.makeScale(s, s, s).setPosition(x, y, z); mesh.setMatrixAt(i, m); });

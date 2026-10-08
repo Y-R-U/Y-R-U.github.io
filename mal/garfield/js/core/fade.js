@@ -8,7 +8,8 @@ export function createOccluderFade() {
   const ray = new THREE.Raycaster();
   const eye = new THREE.Vector3(), aim = new THREE.Vector3(), dir = new THREE.Vector3();
   const sphere = new THREE.Sphere();
-  let cands = [], bigs = [], builtFor = null, builtAt = -99, clock = 0, tick = 0;
+  let cands = [], bigs = [], actors = [], builtFor = null, builtAt = -99, clock = 0, tick = 0;
+  const ap = new THREE.Vector3();
   // merged per-material furniture batches (all the sofa/armchair fabric is one mesh): fade only when right at the lens
   const BIG = /^(ground|upper):(fabric|woodGloss|wood|gloss|paint|tile|metal|ceramic)/;
   const NEAR = 0.75;
@@ -17,7 +18,14 @@ export function createOccluderFade() {
   function build(world, target) {
     const blockers = new Set(world.camBlockers || []);
     const isTarget = (o) => { for (let p = o; p; p = p.parent) if (p === target) return true; return false; };
-    cands = []; bigs = [];
+    cands = []; bigs = []; actors = [];
+    // walking people (root.userData.fadeActor): fade the whole person when the lens is practically inside them
+    world.scene.traverse((o) => {
+      if (!o.userData?.fadeActor || isTarget(o)) return;
+      const meshes = [];
+      o.traverse((m) => { if (m.isMesh && ![].concat(m.material).some((x) => !x || x.isShaderMaterial)) meshes.push(m); });
+      actors.push({ root: o, meshes });
+    });
     world.scene.traverse((o) => {
       if (!o.isMesh || o.isSkinnedMesh || blockers.has(o) || o.userData.noFade) return;
       const mats = [].concat(o.material);
@@ -68,6 +76,12 @@ export function createOccluderFade() {
           ray.far = Math.min(NEAR, ray.far);
           for (const i of ray.intersectObjects(bigs, false)) hit.add(i.object);
         }
+        for (const a of actors) {
+          if (a.root.visible === false || !a.root.userData.fadeActor) continue;
+          a.root.getWorldPosition(ap);
+          const dy = eye.y < ap.y ? ap.y - eye.y : eye.y > ap.y + 1.85 ? eye.y - ap.y - 1.85 : 0;
+          if (Math.hypot(eye.x - ap.x, eye.z - ap.z, dy) < 0.75) for (const m of a.meshes) hit.add(m);
+        }
         // anything the lens is practically inside (a sofa arm filling the screen) fades too
         for (const o of cands) if (o.userData.fadeBox.distanceToPoint(eye) < 0.35) hit.add(o);
         for (const m of live.keys()) live.get(m).want = hit.has(m) ? FADED : 1;
@@ -79,6 +93,6 @@ export function createOccluderFade() {
       if (s.want === 1 && k > 0.98) restore(m); else setFade(m, k);
     }
   }
-  function clear() { for (const m of [...live.keys()]) restore(m); cands = []; bigs = []; builtFor = null; }
+  function clear() { for (const m of [...live.keys()]) restore(m); cands = []; bigs = []; actors = []; builtFor = null; }
   return { update, clear };
 }

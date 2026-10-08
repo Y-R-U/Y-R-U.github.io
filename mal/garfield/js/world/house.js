@@ -281,7 +281,8 @@ export function buildHouse({ quality = 'high' } = {}) {
     anchor('cupboardDoor', ST_X0 - 0.01, 0, (z0 + z1) / 2, -Math.PI / 2, { w: z1 - z0, h });
     anchor('cupboardFront', ST_X0 - 0.55, 0, (z0 + z1) / 2, Math.PI / 2);
     anchor('cupboardInside', (ST_X0 + ST_X1) / 2 + 0.05, 0, (z0 + z1) / 2 + 0.25, 0);
-    anchor('biscuitBox', (ST_X0 + ST_X1) / 2 + 0.15, 0, zA + 0.55, 0);
+    // against the back wall, facing the door: visible from outside and from cam_cupboard
+    anchor('biscuitBox', ST_X1 - 0.17, 0, (z0 + z1) / 2 + 0.05, -Math.PI / 2);
   }
   // upstairs railing around the stairwell
   b.layer = 'upperShell';
@@ -441,8 +442,9 @@ export function buildHouse({ quality = 'high' } = {}) {
     b.cyl('metal', null, cx, 0.8, cz, 0.015, 0.015, 1.56, C.brass, { radial: 8 });
     b.lathe('glowShade', null, cx, 1.42, cz, [[0.23, 0], [0.15, 0.28]], 0xfff1d6, { radial: 24, cast: false });
     col('floorLamp', cx - 0.06, 0, cz - 0.06, cx + 0.06, 1.7, cz + 0.06);
-    lamps.push({ pos: V(cx, 1.5, cz), color: 0xffa850, intensity: 8, distance: 8, prio: 2, room: 'living' });
-    halos.push([cx, 1.56, cz, 0.9]);
+    // light pulled out of the corner and dimmed: at 0.3 m from two walls it burnt the corner white in living-room shots
+    lamps.push({ pos: V(cx + 0.3, 1.35, cz + 0.3), color: 0xffa850, intensity: 5, distance: 8, prio: 2, room: 'living' });
+    halos.push([cx, 1.56, cz, 0.75]);
   }
   // doormat + coat hooks by the front door
   b.box('fabric', 6.65, 0, 0.08, 7.55, 0.012, 0.65, 0x8a5a3a, { r: 0.005, cast: false });
