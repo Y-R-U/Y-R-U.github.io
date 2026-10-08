@@ -325,7 +325,7 @@ html, body {
 }
 
 /* ========== UPGRADES SCREEN ========== */
-#upgrades-screen, #skins-screen, #stats-screen {
+#upgrades-screen, #skins-screen, #stats-screen, #rooms-screen {
     background: var(--bg);
     padding: 20px;
     padding-top: calc(20px + var(--safe-top));
@@ -853,4 +853,177 @@ html, body {
     .game-title { font-size: 38px; }
     .game-subtitle { margin-bottom: 4px; }
     #menu-screen { gap: 10px; }
+}
+
+/* ---------------------------------------------------------- rooms */
+
+.btn-rooms small, #rooms-auto small {
+    display: block;
+    font-size: 11px;
+    font-weight: 500;
+    opacity: 0.75;
+    margin-top: 2px;
+}
+.menu-note {
+    font-size: 13px;
+    color: #ffb4b4;
+    max-width: 300px;
+    text-align: center;
+}
+.menu-room {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 10px;
+    border-radius: 14px;
+    background: rgba(76,175,80,0.1);
+    border: 1px solid rgba(76,175,80,0.35);
+}
+.menu-room[hidden] { display: none; }
+.menu-room-label { font-size: 13px; color: var(--text-mid); text-align: center; }
+body.in-room #pause-btn { display: none; }
+
+.rooms-body {
+    width: 100%;
+    max-width: 400px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+.rooms-body .btn { min-width: 0; width: 100%; }
+.rooms-status {
+    font-size: 13px;
+    color: var(--accent);
+    text-align: center;
+}
+.rooms-card {
+    background: var(--bg-card);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 14px;
+    padding: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+.rooms-tabs { display: flex; gap: 6px; }
+.rooms-tabs button {
+    flex: 1;
+    padding: 9px 6px;
+    border-radius: 9px;
+    border: 1px solid rgba(255,255,255,0.1);
+    background: transparent;
+    color: var(--text-dim);
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+}
+.rooms-tabs button.on { background: rgba(255,255,255,0.1); color: var(--text); }
+.rooms-pane { display: flex; flex-direction: column; gap: 10px; }
+.rooms-pane[hidden] { display: none; }
+.rooms-line { display: flex; gap: 8px; }
+.rooms-line .btn { width: auto; flex: 0 0 auto; padding: 12px 18px; }
+.rooms-body input, .room-code input {
+    flex: 1;
+    min-width: 0;
+    padding: 12px 14px;
+    border-radius: 10px;
+    border: 1px solid rgba(255,255,255,0.15);
+    background: rgba(0,0,0,0.3);
+    color: var(--text);
+    font-size: 16px;
+    user-select: text;
+    -webkit-user-select: text;
+}
+#rooms-code, .room-code input { text-transform: uppercase; letter-spacing: 3px; font-weight: 800; }
+.rooms-toggles-head { font-size: 12px; color: var(--text-dim); }
+#rooms-toggles { display: flex; flex-direction: column; gap: 6px; }
+.rooms-toggle { display: flex; align-items: center; gap: 10px; font-size: 14px; cursor: pointer; }
+.rooms-toggle input { width: 20px; height: 20px; flex: 0 0 auto; accent-color: var(--primary); }
+.rooms-toggle small { color: var(--text-dim); font-size: 11px; }
+.rooms-note { font-size: 11px; color: var(--text-dim); line-height: 1.45; }
+.rooms-list-head { font-size: 12px; font-weight: 800; letter-spacing: 1.5px; color: var(--text-dim); margin-top: 4px; }
+.rooms-empty { font-size: 13px; color: var(--text-dim); text-align: center; padding: 12px; }
+.room-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 14px;
+    margin-bottom: 8px;
+    border-radius: 12px;
+    background: var(--bg-card);
+    border: 1px solid rgba(255,255,255,0.06);
+    cursor: pointer;
+}
+.room-row.full { opacity: 0.5; cursor: default; }
+.room-main { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.room-name { font-weight: 700; font-size: 14px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.room-meta { font-size: 11px; color: var(--text-dim); }
+.room-go { font-size: 12px; font-weight: 800; color: var(--primary); }
+.room-row.priv .room-go { color: var(--accent); }
+.room-code { display: flex; gap: 8px; width: 100%; }
+.room-code .btn { width: auto; min-width: 0; padding: 10px 16px; }
+
+/* During play: which room, and how the link is doing. Tap it for the share
+   card. Left column under the level counter — the leaderboard owns the top
+   right, the minimap and BOOST own the bottom corners. */
+#net-pill {
+    display: none;
+    position: fixed;
+    left: calc(12px + var(--safe-left));
+    top: calc(84px + var(--safe-top));
+    max-width: calc(100% - 180px);
+    padding: 5px 12px;
+    border-radius: 999px;
+    border: 1px solid rgba(255,255,255,0.12);
+    background: rgba(0,0,0,0.45);
+    color: var(--text-mid);
+    font-size: 11px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    pointer-events: auto;
+    cursor: pointer;
+    z-index: 20;
+}
+#net-pill.slow { border-color: rgba(255,170,0,0.6); color: #ffcc66; }
+body.in-room #net-pill { display: block; }
+#net-tip {
+    position: fixed;
+    left: calc(12px + var(--safe-left));
+    top: calc(112px + var(--safe-top));
+    max-width: min(320px, calc(100% - 180px));
+    padding: 8px 12px;
+    border-radius: 10px;
+    background: rgba(40,28,0,0.8);
+    color: #ffd27a;
+    font-size: 12px;
+    z-index: 20;
+}
+#net-tip[hidden] { display: none; }
+/* Top-left, under the level counter: the leaderboard owns the top right. */
+#room-share {
+    display: none;
+    position: fixed;
+    left: calc(12px + var(--safe-left));
+    top: calc(118px + var(--safe-top));
+    align-items: center;
+    gap: 6px;
+    padding: 8px 6px 8px 12px;
+    border-radius: 14px;
+    background: rgba(10,14,26,0.9);
+    border: 1px solid rgba(255,215,0,0.4);
+    pointer-events: auto;
+    z-index: 25;
+    max-width: calc(100% - 180px);
+}
+#room-share.show { display: flex; }
+.room-share-text { font-size: 12px; color: var(--text-mid); display: flex; flex-direction: column; min-width: 0; }
+#room-share-name { font-weight: 700; color: var(--text); }
+#room-share-code { font-size: 16px; letter-spacing: 1.5px; color: var(--accent); }
+#room-share-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 120px; }
+#room-share-copy { min-width: 0; flex: 0 0 auto; padding: 9px 11px; font-size: 12px; white-space: nowrap; }
+#room-share-close {
+    background: none; border: none; color: var(--text-dim);
+    font-size: 22px; cursor: pointer; padding: 0 4px;
 }

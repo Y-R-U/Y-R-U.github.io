@@ -34,6 +34,11 @@ class Game {
 
         this.saveData = Storage.load();
 
+        // Multiplayer. `net` is the room connection, `mp` the game side of it;
+        // `mp.role` is null whenever we are not in a room.
+        this.net = null;
+        this.mp = null;
+
         // Keep camera in sync with renderer resize
         this._origResize = this.renderer.resize.bind(this.renderer);
         this.renderer.resize = () => {
@@ -57,6 +62,7 @@ class Game {
             this.audio.init();
             this.audio.resume();
             this.audio.playClick();
+            if (this.inRoom) { this._saveName(); this._playAgain(); return; }
             this._startGame();
         });
 
@@ -92,11 +98,12 @@ class Game {
         // Death screen
         document.getElementById('play-again-btn')?.addEventListener('click', () => {
             this.audio.playClick();
-            this._startGame();
+            this._playAgain();
         });
 
         document.getElementById('death-menu-btn')?.addEventListener('click', () => {
             this.audio.playClick();
+            if (this.inRoom) { this.leaveRoom(); return; }
             this._showScreen('menu-screen');
             this.state = 'menu';
         });
@@ -110,7 +117,7 @@ class Game {
         // Win screen
         document.getElementById('win-again-btn')?.addEventListener('click', () => {
             this.audio.playClick();
-            this._startGame();
+            this._playAgain();
         });
 
         document.getElementById('win-upgrades-btn')?.addEventListener('click', () => {
@@ -121,6 +128,7 @@ class Game {
 
         document.getElementById('win-menu-btn')?.addEventListener('click', () => {
             this.audio.playClick();
+            if (this.inRoom) { this.leaveRoom(); return; }
             this._showScreen('menu-screen');
             this.state = 'menu';
         });
@@ -173,14 +181,18 @@ class Game {
         });
 
         // Leaving the tab pauses the run rather than letting it die unattended.
+        // A room cannot pause; a host hands the arena to the next player at once
+        // instead, because a hidden tab stops running the game.
         document.addEventListener('visibilitychange', () => {
             if (document.visibilityState === 'visible') return;
+            if (this.inRoom) { this.net.handoff('hidden'); return; }
             if (this.state === 'playing') {
                 this._saveRun(true);
                 this._setPaused(true);
             }
         });
         window.addEventListener('pagehide', () => {
+            if (this.inRoom) { this.net.handoff('pagehide'); return; }
             if (this.state === 'playing') this._saveRun(true);
         });
 
@@ -202,6 +214,13 @@ class Game {
         if (gameUI) {
             gameUI.style.display = screenId === 'game-screen' ? 'block' : 'none';
         }
+
+        document.body.classList.toggle('in-room', this.inRoom);
+        for (const id of ['death-menu-btn', 'win-menu-btn']) {
+            const b = document.getElementById(id);
+            if (b) b.textContent = this.inRoom ? 'Leave room' : 'Menu';
+        }
+        if (this.rooms) this.rooms.onScreen(screenId);
 
         if (screenId === 'menu-screen') {
             this._refreshResumeButton();
@@ -308,6 +327,86 @@ class Game {
         this.audio.resume();
     }
 
+    get inRoom() { return !!(this.mp && this.mp.role); }
+
+    /** The run has begun for this snake: camera, input, HUD. Shared by every mode. */
+    _beginLocalRun(snake) {
+        const now = performance.now();
+        this.player = snake;
+        this.particles.clear();
+        this.camera.reset();
+        this.camera.zoom = this.camera.targetZoom = snake.levelZoom;
+        this.camera.x = snake.x;
+        this.camera.y = snake.y;
+        this.input.reset(snake.angle);
+        this.state = 'playing';
+        this.paused = false;
+        this.resolved = false;
+        this.gameStartTime = now;
+        this.lastEatSound = 0;
+        this.playerLevel = snake.level;
+        this.boostReadyAt = now + (CONFIG.BOOST_STARTS_READY ? 0 : CONFIG.BOOST_RECHARGE_MS);
+        this.gameStats = { mass: 0, kills: 0, time: 0 };
+        this._boostBtnState = '';
+        this._showScreen('game-screen');
+        this._setPaused(false);
+        this.audio.resume();
+    }
+
+    _saveName() {
+        const usernameInput = document.getElementById('username-input');
+        if (!usernameInput) return;
+        this.saveData.username = usernameInput.value.trim() || this.saveData.username || 'Player';
+        Storage.save(this.saveData);
+        usernameInput.blur();
+    }
+
+    _playAgain() {
+        if (!this.inRoom) { this._startGame(); return; }
+        this.saveData = Storage.load();
+        this.state = 'spawning';
+        this.player = null;
+        this._showScreen('game-screen');
+        this.mp.respawn();
+    }
+
+    /** Open the room connection on first use. */
+    ensureNet() {
+        if (this.net) return this.net;
+        this.net = new Net();
+        this.mp = new NetGame(this, this.net);
+        this.net.on('joined', () => {
+            this._saveName();
+            this.saveData = Storage.load();
+            Storage.clearRun();
+            this.state = 'spawning';
+            this._showScreen('game-screen');
+            this.mp.begin();
+            if (this.rooms) this.rooms.onJoined();
+        });
+        this.net.on('closed', () => {
+            if (!this.inRoom) return;
+            this.mp.destroy();
+            this._toMenu();
+            if (this.rooms) this.rooms.flash('Lost the connection to the room server.');
+        });
+        return this.net;
+    }
+
+    leaveRoom() {
+        if (this.net) this.net.leave();
+        if (this.mp) this.mp.destroy();
+        this._toMenu();
+    }
+
+    _toMenu() {
+        this.state = 'menu';
+        this.paused = false;
+        this.player = null;
+        this.snakes = [];
+        this._showScreen('menu-screen');
+    }
+
     /** Mass of the biggest live snake — what new bots are sized against. */
     _leaderMass() {
         let m = 0;
@@ -327,6 +426,7 @@ class Game {
         const bot = AI.createBot(this.saveData, this._leaderMass(), rival);
         this.snakes.push(bot);
         this.ai.register(bot, undefined, rival ? rival.tier : undefined);
+        if (this.inRoom) this.mp.adopt(bot);
     }
 
     /**
@@ -351,6 +451,8 @@ class Game {
     _loop(timestamp) {
         requestAnimationFrame(this._loop);
 
+        if (this.inRoom) { this._roomFrame(); return; }
+
         if (this.state !== 'playing') {
             // Still render menu background
             if (this.state === 'menu' || this.state === 'dead' || this.state === 'won') {
@@ -372,6 +474,27 @@ class Game {
 
         this._update(dt, now);
         this._render();
+    }
+
+    /**
+     * A frame while in a room. The arena never stops for the menus: the host
+     * keeps simulating whether or not its own snake is alive, and everyone
+     * keeps drawing it behind whatever screen is up.
+     */
+    _roomFrame() {
+        const now = performance.now();
+        const dt = Math.min(now - this.lastUpdate, 50);
+        this.lastUpdate = now;
+        this.net.beat(now, this.mp.role === 'host' || this.mp.synced);
+        if (this.mp.role === 'host') {
+            this.mp.hostBeforeUpdate(dt, now);
+            this._update(dt, now);
+            if (this.inRoom) this.mp.hostAfterUpdate(now);
+        } else {
+            this.mp.followUpdate(dt, now);
+        }
+        this._render();
+        if (this.rooms) this.rooms.tickPill(now);
     }
 
     _setPaused(on) {
@@ -403,6 +526,7 @@ class Game {
     _fireBoost(now) {
         if (!this.player || !this.player.alive) return;
         if (now < this.boostReadyAt) return;
+        if (this.inRoom && !this.mp.allowed('boost')) return;
 
         const types = Object.values(CONFIG.POWERUP_TYPES);
         const type = Utils.randPick(types);
@@ -425,6 +549,7 @@ class Game {
         if (key === this._boostBtnState) return;
         this._boostBtnState = key;
 
+        btn.style.display = this.inRoom && !this.mp.allowed('boost') ? 'none' : '';
         btn.classList.toggle('ready', ready);
         btn.style.setProperty('--charge', pct + '%');
         btn.textContent = ready ? 'BOOST' : Math.ceil(left / 1000) + 's';
@@ -432,6 +557,7 @@ class Game {
 
     /** Write the run to its local slot, at most every RESUME_SAVE_MS. */
     _saveRun(force) {
+        if (this.inRoom) return;   // a room is live; there is nothing to resume
         if (this.state !== 'playing' || !this.player || !this.player.alive || this.resolved) return;
         const now = performance.now();
         if (!force && now - this._lastRunSave < CONFIG.RESUME_SAVE_MS) return;
@@ -462,7 +588,7 @@ class Game {
         const btn = document.getElementById('resume-btn');
         if (!btn) return;
         const run = Storage.loadRun();
-        if (!run) {
+        if (!run || this.inRoom) {
             btn.style.display = 'none';
             return;
         }
@@ -474,7 +600,7 @@ class Game {
     /** Update game state */
     _update(dt, now) {
         // Update player input
-        if (this.player && this.player.alive) {
+        if (this.player && this.player.alive && this.state === 'playing') {
             const angle = this.input.update(dt, this.player.angle);
             this.player.setTarget(angle);
             if (this.input.consumeBoostPress()) this._fireBoost(now);
@@ -491,8 +617,9 @@ class Game {
             if (!snake.alive) continue;
             snake.update(dt);
 
-            // Handle boundary deaths (flagged by snake.update)
-            if (snake.boundaryDeath && snake.alive) {
+            // Handle boundary deaths (flagged by snake.update). A remote
+            // player's own browser rules on its head, the edge included.
+            if (snake.boundaryDeath && snake.alive && !snake.remote) {
                 const pellets = snake.die(null);
                 // Only add death pellets if inside boundary (not at edge)
                 if (Utils.dist(0, 0, snake.x, snake.y) < CONFIG.WORLD_RADIUS + 200) {
@@ -507,6 +634,7 @@ class Game {
                     this._onPlayerDeath();
                 }
                 this.ai.unregister(snake.id);
+                if (this.inRoom) this.mp.noteDeath(snake, null);
                 continue;
             }
 
@@ -551,6 +679,7 @@ class Game {
             }
 
             this.ai.unregister(victim.id);
+            if (this.inRoom) this.mp.noteDeath(victim, killer);
         }
 
         // Check food collisions. removeFood is swap-with-last, so indices MUST be
@@ -587,6 +716,7 @@ class Game {
             removedPU.add(powerupIndex);
             const ms = snake.applyPowerup(powerup.type.id);
             this.world.removePowerup(powerupIndex);
+            if (this.inRoom) this.mp.notePowerup(snake, powerup.type.id, ms);
             this.particles.emitPowerup(powerup.x, powerup.y, powerup.type.color);
 
             if (snake.isPlayer) {
@@ -606,8 +736,8 @@ class Game {
         this.world.updatePowerups(now);
 
         // Respawn dead bots
-        const aliveCount = this.snakes.filter(s => s.alive && !s.isPlayer).length;
-        if (aliveCount < CONFIG.BOT_COUNT) {
+        const aliveCount = this.snakes.filter(s => s.alive && !s.isPlayer && !s.owner).length;
+        if (aliveCount < (this.inRoom ? this.mp.botTarget() : CONFIG.BOT_COUNT)) {
             this._respawnBot();
         }
 
@@ -1005,6 +1135,7 @@ class Game {
 // Start game when DOM is ready
 document.addEventListener('DOMContentLoaded', () => {
     window.game = new Game();
+    window.game.rooms = new RoomsUI(window.game);
 
     // Player accounts are strictly optional. Load the glue dynamically and
     // swallow any failure, so offline, blocked, or file:// still plays — just

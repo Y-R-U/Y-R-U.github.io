@@ -11,13 +11,24 @@ class World {
         this.food = [];
         this.powerups = [];
         this.lastPowerupSpawn = 0;
+        // Multiplayer: every pellet carries a fid, and while `log` is set the
+        // host records what appeared and what was eaten so it can tell the room.
+        this.nextFid = 1;
+        this.nextPid = 1;
+        this.log = null;
         this._init();
+    }
+
+    _track(f) {
+        f.fid = this.nextFid++;
+        if (this.log) this.log.add.push(f);
+        return f;
     }
 
     _init() {
         // Spawn initial food
         for (let i = 0; i < CONFIG.FOOD_COUNT; i++) {
-            this.food.push(this._createFood());
+            this.food.push(this._track(this._createFood()));
         }
     }
 
@@ -39,7 +50,7 @@ class World {
     addDeathPellets(pellets) {
         for (const p of pellets) {
             if (this.food.length >= CONFIG.FOOD_MAX) break;
-            this.food.push({
+            this.food.push(this._track({
                 x: p.x,
                 y: p.y,
                 radius: p.radius,
@@ -49,7 +60,7 @@ class World {
                 isDeath: true,
                 owner: null,
                 armAt: 0
-            });
+            }));
         }
     }
 
@@ -62,7 +73,7 @@ class World {
         // Take the value as given — the snake has already decided how much mass
         // this pellet carries, and rounding it up here would mint mass.
         const v = value > 0 ? value : CONFIG.FOOD_VALUE;
-        this.food.push({
+        this.food.push(this._track({
             x, y,
             radius: CONFIG.FOOD_RADIUS + Utils.clamp(Math.sqrt(v) * 0.6, 1, 6),
             value: v,
@@ -71,7 +82,7 @@ class World {
             isBoost: true,
             owner: ownerId || null,
             armAt: (now || performance.now()) + CONFIG.OWN_PELLET_ARM_MS
-        });
+        }));
     }
 
     /**
@@ -81,6 +92,7 @@ class World {
     removeFood(index) {
         const last = this.food.length - 1;
         if (index < 0 || index > last) return;
+        if (this.log) this.log.del.push(this.food[index].fid);
         if (index !== last) this.food[index] = this.food[last];
         this.food.pop();
     }
@@ -88,7 +100,7 @@ class World {
     /** Replenish ambient food to maintain count */
     replenish() {
         while (this.food.length < CONFIG.FOOD_COUNT) {
-            this.food.push(this._createFood());
+            this.food.push(this._track(this._createFood()));
         }
     }
 
@@ -101,6 +113,7 @@ class World {
             const type = Utils.randPick(types);
             const pos = Utils.randInCircle(CONFIG.WORLD_RADIUS * 0.8);
             this.powerups.push({
+                pid: this.nextPid++,
                 x: pos.x,
                 y: pos.y,
                 type: type,
@@ -134,6 +147,7 @@ class World {
         this.food = [];
         this.powerups = [];
         this.lastPowerupSpawn = 0;
+        this.log = null;
         this._init();
     }
 }

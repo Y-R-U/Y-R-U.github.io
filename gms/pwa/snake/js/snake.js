@@ -25,9 +25,15 @@
  */
 class Snake {
     constructor(options = {}) {
-        this.id = Utils.uid();
+        this.id = options.id || Utils.uid();
         this.name = options.name || 'Snake';
         this.isPlayer = options.isPlayer || false;
+        // Multiplayer: nid is the small number the wire uses; owner is the room
+        // member steering it (null for a bot); remote = steered from another
+        // browser, so that browser — not this one — decides when its head hits.
+        this.nid = options.nid || 0;
+        this.owner = options.owner || null;
+        this.remote = false;
 
         // Position & movement
         const spawn = options.position || Utils.randInCircle(CONFIG.WORLD_RADIUS * 0.7);
@@ -289,6 +295,44 @@ class Snake {
             this.segX[k] = x0 + (x1 - x0) * t;
             this.segY[k] = y0 + (y1 - y0) * t;
         }
+    }
+
+    /** Set mass directly — multiplayer copies take it from the host. */
+    setMass(m) {
+        if (m === this.mass) return;
+        this.mass = Math.max(m, CONFIG.SNAKE_MIN_MASS);
+        this._recomputeSize();
+    }
+
+    /**
+     * Rebuild the body from a list of segment positions, head first, as the
+     * host sends it. The path is laid down tail to head so the next appended
+     * head sample continues it seamlessly.
+     */
+    seedFromSegments(flat) {
+        const n = flat.length >> 1;
+        if (n < 2) { this._initBody(); return; }
+        this._ensurePath(n + 2);
+        let s = 0;
+        for (let i = n - 1, k = 0; i >= 0; i--, k++) {
+            const x = flat[i * 2], y = flat[i * 2 + 1];
+            if (k > 0) s += Math.hypot(x - this.pathX[k - 1], y - this.pathY[k - 1]);
+            this.pathX[k] = x;
+            this.pathY[k] = y;
+            this.pathS[k] = s;
+        }
+        this.pathLen = n;
+        this.x = flat[0];
+        this.y = flat[1];
+        this._solveSegments();
+    }
+
+    /** Move the head somewhere and let the body follow, without simulating. */
+    placeHead(x, y) {
+        this.x = x;
+        this.y = y;
+        this._appendPath();
+        this._solveSegments();
     }
 
     // ======================== QUERIES ========================

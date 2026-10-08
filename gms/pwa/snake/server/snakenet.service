@@ -1,0 +1,29 @@
+[Unit]
+Description=snakenet — Snake-eee rooms, WebRTC signalling and relay (games.br8t.com/gms/pwa/snake/net/)
+After=network.target
+
+[Service]
+Type=simple
+User=deploy
+Group=deploy
+WorkingDirectory=/srv/apps/snakenet
+ExecStart=/srv/apps/snakenet/snakenet
+Restart=on-failure
+RestartSec=2
+Environment=SNAKENET_ADDR=127.0.0.1:8013
+Environment=SNAKENET_PREFIX=/gms/pwa/snake/net
+Environment=GOMEMLIMIT=48MiB
+MemoryMax=128M
+CPUQuota=50%
+# Optional Cloudflare TURN key (CF_TURN_KEY_ID, CF_TURN_KEY_TOKEN) lives only on the box.
+EnvironmentFile=-/srv/data/snakenet/snakenet.env
+UMask=0077
+TimeoutStopSec=5
+
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=true
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target

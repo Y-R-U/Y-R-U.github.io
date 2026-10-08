@@ -20,6 +20,16 @@
     <!-- Game UI overlay (boost button, notifications) -->
     <div id="game-ui">
         <button id="pause-btn" aria-label="Pause" aria-pressed="false">II</button>
+        <button id="net-pill" type="button"></button>
+        <div id="net-tip" hidden></div>
+        <div id="room-share">
+            <div class="room-share-text">
+                <span id="room-share-name"></span>
+                Code <b id="room-share-code"></b>
+            </div>
+            <button class="btn btn-accent" id="room-share-copy">Copy link</button>
+            <button id="room-share-close" aria-label="Hide">×</button>
+        </div>
         <button id="boost-btn" class="ready">BOOST</button>
         <div id="powerup-notification"></div>
         <div id="pause-overlay">
@@ -46,9 +56,19 @@
             <input type="text" id="username-input" placeholder="Enter your name" maxlength="16" autocomplete="off">
         </div>
 
+        <div id="menu-note" class="menu-note" hidden></div>
+
         <div class="menu-buttons">
+            <div id="menu-room" class="menu-room" hidden>
+                <div class="menu-room-label">In room <b id="menu-room-name"></b></div>
+                <div class="menu-row">
+                    <button class="btn btn-primary" id="menu-room-play">PLAY</button>
+                    <button class="btn btn-secondary" id="menu-room-leave">Leave room</button>
+                </div>
+            </div>
             <button class="btn btn-accent" id="resume-btn" style="display:none">RESUME</button>
             <button class="btn btn-primary" id="play-btn">PLAY</button>
+            <button class="btn btn-secondary btn-rooms" id="rooms-btn">ROOMS <small id="rooms-count">…</small></button>
             <div class="menu-row">
                 <button class="btn btn-secondary" id="upgrades-btn">Upgrades</button>
                 <button class="btn btn-secondary" id="skins-btn">Skins</button>
@@ -172,6 +192,43 @@
         <div id="ladder-list"></div>
     </div>
 
+    <!-- Rooms Screen -->
+    <div id="rooms-screen" class="screen">
+        <div class="screen-header">
+            <div class="screen-title">Rooms</div>
+            <button class="back-btn">Back</button>
+        </div>
+        <div class="rooms-body">
+            <div id="rooms-status" class="rooms-status" hidden></div>
+            <button class="btn btn-primary" id="rooms-auto">AUTO JOIN <small>finds or starts a room near you</small></button>
+
+            <div class="rooms-card">
+                <div class="rooms-tabs">
+                    <button type="button" data-tab="join" class="on">Join with code</button>
+                    <button type="button" data-tab="new">Start private room</button>
+                </div>
+                <div class="rooms-pane" data-pane="join">
+                    <div class="rooms-line">
+                        <input id="rooms-code" maxlength="6" placeholder="CODE" autocomplete="off" autocapitalize="characters" spellcheck="false">
+                        <button class="btn btn-accent" id="rooms-join">JOIN</button>
+                    </div>
+                </div>
+                <div class="rooms-pane" data-pane="new" hidden>
+                    <input id="rooms-name" maxlength="24" placeholder="Room name" autocomplete="off">
+                    <div class="rooms-toggles-head">Upgrades allowed in this room</div>
+                    <div id="rooms-toggles"></div>
+                    <button class="btn btn-accent" id="rooms-create">START ROOM</button>
+                    <div class="rooms-note">You get a code and a link to send. Everyone on the same Wi-Fi?
+                        If players can't connect directly the game still works, just laggier —
+                        one player switching to mobile data usually fixes it.</div>
+                </div>
+            </div>
+
+            <div class="rooms-list-head">Open rooms</div>
+            <div id="rooms-list"><div class="rooms-empty">…</div></div>
+        </div>
+    </div>
+
     <!-- Stats Screen -->
     <div id="stats-screen" class="screen">
         <div class="screen-header">
@@ -192,6 +249,9 @@
     <script src="js/camera.js"></script>
     <script src="js/collision.js"></script>
     <script src="js/ai.js"></script>
+    <script src="js/net.js"></script>
+    <script src="js/netgame.js"></script>
+    <script src="js/rooms.js"></script>
     <script src="js/particles.js"></script>
     <script src="js/upgrades.js"></script>
     <script src="js/renderer.js"></script>

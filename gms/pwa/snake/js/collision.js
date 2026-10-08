@@ -140,13 +140,17 @@ class CollisionSystem {
      * Check head-to-body collisions for all snakes.
      * Returns array of { victim, killer } pairs.
      */
-    checkSnakeCollisions(snakes) {
+    checkSnakeCollisions(snakes, onlyVictim) {
         const collisions = this._collisions;
         collisions.length = 0;
 
         for (let s = 0; s < snakes.length; s++) {
             const snake = snakes[s];
             if (!snake.alive || snake.isInvulnerable()) continue;
+            // A remote player's own browser decides when its head hits, from
+            // exactly what that player saw — see NetGame.
+            if (snake.remote) continue;
+            if (onlyVictim && snake !== onlyVictim) continue;
 
             const headX = snake.x, headY = snake.y;
             const headR = snake.getRadiusAt(0);

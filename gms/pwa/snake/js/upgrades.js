@@ -2,9 +2,29 @@
  * Upgrades system - manages meta upgrades and skin purchases
  */
 const Upgrades = {
-    /** Get computed player stats based on upgrade levels */
-    getPlayerStats(saveData) {
-        const ups = saveData.upgrades;
+    /**
+     * Room settings that can switch upgrades off. Missing means on: rooms are
+     * a free-for-all unless whoever made them chose otherwise. Coin Bonus is
+     * not here because it only ever changes your own payout.
+     */
+    ROOM_TOGGLES: [
+        { key: 'baseSpeed',   label: 'Base Speed',     note: 'the big one' },
+        { key: 'magnetRange', label: 'Magnet Range' },
+        { key: 'startSize',   label: 'Starting Size' },
+        { key: 'boostTime',   label: 'Boost Duration' },
+        { key: 'boost',       label: 'BOOST button',   note: 'free power-up once a minute' }
+    ],
+
+    allowed(settings, key) {
+        return !settings || settings[key] !== false;
+    },
+
+    /** Get computed player stats based on upgrade levels, minus any the room switched off. */
+    getPlayerStats(saveData, settings) {
+        const ups = { ...saveData.upgrades };
+        for (const t of Upgrades.ROOM_TOGGLES) {
+            if (t.key in ups && !Upgrades.allowed(settings, t.key)) ups[t.key] = 0;
+        }
         return {
             startLength: Math.round(CONFIG.SNAKE_START_LENGTH + Storage.getUpgradeValue('startSize', ups.startSize)),
             speedLevels: ups.baseSpeed || 0,

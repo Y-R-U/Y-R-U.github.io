@@ -1,4 +1,4 @@
-const CACHE_NAME = 'snakeio-v8';
+const CACHE_NAME = 'snakeio-v9';
 const ASSETS = [
     './',
     './index.html',
@@ -13,6 +13,9 @@ const ASSETS = [
     './js/camera.js',
     './js/collision.js',
     './js/ai.js',
+    './js/net.js',
+    './js/netgame.js',
+    './js/rooms.js',
     './js/particles.js',
     './js/upgrades.js',
     './js/renderer.js',
@@ -36,6 +39,8 @@ function isOurs(request) {
     let url;
     try { url = new URL(request.url); } catch (e) { return false; }
     if (url.origin !== self.location.origin) return false;
+    // The room server's stats live under our path but must never be cached.
+    if (url.pathname.startsWith(SCOPE_PATH + 'net/')) return false;
     return url.pathname.startsWith(SCOPE_PATH);
 }
 

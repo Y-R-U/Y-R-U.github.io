@@ -1,6 +1,7 @@
 /**
  * Canvas renderer - draws everything
  */
+const POWERUP_LIST = Object.values(CONFIG.POWERUP_TYPES);
 class Renderer {
     constructor(canvas) {
         this.canvas = canvas;
@@ -120,34 +121,43 @@ class Renderer {
         ctx.stroke();
     }
 
-    /** Draw the world boundary */
+    /**
+     * Draw the world boundary — only when it is actually on screen. It used to
+     * fill a radial gradient across the whole 8,000px world circle every frame,
+     * which was the single most expensive thing the renderer did (13ms on a
+     * phone, 31ms on a 2x laptop) and almost always invisible.
+     */
     drawBoundary(camera) {
+        const b = camera.getViewBounds();
+        const R = CONFIG.WORLD_RADIUS;
+        const fx = Math.max(Math.abs(b.left), Math.abs(b.right));
+        const fy = Math.max(Math.abs(b.top), Math.abs(b.bottom));
+        if (fx * fx + fy * fy < (R - CONFIG.BOUNDARY_WARNING) * (R - CONFIG.BOUNDARY_WARNING)) return;
+
         const ctx = this.ctx;
         const center = camera.worldToScreen(0, 0);
-        const edge = camera.worldToScreen(CONFIG.WORLD_RADIUS, 0);
-        const radius = edge.x - center.x;
+        const radius = R * camera.zoom;
+        const band = CONFIG.BOUNDARY_WARNING * camera.zoom;
 
-        // Outer boundary ring
+        // Warning glow: a ring stroked with the gradient, rather than a filled
+        // disc, so only the band itself is ever rasterised.
+        const inner = radius - band;
+        if (inner > 0) {
+            const gradient = ctx.createRadialGradient(center.x, center.y, inner, center.x, center.y, radius);
+            gradient.addColorStop(0, 'rgba(255,50,50,0)');
+            gradient.addColorStop(1, 'rgba(255,50,50,0.15)');
+            ctx.beginPath();
+            ctx.arc(center.x, center.y, radius - band / 2, 0, Math.PI * 2);
+            ctx.strokeStyle = gradient;
+            ctx.lineWidth = band;
+            ctx.stroke();
+        }
+
         ctx.beginPath();
         ctx.arc(center.x, center.y, radius, 0, Math.PI * 2);
         ctx.strokeStyle = CONFIG.BOUNDARY_COLOR;
         ctx.lineWidth = 4 * camera.zoom;
         ctx.stroke();
-
-        // Warning zone glow
-        const warnRadius = radius - CONFIG.BOUNDARY_WARNING * camera.zoom;
-        if (warnRadius > 0) {
-            const gradient = ctx.createRadialGradient(
-                center.x, center.y, warnRadius,
-                center.x, center.y, radius
-            );
-            gradient.addColorStop(0, 'rgba(255,50,50,0)');
-            gradient.addColorStop(1, 'rgba(255,50,50,0.15)');
-            ctx.beginPath();
-            ctx.arc(center.x, center.y, radius, 0, Math.PI * 2);
-            ctx.fillStyle = gradient;
-            ctx.fill();
-        }
     }
 
     /**
@@ -176,7 +186,9 @@ class Renderer {
             if (r > 2) {
                 ctx.beginPath();
                 ctx.arc(sx, sy, r * 2, 0, Math.PI * 2);
-                ctx.fillStyle = Utils.hexToRgba(f.color, 0.15);
+                // Cached on the pellet: parsing the hex into a fresh rgba()
+                // string for 2,000 pellets a frame was pure garbage.
+                ctx.fillStyle = f._glow || (f._glow = Utils.hexToRgba(f.color, 0.15));
                 ctx.fill();
             }
 
@@ -349,23 +361,18 @@ class Renderer {
             ctx.fillText(Utils.formatNumber(snake.mass), hs.x, hs.y - hr - 18 * camera.zoom);
         }
 
-        // Active powerup indicators
-        const activePowerups = Object.keys(snake.powerups).filter(k => snake.hasPowerup(k));
-        if (activePowerups.length > 0) {
-            const now = performance.now();
-            activePowerups.forEach((pu, idx) => {
-                const config = Object.values(CONFIG.POWERUP_TYPES).find(p => p.id === pu);
-                if (config) {
-                    const remaining = (snake.powerups[pu] - now) / 1000;
-                    ctx.fillStyle = config.color;
-                    ctx.font = `bold ${Math.round(10 * camera.zoom)}px sans-serif`;
-                    ctx.textAlign = 'center';
-                    ctx.fillText(
-                        `${config.icon} ${remaining.toFixed(0)}s`,
-                        hs.x, hs.y + hr + (14 + idx * 14) * camera.zoom
-                    );
-                }
-            });
+        // Active powerup indicators (a plain loop: this runs for every snake, every frame)
+        let idx = 0;
+        const now = performance.now();
+        for (const config of POWERUP_LIST) {
+            const until = snake.powerups[config.id];
+            if (!until || until <= now) continue;
+            ctx.fillStyle = config.color;
+            ctx.font = `bold ${Math.round(10 * camera.zoom)}px sans-serif`;
+            ctx.textAlign = 'center';
+            ctx.fillText(`${config.icon} ${((until - now) / 1000).toFixed(0)}s`,
+                hs.x, hs.y + hr + (14 + idx * 14) * camera.zoom);
+            idx++;
         }
     }
 
@@ -412,10 +419,14 @@ class Renderer {
             this._drawGoal(playerSnake.mass);
         }
 
-        // Leaderboard - top right
-        const sorted = [...allSnakes]
-            .filter(s => s.alive)
-            .sort((a, b) => b.mass - a.mass);
+        // Leaderboard - top right. Re-ranked four times a second, not every frame.
+        const tnow = performance.now();
+        if (!this._lb || tnow - this._lbAt > 250 || this._lbFor !== allSnakes) {
+            this._lb = allSnakes.filter(s => s.alive).sort((a, b) => b.mass - a.mass);
+            this._lbAt = tnow;
+            this._lbFor = allSnakes;
+        }
+        const sorted = this._lb.filter(s => s.alive);
         const top10 = sorted.slice(0, 10);
 
         // The account avatar publishes its top-right footprint as a CSS var; drop
