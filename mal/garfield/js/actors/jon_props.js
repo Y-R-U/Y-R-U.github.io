@@ -82,6 +82,35 @@ export const PROP_BUILDERS = {
     
     return g;
   },
+  mug() {
+    const g = new THREE.Group();
+    const m = new THREE.Mesh(new THREE.CylinderGeometry(0.04, 0.036, 0.09, 16), std(0xd8563a, 0.4));
+    m.position.y = 0.045; g.add(m);
+    const h = new THREE.Mesh(new THREE.TorusGeometry(0.024, 0.008, 6, 12), std(0xd8563a, 0.4));
+    h.position.set(0.045, 0.05, 0); g.add(h);
+    const c = new THREE.Mesh(new THREE.CircleGeometry(0.036, 14), std(0x4a2a14, 0.2));
+    c.rotation.x = -Math.PI / 2; c.position.y = 0.08; g.add(c);
+    return g;
+  },
+  suitcase() {
+    const g = new THREE.Group();
+    const b = new THREE.Mesh(new THREE.BoxGeometry(0.16, 0.42, 0.56), std(0x7a3b22, 0.55));
+    b.position.y = -0.27; g.add(b);
+    const strap = new THREE.Mesh(new THREE.BoxGeometry(0.165, 0.43, 0.04), std(0x3a2416, 0.6));
+    strap.position.set(0, -0.27, 0.12); g.add(strap);
+    const s2 = strap.clone(); s2.position.z = -0.12; g.add(s2);
+    const hnd = new THREE.Mesh(new THREE.TorusGeometry(0.04, 0.01, 6, 12, Math.PI), std(0x2a1a10, 0.5));
+    hnd.rotation.y = Math.PI / 2; hnd.position.y = -0.06; g.add(hnd);
+    return g;
+  },
+  box() {
+    const g = new THREE.Group();
+    const b = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.4, 0.42), std(0xc49a62, 0.85));
+    b.position.y = 0.0; g.add(b);
+    const t = new THREE.Mesh(new THREE.BoxGeometry(0.51, 0.06, 0.08), std(0xe0d4b8, 0.7));
+    t.position.y = 0.18; g.add(t);
+    return g;
+  },
 };
 
 // grip transforms relative to the hand grip socket
@@ -94,6 +123,11 @@ export const GRIPS = {
   plate: { pos: [0.06, -0.1, 0.0], rot: [Math.PI / 2, 0, 0] },
   pan: { pos: [0.1, -0.1, -0.01], rot: [Math.PI / 2, 0, 0] },
   bowl: { pos: [0.05, -0.08, -0.01], rot: [Math.PI / 2, 0, 0] },
+  mug: { pos: [0.03, 0.0, 0.02], rot: [Math.PI / 2, 0, 0] },
+  suitcase: { pos: [0, 0.03, 0], rot: [0, 0, 0] },
+  // two-handed carries sit on the carry socket (in front of the belly)
+  box: { pos: [0, 0, 0], rot: [0, 0, 0] },
+  tv: { pos: [0, -0.2, -0.02], rot: [0, 0, 0] },
 };
 
 // Prefer the props lane's newspaper meshes when available (they lie along local X; ours extend along +Z).

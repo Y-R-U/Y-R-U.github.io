@@ -51,3 +51,17 @@ Cameras (`{pos, look, fov, rotY}`): `cam_culdesac, cam_culdesacLow, cam_houseFro
 - `lighting.js` hemi + warm shadow key + lamp points (count per quality) + RoomEnvironment PMREM
 - `nav.js` 0.2 m grid per floor + stair chain, A* + string pulling
 - Viewer: `tools/house.html` (`?view=kitchen|living|...|cam_*`, `?q=`, `?ext=1`, `?props=0`, `?shot=1`)
+
+## Wave 3 additions (Brief 2)
+- **Lyman's room** upstairs: x 0..9.2, z 7.1..11 (door x 7.75..8.6 in the landing's back wall, prop `lymanDoor`, closed by default).
+- **Under-stair cupboard**: steps 5..13 are hollow (step colliders keep their ids; their bottoms are now `top − 0.22`), side wall
+  colliders `cupWall*`, door hole z 2.55..3.2 (h 1.25) closed by prop `cupboardDoor`. Jon's nav can't enter (too tall).
+- `world.navPet` — same API as `nav`, built for a 0.62 m tall / 0.18 m radius body (Odie, mice): fits under the table and in the cupboard.
+- `world.setChapter(n)`, `world.swapTv()`; lamps of the room the camera is in get priority (Lyman's room lamp).
+- Anchors: `lymanRoom, lymanDoor{w,h}, lymanDoorOut, lymanInside, lymanBed{w,l,top}, suitcaseSpot, odieBed, cupboardDoor{w,h},
+  cupboardFront, cupboardInside, biscuitBox, dresser{w,d,h}, sockDrawer, breakDrawer, lymanChair, lymanSeat, plateSpot2, soupSpot,
+  odieBowl, sofaSeatL, sofaSeatR, sofaFoot, oldTvSpot (= tvFloorSpot), carpet, carpetEdge, tvBoxSpot, mugSpot, doorStep
+  (= deliverySpot = lymanSpawn), doorInside, furPileSpot, whistleSpot, arenaCentre, arenaBounds{min,max}, shedBed, shedSofa,
+  shedArmchair, shedTable, mouseHole0..3 + mouseHoles (array), cheese0..5 + cheeseSpots (array), odieTableEdge, odieSill,
+  odieTableSide, wallBelowWindow, outsideWindow`.
+- Cameras: `cam_lymanRoom, cam_frontDoorIn, cam_sofa, cam_cupboard, cam_dresser, cam_arena, cam_lymanDoor`.

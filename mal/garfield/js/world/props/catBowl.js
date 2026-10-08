@@ -53,6 +53,8 @@ export function createCatBowl(ctx) {
     heap.count = Math.max(N - 6, heap.count - 3);
   };
   p.bitePos = (out = new THREE.Vector3()) => { out.set(0, 0.06, 0); return p.root.localToWorld(out); };
-  p.reset = () => { bits.clear(); heap.count = N; };
+  // Garfield finally eats his biscuits (Ch2): heap shrinks 1 → 0
+  p.eaten = t => { p.state.eaten = Math.max(0, Math.min(1, t)); heap.count = Math.round(N * (1 - p.state.eaten)); };
+  p.reset = () => { bits.clear(); heap.count = N; p.state.eaten = 0; };
   return p;
 }

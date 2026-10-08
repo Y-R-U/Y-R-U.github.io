@@ -125,7 +125,7 @@ function slip(L) {
 }
 
 // Clear direction for Jon's faceplant (body + head reach ~1.5 m forward of his feet), preferring his approach direction.
-function fallDir(ctx, frag, from) {
+export function fallDir(ctx, frag, from) {
   const cols = (ctx.world.colliders || []).filter((c) => c.enabled !== false && c.max.y > 0.12 && c.min.y < 0.6);
   const app = V(frag.x - from.x, 0, frag.z - from.z);
   if (app.lengthSq() < 1e-4) app.set(0, 0, 1);

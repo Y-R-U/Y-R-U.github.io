@@ -8,8 +8,8 @@ function leg(h) {
   return lathe([[0, 0], [0.019, 0], [0.021, 0.03], [0.017, h * 0.4], [0.022, h * 0.5], [0.017, h * 0.6], [0.02, h], [0, h]], 10);
 }
 
-export function createChair(ctx) {
-  const p = makeProp('chair', ctx);
+export function createChair(ctx, id = 'chair') {
+  const p = makeProp(id, ctx);
   const wood = mat(0xffffff, { map: woodTex('#b8773f', '#7b4622', 'chair'), roughness: 0.55 });
   const cushion = new THREE.MeshPhysicalMaterial({ color: 0xd9643b, roughness: 0.85, sheen: 0.7, sheenColor: new THREE.Color(0xffb38a) });
 

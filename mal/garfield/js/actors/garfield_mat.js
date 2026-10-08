@@ -94,6 +94,7 @@ export function createFurMaterial({ tailPts, quality = 'high', shell = -1, share
     uRim: { value: new THREE.Color(0xffd29a) },
     uRimStr: { value: 0.35 },
     uTail: { value: tailPts.map((p) => new THREE.Vector3(...p)) },
+    uBald: { value: 0 }, uSkin: { value: new THREE.Color(0xf0a89c) }, uSkin2: { value: new THREE.Color(0xe08a86) },
   };
   mat.userData.uniforms = uniforms;
   const isShell = shell >= 0;
@@ -111,7 +112,7 @@ export function createFurMaterial({ tailPts, quality = 'high', shell = -1, share
       .replace('#include <morphtarget_vertex>', '#include <morphtarget_vertex>\nvRest = transformed;\nvTone = tone;\n#ifdef USE_MORPHTARGETS\nvTone.z *= 1.0 - smoothstep(0.004, 0.02, length(transformed - position));\n#endif');
     sh.fragmentShader = sh.fragmentShader
       .replace('#include <common>', `#include <common>
-uniform vec3 uOrange, uOrange2, uCream, uPink, uStripe, uRim; uniform float uRimStr, uShell; uniform vec3 uTail[7];
+uniform vec3 uOrange, uOrange2, uCream, uPink, uStripe, uRim, uSkin, uSkin2; uniform float uRimStr, uShell, uBald; uniform vec3 uTail[7];
 varying vec3 vTone; varying vec3 vRest; varying vec3 vRestN;
 ${NOISE}
 ${STRIPES}`)
@@ -124,6 +125,12 @@ ${STRIPES}`)
   base = mix(base, uPink, vTone.y);
   base = mix(base, uStripe, st * 0.97);
   base *= 0.9 + 0.2*fn;
+  if (uBald > 0.5) {
+    // plucked: pink skin, faint wrinkles/blotches, pinker belly/muzzle
+    float w = vnoise(vRest*120.0)*0.6 + vnoise(vRest*30.0)*0.4;
+    base = mix(uSkin, uSkin2, w*0.5 + vTone.y*0.6);
+    base = mix(base, vec3(0.98,0.8,0.74), vTone.x*0.35);
+  }
 #ifdef SHELL
   vec3 cell = floor(vRest * 900.0);
   float h = gh(cell) * 0.75 + gh(floor(vRest * 400.0) + 3.0) * 0.25;

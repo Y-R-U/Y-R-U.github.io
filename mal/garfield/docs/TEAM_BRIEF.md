@@ -203,3 +203,69 @@ audio.voLines                         // manifest: key → {who, text, file, dur
 audio.setVolumes({music, sfx, voice}), audio.setMusicOn(bool)
 ```
 VO keys and text live in `docs/VO_LINES.md` + `audio/vo/manifest.json` (media owns them; levels/barks request lines).
+
+---
+
+# WAVE 3 (2026-10-08): Brief 2 — read docs/BRIEF2.md + DECISIONS D14–D22
+
+Everything above still applies. The game is LIVE (br8t.com/mal/garfield/) and the child plays it: **never break
+Chapter One.** `node tools/sim/play.mjs 1-10`, `play.mjs catch` and `__game.selfTest()` must keep passing. Existing
+contracts stay; additions below. Lanes: **cast** (port 9402), **world** (9404), **media** (9401), **game** (9407).
+
+### Cast additions (`js/actors/`, owner: cast)
+```js
+createOdie({quality})   // same common API as Garfield (root/update/play/setMove/lookAt/sockets{head,mouth,tail,back}/height/radius/anims)
+  // clips: idle, idle_pant (tongue out, panting loop), walk, run, gallop_goofy, sit, sit_pant, jump_up, fall, land,
+  // land_head (lands head-first, dazed), yip_flee (startled hop then run), bark, eat (from bowl), tackle (arena lunge),
+  // hit (arena knockback), dizzy, flattened (pancake under TV, legs out), launched (tumbling flight), shake_scared
+  // (trembling, dog whistle), lick (big slobbery lick), sniff, hug_pile (L9), walk_socked (socks on ears/tail/mouth),
+  // stuck_wall (splat on wall, slide down)
+  // extras: setSocks(bool), setExpression('dopey'|'happy'|'dazed'|'scared'), tongue secondary motion
+createLyman({quality, outfit:'normal'|'disco'})   // Jon's API + body; black hair, moustache
+  // all relevant Jon clips + watch_tv (seated on sofa), drink_coffee (seated, mug), spill (jolt), brawl_* (slapstick
+  // fight loop with Jon: slap, kick, dodge, tangled cartoon dust-cloud fight is fine), chase, catch_mouse (lunge + miss),
+  // hug, eat (seated), give_bowl, carry_suitcase, dramatic (I'm cold... arms flung), walk_in
+createHuman({kind:'delivery'})   // delivery man; carry_box, hand_over, walk, idle
+createMice({count})              // tiny instanced mice: scurry along nav or random floor paths
+Jon gains: watch_tv, eat_soup (spoon), brawl_*, catch_mouse, hug, spilled_on, eyes_widen (shock + lean back), poked
+  (face poke pain), sing_morning (cheery wave), frightened (cower), unbox (kneel, open box, lift TV), carry_tv
+Garfield gains: setBald(bool) (pink skin, no fur stripes — same mesh), shed (shake, fur puff), head_in_corner (sulk),
+  startled_jump (straight up, fur puffed), meow_loud, poke (paw jab upward), seethe (hold-to-build furious glare,
+  0..1 intensity param), loved (melts, huge smile, hearts ok), pull (grip and yank backward), play_socks (rolling in
+  drawer), blow_whistle (cheeks puffed), throw_behind, sit_table (sits upright on table), hug_squeezed
+```
+Lyman/delivery reuse Jon's rig and code paths — don't fork Jon's whole codebase; factor shared human code (e.g.
+`js/actors/human*.js`) without breaking `createJon`.
+
+### World additions (`js/world/`, owner: world)
+- House: **Lyman's bedroom** upstairs next to Jon's (bed, suitcase spot, door), nav + anchors (`lymanRoom`,
+  `lymanDoor`, `lymanBed`); **under-stair cupboard** enterable with a door prop (`cupboardDoor`, `cupboardInside`);
+  Jon's room **dresser** (`dresser`, `sockDrawer`, `breakDrawer`), **sofa seats** anchors for two humans
+  (`sofaSeatL`, `sofaSeatR`, `sofaFoot`), second dining seat for Lyman (`lymanChair`, `lymanSeat`, `plateSpot2`),
+  `odieBowl` spot, `mouseHoles` (3–4 anchors), `cheeseSpots` (4–6), `carpetEdge` (behind the TV stand), `doorStep`
+  (front door outside for visitors), arena bounds in Jon's room (`arenaCentre`, `arenaBounds`).
+- Props (API style as before, Promises for animated actions): second chair + plate + Odie's bowl (dog biscuits),
+  `soupBowl` (`splash()` → splatter decals around the table), `newTv` (identical CRT) + `tvBox` (`open()`), the old
+  TV can sit on the living-room carpet; `carpet` (`pull()` → slides and the TV on it launches in an arc → lands at a
+  target), `cupboardDoor` (open/close/blocker), `biscuitBox` (`burst()` → dog biscuits spill), `dresser` with
+  `sockDrawer.open()/close()` (Garfield can stand in it: surface collider) and `breakDrawer.break()` revealing a
+  `spitballLauncher` (pickup), `whistle` (pickup on floor), `coffeeMug`, `suitcase`, `cheese` (placeable wedges),
+  `mouseHole` decals, `furPile` (heap of hair) + `shedDecals` (hair coverage on bed/sofa/armchair/table, progressive),
+  `table.warp(t)` (L4: the middle sags down to the floor under the fat cat, then springs back), `window` already
+  exists (Odie must fly out of it in L4), `bedroomDoor` (Garfield opens/closes — also Lyman's door), `fridge` open/close
+  by Garfield. Socks (small cloth props to stick on Odie's ears/tail/mouth).
+
+### Media additions (owner: media)
+Lyman voice (designed, male, dramatic theatrical moocher; clearly different from Jon), delivery man voice (any male
+preset is fine), Odie sounds (yip, bark, pant loop, whimper, happy yap, scared whine — synthesised or generated; must
+sound like a goofy dog, not a beep), mouse squeaks, dog-whistle (silent joke — maybe a faint airy puff), TV thud,
+carpet rip/whoosh, soup splash, spit-ball 'thwip', brawl dust-cloud cartoon sfx, doorbell, hug 'aww', shed 'poof'.
+Music: arena (bouncy comedic battle), ch2 menu/sneak variant optional. Lines come from `js/game/lines.js` (game lane
+adds every Ch2 line there; verbatim brief lines must be exact). Refs first: Odie, Lyman, Lyman disco suit, bald
+Garfield, Lyman's bedroom, delivery man.
+
+### Game additions (owner: game — owns everything js/game, js/levels, js/core, js/ui, css, index.html, main.js)
+`js/levels/c2_*.js` (or `js/levels/ch2/l01..l10.js`), `js/levels/freeplay1.js`, `js/levels/freeplay2.js`,
+`js/game/arena.js`, `js/game/humanAI.js` (generalised from jonAI; Jon + Lyman), `js/game/odieAI.js`, menus per D14,
+save migration, docs/LEVELS2.md (write it FIRST, then send media every Ch2 line), autoplayer coverage for Ch2
+(`play.mjs c2:1-10`, arena, free play smoke tests).

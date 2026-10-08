@@ -4,7 +4,7 @@ import { defineLevel, prop, anchor, scratchTarget, platePos } from './common.js'
 // Scratch a BACK leg of Jon's chair → it breaks, Jon falls back with it → eat while he's on the floor.
 const V = (x = 0, y = 0, z = 0) => new THREE.Vector3(x, y, z);
 
-function legPositions(ctx) {
+export function legPositions(ctx) {
   const chair = prop(ctx, 'chair');
   if (chair?.legPos) return [chair.legPos(V()), chair.legPosR(V())].map((p) => p.setY(0.15));
   const a = anchor(ctx, 'jonChair') || anchor(ctx, 'jonSeat');
@@ -12,7 +12,7 @@ function legPositions(ctx) {
   const back = V(-Math.sin(r), 0, -Math.cos(r)).multiplyScalar(0.19), side = V(Math.cos(r), 0, -Math.sin(r)).multiplyScalar(0.19);
   return [c.clone().add(back).add(side), c.clone().add(back).sub(side)];
 }
-function frontLegs(ctx) {
+export function frontLegs(ctx) {
   const a = anchor(ctx, 'jonChair') || anchor(ctx, 'jonSeat');
   const r = a?.rotY || 0, c = a ? a.pos.clone().setY(0.15) : V(6.2, 0.15, 8.4);
   const fw = V(Math.sin(r), 0, Math.cos(r)).multiplyScalar(0.19), side = V(Math.cos(r), 0, -Math.sin(r)).multiplyScalar(0.19);
@@ -98,7 +98,7 @@ function breakChair(L, leg = 0) {
 }
 
 // Jon topples backwards over the chair's back legs: if the cat is standing in that patch, he leaps aside.
-function dodgeFall(L) {
+export function dodgeFall(L) {
   const { ctx } = L, c = ctx.controller;
   if (c.pos.y > 0.4) return;
   const [a, b] = legPositions(ctx);

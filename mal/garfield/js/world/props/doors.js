@@ -67,9 +67,14 @@ function makeDoor(id, ctx, { w = 0.85, h = 2.05, color = 0xf1e6cf, wood = false,
     }, ease.linear);
     leaf.position.z = 0; knob.rotation.z = 0; hinge.rotation.y = p.state.open ? OPEN : 0;
   };
-  p.reset = () => { p.anim.clear(); p.state.open = startOpen; leaf.position.z = 0; knob.rotation.z = 0; apply(); };
+  p.toggle = () => (p.state.open ? p.close() : p.open());
+  // visual-only story moments (front door): unlock lets open() swing it; reset() re-locks
+  p.setLocked = on => { p.state.locked = !!on; };
+  p.reset = () => { p.anim.clear(); p.state.open = startOpen; p.state.locked = locked; leaf.position.z = 0; knob.rotation.z = 0; apply(); };
   return p;
 }
 
 export const createBedroomDoor = ctx => makeDoor('bedroomDoor', ctx, { color: 0xf4ead6, startOpen: true });
+export const createLymanDoor = ctx => makeDoor('lymanDoor', ctx, { color: 0xeadfc8 });
+export const createCupboardDoor = (ctx, { w = 0.65, h = 1.25 } = {}) => makeDoor('cupboardDoor', ctx, { w, h, color: 0xf3e6cc });
 export const createFrontDoor = ctx => makeDoor('frontDoor', ctx, { w: 0.9, wood: true, locked: true });

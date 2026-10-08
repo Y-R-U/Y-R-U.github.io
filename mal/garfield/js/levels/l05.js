@@ -4,7 +4,7 @@ import { bestShot } from '../game/shots.js';
 
 // Climb to the fridge top → grab the vine → swing over the table → Space over the pan to catch it → eat it up top.
 const V = (x = 0, y = 0, z = 0) => new THREE.Vector3(x, y, z);
-const GRIP = V(0, 0.82, -0.07);   // paws midpoint in Garfield's root space during the 'hang' clip
+export const GRIP = V(0, 0.82, -0.07);   // paws midpoint in Garfield's root space during the 'hang' clip
 const SLOW = 0.8;           // swing slower than real physics, for small hands
 const PASSES = 6;
 const OVER_R = 0.65;       // generous catch radius around the pan
@@ -27,7 +27,7 @@ export function fridgeTopPos(ctx) {
 const panPos = (ctx) => { const p = prop(ctx, 'pan'); return p?.pos?.lengthSq() ? p.pos.clone() : apos(ctx, 'panSpot', apos(ctx, 'plateSpot', V(6.2, 0.76, 7.3))); };
 
 // Shortest chain of standable boxes from the floor to the fridge top (each step ≤ 0.9 up, ≤ 0.55 gap).
-function climbRoute(ctx) {
+export function climbRoute(ctx) {
   const fb = fridgeBox(ctx);
   if (!fb) return null;
   const cs = (ctx.world.colliders || []).filter((c) => c.enabled !== false && !c.noWalk && c.max.y > 0.2 && c.max.y <= fb.max.y + 0.01
@@ -50,7 +50,7 @@ function climbRoute(ctx) {
   return route;
 }
 
-function addBreadBin(L) {
+export function addBreadBin(L) {
   const { ctx } = L;
   const fb = fridgeBox(ctx);
   if (!fb) return;
@@ -128,7 +128,7 @@ export default defineLevel({
   },
 });
 
-function onFridge(L) {
+export function onFridge(L) {
   const c = L.ctx.controller, ft = fridgeTopPos(L.ctx);
   return c.grounded && c.pos.y > ft.y - 0.15 && Math.hypot(c.pos.x - ft.x, c.pos.z - ft.z) < 0.9;
 }

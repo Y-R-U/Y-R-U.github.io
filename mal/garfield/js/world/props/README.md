@@ -36,3 +36,36 @@ Food models live in `js/world/food.js` (plate-local; `FOOD_SCALE` 1.4 in plate.j
 `tools/props.html` (`?view=food|pan|chair|vase|curtains|...`, `?shot=1` hides the UI, `window.__props`).
 Particles (`util.Particles`) are world-space InstancedMeshes; shards/feathers/scraps stay until `reset()`.
 No props add lights (light toggles recompile shaders); glows are emissive.
+
+## Chapter Two props (wave 3, `props/ch2.js`)
+Ch2-only props start **inactive** (hidden, colliders off): `p.setActive(bool)`, `p.state.active`. `world.setChapter(2)` turns on
+chair2, odieBowl, carpet, mouseHoles (plate2 stays level-driven: `props.get('plate2').setActive(true)`); `world.setChapter(1)` turns
+them off again. `world.reset()` returns every prop to its default (the chapter's active set is kept). Hand props (`suitcase`,
+`coffeeMug`, `whistle`, `spitballLauncher`, `tvBox`) can be reparented freely (`root`); `reset()` puts them home.
+
+| id | anchor | API |
+|---|---|---|
+| `lymanDoor` | lymanDoor (landing → Lyman's room, swings into his room) | like bedroomDoor but starts CLOSED: `open() close() toggle() rattle() isOpen` (+ blocker) |
+| `cupboardDoor` | cupboardDoor (under the stairs, swings into the living room) | starts closed: `open() close() toggle() isOpen` (+ blocker) |
+| `bedroomDoor`, `frontDoor`, `fridge` | | + `toggle()`. `frontDoor.setLocked(false)` then `open()/close()` really swing it (reset re-locks; the house `frontDoorBlock` collider stays) |
+| `dresser` | dresser (Jon's room) | always present. `sockDrawer.open()/close()/toggle()/isOpen/standPos()/play(dur)/socks[]` (open = surface collider at y UF+0.63 Garfield stands in; socks show while open). `breakDrawer.scratch(n)` (3 hits breaks) / `break()` → front pops off, reveals `spitballLauncher`. `middleDrawer` same API as sockDrawer |
+| `spitballLauncher` | in the break drawer | inactive until revealed. `fire(from, to)` → Promise (spit-ball arcs, pops) |
+| `socks` | — | `items[7]`, `take(i, parentObj, {pos, rot, scale})` → sock Mesh parented to e.g. Odie's ear/tail/mouth socket (dresser.reset puts them back) |
+| `chair2` | lymanChair (left end of the table, faces +x) | full chair API (`seat`, `fallBack()`, `bounce()`...) |
+| `plate2` | plateSpot2 | full plate API (`setFood`, `eaten`, `fling`...) |
+| `catBowl` | | + `eaten(t)` (heap shrinks) |
+| `odieBowl` | odieBowl | dog biscuits: `eaten(t)`, `bitePos()` |
+| `soupBowl` | soupSpot (= plateSpot) | inactive. `splash()` → Promise (droplets + broth splats on table and floor), `eaten(t)` |
+| `table` | | + `warp(t)` 0..1 (middle sags to the floor; top collider follows), `warpTo(t, dur)` → Promise (back to 0 bounces) |
+| `tv` / `newTv` | tv | same CRT. `newTv` inactive. `world.swapTv()` = old tv → oldTvSpot on the carpet + newTv on. `tv.moveTo({pos, rotY})` |
+| `tvBox` | tvBoxSpot | inactive. `open()` → flaps open |
+| `carpet` | carpet (rug in front of the TV stand; the old TV rides it) | `pull({target, dur, height})` → Promise: rug yanks toward carpetEdge, the TV arcs onto `target` + squash. `edgePos()` |
+| `biscuitBox` | biscuitBox (inside the cupboard) | always present. `burst()` → biscuits spill (heap in front), `eaten(t)`, `heapPos()` |
+| `cheese` | cheeseSpots | `put(i, pos?)` (shows wedge i, default cheeseSpots[i]), `putAll()`, `remove(i)`, `nibble(i, t)`, `placed` |
+| `mouseHoles` | mouseHoles | decals at mouseHole0..3 |
+| `shedDecals` | shedBed/shedSofa/shedArmchair/shedTable | `set(name, t)` / `add(name, dt)` / `get(name)`; names bed/sofa/armchair/table (aliases jonBed, loungeChair, tableTop) |
+| `furPile` | furPileSpot | inactive. `drop(pos?)` → Promise, `puff()` |
+| `coffeeMug` | mugSpot | inactive. `spill(dirWorld)` → Promise |
+| `suitcase` | suitcaseSpot | inactive. `handle` (Object3D at the grip) |
+| `whistle` | whistleSpot | inactive, glints on the floor. `blow()` (faint puff) |
+| `vase` | | `knock({target})`: lands/shatters at a world point (Odie's head) |

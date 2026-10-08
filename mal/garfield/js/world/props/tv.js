@@ -3,8 +3,8 @@ import { THREE, makeProp, addBox, Builder, roundedBox, gloss } from './util.js';
 const CW = 160, CH = 120;
 
 // Old CRT: retro beige plastic case (refs/living_room), bulged glass screen with a live canvas (cartoon / static / off).
-export function createTV(ctx) {
-  const p = makeProp('tv', ctx);
+export function createTV(ctx, id = 'tv') {
+  const p = makeProp(id, ctx);
   const W = 0.58, H = 0.46, D = 0.44;
   const veneer = gloss(0xd8c19a, { roughness: 0.55, clearcoat: 0.25, clearcoatRoughness: 0.5 });
   const plastic = gloss(0x3a332c, { roughness: 0.5, clearcoat: 0.3 });
@@ -80,7 +80,16 @@ export function createTV(ctx) {
   p.setMode = m => { mode = m; p.state.mode = m; };
   p.state.mode = mode;
   addBox(p, 'body', p.root, [-W / 2, 0, -D + 0.02], [W / 2, H + 0.05, 0.06]);
-  p.reset = () => p.setMode('cartoon');
+  const home = { pos: null, rotY: 0, parent: null };
+  p.place = a => { home.pos = a.pos.clone(); home.rotY = a.rotY || 0; p.root.position.copy(home.pos); p.root.rotation.set(0, home.rotY, 0); home.parent = p.root.parent; };
+  // instant move to an anchor-like {pos, rotY} (old TV → carpet in the Ch2 L5 swap)
+  p.moveTo = a => { (home.parent || p.root.parent)?.add(p.root); p.root.position.copy(a.pos); p.root.rotation.set(0, a.rotY ?? p.root.rotation.y, 0); p.root.scale.set(1, 1, 1); };
+  p.reset = () => {
+    p.anim.clear(); p.setMode('cartoon');
+    if (home.parent && p.root.parent !== home.parent) home.parent.add(p.root);
+    if (home.pos) { p.root.position.copy(home.pos); p.root.rotation.set(0, home.rotY, 0); }
+    p.root.scale.set(1, 1, 1);
+  };
   draw(); tex.needsUpdate = true;
   return p;
 }

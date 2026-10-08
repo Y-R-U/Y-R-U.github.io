@@ -14,6 +14,11 @@ CAT = ("a very fat chubby orange tabby cat with bold black tiger stripes on its 
        "small rounded ears, thick striped orange tail, fluffy fur, smug lazy expression, ")
 JON = ("a tall lanky friendly cartoon man in his thirties, brown neat hair, big friendly smile, long neck, "
        "light-blue button-up shirt, brown trousers, brown shoes, slightly goofy cartoon proportions, long thin arms and legs, ")
+ODIE = ("a goofy cartoon dog with pale yellow fur, long floppy black ears, a black nose, a thin black tail, one round black spot on his side, "
+        "long gangly legs, a huge long pink slobbery tongue hanging out of his wide open smiling mouth, big dopey happy eyes, "
+        "lovable and dim-witted, ")
+LYMAN = ("a cartoon man in his thirties with neat black hair and a big bushy black moustache, theatrical and charming, "
+         "wearing a mustard-yellow knit sweater over a collared shirt, dark green trousers, brown shoes, slightly goofy cartoon proportions, ")
 BG = "plain warm cream studio backdrop, character turnaround reference sheet style, full body visible"
 
 REFS = {
@@ -43,6 +48,23 @@ REFS = {
                      "appetising close-up on a wooden kitchen table", 1024, 768),
     "food_meatloaf": (STYLE + "a delicious glazed meatloaf on a plate, a thick sliced slab with shiny tomato glaze, on a wooden table, "
                       "appetising food close-up, warm kitchen light", 1024, 768),
+    # wave 3 (Brief 2)
+    "odie_front": (STYLE + ODIE + "standing on all fours, front view facing the camera, tongue hanging out, " + BG, 1024, 768),
+    "odie_side": (STYLE + ODIE + "standing on all fours, exact side profile view facing left, the black spot clearly visible on his side, tongue flopping out, tail up, " + BG, 1024, 768),
+    "lyman_front": (STYLE + LYMAN + "standing relaxed, front view facing camera, " + BG, 768, 1024),
+    "lyman_3q": (STYLE + LYMAN + "standing, three-quarter view, one arm flung out dramatically, holding a small battered suitcase in the other hand, " + BG, 768, 1024),
+    "lyman_disco": (STYLE + "a cartoon man in his thirties with black hair and a big bushy black moustache, wearing a shiny white 1970s disco suit "
+                    "with wide lapels, flared bell-bottom trousers, open-collar shirt, white platform shoes, striking a proud disco pose with one finger pointing up, "
+                    "slightly goofy cartoon proportions, " + BG, 768, 1024),
+    "garfield_bald": (STYLE + "a very fat chubby cartoon cat with NO fur at all, completely hairless bald smooth pink skin, huge round belly, "
+                      "the same shape as a fat orange tabby cat but all pink and naked, large white eyes with small black pupils, small pink nose, "
+                      "wide muzzle, small rounded ears, thin pink tail, comically embarrassed blushing expression, trying to cover himself with a paw, "
+                      "sitting upright, funny and cute not gross, " + BG, 1024, 768),
+    "delivery_man": (STYLE + "a friendly cartoon delivery man in his forties, brown uniform shirt and shorts, brown cap, holding a big cardboard box "
+                     "with a TV picture printed on it, sturdy build, cheerful, slightly goofy cartoon proportions, " + BG, 768, 1024),
+    "lyman_bedroom": (STYLE + "interior of a small cosy upstairs guest bedroom at evening, a single bed with a plain striped blanket, a battered old suitcase "
+                      "open on the floor with clothes spilling out, a small round dog bed with a chewed toy bone, a bedside table with a lamp, "
+                      "a coat rack, wooden floor, small window, warm lamp light, slightly messy, no people, wide shot", 1024, 768),
     "ui_mood": ("cosy cartoon video game main menu screen design, chunky rounded buttons with thick outlines, "
                 "warm palette of orange, cream and chocolate brown, playful bouncy title lettering area, paw print and lasagna "
                 "icons, soft drop shadows, clean friendly UI for kids, flat-shaded game UI mockup, no text", 1024, 576),

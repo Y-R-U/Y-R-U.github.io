@@ -30,6 +30,8 @@
   <label>Belly <input type="range" id="belly" min="0" max="1" step="0.01" value="0.2"></label>
   <label>Move speed <span id="spv">0</span> m/s <input type="range" id="speed" min="0" max="3.6" step="0.05" value="0"></label>
   <label><input type="checkbox" id="claw"> claws</label>
+  <label><input type="checkbox" id="bald" onchange="__g.setBald(this.checked)"> bald</label>
+  <label>seethe <input type="range" min="0" max="1" step="0.05" value="0" oninput="__g.setSeethe(+this.value)"></label>
   <label><input type="checkbox" id="look"> look at orbiting target</label>
   <label><input type="checkbox" id="spin" checked> turntable spin</label>
   <label><input type="checkbox" id="walkcircle"> walk in a circle (uses speed)</label>
@@ -127,6 +129,8 @@ $('speed').oninput = (e) => { $('spv').textContent = (+e.target.value).toFixed(2
 await load();
 if (Q.get('belly')) { $('belly').value = Q.get('belly'); g.setBelly(+Q.get('belly')); }
 if (Q.get('expr')) g.setExpression(Q.get('expr'));
+if (Q.has('bald')) g.setBald(true);
+if (Q.get('seethe')) g.setSeethe(+Q.get('seethe'));
 if (Q.get('clip')) { curClip = Q.get('clip'); g.play(curClip, { fade: 0 }); }
 if (Q.get('speed')) { $('speed').value = Q.get('speed'); }
 if (Q.get('claw')) { g.claw(true); $('claw').checked = true; }

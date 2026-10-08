@@ -78,41 +78,53 @@ export function createTitle(ui) {
   );
   let token = 0;
 
-  async function show({ chapters = [{ id: 1, title: 'Chapter One', subtitle: 'Food', locked: false }], see3D = false } = {}) {
+  // chapters: [{id, title, subtitle, locked, justUnlocked, fromTitle?, kind?}] — fromTitle: the label shown while locked
+  // (e.g. 'Coming Soon' that unlocks into 'Chapter Two'). soon:false hides the trailing locked 'Coming Soon'.
+  async function show({ chapters = [{ id: 1, title: 'Chapter One', subtitle: 'Food', locked: false }], see3D = false, soon: showSoon = true } = {}) {
     const my = ++token;
     el.classList.toggle('see3d', !!see3D);
     chapRow.innerHTML = '';
+    chapRow.classList.toggle('many', chapters.length + (showSoon ? 1 : 0) > 2);
     const anims = [];
     for (const c of chapters) {
       const sub = h('span.chap-sub');
-      const btn = h('button.big-btn.chap-btn', { 'data-chapter': c.id },
-        h('span.chap-title', {}, c.title || `Chapter ${c.id}`), sub);
+      const ttl = h('span.chap-title', {}, c.title || `Chapter ${c.id}`);
+      const btn = h('button.big-btn.chap-btn', { 'data-chapter': c.id }, ttl, sub);
+      if (c.kind) btn.classList.add('kind-' + c.kind);
       const fullSub = c.subtitle ? ': ' + c.subtitle : '';
-      if (c.locked || c.justUnlocked) { btn.classList.add('is-locked'); btn.append(lockBadge()); }
-      else sub.textContent = fullSub;
-      pressable(btn, () => { ui.emit('sfx', 'click'); ui.emit('chapter', c.id); });
+      if (c.locked || c.justUnlocked) {
+        btn.classList.add('is-locked'); btn.append(lockBadge());
+        if (c.fromTitle) ttl.textContent = c.fromTitle;
+      } else sub.textContent = fullSub;
+      pressable(btn, () => {
+        if (btn.classList.contains('is-locked')) { btn.classList.remove('nope'); void btn.offsetWidth; btn.classList.add('nope'); ui.emit('sfx', 'boing'); return; }
+        ui.emit('sfx', 'click'); ui.emit('chapter', c.id);
+      });
       chapRow.append(btn);
-      if (c.justUnlocked) anims.push({ btn, sub, fullSub });
+      if (c.justUnlocked) anims.push({ btn, sub, ttl, fullSub, title: c.title });
     }
     const soon = h('button.big-btn.chap-btn.soon-btn.is-locked', { 'aria-disabled': 'true' },
       h('span.chap-title', {}, 'Coming Soon'), lockBadge());
     pressable(soon, null);
     soon.addEventListener('click', () => { soon.classList.remove('nope'); void soon.offsetWidth; soon.classList.add('nope'); ui.emit('sfx', 'boing'); });
 
-    if (!anims.length) { chapRow.append(soon); return; }
+    if (!anims.length) { if (showSoon) chapRow.append(soon); return; }
     await sleep(600);
     for (const a of anims) {
       if (my !== token) return;
       await playUnlock(a.btn, ui.emit);
+      if (a.ttl.textContent !== a.title && a.title) await typeIn(a.ttl, a.title, 60);
       a.btn.classList.add('grow');
       await typeIn(a.sub, a.fullSub, 85);
       a.btn.classList.remove('grow');
     }
     await sleep(350);
     if (my !== token) return;
-    soon.classList.add('pop-in');
-    chapRow.append(soon);
-    ui.emit('sfx', 'pop');
+    if (showSoon) {
+      soon.classList.add('pop-in');
+      chapRow.append(soon);
+      ui.emit('sfx', 'pop');
+    }
     ui.emit('menuUnlockDone');
   }
   return { el, show };
@@ -137,18 +149,21 @@ export function createChapter(ui) {
   let token = 0;
   const FOOD = { 1: 'steak', 2: 'steak', 7: 'steak', 3: 'lasagna', 5: 'lasagna', 6: 'lasagna', 10: 'lasagna', 4: 'meatloaf', 8: 'meatloaf', 9: 'meatloaf' };
 
-  async function show({ levels, onPick, title: t, see3D = false } = {}) {
+  // side: {label, lockedLabel?, locked, justUnlocked, onPick} — the button right of the grid (Coming Soon / Free Play).
+  // story: {onPick} adds a small '▶ Story' button (Chapter Two). icon per level: L.icon (an icons.js name) or food.
+  async function show({ levels, onPick, title: t, see3D = false, side: sideDef = null, story = null } = {}) {
     const my = ++token;
     el.classList.toggle('see3d', !!see3D);
-    if (t) title.textContent = t;
+    if (t) { const [a, b] = t.split(': '); title.innerHTML = ''; title.append(a + (b ? ': ' : ''), ...(b ? [h('span', {}, b)] : [])); }
     levels = levels || Array.from({ length: 10 }, (_, i) => ({ n: i + 1, locked: i > 0 }));
     grid.innerHTML = ''; side.innerHTML = '';
     const anims = [];
     for (const L of levels) {
       const food = L.food || FOOD[L.n] || 'steak';
-      const btn = h('button.level-btn', { 'data-level': L.n, 'data-food': food },
+      const icon = L.icon && I[L.icon] ? I[L.icon]() : I.food(food);
+      const btn = h('button.level-btn', { 'data-level': L.n, 'data-food': L.icon || food },
         h('span.level-num', {}, String(L.n)),
-        h('span.level-food', { html: I.food(food) }),
+        h('span.level-food', { html: icon }),
       );
       if (L.done) btn.append(h('span.done-stamp', { html: I.paw('#e8711a') + I.check() }));
       if (L.locked || L.justUnlocked) { btn.classList.add('is-locked'); btn.append(lockBadge()); }
@@ -159,14 +174,35 @@ export function createChapter(ui) {
       });
       btn.style.animationDelay = (L.n * 35) + 'ms';
       grid.append(btn);
-      if (L.justUnlocked) anims.push(btn);
+      if (L.justUnlocked) anims.push({ btn });
     }
-    const soon = h('button.level-btn.soon-btn.is-locked', {}, h('span.soon-text', {}, 'Coming', h('br'), 'Soon'), lockBadge());
-    soon.addEventListener('click', () => { soon.classList.remove('nope'); void soon.offsetWidth; soon.classList.add('nope'); ui.emit('sfx', 'boing'); });
+    const sd = sideDef || { label: 'Coming Soon', locked: true };
+    const label = (txt) => { const [a, ...b] = String(txt).split(' '); return b.length ? [a, h('br'), b.join(' ')] : [a]; };
+    const sideText = h('span.soon-text', {}, ...label(sd.locked || sd.justUnlocked ? (sd.lockedLabel || sd.label) : sd.label));
+    const soon = h('button.level-btn.soon-btn', {}, sideText);
+    if (!sd.locked && !sd.justUnlocked) soon.classList.add('free-btn');
+    if (sd.locked || sd.justUnlocked) { soon.classList.add('is-locked'); soon.append(lockBadge()); }
+    soon.addEventListener('click', () => {
+      if (soon.classList.contains('is-locked')) { soon.classList.remove('nope'); void soon.offsetWidth; soon.classList.add('nope'); ui.emit('sfx', 'boing'); return; }
+      ui.emit('sfx', 'click'); sd.onPick?.();
+    });
     side.append(soon);
+    if (story) {
+      const sb = h('button.round-btn.story-btn', { 'aria-label': 'Replay the story', html: I.play() + '<span>Story</span>' });
+      pressable(sb, () => { ui.emit('sfx', 'click'); story.onPick?.(); });
+      side.append(sb);
+    }
+    if (sd.justUnlocked) anims.push({ btn: soon, side: true });
     if (!anims.length) return;
     await sleep(650);
-    for (const b of anims) { if (my !== token) return; await playUnlock(b, ui.emit); }
+    for (const a of anims) {
+      if (my !== token) return;
+      await playUnlock(a.btn, ui.emit);
+      if (a.side) {
+        a.btn.classList.add('free-btn');
+        if ((sd.lockedLabel || sd.label) !== sd.label) { sideText.innerHTML = ''; sideText.append(...label(sd.label)); }
+      }
+    }
   }
   return { el, show };
 }

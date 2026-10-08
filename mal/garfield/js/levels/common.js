@@ -121,7 +121,7 @@ function makeRuntime(ctx, spec) {
     },
     markerHeight: 0.35,
   };
-  ctx.interact.register(foodItem);
+  if (!spec.noFood) ctx.interact.register(foodItem);
   let lastLabel = null;
 
   L.eat = async () => {
@@ -150,6 +150,15 @@ function makeRuntime(ctx, spec) {
     if (!food?.eaten) ctx.world.eatFood?.();
     ctx.audio?.sfx?.('gulp');
     try { g.setExpression?.('happy'); } catch {}
+    if (spec.onAte) {
+      // free play: eating is a treat, not a win
+      ctx.events.emit('ate');
+      barks.say('g_win', { force: true });
+      L.eating = false;
+      c.lock(false);
+      spec.onAte(L);
+      return;
+    }
     L.objDone.forEach((d, i) => { if (!d) L.obj(i, true); });
     L.won = true;
     marker.set(null);

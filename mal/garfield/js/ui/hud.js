@@ -26,11 +26,16 @@ export function createHud(ui) {
   const tutIco = h('div.tut-ico');
   const tut = h('div.tut-card', {}, tutIco, h('div.tut-body', {}, tutText, tutKeys));
 
+  const fpTag = h('div.fp-tag.obj-box', {}, 'Free Play');
+  const scoreG = h('b.gar', {}, '0'), scoreO = h('b.odie', {}, '0'), scoreTo = h('span.to', {}, 'first to 20');
+  const nameG = h('span'), nameO = h('span', {}, 'Odie');
+  const scoreBox = h('div.arena-score', {}, nameG, scoreG, h('span', {}, '–'), scoreO, nameO, scoreTo);
+  const holdRing = h('div.hold-ring');
   const touch = createTouch(ui);
   const el = h('section.ui-screen.scr-hud', {},
     touch.el,
-    h('div.hud-tl', {}, bellyBox, objBox),
-    chaseBox, pauseBtn, prompt, hintBar, tut,
+    h('div.hud-tl', {}, bellyBox, objBox, fpTag),
+    chaseBox, pauseBtn, prompt, hintBar, tut, scoreBox, holdRing,
   );
 
   const state = { objectives: [], belly: 0.25, interactLabel: null, interactHint: false, chaseTimer: null, hints: true };
@@ -77,6 +82,25 @@ export function createHud(ui) {
       }
     }
     if ('hints' in p) hintBar.classList.toggle('show', !!state.hints);
+    if ('freePlay' in p) { fpTag.style.display = state.freePlay ? '' : 'none'; if (state.freePlay) fpTag.textContent = state.freePlay; }
+    // arenaScore: {g, o, to} | null
+    if ('arenaScore' in p) {
+      const a = state.arenaScore;
+      scoreBox.style.display = a ? '' : 'none';
+      if (a) {
+        nameG.textContent = ui.names.get('garfield');
+        for (const [el, v] of [[scoreG, a.g], [scoreO, a.o]]) {
+          if (el.textContent !== String(v)) { el.textContent = String(v); el.classList.remove('pop'); void el.offsetWidth; el.classList.add('pop'); }
+        }
+        scoreTo.textContent = 'first to ' + (a.to || 20);
+      }
+    }
+    // hold: {p: 0..1, label} | null — the "hold to glare" ring
+    if ('hold' in p) {
+      const hd = state.hold;
+      holdRing.style.display = hd ? '' : 'none';
+      if (hd) { holdRing.style.setProperty('--p', Math.max(0, Math.min(1, hd.p || 0)).toFixed(3)); holdRing.dataset.label = hd.label || 'Hold!'; }
+    }
   }
 
   let tutId = null, tutTimer = 0;
@@ -104,6 +128,6 @@ export function createHud(ui) {
     get current() { return tutId; },
   };
 
-  set({ objectives: [], belly: 0.25, interactLabel: null, chaseTimer: null, hints: true });
+  set({ objectives: [], belly: 0.25, interactLabel: null, chaseTimer: null, hints: true, freePlay: null, arenaScore: null, hold: null });
   return { el, set, state, tutorial, touch };
 }

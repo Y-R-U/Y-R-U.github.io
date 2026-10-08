@@ -23,6 +23,10 @@ TRACKS = {
                  "cosy suburban evening at home, calm and charming, 90 bpm, instrumental, animated movie", 70),
     "victory": ("short triumphant cartoon victory jingle, bright brass fanfare, snare roll, cymbal crash, happy jazzy ending "
                 "flourish, instrumental", 15),
+    "arena": ("bouncy comedic cartoon battle music, playful boxing-match energy, punchy tuba and brass stabs, bongos and snare, "
+              "xylophone and slide whistle accents, silly wrestling showdown, upbeat swing, 140 bpm, major key, instrumental, animated movie", 90),
+    "sneak2": ("sneaky mischievous cartoon music with a goofy dog twist, plucky pizzicato strings, bouncy bassoon and tuba, "
+               "light marimba, woodblock, walking bass, tiptoe heist, playful and silly, 104 bpm, instrumental, animated movie", 90),
     "fanfare": ("big celebratory cartoon finale fanfare, jazzy brass band and full orchestra, drum roll, cymbals, joyful "
                 "triumphant chapter complete, instrumental", 20),
 }

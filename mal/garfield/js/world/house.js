@@ -5,13 +5,16 @@ import { Builder, frameAt } from './houseBuild.js';
 export const W = 9.2, D = 11, T = 0.2, CEIL1 = 2.7, UF = 3.0, CEIL2 = 5.6;
 const STEPS = 14, RISE = UF / STEPS, RUN = 0.27, ST_X0 = 8.1, ST_X1 = W, ST_Z0 = 0.9, ST_Z1 = ST_Z0 + STEPS * RUN;
 export const STAIRS = { x0: ST_X0, x1: ST_X1, z0: ST_Z0, z1: ST_Z1, steps: STEPS, rise: RISE, run: RUN };
+// Lyman's door (landing → his room) and the under-stair cupboard (steps CUP_S0..CUP_S1 are hollow underneath)
+const LY_DOOR = [7.75, 8.6];
+export const CUPBOARD = { x0: ST_X0 + 0.04, x1: ST_X1, s0: 5, s1: 13, door: [2.55, 3.2], doorH: 1.25, slab: 0.22 };
 
 export const ROOMS = [
   { id: 'living', x0: 0, x1: W, z0: 0, z1: 5.4, y0: 0, y1: CEIL1 },
   { id: 'kitchen', x0: 0, x1: W, z0: 5.6, z1: D, y0: 0, y1: CEIL1 },
   { id: 'bedroom', x0: 0, x1: 6.3, z0: 0, z1: 6.9, y0: UF, y1: CEIL2 },
   { id: 'landing', x0: 6.5, x1: W, z0: 0, z1: 6.9, y0: UF, y1: CEIL2 },
-  { id: 'bath', x0: 0, x1: W, z0: 7.1, z1: D, y0: UF, y1: CEIL2 },
+  { id: 'lyman', x0: 0, x1: W, z0: 7.1, z1: D, y0: UF, y1: CEIL2 },
 ];
 
 function roomAt(p) {
@@ -63,12 +66,14 @@ export function buildHouse({ quality = 'high' } = {}) {
     landing: { lower: 'wainscot', upper: 'paint', rail: 0.95, color: 0xf3dcb4 },
     // upper half of the stairwell wall: the living-room wallpaper carries on up, no skirting/rail bands
     stairwell: { upper: 'wallpaperLiving', color: 0xffffff, noSkirt: true },
-    bath: { upper: 'paint', color: 0xe8efe8 },
+    lyman: { lower: 'wainscot', upper: 'bedroomWall', rail: 0.95, color: 0xc4d8e6 },
   };
 
   // axis 'x': wall runs along x, plane at z in [c0,c1]. axis 'z': runs along z, plane at x in [c0,c1].
   function wall(w) {
-    const { axis, a0, a1, c0, c1, y0, y1, holes = [] } = w;
+    const { axis, a0, a1, c0, c1, y0, y1, holes = [], idPrefix } = w;
+    let wk = 0;
+    const wid = () => idPrefix ? idPrefix + wk++ : null;
     const P = (u, v, c) => axis === 'x' ? V(u, v, c) : V(c, v, u);
     for (const [side, c, sgn] of [['neg', c0, -1], ['pos', c1, 1]]) {
       const s0 = w[side];
@@ -152,8 +157,8 @@ export function buildHouse({ quality = 'high' } = {}) {
       for (const h of cover) { if (h.y0 > y) segs.push([y, h.y0]); y = Math.max(y, h.y1); }
       if (y < y1) segs.push([y, y1]);
       for (const [s0, s1] of segs) {
-        if (axis === 'x') col(null, p, s0, c0, q, s1, c1, 'solid', { wall: true });
-        else col(null, c0, s0, p, c1, s1, q, 'solid', { wall: true });
+        if (axis === 'x') col(wid(), p, s0, c0, q, s1, c1, 'solid', { wall: true });
+        else col(wid(), c0, s0, p, c1, s1, q, 'solid', { wall: true });
       }
       for (const h of cover) if (h.block) {
         const blk = axis === 'x' ? col(h.block, p, h.y0, c0, q, h.y1, c1) : col(h.block, c0, h.y0, p, c1, h.y1, q);
@@ -185,11 +190,12 @@ export function buildHouse({ quality = 'high' } = {}) {
   wall({ axis: 'x', a0: 0, a1: W, c0: 5.4, c1: 5.6, y0: 0, y1: CEIL1, holes: [{ a0: 1.5, a1: 4.5, y0: 0, y1: 2.3, kind: 'arch' }, { a0: 6.4, a1: 7.4, y0: 0, y1: 2.1, kind: 'door' }], neg: 'living', pos: 'kitchen' });
   // upper floor
   wall({ axis: 'x', a0: -T, a1: W + T, c0: -T, c1: 0, y0: UF, y1: CEIL2 + T, floorY: UF, holes: [{ a0: 2.4, a1: 3.6, y0: UF + 0.9, y1: UF + 2.0, block: 'w' + cid++ }, { a0: 6.9, a1: 7.8, y0: UF + 0.9, y1: UF + 2.0, block: 'w' + cid++ }], neg: 'ext', pos: [{ s: 'bedroom', a0: -T, a1: 6.4 }, { s: 'landing', a0: 6.4, a1: W + T }], innerSide: 'pos' });
-  wall({ axis: 'x', a0: -T, a1: W + T, c0: D, c1: D + T, y0: UF, y1: CEIL2 + T, floorY: UF, holes: [{ a0: 3.0, a1: 3.8, y0: UF + 1.1, y1: UF + 2.0, block: 'w' + cid++ }], neg: null, pos: 'ext', innerSide: 'neg' });
-  wall({ axis: 'z', a0: 0, a1: D, c0: -T, c1: 0, y0: UF, y1: CEIL2 + T, floorY: UF, holes: [{ a0: 3.9, a1: 4.9, y0: UF + 0.9, y1: UF + 2.0, block: 'w' + cid++ }], neg: 'ext', pos: 'bedroom', innerSide: 'pos' });
-  wall({ axis: 'z', a0: 0, a1: D, c0: W, c1: W + T, y0: UF, y1: CEIL2 + T, floorY: UF, holes: [], neg: [{ s: 'landing', a0: 0, a1: ST_Z0 }, { s: 'stairwell', a0: ST_Z0, a1: ST_Z1 }, { s: 'landing', a0: ST_Z1, a1: D }], pos: 'ext' });
+  wall({ axis: 'x', a0: -T, a1: W + T, c0: D, c1: D + T, y0: UF, y1: CEIL2 + T, floorY: UF, holes: [{ a0: 3.0, a1: 3.8, y0: UF + 1.1, y1: UF + 2.0, block: 'w' + cid++ }], neg: 'lyman', pos: 'ext', innerSide: 'neg' });
+  wall({ axis: 'z', a0: 0, a1: D, c0: -T, c1: 0, y0: UF, y1: CEIL2 + T, floorY: UF, holes: [{ a0: 3.9, a1: 4.9, y0: UF + 0.9, y1: UF + 2.0, block: 'w' + cid++ }], neg: 'ext', pos: [{ s: 'bedroom', a0: 0, a1: 6.9 }, { s: 'lyman', a0: 6.9, a1: D }], innerSide: 'pos' });
+  wall({ axis: 'z', a0: 0, a1: D, c0: W, c1: W + T, y0: UF, y1: CEIL2 + T, floorY: UF, holes: [], neg: [{ s: 'landing', a0: 0, a1: ST_Z0 }, { s: 'stairwell', a0: ST_Z0, a1: ST_Z1 }, { s: 'landing', a0: ST_Z1, a1: 6.9 }, { s: 'lyman', a0: 6.9, a1: D }], pos: 'ext' });
   wall({ axis: 'z', a0: 0, a1: 6.9, c0: 6.3, c1: 6.5, y0: UF, y1: CEIL2, floorY: UF, holes: [{ a0: 5.25, a1: 6.15, y0: UF, y1: UF + 2.05, kind: 'door' }], neg: 'bedroom', pos: 'landing' });
-  wall({ axis: 'x', a0: 0, a1: W, c0: 6.9, c1: 7.1, y0: UF, y1: CEIL2, floorY: UF, holes: [], neg: [{ s: 'bedroom', a0: 0, a1: 6.4 }, { s: 'landing', a0: 6.4, a1: W }], pos: null });
+  wall({ axis: 'x', a0: 0, a1: W, c0: 6.9, c1: 7.1, y0: UF, y1: CEIL2, floorY: UF, holes: [{ a0: LY_DOOR[0], a1: LY_DOOR[1], y0: UF, y1: UF + 2.05, kind: 'door' }], neg: [{ s: 'bedroom', a0: 0, a1: 6.4 }, { s: 'landing', a0: 6.4, a1: W }], pos: 'lyman', idPrefix: 'lymanWall' });
+  cid++;
   // ---------- floors, ceilings, slab ----------
   const up = V(0, 1, 0), down = V(0, -1, 0);
   const XZ = (y) => (u, v) => V(u, y, v);
@@ -225,8 +231,15 @@ export function buildHouse({ quality = 'high' } = {}) {
     b.box('fabric', ST_X0 + 0.25, y, z0 - 0.03, ST_X1 - 0.25, y + 0.008, z1 - 0.02, 0x9a3a32, { cast: false });
     b.box('fabric', ST_X0 + 0.25, (i - 1) * RISE + 0.02, z0 - 0.002, ST_X1 - 0.25, y - 0.04, z0 + 0.006, 0x9a3a32, { cast: false });
     b.box('paint', ST_X0 + 0.01, (i - 1) * RISE, z0, ST_X1, y - 0.04, z0 + 0.02, C.trim, { cast: false });
-    b.box('paint', ST_X0, 0, z0, ST_X0 + 0.01, y - 0.04, z1, C.trim, { cast: false });
-    col(`stair${i}`, ST_X0, 0, z0, ST_X1, y, i === STEPS ? ST_Z1 + 0.02 : z1, 'solid', { stairs: true });
+    const hollow = i >= CUPBOARD.s0 && i <= CUPBOARD.s1, under = y - CUPBOARD.slab;
+    if (hollow) {
+      // cupboard side wall with the door hole cut out; stepped ceiling inside
+      const [d0, d1] = CUPBOARD.door, dh = CUPBOARD.doorH;
+      for (const [a, c] of [[z0, Math.min(z1, d0)], [Math.max(z0, d1), z1]]) if (c > a) b.box('paint', ST_X0, 0, a, ST_X0 + 0.01, y - 0.04, c, C.trim, { cast: false });
+      if (z1 > d0 && z0 < d1) b.box('paint', ST_X0, dh, Math.max(z0, d0), ST_X0 + 0.01, y - 0.04, Math.min(z1, d1), C.trim, { cast: false });
+      b.box('paint', ST_X0 + 0.01, under, z0, ST_X1, under + 0.02, z1, 0xe8dcc4, { cast: false });
+    } else b.box('paint', ST_X0, 0, z0, ST_X0 + 0.01, y - 0.04, z1, C.trim, { cast: false });
+    col(`stair${i}`, ST_X0, hollow ? under : 0, z0, ST_X1, y, i === STEPS ? ST_Z1 + 0.02 : z1, 'solid', { stairs: true });
   }
   // stringer + banister
   const railH = 0.9;
@@ -242,15 +255,33 @@ export function buildHouse({ quality = 'high' } = {}) {
     b.sphere('woodGloss', null, ST_X0 + 0.06, railH + 0.36, ST_Z0, 0.06, C.darkWood);
     col('newel', ST_X0, 0, ST_Z0 - 0.06, ST_X0 + 0.12, railH + 0.3, ST_Z0 + 0.06);
   }
-  // under-stair cupboard door
+  // under-stair cupboard (door is the cupboardDoor prop): casing, end walls, shelf + clutter
   {
-    const z0 = 2.55, z1 = 3.2, h = 1.25, x = ST_X0 - 0.012;
-    b.box('paint', x - 0.01, 0.02, z0, x, h, z1, C.door, { r: 0.008, cast: false });
-    b.box('paint', x - 0.016, 0.12, z0 + 0.08, x - 0.01, h - 0.12, z1 - 0.08, 0xf7eedb, { r: 0.006, cast: false });
-    b.sphere('metal', null, x - 0.03, 0.7, z1 - 0.1, 0.025, C.brass);
+    const { door: [z0, z1], doorH: h, s0, s1 } = CUPBOARD, x = ST_X0 - 0.012;
     b.box('paint', x - 0.03, 0, z0 - 0.06, x, h + 0.06, z0, C.trim, { cast: false });
     b.box('paint', x - 0.03, 0, z1, x, h + 0.06, z1 + 0.06, C.trim, { cast: false });
     b.box('paint', x - 0.03, h, z0 - 0.06, x, h + 0.06, z1 + 0.06, C.trim, { cast: false });
+    const zA = ST_Z0 + (s0 - 1) * RUN, zB = ST_Z0 + s1 * RUN;
+    b.box('paint', ST_X0 + 0.01, 0, zA - 0.01, ST_X1, (s0 - 1) * RISE, zA, 0xe8dcc4, { cast: false });
+    b.box('paint', ST_X0 + 0.01, 0, zB, ST_X1, s1 * RISE, zB + 0.01, 0xe8dcc4, { cast: false });
+    b.box('fabric', ST_X0 + 0.1, 0, zA + 0.1, ST_X1 - 0.1, 0.008, zB - 0.15, 0x7a6a58, { r: 0.004, cast: false });
+    // high shelf along the back wall + mop, bucket, boxes
+    b.box('woodGloss', ST_X1 - 0.3, 0.95, zB - 1.3, ST_X1, 0.98, zB - 0.05, C.midWood, { r: 0.006 });
+    b.box('paint', ST_X1 - 0.28, 0.98, zB - 0.6, ST_X1 - 0.04, 1.2, zB - 0.12, 0xc9a271, { r: 0.01 });
+    b.cyl('paint', null, ST_X1 - 0.2, 0.15, zB - 0.25, 0.13, 0.11, 0.3, 0x4f88b8, { radial: 14 });
+    b.cyl('wood', null, ST_X1 - 0.12, 0.8, zB - 0.5, 0.012, 0.012, 1.5, C.lightWood, { radial: 6, rot: [0.15, 0, -0.12] });
+    b.box('paint', ST_X1 - 0.5, 0, zB - 0.42, ST_X1 - 0.1, 0.32, zB - 0.02, 0xb98a5a, { r: 0.01 });
+    col('cupBox', ST_X1 - 0.5, 0, zB - 0.42, ST_X1 - 0.08, 0.32, zB);
+    // side wall colliders (the door hole stays open; cupboardDoor's blocker closes it)
+    for (let i = s0, k = 0; i <= s1; i++) {
+      const a = ST_Z0 + (i - 1) * RUN, c = a + RUN, top = i * RISE - CUPBOARD.slab + 0.01;
+      for (const [p0, p1] of [[a, Math.min(c, z0)], [Math.max(a, z1), c]]) if (p1 > p0) col('cupWall' + k++, ST_X0 - 0.02, 0, p0, ST_X0 + 0.04, top, p1, 'solid', { wall: true });
+      if (c > z0 && a < z1) col('cupWall' + k++, ST_X0 - 0.02, h, Math.max(a, z0), ST_X0 + 0.04, top, Math.min(c, z1), 'solid', { wall: true });
+    }
+    anchor('cupboardDoor', ST_X0 - 0.01, 0, (z0 + z1) / 2, -Math.PI / 2, { w: z1 - z0, h });
+    anchor('cupboardFront', ST_X0 - 0.55, 0, (z0 + z1) / 2, Math.PI / 2);
+    anchor('cupboardInside', (ST_X0 + ST_X1) / 2 + 0.05, 0, (z0 + z1) / 2 + 0.25, 0);
+    anchor('biscuitBox', (ST_X0 + ST_X1) / 2 + 0.15, 0, zA + 0.55, 0);
   }
   // upstairs railing around the stairwell
   b.layer = 'upperShell';
@@ -700,16 +731,12 @@ export function buildHouse({ quality = 'high' } = {}) {
     // a box on top
     b.box('paint', x0 + 0.2, UF + h + 0.06, z0 + 0.1, x0 + 0.65, UF + h + 0.3, z1 - 0.05, 0xc9a271, { r: 0.01 });
   }
-  // chest of drawers with mirror
+  // Jon's dresser (the 'dresser' prop draws the chest + drawers; collider + mirror + knick-knacks stay here)
   {
     const x0 = 3.5, x1 = 4.7, z0 = 6.4, z1 = 6.9, h = 0.85;
-    b.box('paint', x0, UF, z0, x1, UF + h, z1, 0xf0e2c4, { r: 0.02 });
-    b.box('woodGloss', x0 - 0.02, UF + h, z0 - 0.03, x1 + 0.02, UF + h + 0.04, z1, C.midWood, { r: 0.012 });
-    for (let i = 0; i < 3; i++) {
-      const y = UF + 0.1 + i * 0.25;
-      b.box('gloss', x0 + 0.04, y, z0 - 0.015, x1 - 0.04, y + 0.21, z0, 0xf6ead0, { r: 0.01 });
-      for (const dx of [0.3, 0.9]) b.sphere('metal', null, x0 + dx, y + 0.105, z0 - 0.025, 0.018, C.brass);
-    }
+    anchor('dresser', (x0 + x1) / 2, UF, z0, Math.PI, { w: x1 - x0, d: z1 - z0, h });
+    anchor('sockDrawer', (x0 + x1) / 2, UF + 0.62, z0 - 0.2, Math.PI);
+    anchor('breakDrawer', (x0 + x1) / 2, UF + 0.12, z0 - 0.3, Math.PI);
     b.box('woodGloss', 3.75, UF + h + 0.04, z1 - 0.04, 4.45, UF + h + 0.86, z1, C.darkWood, { r: 0.02 });
     b.box('metal', 3.8, UF + h + 0.09, z1 - 0.045, 4.4, UF + h + 0.81, z1 - 0.04, 0xdde6ea);
     col('drawers', x0 - 0.02, UF, z0 - 0.03, x1 + 0.02, UF + h + 0.04, z1);
@@ -770,19 +797,132 @@ export function buildHouse({ quality = 'high' } = {}) {
     b.box('wood', 6.6, UF, 6.4, 7.4, UF + 0.75, 6.88, C.midWood, { r: 0.02 });
     col(null, 6.6, UF, 6.4, 7.4, UF + 0.75, 6.88);
     plantPot(7.0, UF + 0.75, 6.65, 0.3);
-    const x0 = 7.75, x1 = 8.6;
-    b.box('paint', x0, UF, 6.9 - 0.04, x1, UF + 2.05, 6.9, C.door, { r: 0.01 });
-    b.box('paint', x0 + 0.08, UF + 1.1, 6.9 - 0.05, x1 - 0.08, UF + 1.95, 6.9 - 0.04, 0xf7eedb, { r: 0.008 });
-    b.box('paint', x0 + 0.08, UF + 0.1, 6.9 - 0.05, x1 - 0.08, UF + 0.95, 6.9 - 0.04, 0xf7eedb, { r: 0.008 });
-    b.sphere('metal', null, x1 - 0.1, UF + 1.0, 6.9 - 0.07, 0.03, C.brass);
-    b.box('paint', x0 - 0.08, UF, 6.9 - 0.06, x0, UF + 2.13, 6.9, C.trim);
-    b.box('paint', x1, UF, 6.9 - 0.06, x1 + 0.08, UF + 2.13, 6.9, C.trim);
-    b.box('paint', x0 - 0.08, UF + 2.05, 6.9 - 0.06, x1 + 0.08, UF + 2.13, 6.9, C.trim);
     // landing ceiling light
     b.lathe('glowShade', null, 7.8, CEIL2 - 0.1, 3.0, [[0.0, 0], [0.14, 0.02], [0.2, 0.08], [0.2, 0.1]], 0xfff1d6, { radial: 20, cast: false });
     lamps.push({ pos: V(7.8, CEIL2 - 0.4, 3.0), color: 0xffb870, intensity: 5, distance: 8, prio: 0, room: 'landing' });
     halos.push([7.8, CEIL2 - 0.12, 3.0, 0.7]);
   }
+
+  // ---------- upstairs: Lyman's room (x 0..W, z 7.1..D; door from the landing) ----------
+  b.layer = 'upper';
+  {
+    const dz = 7.1, dc = (LY_DOOR[0] + LY_DOOR[1]) / 2;
+    anchor('lymanDoor', dc, UF, dz - 0.1, 0, { w: LY_DOOR[1] - LY_DOOR[0], h: 2.05 });
+    anchor('lymanDoorOut', dc, UF, 6.3, Math.PI);
+    anchor('lymanInside', dc - 0.3, UF, 8.1, Math.PI);
+    anchor('lymanRoom', 4.6, UF, 9.0, 0);
+    anchor('lymanBed', 1.0, UF, 9.3, Math.PI / 2, { w: 1.0, l: 2.0, top: UF + 0.55 });
+    anchor('suitcaseSpot', 2.55, UF, 8.15, -Math.PI / 2);
+    anchor('odieBed', 4.9, UF, 10.35, Math.PI);
+    anchor('cam_lymanRoom', 7.6, UF + 1.9, 7.6, 0, {});
+    anchors.get('cam_lymanRoom').look = V(2.2, UF + 0.4, 10.0);
+    anchors.get('cam_lymanRoom').fov = 60;
+    // single bed, headboard on the left wall
+    const bx0 = 0.02, bx1 = 2.02, bz0 = 8.8, bz1 = 9.8;
+    b.box('woodGloss', bx0, UF + 0.12, bz0, bx1, UF + 0.32, bz1, C.darkWood, { r: 0.03 });
+    for (const [x, z] of [[bx0 + 0.06, bz0 + 0.06], [bx1 - 0.06, bz0 + 0.06], [bx0 + 0.06, bz1 - 0.06], [bx1 - 0.06, bz1 - 0.06]]) b.box('woodGloss', x - 0.04, UF, z - 0.04, x + 0.04, UF + 0.14, z + 0.04, C.darkWood, { r: 0.01 });
+    b.box('woodGloss', bx0, UF, bz0 - 0.03, bx0 + 0.07, UF + 1.0, bz1 + 0.03, C.darkWood, { r: 0.025 });
+    b.box('woodGloss', bx1 - 0.05, UF, bz0 - 0.03, bx1 + 0.02, UF + 0.6, bz1 + 0.03, C.darkWood, { r: 0.02 });
+    b.box('fabric', bx0 + 0.08, UF + 0.32, bz0 + 0.03, bx1 - 0.06, UF + 0.48, bz1 - 0.03, 0xf3eee2, { r: 0.05 });
+    // rumpled brown/mustard blanket + flat pillow (a moocher's bed)
+    b.lbox('fabric', null, 1.2, UF + 0.51, 9.3, 1.45, 0.07, 1.06, 0x8a5a3a, { r: 0.035, rot: [0, 0.04, 0.02] });
+    b.lbox('fabric', null, 0.95, UF + 0.555, 9.28, 0.5, 0.05, 0.98, 0xd9a440, { r: 0.025, rot: [0, -0.06, 0] });
+    b.lbox('fabric', null, 0.3, UF + 0.55, 9.3, 0.34, 0.11, 0.62, 0xfaf6ee, { r: 0.05, rot: [0, 0, -0.25] });
+    col('lymanBed', bx0, UF, bz0, bx1, UF + 0.55, bz1);
+    col('lymanHeadboard', bx0, UF, bz0, bx0 + 0.07, UF + 1.0, bz1);
+    // nightstand + lamp
+    b.box('wood', 0.02, UF, 10.0, 0.48, UF + 0.52, 10.46, C.midWood, { r: 0.02 });
+    b.box('woodGloss', 0.02, UF + 0.52, 9.98, 0.5, UF + 0.56, 10.48, C.darkWood, { r: 0.012 });
+    b.sphere('metal', null, 0.5, UF + 0.37, 10.23, 0.016, C.brass);
+    col('lymanNightstand', 0.02, UF, 9.98, 0.5, UF + 0.56, 10.48);
+    b.lathe('ceramic', null, 0.25, UF + 0.56, 10.23, [[0, 0], [0.07, 0], [0.09, 0.1], [0.05, 0.2], [0.02, 0.24], [0, 0.24]], 0x5d9a8c, { radial: 16 });
+    b.lathe('glowShade', null, 0.25, UF + 0.78, 10.23, [[0.14, 0], [0.09, 0.17]], 0xfff1d6, { radial: 20, cast: false });
+    lamps.push({ pos: V(0.6, UF + 1.0, 9.6), color: 0xffa850, intensity: 5, distance: 8, prio: 2, room: 'lyman' });
+    halos.push([0.25, UF + 0.86, 10.23, 0.6]);
+    // old wardrobe on the back wall + stacked moving boxes by the door + a chair with a jacket
+    {
+      const x0 = 5.5, x1 = 6.7, z0 = 10.45, z1 = D;
+      b.box('wood', x0, UF, z0, x1, UF + 1.9, z1, 0x9a6a42, { r: 0.02 });
+      b.box('woodGloss', x0 - 0.03, UF + 1.9, z0 - 0.03, x1 + 0.03, UF + 1.96, z1, C.darkWood, { r: 0.015 });
+      for (const [a, c] of [[x0 + 0.04, (x0 + x1) / 2 - 0.01], [(x0 + x1) / 2 + 0.01, x1 - 0.04]]) b.box('wood', a, UF + 0.1, z0 - 0.015, c, UF + 1.84, z0, 0xb07a4c, { r: 0.01 });
+      b.sphere('metal', null, (x0 + x1) / 2 - 0.06, UF + 1.0, z0 - 0.03, 0.02, C.brass);
+      b.sphere('metal', null, (x0 + x1) / 2 + 0.06, UF + 1.0, z0 - 0.03, 0.02, C.brass);
+      col('lymanWardrobe', x0, UF, z0, x1, UF + 1.96, z1);
+    }
+    for (const [x0, z0, w, d, h, c] of [[8.45, 10.3, 0.62, 0.55, 0.42, 0xc9a271], [8.5, 10.35, 0.5, 0.44, 0.34, 0xb98a5a], [8.6, 9.6, 0.5, 0.5, 0.4, 0xd2b07e]]) {
+      const y0 = c === 0xb98a5a ? UF + 0.42 : UF;
+      b.box('paint', x0, y0, z0, x0 + w, y0 + h, z0 + d, c, { r: 0.012 });
+      b.box('paint', x0 + w * 0.47, y0 + h, z0 - 0.002, x0 + w * 0.53, y0 + h + 0.003, z0 + d + 0.002, 0xe8d8a8, { cast: false });
+    }
+    col('lymanBoxes', 8.45, UF, 9.6, W, UF + 0.76, 10.85);
+    {
+      const f = frameAt(3.9, UF, 10.55, Math.PI + 0.3);
+      b.lbox('woodGloss', f, 0, 0.45, 0, 0.44, 0.04, 0.42, C.midWood, { r: 0.015 });
+      for (const [x, z] of [[-0.19, -0.18], [0.19, -0.18], [-0.19, 0.18], [0.19, 0.18]]) b.lbox('wood', f, x, 0.22, z, 0.035, 0.44, 0.035, C.midWood);
+      b.lbox('woodGloss', f, 0, 0.75, -0.19, 0.42, 0.3, 0.035, C.midWood, { r: 0.015 });
+      b.lbox('fabric', f, 0, 0.62, -0.15, 0.46, 0.5, 0.1, 0x6b7f4a, { r: 0.04, rot: [0.2, 0, 0.05] });
+      col('lymanChairUp', 3.65, UF, 10.3, 4.15, UF + 0.47, 10.8);
+    }
+    // rug + round dog cushion for Odie
+    {
+      const g = new THREE.PlaneGeometry(2.2, 1.5);
+      g.rotateX(-Math.PI / 2);
+      b.geom('rugBed', g, new THREE.Matrix4().makeTranslation(4.2, UF + 0.004, 9.0), 0xffffff, { uv: 'keep', cast: false });
+      b.lathe('fabric', null, 4.9, UF, 10.35, [[0, 0.05], [0.3, 0.04], [0.36, 0.09], [0.36, 0.15], [0.3, 0.17], [0.26, 0.1], [0, 0.08]], 0x5d8fb0, { radial: 22 });
+    }
+    // simple curtains at the back window
+    for (const x of [2.85, 3.95]) b.lbox('fabric', null, x, UF + 1.5, D - 0.07, 0.3, 1.15, 0.04, 0xd9a440, { r: 0.015, cast: false });
+    b.cyl('metal', null, 3.4, UF + 2.1, D - 0.06, 0.012, 0.012, 1.6, C.brass, { rot: [0, 0, Math.PI / 2], radial: 8 });
+    // ceiling light
+    b.lathe('glowShade', null, 4.6, CEIL2 - 0.12, 9.0, [[0.0, 0], [0.16, 0.02], [0.22, 0.09], [0.22, 0.11]], 0xfff1d6, { radial: 22, cast: false });
+  }
+
+  // ---------- Chapter Two anchors ----------
+  anchor('lymanChair', 3.27, 0, 8.8, Math.PI / 2);
+  anchor('lymanSeat', 3.29, 0.46, 8.8, Math.PI / 2);
+  anchor('plateSpot2', 3.9, 0.76, 8.8, Math.PI / 2);
+  anchor('soupSpot', 4.4, 0.76, 8.58, 0);
+  anchor('odieBowl', 7.35, 0, 9.75, Math.PI);
+  anchor('sofaSeatL', 3.78, 0.49, 2.3, -Math.PI / 2);
+  anchor('sofaSeatR', 3.78, 0.49, 3.2, -Math.PI / 2);
+  anchor('sofaFoot', 3.0, 0, 2.75, -Math.PI / 2);
+  anchor('oldTvSpot', 1.17, 0.012, 2.75, Math.PI / 2);
+  anchor('carpet', 1.17, 0, 2.85, -Math.PI / 2, { w: 1.7, d: 0.9 });
+  anchor('carpetEdge', 1.12, 0, 3.98, Math.PI);
+  anchor('tvBoxSpot', 5.6, 0, 1.3, Math.PI);
+  anchor('mugSpot', 1.88, 0.42, 2.45, 0);
+  anchor('doorStep', 7.1, 0, -0.95, 0);
+  anchor('doorInside', 7.1, 0, 1.0, Math.PI);
+  anchor('furPileSpot', 5.6, 0, 3.2, 0);
+  anchor('whistleSpot', 2.75, UF, 5.35, 0.6);
+  anchor('arenaCentre', 4.1, UF, 4.0, 0);
+  anchor('arenaBounds', 4.1, UF, 4.0, 0, { min: V(2.35, UF, 2.15), max: V(5.85, UF, 5.8) });
+  anchor('shedBed', 1.05, UF + 0.62, 3.2, Math.PI / 2);
+  anchor('shedSofa', 3.85, 0.5, 2.75, -Math.PI / 2);
+  anchor('shedArmchair', 4.45, 0.49, 0.95, -Math.PI / 2 + 0.25);
+  anchor('shedTable', 4.4, 0.765, 8.8, 0);
+  // extra anchors for the game lane (Ch2 levels)
+  anchor('odieTableEdge', 4.4, 0.76, 8.45, Math.PI);
+  anchor('odieSill', 2.55, 0, 0.78, Math.PI);
+  anchor('odieTableSide', 4.4, 0, 7.55, Math.PI);
+  anchor('wallBelowWindow', 3.0, 0.5, 0.52, 0);
+  anchor('outsideWindow', 3.0, -0.3, -3.6, Math.PI);
+  anchor('tvFloorSpot', 1.17, 0.012, 2.75, Math.PI / 2);
+  anchor('deliverySpot', 7.1, 0, -0.95, 0);
+  anchor('lymanSpawn', 7.1, 0, -0.95, 0);
+  const cam = (n, p, l, fov) => anchor(n, p[0], p[1], p[2], Math.atan2(l[0] - p[0], l[2] - p[2]), { look: V(...l), fov });
+  cam('cam_frontDoorIn', [5.6, 1.55, 3.4], [7.1, 1.0, 0.0], 55);
+  cam('cam_sofa', [1.2, 1.4, 1.2], [3.8, 0.7, 2.75], 55);
+  cam('cam_cupboard', [6.2, 1.1, 2.0], [8.4, 0.5, 3.0], 55);
+  cam('cam_dresser', [4.1, UF + 1.4, 4.4], [4.1, UF + 0.6, 6.5], 55);
+  cam('cam_arena', [6.0, UF + 2.0, 1.0], [3.8, UF + 0.2, 4.4], 62);
+  cam('cam_lymanDoor', [7.4, UF + 1.6, 4.6], [8.2, UF + 1.0, 7.1], 55);
+  const holes = [[0, 1.42, Math.PI / 2], [W, 6.85, -Math.PI / 2], [5.55, 5.4, Math.PI], [6.95, D, Math.PI]];
+  holes.forEach(([x, z, r], i) => anchor('mouseHole' + i, x, 0, z, r));
+  anchors.set('mouseHoles', holes.map((_, i) => anchors.get('mouseHole' + i)));
+  const cheese = [[0.55, 1.42], [8.6, 6.85], [5.55, 4.85], [6.95, 10.45], [2.0, 6.2], [6.2, 2.0]];
+  cheese.forEach(([x, z], i) => anchor('cheese' + i, x, 0, z, 0));
+  anchors.set('cheeseSpots', cheese.map((_, i) => anchors.get('cheese' + i)));
 
   // ---------- pictures ----------
   const pics = [
@@ -796,6 +936,9 @@ export function buildHouse({ quality = 'high' } = {}) {
     [3.0, UF + 1.6, 6.9, Math.PI, 0.45, 0.6, 5, 'upper'],
     [W, UF + 1.6, 5.8, -Math.PI / 2, 0.6, 0.45, 6, 'upper'],
     [6.9, 2.38, 5.6, 0, 0.42, 0.27, 7, 'ground'],
+    // Lyman's room
+    [0, UF + 1.55, 9.3, Math.PI / 2, 0.8, 0.5, 4, 'upper'],
+    [7.4, UF + 1.6, D, Math.PI, 0.45, 0.6, 1, 'upper'],
   ];
   for (const [x, y, z, ry, w, h, art, layer] of pics) {
     if (art < 0) continue;
@@ -828,6 +971,7 @@ export function buildHouse({ quality = 'high' } = {}) {
   blob(W - 0.24, 0, 9.85, 0.9, 1.9); blob(3.0, 0, 0.3, 1.9, 0.8); blob(0.2, 0, 4.7, 0.7, 1.4); blob(W - 0.35, 0, 5.95, 0.6, 0.6);
   b.layer = 'upper';
   blob(1.05, UF, 3.2, 2.7, 2.1); blob(1.4, UF, 0.45, 1.8, 0.9); blob(1.5, UF, 1.0, 0.7, 0.7); blob(5.8, UF, 6.6, 1.1, 0.8); blob(1.0, UF, 6.6, 1.8, 1.0); blob(4.1, UF, 6.65, 1.6, 0.8); blob(4.6, UF, 1.3, 1.0, 1.0);
+  blob(1.02, UF, 9.3, 2.4, 1.4); blob(6.1, UF, 10.72, 1.5, 0.8); blob(0.25, UF, 10.23, 0.7, 0.7); blob(8.8, UF, 10.2, 1.0, 1.4);
 
   function leaf(x, y, z, yaw, tilt, len, wid, color) {
     const g = new THREE.SphereGeometry(1, 10, 6);

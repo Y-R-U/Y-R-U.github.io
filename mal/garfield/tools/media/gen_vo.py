@@ -14,6 +14,11 @@ SCR = ROOT / "tools/media/scratch"
 VOICES = json.load(open(ROOT / "tools/media/voices.json")) if (ROOT / "tools/media/voices.json").exists() else {}
 
 
+# Odie keys → the dog clip in audio/sfx/ that best fits the subtitle (default: <sfx>_1).
+ODIE_CLIP = {"o_yip_2": "yip_2", "o_yip_3": "yip_3", "o_yip_long": "yip_long", "o_bark_2": "bark_2", "o_growl_play": "bark_3",
+             "o_whine_muffled": "whine_2", "o_shake_off": "pant_1", "o_pant": "pant_loop"}
+
+
 def tts_text(t):
     t = t.replace("…", "...").replace("—", ", ").replace("–", ", ").replace("’", "'")
     t = re.sub(r"\b([A-Z]{2,})\b", lambda m: m.group(1).capitalize() if m.group(1) not in ("TV", "OK") else m.group(1), t)
@@ -41,7 +46,10 @@ def docs(lines, mf):
           "Bark families: any key matching `<family>_<n>` belongs to the family; `audio.family(prefix)` lists them.", "",
           "Voices (Qwen Voice Studio, designed then saved as clones; no real-actor imitation):",
           "- **Garfield** (thought voice): `Hungry Heist · Garfield` — lazy, deep, deadpan, warm.",
-          "- **Jon** (aloud): `Hungry Heist · Jon` — cheerful, nerdy, slightly nasal, easily flustered.", "",
+          "- **Jon** (aloud): `Hungry Heist · Jon (v2 male)` — cheerful, nerdy, adult male, easily flustered.",
+          "- **Lyman** (aloud): `Hungry Heist · Lyman` — theatrical, dramatic moocher charm.",
+          "- **Delivery man**: `Hungry Heist · Delivery`.",
+          "- **Odie** (`o_*`): dog-noise clips from audio/sfx/ (no TTS; text is the subtitle).", "",
           f"Total lines: {len(lines)}", ""]
     for f, keys in fam.items():
         md.append(f"### {f}  ({len(keys)})")
@@ -64,6 +72,8 @@ def main():
     for k, v in lines.items():
         e = mf.setdefault(k, {})
         e.update(who=v["who"], text=v["text"], file=f"audio/vo/{k}.mp3")
+        if v.get("sfx"):
+            e.update(file=f"audio/sfx/{ODIE_CLIP.get(k, v['sfx'] + '_1')}.mp3", sfx=v["sfx"])
     if args[:1] == ["docs"]:
         save_mf(mf); docs(lines, mf); print("docs written", len(lines)); return
     who = None
@@ -76,6 +86,8 @@ def main():
         if only and k not in only:
             continue
         if who and v["who"] != who:
+            continue
+        if v.get("sfx"):
             continue
         e = mf[k]; dst = OUT / f"{k}.mp3"
         voice = VOICES[v["who"]]

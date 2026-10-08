@@ -326,11 +326,128 @@ export const SFX = {
     for (let i = 0; i < 3; i++) { tone(ctx, out, t + i * 0.18, { f0: 140 * r, f1: 70, dur: 0.12, vol: 0.6 }); hiss(ctx, out, t + i * 0.18, { type: 'lowpass', f: 900, dur: 0.06, vol: 0.4 }); }
     return 0.7;
   },
+
+  // ---- wave 3 (Chapter Two). Dog/aww/doorbell also have recorded-style samples (SAMPLES below); these are fallbacks.
+  doorbell(ctx, out, t, r) {
+    ping(ctx, out, t, 659 * r, 1.4, 0.32, [1, 2.0, 3.01, 4.1]);
+    ping(ctx, out, t + 0.55, 523 * r, 1.8, 0.32, [1, 2.0, 3.01, 4.1]);
+    return 2.4;
+  },
+  drawer(ctx, out, t, r) {
+    const { g } = hiss(ctx, out, t, { type: 'lowpass', f: 700 * r, f1: 1100 * r, q: 1.5, dur: 0.38, a: 0.04, vol: 0.4, pinkish: true, curve: 'lin' });
+    for (let x = 0.04; x < 0.38; x += R(0.02, 0.04)) g.gain.setValueAtTime(R(0.15, 0.45), t + x);
+    tone(ctx, out, t + 0.4, { f0: 160 * r, f1: 80, dur: 0.1, vol: 0.45 });
+    hiss(ctx, out, t + 0.4, { f: 1200, q: 1, dur: 0.05, vol: 0.25 });
+    return 0.6;
+  },
+  tvthud(ctx, out, t, r) {
+    tone(ctx, out, t, { f0: 90 * r, f1: 32, dur: 0.5, vol: 0.85 });
+    hiss(ctx, out, t, { type: 'lowpass', f: 700, f1: 120, dur: 0.4, vol: 0.6, pinkish: true });
+    ping(ctx, out, t + 0.01, 420 * r, 0.25, 0.12, [1, 2.3, 3.7]);
+    hiss(ctx, out, t + 0.05, { f: 3500, q: 6, dur: 0.18, vol: 0.06 });
+    SFX.boing(ctx, out, t + 0.12, r * 0.55);
+    return 0.9;
+  },
+  carpet(ctx, out, t, r) {
+    // Rug yanked out: cloth zip + a rising whoosh.
+    const { g } = hiss(ctx, out, t, { f: 900 * r, f1: 2600 * r, q: 1.2, dur: 0.3, a: 0.01, vol: 0.5, curve: 'lin' });
+    for (let x = 0; x < 0.3; x += R(0.01, 0.025)) g.gain.setValueAtTime(R(0.15, 0.55), t + x);
+    hiss(ctx, out, t + 0.1, { f: 300 * r, f1: 2200 * r, q: 1.3, dur: 0.5, a: 0.18, vol: 0.45, curve: 'lin' });
+    tone(ctx, out, t + 0.1, { type: 'triangle', f0: 300 * r, f1: 900 * r, dur: 0.45, glide: 0.4, vol: 0.08 });
+    return 0.8;
+  },
+  splash(ctx, out, t, r) {
+    hiss(ctx, out, t, { type: 'lowpass', f: 2500 * r, f1: 400, q: 1.5, dur: 0.35, vol: 0.7 });
+    tone(ctx, out, t, { f0: 260 * r, f1: 80, dur: 0.18, vol: 0.4 });
+    for (let i = 0; i < 9; i++) {
+      const tt = t + 0.06 + R(0, 0.45);
+      tone(ctx, out, tt, { f0: R(700, 1500) * r, f1: R(1600, 2800) * r, dur: R(0.03, 0.07), vol: R(0.06, 0.14) });
+      hiss(ctx, out, tt, { f: R(1200, 3000), q: 5, dur: 0.04, vol: 0.1 });
+    }
+    return 0.7;
+  },
+  thwip(ctx, out, t, r) {
+    tone(ctx, out, t, { f0: 1800 * r, f1: 400 * r, dur: 0.1, glide: 0.08, vol: 0.3 });
+    hiss(ctx, out, t, { f: 3000 * r, f1: 900, q: 2, dur: 0.09, vol: 0.4 });
+    tone(ctx, out, t + 0.005, { type: 'square', f0: 220 * r, f1: 110, dur: 0.03, vol: 0.06 });
+    return 0.2;
+  },
+  brawl(ctx, out, t, r) {
+    // Cartoon dust-cloud fight: rumbling cloud + random bonks, slaps, boings and twangs (~2.4 s).
+    const dur = 2.4;
+    const { g } = hiss(ctx, out, t, { type: 'lowpass', f: 600 * r, q: 0.8, dur, a: 0.15, vol: 0.4, pinkish: true, curve: 'lin' });
+    for (let x = 0.15; x < dur - 0.1; x += 0.07) g.gain.setValueAtTime(R(0.25, 0.5), t + x);
+    const kinds = ['hit', 'whack', 'thud', 'pop', 'boing', 'swipe', 'squeak'];
+    for (let x = 0.08; x < dur - 0.3; x += R(0.09, 0.2)) {
+      const k = kinds[Math.floor(Math.random() * kinds.length)];
+      SFX[k](ctx, out, t + x, r * R(0.85, 1.25));
+    }
+    return dur + 0.5;
+  },
+  poof(ctx, out, t, r) {
+    hiss(ctx, out, t, { type: 'lowpass', f: 1800 * r, f1: 300, q: 0.6, dur: 0.45, a: 0.02, vol: 0.6, pinkish: true });
+    tone(ctx, out, t, { f0: 180 * r, f1: 70, dur: 0.2, vol: 0.35 });
+    for (let i = 0; i < 4; i++) ping(ctx, out, t + 0.12 + i * 0.07, [1568, 2093, 2349, 2637][i] * r, 0.3, 0.04, [1, 2]);
+    return 0.7;
+  },
+  whistle(ctx, out, t, r) {
+    // The dog whistle: humans hear only breath — a faint airy puff with a barely-there high edge.
+    hiss(ctx, out, t, { f: 2400 * r, f1: 3000 * r, q: 1.4, dur: 0.9, a: 0.12, vol: 0.18, curve: 'lin' });
+    hiss(ctx, out, t + 0.05, { f: 9000, q: 12, dur: 0.75, a: 0.15, vol: 0.02, curve: 'lin' });
+    return 1.1;
+  },
+  aww(ctx, out, t, r) {
+    [180, 225, 270].forEach((p) => catVoice(ctx, out, t + R(0, 0.06), { pitch: p * r, dur: 1.1, vol: 0.18, vib: 0.03,
+      shape: { pitch: [1.15, 1.05, 0.95, 0.8], formants: [[750, 650, 4, 1], [1150, 900, 5, 0.6], [2500, 2400, 6, 0.3]] } }));
+    return 1.2;
+  },
+  sniff(ctx, out, t, r) {
+    for (let i = 0; i < 3; i++) hiss(ctx, out, t + i * 0.13, { type: 'bandpass', f: R(2500, 3500) * r, f1: R(4000, 5000), q: 2, dur: 0.08, a: 0.02, vol: 0.35 });
+    return 0.45;
+  },
+  yip(ctx, out, t, r) {
+    catVoice(ctx, out, t, { pitch: R(620, 720) * r, dur: 0.16, vol: 0.45,
+      shape: { pitch: [1, 1.35, 0.8], formants: [[1200, 900, 3, 1], [2800, 2000, 5, 0.5], [600, 500, 2, 0.4]] } });
+    return 0.25;
+  },
+  bark(ctx, out, t, r) {
+    for (let i = 0; i < 2; i++) catVoice(ctx, out, t + i * 0.32, { pitch: R(300, 360) * r, dur: 0.18, vol: 0.5,
+      shape: { pitch: [0.9, 1.3, 0.85], formants: [[700, 500, 2.5, 1], [1600, 1100, 4, 0.6], [350, 300, 2, 0.6]] } });
+    hiss(ctx, out, t, { type: 'lowpass', f: 1500, dur: 0.08, vol: 0.2 });
+    return 0.6;
+  },
+  yap(ctx, out, t, r) {
+    for (let i = 0; i < 3; i++) SFX.yip(ctx, out, t + i * 0.17, r * R(0.85, 1));
+    return 0.6;
+  },
+  pant(ctx, out, t, r) {
+    for (let i = 0; i < 8; i++) {
+      const tt = t + i * 0.2;
+      hiss(ctx, out, tt, { f: (i % 2 ? 1300 : 1700) * r, q: 2.5, dur: 0.11, a: 0.02, vol: 0.4 });
+    }
+    return 1.7;
+  },
+  whine(ctx, out, t, r) {
+    catVoice(ctx, out, t, { pitch: R(700, 800) * r, dur: 0.9, vol: 0.3, vib: 0.03,
+      shape: { pitch: [0.9, 1.15, 1.05, 1.2, 0.85], formants: [[1000, 900, 6, 1], [2600, 2400, 8, 0.4], [400, 400, 3, 0.3]] } });
+    return 1.0;
+  },
+  whimper(ctx, out, t, r) {
+    for (let i = 0; i < 3; i++) catVoice(ctx, out, t + i * 0.28, { pitch: R(650, 760) * r, dur: 0.22, vol: 0.25,
+      shape: { pitch: [1.1, 1.0, 0.8], formants: [[1000, 800, 6, 1], [2500, 2300, 8, 0.4], [400, 400, 3, 0.3]] } });
+    return 0.9;
+  },
 };
+
+// Recorded-style samples (audio/sfx/<file>.mp3). audio.sfx(name) picks a random variant and falls back to SFX[name]
+// until the buffer has loaded. `loop: true` entries are what audio.sfxLoop(name) expects.
+export const SAMPLES = {};
 
 // Loudness trims so every effect lands at a similar perceived level (measured offline peaks/RMS).
 export const LEVEL = {
   creak: 3, stars: 2.5, whoosh: 2.5, paper: 2.5, swipe: 2, spit: 1.8, meow: 2.2, yowl: 1.7, slip: 2, squeak: 2,
   sparkle: 2, fridge: 1.8, jump: 1.8, rattle: 1.8, chomp: 1.4, rip: 1.6, unlock: 1.5, ding: 1.4,
   crash: 0.6, whack: 0.65, door: 0.65, thud: 0.8, land: 0.7, step: 0.9,
+  whimper: 5, pant: 3.5, sniff: 3, aww: 2.8, whine: 2.6, carpet: 2.3, yip: 1.7, yap: 1.7, bark: 1.2, thwip: 1.2,
+  whistle: 1.6, poof: 0.6, drawer: 0.55, tvthud: 0.6, brawl: 0.45,
 };

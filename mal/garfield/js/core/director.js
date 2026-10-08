@@ -1,3 +1,4 @@
+import { LINES } from '../game/lines.js';
 import * as THREE from '../../vendor/three/three.module.js';
 
 const wrap = (a) => Math.atan2(Math.sin(a), Math.cos(a));
@@ -141,7 +142,7 @@ export function createDirector({ camera, ui, audio, world, controller, input, ev
     say: async (who, key, opts = {}) => {
       if (skipping) return;
       const line = audio?.voLines?.[key];
-      let text = opts.text ?? line?.text ?? key;
+      let text = opts.text ?? line?.text ?? LINES[key]?.text ?? key;
       text = names ? names.apply(text) : text;
       const thought = opts.thought ?? (who === 'garfield');
       const voP = Promise.resolve(audio?.vo?.(names?.voKey ? names.voKey(key) : key)).catch(() => null);

@@ -3,7 +3,9 @@ import * as THREE from '../../vendor/three/three.module.js';
 import { MESH } from './garfield_mesh.js';
 import { BONES, TAIL_TIP } from './garfield_rig.js';
 import { createFurMaterial } from './garfield_mat.js';
-import { CLIPS, EXT, EXPRESSIONS } from './garfield_anim.js';
+import { CLIPS as CLIPS1, EXT, EXPRESSIONS } from './garfield_anim.js';
+import { CLIPS2 } from './garfield_clips2.js';
+const CLIPS = { ...CLIPS1, ...CLIPS2 };
 import { Pose, ClipPlayer, applyPose, Spring, clamp, lerp } from './shared/pose.js';
 
 const TAU = Math.PI * 2;
@@ -126,6 +128,7 @@ export async function createGarfield({ quality = 'high', shellFur = false } = {}
   }
   const tailPts = [...BONES.filter((b) => b[0].startsWith('tail')).map((b) => b[2]), TAIL_TIP];
   const fur = createFurMaterial({ tailPts, quality });
+  let bald = false;
   if (lodName === 'low') { fur.sheen = 0; }
   disposables.push(fur);
   const mesh = new THREE.SkinnedMesh(geo, fur);
@@ -279,6 +282,15 @@ export async function createGarfield({ quality = 'high', shellFur = false } = {}
   const starRing = new THREE.Group(); starRing.position.copy(local('head', [0, 0.53, 0.25])); starRing.visible = false;
   const stars = [0, 1, 2].map((i) => { const m = new THREE.Mesh(starGeo, starMat); starRing.add(m); return m; });
   head.add(starRing);
+  // hearts (loved)
+  const hs = new THREE.Shape(); hs.moveTo(0, -0.02); hs.bezierCurveTo(0.03, 0.005, 0.02, 0.03, 0, 0.015); hs.bezierCurveTo(-0.02, 0.03, -0.03, 0.005, 0, -0.02);
+  const heartGeo = new THREE.ExtrudeGeometry(hs, { depth: 0.008, bevelEnabled: true, bevelSize: 0.003, bevelThickness: 0.003, bevelSegments: 2 });
+  heartGeo.center();
+  const heartMat = new THREE.MeshStandardMaterial({ color: 0xff4f6e, emissive: 0xd0203a, emissiveIntensity: 0.5, roughness: 0.4 });
+  disposables.push(heartGeo, heartMat);
+  const heartRing = new THREE.Group(); heartRing.position.copy(local('head', [0, 0.56, 0.26])); heartRing.visible = false;
+  const hearts = [0, 1, 2, 3].map(() => { const m = new THREE.Mesh(heartGeo, heartMat); heartRing.add(m); return m; });
+  head.add(heartRing);
 
   // sockets
   const sock = (bone, p) => { const o = new THREE.Object3D(); o.position.copy(local(bone, p)); byName[bone].add(o); return o; };
@@ -292,7 +304,10 @@ export async function createGarfield({ quality = 'high', shellFur = false } = {}
 
   // ---- animation state
   const makePose = () => new Pose(BONES.map((b) => b[0]), EXT);
-  const ctx = { time: 0, locoSpeed: 0, phase: 0, tmpPose: makePose() };
+  const ctx = { time: 0, locoSpeed: 0, phase: 0, tmpPose: makePose(), seethe: 0 };
+  const listeners = {};
+  const emit = (ev, d) => (listeners[ev] || []).forEach((f) => f(d));
+  let evClip = null, evT = 0;
   const player = new ClipPlayer(CLIPS, makePose, 'idle');
   player.play('idle', { fade: 0 });
   let moveSpeed = 0, moveSetAt = -1;
@@ -325,6 +340,19 @@ export async function createGarfield({ quality = 'high', shellFur = false } = {}
 
     const P = player.update(dt, ctx);
     const X = P.x;
+    const CL = player.current;
+    if (CL) {
+      if (CL.name !== evClip) { evClip = CL.name; evT = 0; }
+      if (CL.clip.ev) for (const [n, et] of Object.entries(CL.clip.ev)) if (evT < et && CL.t >= et) emit(n, { clip: CL.name });
+      evT = CL.t;
+    }
+    // fur standing on end
+    if (X.puff) {
+      const f = clamp(X.puff, 0, 1.5);
+      P.s('chest', 0.1 * f, 0.1 * f, 0.06 * f); P.s('spine', 0.1 * f, 0.1 * f, 0.04 * f); P.s('hips', 0.08 * f, 0.08 * f, 0.04 * f);
+      P.s('neck', 0.08 * f, 0.08 * f, 0.08 * f);
+      for (let i = 1; i < 6; i++) P.s('tail' + i, 0.35 * f, 0, 0.35 * f);
+    }
 
     // world motion for secondary
     root.updateWorldMatrix(true, false);
@@ -399,7 +427,7 @@ export async function createGarfield({ quality = 'high', shellFur = false } = {}
     // squash group
     sqSpr.step(dt);
     const sy = clamp(1 + X.sqY + sqSpr.x * 0.06, 0.2, 1.6);
-    const sxz = 1 / Math.sqrt(sy);
+    const sxz = 1 / Math.sqrt(sy) + X.sqX;
     squash.scale.set(sxz, sy, sxz);
     squash.position.set(0, Math.max(0, X.rootY), X.rootZ);
 
@@ -428,6 +456,16 @@ export async function createGarfield({ quality = 'high', shellFur = false } = {}
         stars[i].rotation.set(0, -a, ctx.time * 4);
       }
     }
+    const hv = clamp(X.hearts, 0, 1);
+    heartRing.visible = hv > 0.02;
+    if (heartRing.visible) {
+      heartRing.scale.set(hv / squash.scale.x, hv / squash.scale.y, hv / squash.scale.z);
+      for (let i = 0; i < 4; i++) {
+        const a = ctx.time * 1.6 + i * TAU / 4, b = (ctx.time * 0.6 + i * 0.25) % 1;
+        hearts[i].position.set(Math.cos(a) * 0.14, 0.02 + b * 0.12, Math.sin(a) * 0.1);
+        hearts[i].scale.setScalar(Math.sin(Math.PI * b) * 1.2 + 0.01); hearts[i].rotation.set(0, -a + Math.PI / 2, 0.2 * Math.sin(a * 2));
+      }
+    }
     for (const e of eyes) {
       e.g.scale.copy(e.base).multiplyScalar(eyeS);
       e.lid.rotation.x = lerp(-0.9, 1.55, lidU);
@@ -449,6 +487,7 @@ export async function createGarfield({ quality = 'high', shellFur = false } = {}
     byName.jaw.quaternion.setFromAxisAngle(XAXIS, clamp(o, 0, 1.2) * 0.35);
   }
 
+  const sheen0 = fur.sheen, rough0 = fur.roughness;
   const api = {
     root,
     mesh,
@@ -472,6 +511,19 @@ export async function createGarfield({ quality = 'high', shellFur = false } = {}
     getBelly: () => belly,
     claw(on) { clawOn = !!on; },
     setExpression(name) { if (EXPRESSIONS[name]) expr = name; },
+    // hold-to-build glare intensity for the 'seethe' clip
+    setSeethe(v) { ctx.seethe = clamp(v || 0, 0, 1); },
+    // bald gag (Ch2 L8): pink skin, no stripes; same mesh. setBald(false) restores the fur.
+    setBald(on) {
+      bald = !!on;
+      fur.userData.uniforms.uBald.value = bald ? 1 : 0;
+      fur.sheen = bald ? 0.1 : sheen0; fur.roughness = bald ? 0.55 : rough0;
+      lidMat.color.set(bald ? 0xf2a9a0 : 0xf08a24); lidMat.sheen = bald ? 0.1 : 1;
+      wMat.opacity = bald ? 0.5 : 0.85;
+    },
+    get bald() { return bald; },
+    on(ev, fn) { (listeners[ev] ||= []).push(fn); return () => api.off(ev, fn); },
+    off(ev, fn) { listeners[ev] = (listeners[ev] || []).filter((f) => f !== fn); },
     get expression() { return expr; },
     get clip() { return player.name; },
     dispose() {

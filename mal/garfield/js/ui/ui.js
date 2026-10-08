@@ -37,7 +37,7 @@ export const ui = {
   isTyping() { const a = document.activeElement; return !!a && (a.tagName === 'INPUT' || a.tagName === 'TEXTAREA'); },
 
   names: {
-    get: (who) => settings.names[who] || (who === 'garfield' ? 'Garfield' : who === 'jon' ? 'Jon' : who),
+    get: (who) => settings.names[who] || ({ garfield: 'Garfield', jon: 'Jon', lyman: 'Lyman', odie: 'Odie', delivery: 'Delivery man' }[who]) || who,
     fill: (text) => String(text ?? '')
       .replace(/\{garfield\}/gi, settings.names.garfield)
       .replace(/\{jon\}/gi, settings.names.jon),

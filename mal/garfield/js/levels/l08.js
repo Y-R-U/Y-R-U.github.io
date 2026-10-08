@@ -5,17 +5,17 @@ import { defineLevel, prop, apos, anchor, scratchTarget } from './common.js';
 const NEED = 3;
 const V = (x = 0, y = 0, z = 0) => new THREE.Vector3(x, y, z);
 
-function bedPos(ctx) {
+export function bedPos(ctx) {
   const b = prop(ctx, 'jonBed');
   if (b?.root) return b.root.getWorldPosition(V());
   return apos(ctx, 'jonBed', V(2.5, 3, 3));
 }
-function doorPos(ctx) {
+export function doorPos(ctx) {
   const d = prop(ctx, 'bedroomDoor');
   return apos(ctx, 'bedroomDoor') || (d?.root ? d.root.getWorldPosition(V()) : V(6.4, 3, 5.7));
 }
 // Which side of the door is a point on? Uses the bedroomInside / landing anchors when present.
-function insideRoom(ctx, p) {
+export function insideRoom(ctx, p) {
   const ins = apos(ctx, 'bedroomInside'), out = apos(ctx, 'landing');
   const dp = doorPos(ctx);
   if (p.y < dp.y - 1) return false;

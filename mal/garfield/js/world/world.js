@@ -6,7 +6,9 @@ import { createLighting } from './lighting.js';
 import { createNav } from './nav.js';
 import { makeHalos } from './glow.js';
 
-const GROUND_CULL = new Set(['table', 'bench', 'chair', 'catBowl', 'curtains', 'window', 'fridge', 'vine', 'frontDoor', 'tv']);
+const GROUND_CULL = new Set(['table', 'bench', 'chair', 'catBowl', 'curtains', 'window', 'fridge', 'vine', 'frontDoor', 'tv',
+  'chair2', 'plate2', 'odieBowl', 'soupBowl', 'carpet', 'newTv', 'tvBox', 'biscuitBox', 'cupboardDoor', 'coffeeMug', 'furPile', 'cheese', 'mouseHoles']);
+const UPPER = ['jonBed', 'garfieldBed', 'bedroomDoor', 'dresser', 'lymanDoor', 'whistle'];
 
 async function loadProps() {
   try { return await import('./props/index.js'); } catch (e) { console.warn('[world] props unavailable, using placeholders', e); return null; }
@@ -63,13 +65,19 @@ export async function createWorld({ renderer, quality = 'high', withProps = true
   const propColSet = new Set(propColliders);
   colliders.push(...propColliders);
 
-  const upperProps = ['jonBed', 'garfieldBed', 'bedroomDoor'].map(id => props.get(id)).filter(Boolean);
+  const upperProps = UPPER.map(id => props.get(id)).filter(Boolean);
 
   const nav = createNav({
     colliders, floors: [0, UF], stairs: STAIRS,
     bounds: { x0: 0.1, x1: W - 0.1, z0: 0.1, z1: D - 0.1 },
     isDynamic: (c) => propColSet.has(c) || c.dynamic,
   });
+  // pets (Odie, mice): shorter/narrower body, so they fit under the table and into the under-stair cupboard
+  let navPet = null;
+  const getNavPet = () => navPet || (navPet = createNav({
+    colliders, floors: [0, UF], stairs: STAIRS, bounds: { x0: 0.1, x1: W - 0.1, z0: 0.1, z1: D - 0.1 },
+    isDynamic: (c) => propColSet.has(c) || c.dynamic, radius: 0.18, height: 0.62,
+  }));
 
   // Highest walkable top at or below fromY (+0.3 step) under (x,z).
   function groundAt(x, z, fromY = 10) {
@@ -149,6 +157,10 @@ export async function createWorld({ renderer, quality = 'high', withProps = true
 
   const world = {
     scene, colliders, anchors, nav, props, lighting, exterior, camBlockers, groundAt,
+    get navPet() { return getNavPet(); },
+    // Ch2 dining set (chair2/plate2), Odie's bowl, carpet + mouse holes: on for chapter >= 2
+    setChapter(n) { props.setChapter?.(n); },
+    swapTv() { props.swapTv?.(); },
     quality,
     get floor() { return curFloor; },
     addCollider(c) { if (!c.id) c.id = 'c' + colliders.length; if (c.enabled === undefined) c.enabled = true; colliders.push(c); return c; },
@@ -174,6 +186,7 @@ export async function createWorld({ renderer, quality = 'high', withProps = true
       const y = c?.y ?? focus?.y ?? 0;
       const f = y > (curFloor ? UF - 0.5 : UF - 0.2) ? 1 : 0;
       if (f !== curFloor) setFloor(f);
+      if (!exteriorOn) lighting.setFocusRoom(f && c && c.z > 7.0 ? 'lyman' : null, f);
       // From the kitchen the upper storey's shell is entirely behind the ceiling: skip ~7 draw calls.
       const shellUp = exteriorOn || f === 1 || !c || c.z < 5.7 || c.y > 2.4;
       if (lay.upperShell && lay.upperShell.visible !== shellUp) lay.upperShell.visible = shellUp;

@@ -59,7 +59,7 @@ export function createTable(ctx) {
   p.root.add(top);
   p.top = top;
 
-  addBox(p, 'top', p.root, [-W / 2, TOP - 0.06, -D / 2], [W / 2, TOP, D / 2], 'surface');
+  const topC = addBox(p, 'top', p.root, [-W / 2, TOP - 0.06, -D / 2], [W / 2, TOP, D / 2], 'surface');
   for (const sx of [-1, 1]) for (const sz of [-1, 1]) {
     const x = sx * (W / 2 - 0.08), z = sz * (D / 2 - 0.08);
     addBox(p, `leg${sx}${sz}`, p.root, [x - 0.035, 0, z - 0.035], [x + 0.035, TOP - 0.06, z + 0.035]);
@@ -82,7 +82,45 @@ export function createTable(ctx) {
     }, x => x);
     top.position.y = 0; top.rotation.set(0, 0, 0);
   };
-  p.reset = () => { p.anim.clear(); top.position.set(0, 0, 0); top.rotation.set(0, 0, 0); p.state.bumps = 0; };
+  // L4 gag: warp(t) 0..1 sags the middle of the table down to the floor (1 = touching), warpTo animates.
+  const SAG = TOP - 0.035;
+  const prof = x => Math.max(0, 1 - (x / (W / 2 + 0.02)) ** 2) ** 1.3;
+  const warpSets = [];
+  const grab = (grp, base) => grp.traverse(o => { if (o.isMesh) warpSets.push({ g: o.geometry, orig: o.geometry.attributes.position.array.slice(), base }); });
+  grab(top, false); grab(base, true);
+  const riderY = new Map();
+  p.state.warp = 0;
+  p.warp = t => {
+    t = Math.max(0, Math.min(1.15, t));
+    p.state.warp = t;
+    const sag = SAG * t;
+    for (const w of warpSets) {
+      const a = w.g.attributes.position, o = w.orig;
+      for (let i = 0; i < a.count; i++) {
+        const x = o[i * 3], y = o[i * 3 + 1];
+        const k = w.base ? Math.min(1, Math.max(0, y / TOP)) ** 2 : 1;
+        a.array[i * 3 + 1] = y - sag * prof(x) * k;
+      }
+      a.needsUpdate = true;
+      if (t === 0) w.g.computeVertexNormals(); else if (!w._n || Math.abs(w._n - t) > 0.08) { w.g.computeVertexNormals(); w._n = t; }
+      w.g.computeBoundingSphere();
+    }
+    const centreTop = TOP - sag;
+    topC._lmax.y = Math.max(0.03, centreTop); topC._lmin.y = Math.max(0, centreTop - 0.06);
+    for (const r of p.riders) {
+      if (!r?.root || r.state?.onFloor || r.state?.flying || r.state?.inFridge) continue;
+      const lp = p.root.worldToLocal(r.root.getWorldPosition(new THREE.Vector3()));
+      const off = -sag * prof(lp.x), prev = riderY.get(r) || 0;
+      r.root.position.y += off - prev; riderY.set(r, off);
+    }
+    syncColliders(p);
+  };
+  p.warpTo = (t, dur = 0.7) => {
+    const t0 = p.state.warp;
+    p.sfx(t > t0 ? 'creak' : 'boing', { vol: 0.8, rate: t > t0 ? 0.7 : 1 });
+    return p.anim.tween(dur, e => p.warp(t0 + (t - t0) * e), t > t0 ? ease.inOut : ease.outBounce);
+  };
+  p.reset = () => { p.anim.clear(); top.position.set(0, 0, 0); top.rotation.set(0, 0, 0); p.state.bumps = 0; if (p.state.warp) { riderY.clear(); p.warp(0); } };
   p.topY = TOP;
   p.size = { w: W, d: D, top: TOP };
   return p;

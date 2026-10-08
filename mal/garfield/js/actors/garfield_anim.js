@@ -3,7 +3,7 @@
 import { lerp, smooth, sstep, keys, clamp } from './shared/pose.js';
 
 export const EXT = ['lidU', 'lidD', 'lidTilt', 'eyeScale', 'pupil', 'mouth', 'smile', 'claw', 'sqY', 'rootY', 'rootZ',
-  'noLook', 'cheeks', 'earsBack', 'blinkOff', 'lookDown', 'tongue', 'dizzy'];
+  'noLook', 'cheeks', 'earsBack', 'blinkOff', 'lookDown', 'tongue', 'dizzy', 'puff', 'hearts', 'sqX'];
 
 const TAU = Math.PI * 2;
 const S = ['L', 'R'];

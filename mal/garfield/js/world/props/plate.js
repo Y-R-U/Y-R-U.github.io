@@ -16,8 +16,8 @@ export function plateMesh() {
   return m;
 }
 
-export function createPlate(ctx) {
-  const p = makeProp('plate', ctx);
+export function createPlate(ctx, id = 'plate') {
+  const p = makeProp(id, ctx);
   const q = ctx.quality || 'high';
   const holder = new THREE.Group(); holder.scale.setScalar(FOOD_SCALE);
   p.root.add(holder);

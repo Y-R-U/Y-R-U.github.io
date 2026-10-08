@@ -1,0 +1,41 @@
+// Odie skeleton: rest positions in model space (metres, Y up, facing +Z, feet at y=0). Identity rest rotations.
+export const BONES = [
+  ['root', null, [0, 0, 0]],
+  ['hips', 'root', [0, 0.44, -0.17]],
+  ['spine', 'hips', [0, 0.45, -0.03]],
+  ['chest', 'spine', [0, 0.46, 0.1]],
+  ['neck', 'chest', [0, 0.52, 0.19]],
+  ['head', 'neck', [0, 0.68, 0.27]],
+  ['jaw', 'head', [0, 0.648, 0.36]],
+  ['earL0', 'head', [0.075, 0.79, 0.25]],
+  ['earL1', 'earL0', [0.122, 0.69, 0.255]],
+  ['earR0', 'head', [-0.075, 0.79, 0.25]],
+  ['earR1', 'earR0', [-0.122, 0.69, 0.255]],
+  ['tongue0', 'jaw', [0.012, 0.634, 0.43]],
+  ['tongue1', 'tongue0', [0.03, 0.6, 0.47]],
+  ['tongue2', 'tongue1', [0.04, 0.555, 0.482]],
+  ['shoulderL', 'chest', [0.078, 0.42, 0.16]],
+  ['elbowL', 'shoulderL', [0.078, 0.25, 0.18]],
+  ['pawL', 'elbowL', [0.078, 0.06, 0.19]],
+  ['shoulderR', 'chest', [-0.078, 0.42, 0.16]],
+  ['elbowR', 'shoulderR', [-0.078, 0.25, 0.18]],
+  ['pawR', 'elbowR', [-0.078, 0.06, 0.19]],
+  ['thighL', 'hips', [0.084, 0.43, -0.2]],
+  ['shinL', 'thighL', [0.084, 0.27, -0.14]],
+  ['hockL', 'shinL', [0.084, 0.13, -0.225]],
+  ['footL', 'hockL', [0.084, 0.04, -0.21]],
+  ['thighR', 'hips', [-0.084, 0.43, -0.2]],
+  ['shinR', 'thighR', [-0.084, 0.27, -0.14]],
+  ['hockR', 'shinR', [-0.084, 0.13, -0.225]],
+  ['footR', 'hockR', [-0.084, 0.04, -0.21]],
+  ['tail0', 'hips', [0, 0.5, -0.28]],
+  ['tail1', 'tail0', [0, 0.53, -0.36]],
+  ['tail2', 'tail1', [0, 0.565, -0.43]],
+  ['tail3', 'tail2', [0, 0.605, -0.495]],
+  ['tail4', 'tail3', [0, 0.655, -0.545]],
+  ['tail5', 'tail4', [0, 0.715, -0.575]],
+];
+export const TAIL_TIP = [0, 0.785, -0.585];
+export const TAIL_N = 6;
+export const EAR_TIP = [0.128, 0.575, 0.258];
+export const BONE_INDEX = Object.fromEntries(BONES.map((b, i) => [b[0], i]));

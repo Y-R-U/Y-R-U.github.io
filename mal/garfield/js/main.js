@@ -15,12 +15,13 @@ import { detectQuality, isTouch } from './core/quality.js';
 import { createDev } from './core/dev.js';
 import * as stubs from './core/stubs.js';
 import { selfTest } from './core/selftest.js';
+import { castUpdate } from './game/cast2.js';
 
 const boot = window.__boot || { progress() {}, ready() {}, fail() {} };
 const qs = new URLSearchParams(location.search);
 const params = {
   level: qs.get('level'), skip: qs.get('skip') === '1', dev: qs.get('dev') === '1', shot: qs.get('shot') === '1',
-  nointro: qs.get('nointro') === '1', nogate: qs.get('nogate') === '1', stub: (qs.get('stub') || '').split(',').filter(Boolean),
+  nointro: qs.get('nointro') === '1', nogate: qs.get('nogate') === '1', ch2: qs.get('ch2') === '1', stub: (qs.get('stub') || '').split(',').filter(Boolean),
 };
 const lanes = {};
 // A lane that never settles must not hang the boot: race it against a timer and fall back to a stub.
@@ -159,6 +160,7 @@ async function main() {
       for (const fn of frameFns) fn(dt);
       garfield.update(dt);
       jon?.update(dt);
+      castUpdate(sys, dt);
       interact.update(dt, playing && !director.active && !controller.locked ? garfield.root.position : null);
       ui.hud?.set && playing && Math.random() < 0.1 && ui.hud.set({ belly: controller.belly });
       world.update?.(dt, camera.camera, garfield.root.position);

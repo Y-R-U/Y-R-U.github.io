@@ -1,5 +1,5 @@
 // Web Audio: music / sfx / voice buses, crossfaded music, VO from audio/vo/manifest.json, procedural SFX.
-import { SFX, LEVEL } from './sfx.js';
+import { SFX, LEVEL, SAMPLES } from './sfx.js';
 
 const BASE = new URL('../../audio/', import.meta.url).href;
 const MUSIC = {
@@ -73,8 +73,10 @@ function applyVolumes(t = 0.15) {
 
 function load(url) {
   if (!buffers.has(url)) {
-    buffers.set(url, fetch(url).then((r) => (r.ok ? r.arrayBuffer() : null))
-      .then((ab) => (ab ? decode(ab) : null)).catch(() => null));
+    const p = fetch(url).then((r) => (r.ok ? r.arrayBuffer() : null))
+      .then((ab) => (ab ? decode(ab) : null)).catch(() => null);
+    p.then((b) => { p.done = true; p.buf = b; });
+    buffers.set(url, p);
   }
   return buffers.get(url);
 }
@@ -134,6 +136,31 @@ function spatial(pos) {
   return { gain, pan: Math.max(-0.8, Math.min(0.8, right * 0.8)) };
 }
 
+function sampleUrls(name) {
+  const smp = SAMPLES[name];
+  return smp ? smp.files.map((f) => BASE + 'sfx/' + f + '.mp3') : [];
+}
+function loadSample(name) {
+  const urls = sampleUrls(name);
+  return urls.length ? load(urls[Math.floor(Math.random() * urls.length)]) : Promise.resolve(null);
+}
+const lastPick = new Map();
+// Synchronous pick among already-decoded variants (kicks off loading the rest); never the same variant twice running.
+function pickSample(name) {
+  const urls = sampleUrls(name);
+  const ready = [];
+  for (const u of urls) {
+    const p = buffers.get(u);
+    if (!p) { load(u); continue; }
+    if (p.done && p.buf) ready.push(p.buf);
+  }
+  if (!ready.length) return null;
+  let i = Math.floor(Math.random() * ready.length);
+  if (ready.length > 1 && ready[i] === lastPick.get(name)) i = (i + 1) % ready.length;
+  lastPick.set(name, ready[i]);
+  return ready[i];
+}
+
 function estimateDur(text) { return Math.max(1.2, (text || '').length * 0.06 + 0.5); }
 
 document.addEventListener('visibilitychange', () => {
@@ -157,6 +184,7 @@ export const audio = {
     const b = ctx.createBuffer(1, 1, 22050), s = ctx.createBufferSource();
     s.buffer = b; s.connect(ctx.destination); s.start(0);
     if (wanted && !cur) playMusic(wanted, 1);
+    audio.preloadSfx();
   },
 
   music(name, { fade = 1.2 } = {}) {
@@ -169,17 +197,57 @@ export const audio = {
 
   sfx(name, { vol: v = 1, rate = 1, pos = null, delay = 0 } = {}) {
     if (!ensure() || ctx.state !== 'running') return;
-    const fn = SFX[name];
-    if (!fn) return;
+    const fn = SFX[name], smp = SAMPLES[name];
+    if (!fn && !smp) return;
+    const buf = smp && pickSample(name);
+    if (smp && !buf && !fn) return;
     const { gain, pan } = spatial(pos);
-    const out = ctx.createGain(); out.gain.value = v * gain * (LEVEL[name] || 1);
+    const out = ctx.createGain(); out.gain.value = v * gain * (buf ? (smp.gain || 1) : (LEVEL[name] || 1));
     let node = out;
     if (pan && ctx.createStereoPanner) { const p = ctx.createStereoPanner(); p.pan.value = pan; out.connect(p); node = p; }
     node.connect(sfxBus);
     const t = ctx.currentTime + 0.005 + delay;
-    const len = fn(ctx, out, t, rate) || 1;
+    let len;
+    if (buf) {
+      const src = ctx.createBufferSource(); src.buffer = buf;
+      src.playbackRate.value = rate * (smp.jitter ? 1 + (Math.random() * 2 - 1) * smp.jitter : 1);
+      src.connect(out); src.start(t);
+      len = buf.duration / src.playbackRate.value;
+    } else len = fn(ctx, out, t, rate) || 1;
     setTimeout(() => { try { out.disconnect(); node.disconnect(); } catch {} }, (len + delay + 0.5) * 1000);
   },
+
+  // Looping sample (e.g. Odie's pant): returns stop(fade). Falls back to repeating the one-shot SFX.
+  sfxLoop(name, { vol: v = 1, rate = 1, pos = null } = {}) {
+    let stopped = false, timer = 0, src = null, out = null;
+    const stop = (fade = 0.25) => {
+      stopped = true; clearTimeout(timer);
+      if (out && ctx) {
+        const t = ctx.currentTime;
+        out.gain.cancelScheduledValues(t); out.gain.setValueAtTime(out.gain.value, t); out.gain.linearRampToValueAtTime(0, t + fade);
+        try { src?.stop(t + fade + 0.05); } catch {}
+        const o = out; setTimeout(() => { try { o.disconnect(); } catch {} }, (fade + 0.2) * 1000);
+      }
+    };
+    if (!ensure()) return stop;
+    const smp = SAMPLES[name];
+    (async () => {
+      const buf = smp ? await loadSample(name) : null;
+      if (stopped) return;
+      if (!buf) {
+        const tick = () => { if (stopped) return; audio.sfx(name, { vol: v, rate, pos }); timer = setTimeout(tick, 1600 / rate); };
+        tick(); return;
+      }
+      const { gain } = spatial(pos);
+      out = ctx.createGain(); out.gain.value = 0;
+      out.gain.linearRampToValueAtTime(v * gain * (smp.gain || 1), ctx.currentTime + 0.15);
+      out.connect(sfxBus);
+      src = ctx.createBufferSource(); src.buffer = buf; src.loop = true; src.playbackRate.value = rate;
+      src.connect(out); src.start();
+    })();
+    return stop;
+  },
+  preloadSfx(names = Object.keys(SAMPLES)) { if (ensure()) for (const n of names) loadSample(n); },
 
   async vo(key) {
     if (customNames && voLines[key + '_nn']) key = key + '_nn';
@@ -243,7 +311,7 @@ export const audio = {
   setMusicOn(on) { musicOn = !!on; applyVolumes(0.3); },
   setCustomNames(on) { customNames = !!on; },
   setListener(obj3d) { listener = obj3d; },
-  sfxNames: Object.keys(SFX),
+  sfxNames: [...new Set([...Object.keys(SFX), ...Object.keys(SAMPLES)])],
   musicNames: Object.keys(MUSIC),
 };
 

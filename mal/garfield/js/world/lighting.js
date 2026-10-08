@@ -43,8 +43,9 @@ export function createLighting({ renderer, scene, quality = 'high', lamps = [] }
     spot = new THREE.SpotLight(0xffffff, 0, 10, Math.PI * 0.42, 0.75, 2);
     scene.add(spot, spot.target);
   }
+  let focus = null;
   function assignLamps(floor) {
-    let list = lamps.filter(l => (l.pos.y > 2.9 ? 1 : 0) === floor).sort((a, b) => a.prio - b.prio);
+    let list = lamps.filter(l => (l.pos.y > 2.9 ? 1 : 0) === floor).sort((a, b) => (a.room === focus ? -10 : 0) + a.prio - (b.room === focus ? -10 : 0) - b.prio);
     if (spot) {
       const l = list.find(q => q.spot);
       spot.intensity = 0;
@@ -74,6 +75,8 @@ export function createLighting({ renderer, scene, quality = 'high', lamps = [] }
   let mode = null;
   const api = {
     hemi, key, fill, points, spot, env,
+    // lamps of the room the camera is in win the limited point-light slots (Lyman's room upstairs)
+    setFocusRoom(room, floor) { if (room === focus) return; focus = room; if (mode && mode.startsWith('interior')) assignLamps(floor); },
     // 'interior': shadow box over the active floor; 'exterior': dusk sun over the whole cul-de-sac.
     setMode(m, floor = 0) {
       const tag = m + floor;

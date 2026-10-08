@@ -218,6 +218,31 @@ html.ui-touch .see3d .menu-bg { -webkit-backdrop-filter: none; backdrop-filter: 
 .level-btn.soon-btn { height: calc(374 * var(--px)); width: calc(150 * var(--px)); animation-delay: .4s; }
 .soon-text { display: block; font-size: calc(30 * var(--px)); font-weight: 700; line-height: 1.1; color: #fff8ea; text-shadow: 0 calc(2 * var(--px)) 0 #6f5a43; }
 .soon-btn .lock-badge { top: 30%; }
+.level-side { flex-direction: column; gap: calc(18 * var(--px)); }
+.level-btn.free-btn { background: linear-gradient(180deg, var(--orange-l), var(--orange)); }
+.level-btn.free-btn .soon-text { color: #fff; text-shadow: 0 calc(3 * var(--px)) 0 var(--brown-d); font-size: calc(34 * var(--px)); }
+.story-btn { display: flex; align-items: center; gap: calc(8 * var(--px)); width: auto !important; padding: 0 calc(18 * var(--px)); border-radius: calc(30 * var(--px)) !important; font-weight: 700; font-size: max(16px, calc(22 * var(--px))); }
+.story-btn .ico { width: calc(26 * var(--px)); height: calc(26 * var(--px)); }
+.chap-row.many { gap: calc(18 * var(--px)); max-width: calc(1260 * var(--px)); }
+.chap-row.many .chap-btn { font-size: max(18px, calc(30 * var(--px))); padding: calc(10 * var(--px)) calc(26 * var(--px)); }
+.chap-btn.kind-arena { --bg1: #ff8a6a; --bg2: #d9462e; }
+/* arena scoreboard */
+.arena-score { position: absolute; top: calc(18 * var(--px)); left: 50%; transform: translateX(-50%); display: flex; align-items: center; gap: calc(16 * var(--px));
+  padding: calc(8 * var(--px)) calc(26 * var(--px)); border-radius: calc(26 * var(--px)); background: rgba(255, 248, 234, .94); border: calc(4 * var(--px)) solid var(--brown-d);
+  box-shadow: 0 calc(6 * var(--px)) 0 var(--brown-d); font-weight: 700; font-size: max(18px, calc(32 * var(--px))); color: var(--brown-d); pointer-events: none; z-index: 5; }
+.arena-score b { display: inline-block; min-width: 1.4em; text-align: center; color: var(--orange); font-size: 1.25em; }
+.arena-score b.odie { color: #b9902a; }
+.arena-score b.pop { animation: scorePop .45s cubic-bezier(.2, 1.8, .4, 1); }
+.arena-score .to { font-size: .6em; opacity: .7; }
+@keyframes scorePop { from { transform: scale(1.9); } }
+.fp-tag { position: static; align-self: flex-start; padding: calc(6 * var(--px)) calc(18 * var(--px)); border-radius: calc(20 * var(--px));
+  background: rgba(255, 248, 234, .9); border: calc(3 * var(--px)) solid var(--brown-d); font-weight: 700; color: var(--brown-d); font-size: max(15px, calc(24 * var(--px))); pointer-events: none; }
+.hold-ring { position: absolute; left: 50%; bottom: 22%; width: calc(110 * var(--px)); height: calc(110 * var(--px)); transform: translateX(-50%); pointer-events: none;
+  border-radius: 50%; background: conic-gradient(#e8711a calc(var(--p, 0) * 1turn), rgba(255, 248, 234, .6) 0); border: calc(4 * var(--px)) solid var(--brown-d); }
+.hold-ring::after { content: attr(data-label); position: absolute; inset: 18%; border-radius: 50%; background: #fff8ea; display: grid; place-items: center; font-weight: 700; font-size: calc(18 * var(--px)); color: var(--brown-d); text-align: center; }
+.bubble.who-lyman .bubble-name { background: #3b4a8a; }
+.bubble.who-odie .bubble-name { background: #b9902a; }
+.bubble.who-delivery .bubble-name { background: #5b7d3a; }
 
 /* ---------- HUD ---------- */
 .scr-hud { z-index: 1; }

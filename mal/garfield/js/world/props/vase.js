@@ -66,13 +66,16 @@ export function createVase(ctx) {
   p.place = a => { home.pos = a.pos.clone(); home.rotY = a.rotY || 0; p.root.position.copy(home.pos); p.root.rotation.y = home.rotY; };
 
   // dir: world direction the paw pushes (default: into the room, +Z of anchor is off the sill edge)
-  p.knock = async ({ dir = null, floorY = ctx.floorY ?? 0, sillDepth = 0.26 } = {}) => {
+  // target (optional world point, e.g. Odie's head): the vase lands/shatters there instead of 0.35 m past the edge
+  p.knock = async ({ dir = null, floorY = ctx.floorY ?? 0, sillDepth = 0.26, target = null } = {}) => {
     if (p.state.knocked) return;
+    const userDir = dir;
     p.state.knocked = true;
     p.sfx('click', { vol: 0.6, rate: 0.7 });
     const qy = p.root.getWorldQuaternion(new THREE.Quaternion());
     dir = (dir ? dir.clone() : new THREE.Vector3(0, 0, 1).applyQuaternion(qy)).setY(0).normalize();
     const start = worldPos(p.root, new THREE.Vector3());
+    if (target && !userDir) dir = target.clone().sub(start).setY(0).normalize();
     ctx.scene.attach(p.root);
     const axis = new THREE.Vector3(dir.z, 0, -dir.x); // tip forward around this axis
     // wobble, then tip toward the edge, slide off, fall tumbling
@@ -85,13 +88,14 @@ export function createVase(ctx) {
       p.root.position.lerpVectors(start, edge, e);
       p.root.quaternion.setFromAxisAngle(axis, 0.25 + e * 0.6);
     }, ease.inQuad);
-    const land = edge.clone().addScaledVector(dir, 0.35); land.y = floorY;
-    const fallT = Math.sqrt(2 * Math.max(0.05, edge.y - floorY) / 9.8);
+    const land = target ? target.clone() : edge.clone().addScaledVector(dir, 0.35);
+    if (!target) land.y = floorY;
+    const fallT = Math.sqrt(2 * Math.max(0.05, edge.y - land.y) / 9.8);
     p.sfx('swipe', { vol: 0.3, rate: 0.6 });
     await p.anim.tween(fallT, (e, r) => {
       p.root.position.x = edge.x + (land.x - edge.x) * r;
       p.root.position.z = edge.z + (land.z - edge.z) * r;
-      p.root.position.y = edge.y - (edge.y - floorY) * r * r;
+      p.root.position.y = edge.y - (edge.y - land.y) * r * r;
       p.root.quaternion.setFromAxisAngle(axis, 0.85 + r * 1.6);
     }, ease.linear);
     // shatter
@@ -108,7 +112,8 @@ export function createVase(ctx) {
       flowers.spawn({ pos: land.clone().add(v.set(0, 0.2, 0)), vel: v.set(Math.cos(a) * 0.8, 1.2, Math.sin(a) * 0.8).clone(), life: 1e9, size: 0.8 + Math.random() * 0.4, flat: true, scale: new THREE.Vector3(1, 1, 1) });
       flowers.p[flowers.p.length - 1].color = null;
     }
-    puddle.position.set(land.x, floorY + 0.002, land.z); puddle.visible = true;
+    puddle.position.set(land.x, floorY + 0.002, land.z);
+    land.y = floorY; puddle.visible = true;
     p.fragments = { pos: land.clone(), radius: 0.55 };
     await p.anim.tween(0.4, e => puddle.scale.setScalar(0.3 + 0.7 * e), ease.outQuad);
   };

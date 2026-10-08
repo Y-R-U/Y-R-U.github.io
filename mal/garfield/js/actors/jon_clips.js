@@ -9,12 +9,12 @@ const writeKeyObj = (pose) => Object.fromEntries(CH.map((n, i) => [n, [pose[i * 
 // sit_down starts, and stand_up ends, standing on the floor SEAT.front m in front of the seat: after stand_up
 // resolves, move the root to that floor point (j.seatFloorPoint()) — the pose already compensates.
 export const SEAT = { h: 0.46, front: 0.36 };
-const STAND = (x = 0, y = 0, z = 0) => [x, y - SEAT.h, z + SEAT.front];
-const SIT = {
+export const STAND = (x = 0, y = 0, z = 0) => [x, y - SEAT.h, z + SEAT.front];
+export const SIT = {
   pos: [0, -0.85, -0.05], hips: [0, 0, 0], spine: [6, 0, 0], chest: [2, 0, 0], neck: [-4, 0, 0], head: [0, 0, 0],
   ...S({ thighL: [-80, 0, 4], shinL: [84, 0, 0], footL: [-4, 0, 0], uarmL: [-18, 0, 12], farmL: [-62, 0, 0], handL: [10, 0, 0] }),
 };
-const SIT_BASE = writeKey(REST.slice(), SIT);
+export const SIT_BASE = writeKey(REST.slice(), SIT);
 
 // props' chair.fallBack(): teeter 0.35 s, fall 0.45 s ease-in to ~79°, crash+settle 0.3 s. Jon rides the seat;
 // angle() is only used by tools/jon.html's stand-in chair.

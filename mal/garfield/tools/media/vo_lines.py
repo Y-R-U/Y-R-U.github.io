@@ -12,6 +12,9 @@ def base_lines():
     out = {}
     for k, who, text in re.findall(r"^\s*(\w+):\s*\{\s*who:\s*'(\w+)',\s*text:\s*\"(.*?)\"\s*\}", src, re.M):
         out[k] = {"who": who, "text": text, "src": "levels"}
+    # Odie: dog noises (text = subtitle, sfx = sound family); never TTS'd.
+    for k, who, text, sfx in re.findall(r"^\s*(\w+):\s*\{\s*who:\s*'(\w+)',\s*text:\s*\"(.*?)\",\s*sfx:\s*'(\w+)'\s*\}", src, re.M):
+        out[k] = {"who": who, "text": text, "src": "levels", "sfx": sfx}
     return out
 
 

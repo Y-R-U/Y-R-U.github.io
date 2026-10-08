@@ -104,6 +104,7 @@ export function createFridge(ctx, { hingeSide = -1 } = {}) {
     p.sfx('door', { vol: 0.6, rate: 1.3 });
     syncColliders(p);
   };
+  p.toggle = () => (p.state.open ? p.close() : p.open());
   p.reset = () => { p.anim.clear(); p.state.open = false; hinge.rotation.y = 0; setLight(0); showInside(false); doorC.enabled = false; syncColliders(p); };
   p.top = { y: H, w: W, d: D };
   p.slotPos = (out = new THREE.Vector3()) => { slot.updateWorldMatrix(true, false); return slot.getWorldPosition(out); };

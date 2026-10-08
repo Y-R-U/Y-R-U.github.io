@@ -4,7 +4,7 @@ import * as THREE from '../../vendor/three/three.module.js';
 // joined by an explicit stair chain. Dynamic colliders (props: doors, chair...) are re-tested per query.
 const STEP = 0.2, R = 0.26;
 
-export function createNav({ colliders, floors, stairs, bounds, isDynamic }) {
+export function createNav({ colliders, floors, stairs, bounds, isDynamic, radius = R, height = 1.75 }) {
   const nodes = []; // {x,y,z,floor, staticBlocked}
   const grids = floors.map((fy, fi) => {
     const nx = Math.floor((bounds.x1 - bounds.x0) / STEP) + 1, nz = Math.floor((bounds.z1 - bounds.z0) / STEP) + 1;
@@ -14,8 +14,8 @@ export function createNav({ colliders, floors, stairs, bounds, isDynamic }) {
     }
     return { fy, nx, nz, start };
   });
-  const hits = (c, x, y, z) => c.enabled !== false && x + R > c.min.x && x - R < c.max.x && z + R > c.min.z && z - R < c.max.z
-    && y + 1.75 > c.min.y && y + 0.3 < c.max.y;
+  const hits = (c, x, y, z) => c.enabled !== false && x + radius > c.min.x && x - radius < c.max.x && z + radius > c.min.z && z - radius < c.max.z
+    && y + height > c.min.y && y + 0.3 < c.max.y;
   const supported = (x, y, z) => colliders.some(c => c.enabled !== false && c.floor && x >= c.min.x && x <= c.max.x && z >= c.min.z && z <= c.max.z && Math.abs(c.max.y - y) < 0.05);
   const statics = () => colliders.filter(c => !isDynamic(c));
   const st0 = statics();
