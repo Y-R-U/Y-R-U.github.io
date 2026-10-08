@@ -44,7 +44,6 @@ checklist and the goal marker is off. Food on the table = random of steak / lasa
 | scratch face | cover_face → newspaper throw → fetch (Ch1) | — |
 | scratch a back chair leg (Jon seated) | breakLeg → fall_back_chair (L2) | **knocked out 10 s**, rights the chair |
 | **vine swing over seated Jon** | climb to the fridge top, grab the vine (L5); while the tip is over Jon's head a "SCRATCH!" prompt shows; Scratch/Space → face hit → **fall_back_chair** (same as the chair-leg fall) | knocked out 10 s |
-| vine swing over the lasagna pan (lasagna sessions, Jon not seated) | catch the pan (L5) and eat it on the fridge | pan refills next sit |
 | knock the vase (sill) | crash; Jon comes to look (L3) | spare vase after he leaves |
 | scratch Jon next to the shards | hop → slip → faceplant (L10) | **knocked out 10 s** |
 | shred the curtains (4 scratches) | Jon comes to look (L4) | curtains mended after 60 s |
@@ -212,7 +211,7 @@ Intro: Garfield lies on the floor: `c2_g_l6_intro` **"Well, aren't I bored today
 to each other on the couch (Lyman holds a coffee mug); Odie sits at the foot of the couch (`sofaFoot`).
 Objectives: ☐ Go to Jon's room · ☐ Scratch Jon's drawer open · ☐ Pull out the spit-ball launcher · ☐ Spit-ball Odie
 - Jon's room: enter the bedroom (upstairs, past the door) → tick.
-- `breakDrawer`: 2 scratches → `break()` → reveals the `spitballLauncher` → tick (`c2_g_l6_found` "Ooh. Contraband.").
+- `breakDrawer`: 3 scratches → `break()` → reveals the `spitballLauncher` → tick (`c2_g_l6_found` "Ooh. Contraband.").
 - Interact → Garfield pulls it out (`pull`), carries it (socket `back`/mouth) → tick.
 - Downstairs, within 5 m of Odie with a clear line → interact "Fire!" → cutscene (~14 s):
   `thwip` → Odie hit (`o_yip`), Lyman jolts (`spill`) → coffee over Jon (`spilled_on`): `c2_j_l6_coffee` "HOT COFFEE!
@@ -356,3 +355,14 @@ Lyman (`l_*`): reactions (leg/face/butt), chase, glare, give-up, catch, idle on 
 Jon: Ch2 idles (`c2_j_idle_*`: Lyman/Odie complaints), free play idles. Garfield: Odie barks (`g_c2_odie_*`), Lyman
 barks (`g_c2_lyman_*`), free play barks (`fp_g_*`), arena barks (`ar_g_*`). Odie: `o_*` (dog noises only). The full
 list lives in `js/game/lines.js` (section "WAVE 3").
+
+## 9. As built (2026-10-09)
+
+- Code: js/levels/ch2/{common2,story,c2_01..c2_10,index}.js, js/levels/{freeplay1,arena}.js, js/game/{humanAI,odieAI,
+  arena,cast2}.js. Ch1 levels/jonAI are unchanged apart from added `export`s of helper functions.
+- Ch2 levels start Garfield at `livingCentre` (open floor, so close-ups aren't blocked).
+- Mid-level beats the kid must SEE (L4 wall splat / out-of-window, L5 TV, L6 brawl, L8 bald, L9 glare/hug, L10 end)
+  are short skippable cuts (`L.cut`).
+- Interact labels defined as getters stay live (core interact.js `labelFn`); `isHint()` shows "not yet" prompts as a
+  muted pill (Space still jumps).
+- Testing: `node tools/sim/play.mjs c2:1-10 | arena | fp1 | menus --port=9407` (+ Ch1 `1-10`, `catch`).

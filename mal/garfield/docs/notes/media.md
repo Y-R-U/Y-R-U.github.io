@@ -43,8 +43,13 @@
   design3.py; F0 ~140–250 dramatic, timbre distance to Jon 1.1–1.5 / Garfield 0.9–1.0 vs ~0.5 within a speaker —
   tools/media/timbre.py); delivery = "Hungry Heist · Delivery" 538b211797494cb9a76c6ef968e8ca8a (v1 seed 7).
 
+- VO: 799 manifest keys (785 voiced + 14 odie dog-noise keys). Wave 3 added ~400: game's Ch2/FP1/arena lines, fp2's 83
+  fp2_* lines, plus media EXTRAS (50 more bark-family lines) and 18 new _nn name-free takes (vo_lines.py "Wave 3").
+  QC pass 1: 6 bad takes re-rolled with SEED=101 (c2_l05_hint_1, d_l5_sign, c2_l_l3_disco, fp1_j_recover_2,
+  c2_j_l6_coffee, c2_j_l3_dab). False positives: Jon→John, Lawsey→lausie, moustache→mustache.
+
 ## IN PROGRESS
-- VO batch: `gen_vo.py --who lyman; --who delivery; gen_vo.py` → scratch/w3_vo.log. Then qc_vo.py.
+- QC pass 2 (qc_vo.py) on the rest; then LTX dog-sound test, then arena music.
 
 ## NEXT
 1. Lyman + delivery voices (design3.py → save via POST :7876/api/voices {preserve_voice:true}) → voices.json keys

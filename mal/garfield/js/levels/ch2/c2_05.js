@@ -47,6 +47,7 @@ export default defineLevel2({
       } }));
     L.interact({ id: 'carpet', radius: 0.7, heightTol: 0.5, markerHeight: 0.4,
       get label() { return L.flags.chaos ? 'Grip the carpet!' : 'Too many eyes…'; },
+      isHint: () => !L.flags.chaos,
       pos: () => apos(ctx, 'carpetEdge', V(1.1, 0, 4.0)),
       enabled: () => !L.objDone[3] && L.objDone[0],
       onInteract: () => { if (!L.flags.chaos) { L.say('c2_g_l5_eyes', { force: true }); return; } pullCarpet(L); } });

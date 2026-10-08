@@ -2,112 +2,272 @@
  "ar_g_behind_1": {
   "who": "garfield",
   "text": "Okay, I'm awake now.",
-  "file": "audio/vo/ar_g_behind_1.mp3"
+  "file": "audio/vo/ar_g_behind_1.mp3",
+  "dur": 1.61,
+  "gen_text": "Okay, I'm awake now.",
+  "job": "eaf4a69e37344901936cd072f44e714e",
+  "voice": "9611963dfd0b48d48ec21f9e72ff258b",
+  "seed": 7
  },
  "ar_g_behind_2": {
   "who": "garfield",
   "text": "Time to stop going easy on him.",
-  "file": "audio/vo/ar_g_behind_2.mp3"
+  "file": "audio/vo/ar_g_behind_2.mp3",
+  "dur": 1.98,
+  "gen_text": "Time to stop going easy on him.",
+  "job": "0d8ce7e008494f019f2a7581bb4878a7",
+  "voice": "9611963dfd0b48d48ec21f9e72ff258b",
+  "seed": 7
  },
  "ar_g_hit_1": {
   "who": "garfield",
   "text": "Point to the cat!",
-  "file": "audio/vo/ar_g_hit_1.mp3"
+  "file": "audio/vo/ar_g_hit_1.mp3",
+  "dur": 0.91,
+  "gen_text": "Point to the cat!",
+  "job": "0e44baeac3e249c993ac8943d16ba9e9",
+  "voice": "9611963dfd0b48d48ec21f9e72ff258b",
+  "seed": 7
  },
  "ar_g_hit_2": {
   "who": "garfield",
   "text": "Swipe!",
-  "file": "audio/vo/ar_g_hit_2.mp3"
+  "file": "audio/vo/ar_g_hit_2.mp3",
+  "dur": 0.5,
+  "gen_text": "Swipe!",
+  "job": "192b6116688e4a6fbe3899d026b61162",
+  "voice": "9611963dfd0b48d48ec21f9e72ff258b",
+  "seed": 7
  },
  "ar_g_hit_3": {
   "who": "garfield",
   "text": "Too easy.",
-  "file": "audio/vo/ar_g_hit_3.mp3"
+  "file": "audio/vo/ar_g_hit_3.mp3",
+  "dur": 0.73,
+  "gen_text": "Too easy.",
+  "job": "fcc15d356787469792fbe1e54c715dbf",
+  "voice": "9611963dfd0b48d48ec21f9e72ff258b",
+  "seed": 7
  },
  "ar_g_hit_4": {
   "who": "garfield",
   "text": "Float like a butterfly, scratch like a cat.",
-  "file": "audio/vo/ar_g_hit_4.mp3"
+  "file": "audio/vo/ar_g_hit_4.mp3",
+  "dur": 2.64,
+  "gen_text": "Float like a butterfly, scratch like a cat.",
+  "job": "5dcce4927351409dabc173cbc46a62a9",
+  "voice": "9611963dfd0b48d48ec21f9e72ff258b",
+  "seed": 7
+ },
+ "ar_g_hit_5": {
+  "who": "garfield",
+  "text": "Bap! Right on the snoot.",
+  "file": "audio/vo/ar_g_hit_5.mp3",
+  "dur": 2.0,
+  "gen_text": "Bap! Right on the snoot.",
+  "job": "65d84feb58ca4e4f986f3ed535be515e",
+  "voice": "9611963dfd0b48d48ec21f9e72ff258b",
+  "seed": 7
+ },
+ "ar_g_hit_6": {
+  "who": "garfield",
+  "text": "And the cat scores again!",
+  "file": "audio/vo/ar_g_hit_6.mp3",
+  "dur": 1.6,
+  "gen_text": "And the cat scores again!",
+  "job": "55d9596f90e6453b80ec81e8b10c9eb7",
+  "voice": "9611963dfd0b48d48ec21f9e72ff258b",
+  "seed": 7
+ },
+ "ar_g_hit_7": {
+  "who": "garfield",
+  "text": "Swipe, swipe, hooray.",
+  "file": "audio/vo/ar_g_hit_7.mp3",
+  "dur": 2.61,
+  "gen_text": "Swipe, swipe, hooray.",
+  "job": "72647727f7864546a608942e76d8f8ef",
+  "voice": "9611963dfd0b48d48ec21f9e72ff258b",
+  "seed": 7
  },
  "ar_g_hurt_1": {
   "who": "garfield",
   "text": "Oof. Slobbery.",
-  "file": "audio/vo/ar_g_hurt_1.mp3"
+  "file": "audio/vo/ar_g_hurt_1.mp3",
+  "dur": 1.63,
+  "gen_text": "Oof. Slobbery.",
+  "job": "00dfeca9b0204c4cb3aabd360615866a",
+  "voice": "9611963dfd0b48d48ec21f9e72ff258b",
+  "seed": 7
  },
  "ar_g_hurt_2": {
   "who": "garfield",
   "text": "Lucky shot, dog.",
-  "file": "audio/vo/ar_g_hurt_2.mp3"
+  "file": "audio/vo/ar_g_hurt_2.mp3",
+  "dur": 1.32,
+  "gen_text": "Lucky shot, dog.",
+  "job": "fc28c8dbfeff4f8c9ab64c8cf30083e5",
+  "voice": "9611963dfd0b48d48ec21f9e72ff258b",
+  "seed": 7
  },
  "ar_g_hurt_3": {
   "who": "garfield",
   "text": "I'm fine. I meant to fall over.",
-  "file": "audio/vo/ar_g_hurt_3.mp3"
+  "file": "audio/vo/ar_g_hurt_3.mp3",
+  "dur": 1.95,
+  "gen_text": "I'm fine. I meant to fall over.",
+  "job": "5d05014a63e14e2a9846c021b2a20f22",
+  "voice": "9611963dfd0b48d48ec21f9e72ff258b",
+  "seed": 7
+ },
+ "ar_g_hurt_4": {
+  "who": "garfield",
+  "text": "Ugh. Dog breath right in the face.",
+  "file": "audio/vo/ar_g_hurt_4.mp3",
+  "dur": 2.66,
+  "gen_text": "Ugh. Dog breath right in the face.",
+  "job": "56b51500991a4a85b11c80d1812e6305",
+  "voice": "9611963dfd0b48d48ec21f9e72ff258b",
+  "seed": 7
+ },
+ "ar_g_hurt_5": {
+  "who": "garfield",
+  "text": "That one tickled. Mostly.",
+  "file": "audio/vo/ar_g_hurt_5.mp3",
+  "dur": 2.11,
+  "gen_text": "That one tickled. Mostly.",
+  "job": "75cb051e62ab40b2817ae15a98bbe68d",
+  "voice": "9611963dfd0b48d48ec21f9e72ff258b",
+  "seed": 7
  },
  "ar_g_lead_1": {
   "who": "garfield",
   "text": "Winning. Naturally.",
-  "file": "audio/vo/ar_g_lead_1.mp3"
+  "file": "audio/vo/ar_g_lead_1.mp3",
+  "dur": 1.72,
+  "gen_text": "Winning. Naturally.",
+  "job": "55c9bdc26bf64714809597c29495d8ed",
+  "voice": "9611963dfd0b48d48ec21f9e72ff258b",
+  "seed": 7
  },
  "ar_g_lead_2": {
   "who": "garfield",
   "text": "Is that all you've got, dog?",
-  "file": "audio/vo/ar_g_lead_2.mp3"
+  "file": "audio/vo/ar_g_lead_2.mp3",
+  "dur": 1.45,
+  "gen_text": "Is that all you've got, dog?",
+  "job": "639f5235fc9b4ab88843e4bb14dd1b31",
+  "voice": "9611963dfd0b48d48ec21f9e72ff258b",
+  "seed": 7
  },
  "ar_g_lose": {
   "who": "garfield",
   "text": "Rematch. Now. After a nap.",
-  "file": "audio/vo/ar_g_lose.mp3"
+  "file": "audio/vo/ar_g_lose.mp3",
+  "dur": 2.13,
+  "gen_text": "Rematch. Now. After a nap.",
+  "job": "b3e279310aa74af9881761b08bd4a592",
+  "voice": "9611963dfd0b48d48ec21f9e72ff258b",
+  "seed": 7
  },
  "ar_g_start": {
   "who": "garfield",
   "text": "Let's dance, dog.",
-  "file": "audio/vo/ar_g_start.mp3"
+  "file": "audio/vo/ar_g_start.mp3",
+  "dur": 1.18,
+  "gen_text": "Let's dance, dog.",
+  "job": "07cbbb7a8cd54de38ed6795ed819fe3f",
+  "voice": "9611963dfd0b48d48ec21f9e72ff258b",
+  "seed": 7
  },
  "ar_g_win": {
   "who": "garfield",
   "text": "Undefeated. Mostly.",
-  "file": "audio/vo/ar_g_win.mp3"
+  "file": "audio/vo/ar_g_win.mp3",
+  "dur": 1.89,
+  "gen_text": "Undefeated. Mostly.",
+  "job": "be9f25fda0364ecea10b7e64392084c7",
+  "voice": "9611963dfd0b48d48ec21f9e72ff258b",
+  "seed": 7
  },
  "c2_g_l10_broken": {
   "who": "garfield",
   "text": "Must be broken.",
-  "file": "audio/vo/c2_g_l10_broken.mp3"
+  "file": "audio/vo/c2_g_l10_broken.mp3",
+  "dur": 1.07,
+  "gen_text": "Must be broken.",
+  "job": "dd58c343f96544c88f9c9df01287d562",
+  "voice": "9611963dfd0b48d48ec21f9e72ff258b",
+  "seed": 7
  },
  "c2_g_l10_end": {
   "who": "garfield",
   "text": "…Huh.",
-  "file": "audio/vo/c2_g_l10_end.mp3"
+  "file": "audio/vo/c2_g_l10_end.mp3",
+  "dur": 0.52,
+  "gen_text": "…Huh.",
+  "job": "385705ede08d4204a7529b44edd1b165",
+  "voice": "9611963dfd0b48d48ec21f9e72ff258b",
+  "seed": 7
  },
  "c2_g_l10_idea": {
   "who": "garfield",
   "text": "I have an idea. A beautiful, terrible idea.",
-  "file": "audio/vo/c2_g_l10_idea.mp3"
+  "file": "audio/vo/c2_g_l10_idea.mp3",
+  "dur": 9.73,
+  "gen_text": "I have an idea. A beautiful, terrible idea.",
+  "job": "c2b0432acf9b478bb7beb07d778c7c10",
+  "voice": "9611963dfd0b48d48ec21f9e72ff258b",
+  "seed": 7
  },
  "c2_g_l10_sock_1": {
   "who": "garfield",
   "text": "Ears: fashionable.",
-  "file": "audio/vo/c2_g_l10_sock_1.mp3"
+  "file": "audio/vo/c2_g_l10_sock_1.mp3",
+  "dur": 1.55,
+  "gen_text": "Ears: fashionable.",
+  "job": "d52ef3a252754422a8f0a338bea571b4",
+  "voice": "9611963dfd0b48d48ec21f9e72ff258b",
+  "seed": 7
  },
  "c2_g_l10_sock_2": {
   "who": "garfield",
   "text": "Tail: cosy.",
-  "file": "audio/vo/c2_g_l10_sock_2.mp3"
+  "file": "audio/vo/c2_g_l10_sock_2.mp3",
+  "dur": 1.43,
+  "gen_text": "Tail: cosy.",
+  "job": "bf6a1e11c17a419ab701990c9be7c37d",
+  "voice": "9611963dfd0b48d48ec21f9e72ff258b",
+  "seed": 7
  },
  "c2_g_l10_sock_3": {
   "who": "garfield",
   "text": "Mouth: finally, some peace and quiet.",
-  "file": "audio/vo/c2_g_l10_sock_3.mp3"
+  "file": "audio/vo/c2_g_l10_sock_3.mp3",
+  "dur": 2.96,
+  "gen_text": "Mouth: finally, some peace and quiet.",
+  "job": "a6af14fdcb28431c9a0b37ea67da1304",
+  "voice": "9611963dfd0b48d48ec21f9e72ff258b",
+  "seed": 7
  },
  "c2_g_l10_socks": {
   "who": "garfield",
   "text": "Socks. Warm, smelly, wonderful.",
-  "file": "audio/vo/c2_g_l10_socks.mp3"
+  "file": "audio/vo/c2_g_l10_socks.mp3",
+  "dur": 4.26,
+  "gen_text": "Socks. Warm, smelly, wonderful.",
+  "job": "c1f920dede234a50b6507bdcb3bab6d6",
+  "voice": "9611963dfd0b48d48ec21f9e72ff258b",
+  "seed": 7
  },
  "c2_g_l10_whistle": {
   "who": "garfield",
   "text": "Hmm, a whistle.",
-  "file": "audio/vo/c2_g_l10_whistle.mp3"
+  "file": "audio/vo/c2_g_l10_whistle.mp3",
+  "dur": 1.36,
+  "gen_text": "Hmm, a whistle.",
+  "job": "eebb2de619434c568271a08eb13c17c1",
+  "voice": "9611963dfd0b48d48ec21f9e72ff258b",
+  "seed": 7
  },
  "c2_g_l1_biscuits": {
   "who": "garfield",
@@ -162,167 +322,332 @@
  "c2_g_l2_biscuits": {
   "who": "garfield",
   "text": "Here, doggy doggy.",
-  "file": "audio/vo/c2_g_l2_biscuits.mp3"
+  "file": "audio/vo/c2_g_l2_biscuits.mp3",
+  "dur": 1.46,
+  "gen_text": "Here, doggy doggy.",
+  "job": "06d4911de4814ee1b2f40d02b0ee53dd",
+  "voice": "9611963dfd0b48d48ec21f9e72ff258b",
+  "seed": 7
  },
  "c2_g_l2_intro": {
   "who": "garfield",
   "text": "I think I'll put this dog's lights out.",
-  "file": "audio/vo/c2_g_l2_intro.mp3"
+  "file": "audio/vo/c2_g_l2_intro.mp3",
+  "dur": 2.23,
+  "gen_text": "I think I'll put this dog's lights out.",
+  "job": "6b943eafface4238a630037ec6b40841",
+  "voice": "9611963dfd0b48d48ec21f9e72ff258b",
+  "seed": 7
  },
  "c2_g_l2_shut": {
   "who": "garfield",
   "text": "He's not in yet. Patience. Ugh, patience.",
-  "file": "audio/vo/c2_g_l2_shut.mp3"
+  "file": "audio/vo/c2_g_l2_shut.mp3",
+  "dur": 3.8,
+  "gen_text": "He's not in yet. Patience. Ugh, patience.",
+  "job": "1925785267f844fab063bfc72aeb24ae",
+  "voice": "9611963dfd0b48d48ec21f9e72ff258b",
+  "seed": 7
  },
  "c2_g_l2_vase_miss": {
   "who": "garfield",
   "text": "Missed. Need a dog under it.",
-  "file": "audio/vo/c2_g_l2_vase_miss.mp3"
+  "file": "audio/vo/c2_g_l2_vase_miss.mp3",
+  "dur": 2.01,
+  "gen_text": "Missed. Need a dog under it.",
+  "job": "786426bc3a024c3fa3a1ab8c468b5c6d",
+  "voice": "9611963dfd0b48d48ec21f9e72ff258b",
+  "seed": 7
  },
  "c2_g_l2_win": {
   "who": "garfield",
   "text": "Lights out, dog. Enjoy the snack.",
-  "file": "audio/vo/c2_g_l2_win.mp3"
+  "file": "audio/vo/c2_g_l2_win.mp3",
+  "dur": 2.94,
+  "gen_text": "Lights out, dog. Enjoy the snack.",
+  "job": "39d52afabd4843e88b98d30eb57173d3",
+  "voice": "9611963dfd0b48d48ec21f9e72ff258b",
+  "seed": 7
  },
  "c2_g_l3_intro": {
   "who": "garfield",
   "text": "Next time, I bite.",
-  "file": "audio/vo/c2_g_l3_intro.mp3"
+  "file": "audio/vo/c2_g_l3_intro.mp3",
+  "dur": 1.09,
+  "gen_text": "Next time, I bite.",
+  "job": "5bc788360eb74b308f0d21601c4d4369",
+  "voice": "9611963dfd0b48d48ec21f9e72ff258b",
+  "seed": 7
  },
  "c2_g_l3_suit": {
   "who": "garfield",
   "text": "A white suit. On a man who lives with a cat. Bold.",
-  "file": "audio/vo/c2_g_l3_suit.mp3"
+  "file": "audio/vo/c2_g_l3_suit.mp3",
+  "dur": 4.07,
+  "gen_text": "A white suit. On a man who lives with a cat. Bold.",
+  "job": "16b1f094705d4cebb66beadba8d37939",
+  "voice": "9611963dfd0b48d48ec21f9e72ff258b",
+  "seed": 7
  },
  "c2_g_l4_cranky": {
   "who": "garfield",
   "text": "Diet. The ugliest four-letter word. I need to take it out on someone.",
-  "file": "audio/vo/c2_g_l4_cranky.mp3"
+  "file": "audio/vo/c2_g_l4_cranky.mp3",
+  "dur": 5.32,
+  "gen_text": "Diet. The ugliest four-letter word. I need to take it out on someone.",
+  "job": "c0fc1e61ce924c1c8e9809e3a567ec80",
+  "voice": "9611963dfd0b48d48ec21f9e72ff258b",
+  "seed": 7
  },
  "c2_g_l4_drat": {
   "who": "garfield",
   "text": "Drat. He usually lands in the neighbour's lawn. This diet has got me weak.",
-  "file": "audio/vo/c2_g_l4_drat.mp3"
+  "file": "audio/vo/c2_g_l4_drat.mp3",
+  "dur": 5.38,
+  "gen_text": "Drat. He usually lands in the neighbour's lawn. This diet has got me weak.",
+  "job": "d6afe51b8315425d86f6607aced9fc1d",
+  "voice": "9611963dfd0b48d48ec21f9e72ff258b",
+  "seed": 7
  },
  "c2_g_l4_higher": {
   "who": "garfield",
   "text": "Maybe if I scratch him from higher he will go higher.",
-  "file": "audio/vo/c2_g_l4_higher.mp3"
+  "file": "audio/vo/c2_g_l4_higher.mp3",
+  "dur": 3.02,
+  "gen_text": "Maybe if I scratch him from higher he will go higher.",
+  "job": "ed62d8f41f40452db53784c5a6386284",
+  "voice": "9611963dfd0b48d48ec21f9e72ff258b",
+  "seed": 7
  },
  "c2_g_l4_shut": {
   "who": "garfield",
   "text": "Window's shut. Even I know that.",
-  "file": "audio/vo/c2_g_l4_shut.mp3"
+  "file": "audio/vo/c2_g_l4_shut.mp3",
+  "dur": 2.61,
+  "gen_text": "Window's shut. Even I know that.",
+  "job": "7197990e92754a4c9031eea3d20ac2da",
+  "voice": "9611963dfd0b48d48ec21f9e72ff258b",
+  "seed": 7
  },
  "c2_g_l4_win": {
   "who": "garfield",
   "text": "And stay out. Or come back. Whatever. Bye.",
-  "file": "audio/vo/c2_g_l4_win.mp3"
+  "file": "audio/vo/c2_g_l4_win.mp3",
+  "dur": 4.25,
+  "gen_text": "And stay out. Or come back. Whatever. Bye.",
+  "job": "27d6ff5210aa458ab332d3c51e0a94a2",
+  "voice": "9611963dfd0b48d48ec21f9e72ff258b",
+  "seed": 7
  },
  "c2_g_l5_cheese": {
   "who": "garfield",
   "text": "Cheese. For the mice. Mostly.",
-  "file": "audio/vo/c2_g_l5_cheese.mp3"
+  "file": "audio/vo/c2_g_l5_cheese.mp3",
+  "dur": 1.97,
+  "gen_text": "Cheese. For the mice. Mostly.",
+  "job": "f9a6ea0958e84f39ac58383b48196132",
+  "voice": "9611963dfd0b48d48ec21f9e72ff258b",
+  "seed": 7
  },
  "c2_g_l5_eyes": {
   "who": "garfield",
   "text": "Too many eyes. I need a distraction.",
-  "file": "audio/vo/c2_g_l5_eyes.mp3"
+  "file": "audio/vo/c2_g_l5_eyes.mp3",
+  "dur": 2.01,
+  "gen_text": "Too many eyes. I need a distraction.",
+  "job": "1bccd56fcb45474d999fb022add449c9",
+  "voice": "9611963dfd0b48d48ec21f9e72ff258b",
+  "seed": 7
  },
  "c2_g_l5_hole": {
   "who": "garfield",
   "text": "A mouse hole. Mice love cheese. Humans hate mice.",
-  "file": "audio/vo/c2_g_l5_hole.mp3"
+  "file": "audio/vo/c2_g_l5_hole.mp3",
+  "dur": 3.72,
+  "gen_text": "A mouse hole. Mice love cheese. Humans hate mice.",
+  "job": "58517d4b573a487cb2b956b9bebbd2aa",
+  "voice": "9611963dfd0b48d48ec21f9e72ff258b",
+  "seed": 7
  },
  "c2_g_l5_intro": {
   "who": "garfield",
   "text": "A new TV and an old one. And a dog. I sense an opportunity.",
-  "file": "audio/vo/c2_g_l5_intro.mp3"
+  "file": "audio/vo/c2_g_l5_intro.mp3",
+  "dur": 4.78,
+  "gen_text": "A new TV and an old one. And a dog. I sense an opportunity.",
+  "job": "4637ffc79e9c43cb8a33674f5a4d6d91",
+  "voice": "9611963dfd0b48d48ec21f9e72ff258b",
+  "seed": 7
  },
  "c2_g_l5_place": {
   "who": "garfield",
   "text": "Come and get it, little guys.",
-  "file": "audio/vo/c2_g_l5_place.mp3"
+  "file": "audio/vo/c2_g_l5_place.mp3",
+  "dur": 1.51,
+  "gen_text": "Come and get it, little guys.",
+  "job": "ff751daef5934f1ba20ac033b16ce16f",
+  "voice": "9611963dfd0b48d48ec21f9e72ff258b",
+  "seed": 7
  },
  "c2_g_l5_win": {
   "who": "garfield",
   "text": "TV dinner.",
-  "file": "audio/vo/c2_g_l5_win.mp3"
+  "file": "audio/vo/c2_g_l5_win.mp3",
+  "dur": 1.02,
+  "gen_text": "TV dinner.",
+  "job": "d189980db0af40dd931298e3d043aca3",
+  "voice": "9611963dfd0b48d48ec21f9e72ff258b",
+  "seed": 7
  },
  "c2_g_l6_far": {
   "who": "garfield",
   "text": "Out of range. Get closer.",
-  "file": "audio/vo/c2_g_l6_far.mp3"
+  "file": "audio/vo/c2_g_l6_far.mp3",
+  "dur": 2.45,
+  "gen_text": "Out of range. Get closer.",
+  "job": "6da543f687294f93a676947e6da00130",
+  "voice": "9611963dfd0b48d48ec21f9e72ff258b",
+  "seed": 7
  },
  "c2_g_l6_found": {
   "who": "garfield",
   "text": "Ooh. Contraband.",
-  "file": "audio/vo/c2_g_l6_found.mp3"
+  "file": "audio/vo/c2_g_l6_found.mp3",
+  "dur": 2.11,
+  "gen_text": "Ooh. Contraband.",
+  "job": "03f37b9437854db0b57217fc964f0043",
+  "voice": "9611963dfd0b48d48ec21f9e72ff258b",
+  "seed": 7
  },
  "c2_g_l6_intro": {
   "who": "garfield",
   "text": "Well, aren't I bored today.",
-  "file": "audio/vo/c2_g_l6_intro.mp3"
+  "file": "audio/vo/c2_g_l6_intro.mp3",
+  "dur": 1.63,
+  "gen_text": "Well, aren't I bored today.",
+  "job": "3d3e8b9cae13496ba64d087a5cc15afd",
+  "voice": "9611963dfd0b48d48ec21f9e72ff258b",
+  "seed": 7
  },
  "c2_g_l6_win": {
   "who": "garfield",
   "text": "Much better.",
-  "file": "audio/vo/c2_g_l6_win.mp3"
+  "file": "audio/vo/c2_g_l6_win.mp3",
+  "dur": 0.83,
+  "gen_text": "Much better.",
+  "job": "6759dcd19d2e4fe6a99f0c19ba774ebb",
+  "voice": "9611963dfd0b48d48ec21f9e72ff258b",
+  "seed": 7
  },
  "c2_g_l7_intro": {
   "who": "garfield",
   "text": "You. Me. The bedroom. Now.",
-  "file": "audio/vo/c2_g_l7_intro.mp3"
+  "file": "audio/vo/c2_g_l7_intro.mp3",
+  "dur": 3.04,
+  "gen_text": "You. Me. The bedroom. Now.",
+  "job": "62d1e4def2124570a8495d6a53ffb147",
+  "voice": "9611963dfd0b48d48ec21f9e72ff258b",
+  "seed": 7
  },
  "c2_g_l7_lose": {
   "who": "garfield",
   "text": "I let him win. For his self-esteem.",
-  "file": "audio/vo/c2_g_l7_lose.mp3"
+  "file": "audio/vo/c2_g_l7_lose.mp3",
+  "dur": 2.66,
+  "gen_text": "I let him win. For his self-esteem.",
+  "job": "5ca30015a4774ab281c63f9899c1891d",
+  "voice": "9611963dfd0b48d48ec21f9e72ff258b",
+  "seed": 7
  },
  "c2_g_l7_win": {
   "who": "garfield",
   "text": "Champion. Obviously.",
-  "file": "audio/vo/c2_g_l7_win.mp3"
+  "file": "audio/vo/c2_g_l7_win.mp3",
+  "dur": 1.43,
+  "gen_text": "Champion. Obviously.",
+  "job": "9353744c12b8443d90815ce823f92302",
+  "voice": "9611963dfd0b48d48ec21f9e72ff258b",
+  "seed": 7
  },
  "c2_g_l8_bald": {
   "who": "garfield",
   "text": "I feel… breezy.",
-  "file": "audio/vo/c2_g_l8_bald.mp3"
+  "file": "audio/vo/c2_g_l8_bald.mp3",
+  "dur": 1.65,
+  "gen_text": "I feel… breezy.",
+  "job": "48b473fb287b4200b6e90228b6f0f2ba",
+  "voice": "9611963dfd0b48d48ec21f9e72ff258b",
+  "seed": 7
  },
  "c2_g_l8_intro": {
   "who": "garfield",
   "text": "Oh goody, its shedding week. Time for some fun.",
-  "file": "audio/vo/c2_g_l8_intro.mp3"
+  "file": "audio/vo/c2_g_l8_intro.mp3",
+  "dur": 3.63,
+  "gen_text": "Oh goody, its shedding week. Time for some fun.",
+  "job": "7216b47aff7a44b799910c6fa244f4e5",
+  "voice": "9611963dfd0b48d48ec21f9e72ff258b",
+  "seed": 7
  },
  "c2_g_l8_shed_1": {
   "who": "garfield",
   "text": "A little gift. From me. Made of me.",
-  "file": "audio/vo/c2_g_l8_shed_1.mp3"
+  "file": "audio/vo/c2_g_l8_shed_1.mp3",
+  "dur": 3.66,
+  "gen_text": "A little gift. From me. Made of me.",
+  "job": "42ef43f8de4e42539875ed7a6a3eb93f",
+  "voice": "9611963dfd0b48d48ec21f9e72ff258b",
+  "seed": 7
  },
  "c2_g_l8_shed_2": {
   "who": "garfield",
   "text": "Orange is the new everything.",
-  "file": "audio/vo/c2_g_l8_shed_2.mp3"
+  "file": "audio/vo/c2_g_l8_shed_2.mp3",
+  "dur": 1.88,
+  "gen_text": "Orange is the new everything.",
+  "job": "c4f29714cd2547a5807be4407c05dee4",
+  "voice": "9611963dfd0b48d48ec21f9e72ff258b",
+  "seed": 7
  },
  "c2_g_l8_shed_3": {
   "who": "garfield",
   "text": "That's a nice sofa. Was.",
-  "file": "audio/vo/c2_g_l8_shed_3.mp3"
+  "file": "audio/vo/c2_g_l8_shed_3.mp3",
+  "dur": 2.41,
+  "gen_text": "That's a nice sofa. Was.",
+  "job": "26f11f079d064bd990f85c138c168a94",
+  "voice": "9611963dfd0b48d48ec21f9e72ff258b",
+  "seed": 7
  },
  "c2_g_l9_glare": {
   "who": "garfield",
   "text": "Behold. The glare.",
-  "file": "audio/vo/c2_g_l9_glare.mp3"
+  "file": "audio/vo/c2_g_l9_glare.mp3",
+  "dur": 1.42,
+  "gen_text": "Behold. The glare.",
+  "job": "91b3d8a51ed64c7d855762363928dfe6",
+  "voice": "9611963dfd0b48d48ec21f9e72ff258b",
+  "seed": 7
  },
  "c2_g_l9_intro": {
   "who": "garfield",
   "text": "Boy, am I in a bad mood.",
-  "file": "audio/vo/c2_g_l9_intro.mp3"
+  "file": "audio/vo/c2_g_l9_intro.mp3",
+  "dur": 2.27,
+  "gen_text": "Boy, am I in a bad mood.",
+  "job": "a45203c6407d49e9951bfcccb9b615d6",
+  "voice": "9611963dfd0b48d48ec21f9e72ff258b",
+  "seed": 7
  },
  "c2_g_l9_loved": {
   "who": "garfield",
   "text": "Okay. Bad mood cancelled. For now.",
-  "file": "audio/vo/c2_g_l9_loved.mp3"
+  "file": "audio/vo/c2_g_l9_loved.mp3",
+  "dur": 2.95,
+  "gen_text": "Okay. Bad mood cancelled. For now.",
+  "job": "3e197b2cc639444ab20238d1bf8b6d2d",
+  "voice": "9611963dfd0b48d48ec21f9e72ff258b",
+  "seed": 7
  },
  "c2_g_story_lawsey": {
   "who": "garfield",
@@ -357,42 +682,102 @@
  "c2_j_idle_1": {
   "who": "jon",
   "text": "Two pets and a houseguest. My life is so full!",
-  "file": "audio/vo/c2_j_idle_1.mp3"
+  "file": "audio/vo/c2_j_idle_1.mp3",
+  "dur": 3.22,
+  "gen_text": "Two pets and a houseguest. My life is so full!",
+  "job": "98497fe0a159430181da123d17ef6793",
+  "voice": "04254ade71d1424c9e89e05626956bde",
+  "seed": 21
  },
  "c2_j_idle_2": {
   "who": "jon",
   "text": "Lyman, have you seen my socks? All of them?",
-  "file": "audio/vo/c2_j_idle_2.mp3"
+  "file": "audio/vo/c2_j_idle_2.mp3",
+  "dur": 2.93,
+  "gen_text": "Lyman, have you seen my socks? All of them?",
+  "job": "c5489e03a14542a880e2311bf712b193",
+  "voice": "04254ade71d1424c9e89e05626956bde",
+  "seed": 21
  },
  "c2_j_idle_3": {
   "who": "jon",
   "text": "Odie, please stop licking the TV.",
-  "file": "audio/vo/c2_j_idle_3.mp3"
+  "file": "audio/vo/c2_j_idle_3.mp3",
+  "dur": 1.86,
+  "gen_text": "Odie, please stop licking the TV.",
+  "job": "2e0270ed3e324cf79d76223b6368ca4d",
+  "voice": "04254ade71d1424c9e89e05626956bde",
+  "seed": 21
  },
  "c2_j_idle_4": {
   "who": "jon",
   "text": "I think the cat and the dog are really bonding.",
-  "file": "audio/vo/c2_j_idle_4.mp3"
+  "file": "audio/vo/c2_j_idle_4.mp3",
+  "dur": 2.15,
+  "gen_text": "I think the cat and the dog are really bonding.",
+  "job": "5ef1e9686f274d4e84ffd27842b05cce",
+  "voice": "04254ade71d1424c9e89e05626956bde",
+  "seed": 21
  },
  "c2_j_idle_5": {
   "who": "jon",
   "text": "Lyman, it's been three days. Are you staying? …Great!",
-  "file": "audio/vo/c2_j_idle_5.mp3"
+  "file": "audio/vo/c2_j_idle_5.mp3",
+  "dur": 2.92,
+  "gen_text": "Lyman, it's been three days. Are you staying? …Great!",
+  "job": "a3643663b809498b978a7851db2030e1",
+  "voice": "04254ade71d1424c9e89e05626956bde",
+  "seed": 21
  },
  "c2_j_idle_6": {
   "who": "jon",
   "text": "Who put a sock on the lampshade?",
-  "file": "audio/vo/c2_j_idle_6.mp3"
+  "file": "audio/vo/c2_j_idle_6.mp3",
+  "dur": 1.75,
+  "gen_text": "Who put a sock on the lampshade?",
+  "job": "12bc84bdee504809bfc6c0c25b28e82c",
+  "voice": "04254ade71d1424c9e89e05626956bde",
+  "seed": 21
+ },
+ "c2_j_idle_7": {
+  "who": "jon",
+  "text": "Odie, buddy, that's not a chew toy. That's my shoe.",
+  "file": "audio/vo/c2_j_idle_7.mp3",
+  "dur": 3.04,
+  "gen_text": "Odie, buddy, that's not a chew toy. That's my shoe.",
+  "job": "bd4c3fc413814ab3b7ead523ea3c4068",
+  "voice": "04254ade71d1424c9e89e05626956bde",
+  "seed": 21
+ },
+ "c2_j_idle_8": {
+  "who": "jon",
+  "text": "Lyman ate all the cereal again. All of it. The box too, probably.",
+  "file": "audio/vo/c2_j_idle_8.mp3",
+  "dur": 4.41,
+  "gen_text": "Lyman ate all the cereal again. All of it. The box too, probably.",
+  "job": "07eb32a04a10491e89f2d177e672fc1b",
+  "voice": "04254ade71d1424c9e89e05626956bde",
+  "seed": 21
  },
  "c2_j_l10_socks": {
   "who": "jon",
   "text": "Garfield!",
-  "file": "audio/vo/c2_j_l10_socks.mp3"
+  "file": "audio/vo/c2_j_l10_socks.mp3",
+  "dur": 0.8,
+  "gen_text": "Garfield!",
+  "job": "16a160258a5144ceb5e3520a95487170",
+  "voice": "04254ade71d1424c9e89e05626956bde",
+  "seed": 21
  },
  "c2_j_l10_socks_nn": {
   "who": "jon",
   "text": "Hey! Kitty!",
-  "file": "audio/vo/c2_j_l10_socks_nn.mp3"
+  "file": "audio/vo/c2_j_l10_socks_nn.mp3",
+  "dur": 0.53,
+  "gen_text": "Hey! Kitty!",
+  "job": "6a5aef82cc334c40bc0948d6cfbb3c5f",
+  "voice": "04254ade71d1424c9e89e05626956bde",
+  "seed": 21
  },
  "c2_j_l1_ew": {
   "who": "jon",
@@ -437,122 +822,242 @@
  "c2_j_l3_dab": {
   "who": "jon",
   "text": "I smell like a chicken. A soggy chicken.",
-  "file": "audio/vo/c2_j_l3_dab.mp3"
+  "file": "audio/vo/c2_j_l3_dab.mp3",
+  "dur": 2.47,
+  "gen_text": "I smell like a chicken. A soggy chicken.",
+  "job": "128176ac65d742e4825200a1983f63e7",
+  "voice": "04254ade71d1424c9e89e05626956bde",
+  "seed": 101
  },
  "c2_j_l3_soup": {
   "who": "jon",
   "text": "Mmm, chicken soup. Good for the soul. And the sniffles.",
-  "file": "audio/vo/c2_j_l3_soup.mp3"
+  "file": "audio/vo/c2_j_l3_soup.mp3",
+  "dur": 4.28,
+  "gen_text": "Mmm, chicken soup. Good for the soul. And the sniffles.",
+  "job": "60017729befe451d9bf745a4a622d45c",
+  "voice": "04254ade71d1424c9e89e05626956bde",
+  "seed": 21
  },
  "c2_j_l3_splash": {
   "who": "jon",
   "text": "AAH! Hot soup! Hot soup!",
-  "file": "audio/vo/c2_j_l3_splash.mp3"
+  "file": "audio/vo/c2_j_l3_splash.mp3",
+  "dur": 3.17,
+  "gen_text": "AAH! Hot soup! Hot soup!",
+  "job": "1c0db1ed9c0e49588919b2333e97f190",
+  "voice": "04254ade71d1424c9e89e05626956bde",
+  "seed": 21
  },
  "c2_j_l4_diet": {
   "who": "jon",
   "text": "Diet time.",
-  "file": "audio/vo/c2_j_l4_diet.mp3"
+  "file": "audio/vo/c2_j_l4_diet.mp3",
+  "dur": 0.94,
+  "gen_text": "Diet time.",
+  "job": "68704d3d3b6948369e5b1654c1973964",
+  "voice": "04254ade71d1424c9e89e05626956bde",
+  "seed": 21
  },
  "c2_j_l4_work": {
   "who": "jon",
   "text": "Off to work! Be good, you two!",
-  "file": "audio/vo/c2_j_l4_work.mp3"
+  "file": "audio/vo/c2_j_l4_work.mp3",
+  "dur": 2.08,
+  "gen_text": "Off to work! Be good, you two!",
+  "job": "1cdcf608663145bd8c245311ecd0c80f",
+  "voice": "04254ade71d1424c9e89e05626956bde",
+  "seed": 21
  },
  "c2_j_l5_chase": {
   "who": "jon",
   "text": "Hold still, you little — missed!",
-  "file": "audio/vo/c2_j_l5_chase.mp3"
+  "file": "audio/vo/c2_j_l5_chase.mp3",
+  "dur": 1.49,
+  "gen_text": "Hold still, you little — missed!",
+  "job": "e6379cc999e048da8225b35295bfa7c9",
+  "voice": "04254ade71d1424c9e89e05626956bde",
+  "seed": 21
  },
  "c2_j_l5_mice": {
   "who": "jon",
   "text": "MICE! Lyman, get the broom!",
-  "file": "audio/vo/c2_j_l5_mice.mp3"
+  "file": "audio/vo/c2_j_l5_mice.mp3",
+  "dur": 1.78,
+  "gen_text": "MICE! Lyman, get the broom!",
+  "job": "8564a7122834441c9ce029bd084f2234",
+  "voice": "04254ade71d1424c9e89e05626956bde",
+  "seed": 21
  },
  "c2_j_l5_swap": {
   "who": "jon",
   "text": "Out with the old, in with the… identical. Perfect!",
-  "file": "audio/vo/c2_j_l5_swap.mp3"
+  "file": "audio/vo/c2_j_l5_swap.mp3",
+  "dur": 3.48,
+  "gen_text": "Out with the old, in with the… identical. Perfect!",
+  "job": "a226ebfeba5941a9b00cc305a2a498c2",
+  "voice": "04254ade71d1424c9e89e05626956bde",
+  "seed": 21
  },
  "c2_j_l5_tv": {
   "who": "jon",
   "text": "Oh, goodie, the new TV!",
-  "file": "audio/vo/c2_j_l5_tv.mp3"
+  "file": "audio/vo/c2_j_l5_tv.mp3",
+  "dur": 1.68,
+  "gen_text": "Oh, goodie, the new TV!",
+  "job": "2cc677f668dc486fb0c5d3bf8e892943",
+  "voice": "04254ade71d1424c9e89e05626956bde",
+  "seed": 21
  },
  "c2_j_l6_brawl": {
   "who": "jon",
   "text": "My cat is UPSTAIRS!",
-  "file": "audio/vo/c2_j_l6_brawl.mp3"
+  "file": "audio/vo/c2_j_l6_brawl.mp3",
+  "dur": 1.65,
+  "gen_text": "My cat is UPSTAIRS!",
+  "job": "d7313a0b810b44c6894c833f21378319",
+  "voice": "04254ade71d1424c9e89e05626956bde",
+  "seed": 21
  },
  "c2_j_l6_coffee": {
   "who": "jon",
   "text": "HOT COFFEE! Lyman!",
-  "file": "audio/vo/c2_j_l6_coffee.mp3"
+  "file": "audio/vo/c2_j_l6_coffee.mp3",
+  "dur": 1.66,
+  "gen_text": "HOT COFFEE! Lyman!",
+  "job": "3bc6b9afae554350844fd47abdfcebfe",
+  "voice": "04254ade71d1424c9e89e05626956bde",
+  "seed": 101
  },
  "c2_j_l8_bald": {
   "who": "jon",
   "text": "It was bound to happen, Garfield.",
-  "file": "audio/vo/c2_j_l8_bald.mp3"
+  "file": "audio/vo/c2_j_l8_bald.mp3",
+  "dur": 1.52,
+  "gen_text": "It was bound to happen, Garfield.",
+  "job": "3679deb55c5c4ea1a1906f44b7913a07",
+  "voice": "04254ade71d1424c9e89e05626956bde",
+  "seed": 21
  },
  "c2_j_l8_bald_nn": {
   "who": "jon",
   "text": "It was bound to happen, buddy.",
-  "file": "audio/vo/c2_j_l8_bald_nn.mp3"
+  "file": "audio/vo/c2_j_l8_bald_nn.mp3",
+  "dur": 1.43,
+  "gen_text": "It was bound to happen, buddy.",
+  "job": "e3fe3f7ac2a546438d71e84c192c2fe4",
+  "voice": "04254ade71d1424c9e89e05626956bde",
+  "seed": 21
  },
  "c2_j_l8_hair_1": {
   "who": "jon",
   "text": "Who shed on the sofa? …Oh. Right.",
-  "file": "audio/vo/c2_j_l8_hair_1.mp3"
+  "file": "audio/vo/c2_j_l8_hair_1.mp3",
+  "dur": 2.44,
+  "gen_text": "Who shed on the sofa? …Oh. Right.",
+  "job": "b66370dd3c9c43f0a10737947a712a35",
+  "voice": "04254ade71d1424c9e89e05626956bde",
+  "seed": 21
  },
  "c2_j_l8_hair_2": {
   "who": "jon",
   "text": "My bed is ORANGE now. Wonderful.",
-  "file": "audio/vo/c2_j_l8_hair_2.mp3"
+  "file": "audio/vo/c2_j_l8_hair_2.mp3",
+  "dur": 2.24,
+  "gen_text": "My bed is ORANGE now. Wonderful.",
+  "job": "62307a5924f8444e951742dcb6d40319",
+  "voice": "04254ade71d1424c9e89e05626956bde",
+  "seed": 21
  },
  "c2_j_l8_hair_3": {
   "who": "jon",
   "text": "I'm going to need a bigger lint roller.",
-  "file": "audio/vo/c2_j_l8_hair_3.mp3"
+  "file": "audio/vo/c2_j_l8_hair_3.mp3",
+  "dur": 1.79,
+  "gen_text": "I'm going to need a bigger lint roller.",
+  "job": "31cdfa0f3e62478c883c5db48a6aac5a",
+  "voice": "04254ade71d1424c9e89e05626956bde",
+  "seed": 21
  },
  "c2_j_l9_love": {
   "who": "jon",
   "text": "WE LOVE YOU GARFIELD!",
-  "file": "audio/vo/c2_j_l9_love.mp3"
+  "file": "audio/vo/c2_j_l9_love.mp3",
+  "dur": 1.28,
+  "gen_text": "WE LOVE YOU GARFIELD!",
+  "job": "a3e07d939ca34484a5c02585fb3b1e9c",
+  "voice": "04254ade71d1424c9e89e05626956bde",
+  "seed": 21
  },
  "c2_j_l9_love_nn": {
   "who": "jon",
   "text": "WE LOVE YOU, KITTY!",
-  "file": "audio/vo/c2_j_l9_love_nn.mp3"
+  "file": "audio/vo/c2_j_l9_love_nn.mp3",
+  "dur": 1.0,
+  "gen_text": "WE LOVE YOU, KITTY!",
+  "job": "3b05cb0be9e24d1da9ae6b1d8abef560",
+  "voice": "04254ade71d1424c9e89e05626956bde",
+  "seed": 21
  },
  "c2_j_l9_morning": {
   "who": "jon",
   "text": "Goooood moooorrrning Garfield!",
-  "file": "audio/vo/c2_j_l9_morning.mp3"
+  "file": "audio/vo/c2_j_l9_morning.mp3",
+  "dur": 1.67,
+  "gen_text": "Goooood moooorrrning Garfield!",
+  "job": "dc0a4f39ab2f4ba9bd44f3da5a67b15b",
+  "voice": "04254ade71d1424c9e89e05626956bde",
+  "seed": 21
  },
  "c2_j_l9_morning_nn": {
   "who": "jon",
   "text": "Goooood moooorrrning kitty!",
-  "file": "audio/vo/c2_j_l9_morning_nn.mp3"
+  "file": "audio/vo/c2_j_l9_morning_nn.mp3",
+  "dur": 1.6,
+  "gen_text": "Goooood moooorrrning kitty!",
+  "job": "5672759782a5411cb1f6ad68492dfd48",
+  "voice": "04254ade71d1424c9e89e05626956bde",
+  "seed": 21
  },
  "c2_j_l9_nasty": {
   "who": "jon",
   "text": "Garfield's sure been in a nasty mood lately.",
-  "file": "audio/vo/c2_j_l9_nasty.mp3"
+  "file": "audio/vo/c2_j_l9_nasty.mp3",
+  "dur": 2.67,
+  "gen_text": "Garfield's sure been in a nasty mood lately.",
+  "job": "f3a7e3b16a924c389444cb33b44c6fef",
+  "voice": "04254ade71d1424c9e89e05626956bde",
+  "seed": 21
  },
  "c2_j_l9_nasty_nn": {
   "who": "jon",
   "text": "The cat's sure been in a nasty mood lately.",
-  "file": "audio/vo/c2_j_l9_nasty_nn.mp3"
+  "file": "audio/vo/c2_j_l9_nasty_nn.mp3",
+  "dur": 2.5,
+  "gen_text": "The cat's sure been in a nasty mood lately.",
+  "job": "b66659b6dd2b48f3971836e64ed31246",
+  "voice": "04254ade71d1424c9e89e05626956bde",
+  "seed": 21
  },
  "c2_j_l9_ow": {
   "who": "jon",
   "text": "OW! Right in the nose!",
-  "file": "audio/vo/c2_j_l9_ow.mp3"
+  "file": "audio/vo/c2_j_l9_ow.mp3",
+  "dur": 1.38,
+  "gen_text": "OW! Right in the nose!",
+  "job": "fc74f5188cba4080b66488638c492298",
+  "voice": "04254ade71d1424c9e89e05626956bde",
+  "seed": 21
  },
  "c2_j_l9_respect": {
   "who": "jon",
   "text": "With great, great respect.",
-  "file": "audio/vo/c2_j_l9_respect.mp3"
+  "file": "audio/vo/c2_j_l9_respect.mp3",
+  "dur": 1.7,
+  "gen_text": "With great, great respect.",
+  "job": "f8bde461c14a4265b857de61b3747035",
+  "voice": "04254ade71d1424c9e89e05626956bde",
+  "seed": 21
  },
  "c2_j_naughty": {
   "who": "jon",
@@ -627,12 +1132,22 @@
  "c2_j_watch_1": {
   "who": "jon",
   "text": "Ooh, a documentary about cheese!",
-  "file": "audio/vo/c2_j_watch_1.mp3"
+  "file": "audio/vo/c2_j_watch_1.mp3",
+  "dur": 2.6,
+  "gen_text": "Ooh, a documentary about cheese!",
+  "job": "03531d9a42cd4f44a34ef6d360a94b1e",
+  "voice": "04254ade71d1424c9e89e05626956bde",
+  "seed": 21
  },
  "c2_j_watch_2": {
   "who": "jon",
   "text": "This show's great. I have no idea what's happening.",
-  "file": "audio/vo/c2_j_watch_2.mp3"
+  "file": "audio/vo/c2_j_watch_2.mp3",
+  "dur": 2.69,
+  "gen_text": "This show's great. I have no idea what's happening.",
+  "job": "a7aa384eb4eb40f39459112109c69272",
+  "voice": "04254ade71d1424c9e89e05626956bde",
+  "seed": 21
  },
  "c2_l01_hint_1": {
   "who": "garfield",
@@ -647,132 +1162,322 @@
  "c2_l01_hint_2": {
   "who": "garfield",
   "text": "If I step in their dinners, they won't want them.",
-  "file": "audio/vo/c2_l01_hint_2.mp3"
+  "file": "audio/vo/c2_l01_hint_2.mp3",
+  "dur": 2.47,
+  "gen_text": "If I step in their dinners, they won't want them.",
+  "job": "096b2a5d145c4dd09621b3e507e9758f",
+  "voice": "9611963dfd0b48d48ec21f9e72ff258b",
+  "seed": 7
  },
  "c2_l01_hint_3": {
   "who": "garfield",
   "text": "Biscuits, table, both plates, scratch the dog, eat his food.",
-  "file": "audio/vo/c2_l01_hint_3.mp3"
+  "file": "audio/vo/c2_l01_hint_3.mp3",
+  "dur": 4.2,
+  "gen_text": "Biscuits, table, both plates, scratch the dog, eat his food.",
+  "job": "c8adbbd092c344d0814f91839a3a0ccf",
+  "voice": "9611963dfd0b48d48ec21f9e72ff258b",
+  "seed": 7
  },
  "c2_l02_hint_1": {
   "who": "garfield",
   "text": "That dog's on the edge of the table. Literally.",
-  "file": "audio/vo/c2_l02_hint_1.mp3"
+  "file": "audio/vo/c2_l02_hint_1.mp3",
+  "dur": 2.55,
+  "gen_text": "That dog's on the edge of the table. Literally.",
+  "job": "bec92aa8690d489c9485691ba9cb433a",
+  "voice": "9611963dfd0b48d48ec21f9e72ff258b",
+  "seed": 7
  },
  "c2_l02_hint_2": {
   "who": "garfield",
   "text": "Vase plus dog, from the windowsill.",
-  "file": "audio/vo/c2_l02_hint_2.mp3"
+  "file": "audio/vo/c2_l02_hint_2.mp3",
+  "dur": 2.53,
+  "gen_text": "Vase plus dog, from the windowsill.",
+  "job": "a993b9812d05491bbff87cf8f408021c",
+  "voice": "9611963dfd0b48d48ec21f9e72ff258b",
+  "seed": 7
  },
  "c2_l02_hint_3": {
   "who": "garfield",
   "text": "Open the cupboard under the stairs, scratch the biscuit box, shut him in.",
-  "file": "audio/vo/c2_l02_hint_3.mp3"
+  "file": "audio/vo/c2_l02_hint_3.mp3",
+  "dur": 4.52,
+  "gen_text": "Open the cupboard under the stairs, scratch the biscuit box, shut him in.",
+  "job": "7787f6672eaa4bc1938e4dbbb4e235e2",
+  "voice": "9611963dfd0b48d48ec21f9e72ff258b",
+  "seed": 7
  },
  "c2_l03_hint_1": {
   "who": "garfield",
   "text": "Jon's soup looks splashable.",
-  "file": "audio/vo/c2_l03_hint_1.mp3"
+  "file": "audio/vo/c2_l03_hint_1.mp3",
+  "dur": 2.03,
+  "gen_text": "Jon's soup looks splashable.",
+  "job": "6a30f8f5e5a448448699b656526b6e60",
+  "voice": "9611963dfd0b48d48ec21f9e72ff258b",
+  "seed": 7
+ },
+ "c2_l03_hint_1_nn": {
+  "who": "garfield",
+  "text": "That soup looks splashable.",
+  "file": "audio/vo/c2_l03_hint_1_nn.mp3",
+  "dur": 1.62,
+  "gen_text": "That soup looks splashable.",
+  "job": "07751c905d02476f982b3425a4f19a18",
+  "voice": "9611963dfd0b48d48ec21f9e72ff258b",
+  "seed": 7
  },
  "c2_l03_hint_2": {
   "who": "garfield",
   "text": "Lyman's dressed in white. And I'm made of orange.",
-  "file": "audio/vo/c2_l03_hint_2.mp3"
+  "file": "audio/vo/c2_l03_hint_2.mp3",
+  "dur": 3.09,
+  "gen_text": "Lyman's dressed in white. And I'm made of orange.",
+  "job": "74b30384467f481da6d707014e7d174b",
+  "voice": "9611963dfd0b48d48ec21f9e72ff258b",
+  "seed": 7
  },
  "c2_l03_hint_3": {
   "who": "garfield",
   "text": "Rub against Lyman's legs till his suit's covered in fur.",
-  "file": "audio/vo/c2_l03_hint_3.mp3"
+  "file": "audio/vo/c2_l03_hint_3.mp3",
+  "dur": 3.24,
+  "gen_text": "Rub against Lyman's legs till his suit's covered in fur.",
+  "job": "a6c2fc4109e84116a7833e47e119bf96",
+  "voice": "9611963dfd0b48d48ec21f9e72ff258b",
+  "seed": 7
  },
  "c2_l04_hint_1": {
   "who": "garfield",
   "text": "That window is a perfect dog-shaped exit.",
-  "file": "audio/vo/c2_l04_hint_1.mp3"
+  "file": "audio/vo/c2_l04_hint_1.mp3",
+  "dur": 2.93,
+  "gen_text": "That window is a perfect dog-shaped exit.",
+  "job": "c50bc6f281dc4943b446192b8f651a17",
+  "voice": "9611963dfd0b48d48ec21f9e72ff258b",
+  "seed": 7
  },
  "c2_l04_hint_2": {
   "who": "garfield",
   "text": "Open the window first. Then aim the dog.",
-  "file": "audio/vo/c2_l04_hint_2.mp3"
+  "file": "audio/vo/c2_l04_hint_2.mp3",
+  "dur": 3.03,
+  "gen_text": "Open the window first. Then aim the dog.",
+  "job": "6a8d01ef541a4923b34ae3aece2a269e",
+  "voice": "9611963dfd0b48d48ec21f9e72ff258b",
+  "seed": 7
  },
  "c2_l04_hint_3": {
   "who": "garfield",
   "text": "Scratch Odie from the table so he flies higher.",
-  "file": "audio/vo/c2_l04_hint_3.mp3"
+  "file": "audio/vo/c2_l04_hint_3.mp3",
+  "dur": 2.98,
+  "gen_text": "Scratch Odie from the table so he flies higher.",
+  "job": "74b24457dabb4980a0d22097cdd28d58",
+  "voice": "9611963dfd0b48d48ec21f9e72ff258b",
+  "seed": 7
  },
  "c2_l05_hint_1": {
   "who": "garfield",
   "text": "Mice. I need mice. Where do mice live?",
-  "file": "audio/vo/c2_l05_hint_1.mp3"
+  "file": "audio/vo/c2_l05_hint_1.mp3",
+  "dur": 3.59,
+  "gen_text": "Mice. I need mice. Where do mice live?",
+  "job": "1ee90b8e81ba4ac3926bdc09f8139ad4",
+  "voice": "9611963dfd0b48d48ec21f9e72ff258b",
+  "seed": 101
  },
  "c2_l05_hint_2": {
   "who": "garfield",
   "text": "Cheese from the fridge, then leave it lying about.",
-  "file": "audio/vo/c2_l05_hint_2.mp3"
+  "file": "audio/vo/c2_l05_hint_2.mp3",
+  "dur": 2.54,
+  "gen_text": "Cheese from the fridge, then leave it lying about.",
+  "job": "bf67e89a458f4b578be384a522190f32",
+  "voice": "9611963dfd0b48d48ec21f9e72ff258b",
+  "seed": 7
  },
  "c2_l05_hint_3": {
   "who": "garfield",
   "text": "Grip the carpet behind the new TV and PULL.",
-  "file": "audio/vo/c2_l05_hint_3.mp3"
+  "file": "audio/vo/c2_l05_hint_3.mp3",
+  "dur": 2.66,
+  "gen_text": "Grip the carpet behind the new TV and PULL.",
+  "job": "4b38166ecf2c4362a57c359ac7d9d1bd",
+  "voice": "9611963dfd0b48d48ec21f9e72ff258b",
+  "seed": 7
  },
  "c2_l06_hint_1": {
   "who": "garfield",
   "text": "Jon keeps all sorts of junk in his bedroom drawers.",
-  "file": "audio/vo/c2_l06_hint_1.mp3"
+  "file": "audio/vo/c2_l06_hint_1.mp3",
+  "dur": 3.36,
+  "gen_text": "Jon keeps all sorts of junk in his bedroom drawers.",
+  "job": "cf483366f92149d98f4d3dab7b55ab80",
+  "voice": "9611963dfd0b48d48ec21f9e72ff258b",
+  "seed": 7
+ },
+ "c2_l06_hint_1_nn": {
+  "who": "garfield",
+  "text": "My human keeps all sorts of junk in his bedroom drawers.",
+  "file": "audio/vo/c2_l06_hint_1_nn.mp3",
+  "dur": 3.34,
+  "gen_text": "My human keeps all sorts of junk in his bedroom drawers.",
+  "job": "669dea01ae97494794807a8b863b07dd",
+  "voice": "9611963dfd0b48d48ec21f9e72ff258b",
+  "seed": 7
  },
  "c2_l06_hint_2": {
   "who": "garfield",
   "text": "Scratch the drawer in Jon's room open.",
-  "file": "audio/vo/c2_l06_hint_2.mp3"
+  "file": "audio/vo/c2_l06_hint_2.mp3",
+  "dur": 2.28,
+  "gen_text": "Scratch the drawer in Jon's room open.",
+  "job": "3f1a9221ffba4d218b70dc11ef7cabf8",
+  "voice": "9611963dfd0b48d48ec21f9e72ff258b",
+  "seed": 7
+ },
+ "c2_l06_hint_2_nn": {
+  "who": "garfield",
+  "text": "Scratch the drawer upstairs open.",
+  "file": "audio/vo/c2_l06_hint_2_nn.mp3",
+  "dur": 1.93,
+  "gen_text": "Scratch the drawer upstairs open.",
+  "job": "861b337ba4c04ba98c5fbc886aac58db",
+  "voice": "9611963dfd0b48d48ec21f9e72ff258b",
+  "seed": 7
  },
  "c2_l06_hint_3": {
   "who": "garfield",
   "text": "Take the launcher downstairs and fire it at Odie.",
-  "file": "audio/vo/c2_l06_hint_3.mp3"
+  "file": "audio/vo/c2_l06_hint_3.mp3",
+  "dur": 2.6,
+  "gen_text": "Take the launcher downstairs and fire it at Odie.",
+  "job": "88b48194eb8c4ea9ae3c4afc0a393105",
+  "voice": "9611963dfd0b48d48ec21f9e72ff258b",
+  "seed": 7
  },
  "c2_l08_hint_1": {
   "who": "garfield",
   "text": "Shedding week. Jon's bed first.",
-  "file": "audio/vo/c2_l08_hint_1.mp3"
+  "file": "audio/vo/c2_l08_hint_1.mp3",
+  "dur": 2.69,
+  "gen_text": "Shedding week. Jon's bed first.",
+  "job": "bdfa20eadc96425c955803980ab82d37",
+  "voice": "9611963dfd0b48d48ec21f9e72ff258b",
+  "seed": 7
+ },
+ "c2_l08_hint_1_nn": {
+  "who": "garfield",
+  "text": "Shedding week. The big bed first.",
+  "file": "audio/vo/c2_l08_hint_1_nn.mp3",
+  "dur": 2.34,
+  "gen_text": "Shedding week. The big bed first.",
+  "job": "64696110fb6c41f383f6e7863795e4f5",
+  "voice": "9611963dfd0b48d48ec21f9e72ff258b",
+  "seed": 7
  },
  "c2_l08_hint_2": {
   "who": "garfield",
   "text": "Next: the sofa. Then the armchair.",
-  "file": "audio/vo/c2_l08_hint_2.mp3"
+  "file": "audio/vo/c2_l08_hint_2.mp3",
+  "dur": 3.27,
+  "gen_text": "Next: the sofa. Then the armchair.",
+  "job": "cd0e3d6d77864028a2d95531cb908788",
+  "voice": "9611963dfd0b48d48ec21f9e72ff258b",
+  "seed": 7
  },
  "c2_l08_hint_3": {
   "who": "garfield",
   "text": "Save the table for last. It's the big finish.",
-  "file": "audio/vo/c2_l08_hint_3.mp3"
+  "file": "audio/vo/c2_l08_hint_3.mp3",
+  "dur": 2.99,
+  "gen_text": "Save the table for last. It's the big finish.",
+  "job": "3c60778bf31246f89b9ea85e5e3212a8",
+  "voice": "9611963dfd0b48d48ec21f9e72ff258b",
+  "seed": 7
  },
  "c2_l09_hint_1": {
   "who": "garfield",
   "text": "Sit on the table and wait for someone to annoy me.",
-  "file": "audio/vo/c2_l09_hint_1.mp3"
+  "file": "audio/vo/c2_l09_hint_1.mp3",
+  "dur": 2.65,
+  "gen_text": "Sit on the table and wait for someone to annoy me.",
+  "job": "045cc612d88b4932ba09b25a82fc82a7",
+  "voice": "9611963dfd0b48d48ec21f9e72ff258b",
+  "seed": 7
  },
  "c2_l09_hint_2": {
   "who": "garfield",
   "text": "Poke him. Right in the face.",
-  "file": "audio/vo/c2_l09_hint_2.mp3"
+  "file": "audio/vo/c2_l09_hint_2.mp3",
+  "dur": 2.06,
+  "gen_text": "Poke him. Right in the face.",
+  "job": "c296b5181a9a44feab2e72720e13e1b9",
+  "voice": "9611963dfd0b48d48ec21f9e72ff258b",
+  "seed": 7
  },
  "c2_l09_hint_3": {
   "who": "garfield",
   "text": "Hold Interact and give them the full glare.",
-  "file": "audio/vo/c2_l09_hint_3.mp3"
+  "file": "audio/vo/c2_l09_hint_3.mp3",
+  "dur": 2.61,
+  "gen_text": "Hold Interact and give them the full glare.",
+  "job": "3dfa10f69df74acb9e4cbdb6f011e560",
+  "voice": "9611963dfd0b48d48ec21f9e72ff258b",
+  "seed": 7
  },
  "c2_l10_hint_1": {
   "who": "garfield",
   "text": "Jon's sock drawer. A cat's paradise.",
-  "file": "audio/vo/c2_l10_hint_1.mp3"
+  "file": "audio/vo/c2_l10_hint_1.mp3",
+  "dur": 3.28,
+  "gen_text": "Jon's sock drawer. A cat's paradise.",
+  "job": "14a810f7132641abbfbe31fba7a60f06",
+  "voice": "9611963dfd0b48d48ec21f9e72ff258b",
+  "seed": 7
+ },
+ "c2_l10_hint_1_nn": {
+  "who": "garfield",
+  "text": "The sock drawer. A cat's paradise.",
+  "file": "audio/vo/c2_l10_hint_1_nn.mp3",
+  "dur": 2.78,
+  "gen_text": "The sock drawer. A cat's paradise.",
+  "job": "3736585e1a5e4c06b88dfde9a0b7bb3f",
+  "voice": "9611963dfd0b48d48ec21f9e72ff258b",
+  "seed": 7
  },
  "c2_l10_hint_2": {
   "who": "garfield",
   "text": "Socks… on the dog. Obviously.",
-  "file": "audio/vo/c2_l10_hint_2.mp3"
+  "file": "audio/vo/c2_l10_hint_2.mp3",
+  "dur": 2.44,
+  "gen_text": "Socks… on the dog. Obviously.",
+  "job": "c7bcc316d02744cc809e968ef8a630c0",
+  "voice": "9611963dfd0b48d48ec21f9e72ff258b",
+  "seed": 7
  },
  "c2_l10_hint_3": {
   "who": "garfield",
   "text": "There's a whistle on Jon's floor. Blow it as hard as you can.",
-  "file": "audio/vo/c2_l10_hint_3.mp3"
+  "file": "audio/vo/c2_l10_hint_3.mp3",
+  "dur": 4.06,
+  "gen_text": "There's a whistle on Jon's floor. Blow it as hard as you can.",
+  "job": "2444acba355545519731afa1c9ef7435",
+  "voice": "9611963dfd0b48d48ec21f9e72ff258b",
+  "seed": 7
+ },
+ "c2_l10_hint_3_nn": {
+  "who": "garfield",
+  "text": "There's a whistle on the bedroom floor. Blow it as hard as you can.",
+  "file": "audio/vo/c2_l10_hint_3_nn.mp3",
+  "dur": 3.96,
+  "gen_text": "There's a whistle on the bedroom floor. Blow it as hard as you can.",
+  "job": "c802d0262b7d424e94ea559b149831d3",
+  "voice": "9611963dfd0b48d48ec21f9e72ff258b",
+  "seed": 7
  },
  "c2_l_l1_bowl": {
   "who": "lyman",
@@ -824,15 +1529,25 @@
   "voice": "174b6b2ab49a4b0b8e3ca4b7d37af3e0",
   "seed": 7
  },
+ "c2_l_l3_dance_nn": {
+  "who": "lyman",
+  "text": "Look at these moves! Disco never died, pal!",
+  "file": "audio/vo/c2_l_l3_dance_nn.mp3",
+  "dur": 3.09,
+  "gen_text": "Look at these moves! Disco never died, pal!",
+  "job": "024c5355912846daa331e1a476ac1fe1",
+  "voice": "174b6b2ab49a4b0b8e3ca4b7d37af3e0",
+  "seed": 7
+ },
  "c2_l_l3_disco": {
   "who": "lyman",
   "text": "Make way! Lyman's got his dancing pants on!",
   "file": "audio/vo/c2_l_l3_disco.mp3",
-  "dur": 3.22,
+  "dur": 3.37,
   "gen_text": "Make way! Lyman's got his dancing pants on!",
-  "job": "d5567f79871b468f931648586354be15",
+  "job": "e16ef2882e054e328f824cd878d79ae6",
   "voice": "174b6b2ab49a4b0b8e3ca4b7d37af3e0",
-  "seed": 7
+  "seed": 101
  },
  "c2_l_l3_furry": {
   "who": "lyman",
@@ -994,6 +1709,16 @@
   "voice": "174b6b2ab49a4b0b8e3ca4b7d37af3e0",
   "seed": 7
  },
+ "c2_l_telly_1_nn": {
+  "who": "lyman",
+  "text": "Ooh, the good bit's on. Sit down, pal!",
+  "file": "audio/vo/c2_l_telly_1_nn.mp3",
+  "dur": 3.46,
+  "gen_text": "Ooh, the good bit's on. Sit down, pal!",
+  "job": "f1c83de294e3499190aa1039ad2e5151",
+  "voice": "174b6b2ab49a4b0b8e3ca4b7d37af3e0",
+  "seed": 7
+ },
  "c2_l_telly_2": {
   "who": "lyman",
   "text": "Pass the remote. And the snacks. And the cushion.",
@@ -1018,9 +1743,19 @@
   "who": "delivery",
   "text": "Delivery for Arbuckle! Sign here.",
   "file": "audio/vo/d_l5_sign.mp3",
-  "dur": 2.64,
+  "dur": 2.95,
   "gen_text": "Delivery for Arbuckle! Sign here.",
-  "job": "2ef041740cd94e83b7a9a2d7db660ae0",
+  "job": "5d203018545d440ca521b6a5065e5dd9",
+  "voice": "538b211797494cb9a76c6ef968e8ca8a",
+  "seed": 101
+ },
+ "d_l5_sign_nn": {
+  "who": "delivery",
+  "text": "Delivery! Sign here.",
+  "file": "audio/vo/d_l5_sign_nn.mp3",
+  "dur": 1.89,
+  "gen_text": "Delivery! Sign here.",
+  "job": "92031c640c824107b5a82e2d83ae12c3",
   "voice": "538b211797494cb9a76c6ef968e8ca8a",
   "seed": 7
  },
@@ -1051,6 +1786,16 @@
   "dur": 4.8,
   "gen_text": "Empty. Who keeps an empty fridge? Jon, that's who.",
   "job": "be358d17664d466eaf0feaaf45b81de6",
+  "voice": "9611963dfd0b48d48ec21f9e72ff258b",
+  "seed": 7
+ },
+ "fp1_g_fridge_1_nn": {
+  "who": "garfield",
+  "text": "Empty. Who keeps an empty fridge? My human, that's who.",
+  "file": "audio/vo/fp1_g_fridge_1_nn.mp3",
+  "dur": 4.92,
+  "gen_text": "Empty. Who keeps an empty fridge? My human, that's who.",
+  "job": "bc5ed1da97a14aa59d52807f8e59cd1b",
   "voice": "9611963dfd0b48d48ec21f9e72ff258b",
   "seed": 7
  },
@@ -1091,6 +1836,16 @@
   "dur": 4.84,
   "gen_text": "Free play. Free food. Free time to annoy Jon.",
   "job": "8e10e9d6f35d4fd28567b433526425f8",
+  "voice": "9611963dfd0b48d48ec21f9e72ff258b",
+  "seed": 7
+ },
+ "fp1_g_start_2_nn": {
+  "who": "garfield",
+  "text": "Free play. Free food. Free time to annoy the human.",
+  "file": "audio/vo/fp1_g_start_2_nn.mp3",
+  "dur": 3.94,
+  "gen_text": "Free play. Free food. Free time to annoy the human.",
+  "job": "2174cf71c26e47b78c9231af0f24c2d6",
   "voice": "9611963dfd0b48d48ec21f9e72ff258b",
   "seed": 7
  },
@@ -1158,11 +1913,11 @@
   "who": "jon",
   "text": "I'm okay! I'm okay. Mostly okay.",
   "file": "audio/vo/fp1_j_recover_2.mp3",
-  "dur": 3.13,
+  "dur": 3.19,
   "gen_text": "I'm okay! I'm okay. Mostly okay.",
-  "job": "99939381dd7744028e2335436ea96896",
+  "job": "592994fed0ac4495a48637a56051baf8",
   "voice": "04254ade71d1424c9e89e05626956bde",
-  "seed": 21
+  "seed": 101
  },
  "fp1_j_recover_3": {
   "who": "jon",
@@ -1171,6 +1926,26 @@
   "dur": 2.15,
   "gen_text": "Note to self: stop falling over.",
   "job": "f1e9ecb7323b41d2945caf7b4dcd5bf3",
+  "voice": "04254ade71d1424c9e89e05626956bde",
+  "seed": 21
+ },
+ "fp1_j_recover_4": {
+  "who": "jon",
+  "text": "Up I get. Everything's fine. Nothing to see here.",
+  "file": "audio/vo/fp1_j_recover_4.mp3",
+  "dur": 2.69,
+  "gen_text": "Up I get. Everything's fine. Nothing to see here.",
+  "job": "5eac415ab8504aa49e9e31c28630109c",
+  "voice": "04254ade71d1424c9e89e05626956bde",
+  "seed": 21
+ },
+ "fp1_j_recover_5": {
+  "who": "jon",
+  "text": "Ow. Okay. Shaking it off. Shake, shake, shake.",
+  "file": "audio/vo/fp1_j_recover_5.mp3",
+  "dur": 2.63,
+  "gen_text": "Ow. Okay. Shaking it off. Shake, shake, shake.",
+  "job": "ca9a12bbdeb845ebb4d100a8eb7b25d6",
   "voice": "04254ade71d1424c9e89e05626956bde",
   "seed": 21
  },
@@ -1224,6 +1999,16 @@
   "voice": "04254ade71d1424c9e89e05626956bde",
   "seed": 21
  },
+ "fp1_j_sit_5": {
+  "who": "jon",
+  "text": "Ahh. A chair. A table. No dinner. Peaceful.",
+  "file": "audio/vo/fp1_j_sit_5.mp3",
+  "dur": 4.17,
+  "gen_text": "Ahh. A chair. A table. No dinner. Peaceful.",
+  "job": "3d7d24251d164e0d9eb5d0d50de90566",
+  "voice": "04254ade71d1424c9e89e05626956bde",
+  "seed": 21
+ },
  "fp1_j_wander_1": {
   "who": "jon",
   "text": "Day off! What should I do? …Wander. I'll wander.",
@@ -1264,25 +2049,845 @@
   "voice": "04254ade71d1424c9e89e05626956bde",
   "seed": 21
  },
+ "fp1_j_wander_5": {
+  "who": "jon",
+  "text": "La la la, just me, walking around my own house.",
+  "file": "audio/vo/fp1_j_wander_5.mp3",
+  "dur": 3.09,
+  "gen_text": "La la la, just me, walking around my own house.",
+  "job": "2d91a9a0602349439857b6b39246613b",
+  "voice": "04254ade71d1424c9e89e05626956bde",
+  "seed": 21
+ },
  "fp2_g_back": {
   "who": "garfield",
   "text": "He's back. Of course he's back. They always come back.",
-  "file": "audio/vo/fp2_g_back.mp3"
+  "file": "audio/vo/fp2_g_back.mp3",
+  "dur": 3.59,
+  "gen_text": "He's back. Of course he's back. They always come back.",
+  "job": "d047764e89a948fa9df47bd1eaa93537",
+  "voice": "9611963dfd0b48d48ec21f9e72ff258b",
+  "seed": 7
  },
  "fp2_g_bald": {
   "who": "garfield",
   "text": "Still breezy.",
-  "file": "audio/vo/fp2_g_bald.mp3"
+  "file": "audio/vo/fp2_g_bald.mp3",
+  "dur": 1.04,
+  "gen_text": "Still breezy.",
+  "job": "0f316eb333a348688c98fec9f9362b68",
+  "voice": "9611963dfd0b48d48ec21f9e72ff258b",
+  "seed": 7
+ },
+ "fp2_g_bald_back_1": {
+  "who": "garfield",
+  "text": "Fur's back. Order restored. Handsome restored.",
+  "file": "audio/vo/fp2_g_bald_back_1.mp3",
+  "dur": 3.64,
+  "gen_text": "Fur's back. Order restored. Handsome restored.",
+  "job": "3ab8e969b88c4b11a8f6d8e32693215f",
+  "voice": "9611963dfd0b48d48ec21f9e72ff258b",
+  "seed": 7
+ },
+ "fp2_g_bowl_1": {
+  "who": "garfield",
+  "text": "Biscuits. The salad of cat food.",
+  "file": "audio/vo/fp2_g_bowl_1.mp3",
+  "dur": 2.63,
+  "gen_text": "Biscuits. The salad of cat food.",
+  "job": "ade6ba0e82f345c1bbc9594270024b66",
+  "voice": "9611963dfd0b48d48ec21f9e72ff258b",
+  "seed": 7
+ },
+ "fp2_g_brawl_1": {
+  "who": "garfield",
+  "text": "I didn't do anything. I'm just a cat.",
+  "file": "audio/vo/fp2_g_brawl_1.mp3",
+  "dur": 2.35,
+  "gen_text": "I didn't do anything. I'm just a cat.",
+  "job": "e1745bbb9a934f36b6cd3a8e74392c61",
+  "voice": "9611963dfd0b48d48ec21f9e72ff258b",
+  "seed": 7
+ },
+ "fp2_g_brawl_2": {
+  "who": "garfield",
+  "text": "Two grown men and a dog. Best show on telly.",
+  "file": "audio/vo/fp2_g_brawl_2.mp3",
+  "dur": 3.84,
+  "gen_text": "Two grown men and a dog. Best show on telly.",
+  "job": "d8f7d8bea5974a94af2ca5185cf2e513",
+  "voice": "9611963dfd0b48d48ec21f9e72ff258b",
+  "seed": 7
+ },
+ "fp2_g_cancel_1": {
+  "who": "garfield",
+  "text": "Two things were about to happen. Then neither did. Typical.",
+  "file": "audio/vo/fp2_g_cancel_1.mp3",
+  "dur": 4.15,
+  "gen_text": "Two things were about to happen. Then neither did. Typical.",
+  "job": "aeaf0eab99e54ca6817a7f11619ceb9e",
+  "voice": "9611963dfd0b48d48ec21f9e72ff258b",
+  "seed": 7
+ },
+ "fp2_g_cancel_2": {
+  "who": "garfield",
+  "text": "Something was going to happen. It changed its mind.",
+  "file": "audio/vo/fp2_g_cancel_2.mp3",
+  "dur": 3.45,
+  "gen_text": "Something was going to happen. It changed its mind.",
+  "job": "113d1db129ba41f698913c1c200ecf0b",
+  "voice": "9611963dfd0b48d48ec21f9e72ff258b",
+  "seed": 7
+ },
+ "fp2_g_carpet_1": {
+  "who": "garfield",
+  "text": "TV dinner, round two.",
+  "file": "audio/vo/fp2_g_carpet_1.mp3",
+  "dur": 1.64,
+  "gen_text": "TV dinner, round two.",
+  "job": "01ad1df8b6d44a28a6f50ce493ba9223",
+  "voice": "9611963dfd0b48d48ec21f9e72ff258b",
+  "seed": 7
+ },
+ "fp2_g_carpet_miss_1": {
+  "who": "garfield",
+  "text": "No dog under it. Still satisfying.",
+  "file": "audio/vo/fp2_g_carpet_miss_1.mp3",
+  "dur": 2.6,
+  "gen_text": "No dog under it. Still satisfying.",
+  "job": "6b0c9d3d00e6426e9cf28f16a667bd01",
+  "voice": "9611963dfd0b48d48ec21f9e72ff258b",
+  "seed": 7
+ },
+ "fp2_g_cupboard_1": {
+  "who": "garfield",
+  "text": "Dinner's in the cupboard, dog. So are you.",
+  "file": "audio/vo/fp2_g_cupboard_1.mp3",
+  "dur": 2.19,
+  "gen_text": "Dinner's in the cupboard, dog. So are you.",
+  "job": "974cdb38e753464398fb7d1d48cad4f8",
+  "voice": "9611963dfd0b48d48ec21f9e72ff258b",
+  "seed": 7
+ },
+ "fp2_g_cupboard_out_1": {
+  "who": "garfield",
+  "text": "He's out. Nobody tell him how doors work.",
+  "file": "audio/vo/fp2_g_cupboard_out_1.mp3",
+  "dur": 2.93,
+  "gen_text": "He's out. Nobody tell him how doors work.",
+  "job": "9c6c68ca419c4772a5be5adb5a36a249",
+  "voice": "9611963dfd0b48d48ec21f9e72ff258b",
+  "seed": 7
+ },
+ "fp2_g_delivery_1": {
+  "who": "garfield",
+  "text": "A parcel! Is it lasagna? It's never lasagna.",
+  "file": "audio/vo/fp2_g_delivery_1.mp3",
+  "dur": 3.7,
+  "gen_text": "A parcel! Is it lasagna? It's never lasagna.",
+  "job": "09818154ed9448869c0f3cd417727513",
+  "voice": "9611963dfd0b48d48ec21f9e72ff258b",
+  "seed": 7
+ },
+ "fp2_g_disco_1": {
+  "who": "garfield",
+  "text": "The white suit's back. My fur sees an opportunity.",
+  "file": "audio/vo/fp2_g_disco_1.mp3",
+  "dur": 3.44,
+  "gen_text": "The white suit's back. My fur sees an opportunity.",
+  "job": "b43c9b3732ab4bba94c34cc2723286a0",
+  "voice": "9611963dfd0b48d48ec21f9e72ff258b",
+  "seed": 7
+ },
+ "fp2_g_disco_end_1": {
+  "who": "garfield",
+  "text": "Disco's dead. I killed it. With fur.",
+  "file": "audio/vo/fp2_g_disco_end_1.mp3",
+  "dur": 2.92,
+  "gen_text": "Disco's dead. I killed it. With fur.",
+  "job": "146c74c90db54286884cf3de22b97646",
+  "voice": "9611963dfd0b48d48ec21f9e72ff258b",
+  "seed": 7
+ },
+ "fp2_g_eat_1": {
+  "who": "garfield",
+  "text": "Unguarded dinner. My favourite kind.",
+  "file": "audio/vo/fp2_g_eat_1.mp3",
+  "dur": 3.11,
+  "gen_text": "Unguarded dinner. My favourite kind.",
+  "job": "1d6fbe85b55a45a9923c351ba388e46e",
+  "voice": "9611963dfd0b48d48ec21f9e72ff258b",
+  "seed": 7
+ },
+ "fp2_g_eat_2": {
+  "who": "garfield",
+  "text": "Ew for them. Yum for me.",
+  "file": "audio/vo/fp2_g_eat_2.mp3",
+  "dur": 2.33,
+  "gen_text": "Ew for them. Yum for me.",
+  "job": "10ca32b860b84bba867c4fc070cf3673",
+  "voice": "9611963dfd0b48d48ec21f9e72ff258b",
+  "seed": 7
+ },
+ "fp2_g_guard_1": {
+  "who": "garfield",
+  "text": "The dog's guarding it. With his face.",
+  "file": "audio/vo/fp2_g_guard_1.mp3",
+  "dur": 2.19,
+  "gen_text": "The dog's guarding it. With his face.",
+  "job": "8171d4aa0c6142e699b5185f777918b8",
+  "voice": "9611963dfd0b48d48ec21f9e72ff258b",
+  "seed": 7
+ },
+ "fp2_g_hug_1": {
+  "who": "garfield",
+  "text": "Fine. I'm loved. Don't make it weird.",
+  "file": "audio/vo/fp2_g_hug_1.mp3",
+  "dur": 3.3,
+  "gen_text": "Fine. I'm loved. Don't make it weird.",
+  "job": "601aeaabb3114debb8cf3f6e333940ec",
+  "voice": "9611963dfd0b48d48ec21f9e72ff258b",
+  "seed": 7
+ },
+ "fp2_g_idle_1": {
+  "who": "garfield",
+  "text": "Jon, Lyman, a dog and me. One of us is the brains. Guess who.",
+  "file": "audio/vo/fp2_g_idle_1.mp3",
+  "dur": 5.07,
+  "gen_text": "Jon, Lyman, a dog and me. One of us is the brains. Guess who.",
+  "job": "d79212e06d98483db259d60875f740ef",
+  "voice": "9611963dfd0b48d48ec21f9e72ff258b",
+  "seed": 7
+ },
+ "fp2_g_idle_2": {
+  "who": "garfield",
+  "text": "The house is quiet. That's my cue.",
+  "file": "audio/vo/fp2_g_idle_2.mp3",
+  "dur": 2.14,
+  "gen_text": "The house is quiet. That's my cue.",
+  "job": "b7934a122d8945069e9e242d4d9d9cc7",
+  "voice": "9611963dfd0b48d48ec21f9e72ff258b",
+  "seed": 7
+ },
+ "fp2_g_idle_3": {
+  "who": "garfield",
+  "text": "Every day is free play if you're a cat.",
+  "file": "audio/vo/fp2_g_idle_3.mp3",
+  "dur": 2.32,
+  "gen_text": "Every day is free play if you're a cat.",
+  "job": "480920b35f404b9799b05c94884a3dd1",
+  "voice": "9611963dfd0b48d48ec21f9e72ff258b",
+  "seed": 7
+ },
+ "fp2_g_idle_4": {
+  "who": "garfield",
+  "text": "I could nap. Or I could cause chaos. Why not both?",
+  "file": "audio/vo/fp2_g_idle_4.mp3",
+  "dur": 4.33,
+  "gen_text": "I could nap. Or I could cause chaos. Why not both?",
+  "job": "9a3a9b6041034d3b9fa8ded05e26453e",
+  "voice": "9611963dfd0b48d48ec21f9e72ff258b",
+  "seed": 7
+ },
+ "fp2_g_idle_5": {
+  "who": "garfield",
+  "text": "So many targets. So little nap time.",
+  "file": "audio/vo/fp2_g_idle_5.mp3",
+  "dur": 3.13,
+  "gen_text": "So many targets. So little nap time.",
+  "job": "847e63c09d2440b6a8b2d44c270990a7",
+  "voice": "9611963dfd0b48d48ec21f9e72ff258b",
+  "seed": 7
+ },
+ "fp2_g_launcher_1": {
+  "who": "garfield",
+  "text": "Spit-ball launcher. Loaded and dangerous.",
+  "file": "audio/vo/fp2_g_launcher_1.mp3",
+  "dur": 3.26,
+  "gen_text": "Spit-ball launcher. Loaded and dangerous.",
+  "job": "26895ca33524437985b67f3e5e3e0259",
+  "voice": "9611963dfd0b48d48ec21f9e72ff258b",
+  "seed": 7
+ },
+ "fp2_g_launcher_2": {
+  "who": "garfield",
+  "text": "One straw. Infinite possibilities.",
+  "file": "audio/vo/fp2_g_launcher_2.mp3",
+  "dur": 2.73,
+  "gen_text": "One straw. Infinite possibilities.",
+  "job": "f188beb52590456cbbcbdeff245a9f7e",
+  "voice": "9611963dfd0b48d48ec21f9e72ff258b",
+  "seed": 7
+ },
+ "fp2_g_mice_1": {
+  "who": "garfield",
+  "text": "Mice party. Humans dancing. Everything's going to plan.",
+  "file": "audio/vo/fp2_g_mice_1.mp3",
+  "dur": 4.04,
+  "gen_text": "Mice party. Humans dancing. Everything's going to plan.",
+  "job": "537a18f6c5724b158e39054fe47f1f78",
+  "voice": "9611963dfd0b48d48ec21f9e72ff258b",
+  "seed": 7
+ },
+ "fp2_g_mice_2": {
+  "who": "garfield",
+  "text": "I'd catch them, but I'm on a break. Forever.",
+  "file": "audio/vo/fp2_g_mice_2.mp3",
+  "dur": 3.02,
+  "gen_text": "I'd catch them, but I'm on a break. Forever.",
+  "job": "64f28eb80bcc444781205406710274a4",
+  "voice": "9611963dfd0b48d48ec21f9e72ff258b",
+  "seed": 7
+ },
+ "fp2_g_morning_1": {
+  "who": "garfield",
+  "text": "Bad mood. Big table. Let's see who dares.",
+  "file": "audio/vo/fp2_g_morning_1.mp3",
+  "dur": 4.48,
+  "gen_text": "Bad mood. Big table. Let's see who dares.",
+  "job": "ac4cc0413f534cb4863440659326f819",
+  "voice": "9611963dfd0b48d48ec21f9e72ff258b",
+  "seed": 7
+ },
+ "fp2_g_nohug_1": {
+  "who": "garfield",
+  "text": "Respect. That's all I ask. And lasagna.",
+  "file": "audio/vo/fp2_g_nohug_1.mp3",
+  "dur": 3.47,
+  "gen_text": "Respect. That's all I ask. And lasagna.",
+  "job": "fe331b833d5d46c59af2a385fde4565b",
+  "voice": "9611963dfd0b48d48ec21f9e72ff258b",
+  "seed": 7
+ },
+ "fp2_g_odie_fly_1": {
+  "who": "garfield",
+  "text": "Bon voyage, dog breath.",
+  "file": "audio/vo/fp2_g_odie_fly_1.mp3",
+  "dur": 2.11,
+  "gen_text": "Bon voyage, dog breath.",
+  "job": "a7274571e74446dbaa60672e3784d568",
+  "voice": "9611963dfd0b48d48ec21f9e72ff258b",
+  "seed": 7
+ },
+ "fp2_g_odie_fly_2": {
+  "who": "garfield",
+  "text": "Fly, Odie, fly! Preferably far.",
+  "file": "audio/vo/fp2_g_odie_fly_2.mp3",
+  "dur": 2.53,
+  "gen_text": "Fly, Odie, fly! Preferably far.",
+  "job": "e4db70ba2b98456faf08b80bb1d38031",
+  "voice": "9611963dfd0b48d48ec21f9e72ff258b",
+  "seed": 7
+ },
+ "fp2_g_odie_splat_1": {
+  "who": "garfield",
+  "text": "Wall: one. Dog: nil.",
+  "file": "audio/vo/fp2_g_odie_splat_1.mp3",
+  "dur": 3.61,
+  "gen_text": "Wall: one. Dog: nil.",
+  "job": "2c70e4840367420594d6550578b90d94",
+  "voice": "9611963dfd0b48d48ec21f9e72ff258b",
+  "seed": 7
+ },
+ "fp2_g_odie_splat_2": {
+  "who": "garfield",
+  "text": "Close. Next time, open window AND good aim.",
+  "file": "audio/vo/fp2_g_odie_splat_2.mp3",
+  "dur": 3.48,
+  "gen_text": "Close. Next time, open window AND good aim.",
+  "job": "451981641701428c84707118bf406e8f",
+  "voice": "9611963dfd0b48d48ec21f9e72ff258b",
+  "seed": 7
+ },
+ "fp2_g_odie_table_1": {
+  "who": "garfield",
+  "text": "The dog's on the table again. Gravity, do your thing.",
+  "file": "audio/vo/fp2_g_odie_table_1.mp3",
+  "dur": 4.03,
+  "gen_text": "The dog's on the table again. Gravity, do your thing.",
+  "job": "dfbffa966ff14171b1d358002240d1e4",
+  "voice": "9611963dfd0b48d48ec21f9e72ff258b",
+  "seed": 7
+ },
+ "fp2_g_odie_table_2": {
+  "who": "garfield",
+  "text": "Somebody's about to learn about edges.",
+  "file": "audio/vo/fp2_g_odie_table_2.mp3",
+  "dur": 1.81,
+  "gen_text": "Somebody's about to learn about edges.",
+  "job": "443efe59b15e4640a0beb8400a7977e5",
+  "voice": "9611963dfd0b48d48ec21f9e72ff258b",
+  "seed": 7
+ },
+ "fp2_g_shed_1": {
+  "who": "garfield",
+  "text": "Shedding week again. Bless.",
+  "file": "audio/vo/fp2_g_shed_1.mp3",
+  "dur": 2.48,
+  "gen_text": "Shedding week again. Bless.",
+  "job": "0bc285f74334476489d2a863f587740a",
+  "voice": "9611963dfd0b48d48ec21f9e72ff258b",
+  "seed": 7
+ },
+ "fp2_g_shed_2": {
+  "who": "garfield",
+  "text": "A little orange makes everything better.",
+  "file": "audio/vo/fp2_g_shed_2.mp3",
+  "dur": 2.05,
+  "gen_text": "A little orange makes everything better.",
+  "job": "d7cc39dabd6441de97e14d48364e20eb",
+  "voice": "9611963dfd0b48d48ec21f9e72ff258b",
+  "seed": 7
+ },
+ "fp2_g_shed_3": {
+  "who": "garfield",
+  "text": "Fur here. Fur there. Fur everywhere.",
+  "file": "audio/vo/fp2_g_shed_3.mp3",
+  "dur": 2.95,
+  "gen_text": "Fur here. Fur there. Fur everywhere.",
+  "job": "63eadc3bd1a540999f0bb3c874efd962",
+  "voice": "9611963dfd0b48d48ec21f9e72ff258b",
+  "seed": 7
+ },
+ "fp2_g_socks_1": {
+  "who": "garfield",
+  "text": "Odie in socks. My finest work.",
+  "file": "audio/vo/fp2_g_socks_1.mp3",
+  "dur": 2.69,
+  "gen_text": "Odie in socks. My finest work.",
+  "job": "554979419ca4494496e81be70ed45774",
+  "voice": "9611963dfd0b48d48ec21f9e72ff258b",
+  "seed": 7
+ },
+ "fp2_g_soup_1": {
+  "who": "garfield",
+  "text": "Soup. The drink you eat. I approve.",
+  "file": "audio/vo/fp2_g_soup_1.mp3",
+  "dur": 2.94,
+  "gen_text": "Soup. The drink you eat. I approve.",
+  "job": "3b7c94b32f5f4d4fb04adca23cc6d5d3",
+  "voice": "9611963dfd0b48d48ec21f9e72ff258b",
+  "seed": 7
  },
  "fp2_g_start_1": {
   "who": "garfield",
   "text": "A house full of targets. Where do I start?",
-  "file": "audio/vo/fp2_g_start_1.mp3"
+  "file": "audio/vo/fp2_g_start_1.mp3",
+  "dur": 2.42,
+  "gen_text": "A house full of targets. Where do I start?",
+  "job": "ddd8644bb25d4bbc8e26ac49a627e1d0",
+  "voice": "9611963dfd0b48d48ec21f9e72ff258b",
+  "seed": 7
  },
  "fp2_g_start_2": {
   "who": "garfield",
   "text": "Free play, round two. The dog doesn't stand a chance.",
-  "file": "audio/vo/fp2_g_start_2.mp3"
+  "file": "audio/vo/fp2_g_start_2.mp3",
+  "dur": 4.29,
+  "gen_text": "Free play, round two. The dog doesn't stand a chance.",
+  "job": "7eb19b4d1819446c9a2f6d2dc2a50a39",
+  "voice": "9611963dfd0b48d48ec21f9e72ff258b",
+  "seed": 7
+ },
+ "fp2_g_trap_1": {
+  "who": "garfield",
+  "text": "Enjoy your room. I'll hold the door. Closed.",
+  "file": "audio/vo/fp2_g_trap_1.mp3",
+  "dur": 3.6,
+  "gen_text": "Enjoy your room. I'll hold the door. Closed.",
+  "job": "9777a523d3c94df9bb8666c62a236d01",
+  "voice": "9611963dfd0b48d48ec21f9e72ff258b",
+  "seed": 7
+ },
+ "fp2_g_trap_2": {
+  "who": "garfield",
+  "text": "Peace and quiet. Finally.",
+  "file": "audio/vo/fp2_g_trap_2.mp3",
+  "dur": 1.74,
+  "gen_text": "Peace and quiet. Finally.",
+  "job": "980676250b0048b48873e94420ad9984",
+  "voice": "9611963dfd0b48d48ec21f9e72ff258b",
+  "seed": 7
+ },
+ "fp2_g_vase_miss_1": {
+  "who": "garfield",
+  "text": "Missed. That vase died for nothing.",
+  "file": "audio/vo/fp2_g_vase_miss_1.mp3",
+  "dur": 3.1,
+  "gen_text": "Missed. That vase died for nothing.",
+  "job": "1bebfa0284e8498aa53cdbb734dce321",
+  "voice": "9611963dfd0b48d48ec21f9e72ff258b",
+  "seed": 7
+ },
+ "fp2_g_vase_odie_1": {
+  "who": "garfield",
+  "text": "Bullseye. Sorry, vase.",
+  "file": "audio/vo/fp2_g_vase_odie_1.mp3",
+  "dur": 1.7,
+  "gen_text": "Bullseye. Sorry, vase.",
+  "job": "e31c84fb3b4549859b9fa7c840058c69",
+  "voice": "9611963dfd0b48d48ec21f9e72ff258b",
+  "seed": 7
+ },
+ "fp2_g_vase_odie_2": {
+  "who": "garfield",
+  "text": "Special delivery: one vase, express.",
+  "file": "audio/vo/fp2_g_vase_odie_2.mp3",
+  "dur": 3.5,
+  "gen_text": "Special delivery: one vase, express.",
+  "job": "434d4288bfee4974a08547cf3b08227e",
+  "voice": "9611963dfd0b48d48ec21f9e72ff258b",
+  "seed": 7
+ },
+ "fp2_g_warp_1": {
+  "who": "garfield",
+  "text": "The table's weak. Not me. The table.",
+  "file": "audio/vo/fp2_g_warp_1.mp3",
+  "dur": 2.77,
+  "gen_text": "The table's weak. Not me. The table.",
+  "job": "7444fad69e3047e2a2149b36430f40b3",
+  "voice": "9611963dfd0b48d48ec21f9e72ff258b",
+  "seed": 7
+ },
+ "fp2_g_whistle_again_1": {
+  "who": "garfield",
+  "text": "Still broken. I'll keep testing it. For science.",
+  "file": "audio/vo/fp2_g_whistle_again_1.mp3",
+  "dur": 3.52,
+  "gen_text": "Still broken. I'll keep testing it. For science.",
+  "job": "1b59a665104344e5927404b611adac90",
+  "voice": "9611963dfd0b48d48ec21f9e72ff258b",
+  "seed": 7
+ },
+ "fp2_g_whistle_again_2": {
+  "who": "garfield",
+  "text": "Not a peep. Rubbish whistle.",
+  "file": "audio/vo/fp2_g_whistle_again_2.mp3",
+  "dur": 2.24,
+  "gen_text": "Not a peep. Rubbish whistle.",
+  "job": "bc1edf68754e47d8a3004b070bcc8a19",
+  "voice": "9611963dfd0b48d48ec21f9e72ff258b",
+  "seed": 7
+ },
+ "fp2_g_window_1": {
+  "who": "garfield",
+  "text": "Fresh air. For the dog. On his way out.",
+  "file": "audio/vo/fp2_g_window_1.mp3",
+  "dur": 2.78,
+  "gen_text": "Fresh air. For the dog. On his way out.",
+  "job": "701d2acc42584160af17a9be65d1f8ad",
+  "voice": "9611963dfd0b48d48ec21f9e72ff258b",
+  "seed": 7
+ },
+ "fp2_j_coffee_1": {
+  "who": "jon",
+  "text": "Ahh. Coffee. The only thing in this house that doesn't shed.",
+  "file": "audio/vo/fp2_j_coffee_1.mp3",
+  "dur": 4.42,
+  "gen_text": "Ahh. Coffee. The only thing in this house that doesn't shed.",
+  "job": "a0880e4ed7c440d49e7c84aa989a2026",
+  "voice": "04254ade71d1424c9e89e05626956bde",
+  "seed": 21
+ },
+ "fp2_j_coffee_2": {
+  "who": "jon",
+  "text": "A quiet cup of coffee. Any second now. Quiet. Any second.",
+  "file": "audio/vo/fp2_j_coffee_2.mp3",
+  "dur": 4.05,
+  "gen_text": "A quiet cup of coffee. Any second now. Quiet. Any second.",
+  "job": "e073aee9874d408fb60c8860a65f7fe5",
+  "voice": "04254ade71d1424c9e89e05626956bde",
+  "seed": 21
+ },
+ "fp2_j_delivery_1": {
+  "who": "jon",
+  "text": "The doorbell! Coming!",
+  "file": "audio/vo/fp2_j_delivery_1.mp3",
+  "dur": 1.25,
+  "gen_text": "The doorbell! Coming!",
+  "job": "6d43d7a176b94c18a14710e1d81f0d15",
+  "voice": "04254ade71d1424c9e89e05626956bde",
+  "seed": 21
+ },
+ "fp2_j_dinner_1": {
+  "who": "jon",
+  "text": "Dinner time! Two plates, zero cats.",
+  "file": "audio/vo/fp2_j_dinner_1.mp3",
+  "dur": 2.68,
+  "gen_text": "Dinner time! Two plates, zero cats.",
+  "job": "9b3f02e208c1477ea81e00d31b7283d8",
+  "voice": "04254ade71d1424c9e89e05626956bde",
+  "seed": 21
+ },
+ "fp2_j_free_1": {
+  "who": "jon",
+  "text": "Freedom! Who keeps shutting doors?!",
+  "file": "audio/vo/fp2_j_free_1.mp3",
+  "dur": 2.21,
+  "gen_text": "Freedom! Who keeps shutting doors?!",
+  "job": "a05aa15f8c2247029c2bb34269f4b120",
+  "voice": "04254ade71d1424c9e89e05626956bde",
+  "seed": 21
+ },
+ "fp2_j_makeup_1": {
+  "who": "jon",
+  "text": "Sorry, Lyman. Hug it out?",
+  "file": "audio/vo/fp2_j_makeup_1.mp3",
+  "dur": 1.62,
+  "gen_text": "Sorry, Lyman. Hug it out?",
+  "job": "6f867c304d8e499d90490f6d024d1ed8",
+  "voice": "04254ade71d1424c9e89e05626956bde",
+  "seed": 21
+ },
+ "fp2_j_mice_end_1": {
+  "who": "jon",
+  "text": "I think they're gone. I'm never buying cheese again.",
+  "file": "audio/vo/fp2_j_mice_end_1.mp3",
+  "dur": 2.75,
+  "gen_text": "I think they're gone. I'm never buying cheese again.",
+  "job": "9ff1d758614c43e88627595e5631caca",
+  "voice": "04254ade71d1424c9e89e05626956bde",
+  "seed": 21
+ },
+ "fp2_j_odie_1": {
+  "who": "jon",
+  "text": "Odie! Are you okay, boy?",
+  "file": "audio/vo/fp2_j_odie_1.mp3",
+  "dur": 1.73,
+  "gen_text": "Odie! Are you okay, boy?",
+  "job": "0cb40768817b4fedb3528d263c0fbe51",
+  "voice": "04254ade71d1424c9e89e05626956bde",
+  "seed": 21
+ },
+ "fp2_j_room_1": {
+  "who": "jon",
+  "text": "Now where did I put my good socks?",
+  "file": "audio/vo/fp2_j_room_1.mp3",
+  "dur": 1.98,
+  "gen_text": "Now where did I put my good socks?",
+  "job": "51907e1d236f42bbb184514ddb4cf03e",
+  "voice": "04254ade71d1424c9e89e05626956bde",
+  "seed": 21
+ },
+ "fp2_j_room_2": {
+  "who": "jon",
+  "text": "Who's been rolling in my sock drawer?",
+  "file": "audio/vo/fp2_j_room_2.mp3",
+  "dur": 1.7,
+  "gen_text": "Who's been rolling in my sock drawer?",
+  "job": "edb28b43323940d5a19795f6dac5e870",
+  "voice": "04254ade71d1424c9e89e05626956bde",
+  "seed": 21
+ },
+ "fp2_j_shed_1": {
+  "who": "jon",
+  "text": "Is it shedding week AGAIN?!",
+  "file": "audio/vo/fp2_j_shed_1.mp3",
+  "dur": 1.46,
+  "gen_text": "Is it shedding week AGAIN?!",
+  "job": "3372456f5ff643cf927fb0b48bc68028",
+  "voice": "04254ade71d1424c9e89e05626956bde",
+  "seed": 21
+ },
+ "fp2_j_soup_1": {
+  "who": "jon",
+  "text": "Chicken soup for one. Lovely.",
+  "file": "audio/vo/fp2_j_soup_1.mp3",
+  "dur": 2.52,
+  "gen_text": "Chicken soup for one. Lovely.",
+  "job": "0b74ce6dfc184fb99978f4526f921598",
+  "voice": "04254ade71d1424c9e89e05626956bde",
+  "seed": 21
+ },
+ "fp2_j_tv_1": {
+  "who": "jon",
+  "text": "Telly time! Lyman, budge up.",
+  "file": "audio/vo/fp2_j_tv_1.mp3",
+  "dur": 2.07,
+  "gen_text": "Telly time! Lyman, budge up.",
+  "job": "ac8b17f51aeb4d06b18fa5b41ed673b2",
+  "voice": "04254ade71d1424c9e89e05626956bde",
+  "seed": 21
+ },
+ "fp2_j_wander_1": {
+  "who": "jon",
+  "text": "Lyman, did you eat my sandwich? …Lyman?",
+  "file": "audio/vo/fp2_j_wander_1.mp3",
+  "dur": 2.05,
+  "gen_text": "Lyman, did you eat my sandwich? …Lyman?",
+  "job": "df83f6114b9f4711a235e2a3e649face",
+  "voice": "04254ade71d1424c9e89e05626956bde",
+  "seed": 21
+ },
+ "fp2_j_wander_2": {
+  "who": "jon",
+  "text": "What a lovely day to stay in with my pets!",
+  "file": "audio/vo/fp2_j_wander_2.mp3",
+  "dur": 2.27,
+  "gen_text": "What a lovely day to stay in with my pets!",
+  "job": "bec489ec83914090b06a3d8bf7140bdf",
+  "voice": "04254ade71d1424c9e89e05626956bde",
+  "seed": 21
+ },
+ "fp2_j_wander_3": {
+  "who": "jon",
+  "text": "Odie, that's not a chew toy, that's my slipper.",
+  "file": "audio/vo/fp2_j_wander_3.mp3",
+  "dur": 3.0,
+  "gen_text": "Odie, that's not a chew toy, that's my slipper.",
+  "job": "52a23e756b254821a0d86a15441ac01d",
+  "voice": "04254ade71d1424c9e89e05626956bde",
+  "seed": 21
+ },
+ "fp2_j_window_1": {
+  "who": "jon",
+  "text": "Who opened the window? Brrr!",
+  "file": "audio/vo/fp2_j_window_1.mp3",
+  "dur": 1.45,
+  "gen_text": "Who opened the window? Brrr!",
+  "job": "d1267ff5c476441280d07e3881918a03",
+  "voice": "04254ade71d1424c9e89e05626956bde",
+  "seed": 21
+ },
+ "fp2_l_coffee_1": {
+  "who": "lyman",
+  "text": "Coffee and telly. Living the dream.",
+  "file": "audio/vo/fp2_l_coffee_1.mp3",
+  "dur": 3.24,
+  "gen_text": "Coffee and telly. Living the dream.",
+  "job": "4097f05b668744e78e7b5c2523e99648",
+  "voice": "174b6b2ab49a4b0b8e3ca4b7d37af3e0",
+  "seed": 7
+ },
+ "fp2_l_dinner_1": {
+  "who": "lyman",
+  "text": "Steak? Again? Jon, you spoil me.",
+  "file": "audio/vo/fp2_l_dinner_1.mp3",
+  "dur": 3.19,
+  "gen_text": "Steak? Again? Jon, you spoil me.",
+  "job": "dcfad32764f34f47a8df42796f7c0eac",
+  "voice": "174b6b2ab49a4b0b8e3ca4b7d37af3e0",
+  "seed": 7
+ },
+ "fp2_l_disco_1": {
+  "who": "lyman",
+  "text": "Time to boogie! Make way for Lyman!",
+  "file": "audio/vo/fp2_l_disco_1.mp3",
+  "dur": 2.83,
+  "gen_text": "Time to boogie! Make way for Lyman!",
+  "job": "97d5311d4804433094bbcef3c54d4bf6",
+  "voice": "174b6b2ab49a4b0b8e3ca4b7d37af3e0",
+  "seed": 7
+ },
+ "fp2_l_disco_done_1": {
+  "who": "lyman",
+  "text": "Right. Back to normal Lyman. Dull, dull Lyman.",
+  "file": "audio/vo/fp2_l_disco_done_1.mp3",
+  "dur": 4.28,
+  "gen_text": "Right. Back to normal Lyman. Dull, dull Lyman.",
+  "job": "dfd304638c5844fdad82585afb9e1237",
+  "voice": "174b6b2ab49a4b0b8e3ca4b7d37af3e0",
+  "seed": 7
+ },
+ "fp2_l_disco_end_1": {
+  "who": "lyman",
+  "text": "My suit! Covered in cat! I'm going to change.",
+  "file": "audio/vo/fp2_l_disco_end_1.mp3",
+  "dur": 4.12,
+  "gen_text": "My suit! Covered in cat! I'm going to change.",
+  "job": "3e01bf352763433ba384886a82ba598a",
+  "voice": "174b6b2ab49a4b0b8e3ca4b7d37af3e0",
+  "seed": 7
+ },
+ "fp2_l_free_1": {
+  "who": "lyman",
+  "text": "I'm out! I'm cold, I'm hungry, I'm weak… but I'm out!",
+  "file": "audio/vo/fp2_l_free_1.mp3",
+  "dur": 5.43,
+  "gen_text": "I'm out! I'm cold, I'm hungry, I'm weak… but I'm out!",
+  "job": "b2cead3ec01e41ff9f1b8aa86fe4032d",
+  "voice": "174b6b2ab49a4b0b8e3ca4b7d37af3e0",
+  "seed": 7
+ },
+ "fp2_l_makeup_1": {
+  "who": "lyman",
+  "text": "No hard feelings, Jon. Your cat started it.",
+  "file": "audio/vo/fp2_l_makeup_1.mp3",
+  "dur": 3.54,
+  "gen_text": "No hard feelings, Jon. Your cat started it.",
+  "job": "d52453973ea3429a98404685dc88544b",
+  "voice": "174b6b2ab49a4b0b8e3ca4b7d37af3e0",
+  "seed": 7
+ },
+ "fp2_l_odie_1": {
+  "who": "lyman",
+  "text": "Odie! Who did this to you? …I bet it was the cat.",
+  "file": "audio/vo/fp2_l_odie_1.mp3",
+  "dur": 4.14,
+  "gen_text": "Odie! Who did this to you? …I bet it was the cat.",
+  "job": "5d94aae9ad9e40d4984524d031a5fda6",
+  "voice": "174b6b2ab49a4b0b8e3ca4b7d37af3e0",
+  "seed": 7
+ },
+ "fp2_l_odie_back_1": {
+  "who": "lyman",
+  "text": "Odie! You came back! Good boy!",
+  "file": "audio/vo/fp2_l_odie_back_1.mp3",
+  "dur": 3.39,
+  "gen_text": "Odie! You came back! Good boy!",
+  "job": "77bb1ba0833841ebb51d064f5f9ae752",
+  "voice": "174b6b2ab49a4b0b8e3ca4b7d37af3e0",
+  "seed": 7
+ },
+ "fp2_l_room_1": {
+  "who": "lyman",
+  "text": "Just a little nap. A twelve-hour little nap.",
+  "file": "audio/vo/fp2_l_room_1.mp3",
+  "dur": 3.41,
+  "gen_text": "Just a little nap. A twelve-hour little nap.",
+  "job": "c1ea44ca03314356b28e9ed20f1a7901",
+  "voice": "174b6b2ab49a4b0b8e3ca4b7d37af3e0",
+  "seed": 7
+ },
+ "fp2_l_trapped_1": {
+  "who": "lyman",
+  "text": "Jon! The door's stuck! I'm wasting away in here!",
+  "file": "audio/vo/fp2_l_trapped_1.mp3",
+  "dur": 4.22,
+  "gen_text": "Jon! The door's stuck! I'm wasting away in here!",
+  "job": "dac0383c491542319ae0c24544b78ae6",
+  "voice": "174b6b2ab49a4b0b8e3ca4b7d37af3e0",
+  "seed": 7
+ },
+ "fp2_l_trapped_2": {
+  "who": "lyman",
+  "text": "Let me out! I can hear snacks!",
+  "file": "audio/vo/fp2_l_trapped_2.mp3",
+  "dur": 2.57,
+  "gen_text": "Let me out! I can hear snacks!",
+  "job": "b9d7e46d37184eb3b58a6829737dc4be",
+  "voice": "174b6b2ab49a4b0b8e3ca4b7d37af3e0",
+  "seed": 7
+ },
+ "fp2_l_wander_1": {
+  "who": "lyman",
+  "text": "Jon, your fridge is my fridge, right? Right.",
+  "file": "audio/vo/fp2_l_wander_1.mp3",
+  "dur": 3.07,
+  "gen_text": "Jon, your fridge is my fridge, right? Right.",
+  "job": "df115213476b45fe9d45478bc583fe4b",
+  "voice": "174b6b2ab49a4b0b8e3ca4b7d37af3e0",
+  "seed": 7
+ },
+ "fp2_l_wander_2": {
+  "who": "lyman",
+  "text": "A man needs his afternoon snack. And his morning snack.",
+  "file": "audio/vo/fp2_l_wander_2.mp3",
+  "dur": 3.92,
+  "gen_text": "A man needs his afternoon snack. And his morning snack.",
+  "job": "3b8670adf4aa44ada409c65291a79c28",
+  "voice": "174b6b2ab49a4b0b8e3ca4b7d37af3e0",
+  "seed": 7
  },
  "fp_g_idle_1": {
   "who": "garfield",
@@ -1324,6 +2929,26 @@
   "voice": "9611963dfd0b48d48ec21f9e72ff258b",
   "seed": 7
  },
+ "fp_g_idle_5": {
+  "who": "garfield",
+  "text": "No objectives? Finally, a game that understands me.",
+  "file": "audio/vo/fp_g_idle_5.mp3",
+  "dur": 3.83,
+  "gen_text": "No objectives? Finally, a game that understands me.",
+  "job": "7e5901f5cef24adeb8f32f40f51469f4",
+  "voice": "9611963dfd0b48d48ec21f9e72ff258b",
+  "seed": 7
+ },
+ "fp_g_idle_6": {
+  "who": "garfield",
+  "text": "I could do anything. I'll start with nothing.",
+  "file": "audio/vo/fp_g_idle_6.mp3",
+  "dur": 3.16,
+  "gen_text": "I could do anything. I'll start with nothing.",
+  "job": "c666a7f8abf84fd2a06f9de1f9dac070",
+  "voice": "9611963dfd0b48d48ec21f9e72ff258b",
+  "seed": 7
+ },
  "g_belly_1": {
   "who": "garfield",
   "text": "My belly's getting bigger. My plan is working.",
@@ -1336,107 +2961,332 @@
  "g_c2_chased_1": {
   "who": "garfield",
   "text": "Two of them! That's not fair! …Running anyway!",
-  "file": "audio/vo/g_c2_chased_1.mp3"
+  "file": "audio/vo/g_c2_chased_1.mp3",
+  "dur": 3.16,
+  "gen_text": "Two of them! That's not fair! …Running anyway!",
+  "job": "12595f190f3f4bb5b7a155ca34aa6fd4",
+  "voice": "9611963dfd0b48d48ec21f9e72ff258b",
+  "seed": 7
  },
  "g_c2_chased_2": {
   "who": "garfield",
   "text": "Double trouble. Double legs. Go go go!",
-  "file": "audio/vo/g_c2_chased_2.mp3"
+  "file": "audio/vo/g_c2_chased_2.mp3",
+  "dur": 2.68,
+  "gen_text": "Double trouble. Double legs. Go go go!",
+  "job": "0f9a495254084570af9ceef3fbef3607",
+  "voice": "9611963dfd0b48d48ec21f9e72ff258b",
+  "seed": 7
+ },
+ "g_c2_chased_3": {
+  "who": "garfield",
+  "text": "Two humans chasing one cat? Rude!",
+  "file": "audio/vo/g_c2_chased_3.mp3",
+  "dur": 2.98,
+  "gen_text": "Two humans chasing one cat? Rude!",
+  "job": "566c069730544ebdb1e53297b7fab78f",
+  "voice": "9611963dfd0b48d48ec21f9e72ff258b",
+  "seed": 7
+ },
+ "g_c2_chased_4": {
+  "who": "garfield",
+  "text": "Up, up, up! Humans can't climb!",
+  "file": "audio/vo/g_c2_chased_4.mp3",
+  "dur": 3.36,
+  "gen_text": "Up, up, up! Humans can't climb!",
+  "job": "055c70a7a3644107a7bc5c618ebf29b2",
+  "voice": "9611963dfd0b48d48ec21f9e72ff258b",
+  "seed": 7
+ },
+ "g_c2_chased_5": {
+  "who": "garfield",
+  "text": "Run now. Gloat later.",
+  "file": "audio/vo/g_c2_chased_5.mp3",
+  "dur": 1.74,
+  "gen_text": "Run now. Gloat later.",
+  "job": "0d29001905054c50a1af1420b29eef9d",
+  "voice": "9611963dfd0b48d48ec21f9e72ff258b",
+  "seed": 7
+ },
+ "g_c2_chased_6": {
+  "who": "garfield",
+  "text": "Whoa! Too many feet! Too many feet!",
+  "file": "audio/vo/g_c2_chased_6.mp3",
+  "dur": 2.32,
+  "gen_text": "Whoa! Too many feet! Too many feet!",
+  "job": "a582fc786d6943c5b4816c7d6d18f90a",
+  "voice": "9611963dfd0b48d48ec21f9e72ff258b",
+  "seed": 7
  },
  "g_c2_idle_1": {
   "who": "garfield",
   "text": "A dog in my house. What's next, a goldfish with opinions?",
-  "file": "audio/vo/g_c2_idle_1.mp3"
+  "file": "audio/vo/g_c2_idle_1.mp3",
+  "dur": 4.53,
+  "gen_text": "A dog in my house. What's next, a goldfish with opinions?",
+  "job": "0d160f3f6d32456e836879b7daa3f9e5",
+  "voice": "9611963dfd0b48d48ec21f9e72ff258b",
+  "seed": 7
  },
  "g_c2_idle_2": {
   "who": "garfield",
   "text": "Peace and quiet. Remember those? I miss those.",
-  "file": "audio/vo/g_c2_idle_2.mp3"
+  "file": "audio/vo/g_c2_idle_2.mp3",
+  "dur": 3.56,
+  "gen_text": "Peace and quiet. Remember those? I miss those.",
+  "job": "ca95d64aa759403eb718838dc1aac108",
+  "voice": "9611963dfd0b48d48ec21f9e72ff258b",
+  "seed": 7
  },
  "g_c2_idle_3": {
   "who": "garfield",
   "text": "Somebody should get rid of the dog. Somebody orange.",
-  "file": "audio/vo/g_c2_idle_3.mp3"
+  "file": "audio/vo/g_c2_idle_3.mp3",
+  "dur": 3.7,
+  "gen_text": "Somebody should get rid of the dog. Somebody orange.",
+  "job": "99296f9c1cad4b259a026af3e809455d",
+  "voice": "9611963dfd0b48d48ec21f9e72ff258b",
+  "seed": 7
  },
  "g_c2_idle_4": {
   "who": "garfield",
   "text": "I'm not jealous of the dog. I'm superior to the dog. Different thing.",
-  "file": "audio/vo/g_c2_idle_4.mp3"
+  "file": "audio/vo/g_c2_idle_4.mp3",
+  "dur": 4.4,
+  "gen_text": "I'm not jealous of the dog. I'm superior to the dog. Different thing.",
+  "job": "d1567f7d90a945c7ae2880358a3f36f9",
+  "voice": "9611963dfd0b48d48ec21f9e72ff258b",
+  "seed": 7
+ },
+ "g_c2_idle_5": {
+  "who": "garfield",
+  "text": "Two humans, one dog, one cat. The cat's in charge, obviously.",
+  "file": "audio/vo/g_c2_idle_5.mp3",
+  "dur": 4.84,
+  "gen_text": "Two humans, one dog, one cat. The cat's in charge, obviously.",
+  "job": "5a834d841159444cbd818df8f24082fd",
+  "voice": "9611963dfd0b48d48ec21f9e72ff258b",
+  "seed": 7
+ },
+ "g_c2_idle_6": {
+  "who": "garfield",
+  "text": "The dog gets a walk. I get a nap. I win.",
+  "file": "audio/vo/g_c2_idle_6.mp3",
+  "dur": 3.44,
+  "gen_text": "The dog gets a walk. I get a nap. I win.",
+  "job": "d142ff9929ab470b87ac776d1837f62f",
+  "voice": "9611963dfd0b48d48ec21f9e72ff258b",
+  "seed": 7
+ },
+ "g_c2_idle_7": {
+  "who": "garfield",
+  "text": "This house used to be quiet. Then the dog happened.",
+  "file": "audio/vo/g_c2_idle_7.mp3",
+  "dur": 3.02,
+  "gen_text": "This house used to be quiet. Then the dog happened.",
+  "job": "ecd56a4a7c4d4619ba3bdcea9ebfda6f",
+  "voice": "9611963dfd0b48d48ec21f9e72ff258b",
+  "seed": 7
  },
  "g_c2_lyman_1": {
   "who": "garfield",
   "text": "Lyman. The guest who never leaves.",
-  "file": "audio/vo/g_c2_lyman_1.mp3"
+  "file": "audio/vo/g_c2_lyman_1.mp3",
+  "dur": 2.59,
+  "gen_text": "Lyman. The guest who never leaves.",
+  "job": "b584fd14f64246d693eac335910f6e9b",
+  "voice": "9611963dfd0b48d48ec21f9e72ff258b",
+  "seed": 7
  },
  "g_c2_lyman_2": {
   "who": "garfield",
   "text": "He eats more than me. I didn't think that was possible.",
-  "file": "audio/vo/g_c2_lyman_2.mp3"
+  "file": "audio/vo/g_c2_lyman_2.mp3",
+  "dur": 3.03,
+  "gen_text": "He eats more than me. I didn't think that was possible.",
+  "job": "3f9c0dca67b34128afdebfa409edbacb",
+  "voice": "9611963dfd0b48d48ec21f9e72ff258b",
+  "seed": 7
  },
  "g_c2_lyman_3": {
   "who": "garfield",
   "text": "That moustache is hiding crumbs. My crumbs.",
-  "file": "audio/vo/g_c2_lyman_3.mp3"
+  "file": "audio/vo/g_c2_lyman_3.mp3",
+  "dur": 3.92,
+  "gen_text": "That moustache is hiding crumbs. My crumbs.",
+  "job": "eccc205a413d491fbbdc54d534fb7574",
+  "voice": "9611963dfd0b48d48ec21f9e72ff258b",
+  "seed": 7
  },
  "g_c2_lyman_4": {
   "who": "garfield",
   "text": "Two humans. Twice the snacks. Twice the chasing.",
-  "file": "audio/vo/g_c2_lyman_4.mp3"
+  "file": "audio/vo/g_c2_lyman_4.mp3",
+  "dur": 3.73,
+  "gen_text": "Two humans. Twice the snacks. Twice the chasing.",
+  "job": "6a00198ea8f548a4bd23ccd1a1c27a99",
+  "voice": "9611963dfd0b48d48ec21f9e72ff258b",
+  "seed": 7
+ },
+ "g_c2_lyman_5": {
+  "who": "garfield",
+  "text": "Lyman: the only creature in this house lazier than me. I'm almost impressed.",
+  "file": "audio/vo/g_c2_lyman_5.mp3",
+  "dur": 4.91,
+  "gen_text": "Lyman: the only creature in this house lazier than me. I'm almost impressed.",
+  "job": "d3123b77809a4faba4191bb4e677c2a7",
+  "voice": "9611963dfd0b48d48ec21f9e72ff258b",
+  "seed": 7
+ },
+ "g_c2_lyman_6": {
+  "who": "garfield",
+  "text": "Every time he moves in, the fridge gets emptier. Unacceptable.",
+  "file": "audio/vo/g_c2_lyman_6.mp3",
+  "dur": 4.18,
+  "gen_text": "Every time he moves in, the fridge gets emptier. Unacceptable.",
+  "job": "37480559c51d4fc0b0acba004e48a59c",
+  "voice": "9611963dfd0b48d48ec21f9e72ff258b",
+  "seed": 7
  },
  "g_c2_odie_1": {
   "who": "garfield",
   "text": "The dog is breathing on me. Again.",
-  "file": "audio/vo/g_c2_odie_1.mp3"
+  "file": "audio/vo/g_c2_odie_1.mp3",
+  "dur": 2.21,
+  "gen_text": "The dog is breathing on me. Again.",
+  "job": "cf01617edcc4455eade51933aa5120ec",
+  "voice": "9611963dfd0b48d48ec21f9e72ff258b",
+  "seed": 7
+ },
+ "g_c2_odie_10": {
+  "who": "garfield",
+  "text": "He's wagging. Something terrible is about to happen.",
+  "file": "audio/vo/g_c2_odie_10.mp3",
+  "dur": 3.17,
+  "gen_text": "He's wagging. Something terrible is about to happen.",
+  "job": "23df6075423f43f499c916cfa4cb29db",
+  "voice": "9611963dfd0b48d48ec21f9e72ff258b",
+  "seed": 7
+ },
+ "g_c2_odie_11": {
+  "who": "garfield",
+  "text": "That dog licked me. I need a bath. A cat bath. Which is just more licking.",
+  "file": "audio/vo/g_c2_odie_11.mp3",
+  "dur": 5.27,
+  "gen_text": "That dog licked me. I need a bath. A cat bath. Which is just more licking.",
+  "job": "6ae4ee0522d94a2a90db88fe0fcda06d",
+  "voice": "9611963dfd0b48d48ec21f9e72ff258b",
+  "seed": 7
  },
  "g_c2_odie_2": {
   "who": "garfield",
   "text": "His tongue has its own postcode.",
-  "file": "audio/vo/g_c2_odie_2.mp3"
+  "file": "audio/vo/g_c2_odie_2.mp3",
+  "dur": 1.94,
+  "gen_text": "His tongue has its own postcode.",
+  "job": "2e991169a8c447fa86d06c9d73426fb6",
+  "voice": "9611963dfd0b48d48ec21f9e72ff258b",
+  "seed": 7
  },
  "g_c2_odie_3": {
   "who": "garfield",
   "text": "Somewhere, a brain cell is lonely. It's his.",
-  "file": "audio/vo/g_c2_odie_3.mp3"
+  "file": "audio/vo/g_c2_odie_3.mp3",
+  "dur": 3.64,
+  "gen_text": "Somewhere, a brain cell is lonely. It's his.",
+  "job": "b4694642728a42c3991ae8b8cfd377a1",
+  "voice": "9611963dfd0b48d48ec21f9e72ff258b",
+  "seed": 7
  },
  "g_c2_odie_4": {
   "who": "garfield",
   "text": "Panting is not a personality, Odie.",
-  "file": "audio/vo/g_c2_odie_4.mp3"
+  "file": "audio/vo/g_c2_odie_4.mp3",
+  "dur": 2.18,
+  "gen_text": "Panting is not a personality, Odie.",
+  "job": "4d6d4a8ad8874370902ecf6ee0b061e3",
+  "voice": "9611963dfd0b48d48ec21f9e72ff258b",
+  "seed": 7
  },
  "g_c2_odie_5": {
   "who": "garfield",
   "text": "Why is he wet? Why is he always wet?",
-  "file": "audio/vo/g_c2_odie_5.mp3"
+  "file": "audio/vo/g_c2_odie_5.mp3",
+  "dur": 3.39,
+  "gen_text": "Why is he wet? Why is he always wet?",
+  "job": "b19c75c7cfa54e739a96a124c188eb46",
+  "voice": "9611963dfd0b48d48ec21f9e72ff258b",
+  "seed": 7
  },
  "g_c2_odie_6": {
   "who": "garfield",
   "text": "If dogs are man's best friend, I'm man's best boss.",
-  "file": "audio/vo/g_c2_odie_6.mp3"
+  "file": "audio/vo/g_c2_odie_6.mp3",
+  "dur": 3.93,
+  "gen_text": "If dogs are man's best friend, I'm man's best boss.",
+  "job": "ee92c637844641808060f7cb771e0dfe",
+  "voice": "9611963dfd0b48d48ec21f9e72ff258b",
+  "seed": 7
  },
  "g_c2_odie_7": {
   "who": "garfield",
   "text": "He chased his tail for an hour. The tail won.",
-  "file": "audio/vo/g_c2_odie_7.mp3"
+  "file": "audio/vo/g_c2_odie_7.mp3",
+  "dur": 3.27,
+  "gen_text": "He chased his tail for an hour. The tail won.",
+  "job": "631bdf18edb54101966e58458950ad51",
+  "voice": "9611963dfd0b48d48ec21f9e72ff258b",
+  "seed": 7
  },
  "g_c2_odie_8": {
   "who": "garfield",
   "text": "Hello, drool. Goodbye, dignity.",
-  "file": "audio/vo/g_c2_odie_8.mp3"
+  "file": "audio/vo/g_c2_odie_8.mp3",
+  "dur": 3.35,
+  "gen_text": "Hello, drool. Goodbye, dignity.",
+  "job": "d8e5102c1c4a456592e226c347ab7143",
+  "voice": "9611963dfd0b48d48ec21f9e72ff258b",
+  "seed": 7
+ },
+ "g_c2_odie_9": {
+  "who": "garfield",
+  "text": "Odie. Proof that a head can be completely empty.",
+  "file": "audio/vo/g_c2_odie_9.mp3",
+  "dur": 2.9,
+  "gen_text": "Odie. Proof that a head can be completely empty.",
+  "job": "93ecb83a43604d828213a27dec4cd8b6",
+  "voice": "9611963dfd0b48d48ec21f9e72ff258b",
+  "seed": 7
  },
  "g_c2_odie_scratch_1": {
   "who": "garfield",
   "text": "Not yet, dog. I have plans for you.",
-  "file": "audio/vo/g_c2_odie_scratch_1.mp3"
+  "file": "audio/vo/g_c2_odie_scratch_1.mp3",
+  "dur": 2.58,
+  "gen_text": "Not yet, dog. I have plans for you.",
+  "job": "c5b91a84c6c64a44b40e1cd7a5ea2753",
+  "voice": "9611963dfd0b48d48ec21f9e72ff258b",
+  "seed": 7
  },
  "g_c2_odie_scratch_2": {
   "who": "garfield",
   "text": "Just a warm-up scratch.",
-  "file": "audio/vo/g_c2_odie_scratch_2.mp3"
+  "file": "audio/vo/g_c2_odie_scratch_2.mp3",
+  "dur": 1.62,
+  "gen_text": "Just a warm-up scratch.",
+  "job": "eade79cc12bf4d209e3c8747dc3d5809",
+  "voice": "9611963dfd0b48d48ec21f9e72ff258b",
+  "seed": 7
  },
  "g_c2_odie_scratch_3": {
   "who": "garfield",
   "text": "Run along. And come back so I can do it again.",
-  "file": "audio/vo/g_c2_odie_scratch_3.mp3"
+  "file": "audio/vo/g_c2_odie_scratch_3.mp3",
+  "dur": 2.98,
+  "gen_text": "Run along. And come back so I can do it again.",
+  "job": "28a110d3d62b4ab893925abaa5ca41c6",
+  "voice": "9611963dfd0b48d48ec21f9e72ff258b",
+  "seed": 7
  },
  "g_c2_story_bored": {
   "who": "garfield",
@@ -4956,6 +6806,26 @@
   "voice": "174b6b2ab49a4b0b8e3ca4b7d37af3e0",
   "seed": 7
  },
+ "l_butt_3": {
+  "who": "lyman",
+  "text": "Ow-ow-ow! Right in the trousers!",
+  "file": "audio/vo/l_butt_3.mp3",
+  "dur": 2.63,
+  "gen_text": "Ow-ow-ow! Right in the trousers!",
+  "job": "b46dde49a3f4461cb08e54ba4f13e7cd",
+  "voice": "174b6b2ab49a4b0b8e3ca4b7d37af3e0",
+  "seed": 7
+ },
+ "l_butt_4": {
+  "who": "lyman",
+  "text": "That cat has no respect for a man's behind!",
+  "file": "audio/vo/l_butt_4.mp3",
+  "dur": 2.87,
+  "gen_text": "That cat has no respect for a man's behind!",
+  "job": "4a7b3c18b9ff4aa9aec121cf3d94d210",
+  "voice": "174b6b2ab49a4b0b8e3ca4b7d37af3e0",
+  "seed": 7
+ },
  "l_catch_1": {
   "who": "lyman",
   "text": "Got you, you rascal!",
@@ -4983,6 +6853,36 @@
   "dur": 4.15,
   "gen_text": "Gotcha! Jon, I got him! Jon? Are you watching?",
   "job": "6252987a882b4ff69594ff50cb4f401c",
+  "voice": "174b6b2ab49a4b0b8e3ca4b7d37af3e0",
+  "seed": 7
+ },
+ "l_catch_3_nn": {
+  "who": "lyman",
+  "text": "Gotcha! I got him! Hello? Is anybody watching?",
+  "file": "audio/vo/l_catch_3_nn.mp3",
+  "dur": 4.14,
+  "gen_text": "Gotcha! I got him! Hello? Is anybody watching?",
+  "job": "cfa62fc28d9d470b8f56604f8380a66a",
+  "voice": "174b6b2ab49a4b0b8e3ca4b7d37af3e0",
+  "seed": 7
+ },
+ "l_catch_4": {
+  "who": "lyman",
+  "text": "Ha ha! Lyman strikes again!",
+  "file": "audio/vo/l_catch_4.mp3",
+  "dur": 2.27,
+  "gen_text": "Ha ha! Lyman strikes again!",
+  "job": "c7caa78440fe4eeb9ac68df6c8948d83",
+  "voice": "174b6b2ab49a4b0b8e3ca4b7d37af3e0",
+  "seed": 7
+ },
+ "l_catch_5": {
+  "who": "lyman",
+  "text": "Caught red-pawed!",
+  "file": "audio/vo/l_catch_5.mp3",
+  "dur": 1.37,
+  "gen_text": "Caught red-pawed!",
+  "job": "ea755d7ae9e74728a908e5dd0bb5e834",
   "voice": "174b6b2ab49a4b0b8e3ca4b7d37af3e0",
   "seed": 7
  },
@@ -5016,6 +6916,16 @@
   "voice": "174b6b2ab49a4b0b8e3ca4b7d37af3e0",
   "seed": 7
  },
+ "l_chase_3_nn": {
+  "who": "lyman",
+  "text": "Quick! Cut him off at the sofa!",
+  "file": "audio/vo/l_chase_3_nn.mp3",
+  "dur": 2.21,
+  "gen_text": "Quick! Cut him off at the sofa!",
+  "job": "18ec79f089894f8db32c031b8e60376b",
+  "voice": "174b6b2ab49a4b0b8e3ca4b7d37af3e0",
+  "seed": 7
+ },
  "l_chase_4": {
   "who": "lyman",
   "text": "I haven't run this much since the buffet closed!",
@@ -5026,6 +6936,46 @@
   "voice": "174b6b2ab49a4b0b8e3ca4b7d37af3e0",
   "seed": 7
  },
+ "l_chase_5": {
+  "who": "lyman",
+  "text": "Halt, you furry fiend!",
+  "file": "audio/vo/l_chase_5.mp3",
+  "dur": 2.04,
+  "gen_text": "Halt, you furry fiend!",
+  "job": "aea098acf880479e8cc590cbb7f9bf8a",
+  "voice": "174b6b2ab49a4b0b8e3ca4b7d37af3e0",
+  "seed": 7
+ },
+ "l_chase_6": {
+  "who": "lyman",
+  "text": "Huff, puff! I'm a guest! Guests don't run!",
+  "file": "audio/vo/l_chase_6.mp3",
+  "dur": 3.64,
+  "gen_text": "Huff, puff! I'm a guest! Guests don't run!",
+  "job": "9be3b3466e384e0dbae7985263c7151f",
+  "voice": "174b6b2ab49a4b0b8e3ca4b7d37af3e0",
+  "seed": 7
+ },
+ "l_chase_7": {
+  "who": "lyman",
+  "text": "Come back here! I only want to have a little word!",
+  "file": "audio/vo/l_chase_7.mp3",
+  "dur": 3.42,
+  "gen_text": "Come back here! I only want to have a little word!",
+  "job": "90dcd56b367e4b8bb3bab304113e6ec6",
+  "voice": "174b6b2ab49a4b0b8e3ca4b7d37af3e0",
+  "seed": 7
+ },
+ "l_chase_8": {
+  "who": "lyman",
+  "text": "Faster, legs! Faster! Why aren't you listening, legs?",
+  "file": "audio/vo/l_chase_8.mp3",
+  "dur": 5.04,
+  "gen_text": "Faster, legs! Faster! Why aren't you listening, legs?",
+  "job": "0129e0ab4616457b9a90d391277e07f4",
+  "voice": "174b6b2ab49a4b0b8e3ca4b7d37af3e0",
+  "seed": 7
+ },
  "l_eat_1": {
   "who": "lyman",
   "text": "Mmm! Jon, you've outdone yourself.",
@@ -5033,6 +6983,16 @@
   "dur": 2.68,
   "gen_text": "Mmm! Jon, you've outdone yourself.",
   "job": "ed9bb313d8304ade9146e43791ffeed8",
+  "voice": "174b6b2ab49a4b0b8e3ca4b7d37af3e0",
+  "seed": 7
+ },
+ "l_eat_1_nn": {
+  "who": "lyman",
+  "text": "Mmm! Pal, you've outdone yourself.",
+  "file": "audio/vo/l_eat_1_nn.mp3",
+  "dur": 2.46,
+  "gen_text": "Mmm! Pal, you've outdone yourself.",
+  "job": "19614e43a25040d1a82cc25ee2619325",
   "voice": "174b6b2ab49a4b0b8e3ca4b7d37af3e0",
   "seed": 7
  },
@@ -5053,6 +7013,26 @@
   "dur": 3.33,
   "gen_text": "Delicious. Free food always tastes better.",
   "job": "a079d56673ff4180a86eb3a9e3a68904",
+  "voice": "174b6b2ab49a4b0b8e3ca4b7d37af3e0",
+  "seed": 7
+ },
+ "l_eat_4": {
+  "who": "lyman",
+  "text": "Mmm, free dinner. My favourite kind.",
+  "file": "audio/vo/l_eat_4.mp3",
+  "dur": 3.54,
+  "gen_text": "Mmm, free dinner. My favourite kind.",
+  "job": "322cb8e7827c4cf9b09054f4e3048303",
+  "voice": "174b6b2ab49a4b0b8e3ca4b7d37af3e0",
+  "seed": 7
+ },
+ "l_eat_5": {
+  "who": "lyman",
+  "text": "Magnificent! Simply magnificent! Pass the gravy.",
+  "file": "audio/vo/l_eat_5.mp3",
+  "dur": 4.5,
+  "gen_text": "Magnificent! Simply magnificent! Pass the gravy.",
+  "job": "f80a5cd793d548efaa3389ad0c521059",
   "voice": "174b6b2ab49a4b0b8e3ca4b7d37af3e0",
   "seed": 7
  },
@@ -5086,6 +7066,26 @@
   "voice": "174b6b2ab49a4b0b8e3ca4b7d37af3e0",
   "seed": 7
  },
+ "l_face_4": {
+  "who": "lyman",
+  "text": "My face! My handsome, handsome face!",
+  "file": "audio/vo/l_face_4.mp3",
+  "dur": 3.12,
+  "gen_text": "My face! My handsome, handsome face!",
+  "job": "7bfb9f9293784205a2fc8b7fbaee8621",
+  "voice": "174b6b2ab49a4b0b8e3ca4b7d37af3e0",
+  "seed": 7
+ },
+ "l_face_5": {
+  "who": "lyman",
+  "text": "He scratched the moustache! Is it still there? Tell me it's still there!",
+  "file": "audio/vo/l_face_5.mp3",
+  "dur": 4.66,
+  "gen_text": "He scratched the moustache! Is it still there? Tell me it's still there!",
+  "job": "189fc9f0365c450f9bbfc519a7f6bca2",
+  "voice": "174b6b2ab49a4b0b8e3ca4b7d37af3e0",
+  "seed": 7
+ },
  "l_giveup_1": {
   "who": "lyman",
   "text": "Fine! I needed a sit-down anyway.",
@@ -5116,6 +7116,26 @@
   "voice": "174b6b2ab49a4b0b8e3ca4b7d37af3e0",
   "seed": 7
  },
+ "l_giveup_4": {
+  "who": "lyman",
+  "text": "That's enough exercise for one year.",
+  "file": "audio/vo/l_giveup_4.mp3",
+  "dur": 2.69,
+  "gen_text": "That's enough exercise for one year.",
+  "job": "13692668467b49bb98b25be4ffe3b8be",
+  "voice": "174b6b2ab49a4b0b8e3ca4b7d37af3e0",
+  "seed": 7
+ },
+ "l_giveup_5": {
+  "who": "lyman",
+  "text": "I let you win. I'm generous like that.",
+  "file": "audio/vo/l_giveup_5.mp3",
+  "dur": 3.18,
+  "gen_text": "I let you win. I'm generous like that.",
+  "job": "5f2ef775a58d4bfa9319d135b27a838c",
+  "voice": "174b6b2ab49a4b0b8e3ca4b7d37af3e0",
+  "seed": 7
+ },
  "l_glare_1": {
   "who": "lyman",
   "text": "Come down from there this instant!",
@@ -5133,6 +7153,26 @@
   "dur": 2.34,
   "gen_text": "I'd climb up there, but I just ate.",
   "job": "43dad109efac4ca490a45889e0f842aa",
+  "voice": "174b6b2ab49a4b0b8e3ca4b7d37af3e0",
+  "seed": 7
+ },
+ "l_glare_3": {
+  "who": "lyman",
+  "text": "I can wait. I'm very good at sitting around. Ask anyone.",
+  "file": "audio/vo/l_glare_3.mp3",
+  "dur": 4.06,
+  "gen_text": "I can wait. I'm very good at sitting around. Ask anyone.",
+  "job": "a721ea3b149f41ff8dc9b81a4a9c6b68",
+  "voice": "174b6b2ab49a4b0b8e3ca4b7d37af3e0",
+  "seed": 7
+ },
+ "l_glare_4": {
+  "who": "lyman",
+  "text": "Down! Now! Please? Pretty please?",
+  "file": "audio/vo/l_glare_4.mp3",
+  "dur": 4.04,
+  "gen_text": "Down! Now! Please? Pretty please?",
+  "job": "2f398cf7ee0f49fb892c2b175f28fbbf",
   "voice": "174b6b2ab49a4b0b8e3ca4b7d37af3e0",
   "seed": 7
  },
@@ -5156,6 +7196,36 @@
   "voice": "174b6b2ab49a4b0b8e3ca4b7d37af3e0",
   "seed": 7
  },
+ "l_huh_2_nn": {
+  "who": "lyman",
+  "text": "Pal, did you hear something?",
+  "file": "audio/vo/l_huh_2_nn.mp3",
+  "dur": 1.36,
+  "gen_text": "Pal, did you hear something?",
+  "job": "8ee3415cda29461596b2702614a5a3c7",
+  "voice": "174b6b2ab49a4b0b8e3ca4b7d37af3e0",
+  "seed": 7
+ },
+ "l_huh_3": {
+  "who": "lyman",
+  "text": "Hmm? Did somebody say snacks?",
+  "file": "audio/vo/l_huh_3.mp3",
+  "dur": 2.16,
+  "gen_text": "Hmm? Did somebody say snacks?",
+  "job": "8b35c813f7134fcb9503a540820f17df",
+  "voice": "174b6b2ab49a4b0b8e3ca4b7d37af3e0",
+  "seed": 7
+ },
+ "l_huh_4": {
+  "who": "lyman",
+  "text": "What on earth was that racket?",
+  "file": "audio/vo/l_huh_4.mp3",
+  "dur": 2.1,
+  "gen_text": "What on earth was that racket?",
+  "job": "24652d46d90845468930fcf1b7835658",
+  "voice": "174b6b2ab49a4b0b8e3ca4b7d37af3e0",
+  "seed": 7
+ },
  "l_idle_1": {
   "who": "lyman",
   "text": "Jon, old pal, is there any more of that cake?",
@@ -5163,6 +7233,46 @@
   "dur": 3.6,
   "gen_text": "Jon, old pal, is there any more of that cake?",
   "job": "39f657421baf48ec9ec67e87d0fff6d7",
+  "voice": "174b6b2ab49a4b0b8e3ca4b7d37af3e0",
+  "seed": 7
+ },
+ "l_idle_10": {
+  "who": "lyman",
+  "text": "I could get a job. Or I could have a nap. Nap wins.",
+  "file": "audio/vo/l_idle_10.mp3",
+  "dur": 4.07,
+  "gen_text": "I could get a job. Or I could have a nap. Nap wins.",
+  "job": "e6c176e1cbaf48b88bf1c84fe1b5d54a",
+  "voice": "174b6b2ab49a4b0b8e3ca4b7d37af3e0",
+  "seed": 7
+ },
+ "l_idle_11": {
+  "who": "lyman",
+  "text": "Odie, stop chewing the remote. I need that.",
+  "file": "audio/vo/l_idle_11.mp3",
+  "dur": 3.35,
+  "gen_text": "Odie, stop chewing the remote. I need that.",
+  "job": "1502ff99c1a945c78d5fd62e0dffec43",
+  "voice": "174b6b2ab49a4b0b8e3ca4b7d37af3e0",
+  "seed": 7
+ },
+ "l_idle_12": {
+  "who": "lyman",
+  "text": "Life is a stage, and I am the star! Also, I'm hungry.",
+  "file": "audio/vo/l_idle_12.mp3",
+  "dur": 4.98,
+  "gen_text": "Life is a stage, and I am the star! Also, I'm hungry.",
+  "job": "c2b8c55cf7ae46858f966568328dac24",
+  "voice": "174b6b2ab49a4b0b8e3ca4b7d37af3e0",
+  "seed": 7
+ },
+ "l_idle_1_nn": {
+  "who": "lyman",
+  "text": "Old pal, is there any more of that cake?",
+  "file": "audio/vo/l_idle_1_nn.mp3",
+  "dur": 2.36,
+  "gen_text": "Old pal, is there any more of that cake?",
+  "job": "998377fbdbe44ace8c79a27b5bc79a92",
   "voice": "174b6b2ab49a4b0b8e3ca4b7d37af3e0",
   "seed": 7
  },
@@ -5236,6 +7346,26 @@
   "voice": "174b6b2ab49a4b0b8e3ca4b7d37af3e0",
   "seed": 7
  },
+ "l_idle_8_nn": {
+  "who": "lyman",
+  "text": "Your cat is giving me a funny look.",
+  "file": "audio/vo/l_idle_8_nn.mp3",
+  "dur": 2.26,
+  "gen_text": "Your cat is giving me a funny look.",
+  "job": "56423db4adc7443f9a5344e4c1e5f95e",
+  "voice": "174b6b2ab49a4b0b8e3ca4b7d37af3e0",
+  "seed": 7
+ },
+ "l_idle_9": {
+  "who": "lyman",
+  "text": "Ah, home sweet somebody else's home.",
+  "file": "audio/vo/l_idle_9.mp3",
+  "dur": 2.83,
+  "gen_text": "Ah, home sweet somebody else's home.",
+  "job": "03d912486bd341dbb5f62714043c7a45",
+  "voice": "174b6b2ab49a4b0b8e3ca4b7d37af3e0",
+  "seed": 7
+ },
  "l_leg_1": {
   "who": "lyman",
   "text": "OW! My dancing leg!",
@@ -5266,6 +7396,36 @@
   "voice": "174b6b2ab49a4b0b8e3ca4b7d37af3e0",
   "seed": 7
  },
+ "l_leg_3_nn": {
+  "who": "lyman",
+  "text": "Hop… hop… I've been wounded, pal!",
+  "file": "audio/vo/l_leg_3_nn.mp3",
+  "dur": 2.28,
+  "gen_text": "Hop… hop… I've been wounded, pal!",
+  "job": "dc588a5486324649be97c332bce6dad9",
+  "voice": "174b6b2ab49a4b0b8e3ca4b7d37af3e0",
+  "seed": 7
+ },
+ "l_leg_4": {
+  "who": "lyman",
+  "text": "Aaagh! The pain! The agony! Somebody fetch me a sandwich!",
+  "file": "audio/vo/l_leg_4.mp3",
+  "dur": 3.85,
+  "gen_text": "Aaagh! The pain! The agony! Somebody fetch me a sandwich!",
+  "job": "dd7f7580d7d446d0ac718b0a52ba4735",
+  "voice": "174b6b2ab49a4b0b8e3ca4b7d37af3e0",
+  "seed": 7
+ },
+ "l_leg_5": {
+  "who": "lyman",
+  "text": "Ooh! Ah! My poor shin! It'll never dance again!",
+  "file": "audio/vo/l_leg_5.mp3",
+  "dur": 4.95,
+  "gen_text": "Ooh! Ah! My poor shin! It'll never dance again!",
+  "job": "e037e898545a4619a9834c8ffa20086e",
+  "voice": "174b6b2ab49a4b0b8e3ca4b7d37af3e0",
+  "seed": 7
+ },
  "l_paper_1": {
   "who": "lyman",
   "text": "Have a newspaper, furball!",
@@ -5283,6 +7443,16 @@
   "dur": 1.94,
   "gen_text": "Catch! Read all about it!",
   "job": "16bd718f98aa41d39ece607d6174cad3",
+  "voice": "174b6b2ab49a4b0b8e3ca4b7d37af3e0",
+  "seed": 7
+ },
+ "l_paper_3": {
+  "who": "lyman",
+  "text": "Special delivery! Headline: cat gets bonked!",
+  "file": "audio/vo/l_paper_3.mp3",
+  "dur": 3.67,
+  "gen_text": "Special delivery! Headline: cat gets bonked!",
+  "job": "5547bef094504da9af92cd2168ad6453",
   "voice": "174b6b2ab49a4b0b8e3ca4b7d37af3e0",
   "seed": 7
  },

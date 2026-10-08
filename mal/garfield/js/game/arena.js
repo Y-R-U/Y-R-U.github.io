@@ -42,7 +42,7 @@ export function createArena(L, { difficulty = 'easy', to = ARENA.to, onPoint } =
     odieAI.onScratch = () => scorePlayer();
     odieAI.scratchable = () => !ar.over && ar.oInv <= 0;
     hud();
-    ctx.audio?.music?.('arena', { fade: 0.6 });
+    ctx.audio?.music?.((ctx.audio?.musicNames || []).includes('arena') ? 'arena' : 'chase', { fade: 0.6 });
     L.say('ar_g_start', { force: true, delay: 0.6 });
     ar.state = 'approach'; ar.cool = 2.0;
   };

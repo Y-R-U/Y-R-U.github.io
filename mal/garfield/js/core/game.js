@@ -259,7 +259,10 @@ export function createGame(sys) {
     camera.follow({ dur: 0.5 });
     controller.lock(false);
     input.enabled = true;
-    audio.music?.(level.music || 'sneak', { fade: 1.2 });
+    // Ch2 can have its own tracks (arena, sneak2) once media lands them; anything missing falls back to 'sneak'
+    const names = audio.musicNames || [];
+    const want = level.music || (info.ch === 2 ? 'sneak2' : 'sneak');
+    audio.music?.(names.includes(want) ? want : 'sneak', { fade: 1.2 });
     game.state = 'play';
     sys.timings.toPlay = Math.round(performance.now() - t0);
     events.emit('levelStart', { n, key: info.key });

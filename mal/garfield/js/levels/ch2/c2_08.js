@@ -22,6 +22,7 @@ export default defineLevel2({
     SPOTS.forEach((s, i) => L.interact({
       id: 'shed_' + s.id, radius: 0.95, heightTol: 0.8, markerHeight: 0.4,
       get label() { return i === 3 && !L.objDone.slice(0, 3).every(Boolean) ? 'Save the table for last!' : 'Shed!'; },
+      isHint: () => i === 3 && !L.objDone.slice(0, 3).every(Boolean),
       pos: () => apos(ctx, s.anchor, s.fb),
       enabled: () => !L.objDone[i] && !L.flags.shedding,
       onInteract: () => {

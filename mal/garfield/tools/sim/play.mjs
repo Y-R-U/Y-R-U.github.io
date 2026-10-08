@@ -576,13 +576,17 @@ async function menusTest(c) {
   await c.nav(B);
   await c.waitFor(`window.__game && __game.state==='menu'`, 45000);
   await c.eval(`localStorage.setItem('garfield_hh_v1', JSON.stringify({introSeen:true, chapterUnlockSeen:true, levelsUnlocked:10, levelsDone:[1,2,3,4,5,6,7,8,9,10], levelUnlockSeen:10, belly:0.5}))`);
-  // gated (no ?ch2=1): Chapter Two stays 'Coming Soon' and the unlock flag is NOT consumed
+  // gated (no ?ch2=1): Chapter Two stays 'Coming Soon' and the unlock flag is NOT consumed (only while CH2_READY=false)
+  const ready = await c.eval(`import('./js/core/game.js').then((m) => m.CH2_READY)`);
+  console.log('   CH2_READY:', ready);
+  if (!ready) {
   await c.nav(B.replace('&ch2=1', ''));
   await c.waitFor(`window.__game && __game.state==='menu'`, 45000);
   await sleep(1500);
   const gated = await c.eval(`[...document.querySelectorAll('.chap-row .chap-btn')].map(b => b.textContent.trim()).join(' | ') + ' / seen=' + !!__game.save.data.ch2MenuSeen`);
   console.log('   gated menu:', gated);
   if (!/^Chapter One: Food \| Coming Soon \/ seen=false$/.test(gated)) throw new Error('gate broken: ' + gated);
+  }
   await c.nav(B);
   await c.waitFor(`window.__game && __game.state==='menu'`, 45000);
   await sleep(1300); await shot(c, 'menu_ch2_unlocking');

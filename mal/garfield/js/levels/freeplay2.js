@@ -11,7 +11,7 @@ import { LINES } from '../game/lines.js';
 // Contradictory events are mutually exclusive: rolled together they cancel each other, and one that clashes with a
 // running event is cancelled. Every Ch2 interaction works any time. Odie knockouts recover after 10 s; a shut-in
 // person (or dog) gets out after 60 s or when Garfield opens the door; "Naughty Garfield!" chases last 10 s.
-export const FP2 = { knockout: 10, trapped: 60, chase: 10, odieBack: 20, firstRoll: [12, 20], roll: [26, 46], pair: 0.3 };
+export const FP2 = { knockout: 10, trapped: 60, chase: 10, odieBack: 20, firstRoll: [10, 16], roll: [18, 34], pair: 0.3 };
 const rnd = (a, b) => a + Math.random() * (b - a);
 const pickW = (list) => { const s = list.reduce((a, x) => a + x.w, 0); let r = Math.random() * s; for (const x of list) if ((r -= x.w) <= 0) return x; return list[list.length - 1]; };
 const any = (arr) => arr[Math.floor(Math.random() * arr.length)];
@@ -126,6 +126,9 @@ const inLymanRoom = (p) => p.y > 2.5 && p.z > 7.05;
 const upstairs = (p) => p.y > 2.5;
 const BOUNDS = { x0: -0.2, x1: 9.6, z0: -0.2, z1: 11.4 };
 const reach = (nav, from, to) => { try { return !!nav?.path?.(from.clone(), to.clone()); } catch { return false; } };
+// inside furniture or a wall? (paths end exactly at the goal even when the goal itself is blocked)
+const solidAt = (ctx, p, r = 0.18) => (ctx.world.colliders || []).some((c) => c.enabled !== false && !/door|blocker/i.test(c.id || '')
+  && p.x > c.min.x - r && p.x < c.max.x + r && p.z > c.min.z - r && p.z < c.max.z + r && p.y + 0.4 > c.min.y && p.y + 0.05 < c.max.y);
 function tableSpots(ctx) {
   const tb = tableBox(ctx), y = tb.topY, cz = (tb.min.z + tb.max.z) / 2, cx = (tb.min.x + tb.max.x) / 2;
   const floorCands = [V(tb.max.x + 0.5, 0, cz), V(tb.min.x - 0.55, 0, cz), V(cx, 0, tb.min.z - 0.55), V(cx, 0, tb.max.z + 0.55)];
@@ -468,7 +471,7 @@ function brawlStart(L, ev) {
   fight(jon, jp, lp, ['c2_j_l6_brawl', 'j_chase'], ['brawl_slap', 'brawl_dodge', 'brawl_hit', 'brawl_slap']);
   fight(ly, lp, jp, ['c2_l_l6_brawl', 'l_chase'], ['brawl_kick', 'brawl_hit', 'brawl_slap', 'brawl_dodge']);
   L.later(2.2, () => { ctx.audio?.sfx?.('brawl'); ctx.camera?.shake?.(0.06); });
-  L.later(3.5, () => { if (odieFree(L)) odieAI.run('fpKicked', async (t) => { await t.walkTo(mid.clone().add(V(0.7, 0, 0)), { speed: 2 }); odieAI.noise('o_growl_play'); t.loop('bark'); await t.wait(8); odieNext(L); }); });
+  L.later(3.5, () => { if (odieFree(L)) odieAI.run('fpKicked', async (t) => { await t.walkTo(mid.clone().add(V(-0.75, 0, 0)), { speed: 2 }); odieAI.noise('o_growl_play'); t.loop('bark'); await t.wait(8); odieNext(L); }); });
   bark(L, 'c2_g_l6_win', { delay: 5.5, force: true });
   bark(L, 'fp2_g_brawl', { delay: 12, force: true });
   ev.until = L.t + 21;
@@ -757,7 +760,7 @@ function odieGo(L, kind) {
   const f = L.flags;
   const here = L.odie.root.position;
   const nav = ctx.world.navPet || ctx.world.nav;
-  const okTo = (p) => reach(nav, here, p);
+  const okTo = (p) => !solidAt(ctx, p) && reach(nav, here, p);
   const dur = rnd(18, 30);
   const finish = () => { if (!L.dead) odieNext(L); };
   f.odieAct = kind;
@@ -921,7 +924,7 @@ function scratchOdie(L) {
       ctx.audio?.sfx?.('boing');
       knockOdie(L, 'land_head', null);
       bark(L, 'fp2_g_odie_table', { delay: 1.2 });
-      L.later(1.4, () => naughty(L, 0.85));
+      L.later(1.4, () => naughty(L));
     });
     return;
   }
@@ -947,7 +950,7 @@ function scratchOdie(L) {
   L.say('g_c2_odie_scratch', { force: true, delay: 0.5 });
   const away = V(op.x - g.x, 0, op.z - g.z); if (away.lengthSq() < 0.01) away.set(1, 0, 0);
   let to = op.clone().addScaledVector(away.normalize(), 1.6);
-  if (!reach(ctx.world.navPet || ctx.world.nav, op, to)) to = op.clone();
+  if (solidAt(ctx, to) || !reach(ctx.world.navPet || ctx.world.nav, op, to)) to = op.clone();
   odieAI.flee(to, { then: 'idle_pant' });
   L.later(4, () => { if (odieFree(L) && odieAI.taskName() !== 'fpBrace' && !L.fp.claims.odie) odieNext(L); });
 }
@@ -1054,7 +1057,7 @@ async function knockVase(L) {
   if (under && odieFree(L)) {
     knockOdie(L, 'dizzy', 'o_yip');
     bark(L, 'fp2_g_vase_odie', { force: true, delay: 0.6 });
-    L.later(1.5, () => naughty(L, 0.85));
+    L.later(1.5, () => naughty(L));
   } else bark(L, 'fp2_g_vase_miss', { force: true, delay: 0.5 });
   L.later(12, () => { try { vase?.reset?.(); } catch {} f.vaseBroken = false; });
 }
@@ -1294,7 +1297,7 @@ function setupDresser(L) {
       if (sl?.root) { sl.setActive?.(true); ctx.world.scene.attach(sl.root); sl.root.scale.setScalar(0.8); f.launcher = sl.root; } else f.launcher = true;
       bark(L, 'fp2_g_launcher', { force: true, delay: 0.4 });
     } });
-  ctx.interact.register({ id: 'fp_fire', radius: 5.0, heightTol: 1.0, markerHeight: 0.6, label: 'Fire at Odie!', getPos: (o) => (o || V()).copy(L.odie.root.position),
+  ctx.interact.register({ id: 'fp_fire', radius: 3.5, heightTol: 1.0, markerHeight: 0.6, label: 'Fire at Odie!', getPos: (o) => (o || V()).copy(L.odie.root.position),
     enabled: () => !!f.launcher && !f.firing && odieFree(L) && !ctx.director?.active && Math.abs(L.odie.root.position.y - ctx.controller.pos.y) < 1.2,
     onInteract: () => fireSpitball(L) });
   // the whistle on Jon's floor
@@ -1437,6 +1440,9 @@ function fireSpitball(L) {
   ctx.audio?.sfx?.('thwip');
   logEv(L, 'spitball', 'fire');
   Promise.resolve(sl?.fire?.(from, to)).catch(() => {});
+  // one spit-ball per trip: the straw goes back in the broken drawer (so Space isn't stuck on "Fire" all session)
+  L.later(1.2, () => { try { const sl2 = prop(ctx, 'spitballLauncher'); sl2?.reset?.(); sl2?.setActive?.(true); } catch {} });
+  f.launcher = null;
   L.later(0.5, () => {
     f.firing = false;
     if (!odieFree(L)) return;

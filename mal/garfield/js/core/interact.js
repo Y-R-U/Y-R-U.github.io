@@ -25,6 +25,9 @@ export function createInteract({ scene, events, ui, camera }) {
     enabled: true,
     register(def) {
       const it = { radius: 0.6, heightTol: 0.6, label: 'Interact', enabled: () => true, ...def };
+      // a getter label (e.g. 'Open the door' / 'Close the door') stays live: the spread above only copied its value
+      const ld = Object.getOwnPropertyDescriptor(def, 'label');
+      if (ld?.get) it.labelFn = () => ld.get.call(def);
       items.set(it.id, it);
       return () => {
         if (items.get(it.id) !== it) return;
@@ -55,8 +58,18 @@ export function createInteract({ scene, events, ui, camera }) {
         try { api.current?.prop?.highlight?.(false); } catch {}
         try { best?.prop?.highlight?.(true); } catch {}
         api.current = best;
-        ui?.hud?.set?.({ interactLabel: best ? best.label : null });
+        if (best?.labelFn) best.label = best.labelFn();
+        api.lastLabel = best ? best.label : null;
+        api.lastHint = best?.isHint ? !!best.isHint() : false;
+        ui?.hud?.set?.({ interactLabel: api.lastLabel, interactHint: api.lastHint });
         events?.emit('highlight', { id: best?.id || null });
+      } else if (best && (best.labelFn || best.isHint)) {
+        // live label / "not yet" hint (a muted pill instead of the green button, and Space still jumps)
+        const lab = best.labelFn ? best.labelFn() : best.label, hint = best.isHint ? !!best.isHint() : api.lastHint;
+        if (lab !== api.lastLabel || hint !== api.lastHint) {
+          best.label = lab; api.lastLabel = lab; api.lastHint = hint;
+          ui?.hud?.set?.({ interactLabel: lab, ...(best.isHint ? { interactHint: hint } : {}) });
+        }
       }
       marker.visible = !!best && best.marker !== false;
       if (best) {

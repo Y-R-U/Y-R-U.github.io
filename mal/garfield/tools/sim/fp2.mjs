@@ -41,6 +41,11 @@ window.S = (() => {
     tp(s, p); return true;
   };
   const cur = () => G.ctx.interact.current?.id || null;
+  // on the tabletop beside Odie (off the middle, so the table-warp gag doesn't fire)
+  const besideOdieOnTable = () => { const o = odie(), tb = G.ctx.world.anchors.get('tableTop').pos; const x = o.x + (o.x <= tb.x ? 0.42 : -0.42); tp(V(x, tb.y + 0.01, o.z), o); };
+  // frame the action for a screenshot (the follow cam resumes after)
+  const look = (p, o = {}) => { G.ctx.camera.cut(G.ctx.L.shot(p.clone ? p.clone() : V(p.x, p.y, p.z), { dist: 3.0, h: 0.8, ...o })); };
+  const follow = () => G.ctx.camera.follow({ dur: 0 });
   const odie = () => G.ctx.L.odie.root.position;
   // anything inside a solid collider (walls/furniture)?
   const inSolid = (p, r = 0.05) => (G.ctx.world.colliders || []).find((c) => c.enabled !== false && c.kind !== 'surface' && !/door|blocker/i.test(c.id || '')
@@ -55,21 +60,39 @@ window.S = (() => {
       claims: { ...f.claims }, locked: G.ctx.controller.locked, dir: !!G.ctx.director.active, g: G.ctx.controller.pos.toArray().map((v) => +v.toFixed(2)),
       wd: f.watchdog.length, logN: f.log.length };
   };
-  return { G, ctx, L, fp, api, A, V, tp, tpItem, tpScratch, cur, odie, inSolid, snap, ground };
+  return { G, ctx, L, fp, api, A, V, tp, tpItem, tpScratch, cur, odie, inSolid, snap, ground, besideOdieOnTable, look, follow };
 })(); true`;
 
 const results = [];
 const ok = (name, pass, detail = '') => { results.push({ name, pass, detail }); console.log(`${pass ? 'PASS' : 'FAIL'}  ${name}${detail ? '  — ' + detail : ''}`); };
 const CDP = homedir() + '/.claude/bin/cdp';
-if (!args.keep) { try { execFileSync(CDP, ['start', '--port', String(port), '--idle', '900', '--', '--use-angle=metal'], { stdio: 'ignore' }); } catch {} }
+if (!args.keep) { try { execFileSync(CDP, ['start', '--port', String(port), '--idle', String(mins * 60 + 1200), '--', '--use-angle=metal'], { stdio: 'ignore' }); } catch {} }
 const stopBrowser = () => { if (!args.keep) { try { execFileSync(CDP, ['stop', String(port)], { stdio: 'ignore' }); } catch {} } };
 process.on('exit', stopBrowser);
 process.on('SIGINT', () => process.exit(130));
 
-const c = await connect(port);
+let c = await connect(port);
 const E = (x) => c.eval(x);
+const allLogs = [];
+// if the browser dies mid-run (memory pressure, a stray `cdp stop`), start a fresh one and a fresh session
+async function revive(why) {
+  console.log(`   (browser lost: ${why} — restarting it)`);
+  allLogs.push(...c.logs);
+  try { execFileSync(CDP, ['start', '--port', String(port), '--idle', '1800', '--', '--use-angle=metal'], { stdio: 'ignore' }); } catch {}
+  const fresh = await connect(port);
+  Object.assign(c, fresh); c.dead = false;
+  await c.nav(`${base}?level=fp2&skip=1&nointro=1&ch2=1`);
+  await c.waitFor(`window.__game && __game.state==='play' && __game.ctx && __game.ctx.L && __game.ctx.L.started && __game.ctx.L.fp`, 60000);
+  await E(HELPERS);
+  await E(`S.api().director(false)`);
+}
 const until = async (expr, timeout = 20000, every = 200) => { try { await c.waitFor(expr, timeout, every); return true; } catch { return false; } };
-const shot = async (name) => { if (shots) await c.shot(`${shots}/fp2_${name}.png`); };
+const shot = async (name, lookExpr) => {
+  if (!shots) return;
+  if (lookExpr) { await E(`S.look(${lookExpr})`); await sleep(120); }
+  await c.shot(`${shots}/fp2_${name}.png`);
+  if (lookExpr) await E(`S.follow()`);
+};
 const logHas = (kind, id, since = 0) => E(`S.fp().log.some((e) => e.kind === ${JSON.stringify(kind)} ${id ? `&& e.id === ${JSON.stringify(id)}` : ''} && e.t >= ${since})`);
 const now = () => E('S.L().t');
 const settle = async () => {
@@ -112,12 +135,12 @@ T.zoomies = async () => {
   await shot('01_zoomies_edge');
   if (!up) return;
   const t0 = await now();
-  await E(`(() => { const o = S.odie(), tb = S.A('tableTop').pos; const d = S.V(tb.x - o.x, 0, tb.z - o.z).normalize(); S.tp(S.V(o.x + d.x * 0.42, tb.y + 0.01, o.z + d.z * 0.42), o); })()`);
+  await E(`S.besideOdieOnTable()`);
   await sleep(350);
   await pressJ();
   const down = await until(`S.L().flags.odieDown`, 3000);
-  ok('scratch Odie off the table → land_head knockout', down);
-  await sleep(1200); await shot('02_odie_landhead');
+  ok('scratch Odie off the table → land_head knockout', down, down ? '' : await E(`JSON.stringify({hit: S.ctx().scratch.lastHit && [S.ctx().scratch.lastHit.hit, S.ctx().scratch.lastHit.propId, S.ctx().scratch.lastHit.zone], g: S.ctx().controller.pos, odie: S.snap().odie, log: S.fp().log.slice(-4)})`));
+  await sleep(1200); await shot('02_odie_landhead', `S.odie().clone().setY(0.4)`);
   const chase = await until(`S.fp().log.some((e) => e.kind === 'chase' && e.t >= ${t0})`, 4000);
   ok('…and Jon + Lyman chase ("Naughty Garfield!")', chase);
   const rec = await until(`!S.L().flags.odieDown`, 16000);
@@ -136,7 +159,7 @@ T.trapDoor = async () => {
   await pressE();
   const trapped = await until(`S.L().jon.state === 'trapped'`, 4000);
   ok('close the bedroom door on Jon → trapped', trapped);
-  await sleep(2500); await shot('03_jon_trapped');
+  await sleep(2500); await shot('03_jon_trapped', `S.A('bedroomDoor').pos.clone().setY(4)`);
   await until(`S.cur() === 'fp_bedroomDoor'`, 3000);
   await pressE();
   const freed = await until(`S.L().jon.state !== 'trapped'`, 4000);
@@ -160,7 +183,7 @@ T.delivery = async () => {
   await settle();
   await E(`S.api().start('delivery')`);
   const atDoor = await until(`S.L().del && S.L().del.root.visible`, 30000);
-  await sleep(1500); await E(`S.tp(S.V(6.2, 0, 2.6), S.A('doorInside').pos)`); await sleep(400); await shot('04_delivery');
+  await sleep(1500); await E(`S.tp(S.V(6.2, 0, 2.6), S.A('doorInside').pos)`); await sleep(400); await shot('04_delivery', `S.A('doorInside').pos.clone().setY(1.2)`);
   const swapped = await until(`S.L().flags.swapped && !S.fp().active.has('delivery')`, 60000);
   ok('delivery man + new TV, old TV left on the carpet', atDoor && swapped, JSON.stringify(await E(`JSON.stringify(S.fp().log.filter((e) => /delivery|swap/.test(e.id)))`)));
 };
@@ -174,11 +197,14 @@ T.carpet = async () => {
   await E(`S.tpItem('fp_carpet')`);
   await sleep(400);
   const cur = await E('S.cur()');
+  const tv0 = await E(`JSON.stringify(S.ctx().world.props.get('tv').root.getWorldPosition(S.V(0,0,0)).toArray().map((v) => +v.toFixed(2)))`);
   await pressE();
   const pulled = await until(`S.L().flags.pulled`, 3000);
-  await sleep(1500); await shot('05_carpet_flatten');
+  await sleep(2000);
+  console.log('   old TV', tv0, '→', await E(`JSON.stringify(S.ctx().world.props.get('tv').root.getWorldPosition(S.V(0,0,0)).toArray().map((v) => +v.toFixed(2)))`), 'odie', await E(`JSON.stringify(S.odie().toArray().map((v) => +v.toFixed(2)))`));
+  await sleep(3000); await shot('05_carpet_flatten', `S.odie().clone().setY(0.5)`);
   const flat = await until(`S.L().odieAI.state === 'down'`, 3000);
-  ok('grip the carpet → old TV flattens Odie', there && pulled && flat, `cur=${cur}`);
+  ok('grip the carpet → old TV flattens Odie', there && pulled && flat, `cur=${cur} there=${there} pulled=${pulled} flat=${flat} ` + await E(`JSON.stringify({o: S.snap().odie, log: S.fp().log.slice(-3), hs: S.snap().hs.map((h) => h.st)})`));
   const back = await until(`!S.L().flags.pulled`, 20000);
   ok('carpet + old TV reset for another go', back);
 };
@@ -191,7 +217,7 @@ T.vase = async () => {
   await pressJ();
   const hit = await until(`S.fp().log.some((e) => e.kind === 'vase')`, 3000);
   const res = await E(`JSON.stringify(S.fp().log.filter((e) => e.kind === 'vase').slice(-1)[0])`);
-  await sleep(1300); await shot('06_vase_odie');
+  await sleep(1300); await shot('06_vase_odie', `S.odie().clone().setY(0.5)`);
   ok('knock the vase onto Odie by the sill', there && hit && /hit/.test(res), res);
   await settle();
 };
@@ -205,12 +231,12 @@ T.windowLaunch = async () => {
   await until(`!S.L().flags.odieDown`, 15000);
   await E(`S.api().start('zoomies')`);
   const up = await until(`S.L().flags.zoomSat && S.L().odieAI.taskName() === 'fpZoomies'`, 30000);
-  await E(`(() => { const o = S.odie(), tb = S.A('tableTop').pos; const d = S.V(tb.x - o.x, 0, tb.z - o.z).normalize(); S.tp(S.V(o.x + d.x * 0.42, tb.y + 0.01, o.z + d.z * 0.42), o); })()`);
+  await E(`S.besideOdieOnTable()`);
   await sleep(350);
   if (!(await E('S.L().flags.winOpen'))) await E(`S.L().flags.winOpen = true`); // a human may have shut it meanwhile
   await pressJ();
   const out = await until(`S.L().flags.odieOut`, 3000);
-  await sleep(1300); await shot('07_out_the_window');
+  await sleep(1300); await shot('07_out_the_window', `S.A('window').pos.clone()`);
   ok('scratch Odie from the table with the window open → out he goes', up && out);
   const back = await until(`!S.L().flags.odieOut && S.L().odie.root.visible`, 30000);
   ok('Odie comes back through the front door ~20 s later', back);
@@ -270,7 +296,7 @@ T.socksWhistle = async () => {
       await sleep(900);
     }
     const socked = await until(`S.fp().log.some((e) => e.kind === 'socks' && e.id === 'odie')`, 3000);
-    await sleep(2500); await shot('09_odie_socked');
+    await sleep(2500); await shot('09_odie_socked', `S.odie().clone().setY(S.odie().y + 0.4)`);
     ok('sock Odie ×3 → he walks off socked, Jon chases', socked);
   }
   await settle();
@@ -310,7 +336,7 @@ T.brawl = async () => {
   const cur = await E('S.cur()');
   if (cur === 'fp_fire') await pressE(); else await E(`S.ctx().interact.items.get('fp_fire').onInteract()`);
   const brawl = await until(`S.fp().active.has('brawl')`, 3000);
-  await sleep(5000); await shot('10_brawl');
+  await sleep(5000); await shot('10_brawl', `S.A('sofaFoot').pos.clone().setY(1.0)`);
   ok('spit-ball Odie while they watch telly → the coffee brawl', sofa && brawl, `fire via ${cur === 'fp_fire' ? 'E' : 'direct call (another interactable was nearer)'}`);
   const end = await until(`!S.fp().active.has('brawl')`, 30000);
   const hs = await E(`JSON.stringify(S.snap().hs.map((h) => h.st + '/' + h.task))`);
@@ -320,7 +346,7 @@ T.dinner = async () => {
   await settle();
   await E(`S.api().start('dinner')`);
   const seated = await until(`S.L().jon.state === 'sitEat' && S.L().ly.state === 'sitEat'`, 40000);
-  await shot('11_dinner');
+  await shot('11_dinner', `S.A('tableTop').pos.clone().setY(1.0)`);
   await E(`(() => { const p = S.ctx().world.props.get('plate').pos.clone(); const tb = S.A('tableTop').pos; S.tp(S.V(p.x, tb.y + 0.01, p.z + 0.3), p); })()`);
   const ew = await until(`S.L().flags.ew`, 3000);
   ok('dinner for two; step in it → "Ew!", they leave it', seated && ew);
@@ -343,7 +369,7 @@ T.soup = async () => {
   const cur = await E('S.cur()');
   if (cur === 'fp_splash') await pressE(); else await E(`S.ctx().interact.items.get('fp_splash').enabled() && S.ctx().interact.items.get('fp_splash').onInteract()`);
   const splash = await until(`S.fp().log.some((e) => e.kind === 'splash')`, 3000);
-  await sleep(1200); await shot('12_soup_splash');
+  await sleep(1200); await shot('12_soup_splash', `S.A('tableTop').pos.clone().setY(1.0)`);
   ok("splash Jon's chicken soup", seated && splash, `cur=${cur}`);
   const end = await until(`!S.fp().active.has('soup')`, 30000);
   ok('…he wipes off and the soup event ends', end);
@@ -374,13 +400,13 @@ T.goodmorning = async () => {
   await pressE();
   const sat = await until(`S.L().flags.gmSit`, 2000);
   const by = await until(`S.L().flags.gmPhase === 'byTable'`, 30000);
-  await sleep(600); await shot('15_good_morning');
+  await sleep(600); await shot('15_good_morning', `S.A('tableTop').pos.clone().setY(1.1)`);
   await until(`S.cur() === 'fp_poke'`, 3000);
   const cur = await E('S.cur()');
   if (cur === 'fp_poke') await pressE(); else await E(`S.ctx().interact.items.get('fp_poke').onInteract()`);
   const poked = await until(`S.fp().log.some((e) => e.kind === 'poke')`, 3000);
   const glarePh = await until(`S.L().flags.gmPhase === 'glare'`, 20000);
-  await c.keyDown('KeyE'); await sleep(2200); await shot('16_glare'); await c.keyUp('KeyE');
+  await c.keyDown('KeyE'); await sleep(2200); await shot('16_glare', `S.ctx().controller.pos.clone().setY(1.1)`); await c.keyUp('KeyE');
   const glared = await until(`S.fp().log.some((e) => e.kind === 'glare')`, 3000);
   ok('bad mood: sit on the table, Jon sings good morning, poke, hold to glare', sat && by && poked && glarePh && glared, `cur=${cur}`);
   const end = await until(`!S.fp().active.has('goodmorning') && !S.ctx().controller.locked`, 15000);
@@ -394,7 +420,7 @@ T.shedding = async () => {
     await E(`S.tpItem('fp_shed_${s}')`);
     await sleep(400);
     const cur = await E('S.cur()');
-    if (cur === 'fp_shed_' + s) await pressE(); else await E(`S.ctx().interact.items.get('fp_shed_${s}').onInteract()`);
+    if (cur === 'fp_shed_' + s) await pressE(); else { console.log(`   shed ${s}: cur=${cur} enabled=${await E(`S.ctx().interact.items.get('fp_shed_${s}').enabled()`)}`); await E(`S.ctx().interact.items.get('fp_shed_${s}').onInteract()`); }
     await sleep(1900);
     if (s === 'sofa') await shot('17_shed_sofa');
   }
@@ -418,7 +444,7 @@ T.mice = async () => {
   }
   const mice = await until(`S.fp().active.has('mice') || S.fp().pending.has('mice')`, 3000);
   const run = await until(`S.fp().active.has('mice')`, 30000);
-  await sleep(4000); await shot('18_mice');
+  await sleep(4000); await shot('18_mice', `S.L().jon.pos().setY(0.8)`);
   ok('cheese from the fridge + 2 around the house → mice night (both humans chase mice)', cheese && mice && run);
   const end = await until(`!S.fp().active.has('mice')`, 35000);
   ok('…and it ends after ~20 s', end);
@@ -443,7 +469,7 @@ T.warp = async () => {
 T.debugTable = async () => {
   await E(`S.api().start('zoomies')`);
   await until(`S.L().flags.odieOnTable && S.L().odieAI.taskName() === 'fpZoomies' && S.odie().distanceTo(S.A('odieTableEdge').pos) < 0.3`, 30000);
-  await E(`(() => { const o = S.odie(), tb = S.A('tableTop').pos; const d = S.V(tb.x - o.x, 0, tb.z - o.z).normalize(); S.tp(S.V(o.x + d.x * 0.42, tb.y + 0.01, o.z + d.z * 0.42), o); })()`);
+  await E(`S.besideOdieOnTable()`);
   await sleep(350);
   console.log(await E(`JSON.stringify({g: S.ctx().controller.pos, rot: S.ctx().garfield.root.rotation.y, odie: S.odie(), tgt: S.ctx().scratch.targets.get('odie').getPos(S.V(0,0,0)), en: S.ctx().scratch.targets.get('odie').enabled(), jon: S.L().jon.pos(), jst: S.L().jon.state})`));
   await pressJ();
@@ -457,7 +483,10 @@ for (const name of only || order) {
   try {
     const r = await T[name]();
     if (name === 'lymanTrap60') lymanTrapAt = r;
-  } catch (e) { ok(name, false, 'threw: ' + e.message); }
+  } catch (e) {
+    if (/socket closed/.test(e.message)) { await revive(name); try { const r = await T[name](); if (name === 'lymanTrap60') lymanTrapAt = r; } catch (e2) { ok(name, false, 'threw after restart: ' + e2.message); } }
+    else ok(name, false, 'threw: ' + e.message);
+  }
   if (lymanTrapAt != null && (await now()) - lymanTrapAt > 62) {
     const ev = await E(`JSON.stringify(S.fp().log.find((e) => e.kind === 'free' && e.id === 'lyman'))`);
     ok('Lyman lets himself out after 60 s', /"self":true/.test(ev) && /"after":6[0-2]/.test(ev), ev);
@@ -539,7 +568,7 @@ if (!args.nosoak) {
   ok('soak: plenty of barks (≥ 4 per minute)', fpState.barks / gameMin >= 4, `${(fpState.barks / gameMin).toFixed(1)}/min`);
 }
 
-const errs = [...new Set(c.logs.filter((l) => /exception|\[error\]/.test(l)))];
+const errs = [...new Set([...allLogs, ...c.logs].filter((l) => /exception|\[error\]/.test(l)))];
 ok('no exceptions / console errors', !errs.length, errs.slice(0, 6).join('\n   '));
 const warns = [...new Set(c.logs.filter((l) => /\[warn/.test(l) && /fp2|odie|human|cast2/i.test(l)))];
 if (warns.length) console.log('   warnings:\n   ' + warns.slice(0, 8).join('\n   '));

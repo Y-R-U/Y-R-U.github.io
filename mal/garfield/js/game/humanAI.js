@@ -104,7 +104,9 @@ export function createHumanAI(ctx, opts = {}) {
     goal = p.clone(); moveSpeed = speed;
     let pts = null;
     try { pts = world.nav?.path?.(root.position.clone(), goal.clone()); } catch (e) { pts = null; }
-    path = pts && pts.length ? pts.map((q) => q.clone()) : [goal.clone()];
+    ai.noPath = !(pts && pts.length);
+    // unreachable (e.g. behind a shut door): never take the straight line through it across floors
+    path = !ai.noPath ? pts.map((q) => q.clone()) : (Math.abs(goal.y - root.position.y) > 1 ? [] : [goal.clone()]);
     // drop a first node behind us
     if (path.length > 1 && flat(path[0], root.position) < 0.3) path.shift();
     pathI = 0;
@@ -117,7 +119,7 @@ export function createHumanAI(ctx, opts = {}) {
     while (tgt && flat(root.position, tgt) < (pathI === path.length - 1 ? arriveDist : 0.3)) {
       pathI++; tgt = path[pathI];
     }
-    if (!tgt) { root.position.y = goal ? (goal.y ?? root.position.y) : root.position.y; stopMove(); return true; }
+    if (!tgt) { if (path.length && goal) root.position.y = goal.y ?? root.position.y; stopMove(); return true; }
     const dx = tgt.x - root.position.x, dz = tgt.z - root.position.z, d = Math.hypot(dx, dz);
     const want = Math.atan2(dx, dz);
     const turn = wrap(want - root.rotation.y);
@@ -165,7 +167,7 @@ export function createHumanAI(ctx, opts = {}) {
   }
   const tickers = new Set();
   function addTicker(fn) { tickers.add(fn); return () => tickers.delete(fn); }
-  function cancelTask() { if (task) task.cancelled = true; task = null; stopMove(); }
+  function cancelTask() { if (task) task.cancelled = true; task = null; ai.taskName = null; stopMove(); }
 
   function setState(s) { ai.state = s; ai.stateT = 0; ai.events?.emit?.('state', s); }
 
@@ -404,7 +406,7 @@ export function createHumanAI(ctx, opts = {}) {
     ai.chaseLeft -= dt;
     ctx.ui?.hud?.set?.({ chaseTimer: Math.max(0, ai.chaseLeft) });
     const gp = ai.gFloorPos();
-    const elevated = ai.gElevated();
+    const elevated = ai.gElevated() || (ai.noPath && ai.state !== 'catch');
     if (ai.chaseLeft <= 0) return endChase(true);
     if (elevated) {
       if (ai.state !== 'glare') { setState('glare'); ai.glareT = 0; ctx.barks?.say('g_escape', { delay: 0.5 }); }
@@ -412,8 +414,9 @@ export function createHumanAI(ctx, opts = {}) {
       const d = flat(root.position, gp);
       if (d > 0.9) {
         repathT -= dt;
-        if (repathT <= 0 || !path) { setGoal(gp, HUMAN.run * 0.8); repathT = 0.5; }
-        stepMove(dt, 0.85);
+        if (repathT <= 0 || (!path && !ai.noPath)) { setGoal(gp, HUMAN.run * 0.8); repathT = 0.5; }
+        if (ai.noPath) { stopMove(); faceTo(controller.pos, Math.min(1, dt * 8)); clip('talk_angry', { fallback: 'idle' }); }
+        else stepMove(dt, 0.85);
       } else { stopMove(); faceTo(controller.pos, Math.min(1, dt * 8)); clip('talk_angry', { fallback: 'idle' }); }
       if (ai.glareT > 0.9 && !ai._glared) { ai._glared = true; say('j_glare'); }
       if (ai.glareT > HUMAN.glareGiveUp) { ai._glared = false; return endChase(true); }

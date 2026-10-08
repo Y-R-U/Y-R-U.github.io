@@ -115,7 +115,12 @@ async function makeRuntime(ctx, spec) {
   L.tableTopY = () => tableBox(ctx).topY;
 
   // Interact helper (auto-cleared at teardown by ctx.interact).
-  L.interact = (def) => ctx.interact.register({ radius: 0.7, heightTol: 0.6, ...def, getPos: def.getPos || ((o) => (o || V()).copy(def.pos())) });
+  L.interact = (def) => {
+    // keep getter labels live (a spread would freeze them)
+    const o = Object.defineProperties({ radius: 0.7, heightTol: 0.6 }, Object.getOwnPropertyDescriptors(def));
+    if (!o.getPos) o.getPos = (out) => (out || V()).copy(def.pos());
+    return ctx.interact.register(o);
+  };
 
   // An "Eat!" spot: Garfield eats in place (2.4 s, prop.eaten(t)) then onDone.
   L.eatSpot = ({ id, pos, prop: p, enabled, onDone, label = 'Eat!', radius = 0.65, heightTol = 0.5, dur = 2.4, notYet }) => {
@@ -123,7 +128,8 @@ async function makeRuntime(ctx, spec) {
     return L.interact({
       id, radius, heightTol, markerHeight: 0.35,
       get label() { return enabled && !enabled() ? ((typeof notYet === 'function' ? notYet() : notYet) || 'Not yet!') : label; },
-      pos, enabled: () => !eating && !L.won && (!notYet || true) && (enabled ? (enabled() || !!notYet) : true),
+      pos, enabled: () => !eating && !L.won && (enabled ? (enabled() || !!notYet) : true),
+      isHint: () => !!(enabled && !enabled()),
       onInteract: async () => {
         if (enabled && !enabled()) { L.say(spec.notYetBark || 'g_guarded', { force: true }); return; }
         eating = true;

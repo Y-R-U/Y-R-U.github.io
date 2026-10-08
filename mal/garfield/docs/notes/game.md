@@ -29,12 +29,19 @@ tools/ui_kit.html, docs/LEVELS2.md. CDP port 9407 (`node tools/sim/play.mjs ... 
   arena (L7 win, L7 lose, menu arena) PASS
 - freeplay2 handed to helper 'fp2' (owns js/levels/freeplay2.js + tools/sim/fp2.mjs only)
 
+- Ch2 LIVE (manager 71ff204a, CH2_READY=true); menus test reads CH2_READY
+- touch pass (scratchpad touchpass.mjs, real CDP touch on the HUD buttons) at 1024x768 + 844x390: carpet, spit-ball,
+  sock drawer hop, glare HOLD, arena scratch — all PASS. Found+fixed: getter labels were frozen by core interact's
+  spread (now live via labelFn) + isHint muted pills
+- audio: Ch2 music falls back (arena→chase, sneak2→sneak) until media's tracks land; L2 Odie pant loop (sfxLoop)
+- regression after all that: Ch1 1-10, catch, fp1, c2:1-10, arena all PASS
+
 ## IN PROGRESS
-- touch/tablet checks of new HUD bits (arena score, hold ring)
+- nothing mid-edit
 
 ## NEXT
-- manager flips CH2_READY after running the suite
-- polish ideas: Lyman's hair reads brown in some light (cast); arena camera; L5 mice visibility
+- support helper 'fp2' (owns js/levels/freeplay2.js, tools/sim/fp2.mjs)
+- polish: sock-drawer camera jams into the dresser; L5 mice hard to see; Lyman hair reads brown in warm light
 
 ## REQUESTS
-- (none open)
+- none open

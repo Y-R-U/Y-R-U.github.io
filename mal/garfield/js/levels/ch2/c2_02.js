@@ -64,6 +64,8 @@ export default defineLevel2({
     L.odieAI.place('odieTableEdge');
     L.odieAI.sit('sit_pant');
     L.odieAI.onScratch = () => scratchOdie(L);
+    // "always panting"
+    try { L.flags.pant = ctx.audio?.sfxLoop?.('pant', { vol: 0.35, pos: L.odie.root.position }); } catch {}
   },
   update(L) {
     const { ctx } = L;
@@ -83,7 +85,7 @@ export default defineLevel2({
     else if (n === 5) L.target((o) => o.copy(apos(ctx, 'biscuitBox', V())), { height: 0.35 });
     else L.target(null);
   },
-  teardown(L) { showPlates(L); try { prop(L.ctx, 'cupboardDoor')?.reset?.(); prop(L.ctx, 'vase')?.reset?.(); } catch {} },
+  teardown(L) { try { L.flags.pant?.(0.3); } catch {} showPlates(L); try { prop(L.ctx, 'cupboardDoor')?.reset?.(); prop(L.ctx, 'vase')?.reset?.(); } catch {} },
 });
 
 async function scratchOdie(L) {
