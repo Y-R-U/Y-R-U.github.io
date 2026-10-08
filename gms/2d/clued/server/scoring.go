@@ -31,6 +31,7 @@ type qMeta struct {
 	Answer  json.RawMessage
 	LimitMs int
 	Stages  int     // progressive question: stages 0…Stages-1 (0/1 = not progressive)
+	StepMs  int     // online auto-advance interval (progressive, not kids)
 	Round   int     // spec round index (question.round)
 	TScale  float64 // the format's answer-time stretch, resolved by the client (question.tscale)
 	// listen: host-chosen clip length (s), artwork mode and replays allowed (-1 = unlimited), from question.data
@@ -173,6 +174,28 @@ const (
 	stageExtendMin     = 5000
 	progressiveCap     = 90000
 )
+
+// Online rooms: progressive stages auto-advance for everyone (no voting). The window fits the stages at a per-format
+// pace plus a tail after the last stage; the deadline is fixed when the question opens. Mirrors js/core/scoring.js.
+var stageStepMs = map[string]int{"ladder": 4500, "silhouette": 5000}
+
+func autoStages(format string, n, answerMs int) (limit, step int) {
+	tail := min(8000, max(5000, int(math.Round(float64(answerMs)/2))))
+	pace, ok := stageStepMs[format]
+	if !ok {
+		pace = 4000
+	}
+	limit = min(progressiveCap, max(progressiveInitial, int(math.Round(float64(answerMs)*1.5)), (n-1)*pace+tail))
+	step = (limit - tail) / (n - 1)
+	return
+}
+
+func dueStage(elapsed int64, n, step int) int {
+	if elapsed <= 0 || step <= 0 {
+		return 0
+	}
+	return min(n-1, int(elapsed/int64(step)))
+}
 
 // answerMs is the answer time used for speed points, measured against the server's question start. The client's
 // clock-corrected ms (taken at the tap) is used when it is plausible: never more than 300 ms past the server's receive

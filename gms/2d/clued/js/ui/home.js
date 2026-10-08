@@ -1,12 +1,12 @@
-import { h } from './kit.js?v=202610081134';
-import { defineScreen, go } from './app.js?v=202610081134';
-import { getSettings, setSettings, dailyDone, todayUTC } from '../core/store.js?v=202610081134';
-import { kidsProgress } from './stickers.js?v=202610081134';
-import { sfx } from './fx.js?v=202610081134';
-import { loadNet } from './net.js?v=202610081134';
-import { toolButtons } from './toggles.js?v=202610081134';
-import { statsLine } from './statsline.js?v=202610081134';
-import { BUILD } from '../build.js?v=202610081134';
+import { h } from './kit.js?v=202610081215';
+import { defineScreen, go } from './app.js?v=202610081215';
+import { getSettings, setSettings, dailyDone, todayUTC } from '../core/store.js?v=202610081215';
+import { kidsProgress } from './stickers.js?v=202610081215';
+import { sfx } from './fx.js?v=202610081215';
+import { loadNet } from './net.js?v=202610081215';
+import { toolButtons } from './toggles.js?v=202610081215';
+import { statsLine } from './statsline.js?v=202610081215';
+import { BUILD } from '../build.js?v=202610081215';
 
 export const logo = (sm = false) => h('div.logo', { class: sm ? 'sm' : '', 'aria-label': 'Clued' },
   h('span.lens', {}, '?'), ...'lued'.split('').map(c => h('span.l', {}, c)));

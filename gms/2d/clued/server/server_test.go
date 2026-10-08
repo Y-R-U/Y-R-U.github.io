@@ -13,7 +13,6 @@ import (
 	"encoding/json"
 	"encoding/pem"
 	"fmt"
-	"math"
 	"math/big"
 	"net/http"
 	"net/http/httptest"
@@ -1011,102 +1010,128 @@ func progQ(i, stages int) map[string]any {
 	return q
 }
 
-func TestVoteToReveal(t *testing.T) {
+func ladderQ(i, stages int) map[string]any {
+	q := progQ(i, stages)
+	q["format"] = "ladder"
+	return q
+}
+
+// Online rooms: no voting. Progressive stages auto-advance for everyone on a schedule that fits the window
+// (per-format pace, last stage with a tail left), the deadline is fixed, and an answer doesn't freeze the stage.
+func TestAutoStages(t *testing.T) {
 	resetLimits()
 	clearRooms()
 	r := call(t, "POST", "/rooms", map[string]any{"hostName": "H", "answerSec": 10, "gapSec": 0,
-		"questions": []any{progQ(0, 4), progQ(1, 3), mcQ(2)}})
+		"questions": []any{ladderQ(0, 4), progQ(1, 3), mcQ(2)}})
 	code, hk := r.body["code"].(string), r.body["hostKey"].(string)
 	k1, _ := join(t, code, "A")
 	k2, _ := join(t, code, "B")
-	vote := func(k string, q int) resp {
-		return call(t, "POST", "/rooms/"+code+"/vote", map[string]any{"playerKey": k, "q": q})
+	tick := func() {
+		for _, k := range []string{hk, k1, k2} {
+			state(t, code, k)
+		}
+		tickRooms()
 	}
 	st := call(t, "POST", "/rooms/"+code+"/start", map[string]any{"key": hk}).body
-	if num(st["stages"]) != 4 || num(st["limitMs"]) != 15000 {
-		t.Fatalf("progressive initial deadline = answer × 1.5: %v %v", st["stages"], st["limitMs"])
+	// ladder, 4 clues, 10 s answer: max(15 s, 3 × 4.5 s + 5 s tail) = 18.5 s, a clue every 4.5 s
+	if num(st["stages"]) != 4 || num(st["limitMs"]) != 18500 {
+		t.Fatalf("auto window: %v %v", st["stages"], st["limitMs"])
 	}
-	if vote(k1, 0).code != 409 {
+	if call(t, "POST", "/rooms/"+code+"/vote", map[string]any{"key": k1, "q": 0}).code != 409 {
 		t.Fatal("no voting during the lead-in")
 	}
 	advance(leadInMs * time.Millisecond)
-	start := num(state(t, code, hk)["qDeadline"]) - 15000
-	// unanimous advance
-	vote(k1, 0)
-	st = vote(k2, 0).body
-	if num(st["stage"]) != 0 || num(st["votes"]) != 2 || num(st["needed"]) != 3 {
-		t.Fatalf("2/3 votes: %v %v %v", st["stage"], st["votes"], st["needed"])
+	tick()
+	start := num(state(t, code, hk)["qStart"])
+	deadline := num(state(t, code, hk)["qDeadline"])
+	if deadline-start != 18500 {
+		t.Fatalf("deadline %d", deadline-start)
 	}
-	advance(12 * time.Second)
-	st = vote(hk, 0).body
-	if num(st["stage"]) != 1 || num(st["votes"]) != 0 {
-		t.Fatalf("unanimous → stage 1: %v", st["stage"])
+	advance(4400 * time.Millisecond)
+	tick()
+	if num(state(t, code, hk)["stage"]) != 0 {
+		t.Fatal("too early for clue 2")
 	}
-	// extension: max(15 s, 12 s + max(5 s, 10/2 s)) = 17 s from start
-	if d := num(st["qDeadline"]) - start; d != 17000 || num(st["limitMs"]) != 17000 {
-		t.Fatalf("extended deadline %d", d)
+	advance(200 * time.Millisecond)
+	tick()
+	for _, k := range []string{hk, k1, k2} {
+		if st := state(t, code, k); num(st["stage"]) != 1 || num(st["qDeadline"]) != deadline {
+			t.Fatalf("stage 1 for everyone, fixed deadline: %v %v", st["stage"], num(st["qDeadline"])-deadline)
+		}
 	}
-	// a disconnected player doesn't block: B goes silent
-	advance(onlineMs*time.Millisecond + time.Second)
-	state(t, code, hk)
-	state(t, code, k1)
-	vote(hk, 0)
-	st = vote(k1, 0).body
-	if num(st["stage"]) != 2 || num(st["needed"]) != 2 {
-		t.Fatalf("offline player excluded: stage %v needed %v", st["stage"], st["needed"])
+	// A answers at stage 1 (×0.8); the others keep getting clues
+	a := call(t, "POST", "/rooms/"+code+"/answer", map[string]any{"key": k1, "q": 0, "given": "Right", "correct": true, "points": 400, "ms": 999999})
+	if num(a.body["points"]) != 320 {
+		t.Fatalf("stage multiplier 1 of 4: %v", a.body["points"])
 	}
-	// cap: 90 s from the start
-	if d := num(st["qDeadline"]) - start; d > 90000 {
-		t.Fatalf("deadline beyond the cap: %d", d)
+	advance(4500 * time.Millisecond)
+	tick()
+	st = state(t, code, k2)
+	if num(st["stage"]) != 2 || st["locked"] == true {
+		t.Fatalf("an answer doesn't freeze the stage: %v %v", st["stage"], st["locked"])
 	}
-	// the multiplier: answering at stage 2 of 4 = 1 - 0.6*2/3 = 0.6
-	a := call(t, "POST", "/rooms/"+code+"/answer", map[string]any{"key": k1, "q": 0, "given": "Right", "correct": true, "ms": 999999})
-	ms, lim := num(a.body["ms"]), 15000
-	want := int(math.Round(float64(basePoints("reveal", true, nil, ms, lim, true)) * 0.6))
-	if num(a.body["points"]) != want {
-		t.Fatalf("stage multiplier: got %v want %d", a.body["points"], want)
+	advance(4500 * time.Millisecond)
+	tick()
+	st = state(t, code, k2)
+	if num(st["stage"]) != 3 || deadline-(start+13500) != 5000 || num(st["qDeadline"]) != deadline {
+		t.Fatalf("last clue at 13.5 s with 5 s left: %v", st["stage"])
 	}
-	// lock on first answer
-	st = state(t, code, hk)
-	if st["locked"] != true || vote(hk, 0).code != 409 {
-		t.Fatal("the first answer locks voting")
-	}
-	if num(st["you"].(map[string]any)["stage"]) != 0 {
-		t.Fatal("host hasn't answered")
+	if num(state(t, code, k1)["you"].(map[string]any)["stage"]) != 1 {
+		t.Fatal("A's answer keeps its stage")
 	}
 	call(t, "POST", "/rooms/"+code+"/next", map[string]any{"key": hk, "q": 0})
 	st = call(t, "POST", "/rooms/"+code+"/next", map[string]any{"key": hk}).body
-	if st["locked"] == true || num(st["stage"]) != 0 {
-		t.Fatal("next question resets stage and lock")
+	if num(st["stage"]) != 0 || num(st["limitMs"]) != 15000 {
+		t.Fatalf("q1 resets; reveal 3 stages = max(15 s, 2 × 4 s + 5 s): %v %v", st["stage"], st["limitMs"])
+	}
+	// legacy clients can still vote: a unanimous vote jumps ahead without moving the deadline
+	advance(leadInMs*time.Millisecond + time.Second)
+	tick()
+	deadline = num(state(t, code, hk)["qDeadline"])
+	for _, k := range []string{hk, k1, k2} {
+		st = call(t, "POST", "/rooms/"+code+"/vote", map[string]any{"key": k, "q": 1}).body
+	}
+	if num(st["stage"]) != 1 || num(st["qDeadline"]) != deadline {
+		t.Fatalf("legacy vote: %v %v", st["stage"], num(st["qDeadline"])-deadline)
+	}
+	advance(4500 * time.Millisecond) // 5.5 s: due 1, stays 1
+	tick()
+	if num(state(t, code, hk)["stage"]) != 1 {
+		t.Fatal("schedule doesn't double-advance")
+	}
+	advance(5000 * time.Millisecond) // 10.5 s: due 2
+	tick()
+	if num(state(t, code, hk)["stage"]) != 2 {
+		t.Fatal("schedule catches up")
 	}
 }
 
-func TestStageExtensionCap(t *testing.T) {
+func TestAutoStageWindow(t *testing.T) {
+	for _, c := range []struct {
+		format             string
+		n, answer          int
+		wantLimit, wantStp int
+	}{
+		{"reveal", 10, 30000, 45000, 4111}, // 30 s × 1.5; tail capped at 8 s
+		{"ladder", 20, 10000, 90000, 4473}, // capped at 90 s
+		{"ladder", 5, 10000, 23000, 4500},
+		{"silhouette", 3, 10000, 15000, 5000},
+		{"reveal", 3, 3000, 13000, 4000}, // 5 s tail minimum
+	} {
+		if l, s := autoStages(c.format, c.n, c.answer); l != c.wantLimit || s != c.wantStp {
+			t.Errorf("%s %d %d: %d %d", c.format, c.n, c.answer, l, s)
+		}
+		_, s := autoStages(c.format, c.n, c.answer)
+		if d := dueStage(int64(s*(c.n-1)), c.n, s); d != c.n-1 {
+			t.Errorf("last stage due at (n-1)·step: %d", d)
+		}
+	}
 	resetLimits()
 	clearRooms()
-	r := call(t, "POST", "/rooms", map[string]any{"hostName": "Solo", "answerSec": 30, "questions": []any{progQ(0, 10)}})
-	code, hk := r.body["code"].(string), r.body["hostKey"].(string)
-	st := call(t, "POST", "/rooms/"+code+"/start", map[string]any{"key": hk}).body
-	if num(st["limitMs"]) != 45000 {
-		t.Fatalf("30 s × 1.5: %v", st["limitMs"])
-	}
-	qs := num(st["qStart"])
-	advance(leadInMs * time.Millisecond)
-	for i := 0; i < 8; i++ {
-		advance(14 * time.Second)
-		state(t, code, hk)
-		st = call(t, "POST", "/rooms/"+code+"/vote", map[string]any{"key": hk, "q": 0}).body
-	}
-	if num(st["stage"]) < 5 {
-		t.Fatalf("solo votes advance: %v", st["stage"])
-	}
-	if d := num(st["qDeadline"]) - qs; d != 90000 {
-		t.Fatalf("capped at 90 s, got %d", d)
-	}
-	r2 := call(t, "POST", "/rooms", map[string]any{"hostName": "Short", "answerSec": 3, "questions": []any{progQ(0, 3)}})
-	st = call(t, "POST", "/rooms/"+r2.body["code"].(string)+"/start", map[string]any{"key": r2.body["hostKey"]}).body
-	if num(st["limitMs"]) != 10000 {
-		t.Fatalf("min 10 s: %v", st["limitMs"])
+	r := call(t, "POST", "/rooms", map[string]any{"hostName": "Solo", "answerSec": 10, "questions": []any{ladderQ(0, 20)}})
+	st := call(t, "POST", "/rooms/"+r.body["code"].(string)+"/start", map[string]any{"key": r.body["hostKey"]}).body
+	if num(st["limitMs"]) != 90000 {
+		t.Fatalf("20 clues: %v", st["limitMs"])
 	}
 	clearRooms()
 }
@@ -1116,12 +1141,22 @@ func TestKidsStagesAutoAdvance(t *testing.T) {
 	clearRooms()
 	r := call(t, "POST", "/rooms", map[string]any{"hostName": "Mum", "spec": map[string]any{"kids": true}, "questions": []any{progQ(0, 3)}})
 	code, hk := r.body["code"].(string), r.body["hostKey"].(string)
+	k1, _ := join(t, code, "Kid")
 	call(t, "POST", "/rooms/"+code+"/start", map[string]any{"key": hk})
 	advance(leadInMs*time.Millisecond + kidsStageMs*time.Millisecond + 10*time.Millisecond)
 	state(t, code, hk)
+	state(t, code, k1)
 	tickRooms()
 	if num(state(t, code, hk)["stage"]) != 1 {
 		t.Fatal("kids stages auto-advance")
+	}
+	call(t, "POST", "/rooms/"+code+"/answer", map[string]any{"key": hk, "q": 0, "given": "Right", "correct": true})
+	advance(kidsStageMs*time.Millisecond + 10*time.Millisecond)
+	state(t, code, hk)
+	state(t, code, k1)
+	tickRooms()
+	if st := state(t, code, k1); num(st["stage"]) != 2 || st["phase"] != "question" {
+		t.Fatalf("an answer doesn't freeze the kids' stages: %v %v", st["stage"], st["phase"])
 	}
 	clearRooms()
 }

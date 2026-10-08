@@ -124,3 +124,5 @@ tools/p2p_e2e.mjs    3 headless Chromes (9411–9413) via the real broker: full 
 - **Manager:** commit `js/vendor/peerjs.js` (87 KB, MIT header kept). No server deploy is needed for this lane.
 - **Later (optional):** a TURN relay would close the NAT gap, but needs a server or a paid service. `?peerhost=host:port`
   already lets a self-hosted PeerJS server replace the cloud broker if 0.peerjs.com ever becomes unreliable.
+
+> **2026-10-08 (SIMPLE.md):** P2PRoom mirrors the server change: no voting from the current client; stages auto-advance on the `autoStages` schedule for everyone, the deadline stays fixed (kids keep the 4 s + extension rule), answers don't lock; the `vote` op stays for old clients. p2p_e2e `--ports` added.

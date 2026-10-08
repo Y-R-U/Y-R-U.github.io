@@ -1,12 +1,12 @@
 // Mastery: overall numbers, the world map coloured by countries learned, pack progress rings, kids stickers.
-import { h } from '../ui/kit.js?v=202610081134';
-import { header, go } from '../ui/app.js?v=202610081134';
-import { kidsProgress } from '../ui/stickers.js?v=202610081134';
-import { themeTree, getPack, kidsOn } from './data.js?v=202610081134';
-import { getMastery, getCards, packPct } from './model.js?v=202610081134';
-import { countryScores, mapBand, level } from './mastery.js?v=202610081134';
-import { ring } from './ui.js?v=202610081134';
-import { BUILD } from '../build.js?v=202610081134';
+import { h } from '../ui/kit.js?v=202610081215';
+import { header, go } from '../ui/app.js?v=202610081215';
+import { kidsProgress } from '../ui/stickers.js?v=202610081215';
+import { themeTree, getPack, kidsOn } from './data.js?v=202610081215';
+import { getMastery, getCards, packPct } from './model.js?v=202610081215';
+import { countryScores, mapBand, level } from './mastery.js?v=202610081215';
+import { ring } from './ui.js?v=202610081215';
+import { BUILD } from '../build.js?v=202610081215';
 
 const GEO_PACKS = ['countries', 'flags', 'capitals'];
 const BAND = ['', 'lm1', 'lm2', 'lm3'];

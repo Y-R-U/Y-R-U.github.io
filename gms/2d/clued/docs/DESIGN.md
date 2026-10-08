@@ -37,7 +37,7 @@ with a one-line reason. The last choice is remembered per format.
 | `odd` | Odd one out | items with group/boolean facts |
 | `sort` | Sort into bins (dangerous/harmless, real/fake, continent) | boolean/category facts |
 | `fake` | Spot the fake (which one doesn't exist) | items + fakes list |
-| `reveal` | Picture reveal: pixelated, zoomed or tile-by-tile; faster = more points | images |
+| `reveal` | Picture round: Full image (default) or Zoom (starts zoomed in on the subject, zooms out smoothly to the whole picture at 50/65/80/90% of the answer time); faster = more points | images |
 | `silhouette` | Silhouette (country shapes, animals with cut-outs) | shapes or masks |
 | `number` | Closest guess (how tall, what year) | numeric facts |
 | `connect` | Connections: 16 into 4 hidden groups | items with groups |
@@ -171,15 +171,20 @@ Anything that doesn't need our server has no caps:
   ~8 players max, the room ends if the host leaves. Offered on Pages, and on br8t automatically when the server is at a
   cap or protection level 3 ("host from your device instead").
 
-## Vote to reveal more (Aaron, 2026-10-05)
-Progressive questions (`reveal`, `ladder` clues, `silhouette`, movie-moment zoom/blur; NOT `listen` since 2026-10-08) have
-**stages** 0…N-1, starting at the least revealed.
-- **Online/P2P rooms:** every player gets a "Show more 👀 (2/5 voted)" button. When **all connected players who
-  haven't answered** have voted, everyone advances one stage at once (server/host-authoritative). As soon as **anyone
-  submits a guess, voting locks** for everyone and the stage freezes. Points depend on the stage when you
-  answered (earlier = more). Progressive questions get **more time**: the initial deadline = answer time × 1.5 (min 10 s), and **each successful vote extends the deadline** by max(5 s, ½ × answer time), measured from the moment the stage advances (never shortening it). Total cap 90 s.
-- **Solo/party:** the "Show more" button advances immediately (the same points rule).
-- **Kids:** stages auto-advance every few seconds and voting is optional.
+## Progressive questions: no voting in rooms (Aaron, 2026-10-08; replaces "Vote to reveal more" of 2026-10-05)
+Family playtests: voting to reveal more was too slow in multiplayer (everyone answers fast; waiting for votes stalls the room).
+- **Online/P2P rooms:** no Show-more/vote button for any format. The remaining progressive formats (`ladder` clues,
+  `silhouette` stages) **auto-advance on a timer for everyone**. Window = max(answer × 1.5, 10 s, (stages − 1) × pace +
+  tail), capped at 90 s; pace ladder 4.5 s, silhouette 5 s, others 4 s; tail = answer/2 within 5–8 s, so the last stage
+  arrives with a few seconds left. The deadline is fixed when the question opens (no extensions). An answer no longer
+  freezes the stage: players still thinking keep getting clues. Points still use the stage you answered at
+  (×1 → ×0.4) on top of speed. Kids rooms keep their 4 s auto-advance (with its deadline extension).
+- **Solo/party:** "Show more 👀" stays and advances instantly (kids: auto every 4 s), same points rule.
+- **Picture round (`reveal`)** is no longer progressive: **Full image** (default; plain "which is this?" with speed
+  scoring) or **Zoom** (starts zoomed in on the probable subject, never past ~30% of the picture, and zooms out smoothly
+  to the whole picture at the chosen 50/65/80/90% of the real answer window, default 80%, then holds it; no timer = a 10 s
+  zoom; reduced motion = Full). Pixels and tiles are gone; old favourites/rooms/saved options with them play Full. The
+  zoom is one shared helper (`fkit.timedZoom`) for every picture question that offers zoom.
 
 ## Background music + full screen (Aaron, 2026-10-05)
 Soft PD classical background music (default on, quiet), with a 🎵/🔇 toggle on the home header and a Settings row.
@@ -193,6 +198,8 @@ is whoever answered **correctly with the least revealed** (lowest stage); ties a
 player's result in the challenge comparison ("got it at clue 2 / 3 s of music").
 
 ## Rulings 2026-10-08 (Aaron, after family playtests)
-- Music `listen`: NO "grow the clip". It plays exactly the chosen clip length; replay is how you hear more (shown as "−N replays" in the points breakdown). Vote-to-reveal stays for reveal, ladder and silhouette.
+- Music `listen`: NO "grow the clip". It plays exactly the chosen clip length; replay is how you hear more (shown as "−N replays" in the points breakdown).
+- Picture round: only Full image (default) or Zoom (timed zoom-out, "whole picture at" 50/65/80/90%, default 80%); no pixels/tiles.
+- No voting in online/P2P rooms for any format: ladder clues and silhouette stages auto-advance for everyone; Show more is solo/party only (see "Progressive questions" above).
 - Streak bonus is a setting: "Adds points" (+10%/streak, cap +50%) or "Just for show", with an ⓘ explaining it. It's room-level in online play.
 - Every reveal shows a points breakdown (speed, streak, replays, stage).

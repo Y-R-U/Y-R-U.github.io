@@ -36,3 +36,13 @@ export const stageMultiplier = (stage, n) => (n > 1 ? 1 - 0.6 * Math.min(Math.ma
 export const progressiveLimit = answerMs => Math.max(10000, Math.round(answerMs * 1.5));
 export const stageExtendMs = answerMs => Math.max(5000, Math.round(answerMs / 2));
 export const PROGRESSIVE_CAP = 90000;
+
+// Online rooms: progressive stages auto-advance for everyone (no voting). The window fits the stages at a per-format
+// pace and leaves a tail after the last stage; the deadline is fixed when the question opens. Mirrored in server/scoring.go.
+export const STAGE_STEP_MS = { ladder: 4500, silhouette: 5000 };
+export function autoStages(format, n, answerMs) {
+  const tail = Math.min(8000, Math.max(5000, Math.round(answerMs / 2)));
+  const limit = Math.min(PROGRESSIVE_CAP, Math.max(progressiveLimit(answerMs), (n - 1) * (STAGE_STEP_MS[format] || 4000) + tail));
+  return { limit, step: Math.floor((limit - tail) / (n - 1)), tail };
+}
+export const dueStage = (elapsedMs, n, stepMs) => (elapsedMs <= 0 ? 0 : Math.min(n - 1, Math.floor(elapsedMs / stepMs)));

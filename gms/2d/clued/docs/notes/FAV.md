@@ -56,3 +56,11 @@ Store API: `getFavs(key)`, `setFav(key, slot, fav)`, `clearFav(key, slot)`, `FAV
 - Pub quiz "Surprise me" doesn't use favourites (could prefer a music fav for the music round).
 - The quick-pick strip sits above the theme picker; on the long listen setup the save control is a scroll away (by design:
   pick, then save).
+
+## 2026-10-08 (SIMPLE): picture round labels
+- `reveal` options are now **Picture: Full image | Zoom** and **Zoom: whole picture at 50/65/80/90%** (shown only with Zoom).
+  Labels: a Zoom fav reads "Picture: zoom · full at 80%" (the timing is always named with Zoom, never with Full); Full is
+  the default, so it adds nothing. Old favourites with `mode: 'pixel'|'tiles'|'mix'` lose the mode in `cleanFav` (value no
+  longer offered) and so play Full.
+- favmodel: option `favLabels[i]` overrides the auto label; `favIf(opts)` decides visibility (instead of "differs from
+  default"). fav_test 52/0 (new: real reveal format, old pixel/tiles favs, zoom label, timing matters for sameFav).

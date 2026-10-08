@@ -79,7 +79,7 @@ THEMES ids: `animals nature geography screen music books people science art hist
 ## Format module — `js/formats/<id>.js` (and `js/geo/formats/*.js`, `js/audio/listen.js`)
 ```js
 export default {
-  id: 'reveal', title: 'Picture reveal', icon: '🖼️', blurb: 'Guess before it sharpens',
+  id: 'reveal', title: 'Picture round', icon: '🖼️', blurb: 'Name the picture, fast',
   options: [ { key: 'answers', label: 'Answers', type: 'choice', values: [2,4,6], default: 4 }, … ],
   supports(packInfo) -> true | 'reason string',  // uses index caps; picker greys out with the reason
   generate({ rng, packs, count, opts, difficulty }) -> Question[],   // deterministic given rng; packs are loaded pack objects
@@ -114,15 +114,31 @@ the spec, so media swaps and pack updates can't desync players.
 docs/notes/FAV.md), `clued.last` (last picks), `clued.name`.
 cloud game id: `clued`.
 
-## Progressive stages (vote to reveal)
-A progressive question sets `stages: N` (≥ 2). Formats read `api.stage` (current, starts 0) and subscribe with
-`api.onStage(cb(stage))` to re-render the reveal; they never advance the stage themselves. They call `api.requestMore()` from their
-"Show more" UI (or let the runner draw the shared vote button; the runner owns the button + vote count display).
-`api.answer({ … })` records `stage` automatically. Points multiplier = `1 - 0.6 * stage/(N-1)` (applied by scoring,
-server and client alike). Runner: solo → requestMore advances immediately; online → sends `vote` via the transport
-and advances on the `stage` event; any `answered` event from anyone → `locked` (button disabled).
-Server/P2P: `POST /rooms/{code}/vote {playerKey, q}` → broadcasts `{type:'vote', q, votes, needed}`; when votes ≥ needed
-(connected, not yet answered players) → `{type:'stage', q, stage, deadline}` (deadline extended per DESIGN: initial = time×1.5 min 10 s; +max(5 s, time/2) from the advance; cap 90 s); the first answer → `{type:'lock', q}`.
+## Progressive stages (auto-advance online; Show more solo)
+A progressive question sets `stages: N` (≥ 2): `ladder` (clues) and `silhouette` (3). `reveal` is not progressive since
+2026-10-08 (old room questions with `stages` still play). Formats read `api.stage` (current, starts 0) and subscribe with
+`api.onStage(cb(stage))`; they never advance the stage themselves. `api.answer({ … })` records `stage` automatically.
+Points multiplier = `1 - 0.6 * stage/(N-1)` (applied by scoring, server and client alike).
+- **Solo/party:** the runner draws "Show more 👀"; `api.requestMore()` advances at once and extends the local timer
+  (`stageExtendMs`, cap 90 s); kids auto-advance every 4 s.
+- **Online/P2P rooms** (room.js passes `cfg.stagesAuto`): no button, no voting. The server/host advances stages on a timer
+  for everyone: `autoStages(format, N, answerMs)` (`js/core/scoring.js`, mirrored in `server/scoring.go`) gives
+  `limit = min(90 s, max(answer×1.5, 10 s, (N−1)×pace + tail))` and `step = floor((limit − tail)/(N−1))`, pace ladder 4500,
+  silhouette 5000, else 4000 ms, tail = clamp(answer/2, 5–8 s). Stage k is due at `qStart + k×step`; the deadline is fixed
+  at `qStart + limit` (no extension) and moves only with the media-ready hold. Answers don't lock the stage. State carries
+  `stage, stages` (plus legacy `votes, needed, locked:false`); room.js calls `run.setStage(stage, deadline, limitMs)`.
+  Kids rooms keep the old rule (every 4 s, each advance extends to max(deadline, now + max(5 s, answer/2)), initial
+  max(limit, 10 s, answer×1.5)).
+- **Legacy:** `POST /rooms/{code}/vote {key, q}` (and the P2P `vote` op) stay for older clients: a unanimous vote still
+  advances (no deadline change in non-kids rooms) and the schedule never goes backwards. The current client never votes.
+
+## Timed zoom (`fkit.timedZoom`)
+Every picture question that offers Zoom uses `timedZoom(box, img, src, api, { z0, fullAt, tag })` from `js/formats/fkit.js`
+and the shared option `zoomOption(when)` (key `fullAt`, values 50/65/80/90, default 80, shown only while `when(opts)`).
+The question stores `data.fullAt` so every online player zooms identically. Progress = elapsed share of the runner's real
+answer ring (`api.timer.full`/`remaining`, i.e. timer setting, timeScale, online deadline after any hold) ÷ fullAt; no timer
+= 10 s. Focus = `focusOf()` (edges + colour unlike the border, centre-weighted; centre when the pixels are unreadable).
+Reduced motion = whole picture. The runner's `api.timer` gained `full` and `running` getters.
 
 ## Additive fields in use (documented after the fact, from C1/C2/AU)
 Pack: `kidsSafe` (false = never in kids mode), `path` (index only: "packs/x.json" | "music/x.json").
@@ -143,6 +159,11 @@ Runner api: `api.timed`. Index caps: `formats` / `formatsEasy` / `formatsKids` (
 written by tools/build_index.mjs), `multi`, `catBins`. Index packs: `virtual: { of, tag }` for `general~<theme>` slices.
 Structures: optional `replay: { cfg(spec, questions), score(res, spec) }` for challenge replays. Geo: `js/geo/shape.js`
 `countryShape(iso3, opts)`.
+
+## Additive fields from SIMPLE (2026-10-08)
+Format option fields: `showIf(opts)` (setup shows the row only while true), `help` (small text under a choice row's label),
+`favLabels[i]` (favourite label for value i, e.g. "full at 80%"), `favIf(opts)` (label the option exactly when true, default
+or not). Runner cfg `stagesAuto`; `api.timer.full`, `api.timer.running`. Question `data.fullAt` (reveal zoom).
 
 ## Additive fields from lane STATS
 `clued.stats` keeps its old totals and adds `v, m, f, th, pk, kt, sd, dd, h` (detailed per-mode/format/theme/pack rows,

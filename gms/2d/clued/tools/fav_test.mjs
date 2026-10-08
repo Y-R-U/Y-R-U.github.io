@@ -119,5 +119,19 @@ ok(/`clued\.favs`\*/.test(contract), 'CONTRACT lists clued.favs as synced');
   ok(model.favKey(listen, true) === 'listen:kids' && model.favKey(listen, false) === 'listen', 'fav keys');
 }
 
+// reveal (2026-10-08): only Full image / Zoom; old pixel/tiles favourites fall back to Full; the zoom timing labels with Zoom
+{
+  const reveal = (await imp('js/formats/reveal.js')).default;
+  const L = f => model.favLabel(f, reveal, index);
+  const old = model.cleanFav({ packs: 'all', opts: { mode: 'pixel', answers: 3 } }, reveal, index);
+  ok(old && !('mode' in old.opts) && old.opts.answers === 3, `old pixel fav: mode dropped (→ Full), rest kept: ${JSON.stringify(old?.opts)}`);
+  ok(L({ packs: 'all', opts: { mode: 'tiles' } }) === 'All themes', 'old tiles fav labels as the default');
+  ok(L({ packs: 'all', opts: { mode: 'full', fullAt: 65 } }) === 'All themes', 'zoom timing hidden for Full');
+  const z = L({ packs: 'all', opts: { mode: 'zoom', fullAt: 80 } });
+  ok(z === 'All themes · Picture: zoom · full at 80%', `zoom label carries the timing: ${z}`);
+  ok(L({ packs: 'all', opts: { mode: 'zoom', fullAt: 50 } }) === 'All themes · Picture: zoom · full at 50%', 'zoom 50%');
+  ok(!model.sameFav({ packs: 'all', opts: { mode: 'zoom', fullAt: 50 } }, { packs: 'all', opts: { mode: 'zoom', fullAt: 90 } }, reveal, index), 'different timings are different picks');
+}
+
 console.log(`fav_test: ${passes} passed, ${fails} failed`);
 process.exit(fails ? 1 : 0);

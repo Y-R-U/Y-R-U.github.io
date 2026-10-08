@@ -189,6 +189,17 @@ for (const f of loaded) {
       for (const q of qs) { checkShape(f, q, `${o.key}=${v}`); if (validate) validate(q, ctx, `${o.key}=${v}`); }
     }
   }
+  if (f.id === 'reveal' && sup.length) {
+    // pixels/tiles/mix were removed (2026-10-08): old favourites/rooms/saved options fall back to the full image
+    for (const old of ['pixel', 'tiles', 'mix', undefined]) {
+      const qs = gen(f, sup, `f:reveal:legacy:${old}`, { opts: { mode: old }, count: 5 });
+      ok(qs.length > 0 && qs.every(q => q.data.mode === 'full' && !q.stages), `reveal :: legacy mode ${old} → full`);
+    }
+    const z = gen(f, sup, 'f:reveal:fullAt', { opts: { mode: 'zoom', fullAt: 65 }, count: 5 });
+    ok(z.every(q => q.data.fullAt === 65), 'reveal :: fullAt stored in the question');
+    const zb = gen(f, sup, 'f:reveal:fullAtBad', { opts: { mode: 'zoom', fullAt: 33 }, count: 5 });
+    ok(zb.every(q => q.data.fullAt === 80), 'reveal :: bad fullAt → 80%');
+  }
   console.log(`${f.id.padEnd(11)} ${String(packsOk).padStart(2)} packs  ${String(total).padStart(5)} questions`);
 }
 

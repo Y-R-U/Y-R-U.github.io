@@ -1,6 +1,6 @@
 // Lane S end-to-end: a local clued server + 3 headless Chromes (host + 2 joiners via the share link),
 // a 3-round room game built with real clicks (round 2 picked from a ♥ favourite), round cards, a joiner refresh
-// mid-round-2, per-round scores on the podium, a vote-to-reveal round, host handover, and screenshots.
+// mid-round-2, per-round scores on the podium, an auto-advancing clue ladder round (no voting), host handover, and screenshots.
 //   node tools/s_room_e2e.mjs [--keep] [--shots DIR] [--poll]
 // Needs the :8888 site server and ~/.claude/bin/cdp. Ports: 9451 (host), 9452, 9453.
 //
@@ -99,7 +99,7 @@ class Page {
   room() { return this.eval('window.__cluedRoom ? JSON.parse(JSON.stringify(window.__cluedRoom.st)) : null'); }
 }
 
-const PORTS = TIMING ? [9461, 9462, 9463] : [9451, 9452, 9453];
+const PORTS = argOf('--ports') ? argOf('--ports').split(',').map(Number) : TIMING ? [9461, 9462, 9463] : [9451, 9452, 9453];
 let srv, dataDir, all = [];
 async function main() {
   const port = await freePort();
@@ -282,36 +282,39 @@ async function main() {
   await j2.shot('final-joiner-portrait.png');
   await host.size(1280, 800, 1, false); await sleep(300); await host.shot('final-host-desktop.png'); await host.size(384, 854, 1, true);
 
-  // vote to reveal more: play again with progressive questions (stages: 3)
+  // progressive stages auto-advance for everyone (no voting in rooms, 2026-10-08): play again with a clue ladder
   const hostKey = await host.eval(`JSON.parse(sessionStorage.getItem('clued.room.${code}')||'{}').key`);
-  const prog = [0, 1].map(i => ({ format: 'mc', id: `prog${i}`, prompt: `Progressive ${i}?`, stages: 3, answer: 0, options: [{ text: 'Right' }, { text: 'Wrong' }] }));
-  await fetch(`${API}/rooms/${code}/again`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ key: hostKey, questions: prog, spec: {} }) });
+  const post = (path, body) => fetch(`${API}/rooms/${code}/${path}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ key: hostKey, ...body }) }).then(r => r.json());
+  const clues = ['Clue one is vague.', 'Clue two narrows it.', 'Clue three helps more.', 'Clue four nearly gives it.', 'Clue five gives it away.'];
+  const lad = [0, 1].map(i => ({ format: 'ladder', id: `lad${i}`, prompt: 'Which one is it?', stages: 5, answer: 0, answerText: 'Right',
+    options: [{ text: 'Right' }, { text: 'Wrong' }, { text: 'Nope' }], data: { clues, typed: false, accept: ['right'], layout: 'text' } }));
+  await post('again', { questions: lad, spec: {} });
   await host.waitFor(`window.__cluedRoom?.st?.phase === 'lobby'`, 10000, 'again → lobby');
+  await post('settings', { answerSec: 5 });   // ladder 5 clues @5 s: 23 s window, a clue every 4.5 s, last with 5 s left
   await host.click('[data-act=start]');
-  const btn = `document.querySelector('.more-btn:not([hidden])')`;
-  for (const p of pages) await p.waitFor(`${btn} && !${btn}.disabled && ${btn}.textContent.includes('(0/3)')`, 15000, `${p.name} vote button 0/3`);
-  ok(true, 'everyone sees "Show more 👀 (0/3)"');
-  await host.click('.more-btn:not([hidden])');
-  await j1.click('.more-btn:not([hidden])');
-  await j2.waitFor(`${btn}.textContent.includes('(2/3)')`, 8000, 'bob sees 2/3');
-  ok(await host.eval(`${btn}.disabled`), 'a voter cannot vote twice');
-  await j2.shot('vote-2of3.png');
-  await j2.click('.more-btn:not([hidden])');
-  for (const p of pages) await p.waitFor(`window.__cluedRoom.st.stage === 1 && ${btn}.textContent.includes('(0/3)')`, 8000, `${p.name} stage 1`);
-  ok(true, 'unanimous vote advances everyone to stage 1');
-  ok((await host.room()).limitMs >= 45000, 'progressive deadline (30 s × 1.5) never shrinks on a vote', String((await host.room()).limitMs));
+  const clueN = `(document.querySelector('.stage')?.innerText.match(/Clue (\\d+) of 5/) || [])[1]`;
+  for (const p of pages) await p.waitFor(`window.__cluedRoom?.st?.phase === 'question' && ${clueN} === '1'`, 15000, `${p.name} clue 1`);
+  const noVote = `!document.querySelector('.more-btn:not([hidden])') && !/Show more|voted/.test(document.body.innerText)`;
+  for (const p of pages) ok(await p.eval(noVote), `${p.name}: no Show more / vote button`);
+  ok((await host.room()).limitMs === 23000, 'auto window 23 s', String((await host.room()).limitMs));
+  const t0 = Date.now();
+  for (const p of pages) await p.waitFor(`window.__cluedRoom.st.stage === 1 && ${clueN} === '2'`, 8000, `${p.name} clue 2`);
+  ok(Date.now() - t0 > 2500, `clue 2 arrived on its own for everyone (${Date.now() - t0} ms)`);
+  await j2.shot('auto-clue2-portrait.png');
   await j1.click('.stage .choices .choice');
-  for (const p of [host, j2]) await p.waitFor(`${btn}.textContent.includes('Locked')`, 8000, `${p.name} locked`);
-  ok(true, 'the first answer locks voting for everyone');
-  await host.shot('vote-locked.png');
+  await j2.waitFor(`window.__cluedRoom.st.stage === 2 && ${clueN} === '3'`, 8000, 'bob clue 3');
+  ok(true, 'clues keep coming for players still answering after someone answers');
+  for (const p of pages) ok(await p.eval(noVote), `${p.name}: still no vote button`);
+  await j2.shot('auto-clue3-portrait.png');
   const annSt = await j1.room();
-  ok(annSt.you.stage === 1 && annSt.you.last && annSt.you.last.points > 0, 'answer recorded at stage 1 with stage-reduced points', JSON.stringify(annSt.you.last));
+  ok(annSt.you.stage === 1 && annSt.you.last && annSt.you.last.points > 0, 'Ann scored at clue 2 (stage 1)', JSON.stringify(annSt.you.last));
   for (const p of [host, j2]) await p.click('.stage .choices .choice');
-  await host.waitFor(`window.__cluedRoom.st.phase === 'reveal'`, 8000, 'prog reveal');
+  await host.waitFor(`window.__cluedRoom.st.phase === 'reveal'`, 8000, 'ladder reveal');
   const rows = (await host.room()).players;
-  const ann = rows.find(r => r.name === 'Ann'), hosty = rows.find(r => r.name === 'Hosty');
-  ok(ann.last.points < 500 && hosty.last.points <= ann.last.points, 'stage multiplier applied by the server', `${ann.last.points} ${hosty.last.points}`);
-  await fetch(`${API}/rooms/${code}/end`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ key: hostKey }) });
+  const ann = rows.find(r => r.name === 'Ann'), bob = rows.find(r => r.name === 'Bob');
+  ok(ann.last.points > bob.last.points, 'answering at an earlier clue scores more', `${ann.last.points} ${bob.last.points}`);
+  await host.shot('auto-reveal-portrait.png');
+  await post('end', {});
   await host.waitFor(`window.__cluedRoom?.st?.phase === 'final'`, 8000, 'final again');
 
   // host leaves → Ann becomes host

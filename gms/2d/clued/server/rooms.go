@@ -170,7 +170,11 @@ func (r *Room) buildMeta() {
 		r.meta[i] = parseMeta(q)
 		r.meta[i].LimitMs = r.limitFor(r.meta[i])
 		if n := r.meta[i].Stages; n >= 2 {
-			r.meta[i].LimitMs = max(r.meta[i].LimitMs, progressiveInitial, r.AnswerMs*3/2)
+			if r.Kids {
+				r.meta[i].LimitMs = max(r.meta[i].LimitMs, progressiveInitial, r.AnswerMs*3/2)
+			} else {
+				r.meta[i].LimitMs, r.meta[i].StepMs = autoStages(r.meta[i].Format, n, r.AnswerMs)
+			}
 		}
 	}
 	r.rounds = groupRounds(r.meta)
@@ -518,9 +522,6 @@ func (r *Room) answer(p *Player, in answerIn) (*Answer, string) {
 	}
 	a := &Answer{Given: in.Given, Correct: correct, Points: pts, Ms: ms, Stage: stage, Speed: speed, Bonus: pts - base,
 		ClipMul: clipMul, ArtMul: artMul, Replays: reps}
-	if m.Stages >= 2 {
-		r.Locked = true // the first guess freezes the stage for everyone
-	}
 	p.Answers[r.Q] = a
 	p.Score += pts
 	p.LastSeen = now
@@ -612,11 +613,20 @@ func (r *Room) tick(now int64) bool {
 	switch r.Phase {
 	case "question":
 		r.checkHold(now)
-		if n := r.meta[r.Q].Stages; n >= 2 && !r.Locked && r.Stage < n-1 && now >= r.QStart {
-			if r.Kids && now-r.StageAt >= kidsStageMs {
-				r.setStage(r.Stage + 1)
+		// progressive stages auto-advance for everyone; an answer no longer freezes them
+		if m := r.meta[r.Q]; m.Stages >= 2 && r.Stage < m.Stages-1 && now >= r.QStart {
+			due := 0
+			if r.Kids {
+				if now-r.StageAt >= kidsStageMs {
+					due = r.Stage + 1
+				}
+			} else {
+				due = dueStage(now-r.QStart, m.Stages, m.StepMs)
+			}
+			if due > r.Stage {
+				r.setStage(due)
 			} else if len(r.Votes) > 0 {
-				r.checkVotes(now)
+				r.checkVotes(now) // votes from older clients
 			}
 		}
 		if now > r.QDeadline+graceMs {
@@ -938,13 +948,15 @@ func (r *Room) voteNeed(now int64) (votes, needed int) {
 	return
 }
 
-// setStage advances and extends the deadline: max(current, now + max(5 s, answer/2)),
-// never beyond 90 s from the question start.
+// setStage advances. Kids rooms also extend the deadline: max(current, now + max(5 s, answer/2)), never beyond
+// 90 s from the question start; other rooms keep the fixed deadline (the stage schedule fits inside it).
 func (r *Room) setStage(s int) {
 	now := nowMs()
 	r.Stage, r.StageAt, r.Votes = s, now, nil
-	ext := now + int64(max(stageExtendMin, r.AnswerMs/2))
-	r.QDeadline = min(max(r.QDeadline, ext), r.QStart+progressiveCap)
+	if r.Kids {
+		ext := now + int64(max(stageExtendMin, r.AnswerMs/2))
+		r.QDeadline = min(max(r.QDeadline, ext), r.QStart+progressiveCap)
+	}
 	r.changed()
 }
 

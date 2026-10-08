@@ -127,7 +127,7 @@ func TestReadyHold(t *testing.T) {
 	}
 	advance(2 * time.Second)
 	st = call(t, "POST", "/rooms/"+code+"/ready", map[string]any{"key": k1, "q": 0}).body
-	if st["hold"] == true || num(st["qStart"]) != nowOf(st)+800 || num(st["qDeadline"])-num(st["qStart"]) != 15000 {
+	if st["hold"] == true || num(st["qStart"]) != nowOf(st)+800 || num(st["qDeadline"])-num(st["qStart"]) != 21000 { // listen with old Grow stages: auto window max(15 s, 4 × 4 s + 5 s)
 		t.Fatalf("last ready → opens in 800 ms with the full window: hold=%v start-now=%d window=%d",
 			st["hold"], num(st["qStart"])-nowOf(st), num(st["qDeadline"])-num(st["qStart"]))
 	}
@@ -247,9 +247,10 @@ func TestBreakdownStage(t *testing.T) {
 	call(t, "POST", "/rooms/"+code+"/vote", map[string]any{"key": hk, "q": 0})
 	call(t, "POST", "/rooms/"+code+"/vote", map[string]any{"key": k1, "q": 0})
 	advance(3 * time.Second)
-	a := answerAt(t, code, hk, 0, true, 3000) // 15 s window: speed 100+320 = 420; stage 1 of 5 → ×0.85 = 357
+	// auto window max(15 s, 4 × 4 s + 5 s) = 21 s: speed 100+343 = 443; stage 1 of 5 (legacy vote) → ×0.85 = 377
+	a := answerAt(t, code, hk, 0, true, 3000)
 	last := a.body["state"].(map[string]any)["you"].(map[string]any)["last"].(map[string]any)
-	if num(a.body["points"]) != 357 || num(last["speed"]) != 420 || num(last["stage"]) != 1 || num(last["stages"]) != 5 {
+	if num(a.body["points"]) != 377 || num(last["speed"]) != 443 || num(last["stage"]) != 1 || num(last["stages"]) != 5 {
 		t.Fatalf("stage breakdown: %v %v", a.body["points"], last)
 	}
 }

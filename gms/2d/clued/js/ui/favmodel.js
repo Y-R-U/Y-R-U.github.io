@@ -1,6 +1,6 @@
 // Favourite picks, pure logic (node-testable): sanitising a saved fav against today's packs/options, matching, labels.
-import { supportsPack } from '../formats/registry.js?v=202610081134';
-import { ANSWER_TIMES } from '../core/store.js?v=202610081134';
+import { supportsPack } from '../formats/registry.js?v=202610081215';
+import { ANSWER_TIMES } from '../core/store.js?v=202610081215';
 
 export const favKey = (fmt, kids) => (kids ? `${fmt.id}:kids` : fmt.id);
 const KIDS_TIMES = [0, 20, 30];
@@ -78,6 +78,7 @@ function packsPart(packs, fmt, index) {
 function optPart(o, v) {
   if (o.type === 'bool') return v ? o.label : `No ${o.label.toLowerCase()}`;
   const i = (o.values || []).indexOf(v);
+  if (o.favLabels?.[i]) return o.favLabels[i];
   const lab = String(o.labels?.[i] ?? v);
   const word = o.label.split(/\s+/)[0].toLowerCase();
   return /^\d/.test(lab) ? `${lab} ${word}` : `${o.label.split(/\s+/)[0]}: ${lab.toLowerCase()}`;
@@ -93,7 +94,10 @@ export function favLabel(fav, fmt, index, { kids = false, timerDefault = kids ? 
   if (c.count != null && c.count !== 10) bits.push(`${c.count} Qs`);
   if (!kids && c.difficulty) bits.push(['', 'Easy', 'Medium', 'Hard'][c.difficulty]);
   for (const o of fmt.options || []) {
-    if (o.key in c.opts && c.opts[o.key] !== o.default && !(kids && o.kidsDefault === c.opts[o.key])) bits.push(optPart(o, c.opts[o.key]));
+    if (!(o.key in c.opts)) continue;
+    // favIf(opts): shown exactly when it holds, default or not (reveal: the zoom timing goes with Zoom)
+    const show = o.favIf ? o.favIf(c.opts) : c.opts[o.key] !== o.default && !(kids && o.kidsDefault === c.opts[o.key]);
+    if (show) bits.push(optPart(o, c.opts[o.key]));
   }
   if (c.timer != null && c.timer !== timerDefault) bits.push(c.timer ? `${c.timer}s timer` : 'No timer');
   return bits.join(' · ') || (fmt.packless ? 'Standard picks' : 'All themes');

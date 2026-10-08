@@ -1,6 +1,6 @@
 // Device-hosted room logic: a port of server/rooms.go + scoring.go so the host's tab can be the room
 // server. Pure (no DOM, no network), so tools/p2p_test.mjs runs it in node. State shape = the server's.
-import { stageMultiplier, withStreak, progressiveLimit, stageExtendMs, PROGRESSIVE_CAP } from '../core/scoring.js?v=202610081134';
+import { stageMultiplier, withStreak, progressiveLimit, stageExtendMs, PROGRESSIVE_CAP, autoStages, dueStage } from '../core/scoring.js?v=202610081215';
 export { stageMultiplier, withStreak };
 
 export const MAX_PLAYERS = 8;
@@ -144,7 +144,9 @@ export class P2PRoom {
     if (ts > 1) ms = Math.max(ms, Math.min(Math.round(ms * Math.min(ts, MAX_TSCALE)), MAX_SCALED_MS));
     const long = LONG[q?.format];
     if (long && long > ms) ms = long;
-    return stagesOf(q) ? Math.max(ms, progressiveLimit(this.answerMs)) : ms;
+    const n = stagesOf(q);
+    if (!n) return ms;
+    return this.kids ? Math.max(ms, progressiveLimit(this.answerMs)) : autoStages(q.format, n, this.answerMs).limit;
   }
 
   // Progressive questions stretch their deadline as stages open; the ring re-targets (scoring keeps the initial limit).
@@ -259,11 +261,14 @@ export class P2PRoom {
     return { votes, needed };
   }
 
-  // Advance and extend: deadline = max(current, now + max(5 s, answer/2)), never past start + 90 s.
+  // Advance. Kids rooms also extend: deadline = max(current, now + max(5 s, answer/2)), never past start + 90 s.
+  // Other rooms keep the fixed deadline (the stage schedule fits inside it).
   setStage(st, now = this.now()) {
     this.stage = st; this.stageAt = now; this.votes = new Set();
-    const ext = now + stageExtendMs(this.answerMs);
-    this.qDeadline = Math.min(Math.max(this.qDeadline, ext), this.qStart + PROGRESSIVE_CAP);
+    if (this.kids) {
+      const ext = now + stageExtendMs(this.answerMs);
+      this.qDeadline = Math.min(Math.max(this.qDeadline, ext), this.qStart + PROGRESSIVE_CAP);
+    }
     this.changed();
   }
 
@@ -314,7 +319,6 @@ export class P2PRoom {
     p.answers[this.q] = rec;
     p.score += pts;
     p.seen = now;
-    if (n) this.locked = true;
     if (this.allAnswered(now)) this.reveal(); else this.changed();
     return { answer: rec };
   }
@@ -381,9 +385,12 @@ export class P2PRoom {
     if (this.phase === 'question') {
       this.checkHold(now);
       const n = stagesOf(this.questions[this.q]);
-      if (n && !this.locked && this.stage < n - 1 && now >= this.qStart) {
-        if (this.kids && now - this.stageAt >= KIDS_STAGE_MS) this.setStage(this.stage + 1, now);
-        else if (this.votes.size) this.checkVotes(now);   // a non-voter dropped: the rest may now be enough
+      if (n && this.stage < n - 1 && now >= this.qStart) {
+        // stages auto-advance for everyone (no voting in rooms); an answer no longer freezes them
+        const due = this.kids ? (now - this.stageAt >= KIDS_STAGE_MS ? this.stage + 1 : 0)
+          : dueStage(now - this.qStart, n, autoStages(this.questions[this.q].format, n, this.answerMs).step);
+        if (due > this.stage) this.setStage(due, now);
+        else if (this.votes.size) this.checkVotes(now);   // legacy clients' votes
       }
       if (now > this.qDeadline + GRACE_MS) this.reveal();
       else if (now >= this.qStart && this.allAnswered(now)) this.reveal();

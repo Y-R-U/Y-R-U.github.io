@@ -1,16 +1,16 @@
 // Format grid + per-game setup (themes, count, options, difficulty, timer).
-import { h } from './kit.js?v=202610081134';
-import { defineScreen, go, header } from './app.js?v=202610081134';
-import { listFormats, getFormat, defaultOpts } from '../formats/registry.js?v=202610081134';
-import { getIndex } from '../core/packs.js?v=202610081134';
-import { supportedPackIds, formatAvailable } from '../core/spec.js?v=202610081134';
-import { getSettings, setSettings, getLast, setLast, ANSWER_TIMES } from '../core/store.js?v=202610081134';
-import { streakOption } from './streakopt.js?v=202610081134';
-import { themePicker } from './picker.js?v=202610081134';
-import { STRUCTURES } from '../structures/index.js?v=202610081134';
-import { sfx } from './fx.js?v=202610081134';
-import { favControls } from './favs.js?v=202610081134';
-import { favKey } from './favmodel.js?v=202610081134';
+import { h } from './kit.js?v=202610081215';
+import { defineScreen, go, header } from './app.js?v=202610081215';
+import { listFormats, getFormat, defaultOpts } from '../formats/registry.js?v=202610081215';
+import { getIndex } from '../core/packs.js?v=202610081215';
+import { supportedPackIds, formatAvailable } from '../core/spec.js?v=202610081215';
+import { getSettings, setSettings, getLast, setLast, ANSWER_TIMES } from '../core/store.js?v=202610081215';
+import { streakOption } from './streakopt.js?v=202610081215';
+import { themePicker } from './picker.js?v=202610081215';
+import { STRUCTURES } from '../structures/index.js?v=202610081215';
+import { sfx } from './fx.js?v=202610081215';
+import { favControls } from './favs.js?v=202610081215';
+import { favKey } from './favmodel.js?v=202610081215';
 
 export const DIFFS = [[0, 'Mixed'], [1, 'Easy'], [2, 'Medium'], [3, 'Hard']];
 
@@ -91,6 +91,8 @@ export function optionsPanel(host, fmt, { structure = 'quick', last = null, show
       row.append(custom);
       panel.append(h('div.opt', {}, h('div.opt-label', {}, 'Questions'), row));
     }
+    const conds = [];   // options with showIf(opts): only shown while it holds (e.g. reveal's zoom timing)
+    const syncShow = () => conds.forEach(([row, o]) => { row.hidden = !o.showIf(v.opts); });
     for (const o of fmt.options || []) {
       if (kids && o.kidsHide) continue;
       if (o.type === 'bool') {
@@ -100,9 +102,12 @@ export function optionsPanel(host, fmt, { structure = 'quick', last = null, show
         if (kids && o.kidsValues) { const keep = values.map((x, i) => [x, labels?.[i]]).filter(([x]) => o.kidsValues.includes(x)); values = keep.map(k => k[0]); labels = labels ? keep.map(k => k[1]) : null; }
         if (kids && o.kidsDefault != null && !(last?.opts && o.key in last.opts)) v.opts[o.key] = o.kidsDefault;
         if (!values.includes(v.opts[o.key])) v.opts[o.key] = kids && o.kidsDefault != null ? o.kidsDefault : values.includes(o.default) ? o.default : values[0];
-        panel.append(h('div.opt', { dataset: { opt: o.key } }, h('div.opt-label', {}, o.label), chipRow(values, labels, v.opts[o.key], x => { v.opts[o.key] = x; changed(); })));
+        const row = h('div.opt', { dataset: { opt: o.key } }, h('div.opt-label', {}, o.label, o.help ? h('small.muted.tiny', {}, o.help) : null), chipRow(values, labels, v.opts[o.key], x => { v.opts[o.key] = x; syncShow(); changed(); }));
+        if (o.showIf) conds.push([row, o]);
+        panel.append(row);
       }
     }
+    syncShow();
     if (showDifficulty && !kids) {
       panel.append(h('div.opt', { dataset: { opt: 'difficulty' } }, h('div.opt-label', {}, 'Difficulty'), chipRow(DIFFS.map(d => d[0]), DIFFS.map(d => d[1]), v.difficulty, x => {
         v.difficulty = x;

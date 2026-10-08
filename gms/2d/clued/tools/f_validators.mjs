@@ -200,7 +200,8 @@ function revealCheck(q, { itemOf, ok }, tag) {
   const t = itemOf(q.refs[0]);
   ok(t && optText(q, q.answer) === t.name, `reveal :: answer (${tag}) ${q.id}`);
   ok(q.data.img?.src && t.media.img.some(m => m.src === q.data.img.src), `reveal :: image is the item's (${tag}) ${q.id}`);
-  ok(q.stages >= 2 && ['pixel', 'zoom', 'tiles'].includes(q.data.mode), `reveal :: stages + mode (${tag}) ${q.id}`);
+  ok(!q.stages && ['full', 'zoom'].includes(q.data.mode), `reveal :: not progressive, mode full|zoom (${tag}) ${q.id}`);
+  ok(q.data.mode === 'zoom' ? [50, 65, 80, 90].includes(q.data.fullAt) : q.data.fullAt === undefined, `reveal :: zoom carries fullAt (${tag}) ${q.id}`);
   for (const r of q.refs.slice(1)) ok(itemOf(r)?.name !== t.name, `reveal :: distractor differs (${tag})`);
 }
 

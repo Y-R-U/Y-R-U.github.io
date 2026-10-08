@@ -140,54 +140,50 @@ ok(verifyCorrect({ format: 'type', answer: 'x' }, 'y', true) === true, 'other fo
   eq(k.answerMs, 20000, 'kids default 20 s');
 }
 
-/* vote to reveal more */
+/* progressive stages: auto-advance for everyone (no voting in rooms), mirrors server TestAutoStages */
+for (const [f, n, ans, lim, step] of [['reveal', 10, 30000, 45000, 4111], ['ladder', 20, 10000, 90000, 4473], ['ladder', 5, 10000, 23000, 4500],
+  ['silhouette', 3, 10000, 15000, 5000], ['reveal', 3, 3000, 13000, 4000]]) {
+  eq(S.autoStages(f, n, ans), { limit: lim, step, tail: S.autoStages(f, n, ans).tail }, `auto window ${f} ${n} @${ans} matches server`);
+  eq(S.dueStage(step * (n - 1), n, step), n - 1, `last stage due at (n-1)·step (${f} ${n})`);
+  ok(lim - step * (n - 1) >= 5000, `last stage leaves ≥ 5 s (${f} ${n})`);
+}
 {
   T = 3_000_000;
-  const { r, host } = room({ questions: [prog(0, 4), mc(1)], answerSec: 10 });
+  const lad = i => ({ ...prog(i, 4), format: 'ladder' });
+  const { r, host } = room({ questions: [lad(0), prog(1, 3), mc(2)], answerSec: 10, gapSec: 0 });
   const a = join(r, 'Ann'), b = join(r, 'Bob');
   r.hostAction(host, 'start');
-  eq(r.qDeadline - r.qStart, 15000, 'progressive initial = answer × 1.5');
+  eq(r.qDeadline - r.qStart, 18500, 'ladder 4 clues @10 s: max(15 s, 3 × 4.5 s + 5 s)');
   eq(r.vote(a, 0).error, 'not_open', 'no votes during the lead-in');
   openQ(r);
-  r.vote(a, 0);
-  let st = r.stateFor(b);
-  eq([st.stage, st.stages, st.votes, st.needed, st.locked], [0, 4, 1, 3, false], 'vote count and needed in state');
-  ok(r.stateFor(a).you.voted && !st.you.voted, 'you.voted');
-  r.vote(a, 0); r.vote(b, 0);
-  eq(r.stage, 0, 'repeat votes do not count twice');
-  T += 2000;
-  const res = r.vote(host, 0);
-  ok(res.advanced && r.stage === 1, 'all connected unanswered players voted → stage 1');
-  eq(r.votes.size, 0, 'votes reset after an advance');
-  eq(r.qDeadline, Math.max(r.qStart + 15000, T + 5000), 'deadline = max(current, now + max(5 s, answer/2))');
-  // a dropped non-voter: the rest are enough
-  r.vote(a, 0); r.vote(host, 0);
-  r.connect(b, -1); T += ONLINE_MS + 1; r.tick();
-  eq(r.stage, 2, 'a dropped player stops blocking the vote');
-  r.connect(b, 1);
-  // extend near the deadline
-  T = r.qDeadline - 1000;
-  r.vote(a, 0); r.vote(b, 0); r.vote(host, 0);
-  eq(r.stage, 3, 'stage 3');
-  eq(r.qDeadline, T + 5000, 'late advance extends the deadline');
-  eq(r.vote(a, 0).error, 'last_stage', 'no votes past the last stage');
-  const before = r.limitFor(r.questions[0]);
-  const ans = r.answer(a, { q: 0, given: 0, correct: true, ms: T - r.qStart }).answer;
-  eq(ans.stage, 3, 'answer records its stage');
-  eq(ans.points, Math.round(basePoints('reveal', true, undefined, Math.min(T - r.qStart, before), before, true) * stageMultiplier(3, 4)), 'stage multiplier applied (scored against the initial limit)');
-  ok(r.locked && r.stateFor(b).locked, 'first answer locks voting');
-  eq(r.stateFor(a).you.stage, 3, 'you.stage');
-  eq(r.stateFor(b).limitMs, r.qDeadline - r.qStart, 'ring limit follows the extended deadline');
+  const dl = r.qDeadline;
+  T += 4400; r.tick(); eq(r.stage, 0, 'too early for clue 2');
+  T += 200; r.tick();
+  eq([r.stateFor(a).stage, r.stateFor(b).stage, r.stateFor(host).stage], [1, 1, 1], 'stage 1 for everyone at once');
+  eq(r.qDeadline, dl, 'auto-advance keeps the deadline');
+  const ans = r.answer(a, { q: 0, given: 0, correct: true, points: 400, ms: 999999 }).answer;
+  eq([ans.stage, ans.points], [1, 320], 'answer records its stage; ×0.8 at 1 of 4');
+  T += 4500; r.tick();
+  ok(r.stage === 2 && !r.stateFor(b).locked, 'an answer no longer freezes the stage');
+  T += 4500; r.tick();
+  eq([r.stage, r.qDeadline - r.qStart - 3 * 4500], [3, 5000], 'last clue (13.5 s) arrives with 5 s left');
+  eq(r.stateFor(a).you.stage, 1, 'you.stage kept');
+  eq(r.stateFor(b).limitMs, 18500, 'ring limit = the fixed window');
+  r.hostAction(host, 'next', { q: 0 }); r.hostAction(host, 'next', {});
+  eq([r.stage, r.qDeadline - r.qStart], [0, 15000], 'next question resets; reveal 3 stages = 15 s');
+  openQ(r); T += 1000; r.tick();
+  const dl2 = r.qDeadline;
+  r.vote(a, 1); r.vote(b, 1); r.vote(host, 1);
+  eq([r.stage, r.qDeadline], [1, dl2], 'legacy votes still advance, without moving the deadline');
+  T += 4500; r.tick(); eq(r.stage, 1, 'schedule does not double-advance');
+  T += 5000; r.tick(); eq(r.stage, 2, 'schedule catches up');
 }
 {
   T = 4_000_000;
-  const { r, host } = room({ questions: [prog(0, 20)], answerSec: 30 });
-  const a = join(r, 'Ann');
+  const { r, host } = room({ questions: [{ ...prog(0, 20), format: 'ladder' }], answerSec: 10 });
+  join(r, 'Ann');
   r.hostAction(host, 'start'); openQ(r);
-  for (let i = 0; i < 12; i++) { T += 7000; r.vote(a, 0); r.vote(host, 0); }
-  eq(r.qDeadline - r.qStart, 90000, 'deadline capped at 90 s from the start');
-  r.answer(host, { q: 0, given: 1 });
-  eq(r.vote(a, 0).error, 'locked', 'locked after a wrong guess too');
+  eq(r.qDeadline - r.qStart, 90000, '20 clues: capped at 90 s');
 }
 {
   T = 5_000_000;
@@ -197,6 +193,17 @@ ok(verifyCorrect({ format: 'type', answer: 'x' }, 'y', true) === true, 'other fo
   T += 3999; r.tick(); eq(r.stage, 0, 'kids: no auto-stage before 4 s');
   T += 2; r.tick(); eq(r.stage, 1, 'kids: stage auto-advances every 4 s');
   T += 4001; r.tick(); T += 4001; r.tick(); eq(r.stage, 2, 'kids: stops at the last stage');
+}
+{
+  T = 5_500_000;
+  const r = new P2PRoom({ spec: { kids: true }, questions: [prog(0, 3)], now, rand });
+  const k = r.addPlayer('Kid', { local: true }).player, k2 = join(r, 'Kid 2');
+  r.start(); openQ(r);
+  T += 4001; r.tick();
+  r.answer(k, { q: 0, given: 0, correct: true });
+  T += 4001; r.tick();
+  eq([r.stage, r.phase], [2, 'question'], 'kids: an answer does not freeze the stages');
+  void k2;
 }
 {
   // non-progressive: no stage fields, vote refused

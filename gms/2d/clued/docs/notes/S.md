@@ -183,3 +183,5 @@ preflight from `https://y-r-u.github.io` returns `access-control-allow-origin`, 
 - **A:** `__cluedReload` drops `?join=CODE`; harmless (seats rejoin via the kept URL) but `location.search` could be kept.
 - **Manager:** commit `admin.html` (game root) with the lane; it's linked from alert pushes. Static deploy is yours
   (`STATIC=1 ./deploy.sh` if you want this script to do it).
+
+> **2026-10-08 (SIMPLE.md):** the vote section above is superseded for the current client: no voting in rooms; progressive stages auto-advance for everyone on a fixed schedule (`autoStages`), answers no longer lock, the vote endpoint stays for old clients. See CONTRACT "Progressive stages".

@@ -1,6 +1,6 @@
-import { register, poolItems, pickPack, byDifficulty, placeAnswer, collect, pick, sample, shuffle } from './registry.js?v=202610081134';
-import { layout, choiceGrid, h } from '../ui/kit.js?v=202610081134';
-import { norm, injectCSS } from './fkit.js?v=202610081134';
+import { register, poolItems, pickPack, byDifficulty, placeAnswer, collect, pick, sample, shuffle } from './registry.js?v=202610081215';
+import { layout, choiceGrid, h } from '../ui/kit.js?v=202610081215';
+import { norm, injectCSS } from './fkit.js?v=202610081215';
 
 const CSS = `
 .qt-card{position:relative;margin:0;background:#fff;border:var(--line) solid var(--ink);border-radius:var(--r);box-shadow:var(--shadow);padding:22px 18px 16px;font-size:clamp(19px,5.2vw,24px);line-height:1.3;font-weight:800;text-align:center;text-wrap:balance;animation:ch-in .4s cubic-bezier(.2,1.4,.4,1) both}

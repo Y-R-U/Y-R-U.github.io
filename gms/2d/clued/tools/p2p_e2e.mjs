@@ -1,6 +1,6 @@
 // Lane P2P end-to-end: 3 headless Chromes play a device-hosted room through the real PeerJS cloud broker.
 // Host creates via real clicks, 2 joiners open the ?p2p= share link, full game with a joiner refresh and a
-// host refresh mid-game, a vote-to-reveal round, then the host leaves and the room ends with final scores.
+// host refresh mid-game, an auto-advancing progressive round (no voting), then the host leaves and the room ends with final scores.
 //   node tools/p2p_e2e.mjs [--shots DIR] [--keep] [--peerhost host:port]
 // Needs the :8888 site server, internet (0.peerjs.com) and ~/.claude/bin/cdp. Ports 9411 (host), 9412, 9413.
 import { execFileSync } from 'node:child_process';
@@ -76,7 +76,7 @@ class Page {
   room() { return this.eval('window.__cluedRoom ? JSON.parse(JSON.stringify(window.__cluedRoom.st)) : null'); }
 }
 
-const PORTS = [9411, 9412, 9413];
+const PORTS = args.includes('--ports') ? args[args.indexOf('--ports') + 1].split(',').map(Number) : [9411, 9412, 9413];
 let all = [];
 const extra = `noauth=1${PEERHOST ? `&peerhost=${PEERHOST}` : ''}`;
 
@@ -204,37 +204,32 @@ async function main() {
   await host.shot('final-host-portrait.png');
   await j2.shot('final-joiner-portrait.png');
 
-  /* ------------------------------------------------- game 2: vote to reveal */
+  /* ------------------------------------------------- game 2: auto-advancing stages */
   await host.eval(`(async () => {
     const T = window.__cluedP2P.transport, st = window.__cluedRoom.st, seat = JSON.parse(sessionStorage.getItem('clued.room.' + st.code));
     const q0 = (await T.question(st.code, seat.key, 0)).question, q1 = (await T.question(st.code, seat.key, 1)).question;
-    await T.host(st.code, seat.key, 'again', { spec: st.spec, title: 'Vote test', questions: [{ ...q0, id: 'v0', stages: 3 }, { ...q1, id: 'v1' }] });
+    await T.host(st.code, seat.key, 'again', { spec: st.spec, title: 'Stages test', questions: [{ ...q0, id: 'v0', stages: 3 }, { ...q1, id: 'v1' }] });
   })()`);
   for (const p of pages) await p.waitFor(`window.__cluedRoom?.st?.phase === 'lobby' && window.__cluedRoom.st.game === 1`, 15000, `${p.name} back in the lobby`);
   ok(true, 'play again returns everyone to the lobby');
   await host.click('[data-act=start]');
-  for (const p of pages) await p.waitFor(`document.querySelector('[data-act=more]:not([hidden]):not([disabled])')`, 20000, `${p.name} show-more button`);
+  // no voting in rooms (2026-10-08): stages auto-advance for everyone on the host's timer
+  for (const p of pages) await p.waitFor(`window.__cluedRoom?.st?.phase === 'question' && document.querySelector('.stage .choices .choice:not([disabled])')`, 20000, `${p.name} progressive q`);
   const v0 = await host.room();
-  ok(v0.stages === 3 && v0.stage === 0 && v0.needed === 3, 'progressive question: 3 stages, 3 voters needed', JSON.stringify({ s: v0.stages, st: v0.stage, n: v0.needed }));
+  ok(v0.stages === 3 && v0.stage === 0, 'progressive question: 3 stages', JSON.stringify({ s: v0.stages, st: v0.stage }));
+  const noVote = `!document.querySelector('[data-act=more]:not([hidden])') && !/Show more/.test(document.body.innerText)`;
+  for (const p of pages) ok(await p.eval(noVote), `${p.name}: no Show more / vote button`);
   const dl0 = v0.qDeadline;
-  await j1.click('[data-act=more]');
-  await host.waitFor(`window.__cluedRoom.st.votes === 1`, 5000, 'one vote counted');
-  await j2.waitFor(`document.querySelector('[data-act=more]').textContent.includes('1/3')`, 5000, 'vote count on other screens');
-  ok(true, 'vote count shows "1/3" on another player');
-  await j2.shot('vote-joiner-portrait.png');
-  await j2.click('[data-act=more]');
-  await host.click('[data-act=more]');
-  for (const p of pages) await p.waitFor(`window.__cluedRoom.st.stage === 1`, 5000, `${p.name} stage 1`);
+  for (const p of pages) await p.waitFor(`window.__cluedRoom.st.stage === 1`, 12000, `${p.name} stage 1`);
   const v1 = await host.room();
-  ok(true, 'everyone voted → all advance to stage 1 together');
-  ok(v1.qDeadline >= dl0, 'deadline never shrinks on a stage advance', `${dl0} → ${v1.qDeadline}`);
-  await j1.waitFor(`document.querySelector('.stage .choices .choice:not([disabled])')`, 5000, 'choices');
+  ok(true, 'stage 1 arrives on its own for everyone');
+  ok(v1.qDeadline === dl0, 'auto-advance keeps the deadline', `${dl0} → ${v1.qDeadline}`);
+  await j2.shot('auto-stage-joiner-portrait.png');
   await j1.click('.stage .choices .choice');
-  for (const p of [host, j2]) await p.waitFor(`window.__cluedRoom.st.locked === true && document.querySelector('[data-act=more]')?.textContent.includes('Locked')`, 5000, `${p.name} locked`);
-  ok(true, 'the first answer locks voting for everyone');
-  await host.shot('vote-locked-host-portrait.png');
+  await j2.waitFor(`window.__cluedRoom.st.stage === 2`, 12000, 'bob stage 2');
+  ok(!(await j2.room()).locked, 'an answer no longer freezes the stages');
   await playQuestion([host, j2], v1);
-  await host.waitFor(`window.__cluedRoom.st.phase === 'reveal'`, 10000, 'vote q reveal');
+  await host.waitFor(`window.__cluedRoom.st.phase === 'reveal'`, 10000, 'auto q reveal');
   const ann = (await host.room()).players.find(p => p.name === 'Ann');
   ok(ann.last && (!ann.last.correct || ann.last.points < 500), 'stage-1 answer scored with the stage multiplier', JSON.stringify(ann.last));
 

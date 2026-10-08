@@ -1,25 +1,25 @@
 // Live room screen: lobby → synced questions (driven through A's runner) → scoreboards → podium.
-import { h, fmtNum } from '../ui/kit.js?v=202610081134';
-import { defineScreen, reset, header, current } from '../ui/app.js?v=202610081134';
-import { confirmPop, toast } from '../ui/popup.js?v=202610081134';
-import { sfx, confetti } from '../ui/fx.js?v=202610081134';
-import { createRunner } from '../structures/runner.js?v=202610081134';
-import { prepare, prepareFormats } from '../structures/session.js?v=202610081134';
-import { basePoints, streakMultiplier, stageMultiplier } from '../core/scoring.js?v=202610081134';
-import { urlsOf, preflight } from '../core/media.js?v=202610081134';
-import { randomSeed } from '../core/rng.js?v=202610081134';
-import { listFormats } from '../formats/registry.js?v=202610081134';
-import { loadFormats } from '../formats/index.js?v=202610081134';
-import { friendly } from './api.js?v=202610081134';
-import { getTransport } from './transport.js?v=202610081134';
-import { sharePanel, joinUrl, p2pUrl } from './share.js?v=202610081134';
-import { scoreboard, podium, ordinal, timingPanel, roundsTable, pointsBreakdown } from './board.js?v=202610081134';
-import { streakOption } from '../ui/streakopt.js?v=202610081134';
-import { roundAt, specRound, annotateTimes, fitSet } from './roundset.js?v=202610081134';
-import { roundTitle, roundThemes } from '../structures/rounds.js?v=202610081134';
-import { getFormat } from '../formats/registry.js?v=202610081134';
-import { ensureStyles, dropSeat, setQuery, gapLabel, TRUST_HINT, mmss } from './util.js?v=202610081134';
-import { trackRoom } from '../core/stats.js?v=202610081134';
+import { h, fmtNum } from '../ui/kit.js?v=202610081215';
+import { defineScreen, reset, header, current } from '../ui/app.js?v=202610081215';
+import { confirmPop, toast } from '../ui/popup.js?v=202610081215';
+import { sfx, confetti } from '../ui/fx.js?v=202610081215';
+import { createRunner } from '../structures/runner.js?v=202610081215';
+import { prepare, prepareFormats } from '../structures/session.js?v=202610081215';
+import { basePoints, streakMultiplier, stageMultiplier } from '../core/scoring.js?v=202610081215';
+import { urlsOf, preflight } from '../core/media.js?v=202610081215';
+import { randomSeed } from '../core/rng.js?v=202610081215';
+import { listFormats } from '../formats/registry.js?v=202610081215';
+import { loadFormats } from '../formats/index.js?v=202610081215';
+import { friendly } from './api.js?v=202610081215';
+import { getTransport } from './transport.js?v=202610081215';
+import { sharePanel, joinUrl, p2pUrl } from './share.js?v=202610081215';
+import { scoreboard, podium, ordinal, timingPanel, roundsTable, pointsBreakdown } from './board.js?v=202610081215';
+import { streakOption } from '../ui/streakopt.js?v=202610081215';
+import { roundAt, specRound, annotateTimes, fitSet } from './roundset.js?v=202610081215';
+import { roundTitle, roundThemes } from '../structures/rounds.js?v=202610081215';
+import { getFormat } from '../formats/registry.js?v=202610081215';
+import { ensureStyles, dropSeat, setQuery, gapLabel, TRUST_HINT, mmss } from './util.js?v=202610081215';
+import { trackRoom } from '../core/stats.js?v=202610081215';
 
 const DIFF = ['Mixed', 'Easy', 'Medium', 'Hard'];
 let formatsP = null;
@@ -82,7 +82,7 @@ defineScreen('room', async (el, { code, key, st: initial, via = 'server' }, cur)
     if (ctx.run) {
       syncStages(st);
       // the opening moved (media hold) after this question rendered: keep the ring on the server's deadline
-      if (st.phase === 'question' && ctx.asking === st.q && !st.stages && ctx.deadline !== st.qDeadline) { ctx.deadline = st.qDeadline; ctx.run.setDeadline(st.qDeadline, st.limitMs); }
+      if (st.phase === 'question' && ctx.asking === st.q && ctx.deadline !== st.qDeadline) { ctx.deadline = st.qDeadline; ctx.run.setDeadline(st.qDeadline, st.limitMs); }
       updateLive(st);
       if (st.phase === 'reveal' && ctx.asking === st.q) { ctx.asking = null; ctx.run.timeUp(); }
     } else if (st.phase === 'question' && st.you.joinedQ <= st.q) {
@@ -226,7 +226,7 @@ defineScreen('room', async (el, { code, key, st: initial, via = 'server' }, cur)
       },
       scoreFn: () => basePoints({ timed: !ctx.st.kids, remaining: Math.max(0, ctx.st.qDeadline - serverNow()), limit: ctx.st.limitMs || 20000 }),
       onAnswer: rec => sendAnswer(base + rec.i, rec, run),
-      requestMore: i => T.vote(code, key, base + i).then(s => sub.push(s)).catch(e => { if (e.status !== 409) toast(friendly(e)); }),
+      stagesAuto: true, // progressive stages auto-advance for everyone (server/host timer); no voting in rooms
       revealExtra: rec => liveBox(base + rec.i),
       waitNext: i => waitFor(s => s.game !== game || s.phase === 'final' || s.phase === 'lobby' || (s.phase !== 'lobby' && s.q > base + i)),
       waitLabel: ' ',
@@ -304,13 +304,11 @@ defineScreen('room', async (el, { code, key, st: initial, via = 'server' }, cur)
       h('div.nr-go', {}, h('span', {}, 'Starts in'), n)));
   }
 
-  // Progressive questions: mirror the server's stage, votes and lock into the runner.
+  // Progressive questions: mirror the server's auto-advancing stage into the runner.
   function syncStages(st) {
     const run = ctx.run;
     if (!run || st.phase !== 'question' || !st.stages || ctx.asking !== st.q) return;
     if (st.stage > run.stage) run.setStage(st.stage, st.qDeadline, st.limitMs);
-    run.setVotes(st.votes, st.needed, st.you.voted);
-    if (st.locked) run.lockStages();
   }
 
   function getQuestion(i) {
