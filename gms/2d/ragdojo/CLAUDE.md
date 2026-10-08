@@ -102,6 +102,11 @@ win a SIMULANT run      -> save.simulantWon (CYBORG's replay run); GOD opens
 GOD's replay run        -> DEMON, and the page goes to hell with it (#app.demon)
 ```
 
+**From CYBER on, enemies have double HP and damage** (`WORLD_TOUGHNESS` in config.js; enemy
+specials scale off `baseDmg`, so they double too). Measured 2026-10-08 with the node harness:
+a player at perks 10 / moves 6 wins 100% of DARK but ~25-35% of CYBER fights 40 and 45; at
+perks 13 / moves 8 (the levels CYBER unlocks) it is 100% again. That gap is the point.
+
 World display names: LIGHT (light/bully), DARK (dark/thug), CYBER (cyborg/simulant), DEITIES
 (god/demon). The save ids stay `cyborg` and `god` — only `WORLDS[].name` is shown.
 Past DARK the hub's DARK toggle becomes a WORLDS list (`openWorlds`). `WORLDS` and

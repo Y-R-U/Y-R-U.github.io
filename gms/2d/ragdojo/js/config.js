@@ -193,7 +193,11 @@ function enemyStats(tier, kind, i) {
   };
 }
 
+/** From CYBER on, every enemy has double the health and hits twice as hard (specials too). */
+const WORLD_TOUGHNESS = { cyborg: 2, god: 2 };
+
 function buildLevels(theme) {
+  const tough = WORLD_TOUGHNESS[theme] || 1;
   const RANKS = ranksFor(theme);
   const GRUNT_NAMES = GRUNT_SETS[theme];
   const CHAMPIONS = CHAMPION_SETS[theme];
@@ -221,6 +225,7 @@ function buildLevels(theme) {
           enemies.push({ ...s, name: GRUNT_NAMES[t][(f + e) % 5], tier: t });
         }
       }
+      for (const e of enemies) { e.hp = Math.round(e.hp * tough); e.dmg *= tough; }
       out.push({
         idx, tier: t, kind, enemies,
         event: EVENT_AT[idx] || null,
