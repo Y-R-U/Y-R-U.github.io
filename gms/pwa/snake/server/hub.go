@@ -405,6 +405,12 @@ type memberView struct {
 }
 
 func (h *hub) broadcastMembers(r *room, joined *client) {
+	// TURN credentials only once there is someone to connect to. Fetching them
+	// can block on Cloudflare for a moment, but only on a cache miss (hourly).
+	var ice json.RawMessage
+	if len(r.members) > 1 {
+		ice = h.turn.iceServers()
+	}
 	ms := make([]memberView, len(r.members))
 	for i, m := range r.members {
 		ms[i] = memberView{m.id, m.name}
@@ -414,6 +420,9 @@ func (h *hub) broadcastMembers(r *room, joined *client) {
 			"host": r.members[0].id, "epoch": r.epoch, "you": m.id}
 		if r.private {
 			msg["code"] = r.code
+		}
+		if ice != nil {
+			msg["ice"] = ice
 		}
 		if m == joined {
 			msg["joined"] = true
@@ -535,7 +544,7 @@ func (h *hub) serveWS(w http.ResponseWriter, r *http.Request, origins []string) 
 	defer cancel()
 	go writer(ctx, conn, c.send, cancel)
 
-	welcome, _ := json.Marshal(map[string]any{"t": "welcome", "id": c.id, "ice": h.turn.iceServers(), "turn": h.turn.configured()})
+	welcome, _ := json.Marshal(map[string]any{"t": "welcome", "id": c.id, "ice": stunOnly, "turn": h.turn.configured()})
 	// Straight to the socket: the hub has not been told about anything yet.
 	wctx, wcancel := context.WithTimeout(ctx, 5*time.Second)
 	err = conn.Write(wctx, websocket.MessageText, welcome)

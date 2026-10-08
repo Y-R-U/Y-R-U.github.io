@@ -256,3 +256,18 @@ func toLower(s string) string {
 	}
 	return string(b)
 }
+
+func TestTurnOnlyOnceSomeoneElseIsInTheRoom(t *testing.T) {
+	r := newRig()
+	r.h.turn = &turn{keyID: "k", token: "t", cached: json.RawMessage(`[{"urls":["turn:x"]}]`), until: time.Now().Add(time.Hour)}
+	a := r.client("A", "Australia/Sydney")
+	r.msg(a, map[string]any{"t": "quick"})
+	if m := last(a, "room"); m == nil || m["ice"] != nil {
+		t.Fatalf("a lone player must not get TURN credentials: %v", m)
+	}
+	b := r.client("B", "Australia/Sydney")
+	r.msg(b, map[string]any{"t": "quick"})
+	if m := last(a, "room"); m == nil || m["ice"] == nil {
+		t.Fatalf("with two players, credentials should be handed out")
+	}
+}

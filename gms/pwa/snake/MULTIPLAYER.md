@@ -65,6 +65,11 @@ nearest city instead (Sydney for Australians). Free tier: 1,000 GB/month.
 Put `CF_TURN_KEY_ID` / `CF_TURN_KEY_TOKEN` in `/srv/data/snakenet/snakenet.env`
 on the box and restart `snakenet`. **Never commit them.**
 
+**Live since 2026-10-09** (Cloudflare app `snake-eee`, Aaron's account, card on
+file, usage-billed past 1,000 GB). Because TURN credentials work for whoever
+holds them, the server only sends them in `room` messages once a room has two
+or more players, and they live 2 hours (refreshed hourly, shared).
+
 ## Tests
 
 - `cd server && go test ./...` — rooms, codes never listed, region grouping,

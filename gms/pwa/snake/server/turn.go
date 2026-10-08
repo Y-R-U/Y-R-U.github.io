@@ -17,9 +17,12 @@ import (
 // through Sydney rather than through this US box.
 var stunOnly = json.RawMessage(`[{"urls":["stun:stun.cloudflare.com:3478","stun:stun.l.google.com:19302"]}]`)
 
+// Short-lived and shared: TURN usage is billed past the free tier, and these
+// credentials work for anyone holding them, so they only ever go to players
+// who are in a room with somebody else (see hub.broadcastMembers).
 const (
-	turnTTL     = 6 * time.Hour
-	turnRefresh = 3 * time.Hour
+	turnTTL     = 2 * time.Hour
+	turnRefresh = 1 * time.Hour
 )
 
 type turn struct {

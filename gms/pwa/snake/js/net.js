@@ -410,6 +410,7 @@ class Net {
                 const prevHost = this.hostId, prevEpoch = this.epoch, wasIn = !!this.room;
                 this.room = m.room;
                 this.code = m.code || null;
+                if (m.ice) this.ice = m.ice;   // TURN arrives only once someone else is in the room
                 this.members = m.members;
                 this.hostId = m.host;
                 this.epoch = m.epoch;
