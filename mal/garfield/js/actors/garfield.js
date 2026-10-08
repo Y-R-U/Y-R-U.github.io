@@ -292,6 +292,31 @@ export async function createGarfield({ quality = 'high', shellFur = false } = {}
   const hearts = [0, 1, 2, 3].map(() => { const m = new THREE.Mesh(heartGeo, heartMat); heartRing.add(m); return m; });
   head.add(heartRing);
 
+  // bald gag: a few surviving orange hairs on the crown and the tail tip
+  const tuftMat = new THREE.MeshStandardMaterial({ color: 0xe57a10, roughness: 0.7 });
+  disposables.push(tuftMat);
+  const strand = (pts, r0) => {
+    const curve = new THREE.CatmullRomCurve3(pts.map((p) => new THREE.Vector3(...p)));
+    const g = new THREE.TubeGeometry(curve, 10, 1, 5, false), pos = g.attributes.position, c = new THREE.Vector3(), v = new THREE.Vector3();
+    for (let k = 0; k < pos.count; k++) {
+      const u = Math.floor(k / 6) / 10; curve.getPointAt(u, c);
+      v.fromBufferAttribute(pos, k).sub(c).multiplyScalar(r0 * (1 - 0.85 * u)).add(c); pos.setXYZ(k, v.x, v.y, v.z);
+    }
+    g.computeVertexNormals(); disposables.push(g);
+    return g;
+  };
+  const baldTufts = [];
+  const tuft = (bone, base, dirs, len, r0) => {
+    const grp = new THREE.Group(); grp.position.copy(local(bone, base)); grp.visible = false;
+    for (const [dx, dy, dz, curl] of dirs) {
+      const pts = [[0, -0.004, 0], [dx * len * 0.4, dy * len * 0.45, dz * len * 0.4], [dx * len * 0.85, dy * len * 0.85, dz * len * 0.85 + curl * len * 0.2], [dx * len * (1 - curl * 0.4), dy * len * (1 - curl * 0.5) - curl * len * 0.25, dz * len + curl * len * 0.45]];
+      grp.add(new THREE.Mesh(strand(pts, r0), tuftMat));
+    }
+    byName[bone].add(grp); baldTufts.push(grp);
+  };
+  tuft('head', [0, 0.5, 0.235], [[0, 1, 0.2, 1], [0.4, 0.95, 0.05, 0.5], [-0.35, 0.95, 0.1, 0.3]], 0.085, 0.0055);
+  tuft('tail5', TAIL_TIP, [[0, 0.7, -0.7, 0.3], [0.55, 0.6, -0.55, 0], [-0.55, 0.6, -0.55, 0.1]], 0.06, 0.006);
+
   // sockets
   const sock = (bone, p) => { const o = new THREE.Object3D(); o.position.copy(local(bone, p)); byName[bone].add(o); return o; };
   const sockets = {
@@ -351,7 +376,7 @@ export async function createGarfield({ quality = 'high', shellFur = false } = {}
       const f = clamp(X.puff, 0, 1.5);
       P.s('chest', 0.1 * f, 0.1 * f, 0.06 * f); P.s('spine', 0.1 * f, 0.1 * f, 0.04 * f); P.s('hips', 0.08 * f, 0.08 * f, 0.04 * f);
       P.s('neck', 0.08 * f, 0.08 * f, 0.08 * f);
-      for (let i = 1; i < 6; i++) P.s('tail' + i, 0.35 * f, 0, 0.35 * f);
+      P.s('tail1', 0.28 * f, 0.28 * f, 0.28 * f);   // uniform on one bone: children inherit it (per-bone scales compounded into a bulb)
     }
 
     // world motion for secondary
@@ -520,6 +545,7 @@ export async function createGarfield({ quality = 'high', shellFur = false } = {}
       fur.sheen = bald ? 0.1 : sheen0; fur.roughness = bald ? 0.55 : rough0;
       lidMat.color.set(bald ? 0xf2a9a0 : 0xf08a24); lidMat.sheen = bald ? 0.1 : 1;
       wMat.opacity = bald ? 0.5 : 0.85;
+      for (const t of baldTufts) t.visible = bald;
     },
     get bald() { return bald; },
     on(ev, fn) { (listeners[ev] ||= []).push(fn); return () => api.off(ev, fn); },

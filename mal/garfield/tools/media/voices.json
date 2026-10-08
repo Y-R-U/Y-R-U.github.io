@@ -106,5 +106,77 @@
    "seed": 7,
    "text": "Here you go, buddy! Crunchy cat biscuits, your favourite! And for me, steak and mash! Hey! Ow, ow, ow! My leg!"
   }
+ },
+ "lyman": {
+  "id": "174b6b2ab49a4b0b8e3ca4b7d37af3e0",
+  "name": "Hungry Heist · Lyman",
+  "notes": "Garfield: Hungry Heist Lyman — theatrical dramatic moocher. Original voice, no actor imitation.",
+  "settings": {
+   "mode": "clone",
+   "speaker": "Ryan",
+   "language": "English",
+   "instruct": "",
+   "reference_id": "6467574158354300bf03b6608cb2189f",
+   "ref_text": "I'm cold. I'm hungry. I'm weak. Take me in! Ah, Jon, old buddy. You know, a man could get used to a sofa like this.",
+   "temperature": 0.9,
+   "top_p": 1.0,
+   "top_k": 50,
+   "repetition_penalty": 1.05,
+   "speed": 1,
+   "seed": 7
+  },
+  "preview": "e8918e463d7f4cd2bfe7a35dd10d5fcd",
+  "created": 1791470032.26619,
+  "source_recipe": {
+   "mode": "design",
+   "speaker": "Ryan",
+   "language": "English",
+   "instruct": "Adult man in his thirties with a rich, theatrical, slightly hammy baritone voice. Dramatic and over-the-top like a struggling stage actor, a lovable moocher with smooth charm, rolling delivery, big sighs, grand gestures in the voice. American accent.",
+   "reference_id": null,
+   "ref_text": "",
+   "temperature": 0.9,
+   "top_p": 1.0,
+   "top_k": 50,
+   "repetition_penalty": 1.05,
+   "speed": 1.0,
+   "seed": 7,
+   "text": "I'm cold. I'm hungry. I'm weak. Take me in! Ah, Jon, old buddy. You know, a man could get used to a sofa like this."
+  }
+ },
+ "delivery": {
+  "id": "538b211797494cb9a76c6ef968e8ca8a",
+  "name": "Hungry Heist · Delivery",
+  "notes": "Garfield: Hungry Heist delivery man. Original voice.",
+  "settings": {
+   "mode": "clone",
+   "speaker": "Ryan",
+   "language": "English",
+   "instruct": "",
+   "reference_id": "5d53a93129354358b139319299f0a873",
+   "ref_text": "Delivery! One big box for this address. Sign here, please. Careful, it's a heavy one. Have a good one!",
+   "temperature": 0.9,
+   "top_p": 1.0,
+   "top_k": 50,
+   "repetition_penalty": 1.05,
+   "speed": 1,
+   "seed": 7
+  },
+  "preview": "e233d543edc04542a9fcab182f3f3aef",
+  "created": 1791470032.2717388,
+  "source_recipe": {
+   "mode": "design",
+   "speaker": "Ryan",
+   "language": "English",
+   "instruct": "A chatty, jolly, older delivery guy around fifty, warm husky voice, slightly breathless from carrying boxes, upbeat and polite. American accent.",
+   "reference_id": null,
+   "ref_text": "",
+   "temperature": 0.9,
+   "top_p": 1.0,
+   "top_k": 50,
+   "repetition_penalty": 1.05,
+   "speed": 1.0,
+   "seed": 7,
+   "text": "Delivery! One big box for this address. Sign here, please. Careful, it's a heavy one. Have a good one!"
+  }
  }
 }

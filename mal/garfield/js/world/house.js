@@ -66,7 +66,7 @@ export function buildHouse({ quality = 'high' } = {}) {
     landing: { lower: 'wainscot', upper: 'paint', rail: 0.95, color: 0xf3dcb4 },
     // upper half of the stairwell wall: the living-room wallpaper carries on up, no skirting/rail bands
     stairwell: { upper: 'wallpaperLiving', color: 0xffffff, noSkirt: true },
-    lyman: { lower: 'wainscot', upper: 'bedroomWall', rail: 0.95, color: 0xc4d8e6 },
+    lyman: { upper: 'paint', color: 0xf3dcb2 },
   };
 
   // axis 'x': wall runs along x, plane at z in [c0,c1]. axis 'z': runs along z, plane at x in [c0,c1].
@@ -813,38 +813,48 @@ export function buildHouse({ quality = 'high' } = {}) {
     anchor('lymanRoom', 4.6, UF, 9.0, 0);
     anchor('lymanBed', 1.0, UF, 9.3, Math.PI / 2, { w: 1.0, l: 2.0, top: UF + 0.55 });
     anchor('suitcaseSpot', 2.55, UF, 8.15, -Math.PI / 2);
-    anchor('odieBed', 4.9, UF, 10.35, Math.PI);
+    anchor('odieBed', 4.9, UF, 10.0, Math.PI);
     anchor('cam_lymanRoom', 7.6, UF + 1.9, 7.6, 0, {});
     anchors.get('cam_lymanRoom').look = V(2.2, UF + 0.4, 10.0);
     anchors.get('cam_lymanRoom').fov = 60;
-    // single bed, headboard on the left wall
-    const bx0 = 0.02, bx1 = 2.02, bz0 = 8.8, bz1 = 9.8;
-    b.box('woodGloss', bx0, UF + 0.12, bz0, bx1, UF + 0.32, bz1, C.darkWood, { r: 0.03 });
-    for (const [x, z] of [[bx0 + 0.06, bz0 + 0.06], [bx1 - 0.06, bz0 + 0.06], [bx0 + 0.06, bz1 - 0.06], [bx1 - 0.06, bz1 - 0.06]]) b.box('woodGloss', x - 0.04, UF, z - 0.04, x + 0.04, UF + 0.14, z + 0.04, C.darkWood, { r: 0.01 });
-    b.box('woodGloss', bx0, UF, bz0 - 0.03, bx0 + 0.07, UF + 1.0, bz1 + 0.03, C.darkWood, { r: 0.025 });
-    b.box('woodGloss', bx1 - 0.05, UF, bz0 - 0.03, bx1 + 0.02, UF + 0.6, bz1 + 0.03, C.darkWood, { r: 0.02 });
-    b.box('fabric', bx0 + 0.08, UF + 0.32, bz0 + 0.03, bx1 - 0.06, UF + 0.48, bz1 - 0.03, 0xf3eee2, { r: 0.05 });
-    // rumpled brown/mustard blanket + flat pillow (a moocher's bed)
-    b.lbox('fabric', null, 1.2, UF + 0.51, 9.3, 1.45, 0.07, 1.06, 0x8a5a3a, { r: 0.035, rot: [0, 0.04, 0.02] });
-    b.lbox('fabric', null, 0.95, UF + 0.555, 9.28, 0.5, 0.05, 0.98, 0xd9a440, { r: 0.025, rot: [0, -0.06, 0] });
-    b.lbox('fabric', null, 0.3, UF + 0.55, 9.3, 0.34, 0.11, 0.62, 0xfaf6ee, { r: 0.05, rot: [0, 0, -0.25] });
+    // pine single bed with round knob posts + pastel striped blanket (refs/lyman_bedroom.png), headboard on the left wall
+    const bx0 = 0.02, bx1 = 2.02, bz0 = 8.8, bz1 = 9.8, pine = 0xd9a466;
+    b.box('woodGloss', bx0 + 0.05, UF + 0.14, bz0, bx1, UF + 0.32, bz1, pine, { r: 0.03 });
+    for (const [x, z, h] of [[bx0 + 0.05, bz0 + 0.02, 1.0], [bx0 + 0.05, bz1 - 0.02, 1.0], [bx1 - 0.04, bz0 + 0.02, 0.72], [bx1 - 0.04, bz1 - 0.02, 0.72]]) {
+      b.cyl('woodGloss', null, x, UF + h / 2, z, 0.04, 0.045, h, pine, { radial: 12 });
+      b.sphere('woodGloss', null, x, UF + h + 0.04, z, 0.06, pine);
+    }
+    b.box('woodGloss', bx0 + 0.02, UF + 0.35, bz0 + 0.04, bx0 + 0.08, UF + 0.86, bz1 - 0.04, pine, { r: 0.025 });
+    b.geom('woodGloss', new THREE.CylinderGeometry(0.2, 0.2, 0.06, 24), new THREE.Matrix4().makeTranslation(bx0 + 0.05, UF + 0.84, (bz0 + bz1) / 2).multiply(new THREE.Matrix4().makeRotationZ(Math.PI / 2)).multiply(new THREE.Matrix4().makeScale(1, 1, 2.2)), pine);
+    b.box('woodGloss', bx1 - 0.07, UF + 0.3, bz0 + 0.04, bx1 - 0.01, UF + 0.6, bz1 - 0.04, pine, { r: 0.02 });
+    b.box('fabric', bx0 + 0.1, UF + 0.32, bz0 + 0.03, bx1 - 0.08, UF + 0.48, bz1 - 0.03, 0xf6f0e2, { r: 0.05 });
+    // blanket: stripes across the bed (peach, sage, cream, rose, blue-grey), draped over the sides
+    {
+      const cols = [0xf2b48a, 0xb8c89a, 0xf6ead0, 0xe89a8a, 0xa8b8c4, 0xf2c890];
+      const x0 = 0.55, x1 = 1.98, n = 12;
+      for (let i = 0; i < n; i++) {
+        const xa = x0 + (x1 - x0) * i / n, xc = x0 + (x1 - x0) * (i + 1) / n, c = cols[i % cols.length];
+        b.box('fabric', xa, UF + 0.48, bz0 - 0.02, xc, UF + 0.54, bz1 + 0.02, c, { r: 0.01 });
+        for (const zz of [bz0 - 0.05, bz1 + 0.02]) b.box('fabric', xa, UF + 0.22, zz, xc, UF + 0.53, zz + 0.03, c, { cast: false });
+      }
+    }
+    for (const z of [9.08, 9.52]) b.lbox('fabric', null, 0.3, UF + 0.57, z, 0.3, 0.12, 0.42, 0xfbf3e2, { r: 0.055, rot: [0, 0, -0.3] });
     col('lymanBed', bx0, UF, bz0, bx1, UF + 0.55, bz1);
-    col('lymanHeadboard', bx0, UF, bz0, bx0 + 0.07, UF + 1.0, bz1);
-    // nightstand + lamp
-    b.box('wood', 0.02, UF, 10.0, 0.48, UF + 0.52, 10.46, C.midWood, { r: 0.02 });
-    b.box('woodGloss', 0.02, UF + 0.52, 9.98, 0.5, UF + 0.56, 10.48, C.darkWood, { r: 0.012 });
-    b.sphere('metal', null, 0.5, UF + 0.37, 10.23, 0.016, C.brass);
+    col('lymanHeadboard', bx0, UF, bz0, bx0 + 0.09, UF + 1.1, bz1);
+    // pine nightstand (two drawers) + cream lamp
+    b.box('woodGloss', 0.02, UF, 10.0, 0.5, UF + 0.56, 10.46, pine, { r: 0.02 });
+    for (const y of [0.12, 0.33]) { b.box('woodGloss', 0.5, UF + y, 10.04, 0.515, UF + y + 0.18, 10.42, 0xe2b276, { r: 0.008 }); b.sphere('woodGloss', null, 0.53, UF + y + 0.09, 10.23, 0.018, 0xb98256); }
     col('lymanNightstand', 0.02, UF, 9.98, 0.5, UF + 0.56, 10.48);
-    b.lathe('ceramic', null, 0.25, UF + 0.56, 10.23, [[0, 0], [0.07, 0], [0.09, 0.1], [0.05, 0.2], [0.02, 0.24], [0, 0.24]], 0x5d9a8c, { radial: 16 });
-    b.lathe('glowShade', null, 0.25, UF + 0.78, 10.23, [[0.14, 0], [0.09, 0.17]], 0xfff1d6, { radial: 20, cast: false });
+    b.lathe('ceramic', null, 0.25, UF + 0.56, 10.23, [[0, 0], [0.07, 0], [0.095, 0.08], [0.07, 0.17], [0.025, 0.22], [0, 0.22]], 0xf2c48a, { radial: 16 });
+    b.lathe('glowShade', null, 0.25, UF + 0.76, 10.23, [[0.15, 0], [0.1, 0.18]], 0xfff1d6, { radial: 20, cast: false });
     lamps.push({ pos: V(0.6, UF + 1.0, 9.6), color: 0xffa850, intensity: 5, distance: 8, prio: 2, room: 'lyman' });
     halos.push([0.25, UF + 0.86, 10.23, 0.6]);
     // old wardrobe on the back wall + stacked moving boxes by the door + a chair with a jacket
     {
       const x0 = 5.5, x1 = 6.7, z0 = 10.45, z1 = D;
-      b.box('wood', x0, UF, z0, x1, UF + 1.9, z1, 0x9a6a42, { r: 0.02 });
+      b.box('wood', x0, UF, z0, x1, UF + 1.9, z1, 0xc98a52, { r: 0.02 });
       b.box('woodGloss', x0 - 0.03, UF + 1.9, z0 - 0.03, x1 + 0.03, UF + 1.96, z1, C.darkWood, { r: 0.015 });
-      for (const [a, c] of [[x0 + 0.04, (x0 + x1) / 2 - 0.01], [(x0 + x1) / 2 + 0.01, x1 - 0.04]]) b.box('wood', a, UF + 0.1, z0 - 0.015, c, UF + 1.84, z0, 0xb07a4c, { r: 0.01 });
+      for (const [a, c] of [[x0 + 0.04, (x0 + x1) / 2 - 0.01], [(x0 + x1) / 2 + 0.01, x1 - 0.04]]) b.box('wood', a, UF + 0.1, z0 - 0.015, c, UF + 1.84, z0, 0xd9a466, { r: 0.01 });
       b.sphere('metal', null, (x0 + x1) / 2 - 0.06, UF + 1.0, z0 - 0.03, 0.02, C.brass);
       b.sphere('metal', null, (x0 + x1) / 2 + 0.06, UF + 1.0, z0 - 0.03, 0.02, C.brass);
       col('lymanWardrobe', x0, UF, z0, x1, UF + 1.96, z1);
@@ -855,23 +865,35 @@ export function buildHouse({ quality = 'high' } = {}) {
       b.box('paint', x0 + w * 0.47, y0 + h, z0 - 0.002, x0 + w * 0.53, y0 + h + 0.003, z0 + d + 0.002, 0xe8d8a8, { cast: false });
     }
     col('lymanBoxes', 8.45, UF, 9.6, W, UF + 0.76, 10.85);
+    // coat rack with Lyman's grey coat, beside the window
     {
-      const f = frameAt(3.9, UF, 10.55, Math.PI + 0.3);
-      b.lbox('woodGloss', f, 0, 0.45, 0, 0.44, 0.04, 0.42, C.midWood, { r: 0.015 });
-      for (const [x, z] of [[-0.19, -0.18], [0.19, -0.18], [-0.19, 0.18], [0.19, 0.18]]) b.lbox('wood', f, x, 0.22, z, 0.035, 0.44, 0.035, C.midWood);
-      b.lbox('woodGloss', f, 0, 0.75, -0.19, 0.42, 0.3, 0.035, C.midWood, { r: 0.015 });
-      b.lbox('fabric', f, 0, 0.62, -0.15, 0.46, 0.5, 0.1, 0x6b7f4a, { r: 0.04, rot: [0.2, 0, 0.05] });
-      col('lymanChairUp', 3.65, UF, 10.3, 4.15, UF + 0.47, 10.8);
+      const x = 4.6, z = 10.6;
+      b.cyl('woodGloss', null, x, UF + 0.85, z, 0.025, 0.03, 1.7, 0xc98a52, { radial: 10 });
+      for (let i = 0; i < 4; i++) { const a = i * Math.PI / 2 + 0.4; b.cyl('woodGloss', null, x + Math.cos(a) * 0.17, UF + 0.04, z + Math.sin(a) * 0.17, 0.018, 0.018, 0.36, 0xc98a52, { radial: 8, rot: [Math.sin(a) * 1.35, 0, -Math.cos(a) * 1.35] }); }
+      for (let i = 0; i < 3; i++) { const a = i * 2.1; b.cyl('woodGloss', null, x + Math.cos(a) * 0.08, UF + 1.68, z + Math.sin(a) * 0.08, 0.014, 0.014, 0.22, 0xc98a52, { radial: 8, rot: [Math.sin(a) * 0.8, 0, -Math.cos(a) * 0.8] }); b.sphere('woodGloss', null, x + Math.cos(a) * 0.16, UF + 1.76, z + Math.sin(a) * 0.16, 0.022, 0xc98a52); }
+      b.lbox('fabric', null, x - 0.02, UF + 1.28, z - 0.08, 0.34, 0.68, 0.12, 0x8a8f92, { r: 0.05, rot: [0.08, 0.2, 0.04] });
+      b.lbox('fabric', null, x - 0.02, UF + 1.6, z - 0.08, 0.2, 0.12, 0.14, 0x7a7f82, { r: 0.05 });
+      col('coatRack', x - 0.2, UF, z - 0.2, x + 0.2, UF + 1.8, z + 0.2, 'solid', { decor: true });
     }
+    // floor clutter: chew bone + stray socks
+    b.lbox('ceramic', null, 3.1, UF + 0.02, 8.3, 0.2, 0.035, 0.04, 0xf3e6c8, { r: 0.017, rot: [0, 0.6, 0] });
+    for (const sx of [-1, 1]) for (const sz of [-1, 1]) b.sphere('ceramic', null, 3.1 + Math.cos(0.6) * sx * 0.1 + Math.sin(0.6) * sz * 0.025, UF + 0.025, 8.3 - Math.sin(0.6) * sx * 0.1 + Math.cos(0.6) * sz * 0.025, 0.028, 0xf3e6c8);
+    b.lbox('fabric', null, 2.6, UF + 0.012, 7.75, 0.2, 0.025, 0.08, 0x8a8f92, { r: 0.012, rot: [0, -0.4, 0] });
+    b.lbox('fabric', null, 6.3, UF + 0.012, 8.4, 0.18, 0.025, 0.08, 0xa8b8c4, { r: 0.012, rot: [0, 0.9, 0] });
     // rug + round dog cushion for Odie
     {
       const g = new THREE.PlaneGeometry(2.2, 1.5);
       g.rotateX(-Math.PI / 2);
       b.geom('rugBed', g, new THREE.Matrix4().makeTranslation(4.2, UF + 0.004, 9.0), 0xffffff, { uv: 'keep', cast: false });
-      b.lathe('fabric', null, 4.9, UF, 10.35, [[0, 0.05], [0.3, 0.04], [0.36, 0.09], [0.36, 0.15], [0.3, 0.17], [0.26, 0.1], [0, 0.08]], 0x5d8fb0, { radial: 22 });
+      b.lathe('fabric', null, 4.9, UF, 10.0, [[0, 0.04], [0.28, 0.035], [0.38, 0.08], [0.42, 0.16], [0.4, 0.22], [0.33, 0.23], [0.28, 0.12], [0, 0.07]], 0xcdb48e, { radial: 24 });
+      // plush toy dog in the dog bed
+      b.sphere('fabric', null, 4.95, UF + 0.14, 10.0, 0.08, 0xa8703e, { scale: [1, 0.85, 1.2] });
+      b.sphere('fabric', null, 4.95, UF + 0.24, 9.92, 0.065, 0xa8703e);
+      for (const sx of [-1, 1]) b.sphere('fabric', null, 4.95 + sx * 0.06, UF + 0.24, 9.92, 0.03, 0x6a4024, { scale: [0.6, 1.4, 0.8] });
+      b.sphere('fabric', null, 4.95, UF + 0.23, 9.86, 0.03, 0xe8cfa8);
     }
     // simple curtains at the back window
-    for (const x of [2.85, 3.95]) b.lbox('fabric', null, x, UF + 1.5, D - 0.07, 0.3, 1.15, 0.04, 0xd9a440, { r: 0.015, cast: false });
+    for (const x of [2.85, 3.95]) b.lbox('fabric', null, x, UF + 1.5, D - 0.07, 0.3, 1.15, 0.04, 0xf2e2c4, { r: 0.015, cast: false });
     b.cyl('metal', null, 3.4, UF + 2.1, D - 0.06, 0.012, 0.012, 1.6, C.brass, { rot: [0, 0, Math.PI / 2], radial: 8 });
     // ceiling light
     b.lathe('glowShade', null, 4.6, CEIL2 - 0.12, 9.0, [[0.0, 0], [0.16, 0.02], [0.22, 0.09], [0.22, 0.11]], 0xfff1d6, { radial: 22, cast: false });

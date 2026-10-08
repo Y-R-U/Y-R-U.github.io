@@ -16,11 +16,25 @@ tools/ui_kit.html, docs/LEVELS2.md. CDP port 9407 (`node tools/sim/play.mjs ... 
   bed→trap→door frees, vase→slip→faceplant→recover)
 - Ch1 regression: play.mjs 1-10 all PASS after the changes
 
+- js/game/humanAI.js (jonAI generalised: who/seat/line prefix, sofa seats, pair chase D18; Lyman scratch target),
+  js/game/odieAI.js (pet nav, flee, arc, knockout, scratch target), js/levels/ch2/common2.js (defineLevel2 runtime),
+  ch2/story.js (Ch2 opening story, verified frames), ch2/index.js (defensive per-level loading)
+- C2 L1–L6 written; `play.mjs c2:1..6` each PASS (skip=1); key beats screenshotted + reviewed
+- core: CH2_READY gate (false) + ?ch2=1; input.interactHeld; director say falls back to lines.js text
+
+- C2 L7–L10 + js/game/arena.js + js/levels/arena.js (menu Arena w/ difficulty popup, Rematch/Menu)
+- Intro cutscenes for all Ch2 levels watched at skip=0 (scratchpad intros.mjs); fixes: Ch2 open-floor spawn
+  (livingCentre), L4 shots, L5 delivery on the threshold + box hidden until handed over
+- FULL REGRESSION (2026-10-09): Ch1 1-10 PASS, catch PASS, selfTest 14/14, fp1 PASS, menus PASS, c2:1-10 PASS,
+  arena (L7 win, L7 lose, menu arena) PASS
+- freeplay2 handed to helper 'fp2' (owns js/levels/freeplay2.js + tools/sim/fp2.mjs only)
+
 ## IN PROGRESS
-- humanAI / odieAI / ch2 levels
+- touch/tablet checks of new HUD bits (arena score, hold ring)
 
 ## NEXT
-- arena.js, ch2 L1–L10, freeplay2, story cutscene, play.mjs c2:1-10 / arena / fp2 / menus
+- manager flips CH2_READY after running the suite
+- polish ideas: Lyman's hair reads brown in some light (cast); arena camera; L5 mice visibility
 
 ## REQUESTS
 - (none open)

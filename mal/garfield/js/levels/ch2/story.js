@@ -41,10 +41,8 @@ export async function playStory(ctx) {
       d.music('cutscene');
       const din = A(ctx, 'cam_dining');
       d.cut(din ? { pos: din.pos.clone(), look: (din.look || tc).clone(), fov: din.fov ?? 55 } : bestShot(ctx, gSpot.clone().setY(1.0), { dist: 2.6, h: 0.5 }));
-      jon.play?.('talk');
       await say(d, 'jon', 'c2_j_story_1');
-      // 2. bored
-      jon.play?.('sigh');
+      // 2. bored (seated clips only while he's in the chair)
       garfield.play?.('idle_bored');
       await say(d, 'garfield', 'g_c2_story_bored');
       // 3. doorbell → Jon opens the door
@@ -52,7 +50,10 @@ export async function playStory(ctx) {
       await d.wait(0.6);
       try { jon.setExpression?.('happy'); } catch {}
       if (jon.leaveSeat && jon.root.parent !== world.scene) { await d.play(jon, 'stand_up', { once: true, max: 1.0 }); jon.leaveSeat(world.scene); }
-      d.cam(bestShot(ctx, doorIn.clone().setY(1.2), { dist: 3.4, h: 0.5, prefer: Math.PI }), { dur: 1.2 });
+      {
+        const camIn0 = A(ctx, 'cam_frontDoorIn');
+        d.cut(camIn0 ? { pos: camIn0.pos.clone(), look: (camIn0.look || doorIn).clone(), fov: camIn0.fov ?? 50 } : bestShot(ctx, doorIn.clone().setY(1.2), { dist: 3.4, h: 0.5, prefer: Math.PI }));
+      }
       jon.play?.('walk');
       await d.walk(jon, doorIn.clone().add(V(0.35, 0, 0.25)), { faceEnd: false });
       await d.face(jon, dPos);
@@ -60,7 +61,9 @@ export async function playStory(ctx) {
       d.sfx('door');
       try { door?.open?.(); } catch {}
       // Lyman on the doorstep with his suitcase
-      d.place(lyman, step, Math.atan2(doorIn.x - step.x, doorIn.z - step.z));
+      // he stands in the doorway (on the threshold) so the inside camera sees him past the open door
+      const sill = step.clone().lerp(doorIn, 0.55);
+      d.place(lyman, sill, Math.atan2(doorIn.x - step.x, doorIn.z - step.z));
       lyman.root.visible = true;
       lyman.holdProp?.('suitcase');
       lyman.play?.('carry_suitcase');
@@ -91,7 +94,7 @@ export async function playStory(ctx) {
       lyman.play?.('talk');
       await say(d, 'lyman', 'c2_l_story_hereboy');
       // 4. Odie gallops in
-      d.place(odie, step, Math.atan2(doorIn.x - step.x, doorIn.z - step.z));
+      d.place(odie, step.clone().lerp(doorIn, 0.4).add(V(-0.45, 0, 0)), Math.atan2(doorIn.x - step.x, doorIn.z - step.z));
       odie.root.visible = true;
       d.sfx('yap');
       ctx.barks?.say?.('o_bark_happy', { force: true });
@@ -108,7 +111,7 @@ export async function playStory(ctx) {
       d.place(garfield, corner.pos.clone().addScaledVector(V(Math.sin(corner.rotY), 0, Math.cos(corner.rotY)), -0.4), corner.rotY);
       garfield.play?.('walk');
       await d.walk(garfield, corner.pos, { speed: 0.8, faceEnd: false });
-      d.turn(garfield, corner.rotY);
+      d.place(garfield, corner.pos, corner.rotY);
       garfield.play?.('head_in_corner');
       try { garfield.setExpression?.('sleepy'); } catch {}
       await say(d, 'garfield', 'c2_g_story_lawsey');
@@ -153,7 +156,7 @@ export async function playStory(ctx) {
 
 // A room corner near Garfield, facing into it (for head_in_corner).
 function cornerSpot(ctx, from) {
-  const cands = [[0.32, 5.08, -Math.PI * 0.75], [0.32, 0.32, -Math.PI * 0.25 - Math.PI / 2], [8.85, 10.65, Math.PI * 0.25], [0.32, 5.92, -Math.PI * 0.25]]
+  const cands = [[0.22, 5.18, -Math.PI * 0.75], [0.22, 0.22, -Math.PI * 0.25 - Math.PI / 2], [8.98, 10.78, Math.PI * 0.25], [0.22, 5.82, -Math.PI * 0.25]]
     .map(([x, z, r]) => ({ pos: V(x, 0, z), rotY: r }));
   const free = cands.filter((c) => (ctx.world.groundAt?.(c.pos.x, c.pos.z, 0.3) ?? 0) < 0.05);
   const list = free.length ? free : cands;

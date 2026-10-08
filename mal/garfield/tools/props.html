@@ -23,6 +23,8 @@
 import * as THREE from '../vendor/three/three.module.js';
 import { RoomEnvironment } from '../vendor/three/addons/environments/RoomEnvironment.js';
 import { createProps, updateProps, resetProps } from '../js/world/props/index.js';
+import { initMaterials } from '../js/world/materials.js';
+import { buildHouse } from '../js/world/house.js';
 
 const qs = new URLSearchParams(location.search);
 if (qs.has('shot')) document.body.classList.add('shot');
@@ -64,6 +66,9 @@ const anchors = new Map(Object.entries({
   bedroomDoor: { pos: V(6.4, 3.0, 5.7), rotY: -Math.PI / 2 }, jonBed: { pos: V(1.05, 3.0, 3.2), rotY: Math.PI / 2 }, garfieldBed: { pos: V(4.6, 3.0, 1.3), rotY: 0 },
 }));
 
+// Chapter Two anchors come straight from the house layout
+initMaterials(renderer, qs.get('q') || 'high');
+for (const [k, v] of buildHouse({ quality: 'low' }).anchors) if (!anchors.has(k)) anchors.set(k, v);
 const sfxLog = [];
 const props = await createProps({ scene, quality: qs.get('q') || 'high', anchors, sfx: (n) => { sfxLog.push(n); if (sfxLog.length > 6) sfxLog.shift(); } });
 
@@ -75,6 +80,10 @@ const views = {
   fridge: [V(5.6, 1.0, 10.2), 3.2, 2.6, 0.2], vine: [V(5.0, 1.6, 9.6), 4.0, 2.0, 0.25], frontDoor: [V(7.1, 1.0, 0.2), 3.6, 0.3, 0.1], tv: [V(0.4, 0.8, 2.75), 1.6, 1.4, 0.2],
   bedroomDoor: [V(6.4, 4.0, 5.7), 3.5, -1.2, 0.15], jonBed: [V(1.05, 3.4, 3.2), 3.6, 1.0, 0.5], garfieldBed: [V(4.6, 3.15, 1.3), 1.4, 0.4, 0.6], newspaper: [V(4.8, 0.6, 8.3), 3.6, -2.2, 0.35],
   room: [V(4.4, 1, 5.5), 10, 0.8, 0.6],
+  dresser: [V(4.1, 3.5, 6.1), 2.4, Math.PI, 0.3], cupboardDoor: [V(8.1, 0.6, 2.9), 2.6, -1.4, 0.15], lymanDoor: [V(8.2, 4.0, 7.0), 3.5, Math.PI, 0.1],
+  ch2Table: [V(4.0, 0.8, 8.8), 2.6, -2.4, 0.45], odieBowl: [V(7.35, 0.05, 9.75), 0.8, 0.4, 0.6], carpet: [V(1.3, 0.3, 2.9), 3.2, 1.4, 0.45],
+  tvBox: [V(5.6, 0.3, 1.3), 1.8, 0.6, 0.35], cheese: [V(6.95, 0.05, 10.45), 1.0, 0.2, 0.4], shed: [V(4.0, 0.6, 2.5), 4.0, 1.3, 0.6],
+  hand: [V(5.6, 0.2, 1.6), 1.6, 0.4, 0.5], biscuitBox: [V(8.7, 0.2, 2.5), 1.4, -1.2, 0.4],
 };
 const view = k => { const [t, d, y, p] = views[k]; orbit.target.copy(t); orbit.dist = d; orbit.yaw = y; orbit.pitch = p; };
 view(qs.get('view') || 'food');
@@ -114,6 +123,17 @@ const actions = {
   garfieldBed: {}, tv: { cartoon: () => P('tv').setMode('cartoon'), static: () => P('tv').setMode('static'), off: () => P('tv').setMode('off') },
   newspaper: { throw: () => P('newspaper').throwAt(V(4.4, 1.4, 7.0), V(5.5, 0.3, 9.6)) },
   room: { 'reset all': () => resetProps(props) },
+  dresser: { 'sock open': () => P('dresser').sockDrawer.toggle(), 'play socks': () => P('dresser').sockDrawer.play(2), scratch: () => P('dresser').breakDrawer.scratch(1), break: () => P('dresser').breakDrawer.break(), fire: () => P('spitballLauncher').fire(null, V(4.1, 3.4, 4.6)) },
+  cupboardDoor: { toggle: () => P('cupboardDoor').toggle() },
+  lymanDoor: { toggle: () => P('lymanDoor').toggle(), rattle: () => P('lymanDoor').rattle() },
+  ch2Table: { 'chair2+plate2': () => { P('chair2').setActive(true); P('plate2').setActive(true); }, soup: () => { P('plate').setFood(null); P('soupBowl').setActive(true); }, splash: () => P('soupBowl').splash(), 'warp 1': () => P('table').warpTo(1), 'warp 0': () => P('table').warpTo(0) },
+  odieBowl: { show: () => P('odieBowl').setActive(true), 'eat 25%': () => P('odieBowl').eaten(P('odieBowl').state.eaten + 0.25) },
+  carpet: { show: () => P('carpet').setActive(true), swapTv: () => { P('tv').moveTo(anchors.get('oldTvSpot')); P('newTv').setActive(true); }, pull: () => P('carpet').pull({ target: V(2.9, 0.25, 3.6) }) },
+  tvBox: { show: () => P('tvBox').setActive(true), open: () => P('tvBox').open() },
+  cheese: { holes: () => P('mouseHoles').setActive(true), 'put all': () => P('cheese').putAll() },
+  shed: { 'sofa +0.25': () => P('shedDecals').add('sofa', 0.25), 'armchair +0.25': () => P('shedDecals').add('armchair', 0.25), 'table +0.25': () => P('shedDecals').add('table', 0.25), 'bed +0.25': () => P('shedDecals').add('bed', 0.25), 'fur pile': () => P('furPile').drop() },
+  hand: { show: () => ['suitcase', 'coffeeMug', 'whistle'].forEach(id => { const p = P(id); p.setActive(true); scene.attach(p.root); }), spill: () => P('coffeeMug').spill(V(1, 0, 0)) },
+  biscuitBox: { burst: () => P('biscuitBox').burst(), 'eat 25%': () => P('biscuitBox').eaten(P('biscuitBox').state.eaten + 0.25) },
 };
 const panel = document.getElementById('panel');
 for (const [k, acts] of Object.entries(actions)) {

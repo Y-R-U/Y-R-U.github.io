@@ -8,7 +8,7 @@ const C2_ICON = { 1: 'steak', 2: 'paw', 3: 'paw', 4: 'meatloaf', 5: 'paw', 6: 'p
 
 // Chapter Two ships behind this gate (manager): until true, Ch1-complete saves keep the locked 'Coming Soon' and the
 // unlock-anim save flags stay unset. ?ch2=1 overrides for testing.
-export const CH2_READY = false;
+export const CH2_READY = true;
 
 // Level ids: 1..10 (Chapter One), 'c2:1'..'c2:10', 'fp1', 'fp2', 'arena'.
 export function levelInfo(id) {

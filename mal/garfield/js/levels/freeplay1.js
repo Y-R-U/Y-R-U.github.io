@@ -351,6 +351,9 @@ async function toggleDoor(L) {
         L.flags.trappedAt = L.t;
         L.say('g_escape_2', { delay: 1.5 });
       }
+    } else if (!jonIn && ai.state === 'investigate' && ai.pos().y > 2.5) {
+      // shut too early: he's on his way in, so he just opens it again (and never walks through it)
+      setTimeout(() => { if (!L.dead && d.state?.open === false && ai.state === 'investigate') { ctx.audio?.sfx?.('door'); d.open?.(); } }, 1200);
     }
   }
   L.flags.doorBusy = false;

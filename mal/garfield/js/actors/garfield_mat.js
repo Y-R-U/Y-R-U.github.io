@@ -94,7 +94,7 @@ export function createFurMaterial({ tailPts, quality = 'high', shell = -1, share
     uRim: { value: new THREE.Color(0xffd29a) },
     uRimStr: { value: 0.35 },
     uTail: { value: tailPts.map((p) => new THREE.Vector3(...p)) },
-    uBald: { value: 0 }, uSkin: { value: new THREE.Color(0xf0a89c) }, uSkin2: { value: new THREE.Color(0xe08a86) },
+    uBald: { value: 0 }, uSkin: { value: new THREE.Color(0xf4a3b0) }, uSkin2: { value: new THREE.Color(0xe2858f) },
   };
   mat.userData.uniforms = uniforms;
   const isShell = shell >= 0;

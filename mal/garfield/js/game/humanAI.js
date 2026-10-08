@@ -193,8 +193,8 @@ export function createHumanAI(ctx, opts = {}) {
     if (seat && jon.sitAt) { if (!ai.seated()) jon.sitAt(seat, 'sit_eat'); }
     else { const s = seatInfo(); root.position.copy(s.pos); root.rotation.y = s.rotY; }
     curClip = null;
-    setState('sitEat'); clip('sit_eat', { fallback: 'sit', force: true });
-    jon.holdProp?.('fork');
+    setState('sitEat'); clip(ai.eatClip || 'sit_eat', { fallback: 'sit', force: true });
+    if (!ai.eatClip) jon.holdProp?.('fork');
   };
   ai.goSit = () => {
     setState('goSit'); expr('happy');

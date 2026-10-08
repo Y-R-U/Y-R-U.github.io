@@ -7,9 +7,12 @@ Bark families: any key matching `<family>_<n>` belongs to the family; `audio.fam
 
 Voices (Qwen Voice Studio, designed then saved as clones; no real-actor imitation):
 - **Garfield** (thought voice): `Hungry Heist · Garfield` — lazy, deep, deadpan, warm.
-- **Jon** (aloud): `Hungry Heist · Jon` — cheerful, nerdy, slightly nasal, easily flustered.
+- **Jon** (aloud): `Hungry Heist · Jon (v2 male)` — cheerful, nerdy, adult male, easily flustered.
+- **Lyman** (aloud): `Hungry Heist · Lyman` — theatrical, dramatic moocher charm.
+- **Delivery man**: `Hungry Heist · Delivery`.
+- **Odie** (`o_*`): dog-noise clips from audio/sfx/ (no TTS; text is the subtitle).
 
-Total lines: 387
+Total lines: 652
 
 ### j_intro  (3)
 | key | who | text | dur | src |
@@ -705,6 +708,903 @@ Total lines: 387
 | key | who | text | dur | src |
 |---|---|---|---|---|
 | `g_l09_ready` | garfield | Table: loosened. Now for the chair. | 2.5 | levels |
+
+### fp1_j_sit  (4)
+| key | who | text | dur | src |
+|---|---|---|---|---|
+| `fp1_j_sit_1` | jon | Just going to sit here. Not eating. Totally relaxed. | — | levels |
+| `fp1_j_sit_2` | jon | A nice quiet sit at the table. No food. Nothing to steal. Ha! | — | levels |
+| `fp1_j_sit_3` | jon | I'll just read the paper. The comics first, obviously. | — | levels |
+| `fp1_j_sit_4` | jon | Is it weird to sit at the table without dinner? It feels weird. | — | levels |
+
+### fp1_j_wander  (4)
+| key | who | text | dur | src |
+|---|---|---|---|---|
+| `fp1_j_wander_1` | jon | Day off! What should I do? …Wander. I'll wander. | — | levels |
+| `fp1_j_wander_2` | jon | I should alphabetise my socks today. | — | levels |
+| `fp1_j_wander_3` | jon | Hmm, the house seems suspiciously calm. | — | levels |
+| `fp1_j_wander_4` | jon | I wonder what the cat's up to. Probably nothing. Probably. | — | levels |
+
+### fp1_j_recover  (3)
+| key | who | text | dur | src |
+|---|---|---|---|---|
+| `fp1_j_recover_1` | jon | Ugh… what happened? Did I miss anything? | — | levels |
+| `fp1_j_recover_2` | jon | I'm okay! I'm okay. Mostly okay. | — | levels |
+| `fp1_j_recover_3` | jon | Note to self: stop falling over. | — | levels |
+
+### fp1_j_free  (2)
+| key | who | text | dur | src |
+|---|---|---|---|---|
+| `fp1_j_free_1` | jon | Freedom! Sweet, sweet hallway! | — | levels |
+| `fp1_j_free_2` | jon | Finally! I wiggled the handle the right way! | — | levels |
+
+### fp1_j_refill  (1)
+| key | who | text | dur | src |
+|---|---|---|---|---|
+| `fp1_j_refill` | jon | Good thing I made extra. | — | levels |
+
+### fp1_j_fall_vine  (1)
+| key | who | text | dur | src |
+|---|---|---|---|---|
+| `fp1_j_fall_vine` | jon | A flying cat?! WHOA-OA-OA! | — | levels |
+
+### fp1_g_vine  (2)
+| key | who | text | dur | src |
+|---|---|---|---|---|
+| `fp1_g_vine_1` | garfield | Death from above. Well. Scratches from above. | — | levels |
+| `fp1_g_vine_2` | garfield | Incoming fuzzball! | — | levels |
+
+### fp1_g_start  (2)
+| key | who | text | dur | src |
+|---|---|---|---|---|
+| `fp1_g_start_1` | garfield | No rules. No plan. Just chaos. My favourite. | — | levels |
+| `fp1_g_start_2` | garfield | Free play. Free food. Free time to annoy Jon. | — | levels |
+
+### fp1_g_fridge  (3)
+| key | who | text | dur | src |
+|---|---|---|---|---|
+| `fp1_g_fridge_1` | garfield | Empty. Who keeps an empty fridge? Jon, that's who. | — | levels |
+| `fp1_g_fridge_2` | garfield | Just checking. You never know. | — | levels |
+| `fp1_g_fridge_3` | garfield | Cold air. Zero lasagna. Disappointing. | — | levels |
+
+### fp1_g_door  (1)
+| key | who | text | dur | src |
+|---|---|---|---|---|
+| `fp1_g_door_1` | garfield | Doors: the one thing I'm good at besides eating. | — | levels |
+
+### fp1_g_eat  (1)
+| key | who | text | dur | src |
+|---|---|---|---|---|
+| `fp1_g_eat_1` | garfield | Unguarded food is just food asking to be eaten. | — | levels |
+
+### fp_g_idle  (4)
+| key | who | text | dur | src |
+|---|---|---|---|---|
+| `fp_g_idle_1` | garfield | What shall I wreck next? So many choices. | — | levels |
+| `fp_g_idle_2` | garfield | Pick a trick, any trick. | — | levels |
+| `fp_g_idle_3` | garfield | I'm on holiday. From good behaviour. | — | levels |
+| `fp_g_idle_4` | garfield | Chaos doesn't make itself. Well, it does. But I help. | — | levels |
+
+### c2_j_story  (1)
+| key | who | text | dur | src |
+|---|---|---|---|---|
+| `c2_j_story_1` | jon | My cat may be a naughty rascal, but I will always love him, as he is still an amazing cat. I just can't help but think a dog might have been better... | — | levels |
+
+### g_c2_story_bored  (1)
+| key | who | text | dur | src |
+|---|---|---|---|---|
+| `g_c2_story_bored` | garfield | A dog. Hilarious. Wake me when it's lunch. | — | levels |
+
+### c2_j_story_lyman  (1)
+| key | who | text | dur | src |
+|---|---|---|---|---|
+| `c2_j_story_lyman` | jon | Lyman! | — | levels |
+
+### c2_l_story_jon  (2)
+| key | who | text | dur | src |
+|---|---|---|---|---|
+| `c2_l_story_jon` | lyman | Jon. | 0.8 | levels |
+| `c2_l_story_jon_nn` | lyman | Hey, pal. | 0.83 | levels |
+
+### c2_l_story_cold  (1)
+| key | who | text | dur | src |
+|---|---|---|---|---|
+| `c2_l_story_cold` | lyman | I'm cold. I'm hungry. I'm weak. Take me in! | 4.53 | levels |
+
+### c2_j_story_home  (1)
+| key | who | text | dur | src |
+|---|---|---|---|---|
+| `c2_j_story_home` | jon | Sure, Lyman. You know my home is your home. | — | levels |
+
+### c2_g_story_sandbox  (1)
+| key | who | text | dur | src |
+|---|---|---|---|---|
+| `c2_g_story_sandbox` | garfield | And my sandbox is off limits. | — | levels |
+
+### c2_j_story_suitcase  (1)
+| key | who | text | dur | src |
+|---|---|---|---|---|
+| `c2_j_story_suitcase` | jon | Is that all you have, the one suitcase? | — | levels |
+
+### c2_l_story_hereboy  (1)
+| key | who | text | dur | src |
+|---|---|---|---|---|
+| `c2_l_story_hereboy` | lyman | Not exactly. HERE BOY! | 2.47 | levels |
+
+### c2_g_story_lawsey  (1)
+| key | who | text | dur | src |
+|---|---|---|---|---|
+| `c2_g_story_lawsey` | garfield | Oh, Lawsey, Lawsey, Lawsey. | — | levels |
+
+### c2_l_story_odie  (1)
+| key | who | text | dur | src |
+|---|---|---|---|---|
+| `c2_l_story_odie` | lyman | This is Odie. | 0.98 | levels |
+
+### c2_g_story_tweedledee  (1)
+| key | who | text | dur | src |
+|---|---|---|---|---|
+| `c2_g_story_tweedledee` | garfield | Ten billion dogs in this world, and I get Tweedledee the wonder dummy. | — | levels |
+
+### c2_j_naughty  (2)
+| key | who | text | dur | src |
+|---|---|---|---|---|
+| `c2_j_naughty` | jon | Naughty Garfield! | — | levels |
+| `c2_j_naughty_nn` | jon | Naughty kitty! | — | levels |
+
+### c2_l_naughty  (2)
+| key | who | text | dur | src |
+|---|---|---|---|---|
+| `c2_l_naughty` | lyman | Naughty Garfield! | 1.42 | levels |
+| `c2_l_naughty_nn` | lyman | Naughty kitty! | 1.15 | levels |
+
+### c2_j_offtable  (1)
+| key | who | text | dur | src |
+|---|---|---|---|---|
+| `c2_j_offtable` | jon | Paws off! That's two dinners you're not having! | — | levels |
+
+### c2_l_offtable  (1)
+| key | who | text | dur | src |
+|---|---|---|---|---|
+| `c2_l_offtable` | lyman | Off the table, furball! Guests eat first! | 3.01 | levels |
+
+### c2_j_l2_telly  (1)
+| key | who | text | dur | src |
+|---|---|---|---|---|
+| `c2_j_l2_telly` | jon | Back to the telly. | — | levels |
+
+### c2_l_telly  (2)
+| key | who | text | dur | src |
+|---|---|---|---|---|
+| `c2_l_telly_1` | lyman | Ooh, the good bit's on. Sit down, Jon! | 2.69 | levels |
+| `c2_l_telly_2` | lyman | Pass the remote. And the snacks. And the cushion. | 3.15 | levels |
+
+### c2_g_l1_hungry  (1)
+| key | who | text | dur | src |
+|---|---|---|---|---|
+| `c2_g_l1_hungry` | garfield | I'm extra, extra hungry today. Even biscuits look good. | — | levels |
+
+### c2_l_l1_bowl  (1)
+| key | who | text | dur | src |
+|---|---|---|---|---|
+| `c2_l_l1_bowl` | lyman | Dinner, Odie! Plain dog biscuits, your favourite! | 4.29 | levels |
+
+### c2_j_l1_steak  (1)
+| key | who | text | dur | src |
+|---|---|---|---|---|
+| `c2_j_l1_steak` | jon | Steak for two! Dig in, Lyman. | — | levels |
+
+### c2_l_l1_steak  (1)
+| key | who | text | dur | src |
+|---|---|---|---|---|
+| `c2_l_l1_steak` | lyman | Don't mind if I do. And if I do again. | 3.1 | levels |
+
+### c2_g_l1_biscuits  (1)
+| key | who | text | dur | src |
+|---|---|---|---|---|
+| `c2_g_l1_biscuits` | garfield | Crunchy. Bland. Gone. | — | levels |
+
+### c2_j_l1_ew  (1)
+| key | who | text | dur | src |
+|---|---|---|---|---|
+| `c2_j_l1_ew` | jon | Ew! | — | levels |
+
+### c2_l_l1_ew  (1)
+| key | who | text | dur | src |
+|---|---|---|---|---|
+| `c2_l_l1_ew` | lyman | Ew! | 0.73 | levels |
+
+### c2_j_l1_nomore  (1)
+| key | who | text | dur | src |
+|---|---|---|---|---|
+| `c2_j_l1_nomore` | jon | Cat feet in my peas. I don't want it anymore. | — | levels |
+
+### c2_l_l1_nomore  (1)
+| key | who | text | dur | src |
+|---|---|---|---|---|
+| `c2_l_l1_nomore` | lyman | I've lost my appetite. And I never lose my appetite. | 3.3 | levels |
+
+### c2_g_l1_plate  (1)
+| key | who | text | dur | src |
+|---|---|---|---|---|
+| `c2_g_l1_plate` | garfield | One down. One to go. Then dessert: dog food. | — | levels |
+
+### c2_g_l1_dogfood  (1)
+| key | who | text | dur | src |
+|---|---|---|---|---|
+| `c2_g_l1_dogfood` | garfield | Dog food. Don't tell anyone. | — | levels |
+
+### c2_g_l1_first  (1)
+| key | who | text | dur | src |
+|---|---|---|---|---|
+| `c2_g_l1_first` | garfield | Biscuits first. A cat needs fuel to cause trouble. | — | levels |
+
+### c2_l01_hint  (3)
+| key | who | text | dur | src |
+|---|---|---|---|---|
+| `c2_l01_hint_1` | garfield | My bowl first. A cat needs fuel to cause trouble. | — | levels |
+| `c2_l01_hint_2` | garfield | If I step in their dinners, they won't want them. | — | levels |
+| `c2_l01_hint_3` | garfield | Biscuits, table, both plates, scratch the dog, eat his food. | — | levels |
+
+### c2_g_l2_intro  (1)
+| key | who | text | dur | src |
+|---|---|---|---|---|
+| `c2_g_l2_intro` | garfield | I think I'll put this dog's lights out. | — | levels |
+
+### c2_g_l2_vase_miss  (1)
+| key | who | text | dur | src |
+|---|---|---|---|---|
+| `c2_g_l2_vase_miss` | garfield | Missed. Need a dog under it. | — | levels |
+
+### c2_g_l2_biscuits  (1)
+| key | who | text | dur | src |
+|---|---|---|---|---|
+| `c2_g_l2_biscuits` | garfield | Here, doggy doggy. | — | levels |
+
+### c2_g_l2_win  (1)
+| key | who | text | dur | src |
+|---|---|---|---|---|
+| `c2_g_l2_win` | garfield | Lights out, dog. Enjoy the snack. | — | levels |
+
+### c2_g_l2_shut  (1)
+| key | who | text | dur | src |
+|---|---|---|---|---|
+| `c2_g_l2_shut` | garfield | He's not in yet. Patience. Ugh, patience. | — | levels |
+
+### c2_l02_hint  (3)
+| key | who | text | dur | src |
+|---|---|---|---|---|
+| `c2_l02_hint_1` | garfield | That dog's on the edge of the table. Literally. | — | levels |
+| `c2_l02_hint_2` | garfield | Vase plus dog, from the windowsill. | — | levels |
+| `c2_l02_hint_3` | garfield | Open the cupboard under the stairs, scratch the biscuit box, shut him in. | — | levels |
+
+### c2_g_l3_intro  (1)
+| key | who | text | dur | src |
+|---|---|---|---|---|
+| `c2_g_l3_intro` | garfield | Next time, I bite. | — | levels |
+
+### c2_j_l3_soup  (1)
+| key | who | text | dur | src |
+|---|---|---|---|---|
+| `c2_j_l3_soup` | jon | Mmm, chicken soup. Good for the soul. And the sniffles. | — | levels |
+
+### c2_j_l3_splash  (1)
+| key | who | text | dur | src |
+|---|---|---|---|---|
+| `c2_j_l3_splash` | jon | AAH! Hot soup! Hot soup! | — | levels |
+
+### c2_j_l3_dab  (1)
+| key | who | text | dur | src |
+|---|---|---|---|---|
+| `c2_j_l3_dab` | jon | I smell like a chicken. A soggy chicken. | — | levels |
+
+### c2_l_l3_disco  (1)
+| key | who | text | dur | src |
+|---|---|---|---|---|
+| `c2_l_l3_disco` | lyman | Make way! Lyman's got his dancing pants on! | 3.22 | levels |
+
+### c2_l_l3_dance  (1)
+| key | who | text | dur | src |
+|---|---|---|---|---|
+| `c2_l_l3_dance` | lyman | Look at these moves! Disco never died, Jon! | 3.18 | levels |
+
+### c2_g_l3_suit  (1)
+| key | who | text | dur | src |
+|---|---|---|---|---|
+| `c2_g_l3_suit` | garfield | A white suit. On a man who lives with a cat. Bold. | — | levels |
+
+### c2_l_l3_furry  (1)
+| key | who | text | dur | src |
+|---|---|---|---|---|
+| `c2_l_l3_furry` | lyman | My SUIT! I look like a yeti in a disco! | 3.63 | levels |
+
+### c2_l03_hint  (3)
+| key | who | text | dur | src |
+|---|---|---|---|---|
+| `c2_l03_hint_1` | garfield | Jon's soup looks splashable. | — | levels |
+| `c2_l03_hint_2` | garfield | Lyman's dressed in white. And I'm made of orange. | — | levels |
+| `c2_l03_hint_3` | garfield | Rub against Lyman's legs till his suit's covered in fur. | — | levels |
+
+### c2_j_l4_diet  (1)
+| key | who | text | dur | src |
+|---|---|---|---|---|
+| `c2_j_l4_diet` | jon | Diet time. | — | levels |
+
+### c2_g_l4_cranky  (1)
+| key | who | text | dur | src |
+|---|---|---|---|---|
+| `c2_g_l4_cranky` | garfield | Diet. The ugliest four-letter word. I need to take it out on someone. | — | levels |
+
+### c2_j_l4_work  (1)
+| key | who | text | dur | src |
+|---|---|---|---|---|
+| `c2_j_l4_work` | jon | Off to work! Be good, you two! | — | levels |
+
+### c2_g_l4_drat  (1)
+| key | who | text | dur | src |
+|---|---|---|---|---|
+| `c2_g_l4_drat` | garfield | Drat. He usually lands in the neighbour's lawn. This diet has got me weak. | — | levels |
+
+### c2_g_l4_higher  (1)
+| key | who | text | dur | src |
+|---|---|---|---|---|
+| `c2_g_l4_higher` | garfield | Maybe if I scratch him from higher he will go higher. | — | levels |
+
+### c2_g_l4_shut  (1)
+| key | who | text | dur | src |
+|---|---|---|---|---|
+| `c2_g_l4_shut` | garfield | Window's shut. Even I know that. | — | levels |
+
+### c2_g_l4_win  (1)
+| key | who | text | dur | src |
+|---|---|---|---|---|
+| `c2_g_l4_win` | garfield | And stay out. Or come back. Whatever. Bye. | — | levels |
+
+### c2_l04_hint  (3)
+| key | who | text | dur | src |
+|---|---|---|---|---|
+| `c2_l04_hint_1` | garfield | That window is a perfect dog-shaped exit. | — | levels |
+| `c2_l04_hint_2` | garfield | Open the window first. Then aim the dog. | — | levels |
+| `c2_l04_hint_3` | garfield | Scratch Odie from the table so he flies higher. | — | levels |
+
+### d_l5_sign  (1)
+| key | who | text | dur | src |
+|---|---|---|---|---|
+| `d_l5_sign` | delivery | Delivery for Arbuckle! Sign here. | 2.64 | levels |
+
+### d_l5_bye  (1)
+| key | who | text | dur | src |
+|---|---|---|---|---|
+| `d_l5_bye` | delivery | Enjoy the telly! Mind the cat. | 1.91 | levels |
+
+### c2_j_l5_tv  (1)
+| key | who | text | dur | src |
+|---|---|---|---|---|
+| `c2_j_l5_tv` | jon | Oh, goodie, the new TV! | — | levels |
+
+### c2_j_l5_swap  (1)
+| key | who | text | dur | src |
+|---|---|---|---|---|
+| `c2_j_l5_swap` | jon | Out with the old, in with the… identical. Perfect! | — | levels |
+
+### c2_g_l5_intro  (1)
+| key | who | text | dur | src |
+|---|---|---|---|---|
+| `c2_g_l5_intro` | garfield | A new TV and an old one. And a dog. I sense an opportunity. | — | levels |
+
+### c2_g_l5_hole  (1)
+| key | who | text | dur | src |
+|---|---|---|---|---|
+| `c2_g_l5_hole` | garfield | A mouse hole. Mice love cheese. Humans hate mice. | — | levels |
+
+### c2_g_l5_cheese  (1)
+| key | who | text | dur | src |
+|---|---|---|---|---|
+| `c2_g_l5_cheese` | garfield | Cheese. For the mice. Mostly. | — | levels |
+
+### c2_g_l5_place  (1)
+| key | who | text | dur | src |
+|---|---|---|---|---|
+| `c2_g_l5_place` | garfield | Come and get it, little guys. | — | levels |
+
+### c2_j_l5_mice  (1)
+| key | who | text | dur | src |
+|---|---|---|---|---|
+| `c2_j_l5_mice` | jon | MICE! Lyman, get the broom! | — | levels |
+
+### c2_l_l5_mice  (1)
+| key | who | text | dur | src |
+|---|---|---|---|---|
+| `c2_l_l5_mice` | lyman | I don't do mice! …Fine, I do mice! | 3.98 | levels |
+
+### c2_j_l5_chase  (1)
+| key | who | text | dur | src |
+|---|---|---|---|---|
+| `c2_j_l5_chase` | jon | Hold still, you little — missed! | — | levels |
+
+### c2_l_l5_chase  (1)
+| key | who | text | dur | src |
+|---|---|---|---|---|
+| `c2_l_l5_chase` | lyman | It went up my trouser leg! IT WENT UP MY TROUSER LEG! | 4.02 | levels |
+
+### c2_g_l5_eyes  (1)
+| key | who | text | dur | src |
+|---|---|---|---|---|
+| `c2_g_l5_eyes` | garfield | Too many eyes. I need a distraction. | — | levels |
+
+### c2_g_l5_win  (1)
+| key | who | text | dur | src |
+|---|---|---|---|---|
+| `c2_g_l5_win` | garfield | TV dinner. | — | levels |
+
+### c2_l05_hint  (3)
+| key | who | text | dur | src |
+|---|---|---|---|---|
+| `c2_l05_hint_1` | garfield | Mice. I need mice. Where do mice live? | — | levels |
+| `c2_l05_hint_2` | garfield | Cheese from the fridge, then leave it lying about. | — | levels |
+| `c2_l05_hint_3` | garfield | Grip the carpet behind the new TV and PULL. | — | levels |
+
+### c2_g_l6_intro  (1)
+| key | who | text | dur | src |
+|---|---|---|---|---|
+| `c2_g_l6_intro` | garfield | Well, aren't I bored today. | — | levels |
+
+### c2_g_l6_found  (1)
+| key | who | text | dur | src |
+|---|---|---|---|---|
+| `c2_g_l6_found` | garfield | Ooh. Contraband. | — | levels |
+
+### c2_g_l6_far  (1)
+| key | who | text | dur | src |
+|---|---|---|---|---|
+| `c2_g_l6_far` | garfield | Out of range. Get closer. | — | levels |
+
+### c2_j_l6_coffee  (1)
+| key | who | text | dur | src |
+|---|---|---|---|---|
+| `c2_j_l6_coffee` | jon | HOT COFFEE! Lyman! | — | levels |
+
+### c2_l_l6_brawl  (1)
+| key | who | text | dur | src |
+|---|---|---|---|---|
+| `c2_l_l6_brawl` | lyman | Your cat started it! | 1.77 | levels |
+
+### c2_j_l6_brawl  (1)
+| key | who | text | dur | src |
+|---|---|---|---|---|
+| `c2_j_l6_brawl` | jon | My cat is UPSTAIRS! | — | levels |
+
+### c2_g_l6_win  (1)
+| key | who | text | dur | src |
+|---|---|---|---|---|
+| `c2_g_l6_win` | garfield | Much better. | — | levels |
+
+### c2_l06_hint  (3)
+| key | who | text | dur | src |
+|---|---|---|---|---|
+| `c2_l06_hint_1` | garfield | Jon keeps all sorts of junk in his bedroom drawers. | — | levels |
+| `c2_l06_hint_2` | garfield | Scratch the drawer in Jon's room open. | — | levels |
+| `c2_l06_hint_3` | garfield | Take the launcher downstairs and fire it at Odie. | — | levels |
+
+### c2_g_l7_intro  (1)
+| key | who | text | dur | src |
+|---|---|---|---|---|
+| `c2_g_l7_intro` | garfield | You. Me. The bedroom. Now. | — | levels |
+
+### c2_g_l7_win  (1)
+| key | who | text | dur | src |
+|---|---|---|---|---|
+| `c2_g_l7_win` | garfield | Champion. Obviously. | — | levels |
+
+### c2_g_l7_lose  (1)
+| key | who | text | dur | src |
+|---|---|---|---|---|
+| `c2_g_l7_lose` | garfield | I let him win. For his self-esteem. | — | levels |
+
+### ar_g_hit  (4)
+| key | who | text | dur | src |
+|---|---|---|---|---|
+| `ar_g_hit_1` | garfield | Point to the cat! | — | levels |
+| `ar_g_hit_2` | garfield | Swipe! | — | levels |
+| `ar_g_hit_3` | garfield | Too easy. | — | levels |
+| `ar_g_hit_4` | garfield | Float like a butterfly, scratch like a cat. | — | levels |
+
+### ar_g_hurt  (3)
+| key | who | text | dur | src |
+|---|---|---|---|---|
+| `ar_g_hurt_1` | garfield | Oof. Slobbery. | — | levels |
+| `ar_g_hurt_2` | garfield | Lucky shot, dog. | — | levels |
+| `ar_g_hurt_3` | garfield | I'm fine. I meant to fall over. | — | levels |
+
+### ar_g_lead  (2)
+| key | who | text | dur | src |
+|---|---|---|---|---|
+| `ar_g_lead_1` | garfield | Winning. Naturally. | — | levels |
+| `ar_g_lead_2` | garfield | Is that all you've got, dog? | — | levels |
+
+### ar_g_behind  (2)
+| key | who | text | dur | src |
+|---|---|---|---|---|
+| `ar_g_behind_1` | garfield | Okay, I'm awake now. | — | levels |
+| `ar_g_behind_2` | garfield | Time to stop going easy on him. | — | levels |
+
+### ar_g_start  (1)
+| key | who | text | dur | src |
+|---|---|---|---|---|
+| `ar_g_start` | garfield | Let's dance, dog. | — | levels |
+
+### ar_g_win  (1)
+| key | who | text | dur | src |
+|---|---|---|---|---|
+| `ar_g_win` | garfield | Undefeated. Mostly. | — | levels |
+
+### ar_g_lose  (1)
+| key | who | text | dur | src |
+|---|---|---|---|---|
+| `ar_g_lose` | garfield | Rematch. Now. After a nap. | — | levels |
+
+### c2_g_l8_intro  (1)
+| key | who | text | dur | src |
+|---|---|---|---|---|
+| `c2_g_l8_intro` | garfield | Oh goody, its shedding week. Time for some fun. | — | levels |
+
+### c2_g_l8_shed  (3)
+| key | who | text | dur | src |
+|---|---|---|---|---|
+| `c2_g_l8_shed_1` | garfield | A little gift. From me. Made of me. | — | levels |
+| `c2_g_l8_shed_2` | garfield | Orange is the new everything. | — | levels |
+| `c2_g_l8_shed_3` | garfield | That's a nice sofa. Was. | — | levels |
+
+### c2_j_l8_hair  (3)
+| key | who | text | dur | src |
+|---|---|---|---|---|
+| `c2_j_l8_hair_1` | jon | Who shed on the sofa? …Oh. Right. | — | levels |
+| `c2_j_l8_hair_2` | jon | My bed is ORANGE now. Wonderful. | — | levels |
+| `c2_j_l8_hair_3` | jon | I'm going to need a bigger lint roller. | — | levels |
+
+### c2_j_l8_bald  (2)
+| key | who | text | dur | src |
+|---|---|---|---|---|
+| `c2_j_l8_bald` | jon | It was bound to happen, Garfield. | — | levels |
+| `c2_j_l8_bald_nn` | jon | It was bound to happen, buddy. | — | levels |
+
+### c2_g_l8_bald  (1)
+| key | who | text | dur | src |
+|---|---|---|---|---|
+| `c2_g_l8_bald` | garfield | I feel… breezy. | — | levels |
+
+### c2_l08_hint  (3)
+| key | who | text | dur | src |
+|---|---|---|---|---|
+| `c2_l08_hint_1` | garfield | Shedding week. Jon's bed first. | — | levels |
+| `c2_l08_hint_2` | garfield | Next: the sofa. Then the armchair. | — | levels |
+| `c2_l08_hint_3` | garfield | Save the table for last. It's the big finish. | — | levels |
+
+### c2_g_l9_intro  (1)
+| key | who | text | dur | src |
+|---|---|---|---|---|
+| `c2_g_l9_intro` | garfield | Boy, am I in a bad mood. | — | levels |
+
+### c2_j_l9_morning  (2)
+| key | who | text | dur | src |
+|---|---|---|---|---|
+| `c2_j_l9_morning` | jon | Goooood moooorrrning Garfield! | — | levels |
+| `c2_j_l9_morning_nn` | jon | Goooood moooorrrning kitty! | — | levels |
+
+### c2_j_l9_ow  (1)
+| key | who | text | dur | src |
+|---|---|---|---|---|
+| `c2_j_l9_ow` | jon | OW! Right in the nose! | — | levels |
+
+### c2_j_l9_nasty  (2)
+| key | who | text | dur | src |
+|---|---|---|---|---|
+| `c2_j_l9_nasty` | jon | Garfield's sure been in a nasty mood lately. | — | levels |
+| `c2_j_l9_nasty_nn` | jon | The cat's sure been in a nasty mood lately. | — | levels |
+
+### c2_l_l9_treat  (1)
+| key | who | text | dur | src |
+|---|---|---|---|---|
+| `c2_l_l9_treat` | lyman | We'll see about that. Do you know how to treat a mad cat? | 3.69 | levels |
+
+### c2_j_l9_respect  (1)
+| key | who | text | dur | src |
+|---|---|---|---|---|
+| `c2_j_l9_respect` | jon | With great, great respect. | — | levels |
+
+### c2_j_l9_love  (2)
+| key | who | text | dur | src |
+|---|---|---|---|---|
+| `c2_j_l9_love` | jon | WE LOVE YOU GARFIELD! | — | levels |
+| `c2_j_l9_love_nn` | jon | WE LOVE YOU, KITTY! | — | levels |
+
+### c2_l_l9_love  (2)
+| key | who | text | dur | src |
+|---|---|---|---|---|
+| `c2_l_l9_love` | lyman | WE LOVE YOU GARFIELD! | 1.78 | levels |
+| `c2_l_l9_love_nn` | lyman | WE LOVE YOU, KITTY! | 1.46 | levels |
+
+### c2_g_l9_loved  (1)
+| key | who | text | dur | src |
+|---|---|---|---|---|
+| `c2_g_l9_loved` | garfield | Okay. Bad mood cancelled. For now. | — | levels |
+
+### c2_g_l9_glare  (1)
+| key | who | text | dur | src |
+|---|---|---|---|---|
+| `c2_g_l9_glare` | garfield | Behold. The glare. | — | levels |
+
+### c2_l09_hint  (3)
+| key | who | text | dur | src |
+|---|---|---|---|---|
+| `c2_l09_hint_1` | garfield | Sit on the table and wait for someone to annoy me. | — | levels |
+| `c2_l09_hint_2` | garfield | Poke him. Right in the face. | — | levels |
+| `c2_l09_hint_3` | garfield | Hold Interact and give them the full glare. | — | levels |
+
+### c2_g_l10_socks  (1)
+| key | who | text | dur | src |
+|---|---|---|---|---|
+| `c2_g_l10_socks` | garfield | Socks. Warm, smelly, wonderful. | — | levels |
+
+### c2_g_l10_idea  (1)
+| key | who | text | dur | src |
+|---|---|---|---|---|
+| `c2_g_l10_idea` | garfield | I have an idea. A beautiful, terrible idea. | — | levels |
+
+### c2_g_l10_sock  (3)
+| key | who | text | dur | src |
+|---|---|---|---|---|
+| `c2_g_l10_sock_1` | garfield | Ears: fashionable. | — | levels |
+| `c2_g_l10_sock_2` | garfield | Tail: cosy. | — | levels |
+| `c2_g_l10_sock_3` | garfield | Mouth: finally, some peace and quiet. | — | levels |
+
+### c2_j_l10_socks  (2)
+| key | who | text | dur | src |
+|---|---|---|---|---|
+| `c2_j_l10_socks` | jon | Garfield! | — | levels |
+| `c2_j_l10_socks_nn` | jon | Hey! Kitty! | — | levels |
+
+### c2_g_l10_whistle  (1)
+| key | who | text | dur | src |
+|---|---|---|---|---|
+| `c2_g_l10_whistle` | garfield | Hmm, a whistle. | — | levels |
+
+### c2_g_l10_broken  (1)
+| key | who | text | dur | src |
+|---|---|---|---|---|
+| `c2_g_l10_broken` | garfield | Must be broken. | — | levels |
+
+### c2_g_l10_end  (1)
+| key | who | text | dur | src |
+|---|---|---|---|---|
+| `c2_g_l10_end` | garfield | …Huh. | — | levels |
+
+### c2_l10_hint  (3)
+| key | who | text | dur | src |
+|---|---|---|---|---|
+| `c2_l10_hint_1` | garfield | Jon's sock drawer. A cat's paradise. | — | levels |
+| `c2_l10_hint_2` | garfield | Socks… on the dog. Obviously. | — | levels |
+| `c2_l10_hint_3` | garfield | There's a whistle on Jon's floor. Blow it as hard as you can. | — | levels |
+
+### g_c2_odie  (8)
+| key | who | text | dur | src |
+|---|---|---|---|---|
+| `g_c2_odie_1` | garfield | The dog is breathing on me. Again. | — | levels |
+| `g_c2_odie_2` | garfield | His tongue has its own postcode. | — | levels |
+| `g_c2_odie_3` | garfield | Somewhere, a brain cell is lonely. It's his. | — | levels |
+| `g_c2_odie_4` | garfield | Panting is not a personality, Odie. | — | levels |
+| `g_c2_odie_5` | garfield | Why is he wet? Why is he always wet? | — | levels |
+| `g_c2_odie_6` | garfield | If dogs are man's best friend, I'm man's best boss. | — | levels |
+| `g_c2_odie_7` | garfield | He chased his tail for an hour. The tail won. | — | levels |
+| `g_c2_odie_8` | garfield | Hello, drool. Goodbye, dignity. | — | levels |
+
+### g_c2_odie_scratch  (3)
+| key | who | text | dur | src |
+|---|---|---|---|---|
+| `g_c2_odie_scratch_1` | garfield | Not yet, dog. I have plans for you. | — | levels |
+| `g_c2_odie_scratch_2` | garfield | Just a warm-up scratch. | — | levels |
+| `g_c2_odie_scratch_3` | garfield | Run along. And come back so I can do it again. | — | levels |
+
+### g_c2_lyman  (4)
+| key | who | text | dur | src |
+|---|---|---|---|---|
+| `g_c2_lyman_1` | garfield | Lyman. The guest who never leaves. | — | levels |
+| `g_c2_lyman_2` | garfield | He eats more than me. I didn't think that was possible. | — | levels |
+| `g_c2_lyman_3` | garfield | That moustache is hiding crumbs. My crumbs. | — | levels |
+| `g_c2_lyman_4` | garfield | Two humans. Twice the snacks. Twice the chasing. | — | levels |
+
+### g_c2_idle  (4)
+| key | who | text | dur | src |
+|---|---|---|---|---|
+| `g_c2_idle_1` | garfield | A dog in my house. What's next, a goldfish with opinions? | — | levels |
+| `g_c2_idle_2` | garfield | Peace and quiet. Remember those? I miss those. | — | levels |
+| `g_c2_idle_3` | garfield | Somebody should get rid of the dog. Somebody orange. | — | levels |
+| `g_c2_idle_4` | garfield | I'm not jealous of the dog. I'm superior to the dog. Different thing. | — | levels |
+
+### g_c2_chased  (2)
+| key | who | text | dur | src |
+|---|---|---|---|---|
+| `g_c2_chased_1` | garfield | Two of them! That's not fair! …Running anyway! | — | levels |
+| `g_c2_chased_2` | garfield | Double trouble. Double legs. Go go go! | — | levels |
+
+### fp2_g_start  (2)
+| key | who | text | dur | src |
+|---|---|---|---|---|
+| `fp2_g_start_1` | garfield | A house full of targets. Where do I start? | — | levels |
+| `fp2_g_start_2` | garfield | Free play, round two. The dog doesn't stand a chance. | — | levels |
+
+### fp2_g_bald  (1)
+| key | who | text | dur | src |
+|---|---|---|---|---|
+| `fp2_g_bald` | garfield | Still breezy. | — | levels |
+
+### fp2_g_back  (1)
+| key | who | text | dur | src |
+|---|---|---|---|---|
+| `fp2_g_back` | garfield | He's back. Of course he's back. They always come back. | — | levels |
+
+### l_leg  (3)
+| key | who | text | dur | src |
+|---|---|---|---|---|
+| `l_leg_1` | lyman | OW! My dancing leg! | 1.92 | levels |
+| `l_leg_2` | lyman | Yowza! That cat's got knives for toes! | 3.32 | levels |
+| `l_leg_3` | lyman | Hop… hop… I've been wounded, Jon! | 2.77 | levels |
+
+### l_face  (3)
+| key | who | text | dur | src |
+|---|---|---|---|---|
+| `l_face_1` | lyman | Not the moustache! Anything but the moustache! | 3.06 | levels |
+| `l_face_2` | lyman | My beautiful face! | 1.79 | levels |
+| `l_face_3` | lyman | I can't see! Is my moustache okay? | 3.16 | levels |
+
+### l_butt  (2)
+| key | who | text | dur | src |
+|---|---|---|---|---|
+| `l_butt_1` | lyman | YEOW! My sitting-down part! | 2.91 | levels |
+| `l_butt_2` | lyman | Hey! These are my good trousers! My only trousers! | 4.59 | levels |
+
+### l_paper  (2)
+| key | who | text | dur | src |
+|---|---|---|---|---|
+| `l_paper_1` | lyman | Have a newspaper, furball! | 2.08 | levels |
+| `l_paper_2` | lyman | Catch! Read all about it! | 1.94 | levels |
+
+### l_paper_fetch  (1)
+| key | who | text | dur | src |
+|---|---|---|---|---|
+| `l_paper_fetch_1` | lyman | Where'd it go? I wasn't finished with the crossword. | 3.35 | levels |
+
+### l_chase  (4)
+| key | who | text | dur | src |
+|---|---|---|---|---|
+| `l_chase_1` | lyman | Come here, you orange menace! | 1.91 | levels |
+| `l_chase_2` | lyman | I'm right behind you! …Slightly to the left! | 3.27 | levels |
+| `l_chase_3` | lyman | Jon! Cut him off at the sofa! | 2.38 | levels |
+| `l_chase_4` | lyman | I haven't run this much since the buffet closed! | 2.47 | levels |
+
+### l_glare  (2)
+| key | who | text | dur | src |
+|---|---|---|---|---|
+| `l_glare_1` | lyman | Come down from there this instant! | 2.13 | levels |
+| `l_glare_2` | lyman | I'd climb up there, but I just ate. | 2.34 | levels |
+
+### l_giveup  (3)
+| key | who | text | dur | src |
+|---|---|---|---|---|
+| `l_giveup_1` | lyman | Fine! I needed a sit-down anyway. | 3.15 | levels |
+| `l_giveup_2` | lyman | You win this round, cat. | 1.62 | levels |
+| `l_giveup_3` | lyman | Phew. Snack break. | 1.92 | levels |
+
+### l_catch  (3)
+| key | who | text | dur | src |
+|---|---|---|---|---|
+| `l_catch_1` | lyman | Got you, you rascal! | 1.72 | levels |
+| `l_catch_2` | lyman | The long arm of Lyman! | 1.9 | levels |
+| `l_catch_3` | lyman | Gotcha! Jon, I got him! Jon? Are you watching? | 4.15 | levels |
+
+### l_back  (1)
+| key | who | text | dur | src |
+|---|---|---|---|---|
+| `l_back_1` | lyman | Right. Where was I? Oh yes: relaxing. | 3.7 | levels |
+
+### l_huh  (2)
+| key | who | text | dur | src |
+|---|---|---|---|---|
+| `l_huh_1` | lyman | Eh? What was that? | 1.74 | levels |
+| `l_huh_2` | lyman | Jon, did you hear something? | 1.97 | levels |
+
+### l_eat  (3)
+| key | who | text | dur | src |
+|---|---|---|---|---|
+| `l_eat_1` | lyman | Mmm! Jon, you've outdone yourself. | 2.68 | levels |
+| `l_eat_2` | lyman | Is there seconds? There's always seconds, right? | 3.57 | levels |
+| `l_eat_3` | lyman | Delicious. Free food always tastes better. | 3.33 | levels |
+
+### l_idle  (8)
+| key | who | text | dur | src |
+|---|---|---|---|---|
+| `l_idle_1` | lyman | Jon, old pal, is there any more of that cake? | 3.6 | levels |
+| `l_idle_2` | lyman | I'll only stay a week. Or a month. Or forever. | 3.99 | levels |
+| `l_idle_3` | lyman | Odie, sit! …Odie? Odie, that's a lamp. | 4.63 | levels |
+| `l_idle_4` | lyman | This sofa fits me perfectly. It's like it was made for me. | 4.23 | levels |
+| `l_idle_5` | lyman | Who drank all the milk? …Oh. Me. | 2.79 | levels |
+| `l_idle_6` | lyman | Ah, the dramatic life of a house guest. | 2.77 | levels |
+| `l_idle_7` | lyman | Odie! Good boy! …Mostly good boy. | 3.73 | levels |
+| `l_idle_8` | lyman | Jon, your cat is giving me a funny look. | 2.85 | levels |
+
+### c2_j_idle  (6)
+| key | who | text | dur | src |
+|---|---|---|---|---|
+| `c2_j_idle_1` | jon | Two pets and a houseguest. My life is so full! | — | levels |
+| `c2_j_idle_2` | jon | Lyman, have you seen my socks? All of them? | — | levels |
+| `c2_j_idle_3` | jon | Odie, please stop licking the TV. | — | levels |
+| `c2_j_idle_4` | jon | I think the cat and the dog are really bonding. | — | levels |
+| `c2_j_idle_5` | jon | Lyman, it's been three days. Are you staying? …Great! | — | levels |
+| `c2_j_idle_6` | jon | Who put a sock on the lampshade? | — | levels |
+
+### c2_j_watch  (2)
+| key | who | text | dur | src |
+|---|---|---|---|---|
+| `c2_j_watch_1` | jon | Ooh, a documentary about cheese! | — | levels |
+| `c2_j_watch_2` | jon | This show's great. I have no idea what's happening. | — | levels |
+
+### o_yip  (3)
+| key | who | text | dur | src |
+|---|---|---|---|---|
+| `o_yip_1` | odie | Yip! | — | levels |
+| `o_yip_2` | odie | Yip yip! | — | levels |
+| `o_yip_3` | odie | Yipe! | — | levels |
+
+### o_yip_long  (1)
+| key | who | text | dur | src |
+|---|---|---|---|---|
+| `o_yip_long` | odie | Yiiiiiiiip! | — | levels |
+
+### o_bark  (2)
+| key | who | text | dur | src |
+|---|---|---|---|---|
+| `o_bark_1` | odie | Woof! | — | levels |
+| `o_bark_2` | odie | Arf! Arf! | — | levels |
+
+### o_bark_happy  (1)
+| key | who | text | dur | src |
+|---|---|---|---|---|
+| `o_bark_happy` | odie | Arf arf arf! | — | levels |
+
+### o_pant  (1)
+| key | who | text | dur | src |
+|---|---|---|---|---|
+| `o_pant` | odie | Hah-hah-hah-hah… | — | levels |
+
+### o_whine  (1)
+| key | who | text | dur | src |
+|---|---|---|---|---|
+| `o_whine` | odie | Hnnnn… | — | levels |
+
+### o_whimper  (1)
+| key | who | text | dur | src |
+|---|---|---|---|---|
+| `o_whimper` | odie | Hmm-mm-mm… | — | levels |
+
+### o_whine_muffled  (1)
+| key | who | text | dur | src |
+|---|---|---|---|---|
+| `o_whine_muffled` | odie | Mmf! Mmf! | — | levels |
+
+### o_growl_play  (1)
+| key | who | text | dur | src |
+|---|---|---|---|---|
+| `o_growl_play` | odie | Grrr-arf! | — | levels |
+
+### o_shake_off  (1)
+| key | who | text | dur | src |
+|---|---|---|---|---|
+| `o_shake_off` | odie | Brrrrrr! | — | levels |
+
+### o_sniff  (1)
+| key | who | text | dur | src |
+|---|---|---|---|---|
+| `o_sniff` | odie | Sniff sniff. | — | levels |
 
 ### g_open_plan  (1)
 | key | who | text | dur | src |

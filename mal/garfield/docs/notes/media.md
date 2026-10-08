@@ -38,9 +38,13 @@
   audio/sfx/<clip>.mp3 (ODIE_CLIP); design3.py (Lyman/delivery auditions); gen_dog.py (LTX audio-track dog sounds);
   gen_music.py + arena, sneak2.
 
+- ALL refs done + refs/README.md "Wave 3" table; cast + world matched them (disco shirt added in-game; delivery navy).
+- Voices saved (voices.json): lyman = "Hungry Heist · Lyman" 174b6b2ab49a4b0b8e3ca4b7d37af3e0 (design v0 seed 7 of
+  design3.py; F0 ~140–250 dramatic, timbre distance to Jon 1.1–1.5 / Garfield 0.9–1.0 vs ~0.5 within a speaker —
+  tools/media/timbre.py); delivery = "Hungry Heist · Delivery" 538b211797494cb9a76c6ef968e8ca8a (v1 seed 7).
+
 ## IN PROGRESS
-- Refs (Flux slow ~4 min/img under swap): lyman_3q, lyman_disco, garfield_bald, delivery_man, lyman_bedroom.
-  Fetcher: `python3 tools/media/fetch_done.py`.
+- VO batch: `gen_vo.py --who lyman; --who delivery; gen_vo.py` → scratch/w3_vo.log. Then qc_vo.py.
 
 ## NEXT
 1. Lyman + delivery voices (design3.py → save via POST :7876/api/voices {preserve_voice:true}) → voices.json keys

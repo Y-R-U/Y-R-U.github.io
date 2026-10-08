@@ -7,7 +7,7 @@ const MOVE_KEYS = {
 export function createInput({ canvas, ui, camera }) {
   const keys = new Set();
   const pending = { jump: false, jumpUp: false, scratch: false, interact: false, pause: false, any: false, click: null };
-  let jumpHeldUi = false;
+  let jumpHeldUi = false, interactHeldUi = false;
   const look = { dx: 0, dy: 0 };
   const listeners = new Map();
   const emit = (n, d) => listeners.get(n)?.forEach((f) => f(d));
@@ -87,7 +87,8 @@ export function createInput({ canvas, ui, camera }) {
     ui.on('jump', () => { pending.any = true; jumpHeldUi = true; if (input.hasInteractable() && ui.controls?.jumpInteracts) pending.interact = true; else pending.jump = true; });
     ui.on('jumpUp', () => { jumpHeldUi = false; pending.jumpUp = true; });
     ui.on('scratch', () => { pending.any = true; pending.scratch = true; });
-    ui.on('interact', () => { pending.any = true; pending.interact = true; });
+    ui.on('interact', () => { pending.any = true; pending.interact = true; interactHeldUi = true; });
+    ui.on('interactUp', () => { interactHeldUi = false; });
   }
 
   function poll() {
@@ -109,6 +110,8 @@ export function createInput({ canvas, ui, camera }) {
     if (pending.jumpUp) jumpHeldUi = false;
     input.scratch = pending.scratch;
     input.interact = pending.interact;
+    // held Interact (Ch2 L9 "hold to glare"): E/F/Enter, Space, or the touch Interact button
+    input.interactHeld = keys.has('KeyE') || keys.has('KeyF') || keys.has('Enter') || keys.has('Space') || interactHeldUi;
     input.any = pending.any || len > 0.01;
     input.look = { dx: look.dx, dy: look.dy };
     look.dx = 0; look.dy = 0;

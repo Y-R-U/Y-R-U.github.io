@@ -255,11 +255,23 @@ export function createOdieBowl(ctx) {
   b.add(lathe([[0, 0], [0.12, 0], [0.135, 0.008], [0.14, 0.04], [0.135, 0.075], [0.126, 0.078]], 36), palette().gloss, null, 0xc8382c);
   b.add(lathe([[0.1405, 0.03], [0.1405, 0.05]], 36), palette().gloss, null, 0xfff1d0);
   b.add(lathe([[0.126, 0.078], [0.118, 0.074], [0.105, 0.022], [0.08, 0.014], [0, 0.014]], 36), palette().gloss, null, 0xf4e6d4);
-  p.root.add(b.build('dogBowl'));
-  const N = 46;
-  const heap = heapOf(BONE(), gloss(0xffffff, { roughness: 0.6, clearcoat: 0.2 }), N, 0.1, 0.05, 9, [0.09, 0.45, 0.55]);
-  p.root.add(heap);
-  p.eaten = t => { p.state.eaten = Math.max(0, Math.min(1, t)); heap.count = Math.round(N * (1 - p.state.eaten)); };
+  // biscuits merged into the bowl mesh (one draw call); eating trims the drawRange from the top of the heap down
+  const start = b.marks().get(palette().gloss);
+  const N = 46, r = rng(9), m4 = new THREE.Matrix4(), q = new THREE.Quaternion(), c = new THREE.Color();
+  const bones = [];
+  for (let i = 0; i < N; i++) {
+    const a = r() * Math.PI * 2, d = Math.sqrt(r()) * 0.1, h = 0.022 + 0.05 * (1 - (d / 0.1) ** 2) * (0.5 + r() * 0.5);
+    bones.push([h, a, d, r() * 3, r() * 3, r() * 3, 0.85 + r() * 0.35, r()]);
+  }
+  bones.sort((x, y) => x[0] - y[0]);
+  const per = BONE().attributes.position.count;
+  for (const [h, a, d, rx, ry, rz, sc, k] of bones) {
+    m4.compose(new THREE.Vector3(Math.cos(a) * d, h, Math.sin(a) * d), q.setFromEuler(new THREE.Euler(rx, ry, rz)), new THREE.Vector3(sc, sc, sc));
+    b.add(BONE().clone().applyMatrix4(m4), palette().gloss, null, c.setHSL(0.09 + k * 0.02, 0.45, 0.55 + k * 0.12).getHex());
+  }
+  const bowlMesh = b.build('dogBowl').children[0];
+  p.root.add(bowlMesh.parent);
+  p.eaten = t => { p.state.eaten = Math.max(0, Math.min(1, t)); bowlMesh.geometry.setDrawRange(0, start + per * Math.round(N * (1 - p.state.eaten))); };
   p.bitePos = (out = new THREE.Vector3()) => { out.set(0, 0.07, 0); return p.root.localToWorld(out); };
   p.state.eaten = 0;
   addBox(p, 'body', p.root, [-0.14, 0, -0.14], [0.14, 0.08, 0.14], 'surface');
@@ -379,6 +391,7 @@ export function createCarpet(ctx) {
     g.fillStyle = '#2f5a6a'; g.fillRect(26, 26, w - 52, h - 52);
     g.strokeStyle = '#e8d4a8'; g.lineWidth = 6;
     for (let i = 0; i < 4; i++) { const cy = 90 + i * 110; g.beginPath(); g.moveTo(w / 2, cy - 44); g.lineTo(w / 2 + 60, cy); g.lineTo(w / 2, cy + 44); g.lineTo(w / 2 - 60, cy); g.closePath(); g.stroke(); g.fillStyle = '#b8463a'; g.beginPath(); g.arc(w / 2, cy, 14, 0, 7); g.fill(); }
+    g.fillStyle = '#e8d4a8'; for (let y = 4; y < h; y += 9) { g.fillRect(0, y, 10, 4); g.fillRect(w - 10, y, 10, 4); }
     const r = rng(12); for (let i = 0; i < 900; i++) { g.fillStyle = r() < 0.5 ? 'rgba(0,0,0,0.07)' : 'rgba(255,255,255,0.05)'; g.fillRect(r() * w, r() * h, 2, 2); }
   });
   const rugMat = new THREE.MeshStandardMaterial({ map: tex, roughness: 0.95, polygonOffset: true, polygonOffsetFactor: -1 });
@@ -388,9 +401,6 @@ export function createCarpet(ctx) {
   const rug = new THREE.Mesh(g, rugMat); rug.receiveShadow = true;
   const orig = g.attributes.position.array.slice();
   p.root.add(rug);
-  const fr = new Builder();
-  for (const s of [-1, 1]) for (let i = 0; i < 18; i++) fr.add(new THREE.BoxGeometry(0.05, 0.004, 0.012), palette().matte, { pos: [s * (L / 2 + 0.022), 0.008, -Wd / 2 + 0.03 + i * (Wd - 0.06) / 17] }, 0xe8d4a8);
-  const fringe = fr.build('fringe', { cast: false }); rug.add(fringe);
   homeOf(p);
   p.load = null; // prop riding on the carpet (index.js sets it to the old TV)
   p.state.pulled = false;

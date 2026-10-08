@@ -67,6 +67,11 @@ async function makeRuntime(ctx, spec) {
   };
   // a restart can leave a human parented to a seat
   for (const h of humans.list) { if (h.seated()) h.leave(); }
+  // Ch2 starts Garfield on open floor (the Ch1 spawn hugs the counters, so close-ups got blocked)
+  if (spec.spawn !== false) {
+    const sp = A(ctx, spec.spawn || 'livingCentre');
+    if (sp) ctx.controller.teleport(sp.pos.clone().setY(0), spec.spawnRot ?? Math.PI);
+  }
   const js = A(ctx, 'jonSpawn');
   if (js) { ctx.jon.root.position.copy(js.pos); ctx.jon.root.rotation.set(0, js.rotY || 0, 0); }
   ctx.jon.root.visible = true;
@@ -117,7 +122,7 @@ async function makeRuntime(ctx, spec) {
     let eating = false;
     return L.interact({
       id, radius, heightTol, markerHeight: 0.35,
-      get label() { return enabled && !enabled() ? (notYet || 'Not yet!') : label; },
+      get label() { return enabled && !enabled() ? ((typeof notYet === 'function' ? notYet() : notYet) || 'Not yet!') : label; },
       pos, enabled: () => !eating && !L.won && (!notYet || true) && (enabled ? (enabled() || !!notYet) : true),
       onInteract: async () => {
         if (enabled && !enabled()) { L.say(spec.notYetBark || 'g_guarded', { force: true }); return; }
@@ -164,7 +169,7 @@ async function makeRuntime(ctx, spec) {
   // ambient barks about the newcomers
   let ambT = 18 + Math.random() * 10;
   function updateAmbient(dt) {
-    if ((ambT -= dt) > 0 || ctx.director?.active) return;
+    if ((ambT -= dt) > 0 || ctx.director?.active || L.quiet) return;
     ambT = 20 + Math.random() * 15;
     const r = Math.random();
     if (odie && odie.root.visible && flat(odie.root.position, ctx.controller.pos) < 3 && r < 0.5) barks.say('g_c2_odie', { lowPri: true });

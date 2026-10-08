@@ -21,8 +21,9 @@ export const CLIPS2 = {
   // sulk: walks into the corner and presses his face into it
   head_in_corner: clip(3, true, (P, t) => {
     const b = Math.sin(TAU * t / 3);
-    P.r('neck', 0.35); P.o('neck', 0, -0.01, 0.04); P.r('head', 0.35);
-    P.r('chest', 0.12); P.r('hips', -0.06);
+    // head pushed forward into the corner (not just hung down)
+    P.r('neck', 0.12); P.o('neck', 0, -0.015, 0.1); P.r('head', 0.22);
+    P.r('chest', 0.1); P.o('chest', 0, 0, 0.03); P.r('hips', -0.06);
     P.o('chest', 0, -0.02 + 0.006 * b, 0);
     P.x.earsBack += 0.9; P.x.lidU += 0.75; P.x.smile -= 0.8; P.x.noLook = 1;
     for (let i = 0; i < 6; i++) P.r('tail' + i, 0.35 + (i > 3 ? 0.2 : 0), 0.05 * Math.sin(TAU * t / 3 - i * 0.5));

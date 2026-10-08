@@ -18,8 +18,8 @@ const NORMAL_COLORS = {
 };
 const DISCO_COLORS = {
   ...NORMAL_COLORS,
-  suit: 0xf8f5ee, suitDark: 0xe2ddd2, shirt: 0x2a2440, shirtDark: 0x1e1a30, collar: 0x2a2440,
-  pants: 0xf8f5ee, pantsDark: 0xe2ddd2, belt: 0xf2eee6, buckle: 0xe0b440, shoe: 0x1c1816, sole: 0x0a0806, gold: 0xe6b84a,
+  suit: 0xf8f5ee, suitDark: 0xe2ddd2, shirt: 0xa8d0f0, shirtDark: 0x8cb8e0, collar: 0xa8d0f0,
+  pants: 0xf8f5ee, pantsDark: 0xe2ddd2, belt: 0xf2eee6, buckle: 0xe0b440, shoe: 0xf4f1ea, sole: 0xd8d2c6, gold: 0xe6b84a,
 };
 
 // ---------- head furniture ----------
@@ -30,9 +30,11 @@ function lymanHair(c) {
   // shell: thick, part on his right, hairline a touch higher than Jon's
   add('hair', ellipsoid(hc, [hr[0] + 0.02, hr[1] + 0.026, hr[2] + 0.02], S(24), {
     shape: (p) => {
-      const line = p.y - (0.24 + 0.6 * p.z);
+      const back = THREE.MathUtils.smoothstep(-p.z, 0.3, 0.85);
+      const line = p.y - (0.24 + 0.6 * p.z) + 0.22 * back;
+      const taper = 1 - 0.13 * back * (1 - THREE.MathUtils.smoothstep(p.y, -0.55, 0.25));
       headShape(p);
-      p.multiplyScalar(0.6 + 0.4 * THREE.MathUtils.smoothstep(line, -0.1, 0.02));
+      p.multiplyScalar((0.6 + 0.4 * THREE.MathUtils.smoothstep(line, -0.1, 0.02)) * taper);
     },
     disp: (p) => {
       const d = V(p.x - hc[0], p.y - hc[1], p.z - hc[2]).normalize();
@@ -53,7 +55,29 @@ function lymanHair(c) {
     add('hair', loft([{ p: [k * 0.104, 1.69, 0.04], r: [0.005, 0.014] }, { p: [k * 0.106, 1.65, 0.05], r: [0.005, 0.012] }, { p: [k * 0.104, 1.615, 0.055], r: [0.004, 0.009] }],
       { seg: S(8), cap0: 2, cap1: 3, side: [0, 0, 1] }), C.hairDark, 'head');
   }
-  backTufts(c, { w: 1.25 });
+  layeredBack(c);
+}
+
+// short, combed-back back of the head: flat strands hugging the skull that tuck into the shell at the nape
+function layeredBack(c) {
+  const { add, S, C } = c;
+  const hc = FACE.headC, hr = FACE.headR;
+  const R = [hr[0] + 0.02, hr[1] + 0.026, hr[2] + 0.02];
+  const onHead = (d) => { const q = d.clone().normalize(); headShape(q); return V(hc[0] + q.x * R[0], hc[1] + q.y * R[1], hc[2] + q.z * R[2]); };
+  const N = 13;
+  for (let k = 0; k < N; k++) {
+    const u = k / (N - 1) - 0.5, ph = u * 2.5 + 0.04 * Math.sin(k * 2.1);
+    const secs = [], m = 6;
+    for (let i = 0; i <= m; i++) {
+      const t = i / m, y = 0.8 - t * 1.08, a = ph * (1 - 0.25 * t);
+      const p = onHead(V(Math.sin(a) * 0.95, y, -Math.cos(a) * 0.95));
+      const out = p.clone().sub(V(...hc)).normalize();
+      p.addScaledVector(out, 0.0035 * Math.sin(Math.PI * Math.min(1, t * 1.3)) - 0.003 * (1 - Math.min(1, t * 4)) - 0.016 * t * t * t);
+      secs.push({ p: [p.x, p.y, p.z], r: [0.0035 * Math.min(1, 0.3 + t * 3), 0.022 * (1 - 0.5 * t * t) * (1 - 0.25 * Math.abs(u) * 2) * Math.min(1, 0.35 + t * 2.5)] });
+    }
+    const mid = V(...secs[3].p).sub(V(...hc)).normalize();
+    add('hair', loft(secs, { seg: S(7), cap0: 1, cap1: 2, side: [mid.x, mid.y, mid.z] }), k % 3 === 1 ? C.hair : (p) => (p.y > hc[1] ? C.hair : C.hairDark), 'head');
+  }
 }
 
 function moustache(c) {
@@ -95,7 +119,17 @@ function vestTorso(c) {
 function discoTorso(c) {
   const { add, S, C } = c;
   const vOpen = (p) => p.z > 0.02 && p.y > 1.17 && Math.abs(p.x) < (p.y - 1.17) * 0.42;
-  torsoLoft(c, (p) => (vOpen(p) ? (p.y > 1.3 && Math.abs(p.x) < (p.y - 1.3) * 0.36 ? C.skin : C.shirt) : C.suit));
+  torsoLoft(c, (p) => (vOpen(p) ? C.shirt : C.suit));
+  // shirt fronts as separate panels so the shirt/chest/suit edges stay crisp (vertex colours alone smeared them)
+  for (const k of [1, -1]) {
+    const e = [];
+    for (let i = 0; i <= 8; i++) {
+      const y = 1.172 + i * 0.034, outer = (y - 1.17) * 0.42 + 0.004, inner = Math.max(0, (y - 1.26) * 0.46);
+      const x = k * (outer + inner) / 2;
+      e.push({ p: [x, y, torsoZ(x, y) + 0.003], r: [0.003, Math.max(0.003, (outer - inner) / 2 + 0.003)] });
+    }
+    add('cloth', loft(e, { seg: 8, cap0: 1, cap1: 1, side: [0, 0, 1] }), C.shirt, TORSO_SKIN);
+  }
   // jacket skirt over the hips
   add('cloth', loft([{ p: [0, 1.09, 0.014], r: [0.155, 0.116] }, { p: [0, 1.02, 0.01], r: [0.17, 0.13] }, { p: [0, 0.96, 0.006], r: [0.178, 0.136] }],
     { seg: S(20), exp: 2.3 }), C.suit, blend([[1.0, 'hips'], [1.1, 'spine']]));
