@@ -46,9 +46,9 @@ header {
 }
 .wordmark span { color: var(--amber); font-weight: 400; }
 
-.hero { padding: clamp(46px, 11vh, 110px) clamp(18px, 5vw, 56px) clamp(30px, 6vh, 60px); max-width: 760px; }
+.hero { padding: clamp(22px, 5vh, 56px) clamp(18px, 5vw, 56px) clamp(24px, 4.5vh, 46px); max-width: 760px; }
 .hero h1 {
-  margin: 0 0 16px; font-size: clamp(34px, 7.2vw, 62px); line-height: 1.06;
+  margin: 0 0 12px; font-size: clamp(34px, 7.2vw, 62px); line-height: 1.06;
   letter-spacing: -.028em; font-weight: 700;
 }
 .hero h1 em { font-style: normal; color: var(--amber); }
@@ -61,11 +61,11 @@ header {
 }
 
 .card {
-  position: relative; display: block; overflow: hidden; text-decoration: none;
+  position: relative; display: flex; flex-direction: column; overflow: hidden;
   background: var(--card); border: 1px solid var(--line); border-radius: 16px;
   transition: transform .22s ease, border-color .22s ease, box-shadow .22s ease;
 }
-.card:hover, .card:focus-visible {
+.card:hover, .card:focus-within {
   transform: translateY(-4px);
   border-color: var(--accent, var(--amber));
   box-shadow: 0 16px 44px rgba(0,0,0,.5);
@@ -79,8 +79,17 @@ header {
 .card:hover .shot img { transform: scale(1.05); opacity: 1; }
 .card .body { padding: 15px 17px 18px; }
 .card h2 { margin: 0; font-size: 18px; font-weight: 650; letter-spacing: -.01em; }
+.card .hit { text-decoration: none; outline: none; }
+/* Stretched link: the whole card is the tap target; "More" sits above it. */
+.card .hit::after { content: ""; position: absolute; inset: 0; z-index: 1; }
 .card .tag { display: block; margin: 2px 0 9px; font-size: 12px; letter-spacing: .09em; text-transform: uppercase; color: var(--accent, var(--amber)); }
 .card p { margin: 0; font-size: 13.6px; line-height: 1.55; color: var(--dim); }
+.card .more {
+  position: relative; z-index: 3; pointer-events: auto;
+  margin-top: 8px; padding: 4px 0; border: 0; background: none; cursor: pointer;
+  font: 600 12.5px/1.2 inherit; letter-spacing: .02em; color: var(--accent, var(--amber));
+}
+.card .more:hover, .card .more:focus-visible { text-decoration: underline; outline: none; }
 
 .card.soon { pointer-events: none; }
 .card.soon .shot img { filter: grayscale(1) brightness(.55); }
@@ -92,6 +101,19 @@ header {
   backdrop-filter: blur(6px);
 }
 .card:not(.soon) .flag { color: var(--accent, var(--amber)); border-color: var(--accent, var(--amber)); }
+
+/* Phones in portrait: two across. */
+@media (max-width: 640px) {
+  .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; padding: 0 12px 52px; }
+  .card { border-radius: 12px; }
+  .card .body { padding: 9px 10px 11px; }
+  .card h2 { font-size: 15px; }
+  .card .tag { font-size: 9.5px; letter-spacing: .07em; margin: 1px 0 6px; }
+  .card p { font-size: 12.3px; line-height: 1.45; }
+  .card .more { font-size: 11.5px; margin-top: 5px; }
+  .card .flag { top: 7px; right: 7px; font-size: 8.5px; padding: 3px 6px; letter-spacing: .08em; }
+  .card:hover, .card:focus-within { transform: none; }
+}
 
 footer { padding: 0 clamp(18px, 5vw, 56px) 44px; color: var(--dim); font-size: 13px; }
 footer a { color: var(--dim); }
