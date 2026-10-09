@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 import { createRobot } from '../actors/robots.js';
 import { SUN_DIR } from '../engine/atmosphere.js';
-import { REFLECT_LAYER } from '../fx/reflection.js';
+import { REFLECT_LAYER, MIRROR_ONLY_LAYER } from '../fx/reflection.js';
 import { rng } from './textures.js';
 
 // Distant crowd: camera-facing impostors baked once from the real civilian robots (walk cycle, 3 views), walked along
@@ -120,7 +120,10 @@ export function createFarCrowdMaterial(texture, time, { a2c = false } = {}) {
       #include <fog_pars_fragment>
       void main() {
         vec4 c = texture2D( map, vUv );
-        float a = c.a * vFade;
+        float a = c.a;
+        // sharpen mip-averaged alpha to a ~1 px ramp, or thin far limbs read see-through
+        ${a2c ? 'a = clamp( ( a - 0.5 ) / max( fwidth( a ), 1e-4 ) + 0.5, 0.0, 1.0 );' : ''}
+        a *= vFade;
         ${a2c ? 'if ( a < 0.02 ) discard;' : 'if ( a < 0.5 ) discard; a = 1.0;'}
         gl_FragColor = vec4( c.rgb / max( c.a, 1e-3 ), a );
         #include <fog_fragment>
@@ -130,6 +133,9 @@ export function createFarCrowdMaterial(texture, time, { a2c = false } = {}) {
   m.alphaToCoverage = a2c;
   m.uniforms.map.value = texture;
   m.uniforms.uTime = time;
+  // The non-MSAA mirror can't do alpha-to-coverage: fractional alpha there lets the floor's bright sky term through,
+  // drawing a white 'shadow' under every far bot (2026-10-10). The mirror gets a cutout copy instead.
+  if (a2c) m.userData.mirror = createFarCrowdMaterial(texture, time);
   return m;
 }
 
@@ -183,7 +189,13 @@ export function addFarCrowd(ctx, material, n, { extra = [], seed = 5 } = {}) {
   const mesh = new THREE.Mesh(g, material);
   mesh.frustumCulled = false;
   mesh.name = 'farCrowd';
-  mesh.layers.enable(REFLECT_LAYER);
+  if (material.userData.mirror) {
+    const mirror = new THREE.Mesh(g, material.userData.mirror);
+    mirror.frustumCulled = false;
+    mirror.name = 'farCrowdMirror';
+    mirror.layers.set(MIRROR_ONLY_LAYER);
+    mesh.add(mirror);
+  } else mesh.layers.enable(REFLECT_LAYER);
   scene.add(mesh);
   ctx.stats.farCrowd = N;
   return mesh;

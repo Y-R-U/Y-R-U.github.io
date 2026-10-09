@@ -1,6 +1,8 @@
 import * as THREE from 'three';
 
 export const REFLECT_LAYER = 1;
+// drawn only by the mirror camera (the main camera also enables REFLECT_LAYER)
+export const MIRROR_ONLY_LAYER = 2;
 
 // Planar mirror for the y=planeY floor. Renders only objects on REFLECT_LAYER, at reduced resolution,
 // into a texture that glossy floor/water materials sample in screen-projected space.
@@ -11,6 +13,7 @@ export function createPlanarReflection(renderer, { scale = 0.5, planeY = 0, samp
   rt.resolveDepthBuffer = false;
   const cam = new THREE.PerspectiveCamera();
   cam.layers.set(REFLECT_LAYER);
+  cam.layers.enable(MIRROR_ONLY_LAYER);
   const texMatrix = new THREE.Matrix4();
   const plane = new THREE.Plane();
   const clip = new THREE.Vector4();

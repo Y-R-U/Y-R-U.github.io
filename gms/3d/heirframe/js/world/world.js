@@ -152,7 +152,7 @@ export function createWorld(canvas, { quality, toneMapping = 'aces', onProgress 
   for (const k of ['bark', 'chrome', 'darkMetal', 'gold', 'stone', 'stoneUpper', 'glassRail', 'canopyA', 'warmGlow', 'blueGlow', 'facade', 'facadeWarm', 'shopGlow', 'uber']) fadeMaterial(M[k], fade, { a2c: tier.msaa > 0 });
   const farN = /[?&]nofar/.test(location.search) ? 0 : tier.farCrowd || 0;
   const farAtlas = farN ? bakeCrowdAtlas(renderer, scene.environment) : null;
-  if (farAtlas) { M.farCrowd = createFarCrowdMaterial(farAtlas.texture, time, { a2c: tier.msaa > 0 }); M.farCrowd.userData.atlas = farAtlas; }
+  if (farAtlas) { M.farCrowd = createFarCrowdMaterial(farAtlas.texture, time, { a2c: tier.msaa > 0 }); M.farCrowd.userData.atlas = farAtlas; if (M.farCrowd.userData.mirror) M.farCrowdMirror = M.farCrowd.userData.mirror; }
   const col = createCollision(LAYOUT.bounds);
   const jetMaterial = createJetMaterial(time);
   const makePadRing = (r, c, busy) => createPadRing(time, r, c, busy);
