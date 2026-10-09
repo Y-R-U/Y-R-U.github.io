@@ -1,7 +1,7 @@
 // entities.js — ships, projectiles, prizes, flags, particles.
 
 import {
-  TILE, BULLET, BOMB, MINE, BURST, REPEL, PRIZE_CAPS, RESPAWN_DELAY, PALETTE,
+  TILE, BULLET, BOMB, MINE, BURST, REPEL, PRIZE_CAPS, RESPAWN_DELAY, PALETTE, AIM_RANGE,
 } from './config.js';
 import {
   clamp, rand, randInt, TAU, rotateToward, angleDiff, sign, uid,
@@ -95,10 +95,21 @@ export class Bullet {
     this.radius = opts.radius; this.dmg = opts.dmg; this.team = opts.team;
     this.owner = opts.owner; this.life = opts.life; this.bounces = opts.bounces || 0;
     this.color = opts.color; this.alive = true; this.kind = 'bullet';
+    this.home = opts.home || 0; this.homeTarget = opts.homeTarget || null;
   }
   update(dt, world) {
     this.life -= dt;
     if (this.life <= 0) { this.alive = false; return; }
+    if (this.home && this.homeTarget) {
+      const t = this.homeTarget;
+      if (!t.alive) this.homeTarget = null;
+      else {
+        const sp = Math.hypot(this.vx, this.vy);
+        const cur = Math.atan2(this.vy, this.vx);
+        const a = rotateToward(cur, Math.atan2(t.y - this.y, t.x - this.x), this.home * dt);
+        this.vx = Math.cos(a) * sp; this.vy = Math.sin(a) * sp;
+      }
+    }
     const nx = this.x + this.vx * dt, ny = this.y + this.vy * dt;
     if (world.isSolidPx(nx, ny)) {
       if (this.bounces > 0) {
@@ -208,6 +219,8 @@ export class Ship {
     this.color = opts.color;     // {color, glow, dark}
     this.radius = def.radius;
     this.spriteShape = def.shape;
+    // Hangar effects (hangar.js hangarEffects) — the human player only, never bots.
+    this.upg = opts.upg || null;
 
     this.x = 0; this.y = 0; this.vx = 0; this.vy = 0; this.angle = -Math.PI / 2;
     this.cmd = { turn: 0, thrust: 0, aimAngle: null, aimMag: 0, fireGun: false, fireBomb: false, fireSpecial: false };
@@ -232,20 +245,29 @@ export class Ship {
     this.energyBonus = 0; this.rechargeBonus = 0; this.thrustBonus = 0;
     this.speedBonus = 0; this.rotationBonus = 0;
     this.specialAmmo = 3; this.bounty = 0;
+    const hs = this.upg && this.upg.headstart;
+    if (hs) {
+      this.guns = Math.min(d.maxGuns, d.guns + hs.guns);
+      this.bombs = Math.min(d.maxBombs, d.bombs + hs.bombs);
+      this.specialAmmo += hs.special;
+      if (hs.bounce) this.bounce = true;
+      if (hs.multifire) this.multifire = true;
+    }
   }
 
-  maxEff() { return this.def.maxEnergy + this.energyBonus; }
-  get thrustForce() { return this.def.thrust + this.thrustBonus; }
-  get topSpeed() { return this.def.top + this.speedBonus; }
+  _u(k) { return (this.upg && this.upg[k]) || 0; }
+  maxEff() { return this.def.maxEnergy * (1 + this._u('hull')) + this.energyBonus; }
+  get thrustForce() { return this.def.thrust * (1 + this._u('engines') * 1.5) + this.thrustBonus; }
+  get topSpeed() { return this.def.top * (1 + this._u('engines')) + this.speedBonus; }
   get turnSpeed() { return this.def.turn + this.rotationBonus; }
-  get rechargeRate() { return this.def.recharge + this.rechargeBonus; }
+  get rechargeRate() { return this.def.recharge * (1 + this._u('reactor')) + this.rechargeBonus; }
 
   spawn(x, y, angle = -Math.PI / 2) {
     this.x = x; this.y = y; this.vx = 0; this.vy = 0; this.angle = angle;
     this.alive = true; this.respawnTimer = 0;
     this.resetLoadout();
     this.energy = this.maxEff();
-    this.shieldTime = 2.2; this.gunCd = this.bombCd = this.specialCd = 0;
+    this.shieldTime = 2.2 + this._u('shield'); this.gunCd = this.bombCd = this.specialCd = 0;
     this.carryingFlag = null;
   }
 
@@ -311,18 +333,21 @@ export class Ship {
     this.energy -= cost;
     this.gunCd = 1 / this.def.fireRate;
     const lvl = this.guns;
-    const dmg = this.def.gunDmg * BULLET.levelDmg[lvl];
+    const dmg = this.def.gunDmg * BULLET.levelDmg[lvl] * (1 + this._u('guns'));
     const radius = BULLET.levelRadius[lvl];
     const spd = BULLET.speed;
     const d = this.noseDir();
     const px = this.x + d.x * (this.radius + 4), py = this.y + d.y * (this.radius + 4);
     const angles = this.multifire ? [-0.14, 0, 0.14] : [0];
+    const assist = this._assist(game);
+    const base = assist ? assist.angle : this.angle;
     for (const off of angles) {
-      const a = this.angle + off;
+      const a = base + off;
       const vx = this.vx + Math.cos(a) * spd, vy = this.vy + Math.sin(a) * spd;
       game.bullets.push(new Bullet(px, py, vx, vy, {
         radius, dmg, team: this.team, owner: this.id, life: BULLET.life,
         bounces: this.bounce ? 2 : 0, color: this.color.color,
+        home: assist ? assist.home : 0, homeTarget: assist ? assist.target : null,
       }));
     }
     game.audio && game.audio.gun(lvl);
@@ -340,16 +365,38 @@ export class Ship {
     const px = this.x + d.x * (this.radius + 6), py = this.y + d.y * (this.radius + 6);
     if (speed < 45) {
       // lay a mine when nearly stationary
-      game.mines.push(new Mine(px, py, { dmg: this.def.bombDmg * BOMB.levelDmg[lvl] * 1.3, team: this.team, owner: this.id }));
+      game.mines.push(new Mine(px, py, { dmg: this.def.bombDmg * BOMB.levelDmg[lvl] * 1.3 * (1 + this._u('bombs')), team: this.team, owner: this.id }));
       game.audio && game.audio.mine();
       return;
     }
     const vx = this.vx + d.x * BOMB.speed, vy = this.vy + d.y * BOMB.speed;
     game.bombs.push(new Bomb(px, py, vx, vy, {
-      radius: BOMB.radius, dmg: this.def.bombDmg * BOMB.levelDmg[lvl],
+      radius: BOMB.radius, dmg: this.def.bombDmg * BOMB.levelDmg[lvl] * (1 + this._u('bombs')),
       blast: BOMB.blast[lvl], team: this.team, owner: this.id, life: BOMB.life,
     }));
     game.audio && game.audio.bomb();
+  }
+
+  // Aim Assist: pick the enemy closest to the nose inside the forward cone and
+  // correct the shot toward where it will be (lead), by `snap` of the error.
+  _assist(game) {
+    const A = this.upg && this.upg.aim;
+    if (!A || !A.cone) return null;
+    let best = null, bestOff = A.cone, bestAim = 0;
+    for (const o of game.ships) {
+      if (o === this || !o.alive || !game.areEnemies(this, o)) continue;
+      const dx = o.x - this.x, dy = o.y - this.y;
+      const d = Math.hypot(dx, dy);
+      if (d > AIM_RANGE || d < 1) continue;
+      // lead using the bullet's speed relative to our own drift
+      const t = d / BULLET.speed;
+      const lx = o.x + (o.vx - this.vx) * t, ly = o.y + (o.vy - this.vy) * t;
+      const aim = Math.atan2(ly - this.y, lx - this.x);
+      const off = Math.abs(angleDiff(this.angle, aim));
+      if (off < bestOff) { bestOff = off; best = o; bestAim = aim; }
+    }
+    if (!best) return null;
+    return { angle: this.angle + angleDiff(this.angle, bestAim) * A.snap, home: A.home, target: best };
   }
 
   fireSpecial(game) {

@@ -11,6 +11,7 @@
 import { syncLocalKeys } from '/lib/auth/localsync.js';
 
 import { CAREER_KEY, SETTINGS_KEY, fmtDuration, kdRatio } from './save.js';
+import { HANGAR_KEY } from './hangar.js';
 import { MODES, SHIPS } from './config.js';
 
 const GAME_ID = 'crazyspace';
@@ -18,7 +19,7 @@ const GAME_ID = 'crazyspace';
 // Durable state only. There is deliberately no match-resume slot in this game
 // at all — a half-played arena match is not career progress, and the reload
 // that adopting a cloud save triggers would land mid-dogfight.
-const KEYS = [CAREER_KEY, SETTINGS_KEY];
+const KEYS = [CAREER_KEY, SETTINGS_KEY, HANGAR_KEY];
 
 /**
  * Two or three lines of plain English for the two-saves chooser, when two
@@ -58,6 +59,12 @@ export function describe(s) {
     out.push(bits.join(' · '));
   } else {
     out.push('No matches recorded yet');
+  }
+
+  const h = s[HANGAR_KEY];
+  if (h && h.levels) {
+    const n = Object.values(h.levels).reduce((a, v) => a + (typeof v === 'number' ? v : 0), 0);
+    if (n || h.credits) out.push(`Hangar: ${n} upgrades · ${h.credits || 0} credits`);
   }
 
   return out;

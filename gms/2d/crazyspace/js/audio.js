@@ -14,6 +14,9 @@ export class Audio {
     if (this.ctx) return;
     const AC = window.AudioContext || window.webkitAudioContext;
     if (!AC) return;
+    // iOS puts Web Audio in the "ambient" session, which the ringer silent
+    // switch mutes. 'playback' makes it behave like media (Safari 16.4+).
+    try { if (navigator.audioSession) navigator.audioSession.type = 'playback'; } catch (e) { /* older browsers */ }
     this.ctx = new AC();
     this.master = this.ctx.createGain();
     this.master.gain.value = this._gain();
@@ -32,7 +35,15 @@ export class Audio {
   }
   setMuted(m) { this.muted = !!m; this._apply(); return this.muted; }
 
-  resume() { if (this.ctx && this.ctx.state === 'suspended') this.ctx.resume(); }
+  // iOS can leave the context 'suspended' or 'interrupted' (app switch, call),
+  // and only a gesture brings it back — so this runs on every tap, forever.
+  resume() {
+    const c = this.ctx;
+    if (!c || c.state === 'running' || c.state === 'closed') return;
+    c.resume().catch(() => {});
+    // a 1-sample buffer started inside the gesture finishes the unlock on old WebKit
+    try { const s = c.createBufferSource(); s.buffer = c.createBuffer(1, 1, 22050); s.connect(c.destination); s.start(0); } catch (e) { /* ignore */ }
+  }
   toggleMute() { this.muted = !this.muted; this._apply(); return this.muted; }
 
   _makeNoise() {

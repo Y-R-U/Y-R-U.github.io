@@ -144,3 +144,86 @@ export const MODE_LIST = Object.keys(MODES);
 export const RESPAWN_DELAY = 2.2;
 export const PRIZE_MAX = 26;     // greens alive at once
 export const PRIZE_SPAWN = 1.1;  // seconds between green spawns
+
+// --- Hangar: permanent player-only upgrades (bought with credits) ---
+// Each upgrade has 8 levels; `eff[L]` is the effect at level L (index 0 = none).
+// Bots never get any of this — it is the player's "mini cheat mode".
+export const HANGAR_MAX = 8;
+export const UPGRADES = [
+  { key: 'hull', name: 'Hull', icon: '🛡', blurb: 'More max energy (health and ammo).',
+    eff: [0, 0.03, 0.06, 0.09, 0.13, 0.19, 0.27, 0.38, 0.55], fmt: v => `+${Math.round(v * 100)}% max energy` },
+  { key: 'reactor', name: 'Reactor', icon: '⚡', blurb: 'Energy recharges faster.',
+    eff: [0, 0.03, 0.06, 0.09, 0.12, 0.18, 0.25, 0.36, 0.50], fmt: v => `+${Math.round(v * 100)}% recharge` },
+  { key: 'engines', name: 'Engines', icon: '🔥', blurb: 'More thrust and top speed.',
+    eff: [0, 0.03, 0.06, 0.09, 0.12, 0.15, 0.18, 0.21, 0.25], fmt: v => `+${Math.round(v * 100)}% speed, +${Math.round(v * 150)}% thrust` },
+  { key: 'guns', name: 'Guns', icon: '✹', blurb: 'Bullets hit harder.',
+    eff: [0, 0.03, 0.06, 0.09, 0.13, 0.19, 0.27, 0.38, 0.55], fmt: v => `+${Math.round(v * 100)}% bullet damage` },
+  { key: 'bombs', name: 'Bombs', icon: '💣', blurb: 'Bombs and mines hit harder.',
+    eff: [0, 0.10, 0.20, 0.30, 0.40, 0.55, 0.70, 0.85, 1.00], fmt: v => `+${Math.round(v * 100)}% bomb damage` },
+  { key: 'headstart', name: 'Head Start', icon: '🚀', blurb: 'Every life starts with greens already on board.',
+    eff: [0, 1, 2, 3, 4, 5, 6, 7, 8], fmt: v => headStartText(v) },
+  { key: 'shield', name: 'Shield Pulse', icon: '✧', blurb: 'Longer invulnerability after each respawn.',
+    eff: [0, 0.4, 0.8, 1.2, 1.6, 2.2, 2.8, 3.6, 4.5], fmt: v => `+${v.toFixed(1)}s spawn shield` },
+  { key: 'aim', name: 'Aim Assist', icon: '◎', blurb: 'Your bullets bend toward enemies in front of you. Big help on a phone.',
+    eff: [0, 1, 2, 3, 4, 5, 6, 7, 8], fmt: v => aimText(v) },
+];
+// rising cost per level: cost[L] = price of buying level L
+export const UPGRADE_COST = [0, 20, 30, 40, 50, 65, 80, 100, 120];
+export const UPGRADE_COST_MULT = { aim: 1.2, headstart: 1.1 };
+
+// Head Start level → what each life spawns with (respecting the ship's caps).
+export const HEADSTART = [
+  { guns: 0, bombs: 0, special: 0 },
+  { guns: 0, bombs: 0, special: 1 },
+  { guns: 0, bombs: 1, special: 1 },
+  { guns: 0, bombs: 1, special: 2 },
+  { guns: 0, bombs: 1, special: 2, bounce: true },
+  { guns: 1, bombs: 1, special: 2, bounce: true },
+  { guns: 1, bombs: 2, special: 3, bounce: true },
+  { guns: 1, bombs: 2, special: 3, bounce: true, multifire: true },
+  { guns: 2, bombs: 2, special: 4, bounce: true, multifire: true },
+];
+function headStartText(L) {
+  const h = HEADSTART[L] || HEADSTART[0];
+  if (!L) return 'Nothing extra';
+  const bits = [];
+  if (h.guns) bits.push(`Gun +${h.guns}`);
+  if (h.bombs) bits.push(`Bomb +${h.bombs}`);
+  if (h.special) bits.push(`+${h.special} specials`);
+  if (h.bounce) bits.push('bouncing');
+  if (h.multifire) bits.push('multifire');
+  return bits.join(', ');
+}
+
+// Aim Assist level → forward cone (rad, half-angle), how much of the aim error
+// the shot corrects (0..1), and bullet homing turn rate (rad/s).
+export const AIM_ASSIST = [
+  { cone: 0, snap: 0, home: 0 },
+  { cone: 0.12, snap: 0.25, home: 0 },
+  { cone: 0.15, snap: 0.35, home: 0 },
+  { cone: 0.18, snap: 0.45, home: 0 },
+  { cone: 0.22, snap: 0.55, home: 0.4 },
+  { cone: 0.27, snap: 0.68, home: 1.0 },
+  { cone: 0.32, snap: 0.80, home: 1.6 },
+  { cone: 0.38, snap: 0.90, home: 2.4 },
+  { cone: 0.46, snap: 1.00, home: 3.4 },
+];
+export const AIM_RANGE = 620;
+function aimText(L) {
+  const a = AIM_ASSIST[L] || AIM_ASSIST[0];
+  if (!L) return 'Off';
+  const deg = Math.round(a.cone * 180 / Math.PI);
+  return `${deg}° cone, ${Math.round(a.snap * 100)}% aim fix` + (a.home ? ', homing' : '');
+}
+
+// Credits for a FINISHED match (see hangar.js creditsFor).
+export const CREDITS = {
+  floor: 15,          // just for finishing
+  perMinute: 10,      // time-played floor so a losing match still earns
+  perKill: 5,
+  win: 50,
+  perCap: 20,
+  perReturn: 5,
+  perHoldSec: 0.35,   // KOTH seconds your team held the hill
+  diffMult: { rookie: 0.8, veteran: 1.0, ace: 1.3 },
+};

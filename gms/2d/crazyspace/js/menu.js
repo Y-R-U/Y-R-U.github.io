@@ -1,7 +1,11 @@
-// menu.js — DOM screens: title, mode select, ship select, pause, results.
+// menu.js — DOM screens: title, mode select, ship select, hangar, pause, results.
+//
+// Layout rule (Aaron): every screen is header / scrolling body / footer. Primary
+// actions and navigation live in the header or footer, which never scroll away.
 
-import { MODES, MODE_LIST, SHIPS, SHIP_LIST, TEAMS } from './config.js';
+import { MODES, MODE_LIST, SHIPS, SHIP_LIST, TEAMS, UPGRADES, HANGAR_MAX } from './config.js';
 import { fmtDuration, kdRatio } from './save.js';
+import { loadHangar, buyUpgrade, upgradeCost, upgradeCount } from './hangar.js';
 
 function el(tag, props = {}, ...kids) {
   const e = document.createElement(tag);
@@ -18,6 +22,22 @@ function el(tag, props = {}, ...kids) {
   return e;
 }
 
+// header / scrolling body / fixed footer
+function screen(cls, { head, body = [], foot } = {}) {
+  const s = el('div', { class: 'screen ' + cls });
+  if (head) s.append(el('div', { class: 'shead' }, head));
+  s.append(el('div', { class: 'sbody' }, el('div', { class: 'sinner' }, ...body)));
+  if (foot) s.append(el('div', { class: 'sfoot' }, el('div', { class: 'sinner' }, ...foot)));
+  return s;
+}
+function topbar(title, onBack, right) {
+  return el('div', { class: 'topbar' },
+    onBack ? el('button', { class: 'icon-btn', 'aria-label': 'Back', onclick: onBack }, '‹') : el('span', {}),
+    el('h2', {}, title), right || el('span', {}));
+}
+
+export const HANGAR_HINT = 'Every match earns credits. Hangar upgrades stack, so the longer you play the easier it gets.';
+
 // normalize ship stats for the little bars
 const SMAX = { top: 440, turn: 5.6, energy: 2200, power: 2000 };
 function shipPower(d) { return d.gunDmg * d.fireRate; }
@@ -31,6 +51,7 @@ const DIFFS = [
 export class Menu {
   constructor(root, opts = {}) {
     this.onStart = opts.onStart;
+    this.onHangarRematch = null;
     this.onSettings = opts.onSettings || (() => {});
     this.getCareer = opts.getCareer || (() => null);
     this.onResetCareer = opts.onResetCareer || (() => {});
@@ -40,29 +61,37 @@ export class Menu {
     // last-used selection comes back from the persisted settings
     this.selMode = MODE_LIST.includes(this.settings.lastMode) ? this.settings.lastMode : 'deathmatch';
     this.selShip = SHIP_LIST.includes(this.settings.lastShip) ? this.settings.lastShip : 'warbird';
-    this.selDiff = DIFFS.find(d => d.key === this.settings.lastDiff) || DIFFS[1];
+    this.selDiff = DIFFS.find(d => d.key === this.settings.lastDiff) || DIFFS[0];
 
     this._build();
   }
 
   _build() {
     // ---------------- title ----------------
-    this.title = el('div', { class: 'screen active' },
-      el('div', { class: 'logo' },
-        el('h1', { html: 'CRAZY<span>SPACE</span>' }),
-        el('p', { class: 'tag' }, 'Zero-gravity arena combat')),
-      el('div', { class: 'menu-btns' },
-        el('button', { class: 'btn primary', onclick: () => this.show('mode') }, '▶  PLAY'),
-        el('button', { class: 'btn', onclick: () => this.show('career') }, '📊  Career'),
-        el('button', { class: 'btn', onclick: () => this.show('settings') }, '⚙  Settings'),
-        el('button', { class: 'btn', onclick: () => this.show('help') }, 'How to Play')),
-      el('p', { class: 'foot' }, 'A single-player Subspace-style shooter · play vs AI'),
-    );
+    this.titleCredits = el('span', { class: 'cr-badge' }, '');
+    this.title = screen('title-screen active', {
+      body: [
+        el('div', { class: 'logo' },
+          el('h1', { html: 'CRAZY<span>SPACE</span>' }),
+          el('p', { class: 'tag' }, 'Zero-gravity arena combat')),
+        el('p', { class: 'upg-hint' }, HANGAR_HINT),
+      ],
+      foot: [
+        el('div', { class: 'menu-btns' },
+          el('button', { class: 'btn primary', onclick: () => this.show('mode') }, '▶  PLAY'),
+          el('button', { class: 'btn hangar-btn', onclick: () => this.show('hangar') }, '🛠  Hangar ', this.titleCredits)),
+        el('div', { class: 'nav-row' },
+          el('button', { class: 'btn small', onclick: () => this.show('career') }, '📊 Career'),
+          el('button', { class: 'btn small', onclick: () => this.show('settings') }, '⚙ Settings'),
+          el('button', { class: 'btn small', onclick: () => this.show('help') }, '? Help')),
+        el('p', { class: 'foot' }, 'A single-player Subspace-style shooter · play vs AI'),
+      ],
+    });
 
     // ---------------- help ----------------
-    this.help = el('div', { class: 'screen' },
-      el('div', { class: 'panel' },
-        el('h2', {}, 'How to Play'),
+    this.help = screen('', {
+      head: topbar('How to Play', () => this.show('title')),
+      body: [el('div', { class: 'panel' },
         el('div', { class: 'help-grid', html: `
           <div><b>Move</b><span>Left thumb — drag to steer & thrust. Keyboard: <kbd>W/A/S/D</kbd> or arrows.</span></div>
           <div><b>Fire</b><span>Right buttons or <kbd>Space</kbd>. Hold to keep firing.</span></div>
@@ -71,10 +100,10 @@ export class Menu {
           <div><b>Energy</b><span>Your bar is health <i>and</i> ammo. It recharges — don't bottom out.</span></div>
           <div><b>Greens</b><span>Fly over green prizes to upgrade guns, bombs, speed & more.</span></div>
           <div><b>Scores</b><span>Hold <kbd>Tab</kbd> (or 🏆) for the scoreboard. <kbd>P</kbd> to pause.</span></div>
-        ` }),
-        el('button', { class: 'btn primary', onclick: () => this.show('title') }, 'Got it'),
-      ),
-    );
+          <div><b>Hangar</b><span>Finished matches pay credits. Spend them in the Hangar on permanent upgrades (hull, guns, aim assist…). They stack, so the game gets easier the more you play.</span></div>
+        ` }))],
+      foot: [el('button', { class: 'btn primary wide', onclick: () => this.show('title') }, 'Got it')],
+    });
 
     // ---------------- mode select ----------------
     const modeGrid = el('div', { class: 'cards' });
@@ -88,12 +117,10 @@ export class Menu {
         el('div', { class: 'card-sub' }, m.blurb),
       ));
     }
-    this.mode = el('div', { class: 'screen' },
-      el('div', { class: 'topbar' },
-        el('button', { class: 'icon-btn', onclick: () => this.show('title') }, '‹'),
-        el('h2', {}, 'Select Mode'), el('span', {})),
-      modeGrid,
-    );
+    this.mode = screen('', {
+      head: topbar('Select Mode', () => this.show('title')),
+      body: [modeGrid],
+    });
 
     // ---------------- ship select ----------------
     this.shipGrid = el('div', { class: 'cards ships' });
@@ -103,14 +130,17 @@ export class Menu {
       const b = el('button', { class: 'seg' + (d === this.selDiff ? ' on' : ''), onclick: () => this._pickDiff(d) }, d.label);
       diffWrap.append(b); return b;
     });
-    this.ship = el('div', { class: 'screen' },
-      el('div', { class: 'topbar' },
-        el('button', { class: 'icon-btn', onclick: () => this.show('mode') }, '‹'),
-        el('h2', {}, 'Select Ship'), el('span', {})),
-      this.shipGrid,
-      el('div', { class: 'diff-row' }, el('label', {}, 'AI Difficulty'), diffWrap),
-      el('button', { class: 'btn primary launch', onclick: () => this._launch() }, '🚀  LAUNCH'),
-    );
+    this.shipUpgLine = el('p', { class: 'upg-line' }, '');
+    this.ship = screen('', {
+      head: topbar('Select Ship', () => this.show('mode'),
+        el('button', { class: 'icon-btn', 'aria-label': 'Hangar', onclick: () => this.show('hangar') }, '🛠')),
+      body: [this.shipGrid],
+      foot: [
+        el('div', { class: 'diff-row' }, el('label', {}, 'AI Difficulty'), diffWrap),
+        this.shipUpgLine,
+        el('button', { class: 'btn primary wide', onclick: () => this._launch() }, '🚀  LAUNCH'),
+      ],
+    });
 
     // ---------------- settings ----------------
     this.nameInput = el('input', {
@@ -135,11 +165,9 @@ export class Menu {
       handWrap.append(b); return b;
     });
 
-    this.settingsScreen = el('div', { class: 'screen settings-screen' },
-      el('div', { class: 'topbar' },
-        el('button', { class: 'icon-btn', onclick: () => this.show('title') }, '‹'),
-        el('h2', {}, 'Settings'), el('span', {})),
-      el('div', { class: 'panel' },
+    this.settingsScreen = screen('settings-screen', {
+      head: topbar('Settings', () => this.show('title')),
+      body: [el('div', { class: 'panel' },
         el('div', { class: 'setting' },
           el('label', {}, 'Pilot name'),
           this.nameInput),
@@ -150,17 +178,29 @@ export class Menu {
           el('label', {}, 'Steering thumb'),
           handWrap),
         el('p', { class: 'hint' }, 'Steering joystick goes on this side; fire buttons on the other. Settings and career stats are saved on this device — sign in from the avatar to carry them between devices.'),
-      ),
-    );
+      )],
+    });
 
     // ---------------- career ----------------
     this.careerBody = el('div', { class: 'panel' });
-    this.career = el('div', { class: 'screen career-screen' },
-      el('div', { class: 'topbar' },
-        el('button', { class: 'icon-btn', onclick: () => this.show('title') }, '‹'),
-        el('h2', {}, 'Career'), el('span', {})),
-      this.careerBody,
-    );
+    this.career = screen('career-screen', {
+      head: topbar('Career', () => this.show('title')),
+      body: [this.careerBody],
+    });
+
+    // ---------------- hangar ----------------
+    this.hangarCredits = el('div', { class: 'cr-head' }, '');
+    this.hangarList = el('div', { class: 'upg-list' });
+    this.hangarFoot = el('div', { class: 'menu-btns row' });
+    this.hangar = screen('hangar-screen', {
+      head: topbar('Hangar', () => this._hangarBack()),
+      body: [
+        this.hangarCredits,
+        el('p', { class: 'upg-hint' }, 'Permanent upgrades for every ship, and bots never get them. They stack, so the longer you play the easier it gets.'),
+        this.hangarList,
+      ],
+      foot: [this.hangarFoot],
+    });
 
     // ---------------- pause ----------------
     this.pause = el('div', { class: 'screen overlay' },
@@ -174,8 +214,12 @@ export class Menu {
     );
 
     // ---------------- results ----------------
+    this.resultsHead = el('div', { class: 'res-head' });
     this.resultsBody = el('div', { class: 'panel wide' });
-    this.results = el('div', { class: 'screen overlay' }, this.resultsBody);
+    this.resultsFoot = el('div', { class: 'res-foot' });
+    this.results = screen('overlay results-screen', {
+      head: this.resultsHead, body: [this.resultsBody], foot: [this.resultsFoot],
+    });
 
     // ---------------- in-game small buttons ----------------
     this.gameBtns = el('div', { class: 'game-btns' },
@@ -185,12 +229,72 @@ export class Menu {
     this.gameBtns.style.display = 'none';
 
     this.ui.append(this.title, this.help, this.mode, this.ship, this.settingsScreen,
-      this.career, this.pause, this.results, this.gameBtns);
+      this.career, this.hangar, this.pause, this.results, this.gameBtns);
   }
 
   get _screens() {
     return [this.title, this.help, this.mode, this.ship, this.settingsScreen,
-      this.career, this.pause, this.results];
+      this.career, this.hangar, this.pause, this.results];
+  }
+
+  // ---------------- hangar screen ----------------
+  _renderHangar() {
+    const h = loadHangar();
+    this.hangarCredits.innerHTML = '';
+    this.hangarCredits.append(
+      el('b', {}, '◈ ' + h.credits.toLocaleString()), el('span', {}, 'credits'),
+      el('i', {}, `${upgradeCount(h)} / ${UPGRADES.length * HANGAR_MAX} upgrades`));
+    this.hangarList.innerHTML = '';
+    for (const u of UPGRADES) {
+      const L = h.levels[u.key] || 0;
+      const maxed = L >= HANGAR_MAX;
+      const cost = maxed ? 0 : upgradeCost(u.key, L + 1);
+      const can = !maxed && h.credits >= cost;
+      const pips = el('div', { class: 'pips' });
+      for (let i = 1; i <= HANGAR_MAX; i++) pips.append(el('i', { class: i <= L ? 'on' : '' }));
+      this.hangarList.append(el('div', { class: 'upg' + (maxed ? ' maxed' : '') },
+        el('div', { class: 'upg-ic' }, u.icon),
+        el('div', { class: 'upg-main' },
+          el('div', { class: 'upg-name' }, u.name, el('span', {}, ` L${L}/${HANGAR_MAX}`)),
+          pips,
+          el('div', { class: 'upg-eff' }, 'Now: ', el('b', {}, u.fmt(u.eff[L]))),
+          maxed ? el('div', { class: 'upg-eff max' }, 'Maxed out')
+            : el('div', { class: 'upg-eff next' }, 'Next: ', el('b', {}, u.fmt(u.eff[L + 1]))),
+          el('div', { class: 'upg-blurb' }, u.blurb)),
+        el('button', {
+          class: 'btn buy' + (can ? ' primary' : ''), ...(can ? {} : { disabled: '' }),
+          onclick: () => { if (buyUpgrade(u.key)) { this._renderHangar(); this._refreshCredits(); } },
+        }, maxed ? 'MAX' : '◈ ' + cost),
+      ));
+    }
+    this.hangarFoot.innerHTML = '';
+    if (this.onHangarRematch) {
+      this.hangarFoot.append(
+        el('button', { class: 'btn primary', onclick: () => { const f = this.onHangarRematch; this.onHangarRematch = null; this.hideAll(); f(); } }, '↻ Rematch'),
+        el('button', { class: 'btn', onclick: () => this._hangarBack() }, 'Main Menu'));
+    } else {
+      this.hangarFoot.append(
+        el('button', { class: 'btn', onclick: () => this._hangarBack() }, '‹ Back'),
+        el('button', { class: 'btn primary', onclick: () => this.show('mode') }, '▶ Play'));
+    }
+  }
+
+  _hangarBack() { this.onHangarRematch = null; this.show(this._hangarFrom || 'title'); }
+
+  /** Open the Hangar after a match; `rematch` restarts with the new upgrades. */
+  showHangarAfterMatch(rematch) {
+    this.onHangarRematch = rematch;
+    this._hangarFrom = 'title';
+    this.show('hangar');
+  }
+
+  _refreshCredits() {
+    const h = loadHangar();
+    this.titleCredits.textContent = '◈ ' + h.credits;
+    const n = upgradeCount(h);
+    this.shipUpgLine.textContent = n
+      ? `Hangar: ${n}/${UPGRADES.length * HANGAR_MAX} upgrades active · ◈ ${h.credits} to spend`
+      : `No upgrades yet · finish matches to earn credits for the Hangar`;
   }
 
   // ---------------- settings commits ----------------
@@ -332,12 +436,19 @@ export class Menu {
   }
 
   show(name) {
+    if (name === 'hangar' && !this.onHangarRematch) {
+      const cur = ['title', 'ship', 'mode'].find(k => this[k === 'title' ? 'title' : k].classList.contains('active'));
+      this._hangarFrom = cur || 'title';
+    }
     this.hideAll();
+    this._refreshCredits();
     if (name === 'career') this._renderCareer();
-    ({
+    if (name === 'hangar') this._renderHangar();
+    const s = ({
       title: this.title, help: this.help, mode: this.mode, ship: this.ship,
-      settings: this.settingsScreen, career: this.career,
-    }[name])?.classList.add('active');
+      settings: this.settingsScreen, career: this.career, hangar: this.hangar,
+    }[name]);
+    if (s) { s.classList.add('active'); const b = s.querySelector('.sbody'); if (b) b.scrollTop = 0; }
   }
 
   hideAll() {
@@ -369,17 +480,28 @@ export class Menu {
     const c = this.getCareer();
     const t = (c && c.total) || null;
 
-    this.resultsBody.append(
+    this.resultsHead.innerHTML = '';
+    this.resultsHead.append(
       el('h2', { class: 'win' }, data.winner),
-      el('p', { class: 'mode-name' }, data.modeName),
+      el('p', { class: 'mode-name' }, data.modeName));
+    this.resultsBody.append(
       table,
       t ? el('p', { class: 'career-line' },
         `Career · ${t.matches || 0} matches · ${t.wins || 0} won · ${t.kills || 0} kills · best streak ${t.bestStreak || 0}`) : null,
+    );
+    const h = loadHangar();
+    this.resultsFoot.innerHTML = '';
+    this.resultsFoot.append(
+      el('div', { class: 'earn' },
+        el('b', {}, `+${data.credits || 0} credits`),
+        el('span', {}, ` · ◈ ${h.credits} to spend. Upgrades make every match easier.`)),
       el('div', { class: 'menu-btns row' },
-        el('button', { class: 'btn primary', onclick: () => cb('rematch') }, '↻ Rematch'),
-        el('button', { class: 'btn', onclick: () => cb('menu') }, 'Main Menu')),
+        el('button', { class: 'btn primary', onclick: () => cb('hangar') }, '🛠 Upgrade'),
+        el('button', { class: 'btn', onclick: () => cb('rematch') }, '↻ Rematch'),
+        el('button', { class: 'btn', onclick: () => cb('menu') }, 'Menu')),
     );
     this.results.classList.add('active');
+    const b = this.results.querySelector('.sbody'); if (b) b.scrollTop = 0;
   }
   hideResults() { this.results.classList.remove('active'); }
 }

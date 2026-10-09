@@ -7,10 +7,13 @@ import { Menu } from './menu.js';
 import { Game } from './game.js';
 import { Starfield } from './starfield.js';
 import { loadCareer, loadSettings, saveSettings, recordMatch, resetCareer } from './save.js';
+import { loadHangar, setHangar, hangarEffects, creditsFor, awardCredits, diffKeyFor } from './hangar.js';
 
 const QS = new URLSearchParams(location.search);
 // `?test` keeps automated / soak runs hermetic: no account layer, no avatar.
 const TEST = QS.has('test') || QS.has('soak');
+// `?noupg` flies with no Hangar upgrades (levels stay saved) — for comparison runs.
+const NO_UPG = QS.has('noupg');
 
 const canvas = document.getElementById('game');
 const ctx = canvas.getContext('2d', { alpha: false });
@@ -89,10 +92,12 @@ window.addEventListener('resize', resize);
 window.addEventListener('orientationchange', () => setTimeout(resize, 120));
 
 // ---- audio unlock on first gesture ----
+// Android Chrome does NOT count a touch pointerdown/touchstart as user
+// activation (only pointerup/touchend/click/keydown). Kept for the page
+// lifetime: browsers re-suspend after app switches and only a gesture resumes.
 function unlock() { audio.init(); audio.resume(); }
-window.addEventListener('pointerdown', () => audio.resume(), { passive: true });
-window.addEventListener('pointerdown', unlock, { once: true });
-window.addEventListener('keydown', unlock, { once: true });
+for (const ev of ['pointerup', 'touchend', 'click', 'keydown'])
+  window.addEventListener(ev, unlock, { passive: true, capture: true });
 
 // ---- menu wiring ----
 const menu = new Menu(uiRoot, {
@@ -115,7 +120,8 @@ menu.bindInGame((a) => {
 
 function startGame(mode, ship, diff) {
   lastParams = { mode, ship, diff };
-  game = new Game({ input, audio, modeKey: mode, shipKey: ship, difficulty: diff, playerName: settings.name });
+  const upgrades = NO_UPG ? null : hangarEffects(loadHangar().levels);
+  game = new Game({ input, audio, modeKey: mode, shipKey: ship, difficulty: diff, playerName: settings.name, upgrades });
   game.setViewport(W, H);
   game.onEnd = () => { if (!app.resultsShown) setTimeout(showResults, 1400); };
   app.scene = 'game'; app.paused = false; app.resultsShown = false;
@@ -130,16 +136,24 @@ function showResults() {
 
   // The one place the career is written, and the one place matchCompleted()
   // fires: a FINISHED match, on the results screen. Never mid-match.
-  try { recordMatch(game.matchSummary()); } catch (e) { console.warn('career save failed', e); }
+  let credits = 0;
+  try {
+    const summary = game.matchSummary();
+    recordMatch(summary);
+    credits = awardCredits(creditsFor(summary, diffKeyFor(lastParams.diff)));
+  } catch (e) { console.warn('career save failed', e); }
   if (cloudMod) cloudMod.matchFinished();
 
   menu.showInGameButtons(false);
   menu.showResults(
-    { winner: game.winnerText || 'Match Over', modeName: game.mode.name, rows: game.scoreboard() },
+    { winner: game.winnerText || 'Match Over', modeName: game.mode.name, rows: game.scoreboard(), credits },
     (a) => {
       menu.hideResults();
       if (a === 'rematch') startGame(lastParams.mode, lastParams.ship, lastParams.diff);
-      else quitToMenu();
+      else if (a === 'hangar') {
+        quitToMenu();
+        menu.showHangarAfterMatch(() => startGame(lastParams.mode, lastParams.ship, lastParams.diff));
+      } else quitToMenu();
     });
 }
 
@@ -175,6 +189,10 @@ window.__crazyspace = {
   get cloudLoaded() { return !!cloudMod; },
   settings,
   career: loadCareer,
+  hangar: loadHangar,
+  // e.g. setHangar({ levels: { hull: 8, aim: 4 }, credits: 500 }) — clamped like a synced save
+  setHangar: (patch) => { const h = setHangar(patch); menu._refreshCredits(); return h; },
+  audio,
   startGame,
   showResults,
   endMatch: (text = 'Test Over') => { if (game) game.endMatch(text); },

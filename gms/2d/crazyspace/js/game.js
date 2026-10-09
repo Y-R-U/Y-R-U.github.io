@@ -18,12 +18,13 @@ function ffaColor(h) {
 }
 
 export class Game {
-  constructor({ input, audio, modeKey, shipKey, difficulty = 0.6, playerName = 'You' }) {
+  constructor({ input, audio, modeKey, shipKey, difficulty = 0.6, playerName = 'You', upgrades = null }) {
     this.input = input;
     this.audio = audio;
     this.modeKey = modeKey;
     this.shipKey = shipKey;
     this.difficulty = difficulty;
+    this.upgrades = upgrades;   // hangarEffects() for the player only; null = none
     this.playerName = String(playerName || 'You').slice(0, 14) || 'You';
 
     this.world = generateMap(modeKey);
@@ -66,7 +67,7 @@ export class Game {
 
     // player
     const playerColor = this.mode.ffa ? TEAMS[0] : TEAMS[0];
-    const player = new Ship(SHIPS[this.shipKey], 0, { isPlayer: true, name: this.playerName, color: playerColor });
+    const player = new Ship(SHIPS[this.shipKey], 0, { isPlayer: true, name: this.playerName, color: playerColor, upg: this.upgrades });
     this.player = player;
     this._addShip(player, 0);
 

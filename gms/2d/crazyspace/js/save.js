@@ -73,7 +73,7 @@ export function settingsDefaults() {
     handed: 'left',    // 'left' = steering thumb on the left (default)
     lastMode: 'deathmatch',
     lastShip: 'warbird',
-    lastDiff: 'veteran',
+    lastDiff: 'rookie',  // new players start on Rookie; a saved choice wins via mergeForward
   };
 }
 
