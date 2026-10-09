@@ -221,6 +221,10 @@ export class Ship {
     this.spriteShape = def.shape;
     // Hangar effects (hangar.js hangarEffects) — the human player only, never bots.
     this.upg = opts.upg || null;
+    // difficulty scaling — bots only ({ hull, fire }); the player never gets one
+    this.scale = (!opts.isPlayer && opts.scale) || null;
+    this.hullK = this.scale ? this.scale.hull : 1;
+    this.fireK = this.scale ? this.scale.fire : 1;
 
     this.x = 0; this.y = 0; this.vx = 0; this.vy = 0; this.angle = -Math.PI / 2;
     this.cmd = { turn: 0, thrust: 0, aimAngle: null, aimMag: 0, fireGun: false, fireBomb: false, fireSpecial: false };
@@ -256,11 +260,11 @@ export class Ship {
   }
 
   _u(k) { return (this.upg && this.upg[k]) || 0; }
-  maxEff() { return this.def.maxEnergy * (1 + this._u('hull')) + this.energyBonus; }
+  maxEff() { return this.def.maxEnergy * this.hullK * (1 + this._u('hull')) + this.energyBonus; }
   get thrustForce() { return this.def.thrust * (1 + this._u('engines') * 1.5) + this.thrustBonus; }
   get topSpeed() { return this.def.top * (1 + this._u('engines')) + this.speedBonus; }
   get turnSpeed() { return this.def.turn + this.rotationBonus; }
-  get rechargeRate() { return this.def.recharge * (1 + this._u('reactor')) + this.rechargeBonus; }
+  get rechargeRate() { return this.def.recharge * this.hullK * (1 + this._u('reactor')) + this.rechargeBonus; }
 
   spawn(x, y, angle = -Math.PI / 2) {
     this.x = x; this.y = y; this.vx = 0; this.vy = 0; this.angle = angle;
@@ -333,7 +337,7 @@ export class Ship {
     this.energy -= cost;
     this.gunCd = 1 / this.def.fireRate;
     const lvl = this.guns;
-    const dmg = this.def.gunDmg * BULLET.levelDmg[lvl] * (1 + this._u('guns'));
+    const dmg = this.def.gunDmg * BULLET.levelDmg[lvl] * (1 + this._u('guns')) * this.fireK;
     const radius = BULLET.levelRadius[lvl];
     const spd = BULLET.speed;
     const d = this.noseDir();
@@ -365,13 +369,13 @@ export class Ship {
     const px = this.x + d.x * (this.radius + 6), py = this.y + d.y * (this.radius + 6);
     if (speed < 45) {
       // lay a mine when nearly stationary
-      game.mines.push(new Mine(px, py, { dmg: this.def.bombDmg * BOMB.levelDmg[lvl] * 1.3 * (1 + this._u('bombs')), team: this.team, owner: this.id }));
+      game.mines.push(new Mine(px, py, { dmg: this.def.bombDmg * BOMB.levelDmg[lvl] * 1.3 * (1 + this._u('bombs')) * this.fireK, team: this.team, owner: this.id }));
       game.audio && game.audio.mine();
       return;
     }
     const vx = this.vx + d.x * BOMB.speed, vy = this.vy + d.y * BOMB.speed;
     game.bombs.push(new Bomb(px, py, vx, vy, {
-      radius: BOMB.radius, dmg: this.def.bombDmg * BOMB.levelDmg[lvl] * (1 + this._u('bombs')),
+      radius: BOMB.radius, dmg: this.def.bombDmg * BOMB.levelDmg[lvl] * (1 + this._u('bombs')) * this.fireK,
       blast: BOMB.blast[lvl], team: this.team, owner: this.id, life: BOMB.life,
     }));
     game.audio && game.audio.bomb();
@@ -411,7 +415,7 @@ export class Ship {
       for (let i = 0; i < BURST.count; i++) {
         const a = (i / BURST.count) * TAU;
         game.bullets.push(new Bullet(this.x, this.y, this.vx + Math.cos(a) * BURST.speed, this.vy + Math.sin(a) * BURST.speed, {
-          radius: BURST.radius, dmg: BURST.dmg, team: this.team, owner: this.id,
+          radius: BURST.radius, dmg: BURST.dmg * this.fireK, team: this.team, owner: this.id,
           life: BURST.life, bounces: 0, color: '#ffffff',
         }));
       }

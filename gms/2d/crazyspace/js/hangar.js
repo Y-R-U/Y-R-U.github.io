@@ -75,9 +75,7 @@ export function buyUpgrade(key) {
   return true;
 }
 
-export function diffKeyFor(skill) {
-  return skill < 0.5 ? 'rookie' : skill < 0.75 ? 'veteran' : 'ace';
-}
+export { diffKeyFor } from './config.js';
 
 /** Credits for one FINISHED match summary (see Game.matchSummary). */
 export function creditsFor(summary, diffKey = 'veteran') {

@@ -3,7 +3,7 @@
 // Layout rule (Aaron): every screen is header / scrolling body / footer. Primary
 // actions and navigation live in the header or footer, which never scroll away.
 
-import { MODES, MODE_LIST, SHIPS, SHIP_LIST, TEAMS, UPGRADES, HANGAR_MAX } from './config.js';
+import { MODES, MODE_LIST, SHIPS, SHIP_LIST, TEAMS, UPGRADES, HANGAR_MAX, DIFFICULTY } from './config.js';
 import { fmtDuration, kdRatio } from './save.js';
 import { loadHangar, buyUpgrade, upgradeCost, upgradeCount } from './hangar.js';
 
@@ -42,11 +42,15 @@ export const HANGAR_HINT = 'Every match earns credits. Hangar upgrades stack, so
 const SMAX = { top: 440, turn: 5.6, energy: 2200, power: 2000 };
 function shipPower(d) { return d.gunDmg * d.fireRate; }
 
-const DIFFS = [
-  { key: 'rookie', label: 'Rookie', skill: 0.4 },
-  { key: 'veteran', label: 'Veteran', skill: 0.62 },
-  { key: 'ace', label: 'Ace', skill: 0.85 },
-];
+const DIFFS = Object.entries(DIFFICULTY).map(([key, d]) => ({ key, ...d }));
+function diffText(d) {
+  const pct = k => Math.round((d[k] - 1) * 100);
+  const buff = d.hull === 1 && d.fire === 1 ? 'normal enemies'
+    : pct('hull') === pct('fire') ? `enemies +${pct('hull')}% hull & firepower`
+    : `enemies +${pct('hull')}% hull, +${pct('fire')}% firepower`;
+  const aim = d.skill < 0.5 ? 'sloppy aim' : d.skill < 0.75 ? 'sharp aim' : 'deadly aim';
+  return `${d.label}: ${buff}, ${aim}`;
+}
 
 export class Menu {
   constructor(root, opts = {}) {
@@ -137,6 +141,7 @@ export class Menu {
       body: [this.shipGrid],
       foot: [
         el('div', { class: 'diff-row' }, el('label', {}, 'AI Difficulty'), diffWrap),
+        this.diffLine = el('p', { class: 'diff-line' }, diffText(this.selDiff)),
         this.shipUpgLine,
         el('button', { class: 'btn primary wide', onclick: () => this._launch() }, '🚀  LAUNCH'),
       ],
@@ -428,6 +433,7 @@ export class Menu {
   _pickDiff(d) {
     this.selDiff = d;
     this.diffBtns.forEach((b, i) => b.classList.toggle('on', DIFFS[i] === d));
+    this.diffLine.textContent = diffText(d);
   }
   _launch() {
     this.onSettings({ lastMode: this.selMode, lastShip: this.selShip, lastDiff: this.selDiff.key });

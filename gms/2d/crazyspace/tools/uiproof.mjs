@@ -164,6 +164,21 @@ for (const [W, H] of [[390, 844], [375, 667]]) {
   await ev(`__crazyspace.quitToMenu()`);
 }
 
+// difficulty: picker explains the buff, and it lands on bots only
+await send('Page.navigate', { url: URL }); await wait(1200);
+await ev(`__crazyspace.menu.show('ship')`); await wait(100);
+await tapSel('.seg', 'Veteran');
+check((await ev(`document.querySelector('.diff-line').textContent`)).includes('+25% hull & firepower'), `Veteran picker line names the +25% buff`);
+await layout('ship veteran');
+await ev(`__crazyspace.setHangar({ levels: { hull: 5, reactor: 5, engines: 5, guns: 6, bombs: 7, headstart: 5, shield: 5, aim: 5 }, credits: 1234 })`);
+await ev(`__crazyspace.menu.show('hangar')`); await wait(100); await layout('hangar late levels'); await shot('hangar-late');
+for (const [skill, k] of [[0.4, 1], [0.62, 1.25], [0.85, 1.5]]) {
+  const r = await ev(`(() => { __crazyspace.startGame('team', 'warbird', ${skill}); const g = __crazyspace.game; const bots = g.ships.filter(s => !s.isPlayer);
+    return { player: [g.player.hullK, g.player.fireK], bots: bots.every(b => b.hullK === ${k} && b.fireK === ${k} && Math.abs(b.maxEff() - b.def.maxEnergy * ${k}) < 1e-6) }; })()`);
+  check(r.player[0] === 1 && r.player[1] === 1 && r.bots, `skill ${skill}: bots x${k} hull/fire, player x1 ${JSON.stringify(r)}`);
+  await ev(`__crazyspace.quitToMenu()`);
+}
+
 // ?noupg flies without upgrades even when they are bought
 await send('Page.navigate', { url: URL + '&noupg' }); await wait(1200);
 await ev(`__crazyspace.setHangar({ levels: { hull: 8 } }); __crazyspace.startGame('deathmatch', 'warbird', 0.4)`);

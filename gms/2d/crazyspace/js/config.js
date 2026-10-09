@@ -141,6 +141,19 @@ export const MODES = {
 };
 export const MODE_LIST = Object.keys(MODES);
 
+// --- Difficulty presets: bot aim skill plus bot-only stat scaling ---
+// hull scales max energy AND recharge (energy is health + ammo, so a bigger
+// tank refills in the same time and ammo is never throttled); fire scales
+// bullet, bomb, mine and burst damage. The player is never scaled.
+export const DIFFICULTY = {
+  rookie:  { label: 'Rookie',  skill: 0.4,  hull: 1.0,  fire: 1.0 },
+  veteran: { label: 'Veteran', skill: 0.62, hull: 1.25, fire: 1.25 },
+  ace:     { label: 'Ace',     skill: 0.85, hull: 1.5,  fire: 1.5 },
+};
+export function diffKeyFor(skill) {
+  return skill < 0.5 ? 'rookie' : skill < 0.75 ? 'veteran' : 'ace';
+}
+
 export const RESPAWN_DELAY = 2.2;
 export const PRIZE_MAX = 26;     // greens alive at once
 export const PRIZE_SPAWN = 1.1;  // seconds between green spawns
@@ -168,7 +181,7 @@ export const UPGRADES = [
     eff: [0, 1, 2, 3, 4, 5, 6, 7, 8], fmt: v => aimText(v) },
 ];
 // rising cost per level: cost[L] = price of buying level L
-export const UPGRADE_COST = [0, 20, 30, 40, 50, 65, 80, 100, 120];
+export const UPGRADE_COST = [0, 20, 30, 40, 50, 65, 1300, 2600, 5200];
 export const UPGRADE_COST_MULT = { aim: 1.2, headstart: 1.1 };
 
 // Head Start level → what each life spawns with (respecting the ship's caps).
@@ -225,5 +238,5 @@ export const CREDITS = {
   perCap: 20,
   perReturn: 5,
   perHoldSec: 0.35,   // KOTH seconds your team held the hill
-  diffMult: { rookie: 0.8, veteran: 1.0, ace: 1.3 },
+  diffMult: { rookie: 0.8, veteran: 1.0, ace: 1.5 },
 };

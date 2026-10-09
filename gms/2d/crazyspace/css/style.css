@@ -285,3 +285,5 @@ h3.sec { margin: 18px 0 8px; font-size: 12px; letter-spacing: 2px; text-transfor
 
 /* pause card sits straight in its overlay (no header/footer needed) */
 .screen > .panel.narrow { margin: auto; width: calc(100% - 36px); }
+
+.diff-line { color: #ffb38a; font-size: 12px; text-align: center; margin: 0 0 4px; }

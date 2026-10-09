@@ -1,7 +1,7 @@
 // game.js — world simulation, collisions, camera, render orchestration.
 
 import {
-  SHIPS, TEAMS, TILE, PALETTE, PRIZE_MAX, PRIZE_SPAWN, PRIZES, REPEL,
+  SHIPS, TEAMS, TILE, PALETTE, PRIZE_MAX, PRIZE_SPAWN, PRIZES, REPEL, DIFFICULTY, diffKeyFor,
 } from './config.js';
 import {
   clamp, rand, randInt, pick, weighted, NAMES, TAU, dist, lerp, fmtTime,
@@ -18,13 +18,16 @@ function ffaColor(h) {
 }
 
 export class Game {
-  constructor({ input, audio, modeKey, shipKey, difficulty = 0.6, playerName = 'You', upgrades = null }) {
+  constructor({ input, audio, modeKey, shipKey, difficulty = 0.6, playerName = 'You', upgrades = null, botScale }) {
     this.input = input;
     this.audio = audio;
     this.modeKey = modeKey;
     this.shipKey = shipKey;
     this.difficulty = difficulty;
     this.upgrades = upgrades;   // hangarEffects() for the player only; null = none
+    // bots only: { hull, fire } from the difficulty preset (null = unscaled)
+    const D = DIFFICULTY[diffKeyFor(difficulty)];
+    this.botScale = botScale !== undefined ? botScale : { hull: D.hull, fire: D.fire };
     this.playerName = String(playerName || 'You').slice(0, 14) || 'You';
 
     this.world = generateMap(modeKey);
@@ -87,7 +90,7 @@ export class Game {
         color = TEAMS[team];
       }
       const def = SHIPS[pick(shipKeys)];
-      const bot = new Ship(def, team, { isBot: true, name: names[i % names.length], color });
+      const bot = new Ship(def, team, { isBot: true, name: names[i % names.length], color, scale: this.botScale });
       bot.ai = new Bot(bot, this.difficulty);
       this._addShip(bot, team);
     }

@@ -10,6 +10,8 @@
 //   node tools/upgradegate.mjs --falsify       # max levels bought but upgrades force-disabled
 //   node tools/upgradegate.mjs --career        # play from zero credits, buy greedily, count matches to max
 //   node tools/upgradegate.mjs --gate          # exit 1 unless the targets hold
+//   --nobuff                                   # bots without difficulty hull/firepower scaling (pre-2026-10-10 game)
+//   --career --diff ace                        # career on another difficulty
 
 const argv = process.argv.slice(2);
 const flag = n => argv.includes('--' + n);
@@ -64,6 +66,7 @@ const DT = 1 / 60;
 
 function levelsAt(n) { const l = {}; for (const u of UPGRADES) l[u.key] = n; return l; }
 
+const NOBUFF = flag('nobuff');
 function playMatch({ mode, ship = 'warbird', diff = 'veteran', levels = null, seed = 1, forceOff = false }) {
   Math.random = mulberry32(seed * 7919 + 13);
   let pilot = null;
@@ -77,7 +80,7 @@ function playMatch({ mode, ship = 'warbird', diff = 'veteran', levels = null, se
     consumePressed(k) { return k === 'special' ? !!this._special : false; },
   };
   const upgrades = forceOff || !levels ? null : H.hangarEffects(levels);
-  const game = new Game({ input, audio: null, modeKey: mode, shipKey: ship, difficulty: DIFF[diff], playerName: 'Pilot', upgrades });
+  const game = new Game({ input, audio: null, modeKey: mode, shipKey: ship, difficulty: DIFF[diff], playerName: 'Pilot', upgrades, ...(NOBUFF ? { botScale: null } : {}) });
   pilot = HUMAN ? new HumanPilot(game.player, PILOT_SKILL) : new Bot(game.player, PILOT_SKILL);
   pilot.skill = PILOT_SKILL;   // no random jitter for the stand-in human
   let guard = 0;
@@ -131,17 +134,20 @@ if (flag('ablate')) {
   for (const u of UPGRADES) { const l = levelsAt(0); l[u.key] = L; rows.push(cell(`${u.key} L${L}`, { mode: modes[0], levels: l }, seeds)); }
   print(rows);
 } else if (flag('career')) {
-  // Play from zero, alternating modes on Veteran; after each match buy the
-  // cheapest affordable level (spreads upgrades evenly, like a real player).
-  const runs = Number(opt('runs', 3));
+  // Play from zero, rotating modes and ships; after each match buy the cheapest
+  // affordable level (spreads upgrades evenly, like a real player). Records the
+  // first match at which every upgrade is at L4 (half), L6 and L8 (max).
+  const runs = Number(opt('runs', 3)), cap = Number(opt('cap', 800));
+  const diff = opt('diff', 'veteran');
+  const marks = [4, 6, 8];
   const results = [];
   for (let r = 0; r < runs; r++) {
-    const levels = levelsAt(0); let credits = 0, m = 0;
-    const allMax = () => UPGRADES.every(u => levels[u.key] >= HANGAR_MAX);
+    const levels = levelsAt(0); let credits = 0, m = 0, mins = 0;
+    const hit = {};
     const careerModes = ['deathmatch', 'team', 'ctf', 'koth'];
-    while (!allMax() && m < 200) {
-      const res = playMatch({ mode: careerModes[m % 4], diff: opt('diff', 'veteran'), ship: SHIP_LIST[m % SHIP_LIST.length], levels, seed: 5000 + r * 1000 + m });
-      credits += res.credits; m++;
+    while (!hit[8] && m < cap) {
+      const res = playMatch({ mode: careerModes[m % 4], diff, ship: SHIP_LIST[m % SHIP_LIST.length], levels, seed: 5000 + r * 1000 + m });
+      credits += res.credits; m++; mins += res.secs / 60;
       for (;;) {
         let best = null;
         for (const u of UPGRADES) {
@@ -152,12 +158,13 @@ if (flag('ablate')) {
         if (!best) break;
         credits -= best.c; levels[best.k]++;
       }
-      if (m % 5 === 0) console.log(`  run ${r + 1}: after ${m} matches, upgrade levels total ${Object.values(levels).reduce((a, b) => a + b, 0)}/${UPGRADES.length * HANGAR_MAX}`);
+      for (const L of marks) if (!hit[L] && UPGRADES.every(u => levels[u.key] >= L)) hit[L] = { m, h: mins / 60 };
     }
-    results.push(m);
-    console.log(`career run ${r + 1}: fully upgraded after ${m} matches`);
+    results.push(hit);
+    console.log(`career run ${r + 1} (${diff}): ` + marks.map(L => hit[L] ? `all L${L} after ${hit[L].m} matches / ${hit[L].h.toFixed(1)} h` : `L${L} not reached in ${m}`).join(' · '));
   }
-  console.log(`total cost to max: ${H.totalCostToMax()} credits; matches to max: ${results.join(', ')} (mean ${(results.reduce((a, b) => a + b, 0) / results.length).toFixed(1)})`);
+  const mean = (L, k) => { const v = results.filter(h => h[L]).map(h => h[L][k]); return v.length ? v.reduce((a, b) => a + b, 0) / v.length : NaN; };
+  console.log(`total cost to max: ${H.totalCostToMax()} credits; mean ` + marks.map(L => `L${L}: ${mean(L, 'm').toFixed(0)} matches / ${mean(L, 'h').toFixed(1)} h`).join(' · '));
 } else {
   const rows = [];
   for (const mode of modes) {
@@ -166,14 +173,9 @@ if (flag('ablate')) {
       rows.push(cell(`${mode} vet max FORCED OFF`, { mode, levels: levelsAt(HANGAR_MAX), forceOff: true }, seeds));
       rows.push(cell(`${mode} vet max`, { mode, levels: levelsAt(HANGAR_MAX) }, seeds));
     } else {
-      rows.push(cell(`${mode} vet none`, { mode, levels: levelsAt(0) }, seeds));
-      rows.push(cell(`${mode} vet half`, { mode, levels: levelsAt(HANGAR_MAX / 2) }, seeds));
-      rows.push(cell(`${mode} vet max`, { mode, levels: levelsAt(HANGAR_MAX) }, seeds));
-      rows.push(cell(`${mode} ace max`, { mode, diff: 'ace', levels: levelsAt(HANGAR_MAX) }, seeds));
-      if (flag('rookie')) {
-        rows.push(cell(`${mode} rookie none`, { mode, diff: 'rookie', levels: levelsAt(0) }, seeds));
-        rows.push(cell(`${mode} ace none`, { mode, diff: 'ace', levels: levelsAt(0) }, seeds));
-      }
+      for (const [d, tag] of [['rookie', 'rook'], ['veteran', 'vet'], ['ace', 'ace']])
+        for (const [L, lt] of [[0, 'none'], [4, 'half'], [6, 'L6'], [8, 'max']])
+          rows.push(cell(`${mode} ${tag} ${lt}`, { mode, diff: d, levels: levelsAt(L) }, seeds));
     }
   }
   print(rows);
