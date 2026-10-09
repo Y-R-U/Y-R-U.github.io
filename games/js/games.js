@@ -10,7 +10,9 @@
 // same markup works on both origins.
 //
 // Deliberately NOT here yet: Prism Break, Towered and Hotwire want more play
-// testing and tweaking before they headline the hub.
+// testing and tweaking before they headline the hub. Voidcast is untested.
+// SYNTHWILD is a family project for one of Aaron's sons (like the Garfield
+// game) and too close to Minecraft to headline; it stays reachable by URL only.
 
 export const GAMES = [
   {
@@ -95,21 +97,9 @@ export const GAMES = [
     blurb: "Haul cargo through asteroid fields to pay off a ship you cannot afford. Dock, bank the credits, and take the next route out.",
   },
   {
-    id: "synthwild", name: "SYNTHWILD", tag: "Grow your world",
-    path: "/gms/3d/synthwild/", shot: "synthwild", accent: "#4fe3c8",
-    short: "Voxel survival-builder in a synthetic wild.",
-    blurb: "A voxel survival-builder where bark is carbon lattice and leaves are solar film. Gather, fabricate, survive the night's power-droop, or build at any scale from a quarter block to eight.",
-  },
-  {
     id: "heirframe", name: "HEIRFRAME", tag: "A robot family saga",
     path: "/gms/3d/heirframe/", shot: "heirframe", accent: "#e8c45a",
     short: "Robot-frame RPG in a sunlit chrome megacity.",
     blurb: "Start on a rented robot frame in a sunlit chrome megacity, take shady contracts for loot, own three frames that fight differently, and uncover what your family really built.",
-  },
-  {
-    id: "voidcast", name: "Voidcast", tag: "Eat the planet",
-    path: "/gms/3d/voidcast/", shot: "voidcast", accent: "#b489ff", soon: true,
-    short: "A hole that grows by swallowing a world.",
-    blurb: "A hole that grows by swallowing a world — and the bigger you get, the bigger your audience.",
   },
 ];
