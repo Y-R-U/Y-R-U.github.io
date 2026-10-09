@@ -26,9 +26,6 @@ export const GAMES = [
     path: "/gms/2d/silt/", shot: "silt", accent: "#e0a24a",
     short: "Pour sand, span the board, watch it turn to light.",
     blurb: "Drop sand, watch it flow, span the board with one colour and it dissolves into drifting light. Six modes, five biomes, ninety-six chemistry puzzles.",
-    // soon until Aaron has actually played it — this hub is curated and the
-    // three games above were held back for exactly the same reason.
-    soon: true,
   },
   {
     id: "racketeer", name: "Racketeer", tag: "Tennis, but dirty",

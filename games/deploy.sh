@@ -50,6 +50,8 @@ for g in "${GAMES[@]}"; do
   EXTRA=()
   # heirframe keeps ~90 MB of VO sources and refs under tools/ and refs/ that the game never loads
   if [[ "$g" == "gms/3d/heirframe" ]]; then EXTRA=(--exclude=/tools/ --exclude=/refs/ --exclude=/docs/); fi
+  # silt keeps ~110 MB of review screenshots plus dev/tools/docs the game never loads
+  if [[ "$g" == "gms/2d/silt" ]]; then EXTRA=(--exclude=/shots/ --exclude=/dev/ --exclude=/tools/ --exclude=/docs/); fi
   rsync -az --delete --exclude='PLAN.md' --exclude='*.md' ${EXTRA[@]+"${EXTRA[@]}"} \
     "$REPO/$g/" "$HOST:$SITE/$g/"
 done
