@@ -88,8 +88,11 @@ async function boot() {
     unlock: async () => {}, music() {}, sfx() {}, duck() {}, setVolume() {},
   };
   try { AUDIO.setVolume(save.settings.music, save.settings.sfx); } catch (e) {}
-  window.addEventListener('pointerdown', () => { AUDIO.unlock && AUDIO.unlock(); }, { once: true });
-  window.addEventListener('keydown', () => { AUDIO.unlock && AUDIO.unlock(); }, { once: true });
+  // Kept for the page's lifetime, not { once }: after an app switch iOS suspends the
+  // context and only lets it resume inside a gesture. unlock() is a no-op while running.
+  for (const ev of ['pointerdown', 'touchend', 'keydown']) {
+    window.addEventListener(ev, () => { AUDIO.unlock && AUDIO.unlock(); }, { passive: true });
+  }
 
   MODES = await loadOptional('./modes/index.js', null);
 

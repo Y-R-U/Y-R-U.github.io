@@ -98,6 +98,8 @@ export function createAudio(opts = {}) {
       if (!ctx) {
         const AC = window.AudioContext || window.webkitAudioContext;
         if (!hosted && !AC) { dead = true; return false; }
+        // iOS mutes Web Audio under the ringer's silent switch unless the session is "playback" (Safari 16.4+).
+        if (!hosted) { try { if (navigator.audioSession) navigator.audioSession.type = 'playback'; } catch (e) {} }
         ctx = hosted ? opts.context : new AC({ latencyHint: 'interactive' });
         build();
         if (!hosted) {
