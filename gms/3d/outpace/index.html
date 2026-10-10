@@ -8,9 +8,9 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <title>Outpace</title>
-  <link rel="preload" href="assets/cockpit-chroma.png" as="image">
+  <link rel="preload" href="assets/cockpit-alpha.webp" as="image" type="image/webp">
   <link rel="preload" href="assets/station-lounge-alpha.png" as="image">
-  <link rel="stylesheet" href="style.css?v=20260730a">
+  <link rel="stylesheet" href="style.css?v=20261011a">
 </head>
 <body>
   <main id="game" data-state="menu">
@@ -58,6 +58,9 @@
       <span class="reticle-cross x"></span>
       <span class="reticle-cross y"></span>
     </div>
+
+    <div id="near-miss-popup" class="near-miss-popup" aria-hidden="true"></div>
+    <button id="resume-callout" class="resume-callout hidden" type="button">Paused &middot; tap to resume</button>
 
     <button id="fire-button" class="fire-button hidden" type="button" aria-label="Fire pulse cannon">
       <span></span>
@@ -259,6 +262,7 @@
         <p class="kicker">render error</p>
         <h2>WebGL Unavailable</h2>
         <p id="boot-error-message" class="boot-copy">The renderer did not start.</p>
+        <button id="boot-reload-button" class="primary-action" type="button">Reload</button>
       </div>
     </section>
   </main>
@@ -280,9 +284,32 @@
       if (overlay) overlay.classList.remove('hidden');
     };
 
+    // Fresh copies of the files a stale cache can wedge, then a reload that skips the cache.
+    const hardReload = async () => {
+      const files = ['./game.mjs?v=20261011a', './cloud.mjs', './style.css?v=20261011a', '../../lib/three/0.160.0/three.module.js'];
+      const refresh = Promise.all(files.map((file) => fetch(file, { cache: 'reload' }).catch(() => {})));
+      await Promise.race([refresh, new Promise((resolve) => setTimeout(resolve, 4000))]);
+      const url = new URL(location.href);
+      url.searchParams.set('r', Date.now().toString(36));
+      location.replace(url);
+    };
+    document.getElementById('boot-reload-button')?.addEventListener('click', hardReload);
+    setTimeout(() => {
+      const root = document.documentElement;
+      if (root.dataset.gameReady || root.dataset.gameError) return;
+      root.dataset.bootStalled = '1';
+      document.getElementById('boot-error')?.classList.remove('hidden');
+      const messageEl = document.getElementById('boot-error-message');
+      if (messageEl) messageEl.textContent = 'Outpace is taking too long to start. A reload usually fixes this.';
+      const title = document.querySelector('#boot-error h2');
+      if (title) title.textContent = 'Still Loading';
+      const kicker = document.querySelector('#boot-error .kicker');
+      if (kicker) kicker.textContent = 'boot stalled';
+    }, 12000);
+
     window.addEventListener('error', (event) => markGameError(event.error || event.message));
     window.addEventListener('unhandledrejection', (event) => markGameError(event.reason));
-    import('./game.mjs?v=20260730a').catch(markGameError);
+    import('./game.mjs?v=20261011a').catch(markGameError);
   </script>
 </body>
 </html>

@@ -113,7 +113,8 @@ button {
   left: max(10px, env(safe-area-inset-left));
   /* --br8t-account-space is set by the shared account layer when the avatar is
      mounted top-right; keep the HUD strip clear of it. */
-  width: min(370px, calc(100dvw - 20px - env(safe-area-inset-left) - env(safe-area-inset-right) - var(--br8t-account-space, 0px)));
+  /* …and the 42px settings gear that sits just left of it. */
+  width: min(370px, calc(100dvw - 20px - 42px - env(safe-area-inset-left) - env(safe-area-inset-right) - var(--br8t-account-space, 0px)));
   display: grid;
   gap: 7px;
   pointer-events: none;
@@ -139,15 +140,30 @@ button {
   backdrop-filter: blur(10px) saturate(1.4);
 }
 
+/* backdrop-filter re-blurs the live WebGL canvas every frame; in flight a
+   solid fill that matches the frosted look is much cheaper. */
+#game[data-state="playing"] .hud-cell,
+#game[data-state="playing"] .signal-line {
+  backdrop-filter: none;
+  background:
+    linear-gradient(180deg, rgba(13, 26, 34, 0.86), rgba(5, 11, 16, 0.78)),
+    rgba(6, 12, 18, 0.5);
+}
+
+.hud-cell.overheated {
+  border-color: rgba(255, 92, 67, 0.72);
+}
+
+.hud-cell.overheated strong {
+  color: #ffb4a0;
+  text-shadow: 0 0 13px rgba(255, 76, 67, 0.6);
+}
+
 .hud-cell {
   min-width: 0;
   height: 58px;
   padding: 8px 9px 9px;
   border-radius: 7px;
-}
-
-.hud-cell:last-child {
-  padding-right: 36px;
 }
 
 .hud-cell span,
@@ -309,6 +325,84 @@ button {
 
 .reticle-cross.y::after {
   bottom: -8px;
+}
+
+.reticle.overheated {
+  filter: drop-shadow(0 0 10px rgba(255, 76, 67, 0.62));
+}
+
+.reticle.overheated .reticle-ring {
+  border-color: rgba(255, 110, 84, 0.92);
+  box-shadow:
+    0 0 0 8px rgba(255, 76, 67, 0.06),
+    0 0 18px rgba(255, 76, 67, 0.5) inset;
+}
+
+.reticle.overheated .reticle-cross.x::before,
+.reticle.overheated .reticle-cross.x::after,
+.reticle.overheated .reticle-cross.y::before,
+.reticle.overheated .reticle-cross.y::after {
+  background: rgba(255, 196, 180, 0.9);
+  box-shadow: 0 0 9px rgba(255, 76, 67, 0.8);
+}
+
+.near-miss-popup {
+  position: absolute;
+  z-index: 30;
+  top: 60%;
+  left: 50%;
+  pointer-events: none;
+  color: #ffe0ae;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  text-shadow: 0 0 10px rgba(255, 162, 70, 0.7), 0 1px 3px rgba(0, 0, 0, 0.8);
+  opacity: 0;
+  transform: translate(-50%, 0);
+}
+
+.near-miss-popup[data-side="left"] {
+  left: 34%;
+}
+
+.near-miss-popup[data-side="right"] {
+  left: 66%;
+}
+
+.near-miss-popup.show {
+  animation: near-miss-rise 900ms ease-out forwards;
+}
+
+#game:not([data-state="playing"]) .near-miss-popup {
+  display: none;
+}
+
+@keyframes near-miss-rise {
+  0% { opacity: 0; transform: translate(-50%, 6px); }
+  15% { opacity: 1; transform: translate(-50%, 0); }
+  70% { opacity: 1; }
+  100% { opacity: 0; transform: translate(-50%, -14px); }
+}
+
+.resume-callout {
+  position: absolute;
+  z-index: 36;
+  top: 38%;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 10px 16px;
+  border: 1px solid rgba(124, 232, 255, 0.5);
+  border-radius: 999px;
+  color: #e9fbff;
+  background: rgba(6, 14, 20, 0.86);
+  box-shadow: 0 0 22px rgba(85, 230, 255, 0.22), 0 10px 26px rgba(0, 0, 0, 0.4);
+  font-size: 0.74rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  white-space: nowrap;
 }
 
 .fire-button {
@@ -604,6 +698,8 @@ button {
   text-shadow: 0 0 12px rgba(85, 230, 255, 0.9), 0 1px 4px rgba(0, 0, 0, 0.8);
   opacity: 0;
   white-space: nowrap;
+  text-align: center;
+  line-height: 1.15;
 }
 
 .terminal-open .station-terminal-hotspot {
@@ -988,8 +1084,12 @@ h3 {
 
 .upgrade-list {
   min-height: 0;
-  overflow: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+  touch-action: pan-y;
   display: grid;
+  grid-auto-rows: max-content;
   gap: 6px;
   align-content: start;
   margin: 0;
@@ -1010,7 +1110,6 @@ h3 {
 .achievement-card {
   position: relative;
   min-width: 0;
-  min-height: 0;
   padding: 7px;
   overflow: hidden;
   border: 1px solid rgba(124, 232, 255, 0.18);
@@ -1069,7 +1168,6 @@ h3 {
 .upgrade-card,
 .terminal-card {
   min-width: 0;
-  min-height: 0;
   border: 1px solid rgba(124, 232, 255, 0.18);
   border-radius: 7px;
   background:
@@ -1848,4 +1946,55 @@ h3 {
   .primary-action {
     min-height: 46px;
   }
+}
+
+/* Short landscape phones: the title card goes two-column so Launch stays on screen. */
+@media (orientation: landscape) and (max-height: 500px) {
+  #menu.overlay {
+    align-items: center;
+    justify-items: center;
+    padding-block: max(10px, env(safe-area-inset-top)) max(10px, env(safe-area-inset-bottom));
+  }
+
+  #menu .launch-panel {
+    width: min(640px, calc(100dvw - 28px - env(safe-area-inset-left) - env(safe-area-inset-right)));
+    margin-top: 0;
+    padding: 14px;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    grid-template-rows: 1fr auto auto;
+    grid-template-areas:
+      "kicker ach"
+      "title ach"
+      "readout launch";
+    column-gap: 14px;
+    align-items: end;
+  }
+
+  #menu .kicker { grid-area: kicker; align-self: end; }
+  #menu h1 { grid-area: title; font-size: clamp(2.4rem, 9vh, 3.4rem); }
+  #menu .launch-readout { grid-area: readout; margin: 10px 0 0; min-height: 46px; }
+  #menu .menu-achievements { grid-area: ach; align-self: start; margin: 0; }
+  #menu .primary-action { grid-area: launch; min-height: 46px; }
+
+  /* The terminal list is the part that scrolls; give it the room. */
+  .station-console {
+    height: calc(100svh - 72px);
+    max-height: calc(100svh - 72px);
+    bottom: max(10px, env(safe-area-inset-bottom));
+  }
+
+  .station-panel-copy {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+}
+
+#boot-error {
+  background: rgba(2, 2, 5, 0.86);
+}
+
+#boot-error .primary-action {
+  margin-top: 14px;
 }

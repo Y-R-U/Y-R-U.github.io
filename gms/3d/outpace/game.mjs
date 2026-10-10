@@ -44,6 +44,9 @@ const startButton = document.getElementById('start-button');
 const restartButton = document.getElementById('restart-button');
 const launchNextButton = document.getElementById('launch-next-button');
 const damageFlash = document.getElementById('damage-flash');
+const resumeCallout = document.getElementById('resume-callout');
+const nearMissPopup = document.getElementById('near-miss-popup');
+const bootErrorEl = document.getElementById('boot-error');
 
 const scoreValue = document.getElementById('score-value');
 const shieldValue = document.getElementById('shield-value');
@@ -81,7 +84,7 @@ const BEST_KEY = 'outpace-best';
 const LEGACY_BEST_KEY = 'void-cockpit-best';
 const SAVE_KEY = 'outpace-save-v2';
 const SETTINGS_KEY = 'outpace-settings-v1';
-const RESULT_LOCK_MS = 3200;
+const RESULT_LOCK_MS = 1000;
 const DOCK_FADE_IN_MS = 760;
 const DOCK_HOLD_MS = 360;
 const DOCK_FADE_OUT_MS = 760;
@@ -100,6 +103,7 @@ const DEMO_STORY_STATE = params.get('demoStory') || '';
 const DEMO_QUEST = params.get('demoQuest') || '';
 const DEMO_MODE = params.has('demo') || params.has('demoDock') || params.has('demoResult') || params.has('demoTerminal') || params.has('demoStory') || params.has('demoQuest') || DEMO_SETTINGS || DEMO_DEBUG;
 const DEMO_STATION_TAB = params.get('demoTab') || '';
+const DEBUG_TOOLS = params.has('debug') || params.has('probe') || DEMO_DEBUG;
 const tmpVector = new THREE.Vector3();
 const tmpVectorB = new THREE.Vector3();
 const tmpVectorC = new THREE.Vector3();
@@ -681,9 +685,9 @@ const DEBUG_MEDIA = [
     id: 'BASE-01',
     type: 'image',
     title: 'Cockpit Window Mask',
-    src: 'assets/cockpit-chroma.png',
+    src: 'assets/cockpit-alpha.webp',
     generator: 'generated cockpit asset',
-    prompt: 'Runtime cockpit image. Green-screen window is keyed out so the Three.js space scene renders underneath.',
+    prompt: 'Cockpit image with the green-screen window pre-keyed to alpha, so the Three.js space scene renders underneath.',
   },
   {
     id: 'BASE-02',
@@ -1265,6 +1269,10 @@ const state = {
   laserOverlayActive: false,
   laserBursts: [],
   resultLocked: false,
+  backgroundPaused: false,
+  overheated: false,
+  nearMissCombo: 0,
+  nearMissTimer: 0,
   cockpitReady: false,
   objects: [],
   beams: [],
@@ -2527,6 +2535,7 @@ function layoutStationPlate() {
     style.width = `${box.width.toFixed(1)}px`;
     style.height = `${box.height.toFixed(1)}px`;
     style.setProperty('--face-h', `${box.height.toFixed(1)}px`);   // the button's contents size off this
+    fitTerminalHint();
   }
   return fit;
 }
@@ -3036,6 +3045,29 @@ const TERMINAL_HINTS = ['Dock terminal', 'Tap to open', 'Upgrades · Cargo · Br
 const TERMINAL_HINT_CYCLE = 7;
 let terminalHintPhase = -1;
 
+// The face can be narrow (portrait crops it), so shrink a hint that would clip.
+function fitTerminalHint() {
+  const glass = stationTerminalHint?.parentElement;
+  if (!glass) return;
+  const hint = stationTerminalHint;
+  hint.style.fontSize = '';
+  hint.style.whiteSpace = '';
+  hint.style.maxWidth = '';
+  const room = glass.clientWidth * 0.9;
+  const need = hint.scrollWidth;
+  if (room <= 0 || need <= room) return;
+  const base = parseFloat(getComputedStyle(hint).fontSize);
+  if (need / room > 1.4) {
+    // Two short lines read better than one tiny one.
+    hint.style.whiteSpace = 'normal';
+    hint.style.maxWidth = `${room}px`;
+    const tall = hint.scrollHeight / (glass.clientHeight * 0.8);
+    if (tall > 1) hint.style.fontSize = `${(base / tall).toFixed(2)}px`;
+    return;
+  }
+  hint.style.fontSize = `${(base * room / need).toFixed(2)}px`;
+}
+
 function stepTerminalHint() {
   if (!stationTerminalHint) return;
   const t = state.stationWindowTime % TERMINAL_HINT_CYCLE;
@@ -3043,6 +3075,7 @@ function stepTerminalHint() {
   if (phase !== terminalHintPhase) {
     terminalHintPhase = phase;
     stationTerminalHint.textContent = TERMINAL_HINTS[((phase % TERMINAL_HINTS.length) + TERMINAL_HINTS.length) % TERMINAL_HINTS.length];
+    fitTerminalHint();
   }
   const alpha = t < 0.45 ? t / 0.45 : t < 3.2 ? 1 : t < 3.9 ? (3.9 - t) / 0.7 : 0;
   stationTerminalHint.style.opacity = alpha.toFixed(3);
@@ -3284,6 +3317,32 @@ function clearDynamicScene() {
   state.lockedScreen = null;
 }
 
+function pauseForBackground() {
+  if (!state.running || state.docking || state.demo) return;
+  state.running = false;
+  state.firing = false;
+  state.pointerDown = false;
+  state.movementPointerId = null;
+  state.firePointerId = null;
+  state.backgroundPaused = true;
+  document.documentElement.dataset.paused = '1';
+  resumeCallout?.classList.remove('hidden');
+}
+
+function clearBackgroundPause() {
+  state.backgroundPaused = false;
+  delete document.documentElement.dataset.paused;
+  resumeCallout?.classList.add('hidden');
+}
+
+function resumeFromBackground() {
+  if (!state.backgroundPaused || state.modal) return false;
+  clearBackgroundPause();
+  state.running = true;
+  clock.getDelta();
+  return true;
+}
+
 function setGameState(nextState) {
   gameEl.dataset.state = nextState;
   document.documentElement.dataset.gameState = nextState;
@@ -3441,16 +3500,50 @@ function ensureAudioContext() {
   if (!state.audio.context) {
     const AudioContextClass = window.AudioContext || window.webkitAudioContext;
     if (!AudioContextClass) return null;
+    try { if (navigator.audioSession) navigator.audioSession.type = 'playback'; } catch {}
     state.audio.context = new AudioContextClass();
   }
-  if (state.audio.context.state === 'suspended') state.audio.context.resume().catch(() => {});
+  if (state.audio.context.state !== 'running' && document.visibilityState !== 'hidden') {
+    state.audio.context.resume().catch(() => {});
+  }
   return state.audio.context;
+}
+
+// Android only counts touchend/click as activation, so every gesture gets a try.
+function unlockAudio() {
+  if (state.settings.sound || state.settings.music) ensureAudioContext();
+}
+
+function playVent(ctx) {
+  const now = ctx.currentTime;
+  const length = Math.floor(ctx.sampleRate * 0.5);
+  const buffer = ctx.createBuffer(1, length, ctx.sampleRate);
+  const data = buffer.getChannelData(0);
+  for (let i = 0; i < length; i += 1) data[i] = (Math.random() * 2 - 1) * (1 - i / length);
+  const source = ctx.createBufferSource();
+  source.buffer = buffer;
+  const filter = ctx.createBiquadFilter();
+  filter.type = 'bandpass';
+  filter.frequency.setValueAtTime(2400, now);
+  filter.frequency.exponentialRampToValueAtTime(700, now + 0.48);
+  filter.Q.value = 0.8;
+  const gain = ctx.createGain();
+  gain.gain.setValueAtTime(0.0001, now);
+  gain.gain.exponentialRampToValueAtTime(0.07, now + 0.03);
+  gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.5);
+  source.connect(filter).connect(gain).connect(ctx.destination);
+  source.start(now);
+  source.stop(now + 0.52);
 }
 
 function playSfx(kind = 'click') {
   if (!state.settings.sound) return;
   const ctx = ensureAudioContext();
   if (!ctx) return;
+  if (kind === 'vent') {
+    playVent(ctx);
+    return;
+  }
   const now = ctx.currentTime;
   const gain = ctx.createGain();
   const osc = ctx.createOscillator();
@@ -3460,6 +3553,7 @@ function playSfx(kind = 'click') {
     laser: [980, 0.08, 0.028, 'sawtooth'],
     dock: [180, 0.26, 0.045, 'sine'],
     error: [120, 0.14, 0.040, 'square'],
+    nearMiss: [1180, 0.07, 0.016, 'triangle'],
   }[kind] || [420, 0.035, 0.018, 'triangle'];
   osc.type = config[3];
   osc.frequency.setValueAtTime(config[0], now);
@@ -3605,6 +3699,7 @@ function resetProgress() {
   state.lastDebtAdded = 0;
   state.confiscated = false;
   state.modalPaused = false;
+  clearBackgroundPause();
   state.currentPayout = 0;
   state.routeDistance = 0;
   state.routeLength = getRouteLength();
@@ -3639,6 +3734,7 @@ function resetProgress() {
 
 function debugSkipToDepot() {
   closeAllModals();
+  clearBackgroundPause();
   clearResultLock();
   clearDockTransition();
   clearDynamicScene();
@@ -3705,7 +3801,7 @@ function setActiveQuest(kind) {
   board.activeId = kind;
   board.quests[kind].lastMessage ||= getStoryMessage(board.quests[kind]);
   saveProgress();
-  renderMenuAchievements();
+  markMenuAchievementsDirty();
   updateStationUi(state.currentPayout, state.lastStationType, `${getStoryTitle(board.quests[kind])} selected.`);
   return true;
 }
@@ -3888,8 +3984,17 @@ function formatProgress(value) {
   return String(Math.round(value)).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
 }
 
+// Kills and pickups only mark it dirty: it is rebuilt when the menu is showing.
+let menuAchievementsDirty = true;
+
+function markMenuAchievementsDirty() {
+  menuAchievementsDirty = true;
+  if (!menuEl.classList.contains('hidden')) renderMenuAchievements();
+}
+
 function renderMenuAchievements() {
   if (!menuAchievements) return;
+  menuAchievementsDirty = false;
   menuAchievements.innerHTML = '';
   const rows = getAchievementRows();
   const unlocked = rows.filter((row) => row.unlocked).length;
@@ -3982,7 +4087,7 @@ function runStorySearch() {
     }
   }
   saveProgress();
-  renderMenuAchievements();
+  markMenuAchievementsDirty();
   updateStationUi(state.currentPayout, state.lastStationType, story.lastMessage);
 }
 
@@ -4001,7 +4106,7 @@ function showQuestBoard() {
     board.activeId = null;
   }
   saveProgress();
-  renderMenuAchievements();
+  markMenuAchievementsDirty();
   renderStationPanel();
 }
 
@@ -4317,7 +4422,7 @@ function buyUpgrade(id) {
   state.save.stats.upgradesBought += 1;
   state.save.stats.bestCargo = Math.max(state.save.stats.bestCargo, getCargoCapacity(state.save.upgrades.cargo || 0));
   saveProgress();
-  renderMenuAchievements();
+  markMenuAchievementsDirty();
   playSfx('buy');
   updateStationUi(state.currentPayout, state.lastStationType, `${def.name} installed. Credits updated and the next manifest is still reserved.`);
 }
@@ -4349,7 +4454,7 @@ function openStation(type = getStationType()) {
   state.score += payout;
   recordRunCompleted({ distance: Math.max(state.routeDistance, state.routeLength) });
   saveProgress();
-  renderMenuAchievements();
+  markMenuAchievementsDirty();
   playSfx('dock');
   updateHud();
   resetStationTraffic();
@@ -4408,6 +4513,10 @@ function showConfiscationResult(message = 'Debt exceeded the 10000 credit limit.
 function resetGame() {
   if (state.resultLocked || state.confiscated) return;
   state.modalPaused = false;
+  clearBackgroundPause();
+  setOverheated(false);
+  state.nearMissCombo = 0;
+  state.nearMissTimer = 0;
   if (!DEMO_MODE) {
     const interest = applyDebtInterest();
     if (state.save.debt > DEBT_LIMIT) {
@@ -4418,6 +4527,7 @@ function resetGame() {
   clearResultLock();
   clearDockTransition();
   clearDynamicScene();
+  if (!shadersWarm) prewarmShaders();
   const stats = getShipStats();
   state.running = true;
   state.docked = false;
@@ -4496,7 +4606,7 @@ function finishGame() {
   resultBest.textContent = String(state.best);
   resultWave.textContent = String(state.wave);
   if (resultDebt) resultDebt.textContent = formatCredits(state.save.debt);
-  resultTitle.textContent = state.confiscated ? 'Ship Confiscated' : state.demo ? 'Flight Logged' : finalScore > previousBest ? 'Escape Pod Record' : 'Escape Pod Recovery';
+  resultTitle.textContent = state.confiscated ? 'Ship Confiscated' : state.demo ? 'Flight Logged' : finalScore > previousBest && previousBest > 0 ? 'Escape Pod Record' : 'Escape Pod Recovery';
   resultKicker.textContent = state.confiscated ? 'lender seizure' : state.demo ? 'flight recorder' : 'salvage claim';
   if (resultMessage) {
     if (state.demo) {
@@ -4519,7 +4629,11 @@ function finishGame() {
 
 function firePulse() {
   const stats = getShipStats();
-  if (!state.running || state.docking || state.shotTimer > 0 || state.heat > stats.maxHeat - 4) return;
+  if (!state.running || state.docking || state.shotTimer > 0) return;
+  if (state.heat > stats.maxHeat - 4) {
+    if (!state.overheated) setOverheated(true);
+    return;
+  }
   state.shotTimer = stats.shotCooldown;
   state.heat = clamp(state.heat + stats.shotHeat, 0, stats.maxHeat);
   state.save.stats.shotsFired += 1;
@@ -4557,7 +4671,7 @@ function firePulse() {
       if (bestTarget.userData.kind === 'drone') state.save.stats.droneKills += 1;
       if (bestTarget.userData.kind === 'asteroid') state.save.stats.asteroidKills += 1;
       saveProgress({ defer: true });
-      renderMenuAchievements();
+      markMenuAchievementsDirty();
       bestTarget.getWorldPosition(tmpVectorB);
       createExplosion(tmpVectorB, bestTarget.userData.kind === 'drone' ? 0xff7e40 : 0xffc175, bestTarget.userData.kind === 'drone' ? 34 : 24);
       state.score += bestTarget.userData.value;
@@ -4571,6 +4685,36 @@ function firePulse() {
   updateHud();
 }
 
+// Feedback only: the guns still fire whenever heat allows, but the warning
+// latches until the barrels are properly cool so it cannot flicker.
+function setOverheated(on) {
+  if (state.overheated === on) return;
+  state.overheated = on;
+  reticleEl.classList.toggle('overheated', on);
+  heatValue.closest('.hud-cell')?.classList.toggle('overheated', on);
+  if (on) {
+    playSfx('vent');
+    haptic([30, 40, 50]);
+  }
+}
+
+function awardNearMiss(base, position) {
+  state.nearMissCombo = state.nearMissTimer > 0 ? Math.min(state.nearMissCombo + 1, NEAR_MISS_MAX_COMBO) : 1;
+  state.nearMissTimer = NEAR_MISS_WINDOW;
+  const bonus = Math.round(base * (1 + (state.nearMissCombo - 1) * 0.25));
+  state.score += bonus;
+  playSfx('nearMiss');
+  haptic(10);
+  if (nearMissPopup) {
+    const side = position && position.x < state.player.x * PLAYER_RANGE_X ? 'left' : 'right';
+    nearMissPopup.textContent = state.nearMissCombo > 1 ? `Near miss x${state.nearMissCombo} +${bonus}` : `Near miss +${bonus}`;
+    nearMissPopup.dataset.side = side;
+    nearMissPopup.classList.remove('show');
+    void nearMissPopup.offsetWidth;
+    nearMissPopup.classList.add('show');
+  }
+}
+
 function getAimNdc() {
   return {
     x: clamp(state.target.x * 0.72, -0.84, 0.84),
@@ -4580,6 +4724,8 @@ function getAimNdc() {
 
 function damage(amount, severity = 0.5) {
   state.shield = clamp(state.shield - amount, 0, getShipStats().maxShield);
+  state.nearMissCombo = 0;
+  state.nearMissTimer = 0;
   state.shake = Math.max(state.shake, amount * 0.013);
   state.flashTimer = 0.15;
   damageFlash.classList.add('active');
@@ -4627,6 +4773,8 @@ function updateInputFromMovement(event) {
 }
 
 const FIRE_BUTTON_PAD = 24;
+const NEAR_MISS_WINDOW = 2.6;
+const NEAR_MISS_MAX_COMBO = 5;
 
 function isNearFireButton(x, y) {
   if (fireButton.classList.contains('hidden')) return false;
@@ -4638,6 +4786,7 @@ function isNearFireButton(x, y) {
 
 function onPointerDown(event) {
   if (event.target.closest('button')) return;
+  resumeFromBackground();
   // Reserve the fire button's actual rect (plus a thumb's margin) rather than a
   // flat 22% of the screen, which on a landscape phone swallowed a lot of
   // perfectly good steering area.
@@ -4845,7 +4994,7 @@ function updateObjects(delta) {
         state.score += data.value;
         state.save.stats.collectors += 1;
         saveProgress({ defer: true });
-        renderMenuAchievements();
+        markMenuAchievementsDirty();
         haptic([12, 28, 12]);
         createExplosion(object.position.clone(), 0x82ff9e, 18);
         state.objects.splice(i, 1);
@@ -4862,10 +5011,9 @@ function updateObjects(delta) {
             const reward = data.sizeClass === 'large' ? 34 : data.sizeClass === 'medium' ? 22 : 14;
             data.nearMissAwarded = true;
             data.passed = true;
-            state.score += reward + state.wave * 2;
             state.heat = Math.max(0, state.heat - (data.sizeClass === 'large' ? 12 : 7));
             state.shake = Math.max(state.shake, 0.08);
-            haptic(10);
+            awardNearMiss(reward + state.wave * 2, object.position);
             updateHud();
           }
           continue;
@@ -4881,6 +5029,10 @@ function updateObjects(delta) {
         data.passed = true;
         createExplosion(object.position.clone(), 0xff5d3b, 18);
         damage(16, 0.48);
+      } else if (data.kind === 'drone' && object.position.z > 0 && distance < data.radius + 4) {
+        data.passed = true;
+        awardNearMiss(26 + state.wave * 2, object.position);
+        updateHud();
       }
     }
 
@@ -4968,6 +5120,8 @@ function updateFlight(delta) {
   warmLight.intensity = 1.2 + Math.sin(state.time * 2.1) * 0.22;
   state.shake = Math.max(0, state.shake - delta * 0.9);
   state.heat = Math.max(0, state.heat - delta * stats.coolRate);
+  if (state.overheated && state.heat < stats.maxHeat * 0.55) setOverheated(false);
+  if (state.nearMissTimer > 0) state.nearMissTimer = Math.max(0, state.nearMissTimer - delta);
   state.shotTimer = Math.max(0, state.shotTimer - delta);
   const routePressure = Math.floor(state.routeDistance / 520);
   const dockingFactor = state.docking ? 0.48 : 1;
@@ -5019,63 +5173,8 @@ function animate() {
   if (!stationOnScreen) renderer.render(scene, camera);
 }
 
-function processCockpitImage(img) {
-  const offscreen = document.createElement('canvas');
-  offscreen.width = img.naturalWidth;
-  offscreen.height = img.naturalHeight;
-  const ctx = offscreen.getContext('2d', { willReadFrequently: true });
-  ctx.drawImage(img, 0, 0);
-  const frame = ctx.getImageData(0, 0, offscreen.width, offscreen.height);
-  const pixels = frame.data;
-  const matte = new Uint8ClampedArray(offscreen.width * offscreen.height);
-
-  for (let i = 0, p = 0; i < pixels.length; i += 4, p += 1) {
-    const r = pixels[i];
-    const g = pixels[i + 1];
-    const b = pixels[i + 2];
-    const greenDominance = g - Math.max(r, b);
-    const greenRatio = g / Math.max(1, Math.max(r, b));
-    let alpha = 255;
-    if (g > 142 && greenDominance > 52 && greenRatio > 1.42) {
-      alpha = Math.round(255 * (1 - clamp((greenDominance - 52) / 68, 0, 1)));
-    } else if (g > 78 && greenDominance > 22 && greenRatio > 1.15) {
-      alpha = Math.round(255 * (1 - clamp((greenDominance - 22) / 72, 0, 1) * 0.86));
-    }
-    pixels[i + 3] = alpha;
-    matte[p] = alpha;
-
-    if (greenDominance > 20 && g > 70 && greenRatio > 1.12) {
-      pixels[i + 1] = Math.min(g, Math.round((r + b) * 0.55 + 36));
-    }
-  }
-
-  const width = offscreen.width;
-  const height = offscreen.height;
-  for (let y = 1; y < height - 1; y += 1) {
-    for (let x = 1; x < width - 1; x += 1) {
-      const p = y * width + x;
-      const i = p * 4;
-      if (matte[p] < 12) continue;
-      const r = pixels[i];
-      const g = pixels[i + 1];
-      const b = pixels[i + 2];
-      const edgeGreen = g - Math.max(r, b);
-      if (edgeGreen < 10) continue;
-      const nearTransparent =
-        matte[p - 1] < 48 || matte[p + 1] < 48 ||
-        matte[p - width] < 48 || matte[p + width] < 48;
-      if (nearTransparent) {
-        pixels[i + 3] = Math.round(matte[p] * 0.38);
-        pixels[i + 1] = Math.min(g, Math.round((r + b) * 0.5 + 20));
-      }
-    }
-  }
-
-  ctx.putImageData(frame, 0, 0);
-  state.cockpitPlate = offscreen;
-  state.cockpitReady = true;
-  drawCockpit();
-}
+// Image rows (fractions of height) the landscape cockpit keeps on screen.
+const COCKPIT_LANDSCAPE_BAND = [0.33, 0.69];
 
 function drawCockpit() {
   const dpr = getOverlayPixelRatio();
@@ -5090,12 +5189,32 @@ function drawCockpit() {
   if (!state.cockpitPlate) return;
 
   const img = state.cockpitPlate;
-  const scale = Math.max(width / img.width, height / img.height);
-  const drawWidth = img.width * scale;
-  const drawHeight = img.height * scale;
+  const imgW = img.naturalWidth || img.width;
+  const imgH = img.naturalHeight || img.height;
+  const cover = Math.max(width / imgW, height / imgH);
+  if (width <= height * 1.05) {
+    const drawWidth = imgW * cover;
+    const drawHeight = imgH * cover;
+    cockpitCtx.drawImage(img, (width - drawWidth) * 0.5, (height - drawHeight) * 0.5, drawWidth, drawHeight);
+    return;
+  }
+  // Landscape: a width-cover crop shows only a thin band around the window's
+  // lower edge. Fit a taller band instead so the dashboard reads, and fill the
+  // side gaps with mirrored copies so the frame still runs edge to edge.
+  const band = COCKPIT_LANDSCAPE_BAND;
+  const scale = Math.min(cover, height / ((band[1] - band[0]) * imgH));
+  const drawWidth = imgW * scale;
+  const drawHeight = imgH * scale;
   const x = (width - drawWidth) * 0.5;
-  const y = (height - drawHeight) * 0.5;
+  const y = Math.min(0, Math.max(height - drawHeight, -band[0] * imgH * scale));
   cockpitCtx.drawImage(img, x, y, drawWidth, drawHeight);
+  if (x > 0.5) {
+    cockpitCtx.setTransform(-1, 0, 0, 1, x * 2, 0);
+    cockpitCtx.drawImage(img, x, y, drawWidth, drawHeight);
+    cockpitCtx.setTransform(-1, 0, 0, 1, (x + drawWidth) * 2, 0);
+    cockpitCtx.drawImage(img, x, y, drawWidth, drawHeight);
+    cockpitCtx.setTransform(1, 0, 0, 1, 0, 0);
+  }
 }
 
 function resizeLaserCanvas() {
@@ -5263,12 +5382,26 @@ function setupEvents() {
   window.addEventListener('pageshow', restoreCanvasesSoon);
   window.addEventListener('pagehide', flushProgressSave);
   document.addEventListener('visibilitychange', () => {
-    if (document.visibilityState === 'visible') restoreCanvasesSoon();
-    else flushProgressSave();
+    const ctx = state.audio.context;
+    if (document.visibilityState === 'visible') {
+      restoreCanvasesSoon();
+      if (ctx && ctx.state !== 'running') ctx.resume().catch(() => {});
+    } else {
+      pauseForBackground();
+      flushProgressSave();
+      ctx?.suspend?.().catch(() => {});
+    }
   });
+  resumeCallout?.addEventListener('click', () => {
+    if (resumeFromBackground()) playSfx('click');
+  });
+  for (const type of ['pointerdown', 'touchend', 'click', 'keydown']) {
+    window.addEventListener(type, unlockAudio, { capture: true, passive: true });
+  }
 
   fireButton.addEventListener('pointerdown', (event) => {
     event.preventDefault();
+    resumeFromBackground();
     state.firePointerId = event.pointerId;
     state.firing = true;
     fireButton.setPointerCapture?.(event.pointerId);
@@ -5280,6 +5413,10 @@ function setupEvents() {
   window.addEventListener('keydown', (event) => {
     if (event.code === 'Escape' && state.modal) {
       closeAllModals();
+      return;
+    }
+    if (state.backgroundPaused && !state.modal) {
+      resumeFromBackground();
       return;
     }
     // Otherwise Space scrolls the page and the arrows fight the browser.
@@ -5300,8 +5437,33 @@ function setupEvents() {
   });
 }
 
-// Keyed to one in-flight attempt: the chroma pass is expensive enough that two
-// overlapping loads are worth avoiding.
+// One of everything a run can put on screen, compiled up front, so the first
+// fight does not stall on shader compiles.
+let shadersWarm = false;
+
+function prewarmShaders() {
+  shadersWarm = true;
+  try {
+    for (let i = 0; i < 6; i += 1) createAsteroid();
+    createDrone();
+    createCollector();
+    createStation();
+    for (const type of ['small', 'large', 'mega']) createDockStation(type);
+    tmpVector.set(0, 0, -40);
+    createBeam(camera.position, tmpVector, beamMaterial);
+    createBeam(camera.position, tmpVector, enemyBeamMaterial);
+    createExplosion(tmpVector);
+    renderer.compile(scene, camera);
+  } catch (error) {
+    console.warn('shader prewarm skipped', error);
+  } finally {
+    clearDynamicScene();
+    state.dockObject = null;
+    state.docking = false;
+  }
+}
+
+// The window is keyed to alpha offline (see CLAUDE.md), so loading is just a decode.
 let cockpitLoad = null;
 
 function loadCockpit() {
@@ -5309,16 +5471,19 @@ function loadCockpit() {
   cockpitLoad = new Promise((resolve, reject) => {
     const img = new Image();
     img.onload = () => {
-      processCockpitImage(img);
+      state.cockpitPlate = img;
+      state.cockpitReady = true;
+      drawCockpit();
       resolve();
     };
     img.onerror = reject;
-    img.src = 'assets/cockpit-chroma.png';
+    img.src = 'assets/cockpit-alpha.webp';
   }).finally(() => { cockpitLoad = null; });
   return cockpitLoad;
 }
 
 async function boot() {
+  if (!DEBUG_TOOLS) debugOpenButton?.classList.add('hidden');
   setupEvents();
   resize();
   // The cockpit plate is decoration: drawCockpit no-ops without it. A 404 or a
@@ -5329,6 +5494,10 @@ async function boot() {
   renderSettingsState();
   renderMenuAchievements();
   document.documentElement.dataset.gameReady = '1';
+  if (document.documentElement.dataset.bootStalled) {
+    delete document.documentElement.dataset.bootStalled;
+    bootErrorEl?.classList.add('hidden');
+  }
   // Render/perf probe for automated testing only — never present in normal play.
   if (params.has('probe')) {
     window.__outpace = {
@@ -5337,6 +5506,10 @@ async function boot() {
     };
   }
   animate();
+  // After the menu's first frame, so it costs nothing on the way to the title.
+  window.setTimeout(() => {
+    if (!shadersWarm && !state.running && !state.docked && !state.objects.length) prewarmShaders();
+  }, 0);
   setupAccountCloud();
 
   if (state.demo) {
