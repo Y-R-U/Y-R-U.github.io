@@ -2,6 +2,7 @@
 
 import {
   SHIPS, TEAMS, TILE, PALETTE, PRIZE_MAX, PRIZE_SPAWN, PRIZES, REPEL, DIFFICULTY, diffKeyFor,
+  UPGRADES, MAGNET_PULL,
 } from './config.js';
 import {
   clamp, rand, randInt, pick, weighted, NAMES, TAU, dist, lerp, fmtTime,
@@ -259,9 +260,19 @@ export class Game {
   _updatePrizes(dt) {
     this.prizeTimer -= dt;
     if (this.prizeTimer <= 0 && this.prizes.length < PRIZE_MAX) { this._spawnPrize(); this.prizeTimer = PRIZE_SPAWN; }
+    const me = this.player;
+    const range = (this.upgrades && this.upgrades.magnet) || UPGRADES.find(u => u.key === 'magnet').eff[0];
     for (const p of this.prizes) {
       p.update(dt, this.world);
       if (!p.alive) continue;
+      if (me && me.alive) {
+        const d = dist(p.x, p.y, me.x, me.y);
+        if (d < range && d > 1) {
+          const step = Math.min(d, lerp(MAGNET_PULL.max, MAGNET_PULL.min, d / range) * dt);
+          const nx = p.x + (me.x - p.x) / d * step, ny = p.y + (me.y - p.y) / d * step;
+          if (!this.world.isSolidPx(nx, ny)) { p.x = nx; p.y = ny; }
+        }
+      }
       for (const s of this.ships) {
         if (!s.alive) continue;
         if (dist(p.x, p.y, s.x, s.y) < s.radius + p.radius) {

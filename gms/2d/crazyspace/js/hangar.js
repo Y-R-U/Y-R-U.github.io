@@ -131,5 +131,6 @@ export function hangarEffects(levels) {
     headstart: HEADSTART[L('headstart')],
     shield: eff('shield'),
     aim: AIM_ASSIST[L('aim')],
+    magnet: eff('magnet'),
   };
 }

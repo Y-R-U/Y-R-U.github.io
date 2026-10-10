@@ -17,6 +17,13 @@ All balance data lives in `js/config.js`. Live on GitHub Pages and games.br8t.co
   `__crazyspace.hangar()`, `__crazyspace.audio`.
 - New players default to Rookie (`settingsDefaults().lastDiff`); a saved choice wins via mergeForward.
 
+## Magnet (2026-10-10)
+
+Player-only green magnet (Aaron: picking greens up exactly is the hardest part on a phone). Pull range is the
+9th upgrade `magnet` (`eff` = px, level 0 = 70 px base that every player gets, even with `?noupg`; max 350).
+Pull speed `MAGNET_PULL` 240→720 px/s, edge to contact, in `Game._updatePrizes`; a green never gets pulled into a
+wall. Cost ×0.6 (`UPGRADE_COST_MULT`), so max-everything rose by about 5.6k credits. Bots don't get it.
+
 ## Balance harness
 
 `node tools/upgradegate.mjs --seeds 12 --gate` runs the real Game/Ship/Bot modules in node

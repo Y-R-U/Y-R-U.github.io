@@ -106,7 +106,7 @@ export class Menu {
           <div><b>Bomb</b><span>💣 button or <kbd>Shift</kbd>. Fire while still to drop a mine.</span></div>
           <div><b>Special</b><span>✦ Burst or Repel — <kbd>E</kbd> / <kbd>L</kbd>.</span></div>
           <div><b>Energy</b><span>Your bar is health <i>and</i> ammo. It recharges — don't bottom out.</span></div>
-          <div><b>Greens</b><span>Fly over green prizes to upgrade guns, bombs, speed & more.</span></div>
+          <div><b>Greens</b><span>Fly near green prizes to upgrade guns, bombs, speed & more. Your magnet pulls them in.</span></div>
           <div><b>Scores</b><span>Hold <kbd>Tab</kbd> (or 🏆) for the scoreboard. <kbd>P</kbd> to pause.</span></div>
           <div><b>Hangar</b><span>Finished matches pay credits. Spend them in the Hangar on permanent upgrades (hull, guns, aim assist…). They stack, so the game gets easier the more you play.</span></div>
         ` }))],

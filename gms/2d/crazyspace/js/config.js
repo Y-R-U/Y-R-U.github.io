@@ -179,10 +179,14 @@ export const UPGRADES = [
     eff: [0, 0.4, 0.8, 1.2, 1.6, 2.2, 2.8, 3.6, 4.5], fmt: v => `+${v.toFixed(1)}s spawn shield` },
   { key: 'aim', name: 'Aim Assist', icon: '◎', blurb: 'Your bullets bend toward enemies in front of you. Big help on a phone.',
     eff: [0, 1, 2, 3, 4, 5, 6, 7, 8], fmt: v => aimText(v) },
+  { key: 'magnet', name: 'Magnet', icon: '🧲', blurb: 'Greens get pulled in from further away. Every ship starts with a small one.',
+    eff: [70, 95, 120, 145, 170, 200, 240, 290, 350], fmt: v => `${(v / 70).toFixed(1)}× pull range` },
 ];
 // rising cost per level: cost[L] = price of buying level L
 export const UPGRADE_COST = [0, 20, 30, 40, 50, 65, 1300, 2600, 5200];
-export const UPGRADE_COST_MULT = { aim: 1.2, headstart: 1.1 };
+export const UPGRADE_COST_MULT = { aim: 1.2, headstart: 1.1, magnet: 0.6 };
+// Player green magnet: pull range (px) comes from the 'magnet' upgrade, level 0 = base.
+export const MAGNET_PULL = { min: 240, max: 720 }; // px/s at the edge / at contact
 
 // Head Start level → what each life spawns with (respecting the ship's caps).
 export const HEADSTART = [
