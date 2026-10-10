@@ -18,6 +18,19 @@ export const actorRoot = new THREE.Group();    // tanks, drones, shells, fx
 
 export let lowQuality = LITE_MODE;
 
+// Three tiers, applied live. 'balanced' is what a phone that cannot hold
+// ~45fps on 'high' is dropped to by the first-battle probe in main.js.
+export let qualityLevel = 'high';
+const PIXEL_RATIO = { high: 1.75, balanced: 1.25, low: 1 };
+const SHADOW_MAP = { high: 2048, balanced: 1024, low: 512 };
+
+export function settingsQuality() {
+  if (LITE_MODE) return 'low';
+  const q = profile.settings.quality;
+  if (q === 'high' || q === 'balanced' || q === 'low') return q;
+  return profile.settings.lite ? 'low' : 'high';
+}
+
 export function glowBasic(hex, boost = 1.6, opts = {}) {
   return new THREE.MeshBasicMaterial({
     color: new THREE.Color(hex).multiplyScalar(boost), ...opts,
@@ -25,12 +38,15 @@ export function glowBasic(hex, boost = 1.6, opts = {}) {
 }
 
 export function initRender(container) {
-  lowQuality = LITE_MODE || !!profile.settings.lite;
+  qualityLevel = settingsQuality();
+  lowQuality = qualityLevel === 'low';
 
+  // No antialias: everything goes through EffectComposer's render targets,
+  // which never had MSAA, so the flag only cost a multisampled backbuffer.
   renderer = new THREE.WebGLRenderer({
-    antialias: !lowQuality, powerPreference: 'high-performance', stencil: false,
+    antialias: false, powerPreference: 'high-performance', stencil: false,
   });
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio, lowQuality ? 1 : 1.75));
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, PIXEL_RATIO[qualityLevel]));
   renderer.setSize(window.innerWidth, window.innerHeight);
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
   renderer.toneMappingExposure = 1.12;
@@ -52,7 +68,7 @@ export function initRender(container) {
   sunLight = new THREE.DirectionalLight(0xfff0d0, 1.9);
   sunLight.position.set(70, 90, -60);
   sunLight.castShadow = !lowQuality;
-  sunLight.shadow.mapSize.set(lowQuality ? 512 : 2048, lowQuality ? 512 : 2048);
+  sunLight.shadow.mapSize.set(SHADOW_MAP[qualityLevel], SHADOW_MAP[qualityLevel]);
   const sc = sunLight.shadow.camera;
   sc.left = -125; sc.right = 125; sc.top = 125; sc.bottom = -125;
   sc.near = 12; sc.far = 460;
@@ -63,9 +79,10 @@ export function initRender(container) {
   renderer.info.autoReset = false;
   composer = new EffectComposer(renderer);
   composer.addPass(new RenderPass(scene, camera));
-  if (!lowQuality) {
+  if (!LITE_MODE) {
     bloomPass = new UnrealBloomPass(
       new THREE.Vector2(window.innerWidth, window.innerHeight), 0.62, 0.62, 0.78);
+    bloomPass.enabled = !lowQuality;
     composer.addPass(bloomPass);
   }
   composer.addPass(new OutputPass());
@@ -80,7 +97,49 @@ function onResize() {
   camera.updateProjectionMatrix();
   renderer.setSize(w, h);
   composer.setSize(w, h);
-  if (bloomPass) bloomPass.resolution.set(w, h);
+  if (bloomPass) {
+    bloomPass.resolution.set(w, h);
+    // bloom is a blur: below 'high' it does not need the full backbuffer
+    if (qualityLevel !== 'high') {
+      const pr = renderer.getPixelRatio() * 0.5;
+      bloomPass.setSize(Math.round(w * pr), Math.round(h * pr));
+    }
+  }
+  needFrame = true;
+}
+
+// Set when the canvas has to be redrawn even though the loop is idling
+// (a frozen menu backdrop, a paused battle) — a resize clears it.
+export let needFrame = true;
+export function frameDrawn() { needFrame = false; }
+export function requestFrame() { needFrame = true; }
+
+// Live quality switch: pixel ratio, shadow map, bloom. Materials are flagged
+// for a recompile only when shadows actually turn on or off.
+export function applyQuality(level = settingsQuality()) {
+  if (!renderer) return;
+  qualityLevel = LITE_MODE ? 'low' : level;
+  const wasLow = lowQuality;
+  lowQuality = qualityLevel === 'low';
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, PIXEL_RATIO[qualityLevel]));
+  composer.setPixelRatio(renderer.getPixelRatio());
+  renderer.shadowMap.enabled = !lowQuality;
+  sunLight.castShadow = !lowQuality;
+  const sz = SHADOW_MAP[qualityLevel];
+  if (sunLight.shadow.mapSize.x !== sz) {
+    sunLight.shadow.mapSize.set(sz, sz);
+    if (sunLight.shadow.map) { sunLight.shadow.map.dispose(); sunLight.shadow.map = null; }
+  }
+  if (bloomPass) bloomPass.enabled = !lowQuality;
+  if (wasLow !== lowQuality) {
+    scene.traverse((n) => {
+      const m = n.material;
+      if (!m) return;
+      if (Array.isArray(m)) m.forEach((x) => { x.needsUpdate = true; });
+      else m.needsUpdate = true;
+    });
+  }
+  onResize();
 }
 
 export function setBloom(strength, radius = 0.62, threshold = 0.78) {
@@ -110,12 +169,17 @@ export function clearGroup(group) {
   }
 }
 
-export function disposeObject(obj) {
+// Materials flagged `userData.shared` are module-level and still in use by
+// other objects, so they are skipped; `extra` catches materials swapped out
+// of the tree (a wreck's saved paint) that the traverse cannot see.
+export function disposeObject(obj, extra = null) {
+  const mats = new Set(extra || []);
   obj.traverse((n) => {
     if (n.geometry) n.geometry.dispose();
     const m = n.material;
     if (!m) return;
-    if (Array.isArray(m)) m.forEach((x) => x.dispose());
-    else m.dispose();
+    if (Array.isArray(m)) m.forEach((x) => mats.add(x));
+    else mats.add(m);
   });
+  for (const m of mats) if (m && !m.userData.shared) m.dispose();
 }

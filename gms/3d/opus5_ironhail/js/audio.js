@@ -18,6 +18,8 @@ export const AudioFX = {
     const AC = window.AudioContext || window.webkitAudioContext;
     if (!AC) return;
     this.muted = !!profile.settings.muted;
+    // iOS mutes Web Audio under the silent switch unless the session says playback
+    try { if (navigator.audioSession) navigator.audioSession.type = 'playback'; } catch (e) { /* unsupported */ }
     this.ctx = new AC();
     this.master = this.ctx.createGain();
     this.master.gain.value = this.muted ? 0 : 0.5;
@@ -30,10 +32,17 @@ export const AudioFX = {
 
     this.startAmbient();
     this.started = true;
+    // the context is born on the first gesture, so a battle or a weather bed
+    // that asked for sound before then gets it now
+    if (this.wantWeather) this.setWeatherBed(this.wantWeather);
+    if (this.wantEngine) this.startEngine();
+    if (this.wantDrone) this.droneHum(true);
   },
 
   resume() {
-    if (this.ctx && this.ctx.state === 'suspended') this.ctx.resume();
+    if (this.ctx && this.ctx.state !== 'running') {
+      try { this.ctx.resume().catch(() => {}); } catch (e) { /* closed */ }
+    }
   },
 
   setMuted(m) {
@@ -99,6 +108,7 @@ export const AudioFX = {
 
   // Continuous engine note; call setEngine() every frame while driving.
   startEngine() {
+    this.wantEngine = true;
     if (!this.ctx || this.engine) return;
     const t0 = this.ctx.currentTime;
     const g = this.ctx.createGain();
@@ -135,6 +145,7 @@ export const AudioFX = {
   },
 
   stopEngine() {
+    this.wantEngine = false;
     if (!this.engine) return;
     const t = this.ctx.currentTime;
     this.engine.g.gain.setTargetAtTime(0, t, 0.25);
@@ -147,6 +158,7 @@ export const AudioFX = {
 
   // Rain / wind bed for the weather presets.
   setWeatherBed(kind) {
+    this.wantWeather = kind;
     if (!this.ctx) return;
     if (this.weather) {
       const w = this.weather;
@@ -422,6 +434,7 @@ export const AudioFX = {
   },
 
   droneHum(on) {
+    this.wantDrone = on;
     if (!this.ctx) return;
     if (on && !this.dh) {
       const t0 = this.ctx.currentTime;

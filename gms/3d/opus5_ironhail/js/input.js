@@ -30,6 +30,8 @@ export function clearActions() { input.actions.clear(); }
 
 let joyId = null, aimId = null;
 let joyOrigin = { x: 0, y: 0 };
+// A pinch is two fingers that are both aiming. The stick thumb plus the aim
+// thumb is a drive-and-aim, and must never zoom the camera.
 const pinch = { a: null, b: null, dist: 0 };
 let sens = 1;
 let aimSide = 'right';      // which half of the screen the aiming thumb owns
@@ -103,10 +105,13 @@ export function initInput(dom) {
         input.aimActive = true;
       }
     }
-    if (e.touches.length === 2) {
-      pinch.a = e.touches[0];
-      pinch.b = e.touches[1];
-      pinch.dist = Math.hypot(pinch.a.clientX - pinch.b.clientX, pinch.a.clientY - pinch.b.clientY);
+    if (e.touches.length === 2 && joyId === null) {
+      const [a, b] = e.touches;
+      pinch.a = a.identifier;
+      pinch.b = b.identifier;
+      pinch.dist = Math.hypot(a.clientX - b.clientX, a.clientY - b.clientY);
+    } else {
+      pinch.dist = 0;
     }
     e.preventDefault();
   }, { passive: false });
@@ -134,12 +139,14 @@ export function initInput(dom) {
       }
       if (!aimPrev[t.identifier]) aimPrev[t.identifier] = { x: t.clientX, y: t.clientY };
     }
-    if (e.touches.length === 2) {
-      const d = Math.hypot(
-        e.touches[0].clientX - e.touches[1].clientX,
-        e.touches[0].clientY - e.touches[1].clientY);
-      if (pinch.dist) input.pinchZoom += (pinch.dist - d) * 0.004;
-      pinch.dist = d;
+    if (pinch.dist && e.touches.length === 2 && joyId === null) {
+      const [a, b] = e.touches;
+      if ((a.identifier === pinch.a && b.identifier === pinch.b) ||
+          (a.identifier === pinch.b && b.identifier === pinch.a)) {
+        const d = Math.hypot(a.clientX - b.clientX, a.clientY - b.clientY);
+        input.pinchZoom += (pinch.dist - d) * 0.004;
+        pinch.dist = d;
+      }
     }
     e.preventDefault();
   }, { passive: false });
@@ -163,11 +170,13 @@ export function initInput(dom) {
   dom.addEventListener('touchend', endTouch);
   dom.addEventListener('touchcancel', endTouch);
 
-  // audio unlock on the first gesture
+  // Audio unlock. Android only counts touchend/pointerup/click as user
+  // activation, so those carry the real unlock; the listeners stay for the
+  // page lifetime so a context the OS suspends later is resumed on the next tap.
   const unlock = () => { AudioFX.init(); AudioFX.resume(); };
-  window.addEventListener('pointerdown', unlock);
-  window.addEventListener('touchstart', unlock);
-  window.addEventListener('keydown', unlock);
+  for (const ev of ['pointerdown', 'touchstart', 'touchend', 'pointerup', 'click', 'keydown']) {
+    window.addEventListener(ev, unlock, { passive: true, capture: true });
+  }
 }
 
 const aimPrev = {};

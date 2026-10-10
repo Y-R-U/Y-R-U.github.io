@@ -6,7 +6,7 @@
 import * as THREE from 'three';
 import { PHYS, COMBAT, FIELD_R } from './config.js';
 import { clamp, clamp01, lerp, damp, angDiff, angStep, dirToYaw, hexToCss, rand } from './utils.js';
-import { actorRoot } from './render.js';
+import { actorRoot, disposeObject } from './render.js';
 import { buildTank } from './tankFactory.js';
 import { terrainHeight, terrainNormal } from './terrain.js';
 import { obstacles, crushCheck, damagePropsInRadius } from './props.js';
@@ -21,6 +21,7 @@ const _n = new THREE.Vector3();
 const burntMat = new THREE.MeshStandardMaterial({
   vertexColors: true, flatShading: true, color: 0x4a4644, roughness: 0.95, metalness: 0.2,
 });
+burntMat.userData.shared = true;
 
 let nextId = 1;
 
@@ -489,12 +490,7 @@ export class Tank {
 
   dispose() {
     actorRoot.remove(this.grp);
-    for (const m of [this.hullMesh, this.turretMesh, this.barrelMesh]) {
-      if (m && m.geometry) m.geometry.dispose();
-    }
-    for (const m of this.accentMeshes) if (m.geometry) m.geometry.dispose();
-    for (const f of this.muzzleFlash) f.geometry.dispose();
-    if (this.flashMat) this.flashMat.dispose();
+    disposeObject(this.grp, [this.flashMat, ...(this.savedMats || [])]);
   }
 }
 

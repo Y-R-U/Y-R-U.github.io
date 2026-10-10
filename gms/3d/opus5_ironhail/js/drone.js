@@ -6,7 +6,7 @@
 import * as THREE from 'three';
 import { DRONE } from './config.js';
 import { clamp, clamp01, lerp, damp, rand } from './utils.js';
-import { actorRoot } from './render.js';
+import { actorRoot, disposeObject } from './render.js';
 import { buildDrone } from './tankFactory.js';
 import { terrainHeight } from './terrain.js';
 import { spawnSparks, spawnSmoke, spawnExplosion, spawnDebris, volAt } from './particles.js';
@@ -261,11 +261,9 @@ export class Drone {
     actorRoot.remove(this.grp);
     actorRoot.remove(this.ring);
     actorRoot.remove(this.pulse);
-    this.ring.geometry.dispose();
-    this.ring.material.dispose();
-    this.pulse.geometry.dispose();
-    this.pulse.material.dispose();
-    this.mesh.geometry.dispose();
+    disposeObject(this.grp);
+    disposeObject(this.ring);
+    disposeObject(this.pulse);
   }
 }
 

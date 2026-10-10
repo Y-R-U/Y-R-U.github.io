@@ -25,6 +25,9 @@ export const plateMat = new THREE.MeshStandardMaterial({
 // Unlit accent material for glowing trim (picked up by bloom).
 export const emitMat = new THREE.MeshBasicMaterial({ vertexColors: true });
 
+// Shared across every object that uses them: disposeObject() must leave these.
+solidMat.userData.shared = plateMat.userData.shared = emitMat.userData.shared = true;
+
 export class Parts {
   constructor() { this.geos = []; }
 
