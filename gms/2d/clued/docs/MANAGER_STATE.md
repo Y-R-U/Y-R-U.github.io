@@ -121,9 +121,16 @@ in games/js/games.js ONLY if that file is no longer dirty from another session, 
 - 2026-10-10 APPLEPROXY DONE: proxy deployed (from HEAD+applepx scratch copy to avoid shipping MYROOMS); client audio files shipped selectively WITHOUT BUILD bump (no-cache revalidation). server/main.go register line still uncommitted alongside MYROOMS edits — must ship with MYROOMS. Debug flag ON for Aaron's Edge retest.
 - 2026-10-10 CONFIRMED by Aaron + logs: Edge laptop (ad blocker) times out on itunes.apple.com lookups/previews; proxy serves clips (cache hits), direct artwork ok. Debug logging switched OFF (rows auto-prune in 7 days).
 - 2026-10-10 MYROOMS DONE + shipped (Your rooms: Rejoin/End/Leave; host leave bar; Done ends; 20-min empty-room expiry; admin close-finished). Apple proxy verified intact after its server deploy.
+- 2026-10-11 HUB REVIEW fixes shipped (BUILD 202610101826, commits 27e2c347 client/data, fc9a3acb server; server via deploy.sh RUN_TESTS=1):
+  1. Stored XSS via host questions FIXED: js/net/sanitize.js cleans every room / ?c= / P2P question (string types, format+kind allowlist, https-or-same-origin URLs, < > neutralised, malformed dropped → "didn't load" card); continent options + geo button() use textContent; Apple link only https://music.apple.com/. Reviewer PoC: executed before on room, challenge and P2P paths; renders as text after.
+  2. Answer leak: /q/{i} strips answer/answerText/explain/refs/wrongNotes/id from mc + tf only (the formats verifyCorrect scores) until reveal; client shows "Locked in", then refetches and run.settle() marks the board. Other formats still get answers (server trusts client claims for them, so hiding would break scoring).
+  3. Hidden page suspends AudioContext + pauses streamed Apple clip; resumes when visible (ctx.js trackAudioEl).
+  4. tools/c2_distract.mjs: currency options = bare units from the same region (Kuwait → Dinar/Riyal/Dirham…), languages = neighbours/same branch (+AMBIG table of widely spoken non-main languages never offered as wrong); name giveaways rated 2+ cur 54%→0, curr 83%→0, lang 28%→0, langc 46%→0 (unavoidable ones rated difficulty 1). tools/c2_gender.mjs: item.gender + same-gender distractors (He/She qs with other-gender option 71%→0); runtime distractors() prefers same gender. books first-emma redacted.
+  5. Sessions drop repeated prompt+answer across packs (spec.js dupKey). 6. wrongNotes on the reveal card ("The lek is used in Albania."). 7. Phone-landscape home fits one screen. 8. Room questions stored once in rooms.questions column; state flush excludes them; pre-split rows migrate on next flush.
+  Not done (not approved): player keys in ?k=, long-poll cap. Seen but out of scope: first-line questions for Alice in Wonderland / The Time Machine also name the title; s_challenge_e2e link-reply name check fails ("Player Two" instead of typed "Replier", code untouched here).
 
-## STATE @ 2026-10-10 (pre-compact) — all committed, pushed, deployed
-BUILD 202610100547 live on games.br8t.com + yru.br8t.com (Pages); server healthy, debug logging OFF; tree clean.
+## STATE @ 2026-10-11 — all committed, pushed, deployed
+BUILD 202610101826 live on games.br8t.com + yru.br8t.com (Pages); server healthy, debug logging OFF; tree clean.
 Static deploy = rsync command in this log (excludes docs/server/tools/*.md + media/song-pictures, media/book-moments).
 Server deploy = server/deploy.sh (builds from WORKING TREE — make sure no other lane's half-done server edits are present).
 Open / optional:
