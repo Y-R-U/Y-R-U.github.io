@@ -90,7 +90,7 @@ async function boot() {
   try { AUDIO.setVolume(save.settings.music, save.settings.sfx); } catch (e) {}
   // Kept for the page's lifetime, not { once }: after an app switch iOS suspends the
   // context and only lets it resume inside a gesture. unlock() is a no-op while running.
-  for (const ev of ['pointerdown', 'touchend', 'keydown']) {
+  for (const ev of ['pointerdown', 'touchend', 'click', 'keydown']) {
     window.addEventListener(ev, () => { AUDIO.unlock && AUDIO.unlock(); }, { passive: true });
   }
 
@@ -352,8 +352,13 @@ function simTick() {
   if (mode && MODES && MODES.stepMode) MODES.stepMode(mode, world, api, before);
 }
 
+let lastDrawn = -1e9;
+
 function frame(now) {
   requestAnimationFrame(frame);
+  // no run in progress (title, sheets, pause, results): ~30 fps is plenty
+  if (state !== 'play' && now - lastDrawn < 30) return;
+  lastDrawn = now;
   let dt = (now - last) / 1000;
   last = now;
   if (dt > 0.25) dt = 0.25;
@@ -385,7 +390,7 @@ function frame(now) {
   // `acc * SIM_HZ` is the fraction of a tick the renderer is between frames.
   // It shipped hardcoded to 1, which is the "always exactly on a tick" lie.
   if (world && R) {
-    R.draw(world, { view, t: now / 1000, biome: save.settings.biome, state, shake: shakeAmt },
+    R.draw(world, { view, t: now / 1000, biome: save.settings.biome, state, shake: shakeAmt, idle: state !== 'play' },
       Math.max(0, Math.min(1, acc * SIM_HZ)));
   }
   if (UI && UI.setHud && state === 'play') {
@@ -394,7 +399,7 @@ function frame(now) {
       next: world.nextPiece, mode: mode.name, modeId: mode.id,
       hud: mode.hud,
       // modes publish their own state; the shell shows what it recognises
-      tide: world.tide, hourglass: world.hourglass, alchemy: world.alchemy, zen: world.zen,
+      tide: world.tide, hourglass: world.hourglass, alchemy: world.alchemy, zen: world.zen, jelly: world.jelly,
       chain: lastChainAt,
     });
   }

@@ -281,7 +281,7 @@
 .hud-val.bump { animation: bump .34s var(--ease-out); transform-origin: left center; }
 @keyframes bump { 0% { transform: scale(1); } 32% { transform: scale(1.075); } 100% { transform: scale(1); } }
 
-.hud-pills { display: flex; gap: 6px; margin-top: 8px; }
+.hud-pills { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
 .pill {
   display: inline-flex; align-items: center; gap: 5px;
   height: 22px; padding: 0 9px; border-radius: 11px;
@@ -606,6 +606,8 @@
 
 .pill--tide { border-color: rgba(65,232,196,.32); color: #b9f0e2; background: rgba(5,42,38,.44); }
 .pill--tide b { color: #e8fff9; }
+.pill--tempo { border-color: rgba(120,220,210,.22); color: rgba(200,244,236,.7); }
+.pill--tempo b { color: #e3fbf6; }
 
 /* ------------------------------------------------------------ zen palette */
 /* ZEN declares hud: [] — no score, no chains, no fail state — so the readouts go
@@ -1344,3 +1346,24 @@ input[type=range]::-moz-range-thumb { width: 15px; height: 15px; border-radius: 
 .card--alc .statrow .t-cap { letter-spacing: .13em; white-space: nowrap; }
 .card--alc .card-row .gb { font-size: 11px; letter-spacing: .1em; }
 .lv-cont-n { margin-left: 2px; font-weight: 700; letter-spacing: .1em; color: rgba(255,236,204,.75); }
+
+/* ------------------------------------------------------- landscape gutters */
+/* .is-wide is set by syncBoard() when both gutters beside the board are wide
+   enough to hold the HUD: readouts and mode panels go left of the board,
+   PAUSE and NEXT right of it, and nothing sits over the spawn rows. */
+.is-wide { --gut-w: min(280px, calc(var(--board-x) - var(--sal) - 2 * var(--edge))); }
+.is-wide .scr-hud .frame { left: 0; width: 100%; }
+.is-wide .scr-hud .veil-top { opacity: 0; }
+.is-wide .hud-stack {
+  left: calc(var(--board-x) - 20px - var(--gut-w)); right: auto;
+  width: calc(var(--gut-w) + var(--board-w) + 96px);
+  justify-content: space-between;
+}
+.is-wide .hud-main { flex: 0 0 var(--gut-w); }
+.is-wide .hud-pause { margin-right: 0; }
+.is-wide .scr-hud .hud-hint { left: var(--ui-x); right: auto; width: var(--ui-w); }
+.is-wide .zen-pal {
+  left: auto; right: calc(100% - var(--board-x) + 20px);
+  width: var(--gut-w); bottom: var(--edge); padding: 0;
+}
+.is-wide .scr-hud.is-bare .hud-hint { bottom: calc(var(--edge) + 6px); }

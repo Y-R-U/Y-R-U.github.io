@@ -131,8 +131,13 @@ export function createAudio(opts = {}) {
   function onVisibility() {
     if (!ctx || dead) return;
     try {
-      if (document.hidden) { master.gain.setTargetAtTime(0, ctx.currentTime, 0.08); }
-      else { master.gain.setTargetAtTime(1, ctx.currentTime, 0.12); }
+      if (document.hidden) {
+        master.gain.setTargetAtTime(0, ctx.currentTime, 0.08);
+        ctx.suspend().catch(() => {});
+      } else {
+        master.gain.setTargetAtTime(1, ctx.currentTime, 0.12);
+        if (ctx.state !== 'running') ctx.resume().catch(() => {});
+      }
     } catch (e) {}
   }
 

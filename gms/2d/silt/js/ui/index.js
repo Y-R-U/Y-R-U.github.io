@@ -107,6 +107,7 @@ export function createUI(handlers = {}) {
   const pillChains = h('span', { class: 'pill' }, 'Chains', h('b', { text: '0' }));
   const pillTide = h('span', { class: 'pill pill--tide off' }, 'Tide', h('b', { text: '0%' }));
   const pillCombo = h('span', { class: 'pill pill--combo hide' }, 'Combo', h('b', { text: 'x1' }));
+  const pillTempo = h('span', { class: 'pill pill--tempo off' }, 'Tempo', h('b', { text: 'x1.0' }));
   const nextBox = h('div', { class: 'next' });
   const hudHint = h('div', { class: 'hud-hint', text: HINT.play });
 
@@ -136,7 +137,7 @@ export function createUI(handlers = {}) {
     h('span', { class: 'hud-prog-bar' }, progFill), progLab);
 
   const hudScore = h('div', { class: 'hud-score' }, hudMode, hudVal,
-    h('div', { class: 'hud-pills' }, pillChains, pillTide, pillCombo), hudProg);
+    h('div', { class: 'hud-pills' }, pillChains, pillTide, pillCombo, pillTempo), hudProg);
 
   // The top of the HUD is two columns, and which control sits in which is a
   // playtest result rather than a preference. PAUSE used to live in the
@@ -709,7 +710,7 @@ export function createUI(handlers = {}) {
 
   /* ---------------------------------------------------------------- hud IO */
 
-  let lastScore = -1, lastChains = -1, lastCombo = -1, lastMode = '';
+  let lastScore = -1, lastChains = -1, lastCombo = -1, lastTempo = -1, lastMode = '';
   let lastModeId = '', lastFields = '', lastTidePct = '', fields = null;
   // The payout is a DIFF, and the diff needs its own mark: `lastScore` moves on
   // every frame the score does, so it cannot also be the baseline a chain is
@@ -735,6 +736,8 @@ export function createUI(handlers = {}) {
     pillChains.classList.toggle('off', !has('chains'));
     pillTide.classList.toggle('off', !has('tide'));
     pillCombo.classList.toggle('off', !has('combo'));
+    pillTempo.classList.toggle('off', !F || !F.has('tempo'));
+    lastTempo = -1;
     hudHint.textContent = HINT[lastModeId] || HINT.play;
     zenPal.show(lastModeId === 'zen');
     // A mode panel occupies the band the banner used to drop into, and a banner
@@ -788,6 +791,12 @@ export function createUI(handlers = {}) {
       payMark = score;
       lastChains = s.chains;
       pillChains.lastElementChild.textContent = fmt(s.chains);
+    }
+    const tempo = s.jelly ? Math.round(s.jelly.tempo * 10) / 10 : 1;
+    if (tempo !== lastTempo) {
+      lastTempo = tempo;
+      pillTempo.classList.toggle('hide', !(tempo > 1));
+      pillTempo.lastElementChild.textContent = 'x' + tempo.toFixed(1);
     }
     if (s.combo !== lastCombo) {
       lastCombo = s.combo;
@@ -894,6 +903,11 @@ export function createUI(handlers = {}) {
     const x = Math.max(safe.left, Math.min(b.x + (b.w - w) / 2, v.w - safe.right - w));
     root.style.setProperty('--ui-x', x + 'px');
     root.style.setProperty('--ui-w', w + 'px');
+
+    // Landscape: the board is a narrow column, so the HUD moves into the side
+    // gutters instead of sitting over the spawn rows.
+    const gutL = b.x - safe.left, gutR = v.w - safe.right - (b.x + b.w);
+    root.classList.toggle('is-wide', Math.min(gutL, gutR) >= 180);
   }
   {
     const v = window.__game && window.__game.view;
@@ -929,7 +943,7 @@ export function createUI(handlers = {}) {
     setHud,
     banner,
     results(r = {}) {
-      lastScore = -1; lastChains = -1; lastCombo = -1; payMark = 0;
+      lastScore = -1; lastChains = -1; lastCombo = -1; lastTempo = -1; payMark = 0;
       const alc = r.modeId === 'alchemy' && r.alchemy ? r.alchemy : null;
       runCard.classList.toggle('hide', !!alc);
       alcCard.classList.toggle('hide', !alc);

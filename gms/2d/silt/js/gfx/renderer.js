@@ -7,6 +7,8 @@
 //
 // Pass chain (high tier):
 //   bg -> resolve(MRT) -> occ down -> occ blur x2 -> light -> motes -> bloom(x8) -> composite
+// Low tier lights and blooms at 0.67 of the canvas with one bloom mip; the
+// composite upsamples.
 
 import {
   makeFS, makeTarget, resizeTarget, bindTarget, disposeTarget,
@@ -24,8 +26,8 @@ import { DISSOLVE_TICKS } from '../sim/clears.js';
 export { BUDGETS, BIOME_NAMES };
 
 const TIERS = {
-  high: { R: 2, SIG: 0.80, refract: true, mips: 3, motes: 900, texel: 2.2, maxSS: 4 },
-  low:  { R: 1, SIG: 0.60, refract: false, mips: 2, motes: 220, texel: 3.2, maxSS: 2 },
+  high: { R: 2, SIG: 0.80, refract: true, mips: 3, motes: 900, texel: 2.2, maxSS: 4, scale: 1 },
+  low:  { R: 1, SIG: 0.60, refract: false, mips: 1, motes: 220, texel: 3.2, maxSS: 2, scale: 0.67 },
 };
 
 // How the built world is lit once it is drawn: bevel strength on the cut face,
@@ -102,7 +104,7 @@ export async function createRenderer(canvas, opts = {}) {
     if (post) post.dispose();
     pResolve = makeFS(gl, RESOLVE_FS(T.R, T.SIG, kernelNorm(T.R, T.SIG)), 'resolve');
     pLight = makeFS(gl, LIGHT_FS(T.refract), 'light');
-    post = createPostFX(gl, drawTri, { float, mips: T.mips });
+    post = createPostFX(gl, drawTri, { float, mips: T.mips, scale: T.scale });
     post.resize(vw, vh);
     tierName = name;
     stats.tier = name;
@@ -158,7 +160,7 @@ export async function createRenderer(canvas, opts = {}) {
     superSample = ss;
     resizeTarget(gl, occA, cols, rows);
     resizeTarget(gl, occB, cols, rows);
-    resizeTarget(gl, bgT, Math.ceil(vw / 2), Math.ceil(vh / 2));
+    resizeTarget(gl, bgT, Math.ceil(vw * T.scale / 2), Math.ceil(vh * T.scale / 2));
   }
 
   /* -------------------------------------------------------------- biomes */
@@ -174,6 +176,10 @@ export async function createRenderer(canvas, opts = {}) {
 
   /* --------------------------------------------------------------- state */
   let time = 0, lastNow = performance.now(), frames = 0, probed = tierForced;
+  // quality watch: ~5 s windows of real frame intervals, while a run is drawing
+  // at full rate. Two slow windows in a row drop to low; nothing steps back up.
+  const PROBE_MS = 5000, SLOW_MS = 20.5;
+  let winStart = 0, winDts = [], slowWins = 0;
   let flash = [1, 1, 1, 0];
   let lastChainMax = 0;
   let shakeSeed = 0;
@@ -213,6 +219,7 @@ export async function createRenderer(canvas, opts = {}) {
   function draw(world, o = {}, alpha = 1) {
     if (lost) return;
     const now = performance.now();
+    const rawMs = now - lastNow;
     let dt = (now - lastNow) / 1000;
     lastNow = now;
     if (!(dt > 0) || dt > 0.25) dt = 1 / 60;
@@ -316,7 +323,7 @@ export async function createRenderer(canvas, opts = {}) {
       .tex('u_smooth', 4, smA.tex)
       .tex('u_piece', 5, fieldT.texs[2])
       .tex('u_solid', 6, fieldT.texs[3])
-      .u2f('u_res', vw, vh).u2f('u_grid', cols, rows)
+      .u2f('u_res', post.scene.w, post.scene.h).u2f('u_grid', cols, rows)
       .u4f('u_rect', rect[0], rect[1], rect[2], rect[3])
       .u2f('u_ftex', 1 / fieldT.w, 1 / fieldT.h)
       .u1f('u_time', time)
@@ -336,7 +343,7 @@ export async function createRenderer(canvas, opts = {}) {
 
     /* 6 — dissolve motes, additive on top of the lit scene */
     if (motes.alive) {
-      motes.upload(rect, dpr);
+      motes.upload(rect, dpr * post.scale);
       gl.enable(gl.BLEND);
       gl.blendFunc(gl.ONE, gl.ONE);
       gl.bindVertexArray(motes.vao);
@@ -369,12 +376,22 @@ export async function createRenderer(canvas, opts = {}) {
     stats.motes = motes.alive;
     stats.endFrame();
 
-    /* one-shot quality probe — measure, do not guess at the device */
+    /* quality watch — measure, do not guess at the device */
     frames++;
     if (!probed && frames === 12) stats.reset();
-    if (!probed && frames > 60) {
-      probed = true;
-      if (stats.frame.med > 20.5) { buildTier('low'); motes.dispose(); motes = new Motes(gl, moteCount('low')); stats.reset(); }
+    if (!probed && frames > 12) {
+      if (o.idle || rawMs > 250) { winStart = 0; winDts.length = 0; }
+      else if (!winStart) winStart = now;
+      else {
+        winDts.push(rawMs);
+        if (now - winStart >= PROBE_MS) {
+          winDts.sort((a, b) => a - b);
+          const med = winDts[winDts.length >> 1];
+          slowWins = med > SLOW_MS ? slowWins + 1 : 0;
+          winStart = now; winDts.length = 0;
+          if (slowWins >= 2) setQuality('low');
+        }
+      }
     }
   }
 
@@ -405,6 +422,7 @@ export async function createRenderer(canvas, opts = {}) {
     stats: () => stats.read(),
     statsHtml: () => stats.html(),
     get tier() { return tierName; },
+    get probe() { return { probed, slowWins, winMs: winStart ? performance.now() - winStart : 0 }; },
     get biome() { return biomeName; },
     get rect() { return rect.slice(); },
     dispose,

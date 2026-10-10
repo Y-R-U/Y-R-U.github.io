@@ -9,6 +9,8 @@ import { BRIGHT_FS, DOWN_FS, BLUR_FS, UP_FS, COMPOSITE_FS } from './shaders/post
 export function createPostFX(gl, drawTri, opts = {}) {
   const float = !!opts.float;
   const MIPS = opts.mips || 3;
+  // scene + bloom render at `scale` of the output; the composite upsamples
+  const scale = opts.scale || 1;
 
   const scene = makeTarget(gl, 4, 4, { float });
   const mip = [];
@@ -24,8 +26,9 @@ export function createPostFX(gl, drawTri, opts = {}) {
 
   function resize(w, h) {
     pw = w; ph = h;
-    resizeTarget(gl, scene, w, h);
-    let mw = Math.ceil(w / 2), mh = Math.ceil(h / 2);
+    const sw = Math.max(1, Math.round(w * scale)), sh = Math.max(1, Math.round(h * scale));
+    resizeTarget(gl, scene, sw, sh);
+    let mw = Math.ceil(sw / 2), mh = Math.ceil(sh / 2);
     for (let i = 0; i < MIPS; i++) {
       resizeTarget(gl, mip[i].a, mw, mh);
       resizeTarget(gl, mip[i].b, mw, mh);
@@ -102,5 +105,5 @@ export function createPostFX(gl, drawTri, opts = {}) {
     for (const pr of [pBright, pDown, pBlur, pUp, pComp]) pr.dispose();
   }
 
-  return { scene, resize, run, dispose };
+  return { scene, scale, resize, run, dispose };
 }

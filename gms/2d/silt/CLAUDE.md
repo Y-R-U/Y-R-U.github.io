@@ -92,3 +92,38 @@ Falsification arms, never shipped set: `?attractbug=vent` leaves an exhausted
 attract board running · `?ctxbug=1` skips the GPU-context rebuild
 `window.__state` (lazy getter, never stale) · `window.__game`
 Under `?auto` the account layer is never imported, so soak runs stay hermetic.
+
+## Hub pass, 2026-10-11
+
+- **Landscape:** when both gutters beside the board are at least 180 px wide,
+  `syncBoard()` sets `#ui.is-wide`. The readouts and mode panels (the HOURGLASS
+  flip card, the ALCHEMY objective) then sit in the left gutter, PAUSE and NEXT
+  in the right gutter, and the ZEN palette at the bottom of the left gutter.
+  Nothing covers the spawn rows. Portrait never gets `.is-wide`. The rules are
+  at the end of `css/ui.css`.
+- **Audio:** when the page is hidden the context is suspended (`ctx.suspend()`).
+  When it is visible again the game tries `resume()`, and the persistent unlock
+  listeners (`pointerdown`/`touchend`/`click`/`keydown`) resume it on the next
+  tap if that fails.
+- **Low tier** lights and blooms at 0.67 of the canvas, with one bloom mip, and
+  the composite upsamples (`TIERS.low.scale`, `createPostFX({ scale })`).
+  Measured with ANGLE Metal on the M5 at 390x844 dpr 2.75, JELLY, 200 draws and
+  one fence: low went from 1.06 to 0.82 ms per frame (landscape: 0.90 to
+  0.55), and passes went from 16 to 12. High is unchanged.
+- **Quality watch:** the renderer measures ~5 s windows of real frame intervals
+  during a run (`opts.idle` frames are excluded). Two consecutive windows with a
+  median above 20.5 ms drop it to low, and it never steps back up. Read the
+  state with `__game.renderer.probe`.
+- **Title throttle:** whenever `state !== 'play'` (title, sheets, pause,
+  results), `main.js` draws at ~30 fps.
+- **JELLY tempo:** this is a score multiplier only, so survival is unchanged
+  (the modesim lengths are identical). It climbs +0.1 for a chain within 8 s of
+  the previous one and +0.02 for a piece dropped in under half its gravity time,
+  up to a cap of x1.5. After 8 s idle it decays by 0.1/s. It is published as
+  `world.jelly.tempo` and shown as the TEMPO pill (hud field `'tempo'`). The
+  value is applied through `scorer.award(..., weight)`, so S1 still holds.
+- **modesim:** a `Patient` agent (never soft-drops) runs JELLY up to 600 s, and
+  gate J1 holds its mean length to 300-590 s. Measured over 8 seeds it averaged
+  484 s (267-600). Its arm is `--break patient`, which starts at fallRate 90 with fallMax 240 and
+  fallTime 1.2. That gives 70 s and goes red.
+  The bot and patient JELLY lines print under the mode table.

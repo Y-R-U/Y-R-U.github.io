@@ -23,7 +23,7 @@
 //   node tools/modesim.mjs --break <gate>      falsification arm: that gate MUST go red
 //
 // break gates: ledger  score  stall  rng  tide  zen  slots  trivial  unwinnable  span
-//              aspect  headroom  grace  budget  masher
+//              aspect  headroom  grace  budget  masher  patient
 
 import { World, SIM_HZ, DEFAULT_CFG } from '../js/sim/world.js';
 import { Grid, F_CLEARING } from '../js/sim/grid.js';
@@ -156,6 +156,12 @@ const notes = [];
 const BANDS = {
   flow: [85, 165], tide: [80, 150], jelly: [45, 130], hourglass: [90, 210],
 };
+// JELLY played by the Patient agent (no soft-drop). Measured 2026-10-11 over 8
+// seeds: mean 484s, 267-600s, 2/8 reached the cap. The floor catches JELLY
+// getting harsher for a relaxed player; the ceiling catches it becoming
+// unlosable (every run capped).
+const PATIENT_CAP_S = 600;
+const PATIENT_BAND = [300, 590];
 
 // --------------------------------------------------------------- invariants
 
@@ -248,7 +254,13 @@ class Masher extends HardDropper {
   }
 }
 
-const AGENTS = { bot: Bot, swift: HardDropper, masher: Masher };
+// Never soft-drops: every piece falls at gravity. Closer to a relaxed human than
+// the shipping bot, which soft-drops every piece once it is lined up.
+class Patient extends Bot {
+  update() { super.update(); this.w.softDrop = false; }
+}
+
+const AGENTS = { bot: Bot, swift: HardDropper, masher: Masher, patient: Patient };
 
 // ------------------------------------------------------------------ runner
 
@@ -275,7 +287,7 @@ async function playMode(mode, o = {}) {
   const r = {
     world, seed, ticks: 0, s: 0, chains: 0, score: 0, awarded: 0, awards: [],
     sizes: [], stalled: false, err: null, fill: 0, banners: [], biomes: new Set(),
-    over: false, won: false,
+    over: false, won: false, tempoPeak: 1,
   };
 
   if (mode.onStart) mode.onStart(world, api);
@@ -299,6 +311,7 @@ async function playMode(mode, o = {}) {
       if (typeof pts === 'number') { r.awarded += pts; r.awards.push(pts); }
     }
     if (mode.onTick) mode.onTick(world, api);
+    if (world.jelly && world.jelly.tempo > r.tempoPeak) r.tempoPeak = world.jelly.tempo;
     if (BREAK === 'score' && t === 900) world.score += 5000;   // a leaked engine award
     if (o.sample && (t % 12) === 0) o.sample(world);
     if ((t & 63) === 0) {
@@ -354,6 +367,30 @@ async function gateModes() {
     rows.push({ mode, runs, lens, chains });
   }
   return rows;
+}
+
+// ------------------------------------------- J1: JELLY with a patient player
+
+async function gateJellyPatient(botRuns) {
+  if (ONLY && ONLY !== 'jelly') return null;
+  const runs = [];
+  for (let i = 0; i < GAMES; i++) runs.push(await playMode(jelly, {
+    seed: 400 + i * 137, capS: PATIENT_CAP_S, agent: 'patient',
+    cfg: BREAK === 'patient' ? { fallRate: 90, fallMax: 240, fallTime: 1.2 } : undefined,   // a harsh ramp MUST trip J1
+  }));
+  for (const r of runs) {
+    if (r.err) fail('M1-ledger', r.err);
+    if (r.awards.length && r.score !== r.awarded) fail('S1-score', `jelly/patient seed ${r.seed} world.score=${r.score} but mode awarded ${r.awarded}`);
+  }
+  const m = mean(runs.map((r) => r.s));
+  if (m < PATIENT_BAND[0] || m > PATIENT_BAND[1]) fail('J1-patient', `jelly/patient mean run ${m.toFixed(1)}s outside ${PATIENT_BAND[0]}-${PATIENT_BAND[1]}s`);
+  const line = (tag, rs) => `  jelly/${tag.padEnd(8)}` +
+    ` len ${mean(rs.map((r) => r.s)).toFixed(0)}s [${rs.map((r) => r.s.toFixed(0)).join(',')}]` +
+    `  capped ${rs.filter((r) => !r.over).length}/${rs.length}` +
+    `  chains ${mean(rs.map((r) => r.chains)).toFixed(1)}/game` +
+    `  score ${Math.round(mean(rs.map((r) => r.score)))}` +
+    `  tempo peak ${mean(rs.map((r) => r.tempoPeak)).toFixed(2)}`;
+  return [line('bot', botRuns || []), line('patient', runs)];
 }
 
 // --------------------------------------------------- M2 determinism per mode
@@ -1303,6 +1340,7 @@ if (MASHER) {
   const slots = await gateTintSlots();
   const tideProbe = gateTide();
   const rows = await gateModes();
+  const jp = await gateJellyPatient((rows.find((r) => r.mode.id === 'jelly') || {}).runs);
   await gateDeterminism();
   const flips = await gateHourglass();
   const z = await gateZen();
@@ -1449,6 +1487,7 @@ if (MASHER) {
 
   console.log('');
   fmtRuns(rows);
+  if (jp) { console.log(''); for (const l of jp) console.log(l); }
   console.log(`\n  tide: bare tide self-clears 0x; tinted water bridges a sand run (${tideProbe.bridged} cells). engine treats tint 0 as inert: ${tideProbe.inertZero}. highest tint emitted ${BRINE_FIRST + BRINE_COUNT - 1} of ${slots} renderer slots`);
   console.log(`  hourglass flips in 150s: ${flips}`);
   console.log(`  zen: no fail state over 120s, vented ${z.vented}x`);

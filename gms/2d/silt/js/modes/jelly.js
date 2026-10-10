@@ -1,4 +1,5 @@
 import { JELLY } from '../sim/materials.js';
+import { SIM_HZ } from '../sim/world.js';
 import { safeApi } from './api.js';
 import { makeScorer } from './score.js';
 
@@ -54,12 +55,25 @@ const S = new WeakMap();
 // Soft-body feel, pressed onto the solver instance. Never edit blobs.js.
 export const JELLY_FEEL = { qMin: 0.38, loadSquash: 0.42 };
 
+// TEMPO: a score multiplier, never a survival term. It climbs while chains land
+// within `window` of each other and while pieces are dropped well ahead of
+// gravity, and bleeds back to x1 once nothing has happened for `window`.
+export const TEMPO = {
+  window: 8 * SIM_HZ, chain: 0.1, drop: 0.02, fastFrac: 0.5, minDrop: 24,
+  max: 1.5, decay: 0.1 / SIM_HZ,
+};
+
+function tempoBump(st, world, amt) {
+  st.tempo = Math.min(TEMPO.max, st.tempo + amt);
+  st.lastBeat = world.ticks;
+}
+
 export default {
   id: 'jelly',
   name: 'JELLY LAB',
   blurb: 'Soft bodies. They squash, they fuse, they will not settle for you.',
   biome: 'lumen',
-  hud: ['score', 'chains', 'combo', 'next'],
+  hud: ['score', 'chains', 'combo', 'tempo', 'next'],
 
   worldCfg: {
     mat: JELLY,
@@ -85,7 +99,10 @@ export default {
     const st = {
       scorer: makeScorer({ per: 26, curve: 5000 }),
       soft: !!(world.blobs && typeof world.blobs.step === 'function'),
+      tempo: 1, lastBeat: -1e9, lastChain: -1e9,
+      p: null, y0: 0, t0: 0, landed: world.landed,
     };
+    world.jelly = { tempo: 1 };
     st.scorer.sync(world);
     S.set(world, st);
     api.biome(this.biome);
@@ -96,6 +113,21 @@ export default {
   onTick(world, api) {
     const st = S.get(world);
     if (!st) return;
+    if (world.landed > st.landed) {
+      // st.p is the landed piece object; hardDrop moved its y in place
+      if (st.p) {
+        const dist = st.p.y - st.y0, life = (world.ticks - st.t0) / SIM_HZ;
+        if (dist >= TEMPO.minDrop && life < TEMPO.fastFrac * dist / Math.max(1, world.fallRate)) tempoBump(st, world, TEMPO.drop);
+      }
+      st.landed = world.landed;
+      st.p = null;
+    }
+    if (world.piece) {
+      if (!st.p) { st.y0 = world.piece.y; st.t0 = world.ticks; }
+      st.p = world.piece;
+    }
+    if (st.tempo > 1 && world.ticks - st.lastBeat > TEMPO.window) st.tempo = Math.max(1, st.tempo - TEMPO.decay);
+    world.jelly.tempo = st.tempo;
     st.scorer.tick(world);
   },
 
@@ -104,7 +136,11 @@ export default {
     if (!st) return;
     api = safeApi(api);
     const n = cells ? cells.length : world.lastChainSize;
-    const pts = st.scorer.award(world, n);
+    if (world.ticks - st.lastChain <= TEMPO.window) tempoBump(st, world, TEMPO.chain);
+    else st.lastBeat = world.ticks;
+    st.lastChain = world.ticks;
+    world.jelly.tempo = st.tempo;
+    const pts = st.scorer.award(world, n, st.tempo);
     api.shake(Math.min(1, n / 2000));
     return pts;
   },
