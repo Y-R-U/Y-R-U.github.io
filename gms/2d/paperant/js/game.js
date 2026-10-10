@@ -25,6 +25,44 @@ const Game = (() => {
     let pencilBoosted = false;
     let placingMagnet = false;
 
+    // Undo / hints
+    let lastTap = null;          // { t, pos } of the previous tap, for double-tap undo
+    let gestureConsumed = false; // current contact was used up by an undo
+    let drawHintActive = false;
+    let drawHintT = 0;
+    let drawHintAnchor = null;
+    let rotateHintT = 0;
+    let landscapeHinted = false;
+
+    Renderer.onAreaChange((oldA, newA) => {
+        const map = (x, y) => ({
+            x: newA.x + (x - oldA.x) / oldA.w * newA.w,
+            y: newA.y + (y - oldA.y) / oldA.h * newA.h,
+        });
+        for (const ant of ants) {
+            const p = map(ant.cx, ant.cy);
+            ant.cx = p.x; ant.cy = p.y;
+            const q = map(ant.stuckCheckX, ant.stuckCheckY);
+            ant.stuckCheckX = q.x; ant.stuckCheckY = q.y;
+        }
+        if (magnet) {
+            const p = map(magnet.x, magnet.y);
+            magnet.x = p.x; magnet.y = p.y;
+        }
+        drawHintAnchor = null;
+        Drawing.remap(oldA, newA);
+        checkRotateHint();
+        if (state !== 'idle') render(performance.now() / 1000);
+    });
+
+    function checkRotateHint() {
+        if (!Renderer.isLandscape()) { landscapeHinted = false; rotateHintT = 0; return; }
+        if (state === 'playing' && !landscapeHinted) {
+            landscapeHinted = true;
+            rotateHintT = 4;
+        }
+    }
+
     function startLevel(index) {
         const data = LevelManager.getLevelData(index);
         if (!data) return;
@@ -51,6 +89,11 @@ const Game = (() => {
         freezeTimer = 0;
         pencilBoosted = false;
         placingMagnet = false;
+        lastTap = null;
+        gestureConsumed = false;
+        drawHintActive = !challengeMode && currentLevel < 3;
+        drawHintT = 0;
+        drawHintAnchor = null;
 
         const dpr = Renderer.getDpr();
 
@@ -95,7 +138,9 @@ const Game = (() => {
         Input.setCallbacks(
             (pos) => handleInputStart(pos),
             (pos) => Drawing.addPoint(pos),
-            () => Drawing.endStroke()
+            () => Drawing.endStroke(),
+            () => Drawing.cancelStroke(),
+            (pos) => handleTap(pos)
         );
 
         // Show HUD + power-up bar
@@ -103,9 +148,7 @@ const Game = (() => {
         UI.showHUD(true);
         UI.resetPowerupActive();
         UI.updatePowerupBar();
-
-        // Start music
-        GameAudio.playMusic();
+        checkRotateHint();
 
         lastTime = performance.now() / 1000;
     }
@@ -118,17 +161,46 @@ const Game = (() => {
     }
 
     function handleInputStart(pos) {
+        gestureConsumed = false;
         if (placingMagnet) {
             placeMagnet(pos);
+            gestureConsumed = true;
             return;
         }
+        const dpr = Renderer.getDpr();
+        if (lastTap && performance.now() - lastTap.t < 350 &&
+            Math.hypot(pos.x - lastTap.pos.x, pos.y - lastTap.pos.y) < 30 * dpr) {
+            const line = Drawing.lineAt(pos, 24 * dpr) || Drawing.lineAt(lastTap.pos, 24 * dpr);
+            lastTap = null;
+            if (line) {
+                gestureConsumed = true;
+                undoLine(line);
+                return;
+            }
+        }
         Drawing.startStroke(pos);
+    }
+
+    function handleTap(pos) {
+        if (gestureConsumed) { gestureConsumed = false; return; }
+        lastTap = { t: performance.now(), pos };
+    }
+
+    function undoLine(line) {
+        if (!(line ? Drawing.removeLine(line) : Drawing.undoLast())) return;
+        GameAudio.SFX.undo();
+        GameAudio.vibrate(15);
     }
 
     // === Power-ups ===
 
     function activatePowerUp(type) {
         if (state !== 'playing') return;
+
+        if (type === 'undo') {
+            undoLine(null);
+            return;
+        }
 
         if (type === 'magnet') {
             // Toggle placement mode (second tap on the button cancels)
@@ -218,6 +290,13 @@ const Game = (() => {
         const label = challengeMode ? 'Daily ⚡' : 'Level ' + (currentLevel + 1);
         UI.updateHUD(label, goalText, timeRemaining, Drawing.getInkFraction());
 
+        UI.setUndoEnabled(Drawing.getLines().length > 0);
+        if (drawHintActive) {
+            drawHintT += dt;
+            if (Drawing.pointCount > 2 || Drawing.getStrokeCount() > 0) drawHintActive = false;
+        }
+        if (rotateHintT > 0) rotateHintT -= dt;
+
         // Start delay countdown
         if (levelStartDelay > 0) {
             levelStartDelay -= dt;
@@ -262,7 +341,7 @@ const Game = (() => {
         }
 
         // Update systems
-        Drawing.update(dt, now);
+        Drawing.update(dt);
         Particles.update(dt);
 
         // Update ants
@@ -341,6 +420,11 @@ const Game = (() => {
         // Draw pencil lines
         Drawing.drawLines(ctx);
 
+        if (state === 'playing') {
+            if (UI.ghostEnabled() && (levelStartDelay > 0 || Input.isDrawing)) drawGhosts(ctx, dpr);
+            if (drawHintActive) drawDrawHint(ctx, dpr);
+        }
+
         // Draw active magnet
         if (magnet) drawMagnet(ctx, dpr, now);
 
@@ -384,6 +468,12 @@ const Game = (() => {
             ctx.restore();
         }
 
+        if (rotateHintT > 0 && state === 'playing' && !placingMagnet) {
+            const area = Renderer.getPlayArea();
+            drawPill(ctx, dpr, '\u21BB Turn upright for the best fit',
+                area.x + area.w / 2, area.y + 26 * dpr, Math.min(1, rotateHintT));
+        }
+
         // Start delay overlay
         if (state === 'playing' && levelStartDelay > 0) {
             const area = Renderer.getPlayArea();
@@ -397,6 +487,130 @@ const Game = (() => {
             ctx.fillText('Ready...', area.x + area.w / 2, area.y + area.h / 2);
             ctx.restore();
         }
+    }
+
+    function drawPill(ctx, dpr, msg, mx, my, alpha) {
+        ctx.save();
+        ctx.globalAlpha = alpha;
+        ctx.font = `bold ${18 * dpr}px 'Patrick Hand', cursive`;
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        const tw = ctx.measureText(msg).width;
+        ctx.fillStyle = 'rgba(245, 240, 225, 0.92)';
+        ctx.strokeStyle = 'rgba(139, 115, 85, 0.7)';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.roundRect(mx - tw / 2 - 10 * dpr, my - 15 * dpr, tw + 20 * dpr, 30 * dpr, 10 * dpr);
+        ctx.fill();
+        ctx.stroke();
+        ctx.fillStyle = '#2c1810';
+        ctx.fillText(msg, mx, my);
+        ctx.restore();
+    }
+
+    // Faint dotted preview of each ant's next ~1 s. Walls and obstacles mirror
+    // the path; pencil lines send it along the line's normal, which is the
+    // average of the real (randomised +-70 deg) line bounce.
+    function drawGhosts(ctx, dpr) {
+        const area = Renderer.getPlayArea();
+        const margin = CONFIG.ANT_SIZE * dpr * 0.8;
+        const lines = Drawing.getLines().filter(l => !(l.fading && l.opacity < 0.3));
+        const cur = Drawing.getCurrentStroke();
+        if (cur && cur.points.length >= 2) lines.push(cur);
+        const frozen = freezeTimer > 0 ? CONFIG.FREEZE_FACTOR : 1;
+        ctx.save();
+        ctx.fillStyle = '#2c1810';
+        for (const ant of ants) {
+            let x = ant.cx, y = ant.cy, a = ant.angle;
+            const step = ant.baseSpeed * frozen * 2; // two 60 fps frames per step
+            for (let i = 1; i <= 30; i++) {
+                let nx = x + Math.cos(a) * step;
+                let ny = y + Math.sin(a) * step;
+                let vx = Math.cos(a), vy = Math.sin(a);
+                if (nx - margin < area.x || nx + margin > area.x + area.w) { vx = -vx; nx = x; }
+                if (ny - margin < area.y || ny + margin > area.y + area.h) { vy = -vy; ny = y; }
+                for (const o of obstacles) {
+                    const op = Renderer.toCanvas(o.x, o.y);
+                    const ow = o.w * area.w, oh = o.h * area.h;
+                    if (nx + margin > op.x && nx - margin < op.x + ow &&
+                        ny + margin > op.y && ny - margin < op.y + oh) {
+                        const inX = x + margin > op.x && x - margin < op.x + ow;
+                        if (inX) vy = -vy; else vx = -vx;
+                        nx = x; ny = y;
+                        break;
+                    }
+                }
+                a = Math.atan2(vy, vx);
+                let hit = false;
+                for (const l of lines) {
+                    const th = margin + (l.width || CONFIG.PENCIL_WIDTH) * dpr;
+                    const p = l.points;
+                    for (let j = 1; j < p.length && !hit; j++) {
+                        const dx = p[j].x - p[j - 1].x, dy = p[j].y - p[j - 1].y;
+                        const l2 = dx * dx + dy * dy || 1;
+                        const t = Math.max(0, Math.min(1, ((nx - p[j - 1].x) * dx + (ny - p[j - 1].y) * dy) / l2));
+                        const cx = p[j - 1].x + t * dx, cy = p[j - 1].y + t * dy;
+                        if (Math.hypot(nx - cx, ny - cy) < th) {
+                            let n = Math.atan2(dx, -dy);
+                            if (Math.cos(a - n) > 0) n += Math.PI;
+                            a = n;
+                            nx = x; ny = y;
+                            hit = true;
+                        }
+                    }
+                    if (hit) break;
+                }
+                x = nx; y = ny;
+                if (i % 2 === 0) {
+                    ctx.globalAlpha = 0.32 * (1 - i / 34);
+                    ctx.beginPath();
+                    ctx.arc(x, y, 1.8 * dpr, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+            }
+        }
+        ctx.restore();
+    }
+
+    // Levels 1-3: a ghost pencil traces a funnel in front of the first ant
+    // until the player draws their first stroke.
+    function drawDrawHint(ctx, dpr) {
+        const ant = ants[0];
+        if (!ant) return;
+        const area = Renderer.getPlayArea();
+        const cycle = 2.4;
+        const t = drawHintT % cycle;
+        const R = 0.13 * Math.min(area.w, area.h);
+        const n = Math.floor(drawHintT / cycle);
+        if (!drawHintAnchor || drawHintAnchor.n !== n) {
+            const d = R * 2.4;
+            const cx = Math.max(area.x + R, Math.min(area.x + area.w - R, ant.cx + Math.cos(ant.angle) * d));
+            const cy = Math.max(area.y + R, Math.min(area.y + area.h - R, ant.cy + Math.sin(ant.angle) * d));
+            drawHintAnchor = { n, cx, cy, a: Math.atan2(cy - ant.cy, cx - ant.cx) };
+        }
+        const { cx, cy, a } = drawHintAnchor;
+        const k = Math.min(1, t / 1.4);
+        const fade = t > 1.8 ? Math.max(0, 1 - (t - 1.8) / 0.6) : 1;
+        const a0 = a - Math.PI / 2;
+        const a1 = a0 + Math.PI * k;
+        ctx.save();
+        ctx.globalAlpha = 0.45 * fade;
+        ctx.strokeStyle = CONFIG.PENCIL_COLOR;
+        ctx.lineWidth = CONFIG.PENCIL_WIDTH * dpr;
+        ctx.lineCap = 'round';
+        ctx.setLineDash([2 * dpr, 9 * dpr]);
+        ctx.beginPath();
+        ctx.arc(cx, cy, R, a0, a1);
+        ctx.stroke();
+        ctx.setLineDash([]);
+        ctx.globalAlpha = 0.9 * fade;
+        ctx.font = `${26 * dpr}px serif`;
+        ctx.textAlign = 'left';
+        ctx.textBaseline = 'bottom';
+        ctx.fillText('\u270F\uFE0F', cx + Math.cos(a1) * R - 4 * dpr, cy + Math.sin(a1) * R + 4 * dpr);
+        ctx.restore();
+        drawPill(ctx, dpr, 'Draw a curve to steer the ant', area.x + area.w / 2,
+            area.y + area.h - 22 * dpr, 0.9);
     }
 
     function drawMagnet(ctx, dpr, now) {

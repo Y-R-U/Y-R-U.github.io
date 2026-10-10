@@ -24,14 +24,14 @@ const CONFIG = {
     PENCIL_WIDTH: 5,
     LINE_FADE_TIME: 3.5, // seconds before line starts fading
     LINE_FADE_DURATION: 1.0, // seconds to fully fade
-    // Ink is now TIME-based (in seconds of drawing) instead of pixel-based.
-    // This makes it consistent across DPI / screen sizes — drawing for 1 real
-    // second always uses 1 second of ink, regardless of how far the finger
-    // moved. Drawing fast covers more distance per second of ink (messier),
-    // drawing slow covers less (more accurate). Natural skill trade-off.
-    INK_MAX: 1.25,       // max seconds of continuous drawing time
-    INK_REGEN_RATE: 0.1, // seconds of ink regenerated per real second when not drawing
-    INK_START_MIN: 0.5,  // minimum ink (seconds) required to begin a new stroke
+    // Ink is LENGTH-based, in units of INK_UNIT_PX css px of stroke (DPR
+    // independent). Holding the pen still costs nothing. Tuned to match the
+    // old 1.25 s time budget drawn at a deliberate ~300 css px/s: 375 px.
+    INK_UNIT_PX: 480,
+    INK_MAX: 0.8,
+    INK_REGEN_RATE: 0.064, // per second while not drawing (full refill in 12.5 s, as before)
+    INK_START_MIN: 0.32,   // minimum ink needed to begin a new stroke (same 40% of the tank)
+    UNDO_REFUND: 0.5,      // fraction of a line's ink returned by undo
     MIN_DRAW_DIST: 4,    // min distance between draw points (canvas px)
 
     // Goals

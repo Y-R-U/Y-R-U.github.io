@@ -6,7 +6,7 @@ Paper Ant is a mobile-first top-down puzzle game where players draw pencil lines
 
 - Vanilla JS, HTML5 Canvas, CSS.
 - No external dependencies.
-- Web Audio API for synthesized SFX and optional music.
+- Web Audio API for synthesized SFX (no music).
 - `localStorage` for progress.
 - Mobile-first layout, max-width around 600px on desktop.
 
@@ -29,8 +29,7 @@ paperant/
 ├── js/ui.js
 ├── js/levels.js
 ├── js/game.js
-├── js/main.js
-└── music/
+└── js/main.js
 ```
 
 ## Architecture
@@ -48,8 +47,8 @@ paperant/
 - Ants wander autonomously.
 - Drawn pencil lines are temporary barriers.
 - Ants reflect off lines using surface-normal reflection, not random bounces.
-- Lines fade after about 3.5 seconds.
-- Ink meter limits drawing and regenerates while not drawing.
+- Lines fade after about 3.5 seconds of game time.
+- Ink meter limits stroke length and regenerates while not drawing.
 - Goals include food, nest, friend, leaf, and sugar.
 - Star rating is based on completion speed.
 - 100 levels; 51+ use moving obstacles (`moveX`/`moveY` + `period` + `phase`).
@@ -63,4 +62,3 @@ paperant/
 - Keep touch and mouse input unified.
 - Maintain framerate-independent movement and anti-stuck behavior in ant physics.
 - Do not add dependencies or a build step.
-- Optional music is detected as `music/theme1.mp3` through `music/theme9.mp3`.

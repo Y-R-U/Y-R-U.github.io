@@ -1,22 +1,25 @@
-/* audio.js - Sound effects (Web Audio API) and music management */
+/* audio.js - Synthesized sound effects (Web Audio API) */
 /* Renamed from Audio to GameAudio to avoid shadowing window.Audio */
 'use strict';
 
 const GameAudio = (() => {
     let audioCtx = null;
     let sfxEnabled = true;
-    let musicEnabled = true;
     let vibrateEnabled = true;
-    let musicElement = null;
-    let musicTracks = [];
-    let currentTrack = -1;
+    let noiseBuf = null;
+    let lastDraw = 0;
 
     function getCtx() {
         if (!audioCtx) {
+            try { if (navigator.audioSession) navigator.audioSession.type = 'playback'; } catch (e) {}
             audioCtx = new (window.AudioContext || window.webkitAudioContext)();
         }
-        if (audioCtx.state === 'suspended') audioCtx.resume();
+        if (audioCtx.state !== 'running' && !document.hidden) audioCtx.resume().catch(() => {});
         return audioCtx;
+    }
+
+    function unlock() {
+        try { getCtx(); } catch (e) {}
     }
 
     // Synthesized sound effects
@@ -37,27 +40,43 @@ const GameAudio = (() => {
         } catch (e) { /* silent fail */ }
     }
 
+    // One shared second of white noise; each play reads a slice of it
+    function getNoise(ctx) {
+        if (!noiseBuf || noiseBuf.sampleRate !== ctx.sampleRate) {
+            noiseBuf = ctx.createBuffer(1, ctx.sampleRate, ctx.sampleRate);
+            const data = noiseBuf.getChannelData(0);
+            for (let i = 0; i < data.length; i++) data[i] = Math.random() * 2 - 1;
+        }
+        return noiseBuf;
+    }
+
     function playNoise(duration, vol = 0.08) {
         if (!sfxEnabled) return;
         try {
             const ctx = getCtx();
-            const bufferSize = Math.max(1, Math.floor(ctx.sampleRate * duration));
-            const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
-            const data = buffer.getChannelData(0);
-            for (let i = 0; i < bufferSize; i++) data[i] = (Math.random() * 2 - 1) * vol;
             const src = ctx.createBufferSource();
             const gain = ctx.createGain();
-            src.buffer = buffer;
-            gain.gain.setValueAtTime(vol, ctx.currentTime);
-            gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + duration);
+            src.buffer = getNoise(ctx);
+            // The old per-call buffer baked vol into the samples too, so vol^2 keeps the same level
+            gain.gain.setValueAtTime(vol * vol, ctx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + duration);
             src.connect(gain);
             gain.connect(ctx.destination);
-            src.start();
+            src.start(0, Math.random() * (1 - duration), duration);
         } catch (e) { /* silent fail */ }
     }
 
     const SFX = {
-        draw() { playNoise(0.05, 0.04); },
+        draw() {
+            const t = performance.now();
+            if (t - lastDraw < 35) return;
+            lastDraw = t;
+            playNoise(0.05, 0.04);
+        },
+        undo() {
+            playTone(520, 0.06, 'triangle', 0.1);
+            setTimeout(() => playTone(340, 0.08, 'triangle', 0.1), 50);
+        },
         goalCollect() {
             playTone(523, 0.1, 'sine', 0.2);
             setTimeout(() => playTone(659, 0.1, 'sine', 0.2), 80);
@@ -95,60 +114,10 @@ const GameAudio = (() => {
         }
     }
 
-    // Music - check for theme1-9.mp3 in music/ folder
-    async function initMusic() {
-        musicTracks = [];
-        const basePath = 'music/';
-        for (let i = 1; i <= 9; i++) {
-            try {
-                const resp = await fetch(basePath + 'theme' + i + '.mp3', { method: 'HEAD' });
-                if (resp.ok) musicTracks.push(basePath + 'theme' + i + '.mp3');
-            } catch (e) { /* file doesn't exist */ }
-        }
-    }
-
-    function playMusic() {
-        if (!musicEnabled || musicTracks.length === 0) return;
-        if (musicElement) {
-            musicElement.play().catch(() => {});
-            return;
-        }
-        // Pick random track (avoid repeating same track)
-        let idx;
-        do { idx = Math.floor(Math.random() * musicTracks.length); }
-        while (idx === currentTrack && musicTracks.length > 1);
-        currentTrack = idx;
-
-        musicElement = new window.Audio(musicTracks[currentTrack]);
-        musicElement.loop = false;
-        musicElement.volume = 0.3;
-        musicElement.addEventListener('ended', () => {
-            musicElement = null;
-            playMusic(); // play next random track
-        });
-        musicElement.play().catch(() => {});
-    }
-
-    function stopMusic() {
-        if (musicElement) {
-            musicElement.pause();
-            musicElement.currentTime = 0;
-            musicElement = null;
-        }
-    }
-
     function toggleSfx() {
         sfxEnabled = !sfxEnabled;
         savePref();
         return sfxEnabled;
-    }
-
-    function toggleMusic() {
-        musicEnabled = !musicEnabled;
-        if (musicEnabled) playMusic();
-        else stopMusic();
-        savePref();
-        return musicEnabled;
     }
 
     function toggleVibrate() {
@@ -160,7 +129,7 @@ const GameAudio = (() => {
     function savePref() {
         try {
             localStorage.setItem('paperant_audio', JSON.stringify({
-                sfx: sfxEnabled, music: musicEnabled, vibrate: vibrateEnabled
+                sfx: sfxEnabled, vibrate: vibrateEnabled
             }));
         } catch (e) {}
     }
@@ -170,7 +139,6 @@ const GameAudio = (() => {
             const data = JSON.parse(localStorage.getItem('paperant_audio'));
             if (data) {
                 sfxEnabled = data.sfx !== false;
-                musicEnabled = data.music !== false;
                 vibrateEnabled = data.vibrate !== false;
             }
         } catch (e) {}
@@ -178,14 +146,20 @@ const GameAudio = (() => {
 
     function init() {
         loadPref();
-        initMusic();
+        for (const ev of ['pointerdown', 'touchend', 'click', 'keydown']) {
+            window.addEventListener(ev, unlock, { capture: true, passive: true });
+        }
+        document.addEventListener('visibilitychange', () => {
+            if (!audioCtx) return;
+            if (document.hidden) audioCtx.suspend().catch(() => {});
+            else audioCtx.resume().catch(() => {});
+        });
     }
 
     return {
-        init, SFX, vibrate, playMusic, stopMusic,
-        toggleSfx, toggleMusic, toggleVibrate,
+        init, SFX, vibrate,
+        toggleSfx, toggleVibrate,
         get sfxEnabled() { return sfxEnabled; },
-        get musicEnabled() { return musicEnabled; },
         get vibrateEnabled() { return vibrateEnabled; },
     };
 })();

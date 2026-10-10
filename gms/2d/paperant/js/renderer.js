@@ -33,7 +33,11 @@ const Renderer = (() => {
         window.addEventListener('resize', resize);
     }
 
+    const areaListeners = [];
+    function onAreaChange(fn) { areaListeners.push(fn); }
+
     function resize() {
+        const oldArea = { ...playArea };
         dpr = window.devicePixelRatio || 1;
         const rect = canvas.parentElement.getBoundingClientRect();
         w = Math.round(rect.width * dpr);
@@ -42,17 +46,23 @@ const Renderer = (() => {
         canvas.height = h;
         canvas.style.width = rect.width + 'px';
         canvas.style.height = rect.height + 'px';
-        // Play area inside margins
-        // Left margin is the red ruled-paper margin; right side extends
-        // almost to the screen edge so the ant doesn't appear to hit an
-        // invisible wall.
+        // Left edge is the red ruled margin; right is a small gutter so the ant
+        // doesn't hit an invisible wall. Top clears the HUD (two rows on narrow
+        // screens), bottom clears the power-up bar.
         const mxLeft = Math.round(w * CONFIG.PAPER_MARGIN_X);
-        const mxRight = Math.round(8 * dpr); // small gutter only
-        const topPad = Math.round(52 * dpr);
-        playArea = { x: mxLeft, y: topPad, w: w - mxLeft - mxRight, h: h - topPad - Math.round(16 * dpr) };
-        // Invalidate paper cache on resize
+        const mxRight = Math.round(8 * dpr);
+        const topPad = Math.round((rect.width < 430 ? 88 : 52) * dpr);
+        const bottomPad = Math.round(64 * dpr);
+        playArea = { x: mxLeft, y: topPad, w: w - mxLeft - mxRight, h: h - topPad - bottomPad };
         paperCache = null;
+        if (oldArea.w > 0 && oldArea.h > 0 &&
+            (oldArea.x !== playArea.x || oldArea.y !== playArea.y ||
+             oldArea.w !== playArea.w || oldArea.h !== playArea.h)) {
+            for (const fn of areaListeners) fn(oldArea, { ...playArea });
+        }
     }
+
+    function isLandscape() { return w > h; }
 
     function getPlayArea() { return { ...playArea }; }
     function getSize() { return { w, h }; }
@@ -265,5 +275,6 @@ const Renderer = (() => {
     return {
         init, resize, clear, drawPaper, drawObstacles, drawGoal, drawGoalCollected,
         getPlayArea, getSize, getDpr, getCtx, toCanvas, toFraction,
+        onAreaChange, isLandscape,
     };
 })();

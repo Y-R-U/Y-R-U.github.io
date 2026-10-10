@@ -82,14 +82,21 @@ const UI = (() => {
         bindBtn('settings-btn', () => { GameAudio.SFX.buttonClick(); toggleSettings(); });
         bindBtn('settings-close', () => { GameAudio.SFX.buttonClick(); hideSettings(); });
         bindBtn('sfx-toggle', () => { toggleSettingBtn('sfx-toggle', GameAudio.toggleSfx()); });
-        bindBtn('music-toggle', () => { toggleSettingBtn('music-toggle', GameAudio.toggleMusic()); });
+        bindBtn('ghost-toggle', () => { ghostOn = !ghostOn; saveGhost(); toggleSettingBtn('ghost-toggle', ghostOn); });
         bindBtn('vibrate-toggle', () => { toggleSettingBtn('vibrate-toggle', GameAudio.toggleVibrate()); });
 
         // Init toggle states from saved prefs
         updateToggleBtn('sfx-toggle', GameAudio.sfxEnabled);
-        updateToggleBtn('music-toggle', GameAudio.musicEnabled);
+        try { ghostOn = localStorage.getItem('paperant_ghost') !== '0'; } catch (e) {}
+        updateToggleBtn('ghost-toggle', ghostOn);
         updateToggleBtn('vibrate-toggle', GameAudio.vibrateEnabled);
     }
+
+    let ghostOn = true;
+    function saveGhost() {
+        try { localStorage.setItem('paperant_ghost', ghostOn ? '1' : '0'); } catch (e) {}
+    }
+    function ghostEnabled() { return ghostOn; }
 
     function bindBtn(id, handler) {
         const el = document.getElementById(id);
@@ -182,34 +189,40 @@ const UI = (() => {
         if (bar) bar.classList.toggle('hidden', !show);
     }
 
-    function updateHUD(label, goalText, timeRemaining, inkFrac) {
-        document.getElementById('hud-level').textContent = label;
-        document.getElementById('hud-goal').textContent = goalText;
+    // Only touch the DOM when a shown value actually changes
+    const hudLast = {};
+    let hudEls = null;
+    function setOnce(key, val, fn) {
+        if (hudLast[key] === val) return;
+        hudLast[key] = val;
+        fn(val);
+    }
 
+    function updateHUD(label, goalText, timeRemaining, inkFrac) {
+        if (!hudEls) {
+            hudEls = {};
+            for (const id of ['hud-level', 'hud-goal', 'hud-timer', 'ink-bar', 'ink-bar-container']) {
+                hudEls[id] = document.getElementById(id);
+            }
+        }
+        const timerEl = hudEls['hud-timer'];
+        const bar = hudEls['ink-bar'];
         const mins = Math.floor(timeRemaining / 60);
         const secs = Math.floor(timeRemaining % 60);
-        const timerEl = document.getElementById('hud-timer');
-        timerEl.textContent = mins + ':' + String(secs).padStart(2, '0');
 
-        // Flash timer red when low on time
-        if (timeRemaining <= CONFIG.LOW_TIME_WARN) {
-            timerEl.classList.add('low-time');
-        } else {
-            timerEl.classList.remove('low-time');
-        }
-
-        const bar = document.getElementById('ink-bar');
-        const container = document.getElementById('ink-bar-container');
-        bar.style.width = (inkFrac * 100) + '%';
-
-        // Color ink bar based on level
-        if (inkFrac < 0.2) bar.style.background = 'linear-gradient(90deg, #c44, #e66)';
-        else if (inkFrac < 0.5) bar.style.background = 'linear-gradient(90deg, #c98a2e, #daa840)';
-        else bar.style.background = 'linear-gradient(90deg, #3a5a9f, #5a7abf)';
-
-        // Empty class when ink is below the minimum needed to start a stroke
-        const inkAbsolute = inkFrac * CONFIG.INK_MAX;
-        if (container) container.classList.toggle('empty', inkAbsolute < CONFIG.INK_START_MIN);
+        setOnce('label', label, v => { hudEls['hud-level'].textContent = v; });
+        setOnce('goal', goalText, v => { hudEls['hud-goal'].textContent = v; });
+        setOnce('time', mins + ':' + String(secs).padStart(2, '0'), v => { timerEl.textContent = v; });
+        setOnce('low', timeRemaining <= CONFIG.LOW_TIME_WARN, v => timerEl.classList.toggle('low-time', v));
+        setOnce('ink', Math.round(inkFrac * 200) / 2, v => { bar.style.width = v + '%'; });
+        setOnce('tier', inkFrac < 0.2 ? 0 : inkFrac < 0.5 ? 1 : 2, v => {
+            bar.style.background = ['linear-gradient(90deg, #c44, #e66)',
+                'linear-gradient(90deg, #c98a2e, #daa840)',
+                'linear-gradient(90deg, #3a5a9f, #5a7abf)'][v];
+        });
+        // Empty = below the minimum needed to start a stroke
+        setOnce('empty', inkFrac * CONFIG.INK_MAX < CONFIG.INK_START_MIN,
+            v => hudEls['ink-bar-container'].classList.toggle('empty', v));
     }
 
     function flashInkEmpty() {
@@ -335,6 +348,15 @@ const UI = (() => {
         const bar = document.getElementById('powerup-bar');
         if (!bar) return;
         bar.innerHTML = '';
+        const undo = document.createElement('button');
+        undo.className = 'powerup-btn undo-btn';
+        undo.id = 'undo-btn';
+        undo.title = 'Undo: remove your last line (half its ink back). Or double-tap a line.';
+        undo.setAttribute('aria-label', 'Undo last line');
+        undo.innerHTML = '<span class="pu-icon">\u21B6</span>';
+        undo.disabled = !undoEnabled;
+        undo.addEventListener('click', () => Game.activatePowerUp('undo'));
+        bar.appendChild(undo);
         const inv = PowerUps.getAll();
         for (const [type, def] of Object.entries(PowerUps.TYPES)) {
             const count = inv[type] || 0;
@@ -348,6 +370,14 @@ const UI = (() => {
             btn.addEventListener('click', () => Game.activatePowerUp(type));
             bar.appendChild(btn);
         }
+    }
+
+    let undoEnabled = false;
+    function setUndoEnabled(on) {
+        if (on === undoEnabled) return;
+        undoEnabled = on;
+        const btn = document.getElementById('undo-btn');
+        if (btn) btn.disabled = !on;
     }
 
     function setPowerupActive(type, isActive) {
@@ -486,5 +516,6 @@ const UI = (() => {
         isSettingsOpen, hideSettings, isQuitOpen, hideQuitConfirm,
         updatePowerupBar, setPowerupActive, resetPowerupActive, showChallengeComplete,
         showDailyPopup, showChallengePopup, updateTitleBadges,
+        setUndoEnabled, ghostEnabled,
     };
 })();

@@ -47,7 +47,6 @@
         },
         onBackToTitle() {
             Game.stopLevel();
-            GameAudio.stopMusic();
             UI.showScreen('title-screen');
             UI.showHUD(false);
             Renderer.drawPaper();
@@ -63,12 +62,10 @@
         UI.showHUD(false);
     }
 
-    // Handle resize
+    // Renderer resizes itself; repaint whatever is on screen afterwards
     window.addEventListener('resize', () => {
-        Renderer.resize();
-        if (Game.getState() === 'idle') {
-            Renderer.drawPaper();
-        }
+        if (Game.getState() === 'idle') Renderer.drawPaper();
+        else Game.render(performance.now() / 1000);
     });
 
     // Optional br8t account layer: cloud saves + the avatar. Kept out of the way

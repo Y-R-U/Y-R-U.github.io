@@ -1,22 +1,26 @@
-/* drawing.js - Pencil line drawing, fading, and ink management */
+/* drawing.js - Pencil lines, fading (on game time), length-based ink, undo */
 'use strict';
 
 const Drawing = (() => {
-    let lines = []; // { points: [{x,y}], createdAt, fading, opacity, fadeStart, width, fadeTime }
+    let lines = []; // { points: [{x,y}], createdAt, fading, opacity, fadeStart, width, fadeTime, cost }
     let currentStroke = null;
     let ink = CONFIG.INK_MAX;
     let dpr = 1;
+    let clock = 0; // game time: only advances in update(), so pause/popups freeze line age
     // Thick Pencil power-up: multiplies stroke width & fade time for the
     // rest of the level. Reset on init().
     let widthMult = 1;
     let fadeMult = 1;
+    let strokeCount = 0;
 
     function init() {
         lines = [];
         currentStroke = null;
         ink = CONFIG.INK_MAX;
+        clock = 0;
         widthMult = 1;
         fadeMult = 1;
+        strokeCount = 0;
     }
 
     function setBoost(wm, fm) {
@@ -30,39 +34,51 @@ const Drawing = (() => {
 
     function setDpr(d) { dpr = d; }
 
+    function inkUnit() { return CONFIG.INK_UNIT_PX * dpr; }
+
     function startStroke(pos) {
-        // Need a meaningful minimum ink (in seconds) to begin. Once started,
-        // the stroke runs until the user lifts OR ink hits zero (handled in
-        // update()) — the line is never silently halted mid-drag.
         if (ink < CONFIG.INK_START_MIN) {
-            // Visible feedback so the player understands why nothing drew
             if (typeof UI !== 'undefined' && UI.flashInkEmpty) UI.flashInkEmpty();
-            return;
+            return false;
         }
-        const clamped = clampToPlayArea(pos);
         currentStroke = {
-            points: [clamped],
-            createdAt: performance.now() / 1000,
+            points: [clampToPlayArea(pos)],
+            createdAt: clock,
             width: CONFIG.PENCIL_WIDTH * widthMult,
             fadeTime: CONFIG.LINE_FADE_TIME * fadeMult,
+            cost: 0,
+            len: 0,
         };
         GameAudio.SFX.draw();
+        return true;
     }
 
     function addPoint(pos) {
         if (!currentStroke) return;
-
-        // Clamp the point to the play area instead of dropping it. Users
-        // commonly draw barriers right next to walls; rejecting any drift
-        // outside the area felt like the pen randomly stopped working.
-        const clamped = clampToPlayArea(pos);
-
+        // Clamp instead of dropping: users draw right up against the walls.
+        let p = clampToPlayArea(pos);
         const last = currentStroke.points[currentStroke.points.length - 1];
-        const dist = Math.hypot(clamped.x - last.x, clamped.y - last.y);
+        const dist = Math.hypot(p.x - last.x, p.y - last.y);
         if (dist < CONFIG.MIN_DRAW_DIST * dpr) return;
 
-        currentStroke.points.push(clamped);
+        let cost = dist / inkUnit();
+        let dry = false;
+        if (cost >= ink) {
+            // Pen runs dry partway along this segment: stop exactly there
+            const t = ink / cost;
+            p = { x: last.x + (p.x - last.x) * t, y: last.y + (p.y - last.y) * t };
+            cost = ink;
+            dry = true;
+        }
+        ink -= cost;
+        currentStroke.cost += cost;
+        currentStroke.len += Math.hypot(p.x - last.x, p.y - last.y);
+        currentStroke.points.push(p);
         GameAudio.SFX.draw();
+        if (dry) {
+            ink = 0;
+            endStroke();
+        }
     }
 
     function clampToPlayArea(pos) {
@@ -73,69 +89,131 @@ const Drawing = (() => {
         };
     }
 
+    // Returns the start point when the stroke was really a tap (discarded,
+    // ink refunded) so the caller can treat it as one; otherwise null.
     function endStroke() {
-        if (currentStroke && currentStroke.points.length >= 2) {
-            currentStroke.fading = false;
-            currentStroke.opacity = 1;
-            currentStroke.fadeStart = null;
-            lines.push(currentStroke);
+        const s = currentStroke;
+        currentStroke = null;
+        if (!s) return null;
+        if (s.len < 8 * dpr) {
+            ink = Math.min(CONFIG.INK_MAX, ink + s.cost);
+            return s.points[0];
         }
+        s.fading = false;
+        s.opacity = 1;
+        s.fadeStart = null;
+        lines.push(s);
+        strokeCount++;
+        return null;
+    }
+
+    function cancelStroke() {
+        if (!currentStroke) return;
+        ink = Math.min(CONFIG.INK_MAX, ink + currentStroke.cost);
         currentStroke = null;
     }
 
-    function update(dt, now) {
-        // Time-based ink: drain while a stroke is active, regen while idle.
-        // When ink hits zero mid-stroke, force-end the stroke so the user
-        // sees a clear "pen ran dry" — they must lift and wait for regen.
-        if (currentStroke) {
-            ink -= dt;
-            if (ink <= 0) {
-                ink = 0;
-                endStroke();
+    function removeLine(line) {
+        const i = lines.indexOf(line);
+        if (i < 0) return false;
+        lines.splice(i, 1);
+        ink = Math.min(CONFIG.INK_MAX, ink + (line.cost || 0) * CONFIG.UNDO_REFUND);
+        return true;
+    }
+
+    function undoLast() {
+        return lines.length ? removeLine(lines[lines.length - 1]) : false;
+    }
+
+    // Newest line passing within r of pos (canvas px)
+    function lineAt(pos, r) {
+        for (let i = lines.length - 1; i >= 0; i--) {
+            const pts = lines[i].points;
+            for (let j = 1; j < pts.length; j++) {
+                if (segDist(pos.x, pos.y, pts[j - 1], pts[j]) < r) return lines[i];
             }
-        } else if (!Input.isDrawing) {
-            // Only regen once the user has actually lifted. If their finger
-            // is still down after the stroke auto-ended, no regen until lift.
+        }
+        return null;
+    }
+
+    function segDist(px, py, a, b) {
+        const dx = b.x - a.x, dy = b.y - a.y;
+        const l2 = dx * dx + dy * dy;
+        let t = l2 ? ((px - a.x) * dx + (py - a.y) * dy) / l2 : 0;
+        t = Math.max(0, Math.min(1, t));
+        return Math.hypot(px - (a.x + t * dx), py - (a.y + t * dy));
+    }
+
+    // Keep lines glued to the paper when the play area changes (rotation)
+    function remap(oldA, newA) {
+        const map = (p) => {
+            p.x = newA.x + (p.x - oldA.x) / oldA.w * newA.w;
+            p.y = newA.y + (p.y - oldA.y) / oldA.h * newA.h;
+        };
+        for (const l of lines) l.points.forEach(map);
+        if (currentStroke) currentStroke.points.forEach(map);
+    }
+
+    function update(dt) {
+        clock += dt;
+        // Regen only once the finger has lifted
+        if (!currentStroke && !Input.isDrawing) {
             ink = Math.min(CONFIG.INK_MAX, ink + CONFIG.INK_REGEN_RATE * dt);
         }
 
-        // Update line fading
         for (let i = lines.length - 1; i >= 0; i--) {
             const line = lines[i];
-            const age = now - line.createdAt;
-
+            const age = clock - line.createdAt;
             if (!line.fading && age > (line.fadeTime || CONFIG.LINE_FADE_TIME)) {
                 line.fading = true;
-                line.fadeStart = now;
+                line.fadeStart = clock;
             }
-
             if (line.fading) {
-                const fadeAge = now - line.fadeStart;
-                line.opacity = 1 - (fadeAge / CONFIG.LINE_FADE_DURATION);
-                if (line.opacity <= 0) {
-                    lines.splice(i, 1);
-                }
+                line.opacity = 1 - ((clock - line.fadeStart) / CONFIG.LINE_FADE_DURATION);
+                if (line.opacity <= 0) lines.splice(i, 1);
             }
         }
     }
 
     function drawLines(ctx) {
-        // Draw completed lines
         for (const line of lines) {
             drawStroke(ctx, line.points, line.opacity, line.width);
         }
-        // Draw current stroke
-        if (currentStroke && currentStroke.points.length >= 2) {
-            drawStroke(ctx, currentStroke.points, 1, currentStroke.width);
+        if (currentStroke) {
+            if (currentStroke.points.length >= 2) {
+                drawStroke(ctx, currentStroke.points, 1, currentStroke.width);
+            }
+            drawTip(ctx, currentStroke);
         }
     }
 
-    /**
-     * Simple hash for deterministic per-point noise (no frame-to-frame shimmer)
-     */
+    // Pencil tip shrinks and turns red as the ink runs out
+    function drawTip(ctx, s) {
+        const p = s.points[s.points.length - 1];
+        const f = Math.max(0, Math.min(1, ink / CONFIG.INK_MAX));
+        const lw = (s.width || CONFIG.PENCIL_WIDTH) * dpr;
+        const r = lw * (0.45 + 0.9 * f);
+        const low = f < 0.35;
+        ctx.save();
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, r, 0, Math.PI * 2);
+        ctx.fillStyle = low ? '#c33' : (f < 0.6 ? '#c98a2e' : CONFIG.PENCIL_COLOR);
+        ctx.fill();
+        if (low) {
+            ctx.globalAlpha = 0.35 + 0.35 * Math.sin(performance.now() / 70);
+            ctx.strokeStyle = '#c33';
+            ctx.lineWidth = 1.5 * dpr;
+            ctx.beginPath();
+            ctx.arc(p.x, p.y, r + 4 * dpr, 0, Math.PI * 2);
+            ctx.stroke();
+        }
+        ctx.restore();
+    }
+
+    // Deterministic per-point noise (no frame-to-frame shimmer)
     function pointNoise(index, seed) {
         const h = ((index * 2654435761) ^ (seed * 1103515245)) & 0x7fffffff;
-        return (h % 1000) / 1000 - 0.5; // -0.5 to 0.5
+        return (h % 1000) / 1000 - 0.5;
     }
 
     function drawStroke(ctx, points, opacity, width) {
@@ -149,7 +227,6 @@ const Drawing = (() => {
         ctx.lineCap = 'round';
         ctx.lineJoin = 'round';
 
-        // Main line
         ctx.beginPath();
         ctx.moveTo(points[0].x, points[0].y);
         for (let i = 1; i < points.length; i++) {
@@ -157,7 +234,7 @@ const Drawing = (() => {
         }
         ctx.stroke();
 
-        // Pencil texture - slight rough edge, deterministic per point
+        // Pencil texture - slight rough edge
         ctx.globalAlpha = opacity * 0.2;
         ctx.lineWidth = lw * 1.5;
         ctx.strokeStyle = '#6a6a6a';
@@ -175,12 +252,16 @@ const Drawing = (() => {
     }
 
     function getLines() { return lines; }
+    function getCurrentStroke() { return currentStroke; }
     function getInk() { return ink; }
     function getInkFraction() { return ink / CONFIG.INK_MAX; }
+    function getStrokeCount() { return strokeCount; }
 
     return {
-        init, setDpr, startStroke, addPoint, endStroke,
-        update, drawLines, getLines, getInk, getInkFraction,
-        setBoost, getWidthMultiplier, refillInk,
+        init, setDpr, startStroke, addPoint, endStroke, cancelStroke,
+        update, drawLines, getLines, getCurrentStroke, getInk, getInkFraction,
+        setBoost, getWidthMultiplier, refillInk, remap,
+        removeLine, undoLast, lineAt, getStrokeCount,
+        get pointCount() { return currentStroke ? currentStroke.points.length : 0; },
     };
 })();
