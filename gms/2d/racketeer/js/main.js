@@ -6,8 +6,8 @@ import { bindInput } from "./input.js";
 import * as UI from "./ui.js";
 import * as MODES from "./modes.js";
 import * as STORY from "./story.js";
-import { initAudio, setCrowdLevel, setMuted, isMuted, sfx } from "./audio.js";
-import { setHaptics, setHapticsSilent } from "./haptics.js";
+import { initAudio, silenceCrowd, suppressOutput, sfx } from "./audio.js";
+import { setHaptics } from "./haptics.js";
 import { clearFx } from "./fx.js";
 
 const canvas = document.getElementById("game");
@@ -64,7 +64,7 @@ function launch(cfg, opp, onOver) {
     ...UI.matchHooks,
     onMatchOver(m) {
       App.match = null;
-      setCrowdLevel(0);
+      silenceCrowd();
       onOver(m);
       career.persist(App.save);
       // Fires on the results screen, never mid-match. No-op until (and unless)
@@ -98,6 +98,7 @@ function playStory() {
     career.persist(App.save);
     return UI.showCutscene(STORY.CUTSCENES.start, () => playStory());
   }
+  cfg.tutorial = lvl.n === 1 && !App.save.tutDone;
   launch(cfg, opp, (m) => {
     App.save.money += Math.max(0, m.earnings);
     const wasBoss = lvl.isBoss, level = lvl.n;
@@ -209,7 +210,7 @@ function newDemo() {
   const { cfg, opp } = MODES.quickMatch(2 + Math.random() * 2);
   cfg.mlen = "set"; cfg.eventChance = 0.18; cfg.autoPilot = true;
   cfg.oppSkills = ["heckle", "grunt", "argue", "power", "outrageous", "pigeon", "underarm"];
-  App.demo = makeMatch(dsave, opp, cfg, career.gearBonus(dsave), {});
+  App.demo = suppressOutput(() => makeMatch(dsave, opp, cfg, career.gearBonus(dsave), {}));
   App.demo.silent = true;
 }
 App.wantDemo = () => { if (!App.demo || App.demo.over) newDemo(); };
@@ -242,6 +243,7 @@ document.getElementById("pauseBtn").addEventListener("click", () => {
       App.save.money += Math.round(m.earnings * 0.5);
       career.persist(App.save);
       App.match = null; App.tstate = null;
+      silenceCrowd();
       UI.buildMenu(); UI.showScreen("menu");
     });
 });
@@ -262,6 +264,7 @@ function boot() {
     UI.showScreen("menu");
   }
   if (AUTO) { initAudio(); autoNext(); }
+  window.__booted = true;
 }
 
 let last = performance.now();
@@ -282,9 +285,7 @@ function frame(now) {
       if (!App.demo || demoWait > 2.5) { demoWait = 0; newDemo(); }
     }
     if (App.demo && menuVisible && !App.demo.over) {
-      const was = isMuted(); setMuted(true); setHapticsSilent(true);
-      updateMatch(App.demo, dt);
-      setMuted(was); setHapticsSilent(false);
+      suppressOutput(() => updateMatch(App.demo, dt));
       drawMatch(App.demo, ctx);
     } else if (App.demo && menuVisible) {
       drawMatch(App.demo, ctx);

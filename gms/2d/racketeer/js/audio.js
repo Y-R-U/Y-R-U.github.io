@@ -1,10 +1,13 @@
 // Web Audio synth sfx — no assets. Everything generated.
+import { setHapticsSilent } from "./haptics.js";
 let ac = null, master = null, crowdNode = null, crowdGain = null;
-let muted = false;
+let muted = false, suppressed = false;
+let noiseBufs = [];
 
 export function initAudio() {
-  if (ac) { if (ac.state === "suspended") ac.resume(); return; }
+  if (ac) { if (ac.state !== "running") ac.resume().catch(() => {}); return; }
   try {
+    try { if (navigator.audioSession) navigator.audioSession.type = "playback"; } catch {}
     ac = new (window.AudioContext || window.webkitAudioContext)();
     master = ac.createGain(); master.gain.value = 0.5; master.connect(ac.destination);
     // Continuous crowd murmur: looped filtered noise
@@ -17,18 +20,49 @@ export function initAudio() {
     crowdGain = ac.createGain(); crowdGain.gain.value = 0.0;
     crowdNode.connect(filt); filt.connect(crowdGain); crowdGain.connect(master);
     crowdNode.start();
+    // A few seconds of shared white noise; noise() plays random slices of it.
+    for (let k = 0; k < 3; k++) {
+      const nb = ac.createBuffer(1, ac.sampleRate * 2, ac.sampleRate);
+      const nd = nb.getChannelData(0);
+      for (let i = 0; i < nd.length; i++) nd[i] = Math.random() * 2 - 1;
+      noiseBufs.push(nb);
+    }
+    if (ac.state !== "running") ac.resume().catch(() => {});
   } catch (e) { ac = null; }
+}
+
+// Android only counts touchend/click as activation, so keep resuming for the page's life.
+for (const ev of ["pointerdown", "touchend", "click", "keydown"]) {
+  window.addEventListener(ev, () => { if (ac) { if (ac.state !== "running") ac.resume().catch(() => {}); } else initAudio(); },
+    { capture: true, passive: true });
+}
+document.addEventListener("visibilitychange", () => {
+  if (!ac) return;
+  if (document.hidden) ac.suspend().catch(() => {});
+  else ac.resume().catch(() => {});
+});
+
+// While set, nothing new is scheduled: the menu attract match plays in silence.
+export function setSfxSuppressed(v) { suppressed = !!v; }
+// One scope for "this code must make no sound or buzz" (the menu attract match).
+export function suppressOutput(fn) {
+  const was = suppressed;
+  suppressed = true; setHapticsSilent(true);
+  try { return fn(); } finally { suppressed = was; setHapticsSilent(was); }
+}
+export function silenceCrowd() {
+  if (crowdGain && ac) crowdGain.gain.setTargetAtTime(0, ac.currentTime, 0.3);
 }
 
 export function setMuted(m) { muted = m; if (master) master.gain.value = m ? 0 : 0.5; }
 export function isMuted() { return muted; }
 
 export function setCrowdLevel(v) {  // 0..1 ambience with hype
-  if (crowdGain && ac) crowdGain.gain.setTargetAtTime(0.015 + v * 0.05, ac.currentTime, 0.4);
+  if (crowdGain && ac && !suppressed) crowdGain.gain.setTargetAtTime(0.015 + v * 0.05, ac.currentTime, 0.4);
 }
 
 function env(type, freq, dur, vol = 0.3, slide = 0, delay = 0) {
-  if (!ac) return;
+  if (!ac || suppressed) return;
   const t0 = ac.currentTime + delay;
   const o = ac.createOscillator(), g = ac.createGain();
   o.type = type; o.frequency.setValueAtTime(freq, t0);
@@ -40,17 +74,16 @@ function env(type, freq, dur, vol = 0.3, slide = 0, delay = 0) {
 }
 
 function noise(dur, vol = 0.3, freq = 1200, q = 1, delay = 0) {
-  if (!ac) return;
+  if (!ac || suppressed || !noiseBufs.length) return;
   const t0 = ac.currentTime + delay;
-  const len = Math.ceil(ac.sampleRate * dur);
-  const buf = ac.createBuffer(1, len, ac.sampleRate);
-  const d = buf.getChannelData(0);
-  for (let i = 0; i < len; i++) d[i] = (Math.random() * 2 - 1) * (1 - i / len);
+  const buf = noiseBufs[(Math.random() * noiseBufs.length) | 0];
+  const d = Math.min(dur, buf.duration - 0.01);
   const src = ac.createBufferSource(); src.buffer = buf;
   const f = ac.createBiquadFilter(); f.type = "bandpass"; f.frequency.value = freq; f.Q.value = q;
-  const g = ac.createGain(); g.gain.value = vol;
+  const g = ac.createGain();
+  g.gain.setValueAtTime(vol, t0); g.gain.linearRampToValueAtTime(0, t0 + d);
   src.connect(f); f.connect(g); g.connect(master);
-  src.start(t0);
+  src.start(t0, Math.random() * (buf.duration - d), d);
 }
 
 export const sfx = {

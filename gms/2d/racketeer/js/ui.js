@@ -17,6 +17,7 @@ export function initUI(app) { App = app; }
 export function showScreen(id) {
   for (const s of document.querySelectorAll(".screen")) s.classList.add("hidden");
   $("hud").classList.add("hidden");
+  if (id !== "hud") callout(null);
   if (id === "hud") $("hud").classList.remove("hidden");
   else if (id) $(`scr-${id}`).classList.remove("hidden");
 }
@@ -687,24 +688,47 @@ function openSwap(m, slot) {
   showSkillSwap(m, slot, () => { m.paused = false; matchHooks.onSkillDock(m); });
 }
 
-// Explained once — the first time every slot is full, since that's when tapping an
-// empty slot stops being an option and the hold is the only way in.
+/* Non-blocking coach callout over the court. dur 0 = stays until replaced/cleared. */
+let calloutTO = null;
+export function callout(html, opts = {}) {
+  const box = $("coach");
+  clearTimeout(calloutTO);
+  if (!html) { box.classList.remove("show"); box.dataset.key = ""; return; }
+  if (opts.key && box.dataset.key === opts.key && box.classList.contains("show")) return;
+  box.dataset.key = opts.key || "";
+  box.innerHTML = `<span class="co-face">${opts.face || "👴"}</span><span class="co-body">${html}</span>`;
+  box.classList.toggle("done", !!opts.done);
+  box.classList.add("show");
+  if (opts.dur) calloutTO = setTimeout(() => box.classList.remove("show"), opts.dur * 1000);
+}
+
+// Explained once — the first time a multi-slot loadout is full, since that's when
+// tapping an empty slot stops being an option and the hold is the only way in.
 function maybeSwapHint(m, slots) {
   const save = m.save;
-  if (save.hintSwap || m.autoPilot || m.over) return;
+  if (save.hintSwap || m.autoPilot || m.over || slots < 2) return;
   if (m.state !== "preServe" || save.loadout.length < slots) return;
-  if ($("modal-root").children.length) return;        // never land on top of another popup
+  if ($("coach").classList.contains("show") || $("modal-root").children.length) return;
   save.hintSwap = true;
   career.persist(save);
-  m.paused = true;
-  modal(`<h2>🃏 Swapping mid-match</h2><div class="big-emoji">👇</div>
-    <p>Your skill slots are full — but you're not stuck with them.</p>
-    <p><b>Between points</b>, hold down any skill in the dock to open the picker and
-    swap it for another, or buy a new one on the spot.</p>
-    <p class="sub">An empty slot just needs a tap.</p>`,
-    [{ label: "Got it", fn: () => { m.paused = false; } }]);
+  callout(`<b>Slots full?</b> Between points, <b>hold</b> a skill in the dock to swap it or buy another.`,
+    { face: "🃏", dur: 7, key: "swap" });
 }
+// Everything a dock button's look or handler depends on; rebuild only when it changes.
+function dockKey(m, slots, between) {
+  let k = slots + "|" + between;
+  for (let i = 0; i < slots; i++) {
+    const id = m.save.loadout[i];
+    if (!id) { k += "|-"; continue; }
+    const cd = m.cooldowns[id] && m.time < m.cooldowns[id] ? Math.ceil(m.cooldowns[id] - m.time) : 0;
+    const armed = (id === "power" && m.armedPower) || (id === "outrageous" && m.armedOutrageous) || (id === "grunt" && m.armedGrunt);
+    k += `|${id}:${cd}:${m.usesLeft[id] ?? ""}:${canUseSkill(m, id) ? 1 : 0}:${armed ? 1 : 0}`;
+  }
+  return k;
+}
+
 export const matchHooks = {
+  onCoach(html, opts) { callout(html, opts); },
   onHud(m) {
     const sc = scoreLine(m);
     $("sbYouName").textContent = "YOU" + (m.server === "you" ? " 🎾" : "");
@@ -726,9 +750,12 @@ export const matchHooks = {
   onSkillDock(m) {
     const dock = $("skillDock");
     if (dockPress) return;                  // mid long-press: don't rebuild under the finger
-    dock.innerHTML = "";
     const slots = career.skillSlots(m.save);
     const between = m.state === "preServe" && !m.over && !m.autoPilot;
+    const key = dockKey(m, slots, between);
+    if (dock._m === m && dock._key === key) { matchHooks.onArgue(m); maybeSwapHint(m, slots); return; }
+    dock._m = m; dock._key = key;
+    dock.innerHTML = "";
     for (let i = 0; i < career.SLOT_UNLOCKS.length; i++) {
       if (i >= slots) {
         dock.appendChild(el("button", "skill-btn slot-locked",

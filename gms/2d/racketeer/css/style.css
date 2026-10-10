@@ -24,7 +24,9 @@ canvas#game { position:absolute; inset:0; width:100%; height:100%; display:block
 .sb-games { font-weight:800; min-width:14px; text-align:right; }
 .sb-pts { font-weight:800; min-width:26px; text-align:right; color:#7ee6a1; }
 
-#meters { position:absolute; top:env(safe-area-inset-top, 8px); right:var(--stage-gap); margin-top:6px; width:96px;
+/* Clear of the br8t account avatar, which floats in the window's top-right corner. */
+#meters { position:absolute; top:env(safe-area-inset-top, 8px); margin-top:6px; width:96px;
+  right:max(var(--stage-gap), calc(env(safe-area-inset-right, 0px) + 10px + var(--br8t-account-space, 0px)));
   display:flex; flex-direction:column; gap:4px; }
 .meter { display:flex; align-items:center; gap:4px; }
 .m-ico { font-size:11px; width:14px; text-align:center; }
@@ -366,3 +368,28 @@ canvas#game { position:absolute; inset:0; width:100%; height:100%; display:block
 .brk-p.tbd { opacity:.3; font-style:italic; }
 .brk-champ { margin-top:8px; font-size:13px; text-align:center; color:#ffd34a; }
 .card.cup-locked { opacity:.72; }
+
+/* ---- Coach callout (level-1 tutorial, one-time hints): never blocks the court ---- */
+#coach { position:absolute; left:50%; top:calc(env(safe-area-inset-top, 0px) + 112px);
+  transform:translate(-50%, -6px); width:min(320px, calc(var(--stage-w, 100vw) - 96px));
+  display:flex; gap:9px; align-items:center; padding:9px 12px; border-radius:14px;
+  background:rgba(6,20,12,.84); border:1px solid rgba(255,211,74,.55); box-shadow:0 4px 14px rgba(0,0,0,.45);
+  font-size:13px; line-height:1.4; pointer-events:none; opacity:0; visibility:hidden;
+  transition:opacity .25s, transform .25s, visibility 0s .25s; }
+#coach.show { opacity:1; visibility:visible; transform:translate(-50%, 0); transition:opacity .25s, transform .25s; }
+#coach.done { border-color:#7ee6a1; }
+#coach .co-face { font-size:26px; flex:none; line-height:1; }
+#coach .co-body b { color:#ffe24a; }
+
+/* ---- Landscape phones: the court is a centre column, so use the side gutters ---- */
+@media (orientation: landscape) and (min-aspect-ratio: 3/2) {
+  .menu-col.left  { left:auto; right:calc(50% + var(--stage-w, 100vw) / 2 + 12px); }
+  .menu-col.right { right:auto; left:calc(50% + var(--stage-w, 100vw) / 2 + 12px); }
+  #meters { right:auto; top:calc(env(safe-area-inset-top, 0px) + 8px);
+    left:max(env(safe-area-inset-left, 0px) + 8px, calc(50% - var(--stage-w, 100vw) / 2 - 110px)); }
+  #skillDock { left:calc(50% + var(--stage-w, 100vw) / 2 + 12px); right:auto; width:64px;
+    flex-direction:column-reverse; gap:8px; }
+  #coach { left:auto; right:calc(50% + var(--stage-w, 100vw) / 2 + 12px); top:calc(env(safe-area-inset-top, 0px) + 92px);
+    width:min(260px, calc(50% - var(--stage-w, 100vw) / 2 - 20px)); transform:translateY(-6px); align-items:flex-start; }
+  #coach.show { transform:none; }
+}

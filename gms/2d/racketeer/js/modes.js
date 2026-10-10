@@ -33,6 +33,7 @@ export function storyMatch(save) {
     oppSkills: oppSkillsForStars(lvl.stars),
     eventChance: lvl.eventChance,
     flavour: lvl.line,
+    tutorial: n === 1 && !save.tutDone,
   };
   return { cfg, opp, lvl };
 }

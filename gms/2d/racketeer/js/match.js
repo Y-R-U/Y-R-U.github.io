@@ -6,7 +6,7 @@ import { makeBall, stepBall, predictAtDepth, aimVelocity, drawBall } from "./bal
 import { makePlayer, setState, updatePlayer, drawPlayer } from "./player.js";
 import { drawScene, drawNet, setCrowd, project, view, pokeUmpire, drawServeTarget } from "./court.js";
 import * as FX from "./fx.js";
-import { sfx, setCrowdLevel } from "./audio.js";
+import { sfx, setCrowdLevel, suppressOutput } from "./audio.js";
 import { skillFx, skillCd, SKILLS } from "./skills.js";
 import * as NAMES from "./names.js";
 import * as EV from "./events.js";
@@ -63,6 +63,7 @@ export function makeMatch(save, opp, tier, gear, hooks) {
     // it builds, and a soak bot that isn't flagged yet catches the one-time hint
     // popup — which pauses the match and stalls the whole run.
     autoPilot: !!tier.autoPilot, netcordPending: null,
+    tut: tier.tutorial && !tier.autoPilot ? { beat: 0 } : null,
     stats: { winners: 0, aces: 0, outrageous: 0, longestRally: 0, rally: 0 },
   };
   for (const id of Object.keys(SKILLS)) if (SKILLS[id].uses) m.usesLeft[id] = SKILLS[id].uses;
@@ -79,10 +80,34 @@ export function makeMatch(save, opp, tier, gear, hooks) {
     sayBanner(m, `LEVEL ${tier.level}`, "#ffe24a", 1.2);
     ticker(m, tier.flavour, 6);
   }
+  coach(m);
   return m;
 }
 
+/* ---------------- level-1 tutorial: Ray coaches three beats ---------------- */
+const TUT = [
+  "<b>Serve:</b> tap to toss the ball up, then <b>swipe up</b> as it peaks — into the glowing box.",
+  "<b>Depth:</b> when it comes back, a <b>long swipe</b> sends it deep. Short swipe, short ball.",
+  "<b>Banana:</b> <b>bend</b> your swipe — bow it left or right and the ball curves that way.",
+];
+function coach(m) {
+  if (!m.hooks.onCoach) return;
+  if (m.tut) m.hooks.onCoach(TUT[m.tut.beat], { key: "tut" + m.tut.beat });
+}
+function tutDone(m, beat) {
+  if (!m.tut || m.tut.beat !== beat) return;
+  FX.floatText(m.you.x, m.you.y + 1.4, 2.9, "✓ NICE", "#7ee6a1", 0.8);
+  m.tut.beat++;
+  if (m.tut.beat >= TUT.length) {
+    m.tut = null;
+    m.save.tutDone = true;
+    m.hooks.onCoach && m.hooks.onCoach("That's the lot, kid. Now <b>beat me</b>.", { dur: 4, done: true, key: "tutEnd" });
+  } else coach(m);
+}
+
 /* ---------------- helpers ---------------- */
+// Deferred effects of the silent menu match stay silent when they land.
+function later(m, fn, ms) { setTimeout(() => (m.silent ? suppressOutput(fn) : fn()), ms); }
 function ticker(m, str, dur = 2.4) { m.hooks.onTicker && m.hooks.onTicker(str, dur); }
 // The umpire answers back from the chair, so an argument reads as a conversation.
 function umpireSays(m, str, col) {
@@ -199,6 +224,19 @@ function simShot(b, v, curve) {
     });
   }
   return { net, land };
+}
+
+// Where a just-hit ball will fly, to the first bounce, for the banana trail.
+function predictPath(b, curve) {
+  const t = { x: b.x, y: b.y, z: b.z, vx: b.vx, vy: b.vy, vz: b.vz,
+    live: true, bounces: 0, curve, wind: b.wind || 0, spinT: 0, trail: [] };
+  const pts = [{ x: t.x, y: t.y, z: t.z }];
+  let done = false;
+  for (let i = 0; i < 240 && !done; i++) {
+    stepBall(t, 1 / 60, (ev) => { if (ev === "bounce" || ev === "net") done = true; });
+    if (i % 3 === 2 || done) pts.push({ x: t.x, y: t.y, z: t.z });
+  }
+  return pts;
 }
 
 function startRallyFromServe(m, byYou, quality, aimTx) {
@@ -325,6 +363,7 @@ function hitShot(m, who, quality, aimX, aimY, opts = {}) {
     }
   }
   b.vx = v.vx; b.vy = v.vy; b.vz = v.vz; b.curve = curve; b.live = true;
+  if (you && Math.abs(curve) > 1 && !m.silent) m.curveTrail = { pts: predictPath(b, curve), t0: m.time, k: Math.min(1, Math.abs(curve) / 6) };
   sfx.pock(0.8 + quality + powBonus);
   if (you) recordSpeed(m, v, quality >= 0.75 || !!opts.power);
   if (!you && quality < 0.25) FX.floatText(b.x, b.y, b.z + 0.4, "SHANK!", "#ff8a5c", 0.7);
@@ -420,7 +459,7 @@ function finishMatch(m, won) {
     const len = mlenInfo(m.mlen);
     m.earnings += Math.round(m.tier.prize * hypeMult(m) * len.bonus);
     if (len.bonus > 1) ticker(m, `${len.name} bonus: +${Math.round((len.bonus - 1) * 100)}% purse!`, 4);
-    sfx.fanfare(); setTimeout(() => { if (!m.silent) sfx.cheer(1.5); }, 300);
+    sfx.fanfare(); later(m, () => sfx.cheer(1.5), 300);
     FX.confetti(90);
     setState(m.you, "celebrate"); setState(m.oppP, "sad");
     sayBanner(m, "MATCH WON!", "#ffe24a", 1.8);
@@ -458,6 +497,9 @@ export function inputMove(m, nx, ny) {
   if (m.trail.length > 24) m.trail.shift();
 }
 
+// The OS took the touch (a call, a system gesture): drop the swipe, don't play it.
+export function inputCancel(m) { m.gest = null; }
+
 export function inputRelease(m) {
   const g = m.gest;
   m.gest = null;
@@ -485,6 +527,7 @@ export function inputRelease(m) {
     const lat = clamp(dx * 6, -1, 1) * box;             // +1 = toward the box's sideline
     const tx = box * lerp(-0.9, COURT.W / 2 - 0.45, (lat + 1) / 2);
     serveNow(m, q, tx);
+    tutDone(m, 0);
     return;
   }
 
@@ -506,6 +549,9 @@ export function inputRelease(m) {
     const dur = Math.max(0.03, B.t - A.t);
     swipePow = clamp(len / dur / 6, 0, 0.18);         // fast flick = extra zip
     curve = gestureCurve(pts, dx, dy) * -9;           // signed m/s² sideways (bow right = ball curves right)
+    const beat = m.tut && m.tut.beat;                 // one beat per swipe
+    if (beat === 1 && depth >= 0.6) tutDone(m, 1);
+    else if (beat === 2 && Math.abs(curve) >= 4) tutDone(m, 2);
   }
   commitSwing(m, dtc, aim, curve, swipePow);
 }
@@ -685,7 +731,7 @@ export function useSkill(m, id) {
           NAMES.bleep(2, 3), "#ff4d4d", 0.55);
       }
       const r = Math.random();
-      setTimeout(() => {
+      later(m, () => {
         m.arguePending = false;
         if (m.over) return;
         m.stateT = 0;                        // a beat to read the ruling before serving
@@ -722,12 +768,12 @@ export function useSkill(m, id) {
       setState(m.you, "serve");
       sfx.click();
       const aceChance = skillFx("underarm", lvl, "ace") + (1 - m.oppComp / 100) * 0.3;
-      setTimeout(() => {
+      later(m, () => {
         if (m.over) return;
         m.oppComp = clamp(m.oppComp - skillFx("underarm", lvl, "tilt"), 5, 100);
         if (Math.random() < aceChance) {
           sfx.pock(0.4);
-          setTimeout(() => {
+          later(m, () => {
             sayBanner(m, "UNDERARM ACE! 🥷", "#ffe24a", 1.3);
             FX.floatText(m.oppP.x, OPP_Y - 2, 0.5, "plop.", "#fff", 0.8);
             endPoint(m, "you", "ace");
@@ -758,7 +804,7 @@ export function useSkill(m, id) {
       sfx.pigeonCoo();
       m.oppNextError = 1.2 + skillFx("pigeon", lvl, "weaken") * 1.5;
       sayBanner(m, "RELEASE CLIVE! 🐦", "#fff", 1.1);
-      setTimeout(() => { if (!m.over) FX.floatText(m.oppP.x, OPP_Y, 2.4, "AAGH! BIRD!", "#ff8a5c", 0.9); }, 900);
+      later(m, () => { if (!m.over) FX.floatText(m.oppP.x, OPP_Y, 2.4, "AAGH! BIRD!", "#ff8a5c", 0.9); }, 900);
       break;
     }
     case "racketsmash": {
@@ -1039,19 +1085,38 @@ export function drawMatch(m, ctx) {
   ctx.save();
   if (FX.shake > 0) ctx.translate(rand(-FX.shake, FX.shake) * 0.5, rand(-FX.shake, FX.shake) * 0.5);
   drawScene(ctx, m.time, m.hype, m.hype > 80);
-  if (m.server === "you" && !m.over &&
+  if (m.server === "you" && !m.over && !m.silent &&
       (m.state === "preServe" || m.state === "serveWait" || m.state === "serving")) {
     drawServeTarget(ctx, serveBoxSide(m, true), true, m.time);
   }
   drawPlayer(ctx, m.oppP);
   drawNet(ctx);
+  drawCurveTrail(m, ctx);
   drawBall(ctx, m.ball);
   drawPlayer(ctx, m.you);
-  if ((m.state === "rally" && m.ballTo === "you" && m.contact) || m.state === "serveWait") drawTimingRing(m, ctx);
+  if (!m.silent && ((m.state === "rally" && m.ballTo === "you" && m.contact) || m.state === "serveWait")) drawTimingRing(m, ctx);
   drawSwipeTrail(m, ctx);
   FX.drawFx(ctx);
   FX.drawZoneVignette(ctx, m.zoneShots > 0 ? 1 : 0);
   EV.eventOverlay(m, ctx);
+  ctx.restore();
+}
+
+// Faint banana: the flight the swipe's bow just bought, fading out over ~1.2s.
+function drawCurveTrail(m, ctx) {
+  const ct = m.curveTrail;
+  if (!ct) return;
+  const age = m.time - ct.t0;
+  if (age > 1.2) { m.curveTrail = null; return; }
+  const a = (1 - age / 1.2) * (0.35 + 0.3 * ct.k);
+  ctx.save();
+  ctx.lineCap = "round"; ctx.lineJoin = "round";
+  ctx.setLineDash([Math.max(4, view.stageW * 0.012), Math.max(5, view.stageW * 0.014)]);
+  ctx.lineWidth = Math.max(2, view.stageW * 0.007);
+  ctx.strokeStyle = `rgba(255,226,74,${a})`;
+  ctx.beginPath();
+  ct.pts.forEach((q, i) => { const p = project(q.x, q.y, q.z); if (i) ctx.lineTo(p.x, p.y); else ctx.moveTo(p.x, p.y); });
+  ctx.stroke();
   ctx.restore();
 }
 
