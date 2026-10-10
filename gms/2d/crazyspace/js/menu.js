@@ -5,7 +5,11 @@
 
 import { MODES, MODE_LIST, SHIPS, SHIP_LIST, TEAMS, UPGRADES, HANGAR_MAX, DIFFICULTY } from './config.js';
 import { fmtDuration, kdRatio } from './save.js';
-import { loadHangar, buyUpgrade, upgradeCost, upgradeCount } from './hangar.js';
+import { loadHangar, buyUpgrade, upgradeCost, upgradeCount, setHangar } from './hangar.js';
+
+// Aaron's test panel: only when the game is opened from a literal 192.* LAN address
+// (his phone hitting the Mac's dev server), never on games.br8t.com or Pages.
+const LOCAL_DEBUG = /^192\.\d+\.\d+\.\d+$/.test(location.hostname);
 
 function el(tag, props = {}, ...kids) {
   const e = document.createElement(tag);
@@ -203,6 +207,7 @@ export class Menu {
         this.hangarCredits,
         el('p', { class: 'upg-hint' }, 'Permanent upgrades for every ship, and bots never get them. They stack, so the longer you play the easier it gets.'),
         this.hangarList,
+        ...(LOCAL_DEBUG ? [this._debugPanel()] : []),
       ],
       foot: [this.hangarFoot],
     });
@@ -240,6 +245,21 @@ export class Menu {
   get _screens() {
     return [this.title, this.help, this.mode, this.ship, this.settingsScreen,
       this.career, this.hangar, this.pause, this.results];
+  }
+
+  // ---------------- local debug (192.* only) ----------------
+  _debugPanel() {
+    const act = (fn) => () => { fn(); this._renderHangar(); this._refreshCredits(); };
+    const zero = () => Object.fromEntries(UPGRADES.map(u => [u.key, 0]));
+    const max = () => Object.fromEntries(UPGRADES.map(u => [u.key, HANGAR_MAX]));
+    return el('div', { class: 'dbg-panel' },
+      el('div', { class: 'dbg-title' }, 'DEBUG · local network only'),
+      el('div', { class: 'dbg-btns' },
+        el('button', { class: 'btn', onclick: act(() => setHangar({ credits: loadHangar().credits + 10000 })) }, '+10k ◈'),
+        el('button', { class: 'btn', onclick: act(() => setHangar({ credits: loadHangar().credits + 100000 })) }, '+100k ◈'),
+        el('button', { class: 'btn', onclick: act(() => setHangar({ levels: zero() })) }, 'Reset levels'),
+        el('button', { class: 'btn', onclick: act(() => setHangar({ credits: 0 })) }, 'Zero credits'),
+        el('button', { class: 'btn', onclick: act(() => setHangar({ levels: max() })) }, 'Max all')));
   }
 
   // ---------------- hangar screen ----------------

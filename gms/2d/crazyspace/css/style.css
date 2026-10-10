@@ -287,3 +287,9 @@ h3.sec { margin: 18px 0 8px; font-size: 12px; letter-spacing: 2px; text-transfor
 .screen > .panel.narrow { margin: auto; width: calc(100% - 36px); }
 
 .diff-line { color: #ffb38a; font-size: 12px; text-align: center; margin: 0 0 4px; }
+
+/* local-network debug panel (menu.js LOCAL_DEBUG) */
+.dbg-panel { margin: 18px 0 6px; padding: 10px; border: 1px dashed #ff5d8f; border-radius: 10px; }
+.dbg-title { color: #ff5d8f; font-size: 11px; letter-spacing: .12em; font-weight: 700; margin-bottom: 8px; text-align: center; }
+.dbg-btns { display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; }
+.dbg-btns .btn { flex: 1 1 30%; min-width: 0; padding: 8px 6px; font-size: 13px; margin: 0; }
