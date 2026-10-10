@@ -18,8 +18,39 @@
       <div class="boot-title">HEXPIRE</div>
       <div class="boot-sub">claim every hex</div>
       <div id="boot-status">loading…</div>
+      <button id="boot-reload" class="hidden">Reload</button>
     </div>
   </div>
+  <script>
+    // boot watchdog: a stale cached module can hang the module graph silently,
+    // so this lives inline and offers a cache-busting reload
+    (function () {
+      var shown = false;
+      function stuck(msg) {
+        if (window.__booted || shown) return;
+        shown = true;
+        var s = document.getElementById('boot-status'), b = document.getElementById('boot-reload');
+        if (s) s.textContent = msg || 'Still loading… something may be stuck.';
+        if (b) {
+          b.classList.remove('hidden');
+          b.onclick = function () {
+            var go = function () { location.replace(location.pathname + '?v=' + Date.now()); };
+            var mods = ['main', 'ai', 'audio', 'cloud', 'config', 'editor', 'fx', 'hex', 'input', 'mapgen', 'maps',
+              'menus', 'meshes', 'render', 'rules', 'save', 'state', 'tutorial', 'ui', 'units', 'utils'];
+            try {
+              Promise.all(mods.map(function (m) { return fetch('js/' + m + '.js', { cache: 'reload' }).catch(function () {}); }))
+                .then(go, go);
+              setTimeout(go, 4000);
+            } catch (e) { go(); }
+          };
+        }
+      }
+      setTimeout(function () { stuck(); }, 8000);
+      addEventListener('error', function (e) {
+        if (!window.__booted && (e.target && e.target.tagName === 'SCRIPT' || /import|module|export/i.test(e.message || ''))) stuck('Loading failed — tap Reload.');
+      }, true);
+    })();
+  </script>
 
   <!-- home menu -->
   <div id="menu" class="screen hidden">
@@ -92,6 +123,8 @@
     </div>
     <div id="panel" class="hidden"></div>
     <button id="btn-endturn" class="hidden">End Turn<small id="et-sub"></small></button>
+    <button id="btn-ff" class="hidden">⏩<small>hold to speed up</small></button>
+    <div id="roundsum" class="hidden"></div>
     <div id="turnbanner" class="hidden"></div>
   </div>
 

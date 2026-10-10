@@ -5,6 +5,7 @@ import { STYLES } from './mapgen.js';
 import { Settings, Progress, CustomMaps, Resume } from './save.js';
 import { showModal, toast } from './ui.js';
 import { applyAudioSettings, unlockAudio, Sfx } from './audio.js';
+import { escapeHtml } from './utils.js';
 
 const $ = (id) => document.getElementById(id);
 let H = null; // handlers from main.js
@@ -97,6 +98,7 @@ function renderStoryList() {
 
 // ---------- skirmish ----------
 const sk = { style: 'random', size: 'medium', rivals: 2, personalities: [] };
+export const SMALL_MAX_RIVALS = 3;
 
 function chipRow(el, options, current, onPick) {
   el.innerHTML = '';
@@ -116,8 +118,16 @@ function renderSkirmish() {
   ], sk.style, (v) => { sk.style = v; renderSkirmish(); });
   chipRow($('sk-size'), [['small', 'Small'], ['medium', 'Medium'], ['large', 'Large']],
     sk.size, (v) => { sk.size = v; renderSkirmish(); });
+  // small boards can't fit more than 4 empires without packing every base ring
+  const maxRivals = sk.size === 'small' ? SMALL_MAX_RIVALS : 5;
+  if (sk.rivals > maxRivals) sk.rivals = maxRivals;
   chipRow($('sk-rivals'), [1, 2, 3, 4, 5].map(n => [n, String(n)]),
     sk.rivals, (v) => { sk.rivals = v; renderSkirmish(); });
+  $('sk-rivals').querySelectorAll('.chip').forEach((c, i) => {
+    if (i + 1 <= maxRivals) return;
+    c.classList.add('off');
+    c.onclick = () => { Sfx.error(); toast('Small maps fit up to ' + maxRivals + ' rivals'); };
+  });
 
   const pers = $('sk-personalities');
   pers.innerHTML = '';
@@ -193,7 +203,6 @@ function renderCustomList() {
   }
 }
 
-function escapeHtml(s) { const d = document.createElement('div'); d.textContent = s; return d.innerHTML; }
 
 // ---------- options ----------
 export function openOptions(inGame) {
@@ -202,6 +211,7 @@ export function openOptions(inGame) {
     ['music', '🎵 Music'],
     ['fastAI', '⏩ Fast rival turns'],
     ['showHints', '💡 Hints & tips'],
+    ['lowGfx', '🪫 Low graphics'],
   ];
   let body = rows.map(([k, label]) => `
     <div class="opt-row"><span>${label}</span>
@@ -227,6 +237,7 @@ export function openOptions(inGame) {
       Settings.save();
       t.classList.toggle('on', Settings.data[k]);
       if (k === 'music' || k === 'sound') { unlockAudio(); applyAudioSettings(); }
+      if (k === 'lowGfx') { Settings.data.lowGfxManual = true; Settings.save(); H.onLowGfx?.(Settings.data.lowGfx); }
       Sfx.tap();
     };
   });

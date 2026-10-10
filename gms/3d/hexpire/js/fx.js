@@ -20,6 +20,8 @@ export function fxUpdate(dt) {
 
 function add(dur, step, end) { live.push({ t: 0, dur, step, end }); }
 
+export const fxBusy = () => live.length > 0;
+
 export function tweenPromise(dur, step) {
   return new Promise(res => add(dur, step, res));
 }
@@ -103,7 +105,7 @@ export function puff(pos, color = 0xcccccc, n = 7, spread = 0.5) {
       p.scale.setScalar((1 - t * 0.6) * p.userData.s);
       p.material.opacity = 0.85 * (1 - t);
     }
-  }, () => { for (const p of parts) { scene.remove(p); p.material.dispose(); } });
+  }, () => { for (const p of parts) { scene.remove(p); p.material.dispose(); } m.dispose(); });
 }
 
 export function ringPulse(pos, color = 0xffffff) {

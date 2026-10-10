@@ -2,7 +2,7 @@
 // for the presentation layer to animate; null means the turn is finished.
 // Personalities weight the build economy; aggro shapes army behaviour.
 import { CFG } from './config.js';
-import { key, unkey, neighbors, disc, hexDist, bfs, pathTo } from './hex.js';
+import { key, unkey, neighbors, disc, hexDist, bfs, pathTo, DIRS } from './hex.js';
 import { armyAt, empireBases, empireArmies, villagesOwned } from './state.js';
 import {
   recalcTerritory, buildTower, buildVillage, upgradeBase, upgradeTower,
@@ -57,6 +57,7 @@ function tryBuild(st, idx) {
     if (b.level >= 5) continue;
     const cost = CFG.baseUpgrade[b.level];
     if (e.coins < cost) continue;
+    if (!upgradeGainsLand(st, idx, bt)) continue;
     cands.push({
       score: p.upgrade * (6 - b.level) * 2.2 * jit(rng),
       run: () => { upgradeBase(st, idx, bt.k); return { type: 'upgrade', k: bt.k, what: 'base' }; },
@@ -117,8 +118,9 @@ function tryBuild(st, idx) {
     const worthIt = myArmies.length === 0 ? lvl >= 1 : lvl >= Math.max(2, desired - 2);
     if (worthIt && lvl >= 1) {
       const spot = musterSpot(st, idx);
+      // banked wealth pushes even thrifty personalities to field a host
       if (spot) cands.push({
-        score: p.army * (1.4 + threat * 0.8 + (myArmies.length === 0 ? 1.2 : 0)) * jit(rng),
+        score: p.army * (1.4 + threat * 0.8 + (myArmies.length === 0 ? 1.2 : 0) + Math.min(2, e.coins / 80)) * jit(rng),
         run: () => {
           const err = recruitArmy(st, idx, spot, lvl);
           return err ? null : { type: 'recruit', k: spot, level: lvl };
@@ -137,6 +139,22 @@ function tryBuild(st, idx) {
 }
 
 const jit = (rng) => 0.75 + rng() * 0.5;
+
+// a bigger claim radius is only worth it if the new ring holds land we'd own
+// outright; if every new hex is already claimed by a rival it just turns grey
+function upgradeGainsLand(st, idx, bt) {
+  const r0 = CFG.base[bt.building.level].radius, r1 = CFG.base[bt.building.level + 1].radius;
+  if (r1 <= r0) return true;
+  let ring = 0, gain = 0;
+  for (const [q, r] of disc(bt.q, bt.r, r1)) {
+    if (hexDist(q, r, bt.q, bt.r) <= r0) continue;
+    const t = st.tiles.get(key(q, r));
+    if (!t) continue;
+    ring++;
+    if (t.owner !== idx && t.claims.every(c => c === idx)) gain++;
+  }
+  return ring === 0 || gain > 0;
+}
 
 function threatLevel(st, idx) {
   // enemy armies near any of my buildings
@@ -181,13 +199,22 @@ function chokesMuster(st, idx, q, r) {
   return false;
 }
 
+// would a building here split the walkable land around it into separate
+// arcs? (a 1-wide causeway or corridor) — those walls froze whole games
+function cutsLane(st, q, r) {
+  const open = DIRS.map(([dq, dr]) => { const t = st.tiles.get(key(q + dq, r + dr)); return !!t && !t.building; });
+  let arcs = 0;
+  for (let i = 0; i < 6; i++) if (open[i] && !open[(i + 5) % 6]) arcs++;
+  return arcs >= 2;
+}
+
 function bestVillageSpot(st, idx) {
   let best = null, bs = -1;
   outer:
   for (const t of st.tiles.values()) {
     if (t.owner !== idx || t.building || t.armyId) continue;
     const [q, r] = [t.q, t.r];
-    if (chokesMuster(st, idx, q, r)) continue;
+    if (chokesMuster(st, idx, q, r) || cutsLane(st, q, r)) continue;
     let s = 0, built = 0;
     for (const [nq, nr] of neighbors(q, r)) {
       const nt = st.tiles.get(key(nq, nr));
@@ -208,7 +235,7 @@ function bestTowerSpot(st, idx, mode) {
   let best = null, bg = 0;
   for (const t of st.tiles.values()) {
     if (t.owner !== idx || t.building || t.armyId) continue;
-    if (chokesMuster(st, idx, t.q, t.r)) continue;
+    if (chokesMuster(st, idx, t.q, t.r) || cutsLane(st, t.q, t.r)) continue;
     if (mode === 'expand') {
       // how many currently-unclaimed-by-me tiles would a wood tower claim?
       let gain = 0;
@@ -294,17 +321,8 @@ function armyAct(st, idx, army) {
     value *= p.aggro;
     if (value > bas) { bas = value; bestAtk = { k, info }; }
   }
-  if (bestAtk && bas >= 6) {
-    // walk to the striking tile if needed, then hit (one action: move+attack)
-    let movePath = null;
-    const viaK = bestAtk.info.via;
-    if (viaK !== key(army.q, army.r)) {
-      movePath = pathTo(opts.dist, viaK);
-      applyMove(st, army, movePath);
-    }
-    const ev = applyAttack(st, army, bestAtk.k);
-    return { type: 'attack', armyId: army.id, path: movePath, targetK: bestAtk.k, ev };
-  }
+  // walk to the striking tile if needed, then hit (one action: move+attack)
+  if (bestAtk && bas >= 6) return strike(st, army, bestAtk, opts);
 
   // 3. hurt? fall back into friendly aura
   if (army.hp < army.maxHp * 0.4 && p.aggro < 1.5) {
@@ -325,9 +343,39 @@ function armyAct(st, idx, army) {
       applyMove(st, army, path);
       return { type: 'move', armyId: army.id, path };
     }
+    // the road is jammed (a held causeway or corridor): grind at whatever
+    // blocks it rather than standing idle forever
+    const jam = bestAnyStrike(st, army, opts);
+    if (jam) return strike(st, army, jam, opts);
   }
   army.movesLeft = 0;
   return null;
+}
+
+function bestAnyStrike(st, army, opts) {
+  let best = null, bs = 0;
+  for (const [k, info] of opts.attacks) {
+    const t = st.tiles.get(k);
+    const dfd = armyAt(st, t);
+    const atk = CFG.armyAtk(army.level), def = effectiveDef(st, k);
+    let dmg = atk - def;
+    if (dmg <= 0) dmg = atk >= def - CFG.glancingMargin ? 1 : 0;
+    if (dmg <= 0) continue;
+    const hp = dfd ? dfd.hp : t.building.hp;
+    const s = dmg / hp + (info.via === key(army.q, army.r) ? 0.01 : 0);
+    if (s > bs) { bs = s; best = { k, info }; }
+  }
+  return best;
+}
+
+function strike(st, army, target, opts) {
+  let movePath = null;
+  if (target.info.via !== key(army.q, army.r)) {
+    movePath = pathTo(opts.dist, target.info.via);
+    applyMove(st, army, movePath);
+  }
+  const ev = applyAttack(st, army, target.k);
+  return { type: 'attack', armyId: army.id, path: movePath, targetK: target.k, ev };
 }
 
 function nearestOwnBuilding(st, idx, army) {
@@ -344,6 +392,21 @@ function nearestOwnBuilding(st, idx, army) {
 function pickTarget(st, idx, army, p) {
   let best = null, bs = 0;
   const myBase = empireBases(st, idx)[0];
+  // turtles stay home — until their host dwarfs every rival army combined
+  let mine = 0, theirs = 0;
+  for (const a of st.armies.values()) { if (a.owner === idx) mine += a.level; else theirs += a.level; }
+  const homebody = p.aggro < 0.45 && mine < theirs * 1.5 + 10;
+  // marching distance over land (around water and building walls), not crow-flies
+  const walk = bfs(key(army.q, army.r), 999, (k) => { const t = st.tiles.get(k); return !!t && !t.building; });
+  const walkDist = (t) => {
+    if (walk.has(t.k)) return walk.get(t.k);
+    let d = Infinity;
+    for (const [nq, nr] of neighbors(t.q, t.r)) {
+      const c = walk.get(key(nq, nr));
+      if (c !== undefined && c + 1 < d) d = c + 1;
+    }
+    return d === Infinity ? hexDist(army.q, army.r, t.q, t.r) + 6 : d;
+  };
   for (const t of st.tiles.values()) {
     let value = 0;
     const b = t.building;
@@ -356,17 +419,25 @@ function pickTarget(st, idx, army, p) {
       if (a.level >= army.level + 2) value *= 0.25;   // don't chase giants
     } else continue;
     // turtles defend: only care about targets near home
-    if (p.aggro < 0.45 && myBase && hexDist(t.q, t.r, myBase.q, myBase.r) > CFG.base[myBase.building.level].radius + 2) continue;
-    const d = hexDist(army.q, army.r, t.q, t.r);
-    const s = value / (d + 2);
+    if (homebody && myBase && hexDist(t.q, t.r, myBase.q, myBase.r) > CFG.base[myBase.building.level].radius + 2) continue;
+    const s = value / (walkDist(t) + 2);
     if (s > bs) { bs = s; best = t; }
   }
   return best;
 }
 
+// BFS distance field over land from the target (buildings block, armies don't —
+// they move); falls back to plain land if the army is walled off from it
+function distField(st, targetK, fromK) {
+  const open = bfs(targetK, 999, (k) => { const t = st.tiles.get(k); return !!t && !t.building; });
+  if (open.has(fromK)) return open;
+  return bfs(targetK, 999, (k) => st.tiles.has(k));
+}
+
 // advance as far as possible toward (tq,tr) this turn; returns path or null
 function stepToward(st, army, tq, tr, opts) {
   const fromK = key(army.q, army.r);
+  const field = distField(st, key(tq, tr), fromK);
   // long-range dist map — marches through friendly armies, stands on free land
   const far = bfs(fromK, 64, (k) => {
     const t = st.tiles.get(k);
@@ -375,14 +446,14 @@ function stepToward(st, army, tq, tr, opts) {
     const a = st.armies.get(t.armyId);
     return a && a.owner === army.owner;
   });
-  // best reachable-this-turn FREE tile that minimizes distance to target
-  let bestK = null, bestRem = hexDist(army.q, army.r, tq, tr), bestCost = 0;
+  // best reachable-this-turn FREE tile that minimizes marching distance to target
+  let bestK = null, bestRem = field.get(fromK) ?? Infinity, bestCost = 0;
   for (const [k, c] of far) {
     if (c > army.movesLeft) continue;
     const t = st.tiles.get(k);
     if (t.armyId) continue;
-    const [q, r] = unkey(k);
-    const rem = hexDist(q, r, tq, tr);
+    const rem = field.get(k);
+    if (rem === undefined) continue;
     if (rem < bestRem || (rem === bestRem && c < bestCost)) { bestRem = rem; bestK = k; bestCost = c; }
   }
   if (!bestK || bestK === fromK) return null;

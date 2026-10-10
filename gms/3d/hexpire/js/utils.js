@@ -43,3 +43,6 @@ export function makeBus() {
 // eases
 export const easeOut = (t) => 1 - (1 - t) * (1 - t);
 export const easeInOut = (t) => t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
+
+const HTML_ESC = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' };
+export const escapeHtml = (s) => String(s ?? '').replace(/[&<>"']/g, c => HTML_ESC[c]);

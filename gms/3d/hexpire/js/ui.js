@@ -3,16 +3,47 @@
 import { CFG } from './config.js';
 import { villagesOwned } from './state.js';
 import { computeIncome } from './rules.js';
+import { escapeHtml } from './utils.js';
 
 const $ = (id) => document.getElementById(id);
 
 // ---------- toasts ----------
+// at most 2 on screen; a repeat of a showing toast bumps its count instead
+const TOAST_MAX = 2;
 export function toast(msg, ms = 2600) {
-  const el = document.createElement('div');
-  el.className = 'toast';
-  el.textContent = msg;
-  $('toasts').appendChild(el);
-  setTimeout(() => { el.classList.add('out'); setTimeout(() => el.remove(), 450); }, ms);
+  const root = $('toasts');
+  const live = [...root.children].filter(el => !el.classList.contains('out'));
+  let el = live.find(t => t.dataset.msg === msg);
+  if (el) {
+    el.dataset.n = +el.dataset.n + 1;
+    el.textContent = msg + ' ×' + el.dataset.n;
+    clearTimeout(+el.dataset.timer);
+  } else {
+    while (live.length >= TOAST_MAX) live.shift().remove();
+    el = document.createElement('div');
+    el.className = 'toast';
+    el.textContent = msg;
+    el.dataset.msg = msg;
+    el.dataset.n = 1;
+    root.appendChild(el);
+  }
+  el.dataset.timer = setTimeout(() => { el.classList.add('out'); setTimeout(() => el.remove(), 450); }, ms);
+}
+
+// inline two-step confirm: first tap arms the button, second tap (within ms) runs it
+export function confirmTap(btn, armedHtml, onConfirm, ms = 3000) {
+  if (btn._armTimer) {
+    clearTimeout(btn._armTimer); btn._armTimer = 0;
+    btn.classList.remove('armed'); btn.innerHTML = btn._armOrig;
+    onConfirm();
+    return;
+  }
+  btn._armOrig = btn.innerHTML;
+  btn.innerHTML = armedHtml;
+  btn.classList.add('armed');
+  btn._armTimer = setTimeout(() => {
+    btn._armTimer = 0; btn.classList.remove('armed'); btn.innerHTML = btn._armOrig;
+  }, ms);
 }
 
 // ---------- modal ----------
@@ -22,7 +53,7 @@ export function showModal({ title, body, buttons = [{ label: 'OK', primary: true
   root.classList.remove('hidden');
   const card = document.createElement('div');
   card.className = 'modal-card';
-  card.innerHTML = `<h2>${title}</h2><div class="m-body">${body}</div><div class="m-btns"></div>`;
+  card.innerHTML = `<h2>${escapeHtml(title)}</h2><div class="m-body">${body}</div><div class="m-btns"></div>`;
   const btnRow = card.querySelector('.m-btns');
   for (const b of buttons) {
     const btn = document.createElement('button');
@@ -47,16 +78,23 @@ export function updateHud(st, humanIdx) {
   $('hud-coins').innerHTML = `🪙 ${e.coins} <span id="hud-income">+${inc.total}</span>`;
   $('hud-round').textContent = 'Round ' + st.round;
   $('hud-land').textContent = '⬡ ' + inc.hexCount;
-  // empire chips
+  // empire chips (collapse to dots on narrow portrait; tap to expand)
   const chips = $('hud-empires');
+  if (!chips.onclick) chips.onclick = () => chips.classList.toggle('open');
   chips.innerHTML = '';
   for (const emp of st.empires) {
     const c = document.createElement('div');
     c.className = 'emp-chip' + (st.turn === emp.idx ? ' turn' : '') + (emp.alive ? '' : ' dead');
-    c.innerHTML = `<span class="emp-dot" style="background:${CFG.colors[emp.colorIdx].css}"></span>${emp.name}`;
+    const ico = emp.isAI ? `<span class="emp-ico" title="${escapeHtml(personaLabel(emp))}">${PERSONA_ICON[emp.personality] || '⚖️'}</span>` : '';
+    c.innerHTML = `<span class="emp-dot" style="background:${CFG.colors[emp.colorIdx].css}"></span><span class="emp-name">${escapeHtml(emp.name)}</span>${ico}`;
     chips.appendChild(c);
   }
 }
+
+export const PERSONA_ICON = {
+  balanced: '⚖️', expansionist: '🗺️', warlord: '⚔️', economist: '💰', turtle: '🐢', meek: '🐑',
+};
+const personaLabel = (emp) => CFG.personalities[emp.personality]?.label || 'Meek';
 
 export function showEndTurn(v, sub = '') {
   const b = $('btn-endturn');
@@ -68,7 +106,7 @@ export function endTurnAttention(v) { $('btn-endturn').classList.toggle('attenti
 let bannerTimer = 0;
 export function turnBanner(text, cssColor = '#f0d68a', ms = 1300) {
   const el = $('turnbanner');
-  el.innerHTML = text;
+  el.textContent = text;
   el.style.color = cssColor;
   el.classList.remove('hidden');
   clearTimeout(bannerTimer);
@@ -87,7 +125,7 @@ function panelShell(title, sub, onClose) {
   $('hud').classList.add('panel-open');   // End Turn steps aside
   p.innerHTML = `
     <div class="p-head">
-      <div class="p-title">${title}<span class="p-sub">${sub || ''}</span></div>
+      <div class="p-title">${escapeHtml(title)}<span class="p-sub">${escapeHtml(sub || '')}</span></div>
       <button class="p-close">✕</button>
     </div>`;
   p.querySelector('.p-close').onclick = onClose;
@@ -137,12 +175,12 @@ export function buildPanel(st, k, idx, H) {
 export function basePanel(st, k, idx, H) {
   const t = st.tiles.get(k);
   const b = t.building;
-  const mine = b.owner === idx;
+  const mine = b.owner === idx && !H.readOnly;
   const cfg = CFG.base[b.level];
   const ownerName = b.owner >= 0 ? st.empires[b.owner].name : 'Neutral';
   const p = panelShell(
-    `${mine ? 'Your' : ownerName} Base — Level ${b.level}`,
-    mine ? 'the heart of your empire' : 'an enemy stronghold', H.onClose);
+    `${b.owner === idx ? 'Your' : ownerName} Base — Level ${b.level}`,
+    b.owner === idx ? 'the heart of your empire' : 'an enemy stronghold', H.onClose);
   p.insertBefore(statRow([
     ['HP', `${b.hp}/${b.maxHp}`], ['def', cfg.def], ['claim', cfg.radius],
     ['arrows', cfg.arrows], ['income', cfg.income],
@@ -163,9 +201,9 @@ export function basePanel(st, k, idx, H) {
 export function towerPanel(st, k, idx, H) {
   const b = st.tiles.get(k).building;
   const cfg = CFG.towers[b.type];
-  const mine = b.owner === idx;
+  const mine = b.owner === idx && !H.readOnly;
   const ownerName = b.owner >= 0 ? st.empires[b.owner].name : 'Neutral';
-  const p = panelShell(`${mine ? 'Your' : ownerName + "'s"} ${cfg.name}`, mine ? '' : 'enemy structure', H.onClose);
+  const p = panelShell(`${b.owner === idx ? 'Your' : ownerName + "'s"} ${cfg.name}`, b.owner === idx ? '' : 'enemy structure', H.onClose);
   p.appendChild(statRow([
     ['HP', `${b.hp}/${b.maxHp}`], ['def', cfg.def], ['arrows', cfg.arrows], ['claim', cfg.radius],
   ]));
@@ -179,23 +217,29 @@ export function towerPanel(st, k, idx, H) {
       acts.appendChild(actBtn('⬆️', CFG.towers[next].name.split(' ')[0], cost,
         st.empires[idx].coins < cost, () => H.onUpgradeTower(k)));
     }
-    acts.appendChild(actBtn('💰', 'Sell', '+' + Math.floor(b.invested * CFG.sellRefund), false, () => H.onSell(k), 'danger'));
+    acts.appendChild(sellBtn(b, k, H));
     p.appendChild(acts);
   }
   return p;
 }
 
+function sellBtn(b, k, H) {
+  const btn = actBtn('💰', 'Sell', '+' + Math.floor(b.invested * CFG.sellRefund), false,
+    () => confirmTap(btn, '<span class="ico">💰</span>Tap again<span class="cost">to sell</span>', () => H.onSell(k)), 'danger');
+  return btn;
+}
+
 export function villagePanel(st, k, idx, H) {
   const b = st.tiles.get(k).building;
-  const mine = b.owner === idx;
+  const mine = b.owner === idx && !H.readOnly;
   const ownerName = b.owner >= 0 ? st.empires[b.owner].name : 'No one';
-  const p = panelShell(mine ? 'Your Village' : `Village — ${ownerName}`,
+  const p = panelShell(b.owner === idx ? 'Your Village' : `Village — ${ownerName}`,
     `pays +${CFG.villageIncome} coin to whoever holds this hex`, H.onClose);
   p.appendChild(statRow([['HP', `${b.hp}/${b.maxHp}`], ['income', '+' + CFG.villageIncome]]));
   if (mine) {
     const acts = document.createElement('div');
     acts.className = 'p-actions';
-    acts.appendChild(actBtn('💰', 'Sell', '+' + Math.floor(b.invested * CFG.sellRefund), false, () => H.onSell(k), 'danger'));
+    acts.appendChild(sellBtn(b, k, H));
     p.appendChild(acts);
   }
   return p;
@@ -206,7 +250,7 @@ export function armyPanel(st, army, idx, H) {
   const name = st.empires[army.owner].name;
   const p = panelShell(
     `${mine ? 'Your' : name + "'s"} Army — Level ${army.level}`,
-    mine ? 'tap a highlighted hex to march, red to attack, blue to merge' : 'enemy force', H.onClose);
+    !mine ? 'enemy force' : H.readOnly ? 'orders wait for your turn' : 'tap a highlighted hex to march, red to attack, blue to merge', H.onClose);
   p.appendChild(statRow([
     ['HP', `${army.hp}/${army.maxHp}`],
     ['attack', CFG.armyAtk(army.level)], ['defence', CFG.armyDef(army.level)],
@@ -242,6 +286,21 @@ export function infoPanel(title, sub, pairs, onClose) {
   if (pairs?.length) p.appendChild(statRow(pairs));
   return p;
 }
+
+// ---------- round summary callout (non-blocking) ----------
+let sumTimer = 0;
+export function roundSummary(lines) {
+  const el = $('roundsum');
+  if (!lines.length) { el.classList.add('hidden'); return; }
+  el.innerHTML = `<div class="rs-head">Since your last turn</div>` +
+    lines.map(l => `<div class="rs-line">${escapeHtml(l)}</div>`).join('');
+  el.classList.remove('hidden');
+  el.onclick = () => el.classList.add('hidden');
+  clearTimeout(sumTimer);
+  sumTimer = setTimeout(() => el.classList.add('hidden'), 7000);
+}
+
+export function showFastForward(v) { $('btn-ff').classList.toggle('hidden', !v); }
 
 // ---------- result ----------
 export function resultModal({ win, name, stats, onMenu, onNext, onReplay }) {

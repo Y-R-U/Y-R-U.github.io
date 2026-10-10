@@ -1,7 +1,7 @@
 // HEXPIRE — boot, render loop, turn engine and player interaction.
 import { CFG } from './config.js';
 import { key, disc } from './hex.js';
-import { makeState, serialize, deserialize, armyAt, empireBases } from './state.js';
+import { makeState, serialize, deserialize, armyAt, empireBases, villagesOwned } from './state.js';
 import {
   recalcTerritory, collectIncome, fireArrows, checkWinner,
   buildTower, buildVillage, upgradeBase, upgradeTower, sellBuilding, recruitArmy,
@@ -13,9 +13,9 @@ import { aiBeginTurn, aiStep } from './ai.js';
 import {
   R, initRender, buildBoard, refreshTiles, refreshTrees, syncBuildings, syncArmies,
   setHighlights, clearHighlights, pickHex, pickHexAny, fitCamera, focusOn, worldOf,
-  renderUpdate, armyMeshOf,
+  renderUpdate, armyMeshOf, setLowGraphics, onScreen,
 } from './render.js';
-import { initFx, fxUpdate, moveAlong, arrowShot, floatText, puff, ringPulse, hitFlash } from './fx.js';
+import { initFx, fxUpdate, fxBusy, moveAlong, arrowShot, floatText, puff, ringPulse, hitFlash } from './fx.js';
 import { initInput } from './input.js';
 import * as UI from './ui.js';
 import { initMenus, showScreen, hideAllScreens, openOptions, rivalColorIdx } from './menus.js';
@@ -23,6 +23,7 @@ import { tutStart, tutStop, tutActive, tutEvent } from './tutorial.js';
 import { openEditor, closeEditorUI, editorActive, editorPainting, editorTapAt, editorPaintAt } from './editor.js';
 import { Settings, Progress, Resume } from './save.js';
 import { Sfx, unlockAudio, applyAudioSettings } from './audio.js';
+import { escapeHtml } from './utils.js';
 
 const P = new URLSearchParams(location.search);
 const SHOT = P.get('shot') === '1';
@@ -50,15 +51,19 @@ const G = {
   returnMap: null,         // editor test-play round trip
   input: null,
   over: false,
+  ff: false,               // fast-forward held during rival turns
+  rematch: null,           // () => restart with the same settings
+  turnSnap: null,          // player's position at End Turn, for the round summary
 };
 window.__game = G;
 
-const speed = () => (AUTO || Settings.data.fastAI) ? 0.22 : 1;
+const speed = () => ((AUTO || Settings.data.fastAI) ? 0.22 : 1) * (G.ff ? 0.25 : 1);
 const wait = (ms) => new Promise(r => setTimeout(r, ms * speed()));
 
 // ---------- boot ----------
 const container = document.getElementById('game-container');
 initRender(container, { lite: LITE });
+if (Settings.data.lowGfx && !LITE) setLowGraphics(true);
 initFx(R.scene);
 G.input = initInput(R.renderer.domElement, {
   onTap: routeTap,
@@ -77,31 +82,60 @@ initMenus({
   onOpenEditor: enterEditor,
   onContinue: continueGame,
   onQuitToMenu: quitToMenu,
+  onLowGfx: (v) => setLowGraphics(v),
 });
 
 document.getElementById('btn-endturn').onclick = onEndTurn;
 document.getElementById('btn-cog').onclick = () => { Sfx.tap(); openOptions(true); };
-document.getElementById('btn-home').onclick = () => {
+document.getElementById('btn-home').onclick = (e) => {
   Sfx.tap();
-  UI.showModal({
-    title: 'Leave the battle?',
-    body: '<p>Your campaign is saved — you can continue from the home menu.</p>',
-    buttons: [{ label: 'Home', primary: true, onTap: quitToMenu }, { label: 'Keep Playing' }],
-  });
+  UI.confirmTap(e.currentTarget, 'Leave?', quitToMenu);
 };
 
-// render loop
-let lastT = performance.now();
+// hold to fast-forward rival turns
+const ffBtn = document.getElementById('btn-ff');
+const setFF = (v) => { G.ff = v; ffBtn.classList.toggle('held', v); };
+ffBtn.addEventListener('pointerdown', (e) => { e.preventDefault(); ffBtn.setPointerCapture?.(e.pointerId); setFF(true); });
+for (const ev of ['pointerup', 'pointercancel', 'lostpointercapture']) ffBtn.addEventListener(ev, () => setFF(false));
+ffBtn.addEventListener('contextmenu', (e) => e.preventDefault());
+
+// render loop: full rate while anything moves, ~30 fps when idle
+let lastT = performance.now(), acc = 0, seenCamVer = -1, camBusyUntil = 0, wasActive = false;
+const perf = { sum: 0, n: 0, slowWindows: 0 };
 function frame(now) {
-  const dt = Math.min((now - lastT) / 1000, 0.1);
+  requestAnimationFrame(frame);
+  const raw = now - lastT;
   lastT = now;
+  acc += raw;
+  if (R.camVer !== seenCamVer) { seenCamVer = R.camVer; camBusyUntil = now + 500; }
+  const active = fxBusy() || now < camBusyUntil || AUTO || SHOT ||
+    (G.mode === 'game' && G.st && (G.busy || G.st.turn !== G.humanIdx));
+  if (!active && acc < 29) { wasActive = false; return; }
+  const dt = Math.min(acc / 1000, 0.1);
+  acc = 0;
   fxUpdate(dt);
   renderUpdate(dt, now / 1000);
-  requestAnimationFrame(frame);
+  if (active && wasActive) watchFrameTime(raw);
+  wasActive = active;
 }
 requestAnimationFrame(frame);
 
+// frame time stuck above 25 ms → drop to low graphics once, and remember it
+function watchFrameTime(ms) {
+  if (R.low || R.lite || G.mode !== 'game' || Settings.data.lowGfxManual || ms > 250) return;
+  perf.sum += ms; perf.n++;
+  if (perf.n < 60) return;
+  perf.slowWindows = perf.sum / perf.n > 25 ? perf.slowWindows + 1 : 0;
+  perf.sum = perf.n = 0;
+  if (perf.slowWindows >= 3) {
+    Settings.data.lowGfx = true; Settings.save();
+    setLowGraphics(true);
+    UI.toast('Low graphics on for smoother play — change it in ⚙️ Options', 5000);
+  }
+}
+
 // entry
+window.__booted = true;
 document.getElementById('boot').classList.add('hidden');
 if (SHOT) setupShot();
 else if (MAPP) { const ch = storyById(MAPP); ch ? startStory(ch) : startSkirmish({ style: 'classic', size: 'medium', rivals: rivalsDefault(3), seed: MAPP }); }
@@ -143,6 +177,7 @@ function startSkirmish(opts) {
     if (m.bases.length === opts.rivals.length + 1) map = m;
   }
   if (!map) { UI.toast('Map generation failed — try another style'); return; }
+  G.rematch = () => startSkirmish(opts);
   const empires = [playerDef(), ...opts.rivals.map(r => ({ ...r, isAI: true }))];
   beginGame({ name: map.name, mode: 'skirmish', land: map.land, bases: map.bases }, empires, 'sk-' + map.seed);
 }
@@ -150,6 +185,7 @@ function startSkirmish(opts) {
 function startCustom(m, fromEditor) {
   G.story = null;
   G.returnMap = fromEditor ? m : null;
+  G.rematch = () => startCustom(m, fromEditor);
   const keys = Object.keys(CFG.personalities);
   const empires = [playerDef()];
   for (let i = 1; i < m.bases.length; i++) {
@@ -168,6 +204,7 @@ function beginGame(mapDef, empires, seedStr) {
   UI.closeModal();
   G.mode = 'game';
   G.over = false;
+  G.turnSnap = null;
   deselect();
   G.st = makeState(mapDef, empires, seedStr);
   recalcTerritory(G.st);
@@ -191,6 +228,7 @@ function continueGame() {
   G.story = payload.storyId ? storyById(payload.storyId) : null;
   G.mode = 'game';
   G.over = false;
+  G.turnSnap = null;
   hideAllScreens();
   deselect();
   recalcTerritory(G.st);
@@ -208,6 +246,8 @@ function quitToMenu() {
   UI.showHud(false);
   UI.hidePanel();
   UI.showEndTurn(false);
+  UI.showFastForward(false);
+  UI.roundSummary([]);
   tutStop();
   deselect();
   G.mode = 'menu';
@@ -274,7 +314,7 @@ async function startEmpireTurn(idx) {
   } else {
     UI.updateHud(st, G.humanIdx);
     if (!SHOT) UI.turnBanner(e.name, CFG.colors[e.colorIdx].css, 900);
-    G.input.setTapEnabled(false);
+    if (!AUTO && !SHOT) UI.showFastForward(true);
     await wait(650);
     await runAiTurn(idx);
   }
@@ -284,6 +324,9 @@ function beginHumanTurn(announce) {
   const st = G.st;
   G.busy = false;
   G.input.setTapEnabled(true);
+  UI.showFastForward(false);
+  if (G.sel || G.recruit) deselect(true);
+  UI.roundSummary(roundSummaryLines());
   UI.showEndTurn(true, 'Round ' + st.round);
   if (announce) {
     UI.turnBanner('⚔️ Your turn', '#f0d68a', 1100);
@@ -299,10 +342,47 @@ async function onEndTurn() {
   G.busy = true;
   deselect();
   UI.showEndTurn(false);
+  UI.roundSummary([]);
+  snapshotTurn();
   tutEvent('turn-ended');
   Sfx.turn();
   await arrowsPhase(G.humanIdx);
   if (!G.over) nextEmpire();
+}
+
+// ---------- round summary ----------
+
+function snapshotTurn() {
+  const st = G.st, h = G.humanIdx;
+  let hexes = 0;
+  for (const t of st.tiles.values()) if (t.owner === h) hexes++;
+  G.turnSnap = {
+    log: st.log.length, hexes, villages: villagesOwned(st, h),
+    armies: new Set([...st.armies.values()].filter(a => a.owner === h).map(a => a.id)),
+  };
+}
+
+function roundSummaryLines() {
+  const snap = G.turnSnap, st = G.st, h = G.humanIdx;
+  G.turnSnap = null;
+  if (!snap || AUTO) return [];
+  const lines = [];
+  const name = (i) => st.empires[i]?.name ?? 'Someone';
+  const what = (type) => type === 'base' ? 'base' : type === 'village' ? 'village' : CFG.towers[type]?.name.toLowerCase() ?? type;
+  for (const ev of st.log.slice(snap.log)) {
+    if (ev.ev === 'razed' && ev.owner === h) lines.push(`🔥 ${name(ev.by)} razed your ${what(ev.type)}`);
+    else if (ev.ev === 'razed' && ev.type === 'base' && ev.by !== h) lines.push(`🔥 ${name(ev.by)} razed ${name(ev.owner)}'s base`);
+    else if (ev.ev === 'empireFell' && ev.empire !== h) lines.push(`☠️ ${name(ev.empire)} has fallen`);
+  }
+  const lost = [...snap.armies].filter(id => !st.armies.has(id)).length;
+  if (lost) lines.push(`⚔️ ${lost} ${lost === 1 ? 'army' : 'armies'} lost`);
+  const dv = villagesOwned(st, h) - snap.villages;
+  if (dv) lines.push(`🏘️ ${dv > 0 ? '+' : '−'}${Math.abs(dv)} ${Math.abs(dv) === 1 ? 'village' : 'villages'}`);
+  let hexes = 0;
+  for (const t of st.tiles.values()) if (t.owner === h) hexes++;
+  const dh = hexes - snap.hexes;
+  if (dh) lines.push(`⬡ ${dh > 0 ? '+' : '−'}${Math.abs(dh)} ${Math.abs(dh) === 1 ? 'hex' : 'hexes'}`);
+  return lines.slice(0, 6);
 }
 
 async function runAiTurn(idx) {
@@ -325,9 +405,10 @@ async function runAiTurn(idx) {
 async function arrowsPhase(idx) {
   const st = G.st;
   const shots = fireArrows(st, idx);
-  if (shots.length && !SHOT) {
+  const seen = SHOT ? [] : shots.filter(s => onScreen(s.from) || onScreen(s.to));
+  if (seen.length) {
     Sfx.arrow();
-    const jobs = shots.map((s, i) =>
+    const jobs = seen.map((s, i) =>
       wait(i * 90).then(() => arrowShot(worldOf(s.from, CFG.tileH + 0.7), worldOf(s.to, CFG.tileH + 0.25)))
         .then(() => {
           hitFlash(worldOf(s.to));
@@ -342,24 +423,36 @@ async function arrowsPhase(idx) {
 
 // ---------- action animation (AI + auto player) ----------
 
+// actions entirely off-screen resolve instantly (no tween, no sound)
+function actOnScreen(act) {
+  const keys = act.type === 'move' || act.type === 'attack'
+    ? [...(act.path || []), act.targetK].filter(Boolean)
+    : [act.k, act.from].filter(Boolean);
+  return keys.some(k => onScreen(k));
+}
+
 async function animateAct(act, idx) {
   const st = G.st;
   if (SHOT) return;
+  if (!actOnScreen(act)) {
+    if (act.type === 'attack' && act.ev.killedBuilding) refreshTrees(st);
+    return;
+  }
   if (act.type === 'build' || act.type === 'recruit' || act.type === 'upgrade') {
     const p = worldOf(act.k);
     puff(p, 0xd8cfa8, 8, 0.4);
     ringPulse(p, CFG.colors[st.empires[idx].colorIdx].hex);
-    if (visible(act.k)) Sfx.build();
+    Sfx.build();
     await wait(260);
   } else if (act.type === 'move') {
     await animateMove(act.armyId, act.path);
   } else if (act.type === 'merge') {
     puff(worldOf(act.k, CFG.tileH + 0.3), 0xffffff, 8, 0.3);
-    if (visible(act.k)) Sfx.merge();
+    Sfx.merge();
     await wait(200);
   } else if (act.type === 'attack') {
     if (act.path) await animateMove(act.armyId, act.path);
-    await animateStrike(act.armyId, act.targetK, act.ev);
+    await animateStrike(act.armyId, act.targetK, act.ev, idx === G.humanIdx && !AUTO);
   }
 }
 
@@ -374,7 +467,7 @@ async function animateMove(armyId, path) {
   syncArmies(G.st);
 }
 
-async function animateStrike(armyId, targetK, ev) {
+async function animateStrike(armyId, targetK, ev, announce = true) {
   const st = G.st;
   const entry = armyMeshOf(armyId);
   const tp = worldOf(targetK);
@@ -388,24 +481,22 @@ async function animateStrike(armyId, targetK, ev) {
   }
   if (ev.repelled) {
     floatText(worldOf(targetK, CFG.tileH + 0.9), '🛡 repelled', '#9fc4e8', 0.8);
-    if (visible(targetK)) Sfx.repel();
+    Sfx.repel();
   } else {
     hitFlash(tp);
     floatText(worldOf(targetK, CFG.tileH + 0.9), '-' + ev.dmg, '#ff8a76');
-    if (visible(targetK)) Sfx.hit();
+    Sfx.hit();
     if (ev.killedArmy) puff(tp.clone().setY(tp.y + 0.2), 0x883c30, 12, 0.5);
     if (ev.killedBuilding) {
       Sfx.razed();
       puff(tp.clone().setY(tp.y + 0.3), 0x8a7f6a, 14, 0.7);
-      UI.toast(`${G.st.empires[ev.buildingOwner]?.name ?? 'A'} ${ev.killedBuilding === 'base' ? 'base' : ev.killedBuilding} was razed!`);
+      if (announce) UI.toast(`${G.st.empires[ev.buildingOwner]?.name ?? 'A'} ${ev.killedBuilding === 'base' ? 'base' : ev.killedBuilding} was razed!`);
       refreshTrees(st);
     }
   }
   await wait(200);
   refreshAll();
 }
-
-const visible = () => true; // audio culling hook — keep simple, always audible
 
 // ---------- win / lose ----------
 
@@ -418,6 +509,7 @@ function checkGameEnd() {
   G.over = true;
   G.input.setTapEnabled(true);
   UI.showEndTurn(false);
+  UI.showFastForward(false);
   UI.hidePanel();
   clearHighlights();
   tutStop();
@@ -427,9 +519,9 @@ function checkGameEnd() {
   const win = st.winner === G.humanIdx;
   if (win && G.story) Progress.markDone(G.story.id);
   const razed = st.empires.filter(e => !e.alive).length;
-  const stats = `${st.mapName} · Round ${st.round}<br>` +
+  const stats = `${escapeHtml(st.mapName)} · Round ${st.round}<br>` +
     (win ? `${razed} rival empire${razed === 1 ? '' : 's'} razed` :
-      `Your empire fell to ${st.empires.find(e => e.alive && e.idx !== G.humanIdx)?.name ?? 'the rivals'}`);
+      `Your empire fell to ${escapeHtml(st.empires.find(e => e.alive && e.idx !== G.humanIdx)?.name ?? 'the rivals')}`);
   setTimeout(() => {
     if (win) Sfx.victory(); else Sfx.defeat();
     if (AUTO) return; // soak: leave the modal out, __done is set
@@ -443,7 +535,8 @@ function checkGameEnd() {
       onNext: nextCh ? () => startStory(nextCh) : null,
       onReplay: () => {
         if (G.story) startStory(G.story);
-        else UI.showModal({ title: 'Rematch?', body: '<p>Set up a new skirmish from the home menu.</p>', buttons: [{ label: 'Home', primary: true, onTap: quitToMenu }] });
+        else if (G.rematch) G.rematch();
+        else quitToMenu();
       },
     });
   }, 900 * speed());
@@ -458,8 +551,15 @@ function routeTap(x, y) {
     if (qr) editorTapAt(qr[0], qr[1]);
     return;
   }
-  if (G.mode !== 'game' || G.busy || G.over || G.st.turn !== G.humanIdx) return;
+  if (G.mode !== 'game' || G.over) return;
   const st = G.st;
+  if (st.turn !== G.humanIdx) {
+    // rivals are moving: read-only inspection
+    const k = pickHex(st, x, y);
+    if (k) selectTile(k, true); else deselect();
+    return;
+  }
+  if (G.busy) return;
   const k = pickHex(st, x, y);
   if (!k) { deselect(); return; }
 
@@ -492,16 +592,17 @@ function routeTap(x, y) {
   selectTile(k);
 }
 
-function selectTile(k) {
+function selectTile(k, readOnly = false) {
   const st = G.st;
   const t = st.tiles.get(k);
   const army = armyAt(st, t);
   deselect(true);
   Sfx.select();
   const H = panelHandlers(k);
+  H.readOnly = readOnly;
 
   if (army) {
-    if (army.owner === G.humanIdx && st.turn === G.humanIdx) {
+    if (army.owner === G.humanIdx && st.turn === G.humanIdx && !readOnly) {
       const opts = moveOptions(st, army);
       G.sel = { armyId: army.id, opts, k };
       setHighlights({
@@ -522,12 +623,12 @@ function selectTile(k) {
     G.sel = { k };
     setHighlights({ sel: [k] });
     const b = t.building;
-    if (b.type === 'base') { UI.basePanel(st, k, G.humanIdx, H); tutEvent('select-base'); }
+    if (b.type === 'base') { UI.basePanel(st, k, G.humanIdx, H); if (!readOnly) tutEvent('select-base'); }
     else if (b.type === 'village') UI.villagePanel(st, k, G.humanIdx, H);
     else UI.towerPanel(st, k, G.humanIdx, H);
     return;
   }
-  if (t.owner === G.humanIdx) {
+  if (t.owner === G.humanIdx && !readOnly) {
     G.sel = { k };
     setHighlights({ sel: [k] });
     UI.buildPanel(st, k, G.humanIdx, H);
@@ -537,10 +638,11 @@ function selectTile(k) {
   G.sel = { k };
   setHighlights({ sel: [k] });
   const ownerName = t.owner === -2 ? 'Contested — pays no one' :
-    t.owner === -1 ? 'Unclaimed land' : st.empires[t.owner].name + "'s land";
+    t.owner === -1 ? 'Unclaimed land' : t.owner === G.humanIdx ? 'Your land' : st.empires[t.owner].name + "'s land";
   UI.infoPanel(ownerName,
     t.owner === -2 ? 'both borders touch this hex — break a rival tower or base to claim it' :
-      t.owner === -1 ? 'build a tower nearby to claim it' : 'take it by razing what claims it',
+      t.owner === -1 ? 'build a tower nearby to claim it' :
+        t.owner === G.humanIdx ? 'build here on your turn' : 'take it by razing what claims it',
     null, H.onClose);
 }
 
@@ -586,19 +688,11 @@ function panelHandlers(k) {
       UI.towerPanel(st, kk, idx, panelHandlers(kk));
     },
     onSell: (kk) => {
-      UI.showModal({
-        title: 'Sell this building?',
-        body: `<p>You get half the coin back and the land may shrink.</p>`,
-        buttons: [{
-          label: 'Sell', danger: true, onTap: () => {
-            const err = sellBuilding(st, idx, kk);
-            if (err) { Sfx.error(); UI.toast(err); return; }
-            Sfx.sell();
-            refreshAll();
-            deselect();
-          },
-        }, { label: 'Keep' }],
-      });
+      const err = sellBuilding(st, idx, kk);
+      if (err) { Sfx.error(); UI.toast(err); return; }
+      Sfx.sell();
+      refreshAll();
+      deselect();
     },
     onRecruitStart: (baseK) => startRecruit(baseK, 1),
     onLevel: (lvl) => startRecruit(G.recruit?.baseK ?? k, lvl),

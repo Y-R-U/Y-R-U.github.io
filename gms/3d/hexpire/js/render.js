@@ -7,7 +7,7 @@ import { armyAt } from './state.js';
 import * as M from './meshes.js';
 
 export const R = {
-  scene: null, camera: null, renderer: null, lite: false,
+  scene: null, camera: null, renderer: null, lite: false, low: false, camVer: 0,
   cam: { tx: 0, tz: 0, half: 10, min: 3.5, max: 26 },
   bounds: { minX: -10, maxX: 10, minZ: -10, maxZ: 10 },
   topY: CFG.tileH,
@@ -30,6 +30,7 @@ export function initRender(container, { lite = false } = {}) {
   R.lite = lite;
   R.renderer = new THREE.WebGLRenderer({ antialias: !lite, powerPreference: 'high-performance' });
   R.renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+  R.low = lite;
   R.renderer.setSize(innerWidth, innerHeight);
   R.renderer.outputColorSpace = THREE.SRGBColorSpace;
   if (!lite) { R.renderer.shadowMap.enabled = true; R.renderer.shadowMap.type = THREE.PCFSoftShadowMap; }
@@ -61,9 +62,33 @@ export function initRender(container, { lite = false } = {}) {
   return R;
 }
 
+let wasPortrait = innerHeight >= innerWidth;
 function onResize() {
   R.renderer.setSize(innerWidth, innerHeight);
-  updateCamera();
+  const portrait = innerHeight >= innerWidth;
+  if (portrait !== wasPortrait) { wasPortrait = portrait; fitCamera(); }
+  else updateCamera();
+}
+
+// Low graphics: DPR capped at 1.5 and no shadows. Applied live.
+export function setLowGraphics(on) {
+  if (R.lite) return;
+  R.low = on;
+  R.renderer.setPixelRatio(Math.min(devicePixelRatio, on ? 1.5 : 2));
+  R.renderer.setSize(innerWidth, innerHeight);
+  R.renderer.shadowMap.enabled = !on;
+  dirLight.castShadow = !on;
+  R.scene.traverse(o => {
+    if (!o.material) return;
+    for (const m of [].concat(o.material)) m.needsUpdate = true;
+  });
+  R.camVer++;
+}
+
+const _p = new THREE.Vector3();
+export function onScreen(k, margin = 1.08) {
+  _p.copy(worldOf(k)).project(R.camera);
+  return Math.abs(_p.x) <= margin && Math.abs(_p.y) <= margin;
 }
 
 export function updateCamera() {
@@ -74,6 +99,7 @@ export function updateCamera() {
   R.camera.position.copy(target).addScaledVector(CAM_DIR, 60);
   R.camera.lookAt(target);
   R.camera.updateProjectionMatrix();
+  R.camVer++;
   if (dirLight) {
     dirLight.position.set(R.cam.tx + 18, 30, R.cam.tz + 10);
     dirLight.target.position.set(R.cam.tx, 0, R.cam.tz);
@@ -130,7 +156,7 @@ export function buildBoard(st) {
   geo.setAttribute('normal', new THREE.Float32BufferAttribute(norms, 3));
   boardColors = new THREE.Float32BufferAttribute(cols, 3);
   geo.setAttribute('color', boardColors);
-  boardMesh = new THREE.Mesh(geo, new THREE.MeshLambertMaterial({ vertexColors: true }));
+  boardMesh = new THREE.Mesh(geo, boardMat);
   boardMesh.receiveShadow = true;
   boardMesh.castShadow = false;
   R.scene.add(boardMesh);
@@ -149,14 +175,36 @@ export function buildBoard(st) {
   refreshTiles(st);
 }
 
+const boardMat = new THREE.MeshLambertMaterial({ vertexColors: true });
+const borderMat = new THREE.MeshBasicMaterial({ vertexColors: true });
+const waterMat = new THREE.MeshPhongMaterial({
+  color: CFG.waterColor, emissive: CFG.waterDeep, emissiveIntensity: 0.35,
+  shininess: 90, specular: 0x88bbdd, transparent: true, opacity: 0.94,
+});
+
 function disposeBoard() {
-  for (const g of [boardMesh, borderMesh, water, treeTrunks, treeLeaves]) {
-    if (g) { R.scene.remove(g); g.geometry?.dispose(); }
+  for (const g of [boardMesh, borderMesh, water]) {
+    if (g) { R.scene.remove(g); g.geometry.dispose(); }
   }
-  boardMesh = borderMesh = water = treeTrunks = treeLeaves = null;
-  for (const { mesh } of buildingMeshes.values()) R.scene.remove(mesh);
-  for (const { mesh } of armyMeshes.values()) R.scene.remove(mesh);
+  disposeTrees();
+  boardMesh = borderMesh = water = null;
+  for (const e of buildingMeshes.values()) removeEntity(e);
+  for (const e of armyMeshes.values()) removeEntity(e);
   buildingMeshes = new Map(); armyMeshes = new Map();
+}
+
+function disposeTrees() {
+  if (!treeTrunks) return;
+  R.scene.remove(treeTrunks, treeLeaves);
+  treeTrunks.dispose(); treeLeaves.dispose();
+  treeTrunks = treeLeaves = null;
+}
+
+// entity meshes share cached geometry/materials; only the HP sprite is theirs
+function removeEntity(entry) {
+  R.scene.remove(entry.mesh);
+  if (entry.bar) M.disposeHpBar(entry.bar);
+  entry.bar = null;
 }
 
 function buildWater() {
@@ -165,11 +213,7 @@ function buildWater() {
   const geo = new THREE.PlaneGeometry(w, d, 48, 48);
   geo.rotateX(-Math.PI / 2);
   waterBase = geo.attributes.position.array.slice();
-  const m = new THREE.MeshPhongMaterial({
-    color: CFG.waterColor, emissive: CFG.waterDeep, emissiveIntensity: 0.35,
-    shininess: 90, specular: 0x88bbdd, transparent: true, opacity: 0.94,
-  });
-  water = new THREE.Mesh(geo, m);
+  water = new THREE.Mesh(geo, waterMat);
   water.position.set((R.bounds.minX + R.bounds.maxX) / 2, 0.13, (R.bounds.minZ + R.bounds.maxZ) / 2);
   water.receiveShadow = true;
   R.scene.add(water);
@@ -182,6 +226,7 @@ function buildTrees(st) {
   treeTrunks = new THREE.InstancedMesh(trunk, trunkMat, Math.max(spots.length, 1));
   treeLeaves = new THREE.InstancedMesh(leaf, leafMat, Math.max(spots.length, 1));
   treeTrunks.castShadow = treeLeaves.castShadow = true;
+  treeTrunks.receiveShadow = treeLeaves.receiveShadow = false;
   const m4 = new THREE.Matrix4(), pos = new THREE.Vector3(), quat = new THREE.Quaternion(), scl = new THREE.Vector3();
   const rng = (n) => (Math.sin(n * 127.1) * 43758.5453) % 1;
   spots.forEach((t, i) => {
@@ -201,7 +246,7 @@ function buildTrees(st) {
 }
 
 export function refreshTrees(st) {
-  if (treeTrunks) { R.scene.remove(treeTrunks, treeLeaves); treeTrunks.geometry.dispose(); }
+  disposeTrees();
   buildTrees(st);
 }
 
@@ -275,7 +320,7 @@ function rebuildBorders(st) {
   const geo = new THREE.BufferGeometry();
   geo.setAttribute('position', new THREE.Float32BufferAttribute(verts, 3));
   geo.setAttribute('color', new THREE.Float32BufferAttribute(cols, 3));
-  borderMesh = new THREE.Mesh(geo, new THREE.MeshBasicMaterial({ vertexColors: true }));
+  borderMesh = new THREE.Mesh(geo, borderMat);
   borderMesh.renderOrder = 5;
   R.scene.add(borderMesh);
 }
@@ -294,7 +339,7 @@ export function syncBuildings(st) {
     const cur = buildingMeshes.get(b.id);
     const sig = b.type + '|' + b.level + '|' + b.owner;
     if (cur && cur.sig === sig) { updateHpBar(cur, b.hp, b.maxHp); continue; }
-    if (cur) R.scene.remove(cur.mesh);
+    if (cur) removeEntity(cur);
     const css = cssOf(st, b.owner);
     const mesh =
       b.type === 'base' ? M.baseMesh(b.level, css) :
@@ -306,7 +351,7 @@ export function syncBuildings(st) {
     updateHpBar(buildingMeshes.get(b.id), b.hp, b.maxHp);
   }
   for (const [id, entry] of buildingMeshes) {
-    if (!seen.has(id)) { R.scene.remove(entry.mesh); buildingMeshes.delete(id); }
+    if (!seen.has(id)) { removeEntity(entry); buildingMeshes.delete(id); }
   }
 }
 
@@ -321,7 +366,7 @@ export function syncArmies(st) {
       updateHpBar(cur, a.hp, a.maxHp, 0.75);
       continue;
     }
-    if (cur) R.scene.remove(cur.mesh);
+    if (cur) removeEntity(cur);
     const mesh = M.armyMesh(a.level, hexOf(st, a.owner), cssOf(st, a.owner));
     mesh.position.copy(worldOf(key(a.q, a.r)));
     R.scene.add(mesh);
@@ -329,19 +374,20 @@ export function syncArmies(st) {
     updateHpBar(armyMeshes.get(a.id), a.hp, a.maxHp, 0.75);
   }
   for (const [id, entry] of armyMeshes) {
-    if (!seen.has(id)) { R.scene.remove(entry.mesh); armyMeshes.delete(id); }
+    if (!seen.has(id)) { removeEntity(entry); armyMeshes.delete(id); }
   }
 }
 
 function updateHpBar(entry, hp, maxHp, y = 1.1) {
   const frac = hp / maxHp;
-  const want = frac < 0.999;
-  if (entry.bar) { entry.mesh.remove(entry.bar); entry.bar = null; }
-  if (want) {
-    entry.bar = M.hpBar(frac);
+  if (frac >= 0.999) { if (entry.bar) entry.bar.visible = false; return; }
+  if (!entry.bar) {
+    entry.bar = M.hpBar();
     entry.bar.position.y = y;
     entry.mesh.add(entry.bar);
   }
+  entry.bar.visible = true;
+  M.drawHpBar(entry.bar, frac);
 }
 
 export const armyMeshOf = (id) => armyMeshes.get(id) || null;

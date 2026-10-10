@@ -3,16 +3,37 @@ import { Settings } from './save.js';
 
 let ctx = null, master = null, musicGain = null, musicTimer = 0;
 
+let hidden = false;
 function ac() {
   if (!ctx) {
+    try { if (navigator.audioSession) navigator.audioSession.type = 'playback'; } catch {}
     ctx = new (window.AudioContext || window.webkitAudioContext)();
     master = ctx.createGain(); master.gain.value = 0.5; master.connect(ctx.destination);
     musicGain = ctx.createGain(); musicGain.gain.value = 0.34; musicGain.connect(master);
   }
-  if (ctx.state === 'suspended') ctx.resume();
+  if (ctx.state !== 'running' && !hidden) ctx.resume().catch(() => {});
   return ctx;
 }
 export function unlockAudio() { ac(); }
+
+// Android only grants activation on touchend/click, and iOS re-suspends after an
+// app switch, so these stay attached for the page's lifetime
+for (const ev of ['pointerdown', 'touchend', 'click', 'keydown']) {
+  addEventListener(ev, (e) => {
+    if (e.pointerType === 'touch') return;   // touch pointerdown never counts as activation
+    if (!ctx || ctx.state !== 'running') ac();
+  }, { capture: true, passive: true });
+}
+document.addEventListener('visibilitychange', () => {
+  hidden = document.visibilityState === 'hidden';
+  if (hidden) {
+    clearInterval(musicTimer); musicTimer = 0;
+    if (ctx && ctx.state === 'running') ctx.suspend().catch(() => {});
+  } else if (ctx) {
+    ctx.resume().catch(() => {});
+    if (musicOn && !musicTimer) { nextNote = ctx.currentTime + 0.3; musicTimer = setInterval(scheduleMusic, 400); }
+  }
+});
 
 function env(g, t, a, d, peak = 1) {
   g.gain.setValueAtTime(0.0001, t);
