@@ -7,24 +7,42 @@ class Audio {
         this.enabled = true;
         this.sfxVolume = 0.7;
         this.initialized = false;
+
+        const unlock = () => { this.init(); this.resume(); };
+        for (const ev of ['pointerdown', 'touchend', 'click', 'keydown']) {
+            window.addEventListener(ev, unlock, { capture: true, passive: true });
+        }
+        document.addEventListener('visibilitychange', () => {
+            if (!this.ctx) return;
+            if (document.visibilityState === 'hidden') this.ctx.suspend().catch(() => {});
+            else this.resume();
+        });
     }
 
-    /** Initialize audio context (must be called from user gesture) */
+    /**
+     * Create the context. The constructor's listeners call this on every
+     * gesture: Android does not count a touch *start* as one, so touchend and
+     * click are in the list too, and they stay for the page's lifetime because
+     * the OS can suspend the context again at any time.
+     */
     init() {
         if (this.initialized) return;
         try {
+            // iOS: without this, the silent switch mutes Web Audio.
+            try { if (navigator.audioSession) navigator.audioSession.type = 'playback'; } catch (e) {}
             this.ctx = new (window.AudioContext || window.webkitAudioContext)();
             this.initialized = true;
         } catch (e) {
             console.warn('Web Audio not supported');
             this.enabled = false;
+            this.initialized = true;
         }
     }
 
-    /** Resume audio context if suspended */
+    /** Resume the context whenever it is not running. */
     resume() {
-        if (this.ctx && this.ctx.state === 'suspended') {
-            this.ctx.resume();
+        if (this.ctx && this.ctx.state !== 'running') {
+            this.ctx.resume().catch(() => {});
         }
     }
 

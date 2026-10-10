@@ -319,6 +319,7 @@ class Game {
             (resume ? resume.boostIn || 0 : (CONFIG.BOOST_STARTS_READY ? 0 : CONFIG.BOOST_RECHARGE_MS));
         this._lastRunSave = performance.now();
         this.gameStats = { mass: 0, kills: 0, time: 0 };
+        this._rivalAbove = null;
 
         this._showScreen('game-screen');
         this._setPaused(false);
@@ -348,6 +349,7 @@ class Game {
         this.boostReadyAt = now + (CONFIG.BOOST_STARTS_READY ? 0 : CONFIG.BOOST_RECHARGE_MS);
         this.gameStats = { mass: 0, kills: 0, time: 0 };
         this._boostBtnState = '';
+        this._rivalAbove = null;
         this._showScreen('game-screen');
         this._setPaused(false);
         this.audio.resume();
@@ -383,6 +385,10 @@ class Game {
             this._showScreen('game-screen');
             this.mp.begin();
             if (this.rooms) this.rooms.onJoined();
+        });
+        this.net.on('reconnecting', on => {
+            const pill = document.getElementById('reconnect-pill');
+            if (pill) pill.classList.toggle('show', on);
         });
         this.net.on('closed', () => {
             if (!this.inRoom) return;
@@ -454,12 +460,16 @@ class Game {
         if (this.inRoom) { this._roomFrame(); return; }
 
         if (this.state !== 'playing') {
-            // Still render menu background
-            if (this.state === 'menu' || this.state === 'dead' || this.state === 'won') {
+            // Behind the menus the canvas only needs clearing once, not every
+            // frame — a resize resets it, so that counts as a change too.
+            const key = this.state + this.renderer.width + 'x' + this.renderer.height;
+            if (key !== this._clearedFor) {
+                this._clearedFor = key;
                 this.renderer.clear();
             }
             return;
         }
+        this._clearedFor = null;
 
         if (this.input.consumePausePress()) this._setPaused(!this.paused);
 
@@ -631,7 +641,7 @@ class Game {
                 if (snake.isPlayer) {
                     this.audio.playDeath();
                     this.camera.shake(15);
-                    this._onPlayerDeath();
+                    this._onPlayerDeath(null, 'edge');
                 }
                 this.ai.unregister(snake.id);
                 if (this.inRoom) this.mp.noteDeath(snake, null);
@@ -673,9 +683,10 @@ class Game {
 
             if (victim.isPlayer) {
                 this.audio.playDeath();
-                this._onPlayerDeath();
+                this._onPlayerDeath(killer);
             } else if (killer && killer.isPlayer) {
                 this.audio.playKill();
+                if (victim.rivalName) this._rivalToast(`You ate ${victim.rivalName}, your regular!`, now, true);
             }
 
             this.ai.unregister(victim.id);
@@ -760,6 +771,7 @@ class Game {
 
         this._updateBoostButton(now);
         this._saveRun(false);
+        this._watchRivals(now);
 
         // Update particles
         this.particles.update(dt);
@@ -867,10 +879,56 @@ class Game {
         }, 700);
     }
 
+    /**
+     * A regular overtaking you on the leaderboard. Checked twice a second;
+     * each regular can only do it once every half minute, and toasts of any
+     * kind keep a few seconds apart.
+     */
+    _watchRivals(now) {
+        if (!this.player || !this.player.alive || this.state !== 'playing') return;
+        if (now - (this._rivalCheckAt || 0) < 500) return;
+        this._rivalCheckAt = now;
+        const seen = this._rivalAbove || (this._rivalAbove = new Map());
+        const me = this.player.mass;
+        for (const s of this.snakes) {
+            if (!s.alive || !s.rivalName) continue;
+            const above = s.mass > me;
+            const was = seen.get(s.rivalName);
+            if (above && was && !was.above && now - was.toastAt > 30000) {
+                if (this._rivalToast(`${s.rivalName} just passed you`, now)) was.toastAt = now;
+            }
+            if (was) was.above = above;
+            else seen.set(s.rivalName, { above, toastAt: -1e9 });
+        }
+    }
+
+    /** Short top-centre toast. Kills always show; the rest wait their turn. */
+    _rivalToast(text, now, important) {
+        if (!important && now - (this._rivalToastAt || -1e9) < 8000) return false;
+        const el = document.getElementById('rival-toast');
+        if (!el) return false;
+        this._rivalToastAt = now;
+        el.textContent = text;
+        el.classList.add('show');
+        clearTimeout(this._rivalToastTimer);
+        this._rivalToastTimer = setTimeout(() => el.classList.remove('show'), 2400);
+        return true;
+    }
+
+    /** One line for the death screen: who got you. */
+    _deathCause(killer, how) {
+        if (how === 'edge') return 'You hit the edge of the arena';
+        if (!killer || killer === this.player || !killer.name) return '';
+        const name = Utils.escapeHtml(killer.name);
+        if (killer.rivalName) return `Eaten by <b>${name}</b>, your regular`;
+        return `Eaten by <b>${name}</b>`;
+    }
+
     /** Handle player death */
-    _onPlayerDeath() {
+    _onPlayerDeath(killer, how) {
         if (this.resolved) return;
         this.resolved = true;
+        this._lastDeathCause = this._deathCause(killer, how);
         const r = this._settleRun(false);
 
         // Show death screen after brief delay
@@ -925,6 +983,12 @@ class Game {
         document.getElementById('death-kills').textContent = kills;
         document.getElementById('death-coins').textContent = '+' + coins;
         document.getElementById('death-time').textContent = this._formatTime(time);
+
+        const cause = document.getElementById('death-cause');
+        if (cause) {
+            cause.innerHTML = this._lastDeathCause || '';
+            cause.hidden = !this._lastDeathCause;
+        }
 
         // Show new high score badge
         const highScoreEl = document.getElementById('death-highscore');

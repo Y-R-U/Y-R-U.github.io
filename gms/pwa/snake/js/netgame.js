@@ -356,7 +356,7 @@ class NetGame {
         g.particles.emitDeath(s.x, s.y, s.skin.colors);
         g.ai.unregister(s.id);
         if (s.isPlayer) {
-            if (!g.resolved) { g.audio.playDeath(); g.camera.shake(15); g._onPlayerDeath(); }
+            if (!g.resolved) { g.audio.playDeath(); g.camera.shake(15); g._onPlayerDeath(killer); }
         } else if (killer && killer.isPlayer) g.audio.playKill();
         this.noteDeath(s, killer);
     }
@@ -769,7 +769,7 @@ class NetGame {
         // Our own head, judged against exactly what is on our screen.
         const p = g.player;
         if (p && p.alive && g.state === 'playing') {
-            if (p.boundaryDeath) { this._ownDeath(null); }
+            if (p.boundaryDeath) { this._ownDeath(null, 'edge'); }
             else {
                 g.collision.buildFromSnakes(g.snakes);
                 const hits = g.collision.checkSnakeCollisions(g.snakes, p);
@@ -822,7 +822,7 @@ class NetGame {
         this.net.sendTo(this.net.hostId, 'u', b);
     }
 
-    _ownDeath(killer) {
+    _ownDeath(killer, how) {
         const g = this.game;
         const p = g.player;
         if (!p || !p.alive) return;
@@ -831,7 +831,7 @@ class NetGame {
         g.particles.emitDeath(p.x, p.y, p.skin.colors);
         g.audio.playDeath();
         g.camera.shake(15);
-        g._onPlayerDeath();
+        g._onPlayerDeath(killer, how);
     }
 
     _applyEvents(m) {
@@ -880,7 +880,7 @@ class NetGame {
                     s.alive = false;
                     g.particles.emitDeath(s.x, s.y, s.skin.colors);
                     g.audio.playDeath();
-                    g._onPlayerDeath();
+                    g._onPlayerDeath(kn ? this.byNid.get(kn) : null);
                 }
                 s.alive = false;
                 continue;

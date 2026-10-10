@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"crypto/rand"
+	"crypto/subtle"
 	"encoding/json"
 	"log"
 	"math/big"
@@ -26,6 +27,12 @@ const (
 	tickEvery    = 250 * time.Millisecond
 	relayPerSec  = 400 // messages a second one client may push through sig/relay
 	relayBytesPS = 512 << 10
+	// A dropped socket keeps its place in the room this long, so a network
+	// blip (or a server restart, see rejoin) does not throw the player out.
+	reconnectGrace = 10 * time.Second
+	// After a restart the rooms are gone; for this long clients may rebuild
+	// them from what their browsers remember, under their old ids.
+	rebuildWindow = 60 * time.Second
 )
 
 // One goroutine owns every room and client field below; readers and writers
@@ -39,6 +46,7 @@ type hub struct {
 	now     func() time.Time
 	pubSeq  map[string]int
 	lagging []*client
+	started time.Time
 
 	statsMu sync.Mutex
 	stats   stats
@@ -60,7 +68,11 @@ type client struct {
 	budgetB          float64
 	gone             bool
 	lagging          bool
-	ready            bool // holds the arena (synced follower, or host): fit to take over
+	ready            bool   // holds the arena (synced follower, or host): fit to take over
+	tok              string // resume secret; "" marks a placeholder awaiting its player
+	away             bool   // socket gone, still holding its place
+	awayUntil        time.Time
+	gen              int // which connection is current; events from older ones are ignored
 }
 
 type room struct {
@@ -72,11 +84,21 @@ type room struct {
 }
 
 type event struct {
-	kind int
-	c    *client
-	data []byte
-	bin  bool
-	done chan bool
+	kind  int
+	c     *client
+	data  []byte
+	bin   bool
+	gen   int
+	bye   bool   // the browser closed the socket on purpose (tab closed, page left)
+	rid   string // resume: the id and token the browser had before
+	rtok  string
+	reply chan attachResult
+}
+
+type attachResult struct {
+	c       *client
+	gen     int
+	resumed bool
 }
 
 const (
@@ -95,6 +117,7 @@ func newHub(t *turn) *hub {
 		turn:    t,
 		now:     time.Now,
 		pubSeq:  map[string]int{},
+		started: time.Now(),
 	}
 }
 
@@ -114,16 +137,17 @@ func (h *hub) run() {
 func (h *hub) handle(e event) {
 	switch e.kind {
 	case evJoin:
-		ok := len(h.clients) < maxClients
-		if ok {
-			h.clients[e.c.id] = e.c
-			e.c.seen = h.now()
-		}
-		e.done <- ok
+		e.reply <- h.attach(e)
 	case evLeave:
-		h.drop(e.c)
+		if e.gen == e.c.gen {
+			if e.bye {
+				h.drop(e.c)
+			} else {
+				h.disconnect(e.c)
+			}
+		}
 	case evMsg:
-		if e.c.gone {
+		if e.c.gone || e.gen != e.c.gen {
 			return
 		}
 		e.c.seen = h.now()
@@ -133,6 +157,7 @@ func (h *hub) handle(e event) {
 			h.message(e.c, e.data)
 		}
 	case evTick:
+		h.expireAway()
 		h.checkHosts()
 	}
 	for len(h.lagging) > 0 {
@@ -155,6 +180,20 @@ type inMsg struct {
 	D    json.RawMessage `json:"d"`
 	Set  json.RawMessage `json:"set"`
 	R    int             `json:"r"`
+	RJ   *rejoinMsg      `json:"rj"`
+}
+
+// What a reconnecting browser remembers of its room, for when the server
+// restarted and lost it.
+type rejoinMsg struct {
+	ID      string          `json:"id"`
+	Code    string          `json:"code"`
+	Name    string          `json:"name"`
+	Private bool            `json:"priv"`
+	Region  string          `json:"region"`
+	Set     json.RawMessage `json:"set"`
+	Members []memberView    `json:"members"`
+	Epoch   int             `json:"epoch"`
 }
 
 func (h *hub) message(c *client, raw []byte) {
@@ -178,6 +217,8 @@ func (h *hub) message(c *client, raw []byte) {
 		h.create(c, m)
 	case "join":
 		h.join(c, m)
+	case "rejoin":
+		h.rejoin(c, m.RJ)
 	case "leave":
 		h.leaveRoom(c)
 		h.sendList(c)
@@ -200,7 +241,7 @@ func (h *hub) send(c *client, v any) {
 }
 
 func (h *hub) push(c *client, frame []byte) {
-	if c.gone {
+	if c.gone || c.send == nil {
 		return
 	}
 	select {
@@ -404,6 +445,87 @@ type memberView struct {
 	Name string `json:"name"`
 }
 
+// rejoin puts a reconnected browser back in its room. Normally it never left
+// (the grace period kept its place) and this just resends the room. After a
+// server restart the room is rebuilt from the browser's memory: same id, code,
+// line order and epoch, with the members not back yet held as placeholders, so
+// nobody sees a host change and the WebRTC links between them stay up.
+func (h *hub) rejoin(c *client, rj *rejoinMsg) {
+	if c.room != nil {
+		h.send(c, h.roomMsg(c.room, c, false))
+		return
+	}
+	if rj == nil || !validID(rj.ID) {
+		h.send(c, map[string]any{"t": "err", "msg": "That room has closed.", "code": "gone"})
+		return
+	}
+	if r := h.rooms[rj.ID]; r != nil {
+		if len(r.members) >= roomMax {
+			h.send(c, map[string]any{"t": "err", "msg": "That room is full.", "code": "full"})
+			return
+		}
+		// Not enter(): that would tell the browser it has just joined, and it
+		// would start its arena over.
+		c.room = r
+		r.members = append(r.members, c)
+		h.broadcastMembers(r, nil)
+		return
+	}
+	now := h.now()
+	if now.Sub(h.started) > rebuildWindow || len(h.rooms) >= maxRooms {
+		h.send(c, map[string]any{"t": "err", "msg": "That room has closed.", "code": "gone"})
+		return
+	}
+	r := &room{id: rj.ID, name: cleanName(rj.Name, c.name+"'s room"), region: regionOrDefault(rj.Region),
+		private: rj.Private, epoch: rj.Epoch}
+	if r.private {
+		r.settings = cleanSettings(rj.Set)
+		code := strings.ToUpper(strings.TrimSpace(rj.Code))
+		if !validCode(code) || h.codes[code] != nil {
+			code = h.newCode()
+		}
+		r.code = code
+		h.codes[code] = r
+	}
+	h.rooms[r.id] = r
+	in := false
+	for _, mv := range rj.Members {
+		if len(r.members) >= roomMax {
+			break
+		}
+		if mv.ID == c.id {
+			r.members = append(r.members, c)
+			in = true
+			continue
+		}
+		if !validID(mv.ID) {
+			continue
+		}
+		if back := h.clients[mv.ID]; back != nil {
+			// Reconnected already but its rejoin is still on the way: same
+			// browser, so it takes its old place in the line.
+			if back.room == nil && !back.gone {
+				back.room = r
+				r.members = append(r.members, back)
+			}
+			continue
+		}
+		if len(h.clients) >= maxClients {
+			continue
+		}
+		p := &client{id: mv.ID, name: cleanName(mv.Name, "Player"), region: r.region, room: r,
+			seen: now, away: true, awayUntil: now.Add(reconnectGrace)}
+		h.clients[p.id] = p
+		r.members = append(r.members, p)
+	}
+	if !in {
+		r.members = append(r.members, c)
+	}
+	c.room = r
+	log.Printf("room %s rebuilt by %s after restart (%d members)", r.id, c.id, len(r.members))
+	h.broadcastMembers(r, nil)
+}
+
 func (h *hub) broadcastMembers(r *room, joined *client) {
 	// TURN credentials only once there is someone to connect to. Fetching them
 	// can block on Cloudflare for a moment, but only on a cache miss (hourly).
@@ -416,6 +538,9 @@ func (h *hub) broadcastMembers(r *room, joined *client) {
 		ms[i] = memberView{m.id, m.name}
 	}
 	for _, m := range r.members {
+		if m.send == nil {
+			continue
+		}
 		msg := map[string]any{"t": "room", "room": r.view(), "members": ms,
 			"host": r.members[0].id, "epoch": r.epoch, "you": m.id}
 		if r.private {
@@ -429,6 +554,25 @@ func (h *hub) broadcastMembers(r *room, joined *client) {
 		}
 		h.send(m, msg)
 	}
+}
+
+func (h *hub) roomMsg(r *room, c *client, joined bool) map[string]any {
+	ms := make([]memberView, len(r.members))
+	for i, m := range r.members {
+		ms[i] = memberView{m.id, m.name}
+	}
+	msg := map[string]any{"t": "room", "room": r.view(), "members": ms,
+		"host": r.members[0].id, "epoch": r.epoch, "you": c.id}
+	if r.private {
+		msg["code"] = r.code
+	}
+	if len(r.members) > 1 {
+		msg["ice"] = h.turn.iceServers()
+	}
+	if joined {
+		msg["joined"] = true
+	}
+	return msg
 }
 
 func (h *hub) sendRoom(c *client) {
@@ -502,7 +646,84 @@ func (h *hub) drop(c *client) {
 	h.leaveRoom(c)
 	c.gone = true
 	delete(h.clients, c.id)
-	close(c.send)
+	if c.send != nil {
+		close(c.send)
+		c.send = nil
+	}
+}
+
+// disconnect: the socket is gone. A player in a room keeps its place for the
+// grace period in case it comes straight back; anyone else is simply dropped.
+func (h *hub) disconnect(c *client) {
+	if c.gone {
+		return
+	}
+	if c.room == nil || c.lagging {
+		h.drop(c)
+		return
+	}
+	c.away = true
+	c.awayUntil = h.now().Add(reconnectGrace)
+	if c.send != nil {
+		close(c.send)
+		c.send = nil
+	}
+}
+
+func (h *hub) expireAway() {
+	now := h.now()
+	for _, c := range h.clients {
+		if c.away && now.After(c.awayUntil) {
+			log.Printf("client %s did not come back, removed", c.id)
+			h.drop(c)
+		}
+	}
+}
+
+// attach binds a new socket to a client: the one it had before if it can
+// prove it (resume token, or a placeholder from a rebuilt room), else a new one.
+func (h *hub) attach(e event) attachResult {
+	now := h.now()
+	if e.rid != "" && validID(e.rid) && validTok(e.rtok) {
+		if old := h.clients[e.rid]; old != nil && !old.gone {
+			if old.tok == "" || subtle.ConstantTimeCompare([]byte(old.tok), []byte(e.rtok)) == 1 {
+				if old.send != nil {
+					close(old.send) // a stale socket the server had not noticed was dead
+				}
+				old.send = e.c.send
+				old.tok = e.rtok
+				old.away = false
+				old.lagging = false
+				old.seen = now
+				old.gen++
+				h.welcome(old, true)
+				return attachResult{old, old.gen, true}
+			}
+		} else if old == nil && now.Sub(h.started) < rebuildWindow && len(h.clients) < maxClients {
+			// The server restarted: let the browser keep its id so the rebuilt
+			// room (and everyone's WebRTC links) still know it.
+			c := e.c
+			c.id, c.tok, c.seen = e.rid, e.rtok, now
+			h.clients[c.id] = c
+			h.welcome(c, false)
+			return attachResult{c, c.gen, false}
+		}
+	}
+	if len(h.clients) >= maxClients {
+		return attachResult{}
+	}
+	c := e.c
+	c.id = h.newID()
+	c.tok = randString(idChars, 24)
+	c.seen = now
+	h.clients[c.id] = c
+	h.welcome(c, false)
+	return attachResult{c, c.gen, false}
+}
+
+func (h *hub) welcome(c *client, resumed bool) {
+	h.send(c, map[string]any{"t": "welcome", "id": c.id, "tok": c.tok, "ice": stunOnly,
+		"turn": h.turn.usable(), "grace": reconnectGrace.Milliseconds(), "resumed": resumed})
 }
 
 func (h *hub) countStats() stats {
@@ -532,23 +753,21 @@ func (h *hub) serveWS(w http.ResponseWriter, r *http.Request, origins []string) 
 		return
 	}
 	conn.SetReadLimit(maxMsg)
-	c := &client{id: h.newID(), name: "Player", region: "xx", send: make(chan []byte, sendQueue)}
-	done := make(chan bool, 1)
-	h.in <- event{kind: evJoin, c: c, done: done}
-	if !<-done {
+	send := make(chan []byte, sendQueue)
+	q := r.URL.Query()
+	reply := make(chan attachResult, 1)
+	h.in <- event{kind: evJoin, c: &client{name: "Player", region: "xx", send: send}, rid: q.Get("id"), rtok: q.Get("tok"), reply: reply}
+	res := <-reply
+	if res.c == nil {
 		conn.Close(websocket.StatusTryAgainLater, "server full")
 		return
 	}
+	c, gen := res.c, res.gen
 
 	ctx, cancel := context.WithCancel(r.Context())
 	defer cancel()
-	go writer(ctx, conn, c.send, cancel)
-
-	welcome, _ := json.Marshal(map[string]any{"t": "welcome", "id": c.id, "ice": stunOnly, "turn": h.turn.usable()})
-	// Straight to the socket: the hub has not been told about anything yet.
-	wctx, wcancel := context.WithTimeout(ctx, 5*time.Second)
-	err = conn.Write(wctx, websocket.MessageText, welcome)
-	wcancel()
+	// The welcome is already queued on send, ahead of anything else.
+	go writer(ctx, conn, send, cancel)
 
 	for err == nil {
 		var typ websocket.MessageType
@@ -557,9 +776,11 @@ func (h *hub) serveWS(w http.ResponseWriter, r *http.Request, origins []string) 
 		if err != nil {
 			break
 		}
-		h.in <- event{kind: evMsg, c: c, data: data, bin: typ == websocket.MessageBinary}
+		h.in <- event{kind: evMsg, c: c, gen: gen, data: data, bin: typ == websocket.MessageBinary}
 	}
-	h.in <- event{kind: evLeave, c: c}
+	// A closed tab says goodbye (1001); a dropped network says nothing.
+	st := websocket.CloseStatus(err)
+	h.in <- event{kind: evLeave, c: c, gen: gen, bye: st == websocket.StatusGoingAway || st == websocket.StatusNormalClosure}
 	conn.Close(websocket.StatusNormalClosure, "")
 }
 
@@ -619,6 +840,30 @@ func (h *hub) newCode() string {
 			return code
 		}
 	}
+}
+
+func validFrom(s, chars string, min, max int) bool {
+	if len(s) < min || len(s) > max {
+		return false
+	}
+	for i := 0; i < len(s); i++ {
+		if strings.IndexByte(chars, s[i]) < 0 {
+			return false
+		}
+	}
+	return true
+}
+
+func validID(s string) bool   { return validFrom(s, idChars, 8, 8) }
+func validTok(s string) bool  { return validFrom(s, idChars, 16, 40) }
+func validCode(s string) bool { return validFrom(s, codeChars, 6, 6) }
+
+func regionOrDefault(r string) string {
+	switch r {
+	case "oce", "am", "eu", "as":
+		return r
+	}
+	return "xx"
 }
 
 func cleanName(s, def string) string {

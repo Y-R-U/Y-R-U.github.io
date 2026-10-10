@@ -97,7 +97,10 @@ class Renderer {
     drawGrid(camera) {
         const ctx = this.ctx;
         const bounds = camera.getViewBounds();
-        const gridSize = CONFIG.GRID_SIZE;
+        // Zoomed far out the hairlines crowd into a haze that costs a lot to
+        // stroke; every other line still reads as a grid.
+        let gridSize = CONFIG.GRID_SIZE;
+        while (gridSize * camera.zoom < 24) gridSize *= 2;
 
         ctx.strokeStyle = CONFIG.GRID_COLOR;
         ctx.lineWidth = 1;
@@ -397,17 +400,19 @@ class Renderer {
     drawHUD(playerSnake, allSnakes, gameTime) {
         const ctx = this.ctx;
 
-        // Score - top center
+        // Score - top center. On a narrow screen the account avatar's callout
+        // reaches the middle, so the centre column drops below it too.
+        const top = this.width < 600 ? this._accountSpace() : 0;
         if (playerSnake && playerSnake.alive) {
             ctx.fillStyle = '#fff';
             ctx.font = 'bold 24px sans-serif';
             ctx.textAlign = 'center';
             ctx.textBaseline = 'top';
-            ctx.fillText(Utils.formatNumber(playerSnake.mass), this.width / 2, 16);
+            ctx.fillText(Utils.formatNumber(playerSnake.mass), this.width / 2, 16 + top);
 
             ctx.fillStyle = 'rgba(255,255,255,0.5)';
             ctx.font = '12px sans-serif';
-            ctx.fillText('MASS', this.width / 2, 44);
+            ctx.fillText('MASS', this.width / 2, 44 + top);
 
             // Below the pause button, which owns the top-left corner.
             ctx.fillStyle = 'rgba(255,215,0,0.75)';
@@ -416,7 +421,7 @@ class Renderer {
             ctx.fillText('LV ' + playerSnake.level, 16, 66);
             ctx.textAlign = 'center';
 
-            this._drawGoal(playerSnake.mass);
+            this._drawGoal(playerSnake.mass, top);
         }
 
         // Leaderboard - top right. Re-ranked four times a second, not every frame.
@@ -477,7 +482,7 @@ class Renderer {
 
         // Kill count - below the score and goal bar
         if (playerSnake && playerSnake.alive && playerSnake.kills > 0) {
-            const y = playerSnake.mass / CONFIG.WIN_MASS >= 0.1 ? 82 : 60;
+            const y = (playerSnake.mass / CONFIG.WIN_MASS >= 0.1 ? 82 : 60) + top;
             ctx.fillStyle = '#ff4444';
             ctx.font = 'bold 14px sans-serif';
             ctx.textAlign = 'center';
@@ -490,7 +495,7 @@ class Renderer {
      * Progress toward the 10,000 win. Hidden early on — nobody needs a progress
      * bar at 40 mass — and it turns gold as it fills.
      */
-    _drawGoal(mass) {
+    _drawGoal(mass, top) {
         const goal = CONFIG.WIN_MASS;
         const frac = Utils.clamp(mass / goal, 0, 1);
         if (frac < 0.1) return;
@@ -499,7 +504,7 @@ class Renderer {
         const w = Math.min(180, this.width * 0.45);
         const h = 5;
         const x = (this.width - w) / 2;
-        const y = 62;
+        const y = 62 + top;
 
         ctx.fillStyle = 'rgba(255,255,255,0.14)';
         this._roundRect(x, y, w, h, h / 2);

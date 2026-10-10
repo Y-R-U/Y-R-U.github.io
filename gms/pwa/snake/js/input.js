@@ -109,6 +109,7 @@ class Input {
                     x: touch.clientX,
                     y: touch.clientY
                 };
+                this._followFinger();
             }
         }
     }
@@ -151,7 +152,24 @@ class Input {
                 x: e.clientX,
                 y: e.clientY
             };
+            this._followFinger();
         }
+    }
+
+    /**
+     * A floating stick: once the finger is past the rim, the base is pulled
+     * along behind it. Otherwise a long drag leaves the base far behind, and
+     * turning back means dragging all the way back past it first.
+     */
+    _followFinger() {
+        const b = this.joystickPos, c = this.joystickCurrent;
+        if (!b || !c) return;
+        const dx = c.x - b.x, dy = c.y - b.y;
+        const d = Math.sqrt(dx * dx + dy * dy);
+        if (d <= this.joystickRadius) return;
+        const k = (d - this.joystickRadius) / d;
+        b.x += dx * k;
+        b.y += dy * k;
     }
 
     _onMouseUp(e) {

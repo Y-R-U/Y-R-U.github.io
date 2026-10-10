@@ -32,6 +32,7 @@
         </div>
         <button id="boost-btn" class="ready">BOOST</button>
         <div id="powerup-notification"></div>
+        <div id="rival-toast" role="status"></div>
         <div id="pause-overlay">
             <div class="pause-card">
                 <div class="pause-title">PAUSED</div>
@@ -41,6 +42,8 @@
             </div>
         </div>
     </div>
+
+    <div id="reconnect-pill" role="status">Reconnecting…</div>
 
     <!-- Menu Screen -->
     <div id="menu-screen" class="screen active">
@@ -88,6 +91,7 @@
     <!-- Death Screen -->
     <div id="death-screen" class="screen">
         <div class="death-title">GAME OVER</div>
+        <div id="death-cause" class="death-cause" hidden></div>
         <div id="death-highscore" style="display:none">NEW HIGH SCORE!</div>
 
         <div class="death-stats">

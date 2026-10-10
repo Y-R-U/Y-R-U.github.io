@@ -8,7 +8,7 @@
  * Builds the Go server into a temp dir, so it needs `go` on PATH.
  */
 import { spawn, execFileSync } from 'node:child_process';
-import { mkdtempSync } from 'node:fs';
+import { mkdtempSync, readFileSync, readdirSync, existsSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join, dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -26,10 +26,36 @@ const ok = (name, cond, extra = '') => {
 };
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 
+// ---------------------------------------------------------------- offline cache list
+// Every file index.html (or a dynamic import) loads must be in sw.js's ASSETS,
+// or the installed PWA boots offline with a hole in it; and nothing stale.
+{
+    const sw = readFileSync(join(GAME, 'sw.js'), 'utf8');
+    const assets = new Set([...sw.match(/const ASSETS = \[([\s\S]*?)\];/)[1].matchAll(/'([^']+)'/g)].map(m => m[1].replace(/^\.\//, '')));
+    const html = readFileSync(join(GAME, 'index.html'), 'utf8');
+    const refs = new Set(['', 'index.html']);
+    for (const m of html.matchAll(/(?:src|href)="([^"]+)"/g)) if (!/^(https?:|\/|#|data:)/.test(m[1])) refs.add(m[1].replace(/^\.\//, ''));
+    for (const f of readdirSync(join(GAME, 'js'))) {
+        for (const m of readFileSync(join(GAME, 'js', f), 'utf8').matchAll(/import\(\s*'\.\/([^']+)'\s*\)/g)) refs.add('js/' + m[1]);
+    }
+    const manifest = JSON.parse(readFileSync(join(GAME, 'manifest.json'), 'utf8'));
+    for (const i of manifest.icons || []) refs.add(i.src.replace(/^\.\//, ''));
+    const missing = [...refs].filter(r => !assets.has(r));
+    const extra = [...assets].filter(a => !refs.has(a));
+    const gone = [...assets].filter(a => a && !existsSync(join(GAME, a)));
+    ok('sw.js ASSETS matches what index.html loads', !missing.length && !extra.length && !gone.length,
+        JSON.stringify({ missing, extra, gone }));
+}
+
 // ---------------------------------------------------------------- servers
 execFileSync('go', ['build', '-o', join(tmp, 'snakenet'), '.'], { cwd: join(GAME, 'server') });
 const procs = [];
-procs.push(spawn(join(tmp, 'snakenet'), [], { env: { ...process.env, SNAKENET_ADDR: `127.0.0.1:${NET_PORT}` }, stdio: ['ignore', 'ignore', process.env.NETLOG ? 'inherit' : 'ignore'] }));
+let netProc = null;
+const startNet = () => {
+    netProc = spawn(join(tmp, 'snakenet'), [], { env: { ...process.env, SNAKENET_ADDR: `127.0.0.1:${NET_PORT}`, SNAKENET_INTERNAL_ADDR: `127.0.0.1:${NET_PORT + 1000}` }, stdio: ['ignore', 'ignore', process.env.NETLOG ? 'inherit' : 'ignore'] });
+    procs.push(netProc);
+};
+startNet();
 procs.push(spawn('python3', ['-m', 'http.server', String(WEB_PORT), '--bind', '127.0.0.1'], { cwd: ROOT, stdio: 'ignore' }));
 const cleanup = () => {
     for (const p of procs) try { p.kill(); } catch (e) {}
@@ -186,6 +212,19 @@ try {
     ok('Bob respawns in the room', await B.until(`game.player && game.player.alive && game.state === 'playing'`, 5000));
     await B.eval(`window.__armor = true; game.input.update = (dt, a) => a + 0.03`);
 
+    // ------------------------------------------------ Bob's socket to the room server drops
+    await B.until(`game.net.link(game.net.hostId) && game.net.link(game.net.hostId).direct`, 5000);
+    const bobId = await B.eval(`game.net.id`);
+    await B.eval(`window.__keepLink = game.net.link(game.net.hostId); window.__closedSeen = false; game.net.on('closed', () => { window.__closedSeen = true; })`);
+    await A.eval(`window.__memberEvents = 0; game.net.on('members', () => window.__memberEvents++)`);
+    await B.eval(`game.net._dropSocket()`);
+    ok('dropped socket shows the reconnecting pill', await B.until(`document.getElementById('reconnect-pill').classList.contains('show')`, 1500));
+    const back = await B.until(`game.net.connected && !game.net.reconnecting && !document.getElementById('reconnect-pill').classList.contains('show')`, 8000);
+    ok('Bob reconnects quietly', back, back ? '' : JSON.stringify(await B.eval(`({ log: window.__netlog, id: game.net.id, room: !!game.net.room })`)));
+    ok('same identity, same room, still playing', await B.eval(`game.net.id === ${JSON.stringify(bobId)} && game.inRoom && game.mp.role === 'follow' && game.state === 'playing' && !window.__closedSeen`));
+    ok('the direct link was never torn down', await B.eval(`game.net.link(game.net.hostId) === window.__keepLink && window.__keepLink.direct`));
+    ok("the host never saw Bob leave", await A.eval(`window.__memberEvents === 0 && game.net.members.length === 2`), String(await A.eval(`window.__memberEvents`)));
+
     // ------------------------------------------------ Cara quick-joins and ends up in her own public room
     const C = await player('Cara');
     await C.click('#rooms-btn');
@@ -231,11 +270,27 @@ try {
     await B.eval(`game.net.handoff('test')`);
     ok('handoff: Dan becomes host at once', await D.until(`game.mp.role === 'host'`, 2000));
     await sleep(1500);
-    const logs = { B: await B.eval('window.__netlog'), D: await D.eval('window.__netlog') };
+    const handoffs = l => (l || []).filter(x => x.startsWith('handoff:'));
+    const logs = { B: handoffs(await B.eval('window.__netlog')), D: handoffs(await D.eval('window.__netlog')) };
     if (process.env.NETLOG) console.log('after-handoff', JSON.stringify(logs));
     ok('no handoffs beyond the one asked for', (logs.B || []).length === 1 && !(logs.D || []).length, JSON.stringify(logs));
     ok('handoff: Bob is a follower again and synced', await B.until(`game.mp.role === 'follow' && game.mp.synced && game.mp.clockOff !== null`, 5000));
     ok('handoff: Bob still has his snake', await B.eval(`!!(game.player && game.player.alive && game.player.nid === ${before.mine})`));
+
+    // ------------------------------------------------ the room server restarts
+    const ids = { B: await B.eval(`game.net.id`), D: await D.eval(`game.net.id`) };
+    netProc.kill();
+    await sleep(1500);
+    startNet();
+    const rejoined = async P => P.until(`game.net.connected && !game.net.reconnecting && game.inRoom && game.net.room`, 12000);
+    const rb = await rejoined(B), rd = await rejoined(D), rc = await rejoined(C);
+    ok('after a server restart everyone rejoins their room', rb && rd && rc, JSON.stringify({ B: await B.eval('window.__netlog'), D: await D.eval('window.__netlog'), C: await C.eval('window.__netlog') }));
+    ok('restart: same ids, same code, same host', await B.eval(`game.net.id === ${JSON.stringify(ids.B)} && game.net.code === ${JSON.stringify(code)} && game.mp.role === 'follow'`) &&
+        await D.eval(`game.net.id === ${JSON.stringify(ids.D)} && game.mp.role === 'host'`));
+    ok('restart: Bob still synced to Dan', await B.until(`game.mp.synced && game.player && game.player.alive && game.state === 'playing'`, 5000));
+    const st3 = await stats();
+    // Family (Bob, Dan) and Cara's public room, nothing else.
+    ok('restart: the server counts the rebuilt rooms', st3.rooms === 2 && st3.players === 3 && await B.eval(`game.net.members.length === 2`), JSON.stringify(st3));
 
     // ------------------------------------------------ leaving
     await D.click('#rooms-btn').catch(() => {});

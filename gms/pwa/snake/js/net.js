@@ -20,13 +20,15 @@ const NET_CHUNK = 15000;          // keeps every message under Safari's SCTP lim
 const NET_P2P_TIMEOUT = 8000;     // give up on a direct link after this long
 const NET_P2P_RETRY = 15000;
 const NET_BEAT_MS = 500;
+const NET_RECONNECT_MS = 9000;    // how long to try to get the room server back before leaving the room
 
-function netServerUrl() {
-    const q = new URLSearchParams(location.search).get('net');
-    if (q) return q;
+// Read once at load: the share-link handling tidies the address bar later,
+// and a reconnect must still go to the same server.
+const NET_SERVER = new URLSearchParams(location.search).get('net') ||
     // The Pages mirror and local copies all use the one server on games.br8t.com.
-    return 'wss://games.br8t.com/gms/pwa/snake/net';
-}
+    'wss://games.br8t.com/gms/pwa/snake/net';
+
+function netServerUrl() { return NET_SERVER; }
 
 function netHttpUrl(rest) {
     return netServerUrl().replace(/^ws/, 'http') + rest;
@@ -304,58 +306,145 @@ class Net {
     /** Open the socket (idempotent). Resolves once the server has said hello. */
     connect(name) {
         this.name = name || this.name || 'Player';
-        if (this.connected) return Promise.resolve();
+        if (this.connected || this._reconnect) return Promise.resolve();
         if (this._connecting) return this._connecting;
         this._wantOpen = true;
-        this._connecting = new Promise((resolve, reject) => {
-            let ws;
-            try { ws = new WebSocket(netServerUrl() + '/ws'); }
-            catch (e) { this._connecting = null; reject(e); return; }
-            ws.binaryType = 'arraybuffer';
-            this.ws = ws;
-            const fail = setTimeout(() => { try { ws.close(); } catch (e) {} }, 8000);
-            ws.onmessage = e => {
-                if (typeof e.data === 'string') {
-                    let m;
-                    try { m = JSON.parse(e.data); } catch (err) { return; }
-                    if (m.t === 'welcome') {
-                        clearTimeout(fail);
-                        this.id = m.id;
-                        this.ice = m.ice;
-                        this.turn = !!m.turn;
-                        this._raw({ t: 'hello', name: this.name, tz: Intl.DateTimeFormat().resolvedOptions().timeZone || '' });
-                        for (const q of this._queue) this._raw(q);
-                        this._queue = [];
-                        this._connecting = null;
-                        resolve();
-                        return;
-                    }
-                    this._onServer(m);
-                } else {
-                    this._onRelay(new Uint8Array(e.data));
-                }
-            };
-            ws.onclose = () => {
-                clearTimeout(fail);
-                const had = !!this.id;
-                this.ws = null;
-                this.id = null;
-                this._connecting = null;
-                this._dropLinks();
-                const wasRoom = this.room;
-                this.room = null;
-                this.members = [];
-                this.hostId = null;
-                if (!had) reject(new Error('no connection'));
-                if (wasRoom) this._emit('closed');
-            };
-        });
+        this._connecting = this._open(null);
         return this._connecting;
     }
 
+    /**
+     * One socket. `resume` = {id, tok} to reclaim our place after a drop; the
+     * server answers with the same id if it kept it (or just restarted).
+     */
+    _open(resume) {
+        return new Promise((resolve, reject) => {
+            let url = netServerUrl() + '/ws';
+            if (resume) url += '?id=' + encodeURIComponent(resume.id) + '&tok=' + encodeURIComponent(resume.tok);
+            let ws;
+            try { ws = new WebSocket(url); }
+            catch (e) { this._connecting = null; reject(e); return; }
+            ws.binaryType = 'arraybuffer';
+            this.ws = ws;
+            let welcomed = false;
+            const fail = setTimeout(() => { try { ws.close(); } catch (e) {} }, resume ? 4000 : 8000);
+            ws.onmessage = e => {
+                if (ws !== this.ws) return;
+                if (typeof e.data !== 'string') { this._onRelay(new Uint8Array(e.data)); return; }
+                let m;
+                try { m = JSON.parse(e.data); } catch (err) { return; }
+                if (m.t !== 'welcome') { this._onServer(m); return; }
+                clearTimeout(fail);
+                welcomed = true;
+                this.id = m.id;
+                this.tok = m.tok || null;
+                this.grace = m.grace || 0;     // 0 = an older server: a drop ends the room
+                if (!this.room) this.ice = m.ice;
+                this.turn = !!m.turn;
+                this._connecting = null;
+                this._raw({ t: 'hello', name: this.name, tz: Intl.DateTimeFormat().resolvedOptions().timeZone || '' });
+                if (resume) {
+                    if (m.id !== resume.id || !this.room) this._giveUp('lost-id');
+                    else this._raw({ t: 'rejoin', rj: this._rejoinInfo() });
+                }
+                for (const q of this._queue) this._raw(q);
+                this._queue = [];
+                resolve();
+            };
+            ws.onclose = () => {
+                clearTimeout(fail);
+                if (ws !== this.ws) return;
+                this.ws = null;
+                if (!welcomed) { this._connecting = null; reject(new Error('no connection')); return; }
+                this._lost();
+            };
+        });
+    }
+
+    _lost() {
+        this._connecting = null;
+        if (this._reconnect) { this._retry(); return; }
+        if (this._wantOpen && this.room && this.grace > 0 && this.tok) { this._startReconnect(); return; }
+        this.id = null;
+        this._dropLinks();
+        const wasRoom = this.room;
+        this.room = null;
+        this.members = [];
+        this.hostId = null;
+        if (wasRoom) this._emit('closed');
+    }
+
+    /**
+     * The socket to the room server dropped mid-room. The WebRTC links carry
+     * the game, so keep them and the room as they are and quietly get the
+     * signalling line back; only if that fails within the grace do we give up.
+     */
+    _startReconnect() {
+        const rc = { id: this.id, tok: this.tok, tries: 0, timer: 0 };
+        rc.deadline = setTimeout(() => { if (this._reconnect === rc) this._giveUp('timeout'); }, Math.min(this.grace, NET_RECONNECT_MS));
+        this._reconnect = rc;
+        (window.__netlog = window.__netlog || []).push('reconnecting@' + Math.round(performance.now()));
+        this._emit('reconnecting', true);
+        this._retry();
+    }
+
+    _retry() {
+        const rc = this._reconnect;
+        if (!rc) return;
+        clearTimeout(rc.timer);
+        const wait = Math.min(2000, 250 * 2 ** rc.tries++) + Math.random() * 150;
+        rc.timer = setTimeout(() => {
+            if (this._reconnect !== rc) return;
+            this._open(rc).catch(() => this._retry());
+        }, wait);
+    }
+
+    _reconnected() {
+        const rc = this._reconnect;
+        if (!rc) return;
+        clearTimeout(rc.timer);
+        clearTimeout(rc.deadline);
+        this._reconnect = null;
+        (window.__netlog = window.__netlog || []).push('reconnected@' + Math.round(performance.now()));
+        this._emit('reconnecting', false);
+    }
+
+    /** Could not get our place back: today's behaviour, out of the room. */
+    _giveUp(why) {
+        const rc = this._reconnect;
+        if (rc) (window.__netlog = window.__netlog || []).push('gave-up:' + why);
+        if (rc) { clearTimeout(rc.timer); clearTimeout(rc.deadline); }
+        this._reconnect = null;
+        this._emit('reconnecting', false);
+        if (!this.connected) {
+            this.id = null;
+            if (this.ws) { const ws = this.ws; this.ws = null; try { ws.close(); } catch (e) {} }
+        }
+        this._dropLinks();
+        const wasRoom = this.room;
+        this.room = null;
+        this.members = [];
+        this.hostId = null;
+        this.code = null;
+        this._queue = [];
+        if (wasRoom) this._emit('closed');
+    }
+
+    _rejoinInfo() {
+        const r = this.room;
+        return { id: r.id, code: this.code || '', name: r.name, priv: !!r.priv, region: r.region,
+            set: r.set || null, members: this.members, epoch: this.epoch };
+    }
+
+    get reconnecting() { return !!this._reconnect; }
+
+    /** Test hook: the socket dies without a goodbye, as a network blip kills it. */
+    _dropSocket() { if (this.ws) this.ws.close(4000); }
+
     close() {
         this._wantOpen = false;
-        if (this.ws) try { this.ws.close(); } catch (e) {}
+        if (this._reconnect) this._giveUp('closed');
+        if (this.ws) try { this.ws.close(1000); } catch (e) {}
     }
 
     _raw(m) {
@@ -367,7 +456,11 @@ class Net {
     quick() { this._raw({ t: 'quick' }); }
     create(name, settings) { this._raw({ t: 'create', name, set: settings }); }
     join(opts) { this._raw({ t: 'join', code: opts.code || '', id: opts.id || '' }); }
-    leave() { this._raw({ t: 'leave' }); this._leftRoom(); }
+    leave() {
+        if (this._reconnect) { this._giveUp('left'); return; }
+        this._raw({ t: 'leave' });
+        this._leftRoom();
+    }
     handoff(why) {
         if (!this.isHost) return;
         (window.__netlog = window.__netlog || []).push('handoff:' + (why || '?') + '@' + Math.round(performance.now()));
@@ -404,9 +497,11 @@ class Net {
                 this._emit('rooms', m);
                 break;
             case 'err':
+                if (this._reconnect) { this._giveUp(m.code || 'err'); break; }
                 this._emit('error', m);
                 break;
             case 'room': {
+                this._reconnected();
                 const prevHost = this.hostId, prevEpoch = this.epoch, wasIn = !!this.room;
                 this.room = m.room;
                 this.code = m.code || null;

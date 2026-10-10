@@ -41,10 +41,40 @@ game runs in a player's browser and traffic goes browser to browser (WebRTC).
 | Host hidden / tab closed | immediate handoff (`visibilitychange`, `pagehide`) |
 | Host silent (crash, network) | replaced after **2.5 s**, only by a *ready* member (synced, beating) |
 | Player silent | autopilot after 2.5 s; snake removed when they leave the room |
+| Socket to the room server drops | place kept **10 s** (`reconnectGrace`); the browser reconnects quietly (backoff 250 ms → 2 s, gives up after 9 s) |
+| Room server restarts | for 60 s (`rebuildWindow`) browsers may rebuild their rooms: same ids, code, line order, epoch |
 
 Beats come from the **game loop**, not a timer, so a hidden tab stops beating.
 1.5 s was tried first: on a loaded machine the host stalled 1.6–1.9 s and
 was replaced for nothing. If nobody else is fresh, the host is kept (no thrash).
+
+## Reconnecting (2026-10-11)
+
+A dropped WebSocket no longer throws the player to the menu. The game itself
+runs over WebRTC, so `Net` keeps the room, the members and every `NetLink`
+as they are, shows a small "Reconnecting…" pill, and reopens the socket with
+`?id=&tok=` (the resume token arrives in `welcome`). The server held the
+member's place for `reconnectGrace`, so nobody else sees anything happen; the
+browser then sends `rejoin` and gets its room message back.
+
+- **Goodbye vs. blip.** A close with status 1000/1001 (tab closed, page left)
+  leaves at once, exactly as before; anything else (network drop, 1006, the
+  test hook's 4000) gets the grace.
+- **Server restart.** Rooms live in memory, so after a restart the first
+  member to `rejoin` rebuilds the room from what its browser remembers (id,
+  code, name, settings, member order, epoch). Members not back yet become
+  placeholders that the right id adopts when it reconnects; they expire after
+  the grace like any dropped member. Ids are only re-grantable inside the
+  60 s rebuild window (first come, first served — there is nothing left to
+  check a token against after a restart).
+- **Old server.** A `welcome` without `grace` (pre-2026-10-11 server) turns
+  reconnecting off: a drop goes back to the menu as it always did.
+- A reconnect attempt that comes back with a different id, an `err`, or no
+  room message within 9 s gives up into that same old behaviour.
+- `NET_SERVER` is read once at load: the share-link code strips the query
+  later, and a reconnect read from `location.search` went to the live server.
+- Old clients against the new server: their drops get the grace too, so a
+  vanished old client's snake lingers up to 10 s on autopilot.
 
 ## Room settings
 
@@ -90,8 +120,10 @@ guide is `SHARED_TURN.md`, copied to `/srv/apps/snakenet/SHARED_TURN.md`.
 - `cd server && go test ./...` — rooms, codes never listed, region grouping,
   ready-only promotion, no thrash, handoff, relay stays inside the room.
 - `node gms/pwa/snake/tools/mpgate.mjs` (repo root) — real server + 4 headless
-  Chromes: create/share/join, victim-side death, host correction, AUTO JOIN,
-  relay-only player, host vanishing, planned handoff, leaving, solo intact.
+  Chromes: sw.js ASSETS vs index.html, create/share/join, victim-side death,
+  host correction, a dropped socket reconnecting quietly (same id, P2P link
+  untouched), AUTO JOIN, relay-only player, host vanishing, planned handoff,
+  the room server being killed and restarted mid-room, leaving, solo intact.
   Every key check was falsified (broken on purpose → fails). It is sensitive to
   machine load: at load avg 50+ the browsers stall and a run can fail.
 - `node gms/pwa/snake/tools/perfbench.mjs [baselineRoot] [root]` — frame cost

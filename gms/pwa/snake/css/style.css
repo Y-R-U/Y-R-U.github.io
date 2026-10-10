@@ -258,7 +258,8 @@ html, body {
 /* ========== DEATH SCREEN ========== */
 #death-screen {
     background: rgba(0,0,0,0.85);
-    justify-content: center;
+    justify-content: safe center;
+    overflow-y: auto;
     gap: 16px;
     padding: 30px;
     backdrop-filter: blur(8px);
@@ -271,6 +272,15 @@ html, body {
     color: #ff4444;
     text-align: center;
 }
+
+.death-cause {
+    font-size: 15px;
+    color: var(--text-mid);
+    text-align: center;
+    margin-top: -8px;
+}
+.death-cause b { color: #fff; }
+.death-cause[hidden] { display: none; }
 
 #death-highscore {
     font-size: 18px;
@@ -459,7 +469,8 @@ html, body {
 /* ========== WIN SCREEN ========== */
 #win-screen {
     background: rgba(6, 10, 4, 0.88);
-    justify-content: center;
+    justify-content: safe center;
+    overflow-y: auto;
     gap: 16px;
     padding: 30px;
     backdrop-filter: blur(8px);
@@ -1026,4 +1037,79 @@ body.in-room #net-pill { display: block; }
 #room-share-close {
     background: none; border: none; color: var(--text-dim);
     font-size: 22px; cursor: pointer; padding: 0 4px;
+}
+
+/* ---------------------------------------------------------- short landscape */
+/* A phone on its side is ~390px tall: the results screens put the four stat
+   tiles in one row and tighten up so PLAY AGAIN and Menu stay on screen. */
+@media (max-height: 500px) {
+    #death-screen, #win-screen { gap: 8px; padding: 12px 20px; }
+    #death-screen .death-stats, #win-screen .death-stats {
+        grid-template-columns: repeat(4, 1fr);
+        max-width: 520px;
+        gap: 8px;
+    }
+    .death-stat { padding: 8px 6px; }
+    .death-stat-value { font-size: 20px; }
+    .death-title { font-size: 26px; }
+    .win-title { font-size: 28px; }
+    .death-cause { margin-top: -4px; }
+    .death-buttons { margin-top: 0; gap: 8px; }
+    .death-buttons .btn { padding-top: 10px; padding-bottom: 10px; }
+}
+
+/* In a room the arena keeps running under the results screen, so a live blur
+   of it is a full-screen filter every frame. */
+body.in-room #death-screen, body.in-room #win-screen {
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+}
+
+/* Signalling line dropped mid-room; the game carries on peer to peer. */
+#reconnect-pill {
+    position: fixed;
+    left: 50%;
+    bottom: calc(18px + var(--safe-bottom));
+    transform: translateX(-50%) translateY(10px);
+    padding: 6px 14px;
+    border-radius: 999px;
+    background: rgba(40, 28, 0, 0.85);
+    border: 1px solid rgba(255, 170, 0, 0.5);
+    color: #ffd27a;
+    font-size: 12px;
+    font-weight: 700;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.25s, transform 0.25s, visibility 0.25s;
+    pointer-events: none;
+    z-index: 60;
+}
+#reconnect-pill.show { opacity: 1; visibility: visible; transform: translateX(-50%) translateY(0); }
+
+#rival-toast {
+    position: fixed;
+    left: 50%;
+    top: calc(104px + var(--safe-top));
+    transform: translateX(-50%) translateY(-8px);
+    max-width: calc(100% - 32px);
+    padding: 7px 16px;
+    border-radius: 999px;
+    background: rgba(0, 0, 0, 0.6);
+    border: 1px solid rgba(255, 204, 0, 0.45);
+    color: #ffcc00;
+    font-size: 13px;
+    font-weight: 800;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    opacity: 0;
+    transition: opacity 0.25s, transform 0.25s;
+    pointer-events: none;
+    z-index: 15;
+}
+#rival-toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+/* Narrow screens: the leaderboard reaches the middle, so clear it (its
+   tallest is ~236px below the account avatar's space). */
+@media (max-width: 599px) {
+    #rival-toast { top: calc(248px + var(--br8t-account-space, 0px) + var(--safe-top)); }
 }
