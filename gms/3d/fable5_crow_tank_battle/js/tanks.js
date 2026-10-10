@@ -3,14 +3,14 @@
 // just writes moveInput / aimPoint / wantFire each frame.
 
 import * as THREE from 'three';
-import { TANK, FIELD_R } from './config.js';
+import { TANK, FIELD_R, PICKUP_KINDS } from './config.js';
 import { clamp, lerp, damp, angLerp, hexToCss } from './utils.js';
-import { scene, obstacles } from './world.js';
+import { scene, obstacles, playerGlow } from './world.js';
 import { buildTankMesh } from './tankFactory.js';
 import { spawnExplosion, spawnDebris } from './particles.js';
 import { AudioFX } from './audio.js';
 import { state, addShake } from './state.js';
-import { addFeed, updateLeaderboard, flashHit } from './ui.js';
+import { addFeed, updateLeaderboard, flashHit, hitConfirm, killPop } from './ui.js';
 
 const _tmpV = new THREE.Vector3();
 
@@ -22,13 +22,17 @@ export class Tank {
     this.isPlayer = isPlayer;
     this.personality = personality;
 
-    const m = buildTankMesh(accent, isPlayer);
+    const m = buildTankMesh(accent);
     this.grp = m.grp;
     this.leanG = m.leanG;
     this.turretG = m.turretG;
     this.barrelG = m.barrelG;
     this.muzzles = m.muzzles;
     this.muzzleFlash = m.muzzleFlash;
+    this.bubble = m.bubble;
+    this.buffs = { rapid: 0, shield: 0, ward: 0 };
+    this.nemesis = false;
+    this.peckT = 0;
     scene.add(this.grp);
 
     this.vel = new THREE.Vector3();
@@ -128,17 +132,36 @@ export class Tank {
     }
 
     this.fireTimer -= dt;
+    const b = this.buffs;
+    if (b.rapid > 0) b.rapid -= dt;
+    if (b.ward > 0) b.ward -= dt;
+    if (b.shield > 0) b.shield -= dt;
+    this.bubble.visible = b.shield > 0;
+    if (b.shield > 0) this.bubble.rotation.y += dt * 1.5;
   }
 
-  damage(amount, attacker) {
+  get warded() { return this.buffs.ward > 0; }
+
+  // kind: 'bolt' (tank fire) or 'peck' (the murder)
+  damage(amount, attacker, kind = 'bolt') {
     if (!this.alive) return;
+    if (kind === 'peck' && this.warded) return;
+    if (kind === 'bolt' && this.buffs.shield > 0) amount *= 1 - PICKUP_KINDS.shield.absorb;
     this.hp -= amount;
     this.lastHitT = state.time;
     if (attacker) this.lastAttacker = attacker;
     if (this.isPlayer) {
-      flashHit();
-      addShake(0.3);
-      AudioFX.hit();
+      if (kind === 'peck') {
+        flashHit(true);
+        addShake(0.12);
+        AudioFX.peck();
+      } else {
+        flashHit();
+        addShake(0.3);
+        AudioFX.hit();
+      }
+    } else if (attacker && attacker.isPlayer && kind === 'bolt') {
+      hitConfirm(this);
     }
     if (this.hp <= 0) {
       this.hp = 0;
@@ -148,6 +171,8 @@ export class Tank {
 
   die(attacker) {
     this.alive = false;
+    const i = state.alive.indexOf(this);
+    if (i >= 0) state.alive.splice(i, 1);
     this.killedBy = attacker && attacker !== this ? attacker : null;
     this.place = state.placeCounter--;
     spawnExplosion(_tmpV.copy(this.pos).setY(1.2), 2.0, this.accent);
@@ -156,6 +181,7 @@ export class Tank {
     if (attacker && attacker !== this) {
       attacker.kills++;
       if (state.hooks.onKill) state.hooks.onKill(attacker, this);
+      if (attacker.isPlayer) killPop(this);
     }
     addFeed(attacker, this);
     updateLeaderboard();
@@ -165,6 +191,10 @@ export class Tank {
     this.hp = Math.min(TANK.hp, this.hp + amount);
   }
 
+  applyBuff(kind) {
+    this.buffs[kind] = PICKUP_KINDS[kind].dur;
+  }
+
   reset(x, z) {
     this.pos.set(x, 0, z);
     this.vel.set(0, 0, 0);
@@ -172,16 +202,22 @@ export class Tank {
     this.turretYaw = this.yaw;
     this.hp = TANK.hp;
     this.alive = true;
+    if (!state.alive.includes(this)) state.alive.push(this);
     this.kills = 0;
     this.place = 0;
+    this.buffs.rapid = this.buffs.shield = this.buffs.ward = 0;
+    this.bubble.visible = false;
+    this.peckT = 0;
     this.lastAttacker = null;
     this.killedBy = null;
     this.grp.visible = true;
     this.grp.rotation.y = this.yaw;
   }
 
+  // Geometry and materials are shared (see tankFactory.js): nothing to free.
   dispose() {
     scene.remove(this.grp);
+    this.alive = false;
   }
 }
 
@@ -210,6 +246,15 @@ export function separateTanks() {
 }
 
 export function updateAllTanks(dt, controllersActive) {
+  // One permanent light follows the player, so the scene's light count never
+  // changes between attract mode and a match (that forces shader recompiles).
+  const p = state.player;
+  if (p && p.alive) {
+    playerGlow.position.set(p.pos.x, 1.6, p.pos.z);
+    playerGlow.intensity = 3.0;
+  } else {
+    playerGlow.intensity = 0;
+  }
   for (const t of state.tanks) {
     if (!t.alive) continue;
     if (controllersActive && t.controller) t.controller.update(dt);

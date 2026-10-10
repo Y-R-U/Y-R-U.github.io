@@ -10,6 +10,7 @@ export const state = {
   countdown: 0,
 
   tanks: [],               // all Tank objects in the current match
+  alive: [],               // live subset of tanks, kept by Tank.reset/die
   player: null,            // the player's Tank (null in attract/shot mode)
   playerName: '',
 
@@ -19,6 +20,8 @@ export const state = {
   zoneR: MURDER.startR,    // current murder-ring radius
   zoneShrinking: false,
   zoneTimer: MURDER.graceTime,
+  pace: { graceTime: MURDER.graceTime, shrinkRate: MURDER.shrinkRate },
+  daily: null,             // date key while playing the daily seeded field
 
   pickups: [],
 
@@ -31,6 +34,7 @@ export const state = {
   // needing to know that a career layer exists — keeps the graph acyclic.
   hooks: {
     onKill: null,          // (attacker, victim) => void
+    onStalk: null,         // (aiTank) => void — an AI just started hunting the player
   },
 };
 
@@ -38,6 +42,7 @@ export function addShake(s) {
   state.shake = Math.min(0.9, state.shake + s);
 }
 
+// The live list itself, not a copy: callers must not mutate or sort it.
 export function aliveTanks() {
-  return state.tanks.filter((t) => t.alive);
+  return state.alive;
 }

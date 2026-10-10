@@ -90,7 +90,8 @@ function defaultCareer() {
 }
 
 function defaultSettings() {
-  return { v: 1, name: '', muted: false, mode: DEFAULT_TANK_COUNT };
+  return { v: 1, name: '', muted: false, mode: DEFAULT_TANK_COUNT, autoFire: false,
+    daily: { date: '', best: 0, plays: 0 } };
 }
 
 // Saved values win; missing keys are filled from defaults; keys the defaults
@@ -227,10 +228,18 @@ export function beginMatch(tankCount) {
     bestStreak: 0,
     lastKillT: -999,
     felled: [],          // enemy callsigns destroyed this match
+    bounty: false,       // destroyed the nemesis-tagged tank this match
     killedLabels: [],    // personalities destroyed this match
     recorded: false,
   };
   return live;
+}
+
+export const BOUNTY_POINTS = 250;
+
+/** The player destroyed the tank tagged NEMESIS. */
+export function noteBounty() {
+  if (live) live.bounty = true;
 }
 
 /** The player destroyed someone. `t` is the match clock in seconds. */
@@ -277,7 +286,8 @@ export function recordMatch(r) {
   const total = Math.max(1, Math.round(num(r.tankCount)) || 1);
   const timeAlive = Math.max(0, num(r.timeAlive));
   const won = !!r.won;
-  const score = matchScore({ kills, place, total, timeAlive, won });
+  const bounty = !!(live && live.bounty);
+  const score = matchScore({ kills, place, total, timeAlive, won }) + (bounty ? BOUNTY_POINTS : 0);
   const streak = live ? live.bestStreak : 0;
 
   const firstInMode = m.played === 0;
@@ -326,7 +336,7 @@ export function recordMatch(r) {
   if (live) live.recorded = true;
 
   return {
-    score, streak, mode,
+    score, streak, mode, bounty,
     records: {
       bestScore, bestTime, bestKills, bestPlace,
       bestStreak: bestStreakEver, firstWinInMode, firstInMode,

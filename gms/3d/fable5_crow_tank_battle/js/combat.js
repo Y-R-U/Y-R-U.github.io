@@ -3,7 +3,7 @@
 
 import * as THREE from 'three';
 import { TANK } from './config.js';
-import { rand } from './utils.js';
+import { rand, segHitsCircle } from './utils.js';
 import { scene, obstacles, camera } from './world.js';
 import { spawnFlash, spawnRing, spawnDebris } from './particles.js';
 import { AudioFX } from './audio.js';
@@ -14,6 +14,14 @@ const bolts = [];
 const boltMats = new Map();   // accent hex -> shared material
 const _tmpV = new THREE.Vector3();
 const _dir = new THREE.Vector3();
+
+// Ground-plane line of sight between two points, blocked by cover circles.
+export function losClear(a, b) {
+  for (const o of obstacles) {
+    if (segHitsCircle(a.x, a.z, b.x, b.z, o.x, o.z, o.r)) return false;
+  }
+  return true;
+}
 
 export function initCombat() {
   const geo = new THREE.BoxGeometry(0.14, 0.14, 1.7);
@@ -76,7 +84,7 @@ export function updateCombat(dt) {
   // firing
   for (const t of state.tanks) {
     if (!t.alive || !t.wantFire || t.fireTimer > 0) continue;
-    t.fireTimer = TANK.fireCd * rand(0.92, 1.08);
+    t.fireTimer = TANK.fireCd * rand(0.92, 1.08) * (t.buffs.rapid > 0 ? 0.45 : 1);
     fireFrom(t);
   }
 
@@ -116,7 +124,8 @@ export function updateCombat(dt) {
         const owner = b.owner;   // killBolt clears it — capture for kill credit
         spawnFlash(p, 1.0, owner ? owner.accent : 0xffffff);
         spawnDebris(p, 3, 0.6);
-        AudioFX.hit(1 / (1 + t.pos.distanceTo(camera.position) / 35));
+        // the player's own hit sound comes from Tank.damage — don't double it
+        if (!t.isPlayer) AudioFX.hit(1 / (1 + t.pos.distanceTo(camera.position) / 35));
         killBolt(b);
         t.damage(TANK.boltDmg * rand(0.9, 1.1), owner);
         break;

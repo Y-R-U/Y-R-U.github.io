@@ -16,6 +16,48 @@ let crowRing = null;
 const seeds = [];
 let cawTimer = 3;
 
+// Swooping crows: a few loose birds that dive on a tank being pecked.
+const SWOOP_POOL = 12;
+const swoops = [];
+const _look = new THREE.Vector3();
+
+export function spawnSwoop(target, n = 2) {
+  for (let k = 0; k < n; k++) {
+    const s = swoops.find((x) => !x.active);
+    if (!s) return;
+    const a = rand(0, Math.PI * 2);
+    s.from.set(target.x + Math.cos(a) * 9, rand(7, 11), target.z + Math.sin(a) * 9);
+    s.mid.set(target.x + rand(-0.6, 0.6), 1.9, target.z + rand(-0.6, 0.6));
+    s.to.set(target.x - Math.cos(a) * 10, rand(8, 13), target.z - Math.sin(a) * 10);
+    s.t = -k * 0.12;
+    s.dur = rand(0.7, 0.95);
+    s.active = true;
+    s.mesh.scale.setScalar(rand(0.9, 1.3));
+  }
+}
+
+function updateSwoops(dt, time) {
+  for (const s of swoops) {
+    if (!s.active) continue;
+    s.t += dt;
+    if (s.t < 0) continue;
+    const k = s.t / s.dur;
+    if (k >= 1) { s.active = false; s.mesh.visible = false; continue; }
+    // quadratic bezier dive through the target and back up
+    const u = 1 - k;
+    _p.set(0, 0, 0)
+      .addScaledVector(s.from, u * u).addScaledVector(s.mid, 2 * u * k).addScaledVector(s.to, k * k);
+    _look.set(0, 0, 0)
+      .addScaledVector(s.from, -2 * u).addScaledVector(s.mid, 2 * u - 2 * k).addScaledVector(s.to, 2 * k)
+      .add(_p);
+    s.mesh.position.copy(_p);
+    s.mesh.lookAt(_look);
+    s.mesh.rotateY(Math.PI);           // the crow model faces -z
+    s.mesh.rotateZ(Math.sin(time * 22 + s.dur * 9) * 0.5);
+    s.mesh.visible = true;
+  }
+}
+
 const _m = new THREE.Matrix4();
 const _p = new THREE.Vector3();
 const _q = new THREE.Quaternion();
@@ -58,9 +100,18 @@ export function initMurder() {
   const crowMat = new THREE.MeshStandardMaterial({
     color: 0x14161e, emissive: 0x0a0c14, emissiveIntensity: 0.6,
     flatShading: true, roughness: 0.6 });
-  crowRing = new THREE.InstancedMesh(buildCrowGeo(), crowMat, CROW_COUNT);
+  const crowGeo = buildCrowGeo();
+  crowRing = new THREE.InstancedMesh(crowGeo, crowMat, CROW_COUNT);
   crowRing.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
   scene.add(crowRing);
+
+  for (let i = 0; i < SWOOP_POOL; i++) {
+    const mesh = new THREE.Mesh(crowGeo, crowMat);
+    mesh.visible = false;
+    scene.add(mesh);
+    swoops.push({ mesh, from: new THREE.Vector3(), to: new THREE.Vector3(),
+      mid: new THREE.Vector3(), t: 0, dur: 1, active: false });
+  }
 
   for (let i = 0; i < CROW_COUNT; i++) {
     seeds.push({
@@ -100,6 +151,7 @@ export function setMurderVisual(r, shrinking, time, dt) {
     crowRing.setMatrixAt(i, _m);
   }
   crowRing.instanceMatrix.needsUpdate = true;
+  updateSwoops(dt, time);
 
   // distant caws, more agitated while the ring is closing
   cawTimer -= dt;

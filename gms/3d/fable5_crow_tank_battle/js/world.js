@@ -7,10 +7,50 @@ import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
 import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
 import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
 import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
-import { FIELD_R, LITE_MODE } from './config.js';
-import { rand, randInt, clamp } from './utils.js';
+import { FIELD_R, LITE_MODE, IS_TOUCH } from './config.js';
+import { srand as rand, clamp, seedLayout, hashStr, todayKey } from './utils.js';
+
+// World randomness goes through the seeded layout stream: the field (cover,
+// farm, scenery) is seeded by the date, so it is the same for everyone today
+// and the daily match is a genuinely shared field.
+const randInt = (a, b) => Math.floor(rand(a, b + 1));
 
 export let renderer, scene, camera, composer;
+export let playerGlow;
+let sun = null;
+let bloomPass = null;
+
+// Render quality tiers. Touch devices start at the top and may step down once
+// (see main.js adaptive quality); the chosen tier is remembered per device.
+export const QUALITY = [
+  { ratio: 1.75, shadow: 1024, bloom: true },
+  { ratio: 1.25, shadow: 512, bloom: true },
+  { ratio: 1.0, shadow: 512, bloom: false },
+];
+export let qualityLevel = 0;
+
+export function setQuality(level) {
+  qualityLevel = Math.max(0, Math.min(QUALITY.length - 1, level));
+  const q = QUALITY[qualityLevel];
+  const ratio = Math.min(window.devicePixelRatio, q.ratio);
+  renderer.setPixelRatio(ratio);
+  composer.setPixelRatio(ratio);
+  renderer.setSize(window.innerWidth, window.innerHeight);
+  composer.setSize(window.innerWidth, window.innerHeight);
+  if (sun && sun.shadow.mapSize.x !== q.shadow) {
+    sun.shadow.mapSize.set(q.shadow, q.shadow);
+    if (sun.shadow.map) { sun.shadow.map.dispose(); sun.shadow.map = null; }
+  }
+  if (bloomPass) bloomPass.enabled = q.bloom;
+}
+
+// Portrait phones get a wider lens so enemies off to the sides stay in view.
+export function fitCamera() {
+  const aspect = window.innerWidth / window.innerHeight;
+  camera.aspect = aspect;
+  camera.fov = aspect < 1 ? 74 : 62;
+  camera.updateProjectionMatrix();
+}
 export const obstacles = [];   // { x, z, r } collision circles on the ground
 
 export function glowBasic(hex, boost = 1.6) {
@@ -24,8 +64,11 @@ const fireflySeeds = [];
 const clouds = [];
 
 export function initWorld(container) {
-  renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: 'high-performance' });
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.75));
+  seedLayout(hashStr('f5mr-field-' + todayKey()));
+  // No canvas MSAA: EffectComposer renders into its own targets, so it would
+  // be wasted. Desktop gets MSAA on the composer target instead.
+  renderer = new THREE.WebGLRenderer({ antialias: false, powerPreference: 'high-performance' });
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, QUALITY[0].ratio));
   renderer.setSize(window.innerWidth, window.innerHeight);
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
   renderer.toneMappingExposure = 1.25;
@@ -38,26 +81,33 @@ export function initWorld(container) {
 
   camera = new THREE.PerspectiveCamera(62, window.innerWidth / window.innerHeight, 0.1, 1300);
   camera.position.set(0, 10, 16);
+  fitCamera();
 
-  composer = new EffectComposer(renderer);
+  const rt = new THREE.WebGLRenderTarget(window.innerWidth, window.innerHeight,
+    { type: THREE.HalfFloatType, samples: IS_TOUCH ? 0 : 4 });
+  composer = new EffectComposer(renderer, rt);
   composer.addPass(new RenderPass(scene, camera));
   if (!LITE_MODE) {
-    composer.addPass(new UnrealBloomPass(
-      new THREE.Vector2(window.innerWidth, window.innerHeight), 0.7, 0.55, 0.72));
+    bloomPass = new UnrealBloomPass(
+      new THREE.Vector2(window.innerWidth, window.innerHeight), 0.7, 0.55, 0.72);
+    composer.addPass(bloomPass);
   }
   composer.addPass(new OutputPass());
+  composer.setSize(window.innerWidth, window.innerHeight);
 
   window.addEventListener('resize', () => {
-    camera.aspect = window.innerWidth / window.innerHeight;
-    camera.updateProjectionMatrix();
+    fitCamera();
     renderer.setSize(window.innerWidth, window.innerHeight);
     composer.setSize(window.innerWidth, window.innerHeight);
   });
 
+  playerGlow = new THREE.PointLight(0xffc24d, 0, 8);
+  scene.add(playerGlow);
+
   // dusk light: lavender sky bounce + long warm shadows from the low sun
   scene.add(new THREE.HemisphereLight(0x9a6ab0, 0x4a3018, 1.15));
 
-  const sun = new THREE.DirectionalLight(0xff8a4d, 1.6);
+  sun = new THREE.DirectionalLight(0xff8a4d, 1.6);
   sun.position.set(35, 38, -110);
   sun.castShadow = true;
   sun.shadow.mapSize.set(1024, 1024);
@@ -77,6 +127,7 @@ export function initWorld(container) {
   buildCover();
   buildFarm();
   buildFireflies();
+  seedLayout(null);
 }
 
 // ---------------------------------------------------------------------------

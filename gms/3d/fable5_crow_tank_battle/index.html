@@ -7,7 +7,39 @@
   <meta name="mobile-web-app-capable" content="yes" />
   <meta name="theme-color" content="#160d20" />
   <title>Fable 5 — Murder Royale</title>
+  <link rel="icon" href="data:," />
   <link rel="stylesheet" href="style.css" />
+  <script>
+    // Boot watchdog. A stale cached module (or any load error) stops main.js
+    // without a word; this inline script can still report it and offer a
+    // cache-busting reload. main.js sets window.__mrBooted when it is up.
+    (function () {
+      var shown = false;
+      function show(msg) {
+        if (window.__mrBooted || shown) return;
+        shown = true;
+        var go = function () {
+          var el = document.getElementById('boot-fail');
+          if (!el) return setTimeout(go, 50);
+          document.getElementById('boot-msg').textContent = msg || '';
+          el.classList.remove('hidden');
+        };
+        go();
+      }
+      window.addEventListener('error', function (e) {
+        var t = e.target;
+        var what = t && t !== window && (t.src || t.href) ? 'Could not load ' + (t.src || t.href) : e.message;
+        show(what);
+      }, true);
+      window.addEventListener('unhandledrejection', function (e) {
+        show(e.reason && e.reason.message ? e.reason.message : String(e.reason));
+      });
+      setTimeout(function () { show('The game took too long to start.'); }, 12000);
+      window.__mrReload = function () {
+        location.replace(location.pathname + '?v=' + Date.now() + location.hash);
+      };
+    })();
+  </script>
 </head>
 <body>
   <div id="game-container"></div>
@@ -25,9 +57,16 @@
       </div>
       <div id="hp-bar"><div id="hp-fill"></div></div>
       <div id="kills-chip">&#x2694; <span id="player-kills">0</span> &nbsp;&middot;&nbsp; ALIVE <span id="alive-count">10</span></div>
+      <div id="buffs"></div>
     </div>
-    <div class="hud-center"><div id="zone-status" class="hidden"></div></div>
+    <div class="hud-center">
+      <div id="zone-status" class="hidden"></div>
+      <div id="callouts"></div>
+    </div>
   </div>
+  <div id="kill-pops"></div>
+  <div id="hitmarker"><i></i></div>
+  <div id="inside-arrow" class="hidden"></div>
 
   <!-- Leaderboard -->
   <div id="leaderboard" class="hidden"></div>
@@ -54,9 +93,24 @@
 
   <!-- Spectate bar -->
   <div id="spectate-bar" class="hidden">
-    <span>SPECTATING <b id="spec-name">—</b> &nbsp;&middot;&nbsp; YOU PLACED <b id="spec-place">—</b></span>
-    <button id="btn-spec-retry" class="btn-mini">PLAY AGAIN</button>
-    <button id="btn-spec-menu" class="btn-mini">MENU</button>
+    <span class="spec-text"><b id="spec-place">—</b> &middot; watching <b id="spec-name">—</b></span>
+    <span class="spec-btns">
+      <button id="btn-spec-retry" class="btn-mini">PLAY AGAIN</button>
+      <button id="btn-spec-menu" class="btn-mini">MENU</button>
+    </span>
+  </div>
+
+  <!-- Lost graphics context: non-blocking callout -->
+  <div id="gl-lost" class="hidden">
+    <span>Graphics were reset by the phone.</span>
+    <button class="btn-mini" onclick="window.__mrReload()">RELOAD</button>
+  </div>
+
+  <!-- Boot failure (shown by the inline watchdog only) -->
+  <div id="boot-fail" class="hidden">
+    <b>MURDER ROYALE didn't start</b>
+    <span id="boot-msg"></span>
+    <button class="btn-mini" onclick="window.__mrReload()">RELOAD</button>
   </div>
 
   <!-- Title screen -->
@@ -81,16 +135,24 @@
 
     <div class="menu-buttons">
       <button id="btn-play" class="btn-primary">DEPLOY</button>
-      <button id="btn-help" class="btn-secondary">HOW TO PLAY</button>
+      <button id="btn-daily" class="btn-daily">DAILY FIELD<small id="daily-sub"></small></button>
+      <div class="menu-row">
+        <button id="btn-help" class="btn-secondary">HOW TO PLAY</button>
+        <button id="btn-autofire" class="btn-toggle">AUTO-FIRE OFF</button>
+      </div>
     </div>
     <div id="help-box" class="help-box hidden">
-      <p><b>Move:</b> WASD / arrows (or joystick)</p>
-      <p><b>Aim:</b> mouse — turret tracks your crosshair (auto-aim on touch)</p>
-      <p><b>Fire:</b> hold click / space (or FIRE button)</p>
+      <p><b>Move:</b> WASD / arrows (or drag anywhere on the left to steer)</p>
+      <p><b>Aim:</b> mouse — turret tracks your crosshair. On touch it locks the
+         nearest tank you can see; tap a tank to switch the lock.</p>
+      <p><b>Fire:</b> hold click / space (or FIRE button). AUTO-FIRE shoots
+         whenever your lock is lined up.</p>
       <p>Free-for-all at dusk: every tank fights for itself, and each AI has
-         its own personality — some hunt, some snipe, some run. A circling
-         murder of crows shrinks the field: stay inside the ring or get
-         pecked apart. Grab glowing pumpkins to repair. Outlive everyone.</p>
+         its own personality (the glyph by its name) — some hunt, some snipe,
+         some run. A circling murder of crows shrinks the field: stay inside
+         the ring or get pecked apart. Pumpkins repair; pickups give rapid
+         fire, a shield, or a crow-ward against the pecking. The tank that
+         kills you most turns up as your NEMESIS, with a bounty on it.</p>
     </div>
   </div>
 

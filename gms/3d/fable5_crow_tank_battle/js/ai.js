@@ -4,8 +4,9 @@
 // itself handles physics, so AI and player obey identical rules.
 
 import * as THREE from 'three';
-import { TANK } from './config.js';
-import { rand, clamp, segHitsCircle } from './utils.js';
+import { TANK, OPENING, MURDER } from './config.js';
+import { rand, clamp, leadAim } from './utils.js';
+import { losClear } from './combat.js';
 import { obstacles } from './world.js';
 import { state, aliveTanks } from './state.js';
 
@@ -52,7 +53,10 @@ export class AIController {
     }
 
     const hpFrac = me.hp / TANK.hp;
-    const endgame = others.length <= 2 || state.zoneR < 26;
+    // How far the murder has closed, 0..1. Awareness grows with it, so early
+    // fights stay local and the crows herd everyone together for the finish.
+    const closed = clamp((MURDER.startR - state.zoneR) / (MURDER.startR - MURDER.minR), 0, 1);
+    const endgame = state.zoneR < 26;
 
     // hurt + scared -> flee (but in the endgame everyone has to fight)
     if (hpFrac < this.p.courage && !endgame) {
@@ -64,8 +68,20 @@ export class AIController {
 
     // tempted by a harvest pumpkin?
     if (hpFrac < 0.65 && Math.random() < this.p.pickupLove) {
-      const pk = this.nearestPickup(40);
+      const pk = this.nearestPickup(40, 'heal');
       if (pk) {
+        this.mode = 'collect';
+        this.pickup = pk;
+        this.target = this.nearestOf(others);
+        return;
+      }
+    }
+
+    // a buff lying close by is worth a detour (crow-ward matters once the ring moves)
+    if (this.mode === 'collect' && this.pickup && this.pickup.alive && Math.random() < 0.85) return;
+    if (Math.random() < this.p.pickupLove * 0.5) {
+      const pk = this.nearestPickup(18);
+      if (pk && (pk.kind !== 'ward' || state.zoneShrinking)) {
         this.mode = 'collect';
         this.pickup = pk;
         this.target = this.nearestOf(others);
@@ -84,7 +100,7 @@ export class AIController {
         break;
       case 'nearby': {
         const n = this.nearestOf(others);
-        target = (n && n.pos.distanceTo(me.pos) < 28) || endgame ? n : null;
+        target = (n && n.pos.distanceTo(me.pos) < 12 + 16 * closed) || endgame ? n : null;
         break;
       }
     }
@@ -92,11 +108,14 @@ export class AIController {
     // awareness gate: don't cross the map to start fights — roam until
     // someone is close (or hit us), and let the murder force the endgame
     if (target && !endgame && target !== me.lastAttacker) {
-      const awareness = this.p.range * 1.5 + 5;
+      const k = state.matchTime < OPENING.time ? OPENING.awareness : 0.45 + 0.55 * closed;
+      const awareness = (this.p.range * 1.5 + 5) * k;
       if (target.pos.distanceTo(me.pos) > awareness) target = null;
     }
 
     if (target && (endgame || Math.random() < this.p.aggression + 0.25)) {
+      if (target.isPlayer && (this.mode !== 'engage' || this.target !== target) &&
+          state.hooks.onStalk) state.hooks.onStalk(me);
       this.mode = 'engage';
       this.target = target;
     } else {
@@ -134,19 +153,40 @@ export class AIController {
     return best || this.nearestOf(list);
   }
 
-  nearestPickup(maxD) {
+  nearestPickup(maxD, kind) {
     let best = null, bd = maxD * maxD;
     for (const pk of state.pickups) {
+      if (kind && pk.kind !== kind) continue;
+      if (!kind && pk.kind === 'heal') continue;
       const d = pk.pos.distanceToSquared(this.tank.pos);
       if (d < bd) { bd = d; best = pk; }
     }
     return best;
   }
 
+  // Roam to a nearby spot inside the ring. Until the murder has closed most
+  // of the way, prefer spots away from other tanks so the field stays spread
+  // out instead of everyone meeting in the middle.
   newRoamPoint() {
-    const r = rand(4, Math.max(6, state.zoneR * 0.72));
-    const a = rand(0, Math.PI * 2);
-    this.waypoint.set(Math.cos(a) * r, 0, Math.sin(a) * r);
+    const me = this.tank;
+    const maxR = Math.max(6, state.zoneR * 0.78);
+    const closed = (MURDER.startR - state.zoneR) / (MURDER.startR - MURDER.minR);
+    const tries = closed < 0.6 ? 5 : 1;
+    let bx = 0, bz = 0, best = -1;
+    for (let i = 0; i < tries; i++) {
+      const a = rand(0, Math.PI * 2);
+      const d = rand(8, 22);
+      let x = me.pos.x + Math.cos(a) * d, z = me.pos.z + Math.sin(a) * d;
+      const r = Math.hypot(x, z);
+      if (r > maxR) { x *= maxR / r; z *= maxR / r; }
+      let near = Infinity;
+      for (const t of aliveTanks()) {
+        if (t === me) continue;
+        near = Math.min(near, (t.pos.x - x) ** 2 + (t.pos.z - z) ** 2);
+      }
+      if (near > best) { best = near; bx = x; bz = z; }
+    }
+    this.waypoint.set(bx, 0, bz);
   }
 
   // ---- steering, every frame ----
@@ -230,9 +270,7 @@ export class AIController {
     }
 
     const d = t.pos.distanceTo(me.pos);
-    // lead the target
-    const lead = d / TANK.boltSpeed * 0.85;
-    _v.set(t.pos.x + t.vel.x * lead, 1.0, t.pos.z + t.vel.z * lead);
+    leadAim(_v, me.pos, t);
 
     // personality wobble: slow sine drift + per-decision jitter
     const err = Math.sin(state.time * 1.3 + this.errSeed) * this.p.accuracy * 2.2
@@ -255,14 +293,6 @@ export class AIController {
       diff = ((diff + Math.PI) % (Math.PI * 2) + Math.PI * 2) % (Math.PI * 2) - Math.PI;
       aligned = Math.abs(diff) < 0.14;
     }
-    me.wantFire = inRange && aligned && this.losClear(t) && this.mode !== 'collect';
-  }
-
-  losClear(t) {
-    for (const o of obstacles) {
-      if (segHitsCircle(this.tank.pos.x, this.tank.pos.z,
-        t.pos.x, t.pos.z, o.x, o.z, o.r)) return false;
-    }
-    return true;
+    me.wantFire = inRange && aligned && losClear(me.pos, t.pos) && this.mode !== 'collect';
   }
 }

@@ -11,6 +11,7 @@ export const input = {
   joy: new THREE.Vector2(),
   joyActive: false,
   touchFiring: false,
+  taps: [],                           // pending battlefield taps {x, y}
 };
 
 export function initInput(rendererDom, { onToggleMute }) {
@@ -42,21 +43,32 @@ export function initInput(rendererDom, { onToggleMute }) {
     input.firing = false;
   });
 
-  // touch joystick
+  // Floating touch joystick: the base jumps to wherever the thumb lands in the
+  // left zone. Only the first finger owns it; a second finger can't steal it.
   const zone = $('touch-left');
   const knob = $('joystick-knob');
   const base = $('joystick-base');
+  const MAX = 50;
+  const DEAD = 0.14;              // fraction of MAX ignored around the centre
   let touchId = null;
   let cx = 0, cy = 0;
 
   zone.addEventListener('touchstart', (e) => {
     e.preventDefault();
+    if (touchId !== null) return;
     const t = e.changedTouches[0];
     touchId = t.identifier;
-    const r = base.getBoundingClientRect();
-    cx = r.left + r.width / 2;
-    cy = r.top + r.height / 2;
+    const zr = zone.getBoundingClientRect();
+    const half = base.offsetWidth / 2;
+    const x = Math.max(zr.left + half, Math.min(zr.right - half, t.clientX));
+    const y = Math.max(zr.top + half, Math.min(zr.bottom - half, t.clientY));
+    base.style.left = (x - zr.left - half) + 'px';
+    base.style.top = (y - zr.top - half) + 'px';
+    base.style.bottom = 'auto';
+    base.classList.add('active');
+    cx = x; cy = y;
     input.joyActive = true;
+    input.joy.set(0, 0);
   }, { passive: false });
 
   zone.addEventListener('touchmove', (e) => {
@@ -65,11 +77,13 @@ export function initInput(rendererDom, { onToggleMute }) {
       if (t.identifier !== touchId) continue;
       const dx = t.clientX - cx;
       const dy = t.clientY - cy;
-      const max = 50;
       const len = Math.hypot(dx, dy);
-      const k = len > max ? max / len : 1;
+      const k = len > MAX ? MAX / len : 1;
       knob.style.transform = `translate(${dx * k}px, ${dy * k}px)`;
-      input.joy.set((dx * k) / max, (dy * k) / max);
+      const mag = Math.min(1, len / MAX);
+      if (mag < DEAD) { input.joy.set(0, 0); continue; }
+      const out = (mag - DEAD) / (1 - DEAD);
+      input.joy.set((dx / len) * out, (dy / len) * out);
     }
   }, { passive: false });
 
@@ -80,6 +94,8 @@ export function initInput(rendererDom, { onToggleMute }) {
       input.joyActive = false;
       input.joy.set(0, 0);
       knob.style.transform = 'translate(0,0)';
+      base.style.left = base.style.top = base.style.bottom = '';
+      base.classList.remove('active');
     }
   };
   zone.addEventListener('touchend', end);
@@ -93,8 +109,28 @@ export function initInput(rendererDom, { onToggleMute }) {
   fireBtn.addEventListener('touchend', () => { input.touchFiring = false; });
   fireBtn.addEventListener('touchcancel', () => { input.touchFiring = false; });
 
-  // audio unlock on first gesture
+  // Short taps on the battlefield pick a target (consumed by PlayerController).
+  const tapStart = new Map();
+  rendererDom.addEventListener('touchstart', (e) => {
+    for (const t of e.changedTouches) {
+      tapStart.set(t.identifier, { x: t.clientX, y: t.clientY, t: performance.now() });
+    }
+  }, { passive: true });
+  rendererDom.addEventListener('touchend', (e) => {
+    for (const t of e.changedTouches) {
+      const s = tapStart.get(t.identifier);
+      tapStart.delete(t.identifier);
+      if (!s) continue;
+      if (performance.now() - s.t < 350 && Math.hypot(t.clientX - s.x, t.clientY - s.y) < 16) {
+        input.taps.push({ x: t.clientX, y: t.clientY });
+      }
+    }
+  }, { passive: true });
+
+  // Audio unlock. Android only grants user activation on touchend/click (not
+  // pointerdown/touchstart), so listen on all of them for the page lifetime.
   const unlock = () => { AudioFX.init(); AudioFX.resume(); };
-  window.addEventListener('pointerdown', unlock);
-  window.addEventListener('keydown', unlock);
+  for (const ev of ['pointerdown', 'touchend', 'click', 'keydown']) {
+    window.addEventListener(ev, unlock, { capture: true, passive: true });
+  }
 }

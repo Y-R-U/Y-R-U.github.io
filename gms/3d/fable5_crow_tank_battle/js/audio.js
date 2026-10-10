@@ -12,9 +12,15 @@ export const AudioFX = {
 
   init() {
     if (this.ctx) return;
+    // iPhone: play through the silent switch like any other game audio.
+    try { if (navigator.audioSession) navigator.audioSession.type = 'playback'; } catch {}
     const AC = window.AudioContext || window.webkitAudioContext;
     if (!AC) return;
     this.ctx = new AC();
+    document.addEventListener('visibilitychange', () => {
+      if (document.hidden) this.ctx.suspend().catch(() => {});
+      else this.resume();
+    });
     this.master = this.ctx.createGain();
     this.master.gain.value = this.muted ? 0 : 0.5;
     this.master.connect(this.ctx.destination);
@@ -27,8 +33,11 @@ export const AudioFX = {
     this.startAmbient();
   },
 
+  // Covers 'suspended' and iOS 'interrupted'. Never resume a hidden tab.
   resume() {
-    if (this.ctx && this.ctx.state === 'suspended') this.ctx.resume();
+    if (this.ctx && this.ctx.state !== 'running' && !document.hidden) {
+      this.ctx.resume().catch(() => {});
+    }
   },
 
   setMuted(m) {
@@ -192,6 +201,56 @@ export const AudioFX = {
     src.connect(nf).connect(ng).connect(this.master);
     src.start(t0);
     src.stop(t0 + dur + 0.05);
+  },
+
+  // The murder pecking you: a short raspy caw plus a dry tearing scratch.
+  // Distinct from a bolt hit so you know it's the ring, not a tank.
+  peck() {
+    if (!this.ctx) return;
+    this.caw(1.35 + Math.random() * 0.2, 0.55);
+    const t0 = this.ctx.currentTime;
+    const src = this.ctx.createBufferSource();
+    src.buffer = this.noiseBuf;
+    const f = this.ctx.createBiquadFilter();
+    f.type = 'bandpass';
+    f.frequency.value = 2600;
+    f.Q.value = 3;
+    const g = this.ctx.createGain();
+    this.env(g, 0.22, 0.07, t0);
+    src.connect(f).connect(g).connect(this.master);
+    src.start(t0, Math.random() * 0.5);
+    src.stop(t0 + 0.08);
+  },
+
+  // Hit confirm: a crisp high tick when your own bolt lands.
+  confirm() {
+    if (!this.ctx) return;
+    const t0 = this.ctx.currentTime;
+    const o = this.ctx.createOscillator();
+    o.type = 'triangle';
+    o.frequency.setValueAtTime(1800, t0);
+    o.frequency.exponentialRampToValueAtTime(1200, t0 + 0.05);
+    const g = this.ctx.createGain();
+    this.env(g, 0.11, 0.06, t0);
+    o.connect(g).connect(this.master);
+    o.start(t0);
+    o.stop(t0 + 0.07);
+  },
+
+  // Buff pickup: rising three-note shimmer.
+  powerup() {
+    if (!this.ctx) return;
+    const t0 = this.ctx.currentTime;
+    [523, 784, 1175].forEach((f, i) => {
+      const o = this.ctx.createOscillator();
+      o.type = 'triangle';
+      o.frequency.value = f;
+      const g = this.ctx.createGain();
+      this.env(g, 0.1, 0.22, t0 + i * 0.06);
+      o.connect(g).connect(this.master);
+      o.start(t0 + i * 0.06);
+      o.stop(t0 + i * 0.06 + 0.25);
+    });
   },
 
   pickup() {
