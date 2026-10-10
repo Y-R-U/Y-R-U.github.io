@@ -135,11 +135,12 @@ export function setPropQuality(q) { QUALITY = q === 'med' ? 'medium' : (q || 'hi
 export const propQuality = () => QUALITY;
 
 // Rounded box with analytic smooth normals. seg drops on medium/low quality.
-export function roundedBox(w, h, d, r, seg = 3) {
+// nx (optional): extra evenly spaced slices along X between the rounded ends, so the box can bend (table.warp)
+export function roundedBox(w, h, d, r, seg = 3, nx = 0) {
   seg = QUALITY === 'low' ? 1 : QUALITY === 'medium' ? Math.min(seg, 2) : seg;
   r = Math.min(r, w / 2 - 1e-4, h / 2 - 1e-4, d / 2 - 1e-4);
-  const s = seg * 2 + 1;
-  const g = new THREE.BoxGeometry(w, h, d, s, s, s);
+  const s = seg * 2 + 1, sx = nx ? seg * 2 + nx : s;
+  const g = new THREE.BoxGeometry(w, h, d, sx, s, s);
   const pos = g.attributes.position, nor = g.attributes.normal;
   const half = [w / 2, h / 2, d / 2];
   const map = (x, hw) => {
@@ -148,10 +149,17 @@ export function roundedBox(w, h, d, r, seg = 3) {
     if (idx >= s - seg) return hw - r * (s - idx) / seg;
     return 0;
   };
+  const mapX = (x, hw) => {
+    if (!nx) return map(x, hw);
+    const idx = Math.round((x / hw + 1) / 2 * sx);
+    if (idx <= seg) return -hw + r * idx / seg;
+    if (idx >= sx - seg) return hw - r * (sx - idx) / seg;
+    return -hw + r + (2 * hw - 2 * r) * (idx - seg) / nx;
+  };
   const p = new THREE.Vector3(), c = new THREE.Vector3(), n = new THREE.Vector3();
   for (let i = 0; i < pos.count; i++) {
     p.fromBufferAttribute(pos, i);
-    const a = [map(p.x, half[0]), map(p.y, half[1]), map(p.z, half[2])];
+    const a = [mapX(p.x, half[0]), map(p.y, half[1]), map(p.z, half[2])];
     for (let k = 0; k < 3; k++) {
       if (Math.abs(p.getComponent(k)) >= half[k] - 1e-6) a[k] = Math.sign(p.getComponent(k)) * half[k];
     }

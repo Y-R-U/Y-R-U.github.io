@@ -341,8 +341,12 @@ T.brawl = async () => {
   const cur = await E('S.cur()');
   if (cur === 'fp_fire') await pressE(); else await E(`S.ctx().interact.items.get('fp_fire').onInteract()`);
   const brawl = await until(`S.fp().active.has('brawl')`, 3000);
-  await sleep(5000); await shot('10_brawl', `S.A('sofaFoot').pos.clone().setY(1.0)`);
+  const cloud = await until(`(() => { const d = S.fp().active.get('brawl')?.data; return !!d?.cloud && !d.cloud.dead && !S.ctx().jon.root.visible && !S.ctx().lyman.root.visible; })()`, 9000);
+  await sleep(1500); await shot('10_brawl', `S.A('sofaFoot').pos.clone().setY(1.0)`);
   ok('spit-ball Odie while they watch telly → the coffee brawl', sofa && brawl, `fire via ${cur === 'fp_fire' ? 'E' : 'direct call (another interactable was nearer)'}`);
+  ok('…the brawl is a dust cloud with Jon + Lyman hidden inside (D23)', cloud, await E(`'odie inside: ' + !!S.fp().active.get('brawl')?.data.withOdie`));
+  const out = await until(`(() => { const d = S.fp().active.get('brawl')?.data; return !!d?.cloudDone && d.cloud.dead && S.ctx().jon.root.visible && S.ctx().lyman.root.visible && S.ctx().odie.root.visible; })()`, 15000);
+  ok('…the cloud poofs away and everyone reappears', out);
   const end = await until(`!S.fp().active.has('brawl')`, 30000);
   const hs = await E(`JSON.stringify(S.snap().hs.map((h) => h.st + '/' + h.task))`);
   ok('…they make up and carry on', end, hs);

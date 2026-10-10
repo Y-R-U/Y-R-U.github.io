@@ -7,7 +7,9 @@ const STEPS = 14, RISE = UF / STEPS, RUN = 0.27, ST_X0 = 8.1, ST_X1 = W, ST_Z0 =
 export const STAIRS = { x0: ST_X0, x1: ST_X1, z0: ST_Z0, z1: ST_Z1, steps: STEPS, rise: RISE, run: RUN };
 // Lyman's door (landing → his room) and the under-stair cupboard (steps CUP_S0..CUP_S1 are hollow underneath)
 const LY_DOOR = [7.75, 8.6];
-export const CUPBOARD = { x0: ST_X0 + 0.04, x1: ST_X1, s0: 5, s1: 13, door: [2.55, 3.2], doorH: 1.25, slab: 0.22 };
+// wall: the side wall facing the living room is WALL thick and its collider reaches COL either side, so a pressed-up
+// nose (Garfield 0.17 m, Odie 0.28 m past their radius) stays hidden inside the wall from both rooms
+export const CUPBOARD = { x0: ST_X0 + 0.04, x1: ST_X1, s0: 5, s1: 13, door: [2.55, 3.2], doorH: 1.25, slab: 0.22, wall: 0.22, col: [-0.06, 0.28] };
 
 export const ROOMS = [
   { id: 'living', x0: 0, x1: W, z0: 0, z1: 5.4, y0: 0, y1: CEIL1 },
@@ -235,8 +237,9 @@ export function buildHouse({ quality = 'high' } = {}) {
     if (hollow) {
       // cupboard side wall with the door hole cut out; stepped ceiling inside
       const [d0, d1] = CUPBOARD.door, dh = CUPBOARD.doorH;
-      for (const [a, c] of [[z0, Math.min(z1, d0)], [Math.max(z0, d1), z1]]) if (c > a) b.box('paint', ST_X0, 0, a, ST_X0 + 0.01, y - 0.04, c, C.trim, { cast: false });
-      if (z1 > d0 && z0 < d1) b.box('paint', ST_X0, dh, Math.max(z0, d0), ST_X0 + 0.01, y - 0.04, Math.min(z1, d1), C.trim, { cast: false });
+      const wt = CUPBOARD.wall;
+      for (const [a, c] of [[z0, Math.min(z1, d0)], [Math.max(z0, d1), z1]]) if (c > a) b.box('paint', ST_X0, 0, a, ST_X0 + wt, y - 0.04, c, C.trim, { cast: false });
+      if (z1 > d0 && z0 < d1) b.box('paint', ST_X0, dh, Math.max(z0, d0), ST_X0 + wt, y - 0.04, Math.min(z1, d1), C.trim, { cast: false });
       b.box('paint', ST_X0 + 0.01, under, z0, ST_X1, under + 0.02, z1, 0xe8dcc4, { cast: false });
     } else b.box('paint', ST_X0, 0, z0, ST_X0 + 0.01, y - 0.04, z1, C.trim, { cast: false });
     col(`stair${i}`, ST_X0, hollow ? under : 0, z0, ST_X1, y, i === STEPS ? ST_Z1 + 0.02 : z1, 'solid', { stairs: true });
@@ -275,10 +278,11 @@ export function buildHouse({ quality = 'high' } = {}) {
     // side wall colliders (the door hole stays open; cupboardDoor's blocker closes it)
     for (let i = s0, k = 0; i <= s1; i++) {
       const a = ST_Z0 + (i - 1) * RUN, c = a + RUN, top = i * RISE - CUPBOARD.slab + 0.01;
-      for (const [p0, p1] of [[a, Math.min(c, z0)], [Math.max(a, z1), c]]) if (p1 > p0) col('cupWall' + k++, ST_X0 - 0.02, 0, p0, ST_X0 + 0.04, top, p1, 'solid', { wall: true });
-      if (c > z0 && a < z1) col('cupWall' + k++, ST_X0 - 0.02, h, Math.max(a, z0), ST_X0 + 0.04, top, Math.min(c, z1), 'solid', { wall: true });
+      const [c0, c1] = CUPBOARD.col;
+      for (const [p0, p1] of [[a, Math.min(c, z0)], [Math.max(a, z1), c]]) if (p1 > p0) col('cupWall' + k++, ST_X0 + c0, 0, p0, ST_X0 + c1, top, p1, 'solid', { wall: true });
+      if (c > z0 && a < z1) col('cupWall' + k++, ST_X0 + c0, h, Math.max(a, z0), ST_X0 + c1, top, Math.min(c, z1), 'solid', { wall: true });
     }
-    anchor('cupboardDoor', ST_X0 - 0.01, 0, (z0 + z1) / 2, -Math.PI / 2, { w: z1 - z0, h });
+    anchor('cupboardDoor', ST_X0 - 0.01, 0, (z0 + z1) / 2, -Math.PI / 2, { w: z1 - z0, h, block: [-0.01 - CUPBOARD.col[1], -0.01 - CUPBOARD.col[0]] });
     anchor('cupboardFront', ST_X0 - 0.55, 0, (z0 + z1) / 2, Math.PI / 2);
     anchor('cupboardInside', (ST_X0 + ST_X1) / 2 + 0.05, 0, (z0 + z1) / 2 + 0.25, 0);
     // against the back wall, facing the door: visible from outside and from cam_cupboard

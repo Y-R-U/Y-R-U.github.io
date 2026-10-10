@@ -243,6 +243,26 @@ export function buildClips() {
   });
   C.give_bowl.props.push([1.2, null]);
 
+  // generic "bend down and pick something up" (newspaper, plate): right hand reaches the floor ~0.6 s; NO props
+  add('pick_up', {
+    dur: 1.2, face: [[0, 'neutral']],
+    keys: [
+      [0, {}],
+      [0.3, { pos: [0, -0.1, 0], spine: [24, 0, 0], chest: [10, 0, 0], ...S({ thighL: [-24, 0, 3], shinL: [34, 0, 0], footL: [-10, 0, 0] }),
+        uarmR: [-40, 0, -4], farmR: [-20, 0, 0] }],
+      [0.6, { pos: [0, -0.44, -0.1], spine: [50, 0, 0], chest: [20, 0, 0], neck: [-34, 0, 0], head: [12, 0, 0],
+        ...S({ thighL: [-86, 0, 14], shinL: [110, 0, 0], footL: [-24, 0, 0] }),
+        uarmR: [-82, 0, -2], farmR: [-12, 0, 0], handR: [-40, 0, 0], fingR: [0, 0, 50],
+        uarmL: [-30, 0, 14], farmL: [-50, 0, 0] }],
+      [0.72, { pos: [0, -0.45, -0.1], fingR: [0, 0, 70] }],
+      [1.0, { pos: [0, -0.08, 0], spine: [12, 0, 0], chest: [4, 0, 0], neck: [-6, 0, 0], head: [6, 0, 0],
+        ...S({ thighL: [-10, 0, 2], shinL: [14, 0, 0], footL: [-4, 0, 0] }), uarmR: [-40, 0, -6], farmR: [-55, 0, 0], handR: [0, 0, 0], fingR: [0, 0, 20], uarmL: [-4, 0, 8], farmL: [-12, 0, 0] }],
+      [1.2, { pos: [0, 0, 0], spine: [2, 0, 0], chest: [0, 0, 0], neck: [-2, 0, 0], head: [4, 0, 0],
+        ...S({ thighL: [0, 0, 1], shinL: [2, 0, 0], footL: [0, 0, 0], uarmL: [2, 0, 7], farmL: [-10, 0, 0], handL: [0, 0, 0], fingL: [0, 0, -14] }) }],
+    ],
+    ev: { grab: 0.65 },
+  });
+
   add('serve', {
     dur: 2.2, face: [[0, 'happy']], props: [[0, 'spoon']],
     keys: [

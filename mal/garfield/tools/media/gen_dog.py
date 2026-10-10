@@ -19,6 +19,20 @@ CLIPS = {
     "whine": (DOG + " trembles and whines in fear, a long scared high-pitched dog whine, shaking." + TAIL, 73),
     "sniff": (DOG + " sniffs the floor loudly, quick snuffling sniff sniff sniff sounds with its nose." + TAIL, 73),
 }
+# Wave 4: natural medium-size dog for everything except the yip (son: "too high-pitched / goofy").
+NAT = "A real medium-sized golden Labrador dog in a cosy living room,"
+NTAIL = " Realistic natural dog sounds, normal medium-size dog voice, not a small dog, not a cartoon. Clear close-up sound recording, no music, no people talking."
+CLIPS.update({
+    "nbark": (NAT + " barks twice, a deep natural 'woof! woof!'." + NTAIL, 73),
+    "nyap": (NAT + " barks happily and excitedly, a few playful friendly barks, tail wagging." + NTAIL, 73),
+    "nwhine": (NAT + " is scared and whines, a long low trembling dog whine." + NTAIL, 73),
+    "nwhimper": (NAT + " whimpers sadly, soft low whimpering sighs, ears drooping." + NTAIL, 73),
+    "nmuffled": ("A real medium-sized dog shut inside a closed wooden cupboard whines and whimpers, the sound muffled through the door, a paw scratching the wood." + NTAIL, 73),
+    "npant": (NAT + " pants steadily with its tongue out after running, rhythmic dog panting breaths." + NTAIL, 121),
+    "nsniff": (NAT + " sniffs along the carpet, quick snuffling sniffs with its nose." + NTAIL, 73),
+    "ngrowl": (NAT + " plays tug of war, a playful low growl then one bark, 'grrrr-woof!'." + NTAIL, 73),
+    "nshake": (NAT + " shakes itself off hard, ears and jowls flapping, a fluttery 'brrrr' lip flap and collar tags jingling." + NTAIL, 73),
+})
 
 
 def req(base, path, data=None):

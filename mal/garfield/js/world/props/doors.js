@@ -14,7 +14,8 @@ function doorSlab(w, h, paint) {
 }
 
 // Hinged door. Anchor = centre of the opening at floor, +Z = the side it swings toward; hinge on local -X.
-function makeDoor(id, ctx, { w = 0.85, h = 2.05, color = 0xf1e6cf, wood = false, startOpen = false, locked = false } = {}) {
+// block = [zMin, zMax] of the closed-door collider in door space (default a 12 cm slab round the leaf)
+function makeDoor(id, ctx, { w = 0.85, h = 2.05, color = 0xf1e6cf, wood = false, startOpen = false, locked = false, block: bz = [-0.06, 0.06] } = {}) {
   const p = makeProp(id, ctx);
   const paint = wood ? gloss(0xffffff, { map: woodTex('#a8683a', '#6e3d1d', 'door'), roughness: 0.45, clearcoat: 0.5 }) : gloss(color, { roughness: 0.4, clearcoat: 0.4 });
   const brass = new THREE.MeshStandardMaterial({ color: 0xd8a843, metalness: 0.85, roughness: 0.28 });
@@ -30,7 +31,7 @@ function makeDoor(id, ctx, { w = 0.85, h = 2.05, color = 0xf1e6cf, wood = false,
     kb.add(new THREE.CylinderGeometry(0.035, 0.035, 0.006, 16), brass, { pos: [0, 0, s * 0.026], rot: [Math.PI / 2, 0, 0] });
   }
   knob.add(kb.build('knob'));
-  const block = addBox(p, 'blocker', p.root, [-w / 2, 0, -0.06], [w / 2, h, 0.06]);
+  const block = addBox(p, 'blocker', p.root, [-w / 2, 0, bz[0]], [w / 2, h, bz[1]]);
 
   const OPEN = -1.75;
   Object.assign(p.state, { open: startOpen, locked });
@@ -76,5 +77,5 @@ function makeDoor(id, ctx, { w = 0.85, h = 2.05, color = 0xf1e6cf, wood = false,
 
 export const createBedroomDoor = ctx => makeDoor('bedroomDoor', ctx, { color: 0xf4ead6, startOpen: true });
 export const createLymanDoor = ctx => makeDoor('lymanDoor', ctx, { color: 0xeadfc8 });
-export const createCupboardDoor = (ctx, { w = 0.65, h = 1.25 } = {}) => makeDoor('cupboardDoor', ctx, { w, h, color: 0xf3e6cc });
+export const createCupboardDoor = (ctx, { w = 0.65, h = 1.25, block } = {}) => makeDoor('cupboardDoor', ctx, { w, h, block, color: 0xf3e6cc });
 export const createFrontDoor = ctx => makeDoor('frontDoor', ctx, { w: 0.9, wood: true, locked: true });

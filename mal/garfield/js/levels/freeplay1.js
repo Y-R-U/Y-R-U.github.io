@@ -4,7 +4,7 @@ import { sillHelpers, vaseLevel, intoRoom } from './shared.js';
 import { legPositions, dodgeFall } from './l02.js';
 import { bedPos, doorPos, insideRoom } from './l08.js';
 import { fallDir } from './l10.js';
-import { fridgeTopPos, climbRoute, addBreadBin, onFridge, GRIP } from './l05.js';
+import { fridgeTopPos, climbRoute, addBreadBin, onFridge, rideVine } from './l05.js';
 import { bestShot } from '../game/shots.js';
 
 // Chapter One Free Play (BRIEF2, D21; docs/LEVELS2.md §1): no objectives. Jon has a day of his own (wander / sit at
@@ -466,36 +466,17 @@ function setupVine(L) {
   });
 }
 
-const SLOW = 0.8;
 function jonHead(L) {
   const h = L.ctx.jon.sockets?.head;
   return h ? h.getWorldPosition(V()) : L.ai.pos().setY(1.25);
 }
-function tipAt(L, t) {
-  const vine = prop(L.ctx, 'vine');
-  if (vine?.swingAngle) return vine.swingAngle(vine.theta0 * Math.cos(vine.omega * SLOW * t)).clone();
-  const a = fridgeTopPos(L.ctx).add(V(0, 0.42, 0)), b = platePos(L.ctx).add(V(0, 0.55, 0));
-  const s = (1 - Math.cos(2.2 * SLOW * t)) / 2;
-  return a.lerp(b.addScaledVector(V(b.x - a.x, 0, b.z - a.z).normalize(), 0.6), s);
-}
-// How close does the swing ever get to Jon's head? The "over Jon" radius adapts so it's always reachable.
-function overRadius(L) {
-  const vine = prop(L.ctx, 'vine'), head = jonHead(L);
-  if (!vine?.swingAngle) return 0.8;
-  let best = 9;
-  for (let k = 0; k <= 40; k++) {
-    const tip = vine.swingAngle(vine.theta0 * Math.cos((k / 40) * Math.PI)).clone();
-    best = Math.min(best, flat(tip, head));
-  }
-  vine.swingAngle(vine.theta0);
-  return Math.max(0.65, best + 0.3);
-}
+const OVER_R = 0.75;   // rideVine's path passes over the table near the plate, i.e. right over seated Jon
 
 function startSwing(L) {
   const { ctx } = L;
   const vine = prop(ctx, 'vine');
   L.flags.swinging = true; L.flags.st = 0; L.flags.passes = 0; L.flags.lastSide = 1; L.flags.hitJon = false;
-  L.flags.overR = overRadius(L);
+  L.flags.sw = null; L.flags.tip0 = null;
   ctx.controller.lock(true);
   ctx.controller.animHold = true;
   if (vine) { vine.autoSwing = false; vine.grab?.(); }
@@ -511,24 +492,14 @@ function startSwing(L) {
 
 function updateSwing(L, dt) {
   const { ctx } = L;
-  const c = ctx.controller, g = ctx.garfield, vine = prop(ctx, 'vine');
+  const g = ctx.garfield;
   L.flags.st += dt * (L.flags.over ? 0.45 : 1);
-  const tip = tipAt(L, L.flags.st);
-  const dir = vine?.dirH || V(0, 0, -1);
-  const yaw = Math.atan2(dir.x, dir.z);
-  g.root.rotation.y = yaw;
-  const grip = GRIP.clone().applyAxisAngle(V(0, 1, 0), yaw);
-  const gy = ctx.world.groundAt?.(tip.x - grip.x, tip.z - grip.z, tip.y) ?? 0;
-  const lift = Math.max(0, gy + 0.04 - (tip.y - grip.y));
-  if (lift > 0) tip.y += lift;
-  c.pos.set(tip.x - grip.x, tip.y - grip.y, tip.z - grip.z);
-  c.vel.set(0, 0, 0);
+  const { paws, phase } = rideVine(L, L.flags.st, platePos(ctx));
   const canHit = seatedIdle(L) && !L.flags.hitJon;
-  const over = canHit && flat(tip, jonHead(L)) < L.flags.overR;
+  const over = canHit && flat(paws, jonHead(L)) < OVER_R;
   L.flags.over = over;
   if (over) L.flags.overAt = L.t;
   ctx.ui?.hud?.set?.({ interactLabel: over ? 'SCRATCH!' : null });
-  const phase = (vine?.omega || 2.2) * SLOW * L.flags.st;
   const side = Math.sign(Math.sin(phase)) || 1;
   if (side !== L.flags.lastSide) { L.flags.lastSide = side; L.flags.passes++; }
   const pressed = L.flags.st > 0.4 && (ctx.input?.jumpPressed || ctx.input?.interact || ctx.input?.scratch);
@@ -546,11 +517,16 @@ function updateSwing(L, dt) {
 function endSwing(L) {
   const { ctx } = L;
   const vine = prop(ctx, 'vine');
+  const P = L.flags.sw;
   L.flags.swinging = false; L.flags.over = false;
-  try { vine?.release?.(); vine && (vine.autoSwing = true); vine?.reset?.(); } catch {}
+  L.flags.sw = null; L.flags.tip0 = null;
+  try { if (vine?.letGo) vine.letGo(0.35); else { vine?.release?.(); vine?.reset?.(); } vine && (vine.autoSwing = true); } catch {}
   const ft = fridgeTopPos(ctx);
-  const land = vine?.grabPoint ? vine.grabPoint.clone().setY(ft.y).lerp(ft, 0.4) : ft.clone();
-  ctx.controller.teleport(land.setY(ft.y + 0.05), ctx.garfield.root.rotation.y + Math.PI);
+  // he's already standing on the fridge top at the end of the ride: settle the controller there (no spin)
+  const at = P ? P.F.clone() : ft.clone();
+  at.y = ft.y + 0.005;
+  ctx.controller.teleport(at, ctx.garfield.root.rotation.y);
+  ctx.garfield.setHangTuck?.(0);
   ctx.controller.animHold = false;
   ctx.controller.lock(false);
   ctx.camera.follow?.({ dur: 0.6 });

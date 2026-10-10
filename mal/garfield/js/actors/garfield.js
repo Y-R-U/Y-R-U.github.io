@@ -329,7 +329,7 @@ export async function createGarfield({ quality = 'high', shellFur = false } = {}
 
   // ---- animation state
   const makePose = () => new Pose(BONES.map((b) => b[0]), EXT);
-  const ctx = { time: 0, locoSpeed: 0, phase: 0, tmpPose: makePose(), seethe: 0 };
+  const ctx = { time: 0, locoSpeed: 0, phase: 0, tmpPose: makePose(), seethe: 0, hangTuck: 0 };
   const listeners = {};
   const emit = (ev, d) => (listeners[ev] || []).forEach((f) => f(d));
   let evClip = null, evT = 0;
@@ -538,6 +538,14 @@ export async function createGarfield({ quality = 'high', shellFur = false } = {}
     setExpression(name) { if (EXPRESSIONS[name]) expr = name; },
     // hold-to-build glare intensity for the 'seethe' clip
     setSeethe(v) { ctx.seethe = clamp(v || 0, 0, 1); },
+    // 'hang' clip: 0 = full dangle, 1 = arms bent + hind feet under him (standing on the fridge holding the vine)
+    setHangTuck(v) { ctx.hangTuck = clamp(v || 0, 0, 1); },
+    // midpoint of the front paws in root space, from the current skeleton (the vine tip goes here)
+    gripLocal(out = new THREE.Vector3()) {
+      root.updateMatrixWorld(true);
+      sockets.pawL.getWorldPosition(out); sockets.pawR.getWorldPosition(tv);
+      return root.worldToLocal(out.add(tv).multiplyScalar(0.5));
+    },
     // bald gag (Ch2 L8): pink skin, no stripes; same mesh. setBald(false) restores the fur.
     setBald(on) {
       bald = !!on;

@@ -122,12 +122,13 @@ export function createGame(sys) {
     chapter(2);
   }
 
+  // D25: opponent select, no difficulty levels. Harder fights will be new opponents (unlocked by later chapters).
   async function arenaMenu() {
-    const v = await ui.popup?.({ title: 'Arena', text: 'Garfield vs Odie in Jon\'s bedroom. First to 20 wins!', buttons: [
-      { label: 'Very Easy', value: 'veryEasy', style: 'cream' }, { label: 'Easy', value: 'easy', style: 'primary' },
-      { label: 'Medium (soon)', value: 'locked', style: 'cream' }, { label: 'Back', value: null, style: 'cream' }], cancelValue: null });
-    if (v === 'locked') { ui.toast?.('Harder opponents are coming soon!'); return arenaMenu(); }
-    if (v) startLevel('arena', { difficulty: v });
+    const v = await ui.opponents?.({ opponents: [
+      { id: 'odie', label: 'Odie', icon: 'dog' },
+      { id: 'next', locked: true, lockedText: 'Play through chap four to unlock' },
+    ] });
+    if (v && game.state === 'menu') startLevel('arena', { opponent: v });
   }
 
   ui.on?.('chapter', (id) => {

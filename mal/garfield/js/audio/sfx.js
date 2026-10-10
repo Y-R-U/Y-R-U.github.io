@@ -411,14 +411,15 @@ export const SFX = {
     return 0.25;
   },
   bark(ctx, out, t, r) {
-    for (let i = 0; i < 2; i++) catVoice(ctx, out, t + i * 0.32, { pitch: R(300, 360) * r, dur: 0.18, vol: 0.5,
+    for (let i = 0; i < 2; i++) catVoice(ctx, out, t + i * 0.32, { pitch: R(210, 250) * r, dur: 0.18, vol: 0.5,
       shape: { pitch: [0.9, 1.3, 0.85], formants: [[700, 500, 2.5, 1], [1600, 1100, 4, 0.6], [350, 300, 2, 0.6]] } });
     hiss(ctx, out, t, { type: 'lowpass', f: 1500, dur: 0.08, vol: 0.2 });
     return 0.6;
   },
   yap(ctx, out, t, r) {
-    for (let i = 0; i < 3; i++) SFX.yip(ctx, out, t + i * 0.17, r * R(0.85, 1));
-    return 0.6;
+    for (let i = 0; i < 3; i++) catVoice(ctx, out, t + i * 0.2, { pitch: R(260, 310) * r, dur: 0.13, vol: 0.45,
+      shape: { pitch: [0.9, 1.25, 0.85], formants: [[750, 550, 2.5, 1], [1700, 1200, 4, 0.6], [350, 300, 2, 0.6]] } });
+    return 0.7;
   },
   pant(ctx, out, t, r) {
     for (let i = 0; i < 8; i++) {
@@ -428,12 +429,12 @@ export const SFX = {
     return 1.7;
   },
   whine(ctx, out, t, r) {
-    catVoice(ctx, out, t, { pitch: R(700, 800) * r, dur: 0.9, vol: 0.3, vib: 0.03,
+    catVoice(ctx, out, t, { pitch: R(460, 520) * r, dur: 0.9, vol: 0.3, vib: 0.03,
       shape: { pitch: [0.9, 1.15, 1.05, 1.2, 0.85], formants: [[1000, 900, 6, 1], [2600, 2400, 8, 0.4], [400, 400, 3, 0.3]] } });
     return 1.0;
   },
   whimper(ctx, out, t, r) {
-    for (let i = 0; i < 3; i++) catVoice(ctx, out, t + i * 0.28, { pitch: R(650, 760) * r, dur: 0.22, vol: 0.25,
+    for (let i = 0; i < 3; i++) catVoice(ctx, out, t + i * 0.28, { pitch: R(420, 490) * r, dur: 0.22, vol: 0.25,
       shape: { pitch: [1.1, 1.0, 0.8], formants: [[1000, 800, 6, 1], [2500, 2300, 8, 0.4], [400, 400, 3, 0.3]] } });
     return 0.9;
   },
@@ -442,13 +443,17 @@ export const SFX = {
 // Recorded-style samples (audio/sfx/<file>.mp3). audio.sfx(name) picks a random variant and falls back to SFX[name]
 // until the buffer has loaded. `loop: true` entries are what audio.sfxLoop(name) expects.
 export const SAMPLES = {
+  // Wave 4: everything but `yip` is a natural medium-size dog (pitched down with tools/media/pitchdown.py), ~340–410 Hz.
   bark: { files: ['bark_1', 'bark_2', 'bark_3'], jitter: 0.04 },
   yip: { files: ['yip_1', 'yip_2', 'yip_3'], jitter: 0.05 },
-  yap: { files: ['yap_1', 'yap_2'], jitter: 0.04 },
-  pant: { files: ['pant_1'], loop: 'pant_loop', len: 3.45, gain: 0.8 },
-  whine: { files: ['whine_1', 'whine_2'], jitter: 0.03 },
-  whimper: { files: ['whimper_1', 'whimper_2'], jitter: 0.03 },
-  sniff: { files: ['sniff_1', 'sniff_2'], jitter: 0.06, gain: 0.8 },
+  yap: { files: ['yap_1', 'yap_2', 'yap_3'], jitter: 0.04 },
+  growl: { files: ['growl_1', 'growl_2'], jitter: 0.03 },
+  pant: { files: ['pant_1', 'pant_2'], loop: 'pant_loop', len: 3.53, gain: 0.8 },
+  whine: { files: ['whine_1', 'whine_2', 'whine_3'], jitter: 0.03 },
+  whimper: { files: ['whimper_1', 'whimper_2', 'whimper_3'], jitter: 0.03 },
+  whine_muffled: { files: ['muffled_1', 'muffled_2'], jitter: 0.03 },
+  sniff: { files: ['sniff_1', 'sniff_2', 'sniff_3'], jitter: 0.06, gain: 0.8 },
+  shake: { files: ['shake_1', 'shake_2'], jitter: 0.05, gain: 0.8 },
   aww: { files: ['aww_1'] },
 };
 

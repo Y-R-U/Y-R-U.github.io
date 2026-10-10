@@ -6,22 +6,25 @@ const V = (x = 0, y = 0, z = 0) => new THREE.Vector3(x, y, z);
 const flat = (a, b) => Math.hypot(a.x - b.x, a.z - b.z);
 const wrap = (a) => Math.atan2(Math.sin(a), Math.cos(a));
 
-export const DIFFICULTY = {
-  veryEasy: { speed: 1.5, every: [4, 6], tele: 1.1, lunge: 2.0, trip: 0.45, dumb: 0.3, combo: 4, label: 'Very Easy' },
-  easy: { speed: 2.0, every: [3, 4.5], tele: 0.85, lunge: 2.3, trip: 0.25, dumb: 0.15, combo: 3, label: 'Easy' },
+// D25: no difficulty system. Each opponent has one tuning; harder play = other opponents later (chapter four+).
+// TUTORIAL is Ch2 L7's guided first bout only, never offered as a choice.
+export const OPPONENTS = {
+  odie: { speed: 2.0, every: [3, 4.5], tele: 0.85, lunge: 2.3, trip: 0.25, dumb: 0.15, combo: 3, label: 'Odie' },
 };
+export const TUTORIAL = { speed: 1.5, every: [4, 6], tele: 1.1, lunge: 2.0, trip: 0.45, dumb: 0.3, combo: 4, label: 'Odie' };
 export const ARENA = { to: 20, hitR: 0.55, lungeDur: 0.38, gInvuln: 1.2, oInvuln: 0.9 };
 
-export function createArena(L, { difficulty = 'easy', to = ARENA.to, onPoint } = {}) {
+export function createArena(L, { opponent = 'odie', tutorial = false, to = ARENA.to, onPoint } = {}) {
   const { ctx, odie, odieAI } = L;
-  const D = DIFFICULTY[difficulty] || DIFFICULTY.easy;
+  if (!OPPONENTS[opponent]) opponent = 'odie';
+  const D = tutorial ? TUTORIAL : OPPONENTS[opponent];
   const A = (n) => ctx.world.anchors?.get?.(n) || null;
   const bounds = A('arenaBounds') || { min: V(2.35, 3, 2.15), max: V(5.85, 3, 5.8) };
   const bmin = (bounds.min || bounds.pos?.clone?.().sub(V(1.7, 0, 1.8))).clone(), bmax = (bounds.max || bounds.pos?.clone?.().add(V(1.7, 0, 1.8))).clone();
   const floorY = bmin.y ?? 3;
   const centre = A('arenaCentre')?.pos?.clone() || V((bmin.x + bmax.x) / 2, floorY, (bmin.z + bmax.z) / 2);
   const ar = {
-    g: 0, o: 0, to, over: false, state: 'approach', st: 0, cool: 2.0, gInv: 0, oInv: 0, lungeDir: V(), difficulty, D,
+    g: 0, o: 0, to, over: false, state: 'approach', st: 0, cool: 2.0, gInv: 0, oInv: 0, lungeDir: V(), opponent, D,
     result: null,
   };
   let resolveEnd;

@@ -1,7 +1,7 @@
 import { h, sleep, pressable } from './util.js';
 import * as I from './icons.js';
 import { confetti } from './fx.js';
-import { sparkleBurst } from './menu.js';
+import { sparkleBurst, lockBadge } from './menu.js';
 
 export const btn = (label, cls, onPress, icon) =>
   pressable(h('button.big-btn' + (cls ? '.' + cls : ''), {}, icon ? h('span.btn-ico', { html: icon }) : null, h('span', {}, label)), onPress);
@@ -43,6 +43,31 @@ export function popup(ui, { title = '', text = '', icon = '', buttons = [{ label
       h('div.popup-btns', {}, buttons.map((b) => btn(b.label, b.style || '', () => { ui.emit('sfx', 'click'); done(b.value); }))),
     );
     m = ui.modals.open(card, () => done(cancelValue));
+  });
+}
+
+// D25 Arena opponent select: [{id, label, icon, locked, lockedText}] → Promise<id|null>. Locked cards just wobble.
+export function opponentSelect(ui, { opponents = [], title = 'Arena', text = 'Pick your opponent. First to 20 wins!' } = {}) {
+  return new Promise((res) => {
+    let m;
+    const done = (v) => { ui.modals.close(m); res(v); };
+    const cards = opponents.map((o) => {
+      const b = h('button.big-btn.opp-btn' + (o.locked ? '.is-locked' : '.primary'), { 'data-opp': o.id },
+        h('span.opp-ico', { html: (o.locked ? I.mystery : I[o.icon] || I.dog)() }),
+        h('span.opp-name', {}, o.locked ? (o.lockedText || 'Locked') : o.label));
+      if (o.locked) b.append(lockBadge());
+      return pressable(b, () => {
+        if (o.locked) { b.classList.remove('nope'); void b.offsetWidth; b.classList.add('nope'); ui.emit('sfx', 'boing'); return; }
+        ui.emit('sfx', 'click'); done(o.id);
+      });
+    });
+    const card = h('div.panel.popup.opp-panel', {},
+      h('h3.panel-title', {}, title),
+      text ? h('p.popup-text', {}, text) : null,
+      h('div.opp-row', {}, cards),
+      h('div.popup-btns', {}, btn('Back', 'cream', () => { ui.emit('sfx', 'click'); done(null); })),
+    );
+    m = ui.modals.open(card, () => done(null));
   });
 }
 

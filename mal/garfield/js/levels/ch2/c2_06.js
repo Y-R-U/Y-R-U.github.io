@@ -2,6 +2,7 @@ import { defineLevel2, V, flat, prop, A, apos, sofaTV } from './common2.js';
 import { hidePlates, showPlates } from './c2_02.js';
 import { insideRoom } from '../l08.js';
 import { LINES } from '../../game/lines.js';
+import { brawlCloud, clearSpot } from '../../game/dustcloud.js';
 
 // C2 L6 "Spit Happens": Jon's room → scratch the drawer open → take the spit-ball launcher → fire it at Odie →
 // the coffee-spill brawl. "Much better."
@@ -72,6 +73,7 @@ export default defineLevel2({
   },
   teardown(L) {
     showPlates(L);
+    L.flags.cloud?.kill?.();
     try { L.ctx.lyman?.holdProp?.(null); prop(L.ctx, 'coffeeMug')?.setActive?.(false); prop(L.ctx, 'dresser')?.reset?.(); prop(L.ctx, 'spitballLauncher')?.reset?.(); } catch {}
   },
 });
@@ -119,29 +121,26 @@ function fire(L) {
     ctx.jon.play?.('spilled_on');
     try { ctx.jon.setExpression?.('pain'); } catch {}
     await d.say('jon', 'c2_j_l6_coffee', { text: T('c2_j_l6_coffee') });
-    // up and at it
+    // up and at it: one slap, then the three of them vanish into a cartoon dust cloud (D23)
     jon.leave(); ly.leave();
     const jp = ctx.jon.root.position, lp = ctx.lyman.root.position;
     const mid = jp.clone().lerp(lp, 0.5).setY(0);
     const dir = V(1, 0, 0);
     ctx.jon.root.position.copy(mid.clone().addScaledVector(dir, 0.45)); ctx.lyman.root.position.copy(mid.clone().addScaledVector(dir, -0.45));
     ctx.jon.root.rotation.y = -Math.PI / 2; ctx.lyman.root.rotation.y = Math.PI / 2;
-    d.cut(L.shot(mid.clone().setY(0.8), { dist: 3.0, h: 0.9 }));
+    const spot = clearSpot(ctx, mid, 0.85);
+    d.cut(L.shot(mid.clone().lerp(spot, 0.5).setY(0.8), { dist: 3.6, h: 0.9 }));
+    try { ctx.jon.setExpression?.('angry'); ctx.lyman.setExpression?.('angry'); } catch {}
     ctx.jon.play?.('brawl_slap', { once: true });
     ctx.audio?.sfx?.('whack');
-    await d.wait(0.8);
-    ctx.lyman.play?.('brawl_kick', { once: true });
-    odieAI.place(mid.clone().add(V(0, 0, 0.8)));
-    odieAI.run('kicked', async (t) => { await t.play('hit', 0.5, { fallback: 'dizzy' }); odieAI.noise('o_growl_play'); t.loop('bark'); });
-    await d.wait(0.8);
-    ctx.lyman.play?.('brawl_hit', { once: true });
-    ctx.jon.play?.('brawl_slap', { once: true });
-    await d.wait(0.7);
-    ctx.audio?.sfx?.('brawl');
-    ctx.jon.play?.('brawl_tangle'); ctx.lyman.play?.('brawl_tangle');
-    ctx.camera.shake?.(0.1);
+    odieAI.place(mid.clone().add(V(0, 0, 0.9)));
+    await d.wait(0.55);
+    L.flags.cloud = brawlCloud(ctx, spot, { jon: ctx.jon, lyman: ctx.lyman, odie: L.odie });
+    d.cut(L.shot(spot.clone().setY(0.8), { dist: 3.4, h: 0.9 }));
+    await d.wait(1.6);
     await d.say('lyman', 'c2_l_l6_brawl', { text: T('c2_l_l6_brawl') });
     await d.say('jon', 'c2_j_l6_brawl', { text: T('c2_j_l6_brawl') });
+    await d.wait(0.6);
     const gp = ctx.garfield.root.position;
     d.cut(L.shot(gp.clone().setY(gp.y + 0.35), { dist: 1.4, h: 0.2, prefer: ctx.garfield.root.rotation.y }));
     try { ctx.garfield.setExpression?.('smug'); } catch {}

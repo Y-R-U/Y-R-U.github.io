@@ -30,6 +30,12 @@ r.loopFn = typeof stop;
 await new Promise((res) => setTimeout(res, 800));
 stop();
 const o = await audio.vo('o_yip_2'); r.odieVo = { silent: !!o.silent, dur: +o.dur.toFixed(2) };
+const P = AudioBufferSourceNode.prototype, st0 = P.start, seen = new Set();
+P.start = function (...a) { if (this.buffer) seen.add(this.buffer); return st0.apply(this, a); };
+for (let i = 0; i < 6; i++) await audio.vo('o_whine');
+P.start = st0;
+r.whineTakes = seen.size;                      // o_whine has 3 takes: random, never the same twice running
+if (r.whineTakes < 2) r.fail.push('o_whine variants');
 const l = await audio.vo('c2_l_story_odie'); r.lymanVo = { silent: !!l.silent, dur: +l.dur.toFixed(2) };
 audio.setCustomNames(true);
 const nn = await audio.vo('l_idle_8'); r.nnSwap = nn.key;
@@ -37,9 +43,9 @@ audio.setCustomNames(false);
 const keys = Object.keys(audio.voLines);
 r.voKeys = keys.length;
 let bad = 0;
-for (const k of keys) { const f = audio.voLines[k].file; const h = await fetch(new URL('../../' + f, import.meta.url), { method: 'HEAD' }); if (!h.ok) { bad++; r.fail.push('vo ' + k); } }
+for (const k of keys) for (const f of audio.voLines[k].files || [audio.voLines[k].file]) { const h = await fetch(new URL('../../' + f, import.meta.url), { method: 'HEAD' }); if (!h.ok) { bad++; r.fail.push('vo ' + k); } }
 r.voMissingFiles = bad;
-audio.music('arena'); await new Promise((res) => setTimeout(res, 2500)); r.musicNow = audio.state.music;
+audio.music('arena'); await new Promise((res) => setTimeout(res, 2500)); r.musicNow = audio.state.music; r.liveMusic = audio.state.liveMusic;
 window.__res = r;
 document.getElementById('o').textContent = JSON.stringify(r, null, 1);
 </script>

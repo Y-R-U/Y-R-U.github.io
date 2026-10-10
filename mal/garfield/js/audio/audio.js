@@ -21,11 +21,12 @@ const buffers = new Map();      // url → Promise<AudioBuffer|null>
 let cur = null;                 // {name, src, g}
 let wanted = null;              // last requested music name (replayed after unlock / music-on)
 const voPlaying = new Map();    // who → {src, resolve}
+const lastVoFile = new Map();
 let listener = null;
 
 const voLines = {};
 const ready = fetch(BASE + 'vo/manifest.json').then((r) => r.ok ? r.json() : {}).then((m) => {
-  for (const [k, v] of Object.entries(m)) voLines[k] = { who: v.who, text: v.text, file: v.file, dur: v.dur };
+  for (const [k, v] of Object.entries(m)) voLines[k] = { who: v.who, text: v.text, file: v.file, files: v.files, dur: v.dur };
   return voLines;
 }).catch(() => voLines);
 
@@ -95,20 +96,35 @@ function setDuck(on) {
   duck.gain.setTargetAtTime(on ? 0.55 : 1, ctx.currentTime, on ? 0.08 : 0.5);
 }
 
-async function playMusic(name, fade) {
-  const def = MUSIC[name];
-  const old = cur;
-  cur = null;
-  if (old) {
-    const t = ctx.currentTime;
-    old.g.gain.cancelScheduledValues(t);
-    old.g.gain.setValueAtTime(old.g.gain.value, t);
-    old.g.gain.linearRampToValueAtTime(0, t + fade);
-    try { old.src.stop(t + fade + 0.05); } catch {}
+// Strictly single-track: every request bumps `musicToken`, fades out EVERY live source, and a load that resolves
+// after a newer request is dropped. (Two chasers calling music('chase') while it was still loading used to start it twice.)
+let musicToken = 0, pendingName = undefined;
+const live = new Set();         // every music source still audible (incl. ones fading out)
+
+function fadeOutAll(fade) {
+  const t = ctx.currentTime;
+  for (const m of live) {
+    if (m.dying) continue;
+    m.dying = true;
+    m.g.gain.cancelScheduledValues(t);
+    m.g.gain.setValueAtTime(m.g.gain.value, t);
+    m.g.gain.linearRampToValueAtTime(0, t + fade);
+    try { m.src.stop(t + fade + 0.05); } catch {}
   }
-  if (!def) return;
+}
+
+async function playMusic(name, fade) {
+  const my = ++musicToken;
+  pendingName = name;
+  cur = null;
+  fadeOutAll(fade);
+  const def = MUSIC[name];
+  if (!def) { pendingName = undefined; return; }
   const buf = await load(BASE + def.file);
+  if (my !== musicToken) return;
+  pendingName = undefined;
   if (!buf || wanted !== name) return;
+  fadeOutAll(0.05);
   const src = ctx.createBufferSource();
   src.buffer = buf; src.loop = def.loop;
   // Decoders that don't strip MP3 encoder padding (Safari) leave ~25 ms at the head: skip it so loops stay gapless.
@@ -122,9 +138,14 @@ async function playMusic(name, fade) {
   g.gain.linearRampToValueAtTime(def.gain, t + Math.max(0.05, fade));
   src.connect(g); g.connect(musicBus);
   src.start(t);
-  const me = { name, src, g };
+  const me = { name, src, g, dying: false };
+  live.add(me);
   cur = me;
-  if (!def.loop) src.onended = () => { if (cur === me) { cur = null; if (wanted === name) wanted = null; } };
+  src.onended = () => {
+    live.delete(me);
+    try { g.disconnect(); } catch {}
+    if (cur === me) { cur = null; if (!def.loop && wanted === name) wanted = null; }
+  };
 }
 
 function spatial(pos) {
@@ -179,7 +200,7 @@ export const audio = {
   ready,
   voLines,
   get ctx() { return ctx; },
-  get state() { return { ctx: ctx?.state || 'none', music: cur?.name || null, wanted, vol: { ...vol }, musicOn, customNames }; },
+  get state() { return { ctx: ctx?.state || 'none', music: cur?.name || null, wanted, liveMusic: [...live].filter((m) => !m.dying).length, vol: { ...vol }, musicOn, customNames }; },
 
   unlock() {
     if (!ensure()) return;
@@ -187,17 +208,18 @@ export const audio = {
     // iOS: play a silent buffer inside the gesture.
     const b = ctx.createBuffer(1, 1, 22050), s = ctx.createBufferSource();
     s.buffer = b; s.connect(ctx.destination); s.start(0);
-    if (wanted && !cur) playMusic(wanted, 1);
+    if (wanted && !cur && pendingName !== wanted) playMusic(wanted, 1);
     audio.preloadSfx();
   },
 
   music(name, { fade = 1.2 } = {}) {
     name = name || null;
-    if (name === wanted && (cur?.name === name || !ctx)) return;
+    if (name === wanted && (!ctx || (cur?.name === name && !cur.dying) || pendingName === name)) return;
     wanted = name;
     if (!ensure()) return;
     playMusic(name, fade);
   },
+  stopMusic(fade = 0.3) { wanted = null; if (ctx) playMusic(null, fade); },
 
   sfx(name, { vol: v = 1, rate = 1, pos = null, delay = 0 } = {}) {
     if (!ensure() || ctx.state !== 'running') return;
@@ -263,7 +285,13 @@ export const audio = {
       await new Promise((r) => setTimeout(r, dur * 1000));
       return { dur, key, text, silent: true };
     }
-    const buf = await load(new URL('../../' + line.file, import.meta.url).href);
+    let file = line.file;
+    if (line.files?.length > 1) {   // Odie noises: random take, never the same one twice running
+      const opts = line.files.filter((f) => f !== lastVoFile.get(key));
+      file = opts[Math.floor(Math.random() * opts.length)];
+      lastVoFile.set(key, file);
+    }
+    const buf = await load(new URL('../../' + file, import.meta.url).href);
     if (!buf) {
       const dur = line.dur || estimateDur(text);
       await new Promise((r) => setTimeout(r, dur * 1000));
@@ -305,7 +333,7 @@ export const audio = {
 
   preload(keys) {
     if (!ensure()) return;
-    for (const k of keys) { const l = voLines[k]; if (l?.file) load(new URL('../../' + l.file, import.meta.url).href); }
+    for (const k of keys) { const l = voLines[k]; for (const f of l?.files || (l?.file ? [l.file] : [])) load(new URL('../../' + f, import.meta.url).href); }
   },
   preloadMusic(names = Object.keys(MUSIC)) { if (ensure()) for (const n of names) if (MUSIC[n]) load(BASE + MUSIC[n].file); },
 

@@ -12,7 +12,7 @@ Voices (Qwen Voice Studio, designed then saved as clones; no real-actor imitatio
 - **Delivery man**: `Hungry Heist · Delivery`.
 - **Odie** (`o_*`): dog-noise clips from audio/sfx/ (no TTS; text is the subtitle).
 
-Total lines: 799
+Total lines: 802
 
 ### j_intro  (3)
 | key | who | text | dur | src |
@@ -544,6 +544,13 @@ Total lines: 799
 | `g_chased_9` | garfield | Why does he always take things so personally? | 2.37 | media |
 | `g_chased_10` | garfield | Wheee! I mean... help! | 1.76 | media |
 | `g_chased_6_nn` | garfield | Up high! He can't jump! | 1.68 | media |
+
+### g_runnap  (3)
+| key | who | text | dur | src |
+|---|---|---|---|---|
+| `g_runnap_1` | garfield | Run Now, Nap Later. | 1.64 | levels |
+| `g_runnap_2` | garfield | Run Now, Nap Later. | 1.95 | levels |
+| `g_runnap_3` | garfield | Run Now, Nap Later. | 1.83 | levels |
 
 ### g_escape  (7)
 | key | who | text | dur | src |
@@ -1087,7 +1094,7 @@ Total lines: 799
 ### d_l5_bye  (1)
 | key | who | text | dur | src |
 |---|---|---|---|---|
-| `d_l5_bye` | delivery | Enjoy the telly! Mind the cat. | 1.91 | levels |
+| `d_l5_bye2` | delivery | Enjoy the telly! Have a lovely evening. | 2.24 | levels |
 
 ### c2_j_l5_tv  (1)
 | key | who | text | dur | src |
@@ -1934,48 +1941,48 @@ Total lines: 799
 ### o_bark  (2)
 | key | who | text | dur | src |
 |---|---|---|---|---|
-| `o_bark_1` | odie | Woof! | 0.29 | levels |
-| `o_bark_2` | odie | Arf! Arf! | 0.73 | levels |
+| `o_bark_1` | odie | Woof! | 0.75 | levels |
+| `o_bark_2` | odie | Arf! Arf! | 0.34 | levels |
 
 ### o_bark_happy  (1)
 | key | who | text | dur | src |
 |---|---|---|---|---|
-| `o_bark_happy` | odie | Arf arf arf! | 1.27 | levels |
+| `o_bark_happy` | odie | Arf arf arf! | 1.15 | levels |
 
 ### o_pant  (1)
 | key | who | text | dur | src |
 |---|---|---|---|---|
-| `o_pant` | odie | Hah-hah-hah-hah… | 1.75 | levels |
+| `o_pant` | odie | Hah-hah-hah-hah… | 1.8 | levels |
 
 ### o_whine  (1)
 | key | who | text | dur | src |
 |---|---|---|---|---|
-| `o_whine` | odie | Hnnnn… | 1.6 | levels |
+| `o_whine` | odie | Hnnnn… | 1.78 | levels |
 
 ### o_whimper  (1)
 | key | who | text | dur | src |
 |---|---|---|---|---|
-| `o_whimper` | odie | Hmm-mm-mm… | 1.12 | levels |
+| `o_whimper` | odie | Hmm-mm-mm… | 0.55 | levels |
 
 ### o_whine_muffled  (1)
 | key | who | text | dur | src |
 |---|---|---|---|---|
-| `o_whine_muffled` | odie | Mmf! Mmf! | 0.94 | levels |
+| `o_whine_muffled` | odie | Mmf! Mmf! | 1.85 | levels |
 
 ### o_growl_play  (1)
 | key | who | text | dur | src |
 |---|---|---|---|---|
-| `o_growl_play` | odie | Grrr-arf! | 0.68 | levels |
+| `o_growl_play` | odie | Grrr-arf! | 2.08 | levels |
 
 ### o_shake_off  (1)
 | key | who | text | dur | src |
 |---|---|---|---|---|
-| `o_shake_off` | odie | Brrrrrr! | 1.75 | levels |
+| `o_shake_off` | odie | Brrrrrr! | 1.35 | levels |
 
 ### o_sniff  (1)
 | key | who | text | dur | src |
 |---|---|---|---|---|
-| `o_sniff` | odie | Sniff sniff. | 1.08 | levels |
+| `o_sniff` | odie | Sniff sniff. | 0.9 | levels |
 
 ### g_open_plan  (1)
 | key | who | text | dur | src |

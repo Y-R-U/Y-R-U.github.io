@@ -115,7 +115,21 @@ export function createDirector({ camera, ui, audio, world, controller, input, ev
       let i = 0;
       const pos = actor.root.position, dir = new THREE.Vector3();
       const isCat = actor === controller?.actor;
+      // Never hang a cutscene on a walk: something (the cat controller's wall push-out, a fat belly's bigger radius,
+      // furniture) can hold the actor just short of a waypoint forever. Arrive within 6 cm, give up when no progress
+      // for 0.6 s or after 1.6x the path time + 2 s, and snap to the end (onFinish).
+      let len = 0, prev = pos.clone();
+      for (const q of path) { len += Math.hypot(q.x - prev.x, q.z - prev.z); prev = q; }
+      const maxT = (len / Math.max(0.1, speed)) * 1.6 + 2;
+      let el = 0, best = Infinity, stall = 0;
       return task((dt) => {
+        el += dt;
+        if (el > maxT) return true;
+        const j = Math.min(i, path.length - 1);
+        let rem = Math.hypot(path[j].x - pos.x, path[j].z - pos.z);
+        for (let k = j + 1; k < path.length; k++) rem += Math.hypot(path[k].x - path[k - 1].x, path[k].z - path[k - 1].z);
+        if (rem < 0.06) return true;
+        if (rem < best - 0.01) { best = rem; stall = 0; } else if ((stall += dt) > 0.6) return true;
         let step = speed * dt;
         while (step > 0 && i < path.length) {
           dir.subVectors(path[i], pos); dir.y = 0;

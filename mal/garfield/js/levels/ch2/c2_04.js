@@ -59,11 +59,15 @@ export default defineLevel2({
     if (L.jon.seated()) { await d.play(jon, 'stand_up', { once: true, max: 1.0 }); L.jon.leave(); }
     const doorIn = apos(ctx, 'doorInside', V(7.1, 0, 1)), step = apos(ctx, 'doorStep', V(7.1, 0, -0.95));
     const fd = prop(ctx, 'frontDoor');
-    try { fd?.setLocked?.(false); fd?.open?.(); } catch {}
     const ci = A(ctx, 'cam_frontDoorIn');
     if (ci) d.cut({ pos: ci.pos.clone(), look: (ci.look || doorIn).clone(), fov: ci.fov ?? 55 });
     jon.play?.('walk');
     await d.walk(jon, doorIn, { faceEnd: false });
+    // the door opens only once he's there (FEEDBACK1: it used to swing open as he left the table)
+    await d.face(jon, step);
+    d.sfx('door');
+    try { fd?.setLocked?.(false); fd?.open?.(); } catch {}
+    await d.wait(0.4);
     jon.play?.('walk_in');
     await d.say('jon', 'c2_j_l4_work', { text: T('c2_j_l4_work') });
     await d.walk(jon, step, { faceEnd: false, nav: false });

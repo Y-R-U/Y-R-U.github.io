@@ -123,3 +123,16 @@ export const forkKnife = () => svg('0 0 64 64', `
   <g fill="#fffaf0" stroke="#5a3418" stroke-width="3.5" stroke-linejoin="round" stroke-linecap="round">
     <path d="M14 6v16a7 7 0 0 0 5 6.7V58a3.5 3.5 0 0 0 7 0V28.7A7 7 0 0 0 31 22V6M20.5 6v14M24.5 6v14"/>
     <path d="M46 58V36c-5-2-8-8-8-16 0-9 4-14 8-15a3 3 0 0 1 4 3v50a2 2 0 0 1-4 0z"/></g>`, 'ico-forkknife');
+export const dog = () => svg('0 0 100 100', `
+  <ellipse cx="22" cy="52" rx="13" ry="27" fill="#8a5a2e" transform="rotate(14 22 52)"/>
+  <ellipse cx="78" cy="52" rx="13" ry="27" fill="#8a5a2e" transform="rotate(-14 78 52)"/>
+  <ellipse cx="50" cy="48" rx="30" ry="32" fill="#f2c94c"/>
+  <ellipse cx="50" cy="68" rx="20" ry="15" fill="#f8dc84"/>
+  <circle cx="39" cy="42" r="6.5" fill="#fff"/><circle cx="61" cy="42" r="6.5" fill="#fff"/>
+  <circle cx="40" cy="43" r="3.2" fill="#2b1a10"/><circle cx="60" cy="43" r="3.2" fill="#2b1a10"/>
+  <ellipse cx="50" cy="58" rx="7" ry="5" fill="#2b1a10"/>
+  <path d="M42 68q8 6 16 0" fill="none" stroke="#2b1a10" stroke-width="2.5" stroke-linecap="round"/>
+  <path d="M51 70q1 16 9 15q7-1 4-15z" fill="#ff7a8a" stroke="#c94a5a" stroke-width="1.5"/>`);
+export const mystery = () => svg('0 0 100 100', `
+  <circle cx="50" cy="50" r="34" fill="#a8977c"/>
+  <text x="50" y="68" text-anchor="middle" font-size="52" font-weight="800" fill="#fffaf0" font-family="sans-serif">?</text>`);

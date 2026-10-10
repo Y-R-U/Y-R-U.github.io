@@ -58,7 +58,7 @@ export async function createProps({ scene, quality = 'high', anchors = new Map()
 
   // ---- Chapter Two (always-present furniture first, then Ch2-only props that start inactive) ----
   if (A('lymanDoor')) add(createLymanDoor(ctxFor('lymanDoor')), 'lymanDoor');
-  if (A('cupboardDoor')) add(createCupboardDoor(ctxFor('cupboardDoor'), { w: A('cupboardDoor').w, h: A('cupboardDoor').h }), 'cupboardDoor');
+  if (A('cupboardDoor')) add(createCupboardDoor(ctxFor('cupboardDoor'), { w: A('cupboardDoor').w, h: A('cupboardDoor').h, block: A('cupboardDoor').block }), 'cupboardDoor');
   if (A('dresser')) {
     const dr = add(createDresser(ctxFor('dresser')), 'dresser');
     add(createSocks(ctxFor('dresser'), dr), null);

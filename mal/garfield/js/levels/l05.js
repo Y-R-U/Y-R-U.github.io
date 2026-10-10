@@ -156,45 +156,93 @@ function startSwing(L) {
   } catch (e) { console.warn(e); }
 }
 
-// Pendulum: θ(t) = θ0·cos(ωt). Uses the vine prop's own geometry when present.
-function swingTip(L, t) {
+// The swing is a smooth root path from the fridge top over the pan and back, timed like a pendulum
+// (s = (1 − cos ωt)/2 · sEnd). The path is built once per swing: a dip-and-rise arc pushed up over everything
+// below it (fridge, counter, bench, table), dilated + blurred so it never jumps at a furniture edge.
+// His paws are where the vine tip is drawn, every frame (gripLocal from the live skeleton).
+// exported for Ch1 Free Play (target = Jon's plate there); call with L.flags.sw = null at each grab
+export function swingTip(L, t, target = null) {
   const { ctx } = L;
-  const vine = prop(ctx, 'vine');
-  if (vine?.swingAngle && vine.pivot) {
-    const w = vine.omega * SLOW;
-    return { tip: vine.swingAngle(vine.theta0 * Math.cos(w * t)).clone(), phase: w * t, dir: vine.dirH };
+  let P = L.flags.sw;
+  if (!P) {
+    const vine = prop(ctx, 'vine');
+    const ft = fridgeTopPos(ctx), pan = target || panPos(ctx);
+    const dir = V(pan.x - ft.x, 0, pan.z - ft.z).normalize();
+    const F = ft.clone().addScaledVector(dir, -0.12); F.y = ft.y;
+    const sC = Math.hypot(pan.x - F.x, pan.z - F.z), sE = sC + 0.45;
+    const yaw = Math.atan2(dir.x, dir.z), side = V(dir.z, 0, -dir.x);
+    const N = 96, ds = sE / N, need = new Float32Array(N + 1);
+    const foot = [[0, 0, 0], [0.16, 0, 0], [-0.16, 0, 0], [0, 0.17, 0], [0, -0.14, 0], [0.1, 0.1, 0], [-0.1, 0.1, 0], [0, -0.46, 0.4]];
+    for (let i = 0; i <= N; i++) {
+      const s = i * ds; let m = 0;
+      for (const [x, z, up] of foot) {
+        const px = F.x + dir.x * (s + z) + side.x * x, pz = F.z + dir.z * (s + z) + side.z * x;
+        m = Math.max(m, (ctx.world.groundAt?.(px, pz, ft.y - 0.05) ?? 0) - up);
+      }
+      need[i] = m + (m >= ft.y - 0.01 ? 0 : 0.05);
+    }
+    const R = Math.round(0.16 / ds), r = Math.floor(R / 2);
+    const dil = need.map((_, i) => { let m = 0; for (let j = Math.max(0, i - R); j <= Math.min(N, i + R); j++) m = Math.max(m, need[j]); return m; });
+    const sb = sC * 0.5, yb = 0.45, yEnd = Math.max(ft.y * 0.6, pan.y + 0.5);
+    let y = dil.map((d, i) => {
+      const s = i * ds;
+      const arc = s < sb ? yb + (ft.y - yb) * (1 - s / sb) ** 2 : yb + (yEnd - yb) * ((s - sb) / (sE - sb)) ** 2;
+      const hop = s < 0.5 ? 0.08 * Math.sin(Math.PI * s / 0.5) : 0;   // feet just off the fridge top as he pushes off / comes in
+      return Math.max(arc, d) + hop;
+    });
+    // no cliffs: limit the slope both ways (only ever raises the path, so it stays clear)
+    const slope = 1.8 * ds;
+    for (let i = 1; i <= N; i++) y[i] = Math.max(y[i], y[i - 1] - slope);
+    for (let i = N - 1; i >= 0; i--) y[i] = Math.max(y[i], y[i + 1] - slope);
+    const blur = (a) => a.map((_, i) => { let w = 0, v = 0; for (let j = -r; j <= r; j++) { const k = Math.min(N, Math.max(0, i + j)), q = 1 - Math.abs(j) / (r + 1); w += q; v += a[k] * q; } return v / w; });
+    y = blur(blur(y));
+    y[0] = ft.y;
+    P = L.flags.sw = { F, dir, yaw, sE, ds, N, y, w: (vine?.omega || 2.5) * SLOW, ceil: (vine?.pivot?.y ?? 2.7) - 0.08,
+      start: ctx.controller.pos.clone(), yaw0: ctx.garfield.root.rotation.y };
   }
-  // fallback: our own arc from the fridge top over the pan and a bit past
-  const a = fridgeTopPos(ctx).add(V(0, 0.42, 0)), b = panPos(ctx).add(V(0, 0.55, 0));
-  const dir = V(b.x - a.x, 0, b.z - a.z).normalize();
-  const far = b.clone().addScaledVector(dir, 0.5);
-  const w = 2.2 * SLOW, s = (1 - Math.cos(w * t)) / 2;
-  const tip = a.clone().lerp(far, s); tip.y -= Math.sin(Math.PI * s) * 0.25;
-  return { tip, phase: w * t, dir };
+  const phase = P.w * t, u = (1 - Math.cos(phase)) / 2, s = u * P.sE;
+  const f = Math.min(P.N - 1e-6, s / P.ds), i = Math.floor(f), fr = f - i;
+  const root = P.F.clone().addScaledVector(P.dir, s);
+  root.y = P.y[i] + (P.y[i + 1] - P.y[i]) * fr;
+  // standing on the fridge top: arms bent, feet planted; the further out, the more he dangles
+  const tuck = THREE.MathUtils.smoothstep(root.y, P.F.y - 0.65, P.F.y - 0.05);
+  return { root, phase, s, tuck, dir: P.dir, P };
+}
+
+// Puts Garfield on the swing path at time st with his paws on the vine tip; returns { root, paws, phase, s, P }.
+export function rideVine(L, st, target = null) {
+  const { ctx } = L;
+  const c = ctx.controller, g = ctx.garfield;
+  const { root, phase, s, tuck, P } = swingTip(L, st, target);
+  // ease in from wherever he grabbed the vine (anywhere on the fridge top)
+  const e0 = THREE.MathUtils.smoothstep(st, 0, 0.45);
+  root.lerp(P.start, 1 - e0);
+  let dy = P.yaw - P.yaw0; dy = Math.atan2(Math.sin(dy), Math.cos(dy));
+  g.root.rotation.y = P.yaw0 + dy * e0;
+  // never let his raised paws go through the ceiling: bend the arms more instead
+  const grip0 = 0.77, grip1 = 0.6;
+  const k = Math.max(tuck, THREE.MathUtils.clamp((root.y + grip0 - P.ceil) / (grip0 - grip1), 0, 1));
+  g.setHangTuck?.(k);
+  c.pos.copy(root);
+  c.vel.set(0, 0, 0);
+  g.root.position.copy(root);
+  const paws = g.gripLocal ? g.gripLocal().applyAxisAngle(V(0, 1, 0), g.root.rotation.y).add(root) : root.clone().add(GRIP);
+  const vine = prop(ctx, 'vine');
+  if (vine?.setTip) {
+    // the tip comes up from its draped spot into his paws as he takes hold
+    const e1 = THREE.MathUtils.smoothstep(st, 0, 0.25);
+    if (!L.flags.tip0) L.flags.tip0 = vine.tip?.clone?.() || paws.clone();
+    vine.setTip(L.flags.tip0.clone().lerp(paws, e1), 0);
+  }
+  return { root, paws, phase, s, P };
 }
 
 function updateSwing(L, dt) {
   const { ctx } = L;
-  const c = ctx.controller, g = ctx.garfield;
   L.flags.st += dt * (L.flags.wasOver ? OVER_SLOW : 1);
-  const { tip, phase, dir } = swingTip(L, L.flags.st);
-  const tipRaw = tip.clone();
-  // always face the table (fridge → pan) so he doesn't spin round at each turnaround
-  const yaw = Math.atan2(dir.x, dir.z);
-  g.root.rotation.y = yaw;
-  const grip = GRIP.clone().applyAxisAngle(V(0, 1, 0), yaw);
-  // the ceiling is low: when his feet would sink into the fridge/table, his paws slide up the strand instead
-  const gy = ctx.world.groundAt?.(tip.x - grip.x, tip.z - grip.z, tip.y) ?? 0;
-  const lift = Math.max(0, gy + 0.04 - (tip.y - grip.y));
-  if (lift > 0) {
-    const vine = prop(ctx, 'vine');
-    const up = vine?.pivot ? vine.pivot.clone().sub(tip).normalize() : V(0, 1, 0);
-    tip.addScaledVector(up, lift / Math.max(0.3, up.y));
-  }
-  c.pos.set(tip.x - grip.x, tip.y - grip.y, tip.z - grip.z);
-  c.vel.set(0, 0, 0);
+  const { root, paws, phase, s, P } = rideVine(L, L.flags.st);
   const pp = panPos(ctx);
-  const over = Math.hypot(tipRaw.x - pp.x, tipRaw.z - pp.z) < OVER_R;
+  const over = Math.hypot(paws.x - pp.x, paws.z - pp.z) < OVER_R;
   L.flags.wasOver = over && !L.flags.caught;
   if (over) L.flags.overAt = L.t;
   const nearlyOver = over || L.t - (L.flags.overAt ?? -9) < 0.3;   // forgiving: a slightly late press still counts
@@ -208,7 +256,10 @@ function updateSwing(L, dt) {
     else if (!L.flags.missT || L.t - L.flags.missT > 3) { L.flags.missT = L.t; L.say('g_l05_miss', { force: true }); }
   }
   if (L.flags.caught && L.flags.panObj) {
-    L.flags.panObj.position.set(c.pos.x, c.pos.y - 0.01, c.pos.z);
+    // carried at his feet; over the last stretch home it slides out to where it will sit on the fridge top
+    const home = 1 - THREE.MathUtils.smoothstep(s, 0.05, 0.6);
+    L.flags.panObj.position.copy(root).addScaledVector(P.dir, 0.3 * home);
+    L.flags.panObj.position.y = root.y - 0.01 + 0.015 * home;
   }
   // back at the fridge (cos ≈ 1): land if we've caught it, or after PASSES without one
   const back = Math.cos(phase) > 0.995 && L.flags.st > 1;
@@ -239,14 +290,16 @@ function catchPan(L) {
 function endSwing(L) {
   const { ctx } = L;
   const vine = prop(ctx, 'vine');
+  const P = L.flags.sw;
   L.flags.swinging = false;
-  try { vine?.release?.(); vine && (vine.autoSwing = true); vine?.reset?.(); } catch {}
+  L.flags.sw = null; L.flags.tip0 = null;
+  try { if (vine?.letGo) vine.letGo(0.35); else { vine?.release?.(); vine?.reset?.(); } vine && (vine.autoSwing = true); } catch {}
   const ft = fridgeTopPos(ctx);
-  const v = prop(ctx, 'vine');
-  const land = v?.grabPoint ? v.grabPoint.clone().setY(ft.y) : ft.clone();
-  // keep the landing on the fridge top
-  land.lerp(ft, 0.4);
-  ctx.controller.teleport(land.clone().setY(ft.y + 0.05), ctx.garfield.root.rotation.y + Math.PI);
+  // he is already standing on the fridge top at the end of the path: no teleport, just settle the controller there
+  const at = P ? P.F.clone() : ft.clone();
+  at.y = ft.y + 0.005;
+  ctx.controller.teleport(at, ctx.garfield.root.rotation.y);
+  ctx.garfield.setHangTuck?.(0);
   ctx.controller.animHold = false;
   ctx.controller.lock(false);
   ctx.camera.follow?.({ dur: 0.6 });
@@ -254,10 +307,9 @@ function endSwing(L) {
   ctx.events.emit('swing', { on: false });
   if (L.flags.caught) {
     L.flags.havePan = true;
-    const fwd = V(Math.sin(ctx.garfield.root.rotation.y), 0, Math.cos(ctx.garfield.root.rotation.y));
-    const spot = ft.clone().addScaledVector(fwd, 0.18); spot.y = ft.y + 0.005;
+    const dir = P?.dir || V(Math.sin(ctx.garfield.root.rotation.y), 0, Math.cos(ctx.garfield.root.rotation.y));
+    const spot = at.clone().addScaledVector(dir, 0.3); spot.y = ft.y + 0.005;
     if (L.flags.panObj) { L.flags.panObj.position.copy(spot); L.flags.panObj.rotation.set(0, 0, 0); }
-    ctx.controller.teleport(ft.clone().addScaledVector(fwd, -0.22).setY(ft.y + 0.05), ctx.garfield.root.rotation.y);
     L.say('g_near_lasagna', { delay: 0.6, force: true });
   } else {
     L.say('g_jumpfail', { force: true });

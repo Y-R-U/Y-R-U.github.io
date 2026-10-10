@@ -166,6 +166,10 @@ export const LINES = {
   g_chased_4: { who: 'garfield', text: "He'll never catch me. Probably." },
   g_chased_5: { who: 'garfield', text: "Legs! Do your thing!" },
   g_chased_6: { who: 'garfield', text: "Up high! Jon can't jump!" },
+  // D27: the one and only chase thought (three takes of the same line)
+  g_runnap_1: { who: 'garfield', text: "Run Now, Nap Later." },
+  g_runnap_2: { who: 'garfield', text: "Run Now, Nap Later." },
+  g_runnap_3: { who: 'garfield', text: "Run Now, Nap Later." },
   g_escape_1: { who: 'garfield', text: "Ha. Jons can't jump." },
   g_escape_2: { who: 'garfield', text: "Up here, I'm untouchable." },
   g_escape_3: { who: 'garfield', text: "Enjoy the view, Jon." },
@@ -337,7 +341,7 @@ export const LINES = {
 
   // ---- C2 L5 ----
   d_l5_sign: { who: 'delivery', text: "Delivery for Arbuckle! Sign here." },
-  d_l5_bye: { who: 'delivery', text: "Enjoy the telly! Mind the cat." },
+  d_l5_bye2: { who: 'delivery', text: "Enjoy the telly! Have a lovely evening." },   // D28: never "mind the cat"
   c2_j_l5_tv: { who: 'jon', text: "Oh, goodie, the new TV!" },
   c2_j_l5_swap: { who: 'jon', text: "Out with the old, in with the… identical. Perfect!" },
   c2_g_l5_intro: { who: 'garfield', text: "A new TV and an old one. And a dog. I sense an opportunity." },

@@ -49,3 +49,11 @@ D21 Free Play (both chapters): no objectives; random events from that chapter's 
     and close the bedroom door and the fridge (fridge: nothing happens). Ch1 Free Play: Jon wanders, sometimes sits at
     the table NOT eating; vine swing over him + scratch = face hit → fall_back_chair (same as L2 chair fall).
 D22 Wave 3 lanes (cap 4): cast, world, media, game. Same rules as before.
+
+## Wave 4 (2026-10-10) — son's answers + playtest fixes (docs/FEEDBACK1.md)
+D23 L6 brawl: a cartoon dust cloud containing ALL THREE (Jon, Lyman, Odie) tumbling — not standing/arguing. Same in Ch2 Free Play.
+D24 Ch1 Free Play eating stays as is.
+D25 Arena: NO difficulty system at all. Replace difficulty select with OPPONENT select: 'Odie' + locked 'Play through chap four to unlock'. Harder = different opponents later.
+D26 Arena button lives in the main menu's TOP-LEFT corner, not with the chapter buttons.
+D27 Chase thought: during EVERY Jon/Lyman chase Garfield thinks only "Run Now, Nap Later." on repeat (no other chase barks).
+D28 Delivery man never says "mind the cat" (he can't know about the cat).

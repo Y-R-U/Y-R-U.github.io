@@ -101,7 +101,7 @@ async function fling(L) {
     t.say('j_fling_2', { force: true });
     await t.walkTo(platePos(ctx), { speed: 0.85, arrive: 0.55 });   // slow on purpose: a fair race for small hands
     if (L.eating || L.won) return;
-    await t.play('give_bowl', 1.0, { fallback: 'idle' });
+    await t.play('pick_up', 1.0, { fallback: 'idle' });
     if (L.eating || L.won) return;
     // saved it: plate back on the table, re-arm
     try { plate?.reset?.(); plate?.setFood?.('lasagna'); } catch {}

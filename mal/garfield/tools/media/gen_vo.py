@@ -14,9 +14,14 @@ SCR = ROOT / "tools/media/scratch"
 VOICES = json.load(open(ROOT / "tools/media/voices.json")) if (ROOT / "tools/media/voices.json").exists() else {}
 
 
-# Odie keys → the dog clip in audio/sfx/ that best fits the subtitle (default: <sfx>_1).
-ODIE_CLIP = {"o_yip_2": "yip_2", "o_yip_3": "yip_3", "o_yip_long": "yip_long", "o_bark_1": "bark_2", "o_bark_2": "bark_1",
-             "o_bark_happy": "yap_1", "o_growl_play": "bark_3", "o_whine_muffled": "whine_2", "o_shake_off": "pant_1"}
+# Odie keys → the dog clips in audio/sfx/ that fit the subtitle (audio.vo picks a random take). Default: [<sfx>_1].
+# Wave 4: everything but the yips is a natural medium-size dog (son's feedback), see docs/notes/fixaudio.md.
+ODIE_FILES = {"o_yip_1": ["yip_1"], "o_yip_2": ["yip_2"], "o_yip_3": ["yip_3"], "o_yip_long": ["yip_long"],
+              "o_bark_1": ["bark_1", "bark_2", "bark_3"], "o_bark_2": ["bark_2", "bark_3", "bark_1"],
+              "o_bark_happy": ["yap_1", "yap_2", "yap_3"], "o_growl_play": ["growl_1", "growl_2"],
+              "o_pant": ["pant_1", "pant_2"], "o_shake_off": ["shake_1", "shake_2"],
+              "o_sniff": ["sniff_1", "sniff_2", "sniff_3"], "o_whimper": ["whimper_1", "whimper_2", "whimper_3"],
+              "o_whine": ["whine_1", "whine_2", "whine_3"], "o_whine_muffled": ["muffled_1", "muffled_2"]}
 
 
 def tts_text(t):
@@ -73,7 +78,11 @@ def main():
         e = mf.setdefault(k, {})
         e.update(who=v["who"], text=v["text"], file=f"audio/vo/{k}.mp3")
         if v.get("sfx"):
-            e.update(file=f"audio/sfx/{ODIE_CLIP.get(k, v['sfx'] + '_1')}.mp3", sfx=v["sfx"])
+            fl = [f"audio/sfx/{c}.mp3" for c in ODIE_FILES.get(k, [v['sfx'] + '_1']) if (ROOT / f"audio/sfx/{c}.mp3").exists()]
+            fl = fl or [f"audio/sfx/{v['sfx']}_1.mp3"]
+            e.update(file=fl[0], sfx=v["sfx"])
+            if len(fl) > 1: e["files"] = fl
+            else: e.pop("files", None)
             if (ROOT / e["file"]).exists():
                 e["dur"] = round(float(subprocess.run(["ffprobe", "-v", "error", "-show_entries", "format=duration", "-of", "csv=p=0",
                                                        str(ROOT / e["file"])], capture_output=True, text=True).stdout.strip()), 2)

@@ -69,6 +69,7 @@ export function createHumanAI(ctx, opts = {}) {
   let curSeat = null;
   const seatObj = () => world.props?.get?.(seatProp)?.seat || null;
   ai.seated = () => !!root.parent && root.parent !== world.scene && (root.parent === seatObj() || root.parent === curSeat);
+  const inChair = () => !!seatObj() && root.parent === seatObj();
   ai.pos = (out = V()) => root.getWorldPosition(out);
   ai.facing = () => { const q = root.getWorldQuaternion(new THREE.Quaternion()); const f = V(0, 0, 1).applyQuaternion(q); return Math.atan2(f.x, f.z); };
   ai.leave = () => {
@@ -225,7 +226,7 @@ export function createHumanAI(ctx, opts = {}) {
   ai.sitNow = () => {
     cancelTask();
     const seat = seatObj();
-    if (seat && jon.sitAt) { if (!ai.seated()) jon.sitAt(seat, 'sit_eat'); }
+    if (seat && jon.sitAt) { if (!inChair()) { ai.leave(); jon.sitAt(seat, 'sit_eat'); } }
     else { const s = seatInfo(); root.position.copy(s.pos); root.rotation.y = s.rotY; }
     curClip = null;
     setState('sitEat'); clip(ai.eatClip || 'sit_eat', { fallback: 'sit', force: true });
@@ -234,7 +235,8 @@ export function createHumanAI(ctx, opts = {}) {
   ai.goSit = () => {
     setState('goSit'); expr('happy');
     makeTask(async (t) => {
-      if (ai.seated()) { ai.sitNow(); return; }
+      if (inChair()) { ai.sitNow(); return; }
+      if (ai.seated()) await ai.standUp(t);
       const seat = seatObj();
       if (seat && jon.sitAt) {
         await t.walkTo(ai.seatFront(), { arrive: 0.12 });
@@ -278,11 +280,13 @@ export function createHumanAI(ctx, opts = {}) {
       const a = A(anchorName);
       if (a) {
         const p = anchorPos(anchorName); const f = V(Math.sin(a.rotY || 0), 0, Math.cos(a.rotY || 0));
-        await t.walkTo(p.clone().addScaledVector(f, 0.55));
-        root.position.set(p.x, 0, p.z); root.rotation.y = a.rotY || 0;
+        await t.walkTo(p.clone().setY(0).addScaledVector(f, 0.55));
+        // seated clips expect the root ON the cushion (anchor y), not on the floor inside the chair
+        const o = seatAt(anchorName);
+        if (o && jon.sitAt) { jon.sitAt(o, 'sit'); curSeat = o; curClip = null; }
+        else { root.position.copy(a.pos); root.rotation.y = a.rotY || 0; t.loop('sit', { fallback: 'idle' }); }
       }
       expr('sad');
-      t.loop('sit', { fallback: 'idle' });
       for (;;) { await t.wait(11 + Math.random() * 5); t.say('j_l10_sulk'); }
     }, { name: 'sulk' });
   };
@@ -405,7 +409,7 @@ export function createHumanAI(ctx, opts = {}) {
     await wait(); t.chk();
     t.say('j_paper_fetch');
     await t.walkTo(paper.pos.clone(), { arrive: 0.5 });
-    await t.play('give_bowl', 1.0, { fallback: 'idle' });
+    await t.play('pick_up', 1.0, { fallback: 'idle' });
     paper.dispose(); ai.papers = ai.papers.filter((q) => q !== paper);
     // he stops to smooth out his crumpled paper: keeps the window open long enough for small hands
     jon.holdProp?.('newspaper', createNewspaper(ctx).mesh);

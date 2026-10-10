@@ -178,7 +178,7 @@ async function main() {
     get pos() { return garfield.root.position.toArray().map((v) => +v.toFixed(3)); },
     skipCutscene: () => director.skip(),
     goLevel: (n) => game.startLevel(n),
-    menu: () => game.menu(), chapter: () => game.chapter(), intro: () => game.intro(),
+    menu: () => game.menu(), chapter: (n) => game.chapter(n), intro: () => game.intro(), story: () => game.story(false),
     win: () => game.win(),
     teleport: (x, y, z, rotY) => controller.teleport(new THREE.Vector3(x, y, z), rotY),
     save,

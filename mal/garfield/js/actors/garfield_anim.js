@@ -6,6 +6,8 @@ export const EXT = ['lidU', 'lidD', 'lidTilt', 'eyeScale', 'pupil', 'mouth', 'sm
   'noLook', 'cheeks', 'earsBack', 'blinkOff', 'lookDown', 'tongue', 'dizzy', 'puff', 'hearts', 'sqX'];
 
 const TAU = Math.PI * 2;
+const EAT = { hips: -0.06, chest: 0.35, cy: -0.06, neck: 0.55, nz: 0.03, head: 0.3, sh: -0.9, el: 1.2, paw: -0.52 };   // front elbows bent: crouched over the dish
+const TUCK = { hips: 0, sh: 0.5, el: 1.6, paw: 0, th: 0, sh2: 0, ft: 0 };
 const S = ['L', 'R'];
 
 // curl = sideways '?' carriage so the tail doesn't stand dead-centre in the behind camera
@@ -165,19 +167,21 @@ export const CLIPS = {
   }),
 
   // L5 vine: front paws gripping overhead, body hanging nose-up, hind legs + belly dangling
-  hang: clip(1.6, true, (P, t) => {
-    const w = TAU * t / 1.6, sw = Math.sin(w), sw2 = Math.sin(w - 0.9);
-    P.r('hips', -1.0 + 0.05 * sw, 0, 0.06 * sw);
+  // c.hangTuck (setHangTuck): 1 = arms bent, hind feet planted under him (on the fridge top, holding the vine)
+  hang: clip(1.6, true, (P, t, c) => {
+    const k = c?.hangTuck || 0, d = 1 - k;
+    const w = TAU * t / 1.6, sw = Math.sin(w) * d, sw2 = Math.sin(w - 0.9) * d;
+    P.r('hips', -1.0 + 0.05 * sw + TUCK.hips * k, 0, 0.06 * sw);
     P.r('spine', -0.12); P.r('chest', -0.08 + 0.04 * sw2);
     P.r('neck', 0.35); P.r('head', -0.05 + 0.05 * sw2, 0.08 * Math.sin(w * 0.5));
-    P.r('shoulderL', -2.15, 0, 0.12); P.r('shoulderR', -2.15, 0, -0.12);
+    P.r('shoulderL', -2.15 + TUCK.sh * k, 0, 0.12); P.r('shoulderR', -2.15 + TUCK.sh * k, 0, -0.12);
     P.o('shoulderL', 0.02, 0.01, 0.07); P.o('shoulderR', -0.02, 0.01, 0.07);
-    P.s('shoulderL', 0, 0.25, 0); P.s('shoulderR', 0, 0.25, 0);
-    P.r('elbowL', 0.1); P.r('elbowR', 0.1);
-    P.r('pawL', 0.9); P.r('pawR', 0.9);
-    P.r('thighL', 0.9 + 0.18 * sw2, 0, -0.12 - 0.05 * sw); P.r('thighR', 0.9 - 0.18 * sw2, 0, 0.12 - 0.05 * sw);
-    P.r('shinL', 0.25 + 0.12 * sw); P.r('shinR', 0.25 - 0.12 * sw);
-    P.r('footL', 0.35); P.r('footR', 0.35);
+    P.s('shoulderL', 0, 0.25 * d, 0); P.s('shoulderR', 0, 0.25 * d, 0);
+    P.r('elbowL', 0.1 + TUCK.el * k); P.r('elbowR', 0.1 + TUCK.el * k);
+    P.r('pawL', 0.9 + TUCK.paw * k); P.r('pawR', 0.9 + TUCK.paw * k);
+    P.r('thighL', 0.9 + 0.18 * sw2 + TUCK.th * k, 0, -0.12 - 0.05 * sw); P.r('thighR', 0.9 - 0.18 * sw2 + TUCK.th * k, 0, 0.12 - 0.05 * sw);
+    P.r('shinL', 0.25 + 0.12 * sw + TUCK.sh2 * k); P.r('shinR', 0.25 - 0.12 * sw + TUCK.sh2 * k);
+    P.r('footL', 0.35 + TUCK.ft * k); P.r('footR', 0.35 + TUCK.ft * k);
     P.o('belly', 0, -0.012 + 0.008 * sw2, 0.01 * sw);
     P.s('belly', 0.03, 0.05 + 0.02 * sw2, 0.03);
     P.x.claw += 0.6; P.x.eyeScale += 0.1; P.x.lidU -= 0.25; P.x.mouth += 0.3 + 0.05 * sw; P.x.smile += 0.6; P.x.noLook = 1; P.x.blinkOff = 1;
@@ -213,17 +217,24 @@ export const CLIPS = {
     P.x.sqY += 0.05 * wind - 0.04 * sw;
   }),
 
-  eat: clip(0.55, true, (P, t, c) => {
-    const ch = Math.max(0, Math.sin(TAU * t / 0.55));
-    P.r('chest', 0.3); P.r('neck', 0.3); P.o('neck', 0, 0.01, 0.035); P.r('head', 0.3 + 0.15 * ch);
-    P.r('hips', -0.05);
-    P.r('shoulderL', -0.2); P.r('shoulderR', -0.2);
-    P.r('elbowL', 0.35); P.r('elbowR', 0.35);
-    P.o('chest', 0, -0.03, 0);
-    P.x.mouth += 0.2 + 0.95 * ch; P.x.tongue += 0.5 * ch; P.x.lidU += 0.3; P.x.lidD += 0.3; P.x.smile += 0.3; P.x.noLook = 1;
-    P.x.cheeks += 0.5 + 0.3 * ch;
-    tailWave(P, 0.4, 1.0, t, 0, 0.3);
-  }),
+  // a cat eating: head down in the dish the WHOLE time (levels play it once for the ~2.4 s bout, or loop it),
+  // with a small chewing bob and a slow side tilt; 2.5 s and seamless when looped
+  eat: clip(2.5, true, (P, t) => {
+    const ph = TAU * t * 6 / 2.5;
+    const ch = 0.5 - 0.5 * Math.cos(ph);
+    const bob = Math.sin(ph - 0.7);
+    const tilt = Math.sin(TAU * t / 2.5);
+    P.r('hips', EAT.hips);
+    P.r('chest', EAT.chest); P.o('chest', 0, EAT.cy, 0);
+    P.r('neck', EAT.neck + 0.03 * bob); P.o('neck', 0, 0.005, EAT.nz);
+    P.r('head', EAT.head + 0.05 * ch, 0.05 * tilt, 0.1 * tilt);
+    P.r('shoulderL', EAT.sh); P.r('shoulderR', EAT.sh);
+    P.r('elbowL', EAT.el); P.r('elbowR', EAT.el);
+    P.r('pawL', EAT.paw); P.r('pawR', EAT.paw);
+    P.x.mouth += 0.12 + 0.5 * ch; P.x.tongue += 0.3 * ch; P.x.lidU += 0.4; P.x.lidD += 0.35; P.x.smile += 0.25; P.x.noLook = 1;
+    P.x.cheeks += 0.55 + 0.3 * ch; P.x.earsBack += 0.1;
+    tailWave(P, 0.2, 0.4, t, 0, 0.15);
+  }, { outFade: 0.35 }),
 
   spit: clip(0.85, false, (P, t) => {
     const reel = keys([[0, 0], [0.18, 1], [0.32, 1], [0.42, 0]], t);

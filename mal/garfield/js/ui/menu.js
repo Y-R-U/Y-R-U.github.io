@@ -67,8 +67,10 @@ export function logo() {
 
 export function createTitle(ui) {
   const chapRow = h('div.chap-row');
+  const topLeft = h('div.title-topleft');   // D26: the Arena button lives here, not with the chapter buttons
   const el = h('section.ui-screen.scr-title', {},
     h('div.menu-bg'),
+    topLeft,
     h('div.title-topbar', {},
       pressable(h('button.round-btn.btn-settings', { 'aria-label': 'Settings', html: I.gear() }), () => { ui.emit('sfx', 'click'); ui.settings.open(); }),
       pressable(h('button.round-btn.btn-fs', { 'aria-label': 'Fullscreen', html: I.fullscreen() }), () => { ui.emit('sfx', 'click'); ui.fullscreen.toggle(); }),
@@ -83,8 +85,8 @@ export function createTitle(ui) {
   async function show({ chapters = [{ id: 1, title: 'Chapter One', subtitle: 'Food', locked: false }], see3D = false, soon: showSoon = true } = {}) {
     const my = ++token;
     el.classList.toggle('see3d', !!see3D);
-    chapRow.innerHTML = '';
-    chapRow.classList.toggle('many', chapters.length + (showSoon ? 1 : 0) > 2);
+    chapRow.innerHTML = ''; topLeft.innerHTML = '';
+    chapRow.classList.toggle('many', chapters.filter((c) => c.kind !== 'arena').length + (showSoon ? 1 : 0) > 2);
     const anims = [];
     for (const c of chapters) {
       const sub = h('span.chap-sub');
@@ -100,7 +102,7 @@ export function createTitle(ui) {
         if (btn.classList.contains('is-locked')) { btn.classList.remove('nope'); void btn.offsetWidth; btn.classList.add('nope'); ui.emit('sfx', 'boing'); return; }
         ui.emit('sfx', 'click'); ui.emit('chapter', c.id);
       });
-      chapRow.append(btn);
+      if (c.kind === 'arena') { btn.classList.add('corner-btn'); topLeft.append(btn); } else chapRow.append(btn);
       if (c.justUnlocked) anims.push({ btn, sub, ttl, fullSub, title: c.title });
     }
     const soon = h('button.big-btn.chap-btn.soon-btn.is-locked', { 'aria-disabled': 'true' },

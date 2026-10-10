@@ -174,11 +174,14 @@ export function createVine(ctx, { anchors } = {}) {
   };
   const rest = () => { tip.copy(restTip); slack = 1; p.state.grabbed = false; p.state.free = false; rebuild(); };
 
-  p.grab = () => { p.state.grabbed = true; p.state.free = false; time = 0; setAngle(theta0); slack = 0; rebuild(); p.sfx('rip', { vol: 0.25, rate: 1.8 }); };
+  p.grab = () => { dropT = -1; p.state.grabbed = true; p.state.free = false; time = 0; setAngle(theta0); slack = 0; rebuild(); p.sfx('rip', { vol: 0.25, rate: 1.8 }); };
   // t = seconds since grab (default physics: undamped so the swing is predictable for the catch)
   p.swing = t => { setAngle(theta0 * Math.cos(omega * t)); slack = 0; rebuild(); return tip; };
   p.swingAngle = th => { setAngle(th); slack = 0; rebuild(); return tip; };
-  p.setTip = v => { tip.copy(v); slack = Math.max(0, 1 - tip.distanceTo(pivot) / len) * 0.4; rebuild(); };
+  p.setTip = (v, sl) => { tip.copy(v); slack = sl ?? Math.max(0, 1 - tip.distanceTo(pivot) / len) * 0.4; rebuild(); };
+  // let go of a held tip: it eases back down to its draped rest spot instead of snapping
+  let dropT = -1; const dropFrom = new THREE.Vector3();
+  p.letGo = (dur = 0.6) => { p.state.grabbed = false; p.state.free = false; dropFrom.copy(tip); dropT = 0; p.dropDur = dur; };
   p.release = () => {
     if (!p.state.grabbed) return;
     p.state.grabbed = false; p.state.free = true;
@@ -189,6 +192,14 @@ export function createVine(ctx, { anchors } = {}) {
   p.target = tgt;
 
   p.onUpdate(dt => {
+    if (dropT >= 0) {
+      dropT += dt;
+      const u = Math.min(1, dropT / p.dropDur), e = u * u * (3 - 2 * u);
+      tip.copy(dropFrom).lerp(restTip, e); tip.y -= Math.sin(Math.PI * u) * 0.06;
+      slack = e; rebuild();
+      if (u >= 1) { dropT = -1; time = 0; }
+      return;
+    }
     if (p.state.grabbed && p.autoSwing) { time += dt; p.swing(time); }
     else if (p.state.free) {
       const acc = -omega * omega * Math.sin(p.state.angle) - 0.5 * p.state.angVel;
@@ -210,7 +221,7 @@ export function createVine(ctx, { anchors } = {}) {
     const show = d > 0.45;
     if (leaves.visible !== show) leaves.visible = show;
   };
-  p.reset = () => { time = 0; rest(); };
+  p.reset = () => { time = 0; dropT = -1; rest(); };
   rest();
   return p;
 }

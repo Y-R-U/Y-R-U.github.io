@@ -1,0 +1,26 @@
+<!doctype html><meta charset="utf-8"><title>music race</title>
+<script type="module">
+// Headless check: music() must never leave two tracks audible. ?mod=<path to audio.js> to test another build.
+const mod = new URLSearchParams(location.search).get('mod') || '../../js/audio/audio.js';
+const { audio } = await import(mod);
+const liveSrc = new Set();
+const P = AudioBufferSourceNode.prototype, st = P.start, sp = P.stop;
+P.start = function (...a) { if (this.buffer?.duration > 20) { liveSrc.add(this); this.addEventListener('ended', () => liveSrc.delete(this)); } return st.apply(this, a); };
+P.stop = function (when, ...a) { const c = this.context; if (liveSrc.has(this)) setTimeout(() => liveSrc.delete(this), Math.max(0, (when || 0) - c.currentTime) * 1000 + 30); return sp.call(this, when, ...a); };
+const wait = (ms) => new Promise((r) => setTimeout(r, ms));
+const r = {};
+audio.unlock();
+audio.music('chase', { fade: 0.4 }); audio.music('chase', { fade: 0.4 });           // two chasers, cold buffer
+await wait(3500); r.twoChasers = liveSrc.size;
+audio.music('sneak2'); audio.music('chase', { fade: 0.4 }); audio.music('sneak2');   // flip-flop during loads
+await wait(3500); r.flipFlop = liveSrc.size;
+audio.music('arena'); audio.unlock(); audio.unlock();                                 // unlock while pending
+await wait(3500); r.unlockPending = liveSrc.size;
+audio.music(null, { fade: 0.2 }); audio.music('menu', { fade: 0.2 }); audio.music(null, { fade: 0.2 });
+await wait(3500); r.nullAfter = liveSrc.size;
+audio.music('chase'); await wait(300); audio.music('sneak'); audio.music('chase');    // back to a fading track
+await wait(3500); r.backToFading = liveSrc.size;
+r.state = audio.state;
+r.pass = r.twoChasers === 1 && r.flipFlop === 1 && r.unlockPending === 1 && r.nullAfter === 0 && r.backToFading === 1;
+window.__r = r;
+</script>

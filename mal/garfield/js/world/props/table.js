@@ -25,8 +25,9 @@ export function createTable(ctx) {
 
   const b = new Builder();
   for (const sx of [-1, 1]) for (const sz of [-1, 1]) b.add(turnedLeg(TOP - 0.05), wood, { pos: [sx * (W / 2 - 0.08), 0, sz * (D / 2 - 0.08)] });
-  b.add(roundedBox(W - 0.14, 0.08, 0.025, 0.008), wood, { pos: [0, TOP - 0.09, D / 2 - 0.08] });
-  b.add(roundedBox(W - 0.14, 0.08, 0.025, 0.008), wood, { pos: [0, TOP - 0.09, -D / 2 + 0.08] });
+  // long aprons + top are sliced along X so table.warp() bends the wood, not just the cloth
+  b.add(roundedBox(W - 0.14, 0.08, 0.025, 0.008, 3, 24), wood, { pos: [0, TOP - 0.09, D / 2 - 0.08] });
+  b.add(roundedBox(W - 0.14, 0.08, 0.025, 0.008, 3, 24), wood, { pos: [0, TOP - 0.09, -D / 2 + 0.08] });
   b.add(roundedBox(0.025, 0.08, D - 0.14, 0.008), wood, { pos: [W / 2 - 0.08, TOP - 0.09, 0] });
   b.add(roundedBox(0.025, 0.08, D - 0.14, 0.008), wood, { pos: [-W / 2 + 0.08, TOP - 0.09, 0] });
   const base = b.build('tableBase');
@@ -35,10 +36,10 @@ export function createTable(ctx) {
   // top + tablecloth move together on bump
   const top = new THREE.Group(); top.name = 'tableTop';
   const tb = new Builder();
-  tb.add(roundedBox(W, 0.045, D, 0.015, 2), wood, { pos: [0, TOP - 0.0275, 0] });
+  tb.add(roundedBox(W, 0.045, D, 0.015, 2, 30), wood, { pos: [0, TOP - 0.0275, 0] });
   // cloth: flat top + wavy skirt hanging over each edge
   const cw = W - 0.1, cd = D - 0.1;
-  tb.add(new THREE.BoxGeometry(cw, 0.004, cd), cloth, { pos: [0, TOP + 0.001, 0] });
+  tb.add(new THREE.BoxGeometry(cw, 0.004, cd, 30, 1, 1), cloth, { pos: [0, TOP + 0.001, 0] });
   const skirt = (len, drop) => {
     const g = new THREE.PlaneGeometry(len, drop, Math.round(len * 40), 3);
     const pos = g.attributes.position;
@@ -98,7 +99,7 @@ export function createTable(ctx) {
       const a = w.g.attributes.position, o = w.orig;
       for (let i = 0; i < a.count; i++) {
         const x = o[i * 3], y = o[i * 3 + 1];
-        const k = w.base ? Math.min(1, Math.max(0, y / TOP)) ** 2 : 1;
+        const k = w.base ? Math.min(1, Math.max(0, y / (TOP - 0.13))) ** 2 : 1;   // aprons ride with the top; legs bend from the floor up
         a.array[i * 3 + 1] = y - sag * prof(x) * k;
       }
       a.needsUpdate = true;

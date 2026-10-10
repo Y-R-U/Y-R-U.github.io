@@ -79,7 +79,7 @@ export default defineLevel2({
     try { del.dropProp?.(); del.holdProp?.(null); jon.holdProp?.('box', box?.root); jon.play?.('carry_box'); } catch {}
     try { jon.setExpression?.('happy'); } catch {}
     await d.say('jon', 'c2_j_l5_tv', { text: T('c2_j_l5_tv') });
-    await d.say('delivery', 'd_l5_bye', { text: T('d_l5_bye') });
+    await d.say('delivery', 'd_l5_bye2', { text: T('d_l5_bye2') });
     del.root.visible = false;
     try { fd?.close?.(); } catch {}
     // unbox by the TV, swap them, old TV on the carpet

@@ -13,7 +13,7 @@ export default defineLevel2({
     const { ctx } = L;
     hideHuman(L, L.jon); hideHuman(L, L.ly);
     L.showMarker = false;
-    L.ar = createArena(L, { difficulty: 'veryEasy', onPoint: (who, ar) => tutorialStep(L, who, ar) });
+    L.ar = createArena(L, { tutorial: true, onPoint: (who, ar) => tutorialStep(L, who, ar) });
     L.ar.start();
     ctx.ui?.hud?.set?.({ freePlay: 'Arena · Tutorial' });
   },

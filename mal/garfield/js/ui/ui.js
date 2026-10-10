@@ -5,7 +5,7 @@ import { createHud } from './hud.js';
 import { createTalk } from './talk.js';
 import { createFx } from './fx.js';
 import { showGate } from './gate.js';
-import { createModals, createPause, createSettings, popup, showComplete, showChapterComplete } from './panels.js';
+import { createModals, createPause, createSettings, popup, opponentSelect, showComplete, showChapterComplete } from './panels.js';
 
 export const DEFAULT_SETTINGS = Object.freeze({
   musicOn: true, music: 0.35, sfx: 0.8, voice: 0.9, subtitles: true,
@@ -155,6 +155,7 @@ export const ui = {
   skip: { show: (on) => ui._fx.skip.show(on) },
   fade: (toBlack, dur) => ui._fx.fade(toBlack, dur),
   popup: (o) => popup(ui, o),
+  opponents: (o) => opponentSelect(ui, o),
   confirm: (text, { title = 'Are you sure?', yes = 'Yes', no = 'No' } = {}) =>
     popup(ui, { title, text, buttons: [{ label: no, value: false, style: 'cream' }, { label: yes, value: true, style: 'primary' }], cancelValue: false }),
   complete: { show: (o) => showComplete(ui, o) },

@@ -605,6 +605,31 @@ async function menusTest(c) {
   await sleep(800);
   const again = await c.eval(`[...document.querySelectorAll('.chap-row .chap-btn')].map(b => b.textContent.trim()).join(' | ')`);
   console.log('   menu again (no anim):', again);
+  // D25/D26: Arena button top-left (unlock anim), opponent select = Odie + a locked card, no difficulty levels
+  await c.eval(`localStorage.setItem('garfield_hh_v1', JSON.stringify({introSeen:true, chapterUnlockSeen:true, ch2MenuSeen:true, levelsUnlocked:10, levelsDone:[1,2,3,4,5,6,7,8,9,10], levelUnlockSeen:10, belly:0.5, arenaUnlocked:true, arenaSeen:false, ch2:{levelsUnlocked:8, levelsDone:[1,2,3,4,5,6,7], levelUnlockSeen:8}}))`);
+  await c.nav(B);
+  await c.waitFor(`window.__game && __game.state==='menu'`, 45000);
+  await sleep(900); await shot(c, 'menu_arena_unlocking');
+  await c.waitFor(`__game.save.data.arenaSeen`, 15000);
+  await sleep(600); await shot(c, 'menu_arena');
+  const corner = await c.eval(`[...document.querySelectorAll('.title-topleft .chap-btn')].map(b => b.textContent.trim() + (b.classList.contains('is-locked') ? ' [locked]' : '')).join(' | ') + ' / row: ' + [...document.querySelectorAll('.chap-row .chap-btn')].map(b => b.textContent.trim()).join(' | ')`);
+  console.log('   arena corner:', corner);
+  if (!/^Arena \/ row: (?!.*Arena)/.test(corner)) throw new Error('arena button not top-left / unlocked: ' + corner);
+  const click = async (sel) => {
+    const r = await c.eval(`(() => { const b = document.querySelector(${JSON.stringify(sel)}).getBoundingClientRect(); return [b.x + b.width / 2, b.y + b.height / 2]; })()`);
+    for (const type of ['mousePressed', 'mouseReleased']) await c.send('Input.dispatchMouseEvent', { type, x: r[0], y: r[1], button: 'left', clickCount: 1 });
+  };
+  await click('.title-topleft .chap-btn'); await sleep(700); await shot(c, 'arena_opponents');
+  const opp = await c.eval(`[...document.querySelectorAll('.opp-btn')].map(b => b.querySelector('.opp-name').textContent.trim() + (b.classList.contains('is-locked') ? ' [locked]' : '')).join(' | ')`);
+  console.log('   opponents:', opp);
+  if (opp !== 'Odie | Play through chap four to unlock [locked]') throw new Error('opponent select wrong: ' + opp);
+  await click('.opp-btn[data-opp="next"]'); await sleep(500);
+  if (!(await c.eval(`!!document.querySelector('.opp-panel') && __game.state==='menu'`))) throw new Error('locked opponent did something');
+  await click('.opp-btn[data-opp="odie"]');
+  await c.waitFor(`!!(__game.ctx && __game.ctx.L && __game.ctx.L.ar && __game.state==='play')`, 40000);
+  const o = await c.eval(`__game.ctx.L.ar.opponent`);
+  console.log('   arena vs', o);
+  if (o !== 'odie') throw new Error('arena opponent ' + o);
 }
 
 // Own the browser for exactly the length of the run (the Mac is memory-tight: never leave one idling).

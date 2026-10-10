@@ -1733,13 +1733,13 @@
   "voice": "174b6b2ab49a4b0b8e3ca4b7d37af3e0",
   "seed": 7
  },
- "d_l5_bye": {
+ "d_l5_bye2": {
   "who": "delivery",
-  "text": "Enjoy the telly! Mind the cat.",
-  "file": "audio/vo/d_l5_bye.mp3",
-  "dur": 1.91,
-  "gen_text": "Enjoy the telly! Mind the cat.",
-  "job": "45815045fe9641b9a482f8dc9374db61",
+  "text": "Enjoy the telly! Have a lovely evening.",
+  "file": "audio/vo/d_l5_bye2.mp3",
+  "dur": 2.24,
+  "gen_text": "Enjoy the telly! Have a lovely evening.",
+  "job": "7c16448c3f584ac8b0e9b8ac0409db93",
   "voice": "538b211797494cb9a76c6ef968e8ca8a",
   "seed": 7
  },
@@ -4562,6 +4562,36 @@
   "gen_text": "Bonk. Headline news: cat hit by headline news.",
   "job": "63739f8dc9af4f09a332a24fae79dd6f",
   "voice": "9611963dfd0b48d48ec21f9e72ff258b"
+ },
+ "g_runnap_1": {
+  "who": "garfield",
+  "text": "Run Now, Nap Later.",
+  "file": "audio/vo/g_runnap_1.mp3",
+  "dur": 1.64,
+  "gen_text": "Run Now, Nap Later.",
+  "job": "3e4c5e9fbdc54e2b8e23a2befe7fed0c",
+  "voice": "9611963dfd0b48d48ec21f9e72ff258b",
+  "seed": 7
+ },
+ "g_runnap_2": {
+  "who": "garfield",
+  "text": "Run Now, Nap Later.",
+  "file": "audio/vo/g_runnap_2.mp3",
+  "dur": 1.95,
+  "gen_text": "Run Now, Nap Later.",
+  "job": "79af44bfb31b4185a0674cfdef67312d",
+  "voice": "9611963dfd0b48d48ec21f9e72ff258b",
+  "seed": 31
+ },
+ "g_runnap_3": {
+  "who": "garfield",
+  "text": "Run Now, Nap Later.",
+  "file": "audio/vo/g_runnap_3.mp3",
+  "dur": 1.83,
+  "gen_text": "Run Now, Nap Later.",
+  "job": "405c6a3b8c7d490f94c37bc86a251ee9",
+  "voice": "9611963dfd0b48d48ec21f9e72ff258b",
+  "seed": 53
  },
  "g_scratch_hit_1": {
   "who": "garfield",
@@ -7473,72 +7503,118 @@
  "o_bark_1": {
   "who": "odie",
   "text": "Woof!",
-  "file": "audio/sfx/bark_2.mp3",
+  "file": "audio/sfx/bark_1.mp3",
   "sfx": "bark",
-  "dur": 0.29
+  "dur": 0.75,
+  "files": [
+   "audio/sfx/bark_1.mp3",
+   "audio/sfx/bark_2.mp3",
+   "audio/sfx/bark_3.mp3"
+  ]
  },
  "o_bark_2": {
   "who": "odie",
   "text": "Arf! Arf!",
-  "file": "audio/sfx/bark_1.mp3",
+  "file": "audio/sfx/bark_2.mp3",
   "sfx": "bark",
-  "dur": 0.73
+  "dur": 0.34,
+  "files": [
+   "audio/sfx/bark_2.mp3",
+   "audio/sfx/bark_3.mp3",
+   "audio/sfx/bark_1.mp3"
+  ]
  },
  "o_bark_happy": {
   "who": "odie",
   "text": "Arf arf arf!",
   "file": "audio/sfx/yap_1.mp3",
   "sfx": "yap",
-  "dur": 1.27
+  "dur": 1.15,
+  "files": [
+   "audio/sfx/yap_1.mp3",
+   "audio/sfx/yap_2.mp3",
+   "audio/sfx/yap_3.mp3"
+  ]
  },
  "o_growl_play": {
   "who": "odie",
   "text": "Grrr-arf!",
-  "file": "audio/sfx/bark_3.mp3",
+  "file": "audio/sfx/growl_1.mp3",
   "sfx": "bark",
-  "dur": 0.68
+  "dur": 2.08,
+  "files": [
+   "audio/sfx/growl_1.mp3",
+   "audio/sfx/growl_2.mp3"
+  ]
  },
  "o_pant": {
   "who": "odie",
   "text": "Hah-hah-hah-hah…",
   "file": "audio/sfx/pant_1.mp3",
   "sfx": "pant",
-  "dur": 1.75
+  "dur": 1.8,
+  "files": [
+   "audio/sfx/pant_1.mp3",
+   "audio/sfx/pant_2.mp3"
+  ]
  },
  "o_shake_off": {
   "who": "odie",
   "text": "Brrrrrr!",
-  "file": "audio/sfx/pant_1.mp3",
+  "file": "audio/sfx/shake_1.mp3",
   "sfx": "pant",
-  "dur": 1.75
+  "dur": 1.35,
+  "files": [
+   "audio/sfx/shake_1.mp3",
+   "audio/sfx/shake_2.mp3"
+  ]
  },
  "o_sniff": {
   "who": "odie",
   "text": "Sniff sniff.",
   "file": "audio/sfx/sniff_1.mp3",
   "sfx": "sniff",
-  "dur": 1.08
+  "dur": 0.9,
+  "files": [
+   "audio/sfx/sniff_1.mp3",
+   "audio/sfx/sniff_2.mp3",
+   "audio/sfx/sniff_3.mp3"
+  ]
  },
  "o_whimper": {
   "who": "odie",
   "text": "Hmm-mm-mm…",
   "file": "audio/sfx/whimper_1.mp3",
   "sfx": "whimper",
-  "dur": 1.12
+  "dur": 0.55,
+  "files": [
+   "audio/sfx/whimper_1.mp3",
+   "audio/sfx/whimper_2.mp3",
+   "audio/sfx/whimper_3.mp3"
+  ]
  },
  "o_whine": {
   "who": "odie",
   "text": "Hnnnn…",
   "file": "audio/sfx/whine_1.mp3",
   "sfx": "whine",
-  "dur": 1.6
+  "dur": 1.78,
+  "files": [
+   "audio/sfx/whine_1.mp3",
+   "audio/sfx/whine_2.mp3",
+   "audio/sfx/whine_3.mp3"
+  ]
  },
  "o_whine_muffled": {
   "who": "odie",
   "text": "Mmf! Mmf!",
-  "file": "audio/sfx/whine_2.mp3",
+  "file": "audio/sfx/muffled_1.mp3",
   "sfx": "whine",
-  "dur": 0.94
+  "dur": 1.85,
+  "files": [
+   "audio/sfx/muffled_1.mp3",
+   "audio/sfx/muffled_2.mp3"
+  ]
  },
  "o_yip_1": {
   "who": "odie",

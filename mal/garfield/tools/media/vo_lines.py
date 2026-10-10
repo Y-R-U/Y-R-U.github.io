@@ -264,6 +264,8 @@ NN_FIXES.update({
  "l_idle_8_nn": (L_, "Your cat is giving me a funny look."),
 })
 
+# Wave 4 (D27): g_runnap_1..3 "Run Now, Nap Later." live in lines.js (fixgame); D28: d_l5_bye2 replaces d_l5_bye.
+
 
 def all_lines():
     lines = base_lines()

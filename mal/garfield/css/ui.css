@@ -102,6 +102,9 @@ html.ui-touch .see3d .menu-bg { -webkit-backdrop-filter: none; backdrop-filter: 
   gap: calc(50 * var(--px)); padding-top: calc(90 * var(--px));
 }
 .title-topbar { position: absolute; z-index: 2; top: calc(22 * var(--px) + var(--safe-t)); right: calc(24 * var(--px) + var(--safe-r)); display: flex; gap: calc(16 * var(--px)); }
+.title-topleft { position: absolute; z-index: 2; top: calc(22 * var(--px) + var(--safe-t)); left: calc(24 * var(--px) + var(--safe-l, 0px)); display: flex; }
+.chap-btn.corner-btn { min-height: max(52px, calc(70 * var(--px))); padding: calc(6 * var(--px)) calc(30 * var(--px)); font-size: max(20px, calc(32 * var(--px))); border-radius: calc(26 * var(--px)); transform: rotate(-3deg); }
+.chap-btn.corner-btn .lock-badge { width: calc(46 * var(--px)); height: calc(54 * var(--px)); right: calc(-16 * var(--px)); top: calc(-22 * var(--px)); }
 .footer-note { position: absolute; bottom: calc(10 * var(--px) + var(--safe-b)); left: 0; right: 0; text-align: center;
   font-size: max(11px, calc(14 * var(--px))); font-weight: 500; color: rgba(59, 35, 20, .7); }
 
@@ -609,3 +612,12 @@ html.ui-touch .round-btn { width: max(60px, calc(64 * var(--px))); height: max(6
 .key-prompt.hint kbd, .key-prompt.hint .prompt-or { display: none; }
 .key-prompt.hint .prompt-label { margin-left: calc(10 * var(--px)); color: var(--brown); font-size: max(17px, calc(26 * var(--px))); }
 html.ui-touch .key-prompt.hint.show { display: flex !important; bottom: calc(150 * var(--px) + var(--safe-b)); }
+
+/* D25 arena opponent select */
+.opp-panel { max-width: max(320px, calc(760 * var(--px))); }
+.opp-row { display: flex; flex-wrap: wrap; justify-content: center; gap: calc(26 * var(--px)); margin-bottom: calc(24 * var(--px)); }
+.opp-btn { flex-direction: column; width: max(150px, calc(250 * var(--px))); min-height: max(150px, calc(230 * var(--px))); padding: calc(14 * var(--px)); gap: calc(8 * var(--px)); border-radius: calc(28 * var(--px)); white-space: normal; }
+.opp-ico { width: max(70px, calc(120 * var(--px))); height: max(70px, calc(120 * var(--px))); display: block; }
+.opp-ico .ico { width: 100%; height: 100%; }
+.opp-name { font-size: max(20px, calc(34 * var(--px))); line-height: 1.05; }
+.opp-btn.is-locked .opp-name { font-size: max(14px, calc(21 * var(--px))); text-shadow: none; color: #5e4a35; font-weight: 700; }

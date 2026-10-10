@@ -13,6 +13,15 @@ export function createBarks(ctx) {
   const pending = [];
   let busyUntil = { jon: 0, garfield: 0 };
   const offs = [];
+  // D27: while Jon/Lyman chase him, Garfield's only thought is "Run Now, Nap Later." on repeat
+  const RUN_KEY = 'g_runnap', RUN_EVERY = 3.2;
+  let runNext = 0, wasChasing = false;
+  const chasing = () => {
+    const h = ctx.humans?.chasing?.();
+    if (h != null) return h;
+    const s = ctx.jonAI?.state;
+    return s === 'chase' || s === 'glare';
+  };
 
   const names = () => ctx.save?.data?.names || ctx.save?.get?.()?.names || ctx.save?.names || {};
   const manifest = () => ctx.audio?.voLines || {};
@@ -68,6 +77,7 @@ export function createBarks(ctx) {
     const key = resolveName(key0);
     const L = lineFor(key);
     if (!L) return null;
+    if (L.who === 'garfield' && !key.startsWith(RUN_KEY) && chasing()) return null;
     if (!opts.force) {
       if (now - lastAt < (opts.lowPri ? GAP * 2.5 : GAP)) return null;
       if (key === lastKey) return null;
@@ -111,6 +121,10 @@ export function createBarks(ctx) {
 
   function update(dt) {
     now += dt;
+    const ch = chasing();
+    if (ch && !wasChasing) runNext = now + 0.7;
+    wasChasing = ch;
+    if (ch && now >= runNext && !ctx.director?.active) { runNext = now + RUN_EVERY; say(RUN_KEY, { force: true }); }
     for (let i = pending.length - 1; i >= 0; i--) {
       if (pending[i].at <= now) { const p = pending.splice(i, 1)[0]; say(p.key, p.opts); }
     }
@@ -142,7 +156,7 @@ export function createBarks(ctx) {
   }
 
   const barks = {
-    say, line, pick, update, log: [], muted: false,
+    say, line, pick, update, log: [], muted: false, chasing,
     lineText: (key) => { const L = lineFor(resolveName(key)); return L ? subst(L.text) : ''; },
     near(foodKind) {
       if (now - nearFoodAt < 30) return;

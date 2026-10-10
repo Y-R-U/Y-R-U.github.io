@@ -5,6 +5,7 @@ import { tableBox } from './common.js';
 import { insideRoom } from './l08.js';
 import { getCast } from '../game/cast2.js';
 import { LINES } from '../game/lines.js';
+import { brawlCloud, clearSpot } from '../game/dustcloud.js';
 
 // Chapter Two Free Play (BRIEF2 last paragraph, D21, docs/LEVELS2.md §6). No objectives: a living house. Jon and
 // Lyman run their own day (wander / telly / coffee / their rooms), Odie roams, and a director rolls Ch2 events.
@@ -440,45 +441,68 @@ function tvStart(L, ev) {
   if (odieFree(L) && !L.fp.claims.odie) odieGo(L, 'sofa');
   void ev;
 }
+// D23: the brawl is a cartoon dust cloud with Jon, Lyman and (when he's free) Odie tumbling inside it
 function brawlStart(L, ev) {
   const { ctx, jon, ly, odieAI } = L;
   const mid = apos(ctx, 'sofaFoot', V(3, 0, 2.75)).setY(0);
-  const jp = mid.clone().add(V(0, 0, -0.45)), lp = mid.clone().add(V(0, 0, 0.45));
+  const spot = clearSpot(ctx, mid, 0.85);
+  const jp = spot.clone().add(V(0, 0, -0.45)), lp = spot.clone().add(V(0, 0, 0.45));
   ctx.audio?.sfx?.('thwip');
   try { ctx.lyman.play?.('spill'); prop(ctx, 'coffeeMug')?.setActive?.(true); prop(ctx, 'coffeeMug')?.spill?.(V(0, 0, -1)); } catch {}
-  ev.data.mid = mid;
-  const fight = (h, spot, faceP, lines, clips) => h.run('fpBrawl', async (t) => {
+  ev.data.mid = spot;
+  const D = ev.data;
+  D.ready = 0;
+  const startCloud = () => {
+    if (D.cloud || !L.fp.active.has('brawl')) return;
+    const withOdie = odieFree(L) && !L.fp.claims.odie;
+    if (withOdie) {
+      odieAI.run('fpBrawl', async (t) => { t.loop('idle_pant'); await t.wait(30); });
+      odieAI.place(spot.clone().add(V(-0.3, 0, 0)));
+    }
+    for (const [h, p] of [[jon, jp], [ly, lp]]) h.actor.root.position.copy(p);
+    D.cloud = brawlCloud(ctx, spot, { jon: ctx.jon, lyman: ctx.lyman, odie: withOdie ? L.odie : null });
+    D.withOdie = withOdie;
+    D.cloudT = L.t;
+    L.later(2.2, () => bark(L, 'c2_l_l6_brawl', { force: true }));
+    L.later(4.6, () => bark(L, 'c2_j_l6_brawl', { force: true }));
+    L.later(6.6, () => bark(L, 'c2_g_l6_win', { force: true }));
+    L.later(9.5, async () => {
+      if (!D.cloud || D.cloud.dead) return;
+      await D.cloud.end(0.5);
+      D.cloudDone = true;
+      if (D.withOdie && odieFree(L)) { odieAI.run('fpDizzy', async (t) => { odieAI.noise('o_whimper'); await t.play('dizzy', 2.0, { fallback: 'idle' }); odieNext(L); }); }
+    });
+  };
+  const fight = (h, p, faceP) => h.run('fpBrawl', async (t) => {
     await t.wait(h === jon ? 0.5 : 0.1);
     if (h === jon) { t.loop('spilled_on', { fallback: 'idle' }); t.say('c2_j_l6_coffee', { force: true }); await t.wait(1.2); }
     await h.standUp(t);
     try { h.actor.holdProp?.(null); } catch {}
-    await t.walkTo(spot, { arrive: 0.12, speed: 1.6 });
+    await t.walkTo(p, { arrive: 0.12, speed: 1.6 });
     await t.face(faceP, 0.25);
-    for (let i = 0; L.t - ev.t0 < 14; i++) {
-      if (i === 2) t.say(lines[0], { force: true });
-      if (i === 5) t.say(lines[1], { force: true });
-      if (i % 3 === 2) ctx.audio?.sfx?.('brawl', { vol: 0.6 });
-      await t.play(clips[i % clips.length], 0.75, { fallback: 'talk_angry' });
-    }
-    t.loop('brawl_tangle', { fallback: 'talk_angry' });
-    await t.wait(Math.max(0.1, 15 - (L.t - ev.t0)));
+    if (++D.ready === 2) startCloud();
+    t.loop('brawl_slap', { fallback: 'talk_angry' });
+    while (!D.cloudDone) await t.wait(0.2);
+    await t.face(faceP, 0.1);
+    await t.play('stunned_shake', 1.6, { fallback: 'idle' });
     t.say(h === jon ? 'fp2_j_makeup' : 'fp2_l_makeup', { force: true, delay: h === jon ? 0 : 2.2 });
     await t.play('hug', 3.0, { fallback: 'idle' });
-    ev.data.madeUp = true;
+    D.madeUp = true;
     t.loop('idle');
     await t.wait(30);
   }, { interruptible: false });
-  fight(jon, jp, lp, ['c2_j_l6_brawl', 'j_chase'], ['brawl_slap', 'brawl_dodge', 'brawl_hit', 'brawl_slap']);
-  fight(ly, lp, jp, ['c2_l_l6_brawl', 'l_chase'], ['brawl_kick', 'brawl_hit', 'brawl_slap', 'brawl_dodge']);
-  L.later(2.2, () => { ctx.audio?.sfx?.('brawl'); ctx.camera?.shake?.(0.06); });
-  L.later(3.5, () => { if (odieFree(L)) odieAI.run('fpKicked', async (t) => { await t.walkTo(mid.clone().add(V(-0.75, 0, 0)), { speed: 2 }); odieAI.noise('o_growl_play'); t.loop('bark'); await t.wait(8); odieNext(L); }); });
-  bark(L, 'c2_g_l6_win', { delay: 5.5, force: true });
-  bark(L, 'fp2_g_brawl', { delay: 12, force: true });
-  ev.until = L.t + 21;
+  fight(jon, jp, lp);
+  fight(ly, lp, jp);
+  L.later(5.0, startCloud);   // a slow walker joins it hidden
+  bark(L, 'fp2_g_brawl', { delay: 17, force: true });
+  ev.until = L.t + 22;
 }
 function brawlEnd(L, ev) {
   try { prop(L.ctx, 'coffeeMug')?.reset?.(); prop(L.ctx, 'coffeeMug')?.setActive?.(false); } catch {}
+  ev.data.cloud?.kill?.();
+  ev.data.cloudDone = true;
   for (const h of [L.jon, L.ly]) if (doing(h, 'fpBrawl')) h.setOff();
+  if (L.odieAI.taskName?.() === 'fpBrawl') odieNext(L);
   releaseAll(L, ev);
 }
 
@@ -623,7 +647,7 @@ function deliveryStart(L, ev) {
     t.loop('carry_box', { fallback: 'carry' });
     t.say('c2_j_l5_tv', { force: true });
     await t.wait(1.8);
-    if (del) { L.say('d_l5_bye', { force: true }); await t.wait(1.6); del.root.visible = false; }
+    if (del) { L.say('d_l5_bye2', { force: true }); await t.wait(1.6); del.root.visible = false; }
     try { fd?.close?.(); fd?.setLocked?.(true); } catch {}
     ctx.audio?.sfx?.('door');
     const tvFront = apos(ctx, 'tvBoxSpot', V(5.6, 0, 1.3)).setY(0);

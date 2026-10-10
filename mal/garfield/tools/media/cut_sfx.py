@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 """Cut sample SFX out of raw clips → audio/sfx/<name>.mp3 (mono 44.1k 96 kbps, loudness-normalised).
 cut_sfx.py bursts <raw.wav>                     list detected vocal bursts (start-end s)
-cut_sfx.py cut <name> <raw.wav> <start> <end> [--loop] [--lufs -18]
+cut_sfx.py cut <name> <raw.wav> <start> <end> [--loop] [--lufs -18] [--lp 900]
+  --lp: low-pass (Hz), e.g. a dog heard through a closed cupboard door.
   --loop: crossfade the tail into the head so the clip loops seamlessly (pant_loop)."""
 import subprocess, sys
 from pathlib import Path
@@ -33,7 +34,7 @@ def bursts(x, thr_db=18, gap=0.06, minlen=0.05):
     return [(a * 0.01, b * 0.01) for a, b in merged if (b - a) * 0.01 >= minlen]
 
 
-def cut(name, raw, start, end, loop=False, lufs=-18):
+def cut(name, raw, start, end, loop=False, lufs=-18, lp=None):
     x = load(raw)
     a = x[int(start * SR): int(end * SR)].copy()
     if loop:
@@ -47,7 +48,7 @@ def cut(name, raw, start, end, loop=False, lufs=-18):
     tmp = ROOT / "tools/media/scratch/_cut.wav"
     import soundfile as sf
     sf.write(tmp, a, SR)
-    af = f"highpass=f=110,afftdn=nf=-40,loudnorm=I={lufs}:TP=-1.5:LRA=7"
+    af = f"highpass=f=110,afftdn=nf=-40,{f'lowpass=f={lp},lowpass=f={lp},' if lp else ''}loudnorm=I={lufs}:TP=-1.5:LRA=7"
     subprocess.run(["ffmpeg", "-y", "-loglevel", "error", "-i", str(tmp), "-af", af, "-ac", "1", "-ar", str(SR),
                     "-b:a", "96k", str(OUT / f"{name}.mp3")], check=True)
     print("wrote", name, round(len(a) / SR, 2), "s")
@@ -62,4 +63,6 @@ if __name__ == "__main__":
         args = [a for a in sys.argv[2:] if not a.startswith("--")]
         lufs = float(sys.argv[sys.argv.index("--lufs") + 1]) if "--lufs" in sys.argv else -18
         if "--lufs" in sys.argv: args.remove(sys.argv[sys.argv.index("--lufs") + 1])
-        cut(args[0], args[1], float(args[2]), float(args[3]), "--loop" in sys.argv, lufs)
+        lp = float(sys.argv[sys.argv.index("--lp") + 1]) if "--lp" in sys.argv else None
+        if lp: args.remove(sys.argv[sys.argv.index("--lp") + 1])
+        cut(args[0], args[1], float(args[2]), float(args[3]), "--loop" in sys.argv, lufs, lp)
