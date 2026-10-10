@@ -7,7 +7,7 @@ import { IS_TOUCH } from './config.js';
 import { $, el, clamp, clamp01, fmtTime, fmtRank } from './utils.js';
 import { camera } from './render.js';
 import { state } from './state.js';
-import { profile, worldRank } from './save.js';
+import { profile, worldRank, markDirty } from './save.js';
 import { tierFor } from './arsenal.js';
 import { input, press } from './input.js';
 import { terrainHeight } from './terrain.js';
@@ -39,11 +39,20 @@ export function initHUD(h) {
   bindTap('btn-mark', () => press('mark'));
   bindTap('btn-pause', () => handlers.onPause());
 
+  // the pad shows key letters for a keyboard; a thumb gets what the key does
+  if (IS_TOUCH) {
+    for (const [id, word] of [['btn-drone', 'UPLINK'], ['btn-scope', 'ZOOM'], ['btn-mark', 'PAINT']]) {
+      const sm = $(id).querySelector('small');
+      if (sm) sm.textContent = word;
+    }
+  }
+
   buildTagPool();
   buildArrowPool();
 
   on('banner', ({ text, small }) => showBanner(text, small));
-  on('toast', (text) => showToast(text));
+  // a toast is a string, or { text, dur } for the ones that teach something
+  on('toast', (t) => (typeof t === 'string' ? showToast(t) : showToast(t.text, t.dur)));
   on('crit', ({ tank, kind }) => {
     if (tank.isPlayer) showToast(kind + ' DAMAGED');
     else if (state.player) showToast('ENEMY ' + kind + ' HIT');
@@ -132,49 +141,69 @@ export function showHUD(on) {
 
 let miniT = 0;
 
+// Per-frame DOM writes go through these: a style or text write that has not
+// changed is skipped, and bars move by transform (compositor only, no layout).
+const E = {};
+function q(id) { return E[id] || (E[id] = $(id)); }
+function setText(node, v) {
+  if (node._t !== v) { node._t = v; node.textContent = v; }
+}
+function setBar(node, frac) {
+  const v = Math.round(clamp01(frac) * 1000) / 1000;
+  if (node._f !== v) { node._f = v; node.style.transform = 'scaleX(' + v + ')'; }
+}
+function setCls(node, cls, on) {
+  const k = '_c_' + cls;
+  if (node[k] !== on) { node[k] = on; node.classList.toggle(cls, on); }
+}
+function setStyle(node, prop, v) {
+  const k = '_s_' + prop;
+  if (node[k] !== v) { node[k] = v; node.style[prop] = v; }
+}
+
 export function updateHUD(dt) {
   const p = state.player;
   if (!p) return;
 
   // hull
   const hp = clamp01(p.hpFrac);
-  const fill = $('hull-fill');
-  fill.style.width = (hp * 100) + '%';
-  fill.classList.toggle('low', hp < 0.3);
-  $('hull-text').textContent = Math.ceil(p.hp) + ' / ' + p.hpMax;
+  const fill = q('hull-fill');
+  setBar(fill, hp);
+  setCls(fill, 'low', hp < 0.3);
+  setText(q('hull-text'), Math.ceil(p.hp) + ' / ' + p.hpMax);
 
   // reload
   const rf = clamp01(p.reloadFrac);
-  const rfill = $('reload-fill');
-  rfill.style.width = (rf * 100) + '%';
-  rfill.classList.toggle('ready', rf >= 1);
-  $('reload-text').textContent = rf >= 1
+  const rfill = q('reload-fill');
+  setBar(rfill, rf);
+  setCls(rfill, 'ready', rf >= 1);
+  setText(q('reload-text'), rf >= 1
     ? p.gun.short + ' · READY'
-    : p.gun.short + ' · ' + Math.max(0, p.fireTimer).toFixed(1) + 's';
+    : p.gun.short + ' · ' + Math.max(0, p.fireTimer).toFixed(1) + 's');
 
   // utility button
-  const ub = $('btn-util');
-  ub.querySelector('small').textContent = p.utilCharges != null ? p.utilCharges : '';
-  ub.classList.toggle('spent', !p.utilCharges || p.utilCd > 0);
+  const ub = q('btn-util');
+  if (!ub._small) ub._small = ub.querySelector('small');
+  setText(ub._small, p.utilCharges != null ? String(p.utilCharges) : '');
+  setCls(ub, 'spent', !p.utilCharges || p.utilCd > 0);
 
   // drone chip
   const d = state.drone;
-  const dchip = $('drone-chip');
   if (d) {
-    $('drone-fill').style.width = (d.alive ? d.hpFrac * 100 : 0) + '%';
-    dchip.classList.toggle('down', !d.alive);
-    $('drone-mode').textContent = d.alive
+    setBar(q('drone-fill'), d.alive ? d.hpFrac : 0);
+    setCls(q('drone-chip'), 'down', !d.alive);
+    setText(q('drone-mode'), d.alive
       ? (d.mode === 'scout' ? 'SCOUTING' : 'ORBIT')
-      : 'REBUILD ' + Math.ceil(d.downTimer) + 's';
-    $('btn-drone').classList.toggle('active', state.camMode === 'drone');
-    $('btn-drone').classList.toggle('spent', !d.alive);
+      : 'REBUILD ' + Math.ceil(d.downTimer) + 's');
+    setCls(q('btn-drone'), 'active', state.camMode === 'drone');
+    setCls(q('btn-drone'), 'spent', !d.alive);
   }
-  $('btn-scope').classList.toggle('active', state.camMode === 'scope');
+  setCls(q('btn-scope'), 'active', state.camMode === 'scope');
 
   // wind — the arrow points the way the shells drift
   const w = state.wind;
-  $('wind-arrow').style.transform = `rotate(${Math.atan2(w.x, -w.z) * 180 / Math.PI}deg)`;
-  $('wind-text').textContent = w.speed.toFixed(1);
+  setStyle(q('wind-arrow'), 'transform', `rotate(${Math.round(Math.atan2(w.x, -w.z) * 180 / Math.PI)}deg)`);
+  setText(q('wind-text'), w.speed.toFixed(1));
 
   // status effects
   updateStatus(p);
@@ -191,15 +220,15 @@ export function updateHUD(dt) {
   updateMarkers();
 
   // overlays
-  $('scope-overlay').classList.toggle('hidden', state.camMode !== 'scope');
-  $('drone-overlay').classList.toggle('hidden', state.camMode !== 'drone');
+  setCls(q('scope-overlay'), 'hidden', state.camMode !== 'scope');
+  setCls(q('drone-overlay'), 'hidden', state.camMode !== 'drone');
 
   // streak
-  const st = $('streak');
+  const st = q('streak');
   if (state.streak >= 2 && state.streakTimer > 0) {
-    st.classList.remove('hidden');
-    st.textContent = state.streak + '× STREAK';
-  } else st.classList.add('hidden');
+    setCls(st, 'hidden', false);
+    setText(st, state.streak + '× STREAK');
+  } else setCls(st, 'hidden', true);
 
   // minimap at 12fps — it does not need 60
   miniT -= dt;
@@ -213,7 +242,88 @@ export function updateHUD(dt) {
     toastTimer -= dt;
     if (toastTimer <= 0) $('toast').classList.add('hidden');
   }
+  if (toastHold > 0) {
+    toastHold -= dt;
+    if (toastHold <= 0 && toastNext) { const n = toastNext; toastNext = null; showToast(n); }
+  }
   updateFloaters(dt);
+  updateCoach(dt);
+}
+
+// ---------------------------------------------------------------------------
+// First-battle coach marks (a1m1, touch only)
+// ---------------------------------------------------------------------------
+// Faint ghost thumbs on the drive zone, the aim zone and FIRE. Each fades the
+// first time its control is actually used and never comes back on this save.
+// Positions follow settings.aimSide / padSide, so a swapped layout is taught
+// the right way round.
+
+const COACH = [
+  { id: 'drive', text: 'DRAG TO DRIVE', anim: 'drive' },
+  { id: 'aim', text: 'DRAG TO AIM', anim: 'aim' },
+  { id: 'fire', text: 'HOLD FIRE', anim: 'press' },
+];
+const coach = { els: null, used: { drive: 0, aim: 0, fire: 0 }, aimFrom: null, active: false };
+
+export function resetCoach() {
+  if (coach.els) for (const k in coach.els) coach.els[k].remove();
+  coach.els = null;
+  coach.used = { drive: 0, aim: 0, fire: 0 };
+  coach.aimFrom = null;
+  const seen = profile.seen.coach || {};
+  coach.active = IS_TOUCH && state.mission && state.mission.id === 'a1m1' &&
+    !(seen.drive && seen.aim && seen.fire);
+}
+
+function coachSeen(id) {
+  profile.seen.coach = { ...(profile.seen.coach || {}), [id]: true };
+  markDirty();
+  const e = coach.els && coach.els[id];
+  if (e) { e.classList.add('gone'); setTimeout(() => e.remove(), 700); delete coach.els[id]; }
+}
+
+function updateCoach(dt) {
+  if (!coach.active) return;
+  const seen = profile.seen.coach || {};
+  const live = state.phase === 'playing' && !state.cine && !state.killcam && state.camMode === 'chase';
+  if (!coach.els) {
+    if (!live) return;
+    coach.els = {};
+    for (const c of COACH) {
+      if (seen[c.id]) continue;
+      const e = el('div', 'coach coach-' + c.anim);
+      e.append(el('i'), el('span', null, c.text));
+      $('hud').appendChild(e);
+      coach.els[c.id] = e;
+    }
+  }
+  for (const k in coach.els) setCls(coach.els[k], 'off', !live);
+  if (!live) return;
+
+  // what counts as having used each control
+  if (input.joyActive && input.move.lengthSq() > 0.09) coach.used.drive += dt;
+  if (input.aimActive) {
+    if (!coach.aimFrom) coach.aimFrom = { x: input.aim.x, y: input.aim.y };
+    else if (Math.hypot(input.aim.x - coach.aimFrom.x, input.aim.y - coach.aimFrom.y) > 0.12) coach.used.aim = 1;
+  } else coach.aimFrom = null;
+  if (input.fire) coach.used.fire += dt;
+  if (coach.els.drive && coach.used.drive > 0.35) coachSeen('drive');
+  if (coach.els.aim && coach.used.aim) coachSeen('aim');
+  if (coach.els.fire && coach.used.fire > 0.05) coachSeen('fire');
+  if (!Object.keys(coach.els).length) { coach.active = false; return; }
+
+  const W = window.innerWidth, H = window.innerHeight;
+  const aimRight = profile.settings.aimSide !== 'left';
+  const padRight = profile.settings.padSide !== 'left';
+  const padOnDrive = aimRight ? !padRight : padRight;
+  const place = (e, x, y) => setStyle(e, 'transform', `translate(${Math.round(x)}px, ${Math.round(y)}px)`);
+  if (coach.els.drive) place(coach.els.drive, (aimRight ? 0.2 : 0.8) * W, (padOnDrive ? 0.5 : 0.72) * H);
+  // low in the aim zone, clear of the reticle (which sits near the middle)
+  if (coach.els.aim) place(coach.els.aim, (aimRight ? 0.64 : 0.36) * W, 0.62 * H);
+  if (coach.els.fire) {
+    const r = q('btn-fire').getBoundingClientRect();
+    place(coach.els.fire, r.left + r.width / 2, r.top + r.height / 2);
+  }
 }
 
 function updateStatus(p) {
@@ -236,7 +346,7 @@ function updateStatus(p) {
 function updateObjectiveUI() {
   const o = state.objective;
   if (!o) return;
-  $('obj-label').textContent = o.label;
+  setText(q('obj-label'), o.label);
   let frac = 0, sub = '';
   switch (o.kind) {
     case 'survive':
@@ -265,25 +375,24 @@ function updateObjectiveUI() {
       frac = o.goal ? clamp01(o.progress / o.goal) : 0;
       sub = Math.max(0, Math.floor(o.progress)) + ' / ' + o.goal;
   }
-  $('obj-fill').style.width = (frac * 100) + '%';
-  $('obj-fill').classList.toggle('warn', o.kind === 'hold' && !o.inside);
-  $('obj-sub').textContent = sub;
+  setBar(q('obj-fill'), frac);
+  setCls(q('obj-fill'), 'warn', o.kind === 'hold' && !o.inside);
+  setText(q('obj-sub'), sub);
 }
 
 function updateReticle(p) {
-  const r = $('reticle');
+  const r = q('reticle');
   const show = state.camMode !== 'drone';
-  r.classList.toggle('hidden', !show);
+  setCls(r, 'hidden', !show);
   if (!show) return;
-  const x = (input.aim.x * 0.5 + 0.5) * window.innerWidth;
-  const y = (-input.aim.y * 0.5 + 0.5) * window.innerHeight;
-  r.style.transform = `translate(${x}px, ${y}px)`;
-  r.classList.toggle('locked', !!state.lockTarget);
-  r.classList.toggle('auto', !!state.autoAiming);
-  r.classList.toggle('ready', p.fireTimer <= 0);
-  r.classList.toggle('invalid', state.aimValid === false);
-  const rng = $('ret-range');
-  rng.textContent = state.aimRange ? Math.round(state.aimRange) + 'm' : '';
+  const x = Math.round((input.aim.x * 0.5 + 0.5) * window.innerWidth * 2) / 2;
+  const y = Math.round((-input.aim.y * 0.5 + 0.5) * window.innerHeight * 2) / 2;
+  setStyle(r, 'transform', `translate(${x}px, ${y}px)`);
+  setCls(r, 'locked', !!state.lockTarget);
+  setCls(r, 'auto', !!state.autoAiming);
+  setCls(r, 'ready', p.fireTimer <= 0);
+  setCls(r, 'invalid', state.aimValid === false);
+  setText(q('ret-range'), state.aimRange ? Math.round(state.aimRange) + 'm' : '');
 }
 
 // ---------------------------------------------------------------------------
@@ -610,14 +719,29 @@ export function showBanner(text, small = false) {
   bannerTimer = 1.9;
 }
 
-export function showToast(text) {
+// Teaching toasts stay up ~4s. A routine toast that arrives meanwhile waits
+// for it rather than wiping the lesson off the glass; only the latest waits.
+let toastHold = 0;
+let toastNext = null;
+
+export function showToast(text, dur = 1.9) {
+  if (toastHold > 0 && dur < 3) { toastNext = text; return; }
   const t = $('toast');
   t.textContent = text;
   t.classList.remove('hidden');
+  t.style.setProperty('--toast-dur', dur + 's');
   t.style.animation = 'none';
   void t.offsetWidth;
   t.style.animation = '';
-  toastTimer = 1.9;
+  toastTimer = dur;
+  toastHold = dur >= 3 ? dur * 0.85 : 0;
+}
+
+export function hideToast() {
+  $('toast').classList.add('hidden');
+  toastTimer = 0;
+  toastHold = 0;
+  toastNext = null;
 }
 
 export function flashHit() {
@@ -693,11 +817,12 @@ function updateFloaters(dt) {
 
 // Called once per battle start.
 export function resetHUD() {
+  resetCoach();
   clearFeed();
   for (const f of floaters) f.el.remove();
   floaters.length = 0;
   $('banner').classList.add('hidden');
-  $('toast').classList.add('hidden');
+  hideToast();
   const rank = worldRank();
   const tier = tierFor(rank);
   $('hud-name').textContent = profile.name;
