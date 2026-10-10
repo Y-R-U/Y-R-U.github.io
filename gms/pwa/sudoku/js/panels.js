@@ -7,6 +7,8 @@ class PanelManager {
     this.getStats = hooks.getStats || (() => JSON.parse(localStorage.getItem('sudokuStats') || '{}'));
     this.getHintPref = hooks.getHintPref || (() => true);
     this.setHintPref = hooks.setHintPref || (() => {});
+    this.getPrefs = hooks.getPrefs || (() => ({}));
+    this.setPref = hooks.setPref || (() => {});
     this.initSettingsPanel();
     this.initStatsPanel();
     this.initHelpPanel();
@@ -40,6 +42,14 @@ class PanelManager {
     musicToggle.addEventListener('change', () => this.audio.setMusic(musicToggle.checked));
     soundToggle.addEventListener('change', () => this.audio.setSound(soundToggle.checked));
     hintToggle.addEventListener('change', () => this.setHintPref(hintToggle.checked));
+    this.syncPrefToggles();
+    document.getElementById('fastFillToggle').addEventListener('change', e => this.setPref('fastFill', e.target.checked));
+    document.getElementById('hideMistakesToggle').addEventListener('change', e => this.setPref('hideMistakes', e.target.checked));
+
+    // No music ships yet; the row appears only once tracks are listed.
+    this.audio.checkAvailableTracks().then(() => {
+      document.getElementById('musicRow').hidden = !this.audio.availableTracks.length;
+    });
 
     document.getElementById('helpBtn').addEventListener('click', () => {
       this.closeSettings();
@@ -52,8 +62,15 @@ class PanelManager {
     document.getElementById('musicToggle').checked = this.audio.musicEnabled;
     document.getElementById('soundToggle').checked = this.audio.soundEnabled;
     document.getElementById('hintToggle').checked = this.getHintPref();
+    this.syncPrefToggles();
     document.getElementById('settingsOverlay').classList.add('active');
     this.onOpen();
+  }
+
+  syncPrefToggles() {
+    const p = this.getPrefs();
+    document.getElementById('fastFillToggle').checked = p.fastFill !== false;
+    document.getElementById('hideMistakesToggle').checked = !!p.hideMistakes;
   }
 
   closeSettings() {
@@ -118,6 +135,13 @@ class PanelManager {
     }
 
     document.getElementById('statsTotalWins').textContent = totalWins;
+
+    const d = stats.daily || {};
+    const yesterday = new Date(Date.now() - 86400000).toISOString().slice(0, 10);
+    const streak = d.last && d.last >= yesterday ? d.streak || 0 : 0;
+    document.getElementById('statsDaily').innerHTML = d.wins
+      ? `Daily streak <strong>${streak}</strong> · best ${d.best || 0} · ${d.wins} solved`
+      : 'Solve the daily puzzle (calendar, top left) to start a streak.';
   }
 
   formatTime(ms) {

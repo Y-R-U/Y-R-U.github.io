@@ -3,21 +3,26 @@
 # Path: gms/pwa/sudoku/
 # Last full rework: 2026-07-29 (Opus 5) — engine regraded, notes model replaced,
 # account layer wired. See REVIEW_TODO.md for what was done and what's left.
+# 2026-10-11 hub-review pass: persistent number pad (modal picker and long press
+# retired), tier-3 techniques + tier 4, technique hints, daily puzzle + streak,
+# worker generation with prefetch, SW timeout, landscape layout. See CLAUDE.md.
 
 ## FILE STRUCTURE
 gms/pwa/sudoku/
 ├── index.html          – Single-page app shell; all CSS is inline
 ├── manifest.json       – PWA manifest (display:standalone, theme:#4a90e2)
-├── sw.js               – Service worker, cache 'sudoku-v5'
+├── sw.js               – Service worker, cache 'sudoku-v7'
 ├── icon-512.png        – App icon
 ├── js/
 │   ├── engine.js       – SudokuEngine: generation, solving, difficulty grading
-│   ├── game.js         – SudokuGame: main controller
+│   ├── game.js         – PuzzleSource (worker wrapper) + SudokuGame controller
+│   ├── gen-worker.js   – importScripts(engine.js); generatePuzzle off the main thread
 │   ├── panels.js       – PanelManager: settings/stats/help overlays
 │   ├── audio.js        – AudioManager: music + Web Audio SFX
 │   ├── cloud.js        – br8t account glue (ES module, dynamically imported)
 │   └── boot-cloud.js   – imports cloud.js; the other scripts are classic, not modules
-└── music/              – optional theme1.mp3–theme10.mp3
+└── music/              – tracks.json lists which theme<n>.mp3 exist ([] today,
+                          so the Music setting row is hidden)
 
 ## THE THING TO UNDERSTAND FIRST — difficulty is graded, not counted
 Clue count is a bad proxy for difficulty: at 22 clues a third of random puzzles
@@ -28,30 +33,49 @@ would and reports the hardest technique it forced:
   0  naked / hidden singles
   1  + locked candidates (pointing & claiming), naked / hidden pairs
   2  + naked / hidden triples, X-wing
-  3  none of those finish it — chains or trial and error
+  3  + XY-wing, swordfish, simple colouring (wrap + trap)
+  4  none of those finish it — chains or trial and error
 
 `SudokuEngine.LEVELS` maps each level to { clues, minClues, minTier, maxTier }.
-`carve()` removes to the clue target, then steps one cell at a time — removing
-makes a puzzle harder, restoring makes it easier — hunting the requested band,
-keeping the closest board it saw. `generatePuzzle()` retries up to 12 times
-against a 2s deadline.
+Hard is 2..3 (beyond pairs but always grader-solvable, never a guess); Crazy is
+3..4 (no ceiling). `carve()` removes to the clue target, then steps one cell at
+a time — removing makes a puzzle harder, restoring makes it easier — hunting the
+requested band, keeping the closest board it saw. Restored cells go to the FRONT
+of `kept` (unshift), or the next removal just undoes the restore and the hunt
+oscillates. `bandDistance()` weights overshooting the ceiling ×10, so a Hard
+that misses lands too easy rather than unsolvable. `generatePuzzle()` retries
+up to 24 times against a 2s deadline; with a seed it is deterministic and has
+no deadline.
 
-Measured over 100 puzzles per level: basic/simple/easy 100% tier 0;
-medium 96% tier 1; hard 96% tier 3 (4% tier 2); crazy 100% tier 3.
-Worst case 49ms — the old naive solver peaked at 362ms, a visible phone freeze.
+Measured 2026-10-11 over 200 puzzles per level (node, engine-bench.mjs):
+  basic/simple/easy  100% tier 0
+  medium  200/200 tier 1, clues 24-33 (median 27)
+  hard    200/200 in band: 6 tier 2, 194 tier 3; clues 24-36 (median 28)
+  crazy   46 tier 3, 154 tier 4; clues 22-28 (median 25)
+  no non-unique puzzles, zero unsound eliminations (no true digit removed)
+Main-thread time at a 4x CPU throttle (headless Chrome, n=120, p50/p95/max ms):
+  medium 52/224/346, hard 117/469/975, crazy 43/269/539
+(before this pass: medium 98/445/601, hard 24/131/349, crazy 37/262/658 — Hard
+got slower because it now has to stay solvable). That is a visible freeze, so
+generation runs in js/gen-worker.js and the next puzzle for the current level is
+pre-generated in an idle callback after load and after a win: "New"/"Next" is
+then ~1ms, and a cold request shows "Generating…" over a dimmed board.
 
 **Tier 2 is deliberately not a band of its own.** Puzzles needing triples or an
 X-wing but nothing beyond are rare; hunting one oscillates between tier 1 and 3
-and costs ~45ms for a worse result. Hard and Crazy are both "beyond pairs",
-separated by ~6 clues. Don't "fix" this without re-measuring.
+and costs ~45ms for a worse result. Hard is the 2..3 band (in practice 97%
+tier 3), Crazy the 3..4 band with ~3 fewer clues. Don't "fix" this without
+re-measuring.
 
 ## LOCALSTORAGE KEYS
-'sudokuGame3'   – board in play. Grid/given/level/notes/timer/mistakes/hints.
-                  NOT synced to the cloud, and does NOT contain the solution.
-'sudokuStats'   – { level: { wins, bestMs, cleanWins, hints } }   [synced]
+'sudokuGame3'   – board in play. Grid/given/level/daily/notes/timer/mistakes/
+                  hints. NOT synced, and does NOT contain the solution.
+'sudokuStats'   – { level: { wins, bestMs, cleanWins, hints },
+                    daily: { last:'YYYY-MM-DD' UTC, streak, best, wins } } [synced]
 'sudokuAudio'   – { music, sound, currentTrack }                  [synced]
 'sudokuHintBtn' – 'on' | 'off'                                    [synced]
-'sudokuTracks'  – cached music HEAD-probe result, 24h expiry
+'sudokuPrefs'   – { fastFill (default true), hideMistakes (default false) } [synced]
+('sudokuTracks' is retired and deleted on load.)
 
 ## js/engine.js – SudokuEngine
 Candidate sets are 9-bit masks (bit 0 = digit 1). `this.units` is the 27 houses,
@@ -66,52 +90,63 @@ hasUniqueSolution(grid)       – countSolutions === 1
 solve(grid)                   – complete a puzzle, or null. Used on load to
                                 recover the solution without persisting it.
 gradeTier(puzzle)             – 0..3, see above
-stepSingles/stepLocked/stepSubsets(k)/stepXWing  – the graded techniques
-generatePuzzle(level)         – { grid, solution, given, tier }
+stepSingles/stepLocked/stepSubsets(k)/stepXWing/stepXYWing/stepSwordfish/
+stepColouring                 – the graded techniques. With `engine.trace` set
+                                to an array they stop after their first
+                                productive pattern and describe it there.
+explainNext(puzzle)           – { steps:[…eliminations, single], stuck? } — the
+                                hint button's source
+seededRandom(str)/rand        – mulberry32; shuffle() uses this.rand
+generatePuzzle(level, seed?)  – { grid, solution, given, tier }
 carve(spec, deadline)         – one generation attempt
 isValidCompleteSolution(grid) – full validation of a completed board
 shuffle(arr)                  – Fisher-Yates
 
 ## js/game.js – SudokuGame
-State: grid/solution/given (9×9), level, selected (0-80), lastNumber, history,
-       notes (9×9 of 9-bit masks), notesMode, stats, showHint,
-       elapsedMs/timerStart/timerRunning/solved, mistakes, hintsUsed
+State: grid/solution/given (9×9), level, daily, selected (0-80), lastNumber
+       (the "armed" digit), history, notes (9×9 of 9-bit masks), notesMode,
+       stats, prefs, showHint, elapsedMs/timerStart/timerRunning/solved,
+       generating, spare (pre-generated puzzle), mistakes, hintsUsed, hintInfo
 
-Notes are STANDARD pencil marks: digit n lives in slot n. The old
-position-then-number flow is gone. Notes mode + tapping a digit toggles it, and
-the popup stays open so several can be pencilled in one visit.
+INPUT MODEL: a persistent pad under the board (createPad). Tap a cell, then a
+pad digit (padDigit). With no editable cell selected, a pad digit ARMS itself
+(lastNumber): its cells highlight, and with fast-fill on each tap on an empty
+cell places it where fully valid. Tapping the armed digit again disarms it.
+Notes mode turns the pad into pencil-mark toggles. Long press = plain tap.
 
-init()                  – listeners, incl. the long-press click swallower
-createGrid()            – 81 cells, click + contextmenu + long-press
-newGame()/changeDifficulty(level)/syncDifficultyButtons()
-hasProgress()           – has the player touched this puzzle?
-Timer: currentElapsedMs/formatTime/renderTimer/startTimer/pauseTimer/
-       resumeIfIdle/resetTimer   — pauses on popup, panel, and tab hide
-migrateStats(raw)       – v1 number → v2 {wins,bestMs} → v3 +cleanWins,+hints
-handleKey(e)            – 1-9, arrows, Backspace, Esc, N notes, H hint, U undo
-requestPopup(i)/selectCell(i)/showPopup()/closePopup()
-toggleNotesMode()/toggleNote(num)/clearPeerNotes(row,col,num)
-pushHistory(i)/placeNumber(num)/handleClear()/undo()   – history capped at 200
-useHint()/setHintVisible(on)
-isComplete()/wrongCellCount()/checkSolution()/revealMistakes()
-render()/renderStatusBar(remaining)
-saveGame()              – debounced 250ms; flushSave() forces it out
-writeSave()/loadGame()/isValidSavedState(s)/clearSavedGame()
+locked()                – solved || generating. Every input path returns early
+                          on it, so a solved board can't be re-won.
+newGame({daily})        – uses `spare` if it matches, else asks the worker and
+                          shows "Generating…"; startPuzzle() applies the result
+prefetch()              – idle-callback generation of the next spare
+armConfirm(btn, run)    – "Tap again" on the button, reverts after 3s. Used for
+                          New, difficulty switches and Restart. The daily asks
+                          via a callout in #message. No alert/confirm/prompt.
+requestDaily()/recordDailyWin()/currentStreak()  – UTC dates, `last >= today`
+useHint()               – 1st tap: names the technique (wrong digits first, then
+                          explainNext) and highlights the pattern + target;
+                          2nd tap on an unchanged board places the digit.
+                          Counts as one hint.
+autoCandidates()        – Hard/Crazy only; one undo step (history index -1)
+migrateStats(raw)       – v1 number → v2 → v3, and keeps `daily`
+handleKey(e)            – 1-9 (= pad), arrows, Backspace erase, Esc deselect,
+                          N notes, H hint, U undo
+saveGame() debounced 250ms; flushSave(); writeSave()/loadGame()
 
 ## NOTES / GOTCHAS
-- **The long press was doubly broken and the fix is subtle.** `preventDefault()`
-  inside the long-press `setTimeout` is a no-op — the event has already been
-  dispatched. Worse, by the time the finger lifts the picker is covering the
-  spot that was pressed, so the synthesized click lands on a *number button* and
-  places a digit nobody chose. The fix is a capture-phase click swallower on
-  document with a 700ms deadline (`suppressClickUntil`). A latched boolean flag
-  is wrong: a long press that ends outside the picker never produces a click,
-  and the flag would then eat the player's next real tap.
+- **The long press and its 700ms click swallower are gone** (2026-10-11): the
+  pad made the modal picker unnecessary, so nothing opens under the finger any
+  more. If a popup is ever reintroduced, remember why the swallower existed:
+  `preventDefault()` inside a long-press `setTimeout` is a no-op, and the
+  release-click lands on whatever the popup put under the finger.
 - **The service worker sees every request its clients make**, not just files
   under its scope — including `/lib/auth/*.js` and Firebase's calls to
   googleapis.com. Cache-first on those means stale auth code and replayed API
   reads. sw.js therefore ignores anything cross-origin or outside
-  `self.registration.scope`, and is network-first for HTML/JS within it.
+  `self.registration.scope`, and is network-first for HTML/JS within it —
+  with a 3s timeout that falls back to the cache (the fetch keeps going and
+  refreshes it), after which the network counts as slow for 15s. Navigations
+  are cached under the query-stripped URL and matched with ignoreSearch.
 - The solution is never written to localStorage; `loadGame()` rebuilds it with
   `engine.solve()` from the given cells only, so a tampered grid can't poison it.
 - Saved games only carry the board — undo history is session-scoped by design.

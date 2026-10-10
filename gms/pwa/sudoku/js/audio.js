@@ -11,6 +11,27 @@ class AudioManager {
     this.sfxCtx = null;
 
     this.loadSettings();
+    localStorage.removeItem('sudokuTracks');   // retired HEAD-probe cache
+    this.installUnlock();
+  }
+
+  // Browsers only start audio inside a user gesture, and on Android a touch's
+  // pointerdown/touchstart doesn't count — touchend and click do. So every
+  // gesture type gets a listener for the page's lifetime.
+  installUnlock() {
+    const unlock = () => {
+      if (this.sfxCtx && this.sfxCtx.state !== 'running') this.sfxCtx.resume().catch(() => {});
+      else if (!this.sfxCtx && this.soundEnabled) this.getSfxCtx();
+      this.resumeIfNeeded();
+    };
+    for (const type of ['pointerdown', 'touchend', 'click', 'keydown']) {
+      document.addEventListener(type, unlock, { capture: true, passive: true });
+    }
+    document.addEventListener('visibilitychange', () => {
+      if (!this.sfxCtx) return;
+      if (document.hidden) this.sfxCtx.suspend().catch(() => {});
+      else this.sfxCtx.resume().catch(() => {});
+    });
   }
 
   // Lazy-init a single shared AudioContext. Browsers cap concurrent contexts
@@ -20,9 +41,12 @@ class AudioManager {
     if (!this.sfxCtx) {
       const Ctx = window.AudioContext || window.webkitAudioContext;
       if (!Ctx) return null;
+      // Without this iOS routes Web Audio through the ringer, which the silent
+      // switch mutes.
+      try { if (navigator.audioSession) navigator.audioSession.type = 'playback'; } catch (e) { /* unsupported */ }
       this.sfxCtx = new Ctx();
     }
-    if (this.sfxCtx.state === 'suspended') this.sfxCtx.resume().catch(() => {});
+    if (this.sfxCtx.state !== 'running') this.sfxCtx.resume().catch(() => {});
     return this.sfxCtx;
   }
 
@@ -46,36 +70,19 @@ class AudioManager {
     }));
   }
 
-  // Probe which music files actually exist. Ten HEAD requests on every session
-  // is a lot of noise for an answer that changes only when files are added, so
-  // the result is cached for a day.
+  // music/tracks.json lists the theme numbers that exist (theme<n>.mp3). One
+  // small request instead of probing ten files that mostly 404.
   async checkAvailableTracks() {
-    if (this.tracksChecked) return;
-
-    const cached = this.readTrackCache();
-    if (cached) { this.availableTracks = cached; this.tracksChecked = true; return; }
-
+    if (this.tracksChecked) return this.tracksPromise;
     this.tracksChecked = true;
-    const found = [];
-    await Promise.all(Array.from({ length: this.totalTracks }, (_, i) =>
-      fetch(`./music/theme${i + 1}.mp3`, { method: 'HEAD' })
-        .then(res => { if (res.ok) found.push(i + 1); })
-        .catch(() => { /* file not available */ })
-    ));
-    found.sort((a, b) => a - b);
-    this.availableTracks = found;
-    try {
-      localStorage.setItem('sudokuTracks', JSON.stringify({ at: Date.now(), tracks: found }));
-    } catch (e) { /* private mode */ }
-  }
-
-  readTrackCache() {
-    try {
-      const raw = JSON.parse(localStorage.getItem('sudokuTracks') || 'null');
-      if (!raw || !Array.isArray(raw.tracks)) return null;
-      if (Date.now() - (raw.at || 0) > 86400000) return null;
-      return raw.tracks.filter(n => Number.isInteger(n) && n >= 1 && n <= this.totalTracks);
-    } catch (e) { return null; }
+    this.tracksPromise = fetch('./music/tracks.json')
+      .then(res => (res.ok ? res.json() : []))
+      .then(list => {
+        this.availableTracks = Array.isArray(list)
+          ? list.filter(n => Number.isInteger(n) && n >= 1 && n <= this.totalTracks) : [];
+      })
+      .catch(() => { this.availableTracks = []; });
+    return this.tracksPromise;
   }
 
   async setMusic(enabled) {
@@ -184,8 +191,8 @@ class AudioManager {
 
   // Try resuming music after a user gesture (for autoplay policy)
   resumeIfNeeded() {
-    if (this.musicEnabled && (!this.audio || this.audio.paused)) {
-      this.playNextTrack();
-    }
+    if (!this.musicEnabled || !this.availableTracks.length) return;
+    if (!this.audio) this.playNextTrack();
+    else if (this.audio.paused) this.audio.play().catch(() => {});
   }
 }

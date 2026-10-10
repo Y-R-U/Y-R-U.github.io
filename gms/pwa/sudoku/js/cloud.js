@@ -17,6 +17,7 @@ const KEYS = [
   "sudokuStats",    // per-difficulty wins, best times, hints used
   "sudokuAudio",    // music / sound prefs
   "sudokuHintBtn",  // whether the hint button is shown
+  "sudokuPrefs",    // fast-fill, hide mistakes
 ];
 
 const LEVELS = [
@@ -53,6 +54,7 @@ export function describe(s) {
     return (typeof e === "number" ? e : (e && e.wins) || 0) > 0;
   });
   if (hardest) out.push(`Hardest cleared: ${hardest[1]}`);
+  if (stats.daily && stats.daily.wins) out.push(`${stats.daily.wins} daily puzzle${stats.daily.wins === 1 ? "" : "s"} · best streak ${stats.daily.best || 0}`);
   return out;
 }
 
@@ -61,11 +63,11 @@ export function describe(s) {
 // Sudoku is the exception to "menus and results screens only": it has neither.
 // The grid is up from the first frame to the last, so a rule that waited for a
 // menu would mean this game never asks at all. A pill in the far corner of a
-// still board is not an interruption — the one moment that is, is choosing a
-// digit, so that's the only thing we hold off for.
+// still board is not an interruption — entering digits is, so we wait for a
+// few seconds' pause in input.
 function canPester() {
-  const popup = document.getElementById("popup");
-  return !popup || !popup.classList.contains("active");
+  const g = typeof game !== "undefined" ? game : null;
+  return !g || g.solved || Date.now() - (g.lastInputAt || 0) > 5000;
 }
 
 export const cloud = syncLocalKeys({

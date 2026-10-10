@@ -8,9 +8,17 @@
 //
 // Within the directory, code and markup are network-first — a deploy has to be
 // able to reach players on their next load — while images and audio, which are
-// immutable in practice, are cache-first.
+// immutable in practice, are cache-first. "Network-first" gives the network 3s:
+// a connection that accepts and never answers (captive wifi, a dying signal)
+// otherwise hangs the page forever. Past that the cached copy is served while
+// the fetch carries on and refreshes the cache for next time.
 
-const CACHE_NAME = 'sudoku-v6';
+const CACHE_NAME = 'sudoku-v7';
+const NETWORK_TIMEOUT = 3000;
+// After one timeout the network is presumed bad for a while, so the rest of the
+// page's files come straight from the cache instead of each waiting 3s in turn.
+const SLOW_WINDOW = 15000;
+let slowUntil = 0;
 const APP_SHELL = [
   './',
   './index.html',
@@ -20,7 +28,9 @@ const APP_SHELL = [
   './js/audio.js',
   './js/panels.js',
   './js/game.js',
-  './js/boot-cloud.js'
+  './js/gen-worker.js',
+  './js/boot-cloud.js',
+  './music/tracks.json'
 ];
 
 self.addEventListener('install', event => {
@@ -66,16 +76,31 @@ self.addEventListener('fetch', event => {
     return;
   }
 
-  // Network-first for HTML/JS/JSON: fresh when online, still playable when not.
-  event.respondWith(
-    caches.open(CACHE_NAME).then(cache =>
-      fetch(req)
-        .then(res => {
-          if (res && res.ok) cache.put(req, res.clone());
-          return res;
-        })
-        .catch(() => cache.match(req).then(hit =>
-          hit || (req.mode === 'navigate' ? cache.match('./index.html') : undefined)))
-    )
-  );
+  // A navigation is stored under its bare URL: ?test, ?fbclid=… and friends are
+  // all the same page, and keying on the query piles up a copy per link.
+  const nav = req.mode === 'navigate';
+  const key = nav ? url.origin + url.pathname : req;
+  const cacheP = caches.open(CACHE_NAME);
+  const network = fetch(req);
+  event.waitUntil(network.then(res => {
+    if (!res || !res.ok) return;
+    const copy = res.clone();
+    return cacheP.then(cache => cache.put(key, copy));
+  }).catch(() => {}));
+
+  event.respondWith((async () => {
+    const cache = await cacheP;
+    const cached = () => cache.match(key, { ignoreSearch: nav })
+      .then(hit => hit || (nav ? cache.match('./index.html') : undefined));
+    if (Date.now() < slowUntil) {
+      const hit = await cached();
+      if (hit) return hit;
+    }
+    const timeout = new Promise(resolve => setTimeout(resolve, NETWORK_TIMEOUT, 'timeout'));
+    const first = await Promise.race([network.catch(() => 'error'), timeout]);
+    if (first !== 'timeout' && first !== 'error') { slowUntil = 0; return first; }
+    if (first === 'timeout') slowUntil = Date.now() + SLOW_WINDOW;
+    // Nothing cached: keep waiting on (or fail with) the network.
+    return (await cached()) || network;
+  })());
 });

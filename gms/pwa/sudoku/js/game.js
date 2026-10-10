@@ -1,7 +1,50 @@
+// Generation runs in a worker so a slow Hard/Crazy carve never freezes the
+// board. If the worker can't start (file://, old browser) it falls back to the
+// main thread.
+class PuzzleSource {
+  constructor(engine) {
+    this.engine = engine;
+    this.seq = 0;
+    this.waiting = new Map();
+    try {
+      this.worker = new Worker('./js/gen-worker.js');
+      this.worker.onmessage = e => {
+        const job = this.waiting.get(e.data.id);
+        if (!job) return;
+        this.waiting.delete(e.data.id);
+        job.resolve(e.data.puzzle);
+      };
+      this.worker.onerror = () => this.fallBack();
+    } catch (e) { this.worker = null; }
+  }
+
+  fallBack() {
+    this.worker = null;
+    const jobs = [...this.waiting.values()];
+    this.waiting.clear();
+    for (const job of jobs) this.runLocally(job);
+  }
+
+  runLocally(job) {
+    setTimeout(() => job.resolve(this.engine.generatePuzzle(job.level, job.seed)), 0);
+  }
+
+  get(level, seed) {
+    return new Promise(resolve => {
+      const job = { level, seed, resolve };
+      if (!this.worker) return this.runLocally(job);
+      const id = ++this.seq;
+      this.waiting.set(id, job);
+      this.worker.postMessage({ id, level, seed });
+    });
+  }
+}
+
 // Main Sudoku Game — state management, UI rendering, user interaction
 class SudokuGame {
   constructor() {
     this.engine = new SudokuEngine();
+    this.source = new PuzzleSource(this.engine);
     this.audioManager = new AudioManager();
 
     // Core grid state
@@ -9,15 +52,17 @@ class SudokuGame {
     this.solution = SudokuGame.make9x9(0);
     this.given    = SudokuGame.make9x9(false);
     this.level    = 'easy';
+    this.daily    = null;          // UTC date string while playing a daily
     this.selected = null;
-    this.lastNumber = 0;
+    this.lastNumber = 0;           // the armed digit for fast-fill
     this.history  = [];
 
     // Pencil marks. One 9-bit mask per cell: bit 0 = digit 1 … bit 8 = digit 9.
     this.notes = SudokuGame.make9x9(0);
     this.notesMode = false;
 
-    this.stats = this.migrateStats(JSON.parse(localStorage.getItem('sudokuStats') || '{}'));
+    this.stats = this.migrateStats(SudokuGame.readJSON('sudokuStats', {}));
+    this.prefs = Object.assign({ fastFill: true, hideMistakes: false }, SudokuGame.readJSON('sudokuPrefs', {}));
     this.showHint = localStorage.getItem('sudokuHintBtn') !== 'off';
     this.deferredPrompt = null;
 
@@ -29,9 +74,16 @@ class SudokuGame {
     this.timerInterval = null;
     this.solved = false;
 
+    this.generating = false;
+    this.genToken = 0;
+    this.spare = null;             // a pre-generated { level, puzzle }
+
     // Per-puzzle scoring state
     this.mistakes = 0;
     this.hintsUsed = 0;
+    this.hintInfo = null;
+    this.armed = null;
+    this.lastInputAt = 0;
 
     this.saveTimer = null;
 
@@ -43,36 +95,53 @@ class SudokuGame {
     return Array(9).fill(null).map(() => Array(9).fill(value));
   }
 
+  static readJSON(key, fallback) {
+    try { return JSON.parse(localStorage.getItem(key)) || fallback; } catch (e) { return fallback; }
+  }
+
+  // Dailies use the UTC date so two devices agree on what "today" is.
+  static todayUTC(offsetDays = 0) {
+    return new Date(Date.now() + offsetDays * 86400000).toISOString().slice(0, 10);
+  }
+
+  static dayBefore(date) {
+    return new Date(Date.parse(date + 'T00:00:00Z') - 86400000).toISOString().slice(0, 10);
+  }
+
+  // Weekdays are Medium, weekends Hard.
+  static dailyLevel(date) {
+    const dow = new Date(date + 'T00:00:00Z').getUTCDay();
+    return dow === 0 || dow === 6 ? 'hard' : 'medium';
+  }
+
   // ── Initialise ──────────────────────────────────────────────────────────────
   init() {
     this.createGrid();
+    this.createPad();
     this.loadGame();
 
-    // Difficulty buttons
     document.querySelectorAll('.diff-btn').forEach(btn =>
-      btn.addEventListener('click', () => this.changeDifficulty(btn.dataset.level))
+      btn.addEventListener('click', () => this.changeDifficulty(btn.dataset.level, btn))
     );
 
-    // Controls
-    document.getElementById('newGame').addEventListener('click', () => this.confirmNewGame());
+    document.getElementById('newGame').addEventListener('click', e => this.confirmNewGame(e.currentTarget));
     document.getElementById('undoBtn').addEventListener('click', () => this.undo());
+    document.getElementById('notesToggle').addEventListener('click', () => this.toggleNotesMode());
+    document.getElementById('clearCell').addEventListener('click', () => this.handleClear());
     document.getElementById('hintBtn').addEventListener('click', () => this.useHint());
+    document.getElementById('autoBtn').addEventListener('click', () => this.autoCandidates());
+    document.getElementById('dailyBtn').addEventListener('click', () => this.requestDaily());
     document.getElementById('message').addEventListener('click', e => {
-      const action = e.target.dataset && e.target.dataset.action;
-      if (action === 'restart') this.confirmRestart();
+      const btn = e.target.closest && e.target.closest('[data-action]');
+      if (!btn) return;
+      const action = btn.dataset.action;
+      if (action === 'restart') this.armConfirm(btn, () => this.newGame());
       if (action === 'next') this.newGame();
       if (action === 'review') this.revealMistakes();
+      if (action === 'daily') { this.hideMessage(); this.newGame({ daily: SudokuGame.todayUTC() }); }
+      if (action === 'dismiss') this.hideMessage();
     });
 
-    // Popup
-    document.getElementById('closePopup').addEventListener('click', () => this.closePopup());
-    document.getElementById('clearCell').addEventListener('click', () => this.handleClear());
-    document.getElementById('notesToggle').addEventListener('click', () => this.toggleNotesMode());
-    document.getElementById('popup').addEventListener('click', e => {
-      if (e.target.id === 'popup') this.closePopup();
-    });
-
-    // PWA install
     window.addEventListener('beforeinstallprompt', e => {
       e.preventDefault();
       this.deferredPrompt = e;
@@ -86,32 +155,11 @@ class SudokuGame {
       onClose: () => this.resumeIfIdle(),
       getStats: () => this.stats,
       getHintPref: () => this.showHint,
-      setHintPref: on => this.setHintVisible(on)
+      setHintPref: on => this.setHintVisible(on),
+      getPrefs: () => this.prefs,
+      setPref: (k, v) => this.setPref(k, v)
     });
 
-    // Resume music on first interaction (autoplay policy)
-    const resumeAudio = () => {
-      this.audioManager.resumeIfNeeded();
-      document.removeEventListener('click', resumeAudio);
-      document.removeEventListener('touchstart', resumeAudio);
-    };
-    document.addEventListener('click', resumeAudio);
-    document.addEventListener('touchstart', resumeAudio);
-
-    // Lifting the finger after a long press produces a click, and by then the
-    // picker is covering the spot that was pressed — so that click would pick a
-    // number nobody chose. Swallow it before anything sees it. The deadline
-    // matters: a long press that ends outside the picker never produces a
-    // click at all, and a latched flag would then eat the player's next real
-    // tap instead.
-    document.addEventListener('click', e => {
-      if (!this.suppressClickUntil || Date.now() > this.suppressClickUntil) return;
-      this.suppressClickUntil = 0;
-      e.stopPropagation();
-      e.preventDefault();
-    }, true);
-
-    // Keyboard input — desktop quality-of-life
     document.addEventListener('keydown', e => this.handleKey(e));
 
     // A backgrounded tab must not keep clocking up time — best times are a
@@ -124,15 +172,13 @@ class SudokuGame {
 
     this.setHintVisible(this.showHint);
 
-    // Service Worker
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker.register('./sw.js')
-        .then(reg => console.log('SW registered', reg.scope))
         .catch(err => console.warn('SW registration failed', err));
     }
   }
 
-  // ── Grid DOM creation ───────────────────────────────────────────────────────
+  // ── DOM creation ────────────────────────────────────────────────────────────
   createGrid() {
     const gridEl = document.getElementById('grid');
     gridEl.innerHTML = '';
@@ -144,34 +190,53 @@ class SudokuGame {
       cell.setAttribute('role', 'gridcell');
       cell.tabIndex = -1;
       cell.addEventListener('click', () => this.selectCell(i));
-      cell.addEventListener('contextmenu', e => {
-        e.preventDefault();
-        this.requestPopup(i);
-      });
-      let touchTimer = null;
-      cell.addEventListener('touchstart', () => {
-        this.suppressClickUntil = 0;
-        touchTimer = setTimeout(() => {
-          touchTimer = null;
-          // The picker has just opened underneath the finger that is still
-          // down. Whatever click the browser synthesizes on release has to be
-          // thrown away — see the swallower installed in init().
-          this.suppressClickUntil = Date.now() + 700;
-          this.requestPopup(i);
-        }, 500);
-      }, { passive: true });
-      const cancel = () => { if (touchTimer) { clearTimeout(touchTimer); touchTimer = null; } };
-      cell.addEventListener('touchend', cancel);
-      cell.addEventListener('touchmove', cancel);
-      cell.addEventListener('touchcancel', cancel);
+      // A long press is just a slow tap now that the pad is always there.
+      cell.addEventListener('contextmenu', e => { e.preventDefault(); if (this.selected !== i) this.selectCell(i); });
       gridEl.appendChild(cell);
       this.cells.push(cell);
     }
   }
 
+  // The number pad doubles as the "how many are left" strip.
+  createPad() {
+    const pad = document.getElementById('pad');
+    pad.innerHTML = '';
+    this.padKeys = [];
+    for (let n = 1; n <= 9; n++) {
+      const key = document.createElement('button');
+      key.className = 'pad-key';
+      key.innerHTML = `<span class="pad-n">${n}</span><span class="pad-left"></span>`;
+      key.addEventListener('click', () => this.padDigit(n));
+      pad.appendChild(key);
+      this.padKeys.push(key);
+    }
+  }
+
   // ── New game ────────────────────────────────────────────────────────────────
-  newGame() {
-    const puzzle = this.engine.generatePuzzle(this.level);
+  locked() { return this.solved || this.generating; }
+
+  newGame(opts = {}) {
+    const daily = opts.daily || null;
+    const level = daily ? SudokuGame.dailyLevel(daily) : this.level;
+    const token = ++this.genToken;
+    this.disarm();
+    if (!daily && this.spare && this.spare.level === level) {
+      const puzzle = this.spare.puzzle;
+      this.spare = null;
+      this.startPuzzle(puzzle, level, null);
+      return;
+    }
+    this.setGenerating(true);
+    this.source.get(level, daily ? `daily-${daily}` : undefined).then(puzzle => {
+      if (token !== this.genToken) return;
+      this.setGenerating(false);
+      this.startPuzzle(puzzle, level, daily);
+    });
+  }
+
+  startPuzzle(puzzle, level, daily) {
+    this.level    = level;
+    this.daily    = daily;
     this.grid     = puzzle.grid;
     this.solution = puzzle.solution;
     this.given    = puzzle.given;
@@ -181,26 +246,47 @@ class SudokuGame {
     this.lastNumber = 0;
     this.mistakes = 0;
     this.hintsUsed = 0;
+    this.hintInfo = null;
     this.notesMode = false;
     this.resetTimer();
     this.startTimer();
     this.syncDifficultyButtons();
-
+    this.hideMessage();
     this.saveGame();
     this.render();
-    this.hideMessage();
+    this.prefetch();
   }
 
-  changeDifficulty(level) {
-    if (level === this.level) return;
-    if (this.hasProgress() && !confirm('Switch difficulty? Current progress will be lost.')) {
-      // Re-sync the active class so the rejected button doesn't appear selected
-      this.syncDifficultyButtons();
-      return;
+  setGenerating(on) {
+    this.generating = on;
+    document.getElementById('grid').classList.toggle('generating', on);
+    if (on) {
+      this.pauseTimer();
+      this.showMessage('Generating…', 'info');
+    } else {
+      this.hideMessage();
     }
-    this.level = level;
-    this.syncDifficultyButtons();
-    this.newGame();
+  }
+
+  // Have the next puzzle for this level ready before the player asks for it.
+  prefetch() {
+    const level = this.level;
+    if (this.spare && this.spare.level === level) return;
+    if (this.prefetching === level) return;
+    this.prefetching = level;
+    const idle = window.requestIdleCallback || (fn => setTimeout(fn, 200));
+    idle(() => this.source.get(level).then(puzzle => {
+      if (this.prefetching === level) this.prefetching = null;
+      this.spare = { level, puzzle };
+    }));
+  }
+
+  changeDifficulty(level, btn) {
+    if (this.generating) return;
+    if (level === this.level && !this.daily) return;
+    const go = () => { this.level = level; this.newGame(); };
+    if (this.hasProgress() && !this.solved) this.armConfirm(btn, go);
+    else go();
   }
 
   syncDifficultyButtons() {
@@ -209,6 +295,13 @@ class SudokuGame {
       btn.classList.toggle('active', on);
       btn.setAttribute('aria-pressed', on ? 'true' : 'false');
     });
+    document.getElementById('autoBtn').hidden = !(this.level === 'hard' || this.level === 'crazy');
+    const chip = document.getElementById('dailyChip');
+    chip.hidden = !this.daily;
+    if (this.daily) {
+      const day = new Date(this.daily + 'T00:00:00Z').toLocaleDateString(undefined, { day: 'numeric', month: 'short', timeZone: 'UTC' });
+      chip.querySelector('span').textContent = `Daily · ${day}`;
+    }
   }
 
   // True iff the player has touched the puzzle (filled or cleared anything,
@@ -222,6 +315,76 @@ class SudokuGame {
       }
     }
     return false;
+  }
+
+  // ── Confirmation without a dialog ───────────────────────────────────────────
+  // A destructive button asks to be tapped again; after 3s it lets go.
+  armConfirm(btn, run) {
+    if (this.armed && this.armed.btn === btn) { this.disarm(); run(); return; }
+    this.disarm();
+    this.armed = { btn, html: btn.innerHTML, timer: setTimeout(() => this.disarm(), 3000) };
+    btn.classList.add('confirming');
+    btn.textContent = 'Tap again';
+  }
+
+  disarm() {
+    if (!this.armed) return;
+    const { btn, html, timer } = this.armed;
+    this.armed = null;
+    clearTimeout(timer);
+    btn.innerHTML = html;
+    btn.classList.remove('confirming');
+    this.syncDifficultyButtons();
+  }
+
+  confirmNewGame(btn) {
+    if (this.generating) return;
+    if (!this.hasProgress() || this.solved) this.newGame();
+    else this.armConfirm(btn, () => this.newGame());
+  }
+
+  // ── Daily puzzle ────────────────────────────────────────────────────────────
+  dailyState() {
+    const d = this.stats.daily;
+    return d && typeof d === 'object' ? d : { last: null, streak: 0, best: 0, wins: 0 };
+  }
+
+  // A streak is alive if the last daily solved was today or yesterday.
+  currentStreak() {
+    const d = this.dailyState();
+    return d.last && d.last >= SudokuGame.dayBefore(SudokuGame.todayUTC()) ? d.streak : 0;
+  }
+
+  requestDaily() {
+    if (this.generating) return;
+    const today = SudokuGame.todayUTC();
+    const d = this.dailyState();
+    if (d.last && d.last >= today) {
+      this.showMessage(`Today's daily is solved — streak ${this.currentStreak()}. A new one comes at midnight UTC. ` +
+        `<button class="msg-btn" data-action="dismiss">OK</button>`, 'info');
+      return;
+    }
+    if (this.daily === today && !this.solved) {
+      this.showMessage(`You're on today's daily. <button class="msg-btn" data-action="dismiss">OK</button>`, 'info');
+      return;
+    }
+    if (this.hasProgress() && !this.solved) {
+      this.showMessage(`Start today's daily? This puzzle's progress will be lost. ` +
+        `<button class="msg-btn" data-action="daily">Start daily</button>` +
+        `<button class="msg-btn" data-action="dismiss">Keep playing</button>`, 'info');
+      return;
+    }
+    this.newGame({ daily: today });
+  }
+
+  recordDailyWin() {
+    const d = this.dailyState();
+    if (d.last && d.last >= this.daily) return;     // already counted (or synced from a device ahead of us)
+    d.streak = d.last === SudokuGame.dayBefore(this.daily) ? (d.streak || 0) + 1 : 1;
+    d.best = Math.max(d.best || 0, d.streak);
+    d.wins = (d.wins || 0) + 1;
+    d.last = this.daily;
+    this.stats.daily = d;
   }
 
   // ── Timer ───────────────────────────────────────────────────────────────────
@@ -246,7 +409,7 @@ class SudokuGame {
   }
 
   startTimer() {
-    if (this.timerRunning || this.solved) return;
+    if (this.timerRunning || this.solved || this.generating) return;
     this.timerStart = Date.now();
     this.timerRunning = true;
     if (!this.timerInterval) this.timerInterval = setInterval(() => this.renderTimer(), 1000);
@@ -265,7 +428,6 @@ class SudokuGame {
   resumeIfIdle() {
     if (this.solved || document.hidden) return;
     if (this.isPanelOpen()) return;
-    if (document.getElementById('popup').classList.contains('active')) return;
     this.startTimer();
   }
 
@@ -278,16 +440,28 @@ class SudokuGame {
     this.renderTimer();
   }
 
-  // ── Stats migration ─────────────────────────────────────────────────────────
+  isPanelOpen() {
+    return document.querySelector('.panel-overlay.active') !== null;
+  }
+
+  // ── Stats / prefs ───────────────────────────────────────────────────────────
   // v1: { level: <number wins> }
   // v2: { level: { wins, bestMs } }
   // v3: { level: { wins, bestMs, cleanWins, hints } } — bestMs only ever set by
   //     a win with no hints, so a hinted run can't take the record.
+  // v3 + daily: { …, daily: { last, streak, best, wins } }
   migrateStats(raw) {
     const out = {};
     for (const k in raw) {
       const v = raw[k];
-      if (typeof v === 'number') out[k] = { wins: v, bestMs: null, cleanWins: 0, hints: 0 };
+      if (k === 'daily') {
+        if (v && typeof v === 'object') {
+          out.daily = {
+            last: typeof v.last === 'string' ? v.last : null,
+            streak: v.streak || 0, best: v.best || 0, wins: v.wins || 0
+          };
+        }
+      } else if (typeof v === 'number') out[k] = { wins: v, bestMs: null, cleanWins: 0, hints: 0 };
       else if (v && typeof v === 'object') {
         out[k] = {
           wins: v.wins || 0,
@@ -309,27 +483,27 @@ class SudokuGame {
     localStorage.setItem('sudokuStats', JSON.stringify(this.stats));
   }
 
+  setPref(key, value) {
+    this.prefs[key] = value;
+    localStorage.setItem('sudokuPrefs', JSON.stringify(this.prefs));
+    this.render();
+  }
+
   // ── Keyboard ────────────────────────────────────────────────────────────────
   handleKey(e) {
-    // Don't interfere when typing in form fields (defensive — none today).
     const tag = e.target && e.target.tagName;
     if (tag === 'INPUT' || tag === 'TEXTAREA') return;
     if (e.ctrlKey || e.metaKey || e.altKey) return;
-    // Panels handle their own dismiss; we still want Esc/keys to do nothing
-    // funky underneath, so bail when any panel overlay is active.
     if (this.isPanelOpen()) return;
-
-    const popupOpen = document.getElementById('popup').classList.contains('active');
     const key = e.key;
 
     if (key === 'Escape') {
-      if (popupOpen) { this.closePopup(); e.preventDefault(); }
+      if (this.selected !== null) { this.selected = null; this.render(); e.preventDefault(); }
       return;
     }
 
-    // Arrow nav — works when popup is closed. Auto-select (0,0) if nothing
-    // selected so first arrow press has somewhere to go.
-    if (!popupOpen && (key === 'ArrowUp' || key === 'ArrowDown' || key === 'ArrowLeft' || key === 'ArrowRight')) {
+    if (key === 'ArrowUp' || key === 'ArrowDown' || key === 'ArrowLeft' || key === 'ArrowRight') {
+      if (this.locked()) return;
       let idx = this.selected;
       if (idx === null) idx = 0;
       else {
@@ -345,149 +519,75 @@ class SudokuGame {
       return;
     }
 
-    // Digit input: places a number, or toggles a pencil mark in notes mode.
     if (/^[1-9]$/.test(key)) {
-      const num = parseInt(key, 10);
-      if (this.selected === null) return;
-      const row = Math.floor(this.selected / 9), col = this.selected % 9;
-      if (this.given[row][col]) return;
-      if (this.notesMode) this.toggleNote(num);
-      else this.placeNumber(num);
+      this.padDigit(parseInt(key, 10));
       e.preventDefault();
       return;
     }
 
     if (key === 'Backspace' || key === 'Delete' || key === '0') {
-      if (this.selected === null) return;
-      const row = Math.floor(this.selected / 9), col = this.selected % 9;
-      if (this.given[row][col]) return;
       this.handleClear();
       e.preventDefault();
       return;
     }
 
-    if (key === 'n' || key === 'N') {
-      this.toggleNotesMode();
-      e.preventDefault();
-      return;
-    }
-
-    if (key === 'h' || key === 'H') {
-      if (this.showHint) this.useHint();
-      e.preventDefault();
-      return;
-    }
-
-    if (key === 'u' || key === 'U') {
-      this.undo();
-      e.preventDefault();
-    }
+    if (key === 'n' || key === 'N') { this.toggleNotesMode(); e.preventDefault(); return; }
+    if (key === 'h' || key === 'H') { if (this.showHint) this.useHint(); e.preventDefault(); return; }
+    if (key === 'u' || key === 'U') { this.undo(); e.preventDefault(); }
   }
 
-  // ── Cell selection / popup ──────────────────────────────────────────────────
-  // Long-press / right-click entry: ignore given cells so we don't pop up the
-  // picker for whichever cell happened to be selected before.
-  requestPopup(index) {
-    const row = Math.floor(index / 9), col = index % 9;
-    if (this.given[row][col]) return;
-    this.selected = index;
-    this.audioManager.playSound('click');
-    this.showPopup();
-    this.render();
-  }
-
+  // ── Selection and the pad ───────────────────────────────────────────────────
   selectCell(index) {
+    if (this.locked()) return;
     const row = Math.floor(index / 9), col = index % 9;
-    if (this.given[row][col]) return;
     this.selected = index;
     this.audioManager.playSound('click');
-
-    const val = this.grid[row][col];
-    if (val > 0) { this.showPopup(); this.render(); return; }
-    // Fast-fill: if user just placed a number, auto-place it on the next empty
-    // cell — but only if it's fully valid (row + column + box). Otherwise open
-    // the picker so they pick consciously.
-    if (!this.notesMode && this.lastNumber > 0 && this.engine.isValid(this.grid, row, col, this.lastNumber)) {
+    if (this.given[row][col] || this.grid[row][col]) { this.render(); return; }
+    // Fast-fill: tapping an empty cell drops the armed digit straight in — but
+    // only where it is fully valid (row, column and box).
+    if (this.prefs.fastFill && !this.notesMode && this.lastNumber > 0 &&
+        this.engine.isValid(this.grid, row, col, this.lastNumber)) {
       this.placeNumber(this.lastNumber);
     } else {
-      this.showPopup();
       this.render();
     }
   }
 
-  // ── Popup rendering ─────────────────────────────────────────────────────────
-  showPopup() {
-    if (this.selected === null) return;
-    const popup   = document.getElementById('popup');
-    const numGrid = document.getElementById('numberGrid');
-    const header  = document.getElementById('popupHeader');
-    numGrid.innerHTML = '';
-
-    const row = Math.floor(this.selected / 9), col = this.selected % 9;
-    const mask = this.notes[row][col];
-
-    header.textContent = this.notesMode
-      ? 'Notes — tap digits to pencil them in'
-      : '';
-
-    for (let i = 1; i <= 9; i++) {
-      const btn = document.createElement('button');
-      btn.className = 'number-btn';
-      btn.textContent = i;
-      if (this.notesMode) {
-        const on = (mask & this.engine.bit(i)) !== 0;
-        btn.classList.add('note-btn');
-        btn.classList.toggle('note-on', on);
-        btn.setAttribute('aria-pressed', on ? 'true' : 'false');
-        btn.setAttribute('aria-label', `Note ${i}`);
-        btn.addEventListener('click', () => this.toggleNote(i));
-      } else {
-        btn.setAttribute('aria-label', `Place ${i}`);
-        btn.addEventListener('click', () => this.placeNumber(i));
+  // A pad digit goes into the selected cell (or toggles a pencil mark). With
+  // nothing editable selected it arms that digit instead, which highlights it
+  // and — with fast-fill on — lets each tap on an empty cell place it.
+  padDigit(n) {
+    if (this.locked()) return;
+    if (this.selected !== null) {
+      const row = Math.floor(this.selected / 9), col = this.selected % 9;
+      if (!this.given[row][col]) {
+        if (this.notesMode) { this.toggleNote(n); return; }
+        if (this.grid[row][col] !== n) { this.placeNumber(n); return; }
       }
-      numGrid.appendChild(btn);
     }
-
-    const clearBtn = document.getElementById('clearCell');
-    clearBtn.textContent = this.notesMode ? 'Clear Notes' : 'Clear';
-    document.getElementById('notesToggle').classList.toggle('notes-active', this.notesMode);
-    popup.classList.add('active');
-    this.pauseTimer();
-  }
-
-  closePopup() {
-    document.getElementById('popup').classList.remove('active');
-    this.resumeIfIdle();
-  }
-
-  isPanelOpen() {
-    return document.querySelector('.panel-overlay.active') !== null;
+    this.selected = null;
+    this.lastNumber = this.lastNumber === n ? 0 : n;
+    this.audioManager.playSound('click');
+    this.render();
   }
 
   // ── Notes ───────────────────────────────────────────────────────────────────
   // Standard pencil marks: digit n always sits in slot n, so a cell's notes can
   // be read at a glance without hunting for where a digit was put.
   toggleNotesMode() {
+    if (this.locked()) return;
     this.notesMode = !this.notesMode;
-    const btn = document.getElementById('notesToggle');
-    btn.classList.toggle('notes-active', this.notesMode);
-    btn.setAttribute('aria-pressed', this.notesMode ? 'true' : 'false');
-    if (document.getElementById('popup').classList.contains('active')) this.showPopup();
     this.render();
   }
 
   toggleNote(num) {
-    if (this.selected === null) return;
+    if (this.locked() || this.selected === null) return;
     const row = Math.floor(this.selected / 9), col = this.selected % 9;
     if (this.given[row][col] || this.grid[row][col] !== 0) return;
     this.pushHistory(this.selected);
     this.notes[row][col] ^= this.engine.bit(num);
     this.audioManager.playSound('click');
-    this.saveGame();
-    // The popup stays open on purpose — pencilling one candidate almost always
-    // means pencilling several.
-    if (document.getElementById('popup').classList.contains('active')) this.showPopup();
-    this.render();
+    this.touched();
   }
 
   // Placing a digit retires it as a candidate everywhere it can no longer go.
@@ -501,53 +601,73 @@ class SudokuGame {
     }
   }
 
+  // Every candidate for every empty cell, from the digits on the board.
+  autoCandidates() {
+    if (this.locked()) return;
+    this.pushHistory(-1);
+    const { rows, cols, boxes } = this.engine.masks(this.grid);
+    for (let r = 0; r < 9; r++) {
+      for (let c = 0; c < 9; c++) {
+        this.notes[r][c] = this.grid[r][c] ? 0
+          : this.engine.ALL & ~(rows[r] | cols[c] | boxes[Math.floor(r / 3) * 3 + Math.floor(c / 3)]);
+      }
+    }
+    this.audioManager.playSound('click');
+    this.touched();
+  }
+
   // ── Number placement ────────────────────────────────────────────────────────
+  // index -1 = a board-wide change (auto-candidates) with no single cell.
   pushHistory(index) {
     const row = Math.floor(index / 9), col = index % 9;
     this.history.push({
       index,
-      value: this.grid[row][col],
-      notes: this.notes[row][col],
+      value: index >= 0 ? this.grid[row][col] : 0,
       lastNumber: this.lastNumber,
       mistakes: this.mistakes,
-      // Peer notes are restored wholesale rather than diffed — 81 small ints is
+      // Notes are restored wholesale rather than diffed — 81 small ints is
       // cheaper to reason about than tracking which marks a placement erased.
       allNotes: this.notes.map(r => [...r])
     });
     if (this.history.length > 200) this.history.shift();
   }
 
-  placeNumber(num) {
-    if (this.selected === null) return;
-    const row = Math.floor(this.selected / 9), col = this.selected % 9;
-    if (this.given[row][col]) return;
-    if (this.grid[row][col] === num) { this.closePopup(); return; }
+  touched() {
+    this.lastInputAt = Date.now();
+    if (this.msgKind === 'hint' || this.msgKind === 'info') this.hideMessage();
+    this.saveGame();
+    this.render();
+  }
 
-    this.pushHistory(this.selected);
-    this.grid[row][col] = num;
-    this.notes[row][col] = 0;
-    this.clearPeerNotes(row, col, num);
+  placeNumber(num) {
+    if (this.locked() || this.selected === null) return;
+    const row = Math.floor(this.selected / 9), col = this.selected % 9;
+    if (this.given[row][col] || this.grid[row][col] === num) return;
+    this.setCell(row, col, num);
     this.lastNumber = num;
     if (this.solution[row][col] && num !== this.solution[row][col]) this.mistakes++;
     this.audioManager.playSound('place');
-    this.saveGame();
-    this.closePopup();
-    this.render();
+    this.touched();
     if (this.isComplete()) this.checkSolution();
   }
 
-  // ── Clear handler ───────────────────────────────────────────────────────────
+  setCell(row, col, num) {
+    this.pushHistory(row * 9 + col);
+    this.grid[row][col] = num;
+    this.notes[row][col] = 0;
+    this.clearPeerNotes(row, col, num);
+  }
+
+  // Erase a digit if there is one, otherwise the cell's notes.
   handleClear() {
-    if (this.selected === null) return;
+    if (this.locked() || this.selected === null) return;
     const row = Math.floor(this.selected / 9), col = this.selected % 9;
     if (this.given[row][col]) return;
-
+    if (!this.grid[row][col] && !this.notes[row][col]) return;
     this.pushHistory(this.selected);
-    if (this.notesMode) this.notes[row][col] = 0;
-    else { this.grid[row][col] = 0; this.notes[row][col] = 0; }
-    this.saveGame();
-    this.closePopup();
-    this.render();
+    if (this.grid[row][col]) this.grid[row][col] = 0;
+    else this.notes[row][col] = 0;
+    this.touched();
   }
 
   // ── Hint ────────────────────────────────────────────────────────────────────
@@ -558,54 +678,93 @@ class SudokuGame {
     if (btn) btn.style.display = this.showHint ? '' : 'none';
   }
 
-  // Fill one cell with its real answer: the selected cell if it's empty,
-  // otherwise a random empty one. Using a hint forfeits the best time for this
-  // puzzle — the win still counts, the record doesn't.
-  useHint() {
-    if (this.solved) return;
-    let target = null;
-    if (this.selected !== null) {
-      const r = Math.floor(this.selected / 9), c = this.selected % 9;
-      if (!this.given[r][c] && !this.grid[r][c]) target = [r, c];
-    }
-    if (!target) {
-      const empties = [];
-      for (let r = 0; r < 9; r++) for (let c = 0; c < 9; c++) if (!this.grid[r][c]) empties.push([r, c]);
-      if (!empties.length) return;
-      target = empties[Math.floor(Math.random() * empties.length)];
-    }
-    const [row, col] = target;
-    const answer = this.solution[row][col];
-    if (!answer) return;
+  boardKey() { return this.grid.map(r => r.join('')).join(''); }
 
-    this.selected = row * 9 + col;
-    this.pushHistory(this.selected);
-    this.grid[row][col] = answer;
-    this.notes[row][col] = 0;
-    this.clearPeerNotes(row, col, answer);
+  // First tap: name the technique that forces the next digit and highlight
+  // where it happens. Second tap (board unchanged): reveal the digit. One hint
+  // forfeits the best time for this puzzle — the win still counts.
+  useHint() {
+    if (this.locked()) return;
+    const h = this.hintInfo;
+    if (h && h.key === this.boardKey()) {
+      const [row, col] = h.target;
+      this.hintInfo = null;
+      this.selected = row * 9 + col;
+      this.setCell(row, col, h.digit);
+      this.audioManager.playSound('place');
+      this.touched();
+      if (this.isComplete()) this.checkSolution();
+      return;
+    }
+
+    let info = null;
+    const wrong = [];
+    const board = this.grid.map((r, ri) => r.map((v, ci) => {
+      if (v && !this.given[ri][ci] && v !== this.solution[ri][ci]) { wrong.push([ri, ci]); return 0; }
+      return v;
+    }));
+    const at = ([r, c]) => `row ${r + 1}, column ${c + 1}`;
+    if (wrong.length) {
+      const t = wrong[0];
+      info = { target: t, pattern: [], text: `The ${this.grid[t[0]][t[1]]} at ${at(t)} is wrong.` };
+    } else {
+      const ex = this.engine.explainNext(board);
+      if (ex.stuck) {
+        const t = this.fewestCandidates(board);
+        if (!t) return;
+        info = { target: t, pattern: [],
+          text: `No technique in the hint book cracks this — it needs a chain or a guess. Try ${at(t)}.` };
+      } else {
+        const single = ex.steps[ex.steps.length - 1];
+        const lead = ex.steps.length > 1 ? ex.steps[ex.steps.length - 2] : single;
+        let text;
+        if (lead === single) {
+          text = single.name === 'Naked single'
+            ? `Naked single: only one digit fits ${at(single.target)}.`
+            : `Hidden single in ${single.house}: one place left for a ${single.digit}.`;
+        } else {
+          const what = lead.digit ? ` on ${lead.digit}s` : '';
+          text = `${lead.name}${lead.house ? ' in ' + lead.house : ''}${what} — that forces the outlined cell.`;
+        }
+        info = { target: single.target, pattern: lead.cells || [], text };
+      }
+    }
+
+    this.hintInfo = Object.assign(info, { key: this.boardKey(), digit: this.solution[info.target[0]][info.target[1]] });
+    this.selected = info.target[0] * 9 + info.target[1];
     this.hintsUsed++;
     this.levelStats(this.level).hints++;
     this.saveStats();
-    this.audioManager.playSound('place');
+    this.audioManager.playSound('click');
+    this.showMessage(`${info.text} Tap Hint again for the digit.`, 'hint');
     this.saveGame();
-    this.closePopup();
     this.render();
-    if (this.isComplete()) this.checkSolution();
+  }
+
+  fewestCandidates(board) {
+    const { rows, cols, boxes } = this.engine.masks(board);
+    let best = null, bestN = 10;
+    for (let r = 0; r < 9; r++) for (let c = 0; c < 9; c++) {
+      if (board[r][c]) continue;
+      const n = this.engine.popcount(this.engine.ALL & ~(rows[r] | cols[c] | boxes[Math.floor(r / 3) * 3 + Math.floor(c / 3)]));
+      if (n < bestN) { bestN = n; best = [r, c]; }
+    }
+    return best;
   }
 
   // ── Undo ────────────────────────────────────────────────────────────────────
   undo() {
-    if (!this.history.length) return;
+    if (this.locked() || !this.history.length) return;
     const last = this.history.pop();
-    const row = Math.floor(last.index / 9), col = last.index % 9;
-    this.grid[row][col] = last.value;
-    this.notes = last.allNotes ? last.allNotes.map(r => [...r]) : this.notes;
-    if (typeof last.notes === 'number') this.notes[row][col] = last.notes;
+    if (last.index >= 0) {
+      const row = Math.floor(last.index / 9), col = last.index % 9;
+      this.grid[row][col] = last.value;
+      this.selected = last.index;
+    }
+    this.notes = last.allNotes.map(r => [...r]);
     this.lastNumber = last.lastNumber || 0;
     if (typeof last.mistakes === 'number') this.mistakes = last.mistakes;
-    this.selected = last.index;
-    this.saveGame();
-    this.render();
+    this.touched();
   }
 
   // ── Win detection ───────────────────────────────────────────────────────────
@@ -627,9 +786,13 @@ class SudokuGame {
   }
 
   checkSolution() {
+    if (this.solved) return;
     if (this.engine.isValidCompleteSolution(this.grid)) {
       this.pauseTimer();
       this.solved = true;
+      this.selected = null;
+      this.lastNumber = 0;
+      this.hintInfo = null;
       const finalMs = this.elapsedMs;
       const s = this.levelStats(this.level);
       s.wins++;
@@ -640,12 +803,14 @@ class SudokuGame {
         isNewBest = s.bestMs == null || finalMs < s.bestMs;
         if (isNewBest) s.bestMs = finalMs;
       }
+      if (this.daily) this.recordDailyWin();
       this.saveStats();
       this.clearSavedGame();
       this.audioManager.playSound('win');
 
       const timeStr = this.formatTime(finalMs);
       const bits = [isNewBest ? `New best time: ${timeStr}!` : `Solved in ${timeStr}`];
+      if (this.daily) bits.push(`daily streak ${this.currentStreak()}`);
       if (this.hintsUsed) bits.push(`${this.hintsUsed} hint${this.hintsUsed === 1 ? '' : 's'} used`);
       if (this.mistakes) bits.push(`${this.mistakes} mistake${this.mistakes === 1 ? '' : 's'}`);
       this.showMessage(
@@ -654,6 +819,7 @@ class SudokuGame {
       );
       // No auto-advance: the board stays up until the player asks for another.
       this.render();
+      this.prefetch();
       if (window.SudokuCloud && window.SudokuCloud.puzzleFinished) window.SudokuCloud.puzzleFinished();
     } else {
       this.audioManager.playSound('error');
@@ -678,19 +844,12 @@ class SudokuGame {
     setTimeout(() => { this.reviewing = false; this.render(); }, 4000);
   }
 
-  confirmRestart() {
-    if (confirm('Restart this game?')) this.newGame();
-  }
-
-  confirmNewGame() {
-    if (!this.hasProgress() || confirm('Start a new game? Current progress will be lost.')) this.newGame();
-  }
-
   // ── Render ──────────────────────────────────────────────────────────────────
   render() {
     const selRow = this.selected !== null ? Math.floor(this.selected / 9) : -1;
     const selCol = this.selected !== null ? this.selected % 9 : -1;
     const selNum = this.selected !== null ? this.grid[selRow][selCol] : 0;
+    const hlNum = selNum || this.lastNumber;
     const selBoxR = selRow >= 0 ? Math.floor(selRow / 3) * 3 : -1;
     const selBoxC = selCol >= 0 ? Math.floor(selCol / 3) * 3 : -1;
 
@@ -707,6 +866,10 @@ class SudokuGame {
       }
     }
 
+    const hint = this.hintInfo && this.hintInfo.key === this.boardKey() ? this.hintInfo : null;
+    const hintCells = new Set(hint ? hint.pattern.map(([r, c]) => r * 9 + c) : []);
+    const hintTarget = hint ? hint.target[0] * 9 + hint.target[1] : -1;
+
     const remaining = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
     for (let r = 0; r < 9; r++) for (let c = 0; c < 9; c++) if (this.grid[r][c]) remaining[this.grid[r][c]]++;
 
@@ -720,18 +883,19 @@ class SudokuGame {
 
       if (this.given[row][col]) cell.classList.add('given');
       else if (value) cell.classList.add('filled');
-      // Related = same row, same col, or same 3x3 box as selected (excluding self)
       if (this.selected !== null && index !== this.selected) {
         const inRowOrCol = row === selRow || col === selCol;
         const inBox = row >= selBoxR && row < selBoxR + 3 && col >= selBoxC && col < selBoxC + 3;
         if (inRowOrCol || inBox) cell.classList.add('related');
       }
       if (index === this.selected) cell.classList.add('selected');
-      if (selNum > 0 && value === selNum) cell.classList.add('same-number-highlight');
+      if (hlNum > 0 && value === hlNum) cell.classList.add('same-number-highlight');
       if (value > 0 && !this.given[row][col] && conflict[row][col]) cell.classList.add('conflict');
       if (this.reviewing && value && this.solution[row][col] && value !== this.solution[row][col]) {
         cell.classList.add('wrong');
       }
+      if (hintCells.has(index)) cell.classList.add('hint-pattern');
+      if (index === hintTarget) cell.classList.add('hint-target');
 
       if (value) {
         cell.textContent = value;
@@ -743,7 +907,7 @@ class SudokuGame {
           slot.className = 'cell-note';
           if (mask & this.engine.bit(n)) {
             slot.textContent = n;
-            if (selNum > 0 && n === selNum) slot.classList.add('note-match');
+            if (hlNum > 0 && n === hlNum) slot.classList.add('note-match');
           }
           notesGrid.appendChild(slot);
         }
@@ -756,27 +920,27 @@ class SudokuGame {
     });
 
     this.renderStatusBar(remaining);
-    document.getElementById('notesToggle').classList.toggle('notes-active', this.notesMode);
+    const notesBtn = document.getElementById('notesToggle');
+    notesBtn.classList.toggle('notes-active', this.notesMode);
+    notesBtn.setAttribute('aria-pressed', this.notesMode ? 'true' : 'false');
+    document.getElementById('pad').classList.toggle('notes-mode', this.notesMode);
   }
 
-  // Mistake tally plus a "how many of each digit are left" strip — the single
-  // most useful thing to see while scanning for a home for a number.
   renderStatusBar(remaining) {
     const mEl = document.getElementById('mistakes');
     if (mEl) {
       mEl.textContent = this.mistakes;
       mEl.parentElement.classList.toggle('has-mistakes', this.mistakes > 0);
+      mEl.parentElement.hidden = this.prefs.hideMistakes && !this.solved;
     }
-    const strip = document.getElementById('digitCounts');
-    if (!strip) return;
-    strip.innerHTML = '';
+    const armed = this.prefs.fastFill && !this.notesMode ? this.lastNumber : 0;
     for (let n = 1; n <= 9; n++) {
       const left = 9 - remaining[n];
-      const chip = document.createElement('div');
-      chip.className = 'digit-chip' + (left === 0 ? ' done' : '');
-      chip.innerHTML = `<span class="digit-chip-n">${n}</span><span class="digit-chip-left">${left}</span>`;
-      chip.title = `${left} ${n}${left === 1 ? '' : 's'} left to place`;
-      strip.appendChild(chip);
+      const key = this.padKeys[n - 1];
+      key.classList.toggle('done', left <= 0);
+      key.classList.toggle('armed', n === armed);
+      key.querySelector('.pad-left').textContent = Math.max(0, left);
+      key.setAttribute('aria-label', `${this.notesMode ? 'Note' : 'Place'} ${n}, ${Math.max(0, left)} left`);
     }
   }
 
@@ -785,10 +949,13 @@ class SudokuGame {
     const msg = document.getElementById('message');
     msg.innerHTML = text;
     msg.className = `message ${type}`;
-    msg.classList.remove('hidden');
+    this.msgKind = type;
   }
 
-  hideMessage() { document.getElementById('message').classList.add('hidden'); }
+  hideMessage() {
+    document.getElementById('message').classList.add('hidden');
+    this.msgKind = null;
+  }
 
   // ── PWA install ─────────────────────────────────────────────────────────────
   installApp() {
@@ -829,9 +996,10 @@ class SudokuGame {
   // The solution is deliberately NOT stored — it used to sit in localStorage in
   // plain sight. It's recovered by solving the givens on load instead.
   writeSave() {
-    if (this.solved) return;
+    // Nothing to save while a first puzzle is still being generated.
+    if (this.solved || !this.given.some(r => r.some(Boolean))) return;
     localStorage.setItem('sudokuGame3', JSON.stringify({
-      grid: this.grid, given: this.given, level: this.level,
+      grid: this.grid, given: this.given, level: this.level, daily: this.daily,
       selected: this.selected, lastNumber: this.lastNumber,
       notes: this.notes, elapsedMs: this.currentElapsedMs(),
       mistakes: this.mistakes, hintsUsed: this.hintsUsed
@@ -856,6 +1024,7 @@ class SudokuGame {
         this.solution   = solution;
         this.given      = s.given;
         this.level      = s.level;
+        this.daily      = typeof s.daily === 'string' && /^\d{4}-\d\d-\d\d$/.test(s.daily) ? s.daily : null;
         this.history    = [];
         this.selected   = (typeof s.selected === 'number' && s.selected >= 0 && s.selected < 81) ? s.selected : null;
         this.lastNumber = s.lastNumber || 0;
@@ -868,6 +1037,7 @@ class SudokuGame {
         this.render();
         this.renderTimer();
         this.startTimer();
+        this.prefetch();
         return;
       } catch (e) {
         console.warn('Discarding corrupt saved game:', e.message);
@@ -877,6 +1047,8 @@ class SudokuGame {
     // A v2 save can't be carried over — its notes used the old positional
     // scheme — so it is dropped rather than half-translated.
     localStorage.removeItem('sudokuGame2');
+    this.syncDifficultyButtons();
+    this.render();
     this.newGame();
   }
 

@@ -12,6 +12,30 @@ class SudokuEngine {
     // Cell candidate sets are 9-bit masks: bit 0 = digit 1 … bit 8 = digit 9.
     this.ALL = 0x1ff;
     this.units = SudokuEngine.buildUnits();
+    // peers[i]: the 20 cells sharing a row, column or box with cell i (0-80).
+    this.peers = Array.from({ length: 81 }, (_, i) => {
+      const out = [];
+      for (let j = 0; j < 81; j++) if (j !== i && this.seesIdx(i, j)) out.push(j);
+      return out;
+    });
+    this.rand = Math.random;
+    // When an array, the step functions stop after their first productive
+    // pattern and describe it here — that is how hints explain themselves.
+    this.trace = null;
+  }
+
+  seesIdx(a, b) {
+    const ra = (a / 9) | 0, ca = a % 9, rb = (b / 9) | 0, cb = b % 9;
+    return ra === rb || ca === cb || (((ra / 3) | 0) === ((rb / 3) | 0) && ((ca / 3) | 0) === ((cb / 3) | 0));
+  }
+
+  static houseName(ui) {
+    return ui < 9 ? `row ${ui + 1}` : ui < 18 ? `column ${ui - 8}` : `box ${ui - 17}`;
+  }
+
+  record(name, house, cells, digit, extra) {
+    this.trace.push(Object.assign({ name, house, cells, digit }, extra));
+    return true;
   }
 
   // The 27 houses: 9 rows, 9 columns, 9 boxes. Rows and columns come first —
@@ -163,7 +187,8 @@ class SudokuEngine {
   //   0  naked / hidden singles only
   //   1  + locked candidates (pointing & claiming), naked / hidden pairs
   //   2  + naked / hidden triples, X-wing
-  //   3  none of the above finish it — needs chains or trial and error
+  //   3  + XY-wing, swordfish, simple colouring
+  //   4  none of the above finish it — needs chains or trial and error
   // The puzzle is still guaranteed to have exactly one solution at every tier.
   gradeTier(puzzle) {
     const g = puzzle.map(r => [...r]);
@@ -184,15 +209,37 @@ class SudokuEngine {
       return true;
     };
 
-    if (!recompute()) return 3;
-    for (let guard = 0; guard < 400; guard++) {
-      if (this.stepSingles(g, cand)) { if (!recompute()) return 3; continue; }
+    if (!recompute()) return 4;
+    for (let guard = 0; guard < 600; guard++) {
+      if (this.stepSingles(g, cand)) { if (!recompute()) return 4; continue; }
       if (this.stepLocked(g, cand) || this.stepSubsets(g, cand, 2)) { tier = Math.max(tier, 1); continue; }
       if (this.stepSubsets(g, cand, 3) || this.stepXWing(g, cand)) { tier = Math.max(tier, 2); continue; }
+      if (this.stepXYWing(g, cand) || this.stepSwordfish(g, cand) || this.stepColouring(g, cand)) { tier = 3; continue; }
       break;
     }
-    for (let r = 0; r < 9; r++) for (let c = 0; c < 9; c++) if (!g[r][c]) return 3;
+    for (let r = 0; r < 9; r++) for (let c = 0; c < 9; c++) if (!g[r][c]) return 4;
     return tier;
+  }
+
+  // The next logical step a person could take on `puzzle`: the eliminations it
+  // needed (in order) and then the single they unlocked, or `stuck` when the
+  // grader's techniques run dry.
+  explainNext(puzzle) {
+    const g = puzzle.map(r => [...r]);
+    const { rows, cols, boxes } = this.masks(g);
+    const cand = g.map((row, r) => row.map((v, c) =>
+      v ? 0 : this.ALL & ~(rows[r] | cols[c] | boxes[((r / 3) | 0) * 3 + ((c / 3) | 0)])));
+    this.trace = [];
+    try {
+      for (let guard = 0; guard < 400; guard++) {
+        if (this.stepSingles(g, cand)) return { steps: this.trace };
+        if (this.stepLocked(g, cand) || this.stepSubsets(g, cand, 2) || this.stepSubsets(g, cand, 3) ||
+            this.stepXWing(g, cand) || this.stepXYWing(g, cand) || this.stepSwordfish(g, cand) ||
+            this.stepColouring(g, cand)) continue;
+        break;
+      }
+      return { steps: this.trace, stuck: true };
+    } finally { this.trace = null; }
   }
 
   // Naked single (one candidate left in a cell) or hidden single (one place
@@ -200,10 +247,15 @@ class SudokuEngine {
   stepSingles(g, cand) {
     for (let r = 0; r < 9; r++) {
       for (let c = 0; c < 9; c++) {
-        if (!g[r][c] && this.popcount(cand[r][c]) === 1) { g[r][c] = this.bitDigit(cand[r][c]); return true; }
+        if (!g[r][c] && this.popcount(cand[r][c]) === 1) {
+          g[r][c] = this.bitDigit(cand[r][c]);
+          if (this.trace) this.record('Naked single', null, [[r, c]], g[r][c], { target: [r, c] });
+          return true;
+        }
       }
     }
-    for (const u of this.units) {
+    for (let ui = 0; ui < 27; ui++) {
+      const u = this.units[ui];
       for (let n = 1; n <= 9; n++) {
         const b = this.bit(n);
         let spot = null, count = 0, placed = false;
@@ -211,7 +263,11 @@ class SudokuEngine {
           if (g[r][c] === n) { placed = true; break; }
           if (!g[r][c] && (cand[r][c] & b)) { count++; spot = [r, c]; }
         }
-        if (!placed && count === 1) { g[spot[0]][spot[1]] = n; return true; }
+        if (!placed && count === 1) {
+          g[spot[0]][spot[1]] = n;
+          if (this.trace) this.record('Hidden single', SudokuEngine.houseName(ui), u.filter(([r, c]) => !g[r][c] || (r === spot[0] && c === spot[1])), n, { target: spot });
+          return true;
+        }
       }
     }
     return false;
@@ -233,17 +289,22 @@ class SudokuEngine {
           }
         }
         if (!cells.length) continue;
+        let hit = false;
         if (cells.every(([r]) => r === cells[0][0])) {
           const r = cells[0][0];
           for (let c = 0; c < 9; c++) {
-            if ((c < bc || c >= bc + 3) && !g[r][c] && (cand[r][c] & bit)) { cand[r][c] &= ~bit; changed = true; }
+            if ((c < bc || c >= bc + 3) && !g[r][c] && (cand[r][c] & bit)) { cand[r][c] &= ~bit; hit = true; }
           }
         }
         if (cells.every(([, c]) => c === cells[0][1])) {
           const c = cells[0][1];
           for (let r = 0; r < 9; r++) {
-            if ((r < br || r >= br + 3) && !g[r][c] && (cand[r][c] & bit)) { cand[r][c] &= ~bit; changed = true; }
+            if ((r < br || r >= br + 3) && !g[r][c] && (cand[r][c] & bit)) { cand[r][c] &= ~bit; hit = true; }
           }
+        }
+        if (hit) {
+          changed = true;
+          if (this.trace) return this.record('Locked candidates', `box ${b + 1}`, cells, n);
         }
       }
     }
@@ -256,12 +317,17 @@ class SudokuEngine {
         const box = cells.map(([r, c]) => ((r / 3) | 0) * 3 + ((c / 3) | 0));
         if (!box.every(v => v === box[0])) continue;
         const br = ((box[0] / 3) | 0) * 3, bc = (box[0] % 3) * 3;
+        let hit = false;
         for (let i = 0; i < 3; i++) {
           for (let j = 0; j < 3; j++) {
             const r = br + i, c = bc + j;
             if (cells.some(([a, b2]) => a === r && b2 === c)) continue;
-            if (!g[r][c] && (cand[r][c] & bit)) { cand[r][c] &= ~bit; changed = true; }
+            if (!g[r][c] && (cand[r][c] & bit)) { cand[r][c] &= ~bit; hit = true; }
           }
+        }
+        if (hit) {
+          changed = true;
+          if (this.trace) return this.record('Locked candidates', SudokuEngine.houseName(ui), cells, n);
         }
       }
     }
@@ -271,23 +337,32 @@ class SudokuEngine {
   // Naked and hidden subsets of size k (k = 2 pairs, k = 3 triples), by walking
   // every k-sized combination of the open cells in each house.
   stepSubsets(g, cand, k) {
-    let changed = false;
-    for (const u of this.units) {
+    let changed = false, stop = false;
+    const label = k === 2 ? 'pair' : 'triple';
+    for (let ui = 0; ui < 27 && !stop; ui++) {
+      const u = this.units[ui];
       const open = u.filter(([r, c]) => !g[r][c]);
       const n = open.length;
       if (n <= k) continue;
       const combo = [];
       const walk = (start) => {
+        if (stop) return;
         if (combo.length === k) {
+          const cells = () => combo.map(i => open[i]);
           let union = 0;
           for (const i of combo) union |= cand[open[i][0]][open[i][1]];
           // Naked: k cells between them hold exactly k digits — no other cell
           // in the house can use those digits.
           if (this.popcount(union) === k) {
+            let hit = false;
             for (let i = 0; i < n; i++) {
               if (combo.includes(i)) continue;
               const [r, c] = open[i];
-              if (cand[r][c] & union) { cand[r][c] &= ~union; changed = true; }
+              if (cand[r][c] & union) { cand[r][c] &= ~union; hit = true; }
+            }
+            if (hit) {
+              changed = true;
+              if (this.trace) { stop = this.record(`Naked ${label}`, SudokuEngine.houseName(ui), cells(), 0); return; }
             }
           }
           // Hidden: k digits live only in these k cells — those cells can hold
@@ -303,9 +378,14 @@ class SudokuEngine {
             if (inside && !outside) digits |= b;
           }
           if (this.popcount(digits) === k) {
+            let hit = false;
             for (const i of combo) {
               const [r, c] = open[i];
-              if (cand[r][c] & ~digits) { cand[r][c] &= digits; changed = true; }
+              if (cand[r][c] & ~digits) { cand[r][c] &= digits; hit = true; }
+            }
+            if (hit) {
+              changed = true;
+              if (this.trace) { stop = this.record(`Hidden ${label}`, SudokuEngine.houseName(ui), cells(), 0); return; }
             }
           }
           return;
@@ -338,20 +418,169 @@ class SudokuEngine {
         for (let b = a + 1; b < 9; b++) {
           if (rowPos[a].length === 2 && rowPos[b].length === 2 &&
               rowPos[a][0] === rowPos[b][0] && rowPos[a][1] === rowPos[b][1]) {
+            let hit = false;
             for (const c of rowPos[a]) {
               for (let r = 0; r < 9; r++) {
-                if (r !== a && r !== b && !g[r][c] && (cand[r][c] & bit)) { cand[r][c] &= ~bit; changed = true; }
+                if (r !== a && r !== b && !g[r][c] && (cand[r][c] & bit)) { cand[r][c] &= ~bit; hit = true; }
               }
+            }
+            if (hit) {
+              changed = true;
+              if (this.trace) return this.record('X-wing', `rows ${a + 1} and ${b + 1}`, rowPos[a].flatMap(c => [[a, c], [b, c]]), n);
             }
           }
           if (colPos[a].length === 2 && colPos[b].length === 2 &&
               colPos[a][0] === colPos[b][0] && colPos[a][1] === colPos[b][1]) {
+            let hit = false;
             for (const r of colPos[a]) {
               for (let c = 0; c < 9; c++) {
-                if (c !== a && c !== b && !g[r][c] && (cand[r][c] & bit)) { cand[r][c] &= ~bit; changed = true; }
+                if (c !== a && c !== b && !g[r][c] && (cand[r][c] & bit)) { cand[r][c] &= ~bit; hit = true; }
               }
             }
+            if (hit) {
+              changed = true;
+              if (this.trace) return this.record('X-wing', `columns ${a + 1} and ${b + 1}`, colPos[a].flatMap(r => [[r, a], [r, b]]), n);
+            }
           }
+        }
+      }
+    }
+    return changed;
+  }
+
+  // XY-wing: a two-candidate pivot {x,y} sees pincers {x,z} and {y,z}. Whichever
+  // digit the pivot takes, one pincer becomes z — so z goes from every cell
+  // that sees both pincers.
+  stepXYWing(g, cand) {
+    let changed = false;
+    const at = i => cand[(i / 9) | 0][i % 9];
+    const bi = [];
+    for (let i = 0; i < 81; i++) if (!g[(i / 9) | 0][i % 9] && this.popcount(at(i)) === 2) bi.push(i);
+    for (const p of bi) {
+      const pm = at(p);
+      const wings = bi.filter(i => i !== p && this.seesIdx(p, i));
+      for (let a = 0; a < wings.length; a++) {
+        const am = at(wings[a]);
+        if (am === pm || this.popcount(am & pm) !== 1) continue;
+        const z = am & ~pm, want = (pm & ~am) | z;
+        for (let b = a + 1; b < wings.length; b++) {
+          if (at(wings[b]) !== want) continue;
+          let hit = false;
+          for (const i of this.peers[wings[a]]) {
+            if (i === wings[b] || !this.seesIdx(i, wings[b])) continue;
+            const r = (i / 9) | 0, c = i % 9;
+            if (!g[r][c] && (cand[r][c] & z)) { cand[r][c] &= ~z; hit = true; }
+          }
+          if (hit) {
+            changed = true;
+            if (this.trace) return this.record('XY-wing', null,
+              [p, wings[a], wings[b]].map(i => [(i / 9) | 0, i % 9]), this.bitDigit(z));
+          }
+        }
+      }
+    }
+    return changed;
+  }
+
+  // Swordfish: X-wing with three lines. A digit whose spots in three rows all
+  // fall in the same three columns can be removed from those columns elsewhere.
+  stepSwordfish(g, cand) {
+    let changed = false;
+    for (let n = 1; n <= 9; n++) {
+      const bit = this.bit(n);
+      for (const byRow of [true, false]) {
+        const pos = [];
+        for (let a = 0; a < 9; a++) {
+          let m = 0;
+          for (let b = 0; b < 9; b++) {
+            const r = byRow ? a : b, c = byRow ? b : a;
+            if (!g[r][c] && (cand[r][c] & bit)) m |= 1 << b;
+          }
+          pos.push(m);
+        }
+        const lines = [];
+        for (let a = 0; a < 9; a++) { const k = this.popcount(pos[a]); if (k >= 2 && k <= 3) lines.push(a); }
+        for (let i = 0; i < lines.length; i++) for (let j = i + 1; j < lines.length; j++) for (let k = j + 1; k < lines.length; k++) {
+          const L = [lines[i], lines[j], lines[k]];
+          const span = pos[L[0]] | pos[L[1]] | pos[L[2]];
+          if (this.popcount(span) !== 3) continue;
+          let hit = false;
+          for (let a = 0; a < 9; a++) {
+            if (L.includes(a)) continue;
+            for (let b = 0; b < 9; b++) {
+              if (!(span & (1 << b))) continue;
+              const r = byRow ? a : b, c = byRow ? b : a;
+              if (!g[r][c] && (cand[r][c] & bit)) { cand[r][c] &= ~bit; hit = true; }
+            }
+          }
+          if (hit) {
+            changed = true;
+            if (this.trace) {
+              const cells = [];
+              for (const a of L) for (let b = 0; b < 9; b++) if (pos[a] & (1 << b)) cells.push(byRow ? [a, b] : [b, a]);
+              return this.record('Swordfish', `${byRow ? 'rows' : 'columns'} ${L.map(x => x + 1).join(', ')}`, cells, n);
+            }
+          }
+        }
+      }
+    }
+    return changed;
+  }
+
+  // Simple colouring. For one digit, link the two spots of every house that has
+  // exactly two, and colour each chain alternately: one colour is all true, the
+  // other all false. Two same-coloured cells that see each other condemn their
+  // colour (colour wrap); a cell seeing both colours can't hold the digit
+  // (colour trap).
+  stepColouring(g, cand) {
+    let changed = false;
+    for (let n = 1; n <= 9; n++) {
+      const bit = this.bit(n);
+      const adj = new Map();
+      for (const u of this.units) {
+        const spots = [];
+        for (const [r, c] of u) if (!g[r][c] && (cand[r][c] & bit)) spots.push(r * 9 + c);
+        if (spots.length !== 2) continue;
+        for (const [x, y] of [[spots[0], spots[1]], [spots[1], spots[0]]]) {
+          if (!adj.has(x)) adj.set(x, new Set());
+          adj.get(x).add(y);
+        }
+      }
+      const colour = new Map();
+      for (const start of adj.keys()) {
+        if (colour.has(start)) continue;
+        const comp = [start];
+        colour.set(start, 0);
+        for (let q = 0; q < comp.length; q++) {
+          for (const nb of adj.get(comp[q])) {
+            if (!colour.has(nb)) { colour.set(nb, 1 - colour.get(comp[q])); comp.push(nb); }
+          }
+        }
+        if (comp.length < 3) continue;
+        const cellsOf = k => comp.filter(i => colour.get(i) === k);
+        const asCells = comp.map(i => [(i / 9) | 0, i % 9]);
+        for (const k of [0, 1]) {
+          const same = cellsOf(k);
+          let wrap = false;
+          for (let a = 0; a < same.length && !wrap; a++) for (let b = a + 1; b < same.length; b++) {
+            if (this.seesIdx(same[a], same[b])) { wrap = true; break; }
+          }
+          if (!wrap) continue;
+          for (const i of same) cand[(i / 9) | 0][i % 9] &= ~bit;
+          changed = true;
+          if (this.trace) return this.record('Simple colouring', null, asCells, n);
+          break;
+        }
+        const zero = cellsOf(0), one = cellsOf(1);
+        let hit = false;
+        for (let i = 0; i < 81; i++) {
+          const r = (i / 9) | 0, c = i % 9;
+          if (g[r][c] || !(cand[r][c] & bit) || colour.has(i)) continue;
+          if (zero.some(j => this.seesIdx(i, j)) && one.some(j => this.seesIdx(i, j))) { cand[r][c] &= ~bit; hit = true; }
+        }
+        if (hit) {
+          changed = true;
+          if (this.trace) return this.record('Simple colouring', null, asCells, n);
         }
       }
     }
@@ -364,10 +593,11 @@ class SudokuEngine {
   //
   // The first three levels stay singles-only and differ only in how much is
   // filled in for you — that is what makes them gentle. Medium is the first that
-  // forces a real technique. Hard and Crazy both need more than pairs; Crazy
-  // gives you six fewer clues to do it with. (Tier 2 is deliberately not a band
-  // of its own: puzzles needing triples or an X-wing but nothing beyond are rare
-  // enough that hunting for one costs more than it's worth.)
+  // forces a real technique. Hard needs more than pairs but always yields to the
+  // grader's own toolkit (up to XY-wing, swordfish, colouring); Crazy has fewer
+  // clues and no ceiling. (Tier 2 is deliberately not a band of its own:
+  // puzzles needing triples or an X-wing but nothing beyond are rare enough
+  // that hunting for one costs more than it's worth.)
   static get LEVELS() {
     return {
       basic:  { clues: 50, minClues: 50, minTier: 0, maxTier: 0 },
@@ -375,26 +605,38 @@ class SudokuEngine {
       easy:   { clues: 40, minClues: 40, minTier: 0, maxTier: 0 },
       medium: { clues: 32, minClues: 24, minTier: 1, maxTier: 1 },
       hard:   { clues: 30, minClues: 24, minTier: 2, maxTier: 3 },
-      crazy:  { clues: 24, minClues: 20, minTier: 3, maxTier: 3 },
+      crazy:  { clues: 24, minClues: 20, minTier: 3, maxTier: 4 },
     };
   }
 
-  generatePuzzle(level) {
+  // A `seed` (any string) makes the puzzle reproducible — the daily puzzle —
+  // so the wall-clock deadline is dropped: it would make the result depend on
+  // the device's speed.
+  generatePuzzle(level, seed) {
     const spec = SudokuEngine.LEVELS[level] || SudokuEngine.LEVELS.easy;
-    const deadline = Date.now() + 2000;           // never freeze the UI for long
+    if (seed != null) {
+      this.rand = SudokuEngine.seededRandom(String(seed));
+      try { return this.generatePuzzle(level); } finally { this.rand = Math.random; }
+    }
+    const deadline = this.rand === Math.random ? Date.now() + 2000 : Infinity;
     let best = null, bestDistance = Infinity;
 
-    for (let attempt = 0; attempt < 12; attempt++) {
+    for (let attempt = 0; attempt < 24; attempt++) {
       const candidate = this.carve(spec, deadline);
-      const distance = candidate.tier < spec.minTier ? spec.minTier - candidate.tier
-                     : candidate.tier > spec.maxTier ? candidate.tier - spec.maxTier
-                     : 0;
+      const distance = SudokuEngine.bandDistance(spec, candidate.tier);
       if (distance < bestDistance) { bestDistance = distance; best = candidate; }
       if (distance === 0 || Date.now() > deadline) break;
     }
 
     const grid = best.grid;
     return { grid, solution: best.solution, given: grid.map(row => row.map(v => v !== 0)), tier: best.tier };
+  }
+
+  // Overshooting the ceiling is far worse than undershooting the floor: a Hard
+  // that is too easy is a disappointment, one that needs guessing breaks the
+  // promise that Hard yields to logic.
+  static bandDistance(spec, t) {
+    return t < spec.minTier ? spec.minTier - t : t > spec.maxTier ? (t - spec.maxTier) * 10 : 0;
   }
 
   // One generation attempt: carve a solution down to the clue target, then push
@@ -427,7 +669,7 @@ class SudokuEngine {
     // step budget and the running best — whichever board came closest wins.
     let tier = this.gradeTier(grid);
     let best = { grid: grid.map(r => [...r]), tier };
-    const distance = t => (t < spec.minTier ? spec.minTier - t : t > spec.maxTier ? t - spec.maxTier : 0);
+    const distance = t => SudokuEngine.bandDistance(spec, t);
 
     for (let step = 0; step < 40 && distance(tier) > 0 && Date.now() < deadline; step++) {
       if (tier < spec.minTier) {
@@ -443,7 +685,7 @@ class SudokuEngine {
         if (!removed.length) break;
         const [r, c] = removed.pop();
         grid[r][c] = solution[r][c];
-        kept.push([r, c]);
+        kept.unshift([r, c]);
       }
       tier = this.gradeTier(grid);
       if (distance(tier) < distance(best.tier)) best = { grid: grid.map(r => [...r]), tier };
@@ -478,10 +720,23 @@ class SudokuEngine {
     return true;
   }
 
+  // mulberry32 over an FNV-1a hash of the seed string.
+  static seededRandom(seed) {
+    let h = 2166136261;
+    for (let i = 0; i < seed.length; i++) h = Math.imul(h ^ seed.charCodeAt(i), 16777619);
+    let a = h >>> 0;
+    return () => {
+      a = (a + 0x6D2B79F5) | 0;
+      let t = Math.imul(a ^ (a >>> 15), 1 | a);
+      t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    };
+  }
+
   // Fisher-Yates shuffle
   shuffle(arr) {
     for (let i = arr.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
+      const j = Math.floor(this.rand() * (i + 1));
       [arr[i], arr[j]] = [arr[j], arr[i]];
     }
     return arr;
