@@ -121,3 +121,13 @@ in games/js/games.js ONLY if that file is no longer dirty from another session, 
 - 2026-10-10 APPLEPROXY DONE: proxy deployed (from HEAD+applepx scratch copy to avoid shipping MYROOMS); client audio files shipped selectively WITHOUT BUILD bump (no-cache revalidation). server/main.go register line still uncommitted alongside MYROOMS edits — must ship with MYROOMS. Debug flag ON for Aaron's Edge retest.
 - 2026-10-10 CONFIRMED by Aaron + logs: Edge laptop (ad blocker) times out on itunes.apple.com lookups/previews; proxy serves clips (cache hits), direct artwork ok. Debug logging switched OFF (rows auto-prune in 7 days).
 - 2026-10-10 MYROOMS DONE + shipped (Your rooms: Rejoin/End/Leave; host leave bar; Done ends; 20-min empty-room expiry; admin close-finished). Apple proxy verified intact after its server deploy.
+
+## STATE @ 2026-10-10 (pre-compact) — all committed, pushed, deployed
+BUILD 202610100547 live on games.br8t.com + yru.br8t.com (Pages); server healthy, debug logging OFF; tree clean.
+Static deploy = rsync command in this log (excludes docs/server/tools/*.md + media/song-pictures, media/book-moments).
+Server deploy = server/deploy.sh (builds from WORKING TREE — make sure no other lane's half-done server edits are present).
+Open / optional:
+- media/song-pictures + media/book-moments (113 Flux images) unreviewed, gitignored, no packs.
+- Landscape: result card partly covers ladder clue list / chain portraits (POLISH note).
+- Firebase authorised domains lack yru.br8t.com (Aaron to add in console; all links point at games.br8t.com anyway).
+- Hub card is live; another session's RAGDOJO card in games/js/games.js is still uncommitted (theirs).
