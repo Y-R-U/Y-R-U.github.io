@@ -1,6 +1,6 @@
 // hud.js — screen-space HUD: vitals, radar, status, kill feed, scoreboard.
 
-import { PALETTE, TEAMS, TILE } from './config.js';
+import { PALETTE, TEAMS, TILE, RESERVE } from './config.js';
 import { clamp, fmtTime, TAU } from './util.js';
 
 function roundRect(ctx, x, y, w, h, r) {
@@ -28,10 +28,13 @@ export class Hud {
 
     this._statusBar(ctx, game, W, top, s, insets.account || 0);
     const radarSize = Math.min(W, H) * 0.27;
-    this._radar(ctx, game, W - right - radarSize - 10, top + 38 * s, radarSize, s);
-    this._vitals(ctx, game, insets.left + 10, top + 38 * s, W - insets.left - right - radarSize - 32, s);
-    this._killFeed(ctx, game, W - right - 12, top + 44 * s + radarSize + 10, s);
+    // the DOM ⏸/🏆 buttons end 48px below the inset; keep the row clear of them
+    const rowY = top + Math.max(38 * s, 46);
+    this._radar(ctx, game, W - right - radarSize - 10, rowY, radarSize, s);
+    this._vitals(ctx, game, insets.left + 10, rowY, W - insets.left - right - radarSize - 32, s);
+    this._killFeed(ctx, game, W - right - 12, rowY + 6 * s + radarSize + 10, s);
     this._objectiveArrows(ctx, game, W, H, insets);
+    this._threatArrows(ctx, game, W, H, insets);
     this._banner(ctx, game, W, H, s);
     if (player && !player.alive && game.state === 'playing') this._respawn(ctx, player, W, H, s);
     if (player && player.alive && player.energy / player.maxEff() < 0.25) this._lowVignette(ctx, W, H, game.time);
@@ -80,9 +83,14 @@ export class Hud {
     g.addColorStop(0, col); g.addColorStop(1, '#ffffff');
     ctx.fillStyle = g;
     roundRect(ctx, bx, by, Math.max(4, bw * ratio), barH, 5); ctx.fill();
+    // reserve notch: the gun stops here
+    const nx = Math.round(bx + bw * RESERVE.player) + 0.5;
+    ctx.strokeStyle = ratio < RESERVE.player ? '#ff6b6b' : 'rgba(255,255,255,0.75)'; ctx.lineWidth = 2;
+    ctx.beginPath(); ctx.moveTo(nx, by - 2 * s); ctx.lineTo(nx, by + barH + 2 * s); ctx.stroke();
     ctx.fillStyle = '#fff'; ctx.font = `bold ${Math.round(10 * s)}px ui-monospace, monospace`;
     ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-    ctx.fillText(`${Math.ceil(p.energy)} / ${p.maxEff()}`, bx + bw / 2, by + barH / 2 + 0.5);
+    const mx = Math.round(p.maxEff());
+    ctx.fillText(`${Math.min(mx, Math.ceil(p.energy))} / ${mx}`, bx + bw / 2, by + barH / 2 + 0.5);
 
     // ammo chips
     let cx = bx;
@@ -189,11 +197,43 @@ export class Hud {
       // place along the screen edge in the target direction
       const ix = clamp(cx + Math.cos(ang) * (Math.min(W, H) / 2 - m), m, W - m);
       const iy = clamp(cy + Math.sin(ang) * (Math.min(W, H) / 2 - m), m + insets.top, H - m);
-      ctx.save();
-      ctx.translate(ix, iy); ctx.rotate(ang);
-      ctx.fillStyle = t.c; ctx.globalAlpha = 0.8;
-      ctx.beginPath(); ctx.moveTo(10, 0); ctx.lineTo(-6, 7); ctx.lineTo(-6, -7); ctx.closePath(); ctx.fill();
-      ctx.restore();
+      this._arrow(ctx, ix, iy, ang, t.c, 0.8, 1);
+    }
+    ctx.globalAlpha = 1;
+  }
+
+  _arrow(ctx, x, y, ang, color, alpha, k) {
+    ctx.save();
+    ctx.translate(x, y); ctx.rotate(ang); ctx.scale(k, k);
+    ctx.fillStyle = color; ctx.globalAlpha = alpha;
+    ctx.beginPath(); ctx.moveTo(10, 0); ctx.lineTo(-6, 7); ctx.lineTo(-6, -7); ctx.closePath(); ctx.fill();
+    ctx.restore();
+  }
+
+  // off-screen bots that are hunting the player (targeting it in range, or hit it lately)
+  _threatArrows(ctx, game, W, H, insets) {
+    const p = game.player;
+    if (!p || !p.alive || game.state !== 'playing') return;
+    const c = game.camera;
+    const px = (p.x - c.x) * c.zoom + W / 2, py = (p.y - c.y) * c.zoom + H / 2;
+    const list = [];
+    for (const b of game.ships) {
+      if (b === p || !b.alive || !game.areEnemies(p, b)) continue;
+      const d = Math.hypot(b.x - p.x, b.y - p.y);
+      const hunting = (b.ai && b.ai.target === p && d < 760) || (p.lastHitBy === b.id && game.time - p.lastHitT < 2);
+      if (!hunting) continue;
+      const sx = (b.x - c.x) * c.zoom + W / 2, sy = (b.y - c.y) * c.zoom + H / 2;
+      if (sx > -8 && sx < W + 8 && sy > -8 && sy < H + 8) continue;
+      list.push({ b, d });
+    }
+    if (!list.length) return;
+    list.sort((a, b) => a.d - b.d);
+    const R = Math.min(W, H) / 2 - 30, m = 26;
+    for (const { b, d } of list.slice(0, 4)) {
+      const ang = Math.atan2(b.y - p.y, b.x - p.x);
+      const ix = clamp(px + Math.cos(ang) * R, m, W - m);
+      const iy = clamp(py + Math.sin(ang) * R, m + insets.top, H - m);
+      this._arrow(ctx, ix, iy, ang, b.color.color, d < 450 ? 0.7 : 0.45, 0.8);
     }
     ctx.globalAlpha = 1;
   }

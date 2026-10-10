@@ -99,6 +99,27 @@ function unlock() { audio.init(); audio.resume(); }
 for (const ev of ['pointerup', 'touchend', 'click', 'keydown'])
   window.addEventListener(ev, unlock, { passive: true, capture: true });
 
+// App switch / screen lock: silence audio and pause a live match. The next tap
+// resumes audio through unlock() above.
+document.addEventListener('visibilitychange', () => {
+  if (document.visibilityState !== 'hidden') { audio.resume(); return; }
+  audio.suspend();
+  if (app.scene === 'game' && game && game.state === 'playing' && !app.paused) togglePause();
+});
+
+// one-time, non-blocking tip the first time the energy reserve holds the gun
+let tipEl = null;
+function reserveTip() {
+  if (settings.tipReserve) return;
+  saveSettings({ tipReserve: true });
+  tipEl = document.createElement('div');
+  tipEl.className = 'tip-callout';
+  tipEl.textContent = 'Firing uses your shield. Let it refill.';
+  uiRoot.append(tipEl);
+  setTimeout(() => { if (tipEl) tipEl.classList.add('out'); }, 4200);
+  setTimeout(() => { if (tipEl) { tipEl.remove(); tipEl = null; } }, 5000);
+}
+
 // ---- menu wiring ----
 const menu = new Menu(uiRoot, {
   onStart: startGame,
@@ -215,6 +236,9 @@ function frame(ts) {
     if (input.consumePressed('pause') && game.state === 'playing') togglePause();
     if (input.consumePressed('mute')) doMute();
     if (!app.paused) game.update(dt);
+    const pl = game.player;
+    input.lowEnergy = !!(pl && pl.alive && pl.belowReserve());
+    if (pl && pl.reserveHit) { pl.reserveHit = false; reserveTip(); }
     game.render(ctx, W, H);
     hud.render(ctx, game, W, H, insets, input);
     if (!app.paused && game.state === 'playing') input.renderControls(ctx);
@@ -228,3 +252,4 @@ function frame(ts) {
 resize();
 menu.show('title');
 requestAnimationFrame(frame);
+window.__csBooted = true;

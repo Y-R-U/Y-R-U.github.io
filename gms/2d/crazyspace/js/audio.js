@@ -44,6 +44,7 @@ export class Audio {
     // a 1-sample buffer started inside the gesture finishes the unlock on old WebKit
     try { const s = c.createBufferSource(); s.buffer = c.createBuffer(1, 1, 22050); s.connect(c.destination); s.start(0); } catch (e) { /* ignore */ }
   }
+  suspend() { const c = this.ctx; if (c && c.state === 'running') c.suspend().catch(() => {}); }
   toggleMute() { this.muted = !this.muted; this._apply(); return this.muted; }
 
   _makeNoise() {

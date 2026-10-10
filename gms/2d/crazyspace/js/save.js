@@ -74,6 +74,7 @@ export function settingsDefaults() {
     lastMode: 'deathmatch',
     lastShip: 'warbird',
     lastDiff: 'rookie',  // new players start on Rookie; a saved choice wins via mergeForward
+    tipReserve: false,   // the "firing uses your shield" callout has been shown
   };
 }
 

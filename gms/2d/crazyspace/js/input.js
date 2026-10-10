@@ -4,6 +4,8 @@
 
 import { clamp, TAU } from './util.js';
 
+const TURN_BAND = 0.45;
+
 export class Input {
   constructor(canvas) {
     this.canvas = canvas;
@@ -55,10 +57,12 @@ export class Input {
     const fx = mirror ? edge + 70 : W - edge - 70;
     const fy = H - bottom - 78;
     const s = mirror ? -1 : 1;   // horizontal fan direction
+    // short landscape screens: SP sits up-and-inward of BOMB so it clears the radar
+    const sp = H < 500 ? { x: fx - 112 * s, y: fy - 140 } : { x: fx - 22 * s, y: fy - 132 };
     this.buttons = [
       { id: 'gun',     label: '🔫', sub: 'FIRE',  x: fx,              y: fy,        r: 62, held: false, color: '#ff5d8f' },
       { id: 'bomb',    label: '💣', sub: 'BOMB',  x: fx - 104 * s,    y: fy - 30,   r: 46, held: false, color: '#ff7b3d' },
-      { id: 'special', label: '✦',  sub: 'SP',    x: fx - 22 * s,     y: fy - 132,  r: 44, held: false, color: '#35e3ff' },
+      { id: 'special', label: '✦',  sub: 'SP',    x: sp.x,            y: sp.y,      r: 44, held: false, color: '#35e3ff' },
     ];
   }
 
@@ -149,9 +153,10 @@ export class Input {
     this.joy.x = this.joy.baseX + dx;
     this.joy.y = this.joy.baseY + dy;
     const mag = Math.min(1, len / this.joy.r);
+    // 16-45% deflection turns on the spot; thrust ramps in beyond that
     if (mag > 0.16) {
       this.aimAngle = Math.atan2(dy, dx);
-      this.aimMag = (mag - 0.16) / 0.84;
+      this.aimMag = mag > TURN_BAND ? (mag - TURN_BAND) / (1 - TURN_BAND) : 0;
     } else {
       this.aimAngle = null; this.aimMag = 0;
     }
@@ -221,6 +226,7 @@ export class Input {
     // joystick
     if (this.joy.active) {
       this._ring(ctx, this.joy.baseX, this.joy.baseY, this.joy.r, 'rgba(120,150,255,0.18)', 2);
+      this._ring(ctx, this.joy.baseX, this.joy.baseY, this.joy.r * TURN_BAND, 'rgba(120,150,255,0.10)', 1);
       const g = ctx.createRadialGradient(this.joy.x, this.joy.y, 0, this.joy.x, this.joy.y, 34);
       g.addColorStop(0, 'rgba(180,200,255,0.9)');
       g.addColorStop(1, 'rgba(90,120,255,0.25)');
@@ -242,22 +248,24 @@ export class Input {
     // buttons
     ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
     for (const b of this.buttons) {
-      ctx.globalAlpha = b.held ? 0.95 : 0.55;
+      const dim = this.lowEnergy && b.id !== 'special';
+      ctx.globalAlpha = (b.held ? 0.95 : 0.55) * (dim ? 0.4 : 1);
       const g = ctx.createRadialGradient(b.x, b.y, 0, b.x, b.y, b.r);
       g.addColorStop(0, b.held ? '#ffffff' : 'rgba(255,255,255,0.10)');
       g.addColorStop(0.6, b.color + (b.held ? '' : '55'));
       g.addColorStop(1, 'rgba(0,0,0,0.05)');
       ctx.fillStyle = g;
       ctx.beginPath(); ctx.arc(b.x, b.y, b.r, 0, TAU); ctx.fill();
-      ctx.globalAlpha = b.held ? 1 : 0.8;
-      ctx.lineWidth = 2; ctx.strokeStyle = b.color;
+      ctx.globalAlpha = (b.held ? 1 : 0.8) * (dim ? 0.4 : 1);
+      ctx.lineWidth = 2; ctx.strokeStyle = dim ? '#8890b0' : b.color;
       ctx.beginPath(); ctx.arc(b.x, b.y, b.r, 0, TAU); ctx.stroke();
-      ctx.globalAlpha = 1;
+      ctx.globalAlpha = dim ? 0.5 : 1;
       ctx.fillStyle = '#fff';
       ctx.font = `${Math.round(b.r * 0.62)}px system-ui`;
       ctx.fillText(b.label, b.x, b.y - 4);
       ctx.font = '10px system-ui'; ctx.fillStyle = 'rgba(255,255,255,0.85)';
       ctx.fillText(b.sub, b.x, b.y + b.r * 0.5);
+      ctx.globalAlpha = 1;
     }
     ctx.restore();
   }

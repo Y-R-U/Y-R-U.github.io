@@ -18,6 +18,20 @@ function ffaColor(h) {
   return { color: `hsl(${h},90%,62%)`, glow: `hsl(${h},100%,80%)`, dark: `hsl(${h},75%,30%)` };
 }
 
+// one wall tile's vertical gradient, rendered once at 4x (drawn TILE+0.5 square to hide seams)
+let _wallSpr = null;
+function wallSprite() {
+  if (_wallSpr) return _wallSpr;
+  const R = 4, c = document.createElement('canvas');
+  c.width = c.height = Math.ceil((TILE + 0.5) * R);
+  const x = c.getContext('2d');
+  const g = x.createLinearGradient(0, 0, 0, TILE * R);
+  g.addColorStop(0, '#39459b');
+  g.addColorStop(1, PALETTE.wall);
+  x.fillStyle = g; x.fillRect(0, 0, c.width, c.height);
+  return (_wallSpr = c);
+}
+
 export class Game {
   constructor({ input, audio, modeKey, shipKey, difficulty = 0.6, playerName = 'You', upgrades = null, botScale }) {
     this.input = input;
@@ -325,7 +339,20 @@ export class Game {
 
   _updateCamera(dt) {
     const c = this.camera;
-    const tx = this.player.x, ty = this.player.y;
+    // portrait: lead a little along the (smoothed) velocity and sit the ship above
+    // centre, so more of the arena shows above the thumbs
+    const p = this.player, la = this._look || (this._look = { x: 0, y: 0 });
+    let lx = 0, ly = 0, bias = 0;
+    if (this.H > this.W * 1.1) {
+      const cap = Math.min(this.W, this.H) * 0.16 / c.zoom;
+      lx = p.alive ? p.vx * 0.3 : la.x; ly = p.alive ? p.vy * 0.3 : la.y;
+      const l = Math.hypot(lx, ly);
+      if (l > cap) { lx *= cap / l; ly *= cap / l; }
+      bias = this.H * 0.07 / c.zoom;
+    }
+    const k = 1 - Math.pow(0.08, dt);
+    la.x += (lx - la.x) * k; la.y += (ly - la.y) * k;
+    const tx = p.x + la.x, ty = p.y + la.y + bias;
     c.x = lerp(c.x, tx, 1 - Math.pow(0.0008, dt));
     c.y = lerp(c.y, ty, 1 - Math.pow(0.0008, dt));
     c.shake = Math.max(0, c.shake - c.shake * 9 * dt - 6 * dt);
@@ -365,18 +392,15 @@ export class Game {
     const W = this.world;
     const c0 = Math.max(0, (view.x0 / TILE) | 0), c1 = Math.min(W.cols - 1, (view.x1 / TILE | 0) + 1);
     const r0 = Math.max(0, (view.y0 / TILE) | 0), r1 = Math.min(W.rows - 1, (view.y1 / TILE | 0) + 1);
+    const spr = wallSprite(), S = TILE + 0.5;
+    ctx.strokeStyle = PALETTE.wallEdge;
+    ctx.lineWidth = 2;
     for (let r = r0; r <= r1; r++) {
       for (let cc = c0; cc <= c1; cc++) {
         if (!W.isSolid(cc, r)) continue;
         const x = cc * TILE, y = r * TILE;
-        const g = ctx.createLinearGradient(x, y, x, y + TILE);
-        g.addColorStop(0, '#39459b');
-        g.addColorStop(1, PALETTE.wall);
-        ctx.fillStyle = g;
-        ctx.fillRect(x, y, TILE + 0.5, TILE + 0.5);
+        ctx.drawImage(spr, x, y, S, S);
         // bright edges on exposed faces
-        ctx.strokeStyle = PALETTE.wallEdge;
-        ctx.lineWidth = 2;
         ctx.beginPath();
         if (!W.isSolid(cc, r - 1)) { ctx.moveTo(x, y + 1); ctx.lineTo(x + TILE, y + 1); }
         if (!W.isSolid(cc, r + 1)) { ctx.moveTo(x, y + TILE - 1); ctx.lineTo(x + TILE, y + TILE - 1); }

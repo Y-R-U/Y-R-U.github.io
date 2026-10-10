@@ -40,6 +40,25 @@ function topbar(title, onBack, right) {
     el('h2', {}, title), right || el('span', {}));
 }
 
+const TOUCH = window.matchMedia('(pointer: coarse)').matches || 'ontouchstart' in window;
+const HELP_COMMON = `
+  <div><b>Energy</b><span>Your bar is health <i>and</i> ammo. It recharges. Your gun and bombs stop at the notch on the bar, so firing can't empty your shield.</span></div>
+  <div><b>Greens</b><span>Fly near green prizes to upgrade guns, bombs, speed & more. Your magnet pulls them in.</span></div>`;
+const HELP_HANGAR = `
+  <div><b>Hangar</b><span>Finished matches pay credits. Spend them in the Hangar on permanent upgrades (hull, guns, aim assist…). They stack, so the game gets easier the more you play.</span></div>`;
+const HELP_TOUCH = `
+  <div><b>Move</b><span>Put your steering thumb down anywhere on its half of the screen and drag. A small push turns on the spot; push further to thrust. Swap sides in Settings.</span></div>
+  <div><b>Fire</b><span>Hold the big 🔫 FIRE button to keep firing.</span></div>
+  <div><b>Bomb</b><span>Tap 💣 BOMB. Bomb while nearly still to drop a mine.</span></div>
+  <div><b>Special</b><span>Tap ✦ SP for your ship's Burst or Repel.</span></div>${HELP_COMMON}
+  <div><b>Scores</b><span>Hold 🏆 (top left) for the scoreboard. ⏸ pauses.</span></div>${HELP_HANGAR}`;
+const HELP_KEYS = `
+  <div><b>Move</b><span><kbd>W/A/S/D</kbd> or arrows: turn and thrust.</span></div>
+  <div><b>Fire</b><span><kbd>Space</kbd> or <kbd>J</kbd>. Hold to keep firing.</span></div>
+  <div><b>Bomb</b><span><kbd>Shift</kbd> or <kbd>K</kbd>. Bomb while nearly still to drop a mine.</span></div>
+  <div><b>Special</b><span>Burst or Repel: <kbd>E</kbd> / <kbd>L</kbd>.</span></div>${HELP_COMMON}
+  <div><b>Scores</b><span>Hold <kbd>Tab</kbd> for the scoreboard. <kbd>P</kbd> to pause, <kbd>M</kbd> to mute.</span></div>${HELP_HANGAR}`;
+
 export const HANGAR_HINT = 'Every match earns credits. Hangar upgrades stack, so the longer you play the easier it gets.';
 
 // normalize ship stats for the little bars
@@ -100,16 +119,7 @@ export class Menu {
     this.help = screen('', {
       head: topbar('How to Play', () => this.show('title')),
       body: [el('div', { class: 'panel' },
-        el('div', { class: 'help-grid', html: `
-          <div><b>Move</b><span>Left thumb — drag to steer & thrust. Keyboard: <kbd>W/A/S/D</kbd> or arrows.</span></div>
-          <div><b>Fire</b><span>Right buttons or <kbd>Space</kbd>. Hold to keep firing.</span></div>
-          <div><b>Bomb</b><span>💣 button or <kbd>Shift</kbd>. Fire while still to drop a mine.</span></div>
-          <div><b>Special</b><span>✦ Burst or Repel — <kbd>E</kbd> / <kbd>L</kbd>.</span></div>
-          <div><b>Energy</b><span>Your bar is health <i>and</i> ammo. It recharges — don't bottom out.</span></div>
-          <div><b>Greens</b><span>Fly near green prizes to upgrade guns, bombs, speed & more. Your magnet pulls them in.</span></div>
-          <div><b>Scores</b><span>Hold <kbd>Tab</kbd> (or 🏆) for the scoreboard. <kbd>P</kbd> to pause.</span></div>
-          <div><b>Hangar</b><span>Finished matches pay credits. Spend them in the Hangar on permanent upgrades (hull, guns, aim assist…). They stack, so the game gets easier the more you play.</span></div>
-        ` }))],
+        el('div', { class: 'help-grid', html: TOUCH ? HELP_TOUCH : HELP_KEYS }))],
       foot: [el('button', { class: 'btn primary wide', onclick: () => this.show('title') }, 'Got it')],
     });
 
@@ -234,7 +244,7 @@ export class Menu {
     // ---------------- in-game small buttons ----------------
     this.gameBtns = el('div', { class: 'game-btns' },
       el('button', { class: 'mini', onclick: () => this._igCb('pause') }, '⏸'),
-      el('button', { class: 'mini', ontouchstart: () => this._igCb('scoresOn'), ontouchend: () => this._igCb('scoresOff'), onmousedown: () => this._igCb('scoresOn'), onmouseup: () => this._igCb('scoresOff') }, '🏆'),
+      el('button', { class: 'mini', ontouchstart: () => this._igCb('scoresOn'), ontouchend: () => this._igCb('scoresOff'), ontouchcancel: () => this._igCb('scoresOff'), onmousedown: () => this._igCb('scoresOn'), onmouseup: () => this._igCb('scoresOff') }, '🏆'),
     );
     this.gameBtns.style.display = 'none';
 

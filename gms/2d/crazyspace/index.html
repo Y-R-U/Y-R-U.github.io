@@ -14,6 +14,33 @@
 <body>
   <canvas id="game"></canvas>
   <div id="ui"></div>
+  <script>
+  // Inline on purpose: if a module fails to load or parse (often a half-cached module
+  // set after a deploy), nothing inside it can report that. Reload busts the cache.
+  (function () {
+    var shown = false;
+    function fail(what) {
+      if (shown || window.__csBooted) return;
+      shown = true;
+      var box = document.createElement('div');
+      box.id = 'bootfail';
+      var msg = document.createElement('span');
+      msg.textContent = 'Crazy Space did not load (' + String(what || 'unknown error').slice(0, 140) + ').';
+      var btn = document.createElement('button');
+      btn.textContent = 'Reload';
+      btn.onclick = function () { location.href = location.pathname + '?v=' + Date.now(); };
+      box.appendChild(msg); box.appendChild(btn);
+      document.body.appendChild(box);
+    }
+    window.addEventListener('error', function (e) {
+      fail(e.message || (e.target && e.target.src ? 'failed to load ' + e.target.src : 'load error'));
+    }, true);
+    window.addEventListener('unhandledrejection', function (e) {
+      fail((e.reason && (e.reason.message || e.reason)) || 'promise rejected');
+    });
+    setTimeout(function () { fail('timed out'); }, 12000);
+  })();
+  </script>
   <script type="module" src="js/main.js"></script>
 </body>
 </html>

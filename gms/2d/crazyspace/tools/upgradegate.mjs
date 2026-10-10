@@ -12,6 +12,8 @@
 //   node tools/upgradegate.mjs --gate          # exit 1 unless the targets hold
 //   --nobuff                                   # bots without difficulty hull/firepower scaling (pre-2026-10-10 game)
 //   --career --diff ace                        # career on another difficulty
+//   --phone                                    # PhonePilot instead of HumanPilot (informational, never gated)
+//   --noreserve                                # player gun/bomb energy reserve off (pre-2026-10-11 game)
 
 const argv = process.argv.slice(2);
 const flag = n => argv.includes('--' + n);
@@ -27,13 +29,16 @@ function mulberry32(a) { return () => { a |= 0; a = a + 0x6D2B79F5 | 0; let t = 
 
 const { Game } = await import('../js/game.js');
 const { Bot } = await import('../js/bot.js');
-const { UPGRADES, HANGAR_MAX, SHIP_LIST } = await import('../js/config.js');
+const { UPGRADES, HANGAR_MAX, SHIP_LIST, TILE, RESERVE } = await import('../js/config.js');
+const { angleTo, angleDiff, dist, rand } = await import('../js/util.js');
+if (flag('noreserve')) RESERVE.player = 0;
 const SHIP_PICK = opt('ship', 'all');   // 'all' rotates the five ships across seeds
 const H = await import('../js/hangar.js');
 
 const PILOT_SKILL = Number(opt('skill', 0.5));
 const REACT = Number(opt('react', 0.25));     // seconds of reaction lag
 const HUMAN = !flag('botpilot');
+const PHONE = flag('phone');
 
 // A thumb-on-glass human, built on the game's own Bot: it sees targets
 // REACT seconds late and aims at where they WERE (no lead), and it holds
@@ -61,6 +66,51 @@ class HumanPilot extends Bot {
     return h && h.length ? h[0] : { x: tgt.x, y: tgt.y };
   }
 }
+// A thumb-on-glass newcomer (from the 2026-10-11 hub review): sees only a 390x844
+// portrait screen around itself, steers straight at what it saw 0.45 s ago with
+// ±0.3 rad wobble, never leads, and holds FIRE whenever anything is on screen.
+const PHONE_REACT = 0.45;
+const PZOOM = 390 / (15 * TILE), HALF = { x: 195 / PZOOM, y: 422 / PZOOM };
+class PhonePilot extends Bot {
+  constructor(ship, skill) { super(ship, skill); this.hist = new Map(); this.clock = 0; this.err = 0; this.errT = 0; this.wander = 0; this.wanderT = 0; this.tgt = null; this.reT = 0; }
+  visible(o, s) { return Math.abs(o.x - s.x) < HALF.x && Math.abs(o.y - s.y) < HALF.y; }
+  think(dt, game) {
+    this.clock += dt;
+    for (const o of game.ships) {
+      let h = this.hist.get(o); if (!h) this.hist.set(o, h = []);
+      h.push({ t: this.clock, x: o.x, y: o.y });
+      while (h.length > 2 && h[1].t <= this.clock - PHONE_REACT) h.shift();
+    }
+    const s = this.ship, c = s.cmd;
+    c.fireGun = c.fireBomb = c.fireSpecial = false; c.turn = 0; c.thrust = 0; c.aimAngle = null; c.aimMag = 0;
+    if (!s.alive) return;
+    this.reT -= dt;
+    if (this.reT <= 0 || (this.tgt && !this.tgt.alive)) {
+      this.reT = 0.35; this.tgt = null; let bd = Infinity;
+      for (const o of game.ships) {
+        if (o === s || !o.alive || !game.areEnemies(s, o)) continue;
+        const h = this.hist.get(o)[0]; if (!this.visible(h, s)) continue;
+        const d = dist(s.x, s.y, h.x, h.y); if (d < bd) { bd = d; this.tgt = o; }
+      }
+    }
+    this.errT -= dt; if (this.errT <= 0) { this.errT = 0.3; this.err = rand(-0.3, 0.3); }
+    let desired, thrust;
+    if (this.tgt) {
+      const h = this.hist.get(this.tgt)[0];
+      desired = angleTo(s.x, s.y, h.x, h.y) + this.err;
+      thrust = dist(s.x, s.y, h.x, h.y) > 200 ? 1 : 0.35;
+    } else {
+      let g = null, gd = Infinity;
+      for (const p of game.prizes) { if (!this.visible(p, s)) continue; const d = dist(s.x, s.y, p.x, p.y); if (d < gd) { gd = d; g = p; } }
+      this.wanderT -= dt; if (this.wanderT <= 0) { this.wanderT = rand(1.5, 3); this.wander = rand(0, Math.PI * 2); }
+      desired = g ? angleTo(s.x, s.y, g.x, g.y) : this.wander; thrust = 0.8;
+    }
+    desired = this._avoidWalls(game, desired, thrust);
+    c.fireGun = !!this.tgt || Math.random() < 0.5;
+    c.aimAngle = desired; c.aimMag = thrust;
+  }
+}
+
 const DIFF = { rookie: 0.4, veteran: 0.62, ace: 0.85 };
 const DT = 1 / 60;
 
@@ -81,7 +131,7 @@ function playMatch({ mode, ship = 'warbird', diff = 'veteran', levels = null, se
   };
   const upgrades = forceOff || !levels ? null : H.hangarEffects(levels);
   const game = new Game({ input, audio: null, modeKey: mode, shipKey: ship, difficulty: DIFF[diff], playerName: 'Pilot', upgrades, ...(NOBUFF ? { botScale: null } : {}) });
-  pilot = HUMAN ? new HumanPilot(game.player, PILOT_SKILL) : new Bot(game.player, PILOT_SKILL);
+  pilot = PHONE ? new PhonePilot(game.player, PILOT_SKILL) : HUMAN ? new HumanPilot(game.player, PILOT_SKILL) : new Bot(game.player, PILOT_SKILL);
   pilot.skill = PILOT_SKILL;   // no random jitter for the stand-in human
   let guard = 0;
   while (game.state === 'playing' && guard++ < 60 * 60 * 15) game.update(DT);
@@ -179,7 +229,8 @@ if (flag('ablate')) {
     }
   }
   print(rows);
-  if (flag('gate')) {
+  if (flag('gate') && PHONE) console.log('GATE SKIPPED (--phone is informational only)');
+  else if (flag('gate')) {
     const fails = [];
     for (const mode of modes) {
       const g = l => rows.find(r => r.label === `${mode} ${l}`);
@@ -200,4 +251,4 @@ if (flag('ablate')) {
     if (fails.length) process.exitCode = 1;
   }
 }
-console.log(`(${((Date.now() - t0) / 1000).toFixed(1)}s, pilot ${HUMAN ? `human-model skill ${PILOT_SKILL} react ${REACT}s` : `plain Bot skill ${PILOT_SKILL}`})`);
+console.log(`(${((Date.now() - t0) / 1000).toFixed(1)}s, pilot ${PHONE ? 'phone newcomer' : HUMAN ? `human-model skill ${PILOT_SKILL} react ${REACT}s` : `plain Bot skill ${PILOT_SKILL}`}${RESERVE.player ? '' : ', no reserve'})`);

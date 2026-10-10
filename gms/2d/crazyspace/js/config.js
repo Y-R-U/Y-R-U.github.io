@@ -154,6 +154,10 @@ export function diffKeyFor(skill) {
   return skill < 0.5 ? 'rookie' : skill < 0.75 ? 'veteran' : 'ace';
 }
 
+// The player's gun and bombs stop at this fraction of max energy, so firing can't drain
+// the shield to nothing. Bots are not limited. An object so the harness can switch it off.
+export const RESERVE = { player: 0.3 };
+
 export const RESPAWN_DELAY = 2.2;
 export const PRIZE_MAX = 26;     // greens alive at once
 export const PRIZE_SPAWN = 1.1;  // seconds between green spawns

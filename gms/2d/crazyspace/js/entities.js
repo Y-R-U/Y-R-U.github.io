@@ -1,7 +1,7 @@
 // entities.js — ships, projectiles, prizes, flags, particles.
 
 import {
-  TILE, BULLET, BOMB, MINE, BURST, REPEL, PRIZE_CAPS, RESPAWN_DELAY, PALETTE, AIM_RANGE,
+  TILE, BULLET, BOMB, MINE, BURST, REPEL, PRIZE_CAPS, RESPAWN_DELAY, PALETTE, AIM_RANGE, RESERVE,
 } from './config.js';
 import {
   clamp, rand, randInt, TAU, rotateToward, angleDiff, sign, uid,
@@ -330,10 +330,13 @@ export class Ship {
 
   noseDir(angle = this.angle) { return { x: Math.cos(angle), y: Math.sin(angle) }; }
 
+  belowReserve() { return this.isPlayer && this.energy < this.maxEff() * RESERVE.player; }
+
   fireGun(game) {
     if (this.gunCd > 0) return;
     const cost = this.def.gunCost;
     if (this.energy < cost) return;
+    if (this.belowReserve()) { this.reserveHit = true; return; }
     this.energy -= cost;
     this.gunCd = 1 / this.def.fireRate;
     const lvl = this.guns;
@@ -361,6 +364,7 @@ export class Ship {
     if (this.bombCd > 0 || this.bombs < 1) return;
     const cost = this.def.bombCost;
     if (this.energy < cost) return;
+    if (this.belowReserve()) { this.reserveHit = true; return; }
     const speed = Math.hypot(this.vx, this.vy);
     this.energy -= cost;
     this.bombCd = 1 / this.def.bombRate;
@@ -426,6 +430,7 @@ export class Ship {
 
   damage(amt, game, attackerId) {
     if (!this.alive || this.shieldTime > 0) return;
+    if (this.isPlayer && attackerId != null) { this.lastHitBy = attackerId; this.lastHitT = game.time; }
     this.energy -= amt;
     this.flashTime = 0.12;
     if (this.energy <= 0) this.kill(game, attackerId);
