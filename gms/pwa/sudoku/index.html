@@ -211,7 +211,8 @@ body{
   .pad{grid-area:pad;align-self:center;}
   .pad-key{min-height:50px;}
   .controls{grid-area:controls;}
-  @media (max-width:740px){.header-icons{right:var(--br8t-account-space,0px);}}
+  /* the account avatar sits over the right column's top corner at any width */
+  .header-icons{right:var(--br8t-account-space,0px);}
 }
 </style>
 </head>
