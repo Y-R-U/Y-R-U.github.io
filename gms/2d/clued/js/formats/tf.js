@@ -1,5 +1,5 @@
-import { register, poolItems, pickPack, byDifficulty, imageOf, hasImg, fill, collect, distractors, pick, factAllowed, nested, nameArgs, catStmt, boolStmt } from './registry.js?v=202610100547';
-import { layout, choiceGrid } from '../ui/kit.js?v=202610100547';
+import { register, poolItems, pickPack, byDifficulty, imageOf, hasImg, fill, collect, distractors, pick, factAllowed, nested, nameArgs, catStmt, boolStmt } from './registry.js?v=202610101826';
+import { layout, choiceGrid } from '../ui/kit.js?v=202610101826';
 
 function sources(pack, gate) {
   const out = [];
@@ -95,13 +95,19 @@ export default register({
     const { answersEl } = layout(el, { prompt: q.prompt, media: q.media, big: true });
     const opts = [{ text: 'True', cls: 'tf-true', icon: '✔' }, { text: 'False', cls: 'tf-false', icon: '✘' }];
     const right = q.answer ? 0 : 1;
+    let picked = -1;
     const grid = choiceGrid(answersEl, opts, {
       tf: true,
-      onPick(i) { grid.lock(); grid.mark(right, i); api.answer({ correct: i === right, given: i === 0 }); },
+      onPick(i) {
+        grid.lock(); picked = i;
+        if (q.hidden) { api.answer({ correct: false, given: i === 0, pending: true }); return; }
+        grid.mark(right, i); api.answer({ correct: i === right, given: i === 0 });
+      },
     });
     return {
       destroy: () => grid.destroy(),
-      timeout() { grid.lock(); grid.mark(right, -1); },
+      timeout() { grid.lock(); if (!q.hidden) grid.mark(right, -1); },
+      settle(full) { grid.lock(); grid.mark(full.answer ? 0 : 1, picked); },
       choose(x) { grid.pick(x === 'correct' ? right : x === 'wrong' ? 1 - right : x === true || x === 'true' || x === 0 ? 0 : 1); },
     };
   },

@@ -1,15 +1,15 @@
 // The question runner: plays a list of questions with HUD, timer, reveal and scoring.
 // Every structure uses it, and lane S drives it for online rooms and challenge links. API in docs/notes/A.md.
-import { getFormat } from '../formats/registry.js?v=202610100547';
-import { createTimer } from '../core/timer.js?v=202610100547';
-import { basePoints, withStreak, stageMultiplier, progressiveLimit, stageExtendMs, PROGRESSIVE_CAP } from '../core/scoring.js?v=202610100547';
-import { creditsOf, urlsOf, preflight } from '../core/media.js?v=202610100547';
-import { getSettings } from '../core/store.js?v=202610100547';
-import { h, esc, onKey, countUp, fmtNum } from '../ui/kit.js?v=202610100547';
-import { popup, confirmPop } from '../ui/popup.js?v=202610100547';
-import { sfx, haptic, reducedMotion } from '../ui/fx.js?v=202610100547';
-import { speak, stopSpeaking, questionSpeech, canSpeak } from '../ui/speech.js?v=202610100547';
-import { dlog, debugCheck } from '../core/debuglog.js?v=202610100547';
+import { getFormat } from '../formats/registry.js?v=202610101826';
+import { createTimer } from '../core/timer.js?v=202610101826';
+import { basePoints, withStreak, stageMultiplier, progressiveLimit, stageExtendMs, PROGRESSIVE_CAP } from '../core/scoring.js?v=202610101826';
+import { creditsOf, urlsOf, preflight } from '../core/media.js?v=202610101826';
+import { getSettings } from '../core/store.js?v=202610101826';
+import { h, esc, onKey, countUp, fmtNum } from '../ui/kit.js?v=202610101826';
+import { popup, confirmPop } from '../ui/popup.js?v=202610101826';
+import { sfx, haptic, reducedMotion } from '../ui/fx.js?v=202610101826';
+import { speak, stopSpeaking, questionSpeech, canSpeak } from '../ui/speech.js?v=202610101826';
+import { dlog, debugCheck } from '../core/debuglog.js?v=202610101826';
 
 const KIND_RIGHT = ['Brilliant!', 'You got it!', 'Super!', 'Yes!', 'Amazing!'];
 const KIND_WRONG = ['Good try!', 'Nearly!', 'Nice guess!', 'Ooh, close!'];
@@ -332,7 +332,10 @@ export function createRunner(host, cfg = {}) {
     };
     lockStages();
     if (!t.skipped) state.answered++;
-    if (correct) {
+    if (res.pending) {
+      rec.pending = true; rec.prevStreak = players.length > 1 ? p.streak : state.streak;
+      sfx('tap');
+    } else if (correct) {
       state.correct++; p.correct++; state.stars++;
       sfx(streak >= 3 ? 'streak' : 'correct'); haptic('correct');
     } else if (!t.skipped) {
@@ -357,26 +360,64 @@ export function createRunner(host, cfg = {}) {
     return Array.isArray(q.answer) ? q.answer.join(' → ') : String(q.answer ?? '');
   }
 
+  const wrongNote = (q, rec) => {
+    if (rec.correct || rec.pending || typeof rec.given !== 'number' || !q.wrongNotes) return '';
+    const t = q.options?.[rec.given]?.text;
+    return (t != null && Object.hasOwn(q.wrongNotes, t) && typeof q.wrongNotes[t] === 'string') ? q.wrongNotes[t] : '';
+  };
+  let revealLast = false;
+  // Online: a hidden question's answer arrives at the reveal. full = the question with its answer, res = the server's { correct, points }.
+  function settle(i, full, res) {
+    const q = questions[i];
+    if (!q?.hidden || i !== state.i || !full || full.hidden) return false;
+    const rec = state.answers.find(r => r.i === i);
+    for (const k of ['answer', 'answerText', 'explain', 'refs', 'id', 'wrongNotes']) if (k in full) q[k] = full[k];
+    delete q.hidden;
+    try { ctrl?.settle && ctrl.settle(q); } catch (e) { console.error(e); }
+    if (!rec) return true;
+    rec.qid = q.id;
+    if (rec.pending) {
+      delete rec.pending;
+      const pi = rec.player, p = players[pi];
+      rec.correct = !!res?.correct;
+      if (rec.correct) {
+        rec.streak = (rec.prevStreak || 0) + 1;
+        state.correct++; p.correct++; state.stars++;
+        if (players.length > 1) p.streak = rec.streak; else state.streak = rec.streak;
+        p.bestStreak = Math.max(p.bestStreak, rec.streak);
+        state.bestStreak = Math.max(state.bestStreak, rec.streak);
+        sfx(rec.streak >= 3 ? 'streak' : 'correct'); haptic('correct');
+      } else { sfx('wrong'); haptic('wrong'); }
+      if (res?.points != null) rec.points = res.points;
+      drawHud();
+    }
+    showReveal(q, rec, revealLast);
+    return true;
+  }
+
   function showReveal(q, rec, last = false) {
+    revealLast = last;
     stopSpeaking();
     const pick = arr => arr[Math.floor(Math.random() * arr.length)];
     const good = rec.correct;
-    const title = rec.skipped ? 'Skipped' : rec.timeout ? (kids ? 'Out of time!' : "Time's up") : good ? pick(kids ? KIND_RIGHT : RIGHT) : pick(kids ? KIND_WRONG : WRONG);
+    const pending = !!rec.pending;
+    const title = pending ? 'Locked in' : rec.skipped ? 'Skipped' : rec.timeout ? (kids ? 'Out of time!' : "Time's up") : good ? pick(kids ? KIND_RIGHT : RIGHT) : pick(kids ? KIND_WRONG : WRONG);
     const pts = good ? (kids ? '<span class="star-pop">⭐</span>' : `<span class="pts">+${fmtNum(rec.points)}</span>`) : '';
     // Tall boards (format flag revealInline) get a one-line result under the board with Next beside it; answerOnBoard
     // formats already mark the right answer on the board, so the long "Answer:" line is left out.
     const fmt = getFormat(q.format) || {};
     const inline = !!fmt.revealInline;
-    const ans = good || (fmt.answerOnBoard && !rec.skipped && !rec.timeout) ? '' : `<div class="rv-answer">${kids ? 'The answer is' : 'Answer:'} <b>${esc(answerLine(q))}</b></div>`;
+    const ans = good || pending || q.hidden || (fmt.answerOnBoard && !rec.skipped && !rec.timeout) ? '' : `<div class="rv-answer">${kids ? 'The answer is' : 'Answer:'} <b>${esc(answerLine(q))}</b></div>`;
     const credits = creditsOf(q);
     reveal.innerHTML = '';
-    reveal.className = `reveal ${good ? 'good' : 'bad'}${inline ? ' inline' : ''}`;
-    const head = h('div.rv-head', { html: `<span class="rv-mark">${good ? '✓' : rec.skipped ? '⤼' : kids ? '♥' : '✗'}</span><span class="rv-title">${esc(title)}</span>${pts}` });
+    reveal.className = `reveal ${pending ? 'pending' : good ? 'good' : 'bad'}${inline ? ' inline' : ''}`;
+    const head = h('div.rv-head', { html: `<span class="rv-mark">${pending ? '…' : good ? '✓' : rec.skipped ? '⤼' : kids ? '♥' : '✗'}</span><span class="rv-title">${esc(title)}</span>${pts}` });
     const card = h('div.rv-card', {},
       h('div.rv-q', {}, q.prompt || ''),
       head,
       ans ? h('div', { html: ans }) : null,
       q.explain ? h('p.rv-explain', {}, q.explain) : null,
+      wrongNote(q, rec) ? h('p.rv-explain.rv-note', {}, wrongNote(q, rec)) : null,
       ...extraReveal.map(x => (typeof x === 'string' ? h('div.rv-extra', { html: x }) : x)),
       cfg.revealExtra ? (v => (v == null ? null : typeof v === 'string' ? h('div.rv-extra', { html: v }) : v))(cfg.revealExtra(rec, state)) : null);
     const row = h('div.rv-row');
@@ -395,7 +436,8 @@ export function createRunner(host, cfg = {}) {
       const over = card.getBoundingClientRect().bottom + 24 - stage.getBoundingClientRect().bottom;
       if (over > 0) stage.scrollTo({ top: stage.scrollTop + over, behavior: reducedMotion() ? 'auto' : 'smooth' });
     });
-    if (kids && good) speak(title, { kids }); else if (kids) speak(`${title} The answer is ${answerLine(q)}`, { kids });
+    if (pending || q.hidden) { if (kids) speak(title, { kids }); }
+    else if (kids && good) speak(title, { kids }); else if (kids) speak(`${title} The answer is ${answerLine(q)}`, { kids });
     return Promise.resolve();
   }
 
@@ -499,6 +541,7 @@ export function createRunner(host, cfg = {}) {
     get stage() { return sg.stage; },
     // Online: the server says time is up. Locks input and records a timeout if still unanswered.
     timeUp: () => { R('timeUp'); onTimeout(); },
+    settle: (i, full, res) => settle(i, full, res),
     // "Next question in 3…2…1". `to` is seconds, or an absolute ms time (server clock). Resolves when it ends.
     countdown: (to, label) => countdown(to, label),
     guard: async () => { if (finished) return true; await quit(); return finished; },

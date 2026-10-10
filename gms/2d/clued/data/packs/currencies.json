@@ -2744,14 +2744,19 @@
    "id": "cur-afghanistan",
    "kind": "mc",
    "prompt": "What is the currency of Afghanistan?",
-   "answer": "Afghan afghani",
+   "answer": "Afghani",
    "wrong": [
-    "Zambian kwacha",
-    "Swazi lilangeni",
-    "Gambian dalasi"
+    "Riyal",
+    "Sum",
+    "Taka"
    ],
    "explain": "Afghanistan uses the Afghan afghani (AFN).",
-   "difficulty": 2
+   "difficulty": 1,
+   "wrongNotes": {
+    "Riyal": "The riyal is used in Qatar and Saudi Arabia.",
+    "Sum": "The sum is used in Uzbekistan.",
+    "Taka": "The taka is used in Bangladesh."
+   }
   },
   {
    "id": "curr-afghanistan",
@@ -2764,33 +2769,48 @@
     "Myanmar"
    ],
    "explain": "The Afghan afghani is the currency of Afghanistan.",
-   "difficulty": 3
+   "difficulty": 1,
+   "wrongNotes": {
+    "Palestine": "Palestine uses the Israeli new shekel.",
+    "Turkey": "Turkey uses the Turkish lira.",
+    "Myanmar": "Myanmar uses the Myanmar kyat."
+   }
   },
   {
    "id": "cur-albania",
    "kind": "mc",
    "prompt": "What is the currency of Albania?",
-   "answer": "Albanian lek",
+   "answer": "Lek",
    "wrong": [
-    "Samoan tālā",
-    "Central African CFA franc",
-    "Lao kip"
+    "Euro",
+    "Króna",
+    "Denar"
    ],
    "explain": "Albania uses the Albanian lek (ALL).",
-   "difficulty": 3
+   "difficulty": 3,
+   "wrongNotes": {
+    "Euro": "The euro is used in Andorra, Austria, Belgium and 23 others.",
+    "Króna": "The króna is used in Iceland and Sweden.",
+    "Denar": "The denar is used in North Macedonia."
+   }
   },
   {
    "id": "cur-algeria",
    "kind": "mc",
    "prompt": "What is the currency of Algeria?",
-   "answer": "Algerian dinar",
+   "answer": "Dinar",
    "wrong": [
-    "Jamaican dollar",
-    "West African CFA franc",
-    "Yemeni rial"
+    "CFA franc",
+    "Rand",
+    "Pula"
    ],
    "explain": "Algeria uses the Algerian dinar (DZD).",
-   "difficulty": 2
+   "difficulty": 2,
+   "wrongNotes": {
+    "CFA franc": "The CFA franc is used in Benin, Burkina Faso, Cameroon and 11 others.",
+    "Rand": "The rand is used in Lesotho, Namibia and South Africa.",
+    "Pula": "The pula is used in Botswana."
+   }
   },
   {
    "id": "cur-andorra",
@@ -2798,77 +2818,107 @@
    "prompt": "What is the currency of Andorra?",
    "answer": "Euro",
    "wrong": [
-    "Angolan kwanza",
-    "United States dollar",
-    "Lao kip"
+    "Koruna",
+    "Denar",
+    "Franc"
    ],
    "explain": "Andorra uses the Euro (EUR).",
-   "difficulty": 3
+   "difficulty": 3,
+   "wrongNotes": {
+    "Koruna": "The koruna is used in Czechia.",
+    "Denar": "The denar is used in North Macedonia.",
+    "Franc": "The franc is used in Burundi, Comoros, Democratic Republic of the Congo and 5 others."
+   }
   },
   {
    "id": "cur-angola",
    "kind": "mc",
    "prompt": "What is the currency of Angola?",
-   "answer": "Angolan kwanza",
+   "answer": "Kwanza",
    "wrong": [
-    "Uruguayan peso",
-    "South Sudanese pound",
-    "Malawian kwacha"
+    "Dobra",
+    "Dollar",
+    "Lilangeni"
    ],
    "explain": "Angola uses the Angolan kwanza (AOA).",
-   "difficulty": 2
+   "difficulty": 2,
+   "wrongNotes": {
+    "Dobra": "The dobra is used in São Tomé and Príncipe.",
+    "Dollar": "The dollar is used in Antigua and Barbuda, Australia, Bahamas and 31 others.",
+    "Lilangeni": "The lilangeni is used in Eswatini."
+   }
   },
   {
    "id": "cur-antigua-and-barbuda",
    "kind": "mc",
    "prompt": "What is the currency of Antigua and Barbuda?",
-   "answer": "East Caribbean dollar",
+   "answer": "Dollar",
    "wrong": [
-    "Philippine peso",
-    "Lesotho loti",
-    "Libyan dinar"
+    "Córdoba",
+    "Quetzal",
+    "Colón"
    ],
    "explain": "Antigua and Barbuda uses the East Caribbean dollar (XCD).",
-   "difficulty": 3
+   "difficulty": 3,
+   "wrongNotes": {
+    "Córdoba": "The córdoba is used in Nicaragua.",
+    "Quetzal": "The quetzal is used in Guatemala.",
+    "Colón": "The colón is used in Costa Rica."
+   }
   },
   {
    "id": "cur-argentina",
    "kind": "mc",
    "prompt": "What is the currency of Argentina?",
-   "answer": "Argentine peso",
+   "answer": "Peso",
    "wrong": [
-    "Mozambican metical",
-    "South Korean won",
-    "Guatemalan quetzal"
+    "Real",
+    "Bolívar",
+    "Dollar"
    ],
    "explain": "Argentina uses the Argentine peso (ARS).",
-   "difficulty": 1
+   "difficulty": 1,
+   "wrongNotes": {
+    "Real": "The real is used in Brazil.",
+    "Bolívar": "The bolívar is used in Venezuela.",
+    "Dollar": "The dollar is used in Antigua and Barbuda, Australia, Bahamas and 31 others."
+   }
   },
   {
    "id": "cur-armenia",
    "kind": "mc",
    "prompt": "What is the currency of Armenia?",
-   "answer": "Armenian dram",
+   "answer": "Dram",
    "wrong": [
-    "Bahamian dollar",
-    "Bolivian boliviano",
-    "Azerbaijani manat"
+    "Lari",
+    "Yuan",
+    "Rufiyaa"
    ],
    "explain": "Armenia uses the Armenian dram (AMD).",
-   "difficulty": 2
+   "difficulty": 2,
+   "wrongNotes": {
+    "Lari": "The lari is used in Georgia.",
+    "Yuan": "The yuan is used in China.",
+    "Rufiyaa": "The rufiyaa is used in Maldives."
+   }
   },
   {
    "id": "cur-australia",
    "kind": "mc",
    "prompt": "What is the currency of Australia?",
-   "answer": "Australian dollar",
+   "answer": "Dollar",
    "wrong": [
-    "Eritrean nakfa",
-    "Serbian dinar",
-    "Papua New Guinean kina"
+    "Kina",
+    "Tālā",
+    "Paʻanga"
    ],
    "explain": "Australia uses the Australian dollar (AUD).",
-   "difficulty": 1
+   "difficulty": 1,
+   "wrongNotes": {
+    "Kina": "The kina is used in Papua New Guinea.",
+    "Tālā": "The tālā is used in Samoa.",
+    "Paʻanga": "The paʻanga is used in Tonga."
+   }
   },
   {
    "id": "cur-austria",
@@ -2876,90 +2926,125 @@
    "prompt": "What is the currency of Austria?",
    "answer": "Euro",
    "wrong": [
-    "Libyan dinar",
-    "Tanzanian shilling",
-    "Yemeni rial"
+    "Leu",
+    "Forint",
+    "Ruble"
    ],
    "explain": "Austria uses the Euro (EUR).",
-   "difficulty": 1
+   "difficulty": 1,
+   "wrongNotes": {
+    "Leu": "The leu is used in Moldova and Romania.",
+    "Forint": "The forint is used in Hungary.",
+    "Ruble": "The ruble is used in Belarus and Russia."
+   }
   },
   {
    "id": "cur-azerbaijan",
    "kind": "mc",
    "prompt": "What is the currency of Azerbaijan?",
-   "answer": "Azerbaijani manat",
+   "answer": "Manat",
    "wrong": [
-    "Bolivian boliviano",
-    "Bahamian dollar",
-    "Moroccan dirham"
+    "Yuan",
+    "Rupiah",
+    "Kip"
    ],
    "explain": "Azerbaijan uses the Azerbaijani manat (AZN).",
-   "difficulty": 2
+   "difficulty": 2,
+   "wrongNotes": {
+    "Yuan": "The yuan is used in China.",
+    "Rupiah": "The rupiah is used in Indonesia.",
+    "Kip": "The kip is used in Laos."
+   }
   },
   {
    "id": "cur-bahamas",
    "kind": "mc",
    "prompt": "What is the currency of the Bahamas?",
-   "answer": "Bahamian dollar",
+   "answer": "Dollar",
    "wrong": [
-    "Jamaican dollar",
-    "Solomon Islands dollar",
-    "Japanese yen"
+    "Balboa",
+    "Colón",
+    "Córdoba"
    ],
    "explain": "The Bahamas uses the Bahamian dollar (BSD).",
-   "difficulty": 3
+   "difficulty": 3,
+   "wrongNotes": {
+    "Balboa": "The balboa is used in Panama.",
+    "Colón": "The colón is used in Costa Rica.",
+    "Córdoba": "The córdoba is used in Nicaragua."
+   }
   },
   {
    "id": "cur-bahrain",
    "kind": "mc",
    "prompt": "What is the currency of Bahrain?",
-   "answer": "Bahraini dinar",
+   "answer": "Dinar",
    "wrong": [
-    "Vanuatu vatu",
-    "Djiboutian franc",
-    "Jamaican dollar"
+    "Kip",
+    "Lira",
+    "Ringgit"
    ],
    "explain": "Bahrain uses the Bahraini dinar (BHD).",
-   "difficulty": 3
+   "difficulty": 3,
+   "wrongNotes": {
+    "Kip": "The kip is used in Laos.",
+    "Lira": "The lira is used in Turkey.",
+    "Ringgit": "The ringgit is used in Malaysia."
+   }
   },
   {
    "id": "cur-bangladesh",
    "kind": "mc",
    "prompt": "What is the currency of Bangladesh?",
-   "answer": "Bangladeshi taka",
+   "answer": "Taka",
    "wrong": [
-    "Myanmar kyat",
-    "Rwandan franc",
-    "Ukrainian hryvnia"
+    "Som",
+    "Tögrög",
+    "Yen"
    ],
    "explain": "Bangladesh uses the Bangladeshi taka (BDT).",
-   "difficulty": 2
+   "difficulty": 2,
+   "wrongNotes": {
+    "Som": "The som is used in Kyrgyzstan.",
+    "Tögrög": "The tögrög is used in Mongolia.",
+    "Yen": "The yen is used in Japan."
+   }
   },
   {
    "id": "cur-barbados",
    "kind": "mc",
    "prompt": "What is the currency of Barbados?",
-   "answer": "Barbadian dollar",
+   "answer": "Dollar",
    "wrong": [
-    "Comorian franc",
-    "Somali shilling",
-    "Angolan kwanza"
+    "Quetzal",
+    "Balboa",
+    "Gourde"
    ],
    "explain": "Barbados uses the Barbadian dollar (BBD).",
-   "difficulty": 3
+   "difficulty": 3,
+   "wrongNotes": {
+    "Quetzal": "The quetzal is used in Guatemala.",
+    "Balboa": "The balboa is used in Panama.",
+    "Gourde": "The gourde is used in Haiti."
+   }
   },
   {
    "id": "cur-belarus",
    "kind": "mc",
    "prompt": "What is the currency of Belarus?",
-   "answer": "Belarusian ruble",
+   "answer": "Ruble",
    "wrong": [
-    "Turkmenistan manat",
-    "Sri Lankan rupee",
-    "Pakistani rupee"
+    "Leu",
+    "Pound",
+    "Euro"
    ],
    "explain": "Belarus uses the Belarusian ruble (BYN).",
-   "difficulty": 2
+   "difficulty": 2,
+   "wrongNotes": {
+    "Leu": "The leu is used in Moldova and Romania.",
+    "Pound": "The pound is used in Egypt, Lebanon, South Sudan and 3 others.",
+    "Euro": "The euro is used in Andorra, Austria, Belgium and 23 others."
+   }
   },
   {
    "id": "cur-belgium",
@@ -2967,116 +3052,161 @@
    "prompt": "What is the currency of Belgium?",
    "answer": "Euro",
    "wrong": [
-    "South Sudanese pound",
-    "Congolese franc",
-    "Mongolian tögrög"
+    "Koruna",
+    "Dinar",
+    "Forint"
    ],
    "explain": "Belgium uses the Euro (EUR).",
-   "difficulty": 1
+   "difficulty": 1,
+   "wrongNotes": {
+    "Koruna": "The koruna is used in Czechia.",
+    "Dinar": "The dinar is used in Algeria, Bahrain, Iraq and 5 others.",
+    "Forint": "The forint is used in Hungary."
+   }
   },
   {
    "id": "cur-belize",
    "kind": "mc",
    "prompt": "What is the currency of Belize?",
-   "answer": "Belize dollar",
+   "answer": "Dollar",
    "wrong": [
-    "Swiss franc",
-    "Peruvian sol",
-    "São Tomé and Príncipe dobra"
+    "Colón",
+    "Gourde",
+    "Balboa"
    ],
    "explain": "Belize uses the Belize dollar (BZD).",
-   "difficulty": 3
+   "difficulty": 3,
+   "wrongNotes": {
+    "Colón": "The colón is used in Costa Rica.",
+    "Gourde": "The gourde is used in Haiti.",
+    "Balboa": "The balboa is used in Panama."
+   }
   },
   {
    "id": "cur-benin",
    "kind": "mc",
    "prompt": "What is the currency of Benin?",
-   "answer": "West African CFA franc",
+   "answer": "CFA franc",
    "wrong": [
-    "Dominican peso",
-    "Argentine peso",
-    "Japanese yen"
+    "Leone",
+    "Dollar",
+    "Kwanza"
    ],
    "explain": "Benin uses the West African CFA franc (XOF).",
-   "difficulty": 2
+   "difficulty": 2,
+   "wrongNotes": {
+    "Leone": "The leone is used in Sierra Leone.",
+    "Dollar": "The dollar is used in Antigua and Barbuda, Australia, Bahamas and 31 others.",
+    "Kwanza": "The kwanza is used in Angola."
+   }
   },
   {
    "id": "cur-bhutan",
    "kind": "mc",
    "prompt": "What is the currency of Bhutan?",
-   "answer": "Bhutanese ngultrum",
+   "answer": "Ngultrum",
    "wrong": [
-    "Ethiopian birr",
-    "Myanmar kyat",
-    "Central African CFA franc"
+    "Som",
+    "Taka",
+    "Sum"
    ],
    "explain": "Bhutan uses the Bhutanese ngultrum (BTN).",
-   "difficulty": 3
+   "difficulty": 3,
+   "wrongNotes": {
+    "Som": "The som is used in Kyrgyzstan.",
+    "Taka": "The taka is used in Bangladesh.",
+    "Sum": "The sum is used in Uzbekistan."
+   }
   },
   {
    "id": "cur-bolivia",
    "kind": "mc",
    "prompt": "What is the currency of Bolivia?",
-   "answer": "Bolivian boliviano",
+   "answer": "Boliviano",
    "wrong": [
-    "Afghan afghani",
-    "Israeli new shekel",
-    "Swedish krona"
+    "Sol",
+    "Real",
+    "Peso"
    ],
    "explain": "Bolivia uses the Bolivian boliviano (BOB).",
-   "difficulty": 2
+   "difficulty": 1,
+   "wrongNotes": {
+    "Sol": "The sol is used in Peru.",
+    "Real": "The real is used in Brazil.",
+    "Peso": "The peso is used in Argentina, Chile, Colombia and 5 others."
+   }
   },
   {
    "id": "cur-bosnia-and-herzegovina",
    "kind": "mc",
    "prompt": "What is the currency of Bosnia and Herzegovina?",
-   "answer": "Bosnia and Herzegovina convertible mark",
+   "answer": "Bosnia",
    "wrong": [
-    "Afghan afghani",
-    "Tongan paʻanga",
-    "Serbian dinar"
+    "Krone",
+    "Forint",
+    "Koruna"
    ],
    "explain": "Bosnia and Herzegovina uses the Bosnia and Herzegovina convertible mark (BAM).",
-   "difficulty": 2
+   "difficulty": 1,
+   "wrongNotes": {
+    "Krone": "The krone is used in Denmark and Norway.",
+    "Forint": "The forint is used in Hungary.",
+    "Koruna": "The koruna is used in Czechia."
+   }
   },
   {
    "id": "cur-botswana",
    "kind": "mc",
    "prompt": "What is the currency of Botswana?",
-   "answer": "Botswana pula",
+   "answer": "Pula",
    "wrong": [
-    "Brazilian real",
-    "Ethiopian birr",
-    "Qatari riyal"
+    "Cedi",
+    "Metical",
+    "CFA franc"
    ],
    "explain": "Botswana uses the Botswana pula (BWP).",
-   "difficulty": 3
+   "difficulty": 3,
+   "wrongNotes": {
+    "Cedi": "The cedi is used in Ghana.",
+    "Metical": "The metical is used in Mozambique.",
+    "CFA franc": "The CFA franc is used in Benin, Burkina Faso, Cameroon and 11 others."
+   }
   },
   {
    "id": "cur-brazil",
    "kind": "mc",
    "prompt": "What is the currency of Brazil?",
-   "answer": "Brazilian real",
+   "answer": "Real",
    "wrong": [
-    "Israeli new shekel",
-    "Belize dollar",
-    "Indian rupee"
+    "Peso",
+    "Bolívar",
+    "Boliviano"
    ],
    "explain": "Brazil uses the Brazilian real (BRL).",
-   "difficulty": 1
+   "difficulty": 1,
+   "wrongNotes": {
+    "Peso": "The peso is used in Argentina, Chile, Colombia and 5 others.",
+    "Bolívar": "The bolívar is used in Venezuela.",
+    "Boliviano": "The boliviano is used in Bolivia."
+   }
   },
   {
    "id": "cur-brunei",
    "kind": "mc",
    "prompt": "What is the currency of Brunei?",
-   "answer": "Brunei dollar",
+   "answer": "Dollar",
    "wrong": [
-    "Bahraini dinar",
-    "Cambodian riel",
-    "Tongan paʻanga"
+    "Somoni",
+    "Riel",
+    "Won"
    ],
    "explain": "Brunei uses the Brunei dollar (BND).",
-   "difficulty": 3
+   "difficulty": 3,
+   "wrongNotes": {
+    "Somoni": "The somoni is used in Tajikistan.",
+    "Riel": "The riel is used in Cambodia.",
+    "Won": "The won is used in North Korea and South Korea."
+   }
   },
   {
    "id": "cur-bulgaria",
@@ -3084,142 +3214,197 @@
    "prompt": "What is the currency of Bulgaria?",
    "answer": "Euro",
    "wrong": [
-    "Rwandan franc",
-    "Comorian franc",
-    "Central African CFA franc"
+    "Krone",
+    "Forint",
+    "Króna"
    ],
    "explain": "Bulgaria uses the Euro (EUR).",
-   "difficulty": 2
+   "difficulty": 2,
+   "wrongNotes": {
+    "Krone": "The krone is used in Denmark and Norway.",
+    "Forint": "The forint is used in Hungary.",
+    "Króna": "The króna is used in Iceland and Sweden."
+   }
   },
   {
    "id": "cur-burkina-faso",
    "kind": "mc",
    "prompt": "What is the currency of Burkina Faso?",
-   "answer": "West African CFA franc",
+   "answer": "CFA franc",
    "wrong": [
-    "Saudi riyal",
-    "Romanian leu",
-    "Zambian kwacha"
+    "Leone",
+    "Ariary",
+    "Dirham"
    ],
    "explain": "Burkina Faso uses the West African CFA franc (XOF).",
-   "difficulty": 2
+   "difficulty": 2,
+   "wrongNotes": {
+    "Leone": "The leone is used in Sierra Leone.",
+    "Ariary": "The ariary is used in Madagascar.",
+    "Dirham": "The dirham is used in Morocco and United Arab Emirates."
+   }
   },
   {
    "id": "cur-burundi",
    "kind": "mc",
    "prompt": "What is the currency of Burundi?",
-   "answer": "Burundian franc",
+   "answer": "Franc",
    "wrong": [
-    "Panamanian balboa",
-    "Singapore dollar",
-    "Ukrainian hryvnia"
+    "Kwacha",
+    "Loti",
+    "Dollar"
    ],
    "explain": "Burundi uses the Burundian franc (BIF).",
-   "difficulty": 2
+   "difficulty": 2,
+   "wrongNotes": {
+    "Kwacha": "The kwacha is used in Malawi and Zambia.",
+    "Loti": "The loti is used in Lesotho.",
+    "Dollar": "The dollar is used in Antigua and Barbuda, Australia, Bahamas and 31 others."
+   }
   },
   {
    "id": "cur-cambodia",
    "kind": "mc",
    "prompt": "What is the currency of Cambodia?",
-   "answer": "Cambodian riel",
+   "answer": "Riel",
    "wrong": [
-    "Omani rial",
-    "Brazilian real",
-    "South African rand"
+    "Dirham",
+    "Som",
+    "Baht"
    ],
    "explain": "Cambodia uses the Cambodian riel (KHR).",
-   "difficulty": 2
+   "difficulty": 2,
+   "wrongNotes": {
+    "Dirham": "The dirham is used in Morocco and United Arab Emirates.",
+    "Som": "The som is used in Kyrgyzstan.",
+    "Baht": "The baht is used in Thailand."
+   }
   },
   {
    "id": "cur-cameroon",
    "kind": "mc",
    "prompt": "What is the currency of Cameroon?",
-   "answer": "Central African CFA franc",
+   "answer": "CFA franc",
    "wrong": [
-    "United States dollar",
-    "Venezuelan bolívar",
-    "Haitian gourde"
+    "Escudo",
+    "Pula",
+    "Leone"
    ],
    "explain": "Cameroon uses the Central African CFA franc (XAF).",
-   "difficulty": 2
+   "difficulty": 2,
+   "wrongNotes": {
+    "Escudo": "The escudo is used in Cape Verde.",
+    "Pula": "The pula is used in Botswana.",
+    "Leone": "The leone is used in Sierra Leone."
+   }
   },
   {
    "id": "cur-canada",
    "kind": "mc",
    "prompt": "What is the currency of Canada?",
-   "answer": "Canadian dollar",
+   "answer": "Dollar",
    "wrong": [
-    "Maldivian rufiyaa",
-    "Danish krone",
-    "Turkish lira"
+    "Córdoba",
+    "Balboa",
+    "Colón"
    ],
    "explain": "Canada uses the Canadian dollar (CAD).",
-   "difficulty": 1
+   "difficulty": 1,
+   "wrongNotes": {
+    "Córdoba": "The córdoba is used in Nicaragua.",
+    "Balboa": "The balboa is used in Panama.",
+    "Colón": "The colón is used in Costa Rica."
+   }
   },
   {
    "id": "cur-cape-verde",
    "kind": "mc",
    "prompt": "What is the currency of Cape Verde?",
-   "answer": "Cape Verdean escudo",
+   "answer": "Escudo",
    "wrong": [
-    "Mauritanian ouguiya",
-    "Venezuelan bolívar",
-    "Pakistani rupee"
+    "Cedi",
+    "Dalasi",
+    "Ouguiya"
    ],
    "explain": "Cape Verde uses the Cape Verdean escudo (CVE).",
-   "difficulty": 3
+   "difficulty": 3,
+   "wrongNotes": {
+    "Cedi": "The cedi is used in Ghana.",
+    "Dalasi": "The dalasi is used in Gambia.",
+    "Ouguiya": "The ouguiya is used in Mauritania."
+   }
   },
   {
    "id": "cur-central-african-republic",
    "kind": "mc",
    "prompt": "What is the currency of the Central African Republic?",
-   "answer": "Central African CFA franc",
+   "answer": "CFA franc",
    "wrong": [
-    "Bosnia and Herzegovina convertible mark",
-    "Colombian peso",
-    "Malawian kwacha"
+    "Cedi",
+    "Shilling",
+    "Birr"
    ],
    "explain": "The Central African Republic uses the Central African CFA franc (XAF).",
-   "difficulty": 2
+   "difficulty": 2,
+   "wrongNotes": {
+    "Cedi": "The cedi is used in Ghana.",
+    "Shilling": "The shilling is used in Kenya, Somalia, Tanzania and Uganda.",
+    "Birr": "The birr is used in Ethiopia."
+   }
   },
   {
    "id": "cur-chad",
    "kind": "mc",
    "prompt": "What is the currency of Chad?",
-   "answer": "Central African CFA franc",
+   "answer": "CFA franc",
    "wrong": [
-    "Icelandic króna",
-    "Brunei dollar",
-    "South Sudanese pound"
+    "Nakfa",
+    "Kwanza",
+    "Dollar"
    ],
    "explain": "Chad uses the Central African CFA franc (XAF).",
-   "difficulty": 2
+   "difficulty": 2,
+   "wrongNotes": {
+    "Nakfa": "The nakfa is used in Eritrea.",
+    "Kwanza": "The kwanza is used in Angola.",
+    "Dollar": "The dollar is used in Antigua and Barbuda, Australia, Bahamas and 31 others."
+   }
   },
   {
    "id": "cur-chile",
    "kind": "mc",
    "prompt": "What is the currency of Chile?",
-   "answer": "Chilean peso",
+   "answer": "Peso",
    "wrong": [
-    "Syrian pound",
-    "Swiss franc",
-    "Gambian dalasi"
+    "Dollar",
+    "Bolívar",
+    "Sol"
    ],
    "explain": "Chile uses the Chilean peso (CLP).",
-   "difficulty": 1
+   "difficulty": 1,
+   "wrongNotes": {
+    "Dollar": "The dollar is used in Antigua and Barbuda, Australia, Bahamas and 31 others.",
+    "Bolívar": "The bolívar is used in Venezuela.",
+    "Sol": "The sol is used in Peru."
+   }
   },
   {
    "id": "cur-china",
    "kind": "mc",
    "prompt": "What is the currency of China?",
-   "answer": "Renminbi (yuan)",
+   "answer": "Yuan",
    "wrong": [
-    "Barbadian dollar",
-    "Zimbabwe Gold (ZiG)",
-    "Angolan kwanza"
+    "Riel",
+    "Won",
+    "Yen"
    ],
    "explain": "China uses the Renminbi (yuan) (CNY).",
-   "difficulty": 1
+   "difficulty": 1,
+   "wrongNotes": {
+    "Riel": "The riel is used in Cambodia.",
+    "Won": "The won is used in North Korea and South Korea.",
+    "Yen": "The yen is used in Japan."
+   }
   },
   {
    "id": "curr-china",
@@ -3232,85 +3417,120 @@
     "United Arab Emirates"
    ],
    "explain": "The Renminbi (yuan) is the currency of China.",
-   "difficulty": 2
+   "difficulty": 2,
+   "wrongNotes": {
+    "Saudi Arabia": "Saudi Arabia uses the Saudi riyal.",
+    "Malaysia": "Malaysia uses the Malaysian ringgit.",
+    "United Arab Emirates": "United Arab Emirates uses the UAE dirham."
+   }
   },
   {
    "id": "cur-colombia",
    "kind": "mc",
    "prompt": "What is the currency of Colombia?",
-   "answer": "Colombian peso",
+   "answer": "Peso",
    "wrong": [
-    "Georgian lari",
-    "Angolan kwanza",
-    "Peruvian sol"
+    "Sol",
+    "Real",
+    "Boliviano"
    ],
    "explain": "Colombia uses the Colombian peso (COP).",
-   "difficulty": 2
+   "difficulty": 2,
+   "wrongNotes": {
+    "Sol": "The sol is used in Peru.",
+    "Real": "The real is used in Brazil.",
+    "Boliviano": "The boliviano is used in Bolivia."
+   }
   },
   {
    "id": "cur-comoros",
    "kind": "mc",
    "prompt": "What is the currency of the Comoros?",
-   "answer": "Comorian franc",
+   "answer": "Franc",
    "wrong": [
-    "Jordanian dinar",
-    "Swiss franc",
-    "Bangladeshi taka"
+    "CFA franc",
+    "Pula",
+    "Loti"
    ],
    "explain": "The Comoros uses the Comorian franc (KMF).",
-   "difficulty": 3
+   "difficulty": 3,
+   "wrongNotes": {
+    "CFA franc": "The CFA franc is used in Benin, Burkina Faso, Cameroon and 11 others.",
+    "Pula": "The pula is used in Botswana.",
+    "Loti": "The loti is used in Lesotho."
+   }
   },
   {
    "id": "cur-democratic-republic-of-the-congo",
    "kind": "mc",
    "prompt": "What is the currency of the Democratic Republic of the Congo?",
-   "answer": "Congolese franc",
+   "answer": "Franc",
    "wrong": [
-    "Iranian rial",
-    "Bhutanese ngultrum",
-    "Turkish lira"
+    "Dinar",
+    "Loti",
+    "ZiG"
    ],
    "explain": "The Democratic Republic of the Congo uses the Congolese franc (CDF).",
-   "difficulty": 2
+   "difficulty": 2,
+   "wrongNotes": {
+    "Dinar": "The dinar is used in Algeria, Bahrain, Iraq and 5 others.",
+    "Loti": "The loti is used in Lesotho.",
+    "ZiG": "The ZiG is used in Zimbabwe."
+   }
   },
   {
    "id": "cur-republic-of-the-congo",
    "kind": "mc",
    "prompt": "What is the currency of the Republic of the Congo?",
-   "answer": "Central African CFA franc",
+   "answer": "CFA franc",
    "wrong": [
-    "Ethiopian birr",
-    "Zambian kwacha",
-    "Costa Rican colón"
+    "Escudo",
+    "ZiG",
+    "Nakfa"
    ],
    "explain": "The Republic of the Congo uses the Central African CFA franc (XAF).",
-   "difficulty": 2
+   "difficulty": 2,
+   "wrongNotes": {
+    "Escudo": "The escudo is used in Cape Verde.",
+    "ZiG": "The ZiG is used in Zimbabwe.",
+    "Nakfa": "The nakfa is used in Eritrea."
+   }
   },
   {
    "id": "cur-costa-rica",
    "kind": "mc",
    "prompt": "What is the currency of Costa Rica?",
-   "answer": "Costa Rican colón",
+   "answer": "Colón",
    "wrong": [
-    "Dominican peso",
-    "Honduran lempira",
-    "New Zealand dollar"
+    "Gourde",
+    "Balboa",
+    "Dollar"
    ],
    "explain": "Costa Rica uses the Costa Rican colón (CRC).",
-   "difficulty": 2
+   "difficulty": 2,
+   "wrongNotes": {
+    "Gourde": "The gourde is used in Haiti.",
+    "Balboa": "The balboa is used in Panama.",
+    "Dollar": "The dollar is used in Antigua and Barbuda, Australia, Bahamas and 31 others."
+   }
   },
   {
    "id": "cur-ivory-coast",
    "kind": "mc",
    "prompt": "What is the currency of Ivory Coast?",
-   "answer": "West African CFA franc",
+   "answer": "CFA franc",
    "wrong": [
-    "Iranian rial",
-    "United States dollar",
-    "Cape Verdean escudo"
+    "Kwanza",
+    "Rupee",
+    "Kwacha"
    ],
    "explain": "Ivory Coast uses the West African CFA franc (XOF).",
-   "difficulty": 2
+   "difficulty": 2,
+   "wrongNotes": {
+    "Kwanza": "The kwanza is used in Angola.",
+    "Rupee": "The rupee is used in India, Mauritius, Nepal and 3 others.",
+    "Kwacha": "The kwacha is used in Malawi and Zambia."
+   }
   },
   {
    "id": "cur-croatia",
@@ -3318,25 +3538,35 @@
    "prompt": "What is the currency of Croatia?",
    "answer": "Euro",
    "wrong": [
-    "Djiboutian franc",
-    "Lesotho loti",
-    "Polish złoty"
+    "Ruble",
+    "Pound",
+    "Koruna"
    ],
    "explain": "Croatia uses the Euro (EUR).",
-   "difficulty": 2
+   "difficulty": 2,
+   "wrongNotes": {
+    "Ruble": "The ruble is used in Belarus and Russia.",
+    "Pound": "The pound is used in Egypt, Lebanon, South Sudan and 3 others.",
+    "Koruna": "The koruna is used in Czechia."
+   }
   },
   {
    "id": "cur-cuba",
    "kind": "mc",
    "prompt": "What is the currency of Cuba?",
-   "answer": "Cuban peso",
+   "answer": "Peso",
    "wrong": [
-    "Guyanese dollar",
-    "Bolivian boliviano",
-    "Israeli new shekel"
+    "Córdoba",
+    "Colón",
+    "Dollar"
    ],
    "explain": "Cuba uses the Cuban peso (CUP).",
-   "difficulty": 1
+   "difficulty": 1,
+   "wrongNotes": {
+    "Córdoba": "The córdoba is used in Nicaragua.",
+    "Colón": "The colón is used in Costa Rica.",
+    "Dollar": "The dollar is used in Antigua and Barbuda, Australia, Bahamas and 31 others."
+   }
   },
   {
    "id": "cur-cyprus",
@@ -3344,38 +3574,53 @@
    "prompt": "What is the currency of Cyprus?",
    "answer": "Euro",
    "wrong": [
-    "Norwegian krone",
-    "Mauritanian ouguiya",
-    "Lao kip"
+    "Yen",
+    "Rufiyaa",
+    "Dram"
    ],
    "explain": "Cyprus uses the Euro (EUR).",
-   "difficulty": 3
+   "difficulty": 3,
+   "wrongNotes": {
+    "Yen": "The yen is used in Japan.",
+    "Rufiyaa": "The rufiyaa is used in Maldives.",
+    "Dram": "The dram is used in Armenia."
+   }
   },
   {
    "id": "cur-czechia",
    "kind": "mc",
    "prompt": "What is the currency of Czechia?",
-   "answer": "Czech koruna",
+   "answer": "Koruna",
    "wrong": [
-    "Indian rupee",
-    "Nigerian naira",
-    "Paraguayan guaraní"
+    "Franc",
+    "Króna",
+    "Złoty"
    ],
    "explain": "Czechia uses the Czech koruna (CZK).",
-   "difficulty": 2
+   "difficulty": 2,
+   "wrongNotes": {
+    "Franc": "The franc is used in Burundi, Comoros, Democratic Republic of the Congo and 5 others.",
+    "Króna": "The króna is used in Iceland and Sweden.",
+    "Złoty": "The złoty is used in Poland."
+   }
   },
   {
    "id": "cur-denmark",
    "kind": "mc",
    "prompt": "What is the currency of Denmark?",
-   "answer": "Danish krone",
+   "answer": "Krone",
    "wrong": [
-    "Singapore dollar",
-    "Fijian dollar",
-    "Venezuelan bolívar"
+    "Forint",
+    "Convertible mark",
+    "Króna"
    ],
    "explain": "Denmark uses the Danish krone (DKK).",
-   "difficulty": 1
+   "difficulty": 1,
+   "wrongNotes": {
+    "Forint": "The forint is used in Hungary.",
+    "Convertible mark": "The convertible mark is used in Bosnia and Herzegovina.",
+    "Króna": "The króna is used in Iceland and Sweden."
+   }
   },
   {
    "id": "curr-denmark",
@@ -3388,111 +3633,156 @@
     "Monaco"
    ],
    "explain": "The Danish krone is the currency of Denmark.",
-   "difficulty": 2
+   "difficulty": 1,
+   "wrongNotes": {
+    "Germany": "Germany uses the Euro.",
+    "Latvia": "Latvia uses the Euro.",
+    "Monaco": "Monaco uses the Euro."
+   }
   },
   {
    "id": "cur-djibouti",
    "kind": "mc",
    "prompt": "What is the currency of Djibouti?",
-   "answer": "Djiboutian franc",
+   "answer": "Franc",
    "wrong": [
-    "Azerbaijani manat",
-    "Russian ruble",
-    "Turkish lira"
+    "Leone",
+    "Rupee",
+    "Shilling"
    ],
    "explain": "Djibouti uses the Djiboutian franc (DJF).",
-   "difficulty": 3
+   "difficulty": 3,
+   "wrongNotes": {
+    "Leone": "The leone is used in Sierra Leone.",
+    "Rupee": "The rupee is used in India, Mauritius, Nepal and 3 others.",
+    "Shilling": "The shilling is used in Kenya, Somalia, Tanzania and Uganda."
+   }
   },
   {
    "id": "cur-dominica",
    "kind": "mc",
    "prompt": "What is the currency of Dominica?",
-   "answer": "East Caribbean dollar",
+   "answer": "Dollar",
    "wrong": [
-    "Tajikistani somoni",
-    "Lao kip",
-    "Czech koruna"
+    "Córdoba",
+    "Lempira",
+    "Gourde"
    ],
    "explain": "Dominica uses the East Caribbean dollar (XCD).",
-   "difficulty": 3
+   "difficulty": 3,
+   "wrongNotes": {
+    "Córdoba": "The córdoba is used in Nicaragua.",
+    "Lempira": "The lempira is used in Honduras.",
+    "Gourde": "The gourde is used in Haiti."
+   }
   },
   {
    "id": "cur-dominican-republic",
    "kind": "mc",
    "prompt": "What is the currency of the Dominican Republic?",
-   "answer": "Dominican peso",
+   "answer": "Peso",
    "wrong": [
-    "Congolese franc",
-    "Samoan tālā",
-    "Somali shilling"
+    "Lempira",
+    "Gourde",
+    "Colón"
    ],
    "explain": "The Dominican Republic uses the Dominican peso (DOP).",
-   "difficulty": 2
+   "difficulty": 2,
+   "wrongNotes": {
+    "Lempira": "The lempira is used in Honduras.",
+    "Gourde": "The gourde is used in Haiti.",
+    "Colón": "The colón is used in Costa Rica."
+   }
   },
   {
    "id": "cur-ecuador",
    "kind": "mc",
    "prompt": "What is the currency of Ecuador?",
-   "answer": "United States dollar",
+   "answer": "Dollar",
    "wrong": [
-    "Paraguayan guaraní",
-    "Solomon Islands dollar",
-    "Mongolian tögrög"
+    "Bolívar",
+    "Real",
+    "Boliviano"
    ],
    "explain": "Ecuador uses the United States dollar (USD).",
-   "difficulty": 2
+   "difficulty": 2,
+   "wrongNotes": {
+    "Bolívar": "The bolívar is used in Venezuela.",
+    "Real": "The real is used in Brazil.",
+    "Boliviano": "The boliviano is used in Bolivia."
+   }
   },
   {
    "id": "cur-egypt",
    "kind": "mc",
    "prompt": "What is the currency of Egypt?",
-   "answer": "Egyptian pound",
+   "answer": "Pound",
    "wrong": [
-    "Indian rupee",
-    "Georgian lari",
-    "Czech koruna"
+    "Naira",
+    "Dollar",
+    "Kwacha"
    ],
    "explain": "Egypt uses the Egyptian pound (EGP).",
-   "difficulty": 1
+   "difficulty": 1,
+   "wrongNotes": {
+    "Naira": "The naira is used in Nigeria.",
+    "Dollar": "The dollar is used in Antigua and Barbuda, Australia, Bahamas and 31 others.",
+    "Kwacha": "The kwacha is used in Malawi and Zambia."
+   }
   },
   {
    "id": "cur-el-salvador",
    "kind": "mc",
    "prompt": "What is the currency of El Salvador?",
-   "answer": "United States dollar",
+   "answer": "Dollar",
    "wrong": [
-    "South Sudanese pound",
-    "Tongan paʻanga",
-    "Seychellois rupee"
+    "Balboa",
+    "Gourde",
+    "Colón"
    ],
    "explain": "El Salvador uses the United States dollar (USD).",
-   "difficulty": 2
+   "difficulty": 2,
+   "wrongNotes": {
+    "Balboa": "The balboa is used in Panama.",
+    "Gourde": "The gourde is used in Haiti.",
+    "Colón": "The colón is used in Costa Rica."
+   }
   },
   {
    "id": "cur-equatorial-guinea",
    "kind": "mc",
    "prompt": "What is the currency of Equatorial Guinea?",
-   "answer": "Central African CFA franc",
+   "answer": "CFA franc",
    "wrong": [
-    "Trinidad and Tobago dollar",
-    "Guyanese dollar",
-    "Ghanaian cedi"
+    "Loti",
+    "Rand",
+    "Dirham"
    ],
    "explain": "Equatorial Guinea uses the Central African CFA franc (XAF).",
-   "difficulty": 3
+   "difficulty": 3,
+   "wrongNotes": {
+    "Loti": "The loti is used in Lesotho.",
+    "Rand": "The rand is used in Lesotho, Namibia and South Africa.",
+    "Dirham": "The dirham is used in Morocco and United Arab Emirates."
+   }
   },
   {
    "id": "cur-eritrea",
    "kind": "mc",
    "prompt": "What is the currency of Eritrea?",
-   "answer": "Eritrean nakfa",
+   "answer": "Nakfa",
    "wrong": [
-    "South Korean won",
-    "West African CFA franc",
-    "Bosnia and Herzegovina convertible mark"
+    "Birr",
+    "Leone",
+    "Lilangeni"
    ],
    "explain": "Eritrea uses the Eritrean nakfa (ERN).",
-   "difficulty": 2
+   "difficulty": 2,
+   "wrongNotes": {
+    "Birr": "The birr is used in Ethiopia.",
+    "Leone": "The leone is used in Sierra Leone.",
+    "Lilangeni": "The lilangeni is used in Eswatini."
+   }
   },
   {
    "id": "cur-estonia",
@@ -3500,30 +3790,40 @@
    "prompt": "What is the currency of Estonia?",
    "answer": "Euro",
    "wrong": [
-    "Malagasy ariary",
-    "Dominican peso",
-    "Guatemalan quetzal"
+    "Złoty",
+    "Dinar",
+    "Leu"
    ],
    "explain": "Estonia uses the Euro (EUR).",
-   "difficulty": 3
+   "difficulty": 3,
+   "wrongNotes": {
+    "Złoty": "The złoty is used in Poland.",
+    "Dinar": "The dinar is used in Algeria, Bahrain, Iraq and 5 others.",
+    "Leu": "The leu is used in Moldova and Romania."
+   }
   },
   {
    "id": "cur-eswatini",
    "kind": "mc",
    "prompt": "What is the currency of Eswatini?",
-   "answer": "Swazi lilangeni",
+   "answer": "Lilangeni",
    "wrong": [
-    "Iraqi dinar",
-    "Mauritanian ouguiya",
-    "South African rand"
+    "Cedi",
+    "Pound",
+    "Dobra"
    ],
    "explain": "Eswatini uses the Swazi lilangeni (SZL).",
-   "difficulty": 3
+   "difficulty": 3,
+   "wrongNotes": {
+    "Cedi": "The cedi is used in Ghana.",
+    "Pound": "The pound is used in Egypt, Lebanon, South Sudan and 3 others.",
+    "Dobra": "The dobra is used in São Tomé and Príncipe."
+   }
   },
   {
    "id": "curr-eswatini",
    "kind": "mc",
-   "prompt": "Which country uses the Swazi lilangeni?",
+   "prompt": "Which country uses the lilangeni?",
    "answer": "Eswatini",
    "wrong": [
     "Rwanda",
@@ -3531,33 +3831,48 @@
     "Malawi"
    ],
    "explain": "The Swazi lilangeni is the currency of Eswatini.",
-   "difficulty": 3
+   "difficulty": 3,
+   "wrongNotes": {
+    "Rwanda": "Rwanda uses the Rwandan franc.",
+    "Angola": "Angola uses the Angolan kwanza.",
+    "Malawi": "Malawi uses the Malawian kwacha."
+   }
   },
   {
    "id": "cur-ethiopia",
    "kind": "mc",
    "prompt": "What is the currency of Ethiopia?",
-   "answer": "Ethiopian birr",
+   "answer": "Birr",
    "wrong": [
-    "Albanian lek",
-    "Bahamian dollar",
-    "Indonesian rupiah"
+    "Dobra",
+    "Ariary",
+    "Metical"
    ],
    "explain": "Ethiopia uses the Ethiopian birr (ETB).",
-   "difficulty": 2
+   "difficulty": 2,
+   "wrongNotes": {
+    "Dobra": "The dobra is used in São Tomé and Príncipe.",
+    "Ariary": "The ariary is used in Madagascar.",
+    "Metical": "The metical is used in Mozambique."
+   }
   },
   {
    "id": "cur-fiji",
    "kind": "mc",
    "prompt": "What is the currency of Fiji?",
-   "answer": "Fijian dollar",
+   "answer": "Dollar",
    "wrong": [
-    "Tanzanian shilling",
-    "Lesotho loti",
-    "São Tomé and Príncipe dobra"
+    "Kina",
+    "Vatu",
+    "Tālā"
    ],
    "explain": "Fiji uses the Fijian dollar (FJD).",
-   "difficulty": 3
+   "difficulty": 3,
+   "wrongNotes": {
+    "Kina": "The kina is used in Papua New Guinea.",
+    "Vatu": "The vatu is used in Vanuatu.",
+    "Tālā": "The tālā is used in Samoa."
+   }
   },
   {
    "id": "cur-finland",
@@ -3565,12 +3880,17 @@
    "prompt": "What is the currency of Finland?",
    "answer": "Euro",
    "wrong": [
-    "Somali shilling",
-    "Argentine peso",
-    "Mauritanian ouguiya"
+    "Króna",
+    "Hryvnia",
+    "Koruna"
    ],
    "explain": "Finland uses the Euro (EUR).",
-   "difficulty": 1
+   "difficulty": 1,
+   "wrongNotes": {
+    "Króna": "The króna is used in Iceland and Sweden.",
+    "Hryvnia": "The hryvnia is used in Ukraine.",
+    "Koruna": "The koruna is used in Czechia."
+   }
   },
   {
    "id": "cur-france",
@@ -3578,51 +3898,71 @@
    "prompt": "What is the currency of France?",
    "answer": "Euro",
    "wrong": [
-    "Belize dollar",
-    "Australian dollar",
-    "Yemeni rial"
+    "Denar",
+    "Leu",
+    "Króna"
    ],
    "explain": "France uses the Euro (EUR).",
-   "difficulty": 1
+   "difficulty": 1,
+   "wrongNotes": {
+    "Denar": "The denar is used in North Macedonia.",
+    "Leu": "The leu is used in Moldova and Romania.",
+    "Króna": "The króna is used in Iceland and Sweden."
+   }
   },
   {
    "id": "cur-gabon",
    "kind": "mc",
    "prompt": "What is the currency of Gabon?",
-   "answer": "Central African CFA franc",
+   "answer": "CFA franc",
    "wrong": [
-    "Namibian dollar",
-    "Czech koruna",
-    "Zambian kwacha"
+    "Naira",
+    "Rupee",
+    "Ariary"
    ],
    "explain": "Gabon uses the Central African CFA franc (XAF).",
-   "difficulty": 3
+   "difficulty": 3,
+   "wrongNotes": {
+    "Naira": "The naira is used in Nigeria.",
+    "Rupee": "The rupee is used in India, Mauritius, Nepal and 3 others.",
+    "Ariary": "The ariary is used in Madagascar."
+   }
   },
   {
    "id": "cur-gambia",
    "kind": "mc",
    "prompt": "What is the currency of the Gambia?",
-   "answer": "Gambian dalasi",
+   "answer": "Dalasi",
    "wrong": [
-    "Armenian dram",
-    "Philippine peso",
-    "Myanmar kyat"
+    "Naira",
+    "Dirham",
+    "Dobra"
    ],
    "explain": "The Gambia uses the Gambian dalasi (GMD).",
-   "difficulty": 3
+   "difficulty": 3,
+   "wrongNotes": {
+    "Naira": "The naira is used in Nigeria.",
+    "Dirham": "The dirham is used in Morocco and United Arab Emirates.",
+    "Dobra": "The dobra is used in São Tomé and Príncipe."
+   }
   },
   {
    "id": "cur-georgia",
    "kind": "mc",
    "prompt": "What is the currency of Georgia?",
-   "answer": "Georgian lari",
+   "answer": "Lari",
    "wrong": [
-    "Panamanian balboa",
-    "Zimbabwe Gold (ZiG)",
-    "Samoan tālā"
+    "Peso",
+    "Kyat",
+    "Som"
    ],
    "explain": "Georgia uses the Georgian lari (GEL).",
-   "difficulty": 2
+   "difficulty": 2,
+   "wrongNotes": {
+    "Peso": "The peso is used in Argentina, Chile, Colombia and 5 others.",
+    "Kyat": "The kyat is used in Myanmar.",
+    "Som": "The som is used in Kyrgyzstan."
+   }
   },
   {
    "id": "cur-germany",
@@ -3630,25 +3970,35 @@
    "prompt": "What is the currency of Germany?",
    "answer": "Euro",
    "wrong": [
-    "Mexican peso",
-    "Moroccan dirham",
-    "Indonesian rupiah"
+    "Złoty",
+    "Leu",
+    "Pound"
    ],
    "explain": "Germany uses the Euro (EUR).",
-   "difficulty": 1
+   "difficulty": 1,
+   "wrongNotes": {
+    "Złoty": "The złoty is used in Poland.",
+    "Leu": "The leu is used in Moldova and Romania.",
+    "Pound": "The pound is used in Egypt, Lebanon, South Sudan and 3 others."
+   }
   },
   {
    "id": "cur-ghana",
    "kind": "mc",
    "prompt": "What is the currency of Ghana?",
-   "answer": "Ghanaian cedi",
+   "answer": "Cedi",
    "wrong": [
-    "Chilean peso",
-    "Icelandic króna",
-    "Pakistani rupee"
+    "CFA franc",
+    "Dalasi",
+    "Birr"
    ],
    "explain": "Ghana uses the Ghanaian cedi (GHS).",
-   "difficulty": 2
+   "difficulty": 2,
+   "wrongNotes": {
+    "CFA franc": "The CFA franc is used in Benin, Burkina Faso, Cameroon and 11 others.",
+    "Dalasi": "The dalasi is used in Gambia.",
+    "Birr": "The birr is used in Ethiopia."
+   }
   },
   {
    "id": "cur-greece",
@@ -3656,181 +4006,251 @@
    "prompt": "What is the currency of Greece?",
    "answer": "Euro",
    "wrong": [
-    "Trinidad and Tobago dollar",
-    "Congolese franc",
-    "Botswana pula"
+    "Ruble",
+    "Koruna",
+    "Króna"
    ],
    "explain": "Greece uses the Euro (EUR).",
-   "difficulty": 1
+   "difficulty": 1,
+   "wrongNotes": {
+    "Ruble": "The ruble is used in Belarus and Russia.",
+    "Koruna": "The koruna is used in Czechia.",
+    "Króna": "The króna is used in Iceland and Sweden."
+   }
   },
   {
    "id": "cur-grenada",
    "kind": "mc",
    "prompt": "What is the currency of Grenada?",
-   "answer": "East Caribbean dollar",
+   "answer": "Dollar",
    "wrong": [
-    "Tajikistani somoni",
-    "Euro",
-    "Jamaican dollar"
+    "Gourde",
+    "Córdoba",
+    "Lempira"
    ],
    "explain": "Grenada uses the East Caribbean dollar (XCD).",
-   "difficulty": 3
+   "difficulty": 3,
+   "wrongNotes": {
+    "Gourde": "The gourde is used in Haiti.",
+    "Córdoba": "The córdoba is used in Nicaragua.",
+    "Lempira": "The lempira is used in Honduras."
+   }
   },
   {
    "id": "cur-guatemala",
    "kind": "mc",
    "prompt": "What is the currency of Guatemala?",
-   "answer": "Guatemalan quetzal",
+   "answer": "Quetzal",
    "wrong": [
-    "Bangladeshi taka",
-    "Swiss franc",
-    "Ghanaian cedi"
+    "Colón",
+    "Lempira",
+    "Gourde"
    ],
    "explain": "Guatemala uses the Guatemalan quetzal (GTQ).",
-   "difficulty": 2
+   "difficulty": 2,
+   "wrongNotes": {
+    "Colón": "The colón is used in Costa Rica.",
+    "Lempira": "The lempira is used in Honduras.",
+    "Gourde": "The gourde is used in Haiti."
+   }
   },
   {
    "id": "cur-guinea",
    "kind": "mc",
    "prompt": "What is the currency of Guinea?",
-   "answer": "Guinean franc",
+   "answer": "Franc",
    "wrong": [
-    "Armenian dram",
-    "Cambodian riel",
-    "Bahamian dollar"
+    "Dirham",
+    "ZiG",
+    "Loti"
    ],
    "explain": "Guinea uses the Guinean franc (GNF).",
-   "difficulty": 2
+   "difficulty": 2,
+   "wrongNotes": {
+    "Dirham": "The dirham is used in Morocco and United Arab Emirates.",
+    "ZiG": "The ZiG is used in Zimbabwe.",
+    "Loti": "The loti is used in Lesotho."
+   }
   },
   {
    "id": "cur-guinea-bissau",
    "kind": "mc",
    "prompt": "What is the currency of Guinea-Bissau?",
-   "answer": "West African CFA franc",
+   "answer": "CFA franc",
    "wrong": [
-    "Lao kip",
-    "Papua New Guinean kina",
-    "Tongan paʻanga"
+    "Cedi",
+    "Kwanza",
+    "Pound"
    ],
    "explain": "Guinea-Bissau uses the West African CFA franc (XOF).",
-   "difficulty": 3
+   "difficulty": 3,
+   "wrongNotes": {
+    "Cedi": "The cedi is used in Ghana.",
+    "Kwanza": "The kwanza is used in Angola.",
+    "Pound": "The pound is used in Egypt, Lebanon, South Sudan and 3 others."
+   }
   },
   {
    "id": "cur-guyana",
    "kind": "mc",
    "prompt": "What is the currency of Guyana?",
-   "answer": "Guyanese dollar",
+   "answer": "Dollar",
    "wrong": [
-    "Paraguayan guaraní",
-    "Swiss franc",
-    "Dominican peso"
+    "Boliviano",
+    "Bolívar",
+    "Peso"
    ],
    "explain": "Guyana uses the Guyanese dollar (GYD).",
-   "difficulty": 3
+   "difficulty": 3,
+   "wrongNotes": {
+    "Boliviano": "The boliviano is used in Bolivia.",
+    "Bolívar": "The bolívar is used in Venezuela.",
+    "Peso": "The peso is used in Argentina, Chile, Colombia and 5 others."
+   }
   },
   {
    "id": "cur-haiti",
    "kind": "mc",
    "prompt": "What is the currency of Haiti?",
-   "answer": "Haitian gourde",
+   "answer": "Gourde",
    "wrong": [
-    "Russian ruble",
-    "Somali shilling",
-    "Iraqi dinar"
+    "Balboa",
+    "Lempira",
+    "Dollar"
    ],
    "explain": "Haiti uses the Haitian gourde (HTG).",
-   "difficulty": 2
+   "difficulty": 2,
+   "wrongNotes": {
+    "Balboa": "The balboa is used in Panama.",
+    "Lempira": "The lempira is used in Honduras.",
+    "Dollar": "The dollar is used in Antigua and Barbuda, Australia, Bahamas and 31 others."
+   }
   },
   {
    "id": "cur-honduras",
    "kind": "mc",
    "prompt": "What is the currency of Honduras?",
-   "answer": "Honduran lempira",
+   "answer": "Lempira",
    "wrong": [
-    "Seychellois rupee",
-    "São Tomé and Príncipe dobra",
-    "Belize dollar"
+    "Quetzal",
+    "Dollar",
+    "Colón"
    ],
    "explain": "Honduras uses the Honduran lempira (HNL).",
-   "difficulty": 2
+   "difficulty": 2,
+   "wrongNotes": {
+    "Quetzal": "The quetzal is used in Guatemala.",
+    "Dollar": "The dollar is used in Antigua and Barbuda, Australia, Bahamas and 31 others.",
+    "Colón": "The colón is used in Costa Rica."
+   }
   },
   {
    "id": "cur-hungary",
    "kind": "mc",
    "prompt": "What is the currency of Hungary?",
-   "answer": "Hungarian forint",
+   "answer": "Forint",
    "wrong": [
-    "Australian dollar",
-    "UAE dirham",
-    "Brunei dollar"
+    "Złoty",
+    "Euro",
+    "Krone"
    ],
    "explain": "Hungary uses the Hungarian forint (HUF).",
-   "difficulty": 2
+   "difficulty": 2,
+   "wrongNotes": {
+    "Złoty": "The złoty is used in Poland.",
+    "Euro": "The euro is used in Andorra, Austria, Belgium and 23 others.",
+    "Krone": "The krone is used in Denmark and Norway."
+   }
   },
   {
    "id": "cur-iceland",
    "kind": "mc",
    "prompt": "What is the currency of Iceland?",
-   "answer": "Icelandic króna",
+   "answer": "Króna",
    "wrong": [
-    "Belarusian ruble",
-    "Singapore dollar",
-    "West African CFA franc"
+    "Convertible mark",
+    "Ruble",
+    "Hryvnia"
    ],
    "explain": "Iceland uses the Icelandic króna (ISK).",
-   "difficulty": 1
+   "difficulty": 1,
+   "wrongNotes": {
+    "Convertible mark": "The convertible mark is used in Bosnia and Herzegovina.",
+    "Ruble": "The ruble is used in Belarus and Russia.",
+    "Hryvnia": "The hryvnia is used in Ukraine."
+   }
   },
   {
    "id": "cur-india",
    "kind": "mc",
    "prompt": "What is the currency of India?",
-   "answer": "Indian rupee",
+   "answer": "Rupee",
    "wrong": [
-    "Gambian dalasi",
-    "Bangladeshi taka",
-    "Papua New Guinean kina"
+    "Won",
+    "Pound",
+    "Lari"
    ],
    "explain": "India uses the Indian rupee (INR).",
-   "difficulty": 1
+   "difficulty": 1,
+   "wrongNotes": {
+    "Won": "The won is used in North Korea and South Korea.",
+    "Pound": "The pound is used in Egypt, Lebanon, South Sudan and 3 others.",
+    "Lari": "The lari is used in Georgia."
+   }
   },
   {
    "id": "cur-indonesia",
    "kind": "mc",
    "prompt": "What is the currency of Indonesia?",
-   "answer": "Indonesian rupiah",
+   "answer": "Rupiah",
    "wrong": [
-    "Bahamian dollar",
-    "Thai baht",
-    "Jamaican dollar"
+    "Somoni",
+    "Yen",
+    "Pound"
    ],
    "explain": "Indonesia uses the Indonesian rupiah (IDR).",
-   "difficulty": 2
+   "difficulty": 2,
+   "wrongNotes": {
+    "Somoni": "The somoni is used in Tajikistan.",
+    "Yen": "The yen is used in Japan.",
+    "Pound": "The pound is used in Egypt, Lebanon, South Sudan and 3 others."
+   }
   },
   {
    "id": "cur-iran",
    "kind": "mc",
    "prompt": "What is the currency of Iran?",
-   "answer": "Iranian rial",
+   "answer": "Rial",
    "wrong": [
-    "Maldivian rufiyaa",
-    "Burundian franc",
-    "Albanian lek"
+    "Taka",
+    "Tögrög",
+    "Dinar"
    ],
    "explain": "Iran uses the Iranian rial (IRR).",
-   "difficulty": 2
+   "difficulty": 2,
+   "wrongNotes": {
+    "Taka": "The taka is used in Bangladesh.",
+    "Tögrög": "The tögrög is used in Mongolia.",
+    "Dinar": "The dinar is used in Algeria, Bahrain, Iraq and 5 others."
+   }
   },
   {
    "id": "cur-iraq",
    "kind": "mc",
    "prompt": "What is the currency of Iraq?",
-   "answer": "Iraqi dinar",
+   "answer": "Dinar",
    "wrong": [
-    "Syrian pound",
-    "Zimbabwe Gold (ZiG)",
-    "Mauritian rupee"
+    "Ringgit",
+    "Lari",
+    "Riel"
    ],
    "explain": "Iraq uses the Iraqi dinar (IQD).",
-   "difficulty": 2
+   "difficulty": 2,
+   "wrongNotes": {
+    "Ringgit": "The ringgit is used in Malaysia.",
+    "Lari": "The lari is used in Georgia.",
+    "Riel": "The riel is used in Cambodia."
+   }
   },
   {
    "id": "cur-ireland",
@@ -3838,25 +4258,35 @@
    "prompt": "What is the currency of Ireland?",
    "answer": "Euro",
    "wrong": [
-    "Iraqi dinar",
-    "Algerian dinar",
-    "Hungarian forint"
+    "Złoty",
+    "Lek",
+    "Franc"
    ],
    "explain": "Ireland uses the Euro (EUR).",
-   "difficulty": 1
+   "difficulty": 1,
+   "wrongNotes": {
+    "Złoty": "The złoty is used in Poland.",
+    "Lek": "The lek is used in Albania.",
+    "Franc": "The franc is used in Burundi, Comoros, Democratic Republic of the Congo and 5 others."
+   }
   },
   {
    "id": "cur-israel",
    "kind": "mc",
    "prompt": "What is the currency of Israel?",
-   "answer": "Israeli new shekel",
+   "answer": "Shekel",
    "wrong": [
-    "Lebanese pound",
-    "Australian dollar",
-    "Samoan tālā"
+    "Tögrög",
+    "Rupiah",
+    "Pound"
    ],
    "explain": "Israel uses the Israeli new shekel (ILS).",
-   "difficulty": 2
+   "difficulty": 2,
+   "wrongNotes": {
+    "Tögrög": "The tögrög is used in Mongolia.",
+    "Rupiah": "The rupiah is used in Indonesia.",
+    "Pound": "The pound is used in Egypt, Lebanon, South Sudan and 3 others."
+   }
   },
   {
    "id": "cur-italy",
@@ -3864,121 +4294,166 @@
    "prompt": "What is the currency of Italy?",
    "answer": "Euro",
    "wrong": [
-    "Mauritanian ouguiya",
-    "São Tomé and Príncipe dobra",
-    "Rwandan franc"
+    "Ruble",
+    "Krone",
+    "Leu"
    ],
    "explain": "Italy uses the Euro (EUR).",
-   "difficulty": 1
+   "difficulty": 1,
+   "wrongNotes": {
+    "Ruble": "The ruble is used in Belarus and Russia.",
+    "Krone": "The krone is used in Denmark and Norway.",
+    "Leu": "The leu is used in Moldova and Romania."
+   }
   },
   {
    "id": "cur-jamaica",
    "kind": "mc",
    "prompt": "What is the currency of Jamaica?",
-   "answer": "Jamaican dollar",
+   "answer": "Dollar",
    "wrong": [
-    "Tajikistani somoni",
-    "Brunei dollar",
-    "Norwegian krone"
+    "Colón",
+    "Quetzal",
+    "Gourde"
    ],
    "explain": "Jamaica uses the Jamaican dollar (JMD).",
-   "difficulty": 1
+   "difficulty": 1,
+   "wrongNotes": {
+    "Colón": "The colón is used in Costa Rica.",
+    "Quetzal": "The quetzal is used in Guatemala.",
+    "Gourde": "The gourde is used in Haiti."
+   }
   },
   {
    "id": "cur-japan",
    "kind": "mc",
    "prompt": "What is the currency of Japan?",
-   "answer": "Japanese yen",
+   "answer": "Yen",
    "wrong": [
-    "Ukrainian hryvnia",
-    "Moroccan dirham",
-    "Polish złoty"
+    "Dinar",
+    "Lira",
+    "Afghani"
    ],
    "explain": "Japan uses the Japanese yen (JPY).",
-   "difficulty": 1
+   "difficulty": 1,
+   "wrongNotes": {
+    "Dinar": "The dinar is used in Algeria, Bahrain, Iraq and 5 others.",
+    "Lira": "The lira is used in Turkey.",
+    "Afghani": "The afghani is used in Afghanistan."
+   }
   },
   {
    "id": "cur-jordan",
    "kind": "mc",
    "prompt": "What is the currency of Jordan?",
-   "answer": "Jordanian dinar",
+   "answer": "Dinar",
    "wrong": [
-    "Nigerian naira",
-    "Japanese yen",
-    "Romanian leu"
+    "Baht",
+    "Tenge",
+    "Lari"
    ],
    "explain": "Jordan uses the Jordanian dinar (JOD).",
-   "difficulty": 2
+   "difficulty": 2,
+   "wrongNotes": {
+    "Baht": "The baht is used in Thailand.",
+    "Tenge": "The tenge is used in Kazakhstan.",
+    "Lari": "The lari is used in Georgia."
+   }
   },
   {
    "id": "cur-kazakhstan",
    "kind": "mc",
    "prompt": "What is the currency of Kazakhstan?",
-   "answer": "Kazakhstani tenge",
+   "answer": "Tenge",
    "wrong": [
-    "Bosnia and Herzegovina convertible mark",
-    "Mongolian tögrög",
-    "Omani rial"
+    "Shekel",
+    "Afghani",
+    "Riel"
    ],
    "explain": "Kazakhstan uses the Kazakhstani tenge (KZT).",
-   "difficulty": 2
+   "difficulty": 2,
+   "wrongNotes": {
+    "Shekel": "The shekel is used in Israel and Palestine.",
+    "Afghani": "The afghani is used in Afghanistan.",
+    "Riel": "The riel is used in Cambodia."
+   }
   },
   {
    "id": "cur-kenya",
    "kind": "mc",
    "prompt": "What is the currency of Kenya?",
-   "answer": "Kenyan shilling",
+   "answer": "Shilling",
    "wrong": [
-    "Chilean peso",
-    "Mauritanian ouguiya",
-    "UAE dirham"
+    "Kwanza",
+    "Pula",
+    "CFA franc"
    ],
    "explain": "Kenya uses the Kenyan shilling (KES).",
-   "difficulty": 1
+   "difficulty": 1,
+   "wrongNotes": {
+    "Kwanza": "The kwanza is used in Angola.",
+    "Pula": "The pula is used in Botswana.",
+    "CFA franc": "The CFA franc is used in Benin, Burkina Faso, Cameroon and 11 others."
+   }
   },
   {
    "id": "cur-kiribati",
    "kind": "mc",
    "prompt": "What is the currency of Kiribati?",
-   "answer": "Australian dollar",
+   "answer": "Dollar",
    "wrong": [
-    "Yemeni rial",
-    "Armenian dram",
-    "Brunei dollar"
+    "Tālā",
+    "Vatu",
+    "Kina"
    ],
    "explain": "Kiribati uses the Australian dollar (AUD).",
-   "difficulty": 3
+   "difficulty": 3,
+   "wrongNotes": {
+    "Tālā": "The tālā is used in Samoa.",
+    "Vatu": "The vatu is used in Vanuatu.",
+    "Kina": "The kina is used in Papua New Guinea."
+   }
   },
   {
    "id": "cur-kuwait",
    "kind": "mc",
    "prompt": "What is the currency of Kuwait?",
-   "answer": "Kuwaiti dinar",
+   "answer": "Dinar",
    "wrong": [
-    "Macedonian denar",
-    "Bahamian dollar",
-    "Panamanian balboa"
+    "Yuan",
+    "Won",
+    "Rupiah"
    ],
    "explain": "Kuwait uses the Kuwaiti dinar (KWD).",
-   "difficulty": 2
+   "difficulty": 2,
+   "wrongNotes": {
+    "Yuan": "The yuan is used in China.",
+    "Won": "The won is used in North Korea and South Korea.",
+    "Rupiah": "The rupiah is used in Indonesia."
+   }
   },
   {
    "id": "cur-kyrgyzstan",
    "kind": "mc",
    "prompt": "What is the currency of Kyrgyzstan?",
-   "answer": "Kyrgyz som",
+   "answer": "Som",
    "wrong": [
-    "Uzbekistani sum",
-    "UAE dirham",
-    "Bolivian boliviano"
+    "Yen",
+    "Dram",
+    "Ringgit"
    ],
    "explain": "Kyrgyzstan uses the Kyrgyz som (KGS).",
-   "difficulty": 2
+   "difficulty": 2,
+   "wrongNotes": {
+    "Yen": "The yen is used in Japan.",
+    "Dram": "The dram is used in Armenia.",
+    "Ringgit": "The ringgit is used in Malaysia."
+   }
   },
   {
    "id": "curr-kyrgyzstan",
    "kind": "mc",
-   "prompt": "Which country uses the Kyrgyz som?",
+   "prompt": "Which country uses the som?",
    "answer": "Kyrgyzstan",
    "wrong": [
     "Afghanistan",
@@ -3986,25 +4461,35 @@
     "South Korea"
    ],
    "explain": "The Kyrgyz som is the currency of Kyrgyzstan.",
-   "difficulty": 3
+   "difficulty": 3,
+   "wrongNotes": {
+    "Afghanistan": "Afghanistan uses the Afghan afghani.",
+    "United Arab Emirates": "United Arab Emirates uses the UAE dirham.",
+    "South Korea": "South Korea uses the South Korean won."
+   }
   },
   {
    "id": "cur-laos",
    "kind": "mc",
    "prompt": "What is the currency of Laos?",
-   "answer": "Lao kip",
+   "answer": "Kip",
    "wrong": [
-    "Armenian dram",
-    "Tanzanian shilling",
-    "Qatari riyal"
+    "Yen",
+    "Tenge",
+    "Kyat"
    ],
    "explain": "Laos uses the Lao kip (LAK).",
-   "difficulty": 2
+   "difficulty": 2,
+   "wrongNotes": {
+    "Yen": "The yen is used in Japan.",
+    "Tenge": "The tenge is used in Kazakhstan.",
+    "Kyat": "The kyat is used in Myanmar."
+   }
   },
   {
    "id": "curr-laos",
    "kind": "mc",
-   "prompt": "Which country uses the Lao kip?",
+   "prompt": "Which country uses the kip?",
    "answer": "Laos",
    "wrong": [
     "Philippines",
@@ -4012,7 +4497,12 @@
     "China"
    ],
    "explain": "The Lao kip is the currency of Laos.",
-   "difficulty": 3
+   "difficulty": 3,
+   "wrongNotes": {
+    "Philippines": "Philippines uses the Philippine peso.",
+    "Azerbaijan": "Azerbaijan uses the Azerbaijani manat.",
+    "China": "China uses the Renminbi (yuan)."
+   }
   },
   {
    "id": "cur-latvia",
@@ -4020,64 +4510,89 @@
    "prompt": "What is the currency of Latvia?",
    "answer": "Euro",
    "wrong": [
-    "Samoan tālā",
-    "Serbian dinar",
-    "Bolivian boliviano"
+    "Złoty",
+    "Forint",
+    "Convertible mark"
    ],
    "explain": "Latvia uses the Euro (EUR).",
-   "difficulty": 3
+   "difficulty": 3,
+   "wrongNotes": {
+    "Złoty": "The złoty is used in Poland.",
+    "Forint": "The forint is used in Hungary.",
+    "Convertible mark": "The convertible mark is used in Bosnia and Herzegovina."
+   }
   },
   {
    "id": "cur-lebanon",
    "kind": "mc",
    "prompt": "What is the currency of Lebanon?",
-   "answer": "Lebanese pound",
+   "answer": "Pound",
    "wrong": [
-    "Dominican peso",
-    "Trinidad and Tobago dollar",
-    "Central African CFA franc"
+    "Riyal",
+    "Tögrög",
+    "Manat"
    ],
    "explain": "Lebanon uses the Lebanese pound (LBP).",
-   "difficulty": 2
+   "difficulty": 2,
+   "wrongNotes": {
+    "Riyal": "The riyal is used in Qatar and Saudi Arabia.",
+    "Tögrög": "The tögrög is used in Mongolia.",
+    "Manat": "The manat is used in Azerbaijan and Turkmenistan."
+   }
   },
   {
    "id": "cur-liberia",
    "kind": "mc",
    "prompt": "What is the currency of Liberia?",
-   "answer": "Liberian dollar",
+   "answer": "Dollar",
    "wrong": [
-    "United States dollar",
-    "Somali shilling",
-    "Ukrainian hryvnia"
+    "Naira",
+    "Leone",
+    "Dirham"
    ],
    "explain": "Liberia uses the Liberian dollar (LRD).",
-   "difficulty": 2
+   "difficulty": 2,
+   "wrongNotes": {
+    "Naira": "The naira is used in Nigeria.",
+    "Leone": "The leone is used in Sierra Leone.",
+    "Dirham": "The dirham is used in Morocco and United Arab Emirates."
+   }
   },
   {
    "id": "cur-libya",
    "kind": "mc",
    "prompt": "What is the currency of Libya?",
-   "answer": "Libyan dinar",
+   "answer": "Dinar",
    "wrong": [
-    "Djiboutian franc",
-    "Euro",
-    "Turkish lira"
+    "Rupee",
+    "ZiG",
+    "Ariary"
    ],
    "explain": "Libya uses the Libyan dinar (LYD).",
-   "difficulty": 2
+   "difficulty": 2,
+   "wrongNotes": {
+    "Rupee": "The rupee is used in India, Mauritius, Nepal and 3 others.",
+    "ZiG": "The ZiG is used in Zimbabwe.",
+    "Ariary": "The ariary is used in Madagascar."
+   }
   },
   {
    "id": "cur-liechtenstein",
    "kind": "mc",
    "prompt": "What is the currency of Liechtenstein?",
-   "answer": "Swiss franc",
+   "answer": "Franc",
    "wrong": [
-    "Bahraini dinar",
-    "Sierra Leonean leone",
-    "Bahamian dollar"
+    "Ruble",
+    "Denar",
+    "Leu"
    ],
    "explain": "Liechtenstein uses the Swiss franc (CHF).",
-   "difficulty": 3
+   "difficulty": 3,
+   "wrongNotes": {
+    "Ruble": "The ruble is used in Belarus and Russia.",
+    "Denar": "The denar is used in North Macedonia.",
+    "Leu": "The leu is used in Moldova and Romania."
+   }
   },
   {
    "id": "cur-lithuania",
@@ -4085,12 +4600,17 @@
    "prompt": "What is the currency of Lithuania?",
    "answer": "Euro",
    "wrong": [
-    "Macedonian denar",
-    "Liberian dollar",
-    "Malawian kwacha"
+    "Denar",
+    "Hryvnia",
+    "Złoty"
    ],
    "explain": "Lithuania uses the Euro (EUR).",
-   "difficulty": 3
+   "difficulty": 3,
+   "wrongNotes": {
+    "Denar": "The denar is used in North Macedonia.",
+    "Hryvnia": "The hryvnia is used in Ukraine.",
+    "Złoty": "The złoty is used in Poland."
+   }
   },
   {
    "id": "cur-luxembourg",
@@ -4098,30 +4618,40 @@
    "prompt": "What is the currency of Luxembourg?",
    "answer": "Euro",
    "wrong": [
-    "Bahraini dinar",
-    "Sri Lankan rupee",
-    "Trinidad and Tobago dollar"
+    "Krone",
+    "Lek",
+    "Koruna"
    ],
    "explain": "Luxembourg uses the Euro (EUR).",
-   "difficulty": 3
+   "difficulty": 3,
+   "wrongNotes": {
+    "Krone": "The krone is used in Denmark and Norway.",
+    "Lek": "The lek is used in Albania.",
+    "Koruna": "The koruna is used in Czechia."
+   }
   },
   {
    "id": "cur-madagascar",
    "kind": "mc",
    "prompt": "What is the currency of Madagascar?",
-   "answer": "Malagasy ariary",
+   "answer": "Ariary",
    "wrong": [
-    "Zimbabwe Gold (ZiG)",
-    "Burundian franc",
-    "Uruguayan peso"
+    "Leone",
+    "ZiG",
+    "Dirham"
    ],
    "explain": "Madagascar uses the Malagasy ariary (MGA).",
-   "difficulty": 2
+   "difficulty": 2,
+   "wrongNotes": {
+    "Leone": "The leone is used in Sierra Leone.",
+    "ZiG": "The ZiG is used in Zimbabwe.",
+    "Dirham": "The dirham is used in Morocco and United Arab Emirates."
+   }
   },
   {
    "id": "curr-madagascar",
    "kind": "mc",
-   "prompt": "Which country uses the Malagasy ariary?",
+   "prompt": "Which country uses the ariary?",
    "answer": "Madagascar",
    "wrong": [
     "Mauritania",
@@ -4129,59 +4659,84 @@
     "Ivory Coast"
    ],
    "explain": "The Malagasy ariary is the currency of Madagascar.",
-   "difficulty": 3
+   "difficulty": 3,
+   "wrongNotes": {
+    "Mauritania": "Mauritania uses the Mauritanian ouguiya.",
+    "Burundi": "Burundi uses the Burundian franc.",
+    "Ivory Coast": "Ivory Coast uses the West African CFA franc."
+   }
   },
   {
    "id": "cur-malawi",
    "kind": "mc",
    "prompt": "What is the currency of Malawi?",
-   "answer": "Malawian kwacha",
+   "answer": "Kwacha",
    "wrong": [
-    "Venezuelan bolívar",
-    "Tongan paʻanga",
-    "Pound sterling"
+    "Ariary",
+    "Kwanza",
+    "Birr"
    ],
    "explain": "Malawi uses the Malawian kwacha (MWK).",
-   "difficulty": 2
+   "difficulty": 2,
+   "wrongNotes": {
+    "Ariary": "The ariary is used in Madagascar.",
+    "Kwanza": "The kwanza is used in Angola.",
+    "Birr": "The birr is used in Ethiopia."
+   }
   },
   {
    "id": "cur-malaysia",
    "kind": "mc",
    "prompt": "What is the currency of Malaysia?",
-   "answer": "Malaysian ringgit",
+   "answer": "Ringgit",
    "wrong": [
-    "Egyptian pound",
-    "Dominican peso",
-    "Bhutanese ngultrum"
+    "Rufiyaa",
+    "Yen",
+    "Kip"
    ],
    "explain": "Malaysia uses the Malaysian ringgit (MYR).",
-   "difficulty": 2
+   "difficulty": 2,
+   "wrongNotes": {
+    "Rufiyaa": "The rufiyaa is used in Maldives.",
+    "Yen": "The yen is used in Japan.",
+    "Kip": "The kip is used in Laos."
+   }
   },
   {
    "id": "cur-maldives",
    "kind": "mc",
    "prompt": "What is the currency of the Maldives?",
-   "answer": "Maldivian rufiyaa",
+   "answer": "Rufiyaa",
    "wrong": [
-    "Malagasy ariary",
-    "Panamanian balboa",
-    "Cambodian riel"
+    "Peso",
+    "Taka",
+    "Đồng"
    ],
    "explain": "The Maldives uses the Maldivian rufiyaa (MVR).",
-   "difficulty": 3
+   "difficulty": 3,
+   "wrongNotes": {
+    "Peso": "The peso is used in Argentina, Chile, Colombia and 5 others.",
+    "Taka": "The taka is used in Bangladesh.",
+    "Đồng": "The đồng is used in Vietnam."
+   }
   },
   {
    "id": "cur-mali",
    "kind": "mc",
    "prompt": "What is the currency of Mali?",
-   "answer": "West African CFA franc",
+   "answer": "CFA franc",
    "wrong": [
-    "Bahamian dollar",
-    "Tongan paʻanga",
-    "Tajikistani somoni"
+    "Birr",
+    "Dalasi",
+    "Metical"
    ],
    "explain": "Mali uses the West African CFA franc (XOF).",
-   "difficulty": 2
+   "difficulty": 2,
+   "wrongNotes": {
+    "Birr": "The birr is used in Ethiopia.",
+    "Dalasi": "The dalasi is used in Gambia.",
+    "Metical": "The metical is used in Mozambique."
+   }
   },
   {
    "id": "cur-malta",
@@ -4189,90 +4744,125 @@
    "prompt": "What is the currency of Malta?",
    "answer": "Euro",
    "wrong": [
-    "Samoan tālā",
-    "Peruvian sol",
-    "Jordanian dinar"
+    "Franc",
+    "Króna",
+    "Forint"
    ],
    "explain": "Malta uses the Euro (EUR).",
-   "difficulty": 3
+   "difficulty": 3,
+   "wrongNotes": {
+    "Franc": "The franc is used in Burundi, Comoros, Democratic Republic of the Congo and 5 others.",
+    "Króna": "The króna is used in Iceland and Sweden.",
+    "Forint": "The forint is used in Hungary."
+   }
   },
   {
    "id": "cur-marshall-islands",
    "kind": "mc",
    "prompt": "What is the currency of the Marshall Islands?",
-   "answer": "United States dollar",
+   "answer": "Dollar",
    "wrong": [
-    "Australian dollar",
-    "Algerian dinar",
-    "Moroccan dirham"
+    "Paʻanga",
+    "Tālā",
+    "Kina"
    ],
    "explain": "The Marshall Islands uses the United States dollar (USD).",
-   "difficulty": 3
+   "difficulty": 3,
+   "wrongNotes": {
+    "Paʻanga": "The paʻanga is used in Tonga.",
+    "Tālā": "The tālā is used in Samoa.",
+    "Kina": "The kina is used in Papua New Guinea."
+   }
   },
   {
    "id": "cur-mauritania",
    "kind": "mc",
    "prompt": "What is the currency of Mauritania?",
-   "answer": "Mauritanian ouguiya",
+   "answer": "Ouguiya",
    "wrong": [
-    "Libyan dinar",
-    "Colombian peso",
-    "Euro"
+    "Pula",
+    "Lilangeni",
+    "Ariary"
    ],
    "explain": "Mauritania uses the Mauritanian ouguiya (MRU).",
-   "difficulty": 2
+   "difficulty": 2,
+   "wrongNotes": {
+    "Pula": "The pula is used in Botswana.",
+    "Lilangeni": "The lilangeni is used in Eswatini.",
+    "Ariary": "The ariary is used in Madagascar."
+   }
   },
   {
    "id": "cur-mauritius",
    "kind": "mc",
    "prompt": "What is the currency of Mauritius?",
-   "answer": "Mauritian rupee",
+   "answer": "Rupee",
    "wrong": [
-    "Myanmar kyat",
-    "Israeli new shekel",
-    "Venezuelan bolívar"
+    "Pound",
+    "Cedi",
+    "Pula"
    ],
    "explain": "Mauritius uses the Mauritian rupee (MUR).",
-   "difficulty": 3
+   "difficulty": 3,
+   "wrongNotes": {
+    "Pound": "The pound is used in Egypt, Lebanon, South Sudan and 3 others.",
+    "Cedi": "The cedi is used in Ghana.",
+    "Pula": "The pula is used in Botswana."
+   }
   },
   {
    "id": "cur-mexico",
    "kind": "mc",
    "prompt": "What is the currency of Mexico?",
-   "answer": "Mexican peso",
+   "answer": "Peso",
    "wrong": [
-    "Sri Lankan rupee",
-    "United States dollar",
-    "Ethiopian birr"
+    "Colón",
+    "Balboa",
+    "Quetzal"
    ],
    "explain": "Mexico uses the Mexican peso (MXN).",
-   "difficulty": 1
+   "difficulty": 1,
+   "wrongNotes": {
+    "Colón": "The colón is used in Costa Rica.",
+    "Balboa": "The balboa is used in Panama.",
+    "Quetzal": "The quetzal is used in Guatemala."
+   }
   },
   {
    "id": "cur-micronesia",
    "kind": "mc",
    "prompt": "What is the currency of Micronesia?",
-   "answer": "United States dollar",
+   "answer": "Dollar",
    "wrong": [
-    "Honduran lempira",
-    "Lebanese pound",
-    "South Korean won"
+    "Tālā",
+    "Paʻanga",
+    "Vatu"
    ],
    "explain": "Micronesia uses the United States dollar (USD).",
-   "difficulty": 3
+   "difficulty": 3,
+   "wrongNotes": {
+    "Tālā": "The tālā is used in Samoa.",
+    "Paʻanga": "The paʻanga is used in Tonga.",
+    "Vatu": "The vatu is used in Vanuatu."
+   }
   },
   {
    "id": "cur-moldova",
    "kind": "mc",
    "prompt": "What is the currency of Moldova?",
-   "answer": "Moldovan leu",
+   "answer": "Leu",
    "wrong": [
-    "Kuwaiti dinar",
-    "Zimbabwe Gold (ZiG)",
-    "Cape Verdean escudo"
+    "Złoty",
+    "Hryvnia",
+    "Pound"
    ],
    "explain": "Moldova uses the Moldovan leu (MDL).",
-   "difficulty": 3
+   "difficulty": 3,
+   "wrongNotes": {
+    "Złoty": "The złoty is used in Poland.",
+    "Hryvnia": "The hryvnia is used in Ukraine.",
+    "Pound": "The pound is used in Egypt, Lebanon, South Sudan and 3 others."
+   }
   },
   {
    "id": "cur-monaco",
@@ -4280,25 +4870,35 @@
    "prompt": "What is the currency of Monaco?",
    "answer": "Euro",
    "wrong": [
-    "Mauritian rupee",
-    "South Sudanese pound",
-    "Swedish krona"
+    "Koruna",
+    "Hryvnia",
+    "Króna"
    ],
    "explain": "Monaco uses the Euro (EUR).",
-   "difficulty": 3
+   "difficulty": 3,
+   "wrongNotes": {
+    "Koruna": "The koruna is used in Czechia.",
+    "Hryvnia": "The hryvnia is used in Ukraine.",
+    "Króna": "The króna is used in Iceland and Sweden."
+   }
   },
   {
    "id": "cur-mongolia",
    "kind": "mc",
    "prompt": "What is the currency of Mongolia?",
-   "answer": "Mongolian tögrög",
+   "answer": "Tögrög",
    "wrong": [
-    "Uruguayan peso",
-    "Turkmenistan manat",
-    "Japanese yen"
+    "Pound",
+    "Sum",
+    "Rial"
    ],
    "explain": "Mongolia uses the Mongolian tögrög (MNT).",
-   "difficulty": 2
+   "difficulty": 2,
+   "wrongNotes": {
+    "Pound": "The pound is used in Egypt, Lebanon, South Sudan and 3 others.",
+    "Sum": "The sum is used in Uzbekistan.",
+    "Rial": "The rial is used in Iran, Oman and Yemen."
+   }
   },
   {
    "id": "cur-montenegro",
@@ -4306,77 +4906,107 @@
    "prompt": "What is the currency of Montenegro?",
    "answer": "Euro",
    "wrong": [
-    "Eritrean nakfa",
-    "Albanian lek",
-    "West African CFA franc"
+    "Dinar",
+    "Convertible mark",
+    "Ruble"
    ],
    "explain": "Montenegro uses the Euro (EUR).",
-   "difficulty": 3
+   "difficulty": 3,
+   "wrongNotes": {
+    "Dinar": "The dinar is used in Algeria, Bahrain, Iraq and 5 others.",
+    "Convertible mark": "The convertible mark is used in Bosnia and Herzegovina.",
+    "Ruble": "The ruble is used in Belarus and Russia."
+   }
   },
   {
    "id": "cur-morocco",
    "kind": "mc",
    "prompt": "What is the currency of Morocco?",
-   "answer": "Moroccan dirham",
+   "answer": "Dirham",
    "wrong": [
-    "Russian ruble",
-    "Swedish krona",
-    "Nepalese rupee"
+    "Dollar",
+    "Franc",
+    "CFA franc"
    ],
    "explain": "Morocco uses the Moroccan dirham (MAD).",
-   "difficulty": 2
+   "difficulty": 2,
+   "wrongNotes": {
+    "Dollar": "The dollar is used in Antigua and Barbuda, Australia, Bahamas and 31 others.",
+    "Franc": "The franc is used in Burundi, Comoros, Democratic Republic of the Congo and 5 others.",
+    "CFA franc": "The CFA franc is used in Benin, Burkina Faso, Cameroon and 11 others."
+   }
   },
   {
    "id": "cur-mozambique",
    "kind": "mc",
    "prompt": "What is the currency of Mozambique?",
-   "answer": "Mozambican metical",
+   "answer": "Metical",
    "wrong": [
-    "Ukrainian hryvnia",
-    "Thai baht",
-    "Syrian pound"
+    "CFA franc",
+    "Dinar",
+    "Kwanza"
    ],
    "explain": "Mozambique uses the Mozambican metical (MZN).",
-   "difficulty": 2
+   "difficulty": 2,
+   "wrongNotes": {
+    "CFA franc": "The CFA franc is used in Benin, Burkina Faso, Cameroon and 11 others.",
+    "Dinar": "The dinar is used in Algeria, Bahrain, Iraq and 5 others.",
+    "Kwanza": "The kwanza is used in Angola."
+   }
   },
   {
    "id": "cur-myanmar",
    "kind": "mc",
    "prompt": "What is the currency of Myanmar?",
-   "answer": "Myanmar kyat",
+   "answer": "Kyat",
    "wrong": [
-    "Lebanese pound",
-    "Russian ruble",
-    "Iranian rial"
+    "Somoni",
+    "Baht",
+    "Som"
    ],
    "explain": "Myanmar uses the Myanmar kyat (MMK).",
-   "difficulty": 2
+   "difficulty": 2,
+   "wrongNotes": {
+    "Somoni": "The somoni is used in Tajikistan.",
+    "Baht": "The baht is used in Thailand.",
+    "Som": "The som is used in Kyrgyzstan."
+   }
   },
   {
    "id": "cur-nauru",
    "kind": "mc",
    "prompt": "What is the currency of Nauru?",
-   "answer": "Australian dollar",
+   "answer": "Dollar",
    "wrong": [
-    "Haitian gourde",
-    "Libyan dinar",
-    "Polish złoty"
+    "Vatu",
+    "Tālā",
+    "Paʻanga"
    ],
    "explain": "Nauru uses the Australian dollar (AUD).",
-   "difficulty": 3
+   "difficulty": 3,
+   "wrongNotes": {
+    "Vatu": "The vatu is used in Vanuatu.",
+    "Tālā": "The tālā is used in Samoa.",
+    "Paʻanga": "The paʻanga is used in Tonga."
+   }
   },
   {
    "id": "cur-nepal",
    "kind": "mc",
    "prompt": "What is the currency of Nepal?",
-   "answer": "Nepalese rupee",
+   "answer": "Rupee",
    "wrong": [
-    "Iranian rial",
-    "Chilean peso",
-    "Mozambican metical"
+    "Riel",
+    "Taka",
+    "Tögrög"
    ],
    "explain": "Nepal uses the Nepalese rupee (NPR).",
-   "difficulty": 2
+   "difficulty": 2,
+   "wrongNotes": {
+    "Riel": "The riel is used in Cambodia.",
+    "Taka": "The taka is used in Bangladesh.",
+    "Tögrög": "The tögrög is used in Mongolia."
+   }
   },
   {
    "id": "cur-netherlands",
@@ -4384,103 +5014,143 @@
    "prompt": "What is the currency of the Netherlands?",
    "answer": "Euro",
    "wrong": [
-    "Nigerian naira",
-    "Argentine peso",
-    "Turkmenistan manat"
+    "Ruble",
+    "Hryvnia",
+    "Złoty"
    ],
    "explain": "The Netherlands uses the Euro (EUR).",
-   "difficulty": 1
+   "difficulty": 1,
+   "wrongNotes": {
+    "Ruble": "The ruble is used in Belarus and Russia.",
+    "Hryvnia": "The hryvnia is used in Ukraine.",
+    "Złoty": "The złoty is used in Poland."
+   }
   },
   {
    "id": "cur-new-zealand",
    "kind": "mc",
    "prompt": "What is the currency of New Zealand?",
-   "answer": "New Zealand dollar",
+   "answer": "Dollar",
    "wrong": [
-    "East Caribbean dollar",
-    "Papua New Guinean kina",
-    "Macedonian denar"
+    "Kina",
+    "Paʻanga",
+    "Vatu"
    ],
    "explain": "New Zealand uses the New Zealand dollar (NZD).",
-   "difficulty": 1
+   "difficulty": 1,
+   "wrongNotes": {
+    "Kina": "The kina is used in Papua New Guinea.",
+    "Paʻanga": "The paʻanga is used in Tonga.",
+    "Vatu": "The vatu is used in Vanuatu."
+   }
   },
   {
    "id": "cur-nicaragua",
    "kind": "mc",
    "prompt": "What is the currency of Nicaragua?",
-   "answer": "Nicaraguan córdoba",
+   "answer": "Córdoba",
    "wrong": [
-    "Swedish krona",
-    "Pound sterling",
-    "Renminbi (yuan)"
+    "Peso",
+    "Quetzal",
+    "Dollar"
    ],
    "explain": "Nicaragua uses the Nicaraguan córdoba (NIO).",
-   "difficulty": 2
+   "difficulty": 2,
+   "wrongNotes": {
+    "Peso": "The peso is used in Argentina, Chile, Colombia and 5 others.",
+    "Quetzal": "The quetzal is used in Guatemala.",
+    "Dollar": "The dollar is used in Antigua and Barbuda, Australia, Bahamas and 31 others."
+   }
   },
   {
    "id": "cur-niger",
    "kind": "mc",
    "prompt": "What is the currency of Niger?",
-   "answer": "West African CFA franc",
+   "answer": "CFA franc",
    "wrong": [
-    "Nigerian naira",
-    "Zimbabwe Gold (ZiG)",
-    "Sri Lankan rupee"
+    "Dalasi",
+    "Ariary",
+    "Dobra"
    ],
    "explain": "Niger uses the West African CFA franc (XOF).",
-   "difficulty": 2
+   "difficulty": 2,
+   "wrongNotes": {
+    "Dalasi": "The dalasi is used in Gambia.",
+    "Ariary": "The ariary is used in Madagascar.",
+    "Dobra": "The dobra is used in São Tomé and Príncipe."
+   }
   },
   {
    "id": "cur-nigeria",
    "kind": "mc",
    "prompt": "What is the currency of Nigeria?",
-   "answer": "Nigerian naira",
+   "answer": "Naira",
    "wrong": [
-    "Panamanian balboa",
-    "Bahraini dinar",
-    "North Korean won"
+    "Kwacha",
+    "Leone",
+    "Nakfa"
    ],
    "explain": "Nigeria uses the Nigerian naira (NGN).",
-   "difficulty": 1
+   "difficulty": 1,
+   "wrongNotes": {
+    "Kwacha": "The kwacha is used in Malawi and Zambia.",
+    "Leone": "The leone is used in Sierra Leone.",
+    "Nakfa": "The nakfa is used in Eritrea."
+   }
   },
   {
    "id": "cur-north-korea",
    "kind": "mc",
    "prompt": "What is the currency of North Korea?",
-   "answer": "North Korean won",
+   "answer": "Won",
    "wrong": [
-    "Ugandan shilling",
-    "Belarusian ruble",
-    "Congolese franc"
+    "Afghani",
+    "Dinar",
+    "Baht"
    ],
    "explain": "North Korea uses the North Korean won (KPW).",
-   "difficulty": 2
+   "difficulty": 2,
+   "wrongNotes": {
+    "Afghani": "The afghani is used in Afghanistan.",
+    "Dinar": "The dinar is used in Algeria, Bahrain, Iraq and 5 others.",
+    "Baht": "The baht is used in Thailand."
+   }
   },
   {
    "id": "cur-north-macedonia",
    "kind": "mc",
    "prompt": "What is the currency of North Macedonia?",
-   "answer": "Macedonian denar",
+   "answer": "Denar",
    "wrong": [
-    "Seychellois rupee",
-    "Uruguayan peso",
-    "Burundian franc"
+    "Krone",
+    "Dinar",
+    "Leu"
    ],
    "explain": "North Macedonia uses the Macedonian denar (MKD).",
-   "difficulty": 3
+   "difficulty": 3,
+   "wrongNotes": {
+    "Krone": "The krone is used in Denmark and Norway.",
+    "Dinar": "The dinar is used in Algeria, Bahrain, Iraq and 5 others.",
+    "Leu": "The leu is used in Moldova and Romania."
+   }
   },
   {
    "id": "cur-norway",
    "kind": "mc",
    "prompt": "What is the currency of Norway?",
-   "answer": "Norwegian krone",
+   "answer": "Krone",
    "wrong": [
-    "Nicaraguan córdoba",
     "Euro",
-    "Maldivian rufiyaa"
+    "Denar",
+    "Lek"
    ],
    "explain": "Norway uses the Norwegian krone (NOK).",
-   "difficulty": 1
+   "difficulty": 1,
+   "wrongNotes": {
+    "Euro": "The euro is used in Andorra, Austria, Belgium and 23 others.",
+    "Denar": "The denar is used in North Macedonia.",
+    "Lek": "The lek is used in Albania."
+   }
   },
   {
    "id": "curr-norway",
@@ -4493,116 +5163,161 @@
     "Germany"
    ],
    "explain": "The Norwegian krone is the currency of Norway.",
-   "difficulty": 2
+   "difficulty": 1,
+   "wrongNotes": {
+    "Slovenia": "Slovenia uses the Euro.",
+    "Bosnia and Herzegovina": "Bosnia and Herzegovina uses the Bosnia and Herzegovina convertible mark.",
+    "Germany": "Germany uses the Euro."
+   }
   },
   {
    "id": "cur-oman",
    "kind": "mc",
    "prompt": "What is the currency of Oman?",
-   "answer": "Omani rial",
+   "answer": "Rial",
    "wrong": [
-    "Honduran lempira",
-    "Mauritanian ouguiya",
-    "United States dollar"
+    "Sum",
+    "Riyal",
+    "Lari"
    ],
    "explain": "Oman uses the Omani rial (OMR).",
-   "difficulty": 2
+   "difficulty": 2,
+   "wrongNotes": {
+    "Sum": "The sum is used in Uzbekistan.",
+    "Riyal": "The riyal is used in Qatar and Saudi Arabia.",
+    "Lari": "The lari is used in Georgia."
+   }
   },
   {
    "id": "cur-pakistan",
    "kind": "mc",
    "prompt": "What is the currency of Pakistan?",
-   "answer": "Pakistani rupee",
+   "answer": "Rupee",
    "wrong": [
-    "Barbadian dollar",
-    "Bhutanese ngultrum",
-    "Indonesian rupiah"
+    "Yuan",
+    "Lira",
+    "Rial"
    ],
    "explain": "Pakistan uses the Pakistani rupee (PKR).",
-   "difficulty": 2
+   "difficulty": 2,
+   "wrongNotes": {
+    "Yuan": "The yuan is used in China.",
+    "Lira": "The lira is used in Turkey.",
+    "Rial": "The rial is used in Iran, Oman and Yemen."
+   }
   },
   {
    "id": "cur-palau",
    "kind": "mc",
    "prompt": "What is the currency of Palau?",
-   "answer": "United States dollar",
+   "answer": "Dollar",
    "wrong": [
-    "Czech koruna",
-    "Jordanian dinar",
-    "Maldivian rufiyaa"
+    "Vatu",
+    "Paʻanga",
+    "Kina"
    ],
    "explain": "Palau uses the United States dollar (USD).",
-   "difficulty": 3
+   "difficulty": 3,
+   "wrongNotes": {
+    "Vatu": "The vatu is used in Vanuatu.",
+    "Paʻanga": "The paʻanga is used in Tonga.",
+    "Kina": "The kina is used in Papua New Guinea."
+   }
   },
   {
    "id": "cur-papua-new-guinea",
    "kind": "mc",
    "prompt": "What is the currency of Papua New Guinea?",
-   "answer": "Papua New Guinean kina",
+   "answer": "Kina",
    "wrong": [
-    "Surinamese dollar",
-    "Bhutanese ngultrum",
-    "Angolan kwanza"
+    "Tālā",
+    "Paʻanga",
+    "Dollar"
    ],
    "explain": "Papua New Guinea uses the Papua New Guinean kina (PGK).",
-   "difficulty": 2
+   "difficulty": 2,
+   "wrongNotes": {
+    "Tālā": "The tālā is used in Samoa.",
+    "Paʻanga": "The paʻanga is used in Tonga.",
+    "Dollar": "The dollar is used in Antigua and Barbuda, Australia, Bahamas and 31 others."
+   }
   },
   {
    "id": "cur-paraguay",
    "kind": "mc",
    "prompt": "What is the currency of Paraguay?",
-   "answer": "Paraguayan guaraní",
+   "answer": "Guaraní",
    "wrong": [
-    "Myanmar kyat",
-    "Philippine peso",
-    "Danish krone"
+    "Real",
+    "Dollar",
+    "Sol"
    ],
    "explain": "Paraguay uses the Paraguayan guaraní (PYG).",
-   "difficulty": 2
+   "difficulty": 2,
+   "wrongNotes": {
+    "Real": "The real is used in Brazil.",
+    "Dollar": "The dollar is used in Antigua and Barbuda, Australia, Bahamas and 31 others.",
+    "Sol": "The sol is used in Peru."
+   }
   },
   {
    "id": "cur-peru",
    "kind": "mc",
    "prompt": "What is the currency of Peru?",
-   "answer": "Peruvian sol",
+   "answer": "Sol",
    "wrong": [
-    "Kazakhstani tenge",
-    "Pound sterling",
-    "Rwandan franc"
+    "Real",
+    "Boliviano",
+    "Peso"
    ],
    "explain": "Peru uses the Peruvian sol (PEN).",
-   "difficulty": 1
+   "difficulty": 1,
+   "wrongNotes": {
+    "Real": "The real is used in Brazil.",
+    "Boliviano": "The boliviano is used in Bolivia.",
+    "Peso": "The peso is used in Argentina, Chile, Colombia and 5 others."
+   }
   },
   {
    "id": "cur-philippines",
    "kind": "mc",
    "prompt": "What is the currency of the Philippines?",
-   "answer": "Philippine peso",
+   "answer": "Peso",
    "wrong": [
-    "Maldivian rufiyaa",
-    "Bolivian boliviano",
-    "Azerbaijani manat"
+    "Tenge",
+    "Riyal",
+    "Taka"
    ],
    "explain": "The Philippines uses the Philippine peso (PHP).",
-   "difficulty": 2
+   "difficulty": 2,
+   "wrongNotes": {
+    "Tenge": "The tenge is used in Kazakhstan.",
+    "Riyal": "The riyal is used in Qatar and Saudi Arabia.",
+    "Taka": "The taka is used in Bangladesh."
+   }
   },
   {
    "id": "cur-poland",
    "kind": "mc",
    "prompt": "What is the currency of Poland?",
-   "answer": "Polish złoty",
+   "answer": "Złoty",
    "wrong": [
-    "Japanese yen",
-    "Bangladeshi taka",
-    "Saudi riyal"
+    "Króna",
+    "Dinar",
+    "Franc"
    ],
    "explain": "Poland uses the Polish złoty (PLN).",
-   "difficulty": 1
+   "difficulty": 1,
+   "wrongNotes": {
+    "Króna": "The króna is used in Iceland and Sweden.",
+    "Dinar": "The dinar is used in Algeria, Bahrain, Iraq and 5 others.",
+    "Franc": "The franc is used in Burundi, Comoros, Democratic Republic of the Congo and 5 others."
+   }
   },
   {
    "id": "curr-poland",
    "kind": "mc",
-   "prompt": "Which country uses the Polish złoty?",
+   "prompt": "Which country uses the złoty?",
    "answer": "Poland",
    "wrong": [
     "United Kingdom",
@@ -4610,7 +5325,12 @@
     "Bosnia and Herzegovina"
    ],
    "explain": "The Polish złoty is the currency of Poland.",
-   "difficulty": 2
+   "difficulty": 2,
+   "wrongNotes": {
+    "United Kingdom": "United Kingdom uses the Pound sterling.",
+    "Moldova": "Moldova uses the Moldovan leu.",
+    "Bosnia and Herzegovina": "Bosnia and Herzegovina uses the Bosnia and Herzegovina convertible mark."
+   }
   },
   {
    "id": "cur-portugal",
@@ -4618,116 +5338,161 @@
    "prompt": "What is the currency of Portugal?",
    "answer": "Euro",
    "wrong": [
-    "Canadian dollar",
-    "Philippine peso",
-    "Swazi lilangeni"
+    "Pound",
+    "Leu",
+    "Złoty"
    ],
    "explain": "Portugal uses the Euro (EUR).",
-   "difficulty": 1
+   "difficulty": 1,
+   "wrongNotes": {
+    "Pound": "The pound is used in Egypt, Lebanon, South Sudan and 3 others.",
+    "Leu": "The leu is used in Moldova and Romania.",
+    "Złoty": "The złoty is used in Poland."
+   }
   },
   {
    "id": "cur-qatar",
    "kind": "mc",
    "prompt": "What is the currency of Qatar?",
-   "answer": "Qatari riyal",
+   "answer": "Riyal",
    "wrong": [
-    "Mongolian tögrög",
-    "Honduran lempira",
-    "Sierra Leonean leone"
+    "Rupee",
+    "Dinar",
+    "Shekel"
    ],
    "explain": "Qatar uses the Qatari riyal (QAR).",
-   "difficulty": 3
+   "difficulty": 3,
+   "wrongNotes": {
+    "Rupee": "The rupee is used in India, Mauritius, Nepal and 3 others.",
+    "Dinar": "The dinar is used in Algeria, Bahrain, Iraq and 5 others.",
+    "Shekel": "The shekel is used in Israel and Palestine."
+   }
   },
   {
    "id": "cur-romania",
    "kind": "mc",
    "prompt": "What is the currency of Romania?",
-   "answer": "Romanian leu",
+   "answer": "Leu",
    "wrong": [
-    "Rwandan franc",
-    "Ukrainian hryvnia",
-    "Namibian dollar"
+    "Denar",
+    "Ruble",
+    "Hryvnia"
    ],
    "explain": "Romania uses the Romanian leu (RON).",
-   "difficulty": 2
+   "difficulty": 2,
+   "wrongNotes": {
+    "Denar": "The denar is used in North Macedonia.",
+    "Ruble": "The ruble is used in Belarus and Russia.",
+    "Hryvnia": "The hryvnia is used in Ukraine."
+   }
   },
   {
    "id": "cur-russia",
    "kind": "mc",
    "prompt": "What is the currency of Russia?",
-   "answer": "Russian ruble",
+   "answer": "Ruble",
    "wrong": [
-    "Bolivian boliviano",
-    "Kenyan shilling",
-    "Barbadian dollar"
+    "Euro",
+    "Convertible mark",
+    "Lek"
    ],
    "explain": "Russia uses the Russian ruble (RUB).",
-   "difficulty": 1
+   "difficulty": 1,
+   "wrongNotes": {
+    "Euro": "The euro is used in Andorra, Austria, Belgium and 23 others.",
+    "Convertible mark": "The convertible mark is used in Bosnia and Herzegovina.",
+    "Lek": "The lek is used in Albania."
+   }
   },
   {
    "id": "cur-rwanda",
    "kind": "mc",
    "prompt": "What is the currency of Rwanda?",
-   "answer": "Rwandan franc",
+   "answer": "Franc",
    "wrong": [
-    "Comorian franc",
-    "Argentine peso",
-    "Georgian lari"
+    "Ouguiya",
+    "Rand",
+    "Pound"
    ],
    "explain": "Rwanda uses the Rwandan franc (RWF).",
-   "difficulty": 2
+   "difficulty": 2,
+   "wrongNotes": {
+    "Ouguiya": "The ouguiya is used in Mauritania.",
+    "Rand": "The rand is used in Lesotho, Namibia and South Africa.",
+    "Pound": "The pound is used in Egypt, Lebanon, South Sudan and 3 others."
+   }
   },
   {
    "id": "cur-saint-kitts-and-nevis",
    "kind": "mc",
    "prompt": "What is the currency of Saint Kitts and Nevis?",
-   "answer": "East Caribbean dollar",
+   "answer": "Dollar",
    "wrong": [
-    "Paraguayan guaraní",
-    "Norwegian krone",
-    "Australian dollar"
+    "Balboa",
+    "Colón",
+    "Lempira"
    ],
    "explain": "Saint Kitts and Nevis uses the East Caribbean dollar (XCD).",
-   "difficulty": 3
+   "difficulty": 3,
+   "wrongNotes": {
+    "Balboa": "The balboa is used in Panama.",
+    "Colón": "The colón is used in Costa Rica.",
+    "Lempira": "The lempira is used in Honduras."
+   }
   },
   {
    "id": "cur-saint-lucia",
    "kind": "mc",
    "prompt": "What is the currency of Saint Lucia?",
-   "answer": "East Caribbean dollar",
+   "answer": "Dollar",
    "wrong": [
-    "Pound sterling",
-    "Brunei dollar",
-    "Papua New Guinean kina"
+    "Lempira",
+    "Colón",
+    "Córdoba"
    ],
    "explain": "Saint Lucia uses the East Caribbean dollar (XCD).",
-   "difficulty": 3
+   "difficulty": 3,
+   "wrongNotes": {
+    "Lempira": "The lempira is used in Honduras.",
+    "Colón": "The colón is used in Costa Rica.",
+    "Córdoba": "The córdoba is used in Nicaragua."
+   }
   },
   {
    "id": "cur-saint-vincent-and-the-grenadines",
    "kind": "mc",
    "prompt": "What is the currency of Saint Vincent and the Grenadines?",
-   "answer": "East Caribbean dollar",
+   "answer": "Dollar",
    "wrong": [
-    "Nicaraguan córdoba",
-    "Turkish lira",
-    "Argentine peso"
+    "Gourde",
+    "Balboa",
+    "Córdoba"
    ],
    "explain": "Saint Vincent and the Grenadines uses the East Caribbean dollar (XCD).",
-   "difficulty": 3
+   "difficulty": 3,
+   "wrongNotes": {
+    "Gourde": "The gourde is used in Haiti.",
+    "Balboa": "The balboa is used in Panama.",
+    "Córdoba": "The córdoba is used in Nicaragua."
+   }
   },
   {
    "id": "cur-samoa",
    "kind": "mc",
    "prompt": "What is the currency of Samoa?",
-   "answer": "Samoan tālā",
+   "answer": "Tālā",
    "wrong": [
-    "Iraqi dinar",
-    "Albanian lek",
-    "Kyrgyz som"
+    "Paʻanga",
+    "Dollar",
+    "Kina"
    ],
    "explain": "Samoa uses the Samoan tālā (WST).",
-   "difficulty": 3
+   "difficulty": 3,
+   "wrongNotes": {
+    "Paʻanga": "The paʻanga is used in Tonga.",
+    "Dollar": "The dollar is used in Antigua and Barbuda, Australia, Bahamas and 31 others.",
+    "Kina": "The kina is used in Papua New Guinea."
+   }
   },
   {
    "id": "cur-san-marino",
@@ -4735,103 +5500,143 @@
    "prompt": "What is the currency of San Marino?",
    "answer": "Euro",
    "wrong": [
-    "Malawian kwacha",
-    "Panamanian balboa",
-    "Kuwaiti dinar"
+    "Ruble",
+    "Denar",
+    "Dinar"
    ],
    "explain": "San Marino uses the Euro (EUR).",
-   "difficulty": 3
+   "difficulty": 3,
+   "wrongNotes": {
+    "Ruble": "The ruble is used in Belarus and Russia.",
+    "Denar": "The denar is used in North Macedonia.",
+    "Dinar": "The dinar is used in Algeria, Bahrain, Iraq and 5 others."
+   }
   },
   {
    "id": "cur-sao-tome-and-principe",
    "kind": "mc",
    "prompt": "What is the currency of São Tomé and Príncipe?",
-   "answer": "São Tomé and Príncipe dobra",
+   "answer": "Tomé",
    "wrong": [
-    "Burundian franc",
-    "Colombian peso",
-    "Bhutanese ngultrum"
+    "Dalasi",
+    "Naira",
+    "Birr"
    ],
    "explain": "São Tomé and Príncipe uses the São Tomé and Príncipe dobra (STN).",
-   "difficulty": 3
+   "difficulty": 1,
+   "wrongNotes": {
+    "Dalasi": "The dalasi is used in Gambia.",
+    "Naira": "The naira is used in Nigeria.",
+    "Birr": "The birr is used in Ethiopia."
+   }
   },
   {
    "id": "cur-saudi-arabia",
    "kind": "mc",
    "prompt": "What is the currency of Saudi Arabia?",
-   "answer": "Saudi riyal",
+   "answer": "Riyal",
    "wrong": [
-    "Bahamian dollar",
-    "Belarusian ruble",
-    "Namibian dollar"
+    "Rufiyaa",
+    "Taka",
+    "Tögrög"
    ],
    "explain": "Saudi Arabia uses the Saudi riyal (SAR).",
-   "difficulty": 2
+   "difficulty": 2,
+   "wrongNotes": {
+    "Rufiyaa": "The rufiyaa is used in Maldives.",
+    "Taka": "The taka is used in Bangladesh.",
+    "Tögrög": "The tögrög is used in Mongolia."
+   }
   },
   {
    "id": "cur-senegal",
    "kind": "mc",
    "prompt": "What is the currency of Senegal?",
-   "answer": "West African CFA franc",
+   "answer": "CFA franc",
    "wrong": [
-    "Iranian rial",
-    "Venezuelan bolívar",
-    "Albanian lek"
+    "Nakfa",
+    "Metical",
+    "Escudo"
    ],
    "explain": "Senegal uses the West African CFA franc (XOF).",
-   "difficulty": 2
+   "difficulty": 2,
+   "wrongNotes": {
+    "Nakfa": "The nakfa is used in Eritrea.",
+    "Metical": "The metical is used in Mozambique.",
+    "Escudo": "The escudo is used in Cape Verde."
+   }
   },
   {
    "id": "cur-serbia",
    "kind": "mc",
    "prompt": "What is the currency of Serbia?",
-   "answer": "Serbian dinar",
+   "answer": "Dinar",
    "wrong": [
-    "Congolese franc",
-    "Bangladeshi taka",
-    "Cape Verdean escudo"
+    "Lek",
+    "Franc",
+    "Krone"
    ],
    "explain": "Serbia uses the Serbian dinar (RSD).",
-   "difficulty": 2
+   "difficulty": 2,
+   "wrongNotes": {
+    "Lek": "The lek is used in Albania.",
+    "Franc": "The franc is used in Burundi, Comoros, Democratic Republic of the Congo and 5 others.",
+    "Krone": "The krone is used in Denmark and Norway."
+   }
   },
   {
    "id": "cur-seychelles",
    "kind": "mc",
    "prompt": "What is the currency of the Seychelles?",
-   "answer": "Seychellois rupee",
+   "answer": "Rupee",
    "wrong": [
-    "Chilean peso",
-    "Egyptian pound",
-    "Swiss franc"
+    "Rand",
+    "Naira",
+    "Lilangeni"
    ],
    "explain": "The Seychelles uses the Seychellois rupee (SCR).",
-   "difficulty": 3
+   "difficulty": 3,
+   "wrongNotes": {
+    "Rand": "The rand is used in Lesotho, Namibia and South Africa.",
+    "Naira": "The naira is used in Nigeria.",
+    "Lilangeni": "The lilangeni is used in Eswatini."
+   }
   },
   {
    "id": "cur-sierra-leone",
    "kind": "mc",
    "prompt": "What is the currency of Sierra Leone?",
-   "answer": "Sierra Leonean leone",
+   "answer": "Leone",
    "wrong": [
-    "Gambian dalasi",
-    "Malaysian ringgit",
-    "Honduran lempira"
+    "Shilling",
+    "Ouguiya",
+    "Kwacha"
    ],
    "explain": "Sierra Leone uses the Sierra Leonean leone (SLE).",
-   "difficulty": 2
+   "difficulty": 1,
+   "wrongNotes": {
+    "Shilling": "The shilling is used in Kenya, Somalia, Tanzania and Uganda.",
+    "Ouguiya": "The ouguiya is used in Mauritania.",
+    "Kwacha": "The kwacha is used in Malawi and Zambia."
+   }
   },
   {
    "id": "cur-singapore",
    "kind": "mc",
    "prompt": "What is the currency of Singapore?",
-   "answer": "Singapore dollar",
+   "answer": "Dollar",
    "wrong": [
-    "Argentine peso",
-    "Maldivian rufiyaa",
-    "Guinean franc"
+    "Dirham",
+    "Riyal",
+    "Ringgit"
    ],
    "explain": "Singapore uses the Singapore dollar (SGD).",
-   "difficulty": 2
+   "difficulty": 2,
+   "wrongNotes": {
+    "Dirham": "The dirham is used in Morocco and United Arab Emirates.",
+    "Riyal": "The riyal is used in Qatar and Saudi Arabia.",
+    "Ringgit": "The ringgit is used in Malaysia."
+   }
   },
   {
    "id": "cur-slovakia",
@@ -4839,12 +5644,17 @@
    "prompt": "What is the currency of Slovakia?",
    "answer": "Euro",
    "wrong": [
-    "Australian dollar",
-    "Nepalese rupee",
-    "Namibian dollar"
+    "Convertible mark",
+    "Krone",
+    "Franc"
    ],
    "explain": "Slovakia uses the Euro (EUR).",
-   "difficulty": 2
+   "difficulty": 2,
+   "wrongNotes": {
+    "Convertible mark": "The convertible mark is used in Bosnia and Herzegovina.",
+    "Krone": "The krone is used in Denmark and Norway.",
+    "Franc": "The franc is used in Burundi, Comoros, Democratic Republic of the Congo and 5 others."
+   }
   },
   {
    "id": "cur-slovenia",
@@ -4852,77 +5662,107 @@
    "prompt": "What is the currency of Slovenia?",
    "answer": "Euro",
    "wrong": [
-    "Barbadian dollar",
-    "Lesotho loti",
-    "Turkmenistan manat"
+    "Dinar",
+    "Pound",
+    "Króna"
    ],
    "explain": "Slovenia uses the Euro (EUR).",
-   "difficulty": 3
+   "difficulty": 3,
+   "wrongNotes": {
+    "Dinar": "The dinar is used in Algeria, Bahrain, Iraq and 5 others.",
+    "Pound": "The pound is used in Egypt, Lebanon, South Sudan and 3 others.",
+    "Króna": "The króna is used in Iceland and Sweden."
+   }
   },
   {
    "id": "cur-solomon-islands",
    "kind": "mc",
    "prompt": "What is the currency of the Solomon Islands?",
-   "answer": "Solomon Islands dollar",
+   "answer": "Dollar",
    "wrong": [
-    "United States dollar",
-    "East Caribbean dollar",
-    "Namibian dollar"
+    "Vatu",
+    "Tālā",
+    "Paʻanga"
    ],
    "explain": "The Solomon Islands uses the Solomon Islands dollar (SBD).",
-   "difficulty": 3
+   "difficulty": 3,
+   "wrongNotes": {
+    "Vatu": "The vatu is used in Vanuatu.",
+    "Tālā": "The tālā is used in Samoa.",
+    "Paʻanga": "The paʻanga is used in Tonga."
+   }
   },
   {
    "id": "cur-somalia",
    "kind": "mc",
    "prompt": "What is the currency of Somalia?",
-   "answer": "Somali shilling",
+   "answer": "Shilling",
    "wrong": [
-    "Angolan kwanza",
-    "Euro",
-    "Malawian kwacha"
+    "Lilangeni",
+    "Pound",
+    "Metical"
    ],
    "explain": "Somalia uses the Somali shilling (SOS).",
-   "difficulty": 2
+   "difficulty": 2,
+   "wrongNotes": {
+    "Lilangeni": "The lilangeni is used in Eswatini.",
+    "Pound": "The pound is used in Egypt, Lebanon, South Sudan and 3 others.",
+    "Metical": "The metical is used in Mozambique."
+   }
   },
   {
    "id": "cur-south-africa",
    "kind": "mc",
    "prompt": "What is the currency of South Africa?",
-   "answer": "South African rand",
+   "answer": "Rand",
    "wrong": [
-    "Swedish krona",
-    "Nepalese rupee",
-    "Nigerian naira"
+    "Metical",
+    "Shilling",
+    "Dirham"
    ],
    "explain": "South Africa uses the South African rand (ZAR).",
-   "difficulty": 1
+   "difficulty": 1,
+   "wrongNotes": {
+    "Metical": "The metical is used in Mozambique.",
+    "Shilling": "The shilling is used in Kenya, Somalia, Tanzania and Uganda.",
+    "Dirham": "The dirham is used in Morocco and United Arab Emirates."
+   }
   },
   {
    "id": "cur-south-korea",
    "kind": "mc",
    "prompt": "What is the currency of South Korea?",
-   "answer": "South Korean won",
+   "answer": "Won",
    "wrong": [
-    "Namibian dollar",
-    "Australian dollar",
-    "Afghan afghani"
+    "Riel",
+    "Shekel",
+    "Đồng"
    ],
    "explain": "South Korea uses the South Korean won (KRW).",
-   "difficulty": 1
+   "difficulty": 1,
+   "wrongNotes": {
+    "Riel": "The riel is used in Cambodia.",
+    "Shekel": "The shekel is used in Israel and Palestine.",
+    "Đồng": "The đồng is used in Vietnam."
+   }
   },
   {
    "id": "cur-south-sudan",
    "kind": "mc",
    "prompt": "What is the currency of South Sudan?",
-   "answer": "South Sudanese pound",
+   "answer": "Pound",
    "wrong": [
-    "Thai baht",
-    "Kenyan shilling",
-    "Libyan dinar"
+    "Kwanza",
+    "Dirham",
+    "Naira"
    ],
    "explain": "South Sudan uses the South Sudanese pound (SSP).",
-   "difficulty": 2
+   "difficulty": 2,
+   "wrongNotes": {
+    "Kwanza": "The kwanza is used in Angola.",
+    "Dirham": "The dirham is used in Morocco and United Arab Emirates.",
+    "Naira": "The naira is used in Nigeria."
+   }
   },
   {
    "id": "cur-spain",
@@ -4930,64 +5770,89 @@
    "prompt": "What is the currency of Spain?",
    "answer": "Euro",
    "wrong": [
-    "West African CFA franc",
-    "Malagasy ariary",
-    "Guyanese dollar"
+    "Dinar",
+    "Koruna",
+    "Ruble"
    ],
    "explain": "Spain uses the Euro (EUR).",
-   "difficulty": 1
+   "difficulty": 1,
+   "wrongNotes": {
+    "Dinar": "The dinar is used in Algeria, Bahrain, Iraq and 5 others.",
+    "Koruna": "The koruna is used in Czechia.",
+    "Ruble": "The ruble is used in Belarus and Russia."
+   }
   },
   {
    "id": "cur-sri-lanka",
    "kind": "mc",
    "prompt": "What is the currency of Sri Lanka?",
-   "answer": "Sri Lankan rupee",
+   "answer": "Rupee",
    "wrong": [
-    "Albanian lek",
-    "Panamanian balboa",
-    "Belarusian ruble"
+    "Ringgit",
+    "Dollar",
+    "Dirham"
    ],
    "explain": "Sri Lanka uses the Sri Lankan rupee (LKR).",
-   "difficulty": 2
+   "difficulty": 2,
+   "wrongNotes": {
+    "Ringgit": "The ringgit is used in Malaysia.",
+    "Dollar": "The dollar is used in Antigua and Barbuda, Australia, Bahamas and 31 others.",
+    "Dirham": "The dirham is used in Morocco and United Arab Emirates."
+   }
   },
   {
    "id": "cur-sudan",
    "kind": "mc",
    "prompt": "What is the currency of Sudan?",
-   "answer": "Sudanese pound",
+   "answer": "Pound",
    "wrong": [
-    "Fijian dollar",
-    "Mongolian tögrög",
-    "Euro"
+    "Dirham",
+    "Naira",
+    "ZiG"
    ],
    "explain": "Sudan uses the Sudanese pound (SDG).",
-   "difficulty": 2
+   "difficulty": 2,
+   "wrongNotes": {
+    "Dirham": "The dirham is used in Morocco and United Arab Emirates.",
+    "Naira": "The naira is used in Nigeria.",
+    "ZiG": "The ZiG is used in Zimbabwe."
+   }
   },
   {
    "id": "cur-suriname",
    "kind": "mc",
    "prompt": "What is the currency of Suriname?",
-   "answer": "Surinamese dollar",
+   "answer": "Dollar",
    "wrong": [
-    "Swazi lilangeni",
-    "Angolan kwanza",
-    "Haitian gourde"
+    "Bolívar",
+    "Boliviano",
+    "Guaraní"
    ],
    "explain": "Suriname uses the Surinamese dollar (SRD).",
-   "difficulty": 3
+   "difficulty": 3,
+   "wrongNotes": {
+    "Bolívar": "The bolívar is used in Venezuela.",
+    "Boliviano": "The boliviano is used in Bolivia.",
+    "Guaraní": "The guaraní is used in Paraguay."
+   }
   },
   {
    "id": "cur-sweden",
    "kind": "mc",
    "prompt": "What is the currency of Sweden?",
-   "answer": "Swedish krona",
+   "answer": "Króna",
    "wrong": [
-    "Omani rial",
-    "United States dollar",
-    "Venezuelan bolívar"
+    "Koruna",
+    "Pound",
+    "Franc"
    ],
    "explain": "Sweden uses the Swedish krona (SEK).",
-   "difficulty": 1
+   "difficulty": 1,
+   "wrongNotes": {
+    "Koruna": "The koruna is used in Czechia.",
+    "Pound": "The pound is used in Egypt, Lebanon, South Sudan and 3 others.",
+    "Franc": "The franc is used in Burundi, Comoros, Democratic Republic of the Congo and 5 others."
+   }
   },
   {
    "id": "curr-sweden",
@@ -5000,77 +5865,107 @@
     "Bosnia and Herzegovina"
    ],
    "explain": "The Swedish krona is the currency of Sweden.",
-   "difficulty": 2
+   "difficulty": 1,
+   "wrongNotes": {
+    "Bulgaria": "Bulgaria uses the Euro.",
+    "Moldova": "Moldova uses the Moldovan leu.",
+    "Bosnia and Herzegovina": "Bosnia and Herzegovina uses the Bosnia and Herzegovina convertible mark."
+   }
   },
   {
    "id": "cur-switzerland",
    "kind": "mc",
    "prompt": "What is the currency of Switzerland?",
-   "answer": "Swiss franc",
+   "answer": "Franc",
    "wrong": [
-    "Bangladeshi taka",
-    "Renminbi (yuan)",
-    "Peruvian sol"
+    "Ruble",
+    "Euro",
+    "Forint"
    ],
    "explain": "Switzerland uses the Swiss franc (CHF).",
-   "difficulty": 1
+   "difficulty": 1,
+   "wrongNotes": {
+    "Ruble": "The ruble is used in Belarus and Russia.",
+    "Euro": "The euro is used in Andorra, Austria, Belgium and 23 others.",
+    "Forint": "The forint is used in Hungary."
+   }
   },
   {
    "id": "cur-syria",
    "kind": "mc",
    "prompt": "What is the currency of Syria?",
-   "answer": "Syrian pound",
+   "answer": "Pound",
    "wrong": [
-    "Vietnamese đồng",
-    "Zambian kwacha",
-    "Swazi lilangeni"
+    "Somoni",
+    "Rupiah",
+    "Tögrög"
    ],
    "explain": "Syria uses the Syrian pound (SYP).",
-   "difficulty": 2
+   "difficulty": 2,
+   "wrongNotes": {
+    "Somoni": "The somoni is used in Tajikistan.",
+    "Rupiah": "The rupiah is used in Indonesia.",
+    "Tögrög": "The tögrög is used in Mongolia."
+   }
   },
   {
    "id": "cur-tajikistan",
    "kind": "mc",
    "prompt": "What is the currency of Tajikistan?",
-   "answer": "Tajikistani somoni",
+   "answer": "Somoni",
    "wrong": [
-    "Bosnia and Herzegovina convertible mark",
-    "Guyanese dollar",
-    "Vanuatu vatu"
+    "Rufiyaa",
+    "Manat",
+    "Yen"
    ],
    "explain": "Tajikistan uses the Tajikistani somoni (TJS).",
-   "difficulty": 2
+   "difficulty": 2,
+   "wrongNotes": {
+    "Rufiyaa": "The rufiyaa is used in Maldives.",
+    "Manat": "The manat is used in Azerbaijan and Turkmenistan.",
+    "Yen": "The yen is used in Japan."
+   }
   },
   {
    "id": "cur-tanzania",
    "kind": "mc",
    "prompt": "What is the currency of Tanzania?",
-   "answer": "Tanzanian shilling",
+   "answer": "Shilling",
    "wrong": [
-    "Canadian dollar",
-    "Myanmar kyat",
-    "Guyanese dollar"
+    "Lilangeni",
+    "Pound",
+    "ZiG"
    ],
    "explain": "Tanzania uses the Tanzanian shilling (TZS).",
-   "difficulty": 2
+   "difficulty": 2,
+   "wrongNotes": {
+    "Lilangeni": "The lilangeni is used in Eswatini.",
+    "Pound": "The pound is used in Egypt, Lebanon, South Sudan and 3 others.",
+    "ZiG": "The ZiG is used in Zimbabwe."
+   }
   },
   {
    "id": "cur-thailand",
    "kind": "mc",
    "prompt": "What is the currency of Thailand?",
-   "answer": "Thai baht",
+   "answer": "Baht",
    "wrong": [
-    "Solomon Islands dollar",
-    "Jordanian dinar",
-    "Brazilian real"
+    "Ngultrum",
+    "Lira",
+    "Lari"
    ],
    "explain": "Thailand uses the Thai baht (THB).",
-   "difficulty": 1
+   "difficulty": 1,
+   "wrongNotes": {
+    "Ngultrum": "The ngultrum is used in Bhutan.",
+    "Lira": "The lira is used in Turkey.",
+    "Lari": "The lari is used in Georgia."
+   }
   },
   {
    "id": "curr-thailand",
    "kind": "mc",
-   "prompt": "Which country uses the Thai baht?",
+   "prompt": "Which country uses the baht?",
    "answer": "Thailand",
    "wrong": [
     "Maldives",
@@ -5078,163 +5973,228 @@
     "India"
    ],
    "explain": "The Thai baht is the currency of Thailand.",
-   "difficulty": 2
+   "difficulty": 2,
+   "wrongNotes": {
+    "Maldives": "Maldives uses the Maldivian rufiyaa.",
+    "Qatar": "Qatar uses the Qatari riyal.",
+    "India": "India uses the Indian rupee."
+   }
   },
   {
    "id": "cur-timor-leste",
    "kind": "mc",
    "prompt": "What is the currency of Timor-Leste?",
-   "answer": "United States dollar",
+   "answer": "Dollar",
    "wrong": [
-    "Eritrean nakfa",
-    "Mauritian rupee",
-    "Bangladeshi taka"
+    "Sum",
+    "Riyal",
+    "Som"
    ],
    "explain": "Timor-Leste uses the United States dollar (USD).",
-   "difficulty": 3
+   "difficulty": 3,
+   "wrongNotes": {
+    "Sum": "The sum is used in Uzbekistan.",
+    "Riyal": "The riyal is used in Qatar and Saudi Arabia.",
+    "Som": "The som is used in Kyrgyzstan."
+   }
   },
   {
    "id": "cur-togo",
    "kind": "mc",
    "prompt": "What is the currency of Togo?",
-   "answer": "West African CFA franc",
+   "answer": "CFA franc",
    "wrong": [
-    "Armenian dram",
-    "Cuban peso",
-    "Djiboutian franc"
+    "Metical",
+    "Dinar",
+    "Pula"
    ],
    "explain": "Togo uses the West African CFA franc (XOF).",
-   "difficulty": 2
+   "difficulty": 2,
+   "wrongNotes": {
+    "Metical": "The metical is used in Mozambique.",
+    "Dinar": "The dinar is used in Algeria, Bahrain, Iraq and 5 others.",
+    "Pula": "The pula is used in Botswana."
+   }
   },
   {
    "id": "cur-tonga",
    "kind": "mc",
    "prompt": "What is the currency of Tonga?",
-   "answer": "Tongan paʻanga",
+   "answer": "Paʻanga",
    "wrong": [
-    "Australian dollar",
-    "Icelandic króna",
-    "Nicaraguan córdoba"
+    "Tālā",
+    "Kina",
+    "Dollar"
    ],
    "explain": "Tonga uses the Tongan paʻanga (TOP).",
-   "difficulty": 3
+   "difficulty": 3,
+   "wrongNotes": {
+    "Tālā": "The tālā is used in Samoa.",
+    "Kina": "The kina is used in Papua New Guinea.",
+    "Dollar": "The dollar is used in Antigua and Barbuda, Australia, Bahamas and 31 others."
+   }
   },
   {
    "id": "cur-trinidad-and-tobago",
    "kind": "mc",
    "prompt": "What is the currency of Trinidad and Tobago?",
-   "answer": "Trinidad and Tobago dollar",
+   "answer": "Trinidad",
    "wrong": [
-    "Czech koruna",
-    "Central African CFA franc",
-    "Romanian leu"
+    "Córdoba",
+    "Lempira",
+    "Quetzal"
    ],
    "explain": "Trinidad and Tobago uses the Trinidad and Tobago dollar (TTD).",
-   "difficulty": 3
+   "difficulty": 1,
+   "wrongNotes": {
+    "Córdoba": "The córdoba is used in Nicaragua.",
+    "Lempira": "The lempira is used in Honduras.",
+    "Quetzal": "The quetzal is used in Guatemala."
+   }
   },
   {
    "id": "cur-tunisia",
    "kind": "mc",
    "prompt": "What is the currency of Tunisia?",
-   "answer": "Tunisian dinar",
+   "answer": "Dinar",
    "wrong": [
-    "South African rand",
-    "Argentine peso",
-    "Indian rupee"
+    "Pound",
+    "Rupee",
+    "Franc"
    ],
    "explain": "Tunisia uses the Tunisian dinar (TND).",
-   "difficulty": 2
+   "difficulty": 2,
+   "wrongNotes": {
+    "Pound": "The pound is used in Egypt, Lebanon, South Sudan and 3 others.",
+    "Rupee": "The rupee is used in India, Mauritius, Nepal and 3 others.",
+    "Franc": "The franc is used in Burundi, Comoros, Democratic Republic of the Congo and 5 others."
+   }
   },
   {
    "id": "cur-turkey",
    "kind": "mc",
    "prompt": "What is the currency of Turkey?",
-   "answer": "Turkish lira",
+   "answer": "Lira",
    "wrong": [
-    "Yemeni rial",
-    "Surinamese dollar",
-    "Zambian kwacha"
+    "Ngultrum",
+    "Rupee",
+    "Riyal"
    ],
    "explain": "Turkey uses the Turkish lira (TRY).",
-   "difficulty": 1
+   "difficulty": 1,
+   "wrongNotes": {
+    "Ngultrum": "The ngultrum is used in Bhutan.",
+    "Rupee": "The rupee is used in India, Mauritius, Nepal and 3 others.",
+    "Riyal": "The riyal is used in Qatar and Saudi Arabia."
+   }
   },
   {
    "id": "cur-turkmenistan",
    "kind": "mc",
    "prompt": "What is the currency of Turkmenistan?",
-   "answer": "Turkmenistan manat",
+   "answer": "Manat",
    "wrong": [
-    "Macedonian denar",
-    "Seychellois rupee",
-    "Comorian franc"
+    "Baht",
+    "Dirham",
+    "Riyal"
    ],
    "explain": "Turkmenistan uses the Turkmenistan manat (TMT).",
-   "difficulty": 2
+   "difficulty": 2,
+   "wrongNotes": {
+    "Baht": "The baht is used in Thailand.",
+    "Dirham": "The dirham is used in Morocco and United Arab Emirates.",
+    "Riyal": "The riyal is used in Qatar and Saudi Arabia."
+   }
   },
   {
    "id": "cur-tuvalu",
    "kind": "mc",
    "prompt": "What is the currency of Tuvalu?",
-   "answer": "Australian dollar",
+   "answer": "Dollar",
    "wrong": [
-    "Chilean peso",
-    "Bolivian boliviano",
-    "South Sudanese pound"
+    "Paʻanga",
+    "Kina",
+    "Vatu"
    ],
    "explain": "Tuvalu uses the Australian dollar (AUD).",
-   "difficulty": 3
+   "difficulty": 3,
+   "wrongNotes": {
+    "Paʻanga": "The paʻanga is used in Tonga.",
+    "Kina": "The kina is used in Papua New Guinea.",
+    "Vatu": "The vatu is used in Vanuatu."
+   }
   },
   {
    "id": "cur-uganda",
    "kind": "mc",
    "prompt": "What is the currency of Uganda?",
-   "answer": "Ugandan shilling",
+   "answer": "Shilling",
    "wrong": [
-    "Peruvian sol",
-    "South African rand",
-    "Tanzanian shilling"
+    "Escudo",
+    "Leone",
+    "Naira"
    ],
    "explain": "Uganda uses the Ugandan shilling (UGX).",
-   "difficulty": 2
+   "difficulty": 2,
+   "wrongNotes": {
+    "Escudo": "The escudo is used in Cape Verde.",
+    "Leone": "The leone is used in Sierra Leone.",
+    "Naira": "The naira is used in Nigeria."
+   }
   },
   {
    "id": "cur-ukraine",
    "kind": "mc",
    "prompt": "What is the currency of Ukraine?",
-   "answer": "Ukrainian hryvnia",
+   "answer": "Hryvnia",
    "wrong": [
-    "Cuban peso",
-    "Surinamese dollar",
-    "São Tomé and Príncipe dobra"
+    "Forint",
+    "Króna",
+    "Euro"
    ],
    "explain": "Ukraine uses the Ukrainian hryvnia (UAH).",
-   "difficulty": 2
+   "difficulty": 2,
+   "wrongNotes": {
+    "Forint": "The forint is used in Hungary.",
+    "Króna": "The króna is used in Iceland and Sweden.",
+    "Euro": "The euro is used in Andorra, Austria, Belgium and 23 others."
+   }
   },
   {
    "id": "cur-united-arab-emirates",
    "kind": "mc",
    "prompt": "What is the currency of the United Arab Emirates?",
-   "answer": "UAE dirham",
+   "answer": "Dirham",
    "wrong": [
-    "East Caribbean dollar",
-    "Somali shilling",
-    "Georgian lari"
+    "Baht",
+    "Ringgit",
+    "Manat"
    ],
    "explain": "The United Arab Emirates uses the UAE dirham (AED).",
-   "difficulty": 2
+   "difficulty": 2,
+   "wrongNotes": {
+    "Baht": "The baht is used in Thailand.",
+    "Ringgit": "The ringgit is used in Malaysia.",
+    "Manat": "The manat is used in Azerbaijan and Turkmenistan."
+   }
   },
   {
    "id": "cur-united-kingdom",
    "kind": "mc",
    "prompt": "What is the currency of the United Kingdom?",
-   "answer": "Pound sterling",
+   "answer": "Pound",
    "wrong": [
-    "Sri Lankan rupee",
-    "Nigerian naira",
-    "Australian dollar"
+    "Króna",
+    "Franc",
+    "Krone"
    ],
    "explain": "The United Kingdom uses the Pound sterling (GBP).",
-   "difficulty": 1
+   "difficulty": 1,
+   "wrongNotes": {
+    "Króna": "The króna is used in Iceland and Sweden.",
+    "Franc": "The franc is used in Burundi, Comoros, Democratic Republic of the Congo and 5 others.",
+    "Krone": "The krone is used in Denmark and Norway."
+   }
   },
   {
    "id": "curr-united-kingdom",
@@ -5247,59 +6207,84 @@
     "Iceland"
    ],
    "explain": "The Pound sterling is the currency of the United Kingdom.",
-   "difficulty": 2
+   "difficulty": 2,
+   "wrongNotes": {
+    "Finland": "Finland uses the Euro.",
+    "Andorra": "Andorra uses the Euro.",
+    "Iceland": "Iceland uses the Icelandic króna."
+   }
   },
   {
    "id": "cur-united-states",
    "kind": "mc",
    "prompt": "What is the currency of the United States?",
-   "answer": "United States dollar",
+   "answer": "Dollar",
    "wrong": [
-    "Kyrgyz som",
-    "Bhutanese ngultrum",
-    "Cape Verdean escudo"
+    "Córdoba",
+    "Peso",
+    "Colón"
    ],
    "explain": "The United States uses the United States dollar (USD).",
-   "difficulty": 1
+   "difficulty": 1,
+   "wrongNotes": {
+    "Córdoba": "The córdoba is used in Nicaragua.",
+    "Peso": "The peso is used in Argentina, Chile, Colombia and 5 others.",
+    "Colón": "The colón is used in Costa Rica."
+   }
   },
   {
    "id": "cur-uruguay",
    "kind": "mc",
    "prompt": "What is the currency of Uruguay?",
-   "answer": "Uruguayan peso",
+   "answer": "Peso",
    "wrong": [
-    "Tajikistani somoni",
-    "Nigerian naira",
-    "Kenyan shilling"
+    "Sol",
+    "Bolívar",
+    "Real"
    ],
    "explain": "Uruguay uses the Uruguayan peso (UYU).",
-   "difficulty": 2
+   "difficulty": 2,
+   "wrongNotes": {
+    "Sol": "The sol is used in Peru.",
+    "Bolívar": "The bolívar is used in Venezuela.",
+    "Real": "The real is used in Brazil."
+   }
   },
   {
    "id": "cur-uzbekistan",
    "kind": "mc",
    "prompt": "What is the currency of Uzbekistan?",
-   "answer": "Uzbekistani sum",
+   "answer": "Sum",
    "wrong": [
-    "Dominican peso",
-    "Central African CFA franc",
-    "Philippine peso"
+    "Tenge",
+    "Tögrög",
+    "Afghani"
    ],
    "explain": "Uzbekistan uses the Uzbekistani sum (UZS).",
-   "difficulty": 2
+   "difficulty": 2,
+   "wrongNotes": {
+    "Tenge": "The tenge is used in Kazakhstan.",
+    "Tögrög": "The tögrög is used in Mongolia.",
+    "Afghani": "The afghani is used in Afghanistan."
+   }
   },
   {
    "id": "cur-vanuatu",
    "kind": "mc",
    "prompt": "What is the currency of Vanuatu?",
-   "answer": "Vanuatu vatu",
+   "answer": "Vatu",
    "wrong": [
-    "Tajikistani somoni",
-    "Swedish krona",
-    "Comorian franc"
+    "Tālā",
+    "Dollar",
+    "Paʻanga"
    ],
    "explain": "Vanuatu uses the Vanuatu vatu (VUV).",
-   "difficulty": 3
+   "difficulty": 3,
+   "wrongNotes": {
+    "Tālā": "The tālā is used in Samoa.",
+    "Dollar": "The dollar is used in Antigua and Barbuda, Australia, Bahamas and 31 others.",
+    "Paʻanga": "The paʻanga is used in Tonga."
+   }
   },
   {
    "id": "cur-vatican-city",
@@ -5307,64 +6292,89 @@
    "prompt": "What is the currency of Vatican City?",
    "answer": "Euro",
    "wrong": [
-    "Moldovan leu",
-    "Uruguayan peso",
-    "Bosnia and Herzegovina convertible mark"
+    "Denar",
+    "Króna",
+    "Lek"
    ],
    "explain": "Vatican City uses the Euro (EUR).",
-   "difficulty": 3
+   "difficulty": 3,
+   "wrongNotes": {
+    "Denar": "The denar is used in North Macedonia.",
+    "Króna": "The króna is used in Iceland and Sweden.",
+    "Lek": "The lek is used in Albania."
+   }
   },
   {
    "id": "cur-venezuela",
    "kind": "mc",
    "prompt": "What is the currency of Venezuela?",
-   "answer": "Venezuelan bolívar",
+   "answer": "Bolívar",
    "wrong": [
-    "Afghan afghani",
-    "Bahraini dinar",
-    "Israeli new shekel"
+    "Real",
+    "Peso",
+    "Dollar"
    ],
    "explain": "Venezuela uses the Venezuelan bolívar (VES).",
-   "difficulty": 2
+   "difficulty": 2,
+   "wrongNotes": {
+    "Real": "The real is used in Brazil.",
+    "Peso": "The peso is used in Argentina, Chile, Colombia and 5 others.",
+    "Dollar": "The dollar is used in Antigua and Barbuda, Australia, Bahamas and 31 others."
+   }
   },
   {
    "id": "cur-vietnam",
    "kind": "mc",
    "prompt": "What is the currency of Vietnam?",
-   "answer": "Vietnamese đồng",
+   "answer": "Đồng",
    "wrong": [
-    "Costa Rican colón",
-    "Djiboutian franc",
-    "Somali shilling"
+    "Kip",
+    "Tenge",
+    "Pound"
    ],
    "explain": "Vietnam uses the Vietnamese đồng (VND).",
-   "difficulty": 2
+   "difficulty": 2,
+   "wrongNotes": {
+    "Kip": "The kip is used in Laos.",
+    "Tenge": "The tenge is used in Kazakhstan.",
+    "Pound": "The pound is used in Egypt, Lebanon, South Sudan and 3 others."
+   }
   },
   {
    "id": "cur-yemen",
    "kind": "mc",
    "prompt": "What is the currency of Yemen?",
-   "answer": "Yemeni rial",
+   "answer": "Rial",
    "wrong": [
-    "Philippine peso",
-    "Eritrean nakfa",
-    "Samoan tālā"
+    "Som",
+    "Dinar",
+    "Dirham"
    ],
    "explain": "Yemen uses the Yemeni rial (YER).",
-   "difficulty": 2
+   "difficulty": 2,
+   "wrongNotes": {
+    "Som": "The som is used in Kyrgyzstan.",
+    "Dinar": "The dinar is used in Algeria, Bahrain, Iraq and 5 others.",
+    "Dirham": "The dirham is used in Morocco and United Arab Emirates."
+   }
   },
   {
    "id": "cur-zambia",
    "kind": "mc",
    "prompt": "What is the currency of Zambia?",
-   "answer": "Zambian kwacha",
+   "answer": "Kwacha",
    "wrong": [
-    "Mauritanian ouguiya",
-    "Macedonian denar",
-    "Syrian pound"
+    "Lilangeni",
+    "Loti",
+    "Birr"
    ],
    "explain": "Zambia uses the Zambian kwacha (ZMW).",
-   "difficulty": 2
+   "difficulty": 2,
+   "wrongNotes": {
+    "Lilangeni": "The lilangeni is used in Eswatini.",
+    "Loti": "The loti is used in Lesotho.",
+    "Birr": "The birr is used in Ethiopia."
+   }
   },
   {
    "id": "cur-eurozone-2026",

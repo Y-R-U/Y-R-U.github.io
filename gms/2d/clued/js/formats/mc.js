@@ -1,8 +1,8 @@
 import {
   register, poolItems, packQuestions, pickPack, distractors, byDifficulty, imageOf, hasImg, fill, factText,
   spreadApart, placeAnswer, collect, pick, shuffle, sample, factAllowed, nested, nameArgs, catAsk, boolAsk, numAsk,
-} from './registry.js?v=202610100547';
-import { layout, choiceGrid } from '../ui/kit.js?v=202610100547';
+} from './registry.js?v=202610101826';
+import { layout, choiceGrid } from '../ui/kit.js?v=202610101826';
 
 const PROMPTS = { nameImg: 'Which of these is {aName}?', imgName: 'What is this?' };
 
@@ -38,11 +38,14 @@ function fromQuestion(rng, pack, n, difficulty) {
   const qs = byDifficulty(full.length ? full : mcs.filter(q => (q.wrong || []).length >= 2), difficulty, 1);
   if (!qs.length) return null;
   const q = pick(rng, qs);
-  const { options, answer } = placeAnswer(rng, q.answer, sample(rng, q.wrong, Math.min(n - 1, q.wrong.length)));
+  const wrong = sample(rng, q.wrong, Math.min(n - 1, q.wrong.length));
+  const { options, answer } = placeAnswer(rng, q.answer, wrong);
+  const notes = q.wrongNotes && wrong.filter(w => q.wrongNotes[w]).map(w => [String(w), q.wrongNotes[w]]);
   return {
     format: 'mc', id: `mc:${pack.id}/q:${q.id}`, prompt: q.prompt, media: q.media && Object.keys(q.media).length ? q.media : undefined,
     options: options.map(t => ({ text: String(t) })), answer, answerText: String(q.answer),
     explain: q.explain, refs: [`${pack.id}/q:${q.id}`], hint: `It starts with “${String(q.answer).charAt(0)}”`,
+    ...(notes?.length ? { wrongNotes: Object.fromEntries(notes) } : {}),
   };
 }
 
@@ -170,18 +173,22 @@ export default register({
   render(el, q, api) {
     const imgs = q.data?.layout === 'images';
     const { answersEl } = layout(el, { prompt: q.prompt, media: q.media, compact: imgs });
+    let picked = -1;
     const grid = choiceGrid(answersEl, q.options, {
       images: imgs,
       onPick(i) {
         grid.lock();
+        picked = i;
+        if (q.hidden) { api.answer({ correct: false, given: i, pending: true }); return; }
         grid.mark(q.answer, i);
         api.answer({ correct: i === q.answer, given: i });
       },
     });
     return {
       destroy: () => grid.destroy(),
-      timeout() { grid.lock(); grid.mark(q.answer, -1); },
-      eliminate(k = 2) { grid.eliminate(q.answer, k, api.rng || Math.random); },
+      timeout() { grid.lock(); if (!q.hidden) grid.mark(q.answer, -1); },
+      settle(full) { grid.lock(); grid.mark(full.answer, picked); },
+      eliminate(k = 2) { if (!q.hidden) grid.eliminate(q.answer, k, api.rng || Math.random); },
       choose(x) { grid.pick(x === 'correct' ? q.answer : x === 'wrong' ? (q.answer + 1) % q.options.length : +x); },
     };
   },

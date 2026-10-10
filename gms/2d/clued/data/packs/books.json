@@ -4056,7 +4056,7 @@
   {
    "id": "first-emma",
    "kind": "mc",
-   "prompt": "Which book begins: “Emma Woodhouse, handsome, clever, and rich, with a comfortable home and happy disposition, seemed to unite some of the best blessings of existence…”",
+   "prompt": "Which book begins: “___ ___, handsome, clever, and rich, with a comfortable home and happy disposition, seemed to unite some of the best blessings of existence…”",
    "answer": "Emma",
    "wrong": [
     "The War of the Worlds",

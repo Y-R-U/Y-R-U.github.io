@@ -77,7 +77,8 @@
      }
     ]
    },
-   "difficulty": 1
+   "difficulty": 1,
+   "gender": "m"
   },
   {
    "id": "ibn-battuta",
@@ -112,7 +113,8 @@
      }
     ]
    },
-   "difficulty": 3
+   "difficulty": 3,
+   "gender": "m"
   },
   {
    "id": "zheng-he",
@@ -147,7 +149,8 @@
      }
     ]
    },
-   "difficulty": 3
+   "difficulty": 3,
+   "gender": "m"
   },
   {
    "id": "christopher-columbus",
@@ -185,7 +188,8 @@
      }
     ]
    },
-   "difficulty": 1
+   "difficulty": 1,
+   "gender": "m"
   },
   {
    "id": "ferdinand-magellan",
@@ -222,7 +226,8 @@
      }
     ]
    },
-   "difficulty": 1
+   "difficulty": 1,
+   "gender": "m"
   },
   {
    "id": "hernan-cortes",
@@ -260,7 +265,8 @@
      }
     ]
    },
-   "difficulty": 3
+   "difficulty": 3,
+   "gender": "m"
   },
   {
    "id": "abel-tasman",
@@ -297,7 +303,8 @@
      }
     ]
    },
-   "difficulty": 3
+   "difficulty": 3,
+   "gender": "m"
   },
   {
    "id": "james-cook",
@@ -334,7 +341,8 @@
      }
     ]
    },
-   "difficulty": 1
+   "difficulty": 1,
+   "gender": "m"
   },
   {
    "id": "david-livingstone",
@@ -370,7 +378,8 @@
      }
     ]
    },
-   "difficulty": 1
+   "difficulty": 1,
+   "gender": "m"
   },
   {
    "id": "matthew-henson",
@@ -407,7 +416,8 @@
      }
     ]
    },
-   "difficulty": 3
+   "difficulty": 3,
+   "gender": "m"
   },
   {
    "id": "robert-falcon-scott",
@@ -444,7 +454,8 @@
      }
     ]
    },
-   "difficulty": 1
+   "difficulty": 1,
+   "gender": "m"
   },
   {
    "id": "roald-amundsen",
@@ -481,7 +492,8 @@
      }
     ]
    },
-   "difficulty": 1
+   "difficulty": 1,
+   "gender": "m"
   },
   {
    "id": "ernest-shackleton",
@@ -518,7 +530,8 @@
      }
     ]
    },
-   "difficulty": 1
+   "difficulty": 1,
+   "gender": "m"
   },
   {
    "id": "amelia-earhart",
@@ -555,7 +568,8 @@
      }
     ]
    },
-   "difficulty": 1
+   "difficulty": 1,
+   "gender": "f"
   },
   {
    "id": "charles-lindbergh",
@@ -592,7 +606,8 @@
      }
     ]
    },
-   "difficulty": 2
+   "difficulty": 2,
+   "gender": "m"
   },
   {
    "id": "jacques-cousteau",
@@ -629,7 +644,8 @@
      }
     ]
    },
-   "difficulty": 2
+   "difficulty": 2,
+   "gender": "m"
   },
   {
    "id": "tenzing-norgay",
@@ -666,7 +682,8 @@
      }
     ]
    },
-   "difficulty": 1
+   "difficulty": 1,
+   "gender": "m"
   },
   {
    "id": "edmund-hillary",
@@ -704,7 +721,8 @@
      }
     ]
    },
-   "difficulty": 1
+   "difficulty": 1,
+   "gender": "m"
   },
   {
    "id": "neil-armstrong",
@@ -741,7 +759,8 @@
      }
     ]
    },
-   "difficulty": 1
+   "difficulty": 1,
+   "gender": "m"
   },
   {
    "id": "buzz-aldrin",
@@ -776,7 +795,8 @@
      }
     ]
    },
-   "difficulty": 1
+   "difficulty": 1,
+   "gender": "m"
   },
   {
    "id": "yuri-gagarin",
@@ -813,7 +833,8 @@
      }
     ]
    },
-   "difficulty": 1
+   "difficulty": 1,
+   "gender": "m"
   },
   {
    "id": "valentina-tereshkova",
@@ -849,7 +870,8 @@
      }
     ]
    },
-   "difficulty": 1
+   "difficulty": 1,
+   "gender": "f"
   },
   {
    "id": "sally-ride",
@@ -886,7 +908,8 @@
      }
     ]
    },
-   "difficulty": 2
+   "difficulty": 2,
+   "gender": "f"
   }
  ],
  "questions": [
@@ -897,8 +920,8 @@
    "answer": "Marco Polo",
    "wrong": [
     "Matthew Henson",
-    "Valentina Tereshkova",
-    "Tenzing Norgay"
+    "Tenzing Norgay",
+    "Zheng He"
    ],
    "explain": "Marco Polo (1254–1324): A Venetian traveller who wrote about China.",
    "difficulty": 1,
@@ -928,9 +951,9 @@
    "prompt": "Who is this? He was a Muslim explorer of Africa and Asia.",
    "answer": "Ibn Battuta",
    "wrong": [
-    "Valentina Tereshkova",
     "Abel Tasman",
-    "Tenzing Norgay"
+    "Tenzing Norgay",
+    "Neil Armstrong"
    ],
    "explain": "Ibn Battuta (1304–1368): A Muslim explorer of Africa and Asia.",
    "difficulty": 3,
@@ -960,9 +983,9 @@
    "prompt": "Who is this? He was a Chinese admiral and explorer.",
    "answer": "Zheng He",
    "wrong": [
-    "Valentina Tereshkova",
     "Jacques Cousteau",
-    "Ernest Shackleton"
+    "Ernest Shackleton",
+    "Yuri Gagarin"
    ],
    "explain": "Zheng He (1371–1433): A Chinese admiral and explorer.",
    "difficulty": 3,
@@ -1089,8 +1112,8 @@
    "answer": "Abel Tasman",
    "wrong": [
     "Tenzing Norgay",
-    "Sally Ride",
-    "Ferdinand Magellan"
+    "Ferdinand Magellan",
+    "Neil Armstrong"
    ],
    "explain": "Abel Tasman (1603–1659): A Dutch seafarer.",
    "difficulty": 3,
@@ -1154,7 +1177,7 @@
    "wrong": [
     "Zheng He",
     "Tenzing Norgay",
-    "Valentina Tereshkova"
+    "Ibn Battuta"
    ],
    "explain": "David Livingstone (1813–1873): A Scottish explorer of Africa.",
    "difficulty": 1,
@@ -1186,7 +1209,7 @@
    "wrong": [
     "Robert Falcon Scott",
     "Hernán Cortés",
-    "Sally Ride"
+    "Abel Tasman"
    ],
    "explain": "Matthew Henson (1866–1955): An African American Arctic explorer.",
    "difficulty": 3,
@@ -1280,9 +1303,9 @@
    "prompt": "Who is this? He brought all his men home after their ship sank.",
    "answer": "Ernest Shackleton",
    "wrong": [
-    "Sally Ride",
     "Neil Armstrong",
-    "Christopher Columbus"
+    "Christopher Columbus",
+    "Abel Tasman"
    ],
    "explain": "Ernest Shackleton (1874–1922): Brought all his men home after their ship sank.",
    "difficulty": 1,
@@ -1313,8 +1336,7 @@
    "answer": "Amelia Earhart",
    "wrong": [
     "Sally Ride",
-    "James Cook",
-    "Tenzing Norgay"
+    "Valentina Tereshkova"
    ],
    "explain": "Amelia Earhart (1897–1939): A famous American aviator.",
    "difficulty": 1,
@@ -1378,7 +1400,7 @@
    "wrong": [
     "Abel Tasman",
     "Neil Armstrong",
-    "Amelia Earhart"
+    "Yuri Gagarin"
    ],
    "explain": "Jacques Cousteau (1910–1997): A French ocean explorer.",
    "difficulty": 2,
@@ -1408,9 +1430,9 @@
    "prompt": "Who is this? He was one of the first two people to climb Everest.",
    "answer": "Tenzing Norgay",
    "wrong": [
-    "Sally Ride",
     "Ibn Battuta",
-    "Zheng He"
+    "Zheng He",
+    "Buzz Aldrin"
    ],
    "explain": "Tenzing Norgay (1914–1986): One of the first two people to climb Everest.",
    "difficulty": 1,
@@ -1505,8 +1527,8 @@
    "answer": "Buzz Aldrin",
    "wrong": [
     "Marco Polo",
-    "Valentina Tereshkova",
-    "Tenzing Norgay"
+    "Tenzing Norgay",
+    "Ernest Shackleton"
    ],
    "explain": "Buzz Aldrin (1930): The second person to walk on the Moon.",
    "difficulty": 1,
@@ -1537,8 +1559,8 @@
    "answer": "Yuri Gagarin",
    "wrong": [
     "James Cook",
-    "Sally Ride",
-    "Hernán Cortés"
+    "Hernán Cortés",
+    "David Livingstone"
    ],
    "explain": "Yuri Gagarin (1934–1968): The first human in space.",
    "difficulty": 1,
@@ -1568,9 +1590,8 @@
    "prompt": "Who is this? She was the first woman in space.",
    "answer": "Valentina Tereshkova",
    "wrong": [
-    "Matthew Henson",
-    "Jacques Cousteau",
-    "Edmund Hillary"
+    "Sally Ride",
+    "Amelia Earhart"
    ],
    "explain": "Valentina Tereshkova (1937): The first woman in space.",
    "difficulty": 1,
@@ -1601,8 +1622,7 @@
    "answer": "Sally Ride",
    "wrong": [
     "Amelia Earhart",
-    "David Livingstone",
-    "James Cook"
+    "Valentina Tereshkova"
    ],
    "explain": "Sally Ride (1951–2012): The first American woman in space.",
    "difficulty": 2,

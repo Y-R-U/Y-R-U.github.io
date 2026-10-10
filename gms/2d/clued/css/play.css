@@ -97,6 +97,8 @@ body[data-screen=play] { --br8t-account-space: 0px; }
 .choice.right .badge::before { font-size: 20px; }
 .choice.wrong { background: var(--bad); color: #fff; animation: shake .45s; }
 .choice.dim { opacity: .45; transform: scale(.97); }
+.choices.locked:not(.revealed) .choice.picked { outline: 4px solid var(--ink); outline-offset: 2px; }
+.choices.locked:not(.revealed) .choice:not(.picked) { opacity: .6; }
 .choice.gone { visibility: hidden; }
 @keyframes right-pop { 0% { transform: scale(1); } 40% { transform: scale(1.06); } 100% { transform: scale(1); } }
 @keyframes shake { 20%, 60% { transform: translateX(-8px); } 40%, 80% { transform: translateX(8px); } }
@@ -138,6 +140,8 @@ body[data-screen=play] { --br8t-account-space: 0px; }
 .rv-head { display: flex; align-items: center; gap: 10px; }
 .rv-mark { width: 40px; height: 40px; flex: none; border-radius: 50%; display: grid; place-items: center; color: #fff; font-size: 22px; font-weight: 900; border: var(--line) solid var(--ink); background: var(--good); animation: pop-in .4s cubic-bezier(.2, 1.8, .4, 1) both; }
 .reveal.bad .rv-mark { background: var(--bad); }
+.reveal.pending .rv-card { background: #fff8d6; }
+.reveal.pending .rv-mark { background: var(--sun); }
 .rv-title { font-family: var(--font-display); font-size: 26px; flex: 1; }
 .rv-head .pts { font-family: var(--font-display); font-size: 26px; color: var(--good); animation: pop-in .5s .1s both; }
 .star-pop { font-size: 34px; animation: pop-in .6s cubic-bezier(.2, 1.8, .4, 1) both; }

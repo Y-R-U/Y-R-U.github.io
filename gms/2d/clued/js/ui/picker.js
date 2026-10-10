@@ -1,8 +1,8 @@
 // Theme picker: "All" by default, or a Theme -> packs tree with multi-select. Packs that can't play this format are
 // hidden (and themes left empty); one quiet line at the bottom lists them, grouped by reason, for the curious.
-import { h } from './kit.js?v=202610100547';
-import { getIndex } from '../core/packs.js?v=202610100547';
-import { supportsPack, NOT_ENOUGH } from '../formats/registry.js?v=202610100547';
+import { h } from './kit.js?v=202610101826';
+import { getIndex } from '../core/packs.js?v=202610101826';
+import { supportsPack, NOT_ENOUGH } from '../formats/registry.js?v=202610101826';
 
 const shortWhy = (w, kids) => (w === NOT_ENOUGH ? (kids ? 'Not enough easy questions for this game yet' : 'Too few questions for this game yet') : w);
 

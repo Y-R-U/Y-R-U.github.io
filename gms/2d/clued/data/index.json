@@ -1,5 +1,5 @@
 {
- "build": "202610081215",
+ "build": "202610101807",
  "themes": [
   {
    "id": "animals",
@@ -998,7 +998,7 @@
      "number": 1,
      "tf": 44
     },
-    "easy": 81,
+    "easy": 91,
     "kidsItems": 0,
     "multi": [
      "continent"
@@ -2774,7 +2774,7 @@
     "qkinds": {
      "mc": 327
     },
-    "easy": 68,
+    "easy": 129,
     "kidsItems": 0,
     "multi": [],
     "catBins": {

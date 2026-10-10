@@ -1,8 +1,8 @@
-import { register, collect, pick, shuffle } from '../../formats/registry.js?v=202610100547';
-import { geo, countryIds, createMap, frame, message, revealCard, isKids, cname, theName, byLevel, refFor, supportsGeo, CONTINENTS, loadFlags } from './common.js?v=202610100547';
-import { loadCities, geo as G } from '../data.js?v=202610100547';
-import { CONTINENT_FILL } from '../style.js?v=202610100547';
-import { LAT, LON, STEP, CODES as BAND_CODES } from '../bands.js?v=202610100547';
+import { register, collect, pick, shuffle } from '../../formats/registry.js?v=202610101826';
+import { geo, countryIds, createMap, frame, message, revealCard, isKids, cname, theName, byLevel, refFor, supportsGeo, CONTINENTS, loadFlags } from './common.js?v=202610101826';
+import { loadCities, geo as G } from '../data.js?v=202610101826';
+import { CONTINENT_FILL } from '../style.js?v=202610101826';
+import { LAT, LON, STEP, CODES as BAND_CODES } from '../bands.js?v=202610101826';
 
 await loadCities();
 
@@ -112,7 +112,7 @@ export default register({
   },
   render(el, q, api) {
     const kids = isKids(q, api);
-    const d = q.data, tier = d.tier || 'dot', city = d.city;
+    const d = q.data || {}, tier = ['dot', 'line', 'name'].includes(d.tier) ? d.tier : 'dot', city = d.city && Number.isFinite(d.city.lon) && Number.isFinite(d.city.lat) ? d.city : null;
     const ui = frame(el, { prompt: q.prompt });
     let done = false, map = null;
     const subject = city ? city.n : cap(theName(d.iso));
@@ -137,7 +137,8 @@ export default register({
       const b = document.createElement('button');
       b.type = 'button';
       b.style.background = CONTINENT_FILL[o.code];
-      b.innerHTML = `<span aria-hidden="true">${GLOBE[o.code]}</span> ${o.text}`;
+      const g = document.createElement('span'); g.setAttribute('aria-hidden', 'true'); g.textContent = Object.hasOwn(GLOBE, o.code) ? GLOBE[o.code] : '';
+      b.append(g, ` ${o.text ?? ''}`);
       b.addEventListener('click', () => finish(i));
       grid.append(b);
       return b;
@@ -150,9 +151,9 @@ export default register({
       if (city) {
         map.addMarker({ id: 'city', lon: city.lon, lat: city.lat, kind: 'dot', cls: 'ok', label: city.n });
       } else {
-        const [lon, lat] = geo.countries[d.iso].lp;
+        const lp = geo.countries[d.iso]?.lp;
         map.setState(d.iso, 'target');
-        map.addMarker({ id: 'city', lon, lat, kind: 'dot', cls: 'ok', label: cname(d.iso) });
+        if (lp) map.addMarker({ id: 'city', lon: lp[0], lat: lp[1], kind: 'dot', cls: 'ok', label: cname(d.iso) });
       }
     }
     function finish(i) {

@@ -1,20 +1,21 @@
 // Challenge links: "beat my score on this exact set". Create from a results screen, play via ?c=ID.
-import { h, fmtNum } from '../ui/kit.js?v=202610100547';
-import { defineScreen, header, current, reset } from '../ui/app.js?v=202610100547';
-import { popup, toast } from '../ui/popup.js?v=202610100547';
-import { sfx, confetti } from '../ui/fx.js?v=202610100547';
-import { getSettings } from '../core/store.js?v=202610100547';
-import { createRunner } from '../structures/runner.js?v=202610100547';
-import { replayCfg, replayScore } from '../structures/index.js?v=202610100547';
-import { challenges, friendly } from './api.js?v=202610100547';
-import { suggestedName, rememberName, tidyName, MAX_NAME } from './ident.js?v=202610100547';
-import { openShare, challengeUrl, shareOrCopy } from './share.js?v=202610100547';
-import { scoreboard, ordinal, detailOf, comparison } from './board.js?v=202610100547';
-import { ensureStyles, setQuery } from './util.js?v=202610100547';
-import { ensureFormats } from './room.js?v=202610100547';
-import { openSignIn } from './signin.js?v=202610100547';
-import { linkChallengeShare } from './linkchallenge.js?v=202610100547';
-import { recordGame, summarize, playSecs } from '../core/stats.js?v=202610100547';
+import { h, fmtNum } from '../ui/kit.js?v=202610101826';
+import { defineScreen, header, current, reset } from '../ui/app.js?v=202610101826';
+import { popup, toast } from '../ui/popup.js?v=202610101826';
+import { sfx, confetti } from '../ui/fx.js?v=202610101826';
+import { getSettings } from '../core/store.js?v=202610101826';
+import { createRunner } from '../structures/runner.js?v=202610101826';
+import { replayCfg, replayScore } from '../structures/index.js?v=202610101826';
+import { challenges, friendly } from './api.js?v=202610101826';
+import { suggestedName, rememberName, tidyName, MAX_NAME } from './ident.js?v=202610101826';
+import { openShare, challengeUrl, shareOrCopy } from './share.js?v=202610101826';
+import { scoreboard, ordinal, detailOf, comparison } from './board.js?v=202610101826';
+import { ensureStyles, setQuery } from './util.js?v=202610101826';
+import { ensureFormats } from './room.js?v=202610101826';
+import { openSignIn } from './signin.js?v=202610101826';
+import { linkChallengeShare } from './linkchallenge.js?v=202610101826';
+import { recordGame, summarize, playSecs } from '../core/stats.js?v=202610101826';
+import { cleanQuestions } from './sanitize.js?v=202610101826';
 
 const MAX_SET = 500 * 1024;
 
@@ -92,6 +93,13 @@ defineScreen('challenge', async (el, { id }, cur) => {
     return;
   }
   if (cur !== current()) return;
+  c.questions = cleanQuestions(c.questions);
+  if (!c.questions.length) {
+    setQuery('c', null);
+    body.replaceChildren(h('div.panel.net-hero', {}, h('h2', {}, 'This challenge can’t be played')),
+      h('button.btn.primary.wide', { type: 'button', onclick: () => reset('home') }, 'Home'));
+    return;
+  }
   const kids = !!c.spec?.kids;
   let run = null;
 

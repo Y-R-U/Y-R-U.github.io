@@ -79,7 +79,8 @@
      }
     ]
    },
-   "difficulty": 1
+   "difficulty": 1,
+   "gender": "m"
   },
   {
    "id": "cleopatra",
@@ -116,7 +117,8 @@
      }
     ]
    },
-   "difficulty": 1
+   "difficulty": 1,
+   "gender": "f"
   },
   {
    "id": "alexander-the-great",
@@ -152,7 +154,8 @@
      }
     ]
    },
-   "difficulty": 1
+   "difficulty": 1,
+   "gender": "m"
   },
   {
    "id": "augustus",
@@ -189,7 +192,8 @@
      }
     ]
    },
-   "difficulty": 2
+   "difficulty": 2,
+   "gender": "m"
   },
   {
    "id": "qin-shi-huang",
@@ -226,7 +230,8 @@
      }
     ]
    },
-   "difficulty": 2
+   "difficulty": 2,
+   "gender": "m"
   },
   {
    "id": "genghis-khan",
@@ -261,7 +266,8 @@
      }
     ]
    },
-   "difficulty": 1
+   "difficulty": 1,
+   "gender": "m"
   },
   {
    "id": "charlemagne",
@@ -295,7 +301,8 @@
      }
     ]
    },
-   "difficulty": 2
+   "difficulty": 2,
+   "gender": "m"
   },
   {
    "id": "henry-viii",
@@ -331,7 +338,8 @@
      }
     ]
    },
-   "difficulty": 1
+   "difficulty": 1,
+   "gender": "m"
   },
   {
    "id": "elizabeth-i",
@@ -367,7 +375,8 @@
      }
     ]
    },
-   "difficulty": 1
+   "difficulty": 1,
+   "gender": "f"
   },
   {
    "id": "louis-xiv",
@@ -396,7 +405,8 @@
      }
     ]
    },
-   "difficulty": 2
+   "difficulty": 2,
+   "gender": "m"
   },
   {
    "id": "peter-the-great",
@@ -425,7 +435,8 @@
      }
     ]
    },
-   "difficulty": 2
+   "difficulty": 2,
+   "gender": "m"
   },
   {
    "id": "catherine-the-great",
@@ -462,7 +473,8 @@
      }
     ]
    },
-   "difficulty": 2
+   "difficulty": 2,
+   "gender": "f"
   },
   {
    "id": "george-washington",
@@ -499,7 +511,8 @@
      }
     ]
    },
-   "difficulty": 1
+   "difficulty": 1,
+   "gender": "m"
   },
   {
    "id": "napoleon-bonaparte",
@@ -537,7 +550,8 @@
      }
     ]
    },
-   "difficulty": 1
+   "difficulty": 1,
+   "gender": "m"
   },
   {
    "id": "simon-bolivar",
@@ -574,7 +588,8 @@
      }
     ]
    },
-   "difficulty": 2
+   "difficulty": 2,
+   "gender": "m"
   },
   {
    "id": "queen-victoria",
@@ -611,7 +626,8 @@
      }
     ]
    },
-   "difficulty": 1
+   "difficulty": 1,
+   "gender": "f"
   },
   {
    "id": "abraham-lincoln",
@@ -649,7 +665,8 @@
      }
     ]
    },
-   "difficulty": 1
+   "difficulty": 1,
+   "gender": "m"
   },
   {
    "id": "otto-von-bismarck",
@@ -686,7 +703,8 @@
      }
     ]
    },
-   "difficulty": 3
+   "difficulty": 3,
+   "gender": "m"
   },
   {
    "id": "theodore-roosevelt",
@@ -723,7 +741,8 @@
      }
     ]
    },
-   "difficulty": 2
+   "difficulty": 2,
+   "gender": "m"
   },
   {
    "id": "winston-churchill",
@@ -760,7 +779,8 @@
      }
     ]
    },
-   "difficulty": 1
+   "difficulty": 1,
+   "gender": "m"
   },
   {
    "id": "mahatma-gandhi",
@@ -798,7 +818,8 @@
      }
     ]
    },
-   "difficulty": 1
+   "difficulty": 1,
+   "gender": "m"
   },
   {
    "id": "franklin-d-roosevelt",
@@ -836,7 +857,8 @@
      }
     ]
    },
-   "difficulty": 2
+   "difficulty": 2,
+   "gender": "m"
   },
   {
    "id": "haile-selassie",
@@ -871,7 +893,8 @@
      }
     ]
    },
-   "difficulty": 3
+   "difficulty": 3,
+   "gender": "m"
   },
   {
    "id": "mao-zedong",
@@ -908,7 +931,8 @@
      }
     ]
    },
-   "difficulty": 2
+   "difficulty": 2,
+   "gender": "m"
   },
   {
    "id": "charles-de-gaulle",
@@ -936,7 +960,8 @@
    "media": {
     "img": []
    },
-   "difficulty": 3
+   "difficulty": 3,
+   "gender": "m"
   },
   {
    "id": "john-f-kennedy",
@@ -974,7 +999,8 @@
      }
     ]
    },
-   "difficulty": 1
+   "difficulty": 1,
+   "gender": "m"
   },
   {
    "id": "nelson-mandela",
@@ -1011,7 +1037,8 @@
      }
     ]
    },
-   "difficulty": 1
+   "difficulty": 1,
+   "gender": "m"
   },
   {
    "id": "indira-gandhi",
@@ -1029,7 +1056,8 @@
    "media": {
     "img": []
    },
-   "difficulty": 3
+   "difficulty": 3,
+   "gender": "f"
   },
   {
    "id": "golda-meir",
@@ -1064,7 +1092,8 @@
      }
     ]
    },
-   "difficulty": 3
+   "difficulty": 3,
+   "gender": "f"
   },
   {
    "id": "margaret-thatcher",
@@ -1101,7 +1130,8 @@
      }
     ]
    },
-   "difficulty": 2
+   "difficulty": 2,
+   "gender": "f"
   },
   {
    "id": "angela-merkel",
@@ -1137,7 +1167,8 @@
      }
     ]
    },
-   "difficulty": 2
+   "difficulty": 2,
+   "gender": "f"
   },
   {
    "id": "barack-obama",
@@ -1173,7 +1204,8 @@
      }
     ]
    },
-   "difficulty": 1
+   "difficulty": 1,
+   "gender": "m"
   },
   {
    "id": "elizabeth-ii",
@@ -1209,7 +1241,8 @@
      }
     ]
    },
-   "difficulty": 1
+   "difficulty": 1,
+   "gender": "f"
   },
   {
    "id": "akbar",
@@ -1246,7 +1279,8 @@
      }
     ]
    },
-   "difficulty": 3
+   "difficulty": 3,
+   "gender": "m"
   }
  ],
  "questions": [
@@ -1272,9 +1306,9 @@
    "prompt": "Who is this? She was a queen of ancient Egypt.",
    "answer": "Cleopatra",
    "wrong": [
-    "Otto von Bismarck",
-    "Augustus",
-    "Barack Obama"
+    "Elizabeth II",
+    "Margaret Thatcher",
+    "Queen Victoria"
    ],
    "explain": "Cleopatra (69 BC–30 BC): A queen of ancient Egypt.",
    "difficulty": 1,
@@ -1304,9 +1338,9 @@
    "prompt": "Who is this? He was the first Roman emperor.",
    "answer": "Augustus",
    "wrong": [
-    "Cleopatra",
     "Qin Shi Huang",
-    "Mao Zedong"
+    "Mao Zedong",
+    "Winston Churchill"
    ],
    "explain": "Augustus (63 BC–14): The first Roman emperor.",
    "difficulty": 2,
@@ -1320,9 +1354,9 @@
    "prompt": "Who is this? He was the first emperor of a unified China.",
    "answer": "Qin Shi Huang",
    "wrong": [
-    "Margaret Thatcher",
     "Napoleon Bonaparte",
-    "Catherine the Great"
+    "Franklin D. Roosevelt",
+    "Theodore Roosevelt"
    ],
    "explain": "Qin Shi Huang (259 BC–210 BC): The first emperor of a unified China.",
    "difficulty": 2,
@@ -1352,9 +1386,9 @@
    "prompt": "Who is this? He was King of the Franks.",
    "answer": "Charlemagne",
    "wrong": [
-    "Queen Victoria",
     "Henry VIII",
-    "Charles de Gaulle"
+    "Charles de Gaulle",
+    "Louis XIV"
    ],
    "explain": "Charlemagne: King of the Franks.",
    "difficulty": 2,
@@ -1400,9 +1434,9 @@
    "prompt": "Who is this? She was the last Tudor monarch.",
    "answer": "Elizabeth I",
    "wrong": [
-    "Otto von Bismarck",
-    "Louis XIV",
-    "Golda Meir"
+    "Golda Meir",
+    "Angela Merkel",
+    "Queen Victoria"
    ],
    "explain": "Elizabeth I (1533–1603): The last Tudor monarch.",
    "difficulty": 1,
@@ -1497,8 +1531,8 @@
    "answer": "Catherine the Great",
    "wrong": [
     "Elizabeth I",
-    "Charles de Gaulle",
-    "Margaret Thatcher"
+    "Margaret Thatcher",
+    "Cleopatra"
    ],
    "explain": "Catherine the Great (1729–1796): The longest-ruling female leader of Russia.",
    "difficulty": 2,
@@ -1528,9 +1562,9 @@
    "prompt": "Who is this? He was the first president of the United States.",
    "answer": "George Washington",
    "wrong": [
-    "Elizabeth I",
     "Charlemagne",
-    "Theodore Roosevelt"
+    "Theodore Roosevelt",
+    "Augustus"
    ],
    "explain": "George Washington (1732–1799): The first president of the United States.",
    "difficulty": 1,
@@ -1593,8 +1627,8 @@
    "answer": "Simón Bolívar",
    "wrong": [
     "Peter the Great",
-    "Elizabeth II",
-    "Abraham Lincoln"
+    "Abraham Lincoln",
+    "Akbar"
    ],
    "explain": "Simón Bolívar (1783–1830): Led several South American countries to independence from Spain.",
    "difficulty": 2,
@@ -1625,8 +1659,8 @@
    "answer": "Queen Victoria",
    "wrong": [
     "Catherine the Great",
-    "John F. Kennedy",
-    "Elizabeth I"
+    "Elizabeth I",
+    "Indira Gandhi"
    ],
    "explain": "Queen Victoria (1819–1901): An era of British history is named after her.",
    "difficulty": 1,
@@ -1656,9 +1690,9 @@
    "prompt": "Who is this? He was the 16th US president, assassinated in 1865.",
    "answer": "Abraham Lincoln",
    "wrong": [
-    "Queen Victoria",
     "Charles de Gaulle",
-    "Barack Obama"
+    "Barack Obama",
+    "Mao Zedong"
    ],
    "explain": "Abraham Lincoln (1809–1865): The 16th US president, assassinated in 1865.",
    "difficulty": 1,
@@ -1722,7 +1756,7 @@
    "wrong": [
     "Otto von Bismarck",
     "Julius Caesar",
-    "Margaret Thatcher"
+    "Simón Bolívar"
    ],
    "explain": "Theodore Roosevelt (1858–1919): The 26th US president.",
    "difficulty": 2,
@@ -1753,8 +1787,8 @@
    "answer": "Winston Churchill",
    "wrong": [
     "Abraham Lincoln",
-    "Margaret Thatcher",
-    "Nelson Mandela"
+    "Nelson Mandela",
+    "Franklin D. Roosevelt"
    ],
    "explain": "Winston Churchill (1874–1965): Britain's prime minister during most of the Second World War.",
    "difficulty": 1,
@@ -1784,9 +1818,9 @@
    "prompt": "Who is this? He led India's independence movement against British rule.",
    "answer": "Mahatma Gandhi",
    "wrong": [
-    "Cleopatra",
     "Louis XIV",
-    "Nelson Mandela"
+    "Nelson Mandela",
+    "Charles de Gaulle"
    ],
    "explain": "Mahatma Gandhi (1869–1948): Led India's independence movement against British rule.",
    "difficulty": 1,
@@ -1818,7 +1852,7 @@
    "wrong": [
     "Abraham Lincoln",
     "Louis XIV",
-    "Elizabeth II"
+    "Qin Shi Huang"
    ],
    "explain": "Franklin D. Roosevelt (1882–1945): The only US president elected four times.",
    "difficulty": 2,
@@ -1850,7 +1884,7 @@
    "wrong": [
     "Barack Obama",
     "Henry VIII",
-    "Margaret Thatcher"
+    "Julius Caesar"
    ],
    "explain": "Haile Selassie (1892–1975): The last emperor of Ethiopia.",
    "difficulty": 3,
@@ -1977,8 +2011,8 @@
    "answer": "Nelson Mandela",
    "wrong": [
     "Mao Zedong",
-    "Elizabeth II",
-    "Margaret Thatcher"
+    "Akbar",
+    "Alexander the Great"
    ],
    "explain": "Nelson Mandela (1918–2013): South Africa's first Black president.",
    "difficulty": 1,
@@ -2009,8 +2043,8 @@
    "answer": "Indira Gandhi",
    "wrong": [
     "Golda Meir",
-    "Augustus",
-    "Barack Obama"
+    "Elizabeth II",
+    "Cleopatra"
    ],
    "explain": "Indira Gandhi (1917–1984): India's first female prime minister.",
    "difficulty": 3,
@@ -2040,9 +2074,9 @@
    "prompt": "Who is this? She was Israel's first female prime minister.",
    "answer": "Golda Meir",
    "wrong": [
-    "Mao Zedong",
     "Elizabeth II",
-    "Catherine the Great"
+    "Catherine the Great",
+    "Margaret Thatcher"
    ],
    "explain": "Golda Meir (1898–1978): Israel's first female prime minister.",
    "difficulty": 3,
@@ -2072,9 +2106,9 @@
    "prompt": "Who is this? She was Britain's first female prime minister.",
    "answer": "Margaret Thatcher",
    "wrong": [
-    "Mao Zedong",
-    "Henry VIII",
-    "Catherine the Great"
+    "Catherine the Great",
+    "Cleopatra",
+    "Elizabeth II"
    ],
    "explain": "Margaret Thatcher (1925–2013): Britain's first female prime minister.",
    "difficulty": 2,
@@ -2104,9 +2138,9 @@
    "prompt": "Who is this? She was Germany's first female chancellor.",
    "answer": "Angela Merkel",
    "wrong": [
-    "Louis XIV",
-    "Winston Churchill",
-    "Otto von Bismarck"
+    "Catherine the Great",
+    "Margaret Thatcher",
+    "Cleopatra"
    ],
    "explain": "Angela Merkel (1954): Germany's first female chancellor.",
    "difficulty": 2,
@@ -2168,9 +2202,9 @@
    "prompt": "Who is this? She was the longest-reigning British monarch.",
    "answer": "Elizabeth II",
    "wrong": [
-    "Otto von Bismarck",
-    "Haile Selassie",
-    "Elizabeth I"
+    "Elizabeth I",
+    "Golda Meir",
+    "Margaret Thatcher"
    ],
    "explain": "Elizabeth II (1926–2022): The longest-reigning British monarch.",
    "difficulty": 1,
@@ -2201,8 +2235,8 @@
    "answer": "Akbar",
    "wrong": [
     "Augustus",
-    "Indira Gandhi",
-    "Angela Merkel"
+    "Abraham Lincoln",
+    "Otto von Bismarck"
    ],
    "explain": "Akbar (1542–1605): The third Mughal emperor of India.",
    "difficulty": 3,

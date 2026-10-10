@@ -77,7 +77,8 @@
      }
     ]
    },
-   "difficulty": 1
+   "difficulty": 1,
+   "gender": "m"
   },
   {
    "id": "meryl-streep",
@@ -114,7 +115,8 @@
      }
     ]
    },
-   "difficulty": 2
+   "difficulty": 2,
+   "gender": "f"
   },
   {
    "id": "leonardo-dicaprio",
@@ -152,7 +154,8 @@
      }
     ]
    },
-   "difficulty": 1
+   "difficulty": 1,
+   "gender": "m"
   },
   {
    "id": "denzel-washington",
@@ -189,7 +192,8 @@
      }
     ]
    },
-   "difficulty": 2
+   "difficulty": 2,
+   "gender": "m"
   },
   {
    "id": "morgan-freeman",
@@ -226,7 +230,8 @@
      }
     ]
    },
-   "difficulty": 2
+   "difficulty": 2,
+   "gender": "m"
   },
   {
    "id": "julia-roberts",
@@ -263,7 +268,8 @@
      }
     ]
    },
-   "difficulty": 2
+   "difficulty": 2,
+   "gender": "f"
   },
   {
    "id": "will-smith",
@@ -299,7 +305,8 @@
      }
     ]
    },
-   "difficulty": 1
+   "difficulty": 1,
+   "gender": "m"
   },
   {
    "id": "tom-cruise",
@@ -336,7 +343,8 @@
      }
     ]
    },
-   "difficulty": 1
+   "difficulty": 1,
+   "gender": "m"
   },
   {
    "id": "brad-pitt",
@@ -373,7 +381,8 @@
      }
     ]
    },
-   "difficulty": 2
+   "difficulty": 2,
+   "gender": "m"
   },
   {
    "id": "angelina-jolie",
@@ -410,7 +419,8 @@
      }
     ]
    },
-   "difficulty": 2
+   "difficulty": 2,
+   "gender": "f"
   },
   {
    "id": "johnny-depp",
@@ -447,7 +457,8 @@
      }
     ]
    },
-   "difficulty": 2
+   "difficulty": 2,
+   "gender": "m"
   },
   {
    "id": "scarlett-johansson",
@@ -484,7 +495,8 @@
      }
     ]
    },
-   "difficulty": 2
+   "difficulty": 2,
+   "gender": "f"
   },
   {
    "id": "robert-downey-jr",
@@ -522,7 +534,8 @@
      }
     ]
    },
-   "difficulty": 1
+   "difficulty": 1,
+   "gender": "m"
   },
   {
    "id": "emma-watson",
@@ -559,7 +572,8 @@
      }
     ]
    },
-   "difficulty": 1
+   "difficulty": 1,
+   "gender": "f"
   },
   {
    "id": "daniel-radcliffe",
@@ -596,7 +610,8 @@
      }
     ]
    },
-   "difficulty": 1
+   "difficulty": 1,
+   "gender": "m"
   },
   {
    "id": "keanu-reeves",
@@ -633,7 +648,8 @@
      }
     ]
    },
-   "difficulty": 2
+   "difficulty": 2,
+   "gender": "m"
   },
   {
    "id": "harrison-ford",
@@ -670,7 +686,8 @@
      }
     ]
    },
-   "difficulty": 1
+   "difficulty": 1,
+   "gender": "m"
   },
   {
    "id": "mark-hamill",
@@ -707,7 +724,8 @@
      }
     ]
    },
-   "difficulty": 2
+   "difficulty": 2,
+   "gender": "m"
   },
   {
    "id": "carrie-fisher",
@@ -745,7 +763,8 @@
      }
     ]
    },
-   "difficulty": 2
+   "difficulty": 2,
+   "gender": "f"
   },
   {
    "id": "sigourney-weaver",
@@ -782,7 +801,8 @@
      }
     ]
    },
-   "difficulty": 3
+   "difficulty": 3,
+   "gender": "f"
   },
   {
    "id": "arnold-schwarzenegger",
@@ -820,7 +840,8 @@
      }
     ]
    },
-   "difficulty": 1
+   "difficulty": 1,
+   "gender": "m"
   },
   {
    "id": "sylvester-stallone",
@@ -858,7 +879,8 @@
      }
     ]
    },
-   "difficulty": 2
+   "difficulty": 2,
+   "gender": "m"
   },
   {
    "id": "bruce-willis",
@@ -895,7 +917,8 @@
      }
     ]
    },
-   "difficulty": 2
+   "difficulty": 2,
+   "gender": "m"
   },
   {
    "id": "jim-carrey",
@@ -932,7 +955,8 @@
      }
     ]
    },
-   "difficulty": 2
+   "difficulty": 2,
+   "gender": "m"
   },
   {
    "id": "robin-williams",
@@ -970,7 +994,8 @@
      }
     ]
    },
-   "difficulty": 1
+   "difficulty": 1,
+   "gender": "m"
   },
   {
    "id": "eddie-murphy",
@@ -1007,7 +1032,8 @@
      }
     ]
    },
-   "difficulty": 1
+   "difficulty": 1,
+   "gender": "m"
   },
   {
    "id": "cameron-diaz",
@@ -1044,7 +1070,8 @@
      }
     ]
    },
-   "difficulty": 2
+   "difficulty": 2,
+   "gender": "f"
   },
   {
    "id": "mike-myers",
@@ -1081,7 +1108,8 @@
      }
     ]
    },
-   "difficulty": 2
+   "difficulty": 2,
+   "gender": "m"
   },
   {
    "id": "jack-nicholson",
@@ -1118,7 +1146,8 @@
      }
     ]
    },
-   "difficulty": 3
+   "difficulty": 3,
+   "gender": "m"
   },
   {
    "id": "al-pacino",
@@ -1155,7 +1184,8 @@
      }
     ]
    },
-   "difficulty": 3
+   "difficulty": 3,
+   "gender": "m"
   },
   {
    "id": "robert-de-niro",
@@ -1192,7 +1222,8 @@
      }
     ]
    },
-   "difficulty": 3
+   "difficulty": 3,
+   "gender": "m"
   },
   {
    "id": "marlon-brando",
@@ -1230,7 +1261,8 @@
      }
     ]
    },
-   "difficulty": 3
+   "difficulty": 3,
+   "gender": "m"
   },
   {
    "id": "audrey-hepburn",
@@ -1268,7 +1300,8 @@
      }
     ]
    },
-   "difficulty": 2
+   "difficulty": 2,
+   "gender": "f"
   },
   {
    "id": "marilyn-monroe",
@@ -1306,7 +1339,8 @@
      }
     ]
    },
-   "difficulty": 2
+   "difficulty": 2,
+   "gender": "f"
   },
   {
    "id": "humphrey-bogart",
@@ -1345,7 +1379,8 @@
      }
     ]
    },
-   "difficulty": 3
+   "difficulty": 3,
+   "gender": "m"
   },
   {
    "id": "judy-garland",
@@ -1383,7 +1418,8 @@
      }
     ]
    },
-   "difficulty": 2
+   "difficulty": 2,
+   "gender": "f"
   },
   {
    "id": "julie-andrews",
@@ -1420,7 +1456,8 @@
      }
     ]
    },
-   "difficulty": 1
+   "difficulty": 1,
+   "gender": "f"
   },
   {
    "id": "clint-eastwood",
@@ -1457,7 +1494,8 @@
      }
     ]
    },
-   "difficulty": 3
+   "difficulty": 3,
+   "gender": "m"
   },
   {
    "id": "jackie-chan",
@@ -1494,7 +1532,8 @@
      }
     ]
    },
-   "difficulty": 1
+   "difficulty": 1,
+   "gender": "m"
   },
   {
    "id": "bruce-lee",
@@ -1532,7 +1571,8 @@
      }
     ]
    },
-   "difficulty": 2
+   "difficulty": 2,
+   "gender": "m"
   },
   {
    "id": "michelle-yeoh",
@@ -1569,7 +1609,8 @@
      }
     ]
    },
-   "difficulty": 2
+   "difficulty": 2,
+   "gender": "f"
   },
   {
    "id": "tom-holland",
@@ -1606,7 +1647,8 @@
      }
     ]
    },
-   "difficulty": 1
+   "difficulty": 1,
+   "gender": "m"
   },
   {
    "id": "zendaya",
@@ -1641,7 +1683,8 @@
      }
     ]
    },
-   "difficulty": 2
+   "difficulty": 2,
+   "gender": "f"
   },
   {
    "id": "timothee-chalamet",
@@ -1679,7 +1722,8 @@
      }
     ]
    },
-   "difficulty": 2
+   "difficulty": 2,
+   "gender": "m"
   },
   {
    "id": "margot-robbie",
@@ -1716,7 +1760,8 @@
      }
     ]
    },
-   "difficulty": 1
+   "difficulty": 1,
+   "gender": "f"
   },
   {
    "id": "ryan-gosling",
@@ -1753,7 +1798,8 @@
      }
     ]
    },
-   "difficulty": 2
+   "difficulty": 2,
+   "gender": "m"
   },
   {
    "id": "emma-stone",
@@ -1790,7 +1836,8 @@
      }
     ]
    },
-   "difficulty": 2
+   "difficulty": 2,
+   "gender": "f"
   },
   {
    "id": "jennifer-lawrence",
@@ -1827,7 +1874,8 @@
      }
     ]
    },
-   "difficulty": 2
+   "difficulty": 2,
+   "gender": "f"
   },
   {
    "id": "chris-hemsworth",
@@ -1864,7 +1912,8 @@
      }
     ]
    },
-   "difficulty": 1
+   "difficulty": 1,
+   "gender": "m"
   },
   {
    "id": "chris-pratt",
@@ -1901,7 +1950,8 @@
      }
     ]
    },
-   "difficulty": 1
+   "difficulty": 1,
+   "gender": "m"
   },
   {
    "id": "dwayne-johnson",
@@ -1937,7 +1987,8 @@
      }
     ]
    },
-   "difficulty": 1
+   "difficulty": 1,
+   "gender": "m"
   },
   {
    "id": "hugh-jackman",
@@ -1974,7 +2025,8 @@
      }
     ]
    },
-   "difficulty": 2
+   "difficulty": 2,
+   "gender": "m"
   },
   {
    "id": "ian-mckellen",
@@ -2012,7 +2064,8 @@
      }
     ]
    },
-   "difficulty": 2
+   "difficulty": 2,
+   "gender": "m"
   },
   {
    "id": "cate-blanchett",
@@ -2049,7 +2102,8 @@
      }
     ]
    },
-   "difficulty": 3
+   "difficulty": 3,
+   "gender": "f"
   },
   {
    "id": "anthony-hopkins",
@@ -2087,7 +2141,8 @@
      }
     ]
    },
-   "difficulty": 2
+   "difficulty": 2,
+   "gender": "m"
   },
   {
    "id": "helen-mirren",
@@ -2124,7 +2179,8 @@
      }
     ]
    },
-   "difficulty": 3
+   "difficulty": 3,
+   "gender": "f"
   },
   {
    "id": "judi-dench",
@@ -2162,7 +2218,8 @@
      }
     ]
    },
-   "difficulty": 2
+   "difficulty": 2,
+   "gender": "f"
   },
   {
    "id": "daniel-craig",
@@ -2199,7 +2256,8 @@
      }
     ]
    },
-   "difficulty": 2
+   "difficulty": 2,
+   "gender": "m"
   },
   {
    "id": "sean-connery",
@@ -2237,7 +2295,8 @@
      }
     ]
    },
-   "difficulty": 2
+   "difficulty": 2,
+   "gender": "m"
   },
   {
    "id": "kate-winslet",
@@ -2274,7 +2333,8 @@
      }
     ]
    },
-   "difficulty": 2
+   "difficulty": 2,
+   "gender": "f"
   },
   {
    "id": "nicole-kidman",
@@ -2311,7 +2371,8 @@
      }
     ]
    },
-   "difficulty": 3
+   "difficulty": 3,
+   "gender": "f"
   },
   {
    "id": "natalie-portman",
@@ -2348,7 +2409,8 @@
      }
     ]
    },
-   "difficulty": 2
+   "difficulty": 2,
+   "gender": "f"
   },
   {
    "id": "anne-hathaway",
@@ -2385,7 +2447,8 @@
      }
     ]
    },
-   "difficulty": 2
+   "difficulty": 2,
+   "gender": "f"
   },
   {
    "id": "sandra-bullock",
@@ -2422,7 +2485,8 @@
      }
     ]
    },
-   "difficulty": 2
+   "difficulty": 2,
+   "gender": "f"
   },
   {
    "id": "whoopi-goldberg",
@@ -2459,7 +2523,8 @@
      }
     ]
    },
-   "difficulty": 2
+   "difficulty": 2,
+   "gender": "f"
   },
   {
    "id": "samuel-l-jackson",
@@ -2496,7 +2561,8 @@
      }
     ]
    },
-   "difficulty": 2
+   "difficulty": 2,
+   "gender": "m"
   },
   {
    "id": "viola-davis",
@@ -2533,7 +2599,8 @@
      }
     ]
    },
-   "difficulty": 3
+   "difficulty": 3,
+   "gender": "f"
   },
   {
    "id": "lupita-nyong-o",
@@ -2570,7 +2637,8 @@
      }
     ]
    },
-   "difficulty": 3
+   "difficulty": 3,
+   "gender": "f"
   },
   {
    "id": "idris-elba",
@@ -2598,7 +2666,8 @@
    "media": {
     "img": []
    },
-   "difficulty": 3
+   "difficulty": 3,
+   "gender": "m"
   },
   {
    "id": "benedict-cumberbatch",
@@ -2635,7 +2704,8 @@
      }
     ]
    },
-   "difficulty": 2
+   "difficulty": 2,
+   "gender": "m"
   },
   {
    "id": "gal-gadot",
@@ -2672,7 +2742,8 @@
      }
     ]
    },
-   "difficulty": 2
+   "difficulty": 2,
+   "gender": "f"
   },
   {
    "id": "keira-knightley",
@@ -2709,7 +2780,8 @@
      }
     ]
    },
-   "difficulty": 2
+   "difficulty": 2,
+   "gender": "f"
   },
   {
    "id": "orlando-bloom",
@@ -2746,7 +2818,8 @@
      }
     ]
    },
-   "difficulty": 2
+   "difficulty": 2,
+   "gender": "m"
   },
   {
    "id": "elijah-wood",
@@ -2783,7 +2856,8 @@
      }
     ]
    },
-   "difficulty": 2
+   "difficulty": 2,
+   "gender": "m"
   },
   {
    "id": "rowan-atkinson",
@@ -2820,7 +2894,8 @@
      }
     ]
    },
-   "difficulty": 1
+   "difficulty": 1,
+   "gender": "m"
   },
   {
    "id": "hugh-grant",
@@ -2857,7 +2932,8 @@
      }
     ]
    },
-   "difficulty": 3
+   "difficulty": 3,
+   "gender": "m"
   },
   {
    "id": "emma-thompson",
@@ -2894,7 +2970,8 @@
      }
     ]
    },
-   "difficulty": 3
+   "difficulty": 3,
+   "gender": "f"
   },
   {
    "id": "shirley-temple",
@@ -2932,7 +3009,8 @@
      }
     ]
    },
-   "difficulty": 3
+   "difficulty": 3,
+   "gender": "f"
   },
   {
    "id": "paul-newman",
@@ -2970,7 +3048,8 @@
      }
     ]
    },
-   "difficulty": 3
+   "difficulty": 3,
+   "gender": "m"
   },
   {
    "id": "gene-kelly",
@@ -3008,7 +3087,8 @@
      }
     ]
    },
-   "difficulty": 3
+   "difficulty": 3,
+   "gender": "m"
   },
   {
    "id": "fred-astaire",
@@ -3046,7 +3126,8 @@
      }
     ]
    },
-   "difficulty": 3
+   "difficulty": 3,
+   "gender": "m"
   },
   {
    "id": "jack-black",
@@ -3083,7 +3164,8 @@
      }
     ]
    },
-   "difficulty": 1
+   "difficulty": 1,
+   "gender": "m"
   },
   {
    "id": "vin-diesel",
@@ -3120,7 +3202,8 @@
      }
     ]
    },
-   "difficulty": 2
+   "difficulty": 2,
+   "gender": "m"
   },
   {
    "id": "cillian-murphy",
@@ -3157,7 +3240,8 @@
      }
     ]
    },
-   "difficulty": 3
+   "difficulty": 3,
+   "gender": "m"
   }
  ],
  "questions": [
@@ -3168,8 +3252,8 @@
    "answer": "Tom Hanks",
    "wrong": [
     "Rowan Atkinson",
-    "Shirley Temple",
-    "Morgan Freeman"
+    "Morgan Freeman",
+    "Daniel Craig"
    ],
    "explain": "Tom Hanks (1956): The voice of Woody in Toy Story.",
    "difficulty": 1,
@@ -3199,9 +3283,9 @@
    "prompt": "Who is this? She sang ABBA songs in Mamma Mia!",
    "answer": "Meryl Streep",
    "wrong": [
-    "Arnold Schwarzenegger",
-    "Bruce Lee",
-    "Idris Elba"
+    "Kate Winslet",
+    "Cameron Diaz",
+    "Anne Hathaway"
    ],
    "explain": "Meryl Streep (1949): Sang ABBA songs in Mamma Mia!",
    "difficulty": 2,
@@ -3231,9 +3315,9 @@
    "prompt": "Who is this? He played Jack in Titanic.",
    "answer": "Leonardo DiCaprio",
    "wrong": [
-    "Angelina Jolie",
     "Will Smith",
-    "Margot Robbie"
+    "Bruce Willis",
+    "Paul Newman"
    ],
    "explain": "Leonardo DiCaprio (1974): Played Jack in Titanic.",
    "difficulty": 1,
@@ -3296,8 +3380,8 @@
    "answer": "Morgan Freeman",
    "wrong": [
     "Ian McKellen",
-    "Gal Gadot",
-    "Anthony Hopkins"
+    "Anthony Hopkins",
+    "Denzel Washington"
    ],
    "explain": "Morgan Freeman (1937): Famous for his deep narrating voice and played Red in The Shawshank Redemption.",
    "difficulty": 2,
@@ -3327,9 +3411,9 @@
    "prompt": "Who is this? She shot to fame in Pretty Woman.",
    "answer": "Julia Roberts",
    "wrong": [
-    "Jim Carrey",
-    "Mike Myers",
-    "Chris Hemsworth"
+    "Viola Davis",
+    "Cameron Diaz",
+    "Audrey Hepburn"
    ],
    "explain": "Julia Roberts (1967): Shot to fame in Pretty Woman.",
    "difficulty": 2,
@@ -3359,9 +3443,9 @@
    "prompt": "Who is this? He starred in The Fresh Prince of Bel-Air and Men in Black.",
    "answer": "Will Smith",
    "wrong": [
-    "Cate Blanchett",
     "Keanu Reeves",
-    "Gal Gadot"
+    "Rowan Atkinson",
+    "Morgan Freeman"
    ],
    "explain": "Will Smith (1968): Starred in The Fresh Prince of Bel-Air and Men in Black.",
    "difficulty": 1,
@@ -3455,9 +3539,9 @@
    "prompt": "Who is this? She played the wicked fairy Maleficent.",
    "answer": "Angelina Jolie",
    "wrong": [
-    "Harrison Ford",
-    "Robert De Niro",
-    "Vin Diesel"
+    "Marilyn Monroe",
+    "Viola Davis",
+    "Helen Mirren"
    ],
    "explain": "Angelina Jolie (1975): Played the wicked fairy Maleficent.",
    "difficulty": 2,
@@ -3489,7 +3573,7 @@
    "wrong": [
     "Hugh Grant",
     "Robin Williams",
-    "Emma Watson"
+    "Jack Black"
    ],
    "explain": "Johnny Depp (1963): Played Captain Jack Sparrow.",
    "difficulty": 2,
@@ -3519,9 +3603,9 @@
    "prompt": "Who is this? She played Black Widow in the Marvel films.",
    "answer": "Scarlett Johansson",
    "wrong": [
-    "Jim Carrey",
-    "Robert Downey Jr.",
-    "Jennifer Lawrence"
+    "Jennifer Lawrence",
+    "Helen Mirren",
+    "Marilyn Monroe"
    ],
    "explain": "Scarlett Johansson (1984): Played Black Widow in the Marvel films.",
    "difficulty": 2,
@@ -3553,7 +3637,7 @@
    "wrong": [
     "Eddie Murphy",
     "Jim Carrey",
-    "Jennifer Lawrence"
+    "Idris Elba"
    ],
    "explain": "Robert Downey Jr. (1965): Played Tony Stark, Iron Man.",
    "difficulty": 1,
@@ -3583,9 +3667,9 @@
    "prompt": "Who is this? She played Hermione Granger.",
    "answer": "Emma Watson",
    "wrong": [
-    "Jack Black",
-    "Timothée Chalamet",
-    "Tom Cruise"
+    "Julia Roberts",
+    "Lupita Nyong'o",
+    "Nicole Kidman"
    ],
    "explain": "Emma Watson (1990): Played Hermione Granger.",
    "difficulty": 1,
@@ -3615,9 +3699,9 @@
    "prompt": "Who is this? He played Harry Potter.",
    "answer": "Daniel Radcliffe",
    "wrong": [
-    "Cate Blanchett",
-    "Zendaya",
-    "Mark Hamill"
+    "Mark Hamill",
+    "Jackie Chan",
+    "Tom Cruise"
    ],
    "explain": "Daniel Radcliffe (1989): Played Harry Potter.",
    "difficulty": 1,
@@ -3647,9 +3731,9 @@
    "prompt": "Who is this? He played Neo in The Matrix.",
    "answer": "Keanu Reeves",
    "wrong": [
-    "Gal Gadot",
-    "Scarlett Johansson",
-    "Mark Hamill"
+    "Mark Hamill",
+    "Hugh Jackman",
+    "Humphrey Bogart"
    ],
    "explain": "Keanu Reeves (1964): Played Neo in The Matrix.",
    "difficulty": 2,
@@ -3679,9 +3763,9 @@
    "prompt": "Who is this? He played Han Solo in Star Wars.",
    "answer": "Harrison Ford",
    "wrong": [
-    "Michelle Yeoh",
     "Hugh Grant",
-    "Eddie Murphy"
+    "Eddie Murphy",
+    "Jackie Chan"
    ],
    "explain": "Harrison Ford (1942): Played Han Solo in Star Wars.",
    "difficulty": 1,
@@ -3712,8 +3796,8 @@
    "answer": "Mark Hamill",
    "wrong": [
     "Clint Eastwood",
-    "Natalie Portman",
-    "Sigourney Weaver"
+    "Robert De Niro",
+    "Paul Newman"
    ],
    "explain": "Mark Hamill (1951): Played Luke Skywalker.",
    "difficulty": 2,
@@ -3743,9 +3827,9 @@
    "prompt": "Who is this? She played Princess Leia.",
    "answer": "Carrie Fisher",
    "wrong": [
-    "Orlando Bloom",
     "Anne Hathaway",
-    "Chris Hemsworth"
+    "Audrey Hepburn",
+    "Cameron Diaz"
    ],
    "explain": "Carrie Fisher (1956–2016): Played Princess Leia.",
    "difficulty": 2,
@@ -3775,9 +3859,9 @@
    "prompt": "Who is this? She played Ellen Ripley in Alien.",
    "answer": "Sigourney Weaver",
    "wrong": [
-    "Samuel L. Jackson",
     "Viola Davis",
-    "Sandra Bullock"
+    "Sandra Bullock",
+    "Audrey Hepburn"
    ],
    "explain": "Sigourney Weaver (1949): Played Ellen Ripley in Alien.",
    "difficulty": 3,
@@ -3840,8 +3924,8 @@
    "answer": "Sylvester Stallone",
    "wrong": [
     "Elijah Wood",
-    "Audrey Hepburn",
-    "Ryan Gosling"
+    "Ryan Gosling",
+    "Cillian Murphy"
    ],
    "explain": "Sylvester Stallone (1946): Played the boxer Rocky Balboa.",
    "difficulty": 2,
@@ -3873,7 +3957,7 @@
    "wrong": [
     "Anthony Hopkins",
     "Robin Williams",
-    "Kate Winslet"
+    "Sylvester Stallone"
    ],
    "explain": "Bruce Willis (1955): Fought terrorists in a skyscraper in Die Hard.",
    "difficulty": 2,
@@ -3903,9 +3987,9 @@
    "prompt": "Who is this? He wore a magic green mask.",
    "answer": "Jim Carrey",
    "wrong": [
-    "Sandra Bullock",
     "Tom Cruise",
-    "Cate Blanchett"
+    "Leonardo DiCaprio",
+    "Will Smith"
    ],
    "explain": "Jim Carrey (1962): Wore a magic green mask.",
    "difficulty": 2,
@@ -3935,9 +4019,9 @@
    "prompt": "Who is this? He voiced the Genie in Aladdin.",
    "answer": "Robin Williams",
    "wrong": [
-    "Whoopi Goldberg",
-    "Cameron Diaz",
-    "Tom Hanks"
+    "Tom Hanks",
+    "Jack Black",
+    "Sylvester Stallone"
    ],
    "explain": "Robin Williams (1951–2014): Voiced the Genie in Aladdin.",
    "difficulty": 1,
@@ -4000,8 +4084,8 @@
    "answer": "Cameron Diaz",
    "wrong": [
     "Meryl Streep",
-    "Tom Holland",
-    "Mark Hamill"
+    "Michelle Yeoh",
+    "Cate Blanchett"
    ],
    "explain": "Cameron Diaz (1972): Voiced Princess Fiona in Shrek.",
    "difficulty": 2,
@@ -4032,8 +4116,8 @@
    "answer": "Mike Myers",
    "wrong": [
     "Chris Hemsworth",
-    "Sandra Bullock",
-    "Emma Stone"
+    "Arnold Schwarzenegger",
+    "Chris Pratt"
    ],
    "explain": "Mike Myers (1963): Voiced Shrek.",
    "difficulty": 2,
@@ -4063,9 +4147,9 @@
    "prompt": "Who is this? He starred in The Shining.",
    "answer": "Jack Nicholson",
    "wrong": [
-    "Marilyn Monroe",
     "Mark Hamill",
-    "Audrey Hepburn"
+    "Hugh Jackman",
+    "Tom Cruise"
    ],
    "explain": "Jack Nicholson (1937): Starred in The Shining.",
    "difficulty": 3,
@@ -4096,8 +4180,8 @@
    "answer": "Al Pacino",
    "wrong": [
     "Marlon Brando",
-    "Helen Mirren",
-    "Julia Roberts"
+    "Robert De Niro",
+    "Fred Astaire"
    ],
    "explain": "Al Pacino (1940): Played Michael Corleone in The Godfather.",
    "difficulty": 3,
@@ -4128,8 +4212,8 @@
    "answer": "Robert De Niro",
    "wrong": [
     "Ryan Gosling",
-    "Meryl Streep",
-    "Angelina Jolie"
+    "Denzel Washington",
+    "Orlando Bloom"
    ],
    "explain": "Robert De Niro (1943): Played Travis Bickle in Taxi Driver.",
    "difficulty": 3,
@@ -4191,9 +4275,9 @@
    "prompt": "Who is this? She played Holly Golightly in Breakfast at Tiffany's.",
    "answer": "Audrey Hepburn",
    "wrong": [
-    "Samuel L. Jackson",
-    "Tom Cruise",
-    "Bruce Lee"
+    "Emma Stone",
+    "Helen Mirren",
+    "Anne Hathaway"
    ],
    "explain": "Audrey Hepburn (1929–1993): Played Holly Golightly in Breakfast at Tiffany's.",
    "difficulty": 2,
@@ -4225,7 +4309,7 @@
    "wrong": [
     "Emma Thompson",
     "Audrey Hepburn",
-    "Chris Pratt"
+    "Sigourney Weaver"
    ],
    "explain": "Marilyn Monroe (1926–1962): Sang Diamonds Are a Girl's Best Friend.",
    "difficulty": 2,
@@ -4256,8 +4340,8 @@
    "answer": "Humphrey Bogart",
    "wrong": [
     "Ryan Gosling",
-    "Cameron Diaz",
-    "Jackie Chan"
+    "Jackie Chan",
+    "Cillian Murphy"
    ],
    "explain": "Humphrey Bogart (1899–1957): Played Rick in Casablanca.",
    "difficulty": 3,
@@ -4287,9 +4371,9 @@
    "prompt": "Who is this? She played Dorothy in The Wizard of Oz.",
    "answer": "Judy Garland",
    "wrong": [
-    "Denzel Washington",
     "Carrie Fisher",
-    "Paul Newman"
+    "Marilyn Monroe",
+    "Julia Roberts"
    ],
    "explain": "Judy Garland (1922–1969): Played Dorothy in The Wizard of Oz.",
    "difficulty": 2,
@@ -4321,7 +4405,7 @@
    "wrong": [
     "Viola Davis",
     "Sigourney Weaver",
-    "Johnny Depp"
+    "Zendaya"
    ],
    "explain": "Julie Andrews (1935): Played Mary Poppins.",
    "difficulty": 1,
@@ -4351,9 +4435,9 @@
    "prompt": "Who is this? He played Dirty Harry.",
    "answer": "Clint Eastwood",
    "wrong": [
-    "Viola Davis",
-    "Whoopi Goldberg",
-    "Meryl Streep"
+    "Hugh Grant",
+    "Morgan Freeman",
+    "Al Pacino"
    ],
    "explain": "Clint Eastwood (1930): Played Dirty Harry.",
    "difficulty": 3,
@@ -4383,9 +4467,9 @@
    "prompt": "Who is this? He is a martial arts star who does his own stunts.",
    "answer": "Jackie Chan",
    "wrong": [
-    "Whoopi Goldberg",
     "Samuel L. Jackson",
-    "Jack Black"
+    "Jack Black",
+    "Brad Pitt"
    ],
    "explain": "Jackie Chan (1954): A martial arts star who does his own stunts.",
    "difficulty": 1,
@@ -4417,7 +4501,7 @@
    "wrong": [
     "Daniel Radcliffe",
     "Sean Connery",
-    "Kate Winslet"
+    "Hugh Jackman"
    ],
    "explain": "Bruce Lee (1940–1973): Starred in Enter the Dragon.",
    "difficulty": 2,
@@ -4447,9 +4531,9 @@
    "prompt": "Who is this? She was the first Asian woman to win the Best Actress Oscar.",
    "answer": "Michelle Yeoh",
    "wrong": [
-    "Jim Carrey",
-    "Brad Pitt",
-    "Sandra Bullock"
+    "Sandra Bullock",
+    "Viola Davis",
+    "Zendaya"
    ],
    "explain": "Michelle Yeoh (1962): The first Asian woman to win the Best Actress Oscar.",
    "difficulty": 2,
@@ -4481,7 +4565,7 @@
    "wrong": [
     "Samuel L. Jackson",
     "Morgan Freeman",
-    "Emma Watson"
+    "Tom Hanks"
    ],
    "explain": "Tom Holland (1996): Played Spider-Man in the Marvel films.",
    "difficulty": 1,
@@ -4511,9 +4595,9 @@
    "prompt": "Who is this? She played MJ in the Spider-Man films.",
    "answer": "Zendaya",
    "wrong": [
-    "Denzel Washington",
-    "Daniel Craig",
-    "Benedict Cumberbatch"
+    "Lupita Nyong'o",
+    "Natalie Portman",
+    "Audrey Hepburn"
    ],
    "explain": "Zendaya (1996): Played MJ in the Spider-Man films.",
    "difficulty": 2,
@@ -4543,9 +4627,9 @@
    "prompt": "Who is this? He played the young Willy Wonka.",
    "answer": "Timothée Chalamet",
    "wrong": [
-    "Zendaya",
     "Tom Holland",
-    "Paul Newman"
+    "Paul Newman",
+    "Orlando Bloom"
    ],
    "explain": "Timothée Chalamet (1995): Played the young Willy Wonka.",
    "difficulty": 2,
@@ -4576,8 +4660,8 @@
    "answer": "Margot Robbie",
    "wrong": [
     "Meryl Streep",
-    "Humphrey Bogart",
-    "Jack Black"
+    "Whoopi Goldberg",
+    "Gal Gadot"
    ],
    "explain": "Margot Robbie (1990): Played Barbie in 2023.",
    "difficulty": 1,
@@ -4607,9 +4691,9 @@
    "prompt": "Who is this? He played Ken in Barbie.",
    "answer": "Ryan Gosling",
    "wrong": [
-    "Lupita Nyong'o",
     "Benedict Cumberbatch",
-    "Scarlett Johansson"
+    "Idris Elba",
+    "Bruce Willis"
    ],
    "explain": "Ryan Gosling (1980): Played Ken in Barbie.",
    "difficulty": 2,
@@ -4639,9 +4723,9 @@
    "prompt": "Who is this? She played an aspiring actress in La La Land.",
    "answer": "Emma Stone",
    "wrong": [
-    "Bruce Willis",
-    "Al Pacino",
-    "Marlon Brando"
+    "Nicole Kidman",
+    "Judy Garland",
+    "Emma Thompson"
    ],
    "explain": "Emma Stone (1988): Played an aspiring actress in La La Land.",
    "difficulty": 2,
@@ -4672,8 +4756,8 @@
    "answer": "Jennifer Lawrence",
    "wrong": [
     "Keira Knightley",
-    "Ryan Gosling",
-    "Daniel Radcliffe"
+    "Carrie Fisher",
+    "Judy Garland"
    ],
    "explain": "Jennifer Lawrence (1990): Played Katniss Everdeen.",
    "difficulty": 2,
@@ -4705,7 +4789,7 @@
    "wrong": [
     "Eddie Murphy",
     "Daniel Radcliffe",
-    "Emma Stone"
+    "Morgan Freeman"
    ],
    "explain": "Chris Hemsworth (1983): Plays the thunder god Thor.",
    "difficulty": 1,
@@ -4736,8 +4820,8 @@
    "answer": "Chris Pratt",
    "wrong": [
     "Daniel Craig",
-    "Judi Dench",
-    "Kate Winslet"
+    "Dwayne Johnson",
+    "Will Smith"
    ],
    "explain": "Chris Pratt (1979): Voiced Mario in The Super Mario Bros. Movie.",
    "difficulty": 1,
@@ -4767,9 +4851,9 @@
    "prompt": "Who is this? He voiced the demigod Maui in Moana.",
    "answer": "Dwayne Johnson",
    "wrong": [
-    "Carrie Fisher",
     "Benedict Cumberbatch",
-    "Whoopi Goldberg"
+    "Tom Cruise",
+    "Rowan Atkinson"
    ],
    "explain": "Dwayne Johnson (1972): Voiced the demigod Maui in Moana.",
    "difficulty": 1,
@@ -4799,9 +4883,9 @@
    "prompt": "Who is this? He played Wolverine.",
    "answer": "Hugh Jackman",
    "wrong": [
-    "Marilyn Monroe",
     "Jim Carrey",
-    "Robert De Niro"
+    "Robert De Niro",
+    "Keanu Reeves"
    ],
    "explain": "Hugh Jackman (1968): Played Wolverine.",
    "difficulty": 2,
@@ -4831,9 +4915,9 @@
    "prompt": "Who is this? He played Gandalf.",
    "answer": "Ian McKellen",
    "wrong": [
-    "Emma Stone",
-    "Lupita Nyong'o",
-    "Hugh Grant"
+    "Hugh Grant",
+    "Gene Kelly",
+    "Johnny Depp"
    ],
    "explain": "Ian McKellen (1939): Played Gandalf.",
    "difficulty": 2,
@@ -4863,9 +4947,9 @@
    "prompt": "Who is this? She played the elf queen Galadriel.",
    "answer": "Cate Blanchett",
    "wrong": [
-    "Timothée Chalamet",
     "Nicole Kidman",
-    "Gal Gadot"
+    "Gal Gadot",
+    "Helen Mirren"
    ],
    "explain": "Cate Blanchett (1969): Played the elf queen Galadriel.",
    "difficulty": 3,
@@ -4928,8 +5012,8 @@
    "answer": "Helen Mirren",
    "wrong": [
     "Sigourney Weaver",
-    "Eddie Murphy",
-    "Harrison Ford"
+    "Keira Knightley",
+    "Cameron Diaz"
    ],
    "explain": "Helen Mirren (1945): Won an Oscar for The Queen.",
    "difficulty": 3,
@@ -4959,9 +5043,9 @@
    "prompt": "Who is this? She played M in the James Bond films.",
    "answer": "Judi Dench",
    "wrong": [
-    "Jack Nicholson",
-    "Morgan Freeman",
-    "Fred Astaire"
+    "Michelle Yeoh",
+    "Whoopi Goldberg",
+    "Natalie Portman"
    ],
    "explain": "Judi Dench (1934): Played M in the James Bond films.",
    "difficulty": 2,
@@ -4991,9 +5075,9 @@
    "prompt": "Who is this? He played James Bond from 2006 to 2021.",
    "answer": "Daniel Craig",
    "wrong": [
-    "Julia Roberts",
     "Sean Connery",
-    "Jim Carrey"
+    "Jim Carrey",
+    "Tom Cruise"
    ],
    "explain": "Daniel Craig (1968): Played James Bond from 2006 to 2021.",
    "difficulty": 2,
@@ -5023,9 +5107,9 @@
    "prompt": "Who is this? He was the first actor to play James Bond in a film.",
    "answer": "Sean Connery",
    "wrong": [
-    "Kate Winslet",
     "Clint Eastwood",
-    "Jackie Chan"
+    "Jackie Chan",
+    "Dwayne Johnson"
    ],
    "explain": "Sean Connery (1930–2020): The first actor to play James Bond in a film.",
    "difficulty": 2,
@@ -5056,8 +5140,8 @@
    "answer": "Kate Winslet",
    "wrong": [
     "Carrie Fisher",
-    "Idris Elba",
-    "Morgan Freeman"
+    "Shirley Temple",
+    "Margot Robbie"
    ],
    "explain": "Kate Winslet (1975): Played Rose in Titanic.",
    "difficulty": 2,
@@ -5087,9 +5171,9 @@
    "prompt": "Who is this? She starred in Moulin Rouge!",
    "answer": "Nicole Kidman",
    "wrong": [
-    "Vin Diesel",
-    "Robert Downey Jr.",
-    "Morgan Freeman"
+    "Cate Blanchett",
+    "Helen Mirren",
+    "Natalie Portman"
    ],
    "explain": "Nicole Kidman (1967): Starred in Moulin Rouge!",
    "difficulty": 3,
@@ -5120,8 +5204,8 @@
    "answer": "Natalie Portman",
    "wrong": [
     "Shirley Temple",
-    "Elijah Wood",
-    "Whoopi Goldberg"
+    "Whoopi Goldberg",
+    "Julia Roberts"
    ],
    "explain": "Natalie Portman (1981): Played Padmé Amidala in Star Wars.",
    "difficulty": 2,
@@ -5152,8 +5236,8 @@
    "answer": "Anne Hathaway",
    "wrong": [
     "Gal Gadot",
-    "Gene Kelly",
-    "Jack Nicholson"
+    "Cameron Diaz",
+    "Emma Watson"
    ],
    "explain": "Anne Hathaway (1982): Played Mia in The Princess Diaries.",
    "difficulty": 2,
@@ -5183,9 +5267,9 @@
    "prompt": "Who is this? She played an astronaut stranded in space in Gravity.",
    "answer": "Sandra Bullock",
    "wrong": [
-    "Vin Diesel",
     "Gal Gadot",
-    "Judy Garland"
+    "Judy Garland",
+    "Jennifer Lawrence"
    ],
    "explain": "Sandra Bullock (1964): Played an astronaut stranded in space in Gravity.",
    "difficulty": 2,
@@ -5215,9 +5299,9 @@
    "prompt": "Who is this? She won an Oscar for Ghost.",
    "answer": "Whoopi Goldberg",
    "wrong": [
-    "Idris Elba",
-    "Humphrey Bogart",
-    "Tom Hanks"
+    "Anne Hathaway",
+    "Kate Winslet",
+    "Judy Garland"
    ],
    "explain": "Whoopi Goldberg (1955): Won an Oscar for Ghost.",
    "difficulty": 2,
@@ -5248,8 +5332,8 @@
    "answer": "Samuel L. Jackson",
    "wrong": [
     "Gene Kelly",
-    "Emma Stone",
-    "Bruce Lee"
+    "Bruce Lee",
+    "Leonardo DiCaprio"
    ],
    "explain": "Samuel L. Jackson (1948): Plays Nick Fury in the Marvel films.",
    "difficulty": 2,
@@ -5279,9 +5363,9 @@
    "prompt": "Who is this? She won an Oscar for Fences.",
    "answer": "Viola Davis",
    "wrong": [
-    "Brad Pitt",
-    "Chris Hemsworth",
-    "Hugh Jackman"
+    "Sandra Bullock",
+    "Lupita Nyong'o",
+    "Cate Blanchett"
    ],
    "explain": "Viola Davis (1965): Won an Oscar for Fences.",
    "difficulty": 3,
@@ -5311,9 +5395,9 @@
    "prompt": "Who is this? She won an Oscar for her first feature film role.",
    "answer": "Lupita Nyong'o",
    "wrong": [
-    "Chris Pratt",
-    "Daniel Radcliffe",
-    "Denzel Washington"
+    "Zendaya",
+    "Emma Watson",
+    "Natalie Portman"
    ],
    "explain": "Lupita Nyong'o (1983): Won an Oscar for her first feature film role.",
    "difficulty": 3,
@@ -5343,9 +5427,9 @@
    "prompt": "Who is this? He played Nelson Mandela in Long Walk to Freedom.",
    "answer": "Idris Elba",
    "wrong": [
-    "Viola Davis",
     "Vin Diesel",
-    "Helen Mirren"
+    "Robin Williams",
+    "Benedict Cumberbatch"
    ],
    "explain": "Idris Elba (1972): Played Nelson Mandela in Long Walk to Freedom.",
    "difficulty": 3,
@@ -5376,8 +5460,8 @@
    "answer": "Benedict Cumberbatch",
    "wrong": [
     "Idris Elba",
-    "Julie Andrews",
-    "Kate Winslet"
+    "Jackie Chan",
+    "Mark Hamill"
    ],
    "explain": "Benedict Cumberbatch (1976): Plays Doctor Strange.",
    "difficulty": 2,
@@ -5407,9 +5491,9 @@
    "prompt": "Who is this? She played Wonder Woman.",
    "answer": "Gal Gadot",
    "wrong": [
-    "Jack Black",
-    "Will Smith",
-    "Natalie Portman"
+    "Natalie Portman",
+    "Nicole Kidman",
+    "Margot Robbie"
    ],
    "explain": "Gal Gadot (1985): Played Wonder Woman.",
    "difficulty": 2,
@@ -5439,9 +5523,9 @@
    "prompt": "Who is this? She played Elizabeth Swann in Pirates of the Caribbean.",
    "answer": "Keira Knightley",
    "wrong": [
-    "Chris Hemsworth",
     "Audrey Hepburn",
-    "Natalie Portman"
+    "Natalie Portman",
+    "Sigourney Weaver"
    ],
    "explain": "Keira Knightley (1985): Played Elizabeth Swann in Pirates of the Caribbean.",
    "difficulty": 2,
@@ -5472,8 +5556,8 @@
    "answer": "Orlando Bloom",
    "wrong": [
     "Samuel L. Jackson",
-    "Emma Thompson",
-    "Idris Elba"
+    "Idris Elba",
+    "Eddie Murphy"
    ],
    "explain": "Orlando Bloom (1977): Played the elf Legolas.",
    "difficulty": 2,
@@ -5504,8 +5588,8 @@
    "answer": "Elijah Wood",
    "wrong": [
     "Tom Hanks",
-    "Emma Stone",
-    "Benedict Cumberbatch"
+    "Benedict Cumberbatch",
+    "Robert Downey Jr."
    ],
    "explain": "Elijah Wood (1981): Played the hobbit Frodo Baggins.",
    "difficulty": 2,
@@ -5600,8 +5684,8 @@
    "answer": "Emma Thompson",
    "wrong": [
     "Lupita Nyong'o",
-    "Bruce Willis",
-    "Dwayne Johnson"
+    "Zendaya",
+    "Whoopi Goldberg"
    ],
    "explain": "Emma Thompson (1959): Played Nanny McPhee.",
    "difficulty": 3,
@@ -5631,9 +5715,9 @@
    "prompt": "Who is this? She was the biggest child star of the 1930s.",
    "answer": "Shirley Temple",
    "wrong": [
-    "Ian McKellen",
-    "Morgan Freeman",
-    "Judy Garland"
+    "Judy Garland",
+    "Meryl Streep",
+    "Emma Stone"
    ],
    "explain": "Shirley Temple (1928–2014): The biggest child star of the 1930s.",
    "difficulty": 3,
@@ -5663,9 +5747,9 @@
    "prompt": "Who is this? He played Butch Cassidy.",
    "answer": "Paul Newman",
    "wrong": [
-    "Marilyn Monroe",
     "Chris Pratt",
-    "Sandra Bullock"
+    "Benedict Cumberbatch",
+    "Robert De Niro"
    ],
    "explain": "Paul Newman (1925–2008): Played Butch Cassidy.",
    "difficulty": 3,
@@ -5695,9 +5779,9 @@
    "prompt": "Who is this? He starred in Singin' in the Rain.",
    "answer": "Gene Kelly",
    "wrong": [
-    "Lupita Nyong'o",
     "Rowan Atkinson",
-    "Meryl Streep"
+    "Hugh Grant",
+    "Chris Hemsworth"
    ],
    "explain": "Gene Kelly (1912–1996): Starred in Singin' in the Rain.",
    "difficulty": 3,
@@ -5727,9 +5811,9 @@
    "prompt": "Who is this? He was a famous dancer of Hollywood musicals.",
    "answer": "Fred Astaire",
    "wrong": [
-    "Angelina Jolie",
     "Tom Holland",
-    "Paul Newman"
+    "Paul Newman",
+    "Orlando Bloom"
    ],
    "explain": "Fred Astaire (1899–1987): A famous dancer of Hollywood musicals.",
    "difficulty": 3,
@@ -5759,9 +5843,9 @@
    "prompt": "Who is this? He voices Po in Kung Fu Panda.",
    "answer": "Jack Black",
    "wrong": [
-    "Judy Garland",
     "Sylvester Stallone",
-    "Ian McKellen"
+    "Ian McKellen",
+    "Eddie Murphy"
    ],
    "explain": "Jack Black (1969): Voices Po in Kung Fu Panda.",
    "difficulty": 1,
@@ -5791,9 +5875,9 @@
    "prompt": "Who is this? He plays Dominic Toretto in the Fast & Furious films.",
    "answer": "Vin Diesel",
    "wrong": [
-    "Cate Blanchett",
-    "Sigourney Weaver",
-    "Viola Davis"
+    "Paul Newman",
+    "Ryan Gosling",
+    "Timothée Chalamet"
    ],
    "explain": "Vin Diesel (1967): Plays Dominic Toretto in the Fast & Furious films.",
    "difficulty": 2,
@@ -5823,9 +5907,9 @@
    "prompt": "Who is this? He won an Oscar for playing the father of the atomic bomb.",
    "answer": "Cillian Murphy",
    "wrong": [
-    "Sandra Bullock",
     "Paul Newman",
-    "Rowan Atkinson"
+    "Rowan Atkinson",
+    "Humphrey Bogart"
    ],
    "explain": "Cillian Murphy (1976): Won an Oscar for playing the father of the atomic bomb.",
    "difficulty": 3,

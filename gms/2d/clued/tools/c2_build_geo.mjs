@@ -526,6 +526,8 @@ writePack({
   items: lmItems, questions: landmarkQuestions(), sources: [{ name: 'Wikidata (coordinates, dates)', url: 'https://www.wikidata.org' }, { name: 'Wikimedia Commons (photos)', url: 'https://commons.wikimedia.org' }],
 });
 
+(await import('./c2_distract.mjs')).run();
+
 mkdirSync(join(ROOT, 'tools/c2_reports'), { recursive: true });
 writeFileSync(join(ROOT, 'tools/c2_reports/geo.txt'), report.join('\n') + '\n');
 console.log(`${report.length} report lines -> tools/c2_reports/geo.txt`);

@@ -22,10 +22,10 @@ html,body{margin:0;height:100%;font-family:system-ui,-apple-system,sans-serif;ba
 </div>
 <div id="stage"></div><button id="next">Next</button><div id="log"></div>
 <script type="module">
-import { createMap } from './map.js?v=202610100547';
-import { createExplore } from './explore.js?v=202610100547';
-import { REGIONS, STATE_VIEWS } from './regions.js?v=202610100547';
-import { mulberry32, hashString } from '../core/rng.js?v=202610100547';
+import { createMap } from './map.js?v=202610101826';
+import { createExplore } from './explore.js?v=202610101826';
+import { REGIONS, STATE_VIEWS } from './regions.js?v=202610101826';
+import { mulberry32, hashString } from '../core/rng.js?v=202610101826';
 const FORMATS = ['map-click', 'city-pick', 'continent', 'water-click', 'pin-drop', 'neighbours', 'flag-map'];
 const q = new URLSearchParams(location.search);
 const $ = id => document.getElementById(id);
@@ -55,7 +55,7 @@ async function go() {
     window.map = ctrl; return;
   }
   if (fmt === 'explore') { ctrl = createExplore(stage, { region: $('region').value, onPick: (id, p) => log({ pick: id, n: p.n }) }); window.map = ctrl.map; return; }
-  const ns = await import(`./formats/${fmt}.js?v=202610100547`); mod = ns.default;
+  const ns = await import(`./formats/${fmt}.js?v=202610101826`); mod = ns.default;
   const opts = { kids: $('kids').checked };
   for (const o of mod.options || []) {
     const s = document.createElement('select'); s.id = 'o_' + o.key; s.title = o.label;

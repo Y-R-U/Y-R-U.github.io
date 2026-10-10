@@ -1,5 +1,5 @@
 // Format registry + helpers shared by every format. See docs/notes/A.md "Format author guide".
-import { pick, shuffle, sample, weightedPick } from '../core/rng.js?v=202610100547';
+import { pick, shuffle, sample, weightedPick } from '../core/rng.js?v=202610101826';
 
 const R = globalThis.__cluedFormats || (globalThis.__cluedFormats = { map: new Map(), listeners: new Set() });
 
@@ -278,10 +278,14 @@ export function distractors(rng, target, pool, n, { keyFn = it => it.name, rejec
     }
   };
   const look = new Set(target.item.lookalikes || []);
-  take(pool.filter(c => c.pack === target.pack && look.has(c.item.id)));
-  if (target.item.group) take(pool.filter(c => c.pack === target.pack && c.item.group === target.item.group));
-  take(pool.filter(c => c.pack === target.pack));
-  if (out.length < n && !target.item.group) take(pool);
+  // people: a "Who is this?" photo of a woman with three men offered gives it away, so same gender first
+  const g = target.item.gender;
+  for (const same of g ? [c => c.item.gender === g, () => true] : [() => true]) {
+    take(pool.filter(c => c.pack === target.pack && look.has(c.item.id) && same(c)));
+    if (target.item.group) take(pool.filter(c => c.pack === target.pack && c.item.group === target.item.group && same(c)));
+    take(pool.filter(c => c.pack === target.pack && same(c)));
+    if (out.length < n && !target.item.group) take(pool.filter(same));
+  }
   return out.length >= n ? out : null;
 }
 

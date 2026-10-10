@@ -1,5 +1,5 @@
 // Shared AudioContext, buses and the mobile unlock. sfx, piano and clips all route through here.
-import { dlog, modLoaded } from '../core/debuglog.js?v=202610100547';
+import { dlog, modLoaded } from '../core/debuglog.js?v=202610101826';
 const MOD_ID = modLoaded('ctx', import.meta.url);
 let ctx = null, master = null, sfxBus = null, musicBus = null, comp = null;
 const state = { volume: 0.8, sfx: 1, music: 1, muted: false };
@@ -97,6 +97,10 @@ function silentKeepAlive() {
   keepAlive.play()?.then?.(() => dlog('ctx', 'keepAlive.ok'), (e) => { dlog('ctx', 'keepAlive.fail', { err: String(e) }, 'warn'); keepAlive = null; });
 }
 
+// <audio> elements that aren't in the DOM (clip.js stream) register here so a hidden page pauses them
+const streamEls = new Set();
+export const trackAudioEl = (el) => { streamEls.add(el); return el; };
+
 // call once at boot; resumes on the first real gesture (and again after iOS interruptions)
 let installed = false;
 export function installUnlock(target = globalThis.document) {
@@ -111,8 +115,17 @@ export function installUnlock(target = globalThis.document) {
     if (ctx.state !== 'running') unlock();
   };
   ['pointerdown', 'touchend', 'keydown'].forEach((e) => target.addEventListener(e, wake, true));
+  // Hidden: nothing keeps playing in the background (Web Audio clips, piano, sfx and the streamed Apple preview).
+  const away = () => {
+    if (target.visibilityState !== 'hidden') return;
+    if (ctx && ctx.state === 'running') { dlog('ctx', 'suspend', { why: 'hidden' }); ctx.suspend().catch(() => {}); }
+    for (const el of target.querySelectorAll?.('audio[data-clued="1"]') || []) if (!el.paused) { el.pause(); el.__hidPaused = true; }
+    for (const el of streamEls) if (!el.paused) { el.pause(); el.__hidPaused = true; }
+  };
   const back = () => {
-    if (target.visibilityState !== 'visible' || !ctx || !unlocked) return;
+    if (target.visibilityState !== 'visible') return;
+    for (const el of [...(target.querySelectorAll?.('audio[data-clued="1"]') || []), ...streamEls]) if (el.__hidPaused) { el.__hidPaused = false; el.play()?.catch?.(() => {}); }
+    if (!ctx || !unlocked) return;
     try { if (navigator.audioSession) navigator.audioSession.type = 'playback'; } catch {}
     if (ctx.state !== 'running') {
       const before = ctx.state;
@@ -120,7 +133,7 @@ export function installUnlock(target = globalThis.document) {
       ctx.resume().then(() => dlog('ctx', 'resume.ok', { before, after: ctx.state }), (e) => dlog('ctx', 'resume.fail', { before, err: String(e) }, 'warn'));
     }
   };
-  target.addEventListener('visibilitychange', back);
+  target.addEventListener('visibilitychange', () => (target.visibilityState === 'hidden' ? away() : back()));
   globalThis.addEventListener?.('pageshow', back);
   globalThis.addEventListener?.('focus', back);
 }

@@ -123,5 +123,6 @@ for (const [id, title, theme, icon, text, factsMeta] of packs) {
   for (const it of items) { if (ids.has(it.id)) throw new Error('dup id ' + it.id); ids.add(it.id); }
   writePack({ id, title, theme, icon, kids: false, version: 1, imgPrompt: 'Which of these is {name}?', nameImgPrompt: 'Who is this?', tfImgPrompt: 'This is {name}.', factsMeta, items, questions: questions(items, id), sources: src });
 }
+(await import('./c2_gender.mjs')).run();
 writeFileSync(join(ROOT, 'tools/c2_reports/people.txt'), report.join('\n') + '\n');
 console.log(report.join('\n'));

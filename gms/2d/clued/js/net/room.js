@@ -1,25 +1,26 @@
 // Live room screen: lobby → synced questions (driven through A's runner) → scoreboards → podium.
-import { h, fmtNum } from '../ui/kit.js?v=202610100547';
-import { defineScreen, reset, header, current } from '../ui/app.js?v=202610100547';
-import { confirmPop, toast } from '../ui/popup.js?v=202610100547';
-import { sfx, confetti } from '../ui/fx.js?v=202610100547';
-import { createRunner } from '../structures/runner.js?v=202610100547';
-import { prepare, prepareFormats } from '../structures/session.js?v=202610100547';
-import { basePoints, streakMultiplier, stageMultiplier } from '../core/scoring.js?v=202610100547';
-import { urlsOf, preflight } from '../core/media.js?v=202610100547';
-import { randomSeed } from '../core/rng.js?v=202610100547';
-import { listFormats } from '../formats/registry.js?v=202610100547';
-import { loadFormats } from '../formats/index.js?v=202610100547';
-import { friendly } from './api.js?v=202610100547';
-import { getTransport } from './transport.js?v=202610100547';
-import { sharePanel, joinUrl, p2pUrl } from './share.js?v=202610100547';
-import { scoreboard, podium, ordinal, timingPanel, roundsTable, pointsBreakdown } from './board.js?v=202610100547';
-import { streakOption } from '../ui/streakopt.js?v=202610100547';
-import { roundAt, specRound, annotateTimes, fitSet } from './roundset.js?v=202610100547';
-import { roundTitle, roundThemes } from '../structures/rounds.js?v=202610100547';
-import { getFormat } from '../formats/registry.js?v=202610100547';
-import { ensureStyles, dropSeat, setQuery, gapLabel, TRUST_HINT, mmss } from './util.js?v=202610100547';
-import { trackRoom } from '../core/stats.js?v=202610100547';
+import { h, fmtNum } from '../ui/kit.js?v=202610101826';
+import { defineScreen, reset, header, current } from '../ui/app.js?v=202610101826';
+import { confirmPop, toast } from '../ui/popup.js?v=202610101826';
+import { sfx, confetti } from '../ui/fx.js?v=202610101826';
+import { createRunner } from '../structures/runner.js?v=202610101826';
+import { prepare, prepareFormats } from '../structures/session.js?v=202610101826';
+import { basePoints, streakMultiplier, stageMultiplier } from '../core/scoring.js?v=202610101826';
+import { urlsOf, preflight } from '../core/media.js?v=202610101826';
+import { randomSeed } from '../core/rng.js?v=202610101826';
+import { listFormats } from '../formats/registry.js?v=202610101826';
+import { loadFormats } from '../formats/index.js?v=202610101826';
+import { friendly } from './api.js?v=202610101826';
+import { getTransport } from './transport.js?v=202610101826';
+import { sharePanel, joinUrl, p2pUrl } from './share.js?v=202610101826';
+import { scoreboard, podium, ordinal, timingPanel, roundsTable, pointsBreakdown } from './board.js?v=202610101826';
+import { streakOption } from '../ui/streakopt.js?v=202610101826';
+import { roundAt, specRound, annotateTimes, fitSet } from './roundset.js?v=202610101826';
+import { roundTitle, roundThemes } from '../structures/rounds.js?v=202610101826';
+import { getFormat } from '../formats/registry.js?v=202610101826';
+import { ensureStyles, dropSeat, setQuery, gapLabel, TRUST_HINT, mmss } from './util.js?v=202610101826';
+import { trackRoom } from '../core/stats.js?v=202610101826';
+import { cleanQuestion } from './sanitize.js?v=202610101826';
 
 const DIFF = ['Mixed', 'Easy', 'Medium', 'Hard'];
 let formatsP = null;
@@ -209,6 +210,7 @@ defineScreen('room', async (el, { code, key, st: initial, via = 'server' }, cur)
 
   function startRunner(st) {
     const base = st.q, total = st.total, game = st.game;
+    ctx.base = base;
     setView('play');
     el.innerHTML = '';
     const qs = Array.from({ length: total - base }, (_, i) => ({ format: '_pending', id: `pending:${base + i}` }));
@@ -249,7 +251,7 @@ defineScreen('room', async (el, { code, key, st: initial, via = 'server' }, cur)
     for (let tries = 0; !data && tries < 6 && ctx.run === run; tries++) {
       try { data = await getQuestion(a); } catch (e) {
         ctx.qcache.delete(a);
-        if (e.status === 404 && st.q > a) break;
+        if (e.bad || (e.status === 404 && st.q > a)) break;
         await sleep(600 * (tries + 1));
       }
     }
@@ -314,7 +316,11 @@ defineScreen('room', async (el, { code, key, st: initial, via = 'server' }, cur)
   }
 
   function getQuestion(i) {
-    if (!ctx.qcache.has(i)) ctx.qcache.set(i, T.question(code, key, i));
+    if (!ctx.qcache.has(i)) ctx.qcache.set(i, T.question(code, key, i).then(d => {
+      const question = cleanQuestion(d?.question);
+      if (!question) throw Object.assign(new Error('bad question'), { bad: true });
+      return { ...d, question };
+    }));
     return ctx.qcache.get(i);
   }
 
@@ -362,9 +368,20 @@ defineScreen('room', async (el, { code, key, st: initial, via = 'server' }, cur)
       return;
     }
     L.box.replaceChildren(...revealParts(st));
+    settleHidden(st, L.a);
     // the runner's card shows a local estimate; the server's points (and the breakdown below) are the real ones
     const pts = el.querySelector('.rv-head .pts');
     if (pts && st.you.last) pts.textContent = `+${fmtNum(st.you.last.points)}`;
+  }
+
+  // mc/tf arrive without their answer (the server scores them); fetch it once the question is revealed.
+  function settleHidden(st, a) {
+    const run = ctx.run;
+    if (!run || ctx.settling === a || !run.current()?.hidden) return;
+    ctx.settling = a;
+    ctx.qcache.delete(a);
+    getQuestion(a).then(d => { if (ctx.run === run) run.settle(a - ctx.base, d.question, st.you?.last); })
+      .catch(() => { ctx.qcache.delete(a); if (ctx.settling === a) ctx.settling = null; });
   }
 
   // Server-side result, scoreboard and host controls, shared by the runner reveal and the between view.

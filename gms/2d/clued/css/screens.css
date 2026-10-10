@@ -204,6 +204,28 @@ body.kids-on .kids-toggle { border-style: solid; border-color: var(--ink); backg
   .home-grid { display: grid; grid-template-columns: 1fr 1.3fr; gap: 16px; align-items: start; }
   .play-btn .btn { min-height: 64px; font-size: 28px; }
   .tile { min-height: 84px; }
+  /* phone landscape: the whole home on one screen, 8 compact tiles in two rows */
+  .scr-home .home-top { padding-top: 4px; padding-bottom: 2px; }
+  .scr-home .home-top .logo { font-size: 30px; }
+  .scr-home .home-top .logo .lens { width: 32px; height: 32px; border-width: 4px; font-size: 18px; }
+  .scr-home .home-top .logo .lens::after { width: 6px; height: 14px; bottom: -12px; right: -4px; }
+  .scr-home .tagline { display: none; }
+  .scr-home .kids-toggle { padding: 4px 12px; margin-block: 2px 8px; }
+  .scr-home .kids-toggle .k-ico { font-size: 22px; }
+  .scr-home .kids-toggle .k-txt small { display: inline; margin-left: 8px; }
+  .scr-home .home-grid { gap: 12px; }
+  .scr-home .tiles { gap: 8px; }
+  .scr-home .tile { min-height: 0; padding: 6px 10px 8px; }
+  .scr-home .tile .t-ico { font-size: 24px; }
+  .scr-home .tile .t-title { font-size: 17px; margin-top: 2px; }
+  .scr-home .tile .t-blurb { display: none; }
+  .scr-home .daily-card { padding: 10px 14px; }
+  .scr-home .daily-card h2 { font-size: 22px; }
+  .scr-home .daily-card p { font-size: 14px; }
+  .scr-home .daily-card .d-badge { width: 52px; height: 52px; font-size: 32px; }
+  .scr-home .daily-card .d-badge.cal i { font-size: 24px; }
+  .scr-home .play-btn { margin: 8px 0 0; }
+  .scr-home .play-btn .btn { min-height: 52px; font-size: 26px; }
 }
 .res-score[data-stars]::after { content: ' ⭐'; -webkit-text-stroke: 0; text-shadow: none; }
 .daily-card .d-badge.cal { display: flex; flex-direction: column; overflow: hidden; background: var(--card); place-items: stretch; }

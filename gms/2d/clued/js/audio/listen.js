@@ -2,16 +2,16 @@
 // Also "finish the line" for public-domain songs (items with `lyrics`).
 import {
   register, poolItems, distractors, byDifficulty, placeAnswer, collect, pick, shuffle, hasAudio, imageOf, hasImg, pickPack,
-} from '../formats/registry.js?v=202610100547';
-import { h, choiceGrid, esc } from '../ui/kit.js?v=202610100547';
-import { basePoints } from '../core/scoring.js?v=202610100547';
-import * as clip from './clip.js?v=202610100547';
-import { revealHTML, BADGE_CSS, art as artUrl, previewUrl, setArt } from './apple.js?v=202610100547';
-import { net, appleSrc } from './applenet.js?v=202610100547';
-import { maybeProbe } from './probe.js?v=202610100547';
-import { getCtx, unlock, begin, end, ctxInfo } from './ctx.js?v=202610100547';
-import { LISTEN_CSS } from './listen_css.js?v=202610100547';
-import { dlog, modLoaded, buildsSeen } from '../core/debuglog.js?v=202610100547';
+} from '../formats/registry.js?v=202610101826';
+import { h, choiceGrid, esc } from '../ui/kit.js?v=202610101826';
+import { basePoints } from '../core/scoring.js?v=202610101826';
+import * as clip from './clip.js?v=202610101826';
+import { revealHTML, BADGE_CSS, art as artUrl, previewUrl, setArt } from './apple.js?v=202610101826';
+import { net, appleSrc } from './applenet.js?v=202610101826';
+import { maybeProbe } from './probe.js?v=202610101826';
+import { getCtx, unlock, begin, end, ctxInfo } from './ctx.js?v=202610101826';
+import { LISTEN_CSS } from './listen_css.js?v=202610101826';
+import { dlog, modLoaded, buildsSeen } from '../core/debuglog.js?v=202610101826';
 const MOD_ID = modLoaded('listen', import.meta.url);
 
 let renderSeq = 0;

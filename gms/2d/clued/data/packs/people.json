@@ -79,7 +79,8 @@
      }
     ]
    },
-   "difficulty": 1
+   "difficulty": 1,
+   "gender": "m"
   },
   {
    "id": "isaac-newton",
@@ -117,7 +118,8 @@
      }
     ]
    },
-   "difficulty": 1
+   "difficulty": 1,
+   "gender": "m"
   },
   {
    "id": "marie-curie",
@@ -153,7 +155,8 @@
      }
     ]
    },
-   "difficulty": 1
+   "difficulty": 1,
+   "gender": "f"
   },
   {
    "id": "charles-darwin",
@@ -190,7 +193,8 @@
      }
     ]
    },
-   "difficulty": 1
+   "difficulty": 1,
+   "gender": "m"
   },
   {
    "id": "galileo-galilei",
@@ -227,7 +231,8 @@
      }
     ]
    },
-   "difficulty": 1
+   "difficulty": 1,
+   "gender": "m"
   },
   {
    "id": "nikola-tesla",
@@ -264,7 +269,8 @@
      }
     ]
    },
-   "difficulty": 2
+   "difficulty": 2,
+   "gender": "m"
   },
   {
    "id": "thomas-edison",
@@ -302,7 +308,8 @@
      }
     ]
    },
-   "difficulty": 1
+   "difficulty": 1,
+   "gender": "m"
   },
   {
    "id": "stephen-hawking",
@@ -339,7 +346,8 @@
      }
     ]
    },
-   "difficulty": 1
+   "difficulty": 1,
+   "gender": "m"
   },
   {
    "id": "ada-lovelace",
@@ -376,7 +384,8 @@
      }
     ]
    },
-   "difficulty": 2
+   "difficulty": 2,
+   "gender": "f"
   },
   {
    "id": "alan-turing",
@@ -413,7 +422,8 @@
      }
     ]
    },
-   "difficulty": 2
+   "difficulty": 2,
+   "gender": "m"
   },
   {
    "id": "louis-pasteur",
@@ -450,7 +460,8 @@
      }
     ]
    },
-   "difficulty": 2
+   "difficulty": 2,
+   "gender": "m"
   },
   {
    "id": "alexander-fleming",
@@ -487,7 +498,8 @@
      }
     ]
    },
-   "difficulty": 2
+   "difficulty": 2,
+   "gender": "m"
   },
   {
    "id": "rosalind-franklin",
@@ -524,7 +536,8 @@
      }
     ]
    },
-   "difficulty": 3
+   "difficulty": 3,
+   "gender": "f"
   },
   {
    "id": "gregor-mendel",
@@ -561,7 +574,8 @@
      }
     ]
    },
-   "difficulty": 3
+   "difficulty": 3,
+   "gender": "m"
   },
   {
    "id": "dmitri-mendeleev",
@@ -598,7 +612,8 @@
      }
     ]
    },
-   "difficulty": 2
+   "difficulty": 2,
+   "gender": "m"
   },
   {
    "id": "nicolaus-copernicus",
@@ -635,7 +650,8 @@
      }
     ]
    },
-   "difficulty": 2
+   "difficulty": 2,
+   "gender": "m"
   },
   {
    "id": "michael-faraday",
@@ -672,7 +688,8 @@
      }
     ]
    },
-   "difficulty": 3
+   "difficulty": 3,
+   "gender": "m"
   },
   {
    "id": "alexander-graham-bell",
@@ -709,7 +726,8 @@
      }
     ]
    },
-   "difficulty": 2
+   "difficulty": 2,
+   "gender": "m"
   },
   {
    "id": "katherine-johnson",
@@ -743,7 +761,8 @@
      }
     ]
    },
-   "difficulty": 3
+   "difficulty": 3,
+   "gender": "f"
   },
   {
    "id": "jane-goodall",
@@ -780,7 +799,8 @@
      }
     ]
    },
-   "difficulty": 2
+   "difficulty": 2,
+   "gender": "f"
   },
   {
    "id": "carl-sagan",
@@ -817,7 +837,8 @@
      }
     ]
    },
-   "difficulty": 3
+   "difficulty": 3,
+   "gender": "m"
   },
   {
    "id": "tim-berners-lee",
@@ -853,7 +874,8 @@
      }
     ]
    },
-   "difficulty": 2
+   "difficulty": 2,
+   "gender": "m"
   },
   {
    "id": "edward-jenner",
@@ -890,7 +912,8 @@
      }
     ]
    },
-   "difficulty": 3
+   "difficulty": 3,
+   "gender": "m"
   },
   {
    "id": "florence-nightingale",
@@ -927,7 +950,8 @@
      }
     ]
    },
-   "difficulty": 1
+   "difficulty": 1,
+   "gender": "f"
   },
   {
    "id": "mary-anning",
@@ -964,7 +988,8 @@
      }
     ]
    },
-   "difficulty": 3
+   "difficulty": 3,
+   "gender": "f"
   },
   {
    "id": "niels-bohr",
@@ -1000,7 +1025,8 @@
      }
     ]
    },
-   "difficulty": 3
+   "difficulty": 3,
+   "gender": "m"
   },
   {
    "id": "richard-feynman",
@@ -1037,7 +1063,8 @@
      }
     ]
    },
-   "difficulty": 3
+   "difficulty": 3,
+   "gender": "m"
   },
   {
    "id": "johannes-kepler",
@@ -1074,7 +1101,8 @@
      }
     ]
    },
-   "difficulty": 3
+   "difficulty": 3,
+   "gender": "m"
   },
   {
    "id": "william-shakespeare",
@@ -1112,7 +1140,8 @@
      }
     ]
    },
-   "difficulty": 1
+   "difficulty": 1,
+   "gender": "m"
   },
   {
    "id": "jane-austen",
@@ -1149,7 +1178,8 @@
      }
     ]
    },
-   "difficulty": 2
+   "difficulty": 2,
+   "gender": "f"
   },
   {
    "id": "charles-dickens",
@@ -1186,7 +1216,8 @@
      }
     ]
    },
-   "difficulty": 1
+   "difficulty": 1,
+   "gender": "m"
   },
   {
    "id": "mark-twain",
@@ -1223,7 +1254,8 @@
      }
     ]
    },
-   "difficulty": 2
+   "difficulty": 2,
+   "gender": "m"
   },
   {
    "id": "agatha-christie",
@@ -1260,7 +1292,8 @@
      }
     ]
    },
-   "difficulty": 2
+   "difficulty": 2,
+   "gender": "f"
   },
   {
    "id": "j-k-rowling",
@@ -1297,7 +1330,8 @@
      }
     ]
    },
-   "difficulty": 1
+   "difficulty": 1,
+   "gender": "f"
   },
   {
    "id": "hans-christian-andersen",
@@ -1334,7 +1368,8 @@
      }
     ]
    },
-   "difficulty": 2
+   "difficulty": 2,
+   "gender": "m"
   },
   {
    "id": "roald-dahl",
@@ -1371,7 +1406,8 @@
      }
     ]
    },
-   "difficulty": 1
+   "difficulty": 1,
+   "gender": "m"
   },
   {
    "id": "j-r-r-tolkien",
@@ -1409,7 +1445,8 @@
      }
     ]
    },
-   "difficulty": 1
+   "difficulty": 1,
+   "gender": "m"
   },
   {
    "id": "maya-angelou",
@@ -1446,7 +1483,8 @@
      }
     ]
    },
-   "difficulty": 3
+   "difficulty": 3,
+   "gender": "f"
   },
   {
    "id": "dr-seuss",
@@ -1482,7 +1520,8 @@
      }
     ]
    },
-   "difficulty": 1
+   "difficulty": 1,
+   "gender": "m"
   },
   {
    "id": "wolfgang-amadeus-mozart",
@@ -1519,7 +1558,8 @@
      }
     ]
    },
-   "difficulty": 1
+   "difficulty": 1,
+   "gender": "m"
   },
   {
    "id": "ludwig-van-beethoven",
@@ -1556,7 +1596,8 @@
      }
     ]
    },
-   "difficulty": 1
+   "difficulty": 1,
+   "gender": "m"
   },
   {
    "id": "johann-sebastian-bach",
@@ -1593,7 +1634,8 @@
      }
     ]
    },
-   "difficulty": 2
+   "difficulty": 2,
+   "gender": "m"
   },
   {
    "id": "antonio-vivaldi",
@@ -1630,7 +1672,8 @@
      }
     ]
    },
-   "difficulty": 2
+   "difficulty": 2,
+   "gender": "m"
   },
   {
    "id": "pyotr-ilyich-tchaikovsky",
@@ -1667,7 +1710,8 @@
      }
     ]
    },
-   "difficulty": 2
+   "difficulty": 2,
+   "gender": "m"
   },
   {
    "id": "frederic-chopin",
@@ -1704,7 +1748,8 @@
      }
     ]
    },
-   "difficulty": 3
+   "difficulty": 3,
+   "gender": "m"
   },
   {
    "id": "elvis-presley",
@@ -1741,7 +1786,8 @@
      }
     ]
    },
-   "difficulty": 1
+   "difficulty": 1,
+   "gender": "m"
   },
   {
    "id": "john-lennon",
@@ -1778,7 +1824,8 @@
      }
     ]
    },
-   "difficulty": 2
+   "difficulty": 2,
+   "gender": "m"
   },
   {
    "id": "paul-mccartney",
@@ -1814,7 +1861,8 @@
      }
     ]
    },
-   "difficulty": 2
+   "difficulty": 2,
+   "gender": "m"
   },
   {
    "id": "michael-jackson",
@@ -1851,7 +1899,8 @@
      }
     ]
    },
-   "difficulty": 1
+   "difficulty": 1,
+   "gender": "m"
   },
   {
    "id": "freddie-mercury",
@@ -1887,7 +1936,8 @@
      }
     ]
    },
-   "difficulty": 2
+   "difficulty": 2,
+   "gender": "m"
   },
   {
    "id": "bob-marley",
@@ -1924,7 +1974,8 @@
      }
     ]
    },
-   "difficulty": 2
+   "difficulty": 2,
+   "gender": "m"
   },
   {
    "id": "madonna",
@@ -1957,7 +2008,8 @@
      }
     ]
    },
-   "difficulty": 2
+   "difficulty": 2,
+   "gender": "f"
   },
   {
    "id": "beyonce",
@@ -1993,7 +2045,8 @@
      }
     ]
    },
-   "difficulty": 1
+   "difficulty": 1,
+   "gender": "f"
   },
   {
    "id": "taylor-swift",
@@ -2026,7 +2079,8 @@
      }
     ]
    },
-   "difficulty": 1
+   "difficulty": 1,
+   "gender": "f"
   },
   {
    "id": "louis-armstrong",
@@ -2062,7 +2116,8 @@
      }
     ]
    },
-   "difficulty": 2
+   "difficulty": 2,
+   "gender": "m"
   },
   {
    "id": "dolly-parton",
@@ -2096,7 +2151,8 @@
      }
     ]
    },
-   "difficulty": 2
+   "difficulty": 2,
+   "gender": "f"
   },
   {
    "id": "walt-disney",
@@ -2133,7 +2189,8 @@
      }
     ]
    },
-   "difficulty": 1
+   "difficulty": 1,
+   "gender": "m"
   },
   {
    "id": "charlie-chaplin",
@@ -2169,7 +2226,8 @@
      }
     ]
    },
-   "difficulty": 1
+   "difficulty": 1,
+   "gender": "m"
   },
   {
    "id": "usain-bolt",
@@ -2204,7 +2262,8 @@
      }
     ]
    },
-   "difficulty": 1
+   "difficulty": 1,
+   "gender": "m"
   },
   {
    "id": "pele",
@@ -2241,7 +2300,8 @@
      }
     ]
    },
-   "difficulty": 1
+   "difficulty": 1,
+   "gender": "m"
   },
   {
    "id": "diego-maradona",
@@ -2278,7 +2338,8 @@
      }
     ]
    },
-   "difficulty": 2
+   "difficulty": 2,
+   "gender": "m"
   },
   {
    "id": "lionel-messi",
@@ -2315,7 +2376,8 @@
      }
     ]
    },
-   "difficulty": 1
+   "difficulty": 1,
+   "gender": "m"
   },
   {
    "id": "cristiano-ronaldo",
@@ -2352,7 +2414,8 @@
      }
     ]
    },
-   "difficulty": 1
+   "difficulty": 1,
+   "gender": "m"
   },
   {
    "id": "serena-williams",
@@ -2388,7 +2451,8 @@
      }
     ]
    },
-   "difficulty": 1
+   "difficulty": 1,
+   "gender": "f"
   },
   {
    "id": "roger-federer",
@@ -2424,7 +2488,8 @@
      }
     ]
    },
-   "difficulty": 2
+   "difficulty": 2,
+   "gender": "m"
   },
   {
    "id": "rafael-nadal",
@@ -2461,7 +2526,8 @@
      }
     ]
    },
-   "difficulty": 2
+   "difficulty": 2,
+   "gender": "m"
   },
   {
    "id": "muhammad-ali",
@@ -2497,7 +2563,8 @@
      }
     ]
    },
-   "difficulty": 1
+   "difficulty": 1,
+   "gender": "m"
   },
   {
    "id": "michael-jordan",
@@ -2533,7 +2600,8 @@
      }
     ]
    },
-   "difficulty": 1
+   "difficulty": 1,
+   "gender": "m"
   },
   {
    "id": "simone-biles",
@@ -2569,7 +2637,8 @@
      }
     ]
    },
-   "difficulty": 1
+   "difficulty": 1,
+   "gender": "f"
   },
   {
    "id": "michael-phelps",
@@ -2605,7 +2674,8 @@
      }
     ]
    },
-   "difficulty": 1
+   "difficulty": 1,
+   "gender": "m"
   },
   {
    "id": "tiger-woods",
@@ -2640,7 +2710,8 @@
      }
     ]
    },
-   "difficulty": 1
+   "difficulty": 1,
+   "gender": "m"
   },
   {
    "id": "jesse-owens",
@@ -2677,7 +2748,8 @@
      }
     ]
    },
-   "difficulty": 2
+   "difficulty": 2,
+   "gender": "m"
   },
   {
    "id": "nadia-comaneci",
@@ -2713,7 +2785,8 @@
      }
     ]
    },
-   "difficulty": 2
+   "difficulty": 2,
+   "gender": "f"
   },
   {
    "id": "wayne-gretzky",
@@ -2749,7 +2822,8 @@
      }
     ]
    },
-   "difficulty": 2
+   "difficulty": 2,
+   "gender": "m"
   },
   {
    "id": "sachin-tendulkar",
@@ -2785,7 +2859,8 @@
      }
     ]
    },
-   "difficulty": 2
+   "difficulty": 2,
+   "gender": "m"
   },
   {
    "id": "lewis-hamilton",
@@ -2812,7 +2887,8 @@
    "media": {
     "img": []
    },
-   "difficulty": 1
+   "difficulty": 1,
+   "gender": "m"
   },
   {
    "id": "babe-ruth",
@@ -2848,7 +2924,8 @@
      }
     ]
    },
-   "difficulty": 2
+   "difficulty": 2,
+   "gender": "m"
   },
   {
    "id": "don-bradman",
@@ -2885,7 +2962,8 @@
      }
     ]
    },
-   "difficulty": 3
+   "difficulty": 3,
+   "gender": "m"
   },
   {
    "id": "martin-luther-king-jr",
@@ -2923,7 +3001,8 @@
      }
     ]
    },
-   "difficulty": 1
+   "difficulty": 1,
+   "gender": "m"
   },
   {
    "id": "rosa-parks",
@@ -2960,7 +3039,8 @@
      }
     ]
    },
-   "difficulty": 1
+   "difficulty": 1,
+   "gender": "f"
   },
   {
    "id": "anne-frank",
@@ -2994,7 +3074,8 @@
      }
     ]
    },
-   "difficulty": 2
+   "difficulty": 2,
+   "gender": "f"
   },
   {
    "id": "malala-yousafzai",
@@ -3030,7 +3111,8 @@
      }
     ]
    },
-   "difficulty": 1
+   "difficulty": 1,
+   "gender": "f"
   },
   {
    "id": "mother-teresa",
@@ -3066,7 +3148,8 @@
      }
     ]
    },
-   "difficulty": 2
+   "difficulty": 2,
+   "gender": "f"
   },
   {
    "id": "joan-of-arc",
@@ -3103,7 +3186,8 @@
      }
     ]
    },
-   "difficulty": 2
+   "difficulty": 2,
+   "gender": "f"
   },
   {
    "id": "helen-keller",
@@ -3138,7 +3222,8 @@
      }
     ]
    },
-   "difficulty": 2
+   "difficulty": 2,
+   "gender": "f"
   },
   {
    "id": "emmeline-pankhurst",
@@ -3175,7 +3260,8 @@
      }
     ]
    },
-   "difficulty": 3
+   "difficulty": 3,
+   "gender": "f"
   },
   {
    "id": "aristotle",
@@ -3210,7 +3296,8 @@
      }
     ]
    },
-   "difficulty": 2
+   "difficulty": 2,
+   "gender": "m"
   },
   {
    "id": "confucius",
@@ -3244,7 +3331,8 @@
      }
     ]
    },
-   "difficulty": 2
+   "difficulty": 2,
+   "gender": "m"
   },
   {
    "id": "karl-marx",
@@ -3281,7 +3369,8 @@
      }
     ]
    },
-   "difficulty": 3
+   "difficulty": 3,
+   "gender": "m"
   },
   {
    "id": "sigmund-freud",
@@ -3318,7 +3407,8 @@
      }
     ]
    },
-   "difficulty": 2
+   "difficulty": 2,
+   "gender": "m"
   },
   {
    "id": "steve-jobs",
@@ -3355,7 +3445,8 @@
      }
     ]
    },
-   "difficulty": 1
+   "difficulty": 1,
+   "gender": "m"
   },
   {
    "id": "bill-gates",
@@ -3391,7 +3482,8 @@
      }
     ]
    },
-   "difficulty": 1
+   "difficulty": 1,
+   "gender": "m"
   },
   {
    "id": "henry-ford",
@@ -3428,7 +3520,8 @@
      }
     ]
    },
-   "difficulty": 2
+   "difficulty": 2,
+   "gender": "m"
   },
   {
    "id": "coco-chanel",
@@ -3465,7 +3558,8 @@
      }
     ]
    },
-   "difficulty": 2
+   "difficulty": 2,
+   "gender": "f"
   },
   {
    "id": "martin-luther",
@@ -3502,7 +3596,8 @@
      }
     ]
    },
-   "difficulty": 3
+   "difficulty": 3,
+   "gender": "m"
   }
  ],
  "questions": [
@@ -3576,9 +3671,9 @@
    "prompt": "Who is this? She was a pioneer of research into radioactivity.",
    "answer": "Marie Curie",
    "wrong": [
-    "Charles Darwin",
-    "Bob Marley",
-    "Nikola Tesla"
+    "Nadia Comăneci",
+    "Rosa Parks",
+    "Mary Anning"
    ],
    "explain": "Marie Curie (1867–1934): A pioneer of research into radioactivity.",
    "difficulty": 1,
@@ -3609,8 +3704,8 @@
    "answer": "Charles Darwin",
    "wrong": [
     "Mark Twain",
-    "Rosa Parks",
-    "Albert Einstein"
+    "Albert Einstein",
+    "Frédéric Chopin"
    ],
    "explain": "Charles Darwin (1809–1882): Developed the theory of evolution by natural selection.",
    "difficulty": 1,
@@ -3642,7 +3737,7 @@
    "wrong": [
     "Johannes Kepler",
     "Carl Sagan",
-    "Rosa Parks"
+    "Tim Berners-Lee"
    ],
    "explain": "Galileo Galilei (1564–1642): Supported the idea that the Earth goes around the Sun.",
    "difficulty": 1,
@@ -3674,7 +3769,7 @@
    "wrong": [
     "Albert Einstein",
     "Carl Sagan",
-    "Marie Curie"
+    "Richard Feynman"
    ],
    "explain": "Nikola Tesla (1856–1943): An electric car company is named after him.",
    "difficulty": 2,
@@ -3737,8 +3832,8 @@
    "answer": "Stephen Hawking",
    "wrong": [
     "Isaac Newton",
-    "Anne Frank",
-    "Helen Keller"
+    "Sigmund Freud",
+    "Diego Maradona"
    ],
    "explain": "Stephen Hawking (1942–2018): Wrote A Brief History of Time.",
    "difficulty": 1,
@@ -3768,9 +3863,9 @@
    "prompt": "Who is this? She is often called the first computer programmer.",
    "answer": "Ada Lovelace",
    "wrong": [
-    "Richard Feynman",
-    "Pyotr Ilyich Tchaikovsky",
-    "Tim Berners-Lee"
+    "Taylor Swift",
+    "Marie Curie",
+    "Anne Frank"
    ],
    "explain": "Ada Lovelace (1815–1852): Often called the first computer programmer.",
    "difficulty": 2,
@@ -3801,8 +3896,8 @@
    "answer": "Alan Turing",
    "wrong": [
     "Edward Jenner",
-    "Jane Goodall",
-    "Aristotle"
+    "Aristotle",
+    "Roger Federer"
    ],
    "explain": "Alan Turing (1912–1954): A founder of computer science.",
    "difficulty": 2,
@@ -3834,7 +3929,7 @@
    "wrong": [
     "Thomas Edison",
     "Nikola Tesla",
-    "Katherine Johnson"
+    "Babe Ruth"
    ],
    "explain": "Louis Pasteur (1822–1895): A French chemist and microbiologist.",
    "difficulty": 2,
@@ -3864,9 +3959,9 @@
    "prompt": "Who is this? He discovered penicillin.",
    "answer": "Alexander Fleming",
    "wrong": [
-    "Rosalind Franklin",
     "Stephen Hawking",
-    "Thomas Edison"
+    "Thomas Edison",
+    "Charlie Chaplin"
    ],
    "explain": "Alexander Fleming (1881–1955): Discovered penicillin.",
    "difficulty": 2,
@@ -3896,9 +3991,9 @@
    "prompt": "Who is this? Her work revealed the double helix structure of DNA.",
    "answer": "Rosalind Franklin",
    "wrong": [
-    "Dmitri Mendeleev",
-    "Carl Sagan",
-    "Frédéric Chopin"
+    "Malala Yousafzai",
+    "Marie Curie",
+    "Simone Biles"
    ],
    "explain": "Rosalind Franklin (1920–1958): Her work revealed the double helix structure of DNA.",
    "difficulty": 3,
@@ -3960,9 +4055,9 @@
    "prompt": "Who is this? He created the periodic table of the elements.",
    "answer": "Dmitri Mendeleev",
    "wrong": [
-    "Katherine Johnson",
-    "Agatha Christie",
-    "Alan Turing"
+    "Alan Turing",
+    "Albert Einstein",
+    "Tiger Woods"
    ],
    "explain": "Dmitri Mendeleev (1834–1907): Created the periodic table of the elements.",
    "difficulty": 2,
@@ -3993,8 +4088,8 @@
    "answer": "Nicolaus Copernicus",
    "wrong": [
     "Roger Federer",
-    "Helen Keller",
-    "Mother Teresa"
+    "Tim Berners-Lee",
+    "John Lennon"
    ],
    "explain": "Nicolaus Copernicus (1473–1543): Proposed that the Earth goes around the Sun.",
    "difficulty": 2,
@@ -4057,8 +4152,8 @@
    "answer": "Alexander Graham Bell",
    "wrong": [
     "Richard Feynman",
-    "Mother Teresa",
-    "Bill Gates"
+    "Bill Gates",
+    "Babe Ruth"
    ],
    "explain": "Alexander Graham Bell (1847–1922): Credited with inventing the telephone.",
    "difficulty": 2,
@@ -4088,9 +4183,9 @@
    "prompt": "Who is this? She was a mathematician who checked John Glenn's flight path.",
    "answer": "Katherine Johnson",
    "wrong": [
-    "Karl Marx",
     "Simone Biles",
-    "Sachin Tendulkar"
+    "Emmeline Pankhurst",
+    "Taylor Swift"
    ],
    "explain": "Katherine Johnson (1918–2020): A mathematician who checked John Glenn's flight path.",
    "difficulty": 3,
@@ -4121,8 +4216,8 @@
    "answer": "Jane Goodall",
    "wrong": [
     "Emmeline Pankhurst",
-    "Dr. Seuss",
-    "Michael Faraday"
+    "Helen Keller",
+    "Florence Nightingale"
    ],
    "explain": "Jane Goodall (1934–2025): Spent decades studying wild chimpanzees.",
    "difficulty": 2,
@@ -4153,8 +4248,8 @@
    "answer": "Carl Sagan",
    "wrong": [
     "Stephen Hawking",
-    "Coco Chanel",
-    "Roald Dahl"
+    "Roald Dahl",
+    "Martin Luther"
    ],
    "explain": "Carl Sagan (1934–1996): An American astronomer and science communicator.",
    "difficulty": 3,
@@ -4184,9 +4279,9 @@
    "prompt": "Who is this? He invented the World Wide Web.",
    "answer": "Tim Berners-Lee",
    "wrong": [
-    "Florence Nightingale",
     "Charles Darwin",
-    "Thomas Edison"
+    "Thomas Edison",
+    "Wolfgang Amadeus Mozart"
    ],
    "explain": "Tim Berners-Lee (1955): Invented the World Wide Web.",
    "difficulty": 2,
@@ -4216,9 +4311,9 @@
    "prompt": "Who is this? He pioneered the first vaccine.",
    "answer": "Edward Jenner",
    "wrong": [
-    "J. K. Rowling",
     "Richard Feynman",
-    "Alexander Graham Bell"
+    "Alexander Graham Bell",
+    "Confucius"
    ],
    "explain": "Edward Jenner (1749–1823): Pioneered the first vaccine.",
    "difficulty": 3,
@@ -4248,9 +4343,9 @@
    "prompt": "Who is this? She was known as the Lady with the Lamp.",
    "answer": "Florence Nightingale",
    "wrong": [
-    "Thomas Edison",
-    "Michael Phelps",
-    "Henry Ford"
+    "Helen Keller",
+    "J. K. Rowling",
+    "Madonna"
    ],
    "explain": "Florence Nightingale (1820–1910): Known as the Lady with the Lamp.",
    "difficulty": 1,
@@ -4280,9 +4375,9 @@
    "prompt": "Who is this? She was a pioneering fossil collector.",
    "answer": "Mary Anning",
    "wrong": [
-    "Stephen Hawking",
-    "John Lennon",
-    "Beyoncé"
+    "Beyoncé",
+    "Rosalind Franklin",
+    "Florence Nightingale"
    ],
    "explain": "Mary Anning (1799–1847): A pioneering fossil collector.",
    "difficulty": 3,
@@ -4376,9 +4471,9 @@
    "prompt": "Who is this? He described three laws of planetary motion.",
    "answer": "Johannes Kepler",
    "wrong": [
-    "Rosa Parks",
     "Walt Disney",
-    "Thomas Edison"
+    "Thomas Edison",
+    "Bill Gates"
    ],
    "explain": "Johannes Kepler (1571–1630): Described three laws of planetary motion.",
    "difficulty": 3,
@@ -4409,8 +4504,8 @@
    "answer": "William Shakespeare",
    "wrong": [
     "Martin Luther",
-    "Joan of Arc",
-    "Beyoncé"
+    "Babe Ruth",
+    "Isaac Newton"
    ],
    "explain": "William Shakespeare (1564–1616): Wrote Romeo and Juliet and Hamlet.",
    "difficulty": 1,
@@ -4440,9 +4535,9 @@
    "prompt": "Who is this? She wrote Pride and Prejudice.",
    "answer": "Jane Austen",
    "wrong": [
-    "Nicolaus Copernicus",
     "Beyoncé",
-    "Jane Goodall"
+    "Jane Goodall",
+    "J. K. Rowling"
    ],
    "explain": "Jane Austen (1775–1817): Wrote Pride and Prejudice.",
    "difficulty": 2,
@@ -4474,7 +4569,7 @@
    "wrong": [
     "Hans Christian Andersen",
     "Johann Sebastian Bach",
-    "Agatha Christie"
+    "Mark Twain"
    ],
    "explain": "Charles Dickens (1812–1870): Wrote Oliver Twist and A Christmas Carol.",
    "difficulty": 1,
@@ -4536,9 +4631,9 @@
    "prompt": "Who is this? She created the Belgian detective Hercule Poirot.",
    "answer": "Agatha Christie",
    "wrong": [
-    "Dr. Seuss",
     "Emmeline Pankhurst",
-    "Michael Phelps"
+    "Rosalind Franklin",
+    "Jane Goodall"
    ],
    "explain": "Agatha Christie (1890–1976): Created the Belgian detective Hercule Poirot.",
    "difficulty": 2,
@@ -4569,8 +4664,8 @@
    "answer": "J. K. Rowling",
    "wrong": [
     "Nadia Comăneci",
-    "Louis Armstrong",
-    "Madonna"
+    "Madonna",
+    "Emmeline Pankhurst"
    ],
    "explain": "J. K. Rowling (1965): Wrote the Harry Potter books.",
    "difficulty": 1,
@@ -4600,9 +4695,9 @@
    "prompt": "Who is this? He wrote fairy tales including The Little Mermaid.",
    "answer": "Hans Christian Andersen",
    "wrong": [
-    "Joan of Arc",
     "Isaac Newton",
-    "Jane Austen"
+    "Elvis Presley",
+    "Gregor Mendel"
    ],
    "explain": "Hans Christian Andersen (1805–1875): Wrote fairy tales including The Little Mermaid.",
    "difficulty": 2,
@@ -4697,8 +4792,8 @@
    "answer": "Maya Angelou",
    "wrong": [
     "Taylor Swift",
-    "Muhammad Ali",
-    "Alexander Graham Bell"
+    "Joan of Arc",
+    "Ada Lovelace"
    ],
    "explain": "Maya Angelou (1928–2014): An American poet and civil rights activist.",
    "difficulty": 3,
@@ -4761,8 +4856,8 @@
    "answer": "Wolfgang Amadeus Mozart",
    "wrong": [
     "Martin Luther King Jr.",
-    "Rosa Parks",
-    "Charles Darwin"
+    "Charles Darwin",
+    "Niels Bohr"
    ],
    "explain": "Wolfgang Amadeus Mozart (1756–1791): A famous composer of the Classical era.",
    "difficulty": 1,
@@ -4824,9 +4919,9 @@
    "prompt": "Who is this? He was a great Baroque composer and organist.",
    "answer": "Johann Sebastian Bach",
    "wrong": [
-    "Dolly Parton",
     "Bob Marley",
-    "Paul McCartney"
+    "Paul McCartney",
+    "Alan Turing"
    ],
    "explain": "Johann Sebastian Bach (1685–1750): A great Baroque composer and organist.",
    "difficulty": 2,
@@ -4858,7 +4953,7 @@
    "wrong": [
     "Charlie Chaplin",
     "Dr. Seuss",
-    "Madonna"
+    "Johann Sebastian Bach"
    ],
    "explain": "Antonio Vivaldi (1678–1741): Wrote The Four Seasons.",
    "difficulty": 2,
@@ -4888,9 +4983,9 @@
    "prompt": "Who is this? He wrote the ballet Swan Lake.",
    "answer": "Pyotr Ilyich Tchaikovsky",
    "wrong": [
-    "Rosa Parks",
     "Stephen Hawking",
-    "Louis Armstrong"
+    "Louis Armstrong",
+    "Elvis Presley"
    ],
    "explain": "Pyotr Ilyich Tchaikovsky (1840–1893): Wrote the ballet Swan Lake.",
    "difficulty": 2,
@@ -4952,9 +5047,9 @@
    "prompt": "Who is this? He was called the King of Rock and Roll.",
    "answer": "Elvis Presley",
    "wrong": [
-    "Beyoncé",
     "Frédéric Chopin",
-    "Paul McCartney"
+    "Paul McCartney",
+    "Usain Bolt"
    ],
    "explain": "Elvis Presley (1935–1977): Called the King of Rock and Roll.",
    "difficulty": 1,
@@ -4985,8 +5080,8 @@
    "answer": "John Lennon",
    "wrong": [
     "Johann Sebastian Bach",
-    "Mother Teresa",
-    "Rosalind Franklin"
+    "Hans Christian Andersen",
+    "Cristiano Ronaldo"
    ],
    "explain": "John Lennon (1940–1980): A founding member of the Beatles.",
    "difficulty": 2,
@@ -5016,9 +5111,9 @@
    "prompt": "Who is this? He was a member of the Beatles from Liverpool.",
    "answer": "Paul McCartney",
    "wrong": [
-    "Maya Angelou",
     "Pyotr Ilyich Tchaikovsky",
-    "Usain Bolt"
+    "Usain Bolt",
+    "Wolfgang Amadeus Mozart"
    ],
    "explain": "Paul McCartney (1942): A member of the Beatles from Liverpool.",
    "difficulty": 2,
@@ -5081,8 +5176,8 @@
    "answer": "Freddie Mercury",
    "wrong": [
     "Isaac Newton",
-    "Beyoncé",
-    "J. K. Rowling"
+    "Michael Jackson",
+    "Thomas Edison"
    ],
    "explain": "Freddie Mercury (1946–1991): The lead singer of Queen.",
    "difficulty": 2,
@@ -5145,8 +5240,8 @@
    "answer": "Madonna",
    "wrong": [
     "Coco Chanel",
-    "Gregor Mendel",
-    "Babe Ruth"
+    "Helen Keller",
+    "Florence Nightingale"
    ],
    "explain": "Madonna (1958): Known as the Queen of Pop.",
    "difficulty": 2,
@@ -5176,9 +5271,9 @@
    "prompt": "Who is this? She is called Queen Bey.",
    "answer": "Beyoncé",
    "wrong": [
-    "Alan Turing",
-    "Dr. Seuss",
-    "J. R. R. Tolkien"
+    "Taylor Swift",
+    "Joan of Arc",
+    "Helen Keller"
    ],
    "explain": "Beyoncé (1981): Called Queen Bey.",
    "difficulty": 1,
@@ -5208,9 +5303,9 @@
    "prompt": "Who is this? She started as a country singer before switching to pop.",
    "answer": "Taylor Swift",
    "wrong": [
-    "Pyotr Ilyich Tchaikovsky",
-    "Freddie Mercury",
-    "Stephen Hawking"
+    "Serena Williams",
+    "Joan of Arc",
+    "Marie Curie"
    ],
    "explain": "Taylor Swift (1989): Started as a country singer before switching to pop.",
    "difficulty": 1,
@@ -5240,9 +5335,9 @@
    "prompt": "Who is this? He was a famous jazz trumpeter.",
    "answer": "Louis Armstrong",
    "wrong": [
-    "Coco Chanel",
     "Johann Sebastian Bach",
-    "Michael Faraday"
+    "Michael Faraday",
+    "Nikola Tesla"
    ],
    "explain": "Louis Armstrong (1901–1971): A famous jazz trumpeter.",
    "difficulty": 2,
@@ -5272,9 +5367,9 @@
    "prompt": "Who is this? She is a country music star from Tennessee.",
    "answer": "Dolly Parton",
    "wrong": [
-    "Walt Disney",
-    "Ludwig van Beethoven",
-    "Paul McCartney"
+    "Anne Frank",
+    "Ada Lovelace",
+    "Emmeline Pankhurst"
    ],
    "explain": "Dolly Parton (1946–2026): A country music star from Tennessee.",
    "difficulty": 2,
@@ -5304,9 +5399,9 @@
    "prompt": "Who is this? He co-created Mickey Mouse.",
    "answer": "Walt Disney",
    "wrong": [
-    "Dolly Parton",
     "Antonio Vivaldi",
-    "Agatha Christie"
+    "Don Bradman",
+    "Sachin Tendulkar"
    ],
    "explain": "Walt Disney (1901–1966): Co-created Mickey Mouse.",
    "difficulty": 1,
@@ -5338,7 +5433,7 @@
    "wrong": [
     "Karl Marx",
     "Alan Turing",
-    "Marie Curie"
+    "Paul McCartney"
    ],
    "explain": "Charlie Chaplin (1889–1977): A famous star of silent comedy films.",
    "difficulty": 1,
@@ -5528,9 +5623,9 @@
    "prompt": "Who is this? She is one of the greatest tennis players ever.",
    "answer": "Serena Williams",
    "wrong": [
-    "Bill Gates",
-    "Martin Luther King Jr.",
-    "J. R. R. Tolkien"
+    "Helen Keller",
+    "Marie Curie",
+    "Rosalind Franklin"
    ],
    "explain": "Serena Williams (1981): One of the greatest tennis players ever.",
    "difficulty": 1,
@@ -5562,7 +5657,7 @@
    "wrong": [
     "Lionel Messi",
     "Wayne Gretzky",
-    "Beyoncé"
+    "Freddie Mercury"
    ],
    "explain": "Roger Federer (1981): A Swiss tennis great.",
    "difficulty": 2,
@@ -5626,7 +5721,7 @@
    "wrong": [
     "Ludwig van Beethoven",
     "Alexander Graham Bell",
-    "Serena Williams"
+    "Rafael Nadal"
    ],
    "explain": "Muhammad Ali (1942–2016): A heavyweight boxing champion.",
    "difficulty": 1,
@@ -5658,7 +5753,7 @@
    "wrong": [
     "Cristiano Ronaldo",
     "Richard Feynman",
-    "Rosalind Franklin"
+    "Frédéric Chopin"
    ],
    "explain": "Michael Jordan (1963): A basketball legend.",
    "difficulty": 1,
@@ -5688,9 +5783,9 @@
    "prompt": "Who is this? She is an American gymnast.",
    "answer": "Simone Biles",
    "wrong": [
-    "Sigmund Freud",
-    "Frédéric Chopin",
-    "Henry Ford"
+    "Joan of Arc",
+    "Rosalind Franklin",
+    "Jane Austen"
    ],
    "explain": "Simone Biles (1997): An American gymnast.",
    "difficulty": 1,
@@ -5722,7 +5817,7 @@
    "wrong": [
     "Karl Marx",
     "Bill Gates",
-    "Mother Teresa"
+    "Confucius"
    ],
    "explain": "Michael Phelps (1985): The most decorated Olympian of all time.",
    "difficulty": 1,
@@ -5784,9 +5879,9 @@
    "prompt": "Who is this? He was an American sprinter and long jumper.",
    "answer": "Jesse Owens",
    "wrong": [
-    "Malala Yousafzai",
     "Lionel Messi",
-    "Rosalind Franklin"
+    "Dr. Seuss",
+    "Charles Dickens"
    ],
    "explain": "Jesse Owens (1913–1980): An American sprinter and long jumper.",
    "difficulty": 2,
@@ -5816,9 +5911,9 @@
    "prompt": "Who is this? She is a Romanian gymnast.",
    "answer": "Nadia Comăneci",
    "wrong": [
-    "Wolfgang Amadeus Mozart",
     "Emmeline Pankhurst",
-    "Madonna"
+    "Madonna",
+    "Malala Yousafzai"
    ],
    "explain": "Nadia Comăneci (1961): A Romanian gymnast.",
    "difficulty": 2,
@@ -5850,7 +5945,7 @@
    "wrong": [
     "Jesse Owens",
     "Sachin Tendulkar",
-    "Katherine Johnson"
+    "Elvis Presley"
    ],
    "explain": "Wayne Gretzky (1961): An ice hockey legend.",
    "difficulty": 2,
@@ -5880,9 +5975,9 @@
    "prompt": "Who is this? He is an Indian cricket legend.",
    "answer": "Sachin Tendulkar",
    "wrong": [
-    "Joan of Arc",
     "Alexander Fleming",
-    "Michael Faraday"
+    "Michael Faraday",
+    "Hans Christian Andersen"
    ],
    "explain": "Sachin Tendulkar (1973): An Indian cricket legend.",
    "difficulty": 2,
@@ -5913,8 +6008,8 @@
    "answer": "Lewis Hamilton",
    "wrong": [
     "Bob Marley",
-    "Simone Biles",
-    "Dolly Parton"
+    "Sachin Tendulkar",
+    "Alexander Graham Bell"
    ],
    "explain": "Lewis Hamilton (1985): A British racing driver.",
    "difficulty": 1,
@@ -6008,9 +6103,9 @@
    "prompt": "Who is this? He was a leader of the US civil rights movement.",
    "answer": "Martin Luther King Jr.",
    "wrong": [
-    "Malala Yousafzai",
     "Thomas Edison",
-    "Gregor Mendel"
+    "Gregor Mendel",
+    "Lewis Hamilton"
    ],
    "explain": "Martin Luther King Jr. (1929–1968): A leader of the US civil rights movement.",
    "difficulty": 1,
@@ -6040,9 +6135,9 @@
    "prompt": "Who is this? She is called the mother of the civil rights movement.",
    "answer": "Rosa Parks",
    "wrong": [
-    "Nicolaus Copernicus",
     "Emmeline Pankhurst",
-    "Martin Luther King Jr."
+    "Simone Biles",
+    "Anne Frank"
    ],
    "explain": "Rosa Parks (1913–2005): Called the mother of the civil rights movement.",
    "difficulty": 1,
@@ -6072,9 +6167,9 @@
    "prompt": "Who is this? Her diary is one of the most-read books about the Holocaust.",
    "answer": "Anne Frank",
    "wrong": [
-    "Wolfgang Amadeus Mozart",
-    "Gregor Mendel",
-    "Beyoncé"
+    "Beyoncé",
+    "Agatha Christie",
+    "Taylor Swift"
    ],
    "explain": "Anne Frank (1929–1945): Her diary is one of the most-read books about the Holocaust.",
    "difficulty": 2,
@@ -6104,9 +6199,9 @@
    "prompt": "Who is this? She campaigns for girls' education.",
    "answer": "Malala Yousafzai",
    "wrong": [
-    "Dmitri Mendeleev",
-    "Paul McCartney",
-    "Richard Feynman"
+    "Taylor Swift",
+    "J. K. Rowling",
+    "Maya Angelou"
    ],
    "explain": "Malala Yousafzai (1997): Campaigns for girls' education.",
    "difficulty": 1,
@@ -6136,9 +6231,9 @@
    "prompt": "Who is this? She cared for the poor in Kolkata.",
    "answer": "Mother Teresa",
    "wrong": [
-    "Gregor Mendel",
-    "Elvis Presley",
-    "Edward Jenner"
+    "Emmeline Pankhurst",
+    "Mary Anning",
+    "Dolly Parton"
    ],
    "explain": "Mother Teresa (1910–1997): Cared for the poor in Kolkata.",
    "difficulty": 2,
@@ -6168,9 +6263,9 @@
    "prompt": "Who is this? She was a teenage French heroine of the Hundred Years' War.",
    "answer": "Joan of Arc",
    "wrong": [
-    "Alan Turing",
     "Maya Angelou",
-    "Jane Goodall"
+    "Jane Goodall",
+    "Anne Frank"
    ],
    "explain": "Joan of Arc (1412–1431): A teenage French heroine of the Hundred Years' War.",
    "difficulty": 2,
@@ -6200,9 +6295,9 @@
    "prompt": "Who is this? She lost her sight and hearing as a baby.",
    "answer": "Helen Keller",
    "wrong": [
-    "Babe Ruth",
     "Malala Yousafzai",
-    "Karl Marx"
+    "Katherine Johnson",
+    "Mary Anning"
    ],
    "explain": "Helen Keller (1880–1968): Lost her sight and hearing as a baby.",
    "difficulty": 2,
@@ -6233,8 +6328,8 @@
    "answer": "Emmeline Pankhurst",
    "wrong": [
     "Mother Teresa",
-    "Nikola Tesla",
-    "Joan of Arc"
+    "Joan of Arc",
+    "Simone Biles"
    ],
    "explain": "Emmeline Pankhurst (1858–1928): Led the fight for women's right to vote in Britain.",
    "difficulty": 3,
@@ -6266,7 +6361,7 @@
    "wrong": [
     "Wolfgang Amadeus Mozart",
     "J. R. R. Tolkien",
-    "J. K. Rowling"
+    "Stephen Hawking"
    ],
    "explain": "Aristotle (384 BC–322 BC): An ancient Greek philosopher.",
    "difficulty": 2,
@@ -6280,9 +6375,9 @@
    "prompt": "Who is this? He was an ancient Chinese philosopher.",
    "answer": "Confucius",
    "wrong": [
-    "Maya Angelou",
     "Hans Christian Andersen",
-    "Cristiano Ronaldo"
+    "Cristiano Ronaldo",
+    "Mark Twain"
    ],
    "explain": "Confucius: An ancient Chinese philosopher.",
    "difficulty": 2,
@@ -6296,9 +6391,9 @@
    "prompt": "Who is this? He co-wrote The Communist Manifesto.",
    "answer": "Karl Marx",
    "wrong": [
-    "Florence Nightingale",
     "Bob Marley",
-    "Michael Phelps"
+    "Michael Phelps",
+    "Gregor Mendel"
    ],
    "explain": "Karl Marx (1818–1883): Co-wrote The Communist Manifesto.",
    "difficulty": 3,
@@ -6362,7 +6457,7 @@
    "wrong": [
     "Confucius",
     "Dr. Seuss",
-    "Jane Goodall"
+    "Wolfgang Amadeus Mozart"
    ],
    "explain": "Steve Jobs (1955–2011): Co-founded Apple.",
    "difficulty": 1,
@@ -6392,9 +6487,9 @@
    "prompt": "Who is this? He co-founded Microsoft.",
    "answer": "Bill Gates",
    "wrong": [
-    "Simone Biles",
-    "Taylor Swift",
-    "Malala Yousafzai"
+    "Alexander Graham Bell",
+    "Wayne Gretzky",
+    "Isaac Newton"
    ],
    "explain": "Bill Gates (1955): Co-founded Microsoft.",
    "difficulty": 1,
@@ -6456,9 +6551,9 @@
    "prompt": "Who is this? She founded a famous French fashion house.",
    "answer": "Coco Chanel",
    "wrong": [
-    "Albert Einstein",
-    "Tiger Woods",
-    "Malala Yousafzai"
+    "Malala Yousafzai",
+    "Simone Biles",
+    "Madonna"
    ],
    "explain": "Coco Chanel (1883–1971): Founded a famous French fashion house.",
    "difficulty": 2,
@@ -6489,8 +6584,8 @@
    "answer": "Martin Luther",
    "wrong": [
     "Niels Bohr",
-    "Nadia Comăneci",
-    "Marie Curie"
+    "Lewis Hamilton",
+    "Albert Einstein"
    ],
    "explain": "Martin Luther (1483–1546): Started the Protestant Reformation.",
    "difficulty": 3,

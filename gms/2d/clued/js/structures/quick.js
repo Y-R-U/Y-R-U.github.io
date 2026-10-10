@@ -1,5 +1,5 @@
-import { playSpec } from './session.js?v=202610100547';
-import { specFor, fmtTitle } from './common.js?v=202610100547';
+import { playSpec } from './session.js?v=202610101826';
+import { specFor, fmtTitle } from './common.js?v=202610101826';
 
 const quick = {
   id: 'quick', title: 'Quick game', icon: '▶', blurb: 'One format, your themes.',

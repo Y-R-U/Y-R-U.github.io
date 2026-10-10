@@ -1,6 +1,6 @@
 // iTunes Search API: lookup by trackId (CORS, JSONP fallback), stale-preview refresh, reveal badge.
-import { dlog, modLoaded } from '../core/debuglog.js?v=202610100547';
-import { net, appleSrc, proxyUrl } from './applenet.js?v=202610100547';
+import { dlog, modLoaded } from '../core/debuglog.js?v=202610101826';
+import { net, appleSrc, proxyUrl } from './applenet.js?v=202610101826';
 const MOD_ID = modLoaded('apple', import.meta.url);
 
 const LOOKUP = 'https://itunes.apple.com/lookup';
@@ -93,13 +93,15 @@ export function setArt(img, url) {
 const NOTE = '<svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path fill="currentColor" d="M19 3v12.2a3.3 3.3 0 1 1-2-3V7.3l-8 1.8v8.1a3.3 3.3 0 1 1-2-3V5.4z"/></svg>';
 const esc = (s) => String(s ?? '').replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 
+const appleHref = u => (typeof u === 'string' && u.startsWith('https://music.apple.com/') ? u : '');
+
 // reveal card: artwork + title/artist + the "Listen on Apple Music" badge
 export function revealHTML(a, { title = '', artist = '', year = '' } = {}) {
   const ap = a.apple || {};
   const img = ap.art ? `<img class="au-art" ${artAttrs(art(ap.art, 300))} alt="" width="150" height="150" loading="eager">` : '';
   const sub = [artist, year].filter(Boolean).map(esc).join(' · ');
   return `<div class="au-reveal">${img}<div class="au-meta"><div class="au-title">${esc(title)}</div>${sub ? `<div class="au-sub">${sub}</div>` : ''}` +
-    (ap.url ? `<a class="au-apple" href="${esc(ap.url)}" target="_blank" rel="noopener">${NOTE}<span><small>Listen on</small>Apple Music</span></a>` : '') +
+    (appleHref(ap.url) ? `<a class="au-apple" href="${esc(ap.url)}" target="_blank" rel="noopener">${NOTE}<span><small>Listen on</small>Apple Music</span></a>` : '') +
     `</div></div>`;
 }
 

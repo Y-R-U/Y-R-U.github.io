@@ -1,10 +1,10 @@
 // Clip player: fetch + decode a sound once, keep only the slice a question needs, play it with an analyser.
 // Works for Apple previews, Commons/self-hosted files and piano note JSON (audio object {type:'piano', src}).
-import { getCtx, buses, begin, end, ctxInfo } from './ctx.js?v=202610100547';
-import { previewUrl } from './apple.js?v=202610100547';
-import { net, appleSrc, proxyUrl, isApple } from './applenet.js?v=202610100547';
-import * as piano from './piano.js?v=202610100547';
-import { dlog, modLoaded } from '../core/debuglog.js?v=202610100547';
+import { getCtx, buses, begin, end, ctxInfo, trackAudioEl } from './ctx.js?v=202610101826';
+import { previewUrl } from './apple.js?v=202610101826';
+import { net, appleSrc, proxyUrl, isApple } from './applenet.js?v=202610101826';
+import * as piano from './piano.js?v=202610101826';
+import { dlog, modLoaded } from '../core/debuglog.js?v=202610101826';
 const MOD_ID = modLoaded('clip', import.meta.url);
 
 const host = (u) => { try { const x = new URL(u); return x.host + x.pathname.slice(-40); } catch { return String(u).slice(-60); } };
@@ -150,7 +150,7 @@ export async function stream(a, { start = 0 } = {}) {
   dlog('clip', 'stream', { start });
   stopAll('stream');
   if (isPiano(a)) return play(a, { start: 0 });
-  if (!el) { el = new Audio(); el.dataset.clued = '1'; el.preload = 'auto'; el.crossOrigin = 'anonymous'; }
+  if (!el) { el = trackAudioEl(new Audio()); el.dataset.clued = '1'; el.preload = 'auto'; el.crossOrigin = 'anonymous'; }
   const url = resolve(await previewUrl(a));
   el.src = appleSrc(url);
   el.currentTime = start;
@@ -167,7 +167,7 @@ export async function stream(a, { start = 0 } = {}) {
     await el.play();
   }
   dlog('clip', 'stream.playing', { via: /\/api\/preview\?/.test(el.src) ? 'proxy' : 'direct', ms: performance.now() - t0 });
-  const h = { stop: () => el.pause(), elapsed: () => el.currentTime - start, done: new Promise((r) => el.addEventListener('ended', r, { once: true })), element: el };
+  const h = { stop: () => { el.__hidPaused = false; el.pause(); }, elapsed: () => el.currentTime - start, done: new Promise((r) => el.addEventListener('ended', r, { once: true })), element: el };
   current = h;
   return h;
 }

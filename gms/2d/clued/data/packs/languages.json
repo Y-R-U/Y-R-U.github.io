@@ -1384,12 +1384,17 @@
    "prompt": "Which of these is a main language of Afghanistan?",
    "answer": "Pashto",
    "wrong": [
-    "Bislama",
-    "Malagasy",
-    "Comorian"
+    "Uzbek",
+    "Mandarin Chinese",
+    "Urdu"
    ],
    "explain": "Main languages of Afghanistan: Pashto and Dari.",
-   "difficulty": 2
+   "difficulty": 2,
+   "wrongNotes": {
+    "Uzbek": "Uzbek is a main language in Uzbekistan.",
+    "Mandarin Chinese": "Mandarin Chinese is a main language in China and Singapore.",
+    "Urdu": "Urdu is a main language in Pakistan."
+   }
   },
   {
    "id": "lang-albania",
@@ -1397,12 +1402,17 @@
    "prompt": "Which of these is a main language of Albania?",
    "answer": "Albanian",
    "wrong": [
-    "Palauan",
-    "Filipino",
-    "Tigrinya"
+    "Macedonian",
+    "Greek",
+    "Montenegrin"
    ],
    "explain": "Main language of Albania: Albanian.",
-   "difficulty": 3
+   "difficulty": 1,
+   "wrongNotes": {
+    "Macedonian": "Macedonian is a main language in North Macedonia.",
+    "Greek": "Greek is a main language in Cyprus and Greece.",
+    "Montenegrin": "Montenegrin is a main language in Montenegro."
+   }
   },
   {
    "id": "lang-algeria",
@@ -1410,12 +1420,17 @@
    "prompt": "Which of these is a main language of Algeria?",
    "answer": "Arabic",
    "wrong": [
-    "Bengali",
-    "Bosnian",
-    "Guaraní"
+    "Hausa",
+    "Bambara",
+    "Maltese"
    ],
    "explain": "Main languages of Algeria: Arabic and Berber.",
-   "difficulty": 2
+   "difficulty": 2,
+   "wrongNotes": {
+    "Hausa": "Hausa is a main language in Niger.",
+    "Bambara": "Bambara is a main language in Mali.",
+    "Maltese": "Maltese is a main language in Malta."
+   }
   },
   {
    "id": "lang-andorra",
@@ -1423,12 +1438,17 @@
    "prompt": "Which of these is a main language of Andorra?",
    "answer": "Catalan",
    "wrong": [
-    "Marshallese",
-    "Tuvaluan",
-    "Swahili"
+    "Romanian",
+    "Portuguese",
+    "Italian"
    ],
    "explain": "Main language of Andorra: Catalan.",
-   "difficulty": 3
+   "difficulty": 3,
+   "wrongNotes": {
+    "Romanian": "Romanian is a main language in Moldova and Romania.",
+    "Portuguese": "Portuguese is a main language in Angola, Brazil, Cape Verde and 6 others.",
+    "Italian": "Italian is a main language in Italy, San Marino, Switzerland and Vatican City."
+   }
   },
   {
    "id": "lang-angola",
@@ -1436,12 +1456,17 @@
    "prompt": "Which of these is a main language of Angola?",
    "answer": "Portuguese",
    "wrong": [
-    "Belarusian",
-    "Italian",
-    "Dutch"
+    "French",
+    "English",
+    "Catalan"
    ],
    "explain": "Main language of Angola: Portuguese.",
-   "difficulty": 2
+   "difficulty": 2,
+   "wrongNotes": {
+    "French": "French is a main language in Belgium, Benin, Burkina Faso and 26 others.",
+    "English": "English is a main language in Antigua and Barbuda, Australia, Bahamas and 55 others.",
+    "Catalan": "Catalan is a main language in Andorra."
+   }
   },
   {
    "id": "lang-antigua-and-barbuda",
@@ -1449,12 +1474,17 @@
    "prompt": "Which of these is a main language of Antigua and Barbuda?",
    "answer": "English",
    "wrong": [
-    "Chichewa",
-    "Slovak",
-    "German"
+    "Norwegian",
+    "German",
+    "Afrikaans"
    ],
    "explain": "Main language of Antigua and Barbuda: English.",
-   "difficulty": 3
+   "difficulty": 3,
+   "wrongNotes": {
+    "Norwegian": "Norwegian is a main language in Norway.",
+    "German": "German is a main language in Austria, Belgium, Germany and 3 others.",
+    "Afrikaans": "Afrikaans is a main language in South Africa."
+   }
   },
   {
    "id": "lang-argentina",
@@ -1462,12 +1492,17 @@
    "prompt": "Which of these is a main language of Argentina?",
    "answer": "Spanish",
    "wrong": [
-    "Arabic",
-    "Wolof",
-    "Kyrgyz"
+    "Aymara",
+    "Portuguese",
+    "French"
    ],
    "explain": "Main language of Argentina: Spanish.",
-   "difficulty": 1
+   "difficulty": 1,
+   "wrongNotes": {
+    "Aymara": "Aymara is a main language in Bolivia.",
+    "Portuguese": "Portuguese is a main language in Angola, Brazil, Cape Verde and 6 others.",
+    "French": "French is a main language in Belgium, Benin, Burkina Faso and 26 others."
+   }
   },
   {
    "id": "lang-armenia",
@@ -1475,12 +1510,17 @@
    "prompt": "Which of these is a main language of Armenia?",
    "answer": "Armenian",
    "wrong": [
-    "Dutch",
-    "Nauruan",
-    "Marshallese"
+    "Azerbaijani",
+    "Turkish",
+    "Georgian"
    ],
    "explain": "Main language of Armenia: Armenian.",
-   "difficulty": 2
+   "difficulty": 1,
+   "wrongNotes": {
+    "Azerbaijani": "Azerbaijani is a main language in Azerbaijan.",
+    "Turkish": "Turkish is a main language in Cyprus and Turkey.",
+    "Georgian": "Georgian is a main language in Georgia."
+   }
   },
   {
    "id": "lang-australia",
@@ -1488,12 +1528,17 @@
    "prompt": "Which of these is a main language of Australia?",
    "answer": "English",
    "wrong": [
-    "Hausa",
-    "Bosnian",
-    "Maltese"
+    "German",
+    "Danish",
+    "Afrikaans"
    ],
    "explain": "Main language of Australia: English.",
-   "difficulty": 1
+   "difficulty": 1,
+   "wrongNotes": {
+    "German": "German is a main language in Austria, Belgium, Germany and 3 others.",
+    "Danish": "Danish is a main language in Denmark.",
+    "Afrikaans": "Afrikaans is a main language in South Africa."
+   }
   },
   {
    "id": "lang-austria",
@@ -1501,12 +1546,17 @@
    "prompt": "Which of these is a main language of Austria?",
    "answer": "German",
    "wrong": [
-    "Somali",
-    "Sinhala",
-    "Wolof"
+    "French",
+    "Slovak",
+    "Czech"
    ],
    "explain": "Main language of Austria: German.",
-   "difficulty": 1
+   "difficulty": 1,
+   "wrongNotes": {
+    "French": "French is a main language in Belgium, Benin, Burkina Faso and 26 others.",
+    "Slovak": "Slovak is a main language in Slovakia.",
+    "Czech": "Czech is a main language in Czechia."
+   }
   },
   {
    "id": "lang-azerbaijan",
@@ -1514,12 +1564,17 @@
    "prompt": "Which of these is a main language of Azerbaijan?",
    "answer": "Azerbaijani",
    "wrong": [
-    "Estonian",
-    "Italian",
-    "Marshallese"
+    "Armenian",
+    "Georgian",
+    "Turkish"
    ],
    "explain": "Main language of Azerbaijan: Azerbaijani.",
-   "difficulty": 2
+   "difficulty": 1,
+   "wrongNotes": {
+    "Armenian": "Armenian is a main language in Armenia.",
+    "Georgian": "Georgian is a main language in Georgia.",
+    "Turkish": "Turkish is a main language in Cyprus and Turkey."
+   }
   },
   {
    "id": "lang-bahamas",
@@ -1527,12 +1582,17 @@
    "prompt": "Which of these is a main language of the Bahamas?",
    "answer": "English",
    "wrong": [
-    "Czech",
-    "Finnish",
-    "Tongan"
+    "Norwegian",
+    "Swedish",
+    "Afrikaans"
    ],
    "explain": "Main language of the Bahamas: English.",
-   "difficulty": 3
+   "difficulty": 3,
+   "wrongNotes": {
+    "Norwegian": "Norwegian is a main language in Norway.",
+    "Swedish": "Swedish is a main language in Finland and Sweden.",
+    "Afrikaans": "Afrikaans is a main language in South Africa."
+   }
   },
   {
    "id": "lang-bahrain",
@@ -1540,12 +1600,17 @@
    "prompt": "Which of these is a main language of Bahrain?",
    "answer": "Arabic",
    "wrong": [
-    "Wolof",
-    "Ukrainian",
-    "Shona"
+    "Maltese",
+    "Hebrew",
+    "Amharic"
    ],
    "explain": "Main language of Bahrain: Arabic.",
-   "difficulty": 3
+   "difficulty": 3,
+   "wrongNotes": {
+    "Maltese": "Maltese is a main language in Malta.",
+    "Hebrew": "Hebrew is a main language in Israel.",
+    "Amharic": "Amharic is a main language in Ethiopia."
+   }
   },
   {
    "id": "lang-bangladesh",
@@ -1553,12 +1618,17 @@
    "prompt": "Which of these is a main language of Bangladesh?",
    "answer": "Bengali",
    "wrong": [
-    "Fiji Hindi",
-    "Spanish",
-    "Finnish"
+    "Hindi",
+    "English",
+    "Burmese"
    ],
    "explain": "Main language of Bangladesh: Bengali.",
-   "difficulty": 2
+   "difficulty": 2,
+   "wrongNotes": {
+    "Hindi": "Hindi is a main language in India.",
+    "English": "English is a main language in Antigua and Barbuda, Australia, Bahamas and 55 others.",
+    "Burmese": "Burmese is a main language in Myanmar."
+   }
   },
   {
    "id": "lang-barbados",
@@ -1566,25 +1636,35 @@
    "prompt": "Which of these is a main language of Barbados?",
    "answer": "English",
    "wrong": [
-    "Seychellois Creole",
-    "Tajik",
-    "Swazi"
+    "Danish",
+    "Dutch",
+    "Afrikaans"
    ],
    "explain": "Main language of Barbados: English.",
-   "difficulty": 3
+   "difficulty": 3,
+   "wrongNotes": {
+    "Danish": "Danish is a main language in Denmark.",
+    "Dutch": "Dutch is a main language in Belgium, Netherlands and Suriname.",
+    "Afrikaans": "Afrikaans is a main language in South Africa."
+   }
   },
   {
    "id": "lang-belarus",
    "kind": "mc",
    "prompt": "Which of these is a main language of Belarus?",
-   "answer": "Belarusian",
+   "answer": "Russian",
    "wrong": [
-    "Kirundi",
-    "Fijian",
-    "Mooré"
+    "Lithuanian",
+    "Polish",
+    "Ukrainian"
    ],
    "explain": "Main languages of Belarus: Belarusian and Russian.",
-   "difficulty": 2
+   "difficulty": 2,
+   "wrongNotes": {
+    "Lithuanian": "Lithuanian is a main language in Lithuania.",
+    "Polish": "Polish is a main language in Poland.",
+    "Ukrainian": "Ukrainian is a main language in Ukraine."
+   }
   },
   {
    "id": "lang-belgium",
@@ -1592,12 +1672,17 @@
    "prompt": "Which of these is a main language of Belgium?",
    "answer": "Dutch",
    "wrong": [
-    "Kirundi",
-    "Armenian",
-    "Hausa"
+    "Luxembourgish",
+    "Icelandic",
+    "Swedish"
    ],
    "explain": "Main languages of Belgium: Dutch, French and German.",
-   "difficulty": 1
+   "difficulty": 1,
+   "wrongNotes": {
+    "Luxembourgish": "Luxembourgish is a main language in Luxembourg.",
+    "Icelandic": "Icelandic is a main language in Iceland.",
+    "Swedish": "Swedish is a main language in Finland and Sweden."
+   }
   },
   {
    "id": "lang-belize",
@@ -1605,12 +1690,17 @@
    "prompt": "Which of these is a main language of Belize?",
    "answer": "English",
    "wrong": [
-    "Swahili",
-    "Lao",
+    "Spanish",
+    "Swedish",
     "Dutch"
    ],
    "explain": "Main language of Belize: English.",
-   "difficulty": 3
+   "difficulty": 3,
+   "wrongNotes": {
+    "Spanish": "Spanish is a main language in Argentina, Bolivia, Chile and 17 others.",
+    "Swedish": "Swedish is a main language in Finland and Sweden.",
+    "Dutch": "Dutch is a main language in Belgium, Netherlands and Suriname."
+   }
   },
   {
    "id": "lang-benin",
@@ -1618,12 +1708,17 @@
    "prompt": "Which of these is a main language of Benin?",
    "answer": "French",
    "wrong": [
-    "Māori",
-    "Tamil",
-    "Ukrainian"
+    "Hausa",
+    "English",
+    "Mooré"
    ],
    "explain": "Main language of Benin: French.",
-   "difficulty": 2
+   "difficulty": 2,
+   "wrongNotes": {
+    "Hausa": "Hausa is a main language in Niger.",
+    "English": "English is a main language in Antigua and Barbuda, Australia, Bahamas and 55 others.",
+    "Mooré": "Mooré is a main language in Burkina Faso."
+   }
   },
   {
    "id": "lang-bhutan",
@@ -1631,12 +1726,17 @@
    "prompt": "Which of these is a main language of Bhutan?",
    "answer": "Dzongkha",
    "wrong": [
-    "Tigrinya",
-    "Amharic",
-    "Afrikaans"
+    "Hindi",
+    "English",
+    "Mandarin Chinese"
    ],
    "explain": "Main language of Bhutan: Dzongkha.",
-   "difficulty": 3
+   "difficulty": 3,
+   "wrongNotes": {
+    "Hindi": "Hindi is a main language in India.",
+    "English": "English is a main language in Antigua and Barbuda, Australia, Bahamas and 55 others.",
+    "Mandarin Chinese": "Mandarin Chinese is a main language in China and Singapore."
+   }
   },
   {
    "id": "lang-bolivia",
@@ -1644,25 +1744,35 @@
    "prompt": "Which of these is a main language of Bolivia?",
    "answer": "Spanish",
    "wrong": [
-    "Romanian",
-    "Tetum",
-    "Polish"
+    "Guaraní",
+    "Portuguese",
+    "Romanian"
    ],
    "explain": "Main languages of Bolivia: Spanish, Quechua and Aymara.",
-   "difficulty": 2
+   "difficulty": 2,
+   "wrongNotes": {
+    "Guaraní": "Guaraní is a main language in Paraguay.",
+    "Portuguese": "Portuguese is a main language in Angola, Brazil, Cape Verde and 6 others.",
+    "Romanian": "Romanian is a main language in Moldova and Romania."
+   }
   },
   {
    "id": "lang-bosnia-and-herzegovina",
    "kind": "mc",
    "prompt": "Which of these is a main language of Bosnia and Herzegovina?",
-   "answer": "Bosnian",
+   "answer": "Croatian",
    "wrong": [
-    "Kurdish",
-    "Gilbertese",
-    "Tuvaluan"
+    "Montenegrin",
+    "Ukrainian",
+    "Bulgarian"
    ],
    "explain": "Main languages of Bosnia and Herzegovina: Bosnian, Croatian and Serbian.",
-   "difficulty": 2
+   "difficulty": 2,
+   "wrongNotes": {
+    "Montenegrin": "Montenegrin is a main language in Montenegro.",
+    "Ukrainian": "Ukrainian is a main language in Ukraine.",
+    "Bulgarian": "Bulgarian is a main language in Bulgaria."
+   }
   },
   {
    "id": "lang-botswana",
@@ -1670,12 +1780,17 @@
    "prompt": "Which of these is a main language of Botswana?",
    "answer": "English",
    "wrong": [
-    "Tok Pisin",
-    "Japanese",
-    "Dari"
+    "Afrikaans",
+    "Shona",
+    "Ndebele"
    ],
    "explain": "Main languages of Botswana: English and Setswana.",
-   "difficulty": 3
+   "difficulty": 3,
+   "wrongNotes": {
+    "Afrikaans": "Afrikaans is a main language in South Africa.",
+    "Shona": "Shona is a main language in Zimbabwe.",
+    "Ndebele": "Ndebele is a main language in Zimbabwe."
+   }
   },
   {
    "id": "lang-brazil",
@@ -1683,12 +1798,17 @@
    "prompt": "Which of these is a main language of Brazil?",
    "answer": "Portuguese",
    "wrong": [
-    "Seychellois Creole",
-    "Sesotho",
-    "Indonesian"
+    "Guaraní",
+    "Quechua",
+    "Dutch"
    ],
    "explain": "Main language of Brazil: Portuguese.",
-   "difficulty": 1
+   "difficulty": 1,
+   "wrongNotes": {
+    "Guaraní": "Guaraní is a main language in Paraguay.",
+    "Quechua": "Quechua is a main language in Bolivia and Peru.",
+    "Dutch": "Dutch is a main language in Belgium, Netherlands and Suriname."
+   }
   },
   {
    "id": "lang-brunei",
@@ -1696,12 +1816,17 @@
    "prompt": "Which of these is a main language of Brunei?",
    "answer": "Malay",
    "wrong": [
-    "Shona",
-    "Tok Pisin",
-    "Sango"
+    "Indonesian",
+    "Japanese",
+    "Vietnamese"
    ],
    "explain": "Main language of Brunei: Malay.",
-   "difficulty": 3
+   "difficulty": 3,
+   "wrongNotes": {
+    "Indonesian": "Indonesian is a main language in Indonesia.",
+    "Japanese": "Japanese is a main language in Japan.",
+    "Vietnamese": "Vietnamese is a main language in Vietnam."
+   }
   },
   {
    "id": "lang-bulgaria",
@@ -1709,12 +1834,17 @@
    "prompt": "Which of these is a main language of Bulgaria?",
    "answer": "Bulgarian",
    "wrong": [
-    "Xhosa",
-    "Bengali",
-    "Urdu"
+    "Turkish",
+    "Albanian",
+    "Serbian"
    ],
    "explain": "Main language of Bulgaria: Bulgarian.",
-   "difficulty": 2
+   "difficulty": 1,
+   "wrongNotes": {
+    "Turkish": "Turkish is a main language in Cyprus and Turkey.",
+    "Albanian": "Albanian is a main language in Albania and North Macedonia.",
+    "Serbian": "Serbian is a main language in Bosnia and Herzegovina and Serbia."
+   }
   },
   {
    "id": "lang-burkina-faso",
@@ -1722,25 +1852,35 @@
    "prompt": "Which of these is a main language of Burkina Faso?",
    "answer": "French",
    "wrong": [
-    "Norwegian",
-    "Bulgarian",
-    "Tongan"
+    "Hausa",
+    "English",
+    "Bambara"
    ],
    "explain": "Main languages of Burkina Faso: French and Mooré.",
-   "difficulty": 2
+   "difficulty": 2,
+   "wrongNotes": {
+    "Hausa": "Hausa is a main language in Niger.",
+    "English": "English is a main language in Antigua and Barbuda, Australia, Bahamas and 55 others.",
+    "Bambara": "Bambara is a main language in Mali."
+   }
   },
   {
    "id": "lang-burundi",
    "kind": "mc",
    "prompt": "Which of these is a main language of Burundi?",
-   "answer": "Kirundi",
+   "answer": "French",
    "wrong": [
-    "Irish",
-    "Mongolian",
-    "Albanian"
+    "Swahili",
+    "Kinyarwanda",
+    "English"
    ],
    "explain": "Main languages of Burundi: Kirundi and French.",
-   "difficulty": 2
+   "difficulty": 2,
+   "wrongNotes": {
+    "Swahili": "Swahili is a main language in Kenya, Tanzania and Uganda.",
+    "Kinyarwanda": "Kinyarwanda is a main language in Rwanda.",
+    "English": "English is a main language in Antigua and Barbuda, Australia, Bahamas and 55 others."
+   }
   },
   {
    "id": "lang-cambodia",
@@ -1748,12 +1888,17 @@
    "prompt": "Which of these is a main language of Cambodia?",
    "answer": "Khmer",
    "wrong": [
-    "Slovene",
-    "Xhosa",
-    "Ukrainian"
+    "Thai",
+    "Vietnamese",
+    "Lao"
    ],
    "explain": "Main language of Cambodia: Khmer.",
-   "difficulty": 2
+   "difficulty": 1,
+   "wrongNotes": {
+    "Thai": "Thai is a main language in Thailand.",
+    "Vietnamese": "Vietnamese is a main language in Vietnam.",
+    "Lao": "Lao is a main language in Laos."
+   }
   },
   {
    "id": "lang-cameroon",
@@ -1761,12 +1906,17 @@
    "prompt": "Which of these is a main language of Cameroon?",
    "answer": "French",
    "wrong": [
-    "Dhivehi",
-    "Urdu",
-    "Lithuanian"
+    "Spanish",
+    "Portuguese",
+    "Sango"
    ],
    "explain": "Main languages of Cameroon: French and English.",
-   "difficulty": 2
+   "difficulty": 2,
+   "wrongNotes": {
+    "Spanish": "Spanish is a main language in Argentina, Bolivia, Chile and 17 others.",
+    "Portuguese": "Portuguese is a main language in Angola, Brazil, Cape Verde and 6 others.",
+    "Sango": "Sango is a main language in Central African Republic."
+   }
   },
   {
    "id": "lang-canada",
@@ -1774,12 +1924,17 @@
    "prompt": "Which of these is a main language of Canada?",
    "answer": "English",
    "wrong": [
-    "Turkmen",
-    "Albanian",
-    "Mongolian"
+    "Afrikaans",
+    "German",
+    "Swedish"
    ],
    "explain": "Main languages of Canada: English and French.",
-   "difficulty": 1
+   "difficulty": 1,
+   "wrongNotes": {
+    "Afrikaans": "Afrikaans is a main language in South Africa.",
+    "German": "German is a main language in Austria, Belgium, Germany and 3 others.",
+    "Swedish": "Swedish is a main language in Finland and Sweden."
+   }
   },
   {
    "id": "lang-cape-verde",
@@ -1787,12 +1942,17 @@
    "prompt": "Which of these is a main language of Cape Verde?",
    "answer": "Portuguese",
    "wrong": [
-    "Korean",
-    "Finnish",
-    "Hindi"
+    "Spanish",
+    "Italian",
+    "Catalan"
    ],
    "explain": "Main language of Cape Verde: Portuguese.",
-   "difficulty": 3
+   "difficulty": 3,
+   "wrongNotes": {
+    "Spanish": "Spanish is a main language in Argentina, Bolivia, Chile and 17 others.",
+    "Italian": "Italian is a main language in Italy, San Marino, Switzerland and Vatican City.",
+    "Catalan": "Catalan is a main language in Andorra."
+   }
   },
   {
    "id": "lang-central-african-republic",
@@ -1800,12 +1960,17 @@
    "prompt": "Which of these is a main language of the Central African Republic?",
    "answer": "French",
    "wrong": [
-    "Lithuanian",
-    "Georgian",
-    "Persian"
+    "Arabic",
+    "English",
+    "Portuguese"
    ],
    "explain": "Main languages of the Central African Republic: French and Sango.",
-   "difficulty": 2
+   "difficulty": 2,
+   "wrongNotes": {
+    "Arabic": "Arabic is a main language in Algeria, Bahrain, Chad and 21 others.",
+    "English": "English is a main language in Antigua and Barbuda, Australia, Bahamas and 55 others.",
+    "Portuguese": "Portuguese is a main language in Angola, Brazil, Cape Verde and 6 others."
+   }
   },
   {
    "id": "lang-chad",
@@ -1813,12 +1978,17 @@
    "prompt": "Which of these is a main language of Chad?",
    "answer": "French",
    "wrong": [
-    "Sinhala",
-    "Guaraní",
-    "Khmer"
+    "Sango",
+    "Hausa",
+    "English"
    ],
    "explain": "Main languages of Chad: French and Arabic.",
-   "difficulty": 2
+   "difficulty": 2,
+   "wrongNotes": {
+    "Sango": "Sango is a main language in Central African Republic.",
+    "Hausa": "Hausa is a main language in Niger.",
+    "English": "English is a main language in Antigua and Barbuda, Australia, Bahamas and 55 others."
+   }
   },
   {
    "id": "lang-chile",
@@ -1826,12 +1996,17 @@
    "prompt": "Which of these is a main language of Chile?",
    "answer": "Spanish",
    "wrong": [
-    "Georgian",
-    "Pashto",
-    "Kinyarwanda"
+    "Quechua",
+    "Aymara",
+    "Portuguese"
    ],
    "explain": "Main language of Chile: Spanish.",
-   "difficulty": 1
+   "difficulty": 1,
+   "wrongNotes": {
+    "Quechua": "Quechua is a main language in Bolivia and Peru.",
+    "Aymara": "Aymara is a main language in Bolivia.",
+    "Portuguese": "Portuguese is a main language in Angola, Brazil, Cape Verde and 6 others."
+   }
   },
   {
    "id": "lang-china",
@@ -1839,12 +2014,17 @@
    "prompt": "Which of these is a main language of China?",
    "answer": "Mandarin Chinese",
    "wrong": [
-    "Lithuanian",
-    "Mooré",
-    "Polish"
+    "Dzongkha",
+    "Kazakh",
+    "Pashto"
    ],
    "explain": "Main language of China: Mandarin Chinese.",
-   "difficulty": 1
+   "difficulty": 1,
+   "wrongNotes": {
+    "Dzongkha": "Dzongkha is a main language in Bhutan.",
+    "Kazakh": "Kazakh is a main language in Kazakhstan.",
+    "Pashto": "Pashto is a main language in Afghanistan."
+   }
   },
   {
    "id": "lang-colombia",
@@ -1852,25 +2032,35 @@
    "prompt": "Which of these is a main language of Colombia?",
    "answer": "Spanish",
    "wrong": [
-    "Ndebele",
-    "Croatian",
-    "Gilbertese"
+    "Quechua",
+    "Portuguese",
+    "Catalan"
    ],
    "explain": "Main language of Colombia: Spanish.",
-   "difficulty": 2
+   "difficulty": 2,
+   "wrongNotes": {
+    "Quechua": "Quechua is a main language in Bolivia and Peru.",
+    "Portuguese": "Portuguese is a main language in Angola, Brazil, Cape Verde and 6 others.",
+    "Catalan": "Catalan is a main language in Andorra."
+   }
   },
   {
    "id": "lang-comoros",
    "kind": "mc",
    "prompt": "Which of these is a main language of the Comoros?",
-   "answer": "Comorian",
+   "answer": "Arabic",
    "wrong": [
-    "Belarusian",
-    "Croatian",
-    "Marshallese"
+    "Maltese",
+    "Amharic",
+    "Hebrew"
    ],
    "explain": "Main languages of the Comoros: Comorian, Arabic and French.",
-   "difficulty": 3
+   "difficulty": 3,
+   "wrongNotes": {
+    "Maltese": "Maltese is a main language in Malta.",
+    "Amharic": "Amharic is a main language in Ethiopia.",
+    "Hebrew": "Hebrew is a main language in Israel."
+   }
   },
   {
    "id": "lang-democratic-republic-of-the-congo",
@@ -1878,12 +2068,17 @@
    "prompt": "Which of these is a main language of the Democratic Republic of the Congo?",
    "answer": "French",
    "wrong": [
-    "Gilbertese",
-    "Belarusian",
-    "Thai"
+    "Kirundi",
+    "Swahili",
+    "Portuguese"
    ],
    "explain": "Main language of the Democratic Republic of the Congo: French.",
-   "difficulty": 2
+   "difficulty": 2,
+   "wrongNotes": {
+    "Kirundi": "Kirundi is a main language in Burundi.",
+    "Swahili": "Swahili is a main language in Kenya, Tanzania and Uganda.",
+    "Portuguese": "Portuguese is a main language in Angola, Brazil, Cape Verde and 6 others."
+   }
   },
   {
    "id": "lang-republic-of-the-congo",
@@ -1891,12 +2086,17 @@
    "prompt": "Which of these is a main language of the Republic of the Congo?",
    "answer": "French",
    "wrong": [
-    "Pashto",
-    "Urdu",
-    "Georgian"
+    "English",
+    "Sango",
+    "Portuguese"
    ],
    "explain": "Main language of the Republic of the Congo: French.",
-   "difficulty": 2
+   "difficulty": 2,
+   "wrongNotes": {
+    "English": "English is a main language in Antigua and Barbuda, Australia, Bahamas and 55 others.",
+    "Sango": "Sango is a main language in Central African Republic.",
+    "Portuguese": "Portuguese is a main language in Angola, Brazil, Cape Verde and 6 others."
+   }
   },
   {
    "id": "lang-costa-rica",
@@ -1904,12 +2104,17 @@
    "prompt": "Which of these is a main language of Costa Rica?",
    "answer": "Spanish",
    "wrong": [
-    "Seychellois Creole",
-    "Aymara",
-    "Serbian"
+    "Catalan",
+    "Italian",
+    "Portuguese"
    ],
    "explain": "Main language of Costa Rica: Spanish.",
-   "difficulty": 2
+   "difficulty": 2,
+   "wrongNotes": {
+    "Catalan": "Catalan is a main language in Andorra.",
+    "Italian": "Italian is a main language in Italy, San Marino, Switzerland and Vatican City.",
+    "Portuguese": "Portuguese is a main language in Angola, Brazil, Cape Verde and 6 others."
+   }
   },
   {
    "id": "lang-ivory-coast",
@@ -1917,12 +2122,17 @@
    "prompt": "Which of these is a main language of Ivory Coast?",
    "answer": "French",
    "wrong": [
-    "German",
-    "Lao",
-    "Burmese"
+    "Bambara",
+    "Mooré",
+    "English"
    ],
    "explain": "Main language of Ivory Coast: French.",
-   "difficulty": 2
+   "difficulty": 2,
+   "wrongNotes": {
+    "Bambara": "Bambara is a main language in Mali.",
+    "Mooré": "Mooré is a main language in Burkina Faso.",
+    "English": "English is a main language in Antigua and Barbuda, Australia, Bahamas and 55 others."
+   }
   },
   {
    "id": "lang-croatia",
@@ -1930,12 +2140,17 @@
    "prompt": "Which of these is a main language of Croatia?",
    "answer": "Croatian",
    "wrong": [
-    "Dari",
-    "Japanese",
-    "Swazi"
+    "Serbian",
+    "Montenegrin",
+    "Hungarian"
    ],
    "explain": "Main language of Croatia: Croatian.",
-   "difficulty": 2
+   "difficulty": 1,
+   "wrongNotes": {
+    "Serbian": "Serbian is a main language in Bosnia and Herzegovina and Serbia.",
+    "Montenegrin": "Montenegrin is a main language in Montenegro.",
+    "Hungarian": "Hungarian is a main language in Hungary."
+   }
   },
   {
    "id": "lang-cuba",
@@ -1943,12 +2158,17 @@
    "prompt": "Which of these is a main language of Cuba?",
    "answer": "Spanish",
    "wrong": [
-    "Samoan",
-    "Romanian",
-    "Nauruan"
+    "Italian",
+    "Catalan",
+    "Romanian"
    ],
    "explain": "Main language of Cuba: Spanish.",
-   "difficulty": 1
+   "difficulty": 1,
+   "wrongNotes": {
+    "Italian": "Italian is a main language in Italy, San Marino, Switzerland and Vatican City.",
+    "Catalan": "Catalan is a main language in Andorra.",
+    "Romanian": "Romanian is a main language in Moldova and Romania."
+   }
   },
   {
    "id": "lang-cyprus",
@@ -1956,12 +2176,17 @@
    "prompt": "Which of these is a main language of Cyprus?",
    "answer": "Greek",
    "wrong": [
-    "Finnish",
-    "Gilbertese",
-    "Icelandic"
+    "Urdu",
+    "Pashto",
+    "Malay"
    ],
    "explain": "Main languages of Cyprus: Greek and Turkish.",
-   "difficulty": 3
+   "difficulty": 3,
+   "wrongNotes": {
+    "Urdu": "Urdu is a main language in Pakistan.",
+    "Pashto": "Pashto is a main language in Afghanistan.",
+    "Malay": "Malay is a main language in Brunei, Malaysia and Singapore."
+   }
   },
   {
    "id": "lang-czechia",
@@ -1969,12 +2194,17 @@
    "prompt": "Which of these is a main language of Czechia?",
    "answer": "Czech",
    "wrong": [
-    "Thai",
-    "Quechua",
-    "Swazi"
+    "German",
+    "Polish",
+    "Slovak"
    ],
    "explain": "Main language of Czechia: Czech.",
-   "difficulty": 2
+   "difficulty": 1,
+   "wrongNotes": {
+    "German": "German is a main language in Austria, Belgium, Germany and 3 others.",
+    "Polish": "Polish is a main language in Poland.",
+    "Slovak": "Slovak is a main language in Slovakia."
+   }
   },
   {
    "id": "lang-denmark",
@@ -1982,12 +2212,17 @@
    "prompt": "Which of these is a main language of Denmark?",
    "answer": "Danish",
    "wrong": [
-    "Nepali",
-    "Bambara",
-    "Berber"
+    "German",
+    "Icelandic",
+    "Norwegian"
    ],
    "explain": "Main language of Denmark: Danish.",
-   "difficulty": 1
+   "difficulty": 1,
+   "wrongNotes": {
+    "German": "German is a main language in Austria, Belgium, Germany and 3 others.",
+    "Icelandic": "Icelandic is a main language in Iceland.",
+    "Norwegian": "Norwegian is a main language in Norway."
+   }
   },
   {
    "id": "lang-djibouti",
@@ -1995,12 +2230,17 @@
    "prompt": "Which of these is a main language of Djibouti?",
    "answer": "French",
    "wrong": [
-    "Fiji Hindi",
-    "Dari",
-    "Finnish"
+    "English",
+    "Amharic",
+    "Somali"
    ],
    "explain": "Main languages of Djibouti: French and Arabic.",
-   "difficulty": 3
+   "difficulty": 3,
+   "wrongNotes": {
+    "English": "English is a main language in Antigua and Barbuda, Australia, Bahamas and 55 others.",
+    "Amharic": "Amharic is a main language in Ethiopia.",
+    "Somali": "Somali is a main language in Somalia."
+   }
   },
   {
    "id": "lang-dominica",
@@ -2008,12 +2248,17 @@
    "prompt": "Which of these is a main language of Dominica?",
    "answer": "English",
    "wrong": [
-    "Italian",
-    "Danish",
-    "Slovak"
+    "Icelandic",
+    "Dutch",
+    "Swedish"
    ],
    "explain": "Main language of Dominica: English.",
-   "difficulty": 3
+   "difficulty": 3,
+   "wrongNotes": {
+    "Icelandic": "Icelandic is a main language in Iceland.",
+    "Dutch": "Dutch is a main language in Belgium, Netherlands and Suriname.",
+    "Swedish": "Swedish is a main language in Finland and Sweden."
+   }
   },
   {
    "id": "lang-dominican-republic",
@@ -2021,12 +2266,17 @@
    "prompt": "Which of these is a main language of the Dominican Republic?",
    "answer": "Spanish",
    "wrong": [
-    "Kyrgyz",
-    "Kazakh",
-    "Mauritian Creole"
+    "French",
+    "Haitian Creole",
+    "Portuguese"
    ],
    "explain": "Main language of the Dominican Republic: Spanish.",
-   "difficulty": 2
+   "difficulty": 2,
+   "wrongNotes": {
+    "French": "French is a main language in Belgium, Benin, Burkina Faso and 26 others.",
+    "Haitian Creole": "Haitian Creole is a main language in Haiti.",
+    "Portuguese": "Portuguese is a main language in Angola, Brazil, Cape Verde and 6 others."
+   }
   },
   {
    "id": "lang-ecuador",
@@ -2034,12 +2284,17 @@
    "prompt": "Which of these is a main language of Ecuador?",
    "answer": "Spanish",
    "wrong": [
-    "Māori",
-    "Uzbek",
-    "Sango"
+    "Quechua",
+    "French",
+    "Catalan"
    ],
    "explain": "Main language of Ecuador: Spanish.",
-   "difficulty": 2
+   "difficulty": 2,
+   "wrongNotes": {
+    "Quechua": "Quechua is a main language in Bolivia and Peru.",
+    "French": "French is a main language in Belgium, Benin, Burkina Faso and 26 others.",
+    "Catalan": "Catalan is a main language in Andorra."
+   }
   },
   {
    "id": "lang-egypt",
@@ -2047,12 +2302,17 @@
    "prompt": "Which of these is a main language of Egypt?",
    "answer": "Arabic",
    "wrong": [
-    "Māori",
-    "Dari",
-    "Palauan"
+    "Hebrew",
+    "Amharic",
+    "Maltese"
    ],
    "explain": "Main language of Egypt: Arabic.",
-   "difficulty": 1
+   "difficulty": 1,
+   "wrongNotes": {
+    "Hebrew": "Hebrew is a main language in Israel.",
+    "Amharic": "Amharic is a main language in Ethiopia.",
+    "Maltese": "Maltese is a main language in Malta."
+   }
   },
   {
    "id": "lang-el-salvador",
@@ -2060,12 +2320,17 @@
    "prompt": "Which of these is a main language of El Salvador?",
    "answer": "Spanish",
    "wrong": [
-    "Setswana",
-    "Burmese",
-    "Uzbek"
+    "Romanian",
+    "French",
+    "Portuguese"
    ],
    "explain": "Main language of El Salvador: Spanish.",
-   "difficulty": 2
+   "difficulty": 2,
+   "wrongNotes": {
+    "Romanian": "Romanian is a main language in Moldova and Romania.",
+    "French": "French is a main language in Belgium, Benin, Burkina Faso and 26 others.",
+    "Portuguese": "Portuguese is a main language in Angola, Brazil, Cape Verde and 6 others."
+   }
   },
   {
    "id": "lang-equatorial-guinea",
@@ -2073,12 +2338,17 @@
    "prompt": "Which of these is a main language of Equatorial Guinea?",
    "answer": "Spanish",
    "wrong": [
-    "Malay",
-    "Kazakh",
-    "Thai"
+    "English",
+    "Catalan",
+    "Italian"
    ],
    "explain": "Main languages of Equatorial Guinea: Spanish, French and Portuguese.",
-   "difficulty": 3
+   "difficulty": 3,
+   "wrongNotes": {
+    "English": "English is a main language in Antigua and Barbuda, Australia, Bahamas and 55 others.",
+    "Catalan": "Catalan is a main language in Andorra.",
+    "Italian": "Italian is a main language in Italy, San Marino, Switzerland and Vatican City."
+   }
   },
   {
    "id": "lang-eritrea",
@@ -2086,12 +2356,17 @@
    "prompt": "Which of these is a main language of Eritrea?",
    "answer": "Tigrinya",
    "wrong": [
-    "Nauruan",
-    "Lithuanian",
-    "German"
+    "Amharic",
+    "French",
+    "Comorian"
    ],
    "explain": "Main languages of Eritrea: Tigrinya, Arabic and English.",
-   "difficulty": 2
+   "difficulty": 2,
+   "wrongNotes": {
+    "Amharic": "Amharic is a main language in Ethiopia.",
+    "French": "French is a main language in Belgium, Benin, Burkina Faso and 26 others.",
+    "Comorian": "Comorian is a main language in Comoros."
+   }
   },
   {
    "id": "lang-estonia",
@@ -2099,25 +2374,35 @@
    "prompt": "Which of these is a main language of Estonia?",
    "answer": "Estonian",
    "wrong": [
-    "Comorian",
-    "Khmer",
-    "Burmese"
+    "Latvian",
+    "Finnish",
+    "Norwegian"
    ],
    "explain": "Main language of Estonia: Estonian.",
-   "difficulty": 3
+   "difficulty": 1,
+   "wrongNotes": {
+    "Latvian": "Latvian is a main language in Latvia.",
+    "Finnish": "Finnish is a main language in Finland.",
+    "Norwegian": "Norwegian is a main language in Norway."
+   }
   },
   {
    "id": "lang-eswatini",
    "kind": "mc",
    "prompt": "Which of these is a main language of Eswatini?",
-   "answer": "Swazi",
+   "answer": "English",
    "wrong": [
-    "Tuvaluan",
-    "Lao",
-    "Bislama"
+    "Xhosa",
+    "Zulu",
+    "Portuguese"
    ],
    "explain": "Main languages of Eswatini: Swazi and English.",
-   "difficulty": 3
+   "difficulty": 3,
+   "wrongNotes": {
+    "Xhosa": "Xhosa is a main language in South Africa.",
+    "Zulu": "Zulu is a main language in South Africa.",
+    "Portuguese": "Portuguese is a main language in Angola, Brazil, Cape Verde and 6 others."
+   }
   },
   {
    "id": "lang-ethiopia",
@@ -2125,12 +2410,17 @@
    "prompt": "Which of these is a main language of Ethiopia?",
    "answer": "Amharic",
    "wrong": [
-    "Tajik",
-    "Dutch",
-    "Kyrgyz"
+    "Swahili",
+    "Tigrinya",
+    "French"
    ],
    "explain": "Main language of Ethiopia: Amharic.",
-   "difficulty": 2
+   "difficulty": 2,
+   "wrongNotes": {
+    "Swahili": "Swahili is a main language in Kenya, Tanzania and Uganda.",
+    "Tigrinya": "Tigrinya is a main language in Eritrea.",
+    "French": "French is a main language in Belgium, Benin, Burkina Faso and 26 others."
+   }
   },
   {
    "id": "lang-fiji",
@@ -2138,25 +2428,35 @@
    "prompt": "Which of these is a main language of Fiji?",
    "answer": "English",
    "wrong": [
-    "Hindi",
-    "Azerbaijani",
-    "Korean"
+    "Afrikaans",
+    "Icelandic",
+    "Danish"
    ],
    "explain": "Main languages of Fiji: English, Fijian and Fiji Hindi.",
-   "difficulty": 3
+   "difficulty": 3,
+   "wrongNotes": {
+    "Afrikaans": "Afrikaans is a main language in South Africa.",
+    "Icelandic": "Icelandic is a main language in Iceland.",
+    "Danish": "Danish is a main language in Denmark."
+   }
   },
   {
    "id": "lang-finland",
    "kind": "mc",
    "prompt": "Which of these is a main language of Finland?",
-   "answer": "Finnish",
+   "answer": "Swedish",
    "wrong": [
-    "Haitian Creole",
-    "Bengali",
-    "Afrikaans"
+    "Norwegian",
+    "Russian",
+    "Danish"
    ],
    "explain": "Main languages of Finland: Finnish and Swedish.",
-   "difficulty": 1
+   "difficulty": 1,
+   "wrongNotes": {
+    "Norwegian": "Norwegian is a main language in Norway.",
+    "Russian": "Russian is a main language in Belarus, Kazakhstan, Kyrgyzstan and Russia.",
+    "Danish": "Danish is a main language in Denmark."
+   }
   },
   {
    "id": "lang-france",
@@ -2164,12 +2464,17 @@
    "prompt": "Which of these is a main language of France?",
    "answer": "French",
    "wrong": [
-    "Comorian",
-    "Sesotho",
-    "Arabic"
+    "Romansh",
+    "German",
+    "Spanish"
    ],
    "explain": "Main language of France: French.",
-   "difficulty": 1
+   "difficulty": 1,
+   "wrongNotes": {
+    "Romansh": "Romansh is a main language in Switzerland.",
+    "German": "German is a main language in Austria, Belgium, Germany and 3 others.",
+    "Spanish": "Spanish is a main language in Argentina, Bolivia, Chile and 17 others."
+   }
   },
   {
    "id": "lang-gabon",
@@ -2177,12 +2482,17 @@
    "prompt": "Which of these is a main language of Gabon?",
    "answer": "French",
    "wrong": [
-    "Kurdish",
-    "Dhivehi",
-    "Mandarin Chinese"
+    "English",
+    "Portuguese",
+    "Spanish"
    ],
    "explain": "Main language of Gabon: French.",
-   "difficulty": 3
+   "difficulty": 3,
+   "wrongNotes": {
+    "English": "English is a main language in Antigua and Barbuda, Australia, Bahamas and 55 others.",
+    "Portuguese": "Portuguese is a main language in Angola, Brazil, Cape Verde and 6 others.",
+    "Spanish": "Spanish is a main language in Argentina, Bolivia, Chile and 17 others."
+   }
   },
   {
    "id": "lang-gambia",
@@ -2190,12 +2500,17 @@
    "prompt": "Which of these is a main language of the Gambia?",
    "answer": "English",
    "wrong": [
-    "Lao",
-    "Czech",
-    "Filipino"
+    "Wolof",
+    "French",
+    "Icelandic"
    ],
    "explain": "Main language of the Gambia: English.",
-   "difficulty": 3
+   "difficulty": 3,
+   "wrongNotes": {
+    "Wolof": "Wolof is a main language in Senegal.",
+    "French": "French is a main language in Belgium, Benin, Burkina Faso and 26 others.",
+    "Icelandic": "Icelandic is a main language in Iceland."
+   }
   },
   {
    "id": "lang-georgia",
@@ -2203,12 +2518,17 @@
    "prompt": "Which of these is a main language of Georgia?",
    "answer": "Georgian",
    "wrong": [
-    "Tongan",
-    "Quechua",
-    "Latin"
+    "Armenian",
+    "Azerbaijani",
+    "Turkish"
    ],
    "explain": "Main language of Georgia: Georgian.",
-   "difficulty": 2
+   "difficulty": 1,
+   "wrongNotes": {
+    "Armenian": "Armenian is a main language in Armenia.",
+    "Azerbaijani": "Azerbaijani is a main language in Azerbaijan.",
+    "Turkish": "Turkish is a main language in Cyprus and Turkey."
+   }
   },
   {
    "id": "lang-germany",
@@ -2216,12 +2536,17 @@
    "prompt": "Which of these is a main language of Germany?",
    "answer": "German",
    "wrong": [
-    "Tajik",
-    "Mongolian",
-    "Kirundi"
+    "French",
+    "Danish",
+    "Czech"
    ],
    "explain": "Main language of Germany: German.",
-   "difficulty": 1
+   "difficulty": 1,
+   "wrongNotes": {
+    "French": "French is a main language in Belgium, Benin, Burkina Faso and 26 others.",
+    "Danish": "Danish is a main language in Denmark.",
+    "Czech": "Czech is a main language in Czechia."
+   }
   },
   {
    "id": "lang-ghana",
@@ -2229,12 +2554,17 @@
    "prompt": "Which of these is a main language of Ghana?",
    "answer": "English",
    "wrong": [
-    "Bosnian",
-    "Latin",
-    "Mongolian"
+    "French",
+    "Mooré",
+    "Afrikaans"
    ],
    "explain": "Main language of Ghana: English.",
-   "difficulty": 2
+   "difficulty": 2,
+   "wrongNotes": {
+    "French": "French is a main language in Belgium, Benin, Burkina Faso and 26 others.",
+    "Mooré": "Mooré is a main language in Burkina Faso.",
+    "Afrikaans": "Afrikaans is a main language in South Africa."
+   }
   },
   {
    "id": "lang-greece",
@@ -2242,12 +2572,17 @@
    "prompt": "Which of these is a main language of Greece?",
    "answer": "Greek",
    "wrong": [
-    "Georgian",
-    "Shona",
-    "Pashto"
+    "Bulgarian",
+    "Albanian",
+    "Macedonian"
    ],
    "explain": "Main language of Greece: Greek.",
-   "difficulty": 1
+   "difficulty": 1,
+   "wrongNotes": {
+    "Bulgarian": "Bulgarian is a main language in Bulgaria.",
+    "Albanian": "Albanian is a main language in Albania and North Macedonia.",
+    "Macedonian": "Macedonian is a main language in North Macedonia."
+   }
   },
   {
    "id": "lang-grenada",
@@ -2255,12 +2590,17 @@
    "prompt": "Which of these is a main language of Grenada?",
    "answer": "English",
    "wrong": [
-    "Danish",
-    "Armenian",
-    "Nepali"
+    "Norwegian",
+    "Swedish",
+    "Danish"
    ],
    "explain": "Main language of Grenada: English.",
-   "difficulty": 3
+   "difficulty": 3,
+   "wrongNotes": {
+    "Norwegian": "Norwegian is a main language in Norway.",
+    "Swedish": "Swedish is a main language in Finland and Sweden.",
+    "Danish": "Danish is a main language in Denmark."
+   }
   },
   {
    "id": "lang-guatemala",
@@ -2268,12 +2608,17 @@
    "prompt": "Which of these is a main language of Guatemala?",
    "answer": "Spanish",
    "wrong": [
-    "Romansh",
-    "Luxembourgish",
-    "Dhivehi"
+    "English",
+    "French",
+    "Portuguese"
    ],
    "explain": "Main language of Guatemala: Spanish.",
-   "difficulty": 2
+   "difficulty": 2,
+   "wrongNotes": {
+    "English": "English is a main language in Antigua and Barbuda, Australia, Bahamas and 55 others.",
+    "French": "French is a main language in Belgium, Benin, Burkina Faso and 26 others.",
+    "Portuguese": "Portuguese is a main language in Angola, Brazil, Cape Verde and 6 others."
+   }
   },
   {
    "id": "lang-guinea",
@@ -2281,12 +2626,17 @@
    "prompt": "Which of these is a main language of Guinea?",
    "answer": "French",
    "wrong": [
-    "Persian",
-    "Sinhala",
-    "Mongolian"
+    "Bambara",
+    "Portuguese",
+    "Wolof"
    ],
    "explain": "Main language of Guinea: French.",
-   "difficulty": 2
+   "difficulty": 2,
+   "wrongNotes": {
+    "Bambara": "Bambara is a main language in Mali.",
+    "Portuguese": "Portuguese is a main language in Angola, Brazil, Cape Verde and 6 others.",
+    "Wolof": "Wolof is a main language in Senegal."
+   }
   },
   {
    "id": "lang-guinea-bissau",
@@ -2294,12 +2644,17 @@
    "prompt": "Which of these is a main language of Guinea-Bissau?",
    "answer": "Portuguese",
    "wrong": [
-    "Pashto",
-    "Romanian",
-    "Polish"
+    "Wolof",
+    "French",
+    "Romanian"
    ],
    "explain": "Main language of Guinea-Bissau: Portuguese.",
-   "difficulty": 3
+   "difficulty": 3,
+   "wrongNotes": {
+    "Wolof": "Wolof is a main language in Senegal.",
+    "French": "French is a main language in Belgium, Benin, Burkina Faso and 26 others.",
+    "Romanian": "Romanian is a main language in Moldova and Romania."
+   }
   },
   {
    "id": "lang-guyana",
@@ -2307,25 +2662,35 @@
    "prompt": "Which of these is a main language of Guyana?",
    "answer": "English",
    "wrong": [
-    "Afrikaans",
-    "Indonesian",
-    "Persian"
+    "Dutch",
+    "Portuguese",
+    "Spanish"
    ],
    "explain": "Main language of Guyana: English.",
-   "difficulty": 3
+   "difficulty": 3,
+   "wrongNotes": {
+    "Dutch": "Dutch is a main language in Belgium, Netherlands and Suriname.",
+    "Portuguese": "Portuguese is a main language in Angola, Brazil, Cape Verde and 6 others.",
+    "Spanish": "Spanish is a main language in Argentina, Bolivia, Chile and 17 others."
+   }
   },
   {
    "id": "lang-haiti",
    "kind": "mc",
    "prompt": "Which of these is a main language of Haiti?",
-   "answer": "Haitian Creole",
+   "answer": "French",
    "wrong": [
-    "Xhosa",
-    "Armenian",
-    "Setswana"
+    "Spanish",
+    "Catalan",
+    "Romanian"
    ],
    "explain": "Main languages of Haiti: Haitian Creole and French.",
-   "difficulty": 2
+   "difficulty": 2,
+   "wrongNotes": {
+    "Spanish": "Spanish is a main language in Argentina, Bolivia, Chile and 17 others.",
+    "Catalan": "Catalan is a main language in Andorra.",
+    "Romanian": "Romanian is a main language in Moldova and Romania."
+   }
   },
   {
    "id": "lang-honduras",
@@ -2333,12 +2698,17 @@
    "prompt": "Which of these is a main language of Honduras?",
    "answer": "Spanish",
    "wrong": [
-    "Tamil",
-    "Azerbaijani",
-    "Lithuanian"
+    "Romanian",
+    "French",
+    "Italian"
    ],
    "explain": "Main language of Honduras: Spanish.",
-   "difficulty": 2
+   "difficulty": 2,
+   "wrongNotes": {
+    "Romanian": "Romanian is a main language in Moldova and Romania.",
+    "French": "French is a main language in Belgium, Benin, Burkina Faso and 26 others.",
+    "Italian": "Italian is a main language in Italy, San Marino, Switzerland and Vatican City."
+   }
   },
   {
    "id": "lang-hungary",
@@ -2346,12 +2716,17 @@
    "prompt": "Which of these is a main language of Hungary?",
    "answer": "Hungarian",
    "wrong": [
-    "Persian",
-    "Chichewa",
-    "Mooré"
+    "Slovak",
+    "Ukrainian",
+    "Slovene"
    ],
    "explain": "Main language of Hungary: Hungarian.",
-   "difficulty": 2
+   "difficulty": 1,
+   "wrongNotes": {
+    "Slovak": "Slovak is a main language in Slovakia.",
+    "Ukrainian": "Ukrainian is a main language in Ukraine.",
+    "Slovene": "Slovene is a main language in Slovenia."
+   }
   },
   {
    "id": "lang-iceland",
@@ -2359,12 +2734,17 @@
    "prompt": "Which of these is a main language of Iceland?",
    "answer": "Icelandic",
    "wrong": [
-    "Urdu",
-    "Mandarin Chinese",
-    "Kazakh"
+    "Swedish",
+    "Danish",
+    "English"
    ],
    "explain": "Main language of Iceland: Icelandic.",
-   "difficulty": 1
+   "difficulty": 1,
+   "wrongNotes": {
+    "Swedish": "Swedish is a main language in Finland and Sweden.",
+    "Danish": "Danish is a main language in Denmark.",
+    "English": "English is a main language in Antigua and Barbuda, Australia, Bahamas and 55 others."
+   }
   },
   {
    "id": "lang-india",
@@ -2372,12 +2752,17 @@
    "prompt": "Which of these is a main language of India?",
    "answer": "Hindi",
    "wrong": [
-    "Albanian",
-    "Hungarian",
-    "Mauritian Creole"
+    "Urdu",
+    "Bengali",
+    "Nepali"
    ],
    "explain": "Main languages of India: Hindi and English.",
-   "difficulty": 1
+   "difficulty": 1,
+   "wrongNotes": {
+    "Urdu": "Urdu is a main language in Pakistan.",
+    "Bengali": "Bengali is a main language in Bangladesh.",
+    "Nepali": "Nepali is a main language in Nepal."
+   }
   },
   {
    "id": "lang-indonesia",
@@ -2385,12 +2770,17 @@
    "prompt": "Which of these is a main language of Indonesia?",
    "answer": "Indonesian",
    "wrong": [
-    "Bislama",
-    "Mooré",
-    "Danish"
+    "Hiri Motu",
+    "Malay",
+    "Portuguese"
    ],
    "explain": "Main language of Indonesia: Indonesian.",
-   "difficulty": 2
+   "difficulty": 1,
+   "wrongNotes": {
+    "Hiri Motu": "Hiri Motu is a main language in Papua New Guinea.",
+    "Malay": "Malay is a main language in Brunei, Malaysia and Singapore.",
+    "Portuguese": "Portuguese is a main language in Angola, Brazil, Cape Verde and 6 others."
+   }
   },
   {
    "id": "lang-iran",
@@ -2398,12 +2788,17 @@
    "prompt": "Which of these is a main language of Iran?",
    "answer": "Persian",
    "wrong": [
-    "Slovene",
-    "Māori",
-    "Tuvaluan"
+    "Kurdish",
+    "Azerbaijani",
+    "English"
    ],
    "explain": "Main language of Iran: Persian.",
-   "difficulty": 2
+   "difficulty": 2,
+   "wrongNotes": {
+    "Kurdish": "Kurdish is a main language in Iraq.",
+    "Azerbaijani": "Azerbaijani is a main language in Azerbaijan.",
+    "English": "English is a main language in Antigua and Barbuda, Australia, Bahamas and 55 others."
+   }
   },
   {
    "id": "lang-iraq",
@@ -2411,25 +2806,35 @@
    "prompt": "Which of these is a main language of Iraq?",
    "answer": "Arabic",
    "wrong": [
-    "Macedonian",
-    "Marshallese",
-    "Fiji Hindi"
+    "Turkish",
+    "Persian",
+    "Hebrew"
    ],
    "explain": "Main languages of Iraq: Arabic and Kurdish.",
-   "difficulty": 2
+   "difficulty": 2,
+   "wrongNotes": {
+    "Turkish": "Turkish is a main language in Cyprus and Turkey.",
+    "Persian": "Persian is a main language in Iran.",
+    "Hebrew": "Hebrew is a main language in Israel."
+   }
   },
   {
    "id": "lang-ireland",
    "kind": "mc",
    "prompt": "Which of these is a main language of Ireland?",
-   "answer": "Irish",
+   "answer": "English",
    "wrong": [
-    "Wolof",
-    "Somali",
-    "Swahili"
+    "German",
+    "Dutch",
+    "Norwegian"
    ],
    "explain": "Main languages of Ireland: Irish and English.",
-   "difficulty": 1
+   "difficulty": 1,
+   "wrongNotes": {
+    "German": "German is a main language in Austria, Belgium, Germany and 3 others.",
+    "Dutch": "Dutch is a main language in Belgium, Netherlands and Suriname.",
+    "Norwegian": "Norwegian is a main language in Norway."
+   }
   },
   {
    "id": "lang-israel",
@@ -2437,12 +2842,17 @@
    "prompt": "Which of these is a main language of Israel?",
    "answer": "Hebrew",
    "wrong": [
-    "Zulu",
-    "French",
-    "Aymara"
+    "Amharic",
+    "Maltese",
+    "Armenian"
    ],
    "explain": "Main language of Israel: Hebrew.",
-   "difficulty": 2
+   "difficulty": 2,
+   "wrongNotes": {
+    "Amharic": "Amharic is a main language in Ethiopia.",
+    "Maltese": "Maltese is a main language in Malta.",
+    "Armenian": "Armenian is a main language in Armenia."
+   }
   },
   {
    "id": "lang-italy",
@@ -2450,12 +2860,17 @@
    "prompt": "Which of these is a main language of Italy?",
    "answer": "Italian",
    "wrong": [
-    "Tok Pisin",
-    "Kyrgyz",
-    "Mooré"
+    "German",
+    "French",
+    "Slovene"
    ],
    "explain": "Main language of Italy: Italian.",
-   "difficulty": 1
+   "difficulty": 1,
+   "wrongNotes": {
+    "German": "German is a main language in Austria, Belgium, Germany and 3 others.",
+    "French": "French is a main language in Belgium, Benin, Burkina Faso and 26 others.",
+    "Slovene": "Slovene is a main language in Slovenia."
+   }
   },
   {
    "id": "lang-jamaica",
@@ -2463,12 +2878,17 @@
    "prompt": "Which of these is a main language of Jamaica?",
    "answer": "English",
    "wrong": [
-    "Montenegrin",
-    "Kurdish",
-    "Pashto"
+    "Icelandic",
+    "Norwegian",
+    "Dutch"
    ],
    "explain": "Main language of Jamaica: English.",
-   "difficulty": 1
+   "difficulty": 1,
+   "wrongNotes": {
+    "Icelandic": "Icelandic is a main language in Iceland.",
+    "Norwegian": "Norwegian is a main language in Norway.",
+    "Dutch": "Dutch is a main language in Belgium, Netherlands and Suriname."
+   }
   },
   {
    "id": "lang-japan",
@@ -2476,12 +2896,17 @@
    "prompt": "Which of these is a main language of Japan?",
    "answer": "Japanese",
    "wrong": [
-    "Hiri Motu",
-    "Irish",
-    "Bambara"
+    "Bengali",
+    "Tetum",
+    "Kazakh"
    ],
    "explain": "Main language of Japan: Japanese.",
-   "difficulty": 1
+   "difficulty": 1,
+   "wrongNotes": {
+    "Bengali": "Bengali is a main language in Bangladesh.",
+    "Tetum": "Tetum is a main language in Timor-Leste.",
+    "Kazakh": "Kazakh is a main language in Kazakhstan."
+   }
   },
   {
    "id": "lang-jordan",
@@ -2489,25 +2914,35 @@
    "prompt": "Which of these is a main language of Jordan?",
    "answer": "Arabic",
    "wrong": [
-    "Fijian",
-    "Latvian",
-    "Mauritian Creole"
+    "Hebrew",
+    "Kurdish",
+    "Amharic"
    ],
    "explain": "Main language of Jordan: Arabic.",
-   "difficulty": 2
+   "difficulty": 2,
+   "wrongNotes": {
+    "Hebrew": "Hebrew is a main language in Israel.",
+    "Kurdish": "Kurdish is a main language in Iraq.",
+    "Amharic": "Amharic is a main language in Ethiopia."
+   }
   },
   {
    "id": "lang-kazakhstan",
    "kind": "mc",
    "prompt": "Which of these is a main language of Kazakhstan?",
-   "answer": "Kazakh",
+   "answer": "Russian",
    "wrong": [
-    "Gilbertese",
-    "Luxembourgish",
-    "Lithuanian"
+    "Uzbek",
+    "Kyrgyz",
+    "Turkmen"
    ],
    "explain": "Main languages of Kazakhstan: Kazakh and Russian.",
-   "difficulty": 2
+   "difficulty": 2,
+   "wrongNotes": {
+    "Uzbek": "Uzbek is a main language in Uzbekistan.",
+    "Kyrgyz": "Kyrgyz is a main language in Kyrgyzstan.",
+    "Turkmen": "Turkmen is a main language in Turkmenistan."
+   }
   },
   {
    "id": "lang-kenya",
@@ -2515,12 +2950,17 @@
    "prompt": "Which of these is a main language of Kenya?",
    "answer": "Swahili",
    "wrong": [
-    "Japanese",
-    "Hiri Motu",
-    "Pashto"
+    "Amharic",
+    "Arabic",
+    "Somali"
    ],
    "explain": "Main languages of Kenya: Swahili and English.",
-   "difficulty": 1
+   "difficulty": 1,
+   "wrongNotes": {
+    "Amharic": "Amharic is a main language in Ethiopia.",
+    "Arabic": "Arabic is a main language in Algeria, Bahrain, Chad and 21 others.",
+    "Somali": "Somali is a main language in Somalia."
+   }
   },
   {
    "id": "lang-kiribati",
@@ -2528,12 +2968,17 @@
    "prompt": "Which of these is a main language of Kiribati?",
    "answer": "English",
    "wrong": [
-    "Xhosa",
-    "Georgian",
-    "Vietnamese"
+    "Afrikaans",
+    "Swedish",
+    "Icelandic"
    ],
    "explain": "Main languages of Kiribati: English and Gilbertese.",
-   "difficulty": 3
+   "difficulty": 3,
+   "wrongNotes": {
+    "Afrikaans": "Afrikaans is a main language in South Africa.",
+    "Swedish": "Swedish is a main language in Finland and Sweden.",
+    "Icelandic": "Icelandic is a main language in Iceland."
+   }
   },
   {
    "id": "lang-kuwait",
@@ -2541,25 +2986,35 @@
    "prompt": "Which of these is a main language of Kuwait?",
    "answer": "Arabic",
    "wrong": [
-    "Italian",
-    "Belarusian",
-    "Norwegian"
+    "Kurdish",
+    "Maltese",
+    "Hebrew"
    ],
    "explain": "Main language of Kuwait: Arabic.",
-   "difficulty": 2
+   "difficulty": 2,
+   "wrongNotes": {
+    "Kurdish": "Kurdish is a main language in Iraq.",
+    "Maltese": "Maltese is a main language in Malta.",
+    "Hebrew": "Hebrew is a main language in Israel."
+   }
   },
   {
    "id": "lang-kyrgyzstan",
    "kind": "mc",
    "prompt": "Which of these is a main language of Kyrgyzstan?",
-   "answer": "Kyrgyz",
+   "answer": "Russian",
    "wrong": [
-    "Hiri Motu",
-    "Tongan",
-    "Czech"
+    "Uzbek",
+    "Tajik",
+    "Mandarin Chinese"
    ],
    "explain": "Main languages of Kyrgyzstan: Kyrgyz and Russian.",
-   "difficulty": 2
+   "difficulty": 2,
+   "wrongNotes": {
+    "Uzbek": "Uzbek is a main language in Uzbekistan.",
+    "Tajik": "Tajik is a main language in Tajikistan.",
+    "Mandarin Chinese": "Mandarin Chinese is a main language in China and Singapore."
+   }
   },
   {
    "id": "lang-laos",
@@ -2567,12 +3022,17 @@
    "prompt": "Which of these is a main language of Laos?",
    "answer": "Lao",
    "wrong": [
-    "German",
-    "Spanish",
-    "Romanian"
+    "Thai",
+    "Mandarin Chinese",
+    "Vietnamese"
    ],
    "explain": "Main language of Laos: Lao.",
-   "difficulty": 2
+   "difficulty": 1,
+   "wrongNotes": {
+    "Thai": "Thai is a main language in Thailand.",
+    "Mandarin Chinese": "Mandarin Chinese is a main language in China and Singapore.",
+    "Vietnamese": "Vietnamese is a main language in Vietnam."
+   }
   },
   {
    "id": "lang-latvia",
@@ -2580,12 +3040,17 @@
    "prompt": "Which of these is a main language of Latvia?",
    "answer": "Latvian",
    "wrong": [
-    "Arabic",
-    "Quechua",
-    "Kazakh"
+    "Lithuanian",
+    "Estonian",
+    "Belarusian"
    ],
    "explain": "Main language of Latvia: Latvian.",
-   "difficulty": 3
+   "difficulty": 1,
+   "wrongNotes": {
+    "Lithuanian": "Lithuanian is a main language in Lithuania.",
+    "Estonian": "Estonian is a main language in Estonia.",
+    "Belarusian": "Belarusian is a main language in Belarus."
+   }
   },
   {
    "id": "lang-lebanon",
@@ -2593,25 +3058,35 @@
    "prompt": "Which of these is a main language of Lebanon?",
    "answer": "Arabic",
    "wrong": [
-    "Hiri Motu",
-    "Swedish",
-    "Catalan"
+    "Hebrew",
+    "Amharic",
+    "Maltese"
    ],
    "explain": "Main language of Lebanon: Arabic.",
-   "difficulty": 2
+   "difficulty": 2,
+   "wrongNotes": {
+    "Hebrew": "Hebrew is a main language in Israel.",
+    "Amharic": "Amharic is a main language in Ethiopia.",
+    "Maltese": "Maltese is a main language in Malta."
+   }
   },
   {
    "id": "lang-lesotho",
    "kind": "mc",
    "prompt": "Which of these is a main language of Lesotho?",
-   "answer": "Sesotho",
+   "answer": "English",
    "wrong": [
-    "Hungarian",
-    "Latin",
-    "Norwegian"
+    "Xhosa",
+    "Afrikaans",
+    "Zulu"
    ],
    "explain": "Main languages of Lesotho: Sesotho and English.",
-   "difficulty": 3
+   "difficulty": 3,
+   "wrongNotes": {
+    "Xhosa": "Xhosa is a main language in South Africa.",
+    "Afrikaans": "Afrikaans is a main language in South Africa.",
+    "Zulu": "Zulu is a main language in South Africa."
+   }
   },
   {
    "id": "lang-liberia",
@@ -2619,12 +3094,17 @@
    "prompt": "Which of these is a main language of Liberia?",
    "answer": "English",
    "wrong": [
-    "Italian",
-    "Māori",
-    "Uzbek"
+    "French",
+    "Icelandic",
+    "Danish"
    ],
    "explain": "Main language of Liberia: English.",
-   "difficulty": 2
+   "difficulty": 2,
+   "wrongNotes": {
+    "French": "French is a main language in Belgium, Benin, Burkina Faso and 26 others.",
+    "Icelandic": "Icelandic is a main language in Iceland.",
+    "Danish": "Danish is a main language in Denmark."
+   }
   },
   {
    "id": "lang-libya",
@@ -2632,12 +3112,17 @@
    "prompt": "Which of these is a main language of Libya?",
    "answer": "Arabic",
    "wrong": [
-    "Fijian",
-    "Malay",
-    "Czech"
+    "Hausa",
+    "English",
+    "French"
    ],
    "explain": "Main language of Libya: Arabic.",
-   "difficulty": 2
+   "difficulty": 2,
+   "wrongNotes": {
+    "Hausa": "Hausa is a main language in Niger.",
+    "English": "English is a main language in Antigua and Barbuda, Australia, Bahamas and 55 others.",
+    "French": "French is a main language in Belgium, Benin, Burkina Faso and 26 others."
+   }
   },
   {
    "id": "lang-liechtenstein",
@@ -2645,12 +3130,17 @@
    "prompt": "Which of these is a main language of Liechtenstein?",
    "answer": "German",
    "wrong": [
-    "Guaraní",
-    "Indonesian",
-    "Uzbek"
+    "Romansh",
+    "Italian",
+    "French"
    ],
    "explain": "Main language of Liechtenstein: German.",
-   "difficulty": 3
+   "difficulty": 3,
+   "wrongNotes": {
+    "Romansh": "Romansh is a main language in Switzerland.",
+    "Italian": "Italian is a main language in Italy, San Marino, Switzerland and Vatican City.",
+    "French": "French is a main language in Belgium, Benin, Burkina Faso and 26 others."
+   }
   },
   {
    "id": "lang-lithuania",
@@ -2658,38 +3148,53 @@
    "prompt": "Which of these is a main language of Lithuania?",
    "answer": "Lithuanian",
    "wrong": [
-    "Palauan",
-    "Nepali",
-    "Tajik"
+    "Latvian",
+    "Belarusian",
+    "Latin"
    ],
    "explain": "Main language of Lithuania: Lithuanian.",
-   "difficulty": 3
+   "difficulty": 1,
+   "wrongNotes": {
+    "Latvian": "Latvian is a main language in Latvia.",
+    "Belarusian": "Belarusian is a main language in Belarus.",
+    "Latin": "Latin is a main language in Vatican City."
+   }
   },
   {
    "id": "lang-luxembourg",
    "kind": "mc",
    "prompt": "Which of these is a main language of Luxembourg?",
-   "answer": "Luxembourgish",
+   "answer": "French",
    "wrong": [
-    "Sango",
-    "Amharic",
-    "Mooré"
+    "Dutch",
+    "Portuguese",
+    "Romanian"
    ],
    "explain": "Main languages of Luxembourg: Luxembourgish, French and German.",
-   "difficulty": 3
+   "difficulty": 3,
+   "wrongNotes": {
+    "Dutch": "Dutch is a main language in Belgium, Netherlands and Suriname.",
+    "Portuguese": "Portuguese is a main language in Angola, Brazil, Cape Verde and 6 others.",
+    "Romanian": "Romanian is a main language in Moldova and Romania."
+   }
   },
   {
    "id": "lang-madagascar",
    "kind": "mc",
    "prompt": "Which of these is a main language of Madagascar?",
-   "answer": "Malagasy",
+   "answer": "French",
    "wrong": [
-    "Japanese",
-    "Mandarin Chinese",
-    "Māori"
+    "Italian",
+    "Portuguese",
+    "Catalan"
    ],
    "explain": "Main languages of Madagascar: Malagasy and French.",
-   "difficulty": 2
+   "difficulty": 2,
+   "wrongNotes": {
+    "Italian": "Italian is a main language in Italy, San Marino, Switzerland and Vatican City.",
+    "Portuguese": "Portuguese is a main language in Angola, Brazil, Cape Verde and 6 others.",
+    "Catalan": "Catalan is a main language in Andorra."
+   }
   },
   {
    "id": "lang-malawi",
@@ -2697,12 +3202,17 @@
    "prompt": "Which of these is a main language of Malawi?",
    "answer": "English",
    "wrong": [
-    "Icelandic",
-    "Polish",
-    "Guaraní"
+    "Portuguese",
+    "Swahili",
+    "Norwegian"
    ],
    "explain": "Main languages of Malawi: English and Chichewa.",
-   "difficulty": 2
+   "difficulty": 2,
+   "wrongNotes": {
+    "Portuguese": "Portuguese is a main language in Angola, Brazil, Cape Verde and 6 others.",
+    "Swahili": "Swahili is a main language in Kenya, Tanzania and Uganda.",
+    "Norwegian": "Norwegian is a main language in Norway."
+   }
   },
   {
    "id": "lang-malaysia",
@@ -2710,12 +3220,17 @@
    "prompt": "Which of these is a main language of Malaysia?",
    "answer": "Malay",
    "wrong": [
-    "Aymara",
-    "Slovak",
-    "Bosnian"
+    "Indonesian",
+    "Thai",
+    "Vietnamese"
    ],
    "explain": "Main language of Malaysia: Malay.",
-   "difficulty": 2
+   "difficulty": 1,
+   "wrongNotes": {
+    "Indonesian": "Indonesian is a main language in Indonesia.",
+    "Thai": "Thai is a main language in Thailand.",
+    "Vietnamese": "Vietnamese is a main language in Vietnam."
+   }
   },
   {
    "id": "lang-maldives",
@@ -2723,12 +3238,17 @@
    "prompt": "Which of these is a main language of the Maldives?",
    "answer": "Dhivehi",
    "wrong": [
-    "Setswana",
-    "Xhosa",
-    "Sesotho"
+    "Russian",
+    "Uzbek",
+    "Kurdish"
    ],
    "explain": "Main language of the Maldives: Dhivehi.",
-   "difficulty": 3
+   "difficulty": 3,
+   "wrongNotes": {
+    "Russian": "Russian is a main language in Belarus, Kazakhstan, Kyrgyzstan and Russia.",
+    "Uzbek": "Uzbek is a main language in Uzbekistan.",
+    "Kurdish": "Kurdish is a main language in Iraq."
+   }
   },
   {
    "id": "lang-mali",
@@ -2736,38 +3256,53 @@
    "prompt": "Which of these is a main language of Mali?",
    "answer": "Bambara",
    "wrong": [
-    "Samoan",
-    "Catalan",
-    "Nepali"
+    "Hausa",
+    "Arabic",
+    "Mooré"
    ],
    "explain": "Main language of Mali: Bambara.",
-   "difficulty": 2
+   "difficulty": 2,
+   "wrongNotes": {
+    "Hausa": "Hausa is a main language in Niger.",
+    "Arabic": "Arabic is a main language in Algeria, Bahrain, Chad and 21 others.",
+    "Mooré": "Mooré is a main language in Burkina Faso."
+   }
   },
   {
    "id": "lang-malta",
    "kind": "mc",
    "prompt": "Which of these is a main language of Malta?",
-   "answer": "Maltese",
+   "answer": "English",
    "wrong": [
-    "Japanese",
-    "Nepali",
-    "Shona"
+    "Norwegian",
+    "Afrikaans",
+    "Swedish"
    ],
    "explain": "Main languages of Malta: Maltese and English.",
-   "difficulty": 3
+   "difficulty": 3,
+   "wrongNotes": {
+    "Norwegian": "Norwegian is a main language in Norway.",
+    "Afrikaans": "Afrikaans is a main language in South Africa.",
+    "Swedish": "Swedish is a main language in Finland and Sweden."
+   }
   },
   {
    "id": "lang-marshall-islands",
    "kind": "mc",
    "prompt": "Which of these is a main language of the Marshall Islands?",
-   "answer": "Marshallese",
+   "answer": "English",
    "wrong": [
-    "Nepali",
-    "Mauritian Creole",
-    "Kyrgyz"
+    "Dutch",
+    "Swedish",
+    "Norwegian"
    ],
    "explain": "Main languages of the Marshall Islands: Marshallese and English.",
-   "difficulty": 3
+   "difficulty": 3,
+   "wrongNotes": {
+    "Dutch": "Dutch is a main language in Belgium, Netherlands and Suriname.",
+    "Swedish": "Swedish is a main language in Finland and Sweden.",
+    "Norwegian": "Norwegian is a main language in Norway."
+   }
   },
   {
    "id": "lang-mauritania",
@@ -2775,12 +3310,17 @@
    "prompt": "Which of these is a main language of Mauritania?",
    "answer": "Arabic",
    "wrong": [
-    "Hiri Motu",
-    "Turkmen",
-    "Lithuanian"
+    "Bambara",
+    "Wolof",
+    "Berber"
    ],
    "explain": "Main language of Mauritania: Arabic.",
-   "difficulty": 2
+   "difficulty": 2,
+   "wrongNotes": {
+    "Bambara": "Bambara is a main language in Mali.",
+    "Wolof": "Wolof is a main language in Senegal.",
+    "Berber": "Berber is a main language in Algeria and Morocco."
+   }
   },
   {
    "id": "lang-mauritius",
@@ -2788,12 +3328,17 @@
    "prompt": "Which of these is a main language of Mauritius?",
    "answer": "English",
    "wrong": [
-    "Dzongkha",
-    "Hungarian",
-    "Polish"
+    "Icelandic",
+    "Afrikaans",
+    "Dutch"
    ],
    "explain": "Main languages of Mauritius: English, French and Mauritian Creole.",
-   "difficulty": 3
+   "difficulty": 3,
+   "wrongNotes": {
+    "Icelandic": "Icelandic is a main language in Iceland.",
+    "Afrikaans": "Afrikaans is a main language in South Africa.",
+    "Dutch": "Dutch is a main language in Belgium, Netherlands and Suriname."
+   }
   },
   {
    "id": "lang-mexico",
@@ -2801,12 +3346,17 @@
    "prompt": "Which of these is a main language of Mexico?",
    "answer": "Spanish",
    "wrong": [
-    "Russian",
-    "Chichewa",
-    "Thai"
+    "English",
+    "Romanian",
+    "Portuguese"
    ],
    "explain": "Main language of Mexico: Spanish.",
-   "difficulty": 1
+   "difficulty": 1,
+   "wrongNotes": {
+    "English": "English is a main language in Antigua and Barbuda, Australia, Bahamas and 55 others.",
+    "Romanian": "Romanian is a main language in Moldova and Romania.",
+    "Portuguese": "Portuguese is a main language in Angola, Brazil, Cape Verde and 6 others."
+   }
   },
   {
    "id": "lang-micronesia",
@@ -2814,12 +3364,17 @@
    "prompt": "Which of these is a main language of Micronesia?",
    "answer": "English",
    "wrong": [
-    "Dhivehi",
-    "Belarusian",
-    "Mooré"
+    "Norwegian",
+    "Icelandic",
+    "German"
    ],
    "explain": "Main language of Micronesia: English.",
-   "difficulty": 3
+   "difficulty": 3,
+   "wrongNotes": {
+    "Norwegian": "Norwegian is a main language in Norway.",
+    "Icelandic": "Icelandic is a main language in Iceland.",
+    "German": "German is a main language in Austria, Belgium, Germany and 3 others."
+   }
   },
   {
    "id": "lang-moldova",
@@ -2827,12 +3382,17 @@
    "prompt": "Which of these is a main language of Moldova?",
    "answer": "Romanian",
    "wrong": [
-    "Shona",
-    "Comorian",
-    "Gilbertese"
+    "Ukrainian",
+    "French",
+    "Catalan"
    ],
    "explain": "Main language of Moldova: Romanian.",
-   "difficulty": 3
+   "difficulty": 3,
+   "wrongNotes": {
+    "Ukrainian": "Ukrainian is a main language in Ukraine.",
+    "French": "French is a main language in Belgium, Benin, Burkina Faso and 26 others.",
+    "Catalan": "Catalan is a main language in Andorra."
+   }
   },
   {
    "id": "lang-monaco",
@@ -2840,12 +3400,17 @@
    "prompt": "Which of these is a main language of Monaco?",
    "answer": "French",
    "wrong": [
-    "Dzongkha",
-    "Quechua",
-    "Korean"
+    "Portuguese",
+    "Romanian",
+    "Spanish"
    ],
    "explain": "Main language of Monaco: French.",
-   "difficulty": 3
+   "difficulty": 3,
+   "wrongNotes": {
+    "Portuguese": "Portuguese is a main language in Angola, Brazil, Cape Verde and 6 others.",
+    "Romanian": "Romanian is a main language in Moldova and Romania.",
+    "Spanish": "Spanish is a main language in Argentina, Bolivia, Chile and 17 others."
+   }
   },
   {
    "id": "lang-mongolia",
@@ -2853,12 +3418,17 @@
    "prompt": "Which of these is a main language of Mongolia?",
    "answer": "Mongolian",
    "wrong": [
-    "Gilbertese",
-    "Chichewa",
-    "Hausa"
+    "Russian",
+    "Mandarin Chinese",
+    "Dhivehi"
    ],
    "explain": "Main language of Mongolia: Mongolian.",
-   "difficulty": 2
+   "difficulty": 1,
+   "wrongNotes": {
+    "Russian": "Russian is a main language in Belarus, Kazakhstan, Kyrgyzstan and Russia.",
+    "Mandarin Chinese": "Mandarin Chinese is a main language in China and Singapore.",
+    "Dhivehi": "Dhivehi is a main language in Maldives."
+   }
   },
   {
    "id": "lang-montenegro",
@@ -2866,12 +3436,17 @@
    "prompt": "Which of these is a main language of Montenegro?",
    "answer": "Montenegrin",
    "wrong": [
-    "Hebrew",
-    "Swahili",
-    "Hausa"
+    "Serbian",
+    "Bosnian",
+    "Albanian"
    ],
    "explain": "Main language of Montenegro: Montenegrin.",
-   "difficulty": 3
+   "difficulty": 1,
+   "wrongNotes": {
+    "Serbian": "Serbian is a main language in Bosnia and Herzegovina and Serbia.",
+    "Bosnian": "Bosnian is a main language in Bosnia and Herzegovina.",
+    "Albanian": "Albanian is a main language in Albania and North Macedonia."
+   }
   },
   {
    "id": "lang-morocco",
@@ -2879,12 +3454,17 @@
    "prompt": "Which of these is a main language of Morocco?",
    "answer": "Arabic",
    "wrong": [
-    "Korean",
-    "Urdu",
-    "Khmer"
+    "Spanish",
+    "Maltese",
+    "Hebrew"
    ],
    "explain": "Main languages of Morocco: Arabic and Berber.",
-   "difficulty": 2
+   "difficulty": 2,
+   "wrongNotes": {
+    "Spanish": "Spanish is a main language in Argentina, Bolivia, Chile and 17 others.",
+    "Maltese": "Maltese is a main language in Malta.",
+    "Hebrew": "Hebrew is a main language in Israel."
+   }
   },
   {
    "id": "lang-mozambique",
@@ -2892,12 +3472,17 @@
    "prompt": "Which of these is a main language of Mozambique?",
    "answer": "Portuguese",
    "wrong": [
-    "Ukrainian",
-    "Maltese",
-    "Danish"
+    "Swazi",
+    "Chichewa",
+    "Zulu"
    ],
    "explain": "Main language of Mozambique: Portuguese.",
-   "difficulty": 2
+   "difficulty": 2,
+   "wrongNotes": {
+    "Swazi": "Swazi is a main language in Eswatini.",
+    "Chichewa": "Chichewa is a main language in Malawi.",
+    "Zulu": "Zulu is a main language in South Africa."
+   }
   },
   {
    "id": "lang-myanmar",
@@ -2905,12 +3490,17 @@
    "prompt": "Which of these is a main language of Myanmar?",
    "answer": "Burmese",
    "wrong": [
-    "Māori",
-    "Setswana",
-    "Danish"
+    "English",
+    "Thai",
+    "Mandarin Chinese"
    ],
    "explain": "Main language of Myanmar: Burmese.",
-   "difficulty": 2
+   "difficulty": 1,
+   "wrongNotes": {
+    "English": "English is a main language in Antigua and Barbuda, Australia, Bahamas and 55 others.",
+    "Thai": "Thai is a main language in Thailand.",
+    "Mandarin Chinese": "Mandarin Chinese is a main language in China and Singapore."
+   }
   },
   {
    "id": "lang-namibia",
@@ -2918,25 +3508,35 @@
    "prompt": "Which of these is a main language of Namibia?",
    "answer": "English",
    "wrong": [
-    "Dari",
-    "Kyrgyz",
-    "Danish"
+    "Zulu",
+    "Setswana",
+    "Xhosa"
    ],
    "explain": "Main language of Namibia: English.",
-   "difficulty": 2
+   "difficulty": 2,
+   "wrongNotes": {
+    "Zulu": "Zulu is a main language in South Africa.",
+    "Setswana": "Setswana is a main language in Botswana.",
+    "Xhosa": "Xhosa is a main language in South Africa."
+   }
   },
   {
    "id": "lang-nauru",
    "kind": "mc",
    "prompt": "Which of these is a main language of Nauru?",
-   "answer": "Nauruan",
+   "answer": "English",
    "wrong": [
-    "Kirundi",
-    "Kazakh",
-    "Lithuanian"
+    "Afrikaans",
+    "Dutch",
+    "Danish"
    ],
    "explain": "Main languages of Nauru: Nauruan and English.",
-   "difficulty": 3
+   "difficulty": 3,
+   "wrongNotes": {
+    "Afrikaans": "Afrikaans is a main language in South Africa.",
+    "Dutch": "Dutch is a main language in Belgium, Netherlands and Suriname.",
+    "Danish": "Danish is a main language in Denmark."
+   }
   },
   {
    "id": "lang-nepal",
@@ -2944,12 +3544,17 @@
    "prompt": "Which of these is a main language of Nepal?",
    "answer": "Nepali",
    "wrong": [
-    "Bambara",
-    "Palauan",
-    "Sesotho"
+    "Mandarin Chinese",
+    "English",
+    "Hindi"
    ],
    "explain": "Main language of Nepal: Nepali.",
-   "difficulty": 2
+   "difficulty": 1,
+   "wrongNotes": {
+    "Mandarin Chinese": "Mandarin Chinese is a main language in China and Singapore.",
+    "English": "English is a main language in Antigua and Barbuda, Australia, Bahamas and 55 others.",
+    "Hindi": "Hindi is a main language in India."
+   }
   },
   {
    "id": "lang-netherlands",
@@ -2957,12 +3562,17 @@
    "prompt": "Which of these is a main language of the Netherlands?",
    "answer": "Dutch",
    "wrong": [
-    "Mongolian",
-    "Quechua",
-    "Tongan"
+    "German",
+    "French",
+    "Swedish"
    ],
    "explain": "Main language of the Netherlands: Dutch.",
-   "difficulty": 1
+   "difficulty": 1,
+   "wrongNotes": {
+    "German": "German is a main language in Austria, Belgium, Germany and 3 others.",
+    "French": "French is a main language in Belgium, Benin, Burkina Faso and 26 others.",
+    "Swedish": "Swedish is a main language in Finland and Sweden."
+   }
   },
   {
    "id": "lang-new-zealand",
@@ -2970,12 +3580,17 @@
    "prompt": "Which of these is a main language of New Zealand?",
    "answer": "English",
    "wrong": [
-    "Japanese",
-    "Aymara",
-    "Malagasy"
+    "Dutch",
+    "Afrikaans",
+    "Norwegian"
    ],
    "explain": "Main languages of New Zealand: English and Māori.",
-   "difficulty": 1
+   "difficulty": 1,
+   "wrongNotes": {
+    "Dutch": "Dutch is a main language in Belgium, Netherlands and Suriname.",
+    "Afrikaans": "Afrikaans is a main language in South Africa.",
+    "Norwegian": "Norwegian is a main language in Norway."
+   }
   },
   {
    "id": "lang-nicaragua",
@@ -2983,12 +3598,17 @@
    "prompt": "Which of these is a main language of Nicaragua?",
    "answer": "Spanish",
    "wrong": [
-    "Fiji Hindi",
-    "Lao",
-    "Kurdish"
+    "Romanian",
+    "French",
+    "Portuguese"
    ],
    "explain": "Main language of Nicaragua: Spanish.",
-   "difficulty": 2
+   "difficulty": 2,
+   "wrongNotes": {
+    "Romanian": "Romanian is a main language in Moldova and Romania.",
+    "French": "French is a main language in Belgium, Benin, Burkina Faso and 26 others.",
+    "Portuguese": "Portuguese is a main language in Angola, Brazil, Cape Verde and 6 others."
+   }
   },
   {
    "id": "lang-niger",
@@ -2996,12 +3616,17 @@
    "prompt": "Which of these is a main language of Niger?",
    "answer": "French",
    "wrong": [
-    "Slovak",
-    "Indonesian",
-    "Sinhala"
+    "Bambara",
+    "Arabic",
+    "English"
    ],
    "explain": "Main languages of Niger: French and Hausa.",
-   "difficulty": 2
+   "difficulty": 2,
+   "wrongNotes": {
+    "Bambara": "Bambara is a main language in Mali.",
+    "Arabic": "Arabic is a main language in Algeria, Bahrain, Chad and 21 others.",
+    "English": "English is a main language in Antigua and Barbuda, Australia, Bahamas and 55 others."
+   }
   },
   {
    "id": "lang-nigeria",
@@ -3009,12 +3634,17 @@
    "prompt": "Which of these is a main language of Nigeria?",
    "answer": "English",
    "wrong": [
-    "Latin",
-    "Italian",
-    "Turkish"
+    "Arabic",
+    "French",
+    "Hausa"
    ],
    "explain": "Main language of Nigeria: English.",
-   "difficulty": 1
+   "difficulty": 1,
+   "wrongNotes": {
+    "Arabic": "Arabic is a main language in Algeria, Bahrain, Chad and 21 others.",
+    "French": "French is a main language in Belgium, Benin, Burkina Faso and 26 others.",
+    "Hausa": "Hausa is a main language in Niger."
+   }
   },
   {
    "id": "lang-north-korea",
@@ -3022,25 +3652,35 @@
    "prompt": "Which of these is a main language of North Korea?",
    "answer": "Korean",
    "wrong": [
-    "Romansh",
-    "Malagasy",
-    "Spanish"
+    "Mandarin Chinese",
+    "Russian",
+    "Greek"
    ],
    "explain": "Main language of North Korea: Korean.",
-   "difficulty": 2
+   "difficulty": 1,
+   "wrongNotes": {
+    "Mandarin Chinese": "Mandarin Chinese is a main language in China and Singapore.",
+    "Russian": "Russian is a main language in Belarus, Kazakhstan, Kyrgyzstan and Russia.",
+    "Greek": "Greek is a main language in Cyprus and Greece."
+   }
   },
   {
    "id": "lang-north-macedonia",
    "kind": "mc",
    "prompt": "Which of these is a main language of North Macedonia?",
-   "answer": "Macedonian",
+   "answer": "Albanian",
    "wrong": [
-    "Korean",
-    "Mongolian",
-    "Nauruan"
+    "Serbian",
+    "Bulgarian",
+    "Greek"
    ],
    "explain": "Main languages of North Macedonia: Macedonian and Albanian.",
-   "difficulty": 3
+   "difficulty": 3,
+   "wrongNotes": {
+    "Serbian": "Serbian is a main language in Bosnia and Herzegovina and Serbia.",
+    "Bulgarian": "Bulgarian is a main language in Bulgaria.",
+    "Greek": "Greek is a main language in Cyprus and Greece."
+   }
   },
   {
    "id": "lang-norway",
@@ -3048,12 +3688,17 @@
    "prompt": "Which of these is a main language of Norway?",
    "answer": "Norwegian",
    "wrong": [
-    "Azerbaijani",
-    "Amharic",
-    "Tigrinya"
+    "Swedish",
+    "Russian",
+    "Finnish"
    ],
    "explain": "Main language of Norway: Norwegian.",
-   "difficulty": 1
+   "difficulty": 1,
+   "wrongNotes": {
+    "Swedish": "Swedish is a main language in Finland and Sweden.",
+    "Russian": "Russian is a main language in Belarus, Kazakhstan, Kyrgyzstan and Russia.",
+    "Finnish": "Finnish is a main language in Finland."
+   }
   },
   {
    "id": "lang-oman",
@@ -3061,12 +3706,17 @@
    "prompt": "Which of these is a main language of Oman?",
    "answer": "Arabic",
    "wrong": [
-    "Setswana",
-    "Hausa",
-    "Xhosa"
+    "Hebrew",
+    "Maltese",
+    "Amharic"
    ],
    "explain": "Main language of Oman: Arabic.",
-   "difficulty": 2
+   "difficulty": 2,
+   "wrongNotes": {
+    "Hebrew": "Hebrew is a main language in Israel.",
+    "Maltese": "Maltese is a main language in Malta.",
+    "Amharic": "Amharic is a main language in Ethiopia."
+   }
   },
   {
    "id": "lang-pakistan",
@@ -3074,25 +3724,35 @@
    "prompt": "Which of these is a main language of Pakistan?",
    "answer": "Urdu",
    "wrong": [
-    "Aymara",
-    "Māori",
-    "Irish"
+    "Hindi",
+    "Persian",
+    "Mandarin Chinese"
    ],
    "explain": "Main languages of Pakistan: Urdu and English.",
-   "difficulty": 2
+   "difficulty": 2,
+   "wrongNotes": {
+    "Hindi": "Hindi is a main language in India.",
+    "Persian": "Persian is a main language in Iran.",
+    "Mandarin Chinese": "Mandarin Chinese is a main language in China and Singapore."
+   }
   },
   {
    "id": "lang-palau",
    "kind": "mc",
    "prompt": "Which of these is a main language of Palau?",
-   "answer": "Palauan",
+   "answer": "English",
    "wrong": [
-    "Quechua",
-    "Sesotho",
-    "Shona"
+    "German",
+    "Icelandic",
+    "Swedish"
    ],
    "explain": "Main languages of Palau: Palauan and English.",
-   "difficulty": 3
+   "difficulty": 3,
+   "wrongNotes": {
+    "German": "German is a main language in Austria, Belgium, Germany and 3 others.",
+    "Icelandic": "Icelandic is a main language in Iceland.",
+    "Swedish": "Swedish is a main language in Finland and Sweden."
+   }
   },
   {
    "id": "lang-palestine",
@@ -3100,12 +3760,17 @@
    "prompt": "Which of these is a main language of Palestine?",
    "answer": "Arabic",
    "wrong": [
-    "Irish",
-    "Lithuanian",
-    "Malagasy"
+    "Maltese",
+    "Amharic",
+    "Persian"
    ],
    "explain": "Main language of Palestine: Arabic.",
-   "difficulty": 2
+   "difficulty": 2,
+   "wrongNotes": {
+    "Maltese": "Maltese is a main language in Malta.",
+    "Amharic": "Amharic is a main language in Ethiopia.",
+    "Persian": "Persian is a main language in Iran."
+   }
   },
   {
    "id": "lang-panama",
@@ -3113,12 +3778,17 @@
    "prompt": "Which of these is a main language of Panama?",
    "answer": "Spanish",
    "wrong": [
-    "Romanian",
-    "Tajik",
-    "Hindi"
+    "Portuguese",
+    "Catalan",
+    "Italian"
    ],
    "explain": "Main language of Panama: Spanish.",
-   "difficulty": 2
+   "difficulty": 2,
+   "wrongNotes": {
+    "Portuguese": "Portuguese is a main language in Angola, Brazil, Cape Verde and 6 others.",
+    "Catalan": "Catalan is a main language in Andorra.",
+    "Italian": "Italian is a main language in Italy, San Marino, Switzerland and Vatican City."
+   }
   },
   {
    "id": "lang-papua-new-guinea",
@@ -3126,12 +3796,17 @@
    "prompt": "Which of these is a main language of Papua New Guinea?",
    "answer": "English",
    "wrong": [
-    "Uzbek",
-    "Kazakh",
+    "Indonesian",
+    "Swedish",
     "Icelandic"
    ],
    "explain": "Main languages of Papua New Guinea: English, Tok Pisin and Hiri Motu.",
-   "difficulty": 2
+   "difficulty": 2,
+   "wrongNotes": {
+    "Indonesian": "Indonesian is a main language in Indonesia.",
+    "Swedish": "Swedish is a main language in Finland and Sweden.",
+    "Icelandic": "Icelandic is a main language in Iceland."
+   }
   },
   {
    "id": "lang-paraguay",
@@ -3139,12 +3814,17 @@
    "prompt": "Which of these is a main language of Paraguay?",
    "answer": "Spanish",
    "wrong": [
-    "Armenian",
-    "Somali",
-    "Samoan"
+    "Aymara",
+    "Quechua",
+    "French"
    ],
    "explain": "Main languages of Paraguay: Spanish and Guaraní.",
-   "difficulty": 2
+   "difficulty": 2,
+   "wrongNotes": {
+    "Aymara": "Aymara is a main language in Bolivia.",
+    "Quechua": "Quechua is a main language in Bolivia and Peru.",
+    "French": "French is a main language in Belgium, Benin, Burkina Faso and 26 others."
+   }
   },
   {
    "id": "lang-peru",
@@ -3152,25 +3832,35 @@
    "prompt": "Which of these is a main language of Peru?",
    "answer": "Spanish",
    "wrong": [
-    "Italian",
-    "Kazakh",
-    "Georgian"
+    "Aymara",
+    "Portuguese",
+    "Romanian"
    ],
    "explain": "Main languages of Peru: Spanish and Quechua.",
-   "difficulty": 1
+   "difficulty": 1,
+   "wrongNotes": {
+    "Aymara": "Aymara is a main language in Bolivia.",
+    "Portuguese": "Portuguese is a main language in Angola, Brazil, Cape Verde and 6 others.",
+    "Romanian": "Romanian is a main language in Moldova and Romania."
+   }
   },
   {
    "id": "lang-philippines",
    "kind": "mc",
    "prompt": "Which of these is a main language of the Philippines?",
-   "answer": "Filipino",
+   "answer": "English",
    "wrong": [
-    "Polish",
-    "Wolof",
-    "Tongan"
+    "Icelandic",
+    "German",
+    "Afrikaans"
    ],
    "explain": "Main languages of the Philippines: Filipino and English.",
-   "difficulty": 2
+   "difficulty": 2,
+   "wrongNotes": {
+    "Icelandic": "Icelandic is a main language in Iceland.",
+    "German": "German is a main language in Austria, Belgium, Germany and 3 others.",
+    "Afrikaans": "Afrikaans is a main language in South Africa."
+   }
   },
   {
    "id": "lang-poland",
@@ -3178,12 +3868,17 @@
    "prompt": "Which of these is a main language of Poland?",
    "answer": "Polish",
    "wrong": [
-    "Tigrinya",
-    "Dari",
-    "Tajik"
+    "Czech",
+    "German",
+    "Slovak"
    ],
    "explain": "Main language of Poland: Polish.",
-   "difficulty": 1
+   "difficulty": 1,
+   "wrongNotes": {
+    "Czech": "Czech is a main language in Czechia.",
+    "German": "German is a main language in Austria, Belgium, Germany and 3 others.",
+    "Slovak": "Slovak is a main language in Slovakia."
+   }
   },
   {
    "id": "lang-portugal",
@@ -3191,12 +3886,17 @@
    "prompt": "Which of these is a main language of Portugal?",
    "answer": "Portuguese",
    "wrong": [
-    "Māori",
-    "Seychellois Creole",
-    "Kazakh"
+    "Spanish",
+    "Romanian",
+    "Catalan"
    ],
    "explain": "Main language of Portugal: Portuguese.",
-   "difficulty": 1
+   "difficulty": 1,
+   "wrongNotes": {
+    "Spanish": "Spanish is a main language in Argentina, Bolivia, Chile and 17 others.",
+    "Romanian": "Romanian is a main language in Moldova and Romania.",
+    "Catalan": "Catalan is a main language in Andorra."
+   }
   },
   {
    "id": "lang-qatar",
@@ -3204,12 +3904,17 @@
    "prompt": "Which of these is a main language of Qatar?",
    "answer": "Arabic",
    "wrong": [
-    "Spanish",
-    "Hungarian",
-    "Guaraní"
+    "Hebrew",
+    "Maltese",
+    "Amharic"
    ],
    "explain": "Main language of Qatar: Arabic.",
-   "difficulty": 3
+   "difficulty": 3,
+   "wrongNotes": {
+    "Hebrew": "Hebrew is a main language in Israel.",
+    "Maltese": "Maltese is a main language in Malta.",
+    "Amharic": "Amharic is a main language in Ethiopia."
+   }
   },
   {
    "id": "lang-romania",
@@ -3217,12 +3922,17 @@
    "prompt": "Which of these is a main language of Romania?",
    "answer": "Romanian",
    "wrong": [
-    "Bislama",
-    "Amharic",
-    "Malay"
+    "Serbian",
+    "Bulgarian",
+    "Ukrainian"
    ],
    "explain": "Main language of Romania: Romanian.",
-   "difficulty": 2
+   "difficulty": 1,
+   "wrongNotes": {
+    "Serbian": "Serbian is a main language in Bosnia and Herzegovina and Serbia.",
+    "Bulgarian": "Bulgarian is a main language in Bulgaria.",
+    "Ukrainian": "Ukrainian is a main language in Ukraine."
+   }
   },
   {
    "id": "lang-russia",
@@ -3230,25 +3940,35 @@
    "prompt": "Which of these is a main language of Russia?",
    "answer": "Russian",
    "wrong": [
-    "Japanese",
-    "Mongolian",
-    "Pashto"
+    "Swedish",
+    "Norwegian",
+    "Korean"
    ],
    "explain": "Main language of Russia: Russian.",
-   "difficulty": 1
+   "difficulty": 1,
+   "wrongNotes": {
+    "Swedish": "Swedish is a main language in Finland and Sweden.",
+    "Norwegian": "Norwegian is a main language in Norway.",
+    "Korean": "Korean is a main language in North Korea and South Korea."
+   }
   },
   {
    "id": "lang-rwanda",
    "kind": "mc",
    "prompt": "Which of these is a main language of Rwanda?",
-   "answer": "Kinyarwanda",
+   "answer": "French",
    "wrong": [
-    "Georgian",
-    "Japanese",
-    "Hebrew"
+    "Kirundi",
+    "Swahili",
+    "Spanish"
    ],
    "explain": "Main languages of Rwanda: Kinyarwanda, French and English.",
-   "difficulty": 2
+   "difficulty": 2,
+   "wrongNotes": {
+    "Kirundi": "Kirundi is a main language in Burundi.",
+    "Swahili": "Swahili is a main language in Kenya, Tanzania and Uganda.",
+    "Spanish": "Spanish is a main language in Argentina, Bolivia, Chile and 17 others."
+   }
   },
   {
    "id": "lang-saint-kitts-and-nevis",
@@ -3256,12 +3976,17 @@
    "prompt": "Which of these is a main language of Saint Kitts and Nevis?",
    "answer": "English",
    "wrong": [
-    "Chichewa",
-    "Czech",
-    "Marshallese"
+    "Danish",
+    "Norwegian",
+    "Icelandic"
    ],
    "explain": "Main language of Saint Kitts and Nevis: English.",
-   "difficulty": 3
+   "difficulty": 3,
+   "wrongNotes": {
+    "Danish": "Danish is a main language in Denmark.",
+    "Norwegian": "Norwegian is a main language in Norway.",
+    "Icelandic": "Icelandic is a main language in Iceland."
+   }
   },
   {
    "id": "lang-saint-lucia",
@@ -3269,12 +3994,17 @@
    "prompt": "Which of these is a main language of Saint Lucia?",
    "answer": "English",
    "wrong": [
-    "Lithuanian",
-    "Ukrainian",
-    "Seychellois Creole"
+    "Danish",
+    "Dutch",
+    "Icelandic"
    ],
    "explain": "Main language of Saint Lucia: English.",
-   "difficulty": 3
+   "difficulty": 3,
+   "wrongNotes": {
+    "Danish": "Danish is a main language in Denmark.",
+    "Dutch": "Dutch is a main language in Belgium, Netherlands and Suriname.",
+    "Icelandic": "Icelandic is a main language in Iceland."
+   }
   },
   {
    "id": "lang-saint-vincent-and-the-grenadines",
@@ -3282,25 +4012,35 @@
    "prompt": "Which of these is a main language of Saint Vincent and the Grenadines?",
    "answer": "English",
    "wrong": [
-    "Guaraní",
-    "Sesotho",
-    "Russian"
+    "German",
+    "Afrikaans",
+    "Norwegian"
    ],
    "explain": "Main language of Saint Vincent and the Grenadines: English.",
-   "difficulty": 3
+   "difficulty": 3,
+   "wrongNotes": {
+    "German": "German is a main language in Austria, Belgium, Germany and 3 others.",
+    "Afrikaans": "Afrikaans is a main language in South Africa.",
+    "Norwegian": "Norwegian is a main language in Norway."
+   }
   },
   {
    "id": "lang-samoa",
    "kind": "mc",
    "prompt": "Which of these is a main language of Samoa?",
-   "answer": "Samoan",
+   "answer": "English",
    "wrong": [
-    "Berber",
-    "Tetum",
-    "Hausa"
+    "Icelandic",
+    "German",
+    "Dutch"
    ],
    "explain": "Main languages of Samoa: Samoan and English.",
-   "difficulty": 3
+   "difficulty": 3,
+   "wrongNotes": {
+    "Icelandic": "Icelandic is a main language in Iceland.",
+    "German": "German is a main language in Austria, Belgium, Germany and 3 others.",
+    "Dutch": "Dutch is a main language in Belgium, Netherlands and Suriname."
+   }
   },
   {
    "id": "lang-san-marino",
@@ -3308,12 +4048,17 @@
    "prompt": "Which of these is a main language of San Marino?",
    "answer": "Italian",
    "wrong": [
-    "Kazakh",
-    "Thai",
-    "Comorian"
+    "Spanish",
+    "French",
+    "Catalan"
    ],
    "explain": "Main language of San Marino: Italian.",
-   "difficulty": 3
+   "difficulty": 3,
+   "wrongNotes": {
+    "Spanish": "Spanish is a main language in Argentina, Bolivia, Chile and 17 others.",
+    "French": "French is a main language in Belgium, Benin, Burkina Faso and 26 others.",
+    "Catalan": "Catalan is a main language in Andorra."
+   }
   },
   {
    "id": "lang-sao-tome-and-principe",
@@ -3321,12 +4066,17 @@
    "prompt": "Which of these is a main language of São Tomé and Príncipe?",
    "answer": "Portuguese",
    "wrong": [
-    "Tamil",
-    "Montenegrin",
-    "Fijian"
+    "Catalan",
+    "Spanish",
+    "French"
    ],
    "explain": "Main language of São Tomé and Príncipe: Portuguese.",
-   "difficulty": 3
+   "difficulty": 3,
+   "wrongNotes": {
+    "Catalan": "Catalan is a main language in Andorra.",
+    "Spanish": "Spanish is a main language in Argentina, Bolivia, Chile and 17 others.",
+    "French": "French is a main language in Belgium, Benin, Burkina Faso and 26 others."
+   }
   },
   {
    "id": "lang-saudi-arabia",
@@ -3334,12 +4084,17 @@
    "prompt": "Which of these is a main language of Saudi Arabia?",
    "answer": "Arabic",
    "wrong": [
-    "Dutch",
-    "Kinyarwanda",
-    "Croatian"
+    "Kurdish",
+    "Maltese",
+    "Amharic"
    ],
    "explain": "Main language of Saudi Arabia: Arabic.",
-   "difficulty": 2
+   "difficulty": 1,
+   "wrongNotes": {
+    "Kurdish": "Kurdish is a main language in Iraq.",
+    "Maltese": "Maltese is a main language in Malta.",
+    "Amharic": "Amharic is a main language in Ethiopia."
+   }
   },
   {
    "id": "lang-senegal",
@@ -3347,12 +4102,17 @@
    "prompt": "Which of these is a main language of Senegal?",
    "answer": "French",
    "wrong": [
-    "Malay",
-    "Dutch",
-    "Lithuanian"
+    "English",
+    "Arabic",
+    "Portuguese"
    ],
    "explain": "Main languages of Senegal: French and Wolof.",
-   "difficulty": 2
+   "difficulty": 2,
+   "wrongNotes": {
+    "English": "English is a main language in Antigua and Barbuda, Australia, Bahamas and 55 others.",
+    "Arabic": "Arabic is a main language in Algeria, Bahrain, Chad and 21 others.",
+    "Portuguese": "Portuguese is a main language in Angola, Brazil, Cape Verde and 6 others."
+   }
   },
   {
    "id": "lang-serbia",
@@ -3360,25 +4120,35 @@
    "prompt": "Which of these is a main language of Serbia?",
    "answer": "Serbian",
    "wrong": [
-    "Mandarin Chinese",
-    "Marshallese",
-    "Xhosa"
+    "Montenegrin",
+    "Croatian",
+    "Bulgarian"
    ],
    "explain": "Main language of Serbia: Serbian.",
-   "difficulty": 2
+   "difficulty": 1,
+   "wrongNotes": {
+    "Montenegrin": "Montenegrin is a main language in Montenegro.",
+    "Croatian": "Croatian is a main language in Bosnia and Herzegovina and Croatia.",
+    "Bulgarian": "Bulgarian is a main language in Bulgaria."
+   }
   },
   {
    "id": "lang-seychelles",
    "kind": "mc",
    "prompt": "Which of these is a main language of the Seychelles?",
-   "answer": "Seychellois Creole",
+   "answer": "English",
    "wrong": [
-    "Armenian",
-    "Fiji Hindi",
-    "Kurdish"
+    "Dutch",
+    "Icelandic",
+    "Swedish"
    ],
    "explain": "Main languages of the Seychelles: Seychellois Creole, English and French.",
-   "difficulty": 3
+   "difficulty": 3,
+   "wrongNotes": {
+    "Dutch": "Dutch is a main language in Belgium, Netherlands and Suriname.",
+    "Icelandic": "Icelandic is a main language in Iceland.",
+    "Swedish": "Swedish is a main language in Finland and Sweden."
+   }
   },
   {
    "id": "lang-sierra-leone",
@@ -3386,12 +4156,17 @@
    "prompt": "Which of these is a main language of Sierra Leone?",
    "answer": "English",
    "wrong": [
-    "Norwegian",
-    "Latvian",
-    "Kazakh"
+    "French",
+    "German",
+    "Dutch"
    ],
    "explain": "Main language of Sierra Leone: English.",
-   "difficulty": 2
+   "difficulty": 2,
+   "wrongNotes": {
+    "French": "French is a main language in Belgium, Benin, Burkina Faso and 26 others.",
+    "German": "German is a main language in Austria, Belgium, Germany and 3 others.",
+    "Dutch": "Dutch is a main language in Belgium, Netherlands and Suriname."
+   }
   },
   {
    "id": "lang-singapore",
@@ -3399,12 +4174,17 @@
    "prompt": "Which of these is a main language of Singapore?",
    "answer": "English",
    "wrong": [
-    "German",
-    "Polish",
-    "Haitian Creole"
+    "Norwegian",
+    "Swedish",
+    "Dutch"
    ],
    "explain": "Main languages of Singapore: English, Malay, Mandarin Chinese and Tamil.",
-   "difficulty": 2
+   "difficulty": 2,
+   "wrongNotes": {
+    "Norwegian": "Norwegian is a main language in Norway.",
+    "Swedish": "Swedish is a main language in Finland and Sweden.",
+    "Dutch": "Dutch is a main language in Belgium, Netherlands and Suriname."
+   }
   },
   {
    "id": "lang-slovakia",
@@ -3412,12 +4192,17 @@
    "prompt": "Which of these is a main language of Slovakia?",
    "answer": "Slovak",
    "wrong": [
-    "Lao",
-    "Fiji Hindi",
-    "Māori"
+    "German",
+    "Ukrainian",
+    "Polish"
    ],
    "explain": "Main language of Slovakia: Slovak.",
-   "difficulty": 2
+   "difficulty": 1,
+   "wrongNotes": {
+    "German": "German is a main language in Austria, Belgium, Germany and 3 others.",
+    "Ukrainian": "Ukrainian is a main language in Ukraine.",
+    "Polish": "Polish is a main language in Poland."
+   }
   },
   {
    "id": "lang-slovenia",
@@ -3425,12 +4210,17 @@
    "prompt": "Which of these is a main language of Slovenia?",
    "answer": "Slovene",
    "wrong": [
-    "Urdu",
-    "Lao",
-    "Tuvaluan"
+    "Croatian",
+    "Hungarian",
+    "German"
    ],
    "explain": "Main language of Slovenia: Slovene.",
-   "difficulty": 3
+   "difficulty": 1,
+   "wrongNotes": {
+    "Croatian": "Croatian is a main language in Bosnia and Herzegovina and Croatia.",
+    "Hungarian": "Hungarian is a main language in Hungary.",
+    "German": "German is a main language in Austria, Belgium, Germany and 3 others."
+   }
   },
   {
    "id": "lang-solomon-islands",
@@ -3438,25 +4228,35 @@
    "prompt": "Which of these is a main language of the Solomon Islands?",
    "answer": "English",
    "wrong": [
-    "Guaraní",
-    "Tajik",
-    "Seychellois Creole"
+    "Danish",
+    "Norwegian",
+    "Icelandic"
    ],
    "explain": "Main language of the Solomon Islands: English.",
-   "difficulty": 3
+   "difficulty": 3,
+   "wrongNotes": {
+    "Danish": "Danish is a main language in Denmark.",
+    "Norwegian": "Norwegian is a main language in Norway.",
+    "Icelandic": "Icelandic is a main language in Iceland."
+   }
   },
   {
    "id": "lang-somalia",
    "kind": "mc",
    "prompt": "Which of these is a main language of Somalia?",
-   "answer": "Somali",
+   "answer": "Arabic",
    "wrong": [
-    "Burmese",
-    "Kyrgyz",
-    "Nepali"
+    "English",
+    "Swahili",
+    "Amharic"
    ],
    "explain": "Main languages of Somalia: Somali and Arabic.",
-   "difficulty": 2
+   "difficulty": 2,
+   "wrongNotes": {
+    "English": "English is a main language in Antigua and Barbuda, Australia, Bahamas and 55 others.",
+    "Swahili": "Swahili is a main language in Kenya, Tanzania and Uganda.",
+    "Amharic": "Amharic is a main language in Ethiopia."
+   }
   },
   {
    "id": "lang-south-africa",
@@ -3464,12 +4264,17 @@
    "prompt": "Which of these is a main language of South Africa?",
    "answer": "Zulu",
    "wrong": [
-    "Tajik",
-    "Bosnian",
-    "German"
+    "Ndebele",
+    "Portuguese",
+    "Shona"
    ],
    "explain": "Main languages of South Africa: Zulu, Xhosa, Afrikaans and English.",
-   "difficulty": 1
+   "difficulty": 1,
+   "wrongNotes": {
+    "Ndebele": "Ndebele is a main language in Zimbabwe.",
+    "Portuguese": "Portuguese is a main language in Angola, Brazil, Cape Verde and 6 others.",
+    "Shona": "Shona is a main language in Zimbabwe."
+   }
   },
   {
    "id": "lang-south-korea",
@@ -3477,12 +4282,17 @@
    "prompt": "Which of these is a main language of South Korea?",
    "answer": "Korean",
    "wrong": [
-    "Spanish",
-    "Slovak",
-    "Māori"
+    "Nepali",
+    "Vietnamese",
+    "Kyrgyz"
    ],
    "explain": "Main language of South Korea: Korean.",
-   "difficulty": 1
+   "difficulty": 1,
+   "wrongNotes": {
+    "Nepali": "Nepali is a main language in Nepal.",
+    "Vietnamese": "Vietnamese is a main language in Vietnam.",
+    "Kyrgyz": "Kyrgyz is a main language in Kyrgyzstan."
+   }
   },
   {
    "id": "lang-south-sudan",
@@ -3490,12 +4300,17 @@
    "prompt": "Which of these is a main language of South Sudan?",
    "answer": "English",
    "wrong": [
-    "Indonesian",
-    "Tongan",
-    "Sinhala"
+    "French",
+    "Swahili",
+    "Amharic"
    ],
    "explain": "Main language of South Sudan: English.",
-   "difficulty": 2
+   "difficulty": 2,
+   "wrongNotes": {
+    "French": "French is a main language in Belgium, Benin, Burkina Faso and 26 others.",
+    "Swahili": "Swahili is a main language in Kenya, Tanzania and Uganda.",
+    "Amharic": "Amharic is a main language in Ethiopia."
+   }
   },
   {
    "id": "lang-spain",
@@ -3503,12 +4318,17 @@
    "prompt": "Which of these is a main language of Spain?",
    "answer": "Spanish",
    "wrong": [
-    "Lao",
-    "Kinyarwanda",
-    "Fiji Hindi"
+    "Arabic",
+    "Berber",
+    "French"
    ],
    "explain": "Main language of Spain: Spanish.",
-   "difficulty": 1
+   "difficulty": 1,
+   "wrongNotes": {
+    "Arabic": "Arabic is a main language in Algeria, Bahrain, Chad and 21 others.",
+    "Berber": "Berber is a main language in Algeria and Morocco.",
+    "French": "French is a main language in Belgium, Benin, Burkina Faso and 26 others."
+   }
   },
   {
    "id": "lang-sri-lanka",
@@ -3516,12 +4336,17 @@
    "prompt": "Which of these is a main language of Sri Lanka?",
    "answer": "Sinhala",
    "wrong": [
-    "Dutch",
-    "Quechua",
-    "Czech"
+    "Urdu",
+    "Nepali",
+    "Bengali"
    ],
    "explain": "Main languages of Sri Lanka: Sinhala and Tamil.",
-   "difficulty": 2
+   "difficulty": 2,
+   "wrongNotes": {
+    "Urdu": "Urdu is a main language in Pakistan.",
+    "Nepali": "Nepali is a main language in Nepal.",
+    "Bengali": "Bengali is a main language in Bangladesh."
+   }
   },
   {
    "id": "lang-sudan",
@@ -3529,12 +4354,17 @@
    "prompt": "Which of these is a main language of Sudan?",
    "answer": "Arabic",
    "wrong": [
-    "Lithuanian",
-    "Aymara",
-    "Slovene"
+    "Sango",
+    "French",
+    "Tigrinya"
    ],
    "explain": "Main languages of Sudan: Arabic and English.",
-   "difficulty": 2
+   "difficulty": 2,
+   "wrongNotes": {
+    "Sango": "Sango is a main language in Central African Republic.",
+    "French": "French is a main language in Belgium, Benin, Burkina Faso and 26 others.",
+    "Tigrinya": "Tigrinya is a main language in Eritrea."
+   }
   },
   {
    "id": "lang-suriname",
@@ -3542,12 +4372,17 @@
    "prompt": "Which of these is a main language of Suriname?",
    "answer": "Dutch",
    "wrong": [
-    "Shona",
-    "Burmese",
-    "Tetum"
+    "Portuguese",
+    "English",
+    "French"
    ],
    "explain": "Main language of Suriname: Dutch.",
-   "difficulty": 3
+   "difficulty": 3,
+   "wrongNotes": {
+    "Portuguese": "Portuguese is a main language in Angola, Brazil, Cape Verde and 6 others.",
+    "English": "English is a main language in Antigua and Barbuda, Australia, Bahamas and 55 others.",
+    "French": "French is a main language in Belgium, Benin, Burkina Faso and 26 others."
+   }
   },
   {
    "id": "lang-sweden",
@@ -3555,12 +4390,17 @@
    "prompt": "Which of these is a main language of Sweden?",
    "answer": "Swedish",
    "wrong": [
-    "Samoan",
-    "Arabic",
-    "Shona"
+    "Finnish",
+    "Norwegian",
+    "Dutch"
    ],
    "explain": "Main language of Sweden: Swedish.",
-   "difficulty": 1
+   "difficulty": 1,
+   "wrongNotes": {
+    "Finnish": "Finnish is a main language in Finland.",
+    "Norwegian": "Norwegian is a main language in Norway.",
+    "Dutch": "Dutch is a main language in Belgium, Netherlands and Suriname."
+   }
   },
   {
    "id": "lang-switzerland",
@@ -3568,12 +4408,17 @@
    "prompt": "Which of these is a main language of Switzerland?",
    "answer": "German",
    "wrong": [
-    "Pashto",
-    "Chichewa",
-    "Comorian"
+    "Swedish",
+    "Icelandic",
+    "Norwegian"
    ],
    "explain": "Main languages of Switzerland: German, French, Italian and Romansh.",
-   "difficulty": 1
+   "difficulty": 1,
+   "wrongNotes": {
+    "Swedish": "Swedish is a main language in Finland and Sweden.",
+    "Icelandic": "Icelandic is a main language in Iceland.",
+    "Norwegian": "Norwegian is a main language in Norway."
+   }
   },
   {
    "id": "lang-syria",
@@ -3581,12 +4426,17 @@
    "prompt": "Which of these is a main language of Syria?",
    "answer": "Arabic",
    "wrong": [
-    "German",
-    "Macedonian",
-    "Bulgarian"
+    "Kurdish",
+    "Turkish",
+    "Hebrew"
    ],
    "explain": "Main language of Syria: Arabic.",
-   "difficulty": 2
+   "difficulty": 2,
+   "wrongNotes": {
+    "Kurdish": "Kurdish is a main language in Iraq.",
+    "Turkish": "Turkish is a main language in Cyprus and Turkey.",
+    "Hebrew": "Hebrew is a main language in Israel."
+   }
   },
   {
    "id": "lang-tajikistan",
@@ -3594,12 +4444,17 @@
    "prompt": "Which of these is a main language of Tajikistan?",
    "answer": "Tajik",
    "wrong": [
-    "Tongan",
-    "Norwegian",
-    "Setswana"
+    "Uzbek",
+    "Mandarin Chinese",
+    "Dari"
    ],
    "explain": "Main language of Tajikistan: Tajik.",
-   "difficulty": 2
+   "difficulty": 1,
+   "wrongNotes": {
+    "Uzbek": "Uzbek is a main language in Uzbekistan.",
+    "Mandarin Chinese": "Mandarin Chinese is a main language in China and Singapore.",
+    "Dari": "Dari is a main language in Afghanistan."
+   }
   },
   {
    "id": "lang-tanzania",
@@ -3607,12 +4462,17 @@
    "prompt": "Which of these is a main language of Tanzania?",
    "answer": "Swahili",
    "wrong": [
-    "Kurdish",
-    "Indonesian",
-    "Armenian"
+    "Portuguese",
+    "French",
+    "Kinyarwanda"
    ],
    "explain": "Main languages of Tanzania: Swahili and English.",
-   "difficulty": 2
+   "difficulty": 2,
+   "wrongNotes": {
+    "Portuguese": "Portuguese is a main language in Angola, Brazil, Cape Verde and 6 others.",
+    "French": "French is a main language in Belgium, Benin, Burkina Faso and 26 others.",
+    "Kinyarwanda": "Kinyarwanda is a main language in Rwanda."
+   }
   },
   {
    "id": "lang-thailand",
@@ -3620,12 +4480,17 @@
    "prompt": "Which of these is a main language of Thailand?",
    "answer": "Thai",
    "wrong": [
-    "Romanian",
-    "Malagasy",
-    "Māori"
+    "Burmese",
+    "Khmer",
+    "Lao"
    ],
    "explain": "Main language of Thailand: Thai.",
-   "difficulty": 1
+   "difficulty": 1,
+   "wrongNotes": {
+    "Burmese": "Burmese is a main language in Myanmar.",
+    "Khmer": "Khmer is a main language in Cambodia.",
+    "Lao": "Lao is a main language in Laos."
+   }
   },
   {
    "id": "lang-timor-leste",
@@ -3633,12 +4498,17 @@
    "prompt": "Which of these is a main language of Timor-Leste?",
    "answer": "Tetum",
    "wrong": [
-    "Tigrinya",
-    "Luxembourgish",
-    "Albanian"
+    "Indonesian",
+    "Hebrew",
+    "Vietnamese"
    ],
    "explain": "Main languages of Timor-Leste: Tetum and Portuguese.",
-   "difficulty": 3
+   "difficulty": 3,
+   "wrongNotes": {
+    "Indonesian": "Indonesian is a main language in Indonesia.",
+    "Hebrew": "Hebrew is a main language in Israel.",
+    "Vietnamese": "Vietnamese is a main language in Vietnam."
+   }
   },
   {
    "id": "lang-togo",
@@ -3646,25 +4516,35 @@
    "prompt": "Which of these is a main language of Togo?",
    "answer": "French",
    "wrong": [
-    "Armenian",
-    "Italian",
-    "Nepali"
+    "English",
+    "Mooré",
+    "Italian"
    ],
    "explain": "Main language of Togo: French.",
-   "difficulty": 2
+   "difficulty": 2,
+   "wrongNotes": {
+    "English": "English is a main language in Antigua and Barbuda, Australia, Bahamas and 55 others.",
+    "Mooré": "Mooré is a main language in Burkina Faso.",
+    "Italian": "Italian is a main language in Italy, San Marino, Switzerland and Vatican City."
+   }
   },
   {
    "id": "lang-tonga",
    "kind": "mc",
    "prompt": "Which of these is a main language of Tonga?",
-   "answer": "Tongan",
+   "answer": "English",
    "wrong": [
-    "Tetum",
-    "Montenegrin",
-    "Catalan"
+    "Afrikaans",
+    "Norwegian",
+    "Icelandic"
    ],
    "explain": "Main languages of Tonga: Tongan and English.",
-   "difficulty": 3
+   "difficulty": 3,
+   "wrongNotes": {
+    "Afrikaans": "Afrikaans is a main language in South Africa.",
+    "Norwegian": "Norwegian is a main language in Norway.",
+    "Icelandic": "Icelandic is a main language in Iceland."
+   }
   },
   {
    "id": "lang-trinidad-and-tobago",
@@ -3672,12 +4552,17 @@
    "prompt": "Which of these is a main language of Trinidad and Tobago?",
    "answer": "English",
    "wrong": [
-    "Hausa",
-    "Wolof",
-    "Bislama"
+    "Icelandic",
+    "Afrikaans",
+    "Dutch"
    ],
    "explain": "Main language of Trinidad and Tobago: English.",
-   "difficulty": 3
+   "difficulty": 3,
+   "wrongNotes": {
+    "Icelandic": "Icelandic is a main language in Iceland.",
+    "Afrikaans": "Afrikaans is a main language in South Africa.",
+    "Dutch": "Dutch is a main language in Belgium, Netherlands and Suriname."
+   }
   },
   {
    "id": "lang-tunisia",
@@ -3685,12 +4570,17 @@
    "prompt": "Which of these is a main language of Tunisia?",
    "answer": "Arabic",
    "wrong": [
-    "Samoan",
-    "Pashto",
-    "Dhivehi"
+    "Berber",
+    "Amharic",
+    "Maltese"
    ],
    "explain": "Main language of Tunisia: Arabic.",
-   "difficulty": 2
+   "difficulty": 2,
+   "wrongNotes": {
+    "Berber": "Berber is a main language in Algeria and Morocco.",
+    "Amharic": "Amharic is a main language in Ethiopia.",
+    "Maltese": "Maltese is a main language in Malta."
+   }
   },
   {
    "id": "lang-turkey",
@@ -3698,12 +4588,17 @@
    "prompt": "Which of these is a main language of Turkey?",
    "answer": "Turkish",
    "wrong": [
-    "Swedish",
-    "Zulu",
-    "Fijian"
+    "Kurdish",
+    "Bulgarian",
+    "Azerbaijani"
    ],
    "explain": "Main language of Turkey: Turkish.",
-   "difficulty": 1
+   "difficulty": 1,
+   "wrongNotes": {
+    "Kurdish": "Kurdish is a main language in Iraq.",
+    "Bulgarian": "Bulgarian is a main language in Bulgaria.",
+    "Azerbaijani": "Azerbaijani is a main language in Azerbaijan."
+   }
   },
   {
    "id": "lang-turkmenistan",
@@ -3711,25 +4606,35 @@
    "prompt": "Which of these is a main language of Turkmenistan?",
    "answer": "Turkmen",
    "wrong": [
-    "Lithuanian",
-    "Sango",
-    "Czech"
+    "Kazakh",
+    "Dari",
+    "Pashto"
    ],
    "explain": "Main language of Turkmenistan: Turkmen.",
-   "difficulty": 2
+   "difficulty": 1,
+   "wrongNotes": {
+    "Kazakh": "Kazakh is a main language in Kazakhstan.",
+    "Dari": "Dari is a main language in Afghanistan.",
+    "Pashto": "Pashto is a main language in Afghanistan."
+   }
   },
   {
    "id": "lang-tuvalu",
    "kind": "mc",
    "prompt": "Which of these is a main language of Tuvalu?",
-   "answer": "Tuvaluan",
+   "answer": "English",
    "wrong": [
-    "Spanish",
-    "Swedish",
-    "Belarusian"
+    "Dutch",
+    "Icelandic",
+    "German"
    ],
    "explain": "Main languages of Tuvalu: Tuvaluan and English.",
-   "difficulty": 3
+   "difficulty": 3,
+   "wrongNotes": {
+    "Dutch": "Dutch is a main language in Belgium, Netherlands and Suriname.",
+    "Icelandic": "Icelandic is a main language in Iceland.",
+    "German": "German is a main language in Austria, Belgium, Germany and 3 others."
+   }
   },
   {
    "id": "lang-uganda",
@@ -3737,12 +4642,17 @@
    "prompt": "Which of these is a main language of Uganda?",
    "answer": "English",
    "wrong": [
-    "Gilbertese",
-    "Norwegian",
-    "Irish"
+    "Kinyarwanda",
+    "French",
+    "Afrikaans"
    ],
    "explain": "Main languages of Uganda: English and Swahili.",
-   "difficulty": 2
+   "difficulty": 2,
+   "wrongNotes": {
+    "Kinyarwanda": "Kinyarwanda is a main language in Rwanda.",
+    "French": "French is a main language in Belgium, Benin, Burkina Faso and 26 others.",
+    "Afrikaans": "Afrikaans is a main language in South Africa."
+   }
   },
   {
    "id": "lang-ukraine",
@@ -3750,12 +4660,17 @@
    "prompt": "Which of these is a main language of Ukraine?",
    "answer": "Ukrainian",
    "wrong": [
-    "Hindi",
-    "Malay",
-    "Palauan"
+    "Romanian",
+    "Slovak",
+    "Belarusian"
    ],
    "explain": "Main language of Ukraine: Ukrainian.",
-   "difficulty": 2
+   "difficulty": 1,
+   "wrongNotes": {
+    "Romanian": "Romanian is a main language in Moldova and Romania.",
+    "Slovak": "Slovak is a main language in Slovakia.",
+    "Belarusian": "Belarusian is a main language in Belarus."
+   }
   },
   {
    "id": "lang-united-arab-emirates",
@@ -3763,12 +4678,17 @@
    "prompt": "Which of these is a main language of the United Arab Emirates?",
    "answer": "Arabic",
    "wrong": [
-    "Hausa",
-    "Swahili",
-    "Estonian"
+    "Maltese",
+    "Hebrew",
+    "Amharic"
    ],
    "explain": "Main language of the United Arab Emirates: Arabic.",
-   "difficulty": 2
+   "difficulty": 1,
+   "wrongNotes": {
+    "Maltese": "Maltese is a main language in Malta.",
+    "Hebrew": "Hebrew is a main language in Israel.",
+    "Amharic": "Amharic is a main language in Ethiopia."
+   }
   },
   {
    "id": "lang-uruguay",
@@ -3776,12 +4696,17 @@
    "prompt": "Which of these is a main language of Uruguay?",
    "answer": "Spanish",
    "wrong": [
-    "Uzbek",
-    "Palauan",
-    "Catalan"
+    "Italian",
+    "Romanian",
+    "French"
    ],
    "explain": "Main language of Uruguay: Spanish.",
-   "difficulty": 2
+   "difficulty": 2,
+   "wrongNotes": {
+    "Italian": "Italian is a main language in Italy, San Marino, Switzerland and Vatican City.",
+    "Romanian": "Romanian is a main language in Moldova and Romania.",
+    "French": "French is a main language in Belgium, Benin, Burkina Faso and 26 others."
+   }
   },
   {
    "id": "lang-uzbekistan",
@@ -3789,12 +4714,17 @@
    "prompt": "Which of these is a main language of Uzbekistan?",
    "answer": "Uzbek",
    "wrong": [
-    "Swazi",
-    "Latvian",
-    "Māori"
+    "Kyrgyz",
+    "Dari",
+    "Tajik"
    ],
    "explain": "Main language of Uzbekistan: Uzbek.",
-   "difficulty": 2
+   "difficulty": 1,
+   "wrongNotes": {
+    "Kyrgyz": "Kyrgyz is a main language in Kyrgyzstan.",
+    "Dari": "Dari is a main language in Afghanistan.",
+    "Tajik": "Tajik is a main language in Tajikistan."
+   }
   },
   {
    "id": "lang-vanuatu",
@@ -3802,12 +4732,17 @@
    "prompt": "Which of these is a main language of Vanuatu?",
    "answer": "Bislama",
    "wrong": [
-    "Shona",
-    "Comorian",
-    "Tigrinya"
+    "Marshallese",
+    "Samoan",
+    "Gilbertese"
    ],
    "explain": "Main languages of Vanuatu: Bislama, English and French.",
-   "difficulty": 3
+   "difficulty": 3,
+   "wrongNotes": {
+    "Marshallese": "Marshallese is a main language in Marshall Islands.",
+    "Samoan": "Samoan is a main language in Samoa.",
+    "Gilbertese": "Gilbertese is a main language in Kiribati."
+   }
   },
   {
    "id": "lang-vatican-city",
@@ -3815,12 +4750,17 @@
    "prompt": "Which of these is a main language of Vatican City?",
    "answer": "Italian",
    "wrong": [
-    "Kinyarwanda",
-    "Amharic",
-    "Korean"
+    "Spanish",
+    "Catalan",
+    "Portuguese"
    ],
    "explain": "Main languages of Vatican City: Italian and Latin.",
-   "difficulty": 3
+   "difficulty": 3,
+   "wrongNotes": {
+    "Spanish": "Spanish is a main language in Argentina, Bolivia, Chile and 17 others.",
+    "Catalan": "Catalan is a main language in Andorra.",
+    "Portuguese": "Portuguese is a main language in Angola, Brazil, Cape Verde and 6 others."
+   }
   },
   {
    "id": "lang-venezuela",
@@ -3828,12 +4768,17 @@
    "prompt": "Which of these is a main language of Venezuela?",
    "answer": "Spanish",
    "wrong": [
-    "Albanian",
-    "Persian",
-    "Serbian"
+    "Portuguese",
+    "English",
+    "French"
    ],
    "explain": "Main language of Venezuela: Spanish.",
-   "difficulty": 2
+   "difficulty": 2,
+   "wrongNotes": {
+    "Portuguese": "Portuguese is a main language in Angola, Brazil, Cape Verde and 6 others.",
+    "English": "English is a main language in Antigua and Barbuda, Australia, Bahamas and 55 others.",
+    "French": "French is a main language in Belgium, Benin, Burkina Faso and 26 others."
+   }
   },
   {
    "id": "lang-vietnam",
@@ -3841,12 +4786,17 @@
    "prompt": "Which of these is a main language of Vietnam?",
    "answer": "Vietnamese",
    "wrong": [
-    "Mauritian Creole",
-    "Haitian Creole",
-    "Belarusian"
+    "Mandarin Chinese",
+    "Khmer",
+    "Lao"
    ],
    "explain": "Main language of Vietnam: Vietnamese.",
-   "difficulty": 2
+   "difficulty": 1,
+   "wrongNotes": {
+    "Mandarin Chinese": "Mandarin Chinese is a main language in China and Singapore.",
+    "Khmer": "Khmer is a main language in Cambodia.",
+    "Lao": "Lao is a main language in Laos."
+   }
   },
   {
    "id": "lang-yemen",
@@ -3854,12 +4804,17 @@
    "prompt": "Which of these is a main language of Yemen?",
    "answer": "Arabic",
    "wrong": [
-    "Malagasy",
-    "Romanian",
-    "Bulgarian"
+    "Hebrew",
+    "Maltese",
+    "Amharic"
    ],
    "explain": "Main language of Yemen: Arabic.",
-   "difficulty": 2
+   "difficulty": 2,
+   "wrongNotes": {
+    "Hebrew": "Hebrew is a main language in Israel.",
+    "Maltese": "Maltese is a main language in Malta.",
+    "Amharic": "Amharic is a main language in Ethiopia."
+   }
   },
   {
    "id": "lang-zambia",
@@ -3867,12 +4822,17 @@
    "prompt": "Which of these is a main language of Zambia?",
    "answer": "English",
    "wrong": [
-    "Guaraní",
-    "Hungarian",
-    "German"
+    "Chichewa",
+    "Portuguese",
+    "Shona"
    ],
    "explain": "Main language of Zambia: English.",
-   "difficulty": 2
+   "difficulty": 2,
+   "wrongNotes": {
+    "Chichewa": "Chichewa is a main language in Malawi.",
+    "Portuguese": "Portuguese is a main language in Angola, Brazil, Cape Verde and 6 others.",
+    "Shona": "Shona is a main language in Zimbabwe."
+   }
   },
   {
    "id": "lang-zimbabwe",
@@ -3880,12 +4840,17 @@
    "prompt": "Which of these is a main language of Zimbabwe?",
    "answer": "English",
    "wrong": [
-    "Norwegian",
-    "Azerbaijani",
-    "Hungarian"
+    "Afrikaans",
+    "Setswana",
+    "Xhosa"
    ],
    "explain": "Main languages of Zimbabwe: English, Shona and Ndebele.",
-   "difficulty": 2
+   "difficulty": 2,
+   "wrongNotes": {
+    "Afrikaans": "Afrikaans is a main language in South Africa.",
+    "Setswana": "Setswana is a main language in Botswana.",
+    "Xhosa": "Xhosa is a main language in South Africa."
+   }
   },
   {
    "id": "langc-english",
@@ -3893,12 +4858,17 @@
    "prompt": "In which of these countries is English a main language?",
    "answer": "Australia",
    "wrong": [
-    "Oman",
-    "Czechia",
-    "Nepal"
+    "Dominican Republic",
+    "Jordan",
+    "Morocco"
    ],
    "explain": "English is an Indo-European language written in the Latin script, and a main language of Antigua and Barbuda, Australia, Bahamas, Barbados and Belize and others.",
-   "difficulty": 1
+   "difficulty": 1,
+   "wrongNotes": {
+    "Dominican Republic": "The main language of Dominican Republic: Spanish.",
+    "Jordan": "The main language of Jordan: Arabic.",
+    "Morocco": "The main languages of Morocco: Arabic and Berber."
+   }
   },
   {
    "id": "langs-english",
@@ -3919,12 +4889,17 @@
    "prompt": "In which of these countries is German a main language?",
    "answer": "Austria",
    "wrong": [
-    "El Salvador",
-    "Panama",
-    "Bolivia"
+    "Czechia",
+    "Slovenia",
+    "Hungary"
    ],
    "explain": "German is an Indo-European language written in the Latin script, and a main language of Austria, Belgium, Germany, Liechtenstein and Luxembourg and others.",
-   "difficulty": 1
+   "difficulty": 1,
+   "wrongNotes": {
+    "Czechia": "The main language of Czechia: Czech.",
+    "Slovenia": "The main language of Slovenia: Slovene.",
+    "Hungary": "The main language of Hungary: Hungarian."
+   }
   },
   {
    "id": "langs-german",
@@ -3945,12 +4920,17 @@
    "prompt": "In which of these countries is Dutch a main language?",
    "answer": "Belgium",
    "wrong": [
-    "Singapore",
-    "Somalia",
-    "United States"
+    "Germany",
+    "France",
+    "Luxembourg"
    ],
    "explain": "Dutch is an Indo-European language written in the Latin script, and a main language of Belgium, Netherlands and Suriname.",
-   "difficulty": 1
+   "difficulty": 1,
+   "wrongNotes": {
+    "Germany": "The main language of Germany: German.",
+    "France": "The main language of France: French.",
+    "Luxembourg": "The main languages of Luxembourg: Luxembourgish, French and German."
+   }
   },
   {
    "id": "langs-dutch",
@@ -3971,12 +4951,17 @@
    "prompt": "In which of these countries is Swedish a main language?",
    "answer": "Finland",
    "wrong": [
-    "Sudan",
-    "Bolivia",
-    "India"
+    "Norway",
+    "Russia",
+    "Liechtenstein"
    ],
    "explain": "Swedish is an Indo-European language written in the Latin script, and a main language of Finland and Sweden.",
-   "difficulty": 2
+   "difficulty": 2,
+   "wrongNotes": {
+    "Norway": "The main language of Norway: Norwegian.",
+    "Russia": "The main language of Russia: Russian.",
+    "Liechtenstein": "The main language of Liechtenstein: German."
+   }
   },
   {
    "id": "langs-swedish",
@@ -3997,12 +4982,17 @@
    "prompt": "In which of these countries is Danish a main language?",
    "answer": "Denmark",
    "wrong": [
-    "Morocco",
-    "Kyrgyzstan",
-    "Zimbabwe"
+    "Germany",
+    "France",
+    "Austria"
    ],
    "explain": "Danish is an Indo-European language written in the Latin script, and a main language of Denmark.",
-   "difficulty": 2
+   "difficulty": 1,
+   "wrongNotes": {
+    "Germany": "The main language of Germany: German.",
+    "France": "The main language of France: French.",
+    "Austria": "The main language of Austria: German."
+   }
   },
   {
    "id": "langs-danish",
@@ -4023,12 +5013,17 @@
    "prompt": "In which of these countries is Norwegian a main language?",
    "answer": "Norway",
    "wrong": [
-    "Dominica",
-    "Trinidad and Tobago",
-    "Solomon Islands"
+    "Russia",
+    "Sweden",
+    "Finland"
    ],
    "explain": "Norwegian is an Indo-European language written in the Latin script, and a main language of Norway.",
-   "difficulty": 2
+   "difficulty": 1,
+   "wrongNotes": {
+    "Russia": "The main language of Russia: Russian.",
+    "Sweden": "The main language of Sweden: Swedish.",
+    "Finland": "The main languages of Finland: Finnish and Swedish."
+   }
   },
   {
    "id": "langs-norwegian",
@@ -4049,12 +5044,17 @@
    "prompt": "In which of these countries is Icelandic a main language?",
    "answer": "Iceland",
    "wrong": [
-    "Mozambique",
-    "Nepal",
-    "Timor-Leste"
+    "Norway",
+    "Moldova",
+    "Spain"
    ],
    "explain": "Icelandic is an Indo-European language written in the Latin script, and a main language of Iceland.",
-   "difficulty": 2
+   "difficulty": 1,
+   "wrongNotes": {
+    "Norway": "The main language of Norway: Norwegian.",
+    "Moldova": "The main language of Moldova: Romanian.",
+    "Spain": "The main language of Spain: Spanish."
+   }
   },
   {
    "id": "langs-icelandic",
@@ -4075,12 +5075,17 @@
    "prompt": "In which of these countries is Afrikaans a main language?",
    "answer": "South Africa",
    "wrong": [
-    "Russia",
-    "Iran",
-    "Hungary"
+    "Mozambique",
+    "Lesotho",
+    "Botswana"
    ],
    "explain": "Afrikaans is an Indo-European language written in the Latin script, and a main language of South Africa.",
-   "difficulty": 2
+   "difficulty": 1,
+   "wrongNotes": {
+    "Mozambique": "The main language of Mozambique: Portuguese.",
+    "Lesotho": "The main languages of Lesotho: Sesotho and English.",
+    "Botswana": "The main languages of Botswana: English and Setswana."
+   }
   },
   {
    "id": "langs-afrikaans",
@@ -4101,12 +5106,17 @@
    "prompt": "In which of these countries is French a main language?",
    "answer": "Belgium",
    "wrong": [
-    "Somalia",
-    "China",
-    "Tanzania"
+    "Germany",
+    "Netherlands",
+    "Russia"
    ],
    "explain": "French is an Indo-European language written in the Latin script, and a main language of Belgium, Benin, Burkina Faso, Burundi and Cameroon and others.",
-   "difficulty": 1
+   "difficulty": 1,
+   "wrongNotes": {
+    "Germany": "The main language of Germany: German.",
+    "Netherlands": "The main language of Netherlands: Dutch.",
+    "Russia": "The main language of Russia: Russian."
+   }
   },
   {
    "id": "langs-french",
@@ -4127,12 +5137,17 @@
    "prompt": "In which of these countries is Spanish a main language?",
    "answer": "Argentina",
    "wrong": [
-    "Pakistan",
-    "Iraq",
-    "Denmark"
+    "Brazil",
+    "Suriname",
+    "Guyana"
    ],
    "explain": "Spanish is an Indo-European language written in the Latin script, and a main language of Argentina, Bolivia, Chile, Colombia and Costa Rica and others.",
-   "difficulty": 1
+   "difficulty": 1,
+   "wrongNotes": {
+    "Brazil": "The main language of Brazil: Portuguese.",
+    "Suriname": "The main language of Suriname: Dutch.",
+    "Guyana": "The main language of Guyana: English."
+   }
   },
   {
    "id": "langs-spanish",
@@ -4153,12 +5168,17 @@
    "prompt": "In which of these countries is Portuguese a main language?",
    "answer": "Brazil",
    "wrong": [
-    "Burkina Faso",
-    "Central African Republic",
-    "Vatican City"
+    "Argentina",
+    "Colombia",
+    "France"
    ],
    "explain": "Portuguese is an Indo-European language written in the Latin script, and a main language of Angola, Brazil, Cape Verde, Equatorial Guinea and Guinea-Bissau and others.",
-   "difficulty": 1
+   "difficulty": 1,
+   "wrongNotes": {
+    "Argentina": "The main language of Argentina: Spanish.",
+    "Colombia": "The main language of Colombia: Spanish.",
+    "France": "The main language of France: French."
+   }
   },
   {
    "id": "langs-portuguese",
@@ -4177,14 +5197,19 @@
    "id": "langc-italian",
    "kind": "mc",
    "prompt": "In which of these countries is Italian a main language?",
-   "answer": "Italy",
+   "answer": "San Marino",
    "wrong": [
-    "Thailand",
-    "Turkey",
-    "India"
+    "Sweden",
+    "Netherlands",
+    "Hungary"
    ],
    "explain": "Italian is an Indo-European language written in the Latin script, and a main language of Italy, San Marino, Switzerland and Vatican City.",
-   "difficulty": 1
+   "difficulty": 1,
+   "wrongNotes": {
+    "Sweden": "The main language of Sweden: Swedish.",
+    "Netherlands": "The main language of Netherlands: Dutch.",
+    "Hungary": "The main language of Hungary: Hungarian."
+   }
   },
   {
    "id": "langs-italian",
@@ -4205,12 +5230,17 @@
    "prompt": "In which of these countries is Romanian a main language?",
    "answer": "Moldova",
    "wrong": [
-    "Trinidad and Tobago",
-    "Fiji",
-    "Armenia"
+    "Ukraine",
+    "Belarus",
+    "United Kingdom"
    ],
    "explain": "Romanian is an Indo-European language written in the Latin script, and a main language of Moldova and Romania.",
-   "difficulty": 2
+   "difficulty": 2,
+   "wrongNotes": {
+    "Ukraine": "The main language of Ukraine: Ukrainian.",
+    "Belarus": "The main languages of Belarus: Belarusian and Russian.",
+    "United Kingdom": "The main language of United Kingdom: English."
+   }
   },
   {
    "id": "langs-romanian",
@@ -4231,12 +5261,17 @@
    "prompt": "In which of these countries is Catalan a main language?",
    "answer": "Andorra",
    "wrong": [
-    "Morocco",
-    "Liberia",
-    "Bangladesh"
+    "France",
+    "Montenegro",
+    "Switzerland"
    ],
    "explain": "Catalan is an Indo-European language written in the Latin script, and a main language of Andorra.",
-   "difficulty": 2
+   "difficulty": 2,
+   "wrongNotes": {
+    "France": "The main language of France: French.",
+    "Montenegro": "The main language of Montenegro: Montenegrin.",
+    "Switzerland": "The main languages of Switzerland: German, French, Italian and Romansh."
+   }
   },
   {
    "id": "langs-catalan",
@@ -4255,14 +5290,19 @@
    "id": "langc-russian",
    "kind": "mc",
    "prompt": "In which of these countries is Russian a main language?",
-   "answer": "Russia",
+   "answer": "Belarus",
    "wrong": [
-    "Kenya",
-    "Qatar",
-    "Thailand"
+    "Poland",
+    "Liechtenstein",
+    "Malta"
    ],
    "explain": "Russian is an Indo-European language written in the Cyrillic script, and a main language of Belarus, Kazakhstan, Kyrgyzstan and Russia.",
-   "difficulty": 1
+   "difficulty": 1,
+   "wrongNotes": {
+    "Poland": "The main language of Poland: Polish.",
+    "Liechtenstein": "The main language of Liechtenstein: German.",
+    "Malta": "The main languages of Malta: Maltese and English."
+   }
   },
   {
    "id": "langs-russian",
@@ -4283,12 +5323,17 @@
    "prompt": "In which of these countries is Ukrainian a main language?",
    "answer": "Ukraine",
    "wrong": [
-    "Lesotho",
-    "Kazakhstan",
-    "Palestine"
+    "Poland",
+    "Hungary",
+    "Romania"
    ],
    "explain": "Ukrainian is an Indo-European language written in the Cyrillic script, and a main language of Ukraine.",
-   "difficulty": 2
+   "difficulty": 1,
+   "wrongNotes": {
+    "Poland": "The main language of Poland: Polish.",
+    "Hungary": "The main language of Hungary: Hungarian.",
+    "Romania": "The main language of Romania: Romanian."
+   }
   },
   {
    "id": "langs-ukrainian",
@@ -4309,12 +5354,17 @@
    "prompt": "In which of these countries is Bulgarian a main language?",
    "answer": "Bulgaria",
    "wrong": [
-    "Eritrea",
-    "Senegal",
-    "Tunisia"
+    "Serbia",
+    "Greece",
+    "North Macedonia"
    ],
    "explain": "Bulgarian is an Indo-European language written in the Cyrillic script, and a main language of Bulgaria.",
-   "difficulty": 2
+   "difficulty": 1,
+   "wrongNotes": {
+    "Serbia": "The main language of Serbia: Serbian.",
+    "Greece": "The main language of Greece: Greek.",
+    "North Macedonia": "The main languages of North Macedonia: Macedonian and Albanian."
+   }
   },
   {
    "id": "langs-bulgarian",
@@ -4335,12 +5385,17 @@
    "prompt": "In which of these countries is Polish a main language?",
    "answer": "Poland",
    "wrong": [
-    "Bahamas",
-    "South Korea",
-    "Malawi"
+    "Slovakia",
+    "Belarus",
+    "Ukraine"
    ],
    "explain": "Polish is an Indo-European language written in the Latin script, and a main language of Poland.",
-   "difficulty": 2
+   "difficulty": 1,
+   "wrongNotes": {
+    "Slovakia": "The main language of Slovakia: Slovak.",
+    "Belarus": "The main languages of Belarus: Belarusian and Russian.",
+    "Ukraine": "The main language of Ukraine: Ukrainian."
+   }
   },
   {
    "id": "langs-polish",
@@ -4361,12 +5416,17 @@
    "prompt": "In which of these countries is Czech a main language?",
    "answer": "Czechia",
    "wrong": [
-    "Canada",
-    "Somalia",
-    "Micronesia"
+    "Austria",
+    "Slovakia",
+    "Poland"
    ],
    "explain": "Czech is an Indo-European language written in the Latin script, and a main language of Czechia.",
-   "difficulty": 2
+   "difficulty": 1,
+   "wrongNotes": {
+    "Austria": "The main language of Austria: German.",
+    "Slovakia": "The main language of Slovakia: Slovak.",
+    "Poland": "The main language of Poland: Polish."
+   }
   },
   {
    "id": "langs-czech",
@@ -4387,12 +5447,17 @@
    "prompt": "In which of these countries is Slovak a main language?",
    "answer": "Slovakia",
    "wrong": [
-    "São Tomé and Príncipe",
-    "Cameroon",
-    "Republic of the Congo"
+    "Ukraine",
+    "Czechia",
+    "Hungary"
    ],
    "explain": "Slovak is an Indo-European language written in the Latin script, and a main language of Slovakia.",
-   "difficulty": 3
+   "difficulty": 1,
+   "wrongNotes": {
+    "Ukraine": "The main language of Ukraine: Ukrainian.",
+    "Czechia": "The main language of Czechia: Czech.",
+    "Hungary": "The main language of Hungary: Hungarian."
+   }
   },
   {
    "id": "langs-slovak",
@@ -4413,12 +5478,17 @@
    "prompt": "In which of these countries is Croatian a main language?",
    "answer": "Bosnia and Herzegovina",
    "wrong": [
-    "Costa Rica",
-    "Syria",
-    "Bahamas"
+    "Montenegro",
+    "Serbia",
+    "Hungary"
    ],
    "explain": "Croatian is an Indo-European language written in the Latin script, and a main language of Bosnia and Herzegovina and Croatia.",
-   "difficulty": 2
+   "difficulty": 2,
+   "wrongNotes": {
+    "Montenegro": "The main language of Montenegro: Montenegrin.",
+    "Serbia": "The main language of Serbia: Serbian.",
+    "Hungary": "The main language of Hungary: Hungarian."
+   }
   },
   {
    "id": "langs-croatian",
@@ -4437,14 +5507,19 @@
    "id": "langc-greek",
    "kind": "mc",
    "prompt": "In which of these countries is Greek a main language?",
-   "answer": "Greece",
+   "answer": "Cyprus",
    "wrong": [
-    "Grenada",
-    "Angola",
-    "Japan"
+    "United Arab Emirates",
+    "Kyrgyzstan",
+    "Vietnam"
    ],
    "explain": "Greek is an Indo-European language written in the Greek script, and a main language of Cyprus and Greece.",
-   "difficulty": 1
+   "difficulty": 1,
+   "wrongNotes": {
+    "United Arab Emirates": "The main language of United Arab Emirates: Arabic.",
+    "Kyrgyzstan": "The main languages of Kyrgyzstan: Kyrgyz and Russian.",
+    "Vietnam": "The main language of Vietnam: Vietnamese."
+   }
   },
   {
    "id": "langs-greek",
@@ -4463,14 +5538,19 @@
    "id": "langc-albanian",
    "kind": "mc",
    "prompt": "In which of these countries is Albanian a main language?",
-   "answer": "Albania",
+   "answer": "North Macedonia",
    "wrong": [
-    "Laos",
-    "India",
-    "Micronesia"
+    "Bulgaria",
+    "Serbia",
+    "Greece"
    ],
    "explain": "Albanian is an Indo-European language written in the Latin script, and a main language of Albania and North Macedonia.",
-   "difficulty": 3
+   "difficulty": 3,
+   "wrongNotes": {
+    "Bulgaria": "The main language of Bulgaria: Bulgarian.",
+    "Serbia": "The main language of Serbia: Serbian.",
+    "Greece": "The main language of Greece: Greek."
+   }
   },
   {
    "id": "langs-albanian",
@@ -4491,12 +5571,17 @@
    "prompt": "In which of these countries is Armenian a main language?",
    "answer": "Armenia",
    "wrong": [
-    "Dominican Republic",
-    "Australia",
-    "Uganda"
+    "Georgia",
+    "Turkey",
+    "Iran"
    ],
    "explain": "Armenian is an Indo-European language written in the Armenian script, and a main language of Armenia.",
-   "difficulty": 3
+   "difficulty": 1,
+   "wrongNotes": {
+    "Georgia": "The main language of Georgia: Georgian.",
+    "Turkey": "The main language of Turkey: Turkish.",
+    "Iran": "The main language of Iran: Persian."
+   }
   },
   {
    "id": "langs-armenian",
@@ -4517,12 +5602,17 @@
    "prompt": "In which of these countries is Hindi a main language?",
    "answer": "India",
    "wrong": [
-    "Tuvalu",
-    "Costa Rica",
-    "Gabon"
+    "Myanmar",
+    "Bhutan",
+    "Nepal"
    ],
    "explain": "Hindi is an Indo-European language written in the Devanagari script, and a main language of India.",
-   "difficulty": 1
+   "difficulty": 1,
+   "wrongNotes": {
+    "Myanmar": "The main language of Myanmar: Burmese.",
+    "Bhutan": "The main language of Bhutan: Dzongkha.",
+    "Nepal": "The main language of Nepal: Nepali."
+   }
   },
   {
    "id": "langs-hindi",
@@ -4543,12 +5633,17 @@
    "prompt": "In which of these countries is Bengali a main language?",
    "answer": "Bangladesh",
    "wrong": [
-    "Costa Rica",
-    "Italy",
-    "Lesotho"
+    "Myanmar",
+    "India",
+    "Maldives"
    ],
    "explain": "Bengali is an Indo-European language written in the Bengali script, and a main language of Bangladesh.",
-   "difficulty": 2
+   "difficulty": 2,
+   "wrongNotes": {
+    "Myanmar": "The main language of Myanmar: Burmese.",
+    "India": "The main languages of India: Hindi and English.",
+    "Maldives": "The main language of Maldives: Dhivehi."
+   }
   },
   {
    "id": "langs-bengali",
@@ -4569,12 +5664,17 @@
    "prompt": "In which of these countries is Urdu a main language?",
    "answer": "Pakistan",
    "wrong": [
-    "Monaco",
-    "Palau",
-    "Eswatini"
+    "Iran",
+    "India",
+    "China"
    ],
    "explain": "Urdu is an Indo-European language written in the Arabic script, and a main language of Pakistan.",
-   "difficulty": 2
+   "difficulty": 2,
+   "wrongNotes": {
+    "Iran": "The main language of Iran: Persian.",
+    "India": "The main languages of India: Hindi and English.",
+    "China": "The main language of China: Mandarin Chinese."
+   }
   },
   {
    "id": "langs-urdu",
@@ -4595,12 +5695,17 @@
    "prompt": "In which of these countries is Nepali a main language?",
    "answer": "Nepal",
    "wrong": [
-    "Colombia",
-    "Mauritius",
-    "Venezuela"
+    "India",
+    "China",
+    "United Arab Emirates"
    ],
    "explain": "Nepali is an Indo-European language written in the Devanagari script, and a main language of Nepal.",
-   "difficulty": 3
+   "difficulty": 1,
+   "wrongNotes": {
+    "India": "The main languages of India: Hindi and English.",
+    "China": "The main language of China: Mandarin Chinese.",
+    "United Arab Emirates": "The main language of United Arab Emirates: Arabic."
+   }
   },
   {
    "id": "langs-nepali",
@@ -4621,12 +5726,17 @@
    "prompt": "In which of these countries is Sinhala a main language?",
    "answer": "Sri Lanka",
    "wrong": [
-    "Bolivia",
-    "Norway",
-    "Ecuador"
+    "Japan",
+    "South Korea",
+    "Timor-Leste"
    ],
    "explain": "Sinhala is an Indo-European language written in the Sinhala script, and a main language of Sri Lanka.",
-   "difficulty": 3
+   "difficulty": 3,
+   "wrongNotes": {
+    "Japan": "The main language of Japan: Japanese.",
+    "South Korea": "The main language of South Korea: Korean.",
+    "Timor-Leste": "The main languages of Timor-Leste: Tetum and Portuguese."
+   }
   },
   {
    "id": "langs-sinhala",
@@ -4647,12 +5757,17 @@
    "prompt": "In which of these countries is Persian a main language?",
    "answer": "Iran",
    "wrong": [
-    "Republic of the Congo",
-    "Guyana",
-    "Democratic Republic of the Congo"
+    "Iraq",
+    "Armenia",
+    "Turkey"
    ],
    "explain": "Persian is an Indo-European language written in the Arabic script, and a main language of Iran.",
-   "difficulty": 2
+   "difficulty": 2,
+   "wrongNotes": {
+    "Iraq": "The main languages of Iraq: Arabic and Kurdish.",
+    "Armenia": "The main language of Armenia: Armenian.",
+    "Turkey": "The main language of Turkey: Turkish."
+   }
   },
   {
    "id": "langs-persian",
@@ -4673,12 +5788,17 @@
    "prompt": "In which of these countries is Pashto a main language?",
    "answer": "Afghanistan",
    "wrong": [
-    "Belgium",
-    "Colombia",
-    "New Zealand"
+    "Pakistan",
+    "Iran",
+    "Turkmenistan"
    ],
    "explain": "Pashto is an Indo-European language written in the Arabic script, and a main language of Afghanistan.",
-   "difficulty": 3
+   "difficulty": 3,
+   "wrongNotes": {
+    "Pakistan": "The main languages of Pakistan: Urdu and English.",
+    "Iran": "The main language of Iran: Persian.",
+    "Turkmenistan": "The main language of Turkmenistan: Turkmen."
+   }
   },
   {
    "id": "langs-pashto",
@@ -4699,12 +5819,17 @@
    "prompt": "In which of these countries is Arabic a main language?",
    "answer": "Egypt",
    "wrong": [
-    "Armenia",
-    "Maldives",
-    "Pakistan"
+    "Madagascar",
+    "Kenya",
+    "Malawi"
    ],
    "explain": "Arabic is an Afro-Asiatic language written in the Arabic script, and a main language of Algeria, Bahrain, Chad, Comoros and Djibouti and others.",
-   "difficulty": 1
+   "difficulty": 1,
+   "wrongNotes": {
+    "Madagascar": "The main languages of Madagascar: Malagasy and French.",
+    "Kenya": "The main languages of Kenya: Swahili and English.",
+    "Malawi": "The main languages of Malawi: English and Chichewa."
+   }
   },
   {
    "id": "langs-arabic",
@@ -4725,12 +5850,17 @@
    "prompt": "In which of these countries is Hebrew a main language?",
    "answer": "Israel",
    "wrong": [
-    "United States",
-    "Zambia",
-    "Venezuela"
+    "Egypt",
+    "Lebanon",
+    "Syria"
    ],
    "explain": "Hebrew is an Afro-Asiatic language written in the Hebrew script, and a main language of Israel.",
-   "difficulty": 2
+   "difficulty": 2,
+   "wrongNotes": {
+    "Egypt": "The main language of Egypt: Arabic.",
+    "Lebanon": "The main language of Lebanon: Arabic.",
+    "Syria": "The main language of Syria: Arabic."
+   }
   },
   {
    "id": "langs-hebrew",
@@ -4751,12 +5881,17 @@
    "prompt": "In which of these countries is Amharic a main language?",
    "answer": "Ethiopia",
    "wrong": [
-    "San Marino",
-    "Marshall Islands",
-    "Maldives"
+    "South Sudan",
+    "Kenya",
+    "Djibouti"
    ],
    "explain": "Amharic is an Afro-Asiatic language written in the Ge'ez script, and a main language of Ethiopia.",
-   "difficulty": 3
+   "difficulty": 3,
+   "wrongNotes": {
+    "South Sudan": "The main language of South Sudan: English.",
+    "Kenya": "The main languages of Kenya: Swahili and English.",
+    "Djibouti": "The main languages of Djibouti: French and Arabic."
+   }
   },
   {
    "id": "langs-amharic",
@@ -4777,12 +5912,17 @@
    "prompt": "In which of these countries is Maltese a main language?",
    "answer": "Malta",
    "wrong": [
-    "Syria",
-    "Guatemala",
-    "Maldives"
+    "Greece",
+    "Liechtenstein",
+    "Croatia"
    ],
    "explain": "Maltese is an Afro-Asiatic language written in the Latin script, and a main language of Malta.",
-   "difficulty": 3
+   "difficulty": 1,
+   "wrongNotes": {
+    "Greece": "The main language of Greece: Greek.",
+    "Liechtenstein": "The main language of Liechtenstein: German.",
+    "Croatia": "The main language of Croatia: Croatian."
+   }
   },
   {
    "id": "langs-maltese",
@@ -4803,12 +5943,17 @@
    "prompt": "In which of these countries is Somali a main language?",
    "answer": "Somalia",
    "wrong": [
-    "Kyrgyzstan",
-    "Nepal",
-    "Russia"
+    "Kenya",
+    "Ethiopia",
+    "Djibouti"
    ],
    "explain": "Somali is an Afro-Asiatic language written in the Latin script, and a main language of Somalia.",
-   "difficulty": 3
+   "difficulty": 1,
+   "wrongNotes": {
+    "Kenya": "The main languages of Kenya: Swahili and English.",
+    "Ethiopia": "The main language of Ethiopia: Amharic.",
+    "Djibouti": "The main languages of Djibouti: French and Arabic."
+   }
   },
   {
    "id": "langs-somali",
@@ -4829,12 +5974,17 @@
    "prompt": "In which of these countries is Hausa a main language?",
    "answer": "Niger",
    "wrong": [
-    "Israel",
-    "Iran",
-    "Bahamas"
+    "Burkina Faso",
+    "Libya",
+    "Benin"
    ],
    "explain": "Hausa is an Afro-Asiatic language written in the Latin script, and a main language of Niger.",
-   "difficulty": 3
+   "difficulty": 3,
+   "wrongNotes": {
+    "Burkina Faso": "The main languages of Burkina Faso: French and Mooré.",
+    "Libya": "The main language of Libya: Arabic.",
+    "Benin": "The main language of Benin: French."
+   }
   },
   {
    "id": "langs-hausa",
@@ -4853,14 +6003,19 @@
    "id": "langc-turkish",
    "kind": "mc",
    "prompt": "In which of these countries is Turkish a main language?",
-   "answer": "Turkey",
+   "answer": "Cyprus",
    "wrong": [
-    "Dominican Republic",
-    "Czechia",
-    "Bulgaria"
+    "Syria",
+    "Yemen",
+    "Saudi Arabia"
    ],
    "explain": "Turkish is a Turkic language written in the Latin script, and a main language of Cyprus and Turkey.",
-   "difficulty": 1
+   "difficulty": 1,
+   "wrongNotes": {
+    "Syria": "The main language of Syria: Arabic.",
+    "Yemen": "The main language of Yemen: Arabic.",
+    "Saudi Arabia": "The main language of Saudi Arabia: Arabic."
+   }
   },
   {
    "id": "langs-turkish",
@@ -4881,12 +6036,17 @@
    "prompt": "In which of these countries is Azerbaijani a main language?",
    "answer": "Azerbaijan",
    "wrong": [
-    "Germany",
-    "Latvia",
-    "Italy"
+    "Georgia",
+    "Turkey",
+    "Russia"
    ],
    "explain": "Azerbaijani is a Turkic language written in the Latin script, and a main language of Azerbaijan.",
-   "difficulty": 3
+   "difficulty": 1,
+   "wrongNotes": {
+    "Georgia": "The main language of Georgia: Georgian.",
+    "Turkey": "The main language of Turkey: Turkish.",
+    "Russia": "The main language of Russia: Russian."
+   }
   },
   {
    "id": "langs-azerbaijani",
@@ -4907,12 +6067,17 @@
    "prompt": "In which of these countries is Uzbek a main language?",
    "answer": "Uzbekistan",
    "wrong": [
-    "Iceland",
-    "Egypt",
-    "Haiti"
+    "Turkmenistan",
+    "Afghanistan",
+    "Tajikistan"
    ],
    "explain": "Uzbek is a Turkic language written in the Latin script, and a main language of Uzbekistan.",
-   "difficulty": 3
+   "difficulty": 1,
+   "wrongNotes": {
+    "Turkmenistan": "The main language of Turkmenistan: Turkmen.",
+    "Afghanistan": "The main languages of Afghanistan: Pashto and Dari.",
+    "Tajikistan": "The main language of Tajikistan: Tajik."
+   }
   },
   {
    "id": "langs-uzbek",
@@ -4933,12 +6098,17 @@
    "prompt": "In which of these countries is Finnish a main language?",
    "answer": "Finland",
    "wrong": [
-    "Israel",
-    "Bhutan",
-    "Niger"
+    "Russia",
+    "Norway",
+    "Sweden"
    ],
    "explain": "Finnish is an Uralic language written in the Latin script, and a main language of Finland.",
-   "difficulty": 2
+   "difficulty": 1,
+   "wrongNotes": {
+    "Russia": "The main language of Russia: Russian.",
+    "Norway": "The main language of Norway: Norwegian.",
+    "Sweden": "The main language of Sweden: Swedish."
+   }
   },
   {
    "id": "langs-finnish",
@@ -4959,12 +6129,17 @@
    "prompt": "In which of these countries is Estonian a main language?",
    "answer": "Estonia",
    "wrong": [
-    "Central African Republic",
-    "Sierra Leone",
-    "Gabon"
+    "Russia",
+    "Latvia",
+    "Moldova"
    ],
    "explain": "Estonian is an Uralic language written in the Latin script, and a main language of Estonia.",
-   "difficulty": 3
+   "difficulty": 1,
+   "wrongNotes": {
+    "Russia": "The main language of Russia: Russian.",
+    "Latvia": "The main language of Latvia: Latvian.",
+    "Moldova": "The main language of Moldova: Romanian."
+   }
   },
   {
    "id": "langs-estonian",
@@ -4985,12 +6160,17 @@
    "prompt": "In which of these countries is Hungarian a main language?",
    "answer": "Hungary",
    "wrong": [
-    "Afghanistan",
-    "Madagascar",
-    "Iran"
+    "Ukraine",
+    "Croatia",
+    "Serbia"
    ],
    "explain": "Hungarian is an Uralic language written in the Latin script, and a main language of Hungary.",
-   "difficulty": 2
+   "difficulty": 1,
+   "wrongNotes": {
+    "Ukraine": "The main language of Ukraine: Ukrainian.",
+    "Croatia": "The main language of Croatia: Croatian.",
+    "Serbia": "The main language of Serbia: Serbian."
+   }
   },
   {
    "id": "langs-hungarian",
@@ -5011,12 +6191,17 @@
    "prompt": "In which of these countries is Georgian a main language?",
    "answer": "Georgia",
    "wrong": [
-    "Liechtenstein",
-    "Greece",
-    "Equatorial Guinea"
+    "Azerbaijan",
+    "Armenia",
+    "Russia"
    ],
    "explain": "Georgian is a Kartvelian language written in the Georgian script, and a main language of Georgia.",
-   "difficulty": 3
+   "difficulty": 1,
+   "wrongNotes": {
+    "Azerbaijan": "The main language of Azerbaijan: Azerbaijani.",
+    "Armenia": "The main language of Armenia: Armenian.",
+    "Russia": "The main language of Russia: Russian."
+   }
   },
   {
    "id": "langs-georgian",
@@ -5035,14 +6220,19 @@
    "id": "langc-mandarin-chinese",
    "kind": "mc",
    "prompt": "In which of these countries is Mandarin Chinese a main language?",
-   "answer": "China",
+   "answer": "Singapore",
    "wrong": [
-    "Peru",
-    "Dominican Republic",
-    "Madagascar"
+    "Myanmar",
+    "Armenia",
+    "Pakistan"
    ],
    "explain": "Mandarin Chinese is a Sino-Tibetan language written in the Chinese characters script, and a main language of China and Singapore.",
-   "difficulty": 1
+   "difficulty": 1,
+   "wrongNotes": {
+    "Myanmar": "The main language of Myanmar: Burmese.",
+    "Armenia": "The main language of Armenia: Armenian.",
+    "Pakistan": "The main languages of Pakistan: Urdu and English."
+   }
   },
   {
    "id": "langs-mandarin-chinese",
@@ -5063,12 +6253,17 @@
    "prompt": "In which of these countries is Burmese a main language?",
    "answer": "Myanmar",
    "wrong": [
-    "Liberia",
-    "Antigua and Barbuda",
-    "Czechia"
+    "Thailand",
+    "Bangladesh",
+    "Laos"
    ],
    "explain": "Burmese is a Sino-Tibetan language written in the Burmese script, and a main language of Myanmar.",
-   "difficulty": 3
+   "difficulty": 1,
+   "wrongNotes": {
+    "Thailand": "The main language of Thailand: Thai.",
+    "Bangladesh": "The main language of Bangladesh: Bengali.",
+    "Laos": "The main language of Laos: Lao."
+   }
   },
   {
    "id": "langs-burmese",
@@ -5089,12 +6284,17 @@
    "prompt": "In which of these countries is Japanese a main language?",
    "answer": "Japan",
    "wrong": [
-    "Netherlands",
-    "Guinea",
-    "France"
+    "Mongolia",
+    "Azerbaijan",
+    "Georgia"
    ],
    "explain": "Japanese is a Japonic language written in the Kanji and kana script, and a main language of Japan.",
-   "difficulty": 1
+   "difficulty": 1,
+   "wrongNotes": {
+    "Mongolia": "The main language of Mongolia: Mongolian.",
+    "Azerbaijan": "The main language of Azerbaijan: Azerbaijani.",
+    "Georgia": "The main language of Georgia: Georgian."
+   }
   },
   {
    "id": "langs-japanese",
@@ -5115,12 +6315,17 @@
    "prompt": "In which of these countries is Korean a main language?",
    "answer": "South Korea",
    "wrong": [
-    "France",
-    "Mauritius",
-    "Sierra Leone"
+    "Oman",
+    "Israel",
+    "Singapore"
    ],
    "explain": "Korean is a Koreanic language written in the Hangul script, and a main language of North Korea and South Korea.",
-   "difficulty": 1
+   "difficulty": 1,
+   "wrongNotes": {
+    "Oman": "The main language of Oman: Arabic.",
+    "Israel": "The main language of Israel: Hebrew.",
+    "Singapore": "The main languages of Singapore: English, Malay, Mandarin Chinese and Tamil."
+   }
   },
   {
    "id": "langs-korean",
@@ -5141,12 +6346,17 @@
    "prompt": "In which of these countries is Thai a main language?",
    "answer": "Thailand",
    "wrong": [
-    "Nigeria",
-    "Venezuela",
-    "France"
+    "Laos",
+    "Myanmar",
+    "Cambodia"
    ],
    "explain": "Thai is a Kra-Dai language written in the Thai script, and a main language of Thailand.",
-   "difficulty": 2
+   "difficulty": 1,
+   "wrongNotes": {
+    "Laos": "The main language of Laos: Lao.",
+    "Myanmar": "The main language of Myanmar: Burmese.",
+    "Cambodia": "The main language of Cambodia: Khmer."
+   }
   },
   {
    "id": "langs-thai",
@@ -5167,12 +6377,17 @@
    "prompt": "In which of these countries is Lao a main language?",
    "answer": "Laos",
    "wrong": [
-    "Tanzania",
-    "Albania",
-    "Djibouti"
+    "Vietnam",
+    "Cambodia",
+    "Myanmar"
    ],
    "explain": "Lao is a Kra-Dai language written in the Lao script, and a main language of Laos.",
-   "difficulty": 3
+   "difficulty": 1,
+   "wrongNotes": {
+    "Vietnam": "The main language of Vietnam: Vietnamese.",
+    "Cambodia": "The main language of Cambodia: Khmer.",
+    "Myanmar": "The main language of Myanmar: Burmese."
+   }
   },
   {
    "id": "langs-lao",
@@ -5193,12 +6408,17 @@
    "prompt": "In which of these countries is Vietnamese a main language?",
    "answer": "Vietnam",
    "wrong": [
-    "Mauritius",
-    "Rwanda",
-    "Andorra"
+    "Cambodia",
+    "Laos",
+    "China"
    ],
    "explain": "Vietnamese is an Austroasiatic language written in the Latin script, and a main language of Vietnam.",
-   "difficulty": 2
+   "difficulty": 1,
+   "wrongNotes": {
+    "Cambodia": "The main language of Cambodia: Khmer.",
+    "Laos": "The main language of Laos: Lao.",
+    "China": "The main language of China: Mandarin Chinese."
+   }
   },
   {
    "id": "langs-vietnamese",
@@ -5219,12 +6439,17 @@
    "prompt": "In which of these countries is Khmer a main language?",
    "answer": "Cambodia",
    "wrong": [
-    "Dominican Republic",
-    "El Salvador",
-    "Bahamas"
+    "Laos",
+    "Thailand",
+    "Vietnam"
    ],
    "explain": "Khmer is an Austroasiatic language written in the Khmer script, and a main language of Cambodia.",
-   "difficulty": 3
+   "difficulty": 1,
+   "wrongNotes": {
+    "Laos": "The main language of Laos: Lao.",
+    "Thailand": "The main language of Thailand: Thai.",
+    "Vietnam": "The main language of Vietnam: Vietnamese."
+   }
   },
   {
    "id": "langs-khmer",
@@ -5245,12 +6470,17 @@
    "prompt": "In which of these countries is Malay a main language?",
    "answer": "Brunei",
    "wrong": [
-    "Eswatini",
-    "Guatemala",
-    "Equatorial Guinea"
+    "Yemen",
+    "Bhutan",
+    "Israel"
    ],
    "explain": "Malay is an Austronesian language written in the Latin script, and a main language of Brunei, Malaysia and Singapore.",
-   "difficulty": 2
+   "difficulty": 2,
+   "wrongNotes": {
+    "Yemen": "The main language of Yemen: Arabic.",
+    "Bhutan": "The main language of Bhutan: Dzongkha.",
+    "Israel": "The main language of Israel: Hebrew."
+   }
   },
   {
    "id": "langs-malay",
@@ -5271,12 +6501,17 @@
    "prompt": "In which of these countries is Indonesian a main language?",
    "answer": "Indonesia",
    "wrong": [
-    "Brazil",
-    "Luxembourg",
-    "Paraguay"
+    "Papua New Guinea",
+    "Timor-Leste",
+    "Malaysia"
    ],
    "explain": "Indonesian is an Austronesian language written in the Latin script, and a main language of Indonesia.",
-   "difficulty": 2
+   "difficulty": 1,
+   "wrongNotes": {
+    "Papua New Guinea": "The main languages of Papua New Guinea: English, Tok Pisin and Hiri Motu.",
+    "Timor-Leste": "The main languages of Timor-Leste: Tetum and Portuguese.",
+    "Malaysia": "The main language of Malaysia: Malay."
+   }
   },
   {
    "id": "langs-indonesian",
@@ -5297,12 +6532,17 @@
    "prompt": "In which of these countries is Filipino a main language?",
    "answer": "Philippines",
    "wrong": [
-    "Tunisia",
-    "Iceland",
-    "Saint Kitts and Nevis"
+    "Qatar",
+    "Bangladesh",
+    "Mongolia"
    ],
    "explain": "Filipino is an Austronesian language written in the Latin script, and a main language of Philippines.",
-   "difficulty": 2
+   "difficulty": 1,
+   "wrongNotes": {
+    "Qatar": "The main language of Qatar: Arabic.",
+    "Bangladesh": "The main language of Bangladesh: Bengali.",
+    "Mongolia": "The main language of Mongolia: Mongolian."
+   }
   },
   {
    "id": "langs-filipino",
@@ -5323,12 +6563,17 @@
    "prompt": "In which of these countries is Malagasy a main language?",
    "answer": "Madagascar",
    "wrong": [
-    "China",
-    "Uruguay",
-    "Ecuador"
+    "Benin",
+    "Nigeria",
+    "South Sudan"
    ],
    "explain": "Malagasy is an Austronesian language written in the Latin script, and a main language of Madagascar.",
-   "difficulty": 3
+   "difficulty": 1,
+   "wrongNotes": {
+    "Benin": "The main language of Benin: French.",
+    "Nigeria": "The main language of Nigeria: English.",
+    "South Sudan": "The main language of South Sudan: English."
+   }
   },
   {
    "id": "langs-malagasy",
@@ -5349,12 +6594,17 @@
    "prompt": "In which of these countries is Māori a main language?",
    "answer": "New Zealand",
    "wrong": [
-    "Slovenia",
-    "United States",
-    "Bangladesh"
+    "Marshall Islands",
+    "Micronesia",
+    "Kiribati"
    ],
    "explain": "Māori is an Austronesian language written in the Latin script, and a main language of New Zealand.",
-   "difficulty": 3
+   "difficulty": 3,
+   "wrongNotes": {
+    "Marshall Islands": "The main languages of Marshall Islands: Marshallese and English.",
+    "Micronesia": "The main language of Micronesia: English.",
+    "Kiribati": "The main languages of Kiribati: English and Gilbertese."
+   }
   },
   {
    "id": "langs-maori",
@@ -5375,12 +6625,17 @@
    "prompt": "In which of these countries is Samoan a main language?",
    "answer": "Samoa",
    "wrong": [
-    "Kazakhstan",
-    "Saudi Arabia",
-    "Somalia"
+    "Marshall Islands",
+    "Solomon Islands",
+    "Micronesia"
    ],
    "explain": "Samoan is an Austronesian language written in the Latin script, and a main language of Samoa.",
-   "difficulty": 3
+   "difficulty": 1,
+   "wrongNotes": {
+    "Marshall Islands": "The main languages of Marshall Islands: Marshallese and English.",
+    "Solomon Islands": "The main language of Solomon Islands: English.",
+    "Micronesia": "The main language of Micronesia: English."
+   }
   },
   {
    "id": "langs-samoan",
@@ -5401,12 +6656,17 @@
    "prompt": "In which of these countries is Swahili a main language?",
    "answer": "Kenya",
    "wrong": [
-    "Mexico",
-    "United Arab Emirates",
-    "Monaco"
+    "Somalia",
+    "Ethiopia",
+    "South Sudan"
    ],
    "explain": "Swahili is a Niger-Congo language written in the Latin script, and a main language of Kenya, Tanzania and Uganda.",
-   "difficulty": 2
+   "difficulty": 2,
+   "wrongNotes": {
+    "Somalia": "The main languages of Somalia: Somali and Arabic.",
+    "Ethiopia": "The main language of Ethiopia: Amharic.",
+    "South Sudan": "The main language of South Sudan: English."
+   }
   },
   {
    "id": "langs-swahili",
@@ -5427,12 +6687,17 @@
    "prompt": "In which of these countries is Zulu a main language?",
    "answer": "South Africa",
    "wrong": [
-    "Iraq",
-    "Nicaragua",
-    "Saudi Arabia"
+    "Eswatini",
+    "Zimbabwe",
+    "Namibia"
    ],
    "explain": "Zulu is a Niger-Congo language written in the Latin script, and a main language of South Africa.",
-   "difficulty": 2
+   "difficulty": 2,
+   "wrongNotes": {
+    "Eswatini": "The main languages of Eswatini: Swazi and English.",
+    "Zimbabwe": "The main languages of Zimbabwe: English, Shona and Ndebele.",
+    "Namibia": "The main language of Namibia: English."
+   }
   },
   {
    "id": "langs-zulu",
@@ -5453,12 +6718,17 @@
    "prompt": "In which of these countries is Xhosa a main language?",
    "answer": "South Africa",
    "wrong": [
-    "Jordan",
-    "Haiti",
-    "Vietnam"
+    "Mozambique",
+    "Botswana",
+    "Zimbabwe"
    ],
    "explain": "Xhosa is a Niger-Congo language written in the Latin script, and a main language of South Africa.",
-   "difficulty": 3
+   "difficulty": 3,
+   "wrongNotes": {
+    "Mozambique": "The main language of Mozambique: Portuguese.",
+    "Botswana": "The main languages of Botswana: English and Setswana.",
+    "Zimbabwe": "The main languages of Zimbabwe: English, Shona and Ndebele."
+   }
   },
   {
    "id": "langs-xhosa",
@@ -5479,12 +6749,17 @@
    "prompt": "In which of these countries is Kinyarwanda a main language?",
    "answer": "Rwanda",
    "wrong": [
-    "Andorra",
-    "Nicaragua",
-    "Saint Lucia"
+    "Uganda",
+    "Burundi",
+    "Tanzania"
    ],
    "explain": "Kinyarwanda is a Niger-Congo language written in the Latin script, and a main language of Rwanda.",
-   "difficulty": 3
+   "difficulty": 1,
+   "wrongNotes": {
+    "Uganda": "The main languages of Uganda: English and Swahili.",
+    "Burundi": "The main languages of Burundi: Kirundi and French.",
+    "Tanzania": "The main languages of Tanzania: Swahili and English."
+   }
   },
   {
    "id": "langs-kinyarwanda",
@@ -5505,12 +6780,17 @@
    "prompt": "In which of these countries is Shona a main language?",
    "answer": "Zimbabwe",
    "wrong": [
-    "Mexico",
-    "Fiji",
-    "Kazakhstan"
+    "Mozambique",
+    "Botswana",
+    "South Africa"
    ],
    "explain": "Shona is a Niger-Congo language written in the Latin script, and a main language of Zimbabwe.",
-   "difficulty": 3
+   "difficulty": 3,
+   "wrongNotes": {
+    "Mozambique": "The main language of Mozambique: Portuguese.",
+    "Botswana": "The main languages of Botswana: English and Setswana.",
+    "South Africa": "The main languages of South Africa: Zulu, Xhosa, Afrikaans and English."
+   }
   },
   {
    "id": "langs-shona",
@@ -5531,12 +6811,17 @@
    "prompt": "In which of these countries is Tamil a main language?",
    "answer": "Singapore",
    "wrong": [
-    "Belarus",
-    "Equatorial Guinea",
-    "Andorra"
+    "Israel",
+    "Philippines",
+    "Laos"
    ],
    "explain": "Tamil is a Dravidian language written in the Tamil script, and a main language of Singapore and Sri Lanka.",
-   "difficulty": 2
+   "difficulty": 2,
+   "wrongNotes": {
+    "Israel": "The main language of Israel: Hebrew.",
+    "Philippines": "The main languages of Philippines: Filipino and English.",
+    "Laos": "The main language of Laos: Lao."
+   }
   },
   {
    "id": "langs-tamil",
@@ -5557,12 +6842,17 @@
    "prompt": "In which of these countries is Mongolian a main language?",
    "answer": "Mongolia",
    "wrong": [
-    "Tonga",
-    "Gambia",
-    "Ecuador"
+    "China",
+    "Russia",
+    "Maldives"
    ],
    "explain": "Mongolian is a Mongolic language written in the Cyrillic script, and a main language of Mongolia.",
-   "difficulty": 3
+   "difficulty": 1,
+   "wrongNotes": {
+    "China": "The main language of China: Mandarin Chinese.",
+    "Russia": "The main language of Russia: Russian.",
+    "Maldives": "The main language of Maldives: Dhivehi."
+   }
   },
   {
    "id": "langs-mongolian",
@@ -5583,12 +6873,17 @@
    "prompt": "In which of these countries is Quechua a main language?",
    "answer": "Peru",
    "wrong": [
-    "Madagascar",
-    "Rwanda",
-    "San Marino"
+    "Chile",
+    "Ecuador",
+    "Colombia"
    ],
    "explain": "Quechua is a Quechuan language written in the Latin script, and a main language of Bolivia and Peru.",
-   "difficulty": 3
+   "difficulty": 3,
+   "wrongNotes": {
+    "Chile": "The main language of Chile: Spanish.",
+    "Ecuador": "The main language of Ecuador: Spanish.",
+    "Colombia": "The main language of Colombia: Spanish."
+   }
   },
   {
    "id": "langs-quechua",
@@ -5609,12 +6904,17 @@
    "prompt": "In which of these countries is Guaraní a main language?",
    "answer": "Paraguay",
    "wrong": [
-    "Liechtenstein",
-    "Nicaragua",
-    "Philippines"
+    "Bolivia",
+    "Brazil",
+    "Suriname"
    ],
    "explain": "Guaraní is a Tupian language written in the Latin script, and a main language of Paraguay.",
-   "difficulty": 3
+   "difficulty": 3,
+   "wrongNotes": {
+    "Bolivia": "The main languages of Bolivia: Spanish, Quechua and Aymara.",
+    "Brazil": "The main language of Brazil: Portuguese.",
+    "Suriname": "The main language of Suriname: Dutch."
+   }
   },
   {
    "id": "langs-guarani",

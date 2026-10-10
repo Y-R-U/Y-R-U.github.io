@@ -1,7 +1,7 @@
 // GameSpec -> questions. A spec fully describes a game; same spec + same packs = same questions.
-import { rngFrom, sample, randomSeed } from './rng.js?v=202610100547';
-import { loadIndex, loadPacks } from './packs.js?v=202610100547';
-import { getFormat, supportsPack, defaultOpts } from '../formats/registry.js?v=202610100547';
+import { rngFrom, sample, randomSeed } from './rng.js?v=202610101826';
+import { loadIndex, loadPacks } from './packs.js?v=202610101826';
+import { getFormat, supportsPack, defaultOpts } from '../formats/registry.js?v=202610101826';
 
 export const MAX_ALL_PACKS = 8;
 
@@ -46,7 +46,7 @@ export function resolvePackIds(fmt, packs, index, rng, opts = {}) {
 export async function buildQuestions(spec, { sparesRatio = 0.4, avoid = new Set() } = {}) {
   const index = await loadIndex();
   const questions = [], spares = [];
-  const used = new Set(avoid);
+  const used = new Set(avoid), seen = new Set();
   for (let i = 0; i < spec.rounds.length; i++) {
     const r = spec.rounds[i];
     const fmt = getFormat(r.format);
@@ -66,6 +66,13 @@ export async function buildQuestions(spec, { sparesRatio = 0.4, avoid = new Set(
       console.error('[clued] generate failed', r.format, e);
       throw new Error(`${fmt.title} could not make questions`);
     }
+    // the same question lives in several packs (96 cross-pack copies): one per game, by prompt + answer
+    list = list.filter(q => {
+      const k = dupKey(q);
+      if (k && seen.has(k)) return false;
+      if (k) seen.add(k);
+      return true;
+    });
     list.forEach(q => {
       q.format = q.format || fmt.id;
       if (kids) q.kids = true;
@@ -79,6 +86,14 @@ export async function buildQuestions(spec, { sparesRatio = 0.4, avoid = new Set(
     spares.push(...list.slice(r.count));
   }
   return { questions, spares };
+}
+
+const flat = s => String(s ?? '').toLowerCase().replace(/[^\p{L}\p{N}]+/gu, '');
+function dupKey(q) {
+  const p = flat(q.prompt);
+  if (!p) return '';
+  const a = q.answerText ?? (Array.isArray(q.options) && typeof q.answer === 'number' ? q.options[q.answer]?.text : q.answer);
+  return p + '|' + flat(typeof a === 'object' ? JSON.stringify(a) : a);
 }
 
 export const roundOf = (spec, q) => spec.rounds[q.round] || spec.rounds[0];

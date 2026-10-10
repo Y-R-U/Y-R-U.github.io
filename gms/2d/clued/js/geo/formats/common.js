@@ -1,7 +1,7 @@
 // Shared bits for the map formats: geo index (loaded before any format generates), layout, views, flags.
-import { loadIndex, geo, countryIds, regionMembers, isPlayable } from '../data.js?v=202610100547';
-import { REGIONS, STATE_VIEWS, CONTINENTS } from '../regions.js?v=202610100547';
-import { createMap } from '../map.js?v=202610100547';
+import { loadIndex, geo, countryIds, regionMembers, isPlayable } from '../data.js?v=202610101826';
+import { REGIONS, STATE_VIEWS, CONTINENTS } from '../regions.js?v=202610101826';
+import { createMap } from '../map.js?v=202610101826';
 
 await loadIndex();   // ~75 KB; generate() is synchronous and needs it
 
@@ -139,7 +139,7 @@ export function frame(el, { prompt, flag = null }) {
 }
 export function div(cls, text) { const d = document.createElement('div'); d.className = cls; if (text != null) d.textContent = text; return d; }
 export function button(label, cls = 'gmq-btn', onClick) {
-  const b = document.createElement('button'); b.type = 'button'; b.className = cls; b.innerHTML = label;
+  const b = document.createElement('button'); b.type = 'button'; b.className = cls; b.textContent = label;
   if (onClick) b.addEventListener('click', onClick);
   return b;
 }

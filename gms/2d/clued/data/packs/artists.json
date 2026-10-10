@@ -82,7 +82,8 @@
      }
     ]
    },
-   "difficulty": 1
+   "difficulty": 1,
+   "gender": "m"
   },
   {
    "id": "michelangelo",
@@ -120,7 +121,8 @@
      }
     ]
    },
-   "difficulty": 1
+   "difficulty": 1,
+   "gender": "m"
   },
   {
    "id": "raphael",
@@ -158,7 +160,8 @@
      }
     ]
    },
-   "difficulty": 1
+   "difficulty": 1,
+   "gender": "m"
   },
   {
    "id": "albrecht-durer",
@@ -197,7 +200,8 @@
      }
     ]
    },
-   "difficulty": 3
+   "difficulty": 3,
+   "gender": "m"
   },
   {
    "id": "caravaggio",
@@ -235,7 +239,8 @@
      }
     ]
    },
-   "difficulty": 3
+   "difficulty": 3,
+   "gender": "m"
   },
   {
    "id": "diego-velazquez",
@@ -273,7 +278,8 @@
      }
     ]
    },
-   "difficulty": 3
+   "difficulty": 3,
+   "gender": "m"
   },
   {
    "id": "rembrandt",
@@ -311,7 +317,8 @@
      }
     ]
    },
-   "difficulty": 1
+   "difficulty": 1,
+   "gender": "m"
   },
   {
    "id": "johannes-vermeer",
@@ -349,7 +356,8 @@
      }
     ]
    },
-   "difficulty": 1
+   "difficulty": 1,
+   "gender": "m"
   },
   {
    "id": "francisco-goya",
@@ -387,7 +395,8 @@
      }
     ]
    },
-   "difficulty": 3
+   "difficulty": 3,
+   "gender": "m"
   },
   {
    "id": "katsushika-hokusai",
@@ -425,7 +434,8 @@
      }
     ]
    },
-   "difficulty": 1
+   "difficulty": 1,
+   "gender": "m"
   },
   {
    "id": "j-m-w-turner",
@@ -464,7 +474,8 @@
      }
     ]
    },
-   "difficulty": 3
+   "difficulty": 3,
+   "gender": "m"
   },
   {
    "id": "john-constable",
@@ -502,7 +513,8 @@
      }
     ]
    },
-   "difficulty": 3
+   "difficulty": 3,
+   "gender": "m"
   },
   {
    "id": "claude-monet",
@@ -540,7 +552,8 @@
      }
     ]
    },
-   "difficulty": 1
+   "difficulty": 1,
+   "gender": "m"
   },
   {
    "id": "pierre-auguste-renoir",
@@ -578,7 +591,8 @@
      }
     ]
    },
-   "difficulty": 3
+   "difficulty": 3,
+   "gender": "m"
   },
   {
    "id": "edgar-degas",
@@ -616,7 +630,8 @@
      }
     ]
    },
-   "difficulty": 2
+   "difficulty": 2,
+   "gender": "m"
   },
   {
    "id": "paul-cezanne",
@@ -654,7 +669,8 @@
      }
     ]
    },
-   "difficulty": 3
+   "difficulty": 3,
+   "gender": "m"
   },
   {
    "id": "paul-gauguin",
@@ -692,7 +708,8 @@
      }
     ]
    },
-   "difficulty": 3
+   "difficulty": 3,
+   "gender": "m"
   },
   {
    "id": "vincent-van-gogh",
@@ -730,7 +747,8 @@
      }
     ]
    },
-   "difficulty": 1
+   "difficulty": 1,
+   "gender": "m"
   },
   {
    "id": "georges-seurat",
@@ -768,7 +786,8 @@
      }
     ]
    },
-   "difficulty": 3
+   "difficulty": 3,
+   "gender": "m"
   },
   {
    "id": "gustav-klimt",
@@ -806,7 +825,8 @@
      }
     ]
    },
-   "difficulty": 1
+   "difficulty": 1,
+   "gender": "m"
   },
   {
    "id": "edvard-munch",
@@ -844,7 +864,8 @@
      }
     ]
    },
-   "difficulty": 1
+   "difficulty": 1,
+   "gender": "m"
   },
   {
    "id": "wassily-kandinsky",
@@ -882,7 +903,8 @@
      }
     ]
    },
-   "difficulty": 3
+   "difficulty": 3,
+   "gender": "m"
   },
   {
    "id": "henri-matisse",
@@ -920,7 +942,8 @@
      }
     ]
    },
-   "difficulty": 1
+   "difficulty": 1,
+   "gender": "m"
   },
   {
    "id": "pablo-picasso",
@@ -958,7 +981,8 @@
      }
     ]
    },
-   "difficulty": 1
+   "difficulty": 1,
+   "gender": "m"
   },
   {
    "id": "edward-hopper",
@@ -996,7 +1020,8 @@
      }
     ]
    },
-   "difficulty": 3
+   "difficulty": 3,
+   "gender": "m"
   },
   {
    "id": "georgia-o-keeffe",
@@ -1034,7 +1059,8 @@
      }
     ]
    },
-   "difficulty": 3
+   "difficulty": 3,
+   "gender": "f"
   },
   {
    "id": "grant-wood",
@@ -1072,7 +1098,8 @@
      }
     ]
    },
-   "difficulty": 3
+   "difficulty": 3,
+   "gender": "m"
   },
   {
    "id": "rene-magritte",
@@ -1111,7 +1138,8 @@
      }
     ]
    },
-   "difficulty": 2
+   "difficulty": 2,
+   "gender": "m"
   },
   {
    "id": "salvador-dali",
@@ -1150,7 +1178,8 @@
      }
     ]
    },
-   "difficulty": 1
+   "difficulty": 1,
+   "gender": "m"
   },
   {
    "id": "frida-kahlo",
@@ -1188,7 +1217,8 @@
      }
     ]
    },
-   "difficulty": 1
+   "difficulty": 1,
+   "gender": "f"
   },
   {
    "id": "jackson-pollock",
@@ -1225,7 +1255,8 @@
      }
     ]
    },
-   "difficulty": 3
+   "difficulty": 3,
+   "gender": "m"
   },
   {
    "id": "roy-lichtenstein",
@@ -1263,7 +1294,8 @@
      }
     ]
    },
-   "difficulty": 3
+   "difficulty": 3,
+   "gender": "m"
   },
   {
    "id": "andy-warhol",
@@ -1301,7 +1333,8 @@
      }
     ]
    },
-   "difficulty": 1
+   "difficulty": 1,
+   "gender": "m"
   },
   {
    "id": "yayoi-kusama",
@@ -1337,7 +1370,8 @@
      }
     ]
    },
-   "difficulty": 3
+   "difficulty": 3,
+   "gender": "f"
   }
  ],
  "questions": [
@@ -1603,9 +1637,9 @@
    "prompt": "Who is this? He was a Spanish court painter.",
    "answer": "Francisco Goya",
    "wrong": [
-    "Georgia O'Keeffe",
     "Claude Monet",
-    "John Constable"
+    "John Constable",
+    "Grant Wood"
    ],
    "explain": "Francisco Goya (1746–1828): A Spanish court painter.",
    "difficulty": 3,
@@ -1635,9 +1669,9 @@
    "prompt": "Who is this? He made The Great Wave off Kanagawa.",
    "answer": "Katsushika Hokusai",
    "wrong": [
-    "Georgia O'Keeffe",
     "Leonardo da Vinci",
-    "Wassily Kandinsky"
+    "Wassily Kandinsky",
+    "Pierre-Auguste Renoir"
    ],
    "explain": "Katsushika Hokusai (1760–1849): Made The Great Wave off Kanagawa.",
    "difficulty": 1,
@@ -1669,7 +1703,7 @@
    "wrong": [
     "John Constable",
     "Diego Velázquez",
-    "Georgia O'Keeffe"
+    "Georges Seurat"
    ],
    "explain": "J. M. W. Turner (1775–1851): Famous for stormy seas and glowing light.",
    "difficulty": 3,
@@ -1733,7 +1767,7 @@
    "wrong": [
     "John Constable",
     "Grant Wood",
-    "Frida Kahlo"
+    "Albrecht Dürer"
    ],
    "explain": "Claude Monet (1840–1926): Painted water lilies.",
    "difficulty": 1,
@@ -1923,9 +1957,9 @@
    "prompt": "Who is this? He painted with tiny dots of colour.",
    "answer": "Georges Seurat",
    "wrong": [
-    "Georgia O'Keeffe",
     "Claude Monet",
-    "Michelangelo"
+    "Michelangelo",
+    "Grant Wood"
    ],
    "explain": "Georges Seurat (1859–1891): Painted with tiny dots of colour.",
    "difficulty": 3,
@@ -1956,8 +1990,8 @@
    "answer": "Gustav Klimt",
    "wrong": [
     "Michelangelo",
-    "Yayoi Kusama",
-    "Salvador Dalí"
+    "Salvador Dalí",
+    "Grant Wood"
    ],
    "explain": "Gustav Klimt (1862–1918): Painted The Kiss.",
    "difficulty": 1,
@@ -2115,9 +2149,9 @@
    "prompt": "Who is this? He painted Nighthawks.",
    "answer": "Edward Hopper",
    "wrong": [
-    "Frida Kahlo",
     "Michelangelo",
-    "Pierre-Auguste Renoir"
+    "Pierre-Auguste Renoir",
+    "Georges Seurat"
    ],
    "explain": "Edward Hopper (1882–1967): Painted Nighthawks.",
    "difficulty": 3,
@@ -2147,9 +2181,8 @@
    "prompt": "Who is this? She painted giant close-up flowers.",
    "answer": "Georgia O'Keeffe",
    "wrong": [
-    "Edgar Degas",
-    "Katsushika Hokusai",
-    "Yayoi Kusama"
+    "Yayoi Kusama",
+    "Frida Kahlo"
    ],
    "explain": "Georgia O'Keeffe (1887–1986): Painted giant close-up flowers.",
    "difficulty": 3,
@@ -2275,9 +2308,8 @@
    "prompt": "Who is this? She painted many self-portraits with flowers in her hair.",
    "answer": "Frida Kahlo",
    "wrong": [
-    "René Magritte",
-    "Georges Seurat",
-    "Pierre-Auguste Renoir"
+    "Georgia O'Keeffe",
+    "Yayoi Kusama"
    ],
    "explain": "Frida Kahlo (1907–1954): Painted many self-portraits with flowers in her hair.",
    "difficulty": 1,
@@ -2403,9 +2435,8 @@
    "prompt": "Who is this? She is famous for polka dots.",
    "answer": "Yayoi Kusama",
    "wrong": [
-    "Katsushika Hokusai",
-    "Roy Lichtenstein",
-    "Jackson Pollock"
+    "Frida Kahlo",
+    "Georgia O'Keeffe"
    ],
    "explain": "Yayoi Kusama (1929–2026): Famous for polka dots.",
    "difficulty": 3,

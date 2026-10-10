@@ -1,8 +1,8 @@
 // Background music: a shuffled playlist of gentle public-domain piano pieces on the sampled piano.
 // Pauses (fades out, remembers the spot) whenever anything else with sound plays, resumes 1 s after; ducks under speech.
-import { getCtx, buses, onBusy, busy, ducked, unlock } from './ctx.js?v=202610100547';
-import * as piano from './piano.js?v=202610100547';
-import { dlog, modLoaded } from '../core/debuglog.js?v=202610100547';
+import { getCtx, buses, onBusy, busy, ducked, unlock } from './ctx.js?v=202610101826';
+import * as piano from './piano.js?v=202610101826';
+import { dlog, modLoaded } from '../core/debuglog.js?v=202610101826';
 const MOD_ID = modLoaded('bgm', import.meta.url);
 
 const LEVEL = 0.35, DUCK = 0.15, FADE_IN = 3, FADE_OUT = 1.2, GAP = 3.5, TAIL = 5;

@@ -1,13 +1,13 @@
 // Mastery: overall numbers, the world map coloured by countries learned, pack progress rings, kids stickers.
-import { h } from '../ui/kit.js?v=202610100547';
-import { header, go } from '../ui/app.js?v=202610100547';
-import { kidsProgress } from '../ui/stickers.js?v=202610100547';
-import { themeTree, getPack, kidsOn } from './data.js?v=202610100547';
-import { getMastery, getCards, packPct } from './model.js?v=202610100547';
-import { countryScores, mapBand, level } from './mastery.js?v=202610100547';
-import { ring } from './ui.js?v=202610100547';
-import { BUILD } from '../build.js?v=202610100547';
-import { lazyImport } from '../ui/update.js?v=202610100547';
+import { h } from '../ui/kit.js?v=202610101826';
+import { header, go } from '../ui/app.js?v=202610101826';
+import { kidsProgress } from '../ui/stickers.js?v=202610101826';
+import { themeTree, getPack, kidsOn } from './data.js?v=202610101826';
+import { getMastery, getCards, packPct } from './model.js?v=202610101826';
+import { countryScores, mapBand, level } from './mastery.js?v=202610101826';
+import { ring } from './ui.js?v=202610101826';
+import { BUILD } from '../build.js?v=202610101826';
+import { lazyImport } from '../ui/update.js?v=202610101826';
 
 const GEO_PACKS = ['countries', 'flags', 'capitals'];
 const BAND = ['', 'lm1', 'lm2', 'lm3'];

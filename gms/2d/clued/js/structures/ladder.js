@@ -1,8 +1,8 @@
-import { playSpec } from './session.js?v=202610100547';
-import { specFor } from './common.js?v=202610100547';
-import { LADDER_RUNGS, ladderBanked } from '../core/scoring.js?v=202610100547';
-import { go } from '../ui/app.js?v=202610100547';
-import { fmtNum } from '../ui/kit.js?v=202610100547';
+import { playSpec } from './session.js?v=202610101826';
+import { specFor } from './common.js?v=202610101826';
+import { LADDER_RUNGS, ladderBanked } from '../core/scoring.js?v=202610101826';
+import { go } from '../ui/app.js?v=202610101826';
+import { fmtNum } from '../ui/kit.js?v=202610101826';
 
 // Runner settings for a ladder run; challenge replays reuse them (no spares there, so skip just moves on).
 function ladderCfg(list, spares = [], timer) {

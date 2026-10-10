@@ -75,7 +75,7 @@ function questions() {
     qs.push({ id: `plot-${it.id}`, kind: 'mc', prompt: `Which book is this? ${it.summary.replace(new RegExp(it.name, 'g'), 'the book')}`, answer: it.name, wrong: plotWrong, explain: it.blurb, difficulty: it.difficulty, refs: [`books/${it.id}`] });
     if (it.firstLine) {
       const fw = sample(r, items.filter(x => x !== it && x.facts.year < 1930), 3).map(x => x.name);
-      qs.push({ id: `first-${it.id}`, kind: 'mc', prompt: `Which book begins: “${it.firstLine.replace(/[;:,]$/, '…')}”`, answer: it.name, wrong: fw, explain: `${it.blurb}${it.translator ? ` (Opening as translated by ${it.translator}.)` : ''}`, difficulty: Math.min(3, it.difficulty + 1), refs: [`books/${it.id}`] });
+      qs.push({ id: `first-${it.id}`, kind: 'mc', prompt: `Which book begins: “${it.firstLine.replace(/[;:,]$/, '…').replace(/^Emma Woodhouse/, '___ ___')}”`, answer: it.name, wrong: fw, explain: `${it.blurb}${it.translator ? ` (Opening as translated by ${it.translator}.)` : ''}`, difficulty: Math.min(3, it.difficulty + 1), refs: [`books/${it.id}`] });
     }
     if (it.difficulty >= 2) {
       const wy = sample(r, [-30, -20, -10, 10, 20, 30].map(d => it.facts.year + d).filter(y => y <= 2025), 3).map(String);

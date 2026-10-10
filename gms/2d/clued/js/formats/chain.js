@@ -1,7 +1,7 @@
-import { register, imageOf, collect, pick, shuffle } from './registry.js?v=202610100547';
-import { h, imgEl } from '../ui/kit.js?v=202610100547';
-import { injectCSS, baseCSS, once, hasImg } from './fkit.js?v=202610100547';
-import { FILMS } from './chain_data.js?v=202610100547';
+import { register, imageOf, collect, pick, shuffle } from './registry.js?v=202610101826';
+import { h, imgEl } from '../ui/kit.js?v=202610101826';
+import { injectCSS, baseCSS, once, hasImg } from './fkit.js?v=202610101826';
+import { FILMS } from './chain_data.js?v=202610101826';
 
 const CSS = `
 .ch{gap:10px}
