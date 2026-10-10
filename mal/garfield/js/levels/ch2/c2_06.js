@@ -59,7 +59,7 @@ export default defineLevel2({
   },
   update(L) {
     const { ctx } = L;
-    if (!L.objDone[0] && insideRoom(ctx, ctx.controller.pos)) L.obj(0);
+    if (!L.objDone[0] && insideRoom(ctx, ctx.controller.pos) && !(ctx.controller.pos.y > 2.5 && ctx.controller.pos.z > 7.05)) L.obj(0);
     const n = L.next();
     if (n === 0) L.target((o) => o.copy(apos(ctx, 'bedroomDoor', V(6.4, 3, 5.7))).setY(3.6), { height: 0.3 });
     else if (n === 1 || n === 2) L.target((o) => o.copy(drawerPos(ctx)), { height: 0.35 });

@@ -99,6 +99,17 @@ const settle = async () => {
   // let any chase / catch cutscene finish, then send the humans off to wander
   await until(`!S.L().humans.chasing() && !S.ctx().director.active && !S.L().humans.any((h) => h.state === 'catch')`, 25000);
 };
+// each group starts from a quiet house: no events (or queued ones), no chase/cutscene, nobody mid-script.
+// A human shut in a room stays shut (lymanTrap60 deliberately lets its minute run on under the next groups).
+const SCRIPTED = /^fp(Delivery|Brawl|Window|Hug|Glare|Splash|Change|Poked|LetOut|Ew|Stand|WalkBy|Mice)/;
+const isolate = async () => {
+  await E(`(() => { for (const id of [...S.fp().active.keys()]) S.api().end(id); S.fp().pending.clear(); return true; })()`);
+  await settle();
+  const quiet = await until(`!S.ctx().controller.locked && !S.ctx().director.active && !S.L().flags.warping && S.L().humans.list.every((h) => h.state === 'trapped' || !h.busy() || !${SCRIPTED}.test(h.taskName || ''))`, 30000);
+  if (!quiet) console.log('   (isolate: house not quiet)', await E(`JSON.stringify(S.snap())`));
+};
+// a human's own day activity, once they're free to take it
+const actWait = (who, name) => until(`S.api().act('${who}', '${name}')`, 25000, 400);
 const keyHold = async (code, ms) => { await c.keyDown(code); await sleep(ms); await c.keyUp(code); };
 const pressE = async () => c.key('KeyE');
 const pressJ = async () => c.key('KeyJ');
@@ -150,9 +161,9 @@ T.zoomies = async () => {
 };
 T.trapDoor = async () => {
   await settle();
-  await E(`S.api().act('jon', 'room')`);
+  const acted = await actWait('jon', 'room');
   const inRoom = await until(`S.L().jon.state === 'fpRoom' && S.L().jon.pos().y > 2.9 && S.L().jon.pos().distanceTo(S.A('bedroomCentre').pos) < 1.2`, 40000);
-  ok("Jon goes up to his room", inRoom, JSON.stringify((await E('JSON.stringify(S.snap().hs[0])'))));
+  ok("Jon goes up to his room", inRoom, `acted=${acted} ` + JSON.stringify((await E('JSON.stringify({ h: S.snap().hs[0], act: S.fp().act.jon, claims: S.fp().claims, log: S.fp().log.slice(-4) })'))));
   if (!inRoom) return;
   await E(`S.tp(S.A('landing').pos.clone(), S.A('bedroomDoor').pos)`);
   await until(`S.cur() === 'fp_bedroomDoor'`, 3000);
@@ -163,14 +174,14 @@ T.trapDoor = async () => {
   await until(`S.cur() === 'fp_bedroomDoor'`, 3000);
   await pressE();
   const freed = await until(`S.L().jon.state !== 'trapped'`, 4000);
-  const ev = await E(`JSON.stringify(S.fp().log.filter((e) => e.kind === 'free').slice(-1)[0])`);
+  const ev = await E(`JSON.stringify(S.fp().log.filter((e) => e.kind === 'free' && e.id === 'jon').slice(-1)[0])`);
   ok('Garfield opens the door → Jon gets out', freed && /"self":false/.test(ev), ev);
 };
 T.lymanTrap60 = async () => {
   await settle();
-  await E(`S.api().act('lyman', 'room')`);
+  const acted = await actWait('lyman', 'room');
   const inRoom = await until(`S.L().ly.state === 'fpRoom' && S.L().ly.pos().y > 2.9 && S.L().ly.pos().z > 7.6`, 45000);
-  ok("Lyman goes to his room", inRoom, JSON.stringify((await E('JSON.stringify(S.snap().hs[1])'))));
+  ok("Lyman goes to his room", inRoom, `acted=${acted} ` + JSON.stringify((await E('JSON.stringify({ h: S.snap().hs[1], act: S.fp().act.lyman, claims: S.fp().claims, log: S.fp().log.slice(-4) })'))));
   if (!inRoom) return null;
   // don't shut Odie in with him for the whole minute (the Odie checks that follow would fail at random)
   if (await E(`S.odie().y > 2.5 && S.odie().z > 6.95`)) {
@@ -285,13 +296,15 @@ T.socksWhistle = async () => {
   await pressE(); // jump in
   const inD = await until(`S.L().flags.inDrawer`, 2000);
   let odieCame = false;
-  for (let tries = 0; tries < 3 && !odieCame; tries++) {
+  // he only comes 3 times in 4: play again until he sets off, then give him time to climb the stairs
+  for (let tries = 0; tries < 6 && !odieCame; tries++) {
+    await until(`!S.L().flags.drawerBusy`, 5000);
     await pressE(); // play
-    await sleep(3200);
-    odieCame = await until(`S.L().flags.odieHere`, 25000);
+    const coming = await until(`S.L().flags.odieHere || S.L().odieAI.taskName() === 'fpSockWalk'`, 6000);
+    if (coming) odieCame = await until(`S.L().flags.odieHere`, 30000);
   }
   await shot('08_sock_drawer');
-  ok('open the sock drawer, jump in and play; Odie wanders in', inD && odieCame, `cur=${cur}`);
+  ok('open the sock drawer, jump in and play; Odie wanders in', inD && odieCame, `cur=${cur} inD=${inD} ` + (odieCame ? '' : await E(`JSON.stringify({ o: S.snap().odie, claims: S.fp().claims, socked: !!S.L().flags.socked, g: S.ctx().controller.pos.toArray().map(v => +v.toFixed(2)), log: S.fp().log.slice(-5) })`)));
   if (odieCame) {
     for (let i = 0; i < 3; i++) {
       await E(`(() => { const o = S.odie(); S.tp(S.V(o.x + 0.45, 3, o.z), o); })()`);
@@ -372,16 +385,18 @@ T.dinner = async () => {
 T.soup = async () => {
   await settle();
   await E(`S.api().start('soup')`);
-  const seated = await until(`S.L().jon.state === 'sitEat' && S.ctx().world.props.get('soupBowl').root.visible`, 40000);
-  await E(`(() => { const s = S.ctx().world.props.get('soupBowl').root.getWorldPosition(S.V(0,0,0)); S.tp(S.V(s.x, s.y + 0.01, s.z + 0.3), s); })()`);
+  // seated for THIS meal (a leftover coffee sit is also 'sitEat' until he stands up for the soup)
+  const seated = await until(`S.L().jon.state === 'sitEat' && S.L().jon.seated() && S.L().jon.eatClip === 'eat_soup' && S.ctx().world.props.get('soupBowl').root.visible`, 40000);
+  // beside the bowl, off the table middle (where the "Diet time." warp gag lives)
+  await E(`(() => { const s = S.ctx().world.props.get('soupBowl').root.getWorldPosition(S.V(0,0,0)); S.tp(S.V(s.x + 0.3, s.y + 0.01, s.z + 0.05), s); })()`);
   await sleep(500);
   const cur = await E('S.cur()');
   if (cur === 'fp_splash') await pressE(); else await E(`S.ctx().interact.items.get('fp_splash').enabled() && S.ctx().interact.items.get('fp_splash').onInteract()`);
   const splash = await until(`S.fp().log.some((e) => e.kind === 'splash')`, 3000);
   await sleep(1200); await shot('12_soup_splash', `S.A('tableTop').pos.clone().setY(1.0)`);
-  ok("splash Jon's chicken soup", seated && splash, `cur=${cur} ` + await E(`JSON.stringify({ jon: S.L().jon.state, task: S.L().jon.taskName, p: S.L().jon.pos().toArray().map(v => +v.toFixed(2)), act: [...S.fp().active.keys()], claims: S.fp().claims })`));
+  ok("splash Jon's chicken soup", seated && splash, `cur=${cur} ` + await E(`JSON.stringify({ jon: S.L().jon.state, task: S.L().jon.taskName, p: S.L().jon.pos().toArray().map(v => +v.toFixed(2)), act: [...S.fp().active.keys()], claims: S.fp().claims, warp: !!S.L().flags.warping, dir: !!S.ctx().director.active, locked: S.ctx().controller.locked, onTable: S.L().onTable(), g: S.ctx().controller.pos.toArray().map(v => +v.toFixed(2)), soupFull: S.L().flags.soupFull, splashed: S.L().flags.splashed })`));
   const end = await until(`!S.fp().active.has('soup')`, 30000);
-  ok('…he wipes off and the soup event ends', end);
+  ok('…he wipes off and the soup event ends', end, end ? '' : await E(`JSON.stringify({ jon: S.L().jon.state, task: S.L().jon.taskName, p: S.L().jon.pos().toArray().map(v => +v.toFixed(2)), log: S.fp().log.slice(-5) })`));
 };
 T.disco = async () => {
   await settle();
@@ -404,7 +419,7 @@ T.goodmorning = async () => {
   await settle();
   // Jon has to be free to walk by (a leftover event can hold him, and from upstairs the walk alone is ~20 s)
   for (const id of ['tvtime', 'dinner', 'soup', 'brawl', 'mice', 'disco']) await E(`S.api().end('${id}')`);
-  await E(`S.api().act('jon', 'wander')`);
+  await actWait('jon', 'wander');
   await E(`S.api().start('goodmorning')`);
   await E(`(() => { const tb = S.A('tableTop').pos; S.tp(S.V(tb.x + 0.35, tb.y + 0.01, tb.z)); })()`);
   await sleep(500);
@@ -437,7 +452,7 @@ T.shedding = async () => {
     if (s === 'sofa') await shot('17_shed_sofa');
   }
   const n = await E(`S.fp().log.filter((e) => e.kind === 'shed').length`);
-  ok('shedding week: shed on bed, sofa, armchair, table', n >= 4, `${n} sheds, bald=${await E('!!S.L().flags.bald')}`);
+  ok('shedding week: shed on bed, sofa, armchair, table', n >= 4, `${n} sheds, bald=${await E('!!S.L().flags.bald')} ` + (n >= 4 ? '' : await E(`JSON.stringify({ shed: S.L().flags.shed, act: [...S.fp().active.keys()], log: S.fp().log.slice(-6), locked: S.ctx().controller.locked, dir: !!S.ctx().director.active })`)));
 };
 T.mice = async () => {
   await settle();
@@ -463,7 +478,7 @@ T.mice = async () => {
 };
 T.warp = async () => {
   await settle();
-  await E(`S.api().act('jon', 'coffee')`);
+  await actWait('jon', 'coffee');
   const sat = await until(`S.L().jon.state === 'sitEat' && S.L().jon.seated()`, 40000);
   let warped = false;
   for (let i = 0; i < 6 && !warped; i++) {
@@ -493,6 +508,7 @@ let lymanTrapAt = null;
 for (const name of only || order) {
   if (!want(name)) continue;
   try {
+    if (name !== 'exclusion') await isolate();
     const r = await T[name]();
     if (name === 'lymanTrap60') lymanTrapAt = r;
   } catch (e) {
@@ -500,14 +516,14 @@ for (const name of only || order) {
     else ok(name, false, 'threw: ' + e.message);
   }
   if (lymanTrapAt != null && (await now()) - lymanTrapAt > 62) {
-    const ev = await E(`JSON.stringify(S.fp().log.find((e) => e.kind === 'free' && e.id === 'lyman'))`);
+    const ev = await E(`JSON.stringify(S.fp().log.find((e) => e.kind === 'free' && e.id === 'lyman' && e.t >= ${lymanTrapAt}))`);
     ok('Lyman lets himself out after 60 s', /"self":true/.test(ev) && /"after":6[0-2]/.test(ev), ev);
     lymanTrapAt = null;
   }
 }
 if (lymanTrapAt != null) {
-  await until(`S.fp().log.some((e) => e.kind === 'free' && e.id === 'lyman')`, Math.max(1000, (62 - ((await now()) - lymanTrapAt)) * 1000));
-  const ev = await E(`JSON.stringify(S.fp().log.find((e) => e.kind === 'free' && e.id === 'lyman'))`);
+  await until(`S.fp().log.some((e) => e.kind === 'free' && e.id === 'lyman' && e.t >= ${lymanTrapAt})`, Math.max(1000, (62 - ((await now()) - lymanTrapAt)) * 1000));
+  const ev = await E(`JSON.stringify(S.fp().log.find((e) => e.kind === 'free' && e.id === 'lyman' && e.t >= ${lymanTrapAt}))`);
   ok('Lyman lets himself out after 60 s', /"self":true/.test(ev), ev);
 }
 

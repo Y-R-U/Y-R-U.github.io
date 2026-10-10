@@ -603,6 +603,8 @@ function splashSoup(L) {
   const { ctx, jon, flags: f } = L;
   f.splashed = true; f.soupFull = false;
   logEv(L, 'splash', 'soup');
+  // if the wipe-off gets interrupted (a scratch, a chase) the meal still ends instead of Jon re-sitting to a spilt bowl
+  const sev = L.fp.active.get('soup'); if (sev) sev.until = Math.min(sev.until, L.t + 30);
   try { ctx.garfield.play?.('interact', { once: true }); } catch {}
   ctx.audio?.sfx?.('splash');
   try { prop(ctx, 'soupBowl')?.splash?.(); } catch {}
@@ -1090,7 +1092,9 @@ async function knockVase(L) {
 function updateTableTricks(L, dt) {
   const { ctx, flags: f } = L;
   const seated = [L.jon, L.ly].filter((h) => h.state === 'sitEat' && h.seated());
-  if (L.onTable() && seated.length && !f.warping && L.t - (f.warpAt ?? -99) > 75) {
+  // the soup bowl sits 22 cm from the table middle: going for the splash must not get the warp instead
+  const soupReady = L.fp.active.has('soup') && f.soupFull && !f.splashed && flat(ctx.controller.pos, soupPos(ctx)) < 0.6;
+  if (L.onTable() && seated.length && !f.warping && !soupReady && L.t - (f.warpAt ?? -99) > 75) {
     const mid = apos(ctx, 'tableTop', V(4.4, 0.76, 8.8));
     if (flat(ctx.controller.pos, mid) < 0.3) {
       if (!f.warpTried) { f.warpTried = true; if (Math.random() < 0.6) tableWarp(L, seated[0]); }
@@ -1127,7 +1131,7 @@ function setupDoors(L) {
   const { ctx, flags: f } = L;
   f.trapped = {};
   const doors = [
-    { id: 'bedroomDoor', pos: () => apos(ctx, 'bedroomDoor', V(6.4, 3, 5.7)), inside: (p) => insideRoom(ctx, p) },
+    { id: 'bedroomDoor', pos: () => apos(ctx, 'bedroomDoor', V(6.4, 3, 5.7)), inside: (p) => insideRoom(ctx, p) && !inLymanRoom(p) },   // l08's half-space test also covers Lyman's room
     { id: 'lymanDoor', pos: () => apos(ctx, 'lymanDoor', V(8.18, 3, 7)), inside: inLymanRoom },
   ];
   f.doors = doors;
@@ -1170,7 +1174,11 @@ function free(L, h, self) {
   delete f.trapped[h.who];
   L.fp.frees++;
   logEv(L, 'free', h.who, { after: +(L.t - tr.at).toFixed(1), self });
-  if (self) { try { prop(ctx, tr.door)?.open?.(); } catch {} ctx.audio?.sfx?.('door'); }
+  if (self) {
+    try { prop(ctx, tr.door)?.open?.(); } catch {} ctx.audio?.sfx?.('door');
+    // the door is open now: anyone else shut behind it walks out too
+    for (const o of L.humans.list) if (o !== h && f.trapped[o.who]?.door === tr.door) free(L, o, false);
+  }
   L.say(h.who === 'jon' ? 'fp1_j_free' : 'fp2_l_free', { force: true });
   bark(L, h.who === 'jon' ? 'fp2_j_free' : 'fp2_l_free', { force: true });
   h.setOff();
@@ -1203,7 +1211,10 @@ function updateTrapped(L) {
     const op = L.odie.root.position;
     if (L.odie.root.visible !== false && d.inside(op)) {
       if (f.odieRoom?.door !== d.id) f.odieRoom = { door: d.id, at: L.t };
-      else if (L.t - f.odieRoom.at > FP2.trapped) { try { prop(L.ctx, d.id)?.open?.(); } catch {} L.ctx.audio?.sfx?.('door'); logEv(L, 'free', 'odie', { door: d.id, after: +(L.t - f.odieRoom.at).toFixed(1), self: true }); f.odieRoom = null; }
+      else if (L.t - f.odieRoom.at > FP2.trapped) {
+        try { prop(L.ctx, d.id)?.open?.(); } catch {} L.ctx.audio?.sfx?.('door'); logEv(L, 'free', 'odie', { door: d.id, after: +(L.t - f.odieRoom.at).toFixed(1), self: true }); f.odieRoom = null;
+        for (const h of L.humans.list) if (f.trapped[h.who]?.door === d.id) free(L, h, false);
+      }
     } else if (f.odieRoom?.door === d.id) f.odieRoom = null;
   }
   // Odie shut in the cupboard
