@@ -44,6 +44,11 @@ echo ">> shared auth layer → /lib/auth/"
 ssh "$HOST" "install -d '$SITE/lib'"
 rsync -az --delete "$REPO/lib/auth/" "$HOST:$SITE/lib/auth/"
 
+# The 3D games import three from ../../lib/three/<ver>/ (= /gms/lib/three/). Missing it hangs them on boot.
+echo ">> shared three.js → /gms/lib/three/"
+ssh "$HOST" "install -d '$SITE/gms/lib/three'"
+rsync -az --exclude='*.mjs' "$REPO/gms/lib/three/" "$HOST:$SITE/gms/lib/three/"
+
 for g in "${GAMES[@]}"; do
   echo ">> $g"
   ssh "$HOST" "install -d '$SITE/$g'"
