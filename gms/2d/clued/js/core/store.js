@@ -5,7 +5,7 @@ export const KEYS = {
 export const SYNCED = [KEYS.settings, KEYS.stats, KEYS.mastery, KEYS.cards, KEYS.favs];
 
 export const DEFAULT_SETTINGS = {
-  sound: true, music: 0.5, haptics: true, timerSec: 10, streakPts: true, reducedMotion: false, kids: false, readAloud: false, bgm: true,
+  sound: true, music: 0.5, haptics: true, timerSec: 10, streakPts: true, reducedMotion: false, kids: false, readAloud: false, bgm: false,
 };
 export const DEFAULT_STATS = {
   games: 0, answered: 0, correct: 0, bestStreak: 0, best: {}, daily: { last: '', results: {} },
@@ -31,6 +31,8 @@ export const onChange = fn => (listeners.add(fn), () => listeners.delete(fn));
 export const ANSWER_TIMES = [0, 3, 5, 10, 15, 20, 30];   // 0 = no timer
 export function getSettings() {
   const s = { ...DEFAULT_SETTINGS, ...(read(KEYS.settings) || {}) };
+  // background music defaulted on until 2026-10-10; only an explicit choice (bgmChosen) keeps it on
+  if (!s.bgmChosen) s.bgm = false;
   if (!ANSWER_TIMES.includes(s.timerSec)) s.timerSec = 10;
   s.timer = s.timerSec > 0;
   return s;

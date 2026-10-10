@@ -4,8 +4,8 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Clued audio lab</title>
-<link rel="stylesheet" href="../../css/base.css?v=202610081215">
-<link rel="stylesheet" href="../../css/play.css?v=202610081215">
+<link rel="stylesheet" href="../../css/base.css?v=202610100431">
+<link rel="stylesheet" href="../../css/play.css?v=202610100431">
 <style>
   body { overflow: auto; }
   main { max-width: 900px; margin: 0 auto; padding: 16px; display: grid; gap: 16px; }
@@ -55,13 +55,13 @@
   <section><h2>Log</h2><div id="log"></div></section>
 </main>
 <script type="module">
-import * as sfx from './sfx.js?v=202610081215';
-import * as piano from './piano.js?v=202610081215';
-import * as clip from './clip.js?v=202610081215';
-import { revealHTML, BADGE_CSS } from './apple.js?v=202610081215';
-import { setVolume, mute, getCtx } from './ctx.js?v=202610081215';
-import listen from './listen.js?v=202610081215';
-import { mulberry32 } from '../core/rng.js?v=202610081215';
+import * as sfx from './sfx.js?v=202610100431';
+import * as piano from './piano.js?v=202610100431';
+import * as clip from './clip.js?v=202610100431';
+import { revealHTML, BADGE_CSS } from './apple.js?v=202610100431';
+import { setVolume, mute, getCtx } from './ctx.js?v=202610100431';
+import listen from './listen.js?v=202610100431';
+import { mulberry32 } from '../core/rng.js?v=202610100431';
 
 const $ = (s) => document.querySelector(s);
 const log = (...a) => { $('#log').textContent += a.join(' ') + '\n'; $('#log').scrollTop = 1e9; };

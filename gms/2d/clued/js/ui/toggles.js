@@ -1,5 +1,5 @@
-import { h } from './kit.js?v=202610081215';
-import { getSettings, setSettings } from '../core/store.js?v=202610081215';
+import { h } from './kit.js?v=202610100431';
+import { getSettings, setSettings } from '../core/store.js?v=202610100431';
 
 const root = document.documentElement;
 const fsEl = () => document.fullscreenElement || document.webkitFullscreenElement;
@@ -12,12 +12,12 @@ export function toggleFullscreen() {
 
 let bgmMod = null;
 export async function bgm() {
-  if (!bgmMod) bgmMod = await import('../audio/bgm.js?v=202610081215').catch(() => null);
+  if (!bgmMod) bgmMod = await import('../audio/bgm.js?v=202610100431').catch(() => null);
   return bgmMod;
 }
 
 export async function setBgm(on) {
-  setSettings({ bgm: on });
+  setSettings({ bgm: on, bgmChosen: true });
   const m = await bgm();
   on ? m?.play?.() : m?.stop?.();
 }

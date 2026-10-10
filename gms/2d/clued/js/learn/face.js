@@ -1,5 +1,5 @@
 // Flashcard faces: what a card's front shows for any item, without ever giving the answer away. Pure (tools/cards_test.mjs).
-import { factText } from '../formats/registry.js?v=202610081215';
+import { factText } from '../formats/registry.js?v=202610100431';
 
 export const MIN_LEAK = 4;   // names shorter than this are too common as substrings to police
 export const BLANK = '____';

@@ -11,7 +11,7 @@ const st = () => c.evaluate(`import('./js/audio/bgm.js?v=' + (window.__clued?.BU
 async function until(fn, ms = 8000) { const t0 = Date.now(); let s; while (Date.now() - t0 < ms) { s = await st(); if (fn(s)) return s; await sleep(250); } return s; }
 
 await c.goto('http://localhost:8888/gms/2d/clued/?test', 'window.__cluedReady === true');
-await c.evaluate(`localStorage.setItem('clued.settings', JSON.stringify({ sound: true, bgm: true })); true`);
+await c.evaluate(`localStorage.setItem('clued.settings', JSON.stringify({ sound: true, bgm: true, bgmChosen: true })); true`);
 await c.goto('http://localhost:8888/gms/2d/clued/?test', 'window.__cluedReady === true');
 await c.evaluate(`(async () => { const P = globalThis.__cluedPacks; const { summarize } = await import('./js/core/packs.js?v=' + (window.__clued?.BUILD || window.__cluedCtx?.BUILD || 1));
   const p = await (await fetch('data/music/hits-1990s.json')).json(); P.packs.set(p.id, p); P.index.packs[p.id] = { ...summarize(p), id: p.id }; return true; })()`);

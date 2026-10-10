@@ -1,6 +1,6 @@
 // Sampled piano: Salamander Grand Piano V3 (Alexander Holm, CC BY 3.0), every minor third A0..C7, two velocity layers.
 // Plays note JSON: { title, composer, bpm, notes: [[beat, midi, beats, vel], ...], pedal? }
-import { getCtx, buses, reverbIR, begin, end } from './ctx.js?v=202610081215';
+import { getCtx, buses, reverbIR, begin, end } from './ctx.js?v=202610100431';
 
 const ROOT = new URL('../../audio/piano/', import.meta.url);
 const NAMES = ['C', 'Cs', 'D', 'Ds', 'E', 'F', 'Fs', 'G', 'Gs', 'A', 'As', 'B'];

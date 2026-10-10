@@ -2,13 +2,13 @@
 // Also "finish the line" for public-domain songs (items with `lyrics`).
 import {
   register, poolItems, distractors, byDifficulty, placeAnswer, collect, pick, shuffle, hasAudio, imageOf, hasImg, pickPack,
-} from '../formats/registry.js?v=202610081215';
-import { h, choiceGrid, esc } from '../ui/kit.js?v=202610081215';
-import { basePoints } from '../core/scoring.js?v=202610081215';
-import * as clip from './clip.js?v=202610081215';
-import { revealHTML, BADGE_CSS, art as artUrl, previewUrl } from './apple.js?v=202610081215';
-import { getCtx, unlock, begin, end } from './ctx.js?v=202610081215';
-import { LISTEN_CSS } from './listen_css.js?v=202610081215';
+} from '../formats/registry.js?v=202610100431';
+import { h, choiceGrid, esc } from '../ui/kit.js?v=202610100431';
+import { basePoints } from '../core/scoring.js?v=202610100431';
+import * as clip from './clip.js?v=202610100431';
+import { revealHTML, BADGE_CSS, art as artUrl, previewUrl } from './apple.js?v=202610100431';
+import { getCtx, unlock, begin, end } from './ctx.js?v=202610100431';
+import { LISTEN_CSS } from './listen_css.js?v=202610100431';
 
 const CLIPS = [1, 2, 3, 5, 10, 15, 30];
 const CLIP_MUL = { 1: 2, 2: 1.7, 3: 1.5, 5: 1.25, 10: 1, 15: 0.85, 30: 0.7 };
@@ -253,7 +253,8 @@ function render(el, q, api) {
       play.hidden = true;
       disc.classList.add('playing');
       setStatus('Loading…');
-      handle = await clip.play(d.a, { start: d.start, len: d.len, playLen: playLen() });
+      if (dead) return;
+      handle = await clip.play(d.a, { start: d.start, len: d.len, playLen: playLen(), alive: () => !dead });
       if (dead) { handle.stop(); return; }
       setStatus(isReplay ? 'Listening again…' : 'Listening…');
       played++;
@@ -267,6 +268,7 @@ function render(el, q, api) {
       updateAgain();
       again.hidden = true;
     } catch (e) {
+      if (e?.superseded || dead) return;
       console.warn('[listen] clip failed', e);
       setStatus('This clip would not load');
       play.hidden = false;
@@ -347,7 +349,7 @@ function render(el, q, api) {
   }
 
   const ctrlObj = {
-    destroy() { if (!dead) end(busyTag); dead = true; cancelAnimationFrame(raf); if (handle) handle.stop(0.15); clip.stopAll(); grid.destroy(); },
+    destroy() { if (!dead) end(busyTag); dead = true; cancelAnimationFrame(raf); if (handle) clip.stopHandle(handle, 0.15); grid.destroy(); },
     timeout() { if (done) return; done = true; grid.lock(); grid.mark(q.answer, -1); if (handle) handle.stop(0.3); },
     eliminate(k = 2) { grid.eliminate(q.answer, k, api.rng || Math.random); },
     choose(x) { grid.pick(x === 'correct' ? q.answer : x === 'wrong' ? (q.answer + 1) % q.options.length : +x); },

@@ -1,8 +1,8 @@
 // Clip player: fetch + decode a sound once, keep only the slice a question needs, play it with an analyser.
 // Works for Apple previews, Commons/self-hosted files and piano note JSON (audio object {type:'piano', src}).
-import { getCtx, buses, begin, end } from './ctx.js?v=202610081215';
-import { previewUrl } from './apple.js?v=202610081215';
-import * as piano from './piano.js?v=202610081215';
+import { getCtx, buses, begin, end } from './ctx.js?v=202610100431';
+import { previewUrl } from './apple.js?v=202610100431';
+import * as piano from './piano.js?v=202610100431';
 
 const GAME_ROOT = new URL('../../', import.meta.url);
 export const resolve = (src) => new URL(src, GAME_ROOT).href;
@@ -58,14 +58,18 @@ export const preload = (list) => Promise.allSettled(list.map(([a, o]) => load(a,
 
 let current = null;
 export function stopAll() { if (current) { current.stop(); current = null; } }
+// Stop one clip only. A previous question's late teardown must never cut off the next question's clip.
+export function stopHandle(h, f) { if (!h) return; h.stop(f); if (current === h) current = null; }
 
 // play a loaded clip; returns { stop, analyser, elapsed(), done }
 // len = the loaded slice; playLen (optional, ≤ len) = how much of it to play, so growing clips share one decode
-export async function play(a, { start = 0, len = 0, playLen = 0, fade = 0.08 } = {}) {
-  stopAll();
+export async function play(a, { start = 0, len = 0, playLen = 0, fade = 0.08, alive = () => true } = {}) {
   const c = getCtx();
   if (c.state !== 'running') await c.resume().catch(() => {});
   const clip = await load(a, { start, len });
+  // a question torn down while its clip loaded must not stop the clip that replaced it
+  if (!alive()) throw Object.assign(new Error('superseded'), { superseded: true });
+  stopAll();
   const an = c.createAnalyser(); an.fftSize = 256; an.smoothingTimeConstant = 0.7;
   an.connect(buses().music);
   let h;
