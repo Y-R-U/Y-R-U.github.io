@@ -1,13 +1,13 @@
 // Lane S entry points. Importing this module registers the screens: online, join, host, room, challenge, linkchallenge.
-import { go } from '../ui/app.js?v=202610100510';
-import './room.js?v=202610100510';
-import './join.js?v=202610100510';
-import './host.js?v=202610100510';   // host setup: round list + room settings
-import './p2p.js?v=202610100510';   // lane P2P: registers the device-hosted transport
-import { createChallenge as create, challengeButton } from './challenge.js?v=202610100510';
-import { cleanCode } from './util.js?v=202610100510';
-import { openLinkChallenge as openLink, linkChallengeShare, createLinkChallenge } from './linkchallenge.js?v=202610100510';
-export { registerTransport, getTransport, fallback } from './transport.js?v=202610100510';
+import { go } from '../ui/app.js?v=202610100547';
+import './room.js?v=202610100547';
+import './join.js?v=202610100547';
+import './host.js?v=202610100547';   // host setup: round list + room settings
+import './p2p.js?v=202610100547';   // lane P2P: registers the device-hosted transport
+import { createChallenge as create, challengeButton } from './challenge.js?v=202610100547';
+import { cleanCode } from './util.js?v=202610100547';
+import { openLinkChallenge as openLink, linkChallengeShare, createLinkChallenge } from './linkchallenge.js?v=202610100547';
+export { registerTransport, getTransport, fallback } from './transport.js?v=202610100547';
 export { createLinkChallenge };
 
 export { challengeButton };
@@ -21,7 +21,7 @@ export function createChallenge(a, b) {
   }
   return create(a);
 }
-export { API } from './api.js?v=202610100510';
+export { API } from './api.js?v=202610100547';
 
 // Boot routing: ?join=CODE and ?c=ID.
 // A's boot route calls joinRoom(code, ctx) / openChallenge(id, ctx).
@@ -41,7 +41,7 @@ export const openLinkChallenge = hash => openLink(hash || location.hash, go);
 // Results screen: "send a link challenge" (no server). Same payload shape as createChallenge(ctx, {...}).
 export async function linkChallenge(a, b) {
   const x = b || a;
-  const { suggestedName } = await import('./ident.js?v=202610100510');
+  const { suggestedName } = await import('./ident.js?v=202610100547');
   const name = (await suggestedName()) || 'Player';
   const answers = x.answers || x.result?.answers || [];
   const out = x.result ? x : { spec: x.spec, title: x.title, choice: x.choice, result: { questions: x.questions, score: x.score, answers, correct: x.correct ?? answers.filter(r => r.correct).length } };

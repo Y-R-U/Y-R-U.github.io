@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"net/http"
 	"sort"
 	"time"
@@ -35,6 +36,7 @@ type adminRoom struct {
 	Signed  bool   `json:"signedHost"`
 	Created int64  `json:"created"`
 	Touched int64  `json:"touched"`
+	Ended   bool   `json:"ended,omitempty"`
 }
 
 func handleAdminOverview(w http.ResponseWriter, r *http.Request) {
@@ -50,7 +52,7 @@ func handleAdminOverview(w http.ResponseWriter, r *http.Request) {
 	for _, rm := range list {
 		rm.mu.Lock()
 		a := adminRoom{Code: rm.Code, Title: rm.Title, Public: rm.Public, Kids: rm.Kids, Phase: rm.Phase, Q: rm.Q,
-			Total: len(rm.Questions), Players: len(rm.active()), Created: rm.Created, Touched: rm.Touched}
+			Total: len(rm.Questions), Players: len(rm.active()), Created: rm.Created, Touched: rm.Touched, Ended: rm.Ended}
 		for _, p := range rm.Players {
 			if p.online(now) {
 				a.Online++
@@ -117,12 +119,8 @@ func handleAdminLevel(w http.ResponseWriter, r *http.Request) {
 	writeJSON(w, 200, map[string]any{"level": level()})
 }
 
-func handleAdminClose(w http.ResponseWriter, r *http.Request) {
-	room := getRoom(normCode(r.PathValue("code")))
-	if room == nil {
-		writeErr(w, 404, "room_not_found", "no such room")
-		return
-	}
+// closeRoom deletes a room now; anyone still connected gets "gone".
+func closeRoom(room *Room) {
 	room.mu.Lock()
 	room.dead = true
 	room.changed()
@@ -131,9 +129,45 @@ func handleAdminClose(w http.ResponseWriter, r *http.Request) {
 	delete(rooms, room.Code)
 	roomsMu.Unlock()
 	db.Exec(`DELETE FROM rooms WHERE code = ?`, room.Code)
+}
+
+func handleAdminClose(w http.ResponseWriter, r *http.Request) {
+	room := getRoom(normCode(r.PathValue("code")))
+	if room == nil {
+		writeErr(w, 404, "room_not_found", "no such room")
+		return
+	}
+	closeRoom(room)
 	recordEvent("admin", "Closed room "+room.Code)
 	resetPublicCache()
 	writeJSON(w, 200, map[string]any{"ok": true})
+}
+
+// handleAdminCloseFinished closes every finished or ended room and every room with nobody connected.
+func handleAdminCloseFinished(w http.ResponseWriter, r *http.Request) {
+	now := nowMs()
+	roomsMu.RLock()
+	list := make([]*Room, 0, len(rooms))
+	for _, rm := range rooms {
+		list = append(list, rm)
+	}
+	roomsMu.RUnlock()
+	closed := []string{}
+	for _, rm := range list {
+		rm.mu.Lock()
+		idle := rm.Phase == "final" || rm.Ended || !rm.anyOnline(now)
+		rm.mu.Unlock()
+		if idle {
+			closeRoom(rm)
+			closed = append(closed, rm.Code)
+		}
+	}
+	sort.Strings(closed)
+	if len(closed) > 0 {
+		recordEvent("admin", fmt.Sprintf("Closed %d finished/abandoned rooms", len(closed)))
+	}
+	resetPublicCache()
+	writeJSON(w, 200, map[string]any{"closed": len(closed), "codes": closed})
 }
 
 func handleAdminAlertTest(w http.ResponseWriter, r *http.Request) {

@@ -1,7 +1,7 @@
 // Shared bits for the map formats: geo index (loaded before any format generates), layout, views, flags.
-import { loadIndex, geo, countryIds, regionMembers, isPlayable } from '../data.js?v=202610100510';
-import { REGIONS, STATE_VIEWS, CONTINENTS } from '../regions.js?v=202610100510';
-import { createMap } from '../map.js?v=202610100510';
+import { loadIndex, geo, countryIds, regionMembers, isPlayable } from '../data.js?v=202610100547';
+import { REGIONS, STATE_VIEWS, CONTINENTS } from '../regions.js?v=202610100547';
+import { createMap } from '../map.js?v=202610100547';
 
 await loadIndex();   // ~75 KB; generate() is synchronous and needs it
 

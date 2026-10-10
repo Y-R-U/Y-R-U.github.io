@@ -236,10 +236,14 @@ async function main() {
   /* --------------------------------------------- host leaves → room ends */
   await host.waitFor(`window.__cluedRoom.st.phase === 'question' && window.__cluedRoom.st.q === 1`, 15000, 'q2');
   await host.click('.scr-room [aria-label="Leave room"], [aria-label="Quit"], .hud [aria-label]', 5000).catch(() => {});
+  // the device host's inline leave bar: leaving = ending (MYROOMS.md)
+  const bar = await host.waitFor(`document.querySelector('.net-leavebar.in')?.textContent`, 5000).catch(() => '');
+  ok(/End room for everyone/.test(bar) && /leaving ends it for everyone/.test(bar) && !/someone else becomes host/.test(bar), 'device host: inline "End room for everyone" (leaving = ending), no handover option', bar);
+  await host.shot('host-leavebar-portrait.png');
   await host.eval(`(async () => { const st = window.__cluedRoom.st, seat = JSON.parse(sessionStorage.getItem('clued.room.' + st.code)); await window.__cluedP2P.transport.leave(st.code, seat.key); })()`);
   for (const p of [j1, j2]) await p.waitFor(`window.__cluedRoom?.st?.closed && window.__cluedRoom.st.phase === 'final' && document.querySelector('.net-podium')`, 15000, `${p.name} sees the room end`);
   ok(true, 'host leaving ends the room with final scores for everyone');
-  ok(await j1.eval(`document.body.textContent.includes('The host closed the room')`), 'joiners told the host closed the room');
+  ok(await j1.eval(`document.body.textContent.includes('The host ended the room')`), 'joiners told the host ended the room');
   await sleep(1500);
   await j1.shot('host-left-joiner-portrait.png');
 

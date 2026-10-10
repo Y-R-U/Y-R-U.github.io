@@ -9,6 +9,12 @@
 // presses "Round 2 ›" early and a stale Next tap follows; asserts no auto-answer, equal speed points for two
 // simultaneous taps, the clip starting with the question on both devices and playing its full 5 s.
 // --site/--server point at another copy (e.g. the pre-fix code) to prove the checks fail there.
+//
+//   node tools/s_room_e2e.mjs --myrooms                                   (docs/notes/MYROOMS.md; ports 9521–9523)
+// The host creates a public and a private room, leaves both through the inline Leave/End bar, finds them under
+// "Your rooms", ends the public one with the two-tap confirm (Ann's screen says "The host ended the room", the public
+// slot frees and it leaves the list), rejoins the private one; Bob leaves it from "Your rooms", joins again, and
+// the host's "Done" after the podium ends the finished room while Bob keeps the podium.
 import { spawn, execFileSync } from 'node:child_process';
 import { mkdtempSync, writeFileSync, mkdirSync, rmSync } from 'node:fs';
 import { tmpdir, homedir } from 'node:os';
@@ -22,6 +28,7 @@ const argOf = k => (argv0.includes(k) ? argv0[argv0.indexOf(k) + 1] : null);
 const SERVER = argOf('--server') || join(HERE, '..', 'server');
 const SITE = argOf('--site') || 'http://localhost:8888/gms/2d/clued/';
 const TIMING = argv0.includes('--timing');
+const MYROOMS = argv0.includes('--myrooms');
 const CDP = join(homedir(), '.claude/bin/cdp');
 const args = process.argv.slice(2);
 const SHOTS = args.includes('--shots') ? args[args.indexOf('--shots') + 1] : join(tmpdir(), 'clued-s-shots');
@@ -99,7 +106,7 @@ class Page {
   room() { return this.eval('window.__cluedRoom ? JSON.parse(JSON.stringify(window.__cluedRoom.st)) : null'); }
 }
 
-const PORTS = argOf('--ports') ? argOf('--ports').split(',').map(Number) : TIMING ? [9461, 9462, 9463] : [9451, 9452, 9453];
+const PORTS = argOf('--ports') ? argOf('--ports').split(',').map(Number) : MYROOMS ? [9521, 9522, 9523] : TIMING ? [9461, 9462, 9463] : [9451, 9452, 9453];
 let srv, dataDir, all = [];
 async function main() {
   const port = await freePort();
@@ -314,7 +321,11 @@ async function main() {
   const ann = rows.find(r => r.name === 'Ann'), bob = rows.find(r => r.name === 'Bob');
   ok(ann.last.points > bob.last.points, 'answering at an earlier clue scores more', `${ann.last.points} ${bob.last.points}`);
   await host.shot('auto-reveal-portrait.png');
-  await post('end', {});
+  // skip to the podium ('end' now ends the room for everyone, so step through with Next instead)
+  for (let i = 0, st = await host.room(); i < 60 && st.phase !== 'final'; i++) {
+    await sleep(st.phase === 'question' && st.now < st.qStart ? st.qStart - st.now + 50 : 50);
+    st = await post('next', { q: st.q });
+  }
   await host.waitFor(`window.__cluedRoom?.st?.phase === 'final'`, 8000, 'final again');
 
   // host leaves → Ann becomes host
@@ -460,7 +471,162 @@ async function timingMain() {
   for (const p of all) for (const e of p.events) console.log(`  [${p.name}] ${e}`);
 }
 
-(TIMING ? timingMain() : main()).catch(async e => {
+/* ------------------------------------------------------------------ --myrooms (docs/notes/MYROOMS.md) */
+async function myroomsMain() {
+  const port = await freePort();
+  dataDir = mkdtempSync(join(tmpdir(), 'clued-e2e-'));
+  const bin = join(dataDir, 'clued');
+  execFileSync('go', ['build', '-o', bin, '.'], { cwd: SERVER, env: { ...process.env, CGO_ENABLED: '0' } });
+  srv = spawn(bin, [], { env: { ...process.env, CLUED_ADDR: `127.0.0.1:${port}`, CLUED_DATA: join(dataDir, 'data'), CLUED_ORIGINS: `http://localhost:8888,${new URL(SITE).origin}` }, stdio: 'ignore' });
+  const API = `http://127.0.0.1:${port}/gms/2d/clued/api`;
+  for (let i = 0; i < 50; i++) { try { if ((await fetch(API + '/health')).ok) break; } catch (e) {} await sleep(100); }
+  console.log(`server ${API}`);
+  for (const p of PORTS) { try { execFileSync(CDP, ['stop', String(p)], { stdio: 'ignore' }); } catch (e) {} }
+  for (const p of PORTS) execFileSync(CDP, ['start', '--port', String(p), '--idle', '180', '--', '--use-angle=metal'], { stdio: 'ignore' });
+  const [host, ann, bob] = [new Page('host', PORTS[0]), new Page('ann', PORTS[1]), new Page('bob', PORTS[2])];
+  all = [host, ann, bob];
+  for (const p of all) await p.open();
+  const getJ = async path => (await fetch(API + path)).json();
+  const q = `noauth=1&api=${encodeURIComponent(API)}`;
+  const toOnline = async p => {
+    await p.eval(`import('./js/net/index.js?v=' + window.__cluedCtx.BUILD).then(() => window.__cluedCtx.reset('online'))`);
+    await p.waitFor(`document.body.dataset.screen === 'online'`, 10000, 'online hub');
+  };
+  const mineRow = code => `document.querySelector('.net-myroom[data-code="${code}"]')`;
+
+  await host.go(`${SITE}?${q}`);
+  await host.waitFor('window.__cluedReady', 20000, 'boot');
+  await host.eval(`(() => { localStorage.removeItem('clued.online'); localStorage.removeItem('clued.myrooms'); return true; })()`);
+  await toOnline(host);
+  ok(await host.eval(`document.querySelector('[data-sec=mine]').hidden`), 'no "Your rooms" before hosting anything');
+
+  async function create(pub) {
+    await host.click('[data-act=host]');
+    await host.waitFor(`document.body.dataset.screen === 'host' && document.querySelector('[data-field=name]')`, 10000, 'host screen');
+    await host.type('[data-field=name]', 'Hosty');
+    await host.click(`[data-opt=vis] .chip[data-v="${pub}"]`);
+    if (pub) await host.click('[data-opt=start] .chip[data-v="0"]');
+    await host.click('[data-act=create]');
+    await host.waitFor(`window.__cluedRoom?.st?.phase === 'lobby' && document.querySelector('.net-code')`, 30000, 'lobby');
+    return host.eval(`window.__cluedRoom.code`);
+  }
+  async function leaveVia(p, choice, shot) {
+    await p.click('.scr-room [aria-label="Leave room"]');
+    await p.waitFor(`document.querySelector('.net-leavebar.in')`, 5000, 'leave bar');
+    if (shot) { await sleep(250); await p.shot(shot); }
+    await p.click(`.net-leavebar [data-leave=${choice}]`);
+    await p.waitFor(`document.body.dataset.screen === 'home' && !document.querySelector('.net-leavebar')`, 10000, 'home after leaving');
+  }
+
+  // room A: public, Ann joins
+  const A = await create(true);
+  ok(/^[A-Z2-9]{5}$/.test(A), `host created public room ${A}`);
+  const free0 = (await getJ('/status')).publicFree;
+  await ann.go(`${SITE}?join=${A}&${q}`);
+  await ann.waitFor(`document.querySelector('[data-field=name]')`, 20000, 'join form');
+  await ann.type('[data-field=name]', 'Ann');
+  await ann.click('[data-act=join]');
+  await ann.waitFor(`window.__cluedRoom?.st?.phase === 'lobby'`, 15000, 'ann in lobby');
+  await host.waitFor(`window.__cluedRoom.st.players.length === 2`, 8000, '2 players');
+  // host leaves A: the inline bar offers leave vs end
+  await host.click('.scr-room [aria-label="Leave room"]');
+  await host.waitFor(`document.querySelector('.net-leavebar.in')`, 5000, 'leave bar');
+  const barTxt = await host.eval(`document.querySelector('.net-leavebar').textContent`);
+  ok(barTxt.includes('Leave (room keeps going, someone else becomes host)') && barTxt.includes('End room for everyone'), 'host leave bar: "Leave (room keeps going…)" vs "End room for everyone"', barTxt);
+  ok(await host.eval(`!document.querySelector('#popups .pop')`), 'no popup: the choice is inline');
+  await sleep(250); await host.shot('myrooms-leavebar-host.png');
+  await host.click('.net-leavebar [data-leave=stay]');
+  ok(await host.waitFor(`!document.querySelector('.net-leavebar') && document.body.dataset.screen === 'room'`, 4000, 'stay'), 'Stay keeps the host in the room');
+  await leaveVia(host, 'leave');
+  await ann.waitFor(`window.__cluedRoom?.st?.you?.host === true`, 10000, 'ann becomes host');
+  ok(true, 'host left A: Ann became host, the room keeps going');
+
+  // room B: private, host alone, leaves
+  await toOnline(host);
+  const B = await create(false);
+  ok(B && B !== A, `host created private room ${B}`);
+  await leaveVia(host, 'leave', 'myrooms-leavebar-alone.png');
+
+  // Your rooms
+  await toOnline(host);
+  await host.waitFor(`${mineRow(A)} && ${mineRow(B)}`, 12000, 'both rooms listed');
+  const rowA = await host.eval(`${mineRow(A)}.textContent`), rowB = await host.eval(`${mineRow(B)}.textContent`);
+  ok(rowA.includes('In the lobby') && rowA.includes('You left · 👑 Ann hosts') && /1 player\b/.test(rowA) && rowA.includes('Public'), 'row A: lobby, you left, Ann hosts now, 1 player, public', rowA);
+  ok(rowB.includes('You left · nobody in it') && rowB.includes('Private') && /min old|just made/.test(rowB), 'row B: you left, empty, private, age', rowB);
+  ok(await host.eval(`!!${mineRow(A)}.querySelector('[data-act=end-room]') && !!${mineRow(B)}.querySelector('[data-act=end-room]') && !!${mineRow(B)}.querySelector('[data-act=rejoin]')`), 'both rows offer Rejoin and End room');
+  await sleep(700);   // let the screen transition finish before the screenshot
+  await host.eval(`document.querySelector('[data-sec=mine]').scrollIntoView(); true`);
+  await host.shot('myrooms-list.png');
+
+  // end A with the two-tap confirm
+  await host.click(`.net-myroom[data-code="${A}"] [data-act=end-room]`);
+  ok(await host.eval(`${mineRow(A)}.querySelector('[data-act=end-room]').textContent === 'End for everyone?'`), 'first tap arms: "End for everyone?"');
+  ok(await host.eval(`!!${mineRow(A)} && !document.querySelector('#popups .pop')`), 'nothing ended yet, no popup');
+  await host.shot('myrooms-end-armed.png');
+  await host.click(`.net-myroom[data-code="${A}"] [data-act=end-room]`);
+  await host.waitFor(`!${mineRow(A)}`, 8000, 'row A gone');
+  ok(true, 'second tap ends room A and drops it from the list');
+  await ann.waitFor(`document.body.textContent.includes('The host ended the room')`, 10000, 'ann told');
+  ok(true, 'Ann sees "The host ended the room"');
+  await ann.shot('myrooms-ann-ended.png');
+  const free1 = (await getJ('/status')).publicFree;
+  ok(free1 === free0 + 1, `public slot freed at once (${free0} → ${free1} free)`);
+  ok(!(await getJ('/rooms/public')).rooms.some(r => r.code === A), 'ended room left the public list');
+  ok(!(await host.eval(`JSON.parse(localStorage.getItem('clued.myrooms') || '{}')`))[A], 'ended room forgotten on this device');
+
+  // rejoin B
+  await host.click(`.net-myroom[data-code="${B}"] [data-act=rejoin]`);
+  await host.waitFor(`window.__cluedRoom?.code === '${B}' && window.__cluedRoom.st.phase === 'lobby'`, 15000, 'rejoined B');
+  ok(await host.eval(`window.__cluedRoom.st.you.host === true`), 'rejoined B as its host');
+
+  // a player leaves from "Your rooms"
+  await bob.go(`${SITE}?join=${B}&${q}`);
+  await bob.waitFor(`document.querySelector('[data-field=name]')`, 20000, 'join form');
+  await bob.type('[data-field=name]', 'Bob');
+  await bob.click('[data-act=join]');
+  await bob.waitFor(`window.__cluedRoom?.st?.phase === 'lobby'`, 15000, 'bob in lobby');
+  await host.waitFor(`window.__cluedRoom.st.players.length === 2`, 8000, 'bob joined');
+  await bob.eval(`window.__cluedCtx.reset('home'), true`);
+  await toOnline(bob);
+  await bob.waitFor(`${mineRow(B)}?.querySelector('[data-act=leave-room]')`, 12000, 'bob sees B with Leave');
+  ok(!(await bob.eval(`!!${mineRow(B)}.querySelector('[data-act=end-room]')`)), 'a player gets Leave, not End');
+  await sleep(700);
+  await bob.shot('myrooms-player-list.png');
+  await bob.click(`.net-myroom[data-code="${B}"] [data-act=leave-room]`);
+  await bob.waitFor(`!${mineRow(B)}`, 8000, 'bob row gone');
+  await host.waitFor(`window.__cluedRoom.st.players.length === 1`, 10000, 'host sees bob leave');
+  ok(true, 'Bob left from "Your rooms": the host sees him go');
+
+  // Done after the podium ends the finished room; Bob (back in) keeps the podium
+  await bob.go(`${SITE}?join=${B}&${q}`);
+  await bob.waitFor(`document.querySelector('[data-field=name]')`, 20000, 'join form');
+  await bob.type('[data-field=name]', 'Bob');
+  await bob.click('[data-act=join]');
+  await bob.waitFor(`window.__cluedRoom?.st?.phase === 'lobby'`, 15000, 'bob back');
+  await host.waitFor(`window.__cluedRoom.st.players.length === 2`, 8000, 'bob back for host');
+  const hostKey = await host.eval(`JSON.parse(localStorage.getItem('clued.myrooms'))['${B}'].key`);
+  const post = (a, extra) => fetch(`${API}/rooms/${B}/${a}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ key: hostKey, ...extra }) }).then(r => r.json());
+  let st = await post('start', {});
+  for (let i = 0; i < 40 && st.phase !== 'final'; i++) { await sleep(st.phase === 'question' && st.now < st.qStart ? st.qStart - st.now + 50 : 50); st = await post('next', { q: st.q }); }
+  ok(st.phase === 'final', 'skipped to the podium');
+  await host.waitFor(`document.querySelector('[data-act=done]')`, 15000, 'host Done');
+  await bob.waitFor(`document.querySelector('.net-podium')`, 15000, 'bob podium');
+  await host.shot('myrooms-final-host.png');
+  await host.click('[data-act=done]');
+  await host.waitFor(`document.body.dataset.screen === 'home'`, 10000, 'host home after Done');
+  await bob.waitFor(`document.querySelector('[data-ended]')`, 10000, 'bob told');
+  ok(await bob.eval(`!!document.querySelector('.net-podium') && document.body.textContent.includes('The host ended the room')`), 'Done ended the room; Bob keeps the podium with "The host ended the room"');
+  await bob.shot('myrooms-final-bob-ended.png');
+  const peek = await getJ(`/rooms/${B}`);
+  ok(peek.ended === true, 'server: room B ended');
+  await toOnline(host);
+  await sleep(1500);
+  ok(await host.eval(`document.querySelector('[data-sec=mine]').hidden && Object.keys(JSON.parse(localStorage.getItem('clued.myrooms') || '{}')).length === 0`), '"Your rooms" is empty again');
+  for (const p of all) for (const e of p.events) console.log(`  [${p.name}] ${e}`);
+  ok(all.every(p => !p.events.some(e => e.startsWith('EXC'))), 'no uncaught exceptions');
+}
+
+(MYROOMS ? myroomsMain() : TIMING ? timingMain() : main()).catch(async e => {
   fail++; console.error('FATAL', e.message);
   for (const p of all) {
     try {

@@ -1,8 +1,8 @@
 // Clued admin page: stats, live rooms, protection level, alerts. The server checks the
 // Firebase ID token's email against CLUED_ADMINS; this page only renders what it's given.
-import { h, fmtNum } from '../ui/kit.js?v=202610100510';
-import { toast } from '../ui/popup.js?v=202610100510';
-import { API } from './api.js?v=202610100510';
+import { h, fmtNum } from '../ui/kit.js?v=202610100547';
+import { toast } from '../ui/popup.js?v=202610100547';
+import { API } from './api.js?v=202610100547';
 
 const root = document.getElementById('adm');
 const gate = document.getElementById('gate');
@@ -87,11 +87,12 @@ function render(d) {
   } }, `${i} · ${name}`)));
   const roomRows = d.rooms.map(r => h('tr', {},
     h('td', {}, r.code), h('td', {}, r.title || '—'), h('td', {}, r.public ? 'public' : 'private', r.kids ? ' · kids' : ''),
-    h('td', {}, r.phase === 'question' || r.phase === 'reveal' ? `Q${r.q + 1}/${r.total}` : r.phase),
+    h('td', {}, r.ended ? 'ended' : r.phase === 'question' || r.phase === 'reveal' ? `Q${r.q + 1}/${r.total}` : r.phase),
     h('td', {}, `${r.online}/${r.players}`), h('td', {}, r.host + (r.signedHost ? ' ✓' : '')), h('td', {}, ago(r.touched)),
     h('td', {}, h('button.btn.small.danger', { type: 'button', onclick: async () => {
       try { await call('POST', `/admin/rooms/${r.code}/close`); toast(`Closed ${r.code}`); load(); } catch (e) { toast(e.message); }
     } }, 'Close'))));
+  const idleCount = d.rooms.filter(r => r.phase === 'final' || r.ended || !r.online).length;
   const alertRows = d.alerts.map(a => h('tr', {}, h('td', {}, new Date(a.at).toLocaleString()), h('td.alert-kind', {}, a.kind), h('td', {}, a.msg), h('td.muted', {}, a.delivered)));
   root.replaceChildren(
     h('div.row', { style: { justifyContent: 'space-between' } }, h('h1', {}, 'Clued admin'), h('span.muted', {}, `up ${d.uptime} · alerts via ${[d.channels.ntfy && 'ntfy', d.channels.email && 'email'].filter(Boolean).join(' + ') || 'log only'}`)),
@@ -106,7 +107,11 @@ function render(d) {
       kpi('Today: challenges', `${d.live.challengesToday}/${d.caps.challengesPerDay}`, `${today.challenge_plays || 0} plays`),
       kpi('Today: peaks', today.peak_players || 0, `players · ${today.peak_rooms || 0} rooms · ${today.peak_sse || 0} conns`)),
     h('div.panel', {}, h('h2', {}, 'Last 14 days'), chart(d.days)),
-    h('div.panel', {}, h('h2', {}, `Live rooms (${d.rooms.length})`), d.rooms.length ? h('div.scroll', {}, h('table', {},
+    h('div.panel', {}, h('div.row', { style: { justifyContent: 'space-between' } }, h('h2', {}, `Live rooms (${d.rooms.length})`),
+      idleCount ? h('button.btn.small.danger', { type: 'button', dataset: { act: 'close-finished' }, onclick: async e => {
+        e.currentTarget.disabled = true;
+        try { const r = await call('POST', '/admin/close-finished'); toast(`Closed ${r.closed} room${r.closed === 1 ? '' : 's'}`); load(); } catch (x) { toast(x.message); e.currentTarget.disabled = false; }
+      } }, `Close all finished/abandoned (${idleCount})`) : null), d.rooms.length ? h('div.scroll', {}, h('table', {},
       h('tr', {}, ...['Code', 'Title', 'Type', 'Phase', 'Online', 'Host', 'Active', ''].map(t => h('th', {}, t))), ...roomRows)) : h('p.muted', {}, 'No rooms right now.')),
     h('div.panel', {}, h('div.row', { style: { justifyContent: 'space-between' } }, h('h2', {}, 'Recent alerts'),
       h('button.btn.small', { type: 'button', onclick: async () => {

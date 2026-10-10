@@ -1,14 +1,14 @@
-import { h, esc } from './kit.js?v=202610100510';
-import { setBgm, canFullscreen, toggleFullscreen } from './toggles.js?v=202610100510';
-import { defineScreen, header, back, go } from './app.js?v=202610100510';
-import { getSettings, setSettings, ANSWER_TIMES } from '../core/store.js?v=202610100510';
-import { getIndex, loadPacks, loadedPacks, allPackIds } from '../core/packs.js?v=202610100510';
-import { applyAudioSettings, sfx } from './fx.js?v=202610100510';
-import { applyKids } from './home.js?v=202610100510';
-import { loadLearn, loadNet } from './net.js?v=202610100510';
-import { BUILD } from '../build.js?v=202610100510';
-import { canSpeak, speak } from './speech.js?v=202610100510';
-import { streakOption } from './streakopt.js?v=202610100510';
+import { h, esc } from './kit.js?v=202610100547';
+import { setBgm, canFullscreen, toggleFullscreen } from './toggles.js?v=202610100547';
+import { defineScreen, header, back, go } from './app.js?v=202610100547';
+import { getSettings, setSettings, ANSWER_TIMES } from '../core/store.js?v=202610100547';
+import { getIndex, loadPacks, loadedPacks, allPackIds } from '../core/packs.js?v=202610100547';
+import { applyAudioSettings, sfx } from './fx.js?v=202610100547';
+import { applyKids } from './home.js?v=202610100547';
+import { loadLearn, loadNet } from './net.js?v=202610100547';
+import { BUILD } from '../build.js?v=202610100547';
+import { canSpeak, speak } from './speech.js?v=202610100547';
+import { streakOption } from './streakopt.js?v=202610100547';
 
 function toggleRow(label, help, key, after) {
   const s = getSettings();

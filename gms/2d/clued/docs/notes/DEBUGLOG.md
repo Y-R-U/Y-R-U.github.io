@@ -88,6 +88,7 @@ Every listen/clip/ctx line carries `st` (AudioContext state), `t` (its currentTi
 | `apple` | apple.js | json (lookup/search, ms), json.bad/fail, jsonp, head, preview.refresh, preview.none, search, refresh |
 | `bgm` | bgm.js | play, stop, start, halt (reasons), resume, pause/unpause with counts (+ unpause.unmatched), duck/unduck |
 | `run` | runner.js | create (run id, n, mode, formats), question (i, q, limit, timer, vis), destroyPrev, destroy.fail, render.fail, answer, timeout, deadline, timeUp, finish |
+| `applenet` / `probe` | applenet.js / probe.js | Apple direct-vs-proxy decisions and the per-round Apple connectivity probe, see APPLEPROXY.md |
 | `debug` | debuglog.js | on (why, history length), off, beacon |
 
 Every batch carries device id (random, `localStorage clued.dbg.dev`), session id (per page load), BUILD, user agent and

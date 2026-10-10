@@ -499,6 +499,11 @@ func TestExpiryAndPersistence(t *testing.T) {
 	if st["phase"] != "question" || st["you"].(map[string]any)["name"] != "Keeper" {
 		t.Fatalf("restored room: %v", st)
 	}
+	// someone stays connected the whole time (an open SSE stream), so only the 6 h idle cap applies
+	rm := getRoom(code)
+	rm.mu.Lock()
+	rm.Players[0].conns = 1
+	rm.mu.Unlock()
 	advance(cfg.RoomIdle - time.Minute)
 	tickRooms()
 	if getRoom(code) == nil {

@@ -18,9 +18,12 @@ const (
 	defaultReveal  = 5000
 	defaultAnswer  = 10000
 	abandonedMs    = 10 * 60 * 1000 // an empty public lobby is dropped so the cap can't be squatted
-	kidsStageMs    = 4000           // kids rooms: progressive stages auto-advance
-	kidsAnswer     = 20000          // kids rooms default to a gentle timer and flat 100 per correct
-	roundIntroMs   = 5000           // extra lead-in on the first question of each round (the round card)
+	emptyRoomMs    = 20 * 60 * 1000 // any other room with nobody connected (no SSE/poll) is dropped after this
+	endedEmptyMs   = 2 * 60 * 1000  // an ended room lingers while players still look at the podium, then goes
+	endedMaxMs     = 30 * 60 * 1000
+	kidsStageMs    = 4000  // kids rooms: progressive stages auto-advance
+	kidsAnswer     = 20000 // kids rooms default to a gentle timer and flat 100 per correct
+	roundIntroMs   = 5000  // extra lead-in on the first question of each round (the round card)
 	maxTScale      = 6
 	maxScaledMs    = 180000
 	readyCapMs     = 5000 // longest the opening waits for clients still loading the question's media
@@ -96,6 +99,9 @@ type Room struct {
 	LeadAt    int64             `json:"leadAt,omitempty"`   // the planned opening (qStart before any ready hold)
 	Hold      bool              `json:"hold,omitempty"`     // opening held while clients load media
 	NoStreak  bool              `json:"noStreak,omitempty"` // the streak counter shows but adds no points
+	Owner     string            `json:"owner,omitempty"`    // the creator's player id: may end the room even after handing host over
+	Ended     bool              `json:"ended,omitempty"`    // the host ended the room for everyone
+	EndedAt   int64             `json:"endedAt,omitempty"`
 	meta      []qMeta
 	rounds    roundInfo
 	subs      map[*sub]struct{}
@@ -456,6 +462,29 @@ func (r *Room) finish() {
 	r.changed()
 }
 
+// endRoom ends the room for everyone: the podium stays for whoever is looking, the cap slot frees at once
+// (final rooms aren't counted) and it drops off the public list.
+func (r *Room) endRoom() {
+	if r.Ended {
+		return
+	}
+	if r.Phase != "final" {
+		r.Phase = "final"
+		r.QStart, r.QDeadline, r.RevealAt = 0, 0, 0
+	}
+	r.Ended, r.EndedAt, r.StartAt, r.Hold = true, nowMs(), 0, false
+	r.changed()
+}
+
+func (r *Room) anyOnline(now int64) bool {
+	for _, p := range r.Players {
+		if p.online(now) {
+			return true
+		}
+	}
+	return false
+}
+
 func (r *Room) allAnswered(now int64) bool {
 	n := 0
 	for _, p := range r.Players {
@@ -592,23 +621,37 @@ func (r *Room) tick(now int64) bool {
 	}
 	touched := r.Touched // clock-driven changes aren't activity
 	defer func() { r.Touched = touched }()
-	if r.Public && r.Phase == "lobby" {
-		anyOnline := false
-		for _, p := range r.Players {
-			anyOnline = anyOnline || p.online(now)
+	// Abandoned rooms: nobody connected (no SSE stream, no poll in 30 s). The clock starts when the last one goes;
+	// a rejoin within the window resets it. Public lobbies go sooner so the public cap can't be squatted.
+	if r.anyOnline(now) {
+		if r.EmptyAt != 0 {
+			r.EmptyAt, r.dirty = 0, true
 		}
-		if anyOnline {
-			r.EmptyAt = 0
-		} else if r.EmptyAt == 0 {
-			r.EmptyAt = now
-		} else if now-r.EmptyAt > abandonedMs {
+	} else if r.EmptyAt == 0 {
+		r.EmptyAt, r.dirty = now, true
+	} else {
+		limit := int64(emptyRoomMs)
+		if r.Ended {
+			limit = endedEmptyMs
+		} else if r.Public && r.Phase == "lobby" {
+			limit = abandonedMs
+		}
+		if now-r.EmptyAt > limit {
 			r.dead = true
 			r.changed()
 			return false
 		}
-		if r.StartAt > 0 && now >= r.StartAt && len(r.active()) > 0 {
-			r.start()
+	}
+	if r.Ended {
+		if now-r.EndedAt > endedMaxMs {
+			r.dead = true
+			r.changed()
+			return false
 		}
+		return true
+	}
+	if r.Public && r.Phase == "lobby" && r.StartAt > 0 && now >= r.StartAt && len(r.active()) > 0 {
+		r.start()
 	}
 	switch r.Phase {
 	case "question":
@@ -730,7 +773,9 @@ func loadRooms() {
 		r.buildMeta()
 		r.subs = map[*sub]struct{}{}
 		for _, p := range r.Players {
-			p.LastSeen = now // give everyone time to reconnect before host handover
+			if r.EmptyAt == 0 {
+				p.LastSeen = now // give everyone time to reconnect before host handover (an empty room stays empty)
+			}
 			if p.Answers == nil {
 				p.Answers = map[int]*Answer{}
 			}
@@ -802,6 +847,7 @@ type pubYou struct {
 	JoinedQ int      `json:"joinedQ"`
 	Kicked  bool     `json:"kicked,omitempty"`
 	Gone    bool     `json:"gone,omitempty"`
+	Owner   bool     `json:"owner,omitempty"` // created the room: may end it even when someone else hosts
 	Last    *pubLast `json:"last,omitempty"`
 	Rank    int      `json:"rank"`
 	Voted   bool     `json:"voted,omitempty"`
@@ -848,13 +894,14 @@ type pubState struct {
 	// streakBonus: the streak adds points (off = the counter is just for show); hold: the opening waits for media
 	StreakBonus bool `json:"streakBonus"`
 	Hold        bool `json:"hold,omitempty"`
+	Ended       bool `json:"ended,omitempty"` // the host ended the room for everyone
 }
 
 // stateFor must be called with r.mu held.
 func (r *Room) stateFor(viewer *Player) pubState {
 	now := nowMs()
 	s := pubState{Code: r.Code, Ver: r.Ver, Now: now, Phase: r.Phase, Q: r.Q, Total: len(r.Questions), Game: r.Game, StreakBonus: !r.NoStreak,
-		Auto: r.Auto, AnswerSec: r.AnswerMs / 1000, Title: r.Title, Kids: r.Kids, Diff: r.Diff, Public: r.Public, StartAt: r.StartAt, LateJoin: !r.NoLate, HostID: r.HostID, Expired: r.dead, Spec: r.Spec}
+		Auto: r.Auto, AnswerSec: r.AnswerMs / 1000, Title: r.Title, Kids: r.Kids, Diff: r.Diff, Public: r.Public, StartAt: r.StartAt, LateJoin: !r.NoLate, HostID: r.HostID, Expired: r.dead, Spec: r.Spec, Ended: r.Ended}
 	if r.Auto {
 		s.GapSec = r.RevealMs / 1000
 	}
@@ -913,7 +960,7 @@ func (r *Room) stateFor(viewer *Player) pubState {
 	}
 	if viewer != nil {
 		y := &pubYou{ID: viewer.ID, Name: viewer.Name, Host: viewer.ID == r.HostID, JoinedQ: viewer.JoinedQ,
-			Kicked: viewer.Kicked, Gone: viewer.Gone}
+			Kicked: viewer.Kicked, Gone: viewer.Gone, Owner: r.Owner != "" && viewer.ID == r.Owner}
 		if r.Q >= 0 {
 			if a := viewer.Answers[r.Q]; a != nil {
 				y.Last = r.lastOf(a, viewer)

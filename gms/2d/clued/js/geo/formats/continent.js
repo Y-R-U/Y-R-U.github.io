@@ -1,8 +1,8 @@
-import { register, collect, pick, shuffle } from '../../formats/registry.js?v=202610100510';
-import { geo, countryIds, createMap, frame, message, revealCard, isKids, cname, theName, byLevel, refFor, supportsGeo, CONTINENTS, loadFlags } from './common.js?v=202610100510';
-import { loadCities, geo as G } from '../data.js?v=202610100510';
-import { CONTINENT_FILL } from '../style.js?v=202610100510';
-import { LAT, LON, STEP, CODES as BAND_CODES } from '../bands.js?v=202610100510';
+import { register, collect, pick, shuffle } from '../../formats/registry.js?v=202610100547';
+import { geo, countryIds, createMap, frame, message, revealCard, isKids, cname, theName, byLevel, refFor, supportsGeo, CONTINENTS, loadFlags } from './common.js?v=202610100547';
+import { loadCities, geo as G } from '../data.js?v=202610100547';
+import { CONTINENT_FILL } from '../style.js?v=202610100547';
+import { LAT, LON, STEP, CODES as BAND_CODES } from '../bands.js?v=202610100547';
 
 await loadCities();
 

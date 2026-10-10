@@ -1,6 +1,6 @@
 // "Streak bonus" choice (Adds points / Just for show) with an inline ⓘ explanation. Used by solo/party setup,
 // the pub quiz builder, Settings and the online host/lobby (room-level, server-authoritative there).
-import { h } from './kit.js?v=202610100510';
+import { h } from './kit.js?v=202610100547';
 
 export const STREAK_HELP = {
   on: 'Answer several right in a row to earn up to +50% points per question (+10% for each one in a row after the first).',

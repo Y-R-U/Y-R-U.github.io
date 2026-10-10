@@ -1,25 +1,25 @@
 // Live room screen: lobby → synced questions (driven through A's runner) → scoreboards → podium.
-import { h, fmtNum } from '../ui/kit.js?v=202610100510';
-import { defineScreen, reset, header, current } from '../ui/app.js?v=202610100510';
-import { confirmPop, toast } from '../ui/popup.js?v=202610100510';
-import { sfx, confetti } from '../ui/fx.js?v=202610100510';
-import { createRunner } from '../structures/runner.js?v=202610100510';
-import { prepare, prepareFormats } from '../structures/session.js?v=202610100510';
-import { basePoints, streakMultiplier, stageMultiplier } from '../core/scoring.js?v=202610100510';
-import { urlsOf, preflight } from '../core/media.js?v=202610100510';
-import { randomSeed } from '../core/rng.js?v=202610100510';
-import { listFormats } from '../formats/registry.js?v=202610100510';
-import { loadFormats } from '../formats/index.js?v=202610100510';
-import { friendly } from './api.js?v=202610100510';
-import { getTransport } from './transport.js?v=202610100510';
-import { sharePanel, joinUrl, p2pUrl } from './share.js?v=202610100510';
-import { scoreboard, podium, ordinal, timingPanel, roundsTable, pointsBreakdown } from './board.js?v=202610100510';
-import { streakOption } from '../ui/streakopt.js?v=202610100510';
-import { roundAt, specRound, annotateTimes, fitSet } from './roundset.js?v=202610100510';
-import { roundTitle, roundThemes } from '../structures/rounds.js?v=202610100510';
-import { getFormat } from '../formats/registry.js?v=202610100510';
-import { ensureStyles, dropSeat, setQuery, gapLabel, TRUST_HINT, mmss } from './util.js?v=202610100510';
-import { trackRoom } from '../core/stats.js?v=202610100510';
+import { h, fmtNum } from '../ui/kit.js?v=202610100547';
+import { defineScreen, reset, header, current } from '../ui/app.js?v=202610100547';
+import { confirmPop, toast } from '../ui/popup.js?v=202610100547';
+import { sfx, confetti } from '../ui/fx.js?v=202610100547';
+import { createRunner } from '../structures/runner.js?v=202610100547';
+import { prepare, prepareFormats } from '../structures/session.js?v=202610100547';
+import { basePoints, streakMultiplier, stageMultiplier } from '../core/scoring.js?v=202610100547';
+import { urlsOf, preflight } from '../core/media.js?v=202610100547';
+import { randomSeed } from '../core/rng.js?v=202610100547';
+import { listFormats } from '../formats/registry.js?v=202610100547';
+import { loadFormats } from '../formats/index.js?v=202610100547';
+import { friendly } from './api.js?v=202610100547';
+import { getTransport } from './transport.js?v=202610100547';
+import { sharePanel, joinUrl, p2pUrl } from './share.js?v=202610100547';
+import { scoreboard, podium, ordinal, timingPanel, roundsTable, pointsBreakdown } from './board.js?v=202610100547';
+import { streakOption } from '../ui/streakopt.js?v=202610100547';
+import { roundAt, specRound, annotateTimes, fitSet } from './roundset.js?v=202610100547';
+import { roundTitle, roundThemes } from '../structures/rounds.js?v=202610100547';
+import { getFormat } from '../formats/registry.js?v=202610100547';
+import { ensureStyles, dropSeat, setQuery, gapLabel, TRUST_HINT, mmss } from './util.js?v=202610100547';
+import { trackRoom } from '../core/stats.js?v=202610100547';
 
 const DIFF = ['Mixed', 'Easy', 'Medium', 'Hard'];
 let formatsP = null;
@@ -76,6 +76,7 @@ defineScreen('room', async (el, { code, key, st: initial, via = 'server' }, cur)
     if (ctx.wasHost === false && st.you.host) { toast('You’re the host now'); sfx('join'); }
     ctx.wasHost = st.you.host;
     if (st.game !== ctx.game) { stopRunner(); ctx.game = st.game; ctx.qcache.clear(); }
+    if ((st.ended || st.closed) && !ctx.ended) { ctx.ended = true; dropSeat(code, true); setQuery('join', null); closeLeaveBar(); }
     ctx.waiters = ctx.waiters.filter(w => !w(st));
     if (st.phase === 'lobby') { stopRunner(); showLobby(st); return; }
     if (st.phase === 'final') { stopRunner(); showFinal(st); return; }
@@ -96,7 +97,8 @@ defineScreen('room', async (el, { code, key, st: initial, via = 'server' }, cur)
   function onEnd(why) {
     ctx.ended = true;
     stopRunner();
-    dropSeat(code);
+    closeLeaveBar();
+    dropSeat(code, true);
     setQuery('join', null);
     if (why === 'bad_key') { reset('join', { code, fresh: true }); return; }
     setView('ended');
@@ -105,7 +107,7 @@ defineScreen('room', async (el, { code, key, st: initial, via = 'server' }, cur)
       h('div.net-wrap', {}, h('div.panel.net-hero', {},
         h('div', { style: { fontSize: '54px' } }, kicked ? '👋' : '🏁'),
         h('h2', {}, kicked ? 'You were removed' : 'This room has ended'),
-        h('p', {}, kicked ? 'The host removed you from this room.' : 'Rooms close after 6 hours without play.')),
+        h('p', {}, kicked ? 'The host removed you from this room.' : 'The host ended it, or nobody was in it for a while.')),
         h('button.btn.primary.wide', { type: 'button', onclick: () => reset('home') }, 'Home')));
   }
 
@@ -432,6 +434,7 @@ defineScreen('room', async (el, { code, key, st: initial, via = 'server' }, cur)
 
   /* -------------------------------------------------------------- final */
   function showFinal(st) {
+    if ((st.ended || st.closed) && st.q < 0) { showEndedLobby(st); return; }
     if (setView('final') === false && finalShown === st.game) { updateFinal(st); return; }
     finalShown = st.game;
     el.innerHTML = '';
@@ -457,12 +460,26 @@ defineScreen('room', async (el, { code, key, st: initial, via = 'server' }, cur)
       if (st.roundSizes?.length > 1) parts.push(roundsTable(st.players, st.roundSizes.map((_, k) => roundInfo(st, k)), { meId: st.you.id }));
     }
     const actions = h('div.net-actions');
-    if (st.you.host) actions.append(h('button.btn.go.big.wide', { type: 'button', dataset: { act: 'again' }, onclick: e => playAgain(st, e.currentTarget) }, 'Play again'));
-    else if (st.closed) actions.append(h('div.net-wait', {}, st.hostLost ? 'Lost the host’s device: these are the last scores.' : 'The host closed the room.'));
-    else actions.append(h('div.net-wait', {}, `${hostName(st)} can start another game`, h('span.dots')));
-    actions.append(h('button.btn.wide', { type: 'button', onclick: leave }, 'Leave room'));
+    const over = st.ended || st.closed;
+    if (over) actions.append(h('div.net-wait.net-ended', { dataset: { ended: '1' } }, st.hostLost ? 'Lost the host’s device: these are the last scores.' : 'The host ended the room.'));
+    else if (st.you.host) {
+      actions.append(h('button.btn.go.big.wide', { type: 'button', dataset: { act: 'again' }, onclick: e => playAgain(st, e.currentTarget) }, 'Play again'));
+      // Done ends the finished room for everyone (frees it at once); players keep the podium on screen
+      actions.append(h('button.btn.wide', { type: 'button', dataset: { act: 'done' }, onclick: e => finishLeave('end', e.currentTarget) }, 'Done'));
+    } else actions.append(h('div.net-wait', {}, `${hostName(st)} can start another game`, h('span.dots')));
+    if (over || !st.you.host) actions.append(h('button.btn.wide', { type: 'button', dataset: { act: 'leave' }, onclick: () => (over ? reset('home') : finishLeave('leave')) }, over ? 'Done' : 'Leave room'));
     parts.push(actions);
     wrap.replaceChildren(...parts);
+  }
+
+  function showEndedLobby(st) {
+    if (!setView('ended')) return;
+    el.append(header('Clued online', { backBtn: false }),
+      h('div.net-wrap', {}, h('div.panel.net-hero', {},
+        h('div', { style: { fontSize: '54px' } }, '🏁'),
+        h('h2', { dataset: { ended: '1' } }, 'The host ended the room'),
+        h('p', {}, st.title ? `${st.title} won’t be played.` : 'This game won’t be played.')),
+        h('button.btn.primary.wide', { type: 'button', onclick: () => reset('home') }, 'Home')));
   }
 
   async function playAgain(st, btn) {
@@ -482,14 +499,64 @@ defineScreen('room', async (el, { code, key, st: initial, via = 'server' }, cur)
   }
 
   /* -------------------------------------------------------------- leave */
+  // Leaving asks inline (a docked bar, no popup). A server-room host picks: leave (the room keeps going, someone
+  // else becomes host; it stays under "Your rooms") or end it for everyone. A device room's host is its server,
+  // so leaving ends it.
+  let leaveBar = null;
+  function closeLeaveBar(v = false) { if (leaveBar) { const b = leaveBar; leaveBar = null; b.done(v); } }
+  function leaveChoice() {
+    if (leaveBar) return leaveBar.p;
+    const st = ctx.st;
+    const host = !!st?.you?.host, p2p = !!st?.p2p;
+    const others = (st?.players || []).filter(p => p.id !== st.you.id).length;
+    let done;
+    const p = new Promise(r => { done = r; });
+    const bar = h('div.net-leavebar', { role: 'group', 'aria-label': 'Leave this room?' });
+    const opt = (act, label, sub, cls = '') => h(`button.btn.wide${cls}`, { type: 'button', dataset: { leave: act }, onclick: () => closeLeaveBar(act) },
+      h('b', {}, label), sub ? h('small', {}, sub) : null);
+    const kids = [h('div.nl-head', {}, h('b', {}, host ? 'Leave or end the room?' : 'Leave this room?'))];
+    if (host && p2p) {
+      kids.push(h('p.nl-note', {}, 'This device runs the room, so leaving ends it for everyone.'),
+        opt('end', 'End room for everyone', 'Leave = end: players keep the final scores', '.danger'));
+    } else if (host) {
+      kids.push(opt('leave', others ? 'Leave (room keeps going, someone else becomes host)' : 'Leave (room stays open for now)',
+          others ? 'You can rejoin it or end it later from “Your rooms”.' : 'Rejoin or end it later from “Your rooms”. Empty rooms close after 20 minutes.'),
+        others ? opt('end', 'End room for everyone', st?.phase === 'final' ? 'The scores stay on everyone’s screen.' : st?.phase === 'lobby' ? 'Everyone in the lobby is told the room ended.' : 'The game stops now; everyone sees the scores so far.', '.danger')
+          : opt('end', 'End room', 'Close it now.', '.danger'));
+    } else {
+      kids.push(h('p.nl-note', {}, 'You can rejoin with the link while the room is open.'), opt('leave', 'Leave', null, '.danger'));
+    }
+    kids.push(h('button.btn.ghost.wide', { type: 'button', dataset: { leave: 'stay' }, onclick: () => closeLeaveBar(false) }, 'Stay'));
+    bar.append(...kids);
+    document.body.append(bar);
+    requestAnimationFrame(() => bar.classList.add('in'));
+    leaveBar = { p, done: v => { bar.remove(); done(v); } };
+    return p;
+  }
+
+  // act: 'leave' | 'end'. A host who just leaves keeps the room under "Your rooms" (to rejoin or end it later).
+  async function doLeave(act) {
+    const st = ctx.st;
+    const host = !!(st?.you?.host || st?.you?.owner);
+    ctx.ended = true;
+    closeLeaveBar();
+    try {
+      if (act === 'end' && !st?.p2p) await T.host(code, key, 'end');
+      else await T.leave(code, key);
+    } catch (e) {}
+    dropSeat(code, !(act === 'leave' && host && !st?.p2p));
+    setQuery('join', null);
+  }
+  async function finishLeave(act, btn) {
+    if (btn) btn.disabled = true;
+    await doLeave(act);
+    reset('home');
+  }
   async function confirmLeave() {
     if (ctx.ended) return true;
-    const host = ctx.st?.you?.host && ctx.st.players.length > 1;
-    if (!(await confirmPop('Leave this room?', host ? (ctx.st.p2p ? 'This device is hosting: the game ends for everyone.' : 'Someone else will become the host.') : 'You can rejoin with the link while the room is open.', 'Leave', 'Stay', true))) return false;
-    ctx.ended = true;
-    try { await T.leave(code, key); } catch (e) {}
-    dropSeat(code);
-    setQuery('join', null);
+    const act = await leaveChoice();
+    if (!act) return false;
+    if (!ctx.ended) await doLeave(act);
     return true;
   }
   async function leave() {
@@ -499,6 +566,7 @@ defineScreen('room', async (el, { code, key, st: initial, via = 'server' }, cur)
   return {
     cleanup() {
       ctx.ended = true;
+      closeLeaveBar();
       sub.close();
       stopRunner();
       ctx.timers.forEach(id => clearInterval(id));

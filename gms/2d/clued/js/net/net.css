@@ -173,3 +173,27 @@
 .net-rtable td.tot { font-family: var(--font-display); font-size: 16px; }
 .net-rtable tr.me { background: #e6e0ff; }
 @media (max-height: 700px) { .net-round .nr-ico { font-size: 48px; } .net-round .nr-name { font-size: 26px; } }
+
+/* leave / end choice: docked bar, no scrim (MYROOMS.md) */
+.net-leavebar { position: fixed; left: 50%; bottom: calc(10px + var(--sab, 0px)); z-index: 55; width: min(528px, calc(100% - 24px)); transform: translate(-50%, 16px); opacity: 0; transition: opacity .18s, transform .22s; display: flex; flex-direction: column; gap: 8px; padding: 12px; background: var(--paper); border: var(--line) solid var(--ink); border-radius: 20px; box-shadow: 0 6px 0 var(--ink); }
+.net-leavebar.in { transform: translate(-50%, 0); opacity: 1; }
+.net-leavebar .nl-head { font-family: var(--font-display); font-size: 20px; text-align: center; }
+.net-leavebar .nl-note { margin: 0; font-size: 13px; color: var(--ink-2); text-align: center; }
+.net-leavebar .btn { flex-direction: column; gap: 2px; line-height: 1.15; min-height: 50px; }
+.net-leavebar .btn small { font-size: 12px; font-weight: 700; opacity: .85; }
+.net-leavebar .btn.ghost { min-height: 38px; }
+
+/* "Your rooms" on the Online hub */
+.net-mine { display: flex; flex-direction: column; gap: 8px; }
+.net-mine[hidden] { display: none; }
+.net-myroom { display: flex; flex-direction: column; gap: 6px; padding: 10px 12px; border: 2px solid var(--ink); border-radius: 16px; background: #fff; box-shadow: var(--shadow-sm); }
+.net-myroom .mr-top { display: flex; align-items: baseline; gap: 8px; min-width: 0; }
+.net-myroom .mr-code { font-family: var(--font-display); letter-spacing: 2px; font-size: 18px; flex: none; }
+.net-myroom .mr-title { font-weight: 900; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1; min-width: 0; }
+.net-myroom .mr-phase { flex: none; font-size: 12px; font-weight: 900; padding: 2px 8px; border: 2px solid var(--ink); border-radius: 999px; background: var(--paper-2); }
+.net-myroom .mr-phase.playing { background: #d7f6ee; }
+.net-myroom .mr-phase.finished { background: #eee; }
+.net-myroom .mr-meta { font-size: 13px; color: var(--ink-2); font-weight: 700; }
+.net-myroom .mr-acts { display: flex; gap: 8px; }
+.net-myroom .mr-acts .btn { flex: 1; }
+.net-myroom .mr-acts .btn.armed { background: var(--bad); color: #fff; }

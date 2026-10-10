@@ -1,14 +1,15 @@
 // Online hub, join-by-name screen and host setup. Joining needs only a name.
-import { h } from '../ui/kit.js?v=202610100510';
-import { defineScreen, go, header, current } from '../ui/app.js?v=202610100510';
-import { sfx } from '../ui/fx.js?v=202610100510';
-import { getFormat } from '../formats/registry.js?v=202610100510';
-import { rooms, friendly } from './api.js?v=202610100510';
-import { suggestedName, rememberName, tidyName, MAX_NAME } from './ident.js?v=202610100510';
-import { ensureStyles, saveSeat, loadSeat, dropSeat, cleanCode, validCode, setQuery, mmss } from './util.js?v=202610100510';
-import { packInfo } from '../core/packs.js?v=202610100510';
-import { getTransport, hasTransport } from './transport.js?v=202610100510';
-import { signInPrompt, busyText } from './signin.js?v=202610100510';
+import { h } from '../ui/kit.js?v=202610100547';
+import { defineScreen, go, header, current } from '../ui/app.js?v=202610100547';
+import { sfx } from '../ui/fx.js?v=202610100547';
+import { toast } from '../ui/popup.js?v=202610100547';
+import { getFormat } from '../formats/registry.js?v=202610100547';
+import { rooms, friendly } from './api.js?v=202610100547';
+import { suggestedName, rememberName, tidyName, MAX_NAME } from './ident.js?v=202610100547';
+import { ensureStyles, saveSeat, loadSeat, dropSeat, cleanCode, validCode, setQuery, mmss, myRooms, forgetRoom } from './util.js?v=202610100547';
+import { packInfo } from '../core/packs.js?v=202610100547';
+import { getTransport, hasTransport } from './transport.js?v=202610100547';
+import { signInPrompt, busyText } from './signin.js?v=202610100547';
 
 
 export function nameField(value = '') {
@@ -46,10 +47,92 @@ function publicCard(r, offset) {
       h('span', {}, `⏱ ${r.answerSec}s`))), tick };
 }
 
+/* ------------------------------------------------------- your rooms */
+const PHASE = { lobby: ['In the lobby', 'lobby'], question: ['Playing', 'playing'], reveal: ['Playing', 'playing'], final: ['Finished', 'finished'] };
+function ageText(ms) {
+  const m = Math.max(0, Math.round(ms / 60000));
+  return m < 1 ? 'just made' : m < 60 ? `${m} min old` : `${Math.floor(m / 60)} h ${m % 60 ? `${m % 60} min ` : ''}old`;
+}
+
+// Server rooms this device created or holds a seat in (device rooms die with their tab). Fetched live; rooms that
+// are gone, ended or no longer know our key are forgotten silently.
+function yourRooms(cur) {
+  const list = h('div.net-mine-list.stack');
+  const sec = h('div.net-mine', { hidden: true, dataset: { sec: 'mine' } }, h('h3.sec-title', {}, 'Your rooms'), list);
+  let offset = 0, busy = false;
+  function card(r, seat) {
+    const [ph, cls] = PHASE[r.phase] || [r.phase, ''];
+    const canEnd = r.isHost || r.owner;
+    const role = r.isHost ? '👑 You host' : r.left && !r.players ? 'You left · nobody in it' : r.left ? `You left · 👑 ${r.host || '?'} hosts`
+      : r.owner ? `You made it · 👑 ${r.host || '?'} hosts` : `👑 ${r.host || '?'}`;
+    const acts = h('div.mr-acts');
+    const row = h('div.net-myroom', { dataset: { code: r.code } },
+      h('div.mr-top', {}, h('span.mr-code', {}, r.code), h('span.mr-title', {}, r.title || 'Clued game'),
+        h('span.mr-phase', { class: cls }, r.phase === 'question' || r.phase === 'reveal' ? `${ph} · Q${r.q + 1}/${r.total}` : ph)),
+      h('div.mr-meta', {}, [role, r.players ? `👥 ${r.players} player${r.players === 1 ? '' : 's'}${r.online ? ` (${r.online} online)` : ''}` : null,
+        r.public ? '🌍 Public' : '🔒 Private', ageText(Date.now() + offset - r.created)].filter(Boolean).join(' · ')),
+      acts);
+    const err = msg => { row.querySelector('.net-err')?.remove(); row.append(h('p.net-err', { role: 'alert' }, msg)); };
+    acts.append(h('button.btn.small', { type: 'button', dataset: { act: 'rejoin' }, onclick: () => go('join', { code: r.code }) }, 'Rejoin'));
+    if (canEnd) {
+      let armed = null;
+      const b = h('button.btn.small', { type: 'button', dataset: { act: 'end-room' } }, 'End room');
+      b.onclick = async () => {
+        if (!armed) {   // two-tap confirm, inline
+          b.classList.add('armed'); b.textContent = 'End for everyone?';
+          armed = setTimeout(() => { armed = null; b.classList.remove('armed'); b.textContent = 'End room'; }, 4000);
+          return;
+        }
+        clearTimeout(armed);
+        b.disabled = true; b.textContent = 'Ending…';
+        try {
+          await rooms.end(r.code, seat.key);
+          forgetRoom(r.code); dropSeat(r.code);
+          row.remove(); toast(`Room ${r.code} ended`);
+          sec.hidden = !list.children.length;
+        } catch (e) {
+          if (e.code === 'room_not_found' || e.code === 'bad_key') { forgetRoom(r.code); row.remove(); sec.hidden = !list.children.length; return; }
+          b.disabled = false; b.classList.remove('armed'); b.textContent = 'End room'; armed = null; err(friendly(e));
+        }
+      };
+      acts.append(b);
+    } else {
+      acts.append(h('button.btn.small', { type: 'button', dataset: { act: 'leave-room' }, onclick: async e => {
+        e.currentTarget.disabled = true;
+        try { await rooms.leave(r.code, seat.key); } catch (x) {}
+        forgetRoom(r.code); dropSeat(r.code);
+        row.remove(); toast(`Left room ${r.code}`);
+        sec.hidden = !list.children.length;
+      } }, 'Leave'));
+    }
+    return row;
+  }
+  async function load() {
+    const mine = myRooms();
+    const codes = Object.keys(mine).filter(c => mine[c]?.key);
+    if (!codes.length) { sec.hidden = true; return; }
+    if (busy || list.querySelector('.armed, :disabled')) return;   // don't redraw under a pending tap
+    busy = true;
+    try {
+      const d = await rooms.mine(codes.map(code => ({ code, key: mine[code].key })));
+      if (cur !== current()) return;
+      offset = d.now - Date.now();
+      const gone = (d.gone || []).concat(d.rooms.filter(r => r.left && !r.owner).map(r => r.code));
+      if (gone.length) forgetRoom(...gone);
+      const live = d.rooms.filter(r => !gone.includes(r.code)).sort((a, b) => b.created - a.created);
+      list.replaceChildren(...live.map(r => card(r, mine[r.code])));
+      sec.hidden = !live.length;
+    } catch (e) { /* offline: keep what's shown */ }
+    finally { busy = false; }
+  }
+  return { el: sec, load };
+}
+
 defineScreen('online', (el, params, cur) => {
   ensureStyles();
   const code = codeField();
   const err = h('p.net-err', { role: 'alert' });
+  const mineSec = yourRooms(cur);
   const pubList = h('div.net-pubs', {}, h('div.net-wait', {}, 'Looking for public games', h('span.dots')));
   const pubSec = h('div.stack', {}, h('h3.sec-title', {}, 'Public games'), pubList);
   const live = h('button.net-livechip', { type: 'button', hidden: true, onclick: () => pubSec.scrollIntoView({ behavior: 'smooth', block: 'start' }) });
@@ -63,6 +146,7 @@ defineScreen('online', (el, params, cur) => {
   el.append(header('Play online'),
     h('div.net-wrap', {},
       h('div.net-hero', {}, live, h('div', { style: { fontSize: '48px' } }, '🌐'), h('h2', {}, 'Play with friends'), h('p', {}, 'Host a game and share the link. Friends type a name and they’re in. No sign-in needed.')),
+      mineSec.el,
       h('div.panel.stack', {}, h('h3', {}, 'Host a game'), h('p.muted', { style: { margin: 0 } }, 'Add rounds, pick themes (or a ♥ favourite) for each, then share the link or QR code.'),
         h('button.btn.go.big.wide', { type: 'button', dataset: { act: 'host' }, onclick: () => go('host') }, 'Host a game'),
         hasTransport('p2p') ? h('button.btn.wide', { type: 'button', dataset: { act: 'host-device' }, onclick: () => go('host', { via: 'p2p' }) }, '📡 Host from this device (no server)') : null,
@@ -88,7 +172,9 @@ defineScreen('online', (el, params, cur) => {
   }
   const ticker = setInterval(() => cards.forEach(c => c.tick()), 500);
   load();
-  return () => { stop = true; clearTimeout(timer); clearInterval(ticker); };
+  mineSec.load();
+  const mineTimer = setInterval(() => { if (!document.hidden) mineSec.load(); }, 10000);
+  return () => { stop = true; clearTimeout(timer); clearInterval(ticker); clearInterval(mineTimer); };
 });
 
 /* --------------------------------------------------------------- join */
@@ -111,7 +197,7 @@ defineScreen('join', async (el, { code: raw = '', fresh = false, via = 'server' 
       go('room', { code, key: r.playerKey, st: r.room, via: seat.via }, { replace: true, skipGuard: true });
       return;
     } catch (e) {
-      if (e.code !== 'network') dropSeat(code);
+      if (e.code !== 'network') dropSeat(code, true);
       if (e.code === 'room_not_found') { notFound(); return; }
     }
   }
@@ -126,6 +212,12 @@ defineScreen('join', async (el, { code: raw = '', fresh = false, via = 'server' 
     return;
   }
   if (cur !== current()) return;
+  if (info.ended) {
+    setQuery('join', null);
+    body.replaceChildren(h('div.panel.net-hero', {}, h('div', { style: { fontSize: '48px' } }, '🏁'), h('h2', {}, 'The host ended this room'),
+      h('p', {}, `Room ${code} isn’t taking players any more.`)), codeEntry(''));
+    return;
+  }
   const name = nameField();
   const err = h('p.net-err', { role: 'alert' });
   const btn = h('button.btn.go.big.wide', { type: 'submit', dataset: { act: 'join' } }, 'Join game');

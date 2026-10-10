@@ -1,15 +1,15 @@
 // The question runner: plays a list of questions with HUD, timer, reveal and scoring.
 // Every structure uses it, and lane S drives it for online rooms and challenge links. API in docs/notes/A.md.
-import { getFormat } from '../formats/registry.js?v=202610100510';
-import { createTimer } from '../core/timer.js?v=202610100510';
-import { basePoints, withStreak, stageMultiplier, progressiveLimit, stageExtendMs, PROGRESSIVE_CAP } from '../core/scoring.js?v=202610100510';
-import { creditsOf, urlsOf, preflight } from '../core/media.js?v=202610100510';
-import { getSettings } from '../core/store.js?v=202610100510';
-import { h, esc, onKey, countUp, fmtNum } from '../ui/kit.js?v=202610100510';
-import { popup, confirmPop } from '../ui/popup.js?v=202610100510';
-import { sfx, haptic, reducedMotion } from '../ui/fx.js?v=202610100510';
-import { speak, stopSpeaking, questionSpeech, canSpeak } from '../ui/speech.js?v=202610100510';
-import { dlog, debugCheck } from '../core/debuglog.js?v=202610100510';
+import { getFormat } from '../formats/registry.js?v=202610100547';
+import { createTimer } from '../core/timer.js?v=202610100547';
+import { basePoints, withStreak, stageMultiplier, progressiveLimit, stageExtendMs, PROGRESSIVE_CAP } from '../core/scoring.js?v=202610100547';
+import { creditsOf, urlsOf, preflight } from '../core/media.js?v=202610100547';
+import { getSettings } from '../core/store.js?v=202610100547';
+import { h, esc, onKey, countUp, fmtNum } from '../ui/kit.js?v=202610100547';
+import { popup, confirmPop } from '../ui/popup.js?v=202610100547';
+import { sfx, haptic, reducedMotion } from '../ui/fx.js?v=202610100547';
+import { speak, stopSpeaking, questionSpeech, canSpeak } from '../ui/speech.js?v=202610100547';
+import { dlog, debugCheck } from '../core/debuglog.js?v=202610100547';
 
 const KIND_RIGHT = ['Brilliant!', 'You got it!', 'Super!', 'Yes!', 'Amazing!'];
 const KIND_WRONG = ['Good try!', 'Nearly!', 'Nice guess!', 'Ooh, close!'];

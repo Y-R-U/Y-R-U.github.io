@@ -170,6 +170,7 @@ func handleCreateRoom(w http.ResponseWriter, r *http.Request) {
 		room.NoStreak = !*in.Streak
 	}
 	p, _ := room.addPlayer(name, uid)
+	room.Owner = p.ID
 	writeJSON(w, 200, map[string]any{"code": room.Code, "hostKey": p.Key, "playerKey": p.Key, "playerId": p.ID,
 		"room": room.stateFor(p)})
 }
@@ -187,7 +188,8 @@ func handlePeek(w http.ResponseWriter, r *http.Request) {
 		host = h.Name
 	}
 	writeJSON(w, 200, map[string]any{"code": room.Code, "phase": room.Phase, "players": len(room.active()),
-		"host": host, "title": room.Title, "total": len(room.Questions), "q": room.Q, "rounds": max(1, len(room.rounds.sizes))})
+		"host": host, "title": room.Title, "total": len(room.Questions), "q": room.Q, "rounds": max(1, len(room.rounds.sizes)),
+		"ended": room.Ended, "public": room.Public, "created": room.Created})
 }
 
 func handleJoin(w http.ResponseWriter, r *http.Request) {
@@ -216,6 +218,10 @@ func handleJoin(w http.ResponseWriter, r *http.Request) {
 		p.LastSeen = nowMs()
 		room.changed()
 		writeJSON(w, 200, map[string]any{"playerId": p.ID, "playerKey": p.Key, "room": room.stateFor(p), "rejoined": true})
+		return
+	}
+	if room.Ended {
+		writeErr(w, 410, "room_ended", "the host ended this room")
 		return
 	}
 	raw := in.Name
@@ -474,10 +480,14 @@ func handleAnswer(w http.ResponseWriter, r *http.Request) {
 
 func handleLeave(w http.ResponseWriter, r *http.Request) {
 	var in struct {
-		Key string `json:"key"`
+		Key       string `json:"key"`
+		PlayerKey string `json:"playerKey"`
 	}
 	if !readJSON(w, r, smallBody, &in) {
 		return
+	}
+	if in.Key == "" {
+		in.Key = in.PlayerKey
 	}
 	withPlayer(w, r.PathValue("code"), in.Key, func(room *Room, p *Player) {
 		room.remove(p, false)
@@ -506,8 +516,14 @@ func handleHostAction(w http.ResponseWriter, r *http.Request) {
 		in.Key = in.HostKey
 	}
 	withPlayer(w, r.PathValue("code"), in.Key, func(room *Room, p *Player) {
-		if p.ID != room.HostID || p.Gone {
+		host := p.ID == room.HostID && !p.Gone
+		owner := room.Owner != "" && p.ID == room.Owner // the creator can end it after leaving or handing over
+		if !host && !(action == "end" && owner) {
 			writeErr(w, 403, "not_host", "only the host can do that")
+			return
+		}
+		if room.Ended && action != "end" {
+			writeErr(w, 409, "room_ended", "the host ended this room")
 			return
 		}
 		switch action {
@@ -538,7 +554,8 @@ func handleHostAction(w http.ResponseWriter, r *http.Request) {
 				return
 			}
 		case "end":
-			room.finish()
+			room.endRoom()
+			resetPublicCache()
 		case "kick":
 			t := room.player(in.PlayerID)
 			if t == nil || t.Gone || t.ID == p.ID {
@@ -743,4 +760,72 @@ func handleVote(w http.ResponseWriter, r *http.Request) {
 		}
 		writeJSON(w, 200, room.stateFor(p))
 	})
+}
+
+// handleMine: the "Your rooms" list. The client sends the seats it remembers; rooms that are gone, ended or no longer
+// know the key come back in "gone" so it can forget them. Read-only: it never counts as being online.
+func handleMine(w http.ResponseWriter, r *http.Request) {
+	if !allow(r, "answer") {
+		rateLimited(w)
+		return
+	}
+	var in struct {
+		Rooms []struct {
+			Code string `json:"code"`
+			Key  string `json:"key"`
+		} `json:"rooms"`
+	}
+	if !readJSON(w, r, smallBody, &in) {
+		return
+	}
+	type mine struct {
+		Code    string `json:"code"`
+		Title   string `json:"title"`
+		Phase   string `json:"phase"`
+		Q       int    `json:"q"`
+		Total   int    `json:"total"`
+		Players int    `json:"players"`
+		Online  int    `json:"online"`
+		Host    string `json:"host"`
+		Public  bool   `json:"public"`
+		Created int64  `json:"created"`
+		Touched int64  `json:"touched"`
+		IsHost  bool   `json:"isHost"`
+		Owner   bool   `json:"owner"`
+		Left    bool   `json:"left,omitempty"`
+	}
+	now := nowMs()
+	out, gone := []mine{}, []string{}
+	for i, s := range in.Rooms {
+		if i >= 30 {
+			break
+		}
+		code := normCode(s.Code)
+		room := getRoom(code)
+		if room == nil {
+			gone = append(gone, code)
+			continue
+		}
+		room.mu.Lock()
+		p := room.byKey(s.Key)
+		if p == nil || p.Kicked || room.Ended || room.dead {
+			room.mu.Unlock()
+			gone = append(gone, code)
+			continue
+		}
+		m := mine{Code: room.Code, Title: room.Title, Phase: room.Phase, Q: room.Q, Total: len(room.Questions),
+			Players: len(room.active()), Public: room.Public, Created: room.Created, Touched: room.Touched,
+			IsHost: p.ID == room.HostID && !p.Gone, Owner: room.Owner != "" && p.ID == room.Owner, Left: p.Gone}
+		for _, x := range room.Players {
+			if x.online(now) {
+				m.Online++
+			}
+		}
+		if h := room.player(room.HostID); h != nil {
+			m.Host = h.Name
+		}
+		room.mu.Unlock()
+		out = append(out, m)
+	}
+	writeJSON(w, 200, map[string]any{"now": now, "rooms": out, "gone": gone})
 }

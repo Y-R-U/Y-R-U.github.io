@@ -1,6 +1,6 @@
 // Device-hosted room logic: a port of server/rooms.go + scoring.go so the host's tab can be the room
 // server. Pure (no DOM, no network), so tools/p2p_test.mjs runs it in node. State shape = the server's.
-import { stageMultiplier, withStreak, progressiveLimit, stageExtendMs, PROGRESSIVE_CAP, autoStages, dueStage } from '../core/scoring.js?v=202610100510';
+import { stageMultiplier, withStreak, progressiveLimit, stageExtendMs, PROGRESSIVE_CAP, autoStages, dueStage } from '../core/scoring.js?v=202610100547';
 export { stageMultiplier, withStreak };
 
 export const MAX_PLAYERS = 8;
@@ -372,7 +372,7 @@ export class P2PRoom {
     }
   }
 
-  // Host leaving: the game ends for everyone with the scores so far.
+  // Host leaving = ending the room ("The host ended the room"): everyone keeps the scores so far.
   close() {
     if (this.closed) return;
     this.closed = true;
