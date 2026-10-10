@@ -20,7 +20,9 @@ All balance data lives in `js/config.js`. Live on GitHub Pages and games.br8t.co
 ## Magnet (2026-10-10)
 
 Player-only green magnet (Aaron: picking greens up exactly is the hardest part on a phone). Pull range is the
-9th upgrade `magnet` (`eff` = px, level 0 = 70 px base that every player gets, even with `?noupg`; max 350).
+9th upgrade `magnet` (`eff` = px). Aaron's numbers: level 0 = 35 px base that every player gets, even with
+`?noupg` (contact alone is ~24 px); +14 px a level, so L8 = 147 px ≈ 2.1× the original 70 px base. The first
+70→350 px version made greens far too easy (he won 30 to 20 at the base level).
 Pull speed `MAGNET_PULL` 240→720 px/s, edge to contact, in `Game._updatePrizes`; a green never gets pulled into a
 wall. Cost ×0.6 (`UPGRADE_COST_MULT`), so max-everything rose by about 5.6k credits. Bots don't get it.
 
@@ -34,7 +36,7 @@ plain Bot. Other flags: `--falsify` (max levels bought, upgrades forced off), `-
 
 ## Difficulty (2026-10-10, second pass)
 
-`DIFFICULTY` in config: Rookie ×1.0, Veteran ×1.25, Ace ×1.5 for **bots only** (`Game.botScale` → `Ship.hullK/fireK`).
+`DIFFICULTY` in config: Rookie ×1.0, Veteran ×1.25, Ace hull ×1.5 / firepower ×1.75 (raised from ×1.5 to offset the magnet) for **bots only** (`Game.botScale` → `Ship.hullK/fireK`).
 "Hull" scales max energy AND recharge. Energy is health and ammo, so a bigger tank refills in the same time;
 gun and bomb costs are unscaled, so firepower is never throttled. "Firepower" scales bullet, bomb, mine and burst
 damage. Aim skill (0.4 / 0.62 / 0.85) is unchanged. The picker shows the buff in words. Credit multipliers are

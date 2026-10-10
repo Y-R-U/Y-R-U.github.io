@@ -172,10 +172,10 @@ check((await ev(`document.querySelector('.diff-line').textContent`)).includes('+
 await layout('ship veteran');
 await ev(`__crazyspace.setHangar({ levels: { hull: 5, reactor: 5, engines: 5, guns: 6, bombs: 7, headstart: 5, shield: 5, aim: 5 }, credits: 1234 })`);
 await ev(`__crazyspace.menu.show('hangar')`); await wait(100); await layout('hangar late levels'); await shot('hangar-late');
-for (const [skill, k] of [[0.4, 1], [0.62, 1.25], [0.85, 1.5]]) {
+for (const [skill, k, f] of [[0.4, 1, 1], [0.62, 1.25, 1.25], [0.85, 1.5, 1.75]]) {
   const r = await ev(`(() => { __crazyspace.startGame('team', 'warbird', ${skill}); const g = __crazyspace.game; const bots = g.ships.filter(s => !s.isPlayer);
-    return { player: [g.player.hullK, g.player.fireK], bots: bots.every(b => b.hullK === ${k} && b.fireK === ${k} && Math.abs(b.maxEff() - b.def.maxEnergy * ${k}) < 1e-6) }; })()`);
-  check(r.player[0] === 1 && r.player[1] === 1 && r.bots, `skill ${skill}: bots x${k} hull/fire, player x1 ${JSON.stringify(r)}`);
+    return { player: [g.player.hullK, g.player.fireK], bots: bots.every(b => b.hullK === ${k} && b.fireK === ${f} && Math.abs(b.maxEff() - b.def.maxEnergy * ${k}) < 1e-6) }; })()`);
+  check(r.player[0] === 1 && r.player[1] === 1 && r.bots, `skill ${skill}: bots x${k} hull x${f} fire, player x1 ${JSON.stringify(r)}`);
   await ev(`__crazyspace.quitToMenu()`);
 }
 

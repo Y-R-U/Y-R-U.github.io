@@ -46,7 +46,7 @@ class Mode {
     if (this.ffa) {
       let best = null;
       for (const s of this.game.ships) if (!best || s.stats.kills > best.stats.kills) best = s;
-      if (best && best.stats.kills >= this.scoreLimit) this.end(best.name + ' wins!', { ship: best });
+      if (best && best.stats.kills >= this.scoreLimit) this.end(best.isPlayer ? 'You win!' : best.name + ' wins!', { ship: best });
     } else {
       for (let t = 0; t < this.teamCount; t++)
         if (this.teamScore[t] >= this.scoreLimit) this.end(TEAMS[t].name + ' Team wins!', { team: t });

@@ -148,7 +148,7 @@ export const MODE_LIST = Object.keys(MODES);
 export const DIFFICULTY = {
   rookie:  { label: 'Rookie',  skill: 0.4,  hull: 1.0,  fire: 1.0 },
   veteran: { label: 'Veteran', skill: 0.62, hull: 1.25, fire: 1.25 },
-  ace:     { label: 'Ace',     skill: 0.85, hull: 1.5,  fire: 1.5 },
+  ace:     { label: 'Ace',     skill: 0.85, hull: 1.5,  fire: 1.75 },
 };
 export function diffKeyFor(skill) {
   return skill < 0.5 ? 'rookie' : skill < 0.75 ? 'veteran' : 'ace';
@@ -180,7 +180,7 @@ export const UPGRADES = [
   { key: 'aim', name: 'Aim Assist', icon: '◎', blurb: 'Your bullets bend toward enemies in front of you. Big help on a phone.',
     eff: [0, 1, 2, 3, 4, 5, 6, 7, 8], fmt: v => aimText(v) },
   { key: 'magnet', name: 'Magnet', icon: '🧲', blurb: 'Greens get pulled in from further away. Every ship starts with a small one.',
-    eff: [70, 95, 120, 145, 170, 200, 240, 290, 350], fmt: v => `${(v / 70).toFixed(1)}× pull range` },
+    eff: [35, 49, 63, 77, 91, 105, 119, 133, 147], fmt: v => `${(v / 35).toFixed(1)}× pull range` },
 ];
 // rising cost per level: cost[L] = price of buying level L
 export const UPGRADE_COST = [0, 20, 30, 40, 50, 65, 1300, 2600, 5200];
