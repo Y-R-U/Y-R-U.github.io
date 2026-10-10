@@ -6,7 +6,9 @@ import {
 import { h, choiceGrid, esc } from '../ui/kit.js?v=202610100510';
 import { basePoints } from '../core/scoring.js?v=202610100510';
 import * as clip from './clip.js?v=202610100510';
-import { revealHTML, BADGE_CSS, art as artUrl, previewUrl } from './apple.js?v=202610100510';
+import { revealHTML, BADGE_CSS, art as artUrl, previewUrl, setArt } from './apple.js?v=202610100510';
+import { net, appleSrc } from './applenet.js?v=202610100510';
+import { maybeProbe } from './probe.js?v=202610100510';
 import { getCtx, unlock, begin, end, ctxInfo } from './ctx.js?v=202610100510';
 import { LISTEN_CSS } from './listen_css.js?v=202610100510';
 import { dlog, modLoaded, buildsSeen } from '../core/debuglog.js?v=202610100510';
@@ -179,8 +181,9 @@ function render(el, q, api) {
   const d = q.data;
   const rn = ++renderSeq, qid = String(q.id || '').replace(/^listen:/, '').slice(-64);
   const L = (msg, data, lvl) => dlog('listen', msg, { r: rn, q: qid, ...ctxInfo(), ...data }, lvl);
-  L('render', { lm: MOD_ID, len: d.len, start: d.start, kind: d.kind, art: d.art, stages: q.stages || 0, mode: api.mode, track: d.a?.apple?.trackId, src: String(d.a?.src || '').slice(-50), piano: clip.isPiano(d.a), vis: globalThis.document?.visibilityState });
+  L('render', { lm: MOD_ID, len: d.len, start: d.start, kind: d.kind, art: d.art, stages: q.stages || 0, mode: api.mode, track: d.a?.apple?.trackId, src: String(d.a?.src || '').slice(-50), piano: clip.isPiano(d.a), broken: net.broken, vis: globalThis.document?.visibilityState });
   L('builds', buildsSeen());
+  if (d.a?.apple) maybeProbe([q], 'render');
   const busyTag = 'listen:' + q.id;
   begin(busyTag);
   const lyrics = d.kind === 'lyrics';
@@ -191,7 +194,7 @@ function render(el, q, api) {
   el.innerHTML = '';
   const wrap = h('div.q.has-media.au-listen', { class: d.layout === 'images' ? 'au-pics' : '' });
   const disc = h('div.au-disc', { class: `art-${d.art}` });
-  if (d.artImg && d.art !== 'off') disc.append(h('img.au-cover', { src: d.artImg.src, alt: '', draggable: 'false' }));
+  if (d.artImg && d.art !== 'off') disc.append(setArt(h('img.au-cover', { alt: '', draggable: 'false' }), d.artImg.src));
   const canvas = h('canvas.au-viz', { width: 300, height: 300, 'aria-hidden': 'true' });
   const ring = h('div.au-ring');
   const play = h('button.au-play', { type: 'button', 'aria-label': 'Play clip' }, h('span.au-ico', { html: '▶' }));
@@ -359,7 +362,7 @@ function render(el, q, api) {
     disc.classList.remove('playing');
     play.hidden = true;
     if (more) more.hidden = true;
-    if (d.artImg && !disc.querySelector('img')) disc.prepend(h('img.au-cover', { src: d.artImg.src, alt: '' }));
+    if (d.artImg && !disc.querySelector('img')) disc.prepend(setArt(h('img.au-cover', { alt: '' }), d.artImg.src));
     disc.classList.add('revealed');
     const img = disc.querySelector('img'); if (img) img.style.filter = '';
     again.hidden = true;
@@ -383,11 +386,21 @@ function render(el, q, api) {
 // optional hook for the shell: refresh stale Apple previews before media preflight
 export async function prepare(questions) {
   const list = questions.filter((q) => q.format === 'listen' && q.data?.a?.apple);
-  dlog('listen', 'prepareAll', { n: list.length });
+  dlog('listen', 'prepareAll', { n: list.length, broken: net.broken });
+  if (list.length) maybeProbe(list, 'prepare');
   await Promise.all(list.map(async (q) => {
     const url = await previewUrl(q.data.a, true).catch(() => null);
     if (url) { q.data.a.src = url; if (q.media?.audio?.[0]) q.media.audio[0].src = url; }
   }));
+  // Apple blocked here: point the media preflight (and the clip loader) at the server proxy
+  if (net.broken) {
+    for (const q of list) {
+      for (const m of q.media?.audio || []) if (m.src) m.src = appleSrc(m.src);
+      q.data.a.src = appleSrc(q.data.a.src);
+      if (q.data.artImg?.src) q.data.artImg.src = appleSrc(q.data.artImg.src);
+    }
+    dlog('listen', 'prepare.proxied', { n: list.length });
+  }
   return questions;
 }
 
@@ -396,7 +409,8 @@ export function preload(q) {
   const d = q?.data;
   if (!d?.a) return Promise.resolve();
   const t0 = performance.now(), qid = String(q.id || '').replace(/^listen:/, '').slice(-64);
-  dlog('listen', 'preload', { q: qid });
+  dlog('listen', 'preload', { q: qid, broken: net.broken });
+  maybeProbe([q], 'preload');
   const p = clip.load(d.a, { start: d.start, len: d.len });
   p.then(() => dlog('listen', 'preload.ok', { q: qid, ms: performance.now() - t0 }), (e) => dlog('listen', 'preload.fail', { q: qid, ms: performance.now() - t0, err: String(e?.message || e) }, 'warn'));
   return p;

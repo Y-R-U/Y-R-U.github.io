@@ -2,6 +2,7 @@
 // Works for Apple previews, Commons/self-hosted files and piano note JSON (audio object {type:'piano', src}).
 import { getCtx, buses, begin, end, ctxInfo } from './ctx.js?v=202610100510';
 import { previewUrl } from './apple.js?v=202610100510';
+import { net, appleSrc, proxyUrl, isApple } from './applenet.js?v=202610100510';
 import * as piano from './piano.js?v=202610100510';
 import { dlog, modLoaded } from '../core/debuglog.js?v=202610100510';
 const MOD_ID = modLoaded('clip', import.meta.url);
@@ -22,12 +23,12 @@ const MAX_SLICES = 40;
 async function fetchDecode(url) {
   const t0 = performance.now();
   dlog('clip', 'fetch', { url: host(url) });
-  let r;
-  try { r = await fetch(url, { mode: 'cors', credentials: 'omit' }); } catch (e) { dlog('clip', 'fetch.fail', { url: host(url), err: String(e), ms: performance.now() - t0 }, 'warn'); throw e; }
-  if (!r.ok) { dlog('clip', 'fetch.bad', { url: host(url), status: r.status, ms: performance.now() - t0 }, 'warn'); throw new Error(r.status + ' ' + url); }
-  const ab = await r.arrayBuffer();
+  let r, ab, via;
+  // Apple hosts: direct with a 5 s first-byte timeout, then the server proxy (applenet.js)
+  try { ({ r, body: ab, via } = await net.get(url, { read: (x) => x.arrayBuffer() })); } catch (e) { dlog('clip', 'fetch.fail', { url: host(url), err: String(e?.message || e), ms: performance.now() - t0 }, 'warn'); throw e; }
+  if (!r.ok) { dlog('clip', 'fetch.bad', { url: host(url), via, status: r.status, ms: performance.now() - t0 }, 'warn'); throw new Error(r.status + ' ' + url); }
   const t1 = performance.now();
-  dlog('clip', 'fetch.ok', { url: host(url), status: r.status, bytes: ab.byteLength, type: r.headers.get('content-type'), ms: t1 - t0, ...cs() });
+  dlog('clip', 'fetch.ok', { url: host(url), via, status: r.status, bytes: ab.byteLength, type: r.headers.get('content-type'), ms: t1 - t0, ...cs() });
   try {
     const buf = await getCtx().decodeAudioData(ab);
     dlog('clip', 'decode.ok', { dur: buf.duration, sr: buf.sampleRate, ch: buf.numberOfChannels, ms: performance.now() - t1, ...cs() });
@@ -150,10 +151,22 @@ export async function stream(a, { start = 0 } = {}) {
   stopAll('stream');
   if (isPiano(a)) return play(a, { start: 0 });
   if (!el) { el = new Audio(); el.dataset.clued = '1'; el.preload = 'auto'; el.crossOrigin = 'anonymous'; }
-  el.src = resolve(await previewUrl(a));
+  const url = resolve(await previewUrl(a));
+  el.src = appleSrc(url);
   el.currentTime = start;
   el.volume = Math.min(1, buses().master.gain.value);
-  await el.play();
+  // a blackholed Apple host never errors quickly: give direct 5 s to start, then switch to the proxy
+  const t0 = performance.now();
+  const started = el.play().then(() => true, (e) => (e?.name === 'NotAllowedError' ? Promise.reject(e) : false));
+  const ok = el.src === url && isApple(url) && !net.broken ? await Promise.race([started, new Promise((r) => setTimeout(() => r(false), 5000))]) : await started;
+  if (!ok && !isApple(url)) throw new Error('stream failed');
+  if (!ok) {
+    dlog('clip', 'stream.fallback', { ms: performance.now() - t0, url: host(url) }, 'warn');
+    el.src = proxyUrl(url);
+    el.currentTime = start;
+    await el.play();
+  }
+  dlog('clip', 'stream.playing', { via: /\/api\/preview\?/.test(el.src) ? 'proxy' : 'direct', ms: performance.now() - t0 });
   const h = { stop: () => el.pause(), elapsed: () => el.currentTime - start, done: new Promise((r) => el.addEventListener('ended', r, { once: true })), element: el };
   current = h;
   return h;

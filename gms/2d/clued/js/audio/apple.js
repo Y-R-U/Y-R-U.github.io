@@ -1,5 +1,6 @@
 // iTunes Search API: lookup by trackId (CORS, JSONP fallback), stale-preview refresh, reveal badge.
 import { dlog, modLoaded } from '../core/debuglog.js?v=202610100510';
+import { net, appleSrc, proxyUrl } from './applenet.js?v=202610100510';
 const MOD_ID = modLoaded('apple', import.meta.url);
 
 const LOOKUP = 'https://itunes.apple.com/lookup';
@@ -21,11 +22,12 @@ function jsonp(url) {
 async function getJSON(url) {
   const t0 = globalThis.performance?.now() ?? 0, u = url.replace('https://itunes.apple.com', '').slice(0, 120);
   try {
-    const r = await fetch(url);
-    if (r.ok) { const j = await r.json(); dlog('apple', 'json', { u, n: j?.resultCount, ms: (globalThis.performance?.now() ?? 0) - t0 }); return j; }
-    dlog('apple', 'json.bad', { u, status: r.status }, 'warn');
-  } catch (e) { dlog('apple', 'json.fail', { u, err: String(e) }, 'warn'); }
-  if (globalThis.document) { dlog('apple', 'jsonp', { u }); return jsonp(url); }
+    const { r, body, via } = await net.get(url, { read: (x) => x.json(), what: 'json' });
+    if (r.ok) { dlog('apple', 'json', { u, via, n: body?.resultCount, ms: (globalThis.performance?.now() ?? 0) - t0 }); return body; }
+    dlog('apple', 'json.bad', { u, via, status: r.status }, 'warn');
+  } catch (e) { dlog('apple', 'json.fail', { u, err: String(e?.message || e) }, 'warn'); }
+  // last resort when the proxy is down too; pointless once Apple is known to be blocked here
+  if (globalThis.document && !net.broken) { dlog('apple', 'jsonp', { u }); return jsonp(url); }
   throw new Error('itunes lookup failed');
 }
 
@@ -65,11 +67,9 @@ export function refresh(trackId, term) {
 export async function previewUrl(a, check = false) {
   if (!a.apple?.trackId) return a.src;
   if (check && a.src) {
-    try {
-      const r = await fetch(a.src, { method: 'HEAD' });
-      dlog('apple', 'head', { id: a.apple.trackId, status: r.status });
-      if (r.ok) return a.src;
-    } catch (e) { dlog('apple', 'head.fail', { id: a.apple.trackId, err: String(e) }, 'warn'); }
+    const ok = await net.head(a.src);
+    dlog('apple', 'head', { id: a.apple.trackId, ok, broken: net.broken });
+    if (ok !== false) return a.src;   // null = network unknown: keep it, the clip loader re-resolves a dead one
   } else if (a.src && !check) return a.src;
   dlog('apple', 'preview.refresh', { am: MOD_ID, id: a.apple.trackId, had: !!a.src, check });
   const t = await refresh(a.apple.trackId, a.apple.term);
@@ -78,13 +78,25 @@ export async function previewUrl(a, check = false) {
   throw new Error('no preview for ' + a.apple.trackId);
 }
 
+// src + a one-shot swap to the server proxy if the artwork host is blocked (onerror)
+export function artAttrs(url) {
+  const s = appleSrc(url), px = proxyUrl(url);
+  return `src="${esc(s)}"` + (px !== s ? ` data-px="${esc(px)}" onerror="this.onerror=null;this.src=this.dataset.px"` : '');
+}
+export function setArt(img, url) {
+  const s = appleSrc(url), px = proxyUrl(url);
+  if (px !== s) img.onerror = () => { img.onerror = null; dlog('applenet', 'img.fallback', { url: url.slice(-60) }, 'warn'); img.src = px; };
+  img.src = s;
+  return img;
+}
+
 const NOTE = '<svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path fill="currentColor" d="M19 3v12.2a3.3 3.3 0 1 1-2-3V7.3l-8 1.8v8.1a3.3 3.3 0 1 1-2-3V5.4z"/></svg>';
 const esc = (s) => String(s ?? '').replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 
 // reveal card: artwork + title/artist + the "Listen on Apple Music" badge
 export function revealHTML(a, { title = '', artist = '', year = '' } = {}) {
   const ap = a.apple || {};
-  const img = ap.art ? `<img class="au-art" src="${esc(art(ap.art, 300))}" alt="" width="150" height="150" loading="eager">` : '';
+  const img = ap.art ? `<img class="au-art" ${artAttrs(art(ap.art, 300))} alt="" width="150" height="150" loading="eager">` : '';
   const sub = [artist, year].filter(Boolean).map(esc).join(' · ');
   return `<div class="au-reveal">${img}<div class="au-meta"><div class="au-title">${esc(title)}</div>${sub ? `<div class="au-sub">${sub}</div>` : ''}` +
     (ap.url ? `<a class="au-apple" href="${esc(ap.url)}" target="_blank" rel="noopener">${NOTE}<span><small>Listen on</small>Apple Music</span></a>` : '') +
