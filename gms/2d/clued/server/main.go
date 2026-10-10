@@ -186,6 +186,9 @@ func routes() http.Handler {
 	api.HandleFunc("POST /api/admin/rooms/{code}/close", requireAdmin(handleAdminClose))
 	api.HandleFunc("POST /api/admin/test-alert", requireAdmin(handleAdminAlertTest))
 	api.HandleFunc("GET /api/status", handleStatus)
+	api.HandleFunc("POST /api/debuglog", handleDebugLog)
+	api.HandleFunc("GET /api/admin/debuglog", requireAdmin(handleAdminDebugGet))
+	api.HandleFunc("POST /api/admin/debuglog", requireAdmin(handleAdminDebugSet))
 	api.HandleFunc("/api/", func(w http.ResponseWriter, r *http.Request) {
 		writeErr(w, http.StatusNotFound, "not_found", "no such endpoint")
 	})
@@ -303,7 +306,7 @@ func logRequests(next http.Handler) http.Handler {
 		next.ServeHTTP(w, r)
 		p := r.URL.Path
 		if strings.Contains(p, "/api/") && !strings.HasSuffix(p, "/health") && !strings.HasSuffix(p, "/events") &&
-			!strings.HasSuffix(p, "/state") && !strings.HasSuffix(p, "/time") {
+			!strings.HasSuffix(p, "/state") && !strings.HasSuffix(p, "/time") && !strings.HasSuffix(p, "/debuglog") {
 			log.Printf("%s %s %s", r.Method, logSafe(p), time.Since(start).Round(time.Millisecond))
 		}
 	})
@@ -322,7 +325,8 @@ func logSafe(s string) string {
 }
 
 // CLI for the box: `clued test-alert` sends one alert through the configured channels;
-// `clued level N` sets the protection level (the running service picks it up on restart).
+// `clued level N` sets the protection level (the running service picks it up on restart);
+// `clued debuglog …` switches/reads remote debug logs (picked up live, see docs/notes/DEBUGLOG.md).
 func runCLI(args []string) {
 	switch args[0] {
 	case "test-alert":
@@ -338,8 +342,10 @@ func runCLI(args []string) {
 			}
 		}
 		fmt.Println("level", level())
+	case "debuglog":
+		debugCLI(args[1:])
 	default:
-		fmt.Fprintln(os.Stderr, "usage: clued [test-alert | level N]")
+		fmt.Fprintln(os.Stderr, "usage: clued [test-alert | level N | debuglog on|off|status|clear|dump]")
 		os.Exit(2)
 	}
 }

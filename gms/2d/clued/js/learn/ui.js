@@ -1,9 +1,10 @@
 // Shared Learn widgets: progress ring, credits popup, sound button, read-aloud button, notice banner.
-import { h, esc } from '../ui/kit.js?v=202610100431';
-import { popup } from '../ui/popup.js?v=202610100431';
-import { speak, canSpeak, stopSpeaking } from '../ui/speech.js?v=202610100431';
-import { BUILD } from '../build.js?v=202610100431';
-import { kidsOn } from './data.js?v=202610100431';
+import { h, esc } from '../ui/kit.js?v=202610100510';
+import { popup } from '../ui/popup.js?v=202610100510';
+import { speak, canSpeak, stopSpeaking } from '../ui/speech.js?v=202610100510';
+import { BUILD } from '../build.js?v=202610100510';
+import { lazyImport } from '../ui/update.js?v=202610100510';
+import { kidsOn } from './data.js?v=202610100510';
 
 export function ring(pct, { size = 44, label = true } = {}) {
   const r = 16, c = 2 * Math.PI * r, p = Math.max(0, Math.min(100, pct || 0));
@@ -25,7 +26,7 @@ export const notice = text => (text ? h('div.l-notice', { role: 'note' }, h('spa
 
 /* ---------- audio: AU's clip player when present, a plain <audio> element otherwise ---------- */
 let clipP = null;
-const clipMod = () => clipP || (clipP = import(`../audio/clip.js?v=${BUILD}`).catch(() => null));
+const clipMod = () => clipP || (clipP = lazyImport(new URL(`../audio/clip.js?v=${BUILD}`, import.meta.url).href).catch(() => (clipP = null)));
 let now = null;   // { btn, handle }
 let fallbackEl = null;
 

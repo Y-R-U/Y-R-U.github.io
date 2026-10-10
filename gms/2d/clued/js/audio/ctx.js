@@ -1,4 +1,6 @@
 // Shared AudioContext, buses and the mobile unlock. sfx, piano and clips all route through here.
+import { dlog, modLoaded } from '../core/debuglog.js?v=202610100510';
+const MOD_ID = modLoaded('ctx', import.meta.url);
 let ctx = null, master = null, sfxBus = null, musicBus = null, comp = null;
 const state = { volume: 0.8, sfx: 1, music: 1, muted: false };
 const unlockCbs = [];
@@ -11,6 +13,9 @@ export function getCtx() {
   // iOS mutes Web Audio under the ringer's silent switch unless the session is "playback" (Safari 16.4+).
   try { if (navigator.audioSession) navigator.audioSession.type = 'playback'; } catch {}
   ctx = new AC({ latencyHint: 'interactive' });
+  ctx.__id ||= 'ac?-' + Math.random().toString(36).slice(2, 5);
+  dlog('ctx', 'create', { ac: ctx.__id, m: MOD_ID, n: globalThis.__cluedAC?.n, state: ctx.state, sr: ctx.sampleRate, base: ctx.baseLatency, out: ctx.outputLatency, webkit: !globalThis.AudioContext });
+  ctx.addEventListener?.('statechange', () => dlog('ctx', 'statechange', { ac: ctx.__id, state: ctx.state, t: ctx.currentTime, vis: globalThis.document?.visibilityState }));
   comp = ctx.createDynamicsCompressor();
   comp.threshold.value = -10; comp.knee.value = 8; comp.ratio.value = 4;
   comp.attack.value = 0.003; comp.release.value = 0.2;
@@ -55,9 +60,14 @@ const clamp = (v) => Math.max(0, Math.min(1, +v || 0));
 export function onUnlock(cb) { unlocked ? cb() : unlockCbs.push(cb); }
 export const isUnlocked = () => unlocked && ctx && ctx.state === 'running';
 
+let unlockN = 0;
+// state + identity: ac = which AudioContext, m = which ctx.js instance, n = AudioContexts created in the page
+export const ctxInfo = () => (ctx ? { st: ctx.state, t: Math.round(ctx.currentTime * 1000) / 1000, ac: ctx.__id, m: MOD_ID, n: globalThis.__cluedAC?.n } : { st: 'none', m: MOD_ID });
 export function unlock() {
   const c = getCtx();
   if (!c) return Promise.resolve(false);
+  const n = ++unlockN, before = c.state;
+  dlog('ctx', 'unlock', { n, before, unlocked, act: globalThis.navigator?.userActivation?.isActive });
   // a silent one-sample buffer started inside the gesture is what iOS wants
   try {
     const b = c.createBuffer(1, 1, 22050), s = c.createBufferSource();
@@ -65,9 +75,10 @@ export function unlock() {
   } catch {}
   if (!navigator.audioSession) silentKeepAlive();
   return c.resume().then(() => {
+    dlog('ctx', 'unlock.ok', { n, before, after: c.state });
     if (!unlocked) { unlocked = true; unlockCbs.splice(0).forEach((f) => { try { f(); } catch {} }); }
     return true;
-  }).catch(() => false);
+  }).catch((e) => { dlog('ctx', 'unlock.fail', { n, before, after: c.state, err: String(e) }, 'warn'); return false; });
 }
 
 // Older iOS: a looping silent <audio> started in a gesture moves the session to playback so Web Audio ignores
@@ -82,7 +93,8 @@ function silentKeepAlive() {
   v.setUint16(32, 2, true); v.setUint16(34, 16, true); str(36, 'data'); v.setUint32(40, n * 2, true);
   keepAlive = new Audio(URL.createObjectURL(new Blob([buf], { type: 'audio/wav' })));
   keepAlive.__cluedBgm = true; keepAlive.loop = true; keepAlive.setAttribute('playsinline', '');
-  keepAlive.play()?.catch?.(() => { keepAlive = null; });
+  dlog('ctx', 'keepAlive.play');
+  keepAlive.play()?.then?.(() => dlog('ctx', 'keepAlive.ok'), (e) => { dlog('ctx', 'keepAlive.fail', { err: String(e) }, 'warn'); keepAlive = null; });
 }
 
 // call once at boot; resumes on the first real gesture (and again after iOS interruptions)
@@ -95,14 +107,18 @@ export function installUnlock(target = globalThis.document) {
   const wake = () => {
     if (!ctx) return unlock();
     try { if (navigator.audioSession) navigator.audioSession.type = 'playback'; } catch {}
-    if (keepAlive && keepAlive.paused) keepAlive.play()?.catch?.(() => {});
+    if (keepAlive && keepAlive.paused) { dlog('ctx', 'keepAlive.replay'); keepAlive.play()?.catch?.(() => {}); }
     if (ctx.state !== 'running') unlock();
   };
   ['pointerdown', 'touchend', 'keydown'].forEach((e) => target.addEventListener(e, wake, true));
   const back = () => {
     if (target.visibilityState !== 'visible' || !ctx || !unlocked) return;
     try { if (navigator.audioSession) navigator.audioSession.type = 'playback'; } catch {}
-    if (ctx.state !== 'running') ctx.resume().catch(() => {});
+    if (ctx.state !== 'running') {
+      const before = ctx.state;
+      dlog('ctx', 'resume', { why: 'back', before });
+      ctx.resume().then(() => dlog('ctx', 'resume.ok', { before, after: ctx.state }), (e) => dlog('ctx', 'resume.fail', { before, err: String(e) }, 'warn'));
+    }
   };
   target.addEventListener('visibilitychange', back);
   globalThis.addEventListener?.('pageshow', back);
@@ -136,10 +152,16 @@ const emit = () => busyFns.forEach((f) => { try { f(); } catch {} });
 export const onBusy = (fn) => (busyFns.add(fn), () => busyFns.delete(fn));
 export const busy = () => busyTags.size > 0;
 export const ducked = () => duckTags.size > 0;
-export function begin(tag) { busyTags.set(tag, (busyTags.get(tag) || 0) + 1); emit(); }
-export function end(tag) { const n = (busyTags.get(tag) || 0) - 1; n > 0 ? busyTags.set(tag, n) : busyTags.delete(tag); emit(); }
-export function duckBegin(tag) { duckTags.set(tag, 1); emit(); }
-export function duckEnd(tag) { duckTags.delete(tag); emit(); }
+// begin/end are counted per tag: an unmatched begin leaves bgm paused forever, so both log the live count.
+export function begin(tag) { busyTags.set(tag, (busyTags.get(tag) || 0) + 1); dlog('busy', 'begin', { tag, n: busyTags.get(tag), total: busyTags.size }); emit(); }
+export function end(tag) {
+  const had = busyTags.get(tag) || 0, n = had - 1;
+  n > 0 ? busyTags.set(tag, n) : busyTags.delete(tag);
+  dlog('busy', had ? 'end' : 'end.unmatched', { tag, n: Math.max(0, n), total: busyTags.size, tags: busyTags.size ? [...busyTags.keys()].slice(0, 6) : undefined }, had ? 'info' : 'warn');
+  emit();
+}
+export function duckBegin(tag) { duckTags.set(tag, 1); dlog('busy', 'duck.begin', { tag, total: duckTags.size }); emit(); }
+export function duckEnd(tag) { if (duckTags.delete(tag)) dlog('busy', 'duck.end', { tag, total: duckTags.size }); emit(); }
 
 let mediaSeq = 0;
 function patchMedia() {
@@ -150,6 +172,7 @@ function patchMedia() {
   M.prototype.play = function (...args) {
     if (!this.__cluedBgm && !this.__cluedTag) {
       const tag = this.__cluedTag = 'media' + (++mediaSeq);
+      dlog('media', 'play', { tag, src: String(this.currentSrc || this.src || '').slice(0, 90) });
       begin(tag);
       const off = () => {
         if (this.__cluedTag !== tag) return;

@@ -1,7 +1,9 @@
 // Background music: a shuffled playlist of gentle public-domain piano pieces on the sampled piano.
 // Pauses (fades out, remembers the spot) whenever anything else with sound plays, resumes 1 s after; ducks under speech.
-import { getCtx, buses, onBusy, busy, ducked, unlock } from './ctx.js?v=202610100431';
-import * as piano from './piano.js?v=202610100431';
+import { getCtx, buses, onBusy, busy, ducked, unlock } from './ctx.js?v=202610100510';
+import * as piano from './piano.js?v=202610100510';
+import { dlog, modLoaded } from '../core/debuglog.js?v=202610100510';
+const MOD_ID = modLoaded('bgm', import.meta.url);
 
 const LEVEL = 0.35, DUCK = 0.15, FADE_IN = 3, FADE_OUT = 1.2, GAP = 3.5, TAIL = 5;
 const INDEX = new URL('../../data/music/bgm/index.json', import.meta.url);
@@ -64,6 +66,7 @@ async function begin(from) {
   const h = await piano.play(piece, { from, dest: node(), bgm: true, lead: 0.1 });
   if (!wanted || paused() || piece !== curPiece) { h.stop(0.05); return; }
   cur = h; curStarted = getCtx().currentTime - from;
+  dlog('bgm', 'start', { bm: MOD_ID, piece: piece.title, from: Math.round(from * 10) / 10, ctx: getCtx().state });
   ramp(target(), from ? 1.5 : FADE_IN);
   const left = piano.duration(piece) - from;
   // fade the tail (pieces are cut at ~150 s), then a quiet gap before the next one
@@ -80,6 +83,7 @@ function halt() {
   const h = cur;
   cur = null;
   pos = Math.max(0, getCtx().currentTime - curStarted - 0.5);
+  dlog('bgm', 'halt', { pos: Math.round(pos), reasons: [...reasons].map(([k, n]) => k + ':' + n), busy: busy(), hidden: globalThis.document?.visibilityState === 'hidden' });
   ramp(0, FADE_OUT);
   setTimeout(() => h.stop(0.05), FADE_OUT * 1000 + 50);
 }
@@ -90,7 +94,7 @@ function update() {
   if (paused()) { halt(); return; }
   if (cur) { ramp(target(), 0.4); return; }
   // resume a second after the other sound ends, from where we left off
-  resumeT = setTimeout(() => { if (wanted && !paused() && !cur) startPiece(curPiece ? pos : 0); }, 1000);
+  resumeT = setTimeout(() => { if (wanted && !paused() && !cur) { dlog('bgm', 'resume', { pos: curPiece ? Math.round(pos) : 0 }); startPiece(curPiece ? pos : 0); } }, 1000);
 }
 
 let wired = false;
@@ -102,6 +106,7 @@ function wire() {
 }
 
 export async function play() {
+  dlog('bgm', 'play');
   wire();
   wanted = true;
   await unlock();
@@ -109,21 +114,24 @@ export async function play() {
 }
 
 export function stop() {
+  dlog('bgm', 'stop');
   wanted = false;
   clearTimeout(resumeT);
   halt();
   curPiece = null; pos = 0;
 }
 
-export function pause(reason = 'manual') { reasons.set(reason, (reasons.get(reason) || 0) + 1); update(); }
+export function pause(reason = 'manual') { reasons.set(reason, (reasons.get(reason) || 0) + 1); dlog('bgm', 'pause', { reason, n: reasons.get(reason), total: reasons.size }); update(); }
 export function resume(reason = 'manual') {
-  const n = (reasons.get(reason) || 0) - 1;
+  const had = reasons.get(reason) || 0, n = had - 1;
   n > 0 ? reasons.set(reason, n) : reasons.delete(reason);
+  dlog('bgm', had ? 'unpause' : 'unpause.unmatched', { reason, n: Math.max(0, n), total: reasons.size }, had ? 'info' : 'warn');
   update();
 }
 
 export function duck(on, reason = 'manual') {
   on ? ducks.add(reason) : ducks.delete(reason);
+  dlog('bgm', on ? 'duck' : 'unduck', { reason, total: ducks.size });
   if (cur) ramp(target(), 0.3);
 }
 

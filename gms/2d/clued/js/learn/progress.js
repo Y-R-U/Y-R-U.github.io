@@ -1,12 +1,13 @@
 // Mastery: overall numbers, the world map coloured by countries learned, pack progress rings, kids stickers.
-import { h } from '../ui/kit.js?v=202610100431';
-import { header, go } from '../ui/app.js?v=202610100431';
-import { kidsProgress } from '../ui/stickers.js?v=202610100431';
-import { themeTree, getPack, kidsOn } from './data.js?v=202610100431';
-import { getMastery, getCards, packPct } from './model.js?v=202610100431';
-import { countryScores, mapBand, level } from './mastery.js?v=202610100431';
-import { ring } from './ui.js?v=202610100431';
-import { BUILD } from '../build.js?v=202610100431';
+import { h } from '../ui/kit.js?v=202610100510';
+import { header, go } from '../ui/app.js?v=202610100510';
+import { kidsProgress } from '../ui/stickers.js?v=202610100510';
+import { themeTree, getPack, kidsOn } from './data.js?v=202610100510';
+import { getMastery, getCards, packPct } from './model.js?v=202610100510';
+import { countryScores, mapBand, level } from './mastery.js?v=202610100510';
+import { ring } from './ui.js?v=202610100510';
+import { BUILD } from '../build.js?v=202610100510';
+import { lazyImport } from '../ui/update.js?v=202610100510';
 
 const GEO_PACKS = ['countries', 'flags', 'capitals'];
 const BAND = ['', 'lm1', 'lm2', 'lm3'];
@@ -61,7 +62,7 @@ export async function masteryScreen(el) {
 
 async function drawMap(box, note, m, c) {
   let mapMod;
-  try { mapMod = await import(`../geo/map.js?v=${BUILD}`); } catch (e) { box.replaceWith(Object.assign(document.createElement('p'), { className: 'muted', textContent: 'The map is not available yet.' })); return; }
+  try { mapMod = await lazyImport(new URL(`../geo/map.js?v=${BUILD}`, import.meta.url).href); } catch (e) { box.replaceWith(Object.assign(document.createElement('p'), { className: 'muted', textContent: 'The map is not available yet.' })); return; }
   const isoRefs = await isoRefMap();
   const scores = countryScores(isoRefs, m.items, c.cards);
   let map;

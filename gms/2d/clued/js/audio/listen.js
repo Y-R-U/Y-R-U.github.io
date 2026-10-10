@@ -2,13 +2,17 @@
 // Also "finish the line" for public-domain songs (items with `lyrics`).
 import {
   register, poolItems, distractors, byDifficulty, placeAnswer, collect, pick, shuffle, hasAudio, imageOf, hasImg, pickPack,
-} from '../formats/registry.js?v=202610100431';
-import { h, choiceGrid, esc } from '../ui/kit.js?v=202610100431';
-import { basePoints } from '../core/scoring.js?v=202610100431';
-import * as clip from './clip.js?v=202610100431';
-import { revealHTML, BADGE_CSS, art as artUrl, previewUrl } from './apple.js?v=202610100431';
-import { getCtx, unlock, begin, end } from './ctx.js?v=202610100431';
-import { LISTEN_CSS } from './listen_css.js?v=202610100431';
+} from '../formats/registry.js?v=202610100510';
+import { h, choiceGrid, esc } from '../ui/kit.js?v=202610100510';
+import { basePoints } from '../core/scoring.js?v=202610100510';
+import * as clip from './clip.js?v=202610100510';
+import { revealHTML, BADGE_CSS, art as artUrl, previewUrl } from './apple.js?v=202610100510';
+import { getCtx, unlock, begin, end, ctxInfo } from './ctx.js?v=202610100510';
+import { LISTEN_CSS } from './listen_css.js?v=202610100510';
+import { dlog, modLoaded, buildsSeen } from '../core/debuglog.js?v=202610100510';
+const MOD_ID = modLoaded('listen', import.meta.url);
+
+let renderSeq = 0;
 
 const CLIPS = [1, 2, 3, 5, 10, 15, 30];
 const CLIP_MUL = { 1: 2, 2: 1.7, 3: 1.5, 5: 1.25, 10: 1, 15: 0.85, 30: 0.7 };
@@ -173,6 +177,10 @@ function css() {
 function render(el, q, api) {
   css();
   const d = q.data;
+  const rn = ++renderSeq, qid = String(q.id || '').replace(/^listen:/, '').slice(-64);
+  const L = (msg, data, lvl) => dlog('listen', msg, { r: rn, q: qid, ...ctxInfo(), ...data }, lvl);
+  L('render', { lm: MOD_ID, len: d.len, start: d.start, kind: d.kind, art: d.art, stages: q.stages || 0, mode: api.mode, track: d.a?.apple?.trackId, src: String(d.a?.src || '').slice(-50), piano: clip.isPiano(d.a), vis: globalThis.document?.visibilityState });
+  L('builds', buildsSeen());
   const busyTag = 'listen:' + q.id;
   begin(busyTag);
   const lyrics = d.kind === 'lyrics';
@@ -212,7 +220,7 @@ function render(el, q, api) {
   const ctx2d = canvas.getContext('2d');
   function draw() {
     if (dead) return;
-    if (!wrap.isConnected) { ctrlObj.destroy(); return; }  // the runner replaced the stage without calling destroy
+    if (!wrap.isConnected) { L('detached'); ctrlObj.destroy('detached'); return; }  // the runner replaced the stage without calling destroy
     raf = requestAnimationFrame(draw);
     const W = canvas.width, H = canvas.height;
     ctx2d.clearRect(0, 0, W, H);
@@ -239,52 +247,61 @@ function render(el, q, api) {
     }
   }
 
-  const setStatus = (t) => { status.textContent = t; };
+  const setStatus = (t) => { if (status.textContent !== t) L('status', { text: t }); status.textContent = t; };
+  const showPlay = (why) => { L('playButton', { why }); play.hidden = false; };
   function updateAgain() {
     again.hidden = played === 0 || done || replaysLeft === 0;
     again.textContent = replaysLeft < 0 ? '↻ Play again' : `↻ Replay (${replaysLeft} left)`;
   }
 
-  async function start(isReplay) {
-    if (dead) return;
+  let startN = 0;
+  async function start(isReplay, why = '') {
+    const sn = ++startN;
+    L('start', { sn, replay: !!isReplay, why, dead, done, played });
+    if (dead) { L('start.exit', { sn, reason: 'dead' }); return; }
     try {
-      if (getCtx().state !== 'running') await unlock();
-      if (getCtx().state !== 'running') { setStatus('Tap ▶ to listen'); play.hidden = false; return; }
+      if (getCtx().state !== 'running') { L('start.unlock', { sn }); await unlock(); }
+      if (getCtx().state !== 'running') { L('start.exit', { sn, reason: 'ctx-not-running' }, 'warn'); setStatus('Tap ▶ to listen'); showPlay('ctx-not-running'); return; }
       play.hidden = true;
       disc.classList.add('playing');
       setStatus('Loading…');
-      if (dead) return;
+      if (dead) { L('start.exit', { sn, reason: 'dead-after-unlock' }); return; }
       handle = await clip.play(d.a, { start: d.start, len: d.len, playLen: playLen(), alive: () => !dead });
-      if (dead) { handle.stop(); return; }
+      if (dead) { L('start.exit', { sn, reason: 'dead-after-play', clip: handle.id }); handle.stop(undefined, 'listen-dead-after-play'); return; }
+      L('start.playing', { sn, clip: handle.id, length: handle.length });
       setStatus(isReplay ? 'Listening again…' : 'Listening…');
       played++;
       if (isReplay && replaysLeft > 0) replaysLeft--;
+      const h0 = handle;
       handle.done.then(() => {
+        L('clipDone', { sn, clip: h0.id, elapsed: h0.elapsed?.(), dead, done, current: handle === h0 });
         if (dead) return;
         disc.classList.remove('playing');
-        if (!done) { setStatus(lyrics ? 'Pick the next line' : 'Pick your answer'); play.hidden = false; play.firstChild.innerHTML = '↻'; }
+        if (!done) { setStatus(lyrics ? 'Pick the next line' : 'Pick your answer'); showPlay('replay-after-end'); play.firstChild.innerHTML = '↻'; }
         updateAgain();
       });
       updateAgain();
       again.hidden = true;
     } catch (e) {
-      if (e?.superseded || dead) return;
+      if (e?.superseded || dead) { L('start.exit', { sn, reason: e?.superseded ? 'superseded' : 'dead-in-catch', err: String(e?.message || e) }); return; }
       console.warn('[listen] clip failed', e);
+      L('start.fail', { sn, err: String(e?.message || e), name: e?.name }, 'warn');
       setStatus('This clip would not load');
-      play.hidden = false;
+      showPlay('failed');
     }
   }
   play.addEventListener('click', () => {
-    if (handle && played && !done) { if (replaysLeft === 0) return; start(true); } else start(false);
+    L('tap.play', { played, replaysLeft, done, hasHandle: !!handle });
+    if (handle && played && !done) { if (replaysLeft === 0) return; start(true, 'tap'); } else start(false, 'tap');
   });
-  again.addEventListener('click', () => start(true));
+  again.addEventListener('click', () => { L('tap.again', { replaysLeft }); start(true, 'tap-again'); });
 
   function setStage(n) {
     if (dead || done || n <= stage) return;
     stage = Math.min(q.stages - 1, n);
     if (more) more.hidden = stage >= q.stages - 1;
     setStatus(`${playLen()} s clip`);
-    start(false);
+    start(false, 'stage');
   }
   if (staged) {
     if (more) {
@@ -298,12 +315,16 @@ function render(el, q, api) {
   }
 
   // preload, then autoplay (the runner's tap on "Next" has already unlocked audio)
-  clip.load(d.a, { start: d.start, len: d.len }).then(() => {
+  const pt0 = performance.now();
+  L('prepare');
+  clip.load(d.a, { start: d.start, len: d.len }).then((c) => {
+    L('prepare.ok', { ms: performance.now() - pt0, dead, bufDur: c?.buffer?.duration ?? c?.duration });
     if (dead) return;
     if (lyrics) { setStatus('Tap ▶ to hear the tune'); return; }
     setStatus('Ready');
-    start(false);
-  }, () => setStatus('This clip would not load'));
+    L('autoplay');
+    start(false, 'autoplay');
+  }, (e) => { L('prepare.fail', { ms: performance.now() - pt0, err: String(e?.message || e) }, 'warn'); setStatus('This clip would not load'); });
   draw();
 
   function points(correct) {
@@ -333,7 +354,8 @@ function render(el, q, api) {
   }
 
   function finish(correct, given) {
-    if (handle && !lyrics) handle.stop(0.4);
+    L('answer', { correct, given, played, clip: handle?.id });
+    if (handle && !lyrics) handle.stop(0.4, 'listen-answer');
     disc.classList.remove('playing');
     play.hidden = true;
     if (more) more.hidden = true;
@@ -345,12 +367,12 @@ function render(el, q, api) {
     api.reveal(revealNode());
     const pts = points(correct);
     api.answer({ correct, given, ...(pts != null ? { points: pts } : {}), replays: Math.max(0, played - 1), detail: { played, len: playLen(), art: d.art, stage } });
-    if (lyrics) start(false);
+    if (lyrics) start(false, 'lyrics-reveal');
   }
 
   const ctrlObj = {
-    destroy() { if (!dead) end(busyTag); dead = true; cancelAnimationFrame(raf); if (handle) clip.stopHandle(handle, 0.15); grid.destroy(); },
-    timeout() { if (done) return; done = true; grid.lock(); grid.mark(q.answer, -1); if (handle) handle.stop(0.3); },
+    destroy(why = 'runner') { L('destroy', { why, was: dead, clip: handle?.id }); if (!dead) end(busyTag); dead = true; cancelAnimationFrame(raf); if (handle) clip.stopHandle(handle, 0.15, 'listen-destroy'); grid.destroy(); },
+    timeout() { L('timeout', { done, clip: handle?.id }); if (done) return; done = true; grid.lock(); grid.mark(q.answer, -1); if (handle) handle.stop(0.3, 'listen-timeout'); },
     eliminate(k = 2) { grid.eliminate(q.answer, k, api.rng || Math.random); },
     choose(x) { grid.pick(x === 'correct' ? q.answer : x === 'wrong' ? (q.answer + 1) % q.options.length : +x); },
     hint() { return d.meta.year ? `It came out in ${d.meta.year}` : d.meta.artist ? `Think of ${d.meta.artist}` : null; },
@@ -361,6 +383,7 @@ function render(el, q, api) {
 // optional hook for the shell: refresh stale Apple previews before media preflight
 export async function prepare(questions) {
   const list = questions.filter((q) => q.format === 'listen' && q.data?.a?.apple);
+  dlog('listen', 'prepareAll', { n: list.length });
   await Promise.all(list.map(async (q) => {
     const url = await previewUrl(q.data.a, true).catch(() => null);
     if (url) { q.data.a.src = url; if (q.media?.audio?.[0]) q.media.audio[0].src = url; }
@@ -372,7 +395,11 @@ export async function prepare(questions) {
 export function preload(q) {
   const d = q?.data;
   if (!d?.a) return Promise.resolve();
-  return clip.load(d.a, { start: d.start, len: d.len });
+  const t0 = performance.now(), qid = String(q.id || '').replace(/^listen:/, '').slice(-64);
+  dlog('listen', 'preload', { q: qid });
+  const p = clip.load(d.a, { start: d.start, len: d.len });
+  p.then(() => dlog('listen', 'preload.ok', { q: qid, ms: performance.now() - t0 }), (e) => dlog('listen', 'preload.fail', { q: qid, ms: performance.now() - t0, err: String(e?.message || e) }, 'warn'));
+  return p;
 }
 
 export default register({

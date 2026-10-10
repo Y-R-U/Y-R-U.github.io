@@ -1,26 +1,28 @@
-import { BUILD } from './build.js?v=202610100431';
-import { loadFormats } from './formats/index.js?v=202610100431';
-import { getFormat, listFormats, register } from './formats/registry.js?v=202610100431';
-import { loadIndex, loadPack, loadPacks, getIndex } from './core/packs.js?v=202610100431';
-import { buildQuestions, makeSpec } from './core/spec.js?v=202610100431';
-import { preflight, urlsOf, swapFailed } from './core/media.js?v=202610100431';
-import * as store from './core/store.js?v=202610100431';
-import { mountApp, defineScreen, go, back, reset, header, current, canPester } from './ui/app.js?v=202610100431';
-import { h } from './ui/kit.js?v=202610100431';
-import { popup, toast, confirmPop } from './ui/popup.js?v=202610100431';
-import { sfx, haptic, confetti } from './ui/fx.js?v=202610100431';
-import { shareText } from './ui/share.js?v=202610100431';
-import { loadNet } from './ui/net.js?v=202610100431';
-import { applyAll } from './ui/settings.js?v=202610100431';
-import { armBgm } from './ui/toggles.js?v=202610100431';
-import { setMatchCompleted } from './ui/results.js?v=202610100431';
-import './ui/home.js?v=202610100431';
-import './ui/setup.js?v=202610100431';
-import './ui/statspage.js?v=202610100431';
-import { createRunner } from './structures/runner.js?v=202610100431';
-import { prepare, playSpec } from './structures/session.js?v=202610100431';
-import { STRUCTURES } from './structures/index.js?v=202610100431';
-import { handoff } from './structures/handoff.js?v=202610100431';
+import { BUILD } from './build.js?v=202610100510';
+import './core/debuglog.js?v=202610100510';   // remote debug log (server-switched, docs/notes/DEBUGLOG.md)
+import { loadFormats } from './formats/index.js?v=202610100510';
+import { getFormat, listFormats, register } from './formats/registry.js?v=202610100510';
+import { loadIndex, loadPack, loadPacks, getIndex } from './core/packs.js?v=202610100510';
+import { buildQuestions, makeSpec } from './core/spec.js?v=202610100510';
+import { preflight, urlsOf, swapFailed } from './core/media.js?v=202610100510';
+import * as store from './core/store.js?v=202610100510';
+import { mountApp, defineScreen, go, back, reset, header, current, canPester } from './ui/app.js?v=202610100510';
+import { h } from './ui/kit.js?v=202610100510';
+import { popup, toast, confirmPop } from './ui/popup.js?v=202610100510';
+import { sfx, haptic, confetti } from './ui/fx.js?v=202610100510';
+import { shareText } from './ui/share.js?v=202610100510';
+import { loadNet } from './ui/net.js?v=202610100510';
+import { watchVersion, checkVersion, updateState } from './ui/update.js?v=202610100510';
+import { applyAll } from './ui/settings.js?v=202610100510';
+import { armBgm } from './ui/toggles.js?v=202610100510';
+import { setMatchCompleted } from './ui/results.js?v=202610100510';
+import './ui/home.js?v=202610100510';
+import './ui/setup.js?v=202610100510';
+import './ui/statspage.js?v=202610100510';
+import { createRunner } from './structures/runner.js?v=202610100510';
+import { prepare, playSpec } from './structures/session.js?v=202610100510';
+import { STRUCTURES } from './structures/index.js?v=202610100510';
+import { handoff } from './structures/handoff.js?v=202610100510';
 
 const params = new URLSearchParams(location.search);
 const TEST = params.has('test') || params.has('noauth');
@@ -69,6 +71,21 @@ function hooks() {
     run: () => window.__cluedRun,
     state: () => ({ screen: current()?.name, run: window.__cluedRun ? { ...window.__cluedRun.state, players: undefined, answers: window.__cluedRun.state.answers.length } : null, q: window.__cluedRun?.current() || null }),
     canPester,
+    checkVersion, updateState,
+    // Test helper: what a tap at each point of a grid would hit. Anything outside the live screen, an open popup,
+    // the update banner or the account widget is an overlay eating taps.
+    hits({ cols = 5, rows = 10 } = {}) {
+      const scr = current()?.el, bad = [];
+      const ok = el => !el || el === document.body || el === document.documentElement || el.id === 'app' || scr?.contains(el)
+        || el.closest('#popups .pop:not(.out), .upd-banner, #br8t-account');
+      const name = el => el.tagName.toLowerCase() + (el.id ? '#' + el.id : '') + (el.className && typeof el.className === 'string' ? '.' + el.className.trim().split(/\s+/).join('.') : '');
+      for (let r = 0; r < rows; r++) for (let c = 0; c < cols; c++) {
+        const x = Math.round((c + 0.5) * innerWidth / cols), y = Math.round((r + 0.5) * innerHeight / rows);
+        const el = document.elementFromPoint(x, y);
+        if (!ok(el)) bad.push({ x, y, el: name(el) });
+      }
+      return { screen: current()?.name, bad };
+    },
   };
 }
 
@@ -78,6 +95,7 @@ async function boot() {
   const [fr] = await Promise.all([loadFormats(), loadIndex()]);
   if (fr.failed.length) console.warn('[clued] formats failed to load:', fr.failed.join(', '));
   mountApp(document.getElementById('app'));
+  watchVersion({ poll: !TEST || params.has('vcheck') });
   import(`./learn/hook.js?v=${BUILD}`).then(m => m.install()).catch(() => {});
   hooks();
   await go('home', {}, { replace: true });

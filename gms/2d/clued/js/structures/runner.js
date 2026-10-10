@@ -1,14 +1,15 @@
 // The question runner: plays a list of questions with HUD, timer, reveal and scoring.
 // Every structure uses it, and lane S drives it for online rooms and challenge links. API in docs/notes/A.md.
-import { getFormat } from '../formats/registry.js?v=202610100431';
-import { createTimer } from '../core/timer.js?v=202610100431';
-import { basePoints, withStreak, stageMultiplier, progressiveLimit, stageExtendMs, PROGRESSIVE_CAP } from '../core/scoring.js?v=202610100431';
-import { creditsOf, urlsOf, preflight } from '../core/media.js?v=202610100431';
-import { getSettings } from '../core/store.js?v=202610100431';
-import { h, esc, onKey, countUp, fmtNum } from '../ui/kit.js?v=202610100431';
-import { popup, confirmPop } from '../ui/popup.js?v=202610100431';
-import { sfx, haptic, reducedMotion } from '../ui/fx.js?v=202610100431';
-import { speak, stopSpeaking, questionSpeech, canSpeak } from '../ui/speech.js?v=202610100431';
+import { getFormat } from '../formats/registry.js?v=202610100510';
+import { createTimer } from '../core/timer.js?v=202610100510';
+import { basePoints, withStreak, stageMultiplier, progressiveLimit, stageExtendMs, PROGRESSIVE_CAP } from '../core/scoring.js?v=202610100510';
+import { creditsOf, urlsOf, preflight } from '../core/media.js?v=202610100510';
+import { getSettings } from '../core/store.js?v=202610100510';
+import { h, esc, onKey, countUp, fmtNum } from '../ui/kit.js?v=202610100510';
+import { popup, confirmPop } from '../ui/popup.js?v=202610100510';
+import { sfx, haptic, reducedMotion } from '../ui/fx.js?v=202610100510';
+import { speak, stopSpeaking, questionSpeech, canSpeak } from '../ui/speech.js?v=202610100510';
+import { dlog, debugCheck } from '../core/debuglog.js?v=202610100510';
 
 const KIND_RIGHT = ['Brilliant!', 'You got it!', 'Super!', 'Yes!', 'Amazing!'];
 const KIND_WRONG = ['Good try!', 'Nearly!', 'Nice guess!', 'Ooh, close!'];
@@ -28,6 +29,9 @@ function stageStyles() {
 
 export function createRunner(host, cfg = {}) {
   stageStyles();
+  debugCheck();   // a new game picks up the server's debug-log switch without a reload
+  const runId = Math.random().toString(36).slice(2, 6);
+  const R = (msg, data, lvl) => dlog('run', msg, { run: runId, i: state.i, ...data }, lvl);
   const settings = getSettings();
   const kidsAll = !!cfg.kids;
   let kids = kidsAll;   // per question: party mixes kids and grown-up players
@@ -52,6 +56,7 @@ export function createRunner(host, cfg = {}) {
   const timer = createTimer({ onTick: (r, lim) => drawTimer(r, lim), onEnd: () => onTimeout() });
   const clock = cfg.deadline ? createTimer({ onTick: r => { state.deadlineLeft = r; drawClock(r); }, onEnd: () => finish('time') }) : null;
 
+  R('create', { n: questions.length, mode: cfg.mode || 'solo', formats: [...new Set(questions.map(q => q.format))].slice(0, 8), online: !!cfg.waitNext, timer: cfg.timer });
   host.innerHTML = '';
   const root = h('div.play', { class: kidsAll ? 'kids' : '' });
   const hud = h('header.hud');
@@ -168,7 +173,7 @@ export function createRunner(host, cfg = {}) {
 
   function ask(q) {
     // Formats' timers/loops/audio must not leak into the next question (lane AU request).
-    if (ctrl) { try { ctrl.destroy && ctrl.destroy(); } catch (e) {} ctrl = null; }
+    if (ctrl) { R('destroyPrev', { q: String(q.id || '').replace(/^listen:/, '').slice(-64) }); try { ctrl.destroy && ctrl.destroy(); } catch (e) { R('destroy.fail', { err: String(e) }, 'warn'); } ctrl = null; }
     return new Promise(resolve => {
       reveal.classList.remove('show', 'good', 'bad');
       reveal.innerHTML = '';
@@ -200,12 +205,14 @@ export function createRunner(host, cfg = {}) {
       resetStages(q, limit);
       if (sg.n && !ext && !cfg.limitFor) limit = progressiveLimit(limit);
       api.timed = useTimer;
+      R('question', { q: String(q.id || '').replace(/^listen:/, '').slice(-64), format: q.format, limit, useTimer, ext: ext ? ext - nowFn() : 0, vis: document.visibilityState });
       answerResolve = res => {
         const remaining = timer.remaining();
         timer.stop();
         resolve(record(q, res, { remaining, limit, timedNow: useTimer, ms: performance.now() - t0 }));
       };
       onTimeoutFn = () => {
+        R('timeout', { pending: !!answerResolve });
         if (!answerResolve) return;
         try { ctrl?.timeout && ctrl.timeout(); } catch (e) {}
         const r = answerResolve; answerResolve = null;
@@ -221,6 +228,7 @@ export function createRunner(host, cfg = {}) {
         ctrl = null;
         ctrl = fmt.render(stage, q, api) || {};
       } catch (e) {
+        R('render.fail', { format: q.format, err: String(e?.message || e) }, 'error');
         console.error('[clued] render failed', q.format, e);
         stage.append(h('p.panel', {}, 'This question could not be shown.'));
         setTimeout(() => skipFn(), 900);
@@ -316,6 +324,7 @@ export function createRunner(host, cfg = {}) {
       points = (cfg.noStreak ? base : withStreak(base, streak)) * (cfg.multiplier ? cfg.multiplier(state.i, q, state) : 1);
     } else if (res.partial && res.points) points = res.points;
     if (sg.n) points = Math.round(points * stageMultiplier(sg.stage, sg.n));
+    R('answer', { correct, ms: Math.round(t.ms), timeout: !!t.timeout, skipped: !!t.skipped });
     const rec = {
       i: state.i, qid: q.id, format: q.format, round: q.round, correct, points, given: res.given ?? null,
       detail: res.detail, ms: Math.round(t.ms), streak, player: pi, timeout: !!t.timeout, skipped: !!t.skipped,
@@ -451,6 +460,7 @@ export function createRunner(host, cfg = {}) {
 
   function finish(reason) {
     if (finished) return;
+    R('finish', { reason });
     finished = true;
     state.done = true;
     state.aborted = reason === 'quit' || reason === 'stop';
@@ -476,6 +486,7 @@ export function createRunner(host, cfg = {}) {
     answer: x => { if (ctrl?.choose) ctrl.choose(x); },
     // Online: count the current question down to an absolute (server-synced) time instead of a local limit.
     setDeadline(absMs, limitMs) {
+      R('deadline', { inMs: absMs - nowFn(), limitMs, pending: !!answerResolve });
       if (!answerResolve) return;
       if (limitMs) fullLimit = limitMs;
       ring.hidden = false;
@@ -487,7 +498,7 @@ export function createRunner(host, cfg = {}) {
     lockStages: () => lockStages(),
     get stage() { return sg.stage; },
     // Online: the server says time is up. Locks input and records a timeout if still unanswered.
-    timeUp: () => onTimeout(),
+    timeUp: () => { R('timeUp'); onTimeout(); },
     // "Next question in 3…2…1". `to` is seconds, or an absolute ms time (server clock). Resolves when it ends.
     countdown: (to, label) => countdown(to, label),
     guard: async () => { if (finished) return true; await quit(); return finished; },

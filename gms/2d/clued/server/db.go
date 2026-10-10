@@ -73,6 +73,25 @@ CREATE TABLE IF NOT EXISTS alerts (
   delivered TEXT NOT NULL DEFAULT ''
 );
 
+-- Remote client debug logs (only written while the debugLogs setting is on). Capped + pruned.
+CREATE TABLE IF NOT EXISTS debug_logs (
+  id      INTEGER PRIMARY KEY AUTOINCREMENT,
+  ts      INTEGER NOT NULL,
+  cts     INTEGER NOT NULL DEFAULT 0,
+  perf    INTEGER NOT NULL DEFAULT 0,
+  device  TEXT NOT NULL DEFAULT '',
+  session TEXT NOT NULL DEFAULT '',
+  build   TEXT NOT NULL DEFAULT '',
+  ua      TEXT NOT NULL DEFAULT '',
+  room    TEXT NOT NULL DEFAULT '',
+  level   TEXT NOT NULL DEFAULT 'info',
+  tag     TEXT NOT NULL DEFAULT '',
+  msg     TEXT NOT NULL DEFAULT '',
+  data    TEXT NOT NULL DEFAULT ''
+);
+CREATE INDEX IF NOT EXISTS idx_debug_ts ON debug_logs(ts);
+CREATE INDEX IF NOT EXISTS idx_debug_device ON debug_logs(device, id);
+
 CREATE INDEX IF NOT EXISTS idx_scores_board ON challenge_scores(challenge_id, score DESC, ms ASC, id ASC);
 CREATE INDEX IF NOT EXISTS idx_challenges_touched ON challenges(touched);
 `
@@ -110,4 +129,5 @@ func sweepDB() {
 	old := nowFn().UTC().AddDate(0, 0, -30).Format("2006-01-02")
 	db.Exec(`DELETE FROM stats_ips WHERE day < ?`, old)
 	db.Exec(`DELETE FROM alerts WHERE at < ?`, nowFn().AddDate(0, 0, -90).UnixMilli())
+	pruneDebug()
 }

@@ -1,14 +1,14 @@
-import { h, esc } from './kit.js?v=202610100431';
-import { setBgm, canFullscreen, toggleFullscreen } from './toggles.js?v=202610100431';
-import { defineScreen, header, back, go } from './app.js?v=202610100431';
-import { getSettings, setSettings, ANSWER_TIMES } from '../core/store.js?v=202610100431';
-import { getIndex, loadPacks, loadedPacks, allPackIds } from '../core/packs.js?v=202610100431';
-import { applyAudioSettings, sfx } from './fx.js?v=202610100431';
-import { applyKids } from './home.js?v=202610100431';
-import { loadLearn } from './net.js?v=202610100431';
-import { BUILD } from '../build.js?v=202610100431';
-import { canSpeak, speak } from './speech.js?v=202610100431';
-import { streakOption } from './streakopt.js?v=202610100431';
+import { h, esc } from './kit.js?v=202610100510';
+import { setBgm, canFullscreen, toggleFullscreen } from './toggles.js?v=202610100510';
+import { defineScreen, header, back, go } from './app.js?v=202610100510';
+import { getSettings, setSettings, ANSWER_TIMES } from '../core/store.js?v=202610100510';
+import { getIndex, loadPacks, loadedPacks, allPackIds } from '../core/packs.js?v=202610100510';
+import { applyAudioSettings, sfx } from './fx.js?v=202610100510';
+import { applyKids } from './home.js?v=202610100510';
+import { loadLearn, loadNet } from './net.js?v=202610100510';
+import { BUILD } from '../build.js?v=202610100510';
+import { canSpeak, speak } from './speech.js?v=202610100510';
+import { streakOption } from './streakopt.js?v=202610100510';
 
 function toggleRow(label, help, key, after) {
   const s = getSettings();
@@ -86,16 +86,14 @@ defineScreen('credits', async el => {
   draw();
 });
 
-function comingSoon(el, title, icon, text) {
-  el.append(header(title), h('div.coming', {}, h('div.c-ico', {}, icon), h('h2', {}, 'Coming soon'), h('p.muted', {}, text),
-    h('button.btn.primary', { type: 'button', onclick: () => back() }, 'Back')));
-}
-
-// Fallback only: lane S registers the real 'online' screen when js/net/ loads.
-defineScreen('online-soon', el => comingSoon(el, 'Online', '🌐', 'Play with friends by sharing a link. Nearly ready!'), { pester: true });
+// Shown when js/net/ fails to load (offline, or mid-deploy).
+defineScreen('online-soon', el => {
+  el.append(header('Online'), h('div.coming', {}, h('div.c-ico', {}, '🌐'), h('h2', {}, 'Couldn’t connect'),
+    h('p.muted', {}, 'Online play didn’t load. Check your connection and try again.'),
+    h('button.btn.primary', { type: 'button', dataset: { act: 'retry' }, onclick: async () => { if (await loadNet()) go('online', {}, { replace: true }); } }, 'Retry')));
+}, { pester: true });
 
 defineScreen('learn', async el => {
   const learn = await loadLearn();
-  if (learn?.openLearn) return learn.openLearn(el, window.__cluedCtx);
-  comingSoon(el, 'Learn', '📖', 'Field guides, flashcards and the mastery map are on their way.');
+  return learn.openLearn(el, window.__cluedCtx);
 }, { pester: true });

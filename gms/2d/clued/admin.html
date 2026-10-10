@@ -5,8 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="robots" content="noindex">
 <title>Clued admin</title>
-<link rel="stylesheet" href="css/base.css?v=202610100431">
-<link rel="stylesheet" href="js/net/net.css?v=202610100431">
+<link rel="stylesheet" href="css/base.css?v=202610100510">
+<link rel="stylesheet" href="js/net/net.css?v=202610100510">
 <style>
   body { overflow: auto; }
   .adm { max-width: 980px; margin: 0 auto; padding: 16px 16px 40px; display: flex; flex-direction: column; gap: 14px; }
@@ -27,6 +27,9 @@
   .scroll { overflow-x: auto; }
   .muted { color: var(--ink-2); }
   .alert-kind { font-weight: 900; }
+  .dbg-switch { display: inline-flex; align-items: center; gap: 8px; font-weight: 800; cursor: pointer; }
+  .dbg-switch input { width: 22px; height: 22px; }
+  .dbg-lines { max-height: 360px; overflow: auto; font-size: 11px; white-space: pre-wrap; word-break: break-all; background: #fff; border-radius: 10px; padding: 8px; }
 </style>
 </head>
 <body>
@@ -35,6 +38,6 @@
   <div class="panel" id="gate"><p class="muted">Checking your sign-in…</p></div>
 </main>
 <div id="popups"></div>
-<script type="module" src="js/net/admin.js?v=202610100431"></script>
+<script type="module" src="js/net/admin.js?v=202610100510"></script>
 </body>
 </html>

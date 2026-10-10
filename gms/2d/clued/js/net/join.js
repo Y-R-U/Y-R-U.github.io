@@ -1,14 +1,14 @@
 // Online hub, join-by-name screen and host setup. Joining needs only a name.
-import { h } from '../ui/kit.js?v=202610100431';
-import { defineScreen, go, header, current } from '../ui/app.js?v=202610100431';
-import { sfx } from '../ui/fx.js?v=202610100431';
-import { getFormat } from '../formats/registry.js?v=202610100431';
-import { rooms, friendly } from './api.js?v=202610100431';
-import { suggestedName, rememberName, tidyName, MAX_NAME } from './ident.js?v=202610100431';
-import { ensureStyles, saveSeat, loadSeat, dropSeat, cleanCode, validCode, setQuery, mmss } from './util.js?v=202610100431';
-import { packInfo } from '../core/packs.js?v=202610100431';
-import { getTransport, hasTransport } from './transport.js?v=202610100431';
-import { signInPrompt, busyText } from './signin.js?v=202610100431';
+import { h } from '../ui/kit.js?v=202610100510';
+import { defineScreen, go, header, current } from '../ui/app.js?v=202610100510';
+import { sfx } from '../ui/fx.js?v=202610100510';
+import { getFormat } from '../formats/registry.js?v=202610100510';
+import { rooms, friendly } from './api.js?v=202610100510';
+import { suggestedName, rememberName, tidyName, MAX_NAME } from './ident.js?v=202610100510';
+import { ensureStyles, saveSeat, loadSeat, dropSeat, cleanCode, validCode, setQuery, mmss } from './util.js?v=202610100510';
+import { packInfo } from '../core/packs.js?v=202610100510';
+import { getTransport, hasTransport } from './transport.js?v=202610100510';
+import { signInPrompt, busyText } from './signin.js?v=202610100510';
 
 
 export function nameField(value = '') {

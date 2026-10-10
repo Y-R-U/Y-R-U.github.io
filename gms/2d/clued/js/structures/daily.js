@@ -1,11 +1,11 @@
 // Daily: the same 10 questions for everyone (UTC date seed). Kids, map and music dailies have their own seeds.
-import { playSpec } from './session.js?v=202610100431';
-import { makeSpec } from '../core/spec.js?v=202610100431';
-import { listFormats, getFormat } from '../formats/registry.js?v=202610100431';
-import { todayUTC, dailyDone, recordDaily, getStats, getSettings } from '../core/store.js?v=202610100431';
-import { defineScreen, go, header } from '../ui/app.js?v=202610100431';
-import { h, fmtNum } from '../ui/kit.js?v=202610100431';
-import { shareText } from '../ui/share.js?v=202610100431';
+import { playSpec } from './session.js?v=202610100510';
+import { makeSpec } from '../core/spec.js?v=202610100510';
+import { listFormats, getFormat } from '../formats/registry.js?v=202610100510';
+import { todayUTC, dailyDone, recordDaily, getStats, getSettings } from '../core/store.js?v=202610100510';
+import { defineScreen, go, header } from '../ui/app.js?v=202610100510';
+import { h, fmtNum } from '../ui/kit.js?v=202610100510';
+import { shareText } from '../ui/share.js?v=202610100510';
 
 const KINDS = {
   main: { title: 'Daily challenge', icon: '🔎', blurb: 'Ten questions from everything.' },

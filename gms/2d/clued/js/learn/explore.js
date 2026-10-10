@@ -1,10 +1,11 @@
 // Explore map: tap any country → flag, capital, population, languages, currency, landmark photo, anthem.
-import { h } from '../ui/kit.js?v=202610100431';
-import { header, go } from '../ui/app.js?v=202610100431';
-import { getPack, loadMusic, kidsOn, refOf } from './data.js?v=202610100431';
-import { soundBtn, creditBtn, sayBtn, say, stopAudio, emptyState } from './ui.js?v=202610100431';
-import { factText } from '../formats/registry.js?v=202610100431';
-import { BUILD } from '../build.js?v=202610100431';
+import { h } from '../ui/kit.js?v=202610100510';
+import { header, go } from '../ui/app.js?v=202610100510';
+import { getPack, loadMusic, kidsOn, refOf } from './data.js?v=202610100510';
+import { soundBtn, creditBtn, sayBtn, say, stopAudio, emptyState } from './ui.js?v=202610100510';
+import { factText } from '../formats/registry.js?v=202610100510';
+import { BUILD } from '../build.js?v=202610100510';
+import { lazyImport } from '../ui/update.js?v=202610100510';
 
 const CONT = { AF: 'Africa', AS: 'Asia', EU: 'Europe', NA: 'North America', SA: 'South America', OC: 'Oceania', AN: 'Antarctica' };
 
@@ -69,7 +70,7 @@ export async function exploreScreen(el, params) {
   el.append(h('div.l-xwrap', {}, mapBox, side));
   let exp, S;
   try {
-    const mod = await import(`../geo/explore.js?v=${BUILD}`);
+    const mod = await lazyImport(new URL(`../geo/explore.js?v=${BUILD}`, import.meta.url).href);
     const flagsP = fetch(new URL('../../data/geo/flags.json', import.meta.url)).then(r => r.json()).catch(() => ({}));
     const sP = sources();
     exp = mod.createExplore(mapBox, {

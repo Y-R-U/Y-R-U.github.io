@@ -1,13 +1,13 @@
 // The stats screen: headline tiles, breakdowns, topics, daily calendar, recent games, plain-language glossary.
-import { h, fmtNum } from './kit.js?v=202610100431';
-import { defineScreen, header, go } from './app.js?v=202610100431';
-import { getSettings } from '../core/store.js?v=202610100431';
-import { statsView, resetStats, acc, MODE_INFO, DAILY_BITS } from '../core/stats.js?v=202610100431';
-import { getIndex, THEMES } from '../core/packs.js?v=202610100431';
-import { getFormat } from '../formats/registry.js?v=202610100431';
-import { kidsProgress } from './stickers.js?v=202610100431';
-import { nameOf } from './statsline.js?v=202610100431';
-import { BUILD } from '../build.js?v=202610100431';
+import { h, fmtNum } from './kit.js?v=202610100510';
+import { defineScreen, header, go } from './app.js?v=202610100510';
+import { getSettings } from '../core/store.js?v=202610100510';
+import { statsView, resetStats, acc, MODE_INFO, DAILY_BITS } from '../core/stats.js?v=202610100510';
+import { getIndex, THEMES } from '../core/packs.js?v=202610100510';
+import { getFormat } from '../formats/registry.js?v=202610100510';
+import { kidsProgress } from './stickers.js?v=202610100510';
+import { nameOf } from './statsline.js?v=202610100510';
+import { BUILD } from '../build.js?v=202610100510';
 
 function ensureCss() {
   if (document.getElementById('stats-css')) return;

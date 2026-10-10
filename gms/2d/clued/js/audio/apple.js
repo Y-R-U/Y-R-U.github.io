@@ -1,4 +1,7 @@
 // iTunes Search API: lookup by trackId (CORS, JSONP fallback), stale-preview refresh, reveal badge.
+import { dlog, modLoaded } from '../core/debuglog.js?v=202610100510';
+const MOD_ID = modLoaded('apple', import.meta.url);
+
 const LOOKUP = 'https://itunes.apple.com/lookup';
 const fresh = new Map(); // trackId -> Promise<track|null>
 
@@ -16,11 +19,13 @@ function jsonp(url) {
 }
 
 async function getJSON(url) {
+  const t0 = globalThis.performance?.now() ?? 0, u = url.replace('https://itunes.apple.com', '').slice(0, 120);
   try {
     const r = await fetch(url);
-    if (r.ok) return await r.json();
-  } catch {}
-  if (globalThis.document) return jsonp(url);
+    if (r.ok) { const j = await r.json(); dlog('apple', 'json', { u, n: j?.resultCount, ms: (globalThis.performance?.now() ?? 0) - t0 }); return j; }
+    dlog('apple', 'json.bad', { u, status: r.status }, 'warn');
+  } catch (e) { dlog('apple', 'json.fail', { u, err: String(e) }, 'warn'); }
+  if (globalThis.document) { dlog('apple', 'jsonp', { u }); return jsonp(url); }
   throw new Error('itunes lookup failed');
 }
 
@@ -46,8 +51,11 @@ export function refresh(trackId, term) {
       if (t?.previewUrl || !term) return t;
       const d = await getJSON(`https://itunes.apple.com/search?media=music&entity=song&limit=10&country=US&term=${encodeURIComponent(term)}`).catch(() => null);
       const want = norm(term);
-      return (d?.results || []).find((r) => r.previewUrl && want.startsWith(norm(r.artistName).slice(0, 6)) && want.includes(norm(r.trackName).slice(0, 10))) || null;
+      const hit = (d?.results || []).find((r) => r.previewUrl && want.startsWith(norm(r.artistName).slice(0, 6)) && want.includes(norm(r.trackName).slice(0, 10))) || null;
+      dlog('apple', 'search', { id: k, found: !!hit, newId: hit?.trackId }, hit ? 'info' : 'warn');
+      return hit;
     });
+    p.then((t) => dlog('apple', 'refresh', { id: k, ok: !!t?.previewUrl }));
     fresh.set(k, p);
   }
   return fresh.get(k);
@@ -57,10 +65,16 @@ export function refresh(trackId, term) {
 export async function previewUrl(a, check = false) {
   if (!a.apple?.trackId) return a.src;
   if (check && a.src) {
-    try { const r = await fetch(a.src, { method: 'HEAD' }); if (r.ok) return a.src; } catch {}
+    try {
+      const r = await fetch(a.src, { method: 'HEAD' });
+      dlog('apple', 'head', { id: a.apple.trackId, status: r.status });
+      if (r.ok) return a.src;
+    } catch (e) { dlog('apple', 'head.fail', { id: a.apple.trackId, err: String(e) }, 'warn'); }
   } else if (a.src && !check) return a.src;
+  dlog('apple', 'preview.refresh', { am: MOD_ID, id: a.apple.trackId, had: !!a.src, check });
   const t = await refresh(a.apple.trackId, a.apple.term);
   if (t?.previewUrl) { a.src = t.previewUrl; if (t.trackViewUrl) a.apple.url = t.trackViewUrl; return a.src; }
+  dlog('apple', 'preview.none', { id: a.apple.trackId }, 'warn');
   throw new Error('no preview for ' + a.apple.trackId);
 }
 

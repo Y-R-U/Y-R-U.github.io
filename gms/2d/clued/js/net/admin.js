@@ -1,8 +1,8 @@
 // Clued admin page: stats, live rooms, protection level, alerts. The server checks the
 // Firebase ID token's email against CLUED_ADMINS; this page only renders what it's given.
-import { h, fmtNum } from '../ui/kit.js?v=202610100431';
-import { toast } from '../ui/popup.js?v=202610100431';
-import { API } from './api.js?v=202610100431';
+import { h, fmtNum } from '../ui/kit.js?v=202610100510';
+import { toast } from '../ui/popup.js?v=202610100510';
+import { API } from './api.js?v=202610100510';
 
 const root = document.getElementById('adm');
 const gate = document.getElementById('gate');
@@ -53,6 +53,32 @@ function chart(days) {
 
 const ago = ms => { const s = Math.round((Date.now() - ms) / 1000); return s < 90 ? `${s}s ago` : s < 5400 ? `${Math.round(s / 60)}m ago` : `${Math.round(s / 3600)}h ago`; };
 
+// Remote debug logs (docs/notes/DEBUGLOG.md): clients pick the switch up from /status by themselves.
+function debugPanel(dbg) {
+  if (!dbg) return null;
+  const lines = h('pre.dbg-lines', {}, 'Loading…');
+  const sw = h('input', { type: 'checkbox', checked: dbg.on, onchange: async () => {
+    sw.disabled = true;
+    try { await call('POST', '/admin/debuglog', { on: sw.checked }); toast(sw.checked ? 'Debug logs ON: devices start logging within a minute' : 'Debug logs off'); load(); }
+    catch (e) { toast(e.message); sw.checked = !sw.checked; sw.disabled = false; }
+  } });
+  const fmt = l => `${new Date(l.cts || l.ts).toLocaleTimeString()} ${l.device}/${l.session} ${l.level === 'info' ? '' : l.level.toUpperCase() + ' '}${l.tag} ${l.msg}${l.data ? ' ' + JSON.stringify(l.data) : ''}`;
+  if (dbg.rows) call('GET', '/admin/debuglog?limit=60').then(r => { lines.textContent = r.lines.map(fmt).join('\n') || '—'; }).catch(e => { lines.textContent = e.message; });
+  else lines.textContent = 'No log rows.';
+  return h('div.panel', {},
+    h('div.row', { style: { justifyContent: 'space-between' } }, h('h2', {}, 'Debug logs'),
+      h('label.dbg-switch', {}, sw, ' Collect debug logs')),
+    h('p.muted.tiny', {}, `${dbg.rows} rows from ${dbg.devices} device${dbg.devices === 1 ? '' : 's'}${dbg.last ? ` · last ${ago(dbg.last)}` : ''} · keeps ${dbg.cap} rows / ${dbg.days} days. Turn off when done.`),
+    h('div.row', {},
+      h('button.btn.small', { type: 'button', onclick: async () => {
+        try { const r = await call('GET', '/admin/debuglog?since=24h&limit=20000'); const a = h('a', { href: URL.createObjectURL(new Blob([JSON.stringify(r.lines, null, 1)], { type: 'application/json' })), download: `clued-debuglog-${Date.now()}.json` }); a.click(); } catch (e) { toast(e.message); }
+      } }, 'Download last 24 h'),
+      h('button.btn.small.danger', { type: 'button', onclick: async () => {
+        try { await call('POST', '/admin/debuglog', { clear: true }); toast('Debug logs cleared'); load(); } catch (e) { toast(e.message); }
+      } }, 'Clear logs')),
+    h('details', {}, h('summary', {}, 'Latest 60 lines'), lines));
+}
+
 function render(d) {
   const today = d.days[d.days.length - 1].stats;
   const kpi = (label, v, sub = '') => h('div.kpi', {}, h('small', {}, label), h('b', {}, String(v)), sub ? h('small', {}, sub) : null);
@@ -69,6 +95,7 @@ function render(d) {
   const alertRows = d.alerts.map(a => h('tr', {}, h('td', {}, new Date(a.at).toLocaleString()), h('td.alert-kind', {}, a.kind), h('td', {}, a.msg), h('td.muted', {}, a.delivered)));
   root.replaceChildren(
     h('div.row', { style: { justifyContent: 'space-between' } }, h('h1', {}, 'Clued admin'), h('span.muted', {}, `up ${d.uptime} · alerts via ${[d.channels.ntfy && 'ntfy', d.channels.email && 'email'].filter(Boolean).join(' + ') || 'log only'}`)),
+    debugPanel(d.debug) || '',
     h('div.panel', {}, h('h2', {}, 'Protection level'), levels, h('p.muted.tiny', {}, `Auto-escalates to 1 above ${d.caps.escalateRoomsHour} rooms/hour or at ${d.caps.escalateRefusalsHour} cap refusals/hour. Never auto-lowers.`)),
     h('div.kpis', {},
       kpi('Live rooms', d.live.rooms, `${d.live.public}/${d.caps.public} public · ${d.live.private}/${d.caps.private} private`),

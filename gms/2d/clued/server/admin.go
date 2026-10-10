@@ -96,6 +96,7 @@ func handleAdminOverview(w http.ResponseWriter, r *http.Request) {
 		"days": days, "rooms": live, "alerts": alerts,
 		"channels": map[string]bool{"email": cfg.SMTPHost != "", "ntfy": cfg.NtfyTopic != ""},
 		"uptime":   time.Since(started).Round(time.Second).String(),
+		"debug":    debugStats(),
 	})
 }
 

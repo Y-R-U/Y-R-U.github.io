@@ -179,6 +179,14 @@ input[type=range] { width: 100%; accent-color: var(--grape); }
 .toast.in { opacity: 1; transform: translate(-50%, 0); }
 .credit { font-size: 14px; margin: 4px 0; word-break: break-word; }
 
+.upd-banner {
+  position: fixed; z-index: 110; left: 64px; right: 64px; top: calc(var(--sat) + 8px); margin: 0 auto; width: fit-content; display: flex; flex-direction: column; align-items: center; gap: 1px;
+  padding: 7px 16px; border: var(--line) solid var(--ink); border-radius: 16px; background: var(--sun); color: var(--ink);
+  box-shadow: 0 4px 0 var(--ink); font-size: 14px; line-height: 1.2; text-align: center; animation: upd-in .3s ease-out both;
+}
+.upd-banner[data-kind="err"] { background: #ffd9d9; }
+.upd-banner span { font-size: 12px; font-weight: 800; text-decoration: underline; }
+@keyframes upd-in { from { opacity: 0; transform: translateY(-12px); } }
 .confetti { position: fixed; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 90; }
 
 :focus-visible { outline: 3px solid var(--sky); outline-offset: 3px; }

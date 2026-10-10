@@ -218,5 +218,5 @@ func dayStart(t time.Time) time.Time {
 func handleStatus(w http.ResponseWriter, r *http.Request) {
 	lvl := level()
 	writeJSON(w, 200, map[string]any{"level": lvl, "levelName": levelNames[lvl], "now": nowMs(),
-		"publicFree": max(0, cfg.MaxPublic-publicCount()), "maxPlayers": cfg.MaxPlayers})
+		"publicFree": max(0, cfg.MaxPublic-publicCount()), "maxPlayers": cfg.MaxPlayers, "debugLogs": debugOn()})
 }

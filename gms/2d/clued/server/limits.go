@@ -22,6 +22,7 @@ var limits = map[string]bucket{
 	"challenge": {30, 10 * time.Minute},
 	"score":     {120, 10 * time.Minute},
 	"answer":    {600, time.Minute},
+	"debuglog":  {120, time.Minute},
 }
 
 var (
