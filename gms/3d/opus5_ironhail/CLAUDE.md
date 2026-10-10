@@ -1,6 +1,6 @@
 # IRONHAIL — drone-spotted 3D tank warfare
 
-Mobile-first Three.js (0.160 via CDN importmap, **no build step**). Descended from
+Mobile-first Three.js (0.160, vendored at `/lib/three/0.160.0/` via an importmap, **no build step**). Descended from
 `fable5_crow_tank_battle`, but rebuilt: real ballistics, a heightfield you can dig
 craters into, an RPG garage, a 30-mission campaign and a simulated world ladder.
 
@@ -119,6 +119,73 @@ write happens. Settings are reachable from the pause menu (back returns to
 pause, not the title) because the moment you discover the buttons are under the
 wrong thumb is mid-battle.
 
+## Phone pass (2026-10-11)
+
+Aaron plays on an Android phone, so this pass was all about touch feel:
+
+- **Pinch is two aiming fingers, never stick + aim.** `input.js` only starts or
+  continues a pinch while `joyId === null` and the same two touch ids are down.
+  Drive-and-aim used to zoom the camera (1.15 → 1.26 in a CDP touch test).
+- **Audio is born on the first gesture.** No `AudioFX.init()` at boot; the
+  unlock listens on pointerdown/touchstart/**touchend/pointerup/click**/keydown
+  for the page lifetime and resumes whenever `ctx.state !== 'running'`.
+  `navigator.audioSession.type = 'playback'` is set before the context.
+  `startEngine` / `setWeatherBed` / `droneHum` remember what was asked for
+  (`wantEngine`/`wantWeather`/`wantDrone`) and replay it once the context exists.
+- **Haptics arm on touchend/pointerup/click/keydown** (+ `userActivation`
+  check): arming on touchstart logged "Blocked call to navigator.vibrate".
+- **Toasts wrap** (`max-width: calc(100vw - 32px)`), take `{ text, dur }`
+  for teaching toasts (~4s; routine toasts queue behind them), and
+  `hideToast()` runs on pause.
+- **Dispose:** `disposeObject(obj, extra)` in `render.js` disposes every
+  geometry and every material *not* flagged `userData.shared`
+  (`solidMat`/`plateMat`/`emitMat`/`burntMat`). `Tank.dispose()` and
+  `Drone.dispose()` use it. Geometries over a 10-mission soak: 107→159
+  before, flat ~112–115 after.
+- **Account avatar** is hidden in battle (`body.in-battle #br8t-account`) and
+  `.hud-top` reclaims its corner.
+- **Brief and results scroll; DEPLOY / NEXT MISSION are pinned** under the
+  scroll (`.brief-body` / `.results-body`), so 844×390 can always reach them.
+- **Graphics: HIGH / BALANCED / LOW, applied live** (`applyQuality()` in
+  `render.js`; `settings.quality`, `lite` kept in sync for old saves). On
+  touch, the first real fight samples ~3s of frame times (`perfProbe` in
+  `main.js`); under 45fps it drops to BALANCED (pixel ratio 1.25, 1024
+  shadows, half-res bloom) with a toast. Verdict saved as `settings.autoQ`
+  (`kept`/`dropped`/`user`); any Settings choice retires the probe. No
+  `antialias` — the composer's targets never had MSAA.
+- **Menu backdrop runs at ~30fps** and **freezes** (no sim, no render) on
+  campaign/attack/ladder/settings and over a paused battle. `requestFrame()`
+  forces one redraw (resize, settings writes).
+- **HUD writes are cached** (`setText`/`setBar`/`setCls`/`setStyle` in
+  `hud.js`); bars use `transform: scaleX()` with `transform-origin: 0 50%`.
+  Anything else that toggles a class on a cached HUD node will desync the
+  cache — go through the helpers.
+- **Touch wording:** title footnote, a1m1 intel and the pad's key letters
+  (UPLINK/ZOOM/PAINT) are touch-first when `IS_TOUCH`.
+- **Coach marks (a1m1, touch):** ghost thumbs for drive / aim / FIRE, placed
+  from `aimSide`/`padSide`, each fading on first real use and remembered in
+  `profile.seen.coach`.
+- **Act-two handover:** the a1m6 results offer to keep the fire-control
+  computer for ⬢900 inline (`fireControlOffer()` in `menus.js`). An act-one
+  win pays ~1.4–2K scrap, so 900 is about half a mission. a2m1 is now a
+  hand-aiming warm-up (2 line hulls, skill 0.40, no flankers).
+- **Difficulty breathers:** a1m4 is 5 hulls (was 6) at 0.34; the mission after
+  each boss (a2m6, a3m6, a4m6) runs ~0.05 below the curve. a4m4 was left
+  alone: it precedes the a4m5 boss, it does not follow one.
+- **Kill juice** (`main.js`): a penetrating, non-splash player hit gets a
+  ~55–75ms hit-stop (one per 0.4s, so bursts do not stutter); the shot that
+  ends a mission gets 150ms at 0.22× plus the `final` haptic. It lives in
+  `juice`, separate from `state.timeScale`, decays on wall-clock time, only
+  ever lowers the scale, and is ignored during films and in `?auto`.
+- **Medals:** one optional medal per campaign mission (`MEDALS` in
+  `missions.js`, `medal:` on each record), judged on a win from the results
+  record plus `medalTally` in `battle.js` (drone used, prop kills via
+  `prop-kill-credit`, computer ever laid the gun, utility used). Saved as
+  `campaign[id].medal`; shown on the brief, the results and counted on the
+  campaign screen and the title.
+- **HUD contrast:** the objective block sits on a dark plate; chips and text
+  carry a dark shadow, so dawn skies no longer swallow them.
+
 ## Files
 
 | file | what it owns |
@@ -230,9 +297,21 @@ URL hooks:
 | `?seed=1234` | force a battlefield seed |
 
 `window.__game` exposes `state`, `profile`, `terrainHeight`, `propList`,
-`aimAt(x,z)`, `fireNow()`, `win()`, `info()` (draw calls/triangles),
+`aimAt(x,z)`, `fireNow()`, `win()`, `info()` (draw calls/triangles/geometries),
 `setSetting(k,v)` (writes and applies), `giveModule(id)`, `giveScrap(n)`,
-`reelCount()`, `playReel()`, `utils.useUtility` and the screen functions.
+`reelCount()`, `playReel()`, `utils.useUtility`, the screen functions,
+`renderer` (count frames with `renderer.info.render.frame`), `perf()`
+(probe result, quality, pixel ratio, shadow size, bloom) and `juice()`
+(hit-stop state).
+
+Recipes that proved things this pass (all CDP, touch emulation on):
+pinch — touchStart stick (x<44%) + aim thumb, move both, `state.zoom` must not
+change; audio — wrap `window.AudioContext` with
+`Page.addScriptToEvaluateOnNewDocument`, tap, expect `running`, `suspend()`,
+tap, expect `running` again; perf probe — Metal is too fast to trip it even at
+12× CPU throttle, so falsify it on a SwiftShader Chrome (`cdp start` default)
+where it measures ~15fps and drops to BALANCED; leak — `startMission` + `win()`
+ten times, `info().geometries` stays flat.
 
 Useful battle probes: `state.fcFitted` / `state.fcTrial` / `state.autoAiming`,
 `state.player.controller.manualT`, `state.player.extraSpread`.
