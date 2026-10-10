@@ -26,9 +26,11 @@ export function detectQuality(flag) {
   else if (isMobile) {
     const m = /Adreno\D*(\d{3})/i.exec(gpu);
     const mali = /Mali-G(\d+)/i.exec(gpu);
-    if (m) name = +m[1] >= 700 ? 'high' : +m[1] >= 618 ? 'med' : 'low';
+    const xc = /Xclipse\D*(\d{3})?/i.exec(gpu);
+    if (m) name = +m[1] >= 730 ? 'high' : +m[1] >= 618 ? 'med' : 'low';
     else if (mali) name = +mali[1] >= 710 ? 'high' : +mali[1] >= 57 ? 'med' : 'low';
-    else if (/Apple|Xclipse|Immortalis/i.test(gpu)) name = 'high';
+    else if (xc) name = xc[1] && +xc[1] >= 900 ? 'high' : 'med';
+    else if (/Apple|Immortalis/i.test(gpu)) name = 'high';
     else if ((navigator.deviceMemory || 4) <= 3 || (navigator.hardwareConcurrency || 4) <= 4) name = 'low';
     else name = 'med';
   } else if (/SwiftShader|llvmpipe|Software/i.test(gpu)) name = 'low';
@@ -47,9 +49,20 @@ export function detectQuality(flag) {
 }
 
 // Steps drawing-buffer resolution down when frames stay slow, and back up (sparingly) when there is headroom.
-export function createGovernor(tier, apply) {
+// Stage 2 (resolution at its floor, or under 40 fps): MSAA off, then mirror every other frame, then hard shadows,
+// one at a time and never undone. A 60 Hz device that keeps up never reaches it (D18).
+const STAGES = ['msaa', 'mirror', 'shadows'];
+export function createGovernor(tier, apply, degrade = null) {
   const g = { dpr: tier.dpr, floor: Math.max(0.6, tier.dpr * 0.55), ceil: tier.dpr, acc: 0, frames: 0,
-    slow: 0, fast: 0, ups: 0, fps: 60, enabled: true, history: [] };
+    slow: 0, fast: 0, ups: 0, fps: 60, enabled: true, history: [], stage: 0, stageSlow: 0, stageWait: 0 };
+  // next stage that changes something on this tier; returns its name or null when all are spent
+  g.stageUp = () => {
+    while (g.stage < STAGES.length) {
+      const st = STAGES[g.stage++];
+      if (degrade?.(st)) { g.history.push(['stage', st, +g.fps.toFixed(1)]); return st; }
+    }
+    return null;
+  };
   // Judged on a trimmed mean frame time (the slowest 10% of frames dropped), so one-off hitches (shader compiles, GC,
   // a panel opening) never cost resolution. Thresholds sit well below 60, so a 60 Hz vsync cap (~59.9) is never "slow".
   const dts = [];
@@ -62,7 +75,13 @@ export function createGovernor(tier, apply) {
     g.fps = keep / sum; g.acc = 0; g.frames = 0; dts.length = 0;
     if (!g.enabled || document.hidden) return;
     if (g.fps < 45) { g.slow++; g.fast = 0; } else if (g.fps > 57) { g.fast++; g.slow = 0; } else { g.slow = 0; g.fast = 0; }
-    if (g.slow >= 2 && g.dpr > g.floor + 0.01) {
+    const atFloor = g.dpr <= g.floor + 0.01;
+    g.stageSlow = (g.fps < 40 || (atFloor && g.fps < 45)) ? g.stageSlow + 1 : 0;
+    if (g.stageWait > 0) g.stageWait--;
+    if (degrade && g.stageSlow >= 3 && !g.stageWait && g.stage < STAGES.length) {
+      // the previous change gets ~4.5 s (three windows) to show whether it recovered the frame rate
+      if (g.stageUp()) { g.stageSlow = 0; g.stageWait = 3; }
+    } else if (g.slow >= 2 && !atFloor) {
       g.dpr = Math.max(g.floor, g.dpr - (g.fps < 30 ? 0.25 : 0.12)); g.slow = 0; apply(g.dpr);
       g.history.push(['down', +g.dpr.toFixed(2), +g.fps.toFixed(1)]);
     } else if (g.fast >= 6 && g.dpr < g.ceil - 0.01 && g.ups < 3) {

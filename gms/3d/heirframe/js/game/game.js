@@ -294,6 +294,7 @@ export async function createGame(api) {
     ui.on('pause', () => { if (G.state === 'free') ui.panel.open('pause', { mission: G.runner.mission ? { title: G.runner.mission.title } : null }); });
     ui.on('pause:quit', () => { G.sim.save(); window.__reload?.(); });
     ui.on('tap', (s) => tapAt(s.x, s.y));
+    ui.on('objective:go', () => autoWalkTo());
     ui.on('contract:accept', (c) => acceptCard(c.id));
     ui.on('contract:reroll', () => { const r = G.sim.rerollBoard(); if (r.ok) ui.panel.update(toUiBoard(G.sim)); });
     ui.on('contract:threat', (id) => { if (G.sim.setThreat(id).ok) ui.panel.update(toUiBoard(G.sim)); });
@@ -366,6 +367,34 @@ export async function createGame(api) {
     if (d > 30) { g.x = player.pos.x + dx / d * 30; g.z = player.pos.z + dz / d * 30; g.y = world.groundAt(g.x, g.z); }
     walkTo(g.x, g.z);
     api.marker.position.set(g.x, g.y + 0.03, g.z); api.marker.visible = true;
+  }
+
+  // tap the tracker or the off-screen objective arrow: walk there on the nav grid. The stick, a world tap or anything
+  // else that re-paths the player takes over.
+  function autoWalkTo() {
+    if (blocked()) return;
+    const o = objective();
+    if (!o) { ui?.toast('No objective to walk to', 'info'); return; }
+    autoRoute(o);
+  }
+  function autoRoute(o) {
+    const pts = (G.nav || nav).route(player.pos, { x: o.x, z: o.z }) || [{ x: o.x, z: o.z }];
+    player.setPath(pts, { stopAt: o.enemy ? 2.5 : 0.35 });
+    G.autoWalk = { path: player.path, x: o.x, z: o.z, t: 0 };
+    ui?.hud.autoWalk?.(true, o.label);
+  }
+  function autoWalkUpdate(dt, stick) {
+    const A = G.autoWalk;
+    if (!A) return;
+    if ((stick && Math.hypot(stick.x, stick.y) > 0.12) || G.state !== 'free' || !player.moveTarget || player.path !== A.path) {
+      G.autoWalk = null; ui?.hud.autoWalk?.(false); return;
+    }
+    // follow an objective that moves (escorts, marks)
+    if ((A.t += dt) > 1.5) {
+      A.t = 0;
+      const o = objective();
+      if (o && Math.hypot(o.x - A.x, o.z - A.z) > 3) autoRoute(o);
+    }
   }
 
   function walkTo(x, z, stopAt = 0.25) {
@@ -800,6 +829,7 @@ export async function createGame(api) {
     return null;
   }
 
+  const rot = matchMedia('(orientation: portrait) and (pointer: coarse)');
   function update(rawDt, stick) {
     const dt = rawDt * speedK;
     G.devTick?.(dt);
@@ -815,7 +845,7 @@ export async function createGame(api) {
       return;
     }
     const sim = G.sim;
-    const paused = panelOpen() || G.state === 'results';
+    const paused = panelOpen() || G.state === 'results' || rot.matches;
     const pc = sim.playerCombatant();
     if (!paused) {
       if (shiftLen) sim.state.shiftClock += dt * (SHIFT_SECONDS / shiftLen - 1);
@@ -833,6 +863,7 @@ export async function createGame(api) {
     let hs = 1;
     if (G.hitstopT > 0) { G.hitstopT -= rawDt; hs = 0.15; }
     player.update(dt * (hs < 1 ? 0.5 : 1), canMove ? stick : null);
+    autoWalkUpdate(dt, stick);
     if (canMove && !G.finale.human) G.combat.update(dt, { attackHeld: !!ui?.controls.attackHeld || G.auto?.attackHeld });
     if (!paused) G.enemies.update(dt * hs, { playerDead: G.state === 'down', sneaking: !!ui?.controls.sneak });
     if (!paused && G.state === 'free' && !ui?.dialogue.open && !overlay.cardOpen) G.runner.update(dt);

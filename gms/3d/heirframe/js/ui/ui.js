@@ -139,6 +139,7 @@ export const ui = {
     },
     heading(rad) { hud?.heading(rad); },
     recenter(on) { hud?.recenter(on); },
+    autoWalk(on, label) { hud?.autoWalk(on, label); },
     flash(kind) { hud?.flash(kind); },
     badge(evt, n) { hud?.badge(evt, n); },
   },

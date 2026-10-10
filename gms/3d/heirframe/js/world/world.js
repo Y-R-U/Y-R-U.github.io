@@ -345,6 +345,36 @@ export function createWorld(canvas, { quality, toneMapping = 'aces', onProgress 
       post.setSize(w, h, dpr);
       pxScale.value = b.y / (2 * Math.tan(camera.fov * D2R / 2));
     },
+    // governor stage 2, one-way. Returns false when the step changes nothing on this tier.
+    degrade(step) {
+      const mats = () => { const set = new Set(); scene.traverse((o) => { for (const m of [].concat(o.material || [])) set.add(m); }); for (const k in M) if (M[k]?.isMaterial) set.add(M[k]); return set; };
+      if (step === 'msaa') {
+        if (!tier.msaa) return false;
+        tier.msaa = 0;
+        const rt = post.composer.renderTarget2; rt.samples = 0; rt.dispose();
+        for (const m of mats()) if (m.alphaToCoverage) { m.alphaToCoverage = false; if (m.defines) delete m.defines.HF_A2C; m.needsUpdate = true; }
+        // the far crowd's a2c shader needs MSAA: use its cutout copy everywhere, mirror included
+        const cut = M.farCrowdMirror;
+        if (cut) {
+          M.farCrowd = cut; M.farCrowdMirror = null;
+          scene.traverse((o) => { if (o.name === 'farCrowd') { o.material = cut; o.layers.enable(REFLECT_LAYER); } else if (o.name === 'farCrowdMirror') o.visible = false; });
+        }
+        return true;
+      }
+      if (step === 'mirror') {
+        if (!reflection.enabled || reflection.skip >= 1) return false;
+        reflection.skip = 1;
+        return true;
+      }
+      if (step === 'shadows') {
+        if (!renderer.shadowMap.enabled || renderer.shadowMap.type === THREE.PCFShadowMap) return false;
+        tier.shadowSoft = false;
+        renderer.shadowMap.type = THREE.PCFShadowMap;
+        for (const m of mats()) m.needsUpdate = true;
+        return true;
+      }
+      return false;
+    },
     update(dt) {
       time.value += dt;
       relayFx.update(dt);

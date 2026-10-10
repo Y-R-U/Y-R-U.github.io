@@ -25,11 +25,12 @@ export function createHud(bus) {
     </div>
     <div class="hf-buffs"></div>
     <div class="hf-tracker hf-glass hf-live off">
-      <div class="hd"><span class="hf-label">${icon('contracts')}Contract</span><span class="tm hf-num"></span></div>
+      <div class="hd"><span class="hf-label">${icon('contracts')}Contract</span><span class="tm hf-num"></span><button class="tchev hf-live" aria-label="Collapse tracker">${icon('up')}</button></div>
       <div class="tt"></div>
       <div class="ob"><i></i><span class="ot"></span><em class="hf-num"></em></div>
       <div class="pg"><i></i></div>
     </div>
+    <div class="hf-autowalk off">${icon('pin')}<span>Auto-walking</span></div>
     <div class="hf-goal off">${icon('star')}<span></span><i class="gp"></i></div>
   </div>
   <div class="hf-tc">
@@ -75,7 +76,9 @@ export function createHud(bus) {
   el.querySelectorAll('[data-evt]').forEach(b => onTap(b, () => { haptic(); bus.emit('sfx', 'click'); bus.emit(b.dataset.evt); }));
   onTap($('.hf-pchip'), () => { haptic(); bus.emit('sfx', 'click'); bus.emit('warehouse'); });
   bindFullscreen($('.hf-fs'), bus);
-  onTap(r.tracker, () => { r.tracker.classList.toggle('min'); bus.emit('sfx', 'click'); });
+  onTap(r.tracker, () => { haptic(); bus.emit('sfx', 'click'); bus.emit('objective:go'); });
+  onTap($('.tchev'), () => { r.tracker.classList.toggle('min'); bus.emit('sfx', 'click'); });
+  const aw = $('.hf-autowalk'), awT = $('.hf-autowalk span');
 
   const s = {};
   let creditsShown = 0, creditsAnim = 0, prevLevel = null;
@@ -223,6 +226,11 @@ export function createHud(bus) {
     heading(rad) { r.compass.style.transform = `rotate(${-rad}rad)`; },
     // camera is off its default framing: show the reset-view button
     recenter(on) { r.recenter.classList.toggle('on', !!on); },
+    autoWalk(on, label) {
+      aw.classList.toggle('off', !on);
+      r.tracker.classList.toggle('walking', !!on);
+      if (on) awT.textContent = label ? `Auto-walking · ${label}` : 'Auto-walking';
+    },
     flash(kind = 'hit') {
       r.vig.className = 'hf-vignette'; void r.vig.offsetWidth; r.vig.className = `hf-vignette ${kind}`;
     },

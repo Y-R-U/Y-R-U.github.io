@@ -98,7 +98,7 @@ async function start() {
   let autoIdx = 0;
 
   rig.target.copy(player.pos); rig.snap();
-  const governor = createGovernor(tier, (dpr) => world.resize(innerWidth, innerHeight, dpr));
+  const governor = createGovernor(tier, (dpr) => world.resize(innerWidth, innerHeight, dpr), (step) => world.degrade(step));
   if (flags.shot) governor.enabled = false;
   addEventListener('resize', () => world.resize(innerWidth, innerHeight, governor.dpr));
 
@@ -118,8 +118,22 @@ async function start() {
     info: () => ({ ...stats, dpr: governor.dpr, tier: tier.name, gpu: tier.gpu, static: world.ctx.stats, programs: world.renderer.info.programs?.length }),
   };
 
+  // phone held upright: the rotate prompt covers everything, so the world neither simulates nor draws
+  const rot = matchMedia('(orientation: portrait) and (pointer: coarse)');
+  const errSeen = new Set();
+  const reportErr = (where, e) => {
+    if (errSeen.has(where)) return;
+    console.error(where, e);
+    errSeen.add(where);
+    if (errSeen.size > 1) return;
+    ui?.toast?.('Something glitched', 'warn', { sub: 'The game kept running. A reload clears it if things look wrong.', ms: 6000 });
+  };
   function tick(now) {
+    try { frameBody(now); } catch (e) { reportErr('frame failed', e); } finally { requestAnimationFrame(tick); }
+  }
+  function frameBody(now) {
     const dt = Math.min(0.05, (now - last) / 1000); last = now;
+    if (rot.matches && !flags.shot) { stats.calls = 0; stats.tris = 0; return; }
     let stick = { x: 0, y: 0 };
     if (ui?.controls?.move) stick = { x: ui.controls.move.x, y: -ui.controls.move.y };
     else if (pad?.active) stick = pad.move;
@@ -132,7 +146,7 @@ async function start() {
       player.setTarget({ x, z });
     }
     if (runtime?.update) {
-      try { runtime.update(dt, stick); } catch (e) { if (!runtimeErr) { runtimeErr = true; console.error('runtime update failed', e); } player.update(dt, stick); }
+      try { runtime.update(dt, stick); } catch (e) { if (!runtimeErr) { runtimeErr = true; reportErr('runtime update failed', e); } player.update(dt, stick); }
     } else player.update(dt, stick);
     if (!player.moveTarget) marker.visible = false;
     crowd?.update(dt, player.pos);
@@ -152,7 +166,8 @@ async function start() {
     }
     world.focus.copy(player.pos);
     if (!rig.fixed) world.setFadeTarget(player.pos);
-    world.update(dt);
+    // a broken district updater must not freeze the picture
+    try { world.update(dt); } catch (e) { reportErr('world update failed', e); }
     world.render(dt);
 
     const ri = world.renderer.info.render;
@@ -164,7 +179,6 @@ async function start() {
       perfT = 0;
       perfEl.textContent = `${stats.fps.toFixed(0)} fps  ${stats.ms.toFixed(1)} ms\ncalls ${stats.calls}  tris ${(stats.tris / 1000).toFixed(0)}k\ndpr ${governor.dpr.toFixed(2)}  ${tier.name}  refl ${world.reflection.enabled ? tier.reflect : 'off'}`;
     }
-    requestAnimationFrame(tick);
   }
   requestAnimationFrame((t) => { last = t; tick(t); });
   await frame(); await frame();

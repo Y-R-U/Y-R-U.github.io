@@ -239,3 +239,17 @@
 .hf-goal { align-items: flex-start; }
 .hf-goal span { white-space: normal; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; line-height: 1.2; }
 .hf-goal .hf-ic { margin-top: 2px; }
+
+/* tracker: tap = auto-walk to the objective, the chevron collapses it */
+.hf-tracker .tm { margin-left: auto; }
+.hf-tracker .tchev { position: relative; width: 24px; height: 18px; margin-left: 6px; display: grid; place-items: center; font-size: 14px; color: var(--ink-dim); }
+.hf-tracker .tchev::after { content: ''; position: absolute; inset: -12px -10px -10px -8px; }
+.hf-tracker .tchev .hf-ic { transition: rotate .2s; }
+.hf-tracker.min .tchev .hf-ic { rotate: 180deg; }
+.hf-tracker.walking .ob i { animation: hf-awpulse .9s ease-in-out infinite; }
+.hf-autowalk { display: flex; align-items: center; gap: 5px; align-self: flex-start; max-width: 232px; padding: 3px 10px 3px 7px; border-radius: 10px; font-size: 11px; font-weight: 700; letter-spacing: .08em; color: var(--ice); background: rgba(4, 14, 30, .55); border: 1px solid rgba(var(--cyan-rgb), .3); }
+.hf-autowalk span { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.hf-autowalk.off { display: none; }
+.hf-autowalk .hf-ic { font-size: 12px; color: var(--gold); animation: hf-awbob 1s ease-in-out infinite; }
+@keyframes hf-awbob { 50% { translate: 0 -2px; } }
+@keyframes hf-awpulse { 50% { box-shadow: 0 0 12px var(--cyan); scale: 1.3; } }

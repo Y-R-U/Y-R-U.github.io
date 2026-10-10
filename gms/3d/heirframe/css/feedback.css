@@ -209,3 +209,4 @@
 .hf-loot:has(.leq) { height: 40px; }
 /* keep toasts inside the gap between the vitals block and the menu buttons */
 .hf-toasts { width: max(220px, min(380px, 44vw, calc(100vw - 660px * var(--hs, 1)))); }
+.hf-marker.on.tap { pointer-events: auto; cursor: pointer; }

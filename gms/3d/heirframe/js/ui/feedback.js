@@ -91,6 +91,8 @@ export function createFeedback(bus) {
   const mk = { on: false };
   const mkPin = marker.querySelector('.mk-pin'), mkArrow = marker.querySelector('.mk-arrow');
   const mkLabel = marker.querySelector('.mk-txt b'), mkDist = marker.querySelector('.mk-txt span');
+  let joyEl = null;
+  onTap(marker, () => { if (marker.classList.contains('tap')) { haptic(); bus.emit('sfx', 'click'); bus.emit('objective:go'); } });
   function markerSet(sx, sy, onScreen, label = '', dist) {
     const W = innerWidth, H = innerHeight;
     if (!mk.on) { marker.classList.add('on'); mk.on = true; }
@@ -113,6 +115,10 @@ export function createFeedback(bus) {
     const hs = parseFloat(el.parentElement?.style.getPropertyValue('--hs')) || 1;
     if (!onScreen && x > W - 290 * hs && y > H - 240 * hs) y = H - 240 * hs;
     if (!onScreen && x < 300 * hs && y < 190 * hs) y = 190 * hs;
+    // the off-screen arrow is a tap target (auto-walk), except over the joystick zone where it would swallow drags
+    joyEl ||= el.parentElement?.querySelector('.hf-controls');
+    const inJoy = y - 23 > H * 0.42 && (joyEl?.classList.contains("swap") ? x > W * 0.56 - 20 : x < W * 0.44 + 20);
+    marker.classList.toggle('tap', !onScreen && !inJoy);
     marker.style.transform = `translate(${x}px, ${y}px)`;
   }
 

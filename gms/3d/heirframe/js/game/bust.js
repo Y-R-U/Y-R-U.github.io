@@ -44,6 +44,12 @@ export function createBust({ world, robots, tier, ui, audio }) {
   const head = new THREE.Vector3(), chest = new THREE.Vector3(), vp = new THREE.Vector4(), sc = new THREE.Vector4(), buf = new THREE.Vector2();
   const eyes = [];
   const stats = { renders: 0, calls: 0, ms: 0, compileMs: 0 };
+  // med/low: the bust redraws every 2nd frame; its box is measured only when it can have changed size
+  const every = tier.name === 'high' ? 1 : 2;
+  let tick = 0, dtAcc = 0, size = null;
+  const remeasure = () => { size = null; };
+  if (typeof ResizeObserver !== 'undefined') new ResizeObserver(remeasure).observe(cv.parentNode);
+  addEventListener('resize', remeasure);
 
   function clear() {
     veils.remove(); veil = null;
@@ -167,7 +173,12 @@ export function createBust({ world, robots, tier, ui, audio }) {
     const lv = audio?.voLevel?.() ?? 0;
     level += (lv - level) * (1 - Math.exp(-dt * (lv > level ? 30 : 8)));
     box.style.setProperty('--vl', level.toFixed(3));
-    const r = cv.parentNode.getBoundingClientRect();
+    dtAcc += dt;
+    if (++tick % every) return;
+    const fdt = dtAcc; dtAcc = 0;
+    // layout size, not getBoundingClientRect: the open animation scales the box, and a ResizeObserver never sees transforms
+    if (!size) { const el = cv.parentNode; size = { width: el.offsetWidth, height: el.offsetHeight }; }
+    const r = size;
     if (r.width < 8 || r.height < 8) return;
     const pr = Math.min(2, renderer.getPixelRatio());
     const w = Math.round(r.width * pr), h = Math.round(r.height * pr);
@@ -176,7 +187,7 @@ export function createBust({ world, robots, tier, ui, audio }) {
     renderer.getDrawingBufferSize(buf);
     if (w > buf.x || h > buf.y) return;
     const t0 = performance.now();
-    frame(dt);
+    frame(fdt);
     cam.aspect = w / h; cam.updateProjectionMatrix();
     const rp = renderer.getPixelRatio();
     renderer.getViewport(vp); renderer.getScissor(sc);
@@ -193,7 +204,7 @@ export function createBust({ world, robots, tier, ui, audio }) {
     if (!box.classList.contains('live')) box.classList.add('live');
   }
 
-  ui.on('dialogue:line', (o) => { try { setSpeaker(o); } catch (e) { console.warn('[bust]', e); } });
+  ui.on('dialogue:line', (o) => { size = null; try { setSpeaker(o); } catch (e) { console.warn('[bust]', e); } });
   ui.on('dialogue:end', () => { wantLive = false; box.classList.remove('live'); stopVideo(); if (mode === 'video') curKey = ''; level = 0; box.style.setProperty('--vl', 0); });
   return { update, stats, get mode() { return mode; }, get ready() { return ready; }, get key() { return curKey; }, get veil() { return veil; }, get video() { return vid; } };
 }

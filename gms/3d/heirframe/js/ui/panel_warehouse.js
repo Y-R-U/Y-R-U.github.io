@@ -19,6 +19,11 @@ const TABS = [['loadout', 'Loadout', 'chassis'], ['frames', 'Frames', 'warehouse
 const slotsOf = (f, all) => f.slotsAllowed || (f.rental ? ['weapon', 'chip'] : all);
 const better = (it, eq) => it.fr != null && (!eq || (eq.fr != null && it.fr > eq.fr));
 
+function emptyStash(data, filter) {
+  if (filter !== 'all' && (data.inventory || []).length) return `<div class="hf-empty wi-empty"><b>No ${esc(filter)} parts</b><span>Try another filter, or run contracts to find one.</span></div>`;
+  return `<div class="hf-empty wi-empty">${icon('contracts')}<b>Stash empty</b><span>Gear drops from the bots you beat on contracts. Take one at the Contract board, then equip your finds here.</span></div>`;
+}
+
 export function warehousePanel(body, data, ctx) {
   const st = ctx.state;
   const frames = data.frames || [];
@@ -79,12 +84,12 @@ export function warehousePanel(body, data, ctx) {
         <div class="wd-fig"><div class="wd-plinth"></div>${frameFigure(f.kind)}<p class="wd-blurb">${esc(f.blurb || BLURB[f.kind] || '')}</p></div>
         <div class="wd-col">${allSlots.slice(half).map(s => slotHtml(s, 'r')).join('')}</div>
       </div>
-      <div class="wd-stats">${stats}</div>
+      <div class="wd-stats hf-scroll">${stats}</div>
     </div>
     <div class="wh-inv">
       <div class="wi-hd"><span class="hf-label">Stash</span><span class="wi-n hf-num">${(data.inventory || []).length}${data.invMax ? ` / ${data.invMax}` : ''}</span></div>
       <div class="wi-f">${filters}</div>
-      <div class="wi-grid hf-scroll">${inv.map(it => itemTile(it, better(it, sl[it.slot]) && allowed.includes(it.slot) ? 'better' : '')).join('') || '<div class="hf-empty">Nothing here yet.</div>'}</div>
+      <div class="wi-grid hf-scroll">${inv.map(it => itemTile(it, better(it, sl[it.slot]) && allowed.includes(it.slot) ? 'better' : '')).join('') || emptyStash(data, st.filter)}</div>
     </div>
   </div>`;
 

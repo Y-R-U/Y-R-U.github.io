@@ -43,6 +43,7 @@ export function createAudio() {
     if (ctx) return ctx;
     const AC = hasDOM && (window.AudioContext || window.webkitAudioContext);
     if (!AC) return null;
+    try { if (navigator.audioSession) navigator.audioSession.type = 'playback'; } catch (e) { /* unsupported */ }
     try { ctx = new AC({ latencyHint: 'interactive' }); } catch (e) { ctx = new AC(); }
     const G = (v = 1) => { const g = ctx.createGain(); g.gain.value = v; return g; };
     const comp = ctx.createDynamicsCompressor();
