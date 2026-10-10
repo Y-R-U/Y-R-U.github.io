@@ -30,17 +30,26 @@ if (!params.has('nosave') && !FLAG.auto && !FLAG.shot && !FLAG.fast) {
 
 // ---------------- three boot ----------------
 const container = $('game-container');
-const renderer = new T.WebGLRenderer({ antialias: !FLAG.lite, powerPreference: 'high-performance' });
-renderer.setPixelRatio(Math.min(devicePixelRatio || 1, FLAG.lite ? 1.5 : 2));
+const profile = save.load();
+const renderer = new T.WebGLRenderer({ antialias: !FLAG.lite && !profile.opts.lite, powerPreference: 'high-performance' });
 renderer.setSize(innerWidth, innerHeight);
 renderer.outputColorSpace = T.SRGBColorSpace;
-const profile = save.load();
-const liteMode = FLAG.lite || profile.opts.lite;
-renderer.shadowMap.enabled = !liteMode;
-renderer.shadowMap.type = T.PCFSoftShadowMap;
+// adaptive quality: 0 full, 1 DPR 1.25 + hard PCF shadows, 2 lite (no shadows).
+// Battles step down live when frames drag; the level is remembered.
+let quality = FLAG.auto || FLAG.shot ? 0 : (profile.opts.quality | 0);
+const liteMode = () => FLAG.lite || profile.opts.lite || quality >= 2;
+function applyQuality() {
+  const lite = liteMode();
+  renderer.setPixelRatio(Math.min(devicePixelRatio || 1, quality >= 1 ? 1.25 : lite ? 1.5 : 2));
+  renderer.setSize(innerWidth, innerHeight);
+  renderer.shadowMap.enabled = !lite;
+  renderer.shadowMap.type = quality >= 1 ? T.PCFShadowMap : T.PCFSoftShadowMap;
+  scene.traverse((o) => { if (o.material) for (const m of [].concat(o.material)) m.needsUpdate = true; });
+}
 container.appendChild(renderer.domElement);
 
 const scene = new T.Scene();
+applyQuality();
 const camera = new T.PerspectiveCamera(CAM.fov, innerWidth / innerHeight, 0.05, 260);
 camera.position.set(10, 6, 10);
 
@@ -78,7 +87,7 @@ function toMenu() {
 
 function buildMenuStage() {
   battle = new Battle(scene, deps, {
-    cinematic: true, theme: 'garden', seed: 12, lite: liteMode,
+    cinematic: true, theme: 'garden', seed: 12, lite: liteMode(),
     teams: [
       { factionId: 'ants', count: 2, isAI: true, hat: profile.hat },
       { factionId: 'beetles', count: 2, isAI: true },
@@ -106,7 +115,7 @@ function startQuick(cfg) {
     teams.push({ factionId: f.id, count: cfg.size, isAI: true, diff: resolveDiff(cfg.diff) });
   }
   battle = new Battle(scene, deps, {
-    teams, theme: themeId, lite: liteMode,
+    teams, theme: themeId, lite: liteMode(),
     seed: params.get('seed') ? Number(params.get('seed')) : undefined,
     fast: FLAG.fast || FLAG.auto,
     replays: params.has('replays') ? 'force' : (profile.opts.replays && !FLAG.auto),
@@ -128,7 +137,7 @@ function startStory(ch) {
   battle = new Battle(scene, deps, {
     cinematic: true,
     teams: chapterTeams(ch, p.faction, p.hat),
-    theme: ch.theme, seed: ch.seed, lite: liteMode,
+    theme: ch.theme, seed: ch.seed, lite: liteMode(),
     sandwich: ch.sandwich, sandwichPos: ch.sandwichPos,
     suddenDeathRound: ch.suddenDeathRound,
     fast: FLAG.fast || FLAG.auto, replays: profile.opts.replays && !FLAG.auto,
@@ -218,14 +227,13 @@ ui.init({
 });
 const input = new Input(renderer.domElement, cams, () => (battleIsReal ? battle : null), ui);
 
-// audio unlock on first gesture
-window.addEventListener('pointerdown', () => {
-  audio.init();
-  audio.resume();
-  audio.setSfx(profile.opts.sfx);
-  audio.setMusic(profile.opts.music);
-  if (mode === 'menu') audio.music('menu');
-}, { once: true });
+// audio: every gesture re-checks the context (Android can re-suspend it), and
+// a hidden tab suspends it and stops the music scheduler
+audio.setSfx(profile.opts.sfx);
+audio.setMusic(profile.opts.music);
+for (const ev of ['pointerdown', 'touchend', 'click', 'keydown'])
+  window.addEventListener(ev, () => audio.ensureRunning(), { capture: true, passive: true });
+document.addEventListener('visibilitychange', () => audio.setHidden(document.hidden));
 
 addEventListener('resize', () => {
   camera.aspect = innerWidth / innerHeight;
@@ -235,6 +243,7 @@ addEventListener('resize', () => {
 
 // ---------------- boot path ----------------
 $('boot').classList.add('hidden');
+window.__gbBooted = true;
 if (FLAG.shot) {
   // staged thumbnail: picnic showdown around the sandwich
   battle = new Battle(scene, deps, {
@@ -281,9 +290,33 @@ if (FLAG.shot) {
 // ---------------- loop ----------------
 const clock = new T.Clock();
 let fps = 60, fpsAcc = 0, fpsN = 0;
+const perf = { acc: 0, n: 0, slow: 0, grace: 3 };
+function stepQuality(to) {
+  if (to <= quality || to > 2) return;
+  quality = to;
+  applyQuality();
+  if (!FLAG.auto && !FLAG.shot) { profile.opts.quality = quality; save.save(); }
+  ui.toast(quality === 1 ? '⚙️ Smoother mode: lighter resolution & shadows' : '⚙️ Battery saver on: shadows off', 2600);
+  perf.slow = 0; perf.grace = 3;
+}
+// frames slower than ~22 ms for 2 s straight in a real battle → step down
+function watchPerf(dtReal) {
+  if (mode !== 'battle' || !battleIsReal || ui.isPaused() || document.hidden || quality >= 2 || FLAG.auto || FLAG.shot) {
+    perf.acc = perf.n = perf.slow = 0; perf.grace = Math.max(perf.grace, 1); return;
+  }
+  if (dtReal > 0.25) return;                 // tab switch / GC hitch, not a trend
+  if (perf.grace > 0) { perf.grace -= dtReal; return; }
+  perf.acc += dtReal; perf.n++;
+  if (perf.acc < 0.5) return;
+  perf.slow = perf.acc / perf.n > 0.022 ? perf.slow + 1 : 0;
+  perf.acc = perf.n = 0;
+  if (perf.slow >= 4) stepQuality(quality + 1);
+}
 function frame() {
   requestAnimationFrame(frame);
-  const raw = Math.min(clock.getDelta(), 0.05);
+  const dtReal = clock.getDelta();
+  const raw = Math.min(dtReal, 0.05);
+  watchPerf(dtReal);
   fpsAcc += raw; fpsN++;
   if (fpsAcc > 0.5) { fps = fpsN / fpsAcc; fpsAcc = 0; fpsN = 0; }
   const ts = ui.isPaused() ? 0 : cams.timeScale();
@@ -301,7 +334,8 @@ frame();
 // ---------------- test hooks ----------------
 window.__game = {
   get battle() { return battle; }, get mode() { return mode; },
-  cams, save, startQuick, startStory, CHAPTERS, ui,
+  cams, save, startQuick, startStory, toMenu, CHAPTERS, ui, renderer,
+  stepQuality, get quality() { return quality; },
 };
 window.__state = () => ({
   mode, fps: Math.round(fps),

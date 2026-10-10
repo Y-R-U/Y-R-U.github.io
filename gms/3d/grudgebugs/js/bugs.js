@@ -7,6 +7,7 @@ import * as THREE from 'three';
 const T = THREE;
 
 const matCache = new Map();
+const cached = new WeakSet();
 export function mat(color, opts = {}) {
   const key = color + JSON.stringify(opts);
   if (!matCache.has(key)) {
@@ -16,9 +17,25 @@ export function mat(color, opts = {}) {
       opacity: opts.opacity ?? 1, emissive: opts.emissive ?? 0x000000,
       emissiveIntensity: opts.emissiveIntensity ?? 1, side: opts.side ?? T.FrontSide,
     }));
+    cached.add(matCache.get(key));
   }
   return matCache.get(key);
 }
+
+// free GPU buffers under obj; cached mat()s and anything in `keep` survive
+export function disposeTree(obj, { keep } = {}) {
+  if (!obj) return;
+  const freeMat = (m) => {
+    if (!m || cached.has(m) || keep?.has(m)) return;
+    for (const k in m) if (m[k]?.isTexture && !keep?.has(m[k])) m[k].dispose();
+    m.dispose();
+  };
+  obj.traverse((o) => {
+    if (o.geometry && !keep?.has(o.geometry)) o.geometry.dispose();
+    if (Array.isArray(o.material)) o.material.forEach(freeMat); else freeMat(o.material);
+  });
+}
+
 const sph = (r, c, o) => new T.Mesh(new T.SphereGeometry(r, 12, 10), mat(c, o));
 const cyl = (r1, r2, h, c, o) => new T.Mesh(new T.CylinderGeometry(r1, r2, h, 10), mat(c, o));
 const box = (x, y, z, c, o) => new T.Mesh(new T.BoxGeometry(x, y, z), mat(c, o));

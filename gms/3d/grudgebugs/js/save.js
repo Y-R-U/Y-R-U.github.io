@@ -12,7 +12,7 @@ const DEFAULTS = {
   introSeen: false,
   daily: { last: '', streak: 0 },
   stats: { battles: 0, wins: 0, kills: 0, falls: 0 },
-  opts: { sfx: true, music: true, shake: true, replays: true, lite: false },
+  opts: { sfx: true, music: true, shake: true, replays: true, lite: false, aimHint: 2, quality: 0 },
 };
 
 let data = null;

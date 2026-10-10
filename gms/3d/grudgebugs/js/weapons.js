@@ -140,10 +140,10 @@ export function makeReticle(color = 0xff5a3a) {
 }
 
 // dotted trajectory preview
-export function makeTrajectory(n = 24) {
+export function makeTrajectory(n = 24, { color = 0xffffff, opacity = 0.75, glow = 0.6, r = 0.05 } = {}) {
   const g = new T.Group();
-  const geo = new T.SphereGeometry(0.05, 6, 5);
-  const m = mat(0xffffff, { emissive: 0xffffff, emissiveIntensity: 0.6, opacity: 0.75 });
+  const geo = new T.SphereGeometry(r, 6, 5);
+  const m = mat(color, { emissive: color, emissiveIntensity: glow, opacity });
   for (let i = 0; i < n; i++) {
     const d = new T.Mesh(geo, m);
     d.visible = false;

@@ -157,11 +157,13 @@ export function update(dt) {
     b.target.getWorldPosition(_v);
     _v.y += 0.32;
     _v.project(camera);
-    if (_v.z > 1) { b.el.style.opacity = '0'; continue; }
-    const x = (_v.x * 0.5 + 0.5) * w, y = (-_v.y * 0.5 + 0.5) * h;
-    b.el.style.opacity = b.life < 0.3 ? String(b.life / 0.3) : '1';
-    b.el.style.left = `${x}px`;
-    b.el.style.top = `${y - 14}px`;
+    const op = _v.z > 1 ? '0' : b.life < 0.3 ? (b.life / 0.3).toFixed(2) : '1';
+    if (op !== b.op) { b.op = op; b.el.style.opacity = op; }
+    if (_v.z > 1) continue;
+    const x = Math.round((_v.x * 0.5 + 0.5) * w), y = Math.round((-_v.y * 0.5 + 0.5) * h) - 14;
+    if (x === b.x && y === b.y) continue;
+    b.x = x; b.y = y;
+    b.el.style.transform = `translate(${x}px, ${y}px) translate(-50%, -100%)`;
   }
 }
 

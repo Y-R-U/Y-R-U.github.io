@@ -3,20 +3,37 @@
 
 let ctx = null, master = null, sfxG = null, musG = null;
 let sfxOn = true, musicOn = true;
-let musicTimer = null, musicBed = null, musicStep = 0;
+let musicTimer = null, musicBed = null, musicStep = 0, hidden = false;
 
 export function init() {
   if (ctx) return;
   try {
+    try { if (navigator.audioSession) navigator.audioSession.type = 'playback'; } catch {}
     ctx = new (window.AudioContext || window.webkitAudioContext)();
     master = ctx.createGain(); master.gain.value = 0.9; master.connect(ctx.destination);
-    sfxG = ctx.createGain(); sfxG.connect(master);
-    musG = ctx.createGain(); musG.gain.value = 0.32; musG.connect(master);
-  } catch { /* no audio */ }
+    sfxG = ctx.createGain(); sfxG.gain.value = sfxOn ? 1 : 0; sfxG.connect(master);
+    musG = ctx.createGain(); musG.gain.value = musicOn ? 0.32 : 0; musG.connect(master);
+  } catch { ctx = null; return; }
+  startBed();   // a bed requested before the first gesture starts now
 }
-export function resume() { ctx?.resume?.(); }
+// the one entry point for every gesture: create if needed, resume if not running
+export function ensureRunning() {
+  if (hidden) return;
+  init();
+  if (ctx && ctx.state !== 'running') Promise.resolve(ctx.resume?.()).catch(() => {});
+  if (ctx && musicBed && !musicTimer) startBed();
+}
+export function setHidden(h) {
+  hidden = h;
+  if (h) {
+    if (musicTimer) { clearInterval(musicTimer); musicTimer = null; }
+    chargeStop(); whooshStop();
+    if (ctx) Promise.resolve(ctx.suspend?.()).catch(() => {});
+  } else if (ctx) ensureRunning();
+}
 export function setSfx(on) { sfxOn = on; if (sfxG) sfxG.gain.value = on ? 1 : 0; }
 export function setMusic(on) { musicOn = on; if (musG) musG.gain.value = on ? 0.32 : 0; }
+const live = () => ctx && ctx.state === 'running';
 
 const now = () => ctx.currentTime;
 function env(g, t0, a, peak, d, sustainTo = 0.0001) {
@@ -48,9 +65,9 @@ function noise(t0, dur, peak, filterType = 'lowpass', freq = 800, q = 0.7) {
 }
 
 // ---------------- sfx ----------------
-export function ui() { if (!ctx || !sfxOn) return; osc('triangle', 620, now(), 0.07, 0.12); }
+export function ui() { if (!live() || !sfxOn) return; osc('triangle', 620, now(), 0.07, 0.12); }
 export function boom(size = 1) {
-  if (!ctx || !sfxOn) return;
+  if (!live() || !sfxOn) return;
   const t = now();
   noise(t, 0.5 * size, 0.5, 'lowpass', 320 * size);
   const o = osc('sine', 90 * size, t, 0.5, 0.5);
@@ -58,14 +75,14 @@ export function boom(size = 1) {
   noise(t + 0.02, 0.18, 0.25, 'highpass', 1800);
 }
 export function splash() {
-  if (!ctx || !sfxOn) return;
+  if (!live() || !sfxOn) return;
   const t = now();
   const o = osc('sine', 300, t, 0.16, 0.3);
   o?.frequency.exponentialRampToValueAtTime(70, t + 0.15);
   noise(t + 0.05, 0.55, 0.3, 'bandpass', 1300, 1.2);
 }
 export function boing() {
-  if (!ctx || !sfxOn) return;
+  if (!live() || !sfxOn) return;
   const t = now();
   const o = osc('sine', 240, t, 0.28, 0.28);
   o?.frequency.setValueAtTime(240, t);
@@ -73,24 +90,24 @@ export function boing() {
   o?.frequency.exponentialRampToValueAtTime(180, t + 0.26);
 }
 export function slap() {
-  if (!ctx || !sfxOn) return;
+  if (!live() || !sfxOn) return;
   noise(now(), 0.09, 0.5, 'bandpass', 2400, 1.5);
 }
-export function fuseTick() { if (!ctx || !sfxOn) return; osc('square', 1500, now(), 0.03, 0.06); }
+export function fuseTick() { if (!live() || !sfxOn) return; osc('square', 1500, now(), 0.03, 0.06); }
 export function pop() {
-  if (!ctx || !sfxOn) return;
+  if (!live() || !sfxOn) return;
   const t = now();
   const o = osc('sine', 500, t, 0.09, 0.3);
   o?.frequency.exponentialRampToValueAtTime(900, t + 0.08);
 }
 export function squashThud() {
-  if (!ctx || !sfxOn) return;
+  if (!live() || !sfxOn) return;
   const t = now();
   noise(t, 0.3, 0.6, 'lowpass', 200);
   osc('sine', 55, t, 0.35, 0.55);
 }
 export function fallWhistle(dur = 1.2) {
-  if (!ctx || !sfxOn) return;
+  if (!live() || !sfxOn) return;
   const t = now();
   const o = osc('sine', 1900, t, dur, 0.14);
   o?.frequency.exponentialRampToValueAtTime(500, t + dur);
@@ -99,7 +116,7 @@ export function fallWhistle(dur = 1.2) {
 // charge-up: persistent rising tone while held
 let chargeOsc = null, chargeGain = null;
 export function chargeStart() {
-  if (!ctx || !sfxOn) return;
+  if (!live() || !sfxOn) return;
   chargeStop();
   chargeOsc = ctx.createOscillator(); chargeGain = ctx.createGain();
   chargeOsc.type = 'sawtooth'; chargeOsc.frequency.value = 90;
@@ -115,7 +132,7 @@ export function chargeStop() {
 // projectile whoosh
 let whoosh = null, whooshG = null, whooshF = null;
 export function whooshStart() {
-  if (!ctx || !sfxOn) return;
+  if (!live() || !sfxOn) return;
   whooshStop();
   const len = ctx.sampleRate * 2;
   const buf = ctx.createBuffer(1, len, ctx.sampleRate);
@@ -131,7 +148,7 @@ export function whooshSet(v) { if (whooshG) { whooshG.gain.value = 0.05 + v * 0.
 export function whooshStop() { if (whoosh) { try { whoosh.stop(); } catch {} whoosh = null; } }
 
 export function fanfare(win = true) {
-  if (!ctx || !sfxOn) return;
+  if (!live() || !sfxOn) return;
   const t = now();
   if (win) {
     [[523, 0], [659, 0.12], [784, 0.24], [1047, 0.38]].forEach(([f, dt]) =>
@@ -148,7 +165,7 @@ export function fanfare(win = true) {
 // ---------------- insect gibberish ----------------
 // voice: {base, spread, rate, wave} from FACTIONS; n ≈ syllables
 export function speak(voice, n = 5) {
-  if (!ctx || !sfxOn) return;
+  if (!live() || !sfxOn) return;
   const t0 = now();
   const step = 1 / voice.rate;
   for (let i = 0; i < Math.min(n, 14); i++) {
@@ -165,15 +182,19 @@ const BATTLE_BASS = [82.4, 82.4, 82.4, 92.5, 82.4, 82.4, 73.4, 77.8];
 const BATTLE_MEL = [330, 0, 392, 0, 330, 415, 0, 392, 330, 0, 294, 330, 0, 247, 0, 0];
 
 export function music(bed) {
-  if (musicBed === bed) return;
+  if (musicBed === bed && (musicTimer || !ctx)) return;
   musicBed = bed;
-  if (musicTimer) { clearInterval(musicTimer); musicTimer = null; }
-  if (!bed || !ctx) return;
   musicStep = 0;
+  startBed();
+}
+function startBed() {
+  if (musicTimer) { clearInterval(musicTimer); musicTimer = null; }
+  const bed = musicBed;
+  if (!bed || !ctx || hidden) return;
   const bpm = bed === 'menu' ? 96 : 122;
   const stepDur = 60 / bpm / 2;
   musicTimer = setInterval(() => {
-    if (!musicOn || !ctx) return;
+    if (!musicOn || !live()) return;
     const t = now() + 0.05;
     const i = musicStep++;
     const bass = bed === 'menu' ? MENU_BASS : BATTLE_BASS;

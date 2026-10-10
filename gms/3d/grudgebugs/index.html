@@ -26,11 +26,16 @@
     <div class="menu-inner">
       <div class="game-logo">GRUDGE<span>BUGS</span></div>
       <div class="game-tag">tiny bugs · narrow ledges · enormous grudges</div>
+      <div id="daily-callout" class="hidden">
+        <span>🎁 Daily chest ready <b id="daily-amt"></b></span>
+        <button id="daily-claim">Claim</button>
+        <button id="daily-x" aria-label="dismiss">✕</button>
+      </div>
       <div class="menu-btns">
         <button id="btn-continue" class="big gold hidden">▶&ensp;Continue Story</button>
         <button id="btn-story" class="big gold">🥪&ensp;Story</button>
         <button id="btn-quick" class="big">💥&ensp;Quick Grudge</button>
-        <button id="btn-shop" class="big">🎩&ensp;Hat Shop <span id="menu-coins" class="coinpill">🪙 0</span></button>
+        <button id="btn-shop" class="big">🎩&ensp;Hat Shop<i class="daily-dot">🎁</i> <span id="menu-coins" class="coinpill">🪙 0</span></button>
         <button id="btn-help" class="big">📖&ensp;How to Play</button>
         <button id="btn-options" class="big">⚙️&ensp;Options</button>
       </div>
@@ -129,6 +134,39 @@
       "three/addons/": "../../lib/three/0.160.0/addons/"
     }
   }
+  </script>
+  <script>
+  // boot watchdog: a module error or a stale cached module would otherwise hang
+  // on "loading…" forever. Offer a reload that refetches every module first.
+  (function () {
+    var shown = false;
+    function fail(msg) {
+      if (window.__gbBooted || shown) return;
+      shown = true;
+      var st = document.getElementById('boot-status');
+      if (!st) return;
+      st.innerHTML = '<div class="boot-fail"></div><button id="boot-reload" class="big gold">↻ Reload</button>';
+      st.firstChild.textContent = msg;
+      document.getElementById('boot-reload').onclick = function () {
+        this.textContent = 'reloading…';
+        var files = ['main', 'config', 'utils', 'save', 'audio', 'voice', 'ui', 'fx', 'cameras', 'input', 'game',
+          'story', 'bugs', 'level', 'weapons', 'physics', 'ai', 'cloud'].map(function (f) { return 'js/' + f + '.js'; });
+        files.push('style.css');
+        Promise.all(files.map(function (f) { return fetch(f, { cache: 'reload' }).catch(function () {}); }))
+          .then(function () {
+            var u = new URL(location.href); u.searchParams.set('v', Date.now().toString(36));
+            location.replace(u.toString());
+          });
+      };
+    }
+    addEventListener('error', function (e) {
+      var t = e.target;
+      if (t && t.tagName === 'SCRIPT') fail('The game failed to load.');
+      else if (!window.__gbBooted) fail('The game hit an error while loading.');
+    }, true);
+    addEventListener('unhandledrejection', function () { if (!window.__gbBooted) fail('The game hit an error while loading.'); });
+    setTimeout(function () { fail('This is taking longer than it should.'); }, 15000);
+  })();
   </script>
   <script type="module" src="js/main.js"></script>
 </body>

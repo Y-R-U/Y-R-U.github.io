@@ -7,7 +7,7 @@ import * as THREE from 'three';
 import { PHYS, RULES, WEAPONS, FACTIONS, AI, WIND_LABELS, REPLAY_ANGLES } from './config.js';
 import { mulberry32, clamp, lerp, pick, v3 } from './utils.js';
 import * as phys from './physics.js';
-import { buildBugMesh, animateBug, makeGravestone } from './bugs.js';
+import { buildBugMesh, animateBug, makeGravestone, disposeTree } from './bugs.js';
 import { generateLayout, pickSpawns, ArenaView } from './level.js';
 import { makeProjectile, makeShoe, makeBomber, animateBomber, makeBeeBomb, makeReticle, makeTrajectory, setTrajectory } from './weapons.js';
 import { sampleRecPath } from './cameras.js';
@@ -83,6 +83,9 @@ export class Battle {
     // aim + widgets
     this.aim = { yaw: 0, pitch: 0.55, power: 0, charging: false };
     this.traj = makeTrajectory(); this.traj.visible = false; this.group.add(this.traj);
+    // faint arc of the active team's previous shot, beside the live preview
+    this.ghostTraj = makeTrajectory(30, { color: 0xffd94a, opacity: 0.45, glow: 0.5, r: 0.045 });
+    this.ghostTraj.visible = false; this.group.add(this.ghostTraj);
     this.reticle = makeReticle(); this.reticle.visible = false; this.group.add(this.reticle);
     this.moveInput = 0; this.moveLeft = RULES.moveBudget;
     this.graves = [];
@@ -210,6 +213,9 @@ export class Battle {
     if (this.over || this.phase === 'play') return;
     const bug = this._active;
     this.phase = 'play';
+    // this bug's own last shot if it has one, else the team's
+    this._ghostPath = bug.lastPath || this.activeTeam().lastPath || null;
+    if (this._ghostPath?.length > 1) setTrajectory(this.ghostTraj, this._ghostPath, Infinity);
     this.cams.setMode('aim', { target: () => this._v3(this.bugPos(bug)), aim: () => this.aim });
     voice.say(bug, 'turn', { prob: 0.85 });
     this.opts.onHUD?.(this);
@@ -341,6 +347,7 @@ export class Battle {
     const rec = phys.simulate({ pos: this._muzzle(bug), vel, w, shooterId: bug.id }, this.physWorld());
     rec.weaponId = wid; rec.shooter = bug;
     rec.shotPath = rec.path; rec.dur = rec.impact.t;
+    team.lastPath = bug.lastPath = rec.path;
     this._startShotPlayback(rec);
     this.turnRec = { shots: [rec], victims: [], bites: [], kills: 0, selfHit: false, weaponId: wid, shooter: bug };
     bug.rig.flinchT = 0.2;
@@ -573,7 +580,7 @@ export class Battle {
       this.group.add(grave);
       this.graves.push(grave);
     }
-    this.group.remove(bug.rig.root);
+    this._drop(bug.rig.root);
     this.opts.onHUD?.(this);
   }
 
@@ -646,6 +653,7 @@ export class Battle {
     this.markerTag.textContent = `🎯 ${en.name} · ${Math.max(0, en.hp)} HP`;
     this.markerTag.style.color = en.faction.ui;
     this.markerTag.classList.remove('hidden');
+    this._tagOn = true;
   }
 
   _markerStep(unscaledDt) {
@@ -655,6 +663,7 @@ export class Battle {
     if (this.markerT <= 0 || !en.alive || en.airborne) {
       this.marker.visible = false;
       this.markerTag.classList.add('hidden');
+      this._tagOn = false;
       this.markerBug = null;
       return;
     }
@@ -665,11 +674,15 @@ export class Battle {
     this.marker.rotation.y += unscaledDt * 2.2;
     // DOM tag floats above the chevron
     const v = new T.Vector3(p.x, top + 0.55, p.z).project(this.cams.cam);
-    if (v.z < 1) {
-      this.markerTag.style.left = `${(v.x * 0.5 + 0.5) * innerWidth}px`;
-      this.markerTag.style.top = `${(-v.y * 0.5 + 0.5) * innerHeight}px`;
-      this.markerTag.classList.remove('hidden');
-    } else this.markerTag.classList.add('hidden');
+    const on = v.z < 1;
+    if (on !== this._tagOn) { this._tagOn = on; this.markerTag.classList.toggle('hidden', !on); }
+    if (on) {
+      const x = Math.round((v.x * 0.5 + 0.5) * innerWidth), y = Math.round((-v.y * 0.5 + 0.5) * innerHeight);
+      if (x !== this._tagX || y !== this._tagY) {
+        this._tagX = x; this._tagY = y;
+        this.markerTag.style.transform = `translate(${x}px, ${y}px) translate(-50%, -100%)`;
+      }
+    }
   }
 
   // ---------------- AI ----------------
@@ -799,7 +812,7 @@ export class Battle {
     }
     if (rp.playT >= rp.end) {
       for (const g of rp.ghosts) {
-        this.group.remove(g.mesh);
+        this._drop(g.mesh);
         if (g.bugRef?.alive) g.bugRef.rig.root.visible = true;
       }
       document.getElementById('replay-tag').classList.add('hidden');
@@ -826,6 +839,8 @@ export class Battle {
     }
     this.arena.update(dt, performance.now() / 1000);
     this.reticle.rotation.y += dt * 1.5;
+    this.ghostTraj.visible = this.phase === 'play' && !this.over && !this.targeting
+      && this._ghostPath?.length > 1 && W(this.activeTeam().weapon).kind !== 'melee';
     this._markerStep(unscaledDt);
 
     if (this.over) return;
@@ -892,7 +907,7 @@ export class Battle {
       if (w.fuse && pb.playT - pb.lastFuse > 0.5) { pb.lastFuse = pb.playT; audio.fuseTick(); }
       audio.whooshSet(1 - pb.playT / Math.max(0.5, pb.rec.dur));
       if (pb.playT >= pb.rec.dur) {
-        this.group.remove(pb.mesh);
+        this._drop(pb.mesh);
         this.projectiles.splice(i, 1);
         audio.whooshStop();
         this.cams.setMode('impact', {
@@ -964,7 +979,7 @@ export class Battle {
       st.mesh.position.set(p.x, p.y, p.z);
       st.mesh.rotation.z = Math.sin(st.playT * 3) * 0.08;
       if (k >= 1) {
-        this.group.remove(st.mesh);
+        this._drop(st.mesh);
         audio.squashThud();
         this.cams.addShake(0.9);
         this.strike = null;
@@ -999,16 +1014,19 @@ export class Battle {
         if (st.dropped === 1) this.turnRec.shots.push(rec);
       }
       if (st.playT > st.dur) {
-        for (const b of st.bombers) this.group.remove(b);
+        for (const b of st.bombers) this._drop(b);
         this.strike = null;
         if (!this.projectiles.length) this.phase = 'resolve';
       }
     }
   }
 
+  _drop(obj) { this.group.remove(obj); disposeTree(obj); }
+
   dispose() {
     if (this.cams.groundAt) this.cams.groundAt = null;
     this.scene.remove(this.group);
+    disposeTree(this.group);
     this.arena.dispose();
     this.markerTag?.remove();
     voice.clear();

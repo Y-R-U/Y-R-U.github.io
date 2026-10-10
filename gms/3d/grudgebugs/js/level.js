@@ -7,7 +7,7 @@
 import * as THREE from 'three';
 import { PHYS, THEMES } from './config.js';
 import { solidSpans, posAt } from './physics.js';
-import { mat } from './bugs.js';
+import { mat, disposeTree } from './bugs.js';
 import { lerp } from './utils.js';
 
 const T = THREE;
@@ -404,7 +404,7 @@ export class ArenaView {
     scene.add(this.group);
 
     const th = this.theme;
-    scene.background = gradientTex(th.sky[0], th.sky[1]);
+    this.sky = scene.background = gradientTex(th.sky[0], th.sky[1]);
     scene.fog = new T.Fog(th.fog, 26, 78);
 
     // lights
@@ -477,7 +477,7 @@ export class ArenaView {
 
   refreshLedge(L) {
     const old = this.ledgeGroups.get(L.i);
-    if (old) { this.group.remove(old); old.traverse(m => m.geometry?.dispose?.()); }
+    if (old) { this.group.remove(old); disposeTree(old); }
     const g = buildLedgeMesh(L, this.theme);
     this.ledgeGroups.set(L.i, g);
     this.group.add(g);
@@ -497,8 +497,10 @@ export class ArenaView {
 
   dispose() {
     this.scene.remove(this.group);
-    this.group.traverse(m => m.geometry?.dispose?.());
-    this.scene.background = null;
+    disposeTree(this.group);
+    this.sun.dispose();
+    if (this.scene.background === this.sky) this.scene.background = null;
+    this.sky.dispose();
     this.scene.fog = null;
   }
 }

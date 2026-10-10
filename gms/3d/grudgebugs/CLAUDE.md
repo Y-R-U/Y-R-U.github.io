@@ -124,6 +124,34 @@ boot/modes/loop/flags.
   with `b.over` undefined mid-battle, so every weapon select flipped the
   bottom controls invisible. `over` is now initialised `false` in the Battle
   ctor AND folded into `mine`; keep force args `!!`-coerced.
+- **GPU memory**: everything dropped from a scene goes through
+  `disposeTree(obj, {keep})` (bugs.js) — it skips the shared `mat()` cache
+  (WeakSet) and anything in `keep` (FX's shared sphere/quad geos). Battle
+  uses `_drop(obj)` for projectiles, shoe, bombers, ghosts and killed bugs;
+  `Battle.dispose` + `ArenaView.dispose` free the rest (sky texture, sun
+  shadow map). Restarts are flat (~2.5k buffers, ~12 MB heap); before this
+  each restart leaked ~1,900 buffers.
+- **Audio** (`audio.js`): one `ensureRunning()` for every gesture
+  (pointerdown/touchend/click/keydown, capture, kept for the page lifetime)
+  and the HUD buttons; `setHidden()` on visibilitychange suspends the
+  context and stops the music interval. `music(bed)` before the context
+  exists just records the bed — `init()` starts it. Sfx/music only schedule
+  into a running context.
+- **Adaptive quality** (`main.js` `watchPerf`): in a real battle, >22 ms
+  frames averaged over 2 s step `quality` 0→1 (DPR 1.25, PCFShadowMap) →2
+  (lite: shadows off), live, with a toast; saved in `opts.quality`. Off for
+  `?auto`/`?shot`. `__game.stepQuality(n)` forces it.
+- Daily chest is non-blocking: Hat Shop badge + dismissible menu callout +
+  claim card at the top of the shop. Never a modal.
+- Aim hint counts down `opts.aimHint` (2 player turns ever), fades after 5 s.
+- Portrait aim cam (`cameras.js` aim, `pk` factor) pulls back/up and looks
+  further down-range when aspect < 1. `ghostTraj` shows the active team's
+  previous shot (`team.lastPath`) faintly during aiming.
+- Bubbles and the target tag are positioned with `transform: translate()`
+  (written only on change); their pop-in animates `scale`, not `transform`.
+- `index.html` has an inline boot watchdog: a module load error or 15 s
+  without `window.__gbBooted` shows a reload button that refetches every
+  `js/*.js` with `cache:'reload'` first. **Add new js files to its list.**
 
 ## Testing
 
@@ -137,7 +165,8 @@ boot/modes/loop/flags.
   (skip flybys/replays/dialog), `?replays=1` (force replays even in auto),
   `?lite=1`, `?nosave`, `?seed=N`, `?ch=1..10` (straight into a chapter),
   `?shot=1` (staged thumbnail, `window.__shotReady`), `?rivals=1-3&diff=id`
-  (auto battles).
+  (auto battles). `__game.toMenu()`, `__game.renderer` (for
+  `renderer.info.memory`) are exposed for leak checks.
 - Watch `pend` in `__state` — if it climbs past ~10 the shard chain is back.
 - A battle between AIs lasts 2–6 rounds; teams mostly die by knock-off
   (fall = full bug), which is intended Worms chaos.

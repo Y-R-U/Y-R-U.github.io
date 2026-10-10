@@ -19,11 +19,14 @@ button { font-family: inherit; color: inherit; border: none; background: none; c
 .boot-title span { color: #8be24a; }
 .boot-sub { margin-top: 6px; font-size: 14px; color: #cfe8b0; font-style: italic; }
 #boot-status { margin-top: 26px; font-size: 13px; color: #9db88a; }
+#boot-status .boot-fail { margin-bottom: 12px; color: #ffd0b8; font-size: 14px; }
+#boot-reload { text-align: center; padding: 11px 26px; }
 
 /* ---------- screens ---------- */
 .screen { position: fixed; inset: 0; z-index: 40; display: flex; flex-direction: column;
   background: linear-gradient(180deg, #16281bee 0%, #101c14f5 100%); backdrop-filter: blur(6px); }
-#menu { background: linear-gradient(180deg, #101c1428 0%, #101c1440 45%, #101c14d9 100%); backdrop-filter: none; }
+#menu { background: linear-gradient(180deg, #101c1428 0%, #101c1440 45%, #101c14d9 100%); backdrop-filter: none;
+  overflow-y: auto; touch-action: pan-y; }
 #menu.has-art { background-size: cover; background-position: center; }
 #menu.has-art::before { content:""; position:absolute; inset:0;
   background: linear-gradient(180deg, #101c1420 0%, #101c14d8 78%); }
@@ -44,6 +47,23 @@ button.big.gold { background: #6b4d13e0; border-color: #c99a2e; color: #ffe9ad; 
   padding: 3px 9px; border-radius: 20px; }
 .big-pill { font-size: 15px; padding: 6px 12px; }
 .menu-foot { margin-top: 22px; font-size: 11px; color: #7e9a6c; }
+
+/* daily chest: badge on Hat Shop + a dismissible callout, never a modal */
+.daily-dot { display: none; font-style: normal; margin-left: 6px; }
+#btn-shop.has-daily { border-color: #ffd94a; animation: dailyglow 1.1s infinite alternate; }
+#btn-shop.has-daily .daily-dot { display: inline-block; animation: dailybob .9s infinite alternate; }
+@keyframes dailyglow { to { box-shadow: 0 4px 0 #16241255, 0 0 22px #ffd94a88; } }
+@keyframes dailybob { to { transform: translateY(-3px) rotate(-8deg); } }
+#daily-callout { display: flex; align-items: center; gap: 8px; margin: -12px 0 14px; padding: 7px 8px 7px 14px;
+  border-radius: 14px; background: #1a2b16e6; border: 2px solid #ffd94a99; font-size: 13.5px; font-weight: 700;
+  text-align: left; box-shadow: 0 4px 14px #0007; }
+#daily-callout span { flex: 1; }
+#daily-callout b { color: #ffd94a; white-space: nowrap; }
+#daily-claim { padding: 7px 14px; border-radius: 11px; background: #6b4d13; border: 2px solid #c99a2e; color: #ffe9ad; font-weight: 800; }
+#daily-x { width: 30px; height: 30px; border-radius: 9px; color: #a9c793; font-size: 14px; }
+.daily-card { margin: 10px 0 14px; padding: 13px 14px; border-radius: 15px; background: #2a2412cc; border: 2px solid #c99a2e; }
+.daily-card .dc-head { font-weight: 900; color: #ffd94a; }
+.daily-card button.big { width: 100%; text-align: center; padding: 11px; }
 
 .scr-head { display: flex; align-items: center; gap: 12px; padding: calc(env(safe-area-inset-top) + 12px) calc(16px + var(--br8t-account-space, 0px)) 12px 16px; }
 .scr-head h2 { font-size: 22px; font-weight: 900; color: #ffd94a; flex: 1; }
@@ -131,7 +151,8 @@ button.big.gold { background: #6b4d13e0; border-color: #c99a2e; color: #ffe9ad; 
 #walk-meter { width: 52px; height: 8px; margin-bottom: 24px; border-radius: 5px; background: #0008; overflow: hidden; }
 #walk-fill { height: 100%; width: 100%; background: #8be24a; border-radius: 5px; }
 #aim-hint { position: absolute; bottom: 158px; left: 0; right: 0; text-align: center; font-size: 12.5px;
-  color: #ffffffc9; text-shadow: 0 2px 5px #000; pointer-events: none; }
+  color: #ffffffc9; text-shadow: 0 2px 5px #000; pointer-events: none; transition: opacity .9s; }
+#aim-hint.fade { opacity: 0; }
 
 /* power bar */
 #powerbar { position: absolute; bottom: calc(env(safe-area-inset-bottom) + 116px); left: 50%;
@@ -173,10 +194,11 @@ button.big.gold { background: #6b4d13e0; border-color: #c99a2e; color: #ffe9ad; 
 
 /* ---------- speech bubbles ---------- */
 #bubbles { position: fixed; inset: 0; z-index: 24; pointer-events: none; overflow: hidden; }
-.bubble { position: absolute; max-width: 46vw; padding: 8px 12px; border-radius: 14px;
+.bubble { position: absolute; left: 0; top: 0; max-width: 46vw; padding: 8px 12px; border-radius: 14px;
   background: #fffef2; color: #23301c; font-size: 13.5px; font-weight: 700; line-height: 1.25;
-  box-shadow: 0 3px 12px #0008; transform: translate(-50%, -100%); transition: opacity .25s;
-  animation: bubblein .18s ease-out; }
+  box-shadow: 0 3px 12px #0008; transition: opacity .25s; will-change: transform;
+  transform-origin: 50% 100%; animation: popin .18s ease-out; }
+@keyframes popin { from { scale: .6; opacity: 0; } }
 .bubble::after { content: ""; position: absolute; left: 50%; bottom: -8px; margin-left: -7px;
   border: 8px solid transparent; border-top-color: #fffef2; border-bottom: none; }
 .bubble .who { display: block; font-size: 9.5px; letter-spacing: .5px; opacity: .55; text-transform: uppercase; }
@@ -217,10 +239,10 @@ button.big.gold { background: #6b4d13e0; border-color: #c99a2e; color: #ffe9ad; 
   font-size: 14.5px; font-weight: 800; color: #ffe9ad; box-shadow: 0 6px 20px #000b; animation: bubblein .2s; }
 
 /* target tag (name + HP over the 🎯 marker) */
-.tgt-tag { position: absolute; transform: translate(-50%, -100%); padding: 4px 10px;
+.tgt-tag { position: absolute; left: 0; top: 0; padding: 4px 10px;
   border-radius: 12px; background: #000b; font-size: 12.5px; font-weight: 800;
-  white-space: nowrap; text-shadow: 0 1px 3px #000; pointer-events: none;
-  animation: bubblein .15s ease-out; }
+  white-space: nowrap; text-shadow: 0 1px 3px #000; pointer-events: none; will-change: transform;
+  transform-origin: 50% 100%; animation: popin .15s ease-out; }
 
 /* damage floaters */
 .dmg-float { position: absolute; font-size: 17px; font-weight: 900; color: #ff8a6a;
@@ -228,6 +250,17 @@ button.big.gold { background: #6b4d13e0; border-color: #c99a2e; color: #ffe9ad; 
   animation: dmgfloat 1.1s ease-out forwards; }
 .dmg-float.heal { color: #8be24a; }
 @keyframes dmgfloat { to { transform: translate(-50%, -180%); opacity: 0; } }
+
+/* short landscape phones: compact menu, two-column buttons */
+@media (orientation: landscape) and (max-height: 520px) {
+  .menu-inner { width: min(94vw, 640px); padding: 10px 0 8px; }
+  .game-logo { font-size: 34px; }
+  .game-tag { margin: 2px 0 10px; font-size: 12px; }
+  #daily-callout { margin: 0 0 10px; }
+  .menu-btns { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  button.big { padding: 10px 14px; font-size: 15px; border-radius: 13px; }
+  .menu-foot { margin-top: 8px; }
+}
 
 @media (min-width: 700px) {
   .padbtn { width: 64px; height: 64px; }

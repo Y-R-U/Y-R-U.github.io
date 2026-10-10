@@ -108,11 +108,15 @@ export class CameraDirector {
         const yaw = o.aim().yaw, pitch = o.aim().pitch;
         const back = V(-Math.sin(yaw), 0, -Math.cos(yaw));
         const side = V(Math.cos(yaw), 0, -Math.sin(yaw));
+        // portrait: a tall frustum is half sky, so pull back, rise and look
+        // further down-range to centre the shooter → target line
+        const pk = clamp((1 - this.cam.aspect) / 0.5, 0, 1);
         const pos = V(c.x, c.y, c.z)
-          .addScaledVector(back, CAM.aimDist)
+          .addScaledVector(back, CAM.aimDist + pk * 1.4)
           .addScaledVector(side, CAM.aimSide)
-          .add(V(0, CAM.aimHeight + pitch * 0.5, 0));
-        const look = V(c.x + Math.sin(yaw) * 3.2, c.y + 0.55 + Math.sin(pitch) * 1.7, c.z + Math.cos(yaw) * 3.2);
+          .add(V(0, CAM.aimHeight + pitch * 0.5 + pk * 1.5, 0));
+        const ahead = 3.2 + pk * 2.6;
+        const look = V(c.x + Math.sin(yaw) * ahead, c.y + 0.55 + Math.sin(pitch) * 1.7 * (1 - pk * 0.5) - pk * 0.5, c.z + Math.cos(yaw) * ahead);
         return { pos, look, snap: 7 };
       }
       case 'fly': {

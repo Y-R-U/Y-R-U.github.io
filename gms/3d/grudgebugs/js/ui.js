@@ -25,6 +25,8 @@ export function init(callbacks) {
   $('qk-start').addEventListener('click', () => { audio.ui(); cb.startQuick(quickCfg()); });
   $('wheel').addEventListener('click', (e) => { if (e.target === $('wheel')) toggleWheel(false); });
   $('cine-skip').addEventListener('click', () => cb.skipCine?.());
+  $('daily-claim').addEventListener('click', claimDaily);
+  $('daily-x').addEventListener('click', () => { dailyDismissed = true; refreshDaily(); });
 }
 
 export function showScreen(id) {
@@ -37,6 +39,7 @@ export function showScreen(id) {
     $('menu-coins').textContent = `🪙 ${p.coins}`;
     const hasStory = Object.keys(p.story).length > 0;
     $('btn-continue').classList.toggle('hidden', !hasStory || Object.keys(p.story).length >= cb.chapterCount());
+    refreshDaily();
   }
 }
 
@@ -120,6 +123,18 @@ function renderShop() {
   $('shop-coins').textContent = `🪙 ${p.coins}`;
   const list = $('shop-list');
   list.innerHTML = '';
+  const n = dailyNext();
+  if (n) {
+    const card = document.createElement('div');
+    card.className = 'daily-card';
+    card.innerHTML = `<div class="dc-head">🎁 Daily Grudge Chest</div>${dailyGrid(n)}`;
+    const btn = document.createElement('button');
+    btn.className = 'big gold';
+    btn.textContent = `Claim 🪙 ${ECON.daily[n - 1]}`;
+    btn.addEventListener('click', claimDaily);
+    card.appendChild(btn);
+    list.appendChild(card);
+  }
   for (const hat of HATS) {
     const owned = p.hatsOwned.includes(hat.id);
     const equipped = p.hat === hat.id;
@@ -146,25 +161,36 @@ function renderShop() {
   }
 }
 
-// ---------------- daily chest ----------------
-export function maybeDaily() {
-  if (!save.dailyAvailable()) return false;
+// ---------------- daily chest (non-blocking: badge + callout + shop card) ----------------
+let dailyDismissed = false;
+function dailyNext() {
+  if (!save.dailyAvailable()) return 0;
   const p = save.load();
-  const nextDay = Math.min(7, (p.daily.last === new Date(Date.now() - 864e5).toISOString().slice(0, 10)) ? p.daily.streak + 1 : 1);
+  return Math.min(7, (p.daily.last === new Date(Date.now() - 864e5).toISOString().slice(0, 10)) ? p.daily.streak + 1 : 1);
+}
+function dailyGrid(nextDay) {
   let grid = '<div class="daily-grid">';
   for (let i = 0; i < 7; i++) {
     const cls = i + 1 < nextDay ? 'claimed' : i + 1 === nextDay ? 'today' : '';
     grid += `<div class="daily-cell ${cls}">D${i + 1}<span class="d-amt">🪙${ECON.daily[i]}</span></div>`;
   }
-  grid += '</div>';
-  modal(`<h3>🎁 Daily Grudge Chest</h3><p style="text-align:center">Come back daily to grow the streak.</p>${grid}`,
-    [{ label: `Claim 🪙 ${ECON.daily[nextDay - 1]}`, gold: true }], () => {
-      const r = save.claimDaily(ECON.daily);
-      if (r) toast(`+🪙 ${r.amount} — day ${r.day} streak!`);
-      showScreen('menu');
-    });
-  return true;
+  return grid + '</div>';
 }
+function refreshDaily() {
+  const n = dailyNext();
+  $('btn-shop').classList.toggle('has-daily', n > 0);
+  $('daily-callout').classList.toggle('hidden', !n || dailyDismissed);
+  if (n) $('daily-amt').textContent = `day ${n} · 🪙 ${ECON.daily[n - 1]}`;
+}
+function claimDaily() {
+  const r = save.claimDaily(ECON.daily);
+  if (r) { audio.ui(); toast(`+🪙 ${r.amount} — day ${r.day} streak!`); }
+  const p = save.load();
+  $('menu-coins').textContent = `🪙 ${p.coins}`;
+  refreshDaily();
+  if (!$('shop').classList.contains('hidden')) renderShop();
+}
+export function maybeDaily() { refreshDaily(); return dailyNext() > 0; }
 
 // ---------------- options ----------------
 function optRow(label, key) {
@@ -291,30 +317,50 @@ export function updateHUD(b) {
   const mine = b.phase === 'play' && !!team && !team.isAI && !b.over;
   $('controls').classList.toggle('hidden', !mine);
   $('hud-timer').classList.toggle('hidden', !mine);
-  $('aim-hint').classList.toggle('hidden', !mine || b.turnCount > 1);
+  aimHint(b, mine);
   if (!mine && wheelOpen) toggleWheel(false); // don't linger over AI turns
 }
 
-// called every frame — cheap updates only
+// the aim hint shows on the player's first couple of turns ever, then retires
+let hintBattle = null, hintTurn = -1;
+function aimHint(b, mine) {
+  const el = $('aim-hint');
+  if (!mine) { el.classList.add('hidden'); return; }
+  if (hintBattle === b && hintTurn === b.turnCount) return;
+  hintBattle = b; hintTurn = b.turnCount;
+  const p = save.load();
+  if (!(p.opts.aimHint > 0)) { el.classList.add('hidden'); return; }
+  p.opts.aimHint--; save.save();
+  el.classList.remove('hidden', 'fade');
+  clearTimeout(el._to);
+  el._to = setTimeout(() => el.classList.add('fade'), 5000);
+}
+
+// called every frame — elements cached, DOM written only when a value changes
+let hudEls = null;
+const hudLast = {};
+const hudSet = (k, v, fn) => { if (hudLast[k] !== v) { hudLast[k] = v; fn(v); } };
 export function tickHUD(b) {
   if (!b) return;
+  if (!hudEls) {
+    hudEls = { timer: $('hud-timer'), walk: $('walk-fill'), bar: $('powerbar'), fill: $('power-fill'), arrow: $('wind-arrow') };
+    hudEls.arrow.style.display = 'inline-block';
+  }
+  const E = hudEls;
   const mine = b.phase === 'play' && b.activeTeam() && !b.activeTeam().isAI;
   if (mine) {
-    const t = Math.ceil(b.timer);
-    $('hud-timer').textContent = t;
-    $('hud-timer').classList.toggle('low', t <= 10);
-    $('walk-fill').style.width = `${clamp(b.moveLeft / RULES.moveBudget, 0, 1) * 100}%`;
+    hudSet('t', Math.ceil(b.timer), (t) => { E.timer.textContent = t; E.timer.classList.toggle('low', t <= 10); });
+    hudSet('walk', Math.round(clamp(b.moveLeft / RULES.moveBudget, 0, 1) * 200) / 2, (v) => { E.walk.style.width = `${v}%`; });
   }
-  const charging = b.aim.charging;
-  $('powerbar').classList.toggle('hidden', !charging);
-  if (charging) $('power-fill').style.width = `${b.aim.power * 100}%`;
+  const charging = !!b.aim.charging;
+  hudSet('charging', charging, (c) => E.bar.classList.toggle('hidden', !c));
+  if (charging) hudSet('pow', Math.round(b.aim.power * 200) / 2, (v) => { E.fill.style.width = `${v}%`; });
   // wind arrow relative to camera
-  const cam = cb.cams().cam;
-  const camYaw = Math.atan2(cam.position.x - cb.cams().smoothLook.x, cam.position.z - cb.cams().smoothLook.z);
+  const cams = cb.cams(), cam = cams.cam;
+  const camYaw = Math.atan2(cam.position.x - cams.smoothLook.x, cam.position.z - cams.smoothLook.z);
   const a = Math.atan2(b.wind.x, b.wind.z) - camYaw;
-  $('wind-arrow').style.display = 'inline-block';
-  $('wind-arrow').style.transform = `rotate(${(-a * 180 / Math.PI) + 90}deg)`;
-  $('wind-arrow').style.opacity = String(0.35 + b.wind.mag * 0.65);
+  hudSet('wa', Math.round((-a * 180 / Math.PI) + 90), (d) => { E.arrow.style.transform = `rotate(${d}deg)`; });
+  hudSet('wo', (0.35 + b.wind.mag * 0.65).toFixed(2), (o) => { E.arrow.style.opacity = o; });
 }
 
 export function turnBanner(bug) {

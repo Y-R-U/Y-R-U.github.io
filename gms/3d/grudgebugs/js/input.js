@@ -34,7 +34,7 @@ export class Input {
     // battle buttons
     const hold = (id, on, off) => {
       const b = $(id);
-      b.addEventListener('pointerdown', (e) => { e.preventDefault(); e.stopPropagation(); audio.resume(); on(); });
+      b.addEventListener('pointerdown', (e) => { e.preventDefault(); e.stopPropagation(); audio.ensureRunning(); on(); });
       b.addEventListener('pointerup', (e) => { e.preventDefault(); off(); });
       b.addEventListener('pointerleave', () => off());
       b.addEventListener('pointercancel', () => off());
@@ -46,7 +46,7 @@ export class Input {
       () => { const b = this.getBattle(); if (b) b.releaseCharge(); $('btn-fire').classList.remove('charging'); });
     $('btn-weapon').addEventListener('click', () => { if (this._myTurn()) this.ui.toggleWheel(); });
     $('btn-target').addEventListener('click', () => {
-      if (this._myTurn()) { audio.resume(); this.getBattle().cycleTarget(); }
+      if (this._myTurn()) { audio.ensureRunning(); this.getBattle().cycleTarget(); }
     });
     $('btn-cam').addEventListener('click', () => {
       this.freeCam = !this.freeCam;
@@ -80,7 +80,7 @@ export class Input {
   _walk(d) { const b = this.getBattle(); if (b && this._myTurn()) b.setWalk(d); }
 
   _down(e) {
-    audio.resume();
+    audio.ensureRunning();
     this.pointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
     if (this.pointers.size === 2) {
       const [a, b] = [...this.pointers.values()];

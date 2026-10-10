@@ -2,7 +2,7 @@
 // shockwaves, DOM damage floaters. One pooled system, updated per frame.
 
 import * as THREE from 'three';
-import { mat } from './bugs.js';
+import { mat, disposeTree } from './bugs.js';
 import { $ } from './utils.js';
 
 const T = THREE;
@@ -16,7 +16,10 @@ export class FX {
     scene.add(this.group);
     this._sphereGeo = new T.SphereGeometry(1, 7, 6);
     this._quadGeo = new T.PlaneGeometry(1, 1);
+    this._keep = new Set([this._sphereGeo, this._quadGeo]);
   }
+
+  _drop(mesh) { this.group.remove(mesh); disposeTree(mesh, { keep: this._keep }); }
 
   _spawn(meshMat, scale, pos, vel, { life = 1, grav = -9, spin = 3, shrink = true, fade = true } = {}) {
     const m = new T.Mesh(this._sphereGeo, meshMat);
@@ -123,7 +126,7 @@ export class FX {
     for (let i = this.parts.length - 1; i >= 0; i--) {
       const p = this.parts[i];
       p.life -= dt;
-      if (p.life <= 0) { this.group.remove(p.mesh); this.parts.splice(i, 1); continue; }
+      if (p.life <= 0) { this._drop(p.mesh); this.parts.splice(i, 1); continue; }
       p.vel.y += p.grav * dt;
       p.mesh.position.addScaledVector(p.vel, dt);
       if (p.spin) { p.mesh.rotation.x += p.spin * dt; p.mesh.rotation.y += p.spin * 0.7 * dt; }
@@ -134,7 +137,7 @@ export class FX {
     for (let i = this.rings.length - 1; i >= 0; i--) {
       const r = this.rings[i];
       r.life -= dt;
-      if (r.life <= 0) { this.group.remove(r.mesh); this.rings.splice(i, 1); continue; }
+      if (r.life <= 0) { this._drop(r.mesh); this.rings.splice(i, 1); continue; }
       const f = 1 - r.life / r.life0;
       r.mesh.scale.setScalar(r.mesh.scale.x + r.grow * dt);
       r.mesh.material.opacity = (1 - f) * 0.85;
@@ -142,8 +145,8 @@ export class FX {
   }
 
   clear() {
-    for (const p of this.parts) this.group.remove(p.mesh);
-    for (const r of this.rings) this.group.remove(r.mesh);
+    for (const p of this.parts) this._drop(p.mesh);
+    for (const r of this.rings) this._drop(r.mesh);
     this.parts.length = 0; this.rings.length = 0;
   }
 }
