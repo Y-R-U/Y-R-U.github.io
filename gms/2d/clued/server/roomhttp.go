@@ -451,8 +451,43 @@ func handleQuestion(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
-		fmt.Fprintf(w, `{"i":%d,"game":%d,"question":%s}`, i, room.Game, room.Questions[i])
+		q := room.Questions[i]
+		if !room.answerShown(i) {
+			q = hideAnswer(q, i)
+		}
+		fmt.Fprintf(w, `{"i":%d,"game":%d,"question":%s}`, i, room.Game, q)
 	})
+}
+
+// Formats the server verifies itself (verifyCorrect) don't need the answer on the client until the reveal.
+var hiddenFormats = map[string]bool{"mc": true, "tf": true}
+var answerKeys = []string{"answer", "answerText", "explain", "refs", "wrongNotes"}
+
+func (r *Room) answerShown(i int) bool {
+	return i < r.Q || (i == r.Q && r.Phase != "question") || r.Phase == "final"
+}
+
+// hideAnswer strips the answer (and the id, refs and explanation, which name it) from a verifiable question.
+func hideAnswer(raw json.RawMessage, i int) json.RawMessage {
+	var m map[string]json.RawMessage
+	if json.Unmarshal(raw, &m) != nil {
+		return raw
+	}
+	var f string
+	json.Unmarshal(m["format"], &f)
+	if !hiddenFormats[f] {
+		return raw
+	}
+	for _, k := range answerKeys {
+		delete(m, k)
+	}
+	m["id"], _ = json.Marshal(fmt.Sprintf("room:%d", i))
+	m["hidden"] = json.RawMessage("true")
+	out, err := json.Marshal(m)
+	if err != nil {
+		return raw
+	}
+	return out
 }
 
 func handleAnswer(w http.ResponseWriter, r *http.Request) {

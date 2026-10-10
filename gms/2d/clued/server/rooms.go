@@ -106,6 +106,7 @@ type Room struct {
 	rounds    roundInfo
 	subs      map[*sub]struct{}
 	dirty     bool
+	qDirty    bool // questions changed since the last flush (create / play again)
 	dead      bool
 }
 
@@ -128,7 +129,7 @@ func getRoom(code string) *Room {
 func newRoom(spec json.RawMessage, title string, qs []json.RawMessage) *Room {
 	now := nowMs()
 	r := &Room{Phase: "lobby", Q: -1, Spec: spec, Title: title, Questions: qs, Auto: true, RevealMs: defaultReveal, AnswerMs: defaultAnswer,
-		Created: now, Touched: now, subs: map[*sub]struct{}{}, dirty: true}
+		Created: now, Touched: now, subs: map[*sub]struct{}{}, dirty: true, qDirty: true}
 	r.buildMeta()
 	roomsMu.Lock()
 	defer roomsMu.Unlock()
@@ -603,6 +604,7 @@ func (r *Room) again(spec json.RawMessage, title string, qs []json.RawMessage) {
 	}
 	r.Players = keep
 	r.Spec, r.Title, r.Questions = spec, title, qs
+	r.qDirty = true
 	r.buildMeta()
 	r.Phase, r.Q, r.QStart, r.QDeadline, r.RevealAt = "lobby", -1, 0, 0, 0
 	r.LeadAt, r.Hold = 0, false
@@ -724,6 +726,8 @@ func tickRooms() {
 	}
 }
 
+// flushRooms snapshots changed rooms. The questions (up to 512 KB) go in their own column, written only when they
+// change; the state flush every couple of seconds carries everything else.
 func flushRooms(all bool) {
 	roomsMu.RLock()
 	list := make([]*Room, 0, len(rooms))
@@ -733,27 +737,44 @@ func flushRooms(all bool) {
 	roomsMu.RUnlock()
 	for _, r := range list {
 		r.mu.Lock()
-		if !r.dirty && !all {
+		if !r.dirty && !r.qDirty && !all {
 			r.mu.Unlock()
 			continue
 		}
+		qs := r.Questions
+		r.Questions = nil
 		data, err := json.Marshal(r)
+		r.Questions = qs
+		var qdata []byte
+		withQ := r.qDirty
+		if withQ && err == nil {
+			qdata, err = json.Marshal(qs)
+		}
 		touched := r.Touched
-		r.dirty = false
+		r.dirty, r.qDirty = false, false
 		r.mu.Unlock()
 		if err != nil {
 			log.Printf("room %s marshal: %v", r.Code, err)
 			continue
 		}
-		if _, err := db.Exec(`INSERT INTO rooms(code, data, touched) VALUES(?,?,?)
-			ON CONFLICT(code) DO UPDATE SET data = excluded.data, touched = excluded.touched`, r.Code, data, touched); err != nil {
+		if withQ {
+			_, err = db.Exec(`INSERT INTO rooms(code, data, touched, questions) VALUES(?,?,?,?)
+				ON CONFLICT(code) DO UPDATE SET data = excluded.data, touched = excluded.touched, questions = excluded.questions`, r.Code, data, touched, qdata)
+		} else {
+			_, err = db.Exec(`INSERT INTO rooms(code, data, touched) VALUES(?,?,?)
+				ON CONFLICT(code) DO UPDATE SET data = excluded.data, touched = excluded.touched`, r.Code, data, touched)
+		}
+		if err != nil {
 			log.Printf("room %s save: %v", r.Code, err)
+			r.mu.Lock()
+			r.dirty, r.qDirty = true, r.qDirty || withQ
+			r.mu.Unlock()
 		}
 	}
 }
 
 func loadRooms() {
-	rows, err := db.Query(`SELECT data FROM rooms WHERE touched >= ?`, nowFn().Add(-cfg.RoomIdle).UnixMilli())
+	rows, err := db.Query(`SELECT data, questions FROM rooms WHERE touched >= ?`, nowFn().Add(-cfg.RoomIdle).UnixMilli())
 	if err != nil {
 		log.Printf("load rooms: %v", err)
 		return
@@ -762,12 +783,17 @@ func loadRooms() {
 	now := nowMs()
 	n := 0
 	for rows.Next() {
-		var data []byte
-		if rows.Scan(&data) != nil {
+		var data, qdata []byte
+		if rows.Scan(&data, &qdata) != nil {
 			continue
 		}
 		r := &Room{}
 		if json.Unmarshal(data, r) != nil || r.Code == "" {
+			continue
+		}
+		if qdata == nil {
+			r.qDirty = true // a pre-split row: its questions came inside data; move them to their column on the next flush
+		} else if json.Unmarshal(qdata, &r.Questions) != nil {
 			continue
 		}
 		r.buildMeta()
