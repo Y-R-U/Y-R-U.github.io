@@ -13,12 +13,13 @@ export class Camera {
     this.zoomKey = 'normal';
   }
 
-  resize(viewW, viewH, zoomKey = this.zoomKey) {
+  // sideMargins: landscape may show the dark stands either side of the world
+  resize(viewW, viewH, zoomKey = this.zoomKey, sideMargins = false) {
     this.viewW = viewW; this.viewH = viewH;
     this.zoomKey = zoomKey;
     const targetH = ZOOMS[zoomKey] || ZOOMS.normal;
     // never zoom so far out that the world doesn't cover the view
-    this.minScale = Math.max(viewW / WORLD_W, viewH / WORLD_H);
+    this.minScale = sideMargins ? viewH / WORLD_H : Math.max(viewW / WORLD_W, viewH / WORLD_H);
     this.baseScale = Math.max(viewH / targetH, this.minScale);
     this.scale = Math.max(this.baseScale / this.wide, this.minScale);
   }
@@ -39,7 +40,7 @@ export class Camera {
 
   _clamp() {
     const hw = this.viewW / 2 / this.scale, hh = this.viewH / 2 / this.scale;
-    this.x = clamp(this.x, hw, WORLD_W - hw);
+    this.x = hw * 2 >= WORLD_W ? WORLD_W / 2 : clamp(this.x, hw, WORLD_W - hw);
     this.y = clamp(this.y, hh, WORLD_H - hh);
   }
 

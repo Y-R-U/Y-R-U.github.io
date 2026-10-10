@@ -135,6 +135,7 @@ class UISys {
   hudShow(match) {
     $('hud').classList.remove('hidden');
     this._men = [-1, -1];
+    this._hudScore = this._hudClock = null;
     this._hudTeams(match);
     this.hudTick(match);
   }
@@ -150,9 +151,11 @@ class UISys {
     $('sbAway').innerHTML = `${men(n1)}${t1.def.short}<span class="kitdot" style="background:${t1.kit.shirt};margin:0 0 0 6px"></span>`;
   }
   hudTick(match) {
-    $('sbScore').textContent = `${match.teams[0].score} : ${match.teams[1].score}`;
+    const score = `${match.teams[0].score} : ${match.teams[1].score}`;
+    if (score !== this._hudScore) { this._hudScore = score; $('sbScore').textContent = score; }
     const m = Math.floor(match.clockMin);
-    $('sbClock').textContent = match.mode === 'practice' ? '∞' : (m < 10 ? '0' : '') + m + "'";
+    const clock = match.mode === 'practice' ? '∞' : (m < 10 ? '0' : '') + m + "'";
+    if (clock !== this._hudClock) { this._hudClock = clock; $('sbClock').textContent = clock; }
     this._hudTeams(match);
   }
 
@@ -631,14 +634,29 @@ class UISys {
     return close;
   }
 
-  halfTimeModal(match) {
+  // no button to hunt for: counts down into the second half, any tap skips
+  halfTimeModal(match, secs, onGo) {
     const r = match.result();
-    this.popup({
-      title: 'Half Time',
-      node: this._scorePanel(r, false),
-      buttons: [{ label: '▶ Second Half', cb: () => this.app.secondHalf() }],
-      dismissable: false,
-    });
+    const count = h('div', { class: 'ht-count' });
+    const bar = h('i');
+    const node = h('div', null, this._scorePanel(r, false));
+    node.append(h('div', { class: 'ht-bar', style: 'margin-top:12px' }, bar), count,
+      h('div', { class: 'ht-skip' }, 'tap anywhere to skip'));
+    const { close, card } = this.popup({ title: 'Half Time', node, dismissable: false });
+    const back = card.parentNode;
+    back.classList.add('ht-back');
+    let done = false, t = 0;
+    const go = () => { if (done) return; done = true; close(); onGo(); };
+    back.addEventListener('click', () => { if (t > 0.5) { AUDIO.click(); go(); } });
+    const tick = (tt) => {
+      t = tt;
+      const left = Math.max(0, secs - t);
+      count.textContent = `Second half in ${Math.ceil(left)}…`;
+      bar.style.width = (left / secs * 100) + '%';
+      if (left <= 0) go();
+    };
+    tick(0);
+    return { tick, close: () => { done = true; close(); } };
   }
 
   fullTimeModal(match, meta, onContinue) {

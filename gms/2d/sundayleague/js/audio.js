@@ -14,7 +14,8 @@ class AudioSys {
 
   // must be called from a user gesture
   init() {
-    if (this.ctx) { if (this.ctx.state === 'suspended') this.ctx.resume(); return; }
+    if (this.ctx) { if (this.ctx.state !== 'running' && !document.hidden) this.ctx.resume().catch(() => {}); return; }
+    try { if (navigator.audioSession) navigator.audioSession.type = 'playback'; } catch (e) {}
     try {
       this.ctx = new (window.AudioContext || window.webkitAudioContext)();
     } catch (e) { return; }
@@ -46,6 +47,9 @@ class AudioSys {
     this.crowdGain.connect(this.master);
     src.start(); trem.start();
   }
+
+  suspend() { if (this.ctx && this.ctx.state === 'running') this.ctx.suspend().catch(() => {}); }
+  resume() { if (this.ctx && this.ctx.state !== 'running') this.ctx.resume().catch(() => {}); }
 
   setEnabled(on) {
     this.enabled = on;

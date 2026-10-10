@@ -28,9 +28,11 @@ export class Input {
     window.addEventListener('keyup', (e) => this._key(e, false));
   }
 
-  layout(w, h) {
+  // margin: width of the empty stand either side of the pitch in landscape
+  layout(w, h, margin = 0) {
     this.w = w; this.h = h;
-    const kx = this.side === 'right' ? w - 80 : 80;
+    const edge = margin >= 120 ? Math.max(62, margin / 2) : 80;
+    const kx = this.side === 'right' ? w - edge : edge;
     this.kickAnchor = { x: kx, y: h - 110, r: 46 };
     const sx = this.side === 'right' ? 86 : w - 86;
     this.stickAnchor = { x: sx, y: h - 116 };

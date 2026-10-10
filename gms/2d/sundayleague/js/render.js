@@ -248,8 +248,14 @@ export class Renderer {
   }
 
   _radar(ctx, match) {
-    const rw = 62, rh = 96;
-    const rx = this.w / 2 - rw / 2, ry = 54;
+    let rw = 62, rh = 96, rx = this.w / 2 - rw / 2, ry = 54;
+    if (this.w > this.h) {
+      // top-left stand, under the pause button: clear of the scorebar and the avatar
+      const margin = (this.w - WORLD_W * match.camera.baseScale) / 2;
+      rw = 72; rh = 112;
+      rx = margin >= rw + 20 ? (margin - rw) / 2 : 12;
+      ry = 56;
+    }
     ctx.globalAlpha = 0.75;
     ctx.fillStyle = 'rgba(10,25,14,0.65)';
     this._rr(ctx, rx, ry, rw, rh, 5); ctx.fill();
@@ -327,9 +333,11 @@ export class Renderer {
     ctx.font = '800 14px system-ui, sans-serif';
     ctx.textAlign = 'center';
     ctx.fillStyle = '#08120cdd';
-    this._rr(ctx, this.w / 2 - 130, this.h - 190, 260, 30, 8); ctx.fill();
+    // landscape: bottom strip between the controls, well below the ball
+    const y = this.w > this.h ? this.h - 46 : this.h - 190;
+    this._rr(ctx, this.w / 2 - 130, y, 260, 30, 8); ctx.fill();
     ctx.fillStyle = '#ffde59';
-    ctx.fillText(str, this.w / 2, this.h - 170);
+    ctx.fillText(str, this.w / 2, y + 20);
   }
 
   _rr(ctx, x, y, w, h, r) {

@@ -1,6 +1,6 @@
 // ---- boot, game loop, match lifecycle, app facade ----
-import { SETTINGS_KEY, WORLDCUP_KEY, DEFAULT_HALF, PITCH_TYPES } from './const.js';
-import { clamp, pick, irand } from './util.js';
+import { SETTINGS_KEY, WORLDCUP_KEY, DEFAULT_HALF, PITCH_TYPES, WORLD_W, ZOOMS } from './const.js';
+import { clamp, pick, irand, dist } from './util.js';
 import { Renderer } from './render.js';
 import { Input } from './input.js';
 import { Camera } from './camera.js';
@@ -33,8 +33,9 @@ window.addEventListener('unhandledrejection', (e) => window.__soak.errors.push(S
 const DEFAULTS = {
   side: 'right', joyMode: 'float', halfLen: DEFAULT_HALF, difficulty: 'normal',
   zoom: 'normal', radar: true, replays: true, aftertouch: true, autoSwitch: true,
-  vibration: true, sound: true, offside: false,
+  vibration: true, sound: true, offside: false, tips: {},
 };
+const HALFTIME_SECS = 5;
 function loadSettings() {
   try { return { ...DEFAULTS, ...(JSON.parse(localStorage.getItem(SETTINGS_KEY)) || {}) }; }
   catch (e) { return { ...DEFAULTS }; }
@@ -73,8 +74,12 @@ const app = {
     input.joyMode = s.joyMode;
     AUDIO.setEnabled(s.sound);
     resize();
-    try { localStorage.setItem(SETTINGS_KEY, JSON.stringify(s)); } catch (e) {}
+    this.saveSettings();
   },
+  saveSettings() {
+    try { localStorage.setItem(SETTINGS_KEY, JSON.stringify(this.settings)); } catch (e) {}
+  },
+  resetTips() { this.settings.tips = {}; this.saveSettings(); },
 
   forecastPitch(div) { return pickPitchType(div); },
   pitchLabel(pt) { return `${PITCH_EMOJI[pt] || ''} ${PITCH_TYPES[pt].name}`; },
@@ -107,6 +112,9 @@ const app = {
     UI.hudShow(m);
     input.enabled = true;
     input.releaseAll();
+    coach.reset();
+    orientHint(false);
+    if (!params.get('auto')) armBack();
     return m;
   },
 
@@ -221,6 +229,9 @@ const app = {
 
   _endMatchUI() {
     this.match = null;
+    if (this.halfTime) { this.halfTime.close(); this.halfTime = null; }
+    coach.reset();
+    if (history.state && history.state.slMatch) { backPopping = true; history.back(); }
     input.enabled = false;
     UI.hudHide();
     fx.setWeather(null);
@@ -238,7 +249,9 @@ const app = {
     if (!m) return;
     UI.matchEvent(type, data);
     if (type === 'goal') { UI.hudTick(m); window.__soak.goals++; }
-    if (type === 'half') { if (params.get('auto')) this.secondHalf(); else UI.halfTimeModal(m); }
+    if (type === 'half') { if (params.get('auto')) this.secondHalf();
+      else this.halfTime = UI.halfTimeModal(m, HALFTIME_SECS, () => { this.halfTime = null; this.secondHalf(); });
+    }
     if (type === 'fulltime') this._onFullTime(m);
   },
 
@@ -319,22 +332,106 @@ function startDemo() {
 }
 
 // ---------- resize / orientation ----------
+// landscape pulls out to the far camera and lets the pitch sit between dark
+// stand margins, which take the radar and the kick button.
 function resize() {
   const w = window.innerWidth, hgt = window.innerHeight;
   const dpr = clamp(window.devicePixelRatio || 1, 1, 2);
+  const land = w > hgt;
   renderer.resize(w, hgt, dpr);
-  camera.resize(w, hgt, app.settings.zoom);
-  input.layout(w, hgt);
-  document.getElementById('orient-hint').classList.toggle('hidden', !(w > hgt && hgt < 480));
+  camera.resize(w, hgt, land ? 'far' : app.settings.zoom, land);
+  input.layout(w, hgt, land ? Math.max(0, (w - WORLD_W * hgt / ZOOMS.far) / 2) : 0);
+  orientHint(land && hgt < 480);
 }
+
+// "best played in portrait": once a session, a few seconds, never in a match
+let orientShown = false, orientTimer = 0;
+try { orientShown = sessionStorage.getItem('sundayleague.orientHint') === '1'; } catch (e) {}
+function orientHint(want) {
+  const el = document.getElementById('orient-hint');
+  if (!want || app.match || orientShown) {
+    if (!want || app.match) { clearTimeout(orientTimer); el.classList.add('hidden'); }
+    return;
+  }
+  orientShown = true;
+  try { sessionStorage.setItem('sundayleague.orientHint', '1'); } catch (e) {}
+  el.classList.remove('hidden', 'fade');
+  orientTimer = setTimeout(() => {
+    el.classList.add('fade');
+    orientTimer = setTimeout(() => el.classList.add('hidden'), 700);
+  }, 3000);
+}
+
+// ---------- Android back: pauses a live match instead of leaving ----------
+let backPopping = false;
+function armBack() {
+  if (!(history.state && history.state.slMatch)) history.pushState({ slMatch: 1 }, '');
+}
+window.addEventListener('popstate', () => {
+  if (backPopping) { backPopping = false; if (app.match) armBack(); return; }
+  if (!app.match) return;
+  armBack();
+  if (!app.match.finished) app.pauseToggle();
+});
+
+// ---------- first-match control tips (each shown once, remembered in settings) ----------
+const TIPS = {
+  tap: 'Tap <b>KICK</b> for a quick pass to whoever you aim the stick at',
+  hold: '<b>Hold KICK</b> to power up, let go to shoot or hit it long',
+  curl: 'Right after a shot, <b>swipe the stick sideways</b> to curl it',
+  defend: "No ball? Tap <b>KICK</b> to slide in, or to head it when it's in the air",
+};
+const TIP_SHOW = 5, TIP_GAP = 8, TIP_SEEN = 2.5;
+const coach = {
+  cur: null, t: 0, gap: 4,
+  el: document.getElementById('coach'),
+  reset() { this._hide(); this.gap = 4; },
+  _hide() { this.cur = null; this.el.classList.remove('show'); },
+  _seen(k) { return !!(app.settings.tips && app.settings.tips[k]); },
+  _want(m) {
+    const b = m.ball, sel = m.sel, mine = b.owner && b.owner === sel;
+    if (!this._seen('tap') && mine) return 'tap';
+    if (this._seen('tap') && !this._seen('hold') && mine) return 'hold';
+    if (this._seen('hold') && !this._seen('curl') && m.settings.aftertouch &&
+      !b.owner && b.lastKicker === sel && b.speed() > 350) return 'curl';
+    if (!this._seen('defend') && b.owner && b.owner.team !== m.userTeam &&
+      dist(sel.x, sel.y, b.x, b.y) < 110) return 'defend';
+    return null;
+  },
+  update(m, dt) {
+    const live = m.state === 'play' && !m.paused && m.userTeam >= 0 && m.sel &&
+      !['shootout', 'demo'].includes(m.mode) && !params.get('auto');
+    if (!live) { if (this.cur) this._hide(); return; }
+    if (this.cur) {
+      this.t += dt;
+      if (this.t >= TIP_SEEN && !this._seen(this.cur)) {
+        app.settings.tips = { ...(app.settings.tips || {}), [this.cur]: 1 };
+        app.saveSettings();
+      }
+      if (this.t >= TIP_SHOW) { this._hide(); this.gap = TIP_GAP; }
+      return;
+    }
+    if ((this.gap -= dt) > 0) return;
+    const k = this._want(m);
+    if (!k) return;
+    this.cur = k; this.t = 0;
+    this.el.innerHTML = TIPS[k];
+    this.el.classList.add('show');
+  },
+};
 window.addEventListener('resize', resize);
 window.addEventListener('orientationchange', () => setTimeout(resize, 120));
 
-// audio unlock + pause on hide
-document.addEventListener('pointerdown', () => AUDIO.init(), { once: false });
+// audio unlock (kept for the page's lifetime) + pause and silence on hide
+for (const ev of ['pointerdown', 'touchend', 'click', 'keydown']) {
+  document.addEventListener(ev, () => AUDIO.init(), { capture: true, passive: true });
+}
 document.addEventListener('visibilitychange', () => {
-  if (document.hidden && app.match && !app.match.paused && !app.match.finished && !params.get('auto')) {
-    app.pauseToggle();
+  if (document.hidden) {
+    AUDIO.suspend();
+    if (app.match && !app.match.paused && !app.match.finished && !params.get('auto')) app.pauseToggle();
+  } else {
+    AUDIO.resume();
   }
 });
 
@@ -353,6 +450,8 @@ function loop(t) {
     renderer.draw(m, dt, { demo: m === app.demo });
     if (app.match) {
       UI.hudTick(app.match);
+      if (app.halfTime && app.match.state === 'halftime') app.halfTime.tick(app.match.stateT);
+      coach.update(app.match, dt);
       const st = app.match.state;
       window.__soak.state = st;
       window.__soak.states = window.__soak.states || {};
