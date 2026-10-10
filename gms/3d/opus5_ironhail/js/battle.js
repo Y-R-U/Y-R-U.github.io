@@ -8,9 +8,10 @@ import { rand, clamp01, shuffled, mulberry32, dirToYaw } from './utils.js';
 import { ENEMY_NAMES } from './config.js';
 import { CHASSIS, CAMOS, weaponStats, derivedStats, payout } from './arsenal.js';
 import {
-  profile, applyBP, addScrap, addXp, recordBattle, setMissionResult, acquire, owns,
+  profile, applyBP, addScrap, addXp, recordBattle, setMissionResult, setMissionMedal, acquire, owns,
   fireControlFitted, markDirty,
 } from './save.js';
+import { MEDALS } from './missions.js';
 import { actorRoot } from './render.js';
 import { applyEnvironment, rollWind, BIOMES } from './env.js';
 import { terrainHeight, flushTerrain, resettleDetail } from './terrain.js';
@@ -39,6 +40,9 @@ let killsThisBattle = 0;
 let reconMarks = new Set();
 let reinforceT = 0;
 let endedFlag = false;
+let lastPlayerKillT = -99;
+// What the medals need that the results tallies do not already hold.
+let medalTally = { droneUsed: false, propKills: 0, autoAimed: false, utilUsed: false };
 
 // ---------------------------------------------------------------------------
 // Enemy stat derivation
@@ -90,6 +94,7 @@ function wireEvents() {
 
   on('tank-killed', ({ victim, attacker }) => {
     if (attacker && attacker.isPlayer) {
+      lastPlayerKillT = state.time;
       killsThisBattle++;
       state.kills++;
       state.streak++;
@@ -119,6 +124,10 @@ function wireEvents() {
   });
 
   on('drone-down', () => { profile.stats.dronesLost++; });
+
+  on('drone-marked', () => { medalTally.droneUsed = true; });
+  on('utility', (u) => { if (!u.failed) medalTally.utilUsed = true; });
+  on('prop-kill-credit', (n) => { medalTally.propKills += n; });
 }
 
 export function startBattle(mission) {
@@ -130,6 +139,8 @@ export function startBattle(mission) {
   killsThisBattle = 0;
   reconMarks = new Set();
   reinforceT = 0;
+  lastPlayerKillT = -99;
+  medalTally = { droneUsed: false, propKills: 0, autoAimed: false, utilUsed: false };
 
   state.mission = mission;
   state.seed = mission.seed || Math.floor(Math.random() * 1e6);
@@ -596,6 +607,8 @@ function convoyProgress() {
 function completeObjective() {
   if (state.objective.done || endedFlag) return;
   state.objective.done = true;
+  // the shot that ended it gets a beat of slow motion and a heavy buzz
+  if (state.time - lastPlayerKillT < 0.5) emit('final-kill');
   endBattle(true);
 }
 
@@ -621,7 +634,7 @@ function firstBattleHint() {
       ? 'FIRE CONTROL ON LOAN — HOLD FIRE AND IT LAYS THE GUN'
       : 'FIRE CONTROL IS SWITCHED OFF — EVERY SHOT IS YOURS')
     : 'NO FIRE CONTROL — READ THE WIND AND LEAD THEM';
-  setTimeout(() => emit('toast', msg), 1400);
+  setTimeout(() => emit('toast', { text: msg, dur: 4.2 }), 1400);
 }
 
 export function updateBattle(dt, rawDt) {
@@ -683,6 +696,8 @@ export function updateBattle(dt, rawDt) {
   updateProps(dt);
   updateUtilities(dt);
   updateParticles(dt);
+  if (state.camMode === 'drone') medalTally.droneUsed = true;
+  if (state.autoAiming) medalTally.autoAimed = true;
   updateObjective(dt);
   checkMidCine();
   flushTerrain();
@@ -772,7 +787,14 @@ export function endBattle(win) {
     scrap: pay.scrap, xp: pay.xp, bp: bpDelta, rank, level: lvl,
     unlocked, mission, hpLeft: Math.round(hpFrac * 100),
     reason: state.objective ? state.objective.failReason : null,
+    medal: null,
   };
+  const md = !mission.skirmish && mission.medal && MEDALS[mission.medal];
+  if (md) {
+    const got = win && md.test(results, medalTally);
+    results.medal = { id: mission.medal, name: md.name, desc: md.desc, got,
+      fresh: got ? setMissionMedal(mission.id) : false };
+  }
   state.results = results;
   if (win) AudioFX.fanfare(); else AudioFX.dirge();
 

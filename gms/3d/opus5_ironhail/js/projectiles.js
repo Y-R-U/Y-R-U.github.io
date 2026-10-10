@@ -440,10 +440,12 @@ export function applyBlast({
 
 // A fuel drum you set off is your kill. It can also take your own tracks off.
 on('chain-blast', ({ pos, radius, dmg, byPlayer }) => {
+  const before = state.kills;
   applyBlast({
     pos, radius, dmg, byPlayer,
     owner: byPlayer ? state.player : null, friendly: true,
   });
+  if (byPlayer && state.kills > before) emit('prop-kill-credit', state.kills - before);
 });
 
 function splitCluster(b) {

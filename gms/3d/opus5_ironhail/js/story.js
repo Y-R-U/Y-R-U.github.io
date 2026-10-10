@@ -85,7 +85,7 @@ export const CUTSCENES = {
         fov: 54, fovTo: 44, dur: 4.4, ease: 'out',
         who: ANVIL, say: 'Harvest country. The last three valleys still growing food, and the Consortium has decided food is a munition.' },
       { anchor: 'enemy', from: [-22, 4, 18], to: [-6, 3, 12], lookOff: [0, 2.2, 0], fov: 38, dur: 4.0,
-        who: ANVIL, say: 'They are requisitioning grain at gunpoint. Four hulls in the stubble. The hedgerows are cover — right up until somebody fires high explosive at them.' },
+        who: ANVIL, say: 'They are requisitioning grain at gunpoint. Two hulls in the stubble. The hedgerows are cover — right up until somebody fires high explosive at them.' },
     ],
   },
 

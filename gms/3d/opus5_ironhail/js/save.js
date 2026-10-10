@@ -216,6 +216,19 @@ export function setMissionResult(id, stars, score) {
   return cur;
 }
 
+export function setMissionMedal(id) {
+  const cur = profile.campaign[id] || { stars: 0, bestScore: 0, done: false };
+  const fresh = !cur.medal;
+  cur.medal = true;
+  profile.campaign[id] = cur;
+  markDirty();
+  return fresh;
+}
+
+export function totalMedals() {
+  return Object.values(profile.campaign).filter((m) => m && m.medal).length;
+}
+
 export function missionRecord(id) {
   return profile.campaign[id] || { stars: 0, bestScore: 0, done: false };
 }

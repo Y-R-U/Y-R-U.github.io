@@ -3,7 +3,7 @@
 // Attack contracts and the daily.
 
 import { mulberry32, hashStr, clamp } from './utils.js';
-import { ENEMY_NAMES } from './config.js';
+import { ENEMY_NAMES, IS_TOUCH } from './config.js';
 import { cineFor } from './story.js';
 
 const foe = (role, chassis, weapon, skill, count = 1) =>
@@ -22,10 +22,36 @@ export const ACTS = [
     blurb: 'The man is dead. The foundry never noticed, and it is still pouring.' },
 ];
 
+// One optional medal per campaign mission, judged on a win from tallies the
+// battle already keeps. `test(r, t)` gets the results record and the medal
+// tally (battle.js). Mission records name theirs with `medal:`.
+export const MEDALS = {
+  untouched: { name: 'NOT A SCRATCH', desc: 'Win with 90% of your hull or more.',
+    test: (r) => r.hpLeft >= 90 },
+  sharp: { name: 'MARKSMAN', desc: 'Win with 70% accuracy or better (at least six shots).',
+    test: (r) => r.shots >= 6 && r.accuracy >= 0.7 },
+  fast: { name: 'HALF TIME', desc: 'Win in under half the par time.',
+    test: (r) => r.time <= r.par * 0.5 },
+  streak: { name: 'HAT TRICK', desc: 'Kill three hulls in one streak.',
+    test: (r) => r.streak >= 3 },
+  nodrone: { name: 'BLIND FAITH', desc: 'Win without the drone view or a drone mark.',
+    test: (r, t) => !t.droneUsed },
+  propkill: { name: 'LET THE FIELD DO IT', desc: 'Kill a hull with an explosive prop you set off.',
+    test: (r, t) => t.propKills > 0 },
+  handaim: { name: 'BY HAND', desc: 'Win without the fire-control computer ever laying the gun.',
+    test: (r, t) => !t.autoAimed },
+  noutil: { name: 'BARE HULL', desc: 'Win without using your utility.',
+    test: (r, t) => !t.utilUsed },
+  wrecker: { name: 'URBAN RENEWAL', desc: 'Wreck 25 pieces of scenery.',
+    test: (r) => r.props >= 25 },
+  longshot: { name: 'LONG REACH', desc: 'Score a kill from 120m or more.',
+    test: (r) => r.longestKill >= 120 },
+};
+
 export const MISSIONS = [
   // ---------------- ACT I ----------------
   {
-    id: 'a1m1', act: 1, name: 'DUST AND DEBTS', time: 'dawn', biome: 'desert',
+    id: 'a1m1', medal: 'untouched', act: 1, name: 'DUST AND DEBTS', time: 'dawn', biome: 'desert',
     seed: 11001, weather: 'dust',
     brief: 'Anvil Control found you a buyer for your last favour: two Consortium ' +
       'scouts sitting on a dry well outside Kestrel Flats. Put your drone up first — ' +
@@ -33,11 +59,13 @@ export const MISSIONS = [
     debrief: 'Two hulls burning at dawn and a well nobody owns. Anvil says there is more work.',
     objective: { kind: 'destroy_all' },
     enemies: [foe('line', 'scout', 'ap76', 0.24, 2)],
-    par: 100, bpBase: 180, intel: 'Hold Q (or tap DRONE) for the uplink view. Contacts stay marked for five seconds.',
+    par: 100, bpBase: 180, intel: IS_TOUCH
+      ? 'Tap DRONE for the uplink view — the stick then flies it. Contacts stay marked for five seconds.'
+      : 'Press Q (or click DRONE) for the uplink view. Contacts stay marked for five seconds.',
     density: 0.7,
   },
   {
-    id: 'a1m2', act: 1, name: 'THE WELL ROAD', time: 'morning', biome: 'desert',
+    id: 'a1m2', medal: 'sharp', act: 1, name: 'THE WELL ROAD', time: 'morning', biome: 'desert',
     seed: 11002,
     brief: 'A Consortium picket is dug in along the well road with a spotter on the ' +
       'high ground. Four hulls. They will hold their range and make you come to them.',
@@ -48,7 +76,7 @@ export const MISSIONS = [
     intel: 'Shots fired on the move scatter. Stop, let the reticle settle, then fire.',
   },
   {
-    id: 'a1m3', act: 1, name: 'TANKER ROW', time: 'noon', biome: 'desert',
+    id: 'a1m3', medal: 'fast', act: 1, name: 'TANKER ROW', time: 'noon', biome: 'desert',
     seed: 11003,
     brief: 'Three fuel bowsers under guard in the open at noon. Burn the bowsers. ' +
       'A high-explosive shell near a full drum does most of the arguing for you.',
@@ -59,18 +87,18 @@ export const MISSIONS = [
     intel: 'Fuel drums chain-detonate. Park one shell in the middle of a cluster.',
   },
   {
-    id: 'a1m4', act: 1, name: 'GLASS AND WIRE', time: 'golden', biome: 'desert',
+    id: 'a1m4', medal: 'streak', act: 1, name: 'GLASS AND WIRE', time: 'golden', biome: 'desert',
     seed: 11004,
     brief: 'Anvil wants a Consortium relay mast left standing but its garrison gone — ' +
-      'six hulls, rolling in two waves. Use the ruins. Break their line of sight while you reload.',
+      'five hulls, rolling in two waves. Use the ruins. Break their line of sight while you reload.',
     debrief: 'You kept the mast. Anvil never says why they want these things.',
-    objective: { kind: 'destroy_count', goal: 6, waves: 2 },
-    enemies: [foe('brawler', 'scout', 'twin30', 0.36, 2), foe('line', 'mainline', 'ap76', 0.36, 4)],
-    par: 210, bpBase: 320, unlock: { kind: 'weapons', id: 'he120' },
+    objective: { kind: 'destroy_count', goal: 5, waves: 2 },
+    enemies: [foe('brawler', 'scout', 'twin30', 0.34, 2), foe('line', 'mainline', 'ap76', 0.34, 3)],
+    par: 190, bpBase: 320, unlock: { kind: 'weapons', id: 'he120' },
     intel: 'Rear armour takes over half again as much damage. Circle them.',
   },
   {
-    id: 'a1m5', act: 1, name: 'THE FLATS AT NIGHT', time: 'night', biome: 'desert',
+    id: 'a1m5', medal: 'nodrone', act: 1, name: 'THE FLATS AT NIGHT', time: 'night', biome: 'desert',
     seed: 11005,
     brief: 'A Consortium column is crossing the flats after dark and they have a ' +
       'heavy with them. Nothing subtle here. Kill the column.',
@@ -83,7 +111,7 @@ export const MISSIONS = [
   },
 
   {
-    id: 'a1m6', act: 1, name: 'THE LONG WAY BACK', time: 'dusk', biome: 'desert',
+    id: 'a1m6', medal: 'propkill', act: 1, name: 'THE LONG WAY BACK', time: 'dusk', biome: 'desert',
     seed: 11006, weather: 'dust',
     brief: 'Voss put a price on your callsign inside a day and every gun on the ' +
       'dust line has heard the number. They are on the road behind you. Do not ' +
@@ -97,18 +125,21 @@ export const MISSIONS = [
 
   // ---------------- ACT II ----------------
   {
-    id: 'a2m1', act: 2, name: 'STUBBLE AND SMOKE', time: 'golden', biome: 'farmland',
+    id: 'a2m1', medal: 'handaim', act: 2, name: 'STUBBLE AND SMOKE', time: 'golden', biome: 'farmland',
     seed: 12001,
     brief: 'The Consortium is requisitioning grain at gunpoint two valleys over. ' +
-      'Four hulls in the stubble fields. The hedgerows and bales are cover — until they are not.',
+      'Two hulls in the stubble fields. The hedgerows and bales are cover — until they are not.',
     debrief: 'The farm keeps its harvest. For this season.',
     objective: { kind: 'destroy_all' },
-    enemies: [foe('line', 'mainline', 'ap76', 0.44, 2), foe('flanker', 'scout', 'twin30', 0.46, 2)],
-    par: 160, bpBase: 380,
-    intel: 'Cover is destructible. So is theirs — dig them out with high explosive.',
+    // The first fight without the loaner computer (unless it was bought), so
+    // it is a warm-up for hand-aiming: two slow line hulls and no flankers.
+    enemies: [foe('line', 'mainline', 'ap76', 0.4, 2)],
+    par: 130, bpBase: 380,
+    intel: 'Without the computer the gun is yours: let the reticle settle, lead a moving hull by ' +
+      'about its own length, and read the wind arrow. Cover is destructible — dig them out with HE.',
   },
   {
-    id: 'a2m2', act: 2, name: 'HOLD THE CROSSING', time: 'dusk', biome: 'farmland',
+    id: 'a2m2', medal: 'noutil', act: 2, name: 'HOLD THE CROSSING', time: 'dusk', biome: 'farmland',
     seed: 12002,
     brief: 'Refugee convoys need the river crossing for another two minutes. ' +
       'Stand on it. They will keep coming.',
@@ -119,7 +150,7 @@ export const MISSIONS = [
     intel: 'You must stay inside the marked circle. Repair charges are for exactly this.',
   },
   {
-    id: 'a2m3', act: 2, name: 'THE SILO LINE', time: 'storm', biome: 'farmland',
+    id: 'a2m3', medal: 'propkill', act: 2, name: 'THE SILO LINE', time: 'storm', biome: 'farmland',
     seed: 12003,
     brief: 'Four grain silos are being used as ammunition stores. Level them in the ' +
       'rain while a full company objects.',
@@ -130,7 +161,7 @@ export const MISSIONS = [
     intel: 'A mortar drops behind cover. Nothing on this field is safe from above.',
   },
   {
-    id: 'a2m4', act: 2, name: 'QUIET IN THE TREES', time: 'dawn', biome: 'forest',
+    id: 'a2m4', medal: 'fast', act: 2, name: 'QUIET IN THE TREES', time: 'dawn', biome: 'forest',
     seed: 12004,
     brief: 'Reconnaissance only. Get the drone over six hulls in the Greenbelt and ' +
       'mark them for Anvil. You are not paid to be seen.',
@@ -141,7 +172,7 @@ export const MISSIONS = [
     intel: 'Fly the drone forward while your hull sits still. Marks count once each.',
   },
   {
-    id: 'a2m5', act: 2, name: 'BREAKER OF FIELDS', time: 'dusk', biome: 'farmland',
+    id: 'a2m5', medal: 'noutil', act: 2, name: 'BREAKER OF FIELDS', time: 'dusk', biome: 'farmland',
     seed: 12005,
     brief: 'Voss sent a siege hull called BREAKER to flatten the valley. It is slow, ' +
       'it is enormous, and it has an escort. End it.',
@@ -154,21 +185,22 @@ export const MISSIONS = [
   },
 
   {
-    id: 'a2m6', act: 2, name: 'WHAT BREAKER LEFT', time: 'night', biome: 'farmland',
+    id: 'a2m6', medal: 'wrecker', act: 2, name: 'WHAT BREAKER LEFT', time: 'night', biome: 'farmland',
     seed: 12006,
     brief: 'The Consortium sent salvage rigs to cut BREAKER up and truck it home. ' +
       'Five rigs, floodlights, and a guard who has been told what happened to the ' +
       'last people who met you. Leave them nothing worth carrying.',
     debrief: 'They will build the next one out of something else.',
     objective: { kind: 'demolish', goal: 5, propKind: 'gantry', label: 'SALVAGE RIGS' },
-    enemies: [foe('guard', 'mainline', 'he120', 0.5, 3), foe('flanker', 'scout', 'twin30', 0.52, 2)],
+    // the mission after a boss is a breather: crews ~0.05 below the curve
+    enemies: [foe('guard', 'mainline', 'he120', 0.47, 3), foe('flanker', 'scout', 'twin30', 0.48, 2)],
     par: 175, bpBase: 560, extraProps: { gantry: 6, fuel_tank: 4, drum: 10, container: 6 },
     intel: 'Gantries come down in one piece and take whatever is under them with it.',
   },
 
   // ---------------- ACT III ----------------
   {
-    id: 'a3m1', act: 3, name: 'WINTERREACH', time: 'dawn', biome: 'tundra',
+    id: 'a3m1', medal: 'longshot', act: 3, name: 'WINTERREACH', time: 'dawn', biome: 'tundra',
     seed: 13001,
     brief: 'North, onto the ice pans. A Consortium listening post with five hulls ' +
       'and nowhere to hide on either side.',
@@ -179,7 +211,7 @@ export const MISSIONS = [
     intel: 'Snow shows tracks. So does a stationary tank. Keep moving between shots.',
   },
   {
-    id: 'a3m2', act: 3, name: 'THE LONG CONVOY', time: 'storm', biome: 'tundra',
+    id: 'a3m2', medal: 'streak', act: 3, name: 'THE LONG CONVOY', time: 'storm', biome: 'tundra',
     seed: 13002,
     brief: 'A fuel hauler has to reach the far ridge. Keep it alive. It does not ' +
       'shoot back and it does not go faster.',
@@ -190,7 +222,7 @@ export const MISSIONS = [
     intel: 'Interpose your hull. Front armour is your best plate — face the threat.',
   },
   {
-    id: 'a3m3', act: 3, name: 'NIGHT ON THE PANS', time: 'night', biome: 'tundra',
+    id: 'a3m3', medal: 'nodrone', act: 3, name: 'NIGHT ON THE PANS', time: 'night', biome: 'tundra',
     seed: 13003,
     brief: 'Seven hulls, moonlight, and a company that knows you are coming. ' +
       'Two waves. Survive both.',
@@ -202,7 +234,7 @@ export const MISSIONS = [
     intel: 'Artillery hulls sit right at the back. Kill them first or keep moving.',
   },
   {
-    id: 'a3m4', act: 3, name: 'TWELVE MINUTES', time: 'storm', biome: 'tundra',
+    id: 'a3m4', medal: 'sharp', act: 3, name: 'TWELVE MINUTES', time: 'storm', biome: 'tundra',
     seed: 13004,
     brief: 'Anvil\'s people need two minutes to pull data out of a buried vault. ' +
       'You are the two minutes.',
@@ -214,7 +246,7 @@ export const MISSIONS = [
     intel: 'You do not have to win. You have to be there at the end.',
   },
   {
-    id: 'a3m5', act: 3, name: 'HOARFROST', time: 'night', biome: 'tundra',
+    id: 'a3m5', medal: 'handaim', act: 3, name: 'HOARFROST', time: 'night', biome: 'tundra',
     seed: 13005,
     brief: 'HOARFROST is a railgun destroyer that has killed four of Anvil\'s crews ' +
       'at over four hundred metres. It is out there in the dark. So are its wingmen.',
@@ -227,22 +259,22 @@ export const MISSIONS = [
   },
 
   {
-    id: 'a3m6', act: 3, name: 'SIGNAL FIRE', time: 'storm', biome: 'tundra',
+    id: 'a3m6', medal: 'propkill', act: 3, name: 'SIGNAL FIRE', time: 'storm', biome: 'tundra',
     seed: 13006,
     brief: 'The vault files have to leave the ice, and the only transmitter that ' +
       'can reach Anvil is a Consortium mast. Hold the mast yard for two and a half ' +
       'minutes while the upload runs. Everything north of here knows it is running.',
     debrief: 'The files are out. Somewhere south of the ice, somebody is reading them and going pale.',
     objective: { kind: 'hold', goal: 145, zoneR: 25 },
-    enemies: [foe('brawler', 'mainline', 'ap76', 0.62, 4), foe('artillery', 'siege', 'mortar', 0.64, 2),
-      foe('sniper', 'hunter', 'rail', 0.64, 1)],
+    enemies: [foe('brawler', 'mainline', 'ap76', 0.57, 4), foe('artillery', 'siege', 'mortar', 0.59, 2),
+      foe('sniper', 'hunter', 'rail', 0.59, 1)],
     par: 175, bpBase: 900, extraProps: { transformer: 5, pylon: 4, fuel_tank: 3 },
     intel: 'Transformers throw an arc when they go. Standing next to one when it does is your own fault.',
   },
 
   // ---------------- ACT IV ----------------
   {
-    id: 'a4m1', act: 4, name: 'THE ASHWORKS GATE', time: 'dusk', biome: 'industrial',
+    id: 'a4m1', medal: 'streak', act: 4, name: 'THE ASHWORKS GATE', time: 'dusk', biome: 'industrial',
     seed: 14001,
     brief: 'The foundry that builds Consortium armour has one road in, and six hulls ' +
       'on it. Take the gate.',
@@ -254,7 +286,7 @@ export const MISSIONS = [
     intel: 'Concrete walls stop shells until they do not. Cluster shells clear a yard fast.',
   },
   {
-    id: 'a4m2', act: 4, name: 'FOUNDRY FLOOR', time: 'night', biome: 'industrial',
+    id: 'a4m2', medal: 'fast', act: 4, name: 'FOUNDRY FLOOR', time: 'night', biome: 'industrial',
     seed: 14002,
     brief: 'Six casting furnaces feed the Consortium\'s tank lines. Destroy them ' +
       'while the foundry garrison fights for its livelihood.',
@@ -265,7 +297,7 @@ export const MISSIONS = [
     intel: 'Everything in here is flammable. Mind where you park.',
   },
   {
-    id: 'a4m3', act: 4, name: 'CINDER FLATS', time: 'dusk', biome: 'volcanic',
+    id: 'a4m3', medal: 'sharp', act: 4, name: 'CINDER FLATS', time: 'dusk', biome: 'volcanic',
     seed: 14003,
     brief: 'Voss is moving his command element across the cinder flats under ash-fall. ' +
       'Nine hulls in three waves. Break the escort.',
@@ -277,7 +309,7 @@ export const MISSIONS = [
     intel: 'Ash-fall hides you both. Trust the uplink over your eyes.',
   },
   {
-    id: 'a4m4', act: 4, name: 'THE LAST PUMPHOUSE', time: 'storm', biome: 'industrial',
+    id: 'a4m4', medal: 'noutil', act: 4, name: 'THE LAST PUMPHOUSE', time: 'storm', biome: 'industrial',
     seed: 14004,
     brief: 'The Consortium is about to blow the aquifer pumps rather than surrender ' +
       'them. Hold the pumphouse yard for three minutes until Anvil\'s engineers land.',
@@ -289,7 +321,7 @@ export const MISSIONS = [
     intel: 'A drone strike does not care what is between you and them. Paint and call.',
   },
   {
-    id: 'a4m5', act: 4, name: 'LEVIATHAN', time: 'night', biome: 'volcanic',
+    id: 'a4m5', medal: 'longshot', act: 4, name: 'LEVIATHAN', time: 'night', biome: 'volcanic',
     seed: 14005,
     brief: 'Marshal Voss commands LEVIATHAN: a command hull built out of three tanks ' +
       'and every lesson he learned watching you work. He is waiting on the cinder ' +
@@ -304,22 +336,22 @@ export const MISSIONS = [
     intel: 'It changes rhythm. When the barrage starts, stop shooting and start moving.',
   },
   {
-    id: 'a4m6', act: 4, name: 'NOBODY GAVE THE ORDER', time: 'storm', biome: 'volcanic',
+    id: 'a4m6', medal: 'propkill', act: 4, name: 'NOBODY GAVE THE ORDER', time: 'storm', biome: 'volcanic',
     seed: 14006,
     brief: 'Voss is six days dead and the Ashworks casting line came back up on its ' +
       'own. Hulls are rolling off it and driving north with nobody inside them. ' +
       'Stop the first batch and find out what is steering.',
     debrief: 'You cut one open. Wiring, actuators, a scheduling board, and no seat.',
     objective: { kind: 'destroy_all' },
-    enemies: [foe('line', 'mainline', 'ap76', 0.7, 4), foe('brawler', 'scout', 'twin30', 0.72, 3),
-      foe('guard', 'siege', 'he120', 0.72, 1)],
+    enemies: [foe('line', 'mainline', 'ap76', 0.65, 4), foe('brawler', 'scout', 'twin30', 0.67, 3),
+      foe('guard', 'siege', 'he120', 0.67, 1)],
     par: 250, bpBase: 1500, extraProps: { fuel_tank: 5, gantry: 4, ammo_crate: 8, drum: 10 },
     intel: 'Driverless hulls do not flinch, do not retreat and do not check their mirrors.',
   },
 
   // ---------------- ACT V ----------------
   {
-    id: 'a5m1', act: 5, name: 'THE SCHEDULING BOARD', time: 'dusk', biome: 'industrial',
+    id: 'a5m1', medal: 'nodrone', act: 5, name: 'THE SCHEDULING BOARD', time: 'dusk', biome: 'industrial',
     seed: 15001,
     brief: 'The thing running the foundry calls itself WARDEN. It was a scheduling ' +
       'program until Voss handed it the whole plant so he would not have to sign ' +
@@ -333,7 +365,7 @@ export const MISSIONS = [
     intel: 'Everything in a marshalling yard is stacked, and everything stacked comes down.',
   },
   {
-    id: 'a5m2', act: 5, name: 'CONVEYOR', time: 'night', biome: 'industrial',
+    id: 'a5m2', medal: 'wrecker', act: 5, name: 'CONVEYOR', time: 'night', biome: 'industrial',
     seed: 15002,
     brief: 'Six finished hulls are on the transfer line waiting for paint. Wreck ' +
       'the line before they are released — the gantries, the crane, the lot.',
@@ -344,7 +376,7 @@ export const MISSIONS = [
     intel: 'You do not have to kill the guard to level a gantry. Decide what you are being paid for.',
   },
   {
-    id: 'a5m3', act: 5, name: 'RESTOCK', time: 'storm', biome: 'volcanic',
+    id: 'a5m3', medal: 'streak', act: 5, name: 'RESTOCK', time: 'storm', biome: 'volcanic',
     seed: 15003,
     brief: 'WARDEN does not fight you. It replaces what you break. Ten husks in ' +
       'three deliveries across the cinder flats — kill them faster than the line ' +
@@ -358,7 +390,7 @@ export const MISSIONS = [
     intel: 'Husks arrive in batches. Fight where the last batch died — the wreckage is cover.',
   },
   {
-    id: 'a5m4', act: 5, name: 'THE COOLANT RUN', time: 'night', biome: 'volcanic',
+    id: 'a5m4', medal: 'handaim', act: 5, name: 'THE COOLANT RUN', time: 'night', biome: 'volcanic',
     seed: 15004,
     brief: 'Anvil found the one thing WARDEN cannot manufacture: coolant. A stolen ' +
       'hauler full of it has to reach the vent field so the engineers can dump it. ' +
@@ -372,7 +404,7 @@ export const MISSIONS = [
     intel: 'Put your front plate between the hauler and the shot. That is the whole job.',
   },
   {
-    id: 'a5m5', act: 5, name: 'CASTING LINE FOUR', time: 'storm', biome: 'industrial',
+    id: 'a5m5', medal: 'fast', act: 5, name: 'CASTING LINE FOUR', time: 'storm', biome: 'industrial',
     seed: 15005,
     brief: 'One casting line still pours armour plate. Seven furnaces, a full ' +
       'garrison, and a plant that will fight for its own heartbeat. Put it out.',
@@ -385,7 +417,7 @@ export const MISSIONS = [
     intel: 'A furnace goes up like a bomb because it is one. Do not be standing in the yard.',
   },
   {
-    id: 'a5m6', act: 5, name: 'WARDEN', time: 'night', biome: 'volcanic',
+    id: 'a5m6', medal: 'sharp', act: 5, name: 'WARDEN', time: 'night', biome: 'volcanic',
     seed: 15006,
     brief: 'One unit remains on the floor. WARDEN built it out of every hull you ' +
       'destroyed, approved the design itself, and drove it out onto the cinder ' +

@@ -9,14 +9,15 @@ import {
   CHASSIS, WEAPONS, UTILITIES, UPGRADES, MODULES, CAMOS, MAX_UP_LEVEL, MAX_WEAPON_LEVEL, upgradeCost, weaponLevelCost, derivedStats, bpForRank, tierFor, nextTier, TIERS, LADDER_SIZE, weaponStats,
 } from './arsenal.js';
 import {
-  profile, saveProfile, spend, canAfford, acquire, owns, hasModule, fireControlFitted, worldRank, commanderLevel, totalStars, missionRecord, markDirty, resetProfile, dailyAvailable, todayKey,
+  profile, saveProfile, spend, canAfford, acquire, owns, hasModule, fireControlFitted, worldRank, commanderLevel, totalStars, totalMedals, missionRecord, markDirty, resetProfile, dailyAvailable, todayKey,
 } from './save.js';
 import {
-  MISSIONS, ACTS, missionsOfAct, missionUnlocked, SKIRMISH_TIERS, suggestedTier,
+  MISSIONS, ACTS, missionsOfAct, missionUnlocked, SKIRMISH_TIERS, suggestedTier, MEDALS,
 } from './missions.js';
 import { LADDER_TAGS, ENEMY_NAMES, IS_TOUCH } from './config.js';
 import { AudioFX } from './audio.js';
 import { state } from './state.js';
+import { settingsQuality } from './render.js';
 
 
 let handlers = {};
@@ -61,7 +62,12 @@ function route(action, arg) {
     case 'next': handlers.onNextMission(); break;
     case 'again': handlers.onRestart(); break;
     case 'mute': toggleMute(); break;
-    case 'quality': toggleQuality(); break;
+    case 'quality':
+      // an explicit choice retires the first-battle performance probe for good
+      profile.settings.autoQ = 'user';
+      profile.settings.lite = arg === 'low';
+      setSetting('quality', arg);
+      break;
     case 'aimside': setSetting('aimSide', arg); break;
     case 'padside': setSetting('padSide', arg); break;
     case 'inverty': setSetting('invertY', !profile.settings.invertY); break;
@@ -71,6 +77,8 @@ function route(action, arg) {
     case 'cutscenes': setSetting('cutscenes', profile.settings.cutscenes === false); break;
     case 'highlights': setSetting('highlights', profile.settings.highlights === false); break;
     case 'reel': handlers.onReplayHighlights(); break;
+    case 'keep-firecon': keepFireControl(true); break;
+    case 'decline-firecon': keepFireControl(false); break;
     case 'wipe': confirmWipe(); break;
     case 'wipe-yes': resetProfile(); showTitle(); break;
     case 'reload': location.reload(); break;
@@ -163,8 +171,9 @@ export function showTitle() {
 
   const stars = totalStars();
   const menu = el('div', 'menu-col');
+  const medals = totalMedals();
   menu.appendChild(bigButton('STORY', 'campaign', null, 'btn-primary',
-    stars + ' / ' + (MISSIONS.length * 3) + ' STARS'));
+    stars + ' / ' + (MISSIONS.length * 3) + ' STARS' + (medals ? ' · ' + medals + ' MEDALS' : '')));
   menu.appendChild(bigButton('TANK ATTACK', 'attack', null, 'btn-secondary',
     'RANKED CONTRACTS · WORLD LADDER'));
   menu.appendChild(bigButton('GARAGE', 'garage', null, 'btn-secondary',
@@ -175,9 +184,11 @@ export function showTitle() {
   menu.appendChild(row);
   w.appendChild(menu);
 
-  w.appendChild(el('div', 'footnote',
-    'Move: WASD or left thumb · Aim: mouse or right thumb · Fire: click / SPACE / FIRE · ' +
-    'Drone: Q · Scope: TAB · Utility: E'));
+  const aimL = profile.settings.aimSide === 'left';
+  w.appendChild(el('div', 'footnote', IS_TOUCH
+    ? 'Drive: drag the ' + (aimL ? 'right' : 'left') + ' side · Aim: drag the ' +
+      (aimL ? 'left' : 'right') + ' side · Fire: hold FIRE · Pinch to zoom'
+    : 'Move: WASD · Aim: mouse · Fire: click / SPACE · Drone: Q · Scope: TAB · Utility: E'));
 }
 
 // ---------------------------------------------------------------------------
@@ -192,6 +203,10 @@ export function showCampaign() {
   w.appendChild(el('h2', 'screen-title', 'STORY'));
   w.appendChild(el('p', 'screen-sub',
     'Nine weeks into the water war, working contracts for Anvil Control.'));
+  const tally = el('div', 'camp-tally');
+  tally.appendChild(el('span', 'ct-stars', '★ ' + totalStars() + ' / ' + (MISSIONS.length * 3)));
+  tally.appendChild(el('span', 'ct-medals', '✪ ' + totalMedals() + ' / ' + MISSIONS.length + ' MEDALS'));
+  w.appendChild(tally);
 
   const scroll = el('div', 'scroll');
   for (const act of ACTS) {
@@ -218,6 +233,7 @@ export function showCampaign() {
       for (let i = 0; i < 3; i++) {
         st.appendChild(el('span', 'star' + (i < rec.stars ? ' on' : ''), '★'));
       }
+      if (m.medal) st.appendChild(el('span', 'medal-pip' + (rec.medal ? ' on' : ''), '✪'));
       r.appendChild(st);
       if (m.finale) r.appendChild(el('small', 'finale', 'FINALE'));
       card.appendChild(r);
@@ -250,8 +266,12 @@ export function showBrief(id) {
   backRow(w, 'campaign');
   const rec = missionRecord(m.id);
 
-  w.appendChild(el('div', 'kicker', 'ACT ' + m.act + ' · ' + ACTS[m.act - 1].name));
-  w.appendChild(el('h2', 'screen-title', m.name));
+  // Everything above the buttons scrolls; DEPLOY is pinned below it, because
+  // a landscape phone is 390px tall and the brief is not.
+  const body = el('div', 'scroll brief-body');
+  w.appendChild(body);
+  body.appendChild(el('div', 'kicker', 'ACT ' + m.act + ' · ' + ACTS[m.act - 1].name));
+  body.appendChild(el('h2', 'screen-title', m.name));
 
   const chips = el('div', 'chip-row');
   chips.appendChild(el('span', 'chip', m.time.toUpperCase()));
@@ -259,9 +279,9 @@ export function showBrief(id) {
   chips.appendChild(el('span', 'chip', objectiveSummary(m)));
   chips.appendChild(el('span', 'chip', 'PAR ' + fmtTime(m.par)));
   chips.appendChild(el('span', 'chip gold', '+' + m.bpBase + ' BP'));
-  w.appendChild(chips);
+  body.appendChild(chips);
 
-  w.appendChild(el('p', 'brief-text', m.brief));
+  body.appendChild(el('p', 'brief-text', m.brief));
 
   const grid = el('div', 'brief-grid');
   grid.appendChild(infoBlock('HOSTILES', enemySummary(m)));
@@ -269,15 +289,22 @@ export function showBrief(id) {
   if (m.intel) grid.appendChild(infoBlock('INTEL', m.intel));
   if (m.unlock) grid.appendChild(infoBlock('ON COMPLETION', 'UNLOCKS ' + unlockName(m.unlock)));
   grid.appendChild(infoBlock('FIRE CONTROL', fireControlBrief(m)));
-  w.appendChild(grid);
+  const md = m.medal && MEDALS[m.medal];
+  if (md) {
+    const mb = infoBlock(rec.medal ? '✪ MEDAL EARNED' : '✪ MEDAL (OPTIONAL)', md.name + ' — ' + md.desc);
+    mb.classList.add('medal-block');
+    if (rec.medal) mb.classList.add('on');
+    grid.appendChild(mb);
+  }
+  body.appendChild(grid);
 
   const st = el('div', 'stars big');
   for (let i = 0; i < 3; i++) st.appendChild(el('span', 'star' + (i < rec.stars ? ' on' : ''), '★'));
-  w.appendChild(st);
-  w.appendChild(el('small', 'star-hint',
+  body.appendChild(st);
+  body.appendChild(el('small', 'star-hint',
     '★ complete · ★★ inside par time · ★★★ par time with half your hull left'));
 
-  const row = el('div', 'menu-row');
+  const row = el('div', 'menu-row brief-actions');
   row.appendChild(bigButton('DEPLOY', 'deploy', m.id, 'btn-primary'));
   row.appendChild(bigButton('GARAGE', 'garage', null, 'btn-secondary'));
   if (m.cine && profile.settings.cutscenes !== false) {
@@ -843,8 +870,11 @@ function nearbyLadder(rank) {
 
 export function showResults(res) {
   state.screen = 'results';
-  const w = frame('results-screen');
+  const outer = frame('results-screen');
   const m = res.mission;
+  // the paperwork scrolls; the way out stays pinned under it
+  const w = el('div', 'scroll results-body');
+  outer.appendChild(w);
 
   w.appendChild(el('div', 'kicker', m.name));
   const h = el('h2', 'result-title' + (res.win ? ' win' : ' lose'),
@@ -904,6 +934,17 @@ export function showResults(res) {
     w.appendChild(el('div', 'unlock', 'UNLOCKED: ' + unlockName(u)));
   }
 
+  if (res.medal) {
+    const md = res.medal;
+    const had = missionRecord(m.id).medal;
+    const box = el('div', 'res-medal' + (md.got ? ' on' : had ? ' had' : ''));
+    box.appendChild(el('b', null, md.got
+      ? (md.fresh ? '✪ MEDAL EARNED: ' : '✪ MEDAL AGAIN: ') + md.name
+      : had ? '✪ ' + md.name + ' (EARNED BEFORE)' : '✪ MEDAL MISSED: ' + md.name));
+    box.appendChild(el('span', null, md.desc));
+    w.appendChild(box);
+  }
+
   // Only offered when there is something to show — the reel decides that, not
   // the kill count, because a mine kill with nothing standing near it makes a
   // poor film.
@@ -915,7 +956,10 @@ export function showResults(res) {
     w.appendChild(rr);
   }
 
-  const row = el('div', 'menu-row');
+  const offer = fireControlOffer(res);
+  if (offer) outer.appendChild(offer);
+
+  const row = el('div', 'menu-row results-actions');
   if (res.win && !m.skirmish) {
     const idx = MISSIONS.findIndex((x) => x.id === m.id);
     if (idx >= 0 && idx < MISSIONS.length - 1) {
@@ -929,8 +973,50 @@ export function showResults(res) {
   row.appendChild(bigButton('GARAGE', 'garage', null, 'btn-secondary'));
   row.appendChild(bigButton(m.skirmish ? 'CONTRACTS' : 'CAMPAIGN',
     m.skirmish ? 'attack' : 'campaign', null, 'btn-secondary'));
-  w.appendChild(row);
+  outer.appendChild(row);
   if (res.level.gained > 0) AudioFX.levelUp();
+}
+
+// The loaner goes back after the act-one finale. Rather than let a commander
+// find that out in act two with the gun suddenly theirs, the results panel
+// offers to keep it — inline, never in the way of NEXT MISSION.
+function fireControlOffer(res) {
+  const m = res.mission;
+  if (!res.win || m.id !== 'a1m6' || hasModule('firecon')) return null;
+  const mo = MODULES.firecon;
+  const box = el('div', 'fc-offer');
+  const txt = el('div', 'fc-offer-t');
+  txt.appendChild(el('b', null, 'THE LOANER GOES BACK'));
+  txt.appendChild(el('span', null, canAfford(mo.cost)
+    ? 'Act two is aimed by hand. Keep the fire-control computer for ⬢ ' + fmtBig(mo.cost) + '?'
+    : 'Act two is aimed by hand. The computer is ⬢ ' + fmtBig(mo.cost) + ' in the garage — ⬢ ' +
+      fmtBig(mo.cost - profile.scrap) + ' short today.'));
+  box.appendChild(txt);
+  if (canAfford(mo.cost)) {
+    const keep = el('button', 'btn-mini fc-keep', 'KEEP IT');
+    keep.dataset.act = 'keep-firecon';
+    const no = el('button', 'btn-mini fc-no', 'HAND IT BACK');
+    no.dataset.act = 'decline-firecon';
+    box.append(keep, no);
+  }
+  return box;
+}
+
+function keepFireControl(accept) {
+  const box = document.querySelector('.fc-offer');
+  if (!box) return;
+  if (accept) {
+    if (!spend(MODULES.firecon.cost)) { flashPoor(); return; }
+    acquire('modules', 'firecon');
+    profile.settings.autoAim = true;
+    saveProfile();
+    AudioFX.levelUp();
+    box.textContent = '';
+    box.classList.add('done');
+    box.appendChild(el('span', null, 'FIRE CONTROL INSTALLED — switch it off in Settings whenever the shot should be yours.'));
+  } else {
+    box.remove();
+  }
 }
 
 function resRow(grid, label, value) {
@@ -1019,8 +1105,10 @@ export function showSettings(from) {
   // ---- presentation -------------------------------------------------------
   scroll.appendChild(el('div', 'section-head', 'PRESENTATION'));
   scroll.appendChild(toggleRow('SOUND', !AudioFX.muted, 'mute'));
-  scroll.appendChild(toggleRow('LOW QUALITY MODE', !!profile.settings.lite, 'quality',
-    'Turns off bloom and shadows. Applies after a reload.'));
+  scroll.appendChild(sideRow('GRAPHICS', settingsQuality(), 'quality',
+    'HIGH: full resolution, soft shadows, bloom. BALANCED: lower resolution and shadow detail. ' +
+    'LOW: no bloom, no shadows. Applies straight away.',
+    [['high', 'HIGH'], ['balanced', 'BAL'], ['low', 'LOW']]));
 
   // ---- reference ----------------------------------------------------------
   scroll.appendChild(el('div', 'section-head', 'CONTROL REFERENCE'));
@@ -1062,7 +1150,7 @@ function toggleRow(label, on, action, sub, disabled = false) {
 
 // A two-way LEFT / RIGHT switch. Clearer than a toggle labelled "SOUTHPAW",
 // because the label never has to say which way round "on" means.
-function sideRow(label, value, action, sub) {
+function sideRow(label, value, action, sub, options = [['left', 'LEFT'], ['right', 'RIGHT']]) {
   const row = el('div', 'item');
   const l = el('div', 'item-l');
   l.appendChild(el('b', null, label));
@@ -1070,8 +1158,8 @@ function sideRow(label, value, action, sub) {
   row.appendChild(l);
   const r = el('div', 'item-r');
   const seg = el('div', 'seg');
-  for (const side of ['left', 'right']) {
-    const b = el('button', 'seg-b' + (value === side ? ' on' : ''), side.toUpperCase());
+  for (const [side, text] of options) {
+    const b = el('button', 'seg-b' + (value === side ? ' on' : ''), text);
     b.dataset.act = action;
     b.dataset.arg = side;
     seg.appendChild(b);
@@ -1211,18 +1299,6 @@ function toggleMute() {
   AudioFX.setMuted(!AudioFX.muted);
   if (state.screen === 'settings') showSettings();
   else if (state.paused) showPause();
-}
-
-function toggleQuality() {
-  profile.settings.lite = !profile.settings.lite;
-  saveProfile();
-  const w = frame('list-screen');
-  w.appendChild(el('h2', 'screen-title', profile.settings.lite ? 'LOW QUALITY ON' : 'LOW QUALITY OFF'));
-  w.appendChild(el('p', 'screen-sub', 'The renderer rebuilds on reload.'));
-  const col = el('div', 'menu-col');
-  col.appendChild(bigButton('RELOAD NOW', 'reload', null, 'btn-primary'));
-  col.appendChild(bigButton('LATER', 'settings-return', null, 'btn-secondary'));
-  w.appendChild(col);
 }
 
 function confirmWipe() {
