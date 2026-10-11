@@ -2,6 +2,7 @@
 // Usage: node tools/mv_build.mjs [movie-moments|book-moments|song-pictures|all]
 import fs from 'fs';
 import path from 'path';
+import { momentFile } from './mv_paths.mjs';
 
 const ROOT = path.resolve(path.dirname(new URL(import.meta.url).pathname), '..');
 const CREDIT = 'Clued (AI-generated illustration)';
@@ -72,7 +73,7 @@ function build(id) {
   for (const f of cfg.films) {
     const img = [];
     f.scenes.forEach((sc, i) => {
-      const file = `${def.media}/${f.id}-${i + 1}.webp`;
+      const file = `${def.media}/${momentFile(`${f.id}-${i + 1}`)}`;
       if (sc.drop || !fs.existsSync(path.join(ROOT, file))) return;
       const [w, h] = webpSize(path.join(ROOT, file));
       img.push({ src: file, w, h, credit: CREDIT, license: 'CC0', page: PAGE, difficulty: sc.d, caption: sc.cap });

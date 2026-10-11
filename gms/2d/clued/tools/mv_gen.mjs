@@ -1,10 +1,11 @@
-// Movie Moments generator. Resumable: a scene is done when media/moments/<id>-<n>.webp exists.
+// Movie Moments generator. Resumable: a scene is done when its media/moments file exists (tools/mv_paths.mjs names it).
 // Usage: node tools/mv_gen.mjs [--pack movie-moments] [--only id,id] [--batch 6]
 // Rejected scenes: node tools/mv_gen.mjs --reject id-n[,id-n] (deletes the webp, bumps the seed attempt).
 import fs from 'fs';
 import path from 'path';
 import { execFileSync } from 'child_process';
 import os from 'os';
+import { momentFile } from './mv_paths.mjs';
 
 const ROOT = path.resolve(path.dirname(new URL(import.meta.url).pathname), '..');
 const args = process.argv.slice(2);
@@ -34,7 +35,7 @@ if (arg('reject')) {
     const s = state[key] || (state[key] = { attempt: 0 });
     s.attempt = (s.attempt || 0) + 1;
     s.rejected = (s.rejected || 0) + 1;
-    try { fs.unlinkSync(path.join(MEDIA, key + '.webp')); } catch {}
+    try { fs.unlinkSync(path.join(MEDIA, momentFile(key))); } catch {}
     console.log('rejected', key, '-> attempt', s.attempt);
   }
   save();
@@ -58,7 +59,7 @@ function scan() {
     if (only && !only.has(f.id)) continue;
     f.scenes.forEach((sc, i) => {
       const key = `${f.id}-${i + 1}`;
-      if (sc.drop || failed.has(key) || fs.existsSync(path.join(MEDIA, key + '.webp'))) return;
+      if (sc.drop || failed.has(key) || fs.existsSync(path.join(MEDIA, momentFile(key)))) return;
       todo.push({ key, sc, i });
     });
   }
@@ -91,7 +92,7 @@ async function finish({ key, seed, job }) {
   }
   const raw = path.join(RAW, `${key}.png`);
   fs.writeFileSync(raw, Buffer.from(await (await fetch(`${Q}/api/jobs/${job}/file/0`)).arrayBuffer()));
-  const out = path.join(MEDIA, `${key}.webp`);
+  const out = path.join(MEDIA, momentFile(key));
   execFileSync('cwebp', ['-quiet', '-q', '82', '-resize', '640', '0', raw, '-o', out]);
   state = load();
   state[key] = { ...(state[key] || {}), seed, model: cfg.model, at: new Date().toISOString() };

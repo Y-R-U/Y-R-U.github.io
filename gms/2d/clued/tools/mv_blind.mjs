@@ -4,6 +4,7 @@
 // Results: tools/mv_blind_<pack>.json  { "film-id-n": { guesses: [...], rank: 1|2|3|0 } }
 import fs from 'fs';
 import path from 'path';
+import { momentFile } from './mv_paths.mjs';
 
 const ROOT = path.resolve(path.dirname(new URL(import.meta.url).pathname), '..');
 const args = process.argv.slice(2);
@@ -25,7 +26,7 @@ const matches = (guess, f) => [f.name, ...(f.alt || [])].some(n => { const a = n
 
 for (const f of cfg.films) {
   for (let i = 0; i < f.scenes.length; i++) {
-    const key = `${f.id}-${i + 1}`, file = path.join(ROOT, media, key + '.webp');
+    const key = `${f.id}-${i + 1}`, file = path.join(ROOT, media, momentFile(key));
     if (res[key] || f.scenes[i].drop || !fs.existsSync(file)) continue;
     const b64 = fs.readFileSync(file).toString('base64');
     const body = {

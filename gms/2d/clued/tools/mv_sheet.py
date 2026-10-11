@@ -34,7 +34,8 @@ if mode == 'contact':
     cols = int(sys.argv[4]) if len(sys.argv) > 4 else 16
     grid(files, cols, 160, sys.argv[3], 11)
 elif mode == 'keys':
-    sel = [os.path.join(media, k + '.webp') for k in sys.argv[4].split(',')]
+    import hashlib
+    sel = [os.path.join(media, hashlib.sha1(('clued-moment:' + k).encode()).hexdigest()[:12] + '.webp') for k in sys.argv[4].split(',')]
     for k in range(0, len(sel), 6):
         grid(sel[k:k + 6], 3, 520, f'{sys.argv[3]}_{k:03d}.jpg', 16)
 else:

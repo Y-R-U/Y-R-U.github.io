@@ -3,6 +3,7 @@
 // A new prompt or reject:true deletes the webp and bumps the seed attempt so mv_gen regenerates it.
 import fs from 'fs';
 import path from 'path';
+import { momentFile } from './mv_paths.mjs';
 
 const ROOT = path.resolve(path.dirname(new URL(import.meta.url).pathname), '..');
 const args = process.argv.slice(2);
@@ -22,10 +23,10 @@ for (const [key, e] of Object.entries(edits)) {
   const regen = (e.p && e.p !== sc.p) || e.reject;
   for (const k of ['p', 'd', 'cap', 'drop']) if (e[k] !== undefined) sc[k] = e[k];
   const s = state[key] || (state[key] = {});
-  if (e.drop) { s.dropped = true; try { fs.unlinkSync(path.join(ROOT, media, key + '.webp')); } catch {} }
+  if (e.drop) { s.dropped = true; try { fs.unlinkSync(path.join(ROOT, media, momentFile(key))); } catch {} }
   if (regen && !e.drop) {
     s.attempt = (s.attempt || 0) + 1;
-    try { fs.unlinkSync(path.join(ROOT, media, key + '.webp')); } catch {}
+    try { fs.unlinkSync(path.join(ROOT, media, momentFile(key))); } catch {}
     if (s.attempt >= 3) console.log('WARNING', key, 'attempt', s.attempt + 1, '(last try, then drop)');
   }
   console.log(key, regen ? 'regen' : '', e.drop ? 'dropped' : '', e.d ? 'd=' + e.d : '');
