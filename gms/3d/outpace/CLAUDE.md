@@ -31,7 +31,13 @@ Live at https://games.br8t.com/gms/3d/outpace/ (on the hub), and it's mirrored o
   - If debt goes over the limit, the ship is confiscated and "Sign New Hull" resets the ship (`claimNewHull`), but the career is kept.
 - Upgrades: `UPGRADE_DEFS`, where cost = base × scale^level.
 - **Score is not money.** Score only feeds best score and the results card. Credits come from payouts.
-- The death-spiral balance (repair vs payout, interest, confiscation) is awaiting Aaron's decision. Leave it alone.
+- **Insurance** (Aaron's design, 2026-10-11): `save.insurance = {launches, year, claimsUsed}` (missing in old saves → defaults).
+  - Every non-demo launch counts in `startInsuredFlight()` (called from `resetGame`); a policy year is `INSURANCE_FLIGHTS_PER_YEAR` = 12 launches.
+  - The first `INSURANCE_CLAIMS_PER_YEAR` = 3 crashes a year cost only the excess: 20% of the bill, capped at 40% of a small-station payout for the route, rounded to 5.
+  - Route 1: 415 bill → 85 excess vs 267 payout. Route 10: 1080 → 200 vs 501. Route 20: 1820 → 305 vs 761.
+  - After that, repairs are billed in full until the year renews. Unpaid charge still becomes debt; confiscation + Sign New Hull stays the floor (launching never costs anything, so a paying route is always flyable).
+  - `getInsuranceSummary()` feeds `#result-insurance` (result card), `#station-insurance` (station status panel) and a "Hull insurance" card in the Cargo tab. `.spent` turns them amber.
+  - Balance sim (no upgrades, debt paid down whenever possible), net worth after 36 flights: crash 1-in-4 2946 → 14457; 1-in-3 −4256 → 6634; 4-crash bad start then 1-in-3 −7303 → 2690; 1-in-2 one seizure → no seizure (−6714). 2-of-3 still seizes, by design.
 
 ## Dock flow
 1. The route fills, then `spawnObjects` clears the field and spawns `createDockStation`.
@@ -76,6 +82,9 @@ Live at https://games.br8t.com/gms/3d/outpace/ (on the hub), and it's mirrored o
 Run the old `processCockpitImage` key (in git history before 2026-10-11) on `cockpit-chroma.png` in Chrome, and dump the RGBA as a PNG.
 Then encode it with `cwebp -q 92 -m 6 -sharp_yuv -alpha_q 100 keyed.png -o assets/cockpit-alpha.webp`.
 This keeps the alpha lossless and gives 41 dB PSNR on colour against the keyed PNG.
+
+- **Result card, short landscape**: under `(orientation: landscape) and (max-height: 500px)` it is two columns (title/message/insurance | 2×2 stats/lock/button). It was 402px tall at 844×390; it is now 101–335.
+- `?probe` also exposes `damage` (`__outpace.damage(1e6)` kills instantly).
 
 ## Testing
 Serve the site root (`python3 -m http.server <port>` in `yru/site`).

@@ -10,7 +10,7 @@
   <title>Outpace</title>
   <link rel="preload" href="assets/cockpit-alpha.webp" as="image" type="image/webp">
   <link rel="preload" href="assets/station-lounge-alpha.png" as="image">
-  <link rel="stylesheet" href="style.css?v=20261011a">
+  <link rel="stylesheet" href="style.css?v=20261011b">
 </head>
 <body>
   <main id="game" data-state="menu">
@@ -84,6 +84,7 @@
         <p class="kicker" id="result-kicker">signal lost</p>
         <h2 id="result-title">Hull Breach</h2>
         <p class="result-message" id="result-message">Flight recorder sealed.</p>
+        <p class="insurance-line result-insurance hidden" id="result-insurance" aria-live="polite"></p>
         <div class="result-grid">
           <div>
             <span>Score</span>
@@ -138,6 +139,7 @@
               <strong id="station-route">02</strong>
             </div>
           </div>
+          <p class="insurance-line station-insurance" id="station-insurance"></p>
         </div>
         <button id="station-terminal-hotspot" class="station-terminal-hotspot" type="button" aria-label="Open dock terminal" aria-expanded="false">
           <span class="terminal-glass" aria-hidden="true">
@@ -286,7 +288,7 @@
 
     // Fresh copies of the files a stale cache can wedge, then a reload that skips the cache.
     const hardReload = async () => {
-      const files = ['./game.mjs?v=20261011a', './cloud.mjs', './style.css?v=20261011a', '../../lib/three/0.160.0/three.module.js'];
+      const files = ['./game.mjs?v=20261011b', './cloud.mjs', './style.css?v=20261011b', '../../lib/three/0.160.0/three.module.js'];
       const refresh = Promise.all(files.map((file) => fetch(file, { cache: 'reload' }).catch(() => {})));
       await Promise.race([refresh, new Promise((resolve) => setTimeout(resolve, 4000))]);
       const url = new URL(location.href);
@@ -309,7 +311,7 @@
 
     window.addEventListener('error', (event) => markGameError(event.error || event.message));
     window.addEventListener('unhandledrejection', (event) => markGameError(event.reason));
-    import('./game.mjs?v=20261011a').catch(markGameError);
+    import('./game.mjs?v=20261011b').catch(markGameError);
   </script>
 </body>
 </html>

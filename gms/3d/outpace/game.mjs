@@ -60,6 +60,7 @@ const resultScore = document.getElementById('result-score');
 const resultBest = document.getElementById('result-best');
 const resultWave = document.getElementById('result-wave');
 const resultDebt = document.getElementById('result-debt');
+const resultInsurance = document.getElementById('result-insurance');
 const resultTitle = document.getElementById('result-title');
 const resultKicker = document.getElementById('result-kicker');
 const resultMessage = document.getElementById('result-message');
@@ -73,6 +74,7 @@ const stationCredits = document.getElementById('station-credits');
 const stationPayout = document.getElementById('station-payout');
 const stationCargo = document.getElementById('station-cargo');
 const stationDebt = document.getElementById('station-debt');
+const stationInsurance = document.getElementById('station-insurance');
 const stationRoute = document.getElementById('station-route');
 const stationTabs = document.getElementById('station-tabs');
 const stationPanelTitle = document.getElementById('station-panel-title');
@@ -91,6 +93,12 @@ const DOCK_FADE_OUT_MS = 760;
 const STARTING_DEBT = 2000;
 const DEBT_LIMIT = 10000;
 const DEBT_INTEREST_RATE = 0.02;
+// A policy year is 12 launches. Insured crashes cost only the excess; once the
+// year's claims are spent, repairs are billed in full until it renews.
+const INSURANCE_FLIGHTS_PER_YEAR = 12;
+const INSURANCE_CLAIMS_PER_YEAR = 3;
+const INSURANCE_EXCESS_RATE = 0.2;
+const INSURANCE_EXCESS_PAYOUT_CAP = 0.4;
 let resultUnlockTimeout = 0;
 let resultCountdownTimer = 0;
 let dockTransitionTimers = [];
@@ -908,7 +916,21 @@ function makeDefaultSave() {
     upgrades: Object.fromEntries(UPGRADE_DEFS.map((def) => [def.id, 0])),
     stats: makeDefaultStats(),
     story: createStoryBoard(),
+    insurance: makeDefaultInsurance(),
   };
+}
+
+function makeDefaultInsurance() {
+  return { launches: 0, year: 0, claimsUsed: 0 };
+}
+
+function normalizeInsurance(raw) {
+  const ins = makeDefaultInsurance();
+  if (!raw || typeof raw !== 'object') return ins;
+  ins.launches = Math.max(0, Math.round(Number(raw.launches) || 0));
+  ins.year = Math.max(0, Math.round(Number(raw.year) || 0));
+  ins.claimsUsed = clamp(Math.round(Number(raw.claimsUsed) || 0), 0, INSURANCE_CLAIMS_PER_YEAR);
+  return ins;
 }
 
 // Load-with-defaults. Anything this build does not know about is carried
@@ -943,6 +965,7 @@ function loadSave() {
     save.stats.bestCargo = Math.max(save.stats.bestCargo, getCargoCapacity(save.upgrades.cargo || 0));
     save.stats.bestWave = Math.max(1, save.stats.bestWave);
     save.story = normalizeStory(parsed.story);
+    save.insurance = normalizeInsurance(parsed.insurance);
   } catch {
     return makeDefaultSave();
   }
@@ -1127,6 +1150,46 @@ function calculateRepairBill() {
   return Math.round((340 + routePressure * 74 + installedLevels * 28) / 5) * 5;
 }
 
+function getInsurance() {
+  if (!state.save.insurance) state.save.insurance = makeDefaultInsurance();
+  return state.save.insurance;
+}
+
+function startInsuredFlight() {
+  const ins = getInsurance();
+  ins.launches += 1;
+  const year = Math.floor((ins.launches - 1) / INSURANCE_FLIGHTS_PER_YEAR);
+  if (year !== ins.year) {
+    ins.year = year;
+    ins.claimsUsed = 0;
+  }
+}
+
+function getInsuranceClaimsLeft() {
+  return Math.max(0, INSURANCE_CLAIMS_PER_YEAR - getInsurance().claimsUsed);
+}
+
+function getInsuranceFlightsToRenewal() {
+  const ins = getInsurance();
+  if (ins.launches <= 0) return INSURANCE_FLIGHTS_PER_YEAR;
+  return INSURANCE_FLIGHTS_PER_YEAR - ((ins.launches - 1) % INSURANCE_FLIGHTS_PER_YEAR) - 1;
+}
+
+function getInsuranceExcess(bill = calculateRepairBill(), route = state.save.route) {
+  const cap = getDeliveryPayout(route, 'small') * INSURANCE_EXCESS_PAYOUT_CAP;
+  return Math.min(bill, Math.max(5, Math.round(Math.min(bill * INSURANCE_EXCESS_RATE, cap) / 5) * 5));
+}
+
+function getInsuranceSummary() {
+  const left = getInsuranceClaimsLeft();
+  const renew = getInsuranceFlightsToRenewal();
+  if (left > 0) {
+    return `Insurance: ${left} of ${INSURANCE_CLAIMS_PER_YEAR} claims left this year · excess ${getInsuranceExcess()} cr`;
+  }
+  const when = renew > 0 ? `renews in ${renew} flight${renew === 1 ? '' : 's'}` : 'renews next launch';
+  return `Insurance: no claims left · full repairs (${calculateRepairBill()} cr) · ${when}`;
+}
+
 function applyDebtInterest() {
   if (state.save.debt <= 0) {
     state.lastDebtInterest = 0;
@@ -1141,8 +1204,12 @@ function applyDebtInterest() {
 
 function applyEscapePodRepair() {
   const bill = calculateRepairBill();
-  const paid = Math.min(state.save.credits, bill);
-  const addedDebt = bill - paid;
+  const ins = getInsurance();
+  const insured = ins.claimsUsed < INSURANCE_CLAIMS_PER_YEAR;
+  const charge = insured ? getInsuranceExcess(bill) : bill;
+  if (insured) ins.claimsUsed += 1;
+  const paid = Math.min(state.save.credits, charge);
+  const addedDebt = charge - paid;
   state.save.credits -= paid;
   state.save.debt += addedDebt;
   state.save.stats.escapePods += 1;
@@ -1152,7 +1219,7 @@ function applyEscapePodRepair() {
   state.confiscated = state.save.debt > DEBT_LIMIT;
   if (state.confiscated) state.save.stats.confiscations += 1;
   saveProgress();
-  return { bill, paid, addedDebt };
+  return { bill, charge, insured, paid, addedDebt };
 }
 
 function payDebt() {
@@ -4294,6 +4361,13 @@ function renderCargoOffice() {
       disabled: state.save.debt <= 0 || state.save.credits <= 0,
     },
     {
+      kicker: 'Hull insurance',
+      title: `${getInsuranceClaimsLeft()} of ${INSURANCE_CLAIMS_PER_YEAR} claims left`,
+      text: getInsuranceClaimsLeft() > 0
+        ? `A crash costs only the ${getInsuranceExcess()} cr excess. Claims renew every ${INSURANCE_FLIGHTS_PER_YEAR} launches (${getInsuranceFlightsToRenewal()} to go).`
+        : `Repairs are billed in full (${calculateRepairBill()} cr) until the policy renews in ${getInsuranceFlightsToRenewal()} launches.`,
+    },
+    {
       kicker: 'Shipyard',
       title: 'Purchase ship',
       text: 'Browse larger hulls, specialist cockpits, and premium contracts.',
@@ -4407,6 +4481,10 @@ function updateStationUi(payout = state.currentPayout, type = getStationType(), 
   stationPayout.textContent = String(payout || state.currentPayout || getDeliveryPayout(dockedRoute, type));
   stationCargo.textContent = `${getShipStats().cargo}t`;
   if (stationDebt) stationDebt.textContent = formatCredits(state.save.debt);
+  if (stationInsurance) {
+    stationInsurance.textContent = getInsuranceSummary();
+    stationInsurance.classList.toggle('spent', getInsuranceClaimsLeft() === 0);
+  }
   stationRoute.textContent = String(state.save.route).padStart(2, '0');
   renderStationPanel();
 }
@@ -4488,6 +4566,14 @@ function recordRunCompleted({ distance = state.routeDistance } = {}) {
   notifyRunCompleted();
 }
 
+function renderResultInsurance(show) {
+  if (!resultInsurance) return;
+  resultInsurance.classList.toggle('hidden', !show);
+  if (!show) return;
+  resultInsurance.textContent = getInsuranceSummary();
+  resultInsurance.classList.toggle('spent', getInsuranceClaimsLeft() === 0);
+}
+
 function showConfiscationResult(message = 'Debt exceeded the 10000 credit limit. The lender seized your ship at berth.') {
   state.running = false;
   state.firing = false;
@@ -4500,6 +4586,7 @@ function showConfiscationResult(message = 'Debt exceeded the 10000 credit limit.
   resultTitle.textContent = 'Ship Confiscated';
   resultKicker.textContent = 'lender seizure';
   if (resultMessage) resultMessage.textContent = message;
+  renderResultInsurance(false);
   menuEl.classList.add('hidden');
   stationEl.classList.add('hidden');
   resultEl.classList.remove('hidden');
@@ -4523,6 +4610,8 @@ function resetGame() {
       showConfiscationResult(`Debt interest added ${interest} credits and pushed the ledger over ${DEBT_LIMIT}. The lender seized your ship.`);
       return;
     }
+    startInsuredFlight();
+    saveProgress();
   }
   clearResultLock();
   clearDockTransition();
@@ -4589,7 +4678,7 @@ function finishGame() {
   state.firing = false;
   state.pointerDown = false;
   state.modalPaused = false;
-  const repair = DEMO_MODE ? { bill: 0, paid: 0, addedDebt: 0 } : applyEscapePodRepair();
+  const repair = DEMO_MODE ? { bill: 0, charge: 0, insured: false, paid: 0, addedDebt: 0 } : applyEscapePodRepair();
   const finalScore = Math.round(state.score);
   const previousBest = state.best;
   state.best = Math.max(state.best, finalScore);
@@ -4612,14 +4701,17 @@ function finishGame() {
     if (state.demo) {
       resultMessage.textContent = `Demo run sealed at ${finalScore} points through wave ${state.wave}.`;
     } else if (state.confiscated) {
-      resultMessage.textContent = `Escape pod recovered. Repair claim was ${repair.bill} credits, but debt reached ${formatCredits(state.save.debt)}. Your ship was confiscated to settle the account.`;
+      resultMessage.textContent = `Escape pod recovered. Your share of the ${repair.bill} credit repair was ${repair.charge}, and debt reached ${formatCredits(state.save.debt)}. Your ship was confiscated to settle the account.`;
     } else {
       const paidText = repair.addedDebt > 0
         ? `${repair.paid} paid, ${repair.addedDebt} added to debt`
         : `${repair.paid} paid in full`;
-      resultMessage.textContent = `Escape pod recovered. Salvage repair cost ${repair.bill} credits: ${paidText}. Debt now ${formatCredits(state.save.debt)}.`;
+      resultMessage.textContent = repair.insured
+        ? `Escape pod recovered. Repairs cost ${repair.bill} credits; insurance covered ${repair.bill - repair.charge}. Your ${repair.charge} excess: ${paidText}.`
+        : `Escape pod recovered. No insurance claims left, so the full ${repair.bill} credit repair is yours: ${paidText}.`;
     }
   }
+  renderResultInsurance(!state.demo && !state.confiscated);
   resultEl.classList.remove('hidden');
   fireButton.classList.add('hidden');
   setGameState('result');
@@ -5501,7 +5593,7 @@ async function boot() {
   // Render/perf probe for automated testing only — never present in normal play.
   if (params.has('probe')) {
     window.__outpace = {
-      THREE, renderer, scene, camera, state, materials, stationView,
+      THREE, renderer, scene, camera, state, materials, stationView, damage,
       spawn: { asteroid: createAsteroid, station: createStation, dock: createDockStation, drone: createDrone },
     };
   }
