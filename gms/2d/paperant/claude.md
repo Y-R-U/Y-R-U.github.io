@@ -126,6 +126,13 @@ under `?auto` / `?test`, so automated runs stay hermetic.
 - Pencil tip dot shrinks and turns amber, then red, as ink runs low.
 - Audio: unlock on pointerdown/touchend/click/keydown, audioSession=playback, suspend when hidden;
   one cached noise buffer.
-- Balance harness lives outside the repo (scratchpad `paperant-impl/sim.mjs`): node vm, a geometry check plus a BFS-
+- Balance harness: `tools/sim.mjs`: node vm, a geometry check plus a BFS-
   waypoint bot comparing the old time-ink against the new length-ink. Result: parity (951 vs 943 of 1000 portrait runs).
   L42 (The Grand Maze) is very hard for the bot under every ink rule.
+
+## Moving-obstacle start check (2026-10-11)
+- `node tools/sim.mjs new 0 portrait 1-0` (and `landscape`) runs only the level validator: GEO (goal/ant vs each
+  obstacle's full sweep envelope) and EARLY (ant travelling straight along its start heading meets a MOVING obstacle
+  within 2×ANT_SIZE px). Both must print 100/100. `node tools/sim.mjs new 20 portrait 95-100` adds the bot solve rate.
+- Obstacles never kill an ant (contact is a bounce), so "unfair start" means spawning on or against a moving block.
+  L99/L100 only grazed the sweep envelope by a few px; fixed anyway along with L95/L96 (start angle) and L100 (left ants x 0.06).

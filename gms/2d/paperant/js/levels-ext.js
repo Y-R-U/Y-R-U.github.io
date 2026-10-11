@@ -804,7 +804,7 @@
             name: 'Precision Master',
             description: 'Three tiny gaps, three guards.',
             timeLimit: 80,
-            ants: [{ x: 0.5, y: 0.06, angle: Math.PI / 2 }],
+            ants: [{ x: 0.5, y: 0.06, angle: 0 }],
             goals: [{ x: 0.5, y: 0.94, type: 'nest' }],
             obstacles: [
                 H(0.0, 0.26, 0.46, null),
@@ -823,7 +823,7 @@
             name: 'The Hive',
             description: 'Dense pillars, four ordered stops.',
             timeLimit: 120,
-            ants: [{ x: 0.08, y: 0.5, angle: 0 }],
+            ants: [{ x: 0.08, y: 0.5, angle: -Math.PI / 2 }],
             goals: [
                 { x: 0.92, y: 0.12, type: 'food', order: 1 },
                 { x: 0.12, y: 0.12, type: 'sugar', order: 2 },
@@ -876,7 +876,7 @@
             ants: [
                 { x: 0.08, y: 0.1, angle: Math.PI / 4 },
                 { x: 0.08, y: 0.3, angle: 0 },
-                { x: 0.08, y: 0.5, angle: 0 },
+                { x: 0.08, y: 0.52, angle: 0 },
                 { x: 0.08, y: 0.7, angle: 0 },
                 { x: 0.08, y: 0.9, angle: -Math.PI / 4 },
                 { x: 0.92, y: 0.3, angle: Math.PI },
@@ -905,11 +905,11 @@
             description: 'The last page. Everything at once.',
             timeLimit: 180,
             ants: [
-                { x: 0.08, y: 0.15, angle: 0 },
-                { x: 0.08, y: 0.4, angle: 0 },
-                { x: 0.08, y: 0.6, angle: 0 },
-                { x: 0.08, y: 0.85, angle: 0 },
-                { x: 0.5, y: 0.08, angle: Math.PI / 2 },
+                { x: 0.06, y: 0.15, angle: 0 },
+                { x: 0.06, y: 0.4, angle: 0 },
+                { x: 0.06, y: 0.6, angle: 0 },
+                { x: 0.06, y: 0.85, angle: 0 },
+                { x: 0.52, y: 0.08, angle: Math.PI / 2 },
             ],
             goals: [
                 { x: 0.3, y: 0.12, type: 'food', order: 1 },
