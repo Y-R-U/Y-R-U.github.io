@@ -371,3 +371,22 @@ button.big.gold { background: linear-gradient(180deg, #e8c355, #c99b2e); color: 
 @media (min-width: 700px) {
   #panel, #ed-tools { max-width: 520px; }
 }
+
+/* short landscape: two-column skirmish setup with a sticky Begin button */
+@media (orientation: landscape) and (max-height: 560px) {
+  #skirmish .scr-head { padding: max(8px, env(safe-area-inset-top)) calc(16px + var(--br8t-account-space, 0px)) 6px 16px; }
+  #skirmish .scr-head h2 { font-size: 19px; }
+  #sk-random:not(.hidden) {
+    display: grid; grid-template-columns: 1.25fr 1fr; column-gap: 16px; align-content: start;
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+  #sk-random .form-row { margin-bottom: 9px; grid-column: 1; }
+  #sk-random .form-row > label { margin-bottom: 5px; font-size: 11px; }
+  #sk-random .form-row:nth-child(4) { grid-column: 2; grid-row: 1 / span 4; }
+  #sk-random .chips { gap: 6px; }
+  #sk-random .chip { padding: 7px 12px; font-size: 13px; }
+  #sk-random .rival-row { padding: 5px 10px; }
+  #sk-random .rival-row select { padding: 4px 6px; }
+  #sk-random #sk-seed { padding: 7px 10px; }
+  #sk-start { grid-column: 1 / -1; position: sticky; bottom: 6px; z-index: 1; margin: 4px 0 8px; padding-top: 11px; padding-bottom: 11px; }
+}

@@ -110,3 +110,10 @@ JSON-serializable (powers autosave/Continue and the node-side balance sim):
 - Army meshes flagged `animating` are skipped by `syncArmies` position sync.
 - Editor slots = colour indices; exported maps compact them to empire indices
   (player is always index 0 = first base).
+
+## Landscape skirmish setup (2026-10-11)
+- Short landscape (`max-height: 560px`): `#sk-random` becomes a two-column grid (map style/size/rivals/seed left,
+  rival personalities right) with compact chips, and `#sk-start` is sticky at the bottom, so Begin Conquest is on
+  screen without scrolling at 844×390 and 915×412 even with 5 rivals. Portrait is untouched.
+- Known, not fixed: in portrait the account avatar half-covers the Custom tab, and the landscape home menu scrolls
+  (Skirmish sits below the fold).
