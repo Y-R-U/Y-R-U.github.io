@@ -6,6 +6,8 @@
  *   DARK -> inverted page, gang ranks, knives, five more skill levels, its own run+records
  *   start a THUG run -> walking back into the light asks "stay a THUG?", with YES locked
  *   win the THUG run -> YES works, and you keep the knife in the daylight
+ * DARK is free (no purchase) — the release-build gating of CYBER/DEITIES is in releasegate,
+ * accountgate and familygate; this gate runs on localhost source, where DEV opens everything.
  *
  *   node tools/darkgate.mjs
  */
@@ -76,6 +78,15 @@ try {
     return JSON.stringify({ light: cfg.perkMax(p, 'light'), dark: cfg.perkMax(p, 'dark') });
   })()`));
   ok('skills go five levels deeper in the dark', caps.dark === caps.light + 5, JSON.stringify(caps));
+  // DARK is free, so its levels are too; CYBER/DEITIES (paid) add theirs only with the upgrade.
+  const free = JSON.parse(await c.eval(`(async()=>{
+    const cfg = await import('/js/config.js');
+    const p = cfg.PERKS[0], sv = { darkUnlocked: true, thugWon: true, simulantWon: true };
+    return JSON.stringify({ base: p.max, unpaid: cfg.perkMax(p, sv, false), paid: cfg.perkMax(p, sv, true),
+      moveUnpaid: cfg.moveMaxLv(sv, null, 'power', false), movePaid: cfg.moveMaxLv(sv, null, 'power', true) });
+  })()`));
+  ok('DARK\'s five levels need no purchase', free.unpaid === free.base + 5, JSON.stringify(free));
+  ok('the paid worlds\' levels need the upgrade', free.paid === free.unpaid + 2 && free.movePaid === free.moveUnpaid + 2, JSON.stringify(free));
 
   // Back to the light with no thug run in play: straight through, no question asked.
   await c.eval(`document.getElementById('btnDark').click()`);

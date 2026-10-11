@@ -25,15 +25,16 @@ for (const edition of ['home', 'itch']) {
   let html = await readFile(join(root, 'index.html'), 'utf8');
   html = html.replace(/<link[^>]+https:\/\/fonts\.[^>]+>\n/g, '')
     .replace(/<link rel="stylesheet" href="css\/style\.css(?:\?[^"<>]*)?">/, '<link rel="stylesheet" href="assets/fonts/fonts.css">\n$&');
-  if (edition === 'itch') html = html.replace('RAGDOJO</title>', 'RAGDOJO — Free LIGHT Campaign</title>');
+  if (edition === 'itch') html = html.replace('RAGDOJO</title>', 'RAGDOJO — Free LIGHT and DARK Campaigns</title>');
   await writeFile(join(out, 'index.html'), html);
   const css = await transform(await readFile(join(root, 'css/style.css'), 'utf8'), { loader: 'css', minify: true });
   await writeFile(join(out, 'css/style.css'), css.code);
   await cp(join(root, 'assets/fonts'), join(out, 'assets/fonts'), { recursive: true });
   for (const file of await readdir(join(root, 'assets/audio'))) {
-    if (/^[a-z0-9]+\.mp3$/.test(file) && (edition === 'home' || !file.startsWith('d'))) await cp(join(root, 'assets/audio', file), join(out, 'assets/audio', file));
+    if (/^[a-z0-9]+\.mp3$/.test(file)) await cp(join(root, 'assets/audio', file), join(out, 'assets/audio', file));
   }
   await cp(join(root, 'privacy.html'), join(out, 'privacy.html'));
+  await cp(join(root, 'terms.html'), join(out, 'terms.html'));
   const files = [];
   async function walk(dir) { for (const f of (await readdir(dir)).sort()) { const p = join(dir, f); const st = await stat(p); if (st.isDirectory()) await walk(p); else files.push({ path: relative(out, p), bytes: st.size, sha256: createHash('sha256').update(await readFile(p)).digest('hex') }); } }
   await walk(out);

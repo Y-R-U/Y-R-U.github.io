@@ -1,4 +1,5 @@
 // Entitlements only exist in memory, scoped to the current verified account. Never in saves.
+// The one product, ragdojo_supporter, opens CYBER and DEITIES; LIGHT and DARK are free.
 export class Purchases {
   constructor(auth, request = fetch, changed = () => {}) { this.auth = auth; this.request = (...args) => request(...args); this.changed = changed; this.owned = false; this.generation = 0; this.uid = null; }
   async refresh() {
@@ -13,7 +14,7 @@ export class Purchases {
     if (!res.ok) throw new Error('Could not check your purchase. Try Restore again when online.');
     const data = await res.json();
     if (generation !== this.generation || uid !== this.auth.user?.uid || !this.auth.signedIn) return false;
-    this.owned = data.owned === true && data.product === 'ragdojo_dark' && data.testMode === true;
+    this.owned = data.owned === true && data.product === 'ragdojo_supporter' && data.testMode === true;
     this.changed(this.owned); return this.owned;
   }
   async checkout(analytics = {}) {

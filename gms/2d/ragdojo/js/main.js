@@ -18,7 +18,7 @@ import { buildShop } from './shop.js';
 import { MUSIC, TRACK_NAME, poolFor, roleTrack, unlockedFightTracks, pickFightTrack, RECENT_KEEP } from './music.js';
 
 import { DEV, DEMO, ACCOUNTS, HOME } from './edition.js?v=20261008-names';
-import { Purchases } from './purchases.js';
+import { Purchases } from './purchases.js?v=20261011-supporter';
 import { createFamilyAccess } from './family-access.js?v=20261008-names';
 import { track, visitor, source, analyticsChoice, analyticsEnabled } from './analytics.js';
 const qs = new URLSearchParams(location.search);
@@ -27,6 +27,12 @@ let familyStorage;
 try { familyStorage = localStorage; } catch {}
 const familyAccess = createFamilyAccess(location.hostname, familyStorage, !DEMO);
 const hasPremium = () => DEV || familyAccess.active || (!DEMO && purchases?.owned === true);
+/** LIGHT and DARK are free; the supporter upgrade opens these. */
+const PAID_WORLDS = ['cyborg', 'god'];
+const isPaid = (id) => PAID_WORLDS.includes(id);
+const PAID_NAMES = 'CYBER and DEITIES';
+// null until probed: the purchase API is not live yet, and asking it repeatedly is just noise.
+let paymentsUp = null;
 
 const cvs = document.getElementById('game');
 const ctx = cvs.getContext('2d', { alpha: false });
@@ -136,7 +142,7 @@ function applyTheme() {
 
 /** Each world past LIGHT is opened by winning the previous world's replay run. */
 const worldEarned = (id) => id === 'light' || !!S[worldOf(id).flag];
-const worldOpen = (id) => id === 'light' || (worldEarned(id) && hasPremium());
+const worldOpen = (id) => id === 'light' || (worldEarned(id) && (!isPaid(id) || hasPremium()));
 /** True once you have won a bully run in the light — that is what opens the door. */
 const darkOpen = () => worldOpen('dark');
 /** Past DARK the single toggle becomes a list of worlds. */
@@ -155,8 +161,7 @@ const CHAMP_TITLE = { light: 'CHAMPION', dark: 'THE BOSS', cyborg: 'SINGULARITY'
 const thugInPlay = () => !!(S.stash.dark ? S.stash.dark.bully : false) || (S.theme === 'dark' && S.bully);
 
 function setTheme(to, { keepMoves = null, fresh = false } = {}) {
-  if (to !== 'light' && !worldOpen(to)) { if (!hasPremium()) openUpgrade(); return; }
-  if (keepMoves && !hasPremium()) keepMoves = false;
+  if (to !== 'light' && !worldOpen(to)) { if (worldEarned(to)) openUpgrade(to); return; }
   if (to === S.theme && !fresh) return;
   S.stash[S.theme] = Object.fromEntries(RUN_KEYS.map((k) => [k, S[k]]));
   // `fresh` starts the world's campaign again from fight 1. Its records are all-time and stay.
@@ -170,6 +175,7 @@ function setTheme(to, { keepMoves = null, fresh = false } = {}) {
   persist(S);
   setMode('hub');
   refreshHub();
+  if (to === 'dark') maybeNudge();
 }
 
 // ── matches ──────────────────────────────────────────────────────────────
@@ -192,7 +198,7 @@ function startDemo() {
 }
 
 function startFight(levelIdx, bully = false) {
-  if ((S.theme !== 'light' || S.carryDark) && !hasPremium()) { parkDark(); refreshHub(); openUpgrade(); return; }
+  if (isPaid(S.theme) && !hasPremium()) { const was = S.theme; parkPaid(); refreshHub(); openUpgrade(was); return; }
   if (pendingCloud) { applyCloud(); toMenu(); return; }
   // Never trust the index: an out-of-range one throws inside the click handler, which looks
   // exactly like a button that does nothing.
@@ -435,7 +441,7 @@ function refreshHub() {
   dk.textContent = darkOpen() ? (S.theme === 'dark' ? '☀ LIGHT' : '☾ DARK') : '🔒 DARK';
   dk.title = darkOpen()
     ? (S.theme === 'dark' ? 'Back to the dojo' : 'The streets after dark')
-    : (!hasPremium() ? 'Permanent DARK upgrade required; win BULLY to enter' : 'Win a BULLY run to unlock');
+    : 'Win a BULLY run to unlock';
 }
 
 // ── render ───────────────────────────────────────────────────────────────
@@ -522,7 +528,6 @@ $('btnTrophy').onclick = () => { click(); showVictory(S.bully, false); };
 $('btnDark').onclick = () => {
   click();
   if (manyWorlds()) { openWorlds(); return; }
-  if (!hasPremium()) { openUpgrade(); return; }
   if (!darkOpen()) {
     // Locked, and it says why rather than doing nothing.
     match && match.fx && match.fx.text(SHEET_W / 2, GROUND_Y - 260,
@@ -562,9 +567,11 @@ function openWorlds() {
     const why = here ? 'you are here'
       : open ? (S.stash[w.id] ? `fight ${Math.min(TOTAL_LEVELS, (S.stash[w.id].level | 0) + 1)}` : 'fight 1')
       : !worldEarned(w.id) ? `win a ${prev(w.id).bully} run`
-      : 'needs the DARK upgrade';
+      : paymentsUp ? 'support the dev' : 'support the dev · soon';
+    // Earned but unpaid stays tappable: it opens the upgrade rather than doing nothing.
+    const tappable = !here && (open || worldEarned(w.id));
     return `<button class="btn world${here ? ' on' : ''}${open ? '' : ' locked'}" data-world="${w.id}"` +
-      `${open && !here ? '' : ' disabled'}><span>${open ? w.icon : '🔒'} ${w.name}` +
+      `${tappable ? '' : ' disabled'}><span>${open ? w.icon : '🔒'} ${w.name}` +
       `<small class="modes">${w.mode.toLowerCase()} · ${w.bully.toLowerCase()}</small></span><small>${why}</small></button>`;
   }).join('');
   $('worldRows').querySelectorAll('[data-world]').forEach((b) => {
@@ -573,6 +580,7 @@ function openWorlds() {
       const to = b.dataset.world;
       // Leaving the dark mid-THUG still gets asked whether to keep the knife.
       if (to === 'light' && S.theme === 'dark' && thugInPlay()) { openThug(); return; }
+      if (!worldOpen(to)) { openUpgrade(to); return; }
       overlay(null);
       setTheme(to, { keepMoves: to === 'light' ? false : null });
     };
@@ -596,7 +604,7 @@ $('btnResult').onclick = () => {
   overlay(null);
   const R = pendingResult;
   if (R && R.result === 'lose') startFight(R.m.level.idx, R.bully);
-  else { setMode('hub'); refreshHub(); }
+  else { setMode('hub'); refreshHub(); if (S.theme === 'dark') maybeNudge(); }
 };
 $('btnResMenu').onclick = () => { click(); overlay(null); toMenu(); };
 $('btnQuit').onclick = () => { click(); overlay(null); toMenu(); };
@@ -845,7 +853,7 @@ function applySettings() {
 // ── boot ─────────────────────────────────────────────────────────────────
 const BOOT_MSGS = ['sharpening pencils…', 'ruling lines…', 'tying bandanas…', 'warming up the ragdolls…', 'ready'];
 async function boot() {
-  if (!DEV) parkDark();
+  if (!DEV) parkPaid();
   resize();
   show('boot');
   let step = 0;
@@ -884,16 +892,15 @@ boot().catch((err) => {
 if (DEV) window.__ragdojo = { get save() { return S; }, get match() { return match; }, startFight, fightTrack, fightPool, setTheme, get LEVELS() { return LEVELS(); }, S };
 if (DEV) window.__input = input;
 
-// Paid access never deletes earned progress. Park the dark run intact while signed out,
-// refunded or offline; restoring ownership lets the player resume it from the DARK button.
-function parkDark() {
-  if (S.theme !== 'light') {
-    S.stash[S.theme] = Object.fromEntries(RUN_KEYS.map(k => [k, S[k]]));
-    const light = S.stash.light || RUN();
-    for (const k of RUN_KEYS) S[k] = light[k];
-    S.theme = 'light';
-  }
-  S.carryDark = false;
+// Paid access never deletes earned progress. Park a CYBER/DEITIES run intact while signed
+// out, refunded or offline; restoring ownership resumes it from the WORLDS list. DARK is free.
+function parkPaid() {
+  if (!isPaid(S.theme) || hasPremium()) return;
+  S.stash[S.theme] = Object.fromEntries(RUN_KEYS.map(k => [k, S[k]]));
+  const back = S.darkUnlocked && S.stash.dark ? 'dark' : 'light';
+  const run = S.stash[back] || RUN();
+  for (const k of RUN_KEYS) S[k] = run[k];
+  S.theme = back;
   sheetLevel = -1;
   applyTheme();
 }
@@ -901,56 +908,75 @@ function applyCloud() {
   if (!pendingCloud) return;
   // Heal using the game's established loader; remote saves contain progress only.
   S = load(); pendingCloud = null;
-  if (!hasPremium()) parkDark();
+  parkPaid();
   match = null; sheetLevel = -1;
   applySettings();
   if (mode === 'hub') setMode('hub');
 }
 function purchaseStatus(text) { $('purchaseStatus').textContent = text; }
+const SOON = `Supporting the developer is coming soon — thank you for looking! Until then ${PAID_NAMES} stay locked, and LIGHT and DARK are free.`;
+/** One cheap probe of the purchase API; nothing else asks it anything until this says yes. */
+async function probePayments() {
+  if (DEMO || !ACCOUNTS) return false;
+  try {
+    const res = await fetch('/api/ragdojo/offer', { cache: 'no-store' });
+    const offer = res.ok ? await res.json() : null;
+    paymentsUp = !!(offer && offer.testMode && offer.product === 'ragdojo_supporter' && offer.currency && offer.amount > 0);
+    return paymentsUp ? offer : false;
+  } catch { paymentsUp = false; return false; }
+}
 async function restorePurchase() {
   if (!purchases) { purchaseStatus('Use the account button to sign in on games.br8t.com.'); return; }
+  if (!paymentsUp) { if (paymentsUp === false && !familyAccess.available) purchaseStatus(SOON); return; }
   try {
     const owned = await purchases.refresh();
-    purchaseStatus(owned ? 'DARK upgrade restored. Win a BULLY run to enter; earned DARK progress is kept.' : 'No purchase found on this account. Sign in with the same Google or email account used at checkout.');
+    purchaseStatus(owned ? `Thank you — your support is restored. ${PAID_NAMES} open as you earn them; earned progress is kept.` : 'No purchase found on this account. Sign in with the same Google or email account used at checkout.');
     $('btnCheckout').disabled = !!owned || !account?.auth.signedIn;
     refreshHub();
   } catch (e) { purchaseStatus(e.message); }
 }
-function openUpgrade() {
+/** The world the player was reaching for when the upgrade opened, so family/restore can follow through. */
+let upgradeFor = null;
+function openUpgrade(forWorld = null) {
+  upgradeFor = forWorld;
+  hideNudge();
   track('upgrade_view', S);
   overlay('premium');
   $('premiumHome').classList.toggle('hidden', familyAccess.available || (!DEMO && ACCOUNTS));
   $('btnFamilySkip').classList.toggle('hidden', !familyAccess.available);
   $('btnFamilySkip').disabled = familyAccess.active;
   $('btnFamilySkip').textContent = familyAccess.active ? 'FAMILY ACCESS ENABLED' : 'Skip payment — I’m a family member';
-  $('btnRestore').classList.toggle('hidden', DEMO || !ACCOUNTS);
+  $('btnRestore').classList.add('hidden');
   $('btnCheckout').classList.toggle('hidden', DEMO || !ACCOUNTS);
-  purchaseStatus(DEMO ? 'Play LIGHT here. Accounts and the DARK upgrade live on games.br8t.com.' : 'Test checkout only. Sign in using the account button before buying or restoring.');
-  if (familyAccess.available) purchaseStatus(familyAccess.active
-    ? 'Family access enabled on this network. Complete LIGHT and win a BULLY run to enter DARK.'
-    : 'Playing on a 192.* address? Family members can skip payment here. Complete LIGHT and win a BULLY run to enter DARK.');
+  $('btnCheckout').textContent = 'SUPPORT · COMING SOON';
   $('btnCheckout').disabled = true;
+  purchaseStatus(DEMO ? `LIGHT and DARK are free here. Supporting the developer (and the ${PAID_NAMES} thank-you) lives on games.br8t.com.`
+    : ACCOUNTS ? 'Checking the upgrade…' : SOON);
+  if (familyAccess.available) purchaseStatus(familyAccess.active
+    ? `Family access enabled on this network. Win a THUG run to open CYBER, then a SIMULANT run for DEITIES.`
+    : `Playing on a 192.* address? Family members can skip payment here. ${PAID_NAMES} still open by winning THUG, then SIMULANT.`);
   if (DEMO || !ACCOUNTS) return;
-  void fetch('/api/ragdojo/offer', { cache: 'no-store' }).then(async res => {
-    if (!res.ok) throw new Error('Upgrade checkout is not configured yet.');
-    const offer = await res.json();
-    if (!offer.testMode || offer.product !== 'ragdojo_dark') throw new Error('Upgrade unavailable.');
+  void probePayments().then(async offer => {
+    if (!$('premium').classList.contains('show')) return;
+    if (!offer) { if (!familyAccess.available) purchaseStatus(SOON); return; }
     const digits = new Intl.NumberFormat('en', { style: 'currency', currency: offer.currency }).resolvedOptions().maximumFractionDigits;
-    $('btnCheckout').textContent = 'TEST UPGRADE · ' + new Intl.NumberFormat('en', { style: 'currency', currency: offer.currency }).format(offer.amount / 10 ** digits);
+    $('btnCheckout').textContent = 'SUPPORT (TEST) · ' + new Intl.NumberFormat('en', { style: 'currency', currency: offer.currency }).format(offer.amount / 10 ** digits);
     $('btnCheckout').disabled = !account?.auth.signedIn || !!purchases?.owned;
+    $('btnRestore').classList.remove('hidden');
+    if (!familyAccess.available) purchaseStatus('Test checkout only. Sign in using the account button before buying or restoring.');
     if (account?.auth.signedIn) await restorePurchase();
-  }).catch(e => purchaseStatus(e.message));
+  });
 }
 $('btnUpgrade').onclick = () => { click(); openUpgrade(); };
 $('btnPremiumClose').onclick = () => { click(); overlay(null); };
 $('btnFamilySkip').onclick = () => {
   if (!familyAccess.grant()) return;
   click(); refreshHub();
-  if (darkOpen() && S.theme === 'light') { overlay(null); setTheme('dark'); }
+  if (upgradeFor && worldOpen(upgradeFor)) { overlay(null); setTheme(upgradeFor); }
   else {
     $('btnFamilySkip').disabled = true;
     $('btnFamilySkip').textContent = 'FAMILY ACCESS ENABLED';
-    purchaseStatus('Family access enabled on this network. Complete LIGHT and win a BULLY run to enter DARK.');
+    purchaseStatus('Family access enabled on this network. Win a THUG run to open CYBER, then a SIMULANT run for DEITIES.');
   }
 };
 $('premiumHome').href = HOME + '?from=itch';
@@ -960,6 +986,27 @@ $('btnCheckout').onclick = async () => {
   try { location.assign(await purchases.checkout({ visitor: visitor(), source })); }
   catch (e) { purchaseStatus(e.message); $('btnCheckout').disabled = !account?.auth.signedIn; }
 };
+
+/**
+ * DARK is free; this is the gentle ask. Never a modal, never mid-fight, never for supporters,
+ * and at most once every two days on this device.
+ */
+const NUDGE_KEY = 'ragdojo.nudge.v1';
+const NUDGE_GAP = 2 * 24 * 3600 * 1000;
+let nudgeT = null;
+function maybeNudge() {
+  if (hasPremium() || mode !== 'hub' || S.theme !== 'dark') return;
+  let last = 0;
+  try { last = +localStorage.getItem(NUDGE_KEY) || 0; } catch {}
+  if (Date.now() - last < NUDGE_GAP) return;
+  try { localStorage.setItem(NUDGE_KEY, String(Date.now())); } catch {}
+  $('nudge').classList.remove('hidden');
+  clearTimeout(nudgeT);
+  nudgeT = setTimeout(hideNudge, 14000);
+}
+function hideNudge() { clearTimeout(nudgeT); $('nudge').classList.add('hidden'); }
+$('btnNudge').onclick = () => { click(); openUpgrade(); };
+$('btnNudgeClose').onclick = () => { click(); hideNudge(); };
 $('btnCloudLocal').onclick = () => void account?.sync.choose('local');
 $('btnCloudRemote').onclick = () => void account?.sync.choose('remote');
 $('btnCloudRetry').onclick = () => { if (!account) return; if (account.sync.conflict) { openSettings(); return; } void account.sync.connect(account.auth.signedIn ? account.auth.user.uid : null); };
@@ -981,9 +1028,11 @@ if (ACCOUNTS && !DEV) {
       },
     });
     purchases = new Purchases(account.auth, fetch, owned => {
-      if (!hasPremium() && (S.theme !== 'light' || S.carryDark)) { parkDark(); toMenu(); }
+      if (!hasPremium() && isPaid(S.theme)) { parkPaid(); toMenu(); }
       refreshHub();
     });
+    // Probe once; ownership checks only start if the purchase API actually answers.
+    void probePayments().then(() => restorePurchase());
     account.auth.onChange(() => { void restorePurchase(); });
     // Returning from Checkout is only a prompt to check the server, never proof of payment.
     if (qs.get('checkout') === 'success') {

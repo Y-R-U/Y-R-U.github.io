@@ -1,6 +1,6 @@
 # itch.io draft — do not publish yet
 
-**Title:** RAGDOJO — Free LIGHT Campaign
+**Title:** RAGDOJO — Free LIGHT and DARK Campaigns
 
 **Short description:** Draw your punches. Launch your rivals. Climb nine bandana ranks in a ragdoll dojo scribbled on notebook paper.
 
@@ -26,12 +26,12 @@ animated gesture hints are available in the game.
 
 **The main home:** [games.br8t.com](https://games.br8t.com/gms/2d/ragdojo/?from=itch).
 Play the free campaign there with optional Google/email login for cloud saves.
-The permanent DARK upgrade adds the existing after-dark campaign, dark moves,
-THUG replay, deeper training and its own music. DARK requires completing LIGHT and
-winning a BULLY run. Upgrade price/availability will be announced when ready.
+LIGHT and DARK are both free. Supporting the developer with a one-time payment on
+games.br8t.com unlocks the CYBER and DEITIES worlds as a thank-you (opened in play by
+winning THUG, then SIMULANT). Availability and price will be announced when ready.
 
-This itch version contains the complete free LIGHT campaign. Purchases and account
-restoration are handled on games.br8t.com. Your itch browser save stays here and
+This itch version contains the complete free LIGHT and DARK campaigns. Support and
+account restoration are handled on games.br8t.com. Your itch browser save stays here and
 does not automatically transfer to the main site. No ads or required login.
 
 **Music:** Suno-generated instrumental soundtrack, used with commercial-use rights.

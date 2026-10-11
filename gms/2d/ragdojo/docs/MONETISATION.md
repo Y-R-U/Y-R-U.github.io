@@ -3,31 +3,61 @@
 Prepared 8 September 2026. **No deployment, publishing, account creation, live
 payments or spending has been performed.** Price and currency remain undecided.
 
-## Product decision
+## Product decision (revised 11 October 2026 — supersedes the September DARK gate)
 
-Aaron approved: **require purchase for DARK, including existing players**.
-Keep earned DARK progress; do not grandfather editable save flags into ownership.
+Since September the game grew to four worlds (LIGHT → DARK → CYBER → DEITIES). Aaron's
+current model:
 
-On 4 October 2026 Aaron additionally authorized family play when accessing the
-game through a literal `192.*` IPv4 address. The upgrade popup offers “Skip
-payment — I’m a family member”. Acceptance is remembered in a separate,
-origin-local browser preference and rechecked against the current hostname;
-it grants no account purchase and is never put in game/cloud saves. Normal
-LIGHT completion and BULLY victory prerequisites remain. Public hosts and the
-itch edition exclude this exception. Local source and home release artifacts
-include it; no deployment or live-payment changes are part of this update.
+| World | Access |
+| --- | --- |
+| **LIGHT** | Free. |
+| **DARK** | **Free.** A small, dismissible "support the developer" note appears in the hub on entering DARK or returning to the hub after a DARK win: at most once every 48 hours per device (`ragdojo.nudge.v1` in localStorage), never mid-fight, never for supporters/family, never a modal. It links to the upgrade panel. |
+| **CYBER, DEITIES** | **Paid**: one permanent payment, presented as **"Support the developer"** (warm, not salesy), that unlocks both worlds as a thank-you. Tied to a signed-in (non-anonymous Google/email) br8t account, server-verified by Firebase UID (product id `ragdojo_supporter`); restore by signing in on any device. |
+
+Each world keeps its gameplay prerequisite: win BULLY → DARK, win THUG → CYBER, win
+SIMULANT → DEITIES. Paying never skips one. Earned CYBER/DEITIES progress is parked, not
+deleted, while access is unavailable (signed out, refunded, offline); a parked run lands
+in DARK if you have a DARK run, else LIGHT (`parkPaid()` in main.js). Skill caps follow
+the same split: DARK's +5 levels are free; the +1 per later world needs the upgrade.
+
+**Payments are not live** (no price, no Stripe keys, no Firebase Admin credential). The
+client probes `GET /api/ragdojo/offer` once; if it is missing or unconfigured, CYBER and
+DEITIES show "support the dev · soon", the panel says support is coming soon, checkout is
+a disabled "SUPPORT · COMING SOON" button, Restore is hidden, and no entitlement request
+is ever sent (no retry/focus polling). Off games.br8t.com (GitHub Pages, LAN, itch) there
+are no account/payment requests at all.
+
+The `192.*` family exception (4 October 2026) is unchanged in mechanism and now stands in
+for the supporter upgrade: on a literal `192.*` IPv4 host the panel offers "Skip payment —
+I'm a family member", remembered in a separate origin-local preference, never in saves,
+excluded on public hosts and in the itch edition. Skipping from a world you have earned
+walks straight into it.
+
+Old `ragdojo_dark` purchases: none exist (nothing was ever deployed); the client rejects
+that product id. DARK careers parked by the September build simply reopen, free.
 
 Regression commands: `node --test tools/family-access.test.mjs tools/services.test.mjs`,
-`npm run build`, `node tools/familygate.mjs`, `node tools/releasegate.mjs`.
+`npm run build`, `node tools/releasegate.mjs`, `node tools/accountgate.mjs`,
+`node tools/familygate.mjs`, `node tools/darkgate.mjs`, `node tools/stuckgate.mjs`,
+`node tools/progressgate.mjs`; payments: `go test -race ./...` in `~/cc/ionos/ragdojo-payments`.
 
-| Free on games.br8t.com and itch.io | One permanent DARK upgrade on games.br8t.com |
-| --- | --- |
-| All 45 LIGHT fights / nine bandana ranks | Existing 45-fight DARK campaign |
-| Eight LIGHT gesture moves and earned upgrades | Eight existing dark moves, including knife volleys and gun mechanics |
-| BULLY replay, record book and new games | THUG replay and earned dark-move carry-back |
-| Fourteen LIGHT music tracks | Ten DARK tracks and five extra skill levels |
-| Local saves; login optional for play | Account-based purchase restoration |
-| Optional Google/email cloud saves on main site | Existing DARK career retained behind verified access |
+### Refunds and terms (decided 11 October 2026)
+
+Full refund on request within **14 days** of purchase, no questions asked — even if the
+player finished the paid worlds. A refund removes CYBER/DEITIES access (the service
+already revokes on a full refund); progress is kept. After 14 days, help only if
+something is broken. "This doesn't affect your rights under the Australian Consumer Law."
+Because a 14-day refund is offered, no EU withdrawal-waiver checkbox is needed.
+Draft page: `terms.html` (next to `privacy.html`, linked from the upgrade panel); support
+contact support@br8t.com; **business name is a marked placeholder**. Link it in Stripe
+(see the payments README: Public details + Checkout policies).
+
+### Future plans — TODO only, not built
+
+- **Events**: some free, some paid.
+- **Online battles**: a couple of free battles per day; unlimited for owners (supporters).
+
+### Original September notes (DARK gate — superseded)
 
 DARK retains its existing gameplay prerequisite: finish LIGHT, then win a BULLY
 run. Buying does not skip that prerequisite. The upgrade panel says so before
@@ -162,16 +192,21 @@ external home link in itch's actual preview before making it public.
 
 ## Remaining decisions and release approvals
 
-1. **One-time price and currency.** Needed to create/configure the Stripe test Price.
-2. **Private test configuration:** Stripe sandbox/test account and API/webhook keys,
-   Price ID; Firebase Admin credential with user lookup permission. Configure these
-   locally, never send secrets in chat. Then run the real test-mode rehearsal.
-3. **Business name, support email, intended sales countries, customer terms/refund
-   policy and purchase-record retention/tax setup.** Replace the draft privacy text.
-4. **itch creator account/slug and review of listing/media/AI metadata.** No upload yet.
-5. **Approval to deploy the reviewed test service/game, and separately publish itch.**
-   Live mode requires another explicit review/change: this executable rejects live
-   keys/events, and test entitlements must never migrate into a future live DB.
+Decided: the model above (LIGHT/DARK free, "Support the developer" unlocks CYBER +
+DEITIES) and the 14-day no-questions refund policy.
+
+Still open:
+
+1. **One-time price and currency.** Needed to create the Stripe test Price.
+2. **Stripe test keys:** sandbox account, API/webhook secrets, Price ID — configured
+   privately on the machine, never in chat. Then the real test-mode rehearsal.
+3. **Firebase Admin credential** with `firebaseauth.users.get` for revocation checks.
+4. **Business name** (placeholder in `terms.html` and `privacy.html`).
+5. **Sales countries and tax treatment** (Stripe Tax / GST) and purchase-record retention.
+6. itch creator account/slug and listing review; no upload yet.
+7. **Approval to deploy** the game to games.br8t.com and the test service, and separately
+   to publish itch. Live mode requires another explicit review: this executable rejects
+   live keys/events, and test entitlements must never migrate into a future live DB.
 
 Ads remain deferred. First look at completion/drop-off by fight, returning browsers
 and voluntary upgrade interest. Only investigate providers when those observations

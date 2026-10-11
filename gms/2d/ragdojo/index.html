@@ -7,10 +7,11 @@
 <meta name="theme-color" content="#3b3428">
 <meta name="description" content="RAGDOJO — a stick-fighting game on a sheet of paper. Draw gestures to fight.">
 <title>RAGDOJO</title>
+<link rel="icon" href="data:,">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Patrick+Hand&family=Caveat:wght@600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/style.css?v=20261008-names">
+<link rel="stylesheet" href="css/style.css?v=20261011-supporter">
 </head>
 <body>
 <div id="app">
@@ -34,7 +35,7 @@
     <div id="hub" class="screen">
       <div class="corner tl">
         <button class="icon" id="btnSettings" title="Settings">⚙</button>
-        <button class="icon" id="btnUpgrade" title="DARK upgrade">☾</button>
+        <button class="icon" id="btnUpgrade" title="Support the developer">★</button>
         <button class="icon" id="btnHelp" title="How to play">?</button>
       </div>
       <div class="corner tr">
@@ -46,6 +47,11 @@
         <div id="hubTitle" class="hubtitle"></div>
         <div id="hubSub" class="hubsub"></div>
         <button id="btnFight" class="btn big">FIGHT</button>
+      </div>
+      <div id="nudge" class="hidden" role="status">
+        <span>Enjoying DARK? It's free. If you'd like to support the developer, there's a thank-you: CYBER and DEITIES.</span>
+        <button id="btnNudge" class="btn">SEE IT</button>
+        <button id="btnNudgeClose" class="icon" aria-label="Dismiss">✕</button>
       </div>
       <div class="corner bl">
         <button class="btn hidden" id="btnDark">☾ DARK</button>
@@ -60,16 +66,15 @@
     <div id="premium" class="screen panel-screen">
       <div class="sheet narrow">
         <button class="icon close" id="btnPremiumClose" aria-label="Close upgrade">✕</button>
-        <h2>AFTER DARK</h2>
+        <h2>SUPPORT THE DEV</h2>
         <div class="rows">
-          <p>One permanent upgrade: 45 DARK fights, eight dark moves, deeper skill training, ten after-dark tracks and THUG replay — and beyond it, the CYBER and DEITIES worlds.</p>
-          <p>Complete LIGHT and win a BULLY run to enter. LIGHT’s 45 fights and BULLY replay stay free.</p>
-          <p>Already played DARK? Your earned progress is kept. Purchase is now required to access it.</p>
+          <p>LIGHT and DARK are free — 90 fights, both move sets, BULLY and THUG replays. RAGDOJO is made by one developer; if you enjoy it, a one-time thank-you keeps it going. As thanks, it opens the two worlds beyond: CYBER and DEITIES, with their moves, music and deeper training.</p>
+          <p>Supporting does not skip the climb: win a THUG run to open CYBER, then a SIMULANT run for DEITIES. Earned progress there is always kept.</p>
           <p id="purchaseStatus" role="status"></p>
           <a id="premiumHome" class="btn hidden" href="https://games.br8t.com/gms/2d/ragdojo/?from=itch" target="_blank" rel="noopener">PLAY ON GAMES.BR8T.COM</a>
-          <p class="fine">Full refunds remove upgrade access; progress is kept. No subscription. No ads.</p>
+          <p class="fine">Tied to your signed-in br8t account. Changed your mind? Full refund within 14 days, no questions asked (it closes CYBER and DEITIES again; progress is kept). No subscription. No ads. <a href="terms.html" target="_blank" rel="noopener">Terms &amp; refunds</a> · <a href="privacy.html" target="_blank" rel="noopener">Privacy</a></p>
         </div>
-        <div class="vicbtns"><button id="btnCheckout" class="btn" disabled>TEST UPGRADE · PRICE PENDING</button><button id="btnRestore" class="btn">RESTORE PURCHASE</button></div>
+        <div class="vicbtns"><button id="btnCheckout" class="btn" disabled>SUPPORT · COMING SOON</button><button id="btnRestore" class="btn hidden">RESTORE PURCHASE</button></div>
         <div class="vicbtns"><button id="btnFamilySkip" class="btn hidden">Skip payment — I’m a family member</button></div>
       </div>
     </div>
@@ -207,6 +212,6 @@
   }, 12000);
 })();
 </script>
-<script type="module" src="js/main.js?v=20261008-names"></script>
+<script type="module" src="js/main.js?v=20261011-supporter"></script>
 </body>
 </html>

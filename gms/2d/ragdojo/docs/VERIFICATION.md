@@ -1,3 +1,17 @@
+# Verification — 11 October 2026 (supporter model)
+
+| Check | Result |
+| --- | --- |
+| Go payment suite `go test -race ./...`, `go vet` | 17 tests pass (product `ragdojo_supporter`; analytics accepts all four worlds) |
+| `node --test tools/services.test.mjs tools/family-access.test.mjs` | 23 pass (retired `ragdojo_dark` id grants nothing) |
+| `releasegate` (itch + home builds) | free DARK + capped support note; forged CYBER save parked into DARK, career kept; "coming soon" copy; no checkout/restore off-site; no cheats/remote requests/errors; 12 s reload guard |
+| `accountgate` (home, local fixtures) | purchase API down: DARK free, CYBER calm "coming soon", 0 entitlement polls; API up: restore opens CYBER, CYBER fight, second profile restores, refund parks CYBER into DARK, account-switch choice |
+| `familygate` | free DARK on LAN/public/itch; family skip opens earned CYBER, fits at 320/390; remembered; prerequisites kept; public-host and itch denial |
+| `darkgate` 38, `worldgate` 50, `progressgate` 18, `stuckgate` 10, `uigate`, `panelgate` 18, `portraitgate`, `bootgate`, `keygate` 18, `flow` 24, `touch` 12, `soundtrackgate` 9 | all pass |
+| Manual CDP touch run, 390×844 and 844×390, Pages-like host (`[::1]`) | LIGHT fight, free DARK + note, note → panel, DARK fight, parked CYBER, worlds list, CYBER → "coming soon"; zero console errors |
+
+Same honest boundaries as below: no real Stripe/Firebase configuration exists yet.
+
 # Verification — 8 September 2026
 
 ## Passed locally

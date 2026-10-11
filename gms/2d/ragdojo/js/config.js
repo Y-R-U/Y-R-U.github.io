@@ -524,8 +524,8 @@ const curveLv = (lv, max) => Math.min(lv, max - DEEP_LEVELS - 1);
 /** Floor on any special's cooldown — a level that would only push past it buys nothing. */
 export const MIN_CD = 0.7;
 /**
- * Levels available on one move's power or cooldown track. `premium` false means no world
- * past LIGHT is open to this player, so nothing past the base cap is either.
+ * Levels available on one move's power or cooldown track. `premium` false means the paid
+ * worlds (CYBER, DEITIES) are shut to this player, so the levels they add are too.
  */
 export function moveMaxLv(save, m, track, premium = true) {
   const max = MOVE_MAX_LV + (premium ? worldBonus(save) : 0);
@@ -583,7 +583,8 @@ const PERK_CAP = { stiff: 6, armor: 12 };
 export function perkMax(p, save, premium = true) {
   // Old callers passed a theme string; keep that meaning (dark = the five extra levels).
   if (typeof save === 'string') save = { darkUnlocked: save === 'dark' };
-  const extra = premium && save && save.darkUnlocked ? DARK_PERK_LEVELS + worldBonus(save) : 0;
+  // DARK is free, so its five levels are too; the paid worlds' extra level each needs `premium`.
+  const extra = save && save.darkUnlocked ? DARK_PERK_LEVELS + (premium ? worldBonus(save) : 0) : 0;
   return Math.min(PERK_CAP[p.id] ?? Infinity, p.max + extra);
 }
 export const perkLocked = (p, save) => !!(p.needs && !(save && save[p.needs]));
